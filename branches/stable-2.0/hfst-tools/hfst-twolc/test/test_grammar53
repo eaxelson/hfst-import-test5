@@ -1,0 +1,7 @@
+Alphabet
+
+a:b a ;
+
+Rules
+"Rule"
+a:b => a ^ 3 _ ;

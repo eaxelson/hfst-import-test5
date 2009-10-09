@@ -1,0 +1,725 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR University of Helsinki
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: hfst-lexc 0.5-beta\n"
+"Report-Msgid-Bugs-To: hfst-bugs@helsinki.fi\n"
+"POT-Creation-Date: 2009-10-09 12:40+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#. TRANSLATORS: filename, line and column
+#: src/flex-utils.cc:115
+#, c-format
+msgid "%s:%d.%d"
+msgstr ""
+
+#. TRANSLATORS: filename, line, column to column
+#: src/flex-utils.cc:121
+#, c-format
+msgid "%s:%d.%d-%d"
+msgstr ""
+
+#. TRANSLATORS: filename, line-column to line-column
+#: src/flex-utils.cc:129
+#, c-format
+msgid "%s:%d.%d-%d.%d"
+msgstr ""
+
+#: src/flex-utils.cc:147
+#, c-format
+msgid "[near: `%s\\n']"
+msgstr ""
+
+#: src/flex-utils.cc:152
+#, c-format
+msgid "[near: `%s']"
+msgstr ""
+
+#: src/flex-utils.cc:156
+#, c-format
+msgid "[near: `%30s...' (truncated)]"
+msgstr ""
+
+#: src/flex-utils.cc:220
+#, c-format
+msgid "Stray escape char %% in %s\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:219
+msgid "<stdout>"
+msgstr ""
+
+#: src/hfst-lexc.cc:236
+#, c-format
+msgid ""
+"Usage: %s [OPTIONS] [INFILE...]\n"
+"Compile lexc files into an HFST transducer\n"
+"\n"
+"  -h, --help                   Print this help message\n"
+"  -V, --version                Print version info\n"
+"  -v, --verbose                Print verbosely while compiling\n"
+"  -q, --quiet                  Do not print verbosely while compiling\n"
+"  -o, --output=OUTFILE         Write output to OUTFILE\n"
+"  -w, --weighted               Use weighted transducer format\n"
+"  -u, --unweighted             Use unweighted transducer format\n"
+"  -t, --time                   Time all stuff\n"
+"  -d, --debug                  Print very verbosely\n"
+"  -y, --hlexcdebug             Enable Yacc's debug state\n"
+"  -X, --xerox                  Imitate Xerox lexc messages\n"
+"\n"
+"If either INFILE... or OUTFILE is missing or -, standard streams will be "
+"used.\n"
+"If BOTH INFILE... and OUTFILE are missing, readline interface will be used.\n"
+"If output is stdout, -q is implied.\n"
+"If SYMFILE is missing, symbol table will be written with transducer binary, "
+"if possible.\n"
+"\n"
+"Examples:\n"
+"  hfst-lexc -o file.hfst file.hlexc  compiles single lexicon withdefault "
+"options\n"
+"  hfst-lexc -w -v -o file.hwfst file1.hlexc file2.hlexc  compile weighted "
+"lexicons from multiple sources\n"
+"\n"
+"Report bugs to HFST team <hfst-bugs@helsinki.fi>\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:281
+#, c-format
+msgid ""
+"%s\n"
+"copyright (C) 2009 University of Helsinki,\n"
+"License GPLv3: GNU GPL version 3 <http://gnu.org/licenses/gpl.html>\n"
+"This is free software: you are free to change and redistribute it.\n"
+"There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:296
+#, c-format
+msgid "Try ``%s --help'' for more information.\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:306
+#, c-format
+msgid ""
+"\n"
+"Input/Output "
+"------------------------------------------------------------------\n"
+"    Source:      compile-source, merge-source, read-source, result-to-"
+"source,\n"
+"                 save-source.\n"
+"    Rules:       read-rules.\n"
+"    Result:      merge-result, read-result, save-result, source-to-result.\n"
+"    Properties:  add-props, reset-props, save-props.\n"
+"Operations "
+"--------------------------------------------------------------------\n"
+"    Composition: compose-result, extract-surface-forms, invert-source, "
+"invert-result.\n"
+"    Checking:    check-all, lookdown, lookup, random, random-lex, random-"
+"surf.\n"
+"    Switches:    ambiguities, duplicates, failures, obey-flags, print-"
+"space,\n"
+"                 recode-cp1252, quit-on-fail, show-flags, singles, time, "
+"utf8-mode.\n"
+"    Scripts:     begin-script, end-script, run-script.\n"
+"Display "
+"-----------------------------------------------------------------------\n"
+"    Misc:        banner, labels, props, status, storage.\n"
+"    Help:        completion, help, history, ?.\n"
+"Type 'quit' to exit.\n"
+"\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:325
+#, c-format
+msgid ""
+"\n"
+"Input/Output "
+"------------------------------------------------------------------\n"
+"    Source:      compile-source, save-source.\n"
+"Operations "
+"--------------------------------------------------------------------\n"
+"    Switches:    debug, verbose, time, weighted.\n"
+"Display "
+"-----------------------------------------------------------------------\n"
+"    Misc:        banner.\n"
+"    Help:        completion, help, history, ?.\n"
+"Type 'quit' to exit.\n"
+"\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:335
+#, c-format
+msgid ""
+"THIS version of hfst-lexc does NOT support MOST of the lexc commands\n"
+"In the meantime:\n"
+" * Handling of RULES (and RESULT) can be done with hfst-twolc\n"
+" * Inspecting can be done with hfst-summarize, hfst-fst2txt, ...\n"
+" * For legacy character set support, use iconv or recode\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:348
+#, c-format
+msgid ""
+"\n"
+"         *******************************************************\n"
+"         *   HFST Finite-State Lexicon Compiler %10s     *\n"
+"         *       compatible(?) with Xerox lexc 3.7.9           *\n"
+"         *                     created by                      *\n"
+"         *           Tommi Pirinen and the HFST team           *\n"
+"         *  Copyright (c) 2008-2009 by University of Helsinki  *\n"
+"         *                 All Rights Reversed.                *\n"
+"         *******************************************************\n"
+"\n"
+"\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:365
+#, c-format
+msgid ""
+"\n"
+"'compile-source <textfile>' reads the lexc source file contained in\n"
+"  <textfile>, compiles it, and stores the resulting network in the\n"
+"  SOURCE register.  You can save this network to file with the command\n"
+"  'save-source'.\n"
+"To read a pre-compiled network from file into the\n"
+"  SOURCE register, use the command 'read-source'.  To compose the SOURCE\n"
+"  network with a set of rule transducers, previously read in by\n"
+"  'read-rules', use the command 'compose-result'.\n"
+"\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:384
+#, c-format
+msgid ""
+"\n"
+"'?' displays a menu of available lexc commands.\n"
+"\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:394
+#, c-format
+msgid ""
+"\n"
+"'banner' displays information about the version and the authors of the\n"
+"Helsinki Finite-State Lexicon Compiler.\n"
+"\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:405
+#, c-format
+msgid ""
+"\n"
+"'help <command>' displays short documentation on what <command> does.\n"
+"  'help all' prints out all help messages.\n"
+"\n"
+"'?' displays a menu of available lexc commands.\n"
+"\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:418
+#, c-format
+msgid ""
+"\n"
+"'history' displays the history list.\n"
+"\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:428
+#, c-format
+msgid ""
+"\n"
+"'quit' exits lexc.\n"
+"\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:438
+#, c-format
+msgid ""
+"\n"
+"'save-source <filename>' stores the current SOURCE network to file in\n"
+"  a binary format.  Use 'read-source' or 'read-result' to read in files\n"
+"  created in this way.\n"
+"\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:450
+#, c-format
+msgid ""
+"\n"
+"'time' is an ON/OFF or toggled switch that provides timing information\n"
+"  for some commands. The default setting is OFF.\n"
+"\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:519
+#, c-format
+msgid "printing verbosely\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:520
+#, c-format
+msgid "debug enabled\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:521
+#, c-format
+msgid "timing enabled\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:524
+#, c-format
+msgid "building weighted transducer\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:528
+#, c-format
+msgid "building unweighted transducer\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:540
+#, c-format
+msgid ""
+"\n"
+"Reading from <stdin>\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:541 src/hfst-lexc.cc:726
+msgid "<stdin>"
+msgstr ""
+
+#: src/hfst-lexc.cc:547
+#, c-format
+msgid ""
+"\n"
+"reading from %s\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:556
+#, c-format
+msgid "There were parsing errors, aborting.\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:561
+#, c-format
+msgid "Compiling...\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:566
+#, c-format
+msgid "Saving result to standard output\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:571
+#, c-format
+msgid "Saving result to %s\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:593
+#, c-format
+msgid "Starting in utf8-mode (in fact, only supporting UTF-8)\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:634
+#, c-format
+msgid "History is empty.\n"
+msgstr ""
+
+#. TRANSLATORS: history listing: #  command
+#: src/hfst-lexc.cc:642
+#, c-format
+msgid "%5d  %s\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:647
+#, c-format
+msgid "This platform does not support history_list\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:655
+#, c-format
+msgid "Timing is OFF.\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:660
+#, c-format
+msgid "Timing is ON.\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:668
+#, c-format
+msgid "Verbosity is OFF.\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:673
+#, c-format
+msgid "Verbosity is ON.\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:681
+#, c-format
+msgid "Debugging is OFF.\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:686
+#, c-format
+msgid "Debugging is ON.\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:694
+#, c-format
+msgid "Changing weightedness after compilation will cause unstability!\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:702
+#, c-format
+msgid "Weights are OFF.\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:707
+#, c-format
+msgid "Weights are ON.\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:719
+msgid "input file [stdin]: "
+msgstr ""
+
+#: src/hfst-lexc.cc:724
+#, c-format
+msgid "Type a standard lexicon file. File ends with '<CR>^D'...\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:732 src/hfst-lexc.cc:751 src/hfst-lexc.cc:786
+#, c-format
+msgid "opening \"%s\"\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:734 src/hfst-lexc.cc:753 src/hfst-lexc.cc:787
+#, c-format
+msgid "Opening '%s'...\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:775
+msgid "Output file [cancel]: "
+msgstr ""
+
+#: src/hfst-lexc.cc:778
+#, c-format
+msgid "Cancelled.\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:792
+#, c-format
+msgid "Done.\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:797
+#, c-format
+msgid "'%s' is not an operation. Type '?' for a list.\n"
+msgstr ""
+
+#: src/hfst-lexc.cc:833
+msgid "Whole process"
+msgstr ""
+
+#: src/hfst-lexc.cc:834
+msgid " * String parsing"
+msgstr ""
+
+#: src/hfst-lexc.cc:835
+msgid " * String trie building"
+msgstr ""
+
+#: src/hfst-lexc.cc:836
+msgid " * Regular expression compiling"
+msgstr ""
+
+#: src/hfst-lexc.cc:837
+msgid " * Regular expression joining"
+msgstr ""
+
+#: src/hfst-lexc.cc:838
+msgid " * Completing sigma set"
+msgstr ""
+
+#: src/hfst-lexc.cc:839
+msgid " * Applying morphotax"
+msgstr ""
+
+#: src/hfst-lexc.cc:840
+msgid " * All the minimising"
+msgstr ""
+
+#: src/lexc.cc:109 src/lexc.cc:167 src/lexc.cc:197
+#, c-format
+msgid "Undeclared character %s in %s\n"
+msgstr ""
+
+#: src/lexc.cc:112 src/lexc.cc:170 src/lexc.cc:200
+#, c-format
+msgid "  All strings containing %s are dropped\n"
+msgstr ""
+
+#: src/lexc.cc:117 src/lexc.cc:175 src/lexc.cc:205 src/lexc.cc:270
+#, c-format
+msgid "Found Xymbol %s from %s\n"
+msgstr ""
+
+#: src/lexc.cc:264
+#, c-format
+msgid ""
+"Undeclared character %s in %s\n"
+"All strings containing %s dropped\n"
+msgstr ""
+
+#: src/lexc.cc:398
+#, c-format
+msgid "Building lexicon..."
+msgstr ""
+
+#: src/lexc.cc:402
+msgid "sigma\n"
+msgstr ""
+
+#: src/lexc.cc:403
+msgid "gamma\n"
+msgstr ""
+
+#: src/lexc.cc:411
+msgid "Strings trie\n"
+msgstr ""
+
+#: src/lexc.cc:416
+msgid "RegExps\n"
+msgstr ""
+
+#: src/lexc.cc:421
+msgid "Strings or RegExps\n"
+msgstr ""
+
+#: src/lexc.cc:425
+#, c-format
+msgid "Minimizing..."
+msgstr ""
+
+#: src/lexc.cc:430
+msgid "Morphotaxed\n"
+msgstr ""
+
+#: src/lexc.cc:431
+#, c-format
+msgid "Done!\n"
+msgstr ""
+
+#: src/lexcio.cc:90 src/lexcio.cc:135
+#, c-format
+msgid "could not open %s for writing: %s\n"
+msgstr ""
+
+#: src/lexcio.cc:128
+#, c-format
+msgid "could not open %s for reading: %s\n"
+msgstr ""
+
+#: src/lexcio.cc:142
+#, c-format
+msgid "could not open %s: %s\n"
+msgstr ""
+
+#: src/lexcio.cc:155
+#, c-format
+msgid "w%d: %s\n"
+msgstr ""
+
+#: src/lexcio.cc:160
+#, c-format
+msgid "W%d: %s"
+msgstr ""
+
+#: src/lexcio.cc:164
+#, c-format
+msgid "E%d: %s"
+msgstr ""
+
+#: src/lexcio.cc:192
+#, c-format
+msgid "%s: W%d: %s %s\n"
+msgstr ""
+
+#: src/lexcio.cc:198
+#, c-format
+msgid "%s: E%d: %s %s\n"
+msgstr ""
+
+#: src/lexcio.cc:222
+#, c-format
+msgid "%s:\n"
+msgstr ""
+
+#: src/lexcio.cc:237
+#, c-format
+msgid ", %s"
+msgstr ""
+
+#: src/lexcio.cc:256
+#, c-format
+msgid "%s\n"
+msgstr ""
+
+#: src/lexcio.cc:260
+#, c-format
+msgid "\n"
+msgstr ""
+
+#: src/lexcio.cc:318
+#, c-format
+msgid "%s: %f s\n"
+msgstr ""
+
+#: src/lexc-lexer.ll:246
+msgid "Illegal 8-bit sequence (cannot form valid UTF-8)"
+msgstr ""
+
+#: src/lexc-lexer.ll:252
+msgid "Syntax error in lexer (no valid token found at the point)"
+msgstr ""
+
+#: src/lexc-parser.yy:63
+#, c-format
+msgid "%s = %s\n"
+msgstr ""
+
+#: src/lexc-parser.yy:69
+#, c-format
+msgid "ALPHABET: %s\n"
+msgstr ""
+
+#: src/lexc-parser.yy:83
+#, c-format
+msgid "MULTICHAR_SYMBOL: %s\n"
+msgstr ""
+
+#: src/lexc-parser.yy:96
+#, c-format
+msgid "%s = [ %s ]\n"
+msgstr ""
+
+#: src/lexc-parser.yy:103
+#, c-format
+msgid "Defined '%s': ? Kb., ? states, ? arcs, ? paths.\n"
+msgstr ""
+
+#: src/lexc-parser.yy:112
+#, c-format
+msgid "LEXICON: %s\n"
+msgstr ""
+
+#: src/lexc-parser.yy:115
+#, c-format
+msgid "%d "
+msgstr ""
+
+#: src/lexc-parser.yy:126
+#, c-format
+msgid "first lexicon is not named Root\n"
+msgstr ""
+
+#: src/lexc-parser.yy:128
+#, c-format
+msgid "  Using %s as initial lexicon\n"
+msgstr ""
+
+#: src/lexc-parser.yy:134
+#, c-format
+msgid "LEXICON Root is not first\n"
+msgstr ""
+
+#: src/lexc-parser.yy:136
+#, c-format
+msgid "  Using Root as initial lexicon again\n"
+msgstr ""
+
+#: src/lexc-parser.yy:144
+#, c-format
+msgid "%s..."
+msgstr ""
+
+#: src/lexc-parser.yy:145
+#, c-format
+msgid ""
+"\n"
+"Lexicon %s...\n"
+msgstr ""
+
+#: src/lexc-parser.yy:184
+#, c-format
+msgid "Entries so far: %10d; in this lexicon: %10d\r"
+msgstr ""
+
+#: src/lexc-parser.yy:188
+#, c-format
+msgid "%d..."
+msgstr ""
+
+#: src/lexc-parser.yy:193
+#, c-format
+msgid "Ignoring info strings\n"
+msgstr ""
+
+#: src/lexc-parser.yy:198
+#, c-format
+msgid "infostring %s\n"
+msgstr ""
+
+#: src/lexc-parser.yy:202
+#, c-format
+msgid "weight %f\n"
+msgstr ""
+
+#: src/lexc-parser.yy:208
+#, c-format
+msgid "Building unweighted transducer from weighted lexicon\n"
+msgstr ""
+
+#: src/lexc-parser.yy:255
+#, c-format
+msgid "%d\n"
+msgstr ""
+
+#: src/lexc-parser.yy:256
+#, c-format
+msgid "EOF\n"
+msgstr ""
+
+#: src/lexc-parser.yy:264
+#, c-format
+msgid "END\n"
+msgstr ""
+
+#: src/lexc-parser.yy:265
+#, c-format
+msgid ""
+"\n"
+"Explicit END called, skipping rest\n"
+msgstr ""
+
+#: src/lexc-parser.yy:324
+msgid "Reading alphabet"
+msgstr ""
+
+#: src/lexc-parser.yy:346
+msgid "Reading multicharacter symbols"
+msgstr ""
+
+#: src/lexc-parser.yy:370
+msgid "Reading definitions"
+msgstr ""

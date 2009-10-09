@@ -1,0 +1,7 @@
+0
+0	1	a	a
+0	0	a	b
+0	0	b	b
+1
+1	0	a	__HFST_TWOLC_EPSILON_SYMBOL
+1	0	b	b

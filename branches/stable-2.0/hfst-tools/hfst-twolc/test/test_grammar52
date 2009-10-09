@@ -1,0 +1,21 @@
+Alphabet
+
+a b c a:b ;
+
+Rule-variables
+
+X ;
+
+Sets
+
+A = a b ;
+
+Rules
+
+"Rule1"
+a:b <=  :X _ ; where X in A ; 
+
+"Rule2"
+a <= _ ; 
+
+
