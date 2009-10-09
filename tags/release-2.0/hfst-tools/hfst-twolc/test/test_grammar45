@@ -1,0 +1,8 @@
+Alphabet
+
+a b c a:b b:0 0:b ;
+
+Rules
+
+"R1"
+a:b /<= b:0 _ 0:b ;

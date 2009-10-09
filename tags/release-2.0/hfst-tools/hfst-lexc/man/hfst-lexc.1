@@ -1,0 +1,68 @@
+.TH HFST-LEXC "1" "August 2009" "hfst-lexc 0.5" "User Commands"
+.SH NAME
+HFST LexC \- manual page for hfst-lexc 0.5
+.SH SYNOPSIS
+.B hfst-lexc
+[\fIOPTIONS\fR] [\fIINFILE\fR...]
+.SH DESCRIPTION
+Compile lexc files into an HFST transducer.
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Print this help message
+.TP
+\fB\-V\fR, \fB\-\-version\fR
+Print version info
+.TP
+\fB\-v\fR, \fB\-\-verbose\fR
+Print verbosely while compiling
+.TP
+\fB\-q\fR, \fB\-\-quiet\fR
+Do not print verbosely while compiling
+.TP
+\fB\-o\fR, \fB\-\-output\fR=\fIOUTFILE\fR
+Write output to OUTFILE
+.TP
+\fB\-w\fR, \fB\-\-weighted\fR
+Use weighted transducer format
+.TP
+\fB\-u\fR, \fB\-\-unweighted\fR
+Use unweighted transducer format
+.TP
+\fB\-t\fR, \fB\-\-time\fR
+Time all stuff
+.TP
+\fB\-d\fR, \fB\-\-debug\fR
+Print very verbosely
+.TP
+\fB\-y\fR, \fB\-\-hlexcdebug\fR
+Enable Yacc's debug state
+.PP
+If either INFILE... or OUTFILE is missing or \-, standard streams will be used.
+If output is stdout, \fB\-q\fR is implied.
+If both INFILE... and OUTFILE are missing, readline user interface is used.
+.SH EXAMPLES
+.TP
+hfst\-lexc \fB\-o\fR file.hfst file.hlexc
+compiles single lexicon withdefault options
+.TP
+hfst\-lexc \fB\-w\fR \fB\-v\fR \fB\-o\fR file.hwfst file1.hlexc file2.hlexc
+compile weighted lexicons from multiple sources
+.TP
+hfst\-lexc
+launch interactive user interface like Xerox lexc
+.SH "REPORTING BUGS"
+Report bugs to HFST team <hfst\-bugs@helsinki.fi>
+.SH "LICENCE"
+copyright (C) 2008 University of Helsinki,
+License GPLv3: GNU GPL version 3 <http://gnu.org/licenses/gpl.html>
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
+.SH "SEE ALSO"
+The full documentation for
+.B hfst-lexc
+is maintained in the web site KitWiki <https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstLexC>.
+the command
+.IP
+.B lynx https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstLexC 
+.PP
+should give you access to the complete manual.
