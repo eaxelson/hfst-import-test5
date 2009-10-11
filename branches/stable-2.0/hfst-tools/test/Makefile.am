@@ -34,7 +34,7 @@ UNARY_TOOLS= \
 	hfst-fst2fst hfst-determinize \
 	hfst-head hfst-invert hfst-minimize hfst-project \
 	hfst-push-weights hfst-remove-epsilons hfst-repeat \
-	hfst-reverse hfst-symbols hfst-tail \
+	hfst-reverse hfst-symbols hfst-tail
 # unary tools that have specific options and other tools
 OTHER_TOOLS= \
 	hfst-project hfst-push-weights hfst-repeat hfst-head hfst-tail \
