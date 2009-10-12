@@ -93,8 +93,8 @@ token_update_positions(const char *token)
 	}
 	else
 	{
-		char *token_last_line_start = rindex(token, '\n');
-		char *token_end = rindex(token, '\0');
+		char *token_last_line_start = rindex((char*) token, '\n');
+		char *token_end = rindex((char*) token, '\0');
 		hlexclloc.last_column = (token_end - token_last_line_start) - 1;
 	}
 }

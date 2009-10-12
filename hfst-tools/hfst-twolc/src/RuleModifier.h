@@ -5,6 +5,7 @@
 #include <set>
 #include <map>
 #include <cstdlib>
+#include <cstdio>
 #include <cstring>
 #include <iostream>
 #include "string_manipulation.h"
