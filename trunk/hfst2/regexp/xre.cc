@@ -92,8 +92,8 @@ xre_strip_percents(const char *s)
 char *
 xre_get_quoted(const char *s)
 {
-	char *qstart = strchr(s, '"') + 1;
-	char *qend = strrchr(s, '"');
+	char *qstart = strchr((char*) s, '"') + 1;
+	char *qend = strrchr((char*) s, '"');
 	char* qpart = strdup(qstart);
 	*(qpart+ (size_t) (qend - qstart)) = '\0';
 	return qpart;

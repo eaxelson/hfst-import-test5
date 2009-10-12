@@ -5,6 +5,7 @@
 #include <getopt.h>
 #include "string_manipulation.h"
 #include <cstring>
+#include <cstdio>
 #include <cstdlib>
 #include <iostream>
 
