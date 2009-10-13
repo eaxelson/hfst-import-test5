@@ -26,4 +26,6 @@ in its uninstallation. If you would rather install in eg. your home directory
 
         ./configure --prefix=${HOME}
 
-Software in this package is variously distributed under the GPL, LGPL and Apache licenses. If you want to develop something or include it in your own software, check which license(s) apply.
+Software in this package is variously distributed under the GPL, LGPL and
+Apache licenses. If you want to develop something or include it in your own
+software, check which license(s) apply.
