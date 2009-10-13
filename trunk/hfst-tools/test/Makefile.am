@@ -4,7 +4,7 @@
 
 SUBDIRS=. binary-tools
 TEXTFSTSRCS=aA.txt catdog.txt cat.txt CAT.txt cat_or_dog.txt cCaAtT.txt ccCaAtT.txt \
-CcAaTt.txt dog.txt tT.txt cat+dog.txt cat2dog.txt tac.txt cat_2_5.txt cat_4_INF.txt cat_0_3.txt \
+CcAaTt_.txt dog.txt tT.txt cat+dog.txt cat2dog.txt tac.txt cat_2_5.txt cat_4_INF.txt cat_0_3.txt \
 4cats.txt summarize_test1.txt summarize_test2.txt non_minimal.txt dog2cat.txt cat_weight_middle.txt \
 cat_weight_initial.txt cat_weight_final.txt \
 infinitely_ambiguous.txt
@@ -499,10 +499,10 @@ hfst-diff-test-functionality-test: cat.hfst cat_sets cat_sets_spaces
 	$(top_builddir)/src/hfst-diff-test -r $(srcdir)/cat_sets -s cat.hfst 
 	$(top_builddir)/src/hfst-diff-test -r $(srcdir)/cat_sets_spaces -S -s cat.hfst 
 
-#hfst-invert-functionality-test: cCaAtT.hfst CcAaTt.hfst
-#	cat cCaAtT.hfst | $(top_builddir)/src/hfst-invert > CcAaTt.hfst.1
-#	$(top_builddir)/src/hfst-compare -e -q CcAaTt.hfst CcAaTt.hfst.1
-#	rm -f CcAaTt.hfst.1
+#hfst-invert-functionality-test: cCaAtT.hfst CcAaTt_.hfst
+#	cat cCaAtT.hfst | $(top_builddir)/src/hfst-invert > CcAaTt_.hfst.1
+#	$(top_builddir)/src/hfst-compare -e -q CcAaTt_.hfst CcAaTt_.hfst.1
+#	rm -f CcAaTt_.hfst.1
 
 hfst-compose-intersect-functionality-test: cat.hfst aA.hfst tT.hfst ccCaAtT.hfst
 	cat cat.hfst aA.hfst tT.hfst | $(top_builddir)/src/hfst-compose-intersect -s > ccCaAtT.hfst.1
@@ -825,8 +825,8 @@ hfst-strings-functionality-test:
 	sort $(srcdir)/animals | diff TMP - 
 	rm -f TMP
 
-#hfst-lookup-crash-test: CcAaTt.hfst cat_sets
-#	$(CRASH_TST) $(top_builddir)/src/hfst-lookup -q -i CcAaTt.hfst -I cat_sets > /dev/null
+#hfst-lookup-crash-test: CcAaTt_.hfst cat_sets
+#	$(CRASH_TST) $(top_builddir)/src/hfst-lookup -q -i CcAaTt_.hfst -I cat_sets > /dev/null
 
 %.hfst: %.txt symbols
 	cat $< | $(top_builddir)/src/hfst-txt2fst -R $(srcdir)/symbols > $@
