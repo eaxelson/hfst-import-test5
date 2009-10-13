@@ -3,7 +3,7 @@
 ## Licence: GPL v3 (not newer)
 
 SUBDIRS=. binary-tools
-TEXTFSTSRCS=aA.txt catdog.txt cat.txt CAT.txt cat_or_dog.txt cCaAtT.txt ccCaAtT.txt \
+TEXTFSTSRCS=aA.txt catdog.txt cat.txt CAT_.txt cat_or_dog.txt cCaAtT.txt ccCaAtT.txt \
 CcAaTt_.txt dog.txt tT.txt cat+dog.txt cat2dog.txt tac.txt cat_2_5.txt cat_4_INF.txt cat_0_3.txt \
 4cats.txt summarize_test1.txt summarize_test2.txt non_minimal.txt dog2cat.txt cat_weight_middle.txt \
 cat_weight_initial.txt cat_weight_final.txt \
@@ -435,7 +435,7 @@ clean-local:
 	rm -f $(TEXTFSTSRCS:%.txt=2%.hwfst)
 	rm -f TMP TMP2 1
 	rm -f $(TEXTFSTSRCS:%.txt=2%.txt)
-	rm -f CAT DOG
+	rm -f CAT_ DOG
 	rm -f cat2dog.temp animals.hwfst
 
 functionality: \
@@ -509,7 +509,7 @@ hfst-compose-intersect-functionality-test: cat.hfst aA.hfst tT.hfst ccCaAtT.hfst
 	$(top_builddir)/src/hfst-compare -1 ccCaAtT.hfst -2 ccCaAtT.hfst.1
 	rm -f ccCaAtT.hfst.1
 
-hfst-project-functionality-test: 2cat.hfst 2CAT.hfst 2cCaAtT.hfst  2cat.hwfst 2CAT.hwfst 2cCaAtT.hwfst cat.hfst
+hfst-project-functionality-test: 2cat.hfst 2CAT_.hfst 2cCaAtT.hfst  2cat.hwfst 2CAT_.hwfst 2cCaAtT.hwfst cat.hfst
 	cat 2cCaAtT.hfst | $(top_builddir)/src/hfst-project -p upper > cat.hfst.1
 	$(top_builddir)/src/hfst-compare -e -1 2cat.hfst -2 cat.hfst.1 -q
 	rm -f cat.hfst.1
@@ -519,15 +519,15 @@ hfst-project-functionality-test: 2cat.hfst 2CAT.hfst 2cCaAtT.hfst  2cat.hwfst 2C
 	cat 2cCaAtT.hfst | $(top_builddir)/src/hfst-project -p analysis > cat.hfst.1
 	$(top_builddir)/src/hfst-compare -e -1 2cat.hfst -2 cat.hfst.1 -q
 	rm -f cat.hfst.1
-	cat 2cCaAtT.hfst | $(top_builddir)/src/hfst-project -p lower > CAT.hfst.1
-	$(top_builddir)/src/hfst-compare -e -1 2CAT.hfst -2 CAT.hfst.1 -q
-	rm -f CAT.hfst.1
-	cat 2cCaAtT.hfst | $(top_builddir)/src/hfst-project -p output > CAT.hfst.1
-	$(top_builddir)/src/hfst-compare -e -1 2CAT.hfst -2 CAT.hfst.1 -q
-	rm -f CAT.hfst.1
-	cat 2cCaAtT.hfst | $(top_builddir)/src/hfst-project -p generation > CAT.hfst.1
-	$(top_builddir)/src/hfst-compare -e -1 2CAT.hfst -2 CAT.hfst.1 -q
-	rm -f CAT.hfst.1
+	cat 2cCaAtT.hfst | $(top_builddir)/src/hfst-project -p lower > CAT_.hfst.1
+	$(top_builddir)/src/hfst-compare -e -1 2CAT_.hfst -2 CAT_.hfst.1 -q
+	rm -f CAT_.hfst.1
+	cat 2cCaAtT.hfst | $(top_builddir)/src/hfst-project -p output > CAT_.hfst.1
+	$(top_builddir)/src/hfst-compare -e -1 2CAT_.hfst -2 CAT_.hfst.1 -q
+	rm -f CAT_.hfst.1
+	cat 2cCaAtT.hfst | $(top_builddir)/src/hfst-project -p generation > CAT_.hfst.1
+	$(top_builddir)/src/hfst-compare -e -1 2CAT_.hfst -2 CAT_.hfst.1 -q
+	rm -f CAT_.hfst.1
 	cat 2cCaAtT.hwfst | $(top_builddir)/src/hfst-project -p upper > cat.hwfst.1
 	$(top_builddir)/src/hfst-compare -e -1 2cat.hwfst -2 cat.hwfst.1 -q
 	rm -f cat.hwfst.1
@@ -537,15 +537,15 @@ hfst-project-functionality-test: 2cat.hfst 2CAT.hfst 2cCaAtT.hfst  2cat.hwfst 2C
 	cat 2cCaAtT.hwfst | $(top_builddir)/src/hfst-project -p analysis > cat.hwfst.1
 	$(top_builddir)/src/hfst-compare -e -1 2cat.hwfst -2 cat.hwfst.1 -q
 	rm -f cat.hwfst.1
-	cat 2cCaAtT.hwfst | $(top_builddir)/src/hfst-project -p lower > CAT.hwfst.1
-	$(top_builddir)/src/hfst-compare -e -1 2CAT.hwfst -2 CAT.hwfst.1 -q
-	rm -f CAT.hwfst.1
-	cat 2cCaAtT.hwfst | $(top_builddir)/src/hfst-project -p output > CAT.hwfst.1
-	$(top_builddir)/src/hfst-compare -e -1 2CAT.hwfst -2 CAT.hwfst.1 -q
-	rm -f CAT.hwfst.1
-	cat 2cCaAtT.hwfst | $(top_builddir)/src/hfst-project -p generation > CAT.hwfst.1
-	$(top_builddir)/src/hfst-compare -e -1 2CAT.hwfst -2 CAT.hwfst.1 -q
-	rm -f CAT.hwfst.1
+	cat 2cCaAtT.hwfst | $(top_builddir)/src/hfst-project -p lower > CAT_.hwfst.1
+	$(top_builddir)/src/hfst-compare -e -1 2CAT_.hwfst -2 CAT_.hwfst.1 -q
+	rm -f CAT_.hwfst.1
+	cat 2cCaAtT.hwfst | $(top_builddir)/src/hfst-project -p output > CAT_.hwfst.1
+	$(top_builddir)/src/hfst-compare -e -1 2CAT_.hwfst -2 CAT_.hwfst.1 -q
+	rm -f CAT_.hwfst.1
+	cat 2cCaAtT.hwfst | $(top_builddir)/src/hfst-project -p generation > CAT_.hwfst.1
+	$(top_builddir)/src/hfst-compare -e -1 2CAT_.hwfst -2 CAT_.hwfst.1 -q
+	rm -f CAT_.hwfst.1
 
 hfst-reverse-functionality-test: 2cat.hfst 2cat.hwfst 2tac.hfst 2tac.hwfst
 	cat 2cat.hfst | $(top_builddir)/src/hfst-reverse > tac.hfst.1
@@ -696,23 +696,23 @@ hfst-symbols-functionality-test: cat.hfst cat.hwfst symbols cat2dog.hfst
 	$(top_builddir)/src/hfst-summarize | grep 'has HFST symbol table' | cut -b 33 > TMP2; test TMP2 != 'n'
 	diff TMP $(srcdir)/symbols
 	for i in hfst hwfst; do \
-	$(top_builddir)/src/hfst-symbols cat2dog.$$i -s --write-input-symbols-to CAT --write-output-symbols-to DOG > /dev/null; \
-	diff CAT $(srcdir)/cat_symbols; \
+	$(top_builddir)/src/hfst-symbols cat2dog.$$i -s --write-input-symbols-to CAT_ --write-output-symbols-to DOG > /dev/null; \
+	diff CAT_ $(srcdir)/cat_symbols; \
 	diff DOG $(srcdir)/dog_symbols; \
-	$(top_builddir)/src/hfst-symbols cat2dog.$$i -s --write-input-symbols-to CAT --write-output-symbols-to DOG -e > /dev/null; \
-	diff CAT $(srcdir)/cat_symbols_and_epsilon; \
+	$(top_builddir)/src/hfst-symbols cat2dog.$$i -s --write-input-symbols-to CAT_ --write-output-symbols-to DOG -e > /dev/null; \
+	diff CAT_ $(srcdir)/cat_symbols_and_epsilon; \
 	diff DOG $(srcdir)/dog_symbols_and_epsilon; \
 	\
 	$(top_builddir)/src/hfst-symbols cat2dog.$$i -s --write-input-symbols > TMP; \
-	$(top_builddir)/src/hfst-symbols TMP -s --write-input-symbols-to CAT > /dev/null; \
-	diff CAT $(srcdir)/cat_symbols; \
+	$(top_builddir)/src/hfst-symbols TMP -s --write-input-symbols-to CAT_ > /dev/null; \
+	diff CAT_ $(srcdir)/cat_symbols; \
 	$(top_builddir)/src/hfst-symbols cat2dog.$$i -s --write-output-symbols > TMP; \
 	$(top_builddir)/src/hfst-symbols TMP -s --write-output-symbols-to DOG > /dev/null; \
 	diff DOG $(srcdir)/dog_symbols; \
 	\
 	$(top_builddir)/src/hfst-symbols cat2dog.$$i -s --write-input-symbols -e > TMP; \
-	$(top_builddir)/src/hfst-symbols TMP -s --write-input-symbols-to CAT -e > /dev/null; \
-	diff CAT $(srcdir)/cat_symbols_and_epsilon; \
+	$(top_builddir)/src/hfst-symbols TMP -s --write-input-symbols-to CAT_ -e > /dev/null; \
+	diff CAT_ $(srcdir)/cat_symbols_and_epsilon; \
 	$(top_builddir)/src/hfst-symbols cat2dog.$$i -s --write-output-symbols -e > TMP; \
 	$(top_builddir)/src/hfst-symbols TMP -s --write-output-symbols-to DOG -e > /dev/null; \
 	diff DOG $(srcdir)/dog_symbols_and_epsilon; \
