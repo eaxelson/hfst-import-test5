@@ -15,9 +15,6 @@ There's a lot of documentation and other information about HFST at
 
         https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome
 
-For installing instructions, see INSTALL. Briefly,
-
-
 INSTALL describes the GNU build system in detail, but for most users the usual
 
 	./configure
