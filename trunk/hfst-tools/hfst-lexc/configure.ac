@@ -138,3 +138,4 @@ cat <<EOF
 	* rst: $RST2HTML
 	* pair-test: $HFSTPAIRTEST
 EOF
+

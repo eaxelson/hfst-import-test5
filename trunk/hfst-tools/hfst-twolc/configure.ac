@@ -51,3 +51,4 @@ AC_CONFIG_FILES([Makefile src/Makefile test/Makefile])
 AC_CONFIG_SRCDIR([src/htwolcpre.yy])
 
 AC_OUTPUT
+
