@@ -36,3 +36,4 @@ AC_CHECK_FUNCS([floor strchr strcspn strdup strtol])
 # AC_CHECK_HEADERS([]) # Maybe one day...
 
 AC_OUTPUT
+
