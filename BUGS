@@ -1,0 +1,10 @@
+This is a catchall file for all hfst-related bugs.
+
+- The currently (elsewhere) distributed German transducer, german.hfst, fails
+under hfst-lookup with
+
+terminate called after throwing an instance of 'std::bad_alloc'
+  what():  std::bad_alloc
+Aborted
+
+The optimized lookup version, german.hfst.ol, works fine however.
