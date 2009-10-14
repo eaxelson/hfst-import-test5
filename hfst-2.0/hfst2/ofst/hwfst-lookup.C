@@ -157,102 +157,102 @@ namespace HWFST
   
 	KeyVectorVector *
 	find_all_continuations(StateId n,
-						   KeyVector::iterator input_position,
-						   KeyVector::iterator input_end_position,
-						   Transducer &t,
-						   bool preserve_epsilons = false)
+			       KeyVector::iterator input_position,
+			       KeyVector::iterator input_end_position,
+			       Transducer &t,
+			       bool preserve_epsilons = false)
 	{
-
-		KeyVectorVector * continuations = NULL;
-
-		if (input_position == input_end_position)
+	  
+	  KeyVectorVector * continuations = NULL;
+	  
+	  if (input_position == input_end_position)
+	    {
+	      for (ArcIterator arcs(t, n);
+		   not arcs.Done();
+		   arcs.Next())
 		{
-			for (ArcIterator arcs(t, n);
-				 not arcs.Done();
-				 arcs.Next())
+		  Arc a = arcs.Value();
+		  if (a.ilabel == 0)
+		    {
+		      KeyVectorVector * suffixes =
+			find_all_continuations(a.nextstate,
+					       input_position,
+					       input_end_position,
+					       t);
+		      if (suffixes == NULL)
+			continue;
+		      else if (continuations == NULL)
 			{
-				Arc a = arcs.Value();
-				if (a.ilabel == 0)
-				{
-					KeyVectorVector * suffixes =
-						find_all_continuations(a.nextstate,
-											   input_position,
-											   input_end_position,
-											   t);
-					if (suffixes == NULL)
-						continue;
-					else if (continuations == NULL)
-					{
-						continuations = new KeyVectorVector;
-					}
-					add_prefix(a.olabel, suffixes);
-					add_to_continuations(continuations,
-										 suffixes);
-				}
+			  continuations = new KeyVectorVector;
 			}
-			if (t.Final(n) == Weight::Zero())
-				return continuations;
-			else
-			{
-				if (continuations == NULL)
-				{
-					continuations = new KeyVectorVector;
-					continuations->push_back(new KeyVector);
-					return continuations;
-				}
-				else
-				{
-					continuations->push_back(new KeyVector);
-					return continuations;
-				}
-			}
+		      add_prefix(a.olabel, suffixes);
+		      add_to_continuations(continuations,
+					   suffixes);
+		    }
 		}
-
-		for (ArcIterator arcs(t, n);
-			 not arcs.Done();
-			 arcs.Next())
-		{
-			Arc a = arcs.Value();
-			if (a.ilabel == *input_position)
-			{
-				KeyVectorVector * suffixes =
-					find_all_continuations(a.nextstate,
-										   input_position + 1,
-										   input_end_position,
-										   t);
-				if (suffixes == NULL)
-					continue;
-				else if (continuations == NULL)
-				{
-					continuations = new KeyVectorVector;
-				}
-				add_prefix(a.olabel, suffixes);
-				add_to_continuations(continuations,
-									 suffixes);
-			}
-
-			if (a.ilabel == 0)
-			{
-				KeyVectorVector * suffixes =
-					find_all_continuations(a.nextstate,
-										   input_position,
-										   input_end_position,
-										   t);
-				if (suffixes == NULL)
-					continue;
-				else if (continuations == NULL)
-				{
-					continuations = new KeyVectorVector;
-				}
-				add_prefix(a.olabel, suffixes);
-				add_to_continuations(continuations,
-									 suffixes);
-			}
-		}
-
+	      if (t.Final(n) == Weight::Zero())
 		return continuations;
+	      else
+		{
+		  if (continuations == NULL)
+		    {
+		      continuations = new KeyVectorVector;
+		      continuations->push_back(new KeyVector);
+		      return continuations;
+		    }
+		  else
+		    {
+		      continuations->push_back(new KeyVector);
+		      return continuations;
+		    }
+		}
+	    }
+	  
+	  for (ArcIterator arcs(t, n);
+	       not arcs.Done();
+	       arcs.Next())
+	    {
+	      Arc a = arcs.Value();
+	      if (a.ilabel == *input_position)
+		{
+		  KeyVectorVector * suffixes =
+		    find_all_continuations(a.nextstate,
+					   input_position + 1,
+					   input_end_position,
+					   t);
+		  if (suffixes == NULL)
+		    continue;
+		  else if (continuations == NULL)
+		    {
+		      continuations = new KeyVectorVector;
+		    }
+		  add_prefix(a.olabel, suffixes);
+		  add_to_continuations(continuations,
+				       suffixes);
+		}
+	      
+	      if (a.ilabel == 0)
+		{
+		  KeyVectorVector * suffixes =
+		    find_all_continuations(a.nextstate,
+					   input_position,
+					   input_end_position,
+					   t);
+		  if (suffixes == NULL)
+		    continue;
+		  else if (continuations == NULL)
+		    {
+		      continuations = new KeyVectorVector;
+		    }
+		  add_prefix(a.olabel, suffixes);
+		  add_to_continuations(continuations,
+				       suffixes);
+		}
+	    }
+	  
+	  return continuations;
 	}
-
+  
 	KeyVector * find_first_output_string(Transducer &t,
 					     KeyVector * input)
 	{
@@ -275,17 +275,23 @@ namespace HWFST
 	}
 
 	KeyVectorVector * find_all_output_strings(Transducer &t,
-											  KeyVector * input)
+						  KeyVector * input)
 	{
 		StateId start = t.Start();
 		KeyVector::iterator input_position = input->begin();
 		KeyVector::iterator last_input_position = input->end();
 		KeyVectorVector * reversed_outputs =
-			find_all_continuations(start,
-								   input_position,
-								   last_input_position,
-								   t);
-		return reverse_inner(reversed_outputs);
+		  find_all_continuations(start,
+					 input_position,
+					 last_input_position,
+					 t);
+		KeyVectorVector * outputs =
+		  reverse_inner(reversed_outputs);
+		if (outputs == NULL)
+		  {
+		    return new KeyVectorVector;
+		  }
+		return outputs;
 	}
 
 	inline Key get_token(Transducer &t, StateId n)

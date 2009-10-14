@@ -76,6 +76,10 @@ int main(int argc, char * argv[])
       {
 	HFST::make_tokenizer();
       }
+    if (debug)
+      {
+	fprintf(stderr,"Done\n");
+      }
   }
   
   // Read test_strings from input_file_name and write them to

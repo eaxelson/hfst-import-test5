@@ -403,13 +403,11 @@ namespace HFST {
 					     KeyTable * kt ) {
     Transducer * multi_char_symbol_sequences =
       split_symbols(keys,kt,TheAlphabet);
-
     Transducer * symbols_to_sequences =
       multicharacter_symbol_maker( multi_char_symbol_sequences,
 				   kt,
 				   0,
 				   TheAlphabet);
-    
     delete multi_char_symbol_sequences;
 
     return PINSTANCE_TO_HANDLE(Transducer,symbols_to_sequences);
