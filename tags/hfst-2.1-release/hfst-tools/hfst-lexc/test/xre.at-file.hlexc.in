@@ -1,0 +1,3 @@
+LEXICON Root
+< @"@srcdir@/a.hfst" >	#	;
+< @"@srcdir@/b.hfst" >	#	;

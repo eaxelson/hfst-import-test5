@@ -1,0 +1,32 @@
+
+For info on HFST commandline tools, see
+<https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstCommandLineTools>.
+
+This package contains the following tools:
+
+ hfst-calculate
+ hfst-compare
+ hfst-compatible
+ hfst-compose
+ hfst-concatenate
+ hfst-conjunct
+ hfst-determinize
+ hfst-disjunct
+ hfst-fst2strings
+ hfst-fst2txt
+ hfst-head
+ hfst-invert
+ hfst-minimize
+ hfst-project
+ hfst-push-weights
+ hfst-regexp2fst
+ hfst-remove-epsilons
+ hfst-repeat
+ hfst-reverse 
+ hfst-split
+ hfst-strings2fst
+ hfst-summarize
+ hfst-symbols
+ hfst-tail
+ hfst-txt2fst
+

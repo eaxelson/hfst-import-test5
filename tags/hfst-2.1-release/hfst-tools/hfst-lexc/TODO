@@ -1,0 +1,66 @@
+=======================================
+ Known bugs, problems and deficiencies
+=======================================
+
+This sketch is only manually written TODO list for the authors. For up-to-date
+list and reporting bugs you are advised to use sourceforge (available when
+first alpha version is actually released).
+
+Differences form Xerox’s lexc
+-----------------------------
+
+* Using ``< @"filename" >`` construction to read weighted transducers in
+  unweighted contexts and vice versa does not work.
+
+* Complement operator ``~`` or any/other/unknown character ``?`` can not work as
+  expected. They are interpreted and expanded under current alphabet during
+  the processing, and are not expanded to accomodate new alphabet found later
+  during the processing. The original lexc semantics depends on underlying
+  libraries to implement the special other character class (although one
+  could fathom some hacks to work around it).
+
+* Declarations and angle bracketed regular expression may not always work.
+
+* Last row of lexicon must also be ended with a semicolon ``;``.
+
+* The original lexc user interface (readline UI) is limited to few commands; in
+  fact I strongly suggest using command line interface instead.
+
+* Readline UI is largely untested, compiling two or more files with it or
+  changing weightedness in the middle of processing will lead to unexpected
+  results (parser state is not resetted between compilations).
+
+* ``%`` cannot be used to break multicharacter symbols apart; both ``ij`` and
+  ``i%j`` will be parsed as character ij, if such exists. Work around by
+  inserting ``0``, not ``%``, between symbols.
+
+* Encodings other than UTF-8 are not supported, by design. Use ``recode`` or
+  ``iconv`` to convert legacy data.
+
+* Additional parts to lexc file format, like ``Alphabet`` have been
+  implemented.
+
+Slow implementations
+--------------------
+
+* Original lexc format does not explicitly define alphabet. Discovering
+  alphabet from entries is slow and sometimes error-prone.
+
+* If xerox style regular expressions are used, the compilation is significantly
+  slower than only with string entries.
+
+* The flex based lexer uses lookahead, which could easily be replaced with
+  yyless stuff.
+
+Postponed bug fixes
+-------------------
+
+* Support for any/other/unknown symbol (HFST 3)
+
+* Optimise yacc/flex handling
+
+.. _hfst-twolc: https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstTwolC
+.. _hfst-calculate: https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstCalculate
+.. _tutorial: https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstTutorial
+
+.. vim: set ft=rst:

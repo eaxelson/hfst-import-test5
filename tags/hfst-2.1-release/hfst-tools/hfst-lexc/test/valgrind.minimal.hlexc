@@ -1,0 +1,11 @@
+Multichar_Symbols aa
+
+LEXICON Root
+a	B	;
+aa	#	;
+
+LEXICON B
+b	#	;
+
+END
+foo

@@ -1,0 +1,14 @@
+Alphabet
+a e g h i j k l m n o p r s t u v y ä ö
+A
+
+Multichar_Symbols
++Ine +Ela +Tra
+
+LEXICON Root
+< ? ? ? ? >	Case	;
+
+LEXICON Case
++Ine:ssA	#	;
++Ela:stA	#	;
++Tra:ksi	#	;

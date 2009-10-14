@@ -1,0 +1,471 @@
+2009-04-30 12:41  tpirinen
+
+	* *: full-fledged restructuring and updating.
+
+2009-03-11 12:33  tpirinen
+
+	* src/: hlexc-compilation.cc, hlexc-compiler.yy,
+	  lexical_resource.cc, lexical_resource.h, lexicon.cc, xducer.cc,
+	  xducer.h, xxx_utils.cc: * Alphabet missing handler.  * More
+	  verbose printing.
+
+2009-02-25 09:40  tpirinen
+
+	* test/sme/combined-sme.lexc: Combined file from divvun northern
+	  sami lexicons
+
+2009-02-25 09:13  tpirinen
+
+	* test/fr/french.lexc: French test lexicon here
+
+2009-02-25 08:52  tpirinen
+
+	* src/: key_utils.cc, key_utils.h: missing files 1
+
+2009-02-25 08:35  tpirinen
+
+	* config.h.in, configure.ac, src/Makefile.am,
+	  src/hlexc-compilation.cc, src/hlexc-compilation.h,
+	  src/hlexc-compiler.yy, src/hlexc-input.cc, src/hlexc-output.cc,
+	  src/hlexc-output.h, src/hlexc-scanner.ll, src/lexc-utils.cc,
+	  src/lexc-utils.h, src/lexical_resource.cc,
+	  src/lexical_resource.h, src/lexicon.cc, src/lexicon.h,
+	  src/lexicon_entry.cc, src/lexicon_entry.h,
+	  src/longest_string_set.h, src/magic_key_table.cc,
+	  src/magic_key_table.h, src/tokeniser.cc, src/tokeniser.h,
+	  src/xducer.cc, src/xducer.h, src/xre_entry.cc, src/xre_entry.h,
+	  src/xxx_utils.cc, src/xxx_utils.h, src/xymbol.cc, src/xymbol.h,
+	  test/Makefile.am: Long winding update towards version of HFST 2
+
+2009-02-03 13:47  tpirinen
+
+	* src/: lexical_resource.cc, lexical_resource.h, tokeniser.cc,
+	  tokeniser.h: missing files
+
+2009-02-03 13:31  tpirinen
+
+	* configure.ac, src/hlexc-compilation.cc, src/hlexc-compiler.yy,
+	  src/hlexc-input.cc, src/hlexc-output.cc, src/hlexc-scanner.ll,
+	  src/lexc-utils.cc, src/lexc-utils.h, src/lexicon.cc,
+	  src/lexicon.h, src/lexicon_entry.cc, src/lexicon_entry.h,
+	  src/xducer.cc, src/xducer.h, src/xre_entry.cc, src/xre_entry.h,
+	  test/Makefile.am, test/test.0009.lexc: one more working version
+
+2008-12-29 11:50  tpirinen
+
+	* TODO, config.h.in, configure.ac, src/Makefile.am,
+	  src/hlexc-compilation.cc, src/hlexc-compilation.h,
+	  src/hlexc-compiler.yy, src/hlexc-output.cc, src/hlexc-output.h,
+	  src/hlexc-scanner.ll, src/lexc-utils.cc, src/lexc-utils.h,
+	  src/lexicon.cc, src/lexicon.h, src/lexicon_entry.cc,
+	  src/lexicon_entry.h, src/xducer.cc, src/xducer.h,
+	  src/xre_entry.cc, src/xre_entry.h: almost functional pre-alpha 2
+
+2008-10-20 15:49  tpirinen
+
+	* test/negtest.0004.lexc: missing test case added
+
+2008-10-20 15:28  tpirinen
+
+	* src/Makefile.am, test/Makefile.am, test/atconfig: distcheck
+
+2008-10-15 14:27  tpirinen
+
+	* bin/hfst-lexc-2008-10-15:
+	  HFST1 based static corpus binary archived
+
+2008-10-15 13:03  tpirinen
+
+	* README, config.h.in, src/hlexc-compilation.cc,
+	  src/hlexc-compilation.h, src/hlexc-compiler.yy,
+	  src/hlexc-output.cc, src/lexc-utils.cc, src/lexicon.cc,
+	  src/lexicon_entry.cc, src/xducer.cc, src/xducer.h,
+	  src/xre_entry.cc, src/xre_entry.h, test/.cvsignore,
+	  test/Makefile.am, test/atconfig, test/test.0009.lexc,
+	  test/test.0202.lexc: Preparing for HFST2 boarding
+
+2008-10-05 20:24  tpirinen
+
+	* bin/hlexc: remove old scripts
+
+2008-10-03 16:28  silfverb
+
+	* test/atconfig: OpenFst to hfst-test
+
+2008-10-02 15:45  tpirinen
+
+	* config.h.in, configure.ac, src/Makefile.am,
+	  src/hlexc-compiler.yy, test/atconfig: corpus compilation mode
+
+2008-10-02 15:17  tpirinen
+
+	* README, TODO, config.h.in, configure.ac, src/Makefile.am,
+	  src/hlexc-compilation.cc, src/hlexc-compilation.h,
+	  src/hlexc-compiler.yy, src/hlexc-input.cc, src/hlexc-input.h,
+	  src/hlexc-output.h, src/hlexc-scanner.ll, src/lexc-utils.cc,
+	  src/lexc-utils.h, src/lexicon.cc, src/lexicon.h,
+	  src/lexicon_entry.cc, src/lexicon_entry.h, src/xducer.cc,
+	  src/xducer.h, src/xre_entry.cc, src/xre_entry.h: Move to using
+	  installed HFST
+
+2008-10-02 04:23  tpirinen
+
+	* test/: README.tests, negtest.0001.lexc, negtest.0002.lexc,
+	  negtest.0003.lexc, test.0202.lexc: negative test cases
+
+2008-10-02 04:00  tpirinen
+
+	* src/: hlexc-compilation.cc, lexicon.cc, lexicon_entry.cc,
+	  lexicon_entry.h, xducer.cc, xducer.h: Add new transducer bridge
+
+2008-09-29 17:38  tpirinen
+
+	* src/Makefile.am, src/hlexc-compilation.cc,
+	  src/hlexc-compilation.h, src/hlexc-compiler.yy,
+	  src/hlexc-output.cc, src/hlexc-output.h, src/lexc-utils.cc,
+	  src/lexc-utils.h, src/lexicon.cc, src/lexicon.h,
+	  src/lexicon_entry.cc, src/lexicon_entry.h, src/xre_entry.cc,
+	  src/xre_entry.h, test/Makefile.am, test/README.tests,
+	  test/test.0016.lexc, test/test.mediumgrind.lexc: Openfst works
+
+2008-09-23 16:32  tpirinen
+
+	* HACKING, README, TODO, configure.ac, src/Makefile.am,
+	  src/hlexc-compilation.cc, src/hlexc-compilation.h,
+	  src/hlexc-compiler.yy, src/lexicon.cc, src/lexicon.h,
+	  src/lexicon_entry.h, src/xre_entry.h, test/Makefile.am,
+	  test/README.tests, test/a.hfst, test/atconfig, test/b.hfst,
+	  test/test.0009.lexc, test/test.0101.lexc, test/test.0201.lexc: I
+	  suppose nobody will read these.
+
+2008-09-15 16:32  tpirinen
+
+	* src/tests/README.tests: Leave info in place
+
+2008-09-15 16:31  tpirinen
+
+	* src/hlexc-compilation.cc, src/hlexc-compiler.yy,
+	  test/Makefile.am: Fix bug with # lexicon when using --quiet
+
+2008-09-15 11:14  tpirinen
+
+	* Makefile.am, README, TODO, configure.ac, doc/Doxyconf,
+	  doc/Makefile.am, src/Makefile.am, src/tests/Makefile.am,
+	  src/tests/README.tests, src/tests/negtest.0001.lexc,
+	  src/tests/negtest.0002.lexc, src/tests/negtest.0003.lexc,
+	  src/tests/test.0001.lexc, src/tests/test.0002.lexc,
+	  src/tests/test.0003.lexc, src/tests/test.0004.lexc,
+	  src/tests/test.0005.lexc, src/tests/test.0006.lexc,
+	  src/tests/test.0007.lexc, src/tests/test.0008.lexc,
+	  src/tests/test.0009.lexc, src/tests/test.0010.lexc,
+	  src/tests/test.0011.lexc, src/tests/test.0012.lexc,
+	  src/tests/test.0013.lexc, src/tests/test.0014.lexc,
+	  src/tests/test.0015.lexc, src/tests/test.0016.lexc,
+	  src/tests/test.0017a.lexc, src/tests/test.0017b.lexc,
+	  src/tests/test.0017c.lexc, src/tests/test.0100.lexc,
+	  src/tests/test.0101.lexc, src/tests/test.0102.lexc,
+	  src/tests/test.0103.lexc, src/tests/test.0104.lexc,
+	  src/tests/test.0105.lexc, src/tests/test.0200.lexc,
+	  src/tests/test.0201.lexc, src/tests/test.0202.lexc,
+	  src/tests/test.0203.lexc, src/tests/test.allgrind.lexc,
+	  test/Makefile.am, test/README.tests, test/atconfig,
+	  test/test.0001.lexc, test/test.0002.lexc, test/test.0003.lexc,
+	  test/test.0004.lexc, test/test.0005.lexc, test/test.0006.lexc,
+	  test/test.0007.lexc, test/test.0008.lexc, test/test.0009.lexc,
+	  test/test.0010.lexc, test/test.0011.lexc, test/test.0012.lexc,
+	  test/test.0013.lexc, test/test.0014.lexc, test/test.0015.lexc,
+	  test/test.0016.lexc, test/test.0017a.lexc, test/test.0017b.lexc,
+	  test/test.0017c.lexc, test/test.0100.lexc, test/test.0101.lexc,
+	  test/test.0102.lexc, test/test.0103.lexc, test/test.0104.lexc,
+	  test/test.0105.lexc, test/test.0200.lexc, test/test.0201.lexc,
+	  test/test.0202.lexc, test/test.0203.lexc,
+	  test/test.smallgrind.lexc, test/testsuite.at: structure revamp++
+
+2008-09-10 13:03  tpirinen
+
+	* src/: hlexc-compiler.yy, lexicon_entry.h: malloc FILE**
+
+2008-09-08 14:29  tpirinen
+
+	* src/tests/: test.0015.lexc, test.0016.lexc, test.0102.lexc,
+	  test.0103.lexc, test.0104.lexc, test.0105.lexc, test.0200.lexc,
+	  test.0201.lexc, test.0202.lexc, test.0203.lexc: tests
+
+2008-09-08 14:23  tpirinen
+
+	* src/hlexc-scanner.ll: remove UTF8
+
+2008-09-08 10:56  tpirinen
+
+	* src/: hlexc-compilation.cc, hlexc-compilation.h,
+	  hlexc-compiler.yy, hlexc-input.h, hlexc-output.cc,
+	  hlexc-output.h, hlexc-scanner.ll, lexc-utils.cc, lexc-utils.h,
+	  lexicon.h, lexicon_entry.cc, xre_entry.cc, xre_entry.h,
+	  tests/README.tests: bunp
+
+2008-08-20 18:35  tpirinen
+
+	* HACKING, README, TODO, config.h.in, configure.ac, doc/Doxyconf,
+	  src/Makefile.am, src/hlexc-compiler.yy, src/hlexc-input.cc,
+	  src/hlexc-input.h, src/hlexc-scanner.ll, src/lexc-utils.cc,
+	  src/lexc-utils.h, src/lexicon.cc, src/lexicon.h,
+	  src/lexicon_entry.cc, src/lexicon_entry.h, src/tests/Makefile.am,
+	  src/tests/README.tests, src/tests/french.lexc,
+	  src/tests/test.0014.lexc, src/tests/test.0017a.lexc,
+	  src/tests/test.0017b.lexc, src/tests/test.0017c.lexc,
+	  src/tests/test.0100.lexc, src/tests/test.0101.lexc,
+	  src/tests/test.twol-fi.lexc: Now and then, here and there.
+
+2008-08-08 11:25  tpirinen
+
+	* README, TODO, src/hlexc-scanner.ll, src/lexc-utils.cc,
+	  src/tests/Makefile.am: slight optimisation
+
+2008-08-06 19:07  tpirinen
+
+	* Makefile.am, README, config.h.in, src/hlexc-compiler.yy,
+	  src/hlexc-scanner.ll: ~Release version alpha?
+
+2008-08-06 18:25  tpirinen
+
+	* src/tests/: test.0014.lexc, test.0100.lexc, test.0101.lexc:
+	  Missing test cases.
+
+2008-08-06 01:28  tpirinen
+
+	* configure.ac: Remove -Werrors§
+
+2008-08-06 01:26  tpirinen
+
+	* configure.ac: corpus fixes
+
+2008-07-30 17:37  tpirinen
+
+	* README, TODO, src/hlexc-compiler.yy, src/hlexc-scanner.ll,
+	  src/lexc-utils.cc, src/lexc-utils.h, src/tests/test.twol-fi.lexc:
+	  En vaan keksi mitään järkevää CVS-lokiin tänään!
+
+2008-07-28 19:28  tpirinen
+
+	* HACKING, Makefile.am, README, TODO, config.h.in, configure.ac,
+	  src/hlexc-compiler.yy, src/hlexc-scanner.ll, src/lexicon.cc,
+	  src/lexicon.h, src/tests/Makefile.am, src/tests/README.tests:
+	  Documentation updated. Test suite updated. Xeroxize some error
+	  messages.
+
+2008-07-25 13:40  tpirinen
+
+	* src/: hlexc-compiler.yy, hlexc-input.cc, hlexc-input.h,
+	  lexicon.cc, lexicon.h, lexicon_entry.cc, lexicon_entry.h,
+	  tests/french.lexc: French512000 works. Lock'n'load.
+
+2008-07-24 19:16  tpirinen
+
+	* src/: hlexc-compiler.yy, hlexc-scanner.ll, lexc-utils.cc,
+	  lexc-utils.h, lexicon.cc, lexicon.h, lexicon_entry.cc,
+	  lexicon_entry.h, tests/Makefile.am, tests/test.allgrind.lexc,
+	  tests/test.twol-fi.lexc: sme, twol-fi working
+
+2008-07-24 14:04  tpirinen
+
+	* src/tests/test.twol-fi.lexc: Finalised clone of the book
+
+2008-07-23 15:41  tpirinen
+
+	* HACKING, README, TODO, configure.ac, doc/Makefile.am,
+	  src/hlexc-compiler.yy, src/lexc-utils.cc, src/lexc-utils.h,
+	  src/lexicon.cc, src/tests/Makefile.am: Version 2008-07-23 lock.
+
+2008-07-22 10:32  tpirinen
+
+	* src/: Makefile.am, hlexc-compiler.yy, hlexc-scanner.ll,
+	  lexc-utils.cc, lexc-utils.h, lexicon.cc, lexicon.h,
+	  lexicon_entry.cc, lexicon_entry.h, multichar_symbol.cc,
+	  multichar_symbol.h, tests/Makefile.am, tests/README.tests,
+	  tests/test.0007.lexc, tests/test.0013.lexc: Multichars work!
+
+2008-07-01 13:44  tpirinen
+
+	* src/: hlexc-compiler.yy, hlexc-scanner.ll, tests/Makefile.am,
+	  tests/README.tests, tests/test.0013.lexc: explicit END symbol
+	  allowed
+
+2008-07-01 02:54  tpirinen
+
+	* src/hlexc-compiler.yy: Hmm, I forgot.:
+
+2008-07-01 00:43  tpirinen
+
+	* src/tests/: README.tests, test.0012.lexc: Multiple entries on one
+	  line
+
+2008-06-30 18:07  tpirinen
+
+	* src/tests/README.tests: Citation corrected
+
+2008-06-30 17:07  tpirinen
+
+	* src/hlexc-compiler.yy: Empty upper or lower string allowed
+
+2008-06-30 17:07  tpirinen
+
+	* src/tests/: README.tests, test.0011.lexc: Empty upper or lower
+	  strings allowed
+
+2008-06-30 16:55  tpirinen
+
+	* src/tests/test.0010.lexc: one more
+
+2008-06-30 16:55  tpirinen
+
+	* src/tests/: README.tests, negtest.0003.lexc, test.twol-fi.lexc:
+	  New test cases.
+
+2008-06-26 15:41  tpirinen
+
+	* HACKING, README, src/hlexc-compiler.yy, src/hlexc-scanner.ll,
+	  src/tests/Makefile.am: doc updates, comment support
+
+2008-06-25 18:02  tpirinen
+
+	* config.h.in, src/Makefile.am, src/hlexc-compiler.yy,
+	  src/hlexc-scanner.ll, src/lexc-utils.cc, src/lexc-utils.h,
+	  src/lexicon.cc, src/lexicon.h, src/lexicon_entry.cc,
+	  src/lexicon_entry.h: Use set<Character> to herd alpahbet
+
+2008-06-24 17:28  tpirinen
+
+	* HACKING, README, TODO, config.h.in, configure.ac, doc/Doxyconf,
+	  doc/Makefile.am, src/lexicon_entry.cc: doc updates, autoconf fall
+	  back to 2.59
+
+2008-06-19 15:53  tpirinen
+
+	* src/: hlexc-compiler.yy, lexicon.cc: Functional version 0,
+	  equivalent to preprocessor one except slower, leaking alphabets
+	  and so forth.
+
+2008-06-18 18:24  tpirinen
+
+	* src/: .cvsignore, hlexc-compiler.yy, lexc-utils.cc, lexc-utils.h,
+	  lexicon.cc, lexicon.h, lexicon_entry.cc, lexicon_entry.h:
+	  +add_string working
+
+2008-06-16 19:47  tpirinen
+
+	* src/: Makefile.am, hlexc-compiler.yy, hlexc-scanner.ll,
+	  lexc-scanner.yy, lexc-utils.cc, lexc-utils.h, lexicon.cc,
+	  lexicon.h, lexicon_entry.cc, lexicon_entry.h,
+	  multichar_symbol.cc, multichar_symbol.h, tests/Makefile.am,
+	  tests/french.lexc, tests/test.0009.lexc: adding alphabet broken
+	  version...
+
+2008-05-28 00:51  tpirinen
+
+	* src/: .cvsignore, hlexc-compiler.yy, lexc-utils.cc, lexicon.cc,
+	  lexicon.h, tests/README.tests, tests/negtest.0001.lexc,
+	  tests/negtest.0002.lexc, tests/test.0008.lexc,
+	  tests/test.0009.lexc: use UTF-8 in lexer and handle all
+	  characters as symbols
+
+2008-05-27 20:26  tpirinen
+
+	* README, src/hlexc-compiler.yy, src/hlexc-scanner.ll,
+	  src/lexc-utils.h, src/lexicon.h, src/lexicon_entry.h,
+	  src/multichar_symbol.h: add doc comments to code (or rather,
+	  reformulate regular comments as)
+
+2008-05-27 03:20  tpirinen
+
+	* src/: hlexc-compiler.yy, hlexc-scanner.ll, tests/Makefile.am:
+	  Revision without <##> mcstring hack
+
+2008-05-26 17:43  tpirinen
+
+	* .cvsignore, Makefile.am, README, TODO, configure.ac: Final
+	  restructuring.
+
+2008-05-26 17:43  tpirinen
+
+	* doc/: .cvsignore, Doxyconf, Makefile.am: docs added
+
+2008-05-26 17:39  tpirinen
+
+	* src/: Makefile, Makefile.am, fst-compiler.yy, hlexc-compiler.yy,
+	  hlexc-scanner.ll, lexc-compiler.yy, lexc-scanner.ll, lexicon.cc:
+	  Adapted src/ to autotoolset infrastructure.
+
+2008-05-26 17:33  tpirinen
+
+	* src/tests/: .cvsignore, Makefile.am, french.lexc, test.0001.lexc,
+	  test.0002.lexc, test.0003.lexc, test.0004.lexc, test.0005.lexc,
+	  test.0006.lexc, test.0007.lexc, test.lexc.0001, test.lexc.0002,
+	  test.lexc.0003, test.lexc.0004, test.lexc.0005, test.lexc.0006,
+	  test.lexc.0007: Test suite updated.
+
+2008-05-22 16:47  tpirinen
+
+	* AUTHORS, COPYING, ChangeLog, HACKING, INSTALL, LISENSSI,
+	  Makefile.am, NEWS, README, THANKS, TODO, config.h.in,
+	  configure.ac, src/Makefile, src/Makefile.am, src/alphabet.C,
+	  src/alphabet.h, src/basic.C, src/basic.h, src/compact.C,
+	  src/compact.h, src/determinise.C, src/fst-compact.C,
+	  src/fst-compare.C, src/fst-generate.C, src/fst-infl.C,
+	  src/fst-infl2.C, src/fst-infl3.C, src/fst-lattice.C,
+	  src/fst-lowmem.C, src/fst-match.C, src/fst-mor.C,
+	  src/fst-parse.C, src/fst-parse2.C, src/fst-print.C,
+	  src/fst-text2bin.C, src/fst-train.C, src/fst.C, src/fst.h,
+	  src/generate.C, src/hlexc-compiler.yy, src/hlexc-scanner.ll,
+	  src/interface.C, src/interface.h, src/lexc-utils.C,
+	  src/lexc-utils.cc, src/lexicon.C, src/lexicon.cc,
+	  src/lexicon_entry.C, src/lexicon_entry.cc, src/lexicon_entry.h,
+	  src/lowmem.C, src/lowmem.h, src/make-compact.C,
+	  src/make-compact.h, src/mem.h, src/multichar_symbol.C,
+	  src/multichar_symbol.cc, src/operators.C, src/robust.C,
+	  src/scanner.ll, src/testprogram.C, src/utf8.C, src/utf8.h: first
+	  compilable version thing stuff
+
+2008-05-10 17:24  trux
+
+	* bin/hlexc, src/Makefile, src/alphabet.C, src/alphabet.h,
+	  src/basic.C, src/basic.h, src/compact.C, src/compact.h,
+	  src/determinise.C, src/fst-compact.C, src/fst-compare.C,
+	  src/fst-compiler.yy, src/fst-generate.C, src/fst-infl.C,
+	  src/fst-infl2.C, src/fst-infl3.C, src/fst-lattice.C,
+	  src/fst-lowmem.C, src/fst-match.C, src/fst-mor.C,
+	  src/fst-parse.C, src/fst-parse2.C, src/fst-print.C,
+	  src/fst-text2bin.C, src/fst-train.C, src/fst.C, src/fst.h,
+	  src/generate.C, src/interface.C, src/interface.h,
+	  src/lexc-compiler.yy, src/lexc-scanner.ll, src/lexc-scanner.yy,
+	  src/lexc-utils.C, src/lexc-utils.h, src/lexicon.C, src/lexicon.h,
+	  src/lexicon_entry.C, src/lexicon_entry.h, src/lowmem.C,
+	  src/lowmem.h, src/make-compact.C, src/make-compact.h, src/mem.h,
+	  src/multichar_symbol.C, src/multichar_symbol.h, src/operators.C,
+	  src/robust.C, src/scanner.ll, src/testprogram.C, src/utf8.C,
+	  src/utf8.h, src/tests/test.lexc.0001, src/tests/test.lexc.0002,
+	  src/tests/test.lexc.0003, src/tests/test.lexc.0004,
+	  src/tests/test.lexc.0005, src/tests/test.lexc.0006,
+	  src/tests/test.lexc.0007: Initial revision
+
+2008-05-10 17:24  trux
+
+	* bin/hlexc, src/Makefile, src/alphabet.C, src/alphabet.h,
+	  src/basic.C, src/basic.h, src/compact.C, src/compact.h,
+	  src/determinise.C, src/fst-compact.C, src/fst-compare.C,
+	  src/fst-compiler.yy, src/fst-generate.C, src/fst-infl.C,
+	  src/fst-infl2.C, src/fst-infl3.C, src/fst-lattice.C,
+	  src/fst-lowmem.C, src/fst-match.C, src/fst-mor.C,
+	  src/fst-parse.C, src/fst-parse2.C, src/fst-print.C,
+	  src/fst-text2bin.C, src/fst-train.C, src/fst.C, src/fst.h,
+	  src/generate.C, src/interface.C, src/interface.h,
+	  src/lexc-compiler.yy, src/lexc-scanner.ll, src/lexc-scanner.yy,
+	  src/lexc-utils.C, src/lexc-utils.h, src/lexicon.C, src/lexicon.h,
+	  src/lexicon_entry.C, src/lexicon_entry.h, src/lowmem.C,
+	  src/lowmem.h, src/make-compact.C, src/make-compact.h, src/mem.h,
+	  src/multichar_symbol.C, src/multichar_symbol.h, src/operators.C,
+	  src/robust.C, src/scanner.ll, src/testprogram.C, src/utf8.C,
+	  src/utf8.h, src/tests/test.lexc.0001, src/tests/test.lexc.0002,
+	  src/tests/test.lexc.0003, src/tests/test.lexc.0004,
+	  src/tests/test.lexc.0005, src/tests/test.lexc.0006,
+	  src/tests/test.lexc.0007: initial import into CVS
+
