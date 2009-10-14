@@ -80,6 +80,8 @@ LexcCompiler::setClosedSigma(bool closed)
 	closedSigma_ = closed;
 	sigma_.insert(Xymbol("@0@")); // quietly inject epsilon to sigma, not pi
 	sigma_.insert(Xymbol("@ZERO@"));
+	sigma_.insert(Xymbol("0"));
+	sigma_.insert(Xymbol("@#@"));
 }
 
 // Construct vector nameJoiner upper:lower contJoiner and add to trie
