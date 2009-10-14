@@ -29,7 +29,4 @@ This package contains the following tools:
  hfst-symbols
  hfst-tail
  hfst-txt2fst
- hfst-unweighted2weighted
- hfst-weighted2unweighted
-
 
