@@ -124,6 +124,7 @@ GRAMMAR: ALPHABET GRAMMAR1 {}
 GRAMMAR1: DIACRITICS GRAMMAR2 {}
 | GRAMMAR2 {}
 ;
+
 GRAMMAR2: VARIABLES GRAMMAR3 {}
 | GRAMMAR3           {}
 ;
@@ -150,9 +151,13 @@ ALPHABET_LINES: ALPHABET_LINES NON_DELIMITER_RANGE EOL
   grammar_displayer.display_alphabet($2);
   grammar_displayer.display_end_of_line();
 }
-|
-NON_DELIMITER_RANGE EOL
+| NON_DELIMITER_RANGE EOL
 {
+  $1->push_back(new Pair(string_copy("@#@"),
+			 string_copy("__HFST_TWOLC_EPSILON_SYMBOL")));
+  NonDelimiterSymbolRange * word_boundary_range = new NonDelimiterSymbolRange;
+  word_boundary_range->push_back(string_copy("@#@"));
+  rule_modifier.define_diacritics(word_boundary_range);
   rule_modifier.define_alphabet($1);
   grammar_displayer.display_alphabet($1);
   grammar_displayer.display_end_of_line();
