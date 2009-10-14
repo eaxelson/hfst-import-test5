@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.60])
-AC_INIT([hfst-tools], [0.1], [hfst-bugs@helsinki.fi])
+AC_INIT([hfst-tools], [2.1], [hfst-bugs@helsinki.fi])
 AC_CONFIG_AUX_DIR([config-aux])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/hfst-subtract.cc])
@@ -207,19 +207,6 @@ AC_ARG_ENABLE([txt2fst],
 			  [enable_txt2fst=$enableval],
 			  [enable_txt2fst=yes])
 AM_CONDITIONAL([WANT_TXT2FST], [test x$enable_txt2fst != xno])
-AC_ARG_ENABLE([unweighted2weighted],
-			  [AS_HELP_STRING([--enable-unweighted2weighted],
-							  [build unweighted2weighted tool @<:@default=yes@:>@])],
-			  [enable_unweighted2weighted=$enableval],
-			  [enable_unweighted2weighted=yes])
-AM_CONDITIONAL([WANT_UNWEIGHTED2WEIGHTED], [test x$enable_unweighted2weighted != xno])
-AC_ARG_ENABLE([weighted2unweighted],
-			  [AS_HELP_STRING([--enable-weighted2unweighted],
-							  [build weighted2unweighted tool @<:@default=yes@:>@])],
-			  [enable_weighted2unweighted=$enableval],
-			  [enable_weighted2unweighted=yes])
-AM_CONDITIONAL([WANT_WEIGHTED2UNWEIGHTED], [test x$enable_weighted2unweighted != xno])
-
 AC_ARG_ENABLE([calculate],
 			  [AS_HELP_STRING([--enable-calculate],
 							  [build calculate tool @<:@default=yes@:>@])],

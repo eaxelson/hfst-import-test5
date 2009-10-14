@@ -1,9 +1,12 @@
 0
+0	0	@#@	__HFST_TWOLC_EPSILON_SYMBOL
 0	1	a	a
 1
-1	1	a	a
+1	1	@#@	__HFST_TWOLC_EPSILON_SYMBOL
 1	0	a	b
 1	2	b	b
+1	1	a	a
 2
-2	1	a	a
+2	2	@#@	__HFST_TWOLC_EPSILON_SYMBOL
 2	0	a	b
+2	1	a	a

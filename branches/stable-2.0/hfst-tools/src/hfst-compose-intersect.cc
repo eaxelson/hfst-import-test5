@@ -71,7 +71,7 @@ static char * symbol_output_file_name = NULL;
 static char * symbol_input_file_name = NULL;
 
 // output stream for messages and warnings
-static FILE* message_out = stdout;
+static FILE* message_out = stderr;
 
 // debug mode.
 static bool debug = false;
@@ -638,7 +638,7 @@ void parse_arguments(int argc, char * argv[])
 
   if (NULL == output_file_name)
   {
-	  message_out = stdout;
+	  message_out = stderr;
   }
   rules_start_index = optind; 
   rules_end_index = argc;
@@ -816,6 +816,22 @@ void compute_result(void)
 	}*/
     
       time_t INTERSECTING_COMPOSITION_START = clock();
+      // Check whether word-boundar @#@ has been mentioned in the rules.
+      if (HWFST::is_symbol("@#@"))
+	{
+	  HWFST::KeyPair * word_boundary_pair =
+	    HWFST::define_keypair(HWFST::Epsilon,
+				  HWFST::get_key(HWFST::get_symbol("@#@"),
+						 weighted_symbol_table));
+	  weighted_lexicon =
+	    HWFST::concatenate
+	    (HWFST::define_transducer(word_boundary_pair),
+	     HWFST::concatenate
+	     (weighted_lexicon,
+	      HWFST::define_transducer(word_boundary_pair)));
+	  weighted_lexicon = HWFST::minimize(weighted_lexicon);
+	  delete word_boundary_pair;
+	}
       weighted_result =
 	HWFST::intersecting_composition(weighted_lexicon,
 					&weighted_rules,
@@ -848,6 +864,22 @@ void compute_result(void)
   else
     {
       time_t INTERSECTING_COMPOSITION_START = clock();
+      if (HFST::is_symbol("@#@"))
+	{
+	  HFST::KeyPair * word_boundary_pair =
+	    HFST::define_keypair(HFST::Epsilon,
+				 HFST::get_key(HFST::get_symbol("@#@"),
+					       unweighted_symbol_table));
+	  unweighted_lexicon =
+	    HFST::concatenate
+	    (HFST::define_transducer(word_boundary_pair),
+	     HFST::concatenate
+	     (unweighted_lexicon,
+	      HFST::define_transducer(word_boundary_pair)));
+	  unweighted_lexicon = HFST::minimize(unweighted_lexicon);
+	  delete word_boundary_pair;
+	}
+
       unweighted_result =
 	HFST::intersecting_composition(unweighted_lexicon,
 				       &unweighted_rules,

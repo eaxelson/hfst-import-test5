@@ -80,6 +80,7 @@ WHITE_SPACE                      [ \t]
 NON_WHITE_SPACE                  [^ \t]
 INTEGER                          -?[1-9][0-9]*
 ZERO                             0|\_\_HFST\_TWOLC\_EPSILON\_SYMBOL
+WORD_BOUNDARY                    #
 %%
 
 {ALPHABET_DECL}    { grammar_displayer.display_alphabet_declaration();
@@ -127,6 +128,8 @@ ZERO                             0|\_\_HFST\_TWOLC\_EPSILON\_SYMBOL
                                    yylval.value = string_copy(yytext); 
                                    return NUMBER; 
                                  }
+{WORD_BOUNDARY}                  {  yylval.value = string_copy("@#@");
+                                    return SYMBOL; }
 {ZERO}                           { return EPSILON; }
 [\t ]{ZERO}[\t ]                 { return EPSILON; }
 ^{ZERO}[\t ]                     { return EPSILON; }

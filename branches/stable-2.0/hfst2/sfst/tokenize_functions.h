@@ -1,6 +1,6 @@
 #include <vector>
 #include <set>
-
+#include <iostream>
 #include "fst.h"
 #include "lookup.h"
 #include "utf8.h"

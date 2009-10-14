@@ -1,0 +1,35 @@
+2009-10-14 17:40  mie
+
+	* Include NEWS to overview releases
+
+2009-10-14 17:24  mie
+
+	* Some version markers to 2.X
+
+2009-10-14 17:20  mie
+
+	* Remove generated files from version control
+
+2009-10-14 13:40  mpsilfve
+
+	* Fixed hfst-lookup
+
+2009-10-14 11:14  mpsilfve
+
+	* Added word-boundaries @#@ to hfst-compose-intersect and
+	  hfst-twolc
+
+2009-10-14 11:11  hardwick
+
+	* Updated hfst-tools/README
+
+2009-10-14 11:11  hardwick
+
+	* Removed weighted2unweighted and unweighted2weighted
+
+2009-10-14 07:59  hardwick
+
+	* Moved everything into hfst-2.0
+	  This may break your commits, sorry about that -
+	  revert if necessary.
+

@@ -13,6 +13,10 @@ KeyVector * get_key_string( const char * input_string,
   char * symbol;
   while ( *input != 0 ) {
     symbol = int2utf8(utf8toint(&input));
+    if (*symbol == 0)
+      {
+	break;
+      }
     Symbol s;
     if ( not alpha.is_symbol(symbol) ) {
       s = alpha.add_symbol(symbol);

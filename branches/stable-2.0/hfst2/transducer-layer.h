@@ -603,7 +603,7 @@ bool is_subset( TransducerHandle t1, TransducerHandle t2 );
 
 
 /** \brief Look up the output-strings corresponding to string \a input_string.
-    Return NULL, if there are no output-strings for input-string. */
+    Return an empty vector, if there are no output-strings for input-string. */
 KeyVectorVector * lookup_all(TransducerHandle t,
 			     vector<Key> * input_string );
 

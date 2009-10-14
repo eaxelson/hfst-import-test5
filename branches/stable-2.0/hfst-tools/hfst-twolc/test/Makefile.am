@@ -70,6 +70,7 @@ check_PROGRAMS = \
 	GrammarTest55 WeightedGrammarTest55 \
 	GrammarTest56 WeightedGrammarTest56 \
 	GrammarTest57 WeightedGrammarTest57 \
+	GrammarTest58 WeightedGrammarTest58 \
 	CleanAllTestfiles
 
 EXTRA_DIST = \
@@ -129,7 +130,8 @@ EXTRA_DIST = \
 	test_grammar54 test_grammar54.txt_fst \
 	test_grammar55 test_grammar55.txt_fst \
 	test_grammar56 test_grammar56.txt_fst \
-	test_grammar57 test_grammar57.txt_fst
+	test_grammar57 test_grammar57.txt_fst \
+	test_grammar58 test_grammar58.txt_fst
 
 string_manipulation_tests_SOURCES = \
 	string_manipulation_tests.cc \
@@ -323,6 +325,8 @@ GrammarTest56_SOURCES = GrammarTest56.cc
 WeightedGrammarTest56_SOURCES = WeightedGrammarTest56.cc
 GrammarTest57_SOURCES = GrammarTest57.cc
 WeightedGrammarTest57_SOURCES = WeightedGrammarTest57.cc
+GrammarTest58_SOURCES = GrammarTest58.cc
+WeightedGrammarTest58_SOURCES = WeightedGrammarTest58.cc
 
 CleanAllTestfiles_SOURCES = CleanAllTestfiles.cc
 
@@ -424,4 +428,6 @@ TESTS = \
 	GrammarTest55 WeightedGrammarTest55 \
 	GrammarTest56 WeightedGrammarTest56 \
 	GrammarTest57 WeightedGrammarTest57 \
+	GrammarTest58 WeightedGrammarTest58 \
 	CleanAllTestfiles
+

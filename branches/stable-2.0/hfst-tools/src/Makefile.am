@@ -102,12 +102,6 @@ endif
 if WANT_TXT2FST
 MAYBE_TXT2FST=hfst-txt2fst
 endif
-if WANT_WEIGHTED2UNWEIGHTED
-MAYBE_WEIGHTED2UNWEIGHTED=hfst-weighted2unweighted
-endif
-if WANT_UNWEIGHTED2WEIGHTED
-MAYBE_UNWEIGHTED2WEIGHTED=hfst-unweighted2weighted
-endif
 if WANT_CALCULATE
 MAYBE_UNWEIGHTED_CALCULATE=hfst-calculate
 MAYBE_WEIGHTED_CALCULATE=hwfst-calculate
@@ -173,8 +167,6 @@ hfst_summarize_SOURCES=hfst-summarize.cc $(HFST_COMMON_SRC)
 hfst_symbols_SOURCES=hfst-symbols.cc $(HFST_COMMON_SRC)
 hfst_tail_SOURCES=hfst-tail.cc $(HFST_COMMON_SRC)
 hfst_txt2fst_SOURCES=hfst-txt2fst.cc $(HFST_COMMON_SRC)
-hfst_unweighted2weighted_SOURCES=hfst-unweighted2weighted.cc $(HFST_COMMON_SRC)
-hfst_weighted2unweighted_SOURCES=hfst-weighted2unweighted.cc $(HFST_COMMON_SRC)
 
 hfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy $(HFST_COMMON_SRC)
 
