@@ -1,0 +1,14 @@
+hfst-optimized-lookup-java: use a fast morphological transducer to
+analyze words.
+
+You need the Java runtime, a transducer in a special fast-lookup format
+(made with separate hfst tools) and this package.
+
+src/ contains .java source files and precompiled .class files.
+
+If you got this from svn, you'll need to compile first, ie.
+
+	javac src/*.java
+
+To run, type (in src/ or wherever you want to install)
+"java HfstOptimizedLookup [name of transducer]"
