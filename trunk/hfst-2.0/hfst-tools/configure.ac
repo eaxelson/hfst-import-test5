@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.60])
-AC_INIT([hfst-tools], [0.1], [hfst-bugs@helsinki.fi])
+AC_INIT([hfst-tools], [2.1], [hfst-bugs@helsinki.fi])
 AC_CONFIG_AUX_DIR([config-aux])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/hfst-subtract.cc])
