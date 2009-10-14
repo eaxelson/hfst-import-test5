@@ -1,0 +1,13 @@
+hfst-optimized-lookup-python: use a fast morphological transducer to
+analyze words.
+
+You need the python interpreter, a transducer in a special fast-lookup format
+(made with separate hfst tools) and this package.
+
+To run, type 
+
+	./hfst-optimized-lookup [name of transducer]
+
+or
+
+	python hfst-optimized-lookup.py [name of transducer]
