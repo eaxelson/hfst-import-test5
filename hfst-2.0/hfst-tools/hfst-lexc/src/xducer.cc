@@ -1274,30 +1274,13 @@ Xducer::removeLexcJoiners(const Xymbol& initial, const Xymbol& final)
 				nuKp = HFST::define_keypair(0, 0);
 				nuTarget = HFST::create_state(nu);
 				HFST::set_final_state(nuTarget, nu);
-				rebuildMap[oldTarget] = nuTarget;
-				agenda.push(oldTarget);
 			}
 			else if (nuStarts.find(upper) != nuStarts.end())
 			{
 				// this is a joiner, also build a link to start state
-				HFST::KeyPair* joinKp = HFST::define_keypair(0, 0);
-				HFST::State joinTarget = nuStarts[upper];
-				HFST::define_transition(nu, nuState, joinKp, joinTarget);
-				agenda.push(oldStarts[upper]);
-				// also follow the old path
 				nuKp = HFST::define_keypair(0, 0);
-				if (rebuildMap.find(oldTarget) != rebuildMap.end())
-				{
-					// target state has been built
-					nuTarget = rebuildMap[oldTarget];
-				}
-				else
-				{
-					// new target: create and map
-					nuTarget = HFST::create_state(nu);
-					rebuildMap[oldTarget] = nuStarts[upper];
-					agenda.push(oldTarget);
-				}
+				nuTarget = nuStarts[upper];
+				agenda.push(oldStarts[upper]);
 			}
 			else
 			{
@@ -1392,30 +1375,13 @@ Xducer::removeLexcJoiners(const Xymbol& initial, const Xymbol& final)
 				nuKp = HWFST::define_keypair(0, 0);
 				nuTarget = HWFST::create_state(nu);
 				HWFST::set_final_state(nuTarget, nu, targetWeight);
-				rebuildMap[oldTarget] = nuTarget;
-				agenda.push(oldTarget);
 			}
 			else if (nuStarts.find(upper) != nuStarts.end())
 			{
 				// this is a joiner, also build a link to start state
-				HWFST::KeyPair* joinKp = HWFST::define_keypair(0, 0);
-				HWFST::State joinTarget = nuStarts[upper];
-				HWFST::define_transition(nu, nuState, joinKp, joinTarget, weight);
-				agenda.push(oldStarts[upper]);
-				// also follow the old path
 				nuKp = HWFST::define_keypair(0, 0);
-				if (rebuildMap.find(oldTarget) != rebuildMap.end())
-				{
-					// target state has been built
-					nuTarget = rebuildMap[oldTarget];
-				}
-				else
-				{
-					// new target: create and map
-					nuTarget = HWFST::create_state(nu);
-					rebuildMap[oldTarget] = nuStarts[upper];
-					agenda.push(oldTarget);
-				}
+				nuTarget = nuStarts[upper];
+				agenda.push(oldStarts[upper]);
 			}
 			else
 			{
