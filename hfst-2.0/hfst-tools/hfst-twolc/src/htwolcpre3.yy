@@ -687,6 +687,12 @@ void yyerror(const char * text) {
 int main(int argc,char * argv[])
 {
   CommandLineParser command_line_parser(argc,argv,false,false);
+  if (command_line_parser.help or
+      command_line_parser.usage or
+      command_line_parser.version)
+    {
+      exit(0);
+    }
   weighted = command_line_parser.weighted;
   verbose = command_line_parser.verbose;
   if (command_line_parser.verbose)
