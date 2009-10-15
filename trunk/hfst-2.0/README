@@ -29,13 +29,13 @@ should result in a local installation and
 	(as root) make uninstall
 
 in its uninstallation. If you aren't going to be linking to the library after
-building it and don't need to be able to send debugging information , you can
+building it and don't need to be able to send debugging information, you can
 save a considerable amount of space and memory by doing
 
 	make install-strip
 
-instead of make install. This strips all the symbols from the binaries, saving
-between 5x and 10x the space.
+instead of make install. This strips all the symbols from the binaries,
+reducing sizes by a factor of 5-10.
 
 If you would rather install in eg. your home directory
 (or aren't the system administrator), you can tell ./configure:
