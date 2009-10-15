@@ -645,8 +645,8 @@ void RuleModifier::init_internal_symbols(void)
   insert_internal_symbol(string_copy("_"));
   insert_internal_symbol(string_copy("-"));
   insert_internal_symbol(string_copy(":"));
-  insert_internal_symbol(string_copy("__HFST_TWOLC_ANY_SYMBOL"));
-  insert_internal_symbol(string_copy("__HFST_TWOLC_EPSILON_SYMBOL"));
+  insert_internal_symbol(string_copy("@?@"));
+  insert_internal_symbol(string_copy("@0@"));
   insert_internal_symbol(string_copy("__HFST_TWOLC_FREELY_INSERT"));
 }
 
@@ -659,7 +659,7 @@ NonDelimiterRange * RuleModifier::get_diacritics(void)
     {
       diacritics->
 	push_back(new Pair(string_copy(*it),
-			   string_copy("__HFST_TWOLC_EPSILON_SYMBOL")));
+			   string_copy("@0@")));
     }
   return diacritics;
 }

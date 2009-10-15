@@ -8,9 +8,9 @@ bool test(void)
   Rule::alphabet.define_pair(string_copy("a"),string_copy("d"));
   Rule::alphabet.define_pair(string_copy("b"),string_copy("a"));
   Rule::alphabet.define_pair(string_copy("b"),string_copy("b"));
-  Rule::alphabet.define_pair(string_copy("__HFST_TWOLC_EPSILON_SYMBOL"),
+  Rule::alphabet.define_pair(string_copy("@0@"),
 			     string_copy("a"));
-  Rule::alphabet.define_pair(string_copy("__HFST_TWOLC_EPSILON_SYMBOL"),
+  Rule::alphabet.define_pair(string_copy("@0@"),
 			     string_copy("b"));
   Weighted w = Weighted::universal(Rule::alphabet);
   w.destroy_fst();
@@ -164,7 +164,7 @@ bool test(void)
 				   context_condition_other.copy());
   other_rules.add_restriction_rule
     (Rule::alphabet.get_key(string_copy
-			    ("__HFST_TWOLC_EPSILON_SYMBOL")),
+			    ("@0@")),
      Rule::alphabet.get_key(string_copy("b")),
      string_copy("Restriction Rule 2"),
      context_condition_other.copy());

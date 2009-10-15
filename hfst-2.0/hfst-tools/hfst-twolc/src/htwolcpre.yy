@@ -154,7 +154,7 @@ ALPHABET_LINES: ALPHABET_LINES NON_DELIMITER_RANGE EOL
 | NON_DELIMITER_RANGE EOL
 {
   $1->push_back(new Pair(string_copy("@#@"),
-			 string_copy("__HFST_TWOLC_EPSILON_SYMBOL")));
+			 string_copy("@0@")));
   NonDelimiterSymbolRange * word_boundary_range = new NonDelimiterSymbolRange;
   word_boundary_range->push_back(string_copy("@#@"));
   rule_modifier.define_diacritics(word_boundary_range);
