@@ -5,6 +5,7 @@
 ## for nested build
 LDADD = ../../hfst2/libhfst.la
 AM_CPPFLAGS = -I../.. -I../../hfst2
+AM_CXXFLAGS = -O3
 
 if WANT_COMPARE
 MAYBE_COMPARE=hfst-compare

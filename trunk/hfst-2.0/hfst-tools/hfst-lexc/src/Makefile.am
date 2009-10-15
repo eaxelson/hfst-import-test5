@@ -3,6 +3,7 @@
 ## For nested distribution as part of hfst
 hfst_lexc_LDADD = ../../../hfst2/libhfst.la libhfstlexc.la
 AM_CPPFLAGS = -I../../../ -I ../../../hfst2
+AM_CXXFLAGS = -O3
 
 lib_LTLIBRARIES=libhfstlexc.la
 bin_PROGRAMS=hfst-lexc
