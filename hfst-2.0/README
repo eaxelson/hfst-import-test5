@@ -15,6 +15,9 @@ There's a lot of documentation and other information about HFST at
 
         https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome
 
+Installation
+------------
+
 INSTALL describes the GNU build system in detail, but for most users the usual
 
 	./configure
@@ -33,3 +36,51 @@ in its uninstallation. If you would rather install in eg. your home directory
 Software in this package is variously distributed under the GPL, LGPL and
 Apache licenses. If you want to develop something or include it in your own
 software, check which license(s) apply.
+
+In CVS or SVN version you must create necessary autotools files in host
+system::
+
+  autoreconf -i
+
+It is common practice to keep `generated files out of version control
+<http://www.gnu.org/software/automake/manual/automake.html#CVS>`_.
+
+For further installation instruction refer to file ``INSTALL``, which contains
+the standard installation instructions for GNU autoconf based software.
+
+Dependencies
+------------
+
+Compilation requirements:
+
+- linker *should* be able to find library named readline, if readline interface
+  will be used. If readline is missing some components will not contain
+  Readline interface.
+
+- Underlying transducer libraries *may* impose further restrictions; e.g.
+  OpenFST may require pthreads library
+
+- Versions loaded from version control systems require relatively new GNU
+  tool-chain to build: autoconf >=2.60, autoconf, libtool >=2.2, >=gettext-0.17.
+  GNU tool-chain is also needed with distributed packages if user wishes to
+  modify Makefile.am or configure.ac files.
+
+- Versions loaded from version control systems require GNU flex 2.5.35 and
+  bison x.x.xx or compatible. Especially flex 2.5.33 will choke on perfectly
+  valid rules used in the hfst. Flex and bison are needed with distribution 
+  versions as well, if user wishes to modify .yy or .ll files.
+
+Runtime requirements:
+
+- If the executable is dynamically linked (almost always), the operating system
+  *must* be able to find hfst and readline libraries.
+
+Further information
+-------------------
+
+Each of the sub-packages contained will have their own set of README's and
+documentation. The `Hfst wiki site
+<https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome>`_ also contains more
+details.
+
+.. vim: set ft=rst:
