@@ -37,8 +37,8 @@ Software in this package is variously distributed under the GPL, LGPL and
 Apache licenses. If you want to develop something or include it in your own
 software, check which license(s) apply.
 
-In CVS or SVN version you must create necessary autotools files in host
-system::
+In the CVS or SVN version you must create necessary autotools files in the host
+system:
 
   autoreconf -i
 
@@ -53,22 +53,22 @@ Dependencies
 
 Compilation requirements:
 
-- linker *should* be able to find library named readline, if readline interface
-  will be used. If readline is missing some components will not contain
-  Readline interface.
+- the linker *should* be able to find library named readline, if the readline
+  interface will be used. If readline is missing some components, hfst will not
+  contain the readline interface.
 
 - Underlying transducer libraries *may* impose further restrictions; e.g.
   OpenFST may require pthreads library
 
-- Versions loaded from version control systems require relatively new GNU
+- Versions loaded from version control systems require a relatively new GNU
   tool-chain to build: autoconf >=2.60, autoconf, libtool >=2.2, >=gettext-0.17.
-  GNU tool-chain is also needed with distributed packages if user wishes to
+  GNU tool-chain is also needed with distributed packages if the user wishes to
   modify Makefile.am or configure.ac files.
 
 - Versions loaded from version control systems require GNU flex 2.5.35 and
   bison x.x.xx or compatible. Especially flex 2.5.33 will choke on perfectly
-  valid rules used in the hfst. Flex and bison are needed with distribution 
-  versions as well, if user wishes to modify .yy or .ll files.
+  valid rules used in hfst. Flex and bison are needed with distribution 
+  versions as well if the user wishes to modify .yy or .ll files.
 
 Runtime requirements:
 
