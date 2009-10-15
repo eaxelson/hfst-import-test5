@@ -419,7 +419,7 @@ LexcCompiler::compileLexical()
 		lexical_.disjunct(regexpUnion_);
 	}
 	lexc_timer_start("morphotaxing");
-	lexical_.minimise();
+	lexical_.determinise();
 	lexc_xducer_printf(lexical_, _("Strings or RegExps\n"));
 	// for each initial joiner target find final joiner and attach
 	lexical_.removeLexcJoiners(initialLexiconName_.first,
