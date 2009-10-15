@@ -448,6 +448,7 @@ class Composer {
       composition_state(0)
     {
       composition->AddState();
+      composition->SetStart(0);
       RulesInfo::init(Rules);
     };
 
