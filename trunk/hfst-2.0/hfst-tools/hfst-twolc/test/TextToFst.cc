@@ -24,7 +24,7 @@ int main(int argc,char * argv[])
   try
     {
       HFST::KeyTable * kt = HFST::create_key_table();
-      Symbol eps = HFST::define_symbol("__HFST_TWOLC_EPSILON_SYMBOL");
+      Symbol eps = HFST::define_symbol("@0@");
       HFST::associate_key(HFST::Epsilon,
 			  kt,
 			  eps);

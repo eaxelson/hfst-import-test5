@@ -82,19 +82,19 @@ void AlphabetCollector::define_alphabet_pair(char * input,
 {
   assert(input != NULL);
   assert(output != NULL);
-  assert(strcmp(input,"__HFST_TWOLC_ANY_SYMBOL") != 0);
-  assert(strcmp(output,"__HFST_TWOLC_ANY_SYMBOL") != 0);
+  assert(strcmp(input,"@?@") != 0);
+  assert(strcmp(output,"@?@") != 0);
   assert(set_names.find(input) == set_names.end());
   assert(set_names.find(output) == set_names.end());
-  if (set_elements["__HFST_TWOLC_ANY_SYMBOL"].find(input)
-      == set_elements["__HFST_TWOLC_ANY_SYMBOL"].end())
+  if (set_elements["@?@"].find(input)
+      == set_elements["@?@"].end())
     {
-      set_elements["__HFST_TWOLC_ANY_SYMBOL"].insert(string_copy(input));
+      set_elements["@?@"].insert(string_copy(input));
     }
-  if (set_elements["__HFST_TWOLC_ANY_SYMBOL"].find(output)
-      == set_elements["__HFST_TWOLC_ANY_SYMBOL"].end())
+  if (set_elements["@?@"].find(output)
+      == set_elements["@?@"].end())
     {
-      set_elements["__HFST_TWOLC_ANY_SYMBOL"].insert(string_copy(output));
+      set_elements["@?@"].insert(string_copy(output));
     }
 	
   insert_symbol_pair(input,output);

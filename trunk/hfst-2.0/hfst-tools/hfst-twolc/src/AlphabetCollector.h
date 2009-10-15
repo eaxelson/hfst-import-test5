@@ -83,11 +83,11 @@ class AlphabetCollector
 		     SymbolPair &construction_pair);
  public:
   AlphabetCollector(void):
-    any_symbol(string_copy("__HFST_TWOLC_ANY_SYMBOL")),
+    any_symbol(string_copy("@?@")),
     set_constructions_ready(false)
     {
-      set_names.insert(string_copy("__HFST_TWOLC_ANY_SYMBOL"));
-      set_elements[string_copy("__HFST_TWOLC_ANY_SYMBOL")];
+      set_names.insert(string_copy("@?@"));
+      set_elements[string_copy("@?@")];
     };
   ~AlphabetCollector(void)
     {

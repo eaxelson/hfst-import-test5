@@ -25,7 +25,7 @@ class TwolCAlphabet
     kt(HFST::create_key_table()),
     alphabet_set(HFST::create_empty_keypair_set())
     {
-      define_epsilon("__HFST_TWOLC_EPSILON_SYMBOL");
+      define_epsilon("@0@");
       define_marker("__HFST_TWOLC_CENTER_MARKER");
     }
   ~TwolCAlphabet(void)
