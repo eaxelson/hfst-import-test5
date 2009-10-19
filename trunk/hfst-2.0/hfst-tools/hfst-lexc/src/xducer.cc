@@ -1219,7 +1219,6 @@ Xducer::removeLexcJoiners(const Xymbol& initial, const Xymbol& final)
 	  HFST::State nuStart = HFST::get_initial_state(nu);
 	  // save knowledge of lexicon starts and
 	  map<HFST::Key,HFST::State> oldStarts;
-	  map<HFST::Key,HFST::State> nuStarts;
 	  // save all states
 	  bool(*hscpt)(HFST::State,HFST::State) = hfst_state_comp;
 	  map<HFST::State,HFST::State,bool(*)(HFST::State,HFST::State)> rebuildMap(hscpt);
@@ -1235,24 +1234,21 @@ Xducer::removeLexcJoiners(const Xymbol& initial, const Xymbol& final)
 		assert(upper == lower);
 		// joiner leads to lexicon start state
 		HFST::State oldState = HFST::get_transition_to(tr);
-		// replace joiners by eps
-		HFST::KeyPair* eps = HFST::define_keypair(0, 0);
-		HFST::State nustate = HFST::create_state(nu);
 		if (upper == initial.getKey())
 		{
 			// transition to start state
+			HFST::KeyPair* eps = HFST::define_keypair(0, 0);
+			HFST::State nustate = HFST::create_state(nu);
 			(void)HFST::define_transition(nu, nuStart, eps, nustate);
 			oldStart = oldState;
+			nuStart = nustate;
 		}
 		// record start states by joiner key
-		nuStarts[upper] = nustate;
 		oldStarts[upper] = oldState;
-		// record correspondences
-		rebuildMap[oldState] = nustate;
 	  }
 	  // rebuilt from target of Root (BFS style yay!)
+	  rebuildMap[oldStart] = nuStart;
 	  agenda.push(oldStart);
-	  HFST::set_marked_state(oldStart, old);
 	  while (!agenda.empty())
 	  {
 		HFST::State oldState = agenda.front();
@@ -1275,12 +1271,20 @@ Xducer::removeLexcJoiners(const Xymbol& initial, const Xymbol& final)
 				nuTarget = HFST::create_state(nu);
 				HFST::set_final_state(nuTarget, nu);
 			}
-			else if (nuStarts.find(upper) != nuStarts.end())
+			else if (oldStarts.find(upper) != oldStarts.end())
 			{
-				// this is a joiner, also build a link to start state
+				// this is a joiner, epsilon to start state
 				nuKp = HFST::define_keypair(0, 0);
-				nuTarget = nuStarts[upper];
-				agenda.push(oldStarts[upper]);
+				if (rebuildMap.find(oldStarts[upper]) != rebuildMap.end())
+				{
+					nuTarget = rebuildMap[oldStarts[upper]];
+				}
+				else
+				{
+					nuTarget = HFST::create_state(nu);
+					rebuildMap[oldStarts[upper]] = nuTarget;
+					agenda.push(oldStarts[upper]);
+				}
 			}
 			else
 			{
@@ -1317,7 +1321,6 @@ Xducer::removeLexcJoiners(const Xymbol& initial, const Xymbol& final)
 	  HWFST::State nuStart = HWFST::get_initial_state(nu);
 	  // save knowledge of lexicon starts and
 	  map<HWFST::Key,HWFST::State> oldStarts;
-	  map<HWFST::Key,HWFST::State> nuStarts;
 	  // save all states
 	  bool(*hscpt)(HWFST::State,HWFST::State) = hwfst_state_comp;
 	  map<HWFST::State,HWFST::State,bool(*)(HWFST::State,HWFST::State)> rebuildMap(hscpt);
@@ -1334,24 +1337,21 @@ Xducer::removeLexcJoiners(const Xymbol& initial, const Xymbol& final)
 		assert(upper == lower);
 		// joiner leads to lexicon start state
 		HWFST::State oldState = HWFST::get_transition_to(tr);
-		// replace joiners by eps
-		HWFST::KeyPair* eps = HWFST::define_keypair(0, 0);
-		HWFST::State nustate = HWFST::create_state(nu);
 		if (upper == initial.getWey())
 		{
 			// transition to start state
+			HWFST::KeyPair* eps = HWFST::define_keypair(0, 0);
+			HWFST::State nustate = HWFST::create_state(nu);
 			(void)HWFST::define_transition(nu, nuStart, eps, nustate, weight);
 			oldStart = oldState;
+			nuStart = nustate;
 		}
 		// record start states by joiner key
-		nuStarts[upper] = nustate;
 		oldStarts[upper] = oldState;
-		// record correspondences
-		rebuildMap[oldState] = nustate;
 	  }
 	  // rebuilt from target of Root (BFS style yay!)
+	  rebuildMap[oldStart] = nuStart;
 	  agenda.push(oldStart);
-	  HWFST::set_marked_state(oldStart, old);
 	  while (!agenda.empty())
 	  {
 		HWFST::State oldState = agenda.front();
@@ -1376,12 +1376,20 @@ Xducer::removeLexcJoiners(const Xymbol& initial, const Xymbol& final)
 				nuTarget = HWFST::create_state(nu);
 				HWFST::set_final_state(nuTarget, nu, targetWeight);
 			}
-			else if (nuStarts.find(upper) != nuStarts.end())
+			else if (oldStarts.find(upper) != oldStarts.end())
 			{
-				// this is a joiner, also build a link to start state
 				nuKp = HWFST::define_keypair(0, 0);
-				nuTarget = nuStarts[upper];
-				agenda.push(oldStarts[upper]);
+				if (rebuildMap.find(oldStarts[upper]) != rebuildMap.end())
+				{
+					nuTarget = rebuildMap[oldStarts[upper]];
+				}
+				else
+				{
+					nuTarget = HWFST::create_state(nu);
+					rebuildMap[oldStarts[upper]] = nuTarget;
+					agenda.push(oldStarts[upper]);
+				}
+			
 			}
 			else
 			{
