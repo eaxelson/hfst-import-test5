@@ -360,6 +360,8 @@ lookup_all(const char* s, KeyTable* kt,
 	}
 	else
 	{
+		lookup_orig->erase(remove_if(lookup_orig->begin(), lookup_orig->end(),
+					_is_epsilon), lookup_orig->end());
 		KeyVectorVector* final_results = new KeyVectorVector;
 		final_results->push_back(lookup_orig);
 		size_t cascade_number = 0;
@@ -392,11 +394,14 @@ lookup_all(const char* s, KeyTable* kt,
 						VERBOSE_PRINT("Got no results\n");
 						lookups = new KeyVectorVector;
 					}
-					for (KeyVectorVector::const_iterator lkv = lookups->begin();
+					for (KeyVectorVector::iterator lkv = lookups->begin();
 							lkv != lookups->end();
 							++lkv)
 					{
-						string* lkvstring = keyVectorToString(*lkv, kt);
+						KeyVector* hmmlkv = *lkv;
+						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
+											_is_epsilon), hmmlkv->end());
+						string* lkvstring = keyVectorToString(hmmlkv, kt);
 						VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
 						current_results->push_back(*lkv);
 						delete lkvstring;
@@ -552,8 +557,7 @@ lookup_all(const char* s, KeyTable* kt,
 	KeyVector* lookup_orig = NULL;
 	if (space_separated)
 	{
-		lookup_orig = stringSeparatedToKeyVector(s, kt, string(" "),
-				true);
+		lookup_orig = stringSeparatedToKeyVector(s, kt, string(" "), true);
 	}
 	else
 	{
@@ -568,6 +572,8 @@ lookup_all(const char* s, KeyTable* kt,
 	}
 	else
 	{
+		lookup_orig->erase(remove_if(lookup_orig->begin(), lookup_orig->end(),
+					_is_epsilon), lookup_orig->end());
 		KeyVectorVector* final_results = new KeyVectorVector;
 		final_results->push_back(lookup_orig);
 		size_t cascade_number = 0;
@@ -604,7 +610,10 @@ lookup_all(const char* s, KeyTable* kt,
 							lkv != lookups->end();
 							++lkv)
 					{
-						string* lkvstring = keyVectorToString(*lkv, kt);
+						KeyVector* hmmlkv = *lkv;
+						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
+											_is_epsilon), hmmlkv->end());
+						string* lkvstring = keyVectorToString(hmmlkv, kt);
 						VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
 						current_results->push_back(*lkv);
 						delete lkvstring;
