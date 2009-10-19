@@ -149,11 +149,15 @@ RE: CONTAINMENT RE
 	}
 	| TERM_COMPLEMENT RE
 	{
-		$$ = HFST::negate($2, _xre_negation_pi);
+		HFST::KeyPairSet* pi = _xre_negation_pi();
+		$$ = HFST::negate($2, pi);
+		delete pi;
 	}
 	| COMPLEMENT RE
 	{
-		$$ = HFST::negate($2, _xre_negation_pi);
+		HFST::KeyPairSet* pi = _xre_negation_pi();
+		$$ = HFST::negate($2, pi);
+		delete pi;
 	} 
 	| RE STAR
 	{
@@ -324,7 +328,9 @@ IMPLICIT_PAIR: CHAR
 		}
 		| ANY	
 		{
-			$$ = HFST::define_transducer(_xre_creation_pi);
+			HFST::KeyPairSet* pi = _xre_creation_pi();
+			$$ = HFST::define_transducer(pi);
+			delete pi;
 		}
 		|		
 		EPSILON {
@@ -332,7 +338,9 @@ IMPLICIT_PAIR: CHAR
 		}
 		| PAIR_SEPARATOR_SOLE
 			{
-				$$ = HFST::define_transducer(_xre_creation_pi);
+				HFST::KeyPairSet* pi = _xre_creation_pi();
+				$$ = HFST::define_transducer(pi);
+				delete pi;
 			}
 		;
 

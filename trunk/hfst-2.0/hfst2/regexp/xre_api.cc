@@ -81,13 +81,13 @@ xre_set_key_table(HFST::KeyTable* kt)
 void
 xre_set_negation_key_pair_set(HFST::KeyPairSet* kps)
 {
-	_xre_negation_pi = kps;
+	assert(false);
 }
 
 void
 xre_set_creation_key_pair_set(HFST::KeyPairSet* kps)
 {
-	_xre_creation_pi = kps;
+	assert(false);
 }
 
 }

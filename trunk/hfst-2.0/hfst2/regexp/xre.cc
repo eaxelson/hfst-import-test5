@@ -17,8 +17,8 @@ char *_xre_data;
 size_t _xre_len;
 HFST::TransducerHandle _xre_transducer_;
 HFST::KeySet* _xre_keys;
-HFST::KeyPairSet* _xre_negation_pi;
-HFST::KeyPairSet* _xre_creation_pi;
+HFST::KeySet* _xre_negation_sigma;
+HFST::KeySet* _xre_creation_sigma;
 HFST::KeyTable* _xre_key_table;
 std::map<HFST::Key,HFST::TransducerHandle> _xre_definitions;
 bool _xre_initialised;
@@ -99,6 +99,41 @@ xre_get_quoted(const char *s)
 	return qpart;
 }
 
+HFST::KeyPairSet*
+_xre_creation_pi()
+{
+	HFST::KeyPairSet* pi = new HFST::KeyPairSet;
+	for (HFST::KeySet::const_iterator k = _xre_creation_sigma->begin();
+			k != _xre_creation_sigma->end();
+			++k)
+	{
+		for (HFST::KeySet::const_iterator k2 = _xre_creation_sigma->begin();
+				k2 != _xre_creation_sigma->end();
+				++k2)
+		{
+			pi->insert(HFST::define_keypair(*k, *k2));
+		}
+	}
+	return pi;
+}
+
+HFST::KeyPairSet*
+_xre_negation_pi()
+{
+	HFST::KeyPairSet* pi = new HFST::KeyPairSet;
+	for (HFST::KeySet::const_iterator k = _xre_negation_sigma->begin();
+			k != _xre_negation_sigma->end();
+			++k)
+	{
+		for (HFST::KeySet::const_iterator k2 = _xre_negation_sigma->begin();
+				k2 != _xre_negation_sigma->end();
+				++k2)
+		{
+			pi->insert(HFST::define_keypair(*k, *k2));
+		}
+	}
+	return pi;
+}
 
 HFST::Key
 _xre_string_to_key(char *s)
@@ -117,59 +152,14 @@ _xre_string_to_key(char *s)
 	return rv;
 }
 
-static
-void
-_xre_maybe_insert_keypair(HFST::KeyPairSet* kps, HFST::KeyPair* kp)
-{
-	if (kps->find(kp) == kps->end())
-	{
-		kps->insert(kp);
-	}
-	else
-	{
-		delete kp;
-	}
-}
-
 void
 _xre_new_key(HFST::Key k)
 {
 	if (_xre_keys->find(k) == _xre_keys->end())
 	{
 		HFST::insert_key(k, _xre_keys);
-		HFST::KeyPair* idkp = HFST::define_keypair(k, k);
-		_xre_maybe_insert_keypair(_xre_creation_pi, idkp);
-		idkp = HFST::define_keypair(k, k);
-		_xre_maybe_insert_keypair(_xre_creation_pi, idkp);
-		for (KeyPairSet::const_iterator ck = _xre_creation_pi->begin();
-				 ck != _xre_creation_pi->end(); ++ck)
-		{
-			HFST::Key inp = HFST::get_input_key(*ck);
-			HFST::Key outp = HFST::get_output_key(*ck);
-			HFST::KeyPair* kp = HFST::define_keypair(k, inp);
-			_xre_maybe_insert_keypair(_xre_creation_pi, kp);
-			kp = HFST::define_keypair(inp, k);
-			_xre_maybe_insert_keypair(_xre_creation_pi, kp);
-			kp = HFST::define_keypair(k, outp);
-			_xre_maybe_insert_keypair(_xre_creation_pi, kp);
-			kp = HFST::define_keypair(outp, k);
-			_xre_maybe_insert_keypair(_xre_creation_pi, kp);
-		}
-		for (KeyPairSet::const_iterator ck = _xre_negation_pi->begin();
-				 ck != _xre_negation_pi->end(); ++ck)
-		{
-			HFST::Key inp = HFST::get_input_key(*ck);
-			HFST::Key outp = HFST::get_output_key(*ck);
-			HFST::KeyPair* kp = HFST::define_keypair(k, inp);
-			_xre_maybe_insert_keypair(_xre_negation_pi, kp);
-			kp = HFST::define_keypair(inp, k);
-			_xre_maybe_insert_keypair(_xre_negation_pi, kp);
-			kp = HFST::define_keypair(k, outp);
-			_xre_maybe_insert_keypair(_xre_negation_pi, kp);
-			kp = HFST::define_keypair(outp, k);
-			_xre_maybe_insert_keypair(_xre_negation_pi, kp);
-		}
-
+		HFST::insert_key(k, _xre_creation_sigma);
+		HFST::insert_key(k, _xre_negation_sigma);
 	}
 }
 
@@ -202,15 +192,29 @@ void _xre_ensure_zero_epsilon()
 	// FIXME
 }
 
-void _xre_initialise(const char* xre, HFST::KeyPairSet* negation_pi,
-					 HFST::KeyPairSet* creation_pi, HFST::KeyTable* keytable,
+void _xre_initialise(const char* xre, HFST::KeyPairSet* negation_sigma,
+					 HFST::KeyPairSet* creation_sigma, HFST::KeyTable* keytable,
 					 bool weighted)
 {
 	_xre_transducer_ = (HFST::TransducerHandle)malloc(sizeof(HFST::TransducerHandle));
 	_xre_data = strdup(xre);
 	_xre_len = strlen(_xre_data);
-	_xre_negation_pi = negation_pi;
-	_xre_creation_pi = creation_pi;
+	_xre_negation_sigma = new HFST::KeySet();
+	for (HFST::KeyPairSet::const_iterator kp= negation_sigma->begin();
+			kp != negation_sigma->end();
+			++kp)
+	{
+		_xre_negation_sigma->insert(HFST::get_input_key(*kp));
+		_xre_negation_sigma->insert(HFST::get_output_key(*kp));
+	}
+	_xre_creation_sigma = new HFST::KeySet();
+	for (HFST::KeyPairSet::const_iterator kp= creation_sigma->begin();
+			kp != creation_sigma->end();
+			++kp)
+	{
+		_xre_creation_sigma->insert(HFST::get_input_key(*kp));
+		_xre_creation_sigma->insert(HFST::get_output_key(*kp));
+	}
 	_xre_keys = HFST::create_empty_key_set();
 	_xre_key_table = keytable;
 	_xre_ensure_zero_epsilon();
@@ -223,13 +227,9 @@ void _xre_initialise()
 	_xre_transducer_ = (HFST::TransducerHandle)malloc(sizeof(HFST::TransducerHandle));
 	_xre_data = (char*)calloc(sizeof(char), 1);
 	_xre_len = 0;
-	_xre_negation_pi = HFST::create_empty_keypair_set();
-	_xre_creation_pi = HFST::create_empty_keypair_set();
+	_xre_negation_sigma = HFST::create_empty_key_set();
+	_xre_creation_sigma = HFST::create_empty_key_set();
 	_xre_keys = HFST::create_empty_key_set();
-	//_xre_new_key(0);
-	// does not have an effect ?
-	_xre_negation_pi = HFST::insert_keypair(HFST::define_keypair(0,0), _xre_negation_pi);
-	_xre_creation_pi = HFST::insert_keypair(HFST::define_keypair(0,0), _xre_creation_pi);
 	//
 	_xre_key_table = HFST::create_key_table();
 	HFST::Symbol zeroeps = HFST::define_symbol("@0@");
@@ -247,39 +247,32 @@ _xre_make_key_pair(HFST::Key k1, HFST::Key k2)
 	{
 		// any id pair
 		HFST::KeyPairSet* id_set = HFST::create_empty_keypair_set();
-		for (KeyPairSet::const_iterator ck = _xre_creation_pi->begin();
-			 ck != _xre_creation_pi->end(); ++ck)
+		for (KeySet::const_iterator ck = _xre_creation_sigma->begin();
+			 ck != _xre_creation_sigma->end(); ++ck)
 		{
-			HFST::Key inp = HFST::get_input_key(*ck);
-			HFST::Key outp = HFST::get_output_key(*ck);
-			id_set->insert(HFST::define_keypair(inp, inp));
-			id_set->insert(HFST::define_keypair(outp, outp));
+			id_set->insert(HFST::define_keypair(*ck, *ck));
 		}
 		rv = HFST::define_transducer(id_set);
 	}
 	else if ( k1 == ANY_KEY )
 	{
+		// ?:k2
 		HFST::KeyPairSet* any_set = HFST::create_empty_keypair_set();
-		for (KeyPairSet::const_iterator ck = _xre_creation_pi->begin();
-			 ck != _xre_creation_pi->end(); ++ck)
+		for (KeySet::const_iterator ck = _xre_creation_sigma->begin();
+			 ck != _xre_creation_sigma->end(); ++ck)
 		{
-			HFST::Key inp = HFST::get_input_key(*ck);
-			HFST::Key outp = HFST::get_output_key(*ck);
-			any_set->insert(HFST::define_keypair(inp, k2));
-			any_set->insert(HFST::define_keypair(outp, k2));
+				any_set->insert(HFST::define_keypair(*ck, k2));
 		}
 		rv = HFST::define_transducer(any_set);
 	}
 	else if ( k2 == ANY_KEY )
 	{
+		// k1:?
 		HFST::KeyPairSet* any_set = HFST::create_empty_keypair_set();
-		for (KeyPairSet::const_iterator ck = _xre_creation_pi->begin();
-			 ck != _xre_creation_pi->end(); ++ck)
+		for (KeySet::const_iterator ck = _xre_creation_sigma->begin();
+			 ck != _xre_creation_sigma->end(); ++ck)
 		{
-			HFST::Key inp = HFST::get_input_key(*ck);
-			HFST::Key outp = HFST::get_output_key(*ck);
-			any_set->insert(HFST::define_keypair(k1, inp));
-			any_set->insert(HFST::define_keypair(k1, outp));
+			any_set->insert(HFST::define_keypair(k1, *ck));
 		}
 		rv = HFST::define_transducer(any_set);
 	}

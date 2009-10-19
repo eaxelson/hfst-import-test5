@@ -18,8 +18,8 @@ extern char *_xre_data;
 extern size_t _xre_len;
 extern HFST::TransducerHandle _xre_transducer_;
 extern HFST::KeySet* _xre_keys;
-extern HFST::KeyPairSet* _xre_negation_pi;
-extern HFST::KeyPairSet* _xre_creation_pi;
+extern HFST::KeySet* _xre_negation_sigma;
+extern HFST::KeySet* _xre_creation_sigma;
 extern HFST::KeyTable* _xre_key_table;
 extern bool _xre_initialised;
 extern std::map<HFST::Key,HFST::TransducerHandle> _xre_definitions;
@@ -47,8 +47,8 @@ char* xre_get_quoted(const char *s);
 void _xre_new_data(const char* xre);
 
 //! @brief initialises XRE data structures with existing data
-void _xre_initialise(const char* xre, HFST::KeyPairSet* negation_pi,
-					 HFST::KeyPairSet* creation_pi, HFST::KeyTable* keytable,
+void _xre_initialise(const char* xre, HFST::KeyPairSet* negation_sigma,
+					 HFST::KeyPairSet* creation_sigma, HFST::KeyTable* keytable,
 					 bool weighted);
 //! @brief initialises XRE data structures empty
 void _xre_initialise();
@@ -57,5 +57,7 @@ HFST::Key _xre_string_to_key(char *s);
 void _xre_new_key(HFST::Key k);
 void _xre_new_transducer(HFST::TransducerHandle t);
 HFST::TransducerHandle _xre_make_key_pair(HFST::Key k1, HFST::Key k2);
+HFST::KeyPairSet* _xre_creation_pi();
+HFST::KeyPairSet* _xre_negation_pi();
 #endif
 // vim: set ft=cpp.doxygen:
