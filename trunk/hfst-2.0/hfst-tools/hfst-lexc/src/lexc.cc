@@ -410,6 +410,8 @@ LexcCompiler::compileLexical()
 	{
 		stringTrie_.substitute(Xymbol("0"), Xymbol("@0@"));
 		stringTrie_.substitute(Xymbol("@ZERO@"), Xymbol("0"));
+		stringTrie_.substitute(XymbolPair(Xymbol("#"), Xymbol("#")),
+				XymbolPair(Xymbol("#"), Xymbol("@#@")));
 		lexc_xducer_printf(stringTrie_, _("Strings trie\n"));
 		lexical_.disjunct(stringTrie_);
 	}
