@@ -1366,7 +1366,6 @@ Xducer::removeLexcJoiners(const Xymbol& initial, const Xymbol& final)
 			HWFST::Key lower = HWFST::get_output_key(oldKp);
 			HWFST::State oldTarget = HWFST::get_transition_to(tr);
 			float weight = HWFST::get_transition_weight(tr);
-			float targetWeight = HWFST::get_final_weight(oldTarget, old);
 			HWFST::KeyPair* nuKp = 0;
 			HWFST::State nuTarget;
 			if (upper == final.getWey())
@@ -1374,11 +1373,13 @@ Xducer::removeLexcJoiners(const Xymbol& initial, const Xymbol& final)
 				// end joiner means end state
 				nuKp = HWFST::define_keypair(0, 0);
 				nuTarget = HWFST::create_state(nu);
-				HWFST::set_final_state(nuTarget, nu, targetWeight);
+				weight += HWFST::get_final_weight(oldTarget, old);
+				HWFST::set_final_state(nuTarget, nu, 0);
 			}
 			else if (oldStarts.find(upper) != oldStarts.end())
 			{
 				nuKp = HWFST::define_keypair(0, 0);
+				weight += HWFST::get_final_weight(oldTarget, old);
 				if (rebuildMap.find(oldStarts[upper]) != rebuildMap.end())
 				{
 					nuTarget = rebuildMap[oldStarts[upper]];
