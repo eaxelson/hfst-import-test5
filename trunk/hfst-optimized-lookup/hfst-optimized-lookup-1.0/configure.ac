@@ -11,6 +11,5 @@ AC_DEFINE([DEBUG], [0], [Print some information useful for debugging])
 AC_DEFINE([TIMING], [0], [Calculate and print timing information (unimplemented currently)])
 AC_DEFINE([DEBUG_DIACRITICS], [0], [Don't suppress printing the representations of flag diacritics])
 AC_DEFINE([FULL_DEBUG], [0], [Print tons of information about the state of the program])
-AC_DEFINE([BE_FAST], [0], [Disable various features for the sake of speed])
 
 AC_OUTPUT

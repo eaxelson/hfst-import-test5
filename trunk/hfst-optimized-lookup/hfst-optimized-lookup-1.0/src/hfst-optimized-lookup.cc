@@ -317,12 +317,10 @@ void runTransducer (genericTransducer T)
   size_t input_form_counter = 0;
   while(std::cin.getline(str,MAX_IO_STRING))
     {
-#if !BE_FAST
       if (echoInputsFlag)
 	{
 	  std::cout << str << std::endl;
 	}
-#endif
       size_t i = 0;
       SymbolNumber k = NO_SYMBOL_NUMBER;
       bool failed = false;
@@ -334,12 +332,10 @@ void runTransducer (genericTransducer T)
 #endif
 	  if (k == NO_SYMBOL_NUMBER)
 	    {
-#if !BE_FAST
 	      if (echoInputsFlag)
 		{
 		  std::cout << std::endl;
 		}
-#endif
 	      failed = true;
 	      break;
 	    }
@@ -354,12 +350,8 @@ void runTransducer (genericTransducer T)
       ++input_form_counter;
       input_string[i] = NO_SYMBOL_NUMBER;
       T.analyze(input_string);
-#if BE_FAST
       std::cout << std::endl;
-#endif
-#if !BE_FAST
       T.printAnalyses();
-#endif
     }
 }
 
@@ -731,19 +723,15 @@ Transducer::find_index(SymbolNumber input,
 
 void Transducer::display(SymbolNumber * whole_output_string)
 {
-#if BE_FAST
   for (SymbolNumber * num = whole_output_string; *num != NO_SYMBOL_NUMBER; ++num)
     std::cout << symbol_table[*num];
   std::cout << std::endl;
-#endif
-#if !BE_FAST
   std::string str = "";
   for (SymbolNumber * num = whole_output_string; *num != NO_SYMBOL_NUMBER; ++num)
     {
       str.append(symbol_table[*num]);
     }
     display_vector.push_back(str);
-#endif
 }
 
 void TransducerUniq::display(SymbolNumber * whole_output_string)
@@ -845,10 +833,7 @@ Transducer::get_analyses(SymbolNumber * input_symbol,
 
 void Transducer::printAnalyses(void)
 {
-#if BE_FAST
   std::cout << std::endl;
-#endif
-#if !BE_FAST
   int i = 0;
   DisplayVector::iterator it = display_vector.begin();
   while ( (it != display_vector.end()) && i < maxAnalyses )
@@ -859,7 +844,6 @@ void Transducer::printAnalyses(void)
     }
     display_vector.clear(); // purge the display vector
   std::cout << std::endl;
-#endif
 }
 
 void TransducerUniq::printAnalyses(void)
