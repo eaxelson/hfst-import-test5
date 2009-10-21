@@ -115,7 +115,7 @@ noinst_HEADERS= \
 	calculate_functions.h hfst-commandline.h hfst-common-cases.h \
 	hfst-common-options.h hfst-common-unary-cases.h \
 	hfst-common-unary-options.h hfst-common-unary-variables.h \
-	hfst-compiler.h hfst-lookup-commandline.h hfst-lookup-transducers.h \
+	hfst-compiler.h \
 	hfst-pair-test-commandline.h hfst-pair-test-transducers.h \
 	hfst-program-options.h hwfst-pair-test-transducers.h \
 	hfst-optimized-lookup.h
