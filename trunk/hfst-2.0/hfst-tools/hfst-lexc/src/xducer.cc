@@ -1374,7 +1374,8 @@ Xducer::removeLexcJoiners(const Xymbol& initial, const Xymbol& final)
 				nuKp = HWFST::define_keypair(0, 0);
 				nuTarget = HWFST::create_state(nu);
 				weight += HWFST::get_final_weight(oldTarget, old);
-				HWFST::set_final_state(nuTarget, nu, 0);
+				HWFST::set_final_state(nuTarget, nu, weight);
+				weight = 0;
 			}
 			else if (oldStarts.find(upper) != oldStarts.end())
 			{
