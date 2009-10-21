@@ -731,15 +731,12 @@ Transducer::find_index(SymbolNumber input,
 
 void Transducer::note_analysis(SymbolNumber * whole_output_string)
 {
-  for (SymbolNumber * num = whole_output_string; *num != NO_SYMBOL_NUMBER; ++num)
-    std::cout << symbol_table[*num];
-  std::cout << std::endl;
   std::string str = "";
   for (SymbolNumber * num = whole_output_string; *num != NO_SYMBOL_NUMBER; ++num)
     {
       str.append(symbol_table[*num]);
     }
-    display_vector.push_back(str);
+  display_vector.push_back(str);
 }
 
 void TransducerUniq::note_analysis(SymbolNumber * whole_output_string)
@@ -841,7 +838,6 @@ Transducer::get_analyses(SymbolNumber * input_symbol,
 
 void Transducer::printAnalyses(void)
 {
-  std::cout << std::endl;
   int i = 0;
   DisplayVector::iterator it = display_vector.begin();
   while ( (it != display_vector.end()) && i < maxAnalyses )
