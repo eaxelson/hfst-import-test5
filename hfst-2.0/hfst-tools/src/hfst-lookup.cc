@@ -35,6 +35,7 @@
 #include <hfst2/string/string.h>
 #endif
 #if !NESTED_BUILD
+#include <hfst2/string.h>
 #endif
 
 // readline here
