@@ -156,7 +156,7 @@ parse_options(int argc, char** argv)
 			else if (strcmp(optarg, "apertium") == 0)
 			{
 				begin_format = strdup("^%i");
-				lookup_format = strdup("^/%l");
+				lookup_format = strdup("/%l");
 				end_format = strdup("$\n");
 			}
 			else if (strncmp(optarg, "custom:", 7) == 0)
