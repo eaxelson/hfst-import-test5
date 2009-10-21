@@ -317,6 +317,10 @@ void runTransducer (genericTransducer T)
   size_t input_form_counter = 0;
   while(std::cin.getline(str,MAX_IO_STRING))
     {
+      if (strlen(str) == 0)
+	{ // for technical reasons we don't support analysing empty inputs
+	  continue;
+	}
       if (echoInputsFlag)
 	{
 	  std::cout << str << std::endl;
