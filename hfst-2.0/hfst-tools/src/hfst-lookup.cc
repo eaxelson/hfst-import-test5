@@ -71,17 +71,18 @@ print_usage(const char *program_name)
 #               endif
 	print_common_unary_program_options(message_out);
 	fprintf(message_out, 
-			"  -I, --input-strings=FILE         Read test cases from a file\n"
+			"  -I, --input-strings=SFILE        Read lookup strings from SFILE\n"
 			"  -S, --spaces                     Use space separated tokens in strings\n"
 			"  -f, --format=FORMAT              Use FORMAT printing results sets\n");
 	fprintf(message_out,
 		   "\n"
 		   "If OUTFILE or INFILE is missing or -, "
 		   "standard streams will be used.\n"
+		   "If SFILE is omitted, a readline interface will be used\n"
 		   "FORMAT is one of {xerox,cg,apertium,custom:``...''}, "
 		   "xerox being default\n"
 		   "\n"
-		   "More info at <https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstDiffTest>\n"
+		   "More info at <https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstLookUp>\n"
 		   "\n"
 		   "Report bugs to HFST team <hfst-bugs@helsinki.fi>\n");
 }
