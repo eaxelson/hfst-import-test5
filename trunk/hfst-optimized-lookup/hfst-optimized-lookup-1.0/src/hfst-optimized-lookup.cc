@@ -1329,13 +1329,13 @@ void TransducerWUniq::printAnalyses(void)
 void TransducerWFdUniq::printAnalyses(void)
 {
   int i = 0;
-  std::map<Weight, std::string> weight_sorted_map;
+  std::multimap<Weight, std::string> weight_sorted_map;
   DisplayMap::iterator it;
   for (it = display_map.begin(); it != display_map.end(); it++)
     {
       weight_sorted_map.insert(std::pair<Weight, std::string>((*it).second, (*it).first));
     }
-  std::map<Weight, std::string>::iterator display_it;
+  std::multimap<Weight, std::string>::iterator display_it;
   for (display_it = weight_sorted_map.begin();
        display_it != weight_sorted_map.end(), i < maxAnalyses;
        display_it++, i++)
