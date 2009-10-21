@@ -259,6 +259,23 @@ void fst::Composer::more( StateId lexicon_target, RulesInfo &Rules, StateId comp
   
 };
 
+float fst::RulesInfo::get_weight(void)
+{
+  float w = 0;
+  for (vector<Arcs*>::iterator it = Rule_arcs.begin();
+       it != Rule_arcs.end();
+       ++it)
+    {
+      w += (*it)->Value().weight.Value();
+    }
+  return w;
+}
+
+float fst::Composer::multiply_weights(Arcs &L, RulesInfo &R)
+{
+  return L.Value().weight.Value() + R.get_weight();
+}
+
 // Compose a single transition x:t in the lexicon with a single transition
 // t:z in the rules.
 void fst::Composer::single_compose( Arcs &lexicon_arcs, RulesInfo &Rules ) {
@@ -285,9 +302,23 @@ void fst::Composer::single_compose( Arcs &lexicon_arcs, RulesInfo &Rules ) {
   if ( new_state ) {
     more( lexicon_target, Rules, composition_target );
   }
- 
-  composition->AddArc(composition_state, Arc(pair.input, pair.output, 0, composition_target));
 
+  if (Rules.pair.input == 0)
+    {
+      composition->AddArc(composition_state, 
+			  Arc(pair.input, 
+			      pair.output, 
+			      Rules.get_weight(), 
+			      composition_target));      
+    }
+  else
+    {
+      composition->AddArc(composition_state, 
+			  Arc(pair.input, 
+			      pair.output, 
+			      multiply_weights(lexicon_arcs,Rules), 
+			      composition_target));
+    }
 };
 
 // Compose a single transition x:0 with transitions in the rules.
@@ -312,7 +343,11 @@ void fst::Composer::single_compose_epsilon( Arcs &lexicon_arcs, RulesInfo &Rules
   pair.input = lexicon_arcs.Value().ilabel;
   pair.output = lexicon_arcs.Value().olabel;
 
-  composition->AddArc(composition_state, Arc(pair.input, pair.output, 0, composition_target));
+  composition->AddArc(composition_state, 
+		      Arc(pair.input, 
+			  pair.output, 
+			  lexicon_arcs.Value().weight.Value(),  
+			  composition_target));
   
 };
 
