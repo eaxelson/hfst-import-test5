@@ -91,7 +91,7 @@ void
 print_version(const char* program_name)
 {
 	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dversion
-	fprintf(message_out, "%s 0.1 (%s)\n"
+	fprintf(message_out, "%s 0.2 (%s)\n"
 		   "Copyright (C) 2009 University of Helsinki,\n"
 		   "License GPLv3: GNU GPL version 3 "
 		   "<http://gnu.org/licenses/gpl.html>\n"
