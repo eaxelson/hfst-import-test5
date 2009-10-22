@@ -92,9 +92,9 @@ xre_strip_percents(const char *s)
 char *
 xre_get_quoted(const char *s)
 {
-	char *qstart = strchr((char*) s, '"') + 1;
-	char *qend = strrchr((char*) s, '"');
-	char* qpart = strdup(qstart);
+	const char *qstart = strchr((char*) s, '"') + 1;
+	const char *qend = strrchr((char*) s, '"');
+	char* qpart = HFST::string_copy(qstart);
 	*(qpart+ (size_t) (qend - qstart)) = '\0';
 	return qpart;
 }

@@ -65,6 +65,25 @@ void xrewerror(char *text)
 
 namespace HWFST {
 
+  char * new_string(size_t lgth)
+  {
+    return (char*)(calloc(sizeof(char),lgth+1));
+  }
+
+  char * string_copy(const char * str)
+  {
+    if (str == NULL)
+      {
+	throw "NULL char * given as input to HFST::string_copy().";
+      }
+    char * new_str = new_string(strlen(str));
+    if (new_str == NULL)
+      {
+	throw std::bad_alloc();
+      }
+    return strcpy(new_str,str);
+  }
+
   typedef struct contexts_t_ {
     fst::StdVectorFst *left, *right;
     struct contexts_t_ *next;

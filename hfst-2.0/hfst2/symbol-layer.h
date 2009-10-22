@@ -3,6 +3,8 @@
 using std::cin; 
 using std::cout;
 
+char * string_copy(const char * str);
+
 /** \defgroup SymbolLayer Symbol Layer
  *
  * Datatypes and functions related to symbols and the relation between symbols
