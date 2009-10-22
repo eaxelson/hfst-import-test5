@@ -569,8 +569,10 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 	  }
 }
 
+extern int xredebug;
 
 int main( int argc, char **argv ) {
+  //xredebug = 1;
 	message_out = stdout;
 	verbose = false;
 	int retval = parse_options(argc, argv);
