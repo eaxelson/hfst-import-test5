@@ -63,6 +63,25 @@ containing Transducer_ pairs left(1),right(1) ... left(n/2),right(n/2). More inf
 
 namespace HFST {
 
+  char * new_string(size_t lgth)
+  {
+    return (char*)(calloc(sizeof(char),lgth+1));
+  }
+
+  char * string_copy(const char * str)
+  {
+    if (str == NULL)
+      {
+	throw "NULL char * given as input to HFST::string_copy().";
+      }
+    char * new_str = new_string(strlen(str));
+    if (new_str == NULL)
+      {
+	throw std::bad_alloc();
+      }
+    return strcpy(new_str,str);
+  }
+
   typedef struct contexts_t_ {
     Transducer *left;
     Transducer *right;

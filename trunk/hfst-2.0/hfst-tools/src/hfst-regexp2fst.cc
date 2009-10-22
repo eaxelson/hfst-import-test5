@@ -249,11 +249,15 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 
 		  if (expression) {
 
-		    char *regex_data = expression;
+		    char *regex_data = HFST::string_copy(expression);
 
 		    VERBOSE_PRINT("Compiling unweighted transducer\n");
 		    HFST::TransducerHandle heavyDucer;
-		    heavyDucer = HFST::compile_xre(regex_data, negation_pi, creation_pi, key_table);
+		    heavyDucer = HFST::compile_xre(regex_data, 
+						   negation_pi, 
+						   creation_pi, 
+						   key_table);
+		    free(regex_data);
 		    VERBOSE_PRINT("Calculating symbol mappings\n");
 		    HFST::KeyTable* symbolmap = HFST::xre_get_last_key_table();
 		    if (NULL == heavyDucer)
@@ -295,16 +299,21 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 		    inputstream.peek();
 
 		    while (!inputstream.eof()) {
-		      char line[256];
-		      inputstream.getline(line,256);
+		      std::string input_line;
+		      std::getline(inputstream,input_line);
+		      const char * line = input_line.c_str();
 		      if (strcmp(line,"") == 0) // an empty line
-			break;
+			continue;
 
-		      char *regex_data = line;
+		      char *regex_data = HFST::string_copy(line);
 		      
 		      VERBOSE_PRINT("Compiling unweighted transducer\n");
 		      HFST::TransducerHandle heavyDucer;
-		      heavyDucer = HFST::compile_xre(regex_data, negation_pi, creation_pi, key_table);
+		      heavyDucer = HFST::compile_xre(regex_data, 
+						     negation_pi, 
+						     creation_pi, 
+						     key_table);
+		      free(regex_data);
 		      VERBOSE_PRINT("Calculating symbol mappings\n");
 		      HFST::KeyTable* symbolmap = HFST::xre_get_last_key_table();
 		      if (NULL == heavyDucer)
@@ -419,11 +428,15 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 
 		  if (expression) {
 
-		    char *regex_data = expression;
+		    char *regex_data = HFST::string_copy(expression);
 
 		    VERBOSE_PRINT("Compiling unweighted transducer\n");
 		    HWFST::TransducerHandle heavyDucer;
-		    heavyDucer = HWFST::compile_xre(regex_data, negation_pi, creation_pi, key_table);
+		    heavyDucer = HWFST::compile_xre(regex_data, 
+						    negation_pi, 
+						    creation_pi, 
+						    key_table);
+		    free(regex_data);
 		    VERBOSE_PRINT("Calculating symbol mappings\n");
 		    HWFST::KeyTable* symbolmap = HWFST::xre_get_last_key_table();
 		    VERBOSE_PRINT("Setting weights to %f\n", final_weight);
@@ -467,16 +480,22 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 		    inputstream.peek();
 
 		    while (!inputstream.eof()) {
-		      char line[256];
-		      inputstream.getline(line,256);
+		      std::string input_line;
+		      std::getline(inputstream,input_line);
+		      const char * line = input_line.c_str();
+
 		      if (strcmp(line,"") == 0) // an empty line
-			break;
+			continue;
 		      
-		      char *regex_data = line;
+		      char *regex_data = HFST::string_copy(line);
 		      
 		      VERBOSE_PRINT("Compiling unweighted transducer\n");
 		      HWFST::TransducerHandle heavyDucer;
-		      heavyDucer = HWFST::compile_xre(regex_data, negation_pi, creation_pi, key_table);
+		      heavyDucer = HWFST::compile_xre(regex_data, 
+						      negation_pi, 
+						      creation_pi, 
+						      key_table);
+		      free(regex_data);
 		      VERBOSE_PRINT("Calculating symbol mappings\n");
 		      HWFST::KeyTable* symbolmap = HWFST::xre_get_last_key_table();
 		      VERBOSE_PRINT("Setting weights to %f\n", final_weight);
