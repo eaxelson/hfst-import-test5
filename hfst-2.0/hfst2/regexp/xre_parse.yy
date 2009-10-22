@@ -44,7 +44,7 @@ extern void xreerror(char * text);
 %token	<values>		CATENATE_N_TO_K
 %token	<transducer>	STAR PLUS
 %token	<transducer>	PAIR_SEPARATOR PAIR_SEPARATOR_SOLE PAIR_SEPARATOR_WO_LEFT PAIR_SEPARATOR_WO_RIGHT
-%token	<transducer> ANY EPSILON
+%token	<transducer> ANY EPSILON_TOKEN
 %token	<name>		READ_BIN READ_TEXT READ_SPACED READ_PROLOG
 %token	<name>		SYMBOL
 %token	<transducer>	REVERSE INVERT UPPER LOWER
@@ -96,21 +96,43 @@ REGULAR_EXPRESSION: REGULAR_EXPRESSION UNION REG
 	}
 	| REGULAR_EXPRESSION CROSS_PRODUCT REG
 	{
-		$$ = $1;
-		fprintf(stderr, "*** XRE: Xproduct missing\n");
-		assert(false);
+	  $$ = 
+	    HFST::compose
+	    ($1,HFST::compose
+	     (HFST::repeat_star(HFST::define_transducer(_xre_creation_pi())),
+	      $3));
 	}
 	| REGULAR_EXPRESSION IGNORING REG
 	{
-		$$ = $1;
-		fprintf(stderr, "*** XRE: Ignoring missing\n");
-		assert(false);
+	  HFST::KeyPair * non_existent_pair = 
+	    HFST::define_keypair(HFST::get_unused_key(_xre_key_table));
+	  $$ = HFST::insert_freely($1,non_existent_pair);
+	  $$ = HFST::substitute_with_transducer($$,non_existent_pair,$3); 
+	  delete non_existent_pair;
 	}
 	| REGULAR_EXPRESSION IGNORE_INTERNALLY REG
 	{
-		$$ = $1;
-		fprintf(stderr, "*** XRE: Ignoring internally missing\n");
-		assert(false);
+	  HFST::KeyPair * non_existent_pair = 
+	    HFST::define_keypair(HFST::get_unused_key(_xre_key_table));
+	  HFST::TransducerHandle freely_insert_universal =
+	    HFST::insert_freely
+	    (HFST::repeat_star(HFST::define_transducer(_xre_creation_pi())),
+	     non_existent_pair);
+
+	  $$ = HFST::insert_freely($1,non_existent_pair);
+	  $$ = HFST::subtract
+	    ($$,
+	     HFST::concatenate
+	     (HFST::define_transducer(non_existent_pair),
+	      HFST::copy(freely_insert_universal)));
+	  $$ = HFST::subtract
+	    ($$,
+	     HFST::concatenate
+	     (freely_insert_universal,
+	      HFST::define_transducer(non_existent_pair)));
+
+	  $$ = HFST::substitute_with_transducer($$,non_existent_pair,$3); 
+	  delete non_existent_pair;
 	}
 	| REG { $$ = $1; }
 	;
@@ -131,21 +153,41 @@ REG: REG CONCATENATE RE
 
 RE: CONTAINMENT RE
 	{ 
-		$$ = $2;
-		fprintf(stderr, "*** XRE: Containment missing\n");
-		assert(false);
+	  $$ =
+	    HFST::concatenate
+	    (HFST::repeat_star(HFST::define_transducer(_xre_creation_pi())),
+	     HFST::concatenate
+	     ($2,
+	      HFST::repeat_star(HFST::define_transducer(_xre_creation_pi()))));
+	  
 	}
 	| CONTAINMENT_ONCE RE
 	{ 
-		$$ = $2;
-		fprintf(stderr, "*** XRE: Contains once missing\n");
-		assert(false);
+	  HFST::print_transducer_number($2);
+	  HFST::TransducerHandle containment =
+	    HFST::concatenate
+	    (HFST::repeat_star(HFST::define_transducer(_xre_creation_pi())),
+	     HFST::concatenate
+	     ($2,
+	      HFST::repeat_star(HFST::define_transducer(_xre_creation_pi()))));
+	  HFST::TransducerHandle containment_twice =
+	    HFST::concatenate(HFST::copy(containment),HFST::copy(containment));
+	  $$ = HFST::subtract(containment,containment_twice);
 	}
 	| CONTAINMENT_OPT RE	
 	{ 
-		$$ = $2;
-		fprintf(stderr, "*** XRE: Contains optionally missing\n");
-		assert(false);
+	  HFST::TransducerHandle containment =
+	    HFST::concatenate
+	    (HFST::repeat_star(HFST::define_transducer(_xre_creation_pi())),
+	     HFST::concatenate
+	     ($2,
+	      HFST::repeat_star(HFST::define_transducer(_xre_creation_pi()))));
+	  HFST::TransducerHandle containment_twice =
+	    HFST::concatenate(HFST::copy(containment),containment);
+	  $$ = 
+	    HFST::subtract
+	    (HFST::repeat_star(HFST::define_transducer(_xre_creation_pi())),
+	     containment_twice);
 	}
 	| TERM_COMPLEMENT RE
 	{
@@ -284,27 +326,27 @@ PAIR: CHAR PAIR_SEPARATOR CHAR
 	| ANY PAIR_SEPARATOR ANY {
 		$$ = _xre_make_key_pair(ANY_KEY, ANY_KEY);  
 	}
-	| CHAR PAIR_SEPARATOR EPSILON {
+	| CHAR PAIR_SEPARATOR EPSILON_TOKEN {
 		$$ = _xre_make_key_pair($1, 0);
 	}
-	| EPSILON PAIR_SEPARATOR EPSILON {
+	| EPSILON_TOKEN PAIR_SEPARATOR EPSILON_TOKEN {
 		$$ = HFST::create_epsilon_transducer();
 	}
-	| EPSILON PAIR_SEPARATOR CHAR	 {
+	| EPSILON_TOKEN PAIR_SEPARATOR CHAR	 {
 		$$ = _xre_make_key_pair(0, $3);
 	}
-	| EPSILON PAIR_SEPARATOR ANY {
+	| EPSILON_TOKEN PAIR_SEPARATOR ANY {
 		$$ = _xre_make_key_pair(0, ANY_KEY);
 	}
-	| ANY PAIR_SEPARATOR EPSILON	 {
+	| ANY PAIR_SEPARATOR EPSILON_TOKEN	 {
 		$$ = _xre_make_key_pair(ANY_KEY, 0);
 	}
 	;
 
-HALF_PAIR: EPSILON PAIR_SEPARATOR_WO_RIGHT	 {
+HALF_PAIR: EPSILON_TOKEN PAIR_SEPARATOR_WO_RIGHT	 {
 				$$ = _xre_make_key_pair(0, ANY_KEY);
 			}
-		| PAIR_SEPARATOR_WO_LEFT EPSILON	 {
+		| PAIR_SEPARATOR_WO_LEFT EPSILON_TOKEN	 {
 				$$ = _xre_make_key_pair(ANY_KEY, 0);
 			}
 		| CHAR PAIR_SEPARATOR_WO_RIGHT { 
@@ -333,7 +375,7 @@ IMPLICIT_PAIR: CHAR
 			delete pi;
 		}
 		|		
-		EPSILON {
+		EPSILON_TOKEN {
 			$$ = HFST::create_epsilon_transducer();
 		}
 		| PAIR_SEPARATOR_SOLE
