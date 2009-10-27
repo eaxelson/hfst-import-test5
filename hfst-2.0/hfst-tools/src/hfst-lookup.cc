@@ -495,6 +495,10 @@ lookup_print_all(const char* s, KeyTable* kt,
 			final_results = current_results;
 		} // for each transducer in cascade
 		// print loop
+		if (final_results->size() == 0)
+		{
+			lookup_printf(no_lookups_format, s, NULL);
+		}
 		for (KeyVectorVector::iterator lkv = final_results->begin();
 				lkv != final_results->end();
 				++lkv)
