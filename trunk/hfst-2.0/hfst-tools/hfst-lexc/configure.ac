@@ -79,7 +79,7 @@ AC_LANG([C++])
 AC_CHECK_LIB([pthread], [main], , [AC_MSG_ERROR([openfst requires pthread])])
 # Don't test for libhfst for a nested dist
 # AC_CHECK_LIB([hfst], [main], , [AC_MSG_ERROR([libhfst is required])])
-AC_CHECK_LIB([readline], [main], , [AC_MSG_ERROR([libreadline is required])])
+AC_CHECK_LIB([readline], [main])
 
 # Checks for header files
 AC_HEADER_STDC
