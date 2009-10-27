@@ -54,6 +54,7 @@ static FILE* lookup_file;
 static bool space_separated = false;
 static char* begin_format; // print before set of lookups
 static char* lookup_format; // print for each lookup
+static char* no_lookups_format; // print for zero results
 static char* end_format; // print after set of lookups
 static bool format_given = false;
 static bool use_readline = true;
@@ -149,18 +150,21 @@ parse_options(int argc, char** argv)
 			{
 				begin_format = strdup("\n");
 				lookup_format = strdup("%i\t%l\n");
+				no_lookups_format = strdup("%i\t%i\t+?\n");
 				end_format = strdup("\n");
 			}
 			else if (strcmp(optarg, "cg") == 0)
 			{
 				begin_format = strdup("\"<%i>\"\n");
 				lookup_format = strdup("\t\"%b\"%a\n");
+				no_lookups_format = strdup("\t\"%i\"\t ?\n");
 				end_format = strdup("\n");
 			}
 			else if (strcmp(optarg, "apertium") == 0)
 			{
 				begin_format = strdup("^%i");
 				lookup_format = strdup("/%l");
+				no_lookups_format = strdup("/*%i");
 				end_format = strdup("$\n");
 			}
 			else if (strncmp(optarg, "custom:", 7) == 0)
@@ -188,6 +192,16 @@ parse_options(int argc, char** argv)
 				lookup_format = static_cast<char*>(memcpy(lookup_format,
 							format_start, format_end - format_start));
 				format_start = format_end + 1;
+				format_end = strchr(format_start, ',');
+				if (format_end == NULL)
+				{
+					goto error_format;
+				}
+				no_lookups_format = static_cast<char*>(calloc(sizeof(char),
+							format_end - format_start + 1));
+				no_lookups_format = static_cast<char*>(memcpy(no_lookups_format,
+							format_start, format_end - format_start));
+				format_start = format_end + 1;
 				for (format_end = format_start; 
 						*format_end != '\0';
 						format_end++)
@@ -201,7 +215,7 @@ parse_options(int argc, char** argv)
 			break;
 error_format:
 			fprintf(message_out, "invalid argument for format"
-					"custom: must be of form BEGIN,LOOKUP,END\n");
+					"custom: must be of form BEGIN,LOOKUP,NO_RES,END\n");
 			return EXIT_FAILURE;
 			break;
 		case 'r':
@@ -225,6 +239,7 @@ error_format:
 	{
 		begin_format = strdup("\n");
 		lookup_format = strdup("%i\t%l\n");
+		no_lookups_format = strdup("%i\t%i\t+?\n");
 		end_format = strdup("\n");
 	}
 	if (is_output_stdout)
@@ -577,6 +592,10 @@ lookup_print_all(const char* s, KeyTable* kt,
 			final_results = current_results;
 		} // for each transducer in cascade
 		// print loop
+		if (final_results->size() == 0)
+		{
+			lookup_printf(no_lookups_format, s, NULL);
+		}
 		for (KeyVectorVector::iterator lkv = final_results->begin();
 				lkv != final_results->end();
 				++lkv)
@@ -652,7 +671,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 #			if HAVE_LIBREADLINE
 			if (use_readline)
 			{
-				while (line = readline("lookup> "))
+				while ((line = readline("lookup> ")) != NULL)
 				{
 					HFST::lookup_print_all(line, key_table, cascade);
 					add_history(line);
@@ -746,7 +765,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 #			if HAVE_LIBREADLINE
 			if (use_readline)
 			{
-				while (line = readline("lookup> "))
+				while ((line = readline("lookup> ")) != NULL)
 				{
 					HWFST::lookup_print_all(line, key_table, cascade);
 					add_history(line);
