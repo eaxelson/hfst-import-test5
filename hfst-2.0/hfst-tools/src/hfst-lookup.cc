@@ -39,8 +39,10 @@
 #endif
 
 // readline here
-#include <readline/readline.h>
-#include <readline/history.h>
+#if HAVE_LIBREADLINE
+#	include <readline/readline.h>
+#	include <readline/history.h>
+#endif
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
@@ -117,11 +119,12 @@ parse_options(int argc, char** argv)
 			{"input-strings", required_argument, 0, 'I'},
 			{"spaces", no_argument, 0, 'S'},
 			{"format", required_argument, 0, 'f'},
+			{"no-readline", no_argument, 0, 'r'},
 			{0,0,0,0}
 		};
 		int option_index = 0;
 		// add tool-specific options here 
-		char c = getopt_long(argc, argv, "df:hi:I:o:sSqvVR:DW:r:t:",
+		char c = getopt_long(argc, argv, "df:hi:I:o:sSqvVrR:DW:r:t:",
 							 long_options, &option_index);
 		if (-1 == c)
 		{
@@ -200,6 +203,9 @@ error_format:
 			fprintf(message_out, "invalid argument for format"
 					"custom: must be of form BEGIN,LOOKUP,END\n");
 			return EXIT_FAILURE;
+			break;
+		case 'r':
+			use_readline = false;
 			break;
 		case '?':
 			fprintf(message_out, "invalid option --%s\n",
@@ -643,6 +649,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 #			define MAX_LINE_LENGTH 254
 			char* line =
 				static_cast<char*>(malloc(sizeof(char)*MAX_LINE_LENGTH+1));
+#			if HAVE_LIBREADLINE
 			if (use_readline)
 			{
 				while (line = readline("lookup> "))
@@ -654,6 +661,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 			}
 			else
 			{
+#endif
 				while ((line = fgets(line, MAX_LINE_LENGTH, lookup_file)))
 				{
 					char *p = line;
@@ -669,7 +677,9 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 					VERBOSE_PRINT("Looking up %s...\n", line);
 					HFST::lookup_print_all(line, key_table, cascade);
 				} // while lines in input
+#if HAVE_LIBREADLINE
 			}
+#endif
 			if (write_symbols_to_filename != NULL) {
 			  ofstream os(write_symbols_to_filename);
 			  HFST::write_symbol_table(key_table, os);
@@ -733,6 +743,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 #			define MAX_LINE_LENGTH 254
 			char* line =
 				static_cast<char*>(malloc(sizeof(char)*MAX_LINE_LENGTH+1));
+#			if HAVE_LIBREADLINE
 			if (use_readline)
 			{
 				while (line = readline("lookup> "))
@@ -744,6 +755,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 			}
 			else
 			{
+#			endif
 				while ((line = fgets(line, MAX_LINE_LENGTH, lookup_file)))
 				{
 					char *p = line;
@@ -759,7 +771,9 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 					VERBOSE_PRINT("Looking up %s...\n", line);
 					HWFST::lookup_print_all(line, key_table, cascade);
 				} // while lines in input
+#if HAVE_LIBREADLINE
 			}
+#endif
 			if (write_symbols_to_filename != NULL) {
 			  ofstream os(write_symbols_to_filename);
 			  HWFST::write_symbol_table(key_table, os);

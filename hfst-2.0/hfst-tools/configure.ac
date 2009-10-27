@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.60])
-AC_INIT([hfst-tools], [2.1], [hfst-bugs@helsinki.fi])
+AC_INIT([hfst-tools], [2.2], [hfst-bugs@helsinki.fi])
 AC_CONFIG_AUX_DIR([config-aux])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/hfst-subtract.cc])
@@ -295,8 +295,6 @@ cat <<EOF
 	* symbols: $enable_symbols
 	* tail: $enable_tail
 	* txt2fst: $enable_txt2fst
-	* unweighted2weighted: $enable_unweighted2weighted
-	* weighted2unweighted: $enable_weighted2unweighted
-        * optimized-lookup: $enable_optimized_lookup
+	* optimized-lookup: $enable_optimized_lookup
 EOF
 
