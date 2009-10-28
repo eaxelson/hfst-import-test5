@@ -364,6 +364,14 @@ int setup(FILE * f)
   TransducerHeader header(f);
   TransducerAlphabet alphabet(f, header.symbol_count());
 
+  if (header.probe_flag(Has_unweighted_input_epsilon_cycles) ||
+      header.probe_flag(Has_input_epsilon_cycles))
+    {
+      std::cerr << "!! Warning: transducer has epsilon cycles                  !!\n"
+		<< "!! This is currently not handled - if they are encountered !!\n"
+		<< "!! program *will* segfault.                                !!\n";
+    }
+  
   if (alphabet.get_state_size() == 0)
     {      // if the state size is zero, there are no flag diacritics to handle
       if (header.probe_flag(Weighted) == false)
