@@ -137,7 +137,9 @@ Composition of \a t1 and \a t2 maps "a" to "c" iff \a t1 maps "a" to some "b" an
 @post The resulting transducer may be nondeterministic and not minimal. 
 \a t1 and \a t2 are deleted. */
 
-TransducerHandle compose( TransducerHandle t1, TransducerHandle t2, bool destructive=true );
+TransducerHandle compose( TransducerHandle t1, TransducerHandle t2, bool destructive);
+
+TransducerHandle compose( TransducerHandle t1, TransducerHandle t2);
 
 
 /** \brief Concatenation of \a t1 and \a t2. 

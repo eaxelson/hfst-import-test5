@@ -3147,6 +3147,44 @@ TransducerHandle compose( TransducerHandle t1, TransducerHandle t2, bool destruc
     }
   }
 
+TransducerHandle compose( TransducerHandle t1, TransducerHandle t2) {
+    bool destructive = true;
+    bool filter=false;
+    if (filter) {
+      KeySet *ks1 = define_key_set(t1);
+      KeySet *ks2 = define_key_set(t2);
+      for ( KeyIterator it = begin_sigma_key(ks1); it != end_sigma_key(ks1); it++ )
+	ks2->insert(get_sigma_key(it));
+      Key eps1 = find_unused_key(*ks2);
+      //fprintf(stderr, "first unused key: %hu\n", eps1);
+      ks2->insert(eps1);
+      Key eps2 = find_unused_key(*ks2);
+      //fprintf(stderr, "second unused key: %hu\n", eps2);
+      TransducerHandle T1, T2;
+      if (destructive) {
+	T1 = substitute_key(t1,Label::epsilon,eps2,true);
+	T2 = substitute_key(t2,Label::epsilon,eps1,true);
+      }
+      else {
+	T1 = substitute_key(copy(t1),Label::epsilon,eps2,true);
+	T2 = substitute_key(copy(t2),Label::epsilon,eps1,true);
+      }
+
+      Transducer *filter_transducer = make_filter_transducer(eps1, eps2, ks1);
+      Transducer* const pT1 = HANDLE_TO_PINSTANCE(Transducer, T1);
+      Transducer* const pT2 = HANDLE_TO_PINSTANCE(Transducer, T2);
+      Transducer *tmp = composition_(pT1, filter_transducer, false); // should be true !!!
+      Transducer *pResult = composition_(tmp, pT2, true);
+      return PINSTANCE_TO_HANDLE(Transducer, pResult);
+    }
+    else {
+      Transducer* const pT1 = HANDLE_TO_PINSTANCE(Transducer, t1);
+      Transducer* const pT2 = HANDLE_TO_PINSTANCE(Transducer, t2);
+      Transducer* const pResult = composition_(pT1, pT2, destructive);
+      return PINSTANCE_TO_HANDLE(Transducer, pResult);
+    }
+  }
+
   TransducerHandle repeat_star( TransducerHandle t ) {
     Transducer* const pT = HANDLE_TO_PINSTANCE(Transducer, t);
     Transducer* const pResult = repetition_(pT);
