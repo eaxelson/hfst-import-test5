@@ -413,6 +413,14 @@ namespace HWFST {
     return PINSTANCE_TO_HANDLE(Transducer, pResult);
   }
 
+  TransducerHandle compose( TransducerHandle t1, TransducerHandle t2) {
+    bool destructive = true;
+    fst::StdVectorFst* const pT1 = HANDLE_TO_PINSTANCE(fst::StdVectorFst, t1);
+    fst::StdVectorFst* const pT2 = HANDLE_TO_PINSTANCE(fst::StdVectorFst, t2);
+    fst::StdVectorFst* const pResult = composition_(pT1, pT2, destructive);
+    return PINSTANCE_TO_HANDLE(Transducer, pResult);
+  }
+
   fst::StdVectorFst *composition_( fst::StdVectorFst *t1, fst::StdVectorFst *t2, bool destructive ) {
     fst::StdVectorFst *composition = new fst::StdVectorFst;
     fst::ArcSort(t1, fst::StdOLabelCompare());

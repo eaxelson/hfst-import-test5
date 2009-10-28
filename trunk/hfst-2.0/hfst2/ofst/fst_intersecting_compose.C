@@ -1,5 +1,4 @@
 #include "fst_intersecting_compose.h"
-
 size_t fst::RulesInfo::number_of_rules;
 vector<fst::Transducer*> fst::RulesInfo::Rules;
 fst::StdVectorFst * fst::Tree::composition;
@@ -384,9 +383,7 @@ void fst::Composer::compose( RulesInfo &Rules ) {
     if ( Rules.first_in( lexicon_out ) ) {
 
       while ( true ) {
-
 	do {
-
 	  single_compose( lexicon_arcs, Rules);
 	  lexicon_arcs.Next();
 
@@ -405,7 +402,6 @@ void fst::Composer::compose( RulesInfo &Rules ) {
 	lexicon_arcs.Next();
     }
   }
-
 };
 
 /*int main ( int argc, char * argv[] ) {
