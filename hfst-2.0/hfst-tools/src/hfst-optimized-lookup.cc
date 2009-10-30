@@ -59,7 +59,7 @@ bool print_version(void)
 {
   std::cerr <<
     "\n" <<
-    "hfst-optimized-lookup 2.0 (" << PACKAGE_STRING << ")" << std::endl <<
+    PACKAGE_STRING << std::endl <<
     __DATE__ << " " __TIME__ << std::endl <<
     "copyright (C) 2009 University of Helsinki\n";
   return true;
@@ -317,12 +317,14 @@ void runTransducer (genericTransducer T)
   size_t input_form_counter = 0;
   while(std::cin.getline(str,MAX_IO_STRING))
     {
-#if !BE_FAST
+      if (strlen(str) == 0)
+	{ // for technical reasons we don't support analysing empty inputs
+	  continue;
+	}
       if (echoInputsFlag)
 	{
 	  std::cout << str << std::endl;
 	}
-#endif
       size_t i = 0;
       SymbolNumber k = NO_SYMBOL_NUMBER;
       bool failed = false;
@@ -334,12 +336,10 @@ void runTransducer (genericTransducer T)
 #endif
 	  if (k == NO_SYMBOL_NUMBER)
 	    {
-#if !BE_FAST
 	      if (echoInputsFlag)
 		{
 		  std::cout << std::endl;
 		}
-#endif
 	      failed = true;
 	      break;
 	    }
@@ -354,12 +354,8 @@ void runTransducer (genericTransducer T)
       ++input_form_counter;
       input_string[i] = NO_SYMBOL_NUMBER;
       T.analyze(input_string);
-#if BE_FAST
       std::cout << std::endl;
-#endif
-#if !BE_FAST
       T.printAnalyses();
-#endif
     }
 }
 
@@ -368,29 +364,41 @@ int setup(FILE * f)
   TransducerHeader header(f);
   TransducerAlphabet alphabet(f, header.symbol_count());
 
+  if (header.probe_flag(Has_unweighted_input_epsilon_cycles) ||
+      header.probe_flag(Has_input_epsilon_cycles))
+    {
+      std::cerr << "!! Warning: transducer has epsilon cycles                  !!\n"
+		<< "!! This is currently not handled - if they are encountered !!\n"
+		<< "!! program *will* segfault.                                !!\n";
+    }
+  
   if (alphabet.get_state_size() == 0)
-    {      // if the state size is nonzero, there are some flag diacritics to handle
+    {      // if the state size is zero, there are no flag diacritics to handle
       if (header.probe_flag(Weighted) == false)
 	{
 	  if (displayUniqueFlag)
 	    { // no flags, no weights, unique analyses only
 	      TransducerUniq C(f, header, alphabet);
 	      runTransducer(C);
-	    } else
+	    } else if (!displayUniqueFlag)
 	    { // no flags, no weights, all analyses
 	    Transducer C(f, header, alphabet);
 	    runTransducer(C);
 	    }
-	} else if (displayUniqueFlag)
-	{ // no flags, weights, unique analyses only
-	  TransducerWUniq C(f, header, alphabet);
-	  runTransducer(C);
-	} else
-	{ // no flags, weights, all analyses
-	  TransducerW C(f, header, alphabet);
-	  runTransducer(C);
 	}
-    } else
+      else if (header.probe_flag(Weighted) == true)
+	{
+	  if (displayUniqueFlag)
+	    { // no flags, weights, unique analyses only
+	      TransducerWUniq C(f, header, alphabet);
+	      runTransducer(C);
+	    } else if (!displayUniqueFlag)
+	    { // no flags, weights, all analyses
+	      TransducerW C(f, header, alphabet);
+	      runTransducer(C);
+	    }
+	}
+    } else // handle flag diacritics
     {
       if (header.probe_flag(Weighted) == false)
 	{
@@ -403,14 +411,18 @@ int setup(FILE * f)
 	      TransducerFd C(f, header, alphabet);
 	      runTransducer(C);
 	    }
-	} else if (displayUniqueFlag)
-	{ // flags, weights, unique analyses only
-	  TransducerWFdUniq C(f, header, alphabet);
-	  runTransducer(C);
-	} else
-	{ // flags, no weights, all analyses
-	  TransducerWFd C(f, header, alphabet);
-	  runTransducer(C);
+	}
+      else if (header.probe_flag(Weighted) == true)
+	{
+	  if (displayUniqueFlag)
+	    { // flags, weights, unique analyses only
+	      TransducerWFdUniq C(f, header, alphabet);
+	      runTransducer(C);
+	    } else
+	    { // flags, no weights, all analyses
+	      TransducerWFd C(f, header, alphabet);
+	      runTransducer(C);
+	    }
 	}
     }
   return 0;
@@ -490,7 +502,7 @@ bool Transition::matches(SymbolNumber s)
 }
 
 
-void RuntimeIndexTableReader::get_index_vector(void)
+void IndexTableReader::get_index_vector(void)
 {
   for (size_t i = 0;
        i < number_of_table_entries;
@@ -729,24 +741,17 @@ Transducer::find_index(SymbolNumber input,
     }
 }
 
-void Transducer::display(SymbolNumber * whole_output_string)
+void Transducer::note_analysis(SymbolNumber * whole_output_string)
 {
-#if BE_FAST
-  for (SymbolNumber * num = whole_output_string; *num != NO_SYMBOL_NUMBER; ++num)
-    std::cout << symbol_table[*num];
-  std::cout << std::endl;
-#endif
-#if !BE_FAST
   std::string str = "";
   for (SymbolNumber * num = whole_output_string; *num != NO_SYMBOL_NUMBER; ++num)
     {
       str.append(symbol_table[*num]);
     }
-    display_vector.push_back(str);
-#endif
+  display_vector.push_back(str);
 }
 
-void TransducerUniq::display(SymbolNumber * whole_output_string)
+void TransducerUniq::note_analysis(SymbolNumber * whole_output_string)
 {
   std::string str = "";
   for (SymbolNumber * num = whole_output_string; *num != NO_SYMBOL_NUMBER; ++num)
@@ -756,7 +761,7 @@ void TransducerUniq::display(SymbolNumber * whole_output_string)
   display_vector.insert(str);
 }
 
-void TransducerFdUniq::display(SymbolNumber * whole_output_string)
+void TransducerFdUniq::note_analysis(SymbolNumber * whole_output_string)
 {
   std::string str = "";
   for (SymbolNumber * num = whole_output_string; *num != NO_SYMBOL_NUMBER; ++num)
@@ -789,7 +794,7 @@ Transducer::get_analyses(SymbolNumber * input_symbol,
 	{
 	  if (final_transition(i))
 	    {
-	      display(original_output_string);
+	      note_analysis(original_output_string);
 	    }
 	  
 	  *output_symbol = NO_SYMBOL_NUMBER;
@@ -824,7 +829,7 @@ Transducer::get_analyses(SymbolNumber * input_symbol,
 #endif
 	  if (final_index(i))
 	    {
-	      display(original_output_string);
+	      note_analysis(original_output_string);
 	    }
 	  
 	  *output_symbol = NO_SYMBOL_NUMBER;
@@ -845,10 +850,6 @@ Transducer::get_analyses(SymbolNumber * input_symbol,
 
 void Transducer::printAnalyses(void)
 {
-#if BE_FAST
-  std::cout << std::endl;
-#endif
-#if !BE_FAST
   int i = 0;
   DisplayVector::iterator it = display_vector.begin();
   while ( (it != display_vector.end()) && i < maxAnalyses )
@@ -859,7 +860,6 @@ void Transducer::printAnalyses(void)
     }
     display_vector.clear(); // purge the display vector
   std::cout << std::endl;
-#endif
 }
 
 void TransducerUniq::printAnalyses(void)
@@ -963,7 +963,7 @@ bool TransducerWFd::PushState(FlagDiacriticOperation op)
   throw; // for the compiler's peace of mind
 }
 
-void RuntimeIndexTableReaderW::get_index_vector(void)
+void IndexTableReaderW::get_index_vector(void)
 {
   for (size_t i = 0;
        i < number_of_table_entries;
@@ -977,7 +977,7 @@ void RuntimeIndexTableReaderW::get_index_vector(void)
     }
 }
 
-void RuntimeTransitionTableReaderW::Set(TransitionTableIndex pos)
+void TransitionTableReaderW::Set(TransitionTableIndex pos)
 {
   if (pos >= TRANSITION_TARGET_TABLE_START)
     {
@@ -989,7 +989,7 @@ void RuntimeTransitionTableReaderW::Set(TransitionTableIndex pos)
     }
 }
 
-void RuntimeTransitionTableReaderW::get_transition_vector(void)
+void TransitionTableReaderW::get_transition_vector(void)
 {
   for (size_t i = 0; i < number_of_table_entries; ++i)
     {
@@ -1011,13 +1011,13 @@ void RuntimeTransitionTableReaderW::get_transition_vector(void)
   transitions.push_back(new TransitionW());
 }
 
-bool RuntimeTransitionTableReaderW::Matches(SymbolNumber s)
+bool TransitionTableReaderW::Matches(SymbolNumber s)
 {
   TransitionW * t = transitions[position];
   return t->matches(s);
 }
 
-bool RuntimeTransitionTableReaderW::get_finality(TransitionTableIndex i)
+bool TransitionTableReaderW::get_finality(TransitionTableIndex i)
 {
   if (i >= TRANSITION_TARGET_TABLE_START) 
     {
@@ -1247,7 +1247,7 @@ void TransducerW::find_index(SymbolNumber input,
     }
 }
 
-void TransducerW::display(SymbolNumber * whole_output_string)
+void TransducerW::note_analysis(SymbolNumber * whole_output_string)
 {
   std::string str = "";
   for (SymbolNumber * num = whole_output_string;
@@ -1259,7 +1259,7 @@ void TransducerW::display(SymbolNumber * whole_output_string)
   display_map.insert(std::pair<Weight, std::string>(current_weight, str));
 }
 
-void TransducerWUniq::display(SymbolNumber * whole_output_string)
+void TransducerWUniq::note_analysis(SymbolNumber * whole_output_string)
 {
   std::string str = "";
   for (SymbolNumber * num = whole_output_string;
@@ -1274,7 +1274,7 @@ void TransducerWUniq::display(SymbolNumber * whole_output_string)
     }
 }
 
-void TransducerWFdUniq::display(SymbolNumber * whole_output_string)
+void TransducerWFdUniq::note_analysis(SymbolNumber * whole_output_string)
 {
   std::string str = "";
   for (SymbolNumber * num = whole_output_string;
@@ -1311,14 +1311,14 @@ void TransducerW::printAnalyses(void)
 void TransducerWUniq::printAnalyses(void)
 {
   int i = 0;
-  std::map<Weight, std::string> weight_sorted_map;
+  std::multimap<Weight, std::string> weight_sorted_map;
   DisplayMap::iterator it = display_map.begin();
   while (it != display_map.end())
     {
       weight_sorted_map.insert(std::pair<Weight, std::string>((*it).second, (*it).first));
       ++it;
     }
-  std::map<Weight, std::string>::iterator display_it = weight_sorted_map.begin();
+  std::multimap<Weight, std::string>::iterator display_it = weight_sorted_map.begin();
   while ( (display_it != weight_sorted_map.end()) && (i < maxAnalyses))
     {
       std::cout << (*display_it).second;
@@ -1337,13 +1337,13 @@ void TransducerWUniq::printAnalyses(void)
 void TransducerWFdUniq::printAnalyses(void)
 {
   int i = 0;
-  std::map<Weight, std::string> weight_sorted_map;
+  std::multimap<Weight, std::string> weight_sorted_map;
   DisplayMap::iterator it;
   for (it = display_map.begin(); it != display_map.end(); it++)
     {
       weight_sorted_map.insert(std::pair<Weight, std::string>((*it).second, (*it).first));
     }
-  std::map<Weight, std::string>::iterator display_it;
+  std::multimap<Weight, std::string>::iterator display_it;
   for (display_it = weight_sorted_map.begin();
        display_it != weight_sorted_map.end(), i < maxAnalyses;
        display_it++, i++)
@@ -1386,7 +1386,7 @@ void TransducerW::get_analyses(SymbolNumber * input_symbol,
 	  if (final_transition(i))
 	    {
 	      current_weight += get_final_transition_weight(i);
-	      display(original_output_string);
+	      note_analysis(original_output_string);
 	      current_weight -= get_final_transition_weight(i);
 	    }
 	  
@@ -1417,7 +1417,7 @@ void TransducerW::get_analyses(SymbolNumber * input_symbol,
 	  if (final_index(i))
 	    {
 	      current_weight += get_final_index_weight(i);
-	      display(original_output_string);
+	      note_analysis(original_output_string);
 	      current_weight -= get_final_index_weight(i);
 	    }
 	  
