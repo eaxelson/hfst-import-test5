@@ -290,8 +290,10 @@ lookup_printf(const char* format, const char* inputform, const char* lookupform)
 	{
 		lookup_really = strdup(lookupform);
 	}
-	size_t space = strlen(format) + strlen(inputform) + strlen(lookup_really) + 10;
-	char* result = static_cast<char*>(malloc(sizeof(char) * space));
+	size_t space = 2 * strlen(format) +
+		2 * strlen(inputform) +
+		2 * strlen(lookup_really) + 10;
+	char* result = static_cast<char*>(calloc(sizeof(char), space + 1));
 	size_t space_left = space;
 	const char* src = format;
 	char* dst = result;
