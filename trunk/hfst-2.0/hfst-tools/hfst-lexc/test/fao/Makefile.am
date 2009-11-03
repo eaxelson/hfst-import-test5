@@ -69,12 +69,12 @@ check-local: $(HFSTLEXC) check-compile check-pair-test
 
 check-compile: $(HFSTLEXC) $(TEST_FILES)
 	$(MAKE) clean
-	@echo "UNWEIGHTED - divvun Northern sami (this may take a while)... "
+	@echo "UNWEIGHTED - Faeroese (this may take a while)... "
 	@for f in $(MULTIFILE_TARGETS) ; do\
 		$(MAKE) -s HFSTLEXCFLAGS="-q" $$f || exit 1 ;\
 	done
 	@echo "OK"
-	@echo "WEIGHTED - divvun Northern sami (this may take a while)... "
+	@echo "WEIGHTED - Faeroese (this may take a while)... "
 	@for f in $(MULTIFILE_WARGETS) ; do\
 		$(MAKE) -s HFSTLEXCFLAGS="-q" $$f || exit 1 ;\
 	done

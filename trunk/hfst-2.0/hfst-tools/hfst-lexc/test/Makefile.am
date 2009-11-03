@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 ## Revision: $Id: Makefile.am,v 1.6 2009/08/31 13:21:36 tpirinen Exp $
-SUBDIRS=. kos83 omorfi divvun-sme morphalou
+SUBDIRS=. kos83 omorfi divvun-sme morphalou fao
 BASIC_TESTS=\
 	basic.cat-dog-bird.hlexc basic.colons.hlexc basic.comments.hlexc \
 	basic.empty-sides.hlexc basic.end.hlexc basic.escapes.hlexc \
