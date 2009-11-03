@@ -465,7 +465,7 @@ bool TransducerFd::PushState(FlagDiacriticOperation op)
     if (statestack.back()[op.Feature()] == 0 || // if the feature is unset or
 	statestack.back()[op.Feature()] == op.Value() || // the feature is at this value already or
 	(statestack.back()[op.Feature()] < 0 &&
-	 (statestack.back()[op.Feature()] * -1 != op.Value()))) // the feature is negatively set to something else
+	 (statestack.back()[op.Feature()] * -1 != op.Value())) // the feature is negatively set to something else
 	)
       {
 	statestack.push_back(statestack.back());
