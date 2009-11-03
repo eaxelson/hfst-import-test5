@@ -1009,7 +1009,7 @@ class TransducerWFd: public TransducerW
  public:
  TransducerWFd(FILE * f, TransducerHeader h, TransducerAlphabet a):
   TransducerW(f, h, a),
-    statestack(a.get_state_size()),
+    statestack(1, FlagDiacriticState (a.get_state_size(), 0)),
     operations(a.get_operation_vector())
       {}
 };
