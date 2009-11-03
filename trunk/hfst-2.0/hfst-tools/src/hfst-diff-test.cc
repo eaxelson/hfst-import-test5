@@ -36,7 +36,6 @@
 #if !NESTED_BUILD
 #endif
 
-// readline here
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
