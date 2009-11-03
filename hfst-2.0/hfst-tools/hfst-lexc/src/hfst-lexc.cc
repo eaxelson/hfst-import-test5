@@ -254,8 +254,6 @@ print_usage()
 		   "\n"
 		   "If either INFILE... or OUTFILE is missing or -, standard streams "
 		   "will be used.\n"
-		   "If BOTH INFILE... and OUTFILE are missing, readline interface "
-		   "will be used.\n"
 		   "If output is stdout, -q is implied.\n"
 		   "If SYMFILE is missing, symbol table will be written with "
 		   "transducer binary, if possible.\n"

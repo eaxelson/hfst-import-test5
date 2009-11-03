@@ -233,14 +233,11 @@ AC_LANG([C++])
 AC_CHECK_LIB([pthread], [main], , [AC_MSG_ERROR([openfst requires pthread])])
 # disable check for nested build
 # AC_CHECK_LIB([hfst], [main], , [AC_MSG_ERROR([libhfst is required])])
-AC_CHECK_LIB([readline], [main])
 
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([string.h unistd.h])
 AC_HEADER_ASSERT
-AC_CHECK_HEADERS([readline/readline.h])
-AC_CHECK_HEADERS([readline/history.h])
 # disable check for nested build
 # AC_CHECK_HEADERS([hfst2/hfst.h], [], [AC_MSG_ERROR([hfst.h required])])
 
@@ -254,9 +251,6 @@ AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strndup])
-AC_CHECK_DECLS([history_list], [], [], [[
-                                #include <stdio.h>
-                                #include <readline/history.h>]])
 
 AC_CONFIG_FILES([Makefile src/Makefile test/Makefile test/binary-tools/Makefile man/Makefile])
 AC_OUTPUT

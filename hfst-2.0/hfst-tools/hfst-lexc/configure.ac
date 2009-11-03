@@ -99,11 +99,6 @@ AC_TYPE_SIZE_T
 
 AC_CHECK_TYPES([ptrdiff_t])
 
-# Checks for library functions
-AC_CHECK_DECLS([history_list], [], [], [[
-				#include <stdio.h>
-				#include <readline/history.h>]])
-
 
 # Output files
 AC_CONFIG_FILES([Makefile src/Makefile test/Makefile test/omorfi/Makefile test/divvun-sme/Makefile test/morphalou/Makefile test/kos83/Makefile man/Makefile test/xre.at-file.hlexc test/hlexc.xre.at-file.hlexc test/fao/Makefile po/Makefile.in])

@@ -52,7 +52,6 @@ static char* lookup_format; // print for each lookup
 static char* no_lookups_format; // print for zero results
 static char* end_format; // print after set of lookups
 static bool format_given = false;
-static bool use_readline = true;
 
 void
 print_usage(const char *program_name)
@@ -77,7 +76,6 @@ print_usage(const char *program_name)
 		   "\n"
 		   "If OUTFILE or INFILE is missing or -, "
 		   "standard streams will be used.\n"
-		   "If SFILE is omitted, a readline interface will be used\n"
 		   "FORMAT is one of {xerox,cg,apertium,custom:``...''}, "
 		   "xerox being default\n"
 		   "\n"
@@ -134,7 +132,6 @@ parse_options(int argc, char** argv)
 		case 'I':
 			lookup_file_name = hfst_strdup(optarg);
 			lookup_file = hfst_fopen(lookup_file_name, "r");
-			use_readline = false;
 			break;
 		case 'S':
 			space_separated = true;
@@ -211,9 +208,6 @@ error_format:
 			fprintf(message_out, "invalid argument for format"
 					"custom: must be of form BEGIN,LOOKUP,NO_RES,END\n");
 			return EXIT_FAILURE;
-			break;
-		case 'r':
-			use_readline = false;
 			break;
 		case '?':
 			fprintf(message_out, "invalid option --%s\n",
