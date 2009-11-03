@@ -32,8 +32,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: hfst-lexc 0.5-beta\n"
 "Report-Msgid-Bugs-To: hfst-bugs@helsinki.fi\n"
-"POT-Creation-Date: 2009-10-09 12:40+0300\n"
-"PO-Revision-Date: 2009-10-09 12:40+0300\n"
+"POT-Creation-Date: 2009-11-03 18:18+0200\n"
+"PO-Revision-Date: 2009-11-03 18:18+0200\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -79,11 +79,11 @@ msgstr "[near: ‘[1m%30s...[0m’ (truncated)]"
 msgid "Stray escape char %% in %s\n"
 msgstr "Stray escape char %% in %s\n"
 
-#: src/hfst-lexc.cc:219
+#: src/hfst-lexc.cc:217
 msgid "<stdout>"
 msgstr "<stdout>"
 
-#: src/hfst-lexc.cc:236
+#: src/hfst-lexc.cc:234
 #, c-format
 msgid ""
 "Usage: %s [OPTIONS] [INFILE...]\n"
@@ -103,7 +103,6 @@ msgid ""
 "\n"
 "If either INFILE... or OUTFILE is missing or -, standard streams will be "
 "used.\n"
-"If BOTH INFILE... and OUTFILE are missing, readline interface will be used.\n"
 "If output is stdout, -q is implied.\n"
 "If SYMFILE is missing, symbol table will be written with transducer binary, "
 "if possible.\n"
@@ -133,7 +132,6 @@ msgstr ""
 "\n"
 "If either INFILE... or OUTFILE is missing or -, standard streams will be "
 "used.\n"
-"If BOTH INFILE... and OUTFILE are missing, readline interface will be used.\n"
 "If output is stdout, -q is implied.\n"
 "If SYMFILE is missing, symbol table will be written with transducer binary, "
 "if possible.\n"
@@ -146,7 +144,7 @@ msgstr ""
 "\n"
 "Report bugs to HFST team <hfst-bugs@helsinki.fi>\n"
 
-#: src/hfst-lexc.cc:281
+#: src/hfst-lexc.cc:277
 #, c-format
 msgid ""
 "%s\n"
@@ -161,286 +159,37 @@ msgstr ""
 "This is free software: you are free to change and redistribute it.\n"
 "There is NO WARRANTY, to the extent permitted by law.\n"
 
-#: src/hfst-lexc.cc:296
+#: src/hfst-lexc.cc:292
 #, c-format
 msgid "Try ``%s --help'' for more information.\n"
 msgstr "Try `‘[1m%s --help[0m’' for more information.\n"
 
 #: src/hfst-lexc.cc:306
 #, c-format
-msgid ""
-"\n"
-"Input/Output "
-"------------------------------------------------------------------\n"
-"    Source:      compile-source, merge-source, read-source, result-to-"
-"source,\n"
-"                 save-source.\n"
-"    Rules:       read-rules.\n"
-"    Result:      merge-result, read-result, save-result, source-to-result.\n"
-"    Properties:  add-props, reset-props, save-props.\n"
-"Operations "
-"--------------------------------------------------------------------\n"
-"    Composition: compose-result, extract-surface-forms, invert-source, "
-"invert-result.\n"
-"    Checking:    check-all, lookdown, lookup, random, random-lex, random-"
-"surf.\n"
-"    Switches:    ambiguities, duplicates, failures, obey-flags, print-"
-"space,\n"
-"                 recode-cp1252, quit-on-fail, show-flags, singles, time, "
-"utf8-mode.\n"
-"    Scripts:     begin-script, end-script, run-script.\n"
-"Display "
-"-----------------------------------------------------------------------\n"
-"    Misc:        banner, labels, props, status, storage.\n"
-"    Help:        completion, help, history, ?.\n"
-"Type 'quit' to exit.\n"
-"\n"
-msgstr ""
-"\n"
-"Input/Output "
-"------------------------------------------------------------------\n"
-"    Source:      compile-source, merge-source, read-source, result-to-"
-"source,\n"
-"                 save-source.\n"
-"    Rules:       read-rules.\n"
-"    Result:      merge-result, read-result, save-result, source-to-result.\n"
-"    Properties:  add-props, reset-props, save-props.\n"
-"Operations "
-"--------------------------------------------------------------------\n"
-"    Composition: compose-result, extract-surface-forms, invert-source, "
-"invert-result.\n"
-"    Checking:    check-all, lookdown, lookup, random, random-lex, random-"
-"surf.\n"
-"    Switches:    ambiguities, duplicates, failures, obey-flags, print-"
-"space,\n"
-"                 recode-cp1252, quit-on-fail, show-flags, singles, time, "
-"utf8-mode.\n"
-"    Scripts:     begin-script, end-script, run-script.\n"
-"Display "
-"-----------------------------------------------------------------------\n"
-"    Misc:        banner, labels, props, status, storage.\n"
-"    Help:        completion, help, history, ?.\n"
-"Type ‘[1mquit[0m’ to exit.\n"
-"\n"
-
-#: src/hfst-lexc.cc:325
-#, c-format
-msgid ""
-"\n"
-"Input/Output "
-"------------------------------------------------------------------\n"
-"    Source:      compile-source, save-source.\n"
-"Operations "
-"--------------------------------------------------------------------\n"
-"    Switches:    debug, verbose, time, weighted.\n"
-"Display "
-"-----------------------------------------------------------------------\n"
-"    Misc:        banner.\n"
-"    Help:        completion, help, history, ?.\n"
-"Type 'quit' to exit.\n"
-"\n"
-msgstr ""
-"\n"
-"Input/Output "
-"------------------------------------------------------------------\n"
-"    Source:      compile-source, save-source.\n"
-"Operations "
-"--------------------------------------------------------------------\n"
-"    Switches:    debug, verbose, time, weighted.\n"
-"Display "
-"-----------------------------------------------------------------------\n"
-"    Misc:        banner.\n"
-"    Help:        completion, help, history, ?.\n"
-"Type ‘[1mquit[0m’ to exit.\n"
-"\n"
-
-#: src/hfst-lexc.cc:335
-#, c-format
-msgid ""
-"THIS version of hfst-lexc does NOT support MOST of the lexc commands\n"
-"In the meantime:\n"
-" * Handling of RULES (and RESULT) can be done with hfst-twolc\n"
-" * Inspecting can be done with hfst-summarize, hfst-fst2txt, ...\n"
-" * For legacy character set support, use iconv or recode\n"
-msgstr ""
-"THIS version of hfst-lexc does NOT support MOST of the lexc commands\n"
-"In the meantime:\n"
-" * Handling of RULES (and RESULT) can be done with hfst-twolc\n"
-" * Inspecting can be done with hfst-summarize, hfst-fst2txt, ...\n"
-" * For legacy character set support, use iconv or recode\n"
-
-#: src/hfst-lexc.cc:348
-#, c-format
-msgid ""
-"\n"
-"         *******************************************************\n"
-"         *   HFST Finite-State Lexicon Compiler %10s     *\n"
-"         *       compatible(?) with Xerox lexc 3.7.9           *\n"
-"         *                     created by                      *\n"
-"         *           Tommi Pirinen and the HFST team           *\n"
-"         *  Copyright (c) 2008-2009 by University of Helsinki  *\n"
-"         *                 All Rights Reversed.                *\n"
-"         *******************************************************\n"
-"\n"
-"\n"
-msgstr ""
-"\n"
-"         *******************************************************\n"
-"         *   HFST Finite-State Lexicon Compiler %10s     *\n"
-"         *       compatible(?) with Xerox lexc 3.7.9           *\n"
-"         *                     created by                      *\n"
-"         *           Tommi Pirinen and the HFST team           *\n"
-"         *  Copyright (c) 2008-2009 by University of Helsinki  *\n"
-"         *                 All Rights Reversed.                *\n"
-"         *******************************************************\n"
-"\n"
-"\n"
-
-#: src/hfst-lexc.cc:365
-#, c-format
-msgid ""
-"\n"
-"'compile-source <textfile>' reads the lexc source file contained in\n"
-"  <textfile>, compiles it, and stores the resulting network in the\n"
-"  SOURCE register.  You can save this network to file with the command\n"
-"  'save-source'.\n"
-"To read a pre-compiled network from file into the\n"
-"  SOURCE register, use the command 'read-source'.  To compose the SOURCE\n"
-"  network with a set of rule transducers, previously read in by\n"
-"  'read-rules', use the command 'compose-result'.\n"
-"\n"
-msgstr ""
-"\n"
-"‘[1mcompile-source <textfile>[0m’ reads the lexc source file contained in\n"
-"  <textfile>, compiles it, and stores the resulting network in the\n"
-"  SOURCE register.  You can save this network to file with the command\n"
-"  'save-source'.\n"
-"To read a pre-compiled network from file into the\n"
-"  SOURCE register, use the command 'read-source'.  To compose the SOURCE\n"
-"  network with a set of rule transducers, previously read in by\n"
-"  'read-rules', use the command 'compose-result'.\n"
-"\n"
-
-#: src/hfst-lexc.cc:384
-#, c-format
-msgid ""
-"\n"
-"'?' displays a menu of available lexc commands.\n"
-"\n"
-msgstr ""
-"\n"
-"‘[1m?[0m’ displays a menu of available lexc commands.\n"
-"\n"
-
-#: src/hfst-lexc.cc:394
-#, c-format
-msgid ""
-"\n"
-"'banner' displays information about the version and the authors of the\n"
-"Helsinki Finite-State Lexicon Compiler.\n"
-"\n"
-msgstr ""
-"\n"
-"‘[1mbanner[0m’ displays information about the version and the authors of "
-"the\n"
-"Helsinki Finite-State Lexicon Compiler.\n"
-"\n"
-
-#: src/hfst-lexc.cc:405
-#, c-format
-msgid ""
-"\n"
-"'help <command>' displays short documentation on what <command> does.\n"
-"  'help all' prints out all help messages.\n"
-"\n"
-"'?' displays a menu of available lexc commands.\n"
-"\n"
-msgstr ""
-"\n"
-"‘[1mhelp <command>[0m’ displays short documentation on what <command> does.\n"
-"  ‘[1mhelp all[0m’ prints out all help messages.\n"
-"\n"
-"‘[1m?[0m’ displays a menu of available lexc commands.\n"
-"\n"
-
-#: src/hfst-lexc.cc:418
-#, c-format
-msgid ""
-"\n"
-"'history' displays the history list.\n"
-"\n"
-msgstr ""
-"\n"
-"‘[1mhistory[0m’ displays the history list.\n"
-"\n"
-
-#: src/hfst-lexc.cc:428
-#, c-format
-msgid ""
-"\n"
-"'quit' exits lexc.\n"
-"\n"
-msgstr ""
-"\n"
-"‘[1mquit[0m’ exits lexc.\n"
-"\n"
-
-#: src/hfst-lexc.cc:438
-#, c-format
-msgid ""
-"\n"
-"'save-source <filename>' stores the current SOURCE network to file in\n"
-"  a binary format.  Use 'read-source' or 'read-result' to read in files\n"
-"  created in this way.\n"
-"\n"
-msgstr ""
-"\n"
-"‘[1msave-source <filename>[0m’ stores the current SOURCE network to file in\n"
-"  a binary format.  Use ‘[1mread-source[0m’ or ‘[1mread-result[0m’ to read "
-"in files\n"
-"  created in this way.\n"
-"\n"
-
-#: src/hfst-lexc.cc:450
-#, c-format
-msgid ""
-"\n"
-"'time' is an ON/OFF or toggled switch that provides timing information\n"
-"  for some commands. The default setting is OFF.\n"
-"\n"
-msgstr ""
-"\n"
-"‘[1mtime[0m’ is an ON/OFF or toggled switch that provides timing "
-"information\n"
-"  for some commands. The default setting is OFF.\n"
-"\n"
-
-#: src/hfst-lexc.cc:519
-#, c-format
 msgid "printing verbosely\n"
 msgstr "printing verbosely\n"
 
-#: src/hfst-lexc.cc:520
+#: src/hfst-lexc.cc:307
 #, c-format
 msgid "debug enabled\n"
 msgstr "debug enabled\n"
 
-#: src/hfst-lexc.cc:521
+#: src/hfst-lexc.cc:308
 #, c-format
 msgid "timing enabled\n"
 msgstr "timing enabled\n"
 
-#: src/hfst-lexc.cc:524
+#: src/hfst-lexc.cc:311
 #, c-format
 msgid "building weighted transducer\n"
 msgstr "building weighted transducer\n"
 
-#: src/hfst-lexc.cc:528
+#: src/hfst-lexc.cc:315
 #, c-format
 msgid "building unweighted transducer\n"
 msgstr "building unweighted transducer\n"
 
-#: src/hfst-lexc.cc:540
+#: src/hfst-lexc.cc:327
 #, c-format
 msgid ""
 "\n"
@@ -449,11 +198,11 @@ msgstr ""
 "\n"
 "Reading from <stdin>\n"
 
-#: src/hfst-lexc.cc:541 src/hfst-lexc.cc:726
+#: src/hfst-lexc.cc:328
 msgid "<stdin>"
 msgstr "<stdin>"
 
-#: src/hfst-lexc.cc:547
+#: src/hfst-lexc.cc:334
 #, c-format
 msgid ""
 "\n"
@@ -462,178 +211,74 @@ msgstr ""
 "\n"
 "reading from %s\n"
 
-#: src/hfst-lexc.cc:556
+#: src/hfst-lexc.cc:343
 #, c-format
 msgid "There were parsing errors, aborting.\n"
 msgstr "There were parsing errors, aborting.\n"
 
-#: src/hfst-lexc.cc:561
+#: src/hfst-lexc.cc:348
 #, c-format
 msgid "Compiling...\n"
 msgstr "Compiling...\n"
 
-#: src/hfst-lexc.cc:566
+#: src/hfst-lexc.cc:353
 #, c-format
 msgid "Saving result to standard output\n"
 msgstr "Saving result to standard output\n"
 
-#: src/hfst-lexc.cc:571
+#: src/hfst-lexc.cc:358
 #, c-format
 msgid "Saving result to %s\n"
 msgstr "Saving result to %s\n"
 
-#: src/hfst-lexc.cc:593
-#, c-format
-msgid "Starting in utf8-mode (in fact, only supporting UTF-8)\n"
-msgstr "Starting in utf8-mode (in fact, only supporting UTF-8)\n"
-
-#: src/hfst-lexc.cc:634
-#, c-format
-msgid "History is empty.\n"
-msgstr "History is empty.\n"
-
-#. TRANSLATORS: history listing: #  command
-#: src/hfst-lexc.cc:642
-#, c-format
-msgid "%5d  %s\n"
-msgstr "%5d  %s\n"
-
-#: src/hfst-lexc.cc:647
-#, c-format
-msgid "This platform does not support history_list\n"
-msgstr "This platform does not support history_list\n"
-
-#: src/hfst-lexc.cc:655
-#, c-format
-msgid "Timing is OFF.\n"
-msgstr "Timing is OFF.\n"
-
-#: src/hfst-lexc.cc:660
-#, c-format
-msgid "Timing is ON.\n"
-msgstr "Timing is ON.\n"
-
-#: src/hfst-lexc.cc:668
-#, c-format
-msgid "Verbosity is OFF.\n"
-msgstr "Verbosity is OFF.\n"
-
-#: src/hfst-lexc.cc:673
-#, c-format
-msgid "Verbosity is ON.\n"
-msgstr "Verbosity is ON.\n"
-
-#: src/hfst-lexc.cc:681
-#, c-format
-msgid "Debugging is OFF.\n"
-msgstr "Debugging is OFF.\n"
-
-#: src/hfst-lexc.cc:686
-#, c-format
-msgid "Debugging is ON.\n"
-msgstr "Debugging is ON.\n"
-
-#: src/hfst-lexc.cc:694
-#, c-format
-msgid "Changing weightedness after compilation will cause unstability!\n"
-msgstr "Changing weightedness after compilation will cause unstability!\n"
-
-#: src/hfst-lexc.cc:702
-#, c-format
-msgid "Weights are OFF.\n"
-msgstr "Weights are OFF.\n"
-
-#: src/hfst-lexc.cc:707
-#, c-format
-msgid "Weights are ON.\n"
-msgstr "Weights are ON.\n"
-
-#: src/hfst-lexc.cc:719
-msgid "input file [stdin]: "
-msgstr "input file [stdin]: "
-
-#: src/hfst-lexc.cc:724
-#, c-format
-msgid "Type a standard lexicon file. File ends with '<CR>^D'...\n"
-msgstr "Type a standard lexicon file. File ends with '<CR>^D'...\n"
-
-#: src/hfst-lexc.cc:732 src/hfst-lexc.cc:751 src/hfst-lexc.cc:786
-#, c-format
-msgid "opening \"%s\"\n"
-msgstr "opening “[1m%s[0m”\n"
-
-#: src/hfst-lexc.cc:734 src/hfst-lexc.cc:753 src/hfst-lexc.cc:787
-#, c-format
-msgid "Opening '%s'...\n"
-msgstr "Opening '%s'...\n"
-
-#: src/hfst-lexc.cc:775
-msgid "Output file [cancel]: "
-msgstr "Output file [cancel]: "
-
-#: src/hfst-lexc.cc:778
-#, c-format
-msgid "Cancelled.\n"
-msgstr "Cancelled.\n"
-
-#: src/hfst-lexc.cc:792
-#, c-format
-msgid "Done.\n"
-msgstr "Done.\n"
-
-#: src/hfst-lexc.cc:797
-#, c-format
-msgid "'%s' is not an operation. Type '?' for a list.\n"
-msgstr "‘[1m%s[0m’ is not an operation. Type ‘[1m?[0m’ for a list.\n"
-
-#: src/hfst-lexc.cc:833
+#: src/hfst-lexc.cc:390
 msgid "Whole process"
 msgstr "Whole process"
 
-#: src/hfst-lexc.cc:834
+#: src/hfst-lexc.cc:391
 msgid " * String parsing"
 msgstr " * String parsing"
 
-#: src/hfst-lexc.cc:835
+#: src/hfst-lexc.cc:392
 msgid " * String trie building"
 msgstr " * String trie building"
 
-#: src/hfst-lexc.cc:836
+#: src/hfst-lexc.cc:393
 msgid " * Regular expression compiling"
 msgstr " * Regular expression compiling"
 
-#: src/hfst-lexc.cc:837
+#: src/hfst-lexc.cc:394
 msgid " * Regular expression joining"
 msgstr " * Regular expression joining"
 
-#: src/hfst-lexc.cc:838
+#: src/hfst-lexc.cc:395
 msgid " * Completing sigma set"
 msgstr " * Completing sigma set"
 
-#: src/hfst-lexc.cc:839
+#: src/hfst-lexc.cc:396
 msgid " * Applying morphotax"
 msgstr " * Applying morphotax"
 
-#: src/hfst-lexc.cc:840
+#: src/hfst-lexc.cc:397
 msgid " * All the minimising"
 msgstr " * All the minimising"
 
-#: src/lexc.cc:109 src/lexc.cc:167 src/lexc.cc:197
+#: src/lexc.cc:111 src/lexc.cc:169 src/lexc.cc:199
 #, c-format
 msgid "Undeclared character %s in %s\n"
 msgstr "Undeclared character %s in %s\n"
 
-#: src/lexc.cc:112 src/lexc.cc:170 src/lexc.cc:200
+#: src/lexc.cc:114 src/lexc.cc:172 src/lexc.cc:202
 #, c-format
 msgid "  All strings containing %s are dropped\n"
 msgstr "  All strings containing %s are dropped\n"
 
-#: src/lexc.cc:117 src/lexc.cc:175 src/lexc.cc:205 src/lexc.cc:270
+#: src/lexc.cc:119 src/lexc.cc:177 src/lexc.cc:207 src/lexc.cc:272
 #, c-format
 msgid "Found Xymbol %s from %s\n"
 msgstr "Found Xymbol %s from %s\n"
 
-#: src/lexc.cc:264
+#: src/lexc.cc:266
 #, c-format
 msgid ""
 "Undeclared character %s in %s\n"
@@ -642,41 +287,41 @@ msgstr ""
 "Undeclared character %s in %s\n"
 "All strings containing %s dropped\n"
 
-#: src/lexc.cc:398
+#: src/lexc.cc:400
 #, c-format
 msgid "Building lexicon..."
 msgstr "Building lexicon..."
 
-#: src/lexc.cc:402
+#: src/lexc.cc:404
 msgid "sigma\n"
 msgstr "sigma\n"
 
-#: src/lexc.cc:403
+#: src/lexc.cc:405
 msgid "gamma\n"
 msgstr "gamma\n"
 
-#: src/lexc.cc:411
+#: src/lexc.cc:415
 msgid "Strings trie\n"
 msgstr "Strings trie\n"
 
-#: src/lexc.cc:416
+#: src/lexc.cc:420
 msgid "RegExps\n"
 msgstr "RegExps\n"
 
-#: src/lexc.cc:421
+#: src/lexc.cc:425
 msgid "Strings or RegExps\n"
 msgstr "Strings or RegExps\n"
 
-#: src/lexc.cc:425
+#: src/lexc.cc:429
 #, c-format
 msgid "Minimizing..."
 msgstr "Minimizing..."
 
-#: src/lexc.cc:430
+#: src/lexc.cc:434
 msgid "Morphotaxed\n"
 msgstr "Morphotaxed\n"
 
-#: src/lexc.cc:431
+#: src/lexc.cc:435
 #, c-format
 msgid "Done!\n"
 msgstr "Done!\n"
