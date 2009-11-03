@@ -62,18 +62,6 @@ AM_CONDITIONAL([CAN_VALGRIND], [test x$VALGRIND != xno])
 AC_PATH_PROG([HFSTPAIRTEST], [hfst-pair-test], [no])
 AM_CONDITIONAL([CAN_PAIRTEST], [test x$HFSTPAIRTEST != xno])
 
-# documentation building:
-AC_PATH_PROG([DOXYGEN], [doxygen], [no])
-AM_CONDITIONAL([CAN_DOXYGEN], [test x$DOXYGEN != xno])
-AM_PATH_PYTHON([2.4])
-AC_PATH_PROGS([RST2HTML], [rst2html.py rst2html], [no])
-AM_CONDITIONAL([CAN_RST2HTML], [test x$RST2HTML != xno])
-AC_PATH_PROGS([RST2XML], [rst2xml.py rst2xml], [no])
-AM_CONDITIONAL([CAN_RST2XML], [test x$RST2XML != xno])
-AC_PATH_PROGS([SAXON], [saxon saxon8 saxon9 saxonb-xslt], [no])
-AM_CONDITIONAL([CAN_SAXON], [test x$SAXON != xno])
-AC_PROG_LN_S
-
 # Checks for libraries
 AC_LANG([C++])
 AC_CHECK_LIB([pthread], [main], , [AC_MSG_ERROR([openfst requires pthread])])
