@@ -67,7 +67,6 @@ AC_LANG([C++])
 AC_CHECK_LIB([pthread], [main], , [AC_MSG_ERROR([openfst requires pthread])])
 # Don't test for libhfst for a nested dist
 # AC_CHECK_LIB([hfst], [main], , [AC_MSG_ERROR([libhfst is required])])
-AC_CHECK_LIB([readline], [main])
 
 # Checks for header files
 AC_HEADER_STDC
@@ -83,8 +82,6 @@ AC_CHECK_HEADERS([stdlib.h])
 AC_CHECK_HEADERS([string.h])
 AC_CHECK_HEADERS([unistd.h])
 AC_CHECK_HEADERS([sys/stat.h])
-AC_CHECK_HEADERS([readline/readline.h])
-AC_CHECK_HEADERS([readline/history.h])
 # Don't test for libhfst for a nested dist
 # AC_CHECK_HEADERS([hfst2/hfst.h], [], [AC_MSG_ERROR([hfst.h required])])
 AC_HEADER_ASSERT
@@ -109,7 +106,7 @@ AC_CHECK_DECLS([history_list], [], [], [[
 
 
 # Output files
-AC_CONFIG_FILES([Makefile src/Makefile test/Makefile test/omorfi/Makefile test/divvun-sme/Makefile test/morphalou/Makefile test/kos83/Makefile doc/Makefile man/Makefile doc/Doxyconf test/xre.at-file.hlexc test/hlexc.xre.at-file.hlexc test/fao/Makefile po/Makefile.in])
+AC_CONFIG_FILES([Makefile src/Makefile test/Makefile test/omorfi/Makefile test/divvun-sme/Makefile test/morphalou/Makefile test/kos83/Makefile man/Makefile test/xre.at-file.hlexc test/hlexc.xre.at-file.hlexc test/fao/Makefile po/Makefile.in])
 AC_CONFIG_HEADERS([config.h])
 AC_DEFINE([NESTED_BUILD], [1], [We're doing a nested build, headers aren't always where we expect them to be])
 AC_CONFIG_SRCDIR([src/lexc.h])
