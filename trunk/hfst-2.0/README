@@ -62,10 +62,6 @@ Dependencies
 
 Compilation requirements:
 
-- the linker *should* be able to find library named readline, if the readline
-  interface will be used. If readline is missing some components, hfst will not
-  contain the readline interface.
-
 - Underlying transducer libraries *may* impose further restrictions; e.g.
   OpenFST may require pthreads library
 
@@ -82,7 +78,7 @@ Compilation requirements:
 Runtime requirements:
 
 - If the executable is dynamically linked (almost always), the operating system
-  *must* be able to find hfst and readline libraries.
+  *must* be able to find hfst libraries.
 
 Further information
 -------------------
