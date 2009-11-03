@@ -33,6 +33,9 @@
 #include <ctime>
 #include <iostream>
 
+enum OutputType {HFST, xerox};
+OutputType outputType = HFST;
+
 bool verboseFlag = false;
 
 bool displayWeightsFlag = false;
@@ -574,7 +577,7 @@ class Transducer
     get_analyses(input_string,output_string,output_string,START_INDEX);
   }
 
-  virtual void printAnalyses(void);
+  virtual void printAnalyses(std::string prepend);
 };
 
 class TransducerUniq: public Transducer
@@ -588,7 +591,7 @@ class TransducerUniq: public Transducer
     display_vector()
       {}
   
-  void printAnalyses(void);
+  void printAnalyses(std::string prepend);
 };
 
 class TransducerFd: public Transducer
@@ -628,7 +631,7 @@ class TransducerFdUniq: public TransducerFd
     display_vector()
       {}
   
-  void printAnalyses(void);
+  void printAnalyses(std::string prepend);
 
 };
 
@@ -971,7 +974,7 @@ class TransducerW
     return encoder.find_key(p);
   }
 
-  virtual void printAnalyses(void);
+  virtual void printAnalyses(std::string prepend);
 };
 
 class TransducerWUniq: public TransducerW
@@ -985,7 +988,7 @@ class TransducerWUniq: public TransducerW
     display_map()
       {}
   
-  void printAnalyses(void);
+  void printAnalyses(std::string prepend);
 };
 
 class TransducerWFd: public TransducerW
@@ -1025,6 +1028,6 @@ class TransducerWFdUniq: public TransducerWFd
     display_map()
       {}
   
-  void printAnalyses(void);
+  void printAnalyses(std::string prepend);
 
 };
