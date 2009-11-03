@@ -22,7 +22,7 @@ should result in a local installation and
 in its uninstallation. If you would rather install in eg. your home directory
 (or aren't the system administrator), you can tell ./configure:
 
-	./configure --prefix=${HOME}
+	./configure --prefix=$HOME
 
 hfst-optimized-lookup is distributed freely under the Apache license which
 should be provided with the source, or can be found at

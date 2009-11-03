@@ -40,7 +40,7 @@ reducing sizes by a factor of 5-10.
 If you would rather install in eg. your home directory
 (or aren't the system administrator), you can tell ./configure:
 
-        ./configure --prefix=${HOME}
+        ./configure --prefix=$HOME
 
 Software in this package is variously distributed under the GPL, LGPL and
 Apache licenses. If you want to develop something or include it in your own
