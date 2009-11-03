@@ -101,7 +101,7 @@ regexp/xre_lex.h: regexp/xre_lex.ll
 	$(LEX) -v --prefix=xre --outfile=regexp/xre_lex.cc --header-file=$@ $<
 
 regexp/xrew_lex.h: regexp/xrew_lex.ll
-	$(LEX) -v --prefix=xrew --outfile=/regexp/xrew_lex.cc --header-file=$@ $<
+	$(LEX) -v --prefix=xrew --outfile=regexp/xrew_lex.cc --header-file=$@ $<
 
 # YACC
 

@@ -49,6 +49,7 @@ bool print_usage(void)
     "  -u, --unique                Suppress duplicate analyses\n" <<
     "  -n N, --analyses=N          Output no more than N analyses\n" <<
     "                              (if the transducer is weighted, the N best analyses)\n" <<
+    "  -x, --xerox                 Xerox output format\n" <<
     "\n" <<
     "Report bugs to " << PACKAGE_BUGREPORT << "\n" <<
     "\n";
@@ -89,12 +90,13 @@ int main(int argc, char **argv)
 	  {"echo-inputs",  no_argument,       0, 'e'},
 	  {"show-weights", no_argument,       0, 'w'},
 	  {"unique",       no_argument,       0, 'u'},
+	  {"xerox",        no_argument,       0, 'x'},
 	  {"analyses",     required_argument, 0, 'n'},
 	  {0,              0,                 0,  0 }
 	};
       
       int option_index = 0;
-      c = getopt_long(argc, argv, "hVvqsewun:", long_options, &option_index);
+      c = getopt_long(argc, argv, "hVvqsewuxn:", long_options, &option_index);
 
       if (c == -1) // no more options to look at
 	break;
@@ -155,6 +157,10 @@ int main(int argc, char **argv)
 	      std::cerr << "Invalid or no argument for analyses count\n";
 	      return EXIT_FAILURE;
 	    }
+	  break;
+
+	case 'x':
+	  outputType = xerox;
 	  break;
 	  
 	default:
@@ -355,7 +361,7 @@ void runTransducer (genericTransducer T)
       input_string[i] = NO_SYMBOL_NUMBER;
       T.analyze(input_string);
       std::cout << std::endl;
-      T.printAnalyses();
+      T.printAnalyses(std::string(str));
     }
 }
 
@@ -852,12 +858,16 @@ Transducer::get_analyses(SymbolNumber * input_symbol,
   *output_symbol = NO_SYMBOL_NUMBER;
 }
 
-void Transducer::printAnalyses(void)
+void Transducer::printAnalyses(std::string prepend)
 {
   int i = 0;
   DisplayVector::iterator it = display_vector.begin();
   while ( (it != display_vector.end()) && i < maxAnalyses )
     {
+      if (outputType == xerox)
+	{
+	  std::cout << prepend << "\t";
+	}
       std::cout << *it << std::endl;
       ++it;
       ++i;
@@ -866,12 +876,16 @@ void Transducer::printAnalyses(void)
   std::cout << std::endl;
 }
 
-void TransducerUniq::printAnalyses(void)
+void TransducerUniq::printAnalyses(std::string prepend)
 {
   int i = 0;
   DisplaySet::iterator it = display_vector.begin();
   while ( (it != display_vector.end()) && i < maxAnalyses)
     {
+      if (outputType == xerox)
+	{
+	  std::cout << prepend << "\t";
+	}
       std::cout << *it << std::endl;
       ++it;
       ++i;
@@ -880,12 +894,16 @@ void TransducerUniq::printAnalyses(void)
   std::cout << std::endl;
 }
 
-void TransducerFdUniq::printAnalyses(void)
+void TransducerFdUniq::printAnalyses(std::string prepend)
 {
   int i = 0;
   DisplaySet::iterator it = display_vector.begin();
   while ( (it != display_vector.end()) && i < maxAnalyses)
     {
+      if (outputType == xerox)
+	{
+	  std::cout << prepend << "\t";
+	}
       std::cout << *it << std::endl;
       ++it;
       ++i;
@@ -1293,12 +1311,16 @@ void TransducerWFdUniq::note_analysis(SymbolNumber * whole_output_string)
     }
 }
 
-void TransducerW::printAnalyses(void)
+void TransducerW::printAnalyses(std::string prepend)
 {
   int i = 0;
   DisplayMultiMap::iterator it = display_map.begin();
   while ( (it != display_map.end()) && (i < maxAnalyses))
     {
+      if (outputType == xerox)
+	{
+	  std::cout << prepend << "\t";
+	}
       std::cout << (*it).second;
       if (displayWeightsFlag)
 	{
@@ -1312,7 +1334,7 @@ void TransducerW::printAnalyses(void)
   std::cout << std::endl;
 }
 
-void TransducerWUniq::printAnalyses(void)
+void TransducerWUniq::printAnalyses(std::string prepend)
 {
   int i = 0;
   std::multimap<Weight, std::string> weight_sorted_map;
@@ -1325,6 +1347,10 @@ void TransducerWUniq::printAnalyses(void)
   std::multimap<Weight, std::string>::iterator display_it = weight_sorted_map.begin();
   while ( (display_it != weight_sorted_map.end()) && (i < maxAnalyses))
     {
+      if (outputType == xerox)
+	{
+	  std::cout << prepend << "\t";
+	}
       std::cout << (*display_it).second;
       if (displayWeightsFlag)
 	{
@@ -1338,7 +1364,7 @@ void TransducerWUniq::printAnalyses(void)
   std::cout << std::endl;
 }
 
-void TransducerWFdUniq::printAnalyses(void)
+void TransducerWFdUniq::printAnalyses(std::string prepend)
 {
   int i = 0;
   std::multimap<Weight, std::string> weight_sorted_map;
@@ -1352,6 +1378,10 @@ void TransducerWFdUniq::printAnalyses(void)
        display_it != weight_sorted_map.end(), i < maxAnalyses;
        display_it++, i++)
     {
+      if (outputType == xerox)
+	{
+	  std::cout << prepend << "\t";
+	}
       std::cout << (*display_it).second;
       if (displayWeightsFlag)
 	{
