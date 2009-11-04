@@ -190,7 +190,21 @@ int process_stream(std::istream& inputstream, FILE * outstream)
 				}
 				VERBOSE_PRINT("Converting to optimized lookup format...\n");
 				// add your code here
-
+				HFST::KeyTable * flag_diacritic_table =
+				  HFST::gather_flag_diacritic_table(key_table);
+				for (HFST::Key k = 0; k < flag_diacritic_table->get_unused_key(); ++k)
+				  {
+				    if (not HFST::is_key(k,flag_diacritic_table))
+				      {
+					continue;
+				      }
+				    HFST::KeyPair kp1(k,k);
+				    HFST::KeyPair kp2(0,k);
+				    input = HFST::substitute_with_pair(input,
+								       &kp1,
+								       &kp2);
+				  }
+				delete flag_diacritic_table;
 				HFST::write_runtime_transducer(input,
 							       key_table,
 							       outstream);
@@ -235,7 +249,23 @@ int process_stream(std::istream& inputstream, FILE * outstream)
 					return EXIT_FAILURE;
 				}
 				// add your code here
+				HFST::KeyTable * flag_diacritic_table =
+				  HFST::gather_flag_diacritic_table(key_table);
+				for (HFST::Key k = 0; k < flag_diacritic_table->get_unused_key(); ++k)
+				  {
 
+				    if (not HFST::is_key(k,flag_diacritic_table))
+				      {
+					continue;
+				      }
+				    HFST::KeyPair kp1(k,k);
+				    HFST::KeyPair kp2(0,k);
+				    input = HWFST::substitute_with_pair(input,
+									&kp1,
+									&kp2);
+				  }
+				delete flag_diacritic_table;
+				HWFST::print_transducer(input,key_table);
 				HWFST::write_runtime_transducer(input,
 								key_table,
 								outstream);

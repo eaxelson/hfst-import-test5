@@ -30,6 +30,7 @@
 #include <cstdarg>
 #include <getopt.h>
 #include <hfst2/hfst.h>
+#include "FlagDiacritics.h"
 
 #if NESTED_BUILD
 #include <hfst2/string/string.h>
@@ -52,7 +53,8 @@ static char* lookup_format; // print for each lookup
 static char* no_lookups_format; // print for zero results
 static char* end_format; // print after set of lookups
 static bool format_given = false;
-
+FlagDiacriticTable flag_diacritic_table;
+HFST::KeySet flag_diacritic_set;
 void
 print_usage(const char *program_name)
 {
@@ -271,6 +273,17 @@ error_format:
 	return EXIT_CONTINUE;
 }
 
+void define_flag_diacritics(HFST::KeyTable * key_table)
+{
+  
+  for (HFST::Key k = 0; k < key_table->get_unused_key(); ++k)
+    {
+      flag_diacritic_table.define_diacritic
+	(k,HFST::get_symbol_name(HFST::get_key_symbol(k,key_table)));
+      if (flag_diacritic_table.is_diacritic(k))
+	{ flag_diacritic_set.insert(k); }
+    }
+}
 int
 lookup_printf(const char* format, const char* inputform, const char* lookupform)
 {
@@ -466,7 +479,7 @@ lookup_print_all(const char* s, KeyTable* kt,
 				}
 				else
 				{
-					KeyVectorVector* lookups = lookup_all(*t, *kv);
+				  KeyVectorVector* lookups = lookup_all(*t, *kv,&flag_diacritic_set);
 					if (lookups == NULL)
 					{
 						// no results as empty result
@@ -478,11 +491,14 @@ lookup_print_all(const char* s, KeyTable* kt,
 							++lkv)
 					{
 						KeyVector* hmmlkv = *lkv;
+						hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
+						if (hmmlkv == NULL)
+						  {continue;}
 						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
 											_is_epsilon), hmmlkv->end());
 						string* lkvstring = keyVectorToString(hmmlkv, kt);
 						VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
-						current_results->push_back(*lkv);
+						current_results->push_back(hmmlkv);
 						delete lkvstring;
 					}
 				}
@@ -567,7 +583,7 @@ lookup_print_all(const char* s, KeyTable* kt,
 				}
 				else
 				{
-					KeyVectorVector* lookups = lookup_all(*t, *kv);
+				  KeyVectorVector* lookups = lookup_all(*t, *kv,&flag_diacritic_set);
 					if (lookups == NULL)
 					{
 						// no results as empty result
@@ -579,11 +595,14 @@ lookup_print_all(const char* s, KeyTable* kt,
 							++lkv)
 					{
 						KeyVector* hmmlkv = *lkv;
+						hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
+						if (hmmlkv == NULL)
+						  { continue; }
 						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
 											_is_epsilon), hmmlkv->end());
 						string* lkvstring = keyVectorToString(hmmlkv, kt);
 						VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
-						current_results->push_back(*lkv);
+						current_results->push_back(hmmlkv);
 						delete lkvstring;
 					}
 				}
@@ -663,6 +682,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				// add your code here
 				cascade.push_back(input);
 			}
+			define_flag_diacritics(key_table);
 			VERBOSE_PRINT("\n");
 #			define MAX_LINE_LENGTH 254
 			char* line =
@@ -741,6 +761,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				// add your code here
 				cascade.push_back(input);
 			}
+			define_flag_diacritics(key_table);
 			VERBOSE_PRINT("\n");
 #			define MAX_LINE_LENGTH 254
 			char* line =

@@ -1856,13 +1856,23 @@ namespace HWFST {
 
 
   KeyVectorVector * lookup_all(TransducerHandle t,
-			       KeyVector * input_string ) {
+			       KeyVector * input_string,
+			       KeySet * skip_symbols ) {
     fst::StdVectorFst * pT = HANDLE_TO_PINSTANCE(fst::StdVectorFst,t);
-    return find_all_output_strings( *pT, input_string );
+    if (skip_symbols != NULL)
+      {
+	return find_all_output_strings( *pT, input_string, skip_symbols );
+      }
+    else
+      {
+	KeySet ks;
+	return find_all_output_strings( *pT, input_string, &ks );
+      }
   }
   
   KeyVector * lookup_first(TransducerHandle t,
-			   KeyVector * input_string ) {
+			   KeyVector * input_string,
+			   KeySet * skip_symbols ) {
     fst::StdVectorFst * pT = HANDLE_TO_PINSTANCE(fst::StdVectorFst,t);
     return find_first_output_string( *pT, input_string );
   }

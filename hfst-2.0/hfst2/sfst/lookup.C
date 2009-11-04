@@ -149,6 +149,7 @@ KeyVectorVector * reverse( KeyVectorVector * key_strings ) {
   find_all_continuations(Node * n, 
 			 KeyVector::iterator input_position, 
 			 KeyVector::iterator input_end_position,
+			 KeySet * skip_symbols,
 			 bool preserve_epsilons=false) {
     
     KeyVectorVector * continuations = NULL;
@@ -156,10 +157,12 @@ KeyVectorVector * reverse( KeyVectorVector * key_strings ) {
     if ( input_position == input_end_position ) {
       for ( ArcsIter arcs(n->arcs()); arcs; arcs++ ) {
 	Arc a = *arcs;
-	if ( a.label().lower_char() == 0 ) {
+	if ( (a.label().lower_char() == 0) or
+	     (skip_symbols->find(a.label().lower_char()) != 
+	      skip_symbols->end())) {
 	  KeyVectorVector * suffixes = 
 	    find_all_continuations(a.target_node(),input_position,
-				   input_end_position );
+				   input_end_position, skip_symbols );
 	  if ( suffixes == NULL )
 	    continue;
 	  else if ( continuations == NULL ) {
@@ -190,7 +193,7 @@ KeyVectorVector * reverse( KeyVectorVector * key_strings ) {
       if ( a.label().lower_char() == *input_position) {
 	KeyVectorVector * suffixes = 
 	  find_all_continuations(a.target_node(),input_position+1,
-				 input_end_position );
+				 input_end_position,skip_symbols );
 	if ( suffixes == NULL )
 	  continue;
 	else if ( continuations == NULL ) {
@@ -201,10 +204,12 @@ KeyVectorVector * reverse( KeyVectorVector * key_strings ) {
 			     suffixes);
       }
   
-      if ( a.label().lower_char() == 0) {
+      if ( (a.label().lower_char() == 0) or
+	   (skip_symbols->find(a.label().lower_char()) != 
+	    skip_symbols->end())) {
 	KeyVectorVector * suffixes = 
 	  find_all_continuations(a.target_node(),input_position,
-				 input_end_position );
+				 input_end_position,skip_symbols );
 	if ( suffixes == NULL )
 	  continue;
 	else if ( continuations == NULL ) {
@@ -236,13 +241,15 @@ KeyVectorVector * reverse( KeyVectorVector * key_strings ) {
   }
 
   KeyVectorVector * find_all_output_strings( Transducer * t,
-						  KeyVector * input ) {
+					     KeyVector * input,
+					     KeySet * skip_symbols) {
     Node * start = t->root_node();
     KeyVector::iterator input_position = input->begin();
     KeyVector::iterator last_input_position = input->end();
     KeyVectorVector * reversed_outputs = 
       find_all_continuations(start, input_position, 
-			     last_input_position);
+			     last_input_position,
+			     skip_symbols);
     KeyVectorVector * outputs = reverse(reversed_outputs);
     if (outputs == NULL)
       {

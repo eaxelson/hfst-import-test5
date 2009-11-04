@@ -160,6 +160,7 @@ namespace HWFST
 			       KeyVector::iterator input_position,
 			       KeyVector::iterator input_end_position,
 			       Transducer &t,
+			       KeySet * skip_symbols,
 			       bool preserve_epsilons = false)
 	{
 	  
@@ -172,13 +173,15 @@ namespace HWFST
 		   arcs.Next())
 		{
 		  Arc a = arcs.Value();
-		  if (a.ilabel == 0)
+		  if ((a.ilabel == 0) or 
+		      (skip_symbols->find(a.ilabel) != skip_symbols->end()))
 		    {
 		      KeyVectorVector * suffixes =
 			find_all_continuations(a.nextstate,
 					       input_position,
 					       input_end_position,
-					       t);
+					       t,
+					       skip_symbols);
 		      if (suffixes == NULL)
 			continue;
 		      else if (continuations == NULL)
@@ -219,7 +222,8 @@ namespace HWFST
 		    find_all_continuations(a.nextstate,
 					   input_position + 1,
 					   input_end_position,
-					   t);
+					   t,
+					   skip_symbols);
 		  if (suffixes == NULL)
 		    continue;
 		  else if (continuations == NULL)
@@ -231,13 +235,14 @@ namespace HWFST
 				       suffixes);
 		}
 	      
-	      if (a.ilabel == 0)
+	      if ((a.ilabel == 0) or
+		  skip_symbols->find(a.ilabel) != skip_symbols->end())
 		{
 		  KeyVectorVector * suffixes =
 		    find_all_continuations(a.nextstate,
 					   input_position,
 					   input_end_position,
-					   t);
+					   t,skip_symbols);
 		  if (suffixes == NULL)
 		    continue;
 		  else if (continuations == NULL)
@@ -275,7 +280,8 @@ namespace HWFST
 	}
 
 	KeyVectorVector * find_all_output_strings(Transducer &t,
-						  KeyVector * input)
+						  KeyVector * input,
+						  KeySet * skip_symbols)
 	{
 		StateId start = t.Start();
 		KeyVector::iterator input_position = input->begin();
@@ -284,7 +290,8 @@ namespace HWFST
 		  find_all_continuations(start,
 					 input_position,
 					 last_input_position,
-					 t);
+					 t,skip_symbols
+					 );
 		KeyVectorVector * outputs =
 		  reverse_inner(reversed_outputs);
 		if (outputs == NULL)
