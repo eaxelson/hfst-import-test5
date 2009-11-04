@@ -671,12 +671,22 @@ NON_DELIMITER_SYMBOL_RANGE: NON_DELIMITER_SYMBOL_RANGE SYMBOL
   $$ = $1;
   $$->push_back(grammar_displayer.get_epsilon_symbol());
 }
+| NON_DELIMITER_SYMBOL_RANGE LONELY_EPSILON 
+{ 
+  $$ = $1;
+  $$->push_back(grammar_displayer.get_epsilon_symbol());
+}
 | CHAR                      
 { 
   $$ = new NonDelimiterSymbolRange;
   $$->push_back($1);
 }
 | EPSILON                            
+{
+  $$ = new NonDelimiterSymbolRange;
+  $$->push_back(grammar_displayer.get_epsilon_symbol());
+}
+| LONELY_EPSILON                            
 {
   $$ = new NonDelimiterSymbolRange;
   $$->push_back(grammar_displayer.get_epsilon_symbol());

@@ -605,16 +605,25 @@ bool is_subset( TransducerHandle t1, TransducerHandle t2 );
 
 
 /** \brief Look up the output-strings corresponding to string \a input_string.
-    Return an empty vector, if there are no output-strings for input-string. */
+    Return an empty vector, if there are no output-strings for input-string. 
+    For pairs \a s:x in \a t, where \s is in \a skip_symbols, treat \a s as 
+    epsilon (i.e. write \a x in the output without consuming characters in 
+    \a input).
+*/
 KeyVectorVector * lookup_all(TransducerHandle t,
-			     vector<Key> * input_string );
+			     vector<Key> * input_string,
+			     KeySet * skip_symbols = NULL);
 
 /** \brief Look up the first found output-string corresponding to string 
     \a input_string. Return NULL, if there are no output-strings for 
-    input-string. */
-
+    input-string.
+    For pairs \a s:x in \a t, where \s is in \a skip_symbols, treat \a s as 
+    epsilon (i.e. write \a x in the output without consuming characters in 
+    \a input).
+*/
 KeyVector * lookup_first(TransducerHandle t,
-			 vector<Key> * input_string );
+			 vector<Key> * input_string,
+			 KeySet * skip_symbols = NULL);
 
 //@}
 

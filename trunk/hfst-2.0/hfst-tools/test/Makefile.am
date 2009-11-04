@@ -576,14 +576,14 @@ hfst-repeat-functionality-test: 2cat.hfst 2cat.hwfst 2cat_2_5.hfst 2cat_4_INF.hf
 	done
 
 hfst-lookup-functionality-test: cat2dog.hfst cat2dog.hwfst cat2dog.input cat2dog.output infinitely_ambiguous.hfst infinitely_ambiguous.hwfst
-	cat cat2dog.hfst | $(top_builddir)/src/hfst-lookup -I $(srcdir)/cat2dog.input > cat2dog.temp
+	cat $(srcdir)/cat2dog.input | $(top_builddir)/src/hfst-lookup cat2dog.hfst > cat2dog.temp
 	diff cat2dog.temp $(srcdir)/cat2dog.output
 	rm -f cat2dog.temp
-	cat cat2dog.hwfst | $(top_builddir)/src/hfst-lookup -I $(srcdir)/cat2dog.input > cat2dog.temp
+	cat $(srcdir)/cat2dog.input | $(top_builddir)/src/hfst-lookup cat2dog.hfst > cat2dog.temp
 	diff cat2dog.temp $(srcdir)/cat2dog.output
 	rm -f cat2og.temp
-	cat infinitely_ambiguous.hfst | $(top_builddir)/src/hfst-lookup -I infinitely_ambiguous_inputs > /dev/null 2> /dev/null
-	cat infinitely_ambiguous.hwfst | $(top_builddir)/src/hfst-lookup -I infinitely_ambiguous_inputs > /dev/null 2> /dev/null
+	cat infinitely_ambiguous_inputs | $(top_builddir)/src/hfst-lookup infinitely_ambiguous.hfst > /dev/null
+	cat infinitely_ambiguous_inputs	| $(top_builddir)/src/hfst-lookup infinitely_ambiguous.hwfst > /dev/null
 
 hfst-remove-epsilons-functionality-test: 2non_minimal.hfst 2non_minimal.hwfst
 	cat 2non_minimal.hfst | $(top_builddir)/src/hfst-remove-epsilons -s -o TMP

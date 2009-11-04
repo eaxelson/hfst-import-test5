@@ -680,7 +680,7 @@ CHAR: SYMBOL { $$ = $1; }
 void warn(const char * warning) { }
 
 void yyerror(const char * text) {
-  //input_reader.error(text);
+  input_reader.error(text);
   exit(1);
 }
 
