@@ -14,9 +14,7 @@ BASIC_TESTS=\
 MULTIFILE_TESTS=\
 	basic.multi-file-1.hlexc basic.multi-file-2.hlexc basic.multi-file-3.hlexc
 MY_EXT_TESTS=\
-	hlexc.partial-alphabet.hlexc hlexc.weights.hlexc \
-	hlexc.xre.any-four-guesser.hlexc hlexc.xre.at-file.hlexc \
-	hlexc.xre.basic.hlexc
+	hlexc.weights.hlexc
 STRESS_TESTS=\
 	stress.random-lexicons-100.hlexc
 VALGRIND_TESTS=\
@@ -49,9 +47,7 @@ BASIC_TARGETS=\
 MULTIFILE_TARGETS=\
 	basic.multi-file.lexc.hfst
 MY_EXT_TARGETS=\
-	hlexc.partial-alphabet.lexc.hfst hlexc.weights.lexc.hfst \
-	hlexc.xre.any-four-guesser.lexc.hfst hlexc.xre.at-file.lexc.hfst \
-	hlexc.xre.basic.lexc.hfst
+	hlexc.weights.lexc.hfst
 STRESS_TARGETS=\
 	stress.random-lexicons-100.lexc.hfst
 VALGRIND_TARGETS=\
@@ -78,9 +74,7 @@ BASIC_WARGETS=\
 MULTIFILE_WARGETS=\
 	basic.multi-file.lexc.hwfst
 MY_EXT_WARGETS=\
-	hlexc.partial-alphabet.lexc.hwfst hlexc.weights.lexc.hwfst \
-	hlexc.xre.any-four-guesser.lexc.hwfst hlexc.xre.at-file.lexc.hwfst \
-	hlexc.xre.basic.lexc.hwfst
+	hlexc.weights.lexc.hwfst
 STRESS_WARGETS=\
 	stress.random-lexicons-100.lexc.hwfst
 VALGRIND_WARGETS=\
@@ -112,9 +106,7 @@ BASIC_PAIRS=\
 MULTIFILE_PAIRS=\
 	basic.multi-file.pair-test
 MY_EXT_PAIRS=\
-	hlexc.partial-alphabet.pair-test hlexc.weights.pair-test \
-	hlexc.xre.any-four-guesser.pair-test hlexc.xre.at-file.pair-test \
-	hlexc.xre.basic.pair-test
+	hlexc.weights.pair-test
 STRESS_PAIRS=\
 	stress.random-lexicons-100.pair-test
 VALGRIND_PAIRS=\
@@ -145,9 +137,7 @@ BASIC_PAIRTARGETS=\
 MULTIFILE_PAIRTARGETS=\
 	basic.multi-file.pair-results
 MY_EXT_PAIRTARGETS=\
-	hlexc.partial-alphabet.pair-results hlexc.weights.pair-results \
-	hlexc.xre.any-four-guesser.pair-results hlexc.xre.at-file.pair-results \
-	hlexc.xre.basic.pair-results
+	hlexc.weights.pair-results
 STRESS_PAIRTARGETS=\
 	stress.random-lexicons-100.pair-results
 VALGRIND_PAIRTARGETS=\

@@ -59,7 +59,6 @@ extern FILE* outfile;
 extern string outfilename;
 extern unsigned int verbosity;
 #if TIMING
-extern bool timing;
 extern std::map<std::string, clock_t> timings_accumulated;
 extern std::map<std::string, clock_t> timings_starts;
 extern std::map<std::string, clock_t> timings_ends;
@@ -296,6 +295,13 @@ lexc_timer_end(const char* name)
 	assert(timings_accumulated.find(name) != timings_accumulated.end());
 	timings_ends[name] = clock();
 	timings_accumulated[name] += timings_ends[name] - timings_starts[name];
+	if (verbosity & PRINT_TIMING_MORE)
+	{
+		// TRANSLATORS: timing description, time, s for seconds
+		(void)fprintf(message_out,
+				_("%s: %f s\n"), name, 
+				static_cast<double>((timings_ends[name] - timings_starts[name]))/CLOCKS_PER_SEC);
+	}
 	timings_starts[name] = clock();
 #	else
 	;

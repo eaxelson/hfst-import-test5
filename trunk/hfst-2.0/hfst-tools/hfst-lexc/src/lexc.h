@@ -53,9 +53,6 @@ class LexcCompiler
 	//! @brief add @a alphabet to sigma set.
 	void addAlphabet(const std::string& alphabet);
 
-	//! @brief make sigma set closed and entries extending alphabet fatal errors.
-	void setClosedSigma(bool closed);
-
 	//! @brief set current processing lexicon name to @a lexicon_name.
 	void setCurrentLexiconName(const std::string& lexicon_name);
 
