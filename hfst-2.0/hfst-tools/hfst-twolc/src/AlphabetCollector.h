@@ -33,11 +33,11 @@ struct CmpSymbolPairs
   bool operator() (const SymbolPair &p1, 
 		   const SymbolPair &p2)
   {
-    if (strcmp(p1.first,p2.first) == 0)
-      {
-	return strcmp(p1.second,p2.second) < 0;
-      }
-    return strcmp(p1.first,p2.first) < 0;
+    if (lax_str_cmp()(p2.first,p1.first))
+      { return false; }
+    if (lax_str_cmp()(p1.first,p2.first))
+      { return true; }
+    return lax_str_cmp()(p1.second,p2.second);
   }
 };
 
