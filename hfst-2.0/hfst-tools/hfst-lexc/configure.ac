@@ -101,7 +101,7 @@ AC_CHECK_TYPES([ptrdiff_t])
 
 
 # Output files
-AC_CONFIG_FILES([Makefile src/Makefile test/Makefile test/omorfi/Makefile test/divvun-sme/Makefile test/morphalou/Makefile test/kos83/Makefile man/Makefile test/xre.at-file.hlexc test/hlexc.xre.at-file.hlexc test/fao/Makefile po/Makefile.in])
+AC_CONFIG_FILES([Makefile src/Makefile test/Makefile test/omorfi/Makefile test/divvun-sme/Makefile test/morphalou/Makefile test/kos83/Makefile man/Makefile test/xre.at-file.hlexc test/fao/Makefile po/Makefile.in])
 AC_CONFIG_HEADERS([config.h])
 AC_DEFINE([NESTED_BUILD], [1], [We're doing a nested build, headers aren't always where we expect them to be])
 AC_CONFIG_SRCDIR([src/lexc.h])

@@ -49,33 +49,10 @@ static unsigned long currentEntries = 0;
 static unsigned long stringEntries = 0;
 static unsigned long regexpEntries = 0;
 
-// Metadata
-static map<string,string> metadata_;
-
-
 // The compiler
 extern LexcCompiler* lexc;
 
 // Actual functions to handle parsed stuff
-static void handle_metadata(const string& name, const string& expression)
-{
-	metadata_.insert( pair<string,string>(name, expression) );
-	lexc_printf(PRINT_DEBUG, 0, _("%s = %s\n"),
-			name.c_str(), expression.c_str());
-}
-
-static void handle_alphabet(const string& alphabet)
-{
-	lexc_printf(PRINT_DEBUG, 0, _("ALPHABET: %s\n"),
-			alphabet.c_str());
-	if (verbosity & PRINT_VERBOSE)
-	{
-		lexc_list_printf("%s", alphabet.c_str());
-	}
-	lexc->addAlphabet(alphabet);
-	lexc->setClosedSigma(true);
-}
-
 static
 void
 handle_multichar(const string& multichar)
@@ -277,63 +254,19 @@ handle_end()
 	int number;
 }
 
-%token <number>	ERROR METADATA_START ALPHABET_START MULTICHARS_START
+%token <number>	ERROR MULTICHARS_START
 	DEFINITIONS_START END_START
 %token <name>	LEXICON_START LEXICON_NAME ULSTRING ENTRY_GLOSS
-	METADATA_FIELDNAME METADATA_VALUE
-	MULTICHAR_SYMBOL ALPHABET_SYMBOL
+	MULTICHAR_SYMBOL
 	DEFINITION_NAME DEFINITION_EXPRESSION
 	XEROX_REGEXP
 
 %%
 
-LEXC_FILE: METADATA_PART ALPHABET_PART MULTICHAR_PART
-			 DEFINITIONS_PART LEXICON_PART END_PART {
+LEXC_FILE: MULTICHAR_PART DEFINITIONS_PART LEXICON_PART END_PART {
 				handle_eof();
 			}
 			 ;
-
-METADATA_PART: METADATA2 FIELD_VALUE_LIST
-				 |
-				 ;
-
-METADATA2: METADATA_START {
-				lexc_printf(PRINT_VERBOSE, 0, "Reading metadata:");
-			}
-			;
-
-FIELD_VALUE_LIST: FIELD_VALUE_LIST FIELD_AND_VALUE
-				  | FIELD_AND_VALUE
-				  ;
-
-FIELD_AND_VALUE: METADATA_FIELDNAME ':' METADATA_VALUE {
-					handle_metadata($1, $3);
-					free( $1);
-					free( $3);
-				}
-				;
-
-ALPHABET_PART: ALPHABET2 ALPHABET_SYMBOL_LIST
-				|
-				;
-
-ALPHABET2: ALPHABET_START {
-				if (verbosity & PRINT_VERBOSE)
-				{
-					lexc_print_list_end("");
-					lexc_print_list_start(_("Reading alphabet"));
-				}
-			}
-			;
-
-ALPHABET_SYMBOL_LIST: ALPHABET_SYMBOL_LIST ALPHABET_SYMBOL2
-					  | ALPHABET_SYMBOL2
-					  ;
-
-ALPHABET_SYMBOL2: ALPHABET_SYMBOL {
-					handle_alphabet($1);
-					free( $1);
-				}
 
 MULTICHAR_PART: MULTICHAR_SYMBOLS2 MULTICHAR_SYMBOL_LIST
 				 |

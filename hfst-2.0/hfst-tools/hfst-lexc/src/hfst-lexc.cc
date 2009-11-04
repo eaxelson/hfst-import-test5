@@ -141,7 +141,14 @@ parse_options(int argc, char** argv)
 			break;
 #if TIMING
 		case 't':
-			verbosity |= PRINT_TIMING;
+			if (verbosity & PRINT_TIMING)
+			{
+				verbosity |= PRINT_TIMING_MORE;
+			}
+			else
+			{
+				verbosity |= PRINT_TIMING;
+			}
 			break;
 #endif
 #if DEBUG
@@ -381,6 +388,7 @@ main(int argc, char* argv[])
 	lexc_timer_initialize("xre-union");
 	lexc_timer_initialize("fill-sigma");
 	lexc_timer_initialize("morphotaxing");
+	lexc_timer_initialize("determinise");
 	lexc_timer_initialize("minimise");
 	// set "default" options
 	set_default_options();
@@ -394,6 +402,7 @@ main(int argc, char* argv[])
 	lexc_timing_printf("xre-union", _(" * Regular expression joining"));
 	lexc_timing_printf("fill-sigma", _(" * Completing sigma set"));
 	lexc_timing_printf("morphotaxing", _(" * Applying morphotax"));
+	lexc_timing_printf("determinise", _(" * All the determinising"));
 	lexc_timing_printf("minimise", _(" * All the minimising"));
 	destructLexcSymbolTablesAndSets();
 	return rv;
