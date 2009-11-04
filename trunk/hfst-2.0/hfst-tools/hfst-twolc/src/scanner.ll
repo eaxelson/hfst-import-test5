@@ -135,10 +135,6 @@ WORD_BOUNDARY                    #
 {WORD_BOUNDARY}                  {  yylval.value = string_copy("@#@");
                                     return SYMBOL; }
 {ZERO}                           { return EPSILON; }
-[\t ]{ZERO}[\t ]                 { return EPSILON; }
-^{ZERO}[\t ]                     { return EPSILON; }
-[\t ]{ZERO}$                     { return EPSILON; }
-^{ZERO}$                         { return EPSILON; }
 
 {LEFT_RANGE}             { return LEFT_SQUARE_BRACKET; }
 {RIGHT_RANGE}            { return RIGHT_SQUARE_BRACKET; }
