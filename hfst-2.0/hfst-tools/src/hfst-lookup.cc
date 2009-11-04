@@ -134,6 +134,7 @@ parse_options(int argc, char** argv)
 		case 'I':
 			lookup_file_name = hfst_strdup(optarg);
 			lookup_file = hfst_fopen(lookup_file_name, "r");
+			lookup_given = true;
 			break;
 		case 'S':
 			space_separated = true;
