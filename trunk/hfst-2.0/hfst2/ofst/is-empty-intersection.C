@@ -38,7 +38,7 @@ namespace HWFST {
 			       fst::StdVectorFst * t2, StateId n2, 
 			       set<NodePair,compare_NodePairs> &handled_nodes) {
     
-    if ( (t1->Final( n1 ) == 0) and (t2->Final( n2 ) == 0) )
+    if ( (t1->Final(n1) != fst::TropicalWeight::Zero()) and (t1->Final(n1) != fst::TropicalWeight::Zero()) )
       return true;
     
     map<SymPair,StateId,compare_SymPairs> n1_labels;
