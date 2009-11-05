@@ -373,7 +373,12 @@ void fst::Composer::compose( RulesInfo &Rules ) {
 
   // Normal transitions x:a in lexicon and a:z in rules.
   while ( not lexicon_arcs.Done() and not Rules.Done()) {
-
+    if (skip_symbols.find(lexicon_arcs.Value().olabel) != skip_symbols.end())
+      {
+    	single_compose_epsilon( lexicon_arcs, Rules );  
+	lexicon_arcs.Next();
+    	continue;
+      }
     // This is the label a in the lexicon
     lexicon_out = lexicon_arcs.Value().olabel;
     StateId first_occurence_of_out = lexicon_arcs.get_current_state();

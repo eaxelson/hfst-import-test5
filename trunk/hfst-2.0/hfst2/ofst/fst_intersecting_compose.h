@@ -2,6 +2,9 @@
 
 #include "fst/lib/fstlib.h"
 #include <vector>
+#include <set>
+
+typedef std::set<unsigned short> KeySet;
 
 using std::vector;
 
@@ -458,19 +461,23 @@ class Composer {
   StateId composition_state;
 
   float multiply_weights(Arcs &L, RulesInfo &R);
+  KeySet &skip_symbols;
+
  public:
 
-  Composer( Transducer &lex , vector<Transducer*> &Rules) :
+ Composer( Transducer &lex , vector<Transducer*> &Rules,KeySet &skip_syms) :
     composition(new Transducer()),
       lexicon( lex, composition ),
-      composition_state(0)
-    {
-      composition->AddState();
+      composition_state(0),
+      skip_symbols(skip_syms)
+    { composition->AddState();
       composition->SetStart(0);
-      RulesInfo::init(Rules);
-    };
+      RulesInfo::init(Rules); };
 
-  void more( StateId lexicon_target, RulesInfo &Rules, StateId composition_target, bool epsilon );
+  void more( StateId lexicon_target, 
+	     RulesInfo &Rules, 
+	     StateId composition_target, 
+	     bool epsilon );
   void single_compose( Arcs &lexicon_arcs, RulesInfo &Rules );
   void single_compose_epsilon( Arcs &lexicon_arcs, RulesInfo &Rules );
   void compose( RulesInfo &Rules );

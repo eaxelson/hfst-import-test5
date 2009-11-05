@@ -1658,7 +1658,9 @@ namespace HWFST {
     map<SymPair,StateId,compare_SymPairs> n1_labels;
     map<SymPair,StateId,compare_SymPairs> n2_labels;
 
-    for ( fst::ArcIterator<fst::StdVectorFst> as(*t1,n1); not as.Done(); as.Next() ) {
+    for ( fst::ArcIterator<fst::StdVectorFst> as(*t1,n1); 
+	  not as.Done(); 
+	  as.Next() ) {
 
       const fst::StdArc a = as.Value();
       SymPair s;
@@ -1669,7 +1671,9 @@ namespace HWFST {
 
     }
 
-    for ( fst::ArcIterator<fst::StdVectorFst> as(*t2,n2); not as.Done(); as.Next() ) {
+    for ( fst::ArcIterator<fst::StdVectorFst> as(*t2,n2); 
+	  not as.Done(); 
+	  as.Next() ) {
 
       const fst::StdArc a = as.Value();
       SymPair s;
@@ -1684,7 +1688,8 @@ namespace HWFST {
 
     set<NodePair,compare_NodePairs> next_pairs;
 
-    for( map<SymPair,StateId,compare_SymPairs>::iterator it = n1_labels.begin();
+    for( map<SymPair,StateId,compare_SymPairs>::iterator it = 
+	   n1_labels.begin();
 	 it != n1_labels.end();
 	 ++it ) {
       
@@ -1700,8 +1705,8 @@ namespace HWFST {
       p.first = target1;
       p.second = target2;
 
-      if ( t1->Final(target1) == fst::TropicalWeight::Zero() )
-	if ( t2->Final(target2) != fst::TropicalWeight::Zero()  )
+      if ( t1->Final(target1) != fst::TropicalWeight::Zero() )
+	if ( t2->Final(target2) == fst::TropicalWeight::Zero()  )
 	  return false;
 
       next_pairs.insert(p);
@@ -5264,9 +5269,11 @@ namespace HWFST {
     for( vector<TransducerHandle>::iterator it = rules->begin();
 	 it != rules->end(); ++it )
       pRules.push_back( HANDLE_TO_PINSTANCE( fst::StdVectorFst, *it ) );
-    			
-    fst::StdVectorFst * result = fst::Composer( *pLexicon, pRules )();
-
+    KeyTable * skip_symbol_table = gather_flag_diacritic_table(k);
+    KeySet * skip_symbols = get_key_set(skip_symbol_table);
+    delete skip_symbol_table;
+    fst::StdVectorFst * result = fst::Composer( *pLexicon, pRules, *skip_symbols )();
+    delete skip_symbols;
     delete pLexicon;
     for( vector<fst::StdVectorFst*>::iterator it = pRules.begin(); it != pRules.end(); ++it )
       delete *it;
