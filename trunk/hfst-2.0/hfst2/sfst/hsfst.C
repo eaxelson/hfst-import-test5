@@ -1773,14 +1773,19 @@ Transducer *negation_( Transducer *t, KeyPairSet *Pi )
 {
   if (RS.size() > 0 || RSS.size() > 0)
     cerr << "\nWarning: agreement operation inside of negation!\n";
-  Alphabet pi_alpha = keypair_set_to_alphabet(Pi);
+
+  Transducer *pi = define_pi_transducer_(Pi);
+  return subtraction_(pi, t);
+
+  /*Alphabet pi_alpha = keypair_set_to_alphabet(Pi);
   //if (!Alphabet_Defined)
   //  error("Negation requires the definition of an alphabet");
   t->alphabet.clear_char_pairs();
   t->alphabet.copy(pi_alpha);
+
   Transducer *nt = &(!*t);
   delete t;
-  return nt;
+  return nt;*/
 }
 
 
