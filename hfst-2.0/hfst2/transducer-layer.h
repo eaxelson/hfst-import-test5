@@ -239,7 +239,9 @@ rules in any way.
 @post The vector \a v is deleted.
 @post The result is not minimized.
 */
-TransducerHandle intersecting_composition( TransducerHandle t, vector<TransducerHandle> * v, KeyTable * kt=NULL);
+TransducerHandle 
+intersecting_composition( TransducerHandle t, 
+			  vector<TransducerHandle> * v, KeyTable * kt=NULL);
 
 /** \brief Switch input and output in the transition pairs of transducer \a t. 
     
