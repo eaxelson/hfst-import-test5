@@ -159,9 +159,15 @@ bool fst::RulesInfo::first_in( Label input ) {
     }
 
     Rule_arcs.at(0)->Next();
-    first_rule_pair.input = Rule_arcs.at(0)->Value().ilabel;
-    first_rule_pair.output = Rule_arcs.at(0)->Value().olabel;
-
+    if (not Rule_arcs.at(0)->Done())
+      {
+	first_rule_pair.input = Rule_arcs.at(0)->Value().ilabel;
+	first_rule_pair.output = Rule_arcs.at(0)->Value().olabel;
+      }
+    else
+      {
+	break;
+      }
   }
 
   return false;
