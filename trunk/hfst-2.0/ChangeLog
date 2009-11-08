@@ -1,35 +1,1066 @@
+2009-11-06 13:13  mpsilfve
+
+	* hfst2/ofst/fst_intersecting_compose.C:
+	  Fixed
+	  a
+	  potential
+	  endless
+	  loop
+	  in
+	  fst_intersecting_composition.C
+
+2009-11-05 18:51  mpsilfve
+
+	* hfst2/ofst/is-empty-intersection.C:
+	  
+
+2009-11-05 17:18  mpsilfve
+
+	* hfst2/ofst/fst_intersecting_compose.C,
+	  hfst2/ofst/fst_intersecting_compose.h,
+	  hfst2/ofst/hofst.C,
+	  hfst2/transducer-layer.h:
+	  Fixed
+	  weighted
+	  is_subset
+	  and
+	  weighted
+	  intersecting
+	  composition
+	  (again)
+
+2009-11-05 12:00  eaxelson
+
+	* hfst2/sfst/hsfst.C,
+	  hfst2/sfst/operators.C:
+	  a
+	  bug
+	  in
+	  unweighted
+	  negation
+	  fixed
+
+2009-11-04 15:15  mie
+
+	* hfst-tools/hfst-lexc/src/lexc-parser.cc,
+	  hfst-tools/hfst-lexc/src/lexc-parser.h:
+	  Remove
+	  generated
+	  sources
+	  from
+	  svn
+
+2009-11-04 15:14  mie
+
+	* hfst-tools/hfst-lexc/configure.ac,
+	  hfst-tools/hfst-lexc/src/hfst-lexc.cc,
+	  hfst-tools/hfst-lexc/src/lexc-lexer.ll,
+	  hfst-tools/hfst-lexc/src/lexc-parser.cc,
+	  hfst-tools/hfst-lexc/src/lexc-parser.h,
+	  hfst-tools/hfst-lexc/src/lexc-parser.yy,
+	  hfst-tools/hfst-lexc/src/lexc.cc,
+	  hfst-tools/hfst-lexc/src/lexc.h,
+	  hfst-tools/hfst-lexc/src/lexcio.cc,
+	  hfst-tools/hfst-lexc/src/lexcio.h,
+	  hfst-tools/hfst-lexc/test/Makefile.am,
+	  hfst-tools/hfst-lexc/test/hlexc.partial-alphabet.hlexc,
+	  hfst-tools/hfst-lexc/test/hlexc.partial-alphabet.pair-test,
+	  hfst-tools/hfst-lexc/test/hlexc.xre.any-four-guesser.hlexc,
+	  hfst-tools/hfst-lexc/test/hlexc.xre.any-four-guesser.pair-test,
+	  hfst-tools/hfst-lexc/test/hlexc.xre.at-file.hlexc,
+	  hfst-tools/hfst-lexc/test/hlexc.xre.at-file.hlexc.in,
+	  hfst-tools/hfst-lexc/test/hlexc.xre.at-file.pair-test,
+	  hfst-tools/hfst-lexc/test/hlexc.xre.basic.hlexc,
+	  hfst-tools/hfst-lexc/test/hlexc.xre.basic.pair-test:
+	  Remove
+	  useless
+	  hlexc
+	  additions,
+	  such
+	  as
+	  alphabet
+	  and
+	  metadata
+
+2009-11-04 13:31  mpsilfve
+
+	* hfst-tools/hfst-twolc/src/scanner.ll,
+	  hfst-tools/src/hfst-compiler.h:
+	  Removed
+	  superfluous
+	  flex
+	  rules
+	  in
+	  hfst-twolc/src/scanner.ll
+
+2009-11-04 12:09  mpsilfve
+
+	* hfst-tools/src/FlagDiacritics.cc,
+	  hfst-tools/src/FlagDiacritics.h:
+	  Fixed
+	  lookup
+	  so
+	  that
+	  it
+	  handles
+	  flag
+	  diacritics
+
+2009-11-04 12:08  mpsilfve
+
+	* hfst-tools/src/hfst-lookup.cc:
+	  Fixed
+	  lookup
+	  so
+	  that
+	  it
+	  handles
+	  flag
+	  diacritics
+
+2009-11-04 12:04  mpsilfve
+
+	* hfst-tools/hfst-twolc/src/AlphabetCollector.h,
+	  hfst-tools/hfst-twolc/test/GrammarTest59.cc,
+	  hfst-tools/hfst-twolc/test/Makefile.am,
+	  hfst-tools/hfst-twolc/test/WeightedGrammarTest59.cc,
+	  hfst-tools/hfst-twolc/test/test_grammar59,
+	  hfst-tools/hfst-twolc/test/test_grammar59.txt_fst:
+	  Fixed
+	  bug
+	  in
+	  using
+	  escaped
+	  symbols
+	  in
+	  set
+	  constructions
+
+2009-11-04 09:58  mpsilfve
+
+	* hfst-tools/hfst-twolc/src/htwolcpre.yy,
+	  hfst-tools/hfst-twolc/src/htwolcpre3.yy,
+	  hfst-tools/hfst-twolc/src/scanner.ll,
+	  hfst-tools/src/Makefile.am,
+	  hfst-tools/src/hfst-lookup-optimize.cc,
+	  hfst-tools/src/hfst-lookup.cc,
+	  hfst-tools/test/Makefile.am,
+	  hfst2/ofst/hofst.C,
+	  hfst2/ofst/hwfst-lookup.C,
+	  hfst2/ofst/hwfst-lookup.h,
+	  hfst2/sfst/hsfst.C,
+	  hfst2/sfst/lookup.C,
+	  hfst2/sfst/lookup.h,
+	  hfst2/transducer-layer.h:
+	  Fixed
+	  lookup
+	  so
+	  that
+	  it
+	  handles
+	  diacritics
+
+2009-11-03 22:20  mie
+
+	* hfst-tools/hfst-lexc/po:
+	  svn:ignore
+	  stuff
+
+2009-11-03 22:16  mie
+
+	* hfst-tools/hfst-lexc/po/en@boldquot.gmo,
+	  hfst-tools/hfst-lexc/po/en@quot.gmo:
+	  Remove
+	  generated
+	  message
+	  files
+
+2009-11-03 19:45  hardwick
+
+	* README:
+	  fixed
+	  misunderstanding
+	  in
+	  README
+
+2009-11-03 19:13  hardwick
+
+	* hfst-tools/src/hfst-optimized-lookup.cc,
+	  hfst-tools/src/hfst-optimized-lookup.h,
+	  hfst2/Makefile.am:
+	  added
+	  xerox
+	  output
+	  to
+	  optimized-lookup
+
+2009-11-03 16:44  hardwick
+
+	* hfst-tools/src/hfst-optimized-lookup.cc:
+	  typo
+	  fix
+
+2009-11-03 16:29  hardwick
+
+	* hfst-tools/hfst-lexc/po/en@boldquot.gmo,
+	  hfst-tools/hfst-lexc/po/en@boldquot.po,
+	  hfst-tools/hfst-lexc/po/en@quot.gmo,
+	  hfst-tools/hfst-lexc/po/en@quot.po,
+	  hfst-tools/hfst-lexc/po/fi.gmo,
+	  hfst-tools/hfst-lexc/po/fi.po,
+	  hfst-tools/hfst-lexc/po/hfst-lexc.pot,
+	  hfst-tools/src/hfst-optimized-lookup.cc:
+	  Fixed
+	  unification
+	  in
+	  optimized-lookup
+	  again
+	  (I'm
+	  sure
+	  I
+	  did
+	  this
+	  already...)
+	  There
+	  appear
+	  to
+	  be
+	  some
+	  generated
+	  files
+	  under
+	  version
+	  control
+	  with
+	  @s
+	  in
+	  their
+	  names
+	  and
+	  I
+	  can't
+	  figure
+	  out
+	  how
+	  to
+	  svn
+	  rm
+	  them
+	  D:
+
+2009-11-03 16:08  hardwick
+
+	* hfst-tools/src/hfst-optimized-lookup.h:
+	  Fixed
+	  bug
+	  with
+	  initial
+	  flag-transition
+
+2009-11-03 13:40  mie
+
+	* hfst-tools/hfst-lexc/test/fao/fao.pair-test:
+	  Dummy
+	  pair
+	  test
+	  for
+	  fao
+
+2009-11-03 13:36  mie
+
+	* hfst-tools/hfst-lexc/test/Makefile.am,
+	  hfst-tools/hfst-lexc/test/fao/Makefile.am:
+	  Include
+	  fao
+	  test
+
+2009-11-03 13:33  mie
+
+	* README,
+	  hfst-tools/configure.ac,
+	  hfst-tools/hfst-lexc/configure.ac,
+	  hfst-tools/hfst-lexc/src/hfst-lexc.cc,
+	  hfst-tools/src/hfst-lookup.cc:
+	  kill
+	  further
+	  references
+	  to
+	  readline
+
+2009-11-03 13:29  mie
+
+	* hfst-tools/src/hfst-diff-test.cc,
+	  hfst-tools/src/hfst-lookup.cc:
+	  Kill
+	  readline?
+	  Again?
+
+2009-11-03 13:09  mie
+
+	* hfst-tools/hfst-lexc/Makefile.am,
+	  hfst-tools/hfst-lexc/configure.ac,
+	  hfst-tools/hfst-lexc/src/hfst-lexc.cc:
+	  Kill
+	  readline
+
+2009-11-03 13:04  mie
+
+	* hfst-tools/hfst-lexc/configure.ac,
+	  hfst-tools/hfst-lexc/doc/Doxyconf.in,
+	  hfst-tools/hfst-lexc/doc/Makefile.am:
+	  Kill
+	  documentation
+
+2009-11-02 16:41  mie
+
+	* hfst-tools/src/hfst-lookup.cc:
+	  Reserve
+	  double
+	  format
+	  string
+	  space
+	  (should
+	  be
+	  vsprintf)
+
+2009-10-30 07:47  hardwick
+
+	* hfst-tools/src/hfst-optimized-lookup.cc:
+	  optimized-lookup
+	  was
+	  missing
+	  a
+	  short
+	  flag
+
+2009-10-30 07:24  hardwick
+
+	* hfst-tools/src/hfst-optimized-lookup.cc,
+	  hfst-tools/src/hfst-optimized-lookup.h:
+	  synchronised
+	  optimized-lookup
+	  versions
+
+2009-10-28 14:01  mpsilfve
+
+	* hfst2/ofst/fst_intersecting_compose.C,
+	  hfst2/ofst/hofst.C,
+	  hfst2/sfst/hsfst.C,
+	  hfst2/transducer-layer.h:
+	  Added
+	  HFST/HWFST::compose
+	  without
+	  bool
+	  parameter
+	  destructive
+
+2009-10-27 15:11  mie
+
+	* hfst-tools/src/hfst-lookup.cc:
+	  make
+	  no
+	  lookup
+	  format
+	  effective
+	  on
+	  unweighted
+	  side
+	  as
+	  well
+
+2009-10-27 14:53  mie
+
+	* hfst-tools/src/hfst-lookup.cc:
+	  format
+	  no
+	  results
+
+2009-10-27 14:32  mie
+
+	* hfst-tools/configure.ac,
+	  hfst-tools/hfst-lexc/configure.ac,
+	  hfst-tools/src/hfst-lookup.cc:
+	  Optionalise
+	  readline
+	  support
+	  more
+
+2009-10-22 17:16  mpsilfve
+
+	* hfst-tools/src/hfst-regexp2fst.cc,
+	  hfst2/regexp/xre_lex.ll,
+	  hfst2/regexp/xre_parse.yy:
+	  Added
+	  containment
+	  and
+	  insertion
+	  operations
+	  to
+	  xre_parse.yy
+
+2009-10-22 14:03  mpsilfve
+
+	* hfst-tools/src/hfst-regexp2fst.cc,
+	  hfst2/ofst/hofst.C,
+	  hfst2/regexp/xre.cc,
+	  hfst2/sfst/hsfst.C,
+	  hfst2/symbol-layer.h:
+	  gcc
+	  4.3
+	  fixes
+	  and
+	  hfst-regexp2fst
+	  input
+	  reading
+	  changed
+	  so
+	  there
+	  is
+	  no
+	  maximum
+	  length
+	  for
+	  lines.
+
+2009-10-21 23:05  mie
+
+	* hfst-tools/test/binary-tools/Makefile.in:
+	  One
+	  more
+	  generated
+	  file
+	  here
+
+2009-10-21 18:46  mpsilfve
+
+	* hfst-tools/test/Makefile.am,
+	  hfst-tools/test/binary-tools/Makefile.in,
+	  hfst-tools/test/cat2dog.output,
+	  hfst-tools/test/lex.txt,
+	  hfst-tools/test/rule1.txt,
+	  hfst-tools/test/rule2.txt,
+	  hfst2/ofst/fst_intersecting_compose.C,
+	  hfst2/ofst/fst_intersecting_compose.h:
+	  Fixed
+	  compose-intersect
+	  again...
+	  Also
+	  fixed
+	  hfst-lookup-functionality-test
+
+2009-10-21 16:50  hardwick
+
+	* hfst-tools/src/hfst-lookup.cc:
+	  Fixed
+	  non-nested
+	  build
+	  #define
+	  in
+	  hfst-lookup
+
+2009-10-21 16:14  mie
+
+	* hfst-tools/src/hfst-lookup.cc:
+	  Typoed
+	  ^
+	  in
+	  apertium
+	  results,
+	  thanks
+	  to
+	  Francis
+	  Tyers
+	  &
+	  Sjur
+	  Moshagen
+	  for
+	  noticing.
+
+2009-10-21 16:12  mie
+
+	* hfst-tools/src/hfst-lookup.cc:
+	  Mark
+	  new
+	  version
+	  as
+	  some
+	  changes
+	  in
+	  functionality
+	  have
+	  been
+	  implemented.
+
+2009-10-21 14:19  mie
+
+	* hfst-tools/src/hfst-lookup.cc:
+	  Update
+	  --help
+	  instructions
+	  to
+	  inform
+	  about
+	  readline
+	  feature.
+
+2009-10-21 14:00  mie
+
+	* hfst-tools/hfst-lexc/test/basic.escapes.pair-test:
+	  Somehow
+	  attribute
+	  the
+	  fact
+	  that
+	  Xerox
+	  treats
+	  #
+	  specially
+
+2009-10-21 13:59  mie
+
+	* hfst-tools/hfst-lexc/src/xducer.cc:
+	  Bit
+	  more
+	  jiggling
+	  with
+	  weight
+	  positioning
+	  here
+
+2009-10-21 13:58  mie
+
+	* hfst-tools/hfst-lexc/doc/Makefile.in,
+	  hfst-tools/hfst-lexc/man/Makefile.in,
+	  hfst-tools/hfst-lexc/test/divvun-sme/Makefile.in,
+	  hfst-tools/hfst-lexc/test/kos83/Makefile.in,
+	  hfst-tools/hfst-lexc/test/morphalou/Makefile.in,
+	  hfst-tools/hfst-lexc/test/omorfi/Makefile.in,
+	  hfst-tools/man/Makefile.in:
+	  More
+	  removals
+	  of
+	  generated
+	  files
+	  from
+	  version
+	  control
+
+2009-10-21 13:53  mie
+
+	* hfst-tools/src/Makefile.am,
+	  hfst-tools/src/hfst-lookup-commandline.h,
+	  hfst-tools/src/hfst-lookup-transducers.h,
+	  hfst-tools/src/hfst-lookup.cc:
+	  Lookup
+	  with
+	  readline
+	  and
+	  format
+	  strings
+
+2009-10-20 11:52  mie
+
+	* hfst-tools/hfst-lexc/src/xducer.cc:
+	  Move
+	  weights
+	  from
+	  final
+	  states
+	  towards
+	  arcs
+
+2009-10-20 00:04  mie
+
+	* hfst-tools/hfst-lexc/src/lexc.cc:
+	  Support
+	  #
+	  as
+	  implicitly
+	  synonymous
+	  to
+	  special
+	  word
+	  boundary
+	  marker
+
+2009-10-19 19:46  mie
+
+	* hfst-tools/hfst-lexc/src/xducer.cc:
+	  Still
+	  more
+	  tweaks
+	  to
+	  joiner
+	  elimination
+	  (HWFST::State
+	  changes
+	  depending
+	  on
+	  weight
+	  assigned
+	  to
+	  incoming
+	  arc?)
+
+2009-10-19 18:22  mie
+
+	* hfst2/regexp/xre.cc,
+	  hfst2/regexp/xre.h,
+	  hfst2/regexp/xre_api.cc,
+	  hfst2/regexp/xre_parse.yy:
+	  Slightly
+	  optimize
+	  ?
+	  handling
+	  (still
+	  wasteful)
+
+2009-10-19 16:42  mie
+
+	* hfst-tools/hfst-lexc/configure.ac:
+	  include
+	  Faeroese
+	  test
+	  suite
+	  in
+	  top
+	  level
+	  configure
+
+2009-10-19 16:26  mie
+
+	* hfst-tools/hfst-lexc/test/fao,
+	  hfst-tools/hfst-lexc/test/fao/Makefile.am,
+	  hfst-tools/hfst-lexc/test/fao/abbr-fao-lex.txt,
+	  hfst-tools/hfst-lexc/test/fao/acro-fao-lex.txt,
+	  hfst-tools/hfst-lexc/test/fao/adj-fao-lex.txt,
+	  hfst-tools/hfst-lexc/test/fao/adj-fao-morph.txt,
+	  hfst-tools/hfst-lexc/test/fao/adv-fao-lex.txt,
+	  hfst-tools/hfst-lexc/test/fao/cc-fao-lex.txt,
+	  hfst-tools/hfst-lexc/test/fao/cs-fao-lex.txt,
+	  hfst-tools/hfst-lexc/test/fao/det-fao-lex.txt,
+	  hfst-tools/hfst-lexc/test/fao/fao-lex.txt,
+	  hfst-tools/hfst-lexc/test/fao/hyph-fao.txt,
+	  hfst-tools/hfst-lexc/test/fao/inc.txt,
+	  hfst-tools/hfst-lexc/test/fao/interj-fao-lex.txt,
+	  hfst-tools/hfst-lexc/test/fao/noun-fao-lex.txt,
+	  hfst-tools/hfst-lexc/test/fao/noun-fao-morph.txt,
+	  hfst-tools/hfst-lexc/test/fao/numeral-fao-lex.txt,
+	  hfst-tools/hfst-lexc/test/fao/pair-fao.txt,
+	  hfst-tools/hfst-lexc/test/fao/pp-fao-lex.txt,
+	  hfst-tools/hfst-lexc/test/fao/pron-fao-lex.txt,
+	  hfst-tools/hfst-lexc/test/fao/propernoun-fao-lex.txt,
+	  hfst-tools/hfst-lexc/test/fao/propernoun-fao-morph.txt,
+	  hfst-tools/hfst-lexc/test/fao/punct-fao-lex.txt,
+	  hfst-tools/hfst-lexc/test/fao/twol-fao.txt,
+	  hfst-tools/hfst-lexc/test/fao/verb-fao-lex.txt,
+	  hfst-tools/hfst-lexc/test/fao/verb-fao-morph.txt:
+	  Add
+	  Faeroese
+	  test
+	  case
+
+2009-10-19 09:38  mie
+
+	* hfst-tools/src/hfst-diff-test.cc:
+	  Omit
+	  epsilons
+	  as
+	  early
+	  as
+	  possible
+
+2009-10-19 08:59  mie
+
+	* hfst-tools/src/hfst-invert.cc,
+	  hfst-tools/src/hfst-reverse.cc:
+	  tell
+	  (what
+	  is
+	  being
+	  done)
+
+2009-10-18 23:54  mie
+
+	* hfst-tools/src/hfst-diff-test.cc:
+	  Print
+	  all
+	  the
+	  interesting
+	  stuff
+	  even
+	  without
+	  -v
+
+2009-10-15 16:05  mie
+
+	* hfst-tools/hfst-lexc/src/xducer.cc:
+	  Remove
+	  extraneous
+	  building
+	  in
+	  lexc
+	  joining
+
+2009-10-15 14:31  mpsilfve
+
+	* hfst-tools/hfst-twolc/src/CommandLineParser.cc,
+	  hfst-tools/hfst-twolc/src/CommandLineParser.h,
+	  hfst-tools/hfst-twolc/src/htwolcpre.yy,
+	  hfst-tools/hfst-twolc/src/htwolcpre2.yy,
+	  hfst-tools/hfst-twolc/src/htwolcpre3.yy,
+	  hfst-tools/src/hfst-compose-intersect.cc,
+	  hfst2/ofst/fst_intersecting_compose.h:
+	  Fixed
+	  hfst-compose-intersect
+	  segfault
+	  for
+	  the
+	  second
+	  time.
+
+2009-10-15 14:21  hardwick
+
+	* README:
+	  README
+	  copyedit
+
+2009-10-15 14:16  hardwick
+
+	* README:
+	  Added
+	  note
+	  about
+	  make
+	  install-strip
+	  in
+	  README
+
+2009-10-15 14:11  mie
+
+	* hfst-tools/hfst-lexc/src/lexc.cc,
+	  hfst-tools/hfst-lexc/src/xducer.cc:
+	  slightly
+	  jiggle
+	  lexc
+	  joiner
+	  elimination
+	  scheme
+	  for
+	  fun
+
+2009-10-15 13:38  hardwick
+
+	* hfst2/Makefile.am:
+	  Makefile
+	  fix
+
+2009-10-15 13:36  hardwick
+
+	* hfst-tools/hfst-lexc/src/Makefile.am,
+	  hfst-tools/src/Makefile.am,
+	  hfst2/Makefile.am:
+	  made
+	  everything
+	  compile
+	  with
+	  -O3
+
+2009-10-15 12:33  mpsilfve
+
+	* hfst-tools/hfst-twolc/src/AlphabetCollector.cc,
+	  hfst-tools/hfst-twolc/src/AlphabetCollector.h,
+	  hfst-tools/hfst-twolc/src/CompileUtilities.h,
+	  hfst-tools/hfst-twolc/src/GrammarDisplayer.cc,
+	  hfst-tools/hfst-twolc/src/RuleModifier.cc,
+	  hfst-tools/hfst-twolc/src/RuleModifier.h,
+	  hfst-tools/hfst-twolc/src/htwolcpre.yy,
+	  hfst-tools/hfst-twolc/src/htwolcpre2.yy,
+	  hfst-tools/hfst-twolc/src/scanner2.ll,
+	  hfst-tools/hfst-twolc/src/scanner3.ll,
+	  hfst-tools/hfst-twolc/test/RuleCompiler_tests.cc,
+	  hfst-tools/hfst-twolc/test/TextToFst.cc,
+	  hfst-tools/hfst-twolc/test/WeightedTextToFst.cc,
+	  hfst-tools/hfst-twolc/test/test_grammar1.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar10.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar11.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar12.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar13.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar14.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar15.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar16.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar17.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar18.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar19.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar2.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar20.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar21.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar22.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar23.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar24.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar25.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar26.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar27.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar28.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar29.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar3.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar30.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar31.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar32.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar33.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar34.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar35.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar36.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar37.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar38.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar39.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar4.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar40.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar41.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar42.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar43.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar44.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar45.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar46.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar47.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar48.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar49.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar5.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar50.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar51.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar52.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar53.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar54.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar55.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar56.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar57.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar58,
+	  hfst-tools/hfst-twolc/test/test_grammar58.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar6.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar7.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar8.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar9.txt_fst:
+	  Change
+	  hfst-twolc
+	  epsilon
+	  symbol
+	  to
+	  @0@
+	  and
+	  any-symbol
+	  to
+	  @?@
+
+2009-10-15 09:02  hardwick
+
+	* README:
+	  README
+	  copyedit
+
+2009-10-15 08:16  mie
+
+	* README:
+	  Detail
+	  VC
+	  building
+	  and
+	  few
+	  more
+	  things
+	  in
+	  README
+
+2009-10-15 07:14  hardwick
+
+	* BUGS:
+	  updated
+	  BUGS
+
+2009-10-14 20:40  mie
+
+	* hfst-tools/hfst-lexc/src/lexc.cc:
+	  Make
+	  more
+	  special
+	  characters
+	  explicit
+	  in
+	  alphabet
+
+2009-10-14 17:41  mie
+
+	* ChangeLog:
+	  Include
+	  ChangeLog
+	  for
+	  detailed
+	  view
+	  on
+	  Changes
+	  between
+	  release
+	  versions
+
 2009-10-14 17:40  mie
 
-	* Include NEWS to overview releases
+	* NEWS:
+	  Include
+	  NEWS
+	  to
+	  overview
+	  releases
 
 2009-10-14 17:24  mie
 
-	* Some version markers to 2.X
+	* configure.ac,
+	  hfst-tools/configure.ac,
+	  hfst-tools/src/hfst-optimized-lookup.cc,
+	  hfst2/configure.ac:
+	  Some
+	  version
+	  markers
+	  to
+	  2.X
 
 2009-10-14 17:20  mie
 
-	* Remove generated files from version control
+	* hfst-tools/src/hfst-compiler.cc,
+	  hfst-tools/src/hfst-scanner.cc:
+	  Remove
+	  generated
+	  files
+	  from
+	  version
+	  control
 
 2009-10-14 13:40  mpsilfve
 
-	* Fixed hfst-lookup
+	* hfst-tools/src/hfst-lookup.cc,
+	  hfst2/ofst/hwfst-lookup.C,
+	  hfst2/ofst/hwfst-tokenize-functions.C,
+	  hfst2/sfst/hsfst.C,
+	  hfst2/sfst/tokenize_functions.C,
+	  hfst2/sfst/tokenize_functions.h,
+	  hfst2/transducer-layer.h:
+	  Fixed
+	  hfst-lookup
 
 2009-10-14 11:14  mpsilfve
 
-	* Added word-boundaries @#@ to hfst-compose-intersect and
+	* hfst-tools/hfst-twolc/src/htwolcpre.yy,
+	  hfst-tools/hfst-twolc/src/scanner.ll,
+	  hfst-tools/hfst-twolc/test/GrammarTest58.cc,
+	  hfst-tools/hfst-twolc/test/Makefile.am,
+	  hfst-tools/hfst-twolc/test/WeightedGrammarTest58.cc,
+	  hfst-tools/hfst-twolc/test/test_grammar1.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar10.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar11.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar12.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar13.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar14.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar15.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar16.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar17.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar18.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar19.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar2.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar20.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar21.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar22.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar23.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar24.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar25.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar26.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar27.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar28.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar29.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar3.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar30.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar31.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar32.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar33.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar34.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar35.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar36.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar37.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar38.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar39.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar4.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar40.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar41.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar42.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar43.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar44.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar45.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar46.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar47.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar48.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar49.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar5.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar50.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar51.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar52.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar53.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar54.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar55.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar56.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar57.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar58,
+	  hfst-tools/hfst-twolc/test/test_grammar58.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar6.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar7.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar8.txt_fst,
+	  hfst-tools/hfst-twolc/test/test_grammar9.txt_fst,
+	  hfst-tools/src/hfst-compose-intersect.cc:
+	  Added
+	  word-boundaries
+	  @#@
+	  to
+	  hfst-compose-intersect
+	  and
 	  hfst-twolc
 
 2009-10-14 11:11  hardwick
 
-	* Updated hfst-tools/README
+	* hfst-tools/README:
+	  Updated
+	  hfst-tools/README
 
 2009-10-14 11:11  hardwick
 
-	* Removed weighted2unweighted and unweighted2weighted
+	* hfst-tools/configure.ac,
+	  hfst-tools/src/Makefile.am,
+	  hfst-tools/src/hfst-unweighted2weighted.cc,
+	  hfst-tools/src/hfst-weighted2unweighted.cc:
+	  Removed
+	  weighted2unweighted
+	  and
+	  unweighted2weighted
 
 2009-10-14 07:59  hardwick
 
-	* Moved everything into hfst-2.0
-	  This may break your commits, sorry about that -
-	  revert if necessary.
+	* .,
+	  BUGS,
+	  INSTALL,
+	  Makefile.am,
+	  README,
+	  configure.ac,
+	  hfst-tools,
+	  hfst2:
+	  Moved
+	  everything
+	  into
+	  hfst-2.0
+	  This
+	  may
+	  break
+	  your
+	  commits,
+	  sorry
+	  about
+	  that
+	  -
+	  revert
+	  if
+	  necessary.
 
