@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([hfst-lexc],[0.5-beta],[tommi.pirinen@helsinki.fi])
+AC_INIT([hfst-lexc],[0.6-beta],[tommi.pirinen@helsinki.fi])
 AC_CONFIG_AUX_DIR([config-aux])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([-Wall foreign dist-bzip2 std-options])
