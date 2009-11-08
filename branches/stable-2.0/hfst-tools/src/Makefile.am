@@ -5,6 +5,7 @@
 ## for nested build
 LDADD = ../../hfst2/libhfst.la
 AM_CPPFLAGS = -I../.. -I../../hfst2
+AM_CXXFLAGS = -O3
 
 if WANT_COMPARE
 MAYBE_COMPARE=hfst-compare
@@ -114,7 +115,7 @@ noinst_HEADERS= \
 	calculate_functions.h hfst-commandline.h hfst-common-cases.h \
 	hfst-common-options.h hfst-common-unary-cases.h \
 	hfst-common-unary-options.h hfst-common-unary-variables.h \
-	hfst-compiler.h hfst-lookup-commandline.h hfst-lookup-transducers.h \
+	hfst-compiler.h \
 	hfst-pair-test-commandline.h hfst-pair-test-transducers.h \
 	hfst-program-options.h hwfst-pair-test-transducers.h \
 	hfst-optimized-lookup.h
@@ -150,7 +151,7 @@ hfst_fst2strings_SOURCES=hfst-fst2strings.cc $(HFST_COMMON_SRC)
 hfst_fst2txt_SOURCES=hfst-fst2txt.cc $(HFST_COMMON_SRC)
 hfst_head_SOURCES=hfst-head.cc $(HFST_COMMON_SRC)
 hfst_invert_SOURCES=hfst-invert.cc $(HFST_COMMON_SRC)
-hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC)
+hfst_lookup_SOURCES=hfst-lookup.cc FlagDiacritics.h FlagDiacritics.cc $(HFST_COMMON_SRC)
 hfst_lookup_optimize_SOURCES=hfst-lookup-optimize.cc $(HFST_COMMON_SRC)
 hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
 hfst_pair_test_SOURCES=hfst-pair-test.cc hwfst-pair-test-transducers.h $(HFST_COMMON_SRC)

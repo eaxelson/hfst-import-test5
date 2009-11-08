@@ -137,7 +137,9 @@ Composition of \a t1 and \a t2 maps "a" to "c" iff \a t1 maps "a" to some "b" an
 @post The resulting transducer may be nondeterministic and not minimal. 
 \a t1 and \a t2 are deleted. */
 
-TransducerHandle compose( TransducerHandle t1, TransducerHandle t2, bool destructive=true );
+TransducerHandle compose( TransducerHandle t1, TransducerHandle t2, bool destructive);
+
+TransducerHandle compose( TransducerHandle t1, TransducerHandle t2);
 
 
 /** \brief Concatenation of \a t1 and \a t2. 
@@ -237,7 +239,9 @@ rules in any way.
 @post The vector \a v is deleted.
 @post The result is not minimized.
 */
-TransducerHandle intersecting_composition( TransducerHandle t, vector<TransducerHandle> * v, KeyTable * kt=NULL);
+TransducerHandle 
+intersecting_composition( TransducerHandle t, 
+			  vector<TransducerHandle> * v, KeyTable * kt=NULL);
 
 /** \brief Switch input and output in the transition pairs of transducer \a t. 
     
@@ -603,16 +607,25 @@ bool is_subset( TransducerHandle t1, TransducerHandle t2 );
 
 
 /** \brief Look up the output-strings corresponding to string \a input_string.
-    Return an empty vector, if there are no output-strings for input-string. */
+    Return an empty vector, if there are no output-strings for input-string. 
+    For pairs \a s:x in \a t, where \s is in \a skip_symbols, treat \a s as 
+    epsilon (i.e. write \a x in the output without consuming characters in 
+    \a input).
+*/
 KeyVectorVector * lookup_all(TransducerHandle t,
-			     vector<Key> * input_string );
+			     vector<Key> * input_string,
+			     KeySet * skip_symbols = NULL);
 
 /** \brief Look up the first found output-string corresponding to string 
     \a input_string. Return NULL, if there are no output-strings for 
-    input-string. */
-
+    input-string.
+    For pairs \a s:x in \a t, where \s is in \a skip_symbols, treat \a s as 
+    epsilon (i.e. write \a x in the output without consuming characters in 
+    \a input).
+*/
 KeyVector * lookup_first(TransducerHandle t,
-			 vector<Key> * input_string );
+			 vector<Key> * input_string,
+			 KeySet * skip_symbols = NULL);
 
 //@}
 

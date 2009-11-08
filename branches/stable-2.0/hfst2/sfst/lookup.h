@@ -8,6 +8,7 @@
 using std::vector;
 
 typedef unsigned short Key;
+typedef std::set<Key> KeySet;
 typedef std::map<Node*,unsigned int> NodeMap;
 typedef std::set<Node*> NodeSet;
 
@@ -28,7 +29,9 @@ KeyVectorVector *
 find_all_continuations(Node * n, 
 		       KeyVector::iterator input_position, 
 		       KeyVector::iterator input_end_position,
+		       KeySet * skip_symbols,
 		       bool preserve_epsilon);
+
 
 KeyVector * 
 find_first_continuation(Node * n, 
@@ -43,7 +46,8 @@ KeyVector * find_first_output_string( Transducer * t,
 					KeyVector * input );
 
 KeyVectorVector * find_all_output_strings( Transducer * t, 
-					      KeyVector * input );
+					   KeyVector * input,
+					   KeySet * skip_symbols);
 
 Key get_next_maximal_prefix(Node * n,
 			    KeyVector::iterator &input_position,

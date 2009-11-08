@@ -636,6 +636,7 @@ Transducer &Transducer::operator!()
     na = &copy();
   else
     na = &minimise();
+  na->alphabet.clear_char_pairs();  // added
   na->alphabet.copy(alphabet);
 
   Node *accept_node=na->new_node();

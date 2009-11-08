@@ -680,13 +680,19 @@ CHAR: SYMBOL { $$ = $1; }
 void warn(const char * warning) { }
 
 void yyerror(const char * text) {
-  //input_reader.error(text);
+  input_reader.error(text);
   exit(1);
 }
 
 int main(int argc,char * argv[])
 {
   CommandLineParser command_line_parser(argc,argv,false,false);
+  if (command_line_parser.help or
+      command_line_parser.usage or
+      command_line_parser.version)
+    {
+      exit(0);
+    }
   weighted = command_line_parser.weighted;
   verbose = command_line_parser.verbose;
   if (command_line_parser.verbose)

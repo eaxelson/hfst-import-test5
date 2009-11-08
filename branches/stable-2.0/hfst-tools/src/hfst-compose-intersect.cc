@@ -263,7 +263,7 @@ void read_symbols(void)
     }
   else
     {
-      message("Reading symbol table from STDIN.");
+      message("Using the symbol table stored with the lexicon.");
       if (with_weights)
 	weighted_symbol_table = HWFST::create_key_table();
       else

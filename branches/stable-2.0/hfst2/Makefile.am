@@ -2,6 +2,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 AM_CPPFLAGS =  -I$(top_builddir) -I$(top_builddir)/ofst -I$(top_builddir)/sfst
 install-exec-hook:
 	$(LDCONFIG)
+AM_CXXFLAGS = -O3 -Wno-deprecated
 
 lib_LTLIBRARIES = libhfst.la
 
@@ -102,7 +103,7 @@ regexp/xre_lex.h: regexp/xre_lex.ll
 	$(LEX) -v --prefix=xre --outfile=regexp/xre_lex.cc --header-file=$@ $<
 
 regexp/xrew_lex.h: regexp/xrew_lex.ll
-	$(LEX) -v --prefix=xrew --outfile=/regexp/xrew_lex.cc --header-file=$@ $<
+	$(LEX) -v --prefix=xrew --outfile=regexp/xrew_lex.cc --header-file=$@ $<
 
 # YACC
 
@@ -214,4 +215,3 @@ sfstinclude_HEADERS = $(SFST_HDRS)
 ofstinclude_HEADERS = $(OFST_HDRS)
 
 libhfst_la_LDFLAGS = -version-info 0:0:0
-AM_CXXFLAGS=-Wno-deprecated

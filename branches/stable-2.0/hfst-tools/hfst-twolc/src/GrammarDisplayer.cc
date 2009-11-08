@@ -1,7 +1,7 @@
 #include "GrammarDisplayer.h"
 
-const char * HFST_TWOLC_ANY_SYMBOL = "__HFST_TWOLC_ANY_SYMBOL";
-const char * HFST_TWOLC_EPSILON_SYMBOL = "__HFST_TWOLC_EPSILON_SYMBOL";
+const char * HFST_TWOLC_ANY_SYMBOL = "@?@";
+const char * HFST_TWOLC_EPSILON_SYMBOL = "@0@";
 const char * UNION_OPERATOR = "|";
 const char * INTERSECTION_OPERATOR = "&";
 const char * DIFFERENCE_OPERATOR = "-";

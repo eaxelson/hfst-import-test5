@@ -180,7 +180,7 @@ LWSP [\t\r\n ]
 	return QUOTED_LITERAL;
 }
 
-"0" { return EPSILON; }
+"0" { return EPSILON_TOKEN; }
 "?" { return ANY; }
 
 {NAME_CH}+ {

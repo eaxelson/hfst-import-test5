@@ -154,7 +154,7 @@ ALPHABET_LINES: ALPHABET_LINES NON_DELIMITER_RANGE EOL
 | NON_DELIMITER_RANGE EOL
 {
   $1->push_back(new Pair(string_copy("@#@"),
-			 string_copy("__HFST_TWOLC_EPSILON_SYMBOL")));
+			 string_copy("@0@")));
   NonDelimiterSymbolRange * word_boundary_range = new NonDelimiterSymbolRange;
   word_boundary_range->push_back(string_copy("@#@"));
   rule_modifier.define_diacritics(word_boundary_range);
@@ -671,12 +671,22 @@ NON_DELIMITER_SYMBOL_RANGE: NON_DELIMITER_SYMBOL_RANGE SYMBOL
   $$ = $1;
   $$->push_back(grammar_displayer.get_epsilon_symbol());
 }
+| NON_DELIMITER_SYMBOL_RANGE LONELY_EPSILON 
+{ 
+  $$ = $1;
+  $$->push_back(grammar_displayer.get_epsilon_symbol());
+}
 | CHAR                      
 { 
   $$ = new NonDelimiterSymbolRange;
   $$->push_back($1);
 }
 | EPSILON                            
+{
+  $$ = new NonDelimiterSymbolRange;
+  $$->push_back(grammar_displayer.get_epsilon_symbol());
+}
+| LONELY_EPSILON                            
 {
   $$ = new NonDelimiterSymbolRange;
   $$->push_back(grammar_displayer.get_epsilon_symbol());
@@ -878,6 +888,12 @@ int main(int argc, char * argv[])
 {
   //yydebug = 1;
   CommandLineParser command_line_parser(argc,argv,true,true);
+  if (command_line_parser.help or
+      command_line_parser.usage or
+      command_line_parser.version)
+    {
+      exit(0);
+    }
   if (command_line_parser.verbose)
     {
       std::cerr << "Compiling variable rules into ordinary"

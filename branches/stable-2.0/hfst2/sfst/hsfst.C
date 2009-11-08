@@ -63,6 +63,25 @@ containing Transducer_ pairs left(1),right(1) ... left(n/2),right(n/2). More inf
 
 namespace HFST {
 
+  char * new_string(size_t lgth)
+  {
+    return (char*)(calloc(sizeof(char),lgth+1));
+  }
+
+  char * string_copy(const char * str)
+  {
+    if (str == NULL)
+      {
+	throw "NULL char * given as input to HFST::string_copy().";
+      }
+    char * new_str = new_string(strlen(str));
+    if (new_str == NULL)
+      {
+	throw std::bad_alloc();
+      }
+    return strcpy(new_str,str);
+  }
+
   typedef struct contexts_t_ {
     Transducer *left;
     Transducer *right;
@@ -226,14 +245,23 @@ namespace HFST {
   };
 
   KeyVectorVector * lookup_all(TransducerHandle t,
-				   KeyVector * input_string ) {
+			       KeyVector * input_string,
+			       KeySet * skip_symbols) {
     Transducer *pT = HANDLE_TO_PINSTANCE(Transducer, t);
-    return find_all_output_strings( pT,input_string );
-
+    if (skip_symbols != NULL)
+      {
+	return find_all_output_strings( pT,input_string, skip_symbols);
+      }
+    else
+      {
+	KeySet ks;
+	return find_all_output_strings( pT,input_string, &ks);
+      }
   }
 
   KeyVector * lookup_first(TransducerHandle t,
-			   KeyVector * input_string ) {
+			   KeyVector * input_string,
+			   KeySet * skip_symbols) {
     Transducer *pT = HANDLE_TO_PINSTANCE(Transducer, t);
     return find_first_output_string( pT,input_string );
 
@@ -1745,14 +1773,19 @@ Transducer *negation_( Transducer *t, KeyPairSet *Pi )
 {
   if (RS.size() > 0 || RSS.size() > 0)
     cerr << "\nWarning: agreement operation inside of negation!\n";
-  Alphabet pi_alpha = keypair_set_to_alphabet(Pi);
+
+  Transducer *pi = define_pi_transducer_(Pi);
+  return subtraction_(pi, t);
+
+  /*Alphabet pi_alpha = keypair_set_to_alphabet(Pi);
   //if (!Alphabet_Defined)
   //  error("Negation requires the definition of an alphabet");
   t->alphabet.clear_char_pairs();
   t->alphabet.copy(pi_alpha);
+
   Transducer *nt = &(!*t);
   delete t;
-  return nt;
+  return nt;*/
 }
 
 
@@ -3092,6 +3125,44 @@ TransducerHandle modify_weights( TransducerHandle t,
 
 
 TransducerHandle compose( TransducerHandle t1, TransducerHandle t2, bool destructive) {
+    bool filter=false;
+    if (filter) {
+      KeySet *ks1 = define_key_set(t1);
+      KeySet *ks2 = define_key_set(t2);
+      for ( KeyIterator it = begin_sigma_key(ks1); it != end_sigma_key(ks1); it++ )
+	ks2->insert(get_sigma_key(it));
+      Key eps1 = find_unused_key(*ks2);
+      //fprintf(stderr, "first unused key: %hu\n", eps1);
+      ks2->insert(eps1);
+      Key eps2 = find_unused_key(*ks2);
+      //fprintf(stderr, "second unused key: %hu\n", eps2);
+      TransducerHandle T1, T2;
+      if (destructive) {
+	T1 = substitute_key(t1,Label::epsilon,eps2,true);
+	T2 = substitute_key(t2,Label::epsilon,eps1,true);
+      }
+      else {
+	T1 = substitute_key(copy(t1),Label::epsilon,eps2,true);
+	T2 = substitute_key(copy(t2),Label::epsilon,eps1,true);
+      }
+
+      Transducer *filter_transducer = make_filter_transducer(eps1, eps2, ks1);
+      Transducer* const pT1 = HANDLE_TO_PINSTANCE(Transducer, T1);
+      Transducer* const pT2 = HANDLE_TO_PINSTANCE(Transducer, T2);
+      Transducer *tmp = composition_(pT1, filter_transducer, false); // should be true !!!
+      Transducer *pResult = composition_(tmp, pT2, true);
+      return PINSTANCE_TO_HANDLE(Transducer, pResult);
+    }
+    else {
+      Transducer* const pT1 = HANDLE_TO_PINSTANCE(Transducer, t1);
+      Transducer* const pT2 = HANDLE_TO_PINSTANCE(Transducer, t2);
+      Transducer* const pResult = composition_(pT1, pT2, destructive);
+      return PINSTANCE_TO_HANDLE(Transducer, pResult);
+    }
+  }
+
+TransducerHandle compose( TransducerHandle t1, TransducerHandle t2) {
+    bool destructive = true;
     bool filter=false;
     if (filter) {
       KeySet *ks1 = define_key_set(t1);

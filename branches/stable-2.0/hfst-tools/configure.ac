@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.60])
-AC_INIT([hfst-tools], [2.1], [hfst-bugs@helsinki.fi])
+AC_INIT([hfst-tools], [2.2], [hfst-bugs@helsinki.fi])
 AC_CONFIG_AUX_DIR([config-aux])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/hfst-subtract.cc])
@@ -233,14 +233,11 @@ AC_LANG([C++])
 AC_CHECK_LIB([pthread], [main], , [AC_MSG_ERROR([openfst requires pthread])])
 # disable check for nested build
 # AC_CHECK_LIB([hfst], [main], , [AC_MSG_ERROR([libhfst is required])])
-AC_CHECK_LIB([readline], [main])
 
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([string.h unistd.h])
 AC_HEADER_ASSERT
-AC_CHECK_HEADERS([readline/readline.h])
-AC_CHECK_HEADERS([readline/history.h])
 # disable check for nested build
 # AC_CHECK_HEADERS([hfst2/hfst.h], [], [AC_MSG_ERROR([hfst.h required])])
 
@@ -254,9 +251,6 @@ AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_FUNC_STRTOD
 AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strndup])
-AC_CHECK_DECLS([history_list], [], [], [[
-                                #include <stdio.h>
-                                #include <readline/history.h>]])
 
 AC_CONFIG_FILES([Makefile src/Makefile test/Makefile test/binary-tools/Makefile man/Makefile])
 AC_OUTPUT
@@ -295,8 +289,6 @@ cat <<EOF
 	* symbols: $enable_symbols
 	* tail: $enable_tail
 	* txt2fst: $enable_txt2fst
-	* unweighted2weighted: $enable_unweighted2weighted
-	* weighted2unweighted: $enable_weighted2unweighted
-        * optimized-lookup: $enable_optimized_lookup
+	* optimized-lookup: $enable_optimized_lookup
 EOF
 

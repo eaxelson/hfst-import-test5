@@ -81,14 +81,17 @@ void CommandLineParser::parse_options(int argc, char * argv[])
 	    verbose = false;
 	    break;
 	  case 'h':
+	    no_output = true;
 	    version = true;
 	    usage = true;
 	    help = true;
 	    break;
 	  case 'u':
+	    no_output = true;
 	    usage = true;
 	    break;
 	  case 'V':
+	    no_output = true;
 	    version = true;
 	    break;
 	  case 'i':
@@ -139,7 +142,10 @@ void CommandLineParser::parse_options(int argc, char * argv[])
       {
 	if (write_messages and not silent)
 	  {
-	    std::cerr << "Note: Reading from STDIN." << std::endl;
+	    if (not no_output)
+	      {
+		std::cerr << "Note: Reading from STDIN." << std::endl;
+	      }
 	  }
       }
     else
@@ -151,7 +157,10 @@ void CommandLineParser::parse_options(int argc, char * argv[])
       {
 	if (write_messages and not silent)
 	  {
-	    std::cerr << "Note: Writing to STDOUT." << std::endl;
+	    if (not no_output)
+	      {
+		std::cerr << "Note: Writing to STDOUT." << std::endl;
+	      }
 	  }
       }
     else
@@ -279,10 +288,6 @@ void CommandLineParser::display_messages(void)
 	{
 	  print_version();
 	}
-    }
-  if (help or usage or version)
-    {
-      exit(0);
     }
 }
 

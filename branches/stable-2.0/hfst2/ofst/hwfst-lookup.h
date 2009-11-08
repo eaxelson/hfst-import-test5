@@ -15,6 +15,7 @@
 namespace HWFST {
 
 typedef std::set<StateId> StateSet;
+typedef std::set<Key> KeySet;
 
 KeyVectorVector * reverse( KeyVectorVector * key_strings ); 
 
@@ -30,6 +31,7 @@ find_all_continuations(StateId n,
 		       KeyVector::iterator input_position, 
 		       KeyVector::iterator input_end_position,
 		       Transducer &t,
+		       KeySet * skip_symbols,
 		       bool preserve_epsilon);
 
 KeyVector *
@@ -45,7 +47,8 @@ KeyVector * find_first_output_string( Transducer &t,
 				      KeyVector * input );
 
 KeyVectorVector * find_all_output_strings( Transducer &t, 
-					   KeyVector * input );
+					   KeyVector * input,
+					   KeySet * skip_symbols);
 
 Key get_next_maximal_prefix(Transducer &t,
 			    StateId n,

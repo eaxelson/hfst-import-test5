@@ -69,9 +69,9 @@ CENTER_MARKER_LITERAL            \_
 PAIR_SEPARATOR_LITERAL           \:
 PAIR_SEPARATOR_LITERAL_LEFT      \:[\t ]
 PAIR_SEPARATOR_LITERAL_RIGHT     [\t ]\:
-NAME_CH                          [^!|&\"+*\:;\n\t?\^<>=\[\]\-$~%\\()= ]
+NAME_CH                          [^!|&\"+*\:;\n\t\^<>=\[\]\-$~%\\()= ]
 SPECIAL_CH                       [!|&\"+*\:;\n\t\^<>=\[\]\-$~()=\\ ]
-ESCAPABLE_CH                     [!|&\"_+*\:;\t?\^<>=\{\}\[\]\-$~()\%=\\ ]
+ESCAPABLE_CH                     [!|&\"_+*0\:;\t?\^<>=\{\}\[\]\-$~()\%=\\ ]
 RULE_NAME_CH                     [^\"\n!]   
 WHITE_SPACE                      [ \t]
 NON_WHITE_SPACE                  [^ \t]
@@ -122,7 +122,7 @@ KILL_SYMBOL                      \_\_HFST\_TWOLC\_DIE
 
 {KILL_SYMBOL}           { exit(1); }
 ({NAME_CH}|%{ESCAPABLE_CH}?)+ {yylval.value = 
-                                  unescape_and_remove_white_space(yytext);
+                               unescape_and_remove_white_space(yytext);
                                return SYMBOL;}
 
 %%

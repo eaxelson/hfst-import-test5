@@ -2,7 +2,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ(2.61)
-AC_INIT([hfst-lexc],[0.5-beta],[tommi.pirinen@helsinki.fi])
+AC_INIT([hfst-lexc],[0.6-beta],[tommi.pirinen@helsinki.fi])
 AC_CONFIG_AUX_DIR([config-aux])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([-Wall foreign dist-bzip2 std-options])
@@ -62,24 +62,11 @@ AM_CONDITIONAL([CAN_VALGRIND], [test x$VALGRIND != xno])
 AC_PATH_PROG([HFSTPAIRTEST], [hfst-pair-test], [no])
 AM_CONDITIONAL([CAN_PAIRTEST], [test x$HFSTPAIRTEST != xno])
 
-# documentation building:
-AC_PATH_PROG([DOXYGEN], [doxygen], [no])
-AM_CONDITIONAL([CAN_DOXYGEN], [test x$DOXYGEN != xno])
-AM_PATH_PYTHON([2.4])
-AC_PATH_PROGS([RST2HTML], [rst2html.py rst2html], [no])
-AM_CONDITIONAL([CAN_RST2HTML], [test x$RST2HTML != xno])
-AC_PATH_PROGS([RST2XML], [rst2xml.py rst2xml], [no])
-AM_CONDITIONAL([CAN_RST2XML], [test x$RST2XML != xno])
-AC_PATH_PROGS([SAXON], [saxon saxon8 saxon9 saxonb-xslt], [no])
-AM_CONDITIONAL([CAN_SAXON], [test x$SAXON != xno])
-AC_PROG_LN_S
-
 # Checks for libraries
 AC_LANG([C++])
 AC_CHECK_LIB([pthread], [main], , [AC_MSG_ERROR([openfst requires pthread])])
 # Don't test for libhfst for a nested dist
 # AC_CHECK_LIB([hfst], [main], , [AC_MSG_ERROR([libhfst is required])])
-AC_CHECK_LIB([readline], [main], , [AC_MSG_ERROR([libreadline is required])])
 
 # Checks for header files
 AC_HEADER_STDC
@@ -95,8 +82,6 @@ AC_CHECK_HEADERS([stdlib.h])
 AC_CHECK_HEADERS([string.h])
 AC_CHECK_HEADERS([unistd.h])
 AC_CHECK_HEADERS([sys/stat.h])
-AC_CHECK_HEADERS([readline/readline.h])
-AC_CHECK_HEADERS([readline/history.h])
 # Don't test for libhfst for a nested dist
 # AC_CHECK_HEADERS([hfst2/hfst.h], [], [AC_MSG_ERROR([hfst.h required])])
 AC_HEADER_ASSERT
@@ -114,14 +99,9 @@ AC_TYPE_SIZE_T
 
 AC_CHECK_TYPES([ptrdiff_t])
 
-# Checks for library functions
-AC_CHECK_DECLS([history_list], [], [], [[
-				#include <stdio.h>
-				#include <readline/history.h>]])
-
 
 # Output files
-AC_CONFIG_FILES([Makefile src/Makefile test/Makefile test/omorfi/Makefile test/divvun-sme/Makefile test/morphalou/Makefile test/kos83/Makefile doc/Makefile man/Makefile doc/Doxyconf test/xre.at-file.hlexc test/hlexc.xre.at-file.hlexc po/Makefile.in])
+AC_CONFIG_FILES([Makefile src/Makefile test/Makefile test/omorfi/Makefile test/divvun-sme/Makefile test/morphalou/Makefile test/kos83/Makefile man/Makefile test/xre.at-file.hlexc test/fao/Makefile po/Makefile.in])
 AC_CONFIG_HEADERS([config.h])
 AC_DEFINE([NESTED_BUILD], [1], [We're doing a nested build, headers aren't always where we expect them to be])
 AC_CONFIG_SRCDIR([src/lexc.h])

@@ -1,5 +1,4 @@
 #include "fst_intersecting_compose.h"
-
 size_t fst::RulesInfo::number_of_rules;
 vector<fst::Transducer*> fst::RulesInfo::Rules;
 fst::StdVectorFst * fst::Tree::composition;
@@ -160,9 +159,15 @@ bool fst::RulesInfo::first_in( Label input ) {
     }
 
     Rule_arcs.at(0)->Next();
-    first_rule_pair.input = Rule_arcs.at(0)->Value().ilabel;
-    first_rule_pair.output = Rule_arcs.at(0)->Value().olabel;
-
+    if (not Rule_arcs.at(0)->Done())
+      {
+	first_rule_pair.input = Rule_arcs.at(0)->Value().ilabel;
+	first_rule_pair.output = Rule_arcs.at(0)->Value().olabel;
+      }
+    else
+      {
+	break;
+      }
   }
 
   return false;
@@ -259,6 +264,23 @@ void fst::Composer::more( StateId lexicon_target, RulesInfo &Rules, StateId comp
   
 };
 
+float fst::RulesInfo::get_weight(void)
+{
+  float w = 0;
+  for (vector<Arcs*>::iterator it = Rule_arcs.begin();
+       it != Rule_arcs.end();
+       ++it)
+    {
+      w += (*it)->Value().weight.Value();
+    }
+  return w;
+}
+
+float fst::Composer::multiply_weights(Arcs &L, RulesInfo &R)
+{
+  return L.Value().weight.Value() + R.get_weight();
+}
+
 // Compose a single transition x:t in the lexicon with a single transition
 // t:z in the rules.
 void fst::Composer::single_compose( Arcs &lexicon_arcs, RulesInfo &Rules ) {
@@ -285,9 +307,23 @@ void fst::Composer::single_compose( Arcs &lexicon_arcs, RulesInfo &Rules ) {
   if ( new_state ) {
     more( lexicon_target, Rules, composition_target );
   }
- 
-  composition->AddArc(composition_state, Arc(pair.input, pair.output, 0, composition_target));
 
+  if (Rules.pair.input == 0)
+    {
+      composition->AddArc(composition_state, 
+			  Arc(pair.input, 
+			      pair.output, 
+			      Rules.get_weight(), 
+			      composition_target));      
+    }
+  else
+    {
+      composition->AddArc(composition_state, 
+			  Arc(pair.input, 
+			      pair.output, 
+			      multiply_weights(lexicon_arcs,Rules), 
+			      composition_target));
+    }
 };
 
 // Compose a single transition x:0 with transitions in the rules.
@@ -312,7 +348,11 @@ void fst::Composer::single_compose_epsilon( Arcs &lexicon_arcs, RulesInfo &Rules
   pair.input = lexicon_arcs.Value().ilabel;
   pair.output = lexicon_arcs.Value().olabel;
 
-  composition->AddArc(composition_state, Arc(pair.input, pair.output, 0, composition_target));
+  composition->AddArc(composition_state, 
+		      Arc(pair.input, 
+			  pair.output, 
+			  lexicon_arcs.Value().weight.Value(),  
+			  composition_target));
   
 };
 
@@ -339,7 +379,12 @@ void fst::Composer::compose( RulesInfo &Rules ) {
 
   // Normal transitions x:a in lexicon and a:z in rules.
   while ( not lexicon_arcs.Done() and not Rules.Done()) {
-
+    if (skip_symbols.find(lexicon_arcs.Value().olabel) != skip_symbols.end())
+      {
+    	single_compose_epsilon( lexicon_arcs, Rules );  
+	lexicon_arcs.Next();
+    	continue;
+      }
     // This is the label a in the lexicon
     lexicon_out = lexicon_arcs.Value().olabel;
     StateId first_occurence_of_out = lexicon_arcs.get_current_state();
@@ -349,9 +394,7 @@ void fst::Composer::compose( RulesInfo &Rules ) {
     if ( Rules.first_in( lexicon_out ) ) {
 
       while ( true ) {
-
 	do {
-
 	  single_compose( lexicon_arcs, Rules);
 	  lexicon_arcs.Next();
 
@@ -370,7 +413,6 @@ void fst::Composer::compose( RulesInfo &Rules ) {
 	lexicon_arcs.Next();
     }
   }
-
 };
 
 /*int main ( int argc, char * argv[] ) {

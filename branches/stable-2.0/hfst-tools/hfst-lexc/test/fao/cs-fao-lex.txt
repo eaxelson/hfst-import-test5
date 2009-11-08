@@ -1,0 +1,17 @@
+LEXICON CStag 
++CS: # ;
+
+
+LEXICON Subjunction
+tá% ið CStag ; ! MWE?
+ið CStag ; ! XXX check this.
+at CStag ;
+um CStag ;  !XXX sjálf um.
+áðrenn CStag ; !XXX
+meðan CStag ;
+so% at CStag ;
+sum CStag ;
+vissi CStag ;
+hóast CStag ;
+tessvegna CStag ; !XXX
+

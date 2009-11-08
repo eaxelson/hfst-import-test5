@@ -120,6 +120,10 @@ WORD_BOUNDARY                    #
 ^{ANY_LITERAL}[\t ]              { return LONELY_ANY; }
 [\t ]{ANY_LITERAL}$              { return LONELY_ANY; }
 ^{ANY_LITERAL}$                  { return LONELY_ANY; }
+[\t ]{ZERO}[\t ]          { return LONELY_EPSILON; }
+^{ZERO}[\t ]              { return LONELY_EPSILON; }
+[\t ]{ZERO}$              { return LONELY_EPSILON; }
+^{ZERO}$                  { return LONELY_EPSILON; }
 {UNION_LITERAL}[\n \t]*          { return UNION; }
 {INTERSECTION_LITERAL}[\n \t]*   { return INTERSECTION; }
 {POWER_LITERAL}                  { return POWER; }
@@ -131,10 +135,6 @@ WORD_BOUNDARY                    #
 {WORD_BOUNDARY}                  {  yylval.value = string_copy("@#@");
                                     return SYMBOL; }
 {ZERO}                           { return EPSILON; }
-[\t ]{ZERO}[\t ]                 { return EPSILON; }
-^{ZERO}[\t ]                     { return EPSILON; }
-[\t ]{ZERO}$                     { return EPSILON; }
-^{ZERO}$                         { return EPSILON; }
 
 {LEFT_RANGE}             { return LEFT_SQUARE_BRACKET; }
 {RIGHT_RANGE}            { return RIGHT_SQUARE_BRACKET; }

@@ -67,35 +67,23 @@ LEXICONNAME {LEXICONCHAR}+
 WSP [\t ]
 LWSP [\r\n\t ]
 
-%x METADATA ALPHABET MULTICHARS DEFINITIONS LEXICONS ENDED
+%x MULTICHARS DEFINITIONS LEXICONS ENDED
 %%
 
 
-<INITIAL>^{WSP}*"Metadata"{LWSP}+ {
-	BEGIN METADATA;
-	token_update_positions(hlexctext);
-	return METADATA_START;
-}
-
-<INITIAL,METADATA>^{WSP}*"Alphabet"{LWSP}+ {
-	BEGIN ALPHABET;
-	token_update_positions(hlexctext);
-	return ALPHABET_START;
-}
-
-<INITIAL,METADATA,ALPHABET>^{WSP}*"Multichar_Symbols"{LWSP}+ {
+<INITIAL>^{WSP}*"Multichar_Symbols"{LWSP}+ {
 	BEGIN MULTICHARS;
 	token_update_positions(hlexctext);
 	return MULTICHARS_START;
 }
 
-<INITIAL,METADATA,ALPHABET,MULTICHARS>^{WSP}*("Definitions"|"Declarations"){LWSP}+ {
+<INITIAL,MULTICHARS>^{WSP}*("Definitions"|"Declarations"){LWSP}+ {
 	BEGIN DEFINITIONS;
 	token_update_positions(hlexctext);
 	return DEFINITIONS_START;
 }
 
-<INITIAL,METADATA,ALPHABET,MULTICHARS,DEFINITIONS>^{WSP}*"LEXICON"{WSP}+{LEXICONNAME} {
+<INITIAL,MULTICHARS,DEFINITIONS>^{WSP}*"LEXICON"{WSP}+{LEXICONNAME} {
 	BEGIN LEXICONS;
 	token_update_positions(hlexctext);
 	char* lexicon_start;
@@ -106,7 +94,7 @@ LWSP [\r\n\t ]
 	return LEXICON_START;
 }
 
-<INITIAL,METADATA,ALPHABET,MULTICHARS,DEFINITIONS>^{WSP}*"END"{LWSP}+ {
+<INITIAL,MULTICHARS,DEFINITIONS>^{WSP}*"END"{LWSP}+ {
 	token_update_positions(hlexctext);
 	return END_START;
 }
@@ -118,36 +106,6 @@ LWSP [\r\n\t ]
 <INITIAL>{LWSP} {
 	token_update_positions(hlexctext);
 }
-
-
-<METADATA>^[^:]* {
-	token_update_positions(hlexctext);
-	hlexclval.name = strstrip(hlexctext);
-	return METADATA_FIELDNAME;
-}
-
-<METADATA>":" {
-	token_update_positions(hlexctext);
-	return ':';
-}
-
-<METADATA>[^:]*$ {
-	token_update_positions(hlexctext);
-	hlexclval.name = strstrip(hlexctext);
-	return METADATA_VALUE;
-}
-
-<METADATA>[\r\n] { token_update_positions(hlexctext); }
-
-<ALPHABET>{STRINGTOKEN} {
-	token_update_positions(hlexctext);
-	hlexclval.name = strip_percents(hlexctext, false);
-	return ALPHABET_SYMBOL;
-}
-
-<ALPHABET>!.* { token_update_positions(hlexctext); }
-
-<ALPHABET>{LWSP} { token_update_positions(hlexctext); }
 
 <MULTICHARS>{STRINGTOKEN} {
 	token_update_positions(hlexctext);

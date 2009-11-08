@@ -1,4 +1,4 @@
-AC_INIT([hfst], [2.1], [hfst-bugs@helsinki.fi])
+AC_INIT([libhfst], [2.2], [hfst-bugs@helsinki.fi])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_CONFIG_FILES([Makefile])
@@ -17,6 +17,7 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_LEX
 AC_PROG_YACC
+# fails on some debian without:
 AC_PATH_PROG([LDCONFIG],[ldconfig],[echo])
 
 # Checks for header files.

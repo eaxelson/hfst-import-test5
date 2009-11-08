@@ -33,6 +33,9 @@
 #include <ctime>
 #include <iostream>
 
+enum OutputType {HFST, xerox};
+OutputType outputType = HFST;
+
 bool verboseFlag = false;
 
 bool displayWeightsFlag = false;
@@ -373,7 +376,7 @@ class Transition
   }
 };
 
-class RuntimeIndexTableReader
+class IndexTableReader
 {
  private:
   TransitionTableIndex number_of_table_entries;
@@ -383,7 +386,7 @@ class RuntimeIndexTableReader
   
   void get_index_vector(void);
  public:
- RuntimeIndexTableReader(FILE * f,
+ IndexTableReader(FILE * f,
 			 TransitionTableIndex index_count): 
   number_of_table_entries(index_count)
     {
@@ -481,7 +484,7 @@ class Transducer
   TransducerHeader header;
   TransducerAlphabet alphabet;
   KeyTable * keys;
-  RuntimeIndexTableReader index_reader;
+  IndexTableReader index_reader;
   TransitionTableReader transition_reader;
   Encoder encoder;
   DisplayVector display_vector;
@@ -498,7 +501,7 @@ class Transducer
   
   void set_symbol_table(void);
 
-  virtual void display(SymbolNumber * whole_output_string);
+  virtual void note_analysis(SymbolNumber * whole_output_string);
 
   bool final_transition(TransitionTableIndex i)
   {
@@ -574,21 +577,21 @@ class Transducer
     get_analyses(input_string,output_string,output_string,START_INDEX);
   }
 
-  virtual void printAnalyses(void);
+  virtual void printAnalyses(std::string prepend);
 };
 
 class TransducerUniq: public Transducer
 {
  private:
   DisplaySet display_vector;
-  void display(SymbolNumber * whole_output_string);
+  void note_analysis(SymbolNumber * whole_output_string);
  public:
  TransducerUniq(FILE * f, TransducerHeader h, TransducerAlphabet a):
   Transducer(f, h, a),
     display_vector()
       {}
   
-  void printAnalyses(void);
+  void printAnalyses(std::string prepend);
 };
 
 class TransducerFd: public Transducer
@@ -621,14 +624,14 @@ class TransducerFdUniq: public TransducerFd
 {
  private:
   DisplaySet display_vector;
-  void display(SymbolNumber * whole_output_string);
+  void note_analysis(SymbolNumber * whole_output_string);
  public:
  TransducerFdUniq(FILE * f, TransducerHeader h, TransducerAlphabet a):
   TransducerFd(f, h, a),
     display_vector()
       {}
   
-  void printAnalyses(void);
+  void printAnalyses(std::string prepend);
 
 };
 
@@ -758,7 +761,7 @@ class TransitionW
   }
 };
 
-class RuntimeIndexTableReaderW
+class IndexTableReaderW
 {
  private:
   TransitionTableIndex number_of_table_entries;
@@ -768,7 +771,7 @@ class RuntimeIndexTableReaderW
   
   void get_index_vector(void);
  public:
- RuntimeIndexTableReaderW(FILE * f,
+ IndexTableReaderW(FILE * f,
 			  TransitionTableIndex index_count): 
   number_of_table_entries(index_count)
     {
@@ -797,7 +800,7 @@ class RuntimeIndexTableReaderW
     { return indices; }
 };
 
-class RuntimeTransitionTableReaderW
+class TransitionTableReaderW
 {
 
  private:
@@ -811,7 +814,7 @@ class RuntimeTransitionTableReaderW
   void get_transition_vector(void);
 
  public:
- RuntimeTransitionTableReaderW(FILE * f,
+ TransitionTableReaderW(FILE * f,
 			       TransitionTableIndex transition_count):
   number_of_table_entries(transition_count),
     position(0)
@@ -867,8 +870,8 @@ class TransducerW
   TransducerHeader header;
   TransducerAlphabet alphabet;
   KeyTable * keys;
-  RuntimeIndexTableReaderW index_reader;
-  RuntimeTransitionTableReaderW transition_reader;
+  IndexTableReaderW index_reader;
+  TransitionTableReaderW transition_reader;
   Encoder encoder;
   DisplayMultiMap display_map;
 
@@ -909,7 +912,7 @@ class TransducerW
 		  SymbolNumber * original_output_string,
 		  TransitionTableIndex i);
   
-  virtual void display(SymbolNumber * whole_output_string);
+  virtual void note_analysis(SymbolNumber * whole_output_string);
 
   bool final_transition(TransitionTableIndex i)
   {
@@ -971,21 +974,21 @@ class TransducerW
     return encoder.find_key(p);
   }
 
-  virtual void printAnalyses(void);
+  virtual void printAnalyses(std::string prepend);
 };
 
 class TransducerWUniq: public TransducerW
 {
  private:
   DisplayMap display_map;
-  void display(SymbolNumber * whole_output_string);
+  void note_analysis(SymbolNumber * whole_output_string);
  public:
  TransducerWUniq(FILE * f, TransducerHeader h, TransducerAlphabet a):
   TransducerW(f, h, a),
     display_map()
       {}
   
-  void printAnalyses(void);
+  void printAnalyses(std::string prepend);
 };
 
 class TransducerWFd: public TransducerW
@@ -1009,7 +1012,7 @@ class TransducerWFd: public TransducerW
  public:
  TransducerWFd(FILE * f, TransducerHeader h, TransducerAlphabet a):
   TransducerW(f, h, a),
-    statestack(a.get_state_size()),
+    statestack(1, FlagDiacriticState (a.get_state_size(), 0)),
     operations(a.get_operation_vector())
       {}
 };
@@ -1018,13 +1021,13 @@ class TransducerWFdUniq: public TransducerWFd
 {
  private:
   DisplayMap display_map;
-  void display(SymbolNumber * whole_output_string);
+  void note_analysis(SymbolNumber * whole_output_string);
  public:
  TransducerWFdUniq(FILE * f, TransducerHeader h, TransducerAlphabet a):
   TransducerWFd(f, h, a),
     display_map()
       {}
   
-  void printAnalyses(void);
+  void printAnalyses(std::string prepend);
 
 };

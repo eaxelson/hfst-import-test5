@@ -36,7 +36,6 @@
 #if !NESTED_BUILD
 #endif
 
-// readline here
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
@@ -170,8 +169,8 @@ parse_options(int argc, char** argv)
 	{
 			outfilename = hfst_strdup("<stdout>");
 			outfile = stdout;
-			message_out = stderr;
 	}
+	message_out = outfile;
 	// rest of arguments are files...
 	if (is_input_stdin && ((argc - optind) == 1))
 	{
@@ -230,7 +229,7 @@ compare_sets(const string& testcase,
 	{
 		if (infinite_r)
 		{
-			fprintf(message_out, "Some of infinite results for %s could not be "
+			fprintf(outfile, "Some of infinite results for %s could not be "
 					"matched against finite strings of test file\n",
 					testcase.c_str());
 			return false;
@@ -253,7 +252,7 @@ compare_sets(const string& testcase,
 			{
 				KeyVector hmmkv = *kv;
 				string* kvs = keyVectorToString(&hmmkv, key_table);
-				VERBOSE_PRINT(" * %s\n", kvs->c_str());
+				fprintf(message_out, " * %s\n", kvs->c_str());
 				delete kvs;
 			}
 			if (eMinusR.size() > 0)
@@ -267,7 +266,7 @@ compare_sets(const string& testcase,
 			{
 				KeyVector hmmkv = *kv;
 				string* kvs = keyVectorToString(&hmmkv, key_table);
-				VERBOSE_PRINT(" * %s\n", kvs->c_str());
+				fprintf(message_out, " * %s\n", kvs->c_str());
 				delete kvs;
 			}
 			return false;
@@ -297,7 +296,7 @@ compare_sets(const string& testcase,
 			{
 				KeyVector hmmkv = *kv;
 				string* kvs = keyVectorToString(&hmmkv, key_table);
-				VERBOSE_PRINT(" * %s\n", kvs->c_str());
+				fprintf(message_out, " * %s\n", kvs->c_str());
 				delete kvs;
 			}
 			return false;
@@ -327,7 +326,7 @@ compare_sets(const string& testcase,
 			{
 				KeyVector hmmkv = *kv;
 				string* kvs = keyVectorToString(&hmmkv, key_table);
-				VERBOSE_PRINT(" * %s\n", kvs->c_str());
+				fprintf(message_out, " * %s\n", kvs->c_str());
 				delete kvs;
 			}
 			return false;
@@ -360,6 +359,8 @@ lookup_all(const char* s, KeyTable* kt,
 	}
 	else
 	{
+		lookup_orig->erase(remove_if(lookup_orig->begin(), lookup_orig->end(),
+					_is_epsilon), lookup_orig->end());
 		KeyVectorVector* final_results = new KeyVectorVector;
 		final_results->push_back(lookup_orig);
 		size_t cascade_number = 0;
@@ -375,7 +376,7 @@ lookup_all(const char* s, KeyTable* kt,
 					++kv)
 			{
 				string* kvstring = keyVectorToString(*kv, kt);
-				VERBOSE_PRINT("Looking up %s from transducer %ld\n",
+				VERBOSE_PRINT("Looking up %s from transducer %zu\n",
 						kvstring->c_str(), cascade_number);
 				if (is_infinitely_ambiguous(*t, *kv))
 				{
@@ -392,11 +393,14 @@ lookup_all(const char* s, KeyTable* kt,
 						VERBOSE_PRINT("Got no results\n");
 						lookups = new KeyVectorVector;
 					}
-					for (KeyVectorVector::const_iterator lkv = lookups->begin();
+					for (KeyVectorVector::iterator lkv = lookups->begin();
 							lkv != lookups->end();
 							++lkv)
 					{
-						string* lkvstring = keyVectorToString(*lkv, kt);
+						KeyVector* hmmlkv = *lkv;
+						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
+											_is_epsilon), hmmlkv->end());
+						string* lkvstring = keyVectorToString(hmmlkv, kt);
 						VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
 						current_results->push_back(*lkv);
 						delete lkvstring;
@@ -461,7 +465,7 @@ compare_sets(const string& testcase,
 			{
 				KeyVector hmmkv = *kv;
 				string* kvs = keyVectorToString(&hmmkv, key_table);
-				VERBOSE_PRINT(" * %s\n", kvs->c_str());
+				fprintf(message_out, " * %s\n", kvs->c_str());
 				delete kvs;
 			}
 			if (eMinusR.size() > 0)
@@ -475,7 +479,7 @@ compare_sets(const string& testcase,
 			{
 				KeyVector hmmkv = *kv;
 				string* kvs = keyVectorToString(&hmmkv, key_table);
-				VERBOSE_PRINT(" * %s\n", kvs->c_str());
+				fprintf(message_out, " * %s\n", kvs->c_str());
 				delete kvs;
 			}
 			return false;
@@ -505,7 +509,7 @@ compare_sets(const string& testcase,
 			{
 				KeyVector hmmkv = *kv;
 				string* kvs = keyVectorToString(&hmmkv, key_table);
-				VERBOSE_PRINT(" * %s\n", kvs->c_str());
+				fprintf(message_out, " * %s\n", kvs->c_str());
 				delete kvs;
 			}
 			return false;
@@ -535,7 +539,7 @@ compare_sets(const string& testcase,
 			{
 				KeyVector hmmkv = *kv;
 				string* kvs = keyVectorToString(&hmmkv, key_table);
-				VERBOSE_PRINT(" * %s\n", kvs->c_str());
+				fprintf(message_out, " * %s\n", kvs->c_str());
 				delete kvs;
 			}
 			return false;
@@ -552,8 +556,7 @@ lookup_all(const char* s, KeyTable* kt,
 	KeyVector* lookup_orig = NULL;
 	if (space_separated)
 	{
-		lookup_orig = stringSeparatedToKeyVector(s, kt, string(" "),
-				true);
+		lookup_orig = stringSeparatedToKeyVector(s, kt, string(" "), true);
 	}
 	else
 	{
@@ -568,6 +571,8 @@ lookup_all(const char* s, KeyTable* kt,
 	}
 	else
 	{
+		lookup_orig->erase(remove_if(lookup_orig->begin(), lookup_orig->end(),
+					_is_epsilon), lookup_orig->end());
 		KeyVectorVector* final_results = new KeyVectorVector;
 		final_results->push_back(lookup_orig);
 		size_t cascade_number = 0;
@@ -583,7 +588,7 @@ lookup_all(const char* s, KeyTable* kt,
 					++kv)
 			{
 				string* kvstring = keyVectorToString(*kv, kt);
-				VERBOSE_PRINT("Looking up %s from transducer %ld\n",
+				VERBOSE_PRINT("Looking up %s from transducer %zu\n",
 						kvstring->c_str(), cascade_number);
 				if (is_infinitely_ambiguous(*t, *kv))
 				{
@@ -604,7 +609,10 @@ lookup_all(const char* s, KeyTable* kt,
 							lkv != lookups->end();
 							++lkv)
 					{
-						string* lkvstring = keyVectorToString(*lkv, kt);
+						KeyVector* hmmlkv = *lkv;
+						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
+											_is_epsilon), hmmlkv->end());
+						string* lkvstring = keyVectorToString(hmmlkv, kt);
 						VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
 						current_results->push_back(*lkv);
 						delete lkvstring;
@@ -944,10 +952,6 @@ int main( int argc, char **argv ) {
 	{
 		fclose(inputfile);
 	}
-	if (outfile != stdout)
-	{
-		fclose(outfile);
-	}
 	VERBOSE_PRINT("Reading from %s, writing to %s\n", 
 		inputfilename, outfilename);
 	// here starts the buffer handling part
@@ -983,6 +987,10 @@ int main( int argc, char **argv ) {
 			retval = process_stream(std::cin, std::cout);
 		}
 		return retval;
+	}
+	if (outfile != stdout)
+	{
+		fclose(outfile);
 	}
 	free(inputfilename);
 	free(outfilename);

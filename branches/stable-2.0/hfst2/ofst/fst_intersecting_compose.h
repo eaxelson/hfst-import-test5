@@ -2,6 +2,9 @@
 
 #include "fst/lib/fstlib.h"
 #include <vector>
+#include <set>
+
+typedef std::set<unsigned short> KeySet;
 
 using std::vector;
 
@@ -364,18 +367,30 @@ class RulesInfo {
 
   bool Final( void ) {
     for ( unsigned int i = 0; i < number_of_rules; ++i ) 
-      if (Rules.at(i)->Final(states.at(i)) != 0)
+      if (Rules.at(i)->Final(states.at(i)) == TropicalWeight::Zero().Value())
 	return false;
     return true;
   };
 
   bool NextFinal( void ) {
     for ( unsigned int i = 0; i < number_of_rules; ++i ) 
-      if (Rules.at(i)->Final(next_states.at(i)) != 0)
+      if (Rules.at(i)->Final(next_states.at(i)) == TropicalWeight::Zero().Value())
 	return false;
     return true;
   };
-
+  float get_weight(void);
+  float get_final_weight(void) {
+    float w = 0;
+    for ( unsigned int i = 0; i < number_of_rules; ++i ) 
+      w += Rules.at(i)->Final(states.at(i)).Value();
+    return w;
+  };
+  float get_next_final_weight(void) {
+    float w = 0;
+    for ( unsigned int i = 0; i < number_of_rules; ++i ) 
+      w += Rules.at(i)->Final(next_states.at(i)).Value();
+    return w;
+  }
 };
 
 class LexiconInfo {
@@ -417,15 +432,20 @@ class LexiconInfo {
 
   StateId compose(StateId lexicon_state, RulesInfo &Rules, bool &new_state) {
     StateId s = find(lexicon_state, Rules.next_states, new_state);
-    if ( (lex.Final(lexicon_state) == 0) and Rules.NextFinal()) {
-      composition_result->SetFinal(s,0);
+    if ((lex.Final(lexicon_state) != TropicalWeight::Zero().Value()) and Rules.NextFinal()) {
+    composition_result->SetFinal(s,
+				 lex.Final(lexicon_state).Value() + 
+				 Rules.get_next_final_weight());
     }
+
     return s;
   };
   StateId compose_epsilon(StateId lexicon_state, RulesInfo &Rules, bool &new_state) {
     StateId s = find(lexicon_state,Rules.states,new_state);
-    if ( (lex.Final(lexicon_state) == 0)  and Rules.Final()) {
-      composition_result->SetFinal(s,0);
+    if ( (lex.Final(lexicon_state) == TropicalWeight::Zero().Value())  and Rules.Final()) {
+      composition_result->SetFinal(s,
+				   lex.Final(lexicon_state).Value() + 
+				   Rules.get_final_weight());
     }
     return s;
   };
@@ -440,18 +460,24 @@ class Composer {
   LexiconInfo lexicon;
   StateId composition_state;
 
+  float multiply_weights(Arcs &L, RulesInfo &R);
+  KeySet &skip_symbols;
+
  public:
 
-  Composer( Transducer &lex , vector<Transducer*> &Rules) :
+ Composer( Transducer &lex , vector<Transducer*> &Rules,KeySet &skip_syms) :
     composition(new Transducer()),
       lexicon( lex, composition ),
-      composition_state(0)
-    {
-      composition->AddState();
-      RulesInfo::init(Rules);
-    };
+      composition_state(0),
+      skip_symbols(skip_syms)
+    { composition->AddState();
+      composition->SetStart(0);
+      RulesInfo::init(Rules); };
 
-  void more( StateId lexicon_target, RulesInfo &Rules, StateId composition_target, bool epsilon );
+  void more( StateId lexicon_target, 
+	     RulesInfo &Rules, 
+	     StateId composition_target, 
+	     bool epsilon );
   void single_compose( Arcs &lexicon_arcs, RulesInfo &Rules );
   void single_compose_epsilon( Arcs &lexicon_arcs, RulesInfo &Rules );
   void compose( RulesInfo &Rules );

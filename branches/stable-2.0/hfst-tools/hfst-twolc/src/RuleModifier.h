@@ -80,7 +80,7 @@ public:
     HFST_TWOLC_COLON(string_copy(":")),
     HFST_TWOLC_UNION(string_copy("|")),
     HFST_TWOLC_FREELY_INSERT(string_copy("__HFST_TWOLC_FREELY_INSERT")),
-    HFST_TWOLC_EPSILON(string_copy("__HFST_TWOLC_EPSILON_SYMBOL")),
+    HFST_TWOLC_EPSILON(string_copy("@0@")),
     HFST_TWOLC_LEFT_BRACKET(string_copy("[")),
     HFST_TWOLC_RIGHT_BRACKET(string_copy("]"))
   {

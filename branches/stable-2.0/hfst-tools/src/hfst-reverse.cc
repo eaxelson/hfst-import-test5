@@ -197,7 +197,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 					fprintf(message_out, "stream format mismatch\n");
 					return EXIT_FAILURE;
 				}
-				VERBOSE_PRINT("(what is being done)...\n");
+				VERBOSE_PRINT("Reversing...\n");
 				// add your code here
 
 				HFST::TransducerHandle result = HFST::reverse(input);
@@ -254,7 +254,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 					fprintf(message_out, "stream format mismatch\n");
 					return EXIT_FAILURE;
 				}
-				VERBOSE_PRINT("(what is being done)...\n");
+				VERBOSE_PRINT("Reversing...\n");
 				// add your code here
 
 				HWFST::TransducerHandle result = HWFST::reverse(input);
