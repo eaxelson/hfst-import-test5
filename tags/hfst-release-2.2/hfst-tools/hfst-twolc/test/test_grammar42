@@ -1,0 +1,14 @@
+Alphabet
+
+a b a:b ;
+
+Definitions
+
+D = a+ ;
+
+Rules
+
+"Rule1"
+a:b => D _ ;
+
+

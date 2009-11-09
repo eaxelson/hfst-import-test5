@@ -1,0 +1,13 @@
+Alphabet
+
+þ:þ č:č č:þ ;
+
+Sets
+
+X = þ ;
+ 
+Rules
+
+"Rule1"
+č:þ => :X _ ;
+

@@ -1,0 +1,16 @@
+Alphabet
+
+a:b a a:c b c ;
+
+Sets
+
+A = a ;
+B = b ;
+
+AB = A B ;
+
+Rules
+
+"Rule1"
+a:b => AB _ ;
+

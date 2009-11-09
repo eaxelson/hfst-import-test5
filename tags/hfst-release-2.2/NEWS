@@ -1,0 +1,19 @@
+Noteworthy changes in release 2.2
+---------------------------------
+
+* Bug fixes in intersecting composition,  is_subset, negation, 
+
+* Handling of flag diacritics included in lookup
+
+* Remove readline because of numerous portability issues
+
+* Remove alphabet and metadata from hfst-lexc
+
+* hfst-lookup support for custom formatting of readings
+
+* fixed hfst-twolc escaping in set constructions
+
+Noteworthy changes in release 2.1
+---------------------------------
+
+* hfst-twolc and hfst-compose-intersect understand # like xerox originals

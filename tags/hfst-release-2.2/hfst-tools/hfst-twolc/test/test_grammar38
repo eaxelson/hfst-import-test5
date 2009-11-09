@@ -1,0 +1,14 @@
+Alphabet 
+
+	a:b a a:c b b:0 ;
+
+Rule-variables
+
+X ;
+
+Rules
+
+"Rule1"
+a:b => X:0 _ ; where X in ( b ) ;
+
+

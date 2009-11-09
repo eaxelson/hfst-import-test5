@@ -1,0 +1,20 @@
+Alphabet
+
+	a e b b:c ;
+
+Rule-variables
+
+Vx Vy ;
+
+Sets
+
+X = a e ;
+Y = e a ;
+
+Rules 
+
+"Rule1"
+b:c <= Vx _ Vy ; where Vx in X 
+		       Vy in Y 
+	         matched ;
+
