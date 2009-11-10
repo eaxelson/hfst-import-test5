@@ -49,7 +49,7 @@ bool print_usage(void)
     "  -u, --unique                Suppress duplicate analyses\n" <<
     "  -n N, --analyses=N          Output no more than N analyses\n" <<
     "                              (if the transducer is weighted, the N best analyses)\n" <<
-    "  -x, --xerox                 Xerox output format\n" <<
+    "  -x, --xerox                 Xerox output format (default)\n" <<
     "\n" <<
     "Report bugs to " << PACKAGE_BUGREPORT << "\n" <<
     "\n";
