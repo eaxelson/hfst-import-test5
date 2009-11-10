@@ -34,7 +34,7 @@
 #include <iostream>
 
 enum OutputType {HFST, xerox};
-OutputType outputType = HFST;
+OutputType outputType = xerox;
 
 bool verboseFlag = false;
 
