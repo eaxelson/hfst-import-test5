@@ -265,7 +265,6 @@ int process_stream(std::istream& inputstream, FILE * outstream)
 									&kp2);
 				  }
 				delete flag_diacritic_table;
-				HWFST::print_transducer(input,key_table);
 				HWFST::write_runtime_transducer(input,
 								key_table,
 								outstream);
