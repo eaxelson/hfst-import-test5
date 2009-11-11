@@ -858,6 +858,36 @@ void compute_result(void)
 	  weighted_lexicon = HWFST::minimize(weighted_lexicon);
 	  delete word_boundary_pair;
 	}
+      if (HFST::is_symbol("@?@"))
+	{
+	  HFST::KeyPair 
+	    unknown_keypair(HFST::get_key(HFST::get_symbol("@?@"),
+					  weighted_symbol_table));
+	  HFST::KeySet * lexicon_keys = 
+	    HWFST::define_key_set(HWFST::extract_output_language
+				 (HWFST::copy(weighted_lexicon)));
+	  HFST::KeySet * rule_keys =
+	    HWFST::define_key_set(HWFST::extract_input_language
+				 (HWFST::copy(weighted_rules.at(0))));
+	  for (HFST::KeySet::iterator it = rule_keys->begin();
+	       it != rule_keys->end();
+	       ++it)
+	    { lexicon_keys->erase(*it); }
+	  delete rule_keys;
+	  HWFST::TransducerHandle unknown_transducer =
+	    HWFST::define_transducer(lexicon_keys);
+	  for (vector<HWFST::TransducerHandle>::iterator it = 
+		 weighted_rules.begin();
+	       it != weighted_rules.end();
+	       ++it)
+	    {
+	      *it = HWFST::substitute_with_transducer
+		(*it,&unknown_keypair,HWFST::copy(unknown_transducer));
+	      *it = HWFST::minimize(*it);
+	    }
+	  delete unknown_transducer;
+	}
+
       weighted_result =
 	HWFST::intersecting_composition(weighted_lexicon,
 					&weighted_rules,
@@ -905,7 +935,36 @@ void compute_result(void)
 	  unweighted_lexicon = HFST::minimize(unweighted_lexicon);
 	  delete word_boundary_pair;
 	}
-
+      // Handle unknown lexicon symbols.
+      if (HFST::is_symbol("@?@"))
+	{
+	  HFST::KeyPair 
+	    unknown_keypair(HFST::get_key(HFST::get_symbol("@?@"),
+					  unweighted_symbol_table));
+	  HFST::KeySet * lexicon_keys = 
+	    HFST::define_key_set(HFST::extract_output_language
+				 (HFST::copy(unweighted_lexicon)));
+	  HFST::KeySet * rule_keys =
+	    HFST::define_key_set(HFST::extract_input_language
+				 (HFST::copy(unweighted_rules.at(0))));
+	  for (HFST::KeySet::iterator it = rule_keys->begin();
+	       it != rule_keys->end();
+	       ++it)
+	    { lexicon_keys->erase(*it); }
+	  delete rule_keys;
+	  HFST::TransducerHandle unknown_transducer =
+	    HFST::define_transducer(lexicon_keys);
+	  for (vector<HFST::TransducerHandle>::iterator it = 
+		 unweighted_rules.begin();
+	       it != unweighted_rules.end();
+	       ++it)
+	    {
+	      *it = HFST::substitute_with_transducer
+		(*it,&unknown_keypair,HFST::copy(unknown_transducer));
+	      *it = HFST::minimize(*it);
+	    }
+	  delete unknown_transducer;
+	}
       unweighted_result =
 	HFST::intersecting_composition(unweighted_lexicon,
 				       &unweighted_rules,
