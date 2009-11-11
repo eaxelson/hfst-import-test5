@@ -514,7 +514,7 @@ void read_rules(istream &in,
 		    }
 		}
 	      rule = HFST::harmonize_transducer(rule,rule_table,
-						weighted_symbol_table);
+						unweighted_symbol_table);
 	    }
 	  else
 	    {
