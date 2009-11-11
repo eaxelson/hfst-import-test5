@@ -360,8 +360,13 @@ LexcCompiler::compileLexical()
 	{
 		stringTrie_.substitute(Xymbol("0"), Xymbol("@0@"));
 		stringTrie_.substitute(Xymbol("@ZERO@"), Xymbol("0"));
-		stringTrie_.substitute(XymbolPair(Xymbol("#"), Xymbol("#")),
-				XymbolPair(Xymbol("#"), Xymbol("@#@")));
+		for (XymbolSet::const_iterator x = sigma_.begin();
+				x != sigma_.end();
+				++x)
+		{
+			stringTrie_.substitute(XymbolPair(*x, Xymbol("#")),
+				XymbolPair(*x, Xymbol("@#@")));
+		}
 		lexc_xducer_printf(stringTrie_, _("Strings trie\n"));
 		lexical_.disjunct(stringTrie_);
 	}
