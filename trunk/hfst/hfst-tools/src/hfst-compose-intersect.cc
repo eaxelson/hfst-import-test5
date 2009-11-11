@@ -95,6 +95,9 @@ static bool store_symbols_with_result = true;
 // Time the intersecting composition ans minimzation.
 static bool time_operation = false;
 
+// If rules contain word boundaries, word boundaries need to be appended to 
+// lexicon entries.
+static bool rules_contain_word_boundary = false;
 
 // The last commandline arguments are rule-files.
 // In addition all transducer arguments after the 
@@ -462,8 +465,20 @@ void read_rules(istream &in,
 	  ++number_of_rules;
 	  if (HWFST::has_symbol_table(in))
 	    {
+	      HFST::KeyTable * rule_table = HFST::create_key_table();
 	      rule = 
-		HWFST::read_transducer(in,weighted_symbol_table); 	    }
+		HWFST::read_transducer(in,rule_table);
+	      if (HFST::is_symbol("@#@"))
+		{ 
+		  if (HFST::is_symbol(HFST::get_symbol("@#@"),
+				      rule_table))
+		    {
+		      rules_contain_word_boundary = true;
+		    }
+		}
+	      rule = HWFST::harmonize_transducer(rule,rule_table,
+						 weighted_symbol_table);
+	    }
 	  else
 	    {
 	      rule = HWFST::read_transducer(in);	      
@@ -487,8 +502,19 @@ void read_rules(istream &in,
 	  ++number_of_rules;
 	  if (HFST::has_symbol_table(in))
 	    {
+	      HFST::KeyTable * rule_table = HFST::create_key_table();
 	      rule = 
-		HFST::read_transducer(in,unweighted_symbol_table);    
+		HFST::read_transducer(in,rule_table);
+	      if (HFST::is_symbol("@#@"))
+		{ 
+		  if (HFST::is_symbol(HFST::get_symbol("@#@"),
+				      rule_table))
+		    {
+		      rules_contain_word_boundary = true;
+		    }
+		}
+	      rule = HFST::harmonize_transducer(rule,rule_table,
+						weighted_symbol_table);
 	    }
 	  else
 	    {
@@ -817,7 +843,7 @@ void compute_result(void)
     
       time_t INTERSECTING_COMPOSITION_START = clock();
       // Check whether word-boundar @#@ has been mentioned in the rules.
-      if (HWFST::is_symbol("@#@"))
+      if (rules_contain_word_boundary)
 	{
 	  HWFST::KeyPair * word_boundary_pair =
 	    HWFST::define_keypair(HWFST::Epsilon,
@@ -864,7 +890,7 @@ void compute_result(void)
   else
     {
       time_t INTERSECTING_COMPOSITION_START = clock();
-      if (HFST::is_symbol("@#@"))
+      if (rules_contain_word_boundary)
 	{
 	  HFST::KeyPair * word_boundary_pair =
 	    HFST::define_keypair(HFST::Epsilon,

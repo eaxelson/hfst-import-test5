@@ -156,7 +156,7 @@ ALPHABET_LINES: ALPHABET_LINES NON_DELIMITER_RANGE EOL
   $1->push_back(new Pair(string_copy("@#@"),
 			 string_copy("@0@")));
   NonDelimiterSymbolRange * word_boundary_range = new NonDelimiterSymbolRange;
-  word_boundary_range->push_back(string_copy("@#@"));
+  //word_boundary_range->push_back(string_copy("@#@"));
   rule_modifier.define_diacritics(word_boundary_range);
   rule_modifier.define_alphabet($1);
   grammar_displayer.display_alphabet($1);
@@ -502,7 +502,7 @@ CENTER_PAIR: CHAR PAIR_SEPARATOR CHAR
 } 
 | ANY PAIR_SEPARATOR CHAR 
 { 
-  $$ = new Pair(grammar_displayer.get_epsilon_symbol(),$3);
+  $$ = new Pair(grammar_displayer.get_any_symbol(),$3);
 }
 | ANY PAIR_SEPARATOR EPSILON 
 { 
@@ -788,7 +788,7 @@ CHAR PAIR_SEPARATOR ANY
       yyerror(rule_modifier.generate_warning(
 	      "The definition %s can't be the left side of a pair!",$1));
     }
-  $$ = make_pair($1,grammar_displayer.get_any_symbol());
+  $$ = make_pair($1,grammar_displayer.get_epsilon_symbol());
 }
 | EPSILON PAIR_SEPARATOR EPSILON 
 { 
