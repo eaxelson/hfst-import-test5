@@ -873,6 +873,8 @@ void compute_result(void)
 	       it != rule_keys->end();
 	       ++it)
 	    { lexicon_keys->erase(*it); }
+	  lexicon_keys->insert(HFST::get_key(HFST::get_symbol("@?@"),
+					     weighted_symbol_table));
 	  delete rule_keys;
 	  HWFST::TransducerHandle unknown_transducer =
 	    HWFST::define_transducer(lexicon_keys);
@@ -951,6 +953,8 @@ void compute_result(void)
 	       it != rule_keys->end();
 	       ++it)
 	    { lexicon_keys->erase(*it); }
+	  lexicon_keys->insert(HFST::get_key(HFST::get_symbol("@?@"),
+					     unweighted_symbol_table));
 	  delete rule_keys;
 	  HFST::TransducerHandle unknown_transducer =
 	    HFST::define_transducer(lexicon_keys);
