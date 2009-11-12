@@ -38,8 +38,8 @@ private:
   SymbolNumberMap symbol_numbers;
   AlphabetSet twolc_internal_symbols;
   LaxAlphabetSet alphabet_set;
-  AlphabetSet diacritics_set;
-  AlphabetSet current_rule_diacritics;
+  LaxAlphabetSet diacritics_set;
+  LaxAlphabetSet current_rule_diacritics;
   AlphabetSet set_name_set;
   AlphabetSet definition_name_set;
   SetMap symbol_sets;
