@@ -10,7 +10,7 @@ AM_INIT_AUTOMAKE([-Wall foreign dist-bzip2 std-options])
 AC_REVISION([$Revision: 1.9 $])
 AC_CONFIG_SUBDIRS([hfst-lexc hfst-twolc])
 
-AC_PROG_LIBTOOL
+ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
 
 AC_DEFINE([NESTED_BUILD], [1], [We're doing a nested build, headers aren't always where we expect them to be])
 
