@@ -49,7 +49,7 @@ fi
 AC_DEFINE([SGIext], 1, [SFST requires this stuff])
 
 # Checks for programs
-AC_PROG_LIBTOOL
+ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_INSTALL
