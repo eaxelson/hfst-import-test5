@@ -415,7 +415,7 @@ class LexiconInfo {
     number_of_nodes( lexicon.NumStates()),
     composition_result(composition),
     lex(lexicon),
-    current_lexicon_state(0)
+      current_lexicon_state(lexicon.Start())
     {
       ArcSort(&lex,output_compare());
       Tree::init(composition);
