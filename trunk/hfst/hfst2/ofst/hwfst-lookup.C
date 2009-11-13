@@ -173,8 +173,7 @@ namespace HWFST
 		   arcs.Next())
 		{
 		  Arc a = arcs.Value();
-		  if ((a.ilabel == 0) or 
-		      (skip_symbols->find(a.ilabel) != skip_symbols->end()))
+		  if (a.ilabel == 0)
 		    {
 		      KeyVectorVector * suffixes =
 			find_all_continuations(a.nextstate,
@@ -189,6 +188,32 @@ namespace HWFST
 			  continuations = new KeyVectorVector;
 			}
 		      add_prefix(a.olabel, suffixes);
+		      add_to_continuations(continuations,
+					   suffixes);
+		    }
+		  else if (skip_symbols->find(a.ilabel) != skip_symbols->end())
+		    {
+		      KeyVectorVector * suffixes =
+			find_all_continuations(a.nextstate,
+					       input_position,
+					       input_end_position,
+					       t,
+					       skip_symbols);
+		      if (suffixes == NULL)
+			continue;
+		      else if (continuations == NULL)
+			{
+			  continuations = new KeyVectorVector;
+			}
+		      if (skip_symbols->find(a.olabel) != skip_symbols->end())
+			{
+			  add_prefix(a.ilabel, suffixes);
+			}
+		      else
+			{
+			  add_prefix(a.olabel, suffixes);
+			  add_prefix(a.ilabel, suffixes);
+			}
 		      add_to_continuations(continuations,
 					   suffixes);
 		    }
@@ -235,21 +260,47 @@ namespace HWFST
 				       suffixes);
 		}
 	      
-	      if ((a.ilabel == 0) or
-		  skip_symbols->find(a.ilabel) != skip_symbols->end())
+	      if (a.ilabel == 0)
 		{
 		  KeyVectorVector * suffixes =
 		    find_all_continuations(a.nextstate,
 					   input_position,
 					   input_end_position,
-					   t,skip_symbols);
+					   t,
+					   skip_symbols);
+		  if (suffixes == NULL)
+		    continue;
+		      else if (continuations == NULL)
+			{
+			  continuations = new KeyVectorVector;
+			}
+		  add_prefix(a.olabel, suffixes);
+		  add_to_continuations(continuations,
+				       suffixes);
+		}
+	      else if (skip_symbols->find(a.ilabel) != skip_symbols->end())
+		{
+		  KeyVectorVector * suffixes =
+		    find_all_continuations(a.nextstate,
+					   input_position,
+					   input_end_position,
+					   t,
+					   skip_symbols);
 		  if (suffixes == NULL)
 		    continue;
 		  else if (continuations == NULL)
 		    {
 		      continuations = new KeyVectorVector;
 		    }
-		  add_prefix(a.olabel, suffixes);
+		  if (skip_symbols->find(a.olabel) != skip_symbols->end())
+		    {
+		      add_prefix(a.ilabel, suffixes);
+		    }
+		  else
+		    {
+		      add_prefix(a.olabel, suffixes);
+		      add_prefix(a.ilabel, suffixes);
+		    }
 		  add_to_continuations(continuations,
 				       suffixes);
 		}
