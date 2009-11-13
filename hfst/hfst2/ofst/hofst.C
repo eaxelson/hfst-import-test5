@@ -2642,10 +2642,59 @@ namespace HWFST {
     print_fst(pT, NULL, print_weights, ostr, true);
   }
 
+  void print_state(fst::StdVectorFst *t, StateId state_id, StateId initial_state_id, Alphabet &alpha, bool print_weights, ostream& ostr, bool use_numbers) {
+
+    StateId state_id_printed=state_id;
+    // if initial state is not numbered as zero,
+    // swap the numbers of initial state and state number zero
+    if (initial_state_id != 0) {
+      if (state_id == initial_state_id)
+	state_id_printed=0;
+      else if (state_id == 0)
+	state_id_printed=initial_state_id;
+    }
+    if (is_final(t, state_id)) {  // a final state
+      ostr << state_id_printed;
+      if (print_weights) {
+	ostr << "\t" << (t->Final(state_id)).Value();  // changed to float
+      }
+      ostr << "\n";
+    }
+    for (fst::ArcIterator<fst::StdFst> aiter(*t, state_id); !aiter.Done(); aiter.Next()) {
+      const fst::StdArc &arc = aiter.Value();
+      StateId dest_id = arc.nextstate;
+      StateId dest_id_printed=dest_id;
+      if (initial_state_id != 0) {
+	if (dest_id == initial_state_id)
+	  dest_id_printed=0;
+	else if (dest_id == 0)
+	  dest_id_printed=initial_state_id;
+      }
+      
+      if (!use_numbers) {
+	const char *ilabel = alpha.code2symbol(arc.ilabel);
+	const char *olabel = alpha.code2symbol(arc.olabel);	  
+	ostr << state_id_printed << "\t" << dest_id_printed << "\t";
+	if (ilabel)
+	  COMMON::escape_and_print(ilabel, ostr, true, false, false);
+	else
+	  ostr << "\\" << arc.ilabel;
+	ostr << "\t";
+	if (olabel)
+	  COMMON::escape_and_print(olabel, ostr, true, false, false);
+	else
+	  ostr << "\\" << arc.olabel;
+      }
+      else
+	ostr << state_id_printed << "\t" << dest_id_printed << "\t" << arc.ilabel << "\t" << arc.olabel;
+      if (print_weights) {
+	ostr << "\t" << (arc.weight).Value();
+      }
+      ostr << "\n";
+    }
+  }
 
   void print_fst( fst::StdVectorFst *t, KeyTable *T, bool print_weights, ostream& ostr, bool use_numbers ) {    
-    // make sure that initial state is number zero
-    StateId initial_state_id = t->Start();
 
     if(!t) {
       fprintf(stderr, "'print_fst': Transducer is NULL.\n");
@@ -2668,59 +2717,20 @@ namespace HWFST {
     #endif
     pthread_mutex_lock(&the_mutex);
     
+    // make sure that initial state is number zero
+    StateId initial_state_id = t->Start();
+
+    print_state(t, initial_state_id, initial_state_id, alpha, print_weights, ostr, use_numbers);
+
     for (fst::StateIterator<fst::StdFst> siter(*t); !siter.Done(); siter.Next()) {
       StateId state_id = siter.Value();
-      StateId state_id_printed=state_id;
-      // if initial state is not numbered as zero,
-      // swap the numbers of initial state and state number zero
-      if (initial_state_id != 0) {
-	if (state_id == initial_state_id)
-	  state_id_printed=0;
-	else if (state_id == 0)
-	  state_id_printed=initial_state_id;
-      }
-      if (is_final(t, state_id)) {  // a final state
-	ostr << state_id_printed;
-	if (print_weights) {
-	  ostr << "\t" << (t->Final(state_id)).Value();  // changed to float
-	}
-	ostr << "\n";
-      }
-      for (fst::ArcIterator<fst::StdFst> aiter(*t, state_id); !aiter.Done(); aiter.Next()) {
-	const fst::StdArc &arc = aiter.Value();
-	StateId dest_id = arc.nextstate;
-	StateId dest_id_printed=dest_id;
-	if (initial_state_id != 0) {
-	  if (dest_id == initial_state_id)
-	    dest_id_printed=0;
-	  else if (dest_id == 0)
-	    dest_id_printed=initial_state_id;
-	}
-	
-	if (!use_numbers) {
-	  const char *ilabel = alpha.code2symbol(arc.ilabel);
-	  const char *olabel = alpha.code2symbol(arc.olabel);	  
-	  ostr << state_id_printed << "\t" << dest_id_printed << "\t";
-	  if (ilabel)
-	    COMMON::escape_and_print(ilabel, ostr, true, false, false);
-	  else
-	    ostr << "\\" << arc.ilabel;
-	  ostr << "\t";
-	  if (olabel)
-	    COMMON::escape_and_print(olabel, ostr, true, false, false);
-	  else
-	    ostr << "\\" << arc.olabel;
-	}
-	else
-	  ostr << state_id_printed << "\t" << dest_id_printed << "\t" << arc.ilabel << "\t" << arc.olabel;
-	if (print_weights) {
-	  ostr << "\t" << (arc.weight).Value();
-	}
-	ostr << "\n";
-      }
+      if (state_id != initial_state_id)
+	print_state(t, state_id, initial_state_id, alpha, print_weights, ostr, use_numbers);
     }
     pthread_mutex_unlock(&the_mutex);
   }
+
+
 
 
   void print_fst_old(fst::StdVectorFst *t, KeyTable *T, ostream& ostr) {
