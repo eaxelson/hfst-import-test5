@@ -157,21 +157,43 @@ KeyVectorVector * reverse( KeyVectorVector * key_strings ) {
     if ( input_position == input_end_position ) {
       for ( ArcsIter arcs(n->arcs()); arcs; arcs++ ) {
 	Arc a = *arcs;
-	if ( (a.label().lower_char() == 0) or
-	     (skip_symbols->find(a.label().lower_char()) != 
-	      skip_symbols->end())) {
+	if ( (a.label().lower_char() == 0))
+	  {
+	    KeyVectorVector * suffixes = 
+	      find_all_continuations(a.target_node(),input_position,
+				     input_end_position,skip_symbols );
+	    if ( suffixes == NULL )
+	      continue;
+	    else if ( continuations == NULL ) {
+	      continuations = new KeyVectorVector;
+	    }
+	    add_prefix(a.label().upper_char(),suffixes);
+	    add_to_continuations(continuations,
+				 suffixes);
+	  }
+	else if ( (skip_symbols->find(a.label().lower_char()) != 
+		   skip_symbols->end())) {
 	  KeyVectorVector * suffixes = 
 	    find_all_continuations(a.target_node(),input_position,
-				   input_end_position, skip_symbols );
+				   input_end_position,skip_symbols );
 	  if ( suffixes == NULL )
 	    continue;
 	  else if ( continuations == NULL ) {
 	    continuations = new KeyVectorVector;
 	  }
-	  add_prefix(a.label().upper_char(),suffixes);
+	  if ((skip_symbols->find(a.label().upper_char()) != 
+	       skip_symbols->end()))
+	    {
+	      add_prefix(a.label().lower_char(),suffixes);
+	    }
+	  else
+	    {
+	      add_prefix(a.label().upper_char(),suffixes);
+	      add_prefix(a.label().lower_char(),suffixes);
+	    }
 	  add_to_continuations(continuations,
 			       suffixes);
-	} 
+	}
       }
       if ( not n->is_final() )
 	return continuations;
@@ -204,9 +226,22 @@ KeyVectorVector * reverse( KeyVectorVector * key_strings ) {
 			     suffixes);
       }
   
-      if ( (a.label().lower_char() == 0) or
-	   (skip_symbols->find(a.label().lower_char()) != 
-	    skip_symbols->end())) {
+      if ( (a.label().lower_char() == 0))
+	{
+	  KeyVectorVector * suffixes = 
+	  find_all_continuations(a.target_node(),input_position,
+				 input_end_position,skip_symbols );
+	  if ( suffixes == NULL )
+	    continue;
+	  else if ( continuations == NULL ) {
+	    continuations = new KeyVectorVector;
+	  }
+	  add_prefix(a.label().upper_char(),suffixes);
+	  add_to_continuations(continuations,
+			       suffixes);
+	}
+      else if ( (skip_symbols->find(a.label().lower_char()) != 
+		 skip_symbols->end())) {
 	KeyVectorVector * suffixes = 
 	  find_all_continuations(a.target_node(),input_position,
 				 input_end_position,skip_symbols );
@@ -215,10 +250,20 @@ KeyVectorVector * reverse( KeyVectorVector * key_strings ) {
 	else if ( continuations == NULL ) {
 	  continuations = new KeyVectorVector;
 	}
-	add_prefix(a.label().upper_char(),suffixes);
+	if ((skip_symbols->find(a.label().upper_char()) != 
+	     skip_symbols->end()))
+	  {
+	    add_prefix(a.label().lower_char(),suffixes);
+	  }
+	else
+	  {
+	    add_prefix(a.label().upper_char(),suffixes);
+	    add_prefix(a.label().lower_char(),suffixes);
+	  }
 	add_to_continuations(continuations,
 			     suffixes);
       }
+      
     }
     
     return continuations;
