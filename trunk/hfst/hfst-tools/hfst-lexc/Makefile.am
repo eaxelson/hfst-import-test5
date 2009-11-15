@@ -2,7 +2,7 @@
 ## Author: Tommi A Pirinen <tommi.pirinen@helsinki.fi>
 ## Licence: GPL v3 (not newer)
 
-SUBDIRS = src test man po
+SUBDIRS = src test man
 EXTRA_DIST = HACKING
 ACLOCAL_AMFLAGS=-I m4
 
