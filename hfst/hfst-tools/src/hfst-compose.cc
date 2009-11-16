@@ -51,6 +51,7 @@ static bool is_output_stdout = true;
 
 static bool use_numbers=false;
 static bool write_symbol_table=true;
+static bool handle_flag_diacritics=false;
 static const char *write_symbols_to;
 
 
@@ -62,6 +63,7 @@ print_usage(const char *program_name)
 		   "Compose two transducers\n"
 		"\n", program_name );
 		print_common_program_options(message_out);
+		fprintf(message_out, "%-35s%s", "  -F, --flag-diacritics",  "Handle flag diacritics\n");
 		print_common_binary_program_options(message_out);
 		fprintf(message_out, "\n");
 #               if DEBUG
@@ -112,10 +114,11 @@ parse_options(int argc, char** argv)
 			{"number", no_argument, 0, 'n'},
 			{"output", required_argument, 0, 'o'},
 			{"write-symbols-to", required_argument, 0, 'W'},
+		        {"flag-diacritics",no_argument, 0, 'F'},
 			{0,0,0,0}
 		};
 		int option_index = 0;
-		char c = getopt_long(argc, argv, "1:2:dDhno:qsvVW:",
+		char c = getopt_long(argc, argv, "1:2:dDhno:qsvVW:F",
 							 long_options, &option_index);
 		if (-1 == c)
 		{
@@ -177,6 +180,9 @@ parse_options(int argc, char** argv)
 			break;
 		case 'W':
 			write_symbols_to = hfst_strdup(optarg);
+			break;
+		case 'F':
+		        handle_flag_diacritics = true;
 			break;
 		case '?':
 			fprintf(message_out, "invalid option --%s\n", 
@@ -345,6 +351,10 @@ compose_streams(std::istream& upperstream, std::istream& lowerstream, std::ostre
 	int format_type = get_compatible_fst_format(upperstream, lowerstream);
 	size_t nth_stream = 0;
     
+	if (handle_flag_diacritics)
+	  {
+	    VERBOSE_PRINT("Minding flag diacritics in argument transducers.");
+	  }
 	if (format_type == SFST_FORMAT)
 	{
 		VERBOSE_PRINT("Using unweighted format\n");
@@ -402,7 +412,17 @@ compose_streams(std::istream& upperstream, std::istream& lowerstream, std::ostre
 				{
 					VERBOSE_PRINT("Compos... %zu...\r", nth_stream);
 				}
-				HFST::TransducerHandle comp = HFST::compose(HFST::copy(upper), HFST::copy(lower), true );
+				HFST::TransducerHandle comp;
+				if (not handle_flag_diacritics)
+				  {
+				    comp = HFST::compose(HFST::copy(upper), HFST::copy(lower), true );
+				  }
+				else
+				  {
+				    std::vector<HFST::TransducerHandle> lower_fst_vector(1,HFST::copy(lower));
+				    comp = HFST::intersecting_composition(HFST::copy(upper),
+									  &lower_fst_vector,key_table);
+				  }
 				if (write_symbol_table && !use_numbers)
 				  HFST::write_transducer(comp, key_table, outstream);
 				else
@@ -481,8 +501,17 @@ compose_streams(std::istream& upperstream, std::istream& lowerstream, std::ostre
 				{
 					VERBOSE_PRINT("Compos... %zu...\r", nth_stream);
 				}
-				HWFST::TransducerHandle comp = 
-				  HWFST::compose(HWFST::copy(upper), HWFST::copy(lower), true);
+				HWFST::TransducerHandle comp;
+				if (not handle_flag_diacritics)
+				  {
+				    comp = HWFST::compose(HWFST::copy(upper), HWFST::copy(lower), true );
+				  }
+				else
+				  {
+				    std::vector<HWFST::TransducerHandle> lower_fst_vector(1,HWFST::copy(lower));
+				    comp = HWFST::intersecting_composition(HWFST::copy(upper),
+									  &lower_fst_vector,key_table);
+				  }
 				if (write_symbol_table && !use_numbers)
 				  HWFST::write_transducer(comp, key_table, outstream);
 				else
