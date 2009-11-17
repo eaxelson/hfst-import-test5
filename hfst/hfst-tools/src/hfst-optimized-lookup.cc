@@ -355,8 +355,11 @@ void runTransducer (genericTransducer T)
       str = old_str;
       if (failed)
       	{ // tokenization failed
-	  std::cout << str << "\t" << str << "\t" << "+?" << std::endl;
-	  std::cout << std::endl;
+	  if (outputType == xerox)
+	    {
+	      std::cout << str << "\t" << str << "\t+?" << std::endl;
+	      std::cout << std::endl;
+	    }
       	  continue;
       	}
       ++input_form_counter;
@@ -853,6 +856,11 @@ Transducer::get_analyses(SymbolNumber * input_symbol,
 
 void Transducer::printAnalyses(std::string prepend)
 {
+  if (outputType == xerox && display_vector.size() == 0)
+    {
+      std::cout << prepend << "\t" << prepend << "\t+?" << std::endl;
+      return;
+    }
   int i = 0;
   DisplayVector::iterator it = display_vector.begin();
   while ( (it != display_vector.end()) && i < maxAnalyses )
@@ -871,6 +879,11 @@ void Transducer::printAnalyses(std::string prepend)
 
 void TransducerUniq::printAnalyses(std::string prepend)
 {
+  if (outputType == xerox && display_vector.size() == 0)
+    {
+      std::cout << prepend << "\t" << prepend << "\t+?" << std::endl;
+      return;
+    }
   int i = 0;
   DisplaySet::iterator it = display_vector.begin();
   while ( (it != display_vector.end()) && i < maxAnalyses)
@@ -889,6 +902,11 @@ void TransducerUniq::printAnalyses(std::string prepend)
 
 void TransducerFdUniq::printAnalyses(std::string prepend)
 {
+  if (outputType == xerox && display_vector.size() == 0)
+    {
+      std::cout << prepend << "\t" << prepend << "\t+?" << std::endl;
+      return;
+    }
   int i = 0;
   DisplaySet::iterator it = display_vector.begin();
   while ( (it != display_vector.end()) && i < maxAnalyses)
@@ -1316,6 +1334,11 @@ void TransducerWFdUniq::note_analysis(SymbolNumber * whole_output_string)
 
 void TransducerW::printAnalyses(std::string prepend)
 {
+  if (outputType == xerox && display_map.size() == 0)
+    {
+      std::cout << prepend << "\t" << prepend << "\t+?" << std::endl;
+      return;
+    }
   int i = 0;
   DisplayMultiMap::iterator it = display_map.begin();
   while ( (it != display_map.end()) && (i < maxAnalyses))
@@ -1339,6 +1362,11 @@ void TransducerW::printAnalyses(std::string prepend)
 
 void TransducerWUniq::printAnalyses(std::string prepend)
 {
+  if (outputType == xerox && display_map.size() == 0)
+    {
+      std::cout << prepend << "\t" << prepend << "\t+?" << std::endl;
+      return;
+    }
   int i = 0;
   std::multimap<Weight, std::string> weight_sorted_map;
   DisplayMap::iterator it = display_map.begin();
@@ -1369,6 +1397,11 @@ void TransducerWUniq::printAnalyses(std::string prepend)
 
 void TransducerWFdUniq::printAnalyses(std::string prepend)
 {
+  if (outputType == xerox && display_map.size() == 0)
+    {
+      std::cout << prepend << "\t" << prepend << "\t+?" << std::endl;
+      return;
+    }
   int i = 0;
   std::multimap<Weight, std::string> weight_sorted_map;
   DisplayMap::iterator it;
