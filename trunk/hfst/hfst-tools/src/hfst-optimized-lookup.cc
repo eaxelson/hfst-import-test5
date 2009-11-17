@@ -355,6 +355,8 @@ void runTransducer (genericTransducer T)
       str = old_str;
       if (failed)
       	{ // tokenization failed
+	  std::cout << str << "\t" << str << "\t" << "+?" << std::endl;
+	  std::cout << std::endl;
       	  continue;
       	}
       ++input_form_counter;
