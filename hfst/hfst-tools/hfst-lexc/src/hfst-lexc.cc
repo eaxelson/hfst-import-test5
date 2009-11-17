@@ -221,7 +221,7 @@ parse_options(int argc, char** argv)
 	}
 	else
 	{
-		outfilename = _("<stdout>");
+		outfilename = "<stdout>";
 		outfile = stdout;
 		isOutfileStdout = true;
 		message_out = stderr;
@@ -238,7 +238,7 @@ print_usage()
 {
 	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
 	lexc_printf(PRINT_ALWAYS, 0,
-			_("Usage: %s [OPTIONS] [INFILE...]\n"
+			"Usage: %s [OPTIONS] [INFILE...]\n"
 		   "Compile lexc files into an HFST transducer\n"
 		   "\n"
 		   "  -h, --help                   Print this help message\n"
@@ -270,7 +270,7 @@ print_usage()
 		   "default options\n"
 		   "  hfst-lexc -w -v -o file.hwfst file1.hlexc file2.hlexc  compile weighted lexicons from multiple sources\n"
 		   "\n"
-		   "Report bugs to HFST team <hfst-bugs@helsinki.fi>\n"),
+		   "Report bugs to HFST team <hfst-bugs@helsinki.fi>\n",
 		   PACKAGE);
 }
 
@@ -281,12 +281,12 @@ print_version()
 {
 	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dversion
 	lexc_printf(PRINT_ALWAYS, 0,
-			_("%s\n"
+			"%s\n"
 		"copyright (C) 2009 University of Helsinki,\n"
 		"License GPLv3: GNU GPL version 3 "
 		"<http://gnu.org/licenses/gpl.html>\n"
 		"This is free software: you are free to change and redistribute it.\n"
-		"There is NO WARRANTY, to the extent permitted by law.\n"),
+		"There is NO WARRANTY, to the extent permitted by law.\n",
 		PACKAGE_STRING);
 }
 
@@ -296,7 +296,7 @@ void
 print_short_help()
 {
 	lexc_printf(PRINT_ALWAYS, 0, 
-			_("Try ``%s --help'' for more information.\n"), "hfst-lexc");
+			"Try ``%s --help'' for more information.\n", "hfst-lexc");
 }
 
 
@@ -310,16 +310,16 @@ cli_main(int argc, char* argv[])
 		return exitCode;
 	}
 	// Be informative
-	lexc_printf(PRINT_VERBOSE, 0, _("printing verbosely\n"));
-	lexc_printf(PRINT_DEBUG, 0, _("debug enabled\n"));
-	lexc_printf(PRINT_TIMING, 0, _("timing enabled\n"));
+	lexc_printf(PRINT_VERBOSE, 0, "printing verbosely\n");
+	lexc_printf(PRINT_DEBUG, 0, "debug enabled\n");
+	lexc_printf(PRINT_TIMING, 0, "timing enabled\n");
 	if (weighted)
 	{
-		lexc_printf(PRINT_VERBOSE, 0, _("building weighted transducer\n"));
+		lexc_printf(PRINT_VERBOSE, 0, "building weighted transducer\n");
 	}
 	else
 	{
-		lexc_printf(PRINT_VERBOSE, 0, _("building unweighted transducer\n"));
+		lexc_printf(PRINT_VERBOSE, 0, "building unweighted transducer\n");
 	}
 	// initialise rest, as we now know weightedness
 	lexc = new LexcCompiler();
@@ -331,14 +331,14 @@ cli_main(int argc, char* argv[])
 		token_reset_positions();
 		if ((isInfilesStdin) || (infilenames[i] == "-"))
 		{
-			lexc_printf(PRINT_VERBOSE, 0, _("\nReading from <stdin>\n"));
-			set_infile_name(_("<stdin>"));
+			lexc_printf(PRINT_VERBOSE, 0, "\nReading from <stdin>\n");
+			set_infile_name("<stdin>");
 			hlexcin = stdin;
 			hlexcparse();
 		}
 		else
 		{
-			lexc_printf(PRINT_VERBOSE, 0, _("\nreading from %s\n"),
+			lexc_printf(PRINT_VERBOSE, 0, "\nreading from %s\n",
 					infilenames[i].c_str());
 			set_infile_name(infilenames[i].c_str());
 			hlexcin = infiles[i];
@@ -347,22 +347,22 @@ cli_main(int argc, char* argv[])
 		}
 		if (hlexcnerrs > 0) {
 			lexc_printf(PRINT_ERROR, 8, 
-					_("There were parsing errors, aborting.\n"));
+					"There were parsing errors, aborting.\n");
 			return EXIT_FAILURE;
 		}
 	}
 	// Process the lexicons now                                                 
-	lexc_printf(PRINT_VERBOSE, 0, _("Compiling...\n"));
+	lexc_printf(PRINT_VERBOSE, 0, "Compiling...\n");
 	Xducer result = lexc->compileLexical();
 	// Write result
 	if (isOutfileStdout)
 	{
-		lexc_printf(PRINT_VERBOSE, 0, _("Saving result to standard output\n"));
+		lexc_printf(PRINT_VERBOSE, 0, "Saving result to standard output\n");
 		result.write(std::cout);
 	}
 	else
 	{
-		lexc_printf(PRINT_VERBOSE, 0, _("Saving result to %s\n"),
+		lexc_printf(PRINT_VERBOSE, 0, "Saving result to %s\n",
 				 outfilename.c_str());
 		std::filebuf fbout;
 		fbout.open(outfilename.c_str(), std::ios::out);
@@ -395,15 +395,15 @@ main(int argc, char* argv[])
 	// parse options with getopt_long; place them to global variables
 	int rv;
 	rv = cli_main(argc, argv);
-	lexc_timing_printf("grand-total", _("Whole process"));
-	lexc_timing_printf("string-compile", _(" * String parsing"));
-	lexc_timing_printf("trie-union", _(" * String trie building"));
-	lexc_timing_printf("xre-compile", _(" * Regular expression compiling"));
-	lexc_timing_printf("xre-union", _(" * Regular expression joining"));
-	lexc_timing_printf("fill-sigma", _(" * Completing sigma set"));
-	lexc_timing_printf("morphotaxing", _(" * Applying morphotax"));
-	lexc_timing_printf("determinise", _(" * All the determinising"));
-	lexc_timing_printf("minimise", _(" * All the minimising"));
+	lexc_timing_printf("grand-total", "Whole process");
+	lexc_timing_printf("string-compile", " * String parsing");
+	lexc_timing_printf("trie-union", " * String trie building");
+	lexc_timing_printf("xre-compile", " * Regular expression compiling");
+	lexc_timing_printf("xre-union", " * Regular expression joining");
+	lexc_timing_printf("fill-sigma", " * Completing sigma set");
+	lexc_timing_printf("morphotaxing", " * Applying morphotax");
+	lexc_timing_printf("determinise", " * All the determinising");
+	lexc_timing_printf("minimise", " * All the minimising");
 	destructLexcSymbolTablesAndSets();
 	return rv;
 }

@@ -124,21 +124,21 @@ lexc_fopen(const char *path, const char *mode)
 		if (strcmp(mode, "r") == 0)
 		{
 			lexc_printf(PRINT_ERROR, 1,
-						_("could not open %s for reading: %s\n"),
+						"could not open %s for reading: %s\n",
 						path, strerror(errno));
 			return NULL;
 		}
 		else if (strcmp(mode, "w") == 0)
 		{
 			lexc_printf(PRINT_ERROR, 2,
-						_("could not open %s for writing: %s\n"),
+						"could not open %s for writing: %s\n",
 						path, strerror(errno));
 			return NULL;
 		}
 		else
 		{
 			lexc_printf(PRINT_ERROR, 1,
-						_("could not open %s: %s\n"),
+						"could not open %s: %s\n",
 						path, strerror(errno));
 			return NULL;
 		}
@@ -151,16 +151,16 @@ lexc_printf(unsigned int log_level, unsigned int id,
 		const char* format, ...)
 {
 	char* real_format = (char*)malloc(sizeof(char)*(strlen(format) +
-				strlen(_("w%d: %s\n")) + 1));
+				strlen("w%d: %s\n") + 1));
 	if (verbosity & log_level)
 	{
 		if (log_level & PRINT_WARNING_LEADER)
 		{
-			sprintf(real_format, _("W%d: %s"), id, format);
+			sprintf(real_format, "W%d: %s", id, format);
 		}
 		else if (log_level & PRINT_ERROR_LEADER)
 		{
-			sprintf(real_format, _("E%d: %s"), id, format);
+			sprintf(real_format, "E%d: %s", id, format);
 		}
 		else
 		{
@@ -188,13 +188,13 @@ lexc_parser_printf(unsigned int log_level, unsigned int warn_id,
 				 strlen(error_token) + 30));
 		if (log_level & PRINT_WARNING_LEADER)
 		{
-			(void)sprintf(real_format, _("%s: W%d: %s %s\n"), 
+			(void)sprintf(real_format, "%s: W%d: %s %s\n", 
 					filename_part, warn_id,
 					format, error_token);
 		}
 		else if (log_level & PRINT_ERROR_LEADER)
 		{
-			(void)sprintf(real_format, _("%s: E%d: %s %s\n"), 
+			(void)sprintf(real_format, "%s: E%d: %s %s\n", 
 					filename_part, warn_id,
 					format, error_token);
 		}
@@ -218,7 +218,7 @@ lexc_parser_printf(unsigned int log_level, unsigned int warn_id,
 bool
 lexc_print_list_start(const char *text)
 {
-	lexc_printf(PRINT_UNQUIET, 0, _("%s:\n"), text);
+	lexc_printf(PRINT_UNQUIET, 0, "%s:\n", text);
 	hlexc_list_first = true;
 	return true;
 }
@@ -233,7 +233,7 @@ lexc_list_printf(const char *format, ...)
 	}
 	else
 	{
-		(void)sprintf(real_format, _(", %s"), format);
+		(void)sprintf(real_format, ", %s", format);
 	}
 	va_list ap;
 	va_start(ap, format);
@@ -252,11 +252,11 @@ lexc_print_list_end(const char* text)
 	{
 		if (text != NULL)
 		{
-			lexc_printf(PRINT_UNQUIET, 0, _("%s\n"), text);
+			lexc_printf(PRINT_UNQUIET, 0, "%s\n", text);
 		}
 		else
 		{
-			lexc_printf(PRINT_UNQUIET, 0, _("\n"));
+			lexc_printf(PRINT_UNQUIET, 0, "\n");
 		}
 		hlexc_list_end = true;
 		hlexc_list_first = true;
@@ -299,7 +299,7 @@ lexc_timer_end(const char* name)
 	{
 		// TRANSLATORS: timing description, time, s for seconds
 		(void)fprintf(message_out,
-				_("%s: %f s\n"), name, 
+				"%s: %f s\n", name, 
 				static_cast<double>((timings_ends[name] - timings_starts[name]))/CLOCKS_PER_SEC);
 	}
 	timings_starts[name] = clock();
@@ -321,7 +321,7 @@ lexc_timing_printf(const char* name, const char* format, ...)
 				30);
 		// TRANSLATORS: timing description, time, s for seconds
 		(void)sprintf(real_format,
-				_("%s: %f s\n"), format, 
+				"%s: %f s\n", format, 
 				static_cast<double>(timings_accumulated[name])/CLOCKS_PER_SEC);
 		va_list ap;
 		va_start(ap, format);
