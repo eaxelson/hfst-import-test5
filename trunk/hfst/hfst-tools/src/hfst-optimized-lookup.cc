@@ -360,7 +360,6 @@ void runTransducer (genericTransducer T)
       ++input_form_counter;
       input_string[i] = NO_SYMBOL_NUMBER;
       T.analyze(input_string);
-      std::cout << std::endl;
       T.printAnalyses(std::string(str));
     }
 }
