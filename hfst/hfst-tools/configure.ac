@@ -10,6 +10,19 @@ AM_INIT_AUTOMAKE([-Wall foreign dist-bzip2 std-options])
 AC_REVISION([$Revision: 1.9 $])
 AC_CONFIG_SUBDIRS([hfst-lexc hfst-twolc])
 
+# test for this here so twolc and lexc don't have to
+# if flex 3.X ever comes out, this breaks :)
+AC_PROG_LEX
+LEX_VERSION=`$LEX --version`
+if test -z "`echo "$LEX_VERSION" | grep 'flex 2\.[[5-9]]\.[[3-9][4-9]]'`"
+then
+	AC_MSG_WARN([
+!! Building hfst successfully requires flex newer than
+!! 2.5.33 on some platforms. Unless you're building with
+!! pre-flex-generated sources, building will probably fail.])
+fi
+
+
 ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
 
 AC_DEFINE([NESTED_BUILD], [1], [We're doing a nested build, headers aren't always where we expect them to be])
