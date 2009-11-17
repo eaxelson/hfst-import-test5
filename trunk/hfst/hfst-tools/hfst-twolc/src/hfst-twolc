@@ -1,4 +1,0 @@
-#!/bin/bash
-/usr/local/bin/htwolcpre $@  |
-/usr/local/bin/htwolcpre2 $@ |
-/usr/local/bin/htwolcpre3 $@
