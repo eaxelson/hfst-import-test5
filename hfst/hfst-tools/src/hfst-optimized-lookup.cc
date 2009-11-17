@@ -323,10 +323,6 @@ void runTransducer (genericTransducer T)
   int input_form_counter = 0;
   while(std::cin.getline(str,MAX_IO_STRING))
     {
-      if (strlen(str) == 0)
-	{ // for technical reasons we don't support analysing empty inputs
-	  continue;
-	}
       if (echoInputsFlag)
 	{
 	  std::cout << str << std::endl;
@@ -859,6 +855,7 @@ void Transducer::printAnalyses(std::string prepend)
   if (outputType == xerox && display_vector.size() == 0)
     {
       std::cout << prepend << "\t" << prepend << "\t+?" << std::endl;
+      std::cout << std::endl;
       return;
     }
   int i = 0;
@@ -882,6 +879,7 @@ void TransducerUniq::printAnalyses(std::string prepend)
   if (outputType == xerox && display_vector.size() == 0)
     {
       std::cout << prepend << "\t" << prepend << "\t+?" << std::endl;
+      std::cout << std::endl;
       return;
     }
   int i = 0;
@@ -905,6 +903,7 @@ void TransducerFdUniq::printAnalyses(std::string prepend)
   if (outputType == xerox && display_vector.size() == 0)
     {
       std::cout << prepend << "\t" << prepend << "\t+?" << std::endl;
+      std::cout << std::endl;
       return;
     }
   int i = 0;
@@ -1337,6 +1336,7 @@ void TransducerW::printAnalyses(std::string prepend)
   if (outputType == xerox && display_map.size() == 0)
     {
       std::cout << prepend << "\t" << prepend << "\t+?" << std::endl;
+      std::cout << std::endl;
       return;
     }
   int i = 0;
@@ -1365,6 +1365,7 @@ void TransducerWUniq::printAnalyses(std::string prepend)
   if (outputType == xerox && display_map.size() == 0)
     {
       std::cout << prepend << "\t" << prepend << "\t+?" << std::endl;
+      std::cout << std::endl;
       return;
     }
   int i = 0;
@@ -1400,6 +1401,7 @@ void TransducerWFdUniq::printAnalyses(std::string prepend)
   if (outputType == xerox && display_map.size() == 0)
     {
       std::cout << prepend << "\t" << prepend << "\t+?" << std::endl;
+      std::cout << std::endl;
       return;
     }
   int i = 0;
