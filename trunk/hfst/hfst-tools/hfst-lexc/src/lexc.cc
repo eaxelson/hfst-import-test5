@@ -94,7 +94,7 @@ LexcCompiler::addStringEntry(const string& data,
 	{
 		if (sigma_.find(*x) == sigma_.end())
 		{
-			lexc_printf(PRINT_DEBUG, 0, _("Found Xymbol %s from %s\n"),
+			lexc_printf(PRINT_DEBUG, 0, "Found Xymbol %s from %s\n",
 					x->getName().c_str(),
 					data.c_str());
 			addAlphabet(x->getName());
@@ -139,7 +139,7 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
 	{
 		if (sigma_.find(*x) == sigma_.end())
 		{
-			lexc_printf(PRINT_DEBUG, 0, _("Found Xymbol %s from %s\n"),
+			lexc_printf(PRINT_DEBUG, 0, "Found Xymbol %s from %s\n",
 					x->getName().c_str(),
 					upper.c_str());
 			addAlphabet(x->getName());
@@ -156,7 +156,7 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
 	{
 		if (sigma_.find(*x) == sigma_.end())
 		{
-			lexc_printf(PRINT_DEBUG, 0,  _("Found Xymbol %s from %s\n"),
+			lexc_printf(PRINT_DEBUG, 0,  "Found Xymbol %s from %s\n",
 					x->getName().c_str(),
 					lower.c_str());
 			addAlphabet(x->getName());
@@ -214,7 +214,7 @@ LexcCompiler::addXreEntry(const string& regexp, const string& continuation,
 	{
 		if (sigma_.find(*x) == sigma_.end())
 		{
-			lexc_printf(PRINT_DEBUG, 0, _("Found Xymbol %s from %s\n"),
+			lexc_printf(PRINT_DEBUG, 0, "Found Xymbol %s from %s\n",
 					x->getName().c_str(),
 					regexp.c_str());
 			addAlphabet(x->getName());
@@ -347,12 +347,12 @@ LexcCompiler::compileMorphotax()
 const Xducer&
 LexcCompiler::compileLexical()
 {
-	lexc_printf(PRINT_XEROXLIKE, 0, _("Building lexicon..."));
+	lexc_printf(PRINT_XEROXLIKE, 0, "Building lexicon...");
 	
 	if (verbosity & PRINT_DEBUG)
 	{
-		lexc_xymbol_set_printf(sigma_, _("sigma\n"));
-		lexc_xymbol_set_printf(gamma_, _("gamma\n"));
+		lexc_xymbol_set_printf(sigma_, "sigma\n");
+		lexc_xymbol_set_printf(gamma_, "gamma\n");
 	}
 	printConnectedness();
 	lexical_.makeEmpty();
@@ -367,32 +367,32 @@ LexcCompiler::compileLexical()
 			stringTrie_.substitute(XymbolPair(*x, Xymbol("#")),
 				XymbolPair(*x, Xymbol("@#@")));
 		}
-		lexc_xducer_printf(stringTrie_, _("Strings trie\n"));
+		lexc_xducer_printf(stringTrie_, "Strings trie\n");
 		lexical_.disjunct(stringTrie_);
 	}
 	if (hasRegExps_)
 	{
-		lexc_xducer_printf(regexpUnion_, _("RegExps\n"));
+		lexc_xducer_printf(regexpUnion_, "RegExps\n");
 		lexical_.disjunct(regexpUnion_);
 	}
 	lexc_timer_start("determinise");
 	lexical_.determinise();
 	lexc_timer_end("determinise");
-	lexc_xducer_printf(lexical_, _("Strings or RegExps\n"));
+	lexc_xducer_printf(lexical_, "Strings or RegExps\n");
 	// for each initial joiner target find final joiner and attach
 	lexc_timer_start("morphotaxing");
 	lexical_.removeLexcJoiners(initialLexiconName_.first,
 			finalContinuation_.first);
 	lexc_timer_end("morphotaxing");
-	lexc_printf(PRINT_XEROXLIKE, 0, _("Minimizing..."));
+	lexc_printf(PRINT_XEROXLIKE, 0, "Minimizing...");
 	lexc_timer_start("determinise");
 	lexical_.determinise();
 	lexc_timer_end("determinise");
 	lexc_timer_start("minimise");
 	lexical_.minimise();
 	lexc_timer_end("minimise");
-	lexc_xducer_printf(lexical_, _("Morphotaxed\n"));
-	lexc_printf(PRINT_XEROXLIKE, 0, _("Done!\n"));
+	lexc_xducer_printf(lexical_, "Morphotaxed\n");
+	lexc_printf(PRINT_XEROXLIKE, 0, "Done!\n");
 	return lexical_;
 }
 
@@ -439,7 +439,7 @@ LexcCompiler::printConnectedness() const
 					"used without corresponding lexicon defined\n");
 			if (verbosity & PRINT_VERBOSE)
 			{
-				lexc_print_list_start("Entries with these continuations"
+				lexc_print_list_start("Entries with these continuations "
 						"have been DISCARDED");
 			}
 			for (vector<string>::iterator s = contMinusLex.begin();
