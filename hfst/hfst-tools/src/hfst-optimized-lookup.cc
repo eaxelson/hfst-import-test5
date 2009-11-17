@@ -311,7 +311,7 @@ template <class genericTransducer>
 void runTransducer (genericTransducer T)
 {
   SymbolNumber * input_string = (SymbolNumber*)(malloc(2000));
-  for (size_t i = 0; i < 1000; ++i)
+  for (int i = 0; i < 1000; ++i)
     {
       input_string[i] = NO_SYMBOL_NUMBER;
     }
@@ -320,7 +320,7 @@ void runTransducer (genericTransducer T)
   *str = 0;
   char * old_str = str;
 
-  size_t input_form_counter = 0;
+  int input_form_counter = 0;
   while(std::cin.getline(str,MAX_IO_STRING))
     {
       if (strlen(str) == 0)
@@ -331,7 +331,7 @@ void runTransducer (genericTransducer T)
 	{
 	  std::cout << str << std::endl;
 	}
-      size_t i = 0;
+      int i = 0;
       SymbolNumber k = NO_SYMBOL_NUMBER;
       bool failed = false;
       for ( char ** Str = &str; **Str != 0; )
@@ -514,7 +514,7 @@ bool Transition::matches(SymbolNumber s)
 
 void IndexTableReader::get_index_vector(void)
 {
-  for (size_t i = 0;
+  for (int i = 0;
        i < number_of_table_entries;
        ++i)
     {

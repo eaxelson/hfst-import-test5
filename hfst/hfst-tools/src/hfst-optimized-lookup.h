@@ -561,7 +561,7 @@ class Transducer
     indices(index_reader()),
     transitions(transition_reader())
       {
-	for (size_t i = 0; i < 1000; ++i)
+	for (int i = 0; i < 1000; ++i)
 	  {
 	    output_string[i] = NO_SYMBOL_NUMBER;
 	  }
@@ -689,8 +689,7 @@ class TransitionWIndex
       {
 	return false;
       }
-    Weight w = static_cast<Weight>(first_transition_index);
-    return w != INFINITE_WEIGHT;
+    return first_transition_index != NO_TABLE_INDEX;
   }
   
   Weight final_weight(void)
@@ -958,7 +957,7 @@ class TransducerW
     transitions(transition_reader()),
     current_weight(0.0)
       {
-	for (size_t i = 0; i < 1000; ++i)
+	for (int i = 0; i < 1000; ++i)
 	  {
 	    output_string[i] = NO_SYMBOL_NUMBER;
 	  }
