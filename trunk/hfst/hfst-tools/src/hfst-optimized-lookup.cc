@@ -239,13 +239,13 @@ void TransducerAlphabet::get_next_symbol(FILE * f, SymbolNumber k)
 	  ++val_num;
 	}
       operations.push_back(FlagDiacriticOperation(op, feature_bucket[feat], value_bucket[val]));
-      kt->operator[](k) = "";
+      kt->operator[](k) = strdup("");
 #if DEBUG_DIACRITICS
       kt->operator[](k) = strdup(line);
 #endif
       return;
     }
-  operations.push_back(FlagDiacriticOperation(P, NO_SYMBOL_NUMBER, 0));
+  operations.push_back(FlagDiacriticOperation());
   kt->operator[](k) = strdup(line);
 }
 
@@ -612,24 +612,32 @@ void TransducerFd::try_epsilon_transitions(SymbolNumber * input_symbol,
 #if FULL_DEBUG
   std::cout << "try_epsilon_transitions " << i << std::endl;
 #endif
-  while (transitions[i]->get_input() == 0)
+
+  /*
+   * We treat input flag diacritics as epsilons except
+   * that we also validate the resulting state
+   */
+  while (transitions[i]->get_input() == 0 ||
+	 (*input_symbol != NO_SYMBOL_NUMBER && operations[*input_symbol].isFlag()))
     {
-      *output_symbol = transitions[i]->get_output();
-      if (operations[*output_symbol].Feature() != NO_SYMBOL_NUMBER) // this is a flag diacritic
+      if (*input_symbol != NO_SYMBOL_NUMBER && operations[*input_symbol].isFlag())
 	{ // we try to modify the state stack
-	  if (PushState(operations[*output_symbol]) == false)
+	  if (PushState(operations[*input_symbol]) == false)
 	    {
-	      ++i;	// the new state wouldn't be legal
-              continue;
-	    } else {      get_analyses(input_symbol,
-				       output_symbol+1,
-				       original_output_string,
-				       transitions[i]->target());
+	      ++i;
+	      continue; // the new state wouldn't be legal
+	    } else {
+	    *output_symbol = transitions[i]->get_output();
+	    get_analyses(input_symbol,
+			 output_symbol+1,
+			 original_output_string,
+			 transitions[i]->target());
 	    ++i;
 	    statestack.pop_back();
 	    continue;
 	  }
 	}
+      *output_symbol = transitions[i]->get_output();
       get_analyses(input_symbol,
 		   output_symbol+1,
 		   original_output_string,
@@ -696,35 +704,19 @@ void TransducerFd::find_transitions(SymbolNumber input,
 #endif
   while (transitions[i]->get_input() != NO_SYMBOL_NUMBER)
     {
-      
       if (transitions[i]->get_input() == input)
 	{
 	  *output_symbol = transitions[i]->get_output();
-	  if (operations[*output_symbol].Feature() != NO_SYMBOL_NUMBER) // this is a flag diacritic
-	    { // we try to modify the state stack
-	      if (PushState(operations[*output_symbol]) == false)
-		{
-		  return; // the new state wouldn't be legal
-		} else {
-		get_analyses(input_symbol,
-			     output_symbol+1,
-			     original_output_string,
-			     transitions[i]->target());
-		++i;
-		statestack.pop_back();
-		continue;
-	      }
-	    }
 	  get_analyses(input_symbol,
 		       output_symbol+1,
 		       original_output_string,
 		       transitions[i]->target());
+	  ++i;
 	}
       else
 	{
 	  return;
 	}
-      ++i;
     }
 }
 
@@ -848,7 +840,7 @@ Transducer::get_analyses(SymbolNumber * input_symbol,
       
       SymbolNumber input = *input_symbol;
       ++input_symbol;
-      
+
       find_index(input,
 		 input_symbol,
 		 output_symbol,
@@ -974,7 +966,11 @@ bool TransducerWFd::PushState(FlagDiacriticOperation op)
     statestack.back()[op.Feature()] = 0;
     return true;
   case U: // unification
-    if (statestack.back()[op.Feature()] == 0 || statestack.back()[op.Feature()] == op.Value())
+    if (statestack.back()[op.Feature()] == 0 || // if the feature is unset or
+	statestack.back()[op.Feature()] == op.Value() || // the feature is at this value already or
+	(statestack.back()[op.Feature()] < 0 &&
+	 (statestack.back()[op.Feature()] * -1 != op.Value())) // the feature is negatively set to something else
+	)
       {
 	statestack.push_back(statestack.back());
 	statestack.back()[op.Feature()] = op.Value();
@@ -1105,36 +1101,42 @@ void TransducerWFd::try_epsilon_transitions(SymbolNumber * input_symbol,
       return;
     }
 
-  while ((transitions[i] != NULL) and (transitions[i]->get_input() == 0))
+  /*
+   * We treat input flag diacritics as epsilons except
+   * that we also validate the resulting state
+   */
+  while (transitions[i] != NULL &&
+	 (transitions[i]->get_input() == 0 ||
+	  (*input_symbol != NO_SYMBOL_NUMBER && operations[*input_symbol].isFlag())))
     {
-      *output_symbol = transitions[i]->get_output();
-      if (operations[*output_symbol].Feature() != NO_SYMBOL_NUMBER) // this is a flag diacritic
+      if (*input_symbol != NO_SYMBOL_NUMBER && operations[*input_symbol].isFlag())
 	{ // we try to modify the state stack
-	  if (PushState(operations[*output_symbol]) == false)
+	  if (PushState(operations[*input_symbol]) == false)
 	    {
-	      return; // the new state wouldn't be legal
+	      ++i;
+	      continue; // the new state wouldn't be legal
 	    } else {
+	    *output_symbol = transitions[i]->get_output();
 	    current_weight += transitions[i]->get_weight();
 	    get_analyses(input_symbol,
-			 output_symbol+1, // output_symbol points to pre-symbol zero entry
+			 output_symbol+1,
 			 original_output_string,
 			 transitions[i]->target());
 	    ++i;
 	    statestack.pop_back();
-	    current_weight -= transitions[i]->get_weight();
 	    continue;
 	  }
 	}
-      
+      *output_symbol = transitions[i]->get_output();
       current_weight += transitions[i]->get_weight();
       get_analyses(input_symbol,
 		   output_symbol+1,
 		   original_output_string,
 		   transitions[i]->target());
-      current_weight -= transitions[i]->get_weight();
       ++i;
     }
-  *output_symbol = NO_SYMBOL_NUMBER;
+  *output_symbol = NO_SYMBOL_NUMBER;  
+
 }
 
 void TransducerW::try_epsilon_indices(SymbolNumber * input_symbol,
@@ -1208,16 +1210,16 @@ void TransducerWFd::find_transitions(SymbolNumber input,
       
       if (transitions[i]->get_input() == input)
 	{
-	  *output_symbol = transitions[i]->get_output();
-	  if (operations[*output_symbol].Feature() != NO_SYMBOL_NUMBER) // this is a flag diacritic
+	  if ((*input_symbol != NO_SYMBOL_NUMBER) && operations[*input_symbol].isFlag()) // this is a flag diacritic
 	    { // we try to modify the state stack
-	      if (PushState(operations[*output_symbol]) == false)
+	      if (PushState(operations[*input_symbol]) == false)
 		{
 		  return; // the new state wouldn't be legal
 		} else {
+		*output_symbol = transitions[i]->get_output();
 		current_weight += transitions[i]->get_weight();
 		get_analyses(input_symbol,
-			     output_symbol+1, // output_symbol points to pre-symbol zero entry
+			     output_symbol+1,
 			     original_output_string,
 			     transitions[i]->target());
 		++i;
@@ -1226,7 +1228,7 @@ void TransducerWFd::find_transitions(SymbolNumber input,
 		continue;
 	      }
 	    }
-	  
+	  *output_symbol = transitions[i]->get_output();	  
 	  current_weight += transitions[i]->get_weight();
 	  get_analyses(input_symbol,
 		       output_symbol+1,
