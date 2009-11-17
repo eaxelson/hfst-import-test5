@@ -188,6 +188,12 @@ class FlagDiacriticOperation
  public:
  FlagDiacriticOperation(FlagDiacriticOperator op, SymbolNumber feat, ValueNumber val):
   operation(op), feature(feat), value(val) {}
+
+  // dummy constructor
+ FlagDiacriticOperation():
+  operation(P), feature(NO_SYMBOL_NUMBER), value(0) {}
+  
+  bool isFlag(void) { return feature != NO_SYMBOL_NUMBER; }
   FlagDiacriticOperator Operation(void) { return operation; }
   SymbolNumber Feature(void) { return feature; }
   ValueNumber Value(void) { return value; }
@@ -215,6 +221,7 @@ class TransducerAlphabet
  TransducerAlphabet(FILE * f,SymbolNumber symbol_number):
   number_of_symbols(symbol_number),
     kt(new KeyTable),
+    operations(),
     line((char*)(malloc(1000)))
       {
 	feat_num = 0;
