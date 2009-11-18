@@ -1,4 +1,31 @@
-This is a catchall file for all hfst-related bugs.
+===================================================
+ This is a catchall file for all hfst-related bugs
+===================================================
+
+Bugs reported to hfst-bugs@helsinki.fi
+--------------------------------------
+
+- Mac OS X gettext / autopoint failures, resolved in r150 by removal of gettext
+
+- libtool version 1 vs. 2 macros, partially resolved in r127
+
+- hfst-twolc escaped and low ascii symbol issues, Resolved in r97, r125
+
+- hfst-lookup does not allow non-ascii in readline on Mac OS X, resolved in r85
+  by removal of readline
+
+- hfst-fst2string -u -n -w
+
+- hfst-lookup formats: Resolved in r63:69, r76:77
+
+- “hfst-optimized-lookup not accepting file input” Resolved in documentation
+
+Discovered bugs
+---------------
+
+- Transducer reading will segfault with files which have a header that is
+  potentially valid HFST, SFST or OpenFST transducer header but rest of the
+  file is faulty.
 
 - (FIXED in development branch)
   The currently (elsewhere) distributed German transducer, german.hfst, fails
@@ -10,6 +37,3 @@ This is a catchall file for all hfst-related bugs.
 
   The optimized lookup version, german.hfst.ol, works fine however.
 
-- Transducer reading will segfault with files which have a header that is
-  potentially valid HFST, SFST or OpenFST transducer header but rest of the
-  file is faulty.
