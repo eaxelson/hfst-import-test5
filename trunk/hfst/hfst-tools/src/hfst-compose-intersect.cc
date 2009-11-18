@@ -869,6 +869,7 @@ void compute_result(void)
 	  HFST::KeySet * rule_keys =
 	    HWFST::define_key_set(HWFST::extract_input_language
 				 (HWFST::copy(weighted_rules.at(0))));
+	  rule_keys->insert(0);
 	  for (HFST::KeySet::iterator it = rule_keys->begin();
 	       it != rule_keys->end();
 	       ++it)
@@ -888,8 +889,7 @@ void compute_result(void)
 	      *it = HWFST::minimize(*it);
 	    }
 	  delete unknown_transducer;
-	}
-
+	  }
       weighted_result =
 	HWFST::intersecting_composition(weighted_lexicon,
 					&weighted_rules,
@@ -949,6 +949,7 @@ void compute_result(void)
 	  HFST::KeySet * rule_keys =
 	    HFST::define_key_set(HFST::extract_input_language
 				 (HFST::copy(unweighted_rules.at(0))));
+	  rule_keys->insert(0);
 	  for (HFST::KeySet::iterator it = rule_keys->begin();
 	       it != rule_keys->end();
 	       ++it)
