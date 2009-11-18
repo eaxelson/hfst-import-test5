@@ -1,7 +1,7 @@
 AM_YFLAGS= -d -o y.tab.c
 AM_CXXFLAGS= -O3 -Wall -Wcast-qual -Wno-deprecated
 bin_PROGRAMS= htwolcpre htwolcpre2 htwolcpre3
-dist_bin_SCRIPTS = hfst-twolc
+bin_SCRIPTS = hfst-twolc
 EXTRA_DIST=hfst-twolc.sh
 
 # Make dested build work
