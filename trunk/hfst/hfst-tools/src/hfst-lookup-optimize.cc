@@ -29,6 +29,7 @@
 
 #include "hfst-common-unary-variables.h"
 
+
 void
 print_usage(const char *program_name)
 {
@@ -182,6 +183,12 @@ int process_stream(std::istream& inputstream, FILE * outstream)
 				{
 				        transducer_has_symbol_table = HFST::has_symbol_table(inputstream);
 					input = HFST::read_transducer(inputstream, key_table);
+					HFST::KeyTable * minimized_key_table = HFST::minimize_key_table(key_table,input);
+					HFST::KeyTable * minimized_copy = new HFST::KeyTable(*minimized_key_table);
+					input = HFST::harmonize_transducer(input,key_table,minimized_copy);
+					delete key_table;
+					delete minimized_copy;
+					key_table = minimized_key_table;
 				}
 				else
 				{
@@ -243,6 +250,12 @@ int process_stream(std::istream& inputstream, FILE * outstream)
 				{
 				        transducer_has_symbol_table = HWFST::has_symbol_table(inputstream);
 					input = HWFST::read_transducer(inputstream, key_table);
+					HFST::KeyTable * minimized_key_table = HWFST::minimize_key_table(key_table,input);
+					HFST::KeyTable * minimized_copy = new HFST::KeyTable(*minimized_key_table);
+					input = HWFST::harmonize_transducer(input,key_table,minimized_copy);
+					delete key_table;
+					delete minimized_copy;
+					key_table = minimized_key_table;
 				}
 				else {
 					fprintf(message_out, "stream format mismatch\n");
