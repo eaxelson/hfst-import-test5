@@ -2,7 +2,7 @@
 DiacriticOperators FlagDiacriticTable::diacritic_operators;
 DiacriticFeatures FlagDiacriticTable::diacritic_features;
 DiacriticValues FlagDiacriticTable::diacritic_values;
-
+DiacriticSettingMap FlagDiacriticTable::diacritic_has_value;
 bool 
 FlagDiacriticTable::is_genuine_diacritic(const std::string &diacritic_string)
 {
@@ -35,7 +35,9 @@ FlagDiacriticTable::is_genuine_diacritic(const std::string &diacritic_string)
     }
   if (diacritic_string.find_last_of('.') == 2)
     {
-      if (diacritic_string.at(1) != 'C')
+      if ((diacritic_string.at(1) != 'R') and
+	  (diacritic_string.at(1) != 'D') and
+	  (diacritic_string.at(1) != 'C'))
 	{ return false; }
     }
   return true;
@@ -76,13 +78,17 @@ void FlagDiacriticTable::split_diacritic(short diacritic_number,
   size_t last_char_pos = diacritic_string.size() - 1;
   if (second_full_stop_pos == std::string::npos)
     {
-      assert(diacritic_operators[diacritic_number] == Cop);
+      assert((diacritic_operators[diacritic_number] == Cop) or
+	     (diacritic_operators[diacritic_number] == Dop) or
+	     (diacritic_operators[diacritic_number] == Rop));
+      diacritic_has_value[diacritic_number] = false;
       diacritic_features[diacritic_number] = 
 	diacritic_string.substr(first_full_stop_pos+1,
 				last_char_pos - first_full_stop_pos - 1);
     }
   else
     {
+      diacritic_has_value[diacritic_number] = true;
       diacritic_features[diacritic_number] = 
 	diacritic_string.substr(first_full_stop_pos+1,
 				second_full_stop_pos-first_full_stop_pos - 1);
@@ -116,6 +122,11 @@ void FlagDiacriticTable::disallow(std::string &feature,
   if (feature_values[feature] == value)
     { error_flag = error_flag or feature_polarities[feature]; }
 }
+void FlagDiacriticTable::disallow(std::string &feature)
+{
+  if (feature_values.find(feature) != feature_values.end())
+    { error_flag = true; }
+}
 void FlagDiacriticTable::require(std::string &feature,
 				 std::string &value)
 {
@@ -124,8 +135,15 @@ void FlagDiacriticTable::require(std::string &feature,
       error_flag = true;
       return; 
     }
-  if (feature_values[feature] == value)
+  else if (feature_values[feature] != value)
+    { error_flag = true; }
+  else
     { error_flag = error_flag or (not feature_polarities[feature]); }
+}
+void FlagDiacriticTable::require(std::string &feature)
+{
+  if (feature_values.find(feature) == feature_values.end())
+    { error_flag = true; }
 }
 void FlagDiacriticTable::unify(std::string &feature,
 			       std::string &value)
@@ -134,7 +152,7 @@ void FlagDiacriticTable::unify(std::string &feature,
   if (feature_values.find(feature) == feature_values.end())
     { set_positive_value(feature,value); }
   // If feature set to something else negatively, set it to value.
-  if (feature_values[feature] != value)
+  else if (feature_values[feature] != value)
     { 
       if (not feature_polarities[feature])
 	{ set_positive_value(feature,value); }
@@ -167,12 +185,26 @@ void FlagDiacriticTable::insert_number(short key_number)
 			     diacritic_values[key_number]);
 	  break;
 	case Dop:
-	  disallow(diacritic_features[key_number],
-		   diacritic_values[key_number]);
+	  if (not diacritic_has_value[key_number])
+	    {
+	      disallow(diacritic_features[key_number]);
+	    }
+	  else
+	    {
+	      disallow(diacritic_features[key_number],
+		       diacritic_values[key_number]);
+	    }
 	  break;
 	case Rop:
-	  require(diacritic_features[key_number],
-		  diacritic_values[key_number]);
+	  if (not diacritic_has_value[key_number])
+	    {
+	      require(diacritic_features[key_number]);
+	    }
+	  else
+	    {
+	      require(diacritic_features[key_number],
+		      diacritic_values[key_number]);
+	    }
 	  break;
 	case Cop:
 	  clear(diacritic_features[key_number]);
