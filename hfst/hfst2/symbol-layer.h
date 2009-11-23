@@ -280,6 +280,10 @@ void write_symbol_table( KeyTable *T, ostream& os, bool binary=false );
 Flag-diacritic symbol names begin and end with an '@'. */
 KeyTable * gather_flag_diacritic_table( KeyTable * kt );
 
+/** \brief Return a key table, containing only keys in \a t. 
+
+  You need to harmonize \a t after this operation. */
+KeyTable * minimize_key_table(KeyTable * key_table,TransducerHandle t);
 //@}
 
 

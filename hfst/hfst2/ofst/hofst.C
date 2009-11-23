@@ -2041,6 +2041,20 @@ namespace HWFST {
     return new_kt;
   }
 
+  KeyTable * minimize_key_table(KeyTable * key_table, TransducerHandle t)
+  {
+    if (key_table == NULL) { return NULL; }
+    KeySet * t_keys = define_key_set(t);
+    HFST::KeyTable * new_key_table = create_key_table();
+    Key new_k = 0;
+    for (Key k = 0; k < key_table->get_unused_key(); ++k)
+      {
+	if (key_table->is_key(k))
+	  { associate_key(new_k++,new_key_table,key_table->get_key_symbol(k)); }
+      }
+    return new_key_table;
+  }
+
   TransducerHandle longest_match_tokenizer2( KeySet * keys,
 					     KeyTable * kt );
 
