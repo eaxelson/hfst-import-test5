@@ -368,7 +368,7 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 				}
 				else if (max_random_strings > 0) {
 				  VERBOSE_PRINT("Finding a maximum of %i random paths...\n", max_random_strings);
-				  HWFST::TransducerHandle paths_transducer = HWFST::find_best_paths(input, max_random_strings, false);
+				  HWFST::TransducerHandle paths_transducer = HWFST::find_random_paths(input, max_random_strings, false);
 				  paths = HWFST::find_all_paths(paths_transducer);
 				}
 				else {
