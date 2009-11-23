@@ -2,6 +2,18 @@
  This is a catchall file for all hfst-related bugs
 ===================================================
 
+Bugs w.r.t. supported Xerox tool idiosyncracies
+-----------------------------------------------
+
+The automatic handling of flag diacritics, i.e. parsing symbols of form
+@?.*@ as special epsilons with side effects is only implemented in
+hfst-compose-intersect, hfst-compose and hfst-lookup. Handling them as
+epsilons for other tools that may require them to be treated as epsilons
+does not work.
+
+The handling of # or .#. as automatic border of automaton symbol is only
+supported in hfst-twolc and hfst-compose-intersect.
+
 Bugs reported to hfst-bugs@helsinki.fi
 --------------------------------------
 
