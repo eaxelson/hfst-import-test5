@@ -1217,8 +1217,21 @@ namespace HWFST {
     return PINSTANCE_TO_HANDLE(Transducer, paths);
   }
 
-  TransducerHandle find_random_paths(TransducerHandle t, int n) {
-    return find_best_paths(t,n,false);
+  TransducerHandle find_random_paths(TransducerHandle t, int n, bool b) {
+    //return find_best_paths(t,n,false);
+    fst::StdVectorFst* pT = HANDLE_TO_PINSTANCE(fst::StdVectorFst, t);
+    fst::StdVectorFst * paths = new fst::StdVectorFst;
+    time_t timer;
+    fst::StdArcSelector selector;
+    fst::RandGenOptions<fst::StdArcSelector> opts(selector);
+    for (int i = 0; i < n; ++i)
+      {
+	fst::StdVectorFst * path = new fst::StdVectorFst;
+	fst::RandGen<StdArc,fst::StdArcSelector> (*pT,path,opts);
+	fst::Union(paths,*path);
+      }
+    t = PINSTANCE_TO_HANDLE(Transducer,paths);
+    return t;
   }
   
   typedef vector< stack<fst::StdArc> > PathVector;
