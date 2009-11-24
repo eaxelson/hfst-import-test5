@@ -470,12 +470,26 @@ void read_rules(istream &in,
 		HWFST::read_transducer(in,rule_table);
 	      if (HFST::is_symbol("@#@"))
 		{ 
+		  try {
 		  if (HFST::is_symbol(HFST::get_symbol("@#@"),
 				      rule_table))
 		    {
 		      rules_contain_word_boundary = true;
 		    }
-		}
+		  }
+		  catch (const char * p)
+		    { std::cerr << p << std::endl; }
+		  try {
+		    if (not HFST::is_symbol(HFST::get_symbol("@#@"),
+					    weighted_symbol_table))	  
+		      { HFST::associate_key
+			  (weighted_symbol_table->get_unused_key(),
+			   weighted_symbol_table,HFST::get_symbol("@#@")); }
+		  }
+		  catch (const char * p)
+		    { std::cerr << p << std::endl; }
+		  }
+		
 	      rule = HWFST::harmonize_transducer(rule,rule_table,
 						 weighted_symbol_table);
 	    }
@@ -512,6 +526,12 @@ void read_rules(istream &in,
 		    {
 		      rules_contain_word_boundary = true;
 		    }
+		  if (not HFST::is_symbol(HFST::get_symbol("@#@"),
+					  unweighted_symbol_table))	  
+		    { HFST::associate_key
+			(unweighted_symbol_table->get_unused_key(),
+			 unweighted_symbol_table,HFST::get_symbol("@#@")); }
+
 		}
 	      rule = HFST::harmonize_transducer(rule,rule_table,
 						unweighted_symbol_table);
@@ -845,10 +865,18 @@ void compute_result(void)
       // Check whether word-boundar @#@ has been mentioned in the rules.
       if (rules_contain_word_boundary)
 	{
-	  HWFST::KeyPair * word_boundary_pair =
-	    HWFST::define_keypair(HWFST::Epsilon,
-				  HWFST::get_key(HWFST::get_symbol("@#@"),
-						 weighted_symbol_table));
+	  HWFST::KeyPair * word_boundary_pair;
+	  try {
+	    word_boundary_pair =
+	      HWFST::define_keypair(HWFST::Epsilon,
+				    HWFST::get_key(HWFST::get_symbol("@#@"),
+						   weighted_symbol_table));
+	  }
+	  catch (const char * p)
+	    {
+	      std::cerr << p << std::endl;
+	      exit(1);
+	    }
 	  weighted_lexicon =
 	    HWFST::concatenate
 	    (HWFST::define_transducer(word_boundary_pair),
@@ -858,8 +886,10 @@ void compute_result(void)
 	  weighted_lexicon = HWFST::minimize(weighted_lexicon);
 	  delete word_boundary_pair;
 	}
-      if (HFST::is_symbol("@?@"))
+      if (HFST::is_symbol("@?@") and (HFST::is_symbol(HFST::get_symbol("@?@"),
+						      weighted_symbol_table)))
 	{
+	  try {
 	  HFST::KeyPair 
 	    unknown_keypair(HFST::get_key(HFST::get_symbol("@?@"),
 					  weighted_symbol_table));
@@ -890,6 +920,11 @@ void compute_result(void)
 	    }
 	  delete unknown_transducer;
 	  }
+	  catch (const char * p)
+	    { std::cerr << p << std::endl; exit(1); }
+	}
+
+
       weighted_result =
 	HWFST::intersecting_composition(weighted_lexicon,
 					&weighted_rules,
@@ -938,7 +973,8 @@ void compute_result(void)
 	  delete word_boundary_pair;
 	}
       // Handle unknown lexicon symbols.
-      if (HFST::is_symbol("@?@"))
+      if (HFST::is_symbol("@?@") and (HFST::is_symbol(HFST::get_symbol("@?@"),
+						      weighted_symbol_table)))
 	{
 	  HFST::KeyPair 
 	    unknown_keypair(HFST::get_key(HFST::get_symbol("@?@"),
