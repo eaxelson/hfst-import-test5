@@ -410,11 +410,24 @@ compose_streams(std::istream& upperstream, std::istream& lowerstream, std::ostre
 				}
 				else
 				{
-					VERBOSE_PRINT("Compos... %zu...\r", nth_stream);
+					VERBOSE_PRINT("Composing... %zu...\r", nth_stream);
 				}
 				HFST::TransducerHandle comp;
 				if (not handle_flag_diacritics)
 				  {
+				    if (verbose)
+				      {
+					HFST::KeyTable * flag_table =
+					  HFST::gather_flag_diacritic_table
+					  (key_table);
+					if (flag_table->get_unused_key() 
+					    !=0)
+					  { VERBOSE_PRINT("Warning! "
+   "Transducers contain flag diacritics which may be filtered!\n"
+   "(Use option -F)\n");
+					  }
+					delete flag_table;
+				      }
 				    comp = HFST::compose(HFST::copy(upper), HFST::copy(lower), true );
 				  }
 				else
@@ -504,6 +517,19 @@ compose_streams(std::istream& upperstream, std::istream& lowerstream, std::ostre
 				HWFST::TransducerHandle comp;
 				if (not handle_flag_diacritics)
 				  {
+				    if (verbose)
+				      {
+					HFST::KeyTable * flag_table =
+					  HFST::gather_flag_diacritic_table
+					  (key_table);
+					if (flag_table->get_unused_key() 
+					    !=0)
+					  { VERBOSE_PRINT("Warning! "
+   "Transducers contain flag diacritics which may be filtered!\n"
+   "(Use option -F)\n");
+					  }
+					delete flag_table;
+				      }
 				    comp = HWFST::compose(HWFST::copy(upper), HWFST::copy(lower), true );
 				  }
 				else
