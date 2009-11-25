@@ -414,7 +414,7 @@ LexcCompiler::compileLexical()
 	lexical_.removeLexcJoiners(initialLexiconName_.first,
 			finalContinuation_.first);
 	lexc_timer_end("morphotaxing");
-	lexc_printf(PRINT_XEROXLIKE, 0, "Minimizing...");
+	lexc_printf(PRINT_XEROXLIKE | PRINT_VERBOSE, 0, "Minimizing...");
 	lexc_timer_start("determinise");
 	lexical_.determinise();
 	lexc_timer_end("determinise");
