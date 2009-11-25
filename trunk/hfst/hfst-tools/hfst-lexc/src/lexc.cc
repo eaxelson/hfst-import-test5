@@ -89,6 +89,7 @@ LexcCompiler::addStringEntry(const string& data,
 	XymbolVector* dataVec = xymbolVectorFromUtf8String(data);
 	lexc_timer_end("string-compile");
 	lexc_timer_start("fill-sigma");
+	unsigned int ats = 0;
 	for (XymbolVector::iterator x = dataVec->begin();
 			x != dataVec->end(); ++x)
 	{
@@ -99,7 +100,6 @@ LexcCompiler::addStringEntry(const string& data,
 					data.c_str());
 			addAlphabet(x->getName());
 		}
-		unsigned int ats = 0;
 		if (x->getName() == "@")
 		{
 			ats++;
@@ -144,6 +144,7 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
 	XymbolVector* upperVec = xymbolVectorFromUtf8String(upper);
 	lexc_timer_end("string-compile");
 	lexc_timer_start("fill-sigma");
+	unsigned int ats = 0;
 	for (XymbolVector::iterator x = upperVec->begin();
 			x != upperVec->end(); ++x)
 	{
@@ -154,7 +155,6 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
 					upper.c_str());
 			addAlphabet(x->getName());
 		}
-		unsigned int ats = 0;
 		if (x->getName() == "@")
 		{
 			ats++;
@@ -171,6 +171,7 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
 	XymbolVector* lowerVec = xymbolVectorFromUtf8String(lower);
 	lexc_timer_end("string-compile");
 	lexc_timer_start("fill-sigma");
+	ats = 0;
 	for (XymbolVector::iterator x = lowerVec->begin();
 			x != lowerVec->end(); ++x)
 	{
@@ -181,7 +182,6 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
 					lower.c_str());
 			addAlphabet(x->getName());
 		}
-		unsigned int ats = 0;
 		if (x->getName() == "@")
 		{
 			ats++;
