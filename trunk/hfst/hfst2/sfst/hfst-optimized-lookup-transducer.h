@@ -717,7 +717,6 @@ private:
       {
 	HFST::Symbol s = HFST::get_key_symbol(i,fst_key_table);
 	const char * symbol_name = HFST::get_symbol_name(s); 
-	std::cerr << symbol_name << std::endl;
       }
   }
 #endif

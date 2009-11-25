@@ -463,7 +463,7 @@ namespace HWFST {
 
   fst::StdVectorFst *determinize_and_minimize_( fst::StdVectorFst *t, bool min=true, bool destructive=true) {
     fst::RmEpsilon(t);
-    fst::EncodeMapper<fst::StdArc> mapper(3,fst::EncodeType(1)); // 3 = Labels and Weights ?, ENCODE = 1
+    fst::EncodeMapper<fst::StdArc> mapper(1,fst::EncodeType(1)); // 3 = Labels and Weights ?, ENCODE = 1
     fst::EncodeFst<fst::StdArc> TEncode(*t, &mapper);
     if (destructive)
       delete t;

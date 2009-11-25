@@ -1,6 +1,6 @@
 AUTOMAKE_OPTIONS = subdir-objects
 AM_CPPFLAGS =  -I$(top_builddir) -I$(top_builddir)/ofst -I$(top_builddir)/sfst
-AM_CXXFLAGS = -O3 -Wno-deprecated
+AM_CXXFLAGS = -Wno-deprecated
 
 lib_LTLIBRARIES = libhfst.la
 
