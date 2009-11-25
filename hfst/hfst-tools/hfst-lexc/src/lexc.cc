@@ -405,11 +405,13 @@ LexcCompiler::compileLexical()
 		lexc_xducer_printf(regexpUnion_, "RegExps\n");
 		lexical_.disjunct(regexpUnion_);
 	}
+	lexc_printf(PRINT_VERBOSE, 0, "Determinizing... ");
 	lexc_timer_start("determinise");
 	lexical_.determinise();
 	lexc_timer_end("determinise");
 	lexc_xducer_printf(lexical_, "Strings or RegExps\n");
 	// for each initial joiner target find final joiner and attach
+	lexc_printf(PRINT_VERBOSE, 0, "Rebuilding... ");
 	lexc_timer_start("morphotaxing");
 	lexical_.removeLexcJoiners(initialLexiconName_.first,
 			finalContinuation_.first);
