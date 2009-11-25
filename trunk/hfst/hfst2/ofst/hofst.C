@@ -463,16 +463,16 @@ namespace HWFST {
 
   fst::StdVectorFst *determinize_and_minimize_( fst::StdVectorFst *t, bool min=true, bool destructive=true) {
     fst::RmEpsilon(t);
-    fst::EncodeMapper<fst::StdArc> mapper(1,fst::EncodeType(1)); // 3 = Labels and Weights ?, ENCODE = 1
-    fst::EncodeFst<fst::StdArc> TEncode(*t, &mapper);
+    fst::EncodeMapper<fst::StdArc> mapper1(0x0001,fst::EncodeType(1)); // 3 = Labels and Weights ?, ENCODE = 1
+    fst::EncodeFst<fst::StdArc> TEncode1(*t, &mapper1);
     if (destructive)
       delete t;
-    fst::StdVectorFst Encoded_T(TEncode);
+    fst::StdVectorFst Encoded_T(TEncode1);
     fst::StdVectorFst *Determinized_T = new fst::StdVectorFst();
     fst::Determinize(Encoded_T, Determinized_T);
     if (min)
       fst::Minimize(Determinized_T);
-    fst::DecodeFst<fst::StdArc> D1(*Determinized_T,mapper);
+    fst::DecodeFst<fst::StdArc> D1(*Determinized_T,mapper1);
     fst::StdVectorFst *DecodedT = new fst::StdVectorFst(D1);
     delete Determinized_T;
     return DecodedT;
@@ -4866,7 +4866,7 @@ fst::StdVectorFst *make_mapping_( Ranges *l1, Ranges *l2 ) {
     // If it is, transducer is cyclic, and a NULL value is returned.
     
     if (calling_path[state_id])
-      return NULL;
+      { return NULL;  }
     
     PathVector *result = new PathVector();
     
