@@ -974,7 +974,7 @@ void compute_result(void)
 	}
       // Handle unknown lexicon symbols.
       if (HFST::is_symbol("@?@") and (HFST::is_symbol(HFST::get_symbol("@?@"),
-						      weighted_symbol_table)))
+						      unweighted_symbol_table)))
 	{
 	  HFST::KeyPair 
 	    unknown_keypair(HFST::get_key(HFST::get_symbol("@?@"),
