@@ -99,6 +99,16 @@ LexcCompiler::addStringEntry(const string& data,
 					data.c_str());
 			addAlphabet(x->getName());
 		}
+		unsigned int ats = 0;
+		if (x->getName() == "@")
+		{
+			ats++;
+			if (ats >= 2)
+			{
+				lexc_printf(PRINT_WARNING, -1, "Two @s in %s do not form "
+						"an special character\n", data.c_str());
+			}
+		}
 	}
 	lexc_timer_end("fill-sigma");
 	XymbolPairVector* morphemeVec = 
@@ -144,6 +154,16 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
 					upper.c_str());
 			addAlphabet(x->getName());
 		}
+		unsigned int ats = 0;
+		if (x->getName() == "@")
+		{
+			ats++;
+			if (ats >= 2)
+			{
+				lexc_printf(PRINT_WARNING, -1, "Two @s in %s do not form "
+						"an special character\n", upper.c_str());
+			}
+		}
 	}
 	lexc_timer_end("fill-sigma");
 	// same for lower
@@ -160,6 +180,16 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
 					x->getName().c_str(),
 					lower.c_str());
 			addAlphabet(x->getName());
+		}
+		unsigned int ats = 0;
+		if (x->getName() == "@")
+		{
+			ats++;
+			if (ats >= 2)
+			{
+				lexc_printf(PRINT_WARNING, -1, "Two @s in %s do not form "
+						"an special character\n", lower.c_str());
+			}
 		}
 	}
 	lexc_timer_end("fill-sigma");
