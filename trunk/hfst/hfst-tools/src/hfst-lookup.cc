@@ -52,6 +52,7 @@ static char* begin_format; // print before set of lookups
 static char* lookup_format; // print for each lookup
 static char* no_lookups_format; // print for zero results
 static char* end_format; // print after set of lookups
+static bool print_statistics = false;
 
 // predefined formats
 static const char* XEROX_BEGIN_FORMAT = "";
@@ -66,6 +67,12 @@ static const char* APERTIUM_BEGIN_FORMAT = "^%i";
 static const char* APERTIUM_LOOKUP_FORMAT = "/%l";
 static const char* APERTIUM_NO_LOOKUPS_FORMAT = "/*%i";
 static const char* APERTIUM_END_FORMAT = "$\n";
+
+// statistic counting
+static unsigned long inputs = 0;
+static unsigned long no_analyses = 0;
+static unsigned long analysed = 0;
+static unsigned long analyses = 0;
 
 static bool format_given = false;
 FlagDiacriticTable flag_diacritic_table;
@@ -88,7 +95,8 @@ print_usage(const char *program_name)
 	fprintf(message_out, 
 			"  -I, --input-strings=SFILE        Read lookup strings from SFILE\n"
 			"  -S, --spaces                     Use space separated tokens in strings\n"
-			"  -f, --format=FORMAT              Use FORMAT printing results sets\n");
+			"  -f, --format=FORMAT              Use FORMAT printing results sets\n"
+			"  -r, --statistics                 Print statistics\n");
 	fprintf(message_out,
 		   "\n"
 		   "If OUTFILE or INFILE is missing or -, "
@@ -130,6 +138,7 @@ parse_options(int argc, char** argv)
 			{"input-strings", required_argument, 0, 'I'},
 			{"spaces", no_argument, 0, 'S'},
 			{"format", required_argument, 0, 'f'},
+			{"statistics", no_argument, 0, 'r'},
 			{0,0,0,0}
 		};
 		int option_index = 0;
@@ -226,6 +235,9 @@ error_format:
 			fprintf(message_out, "invalid argument for format"
 					"custom: must be of form BEGIN,LOOKUP,NO_RES,END\n");
 			return EXIT_FAILURE;
+			break;
+		case 'r':
+			print_statistics = true;
 			break;
 		case '?':
 			fprintf(message_out, "invalid option --%s\n",
@@ -452,6 +464,7 @@ lookup_print_all(const char* s, KeyTable* kt,
 {
 	KeyVector* lookup_orig = NULL;
 	lookup_printf(begin_format, s, NULL);
+	inputs++;
 	if (space_separated)
 	{
 		lookup_orig = stringSeparatedToKeyVector(s, kt, string(" "),
@@ -525,6 +538,11 @@ lookup_print_all(const char* s, KeyTable* kt,
 		if (final_results->size() == 0)
 		{
 			lookup_printf(no_lookups_format, s, NULL);
+			no_analyses++;
+		}
+		else
+		{
+			analysed++;
 		}
 		for (KeyVectorVector::iterator lkv = final_results->begin();
 				lkv != final_results->end();
@@ -535,6 +553,7 @@ lookup_print_all(const char* s, KeyTable* kt,
 			const char* lookup_full = lkvstr->c_str();
 			lookup_printf(lookup_format, s, lookup_full);
 			delete lkvstr;
+			analyses++;
 		}
 		lookup_printf(end_format, s, NULL);
 	} // if proper lookup originally
@@ -556,6 +575,7 @@ lookup_print_all(const char* s, KeyTable* kt,
 {
 	KeyVector* lookup_orig = NULL;
 	lookup_printf(begin_format, s, NULL);
+	inputs++;
 	if (space_separated)
 	{
 		lookup_orig = stringSeparatedToKeyVector(s, kt, string(" "),
@@ -629,6 +649,11 @@ lookup_print_all(const char* s, KeyTable* kt,
 		if (final_results->size() == 0)
 		{
 			lookup_printf(no_lookups_format, s, NULL);
+			no_analyses++;
+		}
+		else
+		{
+			analysed++;
 		}
 		for (KeyVectorVector::iterator lkv = final_results->begin();
 				lkv != final_results->end();
@@ -638,6 +663,7 @@ lookup_print_all(const char* s, KeyTable* kt,
 			string* lkvstr = keyVectorToString(hmmlkv, kt);
 			const char* lookup_full = lkvstr->c_str();
 			lookup_printf(lookup_format, s, lookup_full);
+			analyses++;
 			delete lkvstr;
 		}
 		lookup_printf(end_format, s, NULL);
@@ -718,6 +744,16 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				VERBOSE_PRINT("Looking up %s...\n", line);
 				HFST::lookup_print_all(line, key_table, cascade);
 			} // while lines in input
+			if (print_statistics)
+			{
+				fprintf(message_out, "Strings\tFound\tMissing\tResults\n"
+						"%lu\t%lu\t%lu\t%lu\n", 
+						inputs, analysed, no_analyses, analyses);
+				fprintf(message_out, "Coverage\tAmbiguity\n"
+						"%f\t%f\n",
+						(float)analysed/(float)inputs,
+						(float)inputs/(float)analyses);
+			}
 			if (write_symbols_to_filename != NULL) {
 			  ofstream os(write_symbols_to_filename);
 			  HFST::write_symbol_table(key_table, os);
@@ -797,6 +833,16 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				VERBOSE_PRINT("Looking up %s...\n", line);
 				HWFST::lookup_print_all(line, key_table, cascade);
 			} // while lines in input
+			if (print_statistics)
+			{
+				fprintf(message_out, "Strings\tFound\tMissing\tResults\n"
+						"%lu\t%lu\t%lu\t%lu\n", 
+						inputs, analysed, no_analyses, analyses);
+				fprintf(message_out, "Coverage\tAmbiguity\n"
+						"%f\t%f\n",
+						(float)analysed/(float)inputs,
+						(float)inputs/(float)analyses);
+			}
 			if (write_symbols_to_filename != NULL) {
 			  ofstream os(write_symbols_to_filename);
 			  HWFST::write_symbol_table(key_table, os);
