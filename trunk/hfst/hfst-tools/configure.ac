@@ -22,6 +22,8 @@ then
 !! pre-flex-generated sources, building will probably fail.])
 fi
 
+# Set program-specific build flags here
+AC_DEFINE([OL_FULL_DEBUG], [0], [Very verbose debugging for optimized-lookup])
 
 ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
 
