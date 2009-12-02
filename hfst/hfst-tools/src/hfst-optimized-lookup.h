@@ -33,6 +33,10 @@
 #include <ctime>
 #include <iostream>
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 enum OutputType {HFST, xerox};
 OutputType outputType = xerox;
 

@@ -240,7 +240,7 @@ void TransducerAlphabet::get_next_symbol(FILE * f, SymbolNumber k)
 	}
       operations.push_back(FlagDiacriticOperation(op, feature_bucket[feat], value_bucket[val]));
       kt->operator[](k) = strdup("");
-#if DEBUG_DIACRITICS
+#if OL_FULL_DEBUG
       kt->operator[](k) = strdup(line);
 #endif
       return;
@@ -333,7 +333,7 @@ void runTransducer (genericTransducer T)
       for ( char ** Str = &str; **Str != 0; )
 	{
 	  k = T.find_next_key(Str);
-#if FULL_DEBUG
+#if OL_FULL_DEBUG
 	  std::cout << "INPUT STRING ENTRY " << i << " IS " << k << std::endl;
 #endif
 	  if (k == NO_SYMBOL_NUMBER)
@@ -621,7 +621,7 @@ void TransducerFd::try_epsilon_transitions(SymbolNumber * input_symbol,
 					   original_output_string,
 					   TransitionTableIndex i)
 {
-#if FULL_DEBUG
+#if OL_FULL_DEBUG
   std::cout << "try_epsilon_transitions " << i << std::endl;
 #endif
 
@@ -630,15 +630,22 @@ void TransducerFd::try_epsilon_transitions(SymbolNumber * input_symbol,
    * that we also validate the resulting state
    */
   while (transitions[i]->get_input() == 0 ||
-	 (*input_symbol != NO_SYMBOL_NUMBER && operations[*input_symbol].isFlag()))
+	 ((transitions[i]->get_input() != NO_SYMBOL_NUMBER) &&
+	  (operations[transitions[i]->get_input()].isFlag()) ) )
     {
-      if (*input_symbol != NO_SYMBOL_NUMBER && operations[*input_symbol].isFlag())
+      if (transitions[i]->get_input() != 0) // is it's not epsilon, it's a flag
 	{ // we try to modify the state stack
-	  if (PushState(operations[*input_symbol]) == false)
+	  if (PushState(operations[transitions[i]->get_input()]) == false)
 	    {
+#if OL_FULL_DEBUG
+	      std::cout << "illegal flag combination\n";
+#endif
 	      ++i;
 	      continue; // the new state wouldn't be legal
 	    } else {
+#if OL_FULL_DEBUG
+	    std::cout << "modified state stack\n";
+#endif
 	    *output_symbol = transitions[i]->get_output();
 	    get_analyses(input_symbol,
 			 output_symbol+1,
@@ -649,6 +656,7 @@ void TransducerFd::try_epsilon_transitions(SymbolNumber * input_symbol,
 	    continue;
 	  }
 	}
+      // normal epsilon transition
       *output_symbol = transitions[i]->get_output();
       get_analyses(input_symbol,
 		   output_symbol+1,
@@ -664,7 +672,7 @@ void  Transducer::try_epsilon_indices(SymbolNumber * input_symbol,
 				      SymbolNumber * original_output_string,
 				      TransitionTableIndex i)
 {
-#if FULL_DEBUG
+#if OL_FULL_DEBUG
   std::cout << "try_epsilon_indices " << i << std::endl;
 #endif
   if (indices[i]->get_input() == 0)
@@ -711,7 +719,7 @@ void TransducerFd::find_transitions(SymbolNumber input,
 				    SymbolNumber * original_output_string,
 				    TransitionTableIndex i)
 {
-#if FULL_DEBUG
+#if OL_FULL_DEBUG
   std::cout << "find_transitions " << i << std::endl;
 #endif
   while (transitions[i]->get_input() != NO_SYMBOL_NUMBER)
@@ -740,7 +748,7 @@ Transducer::find_index(SymbolNumber input,
 				      SymbolNumber * original_output_string,
 				      TransitionTableIndex i)
 {
-#if FULL_DEBUG
+#if OL_FULL_DEBUG
   std::cout << "find_index " << i << std::endl;
 #endif
   if (indices[i+input]->get_input() == input)
@@ -791,7 +799,7 @@ Transducer::get_analyses(SymbolNumber * input_symbol,
 			 SymbolNumber * original_output_string,
 			 TransitionTableIndex i)
 {
-#if FULL_DEBUG
+#if OL_FULL_DEBUG
   std::cout << "get_analyses " << i << std::endl;
 #endif
   if (i >= TRANSITION_TARGET_TABLE_START )
@@ -802,7 +810,11 @@ Transducer::get_analyses(SymbolNumber * input_symbol,
 			      output_symbol,
 			      original_output_string,
 			      i+1);
-      
+
+#if OL_FULL_DEBUG
+      std::cout << "Testing input string, " << *input_symbol << " at pointer" << std::endl;
+#endif
+
       // input-string ended.
       if (*input_symbol == NO_SYMBOL_NUMBER)
 	{
@@ -833,14 +845,13 @@ Transducer::get_analyses(SymbolNumber * input_symbol,
 			  original_output_string,
 			  i+1);
       // input-string ended.
-#if FULL_DEBUG
+      
+#if OL_FULL_DEBUG
       std::cout << "Testing input string, " << *input_symbol << " at pointer" << std::endl;
 #endif
+      
       if (*input_symbol == NO_SYMBOL_NUMBER)
 	{
-#if FULL_DEBUG
-	  std::cout << "At end of input string" << std::endl;
-#endif
 	  if (final_index(i))
 	    {
 	      note_analysis(original_output_string);
@@ -1109,7 +1120,7 @@ void TransducerW::try_epsilon_transitions(SymbolNumber * input_symbol,
 					  original_output_string,
 					  TransitionTableIndex i)
 {
-#if FULL_DEBUG
+#if OL_FULL_DEBUG
   std::cerr << "try epsilon transitions " << i << " " << current_weight << std::endl;
 #endif
 
@@ -1138,6 +1149,10 @@ void TransducerWFd::try_epsilon_transitions(SymbolNumber * input_symbol,
 					    original_output_string,
 					    TransitionTableIndex i)
 {
+#if OL_FULL_DEBUG
+  std::cout << "try_epsilon_transitions " << i << std::endl;
+#endif
+
   if (transitions.size() <= i) 
     {
       return;
@@ -1147,13 +1162,14 @@ void TransducerWFd::try_epsilon_transitions(SymbolNumber * input_symbol,
    * We treat input flag diacritics as epsilons except
    * that we also validate the resulting state
    */
-  while (transitions[i] != NULL &&
-	 (transitions[i]->get_input() == 0 ||
-	  (*input_symbol != NO_SYMBOL_NUMBER && operations[*input_symbol].isFlag())))
+  while ( (transitions[i] != NULL) &&
+	  ( (transitions[i]->get_input() == 0) ||
+	  ( (transitions[i]->get_input() != NO_SYMBOL_NUMBER) &&
+	    (operations[transitions[i]->get_input()].isFlag()) ) ) )
     {
-      if (*input_symbol != NO_SYMBOL_NUMBER && operations[*input_symbol].isFlag())
+      if (transitions[i]->get_input() != 0) // if it isn't epsilon, it's a flag
 	{ // we try to modify the state stack
-	  if (PushState(operations[*input_symbol]) == false)
+	  if (PushState(operations[transitions[i]->get_input()]) == false)
 	    {
 	      ++i;
 	      continue; // the new state wouldn't be legal
@@ -1169,6 +1185,7 @@ void TransducerWFd::try_epsilon_transitions(SymbolNumber * input_symbol,
 	    continue;
 	  }
 	}
+      // regular epsilon
       *output_symbol = transitions[i]->get_output();
       current_weight += transitions[i]->get_weight();
       get_analyses(input_symbol,
@@ -1177,7 +1194,7 @@ void TransducerWFd::try_epsilon_transitions(SymbolNumber * input_symbol,
 		   transitions[i]->target());
       ++i;
     }
-  *output_symbol = NO_SYMBOL_NUMBER;  
+  *output_symbol = NO_SYMBOL_NUMBER;
 
 }
 
@@ -1186,7 +1203,7 @@ void TransducerW::try_epsilon_indices(SymbolNumber * input_symbol,
 				      SymbolNumber * original_output_string,
 				      TransitionTableIndex i)
 {
-#if FULL_DEBUG
+#if OL_FULL_DEBUG
   std::cerr << "try indices " << i << " " << current_weight << std::endl;
 #endif
 
@@ -1207,7 +1224,7 @@ void TransducerW::find_transitions(SymbolNumber input,
 				   SymbolNumber * original_output_string,
 				   TransitionTableIndex i)
 {
-#if FULL_DEBUG
+#if OL_FULL_DEBUG
   std::cerr << "find transitions " << i << " " << current_weight << std::endl;
 #endif
 
@@ -1252,24 +1269,6 @@ void TransducerWFd::find_transitions(SymbolNumber input,
       
       if (transitions[i]->get_input() == input)
 	{
-	  if ((*input_symbol != NO_SYMBOL_NUMBER) && operations[*input_symbol].isFlag()) // this is a flag diacritic
-	    { // we try to modify the state stack
-	      if (PushState(operations[*input_symbol]) == false)
-		{
-		  return; // the new state wouldn't be legal
-		} else {
-		*output_symbol = transitions[i]->get_output();
-		current_weight += transitions[i]->get_weight();
-		get_analyses(input_symbol,
-			     output_symbol+1,
-			     original_output_string,
-			     transitions[i]->target());
-		++i;
-		statestack.pop_back();
-		current_weight -= transitions[i]->get_weight();
-		continue;
-	      }
-	    }
 	  *output_symbol = transitions[i]->get_output();	  
 	  current_weight += transitions[i]->get_weight();
 	  get_analyses(input_symbol,
@@ -1293,7 +1292,7 @@ void TransducerW::find_index(SymbolNumber input,
 			     SymbolNumber * original_output_string,
 			     TransitionTableIndex i)
 {
-#if FULL_DEBUG
+#if OL_FULL_DEBUG
   std::cerr << "find index " << i << " " << current_weight << std::endl;
 #endif
   if (transitions.size() <= i) 
@@ -1460,7 +1459,7 @@ void TransducerW::get_analyses(SymbolNumber * input_symbol,
 			       SymbolNumber * original_output_string,
 			       TransitionTableIndex i)
 {
-#if FULL_DEBUG
+#if OL_FULL_DEBUG
   std::cerr << "get analyses " << i << " " << current_weight << std::endl;
 #endif
   if (i >= TRANSITION_TARGET_TABLE_START )
