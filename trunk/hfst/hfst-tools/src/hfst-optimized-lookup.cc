@@ -457,7 +457,19 @@ bool TransducerFd::PushState(FlagDiacriticOperation op)
       }
     return false;
   case D: // disallow
-    if (statestack.back()[op.Feature()] == op.Value())
+        if (op.Value() == 0) // empty disallow
+      {
+	if (statestack.back()[op.Feature()] != 0)
+	  {
+	    return false;
+	  }
+	else
+	  {
+	    statestack.push_back(statestack.back());
+	    return true;
+	  }
+      }
+    if (statestack.back()[op.Feature()] == op.Value()) // nonempty disallow
       {
 	return false;
       }
@@ -973,7 +985,19 @@ bool TransducerWFd::PushState(FlagDiacriticOperation op)
       }
     return false;
   case D: // disallow
-    if (statestack.back()[op.Feature()] == op.Value())
+    if (op.Value() == 0) // empty disallow
+      {
+	if (statestack.back()[op.Feature()] != 0)
+	  {
+	    return false;
+	  }
+	else
+	  {
+	    statestack.push_back(statestack.back());
+	    return true;
+	  }
+      }
+    if (statestack.back()[op.Feature()] == op.Value()) // nonempty disallow
       {
 	return false;
       }
