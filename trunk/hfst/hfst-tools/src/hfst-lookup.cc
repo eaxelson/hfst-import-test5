@@ -520,7 +520,7 @@ lookup_print_all(const char* s, KeyTable* kt,
 							++lkv)
 					{
 						KeyVector* hmmlkv = *lkv;
-						//hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
+						hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
 						if (hmmlkv == NULL)
 						  {continue;}
 						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
