@@ -208,7 +208,7 @@ void TransducerAlphabet::get_next_symbol(FILE * f, SymbolNumber k)
       ++sym;
     }
   *sym = 0;
-  if (line[0] == '@' && *--sym == '@' && line[2] == '.')
+  if (strlen(line) >= 5 && line[0] == '@' && line[strlen(line) - 1] == '@' && line[2] == '.')
     { // a flag diacritic needs to be parsed
       std::string feat;
       std::string val;
@@ -226,7 +226,7 @@ void TransducerAlphabet::get_next_symbol(FILE * f, SymbolNumber k)
       for (c +=3; *c != '.' && *c != '@'; c++) { feat.append(c,1); }
       if (*c == '.')
 	{
-	  for (; *c != '@'; c++) { val.append(c,1); }
+	  for (++c; *c != '@'; c++) { val.append(c,1); }
 	}
       if (feature_bucket.count(feat) == 0)
 	{
@@ -241,6 +241,8 @@ void TransducerAlphabet::get_next_symbol(FILE * f, SymbolNumber k)
       operations.push_back(FlagDiacriticOperation(op, feature_bucket[feat], value_bucket[val]));
       kt->operator[](k) = strdup("");
 #if OL_FULL_DEBUG
+      std::cout << "compiled flag diacritic " << op << " " << feat << " " << val << " to\n";
+      FlagDiacriticOperation(op, feature_bucket[feat], value_bucket[val]).print();
       kt->operator[](k) = strdup(line);
 #endif
       return;
@@ -249,7 +251,7 @@ void TransducerAlphabet::get_next_symbol(FILE * f, SymbolNumber k)
   kt->operator[](k) = strdup(line);
 }
 
-void LetterTrie::add_string(const char * p,SymbolNumber symbol_key)
+void LetterTrie::add_string(const char * p, SymbolNumber symbol_key)
 {
   if (*(p+1) == 0)
     {
