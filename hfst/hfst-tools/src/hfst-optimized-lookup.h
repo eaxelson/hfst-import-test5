@@ -201,6 +201,13 @@ class FlagDiacriticOperation
   FlagDiacriticOperator Operation(void) { return operation; }
   SymbolNumber Feature(void) { return feature; }
   ValueNumber Value(void) { return value; }
+
+#if OL_FULL_DEBUG
+  void print(void)
+  {
+    std::cout << operation << "\t" << feature << "\t" << value << std::endl;
+  }
+#endif
 };
 
 typedef std::vector<FlagDiacriticOperation> OperationVector;
