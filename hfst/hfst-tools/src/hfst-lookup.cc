@@ -501,7 +501,7 @@ lookup_print_all(const char* s, KeyTable* kt,
 				string* kvstring = keyVectorToString(*kv, kt);
 				VERBOSE_PRINT("Looking up %s from transducer %zu\n",
 						kvstring->c_str(), cascade_number);
-				if (is_infinitely_ambiguous(*t, *kv))
+				if (is_infinitely_ambiguous(*t, true, *kv))
 				{
 					VERBOSE_PRINT("Got infinite results\n");
 					return false;
@@ -520,11 +520,11 @@ lookup_print_all(const char* s, KeyTable* kt,
 							++lkv)
 					{
 						KeyVector* hmmlkv = *lkv;
-						hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
+						//hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
 						if (hmmlkv == NULL)
 						  {continue;}
 						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
-											_is_epsilon), hmmlkv->end());
+									_is_epsilon), hmmlkv->end());
 						string* lkvstring = keyVectorToString(hmmlkv, kt);
 						VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
 						current_results->push_back(hmmlkv);
@@ -612,7 +612,7 @@ lookup_print_all(const char* s, KeyTable* kt,
 				string* kvstring = keyVectorToString(*kv, kt);
 				VERBOSE_PRINT("Looking up %s from transducer %zu\n",
 						kvstring->c_str(), cascade_number);
-				if (is_infinitely_ambiguous(*t, *kv))
+				if (is_infinitely_ambiguous(*t, true, *kv))
 				{
 					VERBOSE_PRINT("Got infinite results\n");
 					return false;
@@ -635,7 +635,7 @@ lookup_print_all(const char* s, KeyTable* kt,
 						if (hmmlkv == NULL)
 						  { continue; }
 						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
-											_is_epsilon), hmmlkv->end());
+									_is_epsilon), hmmlkv->end());
 						string* lkvstring = keyVectorToString(hmmlkv, kt);
 						VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
 						current_results->push_back(hmmlkv);
