@@ -5,7 +5,7 @@
 ## for nested build
 LDADD = ../../hfst2/libhfst.la
 AM_CPPFLAGS = -I../.. -I../../hfst2
-AM_CXXFLAGS = -O3
+AM_CXXFLAGS = -Wno-deprecated
 
 if WANT_COMPARE
 MAYBE_COMPARE=hfst-compare
@@ -182,7 +182,6 @@ BUILT_SOURCES=hfst-compiler.h \
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 
-AM_CXXFLAGS=-Wno-deprecated
 
 ## CLEANFILES = hfst-compiler.cc hfst-compiler.h hfst-scanner.cc
 
