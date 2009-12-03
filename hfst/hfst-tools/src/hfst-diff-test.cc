@@ -378,7 +378,7 @@ lookup_all(const char* s, KeyTable* kt,
 				string* kvstring = keyVectorToString(*kv, kt);
 				VERBOSE_PRINT("Looking up %s from transducer %zu\n",
 						kvstring->c_str(), cascade_number);
-				if (is_infinitely_ambiguous(*t, *kv))
+				if (is_infinitely_ambiguous(*t,true, *kv))
 				{
 					VERBOSE_PRINT("Got infinite results\n");
 					*infinite = true;
@@ -590,7 +590,7 @@ lookup_all(const char* s, KeyTable* kt,
 				string* kvstring = keyVectorToString(*kv, kt);
 				VERBOSE_PRINT("Looking up %s from transducer %zu\n",
 						kvstring->c_str(), cascade_number);
-				if (is_infinitely_ambiguous(*t, *kv))
+				if (is_infinitely_ambiguous(*t,true, *kv))
 				{
 					VERBOSE_PRINT("Got infinite results\n");
 					*infinite = true;
