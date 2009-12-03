@@ -245,7 +245,7 @@ void TransducerAlphabet::get_next_symbol(FILE * f, SymbolNumber k)
 #endif
       return;
     }
-  operations.push_back(FlagDiacriticOperation());
+  operations.push_back(FlagDiacriticOperation()); // dummy flag
   kt->operator[](k) = strdup(line);
 }
 
