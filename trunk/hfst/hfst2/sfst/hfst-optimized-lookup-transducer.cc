@@ -77,6 +77,8 @@ const Node * HfstTransition::get_target_node(const Arc &a)
 
 void HfstTransition::set_key_table(HFST::KeyTable * kt)
 {
+  if (not kt->is_key(0))
+    { kt->associate_key(0,0); }
   keys = kt;
 }
 
