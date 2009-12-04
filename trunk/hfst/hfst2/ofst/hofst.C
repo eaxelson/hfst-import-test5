@@ -2055,10 +2055,10 @@ namespace HWFST {
     if (key_table == NULL) { return NULL; }
     KeySet * t_keys = define_key_set(t);
     HFST::KeyTable * new_key_table = create_key_table();
-    Key new_k = 0;
+    Key new_k = 1;
     for (Key k = 0; k < key_table->get_unused_key(); ++k)
       {
-	if (key_table->is_key(k))
+	if (key_table->is_key(k) and (not new_key_table->is_key(k)))
 	  { associate_key(new_k++,new_key_table,key_table->get_key_symbol(k)); }
       }
     return new_key_table;
