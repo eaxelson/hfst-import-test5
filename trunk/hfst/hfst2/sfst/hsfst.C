@@ -422,10 +422,11 @@ namespace HFST {
     if (key_table == NULL) { return NULL; }
     KeySet * t_keys = define_key_set(t);
     HFST::KeyTable * new_key_table = create_key_table();
-    Key new_k = 0;
+    new_key_table->associate_key(0,0);
+    Key new_k = 1;
     for (Key k = 0; k < key_table->get_unused_key(); ++k)
       {
-	if (t_keys->find(k) != t_keys->end())
+	if (t_keys->find(k) != t_keys->end() and (not new_key_table->is_key(k)))
 	  { associate_key(new_k++,new_key_table,key_table->get_key_symbol(k)); }
       }
     return new_key_table;
@@ -554,6 +555,7 @@ namespace HFST {
 
   void get_input_frequency(KeyCountMap &key_count_map,Transducer * t)
   {
+    key_count_map[0] = 1;
     NodeNumbering num(*t);
     for (size_t i = 0; i < num.number_of_nodes(); ++i)
       {
@@ -570,6 +572,7 @@ namespace HFST {
   HFST::KeyTable * reorder_key_table(HFST::KeyTable * kt, Transducer * t)
   {
     InputKeySet * input_keys = get_input_keys(t);
+    input_keys->insert(0);
     KeyCountMap key_count_map;
     get_input_frequency(key_count_map,t);
     HFST::KeyTable * new_kt = lift_input_keys(kt,key_count_map);
