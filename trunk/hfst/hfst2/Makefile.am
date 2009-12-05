@@ -53,8 +53,12 @@ BUILT_SOURCES = \
 	regexp/xrew_parse.yy \
 	regexp/xrew_parse.hh \
 	regexp/xrew_lex.ll \
+	regexp/xrew_lex.cc \
+	regexp/xrew_parse.cc \
 	regexp/xre_parse.hh \
 	regexp/xre_lex.h \
+	regexp/xre_lex.cc \
+	regexp/xre_parse.cc \
 	string/w_letter-trie.h \
 	string/w_letter-trie.cc \
 	string/w_string.cc
