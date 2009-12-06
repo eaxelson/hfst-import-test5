@@ -29,6 +29,7 @@
 #include <cstring>
 #include <getopt.h>
 #include <hfst2/hfst.h>
+#include "FlagDiacritics.h"
 
 #if NESTED_BUILD
 #include <hfst2/string/string.h>
@@ -45,6 +46,8 @@
 static char* relation_file_name;
 static FILE* relation_file;
 static bool space_separated = false;
+FlagDiacriticTable flag_diacritic_table;
+HFST::KeySet flag_diacritic_set;
 
 enum TEST_TYPE { TEST_EXACTLY, TEST_NONE, TEST_AT_LEAST };
 static TEST_TYPE test_type = TEST_EXACTLY;
@@ -201,13 +204,34 @@ parse_options(int argc, char** argv)
 	return EXIT_CONTINUE;
 }
 
+
 namespace HFST
 {
+
+void
+define_flag_diacritics(KeyTable * key_table)
+{
+  
+  for (Key k = 0; k < key_table->get_unused_key(); ++k)
+    {
+      flag_diacritic_table.define_diacritic
+	(k, get_symbol_name(get_key_symbol(k, key_table)));
+      if (flag_diacritic_table.is_diacritic(k))
+	{ flag_diacritic_set.insert(k); }
+    }
+}
 
 bool
 _is_epsilon(Key k)
 {
-	return k == 0;
+	if ((k == 0) || (flag_diacritic_set.find(k) != flag_diacritic_set.end()))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 bool
@@ -386,7 +410,7 @@ lookup_all(const char* s, KeyTable* kt,
 				}
 				else
 				{
-					KeyVectorVector* lookups = lookup_all(*t, *kv);
+					KeyVectorVector* lookups = lookup_all(*t, *kv, &flag_diacritic_set);
 					if (lookups == NULL)
 					{
 						// no results as empty result
@@ -398,6 +422,9 @@ lookup_all(const char* s, KeyTable* kt,
 							++lkv)
 					{
 						KeyVector* hmmlkv = *lkv;
+						hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
+						if (hmmlkv == NULL)
+						  {continue;}
 						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
 											_is_epsilon), hmmlkv->end());
 						string* lkvstring = keyVectorToString(hmmlkv, kt);
@@ -417,10 +444,30 @@ lookup_all(const char* s, KeyTable* kt,
 namespace HWFST
 {
 
+void
+define_flag_diacritics(KeyTable * key_table)
+{
+  
+  for (Key k = 0; k < key_table->get_unused_key(); ++k)
+    {
+      flag_diacritic_table.define_diacritic
+	(k, get_symbol_name(get_key_symbol(k, key_table)));
+      if (flag_diacritic_table.is_diacritic(k))
+	{ flag_diacritic_set.insert(k); }
+    }
+}
+
 bool
 _is_epsilon(Key k)
 {
-	return k == 0;
+	if ((k == 0) || (flag_diacritic_set.find(k) != flag_diacritic_set.end()))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 bool
@@ -598,7 +645,7 @@ lookup_all(const char* s, KeyTable* kt,
 				}
 				else
 				{
-					KeyVectorVector* lookups = lookup_all(*t, *kv);
+					KeyVectorVector* lookups = lookup_all(*t, *kv, &flag_diacritic_set);
 					if (lookups == NULL)
 					{
 						// no results as empty result
@@ -610,6 +657,9 @@ lookup_all(const char* s, KeyTable* kt,
 							++lkv)
 					{
 						KeyVector* hmmlkv = *lkv;
+						hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
+						if (hmmlkv == NULL)
+						  {continue;}
 						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
 											_is_epsilon), hmmlkv->end());
 						string* lkvstring = keyVectorToString(hmmlkv, kt);
@@ -679,6 +729,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				// add your code here
 				cascade.push_back(input);
 			}
+			HFST::define_flag_diacritics(key_table);
 			VERBOSE_PRINT("\n");
 #			define MAX_LINE_LENGTH 254
 			char* line =
@@ -828,6 +879,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				// add your code here
 				cascade.push_back(input);
 			}
+			HWFST::define_flag_diacritics(key_table);
 			VERBOSE_PRINT("\n");
 #			define MAX_LINE_LENGTH 254
 			char* line =
