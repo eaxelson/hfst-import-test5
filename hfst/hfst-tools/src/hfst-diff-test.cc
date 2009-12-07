@@ -429,7 +429,7 @@ lookup_all(const char* s, KeyTable* kt,
 											_is_epsilon), hmmlkv->end());
 						string* lkvstring = keyVectorToString(hmmlkv, kt);
 						VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
-						current_results->push_back(*lkv);
+						current_results->push_back(hmmlkv);
 						delete lkvstring;
 					}
 				}
@@ -664,7 +664,7 @@ lookup_all(const char* s, KeyTable* kt,
 											_is_epsilon), hmmlkv->end());
 						string* lkvstring = keyVectorToString(hmmlkv, kt);
 						VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
-						current_results->push_back(*lkv);
+						current_results->push_back(hmmlkv);
 						delete lkvstring;
 					}
 				}
