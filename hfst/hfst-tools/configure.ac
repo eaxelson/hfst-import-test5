@@ -22,9 +22,6 @@ then
 !! pre-flex-generated sources, building will probably fail.])
 fi
 
-# Set program-specific build flags here
-AC_DEFINE([OL_FULL_DEBUG], [0], [Very verbose debugging for optimized-lookup])
-
 ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
 
 AC_DEFINE([NESTED_BUILD], [1], [We're doing a nested build, headers aren't always where we expect them to be])
