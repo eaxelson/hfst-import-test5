@@ -535,12 +535,12 @@ class Transducer
     return indices[i]->final();
   }
 
-  virtual void try_epsilon_indices(SymbolNumber * input_symbol,
-				  SymbolNumber * output_symbol,
-				  SymbolNumber * original_output_string,
-				  TransitionTableIndex i);
+  void try_epsilon_indices(SymbolNumber * input_symbol,
+			   SymbolNumber * output_symbol,
+			   SymbolNumber * original_output_string,
+			   TransitionTableIndex i);
 
-  virtual void try_epsilon_transitions(SymbolNumber * input_symbol,
+  void try_epsilon_transitions(SymbolNumber * input_symbol,
 				       SymbolNumber * output_symbol,
 				       SymbolNumber * original_output_string,
 				       TransitionTableIndex i);
@@ -622,23 +622,29 @@ class TransducerFd: public Transducer
   OperationVector operations;
   std::vector<SymbolNumber> operation_peek;
 
-  void try_epsilon_transitions(SymbolNumber * input_symbol,
-			       SymbolNumber * output_symbol,
-			       SymbolNumber * original_output_string,
-			       TransitionTableIndex i);
-
-  void try_epsilon_indices(SymbolNumber * input_symbol,
-			   SymbolNumber * output_symbol,
-			   SymbolNumber * original_output_string,
-			   TransitionTableIndex i);
-
-  bool PushState(FlagDiacriticOperation op);
+  void try_flag_transitions(SymbolNumber * input_symbol,
+			    SymbolNumber * output_symbol,
+			    SymbolNumber * original_output_string,
+			    TransitionTableIndex i);
 
   void traverse_flag_transitions(SymbolNumber input,
 				 SymbolNumber * input_symbol,
 				 SymbolNumber * output_symbol,
 				 SymbolNumber * original_output_string,
 				 TransitionTableIndex i);
+  
+  bool PushState(FlagDiacriticOperation op);
+
+  void try_flag_indices(SymbolNumber * input_symbol,
+			SymbolNumber * output_symbol,
+			SymbolNumber * original_output_string,
+			TransitionTableIndex i);
+
+  void get_analyses(SymbolNumber * input_symbol,
+		    SymbolNumber * output_symbol,
+		    SymbolNumber * original_output_string,
+		    TransitionTableIndex i);
+
 
  public:
  TransducerFd(FILE * f, TransducerHeader h, TransducerAlphabet a):
@@ -917,12 +923,12 @@ class TransducerW
 
   void set_symbol_table(void);
 
-  virtual void try_epsilon_transitions(SymbolNumber * input_symbol,
+  void try_epsilon_transitions(SymbolNumber * input_symbol,
 			       SymbolNumber * output_symbol,
 			       SymbolNumber * original_output_string,
 			       TransitionTableIndex i);
     
-  virtual void try_epsilon_indices(SymbolNumber * input_symbol,
+  void try_epsilon_indices(SymbolNumber * input_symbol,
 				   SymbolNumber * output_symbol,
 				   SymbolNumber * original_output_string,
 				   TransitionTableIndex i);
@@ -1024,23 +1030,28 @@ class TransducerWFd: public TransducerW
   OperationVector operations;
   std::vector<SymbolNumber> operation_peek;
 
+  void try_flag_transitions(SymbolNumber * input_symbol,
+			    SymbolNumber * output_symbol,
+			    SymbolNumber * original_output_string,
+			    TransitionTableIndex i);
+  
   bool PushState(FlagDiacriticOperation op);
-  
-  void try_epsilon_indices(SymbolNumber * input_symbol,
-			   SymbolNumber * output_symbol,
-			   SymbolNumber * original_output_string,
-			   TransitionTableIndex i);
-  
-  void try_epsilon_transitions(SymbolNumber * input_symbol,
-			       SymbolNumber * output_symbol,
-			       SymbolNumber * original_output_string,
-			       TransitionTableIndex i);
-  
+
   void traverse_flag_transitions(SymbolNumber input,
 				 SymbolNumber * input_symbol,
 				 SymbolNumber * output_symbol,
 				 SymbolNumber * original_output_string,
 				 TransitionTableIndex i);
+
+  void try_flag_indices(SymbolNumber * input_symbol,
+			SymbolNumber * output_symbol,
+			SymbolNumber * original_output_string,
+			TransitionTableIndex i);
+
+  void get_analyses(SymbolNumber * input_symbol,
+		    SymbolNumber * output_symbol,
+		    SymbolNumber * original_output_string,
+		    TransitionTableIndex i);
   
  public:
  TransducerWFd(FILE * f, TransducerHeader h, TransducerAlphabet a):

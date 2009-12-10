@@ -455,6 +455,18 @@ bool TransducerFd::PushState(FlagDiacriticOperation op)
     statestack.back()[op.Feature()] = -1*op.Value();
     return true;
   case R: // require
+    if (op.Value() == 0) // empty require
+      {
+	if (statestack.back()[op.Feature()] == 0)
+	  {
+	    return false;
+	  }
+	else
+	  {
+	    statestack.push_back(statestack.back());
+	    return true;
+	  }
+      }
     if (statestack.back()[op.Feature()] == op.Value())
       {
 	statestack.push_back(statestack.back());
@@ -622,77 +634,75 @@ void Transducer::try_epsilon_transitions(SymbolNumber * input_symbol,
     }
 }
 
-void TransducerFd::try_epsilon_transitions(SymbolNumber * input_symbol,
-					   SymbolNumber * output_symbol,
-					   SymbolNumber * original_output_string,
-					   TransitionTableIndex i)
-{
-#if OL_FULL_DEBUG
-  std::cout << "try_epsilon_transitions " << i << std::endl;
-#endif
-  
-  while (transitions[i]->get_input() == 0)
-    {
-	  *output_symbol = transitions[i]->get_output();
-	  get_analyses(input_symbol,
-		       output_symbol+1,
-		       original_output_string,
-		       transitions[i]->target());
-	  ++i;
-    }
-  
-  std::vector<SymbolNumber>::iterator it;
-  for (it = operation_peek.begin(); it < operation_peek.end(); it++)
-    {
-      if (transitions[i]->get_input() == *it)
-	{
-	  traverse_flag_transitions(*it,
-				    input_symbol,
-				    output_symbol,
-				    original_output_string,
-				    i);
-	}
-    }
-
-}
-
 void TransducerFd::traverse_flag_transitions(SymbolNumber input,
 					     SymbolNumber * input_symbol,
 					     SymbolNumber * output_symbol,
-					     SymbolNumber * 
-					     original_output_string,
+					     SymbolNumber * original_output_string,
 					     TransitionTableIndex i)
 {
-
-#if OL_FULL_DEBUG
-  std::cout << "traverse_flag_transitions " << i << " " << input << std::endl;
-#endif
-
-  if (PushState(operations[input]) == false)
-    { // try to modify the state stack
-#if OL_FULL_DEBUG
-      std::cout << "failed to modify state stack\n";
-#endif
-      return;
-    }
-  while (transitions[i]->get_input() != NO_SYMBOL_NUMBER)
+  do
     {
-      if (transitions[i]->get_input() == input)
-	{
-	  *output_symbol = transitions[i]->get_output();
-	  get_analyses(input_symbol,
-		       output_symbol+1,
-		       original_output_string,
-		       transitions[i]->target());
-	}
-      else
-	{
-	  break;
-	}
+      *output_symbol = transitions[i]->get_output();
+      get_analyses(input_symbol,
+		   output_symbol+1,
+		   original_output_string,
+		   transitions[i]->target());
       ++i;
+    } while (transitions[i]->get_input() == input);
+}
+
+void TransducerFd::try_flag_transitions(SymbolNumber * input_symbol,
+					SymbolNumber * output_symbol,
+					SymbolNumber * 
+					original_output_string,
+					TransitionTableIndex i)
+{
+  if (transitions[i]->get_input() != NO_SYMBOL_NUMBER)
+    {
+      std::vector<SymbolNumber>::iterator it;
+      for (it = operation_peek.begin(); it < operation_peek.end(); it++)
+	{
+	  if ( (transitions[i]->get_input() == *it) &&
+	       PushState(operations[*it]))
+	    {
+	      traverse_flag_transitions(*it,
+					input_symbol,
+					output_symbol,
+					original_output_string,
+					i);
+	      statestack.pop_back();
+	    }
+	}
     }
-  
-  statestack.pop_back();
+}
+
+void TransducerFd::try_flag_indices(SymbolNumber * input_symbol,
+				    SymbolNumber * output_symbol,
+				    SymbolNumber * 
+				    original_output_string,
+				    TransitionTableIndex i)
+{
+  std::vector<SymbolNumber>::iterator it;
+  for (it = operation_peek.begin(); it < operation_peek.end(); it++)
+    {
+      if (indices[i+*it]->get_input() == *it)
+	{
+	  if (transitions[indices[i+*it]->target() - TRANSITION_TARGET_TABLE_START]->get_input()
+	      != NO_SYMBOL_NUMBER)
+	    {
+	      if ( (transitions[indices[i+*it]->target() - TRANSITION_TARGET_TABLE_START]->get_input() == *it) &&
+		PushState(operations[*it]) )
+		{
+		  traverse_flag_transitions(*it,
+					    input_symbol,
+					    output_symbol,
+					    original_output_string,
+					    indices[i+*it]->target() - TRANSITION_TARGET_TABLE_START);
+		  statestack.pop_back();
+		}
+	    }
+	}
+    }
 }
 
 void Transducer::try_epsilon_indices(SymbolNumber * input_symbol,
@@ -710,42 +720,6 @@ void Transducer::try_epsilon_indices(SymbolNumber * input_symbol,
 			      original_output_string,
 			      indices[i]->target() - 
 			      TRANSITION_TARGET_TABLE_START);
-    }
-}
-
-void TransducerFd::try_epsilon_indices(SymbolNumber * input_symbol,
-				       SymbolNumber * output_symbol,
-				       SymbolNumber * original_output_string,
-				       TransitionTableIndex i)
-{
-#if OL_FULL_DEBUG
-  std::cout << "try_epsilon_indices " << i << std::endl;
-#endif
-  if (indices[i]->get_input() == 0)
-    {
-      try_epsilon_transitions(input_symbol,
-			      output_symbol,
-			      original_output_string,
-			      indices[i]->target() - 
-			      TRANSITION_TARGET_TABLE_START);
-    }
-  // Flags are a kind of epsilon.
-  // Because they're not guaranteed to occur after epsilon transitions
-  // or even contiguously, we do this:
-  // find the indices one by one and have a special function for traversing
-  // each transition for each flag separately.
-  std::vector<SymbolNumber>::iterator it;
-  for (it = operation_peek.begin(); it < operation_peek.end(); it++)
-    {
-      if (indices[i+*it]->get_input() == *it)
-	{
-	  traverse_flag_transitions(*it,
-				    input_symbol,
-				    output_symbol,
-				    original_output_string,
-				    indices[i + *it]->target() -
-				    TRANSITION_TARGET_TABLE_START);
-	}
     }
 }
 
@@ -882,6 +856,91 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
 #if OL_FULL_DEBUG
       std::cout << "Testing input string on index side, " << *input_symbol << " at pointer" << std::endl;
 #endif
+      
+      if (*input_symbol == NO_SYMBOL_NUMBER)
+	{ // input-string ended.
+	  if (final_index(i))
+	    {
+	      note_analysis(original_output_string);
+	    }
+	  *output_symbol = NO_SYMBOL_NUMBER;
+	  return;
+	}
+      
+      SymbolNumber input = *input_symbol;
+      ++input_symbol;
+
+      find_index(input,
+		 input_symbol,
+		 output_symbol,
+		 original_output_string,
+		 i+1);
+    }
+  *output_symbol = NO_SYMBOL_NUMBER;
+}
+
+void TransducerFd::get_analyses(SymbolNumber * input_symbol,
+			      SymbolNumber * output_symbol,
+			      SymbolNumber * original_output_string,
+			      TransitionTableIndex i)
+{
+#if OL_FULL_DEBUG
+  std::cout << "get_analyses " << i << std::endl;
+#endif
+  if (i >= TRANSITION_TARGET_TABLE_START )
+    {
+      i = i - TRANSITION_TARGET_TABLE_START;
+      
+      try_epsilon_transitions(input_symbol,
+			      output_symbol,
+			      original_output_string,
+			      i+1);
+
+      try_flag_transitions(input_symbol,
+			   output_symbol,
+			   original_output_string,
+			   i+1);
+
+#if OL_FULL_DEBUG
+      std::cout << "Testing input string on transition side, " << *input_symbol << " at pointer" << std::endl;
+#endif
+
+      // input-string ended.
+      if (*input_symbol == NO_SYMBOL_NUMBER)
+	{
+	  if (final_transition(i))
+	    {
+	      note_analysis(original_output_string);
+	    }
+	  *output_symbol = NO_SYMBOL_NUMBER;
+	  return;
+	}
+      
+      SymbolNumber input = *input_symbol;
+      ++input_symbol;
+
+      find_transitions(input,
+		       input_symbol,
+		       output_symbol,
+		       original_output_string,
+		       i+1);
+    }
+  else
+    {
+      
+      try_epsilon_indices(input_symbol,
+			  output_symbol,
+			  original_output_string,
+			  i+1);
+      
+#if OL_FULL_DEBUG
+      std::cout << "Testing input string on index side, " << *input_symbol << " at pointer" << std::endl;
+#endif
+
+      try_flag_indices(input_symbol,
+		       output_symbol,
+		       original_output_string,
+		       i+1);
       
       if (*input_symbol == NO_SYMBOL_NUMBER)
 	{ // input-string ended.
@@ -1175,22 +1234,13 @@ void TransducerW::try_epsilon_transitions(SymbolNumber * input_symbol,
   *output_symbol = NO_SYMBOL_NUMBER;
 }
 
-void TransducerWFd::try_epsilon_transitions(SymbolNumber * input_symbol,
-					  SymbolNumber * output_symbol,
-					  SymbolNumber * 
-					  original_output_string,
-					  TransitionTableIndex i)
+void TransducerWFd::traverse_flag_transitions(SymbolNumber input,
+					     SymbolNumber * input_symbol,
+					     SymbolNumber * output_symbol,
+					     SymbolNumber * original_output_string,
+					     TransitionTableIndex i)
 {
-#if OL_FULL_DEBUG
-  std::cerr << "try epsilon transitions " << i << " " << current_weight << std::endl;
-#endif
-
-  if (transitions.size() <= i) 
-    {
-      return;
-    }
-
-  while ((transitions[i] != NULL) and (transitions[i]->get_input() == 0))
+  do
     {
       *output_symbol = transitions[i]->get_output();
       current_weight += transitions[i]->get_weight();
@@ -1200,67 +1250,61 @@ void TransducerWFd::try_epsilon_transitions(SymbolNumber * input_symbol,
 		   transitions[i]->target());
       current_weight -= transitions[i]->get_weight();
       ++i;
+    } while (transitions[i]->get_input() == input);
+}
+
+void TransducerWFd::try_flag_transitions(SymbolNumber * input_symbol,
+					SymbolNumber * output_symbol,
+					SymbolNumber * 
+					original_output_string,
+					TransitionTableIndex i)
+{
+  if (transitions[i]->get_input() != NO_SYMBOL_NUMBER)
+    {
+      std::vector<SymbolNumber>::iterator it;
+      for (it = operation_peek.begin(); it < operation_peek.end(); it++)
+	{
+	  if ( (transitions[i]->get_input() == *it) &&
+	       PushState(operations[*it]))
+	    {
+	      traverse_flag_transitions(*it,
+					input_symbol,
+					output_symbol,
+					original_output_string,
+					i);
+	      statestack.pop_back();
+	    }
+	}
     }
-  
+}
+
+void TransducerWFd::try_flag_indices(SymbolNumber * input_symbol,
+				    SymbolNumber * output_symbol,
+				    SymbolNumber * 
+				    original_output_string,
+				    TransitionTableIndex i)
+{
   std::vector<SymbolNumber>::iterator it;
   for (it = operation_peek.begin(); it < operation_peek.end(); it++)
     {
-      if (transitions[i]->get_input() == *it)
+      if (indices[i+*it]->get_input() == *it)
 	{
-	  traverse_flag_transitions(*it,
-				    input_symbol,
-				    output_symbol,
-				    original_output_string,
-				    i);
+	  if (transitions[indices[i+*it]->target() - TRANSITION_TARGET_TABLE_START]->get_input()
+	      != NO_SYMBOL_NUMBER)
+	    {
+	      if ( (transitions[indices[i+*it]->target() - TRANSITION_TARGET_TABLE_START]->get_input() == *it) &&
+		PushState(operations[*it]) )
+		{
+		  traverse_flag_transitions(*it,
+					    input_symbol,
+					    output_symbol,
+					    original_output_string,
+					    indices[i+*it]->target() - TRANSITION_TARGET_TABLE_START);
+		  statestack.pop_back();
+		}
+	    }
 	}
     }
-
-  *output_symbol = NO_SYMBOL_NUMBER;
-}
-
-void TransducerWFd::traverse_flag_transitions(SymbolNumber input,
-					      SymbolNumber * input_symbol,
-					      SymbolNumber * output_symbol,
-					      SymbolNumber * original_output_string,
-					      TransitionTableIndex i)
-{
-  if (transitions.size() <= i)
-    {
-      return;
-    }
-  if (transitions[i] == NULL)
-    {
-      *output_symbol = NO_SYMBOL_NUMBER;
-      return;
-    }
-  
-  if (PushState(operations[input]) == false)
-    { // try to modify the state stack
-#if OL_FULL_DEBUG
-      std::cout << "failed to modify state stack\n";
-#endif
-      return;
-    }
-  while (transitions[i] != NULL && transitions[i]->get_input() != NO_SYMBOL_NUMBER)
-    {
-      if (transitions[i]->get_input() == input)
-	{
-	  current_weight += transitions[i]->get_weight();
-	  *output_symbol = transitions[i]->get_output();
-	  get_analyses(input_symbol,
-		       output_symbol+1,
-		       original_output_string,
-		       transitions[i]->target());
-	  current_weight -= transitions[i]->get_weight();
-	}
-      else
-	{
-	  break;
-	}
-      ++i;
-    }
-  
-  statestack.pop_back();
 }
 
 void TransducerW::try_epsilon_indices(SymbolNumber * input_symbol,
@@ -1280,40 +1324,6 @@ void TransducerW::try_epsilon_indices(SymbolNumber * input_symbol,
 			      indices[i]->target() - 
 			      TRANSITION_TARGET_TABLE_START);
     }
-}
-
-void TransducerWFd::try_epsilon_indices(SymbolNumber * input_symbol,
-				      SymbolNumber * output_symbol,
-				      SymbolNumber * original_output_string,
-				      TransitionTableIndex i)
-{
-  if (indices[i]->get_input() == 0)
-    {
-      try_epsilon_transitions(input_symbol,
-			      output_symbol,
-			      original_output_string,
-			      indices[i]->target() - 
-			      TRANSITION_TARGET_TABLE_START);
-    }
-  // Flags are a kind of epsilon.
-  // Because they're not guaranteed to occur after epsilon transitions
-  // or even contiguously, we do this:
-  // find the indices one by one and have a special function for traversing
-  // each transition for each flag separately.
-  std::vector<SymbolNumber>::iterator it;
-  for (it = operation_peek.begin(); it < operation_peek.end(); it++)
-    {
-      if (indices[i+*it]->get_input() == *it)
-	{
-	  traverse_flag_transitions(*it,
-				    input_symbol,
-				    output_symbol,
-				    original_output_string,
-				    indices[i + *it]->target() -
-				    TRANSITION_TARGET_TABLE_START);
-	}
-    }
-  
 }
 
 void TransducerW::find_transitions(SymbolNumber input,
@@ -1589,6 +1599,95 @@ void TransducerW::get_analyses(SymbolNumber * input_symbol,
       SymbolNumber input = *input_symbol;
       ++input_symbol;
       
+      find_index(input,
+		 input_symbol,
+		 output_symbol,
+		 original_output_string,
+		 i+1);
+    }
+  *output_symbol = NO_SYMBOL_NUMBER;
+}
+
+void TransducerWFd::get_analyses(SymbolNumber * input_symbol,
+			      SymbolNumber * output_symbol,
+			      SymbolNumber * original_output_string,
+			      TransitionTableIndex i)
+{
+#if OL_FULL_DEBUG
+  std::cout << "get_analyses " << i << std::endl;
+#endif
+  if (i >= TRANSITION_TARGET_TABLE_START )
+    {
+      i = i - TRANSITION_TARGET_TABLE_START;
+      
+      try_epsilon_transitions(input_symbol,
+			      output_symbol,
+			      original_output_string,
+			      i+1);
+
+      try_flag_transitions(input_symbol,
+			   output_symbol,
+			   original_output_string,
+			   i+1);
+
+#if OL_FULL_DEBUG
+      std::cout << "Testing input string on transition side, " << *input_symbol << " at pointer" << std::endl;
+#endif
+
+      // input-string ended.
+      if (*input_symbol == NO_SYMBOL_NUMBER)
+	{
+	  if (final_transition(i))
+	    {
+	      current_weight += get_final_transition_weight(i);
+	      note_analysis(original_output_string);
+	      current_weight -= get_final_transition_weight(i);
+	    }
+	  *output_symbol = NO_SYMBOL_NUMBER;
+	  return;
+	}
+      
+      SymbolNumber input = *input_symbol;
+      ++input_symbol;
+
+      find_transitions(input,
+		       input_symbol,
+		       output_symbol,
+		       original_output_string,
+		       i+1);
+    }
+  else
+    {
+      
+      try_epsilon_indices(input_symbol,
+			  output_symbol,
+			  original_output_string,
+			  i+1);
+      
+#if OL_FULL_DEBUG
+      std::cout << "Testing input string on index side, " << *input_symbol << " at pointer" << std::endl;
+#endif
+
+      try_flag_indices(input_symbol,
+		       output_symbol,
+		       original_output_string,
+		       i+1);
+      
+      if (*input_symbol == NO_SYMBOL_NUMBER)
+	{ // input-string ended.
+	  if (final_index(i))
+	    {
+	      current_weight += get_final_index_weight(i);
+	      note_analysis(original_output_string);
+	      current_weight -= get_final_index_weight(i);
+	    }
+	  *output_symbol = NO_SYMBOL_NUMBER;
+	  return;
+	}
+      
+      SymbolNumber input = *input_symbol;
+      ++input_symbol;
+
       find_index(input,
 		 input_symbol,
 		 output_symbol,
