@@ -2055,6 +2055,7 @@ namespace HWFST {
     if (key_table == NULL) { return NULL; }
     KeySet * t_keys = define_key_set(t);
     HFST::KeyTable * new_key_table = create_key_table();
+    new_key_table->associate_key(0,0);
     Key new_k = 1;
     for (Key k = 0; k < key_table->get_unused_key(); ++k)
       {
@@ -2140,6 +2141,7 @@ namespace HWFST {
   
   SymbolSet * hwfst_get_symbols(InputKeySet * input_keys, HWFST::KeyTable * kt)
   {
+    
     SymbolSet * input_symbols = new SymbolSet;
     for (InputKeySet::iterator it = input_keys->begin();
 	 it != input_keys->end();
