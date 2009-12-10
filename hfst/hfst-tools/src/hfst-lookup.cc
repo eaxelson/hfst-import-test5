@@ -520,15 +520,21 @@ lookup_print_all(const char* s, KeyTable* kt,
 							++lkv)
 					{
 						KeyVector* hmmlkv = *lkv;
-						hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
-						if (hmmlkv == NULL)
-						  {continue;}
-						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
-									_is_epsilon), hmmlkv->end());
 						string* lkvstring = keyVectorToString(hmmlkv, kt);
 						VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
-						current_results->push_back(hmmlkv);
 						delete lkvstring;
+						hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
+						if (hmmlkv == NULL)
+						{
+							VERBOSE_PRINT("Filtered by flag diacritics\n");
+							continue;
+						}
+						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
+									_is_epsilon), hmmlkv->end());
+						string* hmmlkvstring = keyVectorToString(hmmlkv, kt);
+						VERBOSE_PRINT("Filtered %s\n", hmmlkvstring->c_str());
+						delete hmmlkvstring;
+						current_results->push_back(hmmlkv);
 					}
 				}
 			}
@@ -631,15 +637,21 @@ lookup_print_all(const char* s, KeyTable* kt,
 							++lkv)
 					{
 						KeyVector* hmmlkv = *lkv;
-						hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
-						if (hmmlkv == NULL)
-						  { continue; }
-						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
-									_is_epsilon), hmmlkv->end());
 						string* lkvstring = keyVectorToString(hmmlkv, kt);
 						VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
-						current_results->push_back(hmmlkv);
 						delete lkvstring;
+						hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
+						if (hmmlkv == NULL)
+						{
+							VERBOSE_PRINT("Filtered by flag diacritics\n");
+							continue;
+						}
+						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
+									_is_epsilon), hmmlkv->end());
+						string* hmmlkvstring = keyVectorToString(hmmlkv, kt);
+						VERBOSE_PRINT("Filtered %s\n", hmmlkvstring->c_str());
+						delete hmmlkvstring;
+						current_results->push_back(hmmlkv);
 					}
 				}
 			}
