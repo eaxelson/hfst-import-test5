@@ -501,41 +501,43 @@ lookup_print_all(const char* s, KeyTable* kt,
 				string* kvstring = keyVectorToString(*kv, kt);
 				VERBOSE_PRINT("Looking up %s from transducer %zu\n",
 						kvstring->c_str(), cascade_number);
+				KeyVectorVector* lookups;
 				if (is_infinitely_ambiguous(*t, true, *kv))
 				{
-					VERBOSE_PRINT("Got infinite results\n");
-					return false;
+					fprintf(message_out, "WARNING: Got infinite results\n");
+					lookups = new KeyVectorVector;
+					lookups->push_back(lookup_first(*t, *kv, &flag_diacritic_set));
 				}
 				else
 				{
-				  KeyVectorVector* lookups = lookup_all(*t, *kv,&flag_diacritic_set);
-					if (lookups == NULL)
+					lookups = lookup_all(*t, *kv,&flag_diacritic_set);
+				}
+				if (lookups == NULL)
+				{
+					// no results as empty result
+					VERBOSE_PRINT("Got no results\n");
+					lookups = new KeyVectorVector;
+				}
+				for (KeyVectorVector::iterator lkv = lookups->begin();
+						lkv != lookups->end();
+						++lkv)
+				{
+					KeyVector* hmmlkv = *lkv;
+					string* lkvstring = keyVectorToString(hmmlkv, kt);
+					VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
+					delete lkvstring;
+					hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
+					if (hmmlkv == NULL)
 					{
-						// no results as empty result
-						VERBOSE_PRINT("Got no results\n");
-						lookups = new KeyVectorVector;
+						VERBOSE_PRINT("Filtered by flag diacritics\n");
+						continue;
 					}
-					for (KeyVectorVector::iterator lkv = lookups->begin();
-							lkv != lookups->end();
-							++lkv)
-					{
-						KeyVector* hmmlkv = *lkv;
-						string* lkvstring = keyVectorToString(hmmlkv, kt);
-						VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
-						delete lkvstring;
-						hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
-						if (hmmlkv == NULL)
-						{
-							VERBOSE_PRINT("Filtered by flag diacritics\n");
-							continue;
-						}
-						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
-									_is_epsilon), hmmlkv->end());
-						string* hmmlkvstring = keyVectorToString(hmmlkv, kt);
-						VERBOSE_PRINT("Filtered %s\n", hmmlkvstring->c_str());
-						delete hmmlkvstring;
-						current_results->push_back(hmmlkv);
-					}
+					hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
+								_is_epsilon), hmmlkv->end());
+					string* hmmlkvstring = keyVectorToString(hmmlkv, kt);
+					VERBOSE_PRINT("Filtered %s\n", hmmlkvstring->c_str());
+					delete hmmlkvstring;
+					current_results->push_back(hmmlkv);
 				}
 			}
 			final_results = current_results;
@@ -618,41 +620,43 @@ lookup_print_all(const char* s, KeyTable* kt,
 				string* kvstring = keyVectorToString(*kv, kt);
 				VERBOSE_PRINT("Looking up %s from transducer %zu\n",
 						kvstring->c_str(), cascade_number);
+				KeyVectorVector* lookups;
 				if (is_infinitely_ambiguous(*t, true, *kv))
 				{
-					VERBOSE_PRINT("Got infinite results\n");
-					return false;
+					fprintf(message_out, "WARNING: Got infinite results\n");
+					lookups = new KeyVectorVector;
+					lookups->push_back(lookup_first(*t, *kv, &flag_diacritic_set));
 				}
 				else
 				{
-				  KeyVectorVector* lookups = lookup_all(*t, *kv,&flag_diacritic_set);
-					if (lookups == NULL)
+					lookups = lookup_all(*t, *kv,&flag_diacritic_set);
+				}
+				if (lookups == NULL)
+				{
+					// no results as empty result
+					VERBOSE_PRINT("Got no results\n");
+					lookups = new KeyVectorVector;
+				}
+				for (KeyVectorVector::iterator lkv = lookups->begin();
+						lkv != lookups->end();
+						++lkv)
+				{
+					KeyVector* hmmlkv = *lkv;
+					string* lkvstring = keyVectorToString(hmmlkv, kt);
+					VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
+					delete lkvstring;
+					hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
+					if (hmmlkv == NULL)
 					{
-						// no results as empty result
-						VERBOSE_PRINT("Got no results\n");
-						lookups = new KeyVectorVector;
+						VERBOSE_PRINT("Filtered by flag diacritics\n");
+						continue;
 					}
-					for (KeyVectorVector::iterator lkv = lookups->begin();
-							lkv != lookups->end();
-							++lkv)
-					{
-						KeyVector* hmmlkv = *lkv;
-						string* lkvstring = keyVectorToString(hmmlkv, kt);
-						VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
-						delete lkvstring;
-						hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
-						if (hmmlkv == NULL)
-						{
-							VERBOSE_PRINT("Filtered by flag diacritics\n");
-							continue;
-						}
-						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
-									_is_epsilon), hmmlkv->end());
-						string* hmmlkvstring = keyVectorToString(hmmlkv, kt);
-						VERBOSE_PRINT("Filtered %s\n", hmmlkvstring->c_str());
-						delete hmmlkvstring;
-						current_results->push_back(hmmlkv);
-					}
+					hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
+								_is_epsilon), hmmlkv->end());
+					string* hmmlkvstring = keyVectorToString(hmmlkv, kt);
+					VERBOSE_PRINT("Filtered %s\n", hmmlkvstring->c_str());
+					delete hmmlkvstring;
+					current_results->push_back(hmmlkv);
 				}
 			}
 			final_results = current_results;
@@ -738,7 +742,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 			}
 			define_flag_diacritics(key_table);
 			VERBOSE_PRINT("\n");
-#			define MAX_LINE_LENGTH 254
+#			define MAX_LINE_LENGTH 2048
 			char* line =
 				static_cast<char*>(malloc(sizeof(char)*MAX_LINE_LENGTH+1));
 			while ((line = fgets(line, MAX_LINE_LENGTH, lookup_file)))
@@ -827,7 +831,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 			}
 			define_flag_diacritics(key_table);
 			VERBOSE_PRINT("\n");
-#			define MAX_LINE_LENGTH 254
+#			define MAX_LINE_LENGTH 2048
 			char* line =
 				static_cast<char*>(malloc(sizeof(char)*MAX_LINE_LENGTH+1));
 			while ((line = fgets(line, MAX_LINE_LENGTH, lookup_file)))
