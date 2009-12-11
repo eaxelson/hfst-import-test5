@@ -293,7 +293,7 @@ void Encoder::read_input_symbols(KeyTable * kt)
       assert(kt->find(k) != kt->end());
 #endif
       const char * p = kt->operator[](k);
-      if ((unsigned char)(*p) <= 127)
+      if ((strlen(p) == 1) && (unsigned char)(*p) <= 127)
 	{
 	  ascii_symbols[(unsigned char)(*p)] = k;
 	}
@@ -657,6 +657,9 @@ void TransducerFd::try_flag_transitions(SymbolNumber * input_symbol,
 					original_output_string,
 					TransitionTableIndex i)
 {
+#if OL_FULL_DEBUG
+  std::cout << "try flag transitions " << i << std::endl;
+#endif
   if (transitions[i]->get_input() != NO_SYMBOL_NUMBER)
     {
       std::vector<SymbolNumber>::iterator it;
@@ -682,6 +685,9 @@ void TransducerFd::try_flag_indices(SymbolNumber * input_symbol,
 				    original_output_string,
 				    TransitionTableIndex i)
 {
+#if OL_FULL_DEBUG
+  std::cout << "try flag indices " << i << std::endl;
+#endif
   std::vector<SymbolNumber>::iterator it;
   for (it = operation_peek.begin(); it < operation_peek.end(); it++)
     {
@@ -933,15 +939,15 @@ void TransducerFd::get_analyses(SymbolNumber * input_symbol,
 			  original_output_string,
 			  i+1);
       
-#if OL_FULL_DEBUG
-      std::cout << "Testing input string on index side, " << *input_symbol << " at pointer" << std::endl;
-#endif
-
       try_flag_indices(input_symbol,
 		       output_symbol,
 		       original_output_string,
 		       i+1);
-      
+
+#if OL_FULL_DEBUG
+      std::cout << "Testing input string on index side, " << *input_symbol << " at pointer" << std::endl;
+#endif
+
       if (*input_symbol == NO_SYMBOL_NUMBER)
 	{ // input-string ended.
 	  if (final_index(i))
@@ -1080,6 +1086,15 @@ bool TransducerWFd::PushState(FlagDiacriticOperation op)
     statestack.back()[op.Feature()] = -1*op.Value();
     return true;
   case R: // require
+    if (op.Value() == 0) // empty require
+      {
+	if (statestack.back()[op.Feature()] == 0)
+	  {
+	    return false;
+	  }
+	statestack.push_back(statestack.back());
+	return true;
+      }
     if (statestack.back()[op.Feature()] == op.Value())
       {
 	statestack.push_back(statestack.back());
@@ -1240,6 +1255,15 @@ void TransducerWFd::traverse_flag_transitions(SymbolNumber input,
 					     SymbolNumber * original_output_string,
 					     TransitionTableIndex i)
 {
+#if OL_FULL_DEBUG
+  std::cerr << "traverse flag transitions " << i << " " << current_weight << std::endl;
+#endif
+  
+      if (transitions.size() <= i)
+    {
+      return;
+    }
+  
   do
     {
       *output_symbol = transitions[i]->get_output();
@@ -1259,6 +1283,10 @@ void TransducerWFd::try_flag_transitions(SymbolNumber * input_symbol,
 					original_output_string,
 					TransitionTableIndex i)
 {
+#if OL_FULL_DEBUG
+  std::cerr << "try flag transitions " << i << " " << current_weight << std::endl;
+#endif
+  
   if (transitions[i]->get_input() != NO_SYMBOL_NUMBER)
     {
       std::vector<SymbolNumber>::iterator it;
@@ -1284,9 +1312,17 @@ void TransducerWFd::try_flag_indices(SymbolNumber * input_symbol,
 				    original_output_string,
 				    TransitionTableIndex i)
 {
+#if OL_FULL_DEBUG
+  std::cerr << "try flag indices " << i << " " << current_weight << std::endl;
+#endif
+
   std::vector<SymbolNumber>::iterator it;
   for (it = operation_peek.begin(); it < operation_peek.end(); it++)
     {
+      if (indices.size() <= i+*it)
+	{
+	  return;
+	}
       if (indices[i+*it]->get_input() == *it)
 	{
 	  if (transitions[indices[i+*it]->target() - TRANSITION_TARGET_TABLE_START]->get_input()
@@ -1315,7 +1351,6 @@ void TransducerW::try_epsilon_indices(SymbolNumber * input_symbol,
 #if OL_FULL_DEBUG
   std::cerr << "try indices " << i << " " << current_weight << std::endl;
 #endif
-
   if (indices[i]->get_input() == 0)
     {
       try_epsilon_transitions(input_symbol,
@@ -1371,7 +1406,7 @@ void TransducerW::find_index(SymbolNumber input,
 #if OL_FULL_DEBUG
   std::cerr << "find index " << i << " " << current_weight << std::endl;
 #endif
-  if (transitions.size() <= i) 
+  if (indices.size() <= i) 
     {
       return;
     }
@@ -1664,14 +1699,14 @@ void TransducerWFd::get_analyses(SymbolNumber * input_symbol,
 			  original_output_string,
 			  i+1);
       
-#if OL_FULL_DEBUG
-      std::cout << "Testing input string on index side, " << *input_symbol << " at pointer" << std::endl;
-#endif
-
       try_flag_indices(input_symbol,
 		       output_symbol,
 		       original_output_string,
 		       i+1);
+
+#if OL_FULL_DEBUG
+      std::cout << "Testing input string on index side, " << *input_symbol << " at pointer" << std::endl;
+#endif
       
       if (*input_symbol == NO_SYMBOL_NUMBER)
 	{ // input-string ended.
