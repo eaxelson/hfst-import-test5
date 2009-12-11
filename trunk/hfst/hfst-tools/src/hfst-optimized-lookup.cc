@@ -833,11 +833,11 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
       // input-string ended.
       if (*input_symbol == NO_SYMBOL_NUMBER)
 	{
+	  *output_symbol = NO_SYMBOL_NUMBER;
 	  if (final_transition(i))
 	    {
 	      note_analysis(original_output_string);
 	    }
-	  *output_symbol = NO_SYMBOL_NUMBER;
 	  return;
 	}
       
@@ -865,11 +865,11 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
       
       if (*input_symbol == NO_SYMBOL_NUMBER)
 	{ // input-string ended.
+	  *output_symbol = NO_SYMBOL_NUMBER;
 	  if (final_index(i))
 	    {
 	      note_analysis(original_output_string);
 	    }
-	  *output_symbol = NO_SYMBOL_NUMBER;
 	  return;
 	}
       
@@ -892,6 +892,13 @@ void TransducerFd::get_analyses(SymbolNumber * input_symbol,
 {
 #if OL_FULL_DEBUG
   std::cout << "get_analyses " << i << std::endl;
+  int a = 0;
+  while (original_output_string[a] != NO_SYMBOL_NUMBER)
+    {
+      std::cout << " " << original_output_string[a];
+      ++a;
+    }
+  std::cout << "\n";
 #endif
   if (i >= TRANSITION_TARGET_TABLE_START )
     {
@@ -914,11 +921,11 @@ void TransducerFd::get_analyses(SymbolNumber * input_symbol,
       // input-string ended.
       if (*input_symbol == NO_SYMBOL_NUMBER)
 	{
+	  *output_symbol = NO_SYMBOL_NUMBER;
 	  if (final_transition(i))
 	    {
 	      note_analysis(original_output_string);
 	    }
-	  *output_symbol = NO_SYMBOL_NUMBER;
 	  return;
 	}
       
@@ -950,11 +957,11 @@ void TransducerFd::get_analyses(SymbolNumber * input_symbol,
 
       if (*input_symbol == NO_SYMBOL_NUMBER)
 	{ // input-string ended.
+	  *output_symbol = NO_SYMBOL_NUMBER;
 	  if (final_index(i))
 	    {
 	      note_analysis(original_output_string);
 	    }
-	  *output_symbol = NO_SYMBOL_NUMBER;
 	  return;
 	}
       
@@ -967,7 +974,6 @@ void TransducerFd::get_analyses(SymbolNumber * input_symbol,
 		 original_output_string,
 		 i+1);
     }
-  *output_symbol = NO_SYMBOL_NUMBER;
 }
 
 void Transducer::printAnalyses(std::string prepend)
@@ -1585,6 +1591,7 @@ void TransducerW::get_analyses(SymbolNumber * input_symbol,
       // input-string ended.
       if (*input_symbol == NO_SYMBOL_NUMBER)
 	{
+	  *output_symbol = NO_SYMBOL_NUMBER;
 	  if (transitions.size() <= i) 
 	    {
 	      return;
@@ -1595,8 +1602,6 @@ void TransducerW::get_analyses(SymbolNumber * input_symbol,
 	      note_analysis(original_output_string);
 	      current_weight -= get_final_transition_weight(i);
 	    }
-	  
-	  *output_symbol = NO_SYMBOL_NUMBER;
 	  return;
 	}
       
@@ -1620,14 +1625,13 @@ void TransducerW::get_analyses(SymbolNumber * input_symbol,
       // input-string ended.
       if (*input_symbol == NO_SYMBOL_NUMBER)
 	{
+	  *output_symbol = NO_SYMBOL_NUMBER;
 	  if (final_index(i))
 	    {
 	      current_weight += get_final_index_weight(i);
 	      note_analysis(original_output_string);
 	      current_weight -= get_final_index_weight(i);
 	    }
-	  
-	  *output_symbol = NO_SYMBOL_NUMBER;
 	  return;
 	}
       
@@ -1640,7 +1644,6 @@ void TransducerW::get_analyses(SymbolNumber * input_symbol,
 		 original_output_string,
 		 i+1);
     }
-  *output_symbol = NO_SYMBOL_NUMBER;
 }
 
 void TransducerWFd::get_analyses(SymbolNumber * input_symbol,
@@ -1672,13 +1675,13 @@ void TransducerWFd::get_analyses(SymbolNumber * input_symbol,
       // input-string ended.
       if (*input_symbol == NO_SYMBOL_NUMBER)
 	{
+	  *output_symbol = NO_SYMBOL_NUMBER;
 	  if (final_transition(i))
 	    {
 	      current_weight += get_final_transition_weight(i);
 	      note_analysis(original_output_string);
 	      current_weight -= get_final_transition_weight(i);
 	    }
-	  *output_symbol = NO_SYMBOL_NUMBER;
 	  return;
 	}
       
@@ -1710,13 +1713,14 @@ void TransducerWFd::get_analyses(SymbolNumber * input_symbol,
       
       if (*input_symbol == NO_SYMBOL_NUMBER)
 	{ // input-string ended.
+	  *output_symbol = NO_SYMBOL_NUMBER;
 	  if (final_index(i))
 	    {
 	      current_weight += get_final_index_weight(i);
 	      note_analysis(original_output_string);
 	      current_weight -= get_final_index_weight(i);
 	    }
-	  *output_symbol = NO_SYMBOL_NUMBER;
+
 	  return;
 	}
       
@@ -1729,5 +1733,4 @@ void TransducerWFd::get_analyses(SymbolNumber * input_symbol,
 		 original_output_string,
 		 i+1);
     }
-  *output_symbol = NO_SYMBOL_NUMBER;
 }

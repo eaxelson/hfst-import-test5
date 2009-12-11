@@ -534,37 +534,37 @@ class Transducer
   {
     return indices[i]->final();
   }
-
+  
   void try_epsilon_indices(SymbolNumber * input_symbol,
 			   SymbolNumber * output_symbol,
 			   SymbolNumber * original_output_string,
 			   TransitionTableIndex i);
-
+  
   void try_epsilon_transitions(SymbolNumber * input_symbol,
-				       SymbolNumber * output_symbol,
-				       SymbolNumber * original_output_string,
-				       TransitionTableIndex i);
-
+			       SymbolNumber * output_symbol,
+			       SymbolNumber * original_output_string,
+			       TransitionTableIndex i);
+  
   void find_index(SymbolNumber input,
-			 SymbolNumber * input_symbol,
-			 SymbolNumber * output_symbol,
-			 SymbolNumber * original_output_string,
-			 TransitionTableIndex i);
-
+		  SymbolNumber * input_symbol,
+		  SymbolNumber * output_symbol,
+		  SymbolNumber * original_output_string,
+		  TransitionTableIndex i);
+  
   void find_transitions(SymbolNumber input,
-				SymbolNumber * input_symbol,
-				SymbolNumber * output_symbol,
-				SymbolNumber * original_output_string,
-				TransitionTableIndex i);
-
+			SymbolNumber * input_symbol,
+			SymbolNumber * output_symbol,
+			SymbolNumber * original_output_string,
+			TransitionTableIndex i);
+  
   virtual void get_analyses(SymbolNumber * input_symbol,
-		    SymbolNumber * output_symbol,
-		    SymbolNumber * original_output_string,
-		    TransitionTableIndex i);
+			    SymbolNumber * output_symbol,
+			    SymbolNumber * original_output_string,
+			    TransitionTableIndex i);
 
 
  public:
-   Transducer(FILE * f, TransducerHeader h, TransducerAlphabet a):
+ Transducer(FILE * f, TransducerHeader h, TransducerAlphabet a):
   header(h),
     alphabet(a),
     keys(alphabet.get_key_table()),
