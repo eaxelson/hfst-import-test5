@@ -2,20 +2,36 @@
  This is a catchall file for all hfst-related bugs
 ===================================================
 
+Most of the bugs in this file have been reported via official bug tracker,
+which currently is email box <hfst-bugs@helsinki.fi>.
+
 Bugs w.r.t. supported Xerox tool idiosyncracies
 -----------------------------------------------
 
 The automatic handling of flag diacritics, i.e. parsing symbols of form
 @?.*@ as special epsilons with side effects is only implemented in
-hfst-compose-intersect, hfst-compose and hfst-lookup. Handling them as
-epsilons for other tools that may require them to be treated as epsilons
-does not work.
+hfst-compose-intersect, hfst-compose, hfst-lookup and hfst-optimized-lookup.
+Handling them as epsilons for other tools that may require them to be treated
+as epsilons does not work.
 
 The handling of # or .#. as automatic border of automaton symbol is only
 supported in hfst-twolc and hfst-compose-intersect.
 
-Bugs reported to hfst-bugs@helsinki.fi
---------------------------------------
+Unresolved Bugs
+---------------
+
+- Library should provide package-config .pc-files and stable API and reliable
+  version numbering.
+
+- Library headers should not reveal underlying variables or structures, nor
+  cause all compilations to report warnings from bugs of underlying libraries.
+
+- Transducer reading will segfault with files which have a header that is
+  potentially valid HFST, SFST or OpenFST transducer header but rest of the
+  file is faulty.
+
+Resolved bugs
+-------------
 
 - Mac OS X gettext / autopoint failures, resolved in r150 by removal of gettext
 
@@ -32,13 +48,6 @@ Bugs reported to hfst-bugs@helsinki.fi
 
 - “hfst-optimized-lookup not accepting file input” Resolved in documentation
 
-Discovered bugs
----------------
-
-- Transducer reading will segfault with files which have a header that is
-  potentially valid HFST, SFST or OpenFST transducer header but rest of the
-  file is faulty.
-
 - (FIXED in development branch)
   The currently (elsewhere) distributed German transducer, german.hfst, fails
   under hfst-lookup with
@@ -49,3 +58,4 @@ Discovered bugs
 
   The optimized lookup version, german.hfst.ol, works fine however.
 
+.. vim: set ft=rst
