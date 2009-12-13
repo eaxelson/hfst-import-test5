@@ -21,6 +21,7 @@ then
 !! 2.5.33 on some platforms. Unless you're building with
 !! pre-flex-generated sources, building will probably fail.])
 fi
+# ' (because syntax highlight is being silly)
 
 ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
 
@@ -231,6 +232,12 @@ AC_ARG_ENABLE([optimized-lookup],
 			  [enable_optimized_lookup=$enableval],
 			  [enable_optimized_lookup=yes])
 AM_CONDITIONAL([WANT_OPTIMIZED_LOOKUP], [test x$enable_optimized_lookup != xno])
+AC_ARG_ENABLE([substitute],
+			  [AS_HELP_STRING([--enable-substitute],
+							  [build substitution tool @<:@default=yes@:>@])],
+			  [enable_substitute=$enableval],
+			  [enable_substitue=yes])
+AM_CONDITIONAL([WANT_SUBSTITUTE], [test x$enable_substitute != xno])
 
 
 # Checks for programs.

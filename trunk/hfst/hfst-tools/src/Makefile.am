@@ -110,6 +110,9 @@ endif
 if WANT_OPTIMIZED_LOOKUP
 MAYBE_OPTIMIZED_LOOKUP=hfst-optimized-lookup
 endif
+if WANT_SUBSTITUTE
+MAYBE_SUBSTITUTE=hfst-substitute
+endif
 
 noinst_HEADERS= \
 	calculate_functions.h hfst-commandline.h hfst-common-cases.h \
@@ -133,7 +136,7 @@ bin_PROGRAMS=$(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_COMPOSE_INTERSECT) \
 			 $(MAYBE_SYMBOLS) $(MAYBE_TAIL) $(MAYBE_TXT2FST) \
 			 $(MAYBE_UNWEIGHTED2WEIGHTED) $(MAYBE_WEIGHTED2UNWEIGHTED) \
 			 $(MAYBE_UNWEIGHTED_CALCULATE) $(MAYBE_WEIGHTED_CALCULATE) \
-			 $(MAYBE_OPTIMIZED_LOOKUP)
+			 $(MAYBE_OPTIMIZED_LOOKUP) $(MAYBE_SUBSTITUTE)
 
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc
 hfst_compare_SOURCES=hfst-compare.cc $(HFST_COMMON_SRC)
@@ -168,6 +171,7 @@ hfst_summarize_SOURCES=hfst-summarize.cc $(HFST_COMMON_SRC)
 hfst_symbols_SOURCES=hfst-symbols.cc $(HFST_COMMON_SRC)
 hfst_tail_SOURCES=hfst-tail.cc $(HFST_COMMON_SRC)
 hfst_txt2fst_SOURCES=hfst-txt2fst.cc $(HFST_COMMON_SRC)
+hfst_substitute_SOURCES=hfst-substitute.cc $(HFST_COMMON_SRC)
 
 hfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy $(HFST_COMMON_SRC)
 
