@@ -48,7 +48,7 @@ print_usage(const char *program_name)
 {
 	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
 	fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
-		   "Determinize a transducer\n"
+		   "Relabel transducer arcs\n"
 		"\n", program_name);
 
 	print_common_program_options(message_out);
