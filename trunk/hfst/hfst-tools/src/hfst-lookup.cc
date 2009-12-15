@@ -56,17 +56,17 @@ static bool print_statistics = false;
 
 // predefined formats
 static const char* XEROX_BEGIN_FORMAT = "";
-static const char* XEROX_LOOKUP_FORMAT = "%i\t%l\n";
-static const char* XEROX_NO_LOOKUPS_FORMAT = "%i\t%i\t+?\n";
-static const char* XEROX_END_FORMAT = "\n";
-static const char* CG_BEGIN_FORMAT = "\"<%i>\"\n";
-static const char* CG_LOOKUP_FORMAT = "\t\"%b\"%a\n";
-static const char* CG_NO_LOOKUPS_FORMAT = "\t\"%i\"\t ?\n";
-static const char* CG_END_FORMAT = "\n";
+static const char* XEROX_LOOKUP_FORMAT = "%i\t%l%n";
+static const char* XEROX_NO_LOOKUPS_FORMAT = "%i\t%i\t+?%n";
+static const char* XEROX_END_FORMAT = "%n";
+static const char* CG_BEGIN_FORMAT = "\"<%i>\"%n";
+static const char* CG_LOOKUP_FORMAT = "\t\"%b\"%a%n";
+static const char* CG_NO_LOOKUPS_FORMAT = "\t\"%i\"\t ?%n";
+static const char* CG_END_FORMAT = "%n";
 static const char* APERTIUM_BEGIN_FORMAT = "^%i";
 static const char* APERTIUM_LOOKUP_FORMAT = "/%l";
 static const char* APERTIUM_NO_LOOKUPS_FORMAT = "/*%i";
-static const char* APERTIUM_END_FORMAT = "$\n";
+static const char* APERTIUM_END_FORMAT = "$%n";
 
 // statistic counting
 static unsigned long inputs = 0;
