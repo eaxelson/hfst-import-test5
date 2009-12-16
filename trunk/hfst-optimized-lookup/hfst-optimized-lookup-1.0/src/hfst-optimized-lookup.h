@@ -33,6 +33,13 @@
 #include <ctime>
 #include <iostream>
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
+enum OutputType {HFST, xerox};
+OutputType outputType = xerox;
+
 bool verboseFlag = false;
 
 bool displayWeightsFlag = false;
@@ -185,9 +192,22 @@ class FlagDiacriticOperation
  public:
  FlagDiacriticOperation(FlagDiacriticOperator op, SymbolNumber feat, ValueNumber val):
   operation(op), feature(feat), value(val) {}
+
+  // dummy constructor
+ FlagDiacriticOperation():
+  operation(P), feature(NO_SYMBOL_NUMBER), value(0) {}
+  
+  bool isFlag(void) { return feature != NO_SYMBOL_NUMBER; }
   FlagDiacriticOperator Operation(void) { return operation; }
   SymbolNumber Feature(void) { return feature; }
   ValueNumber Value(void) { return value; }
+
+#if OL_FULL_DEBUG
+  void print(void)
+  {
+    std::cout << operation << "\t" << feature << "\t" << value << std::endl;
+  }
+#endif
 };
 
 typedef std::vector<FlagDiacriticOperation> OperationVector;
@@ -198,6 +218,7 @@ class TransducerAlphabet
   SymbolNumber number_of_symbols;
   KeyTable * kt;
   OperationVector operations;
+  std::vector<SymbolNumber> operation_peek;
 
   void get_next_symbol(FILE * f, SymbolNumber k);
 
@@ -212,6 +233,7 @@ class TransducerAlphabet
  TransducerAlphabet(FILE * f,SymbolNumber symbol_number):
   number_of_symbols(symbol_number),
     kt(new KeyTable),
+    operations(),
     line((char*)(malloc(1000)))
       {
 	feat_num = 0;
@@ -231,6 +253,9 @@ class TransducerAlphabet
 
   OperationVector get_operation_vector(void)
   { return operations; }
+
+  std::vector<SymbolNumber> get_operation_peek(void)
+    { return operation_peek; }
 
   SymbolNumber get_state_size(void)
   { return feature_bucket.size(); }
@@ -509,37 +534,37 @@ class Transducer
   {
     return indices[i]->final();
   }
-
+  
   void try_epsilon_indices(SymbolNumber * input_symbol,
-				  SymbolNumber * output_symbol,
-				  SymbolNumber * original_output_string,
-				  TransitionTableIndex i);
-
-  virtual void try_epsilon_transitions(SymbolNumber * input_symbol,
-				       SymbolNumber * output_symbol,
-				       SymbolNumber * original_output_string,
-				       TransitionTableIndex i);
-
+			   SymbolNumber * output_symbol,
+			   SymbolNumber * original_output_string,
+			   TransitionTableIndex i);
+  
+  void try_epsilon_transitions(SymbolNumber * input_symbol,
+			       SymbolNumber * output_symbol,
+			       SymbolNumber * original_output_string,
+			       TransitionTableIndex i);
+  
   void find_index(SymbolNumber input,
-			 SymbolNumber * input_symbol,
-			 SymbolNumber * output_symbol,
-			 SymbolNumber * original_output_string,
-			 TransitionTableIndex i);
-
-  virtual void find_transitions(SymbolNumber input,
+		  SymbolNumber * input_symbol,
+		  SymbolNumber * output_symbol,
+		  SymbolNumber * original_output_string,
+		  TransitionTableIndex i);
+  
+  void find_transitions(SymbolNumber input,
 			SymbolNumber * input_symbol,
 			SymbolNumber * output_symbol,
 			SymbolNumber * original_output_string,
 			TransitionTableIndex i);
-
+  
   virtual void get_analyses(SymbolNumber * input_symbol,
-		    SymbolNumber * output_symbol,
-		    SymbolNumber * original_output_string,
-		    TransitionTableIndex i);
+			    SymbolNumber * output_symbol,
+			    SymbolNumber * original_output_string,
+			    TransitionTableIndex i);
 
 
  public:
-   Transducer(FILE * f, TransducerHeader h, TransducerAlphabet a):
+ Transducer(FILE * f, TransducerHeader h, TransducerAlphabet a):
   header(h),
     alphabet(a),
     keys(alphabet.get_key_table()),
@@ -551,7 +576,7 @@ class Transducer
     indices(index_reader()),
     transitions(transition_reader())
       {
-	for (size_t i = 0; i < 1000; ++i)
+	for (int i = 0; i < 1000; ++i)
 	  {
 	    output_string[i] = NO_SYMBOL_NUMBER;
 	  }
@@ -574,7 +599,7 @@ class Transducer
     get_analyses(input_string,output_string,output_string,START_INDEX);
   }
 
-  virtual void printAnalyses(void);
+  virtual void printAnalyses(std::string prepend);
 };
 
 class TransducerUniq: public Transducer
@@ -588,32 +613,45 @@ class TransducerUniq: public Transducer
     display_vector()
       {}
   
-  void printAnalyses(void);
+  void printAnalyses(std::string prepend);
 };
 
 class TransducerFd: public Transducer
 {
   FlagDiacriticStateStack statestack;
   OperationVector operations;
+  std::vector<SymbolNumber> operation_peek;
 
+  void try_flag_transitions(SymbolNumber * input_symbol,
+			    SymbolNumber * output_symbol,
+			    SymbolNumber * original_output_string,
+			    TransitionTableIndex i);
+
+  void traverse_flag_transitions(SymbolNumber input,
+				 SymbolNumber * input_symbol,
+				 SymbolNumber * output_symbol,
+				 SymbolNumber * original_output_string,
+				 TransitionTableIndex i);
+  
   bool PushState(FlagDiacriticOperation op);
-  
-  void try_epsilon_transitions(SymbolNumber * input_symbol,
-			       SymbolNumber * output_symbol,
-			       SymbolNumber * original_output_string,
-			       TransitionTableIndex i);
-  
-  void find_transitions(SymbolNumber input,
-			SymbolNumber * input_symbol,
+
+  void try_flag_indices(SymbolNumber * input_symbol,
 			SymbolNumber * output_symbol,
 			SymbolNumber * original_output_string,
 			TransitionTableIndex i);
+
+  void get_analyses(SymbolNumber * input_symbol,
+		    SymbolNumber * output_symbol,
+		    SymbolNumber * original_output_string,
+		    TransitionTableIndex i);
+
 
  public:
  TransducerFd(FILE * f, TransducerHeader h, TransducerAlphabet a):
     Transducer(f, h, a),
       statestack(1, FlagDiacriticState (a.get_state_size(), 0)),
-      operations(a.get_operation_vector())
+      operations(a.get_operation_vector()),
+      operation_peek(a.get_operation_peek())
 	{}
 };
 
@@ -628,7 +666,7 @@ class TransducerFdUniq: public TransducerFd
     display_vector()
       {}
   
-  void printAnalyses(void);
+  void printAnalyses(std::string prepend);
 
 };
 
@@ -679,8 +717,7 @@ class TransitionWIndex
       {
 	return false;
       }
-    Weight w = static_cast<Weight>(first_transition_index);
-    return w != INFINITE_WEIGHT;
+    return first_transition_index != NO_TABLE_INDEX;
   }
   
   Weight final_weight(void)
@@ -884,31 +921,30 @@ class TransducerW
 
   Weight current_weight;
 
-
   void set_symbol_table(void);
 
-  virtual void try_epsilon_transitions(SymbolNumber * input_symbol,
-				       SymbolNumber * output_symbol,
-				       SymbolNumber * original_output_string,
-				       TransitionTableIndex i);
+  void try_epsilon_transitions(SymbolNumber * input_symbol,
+			       SymbolNumber * output_symbol,
+			       SymbolNumber * original_output_string,
+			       TransitionTableIndex i);
     
   void try_epsilon_indices(SymbolNumber * input_symbol,
-			   SymbolNumber * output_symbol,
-			   SymbolNumber * original_output_string,
-			   TransitionTableIndex i);
+				   SymbolNumber * output_symbol,
+				   SymbolNumber * original_output_string,
+				   TransitionTableIndex i);
 
-  virtual void find_transitions(SymbolNumber input,
-				SymbolNumber * input_symbol,
-				SymbolNumber * output_symbol,
-				SymbolNumber * original_output_string,
-				TransitionTableIndex i);
+  void find_transitions(SymbolNumber input,
+			SymbolNumber * input_symbol,
+			SymbolNumber * output_symbol,
+			SymbolNumber * original_output_string,
+			TransitionTableIndex i);
 
   void find_index(SymbolNumber input,
 		  SymbolNumber * input_symbol,
 		  SymbolNumber * output_symbol,
 		  SymbolNumber * original_output_string,
 		  TransitionTableIndex i);
-  
+
   virtual void note_analysis(SymbolNumber * whole_output_string);
 
   bool final_transition(TransitionTableIndex i)
@@ -948,7 +984,7 @@ class TransducerW
     transitions(transition_reader()),
     current_weight(0.0)
       {
-	for (size_t i = 0; i < 1000; ++i)
+	for (int i = 0; i < 1000; ++i)
 	  {
 	    output_string[i] = NO_SYMBOL_NUMBER;
 	  }
@@ -971,7 +1007,7 @@ class TransducerW
     return encoder.find_key(p);
   }
 
-  virtual void printAnalyses(void);
+  virtual void printAnalyses(std::string prepend);
 };
 
 class TransducerWUniq: public TransducerW
@@ -985,32 +1021,44 @@ class TransducerWUniq: public TransducerW
     display_map()
       {}
   
-  void printAnalyses(void);
+  void printAnalyses(std::string prepend);
 };
 
 class TransducerWFd: public TransducerW
 {
   FlagDiacriticStateStack statestack;
   OperationVector operations;
+  std::vector<SymbolNumber> operation_peek;
 
+  void try_flag_transitions(SymbolNumber * input_symbol,
+			    SymbolNumber * output_symbol,
+			    SymbolNumber * original_output_string,
+			    TransitionTableIndex i);
+  
   bool PushState(FlagDiacriticOperation op);
-  
-  void try_epsilon_transitions(SymbolNumber * input_symbol,
-			       SymbolNumber * output_symbol,
-			       SymbolNumber * original_output_string,
-			       TransitionTableIndex i);
-  
-  void find_transitions(SymbolNumber input,
-			SymbolNumber * input_symbol,
+
+  void traverse_flag_transitions(SymbolNumber input,
+				 SymbolNumber * input_symbol,
+				 SymbolNumber * output_symbol,
+				 SymbolNumber * original_output_string,
+				 TransitionTableIndex i);
+
+  void try_flag_indices(SymbolNumber * input_symbol,
 			SymbolNumber * output_symbol,
 			SymbolNumber * original_output_string,
 			TransitionTableIndex i);
 
+  void get_analyses(SymbolNumber * input_symbol,
+		    SymbolNumber * output_symbol,
+		    SymbolNumber * original_output_string,
+		    TransitionTableIndex i);
+  
  public:
  TransducerWFd(FILE * f, TransducerHeader h, TransducerAlphabet a):
   TransducerW(f, h, a),
     statestack(1, FlagDiacriticState (a.get_state_size(), 0)),
-    operations(a.get_operation_vector())
+    operations(a.get_operation_vector()),
+    operation_peek(a.get_operation_peek())
       {}
 };
 
@@ -1025,6 +1073,6 @@ class TransducerWFdUniq: public TransducerWFd
     display_map()
       {}
   
-  void printAnalyses(void);
+  void printAnalyses(std::string prepend);
 
 };
