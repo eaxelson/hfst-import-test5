@@ -51,6 +51,11 @@ bool print_usage(void)
     "                              (if the transducer is weighted, the N best analyses)\n" <<
     "  -x, --xerox                 Xerox output format (default)\n" <<
     "\n" <<
+    "Note that " << PACKAGE_NAME << " is *not* guaranteed to behave identically to\n" <<
+    "hfst-lookup (although it almost always does): input-side multicharacter symbols\n" <<
+    "are not fully supported. If the first character of such a symbol is an ASCII\n" <<
+    "symbol also matching a single-character symbol, it will be tokenized as such.\n" <<
+    "\n" <<
     "Report bugs to " << PACKAGE_BUGREPORT << "\n" <<
     "\n";
   return true;
@@ -891,7 +896,7 @@ void TransducerFd::get_analyses(SymbolNumber * input_symbol,
 			      TransitionTableIndex i)
 {
 #if OL_FULL_DEBUG
-  std::cout << "get_analyses " << i << std::endl;
+  std::cout << "get_analyses i=" << i << " output = ";
   int a = 0;
   while (original_output_string[a] != NO_SYMBOL_NUMBER)
     {
