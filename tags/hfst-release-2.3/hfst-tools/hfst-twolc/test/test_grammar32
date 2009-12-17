@@ -1,0 +1,13 @@
+Alphabet
+
+	a e b b:c ;
+
+Rule-variables
+
+Vx ;
+
+Rules 
+
+"Rule1"
+b:c <= Vx _ Vx ; where Vx in ( a e ) matched ;
+

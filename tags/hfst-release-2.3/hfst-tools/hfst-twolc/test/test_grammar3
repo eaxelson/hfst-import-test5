@@ -1,0 +1,9 @@
+Alphabet
+
+	a b a:b ;
+
+Rules 
+
+"Rule1"
+a:b <=> a _ ;
+

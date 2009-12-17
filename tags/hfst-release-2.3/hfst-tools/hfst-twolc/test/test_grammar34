@@ -1,0 +1,17 @@
+Alphabet
+
+	a e b b:c ;
+
+Rule-variables
+
+Vx ;
+
+Sets
+
+X = a e ;
+
+Rules 
+
+"Rule1"
+b:c <= Vx _ Vx ; where Vx in X ;
+

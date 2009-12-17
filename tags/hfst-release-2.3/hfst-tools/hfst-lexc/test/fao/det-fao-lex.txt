@@ -1,0 +1,168 @@
+LEXICON Determiner
+ein+Det:ei       detcas ;
+mín+Det+Poss:mí  poss ;
+tín+Det+Poss:tí  poss ;
+sín+Det+Poss:sí  poss ;
+
+tann+Det+Msc: TANNM ;
+tann+Det+Fem: TANNF ;
+tað+Det+Neu:  TAD   ;
+
+hesin+Det:he HESIN ;
+hasin+Det:ha HESIN ;
+hin+Det: HIN ;
+
+
+LEXICON detcas
++Msc+Sg+Nom:n # ;
++Msc+Sg+Acc:n # ;
++Msc+Sg+Dat:n%>um # ;
++Msc+Sg+Gen:n%>s # ;
+
++Fem+Sg+Nom: # ;
++Fem+Sg+Acc:n%>a # ;
++Fem+Sg+Dat:n%>i # ;
++Fem+Sg+Dat:n%>ari # ;
++Fem+Sg+Gen:n%>ar # ;
+
++Neu+Sg+Nom:t # ;
++Neu+Sg+Acc:t # ;
++Neu+Sg+Nom:tt # ; ! Num, but also Det
++Neu+Sg+Acc:tt # ; ! Num, but also Det
++Neu+Sg+Dat:n%>um # ;
++Neu+Sg+Gen:n%>s # ;
+			 
++Msc+Pl+Nom:n%>ir # ;
++Msc+Pl+Acc:n%>ar # ;
++Msc+Pl+Dat:n%>um # ;
++Msc+Pl+Gen:n%>a # ;
+			 
++Fem+Pl+Nom: # ;
++Fem+Pl+Acc:n%>ar # ;
++Fem+Pl+Dat:n%>ar # ;
++Fem+Pl+Dat:n%>um # ;
++Fem+Pl+Gen:n%>a # ;
+			 
++Neu+Pl+Nom:n%>i # ;
++Neu+Pl+Acc:n%>i # ;
++Neu+Pl+Dat:n%>um # ;
++Neu+Pl+Gen:n%>a # ;
+
+LEXICON poss 
++Msc+Sg+Nom:n # ;
++Msc+Sg+Acc:n # ;
++Msc+Sg+Dat:n%>um # ;
++Msc+Sg+Gen:n%>s # ;
++Fem+Sg+Nom:n  # ;
++Fem+Sg+Acc:n%>a # ;
++Fem+Sg+Dat:n%>ar # ;
++Fem+Sg+Dat:n%>ari # ;
++Fem+Sg+Gen:n%>ar # ;
++Neu+Sg+Nom:%>tt # ;
++Neu+Sg+Acc:%>tt # ;
++Neu+Sg+Dat:n%>um # ;
++Neu+Sg+Gen:n%>s # ;
+
++Msc+Pl+Nom:n%>ir # ;
++Msc+Pl+Acc:n%>ar # ;
++Msc+Pl+Dat:n%>um # ;
++Msc+Pl+Gen:n%>a # ;
++Fem+Pl+Nom:n%>ar # ;
++Fem+Pl+Acc:n%>ar # ;
++Fem+Pl+Dat:n%>um # ;
++Fem+Pl+Gen:n%>a # ;
++Neu+Pl+Nom:n%>i # ;
++Neu+Pl+Acc:n%>i # ;
++Neu+Pl+Dat:n%>um # ;
++Neu+Pl+Gen:n%>a # ;
+
+
+LEXICON TANNM
++Sg+Nom:tann # ;
++Sg+Acc:tann # ;
++Sg+Dat:tí # ;
++Sg+Dat:tann # ;
++Sg+Gen:tess # ;
++Pl+Nom:teir # ;
++Pl+Acc:teir # ;
++Pl+Acc:tá # ;
++Pl+Dat:teimum # ;
++Pl+Gen:teirra # ;
+
+LEXICON TANNF
++Sg+Nom:tann # ;
++Sg+Acc:ta # ;
++Sg+Acc:tí # ;
++Sg+Dat:tí # ;
++Sg+Dat:teirri # ;
++Sg+Gen:teirrar # ;
++Pl+Nom:tær # ;
++Pl+Acc:tær # ;
++Pl+Dat:teimum # ;
++Pl+Gen:teirra # ;
+
+LEXICON TAD
++Sg+Nom:tað # ;
++Sg+Acc:tað # ;
++Sg+Dat:tí # ;
++Sg+Gen:tess # ;
++Pl+Nom:tey # ;
++Pl+Acc:tey # ;
++Pl+Dat:teimum # ;
++Pl+Gen:teirra # ;
+
+LEXICON HESIN
++Msc+Sg+Nom:sin # ;
++Msc+Sg+Acc:nda # ;
++Msc+Sg+Acc:ndan # ;
++Msc+Sg+Dat:sum # ;
++Fem+Sg+Nom:nda # ;
++Fem+Sg+Nom:ndan # ;
++Fem+Sg+Acc:sa # ;
++Fem+Sg+Dat:si # ;
++Fem+Sg+Dat:sari # ;
++Neu+Sg+Nom:tta # ;
++Neu+Sg+Nom:ttar # ;
++Neu+Sg+Acc:tta # ;
++Neu+Sg+Acc:ttar # ;
++Neu+Sg+Dat:sum # ;
++Msc+Pl+Nom:sir # ;
++Msc+Pl+Acc:sar # ;
++Msc+Pl+Dat:sum # ;
++Msc+Pl+Gen:sa # ;
++Fem+Pl+Nom:sar # ;
++Fem+Pl+Acc:sar # ;
++Fem+Pl+Dat:sum # ;
++Fem+Pl+Gen:sa # ;
++Neu+Pl+Nom:si # ;
++Neu+Pl+Acc:si # ;
++Neu+Pl+Dat:sum # ;
++Neu+Pl+Gen:sa # ;
+
+LEXICON HIN
++Msc+Sg+Nom:hin # ;
++Msc+Sg+Acc:hin # ;
++Msc+Sg+Dat:hinum # ;
++Msc+Sg+Gen:hins # ;
++Fem+Sg+Nom:hin # ;
++Fem+Sg+Acc:hina # ;
++Fem+Sg+Dat:hini # ;
++Fem+Sg+Dat:hinari # ;
++Fem+Sg+Gen:hins # ;
++Neu+Sg+Nom:hitt # ;
++Neu+Sg+Acc:hitt # ;
++Neu+Sg+Dat:hinum # ;
++Neu+Sg+Gen:hins # ;
++Msc+Pl+Nom:hinir # ;
++Msc+Pl+Acc:hinar # ;
++Msc+Pl+Dat:hinum # ;
++Msc+Pl+Gen:hinna # ;
++Fem+Pl+Nom:hinar # ;
++Fem+Pl+Acc:hinar # ;
++Fem+Pl+Dat:hinum # ;
++Fem+Pl+Gen:hinna # ;
++Neu+Pl+Nom:hini # ;
++Neu+Pl+Acc:hini # ;
++Neu+Pl+Dat:hinum # ;
++Neu+Pl+Gen:hinna # ;
+
