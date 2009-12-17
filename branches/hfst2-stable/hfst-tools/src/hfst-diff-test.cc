@@ -29,6 +29,7 @@
 #include <cstring>
 #include <getopt.h>
 #include <hfst2/hfst.h>
+#include "FlagDiacritics.h"
 
 #if NESTED_BUILD
 #include <hfst2/string/string.h>
@@ -45,6 +46,15 @@
 static char* relation_file_name;
 static FILE* relation_file;
 static bool space_separated = false;
+FlagDiacriticTable flag_diacritic_table;
+HFST::KeySet flag_diacritic_set;
+
+bool print_statistics = false;
+unsigned long test_lines = 0;
+unsigned long positive_results = 0;
+unsigned long negative_results = 0;
+unsigned long infinite_results = 0;
+unsigned long no_results = 0;
 
 enum TEST_TYPE { TEST_EXACTLY, TEST_NONE, TEST_AT_LEAST };
 static TEST_TYPE test_type = TEST_EXACTLY;
@@ -67,7 +77,8 @@ print_usage(const char *program_name)
 	fprintf(message_out, 
 			"  -r, --relation=FILE              Read test cases from a file\n"
 			"  -S, --spaces                     Use space separated tokens in strings\n"
-			"  -t, --test=TTYPE                 Use TTYPE test comparing result sets\n");
+			"  -t, --test=TTYPE                 Use TTYPE test comparing result sets\n"
+			"  -x, --statistics                 Print statistics of results\n");
 	fprintf(message_out,
 		   "\n"
 		   "If OUTFILE or INFILE is missing or -, "
@@ -83,7 +94,7 @@ void
 print_version(const char* program_name)
 {
 	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dversion
-	fprintf(message_out, "%s 0.1 (%s)\n"
+	fprintf(message_out, "%s 0.2 (%s)\n"
 		   "Copyright (C) 2009 University of Helsinki,\n"
 		   "License GPLv3: GNU GPL version 3 "
 		   "<http://gnu.org/licenses/gpl.html>\n"
@@ -108,11 +119,12 @@ parse_options(int argc, char** argv)
 			{"relation", required_argument, 0, 'r'},
 			{"spaces", no_argument, 0, 'S'},
 			{"test-type", required_argument, 0, 't'},
+			{"statistics", no_argument, 0, 'x'},
 			{0,0,0,0}
 		};
 		int option_index = 0;
 		// add tool-specific options here 
-		char c = getopt_long(argc, argv, "dhi:o:sSqvVR:DW:r:t:",
+		char c = getopt_long(argc, argv, "dhi:o:sSqvVR:DW:r:t:x",
 							 long_options, &option_index);
 		if (-1 == c)
 		{
@@ -150,6 +162,9 @@ parse_options(int argc, char** argv)
 			break;
 		case 'S':
 			space_separated = true;
+			break;
+		case 'x':
+			print_statistics = true;
 			break;
 		case '?':
 			fprintf(message_out, "invalid option --%s\n",
@@ -201,13 +216,49 @@ parse_options(int argc, char** argv)
 	return EXIT_CONTINUE;
 }
 
+static
+void
+do_print_statistics()
+{
+	fprintf(message_out, "Lines analysed\tPositive\tNegative\tInfinite\tNone\n"
+			"%lu\t%lu\t%lu\t%lu\t%lu\n"
+			"%f\t%f\t%f\t%f\t%f\n",
+			test_lines, positive_results, negative_results, infinite_results,
+			no_results,
+			static_cast<float>(test_lines)/static_cast<float>(test_lines),
+			static_cast<float>(positive_results)/static_cast<float>(test_lines),
+			static_cast<float>(negative_results)/static_cast<float>(test_lines),
+			static_cast<float>(infinite_results)/static_cast<float>(test_lines),
+			static_cast<float>(no_results)/static_cast<float>(test_lines));
+}
+
 namespace HFST
 {
+
+void
+define_flag_diacritics(KeyTable * key_table)
+{
+  
+  for (Key k = 0; k < key_table->get_unused_key(); ++k)
+    {
+      flag_diacritic_table.define_diacritic
+	(k, get_symbol_name(get_key_symbol(k, key_table)));
+      if (flag_diacritic_table.is_diacritic(k))
+	{ flag_diacritic_set.insert(k); }
+    }
+}
 
 bool
 _is_epsilon(Key k)
 {
-	return k == 0;
+	if ((k == 0) || (flag_diacritic_set.find(k) != flag_diacritic_set.end()))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 bool
@@ -243,8 +294,8 @@ compare_sets(const string& testcase,
 			// print e \ r and r \ e
 			if (rMinusE.size() > 0)
 			{
-				fprintf(message_out, "Strings for %s in test file missing "
-						"from transducer\n", testcase.c_str());
+				fprintf(message_out, "Strings for %s in test file, not in "
+						"transducer\n", testcase.c_str());
 			}
 			for (set<KeyVector>::const_iterator kv = rMinusE.begin();
 					kv != rMinusE.end(); 
@@ -257,8 +308,8 @@ compare_sets(const string& testcase,
 			}
 			if (eMinusR.size() > 0)
 			{
-				fprintf(message_out, "Strings for %s in transducer missing "
-						"from test file\n", testcase.c_str());
+				fprintf(message_out, "Strings for %s in transducer, not in "
+						"test file\n", testcase.c_str());
 			}
 			for (set<KeyVector>::const_iterator kv = eMinusR.begin();
 					kv != eMinusR.end();
@@ -378,7 +429,7 @@ lookup_all(const char* s, KeyTable* kt,
 				string* kvstring = keyVectorToString(*kv, kt);
 				VERBOSE_PRINT("Looking up %s from transducer %zu\n",
 						kvstring->c_str(), cascade_number);
-				if (is_infinitely_ambiguous(*t, *kv))
+				if (is_infinitely_ambiguous(*t,true, *kv))
 				{
 					VERBOSE_PRINT("Got infinite results\n");
 					*infinite = true;
@@ -386,7 +437,7 @@ lookup_all(const char* s, KeyTable* kt,
 				}
 				else
 				{
-					KeyVectorVector* lookups = lookup_all(*t, *kv);
+					KeyVectorVector* lookups = lookup_all(*t, *kv, &flag_diacritic_set);
 					if (lookups == NULL)
 					{
 						// no results as empty result
@@ -398,11 +449,14 @@ lookup_all(const char* s, KeyTable* kt,
 							++lkv)
 					{
 						KeyVector* hmmlkv = *lkv;
+						hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
+						if (hmmlkv == NULL)
+						  {continue;}
 						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
 											_is_epsilon), hmmlkv->end());
 						string* lkvstring = keyVectorToString(hmmlkv, kt);
 						VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
-						current_results->push_back(*lkv);
+						current_results->push_back(hmmlkv);
 						delete lkvstring;
 					}
 				}
@@ -417,10 +471,30 @@ lookup_all(const char* s, KeyTable* kt,
 namespace HWFST
 {
 
+void
+define_flag_diacritics(KeyTable * key_table)
+{
+  
+  for (Key k = 0; k < key_table->get_unused_key(); ++k)
+    {
+      flag_diacritic_table.define_diacritic
+	(k, get_symbol_name(get_key_symbol(k, key_table)));
+      if (flag_diacritic_table.is_diacritic(k))
+	{ flag_diacritic_set.insert(k); }
+    }
+}
+
 bool
 _is_epsilon(Key k)
 {
-	return k == 0;
+	if ((k == 0) || (flag_diacritic_set.find(k) != flag_diacritic_set.end()))
+	{
+		return true;
+	}
+	else
+	{
+		return false;
+	}
 }
 
 bool
@@ -590,7 +664,7 @@ lookup_all(const char* s, KeyTable* kt,
 				string* kvstring = keyVectorToString(*kv, kt);
 				VERBOSE_PRINT("Looking up %s from transducer %zu\n",
 						kvstring->c_str(), cascade_number);
-				if (is_infinitely_ambiguous(*t, *kv))
+				if (is_infinitely_ambiguous(*t,true, *kv))
 				{
 					VERBOSE_PRINT("Got infinite results\n");
 					*infinite = true;
@@ -598,7 +672,7 @@ lookup_all(const char* s, KeyTable* kt,
 				}
 				else
 				{
-					KeyVectorVector* lookups = lookup_all(*t, *kv);
+					KeyVectorVector* lookups = lookup_all(*t, *kv, &flag_diacritic_set);
 					if (lookups == NULL)
 					{
 						// no results as empty result
@@ -610,11 +684,14 @@ lookup_all(const char* s, KeyTable* kt,
 							++lkv)
 					{
 						KeyVector* hmmlkv = *lkv;
+						hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
+						if (hmmlkv == NULL)
+						  {continue;}
 						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
 											_is_epsilon), hmmlkv->end());
 						string* lkvstring = keyVectorToString(hmmlkv, kt);
 						VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
-						current_results->push_back(*lkv);
+						current_results->push_back(hmmlkv);
 						delete lkvstring;
 					}
 				}
@@ -679,6 +756,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				// add your code here
 				cascade.push_back(input);
 			}
+			HFST::define_flag_diacritics(key_table);
 			VERBOSE_PRINT("\n");
 #			define MAX_LINE_LENGTH 254
 			char* line =
@@ -759,6 +837,23 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 							resultLines, expectedLines, test_type,
 							infinity, key_table));
 				any_failures = any_failures || this_failed;
+				test_lines++;
+				if (this_failed)
+				{
+					negative_results++;
+				}
+				else if (!this_failed)
+				{
+					positive_results++;
+				}
+				if (infinity)
+				{
+					infinite_results++;
+				}
+				if (resultLines.size() == 0)
+				{
+					no_results++;
+				}
 			} // while lines in input
 			if (write_symbols_to_filename != NULL) {
 			  ofstream os(write_symbols_to_filename);
@@ -828,6 +923,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				// add your code here
 				cascade.push_back(input);
 			}
+			HWFST::define_flag_diacritics(key_table);
 			VERBOSE_PRINT("\n");
 #			define MAX_LINE_LENGTH 254
 			char* line =
@@ -908,6 +1004,23 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 							resultLines, expectedLines, test_type,
 							infinity, key_table));
 				any_failures = any_failures || this_failed;
+				test_lines++;
+				if (this_failed)
+				{
+					negative_results++;
+				}
+				else if (!this_failed)
+				{
+					positive_results++;
+				}
+				if (infinity)
+				{
+					infinite_results++;
+				}
+				if (resultLines.size() == 0)
+				{
+					no_results++;
+				}
 			} // while lines in input
 			if (write_symbols_to_filename != NULL) {
 			  ofstream os(write_symbols_to_filename);
@@ -919,6 +1032,10 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 		{
 			printf("HWFST library error: %s\n", p);
 			return EXIT_FAILURE;
+		}
+		if (print_statistics)
+		{
+			do_print_statistics();
 		}
 		if (any_failures)
 		{

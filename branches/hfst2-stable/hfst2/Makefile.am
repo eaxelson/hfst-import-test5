@@ -1,8 +1,6 @@
 AUTOMAKE_OPTIONS = subdir-objects
 AM_CPPFLAGS =  -I$(top_builddir) -I$(top_builddir)/ofst -I$(top_builddir)/sfst
-install-exec-hook:
-	$(LDCONFIG)
-AM_CXXFLAGS = -O3 -Wno-deprecated
+AM_CXXFLAGS = -Wno-deprecated
 
 lib_LTLIBRARIES = libhfst.la
 
@@ -55,8 +53,12 @@ BUILT_SOURCES = \
 	regexp/xrew_parse.yy \
 	regexp/xrew_parse.hh \
 	regexp/xrew_lex.ll \
+	regexp/xrew_lex.cc \
+	regexp/xrew_parse.cc \
 	regexp/xre_parse.hh \
 	regexp/xre_lex.h \
+	regexp/xre_lex.cc \
+	regexp/xre_parse.cc \
 	string/w_letter-trie.h \
 	string/w_letter-trie.cc \
 	string/w_string.cc

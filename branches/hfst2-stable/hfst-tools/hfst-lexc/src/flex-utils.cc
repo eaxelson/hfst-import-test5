@@ -112,13 +112,13 @@ strdup_token_positions()
 		(hlexclloc.first_column == (hlexclloc.last_column - 1)) )
 	{
 		// TRANSLATORS: filename, line and column
-		(void)sprintf(filenames_lines_cols, _("%s:%d.%d"), 
+		(void)sprintf(filenames_lines_cols, "%s:%d.%d", 
 			hlexcfilename, hlexclloc.first_line, hlexclloc.first_column);
 	}
 	else if ( hlexclloc.first_line == hlexclloc.last_line )
 	{
 		// TRANSLATORS: filename, line, column to column
-		(void)sprintf(filenames_lines_cols, _("%s:%d.%d-%d"),
+		(void)sprintf(filenames_lines_cols, "%s:%d.%d-%d",
 			hlexcfilename,
 			hlexclloc.first_line, hlexclloc.first_column,
 			hlexclloc.last_column);
@@ -126,7 +126,7 @@ strdup_token_positions()
 	else
 	{
 		// TRANSLATORS: filename, line-column to line-column
-		(void)sprintf(filenames_lines_cols, _("%s:%d.%d-%d.%d"),
+		(void)sprintf(filenames_lines_cols, "%s:%d.%d-%d.%d",
 			hlexcfilename,
 			hlexclloc.first_line, hlexclloc.first_column,
 			hlexclloc.last_line, hlexclloc.last_column);
@@ -144,16 +144,16 @@ strdup_token_part()
 		char* beforelbr = (char*)malloc(sizeof(char)*strlen(hlexctext)+1);
 		(void)memcpy(beforelbr, hlexctext, maybelbr-hlexctext);
 		beforelbr[maybelbr-hlexctext] = '\0';
-		(void)sprintf(error_token, _("[near: `%s\\n']"), beforelbr);
+		(void)sprintf(error_token, "[near: `%s\\n']", beforelbr);
 		free(beforelbr);
 	}
 	else if (strlen(hlexctext) < 80)
 	{
-		(void)sprintf(error_token, _("[near: `%s']"), hlexctext);
+		(void)sprintf(error_token, "[near: `%s']", hlexctext);
 	}
 	else
 	{
-		(void)sprintf(error_token, _("[near: `%30s...' (truncated)]"),
+		(void)sprintf(error_token, "[near: `%30s...' (truncated)]",
 					  hlexctext);
 	}
 	return error_token;
@@ -217,7 +217,7 @@ strip_percents(const char* s, bool do_zeros)
 	*p = '\0';
 	if (escaping)
 	{
-		lexc_printf(PRINT_ERROR, 9, _("Stray escape char %% in %s\n"), s);
+		lexc_printf(PRINT_ERROR, 9, "Stray escape char %% in %s\n", s);
 		return NULL;
 	}
 	return rv;

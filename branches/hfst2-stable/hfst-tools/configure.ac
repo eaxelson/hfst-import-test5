@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.60])
-AC_INIT([hfst-tools], [2.2], [hfst-bugs@helsinki.fi])
+AC_INIT([hfst-tools], [2.3], [hfst-bugs@helsinki.fi])
 AC_CONFIG_AUX_DIR([config-aux])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/hfst-subtract.cc])
@@ -10,7 +10,20 @@ AM_INIT_AUTOMAKE([-Wall foreign dist-bzip2 std-options])
 AC_REVISION([$Revision: 1.9 $])
 AC_CONFIG_SUBDIRS([hfst-lexc hfst-twolc])
 
-AC_PROG_LIBTOOL
+# test for this here so twolc and lexc don't have to
+# if flex 3.X ever comes out, this breaks :)
+AC_PROG_LEX
+LEX_VERSION=`$LEX --version`
+if test -z "`echo "$LEX_VERSION" | grep 'flex 2\.[[5-9]]\.[[3-9][4-9]]'`"
+then
+	AC_MSG_WARN([
+!! Building hfst successfully requires flex newer than
+!! 2.5.33 on some platforms. Unless you're building with
+!! pre-flex-generated sources, building will probably fail.])
+fi
+# ' (because syntax highlight is being silly)
+
+ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
 
 AC_DEFINE([NESTED_BUILD], [1], [We're doing a nested build, headers aren't always where we expect them to be])
 
@@ -219,13 +232,18 @@ AC_ARG_ENABLE([optimized-lookup],
 			  [enable_optimized_lookup=$enableval],
 			  [enable_optimized_lookup=yes])
 AM_CONDITIONAL([WANT_OPTIMIZED_LOOKUP], [test x$enable_optimized_lookup != xno])
+AC_ARG_ENABLE([substitute],
+			  [AS_HELP_STRING([--enable-substitute],
+							  [build substitution tool @<:@default=yes@:>@])],
+			  [enable_substitute=$enableval],
+			  [enable_substitue=yes])
+AM_CONDITIONAL([WANT_SUBSTITUTE], [test x$enable_substitute != xno])
 
 
 # Checks for programs.
 AC_PROG_CXX
 AC_PROG_CC
 AC_PROG_INSTALL
-AC_PROG_LEX
 AC_PROG_YACC
 
 # Checks for libraries.
@@ -290,5 +308,6 @@ cat <<EOF
 	* tail: $enable_tail
 	* txt2fst: $enable_txt2fst
 	* optimized-lookup: $enable_optimized_lookup
+	* substitute: $enable_substitute
 EOF
 

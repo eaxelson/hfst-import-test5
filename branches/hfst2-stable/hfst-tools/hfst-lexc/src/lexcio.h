@@ -26,15 +26,6 @@
 #  include <config.h>
 #endif
 
-#ifdef ENABLE_NLS
-#  ifdef HAVE_LIBINTL_H
-#    include <libintl.h>
-#  endif
-#else
-#  define gettext(s) (s)
-#endif
-#define _(s) gettext(s)
-
 #include <ctime>
 #include <map>
 

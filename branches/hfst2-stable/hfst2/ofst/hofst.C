@@ -463,20 +463,16 @@ namespace HWFST {
 
   fst::StdVectorFst *determinize_and_minimize_( fst::StdVectorFst *t, bool min=true, bool destructive=true) {
     fst::RmEpsilon(t);
-    fst::EncodeMapper<fst::StdArc> mapper(0x00011,fst::EncodeType(1)); // 3 = Labels and Weights ?, ENCODE = 1
-    
-    fst::EncodeFst<fst::StdArc> TEncode(*t, &mapper);
+    fst::EncodeMapper<fst::StdArc> mapper1(0x0001,fst::EncodeType(1)); // 3 = Labels and Weights ?, ENCODE = 1
+    fst::EncodeFst<fst::StdArc> TEncode1(*t, &mapper1);
     if (destructive)
       delete t;
-    fst::StdVectorFst Encoded_T(TEncode);
-
+    fst::StdVectorFst Encoded_T(TEncode1);
     fst::StdVectorFst *Determinized_T = new fst::StdVectorFst();
     fst::Determinize(Encoded_T, Determinized_T);
-
     if (min)
       fst::Minimize(Determinized_T);
-
-    fst::DecodeFst<fst::StdArc> D1(*Determinized_T, mapper);
+    fst::DecodeFst<fst::StdArc> D1(*Determinized_T,mapper1);
     fst::StdVectorFst *DecodedT = new fst::StdVectorFst(D1);
     delete Determinized_T;
     return DecodedT;
@@ -1217,8 +1213,21 @@ namespace HWFST {
     return PINSTANCE_TO_HANDLE(Transducer, paths);
   }
 
-  TransducerHandle find_random_paths(TransducerHandle t, int n) {
-    return find_best_paths(t,n,false);
+  TransducerHandle find_random_paths(TransducerHandle t, int n, bool b) {
+    //return find_best_paths(t,n,false);
+    fst::StdVectorFst* pT = HANDLE_TO_PINSTANCE(fst::StdVectorFst, t);
+    fst::StdVectorFst * paths = new fst::StdVectorFst;
+    time_t timer;
+    fst::StdArcSelector selector;
+    fst::RandGenOptions<fst::StdArcSelector> opts(selector);
+    for (int i = 0; i < n; ++i)
+      {
+	fst::StdVectorFst * path = new fst::StdVectorFst;
+	fst::RandGen<StdArc,fst::StdArcSelector> (*pT,path,opts);
+	fst::Union(paths,*path);
+      }
+    t = PINSTANCE_TO_HANDLE(Transducer,paths);
+    return t;
   }
   
   typedef vector< stack<fst::StdArc> > PathVector;
@@ -2041,6 +2050,21 @@ namespace HWFST {
     return new_kt;
   }
 
+  KeyTable * minimize_key_table(KeyTable * key_table, TransducerHandle t)
+  {
+    if (key_table == NULL) { return NULL; }
+    KeySet * t_keys = define_key_set(t);
+    HFST::KeyTable * new_key_table = create_key_table();
+    new_key_table->associate_key(0,0);
+    Key new_k = 1;
+    for (Key k = 0; k < key_table->get_unused_key(); ++k)
+      {
+	if (key_table->is_key(k) and (not new_key_table->is_key(k)))
+	  { associate_key(new_k++,new_key_table,key_table->get_key_symbol(k)); }
+      }
+    return new_key_table;
+  }
+
   TransducerHandle longest_match_tokenizer2( KeySet * keys,
 					     KeyTable * kt );
 
@@ -2117,6 +2141,7 @@ namespace HWFST {
   
   SymbolSet * hwfst_get_symbols(InputKeySet * input_keys, HWFST::KeyTable * kt)
   {
+    
     SymbolSet * input_symbols = new SymbolSet;
     for (InputKeySet::iterator it = input_keys->begin();
 	 it != input_keys->end();
@@ -2642,10 +2667,59 @@ namespace HWFST {
     print_fst(pT, NULL, print_weights, ostr, true);
   }
 
+  void print_state(fst::StdVectorFst *t, StateId state_id, StateId initial_state_id, Alphabet &alpha, bool print_weights, ostream& ostr, bool use_numbers) {
+
+    StateId state_id_printed=state_id;
+    // if initial state is not numbered as zero,
+    // swap the numbers of initial state and state number zero
+    if (initial_state_id != 0) {
+      if (state_id == initial_state_id)
+	state_id_printed=0;
+      else if (state_id == 0)
+	state_id_printed=initial_state_id;
+    }
+    if (is_final(t, state_id)) {  // a final state
+      ostr << state_id_printed;
+      if (print_weights) {
+	ostr << "\t" << (t->Final(state_id)).Value();  // changed to float
+      }
+      ostr << "\n";
+    }
+    for (fst::ArcIterator<fst::StdFst> aiter(*t, state_id); !aiter.Done(); aiter.Next()) {
+      const fst::StdArc &arc = aiter.Value();
+      StateId dest_id = arc.nextstate;
+      StateId dest_id_printed=dest_id;
+      if (initial_state_id != 0) {
+	if (dest_id == initial_state_id)
+	  dest_id_printed=0;
+	else if (dest_id == 0)
+	  dest_id_printed=initial_state_id;
+      }
+      
+      if (!use_numbers) {
+	const char *ilabel = alpha.code2symbol(arc.ilabel);
+	const char *olabel = alpha.code2symbol(arc.olabel);	  
+	ostr << state_id_printed << "\t" << dest_id_printed << "\t";
+	if (ilabel)
+	  COMMON::escape_and_print(ilabel, ostr, true, false, false);
+	else
+	  ostr << "\\" << arc.ilabel;
+	ostr << "\t";
+	if (olabel)
+	  COMMON::escape_and_print(olabel, ostr, true, false, false);
+	else
+	  ostr << "\\" << arc.olabel;
+      }
+      else
+	ostr << state_id_printed << "\t" << dest_id_printed << "\t" << arc.ilabel << "\t" << arc.olabel;
+      if (print_weights) {
+	ostr << "\t" << (arc.weight).Value();
+      }
+      ostr << "\n";
+    }
+  }
 
   void print_fst( fst::StdVectorFst *t, KeyTable *T, bool print_weights, ostream& ostr, bool use_numbers ) {    
-    // make sure that initial state is number zero
-    StateId initial_state_id = t->Start();
 
     if(!t) {
       fprintf(stderr, "'print_fst': Transducer is NULL.\n");
@@ -2668,59 +2742,20 @@ namespace HWFST {
     #endif
     pthread_mutex_lock(&the_mutex);
     
+    // make sure that initial state is number zero
+    StateId initial_state_id = t->Start();
+
+    print_state(t, initial_state_id, initial_state_id, alpha, print_weights, ostr, use_numbers);
+
     for (fst::StateIterator<fst::StdFst> siter(*t); !siter.Done(); siter.Next()) {
       StateId state_id = siter.Value();
-      StateId state_id_printed=state_id;
-      // if initial state is not numbered as zero,
-      // swap the numbers of initial state and state number zero
-      if (initial_state_id != 0) {
-	if (state_id == initial_state_id)
-	  state_id_printed=0;
-	else if (state_id == 0)
-	  state_id_printed=initial_state_id;
-      }
-      if (is_final(t, state_id)) {  // a final state
-	ostr << state_id_printed;
-	if (print_weights) {
-	  ostr << "\t" << (t->Final(state_id)).Value();  // changed to float
-	}
-	ostr << "\n";
-      }
-      for (fst::ArcIterator<fst::StdFst> aiter(*t, state_id); !aiter.Done(); aiter.Next()) {
-	const fst::StdArc &arc = aiter.Value();
-	StateId dest_id = arc.nextstate;
-	StateId dest_id_printed=dest_id;
-	if (initial_state_id != 0) {
-	  if (dest_id == initial_state_id)
-	    dest_id_printed=0;
-	  else if (dest_id == 0)
-	    dest_id_printed=initial_state_id;
-	}
-	
-	if (!use_numbers) {
-	  const char *ilabel = alpha.code2symbol(arc.ilabel);
-	  const char *olabel = alpha.code2symbol(arc.olabel);	  
-	  ostr << state_id_printed << "\t" << dest_id_printed << "\t";
-	  if (ilabel)
-	    COMMON::escape_and_print(ilabel, ostr, true, false, false);
-	  else
-	    ostr << "\\" << arc.ilabel;
-	  ostr << "\t";
-	  if (olabel)
-	    COMMON::escape_and_print(olabel, ostr, true, false, false);
-	  else
-	    ostr << "\\" << arc.olabel;
-	}
-	else
-	  ostr << state_id_printed << "\t" << dest_id_printed << "\t" << arc.ilabel << "\t" << arc.olabel;
-	if (print_weights) {
-	  ostr << "\t" << (arc.weight).Value();
-	}
-	ostr << "\n";
-      }
+      if (state_id != initial_state_id)
+	print_state(t, state_id, initial_state_id, alpha, print_weights, ostr, use_numbers);
     }
     pthread_mutex_unlock(&the_mutex);
   }
+
+
 
 
   void print_fst_old(fst::StdVectorFst *t, KeyTable *T, ostream& ostr) {
@@ -4833,7 +4868,7 @@ fst::StdVectorFst *make_mapping_( Ranges *l1, Ranges *l2 ) {
     // If it is, transducer is cyclic, and a NULL value is returned.
     
     if (calling_path[state_id])
-      return NULL;
+      { return NULL;  }
     
     PathVector *result = new PathVector();
     

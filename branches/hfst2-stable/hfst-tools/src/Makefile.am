@@ -5,7 +5,7 @@
 ## for nested build
 LDADD = ../../hfst2/libhfst.la
 AM_CPPFLAGS = -I../.. -I../../hfst2
-AM_CXXFLAGS = -O3
+AM_CXXFLAGS = -Wno-deprecated
 
 if WANT_COMPARE
 MAYBE_COMPARE=hfst-compare
@@ -110,6 +110,9 @@ endif
 if WANT_OPTIMIZED_LOOKUP
 MAYBE_OPTIMIZED_LOOKUP=hfst-optimized-lookup
 endif
+if WANT_SUBSTITUTE
+MAYBE_SUBSTITUTE=hfst-substitute
+endif
 
 noinst_HEADERS= \
 	calculate_functions.h hfst-commandline.h hfst-common-cases.h \
@@ -133,7 +136,7 @@ bin_PROGRAMS=$(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_COMPOSE_INTERSECT) \
 			 $(MAYBE_SYMBOLS) $(MAYBE_TAIL) $(MAYBE_TXT2FST) \
 			 $(MAYBE_UNWEIGHTED2WEIGHTED) $(MAYBE_WEIGHTED2UNWEIGHTED) \
 			 $(MAYBE_UNWEIGHTED_CALCULATE) $(MAYBE_WEIGHTED_CALCULATE) \
-			 $(MAYBE_OPTIMIZED_LOOKUP)
+			 $(MAYBE_OPTIMIZED_LOOKUP) $(MAYBE_SUBSTITUTE)
 
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc
 hfst_compare_SOURCES=hfst-compare.cc $(HFST_COMMON_SRC)
@@ -142,7 +145,7 @@ hfst_compose_intersect_SOURCES=hfst-compose-intersect.cc $(HFST_COMMON_SRC)
 hfst_concatenate_SOURCES=hfst-concatenate.cc $(HFST_COMMON_SRC)
 hfst_conjunct_SOURCES=hfst-conjunct.cc $(HFST_COMMON_SRC)
 hfst_determinize_SOURCES=hfst-determinize.cc $(HFST_COMMON_SRC)
-hfst_diff_test_SOURCES=hfst-diff-test.cc $(HFST_COMMON_SRC)
+hfst_diff_test_SOURCES=hfst-diff-test.cc FlagDiacritics.cc $(HFST_COMMON_SRC)
 hfst_disjunct_SOURCES=hfst-disjunct.cc $(HFST_COMMON_SRC)
 hfst_format_SOURCES=hfst-format.cc $(HFST_COMMON_SRC)
 hfst_fst2fst_SOURCES=hfst-fst2fst.cc $(HFST_COMMON_SRC)
@@ -168,6 +171,7 @@ hfst_summarize_SOURCES=hfst-summarize.cc $(HFST_COMMON_SRC)
 hfst_symbols_SOURCES=hfst-symbols.cc $(HFST_COMMON_SRC)
 hfst_tail_SOURCES=hfst-tail.cc $(HFST_COMMON_SRC)
 hfst_txt2fst_SOURCES=hfst-txt2fst.cc $(HFST_COMMON_SRC)
+hfst_substitute_SOURCES=hfst-substitute.cc $(HFST_COMMON_SRC)
 
 hfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy $(HFST_COMMON_SRC)
 
@@ -182,7 +186,6 @@ BUILT_SOURCES=hfst-compiler.h \
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 
-AM_CXXFLAGS=-Wno-deprecated
 
 ## CLEANFILES = hfst-compiler.cc hfst-compiler.h hfst-scanner.cc
 

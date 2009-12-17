@@ -6,8 +6,6 @@ AC_INIT([hfst-lexc],[0.6-beta],[tommi.pirinen@helsinki.fi])
 AC_CONFIG_AUX_DIR([config-aux])
 AC_CONFIG_MACRO_DIR([m4])
 AM_INIT_AUTOMAKE([-Wall foreign dist-bzip2 std-options])
-AM_GNU_GETTEXT([external])
-AM_GNU_GETTEXT_VERSION(0.17)
 AC_REVISION([$Revision: 1.9 $])
 
 PACKAGE=hfst-lexc
@@ -49,7 +47,7 @@ fi
 AC_DEFINE([SGIext], 1, [SFST requires this stuff])
 
 # Checks for programs
-AC_PROG_LIBTOOL
+ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
 AC_PROG_CC
 AC_PROG_CXX
 AC_PROG_INSTALL
@@ -101,7 +99,7 @@ AC_CHECK_TYPES([ptrdiff_t])
 
 
 # Output files
-AC_CONFIG_FILES([Makefile src/Makefile test/Makefile test/omorfi/Makefile test/divvun-sme/Makefile test/morphalou/Makefile test/kos83/Makefile man/Makefile test/xre.at-file.hlexc test/fao/Makefile po/Makefile.in])
+AC_CONFIG_FILES([Makefile src/Makefile test/Makefile test/omorfi/Makefile test/divvun-sme/Makefile test/morphalou/Makefile test/kos83/Makefile man/Makefile test/xre.at-file.hlexc test/fao/Makefile])
 AC_CONFIG_HEADERS([config.h])
 AC_DEFINE([NESTED_BUILD], [1], [We're doing a nested build, headers aren't always where we expect them to be])
 AC_CONFIG_SRCDIR([src/lexc.h])

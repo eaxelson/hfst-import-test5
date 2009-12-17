@@ -14,7 +14,7 @@ AC_PROG_CXX
 AC_PROG_INSTALL
 AC_PROG_LEX
 AC_PROG_YACC
-AC_PROG_LIBTOOL
+ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
 
 AC_LANG([C++])
 AC_CHECK_LIB([pthread],[main], , [AC_MSG_ERROR([openfst requires pthread])])

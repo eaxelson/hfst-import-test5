@@ -201,13 +201,13 @@ LWSP [\r\n\t ]
 
 <*>[\x80-\xff] {
 	token_update_positions(hlexctext);
-	hlexcerror(_("Illegal 8-bit sequence (cannot form valid UTF-8)"));
+	hlexcerror("Illegal 8-bit sequence (cannot form valid UTF-8)");
 	return ERROR;
 }
 
 <*>. {
 	token_update_positions(hlexctext);
-	hlexcerror(_("Syntax error in lexer (no valid token found at the point)"));
+	hlexcerror("Syntax error in lexer (no valid token found at the point)");
 	return ERROR;
 }
 

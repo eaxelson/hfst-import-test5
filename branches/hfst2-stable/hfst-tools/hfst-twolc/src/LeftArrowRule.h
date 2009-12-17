@@ -28,6 +28,14 @@ template<class T> class LeftArrowRule : public Rule
       }
     return alphabet.get_name(input);
   }
+  const char * get_output_string(HFST::Key input)
+  {
+    if (input == HFST::Epsilon)
+      {
+	return zero_representation;
+      }
+    return alphabet.get_name(input);
+  }
   void conflict_message(LeftArrowRule &another_rule)
   {
     if (silent)
@@ -37,6 +45,8 @@ template<class T> class LeftArrowRule : public Rule
     std::cerr 
       << "There is a <=-conflict w.r.t. " 
       << "input symbol " << get_input_string(input)
+      << " and output symbols " << get_output_string(output)
+      << " and " << get_input_string(another_rule.output) << std::endl
       << " between rules" << std::endl
       << "\t" << name << std::endl 
       << "\t" << another_rule.name << std::endl;

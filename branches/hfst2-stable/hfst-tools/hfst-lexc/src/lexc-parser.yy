@@ -57,7 +57,7 @@ static
 void
 handle_multichar(const string& multichar)
 {
-	lexc_printf(PRINT_DEBUG, 0, _("MULTICHAR_SYMBOL: %s\n"),
+	lexc_printf(PRINT_DEBUG, 0, "MULTICHAR_SYMBOL: %s\n",
 			multichar.c_str());
 	if (verbosity & PRINT_VERBOSE)
 	{
@@ -70,14 +70,14 @@ static
 void
 handle_definition(const string& variable_name, const string& reg_exp)
 {
-	lexc_printf(PRINT_DEBUG, 0, _("%s = [ %s ]\n"),
+	lexc_printf(PRINT_DEBUG, 0, "%s = [ %s ]\n",
 			variable_name.c_str(), reg_exp.c_str());
 	if (verbosity & PRINT_VERBOSE)
 	{
 		lexc_list_printf("%s", variable_name.c_str());
 	}
 	lexc_printf(PRINT_XEROXLIKE, 0,
-			_("Defined '%s': ? Kb., ? states, ? arcs, ? paths.\n"),
+			"Defined '%s': ? Kb., ? states, ? arcs, ? paths.\n",
 			variable_name.c_str());
 	lexc->addXreDefinition(variable_name, reg_exp);
 }
@@ -86,10 +86,10 @@ static
 void
 handle_lexicon_name(const string& lexiconName)
 {
-	lexc_printf(PRINT_DEBUG, 0, _("LEXICON: %s\n"), lexiconName.c_str());
+	lexc_printf(PRINT_DEBUG, 0, "LEXICON: %s\n", lexiconName.c_str());
 	if (!firstLexicon)
 	{
-		lexc_printf(PRINT_XEROXLIKE, 0, _("%d "), currentEntries);
+		lexc_printf(PRINT_XEROXLIKE, 0, "%d ", currentEntries);
 	}
 	lexc->setCurrentLexiconName(lexiconName);
 	currentEntries = 0;
@@ -100,17 +100,17 @@ handle_lexicon_name(const string& lexiconName)
 	else if ((firstLexicon) && (lexiconName != "Root"))
 	{
 		lexc_parser_printf(PRINT_WARNING, 2, 
-				_("first lexicon is not named Root\n"));
+				"first lexicon is not named Root\n");
 		lexc_printf(PRINT_VERBOSE, 0, 
-				_("  Using %s as initial lexicon\n"), lexiconName.c_str());
+				"  Using %s as initial lexicon\n", lexiconName.c_str());
 		lexc->setInitialLexiconName(lexiconName);
 	}
 	else if ((!firstLexicon) && (lexiconName == "Root"))
 	{
 		lexc_parser_printf(PRINT_WARNING, 3,
-				_("LEXICON Root is not first\n"));
+				"LEXICON Root is not first\n");
 		lexc_printf(PRINT_VERBOSE, 0, 
-				_("  Using Root as initial lexicon again\n"));
+				"  Using Root as initial lexicon again\n");
 		lexc->setInitialLexiconName(lexiconName);
 	}
 	
@@ -118,8 +118,8 @@ handle_lexicon_name(const string& lexiconName)
 	{
 		lexc_print_list_end("");
 	}
-	lexc_printf(PRINT_XEROXLIKE, 0, _("%s..."), lexiconName.c_str());
-	lexc_printf(PRINT_VERBOSE, 0, _("\nLexicon %s...\n"), lexiconName.c_str());
+	lexc_printf(PRINT_XEROXLIKE, 0, "%s...", lexiconName.c_str());
+	lexc_printf(PRINT_VERBOSE, 0, "\nLexicon %s...\n", lexiconName.c_str());
 	firstLexicon = false;
 }
 
@@ -158,31 +158,31 @@ handle_string_entry_common(const string& cont,
 		*is_glossed = false;
 	}
 	lexc_printf(PRINT_VERBOSE, 0, 
-				_("Entries so far: %10d; in this lexicon: %10d\r"), 
+				"Entries so far: %10d; in this lexicon: %10d\r", 
 				totalEntries, currentEntries);
 	if ((currentEntries % 10000) == 0)
 	{
-		lexc_printf(PRINT_XEROXLIKE, 0, _("%d..."), currentEntries);
+		lexc_printf(PRINT_XEROXLIKE, 0, "%d...", currentEntries);
 	}
 	if (*is_glossed && !*is_heavy && !warnedInfoStrings)
 	{
 		lexc_printf(PRINT_VERBOSE, 0, "\n");
-		lexc_parser_printf(PRINT_WARNING, 9, _("Ignoring info strings\n"));
+		lexc_parser_printf(PRINT_WARNING, 9, "Ignoring info strings\n");
 		warnedInfoStrings = true;
 	}
 	if (*is_glossed)
 	{
-		lexc_printf(PRINT_DEBUG, 0, _("infostring %s\n"), gloss_handled.c_str());
+		lexc_printf(PRINT_DEBUG, 0, "infostring %s\n", gloss_handled.c_str());
 	}
 	if (*is_heavy)
 	{
-		lexc_printf(PRINT_DEBUG, 0, _("weight %f\n"), *weight);
+		lexc_printf(PRINT_DEBUG, 0, "weight %f\n", *weight);
 	}
 	if (*is_heavy && !weighted && !warnedWeightsUnweighted)
 	{
 		lexc_printf(PRINT_VERBOSE, 0, "\n");
 		lexc_parser_printf(PRINT_WARNING, 11,
-			 _("Building unweighted transducer from weighted lexicon\n"));
+			 "Building unweighted transducer from weighted lexicon\n");
 		warnedWeightsUnweighted = true;
 	}
 }
@@ -229,8 +229,8 @@ static
 void
 handle_eof()
 {
-	lexc_printf(PRINT_XEROXLIKE, 0, _("%d\n"), currentEntries);
-	lexc_printf(PRINT_DEBUG, 0, _("EOF\n"));
+	lexc_printf(PRINT_XEROXLIKE, 0, "%d\n", currentEntries);
+	lexc_printf(PRINT_DEBUG, 0, "EOF\n");
 	lexc_printf(PRINT_VERBOSE, 0, "\n");
 }
 
@@ -238,8 +238,8 @@ static
 void
 handle_end()
 {
-	lexc_printf(PRINT_DEBUG, 0, _("END\n"));
-	lexc_printf(PRINT_VERBOSE, 0, _("\nExplicit END called, skipping rest\n"));
+	lexc_printf(PRINT_DEBUG, 0, "END\n");
+	lexc_printf(PRINT_VERBOSE, 0, "\nExplicit END called, skipping rest\n");
 }
 
 %}
@@ -276,8 +276,8 @@ MULTICHAR_SYMBOLS2: MULTICHARS_START {
 					if (verbosity & PRINT_VERBOSE)
 					{
 						lexc_print_list_end("");
-						lexc_print_list_start(_("Reading "
-												"multicharacter symbols"));
+						lexc_print_list_start("Reading "
+												"multicharacter symbols");
 					}
 				}
 				;
@@ -300,7 +300,7 @@ DEFINITIONS_START2: DEFINITIONS_START {
 					if (verbosity & PRINT_VERBOSE)
 					{
 						lexc_print_list_end("");
-						lexc_print_list_start(_("Reading definitions"));
+						lexc_print_list_start("Reading definitions");
 					}
 				}
 				;

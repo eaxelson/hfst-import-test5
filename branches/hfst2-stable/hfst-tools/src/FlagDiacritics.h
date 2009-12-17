@@ -5,6 +5,7 @@
 #include <string>
 #include <cassert>
 #include <vector>
+#include <iostream>
 #ifdef DEBUG
 #include <iostream>
 #endif
@@ -16,6 +17,7 @@ enum DiacriticOperator
 typedef std::map<short,DiacriticOperator> DiacriticOperators;
 typedef std::map<short,std::string> DiacriticFeatures;
 typedef std::map<short,std::string> DiacriticValues;
+typedef std::map<short,bool> DiacriticSettingMap;
 typedef std::map<std::string,std::string> FeatureValues;
 typedef std::map<std::string,bool> FeaturePolarities;
 typedef std::vector<unsigned short> KeyVector;
@@ -26,6 +28,7 @@ class  FlagDiacriticTable
   static DiacriticValues diacritic_values;
   FeatureValues feature_values;
   FeaturePolarities feature_polarities;
+  static DiacriticSettingMap diacritic_has_value;
   bool error_flag;
   static bool is_genuine_diacritic(const std::string &diacritic_string);
   static void split_diacritic(short diacritic_number,
@@ -36,8 +39,10 @@ class  FlagDiacriticTable
 			  std::string &value);
   void disallow(std::string &feature,
 		std::string &value);
+  void disallow(std::string &feature);
   void require(std::string &feature,
 	       std::string &value);
+  void require(std::string &feature);
   void unify(std::string &feature,
 	     std::string &value);
   void clear(std::string &feature);

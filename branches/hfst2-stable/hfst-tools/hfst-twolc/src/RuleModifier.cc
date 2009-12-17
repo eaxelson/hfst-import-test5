@@ -394,6 +394,11 @@ void RuleModifier::insert_variable(char * variable,
 	  SymbolNumber value_number = define_symbol(*it);
 	  value_numbers.push_back(value_number);
 	}
+      else if (is_diacritic(*it))
+	{
+	  SymbolNumber value_number = define_symbol(*it);
+	  value_numbers.push_back(value_number);
+	}
       else if (is_set_name(*it))
 	{
 	  SymbolNumber set_name_number = define_symbol(*it);

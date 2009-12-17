@@ -417,6 +417,20 @@ namespace HFST {
     return new_kt;
   }
 
+  KeyTable * minimize_key_table(KeyTable * key_table, TransducerHandle t)
+  {
+    if (key_table == NULL) { return NULL; }
+    KeySet * t_keys = define_key_set(t);
+    HFST::KeyTable * new_key_table = create_key_table();
+    new_key_table->associate_key(0,0);
+    Key new_k = 1;
+    for (Key k = 0; k < key_table->get_unused_key(); ++k)
+      {
+	if (t_keys->find(k) != t_keys->end() and (not new_key_table->is_key(k)))
+	  { associate_key(new_k++,new_key_table,key_table->get_key_symbol(k)); }
+      }
+    return new_key_table;
+  }
   TransducerHandle longest_match_tokenizer2( KeySet * keys,
 					     KeyTable * kt );
 
@@ -508,50 +522,60 @@ namespace HFST {
       }
     return input_symbols;
   }
+
+  typedef std::map<Key,unsigned int> KeyCountMap;
   
   HFST::KeyTable * lift_input_keys(HFST::KeyTable * kt,
-				   InputKeySet * input_keys)
+				   KeyCountMap &input_key_counts)
   {
-    SymbolSet * input_symbols = get_symbols(input_keys,kt);
-    HFST::KeyTable * new_kt = HFST::create_key_table();
-    HFST::Key unused_key = 0;
-    
-    SymbolSet only_output_symbols;
-    HFST::Symbol last_symbol = 0;
-    
-    for (SymbolSet::iterator it = input_symbols->begin();
-	 it != input_symbols->end();
+    std::multimap<unsigned int,Key> count_keys;
+    for (KeyCountMap::iterator it = input_key_counts.begin();
+	 it != input_key_counts.end();
 	 ++it)
+      { count_keys.insert(std::pair<unsigned int,Key>(it->second,it->first)); }
+    KeyTable * new_key_table = create_key_table();
+    associate_key(0,new_key_table,kt->get_key_symbol(0));
+    Key k = 1;
+    for (std::multimap<unsigned int,Key>::reverse_iterator it = count_keys.rbegin();
+	 it != count_keys.rend(); ++it)
       {
-	HFST::Symbol s = *it;
-	while (last_symbol < s)
-	  {
-	    if ( HFST::is_symbol(last_symbol,kt) )
-	      {
-		only_output_symbols.insert(last_symbol);
-	      }
-	    ++last_symbol;
-	  }
-	HFST::associate_key(unused_key,new_kt,s);
-	++last_symbol;
-	++unused_key;
+	if (it->second != 0)
+	  { 
+	    associate_key(k++,new_key_table,kt->get_key_symbol(it->second)); }
       }
-    delete input_symbols;
-    for (SymbolSet::iterator it = only_output_symbols.begin();
-	 it != only_output_symbols.end();
-	 ++it)
+    for (Key kk = 1; kk != kt->get_unused_key(); ++kk)
       {
-	HFST::Symbol s = *it;
-	HFST::associate_key(unused_key,new_kt,s);
-	++unused_key;
+	if (input_key_counts.find(kk) == input_key_counts.end())
+	  { 
+	    associate_key(k++,new_key_table,kt->get_key_symbol(kk)); }
       }
-    return new_kt;
+    return new_key_table;
+  }
+  
+
+  void get_input_frequency(KeyCountMap &key_count_map,Transducer * t)
+  {
+    key_count_map[0] = 1;
+    NodeNumbering num(*t);
+    for (size_t i = 0; i < num.number_of_nodes(); ++i)
+      {
+	Node * n = num.get_node(i);
+	std::set<Key> input_keys;
+	for (ArcsIter aiter(n->arcs()); aiter; aiter++)
+	  { Arc * a = aiter; input_keys.insert(a->label().lower_char()); }
+	for (std::set<Key>::iterator it = input_keys.begin();
+	     it != input_keys.end(); ++it)
+	  { ++key_count_map[*it]; }
+      }
   }
   
   HFST::KeyTable * reorder_key_table(HFST::KeyTable * kt, Transducer * t)
   {
     InputKeySet * input_keys = get_input_keys(t);
-    HFST::KeyTable * new_kt = lift_input_keys(kt, input_keys);
+    input_keys->insert(0);
+    KeyCountMap key_count_map;
+    get_input_frequency(key_count_map,t);
+    HFST::KeyTable * new_kt = lift_input_keys(kt,key_count_map);
     delete input_keys;
     return new_kt;
   }
@@ -5135,7 +5159,6 @@ namespace HFST {
     delete pT_copy;
     props.print(os);
   }
-
 
 }
 

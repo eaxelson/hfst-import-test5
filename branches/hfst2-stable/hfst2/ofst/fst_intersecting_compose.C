@@ -81,8 +81,8 @@ fst::RulesInfo::RulesInfo( void ) :
 
   /* All states are initial. */
   for ( unsigned int i = 0; i < number_of_rules; ++i ) {
-    states.push_back( 0 );
-    Rule_arcs.push_back( new Arcs( *Rules.at(i), 0 ) ); 
+    states.push_back( Rules.at(i)->Start() );
+    Rule_arcs.push_back( new Arcs( *Rules.at(i), Rules.at(i)->Start() ) ); 
   }
 
   set_pair();

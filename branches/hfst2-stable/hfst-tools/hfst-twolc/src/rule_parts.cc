@@ -218,7 +218,10 @@ RuleString * make_pair(char * symbol1, char * symbol2)
   RuleString * str = new RuleString;
   str->push_back(symbol1);
   str->push_back(string_copy(":"));
-  str->push_back(symbol2);
+  if (strcmp(symbol1,"@#@") == 0)
+    { str->push_back(string_copy("@0@")); free(symbol2); }
+  else
+    { str->push_back(symbol2); }
   return str;
 }
 
@@ -227,7 +230,10 @@ RuleString * make_pair(char * symbol)
   RuleString * str = new RuleString;
   str->push_back(symbol);
   str->push_back(string_copy(":"));
-  str->push_back(string_copy(symbol));
+  if (strcmp(symbol,"@#@") == 0)
+    { str->push_back(string_copy("@0@")); }
+  else
+    { str->push_back(string_copy(symbol)); }
   return str;
 }
 

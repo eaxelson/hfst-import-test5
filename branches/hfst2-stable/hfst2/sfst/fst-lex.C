@@ -310,16 +310,6 @@ Transducer * intersecting_composition(  Transducer &lexicon,
 					vector<char*> * rule_names, 
 					bool verbose){
   
-  if ( not (known_flag_diacritics == NULL))
-    {
-      //fprintf(stderr,"\nknown flag diacritics:\n");
-      for (FlagDiacriticSet::iterator it = known_flag_diacritics->begin();
-	   it != known_flag_diacritics->end();
-	   ++it)
-	{
-	  fprintf(stderr,"%u\n",*it);
-	}
-    }
   NodeNumbering * numbering = new NodeNumbering( lexicon );
   vector<StateInfo*> * states = new vector<StateInfo*>; 
   for (unsigned int i = 0; i < numbering->number_of_nodes(); i++) {

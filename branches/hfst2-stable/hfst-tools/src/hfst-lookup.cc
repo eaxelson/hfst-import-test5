@@ -52,6 +52,28 @@ static char* begin_format; // print before set of lookups
 static char* lookup_format; // print for each lookup
 static char* no_lookups_format; // print for zero results
 static char* end_format; // print after set of lookups
+static bool print_statistics = false;
+
+// predefined formats
+static const char* XEROX_BEGIN_FORMAT = "";
+static const char* XEROX_LOOKUP_FORMAT = "%i\t%l%n";
+static const char* XEROX_NO_LOOKUPS_FORMAT = "%i\t%i\t+?%n";
+static const char* XEROX_END_FORMAT = "%n";
+static const char* CG_BEGIN_FORMAT = "\"<%i>\"%n";
+static const char* CG_LOOKUP_FORMAT = "\t\"%b\"%a%n";
+static const char* CG_NO_LOOKUPS_FORMAT = "\t\"%i\"\t ?%n";
+static const char* CG_END_FORMAT = "%n";
+static const char* APERTIUM_BEGIN_FORMAT = "^%i";
+static const char* APERTIUM_LOOKUP_FORMAT = "/%l";
+static const char* APERTIUM_NO_LOOKUPS_FORMAT = "/*%i";
+static const char* APERTIUM_END_FORMAT = "$%n";
+
+// statistic counting
+static unsigned long inputs = 0;
+static unsigned long no_analyses = 0;
+static unsigned long analysed = 0;
+static unsigned long analyses = 0;
+
 static bool format_given = false;
 FlagDiacriticTable flag_diacritic_table;
 HFST::KeySet flag_diacritic_set;
@@ -73,7 +95,8 @@ print_usage(const char *program_name)
 	fprintf(message_out, 
 			"  -I, --input-strings=SFILE        Read lookup strings from SFILE\n"
 			"  -S, --spaces                     Use space separated tokens in strings\n"
-			"  -f, --format=FORMAT              Use FORMAT printing results sets\n");
+			"  -f, --format=FORMAT              Use FORMAT printing results sets\n"
+			"  -r, --statistics                 Print statistics\n");
 	fprintf(message_out,
 		   "\n"
 		   "If OUTFILE or INFILE is missing or -, "
@@ -90,7 +113,7 @@ void
 print_version(const char* program_name)
 {
 	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dversion
-	fprintf(message_out, "%s 0.2 (%s)\n"
+	fprintf(message_out, "%s 0.3 (%s)\n"
 		   "Copyright (C) 2009 University of Helsinki,\n"
 		   "License GPLv3: GNU GPL version 3 "
 		   "<http://gnu.org/licenses/gpl.html>\n"
@@ -115,6 +138,7 @@ parse_options(int argc, char** argv)
 			{"input-strings", required_argument, 0, 'I'},
 			{"spaces", no_argument, 0, 'S'},
 			{"format", required_argument, 0, 'f'},
+			{"statistics", no_argument, 0, 'r'},
 			{0,0,0,0}
 		};
 		int option_index = 0;
@@ -142,24 +166,24 @@ parse_options(int argc, char** argv)
 		case 'f':
 			if (strcmp(optarg, "xerox") == 0)
 			{
-				begin_format = strdup("\n");
-				lookup_format = strdup("%i\t%l\n");
-				no_lookups_format = strdup("%i\t%i\t+?\n");
-				end_format = strdup("\n");
+				begin_format = strdup(XEROX_BEGIN_FORMAT);
+				lookup_format = strdup(XEROX_LOOKUP_FORMAT);
+				no_lookups_format = strdup(XEROX_NO_LOOKUPS_FORMAT);
+				end_format = strdup(XEROX_END_FORMAT);
 			}
 			else if (strcmp(optarg, "cg") == 0)
 			{
-				begin_format = strdup("\"<%i>\"\n");
-				lookup_format = strdup("\t\"%b\"%a\n");
-				no_lookups_format = strdup("\t\"%i\"\t ?\n");
-				end_format = strdup("\n");
+				begin_format = strdup(CG_BEGIN_FORMAT);
+				lookup_format = strdup(CG_LOOKUP_FORMAT);
+				no_lookups_format = strdup(CG_NO_LOOKUPS_FORMAT);
+				end_format = strdup(CG_END_FORMAT);
 			}
 			else if (strcmp(optarg, "apertium") == 0)
 			{
-				begin_format = strdup("^%i");
-				lookup_format = strdup("/%l");
-				no_lookups_format = strdup("/*%i");
-				end_format = strdup("$\n");
+				begin_format = strdup(APERTIUM_BEGIN_FORMAT);
+				lookup_format = strdup(APERTIUM_LOOKUP_FORMAT);
+				no_lookups_format = strdup(APERTIUM_NO_LOOKUPS_FORMAT);
+				end_format = strdup(APERTIUM_END_FORMAT);
 			}
 			else if (strncmp(optarg, "custom:", 7) == 0)
 			{
@@ -212,6 +236,9 @@ error_format:
 					"custom: must be of form BEGIN,LOOKUP,NO_RES,END\n");
 			return EXIT_FAILURE;
 			break;
+		case 'r':
+			print_statistics = true;
+			break;
 		case '?':
 			fprintf(message_out, "invalid option --%s\n",
 					long_options[option_index].name);
@@ -228,10 +255,10 @@ error_format:
 
 	if (!format_given)
 	{
-		begin_format = strdup("\n");
-		lookup_format = strdup("%i\t%l\n");
-		no_lookups_format = strdup("%i\t%i\t+?\n");
-		end_format = strdup("\n");
+		begin_format = strdup(XEROX_BEGIN_FORMAT);
+		lookup_format = strdup(XEROX_LOOKUP_FORMAT);
+		no_lookups_format = strdup(XEROX_NO_LOOKUPS_FORMAT);
+		end_format = strdup(XEROX_END_FORMAT);
 	}
 	if (is_output_stdout)
 	{
@@ -437,6 +464,7 @@ lookup_print_all(const char* s, KeyTable* kt,
 {
 	KeyVector* lookup_orig = NULL;
 	lookup_printf(begin_format, s, NULL);
+	inputs++;
 	if (space_separated)
 	{
 		lookup_orig = stringSeparatedToKeyVector(s, kt, string(" "),
@@ -473,35 +501,43 @@ lookup_print_all(const char* s, KeyTable* kt,
 				string* kvstring = keyVectorToString(*kv, kt);
 				VERBOSE_PRINT("Looking up %s from transducer %zu\n",
 						kvstring->c_str(), cascade_number);
-				if (is_infinitely_ambiguous(*t, *kv))
+				KeyVectorVector* lookups;
+				if (is_infinitely_ambiguous(*t, true, *kv))
 				{
-					VERBOSE_PRINT("Got infinite results\n");
-					return false;
+					fprintf(message_out, "WARNING: Got infinite results\n");
+					lookups = new KeyVectorVector;
+					lookups->push_back(lookup_first(*t, *kv, &flag_diacritic_set));
 				}
 				else
 				{
-				  KeyVectorVector* lookups = lookup_all(*t, *kv,&flag_diacritic_set);
-					if (lookups == NULL)
+					lookups = lookup_all(*t, *kv,&flag_diacritic_set);
+				}
+				if (lookups == NULL)
+				{
+					// no results as empty result
+					VERBOSE_PRINT("Got no results\n");
+					lookups = new KeyVectorVector;
+				}
+				for (KeyVectorVector::iterator lkv = lookups->begin();
+						lkv != lookups->end();
+						++lkv)
+				{
+					KeyVector* hmmlkv = *lkv;
+					string* lkvstring = keyVectorToString(hmmlkv, kt);
+					VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
+					delete lkvstring;
+					hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
+					if (hmmlkv == NULL)
 					{
-						// no results as empty result
-						VERBOSE_PRINT("Got no results\n");
-						lookups = new KeyVectorVector;
+						VERBOSE_PRINT("Filtered by flag diacritics\n");
+						continue;
 					}
-					for (KeyVectorVector::iterator lkv = lookups->begin();
-							lkv != lookups->end();
-							++lkv)
-					{
-						KeyVector* hmmlkv = *lkv;
-						hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
-						if (hmmlkv == NULL)
-						  {continue;}
-						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
-											_is_epsilon), hmmlkv->end());
-						string* lkvstring = keyVectorToString(hmmlkv, kt);
-						VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
-						current_results->push_back(hmmlkv);
-						delete lkvstring;
-					}
+					hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
+								_is_epsilon), hmmlkv->end());
+					string* hmmlkvstring = keyVectorToString(hmmlkv, kt);
+					VERBOSE_PRINT("Filtered %s\n", hmmlkvstring->c_str());
+					delete hmmlkvstring;
+					current_results->push_back(hmmlkv);
 				}
 			}
 			final_results = current_results;
@@ -510,6 +546,11 @@ lookup_print_all(const char* s, KeyTable* kt,
 		if (final_results->size() == 0)
 		{
 			lookup_printf(no_lookups_format, s, NULL);
+			no_analyses++;
+		}
+		else
+		{
+			analysed++;
 		}
 		for (KeyVectorVector::iterator lkv = final_results->begin();
 				lkv != final_results->end();
@@ -520,6 +561,7 @@ lookup_print_all(const char* s, KeyTable* kt,
 			const char* lookup_full = lkvstr->c_str();
 			lookup_printf(lookup_format, s, lookup_full);
 			delete lkvstr;
+			analyses++;
 		}
 		lookup_printf(end_format, s, NULL);
 	} // if proper lookup originally
@@ -541,6 +583,7 @@ lookup_print_all(const char* s, KeyTable* kt,
 {
 	KeyVector* lookup_orig = NULL;
 	lookup_printf(begin_format, s, NULL);
+	inputs++;
 	if (space_separated)
 	{
 		lookup_orig = stringSeparatedToKeyVector(s, kt, string(" "),
@@ -577,35 +620,43 @@ lookup_print_all(const char* s, KeyTable* kt,
 				string* kvstring = keyVectorToString(*kv, kt);
 				VERBOSE_PRINT("Looking up %s from transducer %zu\n",
 						kvstring->c_str(), cascade_number);
-				if (is_infinitely_ambiguous(*t, *kv))
+				KeyVectorVector* lookups;
+				if (is_infinitely_ambiguous(*t, true, *kv))
 				{
-					VERBOSE_PRINT("Got infinite results\n");
-					return false;
+					fprintf(message_out, "WARNING: Got infinite results\n");
+					lookups = new KeyVectorVector;
+					lookups->push_back(lookup_first(*t, *kv, &flag_diacritic_set));
 				}
 				else
 				{
-				  KeyVectorVector* lookups = lookup_all(*t, *kv,&flag_diacritic_set);
-					if (lookups == NULL)
+					lookups = lookup_all(*t, *kv,&flag_diacritic_set);
+				}
+				if (lookups == NULL)
+				{
+					// no results as empty result
+					VERBOSE_PRINT("Got no results\n");
+					lookups = new KeyVectorVector;
+				}
+				for (KeyVectorVector::iterator lkv = lookups->begin();
+						lkv != lookups->end();
+						++lkv)
+				{
+					KeyVector* hmmlkv = *lkv;
+					string* lkvstring = keyVectorToString(hmmlkv, kt);
+					VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
+					delete lkvstring;
+					hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
+					if (hmmlkv == NULL)
 					{
-						// no results as empty result
-						VERBOSE_PRINT("Got no results\n");
-						lookups = new KeyVectorVector;
+						VERBOSE_PRINT("Filtered by flag diacritics\n");
+						continue;
 					}
-					for (KeyVectorVector::iterator lkv = lookups->begin();
-							lkv != lookups->end();
-							++lkv)
-					{
-						KeyVector* hmmlkv = *lkv;
-						hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
-						if (hmmlkv == NULL)
-						  { continue; }
-						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
-											_is_epsilon), hmmlkv->end());
-						string* lkvstring = keyVectorToString(hmmlkv, kt);
-						VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
-						current_results->push_back(hmmlkv);
-						delete lkvstring;
-					}
+					hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
+								_is_epsilon), hmmlkv->end());
+					string* hmmlkvstring = keyVectorToString(hmmlkv, kt);
+					VERBOSE_PRINT("Filtered %s\n", hmmlkvstring->c_str());
+					delete hmmlkvstring;
+					current_results->push_back(hmmlkv);
 				}
 			}
 			final_results = current_results;
@@ -614,6 +665,11 @@ lookup_print_all(const char* s, KeyTable* kt,
 		if (final_results->size() == 0)
 		{
 			lookup_printf(no_lookups_format, s, NULL);
+			no_analyses++;
+		}
+		else
+		{
+			analysed++;
 		}
 		for (KeyVectorVector::iterator lkv = final_results->begin();
 				lkv != final_results->end();
@@ -623,6 +679,7 @@ lookup_print_all(const char* s, KeyTable* kt,
 			string* lkvstr = keyVectorToString(hmmlkv, kt);
 			const char* lookup_full = lkvstr->c_str();
 			lookup_printf(lookup_format, s, lookup_full);
+			analyses++;
 			delete lkvstr;
 		}
 		lookup_printf(end_format, s, NULL);
@@ -685,7 +742,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 			}
 			define_flag_diacritics(key_table);
 			VERBOSE_PRINT("\n");
-#			define MAX_LINE_LENGTH 254
+#			define MAX_LINE_LENGTH 2048
 			char* line =
 				static_cast<char*>(malloc(sizeof(char)*MAX_LINE_LENGTH+1));
 			while ((line = fgets(line, MAX_LINE_LENGTH, lookup_file)))
@@ -703,6 +760,16 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				VERBOSE_PRINT("Looking up %s...\n", line);
 				HFST::lookup_print_all(line, key_table, cascade);
 			} // while lines in input
+			if (print_statistics)
+			{
+				fprintf(message_out, "Strings\tFound\tMissing\tResults\n"
+						"%lu\t%lu\t%lu\t%lu\n", 
+						inputs, analysed, no_analyses, analyses);
+				fprintf(message_out, "Coverage\tAmbiguity\n"
+						"%f\t%f\n",
+						(float)analysed/(float)inputs,
+						(float)inputs/(float)analyses);
+			}
 			if (write_symbols_to_filename != NULL) {
 			  ofstream os(write_symbols_to_filename);
 			  HFST::write_symbol_table(key_table, os);
@@ -764,7 +831,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 			}
 			define_flag_diacritics(key_table);
 			VERBOSE_PRINT("\n");
-#			define MAX_LINE_LENGTH 254
+#			define MAX_LINE_LENGTH 2048
 			char* line =
 				static_cast<char*>(malloc(sizeof(char)*MAX_LINE_LENGTH+1));
 			while ((line = fgets(line, MAX_LINE_LENGTH, lookup_file)))
@@ -782,6 +849,16 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				VERBOSE_PRINT("Looking up %s...\n", line);
 				HWFST::lookup_print_all(line, key_table, cascade);
 			} // while lines in input
+			if (print_statistics)
+			{
+				fprintf(message_out, "Strings\tFound\tMissing\tResults\n"
+						"%lu\t%lu\t%lu\t%lu\n", 
+						inputs, analysed, no_analyses, analyses);
+				fprintf(message_out, "Coverage\tAmbiguity\n"
+						"%f\t%f\n",
+						(float)analysed/(float)inputs,
+						(float)inputs/(float)analyses);
+			}
 			if (write_symbols_to_filename != NULL) {
 			  ofstream os(write_symbols_to_filename);
 			  HWFST::write_symbol_table(key_table, os);
@@ -818,6 +895,12 @@ int main( int argc, char **argv ) {
 	}
 	VERBOSE_PRINT("Reading from %s, writing to %s\n", 
 		inputfilename, outfilename);
+	VERBOSE_PRINT("Outputting in format:\n"
+			"  BEGIN:`%s',\n"
+			"  LOOKUP:`%s',\n"
+			"  NO_LOOKUPS:`%s',\n"
+			"  END:`%s'\n", begin_format, 
+			lookup_format, no_lookups_format, end_format);
 	// here starts the buffer handling part
 	if (!is_input_stdin)
 	{

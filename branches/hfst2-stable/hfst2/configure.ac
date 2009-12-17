@@ -1,4 +1,4 @@
-AC_INIT([libhfst], [2.2], [hfst-bugs@helsinki.fi])
+AC_INIT([libhfst], [2.3], [hfst-bugs@helsinki.fi])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_CONFIG_FILES([Makefile])
@@ -8,7 +8,7 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_MACRO_DIR([m4])
 
 AC_PROG_CXX
-AC_PROG_LIBTOOL
+ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
 AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_CPP
@@ -17,7 +17,18 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PROG_LEX
 AC_PROG_YACC
-# fails on some debian without:
+
+# if flex 3.X ever comes out, this breaks :)
+LEX_VERSION=`$LEX --version`
+if test -z "`echo "$LEX_VERSION" | grep 'flex 2\.[[5-9]]\.[[3-9][4-9]]'`"
+then
+	AC_MSG_WARN([
+!! Building hfst successfully requires flex newer than
+!! 2.5.33 on some platforms. Unless you're building with
+!! pre-flex-generated sources, building will probably fail.])
+fi
+
+
 AC_PATH_PROG([LDCONFIG],[ldconfig],[echo])
 
 # Checks for header files.
