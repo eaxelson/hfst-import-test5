@@ -6,8 +6,11 @@ SFST_OBJS=$(SFST_DIR)/fst.o $(SFST_DIR)/basic.o $(SFST_DIR)/utf8.o \
 $(SFST_DIR)/operators.o $(SFST_DIR)/interface.o $(SFST_DIR)/determinise.o \
 $(SFST_DIR)/alphabet.o
 
+OFST_OBJS=./implementations/openfst-1.1/src/lib/*.o
+
 HFST_OBJS=implementations/SymbolDefs.o implementations/GlobalSymbolTable.o \
-implementations/HfstTokenizer.o implementations/ConvertTransducerFormat.o
+implementations/HfstTokenizer.o implementations/ConvertTransducerFormat.o \
+HfstApply.o HfstInputStream.o HfstTransducer.o
 
 IMPLEMENTATIONS=implementations/SfstTransducer.o \
 implementations/TropicalWeightTransducer.o
@@ -15,7 +18,12 @@ implementations/TropicalWeightTransducer.o
 OFST_LIB_PATHS=-Limplementations/openfst-1.1/src/lib \
 -Limplementations/openfst-1.1/src/bin
 
-all: HfstInputStream.o HfstTransducer.o HfstApply.o hfst_obj
+all: objs
+	ar rc libhfst3.a $(SFST_OBJS) $(OFST_OBJS) \
+	$(IMPLEMENTATIONS) $(HFST_OBJS)
+
+
+objs: HfstInputStream.o HfstTransducer.o HfstApply.o hfst_obj
 
 clean:
 	rm -Rf *.o
