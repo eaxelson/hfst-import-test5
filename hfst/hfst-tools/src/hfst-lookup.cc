@@ -742,7 +742,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 			}
 			define_flag_diacritics(key_table);
 			VERBOSE_PRINT("\n");
-#			define MAX_LINE_LENGTH 2048
+#			define MAX_LINE_LENGTH 5000
 			char* line =
 				static_cast<char*>(malloc(sizeof(char)*MAX_LINE_LENGTH+1));
 			while ((line = fgets(line, MAX_LINE_LENGTH, lookup_file)))
@@ -831,7 +831,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 			}
 			define_flag_diacritics(key_table);
 			VERBOSE_PRINT("\n");
-#			define MAX_LINE_LENGTH 2048
+#			define MAX_LINE_LENGTH 5000
 			char* line =
 				static_cast<char*>(malloc(sizeof(char)*MAX_LINE_LENGTH+1));
 			while ((line = fgets(line, MAX_LINE_LENGTH, lookup_file)))

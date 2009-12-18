@@ -197,8 +197,6 @@ int process_stream(std::istream& inputstream, FILE * outstream)
 				}
 				VERBOSE_PRINT("Converting to optimized lookup format...\n");
 				// add your code here
-			       HFST::KeyTable * flag_diacritic_table =
-				  HFST::gather_flag_diacritic_table(key_table);
 				HFST::write_runtime_transducer(input,
 							       key_table,
 							       outstream);
@@ -249,8 +247,6 @@ int process_stream(std::istream& inputstream, FILE * outstream)
 					return EXIT_FAILURE;
 				}
 				// add your code here
-				HFST::KeyTable * flag_diacritic_table =
-				  HFST::gather_flag_diacritic_table(key_table);
 				HWFST::write_runtime_transducer(input,
 								key_table,
 								outstream);

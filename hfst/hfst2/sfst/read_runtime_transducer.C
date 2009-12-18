@@ -2,7 +2,7 @@
 
 void AlphabetReader::display_unicode_symbols(void) {
   for( unsigned int i = 0; i < amount_of_all_symbols; ++i ) {
-    //fprintf(stderr,"UNICODE SYMBOL %u\n",*(unicode_symbols+i));
+    //fprintf(stderr,"UNICODE SYMBOL %s\n",*(unicode_symbols+i));
   }
 }
 
