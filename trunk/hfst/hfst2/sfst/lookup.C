@@ -378,10 +378,8 @@ bool has_infinitely_many_continuations(Node * n,
 				       unsigned int index, 
 				       NodeMap &nodes)
 {
-
-  bool has_old_index = false;
   unsigned int old_index = 0;
-
+  bool has_old_index = false;
   if (nodes.find(n) != nodes.end())
     {
       has_old_index = true;
