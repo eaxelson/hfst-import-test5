@@ -26,7 +26,7 @@ all: objs
 objs: HfstInputStream.o HfstTransducer.o HfstApply.o hfst_obj
 
 clean:
-	rm -Rf *.o
+	rm -Rf *.o libhfst3.a
 	$(MAKE) -C ./implementations clean
 
 HfstTransducer: HfstTransducer.cc HfstInputStream.o HfstApply.o

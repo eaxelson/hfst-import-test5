@@ -8,18 +8,19 @@
 #include "SFST/src/fst.h"
 #include "openfst-1.1/src/include/fst/fstlib.h"
 
-namespace fst {
-  typedef StdArc::StateId StateId;
-  typedef ArcIterator<StdVectorFst> StdArcIterator;
-}
 
-namespace HFST3_INTERFACE {
 
+namespace HFST_IMPLEMENTATIONS {
+
+  using namespace HFST_EXCEPTIONS;
+
+  typedef fst::StdArc::StateId StateId;
+  typedef fst::ArcIterator<fst::StdVectorFst> StdArcIterator;
   typedef fst::StdVectorFst InternalTransducer;
   typedef std::vector<SFST::Node *> SfstStateVector;
-  typedef std::vector<fst::StateId> OfstStateVector;
-  typedef std::map<SFST::Node *,fst::StateId> SfstToOfstStateMap;
-  typedef std::map<fst::StateId,SFST::Node *> OfstToSfstStateMap;
+  typedef std::vector<StateId> OfstStateVector;
+  typedef std::map<SFST::Node *,StateId> SfstToOfstStateMap;
+  typedef std::map<StateId,SFST::Node *> OfstToSfstStateMap;
 
 
     /* SFST::Transducer * is the sfst transducer format.

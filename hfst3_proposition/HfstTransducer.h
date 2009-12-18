@@ -10,7 +10,7 @@
 #include <cassert>
 #include <iostream>
 
-namespace HFST3
+namespace HFST
 {
 
   using HFST_SYMBOLS::KeyTable;
@@ -19,14 +19,14 @@ namespace HFST3
   using HFST_SYMBOLS::StringSymbolPair;
   using HFST_SYMBOLS::KeyPairVector;
   
-  using HFST3_INTERFACE::SfstTransducer;
-  using HFST3_INTERFACE::SfstState;
-  using HFST3_INTERFACE::SfstTransition;
-  using HFST3_INTERFACE::SfstStateIndexer;
-  using HFST3_INTERFACE::TropicalWeightTransducer;
-  using HFST3_INTERFACE::TropicalWeightState;
-  using HFST3_INTERFACE::TropicalWeightTransition;
-  using HFST3_INTERFACE::TropicalWeightStateIndexer;
+  using HFST_IMPLEMENTATIONS::SfstTransducer;
+  using HFST_IMPLEMENTATIONS::SfstState;
+  using HFST_IMPLEMENTATIONS::SfstTransition;
+  using HFST_IMPLEMENTATIONS::SfstStateIndexer;
+  using HFST_IMPLEMENTATIONS::TropicalWeightTransducer;
+  using HFST_IMPLEMENTATIONS::TropicalWeightState;
+  using HFST_IMPLEMENTATIONS::TropicalWeightTransition;
+  using HFST_IMPLEMENTATIONS::TropicalWeightStateIndexer;
 
   enum ImplementationType
   {
@@ -50,8 +50,8 @@ namespace HFST3
 
     union StreamImplementation
     {
-      HFST3_INTERFACE::SfstInputStream * sfst;
-      HFST3_INTERFACE::TropicalWeightInputStream * tropical_ofst;
+      HFST_IMPLEMENTATIONS::SfstInputStream * sfst;
+      HFST_IMPLEMENTATIONS::TropicalWeightInputStream * tropical_ofst;
     };
 
     ImplementationType type;
@@ -79,13 +79,13 @@ namespace HFST3
   protected:
     union TransducerImplementation
     {
-      HFST3_INTERFACE::Transducer * sfst;
-      HFST3_INTERFACE::StdVectorFst * tropical_ofst;
-      HFST3_INTERFACE::StdVectorFst * internal; 
+      HFST_IMPLEMENTATIONS::Transducer * sfst;
+      HFST_IMPLEMENTATIONS::StdVectorFst * tropical_ofst;
+      HFST_IMPLEMENTATIONS::StdVectorFst * internal; 
     };
     
-    static HFST3_INTERFACE::SfstTransducer sfst_interface;
-    static HFST3_INTERFACE::TropicalWeightTransducer tropical_ofst_interface;
+    static HFST_IMPLEMENTATIONS::SfstTransducer sfst_interface;
+    static HFST_IMPLEMENTATIONS::TropicalWeightTransducer tropical_ofst_interface;
 
     ImplementationType type;
 
@@ -146,13 +146,13 @@ namespace HFST3
 
     template<class W> HfstTransducer &set_final_weight(W weight) 
       { (void)weight; 
-	throw HFST3_INTERFACE::FunctionNotImplementedException(); }
+	throw HFST_IMPLEMENTATIONS::FunctionNotImplementedException(); }
 
     template<class T> typename T::const_iterator begin(void)
-      { throw HFST3_INTERFACE::FunctionNotImplementedException(); }
+      { throw HFST_IMPLEMENTATIONS::FunctionNotImplementedException(); }
 
     template<class T> typename T::const_iterator end(void)
-      { throw HFST3_INTERFACE::FunctionNotImplementedException(); }
+      { throw HFST_IMPLEMENTATIONS::FunctionNotImplementedException(); }
 
     HfstTransducer &anonymize(void);
     KeyTable &get_key_table(void);

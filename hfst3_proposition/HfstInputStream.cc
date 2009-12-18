@@ -1,6 +1,6 @@
 #include "HfstTransducer.h"
 
-namespace HFST3
+namespace HFST
 {
   void HfstInputStream::read_transducer(HfstTransducer &t)
   {
@@ -20,7 +20,7 @@ namespace HFST3
   ImplementationType HfstInputStream::stream_fst_type(std::istream &in)
   { 
     if (not in.good())
-      { throw HFST3_INTERFACE::FileNotReadableException(); }
+      { throw HFST_IMPLEMENTATIONS::FileNotReadableException(); }
     if (in.peek() == (int)'a')
       { return SFST_TYPE; }
     if ((char)in.peek() == (char)214)
@@ -32,19 +32,19 @@ namespace HFST3
   HfstInputStream::HfstInputStream(void)
   {
     try { type = stream_fst_type(std::cin); }
-    catch (HFST3_INTERFACE::FileNotReadableException e)
+    catch (HFST_IMPLEMENTATIONS::FileNotReadableException e)
       { throw e; }
 
     if (type == ERROR_TYPE)
-      { throw HFST3_INTERFACE::NotTransducerStreamException(); }
+      { throw HFST_IMPLEMENTATIONS::NotTransducerStreamException(); }
     switch (type)
     {
     case SFST_TYPE:
-      implementation.sfst = new HFST3_INTERFACE::SfstInputStream;
+      implementation.sfst = new HFST_IMPLEMENTATIONS::SfstInputStream;
       break;
     case TROPICAL_OFST_TYPE:
       implementation.tropical_ofst = 
-	new HFST3_INTERFACE::TropicalWeightInputStream;
+	new HFST_IMPLEMENTATIONS::TropicalWeightInputStream;
       break;
     }
   }
@@ -55,20 +55,20 @@ namespace HFST3
       std::ifstream in(filename);
       type = stream_fst_type(in); 
     }
-    catch (HFST3_INTERFACE::FileNotReadableException e)
+    catch (HFST_IMPLEMENTATIONS::FileNotReadableException e)
       { throw e; }
 
     if (type == ERROR_TYPE)
-      { throw HFST3_INTERFACE::NotTransducerStreamException(); }
+      { throw HFST_IMPLEMENTATIONS::NotTransducerStreamException(); }
 
     switch (type)
     {
     case SFST_TYPE:
-      implementation.sfst = new HFST3_INTERFACE::SfstInputStream(filename);
+      implementation.sfst = new HFST_IMPLEMENTATIONS::SfstInputStream(filename);
       break;
     case TROPICAL_OFST_TYPE:
       implementation.tropical_ofst = 
-	new HFST3_INTERFACE::TropicalWeightInputStream(filename);
+	new HFST_IMPLEMENTATIONS::TropicalWeightInputStream(filename);
       break;
     default:
       assert(false);
@@ -182,27 +182,27 @@ namespace HFST3
 #ifdef DEBUG_MAIN_STREAM
 int main(void)
 {
-  HFST3::HfstInputStream sfst_stdin_input(HFST3::SFST_TYPE);
+  HFST::HfstInputStream sfst_stdin_input(HFST::SFST_TYPE);
   sfst_stdin_input.open();
   sfst_stdin_input.close();
-  HFST3::HfstInputStream ofst_stdin_input(HFST3::TROPICAL_OFST_TYPE);
+  HFST::HfstInputStream ofst_stdin_input(HFST::TROPICAL_OFST_TYPE);
   ofst_stdin_input.open();
   ofst_stdin_input.close();
   // This succeeds only if the files stream_test and
   // stream_test_ne exist
-  HFST3::HfstInputStream sfst_file_input("stream_test",HFST3::SFST_TYPE);
+  HFST::HfstInputStream sfst_file_input("stream_test",HFST::SFST_TYPE);
   sfst_file_input.open();
   sfst_file_input.close();
   assert(sfst_file_input.is_eof());
-  HFST3::HfstInputStream sfst_ne_file_input("stream_test_ne",HFST3::SFST_TYPE);
+  HFST::HfstInputStream sfst_ne_file_input("stream_test_ne",HFST::SFST_TYPE);
   sfst_ne_file_input.open();
   assert(not sfst_ne_file_input.is_eof());
   sfst_ne_file_input.close();
-  HFST3::HfstInputStream ofst_file_input("stream_test",HFST3::TROPICAL_OFST_TYPE);
+  HFST::HfstInputStream ofst_file_input("stream_test",HFST::TROPICAL_OFST_TYPE);
   ofst_file_input.open();
   ofst_file_input.close();
   assert(ofst_file_input.is_eof());
-  HFST3::HfstInputStream ofst_ne_file_input("stream_test_ne",HFST3::TROPICAL_OFST_TYPE);
+  HFST::HfstInputStream ofst_ne_file_input("stream_test_ne",HFST::TROPICAL_OFST_TYPE);
   ofst_ne_file_input.open();
   assert(not ofst_ne_file_input.is_eof());
   ofst_ne_file_input.close();

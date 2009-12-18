@@ -9,7 +9,7 @@
 
 namespace HFST_SYMBOLS
 {
-  using namespace HFST3_INTERFACE;
+  using namespace HFST_EXCEPTIONS;
   using std::ostringstream;
 
   typedef std::string StringSymbol;

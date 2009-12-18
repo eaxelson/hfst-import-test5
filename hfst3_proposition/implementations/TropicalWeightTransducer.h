@@ -7,9 +7,10 @@
 #include <sstream>
 #include <iostream>
  
-namespace HFST3_INTERFACE
+namespace HFST_IMPLEMENTATIONS
 {
   using namespace fst;
+  using namespace HFST_EXCEPTIONS;
   typedef StdArc::StateId StateId;
 
   using namespace HFST_SYMBOLS;
