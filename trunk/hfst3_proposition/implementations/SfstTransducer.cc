@@ -4,7 +4,7 @@
 #include <cassert>
 #endif
 
-namespace HFST3_INTERFACE {
+namespace HFST_IMPLEMENTATIONS {
   SfstInputStream::SfstInputStream(void)
   {
     this->input_file = stdin;
@@ -607,7 +607,7 @@ namespace HFST3_INTERFACE {
 }
 
 #ifdef DEBUG_MAIN
-using namespace HFST3_INTERFACE;
+using namespace HFST_IMPLEMENTATIONS;
 #include <iostream>
 HFST_SYMBOLS::GlobalSymbolTable KeyTable::global_symbol_table;
 int main(int argc, char * argv[]) 

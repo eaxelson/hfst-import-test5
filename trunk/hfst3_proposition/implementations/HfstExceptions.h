@@ -1,6 +1,6 @@
 #ifndef _HFST_EXCEPTIONS_H_
 #define _HFST_EXCEPTIONS_H_
-namespace HFST3_INTERFACE
+namespace HFST_EXCEPTIONS
 {
 class HfstSymbolsException {};
 

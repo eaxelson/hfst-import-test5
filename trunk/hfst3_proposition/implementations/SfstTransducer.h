@@ -7,10 +7,11 @@
 #include <sstream>
 #include <iostream>
  
-namespace HFST3_INTERFACE
+namespace HFST_IMPLEMENTATIONS
 {
   using namespace SFST;
   using namespace HFST_SYMBOLS;
+  using namespace HFST_EXCEPTIONS;
   using std::ostream;
   using std::ostringstream;
 

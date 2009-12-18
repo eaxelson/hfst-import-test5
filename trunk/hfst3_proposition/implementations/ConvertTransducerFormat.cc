@@ -1,11 +1,11 @@
 #include "ConvertTransducerFormat.h"
 
-namespace HFST3_INTERFACE
+namespace HFST_IMPLEMENTATIONS
 {
 InternalTransducer * sfst_to_internal_format(SFST::Transducer * t)
 {
   InternalTransducer * internal_transducer = new fst::StdVectorFst();
-  fst::StateId start_state = internal_transducer->AddState();
+  StateId start_state = internal_transducer->AddState();
   internal_transducer->SetStart(start_state);
 
   SfstStateVector agenda;
@@ -22,7 +22,7 @@ InternalTransducer * sfst_to_internal_format(SFST::Transducer * t)
       SFST::Node * current_node = agenda.back();
       agenda.pop_back();
 
-      fst::StateId current_state = state_map[current_node];
+      StateId current_state = state_map[current_node];
 
       for (SFST::ArcsIter it(current_node->arcs()); it; it++)
 	{
@@ -63,7 +63,7 @@ SFST::Transducer *  internal_format_to_sfst
 
   if (internal_transducer->Start() == fst::kNoStateId)
     { throw TransducerHasNoStartStateException(); }
-  fst::StateId start_state = internal_transducer->Start();
+  StateId start_state = internal_transducer->Start();
 
   OfstStateVector agenda;
   agenda.push_back(start_state);
@@ -76,12 +76,12 @@ SFST::Transducer *  internal_format_to_sfst
 
   while (not agenda.empty())
     {
-      fst::StateId current_state = agenda.back();
+      StateId current_state = agenda.back();
       agenda.pop_back();
 
       SFST::Node * current_node = state_map[current_state];
 
-      for (fst::StdArcIterator it(*internal_transducer,current_state);
+      for (StdArcIterator it(*internal_transducer,current_state);
 	   not it.Done();
 	   it.Next())
 	{

@@ -1,6 +1,6 @@
 #include "TropicalWeightTransducer.h"
 
-namespace HFST3_INTERFACE
+namespace HFST_IMPLEMENTATIONS
 {
   TropicalWeightInputStream::TropicalWeightInputStream(void):
     i_stream(),input_stream(cin)
@@ -663,7 +663,7 @@ namespace HFST3_INTERFACE
 }
 
 #ifdef DEBUG_MAIN
-using namespace HFST3_INTERFACE;
+using namespace HFST_IMPLEMENTATIONS;
 HFST_SYMBOLS::GlobalSymbolTable KeyTable::global_symbol_table;
 int main(void) 
 {

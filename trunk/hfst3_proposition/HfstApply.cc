@@ -1,5 +1,5 @@
 #include "HfstTransducer.h"
-namespace HFST3
+namespace HFST
 {
   HfstTransducer &HfstTransducer::apply
   (SFST::Transducer * (*sfst_funct)(SFST::Transducer *),

@@ -3,7 +3,7 @@
 #include "SymbolDefs.h"
 #include "GlobalSymbolTable.h"
 #include <iostream>
-namespace HFST3
+namespace HFST
 {
   using HFST_SYMBOLS::Key;
   using HFST_SYMBOLS::KeyPair;

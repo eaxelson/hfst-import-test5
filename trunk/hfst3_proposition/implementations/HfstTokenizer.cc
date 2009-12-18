@@ -1,5 +1,5 @@
 #include "HfstTokenizer.h"
-namespace HFST3 
+namespace HFST 
 {
 int HfstTokenizer::get_next_symbol_size(const char * symbol)
 const
@@ -66,14 +66,14 @@ const
 }
 
 #ifdef DEBUG_MAIN_TOKENIZE
-HFST_SYMBOLS::GlobalSymbolTable HFST3::KeyTable::global_symbol_table;
+HFST_SYMBOLS::GlobalSymbolTable HFST::KeyTable::global_symbol_table;
 int main(void)
 {
-  HFST3::HfstTokenizer tokenizer;
-  HFST3::KeyTable key_table;
+  HFST::HfstTokenizer tokenizer;
+  HFST::KeyTable key_table;
   const char * str1 = "äläkkä";
   const char * str2 = "kälä";
-  HFST3::KeyPairVector * kpv = tokenizer.tokenize(str1,str2,key_table);
+  HFST::KeyPairVector * kpv = tokenizer.tokenize(str1,str2,key_table);
   delete kpv;
 }
 
