@@ -442,7 +442,7 @@ class LexiconInfo {
   };
   StateId compose_epsilon(StateId lexicon_state, RulesInfo &Rules, bool &new_state) {
     StateId s = find(lexicon_state,Rules.states,new_state);
-    if ( (lex.Final(lexicon_state) == TropicalWeight::Zero().Value())  and Rules.Final()) {
+    if ( (lex.Final(lexicon_state) != TropicalWeight::Zero().Value())  and Rules.Final()) {
       composition_result->SetFinal(s,
 				   lex.Final(lexicon_state).Value() + 
 				   Rules.get_final_weight());
