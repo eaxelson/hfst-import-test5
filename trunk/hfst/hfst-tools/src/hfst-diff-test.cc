@@ -263,7 +263,7 @@ _is_epsilon(Key k)
 
 bool
 compare_sets(const string& testcase, 
-		set<KeyVector> r, set<KeyVector> e, TEST_TYPE t,
+		set<KeyVector>& r, set<KeyVector>& e, TEST_TYPE t,
 		bool infinite_r, KeyTable* key_table)
 {
 	set<KeyVector> rAndE, rMinusE, eMinusR;
@@ -388,7 +388,7 @@ compare_sets(const string& testcase,
 
 KeyVectorVector*
 lookup_all(const char* s, KeyTable* kt,
-		vector<TransducerHandle> cascade, bool* infinite)
+		vector<TransducerHandle>& cascade, bool* infinite)
 {
 	*infinite = false;
 	KeyVector* lookup_orig = NULL;
@@ -499,7 +499,7 @@ _is_epsilon(Key k)
 
 bool
 compare_sets(const string& testcase, 
-		set<KeyVector> r, set<KeyVector> e, TEST_TYPE t,
+		set<KeyVector>& r, set<KeyVector>& e, TEST_TYPE t,
 		bool infinite_r, KeyTable* key_table)
 {
 	set<KeyVector> rAndE, rMinusE, eMinusR;
@@ -624,7 +624,7 @@ compare_sets(const string& testcase,
 
 KeyVectorVector*
 lookup_all(const char* s, KeyTable* kt,
-		vector<TransducerHandle> cascade, bool* infinite)
+		vector<TransducerHandle>& cascade, bool* infinite)
 {
 	*infinite = false;
 	KeyVector* lookup_orig = NULL;
