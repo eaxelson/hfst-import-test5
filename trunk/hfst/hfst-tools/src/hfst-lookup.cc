@@ -77,6 +77,37 @@ static unsigned long analyses = 0;
 static bool format_given = false;
 FlagDiacriticTable flag_diacritic_table;
 HFST::KeySet flag_diacritic_set;
+
+struct KeyVectorCmp
+{
+  bool operator() (const KeyVector * kv1,
+		   const KeyVector * kv2)
+    const
+  { 
+    if (kv2->size() < kv1->size())
+      { const KeyVector * temp = kv1;
+	kv1 = kv2;
+	kv2 = temp; }
+
+    KeyVector::const_iterator jt = kv2->begin();
+    for (KeyVector::const_iterator it = kv1->begin();
+	 it != kv1->end();
+	 ++it)
+      {
+	if (*it < *jt)
+	  { return true; }
+	if (*jt < *it)
+	  { return false; }
+	++jt;
+      }
+    if (jt == kv2->end())
+      { return false; }
+    return true;
+  }
+};
+
+typedef std::set<KeyVector*,KeyVectorCmp> KeyVectorSet;
+
 void
 print_usage(const char *program_name)
 {
@@ -552,11 +583,18 @@ lookup_print_all(const char* s, KeyTable* kt,
 		{
 			analysed++;
 		}
+		KeyVectorSet already_displayed_lookups;
 		for (KeyVectorVector::iterator lkv = final_results->begin();
 				lkv != final_results->end();
 				++lkv)
 		{
 			KeyVector* hmmlkv = *lkv;
+			if (already_displayed_lookups.find(hmmlkv) != 
+			    already_displayed_lookups.end())
+			  {
+			    continue;
+			  }
+			already_displayed_lookups.insert(hmmlkv);
 			string* lkvstr = keyVectorToString(hmmlkv, kt);
 			const char* lookup_full = lkvstr->c_str();
 			lookup_printf(lookup_format, s, lookup_full);
@@ -671,16 +709,24 @@ lookup_print_all(const char* s, KeyTable* kt,
 		{
 			analysed++;
 		}
+
+		KeyVectorSet already_displayed_lookups;
 		for (KeyVectorVector::iterator lkv = final_results->begin();
 				lkv != final_results->end();
 				++lkv)
 		{
 			KeyVector* hmmlkv = *lkv;
+			if (already_displayed_lookups.find(hmmlkv) != 
+			    already_displayed_lookups.end())
+			  {
+			    continue;
+			  }
+			already_displayed_lookups.insert(hmmlkv);
 			string* lkvstr = keyVectorToString(hmmlkv, kt);
 			const char* lookup_full = lkvstr->c_str();
 			lookup_printf(lookup_format, s, lookup_full);
-			analyses++;
 			delete lkvstr;
+			analyses++;
 		}
 		lookup_printf(end_format, s, NULL);
 	} // if proper lookup originally
