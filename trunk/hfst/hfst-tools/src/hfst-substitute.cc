@@ -33,7 +33,13 @@
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 #include <hfst2/hfst.h>
-#include "hfst2/string.h"
+
+#if NESTED_BUILD
+#include <hfst2/string/string.h>
+#endif
+#if !NESTED_BUILD
+#include <hfst2/string.h>
+#endif
 
 #include "hfst-common-unary-variables.h"
 
