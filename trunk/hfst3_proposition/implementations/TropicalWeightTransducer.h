@@ -28,6 +28,8 @@ namespace HFST_IMPLEMENTATIONS
 			    const SymbolTable * i_symbol_table,
 			    const SymbolTable * o_symbol_table,
 			    KeyMap &key_map);
+    void skip_identifier_version_3_0(void);
+    void skip_hfst_header(void);
   public:
     TropicalWeightInputStream(void);
     TropicalWeightInputStream(const char * filename);

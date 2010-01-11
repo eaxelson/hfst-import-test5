@@ -4,6 +4,7 @@
 #include "implementations/GlobalSymbolTable.h"
 #include "implementations/SfstTransducer.h"
 #include "implementations/TropicalWeightTransducer.h"
+#include "implementations/LogWeightTransducer.h"
 #include "implementations/HfstTokenizer.h"
 #include "implementations/ConvertTransducerFormat.h"
 #include <string>
@@ -27,11 +28,16 @@ namespace HFST
   using HFST_IMPLEMENTATIONS::TropicalWeightState;
   using HFST_IMPLEMENTATIONS::TropicalWeightTransition;
   using HFST_IMPLEMENTATIONS::TropicalWeightStateIndexer;
+  using HFST_IMPLEMENTATIONS::LogWeightTransducer;
+  using HFST_IMPLEMENTATIONS::LogWeightState;
+  using HFST_IMPLEMENTATIONS::LogWeightTransition;
+  using HFST_IMPLEMENTATIONS::LogWeightStateIndexer;
 
   enum ImplementationType
   {
     SFST_TYPE,
     TROPICAL_OFST_TYPE,
+    LOG_OFST_TYPE,
     UNSPECIFIED_TYPE,
     ERROR_TYPE
   };
@@ -52,13 +58,18 @@ namespace HFST
     {
       HFST_IMPLEMENTATIONS::SfstInputStream * sfst;
       HFST_IMPLEMENTATIONS::TropicalWeightInputStream * tropical_ofst;
+      HFST_IMPLEMENTATIONS::LogWeightInputStream * log_ofst;
     };
 
     ImplementationType type;
     StreamImplementation implementation;
     void read_transducer(HfstTransducer &t);
     ImplementationType stream_fst_type(std::istream &in);
-
+    bool has_tropical_weight_type(std::istream &in);
+    bool has_log_weight_type(std::istream &in);
+    int read_library_header(std::istream &in);
+    ImplementationType read_version_3_0_fst_type(std::istream &in);
+    
   public:
 
     HfstInputStream(void);
@@ -81,17 +92,21 @@ namespace HFST
     {
       HFST_IMPLEMENTATIONS::Transducer * sfst;
       HFST_IMPLEMENTATIONS::StdVectorFst * tropical_ofst;
+      HFST_IMPLEMENTATIONS::LogFst * log_ofst;
       HFST_IMPLEMENTATIONS::StdVectorFst * internal; 
     };
     
     static HFST_IMPLEMENTATIONS::SfstTransducer sfst_interface;
     static HFST_IMPLEMENTATIONS::TropicalWeightTransducer tropical_ofst_interface;
+    static HFST_IMPLEMENTATIONS::LogWeightTransducer log_ofst_interface;
 
     ImplementationType type;
 
     bool anonymous; // this variable doesn't do anything yet, but it is
                     // is supposed to keep trakc of whether the transducer's
                     // KeyTable is maintained or not.
+
+    bool is_trie;
 
     KeyTable key_table;
     TransducerImplementation implementation; 

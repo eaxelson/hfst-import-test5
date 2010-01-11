@@ -12,8 +12,13 @@ HFST_OBJS=implementations/SymbolDefs.o implementations/GlobalSymbolTable.o \
 implementations/HfstTokenizer.o implementations/ConvertTransducerFormat.o \
 HfstApply.o HfstInputStream.o HfstTransducer.o
 
+HFST_OBJS_FOR_HFST_TRANSDUCER=implementations/SymbolDefs.o implementations/GlobalSymbolTable.o \
+implementations/HfstTokenizer.o implementations/ConvertTransducerFormat.o \
+HfstApply.o HfstInputStream.o
+
 IMPLEMENTATIONS=implementations/SfstTransducer.o \
-implementations/TropicalWeightTransducer.o
+implementations/TropicalWeightTransducer.o \
+implementations/LogWeightTransducer.o
 
 OFST_LIB_PATHS=-Limplementations/openfst-1.1/src/lib \
 -Limplementations/openfst-1.1/src/bin
@@ -29,9 +34,9 @@ clean:
 	rm -Rf *.o libhfst3.a
 	$(MAKE) -C ./implementations clean
 
-HfstTransducer: HfstTransducer.cc HfstInputStream.o HfstApply.o
+HfstTransducer: HfstTransducer.o HfstInputStream.o HfstApply.o $(HFST_OBJS) $(IMPLEMENTATIONS)
 	g++ -Wno-deprecated -g -DDEBUG_MAIN $(OFST_LIB_PATHS) -lfstmain -lfst\
-	 -ldl -lm -o $@ $^ $(SFST_OBJS) $(HFST_OBJS) $(IMPLEMENTATIONS)
+	 -ldl -lm -o $@ HfstTransducer.cc $(SFST_OBJS) $(HFST_OBJS_FOR_HFST_TRANSDUCER) $(IMPLEMENTATIONS)
 
 HfstInputStream: HfstInputStream.cc
 	g++ -g -DDEBUG_MAIN $(OFST_LIB_PATHS) -lfstmain -lfst -ldl -lm \
