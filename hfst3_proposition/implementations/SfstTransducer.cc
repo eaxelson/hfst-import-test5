@@ -111,6 +111,7 @@ namespace HFST_IMPLEMENTATIONS {
 	  { throw e; }
       }
 
+
     StringSymbolVector string_symbols(max_symbol_number+1,"");
     for (StringSymbolMap::iterator it = string_number_map.begin();
 	 it != string_number_map.end();
@@ -136,6 +137,35 @@ namespace HFST_IMPLEMENTATIONS {
       { throw p; }
   }
 
+  /* Skip the identifier string "SFST_TYPE" */
+  void SfstInputStream::skip_identifier_version_3_0(void)
+  { 
+    char sfst_identifier[10];
+    int sfst_id_count = fread(sfst_identifier,10,1,input_file);
+    if (sfst_id_count != 1)
+      { throw NotTransducerStreamException(); }
+    if (0 != strcmp(sfst_identifier,"SFST_TYPE"))
+      { throw NotTransducerStreamException(); }
+  }
+  
+  void SfstInputStream::skip_hfst_header(void)
+  {
+    char hfst_header[6];
+    int header_count = fread(hfst_header,6,1,input_file);
+    if (header_count != 1)
+      { throw NotTransducerStreamException(); }
+    int c = fgetc(input_file);
+    switch (c)
+      {
+      case 0:
+	try { skip_identifier_version_3_0(); }
+	catch (NotTransducerStreamException e) { throw e; }
+	break;
+      default:
+	assert(false);
+      }
+  }
+  
   Transducer * SfstTransducer::harmonize(Transducer * t, KeyMap &key_map)
   {
     Key no_key_number = 0;
@@ -183,6 +213,7 @@ namespace HFST_IMPLEMENTATIONS {
     Transducer * t = NULL;
     try 
       {
+	skip_hfst_header();
 	Transducer tt = Transducer(input_file);
 	t = &tt.copy();
       }

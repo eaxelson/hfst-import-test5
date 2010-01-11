@@ -21,7 +21,8 @@ namespace HFST_IMPLEMENTATIONS {
   typedef std::vector<StateId> OfstStateVector;
   typedef std::map<SFST::Node *,StateId> SfstToOfstStateMap;
   typedef std::map<StateId,SFST::Node *> OfstToSfstStateMap;
-
+  typedef fst::ArcTpl<fst::LogWeight> LogArc;
+  typedef fst::VectorFst<LogArc> LogFst;
 
     /* SFST::Transducer * is the sfst transducer format.
        fst::StdVectorFst * is the openfst transducer format. */
@@ -34,6 +35,11 @@ namespace HFST_IMPLEMENTATIONS {
      internal format. */
     InternalTransducer * tropical_ofst_to_internal_format
       (fst::StdVectorFst * t);
+
+  /* Read a LogFst * and return the equivalent transducer in
+     internal format. */
+    InternalTransducer * log_ofst_to_internal_format
+      (LogFst * t);
   
     /* Read a transducer in internal format and return the equivalent
        SFST::Transducer *. */
@@ -42,5 +48,9 @@ namespace HFST_IMPLEMENTATIONS {
     /* Read a transducer in internal format and return the equivalent
        fst::StdVectorFst * */
     fst::StdVectorFst * internal_format_to_openfst(InternalTransducer * t);
+
+    /* Read a transducer in internal format and return the equivalent
+       LogFst * */
+    LogFst * internal_format_to_log_ofst(InternalTransducer * t);
 }
 #endif

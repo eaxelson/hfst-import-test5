@@ -52,6 +52,25 @@ namespace HFST_IMPLEMENTATIONS
       { throw p; }
   }
 
+  /* Skip the identifier string "TROPICAL_OFST_TYPE" */
+  void TropicalWeightInputStream::skip_identifier_version_3_0(void)
+  { i_stream.ignore(19); }
+
+  void TropicalWeightInputStream::skip_hfst_header(void)
+  {
+    i_stream.ignore(6);
+    char c;
+    i_stream.get(c);
+    switch (c)
+      {
+      case 0:
+	skip_identifier_version_3_0();
+	break;
+      default:
+	assert(false);
+      }
+  }
+  
   void TropicalWeightInputStream::open(void) {}
   void TropicalWeightInputStream::close(void)
   {
@@ -114,6 +133,7 @@ namespace HFST_IMPLEMENTATIONS
     FstHeader header;
     try 
       {
+	skip_hfst_header();
 	if (filename == string())
 	  {
 	    header.Read(input_stream,"STDIN");			    
@@ -461,8 +481,9 @@ namespace HFST_IMPLEMENTATIONS
     EncodeMapper<StdArc> encode_mapper(0x0001,ENCODE);
     EncodeFst<StdArc> enc(*determinized_t,
 			  &encode_mapper);
-    DeterminizeFst<StdArc> minimized_t(enc);
-    DecodeFst<StdArc> dec(minimized_t,
+    StdVectorFst fst_enc(enc);
+    Minimize<StdArc>(&fst_enc);
+    DecodeFst<StdArc> dec(enc,
 			  encode_mapper);
     delete determinized_t;
     return new StdVectorFst(dec);
@@ -586,7 +607,7 @@ namespace HFST_IMPLEMENTATIONS
   }
 
   StdVectorFst * TropicalWeightTransducer::concatenate(StdVectorFst * t1,
-			     StdVectorFst * t2)
+						       StdVectorFst * t2)
   {
     ConcatFst<StdArc> concatenate(*t1,*t2);
     return new StdVectorFst(concatenate);

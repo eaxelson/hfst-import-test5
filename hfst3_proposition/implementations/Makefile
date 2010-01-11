@@ -1,7 +1,10 @@
 SOURCES=SfstTransducer.h SymbolDefs.h TropicalWeightTransducer.h GlobalSymbolTable.h HfstTokenier.h ConvertTransducerFormat.h \
-HfstException.h SfstTransducer.cc SymbolDefs.cc TropicalWeightTransducer.cc HfstTokenizer.cc ConvertTransducerFormat.cc
-CXXFLAGS=-O2 -Wall -Wextra
-all: SfstTransducer.o TropicalWeightTransducer.o SymbolDefs.o GlobalSymbolTable.o HfstTokenizer.o ConvertTransducerFormat.o ofst sfst
+HfstException.h SfstTransducer.cc SymbolDefs.cc TropicalWeightTransducer.cc HfstTokenizer.cc ConvertTransducerFormat.cc \
+LogWeightTransducer.cc
+
+CXXFLAGS=-O2 -g -Wall -Wextra
+all: SfstTransducer.o TropicalWeightTransducer.o LogWeightTransducer.o SymbolDefs.o \
+GlobalSymbolTable.o HfstTokenizer.o ConvertTransducerFormat.o ofst sfst
 
 clean:
 	rm -f SfstTransducer TropicalWeightTransducer *.o
@@ -18,10 +21,10 @@ TropicalWeightTransducer: TropicalWeightTransducer.cc SymbolDefs.o GlobalSymbolT
 	-lfst -ldl -O3 -o $@ $^
 
 SfstTransducer.o: SfstTransducer.cc
-	g++ -g $(CXXFLAGS) -Wno-deprecated -c -o $@ $^
+	g++ $(CXXFLAGS) -Wno-deprecated -c -o $@ $^
 
 ConvertTransducerFormat.o: ConvertTransducerFormat.cc
-	g++ -g $(CXXFLAGS) -Wno-deprecated -c -o $@ $^
+	g++ $(CXXFLAGS) -Wno-deprecated -c -o $@ $^
 
 ofst:
 	$(MAKE) -C ./openfst-1.1 all
