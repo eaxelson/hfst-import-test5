@@ -90,6 +90,7 @@ LexcCompiler::addStringEntry(const string& data,
 	lexc_timer_end("string-compile");
 	lexc_timer_start("fill-sigma");
 	unsigned int ats = 0;
+	unsigned int lbr = 0;
 	for (XymbolVector::iterator x = dataVec->begin();
 			x != dataVec->end(); ++x)
 	{
@@ -107,6 +108,18 @@ LexcCompiler::addStringEntry(const string& data,
 			{
 				lexc_printf(PRINT_WARNING, -1, "Two @s in %s do not form "
 						"an special character\n", data.c_str());
+			}
+		}
+		else if (x->getName() == "[")
+		{
+			lbr++;
+		}
+		else if (x->getName() == "]")
+		{
+			if (lbr > 0)
+			{
+				lexc_printf(PRINT_WARNING, -1, "Square brackets in %s do not "
+						"form a tag\n", data.c_str());
 			}
 		}
 	}
@@ -145,6 +158,7 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
 	lexc_timer_end("string-compile");
 	lexc_timer_start("fill-sigma");
 	unsigned int ats = 0;
+	unsigned int lbr = 0;
 	for (XymbolVector::iterator x = upperVec->begin();
 			x != upperVec->end(); ++x)
 	{
@@ -164,6 +178,18 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
 						"an special character\n", upper.c_str());
 			}
 		}
+		else if (x->getName() == "[")
+		{
+			lbr++;
+		}
+		else if (x->getName() == "]")
+		{
+			if (lbr > 0)
+			{
+				lexc_printf(PRINT_WARNING, -1, "Square brackets in %s do not "
+						"form a tag\n", upper.c_str());
+			}
+		}
 	}
 	lexc_timer_end("fill-sigma");
 	// same for lower
@@ -172,6 +198,7 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
 	lexc_timer_end("string-compile");
 	lexc_timer_start("fill-sigma");
 	ats = 0;
+	lbr = 0;
 	for (XymbolVector::iterator x = lowerVec->begin();
 			x != lowerVec->end(); ++x)
 	{
@@ -189,6 +216,18 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
 			{
 				lexc_printf(PRINT_WARNING, -1, "Two @s in %s do not form "
 						"an special character\n", lower.c_str());
+			}
+		}
+		else if (x->getName() == "[")
+		{
+			lbr++;
+		}
+		else if (x->getName() == "]")
+		{
+			if (lbr > 0)
+			{
+				lexc_printf(PRINT_WARNING, -1, "Square brackets in %s do not "
+						"form a tag\n", lower.c_str());
 			}
 		}
 	}
@@ -492,8 +531,8 @@ LexcCompiler::printConnectedness() const
 		}
 		if (lexMinusContEnd - lexMinusCont.begin() > 0)
 		{
-			lexc_printf(PRINT_WARNING, 7, "Lexicon names were used "
-			   "without entry with continuation pointing to them\n");
+			lexc_printf(PRINT_WARNING, 7, "Lexicon names defined but not "
+			   "referenced\n");
 			if (verbosity & PRINT_VERBOSE)
 			{
 				lexc_print_list_start("These lexicons have been discarded");
