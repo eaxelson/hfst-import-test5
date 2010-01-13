@@ -359,6 +359,7 @@ cli_main(int argc, char* argv[])
 	{
 		lexc_printf(PRINT_VERBOSE, 0, "Saving result to standard output\n");
 		result.write(std::cout);
+		lexc_printf(PRINT_VERBOSE, 0, "? KiB, ? States, ? Arcs, ? Paths\n");
 	}
 	else
 	{
@@ -368,7 +369,24 @@ cli_main(int argc, char* argv[])
 		fbout.open(outfilename.c_str(), std::ios::out);
 		std::ostream outstream(&fbout);
 		result.write(outstream);
+		// print final statistics
+#		if HAVE_SYS_STAT_H
+		struct stat stat_res;
+		if (stat(outfilename.c_str(), &stat_res) == 0)
+		{
+			lexc_printf(PRINT_VERBOSE, 0, "%.1f KiB, ? States, ? Arcs, ? Paths\n",
+					static_cast<float>(stat_res.st_size) / 1024.0f);
+		}
+		else
+		{
+			lexc_printf(PRINT_VERBOSE, 0, "Failed to stat result file?\n");
+#		endif
+			lexc_printf(PRINT_VERBOSE, 0, "? KiB, ? States, ? Arcs, ? Paths\n");
+#		if HAVE_SYS_STAT_H
+		}
+#		endif
 	}
+
 	// destruct global gunk
 	delete lexc;
 	lexc_timer_end("grand-total");
