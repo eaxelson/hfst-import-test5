@@ -78,7 +78,17 @@ static bool format_given = false;
 FlagDiacriticTable flag_diacritic_table;
 HFST::KeySet flag_diacritic_set;
 
-typedef std::set<KeyVector*> KeyVectorSet;
+struct KeyVectorCmp
+{
+  bool operator() (const KeyVector * kv1,
+		   const KeyVector * kv2)
+    const
+  { 
+    return (*kv1 < *kv2);
+  }
+};
+
+typedef std::set<KeyVector*,KeyVectorCmp> KeyVectorSet;
 
 void
 print_usage(const char *program_name)
