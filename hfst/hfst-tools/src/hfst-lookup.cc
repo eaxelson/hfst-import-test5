@@ -78,35 +78,7 @@ static bool format_given = false;
 FlagDiacriticTable flag_diacritic_table;
 HFST::KeySet flag_diacritic_set;
 
-struct KeyVectorCmp
-{
-  bool operator() (const KeyVector * kv1,
-		   const KeyVector * kv2)
-    const
-  { 
-    if (kv2->size() < kv1->size())
-      { const KeyVector * temp = kv1;
-	kv1 = kv2;
-	kv2 = temp; }
-
-    KeyVector::const_iterator jt = kv2->begin();
-    for (KeyVector::const_iterator it = kv1->begin();
-	 it != kv1->end();
-	 ++it)
-      {
-	if (*it < *jt)
-	  { return true; }
-	if (*jt < *it)
-	  { return false; }
-	++jt;
-      }
-    if (jt == kv2->end())
-      { return false; }
-    return true;
-  }
-};
-
-typedef std::set<KeyVector*,KeyVectorCmp> KeyVectorSet;
+typedef std::set<KeyVector*> KeyVectorSet;
 
 void
 print_usage(const char *program_name)
@@ -346,18 +318,12 @@ void define_flag_diacritics(HFST::KeyTable * key_table)
 int
 lookup_printf(const char* format, const char* inputform, const char* lookupform)
 {
-	char* lookup_really;
-	if (lookupform == NULL)
-	{
-		lookup_really = strdup("");
-	}
-	else
-	{
-		lookup_really = strdup(lookupform);
-	}
 	size_t space = 2 * strlen(format) +
-		2 * strlen(inputform) +
-		2 * strlen(lookup_really) + 10;
+		2 * strlen(inputform) + 10;
+	if (lookupform != NULL)
+	{
+		space += 2 * strlen(lookupform);
+	}
 	char* result = static_cast<char*>(calloc(sizeof(char), space + 1));
 	size_t space_left = space;
 	const char* src = format;
@@ -658,6 +624,7 @@ lookup_print_all(const char* s, KeyTable* kt,
 				string* kvstring = keyVectorToString(*kv, kt);
 				VERBOSE_PRINT("Looking up %s from transducer %zu\n",
 						kvstring->c_str(), cascade_number);
+				delete kvstring;
 				KeyVectorVector* lookups;
 				if (is_infinitely_ambiguous(*t, true, *kv))
 				{
@@ -683,20 +650,28 @@ lookup_print_all(const char* s, KeyTable* kt,
 					string* lkvstring = keyVectorToString(hmmlkv, kt);
 					VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
 					delete lkvstring;
-					hmmlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
-					if (hmmlkv == NULL)
+					KeyVector* filtlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
+					if (filtlkv == NULL)
 					{
 						VERBOSE_PRINT("Filtered by flag diacritics\n");
 						continue;
 					}
-					hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
-								_is_epsilon), hmmlkv->end());
-					string* hmmlkvstring = keyVectorToString(hmmlkv, kt);
-					VERBOSE_PRINT("Filtered %s\n", hmmlkvstring->c_str());
-					delete hmmlkvstring;
-					current_results->push_back(hmmlkv);
+					filtlkv->erase(remove_if(filtlkv->begin(), filtlkv->end(),
+								_is_epsilon), filtlkv->end());
+					string* filtlkvstring = keyVectorToString(filtlkv, kt);
+					VERBOSE_PRINT("Filtered %s\n", filtlkvstring->c_str());
+					delete filtlkvstring;
+					current_results->push_back(filtlkv);
 				}
 			}
+			for (KeyVectorVector::iterator lkv = past_results->begin();
+					lkv != past_results->end();
+					++lkv)
+			{
+				KeyVector* hmmlkv = *lkv;
+				delete hmmlkv;
+			}
+			delete past_results;
 			final_results = current_results;
 		} // for each transducer in cascade
 		// print loop
@@ -727,7 +702,9 @@ lookup_print_all(const char* s, KeyTable* kt,
 			lookup_printf(lookup_format, s, lookup_full);
 			delete lkvstr;
 			analyses++;
+			delete hmmlkv;
 		}
+		delete final_results;
 		lookup_printf(end_format, s, NULL);
 	} // if proper lookup originally
 	return false;
