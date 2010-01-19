@@ -58,10 +58,9 @@ def main():
 	line = input_file.readline().strip()
 	in_patterns = False
 	contexts = list()
-	alphabets = list()
+	alphabet = set()
 	for i in range(0, 8):
 		contexts.append([])
-		alphabets.append(set())
 	# collect patterns from file
 	while line:
 		if not in_patterns:
@@ -69,15 +68,31 @@ def main():
 				in_patterns = True
 			line = input_file.readline().strip()
 			continue
-		if line.startswith('%'):
+		if '%' in line:
+			line = line[:line.find('%')].strip()
+		if '^^' in line:
+			print '^^ found, please replace by proper UTF-8'
+			exit(1)
+		if not line or line == '':
 			line = input_file.readline().strip()
 			continue
 		elif line.startswith('}'):
 			break
-		for i in range(1,7):
-			if str(i) in line:
-				contexts[i] += [' '.join(line.replace(str(i), '_', 1).replace('1', '').replace('2','').replace('3','').replace('4','').replace('5','').replace('6','').replace('.','#'))]
-				alphabets[i].update(set(line))
+		things = line.split()
+		for thing in things:
+			for i in range(1,7):
+				if str(i) in thing:
+					if i % 2 == 0:
+						contexts[i] += [' '.join(thing.replace(str(i), '_', 1).replace('1', '').replace('2','').replace('3','').replace('4','').replace('5','').replace('6','').replace('.','#'))]
+					else:
+						context = ' (0:%-) '.join(thing.replace(str(i), '_', 1).replace('1', '').replace('2', '').replace('3', '').replace('4', '').replace('5','').replace('.','#')).replace('(0:%-) _', '_').replace('_ (0:%-)', ' _ ')
+						if thing.find(str(i)) < 1:
+							context = '\\0:%- ' + context
+						elif thing.find(str(i)) > (len(thing) - 2):
+							context = context + ' \\0:%-'
+						contexts[i] += [context]
+
+					alphabet.update(set(thing))
 		line = input_file.readline().strip()
 	input_file.close()
 	# make up alphabets
@@ -88,7 +103,7 @@ def main():
 			print >> htwolc_files[i], '%-:0'
 		else:
 			print >> htwolc_files[i], '0:%-'
-		print >> htwolc_files[i], ' '.join(alphabets[i])
+		print >> htwolc_files[i], ' '.join(alphabet)
 		print >> htwolc_files[i], ";"
 	for i in range(1, 7):
 		print >> htwolc_files[i], "Rules"
