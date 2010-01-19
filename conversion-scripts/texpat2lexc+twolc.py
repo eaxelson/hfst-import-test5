@@ -87,9 +87,9 @@ def main():
 					else:
 						context = ' (0:%-) '.join(thing.replace(str(i), '_', 1).replace('1', '').replace('2', '').replace('3', '').replace('4', '').replace('5','').replace('.','#')).replace('(0:%-) _', '_').replace('_ (0:%-)', ' _ ')
 						if thing.find(str(i)) < 1:
-							context = '\\0:%- ' + context
+							context = '\\:%- ' + context
 						elif thing.find(str(i)) > (len(thing) - 2):
-							context = context + ' \\0:%-'
+							context = context + ' \\:%-'
 						contexts[i] += [context]
 
 					alphabet.update(set(thing))
