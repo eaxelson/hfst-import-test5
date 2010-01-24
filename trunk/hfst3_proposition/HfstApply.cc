@@ -1,11 +1,11 @@
 #include "HfstTransducer.h"
-namespace HFST
+namespace hfst
 {
   HfstTransducer &HfstTransducer::apply
   (SFST::Transducer * (*sfst_funct)(SFST::Transducer *),
    fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *),
-   HFST_IMPLEMENTATIONS::LogFst * (*log_ofst_funct)
-   (HFST_IMPLEMENTATIONS::LogFst *),
+   hfst::implementations::LogFst * (*log_ofst_funct)
+   (hfst::implementations::LogFst *),
    ImplementationType type)
   {
     if (type != UNSPECIFIED_TYPE)
@@ -30,12 +30,16 @@ namespace HFST
 	}
       case LOG_OFST_TYPE:
 	{
-	  HFST_IMPLEMENTATIONS::LogFst * log_ofst_temp =
+	  hfst::implementations::LogFst * log_ofst_temp =
 	    log_ofst_funct(implementation.log_ofst);
 	  delete implementation.log_ofst;
 	  implementation.log_ofst = log_ofst_temp;
 	  break;
-	}
+}
+		case UNSPECIFIED_TYPE:
+	case ERROR_TYPE:
+	default:
+	  throw hfst::exceptions::TransducerHasWrongTypeException();
       }
     return *this;
   }
@@ -43,8 +47,8 @@ namespace HFST
   HfstTransducer &HfstTransducer::apply
   (SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
    fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *, int n),
-   HFST_IMPLEMENTATIONS::LogFst * (*log_ofst_funct)
-   (HFST_IMPLEMENTATIONS::LogFst *, int n),
+   hfst::implementations::LogFst * (*log_ofst_funct)
+   (hfst::implementations::LogFst *, int n),
    int n, ImplementationType type)
   {
     if (type != UNSPECIFIED_TYPE)
@@ -69,12 +73,16 @@ namespace HFST
 	}
       case LOG_OFST_TYPE:
         {
-	  HFST_IMPLEMENTATIONS::LogFst * log_ofst_temp =
+	  hfst::implementations::LogFst * log_ofst_temp =
             log_ofst_funct(implementation.log_ofst,n);
           delete implementation.log_ofst;
           implementation.log_ofst = log_ofst_temp;
           break;
         }
+	case UNSPECIFIED_TYPE:
+	case ERROR_TYPE:
+	default:
+	  throw hfst::exceptions::TransducerHasWrongTypeException();
       }
     return *this;
   }
@@ -83,8 +91,8 @@ namespace HFST
   (SFST::Transducer * (*sfst_funct)(SFST::Transducer *, Key, Key),
    fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,Key, 
 					      Key),
-   HFST_IMPLEMENTATIONS::LogFst * (*log_ofst_funct)
-   (HFST_IMPLEMENTATIONS::LogFst *,Key, Key),
+   hfst::implementations::LogFst * (*log_ofst_funct)
+   (hfst::implementations::LogFst *,Key, Key),
    Key k1, Key k2,ImplementationType type)
   {
     if (type != UNSPECIFIED_TYPE)
@@ -109,12 +117,16 @@ namespace HFST
 	}
       case LOG_OFST_TYPE:
         {
-	  HFST_IMPLEMENTATIONS::LogFst * log_ofst_temp =
+	  hfst::implementations::LogFst * log_ofst_temp =
             log_ofst_funct(implementation.log_ofst,k1,k2);
           delete implementation.log_ofst;
           implementation.log_ofst = log_ofst_temp;
           break;
         }
+	case UNSPECIFIED_TYPE:
+	case ERROR_TYPE:
+	default:
+	  throw hfst::exceptions::TransducerHasWrongTypeException();
       }
     return *this;
   }
@@ -124,8 +136,8 @@ namespace HFST
 				    KeyPair),
    fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,KeyPair, 
 					      KeyPair),
-   HFST_IMPLEMENTATIONS::LogFst * (*log_ofst_funct)
-   (HFST_IMPLEMENTATIONS::LogFst *,KeyPair, KeyPair),
+   hfst::implementations::LogFst * (*log_ofst_funct)
+   (hfst::implementations::LogFst *,KeyPair, KeyPair),
    KeyPair kp1, KeyPair kp2,ImplementationType type)
   {
     if (type != UNSPECIFIED_TYPE)
@@ -150,13 +162,17 @@ namespace HFST
 	}
       case LOG_OFST_TYPE:
         {
-	  HFST_IMPLEMENTATIONS::LogFst * log_ofst_temp =
+	  hfst::implementations::LogFst * log_ofst_temp =
             log_ofst_funct(implementation.log_ofst,kp1,kp2);
           delete implementation.log_ofst;
           implementation.log_ofst = log_ofst_temp;
           break;
         }
-      }
+ 	case UNSPECIFIED_TYPE:
+	case ERROR_TYPE:
+	default:
+	  throw hfst::exceptions::TransducerHasWrongTypeException();
+     }
     return *this;
   }
 
@@ -165,8 +181,8 @@ namespace HFST
 				    SFST::Transducer *),
    fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,
 					      fst::StdVectorFst *),
-   HFST_IMPLEMENTATIONS::LogFst * (*log_ofst_funct)
-   (HFST_IMPLEMENTATIONS::LogFst *,HFST_IMPLEMENTATIONS::LogFst *),
+   hfst::implementations::LogFst * (*log_ofst_funct)
+   (hfst::implementations::LogFst *,hfst::implementations::LogFst *),
    HfstTransducer &another,
    ImplementationType type)
   {
@@ -200,13 +216,17 @@ namespace HFST
 	}
       case LOG_OFST_TYPE:
         {
-	  HFST_IMPLEMENTATIONS::LogFst * log_ofst_temp =
+	  hfst::implementations::LogFst * log_ofst_temp =
             log_ofst_funct(implementation.log_ofst,
 			   another.implementation.log_ofst);
           delete implementation.log_ofst;
           implementation.log_ofst = log_ofst_temp;
           break;
         }
+	case UNSPECIFIED_TYPE:
+	case ERROR_TYPE:
+	default:
+	  throw hfst::exceptions::TransducerHasWrongTypeException();
       }
     return *this;
   }

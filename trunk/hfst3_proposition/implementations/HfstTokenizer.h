@@ -2,13 +2,13 @@
 #define _HFST_TOKENIZER_H_
 #include "SymbolDefs.h"
 #include "GlobalSymbolTable.h"
-#include <iostream>
-namespace HFST
+#include <string>
+namespace hfst
 {
-  using HFST_SYMBOLS::Key;
-  using HFST_SYMBOLS::KeyPair;
-  using HFST_SYMBOLS::KeyPairVector;
-  using HFST_SYMBOLS::KeyTable;
+  using hfst::symbols::Key;
+  using hfst::symbols::KeyPair;
+  using hfst::symbols::KeyPairVector;
+  using hfst::symbols::KeyTable;
 
   /* At the moment, this only tokenizes into utf-8 strings. */
   class HfstTokenizer
@@ -18,12 +18,12 @@ namespace HFST
 
   public:
     /* This is useless for now... */
-    void add_multichar_symbol(const char * symbol,KeyTable &key_table) const;
+    void add_multichar_symbol(const std::string& symbol,KeyTable &key_table) const;
 
-    KeyPairVector * tokenize(const char * input_string,KeyTable &key_table)
+    KeyPairVector * tokenize(const std::string& input_string,KeyTable &key_table)
       const;
-    KeyPairVector * tokenize(const char * input_string,
-			     const char * output_string,
+    KeyPairVector * tokenize(const std::string& input_string,
+			     const std::string& output_string,
 			     KeyTable &key_table) const;
   };
 }

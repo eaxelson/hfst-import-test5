@@ -1,18 +1,18 @@
 #include "HfstTransducer.h"
 
-HFST_SYMBOLS::GlobalSymbolTable HFST_SYMBOLS::KeyTable::global_symbol_table;
+hfst::symbols::GlobalSymbolTable hfst::symbols::KeyTable::global_symbol_table;
 
-namespace HFST
+namespace hfst
 {
-  HFST_IMPLEMENTATIONS::SfstTransducer HfstTransducer::sfst_interface;
-  HFST_IMPLEMENTATIONS::TropicalWeightTransducer 
+  hfst::implementations::SfstTransducer HfstTransducer::sfst_interface;
+  hfst::implementations::TropicalWeightTransducer 
   HfstTransducer::tropical_ofst_interface;
-  HFST_IMPLEMENTATIONS::LogWeightTransducer
+  hfst::implementations::LogWeightTransducer
   HfstTransducer::log_ofst_interface;
 
   void HfstTransducer::harmonize(HfstTransducer &another)
   {
-    HFST_SYMBOLS::KeyMap key_map;
+    hfst::symbols::KeyMap key_map;
     this->key_table.harmonize(key_map,another.key_table);
     key_table = another.key_table;
     switch (type)
@@ -35,13 +35,17 @@ namespace HFST
 	}
       case LOG_OFST_TYPE:
 	{
-	  HFST_IMPLEMENTATIONS::LogFst * temp =
+	  hfst::implementations::LogFst * temp =
 	    log_ofst_interface.harmonize
 	    (implementation.log_ofst,key_map);
 	  delete this->implementation.log_ofst;
 	  this->implementation.log_ofst  = temp;
 	  break;
 	}
+	case UNSPECIFIED_TYPE:
+	case ERROR_TYPE:
+	default:
+	  throw hfst::exceptions::TransducerHasWrongTypeException();
       }
   }
 
@@ -61,6 +65,10 @@ namespace HFST
 	implementation.log_ofst = 
 	  log_ofst_interface.create_empty_transducer();
 	break;
+	case UNSPECIFIED_TYPE:
+	case ERROR_TYPE:
+	default:
+	  throw hfst::exceptions::TransducerHasWrongTypeException();
       }
   }
 
@@ -81,10 +89,14 @@ namespace HFST
 	implementation.log_ofst = 
 	  log_ofst_interface.create_empty_transducer();
 	break;
+	case UNSPECIFIED_TYPE:
+	case ERROR_TYPE:
+	default:
+	  throw hfst::exceptions::TransducerHasWrongTypeException();
       }
   }
 
-  HfstTransducer::HfstTransducer(const char * utf8_str, 
+  HfstTransducer::HfstTransducer(const std::string& utf8_str, 
 				 const HfstTokenizer 
 				 &multichar_symbol_tokenizer,
 				 ImplementationType type):
@@ -105,12 +117,16 @@ namespace HFST
 	implementation.log_ofst = 
 	  log_ofst_interface.define_transducer(*kpv);
 	break;
+	case UNSPECIFIED_TYPE:
+	case ERROR_TYPE:
+	default:
+	  throw hfst::exceptions::TransducerHasWrongTypeException();
       }
     delete kpv;
   }
 
-  HfstTransducer::HfstTransducer(const char * upper_utf8_str,
-				 const char * lower_utf8_str,
+  HfstTransducer::HfstTransducer(const std::string& upper_utf8_str,
+				 const std::string& lower_utf8_str,
 				 const HfstTokenizer 
 				 &multichar_symbol_tokenizer,
 				 ImplementationType type):
@@ -132,6 +148,10 @@ namespace HFST
 	implementation.log_ofst = 
 	  log_ofst_interface.define_transducer(*kpv);
 	break;
+	case UNSPECIFIED_TYPE:
+	case ERROR_TYPE:
+	default:
+	  throw hfst::exceptions::TransducerHasWrongTypeException();
       }
     delete kpv;
   }
@@ -157,6 +177,10 @@ namespace HFST
 	implementation.log_ofst =
 	  log_ofst_interface.copy(another.implementation.log_ofst);
 	break;
+	case UNSPECIFIED_TYPE:
+	case ERROR_TYPE:
+	default:
+	  throw hfst::exceptions::TransducerHasWrongTypeException();
       }
   }
   
@@ -173,104 +197,108 @@ namespace HFST
       case LOG_OFST_TYPE:
 	delete implementation.log_ofst;
 	break;
+	case UNSPECIFIED_TYPE:
+	case ERROR_TYPE:
+	default:
+	  throw hfst::exceptions::TransducerHasWrongTypeException();
       }
   }
 
   HfstTransducer &HfstTransducer::remove_epsilons(ImplementationType type)
   { is_trie = false;
     return apply 
-      (&HFST_IMPLEMENTATIONS::SfstTransducer::remove_epsilons,
-       &HFST_IMPLEMENTATIONS::TropicalWeightTransducer::remove_epsilons,
-       &HFST_IMPLEMENTATIONS::LogWeightTransducer::remove_epsilons,
+      (&hfst::implementations::SfstTransducer::remove_epsilons,
+       &hfst::implementations::TropicalWeightTransducer::remove_epsilons,
+       &hfst::implementations::LogWeightTransducer::remove_epsilons,
        type); }
 
   HfstTransducer &HfstTransducer::determinize(ImplementationType type)
   { is_trie = false;
     return apply 
-      (&HFST_IMPLEMENTATIONS::SfstTransducer::determinize,
-       &HFST_IMPLEMENTATIONS::TropicalWeightTransducer::determinize,
-       &HFST_IMPLEMENTATIONS::LogWeightTransducer::determinize,
+      (&hfst::implementations::SfstTransducer::determinize,
+       &hfst::implementations::TropicalWeightTransducer::determinize,
+       &hfst::implementations::LogWeightTransducer::determinize,
        type); }
 
   HfstTransducer &HfstTransducer::minimize(ImplementationType type)
   { is_trie = false;
     return apply 
-      (&HFST_IMPLEMENTATIONS::SfstTransducer::minimize,
-       &HFST_IMPLEMENTATIONS::TropicalWeightTransducer::minimize,
-       &HFST_IMPLEMENTATIONS::LogWeightTransducer::minimize,
+      (&hfst::implementations::SfstTransducer::minimize,
+       &hfst::implementations::TropicalWeightTransducer::minimize,
+       &hfst::implementations::LogWeightTransducer::minimize,
        type); }
 
   HfstTransducer &HfstTransducer::repeat_star(ImplementationType type)
   { is_trie = false;
     return apply 
-      (&HFST_IMPLEMENTATIONS::SfstTransducer::repeat_star,
-       &HFST_IMPLEMENTATIONS::TropicalWeightTransducer::repeat_star,
-       &HFST_IMPLEMENTATIONS::LogWeightTransducer::repeat_star,
+      (&hfst::implementations::SfstTransducer::repeat_star,
+       &hfst::implementations::TropicalWeightTransducer::repeat_star,
+       &hfst::implementations::LogWeightTransducer::repeat_star,
        type); }
 
   HfstTransducer &HfstTransducer::repeat_plus(ImplementationType type)
   { is_trie = false;
     return apply 
-      (&HFST_IMPLEMENTATIONS::SfstTransducer::repeat_plus,
-       &HFST_IMPLEMENTATIONS::TropicalWeightTransducer::repeat_plus,
-       &HFST_IMPLEMENTATIONS::LogWeightTransducer::repeat_plus,
+      (&hfst::implementations::SfstTransducer::repeat_plus,
+       &hfst::implementations::TropicalWeightTransducer::repeat_plus,
+       &hfst::implementations::LogWeightTransducer::repeat_plus,
        type); }
 
-  HfstTransducer &HfstTransducer::repeat_n(int n, ImplementationType type)
+  HfstTransducer &HfstTransducer::repeat_n(unsigned int n, ImplementationType type)
   { is_trie = false; // This could be done so that is_trie is preserved
     return apply 
-      (&HFST_IMPLEMENTATIONS::SfstTransducer::repeat_n,
-       &HFST_IMPLEMENTATIONS::TropicalWeightTransducer::repeat_n,
-       &HFST_IMPLEMENTATIONS::LogWeightTransducer::repeat_n,
+      (&hfst::implementations::SfstTransducer::repeat_n,
+       &hfst::implementations::TropicalWeightTransducer::repeat_n,
+       &hfst::implementations::LogWeightTransducer::repeat_n,
        n,type); }
 
-  HfstTransducer &HfstTransducer::repeat_le_n(int n, ImplementationType type)
+  HfstTransducer &HfstTransducer::repeat_n_plus(unsigned int n, ImplementationType type)
   { is_trie = false; // This could be done so that is_trie is preserved
     return apply 
-      (&HFST_IMPLEMENTATIONS::SfstTransducer::repeat_le_n,
-       &HFST_IMPLEMENTATIONS::TropicalWeightTransducer::repeat_le_n,
-       &HFST_IMPLEMENTATIONS::LogWeightTransducer::repeat_le_n,
+      (&hfst::implementations::SfstTransducer::repeat_le_n,
+       &hfst::implementations::TropicalWeightTransducer::repeat_le_n,
+       &hfst::implementations::LogWeightTransducer::repeat_le_n,
        n,type); }
 
   HfstTransducer &HfstTransducer::optionalize(ImplementationType type)
   { is_trie = false; // This could be done so that is_trie is preserved
     return apply 
-      (&HFST_IMPLEMENTATIONS::SfstTransducer::optionalize,
-       &HFST_IMPLEMENTATIONS::TropicalWeightTransducer::optionalize,
-       &HFST_IMPLEMENTATIONS::LogWeightTransducer::optionalize,
+      (&hfst::implementations::SfstTransducer::optionalize,
+       &hfst::implementations::TropicalWeightTransducer::optionalize,
+       &hfst::implementations::LogWeightTransducer::optionalize,
        type); }
 
   HfstTransducer &HfstTransducer::input_project(ImplementationType type)
   { is_trie = false; // This could be done so that is_trie is preserved
     return apply 
-      (&HFST_IMPLEMENTATIONS::SfstTransducer::extract_input_language,
-       &HFST_IMPLEMENTATIONS::TropicalWeightTransducer::extract_input_language,
-       &HFST_IMPLEMENTATIONS::LogWeightTransducer::extract_input_language,
+      (&hfst::implementations::SfstTransducer::extract_input_language,
+       &hfst::implementations::TropicalWeightTransducer::extract_input_language,
+       &hfst::implementations::LogWeightTransducer::extract_input_language,
        type); }
 
   HfstTransducer &HfstTransducer::output_project(ImplementationType type)
   { is_trie = false; // This could be done so that is_trie is preserved
     return apply 
-      (&HFST_IMPLEMENTATIONS::SfstTransducer::extract_output_language,
-       &HFST_IMPLEMENTATIONS::TropicalWeightTransducer::extract_output_language,
-       &HFST_IMPLEMENTATIONS::LogWeightTransducer::extract_output_language,
+      (&hfst::implementations::SfstTransducer::extract_output_language,
+       &hfst::implementations::TropicalWeightTransducer::extract_output_language,
+       &hfst::implementations::LogWeightTransducer::extract_output_language,
        type); }
 
   HfstTransducer &HfstTransducer::substitute
   (Key old_key,Key new_key)
   { return apply 
-      (&HFST_IMPLEMENTATIONS::SfstTransducer::substitute,
-       &HFST_IMPLEMENTATIONS::TropicalWeightTransducer::substitute,
-       &HFST_IMPLEMENTATIONS::LogWeightTransducer::substitute,
+      (&hfst::implementations::SfstTransducer::substitute,
+       &hfst::implementations::TropicalWeightTransducer::substitute,
+       &hfst::implementations::LogWeightTransducer::substitute,
        old_key,new_key,
        this->type); }
 
   HfstTransducer &HfstTransducer::substitute
   (const std::string &old_symbol, const std::string &new_symbol)
   { return apply 
-      (&HFST_IMPLEMENTATIONS::SfstTransducer::substitute,
-       &HFST_IMPLEMENTATIONS::TropicalWeightTransducer::substitute,
-       &HFST_IMPLEMENTATIONS::LogWeightTransducer::substitute,
+      (&hfst::implementations::SfstTransducer::substitute,
+       &hfst::implementations::TropicalWeightTransducer::substitute,
+       &hfst::implementations::LogWeightTransducer::substitute,
        key_table.add_symbol(old_symbol),key_table.add_symbol(new_symbol),
        this->type); }
 
@@ -278,9 +306,9 @@ namespace HFST
   (const StringSymbolPair &old_symbol_pair, 
    const StringSymbolPair &new_symbol_pair)
   { return apply 
-      (&HFST_IMPLEMENTATIONS::SfstTransducer::substitute,
-       &HFST_IMPLEMENTATIONS::TropicalWeightTransducer::substitute,
-       &HFST_IMPLEMENTATIONS::LogWeightTransducer::substitute,
+      (&hfst::implementations::SfstTransducer::substitute,
+       &hfst::implementations::TropicalWeightTransducer::substitute,
+       &hfst::implementations::LogWeightTransducer::substitute,
        key_table.get_key_pair(old_symbol_pair),
        key_table.get_key_pair(new_symbol_pair),
        this->type); }
@@ -288,9 +316,9 @@ namespace HFST
   HfstTransducer &HfstTransducer::substitute
   (const KeyPair &old_key_pair,const KeyPair &new_key_pair)
   { return apply 
-      (&HFST_IMPLEMENTATIONS::SfstTransducer::substitute,
-       &HFST_IMPLEMENTATIONS::TropicalWeightTransducer::substitute,
-       &HFST_IMPLEMENTATIONS::LogWeightTransducer::substitute,
+      (&hfst::implementations::SfstTransducer::substitute,
+       &hfst::implementations::TropicalWeightTransducer::substitute,
+       &hfst::implementations::LogWeightTransducer::substitute,
        old_key_pair,new_key_pair,
        this->type); }
 
@@ -299,9 +327,9 @@ namespace HFST
    ImplementationType type)
   { is_trie = false;
     harmonize(another);
-    return apply(&HFST_IMPLEMENTATIONS::SfstTransducer::compose,
-		 &HFST_IMPLEMENTATIONS::TropicalWeightTransducer::compose,
-		 &HFST_IMPLEMENTATIONS::LogWeightTransducer::compose,
+    return apply(&hfst::implementations::SfstTransducer::compose,
+		 &hfst::implementations::TropicalWeightTransducer::compose,
+		 &hfst::implementations::LogWeightTransducer::compose,
 		 another,
 		 type); }
 
@@ -310,9 +338,9 @@ namespace HFST
    ImplementationType type)
   { is_trie = false; // This could be done so that is_trie is preserved
     harmonize(another);
-    return apply(&HFST_IMPLEMENTATIONS::SfstTransducer::concatenate,
-		 &HFST_IMPLEMENTATIONS::TropicalWeightTransducer::concatenate,
-		 &HFST_IMPLEMENTATIONS::LogWeightTransducer::concatenate,
+    return apply(&hfst::implementations::SfstTransducer::concatenate,
+		 &hfst::implementations::TropicalWeightTransducer::concatenate,
+		 &hfst::implementations::LogWeightTransducer::concatenate,
 		 another,
 		 type); }
 
@@ -321,9 +349,9 @@ namespace HFST
    ImplementationType type)
   { is_trie = false; // This could be done so that is_trie is preserved
     harmonize(another);
-    return apply(&HFST_IMPLEMENTATIONS::SfstTransducer::disjunct,
-		 &HFST_IMPLEMENTATIONS::TropicalWeightTransducer::disjunct,
-		 &HFST_IMPLEMENTATIONS::LogWeightTransducer::disjunct,
+    return apply(&hfst::implementations::SfstTransducer::disjunct,
+		 &hfst::implementations::TropicalWeightTransducer::disjunct,
+		 &hfst::implementations::LogWeightTransducer::disjunct,
 		 another,
 		 type); }
 
@@ -332,9 +360,9 @@ namespace HFST
    ImplementationType type)
   { is_trie = false; // This could be done so that is_trie is preserved
     harmonize(another);
-    return apply(&HFST_IMPLEMENTATIONS::SfstTransducer::intersect,
-		 &HFST_IMPLEMENTATIONS::TropicalWeightTransducer::intersect,
-		 &HFST_IMPLEMENTATIONS::LogWeightTransducer::intersect,
+    return apply(&hfst::implementations::SfstTransducer::intersect,
+		 &hfst::implementations::TropicalWeightTransducer::intersect,
+		 &hfst::implementations::LogWeightTransducer::intersect,
 		 another,
 		 type); }
 
@@ -343,9 +371,9 @@ namespace HFST
    ImplementationType type)
   { is_trie = false; // This could be done so that is_trie is preserved
     harmonize(another);
-    return apply(&HFST_IMPLEMENTATIONS::SfstTransducer::subtract,
-		 &HFST_IMPLEMENTATIONS::TropicalWeightTransducer::subtract,
-		 &HFST_IMPLEMENTATIONS::LogWeightTransducer::subtract,
+    return apply(&hfst::implementations::SfstTransducer::subtract,
+		 &hfst::implementations::TropicalWeightTransducer::subtract,
+		 &hfst::implementations::LogWeightTransducer::subtract,
 		 another,
 		 type); }
 
@@ -371,6 +399,10 @@ namespace HFST
       case LOG_OFST_TYPE:
 	return FLOAT;
 	break;
+	case UNSPECIFIED_TYPE:
+	case ERROR_TYPE:
+	default:
+	  throw hfst::exceptions::TransducerHasWrongTypeException();
       }
   }
 
@@ -378,13 +410,13 @@ namespace HFST
   (float weight)
   { 
     if (get_weight_type() != FLOAT)
-      { throw HFST_IMPLEMENTATIONS::WeightTypeMismatchException(); }
+      { throw hfst::implementations::WeightTypeMismatchException(); }
     switch (type)
       {
       case TROPICAL_OFST_TYPE:
 	{
 	  fst::StdVectorFst * temp =
-	    HFST_IMPLEMENTATIONS::TropicalWeightTransducer::set_weight
+	    hfst::implementations::TropicalWeightTransducer::set_weight
 	    (implementation.tropical_ofst,weight); 
 	  delete implementation.tropical_ofst;
 	  implementation.tropical_ofst = temp;
@@ -392,48 +424,52 @@ namespace HFST
 	}
       case LOG_OFST_TYPE:
 	{
-	  HFST_IMPLEMENTATIONS::LogFst * temp =
-	    HFST_IMPLEMENTATIONS::LogWeightTransducer::set_weight
+	  hfst::implementations::LogFst * temp =
+	    hfst::implementations::LogWeightTransducer::set_weight
 	    (implementation.log_ofst,weight); 
 	  delete implementation.log_ofst;
 	  implementation.log_ofst = temp;
 	  break;
 	}
+	case UNSPECIFIED_TYPE:
+	case ERROR_TYPE:
+	default:
+	  throw hfst::exceptions::TransducerHasWrongTypeException();
       }
     return *this; 
   }
 
-  template<> HFST_IMPLEMENTATIONS::SfstTransducer::const_iterator 
+  template<> hfst::implementations::SfstTransducer::const_iterator 
   HfstTransducer::begin<SfstTransducer>(void)
   { 
     if (type != SFST_TYPE) 
-      { throw HFST_IMPLEMENTATIONS::TransducerHasWrongTypeException(); }
+      { throw hfst::implementations::TransducerHasWrongTypeException(); }
     return SfstTransducer::begin(implementation.sfst); 
   }
 
-  template<> HFST_IMPLEMENTATIONS::SfstTransducer::const_iterator 
+  template<> hfst::implementations::SfstTransducer::const_iterator 
   HfstTransducer::end<SfstTransducer>(void)
   { 
     if (type != SFST_TYPE) 
-      { throw HFST_IMPLEMENTATIONS::TransducerHasWrongTypeException(); }
+      { throw hfst::implementations::TransducerHasWrongTypeException(); }
     return SfstTransducer::end(implementation.sfst); 
   }
 
   HfstTransducer &HfstTransducer::convert(ImplementationType type)
   {
     if (type == UNSPECIFIED_TYPE)
-      { throw HFST_IMPLEMENTATIONS::SpecifiedTypeRequiredException(); }
+      { throw hfst::implementations::SpecifiedTypeRequiredException(); }
     if (type == this->type)
       { return *this; }
 
     try 
       {
-	HFST_IMPLEMENTATIONS::InternalTransducer * internal;
+	hfst::implementations::InternalTransducer * internal;
 	switch (this->type)
 	  {
 	  case SFST_TYPE:
 	    internal = 
-	      HFST_IMPLEMENTATIONS::sfst_to_internal_format(implementation.sfst);
+	      hfst::implementations::sfst_to_internal_format(implementation.sfst);
 	    delete implementation.sfst;
 	    break;
 	  case TROPICAL_OFST_TYPE:
@@ -441,16 +477,20 @@ namespace HFST
 	    break;
 	  case LOG_OFST_TYPE:
 	  internal =
-	      HFST_IMPLEMENTATIONS::log_ofst_to_internal_format(implementation.log_ofst);
+	      hfst::implementations::log_ofst_to_internal_format(implementation.log_ofst);
 	  delete implementation.log_ofst;
 	    break;
+	case UNSPECIFIED_TYPE:
+	case ERROR_TYPE:
+	default:
+	  throw hfst::exceptions::TransducerHasWrongTypeException();
 	  }
 	this->type = type;
 	switch (type)
 	  {
 	  case SFST_TYPE:
 	    implementation.sfst = 
-	      HFST_IMPLEMENTATIONS::internal_format_to_sfst(internal);
+	      hfst::implementations::internal_format_to_sfst(internal);
 	    delete internal;
 	    break;
 	  case TROPICAL_OFST_TYPE:
@@ -458,12 +498,16 @@ namespace HFST
 	    break;
 	  case LOG_OFST_TYPE:
 	    implementation.log_ofst =
-	      HFST_IMPLEMENTATIONS::internal_format_to_log_ofst(internal);
+	      hfst::implementations::internal_format_to_log_ofst(internal);
 	    delete internal;
 	    break;
+	case UNSPECIFIED_TYPE:
+	case ERROR_TYPE:
+	default:
+	  throw hfst::exceptions::TransducerHasWrongTypeException();
 	  }
       }
-    catch (HFST_IMPLEMENTATIONS::HfstInterfaceException e)
+    catch (hfst::implementations::HfstInterfaceException e)
       { throw e; }
     return *this;
   }
@@ -483,13 +527,17 @@ namespace HFST
 	t.log_ofst_interface.print
 	  (t.implementation.log_ofst,t.key_table,out);
 	break;
-      }
+ 	case UNSPECIFIED_TYPE:
+	case ERROR_TYPE:
+	default:
+	  throw hfst::exceptions::TransducerHasWrongTypeException();
+     }
     return out;
   }
 
 }
 #ifdef DEBUG_MAIN
-using namespace HFST;
+using namespace hfst;
 int main(void)
 {
   KeyTable key_table;
@@ -532,7 +580,7 @@ int main(void)
     {
       str_fst_ofst2.convert(SFST_TYPE).set_final_weight<bool>(2);
     }
-  catch (HFST_IMPLEMENTATIONS::FunctionNotImplementedException e)
+  catch (hfst::implementations::FunctionNotImplementedException e)
     { failed = true; }
   assert(failed);
   failed = false;
@@ -540,7 +588,7 @@ int main(void)
     {
       str_fst_ofst2.set_final_weight<float>(2);
     }
-  catch (HFST_IMPLEMENTATIONS::WeightTypeMismatchException e)
+  catch (hfst::implementations::WeightTypeMismatchException e)
     { failed = true; }
   assert(failed);
   failed = false;

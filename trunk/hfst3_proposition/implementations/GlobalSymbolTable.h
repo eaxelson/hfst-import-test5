@@ -7,7 +7,7 @@
 #include "SymbolDefs.h"
 #include "HfstExceptions.h"
 
-namespace HFST_SYMBOLS
+namespace hfst { namespace symbols
 {
   class GlobalSymbolTable
   {
@@ -36,5 +36,5 @@ namespace HFST_SYMBOLS
     void map_keys(KeyMap &key_map, 
 		  KeyTable &source, KeyTable &target);
   };
-}
+} }
 #endif

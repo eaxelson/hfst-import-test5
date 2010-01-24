@@ -1,20 +1,20 @@
 HfstTransducer &apply
 (SFST::Transducer * (*sfst_funct)(SFST::Transducer *),
  fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *),
- HFST_IMPLEMENTATIONS::LogFst * (*log_ofst_funct)(HFST_IMPLEMENTATIONS::LogFst *),
+ hfst::implementations::LogFst * (*log_ofst_funct)(hfst::implementations::LogFst *),
  ImplementationType type);
 
 HfstTransducer &apply
 (SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int),
  fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,int),
- HFST_IMPLEMENTATIONS::LogFst * (*log_ofst_funct)(HFST_IMPLEMENTATIONS::LogFst *,int),
+ hfst::implementations::LogFst * (*log_ofst_funct)(hfst::implementations::LogFst *,int),
  int n,ImplementationType type);
 
 HfstTransducer &apply
 (SFST::Transducer * (*sfst_funct)(SFST::Transducer *, Key, Key),
  fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,Key, 
 					    Key),
- HFST_IMPLEMENTATIONS::LogFst * (*log_ofst_funct)(HFST_IMPLEMENTATIONS::LogFst *,
+ hfst::implementations::LogFst * (*log_ofst_funct)(hfst::implementations::LogFst *,
 						  Key,Key),
  Key k1, Key k2,ImplementationType type);
 
@@ -23,7 +23,7 @@ HfstTransducer &apply
 				  KeyPair),
  fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,KeyPair, 
 					    KeyPair),
- HFST_IMPLEMENTATIONS::LogFst * (*log_ofst_funct)(HFST_IMPLEMENTATIONS::LogFst *,
+ hfst::implementations::LogFst * (*log_ofst_funct)(hfst::implementations::LogFst *,
 						  KeyPair, KeyPair),
  KeyPair kp1, KeyPair kp2,ImplementationType type);
 
@@ -32,7 +32,7 @@ HfstTransducer &apply
 				  SFST::Transducer *),
  fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,
 					    fst::StdVectorFst *),
- HFST_IMPLEMENTATIONS::LogFst * (*log_ofst_funct)(HFST_IMPLEMENTATIONS::LogFst *,
-						  HFST_IMPLEMENTATIONS::LogFst *),
+ hfst::implementations::LogFst * (*log_ofst_funct)(hfst::implementations::LogFst *,
+						  hfst::implementations::LogFst *),
  HfstTransducer &another,
  ImplementationType type);
