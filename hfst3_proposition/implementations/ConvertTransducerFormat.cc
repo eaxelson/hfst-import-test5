@@ -1,6 +1,6 @@
 #include "ConvertTransducerFormat.h"
 
-namespace HFST_IMPLEMENTATIONS
+namespace hfst { namespace implementations
 {
 InternalTransducer * sfst_to_internal_format(SFST::Transducer * t)
 {
@@ -114,7 +114,7 @@ fst::StdVectorFst * internal_format_to_openfst(InternalTransducer * t)
 LogFst * internal_format_to_log_ofst(InternalTransducer * t)
 { return new LogFst(*dynamic_cast<LogFst*>(t)); }
 
-}
+} }
 
 #ifdef DEBUG_CONVERT
 /********************************
@@ -124,14 +124,14 @@ LogFst * internal_format_to_log_ofst(InternalTransducer * t)
  ********************************/
 int main(void)
 {
-  HFST::KeyTable * key_table = HFST::create_key_table();
-  HFST::TransducerHandle t;
+  hfst::KeyTable * key_table = hfst::create_key_table();
+  hfst::TransducerHandle t;
   HWFST::TransducerHandle tw;
-  if (HFST::read_format() == 0)
+  if (hfst::read_format() == 0)
     {
       try
 	{
-	  t = HFST::read_transducer(std::cin,key_table);
+	  t = hfst::read_transducer(std::cin,key_table);
 	}
       catch (const char * p)
 	{
@@ -151,7 +151,7 @@ int main(void)
 	  std::cerr << "ERROR: " << p << std::endl;
 	}
       t = internal_format_to_sfst(tw);
-      HFST::write_transducer(t,key_table);
+      hfst::write_transducer(t,key_table);
     }
 }
 #endif

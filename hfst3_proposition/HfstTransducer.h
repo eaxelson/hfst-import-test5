@@ -11,27 +11,27 @@
 #include <cassert>
 #include <iostream>
 
-namespace HFST
+namespace hfst
 {
 
-  using HFST_SYMBOLS::KeyTable;
-  using HFST_SYMBOLS::Key;
-  using HFST_SYMBOLS::KeyPair;
-  using HFST_SYMBOLS::StringSymbolPair;
-  using HFST_SYMBOLS::KeyPairVector;
+  using hfst::symbols::KeyTable;
+  using hfst::symbols::Key;
+  using hfst::symbols::KeyPair;
+  using hfst::symbols::StringSymbolPair;
+  using hfst::symbols::KeyPairVector;
   
-  using HFST_IMPLEMENTATIONS::SfstTransducer;
-  using HFST_IMPLEMENTATIONS::SfstState;
-  using HFST_IMPLEMENTATIONS::SfstTransition;
-  using HFST_IMPLEMENTATIONS::SfstStateIndexer;
-  using HFST_IMPLEMENTATIONS::TropicalWeightTransducer;
-  using HFST_IMPLEMENTATIONS::TropicalWeightState;
-  using HFST_IMPLEMENTATIONS::TropicalWeightTransition;
-  using HFST_IMPLEMENTATIONS::TropicalWeightStateIndexer;
-  using HFST_IMPLEMENTATIONS::LogWeightTransducer;
-  using HFST_IMPLEMENTATIONS::LogWeightState;
-  using HFST_IMPLEMENTATIONS::LogWeightTransition;
-  using HFST_IMPLEMENTATIONS::LogWeightStateIndexer;
+  using hfst::implementations::SfstTransducer;
+  using hfst::implementations::SfstState;
+  using hfst::implementations::SfstTransition;
+  using hfst::implementations::SfstStateIndexer;
+  using hfst::implementations::TropicalWeightTransducer;
+  using hfst::implementations::TropicalWeightState;
+  using hfst::implementations::TropicalWeightTransition;
+  using hfst::implementations::TropicalWeightStateIndexer;
+  using hfst::implementations::LogWeightTransducer;
+  using hfst::implementations::LogWeightState;
+  using hfst::implementations::LogWeightTransition;
+  using hfst::implementations::LogWeightStateIndexer;
 
   enum ImplementationType
   {
@@ -56,9 +56,9 @@ namespace HFST
 
     union StreamImplementation
     {
-      HFST_IMPLEMENTATIONS::SfstInputStream * sfst;
-      HFST_IMPLEMENTATIONS::TropicalWeightInputStream * tropical_ofst;
-      HFST_IMPLEMENTATIONS::LogWeightInputStream * log_ofst;
+      hfst::implementations::SfstInputStream * sfst;
+      hfst::implementations::TropicalWeightInputStream * tropical_ofst;
+      hfst::implementations::LogWeightInputStream * log_ofst;
     };
 
     ImplementationType type;
@@ -73,7 +73,7 @@ namespace HFST
   public:
 
     HfstInputStream(void);
-    HfstInputStream(const char * filename);
+    HfstInputStream(const char* filename);
     ~HfstInputStream(void);
     void open(void);
     void close(void);
@@ -90,15 +90,15 @@ namespace HFST
   protected:
     union TransducerImplementation
     {
-      HFST_IMPLEMENTATIONS::Transducer * sfst;
-      HFST_IMPLEMENTATIONS::StdVectorFst * tropical_ofst;
-      HFST_IMPLEMENTATIONS::LogFst * log_ofst;
-      HFST_IMPLEMENTATIONS::StdVectorFst * internal; 
+      hfst::implementations::Transducer * sfst;
+      hfst::implementations::StdVectorFst * tropical_ofst;
+      hfst::implementations::LogFst * log_ofst;
+      hfst::implementations::StdVectorFst * internal; 
     };
     
-    static HFST_IMPLEMENTATIONS::SfstTransducer sfst_interface;
-    static HFST_IMPLEMENTATIONS::TropicalWeightTransducer tropical_ofst_interface;
-    static HFST_IMPLEMENTATIONS::LogWeightTransducer log_ofst_interface;
+    static hfst::implementations::SfstTransducer sfst_interface;
+    static hfst::implementations::TropicalWeightTransducer tropical_ofst_interface;
+    static hfst::implementations::LogWeightTransducer log_ofst_interface;
 
     ImplementationType type;
 
@@ -106,9 +106,10 @@ namespace HFST
                     // is supposed to keep trakc of whether the transducer's
                     // KeyTable is maintained or not.
 
-    bool is_trie;
-
     KeyTable key_table;
+   
+   	bool is_trie;
+
     TransducerImplementation implementation; 
 
     void harmonize(HfstTransducer &another);
@@ -118,11 +119,11 @@ namespace HFST
   public:
     HfstTransducer(ImplementationType type);
     HfstTransducer(const KeyTable &key_table,ImplementationType type);
-    HfstTransducer(const char * utf8_str, 
+    HfstTransducer(const std::string& utf8_str, 
     		   const HfstTokenizer &multichar_symbol_tokenizer,
 		   ImplementationType type);
-    HfstTransducer(const char * upper_utf8_str,
-    		   const char * lower_utf8_str,
+    HfstTransducer(const std::string& upper_utf8_str,
+    		   const std::string& lower_utf8_str,
     		   const HfstTokenizer &multichar_symbol_tokenizer,
 		   ImplementationType type);
     HfstTransducer(HfstInputStream &in);
@@ -133,9 +134,14 @@ namespace HFST
     HfstTransducer &minimize(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &repeat_star(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &repeat_plus(ImplementationType type=UNSPECIFIED_TYPE);
-    HfstTransducer &repeat_n(int n,ImplementationType type=UNSPECIFIED_TYPE);
-    HfstTransducer &repeat_le_n(int n,
-				ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &repeat_n(unsigned int n,
+                       ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &repeat_n_minus(unsigned int n,
+                       ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &repeat_n_plus(unsigned int n,
+                       ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer& repeat_n_to_k(unsigned int n, unsigned int k,
+                       ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &optionalize(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &invert(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &input_project(ImplementationType type=UNSPECIFIED_TYPE);
@@ -161,13 +167,13 @@ namespace HFST
 
     template<class W> HfstTransducer &set_final_weight(W weight) 
       { (void)weight; 
-	throw HFST_IMPLEMENTATIONS::FunctionNotImplementedException(); }
+	throw hfst::implementations::FunctionNotImplementedException(); }
 
     template<class T> typename T::const_iterator begin(void)
-      { throw HFST_IMPLEMENTATIONS::FunctionNotImplementedException(); }
+      { throw hfst::implementations::FunctionNotImplementedException(); }
 
     template<class T> typename T::const_iterator end(void)
-      { throw HFST_IMPLEMENTATIONS::FunctionNotImplementedException(); }
+      { throw hfst::implementations::FunctionNotImplementedException(); }
 
     HfstTransducer &anonymize(void);
     KeyTable &get_key_table(void);

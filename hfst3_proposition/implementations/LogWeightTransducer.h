@@ -7,15 +7,15 @@
 #include <sstream>
 #include <iostream>
  
-namespace HFST_IMPLEMENTATIONS
+namespace hfst { namespace implementations
 {
   using namespace fst;
-  using namespace HFST_EXCEPTIONS;
+  using namespace hfst::exceptions;
   typedef ArcTpl<LogWeight>::StateId StateId;
   typedef ArcTpl<LogWeight> LogArc;
   typedef VectorFst<LogArc> LogFst;
 
-  using namespace HFST_SYMBOLS;
+  using namespace hfst::symbols;
   using std::ostream;
   using std::ostringstream;
 
@@ -180,4 +180,4 @@ namespace HFST_IMPLEMENTATIONS
       static void print(LogFst * t, KeyTable &key_table, ostream &out);
     };
 
-}
+} }

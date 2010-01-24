@@ -10,9 +10,9 @@
 
 
 
-namespace HFST_IMPLEMENTATIONS {
+namespace hfst { namespace implementations {
 
-  using namespace HFST_EXCEPTIONS;
+  using namespace hfst::exceptions;
 
   typedef fst::StdArc::StateId StateId;
   typedef fst::ArcIterator<fst::StdVectorFst> StdArcIterator;
@@ -52,5 +52,5 @@ namespace HFST_IMPLEMENTATIONS {
     /* Read a transducer in internal format and return the equivalent
        LogFst * */
     LogFst * internal_format_to_log_ofst(InternalTransducer * t);
-}
+} }
 #endif

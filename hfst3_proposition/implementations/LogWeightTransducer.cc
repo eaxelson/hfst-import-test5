@@ -1,6 +1,6 @@
 #include "LogWeightTransducer.h"
 
-namespace HFST_IMPLEMENTATIONS
+namespace hfst { namespace implementations
 {
   LogWeightInputStream::LogWeightInputStream(void):
     i_stream(),input_stream(cin)
@@ -682,11 +682,11 @@ namespace HFST_IMPLEMENTATIONS
     RelabelFst<LogArc> t_subst(*t,v,v);
     return new LogFst(t_subst);
   }
-}
+} }
 
 #ifdef DEBUG_MAIN
-using namespace HFST_IMPLEMENTATIONS;
-HFST_SYMBOLS::GlobalSymbolTable KeyTable::global_symbol_table;
+using namespace hfst::implementations;
+hfst::symbols::GlobalSymbolTable KeyTable::global_symbol_table;
 int main(void) 
 {
   LogWeightTransducer ofst;

@@ -1,4 +1,4 @@
-CXXFLAGS=-Wno-deprecated -g -O3
+CXXFLAGS=-Wno-deprecated -g -Wall -Wextra -Werror
 
 SFST_DIR=implementations/SFST/src
 

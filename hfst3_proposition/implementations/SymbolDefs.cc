@@ -1,7 +1,7 @@
 #include "SymbolDefs.h"
 #include "GlobalSymbolTable.h"
 
-namespace HFST_SYMBOLS
+namespace hfst { namespace symbols
 {
   KeyTable::KeyTable(void)
   { key_symbol_vector.push_back(0); symbol_key_map[0] = 0; }
@@ -162,4 +162,4 @@ namespace HFST_SYMBOLS
   KeyMapper::const_iterator KeyMapper::begin(void) { return key_map.begin(); }
   KeyMapper::const_iterator KeyMapper::end(void) { return key_map.end(); }
 
-}
+} }

@@ -1,6 +1,6 @@
 #include "GlobalSymbolTable.h"
 
-namespace HFST_SYMBOLS
+namespace hfst { namespace symbols
 {
   Symbol GlobalSymbolTable::define_symbol(const char * string_symbol)
   {
@@ -56,11 +56,11 @@ namespace HFST_SYMBOLS
 	catch (HfstSymbolsException e) { throw e; }
       }
   }
-}
+} }
 
 #ifdef DEBUG_MAIN
 #include <iostream>
-using namespace HFST_SYMBOLS;
+using namespace hfst::symbols;
 GlobalSymbolTable KeyTable::global_symbol_table = GlobalSymbolTable();
 GlobalSymbolTable &global_symbol_table = KeyTable::global_symbol_table;
 int main(void) 

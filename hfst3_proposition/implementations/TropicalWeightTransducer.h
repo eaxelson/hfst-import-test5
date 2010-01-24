@@ -7,13 +7,14 @@
 #include <sstream>
 #include <iostream>
  
-namespace HFST_IMPLEMENTATIONS
+namespace hfst { 
+namespace implementations
 {
   using namespace fst;
-  using namespace HFST_EXCEPTIONS;
+  using namespace hfst::exceptions;
   typedef StdArc::StateId StateId;
 
-  using namespace HFST_SYMBOLS;
+  using namespace hfst::symbols;
   using std::ostream;
   using std::ostringstream;
 
@@ -178,4 +179,4 @@ namespace HFST_IMPLEMENTATIONS
       static void print(StdVectorFst * t, KeyTable &key_table, ostream &out);
     };
 
-}
+} }

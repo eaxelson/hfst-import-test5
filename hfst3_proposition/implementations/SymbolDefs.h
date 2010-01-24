@@ -7,9 +7,11 @@
 #include <sstream>
 #include "HfstExceptions.h"
 
-namespace HFST_SYMBOLS
+namespace hfst
 {
-  using namespace HFST_EXCEPTIONS;
+namespace symbols
+{
+  using namespace hfst::exceptions;
   using std::ostringstream;
 
   typedef std::string StringSymbol;
@@ -93,5 +95,5 @@ namespace HFST_SYMBOLS
     const_iterator begin(void);
     const_iterator end(void);
   };
-}
+} }
 #endif

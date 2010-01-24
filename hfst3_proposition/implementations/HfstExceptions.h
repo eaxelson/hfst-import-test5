@@ -1,6 +1,8 @@
 #ifndef _HFST_EXCEPTIONS_H_
 #define _HFST_EXCEPTIONS_H_
-namespace HFST_EXCEPTIONS
+namespace hfst
+{ 
+namespace exceptions
 {
 class HfstSymbolsException {};
 
@@ -59,5 +61,5 @@ public HfstInterfaceException {};
 class WeightTypeMismatchException :
 public HfstInterfaceException {};
 
-}
+} }
 #endif

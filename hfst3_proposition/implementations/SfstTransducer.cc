@@ -4,7 +4,7 @@
 #include <cassert>
 #endif
 
-namespace HFST_IMPLEMENTATIONS {
+namespace hfst { namespace implementations {
   SfstInputStream::SfstInputStream(void)
   {
     this->input_file = stdin;
@@ -635,12 +635,12 @@ namespace HFST_IMPLEMENTATIONS {
       }
   }
 
-}
+} }
 
 #ifdef DEBUG_MAIN
-using namespace HFST_IMPLEMENTATIONS;
+using namespace hfst::implementations;
 #include <iostream>
-HFST_SYMBOLS::GlobalSymbolTable KeyTable::global_symbol_table;
+hfst::symbols::GlobalSymbolTable KeyTable::global_symbol_table;
 int main(int argc, char * argv[]) 
 {
   SfstTransducer sfst;

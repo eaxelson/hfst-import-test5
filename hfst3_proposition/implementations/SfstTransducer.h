@@ -7,11 +7,11 @@
 #include <sstream>
 #include <iostream>
  
-namespace HFST_IMPLEMENTATIONS
+namespace hfst { namespace implementations
 {
   using namespace SFST;
-  using namespace HFST_SYMBOLS;
-  using namespace HFST_EXCEPTIONS;
+  using namespace hfst::symbols;
+  using namespace hfst::exceptions;
   using std::ostream;
   using std::ostringstream;
 
@@ -176,4 +176,4 @@ namespace HFST_IMPLEMENTATIONS
       static Transducer * harmonize(Transducer * t,KeyMap &key_map);
       static void print(Transducer * t, KeyTable &key_table, ostream &out);
     };
-}
+} }
