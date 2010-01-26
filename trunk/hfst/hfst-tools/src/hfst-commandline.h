@@ -126,6 +126,12 @@ int parse_options(int argc, char** argv);
 char* hfst_strdup(const char* s);
 
 /**
+ * @brief duplicate n first characters of string, or print error message and
+ * exit on failure.
+ */
+char* hfst_strndup(const char* s, size_t n);
+
+/**
  * @brief parse weight from string, or print error message and return zero
  * weight on failure.
  */
@@ -153,6 +159,12 @@ void hfst_fseek(FILE* stream, long offset, int whence);
  * failure.
  */
 unsigned long hfst_ftell(FILE* stream);
+
+/**
+ * @brief safely read one full line from file or print informative error
+ * messae and exit on failure.
+ */
+ssize_t hfst_getline(char** lineptr, size_t* n, FILE* stream);
 
 /**
  * @brief allocate memory, or print informative error message and exit on
