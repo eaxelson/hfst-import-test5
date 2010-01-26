@@ -236,8 +236,20 @@ AC_ARG_ENABLE([substitute],
 			  [AS_HELP_STRING([--enable-substitute],
 							  [build substitution tool @<:@default=yes@:>@])],
 			  [enable_substitute=$enableval],
-			  [enable_substitue=yes])
+			  [enable_substitute=yes])
 AM_CONDITIONAL([WANT_SUBSTITUTE], [test x$enable_substitute != xno])
+AC_ARG_ENABLE([flag_diacritics],
+			  [AS_HELP_STRING([--enable-flag-diacritics],
+							  [build flag diacritic tool @<:@default=yes@:>@])],
+			  [enable_flag_diacritics=$enableval],
+			  [enable_flag_diacritics=yes])
+AM_CONDITIONAL([WANT_FLAG_DIACRITICS], [test x$enable_flag_diacritics != xno])
+AC_ARG_ENABLE([omor_evaluate],
+			  [AS_HELP_STRING([--enable-omor-evaluate],
+							  [build omor evaluation tool @<:@default=no@:>@])],
+			  [enable_omor_evaluate=$enableval],
+			  [enable_omor_evaluate=no])
+AM_CONDITIONAL([WANT_OMOR_EVALUATE], [test x$enable_omor_evaluate != xno])
 
 
 # Checks for programs.
@@ -249,65 +261,63 @@ AC_PROG_YACC
 # Checks for libraries.
 AC_LANG([C++])
 AC_CHECK_LIB([pthread], [main], , [AC_MSG_ERROR([openfst requires pthread])])
-# disable check for nested build
-# AC_CHECK_LIB([hfst], [main], , [AC_MSG_ERROR([libhfst is required])])
 
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([string.h unistd.h])
 AC_HEADER_ASSERT
-# disable check for nested build
-# AC_CHECK_HEADERS([hfst2/hfst.h], [], [AC_MSG_ERROR([hfst.h required])])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
 AC_TYPE_SIZE_T
 
 # Checks for library functions.
+AC_SYSTEM_EXTENSIONS
 AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_FUNC_STRTOD
-AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strndup])
+AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strndup getline])
 
 AC_CONFIG_FILES([Makefile src/Makefile test/Makefile test/binary-tools/Makefile man/Makefile])
 AC_OUTPUT
 cat <<EOF
 -- Building $PACKAGE v$VERSION:
-        * calculate: $enable_calculate
-	* compare: $enable_compare
-	* compose: $enable_compose
-	* compose-intersect: $enable_compose_intersect
-	* concatenate: $enable_concatenate
-	* conjunct: $enable_conjunct
-	* determinize: $enable_determinize
-	* diff-test: $enable_diff_test
-	* disjunct: $enable_disjunct
-	* format: $enable_format
-	* fst2fst: $enable_fst2fst
-	* fst2pairstrings: $enable_fst2pairstrings
-	* fst2strings: $enable_fst2strings
-	* fst2txt: $enable_fst2txt
-	* head: $enable_head
-	* invert: $enable_invert
-	* lookup: $enable_lookup
-	* lookup-optimize: $enable_lookup_optimize
-	* minimize: $enable_minimize
-	* pair-test: $enable_pair_test
-	* project: $enable_project
-	* push-weights: $enable_push_weights
-	* regexp2fst: $enable_regexp2fst
-	* remove-epsilons: $enable_remove_epsilons
-	* repeat: $enable_repeat
-	* reverse: $enable_reverse
-	* split: $enable_split
-	* strings2fst: $enable_strings2fst
-	* subtract: $enable_subtract
-	* summarize: $enable_summarize
-	* symbols: $enable_symbols
-	* tail: $enable_tail
-	* txt2fst: $enable_txt2fst
-	* optimized-lookup: $enable_optimized_lookup
-	* substitute: $enable_substitute
+    * calculate: $enable_calculate
+    * compare: $enable_compare
+    * compose: $enable_compose
+    * compose-intersect: $enable_compose_intersect
+    * concatenate: $enable_concatenate
+    * conjunct: $enable_conjunct
+    * determinize: $enable_determinize
+    * diff-test: $enable_diff_test
+    * disjunct: $enable_disjunct
+    * format: $enable_format
+    * fst2fst: $enable_fst2fst
+    * fst2pairstrings: $enable_fst2pairstrings
+    * fst2strings: $enable_fst2strings
+    * fst2txt: $enable_fst2txt
+    * head: $enable_head
+    * invert: $enable_invert
+    * lookup: $enable_lookup
+    * lookup-optimize: $enable_lookup_optimize
+    * minimize: $enable_minimize
+    * pair-test: $enable_pair_test
+    * project: $enable_project
+    * push-weights: $enable_push_weights
+    * regexp2fst: $enable_regexp2fst
+    * remove-epsilons: $enable_remove_epsilons
+    * repeat: $enable_repeat
+    * reverse: $enable_reverse
+    * split: $enable_split
+    * strings2fst: $enable_strings2fst
+    * subtract: $enable_subtract
+    * summarize: $enable_summarize
+    * symbols: $enable_symbols
+    * tail: $enable_tail
+    * txt2fst: $enable_txt2fst
+    * optimized-lookup: $enable_optimized_lookup
+    * substitute: $enable_substitute
+    * omor-evaluate: $enable_omor_evaluate
 EOF
 
