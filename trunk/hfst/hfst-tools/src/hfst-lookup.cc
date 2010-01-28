@@ -52,45 +52,101 @@ enum lookup_input_format
 {
   UTF8_TOKEN_INPUT,
   SPACE_SEPARATED_TOKEN_INPUT,
-  APERTIUM_INPUT,
-  CUSTOM_INPUT
+  APERTIUM_INPUT
 };
 
 enum lookup_output_format
 {
   XEROX_OUTPUT,
   CG_OUTPUT,
-  APERTIUM_OUTPUT,
-  CUSTOM_OUTPUT
+  APERTIUM_OUTPUT
 };
 
 static lookup_input_format input_format = UTF8_TOKEN_INPUT;
 static lookup_output_format output_format = XEROX_OUTPUT;
 
-// in enum order
-static char* begin_format = 0; // print before set of lookups
-static char* lookup_format = 0; // print for each lookup
-static char* no_lookups_format = 0; // print for zero results
-static char* unknown_format = 0; // print when input unrecognized
-static char* end_format = 0; // print after set of lookups
+// the formats for lookup cases go like so:
+//  BEGIN LOOKUP LOOKUP LOOKUP... END
+
+// for standard case of more than 0 and less than infinite results:
+static char* begin_setf = 0; // print before set of lookups
+static char* lookupf = 0; // print before each lookup
+static char* end_setf = 0; // print for each lookup
+// when there are 0 results:
+static char* empty_begin_setf = 0; // print before empty set of results
+static char* empty_lookupf = 0; // print in place of empty lookup result
+static char* empty_end_setf = 0; // print in end of empty set of results
+// when there are 0 results and token is unrecognizable by analyser:
+static char* unknown_begin_setf = 0; // print before unknown set of results
+static char* unknown_lookupf = 0; // print in place of unknown result
+static char* unknown_end_setf = 0; // print in end of set of unknown results
+// when there are infinite results:
+static char* infinite_begin_setf = 0; // print before infinite set of results
+static char* infinite_lookupf = 0; // print in place of infinite results
+static char* infinite_end_setf = 0; // print in end of infinite results
+
 static bool print_statistics = false;
 
 // predefined formats
-static const char* XEROX_BEGIN_FORMAT = "";
-static const char* XEROX_LOOKUP_FORMAT = "%i\t%l%n";
-static const char* XEROX_END_FORMAT = "%n";
-static const char* XEROX_NO_LOOKUPS_FORMAT = "%i\t%i\t+?%n%n";
-static const char* XEROX_UNKNOWN_FORMAT = "%i\t%i\t+?%n%n";
-static const char* CG_BEGIN_FORMAT = "\"<%i>\"%n";
-static const char* CG_LOOKUP_FORMAT = "\t\"%b\"%a%n";
-static const char* CG_END_FORMAT = "%n";
-static const char* CG_NO_LOOKUPS_FORMAT = "\"<%i>\"%n\t\"%i\"\t ?%n%n";
-static const char* CG_UNKNOWN_FORMAT = "\"<%i>\"%n\t\"%i\"\t ?%n%n";
-static const char* APERTIUM_BEGIN_FORMAT = "^%i";
-static const char* APERTIUM_LOOKUP_FORMAT = "/%l";
-static const char* APERTIUM_END_FORMAT = "$%m%n";
-static const char* APERTIUM_NO_LOOKUPS_FORMAT = "^%i/*%i$%m%n";
-static const char* APERTIUM_UNKNOWN_FORMAT = "%m%i ";
+// Xerox:
+// word     word N SG
+// word     word V PRES
+static const char* XEROX_BEGIN_SETF = "";
+static const char* XEROX_LOOKUPF = "%i\t%l%n";
+static const char* XEROX_END_SETF = "%n";
+// notaword notaword+?
+static const char* XEROX_EMPTY_BEGIN_SETF = "";
+static const char* XEROX_EMPTY_LOOKUPF = "%i\t+?%n";
+static const char* XEROX_EMPTY_END_SETF = "%n";
+// ¶    ¶+?
+static const char* XEROX_UNKNOWN_BEGIN_SETF = "";
+static const char* XEROX_UNKNOWN_LOOKUPF = "%i\t+?%n";
+static const char* XEROX_UNKNOWN_END_SETF = "%n";
+// 0    0 NUM SG
+// 0    [...cyclic...]
+static const char* XEROX_INFINITE_BEGIN_SETF = "";
+static const char* XEROX_INFINITE_LOOKUPF = "%i\t%l%n";
+static const char* XEROX_INFINITE_END_SETF = "%i\t[...cyclic...]%n%n";
+// CG:
+// "<word>"
+//      "word"  N SG
+//      "word"  V PRES
+static const char* CG_BEGIN_SETF = "\"<%i>\"%n";
+static const char* CG_LOOKUPF = "\t\"%b\"%a%n";
+static const char* CG_END_SETF = "%n";
+// "<notaword>"
+//      "notaword" ?
+static const char* CG_EMPTY_BEGIN_SETF = "\"<%i>\"%n";
+static const char* CG_EMPTY_LOOKUPF = "\t\"%i\" ?%n";
+static const char* CG_EMPTY_END_SETF = "%n";
+// "<¶>"
+//      "¶" ?
+static const char* CG_UNKNOWN_BEGIN_SETF = "\"<%i>\"%n";
+static const char* CG_UNKNOWN_LOOKUPF = "\t\"%i\"\t ?%n";
+static const char* CG_UNKNOWN_END_SETF = "%n";
+// "<0>"
+//      "0" NUM SG
+//      "0" [...cyclic...]
+static const char* CG_INFINITE_BEGIN_SETF = "\"<%i>\"%n";
+static const char* CG_INFINITE_LOOKUPF = "\t\"%b\"%a%n";
+static const char* CG_INFINITE_END_SETF = "\t\"%i\"...cyclic...%n%n";
+// apertium:
+// ^word/word N SG/word V PRES$[apertium superblank markup]
+static const char* APERTIUM_BEGIN_SETF = "^%i";
+static const char* APERTIUM_LOOKUPF = "/%l";
+static const char* APERTIUM_END_SETF = "$%m%n";
+// ^notaword/*notaword$[apertium superblank markup]
+static const char* APERTIUM_EMPTY_BEGIN_SETF = "^";
+static const char* APERTIUM_EMPTY_LOOKUPF = "/*%i";
+static const char* APERTIUM_EMPTY_END_SETF = "$%m%n";
+// ¶[apertium superblank markup]
+static const char* APERTIUM_UNKNOWN_BEGIN_SETF = " ";
+static const char* APERTIUM_UNKNOWN_LOOKUPF = "%i%m";
+static const char* APERTIUM_UNKNOWN_END_SETF = " ";
+// ^0/0 NUM SG/...$
+static const char* APERTIUM_INFINITE_BEGIN_SETF = "^%i";
+static const char* APERTIUM_INFINITE_LOOKUPF = "/%l";
+static const char* APERTIUM_INFINITE_END_SETF = "/...$%n";
 
 // statistic counting
 static unsigned long inputs = 0;
@@ -158,7 +214,7 @@ void
 print_version(const char* program_name)
 {
 	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dversion
-	fprintf(message_out, "%s 0.3 (%s)\n"
+	fprintf(message_out, "%s 0.5 (%s)\n"
 		   "Copyright (C) 2009 University of Helsinki,\n"
 		   "License GPLv3: GNU GPL version 3 "
 		   "<http://gnu.org/licenses/gpl.html>\n"
@@ -223,56 +279,13 @@ parse_options(int argc, char** argv)
               output_format = APERTIUM_OUTPUT;
               input_format = APERTIUM_INPUT;
             }
-			else if (strncmp(optarg, "custom:", 7) == 0)
-			{
-              output_format = CUSTOM_OUTPUT;
-              // parse custom output parts:
-				// cannot fail, already checked for existence of :
-				char* format_start = strchr(optarg, ':') + 1;
-				char* format_end = strchr(format_start, ',');
-				if (format_end == NULL)
-				{
-					goto error_format;
-				}
-                begin_format = hfst_strndup(format_start,
-                                            format_end - format_start + 1);
-				format_start = format_end + 1;
-				format_end = strchr(format_start, ',');
-				if (format_end == NULL)
-				{
-					goto error_format;
-				}
-				lookup_format = hfst_strndup(format_start,
-                                             format_end - format_start + 1);
-                format_start = format_end + 1;
-				format_end = strchr(format_start, ',');
-				if (format_end == NULL)
-				{
-					goto error_format;
-				}
-				no_lookups_format = hfst_strndup(format_start,
-                                                 format_end - format_start + 1);
-				format_start = format_end + 1;
-				format_end = strchr(format_start, ',');
-				if (format_end == NULL)
-				{
-					goto error_format;
-				}
-				unknown_format = hfst_strndup(format_start,
-                                              format_end - format_start + 1);
-				format_start = format_end + 1;
-				for (format_end = format_start; 
-						*format_end != '\0';
-						format_end++)
-                  {}
-				end_format = hfst_strndup(format_start,
-                                          format_end - format_start + 1);
-			}
-			break;
-error_format:
-			fprintf(message_out, "invalid argument for format"
-					"custom: must be of form BEGIN,LOOKUP,NO_RES,UNK,END\n");
-			return EXIT_FAILURE;
+            else
+              {
+                fprintf(stderr, "Unknown output format %s; valid values are: "
+                        "xerox, cg, apertium\n", optarg);
+                print_short_help(argv[0]);
+                return EXIT_FAILURE;
+              }
 			break;
         case 'F':
             if (strcmp(optarg, "utf8"))
@@ -287,9 +300,12 @@ error_format:
               {
                 input_format = APERTIUM_INPUT;
               }
-            else if (strcmp(optarg, "custom"))
+            else
               {
-                input_format = CUSTOM_INPUT;
+                fprintf(stderr, "Unknown input format %s; valid values are:"
+                        "utf8, spaces, apertium\n", optarg);
+                print_short_help(argv[0]);
+                return EXIT_FAILURE;
               }
             break;
 		case 'r':
@@ -310,30 +326,49 @@ error_format:
 	}
 
 	switch (output_format)
-	{
-    case XEROX_OUTPUT:
-      begin_format = hfst_strdup(XEROX_BEGIN_FORMAT);
-      lookup_format = hfst_strdup(XEROX_LOOKUP_FORMAT);
-      no_lookups_format = hfst_strdup(XEROX_NO_LOOKUPS_FORMAT);
-      unknown_format = hfst_strdup(XEROX_UNKNOWN_FORMAT);
-      end_format = hfst_strdup(XEROX_END_FORMAT);
+      {
+      case XEROX_OUTPUT:
+        begin_setf = hfst_strdup(XEROX_BEGIN_SETF);
+        lookupf = hfst_strdup(XEROX_LOOKUPF);
+        end_setf = hfst_strdup(XEROX_END_SETF);
+        empty_begin_setf = hfst_strdup(XEROX_EMPTY_BEGIN_SETF);
+        empty_lookupf = hfst_strdup(XEROX_EMPTY_LOOKUPF);
+        empty_end_setf = hfst_strdup(XEROX_EMPTY_END_SETF);
+        unknown_begin_setf = hfst_strdup(XEROX_UNKNOWN_BEGIN_SETF);
+        unknown_lookupf = hfst_strdup(XEROX_UNKNOWN_LOOKUPF);
+        unknown_end_setf = hfst_strdup(XEROX_UNKNOWN_END_SETF);
+        infinite_begin_setf = hfst_strdup(XEROX_INFINITE_BEGIN_SETF);
+        infinite_lookupf = hfst_strdup(XEROX_INFINITE_LOOKUPF);
+        infinite_end_setf = hfst_strdup(XEROX_INFINITE_END_SETF);
       break;
     case CG_OUTPUT:
-      begin_format = hfst_strdup(CG_BEGIN_FORMAT);
-      lookup_format = hfst_strdup(CG_LOOKUP_FORMAT);
-      no_lookups_format = hfst_strdup(CG_NO_LOOKUPS_FORMAT);
-      unknown_format = hfst_strdup(CG_UNKNOWN_FORMAT);
-      end_format = hfst_strdup(CG_END_FORMAT);
-      break;
+        begin_setf = hfst_strdup(CG_BEGIN_SETF);
+        lookupf = hfst_strdup(CG_LOOKUPF);
+        end_setf = hfst_strdup(CG_END_SETF);
+        empty_begin_setf = hfst_strdup(CG_EMPTY_BEGIN_SETF);
+        empty_lookupf = hfst_strdup(CG_EMPTY_LOOKUPF);
+        empty_end_setf = hfst_strdup(CG_EMPTY_END_SETF);
+        unknown_begin_setf = hfst_strdup(CG_UNKNOWN_BEGIN_SETF);
+        unknown_lookupf = hfst_strdup(CG_UNKNOWN_LOOKUPF);
+        unknown_end_setf = hfst_strdup(CG_UNKNOWN_END_SETF);
+        infinite_begin_setf = hfst_strdup(CG_INFINITE_BEGIN_SETF);
+        infinite_lookupf = hfst_strdup(CG_INFINITE_LOOKUPF);
+        infinite_end_setf = hfst_strdup(CG_INFINITE_END_SETF);
+        break;
     case APERTIUM_OUTPUT:
-      begin_format = hfst_strdup(APERTIUM_BEGIN_FORMAT);
-      lookup_format = hfst_strdup(APERTIUM_LOOKUP_FORMAT);
-      no_lookups_format = hfst_strdup(APERTIUM_NO_LOOKUPS_FORMAT);
-      unknown_format = hfst_strdup(APERTIUM_UNKNOWN_FORMAT);
-      end_format = hfst_strdup(APERTIUM_END_FORMAT);
-      break;
-    case CUSTOM_OUTPUT:
-      break;
+        begin_setf = hfst_strdup(APERTIUM_BEGIN_SETF);
+        lookupf = hfst_strdup(APERTIUM_LOOKUPF);
+        end_setf = hfst_strdup(APERTIUM_END_SETF);
+        empty_begin_setf = hfst_strdup(APERTIUM_EMPTY_BEGIN_SETF);
+        empty_lookupf = hfst_strdup(APERTIUM_EMPTY_LOOKUPF);
+        empty_end_setf = hfst_strdup(APERTIUM_EMPTY_END_SETF);
+        unknown_begin_setf = hfst_strdup(APERTIUM_UNKNOWN_BEGIN_SETF);
+        unknown_lookupf = hfst_strdup(APERTIUM_UNKNOWN_LOOKUPF);
+        unknown_end_setf = hfst_strdup(APERTIUM_UNKNOWN_END_SETF);
+        infinite_begin_setf = hfst_strdup(APERTIUM_INFINITE_BEGIN_SETF);
+        infinite_lookupf = hfst_strdup(APERTIUM_INFINITE_LOOKUPF);
+        infinite_end_setf = hfst_strdup(APERTIUM_INFINITE_END_SETF);
+        break;
     default:
       fprintf(stderr, "Unknown output format\n");
       return EXIT_FAILURE;
@@ -756,39 +791,55 @@ void
 print_lookups(KeyVectorSet* kvs, KeyTable* kt, const char* s, char* markup,
               bool outside_sigma, bool inf)
 {
-    // print loop
     if (outside_sigma)
       {
-        lookup_printf(unknown_format, s, NULL, markup);
+        lookup_printf(unknown_begin_setf, s, NULL, markup);
+        lookup_printf(unknown_lookupf, s, NULL, markup);
+        lookup_printf(unknown_end_setf, s, NULL, markup);
         no_analyses++;
       }
     else if (kvs->size() == 0)
       {
-        lookup_printf(no_lookups_format, s, NULL, markup);
+        lookup_printf(empty_begin_setf, s, NULL, markup);
+        lookup_printf(empty_lookupf, s, NULL, markup);
+        lookup_printf(empty_end_setf, s, NULL, markup);
         no_analyses++;
+      }
+    else if (inf)
+      {
+        analysed++;
+        lookup_printf(infinite_begin_setf, s, NULL, markup);
+        for (KeyVectorSet::iterator lkv = kvs->begin();
+                lkv != kvs->end();
+                ++lkv)
+        {
+            KeyVector* hmmlkv = *lkv;
+            string* lkvstr = keyVectorToString(hmmlkv, kt);
+            const char* lookup_full = lkvstr->c_str();
+            lookup_printf(infinite_lookupf, s, lookup_full, markup);
+            delete lkvstr;
+            analyses++;
+        }
+        lookup_printf(infinite_end_setf, s, NULL, markup);
       }
     else
       {
         analysed++;
-      }
 
-    lookup_printf(begin_format, s, NULL, markup);
-    for (KeyVectorSet::iterator lkv = kvs->begin();
-            lkv != kvs->end();
-            ++lkv)
-    {
-        KeyVector* hmmlkv = *lkv;
-        string* lkvstr = keyVectorToString(hmmlkv, kt);
-        const char* lookup_full = lkvstr->c_str();
-        lookup_printf(lookup_format, s, lookup_full, markup);
-        delete lkvstr;
-        analyses++;
-    }
-    if (inf)
-      {
-        lookup_printf(lookup_format, s, "[...cyclic...]", markup);
+        lookup_printf(begin_setf, s, NULL, markup);
+        for (KeyVectorSet::iterator lkv = kvs->begin();
+                lkv != kvs->end();
+                ++lkv)
+        {
+            KeyVector* hmmlkv = *lkv;
+            string* lkvstr = keyVectorToString(hmmlkv, kt);
+            const char* lookup_full = lkvstr->c_str();
+            lookup_printf(lookupf, s, lookup_full, markup);
+            delete lkvstr;
+            analyses++;
+        }
+        lookup_printf(end_setf, s, NULL, markup);
       }
-    lookup_printf(end_format, s, NULL, markup);
 }
 
 }
@@ -1004,22 +1055,24 @@ void
 print_lookups(KeyVectorSet* kvs, KeyTable* kt, const char* s, char* markup,
               bool outside_sigma, bool inf)
 {
-    // print loop
     if (outside_sigma)
       {
-        lookup_printf(unknown_format, s, NULL, markup);
+        lookup_printf(unknown_begin_setf, s, NULL, markup);
+        lookup_printf(unknown_lookupf, s, NULL, markup);
+        lookup_printf(unknown_end_setf, s, NULL, markup);
         no_analyses++;
       }
     else if (kvs->size() == 0)
       {
-        lookup_printf(no_lookups_format, s, NULL, markup);
+        lookup_printf(empty_begin_setf, s, NULL, markup);
+        lookup_printf(empty_lookupf, s, NULL, markup);
+        lookup_printf(empty_end_setf, s, NULL, markup);
         no_analyses++;
       }
-    else
+    else if (inf)
       {
         analysed++;
-
-        lookup_printf(begin_format, s, NULL, markup);
+        lookup_printf(infinite_begin_setf, s, NULL, markup);
         for (KeyVectorSet::iterator lkv = kvs->begin();
                 lkv != kvs->end();
                 ++lkv)
@@ -1027,16 +1080,29 @@ print_lookups(KeyVectorSet* kvs, KeyTable* kt, const char* s, char* markup,
             KeyVector* hmmlkv = *lkv;
             string* lkvstr = keyVectorToString(hmmlkv, kt);
             const char* lookup_full = lkvstr->c_str();
-            lookup_printf(lookup_format, s, lookup_full, markup);
+            lookup_printf(infinite_lookupf, s, lookup_full, markup);
             delete lkvstr;
             analyses++;
         }
-        if (inf)
-          {
-            lookup_printf(lookup_format, s, "[...cyclic...]", markup);
-          }
-        lookup_printf(end_format, s, NULL, markup);
+        lookup_printf(infinite_end_setf, s, NULL, markup);
+      }
+    else
+      {
+        analysed++;
 
+        lookup_printf(begin_setf, s, NULL, markup);
+        for (KeyVectorSet::iterator lkv = kvs->begin();
+                lkv != kvs->end();
+                ++lkv)
+        {
+            KeyVector* hmmlkv = *lkv;
+            string* lkvstr = keyVectorToString(hmmlkv, kt);
+            const char* lookup_full = lkvstr->c_str();
+            lookup_printf(lookupf, s, lookup_full, markup);
+            delete lkvstr;
+            analyses++;
+        }
+        lookup_printf(end_setf, s, NULL, markup);
       }
 }
 
@@ -1335,12 +1401,15 @@ int main( int argc, char **argv ) {
 	}
 	VERBOSE_PRINT("Reading from %s, writing to %s\n", 
 		inputfilename, outfilename);
-	VERBOSE_PRINT("Outputting in format:\n"
-			"  BEGIN:`%s',\n"
-			"  LOOKUP:`%s',\n"
-			"  NO_LOOKUPS:`%s',\n"
-			"  END:`%s'\n", begin_format, 
-			lookup_format, no_lookups_format, end_format);
+	VERBOSE_PRINT("Output formats:\n"
+			"  regular:`%s'`%s...'`%s',\n"
+			"  unanalysed:`%s'`%s'`%s',\n"
+			"  untokenised:`%s'`%s'`%s',\n"
+			"  infinite:`%s'`%s'`%s\n",
+            begin_setf, lookupf, end_setf,
+            empty_begin_setf, empty_lookupf, empty_end_setf,
+            unknown_begin_setf, unknown_lookupf, unknown_end_setf,
+            infinite_begin_setf, infinite_lookupf, infinite_end_setf);
 	// here starts the buffer handling part
 	if (!is_input_stdin)
 	{
