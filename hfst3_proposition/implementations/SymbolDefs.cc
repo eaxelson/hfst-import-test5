@@ -81,8 +81,8 @@ namespace hfst { namespace symbols
       std::string str_string(str);
       if (str_string == "\\")
 	{ return "\\\\"; }
-      if (str_string == " ")
-	{ return "\\x20";}
+      //if (str_string == " ")
+      //	{ return "\\x20";}
       return str;
     }
     catch ( HfstSymbolsException e) { throw e; }

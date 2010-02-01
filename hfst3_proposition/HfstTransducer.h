@@ -32,6 +32,7 @@ namespace hfst
   using hfst::implementations::LogWeightState;
   using hfst::implementations::LogWeightTransition;
   using hfst::implementations::LogWeightStateIndexer;
+  using hfst::implementations::WeightedStrings;
 
   enum ImplementationType
   {
@@ -65,11 +66,8 @@ namespace hfst
     StreamImplementation implementation;
     void read_transducer(HfstTransducer &t);
     ImplementationType stream_fst_type(std::istream &in);
-    bool has_tropical_weight_type(std::istream &in);
-    bool has_log_weight_type(std::istream &in);
     int read_library_header(std::istream &in);
     ImplementationType read_version_3_0_fst_type(std::istream &in);
-    
   public:
 
     HfstInputStream(void);
@@ -83,6 +81,23 @@ namespace hfst
     bool is_good(void);
     bool is_fst(void);
     friend class HfstTransducer;
+  };
+
+  class HfstOutputStream
+  {
+  protected:
+    union StreamImplementation
+    {
+      hfst::implementations::LogWeightOutputStream * log_ofst;
+    };
+    ImplementationType type;
+    StreamImplementation implementation;
+
+  public:
+    HfstOutputStream(ImplementationType type);
+    HfstOutputStream(const std::string &filename,ImplementationType type);
+    ~HfstOutputStream(void);
+    HfstOutputStream &operator<< (HfstTransducer &transducer);
   };
 
   class HfstTransducer
@@ -113,6 +128,8 @@ namespace hfst
     TransducerImplementation implementation; 
 
     void harmonize(HfstTransducer &another);
+    HfstTransducer &disjunct_as_tries(HfstTransducer &another,
+				      ImplementationType type);  
 
 #include "apply_schemas.h"
 
@@ -121,6 +138,8 @@ namespace hfst
     HfstTransducer(const KeyTable &key_table,ImplementationType type);
     HfstTransducer(const std::string& utf8_str, 
     		   const HfstTokenizer &multichar_symbol_tokenizer,
+		   ImplementationType type);
+    HfstTransducer(KeyPairVector * kpv, 
 		   ImplementationType type);
     HfstTransducer(const std::string& upper_utf8_str,
     		   const std::string& lower_utf8_str,
@@ -132,6 +151,7 @@ namespace hfst
     HfstTransducer &remove_epsilons(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &determinize(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &minimize(ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &n_best(int n,ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &repeat_star(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &repeat_plus(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &repeat_n(unsigned int n,
@@ -146,6 +166,7 @@ namespace hfst
     HfstTransducer &invert(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &input_project(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &output_project(ImplementationType type=UNSPECIFIED_TYPE);
+    void extract_strings(WeightedStrings<float>::Set &results);
     HfstTransducer &substitute(Key old_key,Key new_key);
     HfstTransducer &substitute(const std::string &old_symbol,
 			       const std::string &new_symbol);
@@ -169,6 +190,10 @@ namespace hfst
       { (void)weight; 
 	throw hfst::implementations::FunctionNotImplementedException(); }
 
+    template<class W> HfstTransducer &transform_weights(W (*func)(W weight)) 
+      { (void)func; 
+	throw hfst::implementations::FunctionNotImplementedException(); }
+
     template<class T> typename T::const_iterator begin(void)
       { throw hfst::implementations::FunctionNotImplementedException(); }
 
@@ -177,12 +202,21 @@ namespace hfst
 
     HfstTransducer &anonymize(void);
     KeyTable &get_key_table(void);
+    void set_key_table(const KeyTable &kt);
     ImplementationType get_type(void);
     HfstTransducer &convert(ImplementationType type);
     friend std::ostream &operator<<(std::ostream &out, HfstTransducer &t);
     friend class HfstInputStream;
+    friend class HfstOutputStream;
   };
+
+  template<> 
+    HfstTransducer &HfstTransducer::set_final_weight<float>(float weight);
+
+  template<> 
+    HfstTransducer &HfstTransducer::transform_weights<float>(float (*func)(float));
 
   std::ostream &operator<<(std::ostream &out,HfstTransducer &t);
 }
+
 #endif
