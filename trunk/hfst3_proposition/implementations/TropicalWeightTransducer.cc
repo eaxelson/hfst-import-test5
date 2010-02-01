@@ -494,6 +494,16 @@ namespace hfst { namespace implementations
   { return new StdVectorFst(RmEpsilonFst<StdArc>(*t)); }
 
   StdVectorFst * 
+  TropicalWeightTransducer::n_best(StdVectorFst * t,int n)
+  { 
+    if (n < 0)
+      { throw ImpossibleTransducerPowerExcpetion(); }
+    StdVectorFst * n_best_fst = new StdVectorFst(); 
+    fst::ShortestPath(*t,n_best_fst,(size_t)n);
+    return n_best_fst;
+  }
+
+  StdVectorFst * 
   TropicalWeightTransducer::repeat_star(StdVectorFst * t)
   { return new StdVectorFst(ClosureFst<StdArc>(*t,CLOSURE_STAR)); }
 
@@ -681,7 +691,45 @@ namespace hfst { namespace implementations
     RelabelFst<StdArc> t_subst(*t,v,v);
     return new StdVectorFst(t_subst);
   }
-} }
+
+  void extract_reversed_strings
+  (StdVectorFst * t, StdArc::StateId s, KeyTable &kt,
+   WeightedStrings<float>::Vector &reversed_results)
+  {
+    WeightedStrings<float>::Vector reversed_continuations;
+    for (fst::ArcIterator<StdVectorFst> it(*t,s); !it.Done(); it.Next())
+      {
+	const StdArc &arc = it.Value();
+	extract_reversed_strings(t,arc.nextstate,kt,reversed_continuations);
+	std::string istring;
+	std::string ostring;
+
+	if (arc.ilabel != 0)
+	  { istring = kt[arc.ilabel]; }
+	if (arc.olabel != 0)
+	  { ostring = kt[arc.olabel]; }
+	WeightedString<float> 
+	  arc_string(istring,ostring,arc.weight.Value());
+	WeightedStrings<float>::add(arc_string,reversed_continuations);
+	WeightedStrings<float>::cat(reversed_results,reversed_continuations);
+	reversed_continuations.clear();
+      }
+    if (t->Final(s) != TropicalWeight::Zero()) 
+      { reversed_results.push_back(WeightedString<float>
+				   ("","",t->Final(s).Value())); }
+  }
+
+  void TropicalWeightTransducer::extract_strings
+  (StdVectorFst * t, KeyTable &kt, WeightedStrings<float>::Set &results)
+  {
+    if (t->Start() == -1)
+      { return; }
+    WeightedStrings<float>::Vector reversed_results;
+    extract_reversed_strings(t,t->Start(),kt,reversed_results);
+    results.insert(reversed_results.begin(),reversed_results.end());
+  }
+  }
+}
 
 #ifdef DEBUG_MAIN
 using namespace hfst::implementations;

@@ -5,6 +5,7 @@
 #include <map>
 #include <iostream>
 #include <sstream>
+#include <set>
 #include "HfstExceptions.h"
 
 namespace hfst
@@ -21,6 +22,7 @@ namespace symbols
   typedef std::pair<Key,Key> KeyPair;
   typedef std::pair<StringSymbol,StringSymbol> StringSymbolPair;
   typedef std::map<StringSymbol,Symbol> StringSymbolMap;
+  typedef std::set<StringSymbol> StringSymbolSet;
   typedef std::map<Key,Key> KeyMap;
   typedef std::vector<KeyPair> KeyPairVector;
 

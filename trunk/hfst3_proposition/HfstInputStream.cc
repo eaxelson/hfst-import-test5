@@ -26,76 +26,6 @@ namespace hfst
 	  }
   }
 
-  bool HfstInputStream::has_tropical_weight_type(std::istream &in)
-  {
-    if ((char)in.peek() != (char)214)
-      { return false; }
-
-    char prefix[18];
-    prefix[0] = 0;
-    size_t prefix_characters_read = in.readsome(prefix,18);
-    if (prefix_characters_read != 18)
-      {
-	for (unsigned int i = 0; i < prefix_characters_read; ++i)
-	  { in.putback(prefix[prefix_characters_read - i]); }
-	return false;
-      }
-    char identifier[9];
-    identifier[0] = 0;
-    size_t identifier_characters_read = in.readsome(identifier,8);
-    if (identifier_characters_read != 8)
-      {
-	for (unsigned int i = 0; i < identifier_characters_read; ++i)
-	  { in.putback(identifier[identifier_characters_read - i]); }
-	for (unsigned int i = 0; i < prefix_characters_read; ++i)
-	  { in.putback(prefix[prefix_characters_read - i]); }
-	return false;
-      }
-    identifier[8] = 0;
-    std::cerr << "identifier: " << identifier << std::endl;
-    bool result = strcmp(identifier,"standard") == 0;
-    for (unsigned int i = 0; i < identifier_characters_read; ++i)
-      { in.putback(identifier[identifier_characters_read - i]); }
-    for (unsigned int i = 0; i < prefix_characters_read; ++i)
-      { in.putback(prefix[prefix_characters_read - i]); }
-    return result;
-  }
-
-  bool HfstInputStream::has_log_weight_type(std::istream &in)
-  {
-    if ((char)in.peek() != (char)214)
-      { return false; }
-
-    char prefix[18];
-    prefix[0] = 0;
-    size_t prefix_characters_read = in.readsome(prefix,18);
-    if (prefix_characters_read != 18)
-      {
-	for (unsigned int i = 0; i < prefix_characters_read; ++i)
-	  { in.putback(prefix[prefix_characters_read - i]); }
-	return false;
-      }
-    char identifier[4];
-    identifier[0] = 0;
-    size_t identifier_characters_read = in.readsome(identifier,3);
-    if (identifier_characters_read != 3)
-      {
-	for (unsigned int i = 0; i < identifier_characters_read; ++i)
-	  { in.putback(identifier[identifier_characters_read - i]); }
-	for (unsigned int i = 0; i < prefix_characters_read; ++i)
-	  { in.putback(prefix[prefix_characters_read - i]); }
-	return false;
-      }
-    identifier[3] = 0;
-    std::cerr << "identifier: " << identifier << std::endl;
-    bool result = strcmp(identifier,"log") == 0;
-    for (unsigned int i = 0; i < identifier_characters_read; ++i)
-      { in.putback(identifier[identifier_characters_read - i]); }
-    for (unsigned int i = 0; i < prefix_characters_read; ++i)
-      { in.putback(prefix[prefix_characters_read - i]); }
-    return result;
-  }
-
   ImplementationType HfstInputStream::read_version_3_0_fst_type
   (std::istream &in) 
   {
@@ -161,10 +91,12 @@ namespace hfst
       implementation.tropical_ofst = 
 	new hfst::implementations::TropicalWeightInputStream;
       break;
-	  case ERROR_TYPE:
-	  case UNSPECIFIED_TYPE:
-	  default:
-		throw hfst::exceptions::NotTransducerStreamException();
+    case LOG_OFST_TYPE:
+      implementation.log_ofst = 
+	new hfst::implementations::LogWeightInputStream;
+      break;
+    default:
+      throw hfst::exceptions::NotTransducerStreamException();
     }
   }
 

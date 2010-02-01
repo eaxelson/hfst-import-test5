@@ -2,6 +2,7 @@
 #include "SymbolDefs.h"
 #include "HfstExceptions.h"
 #include "openfst-1.1/src/include/fst/fstlib.h"
+#include "ExtractStrings.h"
 #include <cstdio>
 #include <string>
 #include <sstream>
@@ -17,6 +18,7 @@ namespace implementations
   using namespace hfst::symbols;
   using std::ostream;
   using std::ostringstream;
+  using std::stringstream;
 
   extern GlobalSymbolTable global_symbol_table;
   class TropicalWeightInputStream 
@@ -148,6 +150,7 @@ namespace implementations
       static StdVectorFst * determinize(StdVectorFst * t);
       static StdVectorFst * minimize(StdVectorFst * t);
       static StdVectorFst * remove_epsilons(StdVectorFst * t);
+      static StdVectorFst * n_best(StdVectorFst * t,int n);
       static StdVectorFst * repeat_star(StdVectorFst * t);
       static StdVectorFst * repeat_plus(StdVectorFst * t);
       static StdVectorFst * repeat_n(StdVectorFst * t,int n);
@@ -157,6 +160,8 @@ namespace implementations
       static StdVectorFst * reverse(StdVectorFst * transducer);
       static StdVectorFst * extract_input_language(StdVectorFst * t);
       static StdVectorFst * extract_output_language(StdVectorFst * t);
+      static void extract_strings(StdVectorFst * t, KeyTable &kt,
+				  WeightedStrings<float>::Set &results);
       static StdVectorFst * substitute(StdVectorFst * t,Key old_key,Key new_key);
       static StdVectorFst * substitute(StdVectorFst * t,
 			      KeyPair old_key_pair,

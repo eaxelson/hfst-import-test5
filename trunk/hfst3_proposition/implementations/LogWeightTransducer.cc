@@ -3,11 +3,11 @@
 namespace hfst { namespace implementations
 {
   LogWeightInputStream::LogWeightInputStream(void):
-    i_stream(),input_stream(cin)
+    filename(""),i_stream(),input_stream(cin),first_read(true)
   {}
-  LogWeightInputStream::LogWeightInputStream(const char * filename):
-    filename(filename),i_stream(filename),input_stream(i_stream)
-  {}
+  LogWeightInputStream::LogWeightInputStream(const char * fn):
+    filename(fn),i_stream(fn),input_stream(i_stream),first_read(true)
+    {}
 
   /* Need to check if i_symbol_table and o_symbol_table are compatible! 
      That is to see that there isn't a name "x" s.t. the input symbol number
@@ -54,13 +54,13 @@ namespace hfst { namespace implementations
 
   /* Skip the identifier string "LOG_OFST_TYPE" */
   void LogWeightInputStream::skip_identifier_version_3_0(void)
-  { i_stream.ignore(14); }
+  { input_stream.ignore(14); }
 
   void LogWeightInputStream::skip_hfst_header(void)
   {
-    i_stream.ignore(6);
+    input_stream.ignore(6);
     char c;
-    i_stream.get(c);
+    input_stream.get(c);
     switch (c)
       {
       case 0:
@@ -85,7 +85,7 @@ namespace hfst { namespace implementations
   }
   bool LogWeightInputStream::is_eof(void) const
   {
-    if (filename == string())
+    if (filename.empty())
       { return std::cin.eof(); }
     else
       { return input_stream.peek() == EOF; }
@@ -127,13 +127,15 @@ namespace hfst { namespace implementations
 
   LogFst * LogWeightInputStream::read_transducer(KeyTable &key_table)
   {
-    if (is_eof())
+    if (this->is_eof())
       { throw FileIsClosedException(); }
-    LogFst * t;
+    LogFst * t = NULL;
     FstHeader header;
     try 
       {
 	skip_hfst_header();
+	first_read = false;
+
 	if (filename == string())
 	  {
 	    header.Read(input_stream,"STDIN");			    
@@ -154,7 +156,7 @@ namespace hfst { namespace implementations
 	  { throw TransducerHasWrongTypeException(); }
       }
     catch (TransducerHasWrongTypeException e)
-      { throw e; }
+      { delete t; throw e; }
 
     try
       {
@@ -178,8 +180,47 @@ namespace hfst { namespace implementations
     catch (HfstInterfaceException e)
       { throw e; }
   }
+  LogWeightOutputStream::LogWeightOutputStream(void):
+    output_stream(std::cout)
+  {}
+
+  LogWeightOutputStream::LogWeightOutputStream(const char * str):
+    filename(str),o_stream(str,std::ios::out),output_stream(o_stream)
+  {}
+
+  void LogWeightOutputStream::open(void) {}
+  void LogWeightOutputStream::close(void) 
+  {
+    if (filename != string())
+      { o_stream.close(); }
+  }
+  void LogWeightOutputStream::set_symbols(LogFst * transducer, KeyTable &key_table) 
+  {
+    SymbolTable symbol_table("anonym_hfst3_symbol_table");
+    for (KeyTable::const_iterator it = key_table.begin();
+	 it != key_table.end();
+	 ++it)
+      { symbol_table.AddSymbol(key_table[it->key],it->key); }
+    transducer->SetInputSymbols(&symbol_table);
+    transducer->SetOutputSymbols(&symbol_table);
+  }
+  void LogWeightOutputStream::write_3_0_library_header(std::ostream &out)
+  {
+    out.write("HFST3",6);
+    out.put(0);
+    out.write("LOG_OFST_TYPE",14);
+  }
+  void LogWeightOutputStream::write_transducer(LogFst * transducer, KeyTable &key_table) 
+  { set_symbols(transducer,key_table);
+    write_3_0_library_header(output_stream);
+    transducer->Write(output_stream,FstWriteOptions()); }
+
+  void LogWeightOutputStream::write_transducer(LogFst * transducer) 
+  { write_3_0_library_header(output_stream);
+    transducer->Write(output_stream,FstWriteOptions()); }
+
   LogWeightState::LogWeightState(StateId state,
-					   LogFst * t):
+				 LogFst * t):
     state(state), t(t) {}
 
   LogWeightState::LogWeightState(const LogWeightState &s)
@@ -465,7 +506,7 @@ namespace hfst { namespace implementations
   LogWeightTransducer::determinize(LogFst * t)
   {
     RmEpsilonFst<LogArc> rm(*t);
-    EncodeMapper<LogArc> encode_mapper(0x0001,ENCODE);
+    EncodeMapper<LogArc> encode_mapper(0x0001,fst::EncodeType(1));
     EncodeFst<LogArc> enc(rm,
 			  &encode_mapper);
     DeterminizeFst<LogArc> det(enc);
@@ -478,13 +519,12 @@ namespace hfst { namespace implementations
   (LogFst * t)
   {
     LogFst * determinized_t = determinize(t);
-    EncodeMapper<LogArc> encode_mapper(0x0001,ENCODE);
+    EncodeMapper<LogArc> encode_mapper(0x0001|0x0002,fst::EncodeType(1));
     EncodeFst<LogArc> enc(*determinized_t,
 			  &encode_mapper);
     LogFst fst_enc(enc);
     Minimize<LogArc>(&fst_enc);
-    DeterminizeFst<LogArc> minimized_t(enc);
-    DecodeFst<LogArc> dec(minimized_t,
+    DecodeFst<LogArc> dec(fst_enc,
 			  encode_mapper);
     delete determinized_t;
     return new LogFst(dec);
@@ -493,6 +533,16 @@ namespace hfst { namespace implementations
   LogFst * 
   LogWeightTransducer::remove_epsilons(LogFst * t)
   { return new LogFst(RmEpsilonFst<LogArc>(*t)); }
+
+  LogFst * 
+  LogWeightTransducer::n_best(LogFst * t,int n)
+  { 
+    if (n < 0)
+      { throw ImpossibleTransducerPowerExcpetion(); }
+    LogFst * n_best_fst = new LogFst(); 
+    fst::ShortestPath(*t,n_best_fst,(size_t)n);
+    return n_best_fst;
+  }
 
   LogFst * 
   LogWeightTransducer::repeat_star(LogFst * t)
@@ -579,7 +629,7 @@ namespace hfst { namespace implementations
 			    KeyPair old_key_pair,
 			    KeyPair new_key_pair)
   {
-    EncodeMapper<LogArc> encode_mapper(0x0001,ENCODE);
+    EncodeMapper<LogArc> encode_mapper(0x0001,fst::EncodeType(1));
     EncodeFst<LogArc> enc(*t,&encode_mapper);
 
     LogArc old_pair_code = 
@@ -601,8 +651,10 @@ namespace hfst { namespace implementations
   }
 
   LogFst * LogWeightTransducer::compose(LogFst * t1,
-			 LogFst * t2)
+					LogFst * t2)
   {
+    fst::ArcSort<LogArc,fst::OLabelCompare<LogArc> > (t1,OLabelCompare<LogArc>());
+    //fst::ArcSort<LogArc,fst::ILabelCompare<LogArc> > (t2,ILabelCompare<LogArc>());
     ComposeFst<LogArc> compose(*t1,*t2);
     return new LogFst(compose);
   }
@@ -621,6 +673,10 @@ namespace hfst { namespace implementations
     return new LogFst(disjunct);
   }
 
+  void LogWeightTransducer::disjunct_as_tries(LogFst &t1,
+					      const LogFst * t2)
+  { HFST_IMPLEMENTATIONS::disjunct_as_tries(t1,t1.Start(),t2,t2->Start()); }
+  
   LogFst * LogWeightTransducer::intersect(LogFst * t1,
 			   LogFst * t2)
   {
@@ -643,6 +699,26 @@ namespace hfst { namespace implementations
       {
 	if (t_copy->Final(iter.Value()) != fst::LogWeight::Zero())
 	  { t_copy->SetFinal(iter.Value(),f); }
+      }
+    return t_copy;
+  }
+
+  LogFst * LogWeightTransducer::transform_weights
+  (LogFst * t,float(*func)(float))
+  {
+    LogFst * t_copy = new LogFst(*t);
+    for (fst::StateIterator<LogFst> iter(*t_copy); 
+	 not iter.Done(); iter.Next())
+      {
+	LogArc::StateId s = iter.Value();
+	t_copy->SetFinal(s,func(t_copy->Final(s).Value()));
+	for (fst::MutableArcIterator<LogFst> aiter(t_copy,s);
+	     !aiter.Done(); aiter.Next())
+	  {
+	    const LogArc &a = aiter.Value();
+	    aiter.SetValue(LogArc(a.ilabel,a.olabel,
+				  func(a.weight.Value()),a.nextstate));
+	  }
       }
     return t_copy;
   }
@@ -682,7 +758,48 @@ namespace hfst { namespace implementations
     RelabelFst<LogArc> t_subst(*t,v,v);
     return new LogFst(t_subst);
   }
-} }
+
+  void extract_reversed_strings
+  (LogFst * t, LogArc::StateId s, KeyTable &kt,
+   WeightedStrings<float>::Vector &reversed_results)
+  {
+    WeightedStrings<float>::Vector reversed_continuations;
+    for (fst::ArcIterator<LogFst> it(*t,s); !it.Done(); it.Next())
+      {
+	const LogArc &arc = it.Value();
+	extract_reversed_strings(t,arc.nextstate,kt,reversed_continuations);
+	std::string istring;
+	std::string ostring;
+
+	if (arc.ilabel != 0)
+	  { istring = kt[arc.ilabel]; }
+	if (arc.olabel != 0)
+	  { ostring = kt[arc.olabel]; }
+	WeightedString<float> 
+	  arc_string(istring,ostring,arc.weight.Value());
+	WeightedStrings<float>::add(arc_string,reversed_continuations);
+	WeightedStrings<float>::cat(reversed_results,reversed_continuations);
+	reversed_continuations.clear();
+      }
+    if (t->Final(s) != LogWeight::Zero()) 
+      { reversed_results.push_back(WeightedString<float>
+				   ("","",t->Final(s).Value())); }
+  }
+
+
+  void LogWeightTransducer::extract_strings
+  (LogFst * t, KeyTable &kt, WeightedStrings<float>::Set &results)
+  {
+    if (t->Start() == -1)
+      { return; }
+    WeightedStrings<float>::Vector reversed_results;
+    extract_reversed_strings(t,t->Start(),kt,reversed_results);
+    //WeightedStrings<float>::reverse_strings(reversed_results);
+    results.insert(reversed_results.begin(),reversed_results.end());
+  }
+  
+  }
+}
 
 #ifdef DEBUG_MAIN
 using namespace hfst::implementations;

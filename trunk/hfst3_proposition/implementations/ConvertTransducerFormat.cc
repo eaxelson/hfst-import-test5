@@ -57,8 +57,11 @@ tropical_ofst_to_internal_format(fst::StdVectorFst * t)
 
 InternalTransducer * log_ofst_to_internal_format
 (LogFst * t)
-{ return new fst::StdVectorFst(*dynamic_cast<fst::StdVectorFst*>(t)); }
-
+{ //return new fst::StdVectorFst(*dynamic_cast<fst::StdVectorFst*>(t)); }
+  InternalTransducer * u = new InternalTransducer;
+  fst::Cast<LogFst,InternalTransducer>(*t,u);
+  return u;
+}
 SFST::Transducer *  internal_format_to_sfst
 (InternalTransducer * internal_transducer)
 {
@@ -112,10 +115,10 @@ fst::StdVectorFst * internal_format_to_openfst(InternalTransducer * t)
 
 
 LogFst * internal_format_to_log_ofst(InternalTransducer * t)
-{ return new LogFst(*dynamic_cast<LogFst*>(t)); }
-
+{ LogFst * u = new LogFst;
+  fst::Cast<InternalTransducer,LogFst>(*t,u);
+  return u; }
 } }
-
 #ifdef DEBUG_CONVERT
 /********************************
  *                              *

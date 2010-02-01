@@ -2,6 +2,8 @@
 #include "SymbolDefs.h"
 #include "HfstExceptions.h"
 #include "openfst-1.1/src/include/fst/fstlib.h"
+#include "LogFstTrieFunctions.h"
+#include "ExtractStrings.h"
 #include <cstdio>
 #include <string>
 #include <sstream>
@@ -26,6 +28,7 @@ namespace hfst { namespace implementations
     std::string filename;
     ifstream i_stream;
     istream &input_stream;
+    bool first_read;
     void populate_key_table(KeyTable &key_table,
 			    const SymbolTable * i_symbol_table,
 			    const SymbolTable * o_symbol_table,
@@ -34,7 +37,7 @@ namespace hfst { namespace implementations
     void skip_hfst_header(void);
   public:
     LogWeightInputStream(void);
-    LogWeightInputStream(const char * filename);
+    LogWeightInputStream(const char * fn);
     void open(void);
     void close(void);
     bool is_open(void) const;
@@ -46,6 +49,24 @@ namespace hfst { namespace implementations
     LogFst * read_transducer(KeyTable &key_table);
     LogFst * read_transducer(void);
   };
+
+  class LogWeightOutputStream 
+  {
+  private:
+    std::string filename;
+    ofstream o_stream;
+    ostream &output_stream;
+    void set_symbols(LogFst * transducer, KeyTable &key_table);
+    void write_3_0_library_header(std::ostream &out);
+  public:
+    LogWeightOutputStream(void); 
+    LogWeightOutputStream(const char * filename);
+    void open(void);
+    void close(void);
+    void write_transducer(LogFst * transducer, KeyTable &key_table);
+    void write_transducer(LogFst * transducer);
+  };
+
 
   class LogWeightTransitionIterator;
   class LogWeightStateIndexer;
@@ -149,6 +170,7 @@ namespace hfst { namespace implementations
       static LogFst * determinize(LogFst * t);
       static LogFst * minimize(LogFst * t);
       static LogFst * remove_epsilons(LogFst * t);
+      static LogFst * n_best(LogFst * t,int n);
       static LogFst * repeat_star(LogFst * t);
       static LogFst * repeat_plus(LogFst * t);
       static LogFst * repeat_n(LogFst * t,int n);
@@ -168,16 +190,21 @@ namespace hfst { namespace implementations
 					LogFst * t2);
       static LogFst * disjunct(LogFst * t1,
 			      LogFst * t2);
+      static void disjunct_as_tries(LogFst &t1,
+				    const LogFst * t2);
       static LogFst * intersect(LogFst * t1,
 			     LogFst * t2);
       static LogFst * subtract(LogFst * t1,
 			    LogFst * t2);
       static LogFst * set_weight(LogFst * t,float f);
+      static LogFst * transform_weights(LogFst * t,float(*func)(float));
       typedef LogWeightStateIterator const_iterator;
       static const_iterator begin(LogFst * t);
       static const_iterator end(LogFst * t);
       static LogFst * harmonize(LogFst * t,KeyMap &key_map);
       static void print(LogFst * t, KeyTable &key_table, ostream &out);
+      static void extract_strings(LogFst * t, KeyTable &kt,
+				  WeightedStrings<float>::Set &results);
     };
 
 } }

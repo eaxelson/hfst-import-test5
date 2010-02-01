@@ -446,7 +446,7 @@ Copyright (C) 2009 Free Software Foundation, Inc.
 This config.status script is free software; the Free Software Foundation
 gives unlimited permission to copy, distribute and modify it."
 
-ac_pwd='/home/mpsilfve/hfst3/implementations/openfst-1.1'
+ac_pwd='/home/mpsilfve/trunk/hfst3_proposition/implementations/openfst-1.1'
 srcdir='.'
 INSTALL='/usr/bin/install -c'
 MKDIR_P='/home/mpsilfve/bin/mkdir -p'
@@ -916,7 +916,7 @@ S["CXXFLAGS"]="-g -O2"
 S["CXX"]="g++"
 S["am__untar"]="${AMTAR} xf -"
 S["am__tar"]="${AMTAR} chof - \"$$tardir\""
-S["AMTAR"]="${SHELL} /home/mpsilfve/hfst3/implementations/openfst-1.1/missing --run tar"
+S["AMTAR"]="${SHELL} /home/mpsilfve/trunk/hfst3_proposition/implementations/openfst-1.1/missing --run tar"
 S["am__leading_dot"]="."
 S["SET_MAKE"]=""
 S["AWK"]="gawk"
@@ -924,12 +924,12 @@ S["mkdir_p"]="/home/mpsilfve/bin/mkdir -p"
 S["MKDIR_P"]="/home/mpsilfve/bin/mkdir -p"
 S["INSTALL_STRIP_PROGRAM"]="$(install_sh) -c -s"
 S["STRIP"]="strip"
-S["install_sh"]="${SHELL} /home/mpsilfve/hfst3/implementations/openfst-1.1/install-sh"
-S["MAKEINFO"]="${SHELL} /home/mpsilfve/hfst3/implementations/openfst-1.1/missing --run makeinfo"
-S["AUTOHEADER"]="${SHELL} /home/mpsilfve/hfst3/implementations/openfst-1.1/missing --run autoheader"
-S["AUTOMAKE"]="${SHELL} /home/mpsilfve/hfst3/implementations/openfst-1.1/missing --run automake-1.11"
-S["AUTOCONF"]="${SHELL} /home/mpsilfve/hfst3/implementations/openfst-1.1/missing --run autoconf"
-S["ACLOCAL"]="${SHELL} /home/mpsilfve/hfst3/implementations/openfst-1.1/missing --run aclocal-1.11"
+S["install_sh"]="${SHELL} /home/mpsilfve/trunk/hfst3_proposition/implementations/openfst-1.1/install-sh"
+S["MAKEINFO"]="${SHELL} /home/mpsilfve/trunk/hfst3_proposition/implementations/openfst-1.1/missing --run makeinfo"
+S["AUTOHEADER"]="${SHELL} /home/mpsilfve/trunk/hfst3_proposition/implementations/openfst-1.1/missing --run autoheader"
+S["AUTOMAKE"]="${SHELL} /home/mpsilfve/trunk/hfst3_proposition/implementations/openfst-1.1/missing --run automake-1.11"
+S["AUTOCONF"]="${SHELL} /home/mpsilfve/trunk/hfst3_proposition/implementations/openfst-1.1/missing --run autoconf"
+S["ACLOCAL"]="${SHELL} /home/mpsilfve/trunk/hfst3_proposition/implementations/openfst-1.1/missing --run aclocal-1.11"
 S["VERSION"]="1.1"
 S["PACKAGE"]="openfst"
 S["CYGPATH_W"]="echo"
