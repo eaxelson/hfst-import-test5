@@ -33,6 +33,7 @@ namespace hfst
   using hfst::implementations::LogWeightTransition;
   using hfst::implementations::LogWeightStateIndexer;
   using hfst::implementations::WeightedStrings;
+  using hfst::implementations::WeightedString;
 
   enum ImplementationType
   {
