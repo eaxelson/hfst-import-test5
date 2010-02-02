@@ -1,5 +1,7 @@
 #include "hfst-optimized-lookup-transducer.h"
 
+std::set<Key> HfstFstState::flag_diacritic_set;
+
 void HfstIdNumberMap::add_node(const Node * n)
 {
   if (node_to_id.find(n) == node_to_id.end())
@@ -98,8 +100,8 @@ void HfstTransition::display(void)
 }
 #endif
 
-bool HfstTransition::operator<( const HfstTransition &another_transition)
-  const
+bool HfstTransition::numerical_cmp( const HfstTransition &another_transition)
+const
 {
   if (input_symbol == another_transition.input_symbol)
     {
@@ -110,6 +112,27 @@ bool HfstTransition::operator<( const HfstTransition &another_transition)
       return output_symbol < another_transition.output_symbol;
     }
   return input_symbol < another_transition.input_symbol;
+}
+
+bool HfstTransition::operator<( const HfstTransition &another_transition)
+  const
+{
+  if ((input_symbol == 0) or HfstFstState::is_flag_diacritic(input_symbol))
+    {
+      if ((another_transition.input_symbol == 0) or
+	  HfstFstState::is_flag_diacritic(another_transition.input_symbol))
+	{ return numerical_cmp(another_transition); }
+      else
+	{ return true; } 
+    }
+  else
+    {
+      if ((another_transition.input_symbol != 0) and
+	  not HfstFstState::is_flag_diacritic(another_transition.input_symbol))
+	{ return numerical_cmp(another_transition); }
+      else
+	{ return false; } 
+    }
 }
 
 void HfstTransition::write_empty_transition(FILE * f, bool final)
@@ -237,7 +260,15 @@ void HfstFstState::set_transitions(const Node * n)
        aiter++)
     {
       const Arc a = *aiter;
-      HfstTransition * t = new HfstTransition(n,a);
+      HfstTransition * t;
+      //      if (is_flag_diacritic(a.label().lower_char()))
+      //	{
+      //	  t = new HfstTransition(n,a,true);
+      //	}
+      //else
+      //	{
+	  t = new HfstTransition(n,a);
+	  //	}
       transitions.insert(t);
     }
 }
@@ -246,7 +277,8 @@ void HfstFstState::set_transition_indices(void)
 {
   SymbolNumber previous_symbol = NO_SYMBOL_NUMBER;
   SymbolNumber position = 0;
-
+  
+  bool zero_transitions = false;
   for (HfstTransitionSet::iterator it = transitions.begin();
        it != transitions.end();
        ++it)
@@ -255,10 +287,26 @@ void HfstFstState::set_transition_indices(void)
       SymbolNumber input_symbol = t->return_input_symbol();
       if (previous_symbol != input_symbol)
 	{
-	  transition_indices.insert(new HfstTransitionIndex(input_symbol,
-							position));
-	  previous_symbol = input_symbol;
+	  if (is_flag_diacritic(input_symbol))
+	    {
+	      if (not zero_transitions)
+		{
+		  transition_indices.insert(new HfstTransitionIndex(0,
+								    position));
+		  
+		  previous_symbol = input_symbol;
+		  zero_transitions =true;
+		}
+	    }
+	  else
+	    {
+	      transition_indices.insert(new HfstTransitionIndex(input_symbol,
+								position));
+	      
+	      previous_symbol = input_symbol;
+	    }
 	}
+      if (input_symbol == 0) { zero_transitions = true; }		
       ++position;
     }
 }
