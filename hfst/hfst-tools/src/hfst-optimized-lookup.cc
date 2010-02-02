@@ -23,12 +23,6 @@
   TODO: USE THE EXISTING HFST-TOOLS FRAMEWORK BETTER.
  */
 
-#include <getopt.h>
-#include <cstdlib>
-#include <climits>
-#include <iostream>
-#include <config.h>
-
 #include "hfst-optimized-lookup.h"
 
 bool print_usage(void)
@@ -50,6 +44,9 @@ bool print_usage(void)
     "  -n N, --analyses=N          Output no more than N analyses\n" <<
     "                              (if the transducer is weighted, the N best analyses)\n" <<
     "  -x, --xerox                 Xerox output format (default)\n" <<
+    "  -f, --fast                  Be as fast as possible.\n" <<
+    "                              (with this option enabled -u and -n don't work and\n" <<
+    "                              output won't be ordered by weight).\n" <<
     "\n" <<
     "Note that " << PACKAGE_NAME << " is *not* guaranteed to behave identically to\n" <<
     "hfst-lookup (although it almost always does): input-side multicharacter symbols\n" <<
@@ -96,12 +93,13 @@ int main(int argc, char **argv)
 	  {"show-weights", no_argument,       0, 'w'},
 	  {"unique",       no_argument,       0, 'u'},
 	  {"xerox",        no_argument,       0, 'x'},
+	  {"fast",         no_argument,       0, 'f'},
 	  {"analyses",     required_argument, 0, 'n'},
 	  {0,              0,                 0,  0 }
 	};
       
       int option_index = 0;
-      c = getopt_long(argc, argv, "hVvqsewuxn:", long_options, &option_index);
+      c = getopt_long(argc, argv, "hVvqsewuxfn:", long_options, &option_index);
 
       if (c == -1) // no more options to look at
 	break;
@@ -166,6 +164,10 @@ int main(int argc, char **argv)
 
 	case 'x':
 	  outputType = xerox;
+	  break;
+
+	case 'f':
+	  beFast = true;
 	  break;
 	  
 	default:
@@ -246,16 +248,20 @@ void TransducerAlphabet::get_next_symbol(FILE * f, SymbolNumber k)
       operations.push_back(FlagDiacriticOperation(op, feature_bucket[feat], value_bucket[val]));
       operation_peek.push_back(k);
       kt->operator[](k) = strdup("");
+      
 #if OL_FULL_DEBUG
-      std::cout << "symbol number " << k << " is " << line << std::endl;
+      std::cout << "symbol number " << k << " (flag) is " << line << std::endl;
       kt->operator[](k) = strdup(line);
 #endif
+      
       return;
     }
   operations.push_back(FlagDiacriticOperation()); // dummy flag
+
 #if OL_FULL_DEBUG
   std::cout << "symbol number " << k << " is " << line << std::endl;
 #endif
+  
   kt->operator[](k) = strdup(line);
 }
 
@@ -330,7 +336,6 @@ void runTransducer (genericTransducer T)
   *str = 0;
   char * old_str = str;
 
-  int input_form_counter = 0;
   while(std::cin.getline(str,MAX_IO_STRING))
     {
       if (echoInputsFlag)
@@ -363,12 +368,11 @@ void runTransducer (genericTransducer T)
       	{ // tokenization failed
 	  if (outputType == xerox)
 	    {
-	      std::cout << str << "\t" << str << "\t+?" << std::endl;
+	      std::cout << str << "\t+?" << std::endl;
 	      std::cout << std::endl;
 	    }
       	  continue;
       	}
-      ++input_form_counter;
       input_string[i] = NO_SYMBOL_NUMBER;
       T.analyze(input_string);
       T.printAnalyses(std::string(str));
@@ -639,87 +643,61 @@ void Transducer::try_epsilon_transitions(SymbolNumber * input_symbol,
     }
 }
 
-void TransducerFd::traverse_flag_transitions(SymbolNumber input,
-					     SymbolNumber * input_symbol,
-					     SymbolNumber * output_symbol,
-					     SymbolNumber * original_output_string,
-					     TransitionTableIndex i)
-{
-  do
-    {
-      *output_symbol = transitions[i]->get_output();
-      get_analyses(input_symbol,
-		   output_symbol+1,
-		   original_output_string,
-		   transitions[i]->target());
-      ++i;
-    } while (transitions[i]->get_input() == input);
-}
-
-void TransducerFd::try_flag_transitions(SymbolNumber * input_symbol,
-					SymbolNumber * output_symbol,
-					SymbolNumber * 
-					original_output_string,
-					TransitionTableIndex i)
+void TransducerFd::try_epsilon_transitions(SymbolNumber * input_symbol,
+					 SymbolNumber * output_symbol,
+					 SymbolNumber * original_output_string,
+					 TransitionTableIndex i)
 {
 #if OL_FULL_DEBUG
-  std::cout << "try flag transitions " << i << std::endl;
+  std::cout << "try_epsilon_transitions " << i << std::endl;
 #endif
-  if (transitions[i]->get_input() != NO_SYMBOL_NUMBER)
+  
+  while (true)
     {
-      std::vector<SymbolNumber>::iterator it;
-      for (it = operation_peek.begin(); it < operation_peek.end(); it++)
+    if (transitions[i]->get_input() == 0) // epsilon
 	{
-	  if ( (transitions[i]->get_input() == *it) &&
-	       PushState(operations[*it]))
+	  *output_symbol = transitions[i]->get_output();
+	  get_analyses(input_symbol,
+		       output_symbol+1,
+		       original_output_string,
+		       transitions[i]->target());
+	  ++i;
+	} else if (transitions[i]->get_input() != NO_SYMBOL_NUMBER &&
+		   operations[transitions[i]->get_input()].isFlag())
+	{
+	  if (PushState(operations[transitions[i]->get_input()]))
 	    {
-	      traverse_flag_transitions(*it,
-					input_symbol,
-					output_symbol,
-					original_output_string,
-					i);
+#if OL_FULL_DEBUG
+	      std::cout << "flag diacritic " <<
+		symbol_table[transitions[i]->get_input()] << " allowed\n";
+#endif
+	      // flag diacritic allowed
+	      *output_symbol = transitions[i]->get_output();
+	      get_analyses(input_symbol,
+			   output_symbol+1,
+			   original_output_string,
+			   transitions[i]->target());
 	      statestack.pop_back();
 	    }
-	}
-    }
-}
-
-void TransducerFd::try_flag_indices(SymbolNumber * input_symbol,
-				    SymbolNumber * output_symbol,
-				    SymbolNumber * 
-				    original_output_string,
-				    TransitionTableIndex i)
-{
-#if OL_FULL_DEBUG
-  std::cout << "try flag indices " << i << std::endl;
-#endif
-  std::vector<SymbolNumber>::iterator it;
-  for (it = operation_peek.begin(); it < operation_peek.end(); it++)
-    {
-      if (indices[i+*it]->get_input() == *it)
-	{
-	  if (transitions[indices[i+*it]->target() - TRANSITION_TARGET_TABLE_START]->get_input()
-	      != NO_SYMBOL_NUMBER)
+	  else
 	    {
-	      if ( (transitions[indices[i+*it]->target() - TRANSITION_TARGET_TABLE_START]->get_input() == *it) &&
-		PushState(operations[*it]) )
-		{
-		  traverse_flag_transitions(*it,
-					    input_symbol,
-					    output_symbol,
-					    original_output_string,
-					    indices[i+*it]->target() - TRANSITION_TARGET_TABLE_START);
-		  statestack.pop_back();
-		}
+#if OL_FULL_DEBUG
+	      std::cout << "flag diacritic " <<
+		symbol_table[transitions[i]->get_input()] << " disallowed\n";
+#endif
 	    }
+	  ++i;
+	} else
+	{
+	  return;
 	}
     }
 }
 
 void Transducer::try_epsilon_indices(SymbolNumber * input_symbol,
-				       SymbolNumber * output_symbol,
-				       SymbolNumber * original_output_string,
-				       TransitionTableIndex i)
+				     SymbolNumber * output_symbol,
+				     SymbolNumber * original_output_string,
+				     TransitionTableIndex i)
 {
 #if OL_FULL_DEBUG
   std::cout << "try_epsilon_indices " << i << std::endl;
@@ -741,9 +719,9 @@ void Transducer::find_transitions(SymbolNumber input,
 				    TransitionTableIndex i)
 {
 #if OL_FULL_DEBUG
-  std::cout << "find_transitions " << i << std::endl;
+  std::cout << "find_transitions " << i << "\t" << transitions[i]->get_input() << std::endl;
 #endif
-  
+
   while (transitions[i]->get_input() != NO_SYMBOL_NUMBER)
     {
       if (transitions[i]->get_input() == input)
@@ -770,11 +748,10 @@ void Transducer::find_index(SymbolNumber input,
 			    TransitionTableIndex i)
 {
 #if OL_FULL_DEBUG
-  std::cout << "find_index " << i << std::endl;
+  std::cout << "find_index " << i << "\t" << indices[i+input]->get_input() << std::endl;
 #endif
   if (indices[i+input]->get_input() == input)
     {
-      
       find_transitions(input,
 		       input_symbol,
 		       output_symbol,
@@ -786,12 +763,22 @@ void Transducer::find_index(SymbolNumber input,
 
 void Transducer::note_analysis(SymbolNumber * whole_output_string)
 {
-  std::string str = "";
-  for (SymbolNumber * num = whole_output_string; *num != NO_SYMBOL_NUMBER; ++num)
+  if (beFast)
     {
-      str.append(symbol_table[*num]);
+      for (SymbolNumber * num = whole_output_string; *num != NO_SYMBOL_NUMBER; ++num)
+	{
+	  std::cout << symbol_table[*num];
+	}
+      std::cout << std::endl;
+    } else
+    {
+      std::string str = "";
+      for (SymbolNumber * num = whole_output_string; *num != NO_SYMBOL_NUMBER; ++num)
+	{
+	  str.append(symbol_table[*num]);
+	}
+      display_vector.push_back(str);
     }
-  display_vector.push_back(str);
 }
 
 void TransducerUniq::note_analysis(SymbolNumber * whole_output_string)
@@ -824,7 +811,7 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
 #endif
   if (i >= TRANSITION_TARGET_TABLE_START )
     {
-      i = i - TRANSITION_TARGET_TABLE_START;
+      i -= TRANSITION_TARGET_TABLE_START;
       
       try_epsilon_transitions(input_symbol,
 			      output_symbol,
@@ -848,7 +835,6 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
       
       SymbolNumber input = *input_symbol;
       ++input_symbol;
-      
       
       find_transitions(input,
 		       input_symbol,
@@ -890,126 +876,38 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
   *output_symbol = NO_SYMBOL_NUMBER;
 }
 
-void TransducerFd::get_analyses(SymbolNumber * input_symbol,
-			      SymbolNumber * output_symbol,
-			      SymbolNumber * original_output_string,
-			      TransitionTableIndex i)
-{
-#if OL_FULL_DEBUG
-  std::cout << "get_analyses i=" << i << " output = ";
-  int a = 0;
-  while (original_output_string[a] != NO_SYMBOL_NUMBER)
-    {
-      std::cout << " " << original_output_string[a];
-      ++a;
-    }
-  std::cout << "\n";
-#endif
-  if (i >= TRANSITION_TARGET_TABLE_START )
-    {
-      i = i - TRANSITION_TARGET_TABLE_START;
-      
-      try_epsilon_transitions(input_symbol,
-			      output_symbol,
-			      original_output_string,
-			      i+1);
-
-      try_flag_transitions(input_symbol,
-			   output_symbol,
-			   original_output_string,
-			   i+1);
-
-#if OL_FULL_DEBUG
-      std::cout << "Testing input string on transition side, " << *input_symbol << " at pointer" << std::endl;
-#endif
-
-      // input-string ended.
-      if (*input_symbol == NO_SYMBOL_NUMBER)
-	{
-	  *output_symbol = NO_SYMBOL_NUMBER;
-	  if (final_transition(i))
-	    {
-	      note_analysis(original_output_string);
-	    }
-	  return;
-	}
-      
-      SymbolNumber input = *input_symbol;
-      ++input_symbol;
-
-      find_transitions(input,
-		       input_symbol,
-		       output_symbol,
-		       original_output_string,
-		       i+1);
-    }
-  else
-    {
-      
-      try_epsilon_indices(input_symbol,
-			  output_symbol,
-			  original_output_string,
-			  i+1);
-      
-      try_flag_indices(input_symbol,
-		       output_symbol,
-		       original_output_string,
-		       i+1);
-
-#if OL_FULL_DEBUG
-      std::cout << "Testing input string on index side, " << *input_symbol << " at pointer" << std::endl;
-#endif
-
-      if (*input_symbol == NO_SYMBOL_NUMBER)
-	{ // input-string ended.
-	  *output_symbol = NO_SYMBOL_NUMBER;
-	  if (final_index(i))
-	    {
-	      note_analysis(original_output_string);
-	    }
-	  return;
-	}
-      
-      SymbolNumber input = *input_symbol;
-      ++input_symbol;
-
-      find_index(input,
-		 input_symbol,
-		 output_symbol,
-		 original_output_string,
-		 i+1);
-    }
-}
-
 void Transducer::printAnalyses(std::string prepend)
 {
-  if (outputType == xerox && display_vector.size() == 0)
+  if (!beFast)
     {
-      std::cout << prepend << "\t" << prepend << "\t+?" << std::endl;
-      std::cout << std::endl;
-      return;
-    }
-  int i = 0;
-  DisplayVector::iterator it = display_vector.begin();
-  while ( (it != display_vector.end()) && i < maxAnalyses )
-    {
-      if (outputType == xerox)
+      if (outputType == xerox && display_vector.size() == 0)
 	{
-	  std::cout << prepend << "\t";
+	  std::cout << prepend << "\t+?" << std::endl;
+	  std::cout << std::endl;
+	  return;
 	}
-      std::cout << *it << std::endl;
-      ++it;
-      ++i;
+      int i = 0;
+      DisplayVector::iterator it = display_vector.begin();
+      while ( (it != display_vector.end()) && i < maxAnalyses )
+	{
+	  if (outputType == xerox)
+	    {
+	      std::cout << prepend << "\t";
+	    }
+	  std::cout << *it << std::endl;
+	  ++it;
+	  ++i;
+	}
+      display_vector.clear(); // purge the display vector
+      std::cout << std::endl;
     }
-    display_vector.clear(); // purge the display vector
-  std::cout << std::endl;
 }
 
 void TransducerUniq::printAnalyses(std::string prepend)
 {
   if (outputType == xerox && display_vector.size() == 0)
     {
-      std::cout << prepend << "\t" << prepend << "\t+?" << std::endl;
+      std::cout << prepend << "\t+?" << std::endl;
       std::cout << std::endl;
       return;
     }
@@ -1033,7 +931,7 @@ void TransducerFdUniq::printAnalyses(std::string prepend)
 {
   if (outputType == xerox && display_vector.size() == 0)
     {
-      std::cout << prepend << "\t" << prepend << "\t+?" << std::endl;
+      std::cout << prepend << "\t+?" << std::endl;
       std::cout << std::endl;
       return;
     }
@@ -1260,96 +1158,57 @@ void TransducerW::try_epsilon_transitions(SymbolNumber * input_symbol,
   *output_symbol = NO_SYMBOL_NUMBER;
 }
 
-void TransducerWFd::traverse_flag_transitions(SymbolNumber input,
-					     SymbolNumber * input_symbol,
-					     SymbolNumber * output_symbol,
-					     SymbolNumber * original_output_string,
-					     TransitionTableIndex i)
+void TransducerWFd::try_epsilon_transitions(SymbolNumber * input_symbol,
+					    SymbolNumber * output_symbol,
+					    SymbolNumber * 
+					    original_output_string,
+					    TransitionTableIndex i)
 {
-#if OL_FULL_DEBUG
-  std::cerr << "traverse flag transitions " << i << " " << current_weight << std::endl;
-#endif
+  if (transitions.size() <= i)
+    { return; }
   
-      if (transitions.size() <= i)
+  while (true)
     {
-      return;
-    }
-  
-  do
-    {
-      *output_symbol = transitions[i]->get_output();
-      current_weight += transitions[i]->get_weight();
-      get_analyses(input_symbol,
-		   output_symbol+1,
-		   original_output_string,
-		   transitions[i]->target());
-      current_weight -= transitions[i]->get_weight();
-      ++i;
-    } while (transitions[i]->get_input() == input);
-}
-
-void TransducerWFd::try_flag_transitions(SymbolNumber * input_symbol,
-					SymbolNumber * output_symbol,
-					SymbolNumber * 
-					original_output_string,
-					TransitionTableIndex i)
-{
-#if OL_FULL_DEBUG
-  std::cerr << "try flag transitions " << i << " " << current_weight << std::endl;
-#endif
-  
-  if (transitions[i]->get_input() != NO_SYMBOL_NUMBER)
-    {
-      std::vector<SymbolNumber>::iterator it;
-      for (it = operation_peek.begin(); it < operation_peek.end(); it++)
+    if (transitions[i]->get_input() == 0) // epsilon
 	{
-	  if ( (transitions[i]->get_input() == *it) &&
-	       PushState(operations[*it]))
+	  *output_symbol = transitions[i]->get_output();
+	  current_weight += transitions[i]->get_weight();
+	  get_analyses(input_symbol,
+		       output_symbol+1,
+		       original_output_string,
+		       transitions[i]->target());
+	  current_weight += transitions[i]->get_weight();
+	  ++i;
+	} else if (transitions[i]->get_input() != NO_SYMBOL_NUMBER &&
+		   operations[transitions[i]->get_input()].isFlag())
+	{
+	  if (PushState(operations[transitions[i]->get_input()]))
 	    {
-	      traverse_flag_transitions(*it,
-					input_symbol,
-					output_symbol,
-					original_output_string,
-					i);
+#if OL_FULL_DEBUG
+	      std::cout << "flag diacritic " <<
+		symbol_table[transitions[i]->get_input()] << " allowed\n";
+#endif
+	      // flag diacritic allowed
+	      *output_symbol = transitions[i]->get_output();
+	      current_weight += transitions[i]->get_weight();
+	      get_analyses(input_symbol,
+			   output_symbol+1,
+			   original_output_string,
+			   transitions[i]->target());
+	      current_weight -= transitions[i]->get_weight();
 	      statestack.pop_back();
 	    }
-	}
-    }
-}
-
-void TransducerWFd::try_flag_indices(SymbolNumber * input_symbol,
-				    SymbolNumber * output_symbol,
-				    SymbolNumber * 
-				    original_output_string,
-				    TransitionTableIndex i)
-{
+	  else
+	    {
 #if OL_FULL_DEBUG
-  std::cerr << "try flag indices " << i << " " << current_weight << std::endl;
+	      std::cout << "flag diacritic " <<
+		symbol_table[transitions[i]->get_input()] << " disallowed\n";
 #endif
-
-  std::vector<SymbolNumber>::iterator it;
-  for (it = operation_peek.begin(); it < operation_peek.end(); it++)
-    {
-      if (indices.size() <= i+*it)
+	    }
+	  ++i;
+	} else
 	{
 	  return;
-	}
-      if (indices[i+*it]->get_input() == *it)
-	{
-	  if (transitions[indices[i+*it]->target() - TRANSITION_TARGET_TABLE_START]->get_input()
-	      != NO_SYMBOL_NUMBER)
-	    {
-	      if ( (transitions[indices[i+*it]->target() - TRANSITION_TARGET_TABLE_START]->get_input() == *it) &&
-		PushState(operations[*it]) )
-		{
-		  traverse_flag_transitions(*it,
-					    input_symbol,
-					    output_symbol,
-					    original_output_string,
-					    indices[i+*it]->target() - TRANSITION_TARGET_TABLE_START);
-		  statestack.pop_back();
-		}
-	    }
 	}
     }
 }
@@ -1480,7 +1339,7 @@ void TransducerW::printAnalyses(std::string prepend)
 {
   if (outputType == xerox && display_map.size() == 0)
     {
-      std::cout << prepend << "\t" << prepend << "\t+?" << std::endl;
+      std::cout << prepend << "\t+?" << std::endl;
       std::cout << std::endl;
       return;
     }
@@ -1509,7 +1368,7 @@ void TransducerWUniq::printAnalyses(std::string prepend)
 {
   if (outputType == xerox && display_map.size() == 0)
     {
-      std::cout << prepend << "\t" << prepend << "\t+?" << std::endl;
+      std::cout << prepend << "\t+?" << std::endl;
       std::cout << std::endl;
       return;
     }
@@ -1545,7 +1404,7 @@ void TransducerWFdUniq::printAnalyses(std::string prepend)
 {
   if (outputType == xerox && display_map.size() == 0)
     {
-      std::cout << prepend << "\t" << prepend << "\t+?" << std::endl;
+      std::cout << prepend << "\t+?" << std::endl;
       std::cout << std::endl;
       return;
     }
@@ -1586,7 +1445,7 @@ void TransducerW::get_analyses(SymbolNumber * input_symbol,
 #endif
   if (i >= TRANSITION_TARGET_TABLE_START )
     {
-      i = i - TRANSITION_TARGET_TABLE_START;
+      i -= TRANSITION_TARGET_TABLE_START;
       
       try_epsilon_transitions(input_symbol,
 			      output_symbol,
@@ -1651,91 +1510,3 @@ void TransducerW::get_analyses(SymbolNumber * input_symbol,
     }
 }
 
-void TransducerWFd::get_analyses(SymbolNumber * input_symbol,
-			      SymbolNumber * output_symbol,
-			      SymbolNumber * original_output_string,
-			      TransitionTableIndex i)
-{
-#if OL_FULL_DEBUG
-  std::cout << "get_analyses " << i << std::endl;
-#endif
-  if (i >= TRANSITION_TARGET_TABLE_START )
-    {
-      i = i - TRANSITION_TARGET_TABLE_START;
-      
-      try_epsilon_transitions(input_symbol,
-			      output_symbol,
-			      original_output_string,
-			      i+1);
-
-      try_flag_transitions(input_symbol,
-			   output_symbol,
-			   original_output_string,
-			   i+1);
-
-#if OL_FULL_DEBUG
-      std::cout << "Testing input string on transition side, " << *input_symbol << " at pointer" << std::endl;
-#endif
-
-      // input-string ended.
-      if (*input_symbol == NO_SYMBOL_NUMBER)
-	{
-	  *output_symbol = NO_SYMBOL_NUMBER;
-	  if (final_transition(i))
-	    {
-	      current_weight += get_final_transition_weight(i);
-	      note_analysis(original_output_string);
-	      current_weight -= get_final_transition_weight(i);
-	    }
-	  return;
-	}
-      
-      SymbolNumber input = *input_symbol;
-      ++input_symbol;
-
-      find_transitions(input,
-		       input_symbol,
-		       output_symbol,
-		       original_output_string,
-		       i+1);
-    }
-  else
-    {
-      
-      try_epsilon_indices(input_symbol,
-			  output_symbol,
-			  original_output_string,
-			  i+1);
-      
-      try_flag_indices(input_symbol,
-		       output_symbol,
-		       original_output_string,
-		       i+1);
-
-#if OL_FULL_DEBUG
-      std::cout << "Testing input string on index side, " << *input_symbol << " at pointer" << std::endl;
-#endif
-      
-      if (*input_symbol == NO_SYMBOL_NUMBER)
-	{ // input-string ended.
-	  *output_symbol = NO_SYMBOL_NUMBER;
-	  if (final_index(i))
-	    {
-	      current_weight += get_final_index_weight(i);
-	      note_analysis(original_output_string);
-	      current_weight -= get_final_index_weight(i);
-	    }
-
-	  return;
-	}
-      
-      SymbolNumber input = *input_symbol;
-      ++input_symbol;
-
-      find_index(input,
-		 input_symbol,
-		 output_symbol,
-		 original_output_string,
-		 i+1);
-    }
-}
