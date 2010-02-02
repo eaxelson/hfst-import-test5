@@ -2106,36 +2106,68 @@ namespace HWFST {
   void add_input_symbols(StateId n,
 			 InputKeySet * input_symbols,
 			 StateIdSet &visited_nodes,
-			 TransduceR * tr)
+			 TransduceR * tr,
+			 KeySet &flag_diacritic_set)
   {
     for(ArcIterator aiter(*tr,n);
 	not aiter.Done();
 	aiter.Next())
       {
 	StdArc a = aiter.Value();
-	input_symbols->insert(a.ilabel);
+	if (flag_diacritic_set.find(a.ilabel) == flag_diacritic_set.end())
+	  {
+	    input_symbols->insert(a.ilabel);
+	  }
 	if (visited_nodes.find(a.nextstate) == visited_nodes.end())
 	  {
 	    visited_nodes.insert(a.nextstate);
 	    add_input_symbols(a.nextstate,
 			      input_symbols,
 			      visited_nodes,
-			      tr);
+			      tr,
+			      flag_diacritic_set);
 	  }
       }
+  }
+
+  KeySet * get_flag_diacritics(KeyTable * kt)
+  {
+    if ( kt == NULL)
+      {
+	return NULL;
+      }
+    KeySet * flag_diacritics = new KeySet;
+    for (Key k = 0;
+	 k < get_unused_key(kt);
+	 ++k)
+      {
+	Symbol s = get_key_symbol(k, kt);
+	const char * symbol_name = get_symbol_name(s);
+	if (parse_flag_diacritic(symbol_name))
+	  {
+	    if (k != 0)
+	      {
+		flag_diacritics->insert(k);
+	      }
+	  }
+      }
+    return flag_diacritics;
   }
   
   const HWFST::Symbol EPSILON = 0;
   
-  InputKeySet * get_input_keys(TransduceR * t)
+  InputKeySet * get_input_keys(TransduceR * t, KeyTable * kt)
   {
     InputKeySet * input_key_set = new InputKeySet;
     input_key_set->insert(EPSILON);
     StateIdSet visited_nodes;
+    KeySet * flag_diacritics = get_flag_diacritics(kt);
     add_input_symbols(t->Start(),
 		      input_key_set,
 		      visited_nodes,
-		      t);
+		      t,
+		      *flag_diacritics);
+    delete flag_diacritics;
     return input_key_set;
   }
   
@@ -2194,7 +2226,7 @@ namespace HWFST {
   
   HWFST::KeyTable * reorder_key_table(HWFST::KeyTable * kt, TransduceR * t)
   {
-    InputKeySet * input_keys = get_input_keys(t);
+    InputKeySet * input_keys = get_input_keys(t,kt);
     HWFST::KeyTable * new_kt = hwfst_lift_input_keys(kt, input_keys);
     delete input_keys;
     return new_kt;
@@ -2208,10 +2240,12 @@ namespace HWFST {
     HWFST::TransducerHandle new_input =
       HWFST::harmonize_transducer(input,key_table,new_kt);
     HWFST::delete_transducer(input);
+    KeySet * flag_diacritic_set = get_flag_diacritics(new_kt);
     t = HANDLE_TO_PINSTANCE(TransduceR,new_input); 
     HwfstFst fst(t,
 		 new_kt,
-		 outstream);
+		 outstream,
+		 *flag_diacritic_set);
   };
 
   TransducerHandle read_runtime_transducer( FILE * f) {
