@@ -96,11 +96,11 @@ static const char* XEROX_LOOKUPF = "%i\t%l%n";
 static const char* XEROX_END_SETF = "%n";
 // notaword notaword+?
 static const char* XEROX_EMPTY_BEGIN_SETF = "";
-static const char* XEROX_EMPTY_LOOKUPF = "%i\t+?%n";
+static const char* XEROX_EMPTY_LOOKUPF = "%i\t%i\t+?%n";
 static const char* XEROX_EMPTY_END_SETF = "%n";
 // ¶    ¶+?
 static const char* XEROX_UNKNOWN_BEGIN_SETF = "";
-static const char* XEROX_UNKNOWN_LOOKUPF = "%i\t+?%n";
+static const char* XEROX_UNKNOWN_LOOKUPF = "%i\t%i\t+?%n";
 static const char* XEROX_UNKNOWN_END_SETF = "%n";
 // 0    0 NUM SG
 // 0    [...cyclic...]
