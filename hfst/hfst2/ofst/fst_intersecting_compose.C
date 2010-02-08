@@ -81,6 +81,12 @@ fst::RulesInfo::RulesInfo( void ) :
 
   /* All states are initial. */
   for ( unsigned int i = 0; i < number_of_rules; ++i ) {
+    if (Rules.at(i) == NULL)
+      { assert(false); } // Temporary...
+    if (Rules.at(i)->Start() == fst::kNoStateId)
+      {
+	throw std::out_of_range("No start state set.");
+      }
     states.push_back( Rules.at(i)->Start() );
     Rule_arcs.push_back( new Arcs( *Rules.at(i), Rules.at(i)->Start() ) ); 
   }
