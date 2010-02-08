@@ -3,6 +3,7 @@
 #include "fst/lib/fstlib.h"
 #include <vector>
 #include <set>
+#include <stdexcept>
 
 typedef std::set<unsigned short> KeySet;
 
@@ -483,10 +484,19 @@ class Composer {
   void compose( RulesInfo &Rules );
 
   Transducer * operator() ( void ) {
-    RulesInfo R;
-    compose(R);
-    composition->SetStart(0);
-    return composition;
+    try 
+      {
+	RulesInfo R;
+	compose(R);
+	composition->SetStart(0);
+	return composition;
+      }
+    catch (std::out_of_range e)
+      {
+	composition = new StdVectorFst();
+	composition->SetStart(composition->AddState());
+	return composition;
+      }
   }
 };
 
