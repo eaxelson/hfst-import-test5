@@ -102,13 +102,13 @@ AUTOMAKE = ${SHELL} /home/mpsilfve/trunk/hfst3_proposition/implementations/openf
 AWK = gawk
 CC = gcc
 CCDEPMODE = depmode=gcc3
-CFLAGS = -pg -O2
+CFLAGS = -g -O2
 CPP = gcc -E
 CPPFLAGS = 
 CXX = g++
 CXXCPP = g++ -E
 CXXDEPMODE = depmode=gcc3
-CXXFLAGS = -pg -O2
+CXXFLAGS = -g -O2
 CYGPATH_W = echo
 DEFS = -DHAVE_CONFIG_H
 DEPDIR = .deps
@@ -209,12 +209,13 @@ target_alias =
 top_build_prefix = ../../
 top_builddir = ../..
 top_srcdir = ../..
-AM_CPPFLAGS = -I$(srcdir)/../include
+AM_CPPFLAGS = -pg -I$(srcdir)/../include
+AM_CFLAGS = $(AM_CFLAGS) -O2 -pg 
 lib_LTLIBRARIES = libfst.la
 libfst_la_SOURCES = compat.cc flags.cc fst.cc properties.cc \
 symbol-table.cc util.cc
 
-libfst_la_LDFLAGS = -version-info 0:0:0
+libfst_la_LDFLAGS = -version-info 0:0:0 -pg
 all: all-am
 
 .SUFFIXES:

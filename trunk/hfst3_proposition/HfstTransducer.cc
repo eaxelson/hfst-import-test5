@@ -9,6 +9,7 @@ namespace hfst
   HfstTransducer::tropical_ofst_interface;
   hfst::implementations::LogWeightTransducer
   HfstTransducer::log_ofst_interface;
+  hfst::implementations::FomaTransducer HfstTransducer::foma_interface;
 
   void HfstTransducer::harmonize(HfstTransducer &another)
   {
