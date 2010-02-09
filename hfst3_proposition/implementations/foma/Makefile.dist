@@ -1,0 +1,83 @@
+prefix = /usr/local
+exec_prefix = $(prefix)
+libdir = $(exec_prefix)/lib
+bindir = $(exec_prefix)/bin
+includedir = $(prefix)/include
+
+VERSION = 0.9.12
+CC = gcc
+AR = ar
+RANLIB = ranlib
+YACC = bison -d -t -v
+LEX = flex -8
+LEXCLEX = flex -8 --prefix=lexc
+LEXIFACE = flex -8 --prefix=interface
+LEXCMATRIX = flex -8 --prefix=cmatrix
+RM  = /bin/rm -f
+ARFLAGS = rcs
+LDFLAGS = -lreadline -lz
+CFLAGS = -O3 -Wall -D_GNU_SOURCE -std=c99 -fvisibility=hidden
+
+FOMAOBJS = foma.o stack.o iface.o lex.interface.o
+
+LIBOBJS = int_stack.o define.o determinize.o apply.o rewrite.o lexcread.o topsort.o flags.o minimize.o reverse.o invert.o extract.o sigma.o io.o structures.o constructions.o coaccessible.o utf8.o spelling.o dynarray.o mem.o lex.lexc.o lex.yy.o lex.cmatrix.o regex.tab.o
+
+foma: $(FOMAOBJS) $(LIBOBJS)
+	$(CC) $(CFLAGS) $(FOMAOBJS) $(LIBOBJS) $(LDFLAGS) -o $@
+
+STATICLIB = libfoma.a
+
+ifeq ($(findstring arwin, $(OSTYPE)),arwin)
+SHAREDLIB = libfoma.dylib
+SHAREDLIBV = libfoma.dylib.$(VERSION)
+SHAREDLIBM = libfoma.dylib.0
+else 
+SHAREDLIB = libfoma.so
+SHAREDLIBV = libfoma.so.$(VERSION)
+SHAREDLIBM = libfoma.so.0
+endif
+
+LIBS = $(SHAREDLIBV) $(STATICLIB)
+
+libfoma: $(LIBOBJS)
+	$(AR) $(ARFLAGS) $(STATICLIB) $(LIBOBJS)
+	$(RANLIB) $(STATICLIB)
+	$(CC) $(CFLAGS) -shared -Wl,-soname,$(SHAREDLIBM) -o $(SHAREDLIBV) $(LIBOBJS)
+
+install: foma libfoma
+	-@if [ ! -d $(exec_prefix) ]; then mkdir -p $(exec_prefix); fi
+	-@if [ ! -d $(includedir)  ]; then mkdir -p $(includedir); fi
+	-@if [ ! -d $(libdir)      ]; then mkdir -p $(libdir); fi
+	cp fomalib.h fomalibconf.h $(includedir);
+	chmod 644 $(includedir)/fomalib.h
+	cp foma $(bindir)
+	cp $(LIBS) $(libdir)
+	cd $(libdir); chmod 755 $(LIBS); \
+	if test -f $(libdir)/$(SHAREDLIB); then rm  $(libdir)/$(SHAREDLIB); fi
+	if test -f $(libdir)/$(SHAREDLIBM); then rm  $(libdir)/$(SHAREDLIBM); fi
+	cd $(libdir); ln -s $(SHAREDLIBV) $(SHAREDLIB); cd $(libdir);	\
+	ln -s $(SHAREDLIBV) $(SHAREDLIBM); (ldconfig || true)		\
+	>/dev/null 2>&1; \
+
+$(OBJS): foma.h
+
+.c.o:
+	$(CC) $(CFLAGS) -c $< -o $@
+
+lex.yy.c: regex.l regex.tab.h
+	$(LEX) regex.l
+
+lex.lexc.c: lexc.l
+	$(LEXCLEX) $<
+
+lex.interface.c: interface.l
+	$(LEXIFACE) $<
+
+lex.cmatrix.c: cmatrix.l
+	$(LEXCMATRIX) $<
+
+regex.tab.c regex.tab.h: regex.y
+	$(YACC) $<
+
+clean:
+	$(RM) foma $(FOMAOBJS) $(LIBOBJS) regex.tab.h regex.output *.so* *.a

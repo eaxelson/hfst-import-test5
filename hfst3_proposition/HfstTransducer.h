@@ -34,12 +34,17 @@ namespace hfst
   using hfst::implementations::LogWeightStateIndexer;
   using hfst::implementations::WeightedStrings;
   using hfst::implementations::WeightedString;
+  using hfst::implementations::FomaTransducer;
+  using hfst::implementations::FomaState;
+  using hfst::implementations::FomaTransition;
+  using hfst::implementations::FomaStateIndexer;
 
   enum ImplementationType
   {
     SFST_TYPE,
     TROPICAL_OFST_TYPE,
     LOG_OFST_TYPE,
+    FOMA_TYPE,
     UNSPECIFIED_TYPE,
     ERROR_TYPE
   };
@@ -61,6 +66,7 @@ namespace hfst
       hfst::implementations::SfstInputStream * sfst;
       hfst::implementations::TropicalWeightInputStream * tropical_ofst;
       hfst::implementations::LogWeightInputStream * log_ofst;
+      hfst::implementations::FomaInputStream * foma;
     };
 
     ImplementationType type;
@@ -109,17 +115,19 @@ namespace hfst
       hfst::implementations::Transducer * sfst;
       hfst::implementations::StdVectorFst * tropical_ofst;
       hfst::implementations::LogFst * log_ofst;
+      hfst::implementations::fsm *foma;
       hfst::implementations::StdVectorFst * internal; 
     };
     
     static hfst::implementations::SfstTransducer sfst_interface;
     static hfst::implementations::TropicalWeightTransducer tropical_ofst_interface;
     static hfst::implementations::LogWeightTransducer log_ofst_interface;
+    static hfst::implementations::FomaTransducer foma_interface;
 
     ImplementationType type;
 
     bool anonymous; // this variable doesn't do anything yet, but it is
-                    // is supposed to keep trakc of whether the transducer's
+                    // is supposed to keep track of whether the transducer's
                     // KeyTable is maintained or not.
 
     KeyTable key_table;

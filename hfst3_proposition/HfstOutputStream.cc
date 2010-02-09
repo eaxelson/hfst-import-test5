@@ -17,6 +17,9 @@ namespace hfst
 	implementation.log_ofst = 
 	  new hfst::implementations::LogWeightOutputStream();
 	break;
+      case FOMA_TYPE:
+	throw hfst::exceptions::FunctionNotImplementedException();
+	break;
       default:
 	throw hfst::exceptions::SpecifiedTypeRequiredException();
 	break;
@@ -37,6 +40,9 @@ namespace hfst
 	implementation.log_ofst = 
 	  new hfst::implementations::LogWeightOutputStream(filename.c_str());
 	break;
+      case FOMA_TYPE:
+	throw hfst::exceptions::FunctionNotImplementedException();
+	break;
       default:
 	throw hfst::exceptions::SpecifiedTypeRequiredException();
 	break;
@@ -53,6 +59,8 @@ namespace hfst
 	break;
       case LOG_OFST_TYPE:
 	delete implementation.log_ofst;
+      case FOMA_TYPE:
+	break;
       default:
 	assert(false);
       }
@@ -83,6 +91,9 @@ namespace hfst
 	      (transducer.implementation.log_ofst,transducer.key_table);
 	  }
 	return *this;
+	break;
+      case FOMA_TYPE:
+	throw hfst::exceptions::FunctionNotImplementedException();
 	break;
       default:
 	assert(false);

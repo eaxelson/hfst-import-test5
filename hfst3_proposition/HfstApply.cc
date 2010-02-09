@@ -6,6 +6,7 @@ namespace hfst
    fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *),
    hfst::implementations::LogFst * (*log_ofst_funct)
    (hfst::implementations::LogFst *),
+   fsm * (*foma_funct)(fsm *),
    ImplementationType type)
   {
     if (type != UNSPECIFIED_TYPE)
@@ -35,8 +36,16 @@ namespace hfst
 	  delete implementation.log_ofst;
 	  implementation.log_ofst = log_ofst_temp;
 	  break;
-}
-		case UNSPECIFIED_TYPE:
+	}
+      case FOMA_TYPE:
+	{
+	  fsm * foma_temp =
+	    foma_funct(implementation.foma);
+	  delete implementation.foma;
+	  implementation.foma = foma_temp;
+	  break;
+	}
+      case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -49,6 +58,7 @@ namespace hfst
    fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *, int n),
    hfst::implementations::LogFst * (*log_ofst_funct)
    (hfst::implementations::LogFst *, int n),
+   fsm * (*fsm_funct)(fsm *,int n),
    int n, ImplementationType type)
   {
     if (type != UNSPECIFIED_TYPE)
@@ -79,6 +89,14 @@ namespace hfst
           implementation.log_ofst = log_ofst_temp;
           break;
         }
+      case FOMA_TYPE:
+	{
+	  fsm * foma_temp = 
+	    foma_funct(implementation.foma,n);
+	  delete implementation.foma;
+	  implementation.foma = foma_temp;
+	  break;
+	}
 	case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
@@ -93,6 +111,7 @@ namespace hfst
 					      Key),
    hfst::implementations::LogFst * (*log_ofst_funct)
    (hfst::implementations::LogFst *,Key, Key),
+   fsm * (*foma_funct)(fsm *, Key, Key),
    Key k1, Key k2,ImplementationType type)
   {
     if (type != UNSPECIFIED_TYPE)
@@ -123,6 +142,14 @@ namespace hfst
           implementation.log_ofst = log_ofst_temp;
           break;
         }
+      case FOMA_TYPE:
+	{
+	  fsm * foma_temp = 
+	    foma_funct(implementation.foma,k1,k2);
+	  delete implementation.foma;
+	  implementation.foma = foma_temp;
+	  break;
+	}
 	case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
@@ -138,6 +165,8 @@ namespace hfst
 					      KeyPair),
    hfst::implementations::LogFst * (*log_ofst_funct)
    (hfst::implementations::LogFst *,KeyPair, KeyPair),
+   fsm * (*foma_funct)(fsm *, KeyPair, 
+				    KeyPair),
    KeyPair kp1, KeyPair kp2,ImplementationType type)
   {
     if (type != UNSPECIFIED_TYPE)
@@ -168,6 +197,14 @@ namespace hfst
           implementation.log_ofst = log_ofst_temp;
           break;
         }
+      case FOMA_TYPE:
+	{
+	  fsm * foma_temp = 
+	    foma_funct(implementation.foma,kp1,kp2);
+	  delete implementation.foma;
+	  implementation.foma = foma_temp;
+	  break;
+	}
  	case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
@@ -183,6 +220,8 @@ namespace hfst
 					      fst::StdVectorFst *),
    hfst::implementations::LogFst * (*log_ofst_funct)
    (hfst::implementations::LogFst *,hfst::implementations::LogFst *),
+   fsm * (*foma_funct)(fsm *,
+				    fsm *),
    HfstTransducer &another,
    ImplementationType type)
   {
@@ -223,6 +262,14 @@ namespace hfst
           implementation.log_ofst = log_ofst_temp;
           break;
         }
+      case FOMA_TYPE:
+	{
+	  fsm * foma_temp = 
+	    foma_funct(implementation.foma,another.implementation.foma);
+	  delete implementation.foma;
+	  implementation.foma = foma_temp;
+	  break;
+	}
 	case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:

@@ -18,6 +18,10 @@ namespace hfst
 	t.implementation.log_ofst =
 	  this->implementation.log_ofst->read_transducer(t.key_table);
 	break;
+      case FOMA_TYPE:
+	t.implementation.foma =
+	  this->implementation.foma->read_transducer(t.key_table);
+	break;
 	  case ERROR_TYPE:
 	  case UNSPECIFIED_TYPE:
 	  default:
@@ -39,6 +43,8 @@ namespace hfst
       { return TROPICAL_OFST_TYPE; }
     if (0 == strcmp(fst_type,"LOG_OFST_TYPE"))
       { return LOG_OFST_TYPE; }
+    if (0 == strcmp(fst_type,"FOMA_TYPE"))
+      { return FOMA_TYPE; }
     return ERROR_TYPE;
   }
 
@@ -95,6 +101,9 @@ namespace hfst
       implementation.log_ofst = 
 	new hfst::implementations::LogWeightInputStream;
       break;
+    case FOMA_TYPE:
+      implementation.foma = new hfst::implementations::FomaInputStream;
+      break;
     default:
       throw hfst::exceptions::NotTransducerStreamException();
     }
@@ -125,6 +134,9 @@ namespace hfst
       implementation.log_ofst = 
 	new hfst::implementations::LogWeightInputStream(filename);
       break;
+    case FOMA_TYPE:
+      implementation.foma = new hfst::implementations::FomaInputStream(filename);
+      break;
     default:
       assert(false);
     }
@@ -142,6 +154,9 @@ namespace hfst
 	break;
       case LOG_OFST_TYPE:
 	delete implementation.log_ofst;
+	break;
+      case FOMA_TYPE:
+	delete implementation.foma;
 	break;
 	  case ERROR_TYPE:
 	  case UNSPECIFIED_TYPE:
@@ -163,6 +178,9 @@ namespace hfst
       case LOG_OFST_TYPE:
 	implementation.log_ofst->open();
 	break;
+      case FOMA_TYPE:
+	implementation.foma->open();
+	break;
       default:
 	assert(false);
       }
@@ -181,6 +199,9 @@ namespace hfst
       case LOG_OFST_TYPE:
 	implementation.log_ofst->close();
 	break;
+      case FOMA_TYPE:
+	implementation.foma->close();
+	break;
       default:
 	assert(false);
       }
@@ -195,8 +216,12 @@ namespace hfst
 	break;
       case TROPICAL_OFST_TYPE:
 	return implementation.tropical_ofst->is_open();
-	  case LOG_OFST_TYPE:
+	break;
+      case LOG_OFST_TYPE:
 	return implementation.log_ofst->is_open();
+	break;
+      case FOMA_TYPE:
+	return implementation.foma->is_open();
 	break;
       default:
 	assert(false);
@@ -214,6 +239,9 @@ namespace hfst
       case TROPICAL_OFST_TYPE:
 	return implementation.tropical_ofst->is_eof();
 	break;
+      case FOMA_TYPE:
+	return implementation.foma->is_eof();
+	break;
       default:
 	assert(false);
 	return false;
@@ -230,6 +258,9 @@ namespace hfst
       case TROPICAL_OFST_TYPE:
 	return implementation.tropical_ofst->is_bad();
 	break;
+      case FOMA_TYPE:
+	return implementation.foma->is_bad();
+	break;
       default:
 	assert(false);
 	return false;
@@ -245,6 +276,9 @@ namespace hfst
 	break;
       case TROPICAL_OFST_TYPE:
 	return implementation.tropical_ofst->is_good();
+	break;
+      case FOMA_TYPE:
+	return implementation.foma->is_good();
 	break;
       default:
 	assert(false);
