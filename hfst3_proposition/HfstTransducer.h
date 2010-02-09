@@ -5,6 +5,7 @@
 #include "implementations/SfstTransducer.h"
 #include "implementations/TropicalWeightTransducer.h"
 #include "implementations/LogWeightTransducer.h"
+#include "implementations/FomaTransducer.h"
 #include "implementations/HfstTokenizer.h"
 #include "implementations/ConvertTransducerFormat.h"
 #include <string>
@@ -115,7 +116,7 @@ namespace hfst
       hfst::implementations::Transducer * sfst;
       hfst::implementations::StdVectorFst * tropical_ofst;
       hfst::implementations::LogFst * log_ofst;
-      hfst::implementations::fsm *foma;
+      fsm * foma;
       hfst::implementations::StdVectorFst * internal; 
     };
     

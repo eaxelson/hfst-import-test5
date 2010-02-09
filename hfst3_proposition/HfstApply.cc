@@ -58,7 +58,7 @@ namespace hfst
    fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *, int n),
    hfst::implementations::LogFst * (*log_ofst_funct)
    (hfst::implementations::LogFst *, int n),
-   fsm * (*fsm_funct)(fsm *,int n),
+   fsm * (*foma_funct)(fsm *,int n),
    int n, ImplementationType type)
   {
     if (type != UNSPECIFIED_TYPE)

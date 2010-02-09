@@ -235,6 +235,7 @@ namespace hfst
       (&hfst::implementations::SfstTransducer::remove_epsilons,
        &hfst::implementations::TropicalWeightTransducer::remove_epsilons,
        &hfst::implementations::LogWeightTransducer::remove_epsilons,
+       &hfst::implementations::FomaTransducer::remove_epsilons,
        type); }
 
   HfstTransducer &HfstTransducer::determinize(ImplementationType type)
@@ -243,6 +244,7 @@ namespace hfst
       (&hfst::implementations::SfstTransducer::determinize,
        &hfst::implementations::TropicalWeightTransducer::determinize,
        &hfst::implementations::LogWeightTransducer::determinize,
+       &hfst::implementations::FomaTransducer::determinize,
        type); }
 
   HfstTransducer &HfstTransducer::minimize(ImplementationType type)
@@ -251,6 +253,7 @@ namespace hfst
       (&hfst::implementations::SfstTransducer::minimize,
        &hfst::implementations::TropicalWeightTransducer::minimize,
        &hfst::implementations::LogWeightTransducer::minimize,
+       &hfst::implementations::FomaTransducer::minimize,
        type); }
 
   HfstTransducer &HfstTransducer::repeat_star(ImplementationType type)
@@ -259,6 +262,7 @@ namespace hfst
       (&hfst::implementations::SfstTransducer::repeat_star,
        &hfst::implementations::TropicalWeightTransducer::repeat_star,
        &hfst::implementations::LogWeightTransducer::repeat_star,
+       &hfst::implementations::FomaTransducer::repeat_star,
        type); }
 
   HfstTransducer &HfstTransducer::repeat_plus(ImplementationType type)
@@ -267,6 +271,7 @@ namespace hfst
       (&hfst::implementations::SfstTransducer::repeat_plus,
        &hfst::implementations::TropicalWeightTransducer::repeat_plus,
        &hfst::implementations::LogWeightTransducer::repeat_plus,
+       &hfst::implementations::FomaTransducer::repeat_plus,
        type); }
 
   HfstTransducer &HfstTransducer::repeat_n(unsigned int n, ImplementationType type)
@@ -275,6 +280,7 @@ namespace hfst
       (&hfst::implementations::SfstTransducer::repeat_n,
        &hfst::implementations::TropicalWeightTransducer::repeat_n,
        &hfst::implementations::LogWeightTransducer::repeat_n,
+       &hfst::implementations::FomaTransducer::repeat_n,
        n,type); }
 
   HfstTransducer &HfstTransducer::repeat_n_plus(unsigned int n, ImplementationType type)
@@ -283,6 +289,7 @@ namespace hfst
       (&hfst::implementations::SfstTransducer::repeat_le_n,
        &hfst::implementations::TropicalWeightTransducer::repeat_le_n,
        &hfst::implementations::LogWeightTransducer::repeat_le_n,
+       &hfst::implementations::FomaTransducer::repeat_le_n,
        n,type); }
 
   HfstTransducer &HfstTransducer::optionalize(ImplementationType type)
@@ -291,6 +298,7 @@ namespace hfst
       (&hfst::implementations::SfstTransducer::optionalize,
        &hfst::implementations::TropicalWeightTransducer::optionalize,
        &hfst::implementations::LogWeightTransducer::optionalize,
+       &hfst::implementations::FomaTransducer::optionalize,
        type); }
 
   HfstTransducer &HfstTransducer::invert(ImplementationType type)
@@ -299,6 +307,7 @@ namespace hfst
       (&hfst::implementations::SfstTransducer::invert,
        &hfst::implementations::TropicalWeightTransducer::invert,
        &hfst::implementations::LogWeightTransducer::invert,
+       &hfst::implementations::FomaTransducer::invert,
        type); }
 
   HfstTransducer &HfstTransducer::input_project(ImplementationType type)
@@ -307,6 +316,7 @@ namespace hfst
       (&hfst::implementations::SfstTransducer::extract_input_language,
        &hfst::implementations::TropicalWeightTransducer::extract_input_language,
        &hfst::implementations::LogWeightTransducer::extract_input_language,
+       &hfst::implementations::FomaTransducer::extract_input_language,
        type); }
 
   HfstTransducer &HfstTransducer::output_project(ImplementationType type)
@@ -315,6 +325,7 @@ namespace hfst
       (&hfst::implementations::SfstTransducer::extract_output_language,
        &hfst::implementations::TropicalWeightTransducer::extract_output_language,
        &hfst::implementations::LogWeightTransducer::extract_output_language,
+       &hfst::implementations::FomaTransducer::extract_output_language,
        type); }
 
   void HfstTransducer::extract_strings(WeightedStrings<float>::Set &results)
@@ -340,6 +351,7 @@ namespace hfst
       (&hfst::implementations::SfstTransducer::substitute,
        &hfst::implementations::TropicalWeightTransducer::substitute,
        &hfst::implementations::LogWeightTransducer::substitute,
+       &hfst::implementations::FomaTransducer::substitute,
        old_key,new_key,
        this->type); }
 
@@ -349,6 +361,7 @@ namespace hfst
       (&hfst::implementations::SfstTransducer::substitute,
        &hfst::implementations::TropicalWeightTransducer::substitute,
        &hfst::implementations::LogWeightTransducer::substitute,
+       &hfst::implementations::FomaTransducer::substitute,
        key_table.add_symbol(old_symbol),key_table.add_symbol(new_symbol),
        this->type); }
 
@@ -359,6 +372,7 @@ namespace hfst
       (&hfst::implementations::SfstTransducer::substitute,
        &hfst::implementations::TropicalWeightTransducer::substitute,
        &hfst::implementations::LogWeightTransducer::substitute,
+       &hfst::implementations::FomaTransducer::substitute,
        key_table.get_key_pair(old_symbol_pair),
        key_table.get_key_pair(new_symbol_pair),
        this->type); }
@@ -369,6 +383,7 @@ namespace hfst
       (&hfst::implementations::SfstTransducer::substitute,
        &hfst::implementations::TropicalWeightTransducer::substitute,
        &hfst::implementations::LogWeightTransducer::substitute,
+       &hfst::implementations::FomaTransducer::substitute,
        old_key_pair,new_key_pair,
        this->type); }
 
@@ -380,6 +395,7 @@ namespace hfst
     return apply(&hfst::implementations::SfstTransducer::compose,
 		 &hfst::implementations::TropicalWeightTransducer::compose,
 		 &hfst::implementations::LogWeightTransducer::compose,
+		 &hfst::implementations::FomaTransducer::compose,
 		 another,
 		 type); }
 
@@ -391,6 +407,7 @@ namespace hfst
     return apply(&hfst::implementations::SfstTransducer::concatenate,
 		 &hfst::implementations::TropicalWeightTransducer::concatenate,
 		 &hfst::implementations::LogWeightTransducer::concatenate,
+		 &hfst::implementations::FomaTransducer::concatenate,
 		 another,
 		 type); }
 
@@ -414,6 +431,9 @@ namespace hfst
       case LOG_OFST_TYPE:
 	hfst::implementations::LogWeightTransducer::disjunct_as_tries
 	  (*implementation.log_ofst,another.implementation.log_ofst);
+	break;
+      case FOMA_TYPE:
+	throw hfst::exceptions::FunctionNotImplementedException();
 	break;
       default:
 	assert(false);
@@ -451,6 +471,9 @@ namespace hfst
 	  return *this;
 	  break;
 	}
+      case FOMA_TYPE:
+	throw hfst::exceptions::FunctionNotImplementedException();
+	break;
       default:       
 	assert(false);
 	return *this;
@@ -473,6 +496,7 @@ namespace hfst
     return apply(&hfst::implementations::SfstTransducer::disjunct,
 		 &hfst::implementations::TropicalWeightTransducer::disjunct,
 		 &hfst::implementations::LogWeightTransducer::disjunct,
+		 &hfst::implementations::FomaTransducer::disjunct,
 		 another,
 		 type); }
 
@@ -484,6 +508,7 @@ namespace hfst
     return apply(&hfst::implementations::SfstTransducer::intersect,
 		 &hfst::implementations::TropicalWeightTransducer::intersect,
 		 &hfst::implementations::LogWeightTransducer::intersect,
+		 &hfst::implementations::FomaTransducer::intersect,
 		 another,
 		 type); }
 
@@ -495,6 +520,7 @@ namespace hfst
     return apply(&hfst::implementations::SfstTransducer::subtract,
 		 &hfst::implementations::TropicalWeightTransducer::subtract,
 		 &hfst::implementations::LogWeightTransducer::subtract,
+		 &hfst::implementations::FomaTransducer::subtract,
 		 another,
 		 type); }
 
@@ -525,6 +551,9 @@ namespace hfst
 	break;
       case LOG_OFST_TYPE:
 	return FLOAT;
+	break;
+      case FOMA_TYPE:
+	return BOOL;
 	break;
 	case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
@@ -620,6 +649,8 @@ namespace hfst
 	hfst::implementations::InternalTransducer * internal;
 	switch (this->type)
 	  {
+	  case FOMA_TYPE:
+	    throw hfst::exceptions::FunctionNotImplementedException();
 	  case SFST_TYPE:
 	    internal = 
 	      hfst::implementations::sfst_to_internal_format(implementation.sfst);
@@ -669,6 +700,8 @@ namespace hfst
   {
     switch (t.type)
       {
+      case FOMA_TYPE:
+	throw hfst::exceptions::FunctionNotImplementedException();
       case SFST_TYPE:
 	t.sfst_interface.print(t.implementation.sfst,t.key_table,out);
 	break;

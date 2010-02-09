@@ -9,6 +9,7 @@
  
 namespace hfst { namespace implementations
 {
+
   using namespace hfst::symbols;
   using namespace hfst::exceptions;
   using std::ostream;
@@ -22,8 +23,8 @@ namespace hfst { namespace implementations
     std::string filename;
     FILE * input_file;
     void add_symbol(StringSymbolMap &string_number_map,
-		    Character c,
-		    Alphabet &alphabet);
+    		    Character c,
+    		    Alphabet &alphabet);
     void populate_key_table(KeyTable &key_table,
 			    Alphabet &alphabet,
 			    KeyMap &key_map);
@@ -40,8 +41,8 @@ namespace hfst { namespace implementations
     bool is_bad(void);
     bool is_good(void);
     bool is_fst(void);
-    Transducer * read_transducer(KeyTable &key_table);
-    Transducer * read_transducer(void);
+    fsm * read_transducer(KeyTable &key_table);
+    fsm * read_transducer(void);
   };
   
   class FomaTransitionIterator;
@@ -50,10 +51,10 @@ namespace hfst { namespace implementations
   {
     protected:
       Node * state;
-      Transducer * t;
+      fsm * t;
       friend class FomaStateIndexer;
     public:
-      FomaState(Node * state, Transducer * t);
+      FomaState(Node * state, fsm * t);
       FomaState(const FomaState &s);
       bool get_final_weight(void) const;
       bool operator< (const FomaState &another) const;
@@ -70,11 +71,11 @@ namespace hfst { namespace implementations
     {
     protected:
       NodeNumbering node_numbering;
-      Transducer * t;
+      fsm * t;
       int current_state;
       bool ended;
     public:
-      FomaStateIterator(Transducer * t);
+      FomaStateIterator(fsm * t);
       FomaStateIterator(void);
       void operator= (const FomaStateIterator &another);
       bool operator== (const FomaStateIterator &another) const;
@@ -89,9 +90,9 @@ namespace hfst { namespace implementations
     protected:
       Arc * arc;
       Node * source_state;
-      Transducer * t;
+      fsm * t;
     public:
-      FomaTransition(Arc * arc, Node * n, Transducer * t);
+      FomaTransition(Arc * arc, Node * n, fsm * t);
       FomaTransition(const FomaTransition &t);
       Key get_input_key(void) const;
       Key get_output_key(void) const;
@@ -110,10 +111,10 @@ namespace hfst { namespace implementations
     protected:
       Node * state;
       ArcsIter arc_iterator;
-      Transducer * t;
+      fsm * t;
       bool end_iterator;
     public:
-      FomaTransitionIterator(Node * state,Transducer * t);
+      FomaTransitionIterator(Node * state,fsm * t);
       FomaTransitionIterator(void);
       void operator=  (const FomaTransitionIterator &another);
       bool operator== (const FomaTransitionIterator &another);
@@ -126,10 +127,10 @@ namespace hfst { namespace implementations
   class FomaStateIndexer
     {
     protected:
-      Transducer * t;
+      fsm * t;
       NodeNumbering numbering;
     public:
-      FomaStateIndexer(Transducer * t);
+      FomaStateIndexer(fsm * t);
       unsigned int operator[](const FomaState &state);
       const FomaState operator[](unsigned int number);
     };
