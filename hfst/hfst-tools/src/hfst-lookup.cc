@@ -136,7 +136,7 @@ static const char* APERTIUM_BEGIN_SETF = "^%i";
 static const char* APERTIUM_LOOKUPF = "/%l";
 static const char* APERTIUM_END_SETF = "$%m%n";
 // ^notaword/*notaword$[apertium superblank markup]
-static const char* APERTIUM_EMPTY_BEGIN_SETF = "^";
+static const char* APERTIUM_EMPTY_BEGIN_SETF = "^%i";
 static const char* APERTIUM_EMPTY_LOOKUPF = "/*%i";
 static const char* APERTIUM_EMPTY_END_SETF = "$%m%n";
 // ¶[apertium superblank markup]
