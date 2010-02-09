@@ -1,10 +1,10 @@
 SOURCES=SfstTransducer.h SymbolDefs.h TropicalWeightTransducer.h GlobalSymbolTable.h HfstTokenier.h ConvertTransducerFormat.h LogWeightTransducer.h \
 HfstException.h SfstTransducer.cc SymbolDefs.cc TropicalWeightTransducer.cc HfstTokenizer.cc ConvertTransducerFormat.cc \
-LogWeightTransducer.cc LogFstTrieFunctions.h LogFstTrieFunctions.cc \
+LogWeightTransducer.cc LogFstTrieFunctions.h LogFstTrieFunctions.cc FomaTransducer.cc \
 ExtractStrings.h
 
 CXXFLAGS=-O3 -Wall -Wextra -g -pg
-all: SfstTransducer.o TropicalWeightTransducer.o LogWeightTransducer.o SymbolDefs.o \
+all: SfstTransducer.o TropicalWeightTransducer.o LogWeightTransducer.o SymbolDefs.o FomaTransducer.o \
 GlobalSymbolTable.o HfstTokenizer.o ConvertTransducerFormat.o LogFstTrieFunctions.o ofst sfst
 
 clean:

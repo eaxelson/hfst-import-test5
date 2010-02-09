@@ -19,7 +19,8 @@ HfstApply.o HfstInputStream.o
 IMPLEMENTATIONS=implementations/SfstTransducer.o \
 implementations/TropicalWeightTransducer.o \
 implementations/LogWeightTransducer.o \
-implementations/LogFstTrieFunctions.o
+implementations/LogFstTrieFunctions.o \
+implementations/FomaTransducer.o
 
 OFST_LIB_PATHS=-Limplementations/openfst-1.1/src/lib \
 -Limplementations/openfst-1.1/src/bin
