@@ -144,7 +144,7 @@ struct sigma {
     struct sigma *next;
 };
 
-  //#include "fomalibconf.h"
+#include "fomalibconf.h"
 
 /********************/
 /* Basic operations */
