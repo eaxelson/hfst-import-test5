@@ -1,39 +1,47 @@
 #include "GlobalSymbolTable.h"
 #include "SymbolDefs.h"
 #include "HfstExceptions.h"
-#include "foma/fomalib.h"
+#include "FOOLIB"
+// Tropical: #include "ExtractStrings.h"
 #include <cstdio>
 #include <string>
 #include <sstream>
 #include <iostream>
  
-namespace hfst { namespace implementations
+namespace hfst {
+  namespace implementations
 {
-
-  using namespace hfst::symbols;
+  using namespace FOO;
   using namespace hfst::exceptions;
+  // Tropical: typedef StdArc::StateId StateId;
+  using namespace hfst::symbols;
   using std::ostream;
   using std::ostringstream;
+  // Tropical: using std::stringstream;
 
   extern GlobalSymbolTable global_symbol_table;
 
-  class FomaInputStream 
+  class FooInputStream 
   {
   private:
     std::string filename;
-    FILE * input_file;
-    void add_symbol(StringSymbolMap &string_number_map,
-    		    Character c,
-    		    Alphabet &alphabet);
+    // Sfst: FILE * input_file;
+    // Tropical: ifstream i_stream;
+    // Tropical: istream &input_stream;
+    // Sfst: void add_symbol(StringSymbolMap &string_number_map,
+    // Character c,
+    // Alphabet &alphabet);
     void populate_key_table(KeyTable &key_table,
-			    Alphabet &alphabet,
+			    Sfst: Alphabet &alphabet,
+			    Tropical: const SymbolTable * i_symbol_table,
+			    Tropical: const SymbolTable * o_symbol_table,
 			    KeyMap &key_map);
     void skip_identifier_version_3_0(void);
     void skip_hfst_header(void);
 
   public:
-    FomaInputStream(void);
-    FomaInputStream(const char * filename);
+    FooInputStream(void);
+    FooInputStream(const char * filename);
     void open(void);
     void close(void);
     bool is_open(void);
@@ -41,139 +49,148 @@ namespace hfst { namespace implementations
     bool is_bad(void);
     bool is_good(void);
     bool is_fst(void);
-    fsm * read_transducer(KeyTable &key_table);
-    fsm * read_transducer(void);
+    // Tropical: bool operator() (void);
+    FooTransducer * read_transducer(KeyTable &key_table);
+    FooTransducer * read_transducer(void);
   };
-  
-  class FomaTransitionIterator;
-  class FomaStateIndexer;
-  class FomaState
+
+  class FooTransitionIterator;
+  class FooStateIndexer;
+  class FooState
   {
     protected:
-      Node * state;
-      fsm * t;
-      friend class FomaStateIndexer;
+      FooNode state;
+      FooTransducer * t;
+      friend class FooStateIndexer;
     public:
-      FomaState(Node * state, fsm * t);
-      FomaState(const FomaState &s);
-      bool get_final_weight(void) const;
-      bool operator< (const FomaState &another) const;
-      bool operator== (const FomaState &another) const;
-      bool operator!= (const FomaState &another) const;
-      typedef FomaTransitionIterator const_iterator; 
+      FooState(FooNode state, FooTransducer * t);
+      FooState(const FooState &s);
+      Foo get_final_weight(void) const;
+      bool operator< (const FooState &another) const;
+      bool operator== (const FooState &another) const;
+      bool operator!= (const FooState &another) const;
+      typedef FooTransitionIterator const_iterator; 
       const_iterator begin(void) const;
       const_iterator end(void) const;
       void print(KeyTable &key_table, ostream &out,
-		 FomaStateIndexer &indexer) const;
+		 FooStateIndexer &indexer) const;
   };
-  
-  class FomaStateIterator 
+
+  class FooStateIterator 
     {
     protected:
-      NodeNumbering node_numbering;
-      fsm * t;
+      FooTransducer * t;
+      // Sfst: NodeNumbering node_numbering;
+      // Tropical: StateIterator<FooTransducer> * iterator;
       int current_state;
       bool ended;
     public:
-      FomaStateIterator(fsm * t);
-      FomaStateIterator(void);
-      void operator= (const FomaStateIterator &another);
-      bool operator== (const FomaStateIterator &another) const;
-      bool operator!= (const FomaStateIterator &another) const;
-      const FomaState operator* (void);
+      FooStateIterator(FooTransducer * t);
+      FooStateIterator(void);
+      // Tropical: ~FooStateIterator(void);
+      void operator= (const FooStateIterator &another);
+      bool operator== (const FooStateIterator &another) const;
+      bool operator!= (const FooStateIterator &another) const;
+      const FooState operator* (void);
       void operator++ (void);
       void operator++ (int);
     };
 
-  class FomaTransition
+  class FooTransition
     {
     protected:
-      Arc * arc;
-      Node * source_state;
-      fsm * t;
+      FooArc arc;
+      FooNode source_state;
+      FooTransducer * t;
     public:
-      FomaTransition(Arc * arc, Node * n, fsm * t);
-      FomaTransition(const FomaTransition &t);
+      // Sfst: FooTransition(FooArc arc, FooNode n, FooTransducer * t);
+      // Tropical: FooTransition(const FooArc &arc, 
+      //		       FooNode source_state, 
+      //		       FooTransducer * t);
+      // Sfst: FooTransition(const FooTransition &t);
       Key get_input_key(void) const;
       Key get_output_key(void) const;
-      FomaState get_target_state(void) const;
-      FomaState get_source_state(void) const;
-      /* Kind of weird function, since foma
-	 transitions don't really carry a weight. 
-	 Will always return true. */
-      bool get_weight(void) const;
+      FooState get_target_state(void) const;
+      FooState get_source_state(void) const;
+      Foo get_weight(void) const;
       void print(KeyTable &key_table, ostream &out,
-		 FomaStateIndexer &indexer) const;
+		 FooStateIndexer &indexer) const;
     };
 
-  class FomaTransitionIterator
+  class FooTransitionIterator
     {
     protected:
-      Node * state;
-      ArcsIter arc_iterator;
-      fsm * t;
+      FooNode state;
+      FooArcsIter arc_iterator;
+      FooTransducer * t;
       bool end_iterator;
     public:
-      FomaTransitionIterator(Node * state,fsm * t);
-      FomaTransitionIterator(void);
-      void operator=  (const FomaTransitionIterator &another);
-      bool operator== (const FomaTransitionIterator &another);
-      bool operator!= (const FomaTransitionIterator &another);
-      const FomaTransition operator* (void);
+      FooTransitionIterator(FooNode state,FooTransducer * t);
+      FooTransitionIterator(void);
+      //Sfst: ~FooTransitionIterator(void);
+      void operator=  (const FooTransitionIterator &another);
+      bool operator== (const FooTransitionIterator &another);
+      bool operator!= (const FooTransitionIterator &another);
+      const FooTransition operator* (void);
       void operator++ (void);
       void operator++ (int);
     };
 
-  class FomaStateIndexer
+  class FooStateIndexer
     {
     protected:
-      fsm * t;
-      NodeNumbering numbering;
+      FooTransducer * t;
+      // Sfst: NodeNumbering numbering;
     public:
-      FomaStateIndexer(fsm * t);
-      unsigned int operator[](const FomaState &state);
-      const FomaState operator[](unsigned int number);
+      FooStateIndexer(FooTransducer * t);
+      unsigned int operator[](const FooState &state);
+      const FooState operator[](unsigned int number);
     };
 
-  class FomaTransducer
+  class FooTransducer
     {
     public:
-      static fsm * create_empty_transducer(void);
-      static fsm * create_epsilon_transducer(void);
-      static fsm * define_transducer(Key k);
-      static fsm * define_transducer(const KeyPair &kp);
-      static fsm * define_transducer(const KeyPairVector &kpv);
-      static fsm * copy(fsm * t);
-      static fsm * determinize(fsm * t);
-      static fsm * minimize(fsm * t);
-      static fsm * remove_epsilons(fsm * t);
-      static fsm * repeat_star(fsm * t);
-      static fsm * repeat_plus(fsm * t);
-      static fsm * repeat_n(fsm * t,int n);
-      static fsm * repeat_le_n(fsm * t,int n);
-      static fsm * optionalize(fsm * t);
-      static fsm * invert(fsm * t);
-      static fsm * reverse(fsm * transducer);
-      static fsm * extract_input_language(fsm * t);
-      static fsm * extract_output_language(fsm * t);
-      static fsm * substitute(fsm * t,Key old_key,Key new_key);
-      static fsm * substitute(fsm * t,
+      static FooTransducer * create_empty_transducer(void);
+      static FooTransducer * create_epsilon_transducer(void);
+      static FooTransducer * define_transducer(Key k);
+      static FooTransducer * define_transducer(const KeyPair &kp);
+      static FooTransducer * define_transducer(const KeyPairVector &kpv);
+      static FooTransducer * copy(FooTransducer * t);
+      static FooTransducer * determinize(FooTransducer * t);
+      static FooTransducer * minimize(FooTransducer * t);
+      static FooTransducer * remove_epsilons(FooTransducer * t);
+      // Tropical: static FooTransducer * n_best(FooTransducer * t,int n);
+      static FooTransducer * repeat_star(FooTransducer * t);
+      static FooTransducer * repeat_plus(FooTransducer * t);
+      static FooTransducer * repeat_n(FooTransducer * t,int n);
+      static FooTransducer * repeat_le_n(FooTransducer * t,int n);
+      static FooTransducer * optionalize(FooTransducer * t);
+      static FooTransducer * invert(FooTransducer * t);
+      static FooTransducer * reverse(FooTransducer * transducer);
+      static FooTransducer * extract_input_language(FooTransducer * t);
+      static FooTransducer * extract_output_language(FooTransducer * t);
+      // Tropical: static void extract_strings(FooTransducer * t, KeyTable &kt,
+      //	  WeightedStrings<float>::Set &results);
+      static FooTransducer * substitute(FooTransducer * t,Key old_key,Key new_key);
+      static FooTransducer * substitute(FooTransducer * t,
 			      KeyPair old_key_pair,
 			      KeyPair new_key_pair);
-      static fsm * compose(fsm * t1,
-			   fsm * t2);
-      static fsm * concatenate(fsm * t1,
-			       fsm * t2);
-      static fsm * disjunct(fsm * t1,
-			    fsm * t2);
-      static fsm * intersect(fsm * t1,
-			     fsm * t2);
-      static fsm * subtract(fsm * t1,
-			    fsm * t2);
-      typedef FomaStateIterator const_iterator;
-      static const_iterator begin(fsm * t);
-      static const_iterator end(fsm * t);
-      static fsm * harmonize(fsm * t,KeyMap &key_map);
-      static void print(fsm * t, KeyTable &key_table, ostream &out);
+      static FooTransducer * compose(FooTransducer * t1,
+				     FooTransducer * t2);
+      static FooTransducer * concatenate(FooTransducer * t1,
+					 FooTransducer * t2);
+      static FooTransducer * disjunct(FooTransducer * t1,
+				      FooTransducer * t2);
+      static FooTransducer * intersect(FooTransducer * t1,
+				       FooTransducer * t2);
+      static FooTransducer * subtract(FooTransducer * t1,
+				      FooTransducer * t2);
+      // Tropical: static FooTransducer * set_weight(FooTransducer * t,float f);
+      typedef FooStateIterator const_iterator;
+      static const_iterator begin(FooTransducer * t);
+      static const_iterator end(FooTransducer * t);
+      static FooTransducer * harmonize(FooTransducer * t,KeyMap &key_map);
+      static void print(FooTransducer * t, KeyTable &key_table, ostream &out);
     };
+
 } }
