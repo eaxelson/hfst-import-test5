@@ -1,4 +1,8 @@
-CXXFLAGS=-Wno-deprecated -g -Wall -Wextra -Werror
+CXXFLAGS=-Wno-deprecated -g -Wall -Wextra -Werror -DDEBUG_MAIN
+
+FOMA_DIR=implementations/foma
+
+FOMA_OBJS=implementations/foma/*.o
 
 SFST_DIR=implementations/SFST/src
 
@@ -26,7 +30,7 @@ OFST_LIB_PATHS=-Limplementations/openfst-1.1/src/lib \
 -Limplementations/openfst-1.1/src/bin
 
 all: objs
-	ar rc libhfst3.a $(SFST_OBJS) $(OFST_OBJS) \
+	ar rc libhfst3.a $(SFST_OBJS) $(OFST_OBJS) $(FOMA_OBJS) \
 	$(IMPLEMENTATIONS) $(HFST_OBJS)
 
 
@@ -46,3 +50,7 @@ HfstInputStream: HfstInputStream.cc
 
 hfst_obj:
 	$(MAKE) -C ./implementations all
+
+test:
+	g++ -i HfstTransducer.o -lhfst3 -L. -o test
+

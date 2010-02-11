@@ -86,7 +86,7 @@ struct state_array *map_firstlines(struct fsm *net);
 void fsm_count(struct fsm *net);
 
 void fsm_sort_lines(struct fsm *net);
-void fsm_update_flags(struct fsm *net, int det, int pru, int min, int eps, int loop, int compl);
+void fsm_update_flags(struct fsm *net, int det, int pru, int min, int eps, int loop, int compl_);
 
 /* Rewrite-related functions */
 struct fsm *rewrite_cp_to_fst(struct fsm *net, char *lower_symbol, char *zero_symbol);
@@ -157,7 +157,7 @@ int flag_get_type(char *string);
 char *trim(char *string);
 char *chop(char *string);
 void strip_newline(char *s);
-char *streqrep(char *s, char *old, char *new);
+char *streqrep(char *s, char *old, char *new_);
 char *xxstrndup(const char *s, size_t n);
 char *xxstrdup(const char *s);
 void *xxmalloc(size_t size);

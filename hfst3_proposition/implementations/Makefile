@@ -27,6 +27,9 @@ SfstTransducer.o: SfstTransducer.cc
 ConvertTransducerFormat.o: ConvertTransducerFormat.cc
 	g++ $(CXXFLAGS) -Wno-deprecated -c -o $@ $^
 
+FomaTransducer.o: FomaTransducer.cc
+	g++ $(CXXFLAGS) -Wno-deprecated -c -o $@ $^
+
 ofst:
 	$(MAKE) -C ./openfst-1.1 all
 
