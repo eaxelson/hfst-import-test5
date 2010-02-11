@@ -158,7 +158,15 @@ typedef void* yyscan_t;
 
 /* Size of default input buffer. */
 #ifndef YY_BUF_SIZE
+#ifdef __ia64__
+/* On IA-64, the buffer size is 16k, not 8k.
+ * Moreover, YY_BUF_SIZE is 2*YY_READ_BUF_SIZE in the general case.
+ * Ditto for the __ia64__ case accordingly.
+ */
+#define YY_BUF_SIZE 32768
+#else
 #define YY_BUF_SIZE 16384
+#endif /* __ia64__ */
 #endif
 
 /* The state buf must be large enough to hold one state per character in the main buffer.
@@ -1819,7 +1827,7 @@ int my_yyparse(char *my_string, int lineno) {
 /* what we're doing is excluding some combinations of multibyte sequences */
 /* using the {-} construct in flex */
 
-#line 1823 "lex.yy.c"
+#line 1831 "lex.yy.c"
 
 #define INITIAL 0
 #define DEFI 1
@@ -1954,7 +1962,12 @@ static int input (yyscan_t yyscanner );
 
 /* Amount of stuff to slurp up with each read. */
 #ifndef YY_READ_BUF_SIZE
+#ifdef __ia64__
+/* On IA-64, the buffer size is 16k, not 8k */
+#define YY_READ_BUF_SIZE 16384
+#else
 #define YY_READ_BUF_SIZE 8192
+#endif /* __ia64__ */
 #endif
 
 /* Copy whatever the last rule matched to the standard output. */
@@ -2063,7 +2076,7 @@ YY_DECL
 
  /* we're matching braced strings */
 
-#line 2067 "lex.yy.c"
+#line 2080 "lex.yy.c"
 
     yylval = yylval_param;
 
@@ -2854,7 +2867,7 @@ YY_RULE_SETUP
 #line 376 "regex.l"
 ECHO;
 	YY_BREAK
-#line 2858 "lex.yy.c"
+#line 2871 "lex.yy.c"
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(DEFI):
 case YY_STATE_EOF(QTD):
@@ -3632,8 +3645,8 @@ YY_BUFFER_STATE yy_scan_string (yyconst char * yystr , yyscan_t yyscanner)
 
 /** Setup the input buffer state to scan the given bytes. The next call to yylex() will
  * scan from a @e copy of @a bytes.
- * @param bytes the byte buffer to scan
- * @param len the number of bytes in the buffer pointed to by @a bytes.
+ * @param yybytes the byte buffer to scan
+ * @param _yybytes_len the number of bytes in the buffer pointed to by @a bytes.
  * @param yyscanner The scanner object.
  * @return the newly allocated buffer state object.
  */

@@ -68,6 +68,9 @@ namespace hfst
 	implementation.log_ofst = 
 	  log_ofst_interface.create_empty_transducer();
 	break;
+      case FOMA_TYPE:
+	implementation.foma = foma_interface.create_empty_transducer();
+	break;
 	case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
@@ -734,6 +737,7 @@ int main(void)
   HfstTransducer ofst(TROPICAL_OFST_TYPE);
   HfstTransducer ofst_kt(key_table,TROPICAL_OFST_TYPE);
   HfstTransducer sfst_copy(sfst_kt);
+  HfstTransducer foma(FOMA_TYPE);
   std::cout << sfst << std::endl;
   KeyTable key_table_c = sfst_kt.get_key_table();
   assert(key_table_c["a"] == 1);
