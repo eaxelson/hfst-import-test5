@@ -5,34 +5,57 @@
 #endif
 
 namespace hfst { namespace implementations {
-  FomaInputStream::FomaInputStream(void)
+    FomaInputStream::FomaInputStream(void):
+      filename(std::string()), is_open_(false)
   {
-
   }
-  
-  FomaInputStream::FomaInputStream(const char * filename)
-  {
 
+    /*  void iface_load_stack(char *filename) {
+    struct fsm *net;
+    char *net_name;
+
+    if (io_gz_file_to_mem(filename) == 0) {
+        printf("File error.\n");
+        return;
+    }
+    while ((net = io_net_read(&net_name)) != NULL)
+        stack_add(net);
+    io_free();
+    return;
+    }*/
+
+    FomaInputStream::FomaInputStream(const char * filename):
+      filename(filename), is_open_(false)
+  {
   }
   
   void FomaInputStream::open(void)
   {
-    throw hfst::exceptions::FunctionNotImplementedException();
+    if (filename == std::string())
+      { is_open_=true; return; }
+    FILE *input_file = fopen(filename.c_str(),"r");
+    if (input_file == NULL)
+      { throw FileNotReadableException(); }
+    is_open_=true;
+    fclose(input_file);
+    return;
   }
   
   void FomaInputStream::close(void)
   {
-    throw hfst::exceptions::FunctionNotImplementedException();
+    is_open_=false;
+    io_free();
+    return;
   }
   
   bool FomaInputStream::is_open(void)
   {
-    throw hfst::exceptions::FunctionNotImplementedException();
+    return is_open_;
   }
   
   bool FomaInputStream::is_eof(void)
   {
-    throw hfst::exceptions::FunctionNotImplementedException();
+    return io_buf_is_end();
   }
   
   bool FomaInputStream::is_bad(void)
@@ -88,7 +111,17 @@ namespace hfst { namespace implementations {
 
   fsm * FomaInputStream::read_transducer(void)
   {
-    throw hfst::exceptions::FunctionNotImplementedException();
+    if ( (not is_open()) )
+      throw FileIsClosedException();
+    if (io_buf_is_empty())
+      io_gz_file_to_mem(strdup(filename.c_str()));
+    if (is_eof())
+      return NULL;
+    char **foo=NULL;
+    struct fsm * t = io_net_read(foo);
+    if (t == NULL)
+      throw NotTransducerStreamException();
+    return t;
   };
   
   FomaState::FomaState(FomaNode state, fsm * t) 
@@ -401,3 +434,14 @@ namespace hfst { namespace implementations {
 
   } }
 
+#ifdef DEBUG_MAIN
+using namespace hfst::implementations;
+#include <iostream>
+hfst::symbols::GlobalSymbolTable KeyTable::global_symbol_table;
+int main(int argc, char * argv[]) 
+{
+  const char *filename = "foo.foma";
+  FomaInputStream in(filename);
+  return 0;
+}
+#endif

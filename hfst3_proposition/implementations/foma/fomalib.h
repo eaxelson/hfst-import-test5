@@ -150,6 +150,14 @@ struct sigma {
 /* Basic operations */
 /********************/
 
+
+FEXPORT int io_buf_is_empty(void);
+FEXPORT int io_buf_is_end(void);
+FEXPORT void io_free(void);
+FEXPORT size_t io_gz_file_to_mem (char *filename);
+FEXPORT struct fsm *io_net_read(char **net_name);
+
+
 FEXPORT struct fsm *fsm_determinize(struct fsm *net);
 FEXPORT struct fsm *fsm_epsilon_remove(struct fsm *net);
 FEXPORT struct fsm *fsm_minimize(struct fsm *net);

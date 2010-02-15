@@ -9,6 +9,14 @@
 #include <sstream>
 #include <iostream>
 
+/*
+int io_buf_is_empty(void);
+int io_buf_is_end(void);
+void io_free(void);
+size_t io_gz_file_to_mem (char *filename);
+struct fsm *io_net_read(char **net_name);
+*/
+
 // dummy definitions
 typedef int FomaNode;
 typedef int FomaArc;
@@ -30,15 +38,16 @@ namespace hfst {
 
   class FomaInputStream 
   {
-    /*private:
+    private:
     std::string filename;
+    bool is_open_;
     // Sfst: FILE * input_file;
     // Tropical: ifstream i_stream;
     // Tropical: istream &input_stream;
     // Sfst: void add_symbol(StringSymbolMap &string_number_map,
     // Character c,
     // Alphabet &alphabet);
-    void populate_key_table(KeyTable &key_table,
+    /*void populate_key_table(KeyTable &key_table,
 			    Sfst: Alphabet &alphabet,
 			    Tropical: const SymbolTable * i_symbol_table,
 			    Tropical: const SymbolTable * o_symbol_table,
@@ -165,45 +174,41 @@ namespace hfst {
     public:
       static fsm * create_empty_transducer(void);
       static fsm * create_epsilon_transducer(void);
-      static fsm * define_transducer(Key k);
-      static fsm * define_transducer(const KeyPair &kp);
-      static fsm * define_transducer(const KeyPairVector &kpv);
+      static fsm * define_transducer(Key k);                     // not done
+      static fsm * define_transducer(const KeyPair &kp);         // not done
+      static fsm * define_transducer(const KeyPairVector &kpv);  // not done
       static fsm * copy(fsm * t);
       static fsm * determinize(fsm * t);
       static fsm * minimize(fsm * t);
       static fsm * remove_epsilons(fsm * t);
-      // Tropical: static fsm * n_best(fsm * t,int n); NOT NEEDED
       static fsm * repeat_star(fsm * t);
       static fsm * repeat_plus(fsm * t);
       static fsm * repeat_n(fsm * t,int n);
       static fsm * repeat_le_n(fsm * t,int n);
       static fsm * optionalize(fsm * t);
       static fsm * invert(fsm * t);
-      static fsm * reverse(fsm * transducer);
+      static fsm * reverse(fsm * t);
       static fsm * extract_input_language(fsm * t);
       static fsm * extract_output_language(fsm * t);
-      // Tropical: static void extract_strings(fsm * t, KeyTable &kt, NOT NEEDED
-      //	  WeightedStrings<float>::Set &results);
-      static fsm * substitute(fsm * t,Key old_key,Key new_key);
-      static fsm * substitute(fsm * t,
+      static fsm * substitute(fsm * t,Key old_key,Key new_key);  // not done
+      static fsm * substitute(fsm * t,                           // not done
 			      KeyPair old_key_pair,
 			      KeyPair new_key_pair);
       static fsm * compose(fsm * t1,
-				     fsm * t2);
+			   fsm * t2);
       static fsm * concatenate(fsm * t1,
-					 fsm * t2);
+			       fsm * t2);
       static fsm * disjunct(fsm * t1,
-				      fsm * t2);
+			    fsm * t2);
       static fsm * intersect(fsm * t1,
-				       fsm * t2);
+			     fsm * t2);
       static fsm * subtract(fsm * t1,
-				      fsm * t2);
-      // Tropical: static fsm * set_weight(fsm * t,float f); NOT NEEDED
+			    fsm * t2);
       typedef FomaStateIterator const_iterator;
       static const_iterator begin(fsm * t);
       static const_iterator end(fsm * t);
-      static fsm * harmonize(fsm * t,KeyMap &key_map);
-      static void print(fsm * t, KeyTable &key_table, ostream &out);
+      static fsm * harmonize(fsm * t,KeyMap &key_map);                // not done
+      static void print(fsm * t, KeyTable &key_table, ostream &out);  // not done
     };
 
 } }

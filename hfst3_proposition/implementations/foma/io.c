@@ -55,6 +55,18 @@ static inline int explode_line (char *buf, int *values);
 
 static char *io_buf = NULL, *io_buf_ptr = NULL;
 
+// HFST additions
+int io_buf_is_end(void) {
+  if (io_buf_ptr == NULL)
+    return 1;
+  return 0;
+}
+int io_buf_is_empty(void) {
+  if (io_buf_ptr == NULL)
+    return 1;
+  return 0;
+}
+
 int write_prolog (struct fsm *net, char *filename) {
   struct fsm_state *stateptr;
   int i, *finals, *used_symbols, maxsigma;
