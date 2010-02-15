@@ -2,7 +2,7 @@ CXXFLAGS=-Wno-deprecated -g -Wall -Wextra -Werror -DDEBUG_MAIN
 
 FOMA_DIR=implementations/foma
 
-FOMA_OBJS=implementations/foma/*.o
+FOMA_OBJS=$(FOMA_DIR)/apply.o $(FOMA_DIR)/coaccessible.o $(FOMA_DIR)/constructions.o $(FOMA_DIR)/define.o $(FOMA_DIR)/determinize.o $(FOMA_DIR)/dynarray.o $(FOMA_DIR)/extract.o $(FOMA_DIR)/flags.o $(FOMA_DIR)/int_stack.o $(FOMA_DIR)/invert.o $(FOMA_DIR)/io.o $(FOMA_DIR)/lex.cmatrix.o $(FOMA_DIR)/lexcread.o $(FOMA_DIR)/mem.o $(FOMA_DIR)/minimize.o $(FOMA_DIR)/regex.tab.o $(FOMA_DIR)/reverse.o $(FOMA_DIR)/rewrite.o $(FOMA_DIR)/sigma.o $(FOMA_DIR)/spelling.o $(FOMA_DIR)/stack.o $(FOMA_DIR)/structures.o $(FOMA_DIR)/topsort.o $(FOMA_DIR)/utf8.o
 
 SFST_DIR=implementations/SFST/src
 

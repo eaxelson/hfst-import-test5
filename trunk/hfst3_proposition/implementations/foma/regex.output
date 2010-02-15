@@ -1,4 +1,4 @@
-Terminals which are not used
+Terminals unused in grammar
 
    ENDM
    ENDD
@@ -318,8 +318,8 @@ network7 (87)
 network8 (88)
     on left: 74, on right: 69
 network9 (89)
-    on left: 75 76 77 78 79 80 81 82 83 84 85 86 87,
-    on right: 74 76 77 78 79 80 81 82 83 84 85 86 87
+    on left: 75 76 77 78 79 80 81 82 83 84 85 86 87, on right: 74 76
+    77 78 79 80 81 82 83 84 85 86 87
 network10 (90)
     on left: 88 89, on right: 75 83 89
 network11 (91)
@@ -329,8 +329,8 @@ sub1 (92)
 sub2 (93)
     on left: 101, on right: 99
 network12 (94)
-    on left: 102 103 104 105 106 107 108 109 110 111 112 113,
-    on right: 91
+    on left: 102 103 104 105 106 107 108 109 110 111 112 113, on right:
+    91
 fstart (95)
     on left: 114 115, on right: 116 119 120
 fmid (96)

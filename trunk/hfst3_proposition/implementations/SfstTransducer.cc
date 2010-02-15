@@ -5,17 +5,18 @@
 #endif
 
 namespace hfst { namespace implementations {
+    /** Create an SfstInputStream that reads from stdin. */
   SfstInputStream::SfstInputStream(void)
   {
     this->input_file = stdin;
   }
-  
+    /** Create an SfstInputStream that reads from file \a filename. */
   SfstInputStream::SfstInputStream(const char * filename):
   filename(filename)
   {
     input_file = NULL;
   }
-  
+    /** Open the stream. */
   void SfstInputStream::open(void)
   {
     if (filename == std::string())
@@ -24,7 +25,7 @@ namespace hfst { namespace implementations {
     if (input_file == NULL)
       { throw FileNotReadableException(); }
   }
-  
+    /** Close the stream. */
   void SfstInputStream::close(void)
   {
     if (input_file == NULL)
@@ -35,7 +36,7 @@ namespace hfst { namespace implementations {
 	input_file = NULL;
       }
   }
-  
+    /** Whether the stream is open. */
   bool SfstInputStream::is_open(void)
   {
     return input_file != NULL;
