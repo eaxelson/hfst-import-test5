@@ -97,6 +97,9 @@ namespace hfst
     union StreamImplementation
     {
       hfst::implementations::LogWeightOutputStream * log_ofst;
+      // hfst::implementations::TropicalWeightOutputStream * tropical_ofst;
+      // hfst::implementations::SfstOutputStream * sfst_ofst;
+      // hfst::implementations::FomaOutputStream * foma_ofst;
     };
     ImplementationType type;
     StreamImplementation implementation;

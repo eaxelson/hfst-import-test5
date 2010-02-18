@@ -70,6 +70,25 @@ namespace hfst {
     fsm * read_transducer(void);
   };
 
+
+  class FomaOutputStream 
+  {
+  private:
+    std::string filename;
+    //ofstream o_stream;
+    //ostream &output_stream;
+    //void set_symbols(LogFst * transducer, KeyTable &key_table);
+    //void write_3_0_library_header(std::ostream &out);
+  public:
+    FomaOutputStream(void); 
+    FomaOutputStream(const char * filename);
+    void open(void);
+    void close(void);
+    void write_transducer(fsm * transducer, KeyTable &key_table);
+    void write_transducer(fsm * transducer);
+  };
+
+
   class FomaTransitionIterator;
   class FomaStateIndexer;
   class FomaState

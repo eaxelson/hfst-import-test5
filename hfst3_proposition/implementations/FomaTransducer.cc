@@ -32,10 +32,10 @@ namespace hfst { namespace implementations {
       }
       fclose(tempfile);
       io_gz_file_to_mem(tempfilename);
-      /*if (remove(tempfilename) != 0) {
+      if (remove(tempfilename) != 0) {
 	fprintf(stderr, "error; could not delete a temporary file.\n");
 	throw ErrorException();
-	}*/
+      }
       return;
     }
     else {
@@ -129,6 +129,49 @@ namespace hfst { namespace implementations {
       throw NotTransducerStreamException();
     return t;
   };
+
+    /*
+  FomaOutputStream::FomaOutputStream(void):
+    output_stream(std::cout)
+  {}
+
+  FomaOutputStream::FomaOutputStream(const char * str):
+    filename(str),o_stream(str,std::ios::out),output_stream(o_stream)
+  {}
+
+    
+  void FomaOutputStream::open(void) {}
+  void FomaOutputStream::close(void) 
+  {
+    if (filename != string())
+      { o_stream.close(); }
+  }
+  void FomaOutputStream::set_symbols(fsm * transducer, KeyTable &key_table) 
+  {
+    SymbolTable symbol_table("anonym_hfst3_symbol_table");
+    for (KeyTable::const_iterator it = key_table.begin();
+	 it != key_table.end();
+	 ++it)
+      { symbol_table.AddSymbol(key_table[it->key],it->key); }
+    transducer->SetInputSymbols(&symbol_table);
+    transducer->SetOutputSymbols(&symbol_table);
+  }
+  void FomaOutputStream::write_3_0_library_header(std::ostream &out)
+  {
+    out.write("HFST3",6);
+    out.put(0);
+    out.write("LOG_OFST_TYPE",14);
+  }
+  void FomaOutputStream::write_transducer(fsm * transducer, KeyTable &key_table) 
+  { set_symbols(transducer,key_table);
+    write_3_0_library_header(output_stream);
+    transducer->Write(output_stream,FstWriteOptions()); }
+
+  void FomaOutputStream::write_transducer(fsm * transducer) 
+  { write_3_0_library_header(output_stream);
+    transducer->Write(output_stream,FstWriteOptions()); }
+
+    */
   
   FomaState::FomaState(FomaNode state, fsm * t) 
   { 
@@ -455,14 +498,6 @@ int main(int argc, char * argv[])
   assert(in.is_open());
   in.close();
   in.open();
-  struct fsm * t;
-  assert(not in.is_eof());
-  while (not in.is_eof()) {
-    t = in.read_transducer();
-    fprintf(stderr, "  One transducer read from file.\n");
-  }
-  in.close();
-  assert(not in.is_open());
 
   // reading from stdin
   FomaInputStream in2;
@@ -475,6 +510,15 @@ int main(int argc, char * argv[])
   }
   in2.close();
   assert(not in2.is_open());
+
+  struct fsm * t;
+  assert(not in.is_eof());
+  while (not in.is_eof()) {
+    t = in.read_transducer();
+    fprintf(stderr, "  One transducer read from file.\n");
+  }
+  in.close();
+  assert(not in.is_open());
 
   fprintf(stderr, "Test ends.\n");
   return 0;
