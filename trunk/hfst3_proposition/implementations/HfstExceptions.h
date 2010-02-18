@@ -61,5 +61,8 @@ public HfstInterfaceException {};
 class WeightTypeMismatchException :
 public HfstInterfaceException {};
 
+class ErrorException :
+public HfstInterfaceException {};
+
 } }
 #endif

@@ -4,6 +4,7 @@ LogWeightTransducer.cc LogFstTrieFunctions.h LogFstTrieFunctions.cc FomaTransduc
 ExtractStrings.h
 
 CXXFLAGS=-O3 -Wall -Wextra -g -pg
+
 all: SfstTransducer.o TropicalWeightTransducer.o LogWeightTransducer.o SymbolDefs.o FomaTransducer.o \
 GlobalSymbolTable.o HfstTokenizer.o ConvertTransducerFormat.o LogFstTrieFunctions.o ofst sfst
 
@@ -36,5 +37,6 @@ ofst:
 sfst:
 	$(MAKE) -C ./SFST/src all
 
-test:
-	g++ -i FomaTransducer.o -lhfst3 -L.. -o test
+testi:	FomaTransducer.cc
+	g++ $(CXXFLAGS) -Wno-deprecated -DDEBUG_MAIN -c FomaTransducer.cc -o FomaTransducer.o
+	g++ -i FomaTransducer.o -lhfst3 -lreadline -lz -L.. -o testi

@@ -57,12 +57,7 @@ static char *io_buf = NULL, *io_buf_ptr = NULL;
 
 // HFST additions
 int io_buf_is_end(void) {
-  if (io_buf_ptr == NULL)
-    return 1;
-  return 0;
-}
-int io_buf_is_empty(void) {
-  if (io_buf_ptr == NULL)
+  if (*(io_buf_ptr) == '\0')
     return 1;
   return 0;
 }

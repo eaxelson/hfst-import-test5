@@ -1,4 +1,4 @@
-CXXFLAGS=-Wno-deprecated -g -Wall -Wextra -Werror -DDEBUG_MAIN
+CXXFLAGS=-Wno-deprecated -g -Wall -Wextra -Werror # -DDEBUG_MAIN
 
 FOMA_DIR=implementations/foma
 
@@ -41,16 +41,16 @@ clean:
 	$(MAKE) -C ./implementations clean
 
 HfstTransducer: HfstTransducer.o HfstInputStream.o HfstApply.o $(HFST_OBJS) $(IMPLEMENTATIONS)
-	g++ -Wno-deprecated -g -DDEBUG_MAIN $(OFST_LIB_PATHS) -lfstmain -lfst\
+	g++ -Wno-deprecated -g $(OFST_LIB_PATHS) -lfstmain -lfst\
 	 -ldl -lm -o $@ HfstTransducer.cc $(SFST_OBJS) $(HFST_OBJS_FOR_HFST_TRANSDUCER) $(IMPLEMENTATIONS)
 
 HfstInputStream: HfstInputStream.cc
-	g++ -g -DDEBUG_MAIN $(OFST_LIB_PATHS) -lfstmain -lfst -ldl -lm \
+	g++ -g $(OFST_LIB_PATHS) -lfstmain -lfst -ldl -lm \
 	-o $@ $^ $(SFST_OBJS) $(HFST_OBJS) $(IMPLEMENTATIONS)
 
 hfst_obj:
 	$(MAKE) -C ./implementations all
 
-test:
-	g++ -i HfstTransducer.o -lhfst3 -L. -o test
+#test:
+#	g++ -i HfstTransducer.o -lhfst3 -L. -o test
 
