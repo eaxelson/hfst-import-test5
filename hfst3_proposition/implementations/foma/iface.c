@@ -536,8 +536,9 @@ void iface_load_stack(char *filename) {
         printf("File error.\n");
         return;
     }
-    while ((net = io_net_read(&net_name)) != NULL)
-        stack_add(net);
+    while ((net = io_net_read(&net_name)) != NULL) {
+      stack_add(net);
+    }
     io_free();
     return;
 }
@@ -864,8 +865,8 @@ void iface_save_stack(char *filename) {
         }
         printf("Writing to file %s.\n", filename);
         for (stack_ptr = stack_find_bottom(); stack_ptr->next != NULL; stack_ptr = stack_ptr->next) {
-            foma_net_print(stack_ptr->fsm, outfile);
-        }
+	  foma_net_print(stack_ptr->fsm, outfile);
+	}
         gzclose(outfile);
         return;
     }

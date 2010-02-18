@@ -150,8 +150,7 @@ struct sigma {
 /* Basic operations */
 /********************/
 
-
-FEXPORT int io_buf_is_empty(void);
+// ADDED TO HFST
 FEXPORT int io_buf_is_end(void);
 FEXPORT void io_free(void);
 FEXPORT size_t io_gz_file_to_mem (char *filename);

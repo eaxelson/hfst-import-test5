@@ -10,20 +10,6 @@ namespace hfst { namespace implementations {
   {
   }
 
-    /*  void iface_load_stack(char *filename) {
-    struct fsm *net;
-    char *net_name;
-
-    if (io_gz_file_to_mem(filename) == 0) {
-        printf("File error.\n");
-        return;
-    }
-    while ((net = io_net_read(&net_name)) != NULL)
-        stack_add(net);
-    io_free();
-    return;
-    }*/
-
     FomaInputStream::FomaInputStream(const char * filename):
       filename(filename), is_open_(false)
   {
@@ -31,14 +17,36 @@ namespace hfst { namespace implementations {
   
   void FomaInputStream::open(void)
   {
-    if (filename == std::string())
-      { is_open_=true; return; }
-    FILE *input_file = fopen(filename.c_str(),"r");
-    if (input_file == NULL)
-      { throw FileNotReadableException(); }
-    is_open_=true;
-    fclose(input_file);
-    return;
+    if (filename == std::string()) {  // reading from stdin 
+      is_open_=true;
+      // read stdin and write it to a file
+      char * tempfilename = tmpnam(NULL);
+      if (tempfilename == NULL) {
+	fprintf(stderr, "error: could not generate a temporary filename.\n");
+	throw ErrorException();
+      }
+      FILE * tempfile = fopen(tempfilename, "w");
+      while( not feof(stdin) ) {
+	int c = fgetc(stdin);
+	fputc(c, tempfile);
+      }
+      fclose(tempfile);
+      io_gz_file_to_mem(tempfilename);
+      /*if (remove(tempfilename) != 0) {
+	fprintf(stderr, "error; could not delete a temporary file.\n");
+	throw ErrorException();
+	}*/
+      return;
+    }
+    else {
+      FILE *input_file = fopen(filename.c_str(),"r");
+      if (input_file == NULL)
+	{ throw FileNotReadableException(); }
+      fclose(input_file);  
+      is_open_=true;
+      io_gz_file_to_mem(strdup(filename.c_str()));    
+      return;
+    }
   }
   
   void FomaInputStream::close(void)
@@ -113,12 +121,10 @@ namespace hfst { namespace implementations {
   {
     if ( (not is_open()) )
       throw FileIsClosedException();
-    if (io_buf_is_empty())
-      io_gz_file_to_mem(strdup(filename.c_str()));
     if (is_eof())
       return NULL;
-    char **foo=NULL;
-    struct fsm * t = io_net_read(foo);
+    char *net_name;
+    struct fsm * t = io_net_read(&net_name);
     if (t == NULL)
       throw NotTransducerStreamException();
     return t;
@@ -440,8 +446,37 @@ using namespace hfst::implementations;
 hfst::symbols::GlobalSymbolTable KeyTable::global_symbol_table;
 int main(int argc, char * argv[]) 
 {
+  fprintf(stderr, "Testing FomaTransducer.cc functions:\n");
+
+  // reading from file
   const char *filename = "foo.foma";
   FomaInputStream in(filename);
+  in.open();
+  assert(in.is_open());
+  in.close();
+  in.open();
+  struct fsm * t;
+  assert(not in.is_eof());
+  while (not in.is_eof()) {
+    t = in.read_transducer();
+    fprintf(stderr, "  One transducer read from file.\n");
+  }
+  in.close();
+  assert(not in.is_open());
+
+  // reading from stdin
+  FomaInputStream in2;
+  in2.open();
+  assert(in2.is_open());
+  struct fsm * t2;
+  while (not in2.is_eof()) {
+    t2 = in2.read_transducer();
+    fprintf(stderr, "  One transducer read from stdin.\n");
+  }
+  in2.close();
+  assert(not in2.is_open());
+
+  fprintf(stderr, "Test ends.\n");
   return 0;
 }
 #endif
