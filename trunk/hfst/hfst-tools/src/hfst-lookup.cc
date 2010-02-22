@@ -200,9 +200,9 @@ print_usage(const char *program_name)
 		   "\n"
 		   "If OUTFILE or INFILE is missing or -, "
 		   "standard streams will be used.\n"
-		   "FORMAT is one of {xerox,cg,apertium,custom:``...''}, "
+		   "FORMAT is one of {xerox,cg,apertium}, "
 		   "xerox being default\n"
-           "IFORMAT is one of {utf8,spaces,apertium,custom}, "
+           "IFORMAT is one of {utf8,spaces,apertium}, "
            "default being utf8 unless FORMAT is apertium\n"
 		   "\n"
 		   "More info at <https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstLookUp>\n"
@@ -295,6 +295,8 @@ parse_options(int argc, char** argv)
             else if (strcmp(optarg, "spaces"))
               {
                 input_format = SPACE_SEPARATED_TOKEN_INPUT;
+				fprintf(stderr, "Warning: option -S is being deprecated in "
+						"favor of -F spaces\n");
               }
             else if (strcmp(optarg, "apertium"))
               {

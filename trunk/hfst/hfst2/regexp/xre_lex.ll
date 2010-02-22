@@ -49,6 +49,8 @@ A7RESTRICTED [- |<>%!:;@0~\\&?$+*/_(){}\]\[-]
 /* non-restricted ASCII */
 A7UNRESTRICTED [\x21-\x7e]{-}[- |<>%!:;@0~\\&?$+*/_(){}\]\[-]
 
+WEIGHT [0-9]+(\.[0-9]+)?
+
 /* token character */
 NAME_CH {A7UNRESTRICTED}|{U8H}|{EC}
 UINTEGER [1-9][0-9]*
@@ -187,6 +189,22 @@ LWSP [\t\r\n ]
 	xrelval.name = xre_strip_percents(xretext);
 	return SYMBOL;
 }  
+
+";\t"{WEIGHT} {
+    const char* weightstart = xretext + 2;
+    while ((*weightstart != '\0') && 
+           ((*weightstart == ' ') || (*weightstart == '\t')))
+    {
+        weightstart++;
+    }
+    char* endp;
+    xrelval.weight = strtod(weightstart, &endp);
+    if (endp == weightstart)
+    {
+        return ERROR;
+    }
+    return END_OF_WEIGHTED_EXPRESSION;
+}
 
 ";" { 
 	return END_OF_EXPRESSION;
