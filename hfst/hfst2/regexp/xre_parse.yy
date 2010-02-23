@@ -326,7 +326,9 @@ PAIR: CHAR PAIR_SEPARATOR CHAR
 		$$ = _xre_make_key_pair(ANY_KEY, $3); 
 	}
 	| ANY PAIR_SEPARATOR ANY {
-		$$ = _xre_make_key_pair(ANY_KEY, ANY_KEY);  
+        HFST::KeyPairSet* pi = _xre_creation_pi();
+        $$ = HFST::define_transducer(pi);
+        delete pi;
 	}
 	| CHAR PAIR_SEPARATOR EPSILON_TOKEN {
 		$$ = _xre_make_key_pair($1, 0);
@@ -372,9 +374,7 @@ IMPLICIT_PAIR: CHAR
 		}
 		| ANY	
 		{
-			HFST::KeyPairSet* pi = _xre_creation_pi();
-			$$ = HFST::define_transducer(pi);
-			delete pi;
+            $$ = _xre_make_key_pair(ANY_KEY, ANY_KEY);  
 		}
 		|		
 		EPSILON_TOKEN {
