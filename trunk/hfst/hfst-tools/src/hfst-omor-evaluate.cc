@@ -249,16 +249,21 @@ do_print_statistics()
 {
 	if (test_type == TEST_RANKED)
 	{
+      fprintf(message_out, "Total\t");
 		for (unsigned int i = 1; i <= ranked_lowest_counted; ++i)
 		{
 			fprintf(message_out, "Rank %u\t", i);
 		}
 		fprintf(message_out, "Lower ranks\tNo rank\n");
+      // counts
+      fprintf(message_out, "%lu\t", test_lines);
 		for (unsigned int i = 1; i <= ranked_lowest_counted; ++i)
 		{
 			fprintf(message_out, "%lu\t", ranked_at[i]);
 		}
 		fprintf(message_out, "%lu\t%lu\n", ranked_lower, ranked_none);
+      // percentages
+      fprintf(message_out, "%f\t", static_cast<float>(test_lines)/static_cast<float>(test_lines));
 		for (unsigned int i = 1; i <= ranked_lowest_counted; ++i)
 		{
 			fprintf(message_out, "%f\t", 
@@ -458,11 +463,70 @@ test_substring(const string& testcase,
 		bool infinite_r, KeyTable* key_table)
 {
 	bool rv = test_at_least(testcase, r, e, infinite_r, key_table);
-	if ((r.size() > 1) || (e.size() > 1))
+	if (e.size() > 1)
 	{
-		fprintf(message_out, "Warning: substring test not 1:1\n");
+		fprintf(message_out, "Warning: expected more than 1 will fail at least once\n");
 	}
 	Key sought = stringToKey(substring, key_table);
+    KeyVector joined;
+    if (r.size() == 1)
+      {
+        for (KeyVector::const_iterator rk = r.begin()->begin();
+             rk != r.begin()->end();
+             ++rk)
+          {
+            joined.push_back(*rk);
+          }
+      }
+    else if (r.size() > 1)
+      {
+        // combine multiple suggestions
+        vector<unsigned short> hyphenity(r.begin()->size(), 0);
+        for (set<KeyVector>::const_iterator rkv = r.begin();
+             rkv != r.end();
+             ++rkv)
+          {
+            unsigned int i = 0;
+            for (KeyVector::const_iterator rk = rkv->begin();
+                 rk != rkv->end();
+                 ++rk)
+              {
+                if (*rk == sought)
+                  {
+                    hyphenity[i]++;
+                  }
+                else
+                  {
+                    i++;
+                  }
+              }
+          }
+        unsigned int j = 0;
+        KeyVector rk = *r.begin();
+        for (vector<unsigned short>::const_iterator h = hyphenity.begin();
+             h != hyphenity.end();
+             ++h)
+          {
+            if (j >= rk.size())
+              {
+                break;
+              }
+            if (rk[j] == sought)
+              {
+                j++;
+              }
+            if (*h >= r.size())
+              {
+                joined.push_back(sought);
+              }
+            joined.push_back(rk[j]);
+            j++;
+          }
+      }
+    else if (r.size() == 0)
+      {
+        // use source as result
+      }
 	for (set<KeyVector>::iterator ekv = e.begin();
 			ekv != e.end();
 			++ekv)
@@ -497,53 +561,50 @@ test_substring(const string& testcase,
 			substrings_missed += substring_count;
 			substrings_needed += substring_count;
 		}
-		for (set<KeyVector>::iterator rkv = r.begin();
-				rkv != r.end();
-				++rkv)
-		{
-			substrings_needed += substring_count;
-			i = 0;
-			KeyVector hmmrkv = *rkv;
-			for (KeyVector::iterator rk = hmmrkv.begin();
-					rk != hmmrkv.end();
-					++rk)
-			{
-				if (*rk == sought)
-				{
-					if (expectedSpots[i])
-					{
-						substrings_correct++;
-						// no two subsequent hyphens
-						++rk;
-						++i;
-						if (rk == hmmrkv.end())
-						{
-							break;
-						}
-					}
-					else
-					{
-						substrings_incorrect++;
-						string* rkvs = keyVectorToString(&hmmrkv, key_table);
-						fprintf(message_out, " * SUB_EXTRA for %s : %s (%s[%u])\n",
-								testcase.c_str(), ekvs->c_str(), rkvs->c_str(),
-								i);
-					}
-				}
-				else
-				{
-					if (expectedSpots[i])
-					{
-						substrings_missed++;
-						string* rkvs = keyVectorToString(&hmmrkv, key_table);
-						fprintf(message_out, " * SUB_MISS for %s : %s (%s[%u])\n",
-								testcase.c_str(), ekvs->c_str(), rkvs->c_str(),
-								i);
-					}
-					i++;
-				}
-			} // for each key in result
-		} // for each result key vector
+        else
+          {
+            substrings_needed += substring_count;
+            i = 0;
+            for (KeyVector::iterator rk = joined.begin();
+                    rk != joined.end();
+                    ++rk)
+            {
+                if (*rk == sought)
+                {
+                    if (expectedSpots[i])
+                    {
+                        substrings_correct++;
+                        // no two subsequent hyphens
+                        ++rk;
+                        ++i;
+                        if (rk == joined.end())
+                        {
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        substrings_incorrect++;
+                        string* rkvs = keyVectorToString(&joined, key_table);
+                        fprintf(message_out, " * SUB_EXTRA for %s : %s (%s[%u])\n",
+                                testcase.c_str(), ekvs->c_str(), rkvs->c_str(),
+                                i);
+                    }
+                }
+                else
+                {
+                    if (expectedSpots[i])
+                    {
+                        substrings_missed++;
+                        string* rkvs = keyVectorToString(&joined, key_table);
+                        fprintf(message_out, " * SUB_MISS for %s : %s (%s[%u])\n",
+                                testcase.c_str(), ekvs->c_str(), rkvs->c_str(),
+                                i);
+                    }
+                    i++;
+                }
+            } // for each key in result
+         }
 	} // for each expected key vector
 	return rv;
 }
@@ -737,7 +798,7 @@ lookup_all(const char* s, KeyTable* kt,
 
 vector<TransducerHandle>*
 lookup_all_weighted(const char* s, KeyTable* kt,
-		vector<TransducerHandle> cascade, bool* infinite)
+		vector<TransducerHandle>& cascade, bool* infinite)
 {
 	*infinite = false;
 	KeyVector* lookup_orig = NULL;
@@ -893,7 +954,6 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 					}
 					p++;
 				}
-				VERBOSE_PRINT("Looking up %s...\n", line);
 				bool infinity = false;
 				HFST::KeyVectorVector* results = 0;
 				vector<HWFST::TransducerHandle>* rankedResults = 0;
@@ -906,6 +966,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				}
 				else
 				{
+                    VERBOSE_PRINT("Looking up %s...\n", line);
 					results = HWFST::lookup_all(line,
 						key_table, cascade,
 						&infinity);
