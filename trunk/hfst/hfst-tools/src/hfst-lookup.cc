@@ -29,15 +29,11 @@
 #include <cstring>
 #include <cstdarg>
 #include <getopt.h>
-#include <hfst2/hfst.h>
-#include "FlagDiacritics.h"
 
-#if NESTED_BUILD
-#include <hfst2/string/string.h>
-#endif
-#if !NESTED_BUILD
-#include <hfst2/string.h>
-#endif
+#include "hfst2/hfst.h"
+#include "hfst2/flag-diacritics/FlagDiacritics.h"
+
+#include "hfst2/string/string.h"
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"

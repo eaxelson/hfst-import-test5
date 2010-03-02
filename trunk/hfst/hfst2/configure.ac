@@ -1,4 +1,4 @@
-AC_INIT([libhfst], [2.3], [hfst-bugs@helsinki.fi])
+AC_INIT([libhfst], [2.4], [hfst-bugs@helsinki.fi])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall -Werror foreign])
 AC_CONFIG_FILES([Makefile])

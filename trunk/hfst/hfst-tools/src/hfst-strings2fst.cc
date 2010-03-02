@@ -404,6 +404,7 @@ vector<char*> parse_identity_string_with_spaces(char *line) {
 int
 invert_stream(std::istream& inputstream, std::ostream& outstream)
 {
+    size_t nth_line=0;
      if (!is_weighted)
                 {
 		VERBOSE_PRINT("Using unweighted format\n");
@@ -558,14 +559,20 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 		      sum_of_weights = sum_of_weights + (unsigned int)weight;
 
 		    }
-
 		    else {
 		      float weight=0;
 		      char *ostring;
 		      ostring = parse_output_string_and_weight(line, weight);
+		      nth_line++;
 		      
-		      
-		      VERBOSE_PRINT("Read one line...\n");
+              if (nth_line < 2)
+                {
+                  VERBOSE_PRINT("Read one line...\n");
+                }
+              else
+                {
+                  VERBOSE_PRINT("Read one line... %zu\r", nth_line);
+                }
 
 		      if (true) {
 			
@@ -787,7 +794,16 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 		      float weight=0;
 		      char *ostring = parse_output_string_and_weight(line, weight);
 		      
-		      VERBOSE_PRINT("Read one line...\n");
+		      nth_line++;
+		      
+              if (nth_line < 2)
+                {
+                  VERBOSE_PRINT("Read one line...\n");
+                }
+              else
+                {
+                  VERBOSE_PRINT("Read one line... %zu\r", nth_line);
+                }
 		      
 		      if (true) {
 			

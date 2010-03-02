@@ -1,7 +1,7 @@
 # Process this file with autoconf to produce a configure script.
 
 AC_PREREQ([2.60])
-AC_INIT([hfst-tools], [2.3], [hfst-bugs@helsinki.fi])
+AC_INIT([hfst-tools], [2.4], [hfst-bugs@helsinki.fi])
 AC_CONFIG_AUX_DIR([config-aux])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/hfst-subtract.cc])
@@ -240,15 +240,15 @@ AC_ARG_ENABLE([substitute],
 AM_CONDITIONAL([WANT_SUBSTITUTE], [test x$enable_substitute != xno])
 AC_ARG_ENABLE([flag_diacritics],
 			  [AS_HELP_STRING([--enable-flag-diacritics],
-							  [build flag diacritic tool @<:@default=yes@:>@])],
+							  [build flag diacritic tool @<:@default=no@:>@])],
 			  [enable_flag_diacritics=$enableval],
-			  [enable_flag_diacritics=yes])
+			  [enable_flag_diacritics=no])
 AM_CONDITIONAL([WANT_FLAG_DIACRITICS], [test x$enable_flag_diacritics != xno])
 AC_ARG_ENABLE([omor_evaluate],
 			  [AS_HELP_STRING([--enable-omor-evaluate],
-							  [build omor evaluation tool @<:@default=no@:>@])],
+							  [build omor evaluation tool @<:@default=yes@:>@])],
 			  [enable_omor_evaluate=$enableval],
-			  [enable_omor_evaluate=no])
+			  [enable_omor_evaluate=yes])
 AM_CONDITIONAL([WANT_OMOR_EVALUATE], [test x$enable_omor_evaluate != xno])
 
 
@@ -280,6 +280,7 @@ AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strndup getline])
 
 AC_CONFIG_FILES([Makefile src/Makefile test/Makefile test/binary-tools/Makefile man/Makefile])
 AC_OUTPUT
+## keep the list alphabetically sorted (vim; !sort)
 cat <<EOF
 -- Building $PACKAGE v$VERSION:
     * calculate: $enable_calculate
@@ -291,6 +292,7 @@ cat <<EOF
     * determinize: $enable_determinize
     * diff-test: $enable_diff_test
     * disjunct: $enable_disjunct
+    * flag-diacritics: $enable_flag_diacritics
     * format: $enable_format
     * fst2fst: $enable_fst2fst
     * fst2pairstrings: $enable_fst2pairstrings
@@ -301,6 +303,8 @@ cat <<EOF
     * lookup: $enable_lookup
     * lookup-optimize: $enable_lookup_optimize
     * minimize: $enable_minimize
+    * omor-evaluate: $enable_omor_evaluate
+    * optimized-lookup: $enable_optimized_lookup
     * pair-test: $enable_pair_test
     * project: $enable_project
     * push-weights: $enable_push_weights
@@ -310,13 +314,11 @@ cat <<EOF
     * reverse: $enable_reverse
     * split: $enable_split
     * strings2fst: $enable_strings2fst
+    * substitute: $enable_substitute
     * subtract: $enable_subtract
     * summarize: $enable_summarize
     * symbols: $enable_symbols
     * tail: $enable_tail
     * txt2fst: $enable_txt2fst
-    * optimized-lookup: $enable_optimized_lookup
-    * substitute: $enable_substitute
-    * omor-evaluate: $enable_omor_evaluate
 EOF
 
