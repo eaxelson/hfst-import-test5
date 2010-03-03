@@ -1,3 +1,133 @@
+2010-02-24 23:55  mie
+
+	* : Combine substring points
+
+2010-02-23 22:37  mie
+
+	* : Swap ? and ?:?
+
+2010-02-22 18:19  mie
+
+	* : Allow final weight for XRE parser
+
+2010-02-09 15:45  mie
+
+	* : missing format symbol for apertium output, patch by Kevin
+	  Brubeck Unhammer
+
+2010-02-08 12:42  mpsilfve
+
+	* : Fixed problem in intersecting composition with argument
+	  transducers which were empty.
+
+2010-02-07 21:19  mie
+
+	* : Fix xerox formats again
+
+2010-02-02 14:40  mpsilfve
+
+	* : The new version of weighted optimized lookup transducers where
+	  flagdiacritics are treated as epsilons in the transition index
+	  array
+
+2010-02-02 14:39  mpsilfve
+
+	* : The new version of unweighted optimized lookup transducers
+	  where flagdiacritics are treated as epsilons in the transition
+	  index array
+
+2010-02-02 14:39  hardwick
+
+	* : New flag transition-ordering for lookup and
+	  a new output-dumping commandline option for maximum speed
+
+2010-01-29 09:05  moshagen
+
+	* : Ignore the binary file 'hfst-flag-diacritics'.
+
+2010-01-28 17:00  mie
+
+	* : remove AC_SYSTEM_EXTENSIONS for Mac OS X compatibility
+
+2010-01-28 12:38  mie
+
+	* : All sorts of different formatting
+
+2010-01-26 13:58  mie
+
+	* : Flag diacritical tool§
+
+2010-01-26 08:58  mie
+
+	* : specific tool to evaluate morphologies as spellers
+
+2010-01-26 08:57  mie
+
+	* : Update lookup to support some apertium input format and true
+	  getline
+
+2010-01-17 03:17  mie
+
+	* : On second thought, use std::less by derefence as compare
+
+2010-01-17 02:30  mie
+
+	* : Remove broken KeyVector comparison functor
+
+2010-01-13 00:37  mie
+
+	* : Change warning 7 to more readable by bug report from Sjur
+	  Moshagen
+
+2010-01-08 19:38  hardwick
+
+	* : Fixed include bug with hfst2/hfst/string.h
+
+2010-01-05 12:33  mpsilfve
+
+	* : hfst-lookup now uniqizes (wonder whether that's a word...)
+	  results
+
+2010-01-04 04:24  mie
+
+	* : Pass STL containers by reference
+
+2009-12-21 13:06  mpsilfve
+
+	* : Fixed new state finality bug in compose-intersect
+
+2009-12-18 15:38  mpsilfve
+
+	* : Added hfst3_proposition
+
+2009-12-17 16:38  mie
+
+	* : another way to break a ChangeLog with svn2cl
+
+2009-12-17 16:22  mie
+
+	* : Documentation and version marker changes for release
+
+2009-12-16 13:58  hardwick
+
+	* : Documented input-multichar handling in optimized-lookup
+
+2009-12-15 15:48  moshagen
+
+	* : Ignore the generated binary hfst-substitute.
+
+2009-12-15 13:06  mie
+
+	* : Make default format strings print neatly
+
+2009-12-15 13:05  mie
+
+	* : Correct synopsis line
+
+2009-12-15 10:12  mie
+
+	* : Man page for new substitution tool
+
 2009-12-14 11:42  mie
 
 	* : Pretty statistics
