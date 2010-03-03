@@ -971,7 +971,7 @@ Xducer::write(std::ostream& out) const
 	if (w_ == false)
 	{
 #	if 1
-		HFST::write_transducer(HFST::copy(sfstDucer_), 
+	  HFST::write_transducer(HFST::copy(sfstDucer_), 
 							   magicKeyTableWithEverything, out);
 #	elif 0
 		HFST::write_transducer(sfstDucer_, 
@@ -981,10 +981,11 @@ Xducer::write(std::ostream& out) const
 	else if (w_ == true)
 	{
 #	if 1
-		HWFST::write_transducer(HWFST::copy(openfstDucer_),
+	  	  
+	HWFST::write_transducer(HWFST::copy(openfstDucer_),
 								wagicKeyTableWithEverything, out);
 #	elif 0
-		HWFST::write_transducer(openfstDucer_,
+	HWFST::write_transducer(openfstDucer_,
 								wagicKeyTableWithEverything, out);
 #	endif
 	}

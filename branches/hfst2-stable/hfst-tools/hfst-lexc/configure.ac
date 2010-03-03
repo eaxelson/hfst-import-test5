@@ -63,8 +63,6 @@ AM_CONDITIONAL([CAN_PAIRTEST], [test x$HFSTPAIRTEST != xno])
 # Checks for libraries
 AC_LANG([C++])
 AC_CHECK_LIB([pthread], [main], , [AC_MSG_ERROR([openfst requires pthread])])
-# Don't test for libhfst for a nested dist
-# AC_CHECK_LIB([hfst], [main], , [AC_MSG_ERROR([libhfst is required])])
 
 # Checks for header files
 AC_HEADER_STDC
@@ -80,8 +78,7 @@ AC_CHECK_HEADERS([stdlib.h])
 AC_CHECK_HEADERS([string.h])
 AC_CHECK_HEADERS([unistd.h])
 AC_CHECK_HEADERS([sys/stat.h])
-# Don't test for libhfst for a nested dist
-# AC_CHECK_HEADERS([hfst2/hfst.h], [], [AC_MSG_ERROR([hfst.h required])])
+
 AC_HEADER_ASSERT
 
 AC_FUNC_ALLOCA

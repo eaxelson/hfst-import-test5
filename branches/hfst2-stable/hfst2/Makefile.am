@@ -174,7 +174,8 @@ libhfst_la_SOURCES = \
 	string/letter-trie.cc \
 	string/string.cc \
 	string/w_letter-trie.cc \
-	string/w_string.cc
+	string/w_string.cc \
+	flag-diacritics/FlagDiacritics.cc
 
 HFST_HDRS = \
 	hfst.h \
@@ -189,7 +190,8 @@ HFST_HDRS = \
 	hfst_defs_private.h \
 	hfst_defs_public.h \
 	regexp/regexp.h \
-	string/string.h
+	string/string.h \
+	flag-diacritics/FlagDiacritics.h
 
 SFST_HDRS = \
 	sfst/alphabet.h sfst/basic.h sfst/compact.h \

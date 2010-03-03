@@ -523,16 +523,49 @@ namespace HFST {
     return input_symbols;
   }
 
+  KeySet * get_flag_diacritics(KeyTable * kt)
+  {
+    if ( kt == NULL)
+      {
+	return NULL;
+      }
+    KeySet * flag_diacritics = new KeySet;
+    for (Key k = 0;
+	 k < get_unused_key(kt);
+	 ++k)
+      {
+	Symbol s = get_key_symbol(k, kt);
+	const char * symbol_name = get_symbol_name(s);
+	if (parse_flag_diacritic(symbol_name))
+	  {
+	    if (k != 0)
+	      {
+		flag_diacritics->insert(k);
+	      }
+	  }
+      }
+    return flag_diacritics;
+  }
+
   typedef std::map<Key,unsigned int> KeyCountMap;
   
   HFST::KeyTable * lift_input_keys(HFST::KeyTable * kt,
 				   KeyCountMap &input_key_counts)
   {
     std::multimap<unsigned int,Key> count_keys;
+    KeySet * flag_diacritics = get_flag_diacritics(kt);
     for (KeyCountMap::iterator it = input_key_counts.begin();
 	 it != input_key_counts.end();
 	 ++it)
-      { count_keys.insert(std::pair<unsigned int,Key>(it->second,it->first)); }
+      { if (flag_diacritics->find(it->first) == flag_diacritics->end())
+	  {
+	    count_keys.insert(std::pair<unsigned int,Key>(it->second,it->first)); 
+	  }
+	else
+	  {
+	    count_keys.insert(std::pair<unsigned int,Key>(0,it->first)); 
+	  }}
+
     KeyTable * new_key_table = create_key_table();
     associate_key(0,new_key_table,kt->get_key_symbol(0));
     Key k = 1;
@@ -553,16 +586,21 @@ namespace HFST {
   }
   
 
-  void get_input_frequency(KeyCountMap &key_count_map,Transducer * t)
+  void get_input_frequency(KeyCountMap &key_count_map,Transducer * t,KeyTable * kt)
   {
     key_count_map[0] = 1;
     NodeNumbering num(*t);
+    KeySet * flag_diacritic_set = get_flag_diacritics(kt);
     for (size_t i = 0; i < num.number_of_nodes(); ++i)
       {
 	Node * n = num.get_node(i);
 	std::set<Key> input_keys;
 	for (ArcsIter aiter(n->arcs()); aiter; aiter++)
-	  { Arc * a = aiter; input_keys.insert(a->label().lower_char()); }
+	  { Arc * a = aiter; 
+	    if (flag_diacritic_set->find(a->label().lower_char())
+		== flag_diacritic_set->end())
+	      { input_keys.insert(a->label().lower_char()); }
+	  }
 	for (std::set<Key>::iterator it = input_keys.begin();
 	     it != input_keys.end(); ++it)
 	  { ++key_count_map[*it]; }
@@ -574,7 +612,7 @@ namespace HFST {
     InputKeySet * input_keys = get_input_keys(t);
     input_keys->insert(0);
     KeyCountMap key_count_map;
-    get_input_frequency(key_count_map,t);
+    get_input_frequency(key_count_map,t,kt);
     HFST::KeyTable * new_kt = lift_input_keys(kt,key_count_map);
     delete input_keys;
     return new_kt;
@@ -587,9 +625,11 @@ namespace HFST {
       HFST::harmonize_transducer(input,key_table,new_kt);
     HFST::delete_transducer(input);
     t = HANDLE_TO_PINSTANCE(Transducer,new_input); 
+    KeySet * flag_diacritic_set = get_flag_diacritics(new_kt);
     HfstFst fst(t,
 		new_kt,
-		outstream);
+		outstream,
+		*flag_diacritic_set);
   };
 
   TransducerHandle read_runtime_transducer( FILE * f ) {
@@ -4806,27 +4846,6 @@ vector <TransducerHandle> find_all_paths( TransducerHandle t, bool unique ) {
     result->push_back( PINSTANCE_TO_HANDLE(Transducer, paths[i]) );
   return *result;
 } 
-
-KeySet * get_flag_diacritics(KeyTable * kt)
-{
-  if ( kt == NULL)
-    {
-      return NULL;
-    }
-  KeySet * flag_diacritics = new KeySet;
-  for (Key k = 0;
-       k < get_unused_key(kt);
-       ++k)
-    {
-      Symbol s = get_key_symbol(k, kt);
-      const char * symbol_name = get_symbol_name(s);
-      if (parse_flag_diacritic(symbol_name))
-	{
-	  flag_diacritics->insert(k);
-	}
-    }
-  return flag_diacritics;
-}
 
 TransducerHandle intersecting_composition(TransducerHandle lexicon,  vector<TransducerHandle> * rules, KeyTable * kt) {
   KeySet * flag_diacritics = get_flag_diacritics(kt);

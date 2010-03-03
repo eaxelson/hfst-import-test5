@@ -59,7 +59,7 @@ hfst_strdup(const char *s)
 {
 	errno = 0;
 	char *rv = strdup(s);
-	if (NULL == s)
+	if (NULL == rv)
 	{
 		if (errno != 0)
 		{
@@ -72,6 +72,31 @@ hfst_strdup(const char *s)
 		exit(EXIT_FAILURE);
 	}
 	return rv;
+}
+
+char*
+hfst_strndup(const char *s, size_t n)
+{
+  errno = 0;
+# if HAVE_STRNDUP
+  char* rv = strndup(s, n);
+  if (NULL == rv)
+    {
+      if (errno != 0)
+        {
+          fprintf(message_out, "strndup failed: %s\n", strerror(errno));
+        }
+      else
+        {
+          fprintf(message_out, "strndup failed\n");
+        }
+      exit(EXIT_FAILURE);
+    }
+# else
+  char* rv = static_cast<char*>(calloc(sizeof(char), n + 1));
+  rv = static_cast<char*>(memcpy(rv, s, n));
+# endif
+  return rv;
 }
 
 double
@@ -180,6 +205,40 @@ hfst_ftell(FILE* stream)
 		fprintf(message_out, "ftell failed: %s\n", strerror(errno));
 		exit(EXIT_FAILURE);
 	}
+}
+
+ssize_t
+hfst_getline(char** lineptr, size_t* n, FILE* stream)
+{
+# if HAVE_GETLINE
+  errno = 0;
+  ssize_t rv = getline(lineptr, n, stream);
+  if ((rv < 0) && errno)
+    {
+      fprintf(message_out, "getline failed: %s\n", strerror(errno));
+      exit(EXIT_FAILURE);
+    }
+# else
+# define GETLINE_BUFFER 65535
+  size_t max_line = *n;
+  ssize_t rv = 0;
+  if (*lineptr != NULL)
+    {
+      free(*lineptr);
+    }
+  *lineptr = static_cast<char*>(calloc(sizeof(char), GETLINE_BUFFER));
+  max_line = GETLINE_BUFFER;
+  *lineptr = fgets(*lineptr, max_line, stream);
+  if (*lineptr == NULL)
+    {
+      rv = -1;
+    }
+  else
+    {
+      *n = rv = strlen(*lineptr);
+    }
+# endif
+  return rv;
 }
 
 // mem functions

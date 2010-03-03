@@ -119,7 +119,8 @@ public:
      to HfstIdNumberMap nodes_to_id_numbers.
   */
   HfstTransition(const Node * source_node, 
-	     const Arc &a):
+		 const Arc &a,
+		 bool set_input_zero=false):
     transition_place(NO_TABLE_INDEX)
   {
 #ifdef DEBUG
@@ -128,7 +129,14 @@ public:
     assert(nodes_to_id_numbers->get_node_id(get_target_node(a)) !=
 	   NO_ID_NUMBER);
 #endif
-    input_symbol = get_input_symbol(a);
+    if (set_input_zero)
+      {
+	input_symbol = 0;
+      }
+    else
+      {
+	input_symbol = get_input_symbol(a);
+      }
     output_symbol = get_output_symbol(a);
     source_state_id = 
       nodes_to_id_numbers->get_node_id(source_node);
@@ -160,6 +168,7 @@ public:
 #endif
   void write(FILE * f);
 
+  bool numerical_cmp( const HfstTransition &another_transition) const;
   bool operator<(const HfstTransition &another_index) const;
 };
 
@@ -248,11 +257,14 @@ private:
 
   static KeyTable * keys;
   static HfstIdNumberMap * state_id_numbers;
-
+  
+  static std::set<Key> flag_diacritic_set;
+  
   void set_transitions(const Node * n);
   void set_transition_indices(void);
 
   friend class fst_state_compare;
+
 
 public:
   HfstFstState(const Node * n):
@@ -295,9 +307,17 @@ public:
 
   void add_state_indices(IndexVector * transition_index_table);
 
+  static bool is_flag_diacritic(Key k)
+  {
+    return flag_diacritic_set.find(k) != flag_diacritic_set.end(); 
+  }
+
   TransitionTableIndex
   write_transitions(FILE * f,
 		    TransitionTableIndex place);
+  
+  static void set_flag_diacritic_set (std::set<Key> &fs)
+  { flag_diacritic_set.insert(fs.begin(),fs.end()); }
 
 #ifdef DEBUG
   void display(void);
@@ -383,7 +403,8 @@ private:
       {
 	Arc a = *aiter;
 	Label l = a.label();
-	input_symbols.insert(l.lower_char());
+	if (not HfstFstState::is_flag_diacritic(l.lower_char()))
+	  { input_symbols.insert(l.lower_char()); }
 	inspect_nodes(a.target_node(),
 		      visited_nodes,
 		      input_symbols);
@@ -735,8 +756,9 @@ private:
 
 public:
   HfstFst(Transducer * tr,
-      HFST::KeyTable * tr_key_table,
-      FILE * f):
+	  HFST::KeyTable * tr_key_table,
+	  FILE * f,
+	  std::set<Key> &flag_diacritic_set):
     fst(tr),
     fst_state_id_numbers(new HfstIdNumberMap(tr)),
     fst_key_table(tr_key_table),
@@ -744,6 +766,7 @@ public:
     fst_indices(new HfstTransitionTableIndices(number_of_input_symbols())),
     transition_index_table(NULL)
   {
+    HfstFstState::set_flag_diacritic_set(flag_diacritic_set);
     HfstFstState::set_key_table(fst_key_table);
     HfstFstState::set_id_numbers(fst_state_id_numbers);
 #ifdef DEBUG

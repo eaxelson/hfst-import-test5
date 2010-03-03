@@ -504,15 +504,18 @@ hfst-diff-test-functionality-test: cat.hfst cat_sets cat_sets_spaces
 #	$(top_builddir)/src/hfst-compare -e -q CcAaTt.hfst CcAaTt.hfst.1
 #	rm -f CcAaTt.hfst.1
 
-hfst-compose-intersect-functionality-test: cat.hfst aA.hfst tT.hfst ccCaAtT.hfst lex.hwfst rule1.hwfst rule2.hwfst
+hfst-compose-intersect-functionality-test: cat.hfst aA.hfst tT.hfst ccCaAtT.hfst lex.hwfst rule1.hwfst rule2.hwfst lex_with_unknown.hfst rule1_with_unknown.hfst rule2_with_unknown.hfst lex_with_unknown.hwfst rule1_with_unknown.hwfst rule2_with_unknown.hwfst
 	cat cat.hfst aA.hfst tT.hfst | $(top_builddir)/src/hfst-compose-intersect -s > ccCaAtT.hfst.1
 	$(top_builddir)/src/hfst-compare -1 ccCaAtT.hfst -2 ccCaAtT.hfst.1
 	rm -f ccCaAtT.hfst.1
 	$(top_builddir)/src/hfst-conjunct -1 rule1.hwfst -2 rule2.hwfst | hfst-compose -1 lex.hwfst | \
         $(top_builddir)/src/hfst-minimize > lexical1.hwfst
-	cat lex.hwfst rule1.hwfst rule2.hwfst | hfst-compose-intersect > lexical2.hwfst
+	cat lex.hwfst rule1.hwfst rule2.hwfst | $(top_builddir)/src/hfst-compose-intersect > lexical2.hwfst
 	$(top_builddir)/src/hfst-compare -1 lexical1.hwfst -2 lexical2.hwfst
 	rm -f lexical1.hwfst lexical2.hwfst
+	cat lex_with_unknown.hfst rule1_with_unknown.hfst rule2_with_unknown.hfst | $(top_builddir)/src/hfst-compose-intersect > lexical_with_unknown1.hfst
+	cat lex_with_unknown.hfst rule1_with_unknown.hfst rule2_with_unknown.hfst | $(top_builddir)/src/hfst-compose-intersect > /dev/null
+	cat lex_with_unknown.hwfst rule1_with_unknown.hwfst rule2_with_unknown.hwfst | $(top_builddir)/src/hfst-compose-intersect > /dev/null
 
 hfst-project-functionality-test: 2cat.hfst 2CAT.hfst 2cCaAtT.hfst  2cat.hwfst 2CAT.hwfst 2cCaAtT.hwfst cat.hfst
 	cat 2cCaAtT.hfst | $(top_builddir)/src/hfst-project -p upper > cat.hfst.1

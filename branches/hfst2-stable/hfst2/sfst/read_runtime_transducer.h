@@ -22,34 +22,38 @@ class RuntimeHeaderReader {
   symbol_pair_number number_of_pairs_in_transducer;
   transition_number size_of_index_table;
   transition_number size_of_transition_table;
-
+  transition_number number_of_states;
 
 
   RuntimeHeaderReader( FILE * f ) {
     size_t foo;
-    foo =  fread(&byte_endianness,sizeof(byte_endianness),1,f);
-    //fprintf(stderr,"ENDIANNESS %u\n",byte_endianness);    
-    foo =  fread(&version,sizeof(version),1,f);
-    //fprintf(stderr,"VERSION %u\n",version);    
-    foo =  fread(&determinism,sizeof(determinism),1,f);
-    //fprintf(stderr,"DETERMINISM %u\n",determinism);    
-    foo =  fread(&minimality,sizeof(minimality),1,f);
-    //fprintf(stderr,"MINIMALITY %u\n",minimality);    
-    foo =  fread(&cyclicity,sizeof(cyclicity),1,f);
-    //fprintf(stderr,"CYCLICITY %u\n",cyclicity);    
-    foo =  fread(&weightedness,sizeof(weightedness),1,f);
-    //fprintf(stderr,"WEIGHTEDNESS %u\n",weightedness);    
-    foo =  fread(&number_of_all_symbols,sizeof(number_of_all_symbols),1,f);    
-    //fprintf(stderr,"NUMBER OF ALL SYMBOLS %u\n",number_of_all_symbols);
     foo =  fread(&number_of_symbols,sizeof(number_of_symbols),1,f);    
-    //fprintf(stderr,"NUMBER OF INPUT SYMBOLS %u\n",number_of_symbols);    
-    foo =  fread(&number_of_pairs_in_transducer,sizeof(number_of_pairs_in_transducer),1,f);
-    //fprintf(stderr,"NUMBER OF PAIRS %u\n",number_of_pairs_in_transducer);    
-    foo =  fread(&size_of_index_table,sizeof(size_of_index_table),1,f);    
-    //fprintf(stderr,"SIZE OF INDEX TABLE %u\n",size_of_index_table);    
+    fprintf(stderr,"NUMBER OF INPUT SYMBOLS %u\n",number_of_symbols);    
+    foo =  fread(&number_of_all_symbols,sizeof(number_of_all_symbols),1,f);    
+    fprintf(stderr,"NUMBER OF ALL SYMBOLS %u\n",number_of_all_symbols);
+    foo =  fread(&size_of_index_table,sizeof(size_of_index_table),1,f);
+    fprintf(stderr,"SIZE OF INDEX TABLE %u\n",size_of_index_table);    
     foo =  fread(&size_of_transition_table,sizeof(size_of_transition_table),1,f);    
-    //fprintf(stderr,"SIZE OF TRANSITION TABLE %u\n",size_of_transition_table);    
-    
+    fprintf(stderr,"SIZE OF TRANSITION TABLE %u\n",size_of_transition_table);    
+    foo =  fread(&number_of_states,sizeof(number_of_states),1,f);
+    fprintf(stderr,"NUMBER OF STATES %u\n",number_of_states);    
+    foo =  fread(&weightedness,sizeof(weightedness),1,f);
+    fprintf(stderr,"WEIGHTEDNESS %u\n",weightedness);    
+    foo =  fread(&determinism,sizeof(determinism),1,f);
+    fprintf(stderr,"DETERMINISM %u\n",determinism);    
+    foo =  fread(&version,sizeof(version),1,f);
+    size_t prop;
+    foo =  fread(&prop,sizeof(prop),1,f);
+    fprintf(stderr,"PROP %u\n",weightedness);    
+    fprintf(stderr,"MINIMALITY %u\n",minimality);    
+    foo =  fread(&cyclicity,sizeof(cyclicity),1,f);
+    fprintf(stderr,"CYCLICITY %u\n",cyclicity);    
+    foo =  fread(&prop,sizeof(prop),1,f);
+    fprintf(stderr,"PROP %u\n",weightedness);    
+    foo =  fread(&prop,sizeof(prop),1,f);
+    fprintf(stderr,"PROP %u\n",weightedness);    
+    foo =  fread(&prop,sizeof(prop),1,f);
+    fprintf(stderr,"PROP %u\n",weightedness);    
   }
 
 };

@@ -81,6 +81,12 @@ fst::RulesInfo::RulesInfo( void ) :
 
   /* All states are initial. */
   for ( unsigned int i = 0; i < number_of_rules; ++i ) {
+    if (Rules.at(i) == NULL)
+      { assert(false); } // Temporary...
+    if (Rules.at(i)->Start() == fst::kNoStateId)
+      {
+	throw std::out_of_range("No start state set.");
+      }
     states.push_back( Rules.at(i)->Start() );
     Rule_arcs.push_back( new Arcs( *Rules.at(i), Rules.at(i)->Start() ) ); 
   }
@@ -363,10 +369,16 @@ void fst::Composer::compose( RulesInfo &Rules ) {
   Arcs lexicon_arcs(lexicon.lex,lexicon.current_lexicon_state);
 
   // Handle x:0 transitions in the lexicon.
-  while ( (not lexicon_arcs.Done()) and lexicon_arcs.Value().olabel == 0 ) {
-    single_compose_epsilon( lexicon_arcs, Rules );  
-    lexicon_arcs.Next();
-  }
+  while (not lexicon_arcs.Done())
+    {
+      if ((lexicon_arcs.Value().olabel == 0) or
+	  (skip_symbols.find(lexicon_arcs.Value().olabel) != skip_symbols.end()))
+	{
+	  single_compose_epsilon( lexicon_arcs, Rules );  
+	}
+      lexicon_arcs.Next();
+    }
+  lexicon_arcs.Reset();
 
   // Handle 0:y transitions in the rules.
   if ( Rules.first_in(0) )
@@ -379,12 +391,14 @@ void fst::Composer::compose( RulesInfo &Rules ) {
 
   // Normal transitions x:a in lexicon and a:z in rules.
   while ( not lexicon_arcs.Done() and not Rules.Done()) {
+
+    if (lexicon_arcs.Value().olabel == 0)
+      { lexicon_arcs.Next();
+	continue; }
     if (skip_symbols.find(lexicon_arcs.Value().olabel) != skip_symbols.end())
-      {
-    	single_compose_epsilon( lexicon_arcs, Rules );  
-	lexicon_arcs.Next();
-    	continue;
-      }
+      { lexicon_arcs.Next();
+	continue; }
+
     // This is the label a in the lexicon
     lexicon_out = lexicon_arcs.Value().olabel;
     StateId first_occurence_of_out = lexicon_arcs.get_current_state();

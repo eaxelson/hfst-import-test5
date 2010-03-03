@@ -22,8 +22,8 @@ extern void xreerror(char * text);
 %union {
 	int value;
 	int* values;
+    double weight;
 	char* name;
-	void* anything;
 	Key symbol;
 	HFST::TransducerHandle transducer;
 }
@@ -31,11 +31,11 @@ extern void xreerror(char * text);
 
 %type	<transducer>	ONE_REGEXP
 
-%left	<anything>	DIFFERENCE
-%left	<anything>	INTERSECTION
-%left	<anything>	UNION
-%left	<anything>	IGNORING IGNORE_INTERNALLY
-%left	<anything>	COMPOSITION CROSS_PRODUCT
+%left	<transducer>	DIFFERENCE
+%left	<transducer>	INTERSECTION
+%left	<transducer>	UNION
+%left	<transducer>	IGNORING IGNORE_INTERNALLY
+%left	<transducer>	COMPOSITION CROSS_PRODUCT
 
 %left	<transducer>	CONCATENATE
 
@@ -50,18 +50,16 @@ extern void xreerror(char * text);
 %token	<transducer>	REVERSE INVERT UPPER LOWER
 
 %token	<transducer>	BEFORE AFTER SHUFFLE
-%token	<anything>		LEFT_RESTRICTION LEFT_RIGHT_ARROW RIGHT_ARROW LEFT_ARROW
-%token	<anything>		OPTIONAL_REPLACE REPLACE_ARROW LTR_LONGEST_REPLACE LTR_SHORTEST_REPLACE RTL_LONGEST_REPLACE RTL_SHORTEST_REPLACE
-%token	<anything>		REPLACE_CONTEXT_UU REPLACE_CONTEXT_LU REPLACE_CONTEXT_UL REPLACE_CONTEXT_LL
 
 %type	<transducer>	IMPLICIT_PAIR HALF_PAIR PAIR RE REG REGULAR_EXPRESSION
 %type	<transducer>	PRECEDENCE_BRACKETS
 %type	<transducer>	OPTIONALITY_BRACKETS
 %token	<name>			QUOTED_LITERAL 
 %type	<symbol>		CHAR
-%token	<anything>		LEFT_BRACKET RIGHT_BRACKET LEFT_PARENTHESIS RIGHT_PARENTHESIS LEFT_CURLY RIGHT_CURLY
-%token	<anything>		EQUALS CENTER_MARKER END_OF_EXPRESSION BOUNDARY_MARKER
-%token	<anything>		ERROR
+%token  <weight>    END_OF_WEIGHTED_EXPRESSION
+
+%token  <transducer>    LEFT_BRACKET RIGHT_BRACKET LEFT_PARENTHESIS RIGHT_PARENTHESIS LEFT_CURLY RIGHT_CURLY END_OF_EXPRESSION
+%token  <transducer>    LEFT_RESTRICTION LEFT_RIGHT_ARROW LEFT_ARROW RIGHT_ARROW REPLACE_ARROW OPTIONAL_REPLACE LTR_LONGEST_REPLACE LTR_SHORTEST_REPLACE RTL_LONGEST_REPLACE RTL_SHORTEST_REPLACE REPLACE_CONTEXT_UU REPLACE_CONTEXT_LU REPLACE_CONTEXT_UL REPLACE_CONTEXT_LL CENTER_MARKER BOUNDARY_MARKER ERROR
 %%
 
 ONE_REGEXP: REGULAR_EXPRESSION
@@ -72,6 +70,10 @@ ONE_REGEXP: REGULAR_EXPRESSION
 	{
 		$$ = _xre_transducer_ = HFST::minimize($1);
 	}
+    | REGULAR_EXPRESSION END_OF_WEIGHTED_EXPRESSION
+    {
+        $$ = _xre_transducer_ = HFST::add_weight(HFST::minimize($1), $2);
+    }
 	;
 
 REGULAR_EXPRESSION: REGULAR_EXPRESSION UNION REG
@@ -324,7 +326,9 @@ PAIR: CHAR PAIR_SEPARATOR CHAR
 		$$ = _xre_make_key_pair(ANY_KEY, $3); 
 	}
 	| ANY PAIR_SEPARATOR ANY {
-		$$ = _xre_make_key_pair(ANY_KEY, ANY_KEY);  
+        HFST::KeyPairSet* pi = _xre_creation_pi();
+        $$ = HFST::define_transducer(pi);
+        delete pi;
 	}
 	| CHAR PAIR_SEPARATOR EPSILON_TOKEN {
 		$$ = _xre_make_key_pair($1, 0);
@@ -370,9 +374,7 @@ IMPLICIT_PAIR: CHAR
 		}
 		| ANY	
 		{
-			HFST::KeyPairSet* pi = _xre_creation_pi();
-			$$ = HFST::define_transducer(pi);
-			delete pi;
+            $$ = _xre_make_key_pair(ANY_KEY, ANY_KEY);  
 		}
 		|		
 		EPSILON_TOKEN {

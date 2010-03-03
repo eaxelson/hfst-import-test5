@@ -2,7 +2,7 @@
 #include <set>
 #include <vector>
 #include <stdio.h>
-
+#include <iostream>
 
 using std::vector;
 using std::map;
@@ -53,7 +53,8 @@ class SymbolPairNumbering {
     character_codes[0] = 0;
     // tentative:
     dense_symbol_numbers[0] = 0;
-
+    std::cerr << "Adding 0 to alphabet" << std::endl;
+    symbol_pair_numbers[Label(0,0)] = 0;
     for ( Alphabet::const_iterator it = tr->alphabet.begin();
 	  it != tr->alphabet.end();
 	  ++it )

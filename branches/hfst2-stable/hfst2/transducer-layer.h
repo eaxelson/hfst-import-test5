@@ -569,7 +569,7 @@ bool is_cyclic(TransducerHandle t);
 @post \a t is not deleted. */
 
 
-bool is_infinitely_ambiguous(TransducerHandle t, bool output=true, KeyVector *kv=NULL);
+bool is_infinitely_ambiguous(TransducerHandle t, bool output, KeyVector *kv);
 
 /** \brief Whether \a t is deterministic. */
 

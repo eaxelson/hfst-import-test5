@@ -28,14 +28,9 @@
 #include <cstdlib>
 #include <cstring>
 #include <getopt.h>
-#include <hfst2/hfst.h>
-#include "FlagDiacritics.h"
-
-#if NESTED_BUILD
-#include <hfst2/string/string.h>
-#endif
-#if !NESTED_BUILD
-#endif
+#include "hfst2/hfst.h"
+#include "hfst2/flag-diacritics/FlagDiacritics.h"
+#include "hfst2/string/string.h"
 
 
 #include "hfst-commandline.h"
@@ -263,7 +258,7 @@ _is_epsilon(Key k)
 
 bool
 compare_sets(const string& testcase, 
-		set<KeyVector> r, set<KeyVector> e, TEST_TYPE t,
+		set<KeyVector>& r, set<KeyVector>& e, TEST_TYPE t,
 		bool infinite_r, KeyTable* key_table)
 {
 	set<KeyVector> rAndE, rMinusE, eMinusR;
@@ -388,7 +383,7 @@ compare_sets(const string& testcase,
 
 KeyVectorVector*
 lookup_all(const char* s, KeyTable* kt,
-		vector<TransducerHandle> cascade, bool* infinite)
+		vector<TransducerHandle>& cascade, bool* infinite)
 {
 	*infinite = false;
 	KeyVector* lookup_orig = NULL;
@@ -499,7 +494,7 @@ _is_epsilon(Key k)
 
 bool
 compare_sets(const string& testcase, 
-		set<KeyVector> r, set<KeyVector> e, TEST_TYPE t,
+		set<KeyVector>& r, set<KeyVector>& e, TEST_TYPE t,
 		bool infinite_r, KeyTable* key_table)
 {
 	set<KeyVector> rAndE, rMinusE, eMinusR;
@@ -624,7 +619,7 @@ compare_sets(const string& testcase,
 
 KeyVectorVector*
 lookup_all(const char* s, KeyTable* kt,
-		vector<TransducerHandle> cascade, bool* infinite)
+		vector<TransducerHandle>& cascade, bool* infinite)
 {
 	*infinite = false;
 	KeyVector* lookup_orig = NULL;

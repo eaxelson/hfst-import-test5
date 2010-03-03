@@ -5,6 +5,7 @@
 SUBDIRS = src test man hfst-lexc hfst-twolc
 EXTRA_DIST = HACKING
 ACLOCAL_AMFLAGS=-I m4
+CXX_FLAGS=-pg -g -O2
 
 .PHONY: doc valgrind bindist bindist-bzip2 bindist-gzip bindist-zip \
 	bindist-dir

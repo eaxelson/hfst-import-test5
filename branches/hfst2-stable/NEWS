@@ -5,6 +5,26 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in release 2.4
+---------------------------------
+
+* Multiple compilation issued fixed w.r.t string.h inclusion inside hfst source
+  tree without installed headers
+
+* Added preliminary pkg-config support
+
+* Optimizations for flag diacritics in optimized format; NB. the optimized
+  format in 2.4 is not compatible with optimized format of previous releases
+
+* More input and output formatting options for hfst-lookup
+
+* New tool hfst-omor-evaluate for testing morphological transducers
+  (an overblown glorified hfst-diff-test)
+
+* Preliminary tool for killing evil flag diacritics
+
+* Several minor bug fixes in composing intersection and flag diacritics
+
 Noteworthy changes in release 2.3
 ---------------------------------
 

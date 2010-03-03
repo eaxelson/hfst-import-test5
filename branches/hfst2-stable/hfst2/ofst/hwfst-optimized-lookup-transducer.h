@@ -181,6 +181,7 @@ public:
 #endif
   void write(FILE * f);
 
+  bool numerical_cmp( const HwfstTransition &another_transition) const;
   bool operator<(const HwfstTransition &another_index) const;
 };
 
@@ -272,6 +273,8 @@ private:
   static KeyTable * keys;
   static HwfstIdNumberMap * state_id_numbers;
 
+  static std::set<Key> flag_diacritic_set;
+
   void set_transitions(StateId n, TransduceR * tr);
   void set_transition_indices(void);
 
@@ -323,9 +326,17 @@ public:
 
   void add_state_indices(IndexVector * transition_index_table);
 
+  static bool is_flag_diacritic(Key k)
+  {
+    return flag_diacritic_set.find(k) != flag_diacritic_set.end(); 
+  }
+
   TransitionTableIndex
   write_transitions(FILE * f,
 		    TransitionTableIndex place);
+
+  static void set_flag_diacritic_set (std::set<Key> &fs)
+  { flag_diacritic_set.insert(fs.begin(),fs.end()); }
 
 #ifdef DEBUG
   void display(void);
@@ -416,7 +427,8 @@ private:
 	transition_label l; 
 	l.lower_char = a.ilabel;
 	l.upper_char = a.olabel;
-	input_symbols.insert(l.lower_char);
+	if (not HwfstFstState::is_flag_diacritic(l.lower_char))
+	  { input_symbols.insert(l.lower_char); }
 	inspect_nodes(a.nextstate,
 		      visited_nodes,
 		      input_symbols,
@@ -787,7 +799,8 @@ private:
 public:
   HwfstFst(TransduceR * tr,
       HWFST::KeyTable * tr_key_table,
-      FILE * f):
+      FILE * f,
+      std::set<Key> &flag_diacritic_set):
     fst(tr),
     fst_state_id_numbers(new HwfstIdNumberMap(tr)),
     fst_key_table(tr_key_table),
@@ -795,6 +808,7 @@ public:
     fst_indices(new HwfstTransitionTableIndices(number_of_input_symbols())),
     transition_index_table(NULL)
   {
+    HwfstFstState::set_flag_diacritic_set(flag_diacritic_set);
     HwfstFstState::set_key_table(fst_key_table);
     HwfstFstState::set_id_numbers(fst_state_id_numbers);
 #ifdef DEBUG
@@ -814,7 +828,10 @@ public:
     delete fst_indices;
 
     build_index_table(index_table_size);
-    HwfstFstHeader header(tr,fst_key_table->get_unused_key(),index_table_size,count_transitions());
+    HwfstFstHeader 
+      header(tr,fst_key_table->get_unused_key(),
+	     index_table_size,
+	     count_transitions());
 #ifdef DEBUG
     header.display();
 #endif    

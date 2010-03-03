@@ -52,7 +52,6 @@
 static bool is_weighted=false;
 static bool disjunct_expressions=false;
 static char *expression=NULL;
-static double final_weight=0;
 
 void
 print_usage(const char *program_name)
@@ -116,11 +115,11 @@ parse_options(int argc, char** argv)
 		  ,
 		  {"expression", required_argument, 0, 'e'},
 		  {"disjunct-expressions", no_argument, 0, 'j'},
-		  {"weighted", required_argument, 0, 'w'},
+		  {"weighted", no_argument, 0, 'w'},
 		  {0,0,0,0}
 		};
 		int option_index = 0;
-		char c = getopt_long(argc, argv, "R:dhi:o:qvVw:W:Djse:",
+		char c = getopt_long(argc, argv, "R:dhi:o:qvVwW:Djse:",
 							 long_options, &option_index);
 		if (-1 == c)
 		{
@@ -139,7 +138,6 @@ parse_options(int argc, char** argv)
 			break;
 		case 'w':
 			is_weighted = true;
-			final_weight = hfst_strtoweight(optarg);
 			break;
 		case '?':
 			fprintf(message_out, "invalid option --%s\n",
@@ -439,8 +437,6 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 		    free(regex_data);
 		    VERBOSE_PRINT("Calculating symbol mappings\n");
 		    HWFST::KeyTable* symbolmap = HWFST::xre_get_last_key_table();
-		    VERBOSE_PRINT("Setting weights to %f\n", final_weight);
-		    heavyDucer = HWFST::add_weight(heavyDucer, (float)final_weight);
 		    if (NULL == heavyDucer)
 		      {
 			fprintf(message_out, "ERROR: null returned");
@@ -498,8 +494,6 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 		      free(regex_data);
 		      VERBOSE_PRINT("Calculating symbol mappings\n");
 		      HWFST::KeyTable* symbolmap = HWFST::xre_get_last_key_table();
-		      VERBOSE_PRINT("Setting weights to %f\n", final_weight);
-		      heavyDucer = HWFST::add_weight(heavyDucer, (float)final_weight);
 		      if (NULL == heavyDucer)
 			{
 			  fprintf(message_out, "ERROR: null returned");

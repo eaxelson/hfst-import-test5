@@ -3,6 +3,7 @@
 #include "fst/lib/fstlib.h"
 #include <vector>
 #include <set>
+#include <stdexcept>
 
 typedef std::set<unsigned short> KeySet;
 
@@ -442,7 +443,7 @@ class LexiconInfo {
   };
   StateId compose_epsilon(StateId lexicon_state, RulesInfo &Rules, bool &new_state) {
     StateId s = find(lexicon_state,Rules.states,new_state);
-    if ( (lex.Final(lexicon_state) == TropicalWeight::Zero().Value())  and Rules.Final()) {
+    if ( (lex.Final(lexicon_state) != TropicalWeight::Zero().Value())  and Rules.Final()) {
       composition_result->SetFinal(s,
 				   lex.Final(lexicon_state).Value() + 
 				   Rules.get_final_weight());
@@ -483,10 +484,19 @@ class Composer {
   void compose( RulesInfo &Rules );
 
   Transducer * operator() ( void ) {
-    RulesInfo R;
-    compose(R);
-    composition->SetStart(0);
-    return composition;
+    try 
+      {
+	RulesInfo R;
+	compose(R);
+	composition->SetStart(0);
+	return composition;
+      }
+    catch (std::out_of_range e)
+      {
+	composition = new StdVectorFst();
+	composition->SetStart(composition->AddState());
+	return composition;
+      }
   }
 };
 

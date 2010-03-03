@@ -113,6 +113,12 @@ endif
 if WANT_SUBSTITUTE
 MAYBE_SUBSTITUTE=hfst-substitute
 endif
+if WANT_FLAG_DIACRITICS
+MAYBE_FLAG_DIACRITICS=hfst-flag-diacritics
+endif
+if WANT_OMOR_EVALUATE
+MAYBE_OMOR_EVALUATE=hfst-omor-evaluate
+endif
 
 noinst_HEADERS= \
 	calculate_functions.h hfst-commandline.h hfst-common-cases.h \
@@ -136,7 +142,8 @@ bin_PROGRAMS=$(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_COMPOSE_INTERSECT) \
 			 $(MAYBE_SYMBOLS) $(MAYBE_TAIL) $(MAYBE_TXT2FST) \
 			 $(MAYBE_UNWEIGHTED2WEIGHTED) $(MAYBE_WEIGHTED2UNWEIGHTED) \
 			 $(MAYBE_UNWEIGHTED_CALCULATE) $(MAYBE_WEIGHTED_CALCULATE) \
-			 $(MAYBE_OPTIMIZED_LOOKUP) $(MAYBE_SUBSTITUTE)
+			 $(MAYBE_OPTIMIZED_LOOKUP) $(MAYBE_SUBSTITUTE) \
+			 $(MAYBE_FLAG_DIACRITICS) $(MAYBE_OMOR_EVALUATE)
 
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc
 hfst_compare_SOURCES=hfst-compare.cc $(HFST_COMMON_SRC)
@@ -145,8 +152,9 @@ hfst_compose_intersect_SOURCES=hfst-compose-intersect.cc $(HFST_COMMON_SRC)
 hfst_concatenate_SOURCES=hfst-concatenate.cc $(HFST_COMMON_SRC)
 hfst_conjunct_SOURCES=hfst-conjunct.cc $(HFST_COMMON_SRC)
 hfst_determinize_SOURCES=hfst-determinize.cc $(HFST_COMMON_SRC)
-hfst_diff_test_SOURCES=hfst-diff-test.cc FlagDiacritics.cc $(HFST_COMMON_SRC)
+hfst_diff_test_SOURCES=hfst-diff-test.cc $(HFST_COMMON_SRC)
 hfst_disjunct_SOURCES=hfst-disjunct.cc $(HFST_COMMON_SRC)
+hfst_flag_diacritics_SOURCES=hfst-flag-diacritics.cc $(HFST_COMMON_SRC)
 hfst_format_SOURCES=hfst-format.cc $(HFST_COMMON_SRC)
 hfst_fst2fst_SOURCES=hfst-fst2fst.cc $(HFST_COMMON_SRC)
 hfst_fst2pairstrings_SOURCES=hfst-fst2pairstrings.cc $(HFST_COMMON_SRC)
@@ -154,9 +162,10 @@ hfst_fst2strings_SOURCES=hfst-fst2strings.cc $(HFST_COMMON_SRC)
 hfst_fst2txt_SOURCES=hfst-fst2txt.cc $(HFST_COMMON_SRC)
 hfst_head_SOURCES=hfst-head.cc $(HFST_COMMON_SRC)
 hfst_invert_SOURCES=hfst-invert.cc $(HFST_COMMON_SRC)
-hfst_lookup_SOURCES=hfst-lookup.cc FlagDiacritics.h FlagDiacritics.cc $(HFST_COMMON_SRC)
+hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC)
 hfst_lookup_optimize_SOURCES=hfst-lookup-optimize.cc $(HFST_COMMON_SRC)
 hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
+hfst_omor_evaluate_SOURCES=hfst-omor-evaluate.cc $(HFST_COMMON_SRC)
 hfst_pair_test_SOURCES=hfst-pair-test.cc hwfst-pair-test-transducers.h $(HFST_COMMON_SRC)
 hfst_project_SOURCES=hfst-project.cc $(HFST_COMMON_SRC)
 hfst_push_weights_SOURCES=hfst-push-weights.cc $(HFST_COMMON_SRC)
@@ -172,7 +181,6 @@ hfst_symbols_SOURCES=hfst-symbols.cc $(HFST_COMMON_SRC)
 hfst_tail_SOURCES=hfst-tail.cc $(HFST_COMMON_SRC)
 hfst_txt2fst_SOURCES=hfst-txt2fst.cc $(HFST_COMMON_SRC)
 hfst_substitute_SOURCES=hfst-substitute.cc $(HFST_COMMON_SRC)
-
 hfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy $(HFST_COMMON_SRC)
 
 hwfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy $(HFST_COMMON_SRC)
