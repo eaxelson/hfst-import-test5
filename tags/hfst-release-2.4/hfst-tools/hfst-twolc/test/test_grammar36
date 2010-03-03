@@ -1,0 +1,18 @@
+Alphabet
+
+	a e b b:c c ;
+
+Rule-variables
+
+S T ;
+
+Sets
+
+X = b c ;
+Y = b c ;
+
+Rules 
+
+"Rule1"
+b:c <= S T _ ; where S in X and T in Y ;
+		      

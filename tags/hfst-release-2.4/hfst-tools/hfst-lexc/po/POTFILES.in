@@ -1,0 +1,12 @@
+# List of source files containing translatable strings.
+src/flex-utils.cc
+src/hfst-lexc.cc
+src/lexc.cc
+src/lexcio.cc
+src/lexc-lexer.ll
+src/lexc-parser.yy
+src/string-munging.cc
+src/xducer.cc
+src/xymbol-bridges.cc
+src/xymbol.cc
+src/xymbol-table.cc

@@ -1,0 +1,16 @@
+Alphabet
+
+	a b a:b ;
+
+Diacritics 
+
+¨  ' ;
+
+Rules 
+
+"Rule1"
+a:b => a ¨:0  _ ;
+
+"Rule2"
+a => b _ ;
+
