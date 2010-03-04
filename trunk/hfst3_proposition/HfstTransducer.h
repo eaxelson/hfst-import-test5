@@ -24,7 +24,6 @@ namespace hfst
   using hfst::implementations::SfstTransducer;
   using hfst::implementations::SfstState;
   using hfst::implementations::SfstTransition;
-  using hfst::implementations::SfstStateIndexer;
   using hfst::implementations::TropicalWeightTransducer;
   using hfst::implementations::TropicalWeightState;
   using hfst::implementations::TropicalWeightTransition;
@@ -38,7 +37,6 @@ namespace hfst
   using hfst::implementations::FomaTransducer;
   using hfst::implementations::FomaState;
   using hfst::implementations::FomaTransition;
-  using hfst::implementations::FomaStateIndexer;
 
   enum ImplementationType
   {
@@ -110,6 +108,109 @@ namespace hfst
     ~HfstOutputStream(void);
     HfstOutputStream &operator<< (HfstTransducer &transducer);
   };
+
+  /*
+  class HfstTransitionIterator;
+  class HfstStateIndexer;
+  class HfstState
+  {
+    protected:
+      hfst::implementations::TropicalWeightState tropical_ofst;
+      friend class HfstStateIndexer;
+    public:
+      HfstState(HfstTransducer &t);
+      HfstState(const HfstState &s);
+      HfstWeight get_final_weight(void) const;
+      bool operator< (const HfstState &another) const;
+      bool operator== (const HfstState &another) const;
+      bool operator!= (const HfstState &another) const;
+      typedef HfstTransitionIterator const_iterator; 
+      const_iterator begin(void) const;
+      const_iterator end(void) const;
+      void print(KeyTable &key_table, ostream &out,
+	HfstStateIndexer &indexer) const;
+  };
+
+  class HfstStateIterator 
+    {
+    protected:
+      hfst::implementations::TropicalWeightStateIterator tropical_ofst;
+    public:
+      HfstStateIterator(HfstTransducer &t);
+      HfstStateIterator(void);
+      ~HfstStateIterator(void);
+      void operator= (const HfstStateIterator &another);
+      bool operator== (const HfstStateIterator &another) const;
+      bool operator!= (const HfstStateIterator &another) const;
+      const HfstState operator* (void);
+      void operator++ (void);
+      void operator++ (int);
+    };
+ */
+  /*
+  class HfstTransition
+    {
+    protected:
+      hfst::implementations::TropicalWeightTransition tropical_ofst;
+    public:
+      HfstTransition(HfstState source,
+		     std::string input_symbol,
+		     std::string output_symbol,
+		     HfstWeight weight,
+		     HfstState target);
+      std::string get_input_symbol(void) const;
+      std::string get_output_symbol(void) const;
+      HfstState get_target_state(void) const;
+      HfstState get_source_state(void) const;
+      HfstWeight get_weight(void) const;
+      void print(KeyTable &key_table, ostream &out,
+	HfstStateIndexer &indexer) const;
+    };
+*/
+  /*
+  class HfstTransitionIterator
+    {
+    protected:
+      hfst::implementations::TropicalWeightTransitionIterator tropical_ofst;
+    public:
+      HfstTransitionIterator(HfstState s);
+      HfstTransitionIterator(void);
+      ~HfstTransitionIterator(void);
+      void operator=  (const HfstTransitionIterator &another);
+      bool operator== (const HfstTransitionIterator &another);
+      bool operator!= (const HfstTransitionIterator &another);
+      const HfstTransition operator* (void);
+      void operator++ (void);
+      void operator++ (int);
+    };
+  */ 
+  typedef hfst::implementations::StateId HfstState;
+  typedef float HfstWeight;
+
+
+  /* Transitions can be created with HfstMutableTransducer::add_transition.
+     Transitions can be accessed and modified through HfstTransitionIterator. */
+  /*
+  class HfstTransition
+  {
+  protected:
+    hfst::implementations::StdArc tropical_arc;
+    static hfst::implementations::TropicalWeightTransducer tropical_ofst_interface;
+    HfstTransition(hfst::implementations::StdArc arc);
+  public:
+    // Accessors
+    HfstWeight get_weight();
+    std::string get_input_symbol();
+    std::string get_output_symbol();
+    HfstState get_target_state();
+    //
+    set_weight(HfstWeight w);
+    set_input_symbol(std::string s);
+    set_output_symbol(std::string s);
+    set_target_state(HfstState s);
+  }
+  */
+
 
   class HfstTransducer
   {
@@ -221,7 +322,34 @@ namespace hfst
     friend std::ostream &operator<<(std::ostream &out, HfstTransducer &t);
     friend class HfstInputStream;
     friend class HfstOutputStream;
+    friend class HfstMutableTransducer;
   };
+
+
+
+  /* This class is basically a wrapper for a TROPICAL_OFST_TYPE HfstTransducer.
+     Since creating new states and transitions and modifying them is easiest
+     in OpenFst, it is chosen as the only implementation type.
+     A separate mutable and iterable transducer class is also safer because
+     it does not interact with other operations. */
+  class HfstMutableTransducer
+  {
+  protected:
+    HfstTransducer *transducer;
+  public:
+    /* Constructors and delete */
+    HfstMutableTransducer(void);     /* Returns an empty transducer. */
+    HfstMutableTransducer(HfstTransducer &t);
+    HfstMutableTransducer(HfstMutableTransducer &t);
+    ~HfstMutableTransducer(void);
+    /* Adding states and transitions */
+    HfstState add_state();  /* Add a state. If it is the first state, it becomes the initial state and gets state index (number) 0. */    
+    void add_transition(HfstState source, std::string isymbol, std::string osymbol, HfstWeight w, HfstState target);
+    /* Accessors */
+    void set_final_weight(HfstState s, HfstWeight w);
+    HfstWeight get_final_weight(HfstState s);
+  };
+
 
   template<> 
     HfstTransducer &HfstTransducer::set_final_weight<float>(float weight);
@@ -231,5 +359,7 @@ namespace hfst
 
   std::ostream &operator<<(std::ostream &out,HfstTransducer &t);
 }
+
+
 
 #endif
