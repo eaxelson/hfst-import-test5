@@ -261,6 +261,14 @@ namespace hfst
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
       }
   }
+
+  HfstTransducer::HfstTransducer(const HfstMutableTransducer &another):
+    type(another.transducer.type),anonymous(another.transducer.anonymous),
+    key_table(another.transducer.key_table),is_trie(another.transducer.is_trie)
+  {
+    implementation.tropical_ofst =
+      tropical_ofst_interface.copy(another.transducer.implementation.tropical_ofst);
+  }
   
   HfstTransducer::~HfstTransducer(void)
   {
@@ -775,43 +783,52 @@ namespace hfst
   }
 
 
-  HfstMutableTransducer::HfstMutableTransducer(void)
+  HfstMutableTransducer::HfstMutableTransducer(void):
+    transducer(HfstTransducer(TROPICAL_OFST_TYPE))
   {
-    this->transducer = &HfstTransducer(TROPICAL_OFST_TYPE).convert(TROPICAL_OFST_TYPE);
   }
 
-  HfstMutableTransducer::HfstMutableTransducer(HfstTransducer &t)
+  HfstMutableTransducer::HfstMutableTransducer(const HfstTransducer &t):
+    transducer(HfstTransducer(t).convert(TROPICAL_OFST_TYPE))
   {
-    this->transducer = &HfstTransducer(t).convert(TROPICAL_OFST_TYPE);
+  }
+
+  /*HfstMutableTransducer::HfstMutableTransducer(const HfstMutableTransducer &t):
+    transducer(HfstTransducer(t).convert(TROPICAL_OFST_TYPE))
+  {
+  }*/
+
+  HfstMutableTransducer::~HfstMutableTransducer(void)
+  {
   }
 
   HfstState HfstMutableTransducer::add_state() 
   {
-    return this->transducer->tropical_ofst_interface.add_state(
-      this->transducer->implementation.tropical_ofst);
+    return this->transducer.tropical_ofst_interface.add_state(
+      this->transducer.implementation.tropical_ofst);
   }
 
   void HfstMutableTransducer::set_final_weight(HfstState s, HfstWeight w)
   {
-    this->transducer->tropical_ofst_interface.set_final_weight(
-	    this->transducer->implementation.tropical_ofst, s, w);
+    this->transducer.tropical_ofst_interface.set_final_weight(
+	    this->transducer.implementation.tropical_ofst, s, w);
   }
 
   void HfstMutableTransducer::add_transition(HfstState source, std::string isymbol, std::string osymbol, HfstWeight w, HfstState target)
   {
-    return this->transducer->tropical_ofst_interface.add_transition(
-             this->transducer->implementation.tropical_ofst,
+    return this->transducer.tropical_ofst_interface.add_transition(
+             this->transducer.implementation.tropical_ofst,
 	     source,
-	     this->transducer->key_table.add_symbol(isymbol),
-	     this->transducer->key_table.add_symbol(osymbol),
+	     this->transducer.key_table.add_symbol(isymbol),
+	     this->transducer.key_table.add_symbol(osymbol),
 	     w,
 	     target);
   }
 
   HfstWeight HfstMutableTransducer::get_final_weight(HfstState s)
   {
-    return this->transducer->tropical_ofst_interface.get_final_weight(
-	     this->transducer->implementation.tropical_ofst, s);
+    return this->transducer.tropical_ofst_interface.get_final_weight(
+	     this->transducer.implementation.tropical_ofst, s);
   }
 
 

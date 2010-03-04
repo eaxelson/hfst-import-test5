@@ -56,6 +56,8 @@ namespace hfst
 
   class HfstTransducer;
 
+  class HfstMutableTransducer;
+
   class HfstInputStream
   {
   protected:
@@ -261,6 +263,7 @@ namespace hfst
 		   ImplementationType type);
     HfstTransducer(HfstInputStream &in);
     HfstTransducer(const HfstTransducer &another);
+    HfstTransducer(const HfstMutableTransducer &t);
     ~HfstTransducer(void);
     HfstTransducer &remove_epsilons(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &determinize(ImplementationType type=UNSPECIFIED_TYPE);
@@ -335,12 +338,12 @@ namespace hfst
   class HfstMutableTransducer
   {
   protected:
-    HfstTransducer *transducer;
+    HfstTransducer transducer;
   public:
     /* Constructors and delete */
     HfstMutableTransducer(void);     /* Returns an empty transducer. */
-    HfstMutableTransducer(HfstTransducer &t);
-    HfstMutableTransducer(HfstMutableTransducer &t);
+    HfstMutableTransducer(const HfstTransducer &t);
+    HfstMutableTransducer(const HfstMutableTransducer &t);
     ~HfstMutableTransducer(void);
     /* Adding states and transitions */
     HfstState add_state();  /* Add a state. If it is the first state, it becomes the initial state and gets state index (number) 0. */    
@@ -348,6 +351,7 @@ namespace hfst
     /* Accessors */
     void set_final_weight(HfstState s, HfstWeight w);
     HfstWeight get_final_weight(HfstState s);
+    friend class HfstTransducer;
   };
 
 

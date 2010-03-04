@@ -51,6 +51,12 @@ HfstInputStream: HfstInputStream.cc
 hfst_obj:
 	$(MAKE) -C ./implementations all
 
-#test:
-#	g++ -i HfstTransducer.o -lhfst3 -L. -o test
+test.o: test.cc
+test: test.o
+
+test.o: 
+	g++ -I. -c test.cc -o test.o
+
+test:
+	g++ -i test.o -lhfst3 -lz -L. -o test
 

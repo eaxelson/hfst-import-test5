@@ -14,12 +14,12 @@ clean:
 	$(MAKE) -C openfst-1.1 clean
 
 SfstTransducer: SfstTransducer.cc SymbolDefs.o GlobalSymbolTable.o
-	g++ -g -DDEBUG -O3 -o $@ $^ SFST/src/fst.o SFST/src/basic.o \
+	g++ -g -O3 -o $@ $^ SFST/src/fst.o SFST/src/basic.o \
 	SFST/src/interface.o SFST/src/utf8.o SFST/src/determinise.o \
 	SFST/src/operators.o SFST/src/alphabet.o
 
 TropicalWeightTransducer: TropicalWeightTransducer.cc SymbolDefs.o GlobalSymbolTable.o
-	g++ -g -DDEBUG -Lopenfst-1.1/src/lib -Lopenfst-1.1/src/bin -lfstmain \
+	g++ -g -Lopenfst-1.1/src/lib -Lopenfst-1.1/src/bin -lfstmain \
 	-lfst -ldl -O3 -o $@ $^
 
 SfstTransducer.o: SfstTransducer.cc
@@ -38,5 +38,5 @@ sfst:
 	$(MAKE) -C ./SFST/src all
 
 testi:	FomaTransducer.cc
-	g++ $(CXXFLAGS) -Wno-deprecated -DDEBUG_MAIN -c FomaTransducer.cc -o FomaTransducer.o
+	g++ $(CXXFLAGS) -Wno-deprecated -c FomaTransducer.cc -o FomaTransducer.o
 	g++ -i FomaTransducer.o -lhfst3 -lreadline -lz -L.. -o testi
