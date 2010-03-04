@@ -35,7 +35,7 @@ namespace hfst { namespace implementations
       }
     for (unsigned int i = 1; i < o_symbol_table->AvailableKey(); ++i)
       {
-	std::string str = i_symbol_table->Find(i);
+	std::string str = o_symbol_table->Find(i);
 	const char * string = str.c_str(); 
 	if (string != NULL)
 	  { transducer_key_table.add_symbol(string); }
@@ -487,6 +487,37 @@ namespace hfst { namespace implementations
 			  encode_mapper);
     delete determinized_t;
     return new StdVectorFst(dec);
+  }
+
+  /* For HfstMutableTransducer */
+
+  StateId 
+  TropicalWeightTransducer::add_state(StdVectorFst *t)
+  { 
+    StateId s = t->AddState();
+    if (s == 0)
+      t->SetStart(s);
+    return s;
+  }
+
+  void 
+  TropicalWeightTransducer::set_final_weight(StdVectorFst *t, StateId s, float w)
+  {
+    t->SetFinal(s, w);
+    return;
+  }
+
+  void 
+  TropicalWeightTransducer::add_transition(StdVectorFst *t, StateId source, Key ilabel, Key olabel, float w, StateId target)
+  {
+    t->AddArc(source, StdArc(ilabel, olabel, w, target));
+    return;
+  }
+
+  float 
+  TropicalWeightTransducer::get_final_weight(StdVectorFst *t, StateId s)
+  {
+    return t->Final(s).Value();
   }
 
   StdVectorFst * 

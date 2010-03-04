@@ -98,7 +98,7 @@ namespace hfst { namespace symbols
   void KeyTable::harmonize(KeyMap &harmonizing_map,
 			   KeyTable &another)
   {
-    global_symbol_table.add_missing_keys
+    global_symbol_table.add_missing_symbols
       (*this,another);
     global_symbol_table.map_keys(harmonizing_map,*this,another);	 
   }
@@ -156,6 +156,7 @@ namespace hfst { namespace symbols
     it = another.it;
   }
 
+  // for debugging
   KeyMapper::KeyMapper(KeyTable &old_key_table,
 		       KeyTable &new_key_table)
   { new_key_table.harmonize(key_map,old_key_table); }

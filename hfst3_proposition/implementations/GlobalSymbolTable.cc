@@ -35,7 +35,7 @@ namespace hfst { namespace symbols
     return string_symbol_vector.at(symbol).c_str();
   }
 
-  void GlobalSymbolTable::add_missing_keys
+  void GlobalSymbolTable::add_missing_symbols
   (KeyTable &source, KeyTable &target)
   {
     for (KeyTable::const_iterator it = source.begin(); 

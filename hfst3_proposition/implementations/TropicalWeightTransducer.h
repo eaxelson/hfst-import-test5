@@ -182,6 +182,12 @@ namespace implementations
       static const_iterator end(StdVectorFst * t);
       static StdVectorFst * harmonize(StdVectorFst * t,KeyMap &key_map);
       static void print(StdVectorFst * t, KeyTable &key_table, ostream &out);
+
+      /* For HfstMutableTransducer */
+      static StateId add_state(StdVectorFst *t);
+      static void set_final_weight(StdVectorFst *t, StateId s, float w);
+      static void add_transition(StdVectorFst *t, StateId source, Key ilabel, Key olabel, float w, StateId target);
+      static float get_final_weight(StdVectorFst *t, StateId s);
     };
 
 } }

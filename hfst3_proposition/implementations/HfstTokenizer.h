@@ -54,6 +54,8 @@ namespace hfst
     KeyPairVector * tokenize(const std::string &input_string,
 			     const std::string &output_string,
 			     KeyTable &key_table) const;
+    // Implement also a version that returns a StringSymbolPairVector (define this datatype)
+    // and does not take a KeyTable argument
   };
 }
 #endif
