@@ -243,10 +243,11 @@ public class Transducer implements HfstOptimizedLookup.transducer
 
     private void tryEpsilonTransitions(long index)
     {
-	while (transitions.get(index).getInput() == 0)
+	while (true)
 	    {
-		if (operations.containsKey(transitions.get(index).getOutput())) {
-		    if (!pushState(operations.get(transitions.get(index).getOutput())))
+		// first test for flag
+		if (operations.containsKey(transitions.get(index).getInput())) {
+		    if (!pushState(operations.get(transitions.get(index).getInput())))
 			{
 			    ++index;
 			    continue;
@@ -259,12 +260,18 @@ public class Transducer implements HfstOptimizedLookup.transducer
 			stateStack.pop();
 			continue;
 		    }
-		}
-		outputString[outputPointer] = transitions.get(index).getOutput();
-		++outputPointer;
-		getAnalyses(transitions.get(index).target());
-		--outputPointer;
-		++index;
+		} else if (transitions.get(index).getInput() == 0)
+		    { // epsilon transitions
+			outputString[outputPointer] = transitions.get(index).getOutput();
+			++outputPointer;
+			getAnalyses(transitions.get(index).target());
+			--outputPointer;
+			++index;
+		    }
+		else
+		    {
+			break;
+		    }
 	    }
     }
 
@@ -377,6 +384,18 @@ public class Transducer implements HfstOptimizedLookup.transducer
 	    stateStack.peek().put(flag.feature, new FlagState(flag.value, false));
 	    return true;
 	} else if (flag.operation.equals("R")) { // require
+	    if (flag.value.equals("")) // empty require
+		{
+		    if (stateStack.peek().get(flag.feature).value.equals(""))
+			{
+			    return false;
+			}
+		    else
+			{
+			    stateStack.push(stateStack.peek());
+			    return true;
+			}
+		}
 	    if (stateStack.peek().containsKey(flag.feature))
 		{
 		    if (stateStack.peek().get(flag.feature).value == flag.value &&
@@ -388,6 +407,18 @@ public class Transducer implements HfstOptimizedLookup.transducer
 		}
 	    return false;
 	} else if (flag.operation.equals("D")) { // disallow
+	    if (flag.value.equals("")) // empty disallow
+		{
+		    if (stateStack.peek().get(flag.feature).value.equals(""))
+			{
+			    return false;
+			}
+		    else
+			{
+			    stateStack.push(stateStack.peek());
+			    return true;
+			}
+		}
 	    if (stateStack.peek().containsKey(flag.feature))
 		{
 		    if (stateStack.peek().get(flag.feature).value == flag.value &&
