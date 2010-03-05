@@ -29,7 +29,7 @@ public class TransducerAlphabet
 			chars[charindex] = charstream.readByte();
 		    }
 		String ustring = new String(chars, 0, charindex, "UTF-8");
-		if (ustring.charAt(0) == '@' && ustring.charAt(ustring.length()-1) == '@' && ustring.charAt(2) == '.')
+		if (ustring.length() > 5 && ustring.charAt(0) == '@' && ustring.charAt(ustring.length()-1) == '@' && ustring.charAt(2) == '.')
 		    { // flag diacritic identified
 			String op;
 			String feat;

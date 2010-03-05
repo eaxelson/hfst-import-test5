@@ -32,6 +32,7 @@ public class HfstOptimizedLookup {
 
     public static void runTransducer(transducer t)
     {
+	System.out.println("Ready for input.");
 	Console console = System.console();
 	String str = console.readLine();
 	while (str != null)
@@ -64,9 +65,12 @@ public class HfstOptimizedLookup {
 		System.err.println("File not found: couldn't read transducer file " + argv[0] + ".");
 		System.exit(1);
 	    }
+	System.out.println("Reading header...");
 	TransducerHeader h = new TransducerHeader(transducerfile);
 	DataInputStream charstream = new DataInputStream(transducerfile);
+	System.out.println("Reading alphabet...");
 	TransducerAlphabet a = new TransducerAlphabet(charstream, h.getSymbolCount());
+	System.out.println("Reading transition and index tables...");
 	if (h.isWeighted())
 	    {
 		TransducerWeighted transducer = new TransducerWeighted(transducerfile, h, a);
