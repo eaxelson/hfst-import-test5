@@ -759,6 +759,16 @@ namespace hfst { namespace implementations
     extract_reversed_strings(t,t->Start(),kt,reversed_results);
     results.insert(reversed_results.begin(),reversed_results.end());
   }
+
+  void TropicalWeightTransducer::represent_empty_transducer_as_having_one_state(StdVectorFst *t)
+  {
+    if (t->Start() == fst::kNoStateId || t->NumStates() == 0) {
+      delete t;
+      t = create_empty_transducer();
+    }
+    return;
+  }
+
   }
 }
 
