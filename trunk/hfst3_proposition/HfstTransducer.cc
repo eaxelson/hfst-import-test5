@@ -25,19 +25,35 @@ namespace hfst
   bool HfstState::operator!= (const HfstState &another) const  { return false; }
   const_iterator HfstState::begin(void) const  { return HfstTransitionIterator(HfstTransducer(UNSPECIFIED_TYPE)); }
   const_iterator HfstState::end(void) const  { return HfstTransitionIterator(HfstTransducer(UNSPECIFIED_TYPE)); }
+  */
   
-  
-  HfstStateIterator::HfstStateIterator(MutableHfstTransducer &t)  {}
-  HfstStateIterator::HfstStateIterator(void)  {}
-  HfstStateIterator::~HfstStateIterator(void)  {}
-  void HfstStateIterator::operator= (const HfstStateIterator &another)  {}
-  bool HfstStateIterator::operator== (const HfstStateIterator &another) const  { return false; }
-  bool HfstStateIterator::operator!= (const HfstStateIterator &another) const  { return false; }
-  const HfstState HfstStateIterator::operator* (void)  { return HfstState(HfstTransducer(UNSPECIFIED_TYPE)); }
-  void HfstStateIterator::operator++ (void)  {}
-  void HfstStateIterator::operator++ (int)  {}
- 
+  HfstStateIterator::HfstStateIterator(const HfstMutableTransducer &t):
+    tropical_ofst_iterator(t.transducer.implementation.tropical_ofst)
+  {}
 
+  //HfstStateIterator::HfstStateIterator(void)  {}
+  
+  HfstStateIterator::~HfstStateIterator(void)  
+  { 
+    delete tropical_ofst_iterator;
+  }
+  
+  void HfstStateIterator::operator= (const HfstStateIterator &another)  {}
+  
+  bool HfstStateIterator::operator== (const HfstStateIterator &another) const  { return false; }
+  
+  bool HfstStateIterator::operator!= (const HfstStateIterator &another) const  { return false; }
+  
+  const HfstState HfstStateIterator::operator* (void)  { return HfstState(HfstTransducer(UNSPECIFIED_TYPE)); }
+  
+  void HfstStateIterator::operator++ (void)  {}
+  
+  void HfstStateIterator::operator++ (int)  {}
+  
+  HfstWeight get_final_weight(HfstState s) {}
+
+
+  /*
   HfstTransition::HfstTransition(HfstState source,
 				 std::string input_symbol,
 				 std::string output_symbol,
@@ -791,6 +807,8 @@ namespace hfst
   HfstMutableTransducer::HfstMutableTransducer(const HfstTransducer &t):
     transducer(HfstTransducer(t).convert(TROPICAL_OFST_TYPE))
   {
+    // guarantees that the internal representation of an empty transducer has at least one state
+    transducer.tropical_ofst_interface.represent_empty_transducer_as_having_one_state(transducer.implementation.tropical_ofst);
   }
 
   /*HfstMutableTransducer::HfstMutableTransducer(const HfstMutableTransducer &t):
@@ -825,11 +843,11 @@ namespace hfst
 	     target);
   }
 
-  HfstWeight HfstMutableTransducer::get_final_weight(HfstState s)
+  /*HfstWeight HfstMutableTransducer::get_final_weight(HfstState s)
   {
     return this->transducer.tropical_ofst_interface.get_final_weight(
 	     this->transducer.implementation.tropical_ofst, s);
-  }
+	     }*/
 
 
 }

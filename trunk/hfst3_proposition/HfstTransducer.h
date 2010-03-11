@@ -326,6 +326,7 @@ namespace hfst
     friend class HfstInputStream;
     friend class HfstOutputStream;
     friend class HfstMutableTransducer;
+    friend class HfstStateIterator;
   };
 
 
@@ -346,13 +347,39 @@ namespace hfst
     HfstMutableTransducer(const HfstMutableTransducer &t);
     ~HfstMutableTransducer(void);
     /* Adding states and transitions */
-    HfstState add_state();  /* Add a state. If it is the first state, it becomes the initial state and gets state index (number) 0. */    
-    void add_transition(HfstState source, std::string isymbol, std::string osymbol, HfstWeight w, HfstState target);
-    /* Accessors */
+    HfstState add_state();
     void set_final_weight(HfstState s, HfstWeight w);
-    HfstWeight get_final_weight(HfstState s);
+    void add_transition(HfstState source, std::string isymbol, std::string osymbol, HfstWeight w, HfstState target);
     friend class HfstTransducer;
+    friend class HfstStateIterator;
   };
+
+
+  class HfstStateIterator
+  {
+  protected:
+    hfst::implementations::TropicalWeightStateIterator tropical_ofst_iterator;
+  public:
+    HfstStateIterator(const HfstMutableTransducer &t);
+    //HfstStateIterator(void);
+    ~HfstStateIterator(void);
+    void operator= (const HfstStateIterator &another);
+    bool operator== (const HfstStateIterator &another) const;
+    bool operator!= (const HfstStateIterator &another) const;
+    const HfstState operator* (void);
+    void operator++ (void);
+    void operator++ (int);
+    HfstWeight get_final_weight(HfstState s);
+  };
+
+  /*
+  class HfstTransition
+  {
+  }
+
+  class HfstTransitionIterator
+  {
+  }*/
 
 
   template<> 
