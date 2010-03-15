@@ -270,6 +270,59 @@ namespace hfst { namespace implementations
 
 
 
+  TropicalWeightTransition::TropicalWeightTransition(const StdArc &arc):
+    arc(arc)
+  {}
+
+  TropicalWeightTransition::~TropicalWeightTransition(void)
+  {}
+
+  Key TropicalWeightTransition::get_input_key(void) const
+  {
+    return arc.ilabel;
+  }
+
+  Key TropicalWeightTransition::get_output_key(void) const
+  {
+    return arc.olabel;
+  }
+
+  TropicalWeightState TropicalWeightTransition::get_target_state(void) const
+  {
+    return arc.nextstate;
+  }
+
+  TropicalWeight TropicalWeightTransition::get_weight(void) const
+  {
+    return arc.weight;
+  }
+
+
+
+  TropicalWeightTransitionIterator::TropicalWeightTransitionIterator(StdVectorFst *t, StateId state):
+    arc_iterator(new ArcIterator<StdVectorFst>(*t, state))
+  {}
+
+  TropicalWeightTransitionIterator::~TropicalWeightTransitionIterator(void)
+  {}
+
+  void TropicalWeightTransitionIterator::next()
+  {
+    arc_iterator->Next();
+  }
+
+  bool TropicalWeightTransitionIterator::done()
+  {
+    return arc_iterator->Done();
+  }
+
+  TropicalWeightTransition TropicalWeightTransitionIterator::value()
+  {
+    return TropicalWeightTransition(arc_iterator->Value());
+  }
+
+
+
   /*
   TropicalWeightTransition::TropicalWeightTransition
   (const StdArc &arc,StateId source_state,StdVectorFst * t):

@@ -326,6 +326,7 @@ namespace hfst
     friend class HfstOutputStream;
     friend class HfstMutableTransducer;
     friend class HfstStateIterator;
+    friend class HfstTransitionIterator;
   };
 
 
@@ -352,6 +353,7 @@ namespace hfst
     void add_transition(HfstState source, std::string isymbol, std::string osymbol, HfstWeight w, HfstState target);
     friend class HfstTransducer;
     friend class HfstStateIterator;
+    friend class HfstTransitionIterator;
   };
 
 
@@ -375,14 +377,36 @@ namespace hfst
     HfstWeight get_final_weight(HfstState s);*/
   };
 
-  /*
+
   class HfstTransition
   {
-  }
+  protected:
+    std::string isymbol;
+    std::string osymbol;
+    HfstWeight weight;
+    HfstState target_state;
+    HfstTransition(std::string isymbol, std::string osymbol, HfstWeight weight, HfstState target_state);
+    ~HfstTransition(void);
+  public:
+    std::string get_input_symbol(void);
+    std::string get_output_symbol(void);
+    HfstWeight get_weight(void);
+    HfstState get_target_state(void);
+    friend class HfstTransitionIterator;
+  };
 
   class HfstTransitionIterator
   {
-  }*/
+  protected:
+    hfst::implementations::TropicalWeightTransitionIterator tropical_ofst_iterator;
+    KeyTable key_table;
+  public:
+    HfstTransitionIterator(const HfstMutableTransducer &t, HfstState s);
+    ~HfstTransitionIterator(void);
+    bool done();
+    HfstTransition value();
+    void next();    
+  };
 
 
   template<> 

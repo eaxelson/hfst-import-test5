@@ -26,6 +26,39 @@ namespace hfst
   const_iterator HfstState::begin(void) const  { return HfstTransitionIterator(HfstTransducer(UNSPECIFIED_TYPE)); }
   const_iterator HfstState::end(void) const  { return HfstTransitionIterator(HfstTransducer(UNSPECIFIED_TYPE)); }
   */
+
+  
+  HfstTransitionIterator::HfstTransitionIterator(const HfstMutableTransducer &t, HfstState s):
+    tropical_ofst_iterator(hfst::implementations::TropicalWeightTransitionIterator(t.transducer.implementation.tropical_ofst, s)),
+    key_table(t.transducer.key_table)
+  {}
+
+  HfstTransitionIterator::~HfstTransitionIterator(void)  
+  {}
+
+  bool HfstTransitionIterator::done()
+  {
+    return tropical_ofst_iterator.done();
+  }
+  
+  HfstTransition HfstTransitionIterator::value()
+  {
+    hfst::implementations::TropicalWeightTransition twt = tropical_ofst_iterator.value();
+    const char *input_symbol = key_table.get_string_symbol( twt.get_input_key() );
+    const char *output_symbol = key_table.get_string_symbol( twt.get_output_key() );
+    HfstWeight weight = twt.get_weight().Value();
+    HfstState target_state = twt.get_target_state();
+    return HfstTransition( std::string(input_symbol),
+			   std::string(output_symbol),
+			   weight,
+			   target_state );
+  }
+  
+  void HfstTransitionIterator::next()
+  {
+    tropical_ofst_iterator.next();
+  }
+
   
   HfstStateIterator::HfstStateIterator(const HfstMutableTransducer &t):
     tropical_ofst_iterator(hfst::implementations::TropicalWeightStateIterator(t.transducer.implementation.tropical_ofst))
@@ -54,17 +87,46 @@ namespace hfst
 
   bool HfstStateIterator::done()
   {
-    return false;
+    return tropical_ofst_iterator.done();
   }
 
   HfstState HfstStateIterator::value()
   {
-    return 0;
+    return tropical_ofst_iterator.value();
   }
 
   void HfstStateIterator::next()
   {
-    return;
+    tropical_ofst_iterator.next();
+  }
+
+
+
+  HfstTransition::HfstTransition(std::string isymbol, std::string osymbol, HfstWeight weight, HfstState target_state):
+    isymbol(isymbol), osymbol(osymbol), weight(weight), target_state(target_state)
+  {}
+
+  HfstTransition::~HfstTransition(void)
+  {}
+
+  std::string HfstTransition::get_input_symbol(void)
+  {
+    return isymbol;
+  }
+
+  std::string HfstTransition::get_output_symbol(void)
+  {
+    return osymbol;
+  }
+  
+  HfstWeight HfstTransition::get_weight(void)
+  {
+    return weight;
+  }
+  
+  HfstState HfstTransition::get_target_state(void)
+  {
+    return target_state;
   }
 
 
