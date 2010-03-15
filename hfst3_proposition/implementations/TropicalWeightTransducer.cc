@@ -178,6 +178,8 @@ namespace hfst { namespace implementations
     catch (HfstInterfaceException e)
       { throw e; }
   }
+
+  /*
   TropicalWeightState::TropicalWeightState(StateId state,
 					   StdVectorFst * t):
     state(state), t(t) {}
@@ -220,6 +222,16 @@ namespace hfst { namespace implementations
       { out << state << "\t" << get_final_weight() << std::endl; }
   }
 
+  HfstState TropicalWeightState::get_state_number(void)
+  {
+    return this->state;
+  }
+
+  HfstWeight TropicalWeightState::get_state_weight(void)
+  {
+    return (t->Final(state)).Value();
+  }
+
   TropicalWeightStateIndexer::TropicalWeightStateIndexer(StdVectorFst * t):
     t(t) {}
 
@@ -231,74 +243,34 @@ namespace hfst { namespace implementations
   (unsigned int number)
   { return TropicalWeightState(number,t); }
 
-  TropicalWeightStateIterator::TropicalWeightStateIterator(StdVectorFst * t):
-    t(t), iterator(new StateIterator<StdVectorFst>(*t)), 
-    current_state(iterator->Value()),ended(iterator->Done())
-  {}
+  */
 
-  TropicalWeightStateIterator::TropicalWeightStateIterator(void):
-    t(NULL),iterator(NULL),current_state(0),ended(true) {}
+
+  TropicalWeightStateIterator::TropicalWeightStateIterator(StdVectorFst * t):
+    iterator(new StateIterator<StdVectorFst>(*t))
+  {}
 
   TropicalWeightStateIterator::~TropicalWeightStateIterator(void)
   { delete iterator; }
 
-  void TropicalWeightStateIterator::operator= 
-  (const TropicalWeightStateIterator &another)
+  void TropicalWeightStateIterator::next(void)
   {
-    if (*this == another) {return; }
-    delete iterator;
-    if (another.ended)
-      {
-	t = NULL;
-	iterator = NULL;
-	current_state = 0;
-	ended = true;
-	return;
-      }
-    ended = false;
-    t = another.t;
-    iterator = new StateIterator<StdVectorFst>(*t);
-    current_state = another.current_state;
-    while (iterator->Value() != current_state)
-      { iterator->Next(); }
-  }
-
-  bool TropicalWeightStateIterator::operator== 
-  (const TropicalWeightStateIterator &another) const
-  {
-    if (ended and another.ended)
-      { return true; }
-    if (ended or another.ended)
-      { return false; }
-    return 
-      (t == another.t) and
-      (current_state == another.current_state);
-  }
-
-  bool TropicalWeightStateIterator::operator!= 
-  (const TropicalWeightStateIterator &another) const
-  { return not (*this == another); }
-
-  const TropicalWeightState 
-  TropicalWeightStateIterator::operator* (void)
-  { return TropicalWeightState(current_state,t); }
-
-  void TropicalWeightStateIterator::operator++ (void)
-  {
-    if (ended) { return; }
     iterator->Next();
-    if (iterator->Done()) { ended = true; }
-    else { current_state = iterator->Value(); }
   }
 
-  void TropicalWeightStateIterator::operator++ (int)
+  bool TropicalWeightStateIterator::done(void)
   {
-    if (ended) { return; }
-    iterator->Next();
-    if (iterator->Done()) { ended = true; }
-    else { current_state = iterator->Value(); }
+    return iterator->Done();
   }
 
+  TropicalWeightState TropicalWeightStateIterator::value(void)
+  {
+    return iterator->Value();
+  }
+
+
+
+  /*
   TropicalWeightTransition::TropicalWeightTransition
   (const StdArc &arc,StateId source_state,StdVectorFst * t):
     arc(arc), source_state(source_state), t(t) {}
@@ -398,7 +370,7 @@ namespace hfst { namespace implementations
     if (arc_iterator->Done())
       { end_iterator = true; }
   }
-
+  */
   StdVectorFst * TropicalWeightTransducer::create_empty_transducer(void)
   { 
     StdVectorFst * t = new StdVectorFst;
@@ -686,7 +658,7 @@ namespace hfst { namespace implementations
       }
     return t_copy;
   }
-
+  /*
   TropicalWeightTransducer::const_iterator 
   TropicalWeightTransducer::begin(StdVectorFst * t)
   { return TropicalWeightStateIterator(t); }
@@ -708,6 +680,14 @@ namespace hfst { namespace implementations
 	s.print(key_table,out,indexer);
       }
   }
+  */
+
+  void TropicalWeightTransducer::print
+  (StdVectorFst * t, KeyTable &key_table, ostream &out) 
+  {
+    return; // dummy implementation
+  }
+
 
   StdVectorFst * TropicalWeightTransducer::harmonize
   (StdVectorFst * t,KeyMap &key_map)

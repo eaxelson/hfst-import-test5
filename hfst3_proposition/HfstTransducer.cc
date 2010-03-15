@@ -28,16 +28,16 @@ namespace hfst
   */
   
   HfstStateIterator::HfstStateIterator(const HfstMutableTransducer &t):
-    tropical_ofst_iterator(t.transducer.implementation.tropical_ofst)
+    tropical_ofst_iterator(hfst::implementations::TropicalWeightStateIterator(t.transducer.implementation.tropical_ofst))
   {}
 
   //HfstStateIterator::HfstStateIterator(void)  {}
   
   HfstStateIterator::~HfstStateIterator(void)  
   { 
-    delete tropical_ofst_iterator;
   }
   
+  /*
   void HfstStateIterator::operator= (const HfstStateIterator &another)  {}
   
   bool HfstStateIterator::operator== (const HfstStateIterator &another) const  { return false; }
@@ -50,7 +50,22 @@ namespace hfst
   
   void HfstStateIterator::operator++ (int)  {}
   
-  HfstWeight get_final_weight(HfstState s) {}
+  HfstWeight get_final_weight(HfstState s) {}*/
+
+  bool HfstStateIterator::done()
+  {
+    return false;
+  }
+
+  HfstState HfstStateIterator::value()
+  {
+    return 0;
+  }
+
+  void HfstStateIterator::next()
+  {
+    return;
+  }
 
 
   /*

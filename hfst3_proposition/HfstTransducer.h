@@ -26,12 +26,11 @@ namespace hfst
   using hfst::implementations::SfstTransition;
   using hfst::implementations::TropicalWeightTransducer;
   using hfst::implementations::TropicalWeightState;
-  using hfst::implementations::TropicalWeightTransition;
-  using hfst::implementations::TropicalWeightStateIndexer;
+  //using hfst::implementations::TropicalWeightTransition;
+  using hfst::implementations::TropicalWeightStateIterator;
   using hfst::implementations::LogWeightTransducer;
   using hfst::implementations::LogWeightState;
   using hfst::implementations::LogWeightTransition;
-  using hfst::implementations::LogWeightStateIndexer;
   using hfst::implementations::WeightedStrings;
   using hfst::implementations::WeightedString;
   using hfst::implementations::FomaTransducer;
@@ -349,6 +348,7 @@ namespace hfst
     /* Adding states and transitions */
     HfstState add_state();
     void set_final_weight(HfstState s, HfstWeight w);
+    HfstWeight get_final_weight(HfstState s);
     void add_transition(HfstState source, std::string isymbol, std::string osymbol, HfstWeight w, HfstState target);
     friend class HfstTransducer;
     friend class HfstStateIterator;
@@ -363,13 +363,16 @@ namespace hfst
     HfstStateIterator(const HfstMutableTransducer &t);
     //HfstStateIterator(void);
     ~HfstStateIterator(void);
-    void operator= (const HfstStateIterator &another);
+    bool done();
+    HfstState value();
+    void next();
+    /*void operator= (const HfstStateIterator &another);
     bool operator== (const HfstStateIterator &another) const;
     bool operator!= (const HfstStateIterator &another) const;
     const HfstState operator* (void);
     void operator++ (void);
     void operator++ (int);
-    HfstWeight get_final_weight(HfstState s);
+    HfstWeight get_final_weight(HfstState s);*/
   };
 
   /*
