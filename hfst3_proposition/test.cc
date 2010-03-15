@@ -8,10 +8,22 @@ int main(int argc, char **argv) {
   HfstState second_state = t.add_state();
   t.set_final_weight(second_state, 0.5);
   t.add_transition(0, "foo", "bar", 0.3, second_state);
+  HfstState initial = t.get_initial_state();
+  cout << "initial state: " << initial << "\n";
   HfstStateIterator it(t);
   while (not it.done()) {
     HfstState s = it.value();
-    cout << s << "\n";
+    HfstTransitionIterator IT(t,s);
+    while (not IT.done()) {
+      HfstTransition tr = IT.value();
+      cout << s << "\t" << tr.get_target_state() << "\t"
+	   << tr.get_input_symbol() << "\t" << tr.get_output_symbol()
+	   << "\t" << tr.get_weight() << "\n";
+      IT.next();
+    }
+    if ( t.is_final(s) )
+      cout << s << "\t" << t.get_final_weight(s);
+    cout << "\n";
     it.next();
   }
   HfstTransducer T(t);

@@ -156,6 +156,39 @@ namespace hfst { namespace symbols
     it = another.it;
   }
 
+  void KeyTable::collect_unknown_sets(const KeyTable &kt1, StringSymbolSet &unknown1,
+				      const KeyTable &kt2, StringSymbolSet &unknown2)
+  {
+    for (KeyTable::const_iterator it1 = kt1.begin(); it1 != kt1.end(); it1++) {
+      Symbol s1 = it1->symbol;
+      if ( not kt2.is_symbol(s1) )
+	unknown2.insert(GlobalSymbolTable::get_symbol_name(s1));  // Symbols could be used
+    }
+    for (KeyTable::const_iterator it2 = kt2.begin(); it2 != kt2.end(); it2++) {
+      Symbol s2 = it2->symbol;
+      if ( not kt1.is_symbol(s2) )
+	unknown1.insert(GlobalSymbolTable::get_symbol_name(s2));  // Symbols could be used
+    }
+  }
+
+  StringSymbolPairSet KeyTable::expand_unknown(const StringSymbolSet &unknown_symbols,
+					       StringSymbol unknown_symbol)
+  {
+    StringSymbolPairSet symbol_pairs;
+    for (StringSymbolSet::const_iterator it1 = unknown_symbols.begin();
+	 it1 != unknown_symbols.end(); it1++) {
+      for (StringSymbolSet::const_iterator it2 = unknown_symbols.begin();
+	   it2 != unknown_symbols.end(); it2++) {
+	if (*it1 != *it2) // non-identity relation
+	  symbol_pairs.insert(StringSymbolPair(*it1, *it2));
+      }
+      symbol_pairs.insert(StringSymbolPair(*it1, unknown_symbol)); // x:?
+      symbol_pairs.insert(StringSymbolPair(unknown_symbol, *it1)); // ?:x
+    }
+    return symbol_pairs;
+  }
+
+
   // for debugging
   KeyMapper::KeyMapper(KeyTable &old_key_table,
 		       KeyTable &new_key_table)
