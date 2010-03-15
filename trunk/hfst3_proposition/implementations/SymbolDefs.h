@@ -25,6 +25,7 @@ namespace symbols
   typedef std::set<StringSymbol> StringSymbolSet;
   typedef std::map<Key,Key> KeyMap;
   typedef std::vector<KeyPair> KeyPairVector;
+  typedef std::set<StringSymbolPair> StringSymbolPairSet;
 
   class KeyTableConstIterator_;
 
@@ -62,6 +63,10 @@ namespace symbols
     typedef KeyTableConstIterator_ const_iterator;
     const_iterator begin();
     const_iterator end();
+    static void collect_unknown_sets(const KeyTable &kt1, StringSymbolSet &unknown1,
+				     const KeyTable &kt2, StringSymbolSet &unknown2);
+    static StringSymbolPairSet expand_unknown(const StringSymbolSet &unknown_symbols,
+					      StringSymbol unknown_symbol);
   };
 
   class KeyTableConstIterator_

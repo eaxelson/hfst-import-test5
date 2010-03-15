@@ -920,12 +920,23 @@ namespace hfst
 	     target);
   }
 
-  /*HfstWeight HfstMutableTransducer::get_final_weight(HfstState s)
+  HfstWeight HfstMutableTransducer::get_final_weight(HfstState s)
   {
     return this->transducer.tropical_ofst_interface.get_final_weight(
 	     this->transducer.implementation.tropical_ofst, s);
-	     }*/
+  }
 
+  bool HfstMutableTransducer::is_final(HfstState s)
+  {
+    return this->transducer.tropical_ofst_interface.is_final(
+	     this->transducer.implementation.tropical_ofst, s);
+  }
+
+  HfstState HfstMutableTransducer::get_initial_state()
+  {
+    return this->transducer.tropical_ofst_interface.get_initial_state(
+	     this->transducer.implementation.tropical_ofst);
+  }
 
 }
 #ifdef DEBUG_MAIN

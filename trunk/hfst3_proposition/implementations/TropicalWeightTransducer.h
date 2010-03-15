@@ -159,6 +159,8 @@ namespace implementations
       static void set_final_weight(StdVectorFst *t, StateId s, float w);
       static void add_transition(StdVectorFst *t, StateId source, Key ilabel, Key olabel, float w, StateId target);
       static float get_final_weight(StdVectorFst *t, StateId s);
+      static float is_final(StdVectorFst *t, StateId s);
+      static StateId get_initial_state(StdVectorFst *t);
       static void represent_empty_transducer_as_having_one_state(StdVectorFst *t);
     };
 

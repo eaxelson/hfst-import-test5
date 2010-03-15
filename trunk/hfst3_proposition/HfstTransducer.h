@@ -349,7 +349,10 @@ namespace hfst
     /* Adding states and transitions */
     HfstState add_state();
     void set_final_weight(HfstState s, HfstWeight w);
+    bool is_final(HfstState s);
+    HfstState get_initial_state();
     HfstWeight get_final_weight(HfstState s);
+    // ADD: HfstState get_initial_state(); 
     void add_transition(HfstState source, std::string isymbol, std::string osymbol, HfstWeight w, HfstState target);
     friend class HfstTransducer;
     friend class HfstStateIterator;
@@ -386,8 +389,8 @@ namespace hfst
     HfstWeight weight;
     HfstState target_state;
     HfstTransition(std::string isymbol, std::string osymbol, HfstWeight weight, HfstState target_state);
-    ~HfstTransition(void);
   public:
+    ~HfstTransition(void);
     std::string get_input_symbol(void);
     std::string get_output_symbol(void);
     HfstWeight get_weight(void);

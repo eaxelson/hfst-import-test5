@@ -545,6 +545,18 @@ namespace hfst { namespace implementations
     return t->Final(s).Value();
   }
 
+  float 
+  TropicalWeightTransducer::is_final(StdVectorFst *t, StateId s)
+  {
+    return ( t->Final(s) != TropicalWeight::Zero() );
+  }
+
+  StateId
+  TropicalWeightTransducer::get_initial_state(StdVectorFst *t)
+  {
+    return t->Start();
+  }
+
   StdVectorFst * 
   TropicalWeightTransducer::remove_epsilons(StdVectorFst * t)
   { return new StdVectorFst(RmEpsilonFst<StdArc>(*t)); }
