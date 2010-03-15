@@ -48,7 +48,7 @@ namespace implementations
     StdVectorFst * read_transducer(void);
   };
 
-  //class TropicalWeightTransitionIterator;
+  class TropicalWeightTransitionIterator;
 
   typedef StateId TropicalWeightState;
 
@@ -65,44 +65,49 @@ namespace implementations
     };
  
 
-  /*
   class TropicalWeightTransition
     {
     protected:
       StdArc arc;
-      StateId source_state;
-      StdVectorFst * t;
+      //StateId source_state;
+      //StdVectorFst * t;
     public:
-      TropicalWeightTransition(const StdArc &arc, 
-			       StateId source_state, 
-			       StdVectorFst * t);
+      TropicalWeightTransition(const StdArc &arc);
+      ~TropicalWeightTransition(void);
+      //TropicalWeightTransition(const StdArc &arc, 
+      //			       StateId source_state, 
+      //		       StdVectorFst * t);*/
       Key get_input_key(void) const;
       Key get_output_key(void) const;
       TropicalWeightState get_target_state(void) const;
       //TropicalWeightState get_source_state(void) const;
       TropicalWeight get_weight(void) const;
-      //void print(KeyTable &key_table, ostream &out) const;
+      //void print(KeyTable &key_table, ostream &out) 
     };
+
 
   class TropicalWeightTransitionIterator
     {
     protected:
       ArcIterator<StdVectorFst> * arc_iterator;
-      StateId state;
-      StdVectorFst * t;
-      bool end_iterator;
+      //StateId state;
+      //StdVectorFst * t;
+      //bool end_iterator;
     public:
-      TropicalWeightTransitionIterator(StateId state,StdVectorFst * t);
-      TropicalWeightTransitionIterator(void);
+      TropicalWeightTransitionIterator(StdVectorFst * t, StateId state);
+      //TropicalWeightTransitionIterator(void);
       ~TropicalWeightTransitionIterator(void);
-      void operator=  (const TropicalWeightTransitionIterator &another);
-      bool operator== (const TropicalWeightTransitionIterator &another);
-      bool operator!= (const TropicalWeightTransitionIterator &another);
-      const TropicalWeightTransition operator* (void);
-      void operator++ (void);
-      void operator++ (int);
+      //void operator=  (const TropicalWeightTransitionIterator &another);
+      //bool operator== (const TropicalWeightTransitionIterator &another);
+      //bool operator!= (const TropicalWeightTransitionIterator &another);
+      //const TropicalWeightTransition operator* (void);
+      //void operator++ (void);
+      //void operator++ (int);
+      void next(void);
+      bool done(void);
+      TropicalWeightTransition value(void);
     };
-  */
+  
 
   class TropicalWeightTransducer
     {
