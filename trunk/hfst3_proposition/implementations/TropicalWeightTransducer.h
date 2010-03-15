@@ -48,48 +48,24 @@ namespace implementations
     StdVectorFst * read_transducer(void);
   };
 
-  class TropicalWeightTransitionIterator;
-  class TropicalWeightStateIndexer;
-  class TropicalWeightState
-  {
-    protected:
-      StateId state;
-      StdVectorFst * t;
-      friend class TropicalWeightStateIndexer;
-    public:
-      TropicalWeightState(StateId state, StdVectorFst * t);
-      TropicalWeightState(const TropicalWeightState &s);
-      TropicalWeight get_final_weight(void) const;
-      bool operator< (const TropicalWeightState &another) const;
-      bool operator== (const TropicalWeightState &another) const;
-      bool operator!= (const TropicalWeightState &another) const;
-      typedef TropicalWeightTransitionIterator const_iterator; 
-      const_iterator begin(void) const;
-      const_iterator end(void) const;
-      void print(KeyTable &key_table, ostream &out,
-      		 TropicalWeightStateIndexer &indexer) const;
-  };
+  //class TropicalWeightTransitionIterator;
+
+  typedef StateId TropicalWeightState;
 
   class TropicalWeightStateIterator 
     {
     protected:
-      StdVectorFst * t;
       StateIterator<StdVectorFst> * iterator;
-      int current_state;
-      bool ended;
     public:
       TropicalWeightStateIterator(StdVectorFst * t);
-      TropicalWeightStateIterator(void);
       ~TropicalWeightStateIterator(void);
-      void operator= (const TropicalWeightStateIterator &another);
-      bool operator== (const TropicalWeightStateIterator &another) const;
-      bool operator!= (const TropicalWeightStateIterator &another) const;
-      const TropicalWeightState operator* (void);
-      void operator++ (void);
-      void operator++ (int);
+      void next(void);
+      bool done(void);
+      TropicalWeightState value(void);
     };
  
 
+  /*
   class TropicalWeightTransition
     {
     protected:
@@ -103,10 +79,9 @@ namespace implementations
       Key get_input_key(void) const;
       Key get_output_key(void) const;
       TropicalWeightState get_target_state(void) const;
-      TropicalWeightState get_source_state(void) const;
+      //TropicalWeightState get_source_state(void) const;
       TropicalWeight get_weight(void) const;
-      void print(KeyTable &key_table, ostream &out,
-		 TropicalWeightStateIndexer &indexer) const;
+      //void print(KeyTable &key_table, ostream &out) const;
     };
 
   class TropicalWeightTransitionIterator
@@ -127,16 +102,7 @@ namespace implementations
       void operator++ (void);
       void operator++ (int);
     };
- 
-  class TropicalWeightStateIndexer
-    {
-    protected:
-      StdVectorFst * t;
-    public:
-      TropicalWeightStateIndexer(StdVectorFst * t);
-      unsigned int operator[](const TropicalWeightState &state);
-      const TropicalWeightState operator[](unsigned int number);
-    };
+  */
 
   class TropicalWeightTransducer
     {
@@ -177,9 +143,9 @@ namespace implementations
       static StdVectorFst * subtract(StdVectorFst * t1,
 			    StdVectorFst * t2);
       static StdVectorFst * set_weight(StdVectorFst * t,float f);
-      typedef TropicalWeightStateIterator const_iterator;
-      static const_iterator begin(StdVectorFst * t);
-      static const_iterator end(StdVectorFst * t);
+      //typedef TropicalWeightStateIterator const_iterator;
+      //static const_iterator begin(StdVectorFst * t);
+      //static const_iterator end(StdVectorFst * t);
       static StdVectorFst * harmonize(StdVectorFst * t,KeyMap &key_map);
       static void print(StdVectorFst * t, KeyTable &key_table, ostream &out);
 
