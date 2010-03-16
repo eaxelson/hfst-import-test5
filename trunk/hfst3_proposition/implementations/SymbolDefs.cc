@@ -17,6 +17,25 @@ namespace hfst { namespace symbols
     symbol_key_map(another.symbol_key_map)
   {}
 
+  KeyTable::KeyTable(struct sigma * s)
+  {
+    struct sigma * p = s;
+    std::map<Key,Symbol> key_symbol_map;
+    int biggest_number=0;
+    while (p != NULL) {
+      Symbol sym = global_symbol_table.define_symbol(p->symbol);
+      this->symbol_key_map[sym] = p->number;
+      key_symbol_map[p->number] = sym;
+      p = p->next;
+      if (p->number > biggest_number)
+	biggest_number = p->number;
+    }
+    // it is assumed that all numbers from 0 to biggest_number are used
+    for (int i=0; i<biggest_number+1; i++) {
+      this->key_symbol_vector.push_back(key_symbol_map[(Key)i]);
+    }
+  }
+
   Key KeyTable::add_symbol(Symbol s)
   {
     if (symbol_key_map.find(s) != symbol_key_map.end())
@@ -156,34 +175,35 @@ namespace hfst { namespace symbols
     it = another.it;
   }
 
-  void KeyTable::collect_unknown_sets(const KeyTable &kt1, StringSymbolSet &unknown1,
-				      const KeyTable &kt2, StringSymbolSet &unknown2)
+  void KeyTable::collect_unknown_sets(KeyTable &kt1, SymbolSet &unknown1,
+				      KeyTable &kt2, SymbolSet &unknown2)
   {
     for (KeyTable::const_iterator it1 = kt1.begin(); it1 != kt1.end(); it1++) {
       Symbol s1 = it1->symbol;
       if ( not kt2.is_symbol(s1) )
-	unknown2.insert(GlobalSymbolTable::get_symbol_name(s1));  // Symbols could be used
+	unknown2.insert(s1);
     }
     for (KeyTable::const_iterator it2 = kt2.begin(); it2 != kt2.end(); it2++) {
       Symbol s2 = it2->symbol;
       if ( not kt1.is_symbol(s2) )
-	unknown1.insert(GlobalSymbolTable::get_symbol_name(s2));  // Symbols could be used
+	unknown1.insert(s2);
     }
   }
 
-  StringSymbolPairSet KeyTable::expand_unknown(const StringSymbolSet &unknown_symbols,
-					       StringSymbol unknown_symbol)
+  SymbolPairSet KeyTable::non_identity_cross_product(
+			    const SymbolSet &unknown_symbols,
+			    Symbol unknown_symbol)
   {
-    StringSymbolPairSet symbol_pairs;
-    for (StringSymbolSet::const_iterator it1 = unknown_symbols.begin();
+    SymbolPairSet symbol_pairs;
+    for (SymbolSet::const_iterator it1 = unknown_symbols.begin();
 	 it1 != unknown_symbols.end(); it1++) {
-      for (StringSymbolSet::const_iterator it2 = unknown_symbols.begin();
+      for (SymbolSet::const_iterator it2 = unknown_symbols.begin();
 	   it2 != unknown_symbols.end(); it2++) {
 	if (*it1 != *it2) // non-identity relation
-	  symbol_pairs.insert(StringSymbolPair(*it1, *it2));
+	  symbol_pairs.insert(SymbolPair(*it1, *it2));
       }
-      symbol_pairs.insert(StringSymbolPair(*it1, unknown_symbol)); // x:?
-      symbol_pairs.insert(StringSymbolPair(unknown_symbol, *it1)); // ?:x
+      symbol_pairs.insert(SymbolPair(*it1, unknown_symbol)); // x:?
+      symbol_pairs.insert(SymbolPair(unknown_symbol, *it1)); // ?:x
     }
     return symbol_pairs;
   }

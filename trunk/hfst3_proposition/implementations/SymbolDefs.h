@@ -8,6 +8,12 @@
 #include <set>
 #include "HfstExceptions.h"
 
+struct sigma {
+  int number;
+  char *symbol;
+  struct sigma * next;
+};
+
 namespace hfst
 {
 namespace symbols
@@ -25,7 +31,10 @@ namespace symbols
   typedef std::set<StringSymbol> StringSymbolSet;
   typedef std::map<Key,Key> KeyMap;
   typedef std::vector<KeyPair> KeyPairVector;
-  typedef std::set<StringSymbolPair> StringSymbolPairSet;
+  //typedef std::set<StringSymbolPair> StringSymbolPairSet;
+  typedef std::set<Symbol> SymbolSet;
+  typedef std::pair<Symbol,Symbol> SymbolPair;
+  typedef std::set<SymbolPair> SymbolPairSet;
 
   class KeyTableConstIterator_;
 
@@ -44,6 +53,7 @@ namespace symbols
     KeyTable(void);    
     KeyTable(Symbol epsilon_symbol);
     KeyTable(const KeyTable &another);
+    KeyTable(struct sigma *s);
     bool is_symbol(Symbol s);
     bool is_key(Key k);
     Key add_symbol(Symbol s);
@@ -63,10 +73,14 @@ namespace symbols
     typedef KeyTableConstIterator_ const_iterator;
     const_iterator begin();
     const_iterator end();
-    static void collect_unknown_sets(const KeyTable &kt1, StringSymbolSet &unknown1,
-				     const KeyTable &kt2, StringSymbolSet &unknown2);
-    static StringSymbolPairSet expand_unknown(const StringSymbolSet &unknown_symbols,
-					      StringSymbol unknown_symbol);
+    static void collect_unknown_sets(KeyTable &kt1, SymbolSet &unknown1,
+				     KeyTable &kt2, SymbolSet &unknown2);
+    // a set of non-identity symbol pairs from  S x S, where
+    // S = the union of unknown_symbols and unknown_symbol_string and
+    // x = cross-product operator
+    static SymbolPairSet non_identity_cross_product(
+      const SymbolSet &unknown_symbols,
+      Symbol unknown_symbol_string);
   };
 
   class KeyTableConstIterator_
