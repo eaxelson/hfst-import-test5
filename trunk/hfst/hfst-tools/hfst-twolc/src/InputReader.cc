@@ -2,7 +2,7 @@
 
 void InputReader::set_input(std::istream * file)
 {
-  buffer_size = 500;
+  buffer_size = 500000;
   buffer_index = 0;
   input_stream = file;
   buffer = new char[buffer_size];
