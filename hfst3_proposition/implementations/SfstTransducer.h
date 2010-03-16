@@ -175,5 +175,6 @@ namespace hfst { namespace implementations
       static const_iterator end(Transducer * t);
       static Transducer * harmonize(Transducer * t,KeyMap &key_map);
       static void print(Transducer * t, KeyTable &key_table, ostream &out);
+      
     };
 } }

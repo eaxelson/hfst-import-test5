@@ -340,7 +340,7 @@ namespace hfst { namespace implementations {
 	<< key_table.get_print_name(get_output_key()) << "\t"
 	<< 0 << std::endl;
   }
-
+    
   SfstTransitionIterator::SfstTransitionIterator
   (Node * state, Transducer * t) : 
     state(state), arc_iterator(state->arcs()), t(t), end_iterator(false) 
@@ -416,7 +416,7 @@ namespace hfst { namespace implementations {
     arc_iterator++;
     if (not arc_iterator) { end_iterator = true; }
   }
-  
+    
   Transducer * SfstTransducer::create_empty_transducer(void)
   { return new Transducer; }
   

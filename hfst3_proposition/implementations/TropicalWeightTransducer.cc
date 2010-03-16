@@ -768,6 +768,26 @@ namespace hfst { namespace implementations
     return new StdVectorFst(t_subst);
   }
 
+  void expand_unknown(StdVectorFst *t, KeyTable key_table, SymbolSet &expand_unknown,
+		      SymbolPairSet &expand_non_identity, Symbol unknown_symbol)
+  {
+    Key unknown_key = key_table.get_key(unknown_symbol);
+      for (fst::StateIterator<StdVectorFst> iter(*t); 
+	   not iter.Done(); iter.Next())
+	{
+	  StateId s = iter.Value();
+	  for (fst::ArcIterator<StdVectorFst> it(*t,s); !it.Done(); it.Next())
+	    {
+	      const StdArc &arc = it.Value();
+	      if (arc.ilabel == unknown_key && arc.olabel == unknown_key) {
+		
+	      }
+		
+	    }
+	  
+	}
+  }
+
   void extract_reversed_strings
   (StdVectorFst * t, StdArc::StateId s, KeyTable &kt,
    WeightedStrings<float>::Vector &reversed_results)

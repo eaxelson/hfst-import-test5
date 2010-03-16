@@ -51,6 +51,10 @@ InternalTransducer * sfst_to_internal_format(SFST::Transducer * t)
   return internal_transducer;
 }
 
+// TODO 
+InternalTransducer * foma_to_internal_format(fsm * t)
+{ return NULL; }
+
 InternalTransducer * 
 tropical_ofst_to_internal_format(fst::StdVectorFst * t)
 { return new fst::StdVectorFst(*t); }
@@ -110,6 +114,12 @@ SFST::Transducer *  internal_format_to_sfst
     }
   return t;
 }
+
+// TODO
+fsm * internal_format_to_foma
+(InternalTransducer * internal_transducer)
+{ return NULL; }
+
 fst::StdVectorFst * internal_format_to_openfst(InternalTransducer * t)
 { return new fst::StdVectorFst(*t); }
 
