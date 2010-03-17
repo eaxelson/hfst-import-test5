@@ -8,11 +8,7 @@
 #include <set>
 #include "HfstExceptions.h"
 
-struct sigma {
-  int number;
-  char *symbol;
-  struct sigma * next;
-};
+struct sigma;
 
 namespace hfst
 {

@@ -8,7 +8,7 @@
 #include "SFST/src/fst.h"
 #include "openfst-1.1/src/include/fst/fstlib.h"
 
-
+struct fsm;
 
 namespace hfst { namespace implementations {
 
@@ -21,6 +21,8 @@ namespace hfst { namespace implementations {
   typedef std::vector<StateId> OfstStateVector;
   typedef std::map<SFST::Node *,StateId> SfstToOfstStateMap;
   typedef std::map<StateId,SFST::Node *> OfstToSfstStateMap;
+  typedef std::map<int,StateId> FomaToOfstStateMap;
+  typedef std::map<StateId,int> OfstToFomaStateMap;
   typedef fst::ArcTpl<fst::LogWeight> LogArc;
   typedef fst::VectorFst<LogArc> LogFst;
 
@@ -30,6 +32,8 @@ namespace hfst { namespace implementations {
     /* Read an SFST::Transducer * and return the equivalent transducer in
        internal format. */
     InternalTransducer * sfst_to_internal_format(SFST::Transducer * t);
+
+    InternalTransducer * foma_to_internal_format(struct foma * t);
   
   /* Read an fst::StdVectorFst * and return the equivalent transducer in
      internal format. */
@@ -44,6 +48,8 @@ namespace hfst { namespace implementations {
     /* Read a transducer in internal format and return the equivalent
        SFST::Transducer *. */
     SFST::Transducer * internal_format_to_sfst(InternalTransducer * t);
+
+    struct fsm * internal_format_to_foma(InternalTransducer * t);
     
     /* Read a transducer in internal format and return the equivalent
        fst::StdVectorFst * */

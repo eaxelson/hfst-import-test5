@@ -1,5 +1,7 @@
 #include "SymbolDefs.h"
 #include "GlobalSymbolTable.h"
+#include <stdbool.h>
+#include "foma/fomalib.h"
 
 namespace hfst { namespace symbols
 {

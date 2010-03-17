@@ -130,34 +130,25 @@ namespace hfst
   }
 
 
-  /*
-  HfstTransition::HfstTransition(HfstState source,
-				 std::string input_symbol,
-				 std::string output_symbol,
-				 HfstWeight weight,
-				 HfstState target)  {}
-  std::string HfstTransition::get_input_symbol(void) const  { return "foo"; }
-  std::string HfstTransition::get_output_symbol(void) const  { return "bar"; }
-  HfstState HfstTransition::get_target_state(void) const  { return HfstState(HfstTransducer(UNSPECIFIED_TYPE)); }
-  HfstState HfstTransition::get_source_state(void) const  { return HfstState(HfstTransducer(UNSPECIFIED_TYPE)); }
-  HfstWeight HfstTransition::get_weight(void) const  { return false; }
-
-
-  HfstTransitionIterator::HfstTransitionIterator(HfstState s)  {}
-  HfstTransitionIterator::HfstTransitionIterator(void)  {}
-  HfstTransitionIterator::~HfstTransitionIterator(void)  {}
-  void HfstTransitionIterator::operator=  (const HfstTransitionIterator &another) {}
-  bool HfstTransitionIterator::operator== (const HfstTransitionIterator &another) { return false; }
-  bool HfstTransitionIterator::operator!= (const HfstTransitionIterator &another)  { return false; }
-  const HfstTransition HfstTransitionIterator::operator* (void)  { return HfstTransition(HfstState(HfstTransducer(UNSPECIFIED_TYPE))); }
-  void HfstTransitionIterator::operator++ (void) {}
-  void HfstTransitionIterator::operator++ (int) {}  
-  */
-
   void HfstTransducer::harmonize(HfstTransducer &another)
   {
     if (this->anonymous or another.anonymous)
       { return; }
+
+    // ADDED by Erik Axelson
+    hfst::symbols::SymbolSet unknown_this;    // symbols known to another but not this
+    hfst::symbols::SymbolSet unknown_another; // and vice versa
+    KeyTable::collect_unknown_sets(this->key_table, unknown_this,
+				   another.key_table, unknown_another);
+
+    hfst::symbols::Symbol us = hfst::symbols::KeyTable::global_symbol_table.get_symbol("@_UNKNOWN_SYMBOL_@");
+    // set of symbol pairs to which a non-identity "?:?" is expanded
+    hfst::symbols::SymbolPairSet non_identity_this = 
+      KeyTable::non_identity_cross_product(unknown_this, us);
+    hfst::symbols::SymbolPairSet non_identity_another = 
+      KeyTable::non_identity_cross_product(unknown_another, us);
+
+
     hfst::symbols::KeyMap key_map;
     this->key_table.harmonize(key_map,another.key_table);
     key_table = another.key_table;
@@ -177,6 +168,11 @@ namespace hfst
 	    (implementation.tropical_ofst,key_map);
 	  delete this->implementation.tropical_ofst;
 	  this->implementation.tropical_ofst = temp;
+	  // ADDED
+	  /*tropical_ofst_interface.expand_unknown(this->implementation.tropical_ofst,
+						 unknown_this, non_identity_this);
+	  tropical_ofst_interface.expand_unknown(another.implementation.tropical_ofst,
+	  unknown_another, non_identity_another);*/
 	  break;
 	}
       case LOG_OFST_TYPE:
@@ -849,6 +845,30 @@ namespace hfst
       { throw e; }
     return *this;
   }
+
+  /* THIS SHOULD WORK AS WELL
+  std::ostream &operator<<(std::ostream &out,HfstTransducer &T)
+  {
+    HfstMutableTransducer t(T);
+    HfstStateIterator it(t);
+    while (not it.done()) {
+      HfstState s = it.value();
+      HfstTransitionIterator IT(t,s);
+      while (not IT.done()) {
+	HfstTransition tr = IT.value();
+	cout << s << "\t" << tr.get_target_state() << "\t"
+	     << tr.get_input_symbol() << "\t" << tr.get_output_symbol()
+	     << "\t" << tr.get_weight();
+	cout << "\n";
+	IT.next();
+      }
+      if ( t.is_final(s) )
+	cout << s << "\t" << t.get_final_weight(s) << "\n";
+      it.next();
+    }
+    delete t;
+  }
+  */
 
   std::ostream &operator<<(std::ostream &out,HfstTransducer &t)
   {

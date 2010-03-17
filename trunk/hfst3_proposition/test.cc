@@ -18,12 +18,12 @@ int main(int argc, char **argv) {
       HfstTransition tr = IT.value();
       cout << s << "\t" << tr.get_target_state() << "\t"
 	   << tr.get_input_symbol() << "\t" << tr.get_output_symbol()
-	   << "\t" << tr.get_weight() << "\n";
+	   << "\t" << tr.get_weight();
+      cout << "\n";
       IT.next();
     }
     if ( t.is_final(s) )
-      cout << s << "\t" << t.get_final_weight(s);
-    cout << "\n";
+      cout << s << "\t" << t.get_final_weight(s) << "\n";
     it.next();
   }
   HfstTransducer T(t);
