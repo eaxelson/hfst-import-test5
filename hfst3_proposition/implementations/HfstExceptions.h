@@ -55,6 +55,9 @@ public HfstInterfaceException {};
 class TransducerHasNoStartStateException :
 public HfstInterfaceException {};
 
+class TransducerHasMoreThanOneStartStateException :
+public HfstInterfaceException {};
+
 class SpecifiedTypeRequiredException :
 public HfstInterfaceException {};
 

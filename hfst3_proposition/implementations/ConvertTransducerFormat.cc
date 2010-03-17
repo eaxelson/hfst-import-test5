@@ -1,4 +1,6 @@
 #include "ConvertTransducerFormat.h"
+#include <stdbool.h>
+#include "foma/fomalib.h"
 
 namespace hfst { namespace implementations
 {
@@ -51,9 +53,92 @@ InternalTransducer * sfst_to_internal_format(SFST::Transducer * t)
   return internal_transducer;
 }
 
-// TODO 
-InternalTransducer * foma_to_internal_format(fsm * t)
-{ return NULL; }
+
+InternalTransducer * foma_to_internal_format(struct fsm * t)
+{
+  InternalTransducer * internal_transducer = new fst::StdVectorFst();
+  FomaToOfstStateMap state_map;
+  bool start_state_found=false;
+  StateId start_state_id=0;
+  
+  struct fsm_state *fsm;
+  fsm = t->states;
+  
+  // For every line in foma transducer:
+  for (int i=0; (fsm+i)->state_no != -1; i++) {
+
+
+    // 1. Find the corresponding source state in internal transducer
+    //    or create it, if not found.
+    StateId source_state;
+    if (state_map.find((fsm+i)->state_no) == state_map.end()) {
+      source_state = internal_transducer->AddState();
+      state_map[(fsm+i)->state_no] = source_state; 
+    }
+    else
+      source_state = state_map[(fsm+i)->state_no];
+
+    // 2. If the source state is an initial state in foma:
+    if ((fsm+1)->start_state == 1) {
+      // If the start state has not yet been encountered,
+      if (not start_state_found) {
+	// mark the source state as initial.
+	internal_transducer->SetStart(source_state);
+	start_state_id = source_state;
+	start_state_found=true;
+      }
+      // If the start state is encountered again, 
+      else if (source_state == start_state_id) {
+	// do nothing.
+      }
+      // If there are several initial states in foma transducer,
+      else {
+	// throw an exception.
+	throw TransducerHasMoreThanOneStartStateException();
+      }
+    }
+
+
+    // 3. If there are transitions leaving from the state,
+    if ((fsm+i)->target != -1) {  
+
+      // find the corresponding source state in internal transducer
+      // or create it, if not found, and
+      StateId target_state;
+      if (state_map.find((fsm+i)->target) == state_map.end()) {
+	target_state = internal_transducer->AddState();
+	state_map[(fsm+i)->target] = target_state; 
+      }
+      else
+	target_state = state_map[(fsm+i)->target];
+      
+      // create the transition between source and target states. 
+      internal_transducer->AddArc
+	(source_state,
+	 fst::StdArc((fsm+i)->in,
+		     (fsm+i)->out,
+		     0,
+		     target_state));
+    }
+
+
+    // 4. If the source state is final in foma,
+    if ((fsm+i)->final_state == 1) {
+      // mark it as final in internal transducer.
+      internal_transducer->SetFinal(source_state,0); 
+    }
+
+  }
+
+  // If there was not an initial state in foma transducer,
+  if (not start_state_found) {
+    // throw an exception.
+    throw TransducerHasNoStartStateException();
+  }
+
+  return internal_transducer;
+}
+
 
 InternalTransducer * 
 tropical_ofst_to_internal_format(fst::StdVectorFst * t)
@@ -116,9 +201,12 @@ SFST::Transducer *  internal_format_to_sfst
 }
 
 // TODO
-fsm * internal_format_to_foma
+struct fsm * internal_format_to_foma
 (InternalTransducer * internal_transducer)
-{ return NULL; }
+{ 
+  (void)internal_transducer;
+  return NULL; 
+}
 
 fst::StdVectorFst * internal_format_to_openfst(InternalTransducer * t)
 { return new fst::StdVectorFst(*t); }
