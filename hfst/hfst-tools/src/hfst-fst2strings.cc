@@ -304,8 +304,7 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 				first_transducer=false;
 				HFST::delete_transducer(input);
 			}
-			if (key_table)
-			  delete key_table;
+            delete key_table;
 		}
 		catch (const char *p)
 		{
@@ -405,8 +404,7 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 				//  delete key_table;  // not implemented
 				HWFST::delete_transducer(input);
 			}
-			if (key_table)
-			  delete key_table;
+			delete key_table;
 		}
 		catch (const char *p) {
 		        fprintf(message_out, "HFST lib error: %s\n", p);

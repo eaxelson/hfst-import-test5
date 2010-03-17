@@ -201,7 +201,7 @@ KeyTable *get_projection_key_table(KeyTable *key_table, KeySet *ks, bool include
   KeySet::iterator it;
   if (include_epsilon)
     ks->insert(EPSILON_KEY);
-  for ( it=ks->begin(); it!=ks->end(); it++ ) {
+  for ( it=ks->begin(); it!=ks->end(); ++it ) {
     if (!HFST::is_key(*it, key_table)) {
       fprintf(message_out, "ERROR: key %hu was not found in the symbol table\n", *it);
       return NULL;

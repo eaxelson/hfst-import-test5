@@ -269,9 +269,8 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				if (from_file != 0)
 				{
 					char* line;
-#					define MAX_LINE_LENGTH 2048
-					line = static_cast<char*>(malloc(sizeof(char)*MAX_LINE_LENGTH+1));
-					while ((line = fgets(line, MAX_LINE_LENGTH, from_file)))
+                    size_t len;
+					while (hfst_getline(&line, &len, from_file) != -1)
 					{
 						char* end = line;
 						while (*end != '\0')
@@ -308,6 +307,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 						delete from_label;
 						delete to_label;
 					} // while line
+                    free(line);
 				}
 				else if ((from_label != 0) && (to_label != 0))
 				{
@@ -399,9 +399,8 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				if (from_file != 0)
 				{
 					char* line;
-#					define MAX_LINE_LENGTH 2048
-					line = static_cast<char*>(malloc(sizeof(char)*MAX_LINE_LENGTH+1));
-					while ((line = fgets(line, MAX_LINE_LENGTH, from_file)))
+                    size_t len;
+					while (hfst_getline(&line, &len, from_file) != -1)
 					{
 						char* end = line;
 						while (*end != '\0')
@@ -438,7 +437,8 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 						delete from_label;
 						delete to_label;
 					} // while line
-				}
+				    free(line);
+                }
 				else if ((from_label != 0) && (to_label != 0))
 				{
 					VERBOSE_PRINT("Substituting %s with %s...\n",

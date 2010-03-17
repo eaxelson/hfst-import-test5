@@ -428,7 +428,8 @@ lookup_all(const char* s, KeyTable* kt,
 				{
 					VERBOSE_PRINT("Got infinite results\n");
 					*infinite = true;
-					return NULL;
+					delete current_results;
+                    return NULL;
 				}
 				else
 				{
@@ -453,7 +454,9 @@ lookup_all(const char* s, KeyTable* kt,
 						VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
 						current_results->push_back(hmmlkv);
 						delete lkvstring;
+
 					}
+                    delete lookups;
 				}
 			}
 			final_results = current_results;
@@ -663,6 +666,7 @@ lookup_all(const char* s, KeyTable* kt,
 				{
 					VERBOSE_PRINT("Got infinite results\n");
 					*infinite = true;
+                    delete current_results;
 					return NULL;
 				}
 				else
@@ -689,6 +693,7 @@ lookup_all(const char* s, KeyTable* kt,
 						current_results->push_back(hmmlkv);
 						delete lkvstring;
 					}
+                    delete lookups;
 				}
 			}
 			final_results = current_results;
@@ -753,10 +758,9 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 			}
 			HFST::define_flag_diacritics(key_table);
 			VERBOSE_PRINT("\n");
-#			define MAX_LINE_LENGTH 254
-			char* line =
-				static_cast<char*>(malloc(sizeof(char)*MAX_LINE_LENGTH+1));
-			while ((line = fgets(line, MAX_LINE_LENGTH, relation_file)) != NULL)
+            size_t len = 0;
+			char* line;
+			while (hfst_getline(&line, &len, relation_file)!= -1)
 			{
 				char *p = line;
 				while (*p != '\0')
@@ -774,10 +778,11 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 						key_table, cascade,
 						&infinity);
 				set<HFST::KeyVector> expectedLines;
-				char* expectedLine = 
-					static_cast<char*>(malloc(sizeof(char)*MAX_LINE_LENGTH+1));
-				expectedLine = fgets(expectedLine, MAX_LINE_LENGTH, relation_file);
-				while ((expectedLine != NULL) &&
+                size_t expLen = 0;
+				char* expectedLine;
+                ssize_t readBytes = hfst_getline(&expectedLine, &expLen,
+                                                  relation_file);
+				while ((readBytes != -1) &&
 						(strcmp(expectedLine, "\n") != 0))
 				{
 					char *q = expectedLine;
@@ -816,9 +821,9 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 					{
 						expectedLines.insert(*expected);
 					}
-				expectedLine =
-					fgets(expectedLine, MAX_LINE_LENGTH, relation_file);
+				    readBytes = hfst_getline(&expectedLine, &expLen, relation_file);
 				}
+                free(expectedLine);
 				set<HFST::KeyVector> resultLines;
 				for (HFST::KeyVectorVector::const_iterator rkv = results->begin();
 						rkv != results->end();
@@ -850,6 +855,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 					no_results++;
 				}
 			} // while lines in input
+            free(line);
 			if (write_symbols_to_filename != NULL) {
 			  ofstream os(write_symbols_to_filename);
 			  HFST::write_symbol_table(key_table, os);
@@ -920,10 +926,9 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 			}
 			HWFST::define_flag_diacritics(key_table);
 			VERBOSE_PRINT("\n");
-#			define MAX_LINE_LENGTH 254
-			char* line =
-				static_cast<char*>(malloc(sizeof(char)*MAX_LINE_LENGTH+1));
-			while ((line = fgets(line, MAX_LINE_LENGTH, relation_file)) != NULL)
+			size_t len;
+            char* line;
+			while (hfst_getline(&line, &len, relation_file) != -1)
 			{
 				char *p = line;
 				while (*p != '\0')
@@ -941,10 +946,11 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 						key_table, cascade,
 						&infinity);
 				set<HWFST::KeyVector> expectedLines;
-				char* expectedLine = 
-					static_cast<char*>(malloc(sizeof(char)*MAX_LINE_LENGTH+1));
-				expectedLine = fgets(expectedLine, MAX_LINE_LENGTH, relation_file);
-				while ((expectedLine != NULL) &&
+				size_t expLen;
+                char* expectedLine;
+				ssize_t read_bytes = hfst_getline(&expectedLine, &expLen,
+                                                  relation_file);
+				while ((read_bytes != -1) &&
 						(strcmp(expectedLine, "\n") != 0))
 				{
 					char *q = expectedLine;
@@ -983,9 +989,10 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 					{
 						expectedLines.insert(*expected);
 					}
-				expectedLine =
-					fgets(expectedLine, MAX_LINE_LENGTH, relation_file);
+				read_bytes =
+					hfst_getline(&expectedLine, &expLen, relation_file);
 				}
+                free(expectedLine);
 				set<HWFST::KeyVector> resultLines;
 				for (HWFST::KeyVectorVector::const_iterator rkv = results->begin();
 						rkv != results->end();
@@ -1017,6 +1024,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 					no_results++;
 				}
 			} // while lines in input
+            free(line);
 			if (write_symbols_to_filename != NULL) {
 			  ofstream os(write_symbols_to_filename);
 			  HWFST::write_symbol_table(key_table, os);

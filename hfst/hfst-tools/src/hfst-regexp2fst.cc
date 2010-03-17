@@ -235,8 +235,8 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 		    HFST::KeySet::iterator it1;
 		    HFST::KeySet::iterator it2;	    
 
-		    for (it1=key_set1->begin(); it1!=key_set1->end(); it1++) {
-		      for (it2=key_set2->begin(); it2!=key_set2->end(); it2++) {
+		    for (it1=key_set1->begin(); it1!=key_set1->end(); ++it1) {
+		      for (it2=key_set2->begin(); it2!=key_set2->end(); ++it2) {
 			negation_pi = HFST::insert_keypair( HFST::define_keypair(*it1, *it2),
 							    negation_pi );
 			creation_pi = HFST::insert_keypair( HFST::define_keypair(*it1, *it2),

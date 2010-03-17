@@ -277,7 +277,7 @@ class LetterTrie
 
  public:
  LetterTrie(void):
-  letters(UCHAR_MAX, (LetterTrie*) NULL),
+  letters(UCHAR_MAX, static_cast<LetterTrie*>(NULL)),
     symbols(UCHAR_MAX,NO_SYMBOL_NUMBER)
       {}
 
