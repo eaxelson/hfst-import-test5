@@ -1211,10 +1211,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
                  }
                delete kvs;
             } // while lines in input
-            if (line)
-              {
-                free(line);
-              }
+            free(line);
             if (print_statistics)
             {
                 fprintf(message_out, "Strings\tFound\tMissing\tResults\n"
@@ -1343,10 +1340,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
                  }
                delete kvs;
             } // while lines in input
-            if (line)
-              {
-                free(line);
-              }
+            free(line);
             if (print_statistics)
             {
                 fprintf(message_out, "Strings\tFound\tMissing\tResults\n"

@@ -242,8 +242,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 		    HFST::write_symbol_table(key_table, os);
 		    os.close();
 		  }
-		  if (key_table)
-		    delete key_table;
+		  delete key_table;
 		}
 		catch (const char *p)
 		{
@@ -288,8 +287,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 		    HWFST::write_symbol_table(key_table, os);
 		    os.close();
 		  }		  
-		  if (key_table)
-		    delete key_table;
+		  delete key_table;
 		}
 		catch (const char *p) {
 			fprintf(message_out, "HFST lib error: %s\n", p);
