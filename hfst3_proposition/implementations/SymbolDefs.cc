@@ -2,6 +2,7 @@
 #include "GlobalSymbolTable.h"
 #include <stdbool.h>
 #include "foma/fomalib.h"
+#include "SFST/src/alphabet.h"
 
 namespace hfst { namespace symbols
 {
@@ -19,6 +20,7 @@ namespace hfst { namespace symbols
     symbol_key_map(another.symbol_key_map)
   {}
 
+  /*
   KeyTable::KeyTable(struct sigma * s)
   {
     struct sigma * p = s;
@@ -37,7 +39,28 @@ namespace hfst { namespace symbols
       this->key_symbol_vector.push_back(key_symbol_map[(Key)i]);
     }
   }
+  */
 
+  /*
+  KeyTable::KeyTable(SFST::Alphabet &alpha)
+  {
+    struct sigma * p = s;
+    std::map<Key,Symbol> key_symbol_map;
+    int biggest_number=0;
+    while (p != NULL) {
+      Symbol sym = global_symbol_table.define_symbol(*string*);
+      this->symbol_key_map[sym] = *number*;
+      key_symbol_map[*number*] = sym;
+      p = p->next;
+      if (*number* > biggest_number)
+	biggest_number = *number*;
+    }
+    // it is assumed that all numbers from 0 to biggest_number are used
+    for (int i=0; i<biggest_number+1; i++) {
+      this->key_symbol_vector.push_back(key_symbol_map[(Key)i]);
+    }
+  }
+  */
   Key KeyTable::add_symbol(Symbol s)
   {
     if (symbol_key_map.find(s) != symbol_key_map.end())

@@ -136,6 +136,18 @@ InternalTransducer * foma_to_internal_format(struct fsm * t)
     throw TransducerHasNoStartStateException();
   }
 
+
+  // Convert sigma to SymbolTable
+  fst::SymbolTable *st = new fst::SymbolTable("anonym_hfst3_symbol_table");
+  struct sigma * p = t->sigma;
+  while (p != NULL) {
+    st->AddSymbol(std::string(p->symbol), (int64)p->number);
+    p = p->next;
+  }
+  // check that this works
+  internal_transducer->SetInputSymbols(st);
+  internal_transducer->SetOutputSymbols(st);
+
   return internal_transducer;
 }
 
@@ -200,12 +212,54 @@ SFST::Transducer *  internal_format_to_sfst
   return t;
 }
 
-// TODO
+// SymbolTable is converted to sigma, but the string-to-number
+// relations are changed...
 struct fsm * internal_format_to_foma
 (InternalTransducer * internal_transducer)
 { 
-  (void)internal_transducer;
-  return NULL; 
+  if (internal_transducer->Start() == fst::kNoStateId)
+    { throw TransducerHasNoStartStateException(); }
+
+  struct fsm_construct_handle *h;
+  struct fsm *net;
+  h = fsm_construct_init(strdup(std::string("").c_str()));
+
+  for (fst::StateIterator<fst::StdVectorFst> siter(*internal_transducer); 
+       not siter.Done(); siter.Next())
+    {
+      StateId source_state = siter.Value();
+      for (fst::ArcIterator<fst::StdVectorFst> aiter(*internal_transducer,source_state);
+	   not aiter.Done(); aiter.Next())
+	{
+	  const fst::StdArc &arc = aiter.Value();
+	  
+	  fst::SymbolTable * isymbols = internal_transducer->InputSymbols();
+	  if (isymbols == NULL)
+	    internal_transducer->SetInputSymbols(fst::SymbolTable("")));
+	  std::string istring = isymbols->Find((int64)arc.ilabel);  // SEGFAULT
+	  if (strcmp(istring.c_str(), "") == 0) {
+	    istring = "\\"
+	    isymbols->AddSymbol(istring, (int64)arc.ilabel);
+	  }
+	  char *in = strdup(istring.c_str());
+
+	  std::string ostring = osymbols->Find((int64)arc.olabel);
+	  if (osymbols == NULL)
+	    internal_transducer->SetOutputSymbols(fst::SymbolTable("")));
+	  char *out = strdup(ostring.c_str());
+	  fsm_construct_add_arc(h, (int)source_state, (int)arc.nextstate, in, out);
+	  // not clear whether in and out should be freed...
+	}
+      if (internal_transducer->Final(source_state) != fst::TropicalWeight::Zero()) {
+	fsm_construct_set_final(h, (int)source_state);
+      }	  
+    }
+  fsm_construct_set_initial(h, (int)internal_transducer->Start());
+  // not clear what happens if start state is not number zero...
+  net = fsm_construct_done(h);
+  fsm_count(net);
+  net = fsm_topsort(net);
+  return net;      
 }
 
 fst::StdVectorFst * internal_format_to_openfst(InternalTransducer * t)

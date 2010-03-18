@@ -1,13 +1,13 @@
 #ifndef _HFST_TRANSDUCER_H_
 #define _HFST_TRANSDUCER_H_
-#include "implementations/SymbolDefs.h" // includes fomalib.h
+#include "implementations/SymbolDefs.h"
 #include "implementations/GlobalSymbolTable.h"
 #include "implementations/SfstTransducer.h"
 #include "implementations/TropicalWeightTransducer.h"
 #include "implementations/LogWeightTransducer.h"
-#include "implementations/FomaTransducer.h" // includes fomalib.h
+#include "implementations/FomaTransducer.h"
 #include "implementations/HfstTokenizer.h"
-#include "implementations/ConvertTransducerFormat.h" // includes fomalib.h
+#include "implementations/ConvertTransducerFormat.h"
 #include <string>
 #include <cassert>
 #include <iostream>
