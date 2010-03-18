@@ -28,11 +28,11 @@ int main(int argc, char **argv) {
   }
   HfstTransducer T(t);
 
-  HfstTransducer TR = T.convert(LOG_OFST_TYPE);
-  HfstOutputStream os(LOG_OFST_TYPE);
-  os << TR;
-  fprintf(stderr, "\n\n");
-  cout << TR;
-  fprintf(stderr, "\n");
+  HfstTransducer T_FOMA = T.convert(FOMA_TYPE);
+  //HfstOutputStream os(LOG_OFST_TYPE);
+  /*os << TR;
+    fprintf(stderr, "\n\n");*/
+  //cout << TR;
+  //fprintf(stderr, "\n");
   return 0;
 }

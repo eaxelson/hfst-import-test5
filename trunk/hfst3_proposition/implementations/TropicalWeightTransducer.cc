@@ -768,6 +768,7 @@ namespace hfst { namespace implementations
     return new StdVectorFst(t_subst);
   }
 
+  // TODO
   void expand_unknown(StdVectorFst *t, KeyTable key_table, SymbolSet &expand_unknown,
 		      SymbolPairSet &expand_non_identity, Symbol unknown_symbol)
   {

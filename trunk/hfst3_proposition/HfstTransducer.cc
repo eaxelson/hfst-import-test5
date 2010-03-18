@@ -835,6 +835,11 @@ namespace hfst
 	      hfst::implementations::internal_format_to_log_ofst(internal);
 	    delete internal;
 	    break;
+	  case FOMA_TYPE:
+	    implementation.foma =
+	      hfst::implementations::internal_format_to_foma(internal);
+	    delete internal;
+	    break;
 	case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
@@ -934,8 +939,8 @@ namespace hfst
     return this->transducer.tropical_ofst_interface.add_transition(
              this->transducer.implementation.tropical_ofst,
 	     source,
-	     this->transducer.key_table.add_symbol(isymbol),
-	     this->transducer.key_table.add_symbol(osymbol),
+	     this->transducer.key_table.add_symbol(isymbol),  // FIX
+	     this->transducer.key_table.add_symbol(osymbol),  // THESE
 	     w,
 	     target);
   }

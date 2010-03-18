@@ -8,8 +8,6 @@
 #include <set>
 #include "HfstExceptions.h"
 
-struct sigma;
-
 namespace hfst
 {
 namespace symbols
@@ -36,6 +34,12 @@ namespace symbols
 
   class GlobalSymbolTable;
 
+
+  // new stuff begins...
+
+  // ...new stuff ends
+
+
   class KeyTable
   {
   public:
@@ -49,7 +53,8 @@ namespace symbols
     KeyTable(void);    
     KeyTable(Symbol epsilon_symbol);
     KeyTable(const KeyTable &another);
-    KeyTable(struct sigma *s);
+    //KeyTable(struct sigma *s);
+    //KeyTable(SFST::Alphabet &alpha);
     bool is_symbol(Symbol s);
     bool is_key(Key k);
     Key add_symbol(Symbol s);
