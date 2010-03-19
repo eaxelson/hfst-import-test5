@@ -70,15 +70,15 @@ namespace implementations
     protected:
       StdArc arc;
       //StateId source_state;
-      //StdVectorFst * t;
+      StdVectorFst * t;
     public:
-      TropicalWeightTransition(const StdArc &arc);
+      TropicalWeightTransition(const StdArc &arc, StdVectorFst *t);
       ~TropicalWeightTransition(void);
       //TropicalWeightTransition(const StdArc &arc, 
       //			       StateId source_state, 
       //		       StdVectorFst * t);*/
-      Key get_input_key(void) const;
-      Key get_output_key(void) const;
+      std::string get_input_symbol(void) const;
+      std::string get_output_symbol(void) const;
       TropicalWeightState get_target_state(void) const;
       //TropicalWeightState get_source_state(void) const;
       TropicalWeight get_weight(void) const;
@@ -91,7 +91,7 @@ namespace implementations
     protected:
       ArcIterator<StdVectorFst> * arc_iterator;
       //StateId state;
-      //StdVectorFst * t;
+      StdVectorFst * t;
       //bool end_iterator;
     public:
       TropicalWeightTransitionIterator(StdVectorFst * t, StateId state);
@@ -158,7 +158,7 @@ namespace implementations
       static StateId add_state(StdVectorFst *t);
       static void set_final_weight(StdVectorFst *t, StateId s, float w);
       static void add_transition(StdVectorFst *t, StateId source,
-				 Key ilabel, Key olabel, float w, StateId target);
+				 std::string &isymbol, std::string &osymbol, float w, StateId target);
       static float get_final_weight(StdVectorFst *t, StateId s);
       static float is_final(StdVectorFst *t, StateId s);
       static StateId get_initial_state(StdVectorFst *t);

@@ -159,6 +159,7 @@ namespace hfst
     HfstTransducer(const HfstTransducer &another);
     HfstTransducer(const HfstMutableTransducer &t);
     ~HfstTransducer(void);
+    void print_type(void);
     HfstTransducer &remove_epsilons(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &determinize(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &minimize(ImplementationType type=UNSPECIFIED_TYPE);
@@ -286,7 +287,6 @@ namespace hfst
   {
   protected:
     hfst::implementations::TropicalWeightTransitionIterator tropical_ofst_iterator;
-    KeyTable key_table;
   public:
     HfstTransitionIterator(const HfstMutableTransducer &t, HfstState s);
     ~HfstTransitionIterator(void);

@@ -33,7 +33,7 @@ namespace hfst { namespace implementations {
        internal format. */
     InternalTransducer * sfst_to_internal_format(SFST::Transducer * t);
 
-    InternalTransducer * foma_to_internal_format(struct foma * t);
+    InternalTransducer * foma_to_internal_format(struct fsm * t);
   
   /* Read an fst::StdVectorFst * and return the equivalent transducer in
      internal format. */
