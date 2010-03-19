@@ -53,7 +53,8 @@ InternalTransducer * sfst_to_internal_format(SFST::Transducer * t)
   return internal_transducer;
 }
 
-
+// Both input and output symbol tables of internal format will contain
+// all symbols in the sigma of the foma transducer
 InternalTransducer * foma_to_internal_format(struct fsm * t)
 {
   InternalTransducer * internal_transducer = new fst::StdVectorFst();
@@ -234,18 +235,11 @@ struct fsm * internal_format_to_foma
 	  const fst::StdArc &arc = aiter.Value();
 	  
 	  fst::SymbolTable * isymbols = internal_transducer->InputSymbols();
-	  if (isymbols == NULL)
-	    internal_transducer->SetInputSymbols(fst::SymbolTable("")));
-	  std::string istring = isymbols->Find((int64)arc.ilabel);  // SEGFAULT
-	  if (strcmp(istring.c_str(), "") == 0) {
-	    istring = "\\"
-	    isymbols->AddSymbol(istring, (int64)arc.ilabel);
-	  }
+	  std::string istring = isymbols->Find((int64)arc.ilabel);  // if not found, SEGFAULT
 	  char *in = strdup(istring.c_str());
 
+	  fst::SymbolTable * osymbols = internal_transducer->OutputSymbols();
 	  std::string ostring = osymbols->Find((int64)arc.olabel);
-	  if (osymbols == NULL)
-	    internal_transducer->SetOutputSymbols(fst::SymbolTable("")));
 	  char *out = strdup(ostring.c_str());
 	  fsm_construct_add_arc(h, (int)source_state, (int)arc.nextstate, in, out);
 	  // not clear whether in and out should be freed...

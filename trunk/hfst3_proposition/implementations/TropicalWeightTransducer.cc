@@ -270,21 +270,21 @@ namespace hfst { namespace implementations
 
 
 
-  TropicalWeightTransition::TropicalWeightTransition(const StdArc &arc):
-    arc(arc)
+  TropicalWeightTransition::TropicalWeightTransition(const StdArc &arc, StdVectorFst *t):
+    arc(arc), t(t)
   {}
 
   TropicalWeightTransition::~TropicalWeightTransition(void)
   {}
 
-  Key TropicalWeightTransition::get_input_key(void) const
+  std::string TropicalWeightTransition::get_input_symbol(void) const
   {
-    return arc.ilabel;
+    return t->InputSymbols()->Find(arc.ilabel);
   }
 
-  Key TropicalWeightTransition::get_output_key(void) const
+  std::string TropicalWeightTransition::get_output_symbol(void) const
   {
-    return arc.olabel;
+    return t->OutputSymbols()->Find(arc.olabel);
   }
 
   TropicalWeightState TropicalWeightTransition::get_target_state(void) const
@@ -300,7 +300,8 @@ namespace hfst { namespace implementations
 
 
   TropicalWeightTransitionIterator::TropicalWeightTransitionIterator(StdVectorFst *t, StateId state):
-    arc_iterator(new ArcIterator<StdVectorFst>(*t, state))
+    arc_iterator(new ArcIterator<StdVectorFst>(*t, state)),
+    t(t)
   {}
 
   TropicalWeightTransitionIterator::~TropicalWeightTransitionIterator(void)
@@ -318,7 +319,7 @@ namespace hfst { namespace implementations
 
   TropicalWeightTransition TropicalWeightTransitionIterator::value()
   {
-    return TropicalWeightTransition(arc_iterator->Value());
+    return TropicalWeightTransition(arc_iterator->Value(), this->t);
   }
 
 
@@ -424,9 +425,29 @@ namespace hfst { namespace implementations
       { end_iterator = true; }
   }
   */
+
+  fst::SymbolTable * create_symbol_table(std::string name);
+
+  fst::SymbolTable * create_symbol_table(std::string name) {
+    fst::SymbolTable * st = new fst::SymbolTable(name);
+    st->AddSymbol("@_EPSILON_SYMBOL_@", 0);
+    st->AddSymbol("@_UNKNOWN_SYMBOL_@", 1);
+    st->AddSymbol("@_IDENTITY_SYMBOL_@", 2);
+    return st;
+  }
+  
+  void initialize_symbol_tables(StdVectorFst *t) {
+    SymbolTable *in = create_symbol_table("");
+    t->SetInputSymbols(in);
+    SymbolTable *out = create_symbol_table("");
+    t->SetOutputSymbols(out);
+    return;
+  }
+
   StdVectorFst * TropicalWeightTransducer::create_empty_transducer(void)
   { 
     StdVectorFst * t = new StdVectorFst;
+    initialize_symbol_tables(t);
     StateId s = t->AddState();
     t->SetStart(s);
     return t;
@@ -533,8 +554,10 @@ namespace hfst { namespace implementations
   }
 
   void 
-  TropicalWeightTransducer::add_transition(StdVectorFst *t, StateId source, Key ilabel, Key olabel, float w, StateId target)
+  TropicalWeightTransducer::add_transition(StdVectorFst *t, StateId source, std::string &isymbol, std::string &osymbol, float w, StateId target)
   {
+    Key ilabel = t->InputSymbols()->AddSymbol(isymbol);
+    Key olabel = t->OutputSymbols()->AddSymbol(osymbol);
     t->AddArc(source, StdArc(ilabel, olabel, w, target));
     return;
   }
@@ -750,6 +773,9 @@ namespace hfst { namespace implementations
   void TropicalWeightTransducer::print
   (StdVectorFst * t, KeyTable &key_table, ostream &out) 
   {
+    (void)t;
+    (void)key_table;
+    (void)out;
     return; // dummy implementation
   }
 
@@ -772,6 +798,7 @@ namespace hfst { namespace implementations
   void expand_unknown(StdVectorFst *t, KeyTable key_table, SymbolSet &expand_unknown,
 		      SymbolPairSet &expand_non_identity, Symbol unknown_symbol)
   {
+    /*
     Key unknown_key = key_table.get_key(unknown_symbol);
       for (fst::StateIterator<StdVectorFst> iter(*t); 
 	   not iter.Done(); iter.Next())
@@ -786,7 +813,13 @@ namespace hfst { namespace implementations
 		
 	    }
 	  
-	}
+	    }*/
+    (void)t;
+    (void)key_table;
+    (void)expand_unknown;
+    (void)expand_non_identity;
+    (void)unknown_symbol;
+    return;
   }
 
   void extract_reversed_strings

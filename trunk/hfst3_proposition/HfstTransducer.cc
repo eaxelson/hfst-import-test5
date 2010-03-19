@@ -29,8 +29,7 @@ namespace hfst
 
   
   HfstTransitionIterator::HfstTransitionIterator(const HfstMutableTransducer &t, HfstState s):
-    tropical_ofst_iterator(hfst::implementations::TropicalWeightTransitionIterator(t.transducer.implementation.tropical_ofst, s)),
-    key_table(t.transducer.key_table)
+    tropical_ofst_iterator(hfst::implementations::TropicalWeightTransitionIterator(t.transducer.implementation.tropical_ofst, s))
   {}
 
   HfstTransitionIterator::~HfstTransitionIterator(void)  
@@ -44,12 +43,10 @@ namespace hfst
   HfstTransition HfstTransitionIterator::value()
   {
     hfst::implementations::TropicalWeightTransition twt = tropical_ofst_iterator.value();
-    const char *input_symbol = key_table.get_string_symbol( twt.get_input_key() );
-    const char *output_symbol = key_table.get_string_symbol( twt.get_output_key() );
     HfstWeight weight = twt.get_weight().Value();
     HfstState target_state = twt.get_target_state();
-    return HfstTransition( std::string(input_symbol),
-			   std::string(output_symbol),
+    return HfstTransition( twt.get_input_symbol(),
+			   twt.get_output_symbol(),
 			   weight,
 			   target_state );
   }
@@ -352,8 +349,8 @@ namespace hfst
   }
 
   HfstTransducer::HfstTransducer(const HfstMutableTransducer &another):
-    type(another.transducer.type),anonymous(another.transducer.anonymous),
-    key_table(another.transducer.key_table),is_trie(another.transducer.is_trie)
+    type(TROPICAL_OFST_TYPE), anonymous(another.transducer.anonymous),
+    key_table(another.transducer.key_table), is_trie(another.transducer.is_trie)
   {
     implementation.tropical_ofst =
       tropical_ofst_interface.copy(another.transducer.implementation.tropical_ofst);
@@ -376,6 +373,30 @@ namespace hfst
 	case ERROR_TYPE:
 	default:
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
+      }
+  }
+
+  void HfstTransducer::print_type(void) {
+    switch (type)
+      {
+      case SFST_TYPE:
+	fprintf(stderr, "SFST_TYPE\n");
+	break;
+      case TROPICAL_OFST_TYPE:
+	fprintf(stderr, "TROPICAL_OFST_TYPE\n");
+	break;
+      case LOG_OFST_TYPE:
+	fprintf(stderr, "LOG_OFST_TYPE\n");
+	break;
+      case UNSPECIFIED_TYPE:
+	fprintf(stderr, "UNSPECIFIED_TYPE\n");
+	break;
+      case ERROR_TYPE:
+	fprintf(stderr, "ERROR_TYPE\n");
+	break;
+      default:
+	fprintf(stderr, "type not defined\n");
+	break;
       }
   }
 
@@ -800,7 +821,10 @@ namespace hfst
 	switch (this->type)
 	  {
 	  case FOMA_TYPE:
-	    throw hfst::exceptions::FunctionNotImplementedException();
+	    internal =
+	      hfst::implementations::foma_to_internal_format(implementation.foma);
+	    delete implementation.foma;
+	    break;
 	  case SFST_TYPE:
 	    internal = 
 	      hfst::implementations::sfst_to_internal_format(implementation.sfst);
@@ -808,6 +832,7 @@ namespace hfst
 	    break;
 	  case TROPICAL_OFST_TYPE:
 	    internal = implementation.tropical_ofst;
+	    fprintf(stderr, "(1)\n");
 	    break;
 	  case LOG_OFST_TYPE:
 	  internal =
@@ -820,25 +845,30 @@ namespace hfst
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
 	  }
 	this->type = type;
-	switch (type)
+	fprintf(stderr, "(2)\n");
+	switch (this->type)
 	  {
 	  case SFST_TYPE:
 	    implementation.sfst = 
 	      hfst::implementations::internal_format_to_sfst(internal);
 	    delete internal;
+	    fprintf(stderr, "(sfst)\n");
 	    break;
 	  case TROPICAL_OFST_TYPE:
-	    implementation.tropical_ofst = internal;
+	    implementation.tropical_ofst = internal; // here this->type is not lost
+	    fprintf(stderr, "(tropical)\n");
 	    break;
 	  case LOG_OFST_TYPE:
 	    implementation.log_ofst =
 	      hfst::implementations::internal_format_to_log_ofst(internal);
 	    delete internal;
+	    fprintf(stderr, "(log)\n");
 	    break;
 	  case FOMA_TYPE:
 	    implementation.foma =
 	      hfst::implementations::internal_format_to_foma(internal);
-	    delete internal;
+	    delete internal;  // this does not cause the lost of this->type
+	    fprintf(stderr, "(foma)\n");
 	    break;
 	case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
@@ -847,7 +877,7 @@ namespace hfst
 	  }
       }
     catch (hfst::implementations::HfstInterfaceException e)
-      { throw e; }
+      { fprintf(stderr, "(cathced an exception)\n"); throw e; }
     return *this;
   }
 
@@ -939,8 +969,8 @@ namespace hfst
     return this->transducer.tropical_ofst_interface.add_transition(
              this->transducer.implementation.tropical_ofst,
 	     source,
-	     this->transducer.key_table.add_symbol(isymbol),  // FIX
-	     this->transducer.key_table.add_symbol(osymbol),  // THESE
+	     isymbol,
+	     osymbol,
 	     w,
 	     target);
   }
