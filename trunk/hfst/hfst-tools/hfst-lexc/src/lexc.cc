@@ -56,7 +56,7 @@ LexcCompiler::LexcCompiler() :
 {
 	lexical_.makeEmpty();
 	stringTrie_.makeEmpty();
-	regexpUnion_.makeEpsilon();
+	regexpUnion_.makeEmpty();
 	morphotax_.makeEmpty();
 }
 
