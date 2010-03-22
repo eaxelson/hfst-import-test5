@@ -576,11 +576,11 @@ class Transducer
     transition_reader(f,header.target_table_size()),
     encoder(keys,header.input_symbol_count()),
     display_vector(),
-    output_string((SymbolNumber*)(malloc(2000))),
+    output_string((SymbolNumber*)(malloc(20000))),
     indices(index_reader()),
     transitions(transition_reader())
       {
-	for (int i = 0; i < 1000; ++i)
+	for (int i = 0; i < 10000; ++i)
 	  {
 	    output_string[i] = NO_SYMBOL_NUMBER;
 	  }
@@ -964,12 +964,12 @@ class TransducerW
     transition_reader(f,header.target_table_size()),
     encoder(keys,header.input_symbol_count()),
     display_map(),
-    output_string((SymbolNumber*)(malloc(2000))),
+    output_string((SymbolNumber*)(malloc(20000))),
     indices(index_reader()),
     transitions(transition_reader()),
     current_weight(0.0)
       {
-	for (int i = 0; i < 1000; ++i)
+	for (int i = 0; i < 10000; ++i)
 	  {
 	    output_string[i] = NO_SYMBOL_NUMBER;
 	  }

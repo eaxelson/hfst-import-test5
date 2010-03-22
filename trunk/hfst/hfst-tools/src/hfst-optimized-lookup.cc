@@ -326,8 +326,8 @@ SymbolNumber Encoder::find_key(char ** p)
 template <class genericTransducer>
 void runTransducer (genericTransducer T)
 {
-  SymbolNumber * input_string = (SymbolNumber*)(malloc(2000));
-  for (int i = 0; i < 1000; ++i)
+  SymbolNumber * input_string = (SymbolNumber*)(malloc(20000));
+  for (int i = 0; i < 10000; ++i)
     {
       input_string[i] = NO_SYMBOL_NUMBER;
     }
