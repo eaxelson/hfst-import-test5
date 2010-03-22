@@ -52,8 +52,14 @@ void Alphabet::add( const char *symbol, Character c )
 Alphabet::Alphabet()
 
 { 
+  /* ORIGINAL
   utf8 = false;
-  add(EpsilonString, Label::epsilon);
+  add(EpsilonString, Label::epsilon); */
+  // HFST version
+  utf8 = true;
+  add("@_EPSILON_SYMBOL_@", 0);
+  add("@_UNKNOWN_SYMBOL_@", 1);
+  add("@_IDENTITY_SYMBOL_@", 2);
 }
 
 

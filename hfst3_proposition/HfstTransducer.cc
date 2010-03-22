@@ -369,33 +369,39 @@ namespace hfst
       case LOG_OFST_TYPE:
 	delete implementation.log_ofst;
 	break;
-	case UNSPECIFIED_TYPE:
-	case ERROR_TYPE:
-	default:
-	  throw hfst::exceptions::TransducerHasWrongTypeException();
+      case FOMA_TYPE:
+	delete implementation.foma;
+	break;
+      case UNSPECIFIED_TYPE:
+      case ERROR_TYPE:
+      default:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
       }
   }
 
-  void HfstTransducer::print_type(void) {
-    switch (type)
+  ImplementationType HfstTransducer::get_type(void) {
+    switch (this->type)
       {
       case SFST_TYPE:
-	fprintf(stderr, "SFST_TYPE\n");
+	return SFST_TYPE;
 	break;
       case TROPICAL_OFST_TYPE:
-	fprintf(stderr, "TROPICAL_OFST_TYPE\n");
+	return TROPICAL_OFST_TYPE;
 	break;
       case LOG_OFST_TYPE:
-	fprintf(stderr, "LOG_OFST_TYPE\n");
+	return LOG_OFST_TYPE;
+	break;
+      case FOMA_TYPE:
+	return FOMA_TYPE;
 	break;
       case UNSPECIFIED_TYPE:
-	fprintf(stderr, "UNSPECIFIED_TYPE\n");
+	return UNSPECIFIED_TYPE;
 	break;
       case ERROR_TYPE:
-	fprintf(stderr, "ERROR_TYPE\n");
+	return ERROR_TYPE;
 	break;
       default:
-	fprintf(stderr, "type not defined\n");
+	throw hfst::exceptions::TransducerHasUnknownTypeException();
 	break;
       }
   }
@@ -707,8 +713,8 @@ namespace hfst
     anonymous = false;
   }
 
-  ImplementationType HfstTransducer::get_type(void)
-  { return this->type; }
+  /*ImplementationType HfstTransducer::get_type(void)
+    { return this->type; }*/
 
   WeightType HfstTransducer::get_weight_type(void)
   {
@@ -821,8 +827,10 @@ namespace hfst
 	switch (this->type)
 	  {
 	  case FOMA_TYPE:
+	    fprintf(stderr, "foma_to_internal_format...\n");
 	    internal =
 	      hfst::implementations::foma_to_internal_format(implementation.foma);
+	    fprintf(stderr, "...foma_to_internal_format\n");
 	    delete implementation.foma;
 	    break;
 	  case SFST_TYPE:
@@ -832,7 +840,6 @@ namespace hfst
 	    break;
 	  case TROPICAL_OFST_TYPE:
 	    internal = implementation.tropical_ofst;
-	    fprintf(stderr, "(1)\n");
 	    break;
 	  case LOG_OFST_TYPE:
 	  internal =
@@ -844,31 +851,27 @@ namespace hfst
 	default:
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
 	  }
+	fprintf(stderr, "convert: middle\n");
 	this->type = type;
-	fprintf(stderr, "(2)\n");
 	switch (this->type)
 	  {
 	  case SFST_TYPE:
 	    implementation.sfst = 
 	      hfst::implementations::internal_format_to_sfst(internal);
 	    delete internal;
-	    fprintf(stderr, "(sfst)\n");
 	    break;
 	  case TROPICAL_OFST_TYPE:
-	    implementation.tropical_ofst = internal; // here this->type is not lost
-	    fprintf(stderr, "(tropical)\n");
+	    implementation.tropical_ofst = internal;
 	    break;
 	  case LOG_OFST_TYPE:
 	    implementation.log_ofst =
 	      hfst::implementations::internal_format_to_log_ofst(internal);
 	    delete internal;
-	    fprintf(stderr, "(log)\n");
 	    break;
 	  case FOMA_TYPE:
 	    implementation.foma =
 	      hfst::implementations::internal_format_to_foma(internal);
-	    delete internal;  // this does not cause the lost of this->type
-	    fprintf(stderr, "(foma)\n");
+	    delete internal;
 	    break;
 	case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
@@ -877,7 +880,7 @@ namespace hfst
 	  }
       }
     catch (hfst::implementations::HfstInterfaceException e)
-      { fprintf(stderr, "(cathced an exception)\n"); throw e; }
+      { throw e; }
     return *this;
   }
 

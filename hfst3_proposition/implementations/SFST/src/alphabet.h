@@ -153,6 +153,7 @@ class Alphabet {
   // hash table used to map the symbols to their codes
   typedef hash_map<const char*, Character, hash<const char*>,eqstr> SymbolMap;
 
+ public: // HFST addition
   // hash table used to map the codes back to the symbols
   typedef hash_map<Character, char*> CharMap;
 
@@ -176,6 +177,9 @@ class Alphabet {
   const_iterator begin() const { return ls.begin(); };
   const_iterator end() const { return ls.end(); };
   size_t size() const { return ls.size(); };
+
+  // HFST addition
+  CharMap get_char_map(void) { return cm; };
 
   void clear();
   void clear_char_pairs() { ls.clear(); };

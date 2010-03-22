@@ -284,7 +284,7 @@ namespace hfst { namespace implementations
 
   std::string TropicalWeightTransition::get_output_symbol(void) const
   {
-    return t->OutputSymbols()->Find(arc.olabel);
+    return t->InputSymbols()->Find(arc.olabel);
   }
 
   TropicalWeightState TropicalWeightTransition::get_target_state(void) const
@@ -437,10 +437,9 @@ namespace hfst { namespace implementations
   }
   
   void initialize_symbol_tables(StdVectorFst *t) {
-    SymbolTable *in = create_symbol_table("");
-    t->SetInputSymbols(in);
-    SymbolTable *out = create_symbol_table("");
-    t->SetOutputSymbols(out);
+    SymbolTable *st = create_symbol_table("");
+    t->SetInputSymbols(st);
+    //t->SetOutputSymbols(st);
     return;
   }
 
@@ -556,8 +555,12 @@ namespace hfst { namespace implementations
   void 
   TropicalWeightTransducer::add_transition(StdVectorFst *t, StateId source, std::string &isymbol, std::string &osymbol, float w, StateId target)
   {
+    /*if (t->InputSymbols() != t->OutputSymbols()) {
+      fprintf(stderr, "ERROR:  TropicalWeightTransducer::add_transition:  input and output symbols are not the same\n"); 
+      throw hfst::exceptions::ErrorException(); 
+      }*/
     Key ilabel = t->InputSymbols()->AddSymbol(isymbol);
-    Key olabel = t->OutputSymbols()->AddSymbol(osymbol);
+    Key olabel = t->InputSymbols()->AddSymbol(osymbol);
     t->AddArc(source, StdArc(ilabel, olabel, w, target));
     return;
   }

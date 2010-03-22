@@ -246,6 +246,7 @@ void fsm_construct_add_arc(struct fsm_construct_handle *handle, int source, int 
     tl->target = target;
 }
 
+
 unsigned int fsm_construct_hash_sym(char *symbol) {
     register unsigned int hash;
     hash = 0;
