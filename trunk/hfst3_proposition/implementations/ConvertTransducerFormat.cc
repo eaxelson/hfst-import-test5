@@ -50,6 +50,17 @@ InternalTransducer * sfst_to_internal_format(SFST::Transducer * t)
 			 state_map[arc->target_node()]));
 	}
     }
+
+  // added
+  fst::SymbolTable *st = new fst::SymbolTable("anonym_hfst3_symbol_table");
+  SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
+  for (SFST::Alphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++) {
+    st->AddSymbol(std::string(it->second), (int64)it->first);
+  }
+  // check that this works
+  internal_transducer->SetInputSymbols(st);
+  //internal_transducer->SetOutputSymbols(st);
+
   return internal_transducer;
 }
 
@@ -80,7 +91,7 @@ InternalTransducer * foma_to_internal_format(struct fsm * t)
       source_state = state_map[(fsm+i)->state_no];
 
     // 2. If the source state is an initial state in foma:
-    if ((fsm+1)->start_state == 1) {
+    if ((fsm+i)->start_state == 1) {
       // If the start state has not yet been encountered,
       if (not start_state_found) {
 	// mark the source state as initial.
@@ -95,6 +106,7 @@ InternalTransducer * foma_to_internal_format(struct fsm * t)
       // If there are several initial states in foma transducer,
       else {
 	// throw an exception.
+	fprintf(stderr, "FOO\n");
 	throw TransducerHasMoreThanOneStartStateException();
       }
     }
@@ -134,6 +146,7 @@ InternalTransducer * foma_to_internal_format(struct fsm * t)
   // If there was not an initial state in foma transducer,
   if (not start_state_found) {
     // throw an exception.
+    fprintf(stderr, "BAR\n");
     throw TransducerHasNoStartStateException();
   }
 
@@ -147,7 +160,7 @@ InternalTransducer * foma_to_internal_format(struct fsm * t)
   }
   // check that this works
   internal_transducer->SetInputSymbols(st);
-  internal_transducer->SetOutputSymbols(st);
+  //internal_transducer->SetOutputSymbols(st);
 
   return internal_transducer;
 }
@@ -164,10 +177,13 @@ InternalTransducer * log_ofst_to_internal_format
   fst::Cast<LogFst,InternalTransducer>(*t,u);
   return u;
 }
+
 SFST::Transducer *  internal_format_to_sfst
 (InternalTransducer * internal_transducer)
 {
+
   SFST::Transducer * t = new SFST::Transducer();
+  try {
   SFST::Node * start_node = t->root_node();
 
   if (internal_transducer->Start() == fst::kNoStateId)
@@ -210,6 +226,19 @@ SFST::Transducer *  internal_format_to_sfst
 				t);
 	}
     }
+  // added
+  /*if (internal_transducer->InputSymbols() != internal_transducer->OutputSymbols())
+    throw hfst::exceptions::ErrorException();*/
+  
+  for ( fst::SymbolTableIterator it = fst::SymbolTableIterator(*internal_transducer->InputSymbols());
+	not it.Done(); it.Next() ) {
+    t->alphabet.add_symbol( it.Symbol(), (SFST::Character)it.Value() );
+  }
+  
+  }
+  catch (char *msg) {
+    fprintf(stderr, "ERROR: %s \n", msg);
+  }
   return t;
 }
 
@@ -221,9 +250,15 @@ struct fsm * internal_format_to_foma
   if (internal_transducer->Start() == fst::kNoStateId)
     { throw TransducerHasNoStartStateException(); }
 
+  /*if (internal_transducer->InputSymbols() != internal_transducer->OutputSymbols()) {
+    fprintf(stderr, "internal_format_to_foma (2)\n"); 
+    throw hfst::exceptions::ErrorException(); 
+    }*/
+
   struct fsm_construct_handle *h;
   struct fsm *net;
   h = fsm_construct_init(strdup(std::string("").c_str()));
+
 
   for (fst::StateIterator<fst::StdVectorFst> siter(*internal_transducer); 
        not siter.Done(); siter.Next())
@@ -238,9 +273,10 @@ struct fsm * internal_format_to_foma
 	  std::string istring = isymbols->Find((int64)arc.ilabel);  // if not found, SEGFAULT
 	  char *in = strdup(istring.c_str());
 
-	  fst::SymbolTable * osymbols = internal_transducer->OutputSymbols();
-	  std::string ostring = osymbols->Find((int64)arc.olabel);
+	  //fst::SymbolTable * osymbols = internal_transducer->OutputSymbols();
+	  std::string ostring = isymbols->Find((int64)arc.olabel);
 	  char *out = strdup(ostring.c_str());
+
 	  fsm_construct_add_arc(h, (int)source_state, (int)arc.nextstate, in, out);
 	  // not clear whether in and out should be freed...
 	}
@@ -248,11 +284,22 @@ struct fsm * internal_format_to_foma
 	fsm_construct_set_final(h, (int)source_state);
       }	  
     }
+
+  // Add symbols that are in the symbol table but do not occur in the transducer
+  for (fst::SymbolTableIterator it = fst::SymbolTableIterator(*internal_transducer->InputSymbols());
+       not it.Done(); it.Next()) 
+    {
+      char * symbol = strdup( it.Symbol() );
+      if ( fsm_construct_check_symbol(h,symbol) == -1 ) // not found
+	fsm_construct_add_symbol(h,symbol);
+    }
+
   fsm_construct_set_initial(h, (int)internal_transducer->Start());
   // not clear what happens if start state is not number zero...
   net = fsm_construct_done(h);
   fsm_count(net);
   net = fsm_topsort(net);
+
   return net;      
 }
 

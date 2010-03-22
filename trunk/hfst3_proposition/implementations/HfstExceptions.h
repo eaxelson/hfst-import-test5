@@ -27,6 +27,9 @@ public HfstInterfaceException {};
 class TransducerHasWrongTypeException :
 public HfstInterfaceException {};
 
+class TransducerHasUnknownTypeException :
+public HfstInterfaceException {};
+
 class TransducerHasNoAlphabetException :
 public HfstInterfaceException {};
 

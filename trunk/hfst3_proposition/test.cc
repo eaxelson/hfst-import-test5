@@ -29,16 +29,24 @@ int main(int argc, char **argv) {
     it.next();
   }
   HfstTransducer T(t);
-  T.print_type();
+  ImplementationType type = T.get_type();
+  fprintf(stderr, "%i\n", type);
 
   fprintf(stderr, "main: (1)\n");
-  T = T.convert(FOMA_TYPE);   // BUG: type is lost in the conversion
-  T.print_type();
+  T = T.convert(FOMA_TYPE);
+  fprintf(stderr, "main: (2)\n");
+  T = T.convert(SFST_TYPE);
+  fprintf(stderr, "main: (3)\n");
+  T = T.convert(TROPICAL_OFST_TYPE);
+  fprintf(stderr, "main: (4)\n");
+  T = T.convert(FOMA_TYPE);
+  fprintf(stderr, "main: (5)\n");
+  type = T.get_type();
+  //fprintf(stderr, "%i\n", type);
   //HfstOutputStream os(LOG_OFST_TYPE);
   /*os << TR;
     fprintf(stderr, "\n\n");*/
   //cout << TR;
   //fprintf(stderr, "\n");
-  fprintf(stderr, "main: (2)\n");
   return 0;
 }
