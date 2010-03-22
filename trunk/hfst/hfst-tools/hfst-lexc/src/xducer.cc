@@ -1214,7 +1214,7 @@ Xducer::removeLexcJoiners(const Xymbol& initial, const Xymbol& final)
 	if (!w_)
 	{
 	  // rebuild from scratch
-	  HFST::TransducerHandle nu = HFST::create_epsilon_transducer();
+	  HFST::TransducerHandle nu = HFST::create_empty_transducer();
 	  HFST::TransducerHandle old = sfstDucer_;
 	  HFST::State oldStart = HFST::get_initial_state(old);
 	  HFST::State nuStart = HFST::get_initial_state(nu);
@@ -1316,7 +1316,7 @@ Xducer::removeLexcJoiners(const Xymbol& initial, const Xymbol& final)
 	{
 		// weighted
 	  // rebuild from scratch
-	  HWFST::TransducerHandle nu = HWFST::create_epsilon_transducer();
+	  HWFST::TransducerHandle nu = HWFST::create_empty_transducer();
 	  HWFST::TransducerHandle old = openfstDucer_;
 	  HWFST::State oldStart = HWFST::get_initial_state(old);
 	  HWFST::State nuStart = HWFST::get_initial_state(nu);
