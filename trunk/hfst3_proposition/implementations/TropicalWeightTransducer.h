@@ -116,6 +116,11 @@ namespace implementations
       static StdVectorFst * create_epsilon_transducer(void);
       static StdVectorFst * define_transducer(Key k);
       static StdVectorFst * define_transducer(const KeyPair &kp);
+
+      // for testing
+      static StdVectorFst * define_transducer(const std::string &symbol);
+      static StdVectorFst * define_transducer(const std::string &isymbol, const std::string &osymbol);
+
       static StdVectorFst * define_transducer(const KeyPairVector &kpv);
       static StdVectorFst * copy(StdVectorFst * t);
       static StdVectorFst * determinize(StdVectorFst * t);

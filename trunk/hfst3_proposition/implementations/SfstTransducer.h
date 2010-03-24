@@ -142,6 +142,8 @@ namespace hfst { namespace implementations
       static Transducer * create_epsilon_transducer(void);
       static Transducer * define_transducer(Key k);
       static Transducer * define_transducer(const KeyPair &kp);
+      static Transducer * define_transducer(const char *symbol);
+      static Transducer * define_transducer(const char *isymbol, const char *osymbol);
       static Transducer * define_transducer(const KeyPairVector &kpv);
       static Transducer * copy(Transducer * t);
       static Transducer * determinize(Transducer * t);
