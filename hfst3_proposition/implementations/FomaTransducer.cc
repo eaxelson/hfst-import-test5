@@ -297,13 +297,26 @@ namespace hfst { namespace implementations {
     return fsm_empty_string();
   }
   
+  // remove?
   fsm * FomaTransducer::define_transducer(Key k)
   {     throw hfst::exceptions::FunctionNotImplementedException();}
 
+  fsm * FomaTransducer::define_transducer(char *symbol)
+  {     
+    return fsm_symbol(symbol);
+  }
+
   
+  // remove?
   fsm * FomaTransducer::define_transducer(const KeyPair &kp)
   { 
     throw hfst::exceptions::FunctionNotImplementedException();
+  }
+
+  fsm * FomaTransducer::define_transducer(char *isymbol, char *osymbol)
+  { 
+    return fsm_cross_product( fsm_symbol(isymbol), fsm_symbol(osymbol) );
+    // should either argument be deleted?
   }
   
   fsm * FomaTransducer::define_transducer(const KeyPairVector &kpv)
@@ -396,25 +409,25 @@ namespace hfst { namespace implementations {
   fsm * FomaTransducer::concatenate
   (fsm * t1, fsm * t2)
   {
-    return fsm_concat(t1, t2);
+    return fsm_concat(fsm_copy(t1), fsm_copy(t2));
   }
 
   fsm * FomaTransducer::disjunct
   (fsm * t1, fsm * t2)
   {
-    return fsm_union(t1, t2);
+    return fsm_union(fsm_copy(t1), fsm_copy(t2));
   }
 
   fsm * FomaTransducer::intersect
   (fsm * t1, fsm * t2)
   {
-    return fsm_intersect(t1, t2);
+    return fsm_intersect(fsm_copy(t1), fsm_copy(t2));
   }
 
   fsm * FomaTransducer::subtract
   (fsm * t1, fsm * t2)
   {
-    return fsm_minus(t1, t2);
+    return fsm_minus(fsm_copy(t1), fsm_copy(t2));
   }
 
   FomaStateIterator::FomaStateIterator(fsm * t):

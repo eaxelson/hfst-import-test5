@@ -2,6 +2,9 @@
 
 namespace hfst { namespace implementations
 {
+
+  void initialize_symbol_tables(StdVectorFst *t);
+
   TropicalWeightInputStream::TropicalWeightInputStream(void):
     i_stream(),input_stream(cin)
   {}
@@ -627,6 +630,7 @@ namespace hfst { namespace implementations
     return t;
   }
 
+  // could these be removed?
   StdVectorFst * TropicalWeightTransducer::define_transducer(Key k)
   {
     StdVectorFst * t = new StdVectorFst;
@@ -637,7 +641,6 @@ namespace hfst { namespace implementations
     t->AddArc(s1,StdArc(k,k,0,s2));
     return t;
   }
-
   StdVectorFst * TropicalWeightTransducer::define_transducer
   (const KeyPair &key_pair)
   {
@@ -649,6 +652,34 @@ namespace hfst { namespace implementations
     t->AddArc(s1,StdArc(key_pair.first,key_pair.second,0,s2));
     return t;
   }
+
+  StdVectorFst * TropicalWeightTransducer::define_transducer(const std::string &symbol)
+  {
+    StdVectorFst * t = new StdVectorFst;
+    initialize_symbol_tables(t);
+    StateId s1 = t->AddState();
+    StateId s2 = t->AddState();
+    t->SetStart(s1);
+    t->SetFinal(s2,0);
+    t->AddArc(s1,StdArc(t->InputSymbols()->AddSymbol(symbol),
+			t->InputSymbols()->AddSymbol(symbol),0,s2));
+    return t;
+  }
+  StdVectorFst * TropicalWeightTransducer::define_transducer
+    (const std::string &isymbol, const std::string &osymbol)
+  {
+    StdVectorFst * t = new StdVectorFst;
+    initialize_symbol_tables(t);
+    StateId s1 = t->AddState();
+    StateId s2 = t->AddState();
+    t->SetStart(s1);
+    t->SetFinal(s2,0);
+    t->AddArc(s1,StdArc(t->InputSymbols()->AddSymbol(isymbol),
+			t->InputSymbols()->AddSymbol(osymbol),0,s2));
+    return t;
+  }
+
+  // HERE
 
   StdVectorFst * TropicalWeightTransducer::define_transducer
   (const KeyPairVector &kpv)

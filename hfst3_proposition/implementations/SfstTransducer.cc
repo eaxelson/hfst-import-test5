@@ -437,13 +437,13 @@ namespace hfst { namespace implementations {
     t->root_node()->set_final(1);
     return t; }
   
+    // could these be removed?
   Transducer * SfstTransducer::define_transducer(Key k)
   { Transducer * t = new Transducer; 
     Node * n = t->new_node();
     t->root_node()->add_arc(Label(k),n,t);
     n->set_final(1);
     return t; }
-  
   Transducer * SfstTransducer::define_transducer(const KeyPair &kp)
   { Transducer * t = new Transducer;
     Node * n = t->new_node();
@@ -451,6 +451,21 @@ namespace hfst { namespace implementations {
     n->set_final(1);
     return t; }
   
+  Transducer * SfstTransducer::define_transducer(const char *symbol)
+  { Transducer * t = new Transducer; 
+    Node * n = t->new_node();
+    t->root_node()->add_arc(Label(t->alphabet.add_symbol(symbol)),n,t);
+    n->set_final(1);
+    return t; }
+  
+  Transducer * SfstTransducer::define_transducer(const char *isymbol, const char *osymbol)
+  { Transducer * t = new Transducer;
+    Node * n = t->new_node();
+    t->root_node()->add_arc(Label(t->alphabet.add_symbol(isymbol), 
+				  t->alphabet.add_symbol(osymbol)),n,t);
+    n->set_final(1);
+    return t; }
+
   Transducer * SfstTransducer::define_transducer(const KeyPairVector &kpv)
   { Transducer * t = new Transducer;
     Node * n = t->root_node();

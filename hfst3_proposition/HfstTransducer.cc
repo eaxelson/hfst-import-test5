@@ -484,6 +484,59 @@ namespace hfst
       }
   }
 
+  // for testing
+HfstTransducer::HfstTransducer(const std::string &symbol, ImplementationType type): 
+type(type),anonymous(false),is_trie(false)
+  {
+    switch (this->type)
+      {
+      case SFST_TYPE:
+	implementation.sfst = sfst_interface.define_transducer(symbol.c_str());
+	break;
+      case TROPICAL_OFST_TYPE:
+	implementation.tropical_ofst = tropical_ofst_interface.define_transducer(symbol);
+	break;
+      case LOG_OFST_TYPE:
+	throw hfst::exceptions::FunctionNotImplementedException();
+	break;
+      case FOMA_TYPE:
+	implementation.foma = foma_interface.define_transducer(strdup(symbol.c_str()));
+	// should the char* be deleted?
+	break;
+      case UNSPECIFIED_TYPE:
+      case ERROR_TYPE:
+      default:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+	break;
+      }
+  }
+HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type):
+type(type),anonymous(false),is_trie(false)
+  {
+    switch (this->type)
+      {
+      case SFST_TYPE:
+	implementation.sfst = sfst_interface.define_transducer(isymbol.c_str(), osymbol.c_str());
+	break;
+      case TROPICAL_OFST_TYPE:
+	implementation.tropical_ofst = tropical_ofst_interface.define_transducer(isymbol, osymbol);
+	break;
+      case LOG_OFST_TYPE:
+	throw hfst::exceptions::FunctionNotImplementedException();
+	break;
+      case FOMA_TYPE:
+	implementation.foma = foma_interface.define_transducer( strdup(isymbol.c_str()), strdup(osymbol.c_str()) );
+	// should the char*:s be deleted?
+	break;
+      case UNSPECIFIED_TYPE:
+      case ERROR_TYPE:
+      default:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+	break;
+      }
+  }
+
+
   ImplementationType HfstTransducer::get_type(void) {
     switch (this->type)
       {
