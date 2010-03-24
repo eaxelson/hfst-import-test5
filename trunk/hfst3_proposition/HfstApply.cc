@@ -225,6 +225,7 @@ namespace hfst
    HfstTransducer &another,
    ImplementationType type)
   {
+    fprintf(stderr, "apply: begins...\n");
     if (type != UNSPECIFIED_TYPE)
       {
 	convert(type);
@@ -233,6 +234,10 @@ namespace hfst
       }
     else if (this->type != another.type)
       { convert(another.type); }
+
+    // added
+    fprintf(stderr, "apply: harmonizing...\n");
+    this->harmonize(another);
 
     switch (this->type)
       {

@@ -52,7 +52,7 @@ hfst_obj:
 	$(MAKE) -C ./implementations all
 
 test.o: test.cc
-test: test.o
+test: test.o libhfst3.a
 
 test.o: 
 	g++ -I. -c test.cc -o test.o

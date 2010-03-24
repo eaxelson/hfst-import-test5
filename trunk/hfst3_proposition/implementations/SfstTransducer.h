@@ -173,8 +173,13 @@ namespace hfst { namespace implementations
       typedef SfstStateIterator const_iterator;
       static const_iterator begin(Transducer * t);
       static const_iterator end(Transducer * t);
-      static Transducer * harmonize(Transducer * t,KeyMap &key_map);
+      //static Transducer * harmonize(Transducer * t,KeyMap &key_map);
       static void print(Transducer * t, KeyTable &key_table, ostream &out);
-      
+
+      static void harmonize(Transducer * t1, Transducer * t2);
+
+      // see if these can be removed
+      static StringSymbolSet get_string_symbol_set(Transducer * t);
+      static KeyMap create_mapping(Transducer * t1, Transducer * t2, StringSymbolSet &unknown2);
     };
 } }

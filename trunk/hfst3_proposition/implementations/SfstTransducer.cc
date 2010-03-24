@@ -167,6 +167,17 @@ namespace hfst { namespace implementations {
       }
   }
   
+
+  void SfstTransducer::harmonize(Transducer * t1, Transducer * t2)
+  {
+    Transducer * new_t1 = &t1->copy(false, &t2->alphabet);
+    t2->alphabet.insert_symbols(new_t1->alphabet);
+    delete t1;
+    t1 = new_t1;
+    return;
+  }
+
+#ifdef foo
   Transducer * SfstTransducer::harmonize(Transducer * t, KeyMap &key_map)
   {
     Key no_key_number = 0;
@@ -206,6 +217,7 @@ namespace hfst { namespace implementations {
       }
     return t;
   }
+#endif
 
   Transducer * SfstInputStream::read_transducer(KeyTable &key_table)
   {
@@ -232,7 +244,7 @@ namespace hfst { namespace implementations {
 	populate_key_table(key_table,
 			   t->alphabet,
 			   key_map);
-	t = SfstTransducer::harmonize(t,key_map);
+	//t = SfstTransducer::harmonize(t,key_map);  // FIX THIS
 	t->alphabet.clear();	
 	return t;
       }
@@ -635,6 +647,29 @@ namespace hfst { namespace implementations {
 	s.print(key_table,out,indexer);
       }
   }
+
+
+  StringSymbolSet SfstTransducer::get_string_symbol_set(Transducer * t)
+  {
+    StringSymbolSet s;
+    SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
+    for ( SFST::Alphabet::CharMap::const_iterator it = cm.begin();
+	  it != cm.end(); it++ ) {
+      s.insert( std::string(it->second) );
+    }
+    return s;
+  }
+  
+  KeyMap create_mapping(Transducer * t1, Transducer * t2, StringSymbolSet &unknown2)
+  {
+    (void)t1;
+    (void)t2;
+    (void)unknown2;
+    KeyMap km;
+    return km;
+  }
+
+
 
 } }
 
