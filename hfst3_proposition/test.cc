@@ -34,6 +34,12 @@ int main(int argc, char **argv) {
 
   fprintf(stderr, "main: (1)\n");
   T = T.convert(FOMA_TYPE);
+  fprintf(stderr, "main: (1.5)\n");
+
+  HfstTransducer Tcopy = HfstTransducer(T);
+  fprintf(stderr, "main: (1.51)\n");
+  HfstTransducer disj = T.disjunct(Tcopy, FOMA_TYPE);
+
   fprintf(stderr, "main: (2)\n");
   T = T.convert(SFST_TYPE);
   fprintf(stderr, "main: (3)\n");
@@ -48,5 +54,7 @@ int main(int argc, char **argv) {
     fprintf(stderr, "\n\n");*/
   //cout << TR;
   //fprintf(stderr, "\n");
+  fprintf(stderr, "main: (6)\n");
+  // FIX: calling ~HfstTransducer causes a glibc with foma
   return 0;
 }

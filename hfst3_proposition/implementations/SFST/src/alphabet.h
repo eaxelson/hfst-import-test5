@@ -157,6 +157,9 @@ class Alphabet {
   // hash table used to map the codes back to the symbols
   typedef hash_map<Character, char*> CharMap;
 
+  // HFST addition
+  bool operator==(const Alphabet &alpha) const;
+
  private:
   SymbolMap sm; // maps symbols to codes
 

@@ -18,7 +18,9 @@ namespace hfst
   using hfst::symbols::KeyTable;
   using hfst::symbols::Key;
   using hfst::symbols::KeyPair;
+  using hfst::symbols::KeyMap;
   using hfst::symbols::StringSymbolPair;
+  using hfst::symbols::StringSymbolSet;
   using hfst::symbols::KeyPairVector;
   
   using hfst::implementations::SfstTransducer;
@@ -214,6 +216,10 @@ namespace hfst
     HfstTransducer &anonymize(void);
     KeyTable &get_key_table(void);
     void set_key_table(const KeyTable &kt);
+
+    //StringSymbolSet get_string_symbol_set(void);
+    //KeyMap create_mapping(HfstTransducer &another, StringSymbolSet &unknown_another);
+
     ImplementationType get_type(void);
     HfstTransducer &convert(ImplementationType type);
     friend std::ostream &operator<<(std::ostream &out, HfstTransducer &t);

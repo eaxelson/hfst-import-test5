@@ -818,4 +818,28 @@ char *Alphabet::print_analysis( Analysis &ana, bool both_layers )
   
   return result;
 }
+
+// HFST addition
+
+bool Alphabet::operator==(const Alphabet &alpha) const
+{
+  for ( SymbolMap::const_iterator it = this->sm.begin(); it != this->sm.end(); it++ )
+    {
+      SymbolMap::const_iterator alpha_it = alpha.sm.find(it->first);
+      if ( alpha_it == alpha.sm.end() )
+	return false;
+      if ( alpha_it->second == it->second )
+	return false;
+    }
+  for ( SymbolMap::const_iterator alpha_it = alpha.sm.begin(); alpha_it != alpha.sm.end(); alpha_it++ )
+    {
+      SymbolMap::const_iterator it = this->sm.find(alpha_it->first);
+      if ( it == this->sm.end() )
+	return false;
+      if ( it->second == alpha_it->second )
+	return false;
+    }
+  return true;
+}
+
 }

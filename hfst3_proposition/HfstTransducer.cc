@@ -27,6 +27,61 @@ namespace hfst
   const_iterator HfstState::end(void) const  { return HfstTransitionIterator(HfstTransducer(UNSPECIFIED_TYPE)); }
   */
 
+
+#ifdef foo
+  /* The set of symbols in the symbol table of the transducer. */
+  StringSymbolSet HfstTransducer::get_string_symbol_set(void) 
+  {
+    switch (this->type)
+      {
+      case (SFST_TYPE):
+	return sfst_interface.get_string_symbol_set(implementation.sfst);
+	break;
+      case (TROPICAL_OFST_TYPE):
+	return tropical_ofst_interface.get_string_symbol_set(implementation.tropical_ofst);
+	break;
+      default:
+	throw hfst::exceptions::FunctionNotImplementedException();	
+      }
+  }
+
+  /* 
+     Add symbols from \a unknown_another to the symbol table of transducer \a another.
+     Then calculate how numbers in this transducer should be mapped if this transducer
+     follows the symbol table of transducer \a another. 
+     Delete the symbol table of this transducer and set as its value
+     a copy of the symbol table of transducer another.
+     Finally, return the calculated number mappings in a KeyMap. 
+     This function is inteded to be used with function 'harmonize' in the following way: 
+
+       KeyMap km = transducer.create_mapping(another_transducer, unknown_another); 
+       transducer = transducer.harmonize(km);  
+  */
+
+  KeyMap HfstTransducer::create_mapping(HfstTransducer &another, StringSymbolSet &unknown_another)
+  {
+    if (this->type != another.type) 
+      {
+      throw hfst::exceptions::ErrorException();
+      }
+
+    switch (this->type)
+      {
+      case (SFST_TYPE):
+	return sfst_interface.create_mapping(this->implementation.sfst,
+					     another.implementation.sfst,
+					     unknown_another);
+	break;
+      case (TROPICAL_OFST_TYPE):
+	return tropical_ofst_interface.create_mapping(this->implementation.tropical_ofst,
+						      another.implementation.tropical_ofst,
+						      unknown_another);
+	break;
+      default:
+	throw hfst::exceptions::FunctionNotImplementedException();	
+      }
+  }
+#endif
   
   HfstTransitionIterator::HfstTransitionIterator(const HfstMutableTransducer &t, HfstState s):
     tropical_ofst_iterator(hfst::implementations::TropicalWeightTransitionIterator(t.transducer.implementation.tropical_ofst, s))
@@ -129,17 +184,62 @@ namespace hfst
 
   void HfstTransducer::harmonize(HfstTransducer &another)
   {
+    if (this->type != another.type)
+      {
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+      }
+    switch(this->type)
+      {
+      case (SFST_TYPE):
+	sfst_interface.harmonize(this->implementation.sfst,
+				 another.implementation.sfst);
+	break;
+      case (FOMA_TYPE):
+	// no need to harmonize as foma's functions take care of harmonizing
+	break;
+      case (TROPICAL_OFST_TYPE):
+	tropical_ofst_interface.harmonize(this->implementation.tropical_ofst,
+					  another.implementation.tropical_ofst);
+	break;
+      case (LOG_OFST_TYPE):
+	// must be implemented
+	break;
+      case (UNSPECIFIED_TYPE):
+      case (ERROR_TYPE):
+      default:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+      }
+  }
+
+#ifdef foo
+  {
     if (this->anonymous or another.anonymous)
       { return; }
 
-    // ADDED by Erik Axelson
-    hfst::symbols::SymbolSet unknown_this;    // symbols known to another but not this
-    hfst::symbols::SymbolSet unknown_another; // and vice versa
-    KeyTable::collect_unknown_sets(this->key_table, unknown_this,
-				   another.key_table, unknown_another);
+    // 1. Calculate the set of unknown symbols for transducers this and another.
 
-    hfst::symbols::Symbol us = hfst::symbols::KeyTable::global_symbol_table.get_symbol("@_UNKNOWN_SYMBOL_@");
-    // set of symbol pairs to which a non-identity "?:?" is expanded
+    StringSymbolSet unknown_this;    // symbols known to another but not this
+    StringSymbolSet unknown_another; // and vice versa
+    StringSymbolSet this_symbols = this->get_string_symbol_set();
+    StringSymbolSet another_symbols = another.get_string_symbol_set();
+    KeyTable::collect_unknown_sets(this_symbols, unknown_this,
+				   another_symbols, unknown_another);
+
+    // 2. Add new symbols from transducer this to the symbol table of transducer
+    //    another and recode the symbol numbers of transducer this so that
+    //    it follows the symbol table of transducer another.
+
+    KeyMap km = this->create_mapping(another, unknown_another);
+    this->recode_symbol_numbers(km);
+
+    // 3. Calculate the set of symbol pairs to which a non-identity "?:?"
+    //    transition is expanded for both transducers.
+    
+    return;
+  }
+
+
+    /*
     hfst::symbols::SymbolPairSet non_identity_this = 
       KeyTable::non_identity_cross_product(unknown_this, us);
     hfst::symbols::SymbolPairSet non_identity_another = 
@@ -152,9 +252,9 @@ namespace hfst
     switch (type)
       {
       case SFST_TYPE:
-	{
+      {*/
 	  /* SFST deletes here by default, so we don't need to delete. */
-	  this->implementation.sfst = 
+    /* this->implementation.sfst = 
 	    sfst_interface.harmonize(implementation.sfst,key_map);
 	  break;
 	}
@@ -164,7 +264,7 @@ namespace hfst
 	    tropical_ofst_interface.harmonize
 	    (implementation.tropical_ofst,key_map);
 	  delete this->implementation.tropical_ofst;
-	  this->implementation.tropical_ofst = temp;
+	  this->implementation.tropical_ofst = temp;*/
 	  // ADDED
 	  /*tropical_ofst_interface.expand_unknown(this->implementation.tropical_ofst,
 						 unknown_this, non_identity_this);
@@ -186,7 +286,9 @@ namespace hfst
 	default:
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
       }
-  }
+#endif
+
+
 
   HfstTransducer::HfstTransducer(ImplementationType type):
     type(type),anonymous(false),is_trie(true)
@@ -341,10 +443,13 @@ namespace hfst
 	implementation.log_ofst =
 	  log_ofst_interface.copy(another.implementation.log_ofst);
 	break;
-	case UNSPECIFIED_TYPE:
-	case ERROR_TYPE:
-	default:
-	  throw hfst::exceptions::TransducerHasWrongTypeException();
+      case FOMA_TYPE:
+	implementation.foma = foma_interface.copy(another.implementation.foma);
+	break;
+      case UNSPECIFIED_TYPE:
+      case ERROR_TYPE:
+      default:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
       }
   }
 
@@ -568,7 +673,7 @@ namespace hfst
   (HfstTransducer &another,
    ImplementationType type)
   { is_trie = false;
-    harmonize(another);
+    //harmonize(another);
     return apply(&hfst::implementations::SfstTransducer::compose,
 		 &hfst::implementations::TropicalWeightTransducer::compose,
 		 &hfst::implementations::LogWeightTransducer::compose,
@@ -580,7 +685,7 @@ namespace hfst
   (HfstTransducer &another,
    ImplementationType type)
   { is_trie = false; // This could be done so that is_trie is preserved
-    harmonize(another);
+    //harmonize(another);
     return apply(&hfst::implementations::SfstTransducer::concatenate,
 		 &hfst::implementations::TropicalWeightTransducer::concatenate,
 		 &hfst::implementations::LogWeightTransducer::concatenate,
@@ -660,7 +765,7 @@ namespace hfst
   HfstTransducer &HfstTransducer::disjunct
   (HfstTransducer &another,
    ImplementationType type)
-  { harmonize(another);
+  { //harmonize(another);
     if (is_trie and another.is_trie)
       {
 	try
@@ -681,7 +786,7 @@ namespace hfst
   (HfstTransducer &another,
    ImplementationType type)
   { is_trie = false; // This could be done so that is_trie is preserved
-    harmonize(another);
+    //harmonize(another);
     return apply(&hfst::implementations::SfstTransducer::intersect,
 		 &hfst::implementations::TropicalWeightTransducer::intersect,
 		 &hfst::implementations::LogWeightTransducer::intersect,
@@ -693,7 +798,7 @@ namespace hfst
   (HfstTransducer &another,
    ImplementationType type)
   { is_trie = false; // This could be done so that is_trie is preserved
-    harmonize(another);
+    //harmonize(another);
     return apply(&hfst::implementations::SfstTransducer::subtract,
 		 &hfst::implementations::TropicalWeightTransducer::subtract,
 		 &hfst::implementations::LogWeightTransducer::subtract,

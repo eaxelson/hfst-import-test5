@@ -74,8 +74,8 @@ namespace symbols
     typedef KeyTableConstIterator_ const_iterator;
     const_iterator begin();
     const_iterator end();
-    static void collect_unknown_sets(KeyTable &kt1, SymbolSet &unknown1,
-				     KeyTable &kt2, SymbolSet &unknown2);
+    static void collect_unknown_sets(StringSymbolSet &s1, StringSymbolSet &unknown1,
+				     StringSymbolSet &s2, StringSymbolSet &unknown2);
     // a set of non-identity symbol pairs from  S x S, where
     // S = the union of unknown_symbols and unknown_symbol_string and
     // x = cross-product operator

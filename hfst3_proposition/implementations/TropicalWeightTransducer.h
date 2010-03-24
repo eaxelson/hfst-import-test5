@@ -151,9 +151,17 @@ namespace implementations
       //typedef TropicalWeightStateIterator const_iterator;
       //static const_iterator begin(StdVectorFst * t);
       //static const_iterator end(StdVectorFst * t);
-      static StdVectorFst * harmonize(StdVectorFst * t,KeyMap &key_map);
+      //static StdVectorFst * harmonize(StdVectorFst * t,KeyMap &key_map);
+      static void harmonize(StdVectorFst *t1, StdVectorFst *t2);
       static void print(StdVectorFst * t, KeyTable &key_table, ostream &out);
 
+    protected:
+      static StringSymbolSet get_string_symbol_set(StdVectorFst *t);
+      static KeyMap create_mapping(StdVectorFst * t1, StdVectorFst * t2);
+      static void recode_symbol_numbers(StdVectorFst * t, KeyMap &km);      
+      static StdVectorFst * expand_arcs(StdVectorFst * t, StringSymbolSet &unknown);
+
+    public:
       /* For HfstMutableTransducer */
       static StateId add_state(StdVectorFst *t);
       static void set_final_weight(StdVectorFst *t, StateId s, float w);

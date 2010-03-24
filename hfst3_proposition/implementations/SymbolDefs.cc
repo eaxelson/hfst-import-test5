@@ -200,18 +200,18 @@ namespace hfst { namespace symbols
     it = another.it;
   }
 
-  void KeyTable::collect_unknown_sets(KeyTable &kt1, SymbolSet &unknown1,
-				      KeyTable &kt2, SymbolSet &unknown2)
+  void KeyTable::collect_unknown_sets(StringSymbolSet &s1, StringSymbolSet &unknown1,
+				      StringSymbolSet &s2, StringSymbolSet &unknown2)
   {
-    for (KeyTable::const_iterator it1 = kt1.begin(); it1 != kt1.end(); it1++) {
-      Symbol s1 = it1->symbol;
-      if ( not kt2.is_symbol(s1) )
-	unknown2.insert(s1);
+    for (StringSymbolSet::const_iterator it1 = s1.begin(); it1 != s1.end(); it1++) {
+      StringSymbol sym1 = *it1;
+      if ( s2.find(sym1) == s2.end() )
+	unknown2.insert(sym1);
     }
-    for (KeyTable::const_iterator it2 = kt2.begin(); it2 != kt2.end(); it2++) {
-      Symbol s2 = it2->symbol;
-      if ( not kt1.is_symbol(s2) )
-	unknown1.insert(s2);
+    for (StringSymbolSet::const_iterator it2 = s2.begin(); it2 != s2.end(); it2++) {
+      StringSymbol sym2 = *it2;
+      if ( s1.find(sym2) == s1.end() )
+	unknown1.insert(sym2);
     }
   }
 

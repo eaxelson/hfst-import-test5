@@ -9,6 +9,172 @@ namespace hfst { namespace implementations
     filename(filename),i_stream(filename),input_stream(i_stream)
   {}
 
+  StringSymbolSet TropicalWeightTransducer::get_string_symbol_set(fst::StdVectorFst *t)
+  {
+    StringSymbolSet s;
+    for ( fst::SymbolTableIterator it = fst::SymbolTableIterator(*(t->InputSymbols()));
+	  not it.Done(); it.Next() ) {
+      s.insert( std::string(it.Symbol()) );
+    }
+    return s;
+  }
+
+  /* Find the number-to-number mappings needed to be performed to t1 so that it will follow 
+     the same symbol-to-number encoding as t2.
+     @pre t2's symbol table must contain all symbols in t1's symbol table. 
+  */
+  KeyMap TropicalWeightTransducer::create_mapping(fst::StdVectorFst *t1, fst::StdVectorFst *t2)
+  {
+    KeyMap km;
+    // find the number-to-number mappings for transducer t1
+    for ( fst::SymbolTableIterator it = fst::SymbolTableIterator(*(t1->InputSymbols()));
+	  not it.Done(); it.Next() ) {    
+      km [ (Key)it.Value() ] = (Key) t2->InputSymbols()->Find( it.Symbol() );
+    }
+    return km;
+  }
+
+  /* Recode the symbol numbers in this transducer as indicated in KeyMap km. */
+  void TropicalWeightTransducer::recode_symbol_numbers(StdVectorFst *t, KeyMap &km) 
+  {
+    for (fst::StateIterator<StdVectorFst> siter(*t); 
+	 not siter.Done(); siter.Next())
+      {
+	StateId s = siter.Value();
+	for (fst::MutableArcIterator<StdVectorFst> aiter(t,s); !aiter.Done(); aiter.Next())
+	  {
+	    const StdArc &arc = aiter.Value();
+	    StdArc new_arc;
+	    new_arc.ilabel = km[arc.ilabel];
+	    new_arc.olabel = km[arc.olabel];
+	    new_arc.weight = arc.weight;
+	    new_arc.nextstate = arc.nextstate;
+	    aiter.SetValue(new_arc);
+	  }
+      }
+    return;
+  }
+
+  /* 
+     Create a copy of this transducer where all transitions of type "?:?", "?:x" and "x:?"
+     are expanded according to the StringSymbolSet 'unknown' that lists all symbols previously
+     unknown to this transducer.
+  */
+  StdVectorFst * TropicalWeightTransducer::expand_arcs(StdVectorFst * t, StringSymbolSet &unknown)
+  {
+    (void)unknown;  // REMOVE THIS !!!
+    StdVectorFst * result = new StdVectorFst();
+    std::map<StateId,StateId> state_map;   // maps states of this to states of result
+
+    // go through all states in this
+    for (fst::StateIterator<StdVectorFst> siter(*t); 
+	 not siter.Done(); siter.Next())
+      {
+	// create new state in result
+	StateId s = siter.Value();
+	StateId result_s = result->AddState();
+	state_map[s] = result_s;
+
+	// make the new state initial, if needed
+	if (t->Start() == s)
+	  result->SetStart(result_s);
+
+	// make the new state final, if needed
+	if (t->Final(s) != TropicalWeight::Zero())
+	  result->SetFinal(result_s, t->Final(s).Value());
+
+
+	// go through all the arcs in this
+	for (fst::ArcIterator<StdVectorFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+	  {
+	    const StdArc &arc = aiter.Value();
+
+	    // find the corresponding target state in result or, if not found, create a new state
+	    StateId result_nextstate;
+	    map<StateId,StateId>::const_iterator it = state_map.find(arc.nextstate); 
+	    if ( it == state_map.end() )
+	      {
+		result_nextstate = result->AddState();
+		state_map[arc.nextstate] = result_nextstate;
+	      }
+	    else 
+	      result_nextstate = it->second;
+
+	    // expand the transitions, if needed
+	    
+#ifdef foo
+	    if ( arc.ilabel == 1 &&       // cross-product "?:?"
+		 arc.olabel == 1 )
+	      {
+	      }
+	    else if (arc.ilabel == 2 &&   // identity "?:?"
+		     arc.olabel == 2 )       
+	      {
+	      }
+	    else if (false)  // "?:x"
+	      {
+	      }
+	    else if (false)  // "x:?"
+	      {
+	      }
+	    else             // "x:y", no need to expand
+	      {
+#endif
+	      result->AddArc(result_s, StdArc(arc.ilabel, arc.olabel, arc.weight, result_nextstate));		
+		//}
+	  }
+      }
+    return result;
+  }
+
+  void TropicalWeightTransducer::harmonize 
+  (StdVectorFst * t1, StdVectorFst * t2)
+  {
+    // 1. Calculate the set of unknown symbols for transducers t1 and t2.
+
+    StringSymbolSet unknown_t1;    // symbols known to another but not this
+    StringSymbolSet unknown_t2;    // and vice versa
+    StringSymbolSet t1_symbols = get_string_symbol_set(t1);
+    StringSymbolSet t2_symbols = get_string_symbol_set(t2);
+    KeyTable::collect_unknown_sets(t1_symbols, unknown_t1,
+				   t2_symbols, unknown_t2);
+
+
+    // 2. Add new symbols from transducer t1 to the symbol table of transducer t2...
+
+    for ( StringSymbolSet::const_iterator it = unknown_t2.begin();
+	  it != unknown_t2.end(); it++ ) {
+	t2->InputSymbols()->AddSymbol(*it);
+    }
+    // ...calculate the number mappings needed in harmonization...
+    KeyMap km = create_mapping(t1, t2);
+
+    // ... replace the symbol table of t1 with a copy of t2's symbol table
+    delete t1->InputSymbols();
+    t1->SetInputSymbols( new fst::SymbolTable(*(t2->InputSymbols())) );
+
+    // ...and recode the symbol numbers of transducer t1 so that
+    //    it follows the new symbol table.
+    recode_symbol_numbers(t1, km);
+
+
+    // 3. Calculate the set of symbol pairs to which a non-identity "?:?"
+    //    transition is expanded for both transducers.
+    
+    fst::StdVectorFst *temp;
+
+    temp = expand_arcs(t1, unknown_t1);
+    delete t1;
+    t1 = temp;
+
+    temp = expand_arcs(t2, unknown_t2);
+    delete t2;
+    t2 = temp;
+
+    return;
+  }
+
+
   /* Need to check if i_symbol_table and o_symbol_table are compatible! 
      That is to se that there isn't a name "x" s.t. the input symbol number
      of "x" is not the same as its output symbol number.
@@ -170,8 +336,8 @@ namespace hfst { namespace implementations
 			       osymbols,
 			       key_map);
 	  }
-	StdVectorFst * t_harmonized = 
-	  TropicalWeightTransducer::harmonize(t,key_map);
+	StdVectorFst * t_harmonized = NULL;  // FIX THIS
+	  //TropicalWeightTransducer::harmonize(t,key_map);
 	delete t;
 	return t_harmonized;
       }
@@ -783,6 +949,7 @@ namespace hfst { namespace implementations
   }
 
 
+#ifdef foo
   StdVectorFst * TropicalWeightTransducer::harmonize
   (StdVectorFst * t,KeyMap &key_map)
   {
@@ -796,6 +963,7 @@ namespace hfst { namespace implementations
     RelabelFst<StdArc> t_subst(*t,v,v);
     return new StdVectorFst(t_subst);
   }
+#endif
 
   // TODO
   void expand_unknown(StdVectorFst *t, KeyTable key_table, SymbolSet &expand_unknown,
