@@ -1,5 +1,5 @@
 from constants import *
-from shared import match, Indexlist, LetterTrie
+from shared import match, Indexlist, LetterTrie, FlagDiacriticStateStack
 import struct
 
 class Transducer:
@@ -64,7 +64,7 @@ class Transducer:
     def __init__(self, file, header, alphabet):
         self.alphabet = alphabet
         self.flagDiacriticOperations = alphabet.flagDiacriticOperations
-        self.stateStack = [dict()]
+        self.stateStack = FlagDiacriticStateStack()
         self.letterTrie = LetterTrie()
         for x in range(header.number_of_symbols):
             self.letterTrie.addString(alphabet.keyTable[x], x)
@@ -84,9 +84,15 @@ class Transducer:
             self.tryEpsilonTransitions(self.indices[index].target - TRANSITION_TARGET_TABLE_START)
 
     def tryEpsilonTransitions(self, index):
-        while self.transitions[index].inputSymbol == 0:
-            if self.transitions[index].outputSymbol in self.flagDiacriticOperations:
-                if not self.pushState(self.flagDiacriticOperations[self.transitions[index].outputSymbol]):
+        while True:
+            if self.transitions[index].inputSymbol == 0:
+                self.outputString.put(self.transitions[index].outputSymbol)
+                self.outputString.pos += 1
+                self.getAnalyses(self.transitions[index].target)
+                self.outputString.pos -= 1
+                index += 1
+            elif self.transitions[index].inputSymbol in self.flagDiacriticOperations:
+                if not self.stateStack.push(self.flagDiacriticOperations[self.transitions[index].inputSymbol]):
                     index += 1
                     continue # illegal state modification; do nothing
                 else:
@@ -97,11 +103,8 @@ class Transducer:
                     index += 1
                     self.stateStack.pop()
                     continue
-            self.outputString.put(self.transitions[index].outputSymbol)
-            self.outputString.pos += 1
-            self.getAnalyses(self.transitions[index].target)
-            self.outputString.pos -= 1
-            index += 1
+            else:
+                return
 
     def findIndex(self, index):
         if self.indices[index + self.inputString.get(-1)].inputSymbol == self.inputString.get(-1):
@@ -167,44 +170,6 @@ class Transducer:
         for x in self.displayVector:
             print '\t' + x.encode("utf-8")
         
-    def pushState(self, flagDiacritic): # operation is an op, feat, val triple
-        """
-        Attempt to modify flag diacritic state stack. If successful, push new
-        state and return True. Otherwise return False.
-        """
-        if flagDiacritic.operation == 'P': # positive set
-            self.stateStack.append(self.stateStack[-1].copy())
-            self.stateStack[-1][flagDiacritic.feature] = (flagDiacritic.value, True)
-            return True
-        if flagDiacritic.operation == 'N': # negative set
-            self.stateStack.append(self.stateStack[-1].copy())
-            self.stateStack[-1][flagDiacritic.feature] = (flagDiacritic.value, False)
-            return True
-        if flagDiacritic.operation == 'R': # require
-            if self.stateStack[-1].get(flagDiacritic.feature) == (flagDiacritic.value, True):
-                self.stateStack.append(self.stateStack[-1].copy())
-                return True
-            return False
-        if flagDiacritic.operation == 'D': # disallow
-            if self.stateStack[-1].get(flagDiacritic.feature) == (flagDiacritic.value, True):
-                return False
-            self.stateStack.append(self.stateStack[-1].copy())
-            return True
-        if flagDiacritic.operation == 'C': # clear
-            self.stateStack.append(self.stateStack[-1].copy())
-            if flagDiacritic.feature in self.stateStack[-1]:
-                del self.stateStack[-1][flagDiacritic.feature]
-            return True
-        if flagDiacritic.operation == 'U': # unification
-            if not flagDiacritic.feature in self.stateStack[-1] or \
-                    self.stateStack[-1][flagDiacritic.feature] == (flagDiacritic.value, True) or \
-                    (self.stateStack[-1][flagDiacritic.feature][1] == False and \
-                         self.stateStack[-1][flagDiacritic.feature][0] != flagDiacritic.value):
-                self.stateStack.append(self.stateStack[-1].copy())
-                self.stateStack[-1][flagDiacritic.feature] = (flagDiacritic.value, True)
-                return True
-            return False
-
 class TransducerW(Transducer):
 
     class TransitionIndex(Transducer.TransitionIndex):
@@ -253,7 +218,7 @@ class TransducerW(Transducer):
     def __init__(self, file, header, alphabet):
         self.alphabet = alphabet
         self.flagDiacriticOperations = alphabet.flagDiacriticOperations
-        self.stateStack = [dict()]
+        self.stateStack = FlagDiacriticStateStack()
         self.letterTrie = LetterTrie()
         for x in range(header.number_of_symbols):
             self.letterTrie.addString(alphabet.keyTable[x], x)
@@ -277,10 +242,13 @@ class TransducerW(Transducer):
         self.outputString.pos -= 1
         self.current_weight -= self.transitions[index].weight
 
-    def tryEpsilonTransitions(self, index):
-        while self.transitions[index].inputSymbol == 0:
-            if self.transitions[index].outputSymbol in self.flagDiacriticOperations:
-                if not self.pushState(self.flagDiacriticOperations[self.transitions[index].outputSymbol]):
+    def tryEpsilonTransitions(self, index): # epsilons and flag diacritics
+        while True:
+            if self.transitions[index].inputSymbol == 0:
+                self.traverse(index)
+                index += 1
+            elif self.transitions[index].inputSymbol in self.flagDiacriticOperations:
+                if not self.stateStack.push(self.flagDiacriticOperations[self.transitions[index].inputSymbol]):
                     index += 1
                     continue # illegal state modification; do nothing
                 else:
@@ -288,9 +256,8 @@ class TransducerW(Transducer):
                     index += 1
                     self.stateStack.pop()
                     continue
-            self.traverse(index)
-            index += 1
-
+            else:
+                return
 
     def findTransitions(self, index):
         while self.transitions[index].inputSymbol != NO_SYMBOL_NUMBER:

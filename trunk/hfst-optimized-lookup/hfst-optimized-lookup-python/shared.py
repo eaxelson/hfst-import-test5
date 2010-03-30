@@ -132,6 +132,63 @@ class FlagDiacriticOperation:
         self.feature = feat
         self.value = val
 
+class FlagDiacriticStateStack:
+    """The combined state for all flag diacritics"""
+
+    def __init__(self):
+        self.stack = [dict()]
+
+    def pop(self):
+        self.stack.pop()
+
+    def pushState(self, flagDiacritic):
+        """
+        Attempt to modify flag diacritic state stack. If successful, push new
+        state and return True. Otherwise return False.
+        """
+        if flagDiacritic.operation == 'P': # positive set
+            self.stack.append(self.stack[-1].copy())
+            self.stack[-1][flagDiacritic.feature] = (flagDiacritic.value, True)
+            return True
+        if flagDiacritic.operation == 'N': # negative set
+            self.stack.append(self.stack[-1].copy())
+            self.stack[-1][flagDiacritic.feature] = (flagDiacritic.value, False)
+            return True
+        if flagDiacritic.operation == 'R': # require
+            if flagDiacritic.value == '': # empty require
+                if self.stack[-1].get(flagDiacritic.feature) == None:
+                    return False # empty require = require nonempty value
+                else:
+                    return True
+            if self.stack[-1].get(flagDiacritic.feature) == (flagDiacritic.value, True):
+                self.stack.append(self.stack[-1].copy())
+                return True
+            return False
+        if flagDiacritic.operation == 'D': # disallow
+            if flagDiacritic.value == '': # empty disallow
+                if self.stack[-1].get(flagDiacritic.feature) == None:
+                    return True
+                else:
+                    return False
+            if self.stack[-1].get(flagDiacritic.feature) == (flagDiacritic.value, True):
+                return False
+            self.stack.append(self.stack[-1].copy())
+            return True
+        if flagDiacritic.operation == 'C': # clear
+            self.stack.append(self.stack[-1].copy())
+            if flagDiacritic.feature in self.stack[-1]:
+                del self.stack[-1][flagDiacritic.feature]
+            return True
+        if flagDiacritic.operation == 'U': # unification
+            if not flagDiacritic.feature in self.stack[-1] or \
+                    self.stack[-1][flagDiacritic.feature] == (flagDiacritic.value, True) or \
+                    (self.stack[-1][flagDiacritic.feature][1] == False and \
+                         self.stack[-1][flagDiacritic.feature][0] != flagDiacritic.value):
+                self.stack.append(self.stack[-1].copy())
+                self.stack[-1][flagDiacritic.feature] = (flagDiacritic.value, True)
+                return True
+            return False
+
 def match(transitionSymbol, inputSymbol):
     """Utility function to check whether we want to traverse a transition/index"""
     if transitionSymbol == NO_SYMBOL_NUMBER:
