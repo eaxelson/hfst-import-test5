@@ -5,6 +5,13 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 2.4.1
+---------------------------
+
+* Fixed inclusion path in pkg-config file
+
+* Fixed extraneous epsilon path in hfst-lexc transducers
+
 Noteworthy changes in release 2.4
 ---------------------------------
 
