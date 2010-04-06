@@ -1,3 +1,44 @@
+2010-03-22 17:15  mie
+
+	* : Also, start from empty in rebuilding phase
+
+2010-03-22 17:09  mie
+
+	* : Start building from *empty(), not *epsilon()
+
+2010-03-22 14:27  moshagen
+
+	* : A few more files to ignore.
+
+2010-03-22 08:54  hardwick
+
+	* : Increased buffer sizes in optimized-lookup
+
+2010-03-17 05:25  mie
+
+	* : optimizations by cppcheck, thanks to Harri Pitkänen for heads
+	  up on the tool
+
+2010-03-16 12:43  mpsilfve
+
+	* : Changed InputReader so that it has a larger buffer
+
+2010-03-15 02:35  mie
+
+	* : still broken eliminate-flags with buggy regexes
+
+2010-03-15 02:33  mie
+
+	* : Remove hfst2 from include path. patch by Harri Pitkänen§
+
+2010-03-03 00:14  mie
+
+	* : Update docs for pending release
+
+2010-03-02 03:05  mie
+
+	* : Move FlagDiacritic code to the library
+
 2010-02-24 23:55  mie
 
 	* : Combine substring points
