@@ -198,9 +198,20 @@ namespace hfst
 	// no need to harmonize as foma's functions take care of harmonizing
 	break;
       case (TROPICAL_OFST_TYPE):
-	tropical_ofst_interface.harmonize(this->implementation.tropical_ofst,
-					  another.implementation.tropical_ofst);
-	break;
+	{
+	  std::pair <fst::StdVectorFst*, fst::StdVectorFst*> result;
+	  result =
+	    tropical_ofst_interface.harmonize(this->implementation.tropical_ofst,
+					      another.implementation.tropical_ofst);
+	  fprintf(stderr, "(1)\n");
+	  this->implementation.tropical_ofst = result.first;
+	  fprintf(stderr, "(2)\n");
+	  another.implementation.tropical_ofst = result.second;
+	  fprintf(stderr, "(3)\n");
+	  this->print();
+	  another.print();
+	  break;
+	}
       case (LOG_OFST_TYPE):
 	// must be implemented
 	break;
@@ -1065,6 +1076,30 @@ type(type),anonymous(false),is_trie(false)
     delete t;
   }
   */
+
+void HfstTransducer::print(void) 
+  {
+    switch (this->type)
+      {
+      case FOMA_TYPE:
+	throw hfst::exceptions::FunctionNotImplementedException();
+	break;
+      case SFST_TYPE:
+	throw hfst::exceptions::FunctionNotImplementedException();
+	break;
+      case TROPICAL_OFST_TYPE:
+	this->tropical_ofst_interface.print_test
+	  (this->implementation.tropical_ofst);
+	break;
+      case LOG_OFST_TYPE:
+	throw hfst::exceptions::FunctionNotImplementedException();
+	break;
+      case UNSPECIFIED_TYPE:
+      case ERROR_TYPE:
+      default:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+     }
+  }
 
   std::ostream &operator<<(std::ostream &out,HfstTransducer &t)
   {

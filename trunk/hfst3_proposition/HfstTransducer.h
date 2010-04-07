@@ -166,6 +166,8 @@ namespace hfst
     HfstTransducer(const std::string &symbol, ImplementationType type);
     HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type);
 
+    void print(void);
+
     HfstTransducer &remove_epsilons(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &determinize(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &minimize(ImplementationType type=UNSPECIFIED_TYPE);

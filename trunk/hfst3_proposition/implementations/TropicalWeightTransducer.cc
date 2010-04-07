@@ -58,6 +58,25 @@ namespace hfst { namespace implementations
     return;
   }
 
+  /* For debugging. */
+  void TropicalWeightTransducer::print_test(StdVectorFst *t) 
+  {
+
+    SymbolTable *sym = t->InputSymbols(); 
+    for (fst::StateIterator<StdVectorFst> siter(*t); 
+	 not siter.Done(); siter.Next())
+      {
+	StateId s = siter.Value();
+	for (fst::ArcIterator<StdVectorFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+	  {
+	    const StdArc &arc = aiter.Value();
+	    fprintf(stderr, "%i\t%i\t%s\t%s\t%f\n", (int)s, (int)arc.nextstate, sym->Find(arc.ilabel).c_str(), sym->Find(arc.olabel).c_str(), arc.weight.Value());
+	  }
+	if (t->Final(s) != TropicalWeight::Zero())
+	  fprintf(stderr, "%i\t%f\n", (int)s, t->Final(s).Value());
+      }
+  }
+
   /* 
      Create a copy of this transducer where all transitions of type "?:?", "?:x" and "x:?"
      are expanded according to the StringSymbolSet 'unknown' that lists all symbols previously
@@ -65,7 +84,7 @@ namespace hfst { namespace implementations
   */
   StdVectorFst * TropicalWeightTransducer::expand_arcs(StdVectorFst * t, StringSymbolSet &unknown)
   {
-    (void)unknown;  // REMOVE THIS !!!
+    //fprintf(stderr, "TropicalWeightTransducer::expand_arcs...\n");
     StdVectorFst * result = new StdVectorFst();
     std::map<StateId,StateId> state_map;   // maps states of this to states of result
 
@@ -73,10 +92,19 @@ namespace hfst { namespace implementations
     for (fst::StateIterator<StdVectorFst> siter(*t); 
 	 not siter.Done(); siter.Next())
       {
-	// create new state in result
+	// create new state in result, if needed
 	StateId s = siter.Value();
-	StateId result_s = result->AddState();
-	state_map[s] = result_s;
+	StateId result_s;
+	{
+	map<StateId,StateId>::const_iterator it = state_map.find(s); 
+	if ( it == state_map.end() )
+	      {
+		result_s = result->AddState();
+		state_map[s] = result_s;
+	      }
+	    else 
+	      result_s = it->second;
+	}
 
 	// make the new state initial, if needed
 	if (t->Start() == s)
@@ -105,34 +133,75 @@ namespace hfst { namespace implementations
 
 	    // expand the transitions, if needed
 	    
-#ifdef foo
+	    fst::SymbolTable *is = t->InputSymbols(); 
+
+	    //fprintf(stderr, "ilabel: %i,    olabel: %i\n", arc.ilabel, arc.olabel);
+
 	    if ( arc.ilabel == 1 &&       // cross-product "?:?"
 		 arc.olabel == 1 )
 	      {
+		for (StringSymbolSet::iterator it1 = unknown.begin(); it1 != unknown.end(); it1++) 
+		  {
+		    //fprintf(stderr, "cross-product ?:?\n");
+		    int64 inumber = is->Find(*it1);
+		    for (StringSymbolSet::iterator it2 = unknown.begin(); it2 != unknown.end(); it2++) 
+		      {
+			int64 onumber = is->Find(*it2);
+			if (inumber != onumber)
+			  result->AddArc(result_s, StdArc(inumber, onumber, arc.weight, result_nextstate));
+		      }
+		    result->AddArc(result_s, StdArc(inumber, 1, arc.weight, result_nextstate));
+		    result->AddArc(result_s, StdArc(1, inumber, arc.weight, result_nextstate));
+		  }
 	      }
 	    else if (arc.ilabel == 2 &&   // identity "?:?"
 		     arc.olabel == 2 )       
 	      {
+		//fprintf(stderr, "identity ?:?\n");
+		for (StringSymbolSet::iterator it = unknown.begin(); it != unknown.end(); it++) 
+		  {
+		    int64 number = is->Find(*it);
+		    result->AddArc(result_s, StdArc(number, number, arc.weight, result_nextstate));
+		    //fprintf(stderr, "added transition %i:%i\n", (int)number, (int)number);
+		  }
 	      }
-	    else if (false)  // "?:x"
+	    else if (arc.ilabel == 1)  // "?:x"
 	      {
+		//fprintf(stderr, "?:x\n");
+		for (StringSymbolSet::iterator it = unknown.begin(); it != unknown.end(); it++) 
+		  {
+		    int64 number = is->Find(*it);
+		    result->AddArc(result_s, StdArc(number, arc.olabel, arc.weight, result_nextstate));
+		    //fprintf(stderr, "added transition %i:%i\n", (int)number, (int)arc.olabel);
+		  }
 	      }
-	    else if (false)  // "x:?"
+	    else if (arc.olabel == 1)  // "x:?"
 	      {
+		//fprintf(stderr, "x:?\n");
+		for (StringSymbolSet::iterator it = unknown.begin(); it != unknown.end(); it++) 
+		  {
+		    int64 number = is->Find(*it);
+		    result->AddArc(result_s, StdArc(arc.ilabel, number, arc.weight, result_nextstate));
+		    //fprintf(stderr, "added transition %i:%i\n", (int)arc.ilabel, (int)number);
+		  }
 	      }
-	    else             // "x:y", no need to expand
-	      {
-#endif
-	      result->AddArc(result_s, StdArc(arc.ilabel, arc.olabel, arc.weight, result_nextstate));		
-		//}
+
+	    // the original transition is copied in all cases
+	    result->AddArc(result_s, StdArc(arc.ilabel, arc.olabel, arc.weight, result_nextstate));		
+	    
 	  }
       }
+    result->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ) );
+
     return result;
   }
 
-  void TropicalWeightTransducer::harmonize 
-  (StdVectorFst * t1, StdVectorFst * t2)
+  std::pair<StdVectorFst*, StdVectorFst*> TropicalWeightTransducer::harmonize 
+  (StdVectorFst *t1, StdVectorFst *t2)
   {
+
+    // fprintf(stderr, "TWT::harmonize...\n");
+
     // 1. Calculate the set of unknown symbols for transducers t1 and t2.
 
     StringSymbolSet unknown_t1;    // symbols known to another but not this
@@ -148,6 +217,7 @@ namespace hfst { namespace implementations
     for ( StringSymbolSet::const_iterator it = unknown_t2.begin();
 	  it != unknown_t2.end(); it++ ) {
 	t2->InputSymbols()->AddSymbol(*it);
+	//fprintf(stderr, "added %s to the set of symbols unknown to t2\n", (*it).c_str());
     }
     // ...calculate the number mappings needed in harmonization...
     KeyMap km = create_mapping(t1, t2);
@@ -164,17 +234,19 @@ namespace hfst { namespace implementations
     // 3. Calculate the set of symbol pairs to which a non-identity "?:?"
     //    transition is expanded for both transducers.
     
-    fst::StdVectorFst *temp;
+    fst::StdVectorFst *harmonized_t1;
+    fst::StdVectorFst *harmonized_t2;
 
-    temp = expand_arcs(t1, unknown_t1);
+    harmonized_t1 = expand_arcs(t1, unknown_t1);
     delete t1;
-    t1 = temp;
 
-    temp = expand_arcs(t2, unknown_t2);
+    harmonized_t2 = expand_arcs(t2, unknown_t2);
     delete t2;
-    t2 = temp;
 
-    return;
+    // fprintf(stderr, "...TWT::harmonize\n");
+
+    return std::pair<StdVectorFst*, StdVectorFst*>(harmonized_t1, harmonized_t2);
+
   }
 
 
@@ -915,10 +987,16 @@ namespace hfst { namespace implementations
   }
 
   StdVectorFst * TropicalWeightTransducer::disjunct(StdVectorFst * t1,
-			  StdVectorFst * t2)
+						    StdVectorFst * t2)
   {
+    fprintf(stderr, "disjunct...\n");
     UnionFst<StdArc> disjunct(*t1,*t2);
-    return new StdVectorFst(disjunct);
+    fprintf(stderr, "(1)\n");
+    StdVectorFst *result = new StdVectorFst(disjunct);
+    fprintf(stderr, "(2)\n");
+    result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    fprintf(stderr, "...disjunct\n");
+    return result;
   }
 
   StdVectorFst * TropicalWeightTransducer::intersect(StdVectorFst * t1,

@@ -157,8 +157,9 @@ namespace implementations
       //static const_iterator begin(StdVectorFst * t);
       //static const_iterator end(StdVectorFst * t);
       //static StdVectorFst * harmonize(StdVectorFst * t,KeyMap &key_map);
-      static void harmonize(StdVectorFst *t1, StdVectorFst *t2);
+      static std::pair<StdVectorFst*, StdVectorFst*> harmonize(StdVectorFst *t1, StdVectorFst *t2);
       static void print(StdVectorFst * t, KeyTable &key_table, ostream &out);
+      static void print_test(StdVectorFst * t);
 
     protected:
       static StringSymbolSet get_string_symbol_set(StdVectorFst *t);

@@ -225,7 +225,6 @@ namespace hfst
    HfstTransducer &another,
    ImplementationType type)
   {
-    fprintf(stderr, "apply: begins...\n");
     if (type != UNSPECIFIED_TYPE)
       {
 	convert(type);
@@ -236,8 +235,12 @@ namespace hfst
       { convert(another.type); }
 
     // added
-    fprintf(stderr, "apply: harmonizing...\n");
     this->harmonize(another);
+
+    fprintf(stderr, "harmonized\n");
+
+    this->print();
+    another.print();
 
     switch (this->type)
       {
@@ -252,7 +255,7 @@ namespace hfst
       case TROPICAL_OFST_TYPE:
 	{
 	  fst::StdVectorFst * tropical_ofst_temp =
-	    tropical_ofst_funct(implementation.tropical_ofst,
+	    tropical_ofst_funct(this->implementation.tropical_ofst,
 				another.implementation.tropical_ofst);
 	  delete implementation.tropical_ofst;
 	  implementation.tropical_ofst = tropical_ofst_temp;
@@ -280,6 +283,9 @@ namespace hfst
 	default:
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
       }
+
+    this->print();
+
     return *this;
   }
 }
