@@ -178,10 +178,16 @@ namespace hfst { namespace implementations
       //static Transducer * harmonize(Transducer * t,KeyMap &key_map);
       static void print(Transducer * t, KeyTable &key_table, ostream &out);
 
-      static void harmonize(Transducer * t1, Transducer * t2);
+      static std::pair<Transducer*, Transducer*> harmonize(Transducer *t1, Transducer *t2);
+
+      // remove this
+      //static void harmonize(Transducer * t1, Transducer * t2);
 
       // see if these can be removed
-      static StringSymbolSet get_string_symbol_set(Transducer * t);
       static KeyMap create_mapping(Transducer * t1, Transducer * t2, StringSymbolSet &unknown2);
+
+    protected:
+      static StringSymbolSet get_string_symbol_set(Transducer *t);
+      static Transducer * expand_arcs(Transducer * t, StringSymbolSet &unknown);
     };
 } }

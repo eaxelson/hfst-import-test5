@@ -8,7 +8,7 @@ SFST_DIR=implementations/SFST/src
 
 SFST_OBJS=$(SFST_DIR)/fst.o $(SFST_DIR)/basic.o $(SFST_DIR)/utf8.o \
 $(SFST_DIR)/operators.o $(SFST_DIR)/interface.o $(SFST_DIR)/determinise.o \
-$(SFST_DIR)/alphabet.o
+$(SFST_DIR)/alphabet.o $(SFST_DIR)/expand.o
 
 OFST_OBJS=./implementations/openfst-1.1/src/lib/*.o
 

@@ -188,12 +188,23 @@ namespace hfst
       {
 	throw hfst::exceptions::TransducerHasWrongTypeException();
       }
+
     switch(this->type)
       {
       case (SFST_TYPE):
-	sfst_interface.harmonize(this->implementation.sfst,
-				 another.implementation.sfst);
-	break;
+	{
+	  //sfst_interface.harmonize(this->implementation.sfst,
+	  //		 another.implementation.sfst);
+	  std::pair <SFST::Transducer*, SFST::Transducer*> result;
+	  result =
+	    sfst_interface.harmonize(this->implementation.sfst,
+				     another.implementation.sfst);
+	  this->implementation.sfst = result.first;
+	  another.implementation.sfst = result.second;
+	  //this->print();
+	  //another.print();
+	  break;
+	}
       case (FOMA_TYPE):
 	// no need to harmonize as foma's functions take care of harmonizing
 	break;
@@ -203,13 +214,8 @@ namespace hfst
 	  result =
 	    tropical_ofst_interface.harmonize(this->implementation.tropical_ofst,
 					      another.implementation.tropical_ofst);
-	  fprintf(stderr, "(1)\n");
 	  this->implementation.tropical_ofst = result.first;
-	  fprintf(stderr, "(2)\n");
 	  another.implementation.tropical_ofst = result.second;
-	  fprintf(stderr, "(3)\n");
-	  this->print();
-	  another.print();
 	  break;
 	}
       case (LOG_OFST_TYPE):
@@ -830,14 +836,14 @@ type(type),anonymous(false),is_trie(false)
   (HfstTransducer &another,
    ImplementationType type)
   { //harmonize(another);
-    if (is_trie and another.is_trie)
+    /*if (is_trie and another.is_trie)
       {
 	try
 	  { disjunct_as_tries(another,type); 
 	    return *this; }
 	catch (hfst::exceptions::FunctionNotImplementedException e) {}
 	catch (hfst::exceptions::HfstInterfaceException e) { throw e; }
-      }
+      }*/
     is_trie = false;
     return apply(&hfst::implementations::SfstTransducer::disjunct,
 		 &hfst::implementations::TropicalWeightTransducer::disjunct,
@@ -996,10 +1002,8 @@ type(type),anonymous(false),is_trie(false)
 	switch (this->type)
 	  {
 	  case FOMA_TYPE:
-	    fprintf(stderr, "foma_to_internal_format...\n");
 	    internal =
 	      hfst::implementations::foma_to_internal_format(implementation.foma);
-	    fprintf(stderr, "...foma_to_internal_format\n");
 	    delete implementation.foma;
 	    break;
 	  case SFST_TYPE:
@@ -1020,7 +1024,7 @@ type(type),anonymous(false),is_trie(false)
 	default:
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
 	  }
-	fprintf(stderr, "convert: middle\n");
+
 	this->type = type;
 	switch (this->type)
 	  {

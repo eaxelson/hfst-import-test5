@@ -167,7 +167,7 @@ namespace hfst { namespace implementations {
       }
   }
   
-
+#ifdef foo
   void SfstTransducer::harmonize(Transducer * t1, Transducer * t2)
   {
     Transducer * new_t1 = &t1->copy(false, &t2->alphabet);
@@ -176,6 +176,76 @@ namespace hfst { namespace implementations {
     t1 = new_t1;
     return;
   }
+#endif
+
+  Transducer * SfstTransducer::expand_arcs(Transducer * t, StringSymbolSet &unknown)
+  {
+    return &t->expand(unknown);
+  }
+
+
+  std::pair<Transducer*, Transducer*> SfstTransducer::harmonize 
+  (Transducer *t1, Transducer *t2) 
+  {
+
+    // 1. Calculate the set of unknown symbols for transducers t1 and t2.
+
+    StringSymbolSet unknown_t1;    // symbols known to another but not this
+    StringSymbolSet unknown_t2;    // and vice versa
+    StringSymbolSet t1_symbols = get_string_symbol_set(t1);
+    StringSymbolSet t2_symbols = get_string_symbol_set(t2);
+    KeyTable::collect_unknown_sets(t1_symbols, unknown_t1,
+				   t2_symbols, unknown_t2);
+
+    fprintf(stderr, "  t1's alphabet:\n");
+    t1->alphabet.print();
+    fprintf(stderr, "  t2's alphabet:\n");
+    t2->alphabet.print();
+
+    Transducer * new_t1 = &t1->copy(false, &t2->alphabet);
+    t2->alphabet.insert_symbols(new_t1->alphabet);
+    delete t1;
+    t1 = new_t1;
+
+#ifdef foo
+    // 2. Add new symbols from transducer t1 to the symbol table of transducer t2...
+
+    for ( StringSymbolSet::const_iterator it = unknown_t2.begin();
+	  it != unknown_t2.end(); it++ ) {
+	t2->InputSymbols()->AddSymbol(*it);
+	//fprintf(stderr, "added %s to the set of symbols unknown to t2\n", (*it).c_str());
+    }
+    // ...calculate the number mappings needed in harmonization...
+    KeyMap km = create_mapping(t1, t2);
+
+    // ... replace the symbol table of t1 with a copy of t2's symbol table
+    delete t1->InputSymbols();
+    t1->SetInputSymbols( new fst::SymbolTable(*(t2->InputSymbols())) );
+
+    // ...and recode the symbol numbers of transducer t1 so that
+    //    it follows the new symbol table.
+    recode_symbol_numbers(t1, km);
+#endif
+
+
+    // 3. Calculate the set of symbol pairs to which a non-identity "?:?"
+    //    transition is expanded for both transducers.
+    
+    Transducer *harmonized_t1;
+    Transducer *harmonized_t2;
+
+    harmonized_t1 = expand_arcs(t1, unknown_t1);
+    delete t1;
+
+    harmonized_t2 = expand_arcs(t2, unknown_t2);
+    delete t2;
+
+    // fprintf(stderr, "...TWT::harmonize\n");
+
+    return std::pair<Transducer*, Transducer*>(harmonized_t1, harmonized_t2);
+
+  }
+
 
 #ifdef foo
   Transducer * SfstTransducer::harmonize(Transducer * t, KeyMap &key_map)

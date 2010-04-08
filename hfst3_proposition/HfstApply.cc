@@ -229,18 +229,13 @@ namespace hfst
       {
 	convert(type);
 	if (type != another.type)
-	  { another = HfstTransducer(another).convert(type); }
+	  { another.convert(type); }
       }
     else if (this->type != another.type)
       { convert(another.type); }
 
     // added
     this->harmonize(another);
-
-    fprintf(stderr, "harmonized\n");
-
-    this->print();
-    another.print();
 
     switch (this->type)
       {
@@ -283,8 +278,6 @@ namespace hfst
 	default:
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
       }
-
-    this->print();
 
     return *this;
   }

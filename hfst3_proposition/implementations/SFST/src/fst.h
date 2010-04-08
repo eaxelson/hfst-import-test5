@@ -14,6 +14,10 @@
 
 #include "alphabet.h"
 
+// HFST addition
+#include "../../SymbolDefs.h"
+using namespace hfst::symbols;
+
 
 /*******************************************************************/
 /* include commands                                                */
@@ -315,6 +319,11 @@ class Transducer {
   Transducer( FILE*, bool binary=true );
   // turns a sequence of labels into a transducer
   Transducer( std::vector<Label>& );
+
+  // HFST addition
+  Transducer &expand( StringSymbolSet &s );
+  Node *expand_nodes( Node *node, Transducer *a, StringSymbolSet &s );
+  void expand_node( Node *origin, Label &l, Node *target, Transducer *a, StringSymbolSet &s );
 
   Node *root_node( void ) { return &root; };  // returns the root node
   const Node *root_node( void ) const { return &root; };  // returns the root node

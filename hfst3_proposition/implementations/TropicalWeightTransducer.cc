@@ -191,8 +191,8 @@ namespace hfst { namespace implementations
 	    
 	  }
       }
-    result->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ) );
 
+    result->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ) );
     return result;
   }
 
@@ -976,26 +976,26 @@ namespace hfst { namespace implementations
 			 StdVectorFst * t2)
   {
     ComposeFst<StdArc> compose(*t1,*t2);
-    return new StdVectorFst(compose);
+    StdVectorFst *result = new StdVectorFst(compose); 
+    result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    return result;
   }
 
   StdVectorFst * TropicalWeightTransducer::concatenate(StdVectorFst * t1,
 						       StdVectorFst * t2)
   {
     ConcatFst<StdArc> concatenate(*t1,*t2);
-    return new StdVectorFst(concatenate);
+    StdVectorFst *result = new StdVectorFst(concatenate); 
+    result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    return result;
   }
 
   StdVectorFst * TropicalWeightTransducer::disjunct(StdVectorFst * t1,
 						    StdVectorFst * t2)
   {
-    fprintf(stderr, "disjunct...\n");
     UnionFst<StdArc> disjunct(*t1,*t2);
-    fprintf(stderr, "(1)\n");
     StdVectorFst *result = new StdVectorFst(disjunct);
-    fprintf(stderr, "(2)\n");
     result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
-    fprintf(stderr, "...disjunct\n");
     return result;
   }
 
@@ -1003,14 +1003,18 @@ namespace hfst { namespace implementations
 			   StdVectorFst * t2)
   {
     IntersectFst<StdArc> intersect(*t1,*t2);
-    return new StdVectorFst(intersect);
+    StdVectorFst *result = new StdVectorFst(intersect); 
+    result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    return result;
   }
 
   StdVectorFst * TropicalWeightTransducer::subtract(StdVectorFst * t1,
 			  StdVectorFst * t2)
   {
     DifferenceFst<StdArc> subtract(*t1,*t2);
-    return new StdVectorFst(subtract);
+    StdVectorFst *result = new StdVectorFst(subtract); 
+    result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    return result;
   }
 
   StdVectorFst * TropicalWeightTransducer::set_weight(StdVectorFst * t,float f)
