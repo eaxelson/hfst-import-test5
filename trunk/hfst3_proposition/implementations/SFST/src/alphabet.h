@@ -181,8 +181,9 @@ class Alphabet {
   const_iterator end() const { return ls.end(); };
   size_t size() const { return ls.size(); };
 
-  // HFST addition
+  // HFST additions
   CharMap get_char_map(void) { return cm; };
+  void print(void);
 
   void clear();
   void clear_char_pairs() { ls.clear(); };

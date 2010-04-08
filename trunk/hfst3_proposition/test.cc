@@ -52,7 +52,7 @@ int main(int argc, char **argv) {
 
   fprintf(stderr, "disjunction:\n");
 
-  HfstTransducer DISJ = T1.disjunct(T2, TROPICAL_OFST_TYPE);
+  HfstTransducer DISJ = T1.disjunct(T2, SFST_TYPE);
 
   fprintf(stderr, "disjunction done\n");
 

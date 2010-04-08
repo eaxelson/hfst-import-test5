@@ -86,6 +86,14 @@ void Alphabet::clear()
   delete[] s;
 }
 
+// HFST addition
+void Alphabet::print(void)
+{
+  for( CharMap::iterator it=cm.begin(); it!=cm.end(); it++ )
+    fprintf(stderr, "%i\t%s\n", it->first, it->second);
+  return;
+}
+
 
 /*******************************************************************/
 /*                                                                 */
@@ -325,8 +333,9 @@ const char *Alphabet::write_label( Label l, bool with_brackets  ) const
 void Alphabet::insert_symbols( const Alphabet &a )
 
 {
-  for( CharMap::const_iterator it=a.cm.begin(); it!=a.cm.end(); it++ )
+  for( CharMap::const_iterator it=a.cm.begin(); it!=a.cm.end(); it++ ) {
     add_symbol(it->second, it->first);
+  }
 }
 
 
