@@ -5,6 +5,10 @@
  * @todo maybe replace with glib?
  */
 
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include <iostream>
 #include <cmath>
 #include <climits>
@@ -222,11 +226,14 @@ hfst_getline(char** lineptr, size_t* n, FILE* stream)
 # define GETLINE_BUFFER 65535
   size_t max_line = *n;
   ssize_t rv = 0;
-  if (*lineptr != NULL)
+  if (*lineptr == NULL)
     {
-      free(*lineptr);
+      *lineptr = static_cast<char*>(calloc(sizeof(char), GETLINE_BUFFER));
     }
-  *lineptr = static_cast<char*>(calloc(sizeof(char), GETLINE_BUFFER));
+  else
+    {
+      *lineptr = static_cast<char*>(realloc(sizeof(char), GETLINE_BUFFER));
+    }
   max_line = GETLINE_BUFFER;
   *lineptr = fgets(*lineptr, max_line, stream);
   if (*lineptr == NULL)

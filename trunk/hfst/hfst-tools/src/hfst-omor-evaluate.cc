@@ -938,7 +938,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 			HWFST::define_flag_diacritics(key_table);
 			VERBOSE_PRINT("\n");
 			size_t len;
-            char* line;
+            char* line = 0;
 			while ((hfst_getline(&line, &len, relation_file)) != -1)
 			{
 				char *p = line;
@@ -972,7 +972,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				set<HWFST::KeyVector> expectedLines;
                 size_t expLen;
                 ssize_t readBytes;
-				char* expectedLine; 
+				char* expectedLine = 0; 
 				readBytes = hfst_getline(&expectedLine, &expLen, relation_file);
 				while ((readBytes != -1) &&
 						(strcmp(expectedLine, "\n") != 0))
