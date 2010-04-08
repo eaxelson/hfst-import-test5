@@ -268,7 +268,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				}
 				if (from_file != 0)
 				{
-					char* line;
+					char* line = 0;
                     size_t len;
 					while (hfst_getline(&line, &len, from_file) != -1)
 					{
@@ -304,8 +304,8 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 						HFST::Key to_key = HFST::stringToKey(to_label,
 								key_table);
 						input = HFST::substitute_key(input, from_key, to_key);
-						delete from_label;
-						delete to_label;
+						free(from_label);
+						free(to_label);
 					} // while line
                     free(line);
 				}
@@ -398,7 +398,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				}
 				if (from_file != 0)
 				{
-					char* line;
+					char* line = 0;
                     size_t len;
 					while (hfst_getline(&line, &len, from_file) != -1)
 					{
@@ -434,8 +434,8 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 						HWFST::Key to_key = HWFST::stringToKey(to_label,
 								key_table);
 						input = HWFST::substitute_key(input, from_key, to_key);
-						delete from_label;
-						delete to_label;
+						free(from_label);
+						free(to_label);
 					} // while line
 				    free(line);
                 }
