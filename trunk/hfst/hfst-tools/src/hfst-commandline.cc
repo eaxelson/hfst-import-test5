@@ -232,7 +232,7 @@ hfst_getline(char** lineptr, size_t* n, FILE* stream)
     }
   else
     {
-      *lineptr = static_cast<char*>(realloc(sizeof(char), GETLINE_BUFFER));
+      *lineptr = static_cast<char*>(realloc(lineptr, GETLINE_BUFFER));
     }
   max_line = GETLINE_BUFFER;
   *lineptr = fgets(*lineptr, max_line, stream);
