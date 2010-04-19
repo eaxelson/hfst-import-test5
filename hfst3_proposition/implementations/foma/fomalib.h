@@ -22,6 +22,8 @@ extern "C" {
 #include <inttypes.h>
 #include <string.h>
 
+#include "zlib.h"
+
 #define FEXPORT __attribute__((visibility("default")))
 
 /* Special symbols on arcs */
@@ -155,7 +157,7 @@ FEXPORT int io_buf_is_end(void);
 FEXPORT void io_free(void);
 FEXPORT size_t io_gz_file_to_mem (char *filename);
 FEXPORT struct fsm *io_net_read(char **net_name);
-
+FEXPORT int foma_net_print(struct fsm *net, gzFile *outfile);
 
 FEXPORT struct fsm *fsm_determinize(struct fsm *net);
 FEXPORT struct fsm *fsm_epsilon_remove(struct fsm *net);
