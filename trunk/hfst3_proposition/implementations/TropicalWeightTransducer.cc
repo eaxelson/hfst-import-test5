@@ -1152,8 +1152,41 @@ namespace hfst { namespace implementations
     return;
   }
 
+
+
+  TropicalWeightOutputStream::TropicalWeightOutputStream(void):
+    output_stream(std::cout)
+  {}
+
+  TropicalWeightOutputStream::TropicalWeightOutputStream(const char * str):
+    filename(str),o_stream(str,std::ios::out),output_stream(o_stream)
+  {}
+
+  void TropicalWeightOutputStream::write_3_0_library_header(std::ostream &out)
+  {
+    out.write("HFST3",6);
+    out.put(0);
+    out.write("TROPICAL_OFST_TYPE",19);
+  }
+
+  void TropicalWeightOutputStream::write_transducer(StdVectorFst * transducer) 
+  { write_3_0_library_header(output_stream);
+    transducer->Write(output_stream,FstWriteOptions()); }
+
+  void TropicalWeightOutputStream::open(void) {}
+
+  void TropicalWeightOutputStream::close(void) 
+  {
+    if (filename != string())
+      { o_stream.close(); }
+  }
   }
 }
+
+  
+
+
+
 
 #ifdef DEBUG_MAIN
 using namespace hfst::implementations;

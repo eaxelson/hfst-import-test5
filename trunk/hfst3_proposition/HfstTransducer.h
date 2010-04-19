@@ -91,18 +91,20 @@ namespace hfst
     union StreamImplementation
     {
       hfst::implementations::LogWeightOutputStream * log_ofst;
-      //hfst::implementations::TropicalWeightOutputStream * tropical_ofst;
-      //hfst::implementations::SfstOutputStream * sfst_ofst;
-      hfst::implementations::FomaOutputStream * foma_ofst;
+      hfst::implementations::TropicalWeightOutputStream * tropical_ofst;
+      hfst::implementations::SfstOutputStream * sfst;
+      hfst::implementations::FomaOutputStream * foma;
     };
     ImplementationType type;
     StreamImplementation implementation;
 
   public:
-    HfstOutputStream(ImplementationType type);
-    HfstOutputStream(const std::string &filename,ImplementationType type);
-    ~HfstOutputStream(void);
-    HfstOutputStream &operator<< (HfstTransducer &transducer);
+    HfstOutputStream(ImplementationType type);  // stdout
+    HfstOutputStream(const std::string &filename,ImplementationType type);  // file
+    ~HfstOutputStream(void);  
+    HfstOutputStream &operator<< (HfstTransducer &transducer);  // binary write
+    void open(void);
+    void close(void);
   };
 
 
