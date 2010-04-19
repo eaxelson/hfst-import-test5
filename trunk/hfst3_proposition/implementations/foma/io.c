@@ -49,7 +49,7 @@ static size_t io_get_gz_file_size(char *filename);
 static size_t io_get_file_size(char *filename);
 static size_t io_get_regular_file_size(char *filename);
 size_t io_gz_file_to_mem (char *filename);
-int foma_net_print(struct fsm *net, gzFile *outfile);
+//int foma_net_print(struct fsm *net, gzFile *outfile);
 struct fsm *io_net_read(char **net_name);
 static inline int explode_line (char *buf, int *values);
 
