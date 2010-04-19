@@ -345,6 +345,44 @@ namespace hfst { namespace implementations {
       }
     return NULL;
   };
+
+
+  // ---------- SfstOutputStream functions ----------
+
+  SfstOutputStream::SfstOutputStream(void)
+  {}
+  SfstOutputStream::SfstOutputStream(const char * str):
+    filename(str)
+  {}
+  void SfstOutputStream::open(void) {
+    if (filename != std::string()) {
+      ofile = fopen(filename.c_str(), "wb");
+      if (ofile == NULL)
+	throw FileNotReadableException();
+    } 
+    else {
+      ofile = stdout;
+    }
+  }
+  void SfstOutputStream::close(void) 
+  {
+    if (filename != std::string())
+      { fclose(ofile); }
+  }
+  void SfstOutputStream::write_3_0_library_header(FILE *file)
+  {
+    fputs("HFST3",file);
+    fputc(0, file);
+    fputs("SFST_TYPE",file);
+  }
+  void SfstOutputStream::write_transducer(Transducer * transducer) 
+  { 
+    write_3_0_library_header(ofile);
+    transducer->store(ofile); 
+  }
+
+  // ------------------------------------------------
+
   
   SfstState::SfstState(Node * state, Transducer * t) 
   { 

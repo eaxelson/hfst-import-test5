@@ -44,6 +44,20 @@ namespace hfst { namespace implementations
     Transducer * read_transducer(KeyTable &key_table);
     Transducer * read_transducer(void);
   };
+
+  class SfstOutputStream 
+  {
+  private:
+    std::string filename;
+    FILE *ofile;
+    void write_3_0_library_header(FILE *file);
+  public:
+    SfstOutputStream(void); 
+    SfstOutputStream(const char * filename);
+    void open(void);
+    void close(void);
+    void write_transducer(Transducer * transducer);
+  };
   
   class SfstTransitionIterator;
   class SfstStateIndexer;

@@ -1,5 +1,7 @@
 #include "FomaTransducer.h"
 
+int foma_net_print(struct fsm *net, gzFile *outfile);
+
 #ifdef DEBUG
 #include <cassert>
 #endif
@@ -130,48 +132,44 @@ namespace hfst { namespace implementations {
     return t;
   };
 
-    /*
-  FomaOutputStream::FomaOutputStream(void):
-    output_stream(std::cout)
-  {}
 
+  // ---------- FomaOutputStream functions ----------
+
+  FomaOutputStream::FomaOutputStream(void)
+  {}
   FomaOutputStream::FomaOutputStream(const char * str):
-    filename(str),o_stream(str,std::ios::out),output_stream(o_stream)
+    filename(str)
   {}
-
-    
-  void FomaOutputStream::open(void) {}
+  void FomaOutputStream::open(void) {
+    if (filename != std::string()) {
+      ofile = gzopen(filename.c_str(), "wb");
+      if (ofile == NULL)
+	throw FileNotReadableException();
+    } 
+    else {
+      ofile = gzopen("/dev/stdout", "wb");
+    }
+  }
   void FomaOutputStream::close(void) 
   {
-    if (filename != string())
-      { o_stream.close(); }
+    if (filename != std::string())
+      { gzclose(ofile); }
   }
-  void FomaOutputStream::set_symbols(fsm * transducer, KeyTable &key_table) 
+  void FomaOutputStream::write_3_0_library_header(gzFile file)
   {
-    SymbolTable symbol_table("anonym_hfst3_symbol_table");
-    for (KeyTable::const_iterator it = key_table.begin();
-	 it != key_table.end();
-	 ++it)
-      { symbol_table.AddSymbol(key_table[it->key],it->key); }
-    transducer->SetInputSymbols(&symbol_table);
-    transducer->SetOutputSymbols(&symbol_table);
+    gzprintf(file, "HFST3");
+    gzputc(file, 0);
+    gzprintf(file, "SFST_TYPE");
   }
-  void FomaOutputStream::write_3_0_library_header(std::ostream &out)
-  {
-    out.write("HFST3",6);
-    out.put(0);
-    out.write("LOG_OFST_TYPE",14);
-  }
-  void FomaOutputStream::write_transducer(fsm * transducer, KeyTable &key_table) 
-  { set_symbols(transducer,key_table);
-    write_3_0_library_header(output_stream);
-    transducer->Write(output_stream,FstWriteOptions()); }
-
   void FomaOutputStream::write_transducer(fsm * transducer) 
-  { write_3_0_library_header(output_stream);
-    transducer->Write(output_stream,FstWriteOptions()); }
+  { 
+    write_3_0_library_header(ofile);
+    foma_net_print(transducer, &ofile);
+  }
 
-    */
+  // ------------------------------------------------
+
+
   
   FomaState::FomaState(FomaNode state, fsm * t) 
   { 

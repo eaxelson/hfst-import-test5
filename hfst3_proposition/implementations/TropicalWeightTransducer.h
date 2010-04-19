@@ -48,6 +48,21 @@ namespace implementations
     StdVectorFst * read_transducer(void);
   };
 
+  class TropicalWeightOutputStream 
+  {
+  private:
+    std::string filename;
+    ofstream o_stream;
+    ostream &output_stream;
+    void write_3_0_library_header(std::ostream &out);
+  public:
+    TropicalWeightOutputStream(void); 
+    TropicalWeightOutputStream(const char * filename);
+    void open(void);
+    void close(void);
+    void write_transducer(StdVectorFst * transducer);
+  };
+
   class TropicalWeightTransitionIterator;
 
   typedef StateId TropicalWeightState;
