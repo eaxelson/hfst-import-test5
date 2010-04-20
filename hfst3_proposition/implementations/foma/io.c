@@ -674,6 +674,7 @@ static int io_gets(char *target) {
 }
 
 int foma_net_print(struct fsm *net, gzFile *outfile) {
+
     struct sigma *sigma;
     struct fsm_state *fsm;
     int i, maxsigma, laststate, *cm;
