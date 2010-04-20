@@ -37,22 +37,45 @@ int main(int argc, char **argv) {
   //HfstState initial = t.get_initial_state();
   //cout << "initial state: " << initial << "\n";
 
-  print(t);
-  fprintf(stderr, "--\n");
+  //print(t);
+  //fprintf(stderr, "--\n");
 
   HfstMutableTransducer t2;
   HfstState second_state2 = t2.add_state();
   t2.set_final_weight(second_state2, 0.3);
   t2.add_transition(0, "@_UNKNOWN_SYMBOL_@", "baz", 1.6, second_state2);
 
-  print(t2);
+  //print(t2);
 
-  HfstTransducer T1(t);
+  /*
+  HfstTransducer T(t);
+  T = T.convert(TROPICAL_OFST_TYPE);
+  HfstOutputStream out_tr("tropical.hfst", TROPICAL_OFST_TYPE);
+  out_tr.open();
+  //out_tr << T;
+  out_tr.close();
+  */
+
   HfstTransducer T2(t2);
+  T2 = T2.convert(FOMA_TYPE);
+  HfstOutputStream out_fo("foma.gz", FOMA_TYPE);
+  out_fo.open();
+  out_fo << T2;
+  out_fo.close();
+
+  HfstOutputStream out_fo1(FOMA_TYPE);
+  out_fo1.open();
+  out_fo1 << T2;
+  out_fo1.close();
+
+  return 0;
+
+
+#ifdef foo
 
   fprintf(stderr, "disjunction:\n");
 
-  HfstTransducer DISJ = T1.disjunct(T2, SFST_TYPE);
+  HfstTransducer DISJ = T1.disjunct(T1, SFST_TYPE);
 
   fprintf(stderr, "disjunction done\n");
 
@@ -60,9 +83,8 @@ int main(int argc, char **argv) {
   fprintf(stderr, "converted to mutable\n");
   print(Disj);
 
-  return 0;
 
-  HfstTransducer T(t);
+  //HfstTransducer T(t);
   ImplementationType type = T.get_type();
   //fprintf(stderr, "%i\n", type);
 
@@ -91,4 +113,5 @@ int main(int argc, char **argv) {
   //fprintf(stderr, "main: (6)\n");
   // FIX: calling ~HfstTransducer causes a glibc with foma
   return 0;
+#endif
 }

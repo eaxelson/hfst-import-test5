@@ -1,7 +1,5 @@
 #include "FomaTransducer.h"
 
-int foma_net_print(struct fsm *net, gzFile *outfile);
-
 #ifdef DEBUG
 #include <cassert>
 #endif
@@ -135,7 +133,8 @@ namespace hfst { namespace implementations {
 
   // ---------- FomaOutputStream functions ----------
 
-  FomaOutputStream::FomaOutputStream(void)
+  FomaOutputStream::FomaOutputStream(void):
+    filename(std::string())
   {}
   FomaOutputStream::FomaOutputStream(const char * str):
     filename(str)
@@ -147,13 +146,15 @@ namespace hfst { namespace implementations {
 	throw FileNotReadableException();
     } 
     else {
-      ofile = gzopen("/dev/stdout", "wb");
+      ofile = gzdopen(fileno(stdout), "wb");
+      if (ofile == Z_NULL)
+	throw FileNotReadableException();
     }
   }
   void FomaOutputStream::close(void) 
   {
-    if (filename != std::string())
-      { gzclose(ofile); }
+    // stdout must also be closed in gz!
+    gzclose(ofile);
   }
   void FomaOutputStream::write_3_0_library_header(gzFile file)
   {
@@ -164,7 +165,8 @@ namespace hfst { namespace implementations {
   void FomaOutputStream::write_transducer(fsm * transducer) 
   { 
     write_3_0_library_header(ofile);
-    foma_net_print(transducer, &ofile);
+    // (void**) conversion is needed as foma requires gzFile*
+    foma_net_print(transducer, (void**)ofile);
   }
 
   // ------------------------------------------------
