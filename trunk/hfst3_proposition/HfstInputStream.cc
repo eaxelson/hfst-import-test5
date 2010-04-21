@@ -20,7 +20,7 @@ namespace hfst
 	break;
       case FOMA_TYPE:
 	t.implementation.foma =
-	  this->implementation.foma->read_transducer(t.key_table);
+	  this->implementation.foma->read_transducer();
 	break;
 	  case ERROR_TYPE:
 	  case UNSPECIFIED_TYPE:

@@ -55,8 +55,15 @@ static inline int explode_line (char *buf, int *values);
 
 static char *io_buf = NULL, *io_buf_ptr = NULL;
 
-// HFST additions
-int io_buf_is_end(void) {
+/*   HFST addition begins...  */
+void io_free_hfst(char * io_buf);
+size_t io_gz_file_to_mem_hfst(char *filename, char *io_buf, char *io_buf_ptr);
+struct fsm *io_net_read_hfst(char **net_name, char *io_buf_ptr);
+static int io_gets_hfst(char *target, char * io_buf_ptr);
+/*   ...HFST addition ends.   */
+
+// HFST additions (remove this)
+int io_buf_is_end(char * io_buf_ptr) {
   if (*(io_buf_ptr) == '\0')
     return 1;
   return 0;
@@ -411,6 +418,15 @@ void io_free() {
     }
 }
 
+/*    HFST addition begins...   */
+void io_free_hfst(char * io_buf) {
+    if (io_buf != NULL) {
+        xxfree(io_buf);
+        io_buf = NULL;
+    }
+}
+/*    ...HFST addition ends.    */
+
 struct fsm *fsm_read_binary_file(char *filename) {
     char *net_name;
     struct fsm *net;
@@ -673,6 +689,152 @@ static int io_gets(char *target) {
     return(i);
 }
 
+/*    HFST addition begins... */
+struct fsm *io_net_read_hfst(char **net_name, char *io_buf_ptr) {
+
+    char buf[READ_BUF_SIZE];
+    struct fsm *net;
+    struct fsm_state *fsm;
+    
+    char *new_symbol;
+    int i, items, new_symbol_number, laststate, lineint[5], *cm;
+    char last_final;
+
+    if (io_gets_hfst(buf, io_buf_ptr) == 0) {
+        return NULL;
+    }
+    
+    net = fsm_create("");
+
+    if (strcmp(buf, "##foma-net 1.0##") != 0) {
+        printf("File format error foma!\n");
+        return NULL;
+    }
+    io_gets_hfst(buf, io_buf_ptr);
+    if (strcmp(buf, "##props##") != 0) {
+        printf("File format error props!\n");
+        return NULL;
+    }
+    /* Properties */
+    io_gets_hfst(buf, io_buf_ptr);
+    sscanf(buf, "%i %i %i %i %i %lld %i %i %i %i %i %i %s", &net->arity, &net->arccount, &net->statecount, &net->linecount, &net->finalcount, &net->pathcount, &net->is_deterministic, &net->is_pruned, &net->is_minimized, &net->is_epsilon_free, &net->is_loop_free, &net->is_completed, buf);
+    strcpy(net->name, buf);
+    *net_name = strdup(buf);
+    io_gets_hfst(buf, io_buf_ptr);
+
+    /* Sigma */
+    if (strcmp(buf, "##sigma##") != 0) {
+        printf("File format error sigma!\n");
+        return NULL;
+    }
+    net->sigma = sigma_create();
+    for (;;) {
+      io_gets_hfst(buf, io_buf_ptr);
+        if (buf[0] == '#') break;
+        new_symbol = strstr(buf, " ");
+        new_symbol[0] = '\0';
+        new_symbol++;
+        sscanf(buf,"%i", &new_symbol_number);
+        sigma_add_number(net->sigma, new_symbol, new_symbol_number);
+    }
+    /* States */
+    if (strcmp(buf, "##states##") != 0) {
+        printf("File format error!\n");
+        return NULL;
+    }
+    net->states = xxmalloc(net->linecount*sizeof(struct fsm_state));
+    fsm = net->states;
+    laststate = -1;
+    for (i=0; ;i++) {
+      io_gets_hfst(buf, io_buf_ptr);
+        if (buf[0] == '#') break;
+
+        /* scanf is just too slow here */
+
+        //items = sscanf(buf, "%i %i %i %i %i",&lineint[0], &lineint[1], &lineint[2], &lineint[3], &lineint[4]);
+
+        items = explode_line(buf, &lineint[0]);
+
+        switch (items) {
+        case 2:
+            (fsm+i)->state_no = laststate;
+            (fsm+i)->in = lineint[0];
+            (fsm+i)->out = lineint[0];
+            (fsm+i)->target = lineint[1];
+            (fsm+i)->final_state = last_final;
+            break;
+        case 3:
+            (fsm+i)->state_no = laststate;
+            (fsm+i)->in = lineint[0];
+            (fsm+i)->out = lineint[1];
+            (fsm+i)->target = lineint[2];
+            (fsm+i)->final_state = last_final;
+            break;
+        case 4:
+            (fsm+i)->state_no = lineint[0];
+            (fsm+i)->in = lineint[1];
+            (fsm+i)->out = lineint[1];
+            (fsm+i)->target = lineint[2];
+            (fsm+i)->final_state = lineint[3];
+            laststate = lineint[0];
+            last_final = lineint[3];
+            break;
+        case 5:
+            (fsm+i)->state_no = lineint[0];
+            (fsm+i)->in = lineint[1];
+            (fsm+i)->out = lineint[2];
+            (fsm+i)->target = lineint[3];
+            (fsm+i)->final_state = lineint[4];
+            laststate = lineint[0];
+            last_final = lineint[4];
+            break;
+        default:
+            printf("File format error\n");
+            return NULL;
+        }
+        if (laststate > 0) {
+            (fsm+i)->start_state = 0;
+        } else if (laststate == -1) {
+            (fsm+i)->start_state = -1;
+        } else {
+            (fsm+i)->start_state = 1;
+        }
+
+    }
+    if (strcmp(buf, "##cmatrix##") == 0) {
+        cmatrix_init(net);
+        cm = net->medlookup->confusion_matrix;
+        for (;;) {
+	  io_gets_hfst(buf, io_buf_ptr);
+            if (buf[0] == '#') break;
+            sscanf(buf,"%i", &i);
+            *cm = i;
+            cm++;
+        }     
+    }
+    if (strcmp(buf, "##end##") != 0) {
+        printf("File format error!\n");
+        return NULL;
+    }
+    return(net);
+}
+
+static int io_gets_hfst(char *target, char * io_buf_ptr) {
+    int i;
+    for (i = 0; *(io_buf_ptr+i) != '\n' && *(io_buf_ptr+i) != '\0'; i++) {
+        *(target+i) = *(io_buf_ptr+i);
+    }   
+    *(target+i) = '\0';
+    if (*(io_buf_ptr+i) == '\0')
+        io_buf_ptr = io_buf_ptr + i;
+    else
+        io_buf_ptr = io_buf_ptr + i + 1;
+
+    return(i);
+}
+/*    ... HFST addition ends. */
+
+
 int foma_net_print(struct fsm *net, gzFile *outfile) {
 
     struct sigma *sigma;
@@ -776,6 +938,31 @@ static size_t io_get_gz_file_size(char *filename) {
     return(numbytes);
 }
 
+/*   HFST addition begins ... */
+static size_t io_get_gz_file_size_hfst(char *filename) {
+
+    FILE    *infile;
+    size_t    numbytes;
+    unsigned char bytes[4];
+    unsigned int ints[4], i;
+
+    /* The last four bytes in a .gz file shows the size of the uncompressed data */
+    if (strcmp(filename, "") != 0)
+      infile = fopen(filename, "r");
+    else 
+      infile = stdin;
+    fseek(infile, -4, SEEK_END);
+    fread(&bytes, 1, 4, infile);
+    if (strcmp(filename, "") != 0)
+      fclose(infile);
+    for (i = 0 ; i < 4 ; i++) {
+        ints[i] = bytes[i];
+    }
+    numbytes = ints[0] | (ints[1] << 8) | (ints[2] << 16 ) | (ints[3] << 24);
+    return(numbytes);
+}
+/*   ... HFST addition ends. */
+
 static size_t io_get_regular_file_size(char *filename) {
 
     FILE    *infile;
@@ -787,6 +974,24 @@ static size_t io_get_regular_file_size(char *filename) {
     fclose(infile);
     return(numbytes);
 }
+
+/*   HFST addition begins ... */
+static size_t io_get_regular_file_size_hfst(char *filename) {
+
+    FILE    *infile;
+    size_t    numbytes;
+
+    if (strcmp(filename, "") != 0)
+      infile = fopen(filename, "r");
+    else 
+      infile = stdin;
+    fseek(infile, 0L, SEEK_END);
+    numbytes = ftell(infile);
+    if (strcmp(filename, "") != 0)
+      fclose(infile);
+    return(numbytes);
+}
+/*   ... HFST addition ends. */
 
 
 static size_t io_get_file_size(char *filename) {
@@ -806,6 +1011,28 @@ static size_t io_get_file_size(char *filename) {
     return(size);
 }
 
+/*   HFST addition begins ... */
+static size_t io_get_file_size_hfst(char *filename) {
+    gzFile *FILE;
+    size_t size;
+    if (strcmp(filename, "") != 0)
+      FILE = gzopen(filename, "r");
+    else
+      FILE = gzdopen(fileno(stdin), "r");
+    if (FILE == NULL) {
+        return(0);
+    }
+    if (gzdirect(FILE) == 1) {
+        gzclose(FILE);
+        size = io_get_regular_file_size_hfst(filename);
+    } else {
+        gzclose(FILE);
+        size = io_get_gz_file_size_hfst(filename);
+    }
+    return(size);
+}
+/*   ... HFST addition ends. */
+
 size_t io_gz_file_to_mem (char *filename) {
 
     size_t size;
@@ -823,6 +1050,29 @@ size_t io_gz_file_to_mem (char *filename) {
     io_buf_ptr = io_buf;
     return(size);
 }
+
+/*   HFST addition begins ... */
+size_t io_gz_file_to_mem_hfst(char *filename, char *io_buf, char *io_buf_ptr) {
+
+    size_t size;
+    gzFile *FILE;
+
+    size = io_get_file_size_hfst(filename);
+    if (size == 0) {
+        return 0;
+    }
+    io_buf = xxmalloc((size+1)*sizeof(char));
+    if (strcmp(filename, "") != 0)
+      FILE = gzopen(filename, "rb");
+    else 
+      FILE = gzdopen(fileno(stdin), "rb");
+    gzread(FILE, io_buf, size);
+    gzclose(FILE);
+    *(io_buf+size) = '\0';
+    io_buf_ptr = io_buf;
+    return(size);
+}
+/*   ... HFST addition ends. */
 
 char *file_to_mem (char *name) {
 
