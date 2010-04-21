@@ -5,54 +5,28 @@
 #endif
 
 namespace hfst { namespace implementations {
+
+
+  // ---------- FomaInputStream functions ----------
+
     FomaInputStream::FomaInputStream(void):
-      filename(std::string()), is_open_(false)
-  {
-  }
+      filename(std::string())
+    {}
 
     FomaInputStream::FomaInputStream(const char * filename):
-      filename(filename), is_open_(false)
-  {
-  }
-  
+      filename(filename)
+    {}
+    
   void FomaInputStream::open(void)
   {
-    if (filename == std::string()) {  // reading from stdin 
-      is_open_=true;
-      // read stdin and write it to a file
-      char * tempfilename = tmpnam(NULL);
-      if (tempfilename == NULL) {
-	fprintf(stderr, "error: could not generate a temporary filename.\n");
-	throw ErrorException();
-      }
-      FILE * tempfile = fopen(tempfilename, "w");
-      while( not feof(stdin) ) {
-	int c = fgetc(stdin);
-	fputc(c, tempfile);
-      }
-      fclose(tempfile);
-      io_gz_file_to_mem(tempfilename);
-      if (remove(tempfilename) != 0) {
-	fprintf(stderr, "error; could not delete a temporary file.\n");
-	throw ErrorException();
-      }
-      return;
-    }
-    else {
-      FILE *input_file = fopen(filename.c_str(),"r");
-      if (input_file == NULL)
-	{ throw FileNotReadableException(); }
-      fclose(input_file);  
-      is_open_=true;
-      io_gz_file_to_mem(strdup(filename.c_str()));    
-      return;
-    }
+    if (io_gz_file_to_mem_hfst(strdup(filename.c_str()), io_buf, io_buf_ptr) == 0)
+      throw FileNotReadableException();
+    return;
   }
   
   void FomaInputStream::close(void)
   {
-    is_open_=false;
-    io_free();
+    io_free_hfst(io_buf);
     return;
   }
   
@@ -63,7 +37,7 @@ namespace hfst { namespace implementations {
   
   bool FomaInputStream::is_eof(void)
   {
-    return io_buf_is_end();
+    return io_buf_is_end(io_buf_ptr);
   }
   
   bool FomaInputStream::is_bad(void)
@@ -81,42 +55,36 @@ namespace hfst { namespace implementations {
     throw hfst::exceptions::FunctionNotImplementedException();
   }
 
-    /*void FomaInputStream::add_symbol(StringSymbolMap &string_number_map,
-				   Character c,
-				   Alphabet &alphabet)
-  {
-    throw hfst::exceptions::FunctionNotImplementedException();
-  }
-
-  void
-  FomaInputStream::populate_key_table(KeyTable &key_table,
-				      Alphabet &alphabet,
-				      KeyMap &key_map)
-  {
-    throw hfst::exceptions::FunctionNotImplementedException();
-    }*/
-
   /* Skip the identifier string "FOMA_TYPE" */
-    /*void FomaInputStream::skip_identifier_version_3_0(void)
+  void FomaInputStream::skip_identifier_version_3_0(void)
   { 
-    throw hfst::exceptions::FunctionNotImplementedException();
+    char foma_identifier[10];
+    for (int i=0; i<9; i++) {
+      foma_identifier[i] = *io_buf_ptr;
+      io_buf_ptr++;
+    }
+    foma_identifier[9] = '\0';
+    if (0 != strcmp(foma_identifier,"FOMA_TYPE"))
+      { throw NotTransducerStreamException(); }
+    io_buf_ptr++;
   }
   
   void FomaInputStream::skip_hfst_header(void)
   {
-    throw hfst::exceptions::FunctionNotImplementedException();
-  }*/
+    io_buf_ptr = io_buf_ptr + 5;
+    switch (*io_buf_ptr)
+      {
+      case 0:
+	io_buf_ptr++;
+	try { skip_identifier_version_3_0(); }
+	catch (NotTransducerStreamException e) { throw e; }
+	break;
+      default:
+	assert(false);
+      }
+    return;
+  }
   
-  fsm * FomaTransducer::harmonize(fsm * t, KeyMap &key_map)
-  {
-    throw hfst::exceptions::FunctionNotImplementedException();
-  }
-
-  fsm * FomaInputStream::read_transducer(KeyTable &key_table)
-  {
-    throw hfst::exceptions::FunctionNotImplementedException();
-  }
-
   fsm * FomaInputStream::read_transducer(void)
   {
     if ( (not is_open()) )
@@ -124,11 +92,27 @@ namespace hfst { namespace implementations {
     if (is_eof())
       return NULL;
     char *net_name;
-    struct fsm * t = io_net_read(&net_name);
+    struct fsm * t = io_net_read_hfst(&net_name, io_buf_ptr);
     if (t == NULL)
       throw NotTransducerStreamException();
     return t;
   };
+
+  // ------------------------------------------------
+
+
+  
+  fsm * FomaTransducer::harmonize(fsm * t, KeyMap &key_map)
+  {
+    throw hfst::exceptions::FunctionNotImplementedException();
+  }
+
+    /*fsm * FomaInputStream::read_transducer(KeyTable &key_table)
+  {
+    throw hfst::exceptions::FunctionNotImplementedException();
+    }*/
+
+
 
 
   // ---------- FomaOutputStream functions ----------

@@ -39,23 +39,13 @@ namespace hfst {
 
   class FomaInputStream 
   {
-    private:
+  private:
     std::string filename;
+    char * io_buf;
+    char * io_buf_ptr;
     bool is_open_;
-    // Sfst: FILE * input_file;
-    // Tropical: ifstream i_stream;
-    // Tropical: istream &input_stream;
-    // Sfst: void add_symbol(StringSymbolMap &string_number_map,
-    // Character c,
-    // Alphabet &alphabet);
-    /*void populate_key_table(KeyTable &key_table,
-			    Sfst: Alphabet &alphabet,
-			    Tropical: const SymbolTable * i_symbol_table,
-			    Tropical: const SymbolTable * o_symbol_table,
-			    KeyMap &key_map);
     void skip_identifier_version_3_0(void);
-    void skip_hfst_header(void);*/
-
+    void skip_hfst_header(void);
   public:
     FomaInputStream(void);
     FomaInputStream(const char * filename);
@@ -66,8 +56,6 @@ namespace hfst {
     bool is_bad(void);
     bool is_good(void);
     bool is_fst(void);
-    // Tropical: bool operator() (void);
-    fsm * read_transducer(KeyTable &key_table);
     fsm * read_transducer(void);
   };
 
