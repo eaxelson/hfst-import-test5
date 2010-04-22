@@ -57,6 +57,7 @@ namespace hfst {
     bool is_good(void);
     bool is_fst(void);
     fsm * read_transducer(void);
+    static bool is_foma_stream(const char * filename); // should be protected
   };
 
   class FomaOutputStream 

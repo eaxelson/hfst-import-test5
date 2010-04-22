@@ -17,7 +17,7 @@ RM  = /bin/rm -f
 ARFLAGS = rcs
 #LDFLAGS = /usr/lib/libreadline.a /usr/lib/libncurses.a /usr/local/lib/libgc.a /usr/lib/libz.a
 LDFLAGS = -lreadline -lz
-CFLAGS = -O3 -Wall -D_GNU_SOURCE -std=c99 -fvisibility=hidden
+CFLAGS = -O3 -Wall -D_GNU_SOURCE -std=c99 -fvisibility=hidden -pg -g ## added 2
 #CFLAGS = -pg -g -Wall -D_GNU_SOURCE -fvisibility=hidden
 
 FOMAOBJS = foma.o stack.o iface.o lex.interface.o

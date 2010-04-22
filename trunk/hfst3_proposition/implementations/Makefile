@@ -6,7 +6,7 @@ ExtractStrings.h
 CXXFLAGS=-O3 -Wall -Wextra -g -pg
 
 all: SfstTransducer.o TropicalWeightTransducer.o LogWeightTransducer.o SymbolDefs.o FomaTransducer.o \
-GlobalSymbolTable.o HfstTokenizer.o ConvertTransducerFormat.o LogFstTrieFunctions.o ofst sfst
+GlobalSymbolTable.o HfstTokenizer.o ConvertTransducerFormat.o LogFstTrieFunctions.o ofst sfst foma
 
 clean:
 	rm -f SfstTransducer TropicalWeightTransducer *.o
@@ -36,6 +36,9 @@ ofst:
 
 sfst:
 	$(MAKE) -C ./SFST/src all
+
+foma:
+	$(MAKE) -C ./foma all
 
 testi:	FomaTransducer.cc
 	g++ $(CXXFLAGS) -Wno-deprecated -c FomaTransducer.cc -o FomaTransducer.o

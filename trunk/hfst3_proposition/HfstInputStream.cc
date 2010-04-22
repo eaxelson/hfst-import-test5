@@ -43,11 +43,11 @@ namespace hfst
       { return TROPICAL_OFST_TYPE; }
     if (0 == strcmp(fst_type,"LOG_OFST_TYPE"))
       { return LOG_OFST_TYPE; }
-    if (0 == strcmp(fst_type,"FOMA_TYPE"))
-      { return FOMA_TYPE; }
+    // FOMA transducers are gzipped, so they are handled separately in function stream_fst_type
     return ERROR_TYPE;
   }
 
+  /* Returns 0 on HFST3 type. */
   int HfstInputStream::read_library_header(std::istream &in) 
   {
     char id[6];
@@ -63,17 +63,27 @@ namespace hfst
     return c;
   }
 
-  ImplementationType HfstInputStream::stream_fst_type(std::istream &in)
+  /* The implementation type of the first transducer in the stream. */
+  ImplementationType HfstInputStream::stream_fst_type(const char *filename)
   { 
-    if (not in.good())
+    // FOMA transducers are gzipped, so they are handled separately
+    if ( hfst::implementations::FomaInputStream::is_foma_stream(filename) )
+      return FOMA_TYPE;
+    std::istream *in;
+    if (strcmp(filename,"") != 0) {
+      std::ifstream ifs(filename);
+      in = &ifs;
+    }
+    in = &cin;
+    if (not in->good())
       { throw hfst::implementations::FileNotReadableException(); }
     int library_version;
-    if (-1 == (library_version = read_library_header(in)))
+    if (-1 == (library_version = read_library_header(*in)))
       { return ERROR_TYPE; }
     switch (library_version)
       {
       case 0:
-	return read_version_3_0_fst_type(in);
+	return read_version_3_0_fst_type(*in);
 	break;
       default:
 	return ERROR_TYPE;
@@ -82,9 +92,12 @@ namespace hfst
     return ERROR_TYPE;
   }
 
+  /* Open a transducer stream to stdout.
+     The implementation type of the stream is defined by 
+     the type of the first transducer in the stream. */
   HfstInputStream::HfstInputStream(void)
   {
-    try { type = stream_fst_type(std::cin); }
+    try { type = stream_fst_type(""); }
     catch (hfst::implementations::FileNotReadableException e)
       { throw e; }
 
@@ -112,8 +125,9 @@ namespace hfst
   HfstInputStream::HfstInputStream(const char* filename)
   {
     try { 
-      std::ifstream in(filename);
-      type = stream_fst_type(in); 
+      //std::ifstream in(filename);
+      //type = stream_fst_type(in); 
+      type = stream_fst_type(filename); 
     }
     catch (hfst::implementations::FileNotReadableException e)
       { throw e; }

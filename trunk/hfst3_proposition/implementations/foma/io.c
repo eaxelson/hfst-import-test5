@@ -56,10 +56,10 @@ static inline int explode_line (char *buf, int *values);
 static char *io_buf = NULL, *io_buf_ptr = NULL;
 
 /*   HFST addition begins...  */
-void io_free_hfst(char * io_buf);
-size_t io_gz_file_to_mem_hfst(char *filename, char *io_buf, char *io_buf_ptr);
-struct fsm *io_net_read_hfst(char **net_name, char *io_buf_ptr);
-static int io_gets_hfst(char *target, char * io_buf_ptr);
+void io_free_hfst(char **io_buf);
+char * io_gz_file_to_mem_hfst(char *filename);
+struct fsm *io_net_read_hfst(char **net_name, char **io_buf_ptr);
+static int io_gets_hfst(char *target, char **io_buf_ptr);
 /*   ...HFST addition ends.   */
 
 // HFST additions (remove this)
@@ -419,10 +419,10 @@ void io_free() {
 }
 
 /*    HFST addition begins...   */
-void io_free_hfst(char * io_buf) {
-    if (io_buf != NULL) {
-        xxfree(io_buf);
-        io_buf = NULL;
+void io_free_hfst(char **io_buf) {
+    if (*io_buf != NULL) {
+        xxfree(*io_buf);
+        *io_buf = NULL; // ###
     }
 }
 /*    ...HFST addition ends.    */
@@ -690,7 +690,7 @@ static int io_gets(char *target) {
 }
 
 /*    HFST addition begins... */
-struct fsm *io_net_read_hfst(char **net_name, char *io_buf_ptr) {
+struct fsm *io_net_read_hfst(char **net_name, char **io_buf_ptr) {
 
     char buf[READ_BUF_SIZE];
     struct fsm *net;
@@ -819,17 +819,17 @@ struct fsm *io_net_read_hfst(char **net_name, char *io_buf_ptr) {
     return(net);
 }
 
-static int io_gets_hfst(char *target, char * io_buf_ptr) {
+static int io_gets_hfst(char * target, char **io_buf_ptr) {
     int i;
-    for (i = 0; *(io_buf_ptr+i) != '\n' && *(io_buf_ptr+i) != '\0'; i++) {
-        *(target+i) = *(io_buf_ptr+i);
+    for (i = 0; *(*io_buf_ptr+i) != '\n' && *(*io_buf_ptr+i) != '\0'; i++) {
+      *(target+i) = *(*io_buf_ptr+i);
     }   
     *(target+i) = '\0';
-    if (*(io_buf_ptr+i) == '\0')
-        io_buf_ptr = io_buf_ptr + i;
+    if (*(*io_buf_ptr+i) == '\0')
+      *io_buf_ptr = *io_buf_ptr + i;  // ###
     else
-        io_buf_ptr = io_buf_ptr + i + 1;
-
+      *io_buf_ptr = *io_buf_ptr + i + 1;  // ###
+    //fprintf(stderr, "io_gets_hfst: read: %s", target);
     return(i);
 }
 /*    ... HFST addition ends. */
@@ -1002,11 +1002,13 @@ static size_t io_get_file_size(char *filename) {
         return(0);
     }
     if (gzdirect(FILE) == 1) {
+      if (strcmp(filename,"") != 0)
         gzclose(FILE);
-        size = io_get_regular_file_size(filename);
+      size = io_get_regular_file_size(filename);
     } else {
+      if (strcmp(filename,"") != 0)
         gzclose(FILE);
-        size = io_get_gz_file_size(filename);
+      size = io_get_gz_file_size(filename);
     }
     return(size);
 }
@@ -1019,15 +1021,18 @@ static size_t io_get_file_size_hfst(char *filename) {
       FILE = gzopen(filename, "r");
     else
       FILE = gzdopen(fileno(stdin), "r");
-    if (FILE == NULL) {
-        return(0);
+    if (FILE == Z_NULL) { // FIX
+      return(0);       
     }
+
     if (gzdirect(FILE) == 1) {
+      if (strcmp(filename, "") != 0)
         gzclose(FILE);
-        size = io_get_regular_file_size_hfst(filename);
+      size = io_get_regular_file_size_hfst(filename);
     } else {
+      if (strcmp(filename, "") != 0)
         gzclose(FILE);
-        size = io_get_gz_file_size_hfst(filename);
+      size = io_get_gz_file_size_hfst(filename);
     }
     return(size);
 }
@@ -1052,14 +1057,15 @@ size_t io_gz_file_to_mem (char *filename) {
 }
 
 /*   HFST addition begins ... */
-size_t io_gz_file_to_mem_hfst(char *filename, char *io_buf, char *io_buf_ptr) {
+char * io_gz_file_to_mem_hfst(char *filename) {
 
+    char *io_buf;
     size_t size;
     gzFile *FILE;
 
     size = io_get_file_size_hfst(filename);
     if (size == 0) {
-        return 0;
+        return NULL;
     }
     io_buf = xxmalloc((size+1)*sizeof(char));
     if (strcmp(filename, "") != 0)
@@ -1069,8 +1075,7 @@ size_t io_gz_file_to_mem_hfst(char *filename, char *io_buf, char *io_buf_ptr) {
     gzread(FILE, io_buf, size);
     gzclose(FILE);
     *(io_buf+size) = '\0';
-    io_buf_ptr = io_buf;
-    return(size);
+    return io_buf;
 }
 /*   ... HFST addition ends. */
 
