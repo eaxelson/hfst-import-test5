@@ -19,14 +19,17 @@ namespace hfst { namespace implementations {
     
   void FomaInputStream::open(void)
   {
-    if (io_gz_file_to_mem_hfst(strdup(filename.c_str()), io_buf, io_buf_ptr) == 0)
+    io_buf = io_gz_file_to_mem_hfst(strdup(filename.c_str()));
+    if (io_buf == NULL)
       throw FileNotReadableException();
+    io_buf_ptr = io_buf;
+    is_open_=true;
     return;
   }
   
   void FomaInputStream::close(void)
   {
-    io_free_hfst(io_buf);
+    io_free_hfst(&io_buf);
     return;
   }
   
@@ -66,7 +69,7 @@ namespace hfst { namespace implementations {
     foma_identifier[9] = '\0';
     if (0 != strcmp(foma_identifier,"FOMA_TYPE"))
       { throw NotTransducerStreamException(); }
-    io_buf_ptr++;
+    //io_buf_ptr++;
   }
   
   void FomaInputStream::skip_hfst_header(void)
@@ -84,6 +87,24 @@ namespace hfst { namespace implementations {
       }
     return;
   }
+
+  bool FomaInputStream::is_foma_stream(const char *filename)
+  {
+    gzFile file;
+    if (strcmp(filename,"") != 0)
+      file = gzopen(filename, "r");
+    else
+      file = gzdopen(fileno(stdin), "r");
+
+    if (file == NULL)
+      throw NotTransducerStreamException();
+    if (gzdirect(file) == 1) {
+        gzclose(file);
+	return false;
+    }
+    gzclose(file);
+    return true;
+  }
   
   fsm * FomaInputStream::read_transducer(void)
   {
@@ -91,8 +112,10 @@ namespace hfst { namespace implementations {
       throw FileIsClosedException();
     if (is_eof())
       return NULL;
+    skip_hfst_header();
+    fprintf(stderr, "read_transducer: next reading: %s\n", io_buf_ptr);
     char *net_name;
-    struct fsm * t = io_net_read_hfst(&net_name, io_buf_ptr);
+    struct fsm * t = io_net_read_hfst(&net_name, &io_buf_ptr);
     if (t == NULL)
       throw NotTransducerStreamException();
     return t;
@@ -131,7 +154,7 @@ namespace hfst { namespace implementations {
     } 
     else {
       ofile = gzdopen(fileno(stdout), "wb");
-      if (ofile == Z_NULL)
+      if (ofile == NULL)
 	throw FileNotReadableException();
     }
   }
@@ -144,7 +167,7 @@ namespace hfst { namespace implementations {
   {
     gzprintf(file, "HFST3");
     gzputc(file, 0);
-    gzprintf(file, "SFST_TYPE");
+    gzprintf(file, "FOMA_TYPE");
   }
   void FomaOutputStream::write_transducer(fsm * transducer) 
   { 

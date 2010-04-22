@@ -27,46 +27,46 @@ void print(HfstMutableTransducer &t)
 }
 
 int main(int argc, char **argv) {
-  HfstMutableTransducer t;
-  HfstState second_state = t.add_state();
-  HfstState third_state = t.add_state();
-  t.set_final_weight(second_state, 0.5);
-  t.add_transition(0, "foo", "bar", 0.3, second_state);
-  t.add_transition(second_state, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0.2, third_state);
-  t.add_transition(third_state, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0.1, second_state);
-  //HfstState initial = t.get_initial_state();
-  //cout << "initial state: " << initial << "\n";
 
-  //print(t);
-  //fprintf(stderr, "--\n");
+  // create transducer t1
+  HfstMutableTransducer t1;
+  HfstState second_state1 = t1.add_state();
+  HfstState third_state1 = t1.add_state();
+  t1.set_final_weight(second_state1, 0.5);
+  t1.add_transition(0, "foo", "bar", 0.3, second_state1);
+  t1.add_transition(second_state1, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0.2, third_state1);
+  t1.add_transition(third_state1, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0.1, second_state1);
 
+  // create transducer t2
   HfstMutableTransducer t2;
   HfstState second_state2 = t2.add_state();
   t2.set_final_weight(second_state2, 0.3);
   t2.add_transition(0, "@_UNKNOWN_SYMBOL_@", "baz", 1.6, second_state2);
 
-  //print(t2);
+#ifdef FOO
+  // open an output stream to a file "foma.gz" of type foma
+  HfstOutputStream out_fo("", FOMA_TYPE);
+  out_fo.open();
 
-  /*
-  HfstTransducer T(t);
-  T = T.convert(TROPICAL_OFST_TYPE);
-  HfstOutputStream out_tr("tropical.hfst", TROPICAL_OFST_TYPE);
-  out_tr.open();
-  //out_tr << T;
-  out_tr.close();
-  */
-
+  // convert both transducers to foma format and write them to the stream
+  HfstTransducer T1(t1);
+  T1 = T1.convert(FOMA_TYPE);
   HfstTransducer T2(t2);
   T2 = T2.convert(FOMA_TYPE);
-  HfstOutputStream out_fo("foma.gz", FOMA_TYPE);
-  out_fo.open();
+  out_fo << T1;
   out_fo << T2;
   out_fo.close();
+#endif
 
-  HfstOutputStream out_fo1(FOMA_TYPE);
-  out_fo1.open();
-  out_fo1 << T2;
-  out_fo1.close();
+#ifndef FOO
+  // open an input stream to the file "foma.gz"
+  HfstInputStream in_fo("");
+  in_fo.open();
+  while (not in_fo.is_eof()) {
+    HfstTransducer t(in_fo);
+    fprintf(stderr, "test.cc: read a transducer\n");
+  }
+#endif
 
   return 0;
 
