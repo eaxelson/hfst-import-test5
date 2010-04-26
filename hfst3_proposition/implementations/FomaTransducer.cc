@@ -19,6 +19,22 @@ namespace hfst { namespace implementations {
     
   void FomaInputStream::open(void)
   {
+    // reading from stdin does not work with zlib, 
+    // so the problem is avoided here by writing to a temporary file
+
+    if (strcmp(filename.c_str(),"") == 0) {
+      char temp [L_tmpnam];
+      tmpnam(temp);
+      fprintf(stderr, "temporary filename: %s\n", temp);
+      filename = std::string(temp);
+      FILE *tempfile = fopen(temp, "w");
+      while (not std::cin.eof()) {
+	int c = std::cin.get();
+	fputc(c, tempfile);
+      } 
+      fclose(tempfile);
+    }
+
     io_buf = io_gz_file_to_mem_hfst(strdup(filename.c_str()));
     if (io_buf == NULL)
       throw FileNotReadableException();
@@ -30,6 +46,10 @@ namespace hfst { namespace implementations {
   void FomaInputStream::close(void)
   {
     io_free_hfst(&io_buf);
+    // see comment in open()
+    if (strcmp(filename.c_str(),"") == 0) {
+      remove(filename.c_str());
+    }
     return;
   }
   
@@ -62,14 +82,12 @@ namespace hfst { namespace implementations {
   void FomaInputStream::skip_identifier_version_3_0(void)
   { 
     char foma_identifier[10];
-    for (int i=0; i<9; i++) {
+    for (int i=0; i<10; i++) {
       foma_identifier[i] = *io_buf_ptr;
       io_buf_ptr++;
     }
-    foma_identifier[9] = '\0';
     if (0 != strcmp(foma_identifier,"FOMA_TYPE"))
       { throw NotTransducerStreamException(); }
-    //io_buf_ptr++;
   }
   
   void FomaInputStream::skip_hfst_header(void)
@@ -113,7 +131,6 @@ namespace hfst { namespace implementations {
     if (is_eof())
       return NULL;
     skip_hfst_header();
-    fprintf(stderr, "read_transducer: next reading: %s\n", io_buf_ptr);
     char *net_name;
     struct fsm * t = io_net_read_hfst(&net_name, &io_buf_ptr);
     if (t == NULL)
@@ -168,6 +185,7 @@ namespace hfst { namespace implementations {
     gzprintf(file, "HFST3");
     gzputc(file, 0);
     gzprintf(file, "FOMA_TYPE");
+    gzputc(file, 0);
   }
   void FomaOutputStream::write_transducer(fsm * transducer) 
   { 

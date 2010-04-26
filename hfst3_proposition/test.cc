@@ -43,30 +43,32 @@ int main(int argc, char **argv) {
   t2.set_final_weight(second_state2, 0.3);
   t2.add_transition(0, "@_UNKNOWN_SYMBOL_@", "baz", 1.6, second_state2);
 
-#ifdef FOO
-  // open an output stream to a file "foma.gz" of type foma
-  HfstOutputStream out_fo("", FOMA_TYPE);
-  out_fo.open();
+  ImplementationType types[] = {FOMA_TYPE, SFST_TYPE, TROPICAL_OFST_TYPE, LOG_OFST_TYPE};
+  for (int i=0; i<4; i++) 
+    {      
+      // open an output stream to a file
+      HfstOutputStream out("tr.hfst", types[i]);
+      out.open();
 
-  // convert both transducers to foma format and write them to the stream
-  HfstTransducer T1(t1);
-  T1 = T1.convert(FOMA_TYPE);
-  HfstTransducer T2(t2);
-  T2 = T2.convert(FOMA_TYPE);
-  out_fo << T1;
-  out_fo << T2;
-  out_fo.close();
-#endif
-
-#ifndef FOO
-  // open an input stream to the file "foma.gz"
-  HfstInputStream in_fo("");
-  in_fo.open();
-  while (not in_fo.is_eof()) {
-    HfstTransducer t(in_fo);
-    fprintf(stderr, "test.cc: read a transducer\n");
-  }
-#endif
+      // convert both transducers and write them to the stream
+      HfstTransducer T1(t1);
+      T1 = T1.convert(types[i]);
+      HfstTransducer T2(t2);
+      T2 = T2.convert(types[i]);
+      out << T1;
+      out << T2;
+      out.close();
+      fprintf(stderr, "test.cc: wrote two transducers of type %i\n", types[i]);
+      
+      // open an input stream to the file
+      HfstInputStream in("tr.hfst");
+      in.open();
+      while (not in.is_eof()) {
+	HfstTransducer t(in);
+	fprintf(stderr, "test.cc: read a transducer of type %i\n", types[i]);
+      }
+      remove("tr.hfst");
+    }
 
   return 0;
 

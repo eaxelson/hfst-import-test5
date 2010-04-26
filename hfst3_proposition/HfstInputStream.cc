@@ -56,11 +56,12 @@ namespace hfst
       { return -1; }
     if (in.eof())
       { return -1; }
-    char c;
-    in.get(c);
-    if (1 != in.gcount())
-      { return -1; }
-    return c;
+    //char c;
+    //in.get(c);
+    //if (1 != in.gcount())
+    //  { return -1; }
+    //return c;
+    return 0;
   }
 
   /* The implementation type of the first transducer in the stream. */
@@ -70,22 +71,25 @@ namespace hfst
     if ( hfst::implementations::FomaInputStream::is_foma_stream(filename) )
       return FOMA_TYPE;
     std::istream *in;
+    std::ifstream ifs(filename);
     if (strcmp(filename,"") != 0) {
-      std::ifstream ifs(filename);
       in = &ifs;
     }
-    in = &cin;
+    else
+      in = &cin;
     if (not in->good())
       { throw hfst::implementations::FileNotReadableException(); }
     int library_version;
     if (-1 == (library_version = read_library_header(*in)))
-      { return ERROR_TYPE; }
+      { fprintf(stderr, "stream_fst_type: returning ERROR_TYPE (1)\n");
+	return ERROR_TYPE; }
     switch (library_version)
       {
       case 0:
 	return read_version_3_0_fst_type(*in);
 	break;
       default:
+	fprintf(stderr, "stream_fst_type: returning ERROR_TYPE (2)\n");
 	return ERROR_TYPE;
 	break;
       }
@@ -253,6 +257,9 @@ namespace hfst
       case TROPICAL_OFST_TYPE:
 	return implementation.tropical_ofst->is_eof();
 	break;
+      case LOG_OFST_TYPE:
+	return implementation.log_ofst->is_eof();
+	break;
       case FOMA_TYPE:
 	return implementation.foma->is_eof();
 	break;
@@ -272,6 +279,9 @@ namespace hfst
       case TROPICAL_OFST_TYPE:
 	return implementation.tropical_ofst->is_bad();
 	break;
+      case LOG_OFST_TYPE:
+	return implementation.log_ofst->is_bad();
+	break;
       case FOMA_TYPE:
 	return implementation.foma->is_bad();
 	break;
@@ -290,6 +300,9 @@ namespace hfst
 	break;
       case TROPICAL_OFST_TYPE:
 	return implementation.tropical_ofst->is_good();
+	break;
+      case LOG_OFST_TYPE:
+	return implementation.log_ofst->is_good();
 	break;
       case FOMA_TYPE:
 	return implementation.foma->is_good();
