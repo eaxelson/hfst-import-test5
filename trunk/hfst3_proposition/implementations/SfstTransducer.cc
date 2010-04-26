@@ -46,7 +46,10 @@ namespace hfst { namespace implementations {
   {
     if (not is_open())
       { return true; }
-    return feof(input_file) != 0;
+    int c = getc(input_file);
+    bool retval = (feof(input_file) != 0);
+    ungetc(c, input_file);
+    return retval;
   }
   
   bool SfstInputStream::is_bad(void)
@@ -155,16 +158,16 @@ namespace hfst { namespace implementations {
     int header_count = fread(hfst_header,6,1,input_file);
     if (header_count != 1)
       { throw NotTransducerStreamException(); }
-    int c = fgetc(input_file);
-    switch (c)
-      {
-      case 0:
-	try { skip_identifier_version_3_0(); }
-	catch (NotTransducerStreamException e) { throw e; }
-	break;
-      default:
-	assert(false);
-      }
+    //int c = fgetc(input_file);
+    //switch (c)
+    //{
+    // case 0:
+    try { skip_identifier_version_3_0(); }
+    catch (NotTransducerStreamException e) { throw e; }
+    //break;
+    //default:
+    //assert(false);
+    //}
   }
   
 #ifdef foo
@@ -374,6 +377,7 @@ namespace hfst { namespace implementations {
     fputs("HFST3",file);
     fputc(0, file);
     fputs("SFST_TYPE",file);
+    fputc(0, file);
   }
   void SfstOutputStream::write_transducer(Transducer * transducer) 
   { 

@@ -59,16 +59,16 @@ namespace hfst { namespace implementations
   void LogWeightInputStream::skip_hfst_header(void)
   {
     input_stream.ignore(6);
-    char c;
-    input_stream.get(c);
-    switch (c)
-      {
-      case 0:
-	skip_identifier_version_3_0();
-	break;
-      default:
-	assert(false);
-      }
+    //char c;
+    //input_stream.get(c);
+    //switch (c)
+    //  {
+    //  case 0:
+    skip_identifier_version_3_0();
+    //break;
+    //default:
+    //assert(false);
+    //}
   }
 
   void LogWeightInputStream::open(void) {}
@@ -162,6 +162,8 @@ namespace hfst { namespace implementations
       {
 	const SymbolTable * isymbols = t->InputSymbols();
 	const SymbolTable * osymbols = t->OutputSymbols();
+	return t;
+#ifdef FOO
 	if ((isymbols == NULL) and (osymbols == NULL))
 	  { return t; }
 	KeyMap key_map;
@@ -176,6 +178,7 @@ namespace hfst { namespace implementations
 	  LogWeightTransducer::harmonize(t,key_map);
 	delete t;
 	return t_harmonized;
+#endif
       }
     catch (HfstInterfaceException e)
       { throw e; }
@@ -207,8 +210,9 @@ namespace hfst { namespace implementations
   void LogWeightOutputStream::write_3_0_library_header(std::ostream &out)
   {
     out.write("HFST3",6);
-    out.put(0);
+    //out.put(0);
     out.write("LOG_OFST_TYPE",14);
+    //out.put(0);
   }
   void LogWeightOutputStream::write_transducer(LogFst * transducer, KeyTable &key_table) 
   { set_symbols(transducer,key_table);

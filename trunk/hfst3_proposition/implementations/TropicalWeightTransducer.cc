@@ -300,16 +300,16 @@ namespace hfst { namespace implementations
   void TropicalWeightInputStream::skip_hfst_header(void)
   {
     i_stream.ignore(6);
-    char c;
-    i_stream.get(c);
-    switch (c)
-      {
-      case 0:
-	skip_identifier_version_3_0();
-	break;
-      default:
-	assert(false);
-      }
+    //char c;
+    //i_stream.get(c);
+    //switch (c)
+    //{
+    //case 0:
+    skip_identifier_version_3_0();
+    //break;
+    //default:
+    //assert(false);
+    //}
   }
   
   void TropicalWeightInputStream::open(void) {}
@@ -401,6 +401,8 @@ namespace hfst { namespace implementations
       {
 	const SymbolTable * isymbols = t->InputSymbols();
 	const SymbolTable * osymbols = t->OutputSymbols();
+	return t;
+#ifdef FOO
 	if ((isymbols == NULL) and (osymbols == NULL))
 	  { return t; }
 	KeyMap key_map;
@@ -412,9 +414,11 @@ namespace hfst { namespace implementations
 			       key_map);
 	  }
 	StdVectorFst * t_harmonized = NULL;  // FIX THIS
+	fprintf(stderr, "FUUUU\n");
 	  //TropicalWeightTransducer::harmonize(t,key_map);
 	delete t;
 	return t_harmonized;
+#endif
       }
     catch (HfstInterfaceException e)
       { throw e; }
@@ -1165,8 +1169,9 @@ namespace hfst { namespace implementations
   void TropicalWeightOutputStream::write_3_0_library_header(std::ostream &out)
   {
     out.write("HFST3",6);
-    out.put(0);
+    //out.put(0);
     out.write("TROPICAL_OFST_TYPE",19);
+    //out.put(0);
   }
 
   void TropicalWeightOutputStream::write_transducer(StdVectorFst * transducer) 
