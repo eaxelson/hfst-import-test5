@@ -295,11 +295,11 @@ namespace hfst { namespace implementations
 
   /* Skip the identifier string "TROPICAL_OFST_TYPE" */
   void TropicalWeightInputStream::skip_identifier_version_3_0(void)
-  { i_stream.ignore(19); }
+  { input_stream.ignore(19); }
 
   void TropicalWeightInputStream::skip_hfst_header(void)
   {
-    i_stream.ignore(6);
+    input_stream.ignore(6);
     //char c;
     //i_stream.get(c);
     //switch (c)
@@ -326,9 +326,9 @@ namespace hfst { namespace implementations
   }
   bool TropicalWeightInputStream::is_eof(void) const
   {
-    if (filename == string())
-      { return std::cin.eof(); }
-    else
+    //if (filename == string())
+    //  { return std::cin.eof(); }
+    //else
       { return input_stream.peek() == EOF; }
   }
   bool TropicalWeightInputStream::is_bad(void) const
@@ -366,7 +366,7 @@ namespace hfst { namespace implementations
   bool TropicalWeightInputStream::operator() (void) const
   { return is_good(); }
 
-  StdVectorFst * TropicalWeightInputStream::read_transducer(KeyTable &key_table)
+  StdVectorFst * TropicalWeightInputStream::read_transducer(bool has_header)
   {
     if (is_eof())
       { throw FileIsClosedException(); }
@@ -374,7 +374,8 @@ namespace hfst { namespace implementations
     FstHeader header;
     try 
       {
-	skip_hfst_header();
+	if (has_header)
+	  skip_hfst_header();
 	if (filename == string())
 	  {
 	    header.Read(input_stream,"STDIN");			    
@@ -399,8 +400,8 @@ namespace hfst { namespace implementations
 
     try
       {
-	const SymbolTable * isymbols = t->InputSymbols();
-	const SymbolTable * osymbols = t->OutputSymbols();
+	//const SymbolTable * isymbols = t->InputSymbols();
+	//const SymbolTable * osymbols = t->OutputSymbols();
 	return t;
 #ifdef FOO
 	if ((isymbols == NULL) and (osymbols == NULL))
@@ -1159,8 +1160,11 @@ namespace hfst { namespace implementations
 
 
   TropicalWeightOutputStream::TropicalWeightOutputStream(void):
-    output_stream(std::cout)
-  {}
+    filename(std::string()), output_stream(std::cout)
+  {
+    if (!output_stream)
+      fprintf(stderr, "TropicalWeightOutputStream: ERROR: failbit set (3).\n");
+  }
 
   TropicalWeightOutputStream::TropicalWeightOutputStream(const char * str):
     filename(str),o_stream(str,std::ios::out),output_stream(o_stream)
@@ -1168,6 +1172,8 @@ namespace hfst { namespace implementations
 
   void TropicalWeightOutputStream::write_3_0_library_header(std::ostream &out)
   {
+    if (!out)
+      fprintf(stderr, "TropicalWeightOutputStream: ERROR: failbit set (2).\n");
     out.write("HFST3",6);
     //out.put(0);
     out.write("TROPICAL_OFST_TYPE",19);
@@ -1175,7 +1181,10 @@ namespace hfst { namespace implementations
   }
 
   void TropicalWeightOutputStream::write_transducer(StdVectorFst * transducer) 
-  { write_3_0_library_header(output_stream);
+  { 
+    if (!output_stream)
+      fprintf(stderr, "TropicalWeightOutputStream: ERROR: failbit set (1).\n");
+    write_3_0_library_header(output_stream);
     transducer->Write(output_stream,FstWriteOptions()); }
 
   void TropicalWeightOutputStream::open(void) {}

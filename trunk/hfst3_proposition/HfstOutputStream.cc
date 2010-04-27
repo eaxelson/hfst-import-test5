@@ -94,16 +94,8 @@ namespace hfst
 	return *this;    
 	break;
       case LOG_OFST_TYPE:
-	if (transducer.anonymous)
-	  {
-	    implementation.log_ofst->write_transducer
-	      (transducer.implementation.log_ofst);
-	  }
-	else
-	  {
-	    implementation.log_ofst->write_transducer
-	      (transducer.implementation.log_ofst,transducer.key_table);
-	  }
+	implementation.log_ofst->write_transducer
+	  (transducer.implementation.log_ofst);
 	return *this;
 	break;
       case FOMA_TYPE:

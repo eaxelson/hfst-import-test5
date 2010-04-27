@@ -85,9 +85,9 @@ namespace hfst { namespace implementations
   }
   bool LogWeightInputStream::is_eof(void) const
   {
-    if (filename.empty())
-      { return std::cin.eof(); }
-    else
+    //if (filename.empty())
+    //  { return std::cin.eof(); }
+    //else
       { return input_stream.peek() == EOF; }
   }
   bool LogWeightInputStream::is_bad(void) const
@@ -125,7 +125,7 @@ namespace hfst { namespace implementations
   bool LogWeightInputStream::operator() (void) const
   { return is_good(); }
 
-  LogFst * LogWeightInputStream::read_transducer(KeyTable &key_table)
+  LogFst * LogWeightInputStream::read_transducer(bool has_header)
   {
     if (this->is_eof())
       { throw FileIsClosedException(); }
@@ -133,7 +133,8 @@ namespace hfst { namespace implementations
     FstHeader header;
     try 
       {
-	skip_hfst_header();
+	if (has_header)
+	  skip_hfst_header();
 	first_read = false;
 
 	if (filename == string())
@@ -160,8 +161,8 @@ namespace hfst { namespace implementations
 
     try
       {
-	const SymbolTable * isymbols = t->InputSymbols();
-	const SymbolTable * osymbols = t->OutputSymbols();
+	//const SymbolTable * isymbols = t->InputSymbols();
+	//const SymbolTable * osymbols = t->OutputSymbols();
 	return t;
 #ifdef FOO
 	if ((isymbols == NULL) and (osymbols == NULL))
@@ -184,7 +185,7 @@ namespace hfst { namespace implementations
       { throw e; }
   }
   LogWeightOutputStream::LogWeightOutputStream(void):
-    output_stream(std::cout)
+    filename(std::string()),output_stream(std::cout)
   {}
 
   LogWeightOutputStream::LogWeightOutputStream(const char * str):

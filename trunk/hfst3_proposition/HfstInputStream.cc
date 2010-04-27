@@ -8,26 +8,30 @@ namespace hfst
       {
       case SFST_TYPE:
 	t.implementation.sfst =
-	  this->implementation.sfst->read_transducer(t.key_table);
+	  this->implementation.sfst->read_transducer(has_header);
+	has_header=true;
 	break;
       case TROPICAL_OFST_TYPE:
 	t.implementation.tropical_ofst =
-	  this->implementation.tropical_ofst->read_transducer(t.key_table);
+	  this->implementation.tropical_ofst->read_transducer(has_header);
+	has_header=true;
 	break;
       case LOG_OFST_TYPE:
 	t.implementation.log_ofst =
-	  this->implementation.log_ofst->read_transducer(t.key_table);
+	  this->implementation.log_ofst->read_transducer(has_header);
+	has_header=true;
 	break;
       case FOMA_TYPE:
 	t.implementation.foma =
-	  this->implementation.foma->read_transducer();
+	  this->implementation.foma->read_transducer(has_header);
+	has_header=true;
 	break;
 	  case ERROR_TYPE:
 	  case UNSPECIFIED_TYPE:
 	  default:
 		throw hfst::exceptions::NotTransducerStreamException();
 		break;
-	  }
+      }
   }
 
   ImplementationType HfstInputStream::read_version_3_0_fst_type
@@ -39,11 +43,12 @@ namespace hfst
       { return ERROR_TYPE; }
     if (0 == strcmp(fst_type,"SFST_TYPE"))
       { return SFST_TYPE; }
+    if (0 == strcmp(fst_type,"FOMA_TYPE"))
+      { return FOMA_TYPE; }
     if (0 == strcmp(fst_type,"TROPICAL_OFST_TYPE"))
       { return TROPICAL_OFST_TYPE; }
     if (0 == strcmp(fst_type,"LOG_OFST_TYPE"))
       { return LOG_OFST_TYPE; }
-    // FOMA transducers are gzipped, so they are handled separately in function stream_fst_type
     return ERROR_TYPE;
   }
 
@@ -67,9 +72,6 @@ namespace hfst
   /* The implementation type of the first transducer in the stream. */
   ImplementationType HfstInputStream::stream_fst_type(const char *filename)
   { 
-    // FOMA transducers are gzipped, so they are handled separately
-    if ( hfst::implementations::FomaInputStream::is_foma_stream(filename) )
-      return FOMA_TYPE;
     std::istream *in;
     std::ifstream ifs(filename);
     if (strcmp(filename,"") != 0) {
@@ -82,7 +84,7 @@ namespace hfst
     int library_version;
     if (-1 == (library_version = read_library_header(*in)))
       { fprintf(stderr, "stream_fst_type: returning ERROR_TYPE (1)\n");
-	return ERROR_TYPE; }
+	return ERROR_TYPE; }    
     switch (library_version)
       {
       case 0:
@@ -99,7 +101,8 @@ namespace hfst
   /* Open a transducer stream to stdout.
      The implementation type of the stream is defined by 
      the type of the first transducer in the stream. */
-  HfstInputStream::HfstInputStream(void)
+  HfstInputStream::HfstInputStream(void):
+    has_header(false)
   {
     try { type = stream_fst_type(""); }
     catch (hfst::implementations::FileNotReadableException e)
@@ -126,7 +129,8 @@ namespace hfst
     }
   }
 
-  HfstInputStream::HfstInputStream(const char* filename)
+  HfstInputStream::HfstInputStream(const char* filename):
+    has_header(true)
   {
     try { 
       //std::ifstream in(filename);

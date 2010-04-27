@@ -55,19 +55,6 @@ static inline int explode_line (char *buf, int *values);
 
 static char *io_buf = NULL, *io_buf_ptr = NULL;
 
-/*   HFST addition begins...  */
-void io_free_hfst(char **io_buf);
-char * io_gz_file_to_mem_hfst(char *filename);
-struct fsm *io_net_read_hfst(char **net_name, char **io_buf_ptr);
-static int io_gets_hfst(char *target, char **io_buf_ptr);
-/*   ...HFST addition ends.   */
-
-// HFST additions (remove this)
-int io_buf_is_end(char * io_buf_ptr) {
-  if (*(io_buf_ptr) == '\0')
-    return 1;
-  return 0;
-}
 
 int write_prolog (struct fsm *net, char *filename) {
   struct fsm_state *stateptr;
@@ -418,14 +405,6 @@ void io_free() {
     }
 }
 
-/*    HFST addition begins...   */
-void io_free_hfst(char **io_buf) {
-    if (*io_buf != NULL) {
-        xxfree(*io_buf);
-        *io_buf = NULL; // ###
-    }
-}
-/*    ...HFST addition ends.    */
 
 struct fsm *fsm_read_binary_file(char *filename) {
     char *net_name;
@@ -689,8 +668,11 @@ static int io_gets(char *target) {
     return(i);
 }
 
-/*    HFST addition begins... */
-struct fsm *io_net_read_hfst(char **net_name, char **io_buf_ptr) {
+
+// hfst addition
+static int io_gets_hfst(FILE *infile, char *target);
+
+struct fsm * read_net_hfst(FILE *infile) {
 
     char buf[READ_BUF_SIZE];
     struct fsm *net;
@@ -700,7 +682,7 @@ struct fsm *io_net_read_hfst(char **net_name, char **io_buf_ptr) {
     int i, items, new_symbol_number, laststate, lineint[5], *cm;
     char last_final;
 
-    if (io_gets_hfst(buf, io_buf_ptr) == 0) {
+    if (io_gets_hfst(infile, buf) == 0) {
         return NULL;
     }
     
@@ -710,17 +692,17 @@ struct fsm *io_net_read_hfst(char **net_name, char **io_buf_ptr) {
         printf("File format error foma!\n");
         return NULL;
     }
-    io_gets_hfst(buf, io_buf_ptr);
+    io_gets_hfst(infile, buf);
     if (strcmp(buf, "##props##") != 0) {
         printf("File format error props!\n");
         return NULL;
     }
     /* Properties */
-    io_gets_hfst(buf, io_buf_ptr);
+    io_gets_hfst(infile, buf);
     sscanf(buf, "%i %i %i %i %i %lld %i %i %i %i %i %i %s", &net->arity, &net->arccount, &net->statecount, &net->linecount, &net->finalcount, &net->pathcount, &net->is_deterministic, &net->is_pruned, &net->is_minimized, &net->is_epsilon_free, &net->is_loop_free, &net->is_completed, buf);
     strcpy(net->name, buf);
-    *net_name = strdup(buf);
-    io_gets_hfst(buf, io_buf_ptr);
+    //*net_name = strdup(buf);
+    io_gets_hfst(infile, buf);
 
     /* Sigma */
     if (strcmp(buf, "##sigma##") != 0) {
@@ -729,7 +711,7 @@ struct fsm *io_net_read_hfst(char **net_name, char **io_buf_ptr) {
     }
     net->sigma = sigma_create();
     for (;;) {
-      io_gets_hfst(buf, io_buf_ptr);
+      io_gets_hfst(infile, buf);
         if (buf[0] == '#') break;
         new_symbol = strstr(buf, " ");
         new_symbol[0] = '\0';
@@ -746,7 +728,7 @@ struct fsm *io_net_read_hfst(char **net_name, char **io_buf_ptr) {
     fsm = net->states;
     laststate = -1;
     for (i=0; ;i++) {
-      io_gets_hfst(buf, io_buf_ptr);
+      io_gets_hfst(infile, buf);
         if (buf[0] == '#') break;
 
         /* scanf is just too slow here */
@@ -805,7 +787,7 @@ struct fsm *io_net_read_hfst(char **net_name, char **io_buf_ptr) {
         cmatrix_init(net);
         cm = net->medlookup->confusion_matrix;
         for (;;) {
-	  io_gets_hfst(buf, io_buf_ptr);
+	  io_gets_hfst(infile, buf);
             if (buf[0] == '#') break;
             sscanf(buf,"%i", &i);
             *cm = i;
@@ -819,20 +801,19 @@ struct fsm *io_net_read_hfst(char **net_name, char **io_buf_ptr) {
     return(net);
 }
 
-static int io_gets_hfst(char * target, char **io_buf_ptr) {
+static int io_gets_hfst(FILE *infile, char *target) {
     int i;
-    for (i = 0; *(*io_buf_ptr+i) != '\n' && *(*io_buf_ptr+i) != '\0'; i++) {
-      *(target+i) = *(*io_buf_ptr+i);
+    int c = getc(infile);
+    for (i = 0; c != '\n' && c != '\0'; i++) {
+        *(target+i) = c;
+	c = getc(infile);
     }   
     *(target+i) = '\0';
-    if (*(*io_buf_ptr+i) == '\0')
-      *io_buf_ptr = *io_buf_ptr + i;  // ###
-    else
-      *io_buf_ptr = *io_buf_ptr + i + 1;  // ###
-    //fprintf(stderr, "io_gets_hfst: read: %s", target);
+    if (c == '\0')
+      ungetc(c, infile);
     return(i);
 }
-/*    ... HFST addition ends. */
+// ... hfst addition ends
 
 
 int foma_net_print(struct fsm *net, gzFile *outfile) {
@@ -894,6 +875,68 @@ int foma_net_print(struct fsm *net, gzFile *outfile) {
     return(1);
 }
 
+// hfst addition
+int write_net_hfst(struct fsm *net, FILE *outfile) {
+
+    struct sigma *sigma;
+    struct fsm_state *fsm;
+    int i, maxsigma, laststate, *cm;
+
+    /* Header */
+    fprintf(outfile, "%s","##foma-net 1.0##\n");
+
+    /* Properties */
+    fprintf(outfile, "%s","##props##\n");
+    fprintf(outfile, "%i %i %i %i %i %lld %i %i %i %i %i %i %s\n",net->arity, net->arccount, net->statecount, net->linecount, net->finalcount, net->pathcount, net->is_deterministic, net->is_pruned, net->is_minimized, net->is_epsilon_free, net->is_loop_free, net->is_completed, net->name);
+    
+    /* Sigma */
+    fprintf(outfile, "%s","##sigma##\n");
+    for (sigma = net->sigma; sigma != NULL && sigma->number != -1; sigma = sigma->next) {
+        fprintf(outfile, "%i %s\n",sigma->number, sigma->symbol);
+    }
+
+    /* State array */
+    laststate = -1;
+    fsm = net->states;
+    fprintf(outfile, "%s","##states##\n");
+    for (fsm = net->states; fsm->state_no !=-1; fsm++) {
+        if (fsm->state_no != laststate) {
+            if (fsm->in != fsm->out) {
+                fprintf(outfile, "%i %i %i %i %i\n",fsm->state_no, fsm->in, fsm->out, fsm->target, fsm->final_state);
+            } else {
+                fprintf(outfile, "%i %i %i %i\n",fsm->state_no, fsm->in, fsm->target, fsm->final_state);
+            }
+        } else {
+            if (fsm->in != fsm->out) {
+                fprintf(outfile, "%i %i %i\n", fsm->in, fsm->out, fsm->target);
+            } else {
+                fprintf(outfile, "%i %i\n", fsm->in, fsm->target);
+            }
+        }
+        laststate = fsm->state_no;
+    }
+    /* Sentinel for states */
+    fprintf(outfile, "-1 -1 -1 -1 -1\n");
+
+    /* Store confusion matrix */
+    if (net->medlookup != NULL && net->medlookup->confusion_matrix != NULL) {
+
+        fprintf(outfile, "%s","##cmatrix##\n");
+        cm = net->medlookup->confusion_matrix;
+        maxsigma = sigma_max(net->sigma)+1;
+        fprintf(outfile, "maxsigma is: %i\n",maxsigma);
+        for (i=0; i < maxsigma*maxsigma; i++) {
+            fprintf(outfile, "%i\n", *(cm+i));
+        }
+    }
+
+    /* End */
+    fprintf(outfile, "%s","##end##\n");
+    return(1);
+}
+// ... hfst addition ends
+
+
 int net_print_att(struct fsm *net, FILE *outfile) {
     struct fsm_state *fsm;
     struct fsm_sigma_list *sl;
@@ -938,31 +981,6 @@ static size_t io_get_gz_file_size(char *filename) {
     return(numbytes);
 }
 
-/*   HFST addition begins ... */
-static size_t io_get_gz_file_size_hfst(char *filename) {
-
-    FILE    *infile;
-    size_t    numbytes;
-    unsigned char bytes[4];
-    unsigned int ints[4], i;
-
-    /* The last four bytes in a .gz file shows the size of the uncompressed data */
-    if (strcmp(filename, "") != 0)
-      infile = fopen(filename, "r");
-    else 
-      infile = stdin;
-    fseek(infile, -4, SEEK_END);
-    fread(&bytes, 1, 4, infile);
-    if (strcmp(filename, "") != 0)
-      fclose(infile);
-    for (i = 0 ; i < 4 ; i++) {
-        ints[i] = bytes[i];
-    }
-    numbytes = ints[0] | (ints[1] << 8) | (ints[2] << 16 ) | (ints[3] << 24);
-    return(numbytes);
-}
-/*   ... HFST addition ends. */
-
 static size_t io_get_regular_file_size(char *filename) {
 
     FILE    *infile;
@@ -974,25 +992,6 @@ static size_t io_get_regular_file_size(char *filename) {
     fclose(infile);
     return(numbytes);
 }
-
-/*   HFST addition begins ... */
-static size_t io_get_regular_file_size_hfst(char *filename) {
-
-    FILE    *infile;
-    size_t    numbytes;
-
-    if (strcmp(filename, "") != 0)
-      infile = fopen(filename, "r");
-    else 
-      infile = stdin;
-    fseek(infile, 0L, SEEK_END);
-    numbytes = ftell(infile);
-    if (strcmp(filename, "") != 0)
-      fclose(infile);
-    return(numbytes);
-}
-/*   ... HFST addition ends. */
-
 
 static size_t io_get_file_size(char *filename) {
     gzFile *FILE;
@@ -1013,31 +1012,6 @@ static size_t io_get_file_size(char *filename) {
     return(size);
 }
 
-/*   HFST addition begins ... */
-static size_t io_get_file_size_hfst(char *filename) {
-    gzFile *FILE;
-    size_t size;
-    if (strcmp(filename, "") != 0)
-      FILE = gzopen(filename, "r");
-    else
-      FILE = gzdopen(fileno(stdin), "r");
-    if (FILE == Z_NULL) { // FIX
-      return(0);       
-    }
-
-    if (gzdirect(FILE) == 1) {
-      if (strcmp(filename, "") != 0)
-        gzclose(FILE);
-      size = io_get_regular_file_size_hfst(filename);
-    } else {
-      if (strcmp(filename, "") != 0)
-        gzclose(FILE);
-      size = io_get_gz_file_size_hfst(filename);
-    }
-    return(size);
-}
-/*   ... HFST addition ends. */
-
 size_t io_gz_file_to_mem (char *filename) {
 
     size_t size;
@@ -1055,29 +1029,6 @@ size_t io_gz_file_to_mem (char *filename) {
     io_buf_ptr = io_buf;
     return(size);
 }
-
-/*   HFST addition begins ... */
-char * io_gz_file_to_mem_hfst(char *filename) {
-
-    char *io_buf;
-    size_t size;
-    gzFile *FILE;
-
-    size = io_get_file_size_hfst(filename);
-    if (size == 0) {
-        return NULL;
-    }
-    io_buf = xxmalloc((size+1)*sizeof(char));
-    if (strcmp(filename, "") != 0)
-      FILE = gzopen(filename, "rb");
-    else 
-      FILE = gzdopen(fileno(stdin), "rb");
-    gzread(FILE, io_buf, size);
-    gzclose(FILE);
-    *(io_buf+size) = '\0';
-    return io_buf;
-}
-/*   ... HFST addition ends. */
 
 char *file_to_mem (char *name) {
 

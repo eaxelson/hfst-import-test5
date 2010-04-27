@@ -9,130 +9,112 @@ namespace hfst { namespace implementations {
 
   // ---------- FomaInputStream functions ----------
 
-    FomaInputStream::FomaInputStream(void):
-      filename(std::string())
-    {}
-
-    FomaInputStream::FomaInputStream(const char * filename):
-      filename(filename)
-    {}
-    
+    /** Create a FomaInputStream that reads from stdin. */
+  FomaInputStream::FomaInputStream(void)
+  {
+    this->input_file = stdin;
+  }
+    /** Create a FomaInputStream that reads from file \a filename. */
+  FomaInputStream::FomaInputStream(const char * filename):
+  filename(filename)
+  {
+    input_file = NULL;
+  }
+    /** Open the stream. */
   void FomaInputStream::open(void)
   {
-    // reading from stdin does not work with zlib, 
-    // so the problem is avoided here by writing to a temporary file
-
-    if (strcmp(filename.c_str(),"") == 0) {
-      char temp [L_tmpnam];
-      tmpnam(temp);
-      fprintf(stderr, "temporary filename: %s\n", temp);
-      filename = std::string(temp);
-      FILE *tempfile = fopen(temp, "w");
-      while (not std::cin.eof()) {
-	int c = std::cin.get();
-	fputc(c, tempfile);
-      } 
-      fclose(tempfile);
-    }
-
-    io_buf = io_gz_file_to_mem_hfst(strdup(filename.c_str()));
-    if (io_buf == NULL)
-      throw FileNotReadableException();
-    io_buf_ptr = io_buf;
-    is_open_=true;
-    return;
+    if (filename == std::string())
+      { return; }
+    input_file = fopen(filename.c_str(),"r");
+    if (input_file == NULL)
+      { throw FileNotReadableException(); }
   }
-  
+    /** Close the stream. */
   void FomaInputStream::close(void)
   {
-    io_free_hfst(&io_buf);
-    // see comment in open()
-    if (strcmp(filename.c_str(),"") == 0) {
-      remove(filename.c_str());
-    }
-    return;
+    if (input_file == NULL)
+      { return; }
+    if (filename.c_str()[0] != 0)
+      {
+	fclose(input_file);
+	input_file = NULL;
+      }
   }
-  
+    /** Whether the stream is open. */
   bool FomaInputStream::is_open(void)
   {
-    return is_open_;
+    return input_file != NULL;
   }
   
   bool FomaInputStream::is_eof(void)
   {
-    return io_buf_is_end(io_buf_ptr);
+    if (not is_open())
+      { return true; }
+    int c = getc(input_file);
+    bool retval = (feof(input_file) != 0);
+    ungetc(c, input_file);
+    return retval;
   }
   
   bool FomaInputStream::is_bad(void)
   {
-    throw hfst::exceptions::FunctionNotImplementedException();
+    return is_eof();
   }
   
   bool FomaInputStream::is_good(void)
   {
-    throw hfst::exceptions::FunctionNotImplementedException();
+    return not is_bad();
   };
 
   bool FomaInputStream::is_fst(void)
   {
-    throw hfst::exceptions::FunctionNotImplementedException();
+    if (not is_good())
+      { return false; }
+    std::fpos_t position;
+    std::fgetpos(input_file,&position);
+    int sign = fgetc(input_file);
+    std::fsetpos(input_file,&position);
+    return sign == (int)'a';
   }
 
   /* Skip the identifier string "FOMA_TYPE" */
   void FomaInputStream::skip_identifier_version_3_0(void)
   { 
     char foma_identifier[10];
-    for (int i=0; i<10; i++) {
-      foma_identifier[i] = *io_buf_ptr;
-      io_buf_ptr++;
-    }
+    int foma_id_count = fread(foma_identifier,10,1,input_file);
+    if (foma_id_count != 1)
+      { throw NotTransducerStreamException(); }
     if (0 != strcmp(foma_identifier,"FOMA_TYPE"))
       { throw NotTransducerStreamException(); }
   }
   
   void FomaInputStream::skip_hfst_header(void)
   {
-    io_buf_ptr = io_buf_ptr + 5;
-    switch (*io_buf_ptr)
-      {
-      case 0:
-	io_buf_ptr++;
-	try { skip_identifier_version_3_0(); }
-	catch (NotTransducerStreamException e) { throw e; }
-	break;
-      default:
-	assert(false);
-      }
-    return;
+    char hfst_header[6];
+    int header_count = fread(hfst_header,6,1,input_file);
+    if (header_count != 1)
+      { throw NotTransducerStreamException(); }
+    //int c = fgetc(input_file);
+    //switch (c)
+    //{
+    // case 0:
+    try { skip_identifier_version_3_0(); }
+    catch (NotTransducerStreamException e) { throw e; }
+    //break;
+    //default:
+    //assert(false);
+    //}
   }
 
-  bool FomaInputStream::is_foma_stream(const char *filename)
-  {
-    gzFile file;
-    if (strcmp(filename,"") != 0)
-      file = gzopen(filename, "r");
-    else
-      file = gzdopen(fileno(stdin), "r");
-
-    if (file == NULL)
-      throw NotTransducerStreamException();
-    if (gzdirect(file) == 1) {
-        gzclose(file);
-	return false;
-    }
-    gzclose(file);
-    return true;
-  }
-  
-  fsm * FomaInputStream::read_transducer(void)
+  fsm * FomaInputStream::read_transducer(bool has_header)
   {
     if ( (not is_open()) )
       throw FileIsClosedException();
     if (is_eof())
       return NULL;
-    skip_hfst_header();
-    char *net_name;
-    struct fsm * t = io_net_read_hfst(&net_name, &io_buf_ptr);
+    if (has_header)
+      skip_hfst_header();
+    struct fsm * t = read_net_hfst(input_file);
     if (t == NULL)
       throw NotTransducerStreamException();
     return t;
@@ -157,41 +139,38 @@ namespace hfst { namespace implementations {
 
   // ---------- FomaOutputStream functions ----------
 
-  FomaOutputStream::FomaOutputStream(void):
-    filename(std::string())
+  FomaOutputStream::FomaOutputStream(void)
   {}
   FomaOutputStream::FomaOutputStream(const char * str):
     filename(str)
   {}
   void FomaOutputStream::open(void) {
     if (filename != std::string()) {
-      ofile = gzopen(filename.c_str(), "wb");
+      ofile = fopen(filename.c_str(), "wb");
       if (ofile == NULL)
 	throw FileNotReadableException();
     } 
     else {
-      ofile = gzdopen(fileno(stdout), "wb");
-      if (ofile == NULL)
-	throw FileNotReadableException();
+      ofile = stdout;
     }
   }
   void FomaOutputStream::close(void) 
   {
-    // stdout must also be closed in gz!
-    gzclose(ofile);
+    if (filename != std::string())
+      { fclose(ofile); }
   }
-  void FomaOutputStream::write_3_0_library_header(gzFile file)
+  void FomaOutputStream::write_3_0_library_header(FILE *file)
   {
-    gzprintf(file, "HFST3");
-    gzputc(file, 0);
-    gzprintf(file, "FOMA_TYPE");
-    gzputc(file, 0);
+    fputs("HFST3",file);
+    fputc(0, file);
+    fputs("FOMA_TYPE",file);
+    fputc(0, file);
   }
-  void FomaOutputStream::write_transducer(fsm * transducer) 
+  void FomaOutputStream::write_transducer(struct fsm * transducer) 
   { 
     write_3_0_library_header(ofile);
-    // (void**) conversion is needed as foma requires gzFile*
-    foma_net_print(transducer, (void**)ofile);
+    if (1 != write_net_hfst(transducer, ofile))
+      throw hfst::exceptions::HfstInterfaceException();
   }
 
   // ------------------------------------------------

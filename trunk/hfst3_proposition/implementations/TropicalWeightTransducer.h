@@ -44,8 +44,8 @@ namespace implementations
     bool is_good(void) const;
     bool is_fst(void) const;
     bool operator() (void) const;
-    StdVectorFst * read_transducer(KeyTable &key_table);
-    StdVectorFst * read_transducer(void);
+    //StdVectorFst * read_transducer(KeyTable &key_table);
+    StdVectorFst * read_transducer(bool has_header);
   };
 
   class TropicalWeightOutputStream 
