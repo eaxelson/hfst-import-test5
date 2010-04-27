@@ -300,7 +300,7 @@ namespace hfst { namespace implementations {
     try 
       {
 	skip_hfst_header();
-	Transducer tt = Transducer(input_file);
+	Transducer tt = Transducer(input_file,true);
 	t = &tt.copy();
       }
     catch (const char * p)
@@ -329,15 +329,17 @@ namespace hfst { namespace implementations {
     return NULL;
   }
 
-  Transducer * SfstInputStream::read_transducer(void)
+  Transducer * SfstInputStream::read_transducer(bool has_header)
   {
     if (is_eof())
       { throw FileIsClosedException(); }
     Transducer * t = NULL;
     try 
       {
+	if (has_header)
+	  skip_hfst_header();
 	Transducer tt = Transducer(input_file,true);
-	tt.alphabet.clear();
+	//tt.alphabet.clear();
 	t = &tt.copy();
 	return t;
       }

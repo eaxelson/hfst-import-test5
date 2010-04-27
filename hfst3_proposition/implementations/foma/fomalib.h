@@ -153,11 +153,8 @@ struct sigma {
 /********************/
 
 // ADDED TO HFST
-FEXPORT int io_buf_is_end(char * io_buf_ptr);
-FEXPORT void io_free_hfst(char ** io_buf);
-FEXPORT char * io_gz_file_to_mem_hfst(char *filename);
-FEXPORT struct fsm *io_net_read_hfst(char **net_name, char **io_buf_ptr);
-FEXPORT int foma_net_print(struct fsm *net, gzFile *outfile);
+FEXPORT struct fsm * read_net_hfst(FILE *file);
+FEXPORT int write_net_hfst(struct fsm *net, FILE *file);
 
 FEXPORT struct fsm *fsm_determinize(struct fsm *net);
 FEXPORT struct fsm *fsm_epsilon_remove(struct fsm *net);

@@ -41,9 +41,7 @@ namespace hfst {
   {
   private:
     std::string filename;
-    char * io_buf;
-    char * io_buf_ptr;
-    bool is_open_;
+    FILE * input_file;
     void skip_identifier_version_3_0(void);
     void skip_hfst_header(void);
   public:
@@ -56,16 +54,15 @@ namespace hfst {
     bool is_bad(void);
     bool is_good(void);
     bool is_fst(void);
-    fsm * read_transducer(void);
-    static bool is_foma_stream(const char * filename); // should be protected
+    fsm * read_transducer(bool has_header);
   };
 
   class FomaOutputStream 
   {
   private:
     std::string filename;
-    gzFile ofile;
-    void write_3_0_library_header(gzFile file);
+    FILE *ofile;
+    void write_3_0_library_header(FILE *file);
   public:
     FomaOutputStream(void); 
     FomaOutputStream(const char * filename);

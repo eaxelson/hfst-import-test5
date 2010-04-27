@@ -43,11 +43,12 @@ int main(int argc, char **argv) {
   t2.set_final_weight(second_state2, 0.3);
   t2.add_transition(0, "@_UNKNOWN_SYMBOL_@", "baz", 1.6, second_state2);
 
-  ImplementationType types[] = {FOMA_TYPE, SFST_TYPE, TROPICAL_OFST_TYPE, LOG_OFST_TYPE};
+  ImplementationType types[] = {TROPICAL_OFST_TYPE, LOG_OFST_TYPE, SFST_TYPE, FOMA_TYPE};
   for (int i=0; i<4; i++) 
     {      
+#ifndef foo
       // open an output stream to a file
-      HfstOutputStream out("tr.hfst", types[i]);
+      HfstOutputStream out("test.hfst", types[i]);
       out.open();
 
       // convert both transducers and write them to the stream
@@ -59,15 +60,18 @@ int main(int argc, char **argv) {
       out << T2;
       out.close();
       fprintf(stderr, "test.cc: wrote two transducers of type %i\n", types[i]);
-      
+#endif      
+
+#ifndef foo
       // open an input stream to the file
-      HfstInputStream in("tr.hfst");
+      HfstInputStream in("test.hfst");
       in.open();
       while (not in.is_eof()) {
 	HfstTransducer t(in);
 	fprintf(stderr, "test.cc: read a transducer of type %i\n", types[i]);
       }
-      remove("tr.hfst");
+      remove("test.hfst");
+#endif      
     }
 
   return 0;

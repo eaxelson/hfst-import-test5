@@ -66,6 +66,7 @@ namespace hfst
 
     ImplementationType type;
     StreamImplementation implementation;
+    bool has_header;
     void read_transducer(HfstTransducer &t);
     ImplementationType stream_fst_type(const char *filename);
     int read_library_header(std::istream &in);

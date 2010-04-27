@@ -42,7 +42,7 @@ namespace hfst { namespace implementations
     bool is_good(void);
     bool is_fst(void);
     Transducer * read_transducer(KeyTable &key_table);
-    Transducer * read_transducer(void);
+    Transducer * read_transducer(bool has_header);
   };
 
   class SfstOutputStream 
