@@ -202,6 +202,7 @@ namespace hfst { namespace implementations
       static const_iterator begin(LogFst * t);
       static const_iterator end(LogFst * t);
       static LogFst * harmonize(LogFst * t,KeyMap &key_map);
+      static std::pair<LogFst*, LogFst*> harmonize(StdVectorFst *t1, StdVectorFst *t2);
       static void print(LogFst * t, KeyTable &key_table, ostream &out);
       static void extract_strings(LogFst * t, KeyTable &kt,
 				  WeightedStrings<float>::Set &results);

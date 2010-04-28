@@ -46,38 +46,97 @@ int main(int argc, char **argv) {
   ImplementationType types[] = {TROPICAL_OFST_TYPE, LOG_OFST_TYPE, SFST_TYPE, FOMA_TYPE};
   for (int i=0; i<4; i++) 
     {      
-#ifndef foo
-      // open an output stream to a file
-      HfstOutputStream out("test.hfst", types[i]);
-      out.open();
+      // open two output streams to file
+      HfstOutputStream out1("test1.hfst", types[i]);
+      out1.open();
+      HfstOutputStream out2("test2.hfst", types[i]);
+      out2.open();
 
-      // convert both transducers and write them to the stream
+      // convert both transducers and write them to the streams
       HfstTransducer T1(t1);
       T1 = T1.convert(types[i]);
       HfstTransducer T2(t2);
       T2 = T2.convert(types[i]);
-      out << T1;
-      out << T2;
-      out.close();
-      fprintf(stderr, "test.cc: wrote two transducers of type %i\n", types[i]);
-#endif      
+      out1 << T1;
+      out2 << T2;
+      out1.close();
+      out2.close();
 
-#ifndef foo
-      // open an input stream to the file
-      HfstInputStream in("test.hfst");
-      in.open();
-      while (not in.is_eof()) {
-	HfstTransducer t(in);
-	fprintf(stderr, "test.cc: read a transducer of type %i\n", types[i]);
+      // open two input streams to the files
+      HfstInputStream in1("test1.hfst");
+      in1.open();
+      HfstInputStream in2("test2.hfst");
+      in2.open();
+
+      while (not in1.is_eof() && not in2.is_eof()) {
+	HfstTransducer tr1 = HfstTransducer(in1);
+	HfstTransducer tr2 = HfstTransducer(in2);
+	fprintf(stderr, "read two transducers:\n");
+	tr1.print();
+	fprintf(stderr, "--\n");
+	tr2.print();
+	fprintf(stderr, "\n");
+
+	HfstTransducer t = tr1.compose(tr2);
+        fprintf(stderr, "  composed\n");
+	fprintf(stderr, "next intersecting...\n");
+	t = tr1.intersect(tr2);
+	fprintf(stderr, "  intersected\n");
+	t = tr1.disjunct(tr2);
+	fprintf(stderr, "  disjuncted\n");
+	t = tr1.concatenate(tr2);
+	fprintf(stderr, "  concatenated\n");
+	t = tr1.subtract(tr2);
+	fprintf(stderr, "  subtracted\n");
       }
-      remove("test.hfst");
-#endif      
+      remove("test1.hfst");
+      remove("test2.hfst");
+
     }
 
   return 0;
-
+}
 
 #ifdef foo
+
+    HfstTransducer &remove_epsilons(ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &determinize(ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &minimize(ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &n_best(int n,ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &repeat_star(ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &repeat_plus(ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &repeat_n(unsigned int n,
+                       ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &repeat_n_minus(unsigned int n,
+                       ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &repeat_n_plus(unsigned int n,
+                       ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer& repeat_n_to_k(unsigned int n, unsigned int k,
+                       ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &optionalize(ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &invert(ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &input_project(ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &output_project(ImplementationType type=UNSPECIFIED_TYPE);
+    void extract_strings(WeightedStrings<float>::Set &results);
+    HfstTransducer &substitute(Key old_key, Key new_key);
+    HfstTransducer &substitute(const std::string &old_symbol,
+			       const std::string &new_symbol);
+    HfstTransducer &substitute(const KeyPair &old_key_pair, 
+			       const KeyPair &new_key_pair);
+    HfstTransducer &substitute(const StringSymbolPair &old_symbol_pair,
+			       const StringSymbolPair &new_symbol_pair);
+    HfstTransducer &compose(HfstTransducer &another,
+			    ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &concatenate(HfstTransducer &another,
+				ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &disjunct(HfstTransducer &another,
+			     ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &intersect(HfstTransducer &another,
+			      ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &subtract(HfstTransducer &another,
+			     ImplementationType type=UNSPECIFIED_TYPE);
+
+
 
   fprintf(stderr, "disjunction:\n");
 
@@ -120,4 +179,4 @@ int main(int argc, char **argv) {
   // FIX: calling ~HfstTransducer causes a glibc with foma
   return 0;
 #endif
-}
+

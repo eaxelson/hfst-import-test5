@@ -658,7 +658,11 @@ namespace hfst { namespace implementations
   LogFst * LogWeightTransducer::compose(LogFst * t1,
 					LogFst * t2)
   {
-    fst::ArcSort<LogArc,fst::OLabelCompare<LogArc> > (t1,OLabelCompare<LogArc>());
+    if (t1->OutputSymbols() == NULL)
+      t1->SetOutputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    ArcSort(t1, OLabelCompare<LogArc>());
+    ArcSort(t2, ILabelCompare<LogArc>());
+    //fst::ArcSort<LogArc,fst::OLabelCompare<LogArc> > (t1,OLabelCompare<LogArc>());
     //fst::ArcSort<LogArc,fst::ILabelCompare<LogArc> > (t2,ILabelCompare<LogArc>());
     ComposeFst<LogArc> compose(*t1,*t2);
     return new LogFst(compose);
@@ -763,6 +767,10 @@ namespace hfst { namespace implementations
     RelabelFst<LogArc> t_subst(*t,v,v);
     return new LogFst(t_subst);
   }
+
+
+
+
 
   void extract_reversed_strings
   (LogFst * t, LogArc::StateId s, KeyTable &kt,
