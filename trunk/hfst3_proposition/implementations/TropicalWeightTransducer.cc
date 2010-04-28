@@ -12,7 +12,7 @@ namespace hfst { namespace implementations
     filename(filename),i_stream(filename),input_stream(i_stream)
   {}
 
-  StringSymbolSet TropicalWeightTransducer::get_string_symbol_set(fst::StdVectorFst *t)
+  StringSymbolSet TropicalWeightTransducer::get_string_symbol_set(StdVectorFst *t)
   {
     StringSymbolSet s;
     for ( fst::SymbolTableIterator it = fst::SymbolTableIterator(*(t->InputSymbols()));
@@ -211,7 +211,6 @@ namespace hfst { namespace implementations
     KeyTable::collect_unknown_sets(t1_symbols, unknown_t1,
 				   t2_symbols, unknown_t2);
 
-
     // 2. Add new symbols from transducer t1 to the symbol table of transducer t2...
 
     for ( StringSymbolSet::const_iterator it = unknown_t2.begin();
@@ -219,17 +218,17 @@ namespace hfst { namespace implementations
 	t2->InputSymbols()->AddSymbol(*it);
 	//fprintf(stderr, "added %s to the set of symbols unknown to t2\n", (*it).c_str());
     }
+
     // ...calculate the number mappings needed in harmonization...
     KeyMap km = create_mapping(t1, t2);
 
     // ... replace the symbol table of t1 with a copy of t2's symbol table
-    delete t1->InputSymbols();
+    //delete t1->InputSymbols(); this causes problems...
     t1->SetInputSymbols( new fst::SymbolTable(*(t2->InputSymbols())) );
 
     // ...and recode the symbol numbers of transducer t1 so that
     //    it follows the new symbol table.
     recode_symbol_numbers(t1, km);
-
 
     // 3. Calculate the set of symbol pairs to which a non-identity "?:?"
     //    transition is expanded for both transducers.
@@ -238,10 +237,18 @@ namespace hfst { namespace implementations
     fst::StdVectorFst *harmonized_t2;
 
     harmonized_t1 = expand_arcs(t1, unknown_t1);
+    harmonized_t1->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
     delete t1;
 
     harmonized_t2 = expand_arcs(t2, unknown_t2);
+    harmonized_t2->SetInputSymbols( new SymbolTable( *(t2->InputSymbols()) ) );
     delete t2;
+
+    fprintf(stderr, "TWT::harmonize: harmonized t1's and t2's input symbol tables now contain (FINAL):\n");
+    harmonized_t1->InputSymbols()->WriteText(std::cerr);
+    std::cerr << "--\n";
+    harmonized_t2->InputSymbols()->WriteText(std::cerr);
+    std::cerr << "\n";
 
     // fprintf(stderr, "...TWT::harmonize\n");
 
@@ -980,6 +987,14 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::compose(StdVectorFst * t1,
 			 StdVectorFst * t2)
   {
+    if (t1->OutputSymbols() == NULL)
+      t1->SetOutputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    if (t2->OutputSymbols() == NULL)
+      t2->SetOutputSymbols( new SymbolTable( *(t2->InputSymbols()) ) );
+
+    ArcSort(t1, OLabelCompare<StdArc>());
+    ArcSort(t2, ILabelCompare<StdArc>());
+
     ComposeFst<StdArc> compose(*t1,*t2);
     StdVectorFst *result = new StdVectorFst(compose); 
     result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
@@ -1007,7 +1022,25 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::intersect(StdVectorFst * t1,
 			   StdVectorFst * t2)
   {
-    IntersectFst<StdArc> intersect(*t1,*t2);
+    if (t1->OutputSymbols() == NULL)
+      t1->SetOutputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    if (t2->OutputSymbols() == NULL)
+      t2->SetOutputSymbols( new SymbolTable( *(t2->InputSymbols()) ) );
+
+    ArcSort(t1, OLabelCompare<StdArc>());
+    ArcSort(t2, ILabelCompare<StdArc>());
+
+    RmEpsilonFst<StdArc> rm1(*t1);
+    RmEpsilonFst<StdArc> rm2(*t2);
+    EncodeMapper<StdArc> encoder(0x0001,ENCODE);
+    Encode(t1, &encoder);
+    Encode(t2, &encoder);
+    EncodeFst<StdArc> enc1(rm1, &encoder);
+    EncodeFst<StdArc> enc2(rm2, &encoder);
+    DeterminizeFst<StdArc> det1(enc1);
+    DeterminizeFst<StdArc> det2(enc2);
+
+    IntersectFst<StdArc> intersect(enc1,enc2);
     StdVectorFst *result = new StdVectorFst(intersect); 
     result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
     return result;
@@ -1016,7 +1049,27 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::subtract(StdVectorFst * t1,
 			  StdVectorFst * t2)
   {
-    DifferenceFst<StdArc> subtract(*t1,*t2);
+    fprintf(stderr, "subtracting...\n");
+
+    if (t1->OutputSymbols() == NULL)
+      t1->SetOutputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    if (t2->OutputSymbols() == NULL)
+      t2->SetOutputSymbols( new SymbolTable( *(t2->InputSymbols()) ) );
+
+    ArcSort(t1, OLabelCompare<StdArc>());
+    ArcSort(t2, ILabelCompare<StdArc>());
+
+    RmEpsilonFst<StdArc> rm1(*t1);
+    RmEpsilonFst<StdArc> rm2(*t2);
+    EncodeMapper<StdArc> encoder(0x0003,ENCODE); // t2 must be unweighted
+    Encode(t1, &encoder);
+    Encode(t2, &encoder);
+    EncodeFst<StdArc> enc1(rm1, &encoder);
+    EncodeFst<StdArc> enc2(rm2, &encoder);
+    DeterminizeFst<StdArc> det1(enc1);
+    DeterminizeFst<StdArc> det2(enc2);
+
+    DifferenceFst<StdArc> subtract(enc1,enc2);
     StdVectorFst *result = new StdVectorFst(subtract); 
     result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
     return result;

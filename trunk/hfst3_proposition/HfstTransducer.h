@@ -132,13 +132,9 @@ namespace hfst
 
     ImplementationType type;
 
-    bool anonymous; // this variable doesn't do anything yet, but it is
-                    // is supposed to keep track of whether the transducer's
-                    // KeyTable is maintained or not.
-
+    bool anonymous;
     KeyTable key_table;
-
-    bool is_trie;
+    bool is_trie; // not used 
 
     TransducerImplementation implementation; 
 
@@ -150,7 +146,7 @@ namespace hfst
 
   public:
     HfstTransducer(ImplementationType type);
-    HfstTransducer(const KeyTable &key_table,ImplementationType type);
+    //HfstTransducer(const KeyTable &key_table,ImplementationType type);
     HfstTransducer(const std::string& utf8_str, 
     		   const HfstTokenizer &multichar_symbol_tokenizer,
 		   ImplementationType type);
@@ -223,12 +219,9 @@ namespace hfst
     template<class T> typename T::const_iterator end(void)
       { throw hfst::implementations::FunctionNotImplementedException(); }
 
-    HfstTransducer &anonymize(void);
-    KeyTable &get_key_table(void);
-    void set_key_table(const KeyTable &kt);
-
-    //StringSymbolSet get_string_symbol_set(void);
-    //KeyMap create_mapping(HfstTransducer &another, StringSymbolSet &unknown_another);
+    //HfstTransducer &anonymize(void);
+    //KeyTable &get_key_table(void);
+    //void set_key_table(const KeyTable &kt);
 
     ImplementationType get_type(void);
     HfstTransducer &convert(ImplementationType type);
@@ -269,6 +262,7 @@ namespace hfst
     friend class HfstTransitionIterator;
   };
 
+  /* State and transition iterators */
   class HfstStateIterator
   {
   protected:

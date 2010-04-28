@@ -193,16 +193,12 @@ namespace hfst
       {
       case (SFST_TYPE):
 	{
-	  //sfst_interface.harmonize(this->implementation.sfst,
-	  //		 another.implementation.sfst);
 	  std::pair <SFST::Transducer*, SFST::Transducer*> result;
 	  result =
 	    sfst_interface.harmonize(this->implementation.sfst,
 				     another.implementation.sfst);
 	  this->implementation.sfst = result.first;
 	  another.implementation.sfst = result.second;
-	  //this->print();
-	  //another.print();
 	  break;
 	}
       case (FOMA_TYPE):
@@ -219,8 +215,17 @@ namespace hfst
 	  break;
 	}
       case (LOG_OFST_TYPE):
-	// must be implemented
-	break;
+	{
+	  // this could be done with templates...
+	  hfst::implementations::InternalTransducer *internal_this =
+	    hfst::implementations::log_ofst_to_internal_format(this->implementation.log_ofst);
+	  hfst::implementations::InternalTransducer *internal_another =
+	    hfst::implementations::log_ofst_to_internal_format(another.implementation.log_ofst);
+	  std::pair <fst::StdVectorFst*, fst::StdVectorFst*> result =
+	    tropical_ofst_interface.harmonize(internal_this, internal_another);
+	  this->implementation.log_ofst = hfst::implementations::internal_format_to_log_ofst(result.first);
+	  another.implementation.log_ofst = hfst::implementations::internal_format_to_log_ofst(result.second);
+	}
       case (UNSPECIFIED_TYPE):
       case (ERROR_TYPE):
       default:
@@ -333,6 +338,7 @@ namespace hfst
       }
   }
 
+/*
   HfstTransducer::HfstTransducer
   (const KeyTable &key_table,ImplementationType type):
     type(type),anonymous(false),key_table(key_table),is_trie(true)
@@ -356,6 +362,7 @@ namespace hfst
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
       }
   }
+*/
 
   HfstTransducer::HfstTransducer(const std::string& utf8_str, 
 				 const HfstTokenizer 
@@ -478,6 +485,7 @@ namespace hfst
       tropical_ofst_interface.copy(another.transducer.implementation.tropical_ofst);
   }
   
+
   HfstTransducer::~HfstTransducer(void)
   {
     switch (type)
@@ -856,7 +864,6 @@ type(type),anonymous(false),is_trie(false)
   (HfstTransducer &another,
    ImplementationType type)
   { is_trie = false; // This could be done so that is_trie is preserved
-    //harmonize(another);
     return apply(&hfst::implementations::SfstTransducer::intersect,
 		 &hfst::implementations::TropicalWeightTransducer::intersect,
 		 &hfst::implementations::LogWeightTransducer::intersect,
@@ -868,7 +875,6 @@ type(type),anonymous(false),is_trie(false)
   (HfstTransducer &another,
    ImplementationType type)
   { is_trie = false; // This could be done so that is_trie is preserved
-    //harmonize(another);
     return apply(&hfst::implementations::SfstTransducer::subtract,
 		 &hfst::implementations::TropicalWeightTransducer::subtract,
 		 &hfst::implementations::LogWeightTransducer::subtract,
@@ -876,7 +882,7 @@ type(type),anonymous(false),is_trie(false)
 		 another,
 		 type); }
 
-  HfstTransducer &HfstTransducer::anonymize(void)
+/*  HfstTransducer &HfstTransducer::anonymize(void)
   { anonymous = true; return *this; }
   
   KeyTable& HfstTransducer::get_key_table(void)
@@ -886,10 +892,7 @@ type(type),anonymous(false),is_trie(false)
   {
     key_table = kt;
     anonymous = false;
-  }
-
-  /*ImplementationType HfstTransducer::get_type(void)
-    { return this->type; }*/
+    }*/
 
   WeightType HfstTransducer::get_weight_type(void)
   {
