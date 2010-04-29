@@ -301,6 +301,11 @@ namespace hfst { namespace implementations {
     return fsm_empty_string();
   }
   
+  void FomaTransducer::delete_foma(struct fsm * net)
+  {
+    fsm_destroy(net);
+  }
+
   // remove?
   fsm * FomaTransducer::define_transducer(Key k)
   {     throw hfst::exceptions::FunctionNotImplementedException();}
@@ -407,7 +412,7 @@ namespace hfst { namespace implementations {
   fsm * FomaTransducer::compose
   (fsm * t1, fsm * t2)
   {
-    return fsm_compose(t1, t2);
+    return fsm_compose(fsm_copy(t1), fsm_copy(t2));
   }
 
   fsm * FomaTransducer::concatenate

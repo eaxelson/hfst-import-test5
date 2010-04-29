@@ -200,11 +200,6 @@ namespace hfst { namespace implementations {
     KeyTable::collect_unknown_sets(t1_symbols, unknown_t1,
 				   t2_symbols, unknown_t2);
 
-    fprintf(stderr, "  t1's alphabet:\n");
-    t1->alphabet.print();
-    fprintf(stderr, "  t2's alphabet:\n");
-    t2->alphabet.print();
-
     Transducer * new_t1 = &t1->copy(false, &t2->alphabet);
     t2->alphabet.insert_symbols(new_t1->alphabet);
     delete t1;

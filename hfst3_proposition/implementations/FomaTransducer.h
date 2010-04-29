@@ -212,6 +212,7 @@ namespace hfst {
       static const_iterator end(fsm * t);
       static fsm * harmonize(fsm * t,KeyMap &key_map);                // not done
       static void print(fsm * t, KeyTable &key_table, ostream &out);  // not done
+      static void delete_foma(fsm * net);
     };
 
 } }

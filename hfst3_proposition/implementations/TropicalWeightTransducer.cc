@@ -244,11 +244,11 @@ namespace hfst { namespace implementations
     harmonized_t2->SetInputSymbols( new SymbolTable( *(t2->InputSymbols()) ) );
     delete t2;
 
-    fprintf(stderr, "TWT::harmonize: harmonized t1's and t2's input symbol tables now contain (FINAL):\n");
-    harmonized_t1->InputSymbols()->WriteText(std::cerr);
-    std::cerr << "--\n";
-    harmonized_t2->InputSymbols()->WriteText(std::cerr);
-    std::cerr << "\n";
+    //fprintf(stderr, "TWT::harmonize: harmonized t1's and t2's input symbol tables now contain (FINAL):\n");
+    //harmonized_t1->InputSymbols()->WriteText(std::cerr);
+    //std::cerr << "--\n";
+    //harmonized_t2->InputSymbols()->WriteText(std::cerr);
+    //std::cerr << "\n";
 
     // fprintf(stderr, "...TWT::harmonize\n");
 
@@ -1040,8 +1040,9 @@ namespace hfst { namespace implementations
     DeterminizeFst<StdArc> det1(enc1);
     DeterminizeFst<StdArc> det2(enc2);
 
-    IntersectFst<StdArc> intersect(enc1,enc2);
-    StdVectorFst *result = new StdVectorFst(intersect); 
+    IntersectFst<StdArc> intersect(det1,det2);
+    StdVectorFst *result = new StdVectorFst(intersect);
+    // decode???
     result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
     return result;
   }
@@ -1049,15 +1050,11 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::subtract(StdVectorFst * t1,
 			  StdVectorFst * t2)
   {
-    fprintf(stderr, "subtracting...\n");
 
     if (t1->OutputSymbols() == NULL)
       t1->SetOutputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
     if (t2->OutputSymbols() == NULL)
       t2->SetOutputSymbols( new SymbolTable( *(t2->InputSymbols()) ) );
-
-    ArcSort(t1, OLabelCompare<StdArc>());
-    ArcSort(t2, ILabelCompare<StdArc>());
 
     RmEpsilonFst<StdArc> rm1(*t1);
     RmEpsilonFst<StdArc> rm2(*t2);
@@ -1068,8 +1065,16 @@ namespace hfst { namespace implementations
     EncodeFst<StdArc> enc2(rm2, &encoder);
     DeterminizeFst<StdArc> det1(enc1);
     DeterminizeFst<StdArc> det2(enc2);
+    
+    ArcSort(t1, OLabelCompare<StdArc>());
+    ArcSort(t2, ILabelCompare<StdArc>());
 
-    DifferenceFst<StdArc> subtract(enc1,enc2);
+    StdVectorFst *difference = new StdVectorFst();
+    Difference(*t1, *t2, difference);
+    DecodeFst<StdArc> subtract(*difference, encoder);
+    delete difference;
+
+    //DifferenceFst<StdArc> subtract(enc1,enc2);
     StdVectorFst *result = new StdVectorFst(subtract); 
     result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
     return result;

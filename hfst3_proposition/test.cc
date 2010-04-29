@@ -46,6 +46,8 @@ int main(int argc, char **argv) {
   ImplementationType types[] = {TROPICAL_OFST_TYPE, LOG_OFST_TYPE, SFST_TYPE, FOMA_TYPE};
   for (int i=0; i<4; i++) 
     {      
+      fprintf(stderr, "testing transducers of type %i\n", types[i]);
+
       // open two output streams to file
       HfstOutputStream out1("test1.hfst", types[i]);
       out1.open();
@@ -69,25 +71,26 @@ int main(int argc, char **argv) {
       in2.open();
 
       while (not in1.is_eof() && not in2.is_eof()) {
-	HfstTransducer tr1 = HfstTransducer(in1);
-	HfstTransducer tr2 = HfstTransducer(in2);
-	fprintf(stderr, "read two transducers:\n");
-	tr1.print();
-	fprintf(stderr, "--\n");
-	tr2.print();
-	fprintf(stderr, "\n");
+	fprintf(stderr, " while loop\n");
+	HfstTransducer tr1(in1);
+	HfstTransducer tr2(in2);
+
+	//tr1.print();
+	//fprintf(stderr, "--\n");
+	//tr2.print();
+	//fprintf(stderr, "\n");
 
 	HfstTransducer t = tr1.compose(tr2);
         fprintf(stderr, "  composed\n");
-	fprintf(stderr, "next intersecting...\n");
-	t = tr1.intersect(tr2);
+	t = (HfstTransducer(tr1)).intersect(tr2);
 	fprintf(stderr, "  intersected\n");
 	t = tr1.disjunct(tr2);
 	fprintf(stderr, "  disjuncted\n");
 	t = tr1.concatenate(tr2);
 	fprintf(stderr, "  concatenated\n");
-	t = tr1.subtract(tr2);
+	t = (HfstTransducer(tr1)).subtract(tr2);
 	fprintf(stderr, "  subtracted\n");
+
       }
       remove("test1.hfst");
       remove("test2.hfst");

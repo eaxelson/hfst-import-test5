@@ -686,19 +686,83 @@ namespace hfst { namespace implementations
 					      const LogFst * t2)
   { HFST_IMPLEMENTATIONS::disjunct_as_tries(t1,t1.Start(),t2,t2->Start()); }
   
+
+  LogFst * LogWeightTransducer::intersect(LogFst * t1,
+			   LogFst * t2)
+  {
+    if (t1->OutputSymbols() == NULL)
+      t1->SetOutputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    if (t2->OutputSymbols() == NULL)
+      t2->SetOutputSymbols( new SymbolTable( *(t2->InputSymbols()) ) );
+
+    ArcSort(t1, OLabelCompare<LogArc>());
+    ArcSort(t2, ILabelCompare<LogArc>());
+
+    RmEpsilonFst<LogArc> rm1(*t1);
+    RmEpsilonFst<LogArc> rm2(*t2);
+    EncodeMapper<LogArc> encoder(0x0001,ENCODE);
+    Encode(t1, &encoder);
+    Encode(t2, &encoder);
+    EncodeFst<LogArc> enc1(rm1, &encoder);
+    EncodeFst<LogArc> enc2(rm2, &encoder);
+    DeterminizeFst<LogArc> det1(enc1);
+    DeterminizeFst<LogArc> det2(enc2);
+
+    IntersectFst<LogArc> intersect(det1,det2);
+    LogFst *result = new LogFst(intersect);
+    // decode???
+    result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    return result;
+  }
+
+  /*
   LogFst * LogWeightTransducer::intersect(LogFst * t1,
 			   LogFst * t2)
   {
     IntersectFst<LogArc> intersect(*t1,*t2);
     return new LogFst(intersect);
+    }*/
+
+  LogFst * LogWeightTransducer::subtract(LogFst * t1,
+			  LogFst * t2)
+  {
+
+    if (t1->OutputSymbols() == NULL)
+      t1->SetOutputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    if (t2->OutputSymbols() == NULL)
+      t2->SetOutputSymbols( new SymbolTable( *(t2->InputSymbols()) ) );
+
+    RmEpsilonFst<LogArc> rm1(*t1);
+    RmEpsilonFst<LogArc> rm2(*t2);
+    EncodeMapper<LogArc> encoder(0x0003,ENCODE); // t2 must be unweighted
+    Encode(t1, &encoder);
+    Encode(t2, &encoder);
+    EncodeFst<LogArc> enc1(rm1, &encoder);
+    EncodeFst<LogArc> enc2(rm2, &encoder);
+    DeterminizeFst<LogArc> det1(enc1);
+    DeterminizeFst<LogArc> det2(enc2);
+    
+    ArcSort(t1, OLabelCompare<LogArc>());
+    ArcSort(t2, ILabelCompare<LogArc>());
+
+    LogFst *difference = new LogFst();
+    Difference(*t1, *t2, difference);
+    DecodeFst<LogArc> subtract(*difference, encoder);
+    delete difference;
+
+    //DifferenceFst<LogArc> subtract(enc1,enc2);
+    LogFst *result = new LogFst(subtract); 
+    result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    return result;
   }
 
+  /*
   LogFst * LogWeightTransducer::subtract(LogFst * t1,
 			  LogFst * t2)
   {
     DifferenceFst<LogArc> subtract(*t1,*t2);
     return new LogFst(subtract);
-  }
+  }*/
 
   LogFst * LogWeightTransducer::set_weight(LogFst * t,float f)
   {
