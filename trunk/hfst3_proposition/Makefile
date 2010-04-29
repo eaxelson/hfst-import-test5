@@ -55,7 +55,7 @@ test.o: test.cc
 test: test.o libhfst3.a
 
 test.o: 
-	g++ -I. -c test.cc -o test.o
+	g++ -pg -I. -c test.cc -o test.o
 
 test:
 	g++ -i test.o -lhfst3 -lz -L. -o test

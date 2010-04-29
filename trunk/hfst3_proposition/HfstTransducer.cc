@@ -186,8 +186,12 @@ namespace hfst
   {
     if (this->type != another.type)
       {
+	fprintf(stderr, "FUFUU\n");
 	throw hfst::exceptions::TransducerHasWrongTypeException();
       }
+
+    //fprintf(stderr, "harmonize(1): this type is %i\n", this->type);
+    //fprintf(stderr, "harmonize(1): another type is %i\n", another.type);
 
     switch(this->type)
       {
@@ -225,10 +229,12 @@ namespace hfst
 	    tropical_ofst_interface.harmonize(internal_this, internal_another);
 	  this->implementation.log_ofst = hfst::implementations::internal_format_to_log_ofst(result.first);
 	  another.implementation.log_ofst = hfst::implementations::internal_format_to_log_ofst(result.second);
+	  break;
 	}
       case (UNSPECIFIED_TYPE):
       case (ERROR_TYPE):
       default:
+	fprintf(stderr, "GAGAA\n");
 	throw hfst::exceptions::TransducerHasWrongTypeException();
       }
   }
@@ -500,7 +506,7 @@ namespace hfst
 	delete implementation.log_ofst;
 	break;
       case FOMA_TYPE:
-	delete implementation.foma;
+	foma_interface.delete_foma(implementation.foma);
 	break;
       case UNSPECIFIED_TYPE:
       case ERROR_TYPE:
@@ -1007,7 +1013,7 @@ type(type),anonymous(false),is_trie(false)
 	  case FOMA_TYPE:
 	    internal =
 	      hfst::implementations::foma_to_internal_format(implementation.foma);
-	    delete implementation.foma;
+	    foma_interface.delete_foma(implementation.foma);
 	    break;
 	  case SFST_TYPE:
 	    internal = 
