@@ -924,11 +924,20 @@ void compute_result(void)
 	    { std::cerr << p << std::endl; exit(1); }
 	}
 
+      HWFST::TransducerHandle weighted_lexicon_phonology_level =
+	HWFST::minimize
+	(HWFST::extract_output_language(HWFST::copy(weighted_lexicon)));
 
       weighted_result =
-	HWFST::intersecting_composition(weighted_lexicon,
+	HWFST::intersecting_composition(weighted_lexicon_phonology_level,
 					&weighted_rules,
 					weighted_symbol_table);
+
+      weighted_result = HWFST::minimize(weighted_result);
+      
+      weighted_result = 
+	HWFST::compose(weighted_lexicon,weighted_result);
+
       time_t INTERSECTING_COMPOSITION_STOP = clock();
       char * intersecting_composition_time = 
  time_to_string(INTERSECTING_COMPOSITION_STOP-INTERSECTING_COMPOSITION_START);
@@ -1006,11 +1015,26 @@ void compute_result(void)
 	    }
 	  delete unknown_transducer;
 	}
+
+      HFST::TransducerHandle unweighted_lexicon_phonology_level =
+	HFST::minimize
+	(HFST::extract_output_language(HFST::copy(unweighted_lexicon)));
+
       unweighted_result =
-	HFST::intersecting_composition(unweighted_lexicon,
+	HFST::intersecting_composition(unweighted_lexicon_phonology_level,
 				       &unweighted_rules,
 				       unweighted_symbol_table);
 
+      unweighted_result = HFST::minimize(unweighted_result);
+      
+      unweighted_result = 
+	HFST::compose(unweighted_lexicon,unweighted_result);
+
+      /*      unweighted_result =
+	HFST::intersecting_composition(unweighted_lexicon,
+				       &unweighted_rules,
+				       unweighted_symbol_table);
+      */
       time_t INTERSECTING_COMPOSITION_STOP = clock();
       char * intersecting_composition_time = 
  time_to_string(INTERSECTING_COMPOSITION_STOP-INTERSECTING_COMPOSITION_START);
