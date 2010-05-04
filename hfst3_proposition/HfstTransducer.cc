@@ -658,6 +658,24 @@ type(type),anonymous(false),is_trie(false)
        &hfst::implementations::FomaTransducer::repeat_le_n,
        n,type); }
 
+  HfstTransducer &HfstTransducer::repeat_n_minus(unsigned int n, ImplementationType type)
+  { is_trie = false; // This could be done so that is_trie is preserved
+    return apply 
+      (&hfst::implementations::SfstTransducer::repeat_le_n,
+       &hfst::implementations::TropicalWeightTransducer::repeat_le_n,
+       &hfst::implementations::LogWeightTransducer::repeat_le_n,
+       &hfst::implementations::FomaTransducer::repeat_le_n,
+       n,type); }
+
+  HfstTransducer &HfstTransducer::repeat_n_to_k(unsigned int n, unsigned int, ImplementationType type)
+  { is_trie = false; // This could be done so that is_trie is preserved
+    return apply 
+      (&hfst::implementations::SfstTransducer::repeat_le_n,
+       &hfst::implementations::TropicalWeightTransducer::repeat_le_n,
+       &hfst::implementations::LogWeightTransducer::repeat_le_n,
+       &hfst::implementations::FomaTransducer::repeat_le_n,
+       n,type); }
+
   HfstTransducer &HfstTransducer::optionalize(ImplementationType type)
   { is_trie = false; // This could be done so that is_trie is preserved
     return apply 
@@ -674,6 +692,15 @@ type(type),anonymous(false),is_trie(false)
        &hfst::implementations::TropicalWeightTransducer::invert,
        &hfst::implementations::LogWeightTransducer::invert,
        &hfst::implementations::FomaTransducer::invert,
+       type); }
+
+  HfstTransducer &HfstTransducer::reverse(ImplementationType type)
+  { is_trie = false; // This could be done so that is_trie is preserved
+    return apply 
+      (&hfst::implementations::SfstTransducer::reverse,
+       &hfst::implementations::TropicalWeightTransducer::reverse,
+       &hfst::implementations::LogWeightTransducer::reverse,
+       &hfst::implementations::FomaTransducer::reverse,
        type); }
 
   HfstTransducer &HfstTransducer::input_project(ImplementationType type)

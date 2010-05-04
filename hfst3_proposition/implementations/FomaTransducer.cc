@@ -340,27 +340,30 @@ namespace hfst { namespace implementations {
   
   fsm * FomaTransducer::determinize(fsm * t)
   {     
-    return fsm_determinize(t);
+    // returns the argument, so a copy is taken here
+    return fsm_determinize(fsm_copy(t));
   }
   
   fsm * FomaTransducer::minimize(fsm * t)
   {     
-    return fsm_minimize(t);
+    // returns the argument, so a copy is taken here
+    return fsm_minimize(fsm_copy(t));
   }
   
   fsm * FomaTransducer::remove_epsilons(fsm * t)
   {
-    return fsm_epsilon_remove(t);
+    // returns the argument, so a copy is taken here
+    return fsm_epsilon_remove(fsm_copy(t));
   }
   
   fsm * FomaTransducer::repeat_star(fsm * t)
   {     
-    return fsm_kleene_star(t);
+    return fsm_kleene_star(fsm_copy(t));
   }
   
   fsm * FomaTransducer::repeat_plus(fsm * t)
   {     
-    return fsm_kleene_plus(t);
+    return fsm_kleene_plus(fsm_copy(t));
   }
   
   fsm * FomaTransducer::repeat_n(fsm * t,int n)
@@ -375,27 +378,27 @@ namespace hfst { namespace implementations {
   
   fsm * FomaTransducer::optionalize(fsm * t)
   { 
-    return fsm_optionality(t);
+    return fsm_optionality(fsm_copy(t));
   }
   
   fsm * FomaTransducer::invert(fsm * t)
   {
-    return fsm_invert(t);
+    return fsm_invert(fsm_copy(t));
   }
   
   fsm * FomaTransducer::reverse(fsm * t)
   { 
-    return fsm_reverse(t);
+    return fsm_reverse(fsm_copy(t));
   }
   
   fsm * FomaTransducer::extract_input_language(fsm * t)
   { 
-    return fsm_upper(t);
+    return fsm_upper(fsm_copy(t));
   }
   
   fsm * FomaTransducer::extract_output_language(fsm * t)
   {
-    return fsm_lower(t);
+    return fsm_lower(fsm_copy(t));
   }
   
   fsm * FomaTransducer::substitute(fsm * t,Key old_key,Key new_key)
