@@ -1,3 +1,7 @@
+/*
+ * test.cc: A test file for hfst3
+ */
+
 #include "HfstTransducer.h"
 #include <cstdio>
 
