@@ -64,7 +64,9 @@ int main(int argc, char **argv) {
       HfstTransducer T2(t2);
       T2 = T2.convert(types[i]);
       out1 << T1;
+      out1 << T2;
       out2 << T2;
+      out2 << T1;
       out1.close();
       out2.close();
 
@@ -79,23 +81,59 @@ int main(int argc, char **argv) {
 	HfstTransducer tr1(in1);
 	HfstTransducer tr2(in2);
 
-	//tr1.print();
-	//fprintf(stderr, "--\n");
-	//tr2.print();
-	//fprintf(stderr, "\n");
+	{ HfstTransducer t = tr1.compose(tr2);
+	  fprintf(stderr, "  composed\n"); }
+	{ HfstTransducer t = tr1.intersect(tr2);
+	  fprintf(stderr, "  intersected\n"); }
+	{ HfstTransducer t = tr1.disjunct(tr2);
+	  fprintf(stderr, "  disjuncted\n"); }
+	{ HfstTransducer t = tr1.concatenate(tr2);
+	  fprintf(stderr, "  concatenated\n"); }
+	{ HfstTransducer t = tr1.subtract(tr2);
+	  fprintf(stderr, "  subtracted\n"); }
 
-	HfstTransducer t = tr1.compose(tr2);
-        fprintf(stderr, "  composed\n");
-	t = (HfstTransducer(tr1)).intersect(tr2);
-	fprintf(stderr, "  intersected\n");
-	t = tr1.disjunct(tr2);
-	fprintf(stderr, "  disjuncted\n");
-	t = tr1.concatenate(tr2);
-	fprintf(stderr, "  concatenated\n");
-	t = (HfstTransducer(tr1)).subtract(tr2);
-	fprintf(stderr, "  subtracted\n");
+	{ HfstTransducer t = tr1.remove_epsilons();
+	  fprintf(stderr, "  removed epsilons\n"); }
+	{ HfstTransducer t = tr1.determinize();
+	  fprintf(stderr, "  determinized\n"); }
+	{ HfstTransducer t = tr1.minimize();
+	  fprintf(stderr, "  minimized\n"); }
+
+	{ HfstTransducer t = tr1.repeat_star();
+	  fprintf(stderr, "  repeated star\n"); }
+	{ HfstTransducer t = tr1.repeat_plus();
+	  fprintf(stderr, "  repeated plus\n"); }
+	{ HfstTransducer t = tr1.repeat_n(3);
+	  fprintf(stderr, "  repeated n\n"); }
+	{ HfstTransducer t = tr1.repeat_n_minus(3);
+	  fprintf(stderr, "  repeated n minus\n"); }
+	{ HfstTransducer t = tr1.repeat_n_plus(3);
+	  fprintf(stderr, "  repeated n plus\n"); }
+	{ HfstTransducer t = tr1.repeat_n_to_k(1, 4);
+	  fprintf(stderr, "  repeated n to k\n"); }
+	{ HfstTransducer t = tr1.optionalize();
+	  fprintf(stderr, "  optionalized\n"); }
+
+	{ HfstTransducer t = tr1.invert();
+	  fprintf(stderr, "  inverted\n"); }
+	{ HfstTransducer t = tr1.input_project();
+	  fprintf(stderr, "  input projected\n"); }
+	{ HfstTransducer t = tr1.output_project();
+	  fprintf(stderr, "  output projected\n"); }
+	{ HfstTransducer t = tr1.reverse();
+	  fprintf(stderr, "  reversed\n"); }
+
+#ifdef foo
+	{ HfstTransducer t = tr1.substitute(std::string(),
+					    std::string();
+	  fprintf(stderr, "  substituted string\n"); }
+	{ HfstTransducer t = tr1.substitute(const StringSymbolPair &old_symbol_pair,
+					    const StringSymbolPair &new_symbol_pair);
+	  fprintf(stderr, "  substituted string pair\n"); }
+#endif
 
       }
+
       remove("test1.hfst");
       remove("test2.hfst");
 
@@ -103,6 +141,13 @@ int main(int argc, char **argv) {
 
   return 0;
 }
+
+
+
+
+
+
+
 
 #ifdef foo
 

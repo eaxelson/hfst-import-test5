@@ -145,33 +145,44 @@ namespace hfst
 #include "apply_schemas.h"
 
   public:
+    /** An empty transducer, i.e. a transducer that does not recognize any string. 
+	@note Use HfstTransducer("@_EPSILON_SYMBOL_@") to create an epsilon transducer.
+     **/
     HfstTransducer(ImplementationType type);
-    //HfstTransducer(const KeyTable &key_table,ImplementationType type);
     HfstTransducer(const std::string& utf8_str, 
     		   const HfstTokenizer &multichar_symbol_tokenizer,
 		   ImplementationType type);
-    HfstTransducer(KeyPairVector * kpv, 
-		   ImplementationType type);
+    //HfstTransducer(KeyPairVector * kpv, 
+    //		   ImplementationType type);
     HfstTransducer(const std::string& upper_utf8_str,
     		   const std::string& lower_utf8_str,
     		   const HfstTokenizer &multichar_symbol_tokenizer,
 		   ImplementationType type);
+    /** Read a transducer from stream \a in. **/
     HfstTransducer(HfstInputStream &in);
+    /** A deep copy of transducer \a another. **/
     HfstTransducer(const HfstTransducer &another);
+    /** An ordinary transducer equivalent to mutable transducer \a t. **/
     HfstTransducer(const HfstMutableTransducer &t);
     ~HfstTransducer(void);
 
-    // for testing
+    /** A transducer that recognizes the string pair "symbol:symbol". **/
     HfstTransducer(const std::string &symbol, ImplementationType type);
+    /** A transducer that recognizes the string pair "isymbol:osymbol". **/
     HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type);
 
     void print(void);
 
+    /** An equivalent transducer that has no epsilon:epsilon transitions. */
     HfstTransducer &remove_epsilons(ImplementationType type=UNSPECIFIED_TYPE);
+    /** An equivalent transducer that has no state with two or more transitions whose input/output pairs are the same. */
     HfstTransducer &determinize(ImplementationType type=UNSPECIFIED_TYPE);
+    /** An equivalent transducer with the smallest number of states. */
     HfstTransducer &minimize(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &n_best(int n,ImplementationType type=UNSPECIFIED_TYPE);
+    /** A transducer that accepts any number of this. */
     HfstTransducer &repeat_star(ImplementationType type=UNSPECIFIED_TYPE);
+    /** A transducer that accepts one or more of this. */
     HfstTransducer &repeat_plus(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &repeat_n(unsigned int n,
                        ImplementationType type=UNSPECIFIED_TYPE);
@@ -183,6 +194,7 @@ namespace hfst
                        ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &optionalize(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &invert(ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &reverse(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &input_project(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &output_project(ImplementationType type=UNSPECIFIED_TYPE);
     void extract_strings(WeightedStrings<float>::Set &results);

@@ -598,8 +598,8 @@ namespace hfst { namespace implementations {
   Transducer * SfstTransducer::minimize(Transducer * t)
   { return &t->minimise(false); }
   
-  Transducer * SfstTransducer::remove_epsilons(Transducer *)
-  { throw FunctionNotImplementedException(); }
+  Transducer * SfstTransducer::remove_epsilons(Transducer * t)
+  { return &t->remove_epsilons(); }
   
   Transducer * SfstTransducer::repeat_star(Transducer * t)
   { return &t->kleene_star(); }

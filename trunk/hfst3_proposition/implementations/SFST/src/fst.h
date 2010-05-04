@@ -29,6 +29,11 @@ using namespace hfst::symbols;
 
 #include "mem.h"
 
+// HFST addition
+#include <map>
+using std::map;
+
+
 // Hfst addition
 namespace SFST
 {
@@ -320,10 +325,15 @@ class Transducer {
   // turns a sequence of labels into a transducer
   Transducer( std::vector<Label>& );
 
-  // HFST addition
+  // HFST additions...
   Transducer &expand( StringSymbolSet &s );
   Node *expand_nodes( Node *node, Transducer *a, StringSymbolSet &s );
   void expand_node( Node *origin, Label &l, Node *target, Transducer *a, StringSymbolSet &s );
+  void copy_nodes( Node *search_node, Transducer *copy_tr,
+		   Node *start_node,
+		   NodeNumbering &nn, map<int, Node*> &mapper );
+  Transducer &remove_epsilons();
+  // ...HFST additions end
 
   Node *root_node( void ) { return &root; };  // returns the root node
   const Node *root_node( void ) const { return &root; };  // returns the root node
