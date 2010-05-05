@@ -376,27 +376,31 @@ namespace hfst
 				 ImplementationType type):
     type(type),anonymous(false),is_trie(true)
   {
-    KeyPairVector * kpv = 
-      multichar_symbol_tokenizer.tokenize(utf8_str,key_table);
+    StringPairVector * spv = 
+      multichar_symbol_tokenizer.tokenize(utf8_str); //,key_table);
     switch (type)
       {
       case SFST_TYPE:
-	implementation.sfst = sfst_interface.define_transducer(*kpv);
+	implementation.sfst = sfst_interface.define_transducer(*spv);
 	break;
       case TROPICAL_OFST_TYPE:
 	implementation.tropical_ofst = 
-	  tropical_ofst_interface.define_transducer(*kpv);
+	  tropical_ofst_interface.define_transducer(*spv);
 	break;
       case LOG_OFST_TYPE:
 	implementation.log_ofst = 
-	  log_ofst_interface.define_transducer(*kpv);
+	  log_ofst_interface.define_transducer(*spv);
 	break;
-	case UNSPECIFIED_TYPE:
-	case ERROR_TYPE:
-	default:
-	  throw hfst::exceptions::TransducerHasWrongTypeException();
+      case FOMA_TYPE:
+	implementation.foma =
+	  foma_interface.define_transducer(*spv);
+	break;
+      case UNSPECIFIED_TYPE:
+      case ERROR_TYPE:
+      default:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
       }
-    delete kpv;
+    delete spv;
   }
 
   HfstTransducer::HfstTransducer(const std::string& upper_utf8_str,
@@ -406,31 +410,35 @@ namespace hfst
 				 ImplementationType type):
     type(type),anonymous(false),is_trie(true)
   {
-    KeyPairVector * kpv = 
+    StringPairVector * spv = 
       multichar_symbol_tokenizer.tokenize
-      (upper_utf8_str,lower_utf8_str,key_table);
+      (upper_utf8_str,lower_utf8_str); //,key_table);
     switch (type)
       {
       case SFST_TYPE:
-	implementation.sfst = sfst_interface.define_transducer(*kpv);
+	implementation.sfst = sfst_interface.define_transducer(*spv);
 	break;
       case TROPICAL_OFST_TYPE:
 	implementation.tropical_ofst = 
-	  tropical_ofst_interface.define_transducer(*kpv);
+	  tropical_ofst_interface.define_transducer(*spv);
 	break;
       case LOG_OFST_TYPE:
 	implementation.log_ofst = 
-	  log_ofst_interface.define_transducer(*kpv);
+	  log_ofst_interface.define_transducer(*spv);
 	break;
-	case UNSPECIFIED_TYPE:
-	case ERROR_TYPE:
-	default:
-	  throw hfst::exceptions::TransducerHasWrongTypeException();
+      case FOMA_TYPE:
+	implementation.foma =
+	  foma_interface.define_transducer(*spv);
+	break;
+      case UNSPECIFIED_TYPE:
+      case ERROR_TYPE:
+      default:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
       }
-    delete kpv;
+    delete spv;
   }
 
-  HfstTransducer::HfstTransducer(KeyPairVector * kpv,
+/*  HfstTransducer::HfstTransducer(KeyPairVector * kpv,
 				 ImplementationType type):
     type(type),anonymous(true),is_trie(true)
   {
@@ -450,7 +458,7 @@ namespace hfst
       default:
 	assert(false);
       }
-  }
+      }*/
 
   HfstTransducer::HfstTransducer(HfstInputStream &in):
     type(in.type), anonymous(false),is_trie(false)
@@ -528,7 +536,7 @@ type(type),anonymous(false),is_trie(false)
 	implementation.tropical_ofst = tropical_ofst_interface.define_transducer(symbol);
 	break;
       case LOG_OFST_TYPE:
-	throw hfst::exceptions::FunctionNotImplementedException();
+	implementation.log_ofst = log_ofst_interface.define_transducer(symbol);
 	break;
       case FOMA_TYPE:
 	implementation.foma = foma_interface.define_transducer(strdup(symbol.c_str()));
@@ -553,7 +561,7 @@ type(type),anonymous(false),is_trie(false)
 	implementation.tropical_ofst = tropical_ofst_interface.define_transducer(isymbol, osymbol);
 	break;
       case LOG_OFST_TYPE:
-	throw hfst::exceptions::FunctionNotImplementedException();
+	implementation.log_ofst = log_ofst_interface.define_transducer(isymbol, osymbol);
 	break;
       case FOMA_TYPE:
 	implementation.foma = foma_interface.define_transducer( strdup(isymbol.c_str()), strdup(osymbol.c_str()) );
@@ -593,6 +601,15 @@ type(type),anonymous(false),is_trie(false)
 	throw hfst::exceptions::TransducerHasUnknownTypeException();
 	break;
       }
+  }
+
+  bool HfstTransducer::test_equivalence(HfstTransducer &one, HfstTransducer &another) 
+  {
+    HfstTransducer oneconv = one.convert(TROPICAL_OFST_TYPE);
+    HfstTransducer anotherconv = another.convert(TROPICAL_OFST_TYPE);
+    return tropical_ofst_interface.test_equivalence(
+	     oneconv.implementation.tropical_ofst,
+	     anotherconv.implementation.tropical_ofst);
   }
 
   HfstTransducer &HfstTransducer::remove_epsilons(ImplementationType type)

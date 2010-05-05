@@ -70,7 +70,7 @@ namespace hfst { namespace implementations
 	for (fst::ArcIterator<StdVectorFst> aiter(*t,s); !aiter.Done(); aiter.Next())
 	  {
 	    const StdArc &arc = aiter.Value();
-	    fprintf(stderr, "%i\t%i\t%s\t%s\t%f\n", (int)s, (int)arc.nextstate, sym->Find(arc.ilabel).c_str(), sym->Find(arc.olabel).c_str(), arc.weight.Value());
+	    fprintf(stderr, "%i\t%i\t%s\t%s\t%f\t\t(%i %i)\t\n", (int)s, (int)arc.nextstate, sym->Find(arc.ilabel).c_str(), sym->Find(arc.olabel).c_str(), arc.weight.Value(), arc.ilabel, arc.olabel);
 	  }
 	if (t->Final(s) != TropicalWeight::Zero())
 	  fprintf(stderr, "%i\t%f\n", (int)s, t->Final(s).Value());
@@ -679,9 +679,7 @@ namespace hfst { namespace implementations
   }
   */
 
-  fst::SymbolTable * create_symbol_table(std::string name);
-
-  fst::SymbolTable * create_symbol_table(std::string name) {
+  fst::SymbolTable * TropicalWeightTransducer::create_symbol_table(std::string name) {
     fst::SymbolTable * st = new fst::SymbolTable(name);
     st->AddSymbol("@_EPSILON_SYMBOL_@", 0);
     st->AddSymbol("@_UNKNOWN_SYMBOL_@", 1);
@@ -689,7 +687,7 @@ namespace hfst { namespace implementations
     return st;
   }
   
-  void initialize_symbol_tables(StdVectorFst *t) {
+  void TropicalWeightTransducer::initialize_symbol_tables(StdVectorFst *t) {
     SymbolTable *st = create_symbol_table("");
     t->SetInputSymbols(st);
     //t->SetOutputSymbols(st);
@@ -763,7 +761,22 @@ namespace hfst { namespace implementations
     return t;
   }
 
-  // HERE
+  bool TropicalWeightTransducer::test_equivalence(StdVectorFst *one, StdVectorFst *another) 
+  {
+    EncodeMapper<StdArc> encode_mapper(0x0001,ENCODE);
+
+    RmEpsilonFst<StdArc> rmone(*one);
+    EncodeFst<StdArc> encone(rmone,
+			  &encode_mapper);
+    DeterminizeFst<StdArc> detone(encone);
+
+    RmEpsilonFst<StdArc> rmanother(*another);
+    EncodeFst<StdArc> encanother(rmanother,
+			  &encode_mapper);
+    DeterminizeFst<StdArc> detanother(encanother);
+
+    return Equivalent(detone, detanother);
+  }
 
   StdVectorFst * TropicalWeightTransducer::define_transducer
   (const KeyPairVector &kpv)
@@ -777,6 +790,26 @@ namespace hfst { namespace implementations
       {
 	StateId s2 = t->AddState();
 	t->AddArc(s1,StdArc(it->first,it->second,0,s2));
+	s1 = s2;
+      }
+    t->SetFinal(s1,0);
+    return t;
+  }
+
+  StdVectorFst * TropicalWeightTransducer::define_transducer
+  (const StringPairVector &spv)
+  {
+    StdVectorFst * t = new StdVectorFst;
+    initialize_symbol_tables(t);
+
+    StateId s1 = t->AddState();
+    t->SetStart(s1);
+    for (StringPairVector::const_iterator it = spv.begin();
+	 it != spv.end();
+	 ++it)
+      {
+	StateId s2 = t->AddState();
+	t->AddArc(s1,StdArc(t->InputSymbols()->AddSymbol(it->first),t->InputSymbols()->AddSymbol(it->second),0,s2));
 	s1 = s2;
       }
     t->SetFinal(s1,0);

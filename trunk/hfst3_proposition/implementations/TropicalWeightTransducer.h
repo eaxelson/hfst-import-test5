@@ -137,6 +137,7 @@ namespace implementations
       static StdVectorFst * define_transducer(const std::string &isymbol, const std::string &osymbol);
 
       static StdVectorFst * define_transducer(const KeyPairVector &kpv);
+      static StdVectorFst * define_transducer(const StringPairVector &spv);
       static StdVectorFst * copy(StdVectorFst * t);
       static StdVectorFst * determinize(StdVectorFst * t);
       static StdVectorFst * minimize(StdVectorFst * t);
@@ -176,6 +177,7 @@ namespace implementations
       static std::pair<StdVectorFst*, StdVectorFst*> harmonize(StdVectorFst *t1, StdVectorFst *t2);
       static void print(StdVectorFst * t, KeyTable &key_table, ostream &out);
       static void print_test(StdVectorFst * t);
+      static bool test_equivalence(StdVectorFst *one, StdVectorFst *another);
 
     protected:
       static StringSymbolSet get_string_symbol_set(StdVectorFst *t);
@@ -183,6 +185,10 @@ namespace implementations
       static void recode_symbol_numbers(StdVectorFst * t, KeyMap &km);      
       static StdVectorFst * expand_arcs(StdVectorFst * t, StringSymbolSet &unknown);
 
+    private:
+      static fst::SymbolTable * create_symbol_table(std::string name);
+      static void initialize_symbol_tables(StdVectorFst *t);
+      
     public:
       /* For HfstMutableTransducer */
       static StateId add_state(StdVectorFst *t);

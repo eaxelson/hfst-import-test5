@@ -92,8 +92,8 @@ const
 
 void
 
-HfstTokenizer::add_multichar_symbol(const string& symbol,KeyTable &key_table)
-{ key_table.add_symbol(symbol.c_str());
+HfstTokenizer::add_multichar_symbol(const string& symbol) // ,KeyTable &key_table)
+{ //key_table.add_symbol(symbol.c_str());
   multi_char_symbols.add(symbol.c_str()); }
 
 void
@@ -103,10 +103,11 @@ HfstTokenizer::add_skip_symbol(const std::string &symbol)
   multi_char_symbols.add(symbol.c_str()); 
   skip_symbol_set.insert(symbol.c_str()); }
 
-KeyPairVector * HfstTokenizer::tokenize
-(const string& input_string,KeyTable &key_table) const
+//KeyPairVector * 
+StringPairVector * HfstTokenizer::tokenize
+(const string& input_string) const // ,KeyTable &key_table) const
 {
-  KeyPairVector * kpv = new KeyPairVector;
+  StringPairVector * spv = new StringPairVector;
   const char* s = input_string.c_str();
   while (*s)
     {
@@ -115,48 +116,48 @@ KeyPairVector * HfstTokenizer::tokenize
       s += symbol_size;
       if (is_skip_symbol(symbol))
 	{ continue; }
-      Key k = key_table.add_symbol(symbol);
-      kpv->push_back(KeyPair(k,k));
+      //Key k = key_table.add_symbol(symbol);
+      spv->push_back(StringPair(symbol,symbol));
     }
-  return kpv;
+  return spv;
 }
 
-KeyPairVector * HfstTokenizer::tokenize
-(const string& input_string,const string& output_string,KeyTable &key_table)
-const
+//KeyPairVector *
+StringPairVector * HfstTokenizer::tokenize
+(const string& input_string,const string& output_string) const // ,KeyTable &key_table)
 {
-  KeyPairVector * kpv = new KeyPairVector;
+  StringPairVector * spv = new StringPairVector;
   
-  KeyPairVector * input_kpv = tokenize(input_string.c_str(),key_table);
-  KeyPairVector * output_kpv = tokenize(output_string.c_str(),key_table);
+  StringPairVector * input_spv = tokenize(input_string.c_str()); //,key_table);
+  StringPairVector * output_spv = tokenize(output_string.c_str()); //,key_table);
 
-  if (input_kpv->size() < output_kpv->size())
+  if (input_spv->size() < output_spv->size())
     {
-      KeyPairVector::iterator jt = output_kpv->begin();
-      for (KeyPairVector::iterator it = input_kpv->begin();
-	   it != input_kpv->end();
+      StringPairVector::iterator jt = output_spv->begin();
+      for (StringPairVector::iterator it = input_spv->begin();
+	   it != input_spv->end();
 	   ++it)
-	{ kpv->push_back(KeyPair(it->first,
-				 jt->first));
+	{ spv->push_back(StringPair(it->first,
+				    jt->first));
 	  ++jt; }
-      for ( ; jt != output_kpv->end(); ++jt)
-	{ kpv->push_back(KeyPair(0,jt->first)); }
+      for ( ; jt != output_spv->end(); ++jt)
+	{ spv->push_back(StringPair("@_EPSILON_SYMBOL_@",jt->first)); }
     }
   else
     {
-      KeyPairVector::iterator it = input_kpv->begin();
-      for (KeyPairVector::iterator jt = output_kpv->begin();
-	   jt != output_kpv->end();
+      StringPairVector::iterator it = input_spv->begin();
+      for (StringPairVector::iterator jt = output_spv->begin();
+	   jt != output_spv->end();
 	   ++jt)
-	{ kpv->push_back(KeyPair(it->first,
-				 jt->first));
+	{ spv->push_back(StringPair(it->first,
+				    jt->first));
 	  ++it; }
-      for ( ; it != input_kpv->end(); ++it)
-	{ kpv->push_back(KeyPair(it->first,0)); }
+      for ( ; it != input_spv->end(); ++it)
+	{ spv->push_back(StringPair(it->first,"@_EPSILON_SYMBOL_@")); }
     }
-  delete input_kpv;
-  delete output_kpv;
-  return kpv;
+  delete input_spv;
+  delete output_spv;
+  return spv;
 }
 
 }

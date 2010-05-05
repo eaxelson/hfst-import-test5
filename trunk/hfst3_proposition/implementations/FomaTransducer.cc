@@ -293,7 +293,7 @@ namespace hfst { namespace implementations {
   
   fsm * FomaTransducer::create_empty_transducer(void)
   {    
-    return fsm_empty_set();
+    struct fsm * retval = fsm_empty_set();
   }
   
   fsm * FomaTransducer::create_epsilon_transducer(void)
@@ -332,6 +332,20 @@ namespace hfst { namespace implementations {
   {
     throw hfst::exceptions::FunctionNotImplementedException();
   }
+
+    // This could be much more efficient...
+  fsm * FomaTransducer::define_transducer(const StringPairVector &spv)
+  {
+    struct fsm * retval = fsm_empty_string();
+    for (StringPairVector::const_iterator it = spv.begin();
+	 it != spv.end();
+	 ++it)
+      {
+	retval = fsm_concat( retval, fsm_cross_product( fsm_symbol(strdup(it->first.c_str())), fsm_symbol(strdup(it->second.c_str())) ) );
+      }
+    return retval;
+  }
+
 
   fsm * FomaTransducer::copy(fsm * t)
   {     

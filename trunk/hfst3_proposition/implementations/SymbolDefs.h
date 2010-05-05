@@ -30,6 +30,10 @@ namespace symbols
   typedef std::pair<Symbol,Symbol> SymbolPair;
   typedef std::set<SymbolPair> SymbolPairSet;
 
+  typedef std::string String;
+  typedef std::pair<String, String> StringPair;
+  typedef std::vector<StringPair> StringPairVector;
+
   class KeyTableConstIterator_;
 
   class GlobalSymbolTable;

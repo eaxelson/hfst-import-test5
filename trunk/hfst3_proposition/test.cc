@@ -4,6 +4,7 @@
 
 #include "HfstTransducer.h"
 #include <cstdio>
+#include <assert.h>
 
 using namespace hfst;
 
@@ -30,7 +31,98 @@ void print(HfstMutableTransducer &t)
   return;
 }
 
+
 int main(int argc, char **argv) {
+
+  ImplementationType types[] = {SFST_TYPE, TROPICAL_OFST_TYPE, LOG_OFST_TYPE, FOMA_TYPE};
+  for (int i=0; i<4; i++) {
+    {
+      // Test the empty transducer constructors for all implementation types.
+      HfstTransducer tr(types[i]);
+      assert (tr.get_type() == types[i]);
+      for (int j=0; j<4; j++) {
+	// Test the conversions.
+	HfstTransducer trconv = tr.convert(types[j]);
+	assert (tr.get_type() == types[j]);
+	assert (HfstTransducer::test_equivalence(tr, trconv));
+      }
+      HfstMutableTransducer mut(tr);
+      HfstTransducer foo(mut);
+      assert (HfstTransducer::test_equivalence(tr, foo));
+    }
+    printf("Empty constructors tested.\n");
+    {
+      // Test the one-transition transducer constructors for all implementation types.
+      HfstTransducer tr("foo", types[i]);
+      assert (tr.get_type() == types[i]);
+      for (int j=0; j<4; j++) {
+	// Test the conversions.
+	HfstTransducer trconv = tr.convert(types[j]);
+	assert (tr.get_type() == types[j]);
+	assert (HfstTransducer::test_equivalence(tr, trconv));
+      }
+      HfstMutableTransducer mut(tr);
+      HfstTransducer foo(mut);
+      assert (HfstTransducer::test_equivalence(tr, foo));
+    }
+    printf("One-transition constructors tested.\n");
+    {
+      // Test the two-transition transducer constructors for all implementation types.
+      HfstTransducer tr("foo", "bar", types[i]);
+      assert (tr.get_type() == types[i]);
+      for (int j=0; j<4; j++) {
+	// Test the conversions.
+	HfstTransducer trconv = tr.convert(types[j]);
+	assert (tr.get_type() == types[j]);
+	assert (HfstTransducer::test_equivalence(tr, trconv));
+      }
+      HfstMutableTransducer mut(tr);
+      HfstTransducer foo(mut);
+      assert (HfstTransducer::test_equivalence(tr, foo));
+    }
+    printf("Two-transition constructors tested.\n");
+    {
+      // Test the one-string transducer constructors for all implementation types.
+      HfstTokenizer tok;
+      tok.add_multichar_symbol("foo");
+      tok.add_multichar_symbol("bar");
+      HfstTransducer tr("foobar", tok, types[i]);
+      assert (tr.get_type() == types[i]);
+      for (int j=0; j<4; j++) {
+	// Test the conversions.
+	HfstTransducer trconv = tr.convert(types[j]);
+	assert (tr.get_type() == types[j]);
+	assert (HfstTransducer::test_equivalence(tr, trconv));
+      }
+      HfstMutableTransducer mut(tr);
+      HfstTransducer foo(mut);
+      assert (HfstTransducer::test_equivalence(tr, foo));
+    }
+    printf("One-string constructors tested.\n");
+    {
+      // Test the two-string transducer constructors for all implementation types.
+      HfstTokenizer tok;
+      tok.add_multichar_symbol("foo");
+      tok.add_multichar_symbol("bar");
+      HfstTransducer tr("fofoo", "barbarba", tok, types[i]);
+      assert (tr.get_type() == types[i]);
+      for (int j=0; j<4; j++) {
+	// Test the conversions.
+	HfstTransducer trconv = tr.convert(types[j]);
+	assert (tr.get_type() == types[j]);
+	assert (HfstTransducer::test_equivalence(tr, trconv));
+      }
+      HfstMutableTransducer mut(tr);
+      HfstTransducer foo(mut);
+      assert (HfstTransducer::test_equivalence(tr, foo));
+    }
+    printf("Two-string constructors tested.\n");
+  }
+  exit(0);
+}
+
+
+#ifdef FOO
 
   // create transducer t1
   HfstMutableTransducer t1;
@@ -46,6 +138,23 @@ int main(int argc, char **argv) {
   HfstState second_state2 = t2.add_state();
   t2.set_final_weight(second_state2, 0.3);
   t2.add_transition(0, "@_UNKNOWN_SYMBOL_@", "baz", 1.6, second_state2);
+
+
+  HfstTokenizer TOK;
+  TOK.add_multichar_symbol("foo");
+  TOK.add_multichar_symbol("bar");
+  HfstTransducer TOK_TR("fooofoooa", "barrbabarr", TOK, TROPICAL_OFST_TYPE);
+  TOK_TR.print();
+
+  HfstTokenizer TOK2;
+  TOK2.add_multichar_symbol("fii");
+  TOK2.add_multichar_symbol("baar");
+  HfstTransducer TOK_TR2("foofii", "barbaarq", TOK2, TROPICAL_OFST_TYPE);
+  TOK_TR2.print();
+
+  HfstTransducer TOK_CAT = TOK_TR.concatenate(TOK_TR2);
+  TOK_CAT.print();
+
 
   ImplementationType types[] = {TROPICAL_OFST_TYPE, LOG_OFST_TYPE, SFST_TYPE, FOMA_TYPE};
   for (int i=0; i<4; i++) 
@@ -122,15 +231,12 @@ int main(int argc, char **argv) {
 	  fprintf(stderr, "  output projected\n"); }
 	{ HfstTransducer t = tr1.reverse();
 	  fprintf(stderr, "  reversed\n"); }
-
-#ifdef foo
 	{ HfstTransducer t = tr1.substitute(std::string(),
 					    std::string();
 	  fprintf(stderr, "  substituted string\n"); }
 	{ HfstTransducer t = tr1.substitute(const StringSymbolPair &old_symbol_pair,
 					    const StringSymbolPair &new_symbol_pair);
 	  fprintf(stderr, "  substituted string pair\n"); }
-#endif
 
       }
 
@@ -142,7 +248,7 @@ int main(int argc, char **argv) {
   return 0;
 }
 
-
+#endif
 
 
 
