@@ -209,6 +209,7 @@ namespace hfst { namespace implementations
       static void print(LogFst * t, KeyTable &key_table, ostream &out);
       static void extract_strings(LogFst * t, KeyTable &kt,
 				  WeightedStrings<float>::Set &results);
+      static void print_test(LogFst *t);
 
     private:
       static fst::SymbolTable * create_symbol_table(std::string name);

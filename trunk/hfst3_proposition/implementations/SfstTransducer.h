@@ -201,6 +201,8 @@ namespace hfst { namespace implementations
       // see if these can be removed
       static KeyMap create_mapping(Transducer * t1, Transducer * t2, StringSymbolSet &unknown2);
 
+      static void print_test(Transducer *t);
+
     protected:
       static StringSymbolSet get_string_symbol_set(Transducer *t);
       static Transducer * expand_arcs(Transducer * t, StringSymbolSet &unknown);
