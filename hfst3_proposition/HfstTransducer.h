@@ -146,7 +146,7 @@ namespace hfst
 
   public:
     /** An empty transducer, i.e. a transducer that does not recognize any string. 
-	@note Use HfstTransducer("@_EPSILON_SYMBOL_@") to create an epsilon transducer.
+	@note Use HfstTransducer("") to create an epsilon transducer.
      **/
     HfstTransducer(ImplementationType type);
     HfstTransducer(const std::string& utf8_str, 
@@ -172,6 +172,7 @@ namespace hfst
     HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type);
 
     void print(void);
+    static bool test_equivalence(HfstTransducer &one, HfstTransducer &another);
 
     /** An equivalent transducer that has no epsilon:epsilon transitions. */
     HfstTransducer &remove_epsilons(ImplementationType type=UNSPECIFIED_TYPE);

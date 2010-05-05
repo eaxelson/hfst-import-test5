@@ -589,6 +589,20 @@ namespace hfst { namespace implementations {
     n->set_final(1);
     return t; }
 
+  Transducer * SfstTransducer::define_transducer(const StringPairVector &spv)
+  { Transducer * t = new Transducer;
+    Node * n = t->root_node();
+    for (StringPairVector::const_iterator it = spv.begin();
+	 it != spv.end();
+	 ++it)
+      {
+	Node * temp = t->new_node();
+	n->add_arc(Label(t->alphabet.add_symbol(it->first.c_str()),t->alphabet.add_symbol(it->second.c_str())),temp,t);
+	n = temp;
+      }
+    n->set_final(1);
+    return t; }
+
   Transducer * SfstTransducer::copy(Transducer * t)
   { return &t->copy(); }
   

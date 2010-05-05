@@ -7,10 +7,10 @@
 #include <string>
 namespace hfst
 {
-  using hfst::symbols::Key;
-  using hfst::symbols::KeyPair;
-  using hfst::symbols::KeyPairVector;
-  using hfst::symbols::KeyTable;
+  using hfst::symbols::String;
+  using hfst::symbols::StringPair;
+  using hfst::symbols::StringPairVector;
+  //using hfst::symbols::KeyTable;
 
   class MultiCharSymbolTrie;
   typedef std::vector<MultiCharSymbolTrie*> MultiCharSymbolTrieVector;
@@ -46,14 +46,14 @@ namespace hfst
 
   public:
     void add_skip_symbol(const std::string &symbol);
-    void add_multichar_symbol(const std::string& symbol,
-			      KeyTable &key_table);
+    void add_multichar_symbol(const std::string& symbol);
+			      //KeyTable &key_table);
 
-    KeyPairVector * tokenize(const std::string &input_string,
-			     KeyTable &key_table) const;
-    KeyPairVector * tokenize(const std::string &input_string,
-			     const std::string &output_string,
-			     KeyTable &key_table) const;
+    StringPairVector * tokenize(const std::string &input_string) const;
+    //KeyTable &key_table) const;
+    StringPairVector * tokenize(const std::string &input_string,
+				const std::string &output_string) const;
+    //KeyTable &key_table) const;
     // Implement also a version that returns a StringSymbolPairVector (define this datatype)
     // and does not take a KeyTable argument
   };

@@ -164,8 +164,11 @@ namespace hfst { namespace implementations
       static LogFst * create_empty_transducer(void);
       static LogFst * create_epsilon_transducer(void);
       static LogFst * define_transducer(Key k);
+      static LogFst * define_transducer(const std::string& symbol);
+      static LogFst * define_transducer(const std::string& isymbol, const std::string& osymbol);
       static LogFst * define_transducer(const KeyPair &kp);
       static LogFst * define_transducer(const KeyPairVector &kpv);
+      static LogFst * define_transducer(const StringPairVector &spv);
       static LogFst * copy(LogFst * t);
       static LogFst * determinize(LogFst * t);
       static LogFst * minimize(LogFst * t);
@@ -206,6 +209,10 @@ namespace hfst { namespace implementations
       static void print(LogFst * t, KeyTable &key_table, ostream &out);
       static void extract_strings(LogFst * t, KeyTable &kt,
 				  WeightedStrings<float>::Set &results);
+
+    private:
+      static fst::SymbolTable * create_symbol_table(std::string name);
+      static void initialize_symbol_tables(LogFst *t);
     };
 
 } }

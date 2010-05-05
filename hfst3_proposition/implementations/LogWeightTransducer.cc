@@ -450,6 +450,7 @@ namespace hfst { namespace implementations
     LogFst * t = new LogFst;
     StateId s = t->AddState();
     t->SetStart(s);
+    initialize_symbol_tables(t);
     return t;
   }
 
@@ -459,6 +460,7 @@ namespace hfst { namespace implementations
     StateId s = t->AddState();
     t->SetStart(s);
     t->SetFinal(s,0);
+    initialize_symbol_tables(t);
     return t;
   }
 
@@ -470,6 +472,7 @@ namespace hfst { namespace implementations
     t->SetStart(s1);
     t->SetFinal(s2,0);
     t->AddArc(s1,LogArc(k,k,0,s2));
+    initialize_symbol_tables(t);
     return t;
   }
 
@@ -482,6 +485,7 @@ namespace hfst { namespace implementations
     t->SetStart(s1);
     t->SetFinal(s2,0);
     t->AddArc(s1,LogArc(key_pair.first,key_pair.second,0,s2));
+    initialize_symbol_tables(t);
     return t;
   }
 
@@ -497,6 +501,67 @@ namespace hfst { namespace implementations
       {
 	StateId s2 = t->AddState();
 	t->AddArc(s1,LogArc(it->first,it->second,0,s2));
+	s1 = s2;
+      }
+    t->SetFinal(s1,0);
+    initialize_symbol_tables(t);
+    return t;
+  }
+
+  LogFst * LogWeightTransducer::define_transducer(const std::string &symbol)
+  {
+    LogFst * t = new LogFst;
+    initialize_symbol_tables(t);
+    StateId s1 = t->AddState();
+    StateId s2 = t->AddState();
+    t->SetStart(s1);
+    t->SetFinal(s2,0);
+    t->AddArc(s1,LogArc(t->InputSymbols()->AddSymbol(symbol),
+			t->InputSymbols()->AddSymbol(symbol),0,s2));
+    return t;
+  }
+  LogFst * LogWeightTransducer::define_transducer
+    (const std::string &isymbol, const std::string &osymbol)
+  {
+    LogFst * t = new LogFst;
+    initialize_symbol_tables(t);
+    StateId s1 = t->AddState();
+    StateId s2 = t->AddState();
+    t->SetStart(s1);
+    t->SetFinal(s2,0);
+    t->AddArc(s1,LogArc(t->InputSymbols()->AddSymbol(isymbol),
+			t->InputSymbols()->AddSymbol(osymbol),0,s2));
+    return t;
+  }
+
+  fst::SymbolTable * LogWeightTransducer::create_symbol_table(std::string name) {
+    fst::SymbolTable * st = new fst::SymbolTable(name);
+    st->AddSymbol("@_EPSILON_SYMBOL_@", 0);
+    st->AddSymbol("@_UNKNOWN_SYMBOL_@", 1);
+    st->AddSymbol("@_IDENTITY_SYMBOL_@", 2);
+    return st;
+  }
+
+  void LogWeightTransducer::initialize_symbol_tables(LogFst *t) {
+    SymbolTable *st = create_symbol_table("");
+    t->SetInputSymbols(st);
+    //t->SetOutputSymbols(st);
+    return;
+  }
+
+  LogFst * LogWeightTransducer::define_transducer
+  (const StringPairVector &spv)
+  {
+    LogFst * t = new LogFst;
+    initialize_symbol_tables(t);
+    StateId s1 = t->AddState();
+    t->SetStart(s1);
+    for (StringPairVector::const_iterator it = spv.begin();
+	 it != spv.end();
+	 ++it)
+      {
+	StateId s2 = t->AddState();
+	t->AddArc(s1,LogArc(t->InputSymbols()->AddSymbol(it->first),t->InputSymbols()->AddSymbol(it->second),0,s2));
 	s1 = s2;
       }
     t->SetFinal(s1,0);

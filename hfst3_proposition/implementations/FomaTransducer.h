@@ -178,6 +178,7 @@ namespace hfst {
       static fsm * define_transducer(Key k);                     // not done
       static fsm * define_transducer(const KeyPair &kp);         // not done
       static fsm * define_transducer(const KeyPairVector &kpv);  // not done
+      static fsm * define_transducer(const StringPairVector &spv);  // not done
       static fsm * define_transducer(char *symbol);                     
       static fsm * define_transducer(char *isymbol, char *osymbol);       
       static fsm * copy(fsm * t);

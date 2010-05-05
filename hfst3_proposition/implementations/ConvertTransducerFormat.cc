@@ -146,16 +146,20 @@ InternalTransducer * foma_to_internal_format(struct fsm * t)
   // If there was not an initial state in foma transducer,
   if (not start_state_found) {
     // throw an exception.
-    fprintf(stderr, "BAR\n");
     throw TransducerHasNoStartStateException();
   }
 
 
   // Convert sigma to SymbolTable
   fst::SymbolTable *st = new fst::SymbolTable("anonym_hfst3_symbol_table");
+  st->AddSymbol("@_EPSILON_SYMBOL_@", 0);
+  st->AddSymbol("@_UNKNOWN_SYMBOL_@", 1);
+  st->AddSymbol("@_IDENTITY_SYMBOL_@", 2);
   struct sigma * p = t->sigma;
   while (p != NULL) {
-    st->AddSymbol(std::string(p->symbol), (int64)p->number);
+    if (p->symbol == NULL)
+      break;
+    st->AddSymbol(std::string(p->symbol), (int64)p->number);  // check that here are no problems
     p = p->next;
   }
   // check that this works
