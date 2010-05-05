@@ -607,6 +607,9 @@ type(type),anonymous(false),is_trie(false)
   {
     HfstTransducer oneconv = one.convert(TROPICAL_OFST_TYPE);
     HfstTransducer anotherconv = another.convert(TROPICAL_OFST_TYPE);
+
+    oneconv.harmonize(another);
+
     return tropical_ofst_interface.test_equivalence(
 	     oneconv.implementation.tropical_ofst,
 	     anotherconv.implementation.tropical_ofst);
@@ -1139,17 +1142,20 @@ void HfstTransducer::print(void)
     switch (this->type)
       {
       case FOMA_TYPE:
-	throw hfst::exceptions::FunctionNotImplementedException();
+	this->foma_interface.print_test
+	  (this->implementation.foma);
 	break;
       case SFST_TYPE:
-	throw hfst::exceptions::FunctionNotImplementedException();
+	this->sfst_interface.print_test
+	  (this->implementation.sfst);
 	break;
       case TROPICAL_OFST_TYPE:
 	this->tropical_ofst_interface.print_test
 	  (this->implementation.tropical_ofst);
 	break;
       case LOG_OFST_TYPE:
-	throw hfst::exceptions::FunctionNotImplementedException();
+	this->log_ofst_interface.print_test
+	  (this->implementation.log_ofst);
 	break;
       case UNSPECIFIED_TYPE:
       case ERROR_TYPE:

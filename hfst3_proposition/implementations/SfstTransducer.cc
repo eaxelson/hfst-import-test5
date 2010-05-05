@@ -417,6 +417,11 @@ namespace hfst { namespace implementations {
   SfstTransitionIterator SfstState::end(void) const 
   { return   SfstTransitionIterator(); } 
 
+  void SfstTransducer::print_test(Transducer *t)
+  {
+    std::cerr << *t;
+  }
+    
   void SfstState::print(KeyTable &key_table, ostream &out,
 			SfstStateIndexer &indexer) const
   {

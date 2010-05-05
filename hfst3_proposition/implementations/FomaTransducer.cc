@@ -520,6 +520,11 @@ namespace hfst { namespace implementations {
     throw hfst::exceptions::FunctionNotImplementedException();
   }
 
+  void FomaTransducer::print_test(fsm * t)
+  {
+    net_print_att(t, stdout);
+  }
+
   } }
 
 #ifdef DEBUG_MAIN

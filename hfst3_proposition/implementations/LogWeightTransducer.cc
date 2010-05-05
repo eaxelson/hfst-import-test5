@@ -568,6 +568,25 @@ namespace hfst { namespace implementations
     return t;
   }
 
+  void LogWeightTransducer::print_test(LogFst *t) 
+  {
+
+    SymbolTable *sym = t->InputSymbols(); 
+    for (fst::StateIterator<LogFst> siter(*t); 
+	 not siter.Done(); siter.Next())
+      {
+	StateId s = siter.Value();
+	for (fst::ArcIterator<LogFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+	  {
+	    const LogArc &arc = aiter.Value();
+	    fprintf(stderr, "%i\t%i\t%s\t%s\t%f\t\t(%i %i)\t\n", (int)s, (int)arc.nextstate, sym->Find(arc.ilabel).c_str(), sym->Find(arc.olabel).c_str(), arc.weight.Value(), arc.ilabel, arc.olabel);
+	  }
+	if (t->Final(s) != LogWeight::Zero())
+	  fprintf(stderr, "%i\t%f\n", (int)s, t->Final(s).Value());
+      }
+  }
+
+
   LogFst * 
   LogWeightTransducer::copy(LogFst * t)
   { return new LogFst(*t); }

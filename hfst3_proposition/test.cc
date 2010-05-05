@@ -45,6 +45,8 @@ int main(int argc, char **argv) {
 	HfstTransducer trconv = tr.convert(types[j]);
 	assert (tr.get_type() == types[j]);
 	assert (HfstTransducer::test_equivalence(tr, trconv));
+	HfstTransducer tranother(types[j]);
+	assert (HfstTransducer::test_equivalence(tr, tranother));
       }
       HfstMutableTransducer mut(tr);
       HfstTransducer foo(mut);
@@ -60,6 +62,8 @@ int main(int argc, char **argv) {
 	HfstTransducer trconv = tr.convert(types[j]);
 	assert (tr.get_type() == types[j]);
 	assert (HfstTransducer::test_equivalence(tr, trconv));
+	HfstTransducer tranother("foo", types[j]);
+	assert (HfstTransducer::test_equivalence(tr, tranother));
       }
       HfstMutableTransducer mut(tr);
       HfstTransducer foo(mut);
@@ -75,6 +79,8 @@ int main(int argc, char **argv) {
 	HfstTransducer trconv = tr.convert(types[j]);
 	assert (tr.get_type() == types[j]);
 	assert (HfstTransducer::test_equivalence(tr, trconv));
+	HfstTransducer tranother("foo", "bar", types[j]);
+	assert (HfstTransducer::test_equivalence(tr, tranother));
       }
       HfstMutableTransducer mut(tr);
       HfstTransducer foo(mut);
@@ -93,6 +99,8 @@ int main(int argc, char **argv) {
 	HfstTransducer trconv = tr.convert(types[j]);
 	assert (tr.get_type() == types[j]);
 	assert (HfstTransducer::test_equivalence(tr, trconv));
+	HfstTransducer tranother("foobar", tok, types[j]);
+	assert (HfstTransducer::test_equivalence(tr, tranother));
       }
       HfstMutableTransducer mut(tr);
       HfstTransducer foo(mut);
@@ -111,6 +119,8 @@ int main(int argc, char **argv) {
 	HfstTransducer trconv = tr.convert(types[j]);
 	assert (tr.get_type() == types[j]);
 	assert (HfstTransducer::test_equivalence(tr, trconv));
+	HfstTransducer tranother("fofoo", "barbarba", tok, types[j]);
+	assert (HfstTransducer::test_equivalence(tr, tranother));
       }
       HfstMutableTransducer mut(tr);
       HfstTransducer foo(mut);
