@@ -251,7 +251,7 @@ HFSTApertiumApplicator::generation(FILE *input, FILE *output, GenerationMode mod
   //
   // Disambiguated lexical units output by the final stage of transfer look like:
   // 
-  //   ^lemma1<tag1><tag2><tag3>$[ <b>]^lemma2<tag1><tag2>$[ <\/b>]
+  //   ^lemma1<tag1><tag2><tag3>$[ <b>]^lemma2<tag1><tag2>$[<\/b>].
   //   
   // Where '^' marks the beginning of a new lexical unit and '$' marks the end. Tags
   // are enclosed in '<' and '>'. The unescaped characters '[' and ']' mark the 
@@ -259,7 +259,7 @@ HFSTApertiumApplicator::generation(FILE *input, FILE *output, GenerationMode mod
   // 
   // So, the generation should in this case output:
   // 
-  //   surfaceform1[ <b>]surfaceform2[ <\/b>]
+  //   surfaceform1[ <b>]surfaceform2[<\/b>].
   // 
 
   return;
@@ -295,6 +295,8 @@ HFSTTransducerHeader::readHeader(FILE *transducer)
   val = fread(&transition_target_table_size, sizeof(TransitionTableIndex), 1, transducer);
 
   val = fread(&number_of_states, sizeof(StateIdNumber), 1, transducer);
+
+  // TODO: Check what is _really_ in the header, is 'number_of_transitions' really 0 / 1?
   val = fread(&number_of_transitions, sizeof(TransitionNumber), 1, transducer);
 
   std::cerr << number_of_states << " " << number_of_transitions << std::endl;
@@ -378,12 +380,30 @@ HFSTTransducer::loadTransducer(FILE *input)
 {
   std::cerr << "HFSTTransducer::loadTransducer()" << std::endl;
   header.readHeader(input);
-
+  alphabet.readAlphabet(input, header.symbolCount());
   if(header.probeFlag(hf_uw_input_epsilon_cycles) || 
      header.probeFlag(hf_input_epsilon_cycles))
   {
     std::cerr << "Transducer has epsilon cycles, these are not supported." << std::endl;
     exit(-1);
+  }
+
+  if(alphabet.getStateSize() == 0) 
+  {
+    // If the state size is zero there are no flag diacritics to handle
+
+    if(header.probeFlags(weighted) == false)
+    {
+       
+    }
+    else if(header.probeFlags(weighted) == true)
+    {
+
+    }
+  }
+  else
+  {
+    // Handle flag diacritics
   }
 
   return;
