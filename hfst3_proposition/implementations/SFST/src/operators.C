@@ -409,6 +409,24 @@ void Transducer::rec_cat_nodes( Node *node, Node *node2 )
   }
 }
 
+void Transducer::rec_cat_nodes_hfst( Node *node, Node *node2 )
+
+{
+  if (!node->was_visited( vmark )) {
+
+    // iterate over all outgoing arcs of node
+    for( ArcsIter p(node->arcs()); p; p++ ) {
+      Arc *arc=p;
+      rec_cat_nodes_hfst( arc->target_node(), node2 );
+    }
+    
+    if (node->is_final()) {
+      // link this node to node2
+      node->add_arc( Label(), node2, this );
+    }
+  }
+}
+
 
 /*******************************************************************/
 /*                                                                 */
@@ -443,6 +461,7 @@ Transducer &Transducer::operator+( Transducer &a )
 /*******************************************************************/
 /*                                                                 */
 /*  Transducer::kleene_star                                        */
+/*   (HFST addition: now works for cyclic transducers as well)     */
 /*                                                                 */
 /*******************************************************************/
 
@@ -454,12 +473,22 @@ Transducer &Transducer::kleene_star()
 
   // link back to the start node
   na->incr_vmark();
-  na->rec_cat_nodes(na->root_node(), na->root_node());
-  na->root_node()->set_final(1);
+  //na->rec_cat_nodes(na->root_node(), na->root_node()); SFST code
+  // HFST code
+  na->rec_cat_nodes_hfst(na->root_node(), na->root_node());
+  
+  na->root_node()->set_final(1); // SFST code
+  // HFST code
+  Transducer eps;
+  eps.root_node()->set_final(1);
+  Transducer *result = &(eps | *na);
+  delete na;
 
-  na->deterministic = na->minimised = false;
-
-  return *na;
+  //na->deterministic = na->minimised = false; SFST code
+  //return *na;   SFST code
+  // HFST code
+  result->deterministic = result->minimised = false;
+  return *result;
 }
 
 

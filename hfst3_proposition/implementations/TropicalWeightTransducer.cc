@@ -893,21 +893,19 @@ namespace hfst { namespace implementations
     return t;
   }
 
-  bool TropicalWeightTransducer::test_equivalence(StdVectorFst *one, StdVectorFst *another) 
+  bool TropicalWeightTransducer::test_equivalence(StdVectorFst *a, StdVectorFst *b) 
   {
+    StdVectorFst * mina = minimize(a);
+    StdVectorFst * minb = minimize(b);
     EncodeMapper<StdArc> encode_mapper(0x0001,ENCODE);
 
-    RmEpsilonFst<StdArc> rmone(*one);
-    EncodeFst<StdArc> encone(rmone,
-			  &encode_mapper);
-    DeterminizeFst<StdArc> detone(encone);
+    EncodeFst<StdArc> enca(*mina, &encode_mapper);
+    EncodeFst<StdArc> encb(*minb, &encode_mapper);
 
-    RmEpsilonFst<StdArc> rmanother(*another);
-    EncodeFst<StdArc> encanother(rmanother,
-			  &encode_mapper);
-    DeterminizeFst<StdArc> detanother(encanother);
+    StdVectorFst A(enca);
+    StdVectorFst B(encb);
 
-    return Equivalent(detone, detanother);
+    return Equivalent(A, B);
   }
 
   StdVectorFst * TropicalWeightTransducer::define_transducer
@@ -974,8 +972,9 @@ namespace hfst { namespace implementations
 			  &encode_mapper);
     StdVectorFst fst_enc(enc);
     Minimize<StdArc>(&fst_enc);
-    DecodeFst<StdArc> dec(enc,
-			  encode_mapper);
+    //DecodeFst<StdArc> dec(enc,
+    //			  encode_mapper);  // FIX: ERROR???
+    DecodeFst<StdArc> dec(fst_enc, encode_mapper);  // is this correct?
     delete determinized_t;
     return new StdVectorFst(dec);
   }
