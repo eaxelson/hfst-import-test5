@@ -166,9 +166,13 @@ main(int argc, char *argv[])
     {
       case 'n':
         // Init generation (no word marks) here
+        // Run generation here 'runTransducer(C)'
+        proc.generation(input, output, gm_clean);
         break;
       case 'g':
 	// Init generation (with word marks) here
+        // Run generation here 'runTransducer(C)'
+        proc.generation(input, output, gm_unknown);
         break;
       case 'a':
       default:
@@ -361,6 +365,12 @@ HFSTTransducerHeader::probeFlag(HeaderFlag flag)
   return false;
 }
 
+SymbolNumber
+HFSTTransducerHeader::symbolCount()
+{
+  return number_of_symbols;
+}
+
 /*****************************************************************************
  * HFSTTransducer class methods below this line
  *****************************************************************************/
@@ -381,6 +391,7 @@ HFSTTransducer::loadTransducer(FILE *input)
   std::cerr << "HFSTTransducer::loadTransducer()" << std::endl;
   header.readHeader(input);
   alphabet.readAlphabet(input, header.symbolCount());
+
   if(header.probeFlag(hf_uw_input_epsilon_cycles) || 
      header.probeFlag(hf_input_epsilon_cycles))
   {
@@ -392,13 +403,14 @@ HFSTTransducer::loadTransducer(FILE *input)
   {
     // If the state size is zero there are no flag diacritics to handle
 
-    if(header.probeFlags(weighted) == false)
+    if(header.probeFlag(hf_weighted) == false)
     {
-       
+      // No flags, no weights, all analyses       
+      
     }
-    else if(header.probeFlags(weighted) == true)
+    else if(header.probeFlag(hf_weighted) == true)
     {
-
+      // No flags, weights, all analyses
     }
   }
   else
@@ -407,4 +419,75 @@ HFSTTransducer::loadTransducer(FILE *input)
   }
 
   return;
+}
+
+/*****************************************************************************
+ * HFSTTransducerAlphabet class methods below this line
+ *****************************************************************************/
+
+HFSTTransducerAlphabet::HFSTTransducerAlphabet()
+{
+  key_table = new KeyTable;
+}
+
+HFSTTransducerAlphabet::~HFSTTransducerAlphabet()
+{
+
+}
+
+void
+HFSTTransducerAlphabet::readAlphabet(FILE *transducer, SymbolNumber symbol_number)
+{
+  std::cerr << "HFSTTransducerAlphabet::readAlphabet" << std::endl;
+
+  number_of_symbols = symbol_number;
+  feature_number = 0;
+  value_number = 1; 
+  value_bucket[std::string()] = 0; // Empty value = neutral TODO: what does 'neutral' mean ?
+   
+  for(SymbolNumber k = 0; k < number_of_symbols; ++k) 
+  {
+    getNextSymbol(transducer, k);
+  }
+  // Assume the first symbol is epsilon which we don't want to print
+  // TODO: Why ?
+  key_table->operator[](0) = "";
+  
+}
+
+void
+HFSTTransducerAlphabet::getNextSymbol(FILE *transducer, SymbolNumber key)
+{
+  int byte;
+  char *sym = line;
+  while((byte = fgetc(transducer)) != 0)
+  {
+    if (byte == EOF)
+    {
+      std::cerr << "Could not parse transducer: " << ferror(transducer) << std::endl;
+      exit(1);
+    }
+    *sym = byte;
+    ++sym;
+  }
+  *sym = 0;
+
+  // CONVERSION CONTINUES HERE
+}
+
+SymbolNumber
+HFSTTransducerAlphabet::getStateSize()
+{
+  return feature_bucket.size();
+}
+
+/*****************************************************************************
+ * FlagDiacriticOperation class methods below this line
+ *****************************************************************************/
+
+FlagDiacriticOperation::FlagDiacriticOperation(FlagDiacriticOperator op, SymbolNumber feat, ValueNumber val)
+{
+  operation = op;
+  feature = feat;
+  value = val;
 }

@@ -2,9 +2,14 @@
 #define __HFST_PROC_H__
 
 #include <cstdlib>
+#include <climits>
 #include <getopt.h>
 #include <iostream>
 #include <libgen.h>
+
+#include <map>
+#include <vector>
+#include <set>
 
 #ifdef _MSC_VER
 #include <io.h>
@@ -13,10 +18,38 @@
 
 #define PACKAGE_VERSION "0.0.1"
 
-typedef unsigned short SymbolNumber;       // TODO: What is this ?
-typedef unsigned int TransitionTableIndex; // TODO: What is this ? 
-typedef unsigned int TransitionNumber;     // TODO: What is this ? 
-typedef unsigned int StateIdNumber;        // TODO: What is this ? 
+/** 
+ * The flag diacritic operators as given in:
+ *   Beesley & Karttunen (2003) Finite State Morphology 
+ */
+
+enum FlagDiacriticOperator 
+{
+  // (P) Positive:    When a @P.feature.value@ flag diacritic is encountered, the 
+  //       value of the indicated feature is simply set or reset to the indicated value. 
+  // (N) Negative:    When an @N.feature.value@ flag diacritic is encountered, the 
+  //       value of feature is set or reset to the negation or complement of value.
+  // (R) Require:     When an @R.feature.value@ flag diacritic is encountered, a test 
+  //       is performed; this test succeeds if and only if feature is currently set 
+  //       to value.
+  // (D) Disallow:    When a @D.feature.value@ flag diacritic is encountered, the test 
+  //       succeeds if and only if feature is currently neutral or is set to a value 
+  //       that is incompatible with value.
+  // (C) Clear:       When a @C.feature@ Flag Diacritic is encountered, the value of 
+  //       feature is reset to neutral.
+  // (U) Unification: If feature is currently neutral, then encountering @U.feature.value@ 
+  //       simply causes feature to be set to value. Else if feature is currently 
+  //       set (non-neutral), then the test will succeed if and only if value is 
+  //       compatible with the current value of feature.
+
+  P,  
+  N, 
+  R, 
+  D, 
+  C, 
+  U 
+};
+
 
 /**
  * Kind of output of the generator module (taken from lttoolbox/fst_processor.h)
@@ -65,6 +98,39 @@ enum HeaderFlag
 class HFSTTransducer;
 class HFSTTransducerHeader;
 class HFSTTransducerAlphabet;
+class FlagDiacriticOperation;
+
+typedef unsigned short SymbolNumber;                 // TODO: Describe these
+typedef unsigned int TransitionTableIndex;           
+typedef unsigned int TransitionNumber;               
+typedef unsigned int StateIdNumber;                  
+typedef unsigned int ArcNumber;
+typedef short ValueNumber;
+typedef std::map<SymbolNumber,const char*> KeyTable;
+typedef std::vector<FlagDiacriticOperation> OperationVector;
+
+const StateIdNumber NO_ID_NUMBER = UINT_MAX;
+const SymbolNumber NO_SYMBOL_NUMBER = USHRT_MAX;
+const TransitionTableIndex NO_TABLE_INDEX = UINT_MAX;
+
+
+/******************************************************************************
+ * This class implements a flag diacritic operation
+ *****************************************************************************/
+
+class FlagDiacriticOperation
+{
+private:
+  FlagDiacriticOperator operation;
+  SymbolNumber feature;
+  ValueNumber value;
+
+public:
+  FlagDiacriticOperation(FlagDiacriticOperator operation, SymbolNumber feat, ValueNumber value);
+
+};
+
+
 
 /******************************************************************************
  * This class implements the header of an HFST transducer.
@@ -99,6 +165,7 @@ public:
 
   void readHeader(FILE *transducer);
   bool probeFlag(HeaderFlag flag);
+  SymbolNumber symbolCount();
 
 };
 
@@ -108,7 +175,24 @@ public:
 
 class HFSTTransducerAlphabet
 {
+private:
+  SymbolNumber number_of_symbols;
+  KeyTable *key_table;
+  char *line;
 
+  std::map<std::string, SymbolNumber> feature_bucket;
+  std::map<std::string, ValueNumber> value_bucket;
+
+  ValueNumber value_number;
+  SymbolNumber feature_number;
+
+public:
+  HFSTTransducerAlphabet();
+  ~HFSTTransducerAlphabet();
+
+  void readAlphabet(FILE *transducer, SymbolNumber symbol_number);
+  void getNextSymbol(FILE *transducer, SymbolNumber key);
+  SymbolNumber getStateSize();
 };
 
 /******************************************************************************
@@ -119,6 +203,7 @@ class HFSTTransducer
 {
 protected:
   HFSTTransducerHeader header;
+  HFSTTransducerAlphabet alphabet;
 
 public:
   HFSTTransducer();
