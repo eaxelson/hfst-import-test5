@@ -13,6 +13,11 @@
 
 #define PACKAGE_VERSION "0.0.1"
 
+typedef unsigned short SymbolNumber;       // TODO: What is this ?
+typedef unsigned int TransitionTableIndex; // TODO: What is this ? 
+typedef unsigned int TransitionNumber;     // TODO: What is this ? 
+typedef unsigned int StateIdNumber;        // TODO: What is this ? 
+
 /**
  * Kind of output of the generator module (taken from lttoolbox/fst_processor.h)
  */
@@ -48,11 +53,67 @@ enum HeaderFlag
 {
   hf_uw_input_epsilon_cycles,
   hf_input_epsilon_cycles,
+  hf_epsilon_epsilon_transitions,
+  hf_input_epsilon_transitions,
   hf_minimised,
+  hf_input_deterministic,
   hf_deterministic,
   hf_weighted,
   hf_cyclic
 };
+
+class HFSTTransducer;
+class HFSTTransducerHeader;
+class HFSTTransducerAlphabet;
+
+/******************************************************************************
+ * This class implements the header of an HFST transducer.
+ *****************************************************************************/
+
+class HFSTTransducerHeader 
+{
+private:
+  SymbolNumber number_of_symbols;
+  SymbolNumber number_of_input_symbols;
+  TransitionTableIndex transition_index_table_size;
+  TransitionTableIndex transition_target_table_size;
+
+  StateIdNumber number_of_states;
+  TransitionNumber number_of_transitions;
+
+  bool weighted;
+  bool input_deterministic;
+  bool deterministic;
+  bool minimised;
+  bool cyclic;
+  bool has_epsilon_epsilon_transitions;
+  bool has_input_epsilon_transitions;
+  bool has_input_epsilon_cycles;
+  bool has_unweighted_input_epsilon_cycles;
+  
+  void readProperty(bool &property, FILE *transducer);
+
+public:
+  HFSTTransducerHeader();
+  ~HFSTTransducerHeader();
+
+  void readHeader(FILE *transducer);
+  bool probeFlag(HeaderFlag flag);
+
+};
+
+/******************************************************************************
+ * This class implements the alphabet of an HFST transducer.
+ *****************************************************************************/
+
+class HFSTTransducerAlphabet
+{
+
+};
+
+/******************************************************************************
+ * This class implements an HFST transducer.
+ *****************************************************************************/
 
 class HFSTTransducer
 {
@@ -62,38 +123,22 @@ protected:
 public:
   HFSTTransducer();
   ~HFSTTransducer();
-}
 
-class HFSTTransducerHeader 
-{
-private:
-  bool weighted;
-  bool deterministic;
-  bool minimised;
-  bool cyclic;
-  bool has_input_epsilon_cycles;
-  bool has_unweighted_input_epsilon_cycles;
-  
-  void readProperty(bool &property, FILE *transducer);
-
-public:
-  HFSTTransducerHeader(FILE *transducer);
-  ~HFSTTransducerHeader();
-
-  bool probeFlag(HeaderFlag flag);
-
+  void loadTransducer(FILE *input);
 };
 
-class HFSTTransducerAlphabet
-{
-
-};
+/******************************************************************************
+ * This is the wrapper class for Apertium stream format. It contains an HFST
+ * transducer object, and methods to read a stream and tokenise and analyse, 
+ * and to read a stream and generate. The general layout is modelled after the
+ * FSTProcessor class in lttoolbox/fst_processor.h 
+ *****************************************************************************/
 
 class HFSTApertiumApplicator 
 {
 
 private:
-  HFSTTransducer
+  HFSTTransducer transducer;
   bool dictionaryCase;
   bool nullFlush;
 

@@ -79,11 +79,11 @@ main(int argc, char *argv[])
 
 
     case 'z':
-      // Set up null flush mode here
+      proc.setNullFlush(true);
       break;
 
     case 'w':
-      // Setup dictionary case mode here
+      proc.setDictionaryCaseMode(true);
       break;
 
     case 'v':
@@ -119,7 +119,7 @@ main(int argc, char *argv[])
       endProgram(argv[0]);
     }
     
-    // Load FST here 
+    proc.loadTransducer(in);
     fclose(in);
   }
   else if(optind == (argc -2))
@@ -136,7 +136,7 @@ main(int argc, char *argv[])
       endProgram(argv[0]);
     }
     
-    // load FST here
+    proc.loadTransducer(in);
     fclose(in);
   }   
   else if(optind == (argc - 1))
@@ -146,7 +146,7 @@ main(int argc, char *argv[])
     {
       endProgram(argv[0]);
     }
-    // load FST here
+    proc.loadTransducer(in);
     fclose(in);
   }
   else
@@ -206,30 +206,22 @@ HFSTApertiumApplicator::~HFSTApertiumApplicator()
 }
 
 void 
-HFSTApertiumApplicator::load(FILE *input)
+HFSTApertiumApplicator::loadTransducer(FILE *input)
 {
-  HFSTTransducerHeader header(input);
+  std::cerr << "HFSTApertiumApplicator::loadTransducer" << std::endl;
+  transducer.loadTransducer(input);
 
-  if(header.probeFlag(hf_uw_input_epsilon_cycles) || 
-     header.probeFlag(hf_input_epsilon_cycles))
-  {
-    std::cerr << "Transducer has epsilon cycles, these are not supported." << std::endl;
-    exit(-1);
-  }
-
-  return;
 }
-
 void 
 HFSTApertiumApplicator::setDictionaryCaseMode(bool const value)
 {
-  return;
+  dictionaryCase = value;
 }
 
 void 
 HFSTApertiumApplicator::setNullFlush(bool const value)
 {
-  return;
+  nullFlush = value;
 }
 
 void 
@@ -277,7 +269,7 @@ HFSTApertiumApplicator::generation(FILE *input, FILE *output, GenerationMode mod
  * HFSTTransducerHeader class methods below this line
  *****************************************************************************/
 
-HFSTTransducerHeader::HFSTTransducerHeader(FILE *transducer)
+HFSTTransducerHeader::HFSTTransducerHeader()
 {
   return;
 }
@@ -288,12 +280,44 @@ HFSTTransducerHeader::~HFSTTransducerHeader()
 }
 
 void
+HFSTTransducerHeader::readHeader(FILE *transducer)
+{
+  std::cerr << "HFSTTransducerHeader::readHeader()" << std::endl;
+
+  // Read the header, these operations are ordered.
+
+  size_t val; // TODO: Catch possible errors here.
+
+  val = fread(&number_of_input_symbols, sizeof(SymbolNumber), 1, transducer);
+  val = fread(&number_of_symbols, sizeof(SymbolNumber), 1, transducer);
+
+  val = fread(&transition_index_table_size, sizeof(TransitionTableIndex), 1, transducer);
+  val = fread(&transition_target_table_size, sizeof(TransitionTableIndex), 1, transducer);
+
+  val = fread(&number_of_states, sizeof(StateIdNumber), 1, transducer);
+  val = fread(&number_of_transitions, sizeof(TransitionNumber), 1, transducer);
+
+  std::cerr << number_of_states << " " << number_of_transitions << std::endl;
+
+  readProperty(weighted, transducer);
+  readProperty(deterministic, transducer);
+  readProperty(input_deterministic, transducer);
+  readProperty(minimised, transducer);
+  readProperty(cyclic, transducer);
+
+  readProperty(has_epsilon_epsilon_transitions, transducer);
+  readProperty(has_input_epsilon_transitions, transducer);
+  readProperty(has_input_epsilon_cycles, transducer);
+  readProperty(has_unweighted_input_epsilon_cycles, transducer);
+}
+
+void
 HFSTTransducerHeader::readProperty(bool &property, FILE *transducer)
 {
   unsigned int value = 0;
   unsigned int ret = 0;
   
-  ret = fread(&value, sizeof(unsigned int), 1, transducer);
+  ret = fread(&value, sizeof(unsigned int), 1, transducer); // TODO: Check return value
   if(value == 0)
   {
     property = false;
@@ -321,10 +345,46 @@ HFSTTransducerHeader::probeFlag(HeaderFlag flag)
     return minimised;
   case hf_deterministic: 
     return deterministic;
+  case hf_input_deterministic: 
+    return input_deterministic;
   case hf_input_epsilon_cycles:
     return has_input_epsilon_cycles;
+  case hf_epsilon_epsilon_transitions:
+    return has_epsilon_epsilon_transitions;
+  case hf_input_epsilon_transitions:
+    return has_input_epsilon_transitions;
   case hf_uw_input_epsilon_cycles:
     return has_unweighted_input_epsilon_cycles;
   }
   return false;
+}
+
+/*****************************************************************************
+ * HFSTTransducer class methods below this line
+ *****************************************************************************/
+
+HFSTTransducer::HFSTTransducer()
+{
+  return;
+}
+
+HFSTTransducer::~HFSTTransducer()
+{
+  return;
+}
+
+void 
+HFSTTransducer::loadTransducer(FILE *input)
+{
+  std::cerr << "HFSTTransducer::loadTransducer()" << std::endl;
+  header.readHeader(input);
+
+  if(header.probeFlag(hf_uw_input_epsilon_cycles) || 
+     header.probeFlag(hf_input_epsilon_cycles))
+  {
+    std::cerr << "Transducer has epsilon cycles, these are not supported." << std::endl;
+    exit(-1);
+  }
+
+  return;
 }
