@@ -81,6 +81,10 @@ int main(int argc, char **argv) {
 	assert (HfstTransducer::test_equivalence(tr, trconv));
 	HfstTransducer tranother("foo", "bar", types[j]);
 	assert (HfstTransducer::test_equivalence(tr, tranother));
+	// test the att format
+	tr.write_in_att_format("testfile");
+	HfstTransducer foo = HfstTransducer::read_in_att_format("testfile");
+	assert (HfstTransducer::test_equivalence(tr, foo));
       }
       HfstMutableTransducer mut(tr);
       HfstTransducer foo(mut);
@@ -127,6 +131,18 @@ int main(int argc, char **argv) {
       assert (HfstTransducer::test_equivalence(tr, foo));
     }
     printf("Two-string constructors tested.\n");
+    {
+      HfstTransducer foo = HfstTransducer::read_in_att_format("test_transducer.att");
+      HfstTransducer test = foo.convert(types[i]);
+      HfstTransducer t1 = test.repeat_star();
+      HfstTransducer t2 = test.repeat_plus();
+      HfstTransducer t3 = test.repeat_n(3);
+      HfstTransducer t4 = test.repeat_n_minus(3);
+      HfstTransducer t5 = test.repeat_n_plus(3);
+      HfstTransducer t6 = test.repeat_n_to_k(1,4);
+      HfstTransducer t7 = test.optionalize();
+    }
+    printf("Repeat and optionalize functions tested.\n");
   }
   exit(0);
 }

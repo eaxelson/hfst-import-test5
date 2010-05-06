@@ -177,6 +177,8 @@ namespace implementations
       static std::pair<StdVectorFst*, StdVectorFst*> harmonize(StdVectorFst *t1, StdVectorFst *t2);
       static void print(StdVectorFst * t, KeyTable &key_table, ostream &out);
       static void print_test(StdVectorFst * t);
+      static void print_test(StdVectorFst * t, FILE *ofile);
+      static StdVectorFst * read_in_att_format(FILE *ifile);
       static bool test_equivalence(StdVectorFst *one, StdVectorFst *another);
 
     protected:

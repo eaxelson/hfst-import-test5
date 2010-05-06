@@ -579,7 +579,7 @@ namespace hfst { namespace implementations
 	for (fst::ArcIterator<LogFst> aiter(*t,s); !aiter.Done(); aiter.Next())
 	  {
 	    const LogArc &arc = aiter.Value();
-	    fprintf(stderr, "%i\t%i\t%s\t%s\t%f\t\t(%i %i)\t\n", (int)s, (int)arc.nextstate, sym->Find(arc.ilabel).c_str(), sym->Find(arc.olabel).c_str(), arc.weight.Value(), arc.ilabel, arc.olabel);
+	    fprintf(stderr, "%i\t%i\t%s\t%s\t%f\n", (int)s, (int)arc.nextstate, sym->Find(arc.ilabel).c_str(), sym->Find(arc.olabel).c_str(), arc.weight.Value());
 	  }
 	if (t->Final(s) != LogWeight::Zero())
 	  fprintf(stderr, "%i\t%f\n", (int)s, t->Final(s).Value());
