@@ -1,40 +1,29 @@
+#include "hfst_proc.h"
 
-#include <cstdlib>
-#include <getopt.h>
-#include <iostream>
-#include <libgen.h>
-
-#ifdef _MSC_VER
-#include <io.h>
-#include <fcntl.h>
-#endif
-
-#define PACKAGE_VERSION "0.0.1"
-
-using namespace std;
+void endProgram(char *name);
 
 void 
 endProgram(char *name)
 {
-  cout << basename(name) << ": process a stream with a finite-state transducer" << endl;
-  cout << "USAGE: " << basename(name) << " [-w] [-z] [-a|-g|-n] fst_file [input_file [output_file]]" << endl;
-  cout << "Options:" << endl;
+  std::cout << basename(name) << ": process a stream with a finite-state transducer" << std::endl;
+  std::cout << "USAGE: " << basename(name) << " [-w] [-z] [-a|-g|-n] fst_file [input_file [output_file]]" << std::endl;
+  std::cout << "Options:" << std::endl;
 #if HAVE_GETOPT_LONG
-  cout << "  -a, --analysis:         morphological analysis (default behaviour)" << endl;
-  cout << "  -g, --generation:       morphological generation" << endl;
-  cout << "  -n, --non-marked-gen    morph. generation without unknown word marks" << endl;
-  cout << "  -z, --null-flush:       flush output on the null character " << endl;
-  cout << "  -w, --dictionary-case:  use dictionary case instead of surface case" << endl;
-  cout << "  -v, --version:          version" << endl;
-  cout << "  -h, --help:             show this help" << endl;
+  std::cout << "  -a, --analysis:         morphological analysis (default behaviour)" << std::endl;
+  std::cout << "  -g, --generation:       morphological generation" << std::endl;
+  std::cout << "  -n, --non-marked-gen    morph. generation without unknown word marks" << std::endl;
+  std::cout << "  -z, --null-flush:       flush output on the null character " << std::endl;
+  std::cout << "  -w, --dictionary-case:  use dictionary case instead of surface case" << std::endl;
+  std::cout << "  -v, --version:          version" << std::endl;
+  std::cout << "  -h, --help:             show this help" << std::endl;
 #else
-  cout << "  -a:   morphological analysis (default behaviour)" << endl;
-  cout << "  -g:   morphological generation" << endl;
-  cout << "  -n:   morph. generation without unknown word marks" << endl;
-  cout << "  -z:   flush output on the null character " << endl;
-  cout << "  -w:   use dictionary case instead of surface case" << endl;
-  cout << "  -v:   version" << endl;
-  cout << "  -h:   show this help" << endl;
+  std::cout << "  -a:   morphological analysis (default behaviour)" << std::endl;
+  std::cout << "  -g:   morphological generation" << std::endl;
+  std::cout << "  -n:   morph. generation without unknown word marks" << std::endl;
+  std::cout << "  -z:   flush output on the null character " << std::endl;
+  std::cout << "  -w:   use dictionary case instead of surface case" << std::endl;
+  std::cout << "  -v:   version" << std::endl;
+  std::cout << "  -h:   show this help" << std::endl;
 #endif
   exit(EXIT_FAILURE);
 }
@@ -43,6 +32,7 @@ int
 main(int argc, char *argv[])
 {
   int cmd = 0;
+  HFSTApertiumApplicator proc;
 
 #if HAVE_GETOPT_LONG
   static struct option long_options[]=
@@ -97,7 +87,7 @@ main(int argc, char *argv[])
       break;
 
     case 'v':
-      cout << basename(argv[0]) << " version " << PACKAGE_VERSION << endl;
+      std::cout << basename(argv[0]) << " version " << PACKAGE_VERSION << std::endl;
       exit(EXIT_SUCCESS);
       break;
     case 'h':
@@ -186,9 +176,9 @@ main(int argc, char *argv[])
         break;
     }
   }
-  catch (exception& e)
+  catch (std::exception& e)
   {
-    cerr << e.what();
+    std::cerr << e.what();
     // If null flush turned on, flush output here
 
     exit(1);
@@ -200,3 +190,141 @@ main(int argc, char *argv[])
   return EXIT_SUCCESS;
 }
 
+/*****************************************************************************
+ * HFSTApertiumApplicator class methods below this line
+ *****************************************************************************/
+
+
+HFSTApertiumApplicator::HFSTApertiumApplicator()
+{
+  return;
+}
+
+HFSTApertiumApplicator::~HFSTApertiumApplicator()
+{
+  return;
+}
+
+void 
+HFSTApertiumApplicator::load(FILE *input)
+{
+  HFSTTransducerHeader header(input);
+
+  if(header.probeFlag(hf_uw_input_epsilon_cycles) || 
+     header.probeFlag(hf_input_epsilon_cycles))
+  {
+    std::cerr << "Transducer has epsilon cycles, these are not supported." << std::endl;
+    exit(-1);
+  }
+
+  return;
+}
+
+void 
+HFSTApertiumApplicator::setDictionaryCaseMode(bool const value)
+{
+  return;
+}
+
+void 
+HFSTApertiumApplicator::setNullFlush(bool const value)
+{
+  return;
+}
+
+void 
+HFSTApertiumApplicator::initAnalysis()
+{
+  return;
+}
+
+void 
+HFSTApertiumApplicator::initGeneration()
+{
+  return;
+}
+
+void 
+HFSTApertiumApplicator::analysis(FILE *input, FILE *output)
+{
+  return;
+}
+
+void 
+HFSTApertiumApplicator::generation(FILE *input, FILE *output, GenerationMode mode)
+{
+  // The generation method reads an input stream of disambiguated lexical units
+  // and outputs the forms generated by the transducer. There are a number of 
+  // generation modes (see hfst_proc.h 'enum GenerationMode'). 
+  //
+  // Disambiguated lexical units output by the final stage of transfer look like:
+  // 
+  //   ^lemma1<tag1><tag2><tag3>$[ <b>]^lemma2<tag1><tag2>$[ <\/b>]
+  //   
+  // Where '^' marks the beginning of a new lexical unit and '$' marks the end. Tags
+  // are enclosed in '<' and '>'. The unescaped characters '[' and ']' mark the 
+  // beginning and end of superblanks (blocks of formatting).
+  // 
+  // So, the generation should in this case output:
+  // 
+  //   surfaceform1[ <b>]surfaceform2[ <\/b>]
+  // 
+
+  return;
+}
+
+/*****************************************************************************
+ * HFSTTransducerHeader class methods below this line
+ *****************************************************************************/
+
+HFSTTransducerHeader::HFSTTransducerHeader(FILE *transducer)
+{
+  return;
+}
+
+HFSTTransducerHeader::~HFSTTransducerHeader()
+{
+  return;
+}
+
+void
+HFSTTransducerHeader::readProperty(bool &property, FILE *transducer)
+{
+  unsigned int value = 0;
+  unsigned int ret = 0;
+  
+  ret = fread(&value, sizeof(unsigned int), 1, transducer);
+  if(value == 0)
+  {
+    property = false;
+    return;
+  }
+  else 
+  {
+    property = true;
+    return;
+  }
+  std::cerr << "Could not parse transducer: " << ferror(transducer) << std::endl;
+  exit(1);
+}
+
+bool
+HFSTTransducerHeader::probeFlag(HeaderFlag flag)
+{
+  switch(flag) 
+  {
+  case hf_weighted: 
+    return weighted;
+  case hf_cyclic: 
+    return cyclic;
+  case hf_minimised: 
+    return minimised;
+  case hf_deterministic: 
+    return deterministic;
+  case hf_input_epsilon_cycles:
+    return has_input_epsilon_cycles;
+  case hf_uw_input_epsilon_cycles:
+    return has_unweighted_input_epsilon_cycles;
+  }
+  return false;
+}
