@@ -158,7 +158,7 @@ namespace hfst
     		   const std::string& lower_utf8_str,
     		   const HfstTokenizer &multichar_symbol_tokenizer,
 		   ImplementationType type);
-    /** Read a transducer from stream \a in. **/
+    /** Read a binary transducer from stream \a in. **/
     HfstTransducer(HfstInputStream &in);
     /** A deep copy of transducer \a another. **/
     HfstTransducer(const HfstTransducer &another);
@@ -171,8 +171,12 @@ namespace hfst
     /** A transducer that recognizes the string pair "isymbol:osymbol". **/
     HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type);
 
+    // for testing
     void print(void);
+
     static bool test_equivalence(HfstTransducer &one, HfstTransducer &another);
+    void write_in_att_format(const char * filename);
+    static HfstTransducer &read_in_att_format(const char * filename);
 
     /** An equivalent transducer that has no epsilon:epsilon transitions. */
     HfstTransducer &remove_epsilons(ImplementationType type=UNSPECIFIED_TYPE);

@@ -70,11 +70,143 @@ namespace hfst { namespace implementations
 	for (fst::ArcIterator<StdVectorFst> aiter(*t,s); !aiter.Done(); aiter.Next())
 	  {
 	    const StdArc &arc = aiter.Value();
-	    fprintf(stderr, "%i\t%i\t%s\t%s\t%f\t\t(%i %i)\t\n", (int)s, (int)arc.nextstate, sym->Find(arc.ilabel).c_str(), sym->Find(arc.olabel).c_str(), arc.weight.Value(), arc.ilabel, arc.olabel);
+	    fprintf(stderr, "%i\t%i\t%s\t%s\t%f\n", (int)s, (int)arc.nextstate, sym->Find(arc.ilabel).c_str(), sym->Find(arc.olabel).c_str(), arc.weight.Value());
 	  }
 	if (t->Final(s) != TropicalWeight::Zero())
 	  fprintf(stderr, "%i\t%f\n", (int)s, t->Final(s).Value());
       }
+  }
+
+  // FIX: change the name to print_att or something like that...
+  void TropicalWeightTransducer::print_test(StdVectorFst *t, FILE *ofile)
+  {
+
+    SymbolTable *sym = t->InputSymbols();
+
+    // this takes care that initial state is always printed as number zero
+    // and state number zero (if it is not initial) is printed as another number
+    // (basically as the number of the initial state in that case, i.e.
+    // the numbers of initial state and state number zero are swapped)
+    StateId zero_print=0;
+    StateId initial_state = t->Start();
+    if (initial_state != 0) {
+      zero_print = initial_state;
+    }
+      
+    for (fst::StateIterator<StdVectorFst> siter(*t); 
+	 not siter.Done(); siter.Next())
+      {
+	StateId s = siter.Value();
+	int origin;  // how origin state is printed, see the first comment
+	/*if (s == 0)
+	  origin = zero_print;
+	else if (s == initial_state)
+	  origin = 0;
+	  else*/
+	  origin = (int)s;
+	for (fst::ArcIterator<StdVectorFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+	  {
+	    const StdArc &arc = aiter.Value();
+	    int target;  // how target state is printed, see the first comment
+	    /*if (arc.nextstate == 0)
+	      target = zero_print;
+	    else if (arc.nextstate == initial_state)
+	      target = 0;
+	      else*/
+	      target = (int)arc.nextstate;
+	    fprintf(ofile, "%i\t%i\t%s\t%s\t%f\n", origin, target,
+		    sym->Find(arc.ilabel).c_str(), sym->Find(arc.olabel).c_str(),
+		    arc.weight.Value());
+	  }
+	if (t->Final(s) != TropicalWeight::Zero())
+	  fprintf(ofile, "%i\t%f\n", origin, t->Final(s).Value());
+      }
+  }
+  
+
+  // AT&T format is handled here ------------------------------
+
+  /* Maps state numbers in AT&T text format to state ids used by OpenFst transducers. */
+  typedef std::map<int, StateId> StateMap;
+
+  // FIX: this would be better in namespace TropicalWeightTransducer...
+  /* A method used by function 'read_in_att_format'.
+     Returns the state id of state number state_number and adds a new
+     state to t if state_number is encountered for the first time and
+     updates state_map accordingly. */
+  StateId add_and_map_state(StdVectorFst *t, int state_number, StateMap &state_map)
+  {
+    StateMap::iterator it = state_map.find(state_number);
+    if (it == state_map.end()) {
+      StateId retval  = t->AddState();
+      state_map.insert( std::pair<int, StateId>(state_number, retval) );
+      return retval;
+    }
+    else
+      return it->second;
+  }
+
+  // FIX: atof and atoi are not necessarily portable...
+  /* Reads a description of a transducer in AT&T text format and returns a corresponding
+     binary transducer. 
+     @note The initial state must be numbered as zero. */
+  StdVectorFst * TropicalWeightTransducer::read_in_att_format(FILE * ifile)
+  {
+    StdVectorFst *t = new StdVectorFst();
+    initialize_symbol_tables(t);
+    char line [255];
+    StateMap state_map;
+
+    // Add initial state that is numbered as zero.
+    StateId initial_state = add_and_map_state(t, 0, state_map);
+    t->SetStart(initial_state);
+
+
+    while ( fgets(line, 255, ifile) != NULL ) 
+      {
+	//printf("read line: %s: ", line);
+	char a1 [100]; char a2 [100]; char a3 [100]; char a4 [100]; char a5 [100];
+	int n = sscanf(line, "%s\t%s\t%s\t%s\t%s", a1, a2, a3, a4, a5);
+	//printf("number of arguments: (%i)\n", n);
+
+	// set value of weight
+	float weight = 0;
+	if (n == 2)
+	  weight = atof(a2);
+	if (n == 5)
+	  weight = atof(a5);
+
+	if (n == 1 || n == 2)  // final state line
+	  {
+	    int final_number = atoi(a1);
+	    StateId final_state = add_and_map_state(t, final_number, state_map);
+	    t->SetFinal(final_state, weight);
+	    //printf("...added final state %i with weight %f\n", final_state, weight);
+	  }
+
+	else if (n == 4 || n == 5)  // transition line
+	  {
+	    int origin_number = atoi(a1);
+	    int target_number = atoi(a2);
+	    StateId origin_state = add_and_map_state(t, origin_number, state_map);
+	    StateId target_state = add_and_map_state(t, target_number, state_map);
+
+	    int input_number = t->InputSymbols()->AddSymbol(std::string(a3));
+	    int output_number = t->InputSymbols()->AddSymbol(std::string(a4));
+
+	    t->AddArc(origin_state, StdArc(input_number, output_number, weight, target_state));
+	    //printf("...added transition from state %i to state %i with input number %i and output number
+	    //%i and weight %f\n", origin_state, target_state, input_number, output_number, weight);
+	  }
+
+	else  // line could not be parsed
+	  {
+	    printf("ERROR: in AT&T file: line: \"%s\"\n", line);
+	    throw HfstInterfaceException();
+	  }
+
+      } 
+    return t;
   }
 
   /* 

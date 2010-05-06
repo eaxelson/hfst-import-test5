@@ -1137,6 +1137,28 @@ type(type),anonymous(false),is_trie(false)
   }
   */
 
+void HfstTransducer::write_in_att_format(const char * filename)
+{
+  FILE * ofile = fopen(filename, "wb");
+  if (ofile == NULL)
+    throw FileNotReadableException();
+  HfstTransducer conv = this->convert(TROPICAL_OFST_TYPE);
+  this->tropical_ofst_interface.print_test
+    (conv.implementation.tropical_ofst, ofile);
+  fclose(ofile);
+}
+
+HfstTransducer &HfstTransducer::read_in_att_format(const char * filename)
+{
+  HfstTransducer * retval = new HfstTransducer(TROPICAL_OFST_TYPE);
+  FILE * ifile = fopen(filename, "rb");
+  if (ifile == NULL)
+    throw FileNotReadableException();
+  retval->implementation.tropical_ofst = TropicalWeightTransducer::read_in_att_format(ifile);
+  fclose(ifile);
+  return *retval;
+}
+
 void HfstTransducer::print(void) 
   {
     switch (this->type)
