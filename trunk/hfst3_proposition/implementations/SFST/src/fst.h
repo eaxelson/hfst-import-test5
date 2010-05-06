@@ -289,6 +289,7 @@ class Transducer {
   Node *copy_nodes( Node *n, Transducer *a, 
 		    bool lswitch=false, bool recode=false );
   void rec_cat_nodes( Node*, Node* );
+  void rec_cat_nodes_hfst( Node*, Node* );
   bool productive_node( Node* );
   bool prune_nodes( Node* );
   void negate_nodes( Node*, Node* );
