@@ -1,0 +1,99 @@
+==================================================================
+ Helsinki Finite-State Technology (library and application suite)
+==================================================================
+
+This package contains a bridging library for multiple FST libraries and toolkits
+and set of tools for processing of finite-state automate especially for
+linguistic systems.
+
+This package is for users who want to configure, build and install them all.
+
+There's a lot of documentation and other information about HFST at
+`Kitwiki HFST pages <https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome>`_.
+
+Installation
+------------
+
+INSTALL describes the GNU build system in detail, but for most users the usual::
+
+	./configure
+	make
+	(as root) make install
+
+should result in a local installation and::
+
+	(as root) make uninstall
+
+in its uninstallation. If you aren't going to be linking to the library after
+building it and don't need to be able to send debugging information, you can
+save a considerable amount of space and memory by doing::
+
+	make install-strip
+
+instead of make install. This strips all the symbols from the binaries,
+reducing sizes by a factor of 5-10.
+
+If you would rather install in eg. your home directory
+(or aren't the system administrator), you can tell ./configure::
+
+        ./configure --prefix=$HOME
+
+Software in this package is variously distributed under the GPL, LGPL and
+Apache licenses. If you want to develop something or include it in your own
+software, check which license(s) apply.
+
+In the CVS or SVN version you must create necessary autotools files in the host
+system::
+
+  autoreconf -i
+
+It is common practice to keep `generated files out of version control
+<http://www.gnu.org/software/automake/manual/automake.html#CVS>`_.
+
+For further installation instruction refer to file ``INSTALL``, which contains
+the standard installation instructions for GNU autoconf based software.
+
+Dependencies
+------------
+
+Compilation requirements:
+
+- Underlying transducer libraries *may* impose further restrictions; e.g.
+  OpenFST may require pthreads library
+
+- Versions loaded from version control systems require a relatively new GNU
+  tool-chain to build: autoconf >=2.60, automake, libtool >=2.2, >=gettext-0.17.
+  GNU tool-chain is also needed with distributed packages if the user wishes to
+  modify Makefile.am or configure.ac files.
+
+- Versions loaded from version control systems require GNU flex 2.5.35 and
+  relatively new bison or compatible. Especially flex 2.5.33 will choke on
+  perfectly valid rules used in hfst. Flex and bison are needed with
+  distribution versions as well if the user wishes to modify .yy or .ll files.
+
+Runtime requirements:
+
+- If the executable is dynamically linked (almost always), the operating system
+  *must* be able to find hfst libraries.
+
+Further information
+-------------------
+
+The `Hfst wiki site
+<https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome>`_ also contains more
+details.
+
+Reporting bugs
+--------------
+
+The primary channel for reporting bugs is currently email box
+<hfst-bugs@helsinki.fi>. When reporting, please include at least following:
+
+* version of software used (hfst-toolname --version)
+
+* steps to reproduce, attach all related files if possible
+
+* information about platform used (e.g. uname -a)
+
+
+.. vim: set ft=rst:

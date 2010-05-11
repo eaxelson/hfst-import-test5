@@ -1,0 +1,41 @@
+===============================
+ Coding style and instructions
+===============================
+
+This file contains information on coding conventions, style and implementation.
+If you plan to contribute, read this before making changes.
+
+On coding style
+---------------
+
+Coding style is not currently forced, but it is preferred that authors follow
+`GNU coding style guidelines`_ for C and C++ parts, `SUN coding conventions`_
+for Java parts, PEP8_ for python parts, and so on. But more important than
+following certain guidelines is being *consistent*. The users of vim are
+advised to use ``cindent``, ``autoindent`` and file type indentation rules at
+all times. The users of emacs should also turn on automatic indentation and
+code formatting-for C and C++ emacs defaults to GNU coding styles anyways.  At
+very least stick to maximum line length of 79, and use some indentation.
+
+.. _GNU coding style guidelines: http://www.gnu.org/prep/standards/standards.html
+.. _SUN coding conventions: http://java.sun.com/docs/codeconv/
+.. _PEP8: http://www.python.org/dev/peps/pep-0008/
+
+Version control usage
+---------------------
+
+All changes should be commited to version control system, ideally one change at
+a time. Each commit must be accompanied by meaningful commit message summarising
+change(s) in English. Commit logs are collected to ChangeLog on each release.
+
+On stability
+------------
+
+This software uses all the typical autotools & GNU tricks, so follow the
+usual practices. Do not commit anything that won’t pass ``make``. Do not
+distribute any alphas that do not pass ``make check``. Do not distribute
+any betas that won’t pass ``make distcheck``. Do not distribute release versions
+that have not had large-scale end-user testings, if in doubt, mark them at least
+release candidates.
+
+.. vim: set ft=rst:
