@@ -1,0 +1,73 @@
+=================================
+ NEWS for hfst-tools and library
+=================================
+
+This file contains all noteworthy changes in HFST development between releases.
+For full listing of changes see ChangeLog.
+
+Noteworthy changes in 3.0
+-------------------------
+
+* All new API in object oriented form
+
+* brand new foma backend for unweighted transducer handling
+
+Noteworthy changes in 2.4.1
+---------------------------
+
+* Fixed inclusion path in pkg-config file
+
+* Fixed extraneous epsilon path in hfst-lexc transducers
+
+Noteworthy changes in release 2.4
+---------------------------------
+
+* Multiple compilation issued fixed w.r.t string.h inclusion inside hfst source
+  tree without installed headers
+
+* Added preliminary pkg-config support
+
+* Optimizations for flag diacritics in optimized format; NB. the optimized
+  format in 2.4 is not compatible with optimized format of previous releases
+
+* More input and output formatting options for hfst-lookup
+
+* New tool hfst-omor-evaluate for testing morphological transducers
+  (an overblown glorified hfst-diff-test)
+
+* Preliminary tool for killing evil flag diacritics
+
+* Several minor bug fixes in composing intersection and flag diacritics
+
+Noteworthy changes in release 2.3
+---------------------------------
+
+* Major fixes in flag diacritic handling for lookup and lookup-optimize
+
+* New tool hfst-substitute for safe relabeling
+
+* Bug fixes in hfst-compose-intersect w.r.t. any symbol and #
+
+* Remove gettext support because of numerous portability issues
+
+Noteworthy changes in release 2.2
+---------------------------------
+
+* Bug fixes in intersecting composition,  is_subset, negation, 
+
+* Handling of flag diacritics included in lookup
+
+* Remove readline because of numerous portability issues
+
+* Remove alphabet and metadata from hfst-lexc
+
+* hfst-lookup support for custom formatting of readings
+
+* fixed hfst-twolc escaping in set constructions
+
+Noteworthy changes in release 2.1
+---------------------------------
+
+* hfst-twolc and hfst-compose-intersect understand # like xerox originals
+
+.. vim: set ft=rst:
