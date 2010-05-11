@@ -72,7 +72,6 @@ typedef int flex_int32_t;
 typedef unsigned char flex_uint8_t; 
 typedef unsigned short int flex_uint16_t;
 typedef unsigned int flex_uint32_t;
-#endif /* ! C99 */
 
 /* Limits of integral types. */
 #ifndef INT8_MIN
@@ -102,6 +101,8 @@ typedef unsigned int flex_uint32_t;
 #ifndef UINT32_MAX
 #define UINT32_MAX             (4294967295U)
 #endif
+
+#endif /* ! C99 */
 
 #endif /* ! FLEXINT_H */
 
@@ -724,7 +725,7 @@ void my_cmatrixparse(struct fsm *net, char *my_string) {
 }
 
 
-#line 728 "lex.cmatrix.c"
+#line 729 "lex.cmatrix.c"
 
 #define INITIAL 0
 #define SUB 1
@@ -816,7 +817,7 @@ static int input (void );
 /* This used to be an fputs(), but since the string might contain NUL's,
  * we now use fwrite().
  */
-#define ECHO fwrite( cmatrixtext, cmatrixleng, 1, cmatrixout )
+#define ECHO do { if (fwrite( cmatrixtext, cmatrixleng, 1, cmatrixout )) {} } while (0)
 #endif
 
 /* Gets input and stuffs it into "buf".  number of characters read, or YY_NULL,
@@ -827,7 +828,7 @@ static int input (void );
 	if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
 		{ \
 		int c = '*'; \
-		int n; \
+		size_t n; \
 		for ( n = 0; n < max_size && \
 			     (c = getc( cmatrixin )) != EOF && c != '\n'; ++n ) \
 			buf[n] = (char) c; \
@@ -915,7 +916,7 @@ YY_DECL
 #line 53 "cmatrix.l"
 
 
-#line 919 "lex.cmatrix.c"
+#line 920 "lex.cmatrix.c"
 
 	if ( !(yy_init) )
 		{
@@ -1132,7 +1133,7 @@ YY_RULE_SETUP
 #line 99 "cmatrix.l"
 ECHO;
 	YY_BREAK
-#line 1136 "lex.cmatrix.c"
+#line 1137 "lex.cmatrix.c"
 			case YY_STATE_EOF(INITIAL):
 			case YY_STATE_EOF(SUB):
 			case YY_STATE_EOF(DEL):
@@ -1619,19 +1620,9 @@ static void cmatrix_load_buffer_state  (void)
 	cmatrixfree((void *) b  );
 }
 
-#ifndef _UNISTD_H /* assume unistd.h has isatty() for us */
-#ifdef __cplusplus
-extern "C" {
-#endif
-#ifdef __THROW /* this is a gnuism */
-extern int isatty (int ) __THROW;
-#else
+#ifndef __cplusplus
 extern int isatty (int );
-#endif
-#ifdef __cplusplus
-}
-#endif
-#endif
+#endif /* __cplusplus */
     
 /* Initializes or reinitializes a buffer.
  * This function is sometimes called more than once on the same buffer,

@@ -33,12 +33,15 @@ SFST_DIR = SFST/src
 SFST_HDRS = \
 		$(SFST_DIR)/alphabet.h $(SFST_DIR)/basic.h $(SFST_DIR)/compact.h \
 		$(SFST_DIR)/make-compact.h $(SFST_DIR)/fst.h $(SFST_DIR)/mem.h \
-		$(SFST_DIR)/lowmem.h $(SFST_DIR)/parse_flag_diacritics.h \
-		$(SFST_DIR)/utf8.h $(SFST_DIR)/lookup.h $(SFST_DIR)/fst-lex.h \
-		$(SFST_DIR)/fst-regression.h $(SFST_DIR)/runtime_conversion.h  \
-		$(SFST_DIR)/read_runtime_transducer.h \
-		$(SFST_DIR)/tokenize_functions.h $(SFST_DIR)/runtime_type_defs.h \
-		$(SFST_DIR)/binSearch.h $(SFST_DIR)/transducer-conversion.h
+		$(SFST_DIR)/lowmem.h \
+		$(SFST_DIR)/utf8.h
+# $(SFST_DIR)/tokenize_functions.h 
+# $(SFST_DIR)/binSearch.h $(SFST_DIR)/transducer-conversion.h
+# $(SFST_DIR)/lookup.h $(SFST_DIR)/fst-lex.h $(SFST_DIR)/fst-regression.h
+# $(SFST_DIR)/runtime_conversion.h 
+# $(SFST_DIR)/read_runtime_transducer.h
+# $(SFST_DIR)/runtime_type_defs.h
+
 
 OFST_DIR = openfst-1.1/src/include/fst/
 OFST_HDRS = \

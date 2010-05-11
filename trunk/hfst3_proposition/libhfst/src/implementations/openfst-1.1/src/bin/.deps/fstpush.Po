@@ -1,194 +1,161 @@
 fstpush.o: fstpush.cc push-main.h ../include/fst/push.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/vector \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_algobase.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/c++config.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/os_defines.h \
-  /usr/include/features.h /usr/include/sys/cdefs.h \
-  /usr/include/bits/wordsize.h /usr/include/gnu/stubs.h \
-  /usr/include/gnu/stubs-32.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/cpu_defines.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/cstddef \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/stddef.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/functexcept.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/exception_defines.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/cpp_type_traits.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/ext/type_traits.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/ext/numeric_traits.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_pair.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_move.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/concept_check.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_iterator_base_types.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_iterator_base_funcs.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_iterator.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/debug/debug.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/allocator.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/c++allocator.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/ext/new_allocator.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/new \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/exception \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_construct.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_uninitialized.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_vector.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_bvector.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/vector.tcc \
-  ../include/fst/factor-weight.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/algorithm \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_algo.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/cstdlib \
-  /usr/include/stdlib.h /usr/include/bits/waitflags.h \
-  /usr/include/bits/waitstatus.h /usr/include/endian.h \
-  /usr/include/bits/endian.h /usr/include/bits/byteswap.h \
-  /usr/include/xlocale.h /usr/include/sys/types.h \
-  /usr/include/bits/types.h /usr/include/bits/typesizes.h \
-  /usr/include/time.h /usr/include/sys/select.h \
-  /usr/include/bits/select.h /usr/include/bits/sigset.h \
-  /usr/include/bits/time.h /usr/include/sys/sysmacros.h \
-  /usr/include/bits/pthreadtypes.h /usr/include/alloca.h \
-  /usr/include/bits/stdlib.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/algorithmfwd.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_heap.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_tempbuf.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1/unordered_map \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/utility \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_relops.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_function.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/backward/binders.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stringfwd.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1/type_traits \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1_impl/type_traits \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1/functional_hash.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1_impl/functional_hash.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1/hashtable.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1_impl/hashtable \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1_impl/hashtable_policy.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1_impl/unordered_map \
-  ../include/fst/slist.h ../include/fst/config.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/ext/slist \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/string \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/char_traits.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/postypes.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/cwchar \
-  /usr/include/wchar.h /usr/include/stdio.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/stdarg.h \
-  /usr/include/bits/wchar.h /usr/include/bits/wchar2.h \
-  /usr/include/stdint.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/cstdio \
-  /usr/include/libio.h /usr/include/_G_config.h \
-  /usr/include/bits/stdio_lim.h /usr/include/bits/sys_errlist.h \
-  /usr/include/bits/stdio.h /usr/include/bits/stdio2.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/localefwd.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/c++locale.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/clocale \
-  /usr/include/locale.h /usr/include/bits/locale.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/iosfwd \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/cctype \
-  /usr/include/ctype.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/ostream_insert.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/cxxabi-forced.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/basic_string.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/ext/atomicity.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/gthr.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/gthr-default.h \
-  /usr/include/pthread.h /usr/include/sched.h /usr/include/bits/sched.h \
-  /usr/include/signal.h /usr/include/bits/setjmp.h /usr/include/unistd.h \
-  /usr/include/bits/posix_opt.h /usr/include/bits/environments.h \
-  /usr/include/bits/confname.h /usr/include/getopt.h \
-  /usr/include/bits/unistd.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/atomic_word.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/basic_string.tcc \
-  ../include/fst/cache.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/list \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_list.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/list.tcc \
-  ../include/fst/vector-fst.h ../include/fst/mutable-fst.h \
-  ../include/fst/expanded-fst.h ../include/fst/fst.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/cmath \
-  /usr/include/math.h /usr/include/bits/huge_val.h \
-  /usr/include/bits/huge_valf.h /usr/include/bits/huge_vall.h \
-  /usr/include/bits/inf.h /usr/include/bits/nan.h \
-  /usr/include/bits/mathdef.h /usr/include/bits/mathcalls.h \
-  /usr/include/bits/mathinline.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/cmath.tcc \
-  ../include/fst/compat.h /usr/include/dlfcn.h /usr/include/bits/dlfcn.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/climits \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include-fixed/limits.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include-fixed/syslimits.h \
-  /usr/include/limits.h /usr/include/bits/posix1_lim.h \
-  /usr/include/bits/local_lim.h /usr/include/linux/limits.h \
-  /usr/include/bits/posix2_lim.h /usr/include/bits/xopen_lim.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/cstring \
-  /usr/include/string.h /usr/include/bits/string3.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/iostream \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/ostream \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/ios \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/ios_base.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/locale_classes.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/locale_classes.tcc \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/streambuf \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/streambuf.tcc \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/basic_ios.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/locale_facets.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/cwctype \
-  /usr/include/wctype.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/ctype_base.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/streambuf_iterator.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/ctype_inline.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/locale_facets.tcc \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/basic_ios.tcc \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/ostream.tcc \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/istream \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/istream.tcc \
-  ../include/fst/lock.h ../include/fst/flags.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/map \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_tree.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_map.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_multimap.h \
-  ../include/fst/log.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/cassert \
-  /usr/include/assert.h ../include/fst/arc.h \
-  ../include/fst/float-weight.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/limits \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/sstream \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/sstream.tcc \
-  ../include/fst/util.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/fstream \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/codecvt.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/basic_file.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/c++io.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/fstream.tcc \
-  ../include/fst/weight.h ../include/fst/product-weight.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/stack \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/deque \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_deque.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/deque.tcc \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_stack.h \
-  ../include/fst/pair-weight.h ../include/fst/string-weight.h \
-  ../include/fst/lexicographic-weight.h ../include/fst/register.h \
-  ../include/fst/symbol-table.h ../include/fst/properties.h \
-  ../include/fst/test-properties.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1/unordered_set \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1_impl/unordered_set \
-  ../include/fst/dfs-visit.h ../include/fst/arcfilter.h \
-  ../include/fst/connect.h ../include/fst/map.h ../include/fst/reweight.h \
-  ../include/fst/shortest-distance.h ../include/fst/queue.h \
-  ../include/fst/heap.h \
-  /usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/functional \
-  ../include/fst/topsort.h ../include/fst/statesort.h \
-  ../include/fst/reverse.h ../include/fst/main.h
+ /usr/include/c++/4.4/vector /usr/include/c++/4.4/bits/stl_algobase.h \
+ /usr/include/c++/4.4/x86_64-linux-gnu/bits/c++config.h \
+ /usr/include/c++/4.4/x86_64-linux-gnu/bits/os_defines.h \
+ /usr/include/features.h /usr/include/bits/predefs.h \
+ /usr/include/sys/cdefs.h /usr/include/bits/wordsize.h \
+ /usr/include/gnu/stubs.h /usr/include/gnu/stubs-64.h \
+ /usr/include/c++/4.4/x86_64-linux-gnu/bits/cpu_defines.h \
+ /usr/include/c++/4.4/cstddef \
+ /usr/lib/gcc/x86_64-linux-gnu/4.4.1/include/stddef.h \
+ /usr/include/c++/4.4/bits/functexcept.h \
+ /usr/include/c++/4.4/exception_defines.h \
+ /usr/include/c++/4.4/bits/cpp_type_traits.h \
+ /usr/include/c++/4.4/ext/type_traits.h \
+ /usr/include/c++/4.4/ext/numeric_traits.h \
+ /usr/include/c++/4.4/bits/stl_pair.h /usr/include/c++/4.4/bits/move.h \
+ /usr/include/c++/4.4/bits/concept_check.h \
+ /usr/include/c++/4.4/bits/stl_iterator_base_types.h \
+ /usr/include/c++/4.4/bits/stl_iterator_base_funcs.h \
+ /usr/include/c++/4.4/bits/stl_iterator.h \
+ /usr/include/c++/4.4/debug/debug.h /usr/include/c++/4.4/bits/allocator.h \
+ /usr/include/c++/4.4/x86_64-linux-gnu/bits/c++allocator.h \
+ /usr/include/c++/4.4/ext/new_allocator.h /usr/include/c++/4.4/new \
+ /usr/include/c++/4.4/exception /usr/include/c++/4.4/bits/stl_construct.h \
+ /usr/include/c++/4.4/bits/stl_uninitialized.h \
+ /usr/include/c++/4.4/bits/stl_vector.h \
+ /usr/include/c++/4.4/initializer_list \
+ /usr/include/c++/4.4/bits/stl_bvector.h \
+ /usr/include/c++/4.4/bits/vector.tcc ../include/fst/factor-weight.h \
+ /usr/include/c++/4.4/algorithm /usr/include/c++/4.4/bits/stl_algo.h \
+ /usr/include/c++/4.4/cstdlib /usr/include/stdlib.h \
+ /usr/include/bits/waitflags.h /usr/include/bits/waitstatus.h \
+ /usr/include/endian.h /usr/include/bits/endian.h \
+ /usr/include/bits/byteswap.h /usr/include/xlocale.h \
+ /usr/include/sys/types.h /usr/include/bits/types.h \
+ /usr/include/bits/typesizes.h /usr/include/time.h \
+ /usr/include/sys/select.h /usr/include/bits/select.h \
+ /usr/include/bits/sigset.h /usr/include/bits/time.h \
+ /usr/include/sys/sysmacros.h /usr/include/bits/pthreadtypes.h \
+ /usr/include/alloca.h /usr/include/bits/stdlib.h \
+ /usr/include/c++/4.4/bits/algorithmfwd.h \
+ /usr/include/c++/4.4/bits/stl_heap.h \
+ /usr/include/c++/4.4/bits/stl_tempbuf.h \
+ /usr/include/c++/4.4/tr1/unordered_map /usr/include/c++/4.4/utility \
+ /usr/include/c++/4.4/bits/stl_relops.h \
+ /usr/include/c++/4.4/bits/stl_function.h \
+ /usr/include/c++/4.4/backward/binders.h \
+ /usr/include/c++/4.4/bits/stringfwd.h \
+ /usr/include/c++/4.4/tr1/type_traits \
+ /usr/include/c++/4.4/tr1_impl/type_traits \
+ /usr/include/c++/4.4/tr1/functional_hash.h \
+ /usr/include/c++/4.4/tr1_impl/functional_hash.h \
+ /usr/include/c++/4.4/tr1/hashtable.h \
+ /usr/include/c++/4.4/tr1_impl/hashtable \
+ /usr/include/c++/4.4/tr1_impl/hashtable_policy.h \
+ /usr/include/c++/4.4/tr1_impl/unordered_map ../include/fst/slist.h \
+ ../include/fst/config.h /usr/include/c++/4.4/ext/slist \
+ /usr/include/c++/4.4/string /usr/include/c++/4.4/bits/char_traits.h \
+ /usr/include/c++/4.4/bits/postypes.h /usr/include/c++/4.4/cwchar \
+ /usr/include/wchar.h /usr/include/stdio.h \
+ /usr/lib/gcc/x86_64-linux-gnu/4.4.1/include/stdarg.h \
+ /usr/include/bits/wchar.h /usr/include/bits/wchar2.h \
+ /usr/include/c++/4.4/bits/localefwd.h \
+ /usr/include/c++/4.4/x86_64-linux-gnu/bits/c++locale.h \
+ /usr/include/c++/4.4/clocale /usr/include/locale.h \
+ /usr/include/bits/locale.h /usr/include/c++/4.4/iosfwd \
+ /usr/include/c++/4.4/cctype /usr/include/ctype.h \
+ /usr/include/c++/4.4/bits/ostream_insert.h \
+ /usr/include/c++/4.4/cxxabi-forced.h \
+ /usr/include/c++/4.4/bits/basic_string.h \
+ /usr/include/c++/4.4/ext/atomicity.h \
+ /usr/include/c++/4.4/x86_64-linux-gnu/bits/gthr.h \
+ /usr/include/c++/4.4/x86_64-linux-gnu/bits/gthr-default.h \
+ /usr/include/pthread.h /usr/include/sched.h /usr/include/bits/sched.h \
+ /usr/include/signal.h /usr/include/bits/setjmp.h /usr/include/unistd.h \
+ /usr/include/bits/posix_opt.h /usr/include/bits/environments.h \
+ /usr/include/bits/confname.h /usr/include/getopt.h \
+ /usr/include/bits/unistd.h \
+ /usr/include/c++/4.4/x86_64-linux-gnu/bits/atomic_word.h \
+ /usr/include/c++/4.4/bits/basic_string.tcc ../include/fst/cache.h \
+ /usr/include/c++/4.4/list /usr/include/c++/4.4/bits/stl_list.h \
+ /usr/include/c++/4.4/bits/list.tcc ../include/fst/vector-fst.h \
+ ../include/fst/mutable-fst.h ../include/fst/expanded-fst.h \
+ ../include/fst/fst.h /usr/include/c++/4.4/cmath /usr/include/math.h \
+ /usr/include/bits/huge_val.h /usr/include/bits/huge_valf.h \
+ /usr/include/bits/huge_vall.h /usr/include/bits/inf.h \
+ /usr/include/bits/nan.h /usr/include/bits/mathdef.h \
+ /usr/include/bits/mathcalls.h /usr/include/bits/mathinline.h \
+ /usr/include/c++/4.4/bits/cmath.tcc ../include/fst/compat.h \
+ /usr/include/dlfcn.h /usr/include/bits/dlfcn.h \
+ /usr/include/c++/4.4/climits \
+ /usr/lib/gcc/x86_64-linux-gnu/4.4.1/include-fixed/limits.h \
+ /usr/lib/gcc/x86_64-linux-gnu/4.4.1/include-fixed/syslimits.h \
+ /usr/include/limits.h /usr/include/bits/posix1_lim.h \
+ /usr/include/bits/local_lim.h /usr/include/linux/limits.h \
+ /usr/include/bits/posix2_lim.h /usr/include/bits/xopen_lim.h \
+ /usr/include/bits/stdio_lim.h /usr/include/c++/4.4/cstring \
+ /usr/include/string.h /usr/include/bits/string3.h \
+ /usr/include/c++/4.4/iostream /usr/include/c++/4.4/ostream \
+ /usr/include/c++/4.4/ios /usr/include/c++/4.4/bits/ios_base.h \
+ /usr/include/c++/4.4/bits/locale_classes.h \
+ /usr/include/c++/4.4/bits/locale_classes.tcc \
+ /usr/include/c++/4.4/streambuf /usr/include/c++/4.4/bits/streambuf.tcc \
+ /usr/include/c++/4.4/bits/basic_ios.h \
+ /usr/include/c++/4.4/bits/locale_facets.h /usr/include/c++/4.4/cwctype \
+ /usr/include/wctype.h \
+ /usr/include/c++/4.4/x86_64-linux-gnu/bits/ctype_base.h \
+ /usr/include/c++/4.4/bits/streambuf_iterator.h \
+ /usr/include/c++/4.4/x86_64-linux-gnu/bits/ctype_inline.h \
+ /usr/include/c++/4.4/bits/locale_facets.tcc \
+ /usr/include/c++/4.4/bits/basic_ios.tcc \
+ /usr/include/c++/4.4/bits/ostream.tcc /usr/include/c++/4.4/istream \
+ /usr/include/c++/4.4/bits/istream.tcc ../include/fst/lock.h \
+ ../include/fst/flags.h /usr/include/c++/4.4/map \
+ /usr/include/c++/4.4/bits/stl_tree.h /usr/include/c++/4.4/bits/stl_map.h \
+ /usr/include/c++/4.4/bits/stl_multimap.h ../include/fst/log.h \
+ /usr/include/c++/4.4/cassert /usr/include/assert.h ../include/fst/arc.h \
+ ../include/fst/float-weight.h /usr/include/c++/4.4/limits \
+ /usr/include/c++/4.4/sstream /usr/include/c++/4.4/bits/sstream.tcc \
+ ../include/fst/util.h /usr/include/c++/4.4/fstream \
+ /usr/include/c++/4.4/bits/codecvt.h /usr/include/c++/4.4/cstdio \
+ /usr/include/libio.h /usr/include/_G_config.h \
+ /usr/include/bits/sys_errlist.h /usr/include/bits/stdio.h \
+ /usr/include/bits/stdio2.h \
+ /usr/include/c++/4.4/x86_64-linux-gnu/bits/basic_file.h \
+ /usr/include/c++/4.4/x86_64-linux-gnu/bits/c++io.h \
+ /usr/include/c++/4.4/bits/fstream.tcc ../include/fst/weight.h \
+ ../include/fst/product-weight.h /usr/include/c++/4.4/stack \
+ /usr/include/c++/4.4/deque /usr/include/c++/4.4/bits/stl_deque.h \
+ /usr/include/c++/4.4/bits/deque.tcc \
+ /usr/include/c++/4.4/bits/stl_stack.h ../include/fst/pair-weight.h \
+ ../include/fst/string-weight.h ../include/fst/lexicographic-weight.h \
+ ../include/fst/register.h ../include/fst/symbol-table.h \
+ ../include/fst/properties.h ../include/fst/test-properties.h \
+ /usr/include/c++/4.4/tr1/unordered_set \
+ /usr/include/c++/4.4/tr1_impl/unordered_set ../include/fst/dfs-visit.h \
+ ../include/fst/arcfilter.h ../include/fst/connect.h ../include/fst/map.h \
+ ../include/fst/reweight.h ../include/fst/shortest-distance.h \
+ ../include/fst/queue.h ../include/fst/heap.h \
+ /usr/include/c++/4.4/functional ../include/fst/topsort.h \
+ ../include/fst/statesort.h ../include/fst/reverse.h \
+ ../include/fst/main.h
 
 push-main.h:
 
 ../include/fst/push.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/vector:
+/usr/include/c++/4.4/vector:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_algobase.h:
+/usr/include/c++/4.4/bits/stl_algobase.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/c++config.h:
+/usr/include/c++/4.4/x86_64-linux-gnu/bits/c++config.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/os_defines.h:
+/usr/include/c++/4.4/x86_64-linux-gnu/bits/os_defines.h:
 
 /usr/include/features.h:
+
+/usr/include/bits/predefs.h:
 
 /usr/include/sys/cdefs.h:
 
@@ -196,65 +163,67 @@ push-main.h:
 
 /usr/include/gnu/stubs.h:
 
-/usr/include/gnu/stubs-32.h:
+/usr/include/gnu/stubs-64.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/cpu_defines.h:
+/usr/include/c++/4.4/x86_64-linux-gnu/bits/cpu_defines.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/cstddef:
+/usr/include/c++/4.4/cstddef:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/stddef.h:
+/usr/lib/gcc/x86_64-linux-gnu/4.4.1/include/stddef.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/functexcept.h:
+/usr/include/c++/4.4/bits/functexcept.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/exception_defines.h:
+/usr/include/c++/4.4/exception_defines.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/cpp_type_traits.h:
+/usr/include/c++/4.4/bits/cpp_type_traits.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/ext/type_traits.h:
+/usr/include/c++/4.4/ext/type_traits.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/ext/numeric_traits.h:
+/usr/include/c++/4.4/ext/numeric_traits.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_pair.h:
+/usr/include/c++/4.4/bits/stl_pair.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_move.h:
+/usr/include/c++/4.4/bits/move.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/concept_check.h:
+/usr/include/c++/4.4/bits/concept_check.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_iterator_base_types.h:
+/usr/include/c++/4.4/bits/stl_iterator_base_types.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_iterator_base_funcs.h:
+/usr/include/c++/4.4/bits/stl_iterator_base_funcs.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_iterator.h:
+/usr/include/c++/4.4/bits/stl_iterator.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/debug/debug.h:
+/usr/include/c++/4.4/debug/debug.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/allocator.h:
+/usr/include/c++/4.4/bits/allocator.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/c++allocator.h:
+/usr/include/c++/4.4/x86_64-linux-gnu/bits/c++allocator.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/ext/new_allocator.h:
+/usr/include/c++/4.4/ext/new_allocator.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/new:
+/usr/include/c++/4.4/new:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/exception:
+/usr/include/c++/4.4/exception:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_construct.h:
+/usr/include/c++/4.4/bits/stl_construct.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_uninitialized.h:
+/usr/include/c++/4.4/bits/stl_uninitialized.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_vector.h:
+/usr/include/c++/4.4/bits/stl_vector.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_bvector.h:
+/usr/include/c++/4.4/initializer_list:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/vector.tcc:
+/usr/include/c++/4.4/bits/stl_bvector.h:
+
+/usr/include/c++/4.4/bits/vector.tcc:
 
 ../include/fst/factor-weight.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/algorithm:
+/usr/include/c++/4.4/algorithm:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_algo.h:
+/usr/include/c++/4.4/bits/stl_algo.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/cstdlib:
+/usr/include/c++/4.4/cstdlib:
 
 /usr/include/stdlib.h:
 
@@ -294,107 +263,91 @@ push-main.h:
 
 /usr/include/bits/stdlib.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/algorithmfwd.h:
+/usr/include/c++/4.4/bits/algorithmfwd.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_heap.h:
+/usr/include/c++/4.4/bits/stl_heap.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_tempbuf.h:
+/usr/include/c++/4.4/bits/stl_tempbuf.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1/unordered_map:
+/usr/include/c++/4.4/tr1/unordered_map:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/utility:
+/usr/include/c++/4.4/utility:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_relops.h:
+/usr/include/c++/4.4/bits/stl_relops.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_function.h:
+/usr/include/c++/4.4/bits/stl_function.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/backward/binders.h:
+/usr/include/c++/4.4/backward/binders.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stringfwd.h:
+/usr/include/c++/4.4/bits/stringfwd.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1/type_traits:
+/usr/include/c++/4.4/tr1/type_traits:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1_impl/type_traits:
+/usr/include/c++/4.4/tr1_impl/type_traits:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1/functional_hash.h:
+/usr/include/c++/4.4/tr1/functional_hash.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1_impl/functional_hash.h:
+/usr/include/c++/4.4/tr1_impl/functional_hash.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1/hashtable.h:
+/usr/include/c++/4.4/tr1/hashtable.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1_impl/hashtable:
+/usr/include/c++/4.4/tr1_impl/hashtable:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1_impl/hashtable_policy.h:
+/usr/include/c++/4.4/tr1_impl/hashtable_policy.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1_impl/unordered_map:
+/usr/include/c++/4.4/tr1_impl/unordered_map:
 
 ../include/fst/slist.h:
 
 ../include/fst/config.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/ext/slist:
+/usr/include/c++/4.4/ext/slist:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/string:
+/usr/include/c++/4.4/string:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/char_traits.h:
+/usr/include/c++/4.4/bits/char_traits.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/postypes.h:
+/usr/include/c++/4.4/bits/postypes.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/cwchar:
+/usr/include/c++/4.4/cwchar:
 
 /usr/include/wchar.h:
 
 /usr/include/stdio.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/stdarg.h:
+/usr/lib/gcc/x86_64-linux-gnu/4.4.1/include/stdarg.h:
 
 /usr/include/bits/wchar.h:
 
 /usr/include/bits/wchar2.h:
 
-/usr/include/stdint.h:
+/usr/include/c++/4.4/bits/localefwd.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/cstdio:
+/usr/include/c++/4.4/x86_64-linux-gnu/bits/c++locale.h:
 
-/usr/include/libio.h:
-
-/usr/include/_G_config.h:
-
-/usr/include/bits/stdio_lim.h:
-
-/usr/include/bits/sys_errlist.h:
-
-/usr/include/bits/stdio.h:
-
-/usr/include/bits/stdio2.h:
-
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/localefwd.h:
-
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/c++locale.h:
-
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/clocale:
+/usr/include/c++/4.4/clocale:
 
 /usr/include/locale.h:
 
 /usr/include/bits/locale.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/iosfwd:
+/usr/include/c++/4.4/iosfwd:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/cctype:
+/usr/include/c++/4.4/cctype:
 
 /usr/include/ctype.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/ostream_insert.h:
+/usr/include/c++/4.4/bits/ostream_insert.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/cxxabi-forced.h:
+/usr/include/c++/4.4/cxxabi-forced.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/basic_string.h:
+/usr/include/c++/4.4/bits/basic_string.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/ext/atomicity.h:
+/usr/include/c++/4.4/ext/atomicity.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/gthr.h:
+/usr/include/c++/4.4/x86_64-linux-gnu/bits/gthr.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/gthr-default.h:
+/usr/include/c++/4.4/x86_64-linux-gnu/bits/gthr-default.h:
 
 /usr/include/pthread.h:
 
@@ -418,17 +371,17 @@ push-main.h:
 
 /usr/include/bits/unistd.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/atomic_word.h:
+/usr/include/c++/4.4/x86_64-linux-gnu/bits/atomic_word.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/basic_string.tcc:
+/usr/include/c++/4.4/bits/basic_string.tcc:
 
 ../include/fst/cache.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/list:
+/usr/include/c++/4.4/list:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_list.h:
+/usr/include/c++/4.4/bits/stl_list.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/list.tcc:
+/usr/include/c++/4.4/bits/list.tcc:
 
 ../include/fst/vector-fst.h:
 
@@ -438,7 +391,7 @@ push-main.h:
 
 ../include/fst/fst.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/cmath:
+/usr/include/c++/4.4/cmath:
 
 /usr/include/math.h:
 
@@ -458,7 +411,7 @@ push-main.h:
 
 /usr/include/bits/mathinline.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/cmath.tcc:
+/usr/include/c++/4.4/bits/cmath.tcc:
 
 ../include/fst/compat.h:
 
@@ -466,11 +419,11 @@ push-main.h:
 
 /usr/include/bits/dlfcn.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/climits:
+/usr/include/c++/4.4/climits:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include-fixed/limits.h:
+/usr/lib/gcc/x86_64-linux-gnu/4.4.1/include-fixed/limits.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include-fixed/syslimits.h:
+/usr/lib/gcc/x86_64-linux-gnu/4.4.1/include-fixed/syslimits.h:
 
 /usr/include/limits.h:
 
@@ -484,67 +437,69 @@ push-main.h:
 
 /usr/include/bits/xopen_lim.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/cstring:
+/usr/include/bits/stdio_lim.h:
+
+/usr/include/c++/4.4/cstring:
 
 /usr/include/string.h:
 
 /usr/include/bits/string3.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/iostream:
+/usr/include/c++/4.4/iostream:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/ostream:
+/usr/include/c++/4.4/ostream:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/ios:
+/usr/include/c++/4.4/ios:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/ios_base.h:
+/usr/include/c++/4.4/bits/ios_base.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/locale_classes.h:
+/usr/include/c++/4.4/bits/locale_classes.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/locale_classes.tcc:
+/usr/include/c++/4.4/bits/locale_classes.tcc:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/streambuf:
+/usr/include/c++/4.4/streambuf:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/streambuf.tcc:
+/usr/include/c++/4.4/bits/streambuf.tcc:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/basic_ios.h:
+/usr/include/c++/4.4/bits/basic_ios.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/locale_facets.h:
+/usr/include/c++/4.4/bits/locale_facets.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/cwctype:
+/usr/include/c++/4.4/cwctype:
 
 /usr/include/wctype.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/ctype_base.h:
+/usr/include/c++/4.4/x86_64-linux-gnu/bits/ctype_base.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/streambuf_iterator.h:
+/usr/include/c++/4.4/bits/streambuf_iterator.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/ctype_inline.h:
+/usr/include/c++/4.4/x86_64-linux-gnu/bits/ctype_inline.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/locale_facets.tcc:
+/usr/include/c++/4.4/bits/locale_facets.tcc:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/basic_ios.tcc:
+/usr/include/c++/4.4/bits/basic_ios.tcc:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/ostream.tcc:
+/usr/include/c++/4.4/bits/ostream.tcc:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/istream:
+/usr/include/c++/4.4/istream:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/istream.tcc:
+/usr/include/c++/4.4/bits/istream.tcc:
 
 ../include/fst/lock.h:
 
 ../include/fst/flags.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/map:
+/usr/include/c++/4.4/map:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_tree.h:
+/usr/include/c++/4.4/bits/stl_tree.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_map.h:
+/usr/include/c++/4.4/bits/stl_map.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_multimap.h:
+/usr/include/c++/4.4/bits/stl_multimap.h:
 
 ../include/fst/log.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/cassert:
+/usr/include/c++/4.4/cassert:
 
 /usr/include/assert.h:
 
@@ -552,37 +507,49 @@ push-main.h:
 
 ../include/fst/float-weight.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/limits:
+/usr/include/c++/4.4/limits:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/sstream:
+/usr/include/c++/4.4/sstream:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/sstream.tcc:
+/usr/include/c++/4.4/bits/sstream.tcc:
 
 ../include/fst/util.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/fstream:
+/usr/include/c++/4.4/fstream:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/codecvt.h:
+/usr/include/c++/4.4/bits/codecvt.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/basic_file.h:
+/usr/include/c++/4.4/cstdio:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/i686-pc-linux-gnu/bits/c++io.h:
+/usr/include/libio.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/fstream.tcc:
+/usr/include/_G_config.h:
+
+/usr/include/bits/sys_errlist.h:
+
+/usr/include/bits/stdio.h:
+
+/usr/include/bits/stdio2.h:
+
+/usr/include/c++/4.4/x86_64-linux-gnu/bits/basic_file.h:
+
+/usr/include/c++/4.4/x86_64-linux-gnu/bits/c++io.h:
+
+/usr/include/c++/4.4/bits/fstream.tcc:
 
 ../include/fst/weight.h:
 
 ../include/fst/product-weight.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/stack:
+/usr/include/c++/4.4/stack:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/deque:
+/usr/include/c++/4.4/deque:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_deque.h:
+/usr/include/c++/4.4/bits/stl_deque.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/deque.tcc:
+/usr/include/c++/4.4/bits/deque.tcc:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/bits/stl_stack.h:
+/usr/include/c++/4.4/bits/stl_stack.h:
 
 ../include/fst/pair-weight.h:
 
@@ -598,9 +565,9 @@ push-main.h:
 
 ../include/fst/test-properties.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1/unordered_set:
+/usr/include/c++/4.4/tr1/unordered_set:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/tr1_impl/unordered_set:
+/usr/include/c++/4.4/tr1_impl/unordered_set:
 
 ../include/fst/dfs-visit.h:
 
@@ -618,7 +585,7 @@ push-main.h:
 
 ../include/fst/heap.h:
 
-/usr/lib/gcc/i686-pc-linux-gnu/4.3.4/include/g++-v4/functional:
+/usr/include/c++/4.4/functional:
 
 ../include/fst/topsort.h:
 

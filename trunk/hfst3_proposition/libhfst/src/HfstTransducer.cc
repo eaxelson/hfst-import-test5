@@ -605,14 +605,15 @@ type(type),anonymous(false),is_trie(false)
 
   bool HfstTransducer::test_equivalence(HfstTransducer &one, HfstTransducer &another) 
   {
-    HfstTransducer oneconv = one.convert(TROPICAL_OFST_TYPE);
-    HfstTransducer anotherconv = another.convert(TROPICAL_OFST_TYPE);
-
-    oneconv.harmonize(another);
+    HfstTransducer onecopy(one);
+    HfstTransducer anothercopy(another);
+    onecopy.convert(TROPICAL_OFST_TYPE);
+    anothercopy.convert(TROPICAL_OFST_TYPE);
+    onecopy.harmonize(anothercopy);
 
     return tropical_ofst_interface.test_equivalence(
-	     oneconv.implementation.tropical_ofst,
-	     anotherconv.implementation.tropical_ofst);
+	     onecopy.implementation.tropical_ofst,
+	     anothercopy.implementation.tropical_ofst);
   }
 
   HfstTransducer &HfstTransducer::remove_epsilons(ImplementationType type)
@@ -671,12 +672,9 @@ type(type),anonymous(false),is_trie(false)
 
   HfstTransducer &HfstTransducer::repeat_n_plus(unsigned int n, ImplementationType type)
   { is_trie = false; // This could be done so that is_trie is preserved
-    return apply 
-      (&hfst::implementations::SfstTransducer::repeat_le_n,
-       &hfst::implementations::TropicalWeightTransducer::repeat_le_n,
-       &hfst::implementations::LogWeightTransducer::repeat_le_n,
-       &hfst::implementations::FomaTransducer::repeat_le_n,
-       n,type); }
+    HfstTransducer a(*this);
+    return (a.repeat_n(n,type)).concatenate(this->repeat_star(type));  // FIX: memory leaks?
+  }
 
   HfstTransducer &HfstTransducer::repeat_n_minus(unsigned int n, ImplementationType type)
   { is_trie = false; // This could be done so that is_trie is preserved
@@ -687,14 +685,11 @@ type(type),anonymous(false),is_trie(false)
        &hfst::implementations::FomaTransducer::repeat_le_n,
        n,type); }
 
-  HfstTransducer &HfstTransducer::repeat_n_to_k(unsigned int n, unsigned int, ImplementationType type)
+  HfstTransducer &HfstTransducer::repeat_n_to_k(unsigned int n, unsigned int k, ImplementationType type)
   { is_trie = false; // This could be done so that is_trie is preserved
-    return apply 
-      (&hfst::implementations::SfstTransducer::repeat_le_n,
-       &hfst::implementations::TropicalWeightTransducer::repeat_le_n,
-       &hfst::implementations::LogWeightTransducer::repeat_le_n,
-       &hfst::implementations::FomaTransducer::repeat_le_n,
-       n,type); }
+    HfstTransducer a(*this);
+    return (a.repeat_n(n,type).concatenate(this->repeat_n_minus(k)));   // FIX: memory leaks? 
+  }
 
   HfstTransducer &HfstTransducer::optionalize(ImplementationType type)
   { is_trie = false; // This could be done so that is_trie is preserved

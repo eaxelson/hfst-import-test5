@@ -47,11 +47,12 @@ PROGRAMS = fst-compiler$(EXE) fst-infl$(EXE) fst-generate$(EXE) fst-print$(EXE)\
 ALLPROGRAMS = $(PROGRAMS)
 
 
-OBJ = basic.o alphabet.o fst.o operators.o determinise.o utf8.o 
+OBJ = basic.o alphabet.o fst.o operators.o determinise.o utf8.o expand.o # HFST addition
 
 .PHONY: all clean maintainer-clean install maninstall remake
 
-all: $(OBJ)
+all: $(ALLPROGRAMS)
+	strip $(ALLPROGRAMS)
 
 fst-api.zip: testprogram.C alphabet.C alphabet.h basic.C basic.h compact.C \
 	compact.h lowmem.C lowmem.h robust.C
@@ -112,7 +113,7 @@ utf8-scanner.ll: scanner.ll
 libsfst.tar.gz: libsfst.so compact.h alphabet.h basic.h fst.h 
 	tar -zcf $@ $^
 
-libsfst.so: alphabet.o basic.o utf8.o compact.o fst.o operators.o determinise.o generate.o
+libsfst.so: alphabet.o basic.o utf8.o compact.o fst.o operators.o determinise.o generate.o expand.o
 	$(CL) -shared -o $@ $^ $(LDFLAGS)
 
 remake: clean $(ALLPROGRAMS)
@@ -169,3 +170,4 @@ testprogram.o: compact.h alphabet.h basic.h sgi.h
 utf8-scanner.o: interface.h utf8.h fst.h alphabet.h basic.h sgi.h mem.h
 utf8-scanner.o: fst-compiler.h
 utf8.o: utf8.h
+expand.o: fst.h alphabet.h basic.h sgi.h mem.h  # HFST addition

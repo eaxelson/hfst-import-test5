@@ -54,7 +54,6 @@ typedef int flex_int32_t;
 typedef unsigned char flex_uint8_t; 
 typedef unsigned short int flex_uint16_t;
 typedef unsigned int flex_uint32_t;
-#endif /* ! C99 */
 
 /* Limits of integral types. */
 #ifndef INT8_MIN
@@ -84,6 +83,8 @@ typedef unsigned int flex_uint32_t;
 #ifndef UINT32_MAX
 #define UINT32_MAX             (4294967295U)
 #endif
+
+#endif /* ! C99 */
 
 #endif /* ! FLEXINT_H */
 
@@ -141,7 +142,15 @@ typedef unsigned int flex_uint32_t;
 
 /* Size of default input buffer. */
 #ifndef YY_BUF_SIZE
+#ifdef __ia64__
+/* On IA-64, the buffer size is 16k, not 8k.
+ * Moreover, YY_BUF_SIZE is 2*YY_READ_BUF_SIZE in the general case.
+ * Ditto for the __ia64__ case accordingly.
+ */
+#define YY_BUF_SIZE 32768
+#else
 #define YY_BUF_SIZE 16384
+#endif /* __ia64__ */
 #endif
 
 /* The state buf must be large enough to hold one state per character in the main buffer.
@@ -644,9 +653,12 @@ YY_BUFFER_STATE Include_Stack[MAX_INCLUDE_DEPTH];
 char *Name_Stack[MAX_INCLUDE_DEPTH];
 int  Lineno_Stack[MAX_INCLUDE_DEPTH];
 
+namespace SFST 
+{
 char *FileName;
 
 bool UTF8=true;
+}
 
 static char *unquote(char *string, bool del_quote=true) {
   char *s=string, *result=string;
@@ -677,7 +689,7 @@ static void print_lineno() {
 
 extern void yyerror(char *text);
 
-#line 681 "utf8-scanner.C"
+#line 693 "utf8-scanner.C"
 
 #define INITIAL 0
 #define incl 1
@@ -759,7 +771,12 @@ static int input (void );
 
 /* Amount of stuff to slurp up with each read. */
 #ifndef YY_READ_BUF_SIZE
+#ifdef __ia64__
+/* On IA-64, the buffer size is 16k, not 8k */
+#define YY_READ_BUF_SIZE 16384
+#else
 #define YY_READ_BUF_SIZE 8192
+#endif /* __ia64__ */
 #endif
 
 /* Copy whatever the last rule matched to the standard output. */
@@ -767,7 +784,7 @@ static int input (void );
 /* This used to be an fputs(), but since the string might contain NUL's,
  * we now use fwrite().
  */
-#define ECHO fwrite( yytext, yyleng, 1, yyout )
+#define ECHO do { if (fwrite( yytext, yyleng, 1, yyout )) {} } while (0)
 #endif
 
 /* Gets input and stuffs it into "buf".  number of characters read, or YY_NULL,
@@ -778,7 +795,7 @@ static int input (void );
 	if ( YY_CURRENT_BUFFER_LVALUE->yy_is_interactive ) \
 		{ \
 		int c = '*'; \
-		int n; \
+		size_t n; \
 		for ( n = 0; n < max_size && \
 			     (c = getc( yyin )) != EOF && c != '\n'; ++n ) \
 			buf[n] = (char) c; \
@@ -863,10 +880,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 72 "utf8-scanner.ll"
+#line 75 "utf8-scanner.ll"
 
 
-#line 870 "utf8-scanner.C"
+#line 887 "utf8-scanner.C"
 
 	if ( !(yy_init) )
 		{
@@ -958,22 +975,22 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 74 "utf8-scanner.ll"
+#line 77 "utf8-scanner.ll"
 BEGIN(incl);
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 75 "utf8-scanner.ll"
+#line 78 "utf8-scanner.ll"
 /* eat the whitespace */
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 76 "utf8-scanner.ll"
+#line 79 "utf8-scanner.ll"
 { error2("Missing quotes",yytext); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 77 "utf8-scanner.ll"
+#line 80 "utf8-scanner.ll"
 { /* got the include file name */
                      FILE *file;
                      char *name=fst_strdup(yytext+1);
@@ -1001,7 +1018,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(incl):
-#line 101 "utf8-scanner.ll"
+#line 104 "utf8-scanner.ll"
 {
                      if (Verbose)
 		       fputc('\n', stderr);
@@ -1019,118 +1036,118 @@ case YY_STATE_EOF(incl):
 case 5:
 /* rule 5 can match eol */
 YY_RULE_SETUP
-#line 116 "utf8-scanner.ll"
+#line 119 "utf8-scanner.ll"
 { print_lineno();  /* ignore comments */ }
 	YY_BREAK
 case 6:
 /* rule 6 can match eol */
 YY_RULE_SETUP
-#line 118 "utf8-scanner.ll"
+#line 121 "utf8-scanner.ll"
 { print_lineno();  /* ignore comments */ }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 120 "utf8-scanner.ll"
+#line 123 "utf8-scanner.ll"
 { /* ignore comments */ }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 123 "utf8-scanner.ll"
+#line 126 "utf8-scanner.ll"
 { return ALPHA; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 125 "utf8-scanner.ll"
+#line 128 "utf8-scanner.ll"
 { return COMPOSE; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 126 "utf8-scanner.ll"
+#line 129 "utf8-scanner.ll"
 { yylval.type = twol_both; return ARROW; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 127 "utf8-scanner.ll"
+#line 130 "utf8-scanner.ll"
 { yylval.type = twol_right;return ARROW; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 128 "utf8-scanner.ll"
+#line 131 "utf8-scanner.ll"
 { yylval.type = twol_left; return ARROW; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 129 "utf8-scanner.ll"
+#line 132 "utf8-scanner.ll"
 { yylval.rtype = repl_up;   return REPLACE; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 130 "utf8-scanner.ll"
+#line 133 "utf8-scanner.ll"
 { yylval.rtype = repl_down; return REPLACE; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 131 "utf8-scanner.ll"
+#line 134 "utf8-scanner.ll"
 { yylval.rtype = repl_right;return REPLACE; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 132 "utf8-scanner.ll"
+#line 135 "utf8-scanner.ll"
 { yylval.rtype = repl_left; return REPLACE; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 133 "utf8-scanner.ll"
+#line 136 "utf8-scanner.ll"
 { return PRINT; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 134 "utf8-scanner.ll"
+#line 137 "utf8-scanner.ll"
 { return INSERT; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 135 "utf8-scanner.ll"
+#line 138 "utf8-scanner.ll"
 { return POS; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 136 "utf8-scanner.ll"
+#line 139 "utf8-scanner.ll"
 { return SWITCH; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 138 "utf8-scanner.ll"
+#line 141 "utf8-scanner.ll"
 { return yytext[0]; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 140 "utf8-scanner.ll"
+#line 143 "utf8-scanner.ll"
 { yylval.name = fst_strdup(yytext); return RVAR; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 142 "utf8-scanner.ll"
+#line 145 "utf8-scanner.ll"
 { yylval.name = fst_strdup(yytext); return VAR; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 144 "utf8-scanner.ll"
+#line 147 "utf8-scanner.ll"
 { yylval.name = fst_strdup(yytext); return RSVAR; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 146 "utf8-scanner.ll"
+#line 149 "utf8-scanner.ll"
 { yylval.name = fst_strdup(yytext); return SVAR; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 148 "utf8-scanner.ll"
+#line 151 "utf8-scanner.ll"
 { yylval.name = unquote(yytext,false); return SYMBOL; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 150 "utf8-scanner.ll"
+#line 153 "utf8-scanner.ll"
 { 
                     yylval.value = fst_strdup(yytext+2);
 		    yylval.value[strlen(yylval.value)-2] = 0;
@@ -1139,7 +1156,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 156 "utf8-scanner.ll"
+#line 159 "utf8-scanner.ll"
 { 
                     yylval.value = fst_strdup(yytext+1);
 		    yylval.value[strlen(yylval.value)-1] = 0;
@@ -1148,24 +1165,24 @@ YY_RULE_SETUP
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 162 "utf8-scanner.ll"
+#line 165 "utf8-scanner.ll"
 { /* ignored */ }
 	YY_BREAK
 case 30:
 /* rule 30 can match eol */
 YY_RULE_SETUP
-#line 163 "utf8-scanner.ll"
+#line 166 "utf8-scanner.ll"
 { print_lineno(); /* ignored */ }
 	YY_BREAK
 case 31:
 /* rule 31 can match eol */
 YY_RULE_SETUP
-#line 164 "utf8-scanner.ll"
+#line 167 "utf8-scanner.ll"
 { print_lineno(); return NEWLINE; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 166 "utf8-scanner.ll"
+#line 169 "utf8-scanner.ll"
 { long l=atol(yytext+1); 
 		    if (l <= 1114112) { yylval.value=fst_strdup(int2utf8((unsigned)l)); return UTF8CHAR; }
 		    yyerror("invalid expression");
@@ -1173,36 +1190,36 @@ YY_RULE_SETUP
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 172 "utf8-scanner.ll"
+#line 175 "utf8-scanner.ll"
 { yylval.value=fst_strdup(yytext+1); return UTF8CHAR; }
 	YY_BREAK
 case 34:
 /* rule 34 can match eol */
 YY_RULE_SETUP
-#line 173 "utf8-scanner.ll"
+#line 176 "utf8-scanner.ll"
 { yylval.value=fst_strdup(yytext); return UTF8CHAR; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 174 "utf8-scanner.ll"
+#line 177 "utf8-scanner.ll"
 { yylval.value=fst_strdup(yytext); return UTF8CHAR; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 175 "utf8-scanner.ll"
+#line 178 "utf8-scanner.ll"
 { yylval.value=fst_strdup(yytext); return UTF8CHAR; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 176 "utf8-scanner.ll"
+#line 179 "utf8-scanner.ll"
 { yylval.value=fst_strdup(yytext); return UTF8CHAR; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 178 "utf8-scanner.ll"
+#line 181 "utf8-scanner.ll"
 ECHO;
 	YY_BREAK
-#line 1206 "utf8-scanner.C"
+#line 1223 "utf8-scanner.C"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -1762,19 +1779,9 @@ static void yy_load_buffer_state  (void)
 	yyfree((void *) b  );
 }
 
-#ifndef _UNISTD_H /* assume unistd.h has isatty() for us */
-#ifdef __cplusplus
-extern "C" {
-#endif
-#ifdef __THROW /* this is a gnuism */
-extern int isatty (int ) __THROW;
-#else
+#ifndef __cplusplus
 extern int isatty (int );
-#endif
-#ifdef __cplusplus
-}
-#endif
-#endif
+#endif /* __cplusplus */
     
 /* Initializes or reinitializes a buffer.
  * This function is sometimes called more than once on the same buffer,
@@ -1980,8 +1987,8 @@ YY_BUFFER_STATE yy_scan_string (yyconst char * yystr )
 
 /** Setup the input buffer state to scan the given bytes. The next call to yylex() will
  * scan from a @e copy of @a bytes.
- * @param bytes the byte buffer to scan
- * @param len the number of bytes in the buffer pointed to by @a bytes.
+ * @param yybytes the byte buffer to scan
+ * @param _yybytes_len the number of bytes in the buffer pointed to by @a bytes.
  * 
  * @return the newly allocated buffer state object.
  */
@@ -2223,7 +2230,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 178 "utf8-scanner.ll"
+#line 181 "utf8-scanner.ll"
 
 
 

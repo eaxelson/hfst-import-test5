@@ -448,6 +448,7 @@ namespace hfst { namespace implementations
   LogFst * LogWeightTransducer::create_empty_transducer(void)
   { 
     LogFst * t = new LogFst;
+    initialize_symbol_tables(t);
     StateId s = t->AddState();
     t->SetStart(s);
     initialize_symbol_tables(t);
@@ -457,6 +458,7 @@ namespace hfst { namespace implementations
   LogFst * LogWeightTransducer::create_epsilon_transducer(void)
   { 
     LogFst * t = new LogFst;
+    initialize_symbol_tables(t);
     StateId s = t->AddState();
     t->SetStart(s);
     t->SetFinal(s,0);
@@ -608,13 +610,12 @@ namespace hfst { namespace implementations
   (LogFst * t)
   {
     LogFst * determinized_t = determinize(t);
-    EncodeMapper<LogArc> encode_mapper(0x0001|0x0002,fst::EncodeType(1));
+    EncodeMapper<LogArc> encode_mapper(0x0001,ENCODE);
     EncodeFst<LogArc> enc(*determinized_t,
 			  &encode_mapper);
     LogFst fst_enc(enc);
     Minimize<LogArc>(&fst_enc);
-    DecodeFst<LogArc> dec(fst_enc,
-			  encode_mapper);
+    DecodeFst<LogArc> dec(fst_enc, encode_mapper);
     delete determinized_t;
     return new LogFst(dec);
   }
@@ -645,11 +646,12 @@ namespace hfst { namespace implementations
   LogWeightTransducer::repeat_n(LogFst * t,int n)
   {
     if (n <= 0)
-      { return create_empty_transducer(); }
+      { return create_epsilon_transducer(); }
 
     LogFst * repetition = create_epsilon_transducer();
     for (int i = 0; i < n; ++i)
       { Concat(repetition,*t); }
+    repetition->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ));
     return repetition;
   }
 
@@ -657,16 +659,15 @@ namespace hfst { namespace implementations
   LogWeightTransducer::repeat_le_n(LogFst * t,int n)
   {
     if (n <= 0)
-      { return create_empty_transducer(); }
+      { return create_epsilon_transducer(); }
 
     LogFst * repetition = create_epsilon_transducer();
-    LogFst * t_i_times = create_epsilon_transducer();
     for (int i = 0; i < n; ++i)
-      { 
-	Union(repetition,*t_i_times); 
-	Concat(t_i_times,*t);
+      {
+	LogFst * optional_t = optionalize(t);
+	Concat(repetition,*optional_t);
+	delete optional_t;
       }
-    delete t_i_times;
     return repetition;
   }
 

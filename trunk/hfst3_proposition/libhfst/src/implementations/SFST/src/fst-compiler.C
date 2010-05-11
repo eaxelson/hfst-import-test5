@@ -1,24 +1,23 @@
-/* A Bison parser, made by GNU Bison 2.3.  */
+
+/* A Bison parser, made by GNU Bison 2.4.1.  */
 
 /* Skeleton implementation for Bison's Yacc-like parsers in C
-
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+   
+      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
    Free Software Foundation, Inc.
-
-   This program is free software; you can redistribute it and/or modify
+   
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
-
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+   
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-
+   
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -29,7 +28,7 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-
+   
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
 
@@ -47,7 +46,7 @@
 #define YYBISON 1
 
 /* Bison version.  */
-#define YYBISON_VERSION "2.3"
+#define YYBISON_VERSION "2.4.1"
 
 /* Skeleton name.  */
 #define YYSKELETON_NAME "yacc.c"
@@ -55,63 +54,20 @@
 /* Pure parsers.  */
 #define YYPURE 0
 
+/* Push parsers.  */
+#define YYPUSH 0
+
+/* Pull parsers.  */
+#define YYPULL 1
+
 /* Using locations.  */
 #define YYLSP_NEEDED 0
 
 
 
-/* Tokens.  */
-#ifndef YYTOKENTYPE
-# define YYTOKENTYPE
-   /* Put the tokens into the symbol table, so that GDB and other debuggers
-      know about them.  */
-   enum yytokentype {
-     NEWLINE = 258,
-     ALPHA = 259,
-     COMPOSE = 260,
-     PRINT = 261,
-     POS = 262,
-     INSERT = 263,
-     SWITCH = 264,
-     ARROW = 265,
-     REPLACE = 266,
-     SYMBOL = 267,
-     VAR = 268,
-     SVAR = 269,
-     RVAR = 270,
-     RSVAR = 271,
-     STRING = 272,
-     STRING2 = 273,
-     UTF8CHAR = 274,
-     CHARACTER = 275,
-     SEQ = 276
-   };
-#endif
-/* Tokens.  */
-#define NEWLINE 258
-#define ALPHA 259
-#define COMPOSE 260
-#define PRINT 261
-#define POS 262
-#define INSERT 263
-#define SWITCH 264
-#define ARROW 265
-#define REPLACE 266
-#define SYMBOL 267
-#define VAR 268
-#define SVAR 269
-#define RVAR 270
-#define RSVAR 271
-#define STRING 272
-#define STRING2 273
-#define UTF8CHAR 274
-#define CHARACTER 275
-#define SEQ 276
-
-
-
-
 /* Copy the first part of user declarations.  */
+
+/* Line 189 of yacc.c  */
 #line 1 "fst-compiler.yy"
 
 /*******************************************************************/
@@ -145,6 +101,9 @@ static int Switch=0;
 Transducer *Result;
 
 
+/* Line 189 of yacc.c  */
+#line 106 "fst-compiler.C"
+
 /* Enabling traces.  */
 #ifndef YYDEBUG
 # define YYDEBUG 0
@@ -163,10 +122,44 @@ Transducer *Result;
 # define YYTOKEN_TABLE 0
 #endif
 
+
+/* Tokens.  */
+#ifndef YYTOKENTYPE
+# define YYTOKENTYPE
+   /* Put the tokens into the symbol table, so that GDB and other debuggers
+      know about them.  */
+   enum yytokentype {
+     NEWLINE = 258,
+     ALPHA = 259,
+     COMPOSE = 260,
+     PRINT = 261,
+     POS = 262,
+     INSERT = 263,
+     SWITCH = 264,
+     ARROW = 265,
+     REPLACE = 266,
+     SYMBOL = 267,
+     VAR = 268,
+     SVAR = 269,
+     RVAR = 270,
+     RSVAR = 271,
+     STRING = 272,
+     STRING2 = 273,
+     UTF8CHAR = 274,
+     CHARACTER = 275,
+     SEQ = 276
+   };
+#endif
+
+
+
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 34 "fst-compiler.yy"
 {
+
+/* Line 214 of yacc.c  */
+#line 34 "fst-compiler.yy"
+
   int        number;
   SFST::Twol_Type  type;
   SFST::Repl_Type  rtype;
@@ -179,22 +172,23 @@ typedef union YYSTYPE
   SFST::Range      *range;
   SFST::Ranges     *ranges;
   SFST::Contexts   *contexts;
-}
-/* Line 187 of yacc.c.  */
-#line 185 "fst-compiler.C"
-	YYSTYPE;
+
+
+
+/* Line 214 of yacc.c  */
+#line 180 "fst-compiler.C"
+} YYSTYPE;
+# define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
-# define YYSTYPE_IS_TRIVIAL 1
 #endif
-
 
 
 /* Copy the second part of user declarations.  */
 
 
-/* Line 216 of yacc.c.  */
-#line 198 "fst-compiler.C"
+/* Line 264 of yacc.c  */
+#line 192 "fst-compiler.C"
 
 #ifdef short
 # undef short
@@ -269,14 +263,14 @@ typedef short int yytype_int16;
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static int
-YYID (int i)
+YYID (int yyi)
 #else
 static int
-YYID (i)
-    int i;
+YYID (yyi)
+    int yyi;
 #endif
 {
-  return i;
+  return yyi;
 }
 #endif
 
@@ -357,9 +351,9 @@ void free (void *); /* INFRINGES ON USER NAME SPACE */
 /* A type that is properly aligned for any stack member.  */
 union yyalloc
 {
-  yytype_int16 yyss;
-  YYSTYPE yyvs;
-  };
+  yytype_int16 yyss_alloc;
+  YYSTYPE yyvs_alloc;
+};
 
 /* The size of the maximum gap between one aligned stack and the next.  */
 # define YYSTACK_GAP_MAXIMUM (sizeof (union yyalloc) - 1)
@@ -393,12 +387,12 @@ union yyalloc
    elements in the stack, and YYPTR gives the new location of the
    stack.  Advance YYPTR to a properly aligned location for the next
    stack.  */
-# define YYSTACK_RELOCATE(Stack)					\
+# define YYSTACK_RELOCATE(Stack_alloc, Stack)				\
     do									\
       {									\
 	YYSIZE_T yynewbytes;						\
-	YYCOPY (&yyptr->Stack, Stack, yysize);				\
-	Stack = &yyptr->Stack;						\
+	YYCOPY (&yyptr->Stack_alloc, Stack, yysize);			\
+	Stack = &yyptr->Stack_alloc;					\
 	yynewbytes = yystacksize * sizeof (*Stack) + YYSTACK_GAP_MAXIMUM; \
 	yyptr += yynewbytes / sizeof (*yyptr);				\
       }									\
@@ -1046,17 +1040,20 @@ yy_symbol_print (yyoutput, yytype, yyvaluep)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_stack_print (yytype_int16 *bottom, yytype_int16 *top)
+yy_stack_print (yytype_int16 *yybottom, yytype_int16 *yytop)
 #else
 static void
-yy_stack_print (bottom, top)
-    yytype_int16 *bottom;
-    yytype_int16 *top;
+yy_stack_print (yybottom, yytop)
+    yytype_int16 *yybottom;
+    yytype_int16 *yytop;
 #endif
 {
   YYFPRINTF (stderr, "Stack now");
-  for (; bottom <= top; ++bottom)
-    YYFPRINTF (stderr, " %d", *bottom);
+  for (; yybottom <= yytop; yybottom++)
+    {
+      int yybot = *yybottom;
+      YYFPRINTF (stderr, " %d", yybot);
+    }
   YYFPRINTF (stderr, "\n");
 }
 
@@ -1090,11 +1087,11 @@ yy_reduce_print (yyvsp, yyrule)
   /* The symbols being reduced.  */
   for (yyi = 0; yyi < yynrhs; yyi++)
     {
-      fprintf (stderr, "   $%d = ", yyi + 1);
+      YYFPRINTF (stderr, "   $%d = ", yyi + 1);
       yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],
 		       &(yyvsp[(yyi + 1) - (yynrhs)])
 		       		       );
-      fprintf (stderr, "\n");
+      YYFPRINTF (stderr, "\n");
     }
 }
 
@@ -1374,10 +1371,8 @@ yydestruct (yymsg, yytype, yyvaluep)
 	break;
     }
 }
-
 
 /* Prevent warnings from -Wmissing-prototypes.  */
-
 #ifdef YYPARSE_PARAM
 #if defined __STDC__ || defined __cplusplus
 int yyparse (void *YYPARSE_PARAM);
@@ -1393,11 +1388,10 @@ int yyparse ();
 #endif /* ! YYPARSE_PARAM */
 
 
-
-/* The look-ahead symbol.  */
+/* The lookahead symbol.  */
 int yychar;
 
-/* The semantic value of the look-ahead symbol.  */
+/* The semantic value of the lookahead symbol.  */
 YYSTYPE yylval;
 
 /* Number of syntax errors so far.  */
@@ -1405,9 +1399,9 @@ int yynerrs;
 
 
 
-/*----------.
-| yyparse.  |
-`----------*/
+/*-------------------------.
+| yyparse or yypush_parse.  |
+`-------------------------*/
 
 #ifdef YYPARSE_PARAM
 #if (defined __STDC__ || defined __C99__FUNC__ \
@@ -1431,14 +1425,39 @@ yyparse ()
 #endif
 #endif
 {
-  
-  int yystate;
+
+
+    int yystate;
+    /* Number of tokens to shift before error messages enabled.  */
+    int yyerrstatus;
+
+    /* The stacks and their tools:
+       `yyss': related to states.
+       `yyvs': related to semantic values.
+
+       Refer to the stacks thru separate pointers, to allow yyoverflow
+       to reallocate them elsewhere.  */
+
+    /* The state stack.  */
+    yytype_int16 yyssa[YYINITDEPTH];
+    yytype_int16 *yyss;
+    yytype_int16 *yyssp;
+
+    /* The semantic value stack.  */
+    YYSTYPE yyvsa[YYINITDEPTH];
+    YYSTYPE *yyvs;
+    YYSTYPE *yyvsp;
+
+    YYSIZE_T yystacksize;
+
   int yyn;
   int yyresult;
-  /* Number of tokens to shift before error messages enabled.  */
-  int yyerrstatus;
-  /* Look-ahead token as an internal (translated) token number.  */
-  int yytoken = 0;
+  /* Lookahead token as an internal (translated) token number.  */
+  int yytoken;
+  /* The variables used to return semantic value and location from the
+     action routines.  */
+  YYSTYPE yyval;
+
 #if YYERROR_VERBOSE
   /* Buffer for error messages, and its allocated size.  */
   char yymsgbuf[128];
@@ -1446,51 +1465,28 @@ yyparse ()
   YYSIZE_T yymsg_alloc = sizeof yymsgbuf;
 #endif
 
-  /* Three stacks and their tools:
-     `yyss': related to states,
-     `yyvs': related to semantic values,
-     `yyls': related to locations.
-
-     Refer to the stacks thru separate pointers, to allow yyoverflow
-     to reallocate them elsewhere.  */
-
-  /* The state stack.  */
-  yytype_int16 yyssa[YYINITDEPTH];
-  yytype_int16 *yyss = yyssa;
-  yytype_int16 *yyssp;
-
-  /* The semantic value stack.  */
-  YYSTYPE yyvsa[YYINITDEPTH];
-  YYSTYPE *yyvs = yyvsa;
-  YYSTYPE *yyvsp;
-
-
-
 #define YYPOPSTACK(N)   (yyvsp -= (N), yyssp -= (N))
-
-  YYSIZE_T yystacksize = YYINITDEPTH;
-
-  /* The variables used to return semantic value and location from the
-     action routines.  */
-  YYSTYPE yyval;
-
 
   /* The number of symbols on the RHS of the reduced rule.
      Keep to zero when no symbol should be popped.  */
   int yylen = 0;
+
+  yytoken = 0;
+  yyss = yyssa;
+  yyvs = yyvsa;
+  yystacksize = YYINITDEPTH;
 
   YYDPRINTF ((stderr, "Starting parse\n"));
 
   yystate = 0;
   yyerrstatus = 0;
   yynerrs = 0;
-  yychar = YYEMPTY;		/* Cause a token to be read.  */
+  yychar = YYEMPTY; /* Cause a token to be read.  */
 
   /* Initialize stack pointers.
      Waste one element of value and location stack
      so that they stay on the same level as the state stack.
      The wasted elements are never initialized.  */
-
   yyssp = yyss;
   yyvsp = yyvs;
 
@@ -1520,7 +1516,6 @@ yyparse ()
 	YYSTYPE *yyvs1 = yyvs;
 	yytype_int16 *yyss1 = yyss;
 
-
 	/* Each stack pointer address is followed by the size of the
 	   data in use in that stack, in bytes.  This used to be a
 	   conditional around just the two extra args, but that might
@@ -1528,7 +1523,6 @@ yyparse ()
 	yyoverflow (YY_("memory exhausted"),
 		    &yyss1, yysize * sizeof (*yyssp),
 		    &yyvs1, yysize * sizeof (*yyvsp),
-
 		    &yystacksize);
 
 	yyss = yyss1;
@@ -1551,9 +1545,8 @@ yyparse ()
 	  (union yyalloc *) YYSTACK_ALLOC (YYSTACK_BYTES (yystacksize));
 	if (! yyptr)
 	  goto yyexhaustedlab;
-	YYSTACK_RELOCATE (yyss);
-	YYSTACK_RELOCATE (yyvs);
-
+	YYSTACK_RELOCATE (yyss_alloc, yyss);
+	YYSTACK_RELOCATE (yyvs_alloc, yyvs);
 #  undef YYSTACK_RELOCATE
 	if (yyss1 != yyssa)
 	  YYSTACK_FREE (yyss1);
@@ -1564,7 +1557,6 @@ yyparse ()
       yyssp = yyss + yysize - 1;
       yyvsp = yyvs + yysize - 1;
 
-
       YYDPRINTF ((stderr, "Stack size increased to %lu\n",
 		  (unsigned long int) yystacksize));
 
@@ -1574,6 +1566,9 @@ yyparse ()
 
   YYDPRINTF ((stderr, "Entering state %d\n", yystate));
 
+  if (yystate == YYFINAL)
+    YYACCEPT;
+
   goto yybackup;
 
 /*-----------.
@@ -1582,16 +1577,16 @@ yyparse ()
 yybackup:
 
   /* Do appropriate processing given the current state.  Read a
-     look-ahead token if we need one and don't already have one.  */
+     lookahead token if we need one and don't already have one.  */
 
-  /* First try to decide what to do without reference to look-ahead token.  */
+  /* First try to decide what to do without reference to lookahead token.  */
   yyn = yypact[yystate];
   if (yyn == YYPACT_NINF)
     goto yydefault;
 
-  /* Not known => get a look-ahead token if don't already have one.  */
+  /* Not known => get a lookahead token if don't already have one.  */
 
-  /* YYCHAR is either YYEMPTY or YYEOF or a valid look-ahead symbol.  */
+  /* YYCHAR is either YYEMPTY or YYEOF or a valid lookahead symbol.  */
   if (yychar == YYEMPTY)
     {
       YYDPRINTF ((stderr, "Reading a token: "));
@@ -1623,20 +1618,16 @@ yybackup:
       goto yyreduce;
     }
 
-  if (yyn == YYFINAL)
-    YYACCEPT;
-
   /* Count tokens shifted since error; after three, turn off error
      status.  */
   if (yyerrstatus)
     yyerrstatus--;
 
-  /* Shift the look-ahead token.  */
+  /* Shift the lookahead token.  */
   YY_SYMBOL_PRINT ("Shifting", yytoken, &yylval, &yylloc);
 
-  /* Discard the shifted token unless it is eof.  */
-  if (yychar != YYEOF)
-    yychar = YYEMPTY;
+  /* Discard the shifted token.  */
+  yychar = YYEMPTY;
 
   yystate = yyn;
   *++yyvsp = yylval;
@@ -1676,473 +1667,660 @@ yyreduce:
   switch (yyn)
     {
         case 2:
+
+/* Line 1455 of yacc.c  */
 #line 75 "fst-compiler.yy"
     { Result=result((yyvsp[(2) - (3)].expression), Switch); ;}
     break;
 
   case 3:
+
+/* Line 1455 of yacc.c  */
 #line 78 "fst-compiler.yy"
     {;}
     break;
 
   case 4:
+
+/* Line 1455 of yacc.c  */
 #line 79 "fst-compiler.yy"
     {;}
     break;
 
   case 5:
+
+/* Line 1455 of yacc.c  */
 #line 80 "fst-compiler.yy"
     {;}
     break;
 
   case 6:
+
+/* Line 1455 of yacc.c  */
 #line 83 "fst-compiler.yy"
     { if (def_var((yyvsp[(1) - (3)].name),(yyvsp[(3) - (3)].expression))) warn2("assignment of empty transducer to",(yyvsp[(1) - (3)].name)); ;}
     break;
 
   case 7:
+
+/* Line 1455 of yacc.c  */
 #line 84 "fst-compiler.yy"
     { if (def_rvar((yyvsp[(1) - (3)].name),(yyvsp[(3) - (3)].expression))) warn2("assignment of empty transducer to",(yyvsp[(1) - (3)].name)); ;}
     break;
 
   case 8:
+
+/* Line 1455 of yacc.c  */
 #line 85 "fst-compiler.yy"
     { if (def_svar((yyvsp[(1) - (3)].name),(yyvsp[(3) - (3)].range))) warn2("assignment of empty symbol range to",(yyvsp[(1) - (3)].name)); ;}
     break;
 
   case 9:
+
+/* Line 1455 of yacc.c  */
 #line 86 "fst-compiler.yy"
     { if (def_svar((yyvsp[(1) - (3)].name),(yyvsp[(3) - (3)].range))) warn2("assignment of empty symbol range to",(yyvsp[(1) - (3)].name)); ;}
     break;
 
   case 10:
+
+/* Line 1455 of yacc.c  */
 #line 87 "fst-compiler.yy"
     { write_to_file((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].value)); ;}
     break;
 
   case 11:
+
+/* Line 1455 of yacc.c  */
 #line 88 "fst-compiler.yy"
     { def_alphabet((yyvsp[(2) - (2)].expression)); ;}
     break;
 
   case 12:
+
+/* Line 1455 of yacc.c  */
 #line 91 "fst-compiler.yy"
     { (yyval.expression) = restriction((yyvsp[(1) - (3)].expression),(yyvsp[(2) - (3)].type),(yyvsp[(3) - (3)].contexts),0); ;}
     break;
 
   case 13:
+
+/* Line 1455 of yacc.c  */
 #line 92 "fst-compiler.yy"
     { (yyval.expression) = restriction((yyvsp[(1) - (4)].expression),(yyvsp[(3) - (4)].type),(yyvsp[(4) - (4)].contexts),1); ;}
     break;
 
   case 14:
+
+/* Line 1455 of yacc.c  */
 #line 93 "fst-compiler.yy"
     { (yyval.expression) = restriction((yyvsp[(1) - (4)].expression),(yyvsp[(3) - (4)].type),(yyvsp[(4) - (4)].contexts),-1); ;}
     break;
 
   case 15:
+
+/* Line 1455 of yacc.c  */
 #line 94 "fst-compiler.yy"
     { (yyval.expression) = replace_in_context(minimise(explode((yyvsp[(1) - (3)].expression))),(yyvsp[(2) - (3)].rtype),(yyvsp[(3) - (3)].contexts),false); ;}
     break;
 
   case 16:
+
+/* Line 1455 of yacc.c  */
 #line 95 "fst-compiler.yy"
     { (yyval.expression) = replace_in_context(minimise(explode((yyvsp[(1) - (4)].expression))),(yyvsp[(2) - (4)].rtype),(yyvsp[(4) - (4)].contexts),true);;}
     break;
 
   case 17:
+
+/* Line 1455 of yacc.c  */
 #line 96 "fst-compiler.yy"
     { (yyval.expression) = replace(minimise(explode((yyvsp[(1) - (4)].expression))), (yyvsp[(2) - (4)].rtype), false); ;}
     break;
 
   case 18:
+
+/* Line 1455 of yacc.c  */
 #line 97 "fst-compiler.yy"
     { (yyval.expression) = replace(minimise(explode((yyvsp[(1) - (5)].expression))), (yyvsp[(2) - (5)].rtype), true); ;}
     break;
 
   case 19:
+
+/* Line 1455 of yacc.c  */
 #line 98 "fst-compiler.yy"
     { (yyval.expression) = make_rule((yyvsp[(1) - (5)].expression),(yyvsp[(2) - (5)].range),(yyvsp[(3) - (5)].type),(yyvsp[(4) - (5)].range),(yyvsp[(5) - (5)].expression)); ;}
     break;
 
   case 20:
+
+/* Line 1455 of yacc.c  */
 #line 99 "fst-compiler.yy"
     { (yyval.expression) = make_rule((yyvsp[(1) - (4)].expression),(yyvsp[(2) - (4)].range),(yyvsp[(3) - (4)].type),(yyvsp[(4) - (4)].range),NULL); ;}
     break;
 
   case 21:
+
+/* Line 1455 of yacc.c  */
 #line 100 "fst-compiler.yy"
     { (yyval.expression) = make_rule(NULL,(yyvsp[(1) - (4)].range),(yyvsp[(2) - (4)].type),(yyvsp[(3) - (4)].range),(yyvsp[(4) - (4)].expression)); ;}
     break;
 
   case 22:
+
+/* Line 1455 of yacc.c  */
 #line 101 "fst-compiler.yy"
     { (yyval.expression) = make_rule(NULL,(yyvsp[(1) - (3)].range),(yyvsp[(2) - (3)].type),(yyvsp[(3) - (3)].range),NULL); ;}
     break;
 
   case 23:
+
+/* Line 1455 of yacc.c  */
 #line 102 "fst-compiler.yy"
     { (yyval.expression) = composition((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression)); ;}
     break;
 
   case 24:
+
+/* Line 1455 of yacc.c  */
 #line 103 "fst-compiler.yy"
     { (yyval.expression) = make_mapping((yyvsp[(2) - (7)].ranges),(yyvsp[(6) - (7)].ranges)); ;}
     break;
 
   case 25:
+
+/* Line 1455 of yacc.c  */
 #line 104 "fst-compiler.yy"
     { (yyval.expression) = make_mapping(add_range((yyvsp[(1) - (5)].range),NULL),(yyvsp[(4) - (5)].ranges)); ;}
     break;
 
   case 26:
+
+/* Line 1455 of yacc.c  */
 #line 105 "fst-compiler.yy"
     { (yyval.expression) = make_mapping((yyvsp[(2) - (5)].ranges),add_range((yyvsp[(5) - (5)].range),NULL)); ;}
     break;
 
   case 27:
+
+/* Line 1455 of yacc.c  */
 #line 106 "fst-compiler.yy"
     { (yyval.expression) = freely_insert((yyvsp[(1) - (5)].expression), (yyvsp[(3) - (5)].character), (yyvsp[(5) - (5)].character)); ;}
     break;
 
   case 28:
+
+/* Line 1455 of yacc.c  */
 #line 107 "fst-compiler.yy"
     { (yyval.expression) = freely_insert((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].character), (yyvsp[(3) - (3)].character)); ;}
     break;
 
   case 29:
+
+/* Line 1455 of yacc.c  */
 #line 108 "fst-compiler.yy"
     { (yyval.expression) = new_transducer((yyvsp[(1) - (3)].range),(yyvsp[(3) - (3)].range)); ;}
     break;
 
   case 30:
+
+/* Line 1455 of yacc.c  */
 #line 109 "fst-compiler.yy"
     { (yyval.expression) = new_transducer((yyvsp[(1) - (1)].range),(yyvsp[(1) - (1)].range)); ;}
     break;
 
   case 31:
+
+/* Line 1455 of yacc.c  */
 #line 110 "fst-compiler.yy"
     { (yyval.expression) = var_value((yyvsp[(1) - (1)].name)); ;}
     break;
 
   case 32:
+
+/* Line 1455 of yacc.c  */
 #line 111 "fst-compiler.yy"
     { (yyval.expression) = rvar_value((yyvsp[(1) - (1)].name)); ;}
     break;
 
   case 33:
+
+/* Line 1455 of yacc.c  */
 #line 112 "fst-compiler.yy"
     { (yyval.expression) = repetition((yyvsp[(1) - (2)].expression)); ;}
     break;
 
   case 34:
+
+/* Line 1455 of yacc.c  */
 #line 113 "fst-compiler.yy"
     { (yyval.expression) = repetition2((yyvsp[(1) - (2)].expression)); ;}
     break;
 
   case 35:
+
+/* Line 1455 of yacc.c  */
 #line 114 "fst-compiler.yy"
     { (yyval.expression) = optional((yyvsp[(1) - (2)].expression)); ;}
     break;
 
   case 36:
+
+/* Line 1455 of yacc.c  */
 #line 115 "fst-compiler.yy"
     { (yyval.expression) = catenate((yyvsp[(1) - (2)].expression), (yyvsp[(2) - (2)].expression)); ;}
     break;
 
   case 37:
+
+/* Line 1455 of yacc.c  */
 #line 116 "fst-compiler.yy"
     { (yyval.expression) = negation((yyvsp[(2) - (2)].expression)); ;}
     break;
 
   case 38:
+
+/* Line 1455 of yacc.c  */
 #line 117 "fst-compiler.yy"
     { (yyval.expression) = switch_levels((yyvsp[(2) - (2)].expression)); ;}
     break;
 
   case 39:
+
+/* Line 1455 of yacc.c  */
 #line 118 "fst-compiler.yy"
     { (yyval.expression) = upper_level((yyvsp[(2) - (2)].expression)); ;}
     break;
 
   case 40:
+
+/* Line 1455 of yacc.c  */
 #line 119 "fst-compiler.yy"
     { (yyval.expression) = lower_level((yyvsp[(2) - (2)].expression)); ;}
     break;
 
   case 41:
+
+/* Line 1455 of yacc.c  */
 #line 120 "fst-compiler.yy"
     { (yyval.expression) = conjunction((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression)); ;}
     break;
 
   case 42:
+
+/* Line 1455 of yacc.c  */
 #line 121 "fst-compiler.yy"
     { (yyval.expression) = subtraction((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression)); ;}
     break;
 
   case 43:
+
+/* Line 1455 of yacc.c  */
 #line 122 "fst-compiler.yy"
     { (yyval.expression) = disjunction((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression)); ;}
     break;
 
   case 44:
+
+/* Line 1455 of yacc.c  */
 #line 123 "fst-compiler.yy"
     { (yyval.expression) = (yyvsp[(2) - (3)].expression); ;}
     break;
 
   case 45:
+
+/* Line 1455 of yacc.c  */
 #line 124 "fst-compiler.yy"
     { (yyval.expression) = read_words((yyvsp[(1) - (1)].value)); ;}
     break;
 
   case 46:
+
+/* Line 1455 of yacc.c  */
 #line 125 "fst-compiler.yy"
     { (yyval.expression) = read_transducer((yyvsp[(1) - (1)].value)); ;}
     break;
 
   case 47:
+
+/* Line 1455 of yacc.c  */
 #line 128 "fst-compiler.yy"
     { (yyval.ranges) = add_range((yyvsp[(1) - (2)].range),(yyvsp[(2) - (2)].ranges)); ;}
     break;
 
   case 48:
+
+/* Line 1455 of yacc.c  */
 #line 129 "fst-compiler.yy"
     { (yyval.ranges) = NULL; ;}
     break;
 
   case 49:
+
+/* Line 1455 of yacc.c  */
 #line 132 "fst-compiler.yy"
     { (yyval.range)=(yyvsp[(2) - (3)].range); ;}
     break;
 
   case 50:
+
+/* Line 1455 of yacc.c  */
 #line 133 "fst-compiler.yy"
     { (yyval.range)=complement_range((yyvsp[(3) - (4)].range)); ;}
     break;
 
   case 51:
+
+/* Line 1455 of yacc.c  */
 #line 134 "fst-compiler.yy"
     { (yyval.range)=rsvar_value((yyvsp[(2) - (3)].name)); ;}
     break;
 
   case 52:
+
+/* Line 1455 of yacc.c  */
 #line 135 "fst-compiler.yy"
     { (yyval.range)=NULL; ;}
     break;
 
   case 53:
+
+/* Line 1455 of yacc.c  */
 #line 136 "fst-compiler.yy"
     { (yyval.range)=add_value((yyvsp[(1) - (1)].character),NULL); ;}
     break;
 
   case 54:
+
+/* Line 1455 of yacc.c  */
 #line 139 "fst-compiler.yy"
     { (yyval.contexts) = (yyvsp[(1) - (1)].contexts); ;}
     break;
 
   case 55:
+
+/* Line 1455 of yacc.c  */
 #line 140 "fst-compiler.yy"
     { (yyval.contexts) = (yyvsp[(2) - (3)].contexts); ;}
     break;
 
   case 56:
+
+/* Line 1455 of yacc.c  */
 #line 143 "fst-compiler.yy"
     { (yyval.contexts) = add_context((yyvsp[(1) - (3)].contexts),(yyvsp[(3) - (3)].contexts)); ;}
     break;
 
   case 57:
+
+/* Line 1455 of yacc.c  */
 #line 144 "fst-compiler.yy"
     { (yyval.contexts) = (yyvsp[(1) - (1)].contexts); ;}
     break;
 
   case 58:
+
+/* Line 1455 of yacc.c  */
 #line 147 "fst-compiler.yy"
     { (yyval.contexts) = (yyvsp[(1) - (1)].contexts); ;}
     break;
 
   case 59:
+
+/* Line 1455 of yacc.c  */
 #line 148 "fst-compiler.yy"
     { (yyval.contexts) = (yyvsp[(2) - (3)].contexts); ;}
     break;
 
   case 60:
+
+/* Line 1455 of yacc.c  */
 #line 151 "fst-compiler.yy"
     { (yyval.contexts) = make_context((yyvsp[(1) - (3)].expression), (yyvsp[(3) - (3)].expression)); ;}
     break;
 
   case 61:
+
+/* Line 1455 of yacc.c  */
 #line 152 "fst-compiler.yy"
     { (yyval.contexts) = make_context(NULL, (yyvsp[(2) - (2)].expression)); ;}
     break;
 
   case 62:
+
+/* Line 1455 of yacc.c  */
 #line 153 "fst-compiler.yy"
     { (yyval.contexts) = make_context((yyvsp[(1) - (2)].expression), NULL); ;}
     break;
 
   case 63:
+
+/* Line 1455 of yacc.c  */
 #line 156 "fst-compiler.yy"
     { (yyval.range)=append_values((yyvsp[(1) - (2)].range),(yyvsp[(2) - (2)].range)); ;}
     break;
 
   case 64:
+
+/* Line 1455 of yacc.c  */
 #line 157 "fst-compiler.yy"
     { (yyval.range) = (yyvsp[(1) - (1)].range); ;}
     break;
 
   case 65:
+
+/* Line 1455 of yacc.c  */
 #line 160 "fst-compiler.yy"
     { (yyval.range)=add_values((yyvsp[(1) - (3)].longchar),(yyvsp[(3) - (3)].longchar),NULL); ;}
     break;
 
   case 66:
+
+/* Line 1455 of yacc.c  */
 #line 161 "fst-compiler.yy"
     { (yyval.range)=svar_value((yyvsp[(1) - (1)].name)); ;}
     break;
 
   case 67:
+
+/* Line 1455 of yacc.c  */
 #line 162 "fst-compiler.yy"
     { (yyval.range)=add_value(character_code((yyvsp[(1) - (1)].longchar)),NULL); ;}
     break;
 
   case 68:
+
+/* Line 1455 of yacc.c  */
 #line 163 "fst-compiler.yy"
     { (yyval.range)=add_value((yyvsp[(1) - (1)].character),NULL); ;}
     break;
 
   case 69:
+
+/* Line 1455 of yacc.c  */
 #line 164 "fst-compiler.yy"
     { (yyval.range)=add_value((yyvsp[(1) - (1)].uchar),NULL); ;}
     break;
 
   case 70:
+
+/* Line 1455 of yacc.c  */
 #line 167 "fst-compiler.yy"
     { (yyval.longchar)=(yyvsp[(1) - (1)].uchar); ;}
     break;
 
   case 71:
+
+/* Line 1455 of yacc.c  */
 #line 168 "fst-compiler.yy"
     { (yyval.longchar)=utf8toint((yyvsp[(1) - (1)].value)); free((yyvsp[(1) - (1)].value)); ;}
     break;
 
   case 72:
+
+/* Line 1455 of yacc.c  */
 #line 169 "fst-compiler.yy"
     { (yyval.longchar)=(yyvsp[(1) - (1)].uchar); ;}
     break;
 
   case 73:
+
+/* Line 1455 of yacc.c  */
 #line 172 "fst-compiler.yy"
     { (yyval.character)=character_code((yyvsp[(1) - (1)].uchar)); ;}
     break;
 
   case 74:
+
+/* Line 1455 of yacc.c  */
 #line 173 "fst-compiler.yy"
     { (yyval.character)=symbol_code((yyvsp[(1) - (1)].value)); ;}
     break;
 
   case 75:
+
+/* Line 1455 of yacc.c  */
 #line 174 "fst-compiler.yy"
     { (yyval.character)=symbol_code((yyvsp[(1) - (1)].name)); ;}
     break;
 
   case 76:
+
+/* Line 1455 of yacc.c  */
 #line 177 "fst-compiler.yy"
     { (yyval.uchar)=(unsigned char)character_code('.'); ;}
     break;
 
   case 77:
+
+/* Line 1455 of yacc.c  */
 #line 178 "fst-compiler.yy"
     { (yyval.uchar)=(unsigned char)character_code('!'); ;}
     break;
 
   case 78:
+
+/* Line 1455 of yacc.c  */
 #line 179 "fst-compiler.yy"
     { (yyval.uchar)=(unsigned char)character_code('?'); ;}
     break;
 
   case 79:
+
+/* Line 1455 of yacc.c  */
 #line 180 "fst-compiler.yy"
     { (yyval.uchar)=(unsigned char)character_code('{'); ;}
     break;
 
   case 80:
+
+/* Line 1455 of yacc.c  */
 #line 181 "fst-compiler.yy"
     { (yyval.uchar)=(unsigned char)character_code('}'); ;}
     break;
 
   case 81:
+
+/* Line 1455 of yacc.c  */
 #line 182 "fst-compiler.yy"
     { (yyval.uchar)=(unsigned char)character_code(')'); ;}
     break;
 
   case 82:
+
+/* Line 1455 of yacc.c  */
 #line 183 "fst-compiler.yy"
     { (yyval.uchar)=(unsigned char)character_code('('); ;}
     break;
 
   case 83:
+
+/* Line 1455 of yacc.c  */
 #line 184 "fst-compiler.yy"
     { (yyval.uchar)=(unsigned char)character_code('&'); ;}
     break;
 
   case 84:
+
+/* Line 1455 of yacc.c  */
 #line 185 "fst-compiler.yy"
     { (yyval.uchar)=(unsigned char)character_code('|'); ;}
     break;
 
   case 85:
+
+/* Line 1455 of yacc.c  */
 #line 186 "fst-compiler.yy"
     { (yyval.uchar)=(unsigned char)character_code('*'); ;}
     break;
 
   case 86:
+
+/* Line 1455 of yacc.c  */
 #line 187 "fst-compiler.yy"
     { (yyval.uchar)=(unsigned char)character_code('+'); ;}
     break;
 
   case 87:
+
+/* Line 1455 of yacc.c  */
 #line 188 "fst-compiler.yy"
     { (yyval.uchar)=(unsigned char)character_code(':'); ;}
     break;
 
   case 88:
+
+/* Line 1455 of yacc.c  */
 #line 189 "fst-compiler.yy"
     { (yyval.uchar)=(unsigned char)character_code(','); ;}
     break;
 
   case 89:
+
+/* Line 1455 of yacc.c  */
 #line 190 "fst-compiler.yy"
     { (yyval.uchar)=(unsigned char)character_code('='); ;}
     break;
 
   case 90:
+
+/* Line 1455 of yacc.c  */
 #line 191 "fst-compiler.yy"
     { (yyval.uchar)=(unsigned char)character_code('_'); ;}
     break;
 
   case 91:
+
+/* Line 1455 of yacc.c  */
 #line 192 "fst-compiler.yy"
     { (yyval.uchar)=(unsigned char)character_code('^'); ;}
     break;
 
   case 92:
+
+/* Line 1455 of yacc.c  */
 #line 193 "fst-compiler.yy"
     { (yyval.uchar)=(unsigned char)character_code('-'); ;}
     break;
 
   case 93:
+
+/* Line 1455 of yacc.c  */
 #line 196 "fst-compiler.yy"
     {;}
     break;
 
   case 94:
+
+/* Line 1455 of yacc.c  */
 #line 197 "fst-compiler.yy"
     {;}
     break;
 
 
-/* Line 1267 of yacc.c.  */
-#line 2146 "fst-compiler.C"
+
+/* Line 1455 of yacc.c  */
+#line 2324 "fst-compiler.C"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -2152,7 +2330,6 @@ yyreduce:
   YY_STACK_PRINT (yyss, yyssp);
 
   *++yyvsp = yyval;
-
 
   /* Now `shift' the result of the reduction.  Determine what state
      that goes to, based on the state we popped back to and the rule
@@ -2218,7 +2395,7 @@ yyerrlab:
 
   if (yyerrstatus == 3)
     {
-      /* If just tried and failed to reuse look-ahead token after an
+      /* If just tried and failed to reuse lookahead token after an
 	 error, discard it.  */
 
       if (yychar <= YYEOF)
@@ -2235,7 +2412,7 @@ yyerrlab:
 	}
     }
 
-  /* Else will try to reuse look-ahead token after shifting the error
+  /* Else will try to reuse lookahead token after shifting the error
      token.  */
   goto yyerrlab1;
 
@@ -2292,9 +2469,6 @@ yyerrlab1:
       YY_STACK_PRINT (yyss, yyssp);
     }
 
-  if (yyn == YYFINAL)
-    YYACCEPT;
-
   *++yyvsp = yylval;
 
 
@@ -2319,7 +2493,7 @@ yyabortlab:
   yyresult = 1;
   goto yyreturn;
 
-#ifndef yyoverflow
+#if !defined(yyoverflow) || YYERROR_VERBOSE
 /*-------------------------------------------------.
 | yyexhaustedlab -- memory exhaustion comes here.  |
 `-------------------------------------------------*/
@@ -2330,7 +2504,7 @@ yyexhaustedlab:
 #endif
 
 yyreturn:
-  if (yychar != YYEOF && yychar != YYEMPTY)
+  if (yychar != YYEMPTY)
      yydestruct ("Cleanup: discarding lookahead",
 		 yytoken, &yylval);
   /* Do not reclaim the symbols of the rule which action triggered
@@ -2356,6 +2530,8 @@ yyreturn:
 }
 
 
+
+/* Line 1675 of yacc.c  */
 #line 200 "fst-compiler.yy"
 
 

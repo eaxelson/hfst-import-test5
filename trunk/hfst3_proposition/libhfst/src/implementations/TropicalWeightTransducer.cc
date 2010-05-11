@@ -61,20 +61,7 @@ namespace hfst { namespace implementations
   /* For debugging. */
   void TropicalWeightTransducer::print_test(StdVectorFst *t) 
   {
-
-    SymbolTable *sym = t->InputSymbols(); 
-    for (fst::StateIterator<StdVectorFst> siter(*t); 
-	 not siter.Done(); siter.Next())
-      {
-	StateId s = siter.Value();
-	for (fst::ArcIterator<StdVectorFst> aiter(*t,s); !aiter.Done(); aiter.Next())
-	  {
-	    const StdArc &arc = aiter.Value();
-	    fprintf(stderr, "%i\t%i\t%s\t%s\t%f\n", (int)s, (int)arc.nextstate, sym->Find(arc.ilabel).c_str(), sym->Find(arc.olabel).c_str(), arc.weight.Value());
-	  }
-	if (t->Final(s) != TropicalWeight::Zero())
-	  fprintf(stderr, "%i\t%f\n", (int)s, t->Final(s).Value());
-      }
+    print_test(t, stderr);
   }
 
   // FIX: change the name to print_att or something like that...
@@ -94,25 +81,26 @@ namespace hfst { namespace implementations
     }
       
     for (fst::StateIterator<StdVectorFst> siter(*t); 
-	 not siter.Done(); siter.Next())
+	 not siter.Done(); siter.Next()) 
       {
 	StateId s = siter.Value();
+	if (s == initial_state) {
 	int origin;  // how origin state is printed, see the first comment
-	/*if (s == 0)
+	if (s == 0)
 	  origin = zero_print;
 	else if (s == initial_state)
 	  origin = 0;
-	  else*/
+	else
 	  origin = (int)s;
 	for (fst::ArcIterator<StdVectorFst> aiter(*t,s); !aiter.Done(); aiter.Next())
 	  {
 	    const StdArc &arc = aiter.Value();
 	    int target;  // how target state is printed, see the first comment
-	    /*if (arc.nextstate == 0)
+	    if (arc.nextstate == 0)
 	      target = zero_print;
 	    else if (arc.nextstate == initial_state)
 	      target = 0;
-	      else*/
+	    else
 	      target = (int)arc.nextstate;
 	    fprintf(ofile, "%i\t%i\t%s\t%s\t%f\n", origin, target,
 		    sym->Find(arc.ilabel).c_str(), sym->Find(arc.olabel).c_str(),
@@ -120,6 +108,39 @@ namespace hfst { namespace implementations
 	  }
 	if (t->Final(s) != TropicalWeight::Zero())
 	  fprintf(ofile, "%i\t%f\n", origin, t->Final(s).Value());
+	break;
+	}
+      }
+
+    for (fst::StateIterator<StdVectorFst> siter(*t); 
+	 not siter.Done(); siter.Next())
+      {
+	StateId s = siter.Value();
+	if (s != initial_state) {
+	  int origin;  // how origin state is printed, see the first comment
+	  if (s == 0)
+	    origin = zero_print;
+	  else if (s == initial_state)
+	    origin = 0;
+	  else
+	    origin = (int)s;
+	  for (fst::ArcIterator<StdVectorFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+	    {
+	      const StdArc &arc = aiter.Value();
+	      int target;  // how target state is printed, see the first comment
+	      if (arc.nextstate == 0)
+		target = zero_print;
+	      else if (arc.nextstate == initial_state)
+		target = 0;
+	      else
+		target = (int)arc.nextstate;
+	      fprintf(ofile, "%i\t%i\t%s\t%s\t%f\n", origin, target,
+		      sym->Find(arc.ilabel).c_str(), sym->Find(arc.olabel).c_str(),
+		      arc.weight.Value());
+	    }
+	  if (t->Final(s) != TropicalWeight::Zero())
+	    fprintf(ofile, "%i\t%f\n", origin, t->Final(s).Value());
+	}
       }
   }
   
@@ -838,6 +859,7 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::create_epsilon_transducer(void)
   { 
     StdVectorFst * t = new StdVectorFst;
+    initialize_symbol_tables(t);
     StateId s = t->AddState();
     t->SetStart(s);
     t->SetFinal(s,0);
@@ -1054,11 +1076,12 @@ namespace hfst { namespace implementations
   TropicalWeightTransducer::repeat_n(StdVectorFst * t,int n)
   {
     if (n <= 0)
-      { return create_empty_transducer(); }
+      { return create_epsilon_transducer(); }
 
     StdVectorFst * repetition = create_epsilon_transducer();
     for (int i = 0; i < n; ++i)
       { Concat(repetition,*t); }
+    repetition->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ));
     return repetition;
   }
 
@@ -1066,16 +1089,16 @@ namespace hfst { namespace implementations
   TropicalWeightTransducer::repeat_le_n(StdVectorFst * t,int n)
   {
     if (n <= 0)
-      { return create_empty_transducer(); }
+      { return create_epsilon_transducer(); }
 
     StdVectorFst * repetition = create_epsilon_transducer();
-    StdVectorFst * t_i_times = create_epsilon_transducer();
     for (int i = 0; i < n; ++i)
-      { 
-	Union(repetition,*t_i_times); 
-	Concat(t_i_times,*t);
+      {
+	StdVectorFst * optional_t = optionalize(t);
+	Concat(repetition,*optional_t);
+	delete optional_t;
       }
-    delete t_i_times;
+    repetition->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ));
     return repetition;
   }
 
