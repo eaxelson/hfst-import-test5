@@ -471,24 +471,21 @@ Transducer &Transducer::kleene_star()
   Transducer *na = &copy();
   na->alphabet.copy(alphabet);
 
-  // link back to the start node
-  na->incr_vmark();
-  //na->rec_cat_nodes(na->root_node(), na->root_node()); SFST code
-  // HFST code
-  na->rec_cat_nodes_hfst(na->root_node(), na->root_node());
-  
-  na->root_node()->set_final(1); // SFST code
-  // HFST code
+  // HFST addition
   Transducer eps;
   eps.root_node()->set_final(1);
-  Transducer *result = &(eps | *na);
+  Transducer *tmp = &(eps + *na);
   delete na;
+  na = tmp;
 
-  //na->deterministic = na->minimised = false; SFST code
-  //return *na;   SFST code
-  // HFST code
-  result->deterministic = result->minimised = false;
-  return *result;
+  // link back to the start node
+  na->incr_vmark();
+  na->rec_cat_nodes(na->root_node(), na->root_node());
+ 
+  na->root_node()->set_final(1);  // root node is already final
+  na->deterministic = na->minimised = false;
+
+  return *na;
 }
 
 

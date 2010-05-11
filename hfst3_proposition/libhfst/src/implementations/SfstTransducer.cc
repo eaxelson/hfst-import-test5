@@ -654,9 +654,10 @@ namespace hfst { namespace implementations {
     return result; }
   
   Transducer * SfstTransducer::optionalize(Transducer * t)
-  { Transducer * tt = &t->copy(); 
-    tt->root_node()->set_final(1); 
-    return tt; }
+  { Transducer *eps = create_epsilon_transducer();
+    Transducer *opt = &(*t | *eps);
+    delete eps;
+    return opt; }
   
   Transducer * SfstTransducer::invert(Transducer * t)
   { return &t->switch_levels(); }

@@ -26,9 +26,12 @@ YY_BUFFER_STATE Include_Stack[MAX_INCLUDE_DEPTH];
 char *Name_Stack[MAX_INCLUDE_DEPTH];
 int  Lineno_Stack[MAX_INCLUDE_DEPTH];
 
+namespace SFST 
+{
 char *FileName;
 
 bool UTF8=true;
+}
 
 static char *unquote(char *string, bool del_quote=true) {
   char *s=string, *result=string;

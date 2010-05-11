@@ -1,24 +1,23 @@
-/* A Bison parser, made by GNU Bison 2.3.  */
+
+/* A Bison parser, made by GNU Bison 2.4.1.  */
 
 /* Skeleton interface for Bison's Yacc-like parsers in C
-
-   Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
+   
+      Copyright (C) 1984, 1989, 1990, 2000, 2001, 2002, 2003, 2004, 2005, 2006
    Free Software Foundation, Inc.
-
-   This program is free software; you can redistribute it and/or modify
+   
+   This program is free software: you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
-   the Free Software Foundation; either version 2, or (at your option)
-   any later version.
-
+   the Free Software Foundation, either version 3 of the License, or
+   (at your option) any later version.
+   
    This program is distributed in the hope that it will be useful,
    but WITHOUT ANY WARRANTY; without even the implied warranty of
    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
    GNU General Public License for more details.
-
+   
    You should have received a copy of the GNU General Public License
-   along with this program; if not, write to the Free Software
-   Foundation, Inc., 51 Franklin Street, Fifth Floor,
-   Boston, MA 02110-1301, USA.  */
+   along with this program.  If not, see <http://www.gnu.org/licenses/>.  */
 
 /* As a special exception, you may create a larger work that contains
    part or all of the Bison parser skeleton and distribute that work
@@ -29,9 +28,10 @@
    special exception, which will cause the skeleton and the resulting
    Bison output files to be licensed under the GNU General Public
    License without this special exception.
-
+   
    This special exception was added by the Free Software Foundation in
    version 2.2 of Bison.  */
+
 
 /* Tokens.  */
 #ifndef YYTOKENTYPE
@@ -113,98 +113,30 @@
      TERM_NEGATION = 329
    };
 #endif
-/* Tokens.  */
-#define NET 258
-#define END 259
-#define LBRACKET 260
-#define RBRACKET 261
-#define LPAREN 262
-#define RPAREN 263
-#define ENDM 264
-#define ENDD 265
-#define CRESTRICT 266
-#define CONTAINS 267
-#define CONTAINS_OPT_ONE 268
-#define CONTAINS_ONE 269
-#define XUPPER 270
-#define XLOWER 271
-#define FLAG_ELIMINATE 272
-#define IGNORE_ALL 273
-#define IGNORE_INTERNAL 274
-#define CONTEXT 275
-#define NCONCAT 276
-#define MNCONCAT 277
-#define MORENCONCAT 278
-#define LESSNCONCAT 279
-#define DOUBLE_COMMA 280
-#define COMMA 281
-#define SHUFFLE 282
-#define PRECEDES 283
-#define FOLLOWS 284
-#define RIGHT_QUOTIENT 285
-#define LEFT_QUOTIENT 286
-#define INTERLEAVE_QUOTIENT 287
-#define UQUANT 288
-#define EQUANT 289
-#define VAR 290
-#define IN 291
-#define IMPLIES 292
-#define EQUALS 293
-#define NEQ 294
-#define SUBSTITUTE 295
-#define SUCCESSOR_OF 296
-#define PRIORITY_UNION_U 297
-#define PRIORITY_UNION_L 298
-#define LENIENT_COMPOSE 299
-#define TRIPLE_DOT 300
-#define LDOT 301
-#define RDOT 302
-#define FUNCTION 303
-#define SUBVAL 304
-#define ISUNAMBIGUOUS 305
-#define ISIDENTITY 306
-#define ISFUNCTIONAL 307
-#define NOTID 308
-#define LOWERUNIQ 309
-#define LOWERUNIQEPS 310
-#define ALLFINAL 311
-#define UNAMBIGUOUSPART 312
-#define AMBIGUOUSPART 313
-#define AMBIGUOUSDOMAIN 314
-#define EQSUBSTRINGS 315
-#define ARROW 316
-#define DIRECTION 317
-#define HIGH_CROSS_PRODUCT 318
-#define CROSS_PRODUCT 319
-#define COMPOSE 320
-#define MINUS 321
-#define INTERSECT 322
-#define UNION 323
-#define COMPLEMENT 324
-#define INVERSE 325
-#define REVERSE 326
-#define KLEENE_PLUS 327
-#define KLEENE_STAR 328
-#define TERM_NEGATION 329
-
 
 
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 152 "regex.y"
 {
+
+/* Line 1676 of yacc.c  */
+#line 152 "regex.y"
+
      char *string;
      struct fsm *net;
      int  type;
-}
-/* Line 1489 of yacc.c.  */
-#line 203 "regex.tab.h"
-	YYSTYPE;
+
+
+
+/* Line 1676 of yacc.c  */
+#line 134 "regex.tab.h"
+} YYSTYPE;
+# define YYSTYPE_IS_TRIVIAL 1
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
-# define YYSTYPE_IS_TRIVIAL 1
 #endif
+
 
 
 

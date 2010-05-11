@@ -125,9 +125,11 @@ noinst_HEADERS= \
 	hfst-common-options.h hfst-common-unary-cases.h \
 	hfst-common-unary-options.h hfst-common-unary-variables.h \
 	hfst-compiler.h \
-	hfst-pair-test-commandline.h hfst-pair-test-transducers.h \
-	hfst-program-options.h hwfst-pair-test-transducers.h \
+	hfst-pair-test-commandline.h \
+	hfst-program-options.h \
 	hfst-optimized-lookup.h
+# hfst-pair-test-transducers.h hwfst-pair-test-transducers.h
+
 bin_PROGRAMS=$(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_COMPOSE_INTERSECT) \
 			 $(MAYBE_CONCATENATE) $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) \
 			 $(MAYBE_DIFF_TEST) $(MAYBE_DISJUNCT) $(MAYBE_FORMAT) \
@@ -166,7 +168,7 @@ hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC)
 hfst_lookup_optimize_SOURCES=hfst-lookup-optimize.cc $(HFST_COMMON_SRC)
 hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
 hfst_omor_evaluate_SOURCES=hfst-omor-evaluate.cc $(HFST_COMMON_SRC)
-hfst_pair_test_SOURCES=hfst-pair-test.cc hwfst-pair-test-transducers.h $(HFST_COMMON_SRC)
+hfst_pair_test_SOURCES=hfst-pair-test.cc $(HFST_COMMON_SRC) # hwfst-pair-test-transducers.h
 hfst_project_SOURCES=hfst-project.cc $(HFST_COMMON_SRC)
 hfst_push_weights_SOURCES=hfst-push-weights.cc $(HFST_COMMON_SRC)
 hfst_regexp2fst_SOURCES=hfst-regexp2fst.cc $(HFST_COMMON_SRC)
@@ -187,8 +189,8 @@ hwfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy $(HFST_COMMON_SRC)
 hfst_optimized_lookup_SOURCES=hfst-optimized-lookup.cc
 hwfst_calculate_CPPFLAGS = -DWEIGHTED -I../../
 
-BUILT_SOURCES=hfst-compiler.h \
-			  hwfst-pair-test-transducers.h
+BUILT_SOURCES=hfst-compiler.h
+# hwfst-pair-test-transducers.h
 
 ## YACC and FLEX with autotools argh
 AM_YFLAGS=-d
