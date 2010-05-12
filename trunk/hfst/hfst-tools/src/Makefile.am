@@ -55,6 +55,9 @@ endif
 if WANT_LOOKUP
 MAYBE_LOOKUP=hfst-lookup
 endif
+if WANT_PROC
+MAYBE_PROC=hfst-proc
+endif
 if WANT_LOOKUP_OPTIMIZE
 MAYBE_LOOKUP_OPTIMIZE=hfst-lookup-optimize
 endif
@@ -133,7 +136,7 @@ bin_PROGRAMS=$(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_COMPOSE_INTERSECT) \
 			 $(MAYBE_DIFF_TEST) $(MAYBE_DISJUNCT) $(MAYBE_FORMAT) \
 			 $(MAYBE_FST2FST) $(MAYBE_FST2PAIRSTRINGS) \
 			 $(MAYBE_FST2STRINGS) $(MAYBE_FST2TXT) \
-			 $(MAYBE_HEAD) $(MAYBE_INVERT) $(MAYBE_LOOKUP) \
+			 $(MAYBE_HEAD) $(MAYBE_INVERT) $(MAYBE_LOOKUP) $(MAYBE_PROC) \
 			 $(MAYBE_LOOKUP_OPTIMIZE) $(MAYBE_MINIMIZE) \
 			 $(MAYBE_PAIR_TEST) $(MAYBE_PROJECT) $(MAYBE_PUSH_WEIGHTS) \
 			 $(MAYBE_REGEXP2FST) $(MAYBE_REMOVE_EPSILONS) \
@@ -163,6 +166,7 @@ hfst_fst2txt_SOURCES=hfst-fst2txt.cc $(HFST_COMMON_SRC)
 hfst_head_SOURCES=hfst-head.cc $(HFST_COMMON_SRC)
 hfst_invert_SOURCES=hfst-invert.cc $(HFST_COMMON_SRC)
 hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC)
+hfst_proc_SOURCES=hfst-proc.cc $(HFST_COMMON_SRC)
 hfst_lookup_optimize_SOURCES=hfst-lookup-optimize.cc $(HFST_COMMON_SRC)
 hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
 hfst_omor_evaluate_SOURCES=hfst-omor-evaluate.cc $(HFST_COMMON_SRC)
