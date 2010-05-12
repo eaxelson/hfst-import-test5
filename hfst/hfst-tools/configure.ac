@@ -124,6 +124,12 @@ AC_ARG_ENABLE([lookup],
 			  [enable_lookup=$enableval],
 			  [enable_lookup=yes])
 AM_CONDITIONAL([WANT_LOOKUP], [test x$enable_lookup != xno])
+AC_ARG_ENABLE([proc],
+			  [AS_HELP_STRING([--enable-proc],
+			  				  [build proc tool @<:@default=yes@:>@])],
+			  [enable_proc=$enableval],
+			  [enable_proc=yes])
+AM_CONDITIONAL([WANT_PROC], [test x$enable_proc != xno])
 AC_ARG_ENABLE([lookup_optimize],
 			  [AS_HELP_STRING([--enable-lookup-optimize],
 							  [build lookup-optimize tool @<:@default=yes@:>@])],
@@ -306,6 +312,7 @@ cat <<EOF
     * omor-evaluate: $enable_omor_evaluate
     * optimized-lookup: $enable_optimized_lookup
     * pair-test: $enable_pair_test
+    * proc: $enable_proc
     * project: $enable_project
     * push-weights: $enable_push_weights
     * regexp2fst: $enable_regexp2fst
