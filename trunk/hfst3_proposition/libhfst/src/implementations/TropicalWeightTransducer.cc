@@ -14,6 +14,7 @@ namespace hfst { namespace implementations
 
   StringSymbolSet TropicalWeightTransducer::get_string_symbol_set(StdVectorFst *t)
   {
+    assert(t->InputSymbols() != NULL);
     StringSymbolSet s;
     for ( fst::SymbolTableIterator it = fst::SymbolTableIterator(*(t->InputSymbols()));
 	  not it.Done(); it.Next() ) {
@@ -185,6 +186,8 @@ namespace hfst { namespace implementations
 
     while ( fgets(line, 255, ifile) != NULL ) 
       {
+	if (strcmp(line, "--") == 0) // transducer separator
+	  break;
 	//printf("read line: %s: ", line);
 	char a1 [100]; char a2 [100]; char a3 [100]; char a4 [100]; char a5 [100];
 	int n = sscanf(line, "%s\t%s\t%s\t%s\t%s", a1, a2, a3, a4, a5);
@@ -226,7 +229,7 @@ namespace hfst { namespace implementations
 	    throw HfstInterfaceException();
 	  }
 
-      } 
+      }
     return t;
   }
 
@@ -1107,14 +1110,19 @@ namespace hfst { namespace implementations
   {
     StdVectorFst * eps = create_epsilon_transducer();
     Union(eps,*t);
+    eps->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ));
     return eps;
   }
 
   StdVectorFst * 
   TropicalWeightTransducer::invert(StdVectorFst * t)
   {
+    assert (t->InputSymbols() != NULL);
     StdVectorFst * inverse = copy(t);
+    assert (inverse->InputSymbols() != NULL);
     Invert(inverse);
+    inverse->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ));
+    assert (inverse->InputSymbols() != NULL);
     return inverse;
   }
 
@@ -1124,6 +1132,7 @@ namespace hfst { namespace implementations
   {
     StdVectorFst * reversed = new StdVectorFst;
     Reverse<StdArc,StdArc>(*t,reversed);
+    reversed->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ));
     return reversed;
   }
 
