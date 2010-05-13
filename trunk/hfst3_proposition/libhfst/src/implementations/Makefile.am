@@ -1,4 +1,5 @@
-SUBDIRS=foma SFST/src openfst-1.1
+#SUBDIRS=foma SFST/src openfst-1.1
+AUTOMAKE_OPTIONS=subdir-objects
 noinst_LTLIBRARIES=libhfstimplementations.la
 # HFST bridge specific stuff
 IMPLEMENTATION_SRCS=SymbolDefs.cc GlobalSymbolTable.cc \
@@ -11,7 +12,39 @@ BRIDGE_SRCS=SfstTransducer.cc \
 	LogFstTrieFunctions.cc \
 	FomaTransducer.cc
 
-libhfstimplementations_la_SOURCES=$(IMPLEMENTATION_SRCS) $(BRIDGE_SRCS)
+# underlying backend objects
+SFST_SRCS=\
+	SFST/src/alphabet.C         \
+	SFST/src/basic.C            \
+	SFST/src/compact.C          SFST/src/fst.C     SFST/src/generate.C\
+	SFST/src/interface.C\
+	SFST/src/determinise.C      SFST/src/lowmem.C\
+	SFST/src/make-compact.C\
+	SFST/src/operators.C\
+	SFST/src/robust.C           SFST/src/utf8.C
+OFST_LIBS=openfst-1.1/src/lib/libfst.la
+OFST_SRCS=\
+		  openfst-1.1/src/lib/compat.cc \
+		  openfst-1.1/src/lib/fst.cc \
+		  openfst-1.1/src/lib/properties.cc \
+		  openfst-1.1/src/lib/symbol-table.cc \
+		  openfst-1.1/src/lib/flags.cc \
+		  openfst-1.1/src/lib/util.cc 
+FOMA_SRCS=\
+foma/apply.c          foma/flags.c        foma/lex.yy.c     foma/spelling.c\
+foma/coaccessible.c   foma/int_stack.c    foma/mem.c        foma/structures.c\
+foma/constructions.c  foma/invert.c       foma/minimize.c   foma/topsort.c\
+foma/define.c         foma/io.c           foma/regex.tab.c  foma/utf8.c\
+foma/determinize.c    foma/lex.cmatrix.c  foma/reverse.c\
+foma/dynarray.c       foma/lexcread.c     foma/rewrite.c\
+foma/extract.c        foma/lex.lexc.c     foma/sigma.c
+
+
+libhfstimplementations_la_SOURCES=$(IMPLEMENTATION_SRCS) $(BRIDGE_SRCS) \
+								  $(SFST_SRCS) $(FOMA_SRCS) $(OFST_SRCS)
+
+# should work like so:
+# libhfstimplementations_la_LIBADD=$(OFST_LIBS)
 
 # headers of implementation bridge to reveal to public
 hfstincludedir = $(includedir)/hfst

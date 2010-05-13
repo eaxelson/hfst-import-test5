@@ -10,5 +10,12 @@ HFST_MINOR=0
 HFST_EXTENSION=_alpha
 HFST_VERSION=$HFST_MAJOR.$HFST_MINOR$HFST_EXTENSION
 
-AC_OUTPUT([Makefile])
+# for tests written in C++ add stuff here
+AC_PROG_CXX
+ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
+AC_PROG_AWK
+AC_PROG_CC
+AC_PROG_CPP
+
+AC_OUTPUT([Makefile test/Makefile test/libhfst/Makefile])
 

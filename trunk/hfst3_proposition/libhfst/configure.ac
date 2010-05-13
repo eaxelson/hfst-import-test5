@@ -48,6 +48,7 @@ AC_PATH_PROG([LDCONFIG],[ldconfig],[echo])
 # Checks for ibraries
 AC_CHECK_LIB([pthread], [main])
 AC_CHECK_LIB([m], [main])
+AC_CHECK_LIB([z], [main])
 
 # Checks for header files.
 AC_CHECK_HEADERS([limits.h stdlib.h string.h])
