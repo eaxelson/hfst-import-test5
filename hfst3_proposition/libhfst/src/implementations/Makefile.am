@@ -31,10 +31,10 @@ OFST_SRCS=\
 		  openfst-1.1/src/lib/flags.cc \
 		  openfst-1.1/src/lib/util.cc 
 FOMA_SRCS=\
-foma/apply.c          foma/flags.c        foma/lex.yy.c     foma/spelling.c\
+foma/apply.c          foma/flags.c        foma/spelling.c\
 foma/coaccessible.c   foma/int_stack.c    foma/mem.c        foma/structures.c\
 foma/constructions.c  foma/invert.c       foma/minimize.c   foma/topsort.c\
-foma/define.c         foma/io.c           foma/regex.tab.c  foma/utf8.c\
+foma/define.c         foma/io.c           foma/utf8.c\
 foma/determinize.c    foma/lex.cmatrix.c  foma/reverse.c\
 foma/dynarray.c       foma/lexcread.c     foma/rewrite.c\
 foma/extract.c        foma/lex.lexc.c     foma/sigma.c
