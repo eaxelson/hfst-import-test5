@@ -41,7 +41,7 @@ namespace hfst
 	{
 	  fsm * foma_temp =
 	    foma_funct(implementation.foma);
-	  delete implementation.foma;
+	  this->foma_interface.delete_foma(implementation.foma);
 	  implementation.foma = foma_temp;
 	  break;
 	}
@@ -93,7 +93,7 @@ namespace hfst
 	{
 	  fsm * foma_temp = 
 	    foma_funct(implementation.foma,n);
-	  delete implementation.foma;
+	  this->foma_interface.delete_foma(implementation.foma);
 	  implementation.foma = foma_temp;
 	  break;
 	}
@@ -146,7 +146,7 @@ namespace hfst
 	{
 	  fsm * foma_temp = 
 	    foma_funct(implementation.foma,k1,k2);
-	  delete implementation.foma;
+	  this->foma_interface.delete_foma(implementation.foma);
 	  implementation.foma = foma_temp;
 	  break;
 	}
@@ -201,7 +201,7 @@ namespace hfst
 	{
 	  fsm * foma_temp = 
 	    foma_funct(implementation.foma,kp1,kp2);
-	  delete implementation.foma;
+	  this->foma_interface.delete_foma(implementation.foma);
 	  implementation.foma = foma_temp;
 	  break;
 	}

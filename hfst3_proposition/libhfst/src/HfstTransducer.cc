@@ -605,11 +605,17 @@ type(type),anonymous(false),is_trie(false)
 
   bool HfstTransducer::test_equivalence(HfstTransducer &one, HfstTransducer &another) 
   {
+    printf("FOO1\n");
     HfstTransducer onecopy(one);
+    printf("FOO2\n");
     HfstTransducer anothercopy(another);
+    printf("FOO3\n");
     onecopy.convert(TROPICAL_OFST_TYPE);
+    printf("FOO4\n");
     anothercopy.convert(TROPICAL_OFST_TYPE);
+    printf("FOO5\n");
     onecopy.harmonize(anothercopy);
+    printf("FOO6\n");
 
     return tropical_ofst_interface.test_equivalence(
 	     onecopy.implementation.tropical_ofst,
@@ -1143,6 +1149,13 @@ void HfstTransducer::write_in_att_format(const char * filename)
   fclose(ofile);
 }
 
+void HfstTransducer::write_in_att_format(FILE * ofile)
+{
+  HfstTransducer conv = this->convert(TROPICAL_OFST_TYPE);
+  this->tropical_ofst_interface.print_test
+    (conv.implementation.tropical_ofst, ofile);
+}
+
 HfstTransducer &HfstTransducer::read_in_att_format(const char * filename)
 {
   HfstTransducer * retval = new HfstTransducer(TROPICAL_OFST_TYPE);
@@ -1151,6 +1164,13 @@ HfstTransducer &HfstTransducer::read_in_att_format(const char * filename)
     throw FileNotReadableException();
   retval->implementation.tropical_ofst = TropicalWeightTransducer::read_in_att_format(ifile);
   fclose(ifile);
+  return *retval;
+}
+
+HfstTransducer &HfstTransducer::read_in_att_format(FILE * ifile)
+{
+  HfstTransducer * retval = new HfstTransducer(TROPICAL_OFST_TYPE);
+  retval->implementation.tropical_ofst = TropicalWeightTransducer::read_in_att_format(ifile);
   return *retval;
 }
 
