@@ -21,7 +21,7 @@ SFST_SRCS=\
 	SFST/src/determinise.C      SFST/src/lowmem.C\
 	SFST/src/make-compact.C\
 	SFST/src/operators.C\
-	SFST/src/robust.C           SFST/src/utf8.C
+	SFST/src/robust.C           SFST/src/utf8.C    SFST/src/expand.C
 OFST_LIBS=openfst-1.1/src/lib/libfst.la
 OFST_SRCS=\
 		  openfst-1.1/src/lib/compat.cc \
