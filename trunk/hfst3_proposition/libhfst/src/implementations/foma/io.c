@@ -43,6 +43,11 @@ struct binaryline {
 
 extern char *g_att_epsilon;
 
+// HFST addition to make the compiler not complain
+struct fsm * current_parse = NULL;
+struct fsm * my_yyparse = NULL;
+// ... addition ends
+
 void io_free();
 static int io_gets(char *target);
 static size_t io_get_gz_file_size(char *filename);
