@@ -175,6 +175,8 @@ namespace hfst
     void print(void);
 
     static bool test_equivalence(HfstTransducer &one, HfstTransducer &another);
+    void write_in_att_format(FILE * f);
+    static HfstTransducer &read_in_att_format(FILE * f);
     void write_in_att_format(const char * filename);
     static HfstTransducer &read_in_att_format(const char * filename);
 
