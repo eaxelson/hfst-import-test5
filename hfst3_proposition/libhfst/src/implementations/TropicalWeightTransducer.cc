@@ -186,9 +186,9 @@ namespace hfst { namespace implementations
 
     while ( fgets(line, 255, ifile) != NULL ) 
       {
-	if (strcmp(line, "--") == 0) // transducer separator
-	  break;
-	//printf("read line: %s: ", line);
+	if (*line == '-') // transducer separator
+	  return t;
+	//printf("read line: %s", line);
 	char a1 [100]; char a2 [100]; char a3 [100]; char a4 [100]; char a5 [100];
 	int n = sscanf(line, "%s\t%s\t%s\t%s\t%s", a1, a2, a3, a4, a5);
 	//printf("number of arguments: (%i)\n", n);
@@ -1138,11 +1138,15 @@ namespace hfst { namespace implementations
 
   StdVectorFst * TropicalWeightTransducer::extract_input_language
   (StdVectorFst * t)
-  { return new StdVectorFst(ProjectFst<StdArc>(*t,PROJECT_INPUT)); }
+  { StdVectorFst * retval =  new StdVectorFst(ProjectFst<StdArc>(*t,PROJECT_INPUT)); 
+    retval->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ));
+    return retval; }
 
   StdVectorFst * TropicalWeightTransducer::extract_output_language
   (StdVectorFst * t)
-  { return new StdVectorFst(ProjectFst<StdArc>(*t,PROJECT_OUTPUT)); }
+  { StdVectorFst * retval = new StdVectorFst(ProjectFst<StdArc>(*t,PROJECT_OUTPUT)); 
+    retval->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ));
+    return retval; }
   
   typedef std::pair<int,int> LabelPair;
   typedef std::vector<LabelPair> LabelPairVector;
@@ -1237,8 +1241,10 @@ namespace hfst { namespace implementations
     DeterminizeFst<StdArc> det2(enc2);
 
     IntersectFst<StdArc> intersect(det1,det2);
-    StdVectorFst *result = new StdVectorFst(intersect);
-    // decode???
+    StdVectorFst *foo = new StdVectorFst(intersect);
+    DecodeFst<StdArc> decode(*foo, encoder);
+    delete foo;
+    StdVectorFst *result = new StdVectorFst(decode);
     result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
     return result;
   }

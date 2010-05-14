@@ -666,10 +666,12 @@ namespace hfst { namespace implementations {
   { return &t->reverse(); }
   
   Transducer * SfstTransducer::extract_input_language(Transducer * t)
-  { return &t->lower_level(); }
+  { t->complete_alphabet();
+    return &t->lower_level(); }
   
   Transducer * SfstTransducer::extract_output_language(Transducer * t)
-  { return &t->upper_level(); }
+  { t->complete_alphabet();
+    return &t->upper_level(); }
   
   Transducer * SfstTransducer::substitute(Transducer * t,Key old_key,Key new_key)
   { return &t->replace_char(old_key,new_key); }

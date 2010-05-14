@@ -676,14 +676,19 @@ namespace hfst { namespace implementations
   {
     LogFst * eps = create_epsilon_transducer();
     Union(eps,*t);
+    eps->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ));
     return eps;
   }
 
   LogFst * 
   LogWeightTransducer::invert(LogFst * t)
   {
+    assert (t->InputSymbols() != NULL);
     LogFst * inverse = copy(t);
+    assert (inverse->InputSymbols() != NULL);
     Invert(inverse);
+    inverse->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ));
+    assert (inverse->InputSymbols() != NULL);
     return inverse;
   }
 
@@ -693,16 +698,21 @@ namespace hfst { namespace implementations
   {
     LogFst * reversed = new LogFst;
     Reverse<LogArc,LogArc>(*t,reversed);
+    reversed->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ));
     return reversed;
   }
 
   LogFst * LogWeightTransducer::extract_input_language
   (LogFst * t)
-  { return new LogFst(ProjectFst<LogArc>(*t,PROJECT_INPUT)); }
+  { LogFst * retval =  new LogFst(ProjectFst<LogArc>(*t,PROJECT_INPUT)); 
+    retval->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ));
+    return retval; }
 
   LogFst * LogWeightTransducer::extract_output_language
   (LogFst * t)
-  { return new LogFst(ProjectFst<LogArc>(*t,PROJECT_OUTPUT)); }
+  { LogFst * retval =  new LogFst(ProjectFst<LogArc>(*t,PROJECT_OUTPUT)); 
+    retval->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ));
+    return retval; }
   
   typedef std::pair<int,int> LabelPair;
   typedef std::vector<LabelPair> LabelPairVector;
@@ -794,8 +804,10 @@ namespace hfst { namespace implementations
     DeterminizeFst<LogArc> det2(enc2);
 
     IntersectFst<LogArc> intersect(det1,det2);
-    LogFst *result = new LogFst(intersect);
-    // decode???
+    LogFst *foo = new LogFst(intersect);
+    DecodeFst<LogArc> decode(*foo, encoder);
+    delete foo;
+    LogFst *result = new LogFst(decode);
     result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
     return result;
   }
