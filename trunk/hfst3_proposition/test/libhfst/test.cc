@@ -50,14 +50,10 @@ void test_function( HfstTransducer& (HfstTransducer::*pt_function) (Implementati
 	   test1.get_type() !=
 	   test2.get_type() !=
 	   test3.get_type() );
- 
-  //printf("(1)\n");
+
   assert (HfstTransducer::test_equivalence( test0, test1 ) );
-  //printf("(2)\n");
   assert (HfstTransducer::test_equivalence( test0, test2 ) );
-  //printf("(3)\n");
   assert (HfstTransducer::test_equivalence( test0, test3 ) );
-  //printf("(4)\n");
 }
 
 void test_function( HfstTransducer& (HfstTransducer::*pt_function) (HfstTransducer&, ImplementationType), 
@@ -66,6 +62,7 @@ void test_function( HfstTransducer& (HfstTransducer::*pt_function) (HfstTransduc
 		    HfstTransducer &tr2,
 		    HfstTransducer &tr3 ) 
 {
+
   HfstTransducer test0s = HfstTransducer(tr0);
   HfstTransducer test1s = HfstTransducer(tr1);
   HfstTransducer test2s = HfstTransducer(tr2);
@@ -75,19 +72,15 @@ void test_function( HfstTransducer& (HfstTransducer::*pt_function) (HfstTransduc
   HfstTransducer test1 = (HfstTransducer(tr1).*pt_function)(test1s, tr1.get_type());
   HfstTransducer test2 = (HfstTransducer(tr2).*pt_function)(test2s, tr2.get_type());
   HfstTransducer test3 = (HfstTransducer(tr3).*pt_function)(test3s, tr3.get_type());
-  
+
   assert ( test0.get_type() !=
 	   test1.get_type() !=
 	   test2.get_type() !=
 	   test3.get_type() );
  
-  //printf("(1)\n");
   assert (HfstTransducer::test_equivalence( test0, test1 ) );
-  //printf("(2)\n");
   assert (HfstTransducer::test_equivalence( test0, test2 ) );
-  //printf("(3)\n");
   assert (HfstTransducer::test_equivalence( test0, test3 ) );
-  //printf("(4)\n");
 }
 
 int main(int argc, char **argv) {
@@ -329,7 +322,7 @@ int main(int argc, char **argv) {
       test_function(&HfstTransducer::output_project, test0, test1, test2, test3);
       printf("output_project tested\n");
 
-      // ----- substitute string -----
+      /* ----- substitute string -----
       {
 	HfstTransducer test0s = HfstTransducer(test0).substitute("a", "e");
 	HfstTransducer test1s = HfstTransducer(test1).substitute("a", "e");
@@ -363,7 +356,7 @@ int main(int argc, char **argv) {
 	assert (HfstTransducer::test_equivalence( test0s, test2s ) );
 	assert (HfstTransducer::test_equivalence( test0s, test3s ) );
       }
-      printf("substitute(StringPair) tested\n");
+      printf("substitute(StringPair) tested\n");*/
 
       // ----- compose -----
       test_function(&HfstTransducer::compose, test0, test1, test2, test3);
@@ -398,7 +391,7 @@ int main(int argc, char **argv) {
       printf("minimize tested\n");
 
 
-      // ----- set_final_weights -----
+      /* ----- set_final_weights -----
       {
 	HfstTransducer test0s = HfstTransducer(test0).set_final_weight(0.5);
 	HfstTransducer test1s = HfstTransducer(test1).set_final_weight(0.5);
@@ -433,7 +426,7 @@ int main(int argc, char **argv) {
 	assert (HfstTransducer::test_equivalence( test1s, test2s ) );
 	assert (HfstTransducer::test_equivalence( test0, test3s ) );	
       }
-      printf("transform_weights tested\n");
+      printf("transform_weights tested\n"); */
 
 
       // ----- write_in_att_format and read_in_att_format -----
@@ -466,7 +459,7 @@ int main(int argc, char **argv) {
 	  read_transducers[n] = HfstTransducer::read_in_att_format(ifile);
 	  n++;
 	}
-	assert( n == 3 );
+	assert( n == 4 );
 	assert ( HfstTransducer::test_equivalence( read_transducers[0], test0 ) );
 	assert ( HfstTransducer::test_equivalence( read_transducers[1], test1 ) );
 	assert ( HfstTransducer::test_equivalence( read_transducers[2], test2 ) );

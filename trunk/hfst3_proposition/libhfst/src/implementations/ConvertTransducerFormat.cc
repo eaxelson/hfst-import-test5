@@ -172,13 +172,19 @@ InternalTransducer * foma_to_internal_format(struct fsm * t)
 
 InternalTransducer * 
 tropical_ofst_to_internal_format(fst::StdVectorFst * t)
-{ return new fst::StdVectorFst(*t); }
+{ fst::StdVectorFst *retval = new fst::StdVectorFst(*t); 
+  assert (t->InputSymbols() != NULL);
+  retval->SetInputSymbols(new fst::SymbolTable(*(t->InputSymbols())));
+  return retval;
+}
 
 InternalTransducer * log_ofst_to_internal_format
 (LogFst * t)
 { //return new fst::StdVectorFst(*dynamic_cast<fst::StdVectorFst*>(t)); }
   InternalTransducer * u = new InternalTransducer;
   fst::Cast<LogFst,InternalTransducer>(*t,u);
+  assert (t->InputSymbols() != NULL);
+  u->SetInputSymbols(new fst::SymbolTable(*(t->InputSymbols())));
   return u;
 }
 
@@ -308,12 +314,18 @@ struct fsm * internal_format_to_foma
 }
 
 fst::StdVectorFst * internal_format_to_openfst(InternalTransducer * t)
-{ return new fst::StdVectorFst(*t); }
+{ fst::StdVectorFst *retval = new fst::StdVectorFst(*t); 
+  assert (t->InputSymbols() != NULL);
+  retval->SetInputSymbols(new fst::SymbolTable(*(t->InputSymbols())));
+  return retval;
+}
 
 
 LogFst * internal_format_to_log_ofst(InternalTransducer * t)
 { LogFst * u = new LogFst;
   fst::Cast<InternalTransducer,LogFst>(*t,u);
+  assert (t->InputSymbols() != NULL);
+  u->SetInputSymbols(new fst::SymbolTable(*(t->InputSymbols())));
   return u; }
 } }
 #ifdef DEBUG_CONVERT

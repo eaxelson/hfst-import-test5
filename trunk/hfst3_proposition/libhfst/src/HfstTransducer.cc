@@ -605,17 +605,11 @@ type(type),anonymous(false),is_trie(false)
 
   bool HfstTransducer::test_equivalence(HfstTransducer &one, HfstTransducer &another) 
   {
-    printf("FOO1\n");
     HfstTransducer onecopy(one);
-    printf("FOO2\n");
     HfstTransducer anothercopy(another);
-    printf("FOO3\n");
     onecopy.convert(TROPICAL_OFST_TYPE);
-    printf("FOO4\n");
     anothercopy.convert(TROPICAL_OFST_TYPE);
-    printf("FOO5\n");
     onecopy.harmonize(anothercopy);
-    printf("FOO6\n");
 
     return tropical_ofst_interface.test_equivalence(
 	     onecopy.implementation.tropical_ofst,
