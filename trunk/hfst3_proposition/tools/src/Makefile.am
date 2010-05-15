@@ -2,9 +2,8 @@
 ## Author: Tommi A Pirinen <tommi.pirinen@helsinki.fi>
 ## Licence: GPL v3 (not newer)
 
-## for nested build
-LDADD = ../../libhfst/libhfst.la
-AM_CPPFLAGS = -I../../libhfst
+LDADD = ../../libhfst/src/libhfst.la
+AM_CPPFLAGS = -I../../libhfst/src
 AM_CXXFLAGS = -Wno-deprecated
 
 if WANT_COMPARE

@@ -26,34 +26,10 @@ bool verbose = false;
 bool debug = false;
 FILE *message_out = stdout;
 
-/* 
- * Returns 0, 1 or 2 if transducers are of the same type and -1
- * if they are not. 
- */
+// deprecated; everything's compatible
 int get_compatible_fst_format(std::istream& is1, std::istream& is2) {
-	int type1 = HFST::read_format(is1);
-	int type2 = HFST::read_format(is2);
-
-	if (type1 == SFST_FORMAT && type2 == SFST_FORMAT)
-	{
-		return SFST_FORMAT;
-	}
-	else if (type1 == 1 && type2 == 1)
-	{
-		return 1;
-	}
-	else if (type1 == OPENFST_FORMAT && type2 == OPENFST_FORMAT)
-	{
-		return OPENFST_FORMAT;
-	}
-	else if (type1 == EOF_FORMAT && type2 == EOF_FORMAT)  // EOF = - 2
-	{
-		return EOF_FORMAT;
-	}
-	else {
-		fprintf(message_out, "ERROR: Transducer type mismatch\n");
-		return FORMAT_ERROR;
-	}
+    assert(false);
+    return -1;
 }
 
 
