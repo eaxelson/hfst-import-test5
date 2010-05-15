@@ -44,9 +44,9 @@ AC_ARG_ENABLE([compose_intersect],
 AM_CONDITIONAL([WANT_COMPOSE_INTERSECT], [test x$enable_compose_intersect != xno])
 AC_ARG_ENABLE([concatenate],
 			  [AS_HELP_STRING([--enable-concatenate],
-							  [build concatenate tool @<:@default=no@:>@])],
+							  [build concatenate tool @<:@default=yes@:>@])],
 			  [enable_concatenate=$enableval],
-			  [enable_concatenate=no])
+			  [enable_concatenate=yes])
 AM_CONDITIONAL([WANT_CONCATENATE], [test x$enable_concatenate != xno])
 AC_ARG_ENABLE([conjunct],
 			  [AS_HELP_STRING([--enable-conjunct],

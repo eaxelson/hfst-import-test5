@@ -32,8 +32,12 @@
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
-#include <hfst2/hfst.h>
+#include "HfstTransducer.h"
 
+using hfst::HfstTransducer;
+using hfst::HfstInputStream;
+using hfst::HfstOutputStream;
+using hfst::ImplementationType;
 
 static bool is_input_stdin = true;
 // left part of concatenation
@@ -248,182 +252,70 @@ parse_options(int argc, char** argv)
 	return EXIT_CONTINUE;
 }
 
-void delete_u(HFST::TransducerHandle t) {
-  if (t != NULL)
-    HFST::delete_transducer(t);
-}
-void delete_w(HWFST::TransducerHandle t) {
-  if (t != NULL)
-    HWFST::delete_transducer(t);
-}
-
 int
-concatenate_streams(std::istream& leftstream, std::istream& rightstream, std::ostream& outstream)
+concatenate_streams(const char* leftfilename, const char* rightfilename,
+                    const char* outfilename)
 {
-	VERBOSE_PRINT("Checking formats of transducers\n");
-	int format_type = get_compatible_fst_format(leftstream, rightstream);
-	size_t nth_stream = 0;
-	if (format_type == SFST_FORMAT)
-	{
-		VERBOSE_PRINT("Using unweighted format\n");
-		try {
-		        HFST::KeyTable *key_table = HFST::create_key_table();
-			HFST::TransducerHandle left = NULL;
-			HFST::TransducerHandle right = NULL;
-			bool left_has_symbols = false;
-			bool right_has_symbols = false;
-
-			while (true) {
-				int leftformat = HFST::read_format(leftstream);
-				int rightformat = HFST::read_format(rightstream);
-				if ((leftformat == EOF_FORMAT) && (rightformat == EOF_FORMAT))
-				{
-				  delete_u(left);
-				  delete_u(right);
-					break;
-				}
-				if (leftformat == SFST_FORMAT)
-				{
-				  delete_u(left);
-				  left_has_symbols = HFST::has_symbol_table(leftstream);
-				  if (left_has_symbols && !use_numbers)
-				    left = HFST::read_transducer(leftstream, key_table);
-				  else
-				    left = HFST::read_transducer(leftstream);
-				}
-				if (rightformat == SFST_FORMAT)
-				{
-				  delete_u(right);
-				  right_has_symbols = HFST::has_symbol_table(rightstream);
-				  if (left_has_symbols && right_has_symbols && !use_numbers)
-				    right = HFST::read_transducer(rightstream, key_table);
-				  else if ((!left_has_symbols && !right_has_symbols) || use_numbers) {
-				    if (!use_numbers)
-				      fprintf(stderr, "Warning: transducers do not have a symbol table, "
-					              "concatenation done using numbers instead\n");
-				    right = HFST::read_transducer(rightstream);
-				  }
-				  else {
-				    fprintf(message_out, "Only one transducer has a symbol table: "
-					                 "concatenation not well defined\n"
-					                 "Use option -n if necessary\n" );
-				    return EXIT_FAILURE;
-				  }
-				}
-				++nth_stream;
-				if (nth_stream < 2)
-				{
-					VERBOSE_PRINT("Concatenating...\n");
-				}
-				else
-				{
-					VERBOSE_PRINT("Concatenating... %zu\r", nth_stream);
-				}
-				HFST::TransducerHandle comp = 
-				  HFST::concatenate(HFST::copy(left), HFST::copy(right));
-				if (write_symbol_table && !use_numbers)
-				  HFST::write_transducer(comp, key_table, outstream);
-				else
-				  HFST::write_transducer(comp, outstream);
-				HFST::delete_transducer(comp);
-			}
-			if (write_symbols_to != NULL) {
-			  ofstream os(write_symbols_to);
-			  HFST::write_symbol_table(key_table, os);
-			  os.close();
-			}
-			delete key_table;
-		}
-		catch (const char *p)
-		{
-			printf("HFST library error: %s\n", p);
-			return EXIT_FAILURE;
-		}
-		return EXIT_SUCCESS;
-	}
-	else if (format_type == OPENFST_FORMAT) 
-	{
-		VERBOSE_PRINT("Using weighted format\n");
-		try {
-		        HWFST::KeyTable *key_table = HWFST::create_key_table();
-			HWFST::TransducerHandle right = NULL;
-			HWFST::TransducerHandle left = NULL;
-			bool left_has_symbols = false;
-			bool right_has_symbols = false;
-
-			while (true) 
-			{
-				int leftformat = HFST::read_format(leftstream);
-				int rightformat = HFST::read_format(rightstream);
-				if ((leftformat == EOF_FORMAT) && (rightformat == EOF_FORMAT))
-				{
-				  delete_w(left);
-				  delete_w(right);
-					break;
-				}
-				if (leftformat == OPENFST_FORMAT)
-				{
-				  delete_w(left);
-				  left_has_symbols = HWFST::has_symbol_table(leftstream);
-				  if (left_has_symbols && !use_numbers)
-				    left = HWFST::read_transducer(leftstream, key_table);
-				  else
-				    left = HWFST::read_transducer(leftstream);
-				}
-				if (rightformat == OPENFST_FORMAT)
-				{
-				  delete_w(right);
-				  right_has_symbols = HWFST::has_symbol_table(rightstream);
-				  if (left_has_symbols && right_has_symbols && !use_numbers)
-				    right = HWFST::read_transducer(rightstream, key_table);
-				  else if ((!left_has_symbols && !right_has_symbols) || use_numbers) {
-				    if (!use_numbers)
-				      fprintf(stderr, "Warning: transducers do not have a symbol table, "
-					              "concatenation done using numbers instead\n");
-				    right = HWFST::read_transducer(rightstream);
-				  }
-				  else {
-				    fprintf(message_out, "Only one transducer has a symbol table: "
-					                 "concatenation not well defined\n"
-					                 "Use option -n if necessary\n" );
-				    return EXIT_FAILURE;
-				  }
-				}
-				++nth_stream;
-				if (nth_stream < 2)
-				{
-					VERBOSE_PRINT("Concatenating...\n");
-				}
-				else
-				{
-					VERBOSE_PRINT("Concatenating... %zu\n", nth_stream);
-				}
-				HWFST::TransducerHandle comp = 
-				  HWFST::concatenate(HWFST::copy(left), HWFST::copy(right));
-				if (write_symbol_table && !use_numbers)
-				  HWFST::write_transducer(comp, key_table, outstream);
-				else
-				  HWFST::write_transducer(comp, outstream);
-				HWFST::delete_transducer(comp);
-			}
-			if (write_symbols_to != NULL) {
-			  ofstream os(write_symbols_to);
-			  HWFST::write_symbol_table(key_table, os);
-			  os.close();
-			}
-			delete key_table;
-		}
-		catch (const char *p) {
-			fprintf(message_out, "HFST lib error: %s\n", p);
-			return 1;
-		}
-		return EXIT_SUCCESS;
-	}
-	else
-	{
-		fprintf(message_out, "ERROR: Transducer has wrong type.\n");
-		return EXIT_FAILURE;
-	}
+    HfstInputStream leftInput(leftfilename);
+    HfstInputStream rightInput(rightfilename);
+    leftInput.open();
+    rightInput.open();
+    // should be is_good? 
+    bool bothInputs = leftInput.is_good() && rightInput.is_good();
+    HfstTransducer* left = new HfstTransducer(leftInput);
+    HfstTransducer* right = new HfstTransducer(rightInput);
+    ImplementationType leftType = left->get_type();
+    ImplementationType rightType = right->get_type();
+    if (leftType != rightType)
+      {
+        fprintf(stderr, "Warning: tranducer type mismatch in %s and %s; "
+                "using former type as output\n",
+                leftfilename, rightfilename);
+      }
+    HfstOutputStream outstream(outfilename, leftType);
+    size_t transducer_n = 0;
+    while (bothInputs) {
+        transducer_n++;
+        if (transducer_n == 1)
+          {
+            VERBOSE_PRINT("Concatenating %s and %s...\n", leftfilename, 
+                          rightfilename);
+          }
+        else
+          {
+            VERBOSE_PRINT("Concatenating %s and %s... %zu\n", leftfilename,
+                          rightfilename, transducer_n);
+          }
+        outstream << left->concatenate(*right);
+        bothInputs = leftInput.is_good() && rightInput.is_good();
+        delete left;
+        left = NULL;
+        delete right;
+        right = NULL;
+        if (leftInput.is_good())
+          {
+            left = new HfstTransducer(leftInput);
+          }
+        if (rightInput.is_good())
+          {
+            right = new HfstTransducer(rightInput);
+          }
+      } 
+    if (leftInput.is_good())
+      {
+        fprintf(stderr, "Warning: %s contains more transducers than %s; "
+                "residue skipped\n", leftfilename, rightfilename);
+      }
+    else if (rightInput.is_good())
+      {
+        fprintf(stderr, "Warning: %s contains fewer transducers than %s; "
+                "residue skipped\n", leftfilename, rightfilename);
+      }
+    leftInput.close();
+    rightInput.close();
+    delete left;
+    delete right;
+    return EXIT_SUCCESS;
 }
 
 
@@ -452,65 +344,20 @@ int main( int argc, char **argv ) {
 		leftfilename, rightfilename, outfilename);
 	// here starts the buffer handling part
 	if ((leftfile != stdin) && (rightfile != stdin))
-	{
-		std::filebuf fbleft;
-		fbleft.open(leftfilename, std::ios::in);
-		std::istream leftstream(&fbleft);
-		std::filebuf fbright;
-		fbright.open(rightfilename, std::ios::in);
-		std::istream rightstream(&fbright);
-		if (outfile != stdout)
-		{
-			std::filebuf fbout;
-			fbout.open(outfilename, std::ios::out);
-			std::ostream outstream(&fbout);
-			retval = concatenate_streams(leftstream, rightstream, outstream);
-		}
-		else
-		{
-			retval = concatenate_streams(leftstream, rightstream, std::cout);
-		}
-		return retval;
-	}
-	else if (leftfile != stdin)
-	{
-		std::filebuf fbleft;
-		fbleft.open(leftfilename, std::ios::in);
-		std::istream leftstream(&fbleft);
-		if (outfile != stdout)
-		{
-			std::filebuf fbout;
-			fbout.open(outfilename, std::ios::out);
-			std::ostream outstream(&fbout);
-			retval = concatenate_streams(leftstream, std::cin, outstream);
-		}
-		else
-		{
-			retval = concatenate_streams(leftstream, std::cin, std::cout);
-		}
-		return retval;
-	}
-	else if (rightfile != stdin)
-	{
-		std::filebuf fbright;
-		fbright.open(rightfilename, std::ios::in);
-		std::istream rightstream(&fbright);
-		if (outfile != stdout)
-		{
-			std::filebuf fbout;
-			fbout.open(outfilename, std::ios::out);
-			std::ostream outstream(&fbout);
-			retval = concatenate_streams(std::cin, rightstream, outstream);
-		}
-		else
-		{
-			retval = concatenate_streams(std::cin, rightstream, std::cout);
-		}
-		return retval;
-	}
+      {
+        retval = concatenate_streams(leftfilename, rightfilename, outfilename);
+      }
+	else if (leftfile == stdin)
+      {
+        retval = concatenate_streams(NULL, rightfilename, outfilename);
+      }
+	else if (rightfile == stdin)
+      {
+        retval = concatenate_streams(leftfilename, NULL, outfilename);
+      }
 	free(leftfilename);
 	free(rightfilename);
 	free(outfilename);
-	return EXIT_SUCCESS;
+    return retval;
 }
 
