@@ -44,15 +44,15 @@ gather_alphabet(const char* word)
           {
             u8len = 1;
           }
-        else if (c & (128 + 64 + 32 + 16) == (128 + 64 + 32 + 16))
+        else if ((c & (128 + 64 + 32 + 16)) == (128 + 64 + 32 + 16))
           { 
             u8len = 4;
           }
-        else if (c & (128 + 64 + 32) == (128 + 64 + 32))
+        else if ((c & (128 + 64 + 32)) == (128 + 64 + 32))
           {
             u8len = 3;
           }
-        else if (c & (128 + 64) == (128 + 64))
+        else if ((c & (128 + 64)) == (128 + 64))
           {
             u8len = 2;
           }
@@ -70,16 +70,40 @@ gather_alphabet(const char* word)
 }
 
 static
+char*
+escape_word(const char* word)
+{
+    char* rv = static_cast<char*>(calloc(sizeof(char), strlen(word)*2+1));
+    const char* s = word;
+    char* p = rv;
+    while (*s != '\0')
+    {
+        if ((*s == '!') || (*s == ' ') || (*s == '%'))
+        {
+            *p = '%';
+            p++;
+        }
+        *p = *s;
+        p++;
+        s++;
+    }
+    *p = '\0';
+    return rv;
+}
+
+static
 void
 handle_wordline(const char* word, const char* conts)
 {
     const char* cont = conts;
     words_read++;
+    char* escaped_word = escape_word(word);
     while (*cont != '\0')
       {
-        fprintf(lexcfile, "%s\tHUNBYTE%u\t;\n", word, *cont);
+        fprintf(lexcfile, "%s\tHUNSPELL_FLAG_%u\t;\n", escaped_word, *cont);
         cont++;
       }
+    free(escaped_word);
 }
 
 static
@@ -87,7 +111,9 @@ void
 handle_wordline(const char* word, unsigned long cont)
 {
     words_read++;
-    fprintf(lexcfile, "%s\tHUNNUM%lu\t;\n", word, cont);
+    char* escaped_word = escape_word(word);
+    fprintf(lexcfile, "%s\tHUNSPELL_AF_%lu\t;\n", escaped_word, cont);
+    free(escaped_word);
 }
 
 static
@@ -150,7 +176,23 @@ handle_stringed_wordline(const char* word, const char* conts,
 %%
 
 DIC_FILE: COUNT WORDLIST {
-        printf("%lu/%lu words read\n", words_read, $1);
+        if (words_read > $1)
+        {
+            printf("%lu/%lu words read? "
+                   "Normally this would indicate an error, "
+                   "but in hunspell it seems quite common\n", words_read, $1);
+        }
+        else if (words_read < $1)
+        {
+            printf("%lu/%lu words read? "
+                   "Check which entries are missing, "
+                   "and add them by hand!\n", words_read, $1);
+        }
+        else
+        {
+            printf("%lu/%lu words read! "
+                   "Everything worked out nicely!\n", words_read, $1);
+        }
         expected_strings = $1;
         }
         ;
@@ -214,6 +256,8 @@ yyerror(const char* text)
 int
 main(int argc, char** argv)
 {
+    char* infilename = 0;
+    char* lexcfilename = 0;
     if (argc > 1)
     {
         if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0))
@@ -221,25 +265,39 @@ main(int argc, char** argv)
             printf("Usage: %s [INFILE [OUTFILE]]\n", argv[0]);
             return EXIT_SUCCESS;
         }
-        yyin = fopen(argv[1], "r");
+        infilename = strdup(argv[1]);
+        yyin = fopen(infilename, "r");
         if (yyin == NULL)
         {
-            fprintf(stderr, "Could not open %s for reading\n", argv[1]);
+            fprintf(stderr, "Could not open %s for reading\n", infilename);
             return EXIT_FAILURE;
         }
-        if (argc > 2)
+    }
+    else
+    {
+        infilename = strdup("<stdin>");
+    }
+    if (argc > 2)
+    {
+        lexcfilename = strdup(argv[2]);
+        lexcfile = fopen(lexcfilename, "w");
+        if (lexcfile == NULL)
         {
-            lexcfile = fopen(argv[2], "w");
-            if (lexcfile == NULL)
-            {
-                fprintf(stderr, "Could not open %s for writing\n", argv[2]);
-                return EXIT_FAILURE;
-            }
+            fprintf(stderr, "Could not open %s for writing\n", lexcfilename);
+            return EXIT_FAILURE;
         }
     }
+    else
+    {
+        lexcfilename = strdup("<stdout>");
+    }
+    printf("Reading from %s, writing to %s\n", infilename, lexcfilename);
     fprintf(lexcfile, "! This file contains hunspell %s dictionary "
-                      "automatically translated to lexc format\n"
-                      "LEXICON Start\n", argv[1]);
+                      "automatically translated to lexc format\n\n"
+                      "LEXICON HUNSPELL_dic_root\n"
+                      "\tHUNSPELL_dic\t;\n"
+                      "\tHUNSPELL_pfx\t;\n\n"
+                      "LEXICON HUNSPELL_dic\n", infilename);
     yyparse();
     if (argc > 1)
     {
