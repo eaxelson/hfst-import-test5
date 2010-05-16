@@ -2,12 +2,16 @@
 
 %{
 #include <stdio.h>
+#include <ctype.h>
+#include <assert.h>
+
+#include "hunspell-aff.tab.hh"
 
 static
 void
 skip_spaces(char **s)
 {
-    while ((**s != '\0') && (is_space(**s)))
+    while ((**s != '\0') && (isspace(**s)))
       {
         *s++;
       }
@@ -48,7 +52,7 @@ NL \n|\r|\r\n
 /* reserced from regular strings */
 RESERVED [*/# \t\n\r]
 /* number giving count of things */
-NUMBER [0-9]|[1-9][0-9]*
+NUMBER [1-9][0-9]*
 /* characters used for continuation classes */
 CONTCHAR [^\t\n\r /]
 /* non-reserved characters used for unicode strings */
@@ -62,152 +66,180 @@ UNI {U8H}|[\x21-\x7e]
     /* comment, ignore */
 }
 
-^"SET"{WSP}+{UNINR}+$ {
-    const char* s = yytext + 3;
-    skip_spaces(&s);
-    yylval.string = strdup(s);
+^"SET "{UNINR}+ {
+    yylval.string = strdup(yytext + 4);
     return SET_LINE;
 }
 
-^"TRY"{WSP}+{UNINR}+$ {
-    const char* s = yytext + 3;
-    skip_spaces(&s);
-    yylval.string = strdup(s);
+^"TRY "{UNINR}+ {
+    yylval.string = strdup(yytext + 4);
     return TRY_LINE;
 }
 
-^"REP"{WSP}+{NUMBER}$ {
-    const char* s = yytext + 3;
-    skip_spaces(&s);
+^"REP "{NUMBER}{LWSP}*$ {
+    char* s = strdup(yytext + 4);
     char* end = yytext;
-    yylval.number = strtoul(s, end, 10);
-    assert(*end == '\0');
+    yylval.number = strtoul(s, &end, 10);
+    if (*end != '\0')
+    {
+        fprintf(stderr, "Junk at the end of REP line: %s\n", end);
+    }
     return REP_COUNT;
 }
 
-^"REP" {
+^"REP " {
     return REP_LEADER;
 }
 
-^"KEY"{WSP}+{UNINR}+$ {
-    const char* s = yytext + 3;
-    skip_spaces(&s);
-    yylval.string = strdup(s);
+^"KEY "{UNINR}+ {
+    yylval.string = strdup(yytext + 4);
     return KEY_LINE;
 }
 
-^"PFX" {
-    return PREFIX_LEADER;
+^"PFX "." "("Y"|"N")" "{NUMBER}{LWSP}*$ {
+    char* s = strdup(yytext + 8);
+    char* end = yytext;
+    yylval.number = strtoul(s, &end, 10);
+    if (*end != '\0')
+    {
+        fprintf(stderr, "Junk at the end of PFX line: %s\n", end);
+    }
+    return PFX_FIRSTLINE;
 }
 
 
-^"SFX" {
-    return SUFFIX_LEADER;
+^"SFX "." "("Y"|"N")" "{NUMBER}{LWSP}*$ {
+    char* s = strdup(yytext + 8);
+    char* end = yytext;
+    yylval.number = strtoul(s, &end, 10);
+    if (*end != '\0')
+    {
+        fprintf(stderr, "Junk at the end of SFX line: %s\n", end);
+    }
+    return SFX_FIRSTLINE;
+}
+
+^"PFX ". {
+    yylval.string = strdup(yytext + 4);
+    return PFX_LEADER;
+}
+
+^"SFX ". {
+    yylval.string = strdup(yytext + 4);
+    return SFX_LEADER;
 }
 
 ^"FLAG"{WSP}+{UNI}+$ {
-    const char* s = yytext + 3;
+    char* s = strdup(yytext + 3);
     skip_spaces(&s);
-    yylval.string = strdup(s);
+    yylval.string = s;
     return FLAG_LINE;
 }
 
-^"AF"{WSP}+{NUMBER}$ {
-    const char* s = yytext + 2;
-    skip_spaces(&s);
+^"AF "{NUMBER}$ {
     char* end = yytext;
-    yylval.number = strtoul(s, &end, 10);
+    yylval.number = strtoul(yytext + 3, &end, 10);
     assert(*end == '\0');
     return AF_COUNT;
 }
 
-^"AF" {
-    return AF_LEADER;
+^"AF "[^# \t\r\n]+ {
+    yylval.string = strdup(yytext + 3);
+    return AF_LINE;
 }
 
-^"AM"{WSP}+{NUMBER}$ {
-    const char* s = yytext + 2;
-    skip_spaces(&s);
+^"AM "{NUMBER}$ {
     char* end = yytext;
-    yylval.number = strtoul(s, &end, 10);
+    yylval.number = strtoul(yytext + 3, &end, 10);
     assert(*end == '\0');
     return AM_COUNT;
 }
 
-^"AM" {
-    return AM_LEADER;
+^"AM "[^#\t\n\r]+ {
+    return AM_LINE;
 }
 
-^"COMPOUNDMIN" {
-    return COMPOUNMIN_LEADER;
+^"COMPOUNDMIN "{NUMBER} {
+    char* end = yytext;
+    yylval.number = strtoul(yytext + 12, &end, 10);
+    assert(*end == '\0');
+    return COMPOUNDMIN_LINE;
 }
 
-^"COMPOUNDFLAG" {
-    return COMPOUNDFLAG_LEADER;
+^"COMPOUNDFLAG ". {
+    yylval.string = strdup(yytext + 13);
+    return COMPOUNDFLAG_LINE;
 }
 
-^"COMPOUNDBEGIN" {
-    return COMPOUNDBEGIN_LEADER;
+^"COMPOUNDBEGIN ". {
+    yylval.string = strdup(yytext + 14);
+    return COMPOUNDBEGIN_LINE;
 }
 
-^"COMPOUNDLAST" {
-    return COMPOUNDLAST_LEADER;
+^"COMPOUNDEND ". {
+    yylval.string = strdup(yytext + 13);
+    return COMPOUNDEND_LINE;
 }
 
-^"COMPOUNDMIDDLE" {
-    return COMPOUNDMIDDLE_LEADER;
+^"COMPOUNDMIDDLE ". {
+    yylval.string = strdup(yytext + 16);
+    return COMPOUNDMIDDLE_LINE;
 }
 
-^"CIRCUMFIX" {
-    return CIRCUMFIX_LEADER;
+^"CIRCUMFIX ". {
+    yylval.string = strdup(yytext + 10);
+    return CIRCUMFIX_LINE;
 }
 
-^[A-Z]+{WSP}*.*$ {
-    fprintf(stderr, "Skipped unknown line %s\n", yytext);
-    yylval.string = strdup(yytext);
-    return UNKNOWN_LINE;
+^("NOSUGGEST "|"ONLYINCOMPOUND "|"COMPOUNDRULE "|"WORDCHARS "|"PHONE "|"NAME "|"LANG "|"HOME "|"VERSION "|"COMPOUNDSYLLABLE "|"SYLLABLENUM "|"KEEPCASE "|"COMPOUNDFORBIDFLAG "|"COMPOUNDPERMITFLAG "|"COMPOUNDPERMITFLAG "|"COMPOUNDFIRST "|"COMPOUNDLAST "|"ONLYROOT "|"HU_KOTOHANGZO "|"NEEDAFFIX "|"ONLYINCOMPOUND "|"COMPOUNDWORDMAX "|"COMPOUNDROOT "|"CHECKCOMPOUND"|"FORBIDDENWORD "|"SUBSTANDARD "|"GENERATE "|"LEMMA_PRESENT "|"MAP "|"BREAK "|"CHECKSHARPS").*$ {
+    printf("Skipped (known): %s\n", yytext);
 }
 
 "/"{NUMBER} {
     char* end = yytext;
-    yylvalue.number = strtoul(yytext+1, end, 10);
+    yylval.number = strtoul(yytext+1, &end, 10);
     return CONTNUMBER;
 }
 
 "/"{UNINR}+ {
-    yylvalue.string = strdup(yytext+1);
+    yylval.string = strdup(yytext+1);
     return CONTSTRING;
 }
 
+"0" {
+    return ZERO;
+}
+
 {NUMBER} {
-    yylvalue.number = strtoul(yytext);
-    return NUMBER;
+    char* end = yytext;
+    yylval.number = strtoul(yytext, &end, 10);
+    return COUNT;
 }
 
 "*"{UNINR}+ {
-    yylvalue.string = strdup(yytext+1);
+    yylval.string = strdup(yytext+1);
     return UTF8_ERRSTRING;
 }
 
 {UNINR}+ {
-    yylvalue.string = strdup(yytext);
+    yylval.string = strdup(yytext);
     return UTF8_STRING;
 }
 
-{LWSP}* {
+{WSP}* {
     /* skip */
 }
 
 . {
     if (*yytext < 0)
       {
-        fprintf(stderr, "Lexer error at %s [%c] on line %lu"
+        fprintf(stderr, "Lexer error at %s [%c] on line %d"
                 "(Possibly unexpected broken UTF-8)\n",
                 yytext, yytext[0], yylineno);
       }
     else
       {
-        fprintf(stderr, "Lexer error at %s [%c] on line %lu\n", 
+        fprintf(stderr, "Lexer error at %s [%c] on line %d\n", 
                 yytext, yytext[0], yylineno);
       }
     return ERROR;

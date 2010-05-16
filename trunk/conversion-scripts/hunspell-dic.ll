@@ -40,7 +40,14 @@ UNINR {U8H}|[\x20-\x2e\x30-\x7e]
 /* any unicode char except space */
 UNI {U8H}|[\x20-\x7e]
 
+LWSP [ \t]
+WSP [ \t\n\r]
+
 %%
+
+^{LWSP}+.* {
+    /* this is apparently a comment (cf. de_DE.dic) */
+}
 
 ^{NUMBER}$ {
     char* end = yytext;
