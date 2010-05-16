@@ -10,7 +10,7 @@ check_PROGRAMS=test
 test_SOURCES=test.cc
 
 # programs to run for unit etc. testing
-TEST=test
+TESTS=test
 
 # files needed for test programs
 EXTRA_DIST=test.att
