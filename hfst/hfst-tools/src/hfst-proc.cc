@@ -58,6 +58,15 @@ enum lookup_output_format
   APERTIUM_OUTPUT
 };
 
+enum GenerationMode
+{
+  gm_clean,      // clear all
+  gm_unknown,    // display unknown words, clear transfer and generation tags
+  gm_all,        // display all
+  gm_tagged      // tagged generation
+};
+
+
 static lookup_input_format input_format = APERTIUM_INPUT; //UTF8_TOKEN_INPUT;
 static lookup_output_format output_format = APERTIUM_OUTPUT; //XEROX_OUTPUT;
 
@@ -170,6 +179,9 @@ struct KeyVectorCmp
 
 typedef std::set<KeyVector*,KeyVectorCmp> KeyVectorSet;
 
+int stream_mode = 0;
+GenerationMode genmode = gm_all;
+
 void
 print_usage(const char *program_name)
 {
@@ -217,6 +229,14 @@ print_version(const char* program_name)
 		program_name, PACKAGE_STRING);
 }
 
+string
+removeTags(string const &str)
+{
+  int off = str.find('<');
+  
+  return str.substr(0, off);
+}
+
 int
 parse_options(int argc, char** argv)
 {
@@ -232,14 +252,16 @@ parse_options(int argc, char** argv)
 		  // add tool-specific options here
 			{"input-strings", required_argument, 0, 'I'},
 			{"spaces", no_argument, 0, 'S'},
+			{"generation", no_argument, 0, 'g'},
+			{"debugged-gen", no_argument, 0, 'd'},
 			{"format", required_argument, 0, 'f'},
-            {"input-format", required_argument, 0, 'F'},
+  	            {"input-format", required_argument, 0, 'F'},
 			{"statistics", no_argument, 0, 'r'},
 			{0,0,0,0}
 		};
 		int option_index = 0;
 		// add tool-specific options here 
-		char c = getopt_long(argc, argv, "df:F:hi:I:o:sSqvVrR:DW:t:",
+		char c = getopt_long(argc, argv, "gdf:F:hi:I:o:sSqvVrR:DW:t:",
 							 long_options, &option_index);
 		if (-1 == c)
 		{
@@ -248,7 +270,7 @@ parse_options(int argc, char** argv)
 
 		switch (c)
 		{
-#include "hfst-common-cases.h"
+//#include "hfst-common-cases.h"
 #include "hfst-common-unary-cases.h"
 		  // add tool-specific cases here
 		case 'I':
@@ -259,6 +281,13 @@ parse_options(int argc, char** argv)
 		case 'S':
 			input_format = SPACE_SEPARATED_TOKEN_INPUT;
 			break;
+		case 'd': 
+			stream_mode = 1;
+			genmode = gm_tagged;
+                        break;
+		case 'g': 
+			stream_mode = 1;
+                        break;
 		case 'f':
 			if (strcmp(optarg, "xerox") == 0)
 			{
@@ -423,8 +452,7 @@ void define_flag_diacritics(HFST::KeyTable * key_table)
     }
 }
 int
-lookup_printf(const char* format, const char* inputform,
-              const char* lookupform, const char* markup)
+lookup_printf(const char* format, const char* inputform, const char* lookupform, const char* markup)
 {
 	size_t space = 2 * strlen(format) +
 		2 * strlen(inputform) + 10;
@@ -1167,8 +1195,8 @@ print_lookups(KeyVectorSet* kvs, KeyTable* kt, const char* s, char* markup,
 bool
 tokenize_on(const char* u8char)
 {
-	static const int num_chars = 4;
-	static const char* t[num_chars] = {" ", ",", ".", "["};
+	static const int num_chars = 10;
+	static const char* t[num_chars] = {" ", ",", ".", "[", ":", ";", "\"", "'", "`", "!"};
 	
 	for(int i=0;i<num_chars;i++)
 		if(strcmp(u8char, t[i]) == 0)
@@ -1210,6 +1238,423 @@ pass_through_superblank()
 		if (c == ']') break;
 	}
 }
+
+int
+process_stream_generation(std::istream& inputstream, std::ostream& outstream)
+{
+        //std::cerr << "Generation" << std::endl;
+	VERBOSE_PRINT("Checking formats of transducers\n");
+	int format_type = HFST::read_format(inputstream);
+	if (format_type == SFST_FORMAT)
+	{
+		VERBOSE_PRINT("Using unweighted format\n");
+		try 
+		{
+			sigma = new KeySet;
+			HFST::KeyTable *key_table;
+			if (read_symbols_from_filename != NULL) 
+			{
+				ifstream is(read_symbols_from_filename);
+				key_table = HFST::read_symbol_table(is);
+				is.close();
+			}
+			else
+				key_table = HFST::create_key_table();
+			bool transducer_has_symbol_table=false;
+			HFST::TransducerHandle input = NULL;
+			size_t nth_stream = 0;
+			std::vector<HFST::TransducerHandle> cascade;
+			while (true) {
+				int inputformat = HFST::read_format(inputstream);
+				nth_stream++;
+				if (inputformat == EOF_FORMAT)
+				{
+					break;
+				}
+				else if (inputformat == SFST_FORMAT)
+				{
+					transducer_has_symbol_table = HFST::has_symbol_table(inputstream);
+					input = HFST::read_transducer(inputstream, key_table);
+				}
+				else
+				{
+					fprintf(message_out, "stream format mismatch\n");
+					return EXIT_FAILURE;
+				}
+				if (nth_stream < 2)
+				{
+					VERBOSE_PRINT("Reading cascade...\r");
+				}
+				else
+				{
+					VERBOSE_PRINT("Reading cascade... %zu\r", nth_stream);
+				}
+				// add your code here
+				cascade.push_back(input);
+			}
+			define_flag_diacritics(key_table);
+            sigma = HFST::get_key_set(key_table);
+            VERBOSE_PRINT("\n");
+
+            // go through character by character, converting each character
+            // into a Key. Add each Key to a KeyVector until a Key is found
+            // which is not in the alphabet. Then tokenize.
+
+	HFST::KeyVector key_vec;
+	string token;
+	bool inWord = false;
+			
+	while (true) // while there is input
+	{
+		char* utf8_char = get_u8_char(lookup_file);
+            	
+            	// if we have the escape character, skip it and use the next
+		if (strcmp(utf8_char, "\\") == 0)
+		{
+            		free(utf8_char);
+            		utf8_char = get_u8_char(lookup_file);
+            	}
+
+		if(utf8_char[0] == '^') 
+		{
+			inWord = true;
+			token.clear();
+			key_vec.clear();
+			continue;
+		}
+
+            	if (!utf8_char[0] || utf8_char[0] == EOF)
+            	{
+            		VERBOSE_PRINT("Breaking..\n");
+            		break;
+            	}
+
+		HFST::KeyVector* kv;
+		if(utf8_char[0] == '<' && inWord)  
+		{
+			string buf;
+            		token.append(utf8_char);
+            		buf.append(utf8_char);
+			while(utf8_char[0] != '>')
+			{
+				utf8_char = get_u8_char(lookup_file);
+				if(utf8_char[0] != '>') 
+				{
+            				token.append(utf8_char);
+				}
+				buf.append(utf8_char);
+			}
+            		kv = HFST::stringUtf8ToKeyVector(buf.c_str(), key_table, true);
+		} else {
+        	    	kv = HFST::stringUtf8ToKeyVector(utf8_char, key_table, true);
+		}
+		//std::cerr << inWord << ": " << utf8_char << ": tok: " << token << " kv: " << key_vec.size() << std::endl;
+
+            	if (kv->size() > 1 && utf8_char[0] != '>')  // ^@ja<Conj>$
+            	{
+            		fprintf(stderr, "UTF-8 character %s converted to multiple keys\n", utf8_char);
+            		assert(false);
+            		return EXIT_FAILURE;
+            	}
+
+		// if the character is out of the alphabet or is whitespace/punctuation
+            	if (strcmp(utf8_char, "$") == 0 && inWord)
+            	{
+			inWord = false;
+
+			if (!key_vec.empty()) 
+			{
+				// tokenize
+		       		VERBOSE_PRINT("Looking up '%s'...\n", token.c_str());
+
+	        		KeyVectorSet* kvs;
+	        		bool infinite = false;
+
+	        		if (cascade.size() == 1)
+				{
+		                    kvs  = HFST::lookup_unique(&key_vec, cascade[0],
+		                                                key_table, &infinite);
+				}
+		                else
+				{
+		                    kvs = HFST::lookup_cascade_unique(&key_vec, cascade,
+		                                                       key_table, 
+		                                                       &infinite);
+				}
+
+		                //std::cerr << "+ tok: " << token << "; " << kvs->empty() << "; " << key_vec.size() << std::endl;
+				if(kvs->empty()) 
+				{
+					if(genmode != gm_tagged) 
+					{
+						token = removeTags(token);
+					}
+					// unknown word in generation
+					if(token.c_str()[0] == '@' || token.c_str()[0] == '*') 
+					{
+						std::cout << token;
+					}
+					else
+					{
+						std::cout << "#" << token;
+					}
+				}
+				bool first = true;
+			        for (KeyVectorSet::iterator lkv = kvs->begin(); lkv != kvs->end(); ++lkv)
+			        {
+					KeyVector* hmmlkv = *lkv;
+					string* lkvstr = HFST::keyVectorToString(hmmlkv, key_table);
+                                        //std::cerr << "lkvstr: " << lkvstr->c_str() << std::endl;
+					const char* lookup_full = lkvstr->c_str();
+					if(first)
+					{
+						std::cout << lookup_full;
+					}
+					else	
+					{
+						std::cout << "/" << lookup_full;
+					}
+					delete lkvstr;
+					first = false;
+				}
+
+		            	for (KeyVectorSet::const_iterator rkv = kvs->begin(); rkv != kvs->end(); ++rkv)
+		             	{
+		          		KeyVector* hmmkv = *rkv;
+		               		delete hmmkv;
+		             	}
+		           	delete kvs;
+		           	key_vec.clear();
+		       	        token.clear();
+				continue;
+			} 
+		           	
+			// pass through superblanks untouched
+			if (strcmp(utf8_char, "[") == 0)
+			{
+				inWord = false;
+				pass_through_superblank();
+			}
+		        else
+		        {
+			        // output the non-alphabetic character
+				inWord = false;
+            			fputs(utf8_char, message_out);
+		        }
+            	}
+		else if(!inWord) 
+		{
+			fputs(utf8_char, message_out);
+			continue;
+		}
+            	else
+            	{
+            		key_vec.push_back(kv->front());
+            		token.append(utf8_char);
+            	}
+            	
+            	delete kv;
+            	free(utf8_char);
+
+		}  // while not at end of input
+            
+		// Cleanup
+		for (vector<TransducerHandle>::iterator t = cascade.begin();
+                 t != cascade.end();
+                 ++t)
+              {
+                HFST::delete_transducer(*t);
+              }
+			if (write_symbols_to_filename != NULL) {
+			  ofstream os(write_symbols_to_filename);
+			  HFST::write_symbol_table(key_table, os);
+			  os.close();
+			}
+		}
+		catch (const char *p)
+		{
+			printf("HFST library error: %s\n", p);
+			return EXIT_FAILURE;
+		}
+		return EXIT_SUCCESS;
+	}
+    else if (format_type == OPENFST_FORMAT) 
+    {
+        VERBOSE_PRINT("Using weighted format\n");
+        try
+        {
+            HWFST::KeyTable *key_table;
+            if (read_symbols_from_filename != NULL) 
+            {
+                ifstream is(read_symbols_from_filename);
+                key_table = HWFST::read_symbol_table(is);
+                is.close();
+            }
+            else
+                key_table = HWFST::create_key_table();
+            bool transducer_has_symbol_table=false;
+            HWFST::TransducerHandle input = NULL;
+            size_t nth_stream = 0;
+            std::vector<HWFST::TransducerHandle> cascade;
+            while (true) {
+                int inputformat = HWFST::read_format(inputstream);
+                nth_stream++;
+                if (inputformat == EOF_FORMAT)
+                {
+                    break;
+                }
+                else if (inputformat == OPENFST_FORMAT)
+                {
+                    transducer_has_symbol_table = HWFST::has_symbol_table(inputstream);
+                    input = HWFST::read_transducer(inputstream, key_table);
+                }
+                else
+                {
+                    fprintf(message_out, "stream format mismatch\n");
+                    return EXIT_FAILURE;
+                }
+                if (nth_stream < 2)
+                {
+                    VERBOSE_PRINT("Reading cascade...\r");
+                }
+                else
+                {
+                    VERBOSE_PRINT("Reading cascade... %zu\r", nth_stream);
+                }
+                // add your code here
+                cascade.push_back(input);
+            }
+            define_flag_diacritics(key_table);
+            sigma = HWFST::get_key_set(key_table);
+            VERBOSE_PRINT("\n");
+            
+            // go through character by character, converting each character
+            // into a Key. Add each Key to a KeyVector until a Key is found
+            // which is not in the alphabet. Then tokenize.
+
+			HWFST::KeyVector key_vec;
+			string token;
+			
+            while (true) // while there is input
+            {
+            	char* utf8_char = get_u8_char(lookup_file);
+            	
+            	// if we have the escape character, skip it and use the next
+            	if (strcmp(utf8_char, "\\") == 0)
+            	{
+            		free(utf8_char);
+            		utf8_char = get_u8_char(lookup_file);
+            	}
+
+            	if (!utf8_char[0] || utf8_char[0] == EOF)
+            	{
+            		VERBOSE_PRINT("Breaking..\n");
+            		break;
+            	}
+
+            	HWFST::KeyVector* kv = HWFST::stringUtf8ToKeyVector(utf8_char, key_table, true);
+            	if (kv->size() > 1) 
+            	{
+            		fprintf(stderr, "UTF-8 character %s converted to multiple keys\n", utf8_char);
+            		assert(false);
+            		return EXIT_FAILURE;
+            	}
+
+				// if the character is out of the alphabet or is whitespace/punctuation
+            	if (sigma->find(kv->front()) == sigma->end() || tokenize_on(utf8_char))
+            	{
+            		if (!key_vec.empty()) {
+		        		// tokenize
+		        		VERBOSE_PRINT("Looking up '%s'...\n", token.c_str());
+
+		        		KeyVectorSet* kvs;
+		        		bool infinite = false;
+
+		        		if (cascade.size() == 1)
+		                  {
+		                    kvs  = HWFST::lookup_unique(&key_vec, cascade[0],
+		                                                key_table, &infinite);
+		                   }
+		                else
+		                  {
+		                    kvs = HWFST::lookup_cascade_unique(&key_vec, cascade,
+		                                                       key_table, \
+		                                                       &infinite);
+		                  }
+
+		                HWFST::print_lookups(kvs, key_table, token.c_str(), NULL, false, infinite);
+		            	for (KeyVectorSet::const_iterator rkv = kvs->begin();
+		                	rkv != kvs->end();
+		                	++rkv)
+		             	{
+		          			KeyVector* hmmkv = *rkv;
+		               		delete hmmkv;
+		             	}
+		           		delete kvs;
+		           		key_vec.clear();
+		                token.clear();
+		           	}
+		           	
+				    // pass through superblanks untouched
+		        	if (strcmp(utf8_char, "[") == 0)
+		        	{
+		        		pass_through_superblank();
+		        	}
+		        	else
+		        	{
+		        		// output the non-alphabetic character
+            			fputs(utf8_char, message_out);
+		        	}
+            	}
+            	else
+            	{
+            		key_vec.push_back(kv->front());
+            		token.append(utf8_char);
+            	}
+            	
+            	delete kv;
+            	free(utf8_char);
+            } // while not at end of input
+            
+			// Cleanup
+
+            if (print_statistics)
+            {
+                fprintf(message_out, "Strings\tFound\tMissing\tResults\n"
+                        "%lu\t%lu\t%lu\t%lu\n", 
+                        inputs, analysed, no_analyses, analyses);
+                fprintf(message_out, "Coverage\tAmbiguity\n"
+                        "%f\t%f\n",
+                        (float)analysed/(float)inputs,
+                        (float)analyses/(float)inputs);
+            }
+            for (vector<TransducerHandle>::iterator t = cascade.begin();
+                 t != cascade.end();
+                 ++t)
+              {
+                HWFST::delete_transducer(*t);
+              }
+            if (write_symbols_to_filename != NULL) {
+              ofstream os(write_symbols_to_filename);
+              HWFST::write_symbol_table(key_table, os);
+              os.close();
+            }
+        }
+        catch (const char *p)
+        {
+            printf("HFST library error: %s\n", p);
+            return EXIT_FAILURE;
+        }
+        return EXIT_SUCCESS;
+    }
+    else
+    {
+        fprintf(message_out, "ERROR: Transducer has wrong type.\n");
+        return EXIT_FAILURE;
+    }
+}
+
+
 
 int
 process_stream(std::istream& inputstream, std::ostream& outstream)
@@ -1598,11 +2043,26 @@ int main( int argc, char **argv ) {
 			std::filebuf fbout;
 			fbout.open(outfilename, std::ios::out);
 			std::ostream outstream(&fbout);
-			retval = process_stream(inputstream, outstream);
+
+                        if(stream_mode == 1)
+                        {
+			  retval = process_stream_generation(inputstream, outstream);
+                        }
+                        else
+                        { 
+			  retval = process_stream(inputstream, outstream);
+                        }
 		}
 		else
 		{
-			retval = process_stream(inputstream, std::cout);
+                        if(stream_mode == 1)
+                        {
+			  retval = process_stream_generation(inputstream, std::cout);
+                        }
+                        else
+                        {
+			  retval = process_stream(inputstream, std::cout);
+                        }
 		}
 		return retval;
 	}
@@ -1613,11 +2073,25 @@ int main( int argc, char **argv ) {
 			std::filebuf fbout;
 			fbout.open(outfilename, std::ios::out);
 			std::ostream outstream(&fbout);
-			retval = process_stream(std::cin, outstream);
+                        if(stream_mode == 1) 
+                        {
+			  retval = process_stream_generation(std::cin, outstream);
+                        } 
+                        else
+                        {
+			  retval = process_stream(std::cin, outstream);
+                        } 
 		}
 		else
 		{
-			retval = process_stream(std::cin, std::cout);
+                        if(stream_mode == 1)
+                        {
+			  retval = process_stream_generation(std::cin, std::cout);
+                        }
+                        else
+                        {
+			  retval = process_stream(std::cin, std::cout);
+                        }
 		}
 		return retval;
 	}
