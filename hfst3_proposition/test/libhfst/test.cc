@@ -5,6 +5,7 @@
 #include "HfstTransducer.h"
 #include <cstdio>
 #include <assert.h>
+#include <fstream>
 
 using namespace hfst;
 
@@ -103,7 +104,7 @@ int main(int argc, char **argv) {
       HfstTransducer foo(mut);
       assert (HfstTransducer::test_equivalence(tr, foo));
     }
-    printf("Empty constructors tested on transducers of type %i.\n", types[i]);
+    //printf("Empty constructors tested on transducers of type %i.\n", types[i]);
     {
       // Test the one-transition transducer constructors for all implementation types.
       HfstTransducer tr("foo", types[i]);
@@ -120,7 +121,7 @@ int main(int argc, char **argv) {
       HfstTransducer foo(mut);
       assert (HfstTransducer::test_equivalence(tr, foo));
     }
-    printf("One-transition constructors tested on transducers of type %i.\n", types[i]);
+    //printf("One-transition constructors tested on transducers of type %i.\n", types[i]);
     {
       // Test the two-transition transducer constructors for all implementation types.
       HfstTransducer tr("foo", "bar", types[i]);
@@ -141,7 +142,7 @@ int main(int argc, char **argv) {
       HfstTransducer foo(mut);
       assert (HfstTransducer::test_equivalence(tr, foo));
     }
-    printf("Two-transition constructors tested on transducers of type %i.\n", types[i]);
+    //printf("Two-transition constructors tested on transducers of type %i.\n", types[i]);
     {
       // Test the one-string transducer constructors for all implementation types.
       HfstTokenizer tok;
@@ -161,7 +162,7 @@ int main(int argc, char **argv) {
       HfstTransducer foo(mut);
       assert (HfstTransducer::test_equivalence(tr, foo));
     }
-    printf("One-string constructors tested on transducers of type %i.\n", types[i]);
+    //printf("One-string constructors tested on transducers of type %i.\n", types[i]);
     {
       // Test the two-string transducer constructors for all implementation types.
       HfstTokenizer tok;
@@ -181,7 +182,12 @@ int main(int argc, char **argv) {
       HfstTransducer foo(mut);
       assert (HfstTransducer::test_equivalence(tr, foo));
     }
-    printf("Two-string constructors tested on transducers of type %i.\n", types[i]);
+    //printf("Two-string constructors tested on transducers of type %i.\n", types[i]);
+    {
+      HfstTransducer *pt = new HfstTransducer(types[i]);
+      delete pt;
+    }
+    printf("Constructors and delete tested on transducers of type %i.\n", types[i]);
   }
 
   {
@@ -390,45 +396,6 @@ int main(int argc, char **argv) {
       test_function(&HfstTransducer::minimize, test0, test1, test2, test3);
       printf("minimize tested\n");
 
-
-      /* ----- set_final_weights -----
-      {
-	HfstTransducer test0s = HfstTransducer(test0).set_final_weight(0.5);
-	HfstTransducer test1s = HfstTransducer(test1).set_final_weight(0.5);
-	HfstTransducer test2s = HfstTransducer(test2).set_final_weight(0.5);
-	HfstTransducer test3s = HfstTransducer(test3).set_final_weight(0.5);
-	
-	assert ( test0s.get_type() !=
-		 test1s.get_type() !=
-		 test2s.get_type() !=
-		 test3s.get_type() );
-	
-	assert (HfstTransducer::test_equivalence( test0, test0s ) );
-	assert (HfstTransducer::test_equivalence( test1s, test2s ) );
-	assert (HfstTransducer::test_equivalence( test0, test3s ) );	
-      }
-      printf("set_final_weights tested\n");
-
-
-      // ----- transform weights -----
-      {	
-	HfstTransducer test0s = HfstTransducer(test0).transform_weights(&func);
-	HfstTransducer test1s = HfstTransducer(test1).transform_weights(&func);
-	HfstTransducer test2s = HfstTransducer(test2).transform_weights(&func);
-	HfstTransducer test3s = HfstTransducer(test3).transform_weights(&func);
-	
-	assert ( test0s.get_type() !=
-		 test1s.get_type() !=
-		 test2s.get_type() !=
-		 test3s.get_type() );
-	
-	assert (HfstTransducer::test_equivalence( test0, test0s ) );
-	assert (HfstTransducer::test_equivalence( test1s, test2s ) );
-	assert (HfstTransducer::test_equivalence( test0, test3s ) );	
-      }
-      printf("transform_weights tested\n"); */
-
-
       // ----- write_in_att_format and read_in_att_format -----
       {
 	FILE * ofile = fopen("test_transducer2.att", "wb");
@@ -467,6 +434,19 @@ int main(int argc, char **argv) {
       }
       printf("write_in_att_format and read_in_att_format tested\n");
 
+      // this test is too sensitive for differences in the number of tabs/spaces
+      // basically this function is tested in write_in_att_format and read_in_att_format 
+      /* ----- operator<< -----
+      {
+	std::filebuf fb;
+	fb.open ("foo",std::ios::out);
+	std::ostream os(&fb);
+	os << test0 << "--\n" << test1 << "--\n" << test2 << "--\n" << test3;	
+	fb.close();
+	// note: the return value of 'system(char*)' is system-dependent
+	assert ( 0 == system("diff foo operator_ltlt_test.att") );
+      }
+      printf("operator<< tested\n"); */
 
       // ----- -----
       //test_function(&HfstTransducer::*, test0, test1, test2, test3);

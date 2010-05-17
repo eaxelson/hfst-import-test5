@@ -44,7 +44,6 @@ namespace implementations
     bool is_good(void) const;
     bool is_fst(void) const;
     bool operator() (void) const;
-    //StdVectorFst * read_transducer(KeyTable &key_table);
     StdVectorFst * read_transducer(bool has_header);
   };
 
@@ -84,20 +83,14 @@ namespace implementations
     {
     protected:
       StdArc arc;
-      //StateId source_state;
       StdVectorFst * t;
     public:
       TropicalWeightTransition(const StdArc &arc, StdVectorFst *t);
       ~TropicalWeightTransition(void);
-      //TropicalWeightTransition(const StdArc &arc, 
-      //			       StateId source_state, 
-      //		       StdVectorFst * t);*/
       std::string get_input_symbol(void) const;
       std::string get_output_symbol(void) const;
       TropicalWeightState get_target_state(void) const;
-      //TropicalWeightState get_source_state(void) const;
       TropicalWeight get_weight(void) const;
-      //void print(KeyTable &key_table, ostream &out) 
     };
 
 
@@ -105,19 +98,10 @@ namespace implementations
     {
     protected:
       ArcIterator<StdVectorFst> * arc_iterator;
-      //StateId state;
       StdVectorFst * t;
-      //bool end_iterator;
     public:
       TropicalWeightTransitionIterator(StdVectorFst * t, StateId state);
-      //TropicalWeightTransitionIterator(void);
       ~TropicalWeightTransitionIterator(void);
-      //void operator=  (const TropicalWeightTransitionIterator &another);
-      //bool operator== (const TropicalWeightTransitionIterator &another);
-      //bool operator!= (const TropicalWeightTransitionIterator &another);
-      //const TropicalWeightTransition operator* (void);
-      //void operator++ (void);
-      //void operator++ (int);
       void next(void);
       bool done(void);
       TropicalWeightTransition value(void);
@@ -129,14 +113,8 @@ namespace implementations
     public:
       static StdVectorFst * create_empty_transducer(void);
       static StdVectorFst * create_epsilon_transducer(void);
-      static StdVectorFst * define_transducer(Key k);
-      static StdVectorFst * define_transducer(const KeyPair &kp);
-
-      // for testing
       static StdVectorFst * define_transducer(const std::string &symbol);
       static StdVectorFst * define_transducer(const std::string &isymbol, const std::string &osymbol);
-
-      static StdVectorFst * define_transducer(const KeyPairVector &kpv);
       static StdVectorFst * define_transducer(const StringPairVector &spv);
       static StdVectorFst * copy(StdVectorFst * t);
       static StdVectorFst * determinize(StdVectorFst * t);
@@ -154,10 +132,6 @@ namespace implementations
       static StdVectorFst * extract_output_language(StdVectorFst * t);
       static void extract_strings(StdVectorFst * t, KeyTable &kt,
 				  WeightedStrings<float>::Set &results);
-      static StdVectorFst * substitute(StdVectorFst * t,Key old_key,Key new_key);
-      static StdVectorFst * substitute(StdVectorFst * t,
-			      KeyPair old_key_pair,
-			      KeyPair new_key_pair);
       static StdVectorFst * compose(StdVectorFst * t1,
 				   StdVectorFst * t2);
       static StdVectorFst * concatenate(StdVectorFst * t1,
@@ -169,23 +143,30 @@ namespace implementations
       static StdVectorFst * subtract(StdVectorFst * t1,
 			    StdVectorFst * t2);
       static StdVectorFst * set_weight(StdVectorFst * t,float f);
-      //typedef TropicalWeightStateIterator const_iterator;
-      //static const_iterator begin(StdVectorFst * t);
-      //static const_iterator end(StdVectorFst * t);
-      //static StdVectorFst * harmonize(StdVectorFst * t,KeyMap &key_map);
+      static StdVectorFst * transform_weights(StdVectorFst * t,float (*func)(float f));
 
       static std::pair<StdVectorFst*, StdVectorFst*> harmonize(StdVectorFst *t1, StdVectorFst *t2);
-      static void print(StdVectorFst * t, KeyTable &key_table, ostream &out);
-      static void print_test(StdVectorFst * t);
-      static void print_test(StdVectorFst * t, FILE *ofile);
+
+      static void write_in_att_format(StdVectorFst * t, FILE *ofile);
+      static void write_in_att_format(StdVectorFst * t, std::ostream &os);
       static StdVectorFst * read_in_att_format(FILE *ifile);
       static bool test_equivalence(StdVectorFst *one, StdVectorFst *another);
+      static StdVectorFst * substitute(StdVectorFst * t, std::string old_symbol, std::string new_symbol);
+      static StdVectorFst * substitute(StdVectorFst * t,
+				       StringSymbolPair old_symbol_pair,
+				       StringSymbolPair new_symbol_pair);
 
-    protected:
       static StringSymbolSet get_string_symbol_set(StdVectorFst *t);
       static KeyMap create_mapping(StdVectorFst * t1, StdVectorFst * t2);
       static void recode_symbol_numbers(StdVectorFst * t, KeyMap &km);      
       static StdVectorFst * expand_arcs(StdVectorFst * t, StringSymbolSet &unknown);
+      static StdVectorFst * substitute(StdVectorFst * t,Key old_key,Key new_key);
+      static StdVectorFst * substitute(StdVectorFst * t,
+				       KeyPair old_key_pair,
+				       KeyPair new_key_pair);
+      static StdVectorFst * define_transducer(Key k);
+      static StdVectorFst * define_transducer(const KeyPair &kp);
+      static StdVectorFst * define_transducer(const KeyPairVector &kpv);
 
     private:
       static fst::SymbolTable * create_symbol_table(std::string name);
@@ -202,9 +183,6 @@ namespace implementations
       static StateId get_initial_state(StdVectorFst *t);
       static void represent_empty_transducer_as_having_one_state(StdVectorFst *t);      
 
-      /*static StdVectorFst * expand_unknown(StdVectorFst *t, key_table &key_table,
-	StringSymbolSet &expand_unknown,
-	StringSymbolPairSet &expand_non_identity);*/
     };
 
 } }
