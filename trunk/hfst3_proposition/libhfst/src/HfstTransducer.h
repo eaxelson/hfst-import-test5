@@ -42,6 +42,7 @@ namespace hfst
     ERROR_TYPE
   };
 
+  // remove
   enum WeightType
   {
     BOOL,
@@ -134,7 +135,7 @@ namespace hfst
 
     bool anonymous;
     KeyTable key_table;
-    bool is_trie; // not used 
+    bool is_trie;
 
     TransducerImplementation implementation; 
 
@@ -152,8 +153,6 @@ namespace hfst
     HfstTransducer(const std::string& utf8_str, 
     		   const HfstTokenizer &multichar_symbol_tokenizer,
 		   ImplementationType type);
-    //HfstTransducer(KeyPairVector * kpv, 
-    //		   ImplementationType type);
     HfstTransducer(const std::string& upper_utf8_str,
     		   const std::string& lower_utf8_str,
     		   const HfstTokenizer &multichar_symbol_tokenizer,
@@ -171,12 +170,11 @@ namespace hfst
     /** A transducer that recognizes the string pair "isymbol:osymbol". **/
     HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type);
 
-    // for testing
-    void print(void);
-
     static bool test_equivalence(HfstTransducer &one, HfstTransducer &another);
+
     void write_in_att_format(FILE * f);
     static HfstTransducer &read_in_att_format(FILE * f);
+
     void write_in_att_format(const char * filename);
     static HfstTransducer &read_in_att_format(const char * filename);
 
@@ -204,14 +202,17 @@ namespace hfst
     HfstTransducer &reverse(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &input_project(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &output_project(ImplementationType type=UNSPECIFIED_TYPE);
+
     void extract_strings(WeightedStrings<float>::Set &results);
-    HfstTransducer &substitute(Key old_key, Key new_key);
+
     HfstTransducer &substitute(const std::string &old_symbol,
 			       const std::string &new_symbol);
-    HfstTransducer &substitute(const KeyPair &old_key_pair, 
-			       const KeyPair &new_key_pair);
     HfstTransducer &substitute(const StringSymbolPair &old_symbol_pair,
 			       const StringSymbolPair &new_symbol_pair);
+    HfstTransducer &substitute(const StringSymbolPair &symbol_pair,
+			       const HfstTransducer &transducer);
+    HfstTransducer &transform_weights(float (*func)(float));
+
     HfstTransducer &compose(HfstTransducer &another,
 			    ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &concatenate(HfstTransducer &another,
@@ -222,21 +223,25 @@ namespace hfst
 			      ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &subtract(HfstTransducer &another,
 			     ImplementationType type=UNSPECIFIED_TYPE);
-    WeightType get_weight_type(void);
 
-    template<class W> HfstTransducer &set_final_weight(W weight) 
-      { (void)weight; 
-	throw hfst::implementations::FunctionNotImplementedException(); }
+    /*    WeightType get_weight_type(void);
 
-    template<class W> HfstTransducer &transform_weights(W (*func)(W weight)) 
+    template<class W> HfstTransducer &set_final_weight(W weight) {
+      (void)weight; 
+      throw hfst::implementations::FunctionNotImplementedException(); }*/
+
+    //HfstTransducer &set_final_weights(float weight);
+    //HfstTransducer &transform_weights(float (*func)(float weight));
+    
+    /*  template<class W> HfstTransducer &transform_weights(W (*func)(W weight)) 
       { (void)func; 
-	throw hfst::implementations::FunctionNotImplementedException(); }
+      throw hfst::implementations::FunctionNotImplementedException(); }*/
 
-    template<class T> typename T::const_iterator begin(void)
+    /*template<class T> typename T::const_iterator begin(void)
       { throw hfst::implementations::FunctionNotImplementedException(); }
 
     template<class T> typename T::const_iterator end(void)
-      { throw hfst::implementations::FunctionNotImplementedException(); }
+    { throw hfst::implementations::FunctionNotImplementedException(); }*/
 
     //HfstTransducer &anonymize(void);
     //KeyTable &get_key_table(void);
@@ -324,11 +329,11 @@ namespace hfst
   };
 
 
-  template<> 
+  /*template<> 
     HfstTransducer &HfstTransducer::set_final_weight<float>(float weight);
 
   template<> 
-    HfstTransducer &HfstTransducer::transform_weights<float>(float (*func)(float));
+  HfstTransducer &HfstTransducer::transform_weights<float>(float (*func)(float));*/
 
   std::ostream &operator<<(std::ostream &out,HfstTransducer &t);
 }

@@ -59,14 +59,7 @@ namespace hfst { namespace implementations
     return;
   }
 
-  /* For debugging. */
-  void TropicalWeightTransducer::print_test(StdVectorFst *t) 
-  {
-    print_test(t, stderr);
-  }
-
-  // FIX: change the name to print_att or something like that...
-  void TropicalWeightTransducer::print_test(StdVectorFst *t, FILE *ofile)
+  void TropicalWeightTransducer::write_in_att_format(StdVectorFst *t, FILE *ofile)
   {
 
     SymbolTable *sym = t->InputSymbols();
@@ -141,6 +134,91 @@ namespace hfst { namespace implementations
 	    }
 	  if (t->Final(s) != TropicalWeight::Zero())
 	    fprintf(ofile, "%i\t%f\n", origin, t->Final(s).Value());
+	}
+      }
+  }
+
+  void TropicalWeightTransducer::write_in_att_format(StdVectorFst *t, std::ostream &os)
+  {
+
+    SymbolTable *sym = t->InputSymbols();
+
+    // this takes care that initial state is always printed as number zero
+    // and state number zero (if it is not initial) is printed as another number
+    // (basically as the number of the initial state in that case, i.e.
+    // the numbers of initial state and state number zero are swapped)
+    StateId zero_print=0;
+    StateId initial_state = t->Start();
+    if (initial_state != 0) {
+      zero_print = initial_state;
+    }
+      
+    for (fst::StateIterator<StdVectorFst> siter(*t); 
+	 not siter.Done(); siter.Next()) 
+      {
+	StateId s = siter.Value();
+	if (s == initial_state) {
+	int origin;  // how origin state is printed, see the first comment
+	if (s == 0)
+	  origin = zero_print;
+	else if (s == initial_state)
+	  origin = 0;
+	else
+	  origin = (int)s;
+	for (fst::ArcIterator<StdVectorFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+	  {
+	    const StdArc &arc = aiter.Value();
+	    int target;  // how target state is printed, see the first comment
+	    if (arc.nextstate == 0)
+	      target = zero_print;
+	    else if (arc.nextstate == initial_state)
+	      target = 0;
+	    else
+	      target = (int)arc.nextstate;
+	    os << origin << "\t" 
+	       << target << "\t" 
+	       << sym->Find(arc.ilabel).c_str() << "\t"
+	       << sym->Find(arc.olabel).c_str() << "\t" 
+	       << arc.weight.Value() << "\n";
+	  }
+	if (t->Final(s) != TropicalWeight::Zero())
+	  os << origin << "\t"
+	     << t->Final(s).Value() << "\n";
+	break;
+	}
+      }
+
+    for (fst::StateIterator<StdVectorFst> siter(*t); 
+	 not siter.Done(); siter.Next())
+      {
+	StateId s = siter.Value();
+	if (s != initial_state) {
+	  int origin;  // how origin state is printed, see the first comment
+	  if (s == 0)
+	    origin = zero_print;
+	  else if (s == initial_state)
+	    origin = 0;
+	  else
+	    origin = (int)s;
+	  for (fst::ArcIterator<StdVectorFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+	    {
+	      const StdArc &arc = aiter.Value();
+	      int target;  // how target state is printed, see the first comment
+	      if (arc.nextstate == 0)
+		target = zero_print;
+	      else if (arc.nextstate == initial_state)
+		target = 0;
+	      else
+		target = (int)arc.nextstate;
+	      os << origin << "\t" 
+		 << target << "\t"
+		 << sym->Find(arc.ilabel).c_str() << "\t"
+		 << sym->Find(arc.olabel).c_str() << "\t"
+		 << arc.weight.Value() << "\n";
+	    }
+	  if (t->Final(s) != TropicalWeight::Zero())
+	    os << origin << "\t"
+	       << t->Final(s).Value() << "\n";
 	}
       }
   }
@@ -1184,6 +1262,27 @@ namespace hfst { namespace implementations
     return new StdVectorFst(dec);
   }
 
+  StdVectorFst * TropicalWeightTransducer::substitute(StdVectorFst *t,
+						      std::string old_symbol,
+						      std::string new_symbol)
+  {
+    SymbolTable * st = t->InputSymbols();
+    return substitute(t, st->AddSymbol(old_symbol), st->AddSymbol(new_symbol));
+  }
+
+  StdVectorFst * TropicalWeightTransducer::substitute(StdVectorFst *t,
+						      StringSymbolPair old_symbol_pair,
+						      StringSymbolPair new_symbol_pair)
+  {
+    SymbolTable * st = t->InputSymbols();
+    KeyPair old_pair(st->AddSymbol(old_symbol_pair.first),
+		     st->AddSymbol(old_symbol_pair.second));
+    KeyPair new_pair(st->AddSymbol(new_symbol_pair.first),
+		     st->AddSymbol(new_symbol_pair.second));
+    return substitute(t, old_pair, new_pair);
+  }
+
+
   StdVectorFst * TropicalWeightTransducer::compose(StdVectorFst * t1,
 			 StdVectorFst * t2)
   {
@@ -1316,15 +1415,6 @@ namespace hfst { namespace implementations
       }
   }
   */
-
-  void TropicalWeightTransducer::print
-  (StdVectorFst * t, KeyTable &key_table, ostream &out) 
-  {
-    (void)t;
-    (void)key_table;
-    (void)out;
-    return; // dummy implementation
-  }
 
 
 #ifdef foo

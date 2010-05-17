@@ -753,7 +753,7 @@ type(type),anonymous(false),is_trie(false)
       }
   }
 
-  HfstTransducer &HfstTransducer::substitute
+/*  HfstTransducer &HfstTransducer::substitute
   (Key old_key,Key new_key)
   { return apply 
       (&hfst::implementations::SfstTransducer::substitute,
@@ -761,31 +761,30 @@ type(type),anonymous(false),is_trie(false)
        &hfst::implementations::LogWeightTransducer::substitute,
        &hfst::implementations::FomaTransducer::substitute,
        old_key,new_key,
-       this->type); }
+       this->type); }*/
 
   HfstTransducer &HfstTransducer::substitute
   (const std::string &old_symbol, const std::string &new_symbol)
-  { return apply 
-      (&hfst::implementations::SfstTransducer::substitute,
-       &hfst::implementations::TropicalWeightTransducer::substitute,
-       &hfst::implementations::LogWeightTransducer::substitute,
-       &hfst::implementations::FomaTransducer::substitute,
-       key_table.add_symbol(old_symbol),key_table.add_symbol(new_symbol),
-       this->type); }
+  {
+  }
 
   HfstTransducer &HfstTransducer::substitute
   (const StringSymbolPair &old_symbol_pair, 
    const StringSymbolPair &new_symbol_pair)
-  { return apply 
-      (&hfst::implementations::SfstTransducer::substitute,
-       &hfst::implementations::TropicalWeightTransducer::substitute,
-       &hfst::implementations::LogWeightTransducer::substitute,
-       &hfst::implementations::FomaTransducer::substitute,
-       key_table.get_key_pair(old_symbol_pair),
-       key_table.get_key_pair(new_symbol_pair),
-       this->type); }
+  { 
+  }
 
   HfstTransducer &HfstTransducer::substitute
+  (const StringSymbolPair &symbol_pair,
+   const HfstTransducer &transducer)
+  {    
+  }
+
+  HfstTransducer &HfstTransducer::transform_weights(float (*func)(float))
+  {
+  }
+
+  /*  HfstTransducer &HfstTransducer::substitute
   (const KeyPair &old_key_pair,const KeyPair &new_key_pair)
   { return apply 
       (&hfst::implementations::SfstTransducer::substitute,
@@ -793,7 +792,7 @@ type(type),anonymous(false),is_trie(false)
        &hfst::implementations::LogWeightTransducer::substitute,
        &hfst::implementations::FomaTransducer::substitute,
        old_key_pair,new_key_pair,
-       this->type); }
+       this->type); }*/
 
   HfstTransducer &HfstTransducer::compose
   (HfstTransducer &another,
@@ -942,6 +941,7 @@ type(type),anonymous(false),is_trie(false)
     anonymous = false;
     }*/
 
+/*
   WeightType HfstTransducer::get_weight_type(void)
   {
     switch (type)
@@ -965,11 +965,46 @@ type(type),anonymous(false),is_trie(false)
       }
   }
 
+  HfstTransducer &HfstTransducer::set_final_weights(float weight) 
+  {
+    switch (type)
+      {
+      case SFST_TYPE:
+	return *this;
+	break;
+      case TROPICAL_OFST_TYPE:
+	{
+	  fst::StdVectorFst * temp =
+	    hfst::implementations::TropicalWeightTransducer::set_weight
+	    (implementation.tropical_ofst,weight); 
+	  delete implementation.tropical_ofst;
+	  implementation.tropical_ofst = temp;
+	  break;
+	}
+      case LOG_OFST_TYPE:
+	{
+	  hfst::implementations::LogFst * temp =
+	    hfst::implementations::LogWeightTransducer::set_weight
+	    (implementation.log_ofst,weight); 
+	  delete implementation.log_ofst;
+	  implementation.log_ofst = temp;
+	  break;
+	}
+      case FOMA_TYPE:
+	return *this;
+	break;
+	case UNSPECIFIED_TYPE:
+	case ERROR_TYPE:
+	default:
+	  throw hfst::exceptions::TransducerHasWrongTypeException();
+      }
+  }
+
   template<> HfstTransducer &HfstTransducer::set_final_weight<float>
   (float weight)
   { 
     if (get_weight_type() != FLOAT)
-      { throw hfst::implementations::WeightTypeMismatchException(); }
+      throw hfst::implementations::WeightTypeMismatchException(); 
     switch (type)
       {
       case TROPICAL_OFST_TYPE:
@@ -998,6 +1033,40 @@ type(type),anonymous(false),is_trie(false)
     return *this; 
   }
 
+  HfstTransducer &HfstTransducer::transform_weights(float(*func)(float))
+  {
+    switch (type)
+      {
+      case SFST_TYPE:
+	return *this;
+	break;
+      case TROPICAL_OFST_TYPE:
+	{
+	  fst::StdVectorFst * temp =
+	    hfst::implementations::TropicalWeightTransducer::transform_weights
+	    (implementation.tropical_ofst,func); 
+	  delete implementation.tropical_ofst;
+	  implementation.tropical_ofst = temp;
+	  break;
+	}
+      case LOG_OFST_TYPE:
+	{
+	  hfst::implementations::LogFst * temp =
+	    hfst::implementations::LogWeightTransducer::transform_weights
+	    (implementation.log_ofst,func); 
+	  delete implementation.log_ofst;
+	  implementation.log_ofst = temp;
+	  break;
+	}
+      case FOMA_TYPE:
+	return *this;
+	break;
+	case UNSPECIFIED_TYPE:
+	case ERROR_TYPE:
+	default:
+	  throw hfst::exceptions::TransducerHasWrongTypeException();
+      }
+  }
 
   template<> HfstTransducer &HfstTransducer::transform_weights<float>
   (float(*func)(float))
@@ -1039,7 +1108,7 @@ type(type),anonymous(false),is_trie(false)
       { throw hfst::implementations::TransducerHasWrongTypeException(); }
     return SfstTransducer::end(implementation.sfst); 
   }
-
+*/
   HfstTransducer &HfstTransducer::convert(ImplementationType type)
   {
     if (type == UNSPECIFIED_TYPE)
@@ -1108,8 +1177,7 @@ type(type),anonymous(false),is_trie(false)
     return *this;
   }
 
-  /* THIS SHOULD WORK AS WELL
-  std::ostream &operator<<(std::ostream &out,HfstTransducer &T)
+/*  std::ostream &operator<<(std::ostream &out,HfstTransducer &T)
   {
     HfstMutableTransducer t(T);
     HfstStateIterator it(t);
@@ -1118,19 +1186,20 @@ type(type),anonymous(false),is_trie(false)
       HfstTransitionIterator IT(t,s);
       while (not IT.done()) {
 	HfstTransition tr = IT.value();
-	cout << s << "\t" << tr.get_target_state() << "\t"
-	     << tr.get_input_symbol() << "\t" << tr.get_output_symbol()
-	     << "\t" << tr.get_weight();
-	cout << "\n";
+	out << s << "\t" << tr.get_target_state() << "\t"
+	    << tr.get_input_symbol() << "\t" << tr.get_output_symbol()
+	    << "\t" << tr.get_weight();
+	out << "\n";
 	IT.next();
       }
       if ( t.is_final(s) )
 	cout << s << "\t" << t.get_final_weight(s) << "\n";
       it.next();
     }
-    delete t;
-  }
-  */
+    return out;
+    }*/
+
+
 
 void HfstTransducer::write_in_att_format(const char * filename)
 {
@@ -1138,7 +1207,7 @@ void HfstTransducer::write_in_att_format(const char * filename)
   if (ofile == NULL)
     throw FileNotReadableException();
   HfstTransducer conv = this->convert(TROPICAL_OFST_TYPE);
-  this->tropical_ofst_interface.print_test
+  this->tropical_ofst_interface.write_in_att_format
     (conv.implementation.tropical_ofst, ofile);
   fclose(ofile);
 }
@@ -1146,7 +1215,7 @@ void HfstTransducer::write_in_att_format(const char * filename)
 void HfstTransducer::write_in_att_format(FILE * ofile)
 {
   HfstTransducer conv = this->convert(TROPICAL_OFST_TYPE);
-  this->tropical_ofst_interface.print_test
+  this->tropical_ofst_interface.write_in_att_format
     (conv.implementation.tropical_ofst, ofile);
 }
 
@@ -1168,7 +1237,7 @@ HfstTransducer &HfstTransducer::read_in_att_format(FILE * ifile)
   return *retval;
 }
 
-void HfstTransducer::print(void) 
+/*void HfstTransducer::print(void) 
   {
     switch (this->type)
       {
@@ -1193,30 +1262,13 @@ void HfstTransducer::print(void)
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
      }
-  }
+     }*/
 
-  std::ostream &operator<<(std::ostream &out,HfstTransducer &t)
+std::ostream &operator<<(std::ostream &out,HfstTransducer &t)
   {
-    switch (t.type)
-      {
-      case FOMA_TYPE:
-	throw hfst::exceptions::FunctionNotImplementedException();
-      case SFST_TYPE:
-	t.sfst_interface.print(t.implementation.sfst,t.key_table,out);
-	break;
-      case TROPICAL_OFST_TYPE:
-	t.tropical_ofst_interface.print
-	  (t.implementation.tropical_ofst,t.key_table,out);
-	break;
-      case LOG_OFST_TYPE:
-	t.log_ofst_interface.print
-	  (t.implementation.log_ofst,t.key_table,out);
-	break;
- 	case UNSPECIFIED_TYPE:
-	case ERROR_TYPE:
-	default:
-	  throw hfst::exceptions::TransducerHasWrongTypeException();
-     }
+    HfstTransducer tc(t);
+    tc.convert(TROPICAL_OFST_TYPE);
+    tc.tropical_ofst_interface.write_in_att_format(tc.implementation.tropical_ofst, out);
     return out;
   }
 
