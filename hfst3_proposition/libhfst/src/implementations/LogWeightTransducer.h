@@ -183,10 +183,17 @@ namespace hfst { namespace implementations
       static LogFst * reverse(LogFst * transducer);
       static LogFst * extract_input_language(LogFst * t);
       static LogFst * extract_output_language(LogFst * t);
+
       static LogFst * substitute(LogFst * t,Key old_key,Key new_key);
       static LogFst * substitute(LogFst * t,
 			      KeyPair old_key_pair,
 			      KeyPair new_key_pair);
+
+      static LogFst * substitute(LogFst * t, StringSymbol old_symbol, StringSymbol new_symbol);
+      static LogFst * substitute(LogFst * t,
+			      StringSymbolPair old_symbol_pair,
+			      StringSymbolPair new_symbol_pair);
+
       static LogFst * compose(LogFst * t1,
 				   LogFst * t2);
       static LogFst * concatenate(LogFst * t1,

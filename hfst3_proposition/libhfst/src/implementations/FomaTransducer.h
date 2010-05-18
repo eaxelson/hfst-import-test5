@@ -194,10 +194,9 @@ namespace hfst {
       static fsm * reverse(fsm * t);
       static fsm * extract_input_language(fsm * t);
       static fsm * extract_output_language(fsm * t);
-      static fsm * substitute(fsm * t,Key old_key,Key new_key);  // not done
-      static fsm * substitute(fsm * t,                           // not done
-			      KeyPair old_key_pair,
-			      KeyPair new_key_pair);
+
+      static fsm * substitute(fsm * t,StringSymbol old_symbol,StringSymbol new_symbol);
+
       static fsm * compose(fsm * t1,
 			   fsm * t2);
       static fsm * concatenate(fsm * t1,

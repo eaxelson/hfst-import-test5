@@ -415,16 +415,11 @@ namespace hfst { namespace implementations {
     return fsm_lower(fsm_copy(t));
   }
   
-  fsm * FomaTransducer::substitute(fsm * t,Key old_key,Key new_key)
+  fsm * FomaTransducer::substitute(fsm * t,StringSymbol old_symbol,StringSymbol new_symbol)
   {
-    throw hfst::exceptions::FunctionNotImplementedException();
+    return fsm_substitute_symbol(t, strdup(old_symbol.c_str()), strdup(new_symbol.c_str()));
   }
   
-  fsm * FomaTransducer::substitute
-  (fsm * t,KeyPair old_key_pair,KeyPair new_key_pair)
-  { 
-    throw hfst::exceptions::FunctionNotImplementedException();
-  }
   
   fsm * FomaTransducer::compose
   (fsm * t1, fsm * t2)

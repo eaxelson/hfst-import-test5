@@ -610,7 +610,6 @@ type(type),anonymous(false),is_trie(false)
     onecopy.convert(TROPICAL_OFST_TYPE);
     anothercopy.convert(TROPICAL_OFST_TYPE);
     onecopy.harmonize(anothercopy);
-
     return tropical_ofst_interface.test_equivalence(
 	     onecopy.implementation.tropical_ofst,
 	     anothercopy.implementation.tropical_ofst);
@@ -764,24 +763,46 @@ type(type),anonymous(false),is_trie(false)
        this->type); }*/
 
   HfstTransducer &HfstTransducer::substitute
-  (const std::string &old_symbol, const std::string &new_symbol)
+  (const std::string &old_symbol, const std::string &new_symbol, ImplementationType type)
   {
+    convert(TROPICAL_OFST_TYPE);
+    fst::StdVectorFst * tropical_ofst_temp =
+      this->tropical_ofst_interface.substitute(implementation.tropical_ofst,old_symbol,new_symbol);
+    delete implementation.tropical_ofst;
+    implementation.tropical_ofst = tropical_ofst_temp;
+    return *this;
   }
 
   HfstTransducer &HfstTransducer::substitute
   (const StringSymbolPair &old_symbol_pair, 
    const StringSymbolPair &new_symbol_pair)
   { 
+    convert(TROPICAL_OFST_TYPE);
+    fst::StdVectorFst * tropical_ofst_temp =
+      this->tropical_ofst_interface.substitute(implementation.tropical_ofst,old_symbol_pair,new_symbol_pair);
+    delete implementation.tropical_ofst;
+    implementation.tropical_ofst = tropical_ofst_temp;
+    return *this;
   }
 
   HfstTransducer &HfstTransducer::substitute
   (const StringSymbolPair &symbol_pair,
-   const HfstTransducer &transducer)
+   HfstTransducer &transducer)
   {    
+    convert(TROPICAL_OFST_TYPE);
+    transducer.convert(TROPICAL_OFST_TYPE);
+    this->harmonize(transducer);
+    implementation.tropical_ofst  =
+      this->tropical_ofst_interface.substitute(this->implementation.tropical_ofst,symbol_pair,transducer.implementation.tropical_ofst);
+    return *this;
   }
 
   HfstTransducer &HfstTransducer::transform_weights(float (*func)(float))
   {
+    convert(TROPICAL_OFST_TYPE);
+    implementation.tropical_ofst  =
+      this->tropical_ofst_interface.transform_weights(this->implementation.tropical_ofst, func);
+    return *this;
   }
 
   /*  HfstTransducer &HfstTransducer::substitute
