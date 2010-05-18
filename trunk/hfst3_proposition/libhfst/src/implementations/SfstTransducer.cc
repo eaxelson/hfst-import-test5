@@ -676,6 +676,10 @@ namespace hfst { namespace implementations {
   Transducer * SfstTransducer::substitute(Transducer * t,Key old_key,Key new_key)
   { return &t->replace_char(old_key,new_key); }
   
+  Transducer * SfstTransducer::substitute(Transducer * t,StringSymbol old_symbol,StringSymbol new_symbol)
+  { Transducer * retval = &t->replace_char(t->alphabet.add_symbol(old_symbol.c_str()),t->alphabet.add_symbol(new_symbol.c_str())); 
+    return retval; }
+
   Transducer * SfstTransducer::substitute
   (Transducer * t,KeyPair old_key_pair,KeyPair new_key_pair)
   { 

@@ -328,23 +328,18 @@ int main(int argc, char **argv) {
       test_function(&HfstTransducer::output_project, test0, test1, test2, test3);
       printf("output_project tested\n");
 
-      /* ----- substitute string -----
+      // ----- substitute string -----
       {
-	HfstTransducer test0s = HfstTransducer(test0).substitute("a", "e");
-	HfstTransducer test1s = HfstTransducer(test1).substitute("a", "e");
-	HfstTransducer test2s = HfstTransducer(test2).substitute("a", "e");
-	HfstTransducer test3s = HfstTransducer(test3).substitute("a", "e");
-	
-	assert ( test0s.get_type() !=
-		 test1s.get_type() !=
-		 test2s.get_type() !=
-		 test3s.get_type() );
+	HfstTransducer test0s = HfstTransducer(test0).substitute("a", "e", test0.get_type());
+	HfstTransducer test1s = HfstTransducer(test1).substitute("a", "e", test1.get_type());
+	HfstTransducer test2s = HfstTransducer(test2).substitute("a", "e", test2.get_type());
+	HfstTransducer test3s = HfstTransducer(test3).substitute("a", "e", test3.get_type());
 	
 	assert (HfstTransducer::test_equivalence( test0s, test1s ) );
 	assert (HfstTransducer::test_equivalence( test0s, test2s ) );
 	assert (HfstTransducer::test_equivalence( test0s, test3s ) );
       }
-      printf("substitute(String) tested\n");
+      printf("substitute(string) tested\n");
 
       // ----- substitute string pair -----
       {
@@ -353,16 +348,42 @@ int main(int argc, char **argv) {
 	HfstTransducer test2s = HfstTransducer(test2).substitute(StringSymbolPair("a", "b"), StringSymbolPair("e", "f"));
 	HfstTransducer test3s = HfstTransducer(test3).substitute(StringSymbolPair("a", "b"), StringSymbolPair("e", "f"));
 	
-	assert ( test0s.get_type() !=
-		 test1s.get_type() !=
-		 test2s.get_type() !=
-		 test3s.get_type() );
+	assert (HfstTransducer::test_equivalence( test0s, test1s ) );
+	assert (HfstTransducer::test_equivalence( test0s, test2s ) );
+	assert (HfstTransducer::test_equivalence( test0s, test3s ) );
+      }
+      printf("substitute(StringPair) tested\n");
+
+      // ----- substitute string pair with transducer -----
+      {
+	StringSymbolPair ssp("a", "b");
+	HfstTransducer r0(test0);
+	HfstTransducer r1(test1);
+	HfstTransducer r2(test2);
+	HfstTransducer r3(test3);
+	HfstTransducer test0s = HfstTransducer(test0).substitute(ssp, r3);
+	HfstTransducer test1s = HfstTransducer(test1).substitute(ssp, r2);
+	HfstTransducer test2s = HfstTransducer(test2).substitute(ssp, r1);
+	HfstTransducer test3s = HfstTransducer(test3).substitute(ssp, r0);
 	
 	assert (HfstTransducer::test_equivalence( test0s, test1s ) );
 	assert (HfstTransducer::test_equivalence( test0s, test2s ) );
 	assert (HfstTransducer::test_equivalence( test0s, test3s ) );
       }
-      printf("substitute(StringPair) tested\n");*/
+      printf("substitute(StringPair, HfstTransducer) tested\n");
+
+      // ----- transform_weights -----
+      { 
+	HfstTransducer test0s = HfstTransducer(test0).transform_weights(&func);
+	HfstTransducer test1s = HfstTransducer(test1).transform_weights(&func);
+	HfstTransducer test2s = HfstTransducer(test2).transform_weights(&func);
+	HfstTransducer test3s = HfstTransducer(test3).transform_weights(&func);
+
+	assert (HfstTransducer::test_equivalence( test0s, test1s ) );
+	assert (HfstTransducer::test_equivalence( test0s, test2s ) );
+	assert (HfstTransducer::test_equivalence( test0s, test3s ) );
+      }
+      printf("transform_weights tested\n");
 
       // ----- compose -----
       test_function(&HfstTransducer::compose, test0, test1, test2, test3);

@@ -750,6 +750,31 @@ namespace hfst { namespace implementations
     return new LogFst(dec);
   }
 
+
+  LogFst * LogWeightTransducer::substitute(LogFst *t,
+					   std::string old_symbol,
+					   std::string new_symbol)
+  {
+    SymbolTable * st = t->InputSymbols();
+    return substitute(t, st->AddSymbol(old_symbol), st->AddSymbol(new_symbol));
+  }
+
+  LogFst * LogWeightTransducer::substitute(LogFst *t,
+					   StringSymbolPair old_symbol_pair,
+					   StringSymbolPair new_symbol_pair)
+  {
+    SymbolTable * st = t->InputSymbols();
+    KeyPair old_pair(st->AddSymbol(old_symbol_pair.first),
+		     st->AddSymbol(old_symbol_pair.second));
+    KeyPair new_pair(st->AddSymbol(new_symbol_pair.first),
+		     st->AddSymbol(new_symbol_pair.second));
+    LogFst * retval = substitute(t, old_pair, new_pair);
+    retval->SetInputSymbols( new SymbolTable ( *(t->InputSymbols()) ) );
+    return retval;
+  }
+
+
+
   LogFst * LogWeightTransducer::compose(LogFst * t1,
 					LogFst * t2)
   {

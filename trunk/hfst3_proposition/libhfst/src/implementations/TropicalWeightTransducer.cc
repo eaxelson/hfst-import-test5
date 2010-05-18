@@ -59,6 +59,28 @@ namespace hfst { namespace implementations
     return;
   }
 
+  StdVectorFst * TropicalWeightTransducer::transform_weights(StdVectorFst * t,float (*func)(float f))
+  {
+    for (fst::StateIterator<StdVectorFst> siter(*t); 
+	 not siter.Done(); siter.Next())
+      {
+	StateId s = siter.Value();
+	if ( t->Final(s) != TropicalWeight::Zero() )
+	  t->SetFinal( s, func(t->Final(s).Value()) );
+	for (fst::MutableArcIterator<StdVectorFst> aiter(t,s); !aiter.Done(); aiter.Next())
+	  {
+	    const StdArc &arc = aiter.Value();
+	    StdArc new_arc;
+	    new_arc.ilabel = arc.ilabel;
+	    new_arc.olabel = arc.olabel;
+	    new_arc.weight = func(arc.weight.Value());
+	    new_arc.nextstate = arc.nextstate;
+	    aiter.SetValue(new_arc);
+	  }
+      }
+    return t;
+  }
+
   void TropicalWeightTransducer::write_in_att_format(StdVectorFst *t, FILE *ofile)
   {
 
@@ -656,7 +678,7 @@ namespace hfst { namespace implementations
 			       key_map);
 	  }
 	StdVectorFst * t_harmonized = NULL;  // FIX THIS
-	fprintf(stderr, "FUUUU\n");
+	
 	  //TropicalWeightTransducer::harmonize(t,key_map);
 	delete t;
 	return t_harmonized;
@@ -1001,13 +1023,10 @@ namespace hfst { namespace implementations
     StdVectorFst * mina = minimize(a);
     StdVectorFst * minb = minimize(b);
     EncodeMapper<StdArc> encode_mapper(0x0001,ENCODE);
-
     EncodeFst<StdArc> enca(*mina, &encode_mapper);
     EncodeFst<StdArc> encb(*minb, &encode_mapper);
-
     StdVectorFst A(enca);
     StdVectorFst B(encb);
-
     return Equivalent(A, B);
   }
 
@@ -1267,7 +1286,9 @@ namespace hfst { namespace implementations
 						      std::string new_symbol)
   {
     SymbolTable * st = t->InputSymbols();
-    return substitute(t, st->AddSymbol(old_symbol), st->AddSymbol(new_symbol));
+    StdVectorFst * retval = substitute(t, st->AddSymbol(old_symbol), st->AddSymbol(new_symbol));
+    retval->SetInputSymbols( new SymbolTable ( *(t->InputSymbols()) ) );
+    return retval;
   }
 
   StdVectorFst * TropicalWeightTransducer::substitute(StdVectorFst *t,
@@ -1279,7 +1300,83 @@ namespace hfst { namespace implementations
 		     st->AddSymbol(old_symbol_pair.second));
     KeyPair new_pair(st->AddSymbol(new_symbol_pair.first),
 		     st->AddSymbol(new_symbol_pair.second));
-    return substitute(t, old_pair, new_pair);
+    StdVectorFst * retval = substitute(t, old_pair, new_pair);
+    retval->SetInputSymbols( new SymbolTable ( *(t->InputSymbols()) ) );
+    return retval;
+  }
+
+  StdVectorFst * TropicalWeightTransducer::substitute(StdVectorFst *t,
+						      StringSymbolPair old_symbol_pair,
+						      StdVectorFst *transducer)
+  {
+    int states = t->NumStates();
+    for( int i = 0; i < states; ++i ) {
+
+      for (fst::MutableArcIterator<fst::StdVectorFst> it(t,i);
+	   not it.Done();
+	   it.Next()) {
+
+	fst::StdArc arc = it.Value();
+
+	// find arcs that must be replaced
+	if ( arc.ilabel == t->InputSymbols()->AddSymbol(old_symbol_pair.first) && 
+	     arc.olabel == t->InputSymbols()->AddSymbol(old_symbol_pair.second) ) 
+	  {
+
+	  StateId destination_state = arc.nextstate;
+	  StateId start_state = t->AddState();
+
+	  // change the label of the arc to epsilon and point the arc to a new state
+	  arc.ilabel = 0;
+	  arc.olabel = 0;
+	  arc.nextstate = start_state;  
+	  // weight remains the same
+	  it.SetValue(arc);
+
+
+	  // add rest of the states to transducer t
+	  int states_to_add = transducer->NumStates();
+	  for (int j=1; j<states_to_add; j++)
+	    t->AddState();
+
+
+	  // go through all states and arcs in replace transducer tr
+	  for (fst::StateIterator<fst::StdFst> siter(*transducer); !siter.Done(); siter.Next()) {
+
+	    StateId tr_state_id = siter.Value();
+
+	    // final states in tr correspond in t to a non-final state which has
+	    // an epsilon transition to original destination state of arc that
+	    // is being replaced
+	    if ( is_final( transducer, tr_state_id ) )
+	      t->AddArc( tr_state_id + start_state,
+			 fst::StdArc( 0,
+				      0,
+				      transducer->Final(tr_state_id),  // final weight is copied to the epsilon transition
+				      destination_state
+				      )
+			 );  
+
+	    for (fst::ArcIterator<fst::StdFst> aiter(*transducer, tr_state_id); !aiter.Done(); aiter.Next()) {
+
+	      const fst::StdArc &tr_arc = aiter.Value();
+
+	      // adding arc from state 'tr_state_id+start_state' to state 'tr_arc.nextstate'
+	      // copy arcs from tr to t
+	      t->AddArc( tr_state_id + start_state, 
+			 fst::StdArc( tr_arc.ilabel, 
+				      tr_arc.olabel, 
+				      tr_arc.weight,  // weight remains the same 
+				      tr_arc.nextstate + start_state 
+				      ) 
+			 );
+
+	    }
+	  }
+	}
+      }
+    }
+    return t;
   }
 
 
@@ -1332,7 +1429,7 @@ namespace hfst { namespace implementations
     RmEpsilonFst<StdArc> rm1(*t1);
     RmEpsilonFst<StdArc> rm2(*t2);
     EncodeMapper<StdArc> encoder(0x0001,ENCODE);
-    Encode(t1, &encoder);
+    Encode(t1, &encoder); // ???
     Encode(t2, &encoder);
     EncodeFst<StdArc> enc1(rm1, &encoder);
     EncodeFst<StdArc> enc2(rm2, &encoder);
@@ -1360,7 +1457,7 @@ namespace hfst { namespace implementations
     RmEpsilonFst<StdArc> rm1(*t1);
     RmEpsilonFst<StdArc> rm2(*t2);
     EncodeMapper<StdArc> encoder(0x0003,ENCODE); // t2 must be unweighted
-    Encode(t1, &encoder);
+    Encode(t1, &encoder); // ???
     Encode(t2, &encoder);
     EncodeFst<StdArc> enc1(rm1, &encoder);
     EncodeFst<StdArc> enc2(rm2, &encoder);

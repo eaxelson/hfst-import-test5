@@ -155,6 +155,9 @@ namespace implementations
       static StdVectorFst * substitute(StdVectorFst * t,
 				       StringSymbolPair old_symbol_pair,
 				       StringSymbolPair new_symbol_pair);
+      static StdVectorFst * substitute(StdVectorFst * t,
+				       StringSymbolPair old_symbol_pair,
+				       StdVectorFst *transducer);
 
       static StringSymbolSet get_string_symbol_set(StdVectorFst *t);
       static KeyMap create_mapping(StdVectorFst * t1, StdVectorFst * t2);
@@ -164,6 +167,7 @@ namespace implementations
       static StdVectorFst * substitute(StdVectorFst * t,
 				       KeyPair old_key_pair,
 				       KeyPair new_key_pair);
+
       static StdVectorFst * define_transducer(Key k);
       static StdVectorFst * define_transducer(const KeyPair &kp);
       static StdVectorFst * define_transducer(const KeyPairVector &kpv);

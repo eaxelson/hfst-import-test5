@@ -13,13 +13,13 @@ HfstTransducer &apply
  int n,ImplementationType type);
 
 HfstTransducer &apply
-(SFST::Transducer * (*sfst_funct)(SFST::Transducer *, Key, Key),
- fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,Key, 
-					    Key),
+(SFST::Transducer * (*sfst_funct)(SFST::Transducer *, StringSymbol, StringSymbol),
+ fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,StringSymbol, 
+					    StringSymbol),
  hfst::implementations::LogFst * (*log_ofst_funct)(hfst::implementations::LogFst *,
-						  Key,Key),
- fsm * (*foma_funct)(fsm *, Key, Key),
- Key k1, Key k2,ImplementationType type);
+						  StringSymbol,StringSymbol),
+ fsm * (*foma_funct)(fsm *, StringSymbol, StringSymbol),
+ StringSymbol k1, StringSymbol k2,ImplementationType type);
 
 HfstTransducer &apply
 (SFST::Transducer * (*sfst_funct)(SFST::Transducer *, KeyPair, 

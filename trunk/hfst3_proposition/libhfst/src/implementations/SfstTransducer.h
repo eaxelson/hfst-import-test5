@@ -175,8 +175,11 @@ namespace hfst { namespace implementations
       static Transducer * extract_output_language(Transducer * t);
       static Transducer * substitute(Transducer * t,Key old_key,Key new_key);
       static Transducer * substitute(Transducer * t,
-			      KeyPair old_key_pair,
-			      KeyPair new_key_pair);
+				     KeyPair old_key_pair,
+				     KeyPair new_key_pair);  // not implemented
+
+      static Transducer * substitute(Transducer * t, StringSymbol old_symbol, StringSymbol new_symbol);
+
       static Transducer * compose(Transducer * t1,
 			   Transducer * t2);
       static Transducer * concatenate(Transducer * t1,

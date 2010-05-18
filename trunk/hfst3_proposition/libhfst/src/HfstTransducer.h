@@ -206,11 +206,12 @@ namespace hfst
     void extract_strings(WeightedStrings<float>::Set &results);
 
     HfstTransducer &substitute(const std::string &old_symbol,
-			       const std::string &new_symbol);
+			       const std::string &new_symbol,
+			       ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &substitute(const StringSymbolPair &old_symbol_pair,
 			       const StringSymbolPair &new_symbol_pair);
     HfstTransducer &substitute(const StringSymbolPair &symbol_pair,
-			       const HfstTransducer &transducer);
+			       HfstTransducer &transducer);
     HfstTransducer &transform_weights(float (*func)(float));
 
     HfstTransducer &compose(HfstTransducer &another,

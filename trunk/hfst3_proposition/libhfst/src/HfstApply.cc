@@ -106,13 +106,13 @@ namespace hfst
   }
 
   HfstTransducer &HfstTransducer::apply
-  (SFST::Transducer * (*sfst_funct)(SFST::Transducer *, Key, Key),
-   fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,Key, 
-					      Key),
+  (SFST::Transducer * (*sfst_funct)(SFST::Transducer *, StringSymbol, StringSymbol),
+   fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,StringSymbol, 
+					      StringSymbol),
    hfst::implementations::LogFst * (*log_ofst_funct)
-   (hfst::implementations::LogFst *,Key, Key),
-   fsm * (*foma_funct)(fsm *, Key, Key),
-   Key k1, Key k2,ImplementationType type)
+   (hfst::implementations::LogFst *,StringSymbol, StringSymbol),
+   fsm * (*foma_funct)(fsm *, StringSymbol, StringSymbol),
+   StringSymbol s1, StringSymbol s2,ImplementationType type)
   {
     if (type != UNSPECIFIED_TYPE)
       { convert(type); }
@@ -121,7 +121,7 @@ namespace hfst
       case SFST_TYPE:
 	{
 	  SFST::Transducer * sfst_temp = 
-	    sfst_funct(implementation.sfst,k1,k2);
+	    sfst_funct(implementation.sfst,s1,s2);
 	  delete implementation.sfst;
 	  implementation.sfst = sfst_temp;
 	  break;
@@ -129,7 +129,7 @@ namespace hfst
       case TROPICAL_OFST_TYPE:
 	{
 	  fst::StdVectorFst * tropical_ofst_temp =
-	    tropical_ofst_funct(implementation.tropical_ofst,k1,k2);
+	    tropical_ofst_funct(implementation.tropical_ofst,s1,s2);
 	  delete implementation.tropical_ofst;
 	  implementation.tropical_ofst = tropical_ofst_temp;
 	  break;
@@ -137,7 +137,7 @@ namespace hfst
       case LOG_OFST_TYPE:
         {
 	  hfst::implementations::LogFst * log_ofst_temp =
-            log_ofst_funct(implementation.log_ofst,k1,k2);
+            log_ofst_funct(implementation.log_ofst,s1,s2);
           delete implementation.log_ofst;
           implementation.log_ofst = log_ofst_temp;
           break;
@@ -145,7 +145,7 @@ namespace hfst
       case FOMA_TYPE:
 	{
 	  fsm * foma_temp = 
-	    foma_funct(implementation.foma,k1,k2);
+	    foma_funct(implementation.foma,s1,s2);
 	  this->foma_interface.delete_foma(implementation.foma);
 	  implementation.foma = foma_temp;
 	  break;
