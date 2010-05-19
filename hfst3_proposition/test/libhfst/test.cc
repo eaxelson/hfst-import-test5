@@ -86,6 +86,10 @@ void test_function( HfstTransducer& (HfstTransducer::*pt_function) (HfstTransduc
 
 int main(int argc, char **argv) {
 
+  HfstTransducer t(TROPICAL_OFST_TYPE);
+  t.test_minimize();
+  exit(0);
+
   ImplementationType types[] = {SFST_TYPE, TROPICAL_OFST_TYPE, LOG_OFST_TYPE, FOMA_TYPE};
   for (int i=0; i<4; i++) {
     {

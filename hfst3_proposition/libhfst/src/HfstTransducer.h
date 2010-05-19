@@ -214,6 +214,8 @@ namespace hfst
 			       HfstTransducer &transducer);
     HfstTransducer &transform_weights(float (*func)(float));
 
+    void test_minimize(void);
+
     HfstTransducer &compose(HfstTransducer &another,
 			    ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &concatenate(HfstTransducer &another,
