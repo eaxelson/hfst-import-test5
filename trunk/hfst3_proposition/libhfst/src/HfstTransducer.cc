@@ -603,6 +603,11 @@ type(type),anonymous(false),is_trie(false)
       }
   }
 
+void HfstTransducer::test_minimize()
+{
+  this->tropical_ofst_interface.test_minimize();
+}
+
   bool HfstTransducer::test_equivalence(HfstTransducer &one, HfstTransducer &another) 
   {
     HfstTransducer onecopy(one);
@@ -610,6 +615,7 @@ type(type),anonymous(false),is_trie(false)
     onecopy.convert(TROPICAL_OFST_TYPE);
     anothercopy.convert(TROPICAL_OFST_TYPE);
     onecopy.harmonize(anothercopy);
+    std::cerr << onecopy << "--\n" << anothercopy;
     return tropical_ofst_interface.test_equivalence(
 	     onecopy.implementation.tropical_ofst,
 	     anothercopy.implementation.tropical_ofst);

@@ -160,6 +160,85 @@ namespace hfst { namespace implementations
       }
   }
 
+
+  void TropicalWeightTransducer::write_in_att_format_number(StdVectorFst *t, FILE *ofile)
+  {
+
+    // this takes care that initial state is always printed as number zero
+    // and state number zero (if it is not initial) is printed as another number
+    // (basically as the number of the initial state in that case, i.e.
+    // the numbers of initial state and state number zero are swapped)
+    StateId zero_print=0;
+    StateId initial_state = t->Start();
+    if (initial_state != 0) {
+      zero_print = initial_state;
+    }
+      
+    for (fst::StateIterator<StdVectorFst> siter(*t); 
+	 not siter.Done(); siter.Next()) 
+      {
+	StateId s = siter.Value();
+	if (s == initial_state) {
+	int origin;  // how origin state is printed, see the first comment
+	if (s == 0)
+	  origin = zero_print;
+	else if (s == initial_state)
+	  origin = 0;
+	else
+	  origin = (int)s;
+	for (fst::ArcIterator<StdVectorFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+	  {
+	    const StdArc &arc = aiter.Value();
+	    int target;  // how target state is printed, see the first comment
+	    if (arc.nextstate == 0)
+	      target = zero_print;
+	    else if (arc.nextstate == initial_state)
+	      target = 0;
+	    else
+	      target = (int)arc.nextstate;
+	    fprintf(ofile, "%i\t%i\t%i\t%i\t%f\n", origin, target,
+		    arc.ilabel, arc.olabel,
+		    arc.weight.Value());
+	  }
+	if (t->Final(s) != TropicalWeight::Zero())
+	  fprintf(ofile, "%i\t%f\n", origin, t->Final(s).Value());
+	break;
+	}
+      }
+
+    for (fst::StateIterator<StdVectorFst> siter(*t); 
+	 not siter.Done(); siter.Next())
+      {
+	StateId s = siter.Value();
+	if (s != initial_state) {
+	  int origin;  // how origin state is printed, see the first comment
+	  if (s == 0)
+	    origin = zero_print;
+	  else if (s == initial_state)
+	    origin = 0;
+	  else
+	    origin = (int)s;
+	  for (fst::ArcIterator<StdVectorFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+	    {
+	      const StdArc &arc = aiter.Value();
+	      int target;  // how target state is printed, see the first comment
+	      if (arc.nextstate == 0)
+		target = zero_print;
+	      else if (arc.nextstate == initial_state)
+		target = 0;
+	      else
+		target = (int)arc.nextstate;
+	      fprintf(ofile, "%i\t%i\t%i\t%i\t%f\n", origin, target,
+		      arc.ilabel, arc.olabel,
+		      arc.weight.Value());
+	    }
+	  if (t->Final(s) != TropicalWeight::Zero())
+	    fprintf(ofile, "%i\t%f\n", origin, t->Final(s).Value());
+	}
+      }
+  }
+
+
   void TropicalWeightTransducer::write_in_att_format(StdVectorFst *t, std::ostream &os)
   {
 
@@ -1085,20 +1164,94 @@ namespace hfst { namespace implementations
     return new StdVectorFst(dec);
   }
   
+#ifdef FOO
+  fst::StdVectorFst * TropicalWeightTransducer::minimize(StdVectorFst * t) {
+    fst::RmEpsilon(t);
+    fst::EncodeMapper<fst::StdArc> mapper(0x0001,fst::EncodeType(1)); //
+    
+    fst::EncodeFst<fst::StdArc> TEncode(*t, &mapper);
+    fst::StdVectorFst Encoded_T(TEncode);
+
+    fst::StdVectorFst *Determinized_T = new fst::StdVectorFst();
+    fst::Determinize(Encoded_T, Determinized_T);
+
+    fst::Minimize(Determinized_T);
+
+    fst::DecodeFst<fst::StdArc> D1(*Determinized_T, mapper);
+    fst::StdVectorFst *DecodedT = new fst::StdVectorFst(D1);
+    delete Determinized_T;
+    return DecodedT;
+  }
+#endif
+
   StdVectorFst * TropicalWeightTransducer::minimize
   (StdVectorFst * t)
   {
     StdVectorFst * determinized_t = determinize(t);
+
     EncodeMapper<StdArc> encode_mapper(0x0001,ENCODE);
     EncodeFst<StdArc> enc(*determinized_t,
 			  &encode_mapper);
     StdVectorFst fst_enc(enc);
     Minimize<StdArc>(&fst_enc);
-    //DecodeFst<StdArc> dec(enc,
-    //			  encode_mapper);  // FIX: ERROR???
-    DecodeFst<StdArc> dec(fst_enc, encode_mapper);  // is this correct?
+    fst::RmEpsilon(&fst_enc);  // For some reason, Minimize creates extra epsilons!
+
+    Decode<StdArc>(&fst_enc, encode_mapper);
     delete determinized_t;
-    return new StdVectorFst(dec);
+
+    return new StdVectorFst(fst_enc);
+  }
+
+  void print_att_number(StdVectorFst *t, FILE * ofile) {
+    fprintf(ofile, "initial state: %i\n", t->Start());
+    for (fst::StateIterator<StdVectorFst> siter(*t); 
+	 not siter.Done(); siter.Next()) 
+      {
+	StateId s = siter.Value();
+	if ( t->Final(s) != TropicalWeight::Zero() )
+	  fprintf(ofile, "%i\t%f\n", s, t->Final(s).Value());
+	for (fst::ArcIterator<StdVectorFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+	  {
+	    const StdArc &arc = aiter.Value();
+	    fprintf(ofile, "%i\t%i\t%i\t%i\t%f\n", s, arc.nextstate, arc.ilabel, arc.olabel, arc.weight.Value());
+	  }
+      }
+  }
+
+  void TropicalWeightTransducer::test_minimize(void)
+  {
+    StdVectorFst * t = new StdVectorFst();
+    StateId initial = t->AddState();
+    t->SetStart(initial);
+    StateId state = t->AddState();
+    t->SetFinal(state, 0.5);
+    t->AddArc(initial, StdArc(1,1,0.5,state));
+    t->AddArc(state, StdArc(2,2,0.5,initial));
+ 
+    // print t before minimize
+    print_att_number(t, stderr);
+
+    // epsilon removal
+    RmEpsilonFst<StdArc> t_rm_eps(*t);
+
+    // encode mapping
+    EncodeMapper<StdArc> encode_mapper(0x0001,ENCODE);
+    EncodeFst<StdArc> t_rm_eps_enc(t_rm_eps,
+				   &encode_mapper);
+
+    // determinization
+    DeterminizeFst<StdArc> t_DET(t_rm_eps_enc);
+
+    // minimization
+    StdVectorFst t_det(t_DET);    
+    Minimize<StdArc>(&t_det);
+
+    // print t after minimize and before decoding
+    print_att_number(&t_det, stderr);
+
+    // decoding
+    Decode<StdArc>(&t_det, encode_mapper);
+    StdVectorFst t_min(t_det);
   }
 
   /* For HfstMutableTransducer */

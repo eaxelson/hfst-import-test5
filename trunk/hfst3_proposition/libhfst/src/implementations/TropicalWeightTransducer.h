@@ -148,6 +148,10 @@ namespace implementations
       static std::pair<StdVectorFst*, StdVectorFst*> harmonize(StdVectorFst *t1, StdVectorFst *t2);
 
       static void write_in_att_format(StdVectorFst * t, FILE *ofile);
+      static void write_in_att_format_number(StdVectorFst * t, FILE *ofile);
+      
+      static void test_minimize(void);
+
       static void write_in_att_format(StdVectorFst * t, std::ostream &os);
       static StdVectorFst * read_in_att_format(FILE *ifile);
       static bool test_equivalence(StdVectorFst *one, StdVectorFst *another);
