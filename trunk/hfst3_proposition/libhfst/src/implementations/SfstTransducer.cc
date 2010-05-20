@@ -673,6 +673,11 @@ namespace hfst { namespace implementations {
   { t->complete_alphabet();
     return &t->upper_level(); }
   
+  void SfstTransducer::extract_strings(Transducer * t, hfst::implementations::WeightedStrings<float>::Set &results)
+  {
+    t->generate_hfst(results, true);
+  }
+
   Transducer * SfstTransducer::substitute(Transducer * t,Key old_key,Key new_key)
   { return &t->replace_char(old_key,new_key); }
   

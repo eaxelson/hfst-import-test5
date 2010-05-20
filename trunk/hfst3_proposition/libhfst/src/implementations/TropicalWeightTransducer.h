@@ -130,7 +130,7 @@ namespace implementations
       static StdVectorFst * reverse(StdVectorFst * transducer);
       static StdVectorFst * extract_input_language(StdVectorFst * t);
       static StdVectorFst * extract_output_language(StdVectorFst * t);
-      static void extract_strings(StdVectorFst * t, KeyTable &kt,
+      static void extract_strings(StdVectorFst * t,
 				  WeightedStrings<float>::Set &results);
       static StdVectorFst * compose(StdVectorFst * t1,
 				   StdVectorFst * t2);
@@ -143,6 +143,7 @@ namespace implementations
       static StdVectorFst * subtract(StdVectorFst * t1,
 			    StdVectorFst * t2);
       static StdVectorFst * set_weight(StdVectorFst * t,float f);
+      static StdVectorFst * set_final_weights(StdVectorFst * t, float weight);
       static StdVectorFst * transform_weights(StdVectorFst * t,float (*func)(float f));
 
       static std::pair<StdVectorFst*, StdVectorFst*> harmonize(StdVectorFst *t1, StdVectorFst *t2);

@@ -84,11 +84,36 @@ void test_function( HfstTransducer& (HfstTransducer::*pt_function) (HfstTransduc
   assert (HfstTransducer::test_equivalence( test0, test3 ) );
 }
 
+void test_extract_strings( HfstTransducer &t )
+{
+  try {
+    WeightedStrings<float>::Set results;
+    t.extract_strings(results);
+  }
+  catch (TransducerIsCyclicException e) {}
+  
+  HfstTokenizer tok;
+  HfstTransducer tr1("aa", "aa", tok, t.get_type());
+  HfstTransducer tr2("acb", "acb", tok, t.get_type());
+  HfstTransducer tr3("bb", "bb", tok, t.get_type());
+  HfstTransducer disj = tr1.disjunct(tr2);
+  disj = disj.disjunct(tr3);
+  disj = disj.minimize();
+  
+  try {
+    WeightedStrings<float>::Set results;
+    disj.extract_strings(results);
+    assert(3 == (int)results.size());
+  }
+  catch (HfstInterfaceException e) { 
+    assert(false); }
+}
+
 int main(int argc, char **argv) {
 
-  HfstTransducer t(TROPICAL_OFST_TYPE);
-  t.test_minimize();
-  exit(0);
+  //HfstTransducer t(TROPICAL_OFST_TYPE);
+  //t.test_minimize();
+  //exit(0);
 
   ImplementationType types[] = {SFST_TYPE, TROPICAL_OFST_TYPE, LOG_OFST_TYPE, FOMA_TYPE};
   for (int i=0; i<4; i++) {
@@ -236,6 +261,7 @@ int main(int argc, char **argv) {
 		 test2_n.get_type() !=
 		 test3_n.get_type() );
 
+	//	std::cerr << test0_n << "--\n" << test3_n << "\n";
 	  assert (HfstTransducer::test_equivalence( test0_n, test1_n ) );
 	  assert (HfstTransducer::test_equivalence( test0_n, test2_n ) );
 	  assert (HfstTransducer::test_equivalence( test0_n, test3_n ) );
@@ -376,6 +402,21 @@ int main(int argc, char **argv) {
       }
       printf("substitute(StringPair, HfstTransducer) tested\n");
 
+      // ----- set_final_weights -----
+      { 
+	float weight=0.5;
+
+	HfstTransducer test0s = HfstTransducer(test0).set_final_weights(weight);
+	HfstTransducer test1s = HfstTransducer(test1).set_final_weights(weight);
+	HfstTransducer test2s = HfstTransducer(test2).set_final_weights(weight);
+	HfstTransducer test3s = HfstTransducer(test3).set_final_weights(weight);
+
+	assert (HfstTransducer::test_equivalence( test0s, test1s ) );
+	assert (HfstTransducer::test_equivalence( test0s, test2s ) );
+	assert (HfstTransducer::test_equivalence( test0s, test3s ) );
+      }
+      printf("set_final_weights tested\n");
+
       // ----- transform_weights -----
       { 
 	HfstTransducer test0s = HfstTransducer(test0).transform_weights(&func);
@@ -388,6 +429,14 @@ int main(int argc, char **argv) {
 	assert (HfstTransducer::test_equivalence( test0s, test3s ) );
       }
       printf("transform_weights tested\n");
+
+      // ----- extract_strings -----
+      {
+	test_extract_strings(test0);
+	test_extract_strings(test1);
+	test_extract_strings(test2);
+      }
+      printf("extract_strings tested\n");
 
       // ----- compose -----
       test_function(&HfstTransducer::compose, test0, test1, test2, test3);

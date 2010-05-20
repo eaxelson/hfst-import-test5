@@ -956,24 +956,27 @@ namespace hfst { namespace implementations
 
 
 
-
-
   void extract_reversed_strings
-  (LogFst * t, LogArc::StateId s, KeyTable &kt,
-   WeightedStrings<float>::Vector &reversed_results)
+  (LogFst * t, LogArc::StateId s,
+   WeightedStrings<float>::Vector &reversed_results, set<StateId> &states_visited)
   {
+    if (states_visited.find(s) == states_visited.end())
+      states_visited.insert(s);
+    else
+      throw TransducerIsCyclicException();
+
     WeightedStrings<float>::Vector reversed_continuations;
     for (fst::ArcIterator<LogFst> it(*t,s); !it.Done(); it.Next())
       {
 	const LogArc &arc = it.Value();
-	extract_reversed_strings(t,arc.nextstate,kt,reversed_continuations);
+	extract_reversed_strings(t,arc.nextstate,reversed_continuations, states_visited);
 	std::string istring;
 	std::string ostring;
 
 	if (arc.ilabel != 0)
-	  { istring = kt[arc.ilabel]; }
+	  { istring = t->InputSymbols()->Find(arc.ilabel); }
 	if (arc.olabel != 0)
-	  { ostring = kt[arc.olabel]; }
+	  { ostring = t->InputSymbols()->Find(arc.olabel); }
 	WeightedString<float> 
 	  arc_string(istring,ostring,arc.weight.Value());
 	WeightedStrings<float>::add(arc_string,reversed_continuations);
@@ -983,16 +986,19 @@ namespace hfst { namespace implementations
     if (t->Final(s) != LogWeight::Zero()) 
       { reversed_results.push_back(WeightedString<float>
 				   ("","",t->Final(s).Value())); }
+
+    states_visited.erase(s);
   }
 
 
   void LogWeightTransducer::extract_strings
-  (LogFst * t, KeyTable &kt, WeightedStrings<float>::Set &results)
+  (LogFst * t, WeightedStrings<float>::Set &results)
   {
     if (t->Start() == -1)
       { return; }
     WeightedStrings<float>::Vector reversed_results;
-    extract_reversed_strings(t,t->Start(),kt,reversed_results);
+    set<StateId> states_visited;
+    extract_reversed_strings(t,t->Start(),reversed_results, states_visited);
     //WeightedStrings<float>::reverse_strings(reversed_results);
     results.insert(reversed_results.begin(),reversed_results.end());
   }

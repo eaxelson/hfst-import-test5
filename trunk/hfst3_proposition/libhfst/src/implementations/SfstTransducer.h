@@ -173,6 +173,7 @@ namespace hfst { namespace implementations
       static Transducer * reverse(Transducer * transducer);
       static Transducer * extract_input_language(Transducer * t);
       static Transducer * extract_output_language(Transducer * t);
+      static void extract_strings(Transducer * t, hfst::implementations::WeightedStrings<float>::Set &results);
       static Transducer * substitute(Transducer * t,Key old_key,Key new_key);
       static Transducer * substitute(Transducer * t,
 				     KeyPair old_key_pair,

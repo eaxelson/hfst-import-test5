@@ -30,6 +30,9 @@ public HfstInterfaceException {};
 class TransducerHasUnknownTypeException :
 public HfstInterfaceException {};
 
+class TransducerIsCyclicException :
+public HfstInterfaceException {};
+
 class TransducerHasNoAlphabetException :
 public HfstInterfaceException {};
 
