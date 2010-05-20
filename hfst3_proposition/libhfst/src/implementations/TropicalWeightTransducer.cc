@@ -59,6 +59,18 @@ namespace hfst { namespace implementations
     return;
   }
 
+  StdVectorFst * TropicalWeightTransducer::set_final_weights(StdVectorFst * t, float weight)
+  {
+    for (fst::StateIterator<StdVectorFst> siter(*t); 
+	 not siter.Done(); siter.Next())
+      {
+	StateId s = siter.Value();
+	if ( t->Final(s) != TropicalWeight::Zero() )
+	  t->SetFinal(s, weight);
+      }
+    return t;
+  }
+
   StdVectorFst * TropicalWeightTransducer::transform_weights(StdVectorFst * t,float (*func)(float f))
   {
     for (fst::StateIterator<StdVectorFst> siter(*t); 
@@ -1101,6 +1113,10 @@ namespace hfst { namespace implementations
   {
     StdVectorFst * mina = minimize(a);
     StdVectorFst * minb = minimize(b);
+    //write_in_att_format_number(a, stdout);
+    //std::cerr << "--\n";
+    //write_in_att_format_number(b, stdout);
+    //std::cerr << "\n\n";
     EncodeMapper<StdArc> encode_mapper(0x0001,ENCODE);
     EncodeFst<StdArc> enca(*mina, &encode_mapper);
     EncodeFst<StdArc> encb(*minb, &encode_mapper);
@@ -1243,15 +1259,17 @@ namespace hfst { namespace implementations
     DeterminizeFst<StdArc> t_DET(t_rm_eps_enc);
 
     // minimization
-    StdVectorFst t_det(t_DET);    
-    Minimize<StdArc>(&t_det);
+    DecodeFst<StdArc> dec(t_DET,
+			  encode_mapper);
+    StdVectorFst t_det_std(t_DET);
 
-    // print t after minimize and before decoding
-    print_att_number(&t_det, stderr);
+    Minimize<StdArc>(&t_det_std);
+
+    // print t after minimize
+    print_att_number(&t_det_std, stderr);
 
     // decoding
-    Decode<StdArc>(&t_det, encode_mapper);
-    StdVectorFst t_min(t_det);
+    //Decode<StdArc>(&t_det, encode_mapper);  COMMENTED
   }
 
   /* For HfstMutableTransducer */
@@ -1712,21 +1730,26 @@ namespace hfst { namespace implementations
   }
 
   void extract_reversed_strings
-  (StdVectorFst * t, StdArc::StateId s, KeyTable &kt,
-   WeightedStrings<float>::Vector &reversed_results)
+  (StdVectorFst * t, StdArc::StateId s,
+   WeightedStrings<float>::Vector &reversed_results, set<StateId> &states_visited)
   {
+    if (states_visited.find(s) == states_visited.end())
+      states_visited.insert(s);
+    else
+      throw TransducerIsCyclicException();
+
     WeightedStrings<float>::Vector reversed_continuations;
     for (fst::ArcIterator<StdVectorFst> it(*t,s); !it.Done(); it.Next())
       {
 	const StdArc &arc = it.Value();
-	extract_reversed_strings(t,arc.nextstate,kt,reversed_continuations);
+	extract_reversed_strings(t,arc.nextstate,reversed_continuations,states_visited);
 	std::string istring;
 	std::string ostring;
 
 	if (arc.ilabel != 0)
-	  { istring = kt[arc.ilabel]; }
+	  { istring = t->InputSymbols()->Find(arc.ilabel); }
 	if (arc.olabel != 0)
-	  { ostring = kt[arc.olabel]; }
+	  { ostring = t->InputSymbols()->Find(arc.olabel); }
 	WeightedString<float> 
 	  arc_string(istring,ostring,arc.weight.Value());
 	WeightedStrings<float>::add(arc_string,reversed_continuations);
@@ -1735,16 +1758,20 @@ namespace hfst { namespace implementations
       }
     if (t->Final(s) != TropicalWeight::Zero()) 
       { reversed_results.push_back(WeightedString<float>
-				   ("","",t->Final(s).Value())); }
+				   ("","",t->Final(s).Value())); 
+      }
+
+    states_visited.erase(s);
   }
 
   void TropicalWeightTransducer::extract_strings
-  (StdVectorFst * t, KeyTable &kt, WeightedStrings<float>::Set &results)
+  (StdVectorFst * t, WeightedStrings<float>::Set &results)
   {
     if (t->Start() == -1)
       { return; }
     WeightedStrings<float>::Vector reversed_results;
-    extract_reversed_strings(t,t->Start(),kt,reversed_results);
+    set<StateId> states_visited;
+    extract_reversed_strings(t,t->Start(),reversed_results,states_visited);
     results.insert(reversed_results.begin(),reversed_results.end());
   }
 

@@ -186,7 +186,6 @@ namespace hfst
   {
     if (this->type != another.type)
       {
-	fprintf(stderr, "FUFUU\n");
 	throw hfst::exceptions::TransducerHasWrongTypeException();
       }
 
@@ -234,7 +233,6 @@ namespace hfst
       case (UNSPECIFIED_TYPE):
       case (ERROR_TYPE):
       default:
-	fprintf(stderr, "GAGAA\n");
 	throw hfst::exceptions::TransducerHasWrongTypeException();
       }
   }
@@ -615,7 +613,7 @@ void HfstTransducer::test_minimize()
     onecopy.convert(TROPICAL_OFST_TYPE);
     anothercopy.convert(TROPICAL_OFST_TYPE);
     onecopy.harmonize(anothercopy);
-    std::cerr << onecopy << "--\n" << anothercopy;
+    //std::cerr << onecopy << "--\n" << anothercopy << "\n\n";
     return tropical_ofst_interface.test_equivalence(
 	     onecopy.implementation.tropical_ofst,
 	     anothercopy.implementation.tropical_ofst);
@@ -741,17 +739,20 @@ void HfstTransducer::test_minimize()
        &hfst::implementations::FomaTransducer::extract_output_language,
        type); }
 
-  void HfstTransducer::extract_strings(WeightedStrings<float>::Set &results)
+void HfstTransducer::extract_strings(WeightedStrings<float>::Set &results)
   {
     switch (type)
       {
       case LOG_OFST_TYPE:
 	hfst::implementations::LogWeightTransducer::extract_strings
-	  (implementation.log_ofst,key_table,results);
+	  (implementation.log_ofst,results);
 	break;
       case TROPICAL_OFST_TYPE:
 	hfst::implementations::TropicalWeightTransducer::extract_strings
-	  (implementation.tropical_ofst,key_table,results);
+	  (implementation.tropical_ofst,results);
+	break;
+      case SFST_TYPE:
+	hfst::implementations::SfstTransducer::extract_strings(implementation.sfst, results);
 	break;
       default:
 	throw hfst::exceptions::FunctionNotImplementedException(); 
@@ -771,6 +772,7 @@ void HfstTransducer::test_minimize()
   HfstTransducer &HfstTransducer::substitute
   (const std::string &old_symbol, const std::string &new_symbol, ImplementationType type)
   {
+    (void)type;
     convert(TROPICAL_OFST_TYPE);
     fst::StdVectorFst * tropical_ofst_temp =
       this->tropical_ofst_interface.substitute(implementation.tropical_ofst,old_symbol,new_symbol);
@@ -800,6 +802,14 @@ void HfstTransducer::test_minimize()
     this->harmonize(transducer);
     implementation.tropical_ofst  =
       this->tropical_ofst_interface.substitute(this->implementation.tropical_ofst,symbol_pair,transducer.implementation.tropical_ofst);
+    return *this;
+  }
+
+  HfstTransducer &HfstTransducer::set_final_weights(float weight)
+  {
+    convert(TROPICAL_OFST_TYPE);
+    implementation.tropical_ofst  =
+      this->tropical_ofst_interface.set_final_weights(this->implementation.tropical_ofst, weight);
     return *this;
   }
 
@@ -1204,7 +1214,8 @@ void HfstTransducer::test_minimize()
     return *this;
   }
 
-/*  std::ostream &operator<<(std::ostream &out,HfstTransducer &T)
+/*  std::ostream &operator<<
+(std::ostream &out,HfstTransducer &T)
   {
     HfstMutableTransducer t(T);
     HfstStateIterator it(t);

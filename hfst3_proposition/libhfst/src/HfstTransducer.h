@@ -32,6 +32,7 @@ namespace hfst
   using hfst::implementations::WeightedString;
   using hfst::implementations::FomaTransducer;
 
+  /** The type of a transducer. **/
   enum ImplementationType
   {
     SFST_TYPE,
@@ -49,10 +50,13 @@ namespace hfst
     FLOAT
   };
 
+  /** A finite-state synchronous transducer. **/
   class HfstTransducer;
 
+  /** A finite-state synchronous transducer that supports iterating through and adding states and transitions. **/
   class HfstMutableTransducer;
 
+  /** A stream for writing binary transducers. **/
   class HfstInputStream
   {
   protected:
@@ -87,6 +91,7 @@ namespace hfst
     friend class HfstTransducer;
   };
 
+  /** A stream for reading binary transducers. **/
   class HfstOutputStream
   {
   protected:
@@ -110,7 +115,9 @@ namespace hfst
   };
 
 
+  /** A handle for a state in a HfstMutableTransducer. **/
   typedef hfst::implementations::StateId HfstState;
+  // remove
   typedef float HfstWeight;
 
 
@@ -150,9 +157,11 @@ namespace hfst
 	@note Use HfstTransducer("") to create an epsilon transducer.
      **/
     HfstTransducer(ImplementationType type);
+    /** **/
     HfstTransducer(const std::string& utf8_str, 
     		   const HfstTokenizer &multichar_symbol_tokenizer,
 		   ImplementationType type);
+    /** **/
     HfstTransducer(const std::string& upper_utf8_str,
     		   const std::string& lower_utf8_str,
     		   const HfstTokenizer &multichar_symbol_tokenizer,
@@ -163,6 +172,7 @@ namespace hfst
     HfstTransducer(const HfstTransducer &another);
     /** An ordinary transducer equivalent to mutable transducer \a t. **/
     HfstTransducer(const HfstMutableTransducer &t);
+    /** Delete operator for HfstTransducer. **/
     ~HfstTransducer(void);
 
     /** A transducer that recognizes the string pair "symbol:symbol". **/
@@ -170,12 +180,18 @@ namespace hfst
     /** A transducer that recognizes the string pair "isymbol:osymbol". **/
     HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type);
 
+    /** If two transducers are equivalent, i.e. accept the same input/output string pairs with the same weights. **/
     static bool test_equivalence(HfstTransducer &one, HfstTransducer &another);
 
-    void write_in_att_format(FILE * f);
-    static HfstTransducer &read_in_att_format(FILE * f);
+    /** Write transducer in AT & T format to FILE \a ofile. 
+	@see operator<< **/
+    void write_in_att_format(FILE * ofile);
+    /** Read a transducer in AT & T format from FILE \a ifile. **/
+    static HfstTransducer &read_in_att_format(FILE * ifile);
 
+    /** */
     void write_in_att_format(const char * filename);
+    /** */
     static HfstTransducer &read_in_att_format(const char * filename);
 
     /** An equivalent transducer that has no epsilon:epsilon transitions. */
@@ -203,52 +219,50 @@ namespace hfst
     HfstTransducer &input_project(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &output_project(ImplementationType type=UNSPECIFIED_TYPE);
 
+    /** Store to \a results all string pairs that are recognised by the transducer. 
+	@pre The transducer is acyclic. 
+	@note If the transducer is cyclic, no guarantees are given how the function will
+	behave. It might get stuck in an infinite loop or return any number of string pairs. 
+	In the case of a cyclic transducer, use #n_best_paths instead. 
+	@see n_best_paths */
     void extract_strings(WeightedStrings<float>::Set &results);
 
+    /** Substitute all symbols \a old_symbol with symbol \a new_symbol. */
     HfstTransducer &substitute(const std::string &old_symbol,
 			       const std::string &new_symbol,
 			       ImplementationType type=UNSPECIFIED_TYPE);
+    /** Substitute all transitions equal to \a old_symbol_pair with symbol pair \a new_symbol_pair. */
     HfstTransducer &substitute(const StringSymbolPair &old_symbol_pair,
 			       const StringSymbolPair &new_symbol_pair);
+    /** Substitute all transitions equal to \a symbol_pair with a copy of transducer \a transducer. 
+	The copy of the transducer is attached to this->transducer with epsilon transitions on its
+	start state and final states (that become ordinary states after substitution). The weight of
+	the original transition is copied to the epsilon transition leading to the original start state. */
     HfstTransducer &substitute(const StringSymbolPair &symbol_pair,
 			       HfstTransducer &transducer);
+    /** Set the weights of all final states to \a weight. */
+    HfstTransducer &set_final_weights(float weight);
+    /** Transform all transition and state weights according to the function pointer \a func. */
     HfstTransducer &transform_weights(float (*func)(float));
 
-    void test_minimize(void);
-
+    /** Compose this transducer with another. */
     HfstTransducer &compose(HfstTransducer &another,
 			    ImplementationType type=UNSPECIFIED_TYPE);
+    /** Concatenate this transducer with another. */
     HfstTransducer &concatenate(HfstTransducer &another,
 				ImplementationType type=UNSPECIFIED_TYPE);
+    /** Disjunct this transducer and another. */
     HfstTransducer &disjunct(HfstTransducer &another,
 			     ImplementationType type=UNSPECIFIED_TYPE);
+    /** Intersect this transducer and another. */
     HfstTransducer &intersect(HfstTransducer &another,
 			      ImplementationType type=UNSPECIFIED_TYPE);
+    /** Subtract another transducer from this. */
     HfstTransducer &subtract(HfstTransducer &another,
 			     ImplementationType type=UNSPECIFIED_TYPE);
 
-    /*    WeightType get_weight_type(void);
-
-    template<class W> HfstTransducer &set_final_weight(W weight) {
-      (void)weight; 
-      throw hfst::implementations::FunctionNotImplementedException(); }*/
-
-    //HfstTransducer &set_final_weights(float weight);
-    //HfstTransducer &transform_weights(float (*func)(float weight));
-    
-    /*  template<class W> HfstTransducer &transform_weights(W (*func)(W weight)) 
-      { (void)func; 
-      throw hfst::implementations::FunctionNotImplementedException(); }*/
-
-    /*template<class T> typename T::const_iterator begin(void)
-      { throw hfst::implementations::FunctionNotImplementedException(); }
-
-    template<class T> typename T::const_iterator end(void)
-    { throw hfst::implementations::FunctionNotImplementedException(); }*/
-
-    //HfstTransducer &anonymize(void);
-    //KeyTable &get_key_table(void);
-    //void set_key_table(const KeyTable &kt);
+    // test
+    void test_minimize(void);
 
     ImplementationType get_type(void);
     HfstTransducer &convert(ImplementationType type);
@@ -271,17 +285,27 @@ namespace hfst
   protected:
     HfstTransducer transducer;
   public:
-    /* Constructors and delete */
-    HfstMutableTransducer(void);     /* Returns an empty transducer. */
+    /** Construct an empty mutable transducer. */
+    HfstMutableTransducer(void);
+    /** Construct a mutable transducer equivalent to \a t. */
     HfstMutableTransducer(const HfstTransducer &t);
+    /** A deep copy of mutable transducer \a t. */
     HfstMutableTransducer(const HfstMutableTransducer &t);
+    /** Delete mutable transducer. */
     ~HfstMutableTransducer(void);
-    /* Adding states and transitions */
+    /** Add a state to this mutable transducer and return a handle to the state. */
     HfstState add_state();
+    /** Set the value of the final weight of state \a s in this mutable transducer to \a w. */
     void set_final_weight(HfstState s, HfstWeight w);
+    /** If state \a s in this mutable transducer is final. */
     bool is_final(HfstState s);
+    /** Return a handle to the initial state in this mutable transducer. */
     HfstState get_initial_state();
-    HfstWeight get_final_weight(HfstState s);
+    /** The final weight of state \a s in this mutable transducer. 
+	@pre State \a s must be final. */
+    float get_final_weight(HfstState s);
+    /** Add transition with input and output symbols \a isymbol and \a osymbol and weight \a w
+	between states \a source and \a target in this mutable transducer. */
     void add_transition(HfstState source, std::string isymbol, std::string osymbol, HfstWeight w, HfstState target);
     /* friend classes */
     friend class HfstTransducer;
@@ -289,19 +313,25 @@ namespace hfst
     friend class HfstTransitionIterator;
   };
 
-  /* State and transition iterators */
+  /** A state iterator to a mutable transducer. */
   class HfstStateIterator
   {
   protected:
     hfst::implementations::TropicalWeightStateIterator tropical_ofst_iterator;
   public:
+    /** Create a state iterator to mutable transducer \a t. */
     HfstStateIterator(const HfstMutableTransducer &t);
     ~HfstStateIterator(void);
+    /** Whether the iterator is at end. */
     bool done();
+    /** The current state pointed by the iterator. */
     HfstState value();
+    /** Advance the iterator to the next state. */
     void next();
   };
 
+  /** A transition in a mutable transducer. 
+      @note Transitions are only returned by transition iterators to mutable transducers. */
   class HfstTransition
   {
   protected:
@@ -312,22 +342,31 @@ namespace hfst
     HfstTransition(std::string isymbol, std::string osymbol, HfstWeight weight, HfstState target_state);
   public:
     ~HfstTransition(void);
+    /** The input symbol of the transition. */
     std::string get_input_symbol(void);
+    /** The output symbol of the transition. */
     std::string get_output_symbol(void);
+    /** The weight of the transition. */
     HfstWeight get_weight(void);
+    /** The target state of the transition. */
     HfstState get_target_state(void);
     friend class HfstTransitionIterator;
   };
 
+  /** A transition iterator to a mutable transducer. */
   class HfstTransitionIterator
   {
   protected:
     hfst::implementations::TropicalWeightTransitionIterator tropical_ofst_iterator;
   public:
+    /** Create a transition iterator to state \a s in the mutable transducer \a t. */
     HfstTransitionIterator(const HfstMutableTransducer &t, HfstState s);
     ~HfstTransitionIterator(void);
+    /** Whether the iterator is at end. */
     bool done();
+    /** The current transition pointed by the iterator. */
     HfstTransition value();
+    /** Advance the iterator to the next transition. */
     void next();    
   };
 
@@ -338,6 +377,8 @@ namespace hfst
   template<> 
   HfstTransducer &HfstTransducer::transform_weights<float>(float (*func)(float));*/
 
+  /** The same as print_in_att_format. 
+      @see print_in_att_format. */
   std::ostream &operator<<(std::ostream &out,HfstTransducer &t);
 }
 

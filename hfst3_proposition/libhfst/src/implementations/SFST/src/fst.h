@@ -17,6 +17,7 @@
 // HFST addition
 #include "../../SymbolDefs.h"
 using namespace hfst::symbols;
+#include "../../ExtractStrings.h"
 
 
 /*******************************************************************/
@@ -301,6 +302,7 @@ class Transducer {
   bool is_cyclic_node( Node*, NodeHashSet &visited );
   bool is_automaton_node( Node* );
   bool generate1( Node*, Node2Int&, char*, int, char*, int, FILE* );
+  bool generate_hfst1( Node*, Node2Int&, char*, int, char*, int, hfst::implementations::WeightedStrings<float>::Set &results); // HFST ADDITION
   void store_symbols( Node*, SymbolMap&, LabelSet& );
 
   void splice_nodes(Node*, Node*, Label sl, Transducer*, Transducer*);
@@ -350,6 +352,7 @@ class Transducer {
   bool analyze_string( char *s, FILE *file, bool with_brackets=true );
   bool generate_string( char *s, FILE *file, bool with_brackets=true );
   bool generate( FILE *file, bool separate=false );
+  bool generate_hfst( hfst::implementations::WeightedStrings<float>::Set &results, bool separate=false); // HFST ADDITION
 
   void clear( void );      // clears the transducer. The resulting transducer
                            // is like one created with Transducer()
