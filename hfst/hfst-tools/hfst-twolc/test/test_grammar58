@@ -1,7 +1,0 @@
-Alphabet
-
-a a:b %0 ;
-
-Rules
-"R"
-a:b => # _ ;

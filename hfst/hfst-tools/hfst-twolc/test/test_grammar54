@@ -1,8 +1,0 @@
-Alphabet
-
-1 2 3 a:b ;
-
-Rules
-
-"R"
-a:b => 1 _ ;
