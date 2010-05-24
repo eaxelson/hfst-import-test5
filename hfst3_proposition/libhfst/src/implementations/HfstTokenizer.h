@@ -35,7 +35,9 @@ namespace hfst
     const char * find(const char * p) const;  
   };
   
-  /* At the moment, this only tokenizes into utf-8 strings. */
+  /** \brief A tokenizer for creating transducers from strings.
+
+      At the moment, the tokenizer only tokenizes utf-8 strings. */
   class HfstTokenizer
   {  
   private:
@@ -45,12 +47,16 @@ namespace hfst
     bool is_skip_symbol(hfst::symbols::StringSymbol &s) const;
 
   public:
+    /** \brief Add a symbol to be skipped to this tokenizer. */
     void add_skip_symbol(const std::string &symbol);
+    /** \brief Add a multicharacter symbol \a symbol to this tokenizer. */
     void add_multichar_symbol(const std::string& symbol);
 			      //KeyTable &key_table);
 
+    /** \brief Tokenize the string \a input string. */
     StringPairVector * tokenize(const std::string &input_string) const;
     //KeyTable &key_table) const;
+    /** \brief Tokenize the string pair \a input_string \a output_string. */
     StringPairVector * tokenize(const std::string &input_string,
 				const std::string &output_string) const;
     //KeyTable &key_table) const;

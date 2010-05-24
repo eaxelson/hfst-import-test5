@@ -888,7 +888,9 @@ void HfstTransducer::extract_strings(WeightedStrings<float>::Set &results)
   HfstTransducer &HfstTransducer::n_best
   (int n,ImplementationType type)
   {
-    if (type != UNSPECIFIED_TYPE)
+    if (type == SFST_TYPE || type == FOMA_TYPE)
+      { convert(TROPICAL_OFST_TYPE); }
+    else if (type != UNSPECIFIED_TYPE)
       { convert(type); }
     switch (this->type)
       {
@@ -918,9 +920,9 @@ void HfstTransducer::extract_strings(WeightedStrings<float>::Set &results)
       case FOMA_TYPE:
 	throw hfst::exceptions::FunctionNotImplementedException();
 	break;
-      default:       
-	assert(false);
-	return *this;
+      default:
+	throw hfst::exceptions::FunctionNotImplementedException();
+	break;       
       }
   }
 

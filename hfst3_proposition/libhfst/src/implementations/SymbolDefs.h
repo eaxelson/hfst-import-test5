@@ -10,6 +10,7 @@
 
 namespace hfst
 {
+  /** \brief A namespace for symbol datatypes. */
 namespace symbols
 {
   using namespace hfst::exceptions;
@@ -30,8 +31,11 @@ namespace symbols
   typedef std::pair<Symbol,Symbol> SymbolPair;
   typedef std::set<SymbolPair> SymbolPairSet;
 
+  /* A symbol in a transition. */
   typedef std::string String;
-  typedef std::pair<String, String> StringPair;
+  /** \brief A symbol pair in a transition. */
+  typedef std::pair<std::string, std::string> StringPair;
+  /** \brief A vector of transitions that represents a path in a transducer. */
   typedef std::vector<StringPair> StringPairVector;
 
   class KeyTableConstIterator_;
