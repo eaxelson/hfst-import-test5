@@ -9,11 +9,17 @@ namespace hfst { namespace implementations {
   using std::stringstream;
   using std::ios;
 
+  /** \brief A weighted string pair that represents a path in a transducer.
+
+      @see WeightedStrings */
   template<class W> class WeightedString
     {
     public:
+      /** \brief The input string of the string pair. */
       std::string istring;
+      /** \brief The output string of the string pair. */
       std::string ostring;
+      /** \brief The weight of the string pair. */
       W weight;
       
       WeightedString(const std::string &is,const std::string &os,W w)
@@ -68,10 +74,15 @@ namespace hfst { namespace implementations {
 	  this->weight = another.weight; }
     };
 
+  /** \brief A class for storing weighted string pairs that represent paths in a transducer. 
+
+      @see HfstTransducer::extract_strings */
   template<class W> class WeightedStrings
     { public:
 
+      /** \brief A vector of weighted string pairs. */
       typedef std::vector< WeightedString<W> > Vector; 
+      /** \brief A set of weighted string pairs. */
       typedef std::set< WeightedString<W> > Set; 
 
       static void add(Vector &v,WeightedString<W> &s)
