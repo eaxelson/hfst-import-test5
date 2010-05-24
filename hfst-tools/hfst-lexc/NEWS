@@ -1,0 +1,5 @@
+0.5 (Summer 2009)
+-----------------
+* Wrapping up stable(!) version of HFST and frozen branch hfst-lexc
+* Preliminary readline based imitation of Xerox lexc
+* Mac OS X support

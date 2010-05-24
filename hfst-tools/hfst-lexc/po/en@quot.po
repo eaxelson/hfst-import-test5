@@ -1,0 +1,532 @@
+# English translations for hfst-lexc package.
+# Copyright (C) 2009 University of Helsinki
+# This file is distributed under the same license as the hfst-lexc package.
+# Automatically generated, 2009.
+#
+# All this catalog "translates" are quotation characters.
+# The msgids must be ASCII and therefore cannot contain real quotation
+# characters, only substitutes like grave accent (0x60), apostrophe (0x27)
+# and double quote (0x22). These substitutes look strange; see
+# http://www.cl.cam.ac.uk/~mgk25/ucs/quotes.html
+#
+# This catalog translates grave accent (0x60) and apostrophe (0x27) to
+# left single quotation mark (U+2018) and right single quotation mark (U+2019).
+# It also translates pairs of apostrophe (0x27) to
+# left single quotation mark (U+2018) and right single quotation mark (U+2019)
+# and pairs of quotation mark (0x22) to
+# left double quotation mark (U+201C) and right double quotation mark (U+201D).
+#
+# When output to an UTF-8 terminal, the quotation characters appear perfectly.
+# When output to an ISO-8859-1 terminal, the single quotation marks are
+# transliterated to apostrophes (by iconv in glibc 2.2 or newer) or to
+# grave/acute accent (by libiconv), and the double quotation marks are
+# transliterated to 0x22.
+# When output to an ASCII terminal, the single quotation marks are
+# transliterated to apostrophes, and the double quotation marks are
+# transliterated to 0x22.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: hfst-lexc 0.5-beta\n"
+"Report-Msgid-Bugs-To: hfst-bugs@helsinki.fi\n"
+"POT-Creation-Date: 2009-11-03 18:18+0200\n"
+"PO-Revision-Date: 2009-11-03 18:18+0200\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#. TRANSLATORS: filename, line and column
+#: src/flex-utils.cc:115
+#, c-format
+msgid "%s:%d.%d"
+msgstr "%s:%d.%d"
+
+#. TRANSLATORS: filename, line, column to column
+#: src/flex-utils.cc:121
+#, c-format
+msgid "%s:%d.%d-%d"
+msgstr "%s:%d.%d-%d"
+
+#. TRANSLATORS: filename, line-column to line-column
+#: src/flex-utils.cc:129
+#, c-format
+msgid "%s:%d.%d-%d.%d"
+msgstr "%s:%d.%d-%d.%d"
+
+#: src/flex-utils.cc:147
+#, c-format
+msgid "[near: `%s\\n']"
+msgstr "[near: ‘%s\\n’]"
+
+#: src/flex-utils.cc:152
+#, c-format
+msgid "[near: `%s']"
+msgstr "[near: ‘%s’]"
+
+#: src/flex-utils.cc:156
+#, c-format
+msgid "[near: `%30s...' (truncated)]"
+msgstr "[near: ‘%30s...’ (truncated)]"
+
+#: src/flex-utils.cc:220
+#, c-format
+msgid "Stray escape char %% in %s\n"
+msgstr "Stray escape char %% in %s\n"
+
+#: src/hfst-lexc.cc:217
+msgid "<stdout>"
+msgstr "<stdout>"
+
+#: src/hfst-lexc.cc:234
+#, c-format
+msgid ""
+"Usage: %s [OPTIONS] [INFILE...]\n"
+"Compile lexc files into an HFST transducer\n"
+"\n"
+"  -h, --help                   Print this help message\n"
+"  -V, --version                Print version info\n"
+"  -v, --verbose                Print verbosely while compiling\n"
+"  -q, --quiet                  Do not print verbosely while compiling\n"
+"  -o, --output=OUTFILE         Write output to OUTFILE\n"
+"  -w, --weighted               Use weighted transducer format\n"
+"  -u, --unweighted             Use unweighted transducer format\n"
+"  -t, --time                   Time all stuff\n"
+"  -d, --debug                  Print very verbosely\n"
+"  -y, --hlexcdebug             Enable Yacc's debug state\n"
+"  -X, --xerox                  Imitate Xerox lexc messages\n"
+"\n"
+"If either INFILE... or OUTFILE is missing or -, standard streams will be "
+"used.\n"
+"If output is stdout, -q is implied.\n"
+"If SYMFILE is missing, symbol table will be written with transducer binary, "
+"if possible.\n"
+"\n"
+"Examples:\n"
+"  hfst-lexc -o file.hfst file.hlexc  compiles single lexicon withdefault "
+"options\n"
+"  hfst-lexc -w -v -o file.hwfst file1.hlexc file2.hlexc  compile weighted "
+"lexicons from multiple sources\n"
+"\n"
+"Report bugs to HFST team <hfst-bugs@helsinki.fi>\n"
+msgstr ""
+"Usage: %s [OPTIONS] [INFILE...]\n"
+"Compile lexc files into an HFST transducer\n"
+"\n"
+"  -h, --help                   Print this help message\n"
+"  -V, --version                Print version info\n"
+"  -v, --verbose                Print verbosely while compiling\n"
+"  -q, --quiet                  Do not print verbosely while compiling\n"
+"  -o, --output=OUTFILE         Write output to OUTFILE\n"
+"  -w, --weighted               Use weighted transducer format\n"
+"  -u, --unweighted             Use unweighted transducer format\n"
+"  -t, --time                   Time all stuff\n"
+"  -d, --debug                  Print very verbosely\n"
+"  -y, --hlexcdebug             Enable Yacc's debug state\n"
+"  -X, --xerox                  Imitate Xerox lexc messages\n"
+"\n"
+"If either INFILE... or OUTFILE is missing or -, standard streams will be "
+"used.\n"
+"If output is stdout, -q is implied.\n"
+"If SYMFILE is missing, symbol table will be written with transducer binary, "
+"if possible.\n"
+"\n"
+"Examples:\n"
+"  hfst-lexc -o file.hfst file.hlexc  compiles single lexicon withdefault "
+"options\n"
+"  hfst-lexc -w -v -o file.hwfst file1.hlexc file2.hlexc  compile weighted "
+"lexicons from multiple sources\n"
+"\n"
+"Report bugs to HFST team <hfst-bugs@helsinki.fi>\n"
+
+#: src/hfst-lexc.cc:277
+#, c-format
+msgid ""
+"%s\n"
+"copyright (C) 2009 University of Helsinki,\n"
+"License GPLv3: GNU GPL version 3 <http://gnu.org/licenses/gpl.html>\n"
+"This is free software: you are free to change and redistribute it.\n"
+"There is NO WARRANTY, to the extent permitted by law.\n"
+msgstr ""
+"%s\n"
+"copyright (C) 2009 University of Helsinki,\n"
+"License GPLv3: GNU GPL version 3 <http://gnu.org/licenses/gpl.html>\n"
+"This is free software: you are free to change and redistribute it.\n"
+"There is NO WARRANTY, to the extent permitted by law.\n"
+
+#: src/hfst-lexc.cc:292
+#, c-format
+msgid "Try ``%s --help'' for more information.\n"
+msgstr "Try `‘%s --help’' for more information.\n"
+
+#: src/hfst-lexc.cc:306
+#, c-format
+msgid "printing verbosely\n"
+msgstr "printing verbosely\n"
+
+#: src/hfst-lexc.cc:307
+#, c-format
+msgid "debug enabled\n"
+msgstr "debug enabled\n"
+
+#: src/hfst-lexc.cc:308
+#, c-format
+msgid "timing enabled\n"
+msgstr "timing enabled\n"
+
+#: src/hfst-lexc.cc:311
+#, c-format
+msgid "building weighted transducer\n"
+msgstr "building weighted transducer\n"
+
+#: src/hfst-lexc.cc:315
+#, c-format
+msgid "building unweighted transducer\n"
+msgstr "building unweighted transducer\n"
+
+#: src/hfst-lexc.cc:327
+#, c-format
+msgid ""
+"\n"
+"Reading from <stdin>\n"
+msgstr ""
+"\n"
+"Reading from <stdin>\n"
+
+#: src/hfst-lexc.cc:328
+msgid "<stdin>"
+msgstr "<stdin>"
+
+#: src/hfst-lexc.cc:334
+#, c-format
+msgid ""
+"\n"
+"reading from %s\n"
+msgstr ""
+"\n"
+"reading from %s\n"
+
+#: src/hfst-lexc.cc:343
+#, c-format
+msgid "There were parsing errors, aborting.\n"
+msgstr "There were parsing errors, aborting.\n"
+
+#: src/hfst-lexc.cc:348
+#, c-format
+msgid "Compiling...\n"
+msgstr "Compiling...\n"
+
+#: src/hfst-lexc.cc:353
+#, c-format
+msgid "Saving result to standard output\n"
+msgstr "Saving result to standard output\n"
+
+#: src/hfst-lexc.cc:358
+#, c-format
+msgid "Saving result to %s\n"
+msgstr "Saving result to %s\n"
+
+#: src/hfst-lexc.cc:390
+msgid "Whole process"
+msgstr "Whole process"
+
+#: src/hfst-lexc.cc:391
+msgid " * String parsing"
+msgstr " * String parsing"
+
+#: src/hfst-lexc.cc:392
+msgid " * String trie building"
+msgstr " * String trie building"
+
+#: src/hfst-lexc.cc:393
+msgid " * Regular expression compiling"
+msgstr " * Regular expression compiling"
+
+#: src/hfst-lexc.cc:394
+msgid " * Regular expression joining"
+msgstr " * Regular expression joining"
+
+#: src/hfst-lexc.cc:395
+msgid " * Completing sigma set"
+msgstr " * Completing sigma set"
+
+#: src/hfst-lexc.cc:396
+msgid " * Applying morphotax"
+msgstr " * Applying morphotax"
+
+#: src/hfst-lexc.cc:397
+msgid " * All the minimising"
+msgstr " * All the minimising"
+
+#: src/lexc.cc:111 src/lexc.cc:169 src/lexc.cc:199
+#, c-format
+msgid "Undeclared character %s in %s\n"
+msgstr "Undeclared character %s in %s\n"
+
+#: src/lexc.cc:114 src/lexc.cc:172 src/lexc.cc:202
+#, c-format
+msgid "  All strings containing %s are dropped\n"
+msgstr "  All strings containing %s are dropped\n"
+
+#: src/lexc.cc:119 src/lexc.cc:177 src/lexc.cc:207 src/lexc.cc:272
+#, c-format
+msgid "Found Xymbol %s from %s\n"
+msgstr "Found Xymbol %s from %s\n"
+
+#: src/lexc.cc:266
+#, c-format
+msgid ""
+"Undeclared character %s in %s\n"
+"All strings containing %s dropped\n"
+msgstr ""
+"Undeclared character %s in %s\n"
+"All strings containing %s dropped\n"
+
+#: src/lexc.cc:400
+#, c-format
+msgid "Building lexicon..."
+msgstr "Building lexicon..."
+
+#: src/lexc.cc:404
+msgid "sigma\n"
+msgstr "sigma\n"
+
+#: src/lexc.cc:405
+msgid "gamma\n"
+msgstr "gamma\n"
+
+#: src/lexc.cc:415
+msgid "Strings trie\n"
+msgstr "Strings trie\n"
+
+#: src/lexc.cc:420
+msgid "RegExps\n"
+msgstr "RegExps\n"
+
+#: src/lexc.cc:425
+msgid "Strings or RegExps\n"
+msgstr "Strings or RegExps\n"
+
+#: src/lexc.cc:429
+#, c-format
+msgid "Minimizing..."
+msgstr "Minimizing..."
+
+#: src/lexc.cc:434
+msgid "Morphotaxed\n"
+msgstr "Morphotaxed\n"
+
+#: src/lexc.cc:435
+#, c-format
+msgid "Done!\n"
+msgstr "Done!\n"
+
+#: src/lexcio.cc:90 src/lexcio.cc:135
+#, c-format
+msgid "could not open %s for writing: %s\n"
+msgstr "could not open %s for writing: %s\n"
+
+#: src/lexcio.cc:128
+#, c-format
+msgid "could not open %s for reading: %s\n"
+msgstr "could not open %s for reading: %s\n"
+
+#: src/lexcio.cc:142
+#, c-format
+msgid "could not open %s: %s\n"
+msgstr "could not open %s: %s\n"
+
+#: src/lexcio.cc:155
+#, c-format
+msgid "w%d: %s\n"
+msgstr "w%d: %s\n"
+
+#: src/lexcio.cc:160
+#, c-format
+msgid "W%d: %s"
+msgstr "W%d: %s"
+
+#: src/lexcio.cc:164
+#, c-format
+msgid "E%d: %s"
+msgstr "E%d: %s"
+
+#: src/lexcio.cc:192
+#, c-format
+msgid "%s: W%d: %s %s\n"
+msgstr "%s: W%d: %s %s\n"
+
+#: src/lexcio.cc:198
+#, c-format
+msgid "%s: E%d: %s %s\n"
+msgstr "%s: E%d: %s %s\n"
+
+#: src/lexcio.cc:222
+#, c-format
+msgid "%s:\n"
+msgstr "%s:\n"
+
+#: src/lexcio.cc:237
+#, c-format
+msgid ", %s"
+msgstr ", %s"
+
+#: src/lexcio.cc:256
+#, c-format
+msgid "%s\n"
+msgstr "%s\n"
+
+#: src/lexcio.cc:260
+#, c-format
+msgid "\n"
+msgstr "\n"
+
+#: src/lexcio.cc:318
+#, c-format
+msgid "%s: %f s\n"
+msgstr "%s: %f s\n"
+
+#: src/lexc-lexer.ll:246
+msgid "Illegal 8-bit sequence (cannot form valid UTF-8)"
+msgstr "Illegal 8-bit sequence (cannot form valid UTF-8)"
+
+#: src/lexc-lexer.ll:252
+msgid "Syntax error in lexer (no valid token found at the point)"
+msgstr "Syntax error in lexer (no valid token found at the point)"
+
+#: src/lexc-parser.yy:63
+#, c-format
+msgid "%s = %s\n"
+msgstr "%s = %s\n"
+
+#: src/lexc-parser.yy:69
+#, c-format
+msgid "ALPHABET: %s\n"
+msgstr "ALPHABET: %s\n"
+
+#: src/lexc-parser.yy:83
+#, c-format
+msgid "MULTICHAR_SYMBOL: %s\n"
+msgstr "MULTICHAR_SYMBOL: %s\n"
+
+#: src/lexc-parser.yy:96
+#, c-format
+msgid "%s = [ %s ]\n"
+msgstr "%s = [ %s ]\n"
+
+#: src/lexc-parser.yy:103
+#, c-format
+msgid "Defined '%s': ? Kb., ? states, ? arcs, ? paths.\n"
+msgstr "Defined '%s': ? Kb., ? states, ? arcs, ? paths.\n"
+
+#: src/lexc-parser.yy:112
+#, c-format
+msgid "LEXICON: %s\n"
+msgstr "LEXICON: %s\n"
+
+#: src/lexc-parser.yy:115
+#, c-format
+msgid "%d "
+msgstr "%d "
+
+#: src/lexc-parser.yy:126
+#, c-format
+msgid "first lexicon is not named Root\n"
+msgstr "first lexicon is not named Root\n"
+
+#: src/lexc-parser.yy:128
+#, c-format
+msgid "  Using %s as initial lexicon\n"
+msgstr "  Using %s as initial lexicon\n"
+
+#: src/lexc-parser.yy:134
+#, c-format
+msgid "LEXICON Root is not first\n"
+msgstr "LEXICON Root is not first\n"
+
+#: src/lexc-parser.yy:136
+#, c-format
+msgid "  Using Root as initial lexicon again\n"
+msgstr "  Using Root as initial lexicon again\n"
+
+#: src/lexc-parser.yy:144
+#, c-format
+msgid "%s..."
+msgstr "%s..."
+
+#: src/lexc-parser.yy:145
+#, c-format
+msgid ""
+"\n"
+"Lexicon %s...\n"
+msgstr ""
+"\n"
+"Lexicon %s...\n"
+
+#: src/lexc-parser.yy:184
+#, c-format
+msgid "Entries so far: %10d; in this lexicon: %10d\r"
+msgstr "Entries so far: %10d; in this lexicon: %10d\r"
+
+#: src/lexc-parser.yy:188
+#, c-format
+msgid "%d..."
+msgstr "%d..."
+
+#: src/lexc-parser.yy:193
+#, c-format
+msgid "Ignoring info strings\n"
+msgstr "Ignoring info strings\n"
+
+#: src/lexc-parser.yy:198
+#, c-format
+msgid "infostring %s\n"
+msgstr "infostring %s\n"
+
+#: src/lexc-parser.yy:202
+#, c-format
+msgid "weight %f\n"
+msgstr "weight %f\n"
+
+#: src/lexc-parser.yy:208
+#, c-format
+msgid "Building unweighted transducer from weighted lexicon\n"
+msgstr "Building unweighted transducer from weighted lexicon\n"
+
+#: src/lexc-parser.yy:255
+#, c-format
+msgid "%d\n"
+msgstr "%d\n"
+
+#: src/lexc-parser.yy:256
+#, c-format
+msgid "EOF\n"
+msgstr "EOF\n"
+
+#: src/lexc-parser.yy:264
+#, c-format
+msgid "END\n"
+msgstr "END\n"
+
+#: src/lexc-parser.yy:265
+#, c-format
+msgid ""
+"\n"
+"Explicit END called, skipping rest\n"
+msgstr ""
+"\n"
+"Explicit END called, skipping rest\n"
+
+#: src/lexc-parser.yy:324
+msgid "Reading alphabet"
+msgstr "Reading alphabet"
+
+#: src/lexc-parser.yy:346
+msgid "Reading multicharacter symbols"
+msgstr "Reading multicharacter symbols"
+
+#: src/lexc-parser.yy:370
+msgid "Reading definitions"
+msgstr "Reading definitions"

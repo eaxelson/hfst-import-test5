@@ -1,0 +1,9 @@
+Alphabet
+
+	a b a:b c c:d ;
+
+Rules 
+
+"Rule1"
+a:b | c:  => a _ ;
+
