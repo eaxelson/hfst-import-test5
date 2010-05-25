@@ -12,10 +12,10 @@ namespace hfst { namespace implementations
     filename(filename),i_stream(filename),input_stream(i_stream)
   {}
 
-  StringSymbolSet TropicalWeightTransducer::get_string_symbol_set(StdVectorFst *t)
+  StringSet TropicalWeightTransducer::get_string_set(StdVectorFst *t)
   {
     assert(t->InputSymbols() != NULL);
-    StringSymbolSet s;
+    StringSet s;
     for ( fst::SymbolTableIterator it = fst::SymbolTableIterator(*(t->InputSymbols()));
 	  not it.Done(); it.Next() ) {
       s.insert( std::string(it.Symbol()) );
@@ -27,19 +27,19 @@ namespace hfst { namespace implementations
      the same symbol-to-number encoding as t2.
      @pre t2's symbol table must contain all symbols in t1's symbol table. 
   */
-  KeyMap TropicalWeightTransducer::create_mapping(fst::StdVectorFst *t1, fst::StdVectorFst *t2)
+  NumberNumberMap TropicalWeightTransducer::create_mapping(fst::StdVectorFst *t1, fst::StdVectorFst *t2)
   {
-    KeyMap km;
+    NumberNumberMap km;
     // find the number-to-number mappings for transducer t1
     for ( fst::SymbolTableIterator it = fst::SymbolTableIterator(*(t1->InputSymbols()));
 	  not it.Done(); it.Next() ) {    
-      km [ (Key)it.Value() ] = (Key) t2->InputSymbols()->Find( it.Symbol() );
+      km [ (unsigned int)it.Value() ] = (unsigned int) t2->InputSymbols()->Find( it.Symbol() );
     }
     return km;
   }
 
   /* Recode the symbol numbers in this transducer as indicated in KeyMap km. */
-  void TropicalWeightTransducer::recode_symbol_numbers(StdVectorFst *t, KeyMap &km) 
+  void TropicalWeightTransducer::recode_symbol_numbers(StdVectorFst *t, NumberNumberMap &km) 
   {
     for (fst::StateIterator<StdVectorFst> siter(*t); 
 	 not siter.Done(); siter.Next())
@@ -429,7 +429,7 @@ namespace hfst { namespace implementations
      are expanded according to the StringSymbolSet 'unknown' that lists all symbols previously
      unknown to this transducer.
   */
-  StdVectorFst * TropicalWeightTransducer::expand_arcs(StdVectorFst * t, StringSymbolSet &unknown)
+  StdVectorFst * TropicalWeightTransducer::expand_arcs(StdVectorFst * t, StringSet &unknown)
   {
     //fprintf(stderr, "TropicalWeightTransducer::expand_arcs...\n");
     StdVectorFst * result = new StdVectorFst();
@@ -487,11 +487,11 @@ namespace hfst { namespace implementations
 	    if ( arc.ilabel == 1 &&       // cross-product "?:?"
 		 arc.olabel == 1 )
 	      {
-		for (StringSymbolSet::iterator it1 = unknown.begin(); it1 != unknown.end(); it1++) 
+		for (StringSet::iterator it1 = unknown.begin(); it1 != unknown.end(); it1++) 
 		  {
 		    //fprintf(stderr, "cross-product ?:?\n");
 		    int64 inumber = is->Find(*it1);
-		    for (StringSymbolSet::iterator it2 = unknown.begin(); it2 != unknown.end(); it2++) 
+		    for (StringSet::iterator it2 = unknown.begin(); it2 != unknown.end(); it2++) 
 		      {
 			int64 onumber = is->Find(*it2);
 			if (inumber != onumber)
@@ -505,7 +505,7 @@ namespace hfst { namespace implementations
 		     arc.olabel == 2 )       
 	      {
 		//fprintf(stderr, "identity ?:?\n");
-		for (StringSymbolSet::iterator it = unknown.begin(); it != unknown.end(); it++) 
+		for (StringSet::iterator it = unknown.begin(); it != unknown.end(); it++) 
 		  {
 		    int64 number = is->Find(*it);
 		    result->AddArc(result_s, StdArc(number, number, arc.weight, result_nextstate));
@@ -515,7 +515,7 @@ namespace hfst { namespace implementations
 	    else if (arc.ilabel == 1)  // "?:x"
 	      {
 		//fprintf(stderr, "?:x\n");
-		for (StringSymbolSet::iterator it = unknown.begin(); it != unknown.end(); it++) 
+		for (StringSet::iterator it = unknown.begin(); it != unknown.end(); it++) 
 		  {
 		    int64 number = is->Find(*it);
 		    result->AddArc(result_s, StdArc(number, arc.olabel, arc.weight, result_nextstate));
@@ -525,7 +525,7 @@ namespace hfst { namespace implementations
 	    else if (arc.olabel == 1)  // "x:?"
 	      {
 		//fprintf(stderr, "x:?\n");
-		for (StringSymbolSet::iterator it = unknown.begin(); it != unknown.end(); it++) 
+		for (StringSet::iterator it = unknown.begin(); it != unknown.end(); it++) 
 		  {
 		    int64 number = is->Find(*it);
 		    result->AddArc(result_s, StdArc(arc.ilabel, number, arc.weight, result_nextstate));
@@ -551,23 +551,23 @@ namespace hfst { namespace implementations
 
     // 1. Calculate the set of unknown symbols for transducers t1 and t2.
 
-    StringSymbolSet unknown_t1;    // symbols known to another but not this
-    StringSymbolSet unknown_t2;    // and vice versa
-    StringSymbolSet t1_symbols = get_string_symbol_set(t1);
-    StringSymbolSet t2_symbols = get_string_symbol_set(t2);
-    KeyTable::collect_unknown_sets(t1_symbols, unknown_t1,
-				   t2_symbols, unknown_t2);
+    StringSet unknown_t1;    // symbols known to another but not this
+    StringSet unknown_t2;    // and vice versa
+    StringSet t1_symbols = get_string_set(t1);
+    StringSet t2_symbols = get_string_set(t2);
+    hfst::symbols::collect_unknown_sets(t1_symbols, unknown_t1,
+					t2_symbols, unknown_t2);
 
     // 2. Add new symbols from transducer t1 to the symbol table of transducer t2...
 
-    for ( StringSymbolSet::const_iterator it = unknown_t2.begin();
+    for ( StringSet::const_iterator it = unknown_t2.begin();
 	  it != unknown_t2.end(); it++ ) {
 	t2->InputSymbols()->AddSymbol(*it);
 	//fprintf(stderr, "added %s to the set of symbols unknown to t2\n", (*it).c_str());
     }
 
     // ...calculate the number mappings needed in harmonization...
-    KeyMap km = create_mapping(t1, t2);
+    NumberNumberMap km = create_mapping(t1, t2);
 
     // ... replace the symbol table of t1 with a copy of t2's symbol table
     //delete t1->InputSymbols(); this causes problems...
@@ -608,7 +608,7 @@ namespace hfst { namespace implementations
      That is to se that there isn't a name "x" s.t. the input symbol number
      of "x" is not the same as its output symbol number.
      Not done yet!!!! */
-  void TropicalWeightInputStream::populate_key_table
+  /*  void TropicalWeightInputStream::populate_key_table
   (KeyTable &key_table,
    const SymbolTable * i_symbol_table,
    const SymbolTable * o_symbol_table,
@@ -645,7 +645,7 @@ namespace hfst { namespace implementations
       { transducer_key_table.harmonize(key_map,key_table); }
     catch (const char * p)
       { throw p; }
-  }
+      }*/
 
   /* Skip the identifier string "TROPICAL_OFST_TYPE" */
   void TropicalWeightInputStream::skip_identifier_version_3_0(void)
@@ -1061,7 +1061,7 @@ namespace hfst { namespace implementations
   }
 
   // could these be removed?
-  StdVectorFst * TropicalWeightTransducer::define_transducer(Key k)
+  /*  StdVectorFst * TropicalWeightTransducer::define_transducer(Key k)
   {
     StdVectorFst * t = new StdVectorFst;
     StateId s1 = t->AddState();
@@ -1081,7 +1081,7 @@ namespace hfst { namespace implementations
     t->SetFinal(s2,0);
     t->AddArc(s1,StdArc(key_pair.first,key_pair.second,0,s2));
     return t;
-  }
+    }*/
 
   StdVectorFst * TropicalWeightTransducer::define_transducer(const std::string &symbol)
   {
@@ -1125,7 +1125,7 @@ namespace hfst { namespace implementations
     return Equivalent(A, B);
   }
 
-  StdVectorFst * TropicalWeightTransducer::define_transducer
+  /*StdVectorFst * TropicalWeightTransducer::define_transducer
   (const KeyPairVector &kpv)
   {
     StdVectorFst * t = new StdVectorFst;
@@ -1141,7 +1141,7 @@ namespace hfst { namespace implementations
       }
     t->SetFinal(s1,0);
     return t;
-  }
+    }*/
 
   StdVectorFst * TropicalWeightTransducer::define_transducer
   (const StringPairVector &spv)
@@ -1297,8 +1297,8 @@ namespace hfst { namespace implementations
       fprintf(stderr, "ERROR:  TropicalWeightTransducer::add_transition:  input and output symbols are not the same\n"); 
       throw hfst::exceptions::ErrorException(); 
       }*/
-    Key ilabel = t->InputSymbols()->AddSymbol(isymbol);
-    Key olabel = t->InputSymbols()->AddSymbol(osymbol);
+    unsigned int ilabel = t->InputSymbols()->AddSymbol(isymbol);
+    unsigned int olabel = t->InputSymbols()->AddSymbol(osymbol);
     t->AddArc(source, StdArc(ilabel, olabel, w, target));
     return;
   }
@@ -1418,8 +1418,9 @@ namespace hfst { namespace implementations
   
   typedef std::pair<int,int> LabelPair;
   typedef std::vector<LabelPair> LabelPairVector;
+
   StdVectorFst * TropicalWeightTransducer::substitute
-  (StdVectorFst * t,Key old_key,Key new_key) 
+  (StdVectorFst * t,unsigned int old_key,unsigned int new_key) 
   {
     LabelPairVector v;
     v.push_back(LabelPair(old_key,new_key));
@@ -1428,8 +1429,8 @@ namespace hfst { namespace implementations
   }
   
   StdVectorFst * TropicalWeightTransducer::substitute(StdVectorFst * t,
-			    KeyPair old_key_pair,
-			    KeyPair new_key_pair)
+						      pair<unsigned int, unsigned int> old_key_pair,
+						      pair<unsigned int, unsigned int> new_key_pair)
   {
     EncodeMapper<StdArc> encode_mapper(0x0001,ENCODE);
     EncodeFst<StdArc> enc(*t,&encode_mapper);
@@ -1444,8 +1445,8 @@ namespace hfst { namespace implementations
     // reinterpret_cast worked, but that is apparently unsafe...
     StdVectorFst * subst = 
       substitute(static_cast<StdVectorFst*>(static_cast<Fst<StdArc>*>(&enc)),
-		 static_cast<Key>(old_pair_code.ilabel),
-		 static_cast<Key>(new_pair_code.ilabel));
+		 static_cast<unsigned int>(old_pair_code.ilabel),
+		 static_cast<unsigned int>(new_pair_code.ilabel));
 
     DecodeFst<StdArc> dec(*subst,encode_mapper);
     delete subst;
@@ -1463,21 +1464,21 @@ namespace hfst { namespace implementations
   }
 
   StdVectorFst * TropicalWeightTransducer::substitute(StdVectorFst *t,
-						      StringSymbolPair old_symbol_pair,
-						      StringSymbolPair new_symbol_pair)
+						      StringPair old_symbol_pair,
+						      StringPair new_symbol_pair)
   {
     SymbolTable * st = t->InputSymbols();
-    KeyPair old_pair(st->AddSymbol(old_symbol_pair.first),
-		     st->AddSymbol(old_symbol_pair.second));
-    KeyPair new_pair(st->AddSymbol(new_symbol_pair.first),
-		     st->AddSymbol(new_symbol_pair.second));
+    pair<unsigned int, unsigned int> old_pair(st->AddSymbol(old_symbol_pair.first),
+					      st->AddSymbol(old_symbol_pair.second));
+    pair<unsigned int, unsigned int> new_pair(st->AddSymbol(new_symbol_pair.first),
+					      st->AddSymbol(new_symbol_pair.second));
     StdVectorFst * retval = substitute(t, old_pair, new_pair);
     retval->SetInputSymbols( new SymbolTable ( *(t->InputSymbols()) ) );
     return retval;
   }
 
   StdVectorFst * TropicalWeightTransducer::substitute(StdVectorFst *t,
-						      StringSymbolPair old_symbol_pair,
+						      StringPair old_symbol_pair,
 						      StdVectorFst *transducer)
   {
     int states = t->NumStates();
@@ -1699,7 +1700,6 @@ namespace hfst { namespace implementations
     RelabelFst<StdArc> t_subst(*t,v,v);
     return new StdVectorFst(t_subst);
   }
-#endif
 
   // TODO
   void expand_unknown(StdVectorFst *t, KeyTable key_table, SymbolSet &expand_unknown,
@@ -1728,17 +1728,18 @@ namespace hfst { namespace implementations
     (void)unknown_symbol;
     return;
   }
+#endif
 
   void extract_reversed_strings
   (StdVectorFst * t, StdArc::StateId s,
-   WeightedStrings<float>::Vector &reversed_results, set<StateId> &states_visited)
+   WeightedPaths<float>::Vector &reversed_results, set<StateId> &states_visited)
   {
     if (states_visited.find(s) == states_visited.end())
       states_visited.insert(s);
     else
       throw TransducerIsCyclicException();
 
-    WeightedStrings<float>::Vector reversed_continuations;
+    WeightedPaths<float>::Vector reversed_continuations;
     for (fst::ArcIterator<StdVectorFst> it(*t,s); !it.Done(); it.Next())
       {
 	const StdArc &arc = it.Value();
@@ -1750,14 +1751,14 @@ namespace hfst { namespace implementations
 	  { istring = t->InputSymbols()->Find(arc.ilabel); }
 	if (arc.olabel != 0)
 	  { ostring = t->InputSymbols()->Find(arc.olabel); }
-	WeightedString<float> 
+	WeightedPath<float> 
 	  arc_string(istring,ostring,arc.weight.Value());
-	WeightedStrings<float>::add(arc_string,reversed_continuations);
-	WeightedStrings<float>::cat(reversed_results,reversed_continuations);
+	WeightedPaths<float>::add(arc_string,reversed_continuations);
+	WeightedPaths<float>::cat(reversed_results,reversed_continuations);
 	reversed_continuations.clear();
       }
     if (t->Final(s) != TropicalWeight::Zero()) 
-      { reversed_results.push_back(WeightedString<float>
+      { reversed_results.push_back(WeightedPath<float>
 				   ("","",t->Final(s).Value())); 
       }
 
@@ -1765,11 +1766,11 @@ namespace hfst { namespace implementations
   }
 
   void TropicalWeightTransducer::extract_strings
-  (StdVectorFst * t, WeightedStrings<float>::Set &results)
+  (StdVectorFst * t, WeightedPaths<float>::Set &results)
   {
     if (t->Start() == -1)
       { return; }
-    WeightedStrings<float>::Vector reversed_results;
+    WeightedPaths<float>::Vector reversed_results;
     set<StateId> states_visited;
     extract_reversed_strings(t,t->Start(),reversed_results,states_visited);
     results.insert(reversed_results.begin(),reversed_results.end());

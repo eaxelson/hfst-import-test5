@@ -1,11 +1,12 @@
 #include "SymbolDefs.h"
-#include "GlobalSymbolTable.h"
+//#include "GlobalSymbolTable.h"
 #include <stdbool.h>
 #include "foma/fomalib.h"
 #include "SFST/src/alphabet.h"
 
 namespace hfst { namespace symbols
 {
+  /*
   KeyTable::KeyTable(void)
   { key_symbol_vector.push_back(0); symbol_key_map[0] = 0; }
 
@@ -18,7 +19,7 @@ namespace hfst { namespace symbols
   KeyTable::KeyTable(const KeyTable &another):
     key_symbol_vector(another.key_symbol_vector),
     symbol_key_map(another.symbol_key_map)
-  {}
+    {}*/
 
   /*
   KeyTable::KeyTable(struct sigma * s)
@@ -61,6 +62,7 @@ namespace hfst { namespace symbols
     }
   }
   */
+  /*
   Key KeyTable::add_symbol(Symbol s)
   {
     if (symbol_key_map.find(s) != symbol_key_map.end())
@@ -198,8 +200,25 @@ namespace hfst { namespace symbols
   { 
     if (this == &another) { return; }
     it = another.it;
+    }*/
+
+  void collect_unknown_sets(StringSet &s1, StringSet &unknown1,
+				   StringSet &s2, StringSet &unknown2)
+  {
+    for (StringSet::const_iterator it1 = s1.begin(); it1 != s1.end(); it1++) {
+      String sym1 = *it1;
+      if ( s2.find(sym1) == s2.end() )
+	unknown2.insert(sym1);
+    }
+    for (StringSet::const_iterator it2 = s2.begin(); it2 != s2.end(); it2++) {
+      String sym2 = *it2;
+      if ( s1.find(sym2) == s1.end() )
+	unknown1.insert(sym2);
+    }
   }
 
+
+  /*
   void KeyTable::collect_unknown_sets(StringSymbolSet &s1, StringSymbolSet &unknown1,
 				      StringSymbolSet &s2, StringSymbolSet &unknown2)
   {
@@ -240,5 +259,5 @@ namespace hfst { namespace symbols
   { new_key_table.harmonize(key_map,old_key_table); }
   KeyMapper::const_iterator KeyMapper::begin(void) { return key_map.begin(); }
   KeyMapper::const_iterator KeyMapper::end(void) { return key_map.end(); }
-
+  */
 } }

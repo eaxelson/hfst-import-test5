@@ -1,4 +1,4 @@
-#include "GlobalSymbolTable.h"
+//#include "GlobalSymbolTable.h"
 #include "SymbolDefs.h"
 #include "HfstExceptions.h"
 #include "SFST/src/fst.h"
@@ -15,19 +15,19 @@ namespace hfst { namespace implementations
   using std::ostream;
   using std::ostringstream;
 
-  extern GlobalSymbolTable global_symbol_table;
+  //extern GlobalSymbolTable global_symbol_table;
 
   class SfstInputStream 
   {
   private:
     std::string filename;
     FILE * input_file;
-    void add_symbol(StringSymbolMap &string_number_map,
+    void add_symbol(StringNumberMap &string_number_map,
 		    Character c,
 		    Alphabet &alphabet);
-    void populate_key_table(KeyTable &key_table,
+    /*void populate_key_table(KeyTable &key_table,
 			    Alphabet &alphabet,
-			    KeyMap &key_map);
+			    KeyMap &key_map);*/
     void skip_identifier_version_3_0(void);
     void skip_hfst_header(void);
 
@@ -41,7 +41,7 @@ namespace hfst { namespace implementations
     bool is_bad(void);
     bool is_good(void);
     bool is_fst(void);
-    Transducer * read_transducer(KeyTable &key_table);
+    //Transducer * read_transducer(KeyTable &key_table);
     Transducer * read_transducer(bool has_header);
   };
 
@@ -59,6 +59,7 @@ namespace hfst { namespace implementations
     void write_transducer(Transducer * transducer);
   };
   
+  /*
   class SfstTransitionIterator;
   class SfstStateIndexer;
   class SfstState
@@ -77,8 +78,8 @@ namespace hfst { namespace implementations
       typedef SfstTransitionIterator const_iterator; 
       const_iterator begin(void) const;
       const_iterator end(void) const;
-      void print(KeyTable &key_table, ostream &out,
-		 SfstStateIndexer &indexer) const;
+      //void print(KeyTable &key_table, ostream &out,
+      //	 SfstStateIndexer &indexer) const;
   };
   
   class SfstStateIterator 
@@ -112,12 +113,12 @@ namespace hfst { namespace implementations
       Key get_output_key(void) const;
       SfstState get_target_state(void) const;
       SfstState get_source_state(void) const;
-      /* Kind of weird function, since SFST
+      // Kind of weird function, since SFST
 	 transitions don't really carry a weight. 
-	 Will always return true. */
+	 Will always return true. //
       bool get_weight(void) const;
-      void print(KeyTable &key_table, ostream &out,
-		 SfstStateIndexer &indexer) const;
+      //void print(KeyTable &key_table, ostream &out,
+      //		 SfstStateIndexer &indexer) const;
     };
 
   class SfstTransitionIterator
@@ -148,17 +149,18 @@ namespace hfst { namespace implementations
       unsigned int operator[](const SfstState &state);
       const SfstState operator[](unsigned int number);
     };
+  */
 
   class SfstTransducer
     {
     public:
       static Transducer * create_empty_transducer(void);
       static Transducer * create_epsilon_transducer(void);
-      static Transducer * define_transducer(Key k);
-      static Transducer * define_transducer(const KeyPair &kp);
+      //static Transducer * define_transducer(Key k);
+      //static Transducer * define_transducer(const KeyPair &kp);
       static Transducer * define_transducer(const char *symbol);
       static Transducer * define_transducer(const char *isymbol, const char *osymbol);
-      static Transducer * define_transducer(const KeyPairVector &kpv);
+      //static Transducer * define_transducer(const KeyPairVector &kpv);
       static Transducer * define_transducer(const StringPairVector &spv);
       static Transducer * copy(Transducer * t);
       static Transducer * determinize(Transducer * t);
@@ -173,13 +175,13 @@ namespace hfst { namespace implementations
       static Transducer * reverse(Transducer * transducer);
       static Transducer * extract_input_language(Transducer * t);
       static Transducer * extract_output_language(Transducer * t);
-      static void extract_strings(Transducer * t, hfst::implementations::WeightedStrings<float>::Set &results);
-      static Transducer * substitute(Transducer * t,Key old_key,Key new_key);
-      static Transducer * substitute(Transducer * t,
-				     KeyPair old_key_pair,
-				     KeyPair new_key_pair);  // not implemented
+      static void extract_strings(Transducer * t, hfst::implementations::WeightedPaths<float>::Set &results);
+      //static Transducer * substitute(Transducer * t,Key old_key,Key new_key);
+      //static Transducer * substitute(Transducer * t,
+      //			     KeyPair old_key_pair,
+      //			     KeyPair new_key_pair);  // not implemented
 
-      static Transducer * substitute(Transducer * t, StringSymbol old_symbol, StringSymbol new_symbol);
+      static Transducer * substitute(Transducer * t, String old_symbol, String new_symbol);
 
       static Transducer * compose(Transducer * t1,
 			   Transducer * t2);
@@ -191,11 +193,11 @@ namespace hfst { namespace implementations
 			     Transducer * t2);
       static Transducer * subtract(Transducer * t1,
 			    Transducer * t2);
-      typedef SfstStateIterator const_iterator;
-      static const_iterator begin(Transducer * t);
-      static const_iterator end(Transducer * t);
+      //typedef SfstStateIterator const_iterator;
+      //static const_iterator begin(Transducer * t);
+      //static const_iterator end(Transducer * t);
       //static Transducer * harmonize(Transducer * t,KeyMap &key_map);
-      static void print(Transducer * t, KeyTable &key_table, ostream &out);
+      //static void print(Transducer * t, KeyTable &key_table, ostream &out);
 
       static std::pair<Transducer*, Transducer*> harmonize(Transducer *t1, Transducer *t2);
 
@@ -203,12 +205,12 @@ namespace hfst { namespace implementations
       //static void harmonize(Transducer * t1, Transducer * t2);
 
       // see if these can be removed
-      static KeyMap create_mapping(Transducer * t1, Transducer * t2, StringSymbolSet &unknown2);
+      //static KeyMap create_mapping(Transducer * t1, Transducer * t2, StringSymbolSet &unknown2);
 
       static void print_test(Transducer *t);
 
     protected:
-      static StringSymbolSet get_string_symbol_set(Transducer *t);
-      static Transducer * expand_arcs(Transducer * t, StringSymbolSet &unknown);
+      static StringSet get_string_set(Transducer *t);
+      static Transducer * expand_arcs(Transducer * t, StringSet &unknown);
     };
 } }

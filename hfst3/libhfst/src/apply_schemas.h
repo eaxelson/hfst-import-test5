@@ -13,15 +13,15 @@ HfstTransducer &apply
  int n,ImplementationType type);
 
 HfstTransducer &apply
-(SFST::Transducer * (*sfst_funct)(SFST::Transducer *, StringSymbol, StringSymbol),
- fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,StringSymbol, 
-					    StringSymbol),
+(SFST::Transducer * (*sfst_funct)(SFST::Transducer *, String, String),
+ fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,String, 
+					    String),
  hfst::implementations::LogFst * (*log_ofst_funct)(hfst::implementations::LogFst *,
-						  StringSymbol,StringSymbol),
- fsm * (*foma_funct)(fsm *, StringSymbol, StringSymbol),
- StringSymbol k1, StringSymbol k2,ImplementationType type);
+						  String,String),
+ fsm * (*foma_funct)(fsm *, String, String),
+ String k1, String k2,ImplementationType type);
 
-HfstTransducer &apply
+/*HfstTransducer &apply
 (SFST::Transducer * (*sfst_funct)(SFST::Transducer *, KeyPair, 
 				  KeyPair),
  fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,KeyPair, 
@@ -30,7 +30,7 @@ HfstTransducer &apply
 						  KeyPair, KeyPair),
  fsm * (*foma_funct)(fsm *, KeyPair, 
 				  KeyPair),
- KeyPair kp1, KeyPair kp2,ImplementationType type);
+				  KeyPair kp1, KeyPair kp2,ImplementationType type);*/
 
 HfstTransducer &apply
 (SFST::Transducer * (*sfst_funct)(SFST::Transducer *,
