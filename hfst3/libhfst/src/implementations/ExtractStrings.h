@@ -15,11 +15,11 @@ namespace hfst { namespace implementations {
   template<class W> class WeightedPath
     {
     public:
-      /** \brief The input string of the string pair. */
+      /** \brief The input string of the path. */
       std::string istring;
-      /** \brief The output string of the string pair. */
+      /** \brief The output string of the path. */
       std::string ostring;
-      /** \brief The weight of the string pair. */
+      /** \brief The weight of the path. */
       W weight;
       
       WeightedPath(const std::string &is,const std::string &os,W w)

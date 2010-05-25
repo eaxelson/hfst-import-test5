@@ -12,6 +12,46 @@
 #include <cassert>
 #include <iostream>
 
+
+/** \mainpage 
+
+    \section first_section Parameter handling
+
+    Currently, all transducer functions of the type t->function(), e.g. t->reverse(),
+    modify the transducer t
+    and return the modified transducer, i.e. it is possible to write 
+\verbatim
+    t = t->reverse();
+\endverbatim
+
+    All transducer functions of the type t1->function(t2), e.g. t1->intersect(t2) create a new transducer
+    and return it, i.e. it is possible to write
+\verbatim
+    HfstTransducer t_intersection12 = t1->intersect(t2);
+    HfstTransducer t_intersection23 = t2->intersect(t3);
+    HfstTransducer t_intersection13 = t1->intersect(t3);
+\endverbatim
+
+    The future versions should also offer static versions of each transducer function, so that
+    it is possible to write either
+\verbatim
+    t = t->reverse();
+    HfstTransducer t_disj = t1->disjunct(t2);
+\endverbatim
+    or
+\verbatim
+    HfstTransducer t_rev = reverse(t);
+    t1->disjunct(t2);
+\endverbatim
+
+    \section second_section Second section
+    
+    bar
+    bar
+
+*/
+
+
 /** \brief A namespace for the HFST functions and datatypes. */
 namespace hfst
 {
