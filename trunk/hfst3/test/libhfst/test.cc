@@ -87,7 +87,7 @@ void test_function( HfstTransducer& (HfstTransducer::*pt_function) (HfstTransduc
 void test_extract_strings( HfstTransducer &t )
 {
   try {
-    WeightedStrings<float>::Set results;
+    WeightedPaths<float>::Set results;
     t.extract_strings(results);
   }
   catch (TransducerIsCyclicException e) {}
@@ -101,7 +101,7 @@ void test_extract_strings( HfstTransducer &t )
   disj = disj.minimize();
   
   try {
-    WeightedStrings<float>::Set results;
+    WeightedPaths<float>::Set results;
     disj.extract_strings(results);
     assert(3 == (int)results.size());
   }
@@ -373,10 +373,10 @@ int main(int argc, char **argv) {
 
       // ----- substitute string pair -----
       {
-	HfstTransducer test0s = HfstTransducer(test0).substitute(StringSymbolPair("a", "b"), StringSymbolPair("e", "f"));
-	HfstTransducer test1s = HfstTransducer(test1).substitute(StringSymbolPair("a", "b"), StringSymbolPair("e", "f"));
-	HfstTransducer test2s = HfstTransducer(test2).substitute(StringSymbolPair("a", "b"), StringSymbolPair("e", "f"));
-	HfstTransducer test3s = HfstTransducer(test3).substitute(StringSymbolPair("a", "b"), StringSymbolPair("e", "f"));
+	HfstTransducer test0s = HfstTransducer(test0).substitute(StringPair("a", "b"), StringPair("e", "f"));
+	HfstTransducer test1s = HfstTransducer(test1).substitute(StringPair("a", "b"), StringPair("e", "f"));
+	HfstTransducer test2s = HfstTransducer(test2).substitute(StringPair("a", "b"), StringPair("e", "f"));
+	HfstTransducer test3s = HfstTransducer(test3).substitute(StringPair("a", "b"), StringPair("e", "f"));
 	
 	assert (HfstTransducer::test_equivalence( test0s, test1s ) );
 	assert (HfstTransducer::test_equivalence( test0s, test2s ) );
@@ -386,7 +386,7 @@ int main(int argc, char **argv) {
 
       // ----- substitute string pair with transducer -----
       {
-	StringSymbolPair ssp("a", "b");
+	StringPair ssp("a", "b");
 	HfstTransducer r0(test0);
 	HfstTransducer r1(test1);
 	HfstTransducer r2(test2);
@@ -643,8 +643,8 @@ int main(int argc, char **argv) {
 	{ HfstTransducer t = tr1.substitute(std::string(),
 					    std::string();
 	  fprintf(stderr, "  substituted string\n"); }
-	{ HfstTransducer t = tr1.substitute(const StringSymbolPair &old_symbol_pair,
-					    const StringSymbolPair &new_symbol_pair);
+	{ HfstTransducer t = tr1.substitute(const StringPair &old_symbol_pair,
+					    const StringPair &new_symbol_pair);
 	  fprintf(stderr, "  substituted string pair\n"); }
 
       }
@@ -690,8 +690,8 @@ int main(int argc, char **argv) {
 			       const std::string &new_symbol);
     HfstTransducer &substitute(const KeyPair &old_key_pair, 
 			       const KeyPair &new_key_pair);
-    HfstTransducer &substitute(const StringSymbolPair &old_symbol_pair,
-			       const StringSymbolPair &new_symbol_pair);
+    HfstTransducer &substitute(const StringPair &old_symbol_pair,
+			       const StringPair &new_symbol_pair);
     HfstTransducer &compose(HfstTransducer &another,
 			    ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &concatenate(HfstTransducer &another,

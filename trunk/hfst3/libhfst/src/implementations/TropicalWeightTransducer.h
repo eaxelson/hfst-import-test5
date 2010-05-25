@@ -1,4 +1,4 @@
-#include "GlobalSymbolTable.h"
+//#include "GlobalSymbolTable.h"
 #include "SymbolDefs.h"
 #include "HfstExceptions.h"
 #include "openfst-1.1/src/include/fst/fstlib.h"
@@ -20,17 +20,17 @@ namespace implementations
   using std::ostringstream;
   using std::stringstream;
 
-  extern GlobalSymbolTable global_symbol_table;
+  //extern GlobalSymbolTable global_symbol_table;
   class TropicalWeightInputStream 
   {
   private:
     std::string filename;
     ifstream i_stream;
     istream &input_stream;
-    void populate_key_table(KeyTable &key_table,
+    /*void populate_key_table(KeyTable &key_table,
 			    const SymbolTable * i_symbol_table,
 			    const SymbolTable * o_symbol_table,
-			    KeyMap &key_map);
+			    KeyMap &key_map);*/
     void skip_identifier_version_3_0(void);
     void skip_hfst_header(void);
   public:
@@ -131,7 +131,7 @@ namespace implementations
       static StdVectorFst * extract_input_language(StdVectorFst * t);
       static StdVectorFst * extract_output_language(StdVectorFst * t);
       static void extract_strings(StdVectorFst * t,
-				  WeightedStrings<float>::Set &results);
+				  WeightedPaths<float>::Set &results);
       static StdVectorFst * compose(StdVectorFst * t1,
 				   StdVectorFst * t2);
       static StdVectorFst * concatenate(StdVectorFst * t1,
@@ -158,24 +158,24 @@ namespace implementations
       static bool test_equivalence(StdVectorFst *one, StdVectorFst *another);
       static StdVectorFst * substitute(StdVectorFst * t, std::string old_symbol, std::string new_symbol);
       static StdVectorFst * substitute(StdVectorFst * t,
-				       StringSymbolPair old_symbol_pair,
-				       StringSymbolPair new_symbol_pair);
+				       StringPair old_symbol_pair,
+				       StringPair new_symbol_pair);
       static StdVectorFst * substitute(StdVectorFst * t,
-				       StringSymbolPair old_symbol_pair,
+				       StringPair old_symbol_pair,
 				       StdVectorFst *transducer);
 
-      static StringSymbolSet get_string_symbol_set(StdVectorFst *t);
-      static KeyMap create_mapping(StdVectorFst * t1, StdVectorFst * t2);
-      static void recode_symbol_numbers(StdVectorFst * t, KeyMap &km);      
-      static StdVectorFst * expand_arcs(StdVectorFst * t, StringSymbolSet &unknown);
-      static StdVectorFst * substitute(StdVectorFst * t,Key old_key,Key new_key);
+      static StringSet get_string_set(StdVectorFst *t);
+      static NumberNumberMap create_mapping(StdVectorFst * t1, StdVectorFst * t2);
+      static void recode_symbol_numbers(StdVectorFst * t, NumberNumberMap &km);      
+      static StdVectorFst * expand_arcs(StdVectorFst * t, StringSet &unknown);
+      static StdVectorFst * substitute(StdVectorFst * t,unsigned int old_key,unsigned int new_key);
       static StdVectorFst * substitute(StdVectorFst * t,
-				       KeyPair old_key_pair,
-				       KeyPair new_key_pair);
+      				       pair<unsigned int, unsigned int> old_key_pair,
+      				       pair<unsigned int, unsigned int> new_key_pair);
 
-      static StdVectorFst * define_transducer(Key k);
-      static StdVectorFst * define_transducer(const KeyPair &kp);
-      static StdVectorFst * define_transducer(const KeyPairVector &kpv);
+      //static StdVectorFst * define_transducer(Key k);
+      //static StdVectorFst * define_transducer(const KeyPair &kp);
+      //static StdVectorFst * define_transducer(const KeyPairVector &kpv);
 
     private:
       static fst::SymbolTable * create_symbol_table(std::string name);

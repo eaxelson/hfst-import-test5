@@ -113,7 +113,7 @@ bool Transducer::generate( FILE *file, bool separate  )
 /*******************************************************************/
 
 bool Transducer::generate_hfst1( Node *node, Node2Int &visitations, char *buffer,
-				 int pos, char *buffer2, int pos2, hfst::implementations::WeightedStrings<float>::Set &results)
+				 int pos, char *buffer2, int pos2, hfst::implementations::WeightedPaths<float>::Set &results)
 {
   bool result = false;
 
@@ -126,14 +126,14 @@ bool Transducer::generate_hfst1( Node *node, Node2Int &visitations, char *buffer
       buffer2[pos2] = '\t';
       buffer2[pos2+1] = 0;
       results.insert( 
-	  hfst::implementations::WeightedString<float>(
+	  hfst::implementations::WeightedPath<float>(
 	  buffer2,
 	  buffer,
 	  0 ) );
 	} 
     else
       results.insert( 
-	  hfst::implementations::WeightedString<float>(
+	  hfst::implementations::WeightedPath<float>(
 	  buffer,
 	  buffer,
 	  0 ) );
@@ -182,7 +182,7 @@ bool Transducer::generate_hfst1( Node *node, Node2Int &visitations, char *buffer
 /*                                                                 */
 /*******************************************************************/
 
-bool Transducer::generate_hfst( hfst::implementations::WeightedStrings<float>::Set &results, bool separate)
+bool Transducer::generate_hfst( hfst::implementations::WeightedPaths<float>::Set &results, bool separate)
 
 {
   bool result;

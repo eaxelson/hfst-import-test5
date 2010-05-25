@@ -87,7 +87,7 @@ const
   return 4;
 }
 
-  bool HfstTokenizer::is_skip_symbol(hfst::symbols::StringSymbol &s) const
+  bool HfstTokenizer::is_skip_symbol(hfst::symbols::String &s) const
 { return (s == "") or (skip_symbol_set.find(s) != skip_symbol_set.end()); }
 
 void

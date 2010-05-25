@@ -73,7 +73,7 @@ namespace hfst { namespace implementations {
     return sign == (int)'a';
   }
 
-  void SfstInputStream::add_symbol(StringSymbolMap &string_number_map,
+  void SfstInputStream::add_symbol(StringNumberMap &string_number_map,
 				   Character c,
 				   Alphabet &alphabet)
   {
@@ -85,7 +85,7 @@ namespace hfst { namespace implementations {
       { throw SymbolRedefinedException(); }
   }
 
-  void
+    /*  void
   SfstInputStream::populate_key_table(KeyTable &key_table,
 				      Alphabet &alphabet,
 				      KeyMap &key_map)
@@ -114,7 +114,7 @@ namespace hfst { namespace implementations {
 	catch (const SymbolRedefinedException e)
 	  { throw e; }
       }
-
+    
 
     StringSymbolVector string_symbols(max_symbol_number+1,"");
     for (StringSymbolMap::iterator it = string_number_map.begin();
@@ -139,7 +139,7 @@ namespace hfst { namespace implementations {
       { transducer_key_table.harmonize(key_map,key_table); }
     catch (const char * p)
       { throw p; }
-  }
+      }*/
 
   /* Skip the identifier string "SFST_TYPE" */
   void SfstInputStream::skip_identifier_version_3_0(void)
@@ -181,7 +181,7 @@ namespace hfst { namespace implementations {
   }
 #endif
 
-  Transducer * SfstTransducer::expand_arcs(Transducer * t, StringSymbolSet &unknown)
+  Transducer * SfstTransducer::expand_arcs(Transducer * t, StringSet &unknown)
   {
     return &t->expand(unknown);
   }
@@ -193,12 +193,12 @@ namespace hfst { namespace implementations {
 
     // 1. Calculate the set of unknown symbols for transducers t1 and t2.
 
-    StringSymbolSet unknown_t1;    // symbols known to another but not this
-    StringSymbolSet unknown_t2;    // and vice versa
-    StringSymbolSet t1_symbols = get_string_symbol_set(t1);
-    StringSymbolSet t2_symbols = get_string_symbol_set(t2);
-    KeyTable::collect_unknown_sets(t1_symbols, unknown_t1,
-				   t2_symbols, unknown_t2);
+    StringSet unknown_t1;    // symbols known to another but not this
+    StringSet unknown_t2;    // and vice versa
+    StringSet t1_symbols = get_string_set(t1);
+    StringSet t2_symbols = get_string_set(t2);
+    hfst::symbols::collect_unknown_sets(t1_symbols, unknown_t1,
+					t2_symbols, unknown_t2);
 
     Transducer * new_t1 = &t1->copy(false, &t2->alphabet);
     t2->alphabet.insert_symbols(new_t1->alphabet);
@@ -208,7 +208,7 @@ namespace hfst { namespace implementations {
 #ifdef foo
     // 2. Add new symbols from transducer t1 to the symbol table of transducer t2...
 
-    for ( StringSymbolSet::const_iterator it = unknown_t2.begin();
+    for ( StringSet::const_iterator it = unknown_t2.begin();
 	  it != unknown_t2.end(); it++ ) {
 	t2->InputSymbols()->AddSymbol(*it);
 	//fprintf(stderr, "added %s to the set of symbols unknown to t2\n", (*it).c_str());
@@ -287,6 +287,7 @@ namespace hfst { namespace implementations {
   }
 #endif
 
+    /*
   Transducer * SfstInputStream::read_transducer(KeyTable &key_table)
   {
     if (is_eof())
@@ -322,7 +323,7 @@ namespace hfst { namespace implementations {
 	throw e; 
       }
     return NULL;
-  }
+    }*/
 
   Transducer * SfstInputStream::read_transducer(bool has_header)
   {
@@ -385,7 +386,7 @@ namespace hfst { namespace implementations {
   // ------------------------------------------------
 
   
-  SfstState::SfstState(Node * state, Transducer * t) 
+    /*  SfstState::SfstState(Node * state, Transducer * t) 
   { 
     this->state = state; 
     this->t = t;
@@ -416,12 +417,14 @@ namespace hfst { namespace implementations {
   //TransitionIterator<Transducer*,bool> SfstState::end(void) const 
   SfstTransitionIterator SfstState::end(void) const 
   { return   SfstTransitionIterator(); } 
+    */
 
   void SfstTransducer::print_test(Transducer *t)
   {
     std::cerr << *t;
   }
-    
+
+    /*    
   void SfstState::print(KeyTable &key_table, ostream &out,
 			SfstStateIndexer &indexer) const
   {
@@ -485,11 +488,11 @@ namespace hfst { namespace implementations {
     arc_iterator = ArcsIter(state->arcs());
     t = another.t;
     end_iterator = another.end_iterator;
-  }
+    }*/
   
   /* This requires the SFST ArcsIter operator* to be
      const qualified. */
-  bool SfstTransitionIterator::operator== 
+    /*  bool SfstTransitionIterator::operator== 
   (const SfstTransitionIterator &another)
   {
     if (end_iterator and another.end_iterator)
@@ -542,7 +545,7 @@ namespace hfst { namespace implementations {
     arc_iterator++;
     if (not arc_iterator) { end_iterator = true; }
   }
-    
+    */
   Transducer * SfstTransducer::create_empty_transducer(void)
   { return new Transducer; }
   
@@ -550,9 +553,10 @@ namespace hfst { namespace implementations {
   { Transducer * t = new Transducer; 
     t->root_node()->set_final(1);
     return t; }
-  
+
+    /*
     // could these be removed?
-  Transducer * SfstTransducer::define_transducer(Key k)
+    // Transducer * SfstTransducer::define_transducer(Key k)
   { Transducer * t = new Transducer; 
     Node * n = t->new_node();
     t->root_node()->add_arc(Label(k),n,t);
@@ -564,6 +568,7 @@ namespace hfst { namespace implementations {
     t->root_node()->add_arc(Label(kp.first,kp.second),n,t);
     n->set_final(1);
     return t; }
+    */
   
   Transducer * SfstTransducer::define_transducer(const char *symbol)
   { Transducer * t = new Transducer; 
@@ -580,7 +585,7 @@ namespace hfst { namespace implementations {
     n->set_final(1);
     return t; }
 
-  Transducer * SfstTransducer::define_transducer(const KeyPairVector &kpv)
+    /*  Transducer * SfstTransducer::define_transducer(const KeyPairVector &kpv)
   { Transducer * t = new Transducer;
     Node * n = t->root_node();
     for (KeyPairVector::const_iterator it = kpv.begin();
@@ -592,7 +597,7 @@ namespace hfst { namespace implementations {
 	n = temp;
       }
     n->set_final(1);
-    return t; }
+    return t; }*/
 
   Transducer * SfstTransducer::define_transducer(const StringPairVector &spv)
   { Transducer * t = new Transducer;
@@ -673,25 +678,25 @@ namespace hfst { namespace implementations {
   { t->complete_alphabet();
     return &t->upper_level(); }
   
-  void SfstTransducer::extract_strings(Transducer * t, hfst::implementations::WeightedStrings<float>::Set &results)
+  void SfstTransducer::extract_strings(Transducer * t, hfst::implementations::WeightedPaths<float>::Set &results)
   {
     t->generate_hfst(results, true);
   }
 
-  Transducer * SfstTransducer::substitute(Transducer * t,Key old_key,Key new_key)
-  { return &t->replace_char(old_key,new_key); }
+    /*  Transducer * SfstTransducer::substitute(Transducer * t,Key old_key,Key new_key)
+	{ return &t->replace_char(old_key,new_key); }*/
   
-  Transducer * SfstTransducer::substitute(Transducer * t,StringSymbol old_symbol,StringSymbol new_symbol)
+  Transducer * SfstTransducer::substitute(Transducer * t,String old_symbol,String new_symbol)
   { Transducer * retval = &t->replace_char(t->alphabet.add_symbol(old_symbol.c_str()),t->alphabet.add_symbol(new_symbol.c_str())); 
     return retval; }
 
-  Transducer * SfstTransducer::substitute
+    /*  Transducer * SfstTransducer::substitute
   (Transducer * t,KeyPair old_key_pair,KeyPair new_key_pair)
   { 
     (void)t;
     (void)old_key_pair;
     (void)new_key_pair;
-    throw FunctionNotImplementedException(); }
+    throw FunctionNotImplementedException(); }*/
   
   Transducer * SfstTransducer::compose
   (Transducer * t1, Transducer * t2)
@@ -713,6 +718,8 @@ namespace hfst { namespace implementations {
   (Transducer * t1, Transducer * t2)
   { return &t1->operator/(*t2); }
 
+
+    /*
   SfstStateIterator::SfstStateIterator(Transducer * t):
   node_numbering(*t),t(t),current_state(0),ended(false)
   {
@@ -801,12 +808,12 @@ namespace hfst { namespace implementations {
 	SfstState s = *it;
 	s.print(key_table,out,indexer);
       }
-  }
+      }*/
 
 
-  StringSymbolSet SfstTransducer::get_string_symbol_set(Transducer * t)
+  StringSet SfstTransducer::get_string_set(Transducer * t)
   {
-    StringSymbolSet s;
+    StringSet s;
     SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
     for ( SFST::Alphabet::CharMap::const_iterator it = cm.begin();
 	  it != cm.end(); it++ ) {
@@ -815,14 +822,14 @@ namespace hfst { namespace implementations {
     return s;
   }
   
-  KeyMap create_mapping(Transducer * t1, Transducer * t2, StringSymbolSet &unknown2)
+    /*  KeyMap create_mapping(Transducer * t1, Transducer * t2, StringSet &unknown2)
   {
     (void)t1;
     (void)t2;
     (void)unknown2;
     KeyMap km;
     return km;
-  }
+    }*/
 
 
 

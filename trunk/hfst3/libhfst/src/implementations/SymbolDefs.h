@@ -16,6 +16,7 @@ namespace symbols
   using namespace hfst::exceptions;
   using std::ostringstream;
 
+  /*
   typedef std::string StringSymbol;
   typedef std::vector<StringSymbol> StringSymbolVector;
   typedef StringSymbolVector::size_type Symbol;
@@ -23,24 +24,35 @@ namespace symbols
   typedef std::pair<Key,Key> KeyPair;
   typedef std::pair<StringSymbol,StringSymbol> StringSymbolPair;
   typedef std::map<StringSymbol,Symbol> StringSymbolMap;
-  typedef std::set<StringSymbol> StringSymbolSet;
+  typedef std::set<String> StringSet;
   typedef std::map<Key,Key> KeyMap;
   typedef std::vector<KeyPair> KeyPairVector;
   //typedef std::set<StringSymbolPair> StringSymbolPairSet;
   typedef std::set<Symbol> SymbolSet;
   typedef std::pair<Symbol,Symbol> SymbolPair;
   typedef std::set<SymbolPair> SymbolPairSet;
+  */
 
   /* A symbol in a transition. */
   typedef std::string String;
+  /* A set of strings. */
+  typedef std::set<String> StringSet;
   /** \brief A symbol pair in a transition. */
   typedef std::pair<std::string, std::string> StringPair;
   /** \brief A vector of transitions that represents a path in a transducer. */
   typedef std::vector<StringPair> StringPairVector;
+  /* Maps strings to numbers. */
+  typedef std::map<String,unsigned int> StringNumberMap;
+  /* Maps numbers to numbers. */
+  typedef std::map<unsigned int,unsigned int> NumberNumberMap;
 
-  class KeyTableConstIterator_;
 
-  class GlobalSymbolTable;
+  void collect_unknown_sets(StringSet &s1, StringSet &unknown1,
+			    StringSet &s2, StringSet &unknown2);
+
+  //class KeyTableConstIterator_;
+
+  //class GlobalSymbolTable;
 
 
   // new stuff begins...
@@ -48,6 +60,7 @@ namespace symbols
   // ...new stuff ends
 
 
+  /*
   class KeyTable
   {
   public:
@@ -124,6 +137,6 @@ namespace symbols
     typedef KeyMap::const_iterator const_iterator;
     const_iterator begin(void);
     const_iterator end(void);
-  };
+    };*/
 } }
 #endif

@@ -106,13 +106,13 @@ namespace hfst
   }
 
   HfstTransducer &HfstTransducer::apply
-  (SFST::Transducer * (*sfst_funct)(SFST::Transducer *, StringSymbol, StringSymbol),
-   fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,StringSymbol, 
-					      StringSymbol),
+  (SFST::Transducer * (*sfst_funct)(SFST::Transducer *, String, String),
+   fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,String, 
+					      String),
    hfst::implementations::LogFst * (*log_ofst_funct)
-   (hfst::implementations::LogFst *,StringSymbol, StringSymbol),
-   fsm * (*foma_funct)(fsm *, StringSymbol, StringSymbol),
-   StringSymbol s1, StringSymbol s2,ImplementationType type)
+   (hfst::implementations::LogFst *,String, String),
+   fsm * (*foma_funct)(fsm *, String, String),
+   String s1, String s2,ImplementationType type)
   {
     if (type != UNSPECIFIED_TYPE)
       { convert(type); }
@@ -158,6 +158,7 @@ namespace hfst
     return *this;
   }
 
+  /*
   HfstTransducer &HfstTransducer::apply
   (SFST::Transducer * (*sfst_funct)(SFST::Transducer *, KeyPair, 
 				    KeyPair),
@@ -211,7 +212,7 @@ namespace hfst
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
      }
     return *this;
-  }
+    }*/
 
   HfstTransducer &HfstTransducer::apply
   (SFST::Transducer * (*sfst_funct)(SFST::Transducer *,

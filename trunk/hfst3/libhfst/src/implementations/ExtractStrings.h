@@ -11,8 +11,8 @@ namespace hfst { namespace implementations {
 
   /** \brief A weighted string pair that represents a path in a transducer.
 
-      @see WeightedStrings */
-  template<class W> class WeightedString
+      @see WeightedPaths */
+  template<class W> class WeightedPath
     {
     public:
       /** \brief The input string of the string pair. */
@@ -22,10 +22,10 @@ namespace hfst { namespace implementations {
       /** \brief The weight of the string pair. */
       W weight;
       
-      WeightedString(const std::string &is,const std::string &os,W w)
+      WeightedPath(const std::string &is,const std::string &os,W w)
 	{ weight = w; istring = is; ostring = os; }
 
-      bool operator< (const WeightedString &another) const
+      bool operator< (const WeightedPath &another) const
 	{ if (weight == another.weight)
 	    { if (istring == another.istring)
 		{ return ostring < another.ostring; }
@@ -39,7 +39,7 @@ namespace hfst { namespace implementations {
 	  return s_stream.str();
 	}
       
-      WeightedString<W> &reverse(void)
+      WeightedPath<W> &reverse(void)
       { for(size_t i = 0; i < (istring.size() / 2); ++i)
 	  { char c = istring[i];
 	    istring[i] = istring[istring.size() - i - 1];
@@ -51,7 +51,7 @@ namespace hfst { namespace implementations {
 	    ostring[ostring.size() - i - 1] = c; }
 	return *this; }
 
-      WeightedString &add(const WeightedString &another,bool in_front=true)
+      WeightedPath &add(const WeightedPath &another,bool in_front=true)
 	{ if (in_front)
 	    {
 	      istring = another.istring + istring;
@@ -67,7 +67,7 @@ namespace hfst { namespace implementations {
 	      return *this;
 	    } 
 	}
-      void operator=(const WeightedString &another)
+      void operator=(const WeightedPath &another)
 	{ if (this == &another) { return; }
 	  this->istring = another.istring;
 	  this->ostring = another.ostring;
@@ -77,21 +77,21 @@ namespace hfst { namespace implementations {
   /** \brief A class for storing weighted string pairs that represent paths in a transducer. 
 
       @see HfstTransducer::extract_strings */
-  template<class W> class WeightedStrings
+  template<class W> class WeightedPaths
     { public:
 
       /** \brief A vector of weighted string pairs. */
-      typedef std::vector< WeightedString<W> > Vector; 
+      typedef std::vector< WeightedPath<W> > Vector; 
       /** \brief A set of weighted string pairs. */
-      typedef std::set< WeightedString<W> > Set; 
+      typedef std::set< WeightedPath<W> > Set; 
 
-      static void add(Vector &v,WeightedString<W> &s)
+      static void add(Vector &v,WeightedPath<W> &s)
       {
 	for (typename Vector::iterator it = v.begin(); it != v.end(); ++it)
 	  { it->add(s,false); }
       }
 
-      static void add(WeightedString<W> &s,Vector &v)
+      static void add(WeightedPath<W> &s,Vector &v)
       {
 	for (typename Vector::iterator it = v.begin(); it != v.end(); ++it)
 	  { it->add(s); }

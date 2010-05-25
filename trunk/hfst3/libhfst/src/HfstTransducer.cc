@@ -1,6 +1,6 @@
 #include "HfstTransducer.h"
 
-hfst::symbols::GlobalSymbolTable hfst::symbols::KeyTable::global_symbol_table;
+//hfst::symbols::GlobalSymbolTable hfst::symbols::KeyTable::global_symbol_table;
 
 namespace hfst
 {
@@ -463,8 +463,8 @@ namespace hfst
   { in.read_transducer(*this); }
 
   HfstTransducer::HfstTransducer(const HfstTransducer &another):
-    type(another.type),anonymous(another.anonymous),
-    key_table(another.key_table),is_trie(another.is_trie)
+    type(another.type),anonymous(another.anonymous),is_trie(another.is_trie)
+    //, key_table(another.key_table)
   {
     switch (type)
       {
@@ -490,8 +490,8 @@ namespace hfst
   }
 
   HfstTransducer::HfstTransducer(const HfstMutableTransducer &another):
-    type(TROPICAL_OFST_TYPE), anonymous(another.transducer.anonymous),
-    key_table(another.transducer.key_table), is_trie(another.transducer.is_trie)
+    type(TROPICAL_OFST_TYPE), anonymous(another.transducer.anonymous), 
+    is_trie(another.transducer.is_trie) // key_table(another.transducer.key_table) 
   {
     implementation.tropical_ofst =
       tropical_ofst_interface.copy(another.transducer.implementation.tropical_ofst);
@@ -739,7 +739,7 @@ void HfstTransducer::test_minimize()
        &hfst::implementations::FomaTransducer::extract_output_language,
        type); }
 
-void HfstTransducer::extract_strings(WeightedStrings<float>::Set &results)
+void HfstTransducer::extract_strings(WeightedPaths<float>::Set &results)
   {
     switch (type)
       {
@@ -782,8 +782,8 @@ void HfstTransducer::extract_strings(WeightedStrings<float>::Set &results)
   }
 
   HfstTransducer &HfstTransducer::substitute
-  (const StringSymbolPair &old_symbol_pair, 
-   const StringSymbolPair &new_symbol_pair)
+  (const StringPair &old_symbol_pair, 
+   const StringPair &new_symbol_pair)
   { 
     convert(TROPICAL_OFST_TYPE);
     fst::StdVectorFst * tropical_ofst_temp =
@@ -794,7 +794,7 @@ void HfstTransducer::extract_strings(WeightedStrings<float>::Set &results)
   }
 
   HfstTransducer &HfstTransducer::substitute
-  (const StringSymbolPair &symbol_pair,
+  (const StringPair &symbol_pair,
    HfstTransducer &transducer)
   {    
     convert(TROPICAL_OFST_TYPE);

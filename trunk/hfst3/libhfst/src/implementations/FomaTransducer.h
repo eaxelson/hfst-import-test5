@@ -1,4 +1,4 @@
-#include "GlobalSymbolTable.h"
+//#include "GlobalSymbolTable.h"
 #include "SymbolDefs.h"
 #include "HfstExceptions.h"
 #include <stdbool.h>  // foma uses _Bool
@@ -35,7 +35,7 @@ namespace hfst {
   using std::ostringstream;
   // Tropical: using std::stringstream;
 
-  extern GlobalSymbolTable global_symbol_table;
+  //extern GlobalSymbolTable global_symbol_table;
 
   class FomaInputStream 
   {
@@ -71,14 +71,15 @@ namespace hfst {
     void write_transducer(fsm * transducer);
   };
 
+  /*
   class FomaTransitionIterator;
   class FomaStateIndexer;
   class FomaState
   {
-    /*protected:
+    protected:
       FomaNode state;
       fsm * t;
-      friend class FomaStateIndexer;*/
+      friend class FomaStateIndexer;
     public:
       FomaState(FomaNode state, fsm * t);
       FomaState(const FomaState &s);
@@ -118,10 +119,10 @@ namespace hfst {
 
   class FomaTransition
     {
-      /*protected:
+    protected:
       FomaArc arc;
       FomaNode source_state;
-      fsm * t;*/
+      fsm * t;
     public:
       FomaTransition(FomaArc arc, FomaNode n, fsm * t); // Sfst:
       // Tropical: FomaTransition(const FomaArc &arc, 
@@ -169,15 +170,15 @@ namespace hfst {
       unsigned int operator[](const FomaState &state);
       const FomaState operator[](unsigned int number);
     };
-
+  */
   class FomaTransducer
     {
     public:
       static fsm * create_empty_transducer(void);
       static fsm * create_epsilon_transducer(void);
-      static fsm * define_transducer(Key k);                     // not done
-      static fsm * define_transducer(const KeyPair &kp);         // not done
-      static fsm * define_transducer(const KeyPairVector &kpv);  // not done
+      //static fsm * define_transducer(Key k);                     // not done
+      //static fsm * define_transducer(const KeyPair &kp);         // not done
+      //static fsm * define_transducer(const KeyPairVector &kpv);  // not done
       static fsm * define_transducer(const StringPairVector &spv);  // not done
       static fsm * define_transducer(char *symbol);                     
       static fsm * define_transducer(char *isymbol, char *osymbol);       
@@ -195,7 +196,7 @@ namespace hfst {
       static fsm * extract_input_language(fsm * t);
       static fsm * extract_output_language(fsm * t);
 
-      static fsm * substitute(fsm * t,StringSymbol old_symbol,StringSymbol new_symbol);
+      static fsm * substitute(fsm * t,String old_symbol,String new_symbol);
 
       static fsm * compose(fsm * t1,
 			   fsm * t2);
@@ -207,11 +208,11 @@ namespace hfst {
 			     fsm * t2);
       static fsm * subtract(fsm * t1,
 			    fsm * t2);
-      typedef FomaStateIterator const_iterator;
-      static const_iterator begin(fsm * t);
-      static const_iterator end(fsm * t);
-      static fsm * harmonize(fsm * t,KeyMap &key_map);                // not done
-      static void print(fsm * t, KeyTable &key_table, ostream &out);  // not done
+      //typedef FomaStateIterator const_iterator;
+      //static const_iterator begin(fsm * t);
+      //static const_iterator end(fsm * t);
+      //static fsm * harmonize(fsm * t,KeyMap &key_map);                // not done
+      //static void print(fsm * t, KeyTable &key_table, ostream &out);  // not done
       static void delete_foma(fsm * net);
       static void print_test(fsm * t);
     };

@@ -1,7 +1,7 @@
 #ifndef _HFST_TRANSDUCER_H_
 #define _HFST_TRANSDUCER_H_
 #include "implementations/SymbolDefs.h"
-#include "implementations/GlobalSymbolTable.h"
+//#include "implementations/GlobalSymbolTable.h"
 #include "implementations/SfstTransducer.h"
 #include "implementations/TropicalWeightTransducer.h"
 #include "implementations/LogWeightTransducer.h"
@@ -16,21 +16,21 @@
 namespace hfst
 {
 
-  using hfst::symbols::KeyTable;
-  using hfst::symbols::Key;
-  using hfst::symbols::KeyPair;
-  using hfst::symbols::KeyMap;
-  using hfst::symbols::StringSymbolPair;
-  using hfst::symbols::StringSymbolSet;
-  using hfst::symbols::KeyPairVector;
+  //using hfst::symbols::KeyTable;
+  //using hfst::symbols::Key;
+  //using hfst::symbols::KeyPair;
+  //using hfst::symbols::KeyMap;
+  using hfst::symbols::StringPair;
+  using hfst::symbols::StringSet;
+  //using hfst::symbols::KeyPairVector;
   
   using hfst::implementations::SfstTransducer;
   using hfst::implementations::TropicalWeightTransducer;
   using hfst::implementations::TropicalWeightState;
   using hfst::implementations::TropicalWeightStateIterator;
   using hfst::implementations::LogWeightTransducer;
-  using hfst::implementations::WeightedStrings;
-  using hfst::implementations::WeightedString;
+  using hfst::implementations::WeightedPaths;
+  using hfst::implementations::WeightedPath;
   using hfst::implementations::FomaTransducer;
 
 
@@ -198,7 +198,7 @@ namespace hfst
     ImplementationType type;
 
     bool anonymous;
-    KeyTable key_table;
+    //KeyTable key_table;
     bool is_trie;
 
     TransducerImplementation implementation; 
@@ -312,7 +312,7 @@ namespace hfst
 	behave. It might get stuck in an infinite loop or return any number of string pairs. 
 	In the case of a cyclic transducer, use #n_best instead. 
 	@see #n_best */
-    void extract_strings(WeightedStrings<float>::Set &results);
+    void extract_strings(WeightedPaths<float>::Set &results);
 
     /** \brief Substitute all symbols \a old_symbol with symbol \a new_symbol. */
     HfstTransducer &substitute(const std::string &old_symbol,

@@ -1,13 +1,14 @@
 #ifndef _HFST_TOKENIZER_H_
 #define _HFST_TOKENIZER_H_
 #include "SymbolDefs.h"
-#include "GlobalSymbolTable.h"
+//#include "GlobalSymbolTable.h"
 #include <iostream>
 #include <climits>
 #include <string>
 namespace hfst
 {
   using hfst::symbols::String;
+  using hfst::symbols::StringSet;
   using hfst::symbols::StringPair;
   using hfst::symbols::StringPairVector;
   //using hfst::symbols::KeyTable;
@@ -42,9 +43,9 @@ namespace hfst
   {  
   private:
     MultiCharSymbolTrie multi_char_symbols;
-    hfst::symbols::StringSymbolSet skip_symbol_set;
+    hfst::symbols::StringSet skip_symbol_set;
     int get_next_symbol_size(const char * symbol) const;
-    bool is_skip_symbol(hfst::symbols::StringSymbol &s) const;
+    bool is_skip_symbol(hfst::symbols::String &s) const;
 
   public:
     /** \brief Add a symbol to be skipped to this tokenizer. */

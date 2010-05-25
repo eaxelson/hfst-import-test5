@@ -123,12 +123,12 @@ namespace hfst { namespace implementations {
   // ------------------------------------------------
 
 
-  
+    /*  
   fsm * FomaTransducer::harmonize(fsm * t, KeyMap &key_map)
   {
     throw hfst::exceptions::FunctionNotImplementedException();
   }
-
+    */
     /*fsm * FomaInputStream::read_transducer(KeyTable &key_table)
   {
     throw hfst::exceptions::FunctionNotImplementedException();
@@ -176,7 +176,7 @@ namespace hfst { namespace implementations {
   // ------------------------------------------------
 
 
-  
+    /*  
   FomaState::FomaState(FomaNode state, fsm * t) 
   { 
     throw hfst::exceptions::FunctionNotImplementedException();
@@ -261,9 +261,10 @@ namespace hfst { namespace implementations {
   {
     throw hfst::exceptions::FunctionNotImplementedException();
   }
-  
+    */  
   /* This requires the SFST ArcsIter operator* to be
      const qualified. */
+    /*
   bool FomaTransitionIterator::operator== 
   (const FomaTransitionIterator &another)
   {
@@ -289,7 +290,7 @@ namespace hfst { namespace implementations {
   void FomaTransitionIterator::operator++ (int)
   {
     throw hfst::exceptions::FunctionNotImplementedException();
-  }
+    }*/
   
   fsm * FomaTransducer::create_empty_transducer(void)
   {    
@@ -307,8 +308,8 @@ namespace hfst { namespace implementations {
   }
 
   // remove?
-  fsm * FomaTransducer::define_transducer(Key k)
-  {     throw hfst::exceptions::FunctionNotImplementedException();}
+  /*fsm * FomaTransducer::define_transducer(Key k)
+    {     throw hfst::exceptions::FunctionNotImplementedException();}*/
 
   fsm * FomaTransducer::define_transducer(char *symbol)
   {     
@@ -317,10 +318,10 @@ namespace hfst { namespace implementations {
 
   
   // remove?
-  fsm * FomaTransducer::define_transducer(const KeyPair &kp)
+  /*fsm * FomaTransducer::define_transducer(const KeyPair &kp)
   { 
     throw hfst::exceptions::FunctionNotImplementedException();
-  }
+    }*/
 
   fsm * FomaTransducer::define_transducer(char *isymbol, char *osymbol)
   { 
@@ -328,10 +329,11 @@ namespace hfst { namespace implementations {
     // should either argument be deleted?
   }
   
+    /*
   fsm * FomaTransducer::define_transducer(const KeyPairVector &kpv)
   {
     throw hfst::exceptions::FunctionNotImplementedException();
-  }
+    }*/
 
     // This could be much more efficient...
   fsm * FomaTransducer::define_transducer(const StringPairVector &spv)
@@ -415,7 +417,7 @@ namespace hfst { namespace implementations {
     return fsm_lower(fsm_copy(t));
   }
   
-  fsm * FomaTransducer::substitute(fsm * t,StringSymbol old_symbol,StringSymbol new_symbol)
+  fsm * FomaTransducer::substitute(fsm * t,String old_symbol,String new_symbol)
   {
     return fsm_substitute_symbol(t, strdup(old_symbol.c_str()), strdup(new_symbol.c_str()));
   }
@@ -450,7 +452,7 @@ namespace hfst { namespace implementations {
   {
     return fsm_minus(fsm_copy(t1), fsm_copy(t2));
   }
-
+    /*
   FomaStateIterator::FomaStateIterator(fsm * t):
   node_numbering(0),t(t),current_state(0),ended(false)
   {
@@ -514,7 +516,7 @@ namespace hfst { namespace implementations {
   {
     throw hfst::exceptions::FunctionNotImplementedException();
   }
-
+    */
   void FomaTransducer::print_test(fsm * t)
   {
     net_print_att(t, stdout);
