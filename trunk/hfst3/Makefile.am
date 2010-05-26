@@ -1,3 +1,2 @@
-SUBDIRS = libhfst tools test # doc
-EXTRA_DIST=BUGS
+SUBDIRS = libhfst tools test doc
 

@@ -17,5 +17,5 @@ AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_CPP
 
-AC_OUTPUT([Makefile test/Makefile test/libhfst/Makefile])
+AC_OUTPUT([Makefile doc/Makefile test/Makefile test/libhfst/Makefile])
 
