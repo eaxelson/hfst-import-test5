@@ -52,6 +52,10 @@ AC_CHECK_LIB([z], [main])
 
 # Checks for header files.
 AC_CHECK_HEADERS([limits.h stdlib.h string.h])
+AC_LANG_PUSH([C++])
+AC_CHECK_HEADERS([backward/hash_set ext/hash_set hash_set])
+AC_CHECK_HEADERS([backward/hash_map ext/hash_map hash_map])
+AC_LANG_POP
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
