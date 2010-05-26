@@ -1,6 +1,7 @@
 #SUBDIRS=foma SFST/src openfst-1.1
 AUTOMAKE_OPTIONS=subdir-objects
 noinst_LTLIBRARIES=libhfstimplementations.la
+AM_CPPFLAGS=-Iopenfst-1.1/src/include/
 # HFST bridge specific stuff
 IMPLEMENTATION_SRCS=SymbolDefs.cc \
 	HfstTokenizer.cc ConvertTransducerFormat.cc # GlobalSymbolTable.cc
