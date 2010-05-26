@@ -17,5 +17,12 @@ AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_CPP
 
+# libhfst's SFST part
+AC_LANG_PUSH([C++])
+AC_CHECK_HEADERS([backward/hash_set ext/hash_set hash_set])
+AC_CHECK_HEADERS([backward/hash_map ext/hash_map hash_map])
+AC_LANG_POP
+
+
 AC_OUTPUT([Makefile doc/Makefile test/Makefile test/libhfst/Makefile])
 

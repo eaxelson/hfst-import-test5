@@ -16,22 +16,32 @@
 #endif
 
 #if HAVE_BACKWARD_HASH_MAP
-#  include <hash_map>
+#  include <backward/hash_map>
 #elif HAVE_EXT_HASH_MAP
 #  include <ext/hash_map>
 #elif HAVE_HASH_MAP
 #  include <hash_map>
+#elif SGIext
+#  include <ext/hash_map>
+#elif SGI__gnu_cxx
+#  include <ext/hash_map>
 #else
-#error "missing hash_map"
+#  warning "unknown hash_map"
+#  include <hash_map>
 #endif
 #if HAVE_BACKWARD_HASH_SET
-#  include <hash_set>
+#  include <backward/hash_set>
 #elif HAVE_EXT_HASH_SET
 #  include <ext/hash_set>
 #elif HAVE_HASH_SET
 #  include <hash_set>
+#elif SGIext
+#  include <ext/hash_set>
+#elif SGI__gnu_cxx
+#  include <ext/hash_set>
 #else
-#error "missing hash_set"
+#  warning "missing hash_set"
+#  include <hash_set>
 #endif
 
 // Hfst addition

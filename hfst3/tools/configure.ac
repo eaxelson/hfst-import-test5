@@ -260,6 +260,10 @@ AC_LANG([C++])
 # Checks for header files.
 AC_HEADER_STDC
 AC_CHECK_HEADERS([string.h unistd.h])
+AC_LANG_PUSH([C++])
+AC_CHECK_HEADERS([backward/hash_set ext/hash_set hash_set])
+AC_CHECK_HEADERS([backward/hash_map ext/hash_map hash_map])
+AC_LANG_POP
 AC_HEADER_ASSERT
 
 # Checks for typedefs, structures, and compiler characteristics.
