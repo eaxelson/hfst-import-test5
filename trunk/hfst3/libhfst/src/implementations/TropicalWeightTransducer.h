@@ -1,4 +1,3 @@
-//#include "GlobalSymbolTable.h"
 #include "SymbolDefs.h"
 #include "HfstExceptions.h"
 #include "openfst-1.1/src/include/fst/fstlib.h"
@@ -15,7 +14,6 @@ namespace implementations
   using namespace hfst::exceptions;
   typedef StdArc::StateId StateId;
 
-  using namespace hfst::symbols;
   using std::ostream;
   using std::ostringstream;
   using std::stringstream;
@@ -115,7 +113,7 @@ namespace implementations
       static StdVectorFst * create_epsilon_transducer(void);
       static StdVectorFst * define_transducer(const std::string &symbol);
       static StdVectorFst * define_transducer(const std::string &isymbol, const std::string &osymbol);
-      static StdVectorFst * define_transducer(const StringPairVector &spv);
+      static StdVectorFst * define_transducer(const hfst::StringPairVector &spv);
       static StdVectorFst * copy(StdVectorFst * t);
       static StdVectorFst * determinize(StdVectorFst * t);
       static StdVectorFst * minimize(StdVectorFst * t);
@@ -131,7 +129,7 @@ namespace implementations
       static StdVectorFst * extract_input_language(StdVectorFst * t);
       static StdVectorFst * extract_output_language(StdVectorFst * t);
       static void extract_strings(StdVectorFst * t,
-				  WeightedPaths<float>::Set &results);
+				  hfst::WeightedPaths<float>::Set &results);
       static StdVectorFst * compose(StdVectorFst * t1,
 				   StdVectorFst * t2);
       static StdVectorFst * concatenate(StdVectorFst * t1,
@@ -166,8 +164,8 @@ namespace implementations
 
       static StringSet get_string_set(StdVectorFst *t);
       static NumberNumberMap create_mapping(StdVectorFst * t1, StdVectorFst * t2);
-      static void recode_symbol_numbers(StdVectorFst * t, NumberNumberMap &km);      
-      static StdVectorFst * expand_arcs(StdVectorFst * t, StringSet &unknown);
+      static void recode_symbol_numbers(StdVectorFst * t, hfst::NumberNumberMap &km);      
+      static StdVectorFst * expand_arcs(StdVectorFst * t, hfst::StringSet &unknown);
       static StdVectorFst * substitute(StdVectorFst * t,unsigned int old_key,unsigned int new_key);
       static StdVectorFst * substitute(StdVectorFst * t,
       				       pair<unsigned int, unsigned int> old_key_pair,

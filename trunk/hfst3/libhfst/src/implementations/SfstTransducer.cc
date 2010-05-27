@@ -187,6 +187,8 @@ namespace hfst { namespace implementations {
   }
 
 
+
+
   std::pair<Transducer*, Transducer*> SfstTransducer::harmonize 
   (Transducer *t1, Transducer *t2) 
   {
@@ -197,8 +199,8 @@ namespace hfst { namespace implementations {
     StringSet unknown_t2;    // and vice versa
     StringSet t1_symbols = get_string_set(t1);
     StringSet t2_symbols = get_string_set(t2);
-    hfst::symbols::collect_unknown_sets(t1_symbols, unknown_t1,
-					t2_symbols, unknown_t2);
+    collect_unknown_sets(t1_symbols, unknown_t1,
+			 t2_symbols, unknown_t2);
 
     Transducer * new_t1 = &t1->copy(false, &t2->alphabet);
     t2->alphabet.insert_symbols(new_t1->alphabet);
@@ -635,7 +637,7 @@ namespace hfst { namespace implementations {
     return t; }
   
   Transducer * SfstTransducer::repeat_n(Transducer * t,int n)
-  { if (n < 0) { throw ImpossibleTransducerPowerExcpetion(); }
+  { if (n < 0) { throw ImpossibleTransducerPowerException(); }
     Transducer * power = create_epsilon_transducer();
     for (int i = 0; i < n; ++i)
       {
@@ -646,7 +648,7 @@ namespace hfst { namespace implementations {
     return power; }
   
   Transducer * SfstTransducer::repeat_le_n(Transducer * t,int n)
-  { if (n < 0) { throw ImpossibleTransducerPowerExcpetion(); }
+  { if (n < 0) { throw ImpossibleTransducerPowerException(); }
     Transducer * result = create_empty_transducer();
     for (int i = 0; i < n+1; ++i)
       {
@@ -678,7 +680,7 @@ namespace hfst { namespace implementations {
   { t->complete_alphabet();
     return &t->upper_level(); }
   
-  void SfstTransducer::extract_strings(Transducer * t, hfst::implementations::WeightedPaths<float>::Set &results)
+  void SfstTransducer::extract_strings(Transducer * t, hfst::WeightedPaths<float>::Set &results)
   {
     t->generate_hfst(results, true);
   }

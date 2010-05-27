@@ -633,7 +633,7 @@ namespace hfst { namespace implementations
   LogWeightTransducer::n_best(LogFst * t,int n)
   { 
     if (n < 0)
-      { throw ImpossibleTransducerPowerExcpetion(); }
+      { throw ImpossibleTransducerPowerException(); }
     LogFst * n_best_fst = new LogFst(); 
     fst::ShortestPath(*t,n_best_fst,(size_t)n);
     return n_best_fst;

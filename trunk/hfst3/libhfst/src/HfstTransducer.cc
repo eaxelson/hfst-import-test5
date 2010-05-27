@@ -1,7 +1,5 @@
 #include "HfstTransducer.h"
 
-//hfst::symbols::GlobalSymbolTable hfst::symbols::KeyTable::global_symbol_table;
-
 namespace hfst
 {
   hfst::implementations::SfstTransducer HfstTransducer::sfst_interface;
@@ -10,78 +8,6 @@ namespace hfst
   hfst::implementations::LogWeightTransducer
   HfstTransducer::log_ofst_interface;
   hfst::implementations::FomaTransducer HfstTransducer::foma_interface;
-
-
-  /*
-  HfstState::HfstState(MutableHfstTransducer &t) 
-  {
-    this->tropical_ofst = t.tropical_ofst;
-  }
-
-  HfstState::HfstState(const HfstState &s) { }
-  HfstWeight HfstState::get_final_weight(void) const  { return false; }
-  bool HfstState::operator< (const HfstState &another) const  { return false; }
-  bool HfstState::operator== (const HfstState &another) const  { return false; }
-  bool HfstState::operator!= (const HfstState &another) const  { return false; }
-  const_iterator HfstState::begin(void) const  { return HfstTransitionIterator(HfstTransducer(UNSPECIFIED_TYPE)); }
-  const_iterator HfstState::end(void) const  { return HfstTransitionIterator(HfstTransducer(UNSPECIFIED_TYPE)); }
-  */
-
-
-#ifdef foo
-  /* The set of symbols in the symbol table of the transducer. */
-  StringSymbolSet HfstTransducer::get_string_symbol_set(void) 
-  {
-    switch (this->type)
-      {
-      case (SFST_TYPE):
-	return sfst_interface.get_string_symbol_set(implementation.sfst);
-	break;
-      case (TROPICAL_OFST_TYPE):
-	return tropical_ofst_interface.get_string_symbol_set(implementation.tropical_ofst);
-	break;
-      default:
-	throw hfst::exceptions::FunctionNotImplementedException();	
-      }
-  }
-
-  /* 
-     Add symbols from \a unknown_another to the symbol table of transducer \a another.
-     Then calculate how numbers in this transducer should be mapped if this transducer
-     follows the symbol table of transducer \a another. 
-     Delete the symbol table of this transducer and set as its value
-     a copy of the symbol table of transducer another.
-     Finally, return the calculated number mappings in a KeyMap. 
-     This function is inteded to be used with function 'harmonize' in the following way: 
-
-       KeyMap km = transducer.create_mapping(another_transducer, unknown_another); 
-       transducer = transducer.harmonize(km);  
-  */
-
-  KeyMap HfstTransducer::create_mapping(HfstTransducer &another, StringSymbolSet &unknown_another)
-  {
-    if (this->type != another.type) 
-      {
-      throw hfst::exceptions::ErrorException();
-      }
-
-    switch (this->type)
-      {
-      case (SFST_TYPE):
-	return sfst_interface.create_mapping(this->implementation.sfst,
-					     another.implementation.sfst,
-					     unknown_another);
-	break;
-      case (TROPICAL_OFST_TYPE):
-	return tropical_ofst_interface.create_mapping(this->implementation.tropical_ofst,
-						      another.implementation.tropical_ofst,
-						      unknown_another);
-	break;
-      default:
-	throw hfst::exceptions::FunctionNotImplementedException();	
-      }
-  }
-#endif
   
   HfstTransitionIterator::HfstTransitionIterator(const HfstMutableTransducer &t, HfstState s):
     tropical_ofst_iterator(hfst::implementations::TropicalWeightTransitionIterator(t.transducer.implementation.tropical_ofst, s))
@@ -111,32 +37,15 @@ namespace hfst
     tropical_ofst_iterator.next();
   }
 
-  
   HfstStateIterator::HfstStateIterator(const HfstMutableTransducer &t):
     tropical_ofst_iterator(hfst::implementations::TropicalWeightStateIterator(t.transducer.implementation.tropical_ofst))
   {}
 
-  //HfstStateIterator::HfstStateIterator(void)  {}
   
   HfstStateIterator::~HfstStateIterator(void)  
   { 
   }
   
-  /*
-  void HfstStateIterator::operator= (const HfstStateIterator &another)  {}
-  
-  bool HfstStateIterator::operator== (const HfstStateIterator &another) const  { return false; }
-  
-  bool HfstStateIterator::operator!= (const HfstStateIterator &another) const  { return false; }
-  
-  const HfstState HfstStateIterator::operator* (void)  { return HfstState(HfstTransducer(UNSPECIFIED_TYPE)); }
-  
-  void HfstStateIterator::operator++ (void)  {}
-  
-  void HfstStateIterator::operator++ (int)  {}
-  
-  HfstWeight get_final_weight(HfstState s) {}*/
-
   bool HfstStateIterator::done()
   {
     return tropical_ofst_iterator.done();
@@ -151,7 +60,6 @@ namespace hfst
   {
     tropical_ofst_iterator.next();
   }
-
 
 
   HfstTransition::HfstTransition(std::string isymbol, std::string osymbol, HfstWeight weight, HfstState target_state):
@@ -182,15 +90,28 @@ namespace hfst
   }
 
 
+  void collect_unknown_sets(StringSet &s1, StringSet &unknown1,
+			    StringSet &s2, StringSet &unknown2)
+  {
+    for (StringSet::const_iterator it1 = s1.begin(); it1 != s1.end(); it1++) {
+      String sym1 = *it1;
+      if ( s2.find(sym1) == s2.end() )
+	unknown2.insert(sym1);
+    }
+    for (StringSet::const_iterator it2 = s2.begin(); it2 != s2.end(); it2++) {
+      String sym2 = *it2;
+      if ( s1.find(sym2) == s1.end() )
+	unknown1.insert(sym2);
+    }
+  }
+
   void HfstTransducer::harmonize(HfstTransducer &another)
   {
     if (this->type != another.type)
       {
+	printf("FOO1\n");
 	throw hfst::exceptions::TransducerHasWrongTypeException();
       }
-
-    //fprintf(stderr, "harmonize(1): this type is %i\n", this->type);
-    //fprintf(stderr, "harmonize(1): another type is %i\n", another.type);
 
     switch(this->type)
       {
@@ -233,88 +154,10 @@ namespace hfst
       case (UNSPECIFIED_TYPE):
       case (ERROR_TYPE):
       default:
+	printf("FOO2\n");
 	throw hfst::exceptions::TransducerHasWrongTypeException();
       }
   }
-
-#ifdef foo
-  {
-    if (this->anonymous or another.anonymous)
-      { return; }
-
-    // 1. Calculate the set of unknown symbols for transducers this and another.
-
-    StringSymbolSet unknown_this;    // symbols known to another but not this
-    StringSymbolSet unknown_another; // and vice versa
-    StringSymbolSet this_symbols = this->get_string_symbol_set();
-    StringSymbolSet another_symbols = another.get_string_symbol_set();
-    KeyTable::collect_unknown_sets(this_symbols, unknown_this,
-				   another_symbols, unknown_another);
-
-    // 2. Add new symbols from transducer this to the symbol table of transducer
-    //    another and recode the symbol numbers of transducer this so that
-    //    it follows the symbol table of transducer another.
-
-    KeyMap km = this->create_mapping(another, unknown_another);
-    this->recode_symbol_numbers(km);
-
-    // 3. Calculate the set of symbol pairs to which a non-identity "?:?"
-    //    transition is expanded for both transducers.
-    
-    return;
-  }
-
-
-    /*
-    hfst::symbols::SymbolPairSet non_identity_this = 
-      KeyTable::non_identity_cross_product(unknown_this, us);
-    hfst::symbols::SymbolPairSet non_identity_another = 
-      KeyTable::non_identity_cross_product(unknown_another, us);
-
-
-    hfst::symbols::KeyMap key_map;
-    this->key_table.harmonize(key_map,another.key_table);
-    key_table = another.key_table;
-    switch (type)
-      {
-      case SFST_TYPE:
-      {*/
-	  /* SFST deletes here by default, so we don't need to delete. */
-    /* this->implementation.sfst = 
-	    sfst_interface.harmonize(implementation.sfst,key_map);
-	  break;
-	}
-      case TROPICAL_OFST_TYPE:
-	{
-	  fst::StdVectorFst * temp =
-	    tropical_ofst_interface.harmonize
-	    (implementation.tropical_ofst,key_map);
-	  delete this->implementation.tropical_ofst;
-	  this->implementation.tropical_ofst = temp;*/
-	  // ADDED
-	  /*tropical_ofst_interface.expand_unknown(this->implementation.tropical_ofst,
-						 unknown_this, non_identity_this);
-	  tropical_ofst_interface.expand_unknown(another.implementation.tropical_ofst,
-	  unknown_another, non_identity_another);*/
-	  break;
-	}
-      case LOG_OFST_TYPE:
-	{
-	  hfst::implementations::LogFst * temp =
-	    log_ofst_interface.harmonize
-	    (implementation.log_ofst,key_map);
-	  delete this->implementation.log_ofst;
-	  this->implementation.log_ofst  = temp;
-	  break;
-	}
-	case UNSPECIFIED_TYPE:
-	case ERROR_TYPE:
-	default:
-	  throw hfst::exceptions::TransducerHasWrongTypeException();
-      }
-#endif
-
-
 
   HfstTransducer::HfstTransducer(ImplementationType type):
     type(type),anonymous(false),is_trie(true)
@@ -325,8 +168,10 @@ namespace hfst
 	implementation.sfst = sfst_interface.create_empty_transducer();
 	break;
       case TROPICAL_OFST_TYPE:
+      case UNSPECIFIED_TYPE:
 	implementation.tropical_ofst = 
 	  tropical_ofst_interface.create_empty_transducer();
+	this->type = TROPICAL_OFST_TYPE;
 	break;
       case LOG_OFST_TYPE:
 	implementation.log_ofst = 
@@ -335,38 +180,13 @@ namespace hfst
       case FOMA_TYPE:
 	implementation.foma = foma_interface.create_empty_transducer();
 	break;
-	case UNSPECIFIED_TYPE:
-	case ERROR_TYPE:
-	default:
-	  throw hfst::exceptions::TransducerHasWrongTypeException();
+      case ERROR_TYPE:
+      default:
+	printf("FOO3\n");
+	throw hfst::exceptions::TransducerHasWrongTypeException();
       }
   }
 
-/*
-  HfstTransducer::HfstTransducer
-  (const KeyTable &key_table,ImplementationType type):
-    type(type),anonymous(false),key_table(key_table),is_trie(true)
-  {
-    switch (type)
-      {
-      case SFST_TYPE:
-	implementation.sfst = sfst_interface.create_empty_transducer();
-	break;
-      case TROPICAL_OFST_TYPE:
-	implementation.tropical_ofst = 
-	  tropical_ofst_interface.create_empty_transducer();
-	break;
-      case LOG_OFST_TYPE:
-	implementation.log_ofst = 
-	  log_ofst_interface.create_empty_transducer();
-	break;
-	case UNSPECIFIED_TYPE:
-	case ERROR_TYPE:
-	default:
-	  throw hfst::exceptions::TransducerHasWrongTypeException();
-      }
-  }
-*/
 
   HfstTransducer::HfstTransducer(const std::string& utf8_str, 
 				 const HfstTokenizer 
@@ -382,8 +202,10 @@ namespace hfst
 	implementation.sfst = sfst_interface.define_transducer(*spv);
 	break;
       case TROPICAL_OFST_TYPE:
+      case UNSPECIFIED_TYPE:
 	implementation.tropical_ofst = 
 	  tropical_ofst_interface.define_transducer(*spv);
+	this->type = TROPICAL_OFST_TYPE;
 	break;
       case LOG_OFST_TYPE:
 	implementation.log_ofst = 
@@ -393,9 +215,9 @@ namespace hfst
 	implementation.foma =
 	  foma_interface.define_transducer(*spv);
 	break;
-      case UNSPECIFIED_TYPE:
       case ERROR_TYPE:
       default:
+	printf("FOO4\n");
 	throw hfst::exceptions::TransducerHasWrongTypeException();
       }
     delete spv;
@@ -417,8 +239,10 @@ namespace hfst
 	implementation.sfst = sfst_interface.define_transducer(*spv);
 	break;
       case TROPICAL_OFST_TYPE:
+      case UNSPECIFIED_TYPE:
 	implementation.tropical_ofst = 
 	  tropical_ofst_interface.define_transducer(*spv);
+	this->type = TROPICAL_OFST_TYPE;
 	break;
       case LOG_OFST_TYPE:
 	implementation.log_ofst = 
@@ -428,35 +252,14 @@ namespace hfst
 	implementation.foma =
 	  foma_interface.define_transducer(*spv);
 	break;
-      case UNSPECIFIED_TYPE:
       case ERROR_TYPE:
       default:
+	printf("FOO5\n");
 	throw hfst::exceptions::TransducerHasWrongTypeException();
       }
     delete spv;
   }
 
-/*  HfstTransducer::HfstTransducer(KeyPairVector * kpv,
-				 ImplementationType type):
-    type(type),anonymous(true),is_trie(true)
-  {
-    switch (type)
-      {
-      case SFST_TYPE:
-	implementation.sfst = sfst_interface.define_transducer(*kpv);
-	break;
-      case TROPICAL_OFST_TYPE:
-	implementation.tropical_ofst = 
-	  tropical_ofst_interface.define_transducer(*kpv);
-	break;
-      case LOG_OFST_TYPE:
-	implementation.log_ofst = 
-	  log_ofst_interface.define_transducer(*kpv);
-	break;
-      default:
-	assert(false);
-      }
-      }*/
 
   HfstTransducer::HfstTransducer(HfstInputStream &in):
     type(in.type), anonymous(false),is_trie(false)
@@ -485,6 +288,7 @@ namespace hfst
       case UNSPECIFIED_TYPE:
       case ERROR_TYPE:
       default:
+	printf("FOO6\n");
 	throw hfst::exceptions::TransducerHasWrongTypeException();
       }
   }
@@ -517,6 +321,7 @@ namespace hfst
       case UNSPECIFIED_TYPE:
       case ERROR_TYPE:
       default:
+	printf("FOO7\n");
 	throw hfst::exceptions::TransducerHasWrongTypeException();
       }
   }
@@ -531,7 +336,9 @@ type(type),anonymous(false),is_trie(false)
 	implementation.sfst = sfst_interface.define_transducer(symbol.c_str());
 	break;
       case TROPICAL_OFST_TYPE:
+      case UNSPECIFIED_TYPE:
 	implementation.tropical_ofst = tropical_ofst_interface.define_transducer(symbol);
+	this->type = TROPICAL_OFST_TYPE;
 	break;
       case LOG_OFST_TYPE:
 	implementation.log_ofst = log_ofst_interface.define_transducer(symbol);
@@ -540,9 +347,9 @@ type(type),anonymous(false),is_trie(false)
 	implementation.foma = foma_interface.define_transducer(strdup(symbol.c_str()));
 	// should the char* be deleted?
 	break;
-      case UNSPECIFIED_TYPE:
       case ERROR_TYPE:
       default:
+	printf("FOO8\n");
 	throw hfst::exceptions::TransducerHasWrongTypeException();
 	break;
       }
@@ -556,7 +363,9 @@ type(type),anonymous(false),is_trie(false)
 	implementation.sfst = sfst_interface.define_transducer(isymbol.c_str(), osymbol.c_str());
 	break;
       case TROPICAL_OFST_TYPE:
+      case UNSPECIFIED_TYPE:
 	implementation.tropical_ofst = tropical_ofst_interface.define_transducer(isymbol, osymbol);
+	this->type = TROPICAL_OFST_TYPE;
 	break;
       case LOG_OFST_TYPE:
 	implementation.log_ofst = log_ofst_interface.define_transducer(isymbol, osymbol);
@@ -565,9 +374,9 @@ type(type),anonymous(false),is_trie(false)
 	implementation.foma = foma_interface.define_transducer( strdup(isymbol.c_str()), strdup(osymbol.c_str()) );
 	// should the char*:s be deleted?
 	break;
-      case UNSPECIFIED_TYPE:
       case ERROR_TYPE:
       default:
+	printf("FOO9\n");
 	throw hfst::exceptions::TransducerHasWrongTypeException();
 	break;
       }
@@ -606,14 +415,13 @@ void HfstTransducer::test_minimize()
   this->tropical_ofst_interface.test_minimize();
 }
 
-  bool HfstTransducer::test_equivalence(HfstTransducer &one, HfstTransducer &another) 
+  bool HfstTransducer::test_equivalence(const HfstTransducer &one, const HfstTransducer &another) 
   {
     HfstTransducer onecopy(one);
     HfstTransducer anothercopy(another);
     onecopy.convert(TROPICAL_OFST_TYPE);
     anothercopy.convert(TROPICAL_OFST_TYPE);
     onecopy.harmonize(anothercopy);
-    //std::cerr << onecopy << "--\n" << anothercopy << "\n\n";
     return tropical_ofst_interface.test_equivalence(
 	     onecopy.implementation.tropical_ofst,
 	     anothercopy.implementation.tropical_ofst);
@@ -675,8 +483,10 @@ void HfstTransducer::test_minimize()
 
   HfstTransducer &HfstTransducer::repeat_n_plus(unsigned int n, ImplementationType type)
   { is_trie = false; // This could be done so that is_trie is preserved
-    HfstTransducer a(*this);
-    return (a.repeat_n(n,type)).concatenate(this->repeat_star(type));  // FIX: memory leaks?
+    HfstTransducer this_repeat_n = HfstTransducer(*this).repeat_n(n,type);
+    HfstTransducer this_repeat_star = HfstTransducer(*this).repeat_star(type);
+    HfstTransducer &retval = (this_repeat_n).concatenate(this_repeat_star);
+    return retval;
   }
 
   HfstTransducer &HfstTransducer::repeat_n_minus(unsigned int n, ImplementationType type)
@@ -739,8 +549,13 @@ void HfstTransducer::test_minimize()
        &hfst::implementations::FomaTransducer::extract_output_language,
        type); }
 
-void HfstTransducer::extract_strings(WeightedPaths<float>::Set &results)
+  void HfstTransducer::extract_strings(WeightedPaths<float>::Set &results, ImplementationType type)
   {
+    if ( (this->type == FOMA_TYPE && type == UNSPECIFIED_TYPE) ||
+	 type == FOMA_TYPE )
+      this->convert(TROPICAL_OFST_TYPE);
+    else
+      this->convert(type);
     switch (type)
       {
       case LOG_OFST_TYPE:
@@ -748,6 +563,7 @@ void HfstTransducer::extract_strings(WeightedPaths<float>::Set &results)
 	  (implementation.log_ofst,results);
 	break;
       case TROPICAL_OFST_TYPE:
+      case FOMA_TYPE:
 	hfst::implementations::TropicalWeightTransducer::extract_strings
 	  (implementation.tropical_ofst,results);
 	break;
@@ -759,15 +575,6 @@ void HfstTransducer::extract_strings(WeightedPaths<float>::Set &results)
       }
   }
 
-/*  HfstTransducer &HfstTransducer::substitute
-  (Key old_key,Key new_key)
-  { return apply 
-      (&hfst::implementations::SfstTransducer::substitute,
-       &hfst::implementations::TropicalWeightTransducer::substitute,
-       &hfst::implementations::LogWeightTransducer::substitute,
-       &hfst::implementations::FomaTransducer::substitute,
-       old_key,new_key,
-       this->type); }*/
 
   HfstTransducer &HfstTransducer::substitute
   (const std::string &old_symbol, const std::string &new_symbol, ImplementationType type)
@@ -783,8 +590,10 @@ void HfstTransducer::extract_strings(WeightedPaths<float>::Set &results)
 
   HfstTransducer &HfstTransducer::substitute
   (const StringPair &old_symbol_pair, 
-   const StringPair &new_symbol_pair)
+   const StringPair &new_symbol_pair,
+   ImplementationType type)
   { 
+    (void)type;
     convert(TROPICAL_OFST_TYPE);
     fst::StdVectorFst * tropical_ofst_temp =
       this->tropical_ofst_interface.substitute(implementation.tropical_ofst,old_symbol_pair,new_symbol_pair);
@@ -795,8 +604,10 @@ void HfstTransducer::extract_strings(WeightedPaths<float>::Set &results)
 
   HfstTransducer &HfstTransducer::substitute
   (const StringPair &symbol_pair,
-   HfstTransducer &transducer)
+   HfstTransducer &transducer,
+   ImplementationType type)
   {    
+    (void)type;
     convert(TROPICAL_OFST_TYPE);
     transducer.convert(TROPICAL_OFST_TYPE);
     this->harmonize(transducer);
@@ -805,31 +616,23 @@ void HfstTransducer::extract_strings(WeightedPaths<float>::Set &results)
     return *this;
   }
 
-  HfstTransducer &HfstTransducer::set_final_weights(float weight)
+  HfstTransducer &HfstTransducer::set_final_weights(float weight, ImplementationType type)
   {
+    (void)type;
     convert(TROPICAL_OFST_TYPE);
     implementation.tropical_ofst  =
       this->tropical_ofst_interface.set_final_weights(this->implementation.tropical_ofst, weight);
     return *this;
   }
 
-  HfstTransducer &HfstTransducer::transform_weights(float (*func)(float))
+  HfstTransducer &HfstTransducer::transform_weights(float (*func)(float), ImplementationType type)
   {
+    (void)type;
     convert(TROPICAL_OFST_TYPE);
     implementation.tropical_ofst  =
       this->tropical_ofst_interface.transform_weights(this->implementation.tropical_ofst, func);
     return *this;
   }
-
-  /*  HfstTransducer &HfstTransducer::substitute
-  (const KeyPair &old_key_pair,const KeyPair &new_key_pair)
-  { return apply 
-      (&hfst::implementations::SfstTransducer::substitute,
-       &hfst::implementations::TropicalWeightTransducer::substitute,
-       &hfst::implementations::LogWeightTransducer::substitute,
-       &hfst::implementations::FomaTransducer::substitute,
-       old_key_pair,new_key_pair,
-       this->type); }*/
 
   HfstTransducer &HfstTransducer::compose
   (HfstTransducer &another,
@@ -929,15 +732,7 @@ void HfstTransducer::extract_strings(WeightedPaths<float>::Set &results)
   HfstTransducer &HfstTransducer::disjunct
   (HfstTransducer &another,
    ImplementationType type)
-  { //harmonize(another);
-    /*if (is_trie and another.is_trie)
-      {
-	try
-	  { disjunct_as_tries(another,type); 
-	    return *this; }
-	catch (hfst::exceptions::FunctionNotImplementedException e) {}
-	catch (hfst::exceptions::HfstInterfaceException e) { throw e; }
-      }*/
+  {
     is_trie = false;
     return apply(&hfst::implementations::SfstTransducer::disjunct,
 		 &hfst::implementations::TropicalWeightTransducer::disjunct,
@@ -968,190 +763,93 @@ void HfstTransducer::extract_strings(WeightedPaths<float>::Set &results)
 		 another,
 		 type); }
 
-/*  HfstTransducer &HfstTransducer::anonymize(void)
-  { anonymous = true; return *this; }
-  
-  KeyTable& HfstTransducer::get_key_table(void)
-  { return key_table; }
 
-  void HfstTransducer::set_key_table(const KeyTable &kt)
+  HfstTransducer &HfstTransducer::convert(const HfstTransducer &t, ImplementationType type)
   {
-    key_table = kt;
-    anonymous = false;
-    }*/
+    //if (type == UNSPECIFIED_TYPE)
+    //  { throw hfst::implementations::SpecifiedTypeRequiredException(); }
 
-/*
-  WeightType HfstTransducer::get_weight_type(void)
-  {
-    switch (type)
+    // no need to convert, just return a copy
+    if (type == t.type)
+      { return *(new HfstTransducer(t)); }
+
+    // the return value, contains an empty transducer that is later deleted
+    HfstTransducer * retval = new HfstTransducer(type);
+
+    try 
       {
-      case SFST_TYPE:
-	return BOOL;
-	break;
-      case TROPICAL_OFST_TYPE:
-	return FLOAT;
-	break;
-      case LOG_OFST_TYPE:
-	return FLOAT;
-	break;
-      case FOMA_TYPE:
-	return BOOL;
-	break;
+	// make a new intermediate transducer of type TROPICAL_OFST_TYPE 
+	hfst::implementations::InternalTransducer * internal;
+	switch (t.type)
+	  {
+	  case FOMA_TYPE:
+	    internal =
+	      hfst::implementations::foma_to_internal_format(t.implementation.foma);
+	    break;
+	  case SFST_TYPE:
+	    internal = 
+	      hfst::implementations::sfst_to_internal_format(t.implementation.sfst);
+	    break;
+	  case TROPICAL_OFST_TYPE:
+	    internal = t.implementation.tropical_ofst;  // just copy the pointer
+	    break;
+	  case LOG_OFST_TYPE:
+	  internal =
+	      hfst::implementations::log_ofst_to_internal_format(t.implementation.log_ofst);
+	    break;
 	case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
+	  printf("FOO10\n");
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
-      }
-  }
+	  }
 
-  HfstTransducer &HfstTransducer::set_final_weights(float weight) 
-  {
-    switch (type)
-      {
-      case SFST_TYPE:
-	return *this;
-	break;
-      case TROPICAL_OFST_TYPE:
-	{
-	  fst::StdVectorFst * temp =
-	    hfst::implementations::TropicalWeightTransducer::set_weight
-	    (implementation.tropical_ofst,weight); 
-	  delete implementation.tropical_ofst;
-	  implementation.tropical_ofst = temp;
-	  break;
-	}
-      case LOG_OFST_TYPE:
-	{
-	  hfst::implementations::LogFst * temp =
-	    hfst::implementations::LogWeightTransducer::set_weight
-	    (implementation.log_ofst,weight); 
-	  delete implementation.log_ofst;
-	  implementation.log_ofst = temp;
-	  break;
-	}
-      case FOMA_TYPE:
-	return *this;
-	break;
-	case UNSPECIFIED_TYPE:
+	// transform the intermediate transducer into format defined by 'type'
+	// and assign it as a value of retval
+	switch (type)
+	  {
+	  case SFST_TYPE:
+	    delete retval->implementation.sfst;  // delete the empty transducer
+	    retval->implementation.sfst = 
+	      hfst::implementations::internal_format_to_sfst(internal);
+	    if (t.type != TROPICAL_OFST_TYPE)  // if a new intermediate transducer was created,
+	      delete internal;                  // delete it
+	    break;
+	  case TROPICAL_OFST_TYPE:
+	  case UNSPECIFIED_TYPE:
+	    delete retval->implementation.tropical_ofst;
+	    retval->implementation.tropical_ofst = internal;
+	    retval->type = TROPICAL_OFST_TYPE;
+	    break;                              // no new intermediate transducer was created
+	  case LOG_OFST_TYPE:
+	    delete retval->implementation.log_ofst;
+	    retval->implementation.log_ofst =
+	      hfst::implementations::internal_format_to_log_ofst(internal);
+	    if (t.type != TROPICAL_OFST_TYPE)
+	      delete internal;
+	    break;
+	  case FOMA_TYPE:
+	    retval->foma_interface.delete_foma(retval->implementation.foma);
+	    retval->implementation.foma =
+	      hfst::implementations::internal_format_to_foma(internal);
+	    if (t.type != TROPICAL_OFST_TYPE)
+	      delete internal;
+	    break;
 	case ERROR_TYPE:
 	default:
+	  printf("FOO11\n");
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
+	  }
       }
+    catch (hfst::implementations::HfstInterfaceException e)
+      { throw e; }
+    return *retval;
   }
 
-  template<> HfstTransducer &HfstTransducer::set_final_weight<float>
-  (float weight)
-  { 
-    if (get_weight_type() != FLOAT)
-      throw hfst::implementations::WeightTypeMismatchException(); 
-    switch (type)
-      {
-      case TROPICAL_OFST_TYPE:
-	{
-	  fst::StdVectorFst * temp =
-	    hfst::implementations::TropicalWeightTransducer::set_weight
-	    (implementation.tropical_ofst,weight); 
-	  delete implementation.tropical_ofst;
-	  implementation.tropical_ofst = temp;
-	  break;
-	}
-      case LOG_OFST_TYPE:
-	{
-	  hfst::implementations::LogFst * temp =
-	    hfst::implementations::LogWeightTransducer::set_weight
-	    (implementation.log_ofst,weight); 
-	  delete implementation.log_ofst;
-	  implementation.log_ofst = temp;
-	  break;
-	}
-	case UNSPECIFIED_TYPE:
-	case ERROR_TYPE:
-	default:
-	  throw hfst::exceptions::TransducerHasWrongTypeException();
-      }
-    return *this; 
-  }
-
-  HfstTransducer &HfstTransducer::transform_weights(float(*func)(float))
-  {
-    switch (type)
-      {
-      case SFST_TYPE:
-	return *this;
-	break;
-      case TROPICAL_OFST_TYPE:
-	{
-	  fst::StdVectorFst * temp =
-	    hfst::implementations::TropicalWeightTransducer::transform_weights
-	    (implementation.tropical_ofst,func); 
-	  delete implementation.tropical_ofst;
-	  implementation.tropical_ofst = temp;
-	  break;
-	}
-      case LOG_OFST_TYPE:
-	{
-	  hfst::implementations::LogFst * temp =
-	    hfst::implementations::LogWeightTransducer::transform_weights
-	    (implementation.log_ofst,func); 
-	  delete implementation.log_ofst;
-	  implementation.log_ofst = temp;
-	  break;
-	}
-      case FOMA_TYPE:
-	return *this;
-	break;
-	case UNSPECIFIED_TYPE:
-	case ERROR_TYPE:
-	default:
-	  throw hfst::exceptions::TransducerHasWrongTypeException();
-      }
-  }
-
-  template<> HfstTransducer &HfstTransducer::transform_weights<float>
-  (float(*func)(float))
-  { 
-    if (get_weight_type() != FLOAT)
-      { throw hfst::implementations::WeightTypeMismatchException(); }
-    switch (type)
-      {
-      case TROPICAL_OFST_TYPE:
-	{ throw hfst::implementations::FunctionNotImplementedException(); }
-      case LOG_OFST_TYPE:
-	{
-	  hfst::implementations::LogFst * temp =
-	    hfst::implementations::LogWeightTransducer::transform_weights
-	    (implementation.log_ofst,func); 
-	  delete implementation.log_ofst;
-	  implementation.log_ofst = temp;
-	  break;
-	}
-      default:
-	assert(false);
-      }
-    return *this; 
-  }
-  
-  template<> hfst::implementations::SfstTransducer::const_iterator 
-
-  HfstTransducer::begin<SfstTransducer>(void)
-  { 
-    if (type != SFST_TYPE) 
-      { throw hfst::implementations::TransducerHasWrongTypeException(); }
-    return SfstTransducer::begin(implementation.sfst); 
-  }
-
-  template<> hfst::implementations::SfstTransducer::const_iterator 
-  HfstTransducer::end<SfstTransducer>(void)
-  { 
-    if (type != SFST_TYPE) 
-      { throw hfst::implementations::TransducerHasWrongTypeException(); }
-    return SfstTransducer::end(implementation.sfst); 
-  }
-*/
   HfstTransducer &HfstTransducer::convert(ImplementationType type)
   {
-    if (type == UNSPECIFIED_TYPE)
-      { throw hfst::implementations::SpecifiedTypeRequiredException(); }
+    //if (type == UNSPECIFIED_TYPE)
+    //  { throw hfst::implementations::SpecifiedTypeRequiredException(); }
     if (type == this->type)
       { return *this; }
 
@@ -1181,6 +879,7 @@ void HfstTransducer::extract_strings(WeightedPaths<float>::Set &results)
 	case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
+	  printf("FOO12\n");
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
 	  }
 
@@ -1193,6 +892,7 @@ void HfstTransducer::extract_strings(WeightedPaths<float>::Set &results)
 	    delete internal;
 	    break;
 	  case TROPICAL_OFST_TYPE:
+	  case UNSPECIFIED_TYPE:
 	    implementation.tropical_ofst = internal;
 	    break;
 	  case LOG_OFST_TYPE:
@@ -1205,9 +905,9 @@ void HfstTransducer::extract_strings(WeightedPaths<float>::Set &results)
 	      hfst::implementations::internal_format_to_foma(internal);
 	    delete internal;
 	    break;
-	case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
+	  printf("FOO13\n");
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
 	  }
       }
@@ -1216,37 +916,12 @@ void HfstTransducer::extract_strings(WeightedPaths<float>::Set &results)
     return *this;
   }
 
-/*  std::ostream &operator<<
-(std::ostream &out,HfstTransducer &T)
-  {
-    HfstMutableTransducer t(T);
-    HfstStateIterator it(t);
-    while (not it.done()) {
-      HfstState s = it.value();
-      HfstTransitionIterator IT(t,s);
-      while (not IT.done()) {
-	HfstTransition tr = IT.value();
-	out << s << "\t" << tr.get_target_state() << "\t"
-	    << tr.get_input_symbol() << "\t" << tr.get_output_symbol()
-	    << "\t" << tr.get_weight();
-	out << "\n";
-	IT.next();
-      }
-      if ( t.is_final(s) )
-	cout << s << "\t" << t.get_final_weight(s) << "\n";
-      it.next();
-    }
-    return out;
-    }*/
-
-
-
 void HfstTransducer::write_in_att_format(const char * filename)
 {
   FILE * ofile = fopen(filename, "wb");
   if (ofile == NULL)
-    throw FileNotReadableException();
-  HfstTransducer conv = this->convert(TROPICAL_OFST_TYPE);
+    throw hfst::exceptions::FileNotReadableException();
+  HfstTransducer conv = convert(*this, TROPICAL_OFST_TYPE);
   this->tropical_ofst_interface.write_in_att_format
     (conv.implementation.tropical_ofst, ofile);
   fclose(ofile);
@@ -1254,55 +929,35 @@ void HfstTransducer::write_in_att_format(const char * filename)
 
 void HfstTransducer::write_in_att_format(FILE * ofile)
 {
-  HfstTransducer conv = this->convert(TROPICAL_OFST_TYPE);
+  HfstTransducer conv = convert(*this, TROPICAL_OFST_TYPE);
   this->tropical_ofst_interface.write_in_att_format
     (conv.implementation.tropical_ofst, ofile);
 }
 
-HfstTransducer &HfstTransducer::read_in_att_format(const char * filename)
+HfstTransducer &HfstTransducer::read_in_att_format(const char * filename, ImplementationType type)
 {
+  if (type == ERROR_TYPE) {
+    printf("FOO14\n");
+    throw hfst::exceptions::TransducerHasWrongTypeException();
+  }
   HfstTransducer * retval = new HfstTransducer(TROPICAL_OFST_TYPE);
   FILE * ifile = fopen(filename, "rb");
   if (ifile == NULL)
-    throw FileNotReadableException();
+    throw hfst::exceptions::FileNotReadableException();
   retval->implementation.tropical_ofst = TropicalWeightTransducer::read_in_att_format(ifile);
   fclose(ifile);
+  retval->convert(type);
   return *retval;
 }
 
-HfstTransducer &HfstTransducer::read_in_att_format(FILE * ifile)
+HfstTransducer &HfstTransducer::read_in_att_format(FILE * ifile, ImplementationType type)
 {
   HfstTransducer * retval = new HfstTransducer(TROPICAL_OFST_TYPE);
   retval->implementation.tropical_ofst = TropicalWeightTransducer::read_in_att_format(ifile);
+  retval->convert(type);
   return *retval;
 }
 
-/*void HfstTransducer::print(void) 
-  {
-    switch (this->type)
-      {
-      case FOMA_TYPE:
-	this->foma_interface.print_test
-	  (this->implementation.foma);
-	break;
-      case SFST_TYPE:
-	this->sfst_interface.print_test
-	  (this->implementation.sfst);
-	break;
-      case TROPICAL_OFST_TYPE:
-	this->tropical_ofst_interface.print_test
-	  (this->implementation.tropical_ofst);
-	break;
-      case LOG_OFST_TYPE:
-	this->log_ofst_interface.print_test
-	  (this->implementation.log_ofst);
-	break;
-      case UNSPECIFIED_TYPE:
-      case ERROR_TYPE:
-      default:
-	throw hfst::exceptions::TransducerHasWrongTypeException();
-     }
-     }*/
 
 std::ostream &operator<<(std::ostream &out,HfstTransducer &t)
   {
@@ -1324,11 +979,6 @@ std::ostream &operator<<(std::ostream &out,HfstTransducer &t)
     // guarantees that the internal representation of an empty transducer has at least one state
     transducer.tropical_ofst_interface.represent_empty_transducer_as_having_one_state(transducer.implementation.tropical_ofst);
   }
-
-  /*HfstMutableTransducer::HfstMutableTransducer(const HfstMutableTransducer &t):
-    transducer(HfstTransducer(t).convert(TROPICAL_OFST_TYPE))
-  {
-  }*/
 
   HfstMutableTransducer::~HfstMutableTransducer(void)
   {

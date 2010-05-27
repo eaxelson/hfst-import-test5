@@ -1,53 +1,77 @@
 #ifndef _HFST_TRANSDUCER_H_
 #define _HFST_TRANSDUCER_H_
 #include "implementations/SymbolDefs.h"
-//#include "implementations/GlobalSymbolTable.h"
 #include "implementations/SfstTransducer.h"
 #include "implementations/TropicalWeightTransducer.h"
 #include "implementations/LogWeightTransducer.h"
 #include "implementations/FomaTransducer.h"
 #include "implementations/HfstTokenizer.h"
 #include "implementations/ConvertTransducerFormat.h"
+#include "implementations/HfstExceptions.h"
 #include <string>
 #include <cassert>
 #include <iostream>
-
+#include <vector>
+#include <map>
+#include <set>
 
 /** \mainpage 
 
     \section first_section Parameter handling
 
-    Currently, all transducer functions of the type t->function(), e.g. t->reverse(),
-    modify the transducer t
-    and return the modified transducer, i.e. it is possible to write 
+    All transducer functions come in two forms, static and non-static.
+    In the case of static unary and binary operators, a new transducer is created
+    and the argument(s) is/are not modified:
 \verbatim
-    t = t->reverse();
+    HfstTransducer t_rev = reverse(t);         // t remains unchanged
+    HfstTransducer t_disj = disjunct(t1, t2);  // t1 and t2 remain unchanged
 \endverbatim
 
-    All transducer functions of the type t1->function(t2), e.g. t1->intersect(t2) create a new transducer
-    and return it, i.e. it is possible to write
+    In the case of non-static unary operators, the transducer itself is modified and
+    returned by the function.
+    In the case of non-static binary operators, the argument remains unmodified but
+    the transducer itself is modified and returned by the function:
 \verbatim
-    HfstTransducer t_intersection12 = t1->intersect(t2);
-    HfstTransducer t_intersection23 = t2->intersect(t3);
-    HfstTransducer t_intersection13 = t1->intersect(t3);
+    t = t->reverse(t);       // t is modifed
+    t1 = t1->disjunct(t2);   // t2 remains unchanged, a copy of t2 is disjuncted with t1
 \endverbatim
 
-    The future versions should also offer static versions of each transducer function, so that
-    it is possible to write either
+    All transducer functions take an \ref hfst::ImplementationType parameter, that defines what underlying
+    library is used. The default value of this parameter is \ref hfst::UNSPECIFIED_TYPE meaning that
+    the type of the calling transducer (in the case of non-static functions) or the (first) argument 
+    (in the case of static functions) is chosen as the implementation type of that function and the 
+    return value is also of the same type:
 \verbatim
-    t = t->reverse();
-    HfstTransducer t_disj = t1->disjunct(t2);
-\endverbatim
-    or
-\verbatim
-    HfstTransducer t_rev = reverse(t);
-    t1->disjunct(t2);
+    HfstTransducer t_rev = reverse(t_tropical_ofst);             // t_rev has type TROPICAL_OFST_TYPE 
+    HfstTransducer t_rev = reverse(t_tropical_ofst, FOMA_TYPE);  // t_rev has type FOMA_TYPE 
+    t_tropical_ofst->reverse();                                  // t_tropical_ofst is modified but still has type TROPICAL_OFST_TYPE 
+    t_tropical_ofst->reverse(FOMA_TYPE);                         // the type of t_tropical_ofst is changed to FOMA_TYPE
+
+    HfstTransducer t_disj = disjunct(t_tropical_ofst, t_foma);                   // t_disj has type TROPICAL_OFST
+    HfstTransducer t_disj = disjunct(t_tropical_ofst, t_foma, "LOG_OFST_TYPE");  // t_disj has type LOG_OFST_TYPE
+    t_tropical_ofst->disjunct(t_foma);                                           // t_tropical_ofst is modified but still has type TROPICAL_OFST
+    t_tropical_ofst->disjunct(t_foma, "LOG_OFST_TYPE");                          // the type of t_tropical_ofst is changed to LOG_OFST_TYPE
 \endverbatim
 
-    \section second_section Second section
-    
-    bar
-    bar
+    The implementation types may be converted by using the function \ref hfst::HfstTransducer::convert :
+\verbatim
+    HfstTransducer t_sfst = convert(t_tropical_ofst, "SFST_TYPE");  // t_sfst has type SFST_TYPE
+    t_tropical_ofst->convert("SFST_TYPE");                          // the type of t_tropical_ofst is changed to SFST_TYPE
+\endverbatim
+
+    \section second_section Creating transducers
+
+    The class \ref hfst::HfstTransducer offers constructors for empty, epsilon, one-transition and path transducers.
+    More complex transducers can be created by combining these transducers with various operations.
+    It is also possible to read transducers in AT&T format from a stream and convert them into binary
+    format with \ref hfst::HfstTransducer::read_in_att_format. Transducers can also be created from scratch with functions in \ref hfst::HfstMutableTransducer.
+
+    HfstTransducers consist of states, one of which is the initial state and transitions between these states.
+    A state can be final or non-final. The transitions consist of an input and an output symbol (strings) and, in the case
+    of TROPICAL_OFST_TYPE and LOG_OFST_TYPE, a weight (float). Final states also have a weight in these cases.
+
+    Special symbols are &amp;_EPSILON_SYMBOL_&amp; (reserved for epsilon), &amp;_UNKNOWN_SYMBOL_&amp; (reserved for unknown) and
+    &amp;_IDENTITY_SYMBOL_&amp; (reserved for identity). More on unknown and identity symbols...
 
 */
 
@@ -55,23 +79,20 @@
 /** \brief A namespace for the HFST functions and datatypes. */
 namespace hfst
 {
-
-  //using hfst::symbols::KeyTable;
-  //using hfst::symbols::Key;
-  //using hfst::symbols::KeyPair;
-  //using hfst::symbols::KeyMap;
-  using hfst::symbols::StringPair;
-  using hfst::symbols::StringSet;
-  //using hfst::symbols::KeyPairVector;
   
   using hfst::implementations::SfstTransducer;
   using hfst::implementations::TropicalWeightTransducer;
   using hfst::implementations::TropicalWeightState;
   using hfst::implementations::TropicalWeightStateIterator;
   using hfst::implementations::LogWeightTransducer;
-  using hfst::implementations::WeightedPaths;
-  using hfst::implementations::WeightedPath;
+  using hfst::WeightedPaths;
+  using hfst::WeightedPath;
   using hfst::implementations::FomaTransducer;
+
+
+
+
+
 
 
   /** \brief The type of an HfstTransducer. */
@@ -284,19 +305,84 @@ namespace hfst
     ~HfstTransducer(void);
 
     /** \brief A transducer that recognizes the string pair "symbol:symbol". **/
-    HfstTransducer(const std::string &symbol, ImplementationType type);
+    HfstTransducer(const std::string &symbol, ImplementationType type=UNSPECIFIED_TYPE);
     /** \brief A transducer that recognizes the string pair "isymbol:osymbol". **/
-    HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type);
+    HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type=UNSPECIFIED_TYPE);
 
     /** \brief If two transducers are equivalent, i.e. accept the same input/output string pairs with the same weights. **/
-    static bool test_equivalence(HfstTransducer &one, HfstTransducer &another);
+    static bool test_equivalence(const HfstTransducer &one, const HfstTransducer &another);
 
     /** \brief Write transducer in AT & T format to FILE \a ofile. 
 
-	@see hfst::operator<<(std::ostream &out,HfstTransducer &t) **/
+	If several transducers are written in the same file, they must be separated by a line
+	of two consecutive hyphens "--".
+
+An example:
+\verbatim
+HfstTransducer foobar("foo","bar");
+HfstTransducer epsilon("");
+HfstTransducer empty();
+HfstTransducer a_star("a");
+a_star.repeat_star();
+
+FILE * ofile = fopen("testfile.att", "wb");
+foobar.write_in_att_format(ofile);
+fprintf(ofile, "--\n");
+epsilon.write_in_att_format(ofile);
+fprintf(ofile, "--\n");
+empty.write_in_att_format(ofile);
+fprintf(ofile, "--\n");
+a_star.write_in_att_format(ofile);
+fclose(ofile);
+\endverbatim
+
+This will yield a file "testfile.att" that looks as follows:
+\verbatim
+0    1    foo  bar  0.0
+1    0.0
+--
+0    0.0
+--
+--
+0    0.0
+0    0    a    a    0.0
+\endverbatim
+
+	@see hfst::operator<<(std::ostream &out,HfstTransducer &t) read_in_att_format **/
     void write_in_att_format(FILE * ofile);
-    /** \brief Read a transducer in AT & T format from FILE \a ifile. **/
-    static HfstTransducer &read_in_att_format(FILE * ifile);
+    /** \brief Read a transducer in AT & T format from FILE \a ifile. 
+	
+	Lines are of the form "source_state TAB destination_state TAB input_symbol TAB output_symbol (TAB weight)"
+	or "final_state (TAB weight)". If several transducers are listed in the same file, they are separated
+	by lines of two consecutive hyphens "--".
+
+An example:
+\verbatim
+0    1    foo  bar  0.3
+1    0.5
+--
+0    0.0
+--
+--
+0    0.0
+0    0    a    a    0.2
+\endverbatim
+
+        The example lists four transducers in AT&T format: one transducers accepting the string pair "foo:bar", one
+	epsilon transducer, one empty transducer and one transducer accepting any number of 'a's. The transducers
+	can be read with the following commands from file named "testfile.att":
+\verbatim
+FILE * ifile = fopen("testfile.att", "rb");
+while (not eof(ifile))
+  {
+  HfstTransducer t = HfstTransducer::read_in_att_format(ifile);
+  }
+fclose(ifile);
+\endverbatim
+
+@see write_in_att_format
+**/
+    static HfstTransducer &read_in_att_format(FILE * ifile, ImplementationType type=UNSPECIFIED_TYPE );
 
     /** \brief Write transducer in AT & T format to file named \a filename.
 
@@ -305,7 +391,7 @@ namespace hfst
     /** \brief Read a transducer in AT & T format from file named \a filename. 
 
 	If the file does not exist, an exception is thrown. */
-    static HfstTransducer &read_in_att_format(const char * filename);
+    static HfstTransducer &read_in_att_format(const char * filename, ImplementationType type=UNSPECIFIED_TYPE );
 
     /** \brief An equivalent transducer that has no epsilon:epsilon transitions. */
     HfstTransducer &remove_epsilons(ImplementationType type=UNSPECIFIED_TYPE);
@@ -352,7 +438,7 @@ namespace hfst
 	behave. It might get stuck in an infinite loop or return any number of string pairs. 
 	In the case of a cyclic transducer, use #n_best instead. 
 	@see #n_best */
-    void extract_strings(WeightedPaths<float>::Set &results);
+    void extract_strings(WeightedPaths<float>::Set &results, ImplementationType type=UNSPECIFIED_TYPE);
 
     /** \brief Substitute all symbols \a old_symbol with symbol \a new_symbol. */
     HfstTransducer &substitute(const std::string &old_symbol,
@@ -360,16 +446,19 @@ namespace hfst
 			       ImplementationType type=UNSPECIFIED_TYPE);
     /** \brief Substitute all transitions equal to \a old_symbol_pair with symbol pair \a new_symbol_pair. */
     HfstTransducer &substitute(const StringPair &old_symbol_pair,
-			       const StringPair &new_symbol_pair);
+			       const StringPair &new_symbol_pair,
+			       ImplementationType type=UNSPECIFIED_TYPE);
     /** \brief Substitute all transitions equal to \a symbol_pair with a copy of transducer \a transducer. 
 
 	The copy of the transducer is attached to this->transducer with epsilon transitions on its
 	start state and final states (that become ordinary states after substitution). The weight of
 	the original transition is copied to the epsilon transition leading to the original start state. */
     HfstTransducer &substitute(const StringPair &symbol_pair,
-			       HfstTransducer &transducer);
+			       HfstTransducer &transducer,
+			       ImplementationType type=UNSPECIFIED_TYPE);
     /** \brief Set the weights of all final states to \a weight. */
-    HfstTransducer &set_final_weights(float weight);
+    HfstTransducer &set_final_weights(float weight,
+				      ImplementationType type=UNSPECIFIED_TYPE);
     /** \brief Transform all transition and state weights according to the function pointer \a func. 
 
      An example:
@@ -383,12 +472,14 @@ namespace hfst
       t.transform_weights(&func);
 \endverbatim 
     */
-    HfstTransducer &transform_weights(float (*func)(float));
+    HfstTransducer &transform_weights(float (*func)(float),
+				      ImplementationType=UNSPECIFIED_TYPE);
+
 
     /** \brief Compose this transducer with another. */
     HfstTransducer &compose(HfstTransducer &another,
 			    ImplementationType type=UNSPECIFIED_TYPE);
-    /** \brief Concatenate this transducer with another. */
+    /** \brief Concatenate this transducer and another. */
     HfstTransducer &concatenate(HfstTransducer &another,
 				ImplementationType type=UNSPECIFIED_TYPE);
     /** \brief Disjunct this transducer and another. */
@@ -401,16 +492,41 @@ namespace hfst
     HfstTransducer &subtract(HfstTransducer &another,
 			     ImplementationType type=UNSPECIFIED_TYPE);
 
+
+    /** \brief Compose this transducer with another. */
+    static HfstTransducer &compose(HfstTransducer &t1, HfstTransducer &t2,
+				   ImplementationType type=UNSPECIFIED_TYPE);
+    /** \brief Concatenate this transducer and another. */
+    static HfstTransducer &concatenate(HfstTransducer &t1, HfstTransducer &t2, 
+				       ImplementationType type=UNSPECIFIED_TYPE);
+    /** \brief Disjunct this transducer and another. */
+    static HfstTransducer &disjunct(HfstTransducer &t1, HfstTransducer &t2,
+				    ImplementationType type=UNSPECIFIED_TYPE);
+    /** \brief Intersect this transducer and another. */
+    static HfstTransducer &intersect(HfstTransducer &t1, HfstTransducer &t2,
+				     ImplementationType type=UNSPECIFIED_TYPE);
+    /** \brief Subtract another transducer from this. */
+    static HfstTransducer &subtract(HfstTransducer &t1, HfstTransducer &t2,
+				    ImplementationType type=UNSPECIFIED_TYPE);
+
+
     // test
     void test_minimize(void);
 
     /** \brief The type of the transducer. */
     ImplementationType get_type(void);
+
     /** \brief Convert this transducer into an equivalent transducer in format \a type. 
 
 	If a weighted transducer is converted into an unweighted one, all weights are lost. 
 	In the reverse case, all weights are initialized to zero. */
     HfstTransducer &convert(ImplementationType type);
+
+    /** \brief Create a new transducer equivalent to \a t in format \a type. 
+
+	@see convert(ImplementationType type) */
+    static HfstTransducer &convert(const HfstTransducer &t, ImplementationType type);
+
     friend std::ostream &operator<<(std::ostream &out, HfstTransducer &t);
     friend class HfstInputStream;
     friend class HfstOutputStream;
@@ -467,7 +583,7 @@ void print(HfstMutableTransducer &t)
 
      @see HfstStateIterator HfstTransitionIterator
      */
-  /* This class is basically a wrapper for a TROPICAL_OFST_TYPE HfstTransducer.
+  /*! \internal This class is basically a wrapper for a TROPICAL_OFST_TYPE HfstTransducer.
      Since creating new states and transitions and modifying them is easiest
      in OpenFst, it is chosen as the only implementation type.
      A separate mutable and iterable transducer class is also safer because
