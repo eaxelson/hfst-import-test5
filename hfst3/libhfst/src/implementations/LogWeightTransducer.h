@@ -1,4 +1,3 @@
-//#include "GlobalSymbolTable.h"
 #include "SymbolDefs.h"
 #include "HfstExceptions.h"
 #include "openfst-1.1/src/include/fst/fstlib.h"
@@ -17,7 +16,6 @@ namespace hfst { namespace implementations
   typedef ArcTpl<LogWeight> LogArc;
   typedef VectorFst<LogArc> LogFst;
 
-  using namespace hfst::symbols;
   using std::ostream;
   using std::ostringstream;
 
@@ -168,7 +166,7 @@ namespace hfst { namespace implementations
       static LogFst * define_transducer(const std::string& isymbol, const std::string& osymbol);
       //static LogFst * define_transducer(const pair<unsigned int, unsigned int> &kp);
       //static LogFst * define_transducer(const KeyPairVector &kpv);
-      static LogFst * define_transducer(const StringPairVector &spv);
+      static LogFst * define_transducer(const hfst::StringPairVector &spv);
       static LogFst * copy(LogFst * t);
       static LogFst * determinize(LogFst * t);
       static LogFst * minimize(LogFst * t);
@@ -191,8 +189,8 @@ namespace hfst { namespace implementations
 
       static LogFst * substitute(LogFst * t, String old_symbol, String new_symbol);
       static LogFst * substitute(LogFst * t,
-			      StringPair old_symbol_pair,
-			      StringPair new_symbol_pair);
+				 hfst::StringPair old_symbol_pair,
+				 hfst::StringPair new_symbol_pair);
 
       static LogFst * compose(LogFst * t1,
 				   LogFst * t2);

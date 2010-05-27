@@ -16,7 +16,6 @@
 
 // HFST addition
 #include "../../SymbolDefs.h"
-using namespace hfst::symbols;
 #include "../../ExtractStrings.h"
 
 
@@ -302,7 +301,7 @@ class Transducer {
   bool is_cyclic_node( Node*, NodeHashSet &visited );
   bool is_automaton_node( Node* );
   bool generate1( Node*, Node2Int&, char*, int, char*, int, FILE* );
-  bool generate_hfst1( Node*, Node2Int&, char*, int, char*, int, hfst::implementations::WeightedPaths<float>::Set &results); // HFST ADDITION
+  bool generate_hfst1( Node*, Node2Int&, char*, int, char*, int, hfst::WeightedPaths<float>::Set &results); // HFST ADDITION
   void store_symbols( Node*, SymbolMap&, LabelSet& );
 
   void splice_nodes(Node*, Node*, Label sl, Transducer*, Transducer*);
@@ -329,9 +328,9 @@ class Transducer {
   Transducer( std::vector<Label>& );
 
   // HFST additions...
-  Transducer &expand( StringSet &s );
-  Node *expand_nodes( Node *node, Transducer *a, StringSet &s );
-  void expand_node( Node *origin, Label &l, Node *target, Transducer *a, StringSet &s );
+  Transducer &expand( hfst::StringSet &s );
+  Node *expand_nodes( Node *node, Transducer *a, hfst::StringSet &s );
+  void expand_node( Node *origin, Label &l, Node *target, Transducer *a, hfst::StringSet &s );
   void copy_nodes( Node *search_node, Transducer *copy_tr,
 		   Node *start_node,
 		   NodeNumbering &nn, map<int, Node*> &mapper );
@@ -352,7 +351,7 @@ class Transducer {
   bool analyze_string( char *s, FILE *file, bool with_brackets=true );
   bool generate_string( char *s, FILE *file, bool with_brackets=true );
   bool generate( FILE *file, bool separate=false );
-  bool generate_hfst( hfst::implementations::WeightedPaths<float>::Set &results, bool separate=false); // HFST ADDITION
+  bool generate_hfst( hfst::WeightedPaths<float>::Set &results, bool separate=false); // HFST ADDITION
 
   void clear( void );      // clears the transducer. The resulting transducer
                            // is like one created with Transducer()

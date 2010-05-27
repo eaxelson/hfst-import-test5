@@ -555,8 +555,8 @@ namespace hfst { namespace implementations
     StringSet unknown_t2;    // and vice versa
     StringSet t1_symbols = get_string_set(t1);
     StringSet t2_symbols = get_string_set(t2);
-    hfst::symbols::collect_unknown_sets(t1_symbols, unknown_t1,
-					t2_symbols, unknown_t2);
+    collect_unknown_sets(t1_symbols, unknown_t1,
+			 t2_symbols, unknown_t2);
 
     // 2. Add new symbols from transducer t1 to the symbol table of transducer t2...
 
@@ -1329,7 +1329,7 @@ namespace hfst { namespace implementations
   TropicalWeightTransducer::n_best(StdVectorFst * t,int n)
   { 
     if (n < 0)
-      { throw ImpossibleTransducerPowerExcpetion(); }
+      { throw ImpossibleTransducerPowerException(); }
     StdVectorFst * n_best_fst = new StdVectorFst(); 
     fst::ShortestPath(*t,n_best_fst,(size_t)n);
     return n_best_fst;

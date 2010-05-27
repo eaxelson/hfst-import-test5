@@ -226,9 +226,7 @@ namespace hfst
    HfstTransducer &another,
    ImplementationType type)
   {
-    //fprintf(stderr, "apply(1): this type is %i\n", this->type);
-    //fprintf(stderr, "apply(1): another type is %i\n", another.type);
-
+    // type conversion to 'type' or type of another
     if (type != UNSPECIFIED_TYPE)
       {
 	convert(type);
@@ -238,16 +236,9 @@ namespace hfst
     else if (this->type != another.type)
       { convert(another.type); }
 
-    //fprintf(stderr, "apply(2): this type is %i\n", this->type);
-    //fprintf(stderr, "apply(2): another type is %i\n", another.type);
-
-    // added
+    // harmonize this according to symbol coding of another
+    // and expand unknowns and identities of both transducers
     this->harmonize(another);
-
-    //fprintf(stderr, "apply(3): this type is %i\n", this->type);
-    //fprintf(stderr, "apply(3): another type is %i\n", another.type);
-
-    HfstTransducer *result = new HfstTransducer(this->type);
 
     switch (this->type)
       {
@@ -255,10 +246,8 @@ namespace hfst
 	{
 	  SFST::Transducer * sfst_temp = 
 	    sfst_funct(implementation.sfst,another.implementation.sfst);
-	  //delete implementation.sfst;
-	  //implementation.sfst = sfst_temp;
-	  delete result->implementation.sfst;
-	  result->implementation.sfst = sfst_temp;
+	  delete implementation.sfst;
+	  implementation.sfst = sfst_temp;
 	  break;
 	}
       case TROPICAL_OFST_TYPE:
@@ -266,10 +255,8 @@ namespace hfst
 	  fst::StdVectorFst * tropical_ofst_temp =
 	    tropical_ofst_funct(this->implementation.tropical_ofst,
 				another.implementation.tropical_ofst);
-	  //delete implementation.tropical_ofst;
-	  //implementation.tropical_ofst = tropical_ofst_temp;
-	  delete result->implementation.tropical_ofst;
-	  result->implementation.tropical_ofst = tropical_ofst_temp;
+	  delete implementation.tropical_ofst;
+	  implementation.tropical_ofst = tropical_ofst_temp;
 	  break;
 	}
       case LOG_OFST_TYPE:
@@ -277,30 +264,24 @@ namespace hfst
 	  hfst::implementations::LogFst * log_ofst_temp =
             log_ofst_funct(implementation.log_ofst,
 			   another.implementation.log_ofst);
-          //delete implementation.log_ofst;
-          //implementation.log_ofst = log_ofst_temp;
-	  delete result->implementation.log_ofst;
-	  result->implementation.log_ofst = log_ofst_temp;
+          delete implementation.log_ofst;
+          implementation.log_ofst = log_ofst_temp;
           break;
         }
       case FOMA_TYPE:
 	{
 	  fsm * foma_temp = 
 	    foma_funct(implementation.foma,another.implementation.foma);
-	  //delete implementation.foma;
-	  //implementation.foma = foma_temp;
-	  this->foma_interface.delete_foma(result->implementation.foma);
-	  result->implementation.foma = foma_temp;
+	  delete implementation.foma;
+	  implementation.foma = foma_temp;
 	  break;
 	}
 	case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
-	  fprintf(stderr, "BABAAR\n");
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
       }
 
-    //return *this;
-    return *result;
+    return *this;
   }
 }

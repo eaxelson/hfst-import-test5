@@ -14,14 +14,14 @@ namespace SFST
 {
 
   /* Expand a transition according to the previously unknown symbols in s. */
-void Transducer::expand_node( Node *origin, Label &l, Node *target, Transducer *a, StringSet &s )
+  void Transducer::expand_node( Node *origin, Label &l, Node *target, Transducer *a, hfst::StringSet &s )
 {
   if ( l.lower_char() == 1 && l.upper_char() == 1 )     // cross product "?:?"
     {
-      for (StringSet::iterator it1 = s.begin(); it1 != s.end(); it1++) 
+      for (hfst::StringSet::iterator it1 = s.begin(); it1 != s.end(); it1++) 
 	{
 	  int inumber = alphabet.symbol2code(it1->c_str());
-	  for (StringSet::iterator it2 = s.begin(); it2 != s.end(); it2++) 
+	  for (hfst::StringSet::iterator it2 = s.begin(); it2 != s.end(); it2++) 
 	    {
 	      int onumber = alphabet.symbol2code(it2->c_str());
 	      if (inumber != onumber) {  
@@ -36,7 +36,7 @@ void Transducer::expand_node( Node *origin, Label &l, Node *target, Transducer *
     }
   else if (l.lower_char() == 2 && l.upper_char() == 2 )  // identity "?:?"	     
     {
-      for (StringSet::iterator it = s.begin(); it != s.end(); it++) 
+      for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
 	{
 	  int number = alphabet.symbol2code(it->c_str());
 	  // add transitions of type x:x
@@ -45,7 +45,7 @@ void Transducer::expand_node( Node *origin, Label &l, Node *target, Transducer *
     }
   else if (l.lower_char() == 1)  // "?:x"
     {
-      for (StringSet::iterator it = s.begin(); it != s.end(); it++) 
+      for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
 	{
 	  int number = alphabet.symbol2code(it->c_str());
 	  origin->add_arc( Label(number, l.upper_char()), target, a );
@@ -53,7 +53,7 @@ void Transducer::expand_node( Node *origin, Label &l, Node *target, Transducer *
     }
   else if (l.upper_char() == 1)  // "x:?"
     {
-      for (StringSet::iterator it = s.begin(); it != s.end(); it++) 
+      for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
 	{
 	  int number = alphabet.symbol2code(it->c_str());
 	  origin->add_arc( Label(l.lower_char(), number), target, a );
@@ -73,7 +73,7 @@ void Transducer::expand_node( Node *origin, Label &l, Node *target, Transducer *
 /*                                                                 */
 /*******************************************************************/
 
-Node *Transducer::expand_nodes( Node *node, Transducer *a, StringSet &s )
+  Node *Transducer::expand_nodes( Node *node, Transducer *a, hfst::StringSet &s )
 {
   if (!node->was_visited(vmark)) {
     
@@ -107,7 +107,7 @@ Node *Transducer::expand_nodes( Node *node, Transducer *a, StringSet &s )
 
   /* Make a copy of this transducer where all transitions are expanded
      according to the previously unknown symbols listed in s. */
-Transducer &Transducer::expand(StringSet &s)
+  Transducer &Transducer::expand(hfst::StringSet &s)
 
 {
   Transducer *na = new Transducer();

@@ -7,11 +7,10 @@
 #include <string>
 namespace hfst
 {
-  using hfst::symbols::String;
-  using hfst::symbols::StringSet;
-  using hfst::symbols::StringPair;
-  using hfst::symbols::StringPairVector;
-  //using hfst::symbols::KeyTable;
+  using hfst::String;
+  using hfst::StringSet;
+  using hfst::StringPair;
+  using hfst::StringPairVector;
 
   class MultiCharSymbolTrie;
   typedef std::vector<MultiCharSymbolTrie*> MultiCharSymbolTrieVector;
@@ -43,9 +42,9 @@ namespace hfst
   {  
   private:
     MultiCharSymbolTrie multi_char_symbols;
-    hfst::symbols::StringSet skip_symbol_set;
+    StringSet skip_symbol_set;
     int get_next_symbol_size(const char * symbol) const;
-    bool is_skip_symbol(hfst::symbols::String &s) const;
+    bool is_skip_symbol(String &s) const;
 
   public:
     /** \brief Add a symbol to be skipped to this tokenizer. */

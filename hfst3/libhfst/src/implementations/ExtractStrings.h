@@ -5,7 +5,7 @@
 #include <iostream>
 #include <sstream>
 #include <set>
-namespace hfst { namespace implementations {
+namespace hfst {
   using std::stringstream;
   using std::ios;
 
@@ -108,5 +108,5 @@ namespace hfst { namespace implementations {
 	  { it->reverse(); }
       }
     };
-  } }  
+  }  
 #endif

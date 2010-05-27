@@ -3,8 +3,8 @@ AUTOMAKE_OPTIONS=subdir-objects
 noinst_LTLIBRARIES=libhfstimplementations.la
 AM_CPPFLAGS=-Iopenfst-1.1/src/include/
 # HFST bridge specific stuff
-IMPLEMENTATION_SRCS=SymbolDefs.cc \
-	HfstTokenizer.cc ConvertTransducerFormat.cc # GlobalSymbolTable.cc
+IMPLEMENTATION_SRCS= \
+	HfstTokenizer.cc ConvertTransducerFormat.cc # GlobalSymbolTable.cc SymbolDefs.cc
 
 # the bridges
 BRIDGE_SRCS=SfstTransducer.cc \
@@ -55,7 +55,7 @@ implinclude_HEADERS = \
 		ConvertTransducerFormat.h \
 		ExtractStrings.h FomaTransducer.h HfstExceptions.h \
 		HfstTokenizer.h LogFstTrieFunctions.h LogWeightTransducer.h \
-		SfstTransducer.h SymbolDefs.h TropicalWeightTransducer.h # GlobalSymbolTable.h
+		SfstTransducer.h TropicalWeightTransducer.h # GlobalSymbolTable.h SymbolDefs.h
 
 # headers of backends to reveal to public...
 # TODO: in ideal case you'd delete these and link to public libs of backends

@@ -8,6 +8,7 @@
 #include <fstream>
 
 using namespace hfst;
+using namespace hfst::exceptions;
 
 void print(HfstMutableTransducer &t)
 {
@@ -296,10 +297,21 @@ int main(int argc, char **argv) {
       {
 	const int MAX_REPEAT_N = 1; 
 	for (int n=0; n <= MAX_REPEAT_N; n++) {
-	  HfstTransducer test0_n = HfstTransducer(test0).repeat_n_plus(n); 
-	  HfstTransducer test1_n = HfstTransducer(test1).repeat_n_plus(n);
-	  HfstTransducer test2_n = HfstTransducer(test2).repeat_n_plus(n);
-	  HfstTransducer test3_n = HfstTransducer(test3).repeat_n_plus(n);
+	  HfstTransducer test0_n(test0);
+	  test0_n.repeat_n_plus(n);
+
+	  HfstTransducer test1_n(test1);
+	  test1_n.repeat_n_plus(n);
+
+	  HfstTransducer test2_n(test2);
+	  test2_n.repeat_n_plus(n);
+
+	  HfstTransducer test3_n(test3);
+	  test3_n.repeat_n_plus(n);
+	  //HfstTransducer test0_n = HfstTransducer(test0).repeat_n_plus(n); 
+	  //HfstTransducer test1_n = HfstTransducer(test1).repeat_n_plus(n);
+	  //HfstTransducer test2_n = HfstTransducer(test2).repeat_n_plus(n);
+	  //HfstTransducer test3_n = HfstTransducer(test3).repeat_n_plus(n);
 	
 	  assert ( test0_n.get_type() !=
 		   test1_n.get_type() !=
@@ -320,10 +332,20 @@ int main(int argc, char **argv) {
 	const int REPEAT_K_MAX = 3;
 	for (int n=0; n <= REPEAT_N_MAX; n++) {
 	  for (int k=n; k <= REPEAT_K_MAX; k++) {
-	    HfstTransducer test0_n = HfstTransducer(test0).repeat_n_to_k(n,k); 
-	    HfstTransducer test1_n = HfstTransducer(test1).repeat_n_to_k(n,k);
-	    HfstTransducer test2_n = HfstTransducer(test2).repeat_n_to_k(n,k);
-	    HfstTransducer test3_n = HfstTransducer(test3).repeat_n_to_k(n,k);
+
+	    HfstTransducer test0_n(test0);
+	    test0_n.repeat_n_to_k(n,k); 
+	    HfstTransducer test1_n(test1);
+	    test1_n.repeat_n_to_k(n,k); 
+	    HfstTransducer test2_n(test2);
+	    test2_n.repeat_n_to_k(n,k); 
+	    HfstTransducer test3_n(test3);
+	    test3_n.repeat_n_to_k(n,k); 
+
+	    //HfstTransducer test0_n = HfstTransducer(test0).repeat_n_to_k(n,k); 
+	    //HfstTransducer test1_n = HfstTransducer(test1).repeat_n_to_k(n,k);
+	    //HfstTransducer test2_n = HfstTransducer(test2).repeat_n_to_k(n,k);
+	    //HfstTransducer test3_n = HfstTransducer(test3).repeat_n_to_k(n,k);
 	    
 	    assert ( test0_n.get_type() !=
 		     test1_n.get_type() !=
