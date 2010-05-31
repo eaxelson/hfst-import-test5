@@ -76,6 +76,8 @@ namespace hfst {
 
   /** \brief A class for storing weighted string pairs that represent paths in a transducer. 
 
+      For an example, see HfstTransducer::extract_strings.
+
       @see HfstTransducer::extract_strings */
   template<class W> class WeightedPaths
     { public:

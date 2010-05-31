@@ -120,11 +120,13 @@ bool Transducer::generate_hfst1( Node *node, Node2Int &visitations, char *buffer
   if (pos > BUFFER_SIZE - 100 || pos2 > BUFFER_SIZE - 100)
     return result;
   if (node->is_final()) {
-    buffer[pos] = '\n';
-    buffer[pos+1] = 0;
+    //buffer[pos] = '\n';
+    //buffer[pos+1] = 0;
+    buffer[pos] = 0;
     if (buffer2) {
-      buffer2[pos2] = '\t';
-      buffer2[pos2+1] = 0;
+      //buffer2[pos2] = '\t';
+      //buffer2[pos2+1] = 0;
+      buffer[pos2] = 0;
       results.insert( 
 	  hfst::WeightedPath<float>(
 	  buffer2,

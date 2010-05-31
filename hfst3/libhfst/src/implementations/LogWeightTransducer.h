@@ -204,7 +204,8 @@ namespace hfst { namespace implementations
 			     LogFst * t2);
       static LogFst * subtract(LogFst * t1,
 			    LogFst * t2);
-      static LogFst * set_weight(LogFst * t,float f);
+      //static LogFst * set_weight(LogFst * t,float f);
+      static LogFst * set_final_weights(LogFst * t, float weight);
       static LogFst * transform_weights(LogFst * t,float(*func)(float));
       //typedef LogWeightStateIterator const_iterator;
       //static const_iterator begin(LogFst * t);

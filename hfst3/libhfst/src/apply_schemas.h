@@ -1,3 +1,5 @@
+bool is_safe_conversion(ImplementationType original, ImplementationType conversion);
+
 HfstTransducer &apply
 (SFST::Transducer * (*sfst_funct)(SFST::Transducer *),
  fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *),

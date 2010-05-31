@@ -17,9 +17,7 @@ void print(HfstMutableTransducer &t)
     HfstState s = it.value();
     HfstTransitionIterator IT(t,s);
     while (not IT.done()) {
-      //fprintf(stderr, "loop starts\n");
       HfstTransition tr = IT.value();
-      //fprintf(stderr, "transition\n");
       cout << s << "\t" << tr.get_target_state() << "\t"
 	   << tr.get_input_symbol() << "\t" << tr.get_output_symbol()
 	   << "\t" << tr.get_weight();
@@ -48,14 +46,14 @@ void test_function( HfstTransducer& (HfstTransducer::*pt_function) (Implementati
   HfstTransducer test2 = (HfstTransducer(tr2).*pt_function)(tr2.get_type());
   HfstTransducer test3 = (HfstTransducer(tr3).*pt_function)(tr3.get_type());
   
-  assert ( test0.get_type() !=
+  /*assert ( test0.get_type() !=
 	   test1.get_type() !=
 	   test2.get_type() !=
-	   test3.get_type() );
+	   test3.get_type() );*/
 
-  assert (HfstTransducer::test_equivalence( test0, test1 ) );
-  assert (HfstTransducer::test_equivalence( test0, test2 ) );
-  assert (HfstTransducer::test_equivalence( test0, test3 ) );
+  assert (HfstTransducer::are_equivalent( test0, test1 ) );
+  assert (HfstTransducer::are_equivalent( test0, test2 ) );
+  assert (HfstTransducer::are_equivalent( test0, test3 ) );
 }
 
 void test_function( HfstTransducer& (HfstTransducer::*pt_function) (HfstTransducer&, ImplementationType), 
@@ -75,14 +73,14 @@ void test_function( HfstTransducer& (HfstTransducer::*pt_function) (HfstTransduc
   HfstTransducer test2 = (HfstTransducer(tr2).*pt_function)(test2s, tr2.get_type());
   HfstTransducer test3 = (HfstTransducer(tr3).*pt_function)(test3s, tr3.get_type());
 
-  assert ( test0.get_type() !=
+  /*assert ( test0.get_type() !=
 	   test1.get_type() !=
 	   test2.get_type() !=
-	   test3.get_type() );
+	   test3.get_type() );*/
  
-  assert (HfstTransducer::test_equivalence( test0, test1 ) );
-  assert (HfstTransducer::test_equivalence( test0, test2 ) );
-  assert (HfstTransducer::test_equivalence( test0, test3 ) );
+  assert (HfstTransducer::are_equivalent( test0, test1 ) );
+  assert (HfstTransducer::are_equivalent( test0, test2 ) );
+  assert (HfstTransducer::are_equivalent( test0, test3 ) );
 }
 
 void test_extract_strings( HfstTransducer &t )
@@ -100,11 +98,22 @@ void test_extract_strings( HfstTransducer &t )
   HfstTransducer disj = tr1.disjunct(tr2);
   disj = disj.disjunct(tr3);
   disj = disj.minimize();
-  
+
   try {
     WeightedPaths<float>::Set results;
     disj.extract_strings(results);
     assert(3 == (int)results.size());
+    HfstTransducer all_paths(t.get_type());
+    for (WeightedPaths<float>::Set::iterator it = results.begin();
+	 it != results.end(); it++)
+      {
+	WeightedPath<float> wp = *it;
+	HfstTransducer one_path(wp.istring, wp.ostring, tok, t.get_type());
+	one_path.set_final_weights(wp.weight);
+	all_paths.disjunct(one_path);
+      }
+
+    assert( HfstTransducer::are_equivalent(all_paths, disj) );
   }
   catch (HfstInterfaceException e) { 
     assert(false); }
@@ -126,13 +135,13 @@ int main(int argc, char **argv) {
 	// Test the conversions.
 	HfstTransducer trconv = tr.convert(types[j]);
 	assert (tr.get_type() == types[j]);
-	assert (HfstTransducer::test_equivalence(tr, trconv));
+	assert (HfstTransducer::are_equivalent(tr, trconv));
 	HfstTransducer tranother(types[j]);
-	assert (HfstTransducer::test_equivalence(tr, tranother));
+	assert (HfstTransducer::are_equivalent(tr, tranother));
       }
       HfstMutableTransducer mut(tr);
       HfstTransducer foo(mut);
-      assert (HfstTransducer::test_equivalence(tr, foo));
+      assert (HfstTransducer::are_equivalent(tr, foo));
     }
     //printf("Empty constructors tested on transducers of type %i.\n", types[i]);
     {
@@ -143,13 +152,13 @@ int main(int argc, char **argv) {
 	// Test the conversions.
 	HfstTransducer trconv = tr.convert(types[j]);
 	assert (tr.get_type() == types[j]);
-	assert (HfstTransducer::test_equivalence(tr, trconv));
+	assert (HfstTransducer::are_equivalent(tr, trconv));
 	HfstTransducer tranother("foo", types[j]);
-	assert (HfstTransducer::test_equivalence(tr, tranother));
+	assert (HfstTransducer::are_equivalent(tr, tranother));
       }
       HfstMutableTransducer mut(tr);
       HfstTransducer foo(mut);
-      assert (HfstTransducer::test_equivalence(tr, foo));
+      assert (HfstTransducer::are_equivalent(tr, foo));
     }
     //printf("One-transition constructors tested on transducers of type %i.\n", types[i]);
     {
@@ -160,17 +169,17 @@ int main(int argc, char **argv) {
 	// Test the conversions.
 	HfstTransducer trconv = tr.convert(types[j]);
 	assert (tr.get_type() == types[j]);
-	assert (HfstTransducer::test_equivalence(tr, trconv));
+	assert (HfstTransducer::are_equivalent(tr, trconv));
 	HfstTransducer tranother("foo", "bar", types[j]);
-	assert (HfstTransducer::test_equivalence(tr, tranother));
+	assert (HfstTransducer::are_equivalent(tr, tranother));
 	// test the att format
 	tr.write_in_att_format("testfile");
-	HfstTransducer foo = HfstTransducer::read_in_att_format("testfile");
-	assert (HfstTransducer::test_equivalence(tr, foo));
+	HfstTransducer foo = HfstTransducer::read_in_att_format("testfile");  // WrongTypeException
+	assert (HfstTransducer::are_equivalent(tr, foo));
       }
       HfstMutableTransducer mut(tr);
       HfstTransducer foo(mut);
-      assert (HfstTransducer::test_equivalence(tr, foo));
+      assert (HfstTransducer::are_equivalent(tr, foo));
     }
     //printf("Two-transition constructors tested on transducers of type %i.\n", types[i]);
     {
@@ -178,19 +187,22 @@ int main(int argc, char **argv) {
       HfstTokenizer tok;
       tok.add_multichar_symbol("foo");
       tok.add_multichar_symbol("bar");
-      HfstTransducer tr("foobar", tok, types[i]);
+      tok.add_skip_symbol("fo");
+      tok.add_skip_symbol("a");
+      HfstTransducer tr("foobara", tok, types[i]);
+      //std::cerr << "tokenized:\n" << tr << "\n\n";
       assert (tr.get_type() == types[i]);
       for (int j=0; j<4; j++) {
 	// Test the conversions.
 	HfstTransducer trconv = tr.convert(types[j]);
 	assert (tr.get_type() == types[j]);
-	assert (HfstTransducer::test_equivalence(tr, trconv));
+	assert (HfstTransducer::are_equivalent(tr, trconv));
 	HfstTransducer tranother("foobar", tok, types[j]);
-	assert (HfstTransducer::test_equivalence(tr, tranother));
+	assert (HfstTransducer::are_equivalent(tr, tranother));
       }
       HfstMutableTransducer mut(tr);
       HfstTransducer foo(mut);
-      assert (HfstTransducer::test_equivalence(tr, foo));
+      assert (HfstTransducer::are_equivalent(tr, foo));
     }
     //printf("One-string constructors tested on transducers of type %i.\n", types[i]);
     {
@@ -204,13 +216,13 @@ int main(int argc, char **argv) {
 	// Test the conversions.
 	HfstTransducer trconv = tr.convert(types[j]);
 	assert (tr.get_type() == types[j]);
-	assert (HfstTransducer::test_equivalence(tr, trconv));
+	assert (HfstTransducer::are_equivalent(tr, trconv));
 	HfstTransducer tranother("fofoo", "barbarba", tok, types[j]);
-	assert (HfstTransducer::test_equivalence(tr, tranother));
+	assert (HfstTransducer::are_equivalent(tr, tranother));
       }
       HfstMutableTransducer mut(tr);
       HfstTransducer foo(mut);
-      assert (HfstTransducer::test_equivalence(tr, foo));
+      assert (HfstTransducer::are_equivalent(tr, foo));
     }
     //printf("Two-string constructors tested on transducers of type %i.\n", types[i]);
     {
@@ -263,9 +275,9 @@ int main(int argc, char **argv) {
 		 test3_n.get_type() );
 
 	//	std::cerr << test0_n << "--\n" << test3_n << "\n";
-	  assert (HfstTransducer::test_equivalence( test0_n, test1_n ) );
-	  assert (HfstTransducer::test_equivalence( test0_n, test2_n ) );
-	  assert (HfstTransducer::test_equivalence( test0_n, test3_n ) );
+	  assert (HfstTransducer::are_equivalent( test0_n, test1_n ) );
+	  assert (HfstTransducer::are_equivalent( test0_n, test2_n ) );
+	  assert (HfstTransducer::are_equivalent( test0_n, test3_n ) );
 	}
       }
       printf("repeat_n tested\n");
@@ -285,9 +297,9 @@ int main(int argc, char **argv) {
 		   test2_n.get_type() !=
 		   test3_n.get_type() );
 
-	  assert (HfstTransducer::test_equivalence( test0_n, test1_n ) );
-	  assert (HfstTransducer::test_equivalence( test0_n, test2_n ) );
-	  assert (HfstTransducer::test_equivalence( test0_n, test3_n ) );
+	  assert (HfstTransducer::are_equivalent( test0_n, test1_n ) );
+	  assert (HfstTransducer::are_equivalent( test0_n, test2_n ) );
+	  assert (HfstTransducer::are_equivalent( test0_n, test3_n ) );
 	}
       }
       printf("repeat_n_minus tested\n");
@@ -318,9 +330,9 @@ int main(int argc, char **argv) {
 		   test2_n.get_type() !=
 		   test3_n.get_type() );
 
-	  assert (HfstTransducer::test_equivalence( test0_n, test1_n ) );
-	  assert (HfstTransducer::test_equivalence( test0_n, test2_n ) );
-	  assert (HfstTransducer::test_equivalence( test0_n, test3_n ) );	  
+	  assert (HfstTransducer::are_equivalent( test0_n, test1_n ) );
+	  assert (HfstTransducer::are_equivalent( test0_n, test2_n ) );
+	  assert (HfstTransducer::are_equivalent( test0_n, test3_n ) );	  
 	}
       }
       printf("repeat_n_plus tested\n");
@@ -352,9 +364,9 @@ int main(int argc, char **argv) {
 		     test2_n.get_type() !=
 		     test3_n.get_type() );
 
-	    assert (HfstTransducer::test_equivalence( test0_n, test1_n ) );
-	    assert (HfstTransducer::test_equivalence( test0_n, test2_n ) );
-	    assert (HfstTransducer::test_equivalence( test0_n, test3_n ) );
+	    assert (HfstTransducer::are_equivalent( test0_n, test1_n ) );
+	    assert (HfstTransducer::are_equivalent( test0_n, test2_n ) );
+	    assert (HfstTransducer::are_equivalent( test0_n, test3_n ) );
 	  }
 	}
       }
@@ -387,9 +399,9 @@ int main(int argc, char **argv) {
 	HfstTransducer test2s = HfstTransducer(test2).substitute("a", "e", test2.get_type());
 	HfstTransducer test3s = HfstTransducer(test3).substitute("a", "e", test3.get_type());
 	
-	assert (HfstTransducer::test_equivalence( test0s, test1s ) );
-	assert (HfstTransducer::test_equivalence( test0s, test2s ) );
-	assert (HfstTransducer::test_equivalence( test0s, test3s ) );
+	assert (HfstTransducer::are_equivalent( test0s, test1s ) );
+	assert (HfstTransducer::are_equivalent( test0s, test2s ) );
+	assert (HfstTransducer::are_equivalent( test0s, test3s ) );
       }
       printf("substitute(string) tested\n");
 
@@ -400,9 +412,9 @@ int main(int argc, char **argv) {
 	HfstTransducer test2s = HfstTransducer(test2).substitute(StringPair("a", "b"), StringPair("e", "f"));
 	HfstTransducer test3s = HfstTransducer(test3).substitute(StringPair("a", "b"), StringPair("e", "f"));
 	
-	assert (HfstTransducer::test_equivalence( test0s, test1s ) );
-	assert (HfstTransducer::test_equivalence( test0s, test2s ) );
-	assert (HfstTransducer::test_equivalence( test0s, test3s ) );
+	assert (HfstTransducer::are_equivalent( test0s, test1s ) );
+	assert (HfstTransducer::are_equivalent( test0s, test2s ) );
+	assert (HfstTransducer::are_equivalent( test0s, test3s ) );
       }
       printf("substitute(StringPair) tested\n");
 
@@ -418,9 +430,9 @@ int main(int argc, char **argv) {
 	HfstTransducer test2s = HfstTransducer(test2).substitute(ssp, r1);
 	HfstTransducer test3s = HfstTransducer(test3).substitute(ssp, r0);
 	
-	assert (HfstTransducer::test_equivalence( test0s, test1s ) );
-	assert (HfstTransducer::test_equivalence( test0s, test2s ) );
-	assert (HfstTransducer::test_equivalence( test0s, test3s ) );
+	assert (HfstTransducer::are_equivalent( test0s, test1s ) );
+	assert (HfstTransducer::are_equivalent( test0s, test2s ) );
+	assert (HfstTransducer::are_equivalent( test0s, test3s ) );
       }
       printf("substitute(StringPair, HfstTransducer) tested\n");
 
@@ -433,9 +445,8 @@ int main(int argc, char **argv) {
 	HfstTransducer test2s = HfstTransducer(test2).set_final_weights(weight);
 	HfstTransducer test3s = HfstTransducer(test3).set_final_weights(weight);
 
-	assert (HfstTransducer::test_equivalence( test0s, test1s ) );
-	assert (HfstTransducer::test_equivalence( test0s, test2s ) );
-	assert (HfstTransducer::test_equivalence( test0s, test3s ) );
+	assert (HfstTransducer::are_equivalent( test0s, test3s ) );
+	assert (HfstTransducer::are_equivalent( test1s, test2s ) );
       }
       printf("set_final_weights tested\n");
 
@@ -446,9 +457,8 @@ int main(int argc, char **argv) {
 	HfstTransducer test2s = HfstTransducer(test2).transform_weights(&func);
 	HfstTransducer test3s = HfstTransducer(test3).transform_weights(&func);
 
-	assert (HfstTransducer::test_equivalence( test0s, test1s ) );
-	assert (HfstTransducer::test_equivalence( test0s, test2s ) );
-	assert (HfstTransducer::test_equivalence( test0s, test3s ) );
+	assert (HfstTransducer::are_equivalent( test0s, test3s ) );
+	assert (HfstTransducer::are_equivalent( test1s, test2s ) );
       }
       printf("transform_weights tested\n");
 
@@ -457,6 +467,7 @@ int main(int argc, char **argv) {
 	test_extract_strings(test0);
 	test_extract_strings(test1);
 	test_extract_strings(test2);
+	test_extract_strings(test3);
       }
       printf("extract_strings tested\n");
 
@@ -523,10 +534,10 @@ int main(int argc, char **argv) {
 	  n++;
 	}
 	assert( n == 4 );
-	assert ( HfstTransducer::test_equivalence( read_transducers[0], test0 ) );
-	assert ( HfstTransducer::test_equivalence( read_transducers[1], test1 ) );
-	assert ( HfstTransducer::test_equivalence( read_transducers[2], test2 ) );
-	assert ( HfstTransducer::test_equivalence( read_transducers[3], test3 ) );
+	assert ( HfstTransducer::are_equivalent( read_transducers[0], test0 ) );
+	assert ( HfstTransducer::are_equivalent( read_transducers[1], test1 ) );
+	assert ( HfstTransducer::are_equivalent( read_transducers[2], test2 ) );
+	assert ( HfstTransducer::are_equivalent( read_transducers[3], test3 ) );
       }
       printf("write_in_att_format and read_in_att_format tested\n");
 
