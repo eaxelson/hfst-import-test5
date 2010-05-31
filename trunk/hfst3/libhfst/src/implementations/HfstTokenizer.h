@@ -35,9 +35,22 @@ namespace hfst
     const char * find(const char * p) const;  
   };
   
-  /** \brief A tokenizer for creating transducers from strings.
+  /** \brief A tokenizer for creating transducers from UTF-8 strings.
 
-      At the moment, the tokenizer only tokenizes utf-8 strings. */
+      An example:
+\verbatim
+      HfstTokenizer TOK;
+      TOK.add_multichar_symbol("foo");
+      TOK.add_multichar_symbol("bar");
+      TOK.add_skip_symbol("fo");
+      TOK.add_skip_symbol("ba");
+      StringPairVector spv = tokenize("fofooo");
+      // spv contains string pairs "foo:foo" and "o:o"
+      HfstTransducer tr("fofooo", "babarr", TOK);
+      // tr now contains the path [foo o]:[bar r]
+\endverbatim
+
+      @note The tokenizer only tokenizes utf-8 strings. */
   class HfstTokenizer
   {  
   private:

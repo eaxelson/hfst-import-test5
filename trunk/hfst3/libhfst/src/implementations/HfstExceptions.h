@@ -3,7 +3,7 @@
 namespace hfst
 { 
 
-  /** \brief Namespase for exceptions. */
+  /** \brief Namespace for HFST exceptions. */
 namespace exceptions
 {
 class HfstSymbolsException {};
@@ -48,6 +48,14 @@ public HfstInterfaceException {};
 class NotTransducerStreamException :
 public HfstInterfaceException {};
 
+/** \brief The stream is not in valid AT&T format. */
+class NotValidAttFormat :
+public HfstInterfaceException {};
+
+/** \brief The implementation type requested does not support weights. */
+class WeightsNotSupportedException :
+public HfstInterfaceException {};
+
 class StateTransitionIteratorOutOfRangeExeption : 
 public HfstInterfaceException 
 {};
@@ -56,25 +64,50 @@ public HfstInterfaceException
 class FunctionNotImplementedException :
 public HfstInterfaceException {};
 
-/** \brief ... */
+/** \brief Information might get lost in the conversion requested.
+
+    This exception is thrown if the type conversion of the calling transducer
+    could result in lost information. This situation occurs if the ImplementationType parameter
+    of a function requires that a weighted transducer (TROPICAL_OFST_TYPE or LOG_OFST_TYPE)
+    is converted into an unweighted one (SFST_TYPE or FOMA_TYPE) or that a TROPICAL_OFST_TYPE
+    transducer is converted into a LOG_OFST_TYPE transducer or vice versa.
+
+    Use function \ref HfstTransducer::convert, if this is the conversion that is really intended.
+
+\verbatim
+    // this causes an error
+    tropical_transducer.repeat_star(FOMA_TYPE);
+    
+    // this is ok
+    tropical_transducer.convert(FOMA_TYPE);
+    tropical_transducer.repeat_star(FOMA_TYPE);
+    tropical_transducer.convert(TROPICAL_OFST_TYPE);
+\endverbatim 
+*/
+class UnsafeConversionException :
+public HfstInterfaceException {};
+
+/* ... */
 class ImpossibleTransducerPowerException :
 public HfstInterfaceException {};
 
-/** \brief ... */
+/* ... */
 class TransitionIteratorOutOfRangeException :
 public HfstInterfaceException {};
 
-/** \brief ... */
+/* ... */
 class StateBelongsToAnotherTransducerException :
 public HfstInterfaceException {};
 
-/** \brief ... */
+/** \brief The StateId argument is not valid.
+
+This exception suggests that the StateId argument is not from HfstStateIterator. */
 class StateIndexOutOfBoundsException :
 public HfstInterfaceException {};
 
 /** \brief Transducer has no start state.
 
-This exceptions suggests that there is something wrong in the HFST code. */
+This exception suggests that there is something wrong in the HFST code. */
 class TransducerHasNoStartStateException :
 public HfstInterfaceException {};
 
@@ -84,15 +117,15 @@ This exceptions suggests that there is something wrong in the HFST code. */
 class TransducerHasMoreThanOneStartStateException :
 public HfstInterfaceException {};
 
-/** \brief ... */
+/* \brief ... */
 class SpecifiedTypeRequiredException :
 public HfstInterfaceException {};
 
-/** \brief ... */
+/* \brief ... */
 class WeightTypeMismatchException :
 public HfstInterfaceException {};
 
-/** \brief ... */
+/* \brief ... */
 class ErrorException :
 public HfstInterfaceException {};
 

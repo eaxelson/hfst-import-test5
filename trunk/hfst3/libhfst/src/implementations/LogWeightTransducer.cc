@@ -891,16 +891,15 @@ namespace hfst { namespace implementations
     return new LogFst(subtract);
   }*/
 
-  LogFst * LogWeightTransducer::set_weight(LogFst * t,float f)
+  LogFst * LogWeightTransducer::set_final_weights(LogFst * t,float f)
   {
-    LogFst * t_copy = new LogFst(*t);
     for (fst::StateIterator<LogFst> iter(*t); 
 	 not iter.Done(); iter.Next())
       {
-	if (t_copy->Final(iter.Value()) != fst::LogWeight::Zero())
-	  { t_copy->SetFinal(iter.Value(),f); }
+	if (t->Final(iter.Value()) != fst::LogWeight::Zero())
+	  { t->SetFinal(iter.Value(),f); }
       }
-    return t_copy;
+    return t;
   }
 
   LogFst * LogWeightTransducer::transform_weights
