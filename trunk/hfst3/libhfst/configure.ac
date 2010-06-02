@@ -77,9 +77,12 @@ AC_CHECK_LIB([fstmain], [main])
 
 # Checks for header files.
 AC_CHECK_HEADERS([limits.h stdlib.h string.h])
+# sfst
 AC_LANG_PUSH([C++])
 AC_CHECK_HEADERS([backward/hash_set ext/hash_set hash_set])
 AC_CHECK_HEADERS([backward/hash_map ext/hash_map hash_map])
+# openfst
+AC_CHECK_HEADERS([fst/fstlib.h])
 AC_LANG_POP
 
 # Checks for typedefs, structures, and compiler characteristics.

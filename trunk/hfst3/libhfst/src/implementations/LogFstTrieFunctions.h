@@ -1,6 +1,6 @@
 #ifndef _LOG_FST_TRIE_FUNCTIONS_
 #define _LOG_FST_TRIE_FUNCTIONS_
-#include "openfst-1.1/src/include/fst/fstlib.h"
+#include <fst/fstlib.h>
 #include <vector>
 
 namespace HFST_IMPLEMENTATIONS
