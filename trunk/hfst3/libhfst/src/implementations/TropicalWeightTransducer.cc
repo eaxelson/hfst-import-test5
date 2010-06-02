@@ -1109,7 +1109,7 @@ namespace hfst { namespace implementations
     return t;
   }
 
-  bool TropicalWeightTransducer::test_equivalence(StdVectorFst *a, StdVectorFst *b) 
+  bool TropicalWeightTransducer::are_equivalent(StdVectorFst *a, StdVectorFst *b) 
   {
     StdVectorFst * mina = minimize(a);
     StdVectorFst * minb = minimize(b);
@@ -1453,11 +1453,57 @@ namespace hfst { namespace implementations
     return new StdVectorFst(dec);
   }
 
+  /* It is not certain whether the transition iterator goes through all the transitions that are added
+     during the substitution. In that case, this function should build a new transducer instead of
+     modifying the original one. */
+  StdVectorFst * TropicalWeightTransducer::substitute(StdVectorFst *t,
+						      StringPair old_symbol_pair,
+						      StringPairSet new_symbol_pair_set)
+  {
+    fst::StdVectorFst * tc = t->Copy();
+    fst::SymbolTable * st = tc->InputSymbols();
+    assert(st != NULL);
+    for (fst::StateIterator<fst::StdVectorFst> siter(*tc); 
+	 not siter.Done(); siter.Next()) 
+      {
+	StateId s = siter.Value();
+	for (fst::MutableArcIterator<StdVectorFst> aiter(tc,s); !aiter.Done(); aiter.Next())
+	  {
+	    const StdArc &arc = aiter.Value();
+	    if ( strcmp( st->Find(arc.ilabel).c_str(), 
+			 old_symbol_pair.first.c_str() ) == 0 &&
+		 strcmp( st->Find(arc.olabel).c_str(), 
+			 old_symbol_pair.second.c_str() ) == 0 )
+	      {
+		bool first_substitution=true;
+		for (StringPairSet::iterator it = new_symbol_pair_set.begin(); 
+		     it != new_symbol_pair_set.end(); it++)
+		  {
+		    if (first_substitution) {
+		      StdArc new_arc;
+		      new_arc.ilabel = st->AddSymbol(it->first);
+		      new_arc.olabel = st->AddSymbol(it->second);
+		      new_arc.weight = arc.weight.Value();
+		      new_arc.nextstate = arc.nextstate;
+		      aiter.SetValue(new_arc); 
+		      first_substitution=false; }
+		    else
+		      tc->AddArc(s, StdArc(st->AddSymbol(it->first), 
+					   st->AddSymbol(it->second), 
+					   arc.weight.Value(), 
+					   arc.nextstate));
+		  }
+	      }
+	  }
+      }
+  }
+
   StdVectorFst * TropicalWeightTransducer::substitute(StdVectorFst *t,
 						      std::string old_symbol,
 						      std::string new_symbol)
   {
     SymbolTable * st = t->InputSymbols();
+    assert(st != NULL);
     StdVectorFst * retval = substitute(t, st->AddSymbol(old_symbol), st->AddSymbol(new_symbol));
     retval->SetInputSymbols( new SymbolTable ( *(t->InputSymbols()) ) );
     return retval;
@@ -1478,7 +1524,7 @@ namespace hfst { namespace implementations
   }
 
   StdVectorFst * TropicalWeightTransducer::substitute(StdVectorFst *t,
-						      StringPair old_symbol_pair,
+						      const StringPair old_symbol_pair,
 						      StdVectorFst *transducer)
   {
     int states = t->NumStates();

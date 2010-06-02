@@ -720,6 +720,10 @@ namespace hfst { namespace implementations {
   (Transducer * t1, Transducer * t2)
   { return &t1->operator/(*t2); }
 
+  bool SfstTransducer::are_equivalent(Transducer * t1, Transducer * t2)
+  {
+    return (t1 == t2);
+  }
 
     /*
   SfstStateIterator::SfstStateIterator(Transducer * t):

@@ -87,6 +87,8 @@ namespace hfst { namespace implementations
 			    Transducer * t2);
       static std::pair<Transducer*, Transducer*> harmonize(Transducer *t1, Transducer *t2);
 
+      static bool are_equivalent(Transducer * t1, Transducer * t2);
+
       static void print_test(Transducer *t);
 
     protected:
