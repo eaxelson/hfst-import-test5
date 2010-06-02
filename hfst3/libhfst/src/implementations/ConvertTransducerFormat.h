@@ -4,9 +4,9 @@
 #include <iostream>
 #include <vector>
 #include <map>
+#include <fst/fstlib.h>
 #include "HfstExceptions.h"
 #include "SFST/src/fst.h"
-#include "openfst-1.1/src/include/fst/fstlib.h"
 
 struct fsm;
 

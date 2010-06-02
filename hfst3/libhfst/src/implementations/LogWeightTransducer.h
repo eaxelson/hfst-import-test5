@@ -1,6 +1,6 @@
 #include "SymbolDefs.h"
 #include "HfstExceptions.h"
-#include "openfst-1.1/src/include/fst/fstlib.h"
+#include <fst/fstlib.h>
 #include "LogFstTrieFunctions.h"
 #include "ExtractStrings.h"
 #include <cstdio>
