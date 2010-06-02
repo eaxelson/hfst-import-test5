@@ -135,6 +135,7 @@ int main(int argc, char **argv) {
 	// Test the conversions.
 	HfstTransducer trconv = tr.convert(types[j]);
 	assert (tr.get_type() == types[j]);
+	std::cerr << tr << "--\n" << trconv;
 	assert (HfstTransducer::are_equivalent(tr, trconv));
 	HfstTransducer tranother(types[j]);
 	assert (HfstTransducer::are_equivalent(tr, tranother));

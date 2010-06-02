@@ -117,6 +117,9 @@ This exceptions suggests that there is something wrong in the HFST code. */
 class TransducerHasMoreThanOneStartStateException :
 public HfstInterfaceException {};
 
+class TypeMismatchException :
+public HfstInterfaceException {};
+
 /* \brief ... */
 class SpecifiedTypeRequiredException :
 public HfstInterfaceException {};

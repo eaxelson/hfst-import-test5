@@ -452,6 +452,14 @@ namespace hfst { namespace implementations {
   {
     return fsm_minus(fsm_copy(t1), fsm_copy(t2));
   }
+
+  bool FomaTransducer::are_equivalent
+  (fsm * t1, fsm * t2)
+  {
+    return fsm_isempty(fsm_union(fsm_minus(fsm_copy(t1),fsm_copy(t2)),fsm_minus(fsm_copy(t1),fsm_copy(t2))));    
+  }
+
+
     /*
   FomaStateIterator::FomaStateIterator(fsm * t):
   node_numbering(0),t(t),current_state(0),ended(false)

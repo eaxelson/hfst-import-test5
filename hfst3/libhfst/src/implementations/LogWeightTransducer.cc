@@ -921,6 +921,20 @@ namespace hfst { namespace implementations
       }
     return t_copy;
   }
+
+
+  bool LogWeightTransducer::are_equivalent(LogFst * t1, LogFst * t2)
+  {
+    LogFst * mina = minimize(t1);
+    LogFst * minb = minimize(t2);
+    EncodeMapper<LogArc> encode_mapper(0x0001,ENCODE);
+    EncodeFst<LogArc> enca(*mina, &encode_mapper);
+    EncodeFst<LogArc> encb(*minb, &encode_mapper);
+    LogFst A(enca);
+    LogFst B(encb);
+    return Equivalent(A, B);
+  }
+
   /*
   LogWeightTransducer::const_iterator 
   LogWeightTransducer::begin(LogFst * t)

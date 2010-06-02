@@ -28,14 +28,8 @@ namespace hfst
    fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *),
    hfst::implementations::LogFst * (*log_ofst_funct)
    (hfst::implementations::LogFst *),
-   fsm * (*foma_funct)(fsm *),
-   ImplementationType type)
+   fsm * (*foma_funct)(fsm *) )
   {
-    if (not is_safe_conversion(this->type, type))
-      throw hfst::exceptions::UnsafeConversionException();
-
-    if (type != UNSPECIFIED_TYPE)
-      { convert(type); }
     switch(this->type)
       {
       case SFST_TYPE:
@@ -84,13 +78,8 @@ namespace hfst
    hfst::implementations::LogFst * (*log_ofst_funct)
    (hfst::implementations::LogFst *, int n),
    fsm * (*foma_funct)(fsm *,int n),
-   int n, ImplementationType type)
+   int n )
   {
-    if (not is_safe_conversion(this->type, type))
-      throw hfst::exceptions::UnsafeConversionException();
-
-    if (type != UNSPECIFIED_TYPE)
-      { convert(type); }
     switch(this->type)
       {
       case SFST_TYPE:
@@ -140,13 +129,8 @@ namespace hfst
    hfst::implementations::LogFst * (*log_ofst_funct)
    (hfst::implementations::LogFst *,String, String),
    fsm * (*foma_funct)(fsm *, String, String),
-   String s1, String s2,ImplementationType type)
+   String s1, String s2)
   {
-    if (not is_safe_conversion(this->type, type))
-      throw hfst::exceptions::UnsafeConversionException();
-
-    if (type != UNSPECIFIED_TYPE)
-      { convert(type); }
     switch(this->type)
       {
       case SFST_TYPE:
@@ -254,24 +238,10 @@ namespace hfst
    (hfst::implementations::LogFst *,hfst::implementations::LogFst *),
    fsm * (*foma_funct)(fsm *,
 				    fsm *),
-   HfstTransducer &another,
-   ImplementationType type)
+   HfstTransducer &another)
   {
-    // type conversion to 'type' or type of another
-    if (type != UNSPECIFIED_TYPE)
-      {
-	if (not is_safe_conversion(this->type, type))
-	  throw hfst::exceptions::UnsafeConversionException();
-	convert(type);
-	if (type != another.type)
-	  { if (not is_safe_conversion(another.type, type))
-	      throw hfst::exceptions::UnsafeConversionException();
-	    another.convert(type); }
-      }
-    else if (this->type != another.type)
-      { if (not is_safe_conversion(this->type, another.type))
-	  throw hfst::exceptions::UnsafeConversionException();
-	convert(another.type); }
+    if (this->type != another.type)
+      throw hfst::exceptions::TypeMismatchException();
 
     // harmonize this according to symbol coding of another
     // and expand unknowns and identities of both transducers

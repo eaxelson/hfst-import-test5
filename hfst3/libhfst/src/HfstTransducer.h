@@ -257,6 +257,8 @@ namespace hfst
 
 #include "apply_schemas.h"
 
+    bool static is_safe_conversion(ImplementationType original, ImplementationType conversion);
+
   public:
     /** \brief Create an empty transducer, i.e. a transducer that does not recognize any string. 
 
@@ -393,18 +395,18 @@ fclose(ifile);
     static HfstTransducer &read_in_att_format(const char * filename, ImplementationType type=UNSPECIFIED_TYPE );
 
     /** \brief Remove all epsilon:epsilon transitions from this transducer. */
-    HfstTransducer &remove_epsilons(ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &remove_epsilons();
     /** \brief Determinize this transducer.
 
 	Determinizing a transducer yields an equivalent transducer that has
 	no state with two or more transitions whose input:output symbol pairs are the same. */
-    HfstTransducer &determinize(ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &determinize();
     /** \brief Minimize this transducer.
 
 	Minimizing a transducer yields an equivalent transducer with the smallest number of states. 
      
 	@bug OpenFst's minimization algorithm seems to add epsilon transitions to weighted transducers. */
-    HfstTransducer &minimize(ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &minimize();
     /** \brief Create a transducer containing \a n best paths of this transducer. 
 
 	In the case of a weighted transducer (TROPICAL_OFST_TYPE or LOG_OFST_TYPE), best paths are defined as paths with the lowest weight.
@@ -412,51 +414,47 @@ fclose(ifile);
 
 	This transducer is not modified, except for the conversion requested with parameter \a type.
     */
-    HfstTransducer &n_best(int n,ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &n_best(int n);
 
     /** \brief A concatenation of n transducers where n is any number from zero to infinity. */
-    HfstTransducer &repeat_star(ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &repeat_star();
 
     /** \brief A concatenation of n transducers where n is any number from one to infinity. */
-    HfstTransducer &repeat_plus(ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &repeat_plus();
 
     /** \brief A concatenation of n transducers. */
-    HfstTransducer &repeat_n(unsigned int n,
-                       ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &repeat_n(unsigned int n);
 
     /** \brief A concatenation of N transducers where N is from zero to n, inclusive.*/
-    HfstTransducer &repeat_n_minus(unsigned int n,
-                       ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &repeat_n_minus(unsigned int n);
 
     /** \brief A concatenation of N transducers where N is from n to infinity, inclusive.*/
-    HfstTransducer &repeat_n_plus(unsigned int n,
-                       ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &repeat_n_plus(unsigned int n);
 
     /** \brief A concatenation of N transducers where N is from n to k, inclusive.*/
-    HfstTransducer& repeat_n_to_k(unsigned int n, unsigned int k,
-                       ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer& repeat_n_to_k(unsigned int n, unsigned int k);
 
     /** \brief Disjunct this transducer with an epsilon transducer. */
-    HfstTransducer &optionalize(ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &optionalize();
 
     /** \brief Swap the input and output labels of each transition in this transducer. */
-    HfstTransducer &invert(ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &invert();
 
     /** \brief Reverse this transducer. 
 
 	A reverted transducer accepts the string "n(0) n(1) ... n(N)" iff the original
 	transducer accepts the string "n(N) n(N-1) ... n(0)" */
-    HfstTransducer &reverse(ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &reverse();
 
     /** \brief Extract the input language of this transducer. 
 
 	All transition symbol pairs "isymbol:osymbol" are changed to "isymbol:isymbol". */
-    HfstTransducer &input_project(ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &input_project();
 
     /** \brief Extract the output language of this transducer.
 
 	All transition symbol pairs "isymbol:osymbol" are changed to "osymbol:osymbol". */
-    HfstTransducer &output_project(ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &output_project();
 
     /** \brief Store to \a results all string pairs that are recognised by the transducer. 
 
@@ -473,33 +471,65 @@ fclose(ifile);
 	  }
 \endverbatim
 
+	If this function is called by an HfstTransducer of type FOMA_TYPE, it is converted to TROPICAL_OFST,
+	substitution is done and it is converted back to FOMA_TYPE.
+
 	@pre The transducer is acyclic. 
 	@note If the transducer is cyclic, no guarantees are given how the function will
 	behave. It might get stuck in an infinite loop or return any number of string pairs. 
 	In the case of a cyclic transducer, use #n_best instead. 
-	@see #n_best */
-    void extract_strings(WeightedPaths<float>::Set &results, ImplementationType type=UNSPECIFIED_TYPE);
+	@see #n_best 
+	@throws hfst::exceptions::FunctionNotImplementedException (if type == FOMA_TYPE)*/
+    void extract_strings(WeightedPaths<float>::Set &results);
 
     /** \brief Substitute all symbols \a old_symbol with symbol \a new_symbol. */
     HfstTransducer &substitute(const std::string &old_symbol,
-			       const std::string &new_symbol,
-			       ImplementationType type=UNSPECIFIED_TYPE);
-    /** \brief Substitute all transitions equal to \a old_symbol_pair with symbol pair \a new_symbol_pair. */
+			       const std::string &new_symbol);
+			      
+    /** \brief Substitute all transitions equal to \a old_symbol_pair with symbol pair \a new_symbol_pair. 
+
+	Implemented only for TROPICAL_OFST_TYPE and LOG_OFST_TYPE.
+
+	If this function is called by an unweighted HfstTransducer, it is converted to weighted one,
+	substitution is done and it is converted back to the original format.
+
+	@throws hfst::exceptions::FunctionNotImplementedException (if type == SFST_TYPE or type == FOMA_TYPE)
+     */
     HfstTransducer &substitute(const StringPair &old_symbol_pair,
-			       const StringPair &new_symbol_pair,
-			       ImplementationType type=UNSPECIFIED_TYPE);
-    /** \brief Substitute all transitions equal to \a symbol_pair with a copy of transducer \a transducer. */
+			       const StringPair &new_symbol_pair);
+
+    /** \brief Substitute all transitions equal to \a old_symbol_pair with a set of transtions in \a new_symbol_pair_set. 
+
+	Implemented only for TROPICAL_OFST_TYPE and LOG_OFST_TYPE.
+
+	If this function is called by an unweighted HfstTransducer, it is converted to weighted one,
+	substitution is done and it is converted back to the original format.
+
+	@throws hfst::exceptions::FunctionNotImplementedException (if type == SFST_TYPE or type == FOMA_TYPE)
+     */
+    HfstTransducer &substitute(const StringPair &old_symbol_pair,
+			       const StringPairSet &new_symbol_pair_set);
+
+    /** \brief Substitute all transitions equal to \a symbol_pair with a copy of transducer \a transducer. 
+
+	Implemented only for TROPICAL_OFST_TYPE and LOG_OFST_TYPE
+
+	If this function is called by an unweighted HfstTransducer, it is converted to weighted one,
+	substitution is done and it is converted back to the original format.
+
+	@throws hfst::exceptions::FunctionNotImplementedException (if type == SFST_TYPE or type == FOMA_TYPE)	
+     */
     HfstTransducer &substitute(const StringPair &symbol_pair,
-			       HfstTransducer &transducer,
-			       ImplementationType type=UNSPECIFIED_TYPE);
+			       HfstTransducer &transducer);
+
     /** \brief Set the weights of all final states to \a weight. 
 
 	@note \a type must be an implementation that supports weights (TROPICAL_OFST_TYPE or LOG_OFST_TYPE), 
 	otherwise an exception is thrown. 
 	@throws hfst::exceptions::WeightsNotSupportedException
     */
-    HfstTransducer &set_final_weights(float weight,
-				      ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &set_final_weights(float weight);
+
     /** \brief Transform all transition and state weights according to the function pointer \a func. 
 
      An example:
@@ -517,25 +547,22 @@ fclose(ifile);
 otherwise an exception is thrown. 
 @throws hfst::exceptions::WeightsNotSupportedException
     */
-    HfstTransducer &transform_weights(float (*func)(float),
-				      ImplementationType=UNSPECIFIED_TYPE);
-
+    HfstTransducer &transform_weights(float (*func)(float));
 
     /** \brief Compose this transducer with \a another. */
-    HfstTransducer &compose(HfstTransducer &another,
-			    ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &compose(HfstTransducer &another);
+
     /** \brief Concatenate this transducer with \a another. */
-    HfstTransducer &concatenate(HfstTransducer &another,
-				ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &concatenate(HfstTransducer &another);
+
     /** \brief Disjunct this transducer with \a another. */
-    HfstTransducer &disjunct(HfstTransducer &another,
-			     ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &disjunct(HfstTransducer &another);
+
     /** \brief Intersect this transducer with \a another. */
-    HfstTransducer &intersect(HfstTransducer &another,
-			      ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &intersect(HfstTransducer &another);
+
     /** \brief Subtract transducer \a another from this. */
-    HfstTransducer &subtract(HfstTransducer &another,
-			     ImplementationType type=UNSPECIFIED_TYPE);
+    HfstTransducer &subtract(HfstTransducer &another);
 
 
     /* \brief Compose this transducer with another. */

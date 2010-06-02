@@ -1,18 +1,15 @@
-bool is_safe_conversion(ImplementationType original, ImplementationType conversion);
-
 HfstTransducer &apply
 (SFST::Transducer * (*sfst_funct)(SFST::Transducer *),
  fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *),
  hfst::implementations::LogFst * (*log_ofst_funct)(hfst::implementations::LogFst *),
- fsm * (*foma_funct)(fsm *), 
- ImplementationType type);
+ fsm * (*foma_funct)(fsm *));
 
 HfstTransducer &apply
 (SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int),
  fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,int),
  hfst::implementations::LogFst * (*log_ofst_funct)(hfst::implementations::LogFst *,int),
  fsm * (*foma_funct)(fsm *,int),
- int n,ImplementationType type);
+ int n);
 
 HfstTransducer &apply
 (SFST::Transducer * (*sfst_funct)(SFST::Transducer *, String, String),
@@ -21,7 +18,7 @@ HfstTransducer &apply
  hfst::implementations::LogFst * (*log_ofst_funct)(hfst::implementations::LogFst *,
 						  String,String),
  fsm * (*foma_funct)(fsm *, String, String),
- String k1, String k2,ImplementationType type);
+ String k1, String k2);
 
 /*HfstTransducer &apply
 (SFST::Transducer * (*sfst_funct)(SFST::Transducer *, KeyPair, 
@@ -43,5 +40,4 @@ HfstTransducer &apply
 						  hfst::implementations::LogFst *),
  fsm * (*foma_funct)(fsm *,
 		     fsm *),
- HfstTransducer &another,
- ImplementationType type);
+ HfstTransducer &another );

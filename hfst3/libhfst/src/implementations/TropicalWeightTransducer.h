@@ -153,13 +153,16 @@ namespace implementations
 
       static void write_in_att_format(StdVectorFst * t, std::ostream &os);
       static StdVectorFst * read_in_att_format(FILE *ifile);
-      static bool test_equivalence(StdVectorFst *one, StdVectorFst *another);
+      static bool are_equivalent(StdVectorFst *one, StdVectorFst *another);
       static StdVectorFst * substitute(StdVectorFst * t, std::string old_symbol, std::string new_symbol);
       static StdVectorFst * substitute(StdVectorFst * t,
 				       StringPair old_symbol_pair,
 				       StringPair new_symbol_pair);
       static StdVectorFst * substitute(StdVectorFst * t,
 				       StringPair old_symbol_pair,
+				       StringPairSet new_symbol_pair_set);
+      static StdVectorFst * substitute(StdVectorFst * t,
+				       const StringPair old_symbol_pair,
 				       StdVectorFst *transducer);
 
       static StringSet get_string_set(StdVectorFst *t);
