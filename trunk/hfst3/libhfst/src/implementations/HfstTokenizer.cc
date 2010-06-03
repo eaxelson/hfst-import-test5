@@ -78,13 +78,16 @@ const
   if (multi_char_symbol_end != NULL)
     { return multi_char_symbol_end - symbol; }
 
-  if ((0b10000000 & *symbol) == 0)
+  if ((128 & *symbol) == 0)
     { return 1; }
-  if ((0b00100000 & *symbol) == 0)
+  else if ((32 & *symbol) == 0)
     { return 2; }
-  if ((0b00010000 & *symbol) == 0)
+  else if ((16 & *symbol) == 0)
     { return 3; }
-  return 4;
+  else
+    {
+      return 4;
+    }
 }
 
   bool HfstTokenizer::is_skip_symbol(hfst::String &s) const
