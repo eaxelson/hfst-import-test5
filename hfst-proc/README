@@ -37,6 +37,11 @@ in its uninstallation. If you would rather install in eg. your home directory
 
 	./configure --prefix=$HOME
 
+If checking out from CVS or SVN you must first create or install the necessary
+autotools files from the host system:
+
+  autoreconf -i
+
 hfst-optimized-lookup is distributed freely under the Apache license which
 should be provided with the source, or can be found at
 
