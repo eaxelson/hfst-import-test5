@@ -153,13 +153,15 @@ class TransducerHeader
     read_property(has_unweighted_input_epsilon_cycles, is);
   }
 
-  SymbolNumber symbol_count(void) { return number_of_symbols; }
-  SymbolNumber input_symbol_count(void) { return number_of_input_symbols; }
+  SymbolNumber symbol_count(void) const { return number_of_symbols; }
+  SymbolNumber input_symbol_count(void) const {return number_of_input_symbols;}
   
-  TransitionTableIndex index_table_size(void) { return size_of_transition_index_table; }
-  TransitionTableIndex target_table_size(void) { return size_of_transition_target_table; }
+  TransitionTableIndex index_table_size(void) const
+  { return size_of_transition_index_table; }
+  TransitionTableIndex target_table_size(void) const
+  { return size_of_transition_target_table; }
 
-  bool probe_flag(HeaderFlag flag)
+  bool probe_flag(HeaderFlag flag) const
   {
     switch (flag) {
     case Weighted: return weighted;
