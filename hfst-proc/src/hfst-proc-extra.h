@@ -70,10 +70,9 @@ class LookupPath
 };
 
 /**
- * A lookup path which additionally stores the state of the flag diacritics on
- * the path
+ * A base class used by lookup path types that handle flag diacritics
  */
-class LookupPathFd : public LookupPath
+class PathFd
 {
  protected:
   /**
@@ -82,10 +81,10 @@ class LookupPathFd : public LookupPath
   FlagDiacriticState fd_state;
   
   /**
-   * A pointer to the list flag diacritic operations in the transducer where
+   * A reference of the list flag diacritic operations in the transducer where
    * the lookup is being done
    */
-  const OperationVector* fd_operations;
+  const OperationVector& fd_operations;
   
   /**
    * Evaluates the given flag diacritic operation, possibly modifying fd_state,
@@ -93,21 +92,34 @@ class LookupPathFd : public LookupPath
    */
   bool evaluate_flag_diacritic(FlagDiacriticOperation op);
   
+  /**
+   * If the given symbol is a flag diacritic, return the result of the other
+   * evaluation method, otherwise return true
+   */
+  bool evaluate_flag_diacritic(SymbolNumber s);
+  
+  bool is_flag_diacritic(SymbolNumber s) const
+  {return fd_operations[s].isFlag();}
+  
+  PathFd(const OperationVector& op): fd_operations(op) {}
+  PathFd(const PathFd& o): fd_state(o.fd_state), 
+                           fd_operations(o.fd_operations) {}
+};
+
+/**
+ * A lookup path which additionally stores the state of the flag diacritics on
+ * the path and whose follow is conditional based on evaluation diacritics
+ */
+class LookupPathFd : public LookupPath, PathFd
+{
  public:
   LookupPathFd(const TransitionTableIndex initial, const OperationVector& op):
-    LookupPath(initial), fd_operations(&op) {}
-  LookupPathFd(const LookupPathFd& o): LookupPath(o), fd_state(o.fd_state), 
-                                       fd_operations(o.fd_operations) {}
+    LookupPath(initial), PathFd(op) {}
+  LookupPathFd(const LookupPathFd& o): LookupPath(o), PathFd(o) {}
   
   virtual LookupPath* clone() const {return new LookupPathFd(*this);}
   
-  /**
-   * As in the superclass, except also modifies the flag diacritic state if
-   * appropriate, and checks whether or not the follow action is allowed
-   */
   virtual bool follow(const Transition& transition);
-  
-  FlagDiacriticState get_fd_state() {return fd_state;}
 };
 
 /**
@@ -125,9 +137,6 @@ class LookupPathW : public LookupPath
    * An extra weight that is added to the sum when the path is at a final state
    */
   Weight final_weight;
-  
-  void follow_weight(const TransitionIndex& index);
-  void follow_weight(const Transition& transition);
  public:
   LookupPathW(const TransitionTableIndex initial): 
   	LookupPath(initial), weight(0.0f), final_weight(0.0f) {}
@@ -136,13 +145,7 @@ class LookupPathW : public LookupPath
   
   virtual LookupPath* clone() const {return new LookupPathW(*this);}
 
-  /**
-   * As in the superclass, except also modifying weight
-   */
   virtual void follow(const TransitionIndex& index);
-  /**
-   * As in the superclass, except also modifying weight
-   **/  
   virtual bool follow(const Transition& transition);
   
   Weight get_weight() const {return at_final() ? weight+final_weight : weight;}
@@ -151,39 +154,16 @@ class LookupPathW : public LookupPath
 /**
  * A lookup path with weight and flag diacritics
  */
-class LookupPathWFd : public LookupPathFd
+class LookupPathWFd : public LookupPathW, PathFd
 {
- protected:
-  /**
-   * The summed weight of the transitions this path has followed
-   */
-  Weight weight;
-  
-  /**
-   * An extra weight that is added to the sum when the path is at a final state
-   */
-  Weight final_weight;
-  
-  void follow_weight(const TransitionIndex& index);
-  void follow_weight(const Transition& transition);
  public:
   LookupPathWFd(const TransitionTableIndex initial, const OperationVector& op):
-    LookupPathFd(initial, op), weight(0.0f), final_weight(0.0f)  {}
-  LookupPathWFd(const LookupPathWFd& o): LookupPathFd(o), weight(o.weight),
-    final_weight(o.final_weight) {}
+    LookupPathW(initial), PathFd(op){}
+  LookupPathWFd(const LookupPathWFd& o): LookupPathW(o), PathFd(o) {}
   
   virtual LookupPath* clone() const {return new LookupPathWFd(*this);}
   
-  /**
-   * As in the superclass, except also modifying weight and doing Fd's
-   */
-  virtual void follow(const TransitionIndex& index);
-  /**
-   * As in the superclass, except also modifying weight and doing Fd's
-   **/  
   virtual bool follow(const Transition& transition);
-  
-  Weight get_weight() const {return at_final() ? weight+final_weight : weight;}
 };
 
 

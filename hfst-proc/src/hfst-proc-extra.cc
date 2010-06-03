@@ -1,3 +1,4 @@
+#include <sstream>
 #include "hfst-optimized-lookup.h"
 #include "hfst-proc-extra.h"
 
@@ -23,10 +24,10 @@ LookupPath::follow(const Transition& transition)
 }
 
 
-//////////Function definitions for class LookupPathFd
+//////////Function definitions for class PathFd
 
 bool
-LookupPathFd::evaluate_flag_diacritic(FlagDiacriticOperation op)
+PathFd::evaluate_flag_diacritic(FlagDiacriticOperation op)
 {
   switch (op.Operation()) {
   case P: // positive set
@@ -68,90 +69,65 @@ LookupPathFd::evaluate_flag_diacritic(FlagDiacriticOperation op)
   throw; // for the compiler's peace of mind
 }
 
-bool LookupPathFd::follow(const Transition& transition)
+bool
+PathFd::evaluate_flag_diacritic(SymbolNumber s)
 {
-  if((*fd_operations)[transition.get_input()].isFlag())
+  if(fd_operations[s].isFlag())
   {
-    if(evaluate_flag_diacritic((*fd_operations)[transition.get_input()]))
+    if(evaluate_flag_diacritic(fd_operations[s]))
     {
       if(printDebuggingInformationFlag)
-        std::cout << "flag diacritic [" << transition.get_input() << "] allowed" << std::endl;
-      return LookupPath::follow(transition);
+        std::cout << "flag diacritic [" << s << "] allowed" << std::endl;
+      return true;
     }
-
-    if(printDebuggingInformationFlag)
-      std::cout << "flag diacritic [" << transition.get_input() << "] disallowed" << std::endl;
-    return false;
+    else
+    {
+      std::cout << "flag diacritic [" << s << "] disallowed" << std::endl;
+      return false;
+    }
   }
-  
-  return LookupPath::follow(transition);
+  else
+    return true;
+}
+
+
+//////////Function definitions for class LookupPathFd
+
+bool
+LookupPathFd::follow(const Transition& transition)
+{
+  if(evaluate_flag_diacritic(transition.get_input()))
+    return LookupPath::follow(transition);
+  return false;
 }
 
 
 //////////Function definitions for class LookupPathW
 
 void
-LookupPathW::follow_weight(const TransitionIndex& index)
-{
-  final_weight = static_cast<const TransitionWIndex&>(index).final_weight();
-}
-void
-LookupPathW::follow_weight(const Transition& transition)
-{
-  weight += static_cast<const TransitionW&>(transition).get_weight();
-  //**is this right? I'm not so sure about the precise semantics of weights
-  //  and finals in this system**
-  final_weight = static_cast<const TransitionW&>(transition).get_weight();
-}
-
-void
 LookupPathW::follow(const TransitionIndex& index)
 {
-  LookupPath::follow(index);
-  follow_weight(index);
+  final_weight = static_cast<const TransitionWIndex&>(index).final_weight();
+  return LookupPath::follow(index);
 }
 
 bool
 LookupPathW::follow(const Transition& transition)
 {
-  LookupPath::follow(transition);
-  follow_weight(transition);
-  
-  return true;
-}
-
-//////////Function definitions for class LookupPathWFd
-
-void
-LookupPathWFd::follow_weight(const TransitionIndex& index)
-{
-  final_weight = static_cast<const TransitionWIndex&>(index).final_weight();
-}
-void
-LookupPathWFd::follow_weight(const Transition& transition)
-{
   weight += static_cast<const TransitionW&>(transition).get_weight();
   //**is this right? I'm not so sure about the precise semantics of weights
   //  and finals in this system**
   final_weight = static_cast<const TransitionW&>(transition).get_weight();
+  return LookupPath::follow(transition);
 }
 
-void
-LookupPathWFd::follow(const TransitionIndex& index)
-{
-  LookupPath::follow(index);
-  follow_weight(index);
-}
+//////////Function definitions for class LookupPathWFd
 
 bool
 LookupPathWFd::follow(const Transition& transition)
 {
-  if(LookupPathFd::follow(transition))
-  {
-    follow_weight(transition);
-    return true;
-  }
-  
+  if(evaluate_flag_diacritic(transition.get_input()))
+    return LookupPathW::follow(transition);
   return false;
 }
 
@@ -656,13 +632,15 @@ print_unknown_word(TokenIOStream& token_stream,
 std::string
 AbstractTransducer::process_finals(TokenIOStream& token_stream, const LookupPathVector& finals) const
 {
-  std::string res="";
+  std::ostringstream res;
   for(LookupPathVector::const_iterator it=finals.begin(); it!=finals.end(); it++)
   {
-    res += '/'+token_stream.escape(alphabet.symbols_to_string((*it)->get_output_symbols()));
+    res << '/' << token_stream.escape(alphabet.symbols_to_string((*it)->get_output_symbols()));
+    if(header.probe_flag(Weighted))
+      res << '~' << dynamic_cast<const LookupPathW*>(*it)->get_weight() << '~';
   }
   
-  return res;
+  return res.str();
 }
 
 void AbstractTransducer::tokenize(TokenIOStream& token_stream)
