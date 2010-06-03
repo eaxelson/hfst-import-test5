@@ -24,6 +24,7 @@
  */
 
 #include "hfst-optimized-lookup.h"
+#include "hfst-proc-extra.h"
 
 
 OutputType outputType = xerox;
@@ -40,7 +41,11 @@ bool preserveDiacriticRepresentationsFlag = false;
 bool timingFlag = false;
 bool printDebuggingInformationFlag = false;
 
+bool do_proc_flag = false;
+bool do_tokenize_flag = false;
 
+
+int setup(std::ifstream& is);
 
 bool print_usage(void)
 {
@@ -64,6 +69,8 @@ bool print_usage(void)
     "  -f, --fast                  Be as fast as possible.\n" <<
     "                              (with this option enabled -u and -n don't work and\n" <<
     "                              output won't be ordered by weight).\n" <<
+    "  -p, --proc                  Operate in hfst-proc mode (experimental)\n" <<
+    "  -t  --tokenize              Tokenize the input stream (for debugging)\n" <<
     "\n" <<
     "Note that " << PACKAGE_NAME << " is *not* guaranteed to behave identically to\n" <<
     "hfst-lookup (although it almost always does): input-side multicharacter symbols\n" <<
@@ -112,11 +119,13 @@ int main(int argc, char **argv)
 	  {"xerox",        no_argument,       0, 'x'},
 	  {"fast",         no_argument,       0, 'f'},
 	  {"analyses",     required_argument, 0, 'n'},
+	  {"proc",         no_argument,       0, 'p'},
+	  {"tokenize",     no_argument,       0, 't'},
 	  {0,              0,                 0,  0 }
 	};
       
       int option_index = 0;
-      c = getopt_long(argc, argv, "hVvqsewuxfn:", long_options, &option_index);
+      c = getopt_long(argc, argv, "hVvqsewuxfptn:", long_options, &option_index);
 
       if (c == -1) // no more options to look at
 	break;
@@ -186,6 +195,14 @@ int main(int argc, char **argv)
 	case 'f':
 	  beFast = true;
 	  break;
+	
+	case 'p':
+	  do_proc_flag = true;
+	  break;
+	
+	case 't':
+	  do_tokenize_flag = true;
+	  break;
 	  
 	default:
 	  std::cerr << "Invalid option\n\n";
@@ -196,103 +213,161 @@ int main(int argc, char **argv)
     }
   // no more options, we should now be at the input filename
   if ( (optind + 1) < argc)
-    {
-      std::cerr << "More than one input file given\n";
-      return EXIT_FAILURE;
-    }
+  {
+    std::cerr << "More than one input file given\n";
+    return EXIT_FAILURE;
+  }
   else if ( (optind + 1) == argc)
+  {
+    std::ifstream is(argv[(optind)], std::ios::in | std::ios::binary);
+    if(!is)
     {
-      FILE * f = fopen(argv[(optind)], "r");
-      if (f == NULL)
-	{
-	  std::cerr << "Could not open file " << argv[(optind)] << std::endl;
-	  return 1;
-	}
-      return setup(f);
+      std::cerr << "Could not open file " << argv[(optind)] << std::endl;
+      return 1;
     }
+    
+    return setup(is);
+  }
   else
-    {
-      std::cerr << "No input file given\n";
-      return EXIT_FAILURE;
-    }
+  {
+    std::cerr << "No input file given\n";
+    return EXIT_FAILURE;
+  }
 }
 
-void TransducerAlphabet::get_next_symbol(FILE * f, SymbolNumber k)
+void
+TransducerAlphabet::setup_blank_symbol()
 {
-  int byte;
-  char * sym = line;
-  while ( (byte = fgetc(f)) != 0 )
+  blank_symbol = NO_SYMBOL_NUMBER;
+  for(SymbolTable::const_iterator it=symbol_table.begin(); it!=symbol_table.end(); it++)
+  {
+    if(it->second == " ")
     {
-      if (byte == EOF)
-	{
-	  std::cerr << "Could not parse transducer; wrong or corrupt file?" << std::endl;
-	  exit(1);
-	}
-      *sym = byte;
-      ++sym;
+      blank_symbol = it->first;
+      break;
     }
-  *sym = 0;
-  if (strlen(line) >= 5 && line[0] == '@' && line[strlen(line) - 1] == '@' && line[2] == '.')
-    { // a flag diacritic needs to be parsed
-      std::string feat;
-      std::string val;
-      FlagDiacriticOperator op = P; // g++ worries about this falling through uninitialized
-      switch (line[1]) {
-      case 'P': op = P; break;
-      case 'N': op = N; break;
-      case 'R': op = R; break;
-      case 'D': op = D; break;
-      case 'C': op = C; break;
-      case 'U': op = U; break;
-      }
-      char * c = line;
-      // as long as we're working with utf-8, this should be ok
-      for (c +=3; *c != '.' && *c != '@'; c++) { feat.append(c,1); }
-      if (*c == '.')
-	{
-	  for (++c; *c != '@'; c++) { val.append(c,1); }
-	}
-      if (feature_bucket.count(feat) == 0)
-	{
-	  feature_bucket[feat] = feat_num;
-	  ++feat_num;
-	}
-      if (value_bucket.count(val) == 0)
-	{
-	  value_bucket[val] = val_num;
-	  ++val_num;
-	}
-      operations.push_back(FlagDiacriticOperation(op, feature_bucket[feat], value_bucket[val]));
-      operation_peek.push_back(k);
-      kt->operator[](k) = strdup("");
-      
+  }
+  
+  if(blank_symbol == NO_SYMBOL_NUMBER)
+    blank_symbol = add_symbol(" ");
+}
+
+void TransducerAlphabet::get_next_symbol(std::istream& is, SymbolNumber k)
+{
+  std::string str;
+  std::getline(is, str, '\0');
+  if(printDebuggingInformationFlag)
+    std::cout << "Got next symbol: '" << str << "' (" << k << ")" << std::endl;
+  
+  if(!is || str.length()==0) 
+  {
+    std::cerr << "Could not parse transducer; wrong or corrupt file?" << std::endl;
+    exit(1);
+  }
+
+  if (str.length() >= 5 && str.at(0) == '@' && str.at(str.length()-1) == '@' && str.at(2) == '.')
+  { // a flag diacritic needs to be parsed
+    std::string feat;
+    std::string val;
+    FlagDiacriticOperator op = P; // g++ worries about this falling through uninitialized
+    switch (str.at(1)) {
+    case 'P': op = P; break;
+    case 'N': op = N; break;
+    case 'R': op = R; break;
+    case 'D': op = D; break;
+    case 'C': op = C; break;
+    case 'U': op = U; break;
+    }
+    const char* cstr = str.c_str();
+    const char * c = cstr;
+    // as long as we're working with utf-8, this should be ok
+    for (c +=3; *c != '.' && *c != '@'; c++) { feat.append(c,1); }
+    if (*c == '.')
+    {
+      for (++c; *c != '@'; c++) { val.append(c,1); }
+    }
+    if (feature_bucket.count(feat) == 0)
+    {
+      feature_bucket[feat] = feat_num;
+      ++feat_num;
+    }
+    if (value_bucket.count(val) == 0)
+    {
+      value_bucket[val] = val_num;
+      ++val_num;
+    }
+    add_symbol(k, "",
+               FlagDiacriticOperation(op, feature_bucket[feat], value_bucket[val]));
+    
 #if OL_FULL_DEBUG
-      std::cout << "symbol number " << k << " (flag) is " << line << std::endl;
-      kt->operator[](k) = strdup(line);
+    std::cout << "symbol number " << k << " (flag) is " << str << std::endl;
+    symbol_table[k] = str;
 #endif
-      
-      return;
-    }
-  operations.push_back(FlagDiacriticOperation()); // dummy flag
+    
+    return;
+  }
 
 #if OL_FULL_DEBUG
-  std::cout << "symbol number " << k << " is " << line << std::endl;
+  std::cout << "symbol number " << k << " is " << str << std::endl;
 #endif
-  
-  kt->operator[](k) = strdup(line);
+  add_symbol(k, str);
 }
+
+std::string
+TransducerAlphabet::symbols_to_string(const SymbolNumberVector& symbols) const
+{
+  std::string str="";
+  for(SymbolNumberVector::const_iterator it=symbols.begin(); it!=symbols.end(); it++)
+    str += symbol_to_string(*it);
+  return str;
+}
+
+bool
+TransducerAlphabet::is_punctuation(const char* c) const
+{
+  static const char* punct_ranges[6][2] = {{"!","/"},
+                                           {":","@"},
+                                           {"[","`"},
+                                           {"{","~"},
+                                           {"¡","¿"},
+                                           {"‐","⁞"}};
+  for(int i=0;i<6;i++)
+  {
+    if(strcmp(c,punct_ranges[i][0]) >= 0 && 
+       strcmp(c,punct_ranges[i][1]) <= 0)
+    {
+      // a hack to filter out symbols (e.g. tags) that may start with punctuation
+      // and then contain ASCII text. Tags should be treated as alphabetic.
+      for(;*c!='\0';c++)
+      {
+        if(isalnum(*c))
+          return false;
+      }
+      return true;
+    }
+  }
+  return false;
+}
+
+void
+TransducerAlphabet::calculate_alphabetic()
+{
+  for(SymbolTable::const_iterator it=symbol_table.begin(); it!=symbol_table.end(); it++)
+    if(is_alphabetic(it->second.c_str()))
+      alphabetic.insert(it->first);
+}
+
 
 void LetterTrie::add_string(const char * p, SymbolNumber symbol_key)
 {
   if (*(p+1) == 0)
-    {
-      symbols[(unsigned char)(*p)] = symbol_key;
-      return;
-    }
+  {
+    symbols[(unsigned char)(*p)] = symbol_key;
+    return;
+  }
+
   if (letters[(unsigned char)(*p)] == NULL)
-    {
-      letters[(unsigned char)(*p)] = new LetterTrie();
-    }
+    letters[(unsigned char)(*p)] = new LetterTrie();
   letters[(unsigned char)(*p)]->add_string(p+1,symbol_key);
 }
 
@@ -301,173 +376,269 @@ SymbolNumber LetterTrie::find_key(char ** p) const
   const char * old_p = *p;
   ++(*p);
   if (letters[(unsigned char)(*old_p)] == NULL)
-    {
-      return symbols[(unsigned char)(*old_p)];
-    }
+    return symbols[(unsigned char)(*old_p)];
+  
   SymbolNumber s = letters[(unsigned char)(*old_p)]->find_key(p);
   if (s == NO_SYMBOL_NUMBER)
-    {
-      --(*p);
-      return symbols[(unsigned char)(*old_p)];
-    }
+  {
+    --(*p);
+    return symbols[(unsigned char)(*old_p)];
+  }
   return s;
 }
 
-void Encoder::read_input_symbols(KeyTable * kt)
+SymbolNumber
+LetterTrie::extract_symbol(std::istream& is) const
+{
+  int c = is.get();
+  if(c == EOF)
+    return 0;
+    
+  if(letters[c] == NULL)
+  {
+    if(symbols[c] == NO_SYMBOL_NUMBER)
+      is.putback(c);
+    return symbols[c];
+  }
+  
+  SymbolNumber s = letters[c]->extract_symbol(is);
+  if(s == NO_SYMBOL_NUMBER)
+  {
+    if(symbols[c] == NO_SYMBOL_NUMBER)
+      is.putback(c);
+    return symbols[c];
+  }
+  return s;
+}
+
+void Encoder::read_input_symbols(const SymbolTable& st)
 {
   for (SymbolNumber k = 0; k < number_of_input_symbols; ++k)
-    {
+  {
 #if DEBUG
-      assert(kt->find(k) != kt->end());
+    assert(st.find(k) != st.end());
 #endif
-      const char * p = kt->operator[](k);
-      if ((strlen(p) == 1) && (unsigned char)(*p) <= 127)
-	{
-	  ascii_symbols[(unsigned char)(*p)] = k;
-	}
-      letters.add_string(p,k);
+    std::string p = st.find(k)->second;
+    
+    if(p.length() > 0)
+    {
+      char first = p.at(0);
+      if(ascii_symbols[first] != 0) 
+      { // if the symbol's first character is ASCII and we're not ignoring it yet
+        if(p.length() == 1)
+          ascii_symbols[first] = k;
+        else
+          ascii_symbols[first] = 0;
+      }
     }
+    
+    letters.add_string(p.c_str(),k);
+  }
 }
 
 SymbolNumber Encoder::find_key(char ** p) const
 {
   if (ascii_symbols[(unsigned char)(**p)] == NO_SYMBOL_NUMBER)
-    {
-      return letters.find_key(p);
-    }
+    return letters.find_key(p);
+
   SymbolNumber s = ascii_symbols[(unsigned char)(**p)];
   ++(*p);
   return s;
 }
 
-template <class genericTransducer>
-void runTransducer (genericTransducer T)
+SymbolNumber
+Encoder::extract_symbol(std::istream& is) const
+{
+  int c = is.peek();
+  if(ascii_symbols[c] == NO_SYMBOL_NUMBER)
+    return letters.extract_symbol(is);
+  
+  return ascii_symbols[is.get()];
+}
+
+
+void runTransducer(AbstractTransducer& T)
 {
   SymbolNumber * input_string = (SymbolNumber*)(malloc(2000));
   for (int i = 0; i < 1000; ++i)
-    {
-      input_string[i] = NO_SYMBOL_NUMBER;
-    }
+    input_string[i] = NO_SYMBOL_NUMBER;
   
   char * str = (char*)(malloc(MAX_IO_STRING*sizeof(char)));  
   *str = 0;
   char * old_str = str;
 
   while(std::cin.getline(str,MAX_IO_STRING))
+  {
+    if (echoInputsFlag)
+      std::cout << str << std::endl;
+    
+    int i = 0;
+    SymbolNumber k = NO_SYMBOL_NUMBER;
+    bool failed = false;
+    for ( char ** Str = &str; **Str != 0; )
     {
-      if (echoInputsFlag)
-	{
-	  std::cout << str << std::endl;
-	}
-      int i = 0;
-      SymbolNumber k = NO_SYMBOL_NUMBER;
-      bool failed = false;
-      for ( char ** Str = &str; **Str != 0; )
-	{
-	  k = T.find_next_key(Str);
+      k = T.get_alphabet().find_key(Str);
 #if OL_FULL_DEBUG
-	  std::cout << "INPUT STRING ENTRY " << i << " IS " << k << std::endl;
+      std::cout << "INPUT STRING ENTRY " << i << " IS " << k << std::endl;
 #endif
-	  if (k == NO_SYMBOL_NUMBER)
-	    {
-	      if (echoInputsFlag)
-		{
-		  std::cout << std::endl;
-		}
-	      failed = true;
-	      break;
-	    }
-	  input_string[i] = k;
-	  ++i;
-	}
-      str = old_str;
-      if (failed)
-      	{ // tokenization failed
-	  if (outputType == xerox)
-	    {
-	      std::cout << str << "\t+?" << std::endl;
-	      std::cout << std::endl;
-	    }
-      	  continue;
-      	}
-      input_string[i] = NO_SYMBOL_NUMBER;
-      T.analyze(input_string);
-      T.printAnalyses(std::string(str));
+      if (k == NO_SYMBOL_NUMBER)
+      {
+        if (echoInputsFlag)
+      	  std::cout << std::endl;
+    	
+        failed = true;
+        break;
+      }
+      input_string[i] = k;
+      ++i;
     }
+    
+    str = old_str;
+    if (failed)
+    { // tokenization failed
+      if (outputType == xerox)
+        std::cout << str << "\t+?" << std::endl << std::endl;
+        
+      continue;
+    }
+    input_string[i] = NO_SYMBOL_NUMBER;
+    T.analyze(input_string);
+    T.printAnalyses(std::string(str));
+    
+    T.analyze_iteratively(input_string);
+    T.printAnalyses(std::string(str));
+  }
 }
 
-int setup(FILE * f)
+AbstractTransducer* load_transducer(std::istream& is)
 {
-  TransducerHeader header(f);
-  TransducerAlphabet alphabet(f, header.symbol_count());
+  AbstractTransducer* t = NULL;
+  
+  TransducerHeader header(is);
+  if(printDebuggingInformationFlag)
+    header.print();
+  TransducerAlphabet alphabet(is, header.symbol_count());
 
   if (header.probe_flag(Has_unweighted_input_epsilon_cycles) ||
       header.probe_flag(Has_input_epsilon_cycles))
     {
       std::cerr << "!! Warning: transducer has epsilon cycles                  !!\n"
-		<< "!! This is currently not handled - if they are encountered !!\n"
-		<< "!! program *will* segfault.                                !!\n";
+                << "!! This is currently not handled - if they are encountered !!\n"
+                << "!! program *will* segfault.                                !!\n";
     }
   
   if (alphabet.get_state_size() == 0)
-    {      // if the state size is zero, there are no flag diacritics to handle
-      if (header.probe_flag(Weighted) == false)
-	{
-	  if (displayUniqueFlag)
-	    { // no flags, no weights, unique analyses only
-	      TransducerUniq C(f, header, alphabet);
-	      runTransducer(C);
-	    } else if (!displayUniqueFlag)
-	    { // no flags, no weights, all analyses
-	    Transducer C(f, header, alphabet);
-	    runTransducer(C);
-	    }
-	}
-      else if (header.probe_flag(Weighted) == true)
-	{
-	  if (displayUniqueFlag)
-	    { // no flags, weights, unique analyses only
-	      TransducerWUniq C(f, header, alphabet);
-	      runTransducer(C);
-	    } else if (!displayUniqueFlag)
-	    { // no flags, weights, all analyses
-	      TransducerW C(f, header, alphabet);
-	      runTransducer(C);
-	    }
-	}
-    } else // handle flag diacritics
+  {      // if the state size is zero, there are no flag diacritics to handle
+    if (header.probe_flag(Weighted) == false)
     {
-      if (header.probe_flag(Weighted) == false)
-	{
-	  if (displayUniqueFlag)
-	    { // flags, no weights, unique analyses only
-	      TransducerFdUniq C(f, header, alphabet);
-	      runTransducer(C);
-	    } else
-	    { // flags, no weights, all analyses
-	      TransducerFd C(f, header, alphabet);
-	      runTransducer(C);
-	    }
-	}
-      else if (header.probe_flag(Weighted) == true)
-	{
-	  if (displayUniqueFlag)
-	    { // flags, weights, unique analyses only
-	      TransducerWFdUniq C(f, header, alphabet);
-	      runTransducer(C);
-	    } else
-	    { // flags, no weights, all analyses
-	      TransducerWFd C(f, header, alphabet);
-	      runTransducer(C);
-	    }
-	}
+      if (displayUniqueFlag)  // no flags, no weights, unique analyses only
+        t = new TransducerUniq(is, header, alphabet); 
+      else // no flags, no weights, all analyses
+	      t = new Transducer(is, header, alphabet);
     }
+    else
+    {
+      if (displayUniqueFlag) // no flags, weights, unique analyses only
+        t = new TransducerWUniq(is, header, alphabet);
+      else // no flags, weights, all analyses
+        t = new TransducerW(is, header, alphabet);
+    }
+  }
+  else // handle flag diacritics
+  {
+    if (header.probe_flag(Weighted) == false)
+    {
+      if (displayUniqueFlag) // flags, no weights, unique analyses only
+        t = new TransducerFdUniq(is, header, alphabet);
+      else // flags, no weights, all analyses
+        t = new TransducerFd(is, header, alphabet);
+    }
+    else
+    {
+      if (displayUniqueFlag) // flags, weights, unique analyses only
+        t = new TransducerWFdUniq(is, header, alphabet);
+      else // flags, weights, all analyses
+        t = new TransducerWFd(is, header, alphabet);
+    }
+  }
+  
+  return t;
+}
+
+int setup(std::ifstream& is)
+{
+  AbstractTransducer* t = load_transducer(is);
+  is.close();
+  
+  if(do_tokenize_flag)
+  {
+    TokenIOStream token_stream(std::cin, std::cout, t->get_alphabet());
+    t->tokenize(token_stream);
+  }
+  else if(do_proc_flag)
+  {
+    TokenIOStream token_stream(std::cin, std::cout, t->get_alphabet());
+    t->run_lookup(token_stream);
+  }
+  else
+    runTransducer(*t);
+  
+  delete t;
+  
   return 0;
 }
 
 /**
  * BEGIN old transducer.cc
  */
+
+LookupPath* Transducer::get_initial_path() const
+{
+  return new LookupPath(START_INDEX);
+}
+LookupPath* TransducerFd::get_initial_path() const 
+{
+  return new LookupPathFd(START_INDEX, operations);
+}
+LookupPath* TransducerW::get_initial_path() const
+{
+  return new LookupPathW(START_INDEX);
+}
+LookupPath* TransducerWFd::get_initial_path() const
+{
+  return new LookupPathWFd(START_INDEX, operations);
+}
+
+void
+AbstractTransducer::analyze_iteratively(SymbolNumber* input_string)
+{
+  LookupState lookup(*this);
+  
+  if(printDebuggingInformationFlag)
+    std::cout << "Num paths after init: " << lookup.num_active() << std::endl;
+  
+  while(*input_string != NO_SYMBOL_NUMBER && lookup.is_active())
+  {
+    if(printDebuggingInformationFlag)
+      std::cout << "Num paths before stepping: " << lookup.num_active() << std::endl;
+    lookup.step(*input_string);
+    input_string++;
+    if(printDebuggingInformationFlag)
+      std::cout << "Num paths after stepping: " << lookup.num_active() << std::endl;
+  }
+  
+  const LookupPathVector finals = lookup.get_finals();
+  
+  if(printDebuggingInformationFlag)
+    std::cout << "Done stepping. Num finals: " << finals.size() << std::endl;
+  
+  LookupPathVector analyses = lookup.get_finals();
+  for(LookupPathVector::const_iterator it=analyses.begin(); 
+        it!=analyses.end(); it++)
+  {
+    note_analysis(*(*it));
+  }
+}
 
 bool TransducerFd::PushState(FlagDiacriticOperation op)
 { // try to alter the flag diacritic state stack
@@ -566,52 +737,6 @@ bool Transition::matches(SymbolNumber s) const
   return input_symbol == s;
 }
 
-
-void IndexTableReader::get_index_vector(void)
-{
-  for (size_t i = 0;
-       i < number_of_table_entries;
-       ++i)
-    {
-      size_t j = i * TransitionIndex::SIZE;
-      SymbolNumber * input = (SymbolNumber*)(TableIndices + j);
-      TransitionTableIndex * index = 
-	(TransitionTableIndex*)(TableIndices + j + sizeof(SymbolNumber));
-      indices.push_back(new TransitionIndex(*input,*index));
-    }
-}
-
-void TransitionTableReader::get_transition_vector(void)
-{
-  for (size_t i = 0; i < number_of_table_entries; ++i)
-    {
-      size_t j = i * Transition::SIZE;
-      SymbolNumber * input = (SymbolNumber*)(TableTransitions + j);
-      SymbolNumber * output = 
-	(SymbolNumber*)(TableTransitions + j + sizeof(SymbolNumber));
-      TransitionTableIndex * target = 
-       (TransitionTableIndex*)(TableTransitions + j + 2 * sizeof(SymbolNumber));
-      transitions.push_back(new Transition(*input,
-					   *output,
-					   *target));
-      
-    }
-}
-
-
-void Transducer::set_symbol_table(void)
-{
-  for(KeyTable::iterator it = keys->begin();
-      it != keys->end();
-      ++it)
-    {
-      const char * key_name =
-	it->second;
-
-      symbol_table.push_back(key_name);
-    }
-}
-
 void Transducer::try_epsilon_transitions(SymbolNumber * input_symbol,
 					 SymbolNumber * output_symbol,
 					 SymbolNumber * original_output_string,
@@ -620,13 +745,13 @@ void Transducer::try_epsilon_transitions(SymbolNumber * input_symbol,
 #if OL_FULL_DEBUG
   std::cout << "try_epsilon_transitions " << i << std::endl;
 #endif
-  while (transitions[i]->get_input() == 0)
+  while (get_transition(i).get_input() == 0)
     {
-      *output_symbol = transitions[i]->get_output();
+      *output_symbol = get_transition(i).get_output();
       get_analyses(input_symbol,
 		   output_symbol+1,
 		   original_output_string,
-		   transitions[i]->target());
+		   get_transition(i).target());
       ++i;
     }
 }
@@ -642,36 +767,36 @@ void TransducerFd::try_epsilon_transitions(SymbolNumber * input_symbol,
   
   while (true)
     {
-    if (transitions[i]->get_input() == 0) // epsilon
+    if (get_transition(i).get_input() == 0) // epsilon
 	{
-	  *output_symbol = transitions[i]->get_output();
+	  *output_symbol = get_transition(i).get_output();
 	  get_analyses(input_symbol,
 		       output_symbol+1,
 		       original_output_string,
-		       transitions[i]->target());
+		       get_transition(i).target());
 	  ++i;
-	} else if (transitions[i]->get_input() != NO_SYMBOL_NUMBER &&
-		   operations[transitions[i]->get_input()].isFlag())
+	} else if (get_transition(i).get_input() != NO_SYMBOL_NUMBER &&
+		   operations[get_transition(i).get_input()].isFlag())
 	{
-	  if (PushState(operations[transitions[i]->get_input()]))
+	  if (PushState(operations[get_transition(i).get_input()]))
 	    {
 #if OL_FULL_DEBUG
 	      std::cout << "flag diacritic " <<
-		symbol_table[transitions[i]->get_input()] << " allowed\n";
+		alphabet.symbol_to_string(get_transition(i).get_input()) << " allowed\n";
 #endif
 	      // flag diacritic allowed
-	      *output_symbol = transitions[i]->get_output();
+	      *output_symbol = get_transition(i).get_output();
 	      get_analyses(input_symbol,
 			   output_symbol+1,
 			   original_output_string,
-			   transitions[i]->target());
+			   get_transition(i).target());
 	      statestack.pop_back();
 	    }
 	  else
 	    {
 #if OL_FULL_DEBUG
 	      std::cout << "flag diacritic " <<
-		symbol_table[transitions[i]->get_input()] << " disallowed\n";
+		alphabet.symbol_to_string(get_transition(i).get_input()) << " disallowed\n";
 #endif
 	    }
 	  ++i;
@@ -690,12 +815,12 @@ void Transducer::try_epsilon_indices(SymbolNumber * input_symbol,
 #if OL_FULL_DEBUG
   std::cout << "try_epsilon_indices " << i << std::endl;
 #endif
-  if (indices[i]->get_input() == 0)
+  if (get_index(i).get_input() == 0)
     {
       try_epsilon_transitions(input_symbol,
 			      output_symbol,
 			      original_output_string,
-			      indices[i]->target() - 
+			      get_index(i).target() - 
 			      TRANSITION_TARGET_TABLE_START);
     }
 }
@@ -707,19 +832,19 @@ void Transducer::find_transitions(SymbolNumber input,
 				    TransitionTableIndex i)
 {
 #if OL_FULL_DEBUG
-  std::cout << "find_transitions " << i << "\t" << transitions[i]->get_input() << std::endl;
+  std::cout << "find_transitions " << i << "\t" << get_transition(i).get_input() << std::endl;
 #endif
 
-  while (transitions[i]->get_input() != NO_SYMBOL_NUMBER)
+  while (get_transition(i).get_input() != NO_SYMBOL_NUMBER)
     {
-      if (transitions[i]->get_input() == input)
+      if (get_transition(i).get_input() == input)
 	{
 	  
-	  *output_symbol = transitions[i]->get_output();
+	  *output_symbol = get_transition(i).get_output();
 	  get_analyses(input_symbol,
 		       output_symbol+1,
 		       original_output_string,
-		       transitions[i]->target());
+		       get_transition(i).target());
 	}
       else
 	{
@@ -736,15 +861,15 @@ void Transducer::find_index(SymbolNumber input,
 			    TransitionTableIndex i)
 {
 #if OL_FULL_DEBUG
-  std::cout << "find_index " << i << "\t" << indices[i+input]->get_input() << std::endl;
+  std::cout << "find_index " << i << "\t" << get_index(i+input).get_input() << std::endl;
 #endif
-  if (indices[i+input]->get_input() == input)
+  if (get_index(i+input).get_input() == input)
     {
       find_transitions(input,
 		       input_symbol,
 		       output_symbol,
 		       original_output_string,
-		       indices[i+input]->target() - 
+		       get_index(i+input).target() - 
 		       TRANSITION_TARGET_TABLE_START);
     }
 }
@@ -755,18 +880,22 @@ void Transducer::note_analysis(SymbolNumber * whole_output_string)
     {
       for (SymbolNumber * num = whole_output_string; *num != NO_SYMBOL_NUMBER; ++num)
 	{
-	  std::cout << symbol_table[*num];
+	  std::cout << alphabet.symbol_to_string(*num);
 	}
       std::cout << std::endl;
     } else
     {
       std::string str = "";
       for (SymbolNumber * num = whole_output_string; *num != NO_SYMBOL_NUMBER; ++num)
-	{
-	  str.append(symbol_table[*num]);
-	}
+      {
+        str.append(alphabet.symbol_to_string(*num));
+      }
       display_vector.push_back(str);
     }
+}
+void Transducer::note_analysis(const LookupPath& path)
+{
+  display_vector.push_back(alphabet.symbols_to_string(path.get_output_symbols()));
 }
 
 void TransducerUniq::note_analysis(SymbolNumber * whole_output_string)
@@ -774,9 +903,13 @@ void TransducerUniq::note_analysis(SymbolNumber * whole_output_string)
   std::string str = "";
   for (SymbolNumber * num = whole_output_string; *num != NO_SYMBOL_NUMBER; ++num)
     {
-      str.append(symbol_table[*num]);
+      str.append(alphabet.symbol_to_string(*num));
     }
   display_vector.insert(str);
+}
+void TransducerUniq::note_analysis(const LookupPath& path)
+{
+  display_vector.insert(alphabet.symbols_to_string(path.get_output_symbols()));
 }
 
 void TransducerFdUniq::note_analysis(SymbolNumber * whole_output_string)
@@ -784,9 +917,13 @@ void TransducerFdUniq::note_analysis(SymbolNumber * whole_output_string)
   std::string str = "";
   for (SymbolNumber * num = whole_output_string; *num != NO_SYMBOL_NUMBER; ++num)
     {
-      str.append(symbol_table[*num]);
+      str.append(alphabet.symbol_to_string(*num));
     }
   display_vector.insert(str);
+}
+void TransducerFdUniq::note_analysis(const LookupPath& path)
+{
+  display_vector.insert(alphabet.symbols_to_string(path.get_output_symbols()));
 }
 
 void Transducer::get_analyses(SymbolNumber * input_symbol,
@@ -814,7 +951,7 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
       if (*input_symbol == NO_SYMBOL_NUMBER)
 	{
 	  *output_symbol = NO_SYMBOL_NUMBER;
-	  if (transitions[i]->final())
+	  if (get_transition(i).final())
 	    {
 	      note_analysis(original_output_string);
 	    }
@@ -845,7 +982,7 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
       if (*input_symbol == NO_SYMBOL_NUMBER)
 	{ // input-string ended.
 	  *output_symbol = NO_SYMBOL_NUMBER;
-	  if (indices[i]->final())
+	  if (get_index(i).final())
 	    {
 	      note_analysis(original_output_string);
 	    }
@@ -1009,41 +1146,6 @@ bool TransducerWFd::PushState(FlagDiacriticOperation op)
   throw; // for the compiler's peace of mind
 }
 
-void IndexTableReaderW::get_index_vector(void)
-{
-  for (size_t i = 0;
-       i < number_of_table_entries;
-       ++i)
-    {
-      size_t j = i * TransitionWIndex::SIZE;
-      SymbolNumber * input = (SymbolNumber*)(TableIndices + j);
-      TransitionTableIndex * index = 
-	(TransitionTableIndex*)(TableIndices + j + sizeof(SymbolNumber));
-      indices.push_back(new TransitionWIndex(*input,*index));
-    }
-}
-
-void TransitionTableReaderW::get_transition_vector(void)
-{
-  for (size_t i = 0; i < number_of_table_entries; ++i)
-    {
-      size_t j = i * TransitionW::SIZE;
-      SymbolNumber * input = (SymbolNumber*)(TableTransitions + j);
-      SymbolNumber * output = 
-	(SymbolNumber*)(TableTransitions + j + sizeof(SymbolNumber));
-      TransitionTableIndex * target = 
-	(TransitionTableIndex*)(TableTransitions + j + 2 * sizeof(SymbolNumber));
-      Weight * weight =
-	(Weight*)(TableTransitions + j + 2 * sizeof(SymbolNumber) + sizeof(TransitionTableIndex));
-      transitions.push_back(new TransitionW(*input,
-					    *output,
-					    *target,
-					    *weight));
-      
-    }
-  transitions.push_back(new TransitionW());
-  transitions.push_back(new TransitionW());
-}
 
 void TransducerW::try_epsilon_transitions(SymbolNumber * input_symbol,
 					  SymbolNumber * output_symbol,
@@ -1055,20 +1157,20 @@ void TransducerW::try_epsilon_transitions(SymbolNumber * input_symbol,
   std::cerr << "try epsilon transitions " << i << " " << current_weight << std::endl;
 #endif
 
-  if (transitions.size() <= i) 
+  if (transition_table.size() <= i) 
     {
       return;
     }
 
-  while ((transitions[i] != NULL) and (transitions[i]->get_input() == 0))
+  while (get_transition(i).get_input() == 0)
     {
-      *output_symbol = transitions[i]->get_output();
-      current_weight += static_cast<TransitionW*>(transitions[i])->get_weight();
+      *output_symbol = get_transition(i).get_output();
+      current_weight += static_cast<const TransitionW&>(get_transition(i)).get_weight();
       get_analyses(input_symbol,
 		   output_symbol+1,
 		   original_output_string,
-		   transitions[i]->target());
-      current_weight -= static_cast<TransitionW*>(transitions[i])->get_weight();
+		   get_transition(i).target());
+      current_weight -= static_cast<const TransitionW&>(get_transition(i)).get_weight();
       ++i;
     }
   *output_symbol = NO_SYMBOL_NUMBER;
@@ -1080,45 +1182,45 @@ void TransducerWFd::try_epsilon_transitions(SymbolNumber * input_symbol,
 					    original_output_string,
 					    TransitionTableIndex i)
 {
-  if (transitions.size() <= i)
+  if (transition_table.size() <= i)
     { return; }
   
   while (true)
     {
-    if (transitions[i]->get_input() == 0) // epsilon
+    if (get_transition(i).get_input() == 0) // epsilon
 	{
-	  *output_symbol = transitions[i]->get_output();
-	  current_weight += static_cast<TransitionW*>(transitions[i])->get_weight();
+	  *output_symbol = get_transition(i).get_output();
+	  current_weight += static_cast<const TransitionW&>(get_transition(i)).get_weight();
 	  get_analyses(input_symbol,
 		       output_symbol+1,
 		       original_output_string,
-		       transitions[i]->target());
-	  current_weight += static_cast<TransitionW*>(transitions[i])->get_weight();
+		       get_transition(i).target());
+	  current_weight += static_cast<const TransitionW&>(get_transition(i)).get_weight();
 	  ++i;
-	} else if (transitions[i]->get_input() != NO_SYMBOL_NUMBER &&
-		   operations[transitions[i]->get_input()].isFlag())
+	} else if (get_transition(i).get_input() != NO_SYMBOL_NUMBER &&
+		   operations[get_transition(i).get_input()].isFlag())
 	{
-	  if (PushState(operations[transitions[i]->get_input()]))
+	  if (PushState(operations[get_transition(i).get_input()]))
 	    {
 #if OL_FULL_DEBUG
 	      std::cout << "flag diacritic " <<
-		symbol_table[transitions[i]->get_input()] << " allowed\n";
+		alphabet.symbol_to_string(get_transition(i).get_input()) << " allowed\n";
 #endif
 	      // flag diacritic allowed
-	      *output_symbol = transitions[i]->get_output();
-	      current_weight += static_cast<TransitionW*>(transitions[i])->get_weight();
+	      *output_symbol = get_transition(i).get_output();
+	      current_weight += static_cast<const TransitionW&>(get_transition(i)).get_weight();
 	      get_analyses(input_symbol,
 			   output_symbol+1,
 			   original_output_string,
-			   transitions[i]->target());
-	      current_weight -= static_cast<TransitionW*>(transitions[i])->get_weight();
+			   get_transition(i).target());
+	      current_weight -= static_cast<const TransitionW&>(get_transition(i)).get_weight();
 	      statestack.pop_back();
 	    }
 	  else
 	    {
 #if OL_FULL_DEBUG
 	      std::cout << "flag diacritic " <<
-		symbol_table[transitions[i]->get_input()] << " disallowed\n";
+		alphabet.symbol_to_string(get_transition(i).get_input()) << " disallowed\n";
 #endif
 	    }
 	  ++i;
@@ -1137,12 +1239,12 @@ void TransducerW::try_epsilon_indices(SymbolNumber * input_symbol,
 #if OL_FULL_DEBUG
   std::cerr << "try indices " << i << " " << current_weight << std::endl;
 #endif
-  if (indices[i]->get_input() == 0)
+  if (get_index(i).get_input() == 0)
     {
       try_epsilon_transitions(input_symbol,
 			      output_symbol,
 			      original_output_string,
-			      indices[i]->target() - 
+			      get_index(i).target() - 
 			      TRANSITION_TARGET_TABLE_START);
     }
 }
@@ -1157,22 +1259,22 @@ void TransducerW::find_transitions(SymbolNumber input,
   std::cerr << "find transitions " << i << " " << current_weight << std::endl;
 #endif
 
-  if (transitions.size() <= i) 
+  if (transition_table.size() <= i) 
     {
       return;
     }
-  while (transitions[i]->get_input() != NO_SYMBOL_NUMBER)
+  while (get_transition(i).get_input() != NO_SYMBOL_NUMBER)
     {
       
-      if (transitions[i]->get_input() == input)
+      if (get_transition(i).get_input() == input)
 	{
-	  current_weight += static_cast<TransitionW*>(transitions[i])->get_weight();
-	  *output_symbol = transitions[i]->get_output();
+	  current_weight += static_cast<const TransitionW&>(get_transition(i)).get_weight();
+	  *output_symbol = get_transition(i).get_output();
 	  get_analyses(input_symbol,
 		       output_symbol+1,
 		       original_output_string,
-		       transitions[i]->target());
-	  current_weight -= static_cast<TransitionW*>(transitions[i])->get_weight();
+		       get_transition(i).target());
+	  current_weight -= static_cast<const TransitionW&>(get_transition(i)).get_weight();
 	}
       else
 	{
@@ -1192,19 +1294,19 @@ void TransducerW::find_index(SymbolNumber input,
 #if OL_FULL_DEBUG
   std::cerr << "find index " << i << " " << current_weight << std::endl;
 #endif
-  if (indices.size() <= i) 
+  if (index_table.size() <= i) 
     {
       return;
     }
   
-  if (indices[i+input]->get_input() == input)
+  if (get_index(i+input).get_input() == input)
     {
       
       find_transitions(input,
 		       input_symbol,
 		       output_symbol,
 		       original_output_string,
-		       indices[i+input]->target() - 
+		       get_index(i+input).target() - 
 		       TRANSITION_TARGET_TABLE_START);
     }
 }
@@ -1216,9 +1318,15 @@ void TransducerW::note_analysis(SymbolNumber * whole_output_string)
        *num != NO_SYMBOL_NUMBER;
        ++num)
     {
-      str.append(symbol_table[*num]);
+      str.append(alphabet.symbol_to_string(*num));
     }
   display_map.insert(std::pair<Weight, std::string>(current_weight, str));
+}
+void TransducerW::note_analysis(const LookupPath& path)
+{
+  display_map.insert(std::pair<Weight, std::string>(
+    static_cast<const LookupPathW&>(path).get_weight(),
+    alphabet.symbols_to_string(path.get_output_symbols())));
 }
 
 void TransducerWUniq::note_analysis(SymbolNumber * whole_output_string)
@@ -1228,12 +1336,20 @@ void TransducerWUniq::note_analysis(SymbolNumber * whole_output_string)
        *num != NO_SYMBOL_NUMBER;
        ++num)
     {
-      str.append(symbol_table[*num]);
+      str.append(alphabet.symbol_to_string(*num));
     }
   if ((display_map.count(str) == 0) || (display_map[str] > current_weight))
     { // if there isn't an entry yet or we've found a lower weight
       display_map.insert(std::pair<std::string, Weight>(str, current_weight));
     }
+}
+void TransducerWUniq::note_analysis(const LookupPath& path)
+{
+  std::string str = alphabet.symbols_to_string(path.get_output_symbols());
+  const LookupPathW& p = static_cast<const LookupPathW&>(path);
+  
+  if((display_map.count(str) == 0) || (display_map[str] > p.get_weight()))
+    display_map.insert(std::pair<std::string, Weight>(str, p.get_weight()));
 }
 
 void TransducerWFdUniq::note_analysis(SymbolNumber * whole_output_string)
@@ -1243,13 +1359,22 @@ void TransducerWFdUniq::note_analysis(SymbolNumber * whole_output_string)
        *num != NO_SYMBOL_NUMBER;
        ++num)
     {
-      str.append(symbol_table[*num]);
+      str.append(alphabet.symbol_to_string(*num));
     }
   if ((display_map.count(str) == 0) || (display_map[str] > current_weight))
     { // if there isn't an entry yet or we've found a lower weight
       display_map.insert(std::pair<std::string, Weight>(str, current_weight));
     }
 }
+void TransducerWFdUniq::note_analysis(const LookupPath& path)
+{
+  std::string str = alphabet.symbols_to_string(path.get_output_symbols());
+  const LookupPathWFd& p = static_cast<const LookupPathWFd&>(path);
+  
+  if((display_map.count(str) == 0) || (display_map[str] > p.get_weight()))
+    display_map.insert(std::pair<std::string, Weight>(str, p.get_weight()));
+}
+
 
 void TransducerW::printAnalyses(std::string prepend)
 {
@@ -1372,11 +1497,11 @@ void TransducerW::get_analyses(SymbolNumber * input_symbol,
       if (*input_symbol == NO_SYMBOL_NUMBER)
 	{
 	  *output_symbol = NO_SYMBOL_NUMBER;
-	  if (transitions.size() <= i) 
+	  if (transition_table.size() <= i) 
 	    {
 	      return;
 	    }
-	  if (transitions[i]->final())
+	  if (get_transition(i).final())
 	    {
 	      current_weight += get_final_transition_weight(i);
 	      note_analysis(original_output_string);
@@ -1406,7 +1531,7 @@ void TransducerW::get_analyses(SymbolNumber * input_symbol,
       if (*input_symbol == NO_SYMBOL_NUMBER)
 	{
 	  *output_symbol = NO_SYMBOL_NUMBER;
-	  if (indices[i]->final())
+	  if (get_index(i).final())
 	    {
 	      current_weight += get_final_index_weight(i);
 	      note_analysis(original_output_string);
