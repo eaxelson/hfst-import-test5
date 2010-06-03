@@ -227,7 +227,6 @@ namespace hfst
 
   HfstTransducer::HfstTransducer(const HfstTransducer &another):
     type(another.type),anonymous(another.anonymous),is_trie(another.is_trie)
-    //, key_table(another.key_table)
   {
     switch (type)
       {
@@ -254,7 +253,7 @@ namespace hfst
 
   HfstTransducer::HfstTransducer(const HfstMutableTransducer &another):
     type(TROPICAL_OFST_TYPE), anonymous(another.transducer.anonymous), 
-    is_trie(another.transducer.is_trie) // key_table(another.transducer.key_table) 
+    is_trie(another.transducer.is_trie)
   {
     implementation.tropical_ofst =
       tropical_ofst_interface.copy(another.transducer.implementation.tropical_ofst);
@@ -284,7 +283,7 @@ namespace hfst
       }
   }
 
-  // for testing
+
 HfstTransducer::HfstTransducer(const std::string &symbol, ImplementationType type): 
 type(type),anonymous(false),is_trie(false)
   {
@@ -638,7 +637,6 @@ void HfstTransducer::test_minimize()
   HfstTransducer &HfstTransducer::compose
   (HfstTransducer &another)
   { is_trie = false;
-    //harmonize(another);
     return apply(&hfst::implementations::SfstTransducer::compose,
 		 &hfst::implementations::TropicalWeightTransducer::compose,
 		 &hfst::implementations::LogWeightTransducer::compose,
@@ -648,7 +646,6 @@ void HfstTransducer::test_minimize()
   HfstTransducer &HfstTransducer::concatenate
   (HfstTransducer &another)
   { is_trie = false; // This could be done so that is_trie is preserved
-    //harmonize(another);
     return apply(&hfst::implementations::SfstTransducer::concatenate,
 		 &hfst::implementations::TropicalWeightTransducer::concatenate,
 		 &hfst::implementations::LogWeightTransducer::concatenate,
@@ -686,7 +683,7 @@ void HfstTransducer::test_minimize()
   }
 
   HfstTransducer &HfstTransducer::n_best
-  (int n)
+  (unsigned int n)
   {
     ImplementationType original_type = this->type;
     if (original_type == SFST_TYPE || original_type == FOMA_TYPE)
@@ -698,7 +695,7 @@ void HfstTransducer::test_minimize()
 	{
 	  fst::StdVectorFst * temp =
 	    hfst::implementations::TropicalWeightTransducer::n_best
-	    (implementation.tropical_ofst,n);
+	    (implementation.tropical_ofst,(int)n);
 	  delete implementation.tropical_ofst;
 	  implementation.tropical_ofst = temp;
 	  return *this;
@@ -708,7 +705,7 @@ void HfstTransducer::test_minimize()
 	{
 	  hfst::implementations::LogFst * temp =
 	    hfst::implementations::LogWeightTransducer::n_best
-	    (implementation.log_ofst,n);
+	    (implementation.log_ofst,(int)n);
 	  delete implementation.log_ofst;
 	  implementation.log_ofst = temp;
 	  return *this;

@@ -66,10 +66,10 @@ namespace hfst
     void add_multichar_symbol(const std::string& symbol);
 			      //KeyTable &key_table);
 
-    /** \brief Tokenize the string \a input string. */
+    /** \brief Tokenize the string \a input_string. */
     StringPairVector * tokenize(const std::string &input_string) const;
     //KeyTable &key_table) const;
-    /** \brief Tokenize the string pair \a input_string \a output_string. */
+    /** \brief Tokenize the string pair \a input_string : \a output_string. */
     StringPairVector * tokenize(const std::string &input_string,
 				const std::string &output_string) const;
     //KeyTable &key_table) const;

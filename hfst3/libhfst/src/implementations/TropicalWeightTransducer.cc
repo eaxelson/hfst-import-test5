@@ -417,7 +417,7 @@ namespace hfst { namespace implementations
 	else  // line could not be parsed
 	  {
 	    printf("ERROR: in AT&T file: line: \"%s\"\n", line);
-	    throw NotValidAttFormat();
+	    throw NotValidAttFormatException();
 	  }
 
       }
