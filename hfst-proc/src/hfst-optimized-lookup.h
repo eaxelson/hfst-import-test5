@@ -22,12 +22,11 @@
   SO THE CURRENT STRUCTURE IS NOT SO GREAT. TODO: FIX THIS.
  */
  
-//BSC added
 #ifndef _HFST_OPTIMIZED_LOOKUP_H_
 #define _HFST_OPTIMIZED_LOOKUP_H_
 
 #include <getopt.h>
-#include <cstdio>
+#include <fstream>
 #include <vector>
 #include <map>
 #include <set>
@@ -35,7 +34,6 @@
 #include <climits>
 #include <cstring>
 #include <cassert>
-#include <ctime>
 #include <iostream>
 
 #ifdef HAVE_CONFIG_H
@@ -43,6 +41,18 @@
 #endif
 
 #define OL_FULL_DEBUG 0
+
+class LookupPath;
+
+/**
+ * A list of pointers to lookup paths. They are pointers for the sake of
+ * polymorphism
+ */
+typedef std::vector<LookupPath*> LookupPathVector;
+
+class TokenIOStream;
+class Token;
+typedef std::vector<Token> TokenVector;
 
 enum OutputType {HFST, xerox};
 extern OutputType outputType;
@@ -66,11 +76,10 @@ typedef unsigned short SymbolNumber;
 typedef unsigned int TransitionTableIndex;
 typedef unsigned int TransitionNumber;
 typedef unsigned int StateIdNumber;
-typedef unsigned int ArcNumber;
 typedef short ValueNumber;
 typedef std::vector<SymbolNumber> SymbolNumberVector;
-typedef std::map<SymbolNumber,const char*> KeyTable;
- 
+typedef std::map<SymbolNumber, std::string> SymbolTable;
+
 const StateIdNumber NO_ID_NUMBER = UINT_MAX;
 const SymbolNumber NO_SYMBOL_NUMBER = USHRT_MAX;
 const TransitionTableIndex NO_TABLE_INDEX = UINT_MAX;
@@ -115,63 +124,40 @@ class TransducerHeader
   bool has_input_epsilon_cycles;
   bool has_unweighted_input_epsilon_cycles;
 
-  void read_property(bool &property, FILE * f)
+  void read_property(bool& property, std::istream& is)
   {
     unsigned int prop;
-    unsigned int ret;
-    ret = fread(&prop,sizeof(unsigned int),1,f);
-    if (prop == 0)
-      {
-	property = false;
-	return;
-      }
-    else
-      {
-	property = true;
-	return;
-      }
-    std::cerr << "Could not parse transducer; wrong or corrupt file?" << std::endl;
-    exit(1);
+    is.read(reinterpret_cast<char*>(&prop), sizeof(unsigned int));
+    
+    property = (prop != 0);
   }
 
  public:
-  TransducerHeader(FILE * f)
-    {
-      // The silly compiler complains about not catching the return value
-      // of fread(). Hence this dummy variable is needed.
-      size_t val;
+  TransducerHeader(std::istream& is)
+  {
+  	is.read(reinterpret_cast<char*>(&number_of_input_symbols), sizeof(SymbolNumber));
+  	is.read(reinterpret_cast<char*>(&number_of_symbols), sizeof(SymbolNumber));
+  	is.read(reinterpret_cast<char*>(&size_of_transition_index_table), sizeof(TransitionTableIndex));
+  	is.read(reinterpret_cast<char*>(&size_of_transition_target_table), sizeof(TransitionTableIndex));
+  	is.read(reinterpret_cast<char*>(&number_of_states), sizeof(StateIdNumber));
+  	is.read(reinterpret_cast<char*>(&number_of_transitions), sizeof(TransitionNumber));
+  	
+  	read_property(weighted, is);
+  	read_property(deterministic, is);
+    read_property(input_deterministic, is);
+    read_property(minimized, is);
+    read_property(cyclic, is);
+    read_property(has_epsilon_epsilon_transitions, is);
+    read_property(has_input_epsilon_transitions, is);
+    read_property(has_input_epsilon_cycles, is);
+    read_property(has_unweighted_input_epsilon_cycles, is);
+  }
 
-      val = fread(&number_of_input_symbols,sizeof(SymbolNumber),1,f);
-      val = fread(&number_of_symbols,sizeof(SymbolNumber),1,f);
-
-      val = fread(&size_of_transition_index_table,sizeof(TransitionTableIndex),1,f);
-      val = fread(&size_of_transition_target_table,sizeof(TransitionTableIndex),1,f);
-
-      val = fread(&number_of_states,sizeof(StateIdNumber),1,f);
-      val = fread(&number_of_transitions,sizeof(TransitionNumber),1,f);
-
-      read_property(weighted,f);
-
-      read_property(deterministic,f);
-      read_property(input_deterministic,f);
-      read_property(minimized,f);
-      read_property(cyclic,f);
-      read_property(has_epsilon_epsilon_transitions,f);
-      read_property(has_input_epsilon_transitions,f);
-      read_property(has_input_epsilon_cycles,f);
-      read_property(has_unweighted_input_epsilon_cycles,f);
-    }
-
-  SymbolNumber symbol_count(void)
-  { return number_of_symbols; }
-
-  SymbolNumber input_symbol_count(void)
-  { return number_of_input_symbols; }
-  TransitionTableIndex index_table_size(void)
-  { return size_of_transition_index_table; }
-
-  TransitionTableIndex target_table_size(void)
-  { return size_of_transition_target_table; }
+  SymbolNumber symbol_count(void) { return number_of_symbols; }
+  SymbolNumber input_symbol_count(void) { return number_of_input_symbols; }
+  
+  TransitionTableIndex index_table_size(void) { return size_of_transition_index_table; }
+  TransitionTableIndex target_table_size(void) { return size_of_transition_target_table; }
 
   bool probe_flag(HeaderFlag flag)
   {
@@ -188,6 +174,30 @@ class TransducerHeader
     }
     return false;
   }
+  
+#ifdef DEBUG
+  void print()
+  {
+    std::cout << "Transducer properties:" << std::endl
+              << " number_of_symbols: " << number_of_symbols << std::endl
+              << " number_of_input_symbols: " << number_of_input_symbols << std::endl
+              << " size_of_transition_index_table: " << size_of_transition_index_table << std::endl
+              << " size_of_transition_target_table: " << size_of_transition_target_table << std::endl
+
+              << " number_of_states: " << number_of_states << std::endl
+              << " number_of_transitions: " << number_of_transitions << std::endl
+
+              << " weighted: " << weighted << std::endl
+              << " deterministic: " << deterministic << std::endl
+              << " input_deterministic: " << input_deterministic << std::endl
+              << " minimized: " << minimized << std::endl
+              << " cyclic: " << cyclic << std::endl
+              << " has_epsilon_epsilon_transitions: " << has_epsilon_epsilon_transitions << std::endl
+              << " has_input_epsilon_transitions: " << has_input_epsilon_transitions << std::endl
+              << " has_input_epsilon_cycles: " << has_input_epsilon_cycles << std::endl
+              << " has_unweighted_input_epsilon_cycles: " << has_unweighted_input_epsilon_cycles << std::endl;
+  }
+#endif
   
 };
 
@@ -220,56 +230,6 @@ class FlagDiacriticOperation
 
 typedef std::vector<FlagDiacriticOperation> OperationVector;
 
-class TransducerAlphabet
-{
- private:
-  SymbolNumber number_of_symbols;
-  KeyTable * kt;
-  OperationVector operations;
-  std::vector<SymbolNumber> operation_peek;
-
-  void get_next_symbol(FILE * f, SymbolNumber k);
-
-  char * line;
-
-  std::map<std::string, SymbolNumber> feature_bucket;
-  std::map<std::string, ValueNumber> value_bucket;
-  ValueNumber val_num;
-  SymbolNumber feat_num;
- 
- public:
- TransducerAlphabet(FILE * f,SymbolNumber symbol_number):
-  number_of_symbols(symbol_number),
-    kt(new KeyTable),
-    operations(),
-    line((char*)(malloc(1000)))
-      {
-	feat_num = 0;
-	val_num = 1;
-	value_bucket[std::string()] = 0; // empty value = neutral
-	for (SymbolNumber k = 0; k < number_of_symbols; ++k)
-	  {
-	    get_next_symbol(f,k);
-	  }
-	// assume the first symbol is epsilon which we don't want to print
-	kt->operator[](0) = "";
-	free(line);
-      }
-  
-  KeyTable * get_key_table(void)
-  { return kt; }
-
-  OperationVector get_operation_vector(void)
-  { return operations; }
-
-  std::vector<SymbolNumber> get_operation_peek(void)
-    { return operation_peek; }
-
-  SymbolNumber get_state_size(void)
-  { return feature_bucket.size(); }
-  
-};
-
 class LetterTrie;
 typedef std::vector<LetterTrie*> LetterTrieVector;
 
@@ -280,42 +240,181 @@ class LetterTrie
   SymbolNumberVector symbols;
 
  public:
- LetterTrie(void):
-  letters(UCHAR_MAX, (LetterTrie*) NULL),
+  LetterTrie(void):
+    letters(UCHAR_MAX, (LetterTrie*) NULL),
     symbols(UCHAR_MAX,NO_SYMBOL_NUMBER)
-      {}
+  {}
+  
+  LetterTrie(const LetterTrie& o): symbols(o.symbols)
+  {
+    for(LetterTrieVector::const_iterator it=o.letters.begin(); it!=o.letters.end(); it++)
+      letters.push_back(((*it)==NULL) ? NULL : new LetterTrie(*(*it)));
+  }
+  
+  ~LetterTrie()
+  {
+    for(LetterTrieVector::iterator it=letters.begin(); it!=letters.end(); it++)
+      delete *it;
+  }
 
   void add_string(const char * p,SymbolNumber symbol_key);
 
   SymbolNumber find_key(char ** p) const;
-
+  
+  /**
+   * Read the next symbol from the stream. If the next character(s) do not form
+   * a symbol, this version will put the characters back, so the stream is in
+   * the same condition it was when this function was called
+   * @return the number of the symbol, 0 for EOF, or NO_SYMBOL_NUMBER
+   */
+  SymbolNumber extract_symbol(std::istream& is) const;
 };
 
-class Encoder {
-
+class Encoder
+{
  private:
   SymbolNumber number_of_input_symbols;
   LetterTrie letters;
   SymbolNumberVector ascii_symbols;
 
-  void read_input_symbols(KeyTable * kt);
+  void read_input_symbols(const SymbolTable& st);
 
  public:
- Encoder(KeyTable * kt, SymbolNumber input_symbol_count):
+ Encoder(const SymbolTable& st, SymbolNumber input_symbol_count):
   number_of_input_symbols(input_symbol_count),
     ascii_symbols(UCHAR_MAX,NO_SYMBOL_NUMBER)
+  {
+    read_input_symbols(st);
+    for(size_t i=0; i<ascii_symbols.size(); i++)
+    {
+      if(ascii_symbols[i] == 0)
       {
-	read_input_symbols(kt);
+        ascii_symbols[i] = NO_SYMBOL_NUMBER;
+        if(printDebuggingInformationFlag)
+          std::cout << "Encoder ignoring shortcut for ASCII character '" 
+                    << (char)i << "' (" << i << ")" << std::endl;
       }
+    }
+  }
   
   SymbolNumber find_key(char ** p) const;
+  SymbolNumber extract_symbol(std::istream& is) const;
+};
+
+class TransducerAlphabet
+{
+ private:
+  SymbolTable symbol_table;
+  OperationVector operations;
+  
+  /**
+   * The set of symbols that are considered alphabetic. Roughly, this includes
+   * symbols that are not whitespace or punctuation
+   */
+  std::set<SymbolNumber> alphabetic;
+  
+  /**
+   * The symbol number for a "blank" which is here considered to be a space.
+   * This symbol requires special handling because it doubles as the 
+   * symbolic representation for a superblank block of text
+   */
+  SymbolNumber blank_symbol;
+  
+  void get_next_symbol(std::istream& is, SymbolNumber k);
+  
+  /**
+   * Store the blank symbol's number in blank_symbol, adding it as a new symbol
+   * if it cannot be found
+   */
+  void setup_blank_symbol();
+  
+  void calculate_alphabetic();
+
+  std::map<std::string, SymbolNumber> feature_bucket;
+  std::map<std::string, ValueNumber> value_bucket;
+  ValueNumber val_num;
+  SymbolNumber feat_num;
+  
+  SymbolNumber add_symbol(std::string string)
+  {
+    return add_symbol(symbol_table.size(), string);
+  }
+  SymbolNumber add_symbol(SymbolNumber symbol, std::string string)
+  {
+    return add_symbol(symbol, string, FlagDiacriticOperation()); // use a dummy flag
+  }
+  SymbolNumber add_symbol(SymbolNumber symbol, std::string string, FlagDiacriticOperation fdo)
+  {
+    operations.push_back(fdo);
+    symbol_table[symbol] = string;
+    return symbol;
+  }
+  
+  Encoder* encoder;
+ 
+ public:
+  
+  TransducerAlphabet(std::istream& is, SymbolNumber symbol_count)
+  {
+    feat_num = 0;
+    val_num = 1;
+    value_bucket[std::string()] = 0; // empty value = neutral
+    for(SymbolNumber k=0; k<symbol_count; k++)
+      get_next_symbol(is, k);
+    
+    // assume the first symbol is epsilon which we don't want to print
+    symbol_table.operator[](0) = "";
+    
+    setup_blank_symbol();
+    calculate_alphabetic();
+    
+    encoder = new Encoder(symbol_table, symbol_table.size());
+  }
+  
+  TransducerAlphabet(const TransducerAlphabet& o):
+    symbol_table(o.symbol_table), operations(o.operations), alphabetic(o.alphabetic),
+    blank_symbol(o.blank_symbol), feature_bucket(o.feature_bucket),
+    value_bucket(o.value_bucket), val_num(o.val_num), feat_num(o.feat_num),
+    encoder(new Encoder(*o.encoder)) {}
+  
+  ~TransducerAlphabet()
+  {
+    delete encoder;
+  }
+  
+  SymbolTable& get_symbol_table(void) { return symbol_table; }
+  OperationVector get_operation_vector(void) { return operations; }
+  SymbolNumber get_state_size(void) const { return feature_bucket.size(); }
+  SymbolNumber get_blank_symbol() const {return blank_symbol;}
+  
+  bool is_punctuation(const char* c) const;
+  
+  bool is_alphabetic(const char* c) const
+  { return (strcmp(c,"")!=0 && !isspace(c[0]) && 
+            !is_punctuation(c)); }
+  bool is_alphabetic(SymbolNumber symbol) const 
+  {return (alphabetic.find(symbol) != alphabetic.end());}
+    
+  std::string symbol_to_string(SymbolNumber symbol) const
+  {
+    SymbolTable::const_iterator it = symbol_table.find(symbol);
+    return (it==symbol_table.end()) ? "" : symbol_table.find(symbol)->second;
+  }
+  
+  /**
+   * Use the symbol table to convert the given symbols into a string
+   * @param symbols the symbols to convert
+   * @return the string representation of the symbols
+   */
+  std::string symbols_to_string(const SymbolNumberVector& symbols) const;
+  
+  SymbolNumber find_key(char ** p) const {return encoder->find_key(p);}
+  SymbolNumber extract_symbol(std::istream& is) const 
+  {return encoder->extract_symbol(is);}
 };
 
 typedef std::vector<ValueNumber> FlagDiacriticState;
 typedef std::vector<FlagDiacriticState> FlagDiacriticStateStack;
-
-// GLOBAL FUNCTION, TODO: SUBSUME IN MAIN FOR SINGLE-FILE VERSION
-int setup(FILE * f);
 
 /*
  * BEGIN old transducer.h
@@ -341,22 +440,21 @@ class TransitionIndex
     input_symbol(input),
     first_transition_index(first_transition)
     {}
+  
+  TransitionIndex(std::istream& is)
+  {
+  	is.read(reinterpret_cast<char*>(&input_symbol), sizeof(SymbolNumber));
+  	is.read(reinterpret_cast<char*>(&first_transition_index), sizeof(TransitionTableIndex));
+  }
 
   bool matches(const SymbolNumber s) const;
   
-  TransitionTableIndex target(void) const
-  {
-    return first_transition_index;
-  }
+  TransitionTableIndex target(void) const {return first_transition_index;}
+  SymbolNumber get_input(void) const {return input_symbol;}
   
   virtual bool final(void) const
   {
     return first_transition_index == 1;
-  }
-  
-  SymbolNumber get_input(void) const
-  {
-    return input_symbol;
   }
 };
 
@@ -365,7 +463,6 @@ class Transition
  protected:
   SymbolNumber input_symbol;
   SymbolNumber output_symbol;
-
   TransitionTableIndex target_index;
 
  public:
@@ -377,33 +474,26 @@ class Transition
 
   Transition(SymbolNumber input, SymbolNumber output,
              TransitionTableIndex target):
-    input_symbol(input),
-    output_symbol(output),
-    target_index(target)
-  {}
+    input_symbol(input), output_symbol(output), target_index(target) {}
   
   Transition():
     input_symbol(NO_SYMBOL_NUMBER),
     output_symbol(NO_SYMBOL_NUMBER),
     target_index(NO_TABLE_INDEX)
   {}
+  
+  Transition(std::istream& is)
+  {
+  	is.read(reinterpret_cast<char*>(&input_symbol), sizeof(SymbolNumber));
+  	is.read(reinterpret_cast<char*>(&output_symbol), sizeof(SymbolNumber));
+  	is.read(reinterpret_cast<char*>(&target_index), sizeof(target_index));
+  }
 
   bool matches(const SymbolNumber s) const;
 
-  TransitionTableIndex target(void) const
-  {
-    return target_index;
-  }
-
-  SymbolNumber get_output(void) const
-  {
-    return output_symbol;
-  }
-
-  SymbolNumber get_input(void) const
-  {
-    return input_symbol;
-  }
+  TransitionTableIndex target(void) const {return target_index;}
+  SymbolNumber get_output(void) const {return output_symbol;}
+  SymbolNumber get_input(void) const {return input_symbol;}
   
   virtual bool final(void) const
   {
@@ -411,93 +501,109 @@ class Transition
   }
 };
 
-class IndexTableReader
+
+template <class T>
+class Table
 {
  protected:
-  TransitionTableIndex number_of_table_entries;
-  char * TableIndices;
-  TransitionIndexVector indices;
-  size_t table_size;
-  
- private:
-  void get_index_vector(void);
+  std::vector<T> table;
   
  public:
- IndexTableReader(TransitionTableIndex index_count):
-    number_of_table_entries(index_count) {}
+  Table(std::istream& is, TransitionTableIndex index_count)
+  {
+    for(size_t i=0; i<index_count; i++)
+      table.push_back(T(is));
+  }
     
- IndexTableReader(FILE * f,
-			 TransitionTableIndex index_count): 
-  number_of_table_entries(index_count)
-    {
-      table_size = number_of_table_entries*TransitionIndex::SIZE;
-      TableIndices = (char*)(malloc(table_size));
-
-      // This dummy variable is needed, since the compiler complains
-      // for not catching the return value of fread().
-      int dummy_number_of_bytes;
-
-      dummy_number_of_bytes = fread(TableIndices,table_size,1,f);
-      get_index_vector();
-    }
-    
-  virtual TransitionIndexVector& get_indices() {return indices;}
+  const T& operator[](unsigned int i) const
+  {
+    return (i < TRANSITION_TARGET_TABLE_START) ? 
+              table[i] : table[i-TRANSITION_TARGET_TABLE_START];
+  }
+  
+  unsigned int size() const {return table.size();}
 };
 
-class TransitionTableReader
-{
- protected:
-  TransitionTableIndex number_of_table_entries;
-  char * TableTransitions;
-  TransitionVector transitions;
-  size_t table_size;
-  size_t transition_size;
 
- private:
-  void get_transition_vector(void);
-  
- public:
-  TransitionTableReader(TransitionTableIndex transition_count):
-    number_of_table_entries(transition_count) {}
-  
- TransitionTableReader(FILE * f,
-            TransitionTableIndex transition_count):
-  number_of_table_entries(transition_count)
-      {
-        table_size = number_of_table_entries*Transition::SIZE;
-        TableTransitions = (char*)(malloc(table_size));
-        int bytes;
-        bytes = fread(TableTransitions,table_size,1,f);
-        get_transition_vector();
-      }
-
-  virtual TransitionVector& get_transitions() {return transitions;}  
-};
-
-class Transducer
+class AbstractTransducer
 {
  protected:
   TransducerHeader header;
   TransducerAlphabet alphabet;
-  KeyTable * keys;
-  IndexTableReader index_reader;
-  TransitionTableReader transition_reader;
-  Encoder encoder;
-  DisplayVector display_vector;
-
-  SymbolNumber * output_string;
-
+  
+  //Subclasses provide the index_table and transition_table
+  
   static const TransitionTableIndex START_INDEX = 0;
   
-  std::vector<const char*> symbol_table;
+  SymbolNumber* output_string;
   
-  TransitionIndexVector &indices;
+  virtual std::string process_finals(TokenIOStream& token_stream, const LookupPathVector& finals) const;
   
-  TransitionVector &transitions;
+  virtual void note_analysis(SymbolNumber * whole_output_string) = 0;
+  virtual void note_analysis(const LookupPath& path) = 0;
   
-  void set_symbol_table(void);
+  virtual void get_analyses(SymbolNumber * input_symbol,
+			    SymbolNumber * output_symbol,
+			    SymbolNumber * original_output_string,
+			    TransitionTableIndex i) = 0;
+  
+ public:
+  AbstractTransducer(TransducerHeader h, TransducerAlphabet a):
+    header(h), alphabet(a),
+    output_string((SymbolNumber*)(malloc(2000)))
+  {
+    for (int i = 0; i < 1000; ++i)
+      output_string[i] = NO_SYMBOL_NUMBER;
+  }
+  
+  virtual ~AbstractTransducer()
+  {
+    free(output_string);
+  }
+  
+  const TransducerAlphabet& get_alphabet() const {return alphabet;}
+  
+  void analyze(SymbolNumber * input_string)
+  {
+    get_analyses(input_string,output_string,output_string,START_INDEX);
+  }
+  
+  void analyze_iteratively(SymbolNumber* input_string);
+  
+  void tokenize(TokenIOStream& token_stream); // for testing
+  void run_lookup(TokenIOStream& token_stream);
+
+  virtual void printAnalyses(const std::string prepend) = 0;
+  
+  virtual bool is_epsilon(const Transition& transition) const
+  {
+    return transition.matches(0);
+  }
+  
+  /**
+   * Create a new lookup path appropriate for initializing a lookup opeation.
+   * Subclasses should override this to return the appropriate subclass of
+   * LookupPath
+   * @return a new lookup path pointing to the beginning of the transducer
+   */
+  virtual LookupPath* get_initial_path() const = 0;
+  
+  virtual const TransitionIndex& get_index(TransitionTableIndex i) const = 0;
+  virtual const Transition& get_transition(TransitionTableIndex i) const = 0;
+};
+
+class Transducer : public AbstractTransducer
+{
+ protected:
+  Table<TransitionIndex> index_table;
+  Table<Transition> transition_table;
+
+  DisplayVector display_vector;
+  
+  virtual LookupPath* get_initial_path() const;
 
   virtual void note_analysis(SymbolNumber * whole_output_string);
+  virtual void note_analysis(const LookupPath& path);
   
   void try_epsilon_indices(SymbolNumber * input_symbol,
 			   SymbolNumber * output_symbol,
@@ -526,64 +632,24 @@ class Transducer
 			    SymbolNumber * original_output_string,
 			    TransitionTableIndex i);
 
-
-  Transducer(TransducerHeader h, TransducerAlphabet a):
-    header(h), alphabet(a), keys(alphabet.get_key_table()),
-    index_reader(header.index_table_size()),
-    transition_reader(header.target_table_size()),
-    encoder(keys,header.input_symbol_count()),
-    output_string((SymbolNumber*)(malloc(2000))),
-    indices(index_reader.get_indices()),
-    transitions(transition_reader.get_transitions()) {}
  public:
- Transducer(FILE * f, TransducerHeader h, TransducerAlphabet a):
-  header(h),
-    alphabet(a),
-    keys(alphabet.get_key_table()),
-    index_reader(f,header.index_table_size()),
-    transition_reader(f,header.target_table_size()),
-    encoder(keys,header.input_symbol_count()),
-    display_vector(),
-    output_string((SymbolNumber*)(malloc(2000))),
-    indices(index_reader.get_indices()),
-    transitions(transition_reader.get_transitions())
-      {
-	for (int i = 0; i < 1000; ++i)
-	  {
-	    output_string[i] = NO_SYMBOL_NUMBER;
-	  }
-	set_symbol_table();
-      }
+  Transducer(std::istream& is, TransducerHeader h, TransducerAlphabet a):
+    AbstractTransducer(h, a),
+    index_table(is, header.index_table_size()),
+    transition_table(is, header.target_table_size()),
+    display_vector()
+  {
+  }
   
-  virtual ~Transducer() {}
-
-  SymbolNumber find_next_key(char ** p) const
-  {
-    return encoder.find_key(p);
-  }
-
-  void analyze(SymbolNumber * input_string)
-  {
-    get_analyses(input_string,output_string,output_string,START_INDEX);
-  }
-
   virtual void printAnalyses(const std::string prepend);
   
-  //BSC added
-  virtual bool is_epsilon(const Transition& transition) const
+  virtual const TransitionIndex& get_index(TransitionTableIndex i) const
   {
-    return transition.matches(0);
+    return index_table[i];
   }
-  
-  const TransitionIndex& get_index(TransitionTableIndex i) const
+  virtual const Transition& get_transition(TransitionTableIndex i) const
   {
-    assert(i < TRANSITION_TARGET_TABLE_START);
-    return *indices[i];
-  }
-  const Transition& get_transition(TransitionTableIndex i) const
-  {
-    return (i < TRANSITION_TARGET_TABLE_START) ? 
-              *transitions[i] : *transitions[i-TRANSITION_TARGET_TABLE_START];
+    return transition_table[i];
   }
 };
 
@@ -592,11 +658,10 @@ class TransducerUniq: public Transducer
  private:
   DisplaySet display_vector;
   void note_analysis(SymbolNumber * whole_output_string);
+  void note_analysis(const LookupPath& path);
  public:
- TransducerUniq(FILE * f, TransducerHeader h, TransducerAlphabet a):
-  Transducer(f, h, a),
-    display_vector()
-      {}
+  TransducerUniq(std::istream& is, TransducerHeader h, TransducerAlphabet a):
+    Transducer(is, h, a), display_vector() {}
   
   void printAnalyses(std::string prepend);
 };
@@ -605,6 +670,8 @@ class TransducerFd: public Transducer
 {
   FlagDiacriticStateStack statestack;
   OperationVector operations;
+  
+  virtual LookupPath* get_initial_path() const;
 
   void try_epsilon_transitions(SymbolNumber * input_symbol,
 			       SymbolNumber * output_symbol,
@@ -614,13 +681,11 @@ class TransducerFd: public Transducer
   bool PushState(FlagDiacriticOperation op);
 
  public:
- TransducerFd(FILE * f, TransducerHeader h, TransducerAlphabet a):
-    Transducer(f, h, a),
-      statestack(1, FlagDiacriticState (a.get_state_size(), 0)),
-      operations(a.get_operation_vector())
-	{}
+  TransducerFd(std::istream& is, TransducerHeader h, TransducerAlphabet a):
+    Transducer(is, h, a),
+    statestack(1, FlagDiacriticState(a.get_state_size(), 0)),
+    operations(a.get_operation_vector()) {}
 	
-	//BSC added
 	virtual bool is_epsilon(const Transition& transition) const
 	{
 	  return transition.matches(0) ||
@@ -634,11 +699,10 @@ class TransducerFdUniq: public TransducerFd
  private:
   DisplaySet display_vector;
   void note_analysis(SymbolNumber * whole_output_string);
+  void note_analysis(const LookupPath& path);
  public:
- TransducerFdUniq(FILE * f, TransducerHeader h, TransducerAlphabet a):
-  TransducerFd(f, h, a),
-    display_vector()
-      {}
+  TransducerFdUniq(std::istream& is, TransducerHeader h, TransducerAlphabet a):
+    TransducerFd(is, h, a), display_vector() {}
   
   void printAnalyses(std::string prepend);
 
@@ -651,27 +715,18 @@ class TransducerFdUniq: public TransducerFd
 typedef float Weight;
 const Weight INFINITE_WEIGHT = static_cast<float>(NO_TABLE_INDEX);
 
-class TransitionWIndex;
-class TransitionW;
-
 typedef std::multimap<Weight, std::string> DisplayMultiMap;
 typedef std::map<std::string, Weight> DisplayMap;
 
-typedef std::vector<TransitionWIndex*> TransitionWIndexVector;
-typedef std::vector<TransitionW*> TransitionWVector;
-
 class TransitionWIndex : public TransitionIndex
-{  
+{
  public:
-  
-  // Each TransitionIndex has an input symbol and a target index.
-//  static const size_t SIZE = 
-//    sizeof(SymbolNumber) + sizeof(TransitionTableIndex);
-
   TransitionWIndex(SymbolNumber input,
 		 TransitionTableIndex first_transition):
 	  TransitionIndex(input, first_transition) {}
 
+  TransitionWIndex(std::istream& is): TransitionIndex(is) {}
+  
   bool final(void) const
   {
     if (input_symbol != NO_SYMBOL_NUMBER)
@@ -706,10 +761,12 @@ class TransitionW : public Transition
 
   TransitionW(): Transition(), transition_weight(INFINITE_WEIGHT) {}
   
-  Weight get_weight(void) const
+  TransitionW(std::istream& is): Transition(is)
   {
-    return transition_weight;
+  	is.read(reinterpret_cast<char*>(&transition_weight), sizeof(Weight));
   }
+  
+  Weight get_weight(void) const {return transition_weight;}
 
   bool final(void) const
   {
@@ -721,66 +778,21 @@ class TransitionW : public Transition
   }
 };
 
-class IndexTableReaderW : public IndexTableReader
+
+class TransducerW : public AbstractTransducer
 {
  protected:
-  TransitionIndexVector indices;
-
- private:
-  void get_index_vector(void);
+  Table<TransitionWIndex> index_table;
+  Table<TransitionW> transition_table;
   
- public:
- IndexTableReaderW(FILE * f,
-			  TransitionTableIndex index_count): 
-  IndexTableReader(index_count)
-    {
-      table_size = number_of_table_entries*TransitionWIndex::SIZE;
-      TableIndices = (char*)(malloc(table_size));
-
-      // This dummy variable is needed, since the compiler complains
-      // for not catching the return value of fread().
-      int dummy_number_of_bytes;
-
-      dummy_number_of_bytes = fread(TableIndices,table_size,1,f);
-      get_index_vector();
-    }
-  
-  virtual TransitionIndexVector& get_indices() {return indices;}
-};
-
-class TransitionTableReaderW : public TransitionTableReader
-{
- protected:
-  TransitionVector transitions;
-  
- private:
-  void get_transition_vector(void);
-
- public:
- TransitionTableReaderW(FILE * f,
-			       TransitionTableIndex transition_count):
-  TransitionTableReader(transition_count)
-      {
-        table_size = number_of_table_entries*TransitionW::SIZE;
-        TableTransitions = (char*)(malloc(table_size));
-        int bytes;
-        bytes = fread(TableTransitions,table_size,1,f);
-        get_transition_vector();
-      }
-  
-  virtual TransitionVector& get_transitions() {return transitions;}  
-};
-
-class TransducerW : public Transducer
-{
- protected:
-  IndexTableReaderW index_reader;
-  TransitionTableReaderW transition_reader;
   DisplayMultiMap display_map;
   
   Weight current_weight;
+  
+  virtual LookupPath* get_initial_path() const;
 
   virtual void note_analysis(SymbolNumber * whole_output_string);
+  virtual void note_analysis(const LookupPath& path);
   
   virtual void try_epsilon_transitions(SymbolNumber * input_symbol,
 				       SymbolNumber * output_symbol,
@@ -804,35 +816,40 @@ class TransducerW : public Transducer
 		  SymbolNumber * original_output_string,
 		  TransitionTableIndex i);
 
-  
-
   void get_analyses(SymbolNumber * input_symbol,
 		    SymbolNumber * output_symbol,
 		    SymbolNumber * original_output_string,
 		    TransitionTableIndex i);
 
   Weight get_final_index_weight(TransitionTableIndex i) {
-    return static_cast<TransitionWIndex*>(indices[i])->final_weight();
+    return static_cast<const TransitionWIndex&>(get_index(i)).final_weight();
   }
 
   Weight get_final_transition_weight(TransitionTableIndex i) {
-    return static_cast<TransitionW*>(transitions[i])->get_weight();
+    return static_cast<const TransitionW&>(get_transition(i)).get_weight();
   }
 
  public:
- TransducerW(FILE * f, TransducerHeader h, TransducerAlphabet a) :
-    Transducer(h, a),
-    index_reader(f,header.index_table_size()),
-    transition_reader(f,header.target_table_size()),
-    display_map(),
-    current_weight(0.0)
-      {
-        for (int i = 0; i < 1000; ++i)
-          output_string[i] = NO_SYMBOL_NUMBER;
-        set_symbol_table();
-      }
+  //NOTE: the old TransitionTableReaderW appended two blank transitions to the
+  // end of the transitions list. Is that really necessary to recreate here?
+  TransducerW(std::istream& is, TransducerHeader h, TransducerAlphabet a) :
+    AbstractTransducer(h, a),
+    index_table(is, header.index_table_size()),
+    transition_table(is, header.target_table_size()),
+    display_map(), current_weight(0.0)
+  {
+  }
 
   virtual void printAnalyses(const std::string prepend);
+  
+  virtual const TransitionIndex& get_index(TransitionTableIndex i) const
+  {
+    return index_table[i];
+  }
+  virtual const Transition& get_transition(TransitionTableIndex i) const
+  {
+    return transition_table[i];
+  }
 };
 
 class TransducerWUniq: public TransducerW
@@ -840,11 +857,10 @@ class TransducerWUniq: public TransducerW
  private:
   DisplayMap display_map;
   void note_analysis(SymbolNumber * whole_output_string);
+  void note_analysis(const LookupPath& path);
  public:
- TransducerWUniq(FILE * f, TransducerHeader h, TransducerAlphabet a):
-  TransducerW(f, h, a),
-    display_map()
-      {}
+  TransducerWUniq(std::istream& is, TransducerHeader h, TransducerAlphabet a):
+    TransducerW(is, h, a), display_map() {}
   
   void printAnalyses(std::string prepend);
 };
@@ -853,7 +869,8 @@ class TransducerWFd: public TransducerW
 {
   FlagDiacriticStateStack statestack;
   OperationVector operations;
-  std::vector<SymbolNumber> operation_peek;
+  
+  virtual LookupPath* get_initial_path() const;
 
   void try_epsilon_transitions(SymbolNumber * input_symbol,
 			       SymbolNumber * output_symbol,
@@ -864,14 +881,11 @@ class TransducerWFd: public TransducerW
 
   
  public:
- TransducerWFd(FILE * f, TransducerHeader h, TransducerAlphabet a):
-  TransducerW(f, h, a),
-    statestack(1, FlagDiacriticState (a.get_state_size(), 0)),
-    operations(a.get_operation_vector()),
-    operation_peek(a.get_operation_peek())
-      {}
+  TransducerWFd(std::istream& is, TransducerHeader h, TransducerAlphabet a):
+    TransducerW(is, h, a),
+    statestack(1, FlagDiacriticState(a.get_state_size(), 0)),
+    operations(a.get_operation_vector()) {}
   
-  //BSC added
 	virtual bool is_epsilon(const Transition& transition) const
 	{
 	  return transition.matches(0) ||
@@ -885,15 +899,13 @@ class TransducerWFdUniq: public TransducerWFd
  private:
   DisplayMap display_map;
   void note_analysis(SymbolNumber * whole_output_string);
+  void note_analysis(const LookupPath& path);
  public:
- TransducerWFdUniq(FILE * f, TransducerHeader h, TransducerAlphabet a):
-  TransducerWFd(f, h, a),
-    display_map()
-      {}
+  TransducerWFdUniq(std::istream& is, TransducerHeader h, TransducerAlphabet a):
+    TransducerWFd(is, h, a), display_map() {}
   
   void printAnalyses(std::string prepend);
 
 };
 
-//BSC added
 #endif
