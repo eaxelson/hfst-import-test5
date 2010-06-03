@@ -42,8 +42,8 @@ Software in this package is variously distributed under the GPL, LGPL and
 Apache licenses. If you want to develop something or include it in your own
 software, check which license(s) apply.
 
-In the CVS or SVN version you must create necessary autotools files in the host
-system::
+If checking out from CVS or SVN you must first create or install the necessary
+autotools files from the host system:
 
   autoreconf -i
 
