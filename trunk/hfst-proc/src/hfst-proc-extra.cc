@@ -83,7 +83,8 @@ PathFd::evaluate_flag_diacritic(SymbolNumber s)
     }
     else
     {
-      std::cout << "flag diacritic [" << s << "] disallowed" << std::endl;
+      if(printDebuggingInformationFlag)
+        std::cout << "flag diacritic [" << s << "] disallowed" << std::endl;
       return false;
     }
   }
