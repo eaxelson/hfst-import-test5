@@ -64,6 +64,9 @@ class LookupPath
    */
   virtual bool follow(const Transition& transition);
   
+  virtual bool operator<(const LookupPath& o) const
+  {return output_symbols.size() < o.output_symbols.size();}
+  
   TransitionTableIndex get_index() const {return index;}
   bool at_final() const {return final;}
   SymbolNumberVector get_output_symbols() const {return output_symbols;}
@@ -147,6 +150,9 @@ class LookupPathW : public LookupPath
 
   virtual void follow(const TransitionIndex& index);
   virtual bool follow(const Transition& transition);
+  
+  virtual bool operator<(const LookupPathW& o) const
+  {return get_weight() < o.get_weight();}
   
   Weight get_weight() const {return at_final() ? weight+final_weight : weight;}
 };
