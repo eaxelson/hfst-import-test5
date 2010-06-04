@@ -93,7 +93,7 @@ class PathFd
    * Evaluates the given flag diacritic operation, possibly modifying fd_state,
    * and returning whether the operation is allowed or not
    */
-  bool evaluate_flag_diacritic(FlagDiacriticOperation op);
+  bool evaluate_flag_diacritic(const FlagDiacriticOperation& op);
   
   /**
    * If the given symbol is a flag diacritic, return the result of the other
@@ -104,7 +104,8 @@ class PathFd
   bool is_flag_diacritic(SymbolNumber s) const
   {return fd_operations[s].isFlag();}
   
-  PathFd(const OperationVector& op): fd_operations(op) {}
+  PathFd(int state_size, const OperationVector& op): 
+    fd_state(state_size, 0), fd_operations(op) {}
   PathFd(const PathFd& o): fd_state(o.fd_state), 
                            fd_operations(o.fd_operations) {}
 };
@@ -116,8 +117,8 @@ class PathFd
 class LookupPathFd : public LookupPath, PathFd
 {
  public:
-  LookupPathFd(const TransitionTableIndex initial, const OperationVector& op):
-    LookupPath(initial), PathFd(op) {}
+  LookupPathFd(const TransitionTableIndex initial, int state_size, const OperationVector& op):
+    LookupPath(initial), PathFd(state_size, op) {}
   LookupPathFd(const LookupPathFd& o): LookupPath(o), PathFd(o) {}
   
   virtual LookupPath* clone() const {return new LookupPathFd(*this);}
@@ -163,8 +164,8 @@ class LookupPathW : public LookupPath
 class LookupPathWFd : public LookupPathW, PathFd
 {
  public:
-  LookupPathWFd(const TransitionTableIndex initial, const OperationVector& op):
-    LookupPathW(initial), PathFd(op){}
+  LookupPathWFd(const TransitionTableIndex initial, int state_size, const OperationVector& op):
+    LookupPathW(initial), PathFd(state_size, op){}
   LookupPathWFd(const LookupPathWFd& o): LookupPathW(o), PathFd(o) {}
   
   virtual LookupPath* clone() const {return new LookupPathWFd(*this);}

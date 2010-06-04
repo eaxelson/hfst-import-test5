@@ -598,7 +598,7 @@ LookupPath* Transducer::get_initial_path() const
 }
 LookupPath* TransducerFd::get_initial_path() const 
 {
-  return new LookupPathFd(START_INDEX, operations);
+  return new LookupPathFd(START_INDEX, alphabet.get_state_size(), operations);
 }
 LookupPath* TransducerW::get_initial_path() const
 {
@@ -606,7 +606,7 @@ LookupPath* TransducerW::get_initial_path() const
 }
 LookupPath* TransducerWFd::get_initial_path() const
 {
-  return new LookupPathWFd(START_INDEX, operations);
+  return new LookupPathWFd(START_INDEX, alphabet.get_state_size(), operations);
 }
 
 void
