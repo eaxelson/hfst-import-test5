@@ -1,4 +1,5 @@
 #include <sstream>
+#include <algorithm>
 #include "hfst-optimized-lookup.h"
 #include "hfst-proc-extra.h"
 
@@ -643,14 +644,21 @@ print_unknown_word(TokenIOStream& token_stream,
 }
 
 
+bool compare_LookupPath_pointers(LookupPath* p1, LookupPath* p2)
+{
+  return *p1 < *p2;
+}
 std::string
 AbstractTransducer::process_finals(TokenIOStream& token_stream, const LookupPathVector& finals) const
 {
+  LookupPathVector sorted_finals(finals.begin(), finals.end());
+  std::sort(sorted_finals.begin(), sorted_finals.end(), compare_LookupPath_pointers);
+  
   std::ostringstream res;
-  for(LookupPathVector::const_iterator it=finals.begin(); it!=finals.end(); it++)
+  for(LookupPathVector::const_iterator it=sorted_finals.begin(); it!=sorted_finals.end(); it++)
   {
     res << '/' << token_stream.escape(alphabet.symbols_to_string((*it)->get_output_symbols()));
-    if(header.probe_flag(Weighted))
+    if(header.probe_flag(Weighted) && displayWeightsFlag)
       res << '~' << dynamic_cast<const LookupPathW*>(*it)->get_weight() << '~';
   }
   
