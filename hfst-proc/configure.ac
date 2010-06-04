@@ -6,7 +6,7 @@ AC_CONFIG_HEADERS([config.h])
 AC_CONFIG_FILES([Makefile src/Makefile test/Makefile])
 
 #CXXFLAGS="-Wall -Werror -Wextra -march=native -O3"
-CXXFLAGS="-Wall -Werror -Wextra -march=native -g"
+CXXFLAGS="-Wall -Werror -Wextra -g"
 
 AC_DEFINE([DEBUG], [1], [Print some information useful for debugging])
 AC_DEFINE([TIMING], [0], [Calculate and print timing information (unimplemented currently)])
