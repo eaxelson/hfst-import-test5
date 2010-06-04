@@ -72,11 +72,6 @@ bool print_usage(void)
     "  -p, --proc                  Operate in hfst-proc mode (experimental)\n" <<
     "  -t  --tokenize              Tokenize the input stream (for debugging)\n" <<
     "\n" <<
-    "Note that " << PACKAGE_NAME << " is *not* guaranteed to behave identically to\n" <<
-    "hfst-lookup (although it almost always does): input-side multicharacter symbols\n" <<
-    "are not fully supported. If the first character of such a symbol is an ASCII\n" <<
-    "symbol also matching a single-character symbol, it will be tokenized as such.\n" <<
-    "\n" <<
     "Report bugs to " << PACKAGE_BUGREPORT << "\n" <<
     "\n";
   return true;
