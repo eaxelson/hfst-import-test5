@@ -1,0 +1,17 @@
+TESTS WITH fao.hfst.ol
+
+"so"                -> ^so/so+Adv$
+"so "               -> ^so/so+Adv$ 
+"at"                -> ^at/at+CS/at+Pr/at+IM/at+N+Neu+Sg+Nom+Indef/at+N+Neu+Sg+Acc+Indef$
+"so at"             -> ^so at/so at+CS$
+
+"so[abc]"           -> ^so/so+Adv$[abc]
+"so[abc] at"        -> ^so/so+Adv$[abc] ^at/at+CS/at+Pr/at+IM/at+N+Neu+Sg+Nom+Indef/at+N+Neu+Sg+Acc+Indef$
+"so [abc] at"       -> ^so/so+Adv$ [abc] ^at/at+CS/at+Pr/at+IM/at+N+Neu+Sg+Nom+Indef/at+N+Neu+Sg+Acc+Indef$
+"so [abc]at"        -> ^so/so+Adv$ [abc]^at/at+CS/at+Pr/at+IM/at+N+Neu+Sg+Nom+Indef/at+N+Neu+Sg+Acc+Indef$
+"x[abc]"            -> ^x/*x$[abc]
+"so a[abc]"         -> ^so/so+Adv$ ^a/*a$[abc]
+"so[abc]at"         -> ^so at/so at+CS$[abc]
+
+-------------
+
