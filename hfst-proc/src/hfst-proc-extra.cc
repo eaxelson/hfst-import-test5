@@ -573,7 +573,7 @@ TokenIOStream::token_to_string(const Token& t) const
   switch(t.type)
   {
     case Symbol:
-      return escape(alphabet.symbol_to_string(t.symbol));
+      return alphabet.symbol_to_string(t.symbol);
     case Character:
       return escape(t.character);
     case Superblank:
@@ -618,7 +618,7 @@ ApertiumResultsPrinter::process_finals(const LookupPathVector& finals) const
   for(LookupPathVector::const_iterator it=sorted_finals.begin(); it!=sorted_finals.end(); it++)
   {
     std::ostringstream res;
-    res << token_stream.escape(token_stream.get_alphabet().symbols_to_string((*it)->get_output_symbols()));
+    res << token_stream.get_alphabet().symbols_to_string((*it)->get_output_symbols());
     if(dynamic_cast<const LookupPathW*>(*it) != NULL && displayWeightsFlag)
       res << '~' << dynamic_cast<const LookupPathW*>(*it)->get_weight() << '~';
     
