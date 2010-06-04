@@ -608,14 +608,28 @@ print_word(TokenIOStream& token_stream,
            const TokenVector& surface_form, 
            std::string const &analyzed_forms)
 {
-//if the surface form contains any superblanks, they need to be printed to the
-//output stream somewhere!
+  // any superblanks in the surface form should not be printed as part of the
+  // analysis output, but should be output directly afterwards
+  TokenVector output_surface_form;
+  std::vector<unsigned int> superblanks;
+  for(TokenVector::const_iterator it=surface_form.begin(); it!=surface_form.end(); it++)
+  {
+    if(it->type == Superblank)
+    {
+      output_surface_form.push_back(Token(token_stream.to_symbol(*it)));
+      superblanks.push_back(it->superblank_index);
+    }
+    else
+      output_surface_form.push_back(*it);
+  }
 
   if(printDebuggingInformationFlag)
-    std::cout << "surface_form consists of " << surface_form.size() << " tokens" << std::endl;
+    std::cout << "surface_form consists of " << output_surface_form.size() << " tokens" << std::endl;
   token_stream.ostream() << '^';
-  token_stream.write_escaped(surface_form);
+  token_stream.write_escaped(output_surface_form);
   token_stream.ostream() << analyzed_forms << '$';
+  for(size_t i=0;i<superblanks.size();i++)
+    token_stream.ostream() << token_stream.get_superblank(superblanks[i]);
 }
 void
 print_unknown_word(TokenIOStream& token_stream,
@@ -709,8 +723,12 @@ void AbstractTransducer::run_lookup(TokenIOStream& token_stream)
       }
       else if(analyzed_forms == "" || token_stream.is_alphabetic(token_stream.at(last_stream_location)))
       {
+        // if this is false, then we need to move the token stream back far
+        // enough that next_token will be read again next iteration
+        bool next_token_is_part_of_word = false;
         if(token_stream.is_alphabetic(next_token))
         {
+          next_token_is_part_of_word = true;
           do
           {
             surface_form.push_back(next_token);
@@ -731,14 +749,17 @@ void AbstractTransducer::run_lookup(TokenIOStream& token_stream)
           if(word_length == string::npos)
             word_length = surface_form.size();
           
+          int revert_count = surface_form.size()-word_length+
+                         next_token_is_part_of_word ? 0 : 1;
+          
           if(printDebuggingInformationFlag)
             std::cout << "word_length=" << word_length << ", surface_form.size()=" << surface_form.size() 
-                      << ", moving back " << surface_form.size()-word_length << " characters" << std::endl;
+                      << ", moving back " << revert_count << " characters" << std::endl;
           
           print_unknown_word(token_stream,
                              TokenVector(surface_form.begin(),
                                          surface_form.begin()+word_length));
-          token_stream.move_back(surface_form.size()-word_length);
+          token_stream.move_back(revert_count);
         }
       } 
       else // there are one or more valid tranductions
