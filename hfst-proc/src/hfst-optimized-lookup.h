@@ -450,6 +450,8 @@ class TransitionIndex
   	is.read(reinterpret_cast<char*>(&input_symbol), sizeof(SymbolNumber));
   	is.read(reinterpret_cast<char*>(&first_transition_index), sizeof(TransitionTableIndex));
   }
+  
+  virtual ~TransitionIndex() {}
 
   bool matches(const SymbolNumber s) const;
   
@@ -492,6 +494,8 @@ class Transition
   	is.read(reinterpret_cast<char*>(&output_symbol), sizeof(SymbolNumber));
   	is.read(reinterpret_cast<char*>(&target_index), sizeof(target_index));
   }
+  
+  virtual ~Transition() {}
 
   bool matches(const SymbolNumber s) const;
 
