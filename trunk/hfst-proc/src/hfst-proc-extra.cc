@@ -692,9 +692,7 @@ void AbstractTransducer::run_lookup(TokenIOStream& token_stream)
   	    std::cout << "Final paths found and saved, stream location is " << last_stream_location << std::endl;
   	}
   	
-  	SymbolNumber next_symbol = token_stream.to_symbol(next_token);
-  	
-  	state.step(next_symbol);
+  	state.step(token_stream.to_symbol(next_token));
     
     if(printDebuggingInformationFlag)
       std::cout << "After stepping, there are " << state.num_active() << " active paths" << std::endl;
@@ -742,14 +740,17 @@ void AbstractTransducer::run_lookup(TokenIOStream& token_stream)
                                          surface_form.begin()+word_length));
           token_stream.move_back(surface_form.size()-word_length);
         }
-      }
+      } 
       else // there are one or more valid tranductions
       {
+        // the number of symbols on the end of surface_form that aren't a part
+        // of the transduction(s) found
+        int revert_count = token_stream.get_pos()-last_stream_location-1;
         print_word(token_stream, 
                    TokenVector(surface_form.begin(), 
-                               surface_form.end()-(token_stream.get_pos()-last_stream_location-1)),
+                               surface_form.end()-revert_count),
                    analyzed_forms);
-        token_stream.move_back(1);
+        token_stream.move_back(revert_count+1);
       }
       
       state.reset();
