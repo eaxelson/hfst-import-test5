@@ -260,7 +260,7 @@ void TransducerAlphabet::get_next_symbol(std::istream& is, SymbolNumber k)
   if(printDebuggingInformationFlag)
     std::cout << "Got next symbol: '" << str << "' (" << k << ")" << std::endl;
   
-  if(!is || str.length()==0) 
+  if(!is)
   {
     std::cerr << "Could not parse transducer; wrong or corrupt file?" << std::endl;
     exit(1);
