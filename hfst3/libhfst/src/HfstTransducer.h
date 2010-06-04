@@ -17,6 +17,16 @@
 
 /** \mainpage 
 
+HFST - The Helsinki Finite-State Transducer technology is intended for creating and manipulating weighted or unweighted synchronic transducers implementing regular relations.
+
+Currently HFST has been implemented using the SFST, OpenFst and foma software libraries.
+Other versions may be added in some future release. 
+The SFST and foma implementations are unweighted and the OpenFst implementations weighted.
+More info on SFST tools is in http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html,
+OpenFst in http://www.openfst.org and foma in http://www.aclweb.org/anthology/E/E09/E09-2008.pdf.
+
+The examples use Xerox transducer notations ( http://www.xrce.xerox.com/Research-Development/Publications/1997-005/(language) ).
+
 */
 
 
@@ -257,6 +267,18 @@ namespace hfst
 	with tokenizer \a multichar_symbol_tokenizer.
 	The type of the transducer is defined by \a type. 
 
+	\a utf8_str is read one token at a time and for each token a new transition is created in the resulting
+	transducer. The input and output symbols of that transition are the same as the token read.
+
+	An example:
+\verbatim
+       std::string input = "foo";
+	std::string output = "bar";
+	HfstTokenizer TOK;
+       HfstTransducer tr(input, output, TOK, LOG_OFST_TYPE);
+	// tr now contains one path [f:b o:a o:r]
+\endverbatim
+
 	@see HfstTokenizer **/
     HfstTransducer(const std::string& utf8_str, 
     		   const HfstTokenizer &multichar_symbol_tokenizer,
@@ -267,12 +289,26 @@ namespace hfst
 	with tokenizer \a multichar_symbol_tokenizer.
 	The type of the transducer is defined by \a type. 
 
+	\a input_utf8_str and \a output_utf8_str are read one token at a time and for each token a new transition 
+	is created in the resulting transducer. The input and output symbols of that transition are the same as 
+	the input and output tokens read. If either string contains less tokens than another, epsilons are used
+	as transition symbols for the string containing less tokens.
+
+	An example:
+\verbatim
+       std::string input = "foo";
+	std::string output = "barr";
+	HfstTokenizer TOK;
+       HfstTransducer tr(input, output, TOK, SFST_TYPE);
+	// tr now contains one path [f:b o:a o:r 0:r]
+\endverbatim
+
 	@see HfstTokenizer **/
     HfstTransducer(const std::string& input_utf8_str,
     		   const std::string& output_utf8_str,
     		   const HfstTokenizer &multichar_symbol_tokenizer,
 		   ImplementationType type);
-    /** \brief Read a binary transducer from stream \a in. 
+    /** \brief Read a binary transducer from transducer stream \a in. 
 
 	@pre ( in.is_eof() == in.is_bad() == false && in.is_fst() ).
 	Otherwise, an exception is thrown.
@@ -286,9 +322,9 @@ namespace hfst
     /** \brief Delete operator for HfstTransducer. **/
     ~HfstTransducer(void);
 
-    /** \brief Create a transducer that recognizes the string pair "symbol:symbol". The type of the transducer is defined by \a type. **/
+    /** \brief Create a transducer that recognizes the string pair [symbol:symbol]. The type of the transducer is defined by \a type. **/
     HfstTransducer(const std::string &symbol, ImplementationType type);
-    /** \brief Create a transducer that recognizes the string pair "isymbol:osymbol". The type of the transducer is defined by \a type. **/
+    /** \brief Create a transducer that recognizes the string pair [isymbol:osymbol]. The type of the transducer is defined by \a type. **/
     HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type);
 
     /** \brief Whether transducers \a tr1 and \a tr2 are equivalent.
@@ -353,20 +389,23 @@ An example:
 0    0    a    a    0.2
 \endverbatim
 
-        The example lists four transducers in AT&T format: one transducers accepting the string pair "foo:bar", one
+        The example lists four transducers in AT&T format: one transducer accepting the string pair "foo:bar", one
 	epsilon transducer, one empty transducer and one transducer accepting any number of 'a's. The transducers
-	can be read with the following commands from file named "testfile.att":
+	can be read with the following commands (from a file named "testfile.att"):
 \verbatim
 FILE * ifile = fopen("testfile.att", "rb");
-while (not eof(ifile))
-  {
-  HfstTransducer t = HfstTransducer::read_in_att_format(ifile);
-  printf("read one transducer\n");
-  }
+try {
+  while (not eof(ifile))
+    {
+    HfstTransducer t = HfstTransducer::read_in_att_format(ifile);
+    printf("read one transducer\n");
+    }
+} catch (NotValidAttFormatException e) {
+    printf("Error reading transducer: not valid AT&T format.\n"); }
 fclose(ifile);
 \endverbatim
 
-@throws hfst::exceptions::NotValidAttFormat
+@throws hfst::exceptions::NotValidAttFormatException
 @see write_in_att_format
 **/
     static HfstTransducer &read_in_att_format(FILE * ifile, ImplementationType type);
@@ -382,7 +421,7 @@ fclose(ifile);
 
 	@pre The file exists, otherwise an exception is thrown.
 	@see read_in_att_format(FILE*,ImplementationType)
-	@throws hfst::exceptions::FileNotReadableException hfst::exceptions::NotValidAttFormat*/
+	@throws hfst::exceptions::FileNotReadableException hfst::exceptions::NotValidAttFormatException */
     static HfstTransducer &read_in_att_format(const char * filename, ImplementationType type);
 
     /** \brief Remove all epsilon:epsilon transitions from this transducer. */
@@ -415,16 +454,16 @@ fclose(ifile);
     /** \brief A concatenation of n transducers where n is any number from one to infinity. */
     HfstTransducer &repeat_plus();
 
-    /** \brief A concatenation of n transducers. */
+    /** \brief A concatenation of \a n transducers. */
     HfstTransducer &repeat_n(unsigned int n);
 
-    /** \brief A concatenation of N transducers where N is any number from zero to n, inclusive.*/
+    /** \brief A concatenation of N transducers where N is any number from zero to \a n, inclusive.*/
     HfstTransducer &repeat_n_minus(unsigned int n);
 
-    /** \brief A concatenation of N transducers where N is any number from n to infinity, inclusive.*/
+    /** \brief A concatenation of N transducers where N is any number from \a n to infinity, inclusive.*/
     HfstTransducer &repeat_n_plus(unsigned int n);
 
-    /** \brief A concatenation of N transducers where N is any number from n to k, inclusive.*/
+    /** \brief A concatenation of N transducers where N is any number from \a n to \a k, inclusive.*/
     HfstTransducer& repeat_n_to_k(unsigned int n, unsigned int k);
 
     /** \brief Disjunct this transducer with an epsilon transducer. */

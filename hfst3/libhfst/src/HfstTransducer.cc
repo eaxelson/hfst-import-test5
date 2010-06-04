@@ -373,7 +373,7 @@ void HfstTransducer::test_minimize()
   bool HfstTransducer::are_equivalent(const HfstTransducer &one, const HfstTransducer &another) 
   {
     if (one.type != another.type)
-      throw hfst::exceptions::TypeMismatchException ();
+      throw hfst::exceptions::TransducerTypeMismatchException ();
     
     HfstTransducer one_copy(one);
     HfstTransducer another_copy(another);
@@ -598,7 +598,7 @@ void HfstTransducer::test_minimize()
    HfstTransducer &transducer)
   { 
     if (this->type != transducer.type)
-      throw hfst::exceptions::TypeMismatchException ();
+      throw hfst::exceptions::TransducerTypeMismatchException ();
    
     ImplementationType original_type = this->type;
     this->convert(TROPICAL_OFST_TYPE);

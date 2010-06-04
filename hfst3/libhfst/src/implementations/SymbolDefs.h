@@ -14,11 +14,17 @@ namespace hfst
   typedef std::string String;
   /* A set of strings. */
   typedef std::set<String> StringSet;
-  /** \brief A symbol pair in a transition. */
+  /** \brief A symbol pair in a transition. 
+
+      @see HfstTransducer::substitute(const StringPair&, const StringPair&) and other substitute functions */
   typedef std::pair<std::string, std::string> StringPair;
-  /** \brief A vector of transitions that represents a path in a transducer. */
+  /** \brief A vector of transitions that represents a path in a transducer. 
+
+      @see HfstTokenizer */
   typedef std::vector<StringPair> StringPairVector;
-  /** \brief A set of symbol pairs used in substituting symbol pairs. */
+  /** \brief A set of symbol pairs used in substituting symbol pairs. 
+
+      @see HfstTransducer::substitute(const StringPair&, const StringPairSet &) */
   typedef std::set<StringPair> StringPairSet;
   /* Maps strings to numbers. */
   typedef std::map<String,unsigned int> StringNumberMap;

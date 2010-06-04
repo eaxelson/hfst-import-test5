@@ -60,6 +60,9 @@ namespace hfst
     bool is_skip_symbol(String &s) const;
 
   public:
+
+    /** \brief Create a tokenizer that recognizes utf-8 symbols. */
+    HfstTokenizer();
     /** \brief Add a symbol to be skipped to this tokenizer. */
     void add_skip_symbol(const std::string &symbol);
     /** \brief Add a multicharacter symbol \a symbol to this tokenizer. */
