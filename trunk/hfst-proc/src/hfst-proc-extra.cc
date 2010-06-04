@@ -398,7 +398,7 @@ TokenIOStream::read_utf8_char()
   else if ( (c & (128 + 64 )) == (128 + 64))
     u8len = 2;
   else
-    stream_error();
+    stream_error("Invalid UTF-8 character found");
 
   char next_u8[u8len+1];
   is.get(next_u8, u8len+1, '\0');
@@ -454,13 +454,10 @@ TokenIOStream::first_nonalphabetic(const TokenVector& s) const
 int
 TokenIOStream::read_escaped()
 {
-  if(is.eof())
-    stream_error();
-
   int c = is.get();
   
   if(c == EOF || escaped_chars.find(c) == escaped_chars.end())
-    stream_error();
+    stream_error("Found invalid character after backslash");
   
   return c;
 }
@@ -483,7 +480,7 @@ TokenIOStream::read_delimited(const char delim)
   }
 
   if(c != delim)
-    stream_error();
+    stream_error(std::string("Didn't find delimiting character ")+delim);
 
   return result;
 }
@@ -520,13 +517,10 @@ TokenIOStream::read_token()
      
      case '\\':
        next_char = is.get(); // get the peeked char for real
-       next_char = is.get();
-       if(escaped_chars.find(next_char) == escaped_chars.end())
-         stream_error();
-       return make_token();
+       return Token::as_character(read_escaped());
       
       default:
-        stream_error();
+        stream_error(std::string("Found unexpected character ")+((char)next_char)+" unescaped in stream");
     }
   }
   return make_token();
