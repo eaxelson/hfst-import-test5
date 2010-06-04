@@ -28,7 +28,7 @@ LookupPath::follow(const Transition& transition)
 //////////Function definitions for class PathFd
 
 bool
-PathFd::evaluate_flag_diacritic(FlagDiacriticOperation op)
+PathFd::evaluate_flag_diacritic(const FlagDiacriticOperation& op)
 {
   switch (op.Operation()) {
   case P: // positive set

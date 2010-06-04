@@ -218,9 +218,9 @@ class FlagDiacriticOperation
   operation(P), feature(NO_SYMBOL_NUMBER), value(0) {}
   
   bool isFlag(void) const { return feature != NO_SYMBOL_NUMBER; }
-  FlagDiacriticOperator Operation(void) { return operation; }
-  SymbolNumber Feature(void) { return feature; }
-  ValueNumber Value(void) { return value; }
+  FlagDiacriticOperator Operation(void) const { return operation; }
+  SymbolNumber Feature(void) const { return feature; }
+  ValueNumber Value(void) const { return value; }
 
 #if OL_FULL_DEBUG
   void print(void)
@@ -364,6 +364,8 @@ class TransducerAlphabet
     for(SymbolNumber k=0; k<symbol_count; k++)
       get_next_symbol(is, k);
     
+    if(printDebuggingInformationFlag && get_state_size()>0)
+      std::cout << "Alphabet contains " << get_state_size() << " flag diacritic feature(s)" << std::endl;
     // assume the first symbol is epsilon which we don't want to print
     symbol_table.operator[](0) = "";
     
