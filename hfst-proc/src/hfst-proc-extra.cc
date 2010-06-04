@@ -496,11 +496,11 @@ TokenIOStream::make_token()
     return Token();
   
   if(s != NO_SYMBOL_NUMBER)
-    return Token(s);
+    return Token::as_symbol(s);
   
   // the next thing in the stream is not a symbol
   // (extract_symbol moved the stream back to before anything was read)
-  return Token(read_utf8_char().c_str());
+  return Token::as_character(read_utf8_char().c_str());
 }
 
 Token
@@ -516,7 +516,7 @@ TokenIOStream::read_token()
     {
       case '[':
         superblank_bucket.push_back(read_delimited(']'));
-        return Token(superblank_bucket.size()-1);
+        return Token::as_superblank(superblank_bucket.size()-1);
      
      case '\\':
        next_char = is.get(); // get the peeked char for real
@@ -618,7 +618,7 @@ print_word(TokenIOStream& token_stream,
   {
     if(it->type == Superblank)
     {
-      output_surface_form.push_back(Token(token_stream.to_symbol(*it)));
+      output_surface_form.push_back(Token::as_symbol(token_stream.to_symbol(*it)));
       superblanks.push_back(it->superblank_index);
     }
     else

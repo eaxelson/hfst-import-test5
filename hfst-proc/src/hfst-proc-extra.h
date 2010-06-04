@@ -363,10 +363,16 @@ struct Token
   };
   
   Token(): type(None) {}
-  Token(SymbolNumber s): type(Symbol), symbol(s) {}
-  Token(const char* c): type(Character)
-  { strncpy(character, c, 4); character[4]='\0'; }
-  Token(unsigned long int i): type(Superblank), superblank_index(i) {}
+  
+  void set_none() {type=None;}
+  void set_symbol(SymbolNumber s) {type=Symbol; symbol=s;}
+  void set_character(const char* c)
+  {type=Character; strncpy(character,c,4); character[4]='\0';}
+  void set_superblank(unsigned int i) {type=Superblank; superblank_index=i;}
+  
+  static Token as_symbol(SymbolNumber s) {Token t; t.set_symbol(s); return t;}
+  static Token as_character(const char* c) {Token t; t.set_character(c); return t;}
+  static Token as_superblank(unsigned int i) {Token t; t.set_superblank(i); return t;}
 };
 
 /**
