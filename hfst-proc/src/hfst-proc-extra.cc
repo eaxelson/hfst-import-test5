@@ -361,7 +361,7 @@ LookupState::try_transitions(LookupPathVector& new_paths,
 }
 
 
-/////////Function definitions for SymbolIOStream
+/////////Function definitions for TokenIOStream
 
 std::set<char> TokenIOStream::escaped_chars;
 
@@ -573,42 +573,69 @@ TokenIOStream::get_token()
   return token;
 }
 
-void
-TokenIOStream::put_token(Token t)
+std::string
+TokenIOStream::token_to_string(const Token& t) const
 {
   switch(t.type)
   {
     case Symbol:
-      os << escape(alphabet.symbol_to_string(t.symbol));
-      break;
+      return escape(alphabet.symbol_to_string(t.symbol));
     case Character:
-      os << escape(t.character);
-      break;
+      return escape(t.character);
     case Superblank:
-      os << superblank_bucket[t.superblank_index];
-      break;
+      return superblank_bucket[t.superblank_index];
     default:
-      if(printDebuggingInformationFlag)
-        std::cerr << "Tried putting a None token" << std::endl;
-      break;
+      return "";
   }
 }
 
-void
-TokenIOStream::write_escaped(const TokenVector& t) 
+std::string
+TokenIOStream::tokens_to_string(const TokenVector& t) const
 {
+  std::string res;
   for(TokenVector::const_iterator it=t.begin(); it!=t.end(); it++)
-    put_token(*it);
+    res += token_to_string(*it);
+  return res;
 }
 
 
-//////////Other lookup functions
+//////////Function definitions for ResultsPrinter
 
+LookupPathVector
+ResultsPrinter::preprocess_finals(const LookupPathVector& finals) const
+{
+  LookupPathVector sorted_finals(finals.begin(), finals.end());
+  std::sort(sorted_finals.begin(), sorted_finals.end(), LookupPath::compare_pointers);
+  
+  if(sorted_finals.size() > (unsigned int)maxAnalyses)
+    return LookupPathVector(sorted_finals.begin(),sorted_finals.begin()+maxAnalyses);
+  else
+    return sorted_finals;
+}
+
+//////////Function definitions for ApertiumResultsPrinter
+
+std::vector<std::string>
+ApertiumResultsPrinter::process_finals(const LookupPathVector& finals) const
+{
+  std::vector<std::string> results;
+  LookupPathVector sorted_finals = preprocess_finals(finals);
+  
+  for(LookupPathVector::const_iterator it=sorted_finals.begin(); it!=sorted_finals.end(); it++)
+  {
+    std::ostringstream res;
+    res << token_stream.escape(token_stream.get_alphabet().symbols_to_string((*it)->get_output_symbols()));
+    if(dynamic_cast<const LookupPathW*>(*it) != NULL && displayWeightsFlag)
+      res << '~' << dynamic_cast<const LookupPathW*>(*it)->get_weight() << '~';
+    
+    results.push_back(res.str());
+  }
+  return results;
+}
 
 void
-print_word(TokenIOStream& token_stream,
-           const TokenVector& surface_form, 
-           std::string const &analyzed_forms)
+ApertiumResultsPrinter::print_word(const TokenVector& surface_form, 
+                                  std::vector<std::string> const &analyzed_forms) const
 {
   // any superblanks in the surface form should not be printed as part of the
   // analysis output, but should be output directly afterwards
@@ -627,15 +654,18 @@ print_word(TokenIOStream& token_stream,
 
   if(printDebuggingInformationFlag)
     std::cout << "surface_form consists of " << output_surface_form.size() << " tokens" << std::endl;
+  
   token_stream.ostream() << '^';
   token_stream.write_escaped(output_surface_form);
-  token_stream.ostream() << analyzed_forms << '$';
+  for(std::vector<std::string>::const_iterator it=analyzed_forms.begin(); it!=analyzed_forms.end(); it++)
+    token_stream.ostream() << "/" << *it;
+  token_stream.ostream() << "$";
+  
   for(size_t i=0;i<superblanks.size();i++)
     token_stream.ostream() << token_stream.get_superblank(superblanks[i]);
 }
 void
-print_unknown_word(TokenIOStream& token_stream,
-                   const TokenVector& surface_form)
+ApertiumResultsPrinter::print_unknown_word(const TokenVector& surface_form) const
 {
   token_stream.ostream() << '^';
   token_stream.write_escaped(surface_form);
@@ -645,26 +675,60 @@ print_unknown_word(TokenIOStream& token_stream,
 }
 
 
-bool compare_LookupPath_pointers(LookupPath* p1, LookupPath* p2)
+//////////Function definitions for XeroxResultsPrinter
+
+TokenVector
+XeroxResultsPrinter::clear_superblanks(const TokenVector& tokens) const
 {
-  return *p1 < *p2;
+  TokenVector output_tokens;
+  for(TokenVector::const_iterator it=tokens.begin(); it!=tokens.end(); it++)
+  {
+    if(it->type == Superblank)
+      output_tokens.push_back(Token::as_symbol(token_stream.get_alphabet().get_blank_symbol()));
+    else
+      output_tokens.push_back(*it);
+  }
+  return output_tokens;
 }
-std::string
-AbstractTransducer::process_finals(TokenIOStream& token_stream, const LookupPathVector& finals) const
+
+std::vector<std::string>
+XeroxResultsPrinter::process_finals(const LookupPathVector& finals) const
 {
-  LookupPathVector sorted_finals(finals.begin(), finals.end());
-  std::sort(sorted_finals.begin(), sorted_finals.end(), compare_LookupPath_pointers);
+  std::vector<std::string> results;
+  LookupPathVector sorted_finals = preprocess_finals(finals);
   
-  std::ostringstream res;
   for(LookupPathVector::const_iterator it=sorted_finals.begin(); it!=sorted_finals.end(); it++)
   {
-    res << '/' << token_stream.escape(alphabet.symbols_to_string((*it)->get_output_symbols()));
-    if(header.probe_flag(Weighted) && displayWeightsFlag)
-      res << '~' << dynamic_cast<const LookupPathW*>(*it)->get_weight() << '~';
+    std::ostringstream res;
+    res << token_stream.get_alphabet().symbols_to_string((*it)->get_output_symbols());
+    if(dynamic_cast<const LookupPathW*>(*it) != NULL && displayWeightsFlag)
+      res << "\t" << dynamic_cast<const LookupPathW*>(*it)->get_weight();
+    
+    results.push_back(res.str());
   }
-  
-  return res.str();
+  return results;
 }
+
+void
+XeroxResultsPrinter::print_word(const TokenVector& surface_form,
+                                std::vector<std::string> const &analyzed_forms) const
+{
+  std::string surface = token_stream.tokens_to_string(clear_superblanks(surface_form));
+  
+  for(std::vector<std::string>::const_iterator it=analyzed_forms.begin(); it!=analyzed_forms.end(); it++)
+    token_stream.ostream() << surface << "\t" << *it << std::endl;
+  token_stream.ostream() << std::endl;
+}
+
+void
+XeroxResultsPrinter::print_unknown_word(const TokenVector& surface_form) const
+{
+  token_stream.ostream() << token_stream.tokens_to_string(clear_superblanks(surface_form))
+                         << "\t+?" << std::endl << std::endl;
+}
+
+
+//////////Other lookup functions
 
 void AbstractTransducer::tokenize(TokenIOStream& token_stream)
 {
@@ -685,12 +749,13 @@ void AbstractTransducer::tokenize(TokenIOStream& token_stream)
   }
 }
 
-void AbstractTransducer::run_lookup(TokenIOStream& token_stream)
+void
+AbstractTransducer::run_lookup(TokenIOStream& token_stream, ResultsPrinter& results_printer)
 {
   LookupState state(*this);
   size_t last_stream_location = 0;
   TokenVector surface_form;
-  std::string analyzed_forms;
+  std::vector<std::string> analyzed_forms;
   
   Token next_token;
   while((next_token = token_stream.get_token()).type != None)
@@ -708,7 +773,7 @@ void AbstractTransducer::run_lookup(TokenIOStream& token_stream)
   	if(state.is_final())
   	{
   	  LookupPathVector finals = state.get_finals();
-  	  analyzed_forms = process_finals(token_stream, finals);
+  	  analyzed_forms = results_printer.process_finals(finals);
   	  last_stream_location = token_stream.get_pos()-1;
   	  
   	  if(printDebuggingInformationFlag)
@@ -728,9 +793,11 @@ void AbstractTransducer::run_lookup(TokenIOStream& token_stream)
     {
       if(surface_form.empty() && !token_stream.is_alphabetic(next_token))
       {
-        token_stream << next_token;
+        if(results_printer.preserve_nonalphabetic())
+          token_stream << next_token;
       }
-      else if(analyzed_forms == "" || token_stream.is_alphabetic(token_stream.at(last_stream_location)))
+      else if(analyzed_forms.size() == 0 || 
+              token_stream.is_alphabetic(token_stream.at(last_stream_location)))
       {
         // if this is false, then we need to move the token stream back far
         // enough that next_token will be read again next iteration
@@ -749,8 +816,11 @@ void AbstractTransducer::run_lookup(TokenIOStream& token_stream)
         
         if(!token_stream.is_alphabetic(surface_form[0]))
         {
-          token_stream << surface_form[0];
-          token_stream.move_back(surface_form.size());
+//          if(printDebuggingInformationFlag)
+//            std::cout << "First character of unrecognized word is nonalphabetic."
+          if(results_printer.preserve_nonalphabetic())
+            token_stream << surface_form[0];
+          token_stream.move_back(surface_form.size()-1);
         }
         else
         {
@@ -765,27 +835,25 @@ void AbstractTransducer::run_lookup(TokenIOStream& token_stream)
             std::cout << "word_length=" << word_length << ", surface_form.size()=" << surface_form.size() 
                       << ", moving back " << revert_count << " characters" << std::endl;
           
-          print_unknown_word(token_stream,
-                             TokenVector(surface_form.begin(),
-                                         surface_form.begin()+word_length));
+          results_printer.print_unknown_word(TokenVector(surface_form.begin(),
+                                               surface_form.begin()+word_length));
           token_stream.move_back(revert_count);
         }
-      } 
+      }
       else // there are one or more valid tranductions
       {
         // the number of symbols on the end of surface_form that aren't a part
         // of the transduction(s) found
         int revert_count = token_stream.get_pos()-last_stream_location-1;
-        print_word(token_stream, 
-                   TokenVector(surface_form.begin(), 
-                               surface_form.end()-revert_count),
-                   analyzed_forms);
+        results_printer.print_word(TokenVector(surface_form.begin(), 
+                                               surface_form.end()-revert_count),
+                                   analyzed_forms); 
         token_stream.move_back(revert_count+1);
       }
       
       state.reset();
       surface_form.clear();
-      analyzed_forms = "";
+      analyzed_forms.clear();
     }
   }
   
@@ -793,8 +861,8 @@ void AbstractTransducer::run_lookup(TokenIOStream& token_stream)
     std::cout << "Got None/EOF symbol; done." << std::endl;
   
   // print any valid transductions stored
-  if(analyzed_forms != "" && token_stream.get_pos() == last_stream_location)
-    print_word(token_stream, surface_form, analyzed_forms);
+  if(analyzed_forms.size() != 0)// && token_stream.get_pos() == last_stream_location)
+    results_printer.print_word(surface_form, analyzed_forms);
   std::cout << std::endl;
 }
 

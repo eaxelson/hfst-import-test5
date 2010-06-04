@@ -53,8 +53,11 @@ typedef std::vector<LookupPath*> LookupPathVector;
 class TokenIOStream;
 class Token;
 typedef std::vector<Token> TokenVector;
+class ResultsPrinter;
+class ApertiumResultsPrinter;
+class XeroxResultsPrinter;
 
-enum OutputType {HFST, xerox};
+enum OutputType {Apertium, xerox};
 extern OutputType outputType;
 
 extern bool verboseFlag;
@@ -544,9 +547,7 @@ class AbstractTransducer
   static const TransitionTableIndex START_INDEX = 0;
   
   SymbolNumber* output_string;
-  
-  virtual std::string process_finals(TokenIOStream& token_stream, const LookupPathVector& finals) const;
-  
+    
   virtual void note_analysis(SymbolNumber * whole_output_string) = 0;
   virtual void note_analysis(const LookupPath& path) = 0;
   
@@ -579,7 +580,7 @@ class AbstractTransducer
   void analyze_iteratively(SymbolNumber* input_string);
   
   void tokenize(TokenIOStream& token_stream); // for testing
-  void run_lookup(TokenIOStream& token_stream);
+  void run_lookup(TokenIOStream& token_stream, ResultsPrinter& results_printer);
 
   virtual void printAnalyses(const std::string prepend) = 0;
   

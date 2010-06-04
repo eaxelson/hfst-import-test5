@@ -12,6 +12,8 @@ TESTS WITH fao.hfst.ol
 "x[abc]"            -> ^x/*x$[abc]
 "so a[abc]"         -> ^so/so+Adv$ ^a/*a$[abc]
 "so[abc]at"         -> ^so at/so at+CS$[abc]
+".a"                -> .^a/*a$
+"orð.maður"         -> ^orð/orð+N+Neu+Pl+Nom+Indef/orð+N+Neu+Pl+Acc+Indef/orð+N+Neu+Sg+Nom+Indef/orð+N+Neu+Sg+Acc+Indef$.^maður/maður+N+Msc+Sg+Nom+Indef$
 
 -------------
-
+Broken:

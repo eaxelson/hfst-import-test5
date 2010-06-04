@@ -27,7 +27,7 @@
 #include "hfst-proc-extra.h"
 
 
-OutputType outputType = xerox;
+OutputType outputType = Apertium;
 
 bool verboseFlag = false;
 
@@ -65,7 +65,8 @@ bool print_usage(void)
     "  -u, --unique                Suppress duplicate analyses\n" <<
     "  -n N, --analyses=N          Output no more than N analyses\n" <<
     "                              (if the transducer is weighted, the N best analyses)\n" <<
-    "  -x, --xerox                 Xerox output format (default)\n" <<
+    "  -a  --apertium              Apertium output format (default)\n" <<
+    "  -x, --xerox                 Xerox output format\n" <<
     "  -f, --fast                  Be as fast as possible.\n" <<
     "                              (with this option enabled -u and -n don't work and\n" <<
     "                              output won't be ordered by weight).\n" <<
@@ -111,6 +112,7 @@ int main(int argc, char **argv)
 	  {"echo-inputs",  no_argument,       0, 'e'},
 	  {"show-weights", no_argument,       0, 'w'},
 	  {"unique",       no_argument,       0, 'u'},
+	  {"apertium",     no_argument,       0, 'a'},
 	  {"xerox",        no_argument,       0, 'x'},
 	  {"fast",         no_argument,       0, 'f'},
 	  {"analyses",     required_argument, 0, 'n'},
@@ -120,7 +122,7 @@ int main(int argc, char **argv)
 	};
       
       int option_index = 0;
-      c = getopt_long(argc, argv, "hVvqsewuxfptn:", long_options, &option_index);
+      c = getopt_long(argc, argv, "hVvqsewuaxfptn:", long_options, &option_index);
 
       if (c == -1) // no more options to look at
 	break;
@@ -183,6 +185,10 @@ int main(int argc, char **argv)
 	    }
 	  break;
 
+  case 'a':
+    outputType = Apertium;
+    break;
+    
 	case 'x':
 	  outputType = xerox;
 	  break;
@@ -573,7 +579,13 @@ int setup(std::ifstream& is)
   else if(do_proc_flag)
   {
     TokenIOStream token_stream(std::cin, std::cout, t->get_alphabet());
-    t->run_lookup(token_stream);
+    ResultsPrinter* results_printer = (outputType==xerox)?
+                                      (ResultsPrinter*)new XeroxResultsPrinter(token_stream):
+                                      (ResultsPrinter*)new ApertiumResultsPrinter(token_stream);
+         
+    t->run_lookup(token_stream, *results_printer);
+    
+    delete results_printer;
   }
   else
     runTransducer(*t);
