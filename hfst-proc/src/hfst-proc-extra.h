@@ -366,7 +366,7 @@ struct Token
   Token(SymbolNumber s): type(Symbol), symbol(s) {}
   Token(const char* c): type(Character)
   { strncpy(character, c, 4); character[4]='\0'; }
-  Token(unsigned int i): type(Superblank), superblank_index(i) {}
+  Token(unsigned long int i): type(Superblank), superblank_index(i) {}
 };
 
 /**
