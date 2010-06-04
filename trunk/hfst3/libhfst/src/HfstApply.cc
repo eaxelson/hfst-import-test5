@@ -241,7 +241,7 @@ namespace hfst
    HfstTransducer &another)
   {
     if (this->type != another.type)
-      throw hfst::exceptions::TypeMismatchException();
+      throw hfst::exceptions::TransducerTypeMismatchException();
 
     // harmonize this according to symbol coding of another
     // and expand unknowns and identities of both transducers
