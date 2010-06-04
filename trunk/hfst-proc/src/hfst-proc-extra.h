@@ -64,6 +64,9 @@ class LookupPath
    */
   virtual bool follow(const Transition& transition);
   
+  
+  static bool compare_pointers(LookupPath* p1, LookupPath* p2) {return *p1<*p2;}
+  
   virtual bool operator<(const LookupPath& o) const
   {return output_symbols.size() < o.output_symbols.size();}
   
@@ -449,6 +452,8 @@ class TokenIOStream
   Token at(size_t pos) const {return token_buffer.get(pos);}
   void move_back(size_t count) {token_buffer.back(count);}
   
+  const TransducerAlphabet& get_alphabet() const {return alphabet;}
+  
   bool is_space(const Token& t) const;
   bool is_alphabetic(const Token& t) const;
   
@@ -479,7 +484,14 @@ class TokenIOStream
   /**
    * Write a token to the output stream
    */
-  void put_token(Token t);
+  void put_token(const Token& t) {os << token_to_string(t);}
+  
+  /**
+   * Get the string representation of the given token
+   */
+  std::string token_to_string(const Token& t) const;
+  
+  std::string tokens_to_string(const TokenVector& t) const;
   
   /**
    * Read the next token from the input stream/buffer
@@ -495,9 +507,70 @@ class TokenIOStream
   std::ostream& ostream() {return os;}
   
   void write_escaped(std::string& str) {os << escape(str);}
-  void write_escaped(const TokenVector& t);
+  void write_escaped(const TokenVector& t) {os << tokens_to_string(t);}
   
   std::string get_superblank(size_t i) const {return superblank_bucket[i];}
+};
+
+
+/**
+ * Abstract base class for handling the outputting of lookup results. Subclasses
+ * implement different formatting systems.
+ */
+class ResultsPrinter
+{
+ protected:
+  TokenIOStream& token_stream;
+  
+  /**
+   * Return a sorted copy of the path vector that contains no more than
+   * maxAnalyses entries
+   */
+  LookupPathVector preprocess_finals(const LookupPathVector& finals) const;
+ public:
+  ResultsPrinter(TokenIOStream& s): token_stream(s) {}
+  
+  virtual std::vector<std::string> process_finals(const LookupPathVector& finals) const = 0;
+  virtual void print_word(const TokenVector& surface_form, 
+                          std::vector<std::string> const &analyzed_forms) const = 0;
+  virtual void print_unknown_word(const TokenVector& surface_form) const = 0;
+  
+  /**
+   * Whether non-alphabetic characters that aren't in the transducer should be
+   * passed through to the output or not
+   */
+  virtual bool preserve_nonalphabetic() const = 0;
+};
+
+class ApertiumResultsPrinter: public ResultsPrinter
+{
+ public:
+  ApertiumResultsPrinter(TokenIOStream& s): ResultsPrinter(s) {}
+  
+  std::vector<std::string> process_finals(const LookupPathVector& finals) const;
+  void print_word(const TokenVector& surface_form, 
+                  std::vector<std::string> const &analyzed_forms) const;
+  void print_unknown_word(const TokenVector& surface_form) const;
+  
+  bool preserve_nonalphabetic() const {return true;}
+};
+
+class XeroxResultsPrinter: public ResultsPrinter
+{
+  /**
+   * Return a copy of the given token vector which has all superblanks
+   * converted to blanks
+   */
+  TokenVector clear_superblanks(const TokenVector& tokens) const;
+ public:
+  XeroxResultsPrinter(TokenIOStream& s): ResultsPrinter(s) {}
+  
+  std::vector<std::string> process_finals(const LookupPathVector& finals) const;
+  void print_word(const TokenVector& surface_form, 
+                  std::vector<std::string> const &analyzed_forms) const;
+  void print_unknown_word(const TokenVector& surface_form) const;
+  
+  bool preserve_nonalphabetic() const {return false;}
 };
 
 #endif
