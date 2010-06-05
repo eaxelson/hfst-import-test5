@@ -279,7 +279,6 @@ namespace hfst_ol {
 	it != keys->end();
 	++it)
       {
-	//      symbol_table.reserve(1000); // FIXME!! memory corruption without this
 	const char * key_name = it->second;
 	symbol_table.push_back(std::string(key_name));
       }
@@ -305,6 +304,7 @@ namespace hfst_ol {
 
   OutputVector Transducer::returnAnalyses(void)
   {
+    output_vector.clear()
     analyze();
     return output_vector;
   }
@@ -329,6 +329,7 @@ namespace hfst_ol {
 
   OutputVector TransducerW::returnAnalyses(void)
   {
+    output_vector.clear()
     analyze();
     return output_vector;
   }
