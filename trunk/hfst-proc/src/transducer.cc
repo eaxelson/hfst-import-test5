@@ -176,7 +176,24 @@ AbstractTransducer::create(std::istream& is, TransducerHeader h)
   
   TransducerAlphabet a(is, h.symbol_count());
   
-  return creators[h.probe_flag(Weighted)][a.get_state_size()>0](is, h, a);
+  AbstractTransducer* t = creators[h.probe_flag(Weighted)][a.get_state_size()>0](is, h, a);
+  
+  if(t->check_for_blank())
+  {
+    std::cerr << "!! Warning: transducer accepts input strings consisting of !!\n"
+              << "!! just a blank. This is probably a bug in the transducer  !!\n"
+              << "!! and will cause strange behavior.                        !!\n";
+  }
+  
+  return t;
+}
+
+bool
+AbstractTransducer::check_for_blank() const
+{
+  LookupState state(*this);
+  state.step(alphabet.get_blank_symbol());
+  return state.is_final();
 }
 
 void

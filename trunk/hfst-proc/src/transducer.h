@@ -365,12 +365,17 @@ class AbstractTransducer
   static TransducerCreator creators[2][2];
   static AbstractTransducer* create(std::istream& is, TransducerHeader h);
   
+  static const TransitionTableIndex START_INDEX = 0;
+  
   TransducerHeader header;
   TransducerAlphabet alphabet;
   
   //Subclasses provide the index_table and transition_table
   
-  static const TransitionTableIndex START_INDEX = 0;
+  /**
+   * Check if the transducer accepts an input string consisting of just a blank
+   */
+  bool check_for_blank() const;
  public:
   AbstractTransducer(TransducerHeader h, TransducerAlphabet a):
     header(h), alphabet(a) {}  
