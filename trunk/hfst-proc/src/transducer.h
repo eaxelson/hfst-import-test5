@@ -224,6 +224,12 @@ class TransducerAlphabet
   bool is_alphabetic(SymbolNumber symbol) const 
   {return (alphabetic.find(symbol) != alphabetic.end());}
   
+  /**
+   * Whether the symbol is an apertium-style tag (i.e. symbols starting 
+   * with < and ending with > ) 
+   */
+  bool is_tag(SymbolNumber symbol) const;
+  
   std::string symbol_to_string(SymbolNumber symbol) const
   {
     SymbolTable::const_iterator it = symbol_table.find(symbol);
@@ -389,8 +395,9 @@ class AbstractTransducer
   const TransducerHeader& get_header() const {return header;}
   const TransducerAlphabet& get_alphabet() const {return alphabet;}
   
-  void tokenize(TokenIOStream& token_stream); // for testing
-  void run_lookup(TokenIOStream& token_stream, OutputFormatter& output_formatter);
+  void do_tokenize(TokenIOStream& token_stream); // for testing
+  void do_analysis(TokenIOStream& token_stream, OutputFormatter& output_formatter);
+  void do_generation(TokenIOStream& token_stream, GenerationMode mode);
   
   virtual bool is_epsilon(const Transition& transition) const
   {return transition.matches(0);}

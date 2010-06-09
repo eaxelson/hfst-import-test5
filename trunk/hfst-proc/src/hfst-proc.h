@@ -85,7 +85,7 @@ enum GenerationMode
   gm_clean,      // clear all
   gm_unknown,    // display unknown words, clear transfer and generation tags
   gm_all,        // display all
-  gm_tagged      // tagged generation
+  gm_marked      // marked generation
 };
 
 class TransitionIndex;
@@ -97,5 +97,9 @@ typedef std::vector<Transition*> TransitionVector;
 // This is 2^31, hopefully equal to UINT_MAX/2 rounded up.
 // For some profound reason it can't be replaced with (UINT_MAX+1)/2.
 const TransitionTableIndex TRANSITION_TARGET_TABLE_START = 2147483648u;
+
+void stream_error(const char* e);
+void stream_error(std::string e);
+
 
 #endif

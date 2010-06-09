@@ -242,7 +242,10 @@ TokenIOStream::make_token()
   
   // the next thing in the stream is not a symbol
   // (extract_symbol moved the stream back to before anything was read)
-  return Token::as_character(read_utf8_char().c_str());
+  std::string ch = read_utf8_char();
+  return (escaped_chars.find(ch[0]) == escaped_chars.end()) ?
+    Token::as_character(ch.c_str()) :
+    Token::as_reservedcharacter(ch[0]);
 }
 
 Token
@@ -259,13 +262,21 @@ TokenIOStream::read_token()
       case '[':
         superblank_bucket.push_back(read_delimited(']'));
         return Token::as_superblank(superblank_bucket.size()-1);
-     
-     case '\\':
-       next_char = is.get(); // get the peeked char for real
-       return Token::as_character(read_escaped());
+      
+      case '\\':
+        next_char = is.get(); // get the peeked char for real
+        return Token::as_character(read_escaped());
+      
+      case '<':
+      {
+        Token t = make_token();
+        if(t.type == Symbol && alphabet.is_tag(t.symbol)) // the '<' introduced a tag, that's fine
+          return t;
+        return Token::as_reservedcharacter('<');
+      }
       
       default:
-        stream_error(std::string("Found unexpected character ")+((char)next_char)+" unescaped in stream");
+        return Token::as_reservedcharacter((char)is.get());
     }
   }
   return make_token();
@@ -277,6 +288,7 @@ TokenIOStream::to_symbol(const Token& t) const
   switch(t.type)
   {
     case None:
+    case ReservedCharacter:
       return NO_SYMBOL_NUMBER;
     case Symbol:
       return t.symbol;
@@ -285,6 +297,14 @@ TokenIOStream::to_symbol(const Token& t) const
     default:
       return is_space(t) ? alphabet.get_blank_symbol() : NO_SYMBOL_NUMBER;
   }
+}
+SymbolNumberVector
+TokenIOStream::to_symbols(const TokenVector& t) const
+{
+  SymbolNumberVector res;
+  for(TokenVector::const_iterator it=t.begin(); it!=t.end(); it++)
+    res.push_back(to_symbol(*it));
+  return res;
 }
 
 std::string
@@ -312,6 +332,18 @@ TokenIOStream::get_token()
   return token;
 }
 
+void
+TokenIOStream::put_tokens(const TokenVector& t)
+{
+  for(TokenVector::const_iterator it=t.begin(); it!=t.end(); it++)
+    put_token(*it);
+}
+void
+TokenIOStream::put_symbols(const SymbolNumberVector& s)
+{
+  os << alphabet.symbols_to_string(s);
+}
+
 std::string
 TokenIOStream::token_to_string(const Token& t) const
 {
@@ -323,6 +355,8 @@ TokenIOStream::token_to_string(const Token& t) const
       return escape(t.character);
     case Superblank:
       return superblank_bucket[t.superblank_index];
+    case ReservedCharacter:
+      return t.character;
     default:
       return "";
   }
@@ -335,5 +369,17 @@ TokenIOStream::tokens_to_string(const TokenVector& t) const
   for(TokenVector::const_iterator it=t.begin(); it!=t.end(); it++)
     res += token_to_string(*it);
   return res;
+}
+
+void
+TokenIOStream::strip_tags(TokenVector& t) const
+{
+  for(TokenVector::iterator it=t.begin(); it!=t.end();)
+  {
+    if(it->type == Symbol && alphabet.is_tag(it->symbol))
+      t.erase(it);
+    else
+      it++;
+  }
 }
 

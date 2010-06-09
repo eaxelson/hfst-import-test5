@@ -20,6 +20,13 @@ LookupState::init(LookupPath* initial)
 }
 
 void
+LookupState::lookup(const SymbolNumberVector& input)
+{
+  for(SymbolNumberVector::const_iterator it=input.begin(); it!=input.end(); it++)
+    step(*it);
+}
+
+void
 LookupState::step(const SymbolNumber input)
 {
   if(input == NO_SYMBOL_NUMBER)

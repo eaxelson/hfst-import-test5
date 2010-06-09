@@ -130,6 +130,15 @@ TransducerAlphabet::calculate_alphabetic()
       alphabetic.insert(it->first);
 }
 
+bool
+TransducerAlphabet::is_tag(SymbolNumber symbol) const
+{
+  std::string str = symbol_to_string(symbol);
+  if(str[0] == '<' && str[str.length()-1] == '>')
+    return true;
+  return false;
+}
+
 
 //////////Function definitions for TransitionIndex and Transition
 
@@ -197,17 +206,19 @@ AbstractTransducer::check_for_blank() const
 }
 
 void
-AbstractTransducer::tokenize(TokenIOStream& token_stream)
+AbstractTransducer::do_tokenize(TokenIOStream& token_stream)
 {
   Token next_token;
   while((next_token=token_stream.get_token()).type != None)
   {
     if(next_token.type == Symbol)
-      std::cout << "Symbol:     #" << next_token.symbol << "(" << alphabet.symbol_to_string(next_token.symbol) << ")";
+      std::cout << "Symbol:        #" << next_token.symbol << "(" << alphabet.symbol_to_string(next_token.symbol) << ")";
     else if(next_token.type == Character)
-      std::cout << "Character:  '" << next_token.character << "'" << (token_stream.is_space(next_token)?" (space)":"");
+      std::cout << "Character:     '" << next_token.character << "'" << (token_stream.is_space(next_token)?" (space)":"");
     else if(next_token.type == Superblank)
-      std::cout << "Superblank: " << token_stream.get_superblank(next_token.superblank_index);
+      std::cout << "Superblank:    " << token_stream.get_superblank(next_token.superblank_index);
+    else if(next_token.type == ReservedCharacter)
+      std::cout << "Reserved char: '" << next_token.character << "'";
     else if(next_token.type == None)
       std::cout << "None/EOF";
     
@@ -217,7 +228,85 @@ AbstractTransducer::tokenize(TokenIOStream& token_stream)
 }
 
 void
-AbstractTransducer::run_lookup(TokenIOStream& token_stream, OutputFormatter& output_formatter)
+AbstractTransducer::do_generation(TokenIOStream& token_stream, GenerationMode mode)
+{
+  LookupState state(*this);
+  
+  Token next_token;
+  while((next_token = token_stream.get_token()).type != None)
+  {
+    if(next_token.type == ReservedCharacter)
+    {
+      if(next_token.character[0] == '^') // start of a word form to generate
+      {
+        TokenVector form;
+        while(true)
+        {
+          next_token = token_stream.get_token();
+          if(next_token.type == ReservedCharacter && next_token.character[0] == '$')
+            break;
+          else if(next_token.type == Symbol ||
+                 (next_token.type == ReservedCharacter && 
+                   (next_token.character[0]=='*' || next_token.character[0]=='@')))
+            form.push_back(next_token);
+          else if(next_token.type == None)
+            stream_error("Stream ended before end-of-word marker $ was found");
+          else
+            stream_error(std::string("Found unexpected non-symbolic character ")+token_stream.token_to_string(next_token)+" in middle of word");
+        }
+        
+        //Figure out how to output the word
+        
+        if(token_stream.token_to_string(form[0]) == "*")
+        {
+          if(mode == gm_clean) // don't output the *
+            token_stream.put_tokens(TokenVector(form.begin()+1,form.end()));
+          else
+            token_stream.put_tokens(form);
+        }
+        else if(form[0].type == ReservedCharacter && form[0].character[0] == '@')
+        {
+          if(mode == gm_clean) // don't output the @
+            token_stream.put_tokens(TokenVector(form.begin()+1,form.end()));
+          else
+            token_stream.put_tokens(form);
+        }
+        else
+        {
+          state.lookup(token_stream.to_symbols(form));
+          if(state.is_final()) // generation succeeded
+          {
+            LookupPathVector finals = state.get_finals();
+            token_stream.put_symbols(finals[0]->get_output_symbols());
+            if(finals.size() > 1)
+            {
+              for(LookupPathVector::const_iterator it=finals.begin()+1;it!=finals.end();it++)
+              {
+                token_stream.ostream() << '/';
+                token_stream.put_symbols((*it)->get_output_symbols());
+              }
+            }
+          }
+          else // no generations found
+          {
+            if(mode != gm_clean)
+              token_stream.put_token(Token::as_reservedcharacter('#'));
+            token_stream.put_tokens(form);
+          }
+          
+          state.reset();
+        }
+      }
+      else
+        stream_error(std::string("Found unexpected character ")+next_token.character+" unescaped in stream");
+    }
+    else
+      token_stream << next_token;
+  }
+}
+
+void
+AbstractTransducer::do_analysis(TokenIOStream& token_stream, OutputFormatter& output_formatter)
 {
   LookupState state(*this);
   size_t last_stream_location = 0;
@@ -235,7 +324,11 @@ AbstractTransducer::run_lookup(TokenIOStream& token_stream, OutputFormatter& out
         std::cout << "Got non-symbolic character '" << next_token.character << "'" << (token_stream.is_space(next_token)?" (space)":"") << std::endl;
       else if(next_token.type == Superblank)
         std::cout << "Got superblank " << token_stream.get_superblank(next_token.superblank_index) << std::endl;
+      else if(next_token.type == ReservedCharacter)
+        std::cout << "Got reserved character '" << next_token.character << "'" << std::endl;
     }
+    if(next_token.type == ReservedCharacter)
+      stream_error(std::string("Found unexpected character ")+next_token.character+" unescaped in stream");
     
   	if(state.is_final())
   	{
