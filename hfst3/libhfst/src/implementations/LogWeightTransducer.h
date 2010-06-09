@@ -167,6 +167,7 @@ namespace hfst { namespace implementations
       //static LogFst * define_transducer(const pair<unsigned int, unsigned int> &kp);
       //static LogFst * define_transducer(const KeyPairVector &kpv);
       static LogFst * define_transducer(const hfst::StringPairVector &spv);
+      static LogFst * define_transducer(const hfst::StringPairSet &sps);
       static LogFst * copy(LogFst * t);
       static LogFst * determinize(LogFst * t);
       static LogFst * minimize(LogFst * t);

@@ -184,6 +184,33 @@ namespace hfst
     delete spv;
   }
 
+  HfstTransducer::HfstTransducer(const StringPairSet & sps, ImplementationType type)
+  {
+    switch (type)
+      {
+      case SFST_TYPE:
+	implementation.sfst = sfst_interface.define_transducer(sps);
+	break;
+      case TROPICAL_OFST_TYPE:
+      case UNSPECIFIED_TYPE:
+	implementation.tropical_ofst = 
+	  tropical_ofst_interface.define_transducer(sps);
+	this->type = TROPICAL_OFST_TYPE;
+	break;
+      case LOG_OFST_TYPE:
+	implementation.log_ofst = 
+	  log_ofst_interface.define_transducer(sps);
+	break;
+      case FOMA_TYPE:
+	implementation.foma =
+	  foma_interface.define_transducer(sps);
+	break;
+      case ERROR_TYPE:
+      default:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+      }
+  }
+
   HfstTransducer::HfstTransducer(const std::string& upper_utf8_str,
 				 const std::string& lower_utf8_str,
 				 const HfstTokenizer 

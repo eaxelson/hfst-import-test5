@@ -59,6 +59,9 @@ namespace hfst
 
   class HfstTransducer;
 
+  typedef std::pair <HfstTransducer,HfstTransducer> HfstTransducerPair;
+  typedef std::set <HfstTransducerPair> HfstTransducerPairSet;
+
   class HfstMutableTransducer;
 
   /** \brief A stream for reading binary transducers. 
@@ -292,7 +295,7 @@ namespace hfst
 	\a input_utf8_str and \a output_utf8_str are read one token at a time and for each token a new transition 
 	is created in the resulting transducer. The input and output symbols of that transition are the same as 
 	the input and output tokens read. If either string contains less tokens than another, epsilons are used
-	as transition symbols for the string containing less tokens.
+	as transition symbols for the shorter string.
 
 	An example:
 \verbatim
@@ -308,6 +311,10 @@ namespace hfst
     		   const std::string& output_utf8_str,
     		   const HfstTokenizer &multichar_symbol_tokenizer,
 		   ImplementationType type);
+
+
+    HfstTransducer(const StringPairSet & sps, ImplementationType type);
+
     /** \brief Read a binary transducer from transducer stream \a in. 
 
 	@pre ( in.is_eof() == in.is_bad() == false && in.is_fst() ).
@@ -806,6 +813,29 @@ void print(HfstMutableTransducer &t)
 
       @see HfstTransducer::write_in_att_format(FILE*) */
   std::ostream &operator<<(std::ostream &out,HfstTransducer &t);
+
+  namespace rules
+  {
+    HfstTransducer two_level_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
+    HfstTransducer two_level_only_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
+    HfstTransducer two_level_if_and_only_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
+
+    HfstTransducer replace_up(HfstTransducerPairSet &contexts, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_down(HfstTransducerPairSet &contexts, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_right(HfstTransducerPairSet &contexts, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_left(HfstTransducerPairSet &contexts, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+
+    HfstTransducer restriction(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer restriction_and_coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer surface_restriction(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer surface_coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer surface_restriction_and_coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer deep_restriction(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer deep_coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer deep_restriction_and_coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+  }
+
 }
 
 

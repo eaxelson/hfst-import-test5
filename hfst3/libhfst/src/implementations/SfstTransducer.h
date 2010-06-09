@@ -58,6 +58,7 @@ namespace hfst { namespace implementations
       static Transducer * define_transducer(const char *symbol);
       static Transducer * define_transducer(const char *isymbol, const char *osymbol);
       static Transducer * define_transducer(const StringPairVector &spv);
+      static Transducer * define_transducer(const StringPairSet &sps);
       static Transducer * copy(Transducer * t);
       static Transducer * determinize(Transducer * t);
       static Transducer * minimize(Transducer * t);

@@ -114,6 +114,7 @@ namespace implementations
       static StdVectorFst * define_transducer(const std::string &symbol);
       static StdVectorFst * define_transducer(const std::string &isymbol, const std::string &osymbol);
       static StdVectorFst * define_transducer(const hfst::StringPairVector &spv);
+      static StdVectorFst * define_transducer(const hfst::StringPairSet &sps);
       static StdVectorFst * copy(StdVectorFst * t);
       static StdVectorFst * determinize(StdVectorFst * t);
       static StdVectorFst * minimize(StdVectorFst * t);

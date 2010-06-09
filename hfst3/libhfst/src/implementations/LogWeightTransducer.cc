@@ -575,6 +575,29 @@ namespace hfst { namespace implementations
     return t;
   }
 
+  LogFst * LogWeightTransducer::define_transducer
+  (const StringPairSet &sps)
+  {
+    LogFst * t = new LogFst;
+    initialize_symbol_tables(t);
+
+    StateId s1 = t->AddState();
+    t->SetStart(s1);
+
+    if (not sps.empty()) {
+      StateId s2 = t->AddState();
+      for (StringPairSet::const_iterator it = sps.begin();
+	   it != sps.end();
+	   ++it)
+	{
+	  t->AddArc(s1,LogArc(t->InputSymbols()->AddSymbol(it->first),t->InputSymbols()->AddSymbol(it->second),0,s2));
+	}
+      s1 = s2;
+    }
+    t->SetFinal(s1,0);
+    return t;
+  }
+
   void LogWeightTransducer::print_test(LogFst *t) 
   {
 
