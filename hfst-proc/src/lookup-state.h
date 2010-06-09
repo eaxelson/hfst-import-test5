@@ -156,6 +156,11 @@ class LookupState
    */
   const LookupPathVector get_finals() const;
   
+  /**
+   * Do a lookup using all the given symbols. This is equivalent to stepping the
+   * state with each of the symbols in the vector.
+   */
+  void lookup(const SymbolNumberVector& input);
   
   /**
    * Apply a new input symbol to the state's active paths, and then follow any

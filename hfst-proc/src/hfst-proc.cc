@@ -34,24 +34,34 @@ int maxAnalyses = std::numeric_limits<int>::max();
 bool preserveDiacriticRepresentationsFlag = false;
 bool printDebuggingInformationFlag = false;
 
+void stream_error(const char* e)
+{
+  throw std::ios_base::failure((std::string("Error: malformed input stream: ")+e).c_str());
+}
+void stream_error(std::string e) {stream_error(e.c_str());}
+
+
 bool print_usage(void)
 {
   std::cerr <<
     "\n" <<
-    "Usage: " << PACKAGE_NAME << " [Options] transducer_file [input_file [output_file]]\n" <<
+    "Usage: " << PACKAGE_NAME << " [-a [-p|-x]|-g|-n|-t] [-W] [-n N] [-v|-q|-s] transducer_file [input_file [output_file]]\n" <<
     "Perform a transducer lookup on a text stream, tokenizing on the fly\n" <<
     "\n" <<
-    "  -h, --help                  Print this help message\n" <<
-    "  -V, --version               Print version information\n" <<
+    "  -a, --analysis              Morphological analysis (default)\n" <<
+    "  -g, --generation            Morphological generation\n" <<
+    "  -n, --non-marked-gen        Morph. generation without unknown word marks\n" <<
+    "  -t  --tokenize              Tokenize the input stream into symbols (for debugging)\n" <<
+    "  -p  --apertium              Apertium output format for analysis (default)\n" <<
+    "  -x, --xerox                 Xerox output format for analysis\n" <<
+    "  -W, --show-weights          Print final analysis weights (if any)\n" <<
+    "  -N N, --analyses=N          Output no more than N analyses\n" <<
+    "                              (if the transducer is weighted, the N best analyses)\n" <<
     "  -v, --verbose               Be verbose\n" <<
     "  -q, --quiet                 Don't be verbose (default)\n" <<
     "  -s, --silent                Same as quiet\n" <<
-    "  -w, --show-weights          Print final analysis weights (if any)\n" <<
-    "  -n N, --analyses=N          Output no more than N analyses\n" <<
-    "                              (if the transducer is weighted, the N best analyses)\n" <<
-    "  -a  --apertium              Apertium output format (default)\n" <<
-    "  -x, --xerox                 Xerox output format\n" <<
-    "  -t  --tokenize              Tokenize the input stream (for debugging)\n" <<
+    "  -V, --version               Print version information\n" <<
+    "  -h, --help                  Print this help message\n" <<
     "\n" <<
     "Report bugs to " << PACKAGE_BUGREPORT << "\n" <<
     "\n";
@@ -76,29 +86,32 @@ bool print_short_help(void)
 
 int main(int argc, char **argv)
 {
-  int cmd = 'l';
+  int cmd = 0;
   
   while (true)
   {
     static struct option long_options[] =
     {
       // first the hfst-mandated options
-      {"help",         no_argument,       0, 'h'},
-      {"version",      no_argument,       0, 'V'},
-      {"verbose",      no_argument,       0, 'v'},
-      {"quiet",        no_argument,       0, 'q'},
-      {"silent",       no_argument,       0, 's'},
-      // the hfst-optimized-lookup-specific options
-      {"show-weights", no_argument,       0, 'w'},
-      {"apertium",     no_argument,       0, 'a'},
-      {"xerox",        no_argument,       0, 'x'},
-      {"analyses",     required_argument, 0, 'n'},
-      {"tokenize",     no_argument,       0, 't'},
-      {0,              0,                 0,  0 }
+      {"help",          no_argument,       0, 'h'},
+      {"version",       no_argument,       0, 'V'},
+      {"verbose",       no_argument,       0, 'v'},
+      {"quiet",         no_argument,       0, 'q'},
+      {"silent",        no_argument,       0, 's'},
+      // the hfst-proc-specific options
+      {"analysis",      no_argument,       0, 'a'},
+      {"generation",    no_argument,       0, 'g'},
+      {"non-marked-gen",no_argument,       0, 'n'},
+      {"tokenize",      no_argument,       0, 't'},
+      {"apertium",      no_argument,       0, 'p'},
+      {"xerox",         no_argument,       0, 'x'},
+      {"show-weights",  no_argument,       0, 'W'},
+      {"analyses",      required_argument, 0, 'N'},
+      {0,               0,                 0,  0 }
     };
       
     int option_index = 0;
-    int c = getopt_long(argc, argv, "hVvqswaxtn:", long_options, &option_index);
+    int c = getopt_long(argc, argv, "hVvqsagntpxWN:", long_options, &option_index);
 
     if (c == -1) // no more options to look at
       break;
@@ -133,30 +146,39 @@ int main(int argc, char **argv)
       verboseFlag = false;
       displayWeightsFlag = true;
       break;
+    
+    case 'a':
+    case 'g':
+    case 'n':
+    case 't':
+      if(cmd==0)
+        cmd = c;
+      else
+      {
+        std::cerr << "Multiple operation modes given" << std::endl;
+        print_short_help();
+        return EXIT_FAILURE;
+      }
+      break;
       
-    case 'w':
+    case 'p':
+      outputType = Apertium;
+      break;
+    case 'x':
+      outputType = xerox;
+      break;
+      
+    case 'W':
       displayWeightsFlag = true;
       break;
       
-    case 'n':
+    case 'N':
       maxAnalyses = atoi(optarg);
       if (maxAnalyses < 1)
         {
           std::cerr << "Invalid or no argument for analyses count\n";
           return EXIT_FAILURE;
         }
-      break;
-
-    case 'a':
-      outputType = Apertium;
-      break;
-      
-    case 'x':
-      outputType = xerox;
-      break;
-        
-    case 't':
-      cmd = 't';
       break;
       
     default:
@@ -218,15 +240,20 @@ int main(int argc, char **argv)
     switch(cmd)
     {
       case 't':
-        t->tokenize(token_stream);
+        t->do_tokenize(token_stream);
         break;
-      case 'l':
+      case 'g':
+        t->do_generation(token_stream, gm_unknown);
+        break;
+      case 'n':
+        t->do_generation(token_stream, gm_clean);
+      case 'a':
       default:
         OutputFormatter* output_formatter = (outputType==xerox)?
                     (OutputFormatter*)new XeroxOutputFormatter(token_stream):
                     (OutputFormatter*)new ApertiumOutputFormatter(token_stream);
          
-        t->run_lookup(token_stream, *output_formatter);
+        t->do_analysis(token_stream, *output_formatter);
     
         delete output_formatter;
         break;

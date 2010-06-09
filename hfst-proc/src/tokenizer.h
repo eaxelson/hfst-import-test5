@@ -82,8 +82,9 @@ class Symbolizer
  * Symbol - a known transducer symbol
  * Character - a (UTF-8) character not in the transducer alphabet
  * Superblank - an escaped string that is handled as a single blank character
+ * ReservedCharacter - an Apertium reserved character not otherwise handled
  */
-enum TokenType {None, Symbol, Character, Superblank};
+enum TokenType {None, Symbol, Character, Superblank, ReservedCharacter};
 
 /**
  * A structure representing a stream token. It can be of various types and
@@ -107,11 +108,13 @@ struct Token
   {type=Character; strncpy(character,c,4); character[4]='\0';}
   void set_character(char c) {type=Character; character[0]=c; character[1]='\0';}
   void set_superblank(unsigned int i) {type=Superblank; superblank_index=i;}
+  void set_reservedcharacter(char c) {type=ReservedCharacter; character[0]=c; character[1]='\0';}
   
   static Token as_symbol(SymbolNumber s) {Token t; t.set_symbol(s); return t;}
   static Token as_character(const char* c) {Token t; t.set_character(c); return t;}
   static Token as_character(char c) {Token t; t.set_character(c); return t;}
   static Token as_superblank(unsigned int i) {Token t; t.set_superblank(i); return t;}
+  static Token as_reservedcharacter(char c) {Token t; t.set_reservedcharacter(c); return t;}
 };
 
 /**
@@ -173,12 +176,6 @@ class TokenIOStream
    * Read the next token in the stream, handling escaped characters
    */
   Token read_token();
-  
-  void stream_error(std::string e) const {stream_error(e.c_str());}
-  void stream_error(const char* e) const 
-  {
-    throw std::ios_base::failure((std::string("Error: malformed input stream: ")+e).c_str());
-  }
  public:
   TokenIOStream(std::istream& i, std::ostream& o, const TransducerAlphabet& a):
     is(i), os(o), alphabet(a), symbolizer(a.get_symbol_table()), superblank_bucket(), token_buffer(1024)
@@ -205,8 +202,10 @@ class TokenIOStream
    * Character - blank_symbol if is_space returns true for the character,
    *             otherwise NO_SYMBOL_NUMBER
    * Superblank - blank_symbol
+   * ReservedCharacter - NO_SYMBOL_NUMBER
    */
   SymbolNumber to_symbol(const Token& t) const;
+  SymbolNumberVector to_symbols(const TokenVector& t) const;
   
   size_t first_nonalphabetic(const TokenVector& s) const;
   
@@ -225,6 +224,9 @@ class TokenIOStream
    */
   void put_token(const Token& t) {os << token_to_string(t);}
   
+  void put_tokens(const TokenVector& t);
+  void put_symbols(const SymbolNumberVector& s);
+  
   /**
    * Get the string representation of the given token
    */
@@ -232,6 +234,11 @@ class TokenIOStream
   
   std::string tokens_to_string(const TokenVector& t) const;
   
+  /**
+   * Strip apertium-style tag symbols from the list of tokens
+   */
+  void strip_tags(TokenVector& t) const;
+    
   /**
    * Read the next token from the input stream/buffer
    */
