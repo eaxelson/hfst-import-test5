@@ -348,6 +348,24 @@ namespace hfst { namespace implementations {
     return retval;
   }
 
+  fsm * FomaTransducer::define_transducer(const StringPairSet &sps)
+  {
+    if (sps.empty())
+      return fsm_empty_string();
+
+    struct fsm * retval = NULL;
+    for (StringPairSet::const_iterator it = sps.begin();
+	 it != sps.end();
+	 ++it)
+      {
+	if (retval == NULL)
+	  retval = fsm_cross_product( fsm_symbol(strdup(it->first.c_str())), fsm_symbol(strdup(it->second.c_str())) );
+	else
+	  retval = fsm_union( retval, fsm_cross_product( fsm_symbol(strdup(it->first.c_str())), fsm_symbol(strdup(it->second.c_str())) ) );
+      }
+    return retval;
+  }
+
 
   fsm * FomaTransducer::copy(fsm * t)
   {     
