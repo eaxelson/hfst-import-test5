@@ -1,0 +1,167 @@
+#ifndef _LOOKUP_PATH_
+#define _LOOKUP_PATH_
+
+#include "hfst-proc.h"
+#include "transducer.h"
+
+/**
+ * Represents a (possibly partial) path through a transducer. This is used
+ * during lookup for storing lookup paths that are continued as input symbols
+ * are provided.
+ */
+class LookupPath
+{
+ protected:
+  /**
+   * Points to the state in the transition index table or the transition table
+   * where the path ends. This follows the normal semantics whereby values less
+   * than TRANSITION_TARGET_TABLE_START reference the transition index table
+   * while values greater than or equal to TRANSITION_TARGET_TABLE_START
+   * reference the transition table
+   */
+  TransitionTableIndex index;
+  
+  /**
+   * Whether the path ends at a final state
+   */
+  bool final;
+  
+  /**
+   * The output symbols of the transitions this path has followed
+   */
+  SymbolNumberVector output_symbols;
+  
+ public:
+  LookupPath(const TransitionTableIndex initial): index(initial) {}
+  
+  LookupPath(const LookupPath& o):
+    index(o.index), output_symbols(o.output_symbols) {}
+  
+  virtual ~LookupPath() {}
+  
+  virtual LookupPath* clone() const {return new LookupPath(*this);}
+  
+  /**
+   * Follow the transition index, modifying our index
+   * @param index the index to follow
+   */
+  virtual void follow(const TransitionIndex& index);
+  
+  /**
+   * Follow the transition, appending the output symbol
+   * @param transition the transition to follow
+   * @true if following the transition succeeded. This can fail because of
+   *       e.g. flag diacritics in some subclasses
+   */
+  virtual bool follow(const Transition& transition);
+  
+  
+  static bool compare_pointers(LookupPath* p1, LookupPath* p2) {return *p1<*p2;}
+  
+  virtual bool operator<(const LookupPath& o) const
+  {return output_symbols.size() < o.output_symbols.size();}
+  
+  TransitionTableIndex get_index() const {return index;}
+  bool at_final() const {return final;}
+  SymbolNumberVector get_output_symbols() const {return output_symbols;}
+};
+
+/**
+ * A base class used by lookup path types that handle flag diacritics
+ */
+class PathFd
+{
+ protected:
+  /**
+   * The values of the flag diacritic features at the end of the path
+   */
+  FlagDiacriticState fd_state;
+  
+  /**
+   * A reference of the list flag diacritic operations in the transducer where
+   * the lookup is being done
+   */
+  const OperationVector& fd_operations;
+  
+  /**
+   * Evaluates the given flag diacritic operation, possibly modifying fd_state,
+   * and returning whether the operation is allowed or not
+   */
+  bool evaluate_flag_diacritic(const FlagDiacriticOperation& op);
+  
+  /**
+   * If the given symbol is a flag diacritic, return the result of the other
+   * evaluation method, otherwise return true
+   */
+  bool evaluate_flag_diacritic(SymbolNumber s);
+  
+  PathFd(int state_size, const OperationVector& op): 
+    fd_state(state_size, 0), fd_operations(op) {}
+  PathFd(const PathFd& o): fd_state(o.fd_state), 
+                           fd_operations(o.fd_operations) {}
+};
+
+/**
+ * A lookup path which additionally stores the state of the flag diacritics on
+ * the path and whose follow is conditional based on evaluation diacritics
+ */
+class LookupPathFd : public LookupPath, PathFd
+{
+ public:
+  LookupPathFd(const TransitionTableIndex initial, int state_size, const OperationVector& op):
+    LookupPath(initial), PathFd(state_size, op) {}
+  LookupPathFd(const LookupPathFd& o): LookupPath(o), PathFd(o) {}
+  
+  virtual LookupPath* clone() const {return new LookupPathFd(*this);}
+  
+  virtual bool follow(const Transition& transition);
+};
+
+/**
+ * A lookup path which additionally stores the summed weight of the path
+ */
+class LookupPathW : public LookupPath
+{
+ protected:
+  /**
+   * The summed weight of the transitions this path has followed
+   */
+  Weight weight;
+  
+  /**
+   * An extra weight that is added to the sum when the path is at a final state
+   */
+  Weight final_weight;
+ public:
+  LookupPathW(const TransitionTableIndex initial): 
+  	LookupPath(initial), weight(0.0f), final_weight(0.0f) {}
+  LookupPathW(const LookupPathW& o): LookupPath(o), weight(o.weight),
+    final_weight(o.final_weight) {}
+  
+  virtual LookupPath* clone() const {return new LookupPathW(*this);}
+
+  virtual void follow(const TransitionIndex& index);
+  virtual bool follow(const Transition& transition);
+  
+  virtual bool operator<(const LookupPathW& o) const
+  {return get_weight() < o.get_weight();}
+  
+  Weight get_weight() const {return at_final() ? weight+final_weight : weight;}
+};
+
+/**
+ * A lookup path with weight and flag diacritics
+ */
+class LookupPathWFd : public LookupPathW, PathFd
+{
+ public:
+  LookupPathWFd(const TransitionTableIndex initial, int state_size, const OperationVector& op):
+    LookupPathW(initial), PathFd(state_size, op){}
+  LookupPathWFd(const LookupPathWFd& o): LookupPathW(o), PathFd(o) {}
+  
+  virtual LookupPath* clone() const {return new LookupPathWFd(*this);}
+  
+  virtual bool follow(const Transition& transition);
+};
+
+#endif
