@@ -76,9 +76,17 @@ const Weight INFINITE_WEIGHT = static_cast<float>(NO_TABLE_INDEX);
 enum FlagDiacriticOperator {P, N, R, D, C, U};
 
 enum HeaderFlag {Weighted, Deterministic, Input_deterministic, Minimized,
-		 Cyclic, Has_epsilon_epsilon_transitions,
-		 Has_input_epsilon_transitions, Has_input_epsilon_cycles,
-		 Has_unweighted_input_epsilon_cycles};
+  	 Cyclic, Has_epsilon_epsilon_transitions,
+  	 Has_input_epsilon_transitions, Has_input_epsilon_cycles,
+  	 Has_unweighted_input_epsilon_cycles};
+
+enum GenerationMode
+{
+  gm_clean,      // clear all
+  gm_unknown,    // display unknown words, clear transfer and generation tags
+  gm_all,        // display all
+  gm_tagged      // tagged generation
+};
 
 class TransitionIndex;
 class Transition;

@@ -20,6 +20,7 @@ class OutputFormatter
   LookupPathVector preprocess_finals(const LookupPathVector& finals) const;
  public:
   OutputFormatter(TokenIOStream& s): token_stream(s) {}
+  virtual ~OutputFormatter() {}
   
   virtual std::vector<std::string> process_finals(const LookupPathVector& finals) const = 0;
   virtual void print_word(const TokenVector& surface_form, 

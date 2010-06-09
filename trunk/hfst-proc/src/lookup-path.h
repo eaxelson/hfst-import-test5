@@ -32,10 +32,11 @@ class LookupPath
   SymbolNumberVector output_symbols;
   
  public:
-  LookupPath(const TransitionTableIndex initial): index(initial) {}
+  LookupPath(const TransitionTableIndex initial): 
+    index(initial), final(false), output_symbols() {}
   
   LookupPath(const LookupPath& o):
-    index(o.index), output_symbols(o.output_symbols) {}
+    index(o.index), final(o.final), output_symbols(o.output_symbols) {}
   
   virtual ~LookupPath() {}
   
@@ -99,6 +100,7 @@ class PathFd
     fd_state(state_size, 0), fd_operations(op) {}
   PathFd(const PathFd& o): fd_state(o.fd_state), 
                            fd_operations(o.fd_operations) {}
+  virtual ~PathFd() {}
 };
 
 /**
