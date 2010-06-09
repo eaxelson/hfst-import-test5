@@ -7,6 +7,7 @@ AC_CONFIG_FILES([Makefile src/Makefile test/Makefile])
 
 #CXXFLAGS="-Wall -Werror -Wextra -march=native -O3"
 CXXFLAGS="-Wall -Werror -Wextra -g"
+#CXXFLAGS="-Wall -Wextra -Weffc++ -g"
 
 AC_DEFINE([DEBUG], [1], [Print some information useful for debugging])
 AC_DEFINE([DEBUG_DIACRITICS], [1], [Don't suppress printing the representations of flag diacritics])

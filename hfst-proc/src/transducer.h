@@ -7,8 +7,8 @@
 class TransducerHeader
 {
  private:
-  SymbolNumber number_of_symbols;
   SymbolNumber number_of_input_symbols;
+  SymbolNumber number_of_symbols;
   TransitionTableIndex size_of_transition_index_table;
   TransitionTableIndex size_of_transition_target_table;
 
@@ -25,33 +25,36 @@ class TransducerHeader
   bool has_input_epsilon_cycles;
   bool has_unweighted_input_epsilon_cycles;
 
-  void read_property(bool& property, std::istream& is)
+  template<class T>
+  static T read_property(std::istream& is)
+  {
+    T p;
+    is.read(reinterpret_cast<char*>(&p), sizeof(T));
+    return p;
+  }
+  static bool read_bool_property(std::istream& is)
   {
     unsigned int prop;
     is.read(reinterpret_cast<char*>(&prop), sizeof(unsigned int));
-    
-    property = (prop != 0);
+    return (prop != 0);
   }
  public:
-  TransducerHeader(std::istream& is)
-  {
-  	is.read(reinterpret_cast<char*>(&number_of_input_symbols), sizeof(SymbolNumber));
-  	is.read(reinterpret_cast<char*>(&number_of_symbols), sizeof(SymbolNumber));
-  	is.read(reinterpret_cast<char*>(&size_of_transition_index_table), sizeof(TransitionTableIndex));
-  	is.read(reinterpret_cast<char*>(&size_of_transition_target_table), sizeof(TransitionTableIndex));
-  	is.read(reinterpret_cast<char*>(&number_of_states), sizeof(StateIdNumber));
-  	is.read(reinterpret_cast<char*>(&number_of_transitions), sizeof(TransitionNumber));
-  	
-  	read_property(weighted, is);
-  	read_property(deterministic, is);
-    read_property(input_deterministic, is);
-    read_property(minimized, is);
-    read_property(cyclic, is);
-    read_property(has_epsilon_epsilon_transitions, is);
-    read_property(has_input_epsilon_transitions, is);
-    read_property(has_input_epsilon_cycles, is);
-    read_property(has_unweighted_input_epsilon_cycles, is);
-  }
+  TransducerHeader(std::istream& is):
+    number_of_input_symbols(read_property<SymbolNumber>(is)),
+    number_of_symbols(read_property<SymbolNumber>(is)),
+    size_of_transition_index_table(read_property<TransitionTableIndex>(is)),
+    size_of_transition_target_table(read_property<TransitionTableIndex>(is)),
+    number_of_states(read_property<StateIdNumber>(is)),
+    number_of_transitions(read_property<TransitionNumber>(is)),
+    weighted(read_bool_property(is)),
+    deterministic(read_bool_property(is)),
+    input_deterministic(read_bool_property(is)),
+    minimized(read_bool_property(is)),
+    cyclic(read_bool_property(is)),
+    has_epsilon_epsilon_transitions(read_bool_property(is)),
+    has_input_epsilon_transitions(read_bool_property(is)),
+    has_input_epsilon_cycles(read_bool_property(is)),
+    has_unweighted_input_epsilon_cycles(read_bool_property(is)) {}
 
   SymbolNumber symbol_count(void) const { return number_of_symbols; }
   SymbolNumber input_symbol_count(void) const {return number_of_input_symbols;}
@@ -184,10 +187,10 @@ class TransducerAlphabet
   }
  public:
   
-  TransducerAlphabet(std::istream& is, SymbolNumber symbol_count)
+  TransducerAlphabet(std::istream& is, SymbolNumber symbol_count):
+    symbol_table(), operations(), alphabetic(), blank_symbol(NO_SYMBOL_NUMBER),
+    feature_bucket(), value_bucket(), val_num(1), feat_num(0)
   {
-    feat_num = 0;
-    val_num = 1;
     value_bucket[std::string()] = 0; // empty value = neutral
     for(SymbolNumber k=0; k<symbol_count; k++)
       get_next_symbol(is, k);
@@ -245,7 +248,8 @@ class TransitionIndex
 		 TransitionTableIndex first_transition):
     input_symbol(input), first_transition_index(first_transition) {}
   
-  TransitionIndex(std::istream& is)
+  TransitionIndex(std::istream& is):
+    input_symbol(NO_SYMBOL_NUMBER), first_transition_index(0)
   {
   	is.read(reinterpret_cast<char*>(&input_symbol), sizeof(SymbolNumber));
   	is.read(reinterpret_cast<char*>(&first_transition_index), sizeof(TransitionTableIndex));
@@ -290,7 +294,8 @@ class Transition
              TransitionTableIndex target):
     input_symbol(input), output_symbol(output), target_index(target) {}
   
-  Transition(std::istream& is)
+  Transition(std::istream& is):
+    input_symbol(NO_SYMBOL_NUMBER), output_symbol(NO_SYMBOL_NUMBER), target_index(0)
   {
   	is.read(reinterpret_cast<char*>(&input_symbol), sizeof(SymbolNumber));
   	is.read(reinterpret_cast<char*>(&output_symbol), sizeof(SymbolNumber));
@@ -317,7 +322,7 @@ class TransitionW : public Transition
               TransitionTableIndex target, Weight w):
       Transition(input, output, target), transition_weight(w) {}
 
-  TransitionW(std::istream& is): Transition(is)
+  TransitionW(std::istream& is): Transition(is), transition_weight(0.0f)
   {is.read(reinterpret_cast<char*>(&transition_weight), sizeof(Weight));}
   
   Weight get_weight(void) const {return transition_weight;}
@@ -340,7 +345,7 @@ class TableFromStream
   std::vector<T> table;
   
  public:
-  TableFromStream(std::istream& is, TransitionTableIndex index_count)
+  TableFromStream(std::istream& is, TransitionTableIndex index_count): table()
   {
     for(size_t i=0; i<index_count; i++)
       table.push_back(T(is));

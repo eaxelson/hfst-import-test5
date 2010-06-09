@@ -20,7 +20,7 @@ class LetterTrie
     symbols(std::numeric_limits<unsigned char>::max(),NO_SYMBOL_NUMBER)
   {}
   
-  LetterTrie(const LetterTrie& o): symbols(o.symbols)
+  LetterTrie(const LetterTrie& o): letters(), symbols(o.symbols)
   {
     for(LetterTrieVector::const_iterator it=o.letters.begin(); it!=o.letters.end(); it++)
       letters.push_back(((*it)==NULL) ? NULL : new LetterTrie(*(*it)));
@@ -55,7 +55,7 @@ class Symbolizer
 
  public:
   Symbolizer(const SymbolTable& st):
-    ascii_symbols(std::numeric_limits<unsigned char>::max(),NO_SYMBOL_NUMBER)
+    letters(), ascii_symbols(std::numeric_limits<unsigned char>::max(),NO_SYMBOL_NUMBER)
   {
     read_input_symbols(st);
     for(size_t i=0; i<ascii_symbols.size(); i++)
@@ -99,7 +99,7 @@ struct Token
     unsigned int superblank_index; // see TokenIOStream::superblank_bucket
   };
   
-  Token(): type(None) {}
+  Token(): type(None), symbol(0) {}
   
   void set_none() {type=None;}
   void set_symbol(SymbolNumber s) {type=Symbol; symbol=s;}
@@ -181,7 +181,7 @@ class TokenIOStream
   }
  public:
   TokenIOStream(std::istream& i, std::ostream& o, const TransducerAlphabet& a):
-    is(i), os(o), alphabet(a), symbolizer(a.get_symbol_table())
+    is(i), os(o), alphabet(a), symbolizer(a.get_symbol_table()), superblank_bucket(), token_buffer(1024)
   {
     if(escaped_chars.size() == 0)
       initialize_escaped_chars();

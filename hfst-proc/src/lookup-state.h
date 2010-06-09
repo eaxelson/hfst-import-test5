@@ -109,12 +109,12 @@ class LookupState
    * given transducer
    * @param t the transducer in which the lookup will occur
    */
-  LookupState(const AbstractTransducer& t): transducer(t)
+  LookupState(const AbstractTransducer& t): transducer(t), paths()
   {
     reset();
   }
   
-  LookupState(const LookupState& o): transducer(o.transducer)
+  LookupState(const LookupState& o): transducer(o.transducer), paths()
   {
     for(LookupPathVector::const_iterator it=o.paths.begin(); it!=o.paths.end(); it++)
       paths.push_back((*it)->clone());

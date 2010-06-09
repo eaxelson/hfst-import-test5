@@ -73,7 +73,8 @@ public:
    * Constructor
    * @param buf_size buffer size
    */
-  Buffer(size_t const buf_size=2048)
+  Buffer(size_t const buf_size=2048): 
+    size(buf_size), buf(NULL), currentpos(0), lastpos(0)
     {
       if(buf_size == 0)
       {
@@ -81,9 +82,6 @@ public:
 	exit(EXIT_FAILURE);
       }    
       buf = new T[buf_size];
-      size = buf_size;
-      currentpos = 0;
-      lastpos = 0;
     }
 
   /**
