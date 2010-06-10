@@ -6,7 +6,7 @@ AM_CXXFLAGS=-Wno-deprecated -Wall -Wextra -g # -DDEBUG_MAIN
 
 # HFST bridge specific stuff
 HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc \
-			 HfstOutputStream.cc
+			 HfstOutputStream.cc HfstRules.cc
 
 # libtool takes over
 libhfst_la_SOURCES =  $(HFST_SRCS)

@@ -820,14 +820,18 @@ namespace hfst { namespace implementations
   (LogFst * t1,LogFst * t2)
   {
     ConcatFst<LogArc> concatenate(*t1,*t2);
-    return new LogFst(concatenate);
+    LogFst * retval = new LogFst(concatenate);
+    retval->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    return retval;
   }
 
   LogFst * LogWeightTransducer::disjunct(LogFst * t1,
 			  LogFst * t2)
   {
     UnionFst<LogArc> disjunct(*t1,*t2);
-    return new LogFst(disjunct);
+    LogFst * retval = new LogFst(disjunct);
+    retval->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    return retval;
   }
 
   void LogWeightTransducer::disjunct_as_tries(LogFst &t1,
@@ -849,8 +853,6 @@ namespace hfst { namespace implementations
     RmEpsilonFst<LogArc> rm1(*t1);
     RmEpsilonFst<LogArc> rm2(*t2);
     EncodeMapper<LogArc> encoder(0x0001,ENCODE);
-    Encode(t1, &encoder);
-    Encode(t2, &encoder);
     EncodeFst<LogArc> enc1(rm1, &encoder);
     EncodeFst<LogArc> enc2(rm2, &encoder);
     DeterminizeFst<LogArc> det1(enc1);
@@ -876,32 +878,32 @@ namespace hfst { namespace implementations
   LogFst * LogWeightTransducer::subtract(LogFst * t1,
 			  LogFst * t2)
   {
-
+    assert(t1->InputSymbols() != NULL);
+    assert(t2->InputSymbols() != NULL);
     if (t1->OutputSymbols() == NULL)
       t1->SetOutputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
     if (t2->OutputSymbols() == NULL)
       t2->SetOutputSymbols( new SymbolTable( *(t2->InputSymbols()) ) );
 
+    ArcSort(t1, OLabelCompare<LogArc>());
+    ArcSort(t2, ILabelCompare<LogArc>());
+
     RmEpsilonFst<LogArc> rm1(*t1);
     RmEpsilonFst<LogArc> rm2(*t2);
+
     EncodeMapper<LogArc> encoder(0x0003,ENCODE); // t2 must be unweighted
-    Encode(t1, &encoder);
-    Encode(t2, &encoder);
     EncodeFst<LogArc> enc1(rm1, &encoder);
     EncodeFst<LogArc> enc2(rm2, &encoder);
     DeterminizeFst<LogArc> det1(enc1);
     DeterminizeFst<LogArc> det2(enc2);
-    
-    ArcSort(t1, OLabelCompare<LogArc>());
-    ArcSort(t2, ILabelCompare<LogArc>());
 
     LogFst *difference = new LogFst();
-    Difference(*t1, *t2, difference);
+    Difference(det1, det2, difference);
     DecodeFst<LogArc> subtract(*difference, encoder);
     delete difference;
 
     //DifferenceFst<LogArc> subtract(enc1,enc2);
-    LogFst *result = new LogFst(subtract); 
+    LogFst *result = new LogFst(subtract);
     result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
     return result;
   }

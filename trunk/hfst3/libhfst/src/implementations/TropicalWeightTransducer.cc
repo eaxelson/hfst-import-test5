@@ -1670,8 +1670,6 @@ namespace hfst { namespace implementations
     RmEpsilonFst<StdArc> rm1(*t1);
     RmEpsilonFst<StdArc> rm2(*t2);
     EncodeMapper<StdArc> encoder(0x0001,ENCODE);
-    Encode(t1, &encoder); // ???
-    Encode(t2, &encoder);
     EncodeFst<StdArc> enc1(rm1, &encoder);
     EncodeFst<StdArc> enc2(rm2, &encoder);
     DeterminizeFst<StdArc> det1(enc1);
@@ -1689,27 +1687,25 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::subtract(StdVectorFst * t1,
 			  StdVectorFst * t2)
   {
-
     if (t1->OutputSymbols() == NULL)
       t1->SetOutputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
     if (t2->OutputSymbols() == NULL)
       t2->SetOutputSymbols( new SymbolTable( *(t2->InputSymbols()) ) );
 
+    ArcSort(t1, OLabelCompare<StdArc>());
+    ArcSort(t2, ILabelCompare<StdArc>());
+
     RmEpsilonFst<StdArc> rm1(*t1);
     RmEpsilonFst<StdArc> rm2(*t2);
+
     EncodeMapper<StdArc> encoder(0x0003,ENCODE); // t2 must be unweighted
-    Encode(t1, &encoder); // ???
-    Encode(t2, &encoder);
     EncodeFst<StdArc> enc1(rm1, &encoder);
     EncodeFst<StdArc> enc2(rm2, &encoder);
     DeterminizeFst<StdArc> det1(enc1);
     DeterminizeFst<StdArc> det2(enc2);
-    
-    ArcSort(t1, OLabelCompare<StdArc>());
-    ArcSort(t2, ILabelCompare<StdArc>());
 
     StdVectorFst *difference = new StdVectorFst();
-    Difference(*t1, *t2, difference);
+    Difference(det1, det2, difference);
     DecodeFst<StdArc> subtract(*difference, encoder);
     delete difference;
 
