@@ -190,6 +190,7 @@ namespace hfst
       {
       case SFST_TYPE:
 	implementation.sfst = sfst_interface.define_transducer(sps);
+	this->type = SFST_TYPE;
 	break;
       case TROPICAL_OFST_TYPE:
       case UNSPECIFIED_TYPE:
@@ -200,10 +201,12 @@ namespace hfst
       case LOG_OFST_TYPE:
 	implementation.log_ofst = 
 	  log_ofst_interface.define_transducer(sps);
+	this->type = LOG_OFST_TYPE;
 	break;
       case FOMA_TYPE:
 	implementation.foma =
 	  foma_interface.define_transducer(sps);
+	this->type = FOMA_TYPE;
 	break;
       case ERROR_TYPE:
       default:
@@ -409,7 +412,7 @@ void HfstTransducer::test_minimize()
     one_copy.minimize();
     another_copy.minimize();
 
-    std::cerr << one_copy << "--\n" << another_copy;
+    //std::cerr << one_copy << "--\n" << another_copy;
 
     switch (one_copy.type)
       {

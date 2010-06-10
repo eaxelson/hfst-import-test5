@@ -121,6 +121,41 @@ void test_extract_strings( HfstTransducer &t )
 
 int main(int argc, char **argv) {
 
+  // HfstTransducer two_level_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet, ImplementationType type);
+
+  ImplementationType types [] = {SFST_TYPE, TROPICAL_OFST_TYPE, FOMA_TYPE};
+  HfstTransducer * rule_transducers [3]; 
+
+  for (int i=0; i<3; i++) {
+    HfstTransducer leftc("c", types[i]);
+    HfstTransducer rightc("c", types[i]);
+    HfstTransducerPair context(leftc, rightc);
+    StringPair mapping("a", "b");
+    StringPairSet mappings;
+    mappings.insert(mapping);
+    StringPairSet alphabet;
+    alphabet.insert(StringPair("a", "a"));
+    alphabet.insert(StringPair("a", "b"));
+    alphabet.insert(StringPair("b", "b"));
+    alphabet.insert(StringPair("c", "c"));
+
+    HfstTransducer rule_transducer = rules::two_level_if(context, mappings, alphabet);
+    rule_transducers[i] = new HfstTransducer(rule_transducer);
+
+    //rule_transducer.minimize();    
+    // std::cerr << rule_transducer << "\n"; 
+  }
+
+  rule_transducers[0]->convert(TROPICAL_OFST_TYPE);
+  rule_transducers[2]->convert(TROPICAL_OFST_TYPE);
+
+  assert( HfstTransducer::are_equivalent(*rule_transducers[0], *rule_transducers[1]) );
+  assert( HfstTransducer::are_equivalent(*rule_transducers[0], *rule_transducers[2]) );
+
+  exit(0);
+
+#ifdef FOO
+
   //HfstTransducer t(TROPICAL_OFST_TYPE);
   //t.test_minimize();
   //exit(0);
@@ -562,6 +597,9 @@ int main(int argc, char **argv) {
 
   }
   return 0;
+
+#endif
+
 }
 
 
