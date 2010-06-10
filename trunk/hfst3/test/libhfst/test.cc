@@ -124,7 +124,9 @@ int main(int argc, char **argv) {
   // HfstTransducer two_level_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet, ImplementationType type);
 
   ImplementationType types [] = {SFST_TYPE, TROPICAL_OFST_TYPE, FOMA_TYPE};
-  HfstTransducer * rule_transducers [3]; 
+  HfstTransducer * rule_transducers1 [3]; 
+  HfstTransducer * rule_transducers2 [3]; 
+  HfstTransducer * rule_transducers3 [3]; 
 
   for (int i=0; i<3; i++) {
     HfstTransducer leftc("c", types[i]);
@@ -139,18 +141,40 @@ int main(int argc, char **argv) {
     alphabet.insert(StringPair("b", "b"));
     alphabet.insert(StringPair("c", "c"));
 
-    HfstTransducer rule_transducer = rules::two_level_if(context, mappings, alphabet);
-    rule_transducers[i] = new HfstTransducer(rule_transducer);
+    HfstTransducer rule_transducer1 = rules::two_level_if(context, mappings, alphabet);
+    HfstTransducer rule_transducer2 = rules::two_level_only_if(context, mappings, alphabet);
+    HfstTransducer rule_transducer3 = rules::two_level_if_and_only_if(context, mappings, alphabet);
+    rule_transducers1[i] = new HfstTransducer(rule_transducer1);
+    rule_transducers2[i] = new HfstTransducer(rule_transducer2);
+    rule_transducers3[i] = new HfstTransducer(rule_transducer3);
 
-    //rule_transducer.minimize();    
-    // std::cerr << rule_transducer << "\n"; 
+    rule_transducer1.minimize();    
+    std::cerr << rule_transducer1 << "\n"; 
+
+    rule_transducer2.minimize();    
+    std::cerr << rule_transducer2 << "\n"; 
+
+    rule_transducer3.minimize();    
+    std::cerr << rule_transducer3 << "\n"; 
   }
 
-  rule_transducers[0]->convert(TROPICAL_OFST_TYPE);
-  rule_transducers[2]->convert(TROPICAL_OFST_TYPE);
+  rule_transducers1[0]->convert(TROPICAL_OFST_TYPE);
+  rule_transducers1[2]->convert(TROPICAL_OFST_TYPE);
 
-  assert( HfstTransducer::are_equivalent(*rule_transducers[0], *rule_transducers[1]) );
-  assert( HfstTransducer::are_equivalent(*rule_transducers[0], *rule_transducers[2]) );
+  rule_transducers2[0]->convert(TROPICAL_OFST_TYPE);
+  rule_transducers2[2]->convert(TROPICAL_OFST_TYPE);
+
+  rule_transducers3[0]->convert(TROPICAL_OFST_TYPE);
+  rule_transducers3[2]->convert(TROPICAL_OFST_TYPE);
+
+  assert( HfstTransducer::are_equivalent(*rule_transducers1[0], *rule_transducers1[1]) );
+  assert( HfstTransducer::are_equivalent(*rule_transducers1[0], *rule_transducers1[2]) );
+
+  assert( HfstTransducer::are_equivalent(*rule_transducers2[0], *rule_transducers2[1]) );
+  assert( HfstTransducer::are_equivalent(*rule_transducers2[0], *rule_transducers2[2]) );
+
+  assert( HfstTransducer::are_equivalent(*rule_transducers3[0], *rule_transducers3[1]) );
+  assert( HfstTransducer::are_equivalent(*rule_transducers3[0], *rule_transducers3[2]) );
 
   exit(0);
 
