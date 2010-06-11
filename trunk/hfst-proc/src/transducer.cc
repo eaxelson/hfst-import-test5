@@ -200,6 +200,8 @@ AbstractTransducer::create(std::istream& is, TransducerHeader h)
 bool
 AbstractTransducer::check_for_blank() const
 {
+  if(printDebuggingInformationFlag)
+    std::cout << "Checking whether the transducer accepts a single blank as a word..." << std::endl;
   LookupState state(*this);
   state.step(alphabet.get_blank_symbol());
   return state.is_final();
