@@ -180,6 +180,8 @@ class TokenIOStream
   TokenIOStream(std::istream& i, std::ostream& o, const TransducerAlphabet& a):
     is(i), os(o), alphabet(a), symbolizer(a.get_symbol_table()), superblank_bucket(), token_buffer(1024)
   {
+    if(printDebuggingInformationFlag)
+      std::cout << "Creating TokenIOStream" << std::endl;
     if(escaped_chars.size() == 0)
       initialize_escaped_chars();
   }

@@ -233,6 +233,8 @@ int main(int argc, char **argv)
   try
   {
     AbstractTransducer* t = AbstractTransducer::load_transducer(in);
+    if(printDebuggingInformationFlag)
+      std::cout << "Transducer successfully loaded" << std::endl;
     in.close();
     
     TokenIOStream token_stream(*input, *output, t->get_alphabet());

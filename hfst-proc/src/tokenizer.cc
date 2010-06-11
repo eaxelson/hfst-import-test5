@@ -287,15 +287,15 @@ TokenIOStream::to_symbol(const Token& t) const
 {
   switch(t.type)
   {
-    case None:
-    case ReservedCharacter:
-      return NO_SYMBOL_NUMBER;
     case Symbol:
       return t.symbol;
-    case Character:
     case Superblank:
+      return alphabet.get_blank_symbol();
+    case None:
+    case Character:
+    case ReservedCharacter:
     default:
-      return is_space(t) ? alphabet.get_blank_symbol() : NO_SYMBOL_NUMBER;
+      return NO_SYMBOL_NUMBER;
   }
 }
 SymbolNumberVector
