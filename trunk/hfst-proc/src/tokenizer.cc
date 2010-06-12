@@ -15,19 +15,14 @@ void LetterTrie::add_string(const char * p, SymbolNumber symbol_key)
   letters[(unsigned char)(*p)]->add_string(p+1,symbol_key);
 }
 
-SymbolNumber LetterTrie::find_key(char ** p) const
+SymbolNumber LetterTrie::find_symbol(const char* c) const
 {
-  const char * old_p = *p;
-  ++(*p);
-  if (letters[(unsigned char)(*old_p)] == NULL)
-    return symbols[(unsigned char)(*old_p)];
+  if (letters[(unsigned char)(c[0])] == NULL)
+    return symbols[(unsigned char)(c[0])];
   
-  SymbolNumber s = letters[(unsigned char)(*old_p)]->find_key(p);
+  SymbolNumber s = letters[(unsigned char)(c[0])]->find_symbol(c+1);
   if (s == NO_SYMBOL_NUMBER)
-  {
-    --(*p);
-    return symbols[(unsigned char)(*old_p)];
-  }
+    return symbols[(unsigned char)(c[0])];
   return s;
 }
 
@@ -63,10 +58,7 @@ Symbolizer::read_input_symbols(const SymbolTable& st)
 {
   for (SymbolNumber k = 0; k < st.size(); ++k)
   {
-#if DEBUG
-    assert(st.find(k) != st.end());
-#endif
-    std::string p = st.find(k)->second;
+    std::string p = st[k].str;
     
     if(p.length() > 0)
     {
@@ -85,14 +77,11 @@ Symbolizer::read_input_symbols(const SymbolTable& st)
 }
 
 SymbolNumber
-Symbolizer::find_key(char ** p) const
+Symbolizer::find_symbol(const char* c) const
 {
-  if (ascii_symbols[(unsigned char)(**p)] == NO_SYMBOL_NUMBER)
-    return letters.find_key(p);
-
-  SymbolNumber s = ascii_symbols[(unsigned char)(**p)];
-  ++(*p);
-  return s;
+  if (ascii_symbols[(unsigned char)(c[0])] == NO_SYMBOL_NUMBER)
+    return letters.find_symbol(c);
+  return ascii_symbols[(unsigned char)(c[0])];
 }
 
 SymbolNumber
@@ -124,6 +113,25 @@ TokenIOStream::initialize_escaped_chars()
   escaped_chars.insert('@');
   escaped_chars.insert('<');
   escaped_chars.insert('>');
+}
+
+CapitalizationState
+TokenIOStream::get_capitalization_state(const TokenVector& tokens) const
+{
+  if(tokens.size() == 0)
+    return Unknown;
+  
+  const Token& first=tokens[0], last=tokens.size()>1?tokens[tokens.size()-1]:tokens[0];
+  
+  if(first.type != Symbol || last.type != Symbol)
+    return Unknown;
+  if(alphabet.is_lower(first.symbol) && alphabet.is_lower(last.symbol))
+    return LowerCase;
+  if(alphabet.is_upper(first.symbol) && alphabet.is_lower(last.symbol))
+    return FirstUpperCase;
+  if(alphabet.is_upper(first.symbol) && alphabet.is_upper(last.symbol))
+    return UpperCase;
+  return Unknown;
 }
 
 std::string
@@ -339,9 +347,9 @@ TokenIOStream::put_tokens(const TokenVector& t)
     put_token(*it);
 }
 void
-TokenIOStream::put_symbols(const SymbolNumberVector& s)
+TokenIOStream::put_symbols(const SymbolNumberVector& s, CapitalizationState caps)
 {
-  os << alphabet.symbols_to_string(s);
+  os << alphabet.symbols_to_string(s, caps);
 }
 
 std::string

@@ -45,6 +45,7 @@ class TokenIOStream;
 class Token;
 typedef std::vector<Token> TokenVector;
 class OutputFormatter;
+class SymbolProperties;
 
 enum OutputType {Apertium, xerox};
 extern OutputType outputType;
@@ -65,7 +66,8 @@ typedef unsigned int StateIdNumber;
 typedef short ValueNumber;
 typedef float Weight;
 typedef std::vector<SymbolNumber> SymbolNumberVector;
-typedef std::map<SymbolNumber, std::string> SymbolTable;
+typedef std::vector<SymbolProperties> SymbolTable;
+
 
 const SymbolNumber NO_SYMBOL_NUMBER = std::numeric_limits<SymbolNumber>::max();
 const TransitionTableIndex NO_TABLE_INDEX = std::numeric_limits<TransitionTableIndex>::max();
@@ -87,6 +89,27 @@ enum GenerationMode
   gm_all,        // display all
   gm_marked      // marked generation
 };
+
+/**
+ * Different methods of dealing with capitalization during generation
+ * IgnoreCase     - allow uppercase symbols to be treated as lowercase during
+ *                  lookup. Retain the surface form's case for the output
+ * CaseSensitive  - only allow the given case of the surface form symbol to be
+ *                  fed into the transducer for lookup
+ * DictionaryCase - allow uppercase symbols to be treated as lowecase during
+ *                  lookup. Output the result with the capitalization found in
+ *                  the transducer
+ */
+enum CapitalizationMode {IgnoreCase, CaseSensitive, DictionaryCase};
+
+/**
+ * Describes the case properties of a surface form (detection examines only
+ * the first and last symbols)
+ * LowerCase      - The first and last symbols are lowercase
+ * FirstUpperCase - The first symbol is uppercase and the last is lowercase
+ * UpperCase      - The first and last symbols are uppercase
+ */
+enum CapitalizationState {Unknown, LowerCase, FirstUpperCase, UpperCase};
 
 class TransitionIndex;
 class Transition;

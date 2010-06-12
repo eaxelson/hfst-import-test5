@@ -69,9 +69,9 @@ PathFd::evaluate_flag_diacritic(const FlagDiacriticOperation& op)
 bool
 PathFd::evaluate_flag_diacritic(SymbolNumber s)
 {
-  if(fd_operations[s].isFlag())
+  if(symbol_table[s].fd_op.isFlag())
   {
-    if(evaluate_flag_diacritic(fd_operations[s]))
+    if(evaluate_flag_diacritic(symbol_table[s].fd_op))
     {
       if(printDebuggingInformationFlag)
         std::cout << "flag diacritic [" << s << "] allowed" << std::endl;

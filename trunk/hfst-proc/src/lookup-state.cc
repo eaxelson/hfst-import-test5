@@ -20,14 +20,14 @@ LookupState::init(LookupPath* initial)
 }
 
 void
-LookupState::lookup(const SymbolNumberVector& input)
+LookupState::lookup(const SymbolNumberVector& input, CapitalizationMode mode)
 {
   for(SymbolNumberVector::const_iterator it=input.begin(); it!=input.end(); it++)
-    step(*it);
+    step(*it, mode);
 }
 
 void
-LookupState::step(const SymbolNumber input)
+LookupState::step(const SymbolNumber input, const SymbolNumber altinput)
 {
   if(input == NO_SYMBOL_NUMBER)
   {
@@ -35,8 +35,26 @@ LookupState::step(const SymbolNumber input)
     return;
   }
   
-  apply_input(input);
+  if(printDebuggingInformationFlag)
+  {
+    std::cout << "Stepping with '" << transducer.get_alphabet().symbol_to_string(input) << "'";
+    if(altinput != NO_SYMBOL_NUMBER)
+      std::cout << " and '" << transducer.get_alphabet().symbol_to_string(altinput) << "'";
+    std::cout << std::endl;
+  }
+  
+  apply_input(input, altinput);
   try_epsilons();
+}
+
+void
+LookupState::step(const SymbolNumber input, CapitalizationMode mode)
+{
+  if(input==NO_SYMBOL_NUMBER || !transducer.get_alphabet().has_case(input) ||
+     transducer.get_alphabet().is_lower(input) || mode==CaseSensitive)
+    step(input);
+  else
+    step(input, transducer.get_alphabet().to_lower(input));
 }
 
   
@@ -171,7 +189,7 @@ LookupState::try_epsilon_transitions(const LookupPath& path)
 
 
 void
-LookupState::apply_input(const SymbolNumber input)
+LookupState::apply_input(const SymbolNumber input, const SymbolNumber altinput)
 {
   LookupPathVector new_paths;
   if(input == 0)
@@ -185,15 +203,27 @@ LookupState::apply_input(const SymbolNumber input)
     LookupPath& path = *paths[i];
     
     if(indexes_transition_index_table(path.get_index()))
+    {
       try_index(new_paths, path, input);
+      if(altinput != NO_SYMBOL_NUMBER)
+        try_index(new_paths, path, altinput);
+      //if(!try_index(new_paths, path, input) && altinput != NO_SYMBOL_NUMBER)
+      //  try_index(new_paths, path, altinput);
+    }
     else // indexes transition table
+    {
       try_transitions(new_paths, path, input);
+      if(altinput != NO_SYMBOL_NUMBER)
+        try_transitions(new_paths, path, altinput);
+      //if(!try_transitions(new_paths, path, input) && altinput != NO_SYMBOL_NUMBER)
+      //  try_transitions(new_paths, path, altinput);
+    }
   }
-
-  replace_paths(new_paths);  
+  
+  replace_paths(new_paths);
 }
 
-void
+bool
 LookupState::try_index(LookupPathVector& new_paths, 
                          const LookupPath& path, 
                          const SymbolNumber input) const
@@ -206,16 +236,19 @@ LookupState::try_index(LookupPathVector& new_paths,
     // copy the path, follow the index, and handle the new transitions
     LookupPath& extended_path = *path.clone();
     extended_path.follow(index);
-    try_transitions(new_paths, extended_path, input);
+    bool res = try_transitions(new_paths, extended_path, input);
     delete &extended_path;
+    return res;
   }
+  return false;
 }
 
-void
+bool
 LookupState::try_transitions(LookupPathVector& new_paths,
                                const LookupPath& path, 
                                const SymbolNumber input) const
 {
+  bool found = false;
   TransitionTableIndex transition_index;
   
   // if the path is pointing to the "state" entry before the transitions
@@ -234,9 +267,10 @@ LookupState::try_transitions(LookupPathVector& new_paths,
       LookupPath& extended_path = *path.clone();
       extended_path.follow(transition);
       new_paths.push_back(&extended_path);
+      found = true;
     }
     else
-      return;
+      return found;
     
     transition_index++;
   }

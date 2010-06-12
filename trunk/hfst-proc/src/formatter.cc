@@ -19,7 +19,7 @@ OutputFormatter::preprocess_finals(const LookupPathVector& finals) const
 //////////Function definitions for ApertiumOutputFormatter
 
 std::vector<std::string>
-ApertiumOutputFormatter::process_finals(const LookupPathVector& finals) const
+ApertiumOutputFormatter::process_finals(const LookupPathVector& finals, CapitalizationState caps) const
 {
   std::vector<std::string> results;
   LookupPathVector sorted_finals = preprocess_finals(finals);
@@ -27,7 +27,7 @@ ApertiumOutputFormatter::process_finals(const LookupPathVector& finals) const
   for(LookupPathVector::const_iterator it=sorted_finals.begin(); it!=sorted_finals.end(); it++)
   {
     std::ostringstream res;
-    res << token_stream.get_alphabet().symbols_to_string((*it)->get_output_symbols());
+    res << token_stream.get_alphabet().symbols_to_string((*it)->get_output_symbols(), caps);
     if(dynamic_cast<const LookupPathW*>(*it) != NULL && displayWeightsFlag)
       res << '~' << dynamic_cast<const LookupPathW*>(*it)->get_weight() << '~';
     
@@ -95,7 +95,7 @@ XeroxOutputFormatter::clear_superblanks(const TokenVector& tokens) const
 }
 
 std::vector<std::string>
-XeroxOutputFormatter::process_finals(const LookupPathVector& finals) const
+XeroxOutputFormatter::process_finals(const LookupPathVector& finals, CapitalizationState caps) const
 {
   std::vector<std::string> results;
   LookupPathVector sorted_finals = preprocess_finals(finals);
@@ -103,7 +103,7 @@ XeroxOutputFormatter::process_finals(const LookupPathVector& finals) const
   for(LookupPathVector::const_iterator it=sorted_finals.begin(); it!=sorted_finals.end(); it++)
   {
     std::ostringstream res;
-    res << token_stream.get_alphabet().symbols_to_string((*it)->get_output_symbols());
+    res << token_stream.get_alphabet().symbols_to_string((*it)->get_output_symbols(), caps);
     if(dynamic_cast<const LookupPathW*>(*it) != NULL && displayWeightsFlag)
       res << "\t" << dynamic_cast<const LookupPathW*>(*it)->get_weight();
     
