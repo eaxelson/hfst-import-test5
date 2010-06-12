@@ -2,6 +2,7 @@
 #define _TRANSDUCER_H_
 
 #include <fstream>
+#include <cstdlib>
 #include "hfst-proc.h"
 
 class TransducerHeader
@@ -217,7 +218,12 @@ class TransducerAlphabet
   TransducerAlphabet(std::istream& is, SymbolNumber symbol_count):
     symbol_table(), blank_symbol(NO_SYMBOL_NUMBER),
     feature_bucket(), value_bucket(), val_num(1), feat_num(0)
-  {  
+  {
+    if(symbol_count == 0)
+    {
+      std::cerr << "Transducer has empty alphabet; wrong or corrupt file?" << std::endl;
+      exit(1);
+    }
     value_bucket[std::string()] = 0; // empty value = neutral
     for(SymbolNumber k=0; k<symbol_count; k++)
       get_next_symbol(is, k);
