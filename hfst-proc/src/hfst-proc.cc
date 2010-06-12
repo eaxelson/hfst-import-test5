@@ -45,7 +45,7 @@ bool print_usage(void)
 {
   std::cerr <<
     "\n" <<
-    "Usage: " << PACKAGE_NAME << " [-a [-p|-x]|-g|-n|-t] [-W] [-n N] [-v|-q|-s] transducer_file [input_file [output_file]]\n" <<
+    "Usage: " << PACKAGE_NAME << " [-a [-p|-x]|-g|-n|-t] [-W] [-n N] [-c|-w] [-v|-q|-s] transducer_file [input_file [output_file]]\n" <<
     "Perform a transducer lookup on a text stream, tokenizing on the fly\n" <<
     "\n" <<
     "  -a, --analysis              Morphological analysis (default)\n" <<
@@ -57,6 +57,8 @@ bool print_usage(void)
     "  -W, --show-weights          Print final analysis weights (if any)\n" <<
     "  -N N, --analyses=N          Output no more than N analyses\n" <<
     "                              (if the transducer is weighted, the N best analyses)\n" <<
+    "  -c, --case-sensitive        Perform lookup using the literal case of the input characters\n" <<
+    "  -w  --dictionary-case       Output results using dictionary case instead of surface case\n" <<
     "  -v, --verbose               Be verbose\n" <<
     "  -q, --quiet                 Don't be verbose (default)\n" <<
     "  -s, --silent                Same as quiet\n" <<
@@ -87,31 +89,34 @@ bool print_short_help(void)
 int main(int argc, char **argv)
 {
   int cmd = 0;
+  int capitalization = 0;
   
   while (true)
   {
     static struct option long_options[] =
     {
       // first the hfst-mandated options
-      {"help",          no_argument,       0, 'h'},
-      {"version",       no_argument,       0, 'V'},
-      {"verbose",       no_argument,       0, 'v'},
-      {"quiet",         no_argument,       0, 'q'},
-      {"silent",        no_argument,       0, 's'},
+      {"help",           no_argument,       0, 'h'},
+      {"version",        no_argument,       0, 'V'},
+      {"verbose",        no_argument,       0, 'v'},
+      {"quiet",          no_argument,       0, 'q'},
+      {"silent",         no_argument,       0, 's'},
       // the hfst-proc-specific options
-      {"analysis",      no_argument,       0, 'a'},
-      {"generation",    no_argument,       0, 'g'},
-      {"non-marked-gen",no_argument,       0, 'n'},
-      {"tokenize",      no_argument,       0, 't'},
-      {"apertium",      no_argument,       0, 'p'},
-      {"xerox",         no_argument,       0, 'x'},
-      {"show-weights",  no_argument,       0, 'W'},
-      {"analyses",      required_argument, 0, 'N'},
-      {0,               0,                 0,  0 }
+      {"analysis",       no_argument,       0, 'a'},
+      {"generation",     no_argument,       0, 'g'},
+      {"non-marked-gen", no_argument,       0, 'n'},
+      {"tokenize",       no_argument,       0, 't'},
+      {"apertium",       no_argument,       0, 'p'},
+      {"xerox",          no_argument,       0, 'x'},
+      {"show-weights",   no_argument,       0, 'W'},
+      {"analyses",       required_argument, 0, 'N'},
+      {"case-sensitive", no_argument,       0, 'c'},
+      {"dictionary-case",no_argument,       0, 'w'},
+      {0,                0,                 0,  0 }
     };
       
     int option_index = 0;
-    int c = getopt_long(argc, argv, "hVvqsagntpxWN:", long_options, &option_index);
+    int c = getopt_long(argc, argv, "hVvqsagntpxWN:cw", long_options, &option_index);
 
     if (c == -1) // no more options to look at
       break;
@@ -180,6 +185,18 @@ int main(int argc, char **argv)
           return EXIT_FAILURE;
         }
       break;
+    
+    case 'c':
+    case 'w':
+      if(capitalization==0)
+        capitalization=c;
+      else
+      {
+        std::cerr << "Multiple capitalization modes given" << std::endl;
+        print_short_help();
+        return EXIT_FAILURE;
+      }
+      break;
       
     default:
       std::cerr << "Invalid option\n\n";
@@ -230,6 +247,19 @@ int main(int argc, char **argv)
     }
   }
   
+  CapitalizationMode capitalization_mode;
+  switch(capitalization)
+  {
+    case 'c':
+      capitalization_mode = CaseSensitive;
+      break;
+    case 'w':
+      capitalization_mode = DictionaryCase;
+      break;
+    default:
+      capitalization_mode = IgnoreCase;
+  }
+  
   try
   {
     AbstractTransducer* t = AbstractTransducer::load_transducer(in);
@@ -245,17 +275,17 @@ int main(int argc, char **argv)
         t->do_tokenize(token_stream);
         break;
       case 'g':
-        t->do_generation(token_stream, gm_unknown);
+        t->do_generation(token_stream, gm_unknown, capitalization_mode);
         break;
       case 'n':
-        t->do_generation(token_stream, gm_clean);
+        t->do_generation(token_stream, gm_clean, capitalization_mode);
       case 'a':
       default:
         OutputFormatter* output_formatter = (outputType==xerox)?
                     (OutputFormatter*)new XeroxOutputFormatter(token_stream):
                     (OutputFormatter*)new ApertiumOutputFormatter(token_stream);
          
-        t->do_analysis(token_stream, *output_formatter);
+        t->do_analysis(token_stream, *output_formatter, capitalization_mode);
     
         delete output_formatter;
         break;

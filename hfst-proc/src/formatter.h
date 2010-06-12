@@ -22,7 +22,14 @@ class OutputFormatter
   OutputFormatter(TokenIOStream& s): token_stream(s) {}
   virtual ~OutputFormatter() {}
   
-  virtual std::vector<std::string> process_finals(const LookupPathVector& finals) const = 0;
+  /**
+   * Take a list of lookup paths that end in final states, and produce a list of
+   * string representations of the paths that can be written to the output
+   * @param finals a list of lookup paths ending in final states
+   * @param state the capitalization of the surface form
+   */
+  virtual std::vector<std::string> process_finals(const LookupPathVector& finals,
+                                                  CapitalizationState state) const = 0;
   virtual void print_word(const TokenVector& surface_form, 
                           std::vector<std::string> const &analyzed_forms) const = 0;
   virtual void print_unknown_word(const TokenVector& surface_form) const = 0;
@@ -39,7 +46,8 @@ class ApertiumOutputFormatter: public OutputFormatter
  public:
   ApertiumOutputFormatter(TokenIOStream& s): OutputFormatter(s) {}
   
-  std::vector<std::string> process_finals(const LookupPathVector& finals) const;
+  std::vector<std::string> process_finals(const LookupPathVector& finals,
+                                          CapitalizationState state) const;
   void print_word(const TokenVector& surface_form, 
                   std::vector<std::string> const &analyzed_forms) const;
   void print_unknown_word(const TokenVector& surface_form) const;
@@ -57,7 +65,8 @@ class XeroxOutputFormatter: public OutputFormatter
  public:
   XeroxOutputFormatter(TokenIOStream& s): OutputFormatter(s) {}
   
-  std::vector<std::string> process_finals(const LookupPathVector& finals) const;
+  std::vector<std::string> process_finals(const LookupPathVector& finals,
+                                          CapitalizationState state) const;
   void print_word(const TokenVector& surface_form, 
                   std::vector<std::string> const &analyzed_forms) const;
   void print_unknown_word(const TokenVector& surface_form) const;

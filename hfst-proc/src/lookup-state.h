@@ -78,8 +78,9 @@ class LookupState
    * the input symbol and generate a new set of paths by following the index
    * and/or transitions
    * @param input the input symbol to apply
+   * @param altinput a secondary input symbol to try when input fails
    */
-  void apply_input(const SymbolNumber input);
+  void apply_input(const SymbolNumber input, const SymbolNumber altinput);
   
   /**
    * If the given path points to a place in the index table with an index for
@@ -88,8 +89,9 @@ class LookupState
    * @param new_paths any new paths generated get appended here
    * @param path a path pointing to the transition index table
    * @param input the input symbol to look up in the transition index table
+   * @return whether the path has a continuation with the given input
    */
-  void try_index(LookupPathVector& new_paths, 
+  bool try_index(LookupPathVector& new_paths, 
                  const LookupPath& path, const SymbolNumber input) const;
   
   /**
@@ -99,8 +101,9 @@ class LookupState
    * @param path a path pointing to the beginning of a state in the transition
    *             table or directly to transitions
    * @param input the input symbol to look up in the transition table
+   * @return whether the path has a continuation with the given input
    */
-  void try_transitions(LookupPathVector& new_paths,
+  bool try_transitions(LookupPathVector& new_paths,
                        const LookupPath& path, const SymbolNumber input) const;
   
  public:
@@ -160,15 +163,30 @@ class LookupState
    * Do a lookup using all the given symbols. This is equivalent to stepping the
    * state with each of the symbols in the vector.
    */
-  void lookup(const SymbolNumberVector& input);
+  void lookup(const SymbolNumberVector& input, CapitalizationMode mode);
   
   /**
    * Apply a new input symbol to the state's active paths, and then follow any
    * epsilon transitions. If NO_SYMBOL_NUMBER is given, it has the effect of
-   * "killing" all active paths
+   * "killing" all active paths. If altinput is anything besides
+   * NO_SYMBOL_NUMBER, it will be used as a fallback to try in case the
+   * symbol in input would result in terminating an active path.
    * @param input the new input symbol
    */
-  void step(const SymbolNumber input);
+  void step(const SymbolNumber input, const SymbolNumber altinput = NO_SYMBOL_NUMBER);
+  
+  /**
+   * Call the main step function, calculating what to pass for altinput based
+   * on the given capitalization mode.
+   * @param input the new input symbol
+   * @param mode how to deal with capitalization. The modes are used as follows:
+   *             IgnoreCase     - if input is lowercase then input as given and
+   *                              no altinput. If input is uppercase then input
+   *                              as given and altinput is the lowercase version
+   *             CaseSensitive  - input as given, no altinput
+   *             DictionaryCase - same as IgnoreCase
+   */
+  void step(const SymbolNumber input, CapitalizationMode mode);
 };
 
 #endif

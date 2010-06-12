@@ -34,7 +34,7 @@ class LetterTrie
 
   void add_string(const char * p,SymbolNumber symbol_key);
 
-  SymbolNumber find_key(char ** p) const;
+  SymbolNumber find_symbol(const char* c) const;
   
   /**
    * Read the next symbol from the stream. If the next character(s) do not form
@@ -70,7 +70,7 @@ class Symbolizer
     }
   }
   
-  SymbolNumber find_key(char ** p) const;
+  SymbolNumber find_symbol(const char *c) const;
   SymbolNumber extract_symbol(std::istream& is) const;
 };
 
@@ -209,6 +209,12 @@ class TokenIOStream
   SymbolNumber to_symbol(const Token& t) const;
   SymbolNumberVector to_symbols(const TokenVector& t) const;
   
+  /**
+   * Calculate the capitalization properties of the given word, which should
+   * contain all symbols
+   */
+  CapitalizationState get_capitalization_state(const TokenVector& tokens) const;
+  
   size_t first_nonalphabetic(const TokenVector& s) const;
   
   /**
@@ -227,7 +233,7 @@ class TokenIOStream
   void put_token(const Token& t) {os << token_to_string(t);}
   
   void put_tokens(const TokenVector& t);
-  void put_symbols(const SymbolNumberVector& s);
+  void put_symbols(const SymbolNumberVector& s, CapitalizationState caps=Unknown);
   
   /**
    * Get the string representation of the given token
@@ -240,7 +246,7 @@ class TokenIOStream
    * Strip apertium-style tag symbols from the list of tokens
    */
   void strip_tags(TokenVector& t) const;
-    
+  
   /**
    * Read the next token from the input stream/buffer
    */

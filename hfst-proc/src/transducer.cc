@@ -12,25 +12,31 @@ void
 TransducerAlphabet::setup_blank_symbol()
 {
   blank_symbol = NO_SYMBOL_NUMBER;
-  for(SymbolTable::const_iterator it=symbol_table.begin(); it!=symbol_table.end(); it++)
+  for(size_t i=0;i<symbol_table.size();i++)
   {
-    if(it->second == " ")
+    if(symbol_table[i].str == " ")
     {
-      blank_symbol = it->first;
+      blank_symbol = i;
       break;
     }
   }
   
   if(blank_symbol == NO_SYMBOL_NUMBER)
-    blank_symbol = add_symbol(" ");
+  {
+    blank_symbol = symbol_table.size();
+    SymbolProperties s;
+    s.str = " ";
+    s.alphabetic = is_alphabetic(s.str.c_str());
+    symbol_table.push_back(s);
+  }
 }
 
 void TransducerAlphabet::get_next_symbol(std::istream& is, SymbolNumber k)
 {
-  std::string str;
-  std::getline(is, str, '\0');
+  SymbolProperties symbol;
+  std::getline(is, symbol.str, '\0');
   if(printDebuggingInformationFlag)
-    std::cout << "Got next symbol: '" << str << "' (" << k << ")" << std::endl;
+    std::cout << "Got next symbol: '" << symbol.str << "' (" << k << ")" << std::endl;
   
   if(!is)
   {
@@ -38,12 +44,12 @@ void TransducerAlphabet::get_next_symbol(std::istream& is, SymbolNumber k)
     exit(1);
   }
 
-  if (str.length() >= 5 && str.at(0) == '@' && str.at(str.length()-1) == '@' && str.at(2) == '.')
+  if (symbol.str.length() >= 5 && symbol.str.at(0) == '@' && symbol.str.at(symbol.str.length()-1) == '@' && symbol.str.at(2) == '.')
   { // a flag diacritic needs to be parsed
     std::string feat;
     std::string val;
     FlagDiacriticOperator op = P; // g++ worries about this falling through uninitialized
-    switch (str.at(1)) {
+    switch (symbol.str.at(1)) {
     case 'P': op = P; break;
     case 'N': op = N; break;
     case 'R': op = R; break;
@@ -51,7 +57,7 @@ void TransducerAlphabet::get_next_symbol(std::istream& is, SymbolNumber k)
     case 'C': op = C; break;
     case 'U': op = U; break;
     }
-    const char* cstr = str.c_str();
+    const char* cstr = symbol.str.c_str();
     const char * c = cstr;
     // as long as we're working with utf-8, this should be ok
     for (c +=3; *c != '.' && *c != '@'; c++) { feat.append(c,1); }
@@ -69,29 +75,161 @@ void TransducerAlphabet::get_next_symbol(std::istream& is, SymbolNumber k)
       value_bucket[val] = val_num;
       ++val_num;
     }
-    add_symbol(k, "",
-               FlagDiacriticOperation(op, feature_bucket[feat], value_bucket[val]));
+    
+    symbol.fd_op = FlagDiacriticOperation(op, feature_bucket[feat], value_bucket[val]);
     
 #if OL_FULL_DEBUG
-    std::cout << "symbol number " << k << " (flag) is " << str << std::endl;
-    symbol_table[k] = str;
+    std::cout << "symbol number " << k << " (flag) is " << symbol.str << std::endl;
+#else
+    symbol.str = "";
 #endif
-    
-    return;
   }
-
+  else // not a flag diacritic
+  {
 #if OL_FULL_DEBUG
-  std::cout << "symbol number " << k << " is " << str << std::endl;
+    std::cout << "symbol number " << k << " is " << symbol.str << std::endl;
 #endif
-  add_symbol(k, str);
+  }
+  
+  symbol.alphabetic = is_alphabetic(symbol.str.c_str());
+  
+  symbol_table.push_back(symbol);
+}
+
+void
+TransducerAlphabet::calculate_caps()
+{
+  Symbolizer symbolizer(symbol_table);
+  for(size_t i=0;i<symbol_table.size();i++)
+  {
+    int case_res;
+    std::string switched = caps_helper(symbol_table[i].str.c_str(), case_res);
+    
+    if(case_res < 0)
+    {
+      symbol_table[i].lower = i;
+      symbol_table[i].upper = (switched=="")?NO_SYMBOL_NUMBER:symbolizer.find_symbol(switched.c_str());
+    }
+    else if(case_res > 0)
+    {
+      symbol_table[i].lower = (switched=="")?NO_SYMBOL_NUMBER:symbolizer.find_symbol(switched.c_str());
+      symbol_table[i].upper = i;
+    }
+    else
+      symbol_table[i].lower=symbol_table[i].upper=NO_SYMBOL_NUMBER;
+  }
 }
 
 std::string
-TransducerAlphabet::symbols_to_string(const SymbolNumberVector& symbols) const
+TransducerAlphabet::caps_helper(const char* c, int& case_res)
+{
+  static const char* parallel_ranges[5][2][2] = {{{"A","Z"},{"a","z"}}, // Basic Latin
+                                                 {{"À","Þ"},{"à","þ"}}, // Latin-1 Supplement
+                                                 {{"Α","Ϋ"},{"α","ϋ"}}, // Greek and Coptic
+                                                 {{"А","Я"},{"а","я"}}, // Cyrillic
+                                                 {{"Ѐ","Џ"},{"ѐ","џ"}}};// Cyrillic
+  static const char* serial_ranges[12][3] = {{"Ā","ķ"}, // Latin Extended A
+                                             {"Ĺ","ň"}, // Latin Extended A
+                                             {"Ŋ","ž"}, // Latin Extended A
+                                             {"Ǎ","ǜ"}, // Latin Extended B
+                                             {"Ǟ","ǯ"}, // Latin Extended B
+                                             {"Ǵ","ȳ"}, // Latin Extended B
+                                             {"Ϙ","ϯ"}, // Greek and Coptic
+                                             {"Ѡ","ҿ"}, // Cyrillic
+                                             {"Ӂ","ӎ"}, // Cyrillic
+                                             {"Ӑ","ӿ"}, // Cyrillic
+                                             {"Ԁ","ԥ"}, // Cyrillic Supplement
+                                             {"Ḁ","ỿ"}};//Latin Extended Additional
+  for(int i=0;i<5;i++) // check parallel ranges
+  {
+    if(strcmp(c,parallel_ranges[i][0][0]) >= 0 &&
+       strcmp(c,parallel_ranges[i][0][1]) <= 0) // in the uppercase section
+    {
+      case_res = 1;
+      int diff = utf8_str_to_int(parallel_ranges[i][1][0]) -
+                 utf8_str_to_int(parallel_ranges[i][0][0]);
+      return utf8_int_to_str(utf8_str_to_int(c)+diff);
+    }
+    else if(strcmp(c,parallel_ranges[i][1][0]) >= 0 &&
+            strcmp(c,parallel_ranges[i][1][1]) <= 0) // in the lowercase section
+    {
+      case_res = -1;
+      int diff = utf8_str_to_int(parallel_ranges[i][1][0]) -
+                 utf8_str_to_int(parallel_ranges[i][0][0]);
+      return utf8_int_to_str(utf8_str_to_int(c)-diff);
+    }
+  }
+  for(int i=0;i<12;i++) // check serial ranges
+  {
+    if(strcmp(c,serial_ranges[i][0]) >= 0 &&
+       strcmp(c,serial_ranges[i][1]) <= 0)
+    {
+      int c_int = utf8_str_to_int(c);
+      if((c_int-utf8_str_to_int(serial_ranges[i][0]))%2 == 0) // uppercase
+      {
+        case_res = 1;
+        return utf8_int_to_str(c_int+1);
+      }
+      else // lowercase
+      {
+        case_res = -1;
+        return utf8_int_to_str(c_int-1);
+      }
+    }
+  }
+  case_res = 0;
+  return "";
+}
+
+int
+TransducerAlphabet::utf8_str_to_int(const char* c)
+{
+  if ((unsigned char)c[0] <= 127)
+    return (unsigned char)c[0];
+  else if ( (c[0] & (128 + 64 + 32 + 16)) == (128 + 64 + 32 + 16) )
+    return (((unsigned char)c[0])<<24)+
+           (((unsigned char)c[1])<<16)+
+           (((unsigned char)c[2])<<8)+
+           ((unsigned char)c[3]);
+  else if ( (c[0] & (128 + 64 + 32 )) == (128 + 64 + 32) )
+    return (((unsigned char)c[0])<<16)+
+           (((unsigned char)c[1])<<8)+
+           ((unsigned char)c[2]);
+  else if ( (c[0] & (128 + 64 )) == (128 + 64))
+    return (((unsigned char)c[0])<<8)+
+           ((unsigned char)c[1]);
+  else
+    stream_error("Invalid UTF-8 character found");
+  return -1;
+}
+std::string
+TransducerAlphabet::utf8_int_to_str(int c)
+{
+  std::string res;
+  for(int i=3;i>=0;i--)
+  {
+    if(c & (0xFF << (8*i)))
+    {
+      for(;i>=0;i--)
+        res.push_back((char)((c&(0xFF<<(8*i)))>>(8*i)  )&0xFF);
+      return res;
+    }
+  }
+  return "";
+}
+
+std::string
+TransducerAlphabet::symbols_to_string(const SymbolNumberVector& symbols, CapitalizationState caps) const
 {
   std::string str="";
-  for(SymbolNumberVector::const_iterator it=symbols.begin(); it!=symbols.end(); it++)
-    str += symbol_to_string(*it);
+  bool first=true;
+  for(SymbolNumberVector::const_iterator it=symbols.begin(); it!=symbols.end(); it++, first=false)
+  {
+    if(caps==UpperCase || (caps==FirstUpperCase && first==true))
+      str += symbol_to_string(to_upper(*it));
+    else
+      str += symbol_to_string(*it);
+  }
   return str;
 }
 
@@ -120,14 +258,6 @@ TransducerAlphabet::is_punctuation(const char* c) const
     }
   }
   return false;
-}
-
-void
-TransducerAlphabet::calculate_alphabetic()
-{
-  for(SymbolTable::const_iterator it=symbol_table.begin(); it!=symbol_table.end(); it++)
-    if(is_alphabetic(it->second.c_str()))
-      alphabetic.insert(it->first);
 }
 
 bool
@@ -225,12 +355,33 @@ AbstractTransducer::do_tokenize(TokenIOStream& token_stream)
       std::cout << "None/EOF";
     
     std::cout << " (to_symbol: " << token_stream.to_symbol(next_token) << ")" 
-              << " (alphabetic: " << token_stream.is_alphabetic(next_token) << ")" << std::endl;
+              << " (alphabetic: " << token_stream.is_alphabetic(next_token) << ")";
+    if(next_token.type == Symbol)
+    {
+      SymbolNumber s=next_token.symbol;
+      std::cout << " (";
+      if(alphabet.is_lower(s))
+      {
+        SymbolNumber s2 = alphabet.to_upper(s);
+        std::cout << "lowercase, upper: " << s2 << "/" << alphabet.symbol_to_string(s2);
+      }
+      else if(alphabet.is_upper(s))
+      {
+        SymbolNumber s2 = alphabet.to_lower(s);
+        std::cout << "uppercase, lower: " << s2 << "/" << alphabet.symbol_to_string(s2);
+      }
+      else
+        std::cout << "no case";
+      std::cout << ")";
+    }
+    std::cout << std::endl;
   }
 }
 
 void
-AbstractTransducer::do_generation(TokenIOStream& token_stream, GenerationMode mode)
+AbstractTransducer::do_generation(TokenIOStream& token_stream, 
+                                  GenerationMode mode,
+                                  CapitalizationMode capitalization_mode)
 {
   LookupState state(*this);
   
@@ -275,17 +426,21 @@ AbstractTransducer::do_generation(TokenIOStream& token_stream, GenerationMode mo
         }
         else
         {
-          state.lookup(token_stream.to_symbols(form));
+          state.lookup(token_stream.to_symbols(form), capitalization_mode);
           if(state.is_final()) // generation succeeded
           {
+            CapitalizationState capitalization_state = 
+              capitalization_mode==DictionaryCase ?
+                Unknown :
+                token_stream.get_capitalization_state(TokenVector(form.begin(),form.size()>1?form.begin()+2:form.end()));
             LookupPathVector finals = state.get_finals();
-            token_stream.put_symbols(finals[0]->get_output_symbols());
+            token_stream.put_symbols(finals[0]->get_output_symbols(),capitalization_state);
             if(finals.size() > 1)
             {
               for(LookupPathVector::const_iterator it=finals.begin()+1;it!=finals.end();it++)
               {
                 token_stream.ostream() << '/';
-                token_stream.put_symbols((*it)->get_output_symbols());
+                token_stream.put_symbols((*it)->get_output_symbols(),capitalization_state);
               }
             }
           }
@@ -308,7 +463,9 @@ AbstractTransducer::do_generation(TokenIOStream& token_stream, GenerationMode mo
 }
 
 void
-AbstractTransducer::do_analysis(TokenIOStream& token_stream, OutputFormatter& output_formatter)
+AbstractTransducer::do_analysis(TokenIOStream& token_stream,
+                                OutputFormatter& output_formatter,
+                                CapitalizationMode capitalization_mode)
 {
   LookupState state(*this);
   size_t last_stream_location = 0;
@@ -335,14 +492,16 @@ AbstractTransducer::do_analysis(TokenIOStream& token_stream, OutputFormatter& ou
   	if(state.is_final())
   	{
   	  LookupPathVector finals = state.get_finals();
-  	  analyzed_forms = output_formatter.process_finals(finals);
+  	  analyzed_forms = output_formatter.process_finals(finals, 
+  	                                                   capitalization_mode==DictionaryCase ? Unknown:
+  	                                                                                         token_stream.get_capitalization_state(surface_form));
   	  last_stream_location = token_stream.get_pos()-1;
   	  
   	  if(printDebuggingInformationFlag)
   	    std::cout << "Final paths found and saved, stream location is " << last_stream_location << std::endl;
   	}
   	
-  	state.step(token_stream.to_symbol(next_token));
+  	state.step(token_stream.to_symbol(next_token), capitalization_mode);
     
     if(printDebuggingInformationFlag)
       std::cout << "After stepping, there are " << state.num_active() << " active paths" << std::endl;
@@ -435,7 +594,7 @@ LookupPath* Transducer::get_initial_path() const
 LookupPath* TransducerFd::get_initial_path() const
 {
   LookupPathFd* p = new LookupPathFd(START_INDEX, alphabet.get_state_size(), 
-                           alphabet.get_operation_vector());
+                           alphabet.get_symbol_table());
   return p;
 }
 LookupPath* TransducerW::get_initial_path() const
@@ -445,6 +604,6 @@ LookupPath* TransducerW::get_initial_path() const
 LookupPath* TransducerWFd::get_initial_path() const
 {
   return new LookupPathWFd(START_INDEX, alphabet.get_state_size(), 
-                            alphabet.get_operation_vector());
+                            alphabet.get_symbol_table());
 }
 

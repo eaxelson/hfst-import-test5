@@ -132,22 +132,49 @@ class FlagDiacriticOperation
 #endif
 };
 
-typedef std::vector<FlagDiacriticOperation> OperationVector;
 typedef std::vector<ValueNumber> FlagDiacriticState;
-typedef std::vector<FlagDiacriticState> FlagDiacriticStateStack;
 
+/**
+ * Various properties of a symbol, mostly used internally by TransducerAlphabet
+ */
+struct SymbolProperties
+{
+  /**
+   * The string representation of the symbol
+   */
+  std::string str;
+  
+  /**
+   * Whether the symbol is considered alphabetic. Roughly, this includes
+   * symbols that are not whitespace or punctuation
+   */
+  bool alphabetic;
+  
+  /**
+   * The symbol number of the lowercase version of the symbol. If the symbol
+   * is already lowercase, this will contain the symbol's own number. If the
+   * symbol has no lowercase form, it will contain NO_SYMBOL_NUMBER
+   */
+  SymbolNumber lower;
+  
+  /**
+   * The symbol number of the uppercase version of the symbol. If the symbol
+   * is already uppercase, this will contain the symbol's own number. If the
+   * symbol has no uppercase form, it will contain NO_SYMBOL_NUMBER
+   */
+  SymbolNumber upper;
+  
+  /**
+   * Flag diacritic information associated with the symbol. This may be a dummy
+   * operation if the symbol is not a flag diacritic
+   */
+  FlagDiacriticOperation fd_op;
+};
 
 class TransducerAlphabet
 {
  private:
   SymbolTable symbol_table;
-  OperationVector operations;
-  
-  /**
-   * The set of symbols that are considered alphabetic. Roughly, this includes
-   * symbols that are not whitespace or punctuation
-   */
-  std::set<SymbolNumber> alphabetic;
   
   /**
    * The symbol number for a "blank" which is here considered to be a space.
@@ -159,38 +186,38 @@ class TransducerAlphabet
   void get_next_symbol(std::istream& is, SymbolNumber k);
   
   /**
+   * Find the upper/lower-case equivalencies for the symbols in the table
+   */
+  void calculate_caps();
+  
+  /**
+   * A routine used for checking/changing a character's case
+   * @param c the character to work with
+   * @param case_res an output: set to <0 if c is lowercase, >0 if c is
+   *                            uppercase, or 0 if neither
+   * @return the equivalent character in the opposite case of c, or the empty
+   *         string if nonexistent
+   */
+  static std::string caps_helper(const char* c, int& case_res);
+  static int utf8_str_to_int(const char* c);
+  static std::string utf8_int_to_str(int c);
+  
+  /**
    * Store the blank symbol's number in blank_symbol, adding it as a new symbol
    * if it cannot be found
    */
   void setup_blank_symbol();
   
-  void calculate_alphabetic();
-
   std::map<std::string, SymbolNumber> feature_bucket;
   std::map<std::string, ValueNumber> value_bucket;
   ValueNumber val_num;
   SymbolNumber feat_num;
   
-  SymbolNumber add_symbol(std::string string)
-  {
-    return add_symbol(symbol_table.size(), string);
-  }
-  SymbolNumber add_symbol(SymbolNumber symbol, std::string string)
-  {
-    return add_symbol(symbol, string, FlagDiacriticOperation()); // use a dummy flag
-  }
-  SymbolNumber add_symbol(SymbolNumber symbol, std::string string, FlagDiacriticOperation fdo)
-  {
-    operations.push_back(fdo);
-    symbol_table[symbol] = string;
-    return symbol;
-  }
  public:
-  
   TransducerAlphabet(std::istream& is, SymbolNumber symbol_count):
-    symbol_table(), operations(), alphabetic(), blank_symbol(NO_SYMBOL_NUMBER),
+    symbol_table(), blank_symbol(NO_SYMBOL_NUMBER),
     feature_bucket(), value_bucket(), val_num(1), feat_num(0)
-  {
+  {  
     value_bucket[std::string()] = 0; // empty value = neutral
     for(SymbolNumber k=0; k<symbol_count; k++)
       get_next_symbol(is, k);
@@ -198,21 +225,20 @@ class TransducerAlphabet
     if(printDebuggingInformationFlag && get_state_size()>0)
       std::cout << "Alphabet contains " << get_state_size() << " flag diacritic feature(s)" << std::endl;
     // assume the first symbol is epsilon which we don't want to print
-    symbol_table.operator[](0) = "";
+    symbol_table[0].str = "";
     
     setup_blank_symbol();
-    calculate_alphabetic();
+    calculate_caps();
   }
   
   TransducerAlphabet(const TransducerAlphabet& o):
-    symbol_table(o.symbol_table), operations(o.operations), alphabetic(o.alphabetic),
-    blank_symbol(o.blank_symbol), feature_bucket(o.feature_bucket),
-    value_bucket(o.value_bucket), val_num(o.val_num), feat_num(o.feat_num) {}
+    symbol_table(o.symbol_table), blank_symbol(o.blank_symbol), 
+    feature_bucket(o.feature_bucket), value_bucket(o.value_bucket),
+    val_num(o.val_num), feat_num(o.feat_num) {}
   
   ~TransducerAlphabet() {}
   
   const SymbolTable& get_symbol_table(void) const { return symbol_table; }
-  const OperationVector& get_operation_vector(void) const { return operations; }
   SymbolNumber get_state_size(void) const { return feature_bucket.size(); }
   SymbolNumber get_blank_symbol() const {return blank_symbol;}
   
@@ -222,7 +248,30 @@ class TransducerAlphabet
   { return (c[0]!='\0' && !isspace(c[0]) && 
             !is_punctuation(c)); }
   bool is_alphabetic(SymbolNumber symbol) const 
-  {return (alphabetic.find(symbol) != alphabetic.end());}
+  {return symbol_table[symbol].alphabetic;}
+  
+  bool is_lower(SymbolNumber symbol) const
+  {return symbol_table[symbol].lower == symbol;}
+  bool is_upper(SymbolNumber symbol) const
+  {return symbol_table[symbol].upper == symbol;}
+  bool has_case(SymbolNumber symbol) const
+  {return symbol_table[symbol].lower != NO_SYMBOL_NUMBER ||
+          symbol_table[symbol].upper != NO_SYMBOL_NUMBER;}
+  /**
+   * Returns the lowercase equivalent of symbol, or just symbol if there is no
+   * lowercase equivalent
+   */
+  SymbolNumber to_lower(SymbolNumber symbol) const
+  {return symbol_table[symbol].lower==NO_SYMBOL_NUMBER ? 
+            symbol : symbol_table[symbol].lower;}
+  
+  /**
+   * Returns the uppercase equivalent of symbol, or just symbol if there is no
+   * uppercase equivalent
+   */
+  SymbolNumber to_upper(SymbolNumber symbol) const
+  {return symbol_table[symbol].upper==NO_SYMBOL_NUMBER ? 
+            symbol : symbol_table[symbol].upper;}
   
   /**
    * Whether the symbol is an apertium-style tag (i.e. symbols starting 
@@ -231,17 +280,20 @@ class TransducerAlphabet
   bool is_tag(SymbolNumber symbol) const;
   
   std::string symbol_to_string(SymbolNumber symbol) const
-  {
-    SymbolTable::const_iterator it = symbol_table.find(symbol);
-    return (it==symbol_table.end()) ? "" : symbol_table.find(symbol)->second;
-  }
+  {return symbol_table[symbol].str;}
   
   /**
-   * Use the symbol table to convert the given symbols into a string
+   * Use the symbol table to convert the given symbols into a string, optionally
+   * modifying the case of some symbols
    * @param symbols the symbols to convert
+   * @param caps how to modify case. The states are handled as follows:
+   *             Unknown        - case unchanged
+   *             LowerCase      - same as Unknown
+   *             FirstUpperCase - first symbol forced to uppercase
+   *             UpperCase      - all symbols force to uppercase
    * @return the string representation of the symbols
    */
-  std::string symbols_to_string(const SymbolNumberVector& symbols) const;
+  std::string symbols_to_string(const SymbolNumberVector& symbols, CapitalizationState caps=Unknown) const;
 };
 
 class TransitionIndex
@@ -396,8 +448,8 @@ class AbstractTransducer
   const TransducerAlphabet& get_alphabet() const {return alphabet;}
   
   void do_tokenize(TokenIOStream& token_stream); // for testing
-  void do_analysis(TokenIOStream& token_stream, OutputFormatter& output_formatter);
-  void do_generation(TokenIOStream& token_stream, GenerationMode mode);
+  void do_analysis(TokenIOStream& token_stream, OutputFormatter& output_formatter, CapitalizationMode capitalization_mode);
+  void do_generation(TokenIOStream& token_stream, GenerationMode mode, CapitalizationMode capitalization_mode);
   
   virtual bool is_epsilon(const Transition& transition) const
   {return transition.matches(0);}
@@ -460,7 +512,7 @@ class TransducerFd: public Transducer
 	{
 	  return transition.matches(0) ||
 	         (transition.get_input() != NO_SYMBOL_NUMBER &&
-	            alphabet.get_operation_vector()[transition.get_input()].isFlag());
+	            alphabet.get_symbol_table()[transition.get_input()].fd_op.isFlag());
 	}
 };
 
@@ -506,7 +558,7 @@ class TransducerWFd: public TransducerW
   {
     return transition.matches(0) ||
            (transition.get_input() != NO_SYMBOL_NUMBER &&
-              alphabet.get_operation_vector()[transition.get_input()].isFlag());
+              alphabet.get_symbol_table()[transition.get_input()].fd_op.isFlag());
   }
 };
 
