@@ -7,13 +7,19 @@
 
 class LetterTrie;
 typedef std::vector<LetterTrie*> LetterTrieVector;
+class Symbolizer;
 
 class LetterTrie
 {
  private:
   LetterTrieVector letters;
   SymbolNumberVector symbols;
-
+  
+  /**
+   * Whether our symbols vector or that of any of our children contains 
+   * symbol number 0
+   */
+  bool has_symbol_0() const;
  public:
   LetterTrie(void):
     letters(std::numeric_limits<unsigned char>::max(), (LetterTrie*) NULL),
@@ -43,6 +49,8 @@ class LetterTrie
    * @return the number of the symbol, 0 for EOF, or NO_SYMBOL_NUMBER
    */
   SymbolNumber extract_symbol(std::istream& is) const;
+  
+  friend class Symbolizer;
 };
 
 class Symbolizer
@@ -67,6 +75,13 @@ class Symbolizer
           std::cout << "Symbolizer ignoring shortcut for ASCII character '" 
                     << (char)i << "' (" << i << ")" << std::endl;
       }
+    }
+    
+    if(letters.has_symbol_0())
+    {
+      std::cerr << "!! Warning: the letter trie contains references to symbol  !!\n"
+                << "!! number 0. This is almost certainly a bug and could      !!\n"
+                << "!! cause certain characters to be misinterpreted as EOF    !!\n";
     }
   }
   

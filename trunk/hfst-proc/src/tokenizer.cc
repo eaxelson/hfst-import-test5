@@ -2,7 +2,24 @@
 
 //////////Function definitions for LetterTrie
 
-void LetterTrie::add_string(const char * p, SymbolNumber symbol_key)
+bool
+LetterTrie::has_symbol_0() const
+{
+  for(size_t i=0;i<symbols.size();i++)
+  {
+    if(symbols[i] == 0)
+      return true;
+  }
+  for(size_t i=0;i<letters.size();i++)
+  {
+    if(letters[i] != NULL && letters[i]->has_symbol_0())
+      return true;
+  }
+  return false;
+}
+
+void
+LetterTrie::add_string(const char * p, SymbolNumber symbol_key)
 {
   if (*(p+1) == 0)
   {
@@ -15,7 +32,8 @@ void LetterTrie::add_string(const char * p, SymbolNumber symbol_key)
   letters[(unsigned char)(*p)]->add_string(p+1,symbol_key);
 }
 
-SymbolNumber LetterTrie::find_symbol(const char* c) const
+SymbolNumber
+LetterTrie::find_symbol(const char* c) const
 {
   if (letters[(unsigned char)(c[0])] == NULL)
     return symbols[(unsigned char)(c[0])];
@@ -57,12 +75,12 @@ void
 Symbolizer::read_input_symbols(const SymbolTable& st)
 {
   for (SymbolNumber k = 0; k < st.size(); ++k)
-  { 
+  {
     std::string p = st[k].str;
     
     if(p.length() > 0)
     {
-      char first = p.at(0);
+      unsigned char first = p.at(0);
       if(ascii_symbols[first] != 0) 
       { // if the symbol's first character is ASCII and we're not ignoring it yet
         if(p.length() == 1)
