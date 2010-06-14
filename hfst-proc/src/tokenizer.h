@@ -158,13 +158,9 @@ class TokenIOStream
   int read_escaped();
   
   /**
-   * Read into the the stream until the delimiting character is found. The
-   * delimiting character is read and included in the string. Charater escaping
-   * is handled. Fails on stream error
-   * @return the string from the stream's current point up to and including
-   *         the delimiting character
+   * Generate an escaped copy of the given string
    */
-  std::string read_delimited(const char delim);
+  std::string escape(const std::string& str) const;
   
   /**
    * Make a token from the next character(s) in the stream by attempting to
@@ -218,9 +214,13 @@ class TokenIOStream
   size_t first_nonalphabetic(const TokenVector& s) const;
   
   /**
-   * Generate an escaped copy of the given string
+   * Read into the the stream until the delimiting character is found. The
+   * delimiting character is read and included in the string. Charater escaping
+   * is handled. Fails on stream error
+   * @return the string from the stream's current point up to and including
+   *         the delimiting character
    */
-  std::string escape(const std::string& str) const;
+  std::string read_delimited(const char delim);
   
   /**
    * Read the next token from the input stream/buffer
@@ -230,7 +230,7 @@ class TokenIOStream
   /**
    * Write a token to the output stream
    */
-  void put_token(const Token& t) {os << token_to_string(t);}
+  void put_token(const Token& t);
   
   void put_tokens(const TokenVector& t);
   void put_symbols(const SymbolNumberVector& s, CapitalizationState caps=Unknown);
@@ -260,7 +260,7 @@ class TokenIOStream
   std::istream& istream() {return is;}
   std::ostream& ostream() {return os;}
   
-  void write_escaped(std::string& str) {os << escape(str);}
+  void write_escaped(const std::string str) {os << escape(str);}
   void write_escaped(const TokenVector& t) {os << tokens_to_string(t);}
   
   std::string get_superblank(size_t i) const {return superblank_bucket[i];}

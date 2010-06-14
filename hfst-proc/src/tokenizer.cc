@@ -57,7 +57,7 @@ void
 Symbolizer::read_input_symbols(const SymbolTable& st)
 {
   for (SymbolNumber k = 0; k < st.size(); ++k)
-  {
+  { 
     std::string p = st[k].str;
     
     if(p.length() > 0)
@@ -70,15 +70,16 @@ Symbolizer::read_input_symbols(const SymbolTable& st)
         else
           ascii_symbols[first] = 0;
       }
+      letters.add_string(p.c_str(),k);
     }
-    
-    letters.add_string(p.c_str(),k);
   }
 }
 
 SymbolNumber
 Symbolizer::find_symbol(const char* c) const
 {
+  if(c[0] == 0)
+    return NO_SYMBOL_NUMBER;
   if (ascii_symbols[(unsigned char)(c[0])] == NO_SYMBOL_NUMBER)
     return letters.find_symbol(c);
   return ascii_symbols[(unsigned char)(c[0])];
@@ -88,6 +89,8 @@ SymbolNumber
 Symbolizer::extract_symbol(std::istream& is) const
 {
   int c = is.peek();
+  if(c == 0)
+    return NO_SYMBOL_NUMBER;
   if(ascii_symbols[c] == NO_SYMBOL_NUMBER)
     return letters.extract_symbol(is);
   
@@ -338,6 +341,12 @@ TokenIOStream::get_token()
   if(token.type != None)
     token_buffer.add(token);
   return token;
+}
+
+void
+TokenIOStream::put_token(const Token& t)
+{
+    os << token_to_string(t);
 }
 
 void

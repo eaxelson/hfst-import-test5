@@ -384,7 +384,7 @@ AbstractTransducer::do_generation(TokenIOStream& token_stream,
                                   CapitalizationMode capitalization_mode)
 {
   LookupState state(*this);
-  
+  char prefix_char = '\0';
   Token next_token;
   while((next_token = token_stream.get_token()).type != None)
   {
@@ -398,31 +398,40 @@ AbstractTransducer::do_generation(TokenIOStream& token_stream,
           next_token = token_stream.get_token();
           if(next_token.type == ReservedCharacter && next_token.character[0] == '$')
             break;
-          else if(next_token.type == Symbol ||
-                 (next_token.type == ReservedCharacter && 
-                   (next_token.character[0]=='*' || next_token.character[0]=='@')))
-            form.push_back(next_token);
+          else if(token_stream.token_to_string(next_token) == "*" ||
+                  token_stream.token_to_string(next_token) == "@")
+          {
+            prefix_char = token_stream.token_to_string(next_token)[0];
+            break;
+          }
           else if(next_token.type == None)
             stream_error("Stream ended before end-of-word marker $ was found");
           else
-            stream_error(std::string("Found unexpected non-symbolic character ")+token_stream.token_to_string(next_token)+" in middle of word");
+            form.push_back(next_token);
         }
         
         //Figure out how to output the word
         
-        if(token_stream.token_to_string(form[0]) == "*")
+        if(prefix_char == '*')
         {
-          if(mode == gm_clean) // don't output the *
-            token_stream.put_tokens(TokenVector(form.begin()+1,form.end()));
-          else
-            token_stream.put_tokens(form);
+          if(mode != gm_clean)
+            token_stream.ostream() << '*';
+          token_stream.write_escaped(token_stream.read_delimited('$'));
         }
-        else if(form[0].type == ReservedCharacter && form[0].character[0] == '@')
+        else if(prefix_char == '@')
         {
-          if(mode == gm_clean) // don't output the @
-            token_stream.put_tokens(TokenVector(form.begin()+1,form.end()));
+          if(mode != gm_clean)
+            token_stream.write_escaped("@");
+          
+          std::string word;
+          if(mode == gm_all)
+            word = token_stream.read_delimited('$');
           else
-            token_stream.put_tokens(form);
+          {
+            word = token_stream.read_delimited('<');
+            token_stream.read_delimited('$');
+          }
+          token_stream.write_escaped(word.substr(0,word.length()-1));
         }
         else
         {
