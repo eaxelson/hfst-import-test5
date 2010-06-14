@@ -4,16 +4,60 @@
 
 //////////Function definitions for OutputFormatter
 
+bool
+OutputFormatter::is_compound_analysis(const SymbolNumberVector& final) const
+{
+  for(SymbolNumberVector::const_iterator it=final.begin(); it!=final.end(); it++)
+  {
+    if(token_stream.get_alphabet().symbol_to_string(*it) == "+")
+      return true;
+  }
+  return false;
+}
+
+void
+OutputFormatter::remove_compound_analyses(LookupPathVector& finals) const
+{
+  bool has_noncompounded = false;
+  
+  // first look to see if there are any non-compounded analyses
+  for(LookupPathVector::const_iterator it=finals.begin(); it!=finals.end(), has_noncompounded==false; it++)
+  {
+    if(!is_compound_analysis((*it)->get_output_symbols()))
+      has_noncompounded = true;
+  }
+  
+  if(has_noncompounded)
+  { //there is a non-compounded analysis, check for any compounded ones
+    for(LookupPathVector::iterator it=finals.begin(); it!=finals.end();)
+    {
+      if(is_compound_analysis((*it)->get_output_symbols()))
+        finals.erase(it);
+      else
+        it++;
+    }
+  }
+}
+
 LookupPathVector
 OutputFormatter::preprocess_finals(const LookupPathVector& finals) const
 {
-  LookupPathVector sorted_finals(finals.begin(), finals.end());
-  std::sort(sorted_finals.begin(), sorted_finals.end(), LookupPath::compare_pointers);
+  LookupPathVector new_finals = LookupPathVector(finals);
+  if(filter_compound_analyses)
+  {
+    remove_compound_analyses(new_finals);
+    if(printDebuggingInformationFlag)
+    {
+      if(new_finals.size() < finals.size())
+        std::cout << "Filtered " << finals.size()-new_finals.size() << " compound analyses" << std::endl;
+    }
+  }
+  std::sort(new_finals.begin(), new_finals.end(), LookupPath::compare_pointers);
   
-  if(sorted_finals.size() > (unsigned int)maxAnalyses)
-    return LookupPathVector(sorted_finals.begin(),sorted_finals.begin()+maxAnalyses);
+  if(new_finals.size() > (unsigned int)maxAnalyses)
+    return LookupPathVector(new_finals.begin(),new_finals.begin()+maxAnalyses);
   else
-    return sorted_finals;
+    return new_finals;
 }
 
 //////////Function definitions for ApertiumOutputFormatter

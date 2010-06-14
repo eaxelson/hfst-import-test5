@@ -12,6 +12,15 @@ class OutputFormatter
 {
  protected:
   TokenIOStream& token_stream;
+  bool filter_compound_analyses;
+  
+  bool is_compound_analysis(const SymbolNumberVector& final) const;
+  
+  /**
+   * If there are any non-compound analyses in the given set of finals, then
+   * filter out all compound analyses from the set
+   */
+  void remove_compound_analyses(LookupPathVector& finals) const;
   
   /**
    * Return a sorted copy of the path vector that contains no more than
@@ -19,7 +28,7 @@ class OutputFormatter
    */
   LookupPathVector preprocess_finals(const LookupPathVector& finals) const;
  public:
-  OutputFormatter(TokenIOStream& s): token_stream(s) {}
+  OutputFormatter(TokenIOStream& s, bool f): token_stream(s), filter_compound_analyses(f) {}
   virtual ~OutputFormatter() {}
   
   /**
@@ -44,7 +53,7 @@ class OutputFormatter
 class ApertiumOutputFormatter: public OutputFormatter
 {
  public:
-  ApertiumOutputFormatter(TokenIOStream& s): OutputFormatter(s) {}
+  ApertiumOutputFormatter(TokenIOStream& s, bool f): OutputFormatter(s,f) {}
   
   std::vector<std::string> process_finals(const LookupPathVector& finals,
                                           CapitalizationState state) const;
@@ -63,7 +72,7 @@ class XeroxOutputFormatter: public OutputFormatter
    */
   TokenVector clear_superblanks(const TokenVector& tokens) const;
  public:
-  XeroxOutputFormatter(TokenIOStream& s): OutputFormatter(s) {}
+  XeroxOutputFormatter(TokenIOStream& s, bool f): OutputFormatter(s,f) {}
   
   std::vector<std::string> process_finals(const LookupPathVector& finals,
                                           CapitalizationState state) const;
