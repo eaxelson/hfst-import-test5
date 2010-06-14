@@ -45,12 +45,13 @@ bool print_usage(void)
 {
   std::cerr <<
     "\n" <<
-    "Usage: " << PACKAGE_NAME << " [-a [-p|-x]|-g|-n|-t] [-W] [-n N] [-c|-w] [-v|-q|-s] transducer_file [input_file [output_file]]\n" <<
+    "Usage: " << PACKAGE_NAME << " [-a [-p|-x]|-g|-n|-d|-t] [-W] [-n N] [-c|-w] [-v|-q|-s] transducer_file [input_file [output_file]]\n" <<
     "Perform a transducer lookup on a text stream, tokenizing on the fly\n" <<
     "\n" <<
     "  -a, --analysis              Morphological analysis (default)\n" <<
     "  -g, --generation            Morphological generation\n" <<
     "  -n, --non-marked-gen        Morph. generation without unknown word marks\n" <<
+    "  -d, --debugged-gen          Morph. generation with everything printed\n" <<
     "  -t  --tokenize              Tokenize the input stream into symbols (for debugging)\n" <<
     "  -p  --apertium              Apertium output format for analysis (default)\n" <<
     "  -x, --xerox                 Xerox output format for analysis\n" <<
@@ -105,6 +106,7 @@ int main(int argc, char **argv)
       {"analysis",       no_argument,       0, 'a'},
       {"generation",     no_argument,       0, 'g'},
       {"non-marked-gen", no_argument,       0, 'n'},
+      {"debugged-gen",   no_argument,       0, 'd'},
       {"tokenize",       no_argument,       0, 't'},
       {"apertium",       no_argument,       0, 'p'},
       {"xerox",          no_argument,       0, 'x'},
@@ -116,7 +118,7 @@ int main(int argc, char **argv)
     };
       
     int option_index = 0;
-    int c = getopt_long(argc, argv, "hVvqsagntpxWN:cw", long_options, &option_index);
+    int c = getopt_long(argc, argv, "hVvqsagndtpxWN:cw", long_options, &option_index);
 
     if (c == -1) // no more options to look at
       break;
@@ -155,6 +157,7 @@ int main(int argc, char **argv)
     case 'a':
     case 'g':
     case 'n':
+    case 'd':
     case 't':
       if(cmd==0)
         cmd = c;
@@ -279,6 +282,8 @@ int main(int argc, char **argv)
         break;
       case 'n':
         t->do_generation(token_stream, gm_clean, capitalization_mode);
+      case 'd':
+        t->do_generation(token_stream, gm_all, capitalization_mode);
       case 'a':
       default:
         OutputFormatter* output_formatter = (outputType==xerox)?
