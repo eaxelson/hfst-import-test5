@@ -148,14 +148,14 @@ int main(int argc, char **argv) {
     rule_transducers2[i] = new HfstTransducer(rule_transducer2);
     rule_transducers3[i] = new HfstTransducer(rule_transducer3);
 
-    rule_transducer1.minimize();    
-    std::cerr << rule_transducer1 << "\n"; 
+    //rule_transducer1.minimize();    
+    //std::cerr << rule_transducer1 << "\n"; 
 
-    rule_transducer2.minimize();    
-    std::cerr << rule_transducer2 << "\n"; 
+    //rule_transducer2.minimize();    
+    //std::cerr << rule_transducer2 << "\n"; 
 
-    rule_transducer3.minimize();    
-    std::cerr << rule_transducer3 << "\n"; 
+    //rule_transducer3.minimize();    
+    //std::cerr << rule_transducer3 << "\n"; 
   }
 
   rule_transducers1[0]->convert(TROPICAL_OFST_TYPE);

@@ -261,6 +261,8 @@ namespace hfst
     bool static is_safe_conversion(ImplementationType original, ImplementationType conversion);
 
   public:
+    HfstTransducer & operator= (HfstTransducer &another);
+
     /** \brief Create an empty transducer, i.e. a transducer that does not recognize any string. 
 
 	@note Use HfstTransducer("") to create an epsilon transducer.
@@ -521,6 +523,10 @@ fclose(ifile);
 	@see #n_best */
     void extract_strings(WeightedPaths<float>::Set &results);
 
+    /** \brief Freely insert symbol pair \a symbol_pair into the transducer. */
+
+    HfstTransducer &insert_freely(const StringPair &symbol_pair);
+
     /** \brief Substitute all transition symbols equal to \a old_symbol with symbol \a new_symbol. 
 
 	The transition weights remain the same. */
@@ -625,7 +631,7 @@ fclose(ifile);
     void test_minimize(void);
 
     /** \brief The type of the transducer. */
-    ImplementationType get_type(void);
+    ImplementationType get_type(void) const;
 
     /** \brief Convert this transducer into an equivalent transducer in format \a type. 
 
@@ -816,14 +822,27 @@ void print(HfstMutableTransducer &t)
 
   namespace rules
   {
+    enum ReplaceType {REPL_UP, REPL_DOWN, REPL_RIGHT, REPL_LEFT};
+
+    /* helping methods */
+    HfstTransducer & universal_fst(const StringPairSet &alphabet, ImplementationType type);
+    HfstTransducer & negation_fst(const HfstTransducer &t, const StringPairSet &alphabet);
+
+    HfstTransducer& replace(HfstTransducer &t, ReplaceType repl_type, bool optional, StringPairSet &alphabet);
+    HfstTransducer& replace_transducer(HfstTransducer &t, std::string lm, std::string rm, ReplaceType repl_type, StringPairSet &alphabet);
+    HfstTransducer& replace_context(HfstTransducer &t, std::string m1, std::string m2, StringPairSet &alphabet);
+    HfstTransducer& replace_in_context(HfstTransducerPair &context, ReplaceType repl_type, HfstTransducer &t, bool optional, StringPairSet &alphabet);
+
+
+    /** \brief ... */
     HfstTransducer two_level_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
     HfstTransducer two_level_only_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
     HfstTransducer two_level_if_and_only_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
 
-    HfstTransducer replace_up(HfstTransducerPairSet &contexts, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
-    HfstTransducer replace_down(HfstTransducerPairSet &contexts, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
-    HfstTransducer replace_right(HfstTransducerPairSet &contexts, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
-    HfstTransducer replace_left(HfstTransducerPairSet &contexts, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_up(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_down(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_right(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_left(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
 
     HfstTransducer restriction(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
     HfstTransducer coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
