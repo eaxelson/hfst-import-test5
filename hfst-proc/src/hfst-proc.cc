@@ -45,26 +45,30 @@ bool print_usage(void)
 {
   std::cerr <<
     "\n" <<
-    "Usage: " << PACKAGE_NAME << " [-a [-p|-x]|-g|-n|-d|-t] [-W] [-n N] [-c|-w] [-v|-q|-s] transducer_file [input_file [output_file]]\n" <<
+    "Usage: " << PACKAGE_NAME << " [-a [-p|-x] [-C]|-g|-n|-d|-t] [-W] [-n N] [-c|-w] [-v|-q|-s] transducer_file [input_file [output_file]]\n" <<
     "Perform a transducer lookup on a text stream, tokenizing on the fly\n" <<
     "\n" <<
-    "  -a, --analysis              Morphological analysis (default)\n" <<
-    "  -g, --generation            Morphological generation\n" <<
-    "  -n, --non-marked-gen        Morph. generation without unknown word marks\n" <<
-    "  -d, --debugged-gen          Morph. generation with everything printed\n" <<
-    "  -t  --tokenize              Tokenize the input stream into symbols (for debugging)\n" <<
-    "  -p  --apertium              Apertium output format for analysis (default)\n" <<
-    "  -x, --xerox                 Xerox output format for analysis\n" <<
-    "  -W, --show-weights          Print final analysis weights (if any)\n" <<
-    "  -N N, --analyses=N          Output no more than N analyses\n" <<
-    "                              (if the transducer is weighted, the N best analyses)\n" <<
-    "  -c, --case-sensitive        Perform lookup using the literal case of the input characters\n" <<
-    "  -w  --dictionary-case       Output results using dictionary case instead of surface case\n" <<
-    "  -v, --verbose               Be verbose\n" <<
-    "  -q, --quiet                 Don't be verbose (default)\n" <<
-    "  -s, --silent                Same as quiet\n" <<
-    "  -V, --version               Print version information\n" <<
-    "  -h, --help                  Print this help message\n" <<
+    "  -a, --analysis          Morphological analysis (default)\n" <<
+    "  -g, --generation        Morphological generation\n" <<
+    "  -n, --non-marked-gen    Morph. generation without unknown word marks\n" <<
+    "  -d, --debugged-gen      Morph. generation with everything printed\n" <<
+    "  -t  --tokenize          Tokenize the input stream into symbols (for debugging)\n" <<
+    "  -p  --apertium          Apertium output format for analysis (default)\n" <<
+    "  -x, --xerox             Xerox output format for analysis\n" <<
+    "  -C, --keep-compounds    Retain compound analyses even when a non-compound\n" <<
+    "                          one is available\n" <<
+    "  -W, --show-weights      Print final analysis weights (if any)\n" <<
+    "  -N N, --analyses=N      Output no more than N analyses\n" <<
+    "                          (if the transducer is weighted, the N best analyses)\n" <<
+    "  -c, --case-sensitive    Perform lookup using the literal case of the input\n" <<
+    "                          characters\n" <<
+    "  -w  --dictionary-case   Output results using dictionary case instead of\n" <<
+    "                          surface case\n" <<
+    "  -v, --verbose           Be verbose\n" <<
+    "  -q, --quiet             Don't be verbose (default)\n" <<
+    "  -s, --silent            Same as quiet\n" <<
+    "  -V, --version           Print version information\n" <<
+    "  -h, --help              Print this help message\n" <<
     "\n" <<
     "Report bugs to " << PACKAGE_BUGREPORT << "\n" <<
     "\n";
@@ -91,6 +95,7 @@ int main(int argc, char **argv)
 {
   int cmd = 0;
   int capitalization = 0;
+  bool filter_compound_analyses = true;
   
   while (true)
   {
@@ -110,6 +115,7 @@ int main(int argc, char **argv)
       {"tokenize",       no_argument,       0, 't'},
       {"apertium",       no_argument,       0, 'p'},
       {"xerox",          no_argument,       0, 'x'},
+      {"keep-compounds", no_argument,       0, 'C'},
       {"show-weights",   no_argument,       0, 'W'},
       {"analyses",       required_argument, 0, 'N'},
       {"case-sensitive", no_argument,       0, 'c'},
@@ -118,7 +124,7 @@ int main(int argc, char **argv)
     };
       
     int option_index = 0;
-    int c = getopt_long(argc, argv, "hVvqsagndtpxWN:cw", long_options, &option_index);
+    int c = getopt_long(argc, argv, "hVvqsagndtpxCWN:cw", long_options, &option_index);
 
     if (c == -1) // no more options to look at
       break;
@@ -174,6 +180,10 @@ int main(int argc, char **argv)
       break;
     case 'x':
       outputType = xerox;
+      break;
+    
+    case 'C':
+      filter_compound_analyses = false;
       break;
       
     case 'W':
@@ -287,9 +297,9 @@ int main(int argc, char **argv)
       case 'a':
       default:
         OutputFormatter* output_formatter = (outputType==xerox)?
-                    (OutputFormatter*)new XeroxOutputFormatter(token_stream):
-                    (OutputFormatter*)new ApertiumOutputFormatter(token_stream);
-         
+                    (OutputFormatter*)new XeroxOutputFormatter(token_stream, filter_compound_analyses):
+                    (OutputFormatter*)new ApertiumOutputFormatter(token_stream, filter_compound_analyses);
+        
         t->do_analysis(token_stream, *output_formatter, capitalization_mode);
     
         delete output_formatter;
