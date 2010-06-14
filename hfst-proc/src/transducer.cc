@@ -419,7 +419,7 @@ AbstractTransducer::do_generation(TokenIOStream& token_stream,
           
           std::string word = token_stream.read_delimited('$');
           
-          if(prefix_char == '@' && mode != gm_all)
+          if(prefix_char == '*' || (prefix_char == '@' && mode != gm_all))
           {
             size_t loc = word.find('<');
             if(loc != std::string::npos)

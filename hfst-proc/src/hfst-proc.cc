@@ -36,7 +36,7 @@ bool printDebuggingInformationFlag = false;
 
 void stream_error(const char* e)
 {
-  throw std::ios_base::failure((std::string("Error: malformed input stream: ")+e).c_str());
+  throw std::ios_base::failure((std::string("Error: malformed input stream: ")+e+"\n").c_str());
 }
 void stream_error(std::string e) {stream_error(e.c_str());}
 
