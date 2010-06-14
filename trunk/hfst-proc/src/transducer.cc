@@ -384,7 +384,6 @@ AbstractTransducer::do_generation(TokenIOStream& token_stream,
                                   CapitalizationMode capitalization_mode)
 {
   LookupState state(*this);
-  char prefix_char = '\0';
   Token next_token;
   while((next_token = token_stream.get_token()).type != None)
   {
@@ -392,6 +391,7 @@ AbstractTransducer::do_generation(TokenIOStream& token_stream,
     {
       if(next_token.character[0] == '^') // start of a word form to generate
       {
+        char prefix_char = '\0';
         TokenVector form;
         while(true)
         {
