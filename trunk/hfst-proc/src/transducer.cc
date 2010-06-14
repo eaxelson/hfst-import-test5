@@ -412,26 +412,22 @@ AbstractTransducer::do_generation(TokenIOStream& token_stream,
         
         //Figure out how to output the word
         
-        if(prefix_char == '*')
+        if(prefix_char != '\0') // the word is unanalyzed (*) or untranslated (@)
         {
           if(mode != gm_clean)
-            token_stream.ostream() << '*';
-          token_stream.write_escaped(token_stream.read_delimited('$'));
-        }
-        else if(prefix_char == '@')
-        {
-          if(mode != gm_clean)
-            token_stream.write_escaped("@");
+            token_stream.write_escaped(std::string(1,prefix_char));
           
-          std::string word;
-          if(mode == gm_all)
-            word = token_stream.read_delimited('$');
-          else
+          std::string word = token_stream.read_delimited('$');
+          
+          if(prefix_char == '@' && mode != gm_all)
           {
-            word = token_stream.read_delimited('<');
-            token_stream.read_delimited('$');
+            size_t loc = word.find('<');
+            if(loc != std::string::npos)
+              word = word.substr(0,loc);
           }
-          token_stream.write_escaped(word.substr(0,word.length()-1));
+          else
+            word = word.substr(0, word.length()-1); // remove the $
+          token_stream.write_escaped(word);
         }
         else
         {
@@ -457,7 +453,20 @@ AbstractTransducer::do_generation(TokenIOStream& token_stream,
           {
             if(mode != gm_clean)
               token_stream.put_token(Token::as_reservedcharacter('#'));
-            token_stream.put_tokens(form);
+            std::string word = token_stream.tokens_to_string(form, true); // get an unescaped string
+            if(mode != gm_all) // strip apertium-style tags
+            {
+              size_t pos1;
+              while((pos1 = word.find('<')) != std::string::npos)
+              {
+                size_t pos2 = word.find('>');
+                if(pos2 != std::string::npos)
+                  word = word.substr(0,pos1)+word.substr(pos2+1);
+                else
+                  stream_error("Found tag without closing '>'");
+              }
+            }
+            token_stream.write_escaped(word);
           }
           
           state.reset();

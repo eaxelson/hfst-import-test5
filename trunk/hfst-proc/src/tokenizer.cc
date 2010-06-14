@@ -362,14 +362,17 @@ TokenIOStream::put_symbols(const SymbolNumberVector& s, CapitalizationState caps
 }
 
 std::string
-TokenIOStream::token_to_string(const Token& t) const
+TokenIOStream::token_to_string(const Token& t, bool raw) const
 {
   switch(t.type)
   {
     case Symbol:
       return alphabet.symbol_to_string(t.symbol);
     case Character:
-      return escape(t.character);
+      if(raw)
+        return t.character;
+      else
+        return escape(t.character);
     case Superblank:
       return superblank_bucket[t.superblank_index];
     case ReservedCharacter:
@@ -380,23 +383,11 @@ TokenIOStream::token_to_string(const Token& t) const
 }
 
 std::string
-TokenIOStream::tokens_to_string(const TokenVector& t) const
+TokenIOStream::tokens_to_string(const TokenVector& t, bool raw) const
 {
   std::string res;
   for(TokenVector::const_iterator it=t.begin(); it!=t.end(); it++)
-    res += token_to_string(*it);
+    res += token_to_string(*it,raw);
   return res;
-}
-
-void
-TokenIOStream::strip_tags(TokenVector& t) const
-{
-  for(TokenVector::iterator it=t.begin(); it!=t.end();)
-  {
-    if(it->type == Symbol && alphabet.is_tag(it->symbol))
-      t.erase(it);
-    else
-      it++;
-  }
 }
 

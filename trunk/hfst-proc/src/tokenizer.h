@@ -237,16 +237,12 @@ class TokenIOStream
   
   /**
    * Get the string representation of the given token
+   * @param raw if true, then don't do any character escaping
    */
-  std::string token_to_string(const Token& t) const;
+  std::string token_to_string(const Token& t, bool raw=false) const;
   
-  std::string tokens_to_string(const TokenVector& t) const;
-  
-  /**
-   * Strip apertium-style tag symbols from the list of tokens
-   */
-  void strip_tags(TokenVector& t) const;
-  
+  std::string tokens_to_string(const TokenVector& t, bool raw=false) const;
+    
   /**
    * Read the next token from the input stream/buffer
    */
