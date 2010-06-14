@@ -753,6 +753,12 @@ namespace hfst { namespace implementations
     return new LogFst(t_subst);
   }
   
+  LogFst * LogWeightTransducer::insert_freely
+  (LogFst * t, const StringPair &symbol_pair)
+  {
+    throw hfst::exceptions::FunctionNotImplementedException();
+  }
+
   LogFst * LogWeightTransducer::substitute(LogFst * t,
 					   pair<unsigned int, unsigned int> old_key_pair,
 					   pair<unsigned int, unsigned int> new_key_pair)

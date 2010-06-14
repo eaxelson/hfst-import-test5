@@ -1442,6 +1442,18 @@ namespace hfst { namespace implementations
   typedef std::pair<int,int> LabelPair;
   typedef std::vector<LabelPair> LabelPairVector;
 
+  StdVectorFst * TropicalWeightTransducer::insert_freely
+  (StdVectorFst * t, const StringPair &symbol_pair)
+  {
+    SymbolTable * st = t->InputSymbols();
+    assert(st != NULL);
+    for (fst::StateIterator<fst::StdFst> siter(*t); !siter.Done(); siter.Next()) {
+      StateId state_id = siter.Value();
+      t->AddArc(state_id, fst::StdArc(st->AddSymbol(symbol_pair.first), st->AddSymbol(symbol_pair.second), 0, state_id));
+    }
+    return t;
+  }
+
   StdVectorFst * TropicalWeightTransducer::substitute
   (StdVectorFst * t,unsigned int old_key,unsigned int new_key) 
   {

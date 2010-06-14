@@ -74,6 +74,7 @@ namespace hfst { namespace implementations
       static Transducer * extract_output_language(Transducer * t);
       static void extract_strings(Transducer * t, hfst::WeightedPaths<float>::Set &results);
 
+      static Transducer * insert_freely(Transducer *t , const StringPair &symbol_pair);
       static Transducer * substitute(Transducer * t, String old_symbol, String new_symbol);
 
       static Transducer * compose(Transducer * t1,

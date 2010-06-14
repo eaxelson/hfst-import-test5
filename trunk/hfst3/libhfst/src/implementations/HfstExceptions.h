@@ -60,6 +60,12 @@ public HfstInterfaceException
 class FunctionNotImplementedException :
 public HfstInterfaceException {};
 
+class ImpossibleReplaceTypeException :
+public HfstInterfaceException {};
+
+class ContextTransducersAreNotAutomataException :
+public HfstInterfaceException {};
+
 /* ... */
 class ImpossibleTransducerPowerException :
 public HfstInterfaceException {};

@@ -702,6 +702,12 @@ namespace hfst { namespace implementations {
     t->generate_hfst(results, true);
   }
 
+  Transducer * SfstTransducer::insert_freely(Transducer * t, const StringPair &symbol_pair)
+  {
+    return &t->freely_insert( Label( t->alphabet.add_symbol(symbol_pair.first.c_str()),
+				     t->alphabet.add_symbol(symbol_pair.second.c_str()) ));
+  }
+
     /*  Transducer * SfstTransducer::substitute(Transducer * t,Key old_key,Key new_key)
 	{ return &t->replace_char(old_key,new_key); }*/
   

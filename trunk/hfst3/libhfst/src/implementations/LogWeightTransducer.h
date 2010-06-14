@@ -183,6 +183,8 @@ namespace hfst { namespace implementations
       static LogFst * extract_input_language(LogFst * t);
       static LogFst * extract_output_language(LogFst * t);
 
+      static LogFst * insert_freely(LogFst * t, const StringPair &symbol_pair);
+
       static LogFst * substitute(LogFst * t,unsigned int old_key,unsigned int new_key);
       static LogFst * substitute(LogFst * t,
 				 pair<unsigned int, unsigned int> old_key_pair,

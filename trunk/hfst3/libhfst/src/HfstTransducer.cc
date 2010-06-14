@@ -122,6 +122,34 @@ namespace hfst
       }
   }
 
+  HfstTransducer & HfstTransducer::operator= (HfstTransducer &another)
+  {
+    if (this->get_type() != another.get_type())
+      throw hfst::exceptions::TransducerTypeMismatchException();
+
+    if (this != &another)
+      {
+	switch (this->type)
+	  {
+	  case SFST_TYPE:
+	    implementation.sfst = another.implementation.sfst;
+	    break;
+	  case TROPICAL_OFST_TYPE:
+	    implementation.tropical_ofst = another.implementation.tropical_ofst;
+	    break;
+	  case LOG_OFST_TYPE:
+	    implementation.log_ofst = another.implementation.log_ofst;
+	    break;
+	  case FOMA_TYPE:
+	    implementation.foma = another.implementation.foma;
+	    break;
+	  default:
+	    throw hfst::exceptions::TransducerHasWrongTypeException();
+	  }
+      }
+    return *this;
+  }
+
   HfstTransducer::HfstTransducer(ImplementationType type):
     type(type),anonymous(false),is_trie(true)
   {
@@ -368,7 +396,7 @@ type(type),anonymous(false),is_trie(false)
   }
 
 
-  ImplementationType HfstTransducer::get_type(void) {
+  ImplementationType HfstTransducer::get_type(void) const {
     switch (this->type)
       {
       case SFST_TYPE:
@@ -581,6 +609,44 @@ void HfstTransducer::test_minimize()
       }
   }
 
+  HfstTransducer &HfstTransducer::insert_freely(const StringPair &symbol_pair)
+  {
+    ImplementationType original_type = this->type;
+    if (original_type == FOMA_TYPE)
+      this->convert(TROPICAL_OFST_TYPE);
+
+    switch (this->type)    
+      {
+      case TROPICAL_OFST_TYPE:
+	{
+	  hfst::implementations::TropicalWeightTransducer::insert_freely
+	    (implementation.tropical_ofst,symbol_pair);
+	  break;
+	}
+      case LOG_OFST_TYPE:
+	{
+	  hfst::implementations::LogWeightTransducer::insert_freely
+	    (implementation.log_ofst,symbol_pair);
+	  break;
+	}
+      case SFST_TYPE:
+	{
+	  hfst::implementations::Transducer * temp =
+	    hfst::implementations::SfstTransducer::insert_freely
+	    (implementation.sfst,symbol_pair);
+	  delete implementation.sfst;
+	  implementation.sfst = temp;
+	  break;
+	}
+      default:
+	throw hfst::exceptions::FunctionNotImplementedException();
+	break;       
+      }
+    this->convert(original_type);
+    return *this;
+  }
+
+
 
   HfstTransducer &HfstTransducer::substitute
   (const std::string &old_symbol, const std::string &new_symbol)
@@ -594,6 +660,7 @@ void HfstTransducer::test_minimize()
     this->convert(original_type);
     return *this;
   }
+
 
   HfstTransducer &HfstTransducer::substitute
   (const StringPair &old_symbol_pair, 
