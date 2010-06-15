@@ -22,6 +22,7 @@
 #include "hfst-proc.h"
 #include "transducer.h"
 #include "formatter.h"
+#include "applicators.h"
 
 
 OutputType outputType = Apertium;
@@ -281,31 +282,36 @@ int main(int argc, char **argv)
     in.close();
     
     TokenIOStream token_stream(*input, *output, t->get_alphabet());
-    
+    Applicator* applicator = NULL;
+    OutputFormatter* output_formatter = NULL;
     switch(cmd)
     {
       case 't':
-        t->do_tokenize(token_stream);
+        applicator = new TokenizationApplicator(*t, token_stream);
         break;
       case 'g':
-        t->do_generation(token_stream, gm_unknown, capitalization_mode);
+        applicator = new GenerationApplicator(*t, token_stream, gm_unknown, capitalization_mode);
         break;
       case 'n':
-        t->do_generation(token_stream, gm_clean, capitalization_mode);
+        applicator = new GenerationApplicator(*t, token_stream, gm_clean, capitalization_mode);
+        break;
       case 'd':
-        t->do_generation(token_stream, gm_all, capitalization_mode);
+        applicator = new GenerationApplicator(*t, token_stream, gm_all, capitalization_mode);
+        break;
       case 'a':
       default:
-        OutputFormatter* output_formatter = (outputType==xerox)?
+        output_formatter = (outputType==xerox)?
                     (OutputFormatter*)new XeroxOutputFormatter(token_stream, filter_compound_analyses):
                     (OutputFormatter*)new ApertiumOutputFormatter(token_stream, filter_compound_analyses);
-        
-        t->do_analysis(token_stream, *output_formatter, capitalization_mode);
-    
-        delete output_formatter;
+        applicator = new AnalysisApplicator(*t, token_stream, *output_formatter, capitalization_mode);
         break;
     }
     
+    applicator->apply();
+    
+    delete applicator;
+    if(output_formatter != NULL)
+      delete output_formatter;
     delete t;
   }
   catch (std::exception& e)
