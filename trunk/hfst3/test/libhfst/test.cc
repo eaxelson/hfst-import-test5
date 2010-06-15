@@ -176,6 +176,25 @@ int main(int argc, char **argv) {
   assert( HfstTransducer::are_equivalent(*rule_transducers3[0], *rule_transducers3[1]) );
   assert( HfstTransducer::are_equivalent(*rule_transducers3[0], *rule_transducers3[2]) );
 
+  // HfstTransducer & replace_in_context(HfstTransducerPair &context, ReplaceType repl_type, HfstTransducer &t, bool optional, StringPairSet &alphabet)
+
+  {
+    ImplementationType type = TROPICAL_OFST_TYPE;
+    HfstTransducer left("c",type);
+    HfstTransducer right("c",type);
+    HfstTransducerPair context(left,right);
+    HfstTransducer mapping("a","b",type);
+    HfstTransducer mapping2("b","c",type);
+    mapping.disjunct(mapping2);
+    StringPairSet alphabet;
+    alphabet.insert(StringPair("a","a"));
+    alphabet.insert(StringPair("b","b"));
+    alphabet.insert(StringPair("c","c"));
+    HfstTransducer rule = rules::replace_up(context, mapping, false, alphabet);
+    rule.minimize();
+    std::cerr << rule << "\n";
+  }
+
   exit(0);
 
 #ifdef FOO
