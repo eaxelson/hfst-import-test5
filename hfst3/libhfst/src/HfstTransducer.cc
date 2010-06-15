@@ -122,26 +122,35 @@ namespace hfst
       }
   }
 
-  HfstTransducer & HfstTransducer::operator= (HfstTransducer &another)
+  HfstTransducer::HfstTransducer():
+    type(UNSPECIFIED_TYPE),anonymous(false),is_trie(true)
+  {}
+
+  HfstTransducer & HfstTransducer::operator= (const HfstTransducer &another)
   {
-    if (this->get_type() != another.get_type())
+    if (this->get_type() != UNSPECIFIED_TYPE && this->get_type() != another.get_type())
       throw hfst::exceptions::TransducerTypeMismatchException();
 
     if (this != &another)
       {
+	this->type = another.type;
 	switch (this->type)
 	  {
 	  case SFST_TYPE:
-	    implementation.sfst = another.implementation.sfst;
+	    delete implementation.sfst;
+	    implementation.sfst = sfst_interface.copy(another.implementation.sfst);
 	    break;
 	  case TROPICAL_OFST_TYPE:
-	    implementation.tropical_ofst = another.implementation.tropical_ofst;
+	    delete implementation.tropical_ofst;
+	    implementation.tropical_ofst = tropical_ofst_interface.copy(another.implementation.tropical_ofst);
 	    break;
 	  case LOG_OFST_TYPE:
-	    implementation.log_ofst = another.implementation.log_ofst;
+	    delete implementation.log_ofst;
+	    implementation.log_ofst = log_ofst_interface.copy(another.implementation.log_ofst);
 	    break;
 	  case FOMA_TYPE:
-	    implementation.foma = another.implementation.foma;
+	    foma_interface.delete_foma(implementation.foma);
+	    implementation.foma = foma_interface.copy(another.implementation.foma);
 	    break;
 	  default:
 	    throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -732,22 +741,22 @@ void HfstTransducer::test_minimize()
   }
 
   HfstTransducer &HfstTransducer::compose
-  (HfstTransducer &another)
+  (const HfstTransducer &another)
   { is_trie = false;
     return apply(&hfst::implementations::SfstTransducer::compose,
 		 &hfst::implementations::TropicalWeightTransducer::compose,
 		 &hfst::implementations::LogWeightTransducer::compose,
 		 &hfst::implementations::FomaTransducer::compose,
-		 another); }
+		 const_cast<HfstTransducer&>(another)); }
 
   HfstTransducer &HfstTransducer::concatenate
-  (HfstTransducer &another)
+  (const HfstTransducer &another)
   { is_trie = false; // This could be done so that is_trie is preserved
     return apply(&hfst::implementations::SfstTransducer::concatenate,
 		 &hfst::implementations::TropicalWeightTransducer::concatenate,
 		 &hfst::implementations::LogWeightTransducer::concatenate,
 		 &hfst::implementations::FomaTransducer::concatenate,
-		 another); }
+		 const_cast<HfstTransducer&>(another)); }
 
   HfstTransducer &HfstTransducer::disjunct_as_tries(HfstTransducer &another,
 						    ImplementationType type)
@@ -816,32 +825,32 @@ void HfstTransducer::test_minimize()
   }
 
   HfstTransducer &HfstTransducer::disjunct
-  (HfstTransducer &another)
+  (const HfstTransducer &another)
   {
     is_trie = false;
     return apply(&hfst::implementations::SfstTransducer::disjunct,
 		 &hfst::implementations::TropicalWeightTransducer::disjunct,
 		 &hfst::implementations::LogWeightTransducer::disjunct,
 		 &hfst::implementations::FomaTransducer::disjunct,
-		 another); }
+		 const_cast<HfstTransducer&>(another)); }
 
   HfstTransducer &HfstTransducer::intersect
-  (HfstTransducer &another)
+  (const HfstTransducer &another)
   { is_trie = false; // This could be done so that is_trie is preserved
     return apply(&hfst::implementations::SfstTransducer::intersect,
 		 &hfst::implementations::TropicalWeightTransducer::intersect,
 		 &hfst::implementations::LogWeightTransducer::intersect,
 		 &hfst::implementations::FomaTransducer::intersect,
-		 another); }
+		 const_cast<HfstTransducer&>(another)); }
 
   HfstTransducer &HfstTransducer::subtract
-  (HfstTransducer &another)
+  (const HfstTransducer &another)
   { is_trie = false; // This could be done so that is_trie is preserved
     return apply(&hfst::implementations::SfstTransducer::subtract,
 		 &hfst::implementations::TropicalWeightTransducer::subtract,
 		 &hfst::implementations::LogWeightTransducer::subtract,
 		 &hfst::implementations::FomaTransducer::subtract,
-		 another); }
+		 const_cast<HfstTransducer&>(another)); }
 
 
   HfstTransducer &HfstTransducer::convert(const HfstTransducer &t, ImplementationType type)

@@ -5,30 +5,28 @@ namespace hfst
   namespace rules
   {
 
-    HfstTransducer & universal_fst(const StringPairSet &alphabet, ImplementationType type)
+    HfstTransducer universal_fst(const StringPairSet &alphabet, ImplementationType type)
     {
       HfstTransducer retval(alphabet, type);
       retval.repeat_star();
-      HfstTransducer &retval_ = retval;
-      return retval_;
+      return retval;
     }
 
-    HfstTransducer & negation_fst(HfstTransducer &t, const StringPairSet &alphabet)
+    HfstTransducer negation_fst(HfstTransducer &t, const StringPairSet &alphabet)
     {
       HfstTransducer retval = universal_fst(alphabet, t.get_type());
       retval.subtract(t);
-      HfstTransducer &retval_ = retval;
-      return retval_;
+      return retval;
     }
 
-    HfstTransducer & replace( HfstTransducer &t, ReplaceType repl_type, bool optional, StringPairSet &alphabet ) 
+    HfstTransducer replace( HfstTransducer &t, ReplaceType repl_type, bool optional, StringPairSet &alphabet ) 
     {
       ImplementationType type = t.get_type();
 
       HfstTransducer t_proj(t);
       if (repl_type == REPL_UP)
 	t_proj.input_project();
-      if (repl_type == REPL_DOWN)
+      else if (repl_type == REPL_DOWN)
 	t_proj.output_project();
       else
 	throw hfst::exceptions::ImpossibleReplaceTypeException();
@@ -41,20 +39,19 @@ namespace hfst
       // tc_neg = ! ( .* t_proj .* )
       HfstTransducer tc_neg = negation_fst(tc, alphabet);
 
-      // retval = ( tc_neg tc )* tc_neg
+      // retval = ( tc_neg t )* tc_neg
       HfstTransducer retval(tc_neg);
-      retval.concatenate(tc);
+      retval.concatenate(t);
       retval.repeat_star();
       retval.concatenate(tc_neg);
 
       if (optional)
 	retval.disjunct(universal_fst(alphabet, type));
 
-      HfstTransducer &retval_ = retval;
-      return retval_;
+      return retval;
     }
 
-    HfstTransducer & replace_transducer(HfstTransducer &t, std::string lm, std::string rm, ReplaceType repl_type, StringPairSet &alphabet)
+    HfstTransducer replace_transducer(HfstTransducer &t, std::string lm, std::string rm, ReplaceType repl_type, StringPairSet &alphabet)
     {
       ImplementationType type = t.get_type();
 
@@ -67,13 +64,13 @@ namespace hfst
       tm.concatenate(tc);
       tm.concatenate(rmtr);
 
-      HfstTransducer &retval = replace(tm, repl_type, false, alphabet);
+      HfstTransducer retval = replace(tm, repl_type, false, alphabet);
       return retval;
     }
 
 
 
-    HfstTransducer & replace_context(HfstTransducer &t, std::string m1, std::string m2, StringPairSet &alphabet)
+    HfstTransducer replace_context(HfstTransducer &t, std::string m1, std::string m2, StringPairSet &alphabet)
     {
       // ct = .* ( m1 >> ( m2 >> t ))  ||  !(.* m1)
 
@@ -110,7 +107,7 @@ namespace hfst
       // disjunction
       HfstTransducer disj = neg_ct_mt.disjunct(ct_neg_mt);
       // negation
-      HfstTransducer &retval = negation_fst(disj, alphabet); 
+      HfstTransducer retval = negation_fst(disj, alphabet); 
       return retval;
     }
 
@@ -225,10 +222,11 @@ namespace hfst
       return if_rule.intersect(only_if_rule);
     }
 
-    HfstTransducer & replace_in_context(HfstTransducerPair &context, ReplaceType repl_type, HfstTransducer &t, bool optional, StringPairSet &alphabet)
+    HfstTransducer replace_in_context(HfstTransducerPair &context, ReplaceType repl_type, HfstTransducer &t, bool optional, StringPairSet &alphabet)
     {
       // test that all transducers have the same type
-      if (context.first.get_type() != context.second.get_type() != t.get_type())
+      if (context.first.get_type() != context.second.get_type() || 
+	  context.first.get_type() != t.get_type() )
 	throw hfst::exceptions::TransducerTypeMismatchException();
       ImplementationType type = t.get_type();      
 
@@ -269,13 +267,57 @@ namespace hfst
       // Create the constrain boundary transducer !(.*<L><R>.*)
       HfstTransducer leftm_to_leftm(leftm, leftm, type);
       HfstTransducer rightm_to_rightm(rightm, rightm, type);
-      HfstTransducer tmp = universal_fst(alphabet,type);
+      HfstTransducer tmp(type);
+      tmp = universal_fst(alphabet,type);
       tmp.concatenate(leftm_to_leftm);
       tmp.concatenate(rightm_to_rightm);
       tmp.concatenate(universal_fst(alphabet,type));
       HfstTransducer cbt = negation_fst(tmp, alphabet);
 
-      throw hfst::exceptions::FunctionNotImplementedException();
+      // left context transducer .* (<R> >> (<L> >> LEFT_CONTEXT)) || !(.*<L>)    
+      HfstTransducer lct = replace_context(context.first, leftm, rightm, alphabet);
+
+      // right context transducer:  reversion( (<R> >> (<L> >> reversion(RIGHT_CONTEXT))) .* || !(<R>.*) )
+      HfstTransducer right_rev(context.second);
+      right_rev.reverse();
+      HfstTransducer rct = replace_context(right_rev, rightm, leftm, alphabet);
+      rct.reverse();
+
+      // unconditional replace transducer      
+      HfstTransducer rt(type);
+      if (repl_type == REPL_UP || repl_type == REPL_RIGHT || repl_type == REPL_LEFT)
+	rt = replace_transducer( t, leftm, rightm, REPL_UP, alphabet );
+      else
+	rt = replace_transducer( t, leftm, rightm, REPL_DOWN, alphabet );
+
+      // build the conditional replacement transducer 
+      HfstTransducer result(ibt);
+      result.compose(cbt);
+      
+      if (repl_type == REPL_UP || repl_type == REPL_RIGHT)
+	result.compose(rct);
+
+      if (repl_type == REPL_UP || repl_type == REPL_LEFT)
+	result.compose(lct);
+      
+      result.compose(rt);
+      
+      if (repl_type == REPL_DOWN || repl_type == REPL_RIGHT)
+	result.compose(lct);
+
+      if (repl_type == REPL_DOWN || repl_type == REPL_LEFT)
+	result.compose(rct);
+      
+      result.compose(rbt);
+
+      // Remove the markers from the alphabet
+      alphabet.erase(StringPair(leftm,leftm));
+      alphabet.erase(StringPair(rightm,rightm));
+      
+      if (optional)
+	result.disjunct(universal_fst(alphabet,type));
+      
+      return result;
     }
 
 

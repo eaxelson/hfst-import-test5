@@ -261,7 +261,8 @@ namespace hfst
     bool static is_safe_conversion(ImplementationType original, ImplementationType conversion);
 
   public:
-    HfstTransducer & operator= (HfstTransducer &another);
+    HfstTransducer();
+    HfstTransducer & operator= (const HfstTransducer &another);
 
     /** \brief Create an empty transducer, i.e. a transducer that does not recognize any string. 
 
@@ -595,19 +596,19 @@ fclose(ifile);
     HfstTransducer &transform_weights(float (*func)(float));
 
     /** \brief Compose this transducer with \a another. */
-    HfstTransducer &compose(HfstTransducer &another);
+    HfstTransducer &compose(const HfstTransducer &another);
 
     /** \brief Concatenate this transducer with \a another. */
-    HfstTransducer &concatenate(HfstTransducer &another);
+    HfstTransducer &concatenate(const HfstTransducer &another);
 
     /** \brief Disjunct this transducer with \a another. */
-    HfstTransducer &disjunct(HfstTransducer &another);
+    HfstTransducer &disjunct(const HfstTransducer &another);
 
     /** \brief Intersect this transducer with \a another. */
-    HfstTransducer &intersect(HfstTransducer &another);
+    HfstTransducer &intersect(const HfstTransducer &another);
 
     /** \brief Subtract transducer \a another from this transducer. */
-    HfstTransducer &subtract(HfstTransducer &another);
+    HfstTransducer &subtract(const HfstTransducer &another);
 
 
     /* \brief Compose this transducer with another. */
@@ -825,13 +826,13 @@ void print(HfstMutableTransducer &t)
     enum ReplaceType {REPL_UP, REPL_DOWN, REPL_RIGHT, REPL_LEFT};
 
     /* helping methods */
-    HfstTransducer & universal_fst(const StringPairSet &alphabet, ImplementationType type);
-    HfstTransducer & negation_fst(const HfstTransducer &t, const StringPairSet &alphabet);
+    HfstTransducer universal_fst(const StringPairSet &alphabet, ImplementationType type);
+    HfstTransducer negation_fst(const HfstTransducer &t, const StringPairSet &alphabet);
 
-    HfstTransducer& replace(HfstTransducer &t, ReplaceType repl_type, bool optional, StringPairSet &alphabet);
-    HfstTransducer& replace_transducer(HfstTransducer &t, std::string lm, std::string rm, ReplaceType repl_type, StringPairSet &alphabet);
-    HfstTransducer& replace_context(HfstTransducer &t, std::string m1, std::string m2, StringPairSet &alphabet);
-    HfstTransducer& replace_in_context(HfstTransducerPair &context, ReplaceType repl_type, HfstTransducer &t, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace(HfstTransducer &t, ReplaceType repl_type, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_transducer(HfstTransducer &t, std::string lm, std::string rm, ReplaceType repl_type, StringPairSet &alphabet);
+    HfstTransducer replace_context(HfstTransducer &t, std::string m1, std::string m2, StringPairSet &alphabet);
+    HfstTransducer replace_in_context(HfstTransducerPair &context, ReplaceType repl_type, HfstTransducer &t, bool optional, StringPairSet &alphabet);
 
 
     /** \brief ... */
@@ -843,6 +844,11 @@ void print(HfstMutableTransducer &t)
     HfstTransducer replace_down(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
     HfstTransducer replace_right(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
     HfstTransducer replace_left(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+
+    HfstTransducer replace_up(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_down(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_right(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_left(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
 
     HfstTransducer restriction(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
     HfstTransducer coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
