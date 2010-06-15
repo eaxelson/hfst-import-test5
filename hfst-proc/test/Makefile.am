@@ -1,9 +1,10 @@
-check_MATERIAL = samibasicout
+check_MATERIAL = samibasicout samicmpndout
 
 SAMI_TRANSDUCER = $(top_builddir)/transducers/sami.hfst.ol
-OPTIMIZED_LOOKUP = $(top_builddir)/src/hfst-optimized-lookup
+SMENOB_TRANSDUCER = $(top_builddir)/transducers/sme-nob.automorf.hfst.ol
+OPTIMIZED_LOOKUP = $(top_builddir)/src/hfst-proc
 
-check_SCRIPTS = basic.sh samibasic.sh samicount.sh
+check_SCRIPTS = basic.sh samibasic.sh samicount.sh samicmpnd.sh
 TESTS = $(check_SCRIPTS)
 
 basic.sh: Makefile
@@ -27,11 +28,19 @@ samibasic.sh: samibasicout Makefile
 
 samicount.sh: Makefile
 	@echo 'test -e $(SAMI_TRANSDUCER) || exit 0' > $@
-	@echo 'echo láhkaásahus | $(OPTIMIZED_LOOKUP) -n 2 $(SAMI_TRANSDUCER) > temp' >> $@
+	@echo 'echo láhkaásahus | $(OPTIMIZED_LOOKUP) -N 2 $(SAMI_TRANSDUCER) > temp' >> $@
 	@echo '[ `wc -l temp | cut -c 1` = "3" ] || exit 1' >> $@
 	@chmod a+x $@
 
+samicmpndout: Makefile
+	@echo '^Jávregáttis/Jávri<N><Sg><Nom><Cmp>+gáddi<N><Sg><Loc>/Jávri<N><Sg><Nom><Cmp>+gáddi<N><Sg><Loc>/Jávri<N><Sg><Nom><Cmp>+gáddi<N><Sg><Acc><PxSg3>/Jávri<N><Sg><Nom><Cmp>+gáddi<N><Sg><Gen><PxSg3>/Jávri<N><Sg><Nom><Cmp>+gáddi<N><Sg><Acc><PxSg3>/Jávri<N><Sg><Nom><Cmp>+gáddi<N><Sg><Gen><PxSg3>$' > $@
+	@echo '' >> $@
 
+samicmpnd.sh: Makefile
+	@echo 'test -e $(SMENOB_TRANSDUCER) || exit 0' > $@
+	@echo 'echo Jávregáttis | $(OPTIMIZED_LOOKUP) $(SMENOB_TRANSDUCER) > temp' >> $@
+	@echo 'test -z `diff temp samicmpndout | head -1` || exit 1' >> $@
+	@chmod a+x $@
 
 CLEANFILES = $(check_SCRIPTS) $(check_MATERIAL) temp
 
