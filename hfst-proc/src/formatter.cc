@@ -21,10 +21,12 @@ OutputFormatter::remove_compound_analyses(LookupPathVector& finals) const
   bool has_noncompounded = false;
   
   // first look to see if there are any non-compounded analyses
-  for(LookupPathVector::const_iterator it=finals.begin(); it!=finals.end(), has_noncompounded==false; it++)
+  for(LookupPathVector::const_iterator it=finals.begin(); it!=finals.end(); it++)
   {
-    if(!is_compound_analysis((*it)->get_output_symbols()))
+    if(!is_compound_analysis((*it)->get_output_symbols())) {
       has_noncompounded = true;
+      break;
+    }
   }
   
   if(has_noncompounded)
