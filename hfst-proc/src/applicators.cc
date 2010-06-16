@@ -189,7 +189,8 @@ GenerationApplicator::apply()
           if(next_token.type == ReservedCharacter && next_token.character[0] == '$')
             break;
           else if(token_stream.token_to_string(next_token) == "*" ||
-                  token_stream.token_to_string(next_token) == "@")
+                  token_stream.token_to_string(next_token) == "@" ||
+                  token_stream.token_to_string(next_token) == "#")
           {
             prefix_char = token_stream.token_to_string(next_token)[0];
             break;
@@ -202,7 +203,7 @@ GenerationApplicator::apply()
         
         //Figure out how to output the word
         
-        if(prefix_char != '\0') // the word is unanalyzed (*) or untranslated (@)
+        if(prefix_char == '*' || prefix_char == '@') // the word is unanalyzed (*) or untranslated (@)
         {
           if(mode != gm_clean)
             token_stream.write_escaped(std::string(1,prefix_char));
@@ -221,7 +222,18 @@ GenerationApplicator::apply()
         }
         else
         {
-          lookup(form);
+          std::vector<TokenVector> parts = split(form);
+          for(std::vector<TokenVector>::const_iterator it=parts.begin(); it!=parts.end(); it++)
+            lookup(*it);
+          
+          if(prefix_char == '#') // if there is an invariant part remaining
+          {
+            std::string invariant = token_stream.read_delimited('$');
+            invariant = invariant.substr(0, invariant.length()-1);
+            token_stream.write_escaped(invariant);
+            if(printDebuggingInformationFlag)
+              std::cout << std::endl << "Invariant: '" << invariant << "'" << std::endl;
+          }
         }
       }
       else
@@ -230,6 +242,26 @@ GenerationApplicator::apply()
     else
       token_stream << next_token;
   }
+}
+
+std::vector<TokenVector>
+GenerationApplicator::split(const TokenVector& tokens) const
+{
+  std::vector<TokenVector> res;
+  TokenVector::const_iterator start = tokens.begin();
+  for(TokenVector::const_iterator it=tokens.begin(); it!=tokens.end(); it++)
+  {
+    if(token_stream.token_to_string(*it) == "+" && it!=tokens.begin() &&
+       transducer.get_alphabet().is_tag(token_stream.to_symbol(*(it-1))))
+    {
+      res.push_back(TokenVector(start, it));
+      start = it+1;
+    }
+  }
+  if(start != tokens.end())
+    res.push_back(TokenVector(start, tokens.end()));
+  
+  return res;
 }
 
 void
