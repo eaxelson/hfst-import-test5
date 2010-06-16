@@ -298,7 +298,7 @@ GenerationApplicator::lookup(const TokenVector& tokens)
       size_t pos1;
       while((pos1 = word.find('<')) != std::string::npos)
       {
-        size_t pos2 = word.find('>');
+        size_t pos2 = word.find('>', pos1);
         if(pos2 != std::string::npos)
           word = word.substr(0,pos1)+word.substr(pos2+1);
         else
