@@ -342,21 +342,18 @@ AbstractTransducer::check_for_blank() const
 
 LookupPath* Transducer::get_initial_path() const
 {
-  return new LookupPath(START_INDEX);
+  return new LookupPath(*this, START_INDEX);
 }
 LookupPath* TransducerFd::get_initial_path() const
 {
-  LookupPathFd* p = new LookupPathFd(START_INDEX, alphabet.get_state_size(), 
-                           alphabet.get_symbol_table());
-  return p;
+  return new LookupPathFd(*this, START_INDEX);
 }
 LookupPath* TransducerW::get_initial_path() const
 {
-  return new LookupPathW(START_INDEX);
+  return new LookupPathW(*this, START_INDEX);
 }
 LookupPath* TransducerWFd::get_initial_path() const
 {
-  return new LookupPathWFd(START_INDEX, alphabet.get_state_size(), 
-                            alphabet.get_symbol_table());
+  return new LookupPathWFd(*this, START_INDEX);
 }
 

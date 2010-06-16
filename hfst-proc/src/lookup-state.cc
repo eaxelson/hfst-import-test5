@@ -108,6 +108,43 @@ LookupState::get_finals() const
   return finals;
 }
 
+const LookupPathSet
+LookupState::get_finals_set() const
+{
+  if(printDebuggingInformationFlag)
+    std::cout << "Calculating final paths" << std::endl;
+  LookupPathSet finals(LookupPath::compare_pointers);
+  for(LookupPathVector::const_iterator i=paths.begin(); i!=paths.end(); ++i)
+  {
+    bool is_final;
+    TransitionTableIndex index = (*i)->get_index();
+    
+    if(indexes_transition_index_table(index))
+      is_final = transducer.get_index(index).final();
+    else
+      is_final = transducer.get_transition(index).final();
+    
+    if(is_final)
+    {
+      if(printDebuggingInformationFlag)
+        std::cout << "  Final path found" << std::endl;
+      std::pair<LookupPathSet::iterator,bool> loc = finals.insert(*i);
+      
+      if(loc.second == false) // if this form was already in the set
+      {
+        if(printDebuggingInformationFlag)
+          std::cout << "  Duplicate LookupPath found" << std::endl;
+        if(*i < *(loc.first)) // if this form has a lower weight than the one there
+        {
+          finals.erase(loc.first);
+          finals.insert(*i);
+        }
+      }
+    }
+  }
+  return finals;
+}
+
 void
 LookupState::add_path(LookupPath& path)
 {

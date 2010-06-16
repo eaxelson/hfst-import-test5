@@ -12,6 +12,8 @@
 class LookupPath
 {
  protected:
+ const AbstractTransducer& transducer;
+ 
   /**
    * Points to the state in the transition index table or the transition table
    * where the path ends. This follows the normal semantics whereby values less
@@ -32,11 +34,11 @@ class LookupPath
   SymbolNumberVector output_symbols;
   
  public:
-  LookupPath(const TransitionTableIndex initial): 
-    index(initial), final(false), output_symbols() {}
+  LookupPath(const AbstractTransducer& t, const TransitionTableIndex initial): 
+    transducer(t), index(initial), final(false), output_symbols() {}
   
   LookupPath(const LookupPath& o):
-    index(o.index), final(o.final), output_symbols(o.output_symbols) {}
+    transducer(o.transducer), index(o.index), final(o.final), output_symbols(o.output_symbols) {}
   
   virtual ~LookupPath() {}
   
@@ -59,13 +61,14 @@ class LookupPath
   
   static bool compare_pointers(LookupPath* p1, LookupPath* p2) {return *p1<*p2;}
   
-  virtual bool operator<(const LookupPath& o) const
-  {return output_symbols.size() < o.output_symbols.size();}
+  virtual bool operator<(const LookupPath& o) const;
   
   TransitionTableIndex get_index() const {return index;}
   bool at_final() const {return final;}
   SymbolNumberVector get_output_symbols() const {return output_symbols;}
 };
+
+typedef std::set<LookupPath*, bool (*)(LookupPath*,LookupPath*)> LookupPathSet;
 
 /**
  * A base class used by lookup path types that handle flag diacritics
@@ -110,8 +113,8 @@ class PathFd
 class LookupPathFd : public LookupPath, PathFd
 {
  public:
-  LookupPathFd(const TransitionTableIndex initial, int state_size, const SymbolTable& table):
-    LookupPath(initial), PathFd(state_size, table) {}
+  LookupPathFd(const AbstractTransducer& t, const TransitionTableIndex initial):
+    LookupPath(t, initial), PathFd(t.get_alphabet().get_state_size(), t.get_alphabet().get_symbol_table()) {}
   LookupPathFd(const LookupPathFd& o): LookupPath(o), PathFd(o) {}
   
   virtual LookupPath* clone() const {return new LookupPathFd(*this);}
@@ -135,8 +138,8 @@ class LookupPathW : public LookupPath
    */
   Weight final_weight;
  public:
-  LookupPathW(const TransitionTableIndex initial): 
-  	LookupPath(initial), weight(0.0f), final_weight(0.0f) {}
+  LookupPathW(const AbstractTransducer& t, const TransitionTableIndex initial): 
+  	LookupPath(t, initial), weight(0.0f), final_weight(0.0f) {}
   LookupPathW(const LookupPathW& o): LookupPath(o), weight(o.weight),
     final_weight(o.final_weight) {}
   
@@ -145,8 +148,10 @@ class LookupPathW : public LookupPath
   virtual void follow(const TransitionIndex& index);
   virtual bool follow(const Transition& transition);
   
-  virtual bool operator<(const LookupPathW& o) const
-  {return get_weight() < o.get_weight();}
+  /**
+   * This sorts first by weight then by the value of output_symbols
+   */
+  virtual bool operator<(const LookupPathW& o) const;
   
   Weight get_weight() const {return at_final() ? weight+final_weight : weight;}
 };
@@ -157,8 +162,8 @@ class LookupPathW : public LookupPath
 class LookupPathWFd : public LookupPathW, PathFd
 {
  public:
-  LookupPathWFd(const TransitionTableIndex initial, int state_size, const SymbolTable& table):
-    LookupPathW(initial), PathFd(state_size, table){}
+  LookupPathWFd(const AbstractTransducer& t, const TransitionTableIndex initial):
+    LookupPathW(t, initial), PathFd(t.get_alphabet().get_state_size(), t.get_alphabet().get_symbol_table()){}
   LookupPathWFd(const LookupPathWFd& o): LookupPathW(o), PathFd(o) {}
   
   virtual LookupPath* clone() const {return new LookupPathWFd(*this);}

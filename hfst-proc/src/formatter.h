@@ -20,13 +20,13 @@ class OutputFormatter
    * If there are any non-compound analyses in the given set of finals, then
    * filter out all compound analyses from the set
    */
-  void remove_compound_analyses(LookupPathVector& finals) const;
+  void remove_compound_analyses(LookupPathSet& finals) const;
   
   /**
    * Return a sorted copy of the path vector that contains no more than
    * maxAnalyses entries
    */
-  LookupPathVector preprocess_finals(const LookupPathVector& finals) const;
+  LookupPathSet preprocess_finals(const LookupPathSet& finals) const;
  public:
   OutputFormatter(TokenIOStream& s, bool f): token_stream(s), filter_compound_analyses(f) {}
   virtual ~OutputFormatter() {}
@@ -37,7 +37,7 @@ class OutputFormatter
    * @param finals a list of lookup paths ending in final states
    * @param state the capitalization of the surface form
    */
-  virtual std::vector<std::string> process_finals(const LookupPathVector& finals,
+  virtual std::vector<std::string> process_finals(const LookupPathSet& finals,
                                                   CapitalizationState state) const = 0;
   virtual void print_word(const TokenVector& surface_form, 
                           std::vector<std::string> const &analyzed_forms) const = 0;
@@ -55,7 +55,7 @@ class ApertiumOutputFormatter: public OutputFormatter
  public:
   ApertiumOutputFormatter(TokenIOStream& s, bool f): OutputFormatter(s,f) {}
   
-  std::vector<std::string> process_finals(const LookupPathVector& finals,
+  std::vector<std::string> process_finals(const LookupPathSet& finals,
                                           CapitalizationState state) const;
   void print_word(const TokenVector& surface_form, 
                   std::vector<std::string> const &analyzed_forms) const;
@@ -74,7 +74,7 @@ class XeroxOutputFormatter: public OutputFormatter
  public:
   XeroxOutputFormatter(TokenIOStream& s, bool f): OutputFormatter(s,f) {}
   
-  std::vector<std::string> process_finals(const LookupPathVector& finals,
+  std::vector<std::string> process_finals(const LookupPathSet& finals,
                                           CapitalizationState state) const;
   void print_word(const TokenVector& surface_form, 
                   std::vector<std::string> const &analyzed_forms) const;
