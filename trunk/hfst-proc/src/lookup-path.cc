@@ -14,10 +14,16 @@ LookupPath::follow(const Transition& transition)
 {
   index = transition.target();
   final = transition.final();
-  if(transition.get_output() != 0)
+  if(transducer.get_alphabet().symbol_to_string(transition.get_output()) != "")
     output_symbols.push_back(transition.get_output());
   
   return true;
+}
+
+bool
+LookupPath::operator<(const LookupPath& o) const
+{
+  return output_symbols < o.output_symbols;
 }
 
 
@@ -118,6 +124,14 @@ LookupPathW::follow(const Transition& transition)
   final_weight = static_cast<const TransitionW&>(transition).get_weight();
   return LookupPath::follow(transition);
 }
+
+bool
+LookupPathW::operator<(const LookupPathW& o) const
+{
+  return ((get_weight() < o.get_weight()) ||
+          (get_weight() == o.get_weight() && this->LookupPath::operator<(o)));
+}
+
 
 //////////Function definitions for class LookupPathWFd
 

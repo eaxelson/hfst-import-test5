@@ -75,14 +75,14 @@ AnalysisApplicator::apply()
     
   	if(state.is_final())
   	{
-  	  LookupPathVector finals = state.get_finals();
+  	  LookupPathSet finals = state.get_finals_set();
   	  analyzed_forms = formatter.process_finals(finals, 
-  	                                                   caps_mode==DictionaryCase ? Unknown:
-  	                                                                               token_stream.get_capitalization_state(surface_form));
+  	                                            caps_mode==DictionaryCase ? Unknown:
+  	                                                                        token_stream.get_capitalization_state(surface_form));
   	  last_stream_location = token_stream.get_pos()-1;
   	  
   	  if(printDebuggingInformationFlag)
-  	    std::cout << "Final paths found and saved, stream location is " << last_stream_location << std::endl;
+  	    std::cout << "Final paths (" << finals.size() << ") found and saved, stream location is " << last_stream_location << std::endl;
   	}
   	
   	state.step(token_stream.to_symbol(next_token), caps_mode);
@@ -277,11 +277,17 @@ GenerationApplicator::lookup(const TokenVector& tokens)
       caps_mode==DictionaryCase ?
         Unknown :
         token_stream.get_capitalization_state(TokenVector(tokens.begin(),tokens.size()>1?tokens.begin()+2:tokens.end()));
-    LookupPathVector finals = state.get_finals();
-    token_stream.put_symbols(finals[0]->get_output_symbols(),capitalization_state);
+    LookupPathSet finals = state.get_finals_set();
+    
+    if(printDebuggingInformationFlag)
+  	    std::cout << "Generated " << finals.size() << " forms" << std::endl;
+    
+    token_stream.put_symbols((*finals.begin())->get_output_symbols(),capitalization_state);
     if(finals.size() > 1)
     {
-      for(LookupPathVector::const_iterator it=finals.begin()+1;it!=finals.end();it++)
+      LookupPathSet::const_iterator it=finals.begin();
+      it++; // start from begin+1
+      for(;it!=finals.end();it++)
       {
         token_stream.ostream() << '/';
         token_stream.put_symbols((*it)->get_output_symbols(),capitalization_state);

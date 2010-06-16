@@ -160,6 +160,11 @@ class LookupState
   const LookupPathVector get_finals() const;
   
   /**
+   * Get the finals with duplicates removed
+   */
+  const LookupPathSet get_finals_set() const;
+  
+  /**
    * Do a lookup using all the given symbols. This is equivalent to stepping the
    * state with each of the symbols in the vector.
    */

@@ -16,12 +16,12 @@ OutputFormatter::is_compound_analysis(const SymbolNumberVector& final) const
 }
 
 void
-OutputFormatter::remove_compound_analyses(LookupPathVector& finals) const
+OutputFormatter::remove_compound_analyses(LookupPathSet& finals) const
 {
   bool has_noncompounded = false;
   
   // first look to see if there are any non-compounded analyses
-  for(LookupPathVector::const_iterator it=finals.begin(); it!=finals.end(); it++)
+  for(LookupPathSet::const_iterator it=finals.begin(); it!=finals.end(); it++)
   {
     if(!is_compound_analysis((*it)->get_output_symbols())) {
       has_noncompounded = true;
@@ -31,20 +31,24 @@ OutputFormatter::remove_compound_analyses(LookupPathVector& finals) const
   
   if(has_noncompounded)
   { //there is a non-compounded analysis, check for any compounded ones
-    for(LookupPathVector::iterator it=finals.begin(); it!=finals.end();)
+    for(LookupPathSet::iterator it=finals.begin(); it!=finals.end();)
     {
       if(is_compound_analysis((*it)->get_output_symbols()))
-        finals.erase(it);
+      {
+        LookupPathSet::iterator to_delete = it;
+        it++;
+        finals.erase(to_delete);
+      }
       else
         it++;
     }
   }
 }
 
-LookupPathVector
-OutputFormatter::preprocess_finals(const LookupPathVector& finals) const
+LookupPathSet
+OutputFormatter::preprocess_finals(const LookupPathSet& finals) const
 {
-  LookupPathVector new_finals = LookupPathVector(finals);
+  LookupPathSet new_finals = LookupPathSet(finals);
   if(filter_compound_analyses)
   {
     remove_compound_analyses(new_finals);
@@ -54,10 +58,15 @@ OutputFormatter::preprocess_finals(const LookupPathVector& finals) const
         std::cout << "Filtered " << finals.size()-new_finals.size() << " compound analyses" << std::endl;
     }
   }
-  std::sort(new_finals.begin(), new_finals.end(), LookupPath::compare_pointers);
   
   if(new_finals.size() > (unsigned int)maxAnalyses)
-    return LookupPathVector(new_finals.begin(),new_finals.begin()+maxAnalyses);
+  {
+    LookupPathSet clipped_finals(LookupPath::compare_pointers);
+    LookupPathSet::const_iterator it=new_finals.begin();
+    for(int i=0;i<maxAnalyses;i++,it++)
+      clipped_finals.insert(*it);
+    return clipped_finals;
+  }
   else
     return new_finals;
 }
@@ -65,12 +74,12 @@ OutputFormatter::preprocess_finals(const LookupPathVector& finals) const
 //////////Function definitions for ApertiumOutputFormatter
 
 std::vector<std::string>
-ApertiumOutputFormatter::process_finals(const LookupPathVector& finals, CapitalizationState caps) const
+ApertiumOutputFormatter::process_finals(const LookupPathSet& finals, CapitalizationState caps) const
 {
   std::vector<std::string> results;
-  LookupPathVector sorted_finals = preprocess_finals(finals);
+  LookupPathSet new_finals = preprocess_finals(finals);
   
-  for(LookupPathVector::const_iterator it=sorted_finals.begin(); it!=sorted_finals.end(); it++)
+  for(LookupPathSet::const_iterator it=new_finals.begin(); it!=new_finals.end(); it++)
   {
     std::ostringstream res;
     res << token_stream.get_alphabet().symbols_to_string((*it)->get_output_symbols(), caps);
@@ -141,12 +150,12 @@ XeroxOutputFormatter::clear_superblanks(const TokenVector& tokens) const
 }
 
 std::vector<std::string>
-XeroxOutputFormatter::process_finals(const LookupPathVector& finals, CapitalizationState caps) const
+XeroxOutputFormatter::process_finals(const LookupPathSet& finals, CapitalizationState caps) const
 {
   std::vector<std::string> results;
-  LookupPathVector sorted_finals = preprocess_finals(finals);
+  LookupPathSet new_finals = preprocess_finals(finals);
   
-  for(LookupPathVector::const_iterator it=sorted_finals.begin(); it!=sorted_finals.end(); it++)
+  for(LookupPathSet::const_iterator it=new_finals.begin(); it!=new_finals.end(); it++)
   {
     std::ostringstream res;
     res << token_stream.get_alphabet().symbols_to_string((*it)->get_output_symbols(), caps);
