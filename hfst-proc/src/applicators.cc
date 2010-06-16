@@ -215,6 +215,8 @@ GenerationApplicator::apply()
             size_t loc = word.find('<');
             if(loc != std::string::npos)
               word = word.substr(0,loc);
+            else
+              word = word.substr(0, word.length()-1); // no tags, but still remove the $
           }
           else
             word = word.substr(0, word.length()-1); // remove the $
