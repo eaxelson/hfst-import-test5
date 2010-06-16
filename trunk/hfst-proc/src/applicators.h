@@ -47,6 +47,12 @@ class GenerationApplicator: public Applicator
   GenerationMode mode;
   CapitalizationMode caps_mode;
   
+  /**
+   * Split the given token string into a set of token strings to generate with,
+   * breaking on + after apertium-style tags.
+   */
+  std::vector<TokenVector> split(const TokenVector& tokens) const;
+  
   void lookup(const TokenVector& tokens);
 
  public:

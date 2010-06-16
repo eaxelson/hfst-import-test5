@@ -445,18 +445,6 @@ class AbstractTransducer
    * Check if the transducer accepts an input string consisting of just a blank
    */
   bool check_for_blank() const;
-  
-  /**
-   * Split the given token string into a set of token strings to generate with,
-   * breaking on + and #
-   */
-  std::vector<TokenVector> generation_split(const TokenVector& tokens) const;
-  
-  /**
-   * Perform a lookup with the tokens and print the results in generation format
-   */
-  void generation_lookup(const TokenVector& tokens, GenerationMode mode,
-                         CapitalizationMode caps_mode);
  public:
   AbstractTransducer(TransducerHeader h, TransducerAlphabet a):
     header(h), alphabet(a) {}  
