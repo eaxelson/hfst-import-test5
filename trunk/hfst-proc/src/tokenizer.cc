@@ -136,6 +136,14 @@ TokenIOStream::initialize_escaped_chars()
   escaped_chars.insert('>');
 }
 
+void
+TokenIOStream::do_null_flush()
+{
+  os.flush();
+  if(os.bad())
+    std::cerr << "Could not flush file" << std::endl;
+}
+
 CapitalizationState
 TokenIOStream::get_capitalization_state(const TokenVector& tokens) const
 {
@@ -251,6 +259,8 @@ TokenIOStream::read_delimited(const char delim)
     result += c;
     if(c == '\\')
       result += read_escaped();
+    if(null_flush && c == '\0')
+      do_null_flush();
   }
 
   if(c != delim)
@@ -272,6 +282,8 @@ TokenIOStream::make_token()
   // the next thing in the stream is not a symbol
   // (extract_symbol moved the stream back to before anything was read)
   std::string ch = read_utf8_char();
+  if(null_flush && ch == "")
+    do_null_flush();
   return (escaped_chars.find(ch[0]) == escaped_chars.end()) ?
     Token::as_character(ch.c_str()) :
     Token::as_reservedcharacter(ch[0]);
