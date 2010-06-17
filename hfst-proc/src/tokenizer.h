@@ -148,6 +148,7 @@ class TokenIOStream
   std::istream& is;
   std::ostream& os;
   const TransducerAlphabet& alphabet;
+  bool null_flush;
   
   Symbolizer symbolizer;
   
@@ -158,6 +159,8 @@ class TokenIOStream
   std::vector<std::string> superblank_bucket;
   
   Buffer<Token> token_buffer;
+  
+  void do_null_flush();
   
   /**
    * Reads a UTF-8 char (1-4 bytes) from the input stream, returning it as a
@@ -188,8 +191,10 @@ class TokenIOStream
    */
   Token read_token();
  public:
-  TokenIOStream(std::istream& i, std::ostream& o, const TransducerAlphabet& a):
-    is(i), os(o), alphabet(a), symbolizer(a.get_symbol_table()), superblank_bucket(), token_buffer(1024)
+  TokenIOStream(std::istream& i, std::ostream& o, const TransducerAlphabet& a,
+                bool flush):
+    is(i), os(o), alphabet(a), null_flush(flush), 
+    symbolizer(a.get_symbol_table()), superblank_bucket(), token_buffer(1024)
   {
     if(printDebuggingInformationFlag)
       std::cout << "Creating TokenIOStream" << std::endl;
@@ -268,7 +273,6 @@ class TokenIOStream
    */
   TokenIOStream& operator<<(const Token& t) {put_token(t); return *this;}
   
-  std::istream& istream() {return is;}
   std::ostream& ostream() {return os;}
   
   void write_escaped(const std::string str) {os << escape(str);}
