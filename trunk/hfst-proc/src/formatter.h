@@ -14,6 +14,12 @@ class OutputFormatter
   TokenIOStream& token_stream;
   bool filter_compound_analyses;
   
+  /**
+   * Return a copy of the given token vector which has all superblanks
+   * converted to blanks
+   */
+  TokenVector clear_superblanks(const TokenVector& tokens) const;
+  
   bool is_compound_analysis(const SymbolNumberVector& final) const;
   
   /**
@@ -64,13 +70,22 @@ class ApertiumOutputFormatter: public OutputFormatter
   bool preserve_nonalphabetic() const {return true;}
 };
 
+class CGOutputFormatter: public OutputFormatter
+{
+ public:
+  CGOutputFormatter(TokenIOStream& s, bool f): OutputFormatter(s,f) {}
+  
+  std::vector<std::string> process_finals(const LookupPathSet& finals,
+                                          CapitalizationState state) const;
+  void print_word(const TokenVector& surface_form, 
+                  std::vector<std::string> const &analyzed_forms) const;
+  void print_unknown_word(const TokenVector& surface_form) const;
+  
+  bool preserve_nonalphabetic() const {return false;}
+};
+
 class XeroxOutputFormatter: public OutputFormatter
 {
-  /**
-   * Return a copy of the given token vector which has all superblanks
-   * converted to blanks
-   */
-  TokenVector clear_superblanks(const TokenVector& tokens) const;
  public:
   XeroxOutputFormatter(TokenIOStream& s, bool f): OutputFormatter(s,f) {}
   
