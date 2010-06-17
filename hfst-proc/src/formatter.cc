@@ -4,6 +4,20 @@
 
 //////////Function definitions for OutputFormatter
 
+TokenVector
+OutputFormatter::clear_superblanks(const TokenVector& tokens) const
+{
+  TokenVector output_tokens;
+  for(TokenVector::const_iterator it=tokens.begin(); it!=tokens.end(); it++)
+  {
+    if(it->type == Superblank)
+      output_tokens.push_back(Token::as_symbol(token_stream.get_alphabet().get_blank_symbol()));
+    else
+      output_tokens.push_back(*it);
+  }
+  return output_tokens;
+}
+
 bool
 OutputFormatter::is_compound_analysis(const SymbolNumberVector& final) const
 {
@@ -133,21 +147,76 @@ ApertiumOutputFormatter::print_unknown_word(const TokenVector& surface_form) con
 }
 
 
-//////////Function definitions for XeroxOutputFormatter
+//////////Function definitions for CGOutputFormatter
 
-TokenVector
-XeroxOutputFormatter::clear_superblanks(const TokenVector& tokens) const
+std::vector<std::string>
+CGOutputFormatter::process_finals(const LookupPathSet& finals, CapitalizationState caps) const
 {
-  TokenVector output_tokens;
-  for(TokenVector::const_iterator it=tokens.begin(); it!=tokens.end(); it++)
+  std::vector<std::string> results;
+  LookupPathSet new_finals = preprocess_finals(finals);
+  
+  for(LookupPathSet::const_iterator it=new_finals.begin(); it!=new_finals.end(); it++)
   {
-    if(it->type == Superblank)
-      output_tokens.push_back(Token::as_symbol(token_stream.get_alphabet().get_blank_symbol()));
-    else
-      output_tokens.push_back(*it);
+    std::ostringstream res;
+    SymbolNumberVector output_symbols = (*it)->get_output_symbols();
+    size_t tag_start = output_symbols.size();
+    for(size_t i=0; i<output_symbols.size(); i++)
+    {
+      if(token_stream.get_alphabet().is_tag(output_symbols[i]))
+      {
+        tag_start = i;
+        break;
+      }
+    }
+    
+    res << '"' << token_stream.get_alphabet().symbols_to_string(
+      SymbolNumberVector(output_symbols.begin(),output_symbols.begin()+tag_start), caps)
+        << '"';
+    
+    if(tag_start != output_symbols.size())
+    {
+      for(size_t i=tag_start; i<output_symbols.size(); i++)
+      {
+        std::string tag = token_stream.get_alphabet().symbol_to_string(output_symbols[i]);
+        // remove the < and >
+        if(tag.size() > 0 && tag[0] == '<')
+        {
+          tag = tag.substr(1);
+          if(tag.size() > 0 && tag[tag.length()-1] == '>')
+            tag = tag.substr(0,tag.length()-1);
+        }
+        
+        res << (i==tag_start?"\t":" ") << tag;
+      }
+    }
+    
+    results.push_back(res.str());
   }
-  return output_tokens;
+  return results;
 }
+
+void
+CGOutputFormatter::print_word(const TokenVector& surface_form,
+                                std::vector<std::string> const &analyzed_forms) const
+{
+  token_stream.ostream() << "\"<"
+                         << token_stream.tokens_to_string(clear_superblanks(surface_form))
+                         << ">\"" << std::endl;
+  
+  for(std::vector<std::string>::const_iterator it=analyzed_forms.begin(); it!=analyzed_forms.end(); it++)
+    token_stream.ostream() << "\t" << *it << std::endl;
+}
+
+void
+CGOutputFormatter::print_unknown_word(const TokenVector& surface_form) const
+{
+  std::string form = token_stream.tokens_to_string(clear_superblanks(surface_form));
+  token_stream.ostream() << "\"<" << form << ">\"" << std::endl
+                         << "\t\"*" << form << "\"" << std::endl;
+}
+
+
+//////////Function definitions for XeroxOutputFormatter
 
 std::vector<std::string>
 XeroxOutputFormatter::process_finals(const LookupPathSet& finals, CapitalizationState caps) const

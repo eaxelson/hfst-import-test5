@@ -47,9 +47,6 @@ typedef std::vector<Token> TokenVector;
 class OutputFormatter;
 class SymbolProperties;
 
-enum OutputType {Apertium, xerox};
-extern OutputType outputType;
-
 extern bool verboseFlag;
 
 extern bool displayWeightsFlag;

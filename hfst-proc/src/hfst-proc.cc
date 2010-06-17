@@ -24,9 +24,6 @@
 #include "formatter.h"
 #include "applicators.h"
 
-
-OutputType outputType = Apertium;
-
 bool verboseFlag = false;
 
 bool displayWeightsFlag = false;
@@ -46,7 +43,7 @@ bool print_usage(void)
 {
   std::cerr <<
     "\n" <<
-    "Usage: " << PACKAGE_NAME << " [-a [-p|-x] [-C]|-g|-n|-d|-t] [-W] [-n N] [-c|-w] [-v|-q|-s] transducer_file [input_file [output_file]]\n" <<
+    "Usage: " << PACKAGE_NAME << " [-a [-p|-C|-x] [-k]|-g|-n|-d|-t] [-W] [-n N] [-c|-w] [-z] [-v|-q|-s] transducer_file [input_file [output_file]]\n" <<
     "Perform a transducer lookup on a text stream, tokenizing on the fly\n" <<
     "\n" <<
     "  -a, --analysis          Morphological analysis (default)\n" <<
@@ -55,8 +52,10 @@ bool print_usage(void)
     "  -d, --debugged-gen      Morph. generation with everything printed\n" <<
     "  -t  --tokenize          Tokenize the input stream into symbols (for debugging)\n" <<
     "  -p  --apertium          Apertium output format for analysis (default)\n" <<
+    "  -C  --cg                Constraint Grammar output format for analysis\n" <<
+    "                          (implies -w)\n" <<
     "  -x, --xerox             Xerox output format for analysis\n" <<
-    "  -C, --keep-compounds    Retain compound analyses even when a non-compound\n" <<
+    "  -k, --keep-compounds    Retain compound analyses even when a non-compound\n" <<
     "                          one is available\n" <<
     "  -W, --show-weights      Print final analysis weights (if any)\n" <<
     "  -N N, --analyses=N      Output no more than N analyses\n" <<
@@ -96,6 +95,7 @@ bool print_short_help(void)
 int main(int argc, char **argv)
 {
   int cmd = 0;
+  int output_type = 0;
   int capitalization = 0;
   bool filter_compound_analyses = true;
   bool null_flush = false;
@@ -118,7 +118,8 @@ int main(int argc, char **argv)
       {"tokenize",       no_argument,       0, 't'},
       {"apertium",       no_argument,       0, 'p'},
       {"xerox",          no_argument,       0, 'x'},
-      {"keep-compounds", no_argument,       0, 'C'},
+      {"cg",             no_argument,       0, 'C'},
+      {"keep-compounds", no_argument,       0, 'k'},
       {"show-weights",   no_argument,       0, 'W'},
       {"analyses",       required_argument, 0, 'N'},
       {"case-sensitive", no_argument,       0, 'c'},
@@ -128,7 +129,7 @@ int main(int argc, char **argv)
     };
     
     int option_index = 0;
-    int c = getopt_long(argc, argv, "hVvqsagndtpxCWN:cwz", long_options, &option_index);
+    int c = getopt_long(argc, argv, "hVvqsagndtpxCkWN:cwz", long_options, &option_index);
 
     if (c == -1) // no more options to look at
       break;
@@ -180,13 +181,19 @@ int main(int argc, char **argv)
       break;
       
     case 'p':
-      outputType = Apertium;
-      break;
-    case 'x':
-      outputType = xerox;
-      break;
-    
     case 'C':
+    case 'x':
+      if(output_type == 0)
+        output_type = c;
+      else
+      {
+        std::cerr << "Multiple output modeds given" << std::endl;
+        print_short_help();
+        return EXIT_FAILURE;
+      }
+      break;
+      
+    case 'k':
       filter_compound_analyses = false;
       break;
       
@@ -278,7 +285,10 @@ int main(int argc, char **argv)
       capitalization_mode = DictionaryCase;
       break;
     default:
-      capitalization_mode = IgnoreCase;
+      if(capitalization == 0 && output_type == 'C')
+        capitalization_mode = DictionaryCase;
+      else
+        capitalization_mode = IgnoreCase;
   }
   
   try
@@ -307,9 +317,17 @@ int main(int argc, char **argv)
         break;
       case 'a':
       default:
-        output_formatter = (outputType==xerox)?
-                    (OutputFormatter*)new XeroxOutputFormatter(token_stream, filter_compound_analyses):
-                    (OutputFormatter*)new ApertiumOutputFormatter(token_stream, filter_compound_analyses);
+        switch(output_type)
+        {
+          case 'C':
+            output_formatter = (OutputFormatter*)new CGOutputFormatter(token_stream, filter_compound_analyses);
+            break;
+          case 'x':
+            output_formatter = (OutputFormatter*)new XeroxOutputFormatter(token_stream, filter_compound_analyses);
+            break;
+          default:
+            output_formatter = (OutputFormatter*)new ApertiumOutputFormatter(token_stream, filter_compound_analyses);
+        }
         applicator = new AnalysisApplicator(*t, token_stream, *output_formatter, capitalization_mode);
         break;
     }
