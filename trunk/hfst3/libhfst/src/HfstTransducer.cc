@@ -126,39 +126,6 @@ namespace hfst
     type(UNSPECIFIED_TYPE),anonymous(false),is_trie(true)
   {}
 
-  HfstTransducer & HfstTransducer::operator= (const HfstTransducer &another)
-  {
-    if (this->get_type() != UNSPECIFIED_TYPE && this->get_type() != another.get_type())
-      throw hfst::exceptions::TransducerTypeMismatchException();
-
-    if (this != &another)
-      {
-	this->type = another.type;
-	switch (this->type)
-	  {
-	  case SFST_TYPE:
-	    delete implementation.sfst;
-	    implementation.sfst = sfst_interface.copy(another.implementation.sfst);
-	    break;
-	  case TROPICAL_OFST_TYPE:
-	    delete implementation.tropical_ofst;
-	    implementation.tropical_ofst = tropical_ofst_interface.copy(another.implementation.tropical_ofst);
-	    break;
-	  case LOG_OFST_TYPE:
-	    delete implementation.log_ofst;
-	    implementation.log_ofst = log_ofst_interface.copy(another.implementation.log_ofst);
-	    break;
-	  case FOMA_TYPE:
-	    foma_interface.delete_foma(implementation.foma);
-	    implementation.foma = foma_interface.copy(another.implementation.foma);
-	    break;
-	  default:
-	    throw hfst::exceptions::TransducerHasWrongTypeException();
-	  }
-      }
-    return *this;
-  }
-
   HfstTransducer::HfstTransducer(ImplementationType type):
     type(type),anonymous(false),is_trie(true)
   {
@@ -1043,6 +1010,68 @@ HfstTransducer &HfstTransducer::read_in_att_format(FILE * ifile, ImplementationT
   return *retval;
 }
 
+
+HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
+{
+  // Check for self-assignment.
+  if (&another == this)
+    { return *this; }
+  
+  // set some features and the key table.
+  anonymous = another.anonymous;
+  is_trie = another.is_trie;
+  
+  // Delete old transducer.
+  switch (this->type)
+    {
+    case FOMA_TYPE:
+      delete implementation.foma;
+      break;
+    case SFST_TYPE:
+      delete implementation.sfst;
+      break;
+    case TROPICAL_OFST_TYPE:
+      delete implementation.tropical_ofst;
+      break;
+    case LOG_OFST_TYPE:
+      delete implementation.log_ofst;
+      break;
+    case UNSPECIFIED_TYPE:
+    case ERROR_TYPE:
+    default:
+      throw hfst::exceptions::TransducerHasWrongTypeException();
+    }
+    
+  // Set new transducer.
+  
+  // Sfst doesn't have a const copy constructor, so we need to do a
+  // const_cast here. Shouldn't be a problem...
+  HfstTransducer &another_1 = const_cast<HfstTransducer&>(another);
+  type = another.type;
+  switch (type)
+    {
+    case FOMA_TYPE:
+      implementation.foma = 
+	foma_interface.copy(another_1.implementation.foma);
+      break;
+    case SFST_TYPE:
+      implementation.sfst = 
+	sfst_interface.copy(another_1.implementation.sfst);
+      break;
+    case TROPICAL_OFST_TYPE:
+      implementation.tropical_ofst = 
+	tropical_ofst_interface.copy(another_1.implementation.tropical_ofst);
+      break;
+    case LOG_OFST_TYPE:
+      implementation.log_ofst = 
+	log_ofst_interface.copy(another_1.implementation.log_ofst);
+      break;
+    default:
+      (void)1;
+    }
+  return *this;
+
+}
 
 std::ostream &operator<<(std::ostream &out,HfstTransducer &t)
   {

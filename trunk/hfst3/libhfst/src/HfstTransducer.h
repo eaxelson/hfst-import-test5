@@ -262,7 +262,6 @@ namespace hfst
 
   public:
     HfstTransducer();
-    HfstTransducer & operator= (const HfstTransducer &another);
 
     /** \brief Create an empty transducer, i.e. a transducer that does not recognize any string. 
 
@@ -645,6 +644,7 @@ fclose(ifile);
 	@see convert(ImplementationType type) */
     static HfstTransducer &convert(const HfstTransducer &t, ImplementationType type);
 
+    HfstTransducer &operator=(const HfstTransducer &another);
     friend std::ostream &operator<<(std::ostream &out, HfstTransducer &t);
     friend class HfstInputStream;
     friend class HfstOutputStream;
