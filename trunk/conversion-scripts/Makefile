@@ -55,7 +55,7 @@ fr_BE.hfst fr_CA.hfst  fr_CH.hfst  fr_FR.hfst  fr_LU.hfst  fr_MC.hfst \
 hu_HU.hfst  se.hfst se_FI.hfst  se_NO.hfst  se_SE.hfst  \
 
 
-all: $(HYPH_TARGETS) hunspell-dic2lexc hunspell-aff2lexc
+all: hunspell-dic2lexc hunspell-aff2lexc
 
 hyph-utf8-hfst.tar.gz: $(HYPH_TARGETS)
 	-mkdir -p hyph-utf8-hfst

@@ -43,8 +43,12 @@ static unsigned long rep_read = 0;
 static bool has_key = false;
 
 static bool lexicon_prefixes_written = false;
+static set<string> contexts_written;
 static set<string> lexicons_written;
 static map<string,set<string> > deletion_contexts;
+static map<string,set<string> > lexicon_contexts;
+
+static set<string> needed_flags;
 
 static
 set<string>*
@@ -204,7 +208,7 @@ handle_af_data(const char* conts)
 
 static
 void
-write_prefix(const char* cont, const char* morph, const char* next_cont)
+write_prefix_lexicon_entry(const char* cont, const char* morph, const char* next_cont)
 {
     if (!lexicon_prefixes_written)
     {
@@ -212,17 +216,21 @@ write_prefix(const char* cont, const char* morph, const char* next_cont)
         lexicon_prefixes_written = true;
     }
     unsigned short contbyte = static_cast<unsigned short>(*cont);
-    char* incoming_prefix_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@U.ALLOW_PREFIX.BYTE123456789@0")));
+    char* incoming_prefix_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@P.NEEDBYTE123456789.ON@0")));
+    char* need_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@P.NEEDBYTE123456789@0")));
     char* deletion_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("{123456789%%<}0")));
-    sprintf(incoming_prefix_flag, "@U.ALLOW_PREFIX.BYTE%d@", contbyte);
+    sprintf(incoming_prefix_flag, "@P.NEEDBYTE%d.ON@", contbyte);
+    sprintf(need_flag, "@D.NEEDBYTE%d@", contbyte);
     sprintf(deletion_context_tag, "{%d%%<}", contbyte);
     sigma.insert(incoming_prefix_flag);
     sigma.insert(deletion_context_tag);
+    sigma.insert(need_flag);
+    needed_flags.insert(need_flag);
     if (next_cont != NULL)
     {
         unsigned short nextcontbyte = static_cast<unsigned short>(*next_cont);
-        char* outgoing_prefix_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@P.ALLOW_PREFIX.BYTE123456789@0")));
-        sprintf(outgoing_prefix_flag, "@P.ALLOW_PREFIX.BYTE%d@", nextcontbyte);
+        char* outgoing_prefix_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@P.NEEDPREFIX123456789@0")));
+        sprintf(outgoing_prefix_flag, "@P.NEEDPREFIX%d@", nextcontbyte);
         sigma.insert(outgoing_prefix_flag);
         fprintf(lexcfile, "%s%s%s%s\tHUNSPELL_pfx\t;\n",
                 morph, incoming_prefix_flag, outgoing_prefix_flag,
@@ -274,12 +282,15 @@ overlay_twol_contexts(const char* remove, const char* context)
     {
         // join context by copying maximum span of removes and continuing by
         // context
-        char* joint_context = static_cast<char*>(malloc(sizeof(char)*(strlen(context) + strlen(remove) + 1)));
+        char* joint_context = static_cast<char*>(calloc(sizeof(char),(strlen(context)*3 + strlen(remove)*3 + 1)));
         char* j = joint_context;
         bool was_colon = false;
         while (*r != '\0')
         {
-            assert(*s != '\0');
+            if (*s == '\0')
+            {
+                break;
+            }
             *j = *r;
             j++;
             if (*r == ':')
@@ -317,7 +328,7 @@ twolize_context(const char* context, bool in_removes = false)
     {
         return strdup("");
     }
-    char* twol_context = static_cast<char*>(malloc(sizeof(char)*strlen(context)*3+1));
+    char* twol_context = static_cast<char*>(calloc(sizeof(char),strlen(context)*4+1));
     char* next_pair = twol_context;
     unsigned short u8len = 0;
     bool in_bracket = false;
@@ -393,10 +404,6 @@ twolize_context(const char* context, bool in_removes = false)
         *next_pair = ' ';
         next_pair++;
         s += u8len;
-        if (*s != '\0')
-        {
-            s += u8len;
-        }
     }
     next_pair = '\0';
     return twol_context;
@@ -419,17 +426,17 @@ save_prefix_deletion_contexts(const char* cont, const char* remove,
     char* twol_context_match = twolize_context(match);
     char* twol_context_add = twolize_context(morph);
     char* twol_context_delmatch = overlay_twol_contexts(twol_context_del, twol_context_match);
-    char* twol_context_delmatch_dup = strdup(twol_context_delmatch);
-    char* context_pair = strtok(twol_context_delmatch_dup, " ");
+    char* twol_context_del_dup = strdup(twol_context_del);
+    char* context_pair = strtok(twol_context_del_dup, " ");
     while (context_pair)
     {
         if (strstr(context_pair, ":0") != NULL)
         {
-            char* cur_pos = strstr(twol_context_delmatch, context_pair);
-            char* rightc = static_cast<char*>(malloc(sizeof(char)*strlen(twol_context_delmatch)));
-            char* leftc = static_cast<char*>(malloc(sizeof(char)*strlen(twol_context_delmatch)));
-            leftc = static_cast<char*>(memcpy(leftc, twol_context_delmatch, cur_pos-twol_context_delmatch));
-            leftc[cur_pos-twol_context_delmatch] = '\0';
+            char* cur_pos = strstr(twol_context_del, context_pair);
+            char* rightc = static_cast<char*>(malloc(sizeof(char)*strlen(twol_context_del)));
+            char* leftc = static_cast<char*>(malloc(sizeof(char)*strlen(twol_context_del)));
+            leftc = static_cast<char*>(memcpy(leftc, twol_context_del, cur_pos-twol_context_del));
+            leftc[cur_pos-twol_context_del] = '\0';
             rightc = strdup(cur_pos+strlen(context_pair));
             char* deletion_context = static_cast<char*>(malloc(1024));
             sprintf(deletion_context, "%s %s %s _ %s ;",
@@ -459,7 +466,7 @@ void
 handle_pfx_line(const char* cont, 
                const char* remove, const char* add, const char* match)
 {
-    write_prefix(cont, add, NULL);
+    write_prefix_lexicon_entry(cont, add, NULL);
     save_prefix_deletion_contexts(cont, remove, add, match);
     pfx_read++;
 }
@@ -475,7 +482,8 @@ handle_pfx_line_with_conts(const char* cont,
     // once for each class
     for (const char* c = conts; *c != '\0'; c++)
     {
-        write_prefix(cont, add, c);
+        write_prefix_lexicon_entry(cont, add, c);
+        save_prefix_deletion_contexts(cont, remove, add, match);
     }
 }
 
@@ -523,9 +531,9 @@ write_suffix_lexicon_entry(const char* cont, const char* morph, const char* next
         fprintf(lexcfile, "LEXICON HUNSPELL_FLAG_%d\n", cont[0]);
         lexicons_written.insert(cont);
     }
-    char* incoming_suffix_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@U.EXPECT_SUFFIX.BYTE123456789@0")));
+    char* incoming_suffix_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@C.NEEDBYTE123456789@0")));
     char* deletion_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("{%%>123456789}0")));
-    sprintf(incoming_suffix_flag, "@U.EXPECT_SUFFIX.BYTE%d@", contbyte);
+    sprintf(incoming_suffix_flag, "@C.NEEDBYTE%d@", contbyte);
     sprintf(deletion_context_tag, "{%%>%d}", contbyte);
     sigma.insert(incoming_suffix_flag);
     sigma.insert(deletion_context_tag);
@@ -538,52 +546,51 @@ write_suffix_lexicon_entry(const char* cont, const char* morph, const char* next
     }
     else
     {
-        fprintf(lexcfile, "%s%s\t#\t;\n",
+        fprintf(lexcfile, "%s%s\tHUNSPELL_FIN\t;\n",
                 deletion_context_tag, morph);
     }
 }
 
+// for each deleted character, add possible contexts of deletion in form of
+// [LEFT CONTEXT] _ [RIGHT CONTEXT] [CONTEXT TAG] [ADDED MORPh] ;
 static
 void
-save_suffix_deletion_contexts(const char* cont, const char* remove, const char* match)
+save_suffix_deletion_contexts(const char* cont, const char* remove,
+                              const char* morph, const char* match)
 {
     unsigned short contbyte = static_cast<unsigned short>(*cont);
-    char* deletion_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{%%>123456789%%}0")));
+    char* deletion_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{123456789%%>%%}0")));
     sprintf(deletion_context_tag, "%%{%%>%d%%}", contbyte);
-    char* deleted_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{%%>123456789%%}:00")));
+    char* deleted_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{123456789%%>%%}:00")));
     sprintf(deleted_context_tag, "%%{%%>%d%%}:0", contbyte);
     pi.insert(deleted_context_tag);
-    char* twol_context = twolize_context(match, remove);
-    if (twol_context == NULL)
-    {
-        twol_context = strdup("");
-    }
-    char* twol_context_dup = strdup(twol_context);
-    char* context_pair = strtok(twol_context_dup, " ");
+    char* twol_context_del = twolize_context(remove, true);
+    char* twol_context_match = twolize_context(match);
+    char* twol_context_add = twolize_context(morph);
+    char* twol_context_delmatch = overlay_twol_contexts(twol_context_del, twol_context_match);
+    char* twol_context_del_dup = strdup(twol_context_del);
+    char* context_pair = strtok(twol_context_del_dup, " ");
     while (context_pair)
     {
-        if ((strcmp(context_pair, "[") == 0) ||
-            (strcmp(context_pair, "]") == 0) ||
-            (strcmp(context_pair, "\\[") == 0) ||
-            (strcmp(context_pair, "|") == 0))
+        if (strstr(context_pair, ":0") != NULL)
         {
-            /* skip these */
-        }
-        else
-        {
-            char* cur_pos = strstr(twol_context, context_pair);
-            char* rightc = static_cast<char*>(malloc(sizeof(char)*strlen(twol_context)));
-            char* leftc = static_cast<char*>(malloc(sizeof(char)*strlen(twol_context)));
-            leftc = static_cast<char*>(memcpy(leftc, twol_context, cur_pos-twol_context));
-            leftc[cur_pos-twol_context] = '\0';
+            char* cur_pos = strstr(twol_context_del, context_pair);
+            char* rightc = static_cast<char*>(malloc(sizeof(char)*strlen(twol_context_del)));
+            char* leftc = static_cast<char*>(malloc(sizeof(char)*strlen(twol_context_del)));
+            leftc = static_cast<char*>(memcpy(leftc, twol_context_del, cur_pos-twol_context_del));
+            leftc[cur_pos-twol_context_del] = '\0';
             rightc = strdup(cur_pos+strlen(context_pair));
             char* deletion_context = static_cast<char*>(malloc(1024));
-            sprintf(deletion_context, "%s _ %s %s;", leftc, rightc, 
-                    deleted_context_tag);
+            sprintf(deletion_context, "%s %s %s _ %s ;",
+                    leftc, rightc,
+                    twol_context_add, deleted_context_tag);
+            // keep only unique contexts
             set<string> dcs = deletion_contexts[context_pair];
             dcs.insert(deletion_context);
             deletion_contexts[context_pair] = dcs;
+            // save deletion to twol alphabet
             pi.insert(context_pair);
+            // also save id pair to twol alphabet
             char* ident = strdup(context_pair);
             char* colon = strstr(ident, ":");
             if (colon != NULL)
@@ -598,9 +605,31 @@ save_suffix_deletion_contexts(const char* cont, const char* remove, const char* 
 
 static
 void
-write_suffix_contexts(const char* cont, const char* add, const char* morph)
+save_suffix_context(const char* cont, const char* remove,
+                      const char* morph, const char* match)
 {
-
+    unsigned short contbyte = static_cast<unsigned short>(*cont);
+    char* deletion_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{123456789%%>%%}0")));
+    sprintf(deletion_context_tag, "%%{%%>%d%%}", contbyte);
+    char* deleted_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{123456789%%>%%}:00")));
+    sprintf(deleted_context_tag, "%%{%%>%d%%}:0", contbyte);
+    pi.insert(deleted_context_tag);
+    char* twol_context_del = twolize_context(remove, true);
+    char* twol_context_match = twolize_context(match);
+    char* twol_context_add = twolize_context(morph);
+    char* twol_context_delmatch = overlay_twol_contexts(twol_context_del, twol_context_match);
+    size_t i = strlen(twol_context_del);
+    size_t j = strlen(twol_context_match);
+    size_t k = strlen(twol_context_delmatch);
+    //fprintf(stderr, "WAH %s %zu + %s %zu = %s %zu\n", twol_context_del,
+      //  i, twol_context_match, j, twol_context_delmatch, k);
+    size_t l = strlen(twol_context_add);
+ //   fprintf(stderr, "Aah %s %zu\n", twol_context_add, l);
+    char* lexicon_context = static_cast<char*>(calloc(sizeof(char),k+l+1000));
+    sprintf(lexicon_context, "%s _ %s ;\n", twol_context_del, twol_context_add);
+    set<string> dcs = lexicon_contexts[deleted_context_tag];
+    dcs.insert(lexicon_context);
+    lexicon_contexts[deleted_context_tag] = dcs;
 }
 
 static
@@ -609,7 +638,8 @@ handle_sfx_line(const char* cont,
                const char* remove, const char* add, const char* match)
 {
     write_suffix_lexicon_entry(cont, add, NULL);
-    save_suffix_context(cont, remove, match);
+    save_suffix_deletion_contexts(cont, remove, add, match);
+    save_suffix_context(cont, remove, add, match);
     sfx_read++;
 }
 
@@ -624,7 +654,9 @@ handle_sfx_line_with_conts(const char* cont,
     // once for each class
     for (const char* c = conts; *c != '\0'; c++)
     {
-        write_prefix(cont, add, c);
+        write_suffix_lexicon_entry(cont, add, c);
+        save_suffix_deletion_contexts(cont,remove, add, match);
+        save_suffix_context(cont, remove, add, match);
     }
 }
 
@@ -1044,6 +1076,14 @@ main(int argc, char** argv)
 #   endif
     sigma.insert("@C.EXPECT_SUFFIX@");
     yyparse();
+    fprintf(lexcfile, "LEXICON HUNSPELL_FIN\n");
+    for (set<string>::const_iterator s = needed_flags.begin();
+         s != needed_flags.end();
+         ++s)
+    {
+        fprintf(lexcfile, "%s", s->c_str());
+    }
+    fprintf(lexcfile, "\t#\t;\n");
     fprintf(symfile, "Multichar_Symbols\n");
     for (set<string>::const_iterator s = sigma.begin();
          s != sigma.end();
@@ -1059,6 +1099,22 @@ main(int argc, char** argv)
         string deleted = context_sets->first;
         set<string> contexts = context_sets->second;
         fprintf(twolcfile, "\"%s deletion contexts\"\n", deleted.c_str());
+        fprintf(twolcfile, "%s <=> ", deleted.c_str());
+        for (set<string>::const_iterator context = contexts.begin();
+             context != contexts.end();
+             ++context)
+        {
+            fprintf(twolcfile, "%s\n\t", context->c_str());
+        }
+        fprintf(twolcfile, "\n");
+    }
+    for (map<string, set<string> >::const_iterator context_sets = lexicon_contexts.begin();
+        context_sets != lexicon_contexts.end();
+        context_sets++)
+    {
+        string deleted = context_sets->first;
+        set<string> contexts = context_sets->second;
+        fprintf(twolcfile, "\"%s lexicon contexts\"\n", deleted.c_str());
         fprintf(twolcfile, "%s <=> ", deleted.c_str());
         for (set<string>::const_iterator context = contexts.begin();
              context != contexts.end();
