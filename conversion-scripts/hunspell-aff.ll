@@ -96,7 +96,7 @@ UNI {U8H}|[\x21-\x7e]
     return KEY_LINE;
 }
 
-^"PFX "." "("Y"|"N")" "{NUMBER}{LWSP}*$ {
+^"PFX"{LWSP}+.{LWSP}+("Y"|"N"){LWSP}+{NUMBER}{LWSP}*$ {
     char* s = strdup(yytext + 8);
     char* end = yytext;
     yylval.number = strtoul(s, &end, 10);
@@ -108,7 +108,7 @@ UNI {U8H}|[\x21-\x7e]
 }
 
 
-^"SFX "." "("Y"|"N")" "{NUMBER}{LWSP}*$ {
+^"SFX"{LWSP}+.{LWSP}+("Y"|"N"){LWSP}+{NUMBER}{LWSP}*$ {
     char* s = strdup(yytext + 8);
     char* end = yytext;
     yylval.number = strtoul(s, &end, 10);
@@ -119,12 +119,12 @@ UNI {U8H}|[\x21-\x7e]
     return SFX_FIRSTLINE;
 }
 
-^"PFX ". {
+^"PFX"{LWSP}+. {
     yylval.string = strdup(yytext + 4);
     return PFX_LEADER;
 }
 
-^"SFX ". {
+^"SFX"{LWSP}+. {
     yylval.string = strdup(yytext + 4);
     return SFX_LEADER;
 }
@@ -191,7 +191,7 @@ UNI {U8H}|[\x21-\x7e]
     return CIRCUMFIX_LINE;
 }
 
-^("NOSUGGEST "|"ONLYINCOMPOUND "|"COMPOUNDRULE "|"WORDCHARS "|"PHONE "|"NAME "|"LANG "|"HOME "|"VERSION "|"COMPOUNDSYLLABLE "|"SYLLABLENUM "|"KEEPCASE "|"COMPOUNDFORBIDFLAG "|"COMPOUNDPERMITFLAG "|"COMPOUNDPERMITFLAG "|"COMPOUNDFIRST "|"COMPOUNDLAST "|"ONLYROOT "|"HU_KOTOHANGZO "|"NEEDAFFIX "|"ONLYINCOMPOUND "|"COMPOUNDWORDMAX "|"COMPOUNDROOT "|"CHECKCOMPOUND"|"FORBIDDENWORD "|"SUBSTANDARD "|"GENERATE "|"LEMMA_PRESENT "|"MAP "|"BREAK "|"CHECKSHARPS").*$ {
+^("NOSUGGEST "|"ONLYINCOMPOUND "|"COMPOUNDRULE "|"WORDCHARS "|"PHONE "|"NAME "|"LANG "|"HOME "|"VERSION "|"COMPOUNDSYLLABLE "|"SYLLABLENUM "|"KEEPCASE "|"COMPOUNDFORBIDFLAG "|"COMPOUNDPERMITFLAG "|"COMPOUNDPERMITFLAG "|"COMPOUNDFIRST "|"COMPOUNDLAST "|"ONLYROOT "|"HU_KOTOHANGZO "|"NEEDAFFIX "|"ONLYINCOMPOUND "|"COMPOUNDWORDMAX "|"COMPOUNDROOT "|"CHECKCOMPOUND"|"FORBIDDENWORD "|"SUBSTANDARD "|"GENERATE "|"LEMMA_PRESENT "|"MAP "|"BREAK "|"CHECKSHARPS"|"NOSPLITSUGS"|"SIMPLIFIEDTRIPLE"|"ICONV").*$ {
     printf("Skipped (known): %s\n", yytext);
 }
 
