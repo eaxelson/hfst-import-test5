@@ -98,6 +98,7 @@ handle_wordline(const char* word, const char* conts)
     const char* cont = conts;
     words_read++;
     char* escaped_word = escape_word(word);
+    fprintf(lexcfile, "%s\tHUNSPELL_FIN\t;\n", escaped_word);
     while (*cont != '\0')
       {
         fprintf(lexcfile, "%s\tHUNSPELL_FLAG_%u\t;\n", escaped_word, *cont);
@@ -124,7 +125,7 @@ handle_numbered_wordline(const char* word, unsigned long cont,
     static bool error_said = false;
     if (!error_said)
       {
-        fprintf(stderr, "Extra numbers at the end of line?\n");
+        fprintf(stderr, "AM number %lu ignored\n", number);
         error_said = true;
       }
     handle_wordline(word, cont);
@@ -138,7 +139,7 @@ handle_numbered_wordline(const char* word, const char* conts,
     static bool error_said = false;
     if (!error_said)
       {
-        fprintf(stderr, "Extra numbers at the end of line?\n");
+        fprintf(stderr, "AM number %lu ignored\n", number);
         error_said = true;
       }
     handle_wordline(word, conts);
