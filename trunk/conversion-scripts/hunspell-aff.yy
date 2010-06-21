@@ -283,35 +283,50 @@ overlay_twol_contexts(const char* remove, const char* context)
         // join context by copying maximum span of removes and continuing by
         // context
         char* joint_context = static_cast<char*>(calloc(sizeof(char),(strlen(context)*3 + strlen(remove)*3 + 1)));
-        char* j = joint_context;
+        char* j = static_cast<char*>(calloc(sizeof(char),(strlen(context)*3 + strlen(remove)* + 1)));
         bool was_colon = false;
+        const char* r_start = r;
+        const char* s_start = s;
+        const char* j_start = j;
+        // start from the end
         while (*r != '\0')
         {
-            if (*s == '\0')
-            {
-                break;
-            }
+            r++;
+        }
+        while (*s != '\0')
+        {
+            s++;
+        }
+        while (r < r_start)
+        {
             *j = *r;
             j++;
             if (*r == ':')
             {
-                was_colon = true;
+                was_colon = false;
             }
             else if (*r == '0')
             {
-                was_colon = false;
+                was_colon = true;
             }
-            r++;
-            if (!was_colon)
+            r--;
+            if (!was_colon && (s < s_start))
             {
-                s++;
+                s--;
             }
         }
-        while (*s != '\0')
+        while (s < s_start)
         {
             *j = *s;
             j++;
-            s++;
+            s--;
+        }
+        char* rv = joint_context;
+        while (j < j_start)
+        {
+            *rv = *j;
+            j--;
+            rv++;
         }
         return joint_context;
     }
@@ -459,6 +474,26 @@ save_prefix_deletion_contexts(const char* cont, const char* remove,
         }
         context_pair = strtok(NULL, " ");
     }
+    char* morph_to_pi = strdup(twol_context_add);
+    char* nupi = strtok(morph_to_pi, " ");
+    while (nupi != NULL)
+    {
+        char* ident = strdup(nupi);
+        char* colon = strstr(ident, ":");
+        if (colon != NULL)
+        {
+            *colon = '\0';
+        }
+        if (*ident == '-')
+        {
+            pi.insert("%-");
+        }
+        else
+        {
+            pi.insert(ident);
+        }
+        nupi = strtok(NULL, " ");
+    }
 }
 
 static
@@ -581,9 +616,9 @@ save_suffix_deletion_contexts(const char* cont, const char* remove,
             leftc[cur_pos-twol_context_del] = '\0';
             rightc = strdup(cur_pos+strlen(context_pair));
             char* deletion_context = static_cast<char*>(malloc(1024));
-            sprintf(deletion_context, "%s %s %s _ %s ;",
-                    leftc, rightc,
-                    twol_context_add, deleted_context_tag);
+            sprintf(deletion_context, "%s _ %s %s %s ;",
+                    leftc, rightc, deleted_context_tag,
+                    twol_context_add);
             // keep only unique contexts
             set<string> dcs = deletion_contexts[context_pair];
             dcs.insert(deletion_context);
@@ -600,6 +635,26 @@ save_suffix_deletion_contexts(const char* cont, const char* remove,
             pi.insert(ident);
         }
         context_pair = strtok(NULL, " ");
+    }
+    char* morph_to_pi = strdup(twol_context_add);
+    char* nupi = strtok(morph_to_pi, " ");
+    while (nupi != NULL)
+    {
+        char* ident = strdup(nupi);
+        char* colon = strstr(ident, ":");
+        if (colon != NULL)
+        {
+            *colon = '\0';
+        }
+        if (*ident == '-')
+        {
+            pi.insert("%-");
+        }
+        else
+        {
+            pi.insert(ident);
+        }
+        nupi = strtok(NULL, " ");
     }
 }
 
@@ -626,7 +681,7 @@ save_suffix_context(const char* cont, const char* remove,
     size_t l = strlen(twol_context_add);
  //   fprintf(stderr, "Aah %s %zu\n", twol_context_add, l);
     char* lexicon_context = static_cast<char*>(calloc(sizeof(char),k+l+1000));
-    sprintf(lexicon_context, "%s _ %s ;\n", twol_context_del, twol_context_add);
+    sprintf(lexicon_context, "%s _ %s ;\n", twol_context_delmatch, twol_context_add);
     set<string> dcs = lexicon_contexts[deleted_context_tag];
     dcs.insert(lexicon_context);
     lexicon_contexts[deleted_context_tag] = dcs;
