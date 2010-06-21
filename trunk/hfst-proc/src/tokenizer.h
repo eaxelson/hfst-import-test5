@@ -203,6 +203,7 @@ class TokenIOStream
   }
   
   size_t get_pos() const {return token_buffer.getPos();}
+  size_t diff_prev(size_t pos) const {return token_buffer.diffPrevPos(pos);}
   Token at(size_t pos) const {return token_buffer.get(pos);}
   void move_back(size_t count) {token_buffer.back(count);}
   

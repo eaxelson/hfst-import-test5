@@ -147,7 +147,7 @@ AnalysisApplicator::apply()
       {
         // the number of symbols on the end of surface_form that aren't a part
         // of the transduction(s) found
-        int revert_count = token_stream.get_pos()-last_stream_location-1;
+        int revert_count = token_stream.diff_prev(last_stream_location+1);
         formatter.print_word(TokenVector(surface_form.begin(), 
                                                 surface_form.end()-revert_count),
                                    analyzed_forms); 
