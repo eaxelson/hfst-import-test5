@@ -71,7 +71,7 @@ class Symbolizer
       if(ascii_symbols[i] == 0)
       {
         ascii_symbols[i] = NO_SYMBOL_NUMBER;
-        if(printDebuggingInformationFlag)
+        if(printDebuggingInformationFlag && i < 128)
           std::cout << "Symbolizer ignoring shortcut for ASCII character '" 
                     << (char)i << "' (" << i << ")" << std::endl;
       }
