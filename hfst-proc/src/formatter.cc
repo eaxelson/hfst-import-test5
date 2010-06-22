@@ -18,46 +18,35 @@ OutputFormatter::clear_superblanks(const TokenVector& tokens) const
   return output_tokens;
 }
 
-bool
-OutputFormatter::is_compound_analysis(const SymbolNumberVector& final) const
-{
-  for(SymbolNumberVector::const_iterator it=final.begin(); it!=final.end(); it++)
-  {
-    if(token_stream.get_alphabet().symbol_to_string(*it) == "+")
-      return true;
-  }
-  return false;
-}
-
 void
-OutputFormatter::remove_compound_analyses(LookupPathSet& finals) const
+OutputFormatter::filter_compound_analyses(LookupPathSet& finals) const
 {
-  bool has_noncompounded = false;
+  int fewest_boundaries = std::numeric_limits<int>::max();
+  std::vector<int> boundary_counts;
   
-  // first look to see if there are any non-compounded analyses
+  // first look to find the analysis with the fewest compound boundaries
   for(LookupPathSet::const_iterator it=finals.begin(); it!=finals.end(); it++)
   {
-    if(!is_compound_analysis((*it)->get_output_symbols())) {
-      has_noncompounded = true;
-      break;
-    }
+    int num = token_stream.get_alphabet().num_compound_boundaries((*it)->get_output_symbols());
+    boundary_counts.push_back(num);
+    if(num < fewest_boundaries)
+      fewest_boundaries = num;
   }
   
-  if(has_noncompounded)
-  { //there is a non-compounded analysis, check for any compounded ones
-    for(LookupPathSet::iterator it=finals.begin(); it!=finals.end();)
+  // filter all analyses with more boundaries than the minimum
+  int i=0;
+  for(LookupPathSet::iterator it=finals.begin(); it!=finals.end();i++)
+  {
+    if(boundary_counts[i] > fewest_boundaries)
     {
-      if(is_compound_analysis((*it)->get_output_symbols()))
-      {
-        LookupPathSet::iterator to_delete = it;
-        it++;
-        finals.erase(to_delete);
-        if(printDebuggingInformationFlag)
-          std::cout << "Found a compound analysis to filter" << std::endl;
-      }
-      else
-        it++;
+      LookupPathSet::iterator to_delete = it;
+      it++;
+      finals.erase(to_delete);
+      if(printDebuggingInformationFlag)
+        std::cout << "Filtering compound analysis with " << boundary_counts[i] << " boundary(s)" << std::endl;
     }
+    else
+      it++;
   }
 }
 
@@ -65,9 +54,9 @@ LookupPathSet
 OutputFormatter::preprocess_finals(const LookupPathSet& finals) const
 {
   LookupPathSet new_finals = LookupPathSet(finals);
-  if(filter_compound_analyses)
+  if(do_compound_filtering)
   {
-    remove_compound_analyses(new_finals);
+    filter_compound_analyses(new_finals);
     if(printDebuggingInformationFlag)
     {
       if(new_finals.size() < finals.size())

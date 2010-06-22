@@ -55,8 +55,8 @@ bool print_usage(void)
     "  -C  --cg                Constraint Grammar output format for analysis\n" <<
     "                          (implies -w)\n" <<
     "  -x, --xerox             Xerox output format for analysis\n" <<
-    "  -k, --keep-compounds    Retain compound analyses even when a non-compound\n" <<
-    "                          one is available\n" <<
+    "  -k, --keep-compounds    Retain compound analyses even when analyses with fewer\n" <<
+    "                          compound-boundaries are available\n" <<
     "  -W, --show-weights      Print final analysis weights (if any)\n" <<
     "  -N N, --analyses=N      Output no more than N analyses\n" <<
     "                          (if the transducer is weighted, the N best analyses)\n" <<

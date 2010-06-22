@@ -12,7 +12,7 @@ class OutputFormatter
 {
  protected:
   TokenIOStream& token_stream;
-  bool filter_compound_analyses;
+  bool do_compound_filtering;
   
   /**
    * Return a copy of the given token vector which has all superblanks
@@ -20,13 +20,11 @@ class OutputFormatter
    */
   TokenVector clear_superblanks(const TokenVector& tokens) const;
   
-  bool is_compound_analysis(const SymbolNumberVector& final) const;
-  
   /**
-   * If there are any non-compound analyses in the given set of finals, then
-   * filter out all compound analyses from the set
+   * Filter any analyses with more compound-boundaries than the minimum
+   * boundary count of any analysis in the set
    */
-  void remove_compound_analyses(LookupPathSet& finals) const;
+  void filter_compound_analyses(LookupPathSet& finals) const;
   
   /**
    * Return a sorted copy of the path vector that contains no more than
@@ -34,7 +32,7 @@ class OutputFormatter
    */
   LookupPathSet preprocess_finals(const LookupPathSet& finals) const;
  public:
-  OutputFormatter(TokenIOStream& s, bool f): token_stream(s), filter_compound_analyses(f) {}
+  OutputFormatter(TokenIOStream& s, bool f): token_stream(s), do_compound_filtering(f) {}
   virtual ~OutputFormatter() {}
   
   /**
