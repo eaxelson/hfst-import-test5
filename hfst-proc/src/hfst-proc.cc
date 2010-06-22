@@ -43,7 +43,7 @@ bool print_usage(void)
 {
   std::cerr <<
     "\n" <<
-    "Usage: " << PACKAGE_NAME << " [-a [-p|-C|-x] [-k]|-g|-n|-d|-t] [-W] [-n N] [-c|-w] [-z] [-v|-q|-s] transducer_file [input_file [output_file]]\n" <<
+    "Usage: " << PACKAGE_NAME << " [-a [-p|-C|-x] [-k]|-g|-n|-d|-t] [-W] [-n N] [-c|-w] [-z] [-v|-q|] transducer_file [input_file [output_file]]\n" <<
     "Perform a transducer lookup on a text stream, tokenizing on the fly\n" <<
     "\n" <<
     "  -a, --analysis          Morphological analysis (default)\n" <<
@@ -67,7 +67,6 @@ bool print_usage(void)
     "  -z  --null-flush        Flush output on the null character\n" <<
     "  -v, --verbose           Be verbose\n" <<
     "  -q, --quiet             Don't be verbose (default)\n" <<
-    "  -s, --silent            Same as quiet\n" <<
     "  -V, --version           Print version information\n" <<
     "  -h, --help              Print this help message\n" <<
     "\n" <<
