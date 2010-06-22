@@ -269,6 +269,28 @@ TransducerAlphabet::is_tag(SymbolNumber symbol) const
   return false;
 }
 
+bool
+TransducerAlphabet::is_compound_boundary(SymbolNumber symbol) const
+{
+  std::string s = symbol_to_string(symbol);
+  if(s == "+" || s[s.length()-1] == '+' ||
+     s == "#" || s[s.length()-1] == '#')
+    return true;
+  return false;
+}
+
+int
+TransducerAlphabet::num_compound_boundaries(const SymbolNumberVector& symbol) const
+{
+  int count=0;
+  for(SymbolNumberVector::const_iterator i=symbol.begin(); i!=symbol.end(); i++)
+  {
+    if(is_compound_boundary(*i))
+      count++;
+  }
+  return count;
+}
+
 
 //////////Function definitions for TransitionIndex and Transition
 

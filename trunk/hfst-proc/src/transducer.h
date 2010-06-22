@@ -285,6 +285,12 @@ class TransducerAlphabet
    */
   bool is_tag(SymbolNumber symbol) const;
   
+  /**
+   * Whether the symbol marks a compound boundary (+ or #)
+   */
+  bool is_compound_boundary(SymbolNumber symbol) const;
+  int num_compound_boundaries(const SymbolNumberVector& symbols) const;
+  
   std::string symbol_to_string(SymbolNumber symbol) const
   {return symbol_table[symbol].str;}
   
