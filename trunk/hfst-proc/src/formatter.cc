@@ -52,6 +52,8 @@ OutputFormatter::remove_compound_analyses(LookupPathSet& finals) const
         LookupPathSet::iterator to_delete = it;
         it++;
         finals.erase(to_delete);
+        if(printDebuggingInformationFlag)
+          std::cout << "Found a compound analysis to filter" << std::endl;
       }
       else
         it++;
@@ -149,6 +151,72 @@ ApertiumOutputFormatter::print_unknown_word(const TokenVector& surface_form) con
 
 //////////Function definitions for CGOutputFormatter
 
+std::string
+CGOutputFormatter::process_final(const SymbolNumberVector& symbols, CapitalizationState caps) const
+{
+  std::ostringstream res;
+  size_t start_pos = 0;
+  
+  res << '"'; // before start of lexical form
+  
+  while(start_pos < symbols.size())
+  {
+    size_t tag_start = symbols.size();
+    size_t compound_split = symbols.size();
+    for(size_t i=start_pos; i<symbols.size(); i++)
+    {
+      if(tag_start == symbols.size() &&
+         token_stream.get_alphabet().is_tag(symbols[i]))
+        tag_start = i;
+      
+      if(compound_split == symbols.size())
+      {
+        std::string s = token_stream.get_alphabet().symbol_to_string(symbols[i]);
+        if(s == "#" || s == "+" || s[s.length()-1] == '+')
+          compound_split = i;
+      }
+      
+      if(tag_start != symbols.size() && compound_split != symbols.size())
+        break;
+    }
+    
+    // grab the base form without tags
+    res << token_stream.get_alphabet().symbols_to_string(
+      SymbolNumberVector(symbols.begin()+start_pos,symbols.begin()+tag_start), caps);
+    
+    // look for compounding. Don't output the tags for non-final segments
+    if(compound_split != symbols.size())
+    {
+      res << "#";
+      start_pos = compound_split+1;
+    }
+    else
+    {
+      res << '"'; // after end of lexical form, now come any tags
+      if(tag_start != symbols.size())
+      {
+        for(size_t i=tag_start; i<symbols.size(); i++)
+        {
+          std::string tag = token_stream.get_alphabet().symbol_to_string(symbols[i]);
+          // remove the < and >
+          if(tag.size() > 0 && tag[0] == '<')
+          {
+            tag = tag.substr(1);
+            if(tag.size() > 0 && tag[tag.length()-1] == '>')
+              tag = tag.substr(0,tag.length()-1);
+          }
+          
+          res << (i==tag_start?"\t":" ") << tag;
+        }
+      }
+      
+      break;
+    }
+  }
+  
+  return res.str();
+}
+
 std::vector<std::string>
 CGOutputFormatter::process_finals(const LookupPathSet& finals, CapitalizationState caps) const
 {
@@ -156,42 +224,8 @@ CGOutputFormatter::process_finals(const LookupPathSet& finals, CapitalizationSta
   LookupPathSet new_finals = preprocess_finals(finals);
   
   for(LookupPathSet::const_iterator it=new_finals.begin(); it!=new_finals.end(); it++)
-  {
-    std::ostringstream res;
-    SymbolNumberVector output_symbols = (*it)->get_output_symbols();
-    size_t tag_start = output_symbols.size();
-    for(size_t i=0; i<output_symbols.size(); i++)
-    {
-      if(token_stream.get_alphabet().is_tag(output_symbols[i]))
-      {
-        tag_start = i;
-        break;
-      }
-    }
-    
-    res << '"' << token_stream.get_alphabet().symbols_to_string(
-      SymbolNumberVector(output_symbols.begin(),output_symbols.begin()+tag_start), caps)
-        << '"';
-    
-    if(tag_start != output_symbols.size())
-    {
-      for(size_t i=tag_start; i<output_symbols.size(); i++)
-      {
-        std::string tag = token_stream.get_alphabet().symbol_to_string(output_symbols[i]);
-        // remove the < and >
-        if(tag.size() > 0 && tag[0] == '<')
-        {
-          tag = tag.substr(1);
-          if(tag.size() > 0 && tag[tag.length()-1] == '>')
-            tag = tag.substr(0,tag.length()-1);
-        }
-        
-        res << (i==tag_start?"\t":" ") << tag;
-      }
-    }
-    
-    results.push_back(res.str());
-  }
+    results.push_back(process_final((*it)->get_output_symbols(), caps));
+  
   return results;
 }
 

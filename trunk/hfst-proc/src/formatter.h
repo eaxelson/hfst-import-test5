@@ -72,11 +72,12 @@ class ApertiumOutputFormatter: public OutputFormatter
 
 class CGOutputFormatter: public OutputFormatter
 {
+  std::string process_final(const SymbolNumberVector& symbols, CapitalizationState caps) const;
  public:
   CGOutputFormatter(TokenIOStream& s, bool f): OutputFormatter(s,f) {}
   
   std::vector<std::string> process_finals(const LookupPathSet& finals,
-                                          CapitalizationState state) const;
+                                          CapitalizationState caps) const;
   void print_word(const TokenVector& surface_form, 
                   std::vector<std::string> const &analyzed_forms) const;
   void print_unknown_word(const TokenVector& surface_form) const;
