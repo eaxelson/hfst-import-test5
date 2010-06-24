@@ -24,6 +24,7 @@ class Applicator
 class TokenizationApplicator: public Applicator
 {
  private:
+  std::string process_token(const Token& t) const;
  public:
   TokenizationApplicator(const AbstractTransducer& t, TokenIOStream& ts): Applicator(t,ts) {}
   void apply();

@@ -130,6 +130,25 @@ struct Token
   static Token as_character(char c) {Token t; t.set_character(c); return t;}
   static Token as_superblank(unsigned int i) {Token t; t.set_superblank(i); return t;}
   static Token as_reservedcharacter(char c) {Token t; t.set_reservedcharacter(c); return t;}
+  
+  bool operator<(const Token& rhs) const
+  {
+    if(type != rhs.type)
+      return type < rhs.type;
+    switch(type)
+    {
+      case Symbol:
+        return symbol < rhs.symbol;
+      case Character:
+      case ReservedCharacter:
+        return strcmp(character, rhs.character) < 0;
+      case Superblank:
+        return superblank_index < rhs.superblank_index;
+      case None:
+      default:
+        return false;
+    }
+  }
 };
 
 /**
