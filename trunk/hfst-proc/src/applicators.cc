@@ -90,7 +90,7 @@ AnalysisApplicator::apply()
     if(next_token.type == ReservedCharacter)
       stream_error(std::string("Found unexpected character ")+next_token.character+" unescaped in stream");
     
-  	if(state.is_final())
+  	if(surface_form.size() > 0 && state.is_final())
   	{
   	  LookupPathSet finals = state.get_finals_set();
   	  analyzed_forms = formatter.process_finals(finals, 
