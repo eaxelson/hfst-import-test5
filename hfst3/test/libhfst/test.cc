@@ -121,6 +121,38 @@ void test_extract_strings( HfstTransducer &t )
 
 int main(int argc, char **argv) {
 
+  {
+    HfstTransducer anon1(3,4,TROPICAL_OFST_TYPE);
+    HfstTransducer anon2(4,1,TROPICAL_OFST_TYPE);
+    anon1.disjunct(anon2);
+    anon1.minimize();
+    std::cerr << anon1 << "\n";
+  }
+
+  {
+    HfstTransducer anon1(3,4,LOG_OFST_TYPE);
+    HfstTransducer anon2(4,1,LOG_OFST_TYPE);
+    anon1.disjunct(anon2);
+    anon1.minimize();
+    std::cerr << anon1 << "\n";
+  }
+
+  {
+    HfstTransducer anon1(3,4,SFST_TYPE);
+    HfstTransducer anon2(4,1,SFST_TYPE);
+    anon1.disjunct(anon2);
+    anon1.minimize();
+    std::cerr << anon1 << "\n";
+  }
+
+  {
+    HfstTransducer anon1(3,4,FOMA_TYPE);
+    HfstTransducer anon2(4,1,FOMA_TYPE);
+    anon1.disjunct(anon2);
+    anon1.minimize();
+    std::cerr << anon1 << "\n";
+  }
+
   // HfstTransducer two_level_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet, ImplementationType type);
 
   ImplementationType types [] = {SFST_TYPE, TROPICAL_OFST_TYPE, FOMA_TYPE};
@@ -639,6 +671,7 @@ int main(int argc, char **argv) {
       //printf("* tested\n");
 
   }
+
   return 0;
 
 #endif

@@ -8,6 +8,7 @@ namespace hfst
   hfst::implementations::LogWeightTransducer
   HfstTransducer::log_ofst_interface;
   hfst::implementations::FomaTransducer HfstTransducer::foma_interface;
+
   
   HfstTransitionIterator::HfstTransitionIterator(const HfstMutableTransducer &t, HfstState s):
     tropical_ofst_iterator(hfst::implementations::TropicalWeightTransitionIterator(t.transducer.implementation.tropical_ofst, s)) {}
@@ -76,6 +77,11 @@ namespace hfst
       {
 	throw hfst::exceptions::TransducerHasWrongTypeException();
       }
+
+    if (this->anonymous && another.anonymous) {
+      printf("no need to harmonize\n");
+      return;
+    }
 
     switch(this->type)
       {
@@ -188,7 +194,8 @@ namespace hfst
     delete spv;
   }
 
-  HfstTransducer::HfstTransducer(const StringPairSet & sps, ImplementationType type)
+  HfstTransducer::HfstTransducer(const StringPairSet & sps, ImplementationType type):
+    type(type),anonymous(false),is_trie(false)
   {
     switch (type)
       {
@@ -294,6 +301,7 @@ namespace hfst
   }
   
 
+
   HfstTransducer::~HfstTransducer(void)
   {
     switch (type)
@@ -314,6 +322,68 @@ namespace hfst
       case ERROR_TYPE:
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
+      }
+  }
+
+HfstTransducer::HfstTransducer(unsigned int number, ImplementationType type): 
+type(type),anonymous(true),is_trie(false)
+  {
+    switch (this->type)
+      {
+      case SFST_TYPE:
+	implementation.sfst = sfst_interface.define_transducer(number);
+	break;
+      case TROPICAL_OFST_TYPE:
+      case UNSPECIFIED_TYPE:
+	implementation.tropical_ofst = tropical_ofst_interface.define_transducer(number);
+	this->type = TROPICAL_OFST_TYPE;
+	break;
+      case LOG_OFST_TYPE:
+	implementation.log_ofst = log_ofst_interface.define_transducer(number);
+	break;
+      case FOMA_TYPE:
+	{
+	  char buf [255];
+	  sprintf(buf, "\\%i", number);
+	  implementation.foma = foma_interface.define_transducer(buf);
+	  break;
+	}
+      case ERROR_TYPE:
+      default:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+	break;
+      }
+  }
+
+HfstTransducer::HfstTransducer(unsigned int inumber, unsigned int onumber, ImplementationType type):
+type(type),anonymous(true),is_trie(false)
+  {
+    switch (this->type)
+      {
+      case SFST_TYPE:
+	implementation.sfst = sfst_interface.define_transducer(inumber, onumber);
+	break;
+      case TROPICAL_OFST_TYPE:
+      case UNSPECIFIED_TYPE:
+	implementation.tropical_ofst = tropical_ofst_interface.define_transducer(inumber, onumber);
+	this->type = TROPICAL_OFST_TYPE;
+	break;
+      case LOG_OFST_TYPE:
+	implementation.log_ofst = log_ofst_interface.define_transducer(inumber, onumber);
+	break;
+      case FOMA_TYPE:
+	{
+	  char ibuf [255];
+	  sprintf(ibuf, "\\%i", inumber);
+	  char obuf [255];
+	  sprintf(obuf, "\\%i", onumber);
+	  implementation.foma = foma_interface.define_transducer( ibuf, obuf );
+	  break;
+	}
+      case ERROR_TYPE:
+      default:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+	break;
       }
   }
 
@@ -344,6 +414,7 @@ type(type),anonymous(false),is_trie(false)
 	break;
       }
   }
+
 HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type):
 type(type),anonymous(false),is_trie(false)
   {
@@ -975,16 +1046,24 @@ void HfstTransducer::write_in_att_format(const char * filename)
   if (ofile == NULL)
     throw hfst::exceptions::FileNotReadableException();
   HfstTransducer conv = convert(*this, TROPICAL_OFST_TYPE);
-  this->tropical_ofst_interface.write_in_att_format
-    (conv.implementation.tropical_ofst, ofile);
+  if (this->anonymous)
+    this->tropical_ofst_interface.write_in_att_format_number
+      (conv.implementation.tropical_ofst, ofile);
+  else
+    this->tropical_ofst_interface.write_in_att_format
+      (conv.implementation.tropical_ofst, ofile);
   fclose(ofile);
 }
 
 void HfstTransducer::write_in_att_format(FILE * ofile)
 {
   HfstTransducer conv = convert(*this, TROPICAL_OFST_TYPE);
-  this->tropical_ofst_interface.write_in_att_format
-    (conv.implementation.tropical_ofst, ofile);
+  if (this->anonymous)
+    this->tropical_ofst_interface.write_in_att_format_number
+      (conv.implementation.tropical_ofst, ofile);
+  else
+    this->tropical_ofst_interface.write_in_att_format
+      (conv.implementation.tropical_ofst, ofile);
 }
 
 HfstTransducer &HfstTransducer::read_in_att_format(const char * filename, ImplementationType type)
@@ -1077,7 +1156,10 @@ std::ostream &operator<<(std::ostream &out,HfstTransducer &t)
   {
     HfstTransducer tc(t);
     tc.convert(TROPICAL_OFST_TYPE);
-    tc.tropical_ofst_interface.write_in_att_format(tc.implementation.tropical_ofst, out);
+    if (t.anonymous)
+      tc.tropical_ofst_interface.write_in_att_format_number(tc.implementation.tropical_ofst, out);
+    else
+      tc.tropical_ofst_interface.write_in_att_format(tc.implementation.tropical_ofst, out);
     return out;
   }
 

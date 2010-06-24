@@ -161,7 +161,11 @@ namespace hfst { namespace implementations
     public:
       static LogFst * create_empty_transducer(void);
       static LogFst * create_epsilon_transducer(void);
-      static LogFst * define_transducer(unsigned int k);
+      //static LogFst * define_transducer(unsigned int k);
+
+      static LogFst * define_transducer(unsigned int number);
+      static LogFst * define_transducer(unsigned int inumber, unsigned int onumber);
+
       static LogFst * define_transducer(const std::string& symbol);
       static LogFst * define_transducer(const std::string& isymbol, const std::string& osymbol);
       //static LogFst * define_transducer(const pair<unsigned int, unsigned int> &kp);

@@ -55,6 +55,10 @@ namespace hfst { namespace implementations
     public:
       static Transducer * create_empty_transducer(void);
       static Transducer * create_epsilon_transducer(void);
+
+      static Transducer * define_transducer(unsigned int number);
+      static Transducer * define_transducer(unsigned int inumber, unsigned int onumber);
+
       static Transducer * define_transducer(const char *symbol);
       static Transducer * define_transducer(const char *isymbol, const char *osymbol);
       static Transducer * define_transducer(const StringPairVector &spv);

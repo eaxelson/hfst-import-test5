@@ -113,6 +113,11 @@ namespace implementations
       static StdVectorFst * create_epsilon_transducer(void);
       static StdVectorFst * define_transducer(const std::string &symbol);
       static StdVectorFst * define_transducer(const std::string &isymbol, const std::string &osymbol);
+
+      /* TEST */
+      static StdVectorFst * define_transducer(unsigned int number);
+      static StdVectorFst * define_transducer(unsigned int inumber, unsigned int onumber);
+
       static StdVectorFst * define_transducer(const hfst::StringPairVector &spv);
       static StdVectorFst * define_transducer(const hfst::StringPairSet &sps);
       static StdVectorFst * copy(StdVectorFst * t);
@@ -153,6 +158,8 @@ namespace implementations
       static void test_minimize(void);
 
       static void write_in_att_format(StdVectorFst * t, std::ostream &os);
+      static void write_in_att_format_number(StdVectorFst * t, std::ostream &os);
+
       static StdVectorFst * read_in_att_format(FILE *ifile);
       static bool are_equivalent(StdVectorFst *one, StdVectorFst *another);
 
