@@ -675,6 +675,7 @@ static void conjoin_nodes( Node *n1, Node *n2, Node *node,
 Transducer &Transducer::operator&( Transducer &a )
 
 {
+
   Transducer *tmp1=NULL;
   Transducer *tmp2=NULL;
   Node *r1, *r2;

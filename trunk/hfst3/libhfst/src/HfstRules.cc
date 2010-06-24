@@ -143,11 +143,12 @@ namespace hfst
       // calculate [ .* - a:b ]
       HfstTransducer neg_mappings(alphabet, type);
       neg_mappings.repeat_star();
+
       HfstTransducer mappings_tr(mappings, type);
       neg_mappings.subtract(mappings_tr);
 
       // center == [ a:. & !a:b ]
-      center.intersect(neg_mappings);
+      center.intersect(neg_mappings);  // ERROR
 
       // left context == [ .* l ]
       HfstTransducer left_context(alphabet, type);

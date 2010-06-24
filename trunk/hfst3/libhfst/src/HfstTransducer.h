@@ -336,6 +336,12 @@ namespace hfst
     /** \brief Create a transducer that recognizes the string pair [isymbol:osymbol]. The type of the transducer is defined by \a type. **/
     HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type);
 
+
+    /* TEST */
+    HfstTransducer(unsigned int number, ImplementationType type);
+    HfstTransducer(unsigned int inumber, unsigned int onumber, ImplementationType type);
+
+
     /** \brief Whether transducers \a tr1 and \a tr2 are equivalent.
 
 	Two transducers are equivalent iff they accept the same input/output string pairs with the same weights. **/

@@ -208,7 +208,7 @@ namespace hfst { namespace implementations
 	      target = 0;
 	    else
 	      target = (int)arc.nextstate;
-	    fprintf(ofile, "%i\t%i\t%i\t%i\t%f\n", origin, target,
+	    fprintf(ofile, "%i\t%i\t\\%i\t\\%i\t%f\n", origin, target,
 		    arc.ilabel, arc.olabel,
 		    arc.weight.Value());
 	  }
@@ -240,7 +240,7 @@ namespace hfst { namespace implementations
 		target = 0;
 	      else
 		target = (int)arc.nextstate;
-	      fprintf(ofile, "%i\t%i\t%i\t%i\t%f\n", origin, target,
+	      fprintf(ofile, "%i\t%i\t\\%i\t\\%i\t%f\n", origin, target,
 		      arc.ilabel, arc.olabel,
 		      arc.weight.Value());
 	    }
@@ -327,6 +327,92 @@ namespace hfst { namespace implementations
 		 << target << "\t"
 		 << sym->Find(arc.ilabel).c_str() << "\t"
 		 << sym->Find(arc.olabel).c_str() << "\t"
+		 << arc.weight.Value() << "\n";
+	    }
+	  if (t->Final(s) != TropicalWeight::Zero())
+	    os << origin << "\t"
+	       << t->Final(s).Value() << "\n";
+	}
+      }
+  }
+
+
+  void TropicalWeightTransducer::write_in_att_format_number(StdVectorFst *t, std::ostream &os)
+  {
+
+    SymbolTable *sym = t->InputSymbols();
+
+    // this takes care that initial state is always printed as number zero
+    // and state number zero (if it is not initial) is printed as another number
+    // (basically as the number of the initial state in that case, i.e.
+    // the numbers of initial state and state number zero are swapped)
+    StateId zero_print=0;
+    StateId initial_state = t->Start();
+    if (initial_state != 0) {
+      zero_print = initial_state;
+    }
+      
+    for (fst::StateIterator<StdVectorFst> siter(*t); 
+	 not siter.Done(); siter.Next()) 
+      {
+	StateId s = siter.Value();
+	if (s == initial_state) {
+	int origin;  // how origin state is printed, see the first comment
+	if (s == 0)
+	  origin = zero_print;
+	else if (s == initial_state)
+	  origin = 0;
+	else
+	  origin = (int)s;
+	for (fst::ArcIterator<StdVectorFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+	  {
+	    const StdArc &arc = aiter.Value();
+	    int target;  // how target state is printed, see the first comment
+	    if (arc.nextstate == 0)
+	      target = zero_print;
+	    else if (arc.nextstate == initial_state)
+	      target = 0;
+	    else
+	      target = (int)arc.nextstate;
+	    os << origin << "\t" 
+	       << target << "\t" 
+	       << "\\" << arc.ilabel << "\t"
+	       << "\\" << arc.olabel << "\t" 
+	       << arc.weight.Value() << "\n";
+	  }
+	if (t->Final(s) != TropicalWeight::Zero())
+	  os << origin << "\t"
+	     << t->Final(s).Value() << "\n";
+	break;
+	}
+      }
+
+    for (fst::StateIterator<StdVectorFst> siter(*t); 
+	 not siter.Done(); siter.Next())
+      {
+	StateId s = siter.Value();
+	if (s != initial_state) {
+	  int origin;  // how origin state is printed, see the first comment
+	  if (s == 0)
+	    origin = zero_print;
+	  else if (s == initial_state)
+	    origin = 0;
+	  else
+	    origin = (int)s;
+	  for (fst::ArcIterator<StdVectorFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+	    {
+	      const StdArc &arc = aiter.Value();
+	      int target;  // how target state is printed, see the first comment
+	      if (arc.nextstate == 0)
+		target = zero_print;
+	      else if (arc.nextstate == initial_state)
+		target = 0;
+	      else
+		target = (int)arc.nextstate;
+	      os << origin << "\t" 
+		 << target << "\t"
+		 << "\\" << arc.ilabel << "\t"
+		 << "\\" << arc.olabel << "\t"
 		 << arc.weight.Value() << "\n";
 	    }
 	  if (t->Final(s) != TropicalWeight::Zero())
@@ -543,7 +629,7 @@ namespace hfst { namespace implementations
     return result;
   }
 
-  std::pair<StdVectorFst*, StdVectorFst*> TropicalWeightTransducer::harmonize 
+  std::pair<StdVectorFst*, StdVectorFst*> TropicalWeightTransducer::harmonize
   (StdVectorFst *t1, StdVectorFst *t2)
   {
 
@@ -1082,6 +1168,32 @@ namespace hfst { namespace implementations
     t->AddArc(s1,StdArc(key_pair.first,key_pair.second,0,s2));
     return t;
     }*/
+
+
+  StdVectorFst * TropicalWeightTransducer::define_transducer(unsigned int number)
+  {
+    StdVectorFst * t = new StdVectorFst;
+    initialize_symbol_tables(t);
+    StateId s1 = t->AddState();
+    StateId s2 = t->AddState();
+    t->SetStart(s1);
+    t->SetFinal(s2,0);
+    t->AddArc(s1,StdArc(number,number,0,s2));
+    return t;
+  }
+  StdVectorFst * TropicalWeightTransducer::define_transducer
+    (unsigned int inumber, unsigned int onumber)
+  {
+    StdVectorFst * t = new StdVectorFst;
+    initialize_symbol_tables(t);
+    StateId s1 = t->AddState();
+    StateId s2 = t->AddState();
+    t->SetStart(s1);
+    t->SetFinal(s2,0);
+    t->AddArc(s1,StdArc(inumber,onumber,0,s2));
+    return t;
+  }
+
 
   StdVectorFst * TropicalWeightTransducer::define_transducer(const std::string &symbol)
   {

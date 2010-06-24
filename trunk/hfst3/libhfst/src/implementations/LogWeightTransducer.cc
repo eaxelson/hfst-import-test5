@@ -541,6 +541,32 @@ namespace hfst { namespace implementations
     return t;
   }
 
+  LogFst * LogWeightTransducer::define_transducer(unsigned int number)
+  {
+    LogFst * t = new LogFst;
+    initialize_symbol_tables(t);
+    StateId s1 = t->AddState();
+    StateId s2 = t->AddState();
+    t->SetStart(s1);
+    t->SetFinal(s2,0);
+    t->AddArc(s1,LogArc(number,
+			number,0,s2));
+    return t;
+  }
+  LogFst * LogWeightTransducer::define_transducer
+  (unsigned int inumber, unsigned int onumber)
+  {
+    LogFst * t = new LogFst;
+    initialize_symbol_tables(t);
+    StateId s1 = t->AddState();
+    StateId s2 = t->AddState();
+    t->SetStart(s1);
+    t->SetFinal(s2,0);
+    t->AddArc(s1,LogArc(inumber,
+			onumber,0,s2));
+    return t;
+  }
+
   fst::SymbolTable * LogWeightTransducer::create_symbol_table(std::string name) {
     fst::SymbolTable * st = new fst::SymbolTable(name);
     st->AddSymbol("@_EPSILON_SYMBOL_@", 0);

@@ -572,6 +572,22 @@ namespace hfst { namespace implementations {
     return t; }
     */
   
+  Transducer * SfstTransducer::define_transducer(unsigned int number)
+  { Transducer * t = new Transducer; 
+    Node * n = t->new_node();
+    t->root_node()->add_arc(Label(number),n,t);
+    n->set_final(1);
+    return t; }
+  
+    Transducer * SfstTransducer::define_transducer(unsigned int inumber, unsigned int onumber)
+  { Transducer * t = new Transducer;
+    Node * n = t->new_node();
+    t->root_node()->add_arc(Label(inumber, 
+				  onumber),n,t);
+    n->set_final(1);
+    return t; }
+
+
   Transducer * SfstTransducer::define_transducer(const char *symbol)
   { Transducer * t = new Transducer; 
     Node * n = t->new_node();
