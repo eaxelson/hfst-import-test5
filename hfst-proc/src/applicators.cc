@@ -1,47 +1,64 @@
+#include <sstream>
 #include "applicators.h"
 #include "lookup-state.h"
 #include "formatter.h"
 
 //////////Function definitions for TokenizationApplicator
 
+std::string
+TokenizationApplicator::process_token(const Token& t) const
+{
+  std::ostringstream s;
+  if(t.type == Symbol)
+    s << "Symbol:        #" << t.symbol << "(" << transducer.get_alphabet().symbol_to_string(t.symbol) << ")";
+  else if(t.type == Character)
+    s << "Character:     '" << t.character << "'" << (token_stream.is_space(t)?" (space)":"");
+  else if(t.type == Superblank)
+    s << "Superblank:    " << token_stream.get_superblank(t.superblank_index);
+  else if(t.type == ReservedCharacter)
+    s << "Reserved char: '" << t.character << "'";
+  else if(t.type == None)
+    s << "None/EOF";
+  
+  s << " (to_symbol: " << token_stream.to_symbol(t) << ")" 
+    << " (alphabetic: " << token_stream.is_alphabetic(t) << ")";
+  if(t.type == Symbol)
+  {
+    SymbolNumber symb=t.symbol;
+    s << " (";
+    if(transducer.get_alphabet().is_lower(symb))
+    {
+      SymbolNumber s2 = transducer.get_alphabet().to_upper(symb);
+      s << "lowercase, upper: " << s2 << "/" << transducer.get_alphabet().symbol_to_string(s2);
+    }
+    else if(transducer.get_alphabet().is_upper(symb))
+    {
+      SymbolNumber s2 = transducer.get_alphabet().to_lower(symb);
+      s << "uppercase, lower: " << s2 << "/" << transducer.get_alphabet().symbol_to_string(s2);
+    }
+    else
+      s << "no case";
+    s << ")";
+  }
+  return s.str();
+}
+
 void
 TokenizationApplicator::apply()
 {
   Token next_token;
+  std::set<Token> alltokens;
   while((next_token=token_stream.get_token()).type != None)
   {
-    if(next_token.type == Symbol)
-      std::cout << "Symbol:        #" << next_token.symbol << "(" << transducer.get_alphabet().symbol_to_string(next_token.symbol) << ")";
-    else if(next_token.type == Character)
-      std::cout << "Character:     '" << next_token.character << "'" << (token_stream.is_space(next_token)?" (space)":"");
-    else if(next_token.type == Superblank)
-      std::cout << "Superblank:    " << token_stream.get_superblank(next_token.superblank_index);
-    else if(next_token.type == ReservedCharacter)
-      std::cout << "Reserved char: '" << next_token.character << "'";
-    else if(next_token.type == None)
-      std::cout << "None/EOF";
-    
-    std::cout << " (to_symbol: " << token_stream.to_symbol(next_token) << ")" 
-              << " (alphabetic: " << token_stream.is_alphabetic(next_token) << ")";
-    if(next_token.type == Symbol)
-    {
-      SymbolNumber s=next_token.symbol;
-      std::cout << " (";
-      if(transducer.get_alphabet().is_lower(s))
-      {
-        SymbolNumber s2 = transducer.get_alphabet().to_upper(s);
-        std::cout << "lowercase, upper: " << s2 << "/" << transducer.get_alphabet().symbol_to_string(s2);
-      }
-      else if(transducer.get_alphabet().is_upper(s))
-      {
-        SymbolNumber s2 = transducer.get_alphabet().to_lower(s);
-        std::cout << "uppercase, lower: " << s2 << "/" << transducer.get_alphabet().symbol_to_string(s2);
-      }
-      else
-        std::cout << "no case";
-      std::cout << ")";
-    }
-    std::cout << std::endl;
+    std::cout << process_token(next_token) << std::endl;
+    if(printDebuggingInformationFlag)
+      alltokens.insert(next_token);
+  }
+  if(printDebuggingInformationFlag)
+  {
+    std::cout << "Set of tokens:" << std::endl;
+    for(std::set<Token>::const_iterator it=alltokens.begin(); it!=alltokens.end(); it++)
+      std::cout << process_token(*it) << std::endl;
   }
 }
 
