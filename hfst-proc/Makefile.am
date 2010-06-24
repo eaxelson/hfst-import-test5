@@ -2,7 +2,9 @@ SUBDIRS = src test
 
 EXTRA_DIST = \
 	transducers \
-	transducers/sami.hfst.ol \
+	transducers/sme-nob.automorf.hfst.ol \
+	transducers/capitalization-test.hfst.ol \
+	transducers/capitalization-test-gen.hfst.ol \
 	transducers/COPYING
 
 # the following is done because distcheck doesn't know anything about
