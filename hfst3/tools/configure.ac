@@ -95,9 +95,9 @@ AC_ARG_ENABLE([format],
 AM_CONDITIONAL([WANT_FORMAT], [test x$enable_format != xno])
 AC_ARG_ENABLE([fst2fst],
 			  [AS_HELP_STRING([--enable-fst2fst],
-							  [build fst2fst tool @<:@default=no@:>@])],
+							  [build fst2fst tool @<:@default=yes@:>@])],
 			  [enable_fst2fst=$enableval],
-			  [enable_fst2fst=no])
+			  [enable_fst2fst=yes])
 AM_CONDITIONAL([WANT_FST2FST], [test x$enable_fst2fst != xno])
 AC_ARG_ENABLE([fst2pairstrings],
 			  [AS_HELP_STRING([--enable-fst2pairstrings],
