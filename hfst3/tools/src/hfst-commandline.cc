@@ -15,10 +15,10 @@
 #include <cstdlib>
 #include <cstdio>
 #include <cstring>
+#include <cassert>
 #include <errno.h>
 
 #include "hfst-commandline.h"
-#include <hfst2/hfst.h>
 
 // defaults
 bool weighted = true;
