@@ -46,6 +46,9 @@ namespace hfst { namespace implementations
     bool operator() (void) const;
     //LogFst * read_transducer(KeyTable &key_table);
     LogFst * read_transducer(bool has_header);
+    
+    static bool is_fst(FILE * f);
+    static bool is_fst(istream &s);
   };
 
   class LogWeightOutputStream 

@@ -65,16 +65,24 @@ namespace hfst { namespace implementations {
   {
     return not is_bad();
   };
-
+  
   bool FomaInputStream::is_fst(void)
   {
-    if (not is_good())
+    return is_fst(input_file);
+  }
+  
+  bool FomaInputStream::is_fst(FILE * f)
+  {
+    if (f == NULL)
       { return false; }
-    std::fpos_t position;
-    std::fgetpos(input_file,&position);
-    int sign = fgetc(input_file);
-    std::fsetpos(input_file,&position);
-    return sign == (int)'a';
+    int c = getc(f);
+    ungetc(c, f);
+    return c == 31;
+  }
+  
+  bool FomaInputStream::is_fst(std::istream &s)
+  {
+    return s.good() && (s.peek() == 31);
   }
 
   /* Skip the identifier string "FOMA_TYPE" */

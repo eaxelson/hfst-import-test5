@@ -43,6 +43,9 @@ namespace implementations
     bool is_fst(void) const;
     bool operator() (void) const;
     StdVectorFst * read_transducer(bool has_header);
+    
+    static bool is_fst(FILE * f);
+    static bool is_fst(istream &s);
   };
 
   class TropicalWeightOutputStream 

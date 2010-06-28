@@ -104,22 +104,24 @@ namespace hfst { namespace implementations
     else
       { return input_stream.good(); }
   }
-
+  
   bool LogWeightInputStream::is_fst(void) const
   {
-    if (not is_good())
+    return is_fst(input_stream);
+  }
+  
+  bool LogWeightInputStream::is_fst(FILE * f)
+  {
+    if (f == NULL)
       { return false; }
-    if (filename == string())
-      {
-	if (std::cin.peek() == -42)
-	  { return true; }
-      }
-    else
-      {
-	if (input_stream.peek() == -42)
-	  { return true; }
-      }
-    return false;
+    int c = getc(f);
+    ungetc(c, f);
+    return c == -42;
+  }
+  
+  bool LogWeightInputStream::is_fst(istream &s)
+  {
+    return s.good() && (s.peek() == -42);
   }
 
   bool LogWeightInputStream::operator() (void) const
