@@ -38,10 +38,10 @@ INSTALL_DIR = install -d -m 755
 DESTDIR =
 PREFIX = /usr/local/
 
-PROGRAMS = fst-compiler$(EXE) fst-infl$(EXE) fst-generate$(EXE) fst-print$(EXE)\
+PROGRAMS = fst-compiler$(EXE) hfst-compiler$(EXE) fst-infl$(EXE) fst-generate$(EXE) fst-print$(EXE)\
 	fst-compare$(EXE) fst-compact$(EXE) fst-infl2$(EXE) fst-lowmem$(EXE)\
 	fst-infl3$(EXE) fst-lattice$(EXE) fst-match$(EXE) fst-parse$(EXE)\
-	fst-parse2$(EXE) fst-train$(EXE) fst-compiler-utf8$(EXE) fst-mor$(EXE) \
+	fst-parse2$(EXE) fst-train$(EXE) fst-compiler-utf8$(EXE) hfst-compiler-utf8$(EXE) fst-mor$(EXE) \
 	fst-text2bin$(EXE)
 
 ALLPROGRAMS = $(PROGRAMS)
@@ -68,8 +68,16 @@ fst-train$(EXE): compact.o
 
 fst-compiler$(EXE): $(OBJ) compact.o make-compact.o interface.o default-scanner.o
 
+# added
+hfst-compiler$(EXE): $(OBJ) compact.o make-compact.o interface.o default-scanner.o ../../../
+
 fst-compiler-utf8$(EXE): $(OBJ) compact.o make-compact.o interface.o \
 	utf8-scanner.o fst-compiler.o
+	$(CXX) -o $@ $^ $(LDFLAGS)
+
+# added
+hfst-compiler-utf8$(EXE): $(OBJ) compact.o make-compact.o interface.o \
+	utf8-scanner.o hfst-compiler.o
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
 fst-mor$(EXE): $(OBJ) fst-mor.o
@@ -97,6 +105,12 @@ fst-compiler.C: fst.h compact.h make-compact.h interface.h fst-compiler.yy
 	bison -d -o $@ fst-compiler.yy
 	if [ -f fst-compiler.C.h ]; then mv fst-compiler.C.h fst-compiler.h; fi
 	if [ -f fst-compiler.H ]; then mv fst-compiler.H fst-compiler.h; fi
+
+# added
+hfst-compiler.C: fst.h compact.h make-compact.h interface.h fst-compiler.yy
+	bison -d -o $@ hfst-compiler.yy
+	if [ -f hfst-compiler.C.h ]; then mv hfst-compiler.C.h hfst-compiler.h; fi
+	if [ -f hfst-compiler.H ]; then mv hfst-compiler.H hfst-compiler.h; fi
 
 default-scanner.C: fst.h interface.h scanner.ll fst-compiler.C default-scanner.ll
 	flex -o$@ default-scanner.ll
@@ -145,6 +159,11 @@ fst-compact.o: make-compact.h fst.h alphabet.h basic.h sgi.h mem.h compact.h
 fst-compare.o: fst.h alphabet.h basic.h sgi.h mem.h
 fst-compiler.o: make-compact.h fst.h alphabet.h basic.h sgi.h mem.h compact.h
 fst-compiler.o: interface.h utf8.h
+
+# added
+hfst-compiler.o: make-compact.h fst.h alphabet.h basic.h sgi.h mem.h compact.h
+hfst-compiler.o: interface.h utf8.h
+
 fst-generate.o: fst.h alphabet.h basic.h sgi.h mem.h
 fst-infl.o: fst.h alphabet.h basic.h sgi.h mem.h
 fst-infl2-daemon.o: Socket.h compact.h alphabet.h basic.h sgi.h

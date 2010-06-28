@@ -8,6 +8,7 @@
 #include "implementations/HfstTokenizer.h"
 #include "implementations/ConvertTransducerFormat.h"
 #include "implementations/HfstExceptions.h"
+#include "implementations/SFST/src/interface.h"
 #include <string>
 #include <cassert>
 #include <iostream>
@@ -865,6 +866,17 @@ void print(HfstMutableTransducer &t)
     HfstTransducer deep_restriction(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
     HfstTransducer deep_coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
     HfstTransducer deep_restriction_and_coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+  }
+
+  namespace compiler
+  {
+    typedef ::SFST::Range Range;
+    typedef ::SFST::Ranges Ranges;
+
+    HfstTransducer * new_transducer( Range *r1, Range *r2, ImplementationType type );
+    HfstTransducer * make_mapping( Ranges *list1, Ranges *list2, ImplementationType type );
+    HfstTransducer * result( HfstTransducer *tr, bool Switch, ImplementationType type );
+    void def_alphabet( HfstTransducer *tr );
   }
 
 }

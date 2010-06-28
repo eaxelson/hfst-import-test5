@@ -10,10 +10,10 @@
 
 #include <stdio.h>
 
-
-//#include "make-compact.h"
-using namespace hfst;
-//#include "interface.h"
+#include "../../../HfstTransducer.h"
+#include "make-compact.h"
+using namespace SFST;
+#include "interface.h"
 using namespace SFST;
 using std::cerr;
 
@@ -26,24 +26,26 @@ void warn2(char *text, char *text2);
 int yylex( void );
 int yyparse( void );
 
+hfst::ImplementationType type= hfst::SFST_TYPE;
+
 static int Switch=0;
-HfstTransducer Result;
+hfst::HfstTransducer * Result;
 %}
 
 /* Slight Hfst addition SFST::... */
 %union {
   int        number;
-  SFST::Twol_Type  type;
-  SFST::Repl_Type  rtype;
+  Twol_Type  type;
+  Repl_Type  rtype;
   char       *name;
   char       *value;
   unsigned char uchar;
   unsigned int  longchar;
-  SFST::Character  character;
-  hfst::HfstTransducer   expression;
-  SFST::Range      *range;
-  SFST::Ranges     *ranges;
-  hfst::HfstTransducerPairSet   contexts;
+  Character  character;
+  hfst::HfstTransducer   *expression;
+  Range      *range;
+  Ranges     *ranges;
+  Contexts   *contexts;
 }
 
 %token <number> NEWLINE ALPHA COMPOSE PRINT POS INSERT SWITCH
@@ -72,7 +74,7 @@ HfstTransducer Result;
 %left '*' '+'
 %%
 
-ALL:        ASSIGNMENTS RE NEWLINES { Result=result($2, Switch); }
+ALL:        ASSIGNMENTS RE NEWLINES { Result=hfst::compiler::result($2, Switch, type); }
           ;
 
 ASSIGNMENTS: ASSIGNMENTS ASSIGNMENT {}
@@ -80,49 +82,49 @@ ASSIGNMENTS: ASSIGNMENTS ASSIGNMENT {}
           | /* nothing */           {}
           ;
 
-ASSIGNMENT: VAR '=' RE              { if (def_var($1,$3)) warn2("assignment of empty transducer to",$1); }
-          | RVAR '=' RE             { if (def_rvar($1,$3)) warn2("assignment of empty transducer to",$1); }
-          | SVAR '=' VALUES         { if (def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
-          | RSVAR '=' VALUES        { if (def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
-          | RE PRINT STRING         { write_to_file($1, $3); }
-          | ALPHA RE                { def_alphabet($2); }
+ASSIGNMENT: // VAR '=' RE              { if (def_var($1,$3)) warn2("assignment of empty transducer to",$1); }
+          // | RVAR '=' RE             { if (def_rvar($1,$3)) warn2("assignment of empty transducer to",$1); }
+          // | SVAR '=' VALUES         { if (def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
+          // | RSVAR '=' VALUES        { if (def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
+          // | RE PRINT STRING         { write_to_file($1, $3); }
+          ALPHA RE                { hfst::compiler::def_alphabet($2); }
           ;
 
 RE:       //   RE ARROW CONTEXTS2      { $$ = restriction($1,$2,$3,0); }
 	  // | RE '^' ARROW CONTEXTS2  { $$ = restriction($1,$3,$4,1); }
 	  // | RE '_' ARROW CONTEXTS2  { $$ = restriction($1,$3,$4,-1); }
-            RE REPLACE CONTEXT2     { $$ = replace_in_context(minimise(explode($1)),$2,$3,false); }
-          | RE REPLACE '?' CONTEXT2 { $$ = replace_in_context(minimise(explode($1)),$2,$4,true);}
-          | RE REPLACE '(' ')'      { $$ = replace(minimise(explode($1)), $2, false); }
-          | RE REPLACE '?' '(' ')'  { $$ = replace(minimise(explode($1)), $2, true); }
-          | RE RANGE ARROW RANGE RE { $$ = make_rule($1,$2,$3,$4,$5); }
-          | RE RANGE ARROW RANGE    { $$ = make_rule($1,$2,$3,$4,NULL); }
-          | RANGE ARROW RANGE RE    { $$ = make_rule(NULL,$1,$2,$3,$4); }
-          | RANGE ARROW RANGE       { $$ = make_rule(NULL,$1,$2,$3,NULL); }
-          | RE COMPOSE RE    { $$ = composition($1, $3); }
-          | '{' RANGES '}' ':' '{' RANGES '}' { $$ = make_mapping($2,$6); }
-          | RANGE ':' '{' RANGES '}' { $$ = make_mapping(add_range($1,NULL),$4); }
-          | '{' RANGES '}' ':' RANGE { $$ = make_mapping($2,add_range($5,NULL)); }
-          | RE INSERT CODE ':' CODE  { $$ = freely_insert($1, $3, $5); }
-          | RE INSERT CODE           { $$ = freely_insert($1, $3, $3); }
-          | RANGE ':' RANGE  { $$ = new_transducer($1,$3); }
-          | RANGE            { $$ = new_transducer($1,$1); }
-          | VAR              { $$ = var_value($1); }
-          | RVAR             { $$ = rvar_value($1); }
-          | RE '*'           { $$ = repeat_star($1); }
-          | RE '+'           { $$ = repeat_plus($1); }
-          | RE '?'           { $$ = optionalize($1); }
-          | RE RE %prec SEQ  { $$ = concatenate($1, $2); delete $2; }
-          | '!' RE           { $$ = negation($2); }
-          | SWITCH RE        { $$ = invert($2); }
-          | '^' RE           { $$ = x_project($2); }
-          | '_' RE           { $$ = x_project($2); }
-          | RE '&' RE        { $$ = conjunct($1, $3); delete $3; }
-          | RE '-' RE        { $$ = subtract($1, $3); delete $3; }
-          | RE '|' RE        { $$ = disjunct($1, $3); delete $3; }
-          | '(' RE ')'       { $$ = $2; }
-          | STRING           { $$ = read_words($1); }
-          | STRING2          { $$ = read_transducer($1); }
+          // | RE REPLACE CONTEXT2     { $$ = replace_in_context(minimise(explode($1)),$2,$3,false); }
+          // | RE REPLACE '?' CONTEXT2 { $$ = replace_in_context(minimise(explode($1)),$2,$4,true);}
+          // | RE REPLACE '(' ')'      { $$ = replace(minimise(explode($1)), $2, false); }
+          // | RE REPLACE '?' '(' ')'  { $$ = replace(minimise(explode($1)), $2, true); }
+          // | RE RANGE ARROW RANGE RE { $$ = make_rule($1,$2,$3,$4,$5); }
+          // | RE RANGE ARROW RANGE    { $$ = make_rule($1,$2,$3,$4,NULL); }
+          // | RANGE ARROW RANGE RE    { $$ = make_rule(NULL,$1,$2,$3,$4); }
+          // | RANGE ARROW RANGE       { $$ = make_rule(NULL,$1,$2,$3,NULL); }
+          // | RE COMPOSE RE    { $$ = composition($1, $3); }
+          '{' RANGES '}' ':' '{' RANGES '}' { $$ = hfst::compiler::make_mapping($2,$6,type); }
+          | RANGE ':' '{' RANGES '}' { $$ = hfst::compiler::make_mapping(add_range($1,NULL),$4,type); }
+          | '{' RANGES '}' ':' RANGE { $$ = hfst::compiler::make_mapping($2,add_range($5,NULL),type); }
+          // | RE INSERT CODE ':' CODE  { $$ = freely_insert($1, $3, $5); }
+          // | RE INSERT CODE           { $$ = freely_insert($1, $3, $3); }
+          | RANGE ':' RANGE  { $$ = hfst::compiler::new_transducer($1,$3,type); }
+          | RANGE            { $$ = hfst::compiler::new_transducer($1,$1,type); }
+          // | VAR              { $$ = var_value($1); }
+          // | RVAR             { $$ = rvar_value($1); }
+          // | RE '*'           { $$ = repeat_star($1); }
+          // | RE '+'           { $$ = repeat_plus($1); }
+          // | RE '?'           { $$ = optionalize($1); }
+          // | RE RE %prec SEQ  { $$ = concatenate($1, $2); delete $2; }
+          // | '!' RE           { $$ = negation($2); }
+          // | SWITCH RE        { $$ = invert($2); }
+          // | '^' RE           { $$ = x_project($2); }
+          // | '_' RE           { $$ = x_project($2); }
+          // | RE '&' RE        { $$ = conjunct($1, $3); delete $3; }
+          // | RE '-' RE        { $$ = subtract($1, $3); delete $3; }
+          // | RE '|' RE        { $$ = disjunct($1, $3); delete $3; }
+          // | '(' RE ')'       { $$ = $2; }
+          // | STRING           { $$ = read_words($1); }
+          // | STRING2          { $$ = read_transducer($1); }
           ;
 
 RANGES:     RANGE RANGES     { $$ = add_range($1,$2); }
@@ -148,7 +150,7 @@ CONTEXT2:   CONTEXT                { $$ = $1; }
           | '(' CONTEXT ')'        { $$ = $2; }
           ;
 
-CONTEXT :   RE POS RE              { $$ = HfstTransducerPair($1, $3); }
+CONTEXT :   RE POS RE              { $$ = make_context($1, $3); }
           |    POS RE              { $$ = make_context(NULL, $2); }  // check
           | RE POS                 { $$ = make_context($1, NULL); }  // check
           ;
@@ -158,7 +160,7 @@ VALUES:     VALUE VALUES           { $$=append_values($1,$2); }
           ;
 
 VALUE:      LCHAR '-' LCHAR	   { $$=add_values($1,$3,NULL); }
-          | SVAR                   { $$=svar_value($1); }
+          // | SVAR                   { $$=svar_value($1); }
           | LCHAR  	           { $$=add_value(character_code($1),NULL); }
           | CODE		   { $$=add_value($1,NULL); }
 	  | SCHAR		   { $$=add_value($1,NULL); }
@@ -307,29 +309,29 @@ int main( int argc, char *argv[] )
     exit(1);
   }
   FileName = argv[1];
-  Result = NULL;
+  //Result = NULL;
   TheAlphabet.utf8 = UTF8;
   yyin = file;
   try {
     yyparse();
-    Result->alphabet.utf8 = UTF8;
-    if (Verbose)
-      cerr << "\n";
-    if (Result->is_empty()) 
-      warn("resulting transducer is empty"); 
+    //Result->alphabet.utf8 = UTF8;
+    //if (Verbose)
+    //  cerr << "\n";
+    //if (Result->is_empty()) 
+    //  warn("resulting transducer is empty"); 
     if ((file = fopen(argv[2],"wb")) == NULL) {
 	fprintf(stderr,"\nError: Cannot open output file %s\n\n", argv[2]);
 	exit(1);
     }
-    if (Compact) {
-      MakeCompactTransducer ca(*Result);
-      delete Result;
-      ca.store(file);
-    }
-    else if (LowMem)
-      Result->store_lowmem(file);
+    //if (Compact) {
+    //  MakeCompactTransducer ca(*Result);
+    //  delete Result;
+    //  ca.store(file);
+    //}
+    //else if (LowMem)
+    //  Result->store_lowmem(file);
     else
-      Result->store(file);
+      Result->write_in_att_format(file);
     fclose(file);
   }
   catch(const char* p) {

@@ -35,6 +35,10 @@ AC_PROG_AWK
 AC_PROG_CC
 AC_PROG_CPP
 
+# added
+AC_PROG_YACC
+AM_PROG_LEX
+
 # libhfst's SFST part
 AC_LANG_PUSH([C++])
 AC_CHECK_HEADERS([backward/hash_set ext/hash_set hash_set])
