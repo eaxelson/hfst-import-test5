@@ -114,6 +114,7 @@ namespace hfst
     ImplementationType stream_fst_type(const char *filename);
     int read_library_header(std::istream &in);
     ImplementationType read_version_3_0_fst_type(std::istream &in);
+    ImplementationType guess_fst_type(std::istream &in);
   public:
 
     /** \brief Create a stream to standard in for reading binary transducers. */

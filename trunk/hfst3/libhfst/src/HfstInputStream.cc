@@ -34,6 +34,19 @@ namespace hfst
       }
   }
 
+  ImplementationType HfstInputStream::guess_fst_type(std::istream &in)
+  {
+    if (hfst::implementations::SfstInputStream::is_fst(in))
+      { return SFST_TYPE; }
+    if (hfst::implementations::FomaInputStream::is_fst(in))
+      { return FOMA_TYPE; }
+    if (hfst::implementations::TropicalWeightInputStream::is_fst(in))
+      { return TROPICAL_OFST_TYPE; }
+    if (hfst::implementations::LogWeightInputStream::is_fst(in))
+      { return LOG_OFST_TYPE; }
+    return ERROR_TYPE;
+  }
+  
   ImplementationType HfstInputStream::read_version_3_0_fst_type
   (std::istream &in) 
   {
@@ -55,17 +68,20 @@ namespace hfst
   /* Returns 0 on HFST3 type. */
   int HfstInputStream::read_library_header(std::istream &in) 
   {
-    char id[6];
-    in.getline(id,6,0);
-    if (strcmp(id,"HFST3") != 0)
-      { return -1; }
-    if (in.eof())
-      { return -1; }
-    //char c;
-    //in.get(c);
-    //if (1 != in.gcount())
-    //  { return -1; }
-    //return c;
+    const char *id = "HFST3";
+    
+    for (int i=0; i<6; i++) {
+      int c = in.get();
+      if(c != id[i]) { /* No match */
+        in.putback(c);
+        if(i > 0) {
+          for(int j=i-1; j>=0; j--) {
+            in.putback(id[j]);
+          }
+        }
+        return -1;
+      }
+    }
     return 0;
   }
 
@@ -82,20 +98,26 @@ namespace hfst
     if (not in->good())
       { throw hfst::implementations::FileNotReadableException(); }
     int library_version;
-    if (-1 == (library_version = read_library_header(*in)))
-      { fprintf(stderr, "stream_fst_type: returning ERROR_TYPE (1)\n");
-	return ERROR_TYPE; }    
-    switch (library_version)
+    if (0 == (library_version = read_library_header(*in))) {
+      switch (library_version)
       {
       case 0:
-	return read_version_3_0_fst_type(*in);
-	break;
+        return read_version_3_0_fst_type(*in);
+        break;
       default:
-	fprintf(stderr, "stream_fst_type: returning ERROR_TYPE (2)\n");
-	return ERROR_TYPE;
-	break;
+        fprintf(stderr, "stream_fst_type: returning ERROR_TYPE (1)\n");
+        return ERROR_TYPE;
+        break;
       }
-    return ERROR_TYPE;
+    }
+    else { /* No HFST3 header on the file */
+      has_header = false;
+      ImplementationType type = guess_fst_type(*in);
+      if (type == ERROR_TYPE) {
+        fprintf(stderr, "stream_fst_type: returning ERROR_TYPE (2)\n");
+      }
+      return type;
+    }
   }
 
   /* Open a transducer stream to stdout.
