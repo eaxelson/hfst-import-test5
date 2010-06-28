@@ -273,6 +273,7 @@ concatenate_streams(const char* leftfilename, const char* rightfilename,
                 leftfilename, rightfilename);
       }
     HfstOutputStream outstream(outfilename, leftType);
+    outstream.open();
     size_t transducer_n = 0;
     while (bothInputs) {
         transducer_n++;
