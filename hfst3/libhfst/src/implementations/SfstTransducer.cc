@@ -64,13 +64,21 @@ namespace hfst { namespace implementations {
 
   bool SfstInputStream::is_fst(void)
   {
-    if (not is_good())
+    return is_fst(input_file);
+  }
+  
+  bool SfstInputStream::is_fst(FILE * f)
+  {
+    if (f == NULL)
       { return false; }
-    std::fpos_t position;
-    std::fgetpos(input_file,&position);
-    int sign = fgetc(input_file);
-    std::fsetpos(input_file,&position);
-    return sign == (int)'a';
+    int c = getc(f);
+    ungetc(c, f);
+    return c == (int)'a';
+  }
+  
+  bool SfstInputStream::is_fst(std::istream &s)
+  {
+    return s.good() && (s.peek() == (int)'a');
   }
 
   void SfstInputStream::add_symbol(StringNumberMap &string_number_map,

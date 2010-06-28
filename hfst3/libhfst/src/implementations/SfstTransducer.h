@@ -34,6 +34,9 @@ namespace hfst { namespace implementations
     bool is_good(void);
     bool is_fst(void);
     Transducer * read_transducer(bool has_header);
+    
+    static bool is_fst(FILE * f);
+    static bool is_fst(std::istream &s);
   };
 
   class SfstOutputStream 
