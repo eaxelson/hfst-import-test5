@@ -77,12 +77,13 @@ namespace hfst { namespace implementations {
       { return false; }
     int c = getc(f);
     ungetc(c, f);
-    return c == 31;
+    return c == 31 || c == (int)'#';
   }
   
   bool FomaInputStream::is_fst(std::istream &s)
   {
-    return s.good() && (s.peek() == 31);
+    int c = s.peek();
+    return s.good() && (c == 31 || c == (int)'#');
   }
 
   /* Skip the identifier string "FOMA_TYPE" */
