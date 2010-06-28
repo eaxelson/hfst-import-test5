@@ -32,26 +32,25 @@
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
-#include <hfst2/hfst.h>
+#include "HfstTransducer.h"
 
 #include "hfst-common-unary-variables.h"
 
+using hfst::HfstTransducer;
+using hfst::HfstInputStream;
+using hfst::HfstOutputStream;
+using hfst::ImplementationType;
+
 // tool-specific variables
 
-// compatibility
-static bool to_sfst=false;
-static bool to_openfst=false;
-
-// weightedness
-static bool unweighted=false;
-static bool weighteD=false;
+ImplementationType output_type = hfst::UNSPECIFIED_TYPE;
 
 void
 print_usage(const char *program_name)
 {
 	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
 	fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
-		"Convert transducers between SFST, OpenFst and HFST formats\n"
+		"Convert transducers between SFST, OpenFst and foma formats\n"
 		"\n", program_name);
 
 	print_common_program_options(message_out);
@@ -62,20 +61,12 @@ print_usage(const char *program_name)
 #               endif
 	print_common_unary_program_options(message_out);
 	// fprintf(message_out, (tool-specific options and short descriptions)
-	fprintf(message_out, "%-35s%s", "  -u, --unweighted",        "Write the output in unweighted HFST format\n");
-	fprintf(message_out, "%-35s%s", "  -w, --weighted",          "Write the output in weighted HFST format\n");
-	fprintf(message_out, "%-35s%s", "  -f, --format=FORMAT", "Write the output in format FORMAT\n");
+	fprintf(message_out, "%-35s%s", "  -S, --sfst",           "Write the output for HFST's SFST implementation\n");
+	fprintf(message_out, "%-35s%s", "  -f, --foma",           "Write the output in HFST's foma implementation\n");
+	fprintf(message_out, "%-35s%s", "  -t, --tropical-weight","Write the output in HFST's tropical weight (OpenFST) implementation\n");
+	fprintf(message_out, "%-35s%s", "  -l, --log-weight",     "Write the output in HFST's log weight (OpenFST) implementation\n");
 	fprintf(message_out, "\n");
 	print_common_unary_program_parameter_instructions(message_out);
-	fprintf(message_out,
-		"\nFORMAT is one of {sfst, openfst}\n");
-	/*
-		"\n"
-		"If the input transducer is converted to OpenFst format, the symbol table is copied\n"
-		"to input symbol table of the OpenFst transducer and vice versa (unless option -D is used).\n"
-		"If the input transducer is converted to SFST format, a symbol table is always written\n"
-		"with the SFST transducer, even if it is empty (i.e. option -D has no effect).\n"
-		"\n");*/
 	fprintf(stderr, "\n");
 	print_more_info(message_out, "Fst2Fst");
 	fprintf(stderr, "\n");
@@ -108,14 +99,15 @@ parse_options(int argc, char** argv)
 #include "hfst-common-unary-options.h"
 		  ,
 		  // add tool-specific options here 
-			{"unweighted", no_argument, 0, 'u'},
-			{"weighted", no_argument, 0, 'w'},
-			{"format", required_argument, 0, 'f'},
+		  {"sfst",            no_argument, 0, 'S'},
+		  {"foma",            no_argument, 0, 'f'},
+		  {"tropical-weight", no_argument, 0, 't'},
+		  {"log-weight",      no_argument, 0, 'l'},
 			{0,0,0,0}
 		};
 		int option_index = 0;
 		// add tool-specific options here 
-		char c = getopt_long(argc, argv, "dhi:o:sqvVR:DW:f:wu",
+		char c = getopt_long(argc, argv, "dhi:o:sqvVR:DW:Sftl",
 							 long_options, &option_index);
 		if (-1 == c)
 		{
@@ -129,28 +121,18 @@ parse_options(int argc, char** argv)
 #include "hfst-common-cases.h"
 #include "hfst-common-unary-cases.h"
 		  // add tool-specific cases here
-		case 'u':
-		        unweighted=true;
-			break;
-		case 'w':
-		        weighteD=true;
-			break;
+		case 'S':
+		  output_type = hfst::SFST_TYPE;
+		  break;
 		case 'f':
-			format = hfst_strdup(optarg);
-			if ( (strncasecmp(format, "sfst", 1) == 0))
-			  to_sfst=true;
-			else if ( (strncasecmp(format, "openfst", 1) == 0))
-			  to_openfst=true;
-			else
-			{
-			  fprintf(message_out, "unknown conversion format %s\n" \
-				  "should be one of {sfst, openfst}\n",	\
-				  format);
-			  print_short_help(argv[0]);
-			  return EXIT_FAILURE;
-			}
-			free(format);
-			break;
+		  output_type = hfst::FOMA_TYPE;
+		  break;
+		case 't':
+		  output_type = hfst::TROPICAL_OFST_TYPE;
+		  break;
+		case 'l':
+		  output_type = hfst::LOG_OFST_TYPE;
+		  break;
 		case '?':
 			fprintf(message_out, "invalid option --%s\n",
 					long_options[option_index].name);
@@ -163,16 +145,13 @@ parse_options(int argc, char** argv)
 			return EXIT_FAILURE;
 			break;
 		}
-		if (unweighted && weighteD) {
-		  fprintf(message_out, "incompatible options -u and -w\n");
-		  print_short_help(argv[0]);
-		  return EXIT_FAILURE;
-		}
-		if ((unweighted || weighteD) && (to_sfst || to_openfst)) {
-		  fprintf(stderr, "warning: options -u and -w have no effect when used with option -c\n");
-		  //print_short_help(argv[0]);
-		  //return EXIT_FAILURE;
-		}
+	}
+	
+	if(output_type == hfst::UNSPECIFIED_TYPE)
+	{
+		fprintf(message_out, "You must specify an output type (one of -S, -f, -t, or -l)\n");
+		print_short_help(argv[0]);
+		return EXIT_FAILURE;
 	}
 
 	if (is_output_stdout)
@@ -219,212 +198,39 @@ parse_options(int argc, char** argv)
 }
 
 int
-process_stream(std::istream& inputstream, std::ostream& outstream)
+process_stream(const char* infilename, const char* outfilename)
 {
-	VERBOSE_PRINT("Checking formats of transducers\n");
-	int format_type = HFST::read_format(inputstream);
-    
-	if (format_type == SFST_FORMAT)
+	HfstInputStream in(infilename);
+	in.open();
+  
+	HfstOutputStream out(outfilename, output_type);
+	out.open();
+	
+	size_t transducer_n = 0;
+	while(in.is_good())
 	{
-	        VERBOSE_PRINT("Reading unweighted format\n");
+		transducer_n++;
+		if(transducer_n == 1)
+		{ VERBOSE_PRINT("Reading transducer from %s...\n", infilename); }
+		else
+		{ VERBOSE_PRINT("Reading transducer from %s...%d\n", infilename, transducer_n); }
+		
 		try {
-		  
-		  HFST::KeyTable *key_table;
-		  if (read_symbols_from_filename != NULL) {
-		    ifstream is(read_symbols_from_filename);
-		    key_table = HFST::read_symbol_table(is);
-		    is.close();
-		  }
-		  else
-		    key_table = HFST::create_key_table();
-		  bool transducer_has_symbol_table=false;
-			HFST::TransducerHandle input = NULL;
-			while (true) {
-				int inputformat = HFST::read_format(inputstream);
-				if (inputformat == EOF_FORMAT)
-				{
-					break;
-				}
-				else if (inputformat == SFST_FORMAT)
-				{
-				        transducer_has_symbol_table = HFST::has_symbol_table(inputstream);
-					input = HFST::read_transducer(inputstream, key_table);
-				}
-				else
-				{
-					fprintf(message_out, "stream format mismatch\n");
-					return EXIT_FAILURE;
-				}
-
-
-				if (weighteD == false && to_openfst == false) {  // no need to convert to weighted format
-				  if (to_sfst) {
-				    VERBOSE_PRINT("Writing SFST transducer...\n");
-				  }
-				  else {
-				    VERBOSE_PRINT("Writing unweighted HFST transducer...\n");
-				  }
-
-				  HFST::TransducerHandle result = input;
-				  if (to_sfst)  // write a key table, even an empty one
-				    HFST::write_transducer(result, key_table, outstream, to_sfst);
-				  else {
-				    if (!write_symbols)
-				      HFST::write_transducer(result, outstream);
-				    else if (transducer_has_symbol_table || read_symbols_from_filename != NULL)
-				      HFST::write_transducer(result, key_table, outstream);
-				    else
-				      HFST::write_transducer(result, outstream);
-				  }
-				}
-				else {  // convert to weighted format
-				  if (to_openfst) {
-				    VERBOSE_PRINT("Writing OpenFst transducer...\n");
-				  }
-				  else {
-				    VERBOSE_PRINT("Writing weighted HFST transducer...\n");
-				  }
-				  
-				  const char *tempfilename="__TEMPORARY_FILE__";
-				  ofstream os(tempfilename);
-				  HFST::print_transducer_number(input, false, os);
-				  os.close();
-				  ifstream is(tempfilename);
-				  HWFST::TransducerHandle result = HWFST::read_transducer_number(is);
-				  is.close();
-				  remove(tempfilename);
-
-				  if (!write_symbols)
-				    HWFST::write_transducer(result, outstream, to_openfst);
-				  else if (transducer_has_symbol_table || read_symbols_from_filename != NULL)
-				    HWFST::write_transducer(result, key_table, outstream, to_openfst);
-				  else
-				    HWFST::write_transducer(result, outstream, to_openfst);
-				}
-				  
-
-			}
-			if (write_symbols_to_filename != NULL) {
-			  ofstream os(write_symbols_to_filename);
-			  HFST::write_symbol_table(key_table, os);
-			  os.close();
-			}
-			delete key_table;
+			HfstTransducer orig(in);
+			VERBOSE_PRINT("Converting...\n");
+			orig.convert(output_type);
+			VERBOSE_PRINT("Writing...\n");
+			out << orig;
 		}
 		catch (const char *p)
 		{
 			printf("HFST library error: %s\n", p);
 			return EXIT_FAILURE;
 		}
+		
+		in.close();
+		out.close();
 		return EXIT_SUCCESS;
-	}
-	else if (format_type == OPENFST_FORMAT) 
-	{
-		VERBOSE_PRINT("Reading weighted format\n");
-		try {
-		  HWFST::KeyTable *key_table;
-		  if (read_symbols_from_filename != NULL) {
-		    ifstream is(read_symbols_from_filename);
-		    key_table = HWFST::read_symbol_table(is);
-		    is.close();
-		  }
-		  else
-		    key_table = HWFST::create_key_table();
-		  bool transducer_has_symbol_table=false;
-			HWFST::TransducerHandle input = NULL;
-			while (true) 
-			{
-				int inputformat = HFST::read_format(inputstream);
-				if (inputformat == EOF_FORMAT)
-				{
-					break;
-				}
-				else if (inputformat == OPENFST_FORMAT)
-				{
-				        transducer_has_symbol_table = HWFST::has_symbol_table(inputstream);
-					input = HWFST::read_transducer(inputstream, key_table);
-				}
-				else {
-					fprintf(message_out, "stream format mismatch\n");
-					return EXIT_FAILURE;
-				}
-
-				if (!transducer_has_symbol_table) {
-				  // see if the OpenFst transducer has an input symbol table
-				  // and convert it to HWFST KeyTable
-				  if (HWFST::has_ofst_input_symbol_table(input)) {
-				    key_table = HWFST::to_hwfst_compatible_format(input);
-				    transducer_has_symbol_table=true;
-				  }
-				}
-				
-				if (unweighted == false && to_sfst == false) {  // no need to convert to unweighted format
-				  if (to_openfst) {
-				    VERBOSE_PRINT("Writing OpenFst transducer...\n");
-				  }
-				  else {
-				    VERBOSE_PRINT("Writing weighted HFST transducer...\n");
-				  }
-
-				  HWFST::TransducerHandle result = input;
-				  
-				  if (!write_symbols)
-				    HWFST::write_transducer(result, outstream, to_openfst);
-				  else if (transducer_has_symbol_table || read_symbols_from_filename != NULL)
-				    HWFST::write_transducer(result, key_table, outstream, to_openfst);
-				  else
-				    HWFST::write_transducer(result, outstream, to_openfst);
-				}
-
-				else {  // convert to unweighted format
-				  if (to_sfst) {
-				    VERBOSE_PRINT("Writing SFST transducer...\n");
-				  }
-				  else {
-				    VERBOSE_PRINT("Writing unweighted HFST transducer...\n");
-				  }
-
-				  const char *tempfilename="__TEMPORARY_FILE__";
-				  
-				  ofstream os(tempfilename);
-				  HWFST::print_transducer_number(input, false, os);
-				  os.close();
-				  ifstream is(tempfilename);
-				  HFST::TransducerHandle result = HFST::read_transducer_number(is);
-				  is.close();
-				  remove(tempfilename);
-
-				  if (to_sfst)  // write a key table, even an empty one
-				    HFST::write_transducer(result, key_table, outstream, to_sfst);
-				  else {
-				    if (!write_symbols)
-				      HFST::write_transducer(result, outstream);
-				    else if (transducer_has_symbol_table || read_symbols_from_filename != NULL)
-				      HFST::write_transducer(result, key_table, outstream);
-				    else
-				      HFST::write_transducer(result, outstream);
-				  }
-
-				}
-				
-			}
-			if (write_symbols_to_filename != NULL) {
-			  ofstream os(write_symbols_to_filename);
-			  HWFST::write_symbol_table(key_table, os);
-			  os.close();
-			}
-			delete key_table;
-		}
-		catch (const char *p) {
-			fprintf(message_out, "HFST lib error: %s\n", p);
-			return 1;
-		}
-		return EXIT_SUCCESS;
-	}
-	else
-	{
-		fprintf(message_out, "ERROR: Transducer has wrong type.\n");
-		return EXIT_FAILURE;
 	}
 }
 
@@ -451,39 +257,14 @@ int main( int argc, char **argv ) {
 	// here starts the buffer handling part
 	if (!is_input_stdin)
 	{
-		std::filebuf fbinput;
-		fbinput.open(inputfilename, std::ios::in);
-		std::istream inputstream(&fbinput);
-		if (!is_output_stdout)
-		{
-			std::filebuf fbout;
-			fbout.open(outfilename, std::ios::out);
-			std::ostream outstream(&fbout);
-			retval = process_stream(inputstream, outstream);
-		}
-		else
-		{
-			retval = process_stream(inputstream, std::cout);
-		}
-		return retval;
+		retval = process_stream(inputfilename, outfilename);
 	}
 	else if (is_input_stdin)
 	{
-		if (!is_output_stdout)
-		{
-			std::filebuf fbout;
-			fbout.open(outfilename, std::ios::out);
-			std::ostream outstream(&fbout);
-			retval = process_stream(std::cin, outstream);
-		}
-		else
-		{
-			retval = process_stream(std::cin, std::cout);
-		}
-		return retval;
+		retval = process_stream(NULL, outfilename);
 	}
 	free(inputfilename);
 	free(outfilename);
-	return EXIT_SUCCESS;
+	return retval;
 }
 
