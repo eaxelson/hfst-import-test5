@@ -18,11 +18,13 @@
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
+#include <map>
 #include <string>
 #include <cassert>
 #include <cstdio>
 
 using std::string;
+using std::map;
 
 #include "../hfst.h"
 #include "w_letter-trie.h"
@@ -30,7 +32,7 @@ using std::string;
 
 namespace HWFST {
 
-LetterTrie* theMagicLetterTrie = NULL;
+map<KeyTable*, LetterTrie*> theMagicLetterTries;
 
 Key
 stringToKey(const string& s, KeyTable* kt, bool addUnknown)
@@ -56,9 +58,9 @@ stringUtf8ToKeyVector(const string& s, KeyTable* kt, bool addUnknown)
 	char* p = strdup(s.c_str());
 	char* p_start = p;
 	vector<Key>* keys = new vector<Key>;
-	if (theMagicLetterTrie == NULL)
+	if (theMagicLetterTries.find(kt) == theMagicLetterTries.end())
 	{
-		theMagicLetterTrie = new LetterTrie(kt);
+		LetterTrie* theMagicLetterTrie = new LetterTrie(kt);
 		KeySet* init_keys = get_key_set(kt);
 		for (KeySet::iterator k = init_keys->begin();
 			 k != init_keys->end(); ++k)
@@ -66,10 +68,11 @@ stringUtf8ToKeyVector(const string& s, KeyTable* kt, bool addUnknown)
 			theMagicLetterTrie->add_string(get_symbol_name(get_key_symbol(*k, kt)));
 		}
 		delete init_keys;
+        theMagicLetterTries[kt] = theMagicLetterTrie;
 	}
 	while (*p != '\0')
 	{
-		Key k = theMagicLetterTrie->find_key(&p, addUnknown);
+		Key k = theMagicLetterTries[kt]->find_key(&p, addUnknown);
 		keys->push_back(k);
 	}
 	free(p_start);
