@@ -125,9 +125,9 @@ AC_ARG_ENABLE([head],
 AM_CONDITIONAL([WANT_HEAD], [test x$enable_head != xno])
 AC_ARG_ENABLE([invert],
 			  [AS_HELP_STRING([--enable-invert],
-							  [build invert tool @<:@default=no@:>@])],
+							  [build invert tool @<:@default=yes@:>@])],
 			  [enable_invert=$enableval],
-			  [enable_invert=no])
+			  [enable_invert=yes])
 AM_CONDITIONAL([WANT_INVERT], [test x$enable_invert != xno])
 AC_ARG_ENABLE([lookup],
 			  [AS_HELP_STRING([--enable-lookup],

@@ -32,9 +32,14 @@
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
-#include <hfst2/hfst.h>
+#include "HfstTransducer.h"
 
 #include "hfst-common-unary-variables.h"
+
+using hfst::HfstTransducer;
+using hfst::HfstInputStream;
+using hfst::HfstOutputStream;
+
 // add tools-specific variables here
 
 void
@@ -161,129 +166,49 @@ parse_options(int argc, char** argv)
 }
 
 int
-process_stream(std::istream& inputstream, std::ostream& outstream)
+process_stream(const char* infilename, const char* outfilename)
 {
-	VERBOSE_PRINT("Checking formats of transducers\n");
-	int format_type = HFST::read_format(inputstream);
-    
-	if (format_type == SFST_FORMAT)
+	HfstInputStream in(infilename);
+	in.open();
+	bool status = in.is_good();
+	HfstTransducer* trans = new HfstTransducer(in);
+	if(trans->get_type() == hfst::ERROR_TYPE)
 	{
-		VERBOSE_PRINT("Using unweighted format\n");
+		fprintf(stderr, "Could not load transducer file %s\n", infilename);
+		return EXIT_FAILURE;
+	}
+	HfstOutputStream out(outfilename, trans->get_type());
+	out.open();
+	
+	size_t transducer_n=0;
+	while(status)
+	{
+		transducer_n++;
+		if(transducer_n==1)
+		{ VERBOSE_PRINT("Inverting transducer...\n"); }
+		else
+		{ VERBOSE_PRINT("Inverting transducer...%zu\n",transducer_n); }
+		
 		try {
-		  
-		  HFST::KeyTable *key_table;
-		  if (read_symbols_from_filename != NULL) {
-		    ifstream is(read_symbols_from_filename);
-		    key_table = HFST::read_symbol_table(is);
-		    is.close();
-		  }
-		  else
-		    key_table = HFST::create_key_table();
-		  bool transducer_has_symbol_table=false;
-			HFST::TransducerHandle input = NULL;
-			while (true) {
-				int inputformat = HFST::read_format(inputstream);
-				if (inputformat == EOF_FORMAT)
-				{
-					break;
-				}
-				else if (inputformat == SFST_FORMAT)
-				{
-				        transducer_has_symbol_table = HFST::has_symbol_table(inputstream);
-					input = HFST::read_transducer(inputstream, key_table);
-				}
-				else
-				{
-					fprintf(message_out, "stream format mismatch\n");
-					return EXIT_FAILURE;
-				}
-				VERBOSE_PRINT("Inverting...\n");
-				// add your code here
-
-				HFST::TransducerHandle result = HFST::invert(input);
-
-				if (!write_symbols)
-				  HFST::write_transducer(result, outstream);
-				else if (transducer_has_symbol_table || read_symbols_from_filename != NULL)
-				  HFST::write_transducer(result, key_table, outstream);
-				else
-				  HFST::write_transducer(result, outstream);
-
-			}
-			if (write_symbols_to_filename != NULL) {
-			  ofstream os(write_symbols_to_filename);
-			  HFST::write_symbol_table(key_table, os);
-			  os.close();
-			}
-			delete key_table;
+			out << trans->invert();
+			delete trans;
+			trans = NULL;
+			
+			status = in.is_good();
+			if(status)
+			{ trans = new HfstTransducer(in); }
 		}
 		catch (const char *p)
 		{
 			printf("HFST library error: %s\n", p);
 			return EXIT_FAILURE;
 		}
-		return EXIT_SUCCESS;
+		status = in.is_good();
 	}
-	else if (format_type == OPENFST_FORMAT) 
-	{
-		VERBOSE_PRINT("Using weighted format\n");
-		try {
-		  HWFST::KeyTable *key_table;
-		  if (read_symbols_from_filename != NULL) {
-		    ifstream is(read_symbols_from_filename);
-		    key_table = HWFST::read_symbol_table(is);
-		    is.close();
-		  }
-		  else
-		    key_table = HWFST::create_key_table();
-		  bool transducer_has_symbol_table=false;
-			HWFST::TransducerHandle input = NULL;
-			while (true) 
-			{
-				int inputformat = HFST::read_format(inputstream);
-				if (inputformat == EOF_FORMAT)
-				{
-					break;
-				}
-				else if (inputformat == OPENFST_FORMAT)
-				{
-				        transducer_has_symbol_table = HWFST::has_symbol_table(inputstream);
-					input = HWFST::read_transducer(inputstream, key_table);
-				}
-				else {
-					fprintf(message_out, "stream format mismatch\n");
-					return EXIT_FAILURE;
-				}
-				VERBOSE_PRINT("Inverting...\n");
-				// add your code here
-
-				HWFST::TransducerHandle result = HWFST::invert(input);
-
-				if (!write_symbols)
-				  HWFST::write_transducer(result, outstream);
-				else if (transducer_has_symbol_table || read_symbols_from_filename != NULL)
-				  HWFST::write_transducer(result, key_table, outstream);
-				else
-				  HWFST::write_transducer(result, outstream);
-			}
-			if (write_symbols_to_filename != NULL) {
-			  ofstream os(write_symbols_to_filename);
-			  HWFST::write_symbol_table(key_table, os);
-			  os.close();
-			}
-			delete key_table;
-		}
-		catch (const char *p) {
-			fprintf(message_out, "HFST lib error: %s\n", p);
-			return 1;
-		}
-		return EXIT_SUCCESS;
-	}
-	else
-	{
-		fprintf(message_out, "ERROR: Transducer has wrong type.\n");
-		return EXIT_FAILURE;
-	}
+	delete trans;
+	in.close();
+	out.close();
+	return EXIT_SUCCESS;
 }
 
 
@@ -309,36 +234,11 @@ int main( int argc, char **argv ) {
 	// here starts the buffer handling part
 	if (!is_input_stdin)
 	{
-		std::filebuf fbinput;
-		fbinput.open(inputfilename, std::ios::in);
-		std::istream inputstream(&fbinput);
-		if (!is_output_stdout)
-		{
-			std::filebuf fbout;
-			fbout.open(outfilename, std::ios::out);
-			std::ostream outstream(&fbout);
-			retval = process_stream(inputstream, outstream);
-		}
-		else
-		{
-			retval = process_stream(inputstream, std::cout);
-		}
-		return retval;
+		retval = process_stream(inputfilename, outfilename);
 	}
 	else if (is_input_stdin)
 	{
-		if (!is_output_stdout)
-		{
-			std::filebuf fbout;
-			fbout.open(outfilename, std::ios::out);
-			std::ostream outstream(&fbout);
-			retval = process_stream(std::cin, outstream);
-		}
-		else
-		{
-			retval = process_stream(std::cin, std::cout);
-		}
-		return retval;
+		retval = process_stream(NULL, outfilename);
 	}
 	free(inputfilename);
 	free(outfilename);
