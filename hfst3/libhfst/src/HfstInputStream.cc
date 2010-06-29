@@ -4,27 +4,24 @@ namespace hfst
 {
   void HfstInputStream::read_transducer(HfstTransducer &t)
   {
+    bool has_header = stream_has_headers && (!header_eaten);
     switch (type)
       {
       case SFST_TYPE:
 	t.implementation.sfst =
 	  this->implementation.sfst->read_transducer(has_header);
-	has_header=true;
 	break;
       case TROPICAL_OFST_TYPE:
 	t.implementation.tropical_ofst =
 	  this->implementation.tropical_ofst->read_transducer(has_header);
-	has_header=true;
 	break;
       case LOG_OFST_TYPE:
 	t.implementation.log_ofst =
 	  this->implementation.log_ofst->read_transducer(has_header);
-	has_header=true;
 	break;
       case FOMA_TYPE:
 	t.implementation.foma =
 	  this->implementation.foma->read_transducer(has_header);
-	has_header=true;
 	break;
 	  case ERROR_TYPE:
 	  case UNSPECIFIED_TYPE:
@@ -32,6 +29,7 @@ namespace hfst
 		throw hfst::exceptions::NotTransducerStreamException();
 		break;
       }
+    header_eaten = false;
   }
 
   ImplementationType HfstInputStream::guess_fst_type(std::istream &in)
@@ -95,10 +93,12 @@ namespace hfst
     }
     else
       in = &cin;
+    
     if (not in->good())
       { throw hfst::implementations::FileNotReadableException(); }
     int library_version;
     if (0 == (library_version = read_library_header(*in))) {
+      stream_has_headers = true;
       switch (library_version)
       {
       case 0:
@@ -111,7 +111,7 @@ namespace hfst
       }
     }
     else { /* No HFST3 header on the file */
-      has_header = false;
+      stream_has_headers = false;
       ImplementationType type = guess_fst_type(*in);
       if (type == ERROR_TYPE) {
         fprintf(stderr, "stream_fst_type: returning ERROR_TYPE (2)\n");
@@ -124,7 +124,7 @@ namespace hfst
      The implementation type of the stream is defined by 
      the type of the first transducer in the stream. */
   HfstInputStream::HfstInputStream(void):
-    has_header(false)
+    header_eaten(true)
   {
     try { type = stream_fst_type(""); }
     catch (hfst::implementations::FileNotReadableException e)
@@ -152,18 +152,11 @@ namespace hfst
   }
 
   HfstInputStream::HfstInputStream(const char* filename):
-    has_header(true)
+    header_eaten(false)
   {
-    try { 
-      //std::ifstream in(filename);
-      //type = stream_fst_type(in); 
-      type = stream_fst_type(filename); 
-    }
+    try { type = stream_fst_type(filename); }
     catch (hfst::implementations::FileNotReadableException e)
       { throw e; }
-
-    if (type == ERROR_TYPE)
-      { throw hfst::implementations::NotTransducerStreamException(); }
 
     switch (type)
     {
@@ -182,7 +175,7 @@ namespace hfst
       implementation.foma = new hfst::implementations::FomaInputStream(filename);
       break;
     default:
-      assert(false);
+      throw hfst::implementations::NotTransducerStreamException();
     }
   }
 
