@@ -1,4 +1,4 @@
-SUBDIRS = src test
+SUBDIRS = src test man
 
 EXTRA_DIST = \
 	transducers \
