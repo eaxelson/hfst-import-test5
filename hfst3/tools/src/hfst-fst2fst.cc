@@ -227,11 +227,10 @@ process_stream(const char* infilename, const char* outfilename)
 			printf("HFST library error: %s\n", p);
 			return EXIT_FAILURE;
 		}
-		
-		in.close();
-		out.close();
-		return EXIT_SUCCESS;
 	}
+	in.close();
+	out.close();
+	return EXIT_SUCCESS;
 }
 
 
