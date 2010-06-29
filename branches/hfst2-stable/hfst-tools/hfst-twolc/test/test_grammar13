@@ -1,9 +1,0 @@
-Alphabet
-
-	a a:b c ;
-
-Rules 
-
-"Rule1"
-a:b <=> a: _ ;
-

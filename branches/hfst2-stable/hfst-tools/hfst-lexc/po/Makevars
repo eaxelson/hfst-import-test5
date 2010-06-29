@@ -1,7 +1,0 @@
-DOMAIN = $(PACKAGE)
-subdir = po
-top_builddir = ..
-XGETTEXT_OPTIONS = --keyword=_ --keyword=N_ --flag=lexc_printf:3:c-format --flag=lexc_parser_printf:3:c-format --flag=lexc_list_printf:1:c-format
-COPYRIGHT_HOLDER = University of Helsinki
-MSGID_BUGS_ADDRESS = hfst-bugs@helsinki.fi
-EXTRA_LOCALE_CATEGORIES =
