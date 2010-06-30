@@ -119,13 +119,23 @@ UNI {U8H}|[\x21-\x7e]
     return SFX_FIRSTLINE;
 }
 
-^"PFX"{LWSP}+. {
-    yylval.string = strdup(yytext + 4);
+^"PFX"{LWSP}+{UNINR}+ {
+    char* s = yytext + 4;
+    while (isspace(*s))
+    {
+        s += 1;
+    }
+    yylval.string = strdup(s);
     return PFX_LEADER;
 }
 
-^"SFX"{LWSP}+. {
-    yylval.string = strdup(yytext + 4);
+^"SFX"{LWSP}+{UNINR}+. {
+    char* s = yytext + 4;
+    while (isspace(*s))
+    {
+        s += 1;
+    }
+    yylval.string = strdup(s);
     return SFX_LEADER;
 }
 
@@ -195,15 +205,9 @@ UNI {U8H}|[\x21-\x7e]
     printf("Skipped (known): %s\n", yytext);
 }
 
-"/"{NUMBER} {
-    char* end = yytext;
-    yylval.number = strtoul(yytext+1, &end, 10);
-    return CONTNUMBER;
-}
-
 "/"{UNINR}+ {
     yylval.string = strdup(yytext+1);
-    return CONTSTRING;
+    return CONT_THING;
 }
 
 "0" {
