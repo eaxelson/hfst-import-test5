@@ -331,6 +331,11 @@ namespace hfst
 	return false;
       }
   }
+  
+  ImplementationType HfstInputStream::get_type(void) const
+  {
+    return type;
+  }
 }
 
 #ifdef DEBUG_MAIN_STREAM
