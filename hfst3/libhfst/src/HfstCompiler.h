@@ -11,6 +11,13 @@ namespace SFST {
 //#include "utf8.h"
 //#include "fst.h"
 
+namespace SFST {
+  extern bool Verbose;
+  extern bool UTF8;
+  extern char *FileName;
+  extern SFST::Alphabet TheAlphabet;
+}
+
 namespace hfst
 {
   class HfstCompiler {
@@ -45,13 +52,6 @@ namespace hfst
       struct contexts_t *next;
     } Contexts;
 
-    /*
-    extern bool Verbose;
-    extern bool UTF8;
-    extern char *FileName;
-    extern SFST::Alphabet TheAlphabet;
-    */
-
   private:
     static HfstTransducer * make_transducer(Range *r1, Range *r2, ImplementationType type);
     
@@ -65,13 +65,15 @@ namespace hfst
     Range *svar_value( char *name );
     Range *complement_range( Range* );
     Range *rsvar_value( char *name );
-    Character character_code( unsigned int uc );
-    Character symbol_code( char *s );
-    
-    Range *add_value( Character, Range*);
+    static Character character_code( unsigned int uc );
+    static Character symbol_code( char *s );
+    static unsigned int utf8toint( char *s );
+    //static unsigned int utf8toint( char **s );
+
+    static Range *add_value( Character, Range*);
     Range *add_var_values( char *name, Range*);
-    Range *add_values( unsigned int, unsigned int, Range*);
-    Range *append_values( Range *r2, Range *r );
+    static Range *add_values( unsigned int, unsigned int, Range*);
+    static Range *append_values( Range *r2, Range *r );
     void add_alphabet( HfstTransducer* );  // ?
     
     // These functions delete their argument automata
