@@ -61,16 +61,9 @@ WSP [ \t\n\r]
     return WORD;
 }
 
-"/"{NUMBER} {
-    char* end = yytext;
-    yylval.number = strtoul(yytext+1, &end, 10);
-    assert ((end != yytext) && (*end == '\0'));
-    return CONTNUM;
-}
-
 "/"{UNINR}+ {
     yylval.string = strdup(yytext+1);
-    return CONTSTRING;
+    return CONT_THING;
 }
 
 "\t"{NUMBER} {

@@ -24,7 +24,8 @@ static FILE* tryfile = stdout;
 static FILE* keyfile = stdout;
 static FILE* twolsymfile = stdout;
 
-static char* flag_type;
+enum flagtypes {BYTE_FLAG, WORD_FLAG, UTF8_FLAG, NUM_FLAG, AF_FLAG} flagtype;
+bool has_afs = false;
 
 static char* compound_flag;
 static char* compound_begin;
@@ -43,8 +44,8 @@ static unsigned long rep_read = 0;
 static bool has_key = false;
 
 static bool lexicon_prefixes_written = false;
-static set<string> contexts_written;
-static set<string> lexicons_written;
+static set<long unsigned int> contexts_written;
+static set<long unsigned int> lexicons_written;
 static map<string,set<string> > deletion_contexts;
 static map<string,set<string> > lexicon_contexts;
 
@@ -91,6 +92,92 @@ gather_alphabet(const char* word)
 }
 
 static
+unsigned long
+parse_flag(char** flagstring, flagtypes flagtype)
+{
+    unsigned long flagnumber = 0;
+    switch (flagtype)
+    {
+    case BYTE_FLAG:
+        flagnumber = static_cast<unsigned int>(**flagstring);
+        *flagstring += 1;
+        break;
+    case WORD_FLAG:
+        memcpy(&flagnumber, *flagstring, 2);
+        *flagstring += 2;
+        break;
+    case UTF8_FLAG:
+      {
+        unsigned char c = static_cast<unsigned char>(**flagstring);
+        size_t u8len = 1;
+        if (c <= 127)
+          {
+            u8len = 1;
+          }
+        else if ((c & (128 + 64 + 32 + 16)) == (128 + 64 + 32 + 16))
+          { 
+            u8len = 4;
+          }
+        else if ((c & (128 + 64 + 32)) == (128 + 64 + 32))
+          {
+            u8len = 3;
+          }
+        else if ((c & (128 + 64)) == (128 + 64))
+          {
+            u8len = 2;
+          }
+        else
+          {
+            fprintf(stderr, "Suspicious UTF8 %s in parser?\n", *flagstring);
+          }
+        char* nextu8 = static_cast<char*>(calloc(sizeof(char), u8len+1));
+        memcpy(nextu8, *flagstring, u8len);
+        nextu8[u8len] = '\0';
+        memcpy(&flagnumber, nextu8, u8len);
+        *flagstring += u8len;
+        break;
+      }
+    case NUM_FLAG:
+      {
+        char* endptr = *flagstring;
+        flagnumber = strtoul(*flagstring, &endptr, 10);
+        if (*endptr == '\0')
+        {
+            *flagstring = endptr;
+        }
+        else if (*endptr == ',')
+        {
+            *flagstring = endptr+1;
+        }
+        else
+        {
+            fprintf(stderr, "Suspicious numstring %s in parser?\n", *flagstring);
+            *flagstring = endptr;
+        }
+        break;
+      }
+    case AF_FLAG:
+      {
+        char* endptr = *flagstring;
+        flagnumber = strtoul(*flagstring, &endptr, 10);
+        if (*endptr == '\0')
+        {
+            *flagstring = endptr;
+        }
+        else
+        {
+            fprintf(stderr, "Suspicious afstring %s in parser?\n", *flagstring);
+            *flagstring = endptr;
+        }
+        break;
+      }
+    default:
+        fprintf(stderr, "DATOISSA VIRHE END\n");
+        break;
+    }
+    return flagnumber;
+}
+static
 void
 handle_setline(const char* setname)
 {
@@ -105,11 +192,25 @@ static
 void
 handle_flagline(const char* flagname)
 {
-    if (strcmp(flagname, "num") == 0)
+    if (strcmp(flagname, "long") == 0)
     {
-        printf("FLAG %s may not work correctly\n", flagname);
+        printf("Parsing WORD FLAGS\n");
+        flagtype = WORD_FLAG;
     }
-    flag_type = strdup(flagname);
+    else if (strcmp(flagname, "UTF-8") == 0)
+    {
+        printf("Parsing UTF-8 FLAGS\n");
+        flagtype = UTF8_FLAG;
+    }
+    else if (strcmp(flagname, "num") == 0)
+    {
+        printf("Parsing NUM FLAGS\n");
+        flagtype = NUM_FLAG;
+    }
+    else
+    {
+        fprintf(stderr, "Unknown FLAG type %s\n", flagname);
+    }
 }
 
 static
@@ -156,6 +257,10 @@ handle_tryline(const char* tryset)
          s1 != ed_chars->end();
          ++s1)
     {
+        fprintf(tryfile, "%s:0\tHUNSPELL_error_return\t\"weight: 1000\"\t;\n",
+                s1->c_str());
+        fprintf(tryfile, "0:%s\tHUNSPELL_error_return\t\"weight: 1000\"\t;\n",
+                s1->c_str());
         for (set<string>::const_iterator s2 = ed_chars->begin();
              s2 != ed_chars->end();
              ++s2)
@@ -192,15 +297,15 @@ static
 void
 handle_af_data(const char* conts)
 {
-    const char* c = conts;
+    has_afs = true;
+    char* s = strdup(conts);
     static unsigned long af_count = 1;
     fprintf(lexcfile, "LEXICON HUNSPELL_AF_%ld\n", af_count);
     af_count++;
-    while (*c != '\0')
+    while (*s != '\0')
     {
-        unsigned int d = *c;
-        fprintf(lexcfile, "\tHUNSPELL_FLAG_%d\t;\n", d);
-        c++;
+        unsigned long d = parse_flag(&s, flagtype);
+        fprintf(lexcfile, "\tHUNSPELL_FLAG_%lu\t;\n", d);
     }
     fprintf(lexcfile, "\n");
     af_read++;
@@ -208,29 +313,28 @@ handle_af_data(const char* conts)
 
 static
 void
-write_prefix_lexicon_entry(const char* cont, const char* morph, const char* next_cont)
+write_prefix_lexicon_entry(unsigned long cont, const char* morph,
+                           unsigned long next_cont)
 {
     if (!lexicon_prefixes_written)
     {
         fprintf(lexcfile, "LEXICON HUNSPELL_pfx\n");
         lexicon_prefixes_written = true;
     }
-    unsigned short contbyte = static_cast<unsigned short>(*cont);
-    char* incoming_prefix_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@P.NEEDBYTE123456789.ON@0")));
-    char* need_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@P.NEEDBYTE123456789@0")));
+    char* incoming_prefix_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@P.NEEDFLAG123456789.ON@0")));
+    char* need_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@P.NEEDFLAG123456789@0")));
     char* deletion_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("{123456789%%<}0")));
-    sprintf(incoming_prefix_flag, "@P.NEEDBYTE%d.ON@", contbyte);
-    sprintf(need_flag, "@D.NEEDBYTE%d@", contbyte);
-    sprintf(deletion_context_tag, "{%d%%<}", contbyte);
+    sprintf(incoming_prefix_flag, "@P.NEEDFLAG%lu.ON@", cont);
+    sprintf(need_flag, "@D.NEEDFLAG%lu@", cont);
+    sprintf(deletion_context_tag, "{%lu%%<}", cont);
     sigma.insert(incoming_prefix_flag);
     sigma.insert(deletion_context_tag);
     sigma.insert(need_flag);
     needed_flags.insert(need_flag);
-    if (next_cont != NULL)
+    if (next_cont != 0)
     {
-        unsigned short nextcontbyte = static_cast<unsigned short>(*next_cont);
         char* outgoing_prefix_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@P.NEEDPREFIX123456789@0")));
-        sprintf(outgoing_prefix_flag, "@P.NEEDPREFIX%d@", nextcontbyte);
+        sprintf(outgoing_prefix_flag, "@P.NEEDPREFIX%lu@", next_cont);
         sigma.insert(outgoing_prefix_flag);
         fprintf(lexcfile, "%s%s%s%s\tHUNSPELL_pfx\t;\n",
                 morph, incoming_prefix_flag, outgoing_prefix_flag,
@@ -428,14 +532,13 @@ twolize_context(const char* context, bool in_removes = false)
 // [ADDED MORPH] [CONTEXT TAG] [LEFT CONTEXT] _ [RIGHT CONTEXT] ;
 static
 void
-save_prefix_deletion_contexts(const char* cont, const char* remove,
+save_prefix_deletion_contexts(unsigned long cont, const char* remove,
                               const char* morph, const char* match)
 {
-    unsigned short contbyte = static_cast<unsigned short>(*cont);
     char* deletion_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{123456789%%<%%}0")));
-    sprintf(deletion_context_tag, "%%{%d%%<%%}", contbyte);
+    sprintf(deletion_context_tag, "%%{%lu%%<%%}", cont);
     char* deleted_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{123456789%%<%%}:00")));
-    sprintf(deleted_context_tag, "%%{%d%%<%%}:0", contbyte);
+    sprintf(deleted_context_tag, "%%{%lu%%<%%}:0", cont);
     pi.insert(deleted_context_tag);
     char* twol_context_del = twolize_context(remove, true);
     char* twol_context_match = twolize_context(match);
@@ -501,24 +604,43 @@ void
 handle_pfx_line(const char* cont, 
                const char* remove, const char* add, const char* match)
 {
-    write_prefix_lexicon_entry(cont, add, NULL);
-    save_prefix_deletion_contexts(cont, remove, add, match);
+    char* s = strdup(cont);
+    unsigned long contnum = parse_flag(&s, flagtype);
+    if (*s != '\0')
+    {
+        fprintf(stderr, "Junk at end of flag %s using current flagtype\n",
+                cont);
+    }
+    write_prefix_lexicon_entry(contnum, add, 0);
+    save_prefix_deletion_contexts(contnum, remove, add, match);
     pfx_read++;
 }
 
 static
 void
-handle_pfx_line_with_conts(const char* cont, 
+handle_pfx_line_with_conts(const char* cont,
                const char* remove, const char* add, const char* conts,
                 const char* match)
 {
     // once without continuation
     handle_pfx_line(cont, remove, add, match);
     // once for each class
-    for (const char* c = conts; *c != '\0'; c++)
+    char* s = strdup(cont);
+    unsigned long contnum = parse_flag(&s, flagtype);
+    char *c = strdup(conts);
+    while (*c != '\0')
     {
-        write_prefix_lexicon_entry(cont, add, c);
-        save_prefix_deletion_contexts(cont, remove, add, match);
+        unsigned long nextcontnum = 0;
+        if (has_afs)
+        {
+            nextcontnum = parse_flag(&c, AF_FLAG);
+        }
+        else
+        {
+            nextcontnum = parse_flag(&c, flagtype);
+        }
+        write_prefix_lexicon_entry(contnum, add, nextcontnum);
+        save_prefix_deletion_contexts(contnum, remove, add, match);
     }
 }
 
@@ -531,7 +653,7 @@ handle_stringed_pfx_line(const char* cont,
     static bool warned = false;
     if (!warned)
     {
-        fprintf(stderr, "Extra string junk at end of line not supported: %s\n",
+        fprintf(stderr, "Morphology AM stuff not supported: %s\n",
                 extra);
         warned = true;
     }
@@ -547,7 +669,7 @@ handle_stringed_pfx_line_with_conts(const char* cont,
     static bool warned = false;
     if (!warned)
     {
-        fprintf(stderr, "Extra string junk at end of line not supported: %s\n",
+        fprintf(stderr, "Morphology AM stuff not supported: %s\n",
                 extra);
         warned = true;
     }
@@ -556,28 +678,27 @@ handle_stringed_pfx_line_with_conts(const char* cont,
 
 static
 void
-write_suffix_lexicon_entry(const char* cont, const char* morph, const char* nextcont)
+write_suffix_lexicon_entry(unsigned long cont, const char* morph,
+                           unsigned long nextcont)
 {
-    unsigned short contbyte = static_cast<unsigned short>(*cont);
     // if someone's jumping back and forth between PFX SFX PFX, rewrite LEXICON
     lexicon_prefixes_written = false;
     if (lexicons_written.find(cont) == lexicons_written.end())
     {
-        fprintf(lexcfile, "LEXICON HUNSPELL_FLAG_%d\n", cont[0]);
+        fprintf(lexcfile, "LEXICON HUNSPELL_FLAG_%lu\n", cont);
         lexicons_written.insert(cont);
     }
-    char* incoming_suffix_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@C.NEEDBYTE123456789@0")));
+    char* incoming_suffix_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@C.NEEDFLAG123456789@0")));
     char* deletion_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("{%%>123456789}0")));
-    sprintf(incoming_suffix_flag, "@C.NEEDBYTE%d@", contbyte);
-    sprintf(deletion_context_tag, "{%%>%d}", contbyte);
+    sprintf(incoming_suffix_flag, "@C.NEEDFLAG%lu@", cont);
+    sprintf(deletion_context_tag, "{%%>%lu}", cont);
     sigma.insert(incoming_suffix_flag);
     sigma.insert(deletion_context_tag);
-    if (nextcont != NULL)
+    if (nextcont != 0)
     {
-        unsigned short nextcontbyte = static_cast<unsigned short>(*nextcont);
-        fprintf(lexcfile, "%s%s\tHUNSPEL_FLAG_%d\t;\n",
+        fprintf(lexcfile, "%s%s\tHUNSPEL_FLAG_%lu\t;\n",
                 deletion_context_tag, morph,
-                nextcontbyte);
+                nextcont);
     }
     else
     {
@@ -590,14 +711,13 @@ write_suffix_lexicon_entry(const char* cont, const char* morph, const char* next
 // [LEFT CONTEXT] _ [RIGHT CONTEXT] [CONTEXT TAG] [ADDED MORPh] ;
 static
 void
-save_suffix_deletion_contexts(const char* cont, const char* remove,
+save_suffix_deletion_contexts(unsigned long cont, const char* remove,
                               const char* morph, const char* match)
 {
-    unsigned short contbyte = static_cast<unsigned short>(*cont);
     char* deletion_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{123456789%%>%%}0")));
-    sprintf(deletion_context_tag, "%%{%%>%d%%}", contbyte);
+    sprintf(deletion_context_tag, "%%{%%>%lu%%}", cont);
     char* deleted_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{123456789%%>%%}:00")));
-    sprintf(deleted_context_tag, "%%{%%>%d%%}:0", contbyte);
+    sprintf(deleted_context_tag, "%%{%%>%lu%%}:0", cont);
     pi.insert(deleted_context_tag);
     char* twol_context_del = twolize_context(remove, true);
     char* twol_context_match = twolize_context(match);
@@ -660,14 +780,13 @@ save_suffix_deletion_contexts(const char* cont, const char* remove,
 
 static
 void
-save_suffix_context(const char* cont, const char* remove,
+save_suffix_context(unsigned long cont, const char* remove,
                       const char* morph, const char* match)
 {
-    unsigned short contbyte = static_cast<unsigned short>(*cont);
     char* deletion_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{123456789%%>%%}0")));
-    sprintf(deletion_context_tag, "%%{%%>%d%%}", contbyte);
+    sprintf(deletion_context_tag, "%%{%%>%lu%%}", cont);
     char* deleted_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{123456789%%>%%}:00")));
-    sprintf(deleted_context_tag, "%%{%%>%d%%}:0", contbyte);
+    sprintf(deleted_context_tag, "%%{%%>%lu%%}:0", cont);
     pi.insert(deleted_context_tag);
     char* twol_context_del = twolize_context(remove, true);
     char* twol_context_match = twolize_context(match);
@@ -692,9 +811,16 @@ void
 handle_sfx_line(const char* cont, 
                const char* remove, const char* add, const char* match)
 {
-    write_suffix_lexicon_entry(cont, add, NULL);
-    save_suffix_deletion_contexts(cont, remove, add, match);
-    save_suffix_context(cont, remove, add, match);
+    char* s = strdup(cont);
+    unsigned long contnum = parse_flag(&s, flagtype);
+    if (*s != '\0')
+    {
+        fprintf(stderr, "Junk at end of flag %s using current flagtype\n",
+                cont);
+    }
+    write_suffix_lexicon_entry(contnum, add, 0);
+    save_suffix_deletion_contexts(contnum, remove, add, match);
+    save_suffix_context(contnum, remove, add, match);
     sfx_read++;
 }
 
@@ -707,11 +833,28 @@ handle_sfx_line_with_conts(const char* cont,
     // once without continuation
     handle_pfx_line(cont, remove, add, match);
     // once for each class
-    for (const char* c = conts; *c != '\0'; c++)
+    char* s = strdup(cont);
+    unsigned long contnum = parse_flag(&s, flagtype);
+    if (*s != '\0')
     {
-        write_suffix_lexicon_entry(cont, add, c);
-        save_suffix_deletion_contexts(cont,remove, add, match);
-        save_suffix_context(cont, remove, add, match);
+        fprintf(stderr, "Junk at end of flag %s using current flagtype\n",
+                cont);
+    }
+    char* c = strdup(conts);
+    while ( *c != '\0')
+    {
+        unsigned long nextcontnum = 0;
+        if (has_afs)
+        {
+            nextcontnum = parse_flag(&c, AF_FLAG);
+        }
+        else
+        {
+            nextcontnum = parse_flag(&c, flagtype);
+        }
+        write_suffix_lexicon_entry(contnum, add, nextcontnum);
+        save_suffix_deletion_contexts(contnum, remove, add, match);
+        save_suffix_context(contnum, remove, add, match);
     }
 }
 
@@ -724,7 +867,7 @@ handle_stringed_sfx_line(const char* cont,
     static bool warned = false;
     if (!warned)
     {
-        fprintf(stderr, "Extra string junk at end of line not supported: %s\n",
+        fprintf(stderr, "Morphology AM stuff not supported: %s\n",
                 extra);
         warned = true;
     }
@@ -740,7 +883,7 @@ handle_stringed_sfx_line_with_conts(const char* cont,
     static bool warned = false;
     if (!warned)
     {
-        fprintf(stderr, "Extra string junk at end of line not supported: %s\n",
+        fprintf(stderr, "Morphology AM stuff not supported: %s\n",
                 extra);
         warned = true;
     }
@@ -765,9 +908,9 @@ handle_unknownline(const char* line)
     unsigned long number;
 }
 
-%token <number> COUNT CONTNUM REP_COUNT AM_COUNT AF_COUNT CONTNUMBER
+%token <number> COUNT REP_COUNT AM_COUNT AF_COUNT CONTNUMBER
                 COMPOUNDMIN_LINE PFX_FIRSTLINE SFX_FIRSTLINE
-%token <string> WORD CONTSTRING SET_LINE TRY_LINE FLAG_LINE KEY_LINE 
+%token <string> WORD CONT_THING SET_LINE TRY_LINE FLAG_LINE KEY_LINE 
                 UNKNOWN_LINE UTF8_STRING BYTESTRING CONT LANG_LINE NAME_LINE 
                 UTF8_ERRSTRING PFX_LEADER SFX_LEADER
                 AF_LINE
@@ -898,16 +1041,16 @@ SFXLINE: SFX_LEADER UTF8_STRING UTF8_STRING UTF8_STRING {
     | SFX_LEADER UTF8_STRING ZERO UTF8_STRING {
         handle_sfx_line($1, $2, "", $4);
     }
-    | SFX_LEADER UTF8_STRING UTF8_STRING CONTSTRING UTF8_STRING {
+    | SFX_LEADER UTF8_STRING UTF8_STRING CONT_THING UTF8_STRING {
         handle_sfx_line_with_conts($1, $2, $3, $4, $5);
     }
     | SFX_LEADER ZERO UTF8_STRING UTF8_STRING {
         handle_sfx_line($1, NULL, $3, $4);
     }
-    | SFX_LEADER ZERO UTF8_STRING CONTSTRING UTF8_STRING {
+    | SFX_LEADER ZERO UTF8_STRING CONT_THING UTF8_STRING {
         handle_sfx_line_with_conts($1, NULL, $3, $4, $5);
     }
-    | SFX_LEADER ZERO ZERO CONTSTRING UTF8_STRING {
+    | SFX_LEADER ZERO ZERO CONT_THING UTF8_STRING {
         handle_sfx_line_with_conts($1, NULL, "", $4, $5);
     }
     | SFX_LEADER UTF8_STRING UTF8_STRING UTF8_STRING BYTESTRING {
@@ -916,7 +1059,7 @@ SFXLINE: SFX_LEADER UTF8_STRING UTF8_STRING UTF8_STRING {
     | SFX_LEADER UTF8_STRING ZERO UTF8_STRING BYTESTRING {
         handle_stringed_sfx_line($1, $2, "", $4, $5);
     }
-    | SFX_LEADER UTF8_STRING UTF8_STRING CONTSTRING UTF8_STRING BYTESTRING {
+    | SFX_LEADER UTF8_STRING UTF8_STRING CONT_THING UTF8_STRING BYTESTRING {
         handle_stringed_sfx_line_with_conts($1, $2, $3, $4, $5, $6);
     }
     | SFX_LEADER ZERO UTF8_STRING UTF8_STRING BYTESTRING {
@@ -943,16 +1086,16 @@ PFXLINE: PFX_LEADER UTF8_STRING UTF8_STRING UTF8_STRING {
     | PFX_LEADER UTF8_STRING ZERO UTF8_STRING {
         handle_pfx_line($1, $2, "", $4);
     }
-    | PFX_LEADER UTF8_STRING UTF8_STRING CONTSTRING UTF8_STRING {
+    | PFX_LEADER UTF8_STRING UTF8_STRING CONT_THING UTF8_STRING {
         handle_pfx_line_with_conts($1, $2, $3, $4, $5);
     }
     | PFX_LEADER ZERO UTF8_STRING UTF8_STRING {
         handle_pfx_line($1, NULL, $3, $4);
     }
-    | PFX_LEADER ZERO UTF8_STRING CONTSTRING UTF8_STRING {
+    | PFX_LEADER ZERO UTF8_STRING CONT_THING UTF8_STRING {
         handle_pfx_line_with_conts($1, NULL, $3, $4, $5);
     }
-    | PFX_LEADER ZERO ZERO CONTSTRING UTF8_STRING {
+    | PFX_LEADER ZERO ZERO CONT_THING UTF8_STRING {
         handle_pfx_line_with_conts($1, NULL, "", $4, $5);
     }
     | PFX_LEADER UTF8_STRING UTF8_STRING UTF8_STRING BYTESTRING {
@@ -961,7 +1104,7 @@ PFXLINE: PFX_LEADER UTF8_STRING UTF8_STRING UTF8_STRING {
     | PFX_LEADER UTF8_STRING ZERO UTF8_STRING BYTESTRING {
         handle_stringed_pfx_line($1, $2, "", $4, $5);
     }
-    | PFX_LEADER UTF8_STRING UTF8_STRING CONTSTRING UTF8_STRING BYTESTRING {
+    | PFX_LEADER UTF8_STRING UTF8_STRING CONT_THING UTF8_STRING BYTESTRING {
         handle_stringed_pfx_line_with_conts($1, $2, $3, $4, $5, $6);
     }
     | PFX_LEADER ZERO UTF8_STRING UTF8_STRING BYTESTRING {
