@@ -38,6 +38,7 @@ using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 using hfst::ImplementationType;
+using hfst::exceptions::NotTransducerStreamException;
 
 static bool is_input_stdin = true;
 // left part of concatenation
@@ -173,9 +174,9 @@ parse_options(int argc, char** argv)
 
 	if (is_output_stdout)
 	{
-			outfilename = hfst_strdup("<stdout>");
-			outfile = stdout;
-			message_out = stderr;
+		outfilename = hfst_strdup("<stdout>");
+		outfile = stdout;
+		message_out = stderr;
 	}
 	// rest of arguments are files...
 	if (leftNamed && rightNamed)
@@ -239,9 +240,6 @@ parse_options(int argc, char** argv)
 			is_input_stdin = true;
 		}
 	}
-	else if (leftNamed && rightNamed) {
-
-	}
 	else
 	{
 		fprintf(message_out,
@@ -253,70 +251,54 @@ parse_options(int argc, char** argv)
 }
 
 int
-concatenate_streams(const char* leftfilename, const char* rightfilename,
-                    const char* outfilename)
+concatenate_streams(HfstInputStream& leftstream, HfstInputStream& rightstream,
+                    HfstOutputStream& outstream)
 {
-    HfstInputStream leftInput(leftfilename);
-    HfstInputStream rightInput(rightfilename);
-    leftInput.open();
-    rightInput.open();
-    // should be is_good? 
-    bool bothInputs = leftInput.is_good() && rightInput.is_good();
-    HfstTransducer* left = new HfstTransducer(leftInput);
-    HfstTransducer* right = new HfstTransducer(rightInput);
-    ImplementationType leftType = left->get_type();
-    ImplementationType rightType = right->get_type();
-    if (leftType != rightType)
-      {
-        fprintf(stderr, "Warning: tranducer type mismatch in %s and %s; "
-                "using former type as output\n",
-                leftfilename, rightfilename);
-      }
-    HfstOutputStream outstream(outfilename, leftType);
-    outstream.open();
-    size_t transducer_n = 0;
-    while (bothInputs) {
-        transducer_n++;
-        if (transducer_n == 1)
-          {
-            VERBOSE_PRINT("Concatenating %s and %s...\n", leftfilename, 
-                          rightfilename);
-          }
-        else
-          {
-            VERBOSE_PRINT("Concatenating %s and %s... %zu\n", leftfilename,
-                          rightfilename, transducer_n);
-          }
-        outstream << left->concatenate(*right);
-        bothInputs = leftInput.is_good() && rightInput.is_good();
-        delete left;
-        left = NULL;
-        delete right;
-        right = NULL;
-        if (leftInput.is_good())
-          {
-            left = new HfstTransducer(leftInput);
-          }
-        if (rightInput.is_good())
-          {
-            right = new HfstTransducer(rightInput);
-          }
-      } 
-    if (leftInput.is_good())
-      {
-        fprintf(stderr, "Warning: %s contains more transducers than %s; "
-                "residue skipped\n", leftfilename, rightfilename);
-      }
-    else if (rightInput.is_good())
-      {
-        fprintf(stderr, "Warning: %s contains fewer transducers than %s; "
-                "residue skipped\n", leftfilename, rightfilename);
-      }
-    leftInput.close();
-    rightInput.close();
-    delete left;
-    delete right;
-    return EXIT_SUCCESS;
+	leftstream.open();
+	rightstream.open();
+	outstream.open();
+	// should be is_good? 
+	bool bothInputs = leftstream.is_good() && rightstream.is_good();
+	if (leftstream.get_type() != rightstream.get_type())
+	{
+	  fprintf(stderr, "Warning: tranducer type mismatch in %s and %s; "
+	          "using former type as output\n",
+	          leftfilename, rightfilename);
+	}
+	
+	size_t transducer_n = 0;
+	while (bothInputs) {
+		transducer_n++;
+		if (transducer_n == 1)
+		{
+			VERBOSE_PRINT("Concatenating %s and %s...\n", leftfilename, 
+		                rightfilename);
+		}
+		else
+		{
+		  VERBOSE_PRINT("Concatenating %s and %s... %zu\n", leftfilename,
+		                rightfilename, transducer_n);
+		}
+		HfstTransducer left(leftstream);
+		HfstTransducer right(rightstream);
+		outstream << left.concatenate(right);
+		bothInputs = leftstream.is_good() && rightstream.is_good();
+	}
+	
+	if (leftstream.is_good())
+	{
+	  fprintf(stderr, "Warning: %s contains more transducers than %s; "
+	          "residue skipped\n", leftfilename, rightfilename);
+	}
+	else if (rightstream.is_good())
+	{
+	  fprintf(stderr, "Warning: %s contains fewer transducers than %s; "
+	          "residue skipped\n", leftfilename, rightfilename);
+	}
+	leftstream.close();
+	rightstream.close();
+	outstream.close();
+	return EXIT_SUCCESS;
 }
 
 
@@ -344,21 +326,33 @@ int main( int argc, char **argv ) {
 	VERBOSE_PRINT("Reading from %s and %s, writing to %s\n", 
 		leftfilename, rightfilename, outfilename);
 	// here starts the buffer handling part
-	if ((leftfile != stdin) && (rightfile != stdin))
-      {
-        retval = concatenate_streams(leftfilename, rightfilename, outfilename);
-      }
-	else if (leftfile == stdin)
-      {
-        retval = concatenate_streams(NULL, rightfilename, outfilename);
-      }
-	else if (rightfile == stdin)
-      {
-        retval = concatenate_streams(leftfilename, NULL, outfilename);
-      }
+	HfstInputStream* leftstream = NULL;
+	HfstInputStream* rightstream = NULL;
+	try {
+		leftstream = (leftfile != stdin) ?
+			new HfstInputStream(leftfilename) : new HfstInputStream();
+	} catch(NotTransducerStreamException)	{
+		fprintf(stderr, "%s is not a valid transducer file\n", leftfilename);
+		return EXIT_FAILURE;
+	}
+	try {
+		rightstream = (rightfile != stdin) ?
+			new HfstInputStream(rightfilename) : new HfstInputStream();
+	} catch(NotTransducerStreamException)	{
+		fprintf(stderr, "%s is not a valid transducer file\n", rightfilename);
+		return EXIT_FAILURE;
+	}
+	HfstOutputStream* outstream = (outfile != stdout) ?
+		new HfstOutputStream(outfilename, leftstream->get_type()) :
+		new HfstOutputStream(leftstream->get_type());
+
+	retval = concatenate_streams(*leftstream, *rightstream, *outstream);
+	delete leftstream;
+	delete rightstream;
+	delete outstream;
 	free(leftfilename);
 	free(rightfilename);
 	free(outfilename);
-    return retval;
+	return retval;
 }
 
