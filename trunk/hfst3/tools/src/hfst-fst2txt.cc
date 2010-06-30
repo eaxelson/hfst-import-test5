@@ -32,14 +32,15 @@
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
-#include <hfst2/hfst.h>
+#include "HfstTransducer.h"
 
 #include "hfst-common-unary-variables.h"
+
+using hfst::HfstTransducer;
+using hfst::HfstInputStream;
+using hfst::exceptions::NotTransducerStreamException;
+
 // add tools-specific variables here
-// whether spaces are printed between symbol pairs
-static bool print_weights=false;
-// whether numbers are used in printing transitions
-static bool print_numbers=false;
 
 void
 print_usage(const char *program_name)
@@ -60,8 +61,6 @@ print_usage(const char *program_name)
 	fprintf(message_out, "%-35s%s",	"  -o, --output=OUTFILE",    "Print transducer to OUTFILE\n");
 	fprintf(message_out, "%-35s%s",	"  -i, --input=INFILE",      "Read input transducer from INFILE\n");
 	fprintf(message_out, "%-35s%s",	"  -R, --read-symbols=FILE", "Read symbol table from FILE\n");
-	fprintf(message_out, "%-35s%s",	"  -n, --number",            "Print numbers instead of symbols in transitions\n");
-	fprintf(message_out, "%-35s%s",	"  -w, --print-weights",     "Print transition and end state weights\n");
 	fprintf(message_out,
 		"\n"
 		"If OUTFILE or INFILE is missing or -,\n"
@@ -100,13 +99,11 @@ parse_options(int argc, char** argv)
 #include "hfst-common-unary-options.h"
 		  ,
 		  // add tool-specific options here
-			{"numbers", no_argument, 0, 'n'},
-			{"print-weights", no_argument, 0, 'w'}, 
 			{0,0,0,0}
 		};
 		int option_index = 0;
 		// add tool-specific options here 
-		char c = getopt_long(argc, argv, "dhi:o:sqvVR:DW:nw",
+		char c = getopt_long(argc, argv, "dhi:o:sqvVR:DW:",
 							 long_options, &option_index);
 		if (-1 == c)
 		{
@@ -118,12 +115,6 @@ parse_options(int argc, char** argv)
 #include "hfst-common-cases.h"
 #include "hfst-common-unary-cases.h"
 		  // add tool-specific cases here
-		case 'n':
-			print_numbers = true;
-			break;
-		case 'w':
-			print_weights = true;
-			break;
 		case '?':
 			fprintf(message_out, "invalid option --%s\n",
 					long_options[option_index].name);
@@ -182,120 +173,27 @@ parse_options(int argc, char** argv)
 }
 
 int
-process_stream(std::istream& inputstream, std::ostream& outstream)
+process_stream(HfstInputStream& instream, FILE* outf)
 {
-	VERBOSE_PRINT("Checking formats of transducers\n");
-	int format_type = HFST::read_format(inputstream);
-    
-	if (format_type == SFST_FORMAT)
+	instream.open();
+		
+	size_t transducer_n = 0;
+	while(instream.is_good())
 	{
-		VERBOSE_PRINT("Using unweighted format\n");
-		try {
-		  
-		  HFST::KeyTable *key_table;
-		  if (read_symbols_from_filename != NULL) {
-		    ifstream is(read_symbols_from_filename);
-		    key_table = HFST::read_symbol_table(is);
-		    is.close();
-		  }
-		  else
-		    key_table = HFST::create_key_table();
-		  bool transducer_has_symbol_table=false;
-			bool first_transducer=true;
-			HFST::TransducerHandle input = NULL;
-			while (true) {
-				int inputformat = HFST::read_format(inputstream);
-				if (inputformat == EOF_FORMAT)
-				{
-					break;
-				}
-				else if (inputformat == SFST_FORMAT)
-				{
-				        transducer_has_symbol_table = HFST::has_symbol_table(inputstream);
-					input = HFST::read_transducer(inputstream, key_table);
-				}
-				else
-				{
-					fprintf(message_out, "stream format mismatch\n");
-					return EXIT_FAILURE;
-				}
-				VERBOSE_PRINT("Printing transducer...\n");
-				// add your code here
-				if (!first_transducer)
-				  outstream << "--\n";
-				if (!print_numbers)
-				  HFST::print_transducer(input, key_table, print_weights, outstream, false);
-				else
-				  HFST::print_transducer_number(input, print_weights, outstream);
-			
-				first_transducer=false;
-
-			}
-			delete key_table;
-		}
-		catch (const char *p)
-		{
-			printf("HFST library error: %s\n", p);
-			return EXIT_FAILURE;
-		}
-		return EXIT_SUCCESS;
+		transducer_n++;
+		if(transducer_n == 1)
+		{ VERBOSE_PRINT("Converting %s...\n", inputfilename); }
+		else
+		{ VERBOSE_PRINT("Converting %s...%d\n", inputfilename, transducer_n); }
+		
+		HfstTransducer t(instream);
+		if(transducer_n > 1)
+			fprintf(outf, "--\n");
+		t.write_in_att_format(outf);
 	}
-	else if (format_type == OPENFST_FORMAT) 
-	{
-		VERBOSE_PRINT("Using weighted format\n");
-		try {
-		  HWFST::KeyTable *key_table;
-		  if (read_symbols_from_filename != NULL) {
-		    ifstream is(read_symbols_from_filename);
-		    key_table = HWFST::read_symbol_table(is);
-		    is.close();
-		  }
-		  else
-		    key_table = HWFST::create_key_table();
-		  bool transducer_has_symbol_table=false;
-		  bool first_transducer=true;
-			HWFST::TransducerHandle input = NULL;
-			while (true) {
-				int inputformat = HFST::read_format(inputstream);
-				if (inputformat == EOF_FORMAT)
-				{
-					break;
-				}
-				else if (inputformat == OPENFST_FORMAT)
-				{
-				        transducer_has_symbol_table = HWFST::has_symbol_table(inputstream);
-					input = HWFST::read_transducer(inputstream, key_table);
-				}
-				else
-				{
-					fprintf(message_out, "stream format mismatch\n");
-					return EXIT_FAILURE;
-				}
-				VERBOSE_PRINT("Printing transducer...\n");
-				// add your code here
-				if (!first_transducer)
-				  outstream << "--\n";
-				if (!print_numbers)
-				  HWFST::print_transducer(input, key_table, print_weights, outstream, false);
-				else
-				  HWFST::print_transducer_number(input, print_weights, outstream);
-			
-				first_transducer=false;
-			}
-			delete key_table;
-			
-		}
-		catch (const char *p) {
-			fprintf(message_out, "HFST lib error: %s\n", p);
-			return 1;
-		}
-		return EXIT_SUCCESS;
-	}
-	else
-	{
-		fprintf(message_out, "ERROR: Transducer has wrong type.\n");
-		return EXIT_FAILURE;
-	}
+	instream.close();
+	fclose(outf);
+	return EXIT_SUCCESS;
 }
 
 
@@ -312,48 +210,23 @@ int main( int argc, char **argv ) {
 	{
 		fclose(inputfile);
 	}
-	if (outfile != stdout)
-	{
-		fclose(outfile);
-	}
+	
 	VERBOSE_PRINT("Reading from %s, writing to %s\n", 
 		inputfilename, outfilename);
 	// here starts the buffer handling part
-	if (!is_input_stdin)
-	{
-		std::filebuf fbinput;
-		fbinput.open(inputfilename, std::ios::in);
-		std::istream inputstream(&fbinput);
-		if (!is_output_stdout)
-		{
-			std::filebuf fbout;
-			fbout.open(outfilename, std::ios::out);
-			std::ostream outstream(&fbout);
-			retval = process_stream(inputstream, outstream);
-		}
-		else
-		{
-			retval = process_stream(inputstream, std::cout);
-		}
-		return retval;
+	HfstInputStream* instream = NULL;
+	try {
+	  instream = (inputfile != stdin) ?
+	    new HfstInputStream(inputfilename) : new HfstInputStream();
+	} catch(NotTransducerStreamException)	{
+		fprintf(stderr, "%s is not a valid transducer file\n", inputfilename);
+		return EXIT_FAILURE;
 	}
-	else if (is_input_stdin)
-	{
-		if (!is_output_stdout)
-		{
-			std::filebuf fbout;
-			fbout.open(outfilename, std::ios::out);
-			std::ostream outstream(&fbout);
-			retval = process_stream(std::cin, outstream);
-		}
-		else
-		{
-			retval = process_stream(std::cin, std::cout);
-		}
-		return retval;
-	}
+	
+	retval = process_stream(*instream, outfile);
+	delete instream;
 	free(inputfilename);
 	free(outfilename);
-	return EXIT_SUCCESS;
+	return retval;
 }
 
