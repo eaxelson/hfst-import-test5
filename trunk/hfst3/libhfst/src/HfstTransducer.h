@@ -145,6 +145,9 @@ namespace hfst
     bool is_good(void);
     /** \brief Whether the next element in the stream is an HfstTransducer. */
     bool is_fst(void);
+    
+    /** \brief The type of the first transducer in the stream. */
+    ImplementationType get_type(void) const;
     friend class HfstTransducer;
   };
 
