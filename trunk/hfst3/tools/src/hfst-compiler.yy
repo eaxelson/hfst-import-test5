@@ -12,7 +12,7 @@
 
 #include "../../libhfst/src/HfstCompiler.h"
 //#include "make-compact.h"
-using namespace SFST;
+using namespace hfst;
 using std::cerr;
 
 extern int  yylineno;
@@ -24,26 +24,26 @@ void warn2(char *text, char *text2);
 int yylex( void );
 int yyparse( void );
 
-hfst::ImplementationType type= hfst::SFST_TYPE;
+hfst::ImplementationType type= SFST_TYPE;
 
 static int Switch=0;
-hfst::HfstTransducer * Result;
+HfstTransducer * Result;
 %}
 
 /* Slight Hfst addition SFST::... */
 %union {
   int        number;
-  Twol_Type  type;
-  Repl_Type  rtype;
+  HfstCompiler::Twol_Type  type;
+  HfstCompiler::Repl_Type  rtype;
   char       *name;
   char       *value;
   unsigned char uchar;
   unsigned int  longchar;
-  Character  character;
-  hfst::HfstTransducer   *expression;
-  Range      *range;
-  Ranges     *ranges;
-  Contexts   *contexts;
+  HfstCompiler::Character  character;
+  HfstTransducer   *expression;
+  HfstCompiler::Range      *range;
+  HfstCompiler::Ranges     *ranges;
+  HfstCompiler::Contexts   *contexts;
 }
 
 %token <number> NEWLINE ALPHA COMPOSE PRINT POS INSERT SWITCH
@@ -72,7 +72,7 @@ hfst::HfstTransducer * Result;
 %left '*' '+'
 %%
 
-ALL:        ASSIGNMENTS RE NEWLINES { Result=hfst::compiler::result($2, Switch); }
+ALL:        ASSIGNMENTS RE NEWLINES { Result=HfstCompiler::result($2, Switch); }
           ;
 
 ASSIGNMENTS: ASSIGNMENTS ASSIGNMENT {}
@@ -85,7 +85,7 @@ ASSIGNMENT: // VAR '=' RE              { if (def_var($1,$3)) warn2("assignment o
           // | SVAR '=' VALUES         { if (def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
           // | RSVAR '=' VALUES        { if (def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
           // | RE PRINT STRING         { write_to_file($1, $3); }
-          ALPHA RE                { hfst::compiler::def_alphabet($2); }
+          ALPHA RE                { HfstCompiler::def_alphabet($2); }
           ;
 
 RE:       //   RE ARROW CONTEXTS2      { $$ = restriction($1,$2,$3,0); }
@@ -100,13 +100,13 @@ RE:       //   RE ARROW CONTEXTS2      { $$ = restriction($1,$2,$3,0); }
           // | RANGE ARROW RANGE RE    { $$ = make_rule(NULL,$1,$2,$3,$4); }
           // | RANGE ARROW RANGE       { $$ = make_rule(NULL,$1,$2,$3,NULL); }
           // | RE COMPOSE RE    { $$ = composition($1, $3); }
-          '{' RANGES '}' ':' '{' RANGES '}' { $$ = hfst::compiler::make_mapping($2,$6,type); }
-          | RANGE ':' '{' RANGES '}' { $$ = hfst::compiler::make_mapping(add_range($1,NULL),$4,type); }
-          | '{' RANGES '}' ':' RANGE { $$ = hfst::compiler::make_mapping($2,add_range($5,NULL),type); }
+          '{' RANGES '}' ':' '{' RANGES '}' { $$ = HfstCompiler::make_mapping($2,$6,type); }
+          | RANGE ':' '{' RANGES '}' { $$ = HfstCompiler::make_mapping(add_range($1,NULL),$4,type); }
+          | '{' RANGES '}' ':' RANGE { $$ = HfstCompiler::make_mapping($2,add_range($5,NULL),type); }
           // | RE INSERT CODE ':' CODE  { $$ = freely_insert($1, $3, $5); }
           // | RE INSERT CODE           { $$ = freely_insert($1, $3, $3); }
-          | RANGE ':' RANGE  { $$ = hfst::compiler::new_transducer($1,$3,type); }
-          | RANGE            { $$ = hfst::compiler::new_transducer($1,$1,type); }
+          | RANGE ':' RANGE  { $$ = HfstCompiler::new_transducer($1,$3,type); }
+          | RANGE            { $$ = HfstCompiler::new_transducer($1,$1,type); }
           // | VAR              { $$ = var_value($1); }
           // | RVAR             { $$ = rvar_value($1); }
           // | RE '*'           { $$ = repeat_star($1); }
@@ -131,9 +131,9 @@ RANGES:     RANGE RANGES     { $$ = add_range($1,$2); }
 
 RANGE:      '[' VALUES ']'   { $$=$2; }
           | '[' '^' VALUES ']' { $$=complement_range($3); }
-          | '[' RSVAR ']'    { $$=rsvar_value($2); }
+          //| '[' RSVAR ']'    { $$=rsvar_value($2); }
           | '.'              { $$=NULL; }
-          | CODE             { $$=add_value($1,NULL); }
+          | CODE             { $$=HfstCompiler::add_value($1,NULL); }
           ;
 
 CONTEXTS2:  CONTEXTS               { $$ = $1; }
@@ -148,49 +148,49 @@ CONTEXT2:   CONTEXT                { $$ = $1; }
           | '(' CONTEXT ')'        { $$ = $2; }
           ;
 
-CONTEXT :   RE POS RE              { $$ = make_context($1, $3); }
-          |    POS RE              { $$ = make_context(NULL, $2); }  // check
-          | RE POS                 { $$ = make_context($1, NULL); }  // check
+CONTEXT :   RE POS RE              { }// $$ = make_context($1, $3); }
+          |    POS RE              { }// $$ = make_context(NULL, $2); }  // check
+          | RE POS                 { }// $$ = make_context($1, NULL); }  // check
           ;
 
-VALUES:     VALUE VALUES           { $$=append_values($1,$2); }
+VALUES:     VALUE VALUES           { $$=HfstCompiler::append_values($1,$2); }
           | VALUE                  { $$ = $1; }
           ;
 
-VALUE:      LCHAR '-' LCHAR	   { $$=add_values($1,$3,NULL); }
+VALUE:      LCHAR '-' LCHAR	   { $$=HfstCompiler::add_values($1,$3,NULL); }
           // | SVAR                   { $$=svar_value($1); }
-          | LCHAR  	           { $$=add_value(character_code($1),NULL); }
-          | CODE		   { $$=add_value($1,NULL); }
-	  | SCHAR		   { $$=add_value($1,NULL); }
+          | LCHAR  	           { $$=HfstCompiler::add_value(HfstCompiler::character_code($1),NULL); }
+          | CODE		   { $$=HfstCompiler::add_value($1,NULL); }
+	  | SCHAR		   { $$=HfstCompiler::add_value($1,NULL); }
           ;
 
 LCHAR:      CHARACTER	{ $$=$1; }
-          | UTF8CHAR	{ $$=utf8toint($1); free($1); }
+          | UTF8CHAR	{ $$=HfstCompiler::utf8toint($1); free($1); }
 	  | SCHAR       { $$=$1; }
           ;
 
-CODE:       CHARACTER	{ $$=character_code($1); }
-          | UTF8CHAR	{ $$=symbol_code($1); }
-          | SYMBOL	{ $$=symbol_code($1); }
+CODE:       CHARACTER	{ $$=HfstCompiler::character_code($1); }
+          | UTF8CHAR	{ $$=HfstCompiler::symbol_code($1); }
+          | SYMBOL	{ $$=HfstCompiler::symbol_code($1); }
           ;
 
-SCHAR:      '.'		{ $$=(unsigned char)character_code('.'); }
-          | '!'		{ $$=(unsigned char)character_code('!'); }
-          | '?'		{ $$=(unsigned char)character_code('?'); }
-          | '{'		{ $$=(unsigned char)character_code('{'); }
-          | '}'		{ $$=(unsigned char)character_code('}'); }
-          | ')'		{ $$=(unsigned char)character_code(')'); }
-          | '('		{ $$=(unsigned char)character_code('('); }
-          | '&'		{ $$=(unsigned char)character_code('&'); }
-          | '|'		{ $$=(unsigned char)character_code('|'); }
-          | '*'		{ $$=(unsigned char)character_code('*'); }
-          | '+'		{ $$=(unsigned char)character_code('+'); }
-          | ':'		{ $$=(unsigned char)character_code(':'); }
-          | ','		{ $$=(unsigned char)character_code(','); }
-          | '='		{ $$=(unsigned char)character_code('='); }
-          | '_'		{ $$=(unsigned char)character_code('_'); }
-          | '^'		{ $$=(unsigned char)character_code('^'); }
-          | '-'		{ $$=(unsigned char)character_code('-'); }
+SCHAR:      '.'		{ $$=(unsigned char)HfstCompiler::character_code('.'); }
+          | '!'		{ $$=(unsigned char)HfstCompiler::character_code('!'); }
+          | '?'		{ $$=(unsigned char)HfstCompiler::character_code('?'); }
+          | '{'		{ $$=(unsigned char)HfstCompiler::character_code('{'); }
+          | '}'		{ $$=(unsigned char)HfstCompiler::character_code('}'); }
+          | ')'		{ $$=(unsigned char)HfstCompiler::character_code(')'); }
+          | '('		{ $$=(unsigned char)HfstCompiler::character_code('('); }
+          | '&'		{ $$=(unsigned char)HfstCompiler::character_code('&'); }
+          | '|'		{ $$=(unsigned char)HfstCompiler::character_code('|'); }
+          | '*'		{ $$=(unsigned char)HfstCompiler::character_code('*'); }
+          | '+'		{ $$=(unsigned char)HfstCompiler::character_code('+'); }
+          | ':'		{ $$=(unsigned char)HfstCompiler::character_code(':'); }
+          | ','		{ $$=(unsigned char)HfstCompiler::character_code(','); }
+          | '='		{ $$=(unsigned char)HfstCompiler::character_code('='); }
+          | '_'		{ $$=(unsigned char)HfstCompiler::character_code('_'); }
+          | '^'		{ $$=(unsigned char)HfstCompiler::character_code('^'); }
+          | '-'		{ $$=(unsigned char)HfstCompiler::character_code('-'); }
           ;
 
 NEWLINES:   NEWLINE NEWLINES     {}
@@ -212,7 +212,7 @@ static int LowMem=0;
 void yyerror(char *text)
 
 {
-  cerr << "\n" << FileName << ":" << yylineno << ": " << text << " at: ";
+  cerr << "\n" << SFST::FileName << ":" << yylineno << ": " << text << " at: ";
   cerr << yytext << "\naborted.\n";
   exit(1);
 }
@@ -227,7 +227,7 @@ void yyerror(char *text)
 void warn(char *text)
 
 {
-  cerr << "\n" << FileName << ":" << yylineno << ": warning: " << text << "!\n";
+  cerr << "\n" << SFST::FileName << ":" << yylineno << ": warning: " << text << "!\n";
 }
 
 
@@ -240,7 +240,7 @@ void warn(char *text)
 void warn2(char *text, char *text2)
 
 {
-  cerr << "\n" << FileName << ":" << yylineno << ": warning: " << text << ": ";
+  cerr << "\n" << SFST::FileName << ":" << yylineno << ": warning: " << text << ": ";
   cerr << text2 << "\n";
 }
 
@@ -264,7 +264,7 @@ void get_flags( int *argc, char **argv )
       argv[i] = NULL;
     }
     else if (strcmp(argv[i],"-q") == 0) {
-      Verbose = 0;
+      SFST::Verbose = 0;
       argv[i] = NULL;
     }
     else if (strcmp(argv[i],"-s") == 0) {
@@ -306,9 +306,9 @@ int main( int argc, char *argv[] )
     fprintf(stderr,"\nError: Cannot open grammar file \"%s\"\n\n", argv[1]);
     exit(1);
   }
-  FileName = argv[1];
+  SFST::FileName = argv[1];
   //Result = NULL;
-  TheAlphabet.utf8 = UTF8;
+  SFST::TheAlphabet.utf8 = SFST::UTF8;
   yyin = file;
   try {
     yyparse();
