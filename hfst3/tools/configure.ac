@@ -113,9 +113,9 @@ AC_ARG_ENABLE([fst2strings],
 AM_CONDITIONAL([WANT_FST2STRINGS], [test x$enable_fst2strings != xno])
 AC_ARG_ENABLE([fst2txt],
 			  [AS_HELP_STRING([--enable-fst2txt],
-							  [build fst2txt tool @<:@default=no@:>@])],
+							  [build fst2txt tool @<:@default=yes@:>@])],
 			  [enable_fst2txt=$enableval],
-			  [enable_fst2txt=no])
+			  [enable_fst2txt=yes])
 AM_CONDITIONAL([WANT_FST2TXT], [test x$enable_fst2txt != xno])
 AC_ARG_ENABLE([head],
 			  [AS_HELP_STRING([--enable-head],
