@@ -40,6 +40,7 @@ using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 using hfst::ImplementationType;
+using hfst::exceptions::NotTransducerStreamException;
 
 // tool-specific variables
 
@@ -198,38 +199,25 @@ parse_options(int argc, char** argv)
 }
 
 int
-process_stream(const char* infilename, const char* outfilename)
+process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 {
-	HfstInputStream in(infilename);
-	in.open();
-  
-	HfstOutputStream out(outfilename, output_type);
-	out.open();
+	instream.open();
+	outstream.open();
 	
 	size_t transducer_n = 0;
-	while(in.is_good())
+	while(instream.is_good())
 	{
 		transducer_n++;
 		if(transducer_n == 1)
-		{ VERBOSE_PRINT("Reading transducer from %s...\n", infilename); }
+		{ VERBOSE_PRINT("Converting %s...\n", inputfilename); }
 		else
-		{ VERBOSE_PRINT("Reading transducer from %s...%d\n", infilename, transducer_n); }
+		{ VERBOSE_PRINT("Converting %s...%zu\n", inputfilename, transducer_n); }
 		
-		try {
-			HfstTransducer orig(in);
-			VERBOSE_PRINT("Converting...\n");
-			orig.convert(output_type);
-			VERBOSE_PRINT("Writing...\n");
-			out << orig;
-		}
-		catch (const char *p)
-		{
-			printf("HFST library error: %s\n", p);
-			return EXIT_FAILURE;
-		}
+		HfstTransducer orig(instream);
+		outstream << orig.convert(output_type);
 	}
-	in.close();
-	out.close();
+	instream.close();
+	outstream.close();
 	return EXIT_SUCCESS;
 }
 
@@ -254,14 +242,21 @@ int main( int argc, char **argv ) {
 	VERBOSE_PRINT("Reading from %s, writing to %s\n", 
 		inputfilename, outfilename);
 	// here starts the buffer handling part
-	if (!is_input_stdin)
-	{
-		retval = process_stream(inputfilename, outfilename);
+	HfstInputStream* instream = NULL;
+	try {
+	  instream = (inputfile != stdin) ?
+	    new HfstInputStream(inputfilename) : new HfstInputStream();
+	} catch(NotTransducerStreamException)	{
+		fprintf(stderr, "%s is not a valid transducer file\n", inputfilename);
+		return EXIT_FAILURE;
 	}
-	else if (is_input_stdin)
-	{
-		retval = process_stream(NULL, outfilename);
-	}
+	HfstOutputStream* outstream = (outfile != stdout) ?
+		new HfstOutputStream(outfilename, instream->get_type()) :
+		new HfstOutputStream(instream->get_type());
+	
+	retval = process_stream(*instream, *outstream);
+	delete instream;
+	delete outstream;
 	free(inputfilename);
 	free(outfilename);
 	return retval;

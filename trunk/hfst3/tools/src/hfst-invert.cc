@@ -39,6 +39,7 @@
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
+using hfst::exceptions::NotTransducerStreamException;
 
 // add tools-specific variables here
 
@@ -166,48 +167,25 @@ parse_options(int argc, char** argv)
 }
 
 int
-process_stream(const char* infilename, const char* outfilename)
+process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 {
-	HfstInputStream in(infilename);
-	in.open();
-	bool status = in.is_good();
-	HfstTransducer* trans = new HfstTransducer(in);
-	if(trans->get_type() == hfst::ERROR_TYPE)
-	{
-		fprintf(stderr, "Could not load transducer file %s\n", infilename);
-		return EXIT_FAILURE;
-	}
-	HfstOutputStream out(outfilename, trans->get_type());
-	out.open();
+  instream.open();
+  outstream.open();
 	
 	size_t transducer_n=0;
-	while(status)
+	while(instream.is_good())
 	{
 		transducer_n++;
 		if(transducer_n==1)
-		{ VERBOSE_PRINT("Inverting transducer...\n"); }
+		{ VERBOSE_PRINT("Inverting %s...\n", inputfilename); }
 		else
-		{ VERBOSE_PRINT("Inverting transducer...%zu\n",transducer_n); }
+		{ VERBOSE_PRINT("Inverting %s...%zu\n", inputfilename, transducer_n); }
 		
-		try {
-			out << trans->invert();
-			delete trans;
-			trans = NULL;
-			
-			status = in.is_good();
-			if(status)
-			{ trans = new HfstTransducer(in); }
-		}
-		catch (const char *p)
-		{
-			printf("HFST library error: %s\n", p);
-			return EXIT_FAILURE;
-		}
-		status = in.is_good();
+		HfstTransducer trans(instream);
+		outstream << trans.invert();
 	}
-	delete trans;
-	in.close();
-	out.close();
+	instream.close();
+	outstream.close();
 	return EXIT_SUCCESS;
 }
 
@@ -232,16 +210,23 @@ int main( int argc, char **argv ) {
 	VERBOSE_PRINT("Reading from %s, writing to %s\n", 
 		inputfilename, outfilename);
 	// here starts the buffer handling part
-	if (!is_input_stdin)
-	{
-		retval = process_stream(inputfilename, outfilename);
+	HfstInputStream* instream = NULL;
+	try {
+	  instream = (inputfile != stdin) ?
+	    new HfstInputStream(inputfilename) : new HfstInputStream();
+	} catch(NotTransducerStreamException)	{
+		fprintf(stderr, "%s is not a valid transducer file\n", inputfilename);
+		return EXIT_FAILURE;
 	}
-	else if (is_input_stdin)
-	{
-		retval = process_stream(NULL, outfilename);
-	}
+	HfstOutputStream* outstream = (outfile != stdout) ?
+		new HfstOutputStream(outfilename, instream->get_type()) :
+		new HfstOutputStream(instream->get_type());
+	
+	retval = process_stream(*instream, *outstream);
+	delete instream;
+	delete outstream;
 	free(inputfilename);
 	free(outfilename);
-	return EXIT_SUCCESS;
+	return retval;
 }
 
