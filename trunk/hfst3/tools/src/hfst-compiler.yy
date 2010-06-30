@@ -10,9 +10,8 @@
 
 #include <stdio.h>
 
-#include "../../libhfst/src/HfstTransducer.h"
+#include "../../libhfst/src/HfstCompiler.h"
 //#include "make-compact.h"
-#include "../../libhfst/src/implementations/SFST/src/interface.h"
 using namespace SFST;
 using std::cerr;
 
@@ -73,7 +72,7 @@ hfst::HfstTransducer * Result;
 %left '*' '+'
 %%
 
-ALL:        ASSIGNMENTS RE NEWLINES { Result=hfst::compiler::result($2, Switch, type); }
+ALL:        ASSIGNMENTS RE NEWLINES { Result=hfst::compiler::result($2, Switch); }
           ;
 
 ASSIGNMENTS: ASSIGNMENTS ASSIGNMENT {}

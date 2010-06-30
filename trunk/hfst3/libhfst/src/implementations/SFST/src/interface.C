@@ -200,7 +200,8 @@ static bool in_range( unsigned int c, Range *r )
 /*                                                                 */
 /*******************************************************************/
 
-static void free_values( Range *r )
+//static 
+void free_values( Range *r )
 
 {
   if (r) {

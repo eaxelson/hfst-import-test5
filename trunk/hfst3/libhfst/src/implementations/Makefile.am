@@ -84,7 +84,7 @@ SFST_HDRS = \
 		$(SFST_DIR)/alphabet.h $(SFST_DIR)/basic.h $(SFST_DIR)/compact.h \
 		$(SFST_DIR)/make-compact.h $(SFST_DIR)/fst.h $(SFST_DIR)/mem.h \
 		$(SFST_DIR)/lowmem.h \
-		$(SFST_DIR)/utf8.h
+		$(SFST_DIR)/utf8.h 
 # $(SFST_DIR)/tokenize_functions.h 
 # $(SFST_DIR)/binSearch.h $(SFST_DIR)/transducer-conversion.h
 # $(SFST_DIR)/lookup.h $(SFST_DIR)/fst-lex.h $(SFST_DIR)/fst-regression.h
