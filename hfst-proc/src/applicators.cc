@@ -119,7 +119,8 @@ AnalysisApplicator::apply()
           token_stream << next_token;
       }
       else if(analyzed_forms.size() == 0 || 
-              token_stream.is_alphabetic(token_stream.at(last_stream_location)))
+              (token_stream.is_alphabetic(token_stream.at(last_stream_location)) &&
+               token_stream.is_alphabetic(surface_form[surface_form.size()-1])))
       {
         // if this is false, then we need to move the token stream back far
         // enough that next_token will be read again next iteration

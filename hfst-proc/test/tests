@@ -15,5 +15,8 @@ TESTS WITH fao.hfst.ol
 ".a"                -> .^a/*a$
 "orð.maður"         -> ^orð/orð+N+Neu+Pl+Nom+Indef/orð+N+Neu+Pl+Acc+Indef/orð+N+Neu+Sg+Nom+Indef/orð+N+Neu+Sg+Acc+Indef$.^maður/maður+N+Msc+Sg+Nom+Indef$
 
+with sme-nob:
+,a.                 -> ^./.<CLB>$^a/a<ABBR><Attr>/a<ABBR><Nom>/a<ABBR><Acc>/a<ABBR><Gen>$^,/,<CLB>$
+
 -------------
 Broken:
