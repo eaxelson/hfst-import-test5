@@ -65,7 +65,7 @@ class LookupPath
   
   TransitionTableIndex get_index() const {return index;}
   bool at_final() const {return final;}
-  SymbolNumberVector get_output_symbols() const {return output_symbols;}
+  const SymbolNumberVector& get_output_symbols() const {return output_symbols;}
 };
 
 typedef std::set<LookupPath*, bool (*)(LookupPath*,LookupPath*)> LookupPathSet;
