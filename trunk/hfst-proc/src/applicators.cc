@@ -71,7 +71,7 @@ AnalysisApplicator::apply()
   LookupState state(transducer);
   size_t last_stream_location = 0;
   TokenVector surface_form;
-  std::vector<std::string> analyzed_forms;
+  std::set<std::string> analyzed_forms;
   
   Token next_token;
   while((next_token = token_stream.get_token()).type != None)
