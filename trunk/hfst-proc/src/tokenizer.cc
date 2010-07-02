@@ -120,6 +120,17 @@ Symbolizer::extract_symbol(std::istream& is) const
 
 std::set<char> TokenIOStream::escaped_chars;
 
+TokenIOStream::TokenIOStream(std::istream& i, std::ostream& o, 
+                             const TransducerAlphabet& a, bool flush):
+  is(i), os(o), alphabet(a), null_flush(flush), 
+  symbolizer(a.get_symbolizer()), superblank_bucket(), token_buffer(1024)
+{
+  if(printDebuggingInformationFlag)
+    std::cout << "Creating TokenIOStream" << std::endl;
+  if(escaped_chars.size() == 0)
+    initialize_escaped_chars();
+}
+
 void
 TokenIOStream::initialize_escaped_chars()
 {
