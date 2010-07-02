@@ -34,11 +34,10 @@ class LookupState
   void add_path(LookupPath& path);
   
   /**
-   * Get rid of the current paths and replace the list with a new list. Note
-   * that the new list is passed by value
+   * Get rid of the current paths and replace the list with a new list.
    * @param new_paths the new list of paths to store in the lookup state
    */
-  void replace_paths(LookupPathVector new_paths);
+  void replace_paths(const LookupPathVector& new_paths);
   
   
   /**

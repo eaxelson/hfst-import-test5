@@ -152,7 +152,7 @@ LookupState::add_path(LookupPath& path)
 }
 
 void
-LookupState::replace_paths(LookupPathVector new_paths)
+LookupState::replace_paths(const LookupPathVector& new_paths)
 {
   clear_paths();
   paths = new_paths;
