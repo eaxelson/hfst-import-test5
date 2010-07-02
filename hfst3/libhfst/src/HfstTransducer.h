@@ -208,12 +208,12 @@ namespace hfst
 
     Transducer functions modify their calling object and return a pointer to it, unless otherwise said.
 \verbatim
-    transducer->reverse();                                    // these lines do
-    transducer = transducer->reverse();                       // the same thing
+    transducer.reverse();                                    // these lines do
+    transducer = transducer.reverse();                       // the same thing
 
-    tr1 = tr1->disjunct(tr2);                                 // tr2 is not modified, but a copy of it is disjuncted with t1
+    tr1 = tr1.disjunct(tr2);                                 // tr2 is not modified, but a copy of it is disjuncted with t1
 
-    tr->reverse()->determinize()->reverse()->determinize();   // a chain of functions is possible
+    tr.reverse().determinize().reverse().determinize();   // a chain of functions is possible
 \endverbatim
 
     \section implementation_types Implementation types
@@ -223,9 +223,9 @@ namespace hfst
     For functions that take a transducer as an argument, the type of the calling transducer
     must be the same as the type of the argument transducer:
 \verbatim
-    log_transducer->disjunct(sfst_transducer);                         // this will cause an error
-    log_transducer->convert(SFST_TYPE)->disjunct(sfst_transducer);     // this works, but weights are lost in the conversion
-    log_transducer->disjunct(sfst_transducer->convert(LOG_OFST_TYPE)); // this works, information is not lost
+    log_transducer.disjunct(sfst_transducer);                         // this will cause an error
+    log_transducer.convert(SFST_TYPE).disjunct(sfst_transducer);     // this works, but weights are lost in the conversion
+    log_transducer.disjunct(sfst_transducer.convert(LOG_OFST_TYPE)); // this works, information is not lost
 \endverbatim
 
     \section creating_transducers Creating transducers
@@ -649,7 +649,7 @@ fclose(ifile);
     /** \brief Convert this transducer into an equivalent transducer in format \a type. 
 
 	If a weighted transducer is converted into an unweighted one, all weights are lost. 
-	In the reverse case, all weights are initialized to zero. */
+	In the reverse case, all weights are initialized to the semiring's one. */
     HfstTransducer &convert(ImplementationType type);
 
     /* \brief Create a new transducer equivalent to \a t in format \a type. 

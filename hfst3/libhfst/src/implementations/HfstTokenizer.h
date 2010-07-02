@@ -37,17 +37,21 @@ namespace hfst
   
   /** \brief A tokenizer for creating transducers from UTF-8 strings.
 
+      Strings are tokenized from left to right using longest match tokenization.
+      For example, if the tokenizer contains a multicharacter symbol "foo" and a skip symbol "fo",
+      the string "foo" is tokenized as "foo:foo".
+      If the tokenizer contains a multicharacter symbol "fo" and a skip symbol "foo",
+      the string "foo" is tokenized as an empty string (check this).
+
       An example:
 \verbatim
       HfstTokenizer TOK;
-      TOK.add_multichar_symbol("foo");
-      TOK.add_multichar_symbol("bar");
-      TOK.add_skip_symbol("fo");
-      TOK.add_skip_symbol("ba");
-      StringPairVector spv = tokenize("fofooo");
-      // spv contains string pairs "foo:foo" and "o:o"
-      HfstTransducer tr("fofooo", "babarr", TOK);
-      // tr now contains the path [foo o]:[bar r]
+      TOK.add_multichar_symbol("<br />");
+      TOK.add_skip_symbol("<p>");
+      TOK.add_skip_symbol("</p>");
+      StringPairVector spv = TOK.tokenize("<p>A<br />paragraph!</p>");
+      // spv now contains
+      //    A:A <br />:<br /> p:p a:a r:r a:a g:g r:r a:a p:p h:h !:!
 \endverbatim
 
       @note The tokenizer only tokenizes utf-8 strings. */

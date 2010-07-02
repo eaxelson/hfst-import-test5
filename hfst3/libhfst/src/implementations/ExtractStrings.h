@@ -76,6 +76,9 @@ namespace hfst {
 
   /** \brief A class for storing weighted string pairs that represent paths in a transducer. 
 
+      Iterators to Vectors and Sets return paths in descending weight order
+      (the string with the biggest weight is returned first). (check this)
+
       For an example, see HfstTransducer::extract_strings.
 
       @see HfstTransducer::extract_strings */
