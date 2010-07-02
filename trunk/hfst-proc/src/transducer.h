@@ -226,7 +226,7 @@ class TransducerAlphabet
     for(SymbolNumber k=0; k<symbol_count; k++)
       get_next_symbol(is, k);
     
-    if(printDebuggingInformationFlag && get_state_size()>0)
+    if(verboseFlag && get_state_size()>0)
       std::cout << "Alphabet contains " << get_state_size() << " flag diacritic feature(s)" << std::endl;
     // assume the first symbol is epsilon which we don't want to print
     symbol_table[0].str = "";

@@ -54,7 +54,7 @@ TokenizationApplicator::apply()
     if(printDebuggingInformationFlag)
       alltokens.insert(next_token);
   }
-  if(printDebuggingInformationFlag)
+  if(verboseFlag)
   {
     std::cout << "Set of tokens:" << std::endl;
     for(std::set<Token>::const_iterator it=alltokens.begin(); it!=alltokens.end(); it++)
@@ -178,8 +178,8 @@ AnalysisApplicator::apply()
     }
   }
   
-  if(printDebuggingInformationFlag)
-    std::cout << "Got None/EOF symbol; done." << std::endl;
+  if(verboseFlag)
+    std::cout << std::endl << "Got None/EOF symbol; done." << std::endl;
   
   // print any valid transductions stored
   if(analyzed_forms.size() != 0)// && token_stream.get_pos() == last_stream_location)
