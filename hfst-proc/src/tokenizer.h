@@ -151,6 +151,8 @@ struct Token
   }
 };
 
+class TransducerAlphabet;
+
 /**
  * Wrapper class around an istream and an ostream for reading and writing
  * tokens, with additional buffering functionality. Input and output
@@ -169,7 +171,7 @@ class TokenIOStream
   const TransducerAlphabet& alphabet;
   bool null_flush;
   
-  Symbolizer symbolizer;
+  const Symbolizer& symbolizer;
   
   /**
    * All superblanks found in the input stream all stored here, and are
@@ -211,15 +213,7 @@ class TokenIOStream
   Token read_token();
  public:
   TokenIOStream(std::istream& i, std::ostream& o, const TransducerAlphabet& a,
-                bool flush):
-    is(i), os(o), alphabet(a), null_flush(flush), 
-    symbolizer(a.get_symbol_table()), superblank_bucket(), token_buffer(1024)
-  {
-    if(printDebuggingInformationFlag)
-      std::cout << "Creating TokenIOStream" << std::endl;
-    if(escaped_chars.size() == 0)
-      initialize_escaped_chars();
-  }
+                bool flush);
   
   size_t get_pos() const {return token_buffer.getPos();}
   size_t diff_prev(size_t pos) const {return token_buffer.diffPrevPos(pos);}

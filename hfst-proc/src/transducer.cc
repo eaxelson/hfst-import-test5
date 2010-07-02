@@ -8,6 +8,38 @@
 
 //////////Function definitions for TransducerAlphabet
 
+TransducerAlphabet::TransducerAlphabet(std::istream& is, 
+                                       SymbolNumber symbol_count):
+  symbol_table(), symbolizer(NULL), blank_symbol(NO_SYMBOL_NUMBER),
+  feature_bucket(), value_bucket(), val_num(1), feat_num(0)
+{
+  if(symbol_count == 0)
+  {
+    std::cerr << "Transducer has empty alphabet; wrong or corrupt file?" << std::endl;
+    exit(1);
+  }
+  value_bucket[std::string()] = 0; // empty value = neutral
+  for(SymbolNumber k=0; k<symbol_count; k++)
+    get_next_symbol(is, k);
+  
+  if(verboseFlag && get_state_size()>0)
+    std::cout << "Alphabet contains " << get_state_size() << " flag diacritic feature(s)" << std::endl;
+  // assume the first symbol is epsilon which we don't want to print
+  symbol_table[0].str = "";
+  
+  setup_blank_symbol();
+  symbolizer = new Symbolizer(symbol_table);
+  calculate_caps();
+}
+
+TransducerAlphabet::TransducerAlphabet(const TransducerAlphabet& o):
+  symbol_table(o.symbol_table), symbolizer(new Symbolizer(symbol_table)),
+  blank_symbol(o.blank_symbol), 
+  feature_bucket(o.feature_bucket), value_bucket(o.value_bucket),
+  val_num(o.val_num), feat_num(o.feat_num) {}
+
+TransducerAlphabet::~TransducerAlphabet() { delete symbolizer;}
+
 void
 TransducerAlphabet::setup_blank_symbol()
 {
@@ -99,7 +131,7 @@ void TransducerAlphabet::get_next_symbol(std::istream& is, SymbolNumber k)
 void
 TransducerAlphabet::calculate_caps()
 {
-  Symbolizer symbolizer(symbol_table);
+  //Symbolizer symbolizer(symbol_table);
   for(size_t i=0;i<symbol_table.size();i++)
   {
     int case_res;
@@ -108,11 +140,11 @@ TransducerAlphabet::calculate_caps()
     if(case_res < 0)
     {
       symbol_table[i].lower = i;
-      symbol_table[i].upper = (switched=="")?NO_SYMBOL_NUMBER:symbolizer.find_symbol(switched.c_str());
+      symbol_table[i].upper = (switched=="")?NO_SYMBOL_NUMBER:symbolizer->find_symbol(switched.c_str());
     }
     else if(case_res > 0)
     {
-      symbol_table[i].lower = (switched=="")?NO_SYMBOL_NUMBER:symbolizer.find_symbol(switched.c_str());
+      symbol_table[i].lower = (switched=="")?NO_SYMBOL_NUMBER:symbolizer->find_symbol(switched.c_str());
       symbol_table[i].upper = i;
     }
     else

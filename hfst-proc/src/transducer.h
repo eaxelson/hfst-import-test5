@@ -4,6 +4,7 @@
 #include <fstream>
 #include <cstdlib>
 #include "hfst-proc.h"
+#include "tokenizer.h"
 
 class TransducerHeader
 {
@@ -170,10 +171,14 @@ struct SymbolProperties
   FlagDiacriticOperation fd_op;
 };
 
+class Symbolizer;
+
 class TransducerAlphabet
 {
  private:
   SymbolTable symbol_table;
+  
+  Symbolizer* symbolizer;
   
   /**
    * The symbol number for a "blank" which is here considered to be a space.
@@ -213,36 +218,13 @@ class TransducerAlphabet
   SymbolNumber feat_num;
   
  public:
-  TransducerAlphabet(std::istream& is, SymbolNumber symbol_count):
-    symbol_table(), blank_symbol(NO_SYMBOL_NUMBER),
-    feature_bucket(), value_bucket(), val_num(1), feat_num(0)
-  {
-    if(symbol_count == 0)
-    {
-      std::cerr << "Transducer has empty alphabet; wrong or corrupt file?" << std::endl;
-      exit(1);
-    }
-    value_bucket[std::string()] = 0; // empty value = neutral
-    for(SymbolNumber k=0; k<symbol_count; k++)
-      get_next_symbol(is, k);
-    
-    if(verboseFlag && get_state_size()>0)
-      std::cout << "Alphabet contains " << get_state_size() << " flag diacritic feature(s)" << std::endl;
-    // assume the first symbol is epsilon which we don't want to print
-    symbol_table[0].str = "";
-    
-    setup_blank_symbol();
-    calculate_caps();
-  }
+  TransducerAlphabet(std::istream& is, SymbolNumber symbol_count);
+  TransducerAlphabet(const TransducerAlphabet& o);
   
-  TransducerAlphabet(const TransducerAlphabet& o):
-    symbol_table(o.symbol_table), blank_symbol(o.blank_symbol), 
-    feature_bucket(o.feature_bucket), value_bucket(o.value_bucket),
-    val_num(o.val_num), feat_num(o.feat_num) {}
-  
-  ~TransducerAlphabet() {}
+  ~TransducerAlphabet();
   
   const SymbolTable& get_symbol_table(void) const { return symbol_table; }
+  const Symbolizer& get_symbolizer(void) const { return *symbolizer; }
   SymbolNumber get_state_size(void) const { return feature_bucket.size(); }
   SymbolNumber get_blank_symbol() const {return blank_symbol;}
   
