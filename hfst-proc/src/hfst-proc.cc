@@ -293,7 +293,7 @@ int main(int argc, char **argv)
   try
   {
     AbstractTransducer* t = AbstractTransducer::load_transducer(in);
-    if(printDebuggingInformationFlag)
+    if(verboseFlag)
       std::cout << "Transducer successfully loaded" << std::endl;
     in.close();
     

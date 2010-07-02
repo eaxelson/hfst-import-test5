@@ -127,7 +127,12 @@ LookupState::get_finals_set() const
     if(is_final)
     {
       if(printDebuggingInformationFlag)
-        std::cout << "  Final path found" << std::endl;
+      {
+        std::cout << "  Final path found:";
+        for(SymbolNumberVector::const_iterator itr=(*i)->get_output_symbols().begin();itr!=(*i)->get_output_symbols().end(); itr++)
+          std::cout << " " << *itr;
+        std::cout << std::endl;
+      }
       std::pair<LookupPathSet::iterator,bool> loc = finals.insert(*i);
       
       if(loc.second == false) // if this form was already in the set
