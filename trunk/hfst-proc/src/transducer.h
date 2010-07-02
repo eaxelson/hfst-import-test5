@@ -81,7 +81,6 @@ class TransducerHeader
     return false;
   }
   
-#ifdef DEBUG
   void print()
   {
     std::cout << "Transducer properties:" << std::endl
@@ -103,7 +102,6 @@ class TransducerHeader
               << " has_input_epsilon_cycles: " << has_input_epsilon_cycles << std::endl
               << " has_unweighted_input_epsilon_cycles: " << has_unweighted_input_epsilon_cycles << std::endl;
   }
-#endif
 };
 
 class FlagDiacriticOperation
