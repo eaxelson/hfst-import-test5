@@ -78,10 +78,10 @@ OutputFormatter::preprocess_finals(const LookupPathSet& finals) const
 
 //////////Function definitions for ApertiumOutputFormatter
 
-std::vector<std::string>
+std::set<std::string>
 ApertiumOutputFormatter::process_finals(const LookupPathSet& finals, CapitalizationState caps) const
 {
-  std::vector<std::string> results;
+  std::set<std::string> results;
   LookupPathSet new_finals = preprocess_finals(finals);
   
   for(LookupPathSet::const_iterator it=new_finals.begin(); it!=new_finals.end(); it++)
@@ -91,14 +91,14 @@ ApertiumOutputFormatter::process_finals(const LookupPathSet& finals, Capitalizat
     if(dynamic_cast<const LookupPathW*>(*it) != NULL && displayWeightsFlag)
       res << '~' << dynamic_cast<const LookupPathW*>(*it)->get_weight() << '~';
     
-    results.push_back(res.str());
+    results.insert(res.str());
   }
   return results;
 }
 
 void
 ApertiumOutputFormatter::print_word(const TokenVector& surface_form, 
-                                  std::vector<std::string> const &analyzed_forms) const
+                                  std::set<std::string> const &analyzed_forms) const
 {
   // any superblanks in the surface form should not be printed as part of the
   // analysis output, but should be output directly afterwards
@@ -120,7 +120,7 @@ ApertiumOutputFormatter::print_word(const TokenVector& surface_form,
   
   token_stream.ostream() << '^';
   token_stream.write_escaped(output_surface_form);
-  for(std::vector<std::string>::const_iterator it=analyzed_forms.begin(); it!=analyzed_forms.end(); it++)
+  for(std::set<std::string>::const_iterator it=analyzed_forms.begin(); it!=analyzed_forms.end(); it++)
     token_stream.ostream() << "/" << *it;
   token_stream.ostream() << "$";
   
@@ -206,27 +206,27 @@ CGOutputFormatter::process_final(const SymbolNumberVector& symbols, Capitalizati
   return res.str();
 }
 
-std::vector<std::string>
+std::set<std::string>
 CGOutputFormatter::process_finals(const LookupPathSet& finals, CapitalizationState caps) const
 {
-  std::vector<std::string> results;
+  std::set<std::string> results;
   LookupPathSet new_finals = preprocess_finals(finals);
   
   for(LookupPathSet::const_iterator it=new_finals.begin(); it!=new_finals.end(); it++)
-    results.push_back(process_final((*it)->get_output_symbols(), caps));
+    results.insert(process_final((*it)->get_output_symbols(), caps));
   
   return results;
 }
 
 void
 CGOutputFormatter::print_word(const TokenVector& surface_form,
-                                std::vector<std::string> const &analyzed_forms) const
+                                std::set<std::string> const &analyzed_forms) const
 {
   token_stream.ostream() << "\"<"
                          << token_stream.tokens_to_string(clear_superblanks(surface_form))
                          << ">\"" << std::endl;
   
-  for(std::vector<std::string>::const_iterator it=analyzed_forms.begin(); it!=analyzed_forms.end(); it++)
+  for(std::set<std::string>::const_iterator it=analyzed_forms.begin(); it!=analyzed_forms.end(); it++)
     token_stream.ostream() << "\t" << *it << std::endl;
 }
 
@@ -241,10 +241,10 @@ CGOutputFormatter::print_unknown_word(const TokenVector& surface_form) const
 
 //////////Function definitions for XeroxOutputFormatter
 
-std::vector<std::string>
+std::set<std::string>
 XeroxOutputFormatter::process_finals(const LookupPathSet& finals, CapitalizationState caps) const
 {
-  std::vector<std::string> results;
+  std::set<std::string> results;
   LookupPathSet new_finals = preprocess_finals(finals);
   
   for(LookupPathSet::const_iterator it=new_finals.begin(); it!=new_finals.end(); it++)
@@ -254,18 +254,18 @@ XeroxOutputFormatter::process_finals(const LookupPathSet& finals, Capitalization
     if(dynamic_cast<const LookupPathW*>(*it) != NULL && displayWeightsFlag)
       res << "\t" << dynamic_cast<const LookupPathW*>(*it)->get_weight();
     
-    results.push_back(res.str());
+    results.insert(res.str());
   }
   return results;
 }
 
 void
 XeroxOutputFormatter::print_word(const TokenVector& surface_form,
-                                std::vector<std::string> const &analyzed_forms) const
+                                std::set<std::string> const &analyzed_forms) const
 {
   std::string surface = token_stream.tokens_to_string(clear_superblanks(surface_form));
   
-  for(std::vector<std::string>::const_iterator it=analyzed_forms.begin(); it!=analyzed_forms.end(); it++)
+  for(std::set<std::string>::const_iterator it=analyzed_forms.begin(); it!=analyzed_forms.end(); it++)
     token_stream.ostream() << surface << "\t" << *it << std::endl;
   token_stream.ostream() << std::endl;
 }

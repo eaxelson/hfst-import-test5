@@ -41,10 +41,10 @@ class OutputFormatter
    * @param finals a list of lookup paths ending in final states
    * @param state the capitalization of the surface form
    */
-  virtual std::vector<std::string> process_finals(const LookupPathSet& finals,
+  virtual std::set<std::string> process_finals(const LookupPathSet& finals,
                                                   CapitalizationState state) const = 0;
   virtual void print_word(const TokenVector& surface_form, 
-                          std::vector<std::string> const &analyzed_forms) const = 0;
+                          std::set<std::string> const &analyzed_forms) const = 0;
   virtual void print_unknown_word(const TokenVector& surface_form) const = 0;
   
   /**
@@ -59,10 +59,10 @@ class ApertiumOutputFormatter: public OutputFormatter
  public:
   ApertiumOutputFormatter(TokenIOStream& s, bool f): OutputFormatter(s,f) {}
   
-  std::vector<std::string> process_finals(const LookupPathSet& finals,
+  std::set<std::string> process_finals(const LookupPathSet& finals,
                                           CapitalizationState state) const;
   void print_word(const TokenVector& surface_form, 
-                  std::vector<std::string> const &analyzed_forms) const;
+                  std::set<std::string> const &analyzed_forms) const;
   void print_unknown_word(const TokenVector& surface_form) const;
   
   bool preserve_nonalphabetic() const {return true;}
@@ -74,10 +74,10 @@ class CGOutputFormatter: public OutputFormatter
  public:
   CGOutputFormatter(TokenIOStream& s, bool f): OutputFormatter(s,f) {}
   
-  std::vector<std::string> process_finals(const LookupPathSet& finals,
+  std::set<std::string> process_finals(const LookupPathSet& finals,
                                           CapitalizationState caps) const;
   void print_word(const TokenVector& surface_form, 
-                  std::vector<std::string> const &analyzed_forms) const;
+                  std::set<std::string> const &analyzed_forms) const;
   void print_unknown_word(const TokenVector& surface_form) const;
   
   bool preserve_nonalphabetic() const {return false;}
@@ -88,10 +88,10 @@ class XeroxOutputFormatter: public OutputFormatter
  public:
   XeroxOutputFormatter(TokenIOStream& s, bool f): OutputFormatter(s,f) {}
   
-  std::vector<std::string> process_finals(const LookupPathSet& finals,
+  std::set<std::string> process_finals(const LookupPathSet& finals,
                                           CapitalizationState state) const;
   void print_word(const TokenVector& surface_form, 
-                  std::vector<std::string> const &analyzed_forms) const;
+                  std::set<std::string> const &analyzed_forms) const;
   void print_unknown_word(const TokenVector& surface_form) const;
   
   bool preserve_nonalphabetic() const {return false;}

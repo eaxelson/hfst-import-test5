@@ -79,11 +79,11 @@ caps3out: Makefile
 
 caps4out: Makefile
 	@echo '^test/test+n$$' > $@
-	@echo '^Test/test+n/Test+np$$' >> $@
-	@echo '^TEST/test+n/Test+np$$' >> $@
-	@echo '^TeSt/test+n/Test+np$$' >> $@
+	@echo '^Test/Test+np/test+n$$' >> $@
+	@echo '^TEST/Test+np/test+n$$' >> $@
+	@echo '^TeSt/Test+np/test+n$$' >> $@
 	@echo '^tesT/test+n$$' >> $@
-	@echo '^TEst/test+n/Test+np$$' >> $@
+	@echo '^TEst/Test+np/test+n$$' >> $@
 	
 caps.sh: capsin caps1out caps2out caps3out caps4out Makefile
 	@echo 'test -e $(CAPS_TRANSDUCER) || exit 0' > $@
@@ -100,8 +100,8 @@ caps.sh: capsin caps1out caps2out caps3out caps4out Makefile
 
 # covers filtering/preservation of compound analyses
 cmpndfilterout: Makefile
-	@echo '^strategiijaplána/strategiijaplána<N><Sg><Nom>/strategiijaplána<N><Sg><Acc>/strategiijaplána<N><Sg><Gen>$$' > $@
-	@echo '^strategiijaplána/strategiijaplána<N><Sg><Nom>/strategiijaplána<N><Sg><Acc>/strategiijaplána<N><Sg><Gen>/strategiija<N><Sg><Nom><Cmp>+plána<N><Sg><Nom>/strategiija<N><Sg><Nom><Cmp>+plána<N><Sg><Acc>/strategiija<N><Sg><Nom><Cmp>+plána<N><Sg><Gen>/strategiija<N><Sg><Gen><Cmp>+plána<N><Sg><Nom>/strategiija<N><Sg><Gen><Cmp>+plána<N><Sg><Acc>/strategiija<N><Sg><Gen><Cmp>+plána<N><Sg><Gen>$$' >> $@
+	@echo '^strategiijaplána/strategiijaplána<N><Sg><Acc>/strategiijaplána<N><Sg><Gen>/strategiijaplána<N><Sg><Nom>$$' > $@
+	@echo '^strategiijaplána/strategiija<N><Sg><Gen><Cmp>+plána<N><Sg><Acc>/strategiija<N><Sg><Gen><Cmp>+plána<N><Sg><Gen>/strategiija<N><Sg><Gen><Cmp>+plána<N><Sg><Nom>/strategiija<N><Sg><Nom><Cmp>+plána<N><Sg><Acc>/strategiija<N><Sg><Nom><Cmp>+plána<N><Sg><Gen>/strategiija<N><Sg><Nom><Cmp>+plána<N><Sg><Nom>/strategiijaplána<N><Sg><Acc>/strategiijaplána<N><Sg><Gen>/strategiijaplána<N><Sg><Nom>$$' >> $@
 
 cmpndfilter.sh: cmpndfilterout Makefile
 	@echo 'test -e $(SMENOB_TRANSDUCER) || exit 0' > $@
