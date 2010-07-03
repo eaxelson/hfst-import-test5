@@ -251,8 +251,8 @@ int main( int argc, char **argv ) {
 		return EXIT_FAILURE;
 	}
 	HfstOutputStream* outstream = (outfile != stdout) ?
-		new HfstOutputStream(outfilename, instream->get_type()) :
-		new HfstOutputStream(instream->get_type());
+		new HfstOutputStream(outfilename, output_type) :
+		new HfstOutputStream(output_type);
 	
 	retval = process_stream(*instream, *outstream);
 	delete instream;
