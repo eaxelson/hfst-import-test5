@@ -30,9 +30,13 @@
 #include <cstring>
 #include <getopt.h>
 
-#include <hfst2/hfst.h>
+#include "HfstTransducer.h"
 #include "hfst-program-options.h"
 #include "hfst-commandline.h"
+
+using hfst::HfstTransducer;
+using hfst::HfstInputStream;
+using hfst::exceptions::NotTransducerStreamException;
 
 static bool is_input_stdin = true;
 // first 
@@ -51,7 +55,6 @@ static bool is_output_stdout = true;
 static bool bail_on_mismatch = false;
 
 static bool use_numbers = false;
-static bool minimal = false;
 
 void
 print_usage(const char *program_name)
@@ -70,7 +73,6 @@ print_usage(const char *program_name)
 	fprintf(message_out, "%-35s%s", "  -2, --input2=INFILE2",      "Read second transducer from INFILE2\n");
 	fprintf(message_out, "%-35s%s", "  -n, --number",              "Use numbers instead of harmonizing transducers\n");
 	fprintf(message_out, "%-35s%s", "  -e, --error-on-mismatch",   "Error if transducer are not equivalent\n");
-	fprintf(message_out, "%-35s%s", "  -m, --minimal",             "If both transducers are known to be minimal\n");
 	fprintf(message_out, "\n");
 	fprintf(message_out, 
 		"If OUTFILE, or either INFILE1 or INFILE2 is missing or -,\n"
@@ -87,15 +89,6 @@ print_usage(const char *program_name)
 	  "and second.hfst\n"
 	  "\n"*/
 	print_report_bugs(message_out);
-}
-
-void delete_u(HFST::TransducerHandle t) {
-  if (t != NULL)
-    HFST::delete_transducer(t);
-}
-void delete_w(HWFST::TransducerHandle t) {
-  if (t != NULL)
-    HWFST::delete_transducer(t);
 }
 
 void
@@ -196,12 +189,6 @@ parse_options(int argc, char** argv)
 			break;
 		case 'v':
 			verbose = true;
-			break;
-		case 'm':
-			minimal = true;
-			break;
-		case 'n':
-			use_numbers = true;
 			break;
 		case 'q':
 			verbose = false;
@@ -361,192 +348,66 @@ parse_options(int argc, char** argv)
 }
 
 int
-compare_streams(std::istream& firststream, std::istream& secondstream, std::ostream& outstream)
+compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
+                std::ostream& outstream)
 {
-	VERBOSE_PRINT("Checking formats of transducers\n");
-	int format_type = get_compatible_fst_format(firststream, secondstream);
-    
-	if (format_type == SFST_FORMAT)
-	{
-		VERBOSE_PRINT("Using unweighted format\n");
-		try {
-			HFST::TransducerHandle first = NULL;
-			HFST::TransducerHandle second = NULL;
-			HFST::KeyTable *key_table = HFST::create_key_table(); 
-			bool first_has_symbols = false;
-			bool second_has_symbols = false;
-			size_t nth_stream = 1;
-
-			while (true) {
-				int firstformat = HFST::read_format(firststream);
-				int secondformat = HFST::read_format(secondstream);
-				if ((firstformat == EOF_FORMAT) && (secondformat == EOF_FORMAT))
-				{
-				  delete_u(first);
-				  delete_u(second);
-				      break;
-				}
-				if (firstformat == SFST_FORMAT)
-				{
-				  delete_u(first);
-				  first_has_symbols = HFST::has_symbol_table(firststream);
-				  if (first_has_symbols && !use_numbers)
-				    first = HFST::read_transducer(firststream, key_table);
-				  else
-				    first = HFST::read_transducer(firststream);
-				}
-				if (secondformat == SFST_FORMAT)
-				{
-				  delete_u(second);
-				  second_has_symbols = HFST::has_symbol_table(secondstream);
-				  if (first_has_symbols && second_has_symbols && !use_numbers)
-				    second = HFST::read_transducer(secondstream, key_table);
-				  else if ( (!first_has_symbols && !second_has_symbols) || use_numbers) {
-				    if (!use_numbers)
-				      fprintf(stderr, "Warning: transducers do not have a symbol table, "
-					              "comparison done using numbers instead\n");
-				    second = HFST::read_transducer(secondstream);
-				  }
-				  else {
-				    fprintf(message_out, "Only one transducer has a symbol table: "
-					                 "comparison not well defined\n"
-					                 "Use option -n if necessary\n" );
-				    return EXIT_FAILURE;
-				  }
-				}
-				if (nth_stream < 2)
-				{
-					VERBOSE_PRINT("Comparing...\n");
-				}
-				else
-				{
-					VERBOSE_PRINT("Comparing... %zu\n", nth_stream);
-				}
-				
-				bool eq=false;
-				
-				if (minimal) {
-				  eq = HFST::is_subset(first, second);
-				  if (eq)
-				    eq = HFST::is_subset(second, first);
-				}
-				else
-				  eq = HFST::are_equivalent(first, second);
-
-				if (eq)
-				{
-					outstream << "Equivalent\n";
-				}
-				else
-				{
-					outstream << "Not equivalent\n";
-					if (bail_on_mismatch)
-					{
-					  delete_u(first);
-					  delete_u(second);
-						return EXIT_FAILURE;
-					}
-				}
-				++nth_stream;
-			}
-			delete key_table;
-		}
-		catch (const char *p)
+	firststream.open();
+	secondstream.open();
+	// should be is_good? 
+	bool bothInputs = firststream.is_good() && secondstream.is_good();	
+	size_t transducer_n = 0;
+	while (bothInputs) {
+		transducer_n++;
+		if (transducer_n == 1)
 		{
-			printf("HFST library error: %s\n", p);
-			return EXIT_FAILURE;
+			VERBOSE_PRINT("Comparing %s and %s...\n", firstfilename, 
+		                secondfilename);
 		}
-		return EXIT_SUCCESS;
-	}
-	else if (format_type == OPENFST_FORMAT) 
-	{
-		VERBOSE_PRINT("Using weighted format\n");
-		try {
-			HWFST::TransducerHandle second = NULL;
-			HWFST::TransducerHandle first = NULL;
-			HWFST::KeyTable *key_table = HWFST::create_key_table(); 
-			bool first_has_symbols = false;
-			bool second_has_symbols = false;
-			size_t nth_stream = 1;
-			while (true) 
+		else
+		{
+		  VERBOSE_PRINT("Comparing %s and %s... %zu\n", firstfilename,
+		                secondfilename, transducer_n);
+		}
+		HfstTransducer first(firststream);
+		HfstTransducer second(secondstream);
+		
+		if(first.get_type() != second.get_type())
+		{
+			fprintf(stderr, "Warning: %s contains a different transducer format "
+				"from %s; converting to the format of %s\n", firstfilename,
+				secondfilename, firstfilename);
+			second.convert(first.get_type());
+		}
+		
+		if (HfstTransducer::are_equivalent(first, second))
+		{
+			outstream << "Equivalent\n";
+		}
+		else
+		{
+			outstream << "Not equivalent\n";
+			if (bail_on_mismatch)
 			{
-				int firstformat = HFST::read_format(firststream);
-				int secondformat = HFST::read_format(secondstream);
-				if ((firstformat == EOF_FORMAT) && (secondformat == EOF_FORMAT))
-				{
-				  delete_w(first);
-				  delete_w(second);
-					break;
-				}
-				if (firstformat == OPENFST_FORMAT)
-				{
-				  delete_w(first);
-				  first_has_symbols = HWFST::has_symbol_table(firststream);
-				  if (first_has_symbols && !use_numbers)
-				    first = HWFST::read_transducer(firststream, key_table);
-				  else
-				    first = HWFST::read_transducer(firststream);
-				}
-				if (secondformat == OPENFST_FORMAT)
-				{
-				  delete_w(second);
-				  second_has_symbols = HWFST::has_symbol_table(secondstream);
-				  if (first_has_symbols && second_has_symbols && !use_numbers)
-				    second = HWFST::read_transducer(secondstream, key_table);
-				  else if ( (!first_has_symbols && !second_has_symbols) || use_numbers) {
-				    if (!use_numbers)
-				      fprintf(stderr, "Warning: transducers do not have a symbol table, "
-					              "comparison done using numbers instead\n");
-				    second = HWFST::read_transducer(secondstream);
-				  }
-				  else {
-				    fprintf(message_out, "Only one transducer has a symbol table: "
-					                 "comparison not well defined\n"
-					                 "Use option -n if necessary\n" );
-				    return EXIT_FAILURE;
-				  }
-				}
-
-				if (nth_stream < 2)
-				{
-					VERBOSE_PRINT("Comparing...\n");
-				}
-				else
-				{
-					VERBOSE_PRINT("Comparing... %zu\n", nth_stream);
-				}
-				bool eq = HWFST::are_equivalent(first, second);
-				if (eq)
-				{
-					outstream << "Equivalent\n";
-				}
-				else
-				{
-					outstream << "Not equivalent\n";
-					if (bail_on_mismatch)
-					{
-					  delete_w(first);
-					  delete_w(second);
-						return EXIT_FAILURE;
-					}
-				}
-				nth_stream++;
+				return EXIT_FAILURE;
 			}
-			delete key_table;
 		}
-		catch (const char *p) {
-			fprintf(message_out, "HFST lib error: %s\n", p);
-			return 1;
-		}
-		return EXIT_SUCCESS;
+		bothInputs = firststream.is_good() && secondstream.is_good();
 	}
-	else
+	
+	if (firststream.is_good())
 	{
-		fprintf(message_out, "ERROR: Transducer has wrong type.\n");
-		return EXIT_FAILURE;
+	  fprintf(stderr, "Warning: %s contains more transducers than %s; "
+	          "residue skipped\n", firstfilename, secondfilename);
 	}
+	else if (secondstream.is_good())
+	{
+	  fprintf(stderr, "Warning: %s contains fewer transducers than %s; "
+	          "residue skipped\n", firstfilename, secondfilename);
+	}
+	firststream.close();
+	secondstream.close();
+	return EXIT_SUCCESS;
 }
-
 
 int main( int argc, char **argv ) {
 	message_out = stdout;
@@ -572,65 +433,37 @@ int main( int argc, char **argv ) {
 	VERBOSE_PRINT("Reading from %s and %s, writing to %s\n", 
 		firstfilename, secondfilename, outfilename);
 	// here starts the buffer handling part
-	if ((firstfile != stdin) && (secondfile != stdin))
-	{
-		std::filebuf fbfirst;
-		fbfirst.open(firstfilename, std::ios::in);
-		std::istream firststream(&fbfirst);
-		std::filebuf fbsecond;
-		fbsecond.open(secondfilename, std::ios::in);
-		std::istream secondstream(&fbsecond);
-		if (outfile != stdout)
-		{
-			std::filebuf fbout;
-			fbout.open(outfilename, std::ios::out);
-			std::ostream outstream(&fbout);
-			retval = compare_streams(firststream, secondstream, outstream);
-		}
-		else
-		{
-			retval = compare_streams(firststream, secondstream, std::cout);
-		}
-		return retval;
+	HfstInputStream* firststream = NULL;
+	HfstInputStream* secondstream = NULL;
+	try {
+		firststream = (firstfile != stdin) ?
+			new HfstInputStream(firstfilename) : new HfstInputStream();
+	} catch(NotTransducerStreamException)	{
+		fprintf(stderr, "%s is not a valid transducer file\n", firstfilename);
+		return EXIT_FAILURE;
 	}
-	else if (firstfile != stdin)
-	{
-		std::filebuf fbfirst;
-		fbfirst.open(firstfilename, std::ios::in);
-		std::istream firststream(&fbfirst);
-		if (outfile != stdout)
-		{
-			std::filebuf fbout;
-			fbout.open(outfilename, std::ios::out);
-			std::ostream outstream(&fbout);
-			retval = compare_streams(firststream, std::cin, outstream);
-		}
-		else
-		{
-			retval = compare_streams(firststream, std::cin, std::cout);
-		}
-		return retval;
+	try {
+		secondstream = (secondfile != stdin) ?
+			new HfstInputStream(secondfilename) : new HfstInputStream();
+	} catch(NotTransducerStreamException)	{
+		fprintf(stderr, "%s is not a valid transducer file\n", secondfilename);
+		return EXIT_FAILURE;
 	}
-	else if (secondfile != stdin)
+	
+	if(outfile != stdout)
 	{
-		std::filebuf fbsecond;
-		fbsecond.open(secondfilename, std::ios::in);
-		std::istream secondstream(&fbsecond);
-		if (outfile != stdout)
-		{
-			std::filebuf fbout;
-			fbout.open(outfilename, std::ios::out);
-			std::ostream outstream(&fbout);
-			retval = compare_streams(std::cin, secondstream, outstream);
-		}
-		else
-		{
-			retval = compare_streams(std::cin, secondstream, std::cout);
-		}
-		return retval;
+		std::ofstream out(outfilename);
+		retval = compare_streams(*firststream, *secondstream, out);
 	}
+	else
+	{
+		retval = compare_streams(*firststream, *secondstream, std::cout);
+	}
+	
+	delete firststream;
+	delete secondstream;
 	free(firstfilename);
 	free(secondfilename);
 	free(outfilename);
-	return EXIT_SUCCESS;
+	return retval;
 }
