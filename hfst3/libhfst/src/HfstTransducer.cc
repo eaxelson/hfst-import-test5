@@ -515,6 +515,25 @@ void HfstTransducer::test_minimize()
 	break;
       }    
   }
+  
+  bool HfstTransducer::is_cyclic(void) const
+  {
+    switch(type)
+    {
+      case SFST_TYPE:
+        return sfst_interface.is_cyclic(implementation.sfst);
+      case TROPICAL_OFST_TYPE:
+        return tropical_ofst_interface.is_cyclic(implementation.tropical_ofst);
+      case LOG_OFST_TYPE:
+        return log_ofst_interface.is_cyclic(implementation.log_ofst);
+      case FOMA_TYPE:
+        return foma_interface.is_cyclic(implementation.foma);
+      case ERROR_TYPE:
+      default:
+        throw hfst::exceptions::TransducerHasWrongTypeException();
+        return false;
+    }
+  }
 
   HfstTransducer &HfstTransducer::remove_epsilons()
   { is_trie = false;

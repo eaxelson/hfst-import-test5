@@ -642,6 +642,9 @@ fclose(ifile);
 
     // test
     void test_minimize(void);
+    
+    /** \brief Whether \a t is cyclic. */
+    bool is_cyclic(void) const;
 
     /** \brief The type of the transducer. */
     ImplementationType get_type(void) const;

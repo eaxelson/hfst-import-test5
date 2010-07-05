@@ -164,7 +164,9 @@ namespace implementations
       static void write_in_att_format_number(StdVectorFst * t, std::ostream &os);
 
       static StdVectorFst * read_in_att_format(FILE *ifile);
+      
       static bool are_equivalent(StdVectorFst *one, StdVectorFst *another);
+      static bool is_cyclic(StdVectorFst * t);
 
       static StdVectorFst * insert_freely(StdVectorFst * t, const StringPair &symbol_pair);
       static StdVectorFst * substitute(StdVectorFst * t, std::string old_symbol, std::string new_symbol);
