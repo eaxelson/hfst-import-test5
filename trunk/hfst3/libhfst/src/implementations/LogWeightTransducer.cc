@@ -993,6 +993,11 @@ namespace hfst { namespace implementations
     LogFst B(encb);
     return Equivalent(A, B);
   }
+  
+  bool LogWeightTransducer::is_cyclic(LogFst * t)
+  {
+    return t->Properties(kCyclic, true) & kCyclic;
+  }
 
   /*
   LogWeightTransducer::const_iterator 

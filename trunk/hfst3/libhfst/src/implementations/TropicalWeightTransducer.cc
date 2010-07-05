@@ -1238,6 +1238,11 @@ namespace hfst { namespace implementations
     StdVectorFst B(encb);
     return Equivalent(A, B);
   }
+  
+  bool TropicalWeightTransducer::is_cyclic(StdVectorFst * t)
+  {
+    return t->Properties(kCyclic, true) & kCyclic;
+  }
 
   /*StdVectorFst * TropicalWeightTransducer::define_transducer
   (const KeyPairVector &kpv)

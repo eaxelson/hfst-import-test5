@@ -76,6 +76,7 @@ namespace hfst {
       static fsm * extract_output_language(fsm * t);
 
       static bool are_equivalent(fsm *t1, fsm *t2);
+      static bool is_cyclic(fsm * t);
 
       static fsm * substitute(fsm * t,hfst::String old_symbol,hfst::String new_symbol);
 

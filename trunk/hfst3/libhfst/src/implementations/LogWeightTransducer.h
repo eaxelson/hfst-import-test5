@@ -216,6 +216,7 @@ namespace hfst { namespace implementations
 			    LogFst * t2);
 
       static bool are_equivalent(LogFst * t1, LogFst * t2);
+      static bool is_cyclic(LogFst * t);
 
       //static LogFst * set_weight(LogFst * t,float f);
       static LogFst * set_final_weights(LogFst * t, float weight);

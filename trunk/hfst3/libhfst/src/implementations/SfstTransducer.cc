@@ -771,6 +771,11 @@ namespace hfst { namespace implementations {
   {
     return (t1 == t2);
   }
+  
+  bool SfstTransducer::is_cyclic(Transducer * t)
+  {
+    return t->is_cyclic();
+  }
 
     /*
   SfstStateIterator::SfstStateIterator(Transducer * t):

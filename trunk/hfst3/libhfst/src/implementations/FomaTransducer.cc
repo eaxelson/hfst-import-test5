@@ -486,6 +486,10 @@ namespace hfst { namespace implementations {
     return fsm_isempty(fsm_union(fsm_minus(fsm_copy(t1),fsm_copy(t2)),fsm_minus(fsm_copy(t1),fsm_copy(t2))));    
   }
 
+  bool FomaTransducer::is_cyclic(fsm * t)
+  {
+    return (t->pathcount == PATHCOUNT_CYCLIC);
+  }
 
     /*
   FomaStateIterator::FomaStateIterator(fsm * t):
