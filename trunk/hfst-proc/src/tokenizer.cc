@@ -177,6 +177,12 @@ TokenIOStream::get_capitalization_state(const TokenVector& tokens) const
 std::string
 TokenIOStream::read_utf8_char()
 {
+  return read_utf8_char(is);
+}
+
+std::string
+TokenIOStream::read_utf8_char(std::istream& is)
+{
   unsigned short u8len = 0;
   int c = is.peek();
   if(is.eof())
