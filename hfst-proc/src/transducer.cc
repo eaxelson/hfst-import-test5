@@ -323,13 +323,16 @@ TransducerAlphabet::symbols_to_string(const SymbolNumberVector& symbols, Capital
 bool
 TransducerAlphabet::is_punctuation(const char* c) const
 {
-  static const char* punct_ranges[6][2] = {{"!","/"},
+  static const char* punct_ranges[8][2] = {{"!","/"},
                                            {":","@"},
                                            {"[","`"},
                                            {"{","~"},
                                            {"¡","¿"},
-                                           {"‐","⁞"}};
-  for(int i=0;i<6;i++)
+                                           {"‐","⁞"},
+                                           {"₠","₸"},
+                                           {"∀","⋿"}};
+  const char* individual_chars = "×÷";
+  for(int i=0;i<8;i++)
   {
     if(strcmp(c,punct_ranges[i][0]) >= 0 && 
        strcmp(c,punct_ranges[i][1]) <= 0)
@@ -344,7 +347,8 @@ TransducerAlphabet::is_punctuation(const char* c) const
       return true;
     }
   }
-  return false;
+  
+  return (strstr(individual_chars, c) != NULL);
 }
 
 bool
