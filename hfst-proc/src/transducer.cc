@@ -1,5 +1,6 @@
 #include <cstring>
 #include <cstdlib>
+#include <sstream>
 #include "transducer.h"
 #include "lookup-path.h"
 #include "lookup-state.h"
@@ -30,6 +31,7 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is,
   setup_blank_symbol();
   symbolizer = new Symbolizer(symbol_table);
   calculate_caps();
+  check_for_overlapping();
 }
 
 TransducerAlphabet::TransducerAlphabet(const TransducerAlphabet& o):
@@ -60,6 +62,59 @@ TransducerAlphabet::setup_blank_symbol()
     s.str = " ";
     s.alphabetic = is_alphabetic(s.str.c_str());
     symbol_table.push_back(s);
+  }
+}
+
+void
+TransducerAlphabet::check_for_overlapping() const
+{
+  std::vector<std::string> overlapping;
+  
+  for(size_t i=0;i<symbol_table.size();i++)
+  {
+    std::string str = symbol_table[i].str;
+    if(str.length() > 1 && !is_punctuation(std::string(1, str[0]).c_str()))
+    {
+      std::istringstream s(str);
+      
+      // divide the symbol into UTF8 characters
+      std::vector<std::string> chars;
+      while(true)
+      {
+        std::string ch = TokenIOStream::read_utf8_char(s);
+        if(ch == "")
+          break;
+        else
+          chars.push_back(ch);
+      }
+      if(chars.size() < 2)
+        continue;
+      
+      bool overlaps = true;
+      for(size_t j=0;j<chars.size();j++)
+      {
+        std::string ch = chars[j];
+        if(!is_alphabetic(ch.c_str()) || symbolizer->find_symbol(ch.c_str()) == NO_SYMBOL_NUMBER)
+        {
+          overlaps = false;
+          break;
+        }
+      }
+      
+      if(overlaps)
+        overlapping.push_back(str);
+    }
+  }
+  
+  if(!overlapping.empty())
+  {
+    std::cerr << "!! Warning: Transducer contains one or more multi-character symbols made up of\n"
+              << "ASCII characters which are also available as single-character symbols. The\n"
+              << "input stream will always be tokenized using the longest symbols available.\n"
+              << "Use the -t option to view the tokenization. The problematic symbol(s):\n";
+    for(size_t i=0;i<overlapping.size();i++)
+      std::cerr << (i==0?"":" ") << overlapping[i];
+    std::cerr << std::endl;
   }
 }
 

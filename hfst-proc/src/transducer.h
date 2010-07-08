@@ -212,6 +212,13 @@ class TransducerAlphabet
    */
   void setup_blank_symbol();
   
+  /**
+   * Check for and warn about the symbol table containing multi-char symbols
+   * consisting ASCII characters that are available individually elsewhere in
+   * the table
+   */
+  void check_for_overlapping() const;
+  
   std::map<std::string, SymbolNumber> feature_bucket;
   std::map<std::string, ValueNumber> value_bucket;
   ValueNumber val_num;
