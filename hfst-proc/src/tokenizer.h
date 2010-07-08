@@ -293,6 +293,12 @@ class TokenIOStream
   void write_escaped(const TokenVector& t) {os << tokens_to_string(t);}
   
   std::string get_superblank(size_t i) const {return superblank_bucket[i];}
+  
+  /**
+   * Reads a UTF-8 char (1-4 bytes) an the input stream, returning it as a
+   * character string
+   */
+  static std::string read_utf8_char(std::istream& is);
 };
 
 #endif
