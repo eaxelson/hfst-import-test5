@@ -21,7 +21,7 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is,
   }
   value_bucket[std::string()] = 0; // empty value = neutral
   for(SymbolNumber k=0; k<symbol_count; k++)
-    get_next_symbol(is, k);
+    symbol_table.push_back(get_next_symbol(is));
   
   if(verboseFlag && get_state_size()>0)
     std::cout << "Alphabet contains " << get_state_size() << " flag diacritic feature(s)" << std::endl;
@@ -32,6 +32,8 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is,
   symbolizer = new Symbolizer(symbol_table);
   calculate_caps();
   check_for_overlapping();
+  if(printDebuggingInformationFlag)
+    print_table();
 }
 
 TransducerAlphabet::TransducerAlphabet(const TransducerAlphabet& o):
@@ -118,12 +120,11 @@ TransducerAlphabet::check_for_overlapping() const
   }
 }
 
-void TransducerAlphabet::get_next_symbol(std::istream& is, SymbolNumber k)
+SymbolProperties
+TransducerAlphabet::get_next_symbol(std::istream& is)
 {
   SymbolProperties symbol;
   std::getline(is, symbol.str, '\0');
-  if(printDebuggingInformationFlag)
-    std::cout << "Got next symbol: '" << symbol.str << "' (" << k << ")" << std::endl;
   
   if(!is)
   {
@@ -165,22 +166,12 @@ void TransducerAlphabet::get_next_symbol(std::istream& is, SymbolNumber k)
     
     symbol.fd_op = FlagDiacriticOperation(op, feature_bucket[feat], value_bucket[val]);
     
-#if OL_FULL_DEBUG
-    std::cout << "symbol number " << k << " (flag) is " << symbol.str << std::endl;
-#else
     symbol.str = "";
-#endif
-  }
-  else // not a flag diacritic
-  {
-#if OL_FULL_DEBUG
-    std::cout << "symbol number " << k << " is " << symbol.str << std::endl;
-#endif
   }
   
   symbol.alphabetic = is_alphabetic(symbol.str.c_str());
   
-  symbol_table.push_back(symbol);
+  return symbol;
 }
 
 void
@@ -204,6 +195,30 @@ TransducerAlphabet::calculate_caps()
     }
     else
       symbol_table[i].lower=symbol_table[i].upper=NO_SYMBOL_NUMBER;
+  }
+}
+
+void
+TransducerAlphabet::print_table() const
+{
+  std::cout << "Symbol table containing " << symbol_table.size() << " symbols:" << std::endl;
+  for(SymbolNumber i=0;i<symbol_table.size();i++)
+  {
+    std::cout << "Symbol: #" << i << ", '" << symbol_to_string(i) << "',"
+              << (is_alphabetic(i)?" ":" not ") << "alphabetic, ";
+    if(is_lower(i))
+    {
+      SymbolNumber s2 = to_upper(i);
+      std::cout << "lowercase, upper: " << s2 << "/" << symbol_to_string(s2);
+    }
+    else if(is_upper(i))
+    {
+      SymbolNumber s2 = to_lower(i);
+      std::cout << "uppercase, lower: " << s2 << "/" << symbol_to_string(s2);
+    }
+    else
+      std::cout << "no case";
+    std::cout << std::endl;
   }
 }
 

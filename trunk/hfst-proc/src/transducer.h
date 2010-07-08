@@ -187,7 +187,7 @@ class TransducerAlphabet
    */
   SymbolNumber blank_symbol;
   
-  void get_next_symbol(std::istream& is, SymbolNumber k);
+  SymbolProperties get_next_symbol(std::istream& is);
   
   /**
    * Find the upper/lower-case equivalencies for the symbols in the table
@@ -218,6 +218,8 @@ class TransducerAlphabet
    * the table
    */
   void check_for_overlapping() const;
+  
+  void print_table() const;
   
   std::map<std::string, SymbolNumber> feature_bucket;
   std::map<std::string, ValueNumber> value_bucket;
