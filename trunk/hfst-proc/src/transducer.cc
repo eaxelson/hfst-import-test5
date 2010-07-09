@@ -195,8 +195,12 @@ TransducerAlphabet::calculate_caps()
   for(size_t i=0;i<size;i++)
   {
     int case_res;
-    std::string switched = caps_helper(symbol_table[i].str.c_str(), case_res);
-    
+    std::string switched;
+    if(is_alphabetic(i))
+      switched = caps_helper(symbol_table[i].str.c_str(), case_res);
+    else
+      case_res = 0;
+        
     if(case_res < 0)
     {
       symbol_table[i].lower = i;
@@ -221,15 +225,17 @@ TransducerAlphabet::calculate_caps()
         {
           symbol_table[i].upper = symbol_table.size();
           new_symb.lower = i;
+          new_symb.upper = symbol_table.size();
         }
         else
         {
           symbol_table[i].lower = symbol_table.size();
           new_symb.upper = i;
+          new_symb.lower = symbol_table.size();
         }
         add_symbol(new_symb);
         if(printDebuggingInformationFlag)
-          std::cout << "Added new symbol '" << switched << "' (" << symbol_table.size() << ") as alternate case for '" 
+          std::cout << "Added new symbol '" << switched << "' (" << symbol_table.size()-1 << ") as alternate case for '" 
                     << symbol_table[i].str << "' (" << i << ")" << std::endl;
       }
       else
