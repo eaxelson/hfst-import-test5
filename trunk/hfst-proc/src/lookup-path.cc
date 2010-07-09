@@ -80,13 +80,13 @@ PathFd::evaluate_flag_diacritic(SymbolNumber s)
     if(evaluate_flag_diacritic(symbol_table[s].fd_op))
     {
       if(printDebuggingInformationFlag)
-        std::cout << "flag diacritic [" << s << "] allowed" << std::endl;
+        std::cout << "flag diacritic [" << s << "/" << symbol_table[s].fd_op.Name() << "] allowed" << std::endl;
       return true;
     }
     else
     {
       if(printDebuggingInformationFlag)
-        std::cout << "flag diacritic [" << s << "] disallowed" << std::endl;
+        std::cout << "flag diacritic [" << s << "/" << symbol_table[s].fd_op.Name() << "] disallowed" << std::endl;
       return false;
     }
   }
