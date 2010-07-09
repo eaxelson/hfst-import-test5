@@ -111,18 +111,34 @@ class FlagDiacriticOperation
   FlagDiacriticOperator operation;
   SymbolNumber feature;
   ValueNumber value;
+  std::string name;
  public:
- FlagDiacriticOperation(FlagDiacriticOperator op, SymbolNumber feat, ValueNumber val):
-  operation(op), feature(feat), value(val) {}
+ FlagDiacriticOperation(FlagDiacriticOperator op, SymbolNumber feat, ValueNumber val, const char* str):
+  operation(op), feature(feat), value(val), name(str) {}
 
   // dummy constructor
  FlagDiacriticOperation():
-  operation(P), feature(NO_SYMBOL_NUMBER), value(0) {}
+  operation(P), feature(NO_SYMBOL_NUMBER), value(0), name() {}
   
   bool isFlag(void) const { return feature != NO_SYMBOL_NUMBER; }
   FlagDiacriticOperator Operation(void) const { return operation; }
   SymbolNumber Feature(void) const { return feature; }
   ValueNumber Value(void) const { return value; }
+  std::string Name(void) const { return name; }
+  
+  static FlagDiacriticOperator char_to_operator(char c)
+  {
+    switch (c) {
+    case 'P': return P;
+    case 'N': return N;
+    case 'R': return R;
+    case 'D': return D;
+    case 'C': return C;
+    case 'U': return U;
+    default:
+      throw;
+    }
+  }
 
 #if OL_FULL_DEBUG
   void print(void)
@@ -226,8 +242,6 @@ class TransducerAlphabet
   
   std::map<std::string, SymbolNumber> feature_bucket;
   std::map<std::string, ValueNumber> value_bucket;
-  ValueNumber val_num;
-  SymbolNumber feat_num;
   
  public:
   TransducerAlphabet(std::istream& is, SymbolNumber symbol_count);
