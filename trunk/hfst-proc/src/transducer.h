@@ -203,6 +203,7 @@ class TransducerAlphabet
    *         string if nonexistent
    */
   static std::string caps_helper(const char* c, int& case_res);
+  static std::string caps_helper_single(const char* c, int& case_res);
   static int utf8_str_to_int(const char* c);
   static std::string utf8_int_to_str(int c);
   

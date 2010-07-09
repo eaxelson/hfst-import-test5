@@ -28,9 +28,9 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is,
   // assume the first symbol is epsilon which we don't want to print
   symbol_table[0].str = "";
   
+  check_for_overlapping();
   setup_blank_symbol();
   calculate_caps();
-  check_for_overlapping();
   if(printDebuggingInformationFlag)
     print_table();
 }
@@ -256,7 +256,8 @@ TransducerAlphabet::calculate_caps()
     }
     
     
-    if(symbol_table[i].lower != NO_SYMBOL_NUMBER && symbol_table[i].upper != NO_SYMBOL_NUMBER && 
+    if(printDebuggingInformationFlag &&
+       symbol_table[i].lower != NO_SYMBOL_NUMBER && symbol_table[i].upper != NO_SYMBOL_NUMBER && 
        symbol_to_string(symbol_table[i].lower).length() != symbol_to_string(symbol_table[i].upper).length())
     {
       std::cout << "Symbol " << i << "'s alternate case has a different string length" << std::endl;
@@ -265,7 +266,7 @@ TransducerAlphabet::calculate_caps()
 }
 
 std::string
-TransducerAlphabet::caps_helper(const char* c, int& case_res)
+TransducerAlphabet::caps_helper_single(const char* c, int& case_res)
 {
   static const char* parallel_ranges[5][2][2] = {{{"A","Z"},{"a","z"}}, // Basic Latin
                                                  {{"À","Þ"},{"à","þ"}}, // Latin-1 Supplement
@@ -323,6 +324,28 @@ TransducerAlphabet::caps_helper(const char* c, int& case_res)
   }
   case_res = 0;
   return "";
+}
+
+std::string
+TransducerAlphabet::caps_helper(const char* in, int& case_res)
+{
+  std::istringstream str(in);
+  std::string out;
+  case_res = 0;
+  int tmp = -2; // -2 indicates first time through the loop
+  
+  std::vector<std::string> chars;
+  while(true)
+  {
+    std::string c = TokenIOStream::read_utf8_char(str);
+    if(c == "")
+      break;
+    
+    std::string switched = caps_helper_single(c.c_str(), (tmp==-2?case_res:tmp));
+    tmp=0;
+    out.append((switched==""?c:switched));
+  }
+  return out;
 }
 
 int

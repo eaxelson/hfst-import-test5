@@ -37,13 +37,13 @@ LetterTrie::add_string(const char * p, SymbolNumber symbol_key)
 SymbolNumber
 LetterTrie::find_symbol(const char* c) const
 {
-  if (letters[(unsigned char)(c[0])] == NULL)
+  if(strlen(c) == 1)
     return symbols[(unsigned char)(c[0])];
   
-  SymbolNumber s = letters[(unsigned char)(c[0])]->find_symbol(c+1);
-  if (s == NO_SYMBOL_NUMBER)
-    return symbols[(unsigned char)(c[0])];
-  return s;
+  if(letters[(unsigned char)(c[0])] == NULL)
+    return NO_SYMBOL_NUMBER;
+  else
+    return letters[(unsigned char)(c[0])]->find_symbol(c+1);
 }
 
 SymbolNumber
@@ -105,7 +105,8 @@ Symbolizer::find_symbol(const char* c) const
 {
   if(c[0] == 0)
     return NO_SYMBOL_NUMBER;
-  if(ascii_symbols[(unsigned char)(c[0])] == NO_SYMBOL_NUMBER ||
+  if(strlen(c) > 1 ||
+     ascii_symbols[(unsigned char)(c[0])] == NO_SYMBOL_NUMBER ||
      ascii_symbols[(unsigned char)(c[0])] == 0)
     return letters.find_symbol(c);
   return ascii_symbols[(unsigned char)(c[0])];
