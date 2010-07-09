@@ -1,4 +1,6 @@
+#include <cstdlib>
 #include "tokenizer.h"
+#include "transducer.h"
 
 //////////Function definitions for LetterTrie
 
@@ -72,25 +74,30 @@ LetterTrie::extract_symbol(std::istream& is) const
 //////////Function definitions for Symbolizer
 
 void
-Symbolizer::read_input_symbols(const SymbolTable& st)
+Symbolizer::add_symbol(const SymbolProperties& symbol)
+{
+  std::string p = symbol.str;
+  
+  if(p.length() > 0)
+  {
+    unsigned char first = p.at(0);
+    if(ascii_symbols[first] != 0)
+    { // if the symbol's first character is ASCII and we're not ignoring it yet
+      if(p.length() == 1)
+        ascii_symbols[first] = symbol_count;
+      else
+        ascii_symbols[first] = 0;
+    }
+    letters.add_string(p.c_str(),symbol_count);
+  }
+  symbol_count++;
+}
+
+void
+Symbolizer::add_symbols(const SymbolTable& st)
 {
   for (SymbolNumber k = 0; k < st.size(); ++k)
-  {
-    std::string p = st[k].str;
-    
-    if(p.length() > 0)
-    {
-      unsigned char first = p.at(0);
-      if(ascii_symbols[first] != 0) 
-      { // if the symbol's first character is ASCII and we're not ignoring it yet
-        if(p.length() == 1)
-          ascii_symbols[first] = k;
-        else
-          ascii_symbols[first] = 0;
-      }
-      letters.add_string(p.c_str(),k);
-    }
-  }
+    add_symbol(st[k]);
 }
 
 SymbolNumber
@@ -98,7 +105,8 @@ Symbolizer::find_symbol(const char* c) const
 {
   if(c[0] == 0)
     return NO_SYMBOL_NUMBER;
-  if (ascii_symbols[(unsigned char)(c[0])] == NO_SYMBOL_NUMBER)
+  if(ascii_symbols[(unsigned char)(c[0])] == NO_SYMBOL_NUMBER ||
+     ascii_symbols[(unsigned char)(c[0])] == 0)
     return letters.find_symbol(c);
   return ascii_symbols[(unsigned char)(c[0])];
 }
@@ -109,7 +117,8 @@ Symbolizer::extract_symbol(std::istream& is) const
   int c = is.peek();
   if(c == 0)
     return NO_SYMBOL_NUMBER;
-  if(ascii_symbols[c] == NO_SYMBOL_NUMBER)
+  if(ascii_symbols[c] == NO_SYMBOL_NUMBER ||
+     ascii_symbols[c] == 0)
     return letters.extract_symbol(is);
   
   return ascii_symbols[is.get()];

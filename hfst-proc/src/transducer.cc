@@ -11,7 +11,7 @@
 
 TransducerAlphabet::TransducerAlphabet(std::istream& is, 
                                        SymbolNumber symbol_count):
-  symbol_table(), symbolizer(NULL), blank_symbol(NO_SYMBOL_NUMBER),
+  symbol_table(), symbolizer(), blank_symbol(NO_SYMBOL_NUMBER),
   feature_bucket(), value_bucket(), val_num(1), feat_num(0)
 {
   if(symbol_count == 0)
@@ -21,7 +21,7 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is,
   }
   value_bucket[std::string()] = 0; // empty value = neutral
   for(SymbolNumber k=0; k<symbol_count; k++)
-    symbol_table.push_back(get_next_symbol(is));
+    add_symbol(get_next_symbol(is));
   
   if(verboseFlag && get_state_size()>0)
     std::cout << "Alphabet contains " << get_state_size() << " flag diacritic feature(s)" << std::endl;
@@ -29,7 +29,6 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is,
   symbol_table[0].str = "";
   
   setup_blank_symbol();
-  symbolizer = new Symbolizer(symbol_table);
   calculate_caps();
   check_for_overlapping();
   if(printDebuggingInformationFlag)
@@ -37,12 +36,12 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is,
 }
 
 TransducerAlphabet::TransducerAlphabet(const TransducerAlphabet& o):
-  symbol_table(o.symbol_table), symbolizer(new Symbolizer(symbol_table)),
+  symbol_table(o.symbol_table), symbolizer(symbol_table),
   blank_symbol(o.blank_symbol), 
   feature_bucket(o.feature_bucket), value_bucket(o.value_bucket),
   val_num(o.val_num), feat_num(o.feat_num) {}
 
-TransducerAlphabet::~TransducerAlphabet() { delete symbolizer;}
+TransducerAlphabet::~TransducerAlphabet() {}
 
 void
 TransducerAlphabet::setup_blank_symbol()
@@ -63,7 +62,7 @@ TransducerAlphabet::setup_blank_symbol()
     SymbolProperties s;
     s.str = " ";
     s.alphabetic = is_alphabetic(s.str.c_str());
-    symbol_table.push_back(s);
+    add_symbol(s);
   }
 }
 
@@ -96,7 +95,7 @@ TransducerAlphabet::check_for_overlapping() const
       for(size_t j=0;j<chars.size();j++)
       {
         std::string ch = chars[j];
-        if(!is_alphabetic(ch.c_str()) || symbolizer->find_symbol(ch.c_str()) == NO_SYMBOL_NUMBER)
+        if(!is_alphabetic(ch.c_str()) || symbolizer.find_symbol(ch.c_str()) == NO_SYMBOL_NUMBER)
         {
           overlaps = false;
           break;
@@ -175,71 +174,6 @@ TransducerAlphabet::get_next_symbol(std::istream& is)
 }
 
 void
-TransducerAlphabet::calculate_caps()
-{
-  //Symbolizer symbolizer(symbol_table);
-  size_t size = symbol_table.size(); // size before any new symbols added
-  for(size_t i=0;i<size;i++)
-  {
-    int case_res;
-    std::string switched = caps_helper(symbol_table[i].str.c_str(), case_res);
-    
-    if(case_res < 0)
-    {
-      symbol_table[i].lower = i;
-      symbol_table[i].upper = (switched=="")?NO_SYMBOL_NUMBER:symbolizer->find_symbol(switched.c_str());
-    }
-    else if(case_res > 0)
-    {
-      symbol_table[i].lower = (switched=="")?NO_SYMBOL_NUMBER:symbolizer->find_symbol(switched.c_str());
-      symbol_table[i].upper = i;
-    }
-    else
-      symbol_table[i].lower=symbol_table[i].upper=NO_SYMBOL_NUMBER;
-    
-    /*if(symbol_table[i].lower == symbol_table[i].upper && symbol_table[i].lower != NO_SYMBOL_NUMBER)
-    {
-      std::cout << "Symbol " << i << " has identical upper and lower cases" << std::endl;
-    }*/
-    if(to_lower(i) == to_upper(i) && symbol_table[i].lower != NO_SYMBOL_NUMBER)
-    {
-      if(switched != "")
-      {
-        SymbolProperties new_symb;
-        new_symb.str = switched;
-        new_symb.alphabetic = symbol_table[i].alphabetic;
-        if(symbol_table[i].lower == i)
-        {
-          symbol_table[i].upper = symbol_table.size();
-          new_symb.lower = i;
-        }
-        else
-        {
-          symbol_table[i].lower = symbol_table.size();
-          new_symb.upper = i;
-        }
-        symbol_table.push_back(new_symb);
-        if(printDebuggingInformationFlag)
-          std::cout << "Added new symbol '" << switched << "' (" << symbol_table.size() << ") as alternate case for '" 
-                    << symbol_table[i].str << "' (" << i << ")" << std::endl;
-      }
-      else
-      {
-        if(printDebuggingInformationFlag)
-          std::cout << "Symbol " << i << "'s alternate case is unknown" << std::endl;
-      }
-    }
-    
-    
-    if(symbol_table[i].lower != NO_SYMBOL_NUMBER && symbol_table[i].upper != NO_SYMBOL_NUMBER && 
-       symbol_to_string(symbol_table[i].lower).length() != symbol_to_string(symbol_table[i].upper).length())
-    {
-      std::cout << "Symbol " << i << "'s alternate case has a different string length" << std::endl;
-    }
-  }
-}
-
-void
 TransducerAlphabet::print_table() const
 {
   std::cout << "Symbol table containing " << symbol_table.size() << " symbols:" << std::endl;
@@ -260,6 +194,73 @@ TransducerAlphabet::print_table() const
     else
       std::cout << "no case";
     std::cout << std::endl;
+  }
+}
+
+void
+TransducerAlphabet::add_symbol(const SymbolProperties& symbol)
+{
+  symbol_table.push_back(symbol);
+  symbolizer.add_symbol(symbol);
+}
+
+void
+TransducerAlphabet::calculate_caps()
+{
+  size_t size = symbol_table.size(); // size before any new symbols added
+  for(size_t i=0;i<size;i++)
+  {
+    int case_res;
+    std::string switched = caps_helper(symbol_table[i].str.c_str(), case_res);
+    
+    if(case_res < 0)
+    {
+      symbol_table[i].lower = i;
+      symbol_table[i].upper = (switched=="")?NO_SYMBOL_NUMBER:symbolizer.find_symbol(switched.c_str());
+    }
+    else if(case_res > 0)
+    {
+      symbol_table[i].lower = (switched=="")?NO_SYMBOL_NUMBER:symbolizer.find_symbol(switched.c_str());
+      symbol_table[i].upper = i;
+    }
+    else
+      symbol_table[i].lower=symbol_table[i].upper=NO_SYMBOL_NUMBER;
+    
+    if(to_lower(i) == to_upper(i) && symbol_table[i].lower != NO_SYMBOL_NUMBER)
+    {
+      if(switched != "")
+      {
+        SymbolProperties new_symb;
+        new_symb.str = switched;
+        new_symb.alphabetic = symbol_table[i].alphabetic;
+        if(symbol_table[i].lower == i)
+        {
+          symbol_table[i].upper = symbol_table.size();
+          new_symb.lower = i;
+        }
+        else
+        {
+          symbol_table[i].lower = symbol_table.size();
+          new_symb.upper = i;
+        }
+        add_symbol(new_symb);
+        if(printDebuggingInformationFlag)
+          std::cout << "Added new symbol '" << switched << "' (" << symbol_table.size() << ") as alternate case for '" 
+                    << symbol_table[i].str << "' (" << i << ")" << std::endl;
+      }
+      else
+      {
+        if(printDebuggingInformationFlag)
+          std::cout << "Symbol " << i << "'s alternate case is unknown" << std::endl;
+      }
+    }
+    
+    
+    if(symbol_table[i].lower != NO_SYMBOL_NUMBER && symbol_table[i].upper != NO_SYMBOL_NUMBER && 
+       symbol_to_string(symbol_table[i].lower).length() != symbol_to_string(symbol_table[i].upper).length())
+    {
+      std::cout << "Symbol " << i << "'s alternate case has a different string length" << std::endl;
+    }
   }
 }
 
@@ -437,6 +438,9 @@ TransducerAlphabet::num_compound_boundaries(const SymbolNumberVector& symbol) co
   }
   return count;
 }
+
+const Symbolizer&
+TransducerAlphabet::get_symbolizer() const { return symbolizer; }
 
 
 //////////Function definitions for TransitionIndex and Transition

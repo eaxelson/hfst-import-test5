@@ -178,7 +178,7 @@ class TransducerAlphabet
  private:
   SymbolTable symbol_table;
   
-  Symbolizer* symbolizer;
+  Symbolizer symbolizer;
   
   /**
    * The symbol number for a "blank" which is here considered to be a space.
@@ -221,6 +221,8 @@ class TransducerAlphabet
   
   void print_table() const;
   
+  void add_symbol(const SymbolProperties& symbol);
+  
   std::map<std::string, SymbolNumber> feature_bucket;
   std::map<std::string, ValueNumber> value_bucket;
   ValueNumber val_num;
@@ -233,7 +235,7 @@ class TransducerAlphabet
   ~TransducerAlphabet();
   
   const SymbolTable& get_symbol_table(void) const { return symbol_table; }
-  const Symbolizer& get_symbolizer(void) const { return *symbolizer; }
+  const Symbolizer& get_symbolizer(void) const;
   SymbolNumber get_state_size(void) const { return feature_bucket.size(); }
   SymbolNumber get_blank_symbol() const {return blank_symbol;}
   
