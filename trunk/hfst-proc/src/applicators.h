@@ -2,6 +2,7 @@
 #define _APPLICATORS_H_
 
 #include "tokenizer.h"
+#include "transducer.h"
 
 /**
  * Abstract base class for actions that can be done using a transducer

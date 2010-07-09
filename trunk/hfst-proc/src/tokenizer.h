@@ -3,7 +3,7 @@
 
 #include "hfst-proc.h"
 #include "buffer.h"
-#include "transducer.h"
+//#include "transducer.h"
 
 class LetterTrie;
 typedef std::vector<LetterTrie*> LetterTrieVector;
@@ -58,24 +58,17 @@ class Symbolizer
  private:
   LetterTrie letters;
   SymbolNumberVector ascii_symbols;
-
-  void read_input_symbols(const SymbolTable& st);
+  
+  SymbolNumber symbol_count;
 
  public:
+  Symbolizer(): letters(), 
+    ascii_symbols(std::numeric_limits<unsigned char>::max(),NO_SYMBOL_NUMBER),
+    symbol_count(0) {}
   Symbolizer(const SymbolTable& st):
-    letters(), ascii_symbols(std::numeric_limits<unsigned char>::max(),NO_SYMBOL_NUMBER)
+    letters(), ascii_symbols(std::numeric_limits<unsigned char>::max(),NO_SYMBOL_NUMBER), symbol_count(0)
   {
-    read_input_symbols(st);
-    for(size_t i=0; i<ascii_symbols.size(); i++)
-    {
-      if(ascii_symbols[i] == 0)
-      {
-        ascii_symbols[i] = NO_SYMBOL_NUMBER;
-        if(printDebuggingInformationFlag && i < 128)
-          std::cout << "Symbolizer ignoring shortcut for ASCII character '" 
-                    << (char)i << "' (" << i << ")" << std::endl;
-      }
-    }
+    add_symbols(st);
     
     if(letters.has_symbol_0())
     {
@@ -84,6 +77,9 @@ class Symbolizer
                 << "!! cause certain characters to be misinterpreted as EOF    !!\n";
     }
   }
+  
+  void add_symbol(const SymbolProperties& symbol);
+  void add_symbols(const SymbolTable& st);
   
   SymbolNumber find_symbol(const char *c) const;
   SymbolNumber extract_symbol(std::istream& is) const;
