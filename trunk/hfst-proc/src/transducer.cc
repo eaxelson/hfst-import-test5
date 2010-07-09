@@ -178,7 +178,8 @@ void
 TransducerAlphabet::calculate_caps()
 {
   //Symbolizer symbolizer(symbol_table);
-  for(size_t i=0;i<symbol_table.size();i++)
+  size_t size = symbol_table.size(); // size before any new symbols added
+  for(size_t i=0;i<size;i++)
   {
     int case_res;
     std::string switched = caps_helper(symbol_table[i].str.c_str(), case_res);
@@ -195,6 +196,46 @@ TransducerAlphabet::calculate_caps()
     }
     else
       symbol_table[i].lower=symbol_table[i].upper=NO_SYMBOL_NUMBER;
+    
+    /*if(symbol_table[i].lower == symbol_table[i].upper && symbol_table[i].lower != NO_SYMBOL_NUMBER)
+    {
+      std::cout << "Symbol " << i << " has identical upper and lower cases" << std::endl;
+    }*/
+    if(to_lower(i) == to_upper(i) && symbol_table[i].lower != NO_SYMBOL_NUMBER)
+    {
+      if(switched != "")
+      {
+        SymbolProperties new_symb;
+        new_symb.str = switched;
+        new_symb.alphabetic = symbol_table[i].alphabetic;
+        if(symbol_table[i].lower == i)
+        {
+          symbol_table[i].upper = symbol_table.size();
+          new_symb.lower = i;
+        }
+        else
+        {
+          symbol_table[i].lower = symbol_table.size();
+          new_symb.upper = i;
+        }
+        symbol_table.push_back(new_symb);
+        if(printDebuggingInformationFlag)
+          std::cout << "Added new symbol '" << switched << "' (" << symbol_table.size() << ") as alternate case for '" 
+                    << symbol_table[i].str << "' (" << i << ")" << std::endl;
+      }
+      else
+      {
+        if(printDebuggingInformationFlag)
+          std::cout << "Symbol " << i << "'s alternate case is unknown" << std::endl;
+      }
+    }
+    
+    
+    if(symbol_table[i].lower != NO_SYMBOL_NUMBER && symbol_table[i].upper != NO_SYMBOL_NUMBER && 
+       symbol_to_string(symbol_table[i].lower).length() != symbol_to_string(symbol_table[i].upper).length())
+    {
+      std::cout << "Symbol " << i << "'s alternate case has a different string length" << std::endl;
+    }
   }
 }
 
