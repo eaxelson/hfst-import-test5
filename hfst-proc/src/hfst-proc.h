@@ -107,12 +107,6 @@ enum CapitalizationMode {IgnoreCase, CaseSensitive, DictionaryCase};
  */
 enum CapitalizationState {Unknown, LowerCase, FirstUpperCase, UpperCase};
 
-class TransitionIndex;
-class Transition;
-
-typedef std::vector<TransitionIndex*> TransitionIndexVector;
-typedef std::vector<Transition*> TransitionVector;
-
 // This is 2^31, hopefully equal to UINT_MAX/2 rounded up.
 // For some profound reason it can't be replaced with (UINT_MAX+1)/2.
 const TransitionTableIndex TRANSITION_TARGET_TABLE_START = 2147483648u;

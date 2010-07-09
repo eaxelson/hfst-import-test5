@@ -143,7 +143,10 @@ TransducerAlphabet::get_next_symbol(std::istream& is)
       for (++c; *c != '@'; c++) { val.append(c,1); }
     }
     if (feature_bucket.count(feat) == 0)
-      feature_bucket[feat] = feature_bucket.size();
+    {
+      SymbolNumber next = feature_bucket.size();
+      feature_bucket[feat] = next;
+    }
     if (value_bucket.count(val) == 0)
       value_bucket[val] = value_bucket.size()+1;
     
