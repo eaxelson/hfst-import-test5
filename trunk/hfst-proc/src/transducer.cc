@@ -12,7 +12,7 @@
 TransducerAlphabet::TransducerAlphabet(std::istream& is, 
                                        SymbolNumber symbol_count):
   symbol_table(), symbolizer(), blank_symbol(NO_SYMBOL_NUMBER),
-  feature_bucket(), value_bucket(), val_num(1), feat_num(0)
+  feature_bucket(), value_bucket()
 {
   if(symbol_count == 0)
   {
@@ -38,8 +38,7 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is,
 TransducerAlphabet::TransducerAlphabet(const TransducerAlphabet& o):
   symbol_table(o.symbol_table), symbolizer(symbol_table),
   blank_symbol(o.blank_symbol), 
-  feature_bucket(o.feature_bucket), value_bucket(o.value_bucket),
-  val_num(o.val_num), feat_num(o.feat_num) {}
+  feature_bucket(o.feature_bucket), value_bucket(o.value_bucket) {}
 
 TransducerAlphabet::~TransducerAlphabet() {}
 
@@ -133,19 +132,10 @@ TransducerAlphabet::get_next_symbol(std::istream& is)
 
   if (symbol.str.length() >= 5 && symbol.str.at(0) == '@' && symbol.str.at(symbol.str.length()-1) == '@' && symbol.str.at(2) == '.')
   { // a flag diacritic needs to be parsed
+    FlagDiacriticOperator op = FlagDiacriticOperation::char_to_operator(symbol.str.at(1));
     std::string feat;
     std::string val;
-    FlagDiacriticOperator op = P; // g++ worries about this falling through uninitialized
-    switch (symbol.str.at(1)) {
-    case 'P': op = P; break;
-    case 'N': op = N; break;
-    case 'R': op = R; break;
-    case 'D': op = D; break;
-    case 'C': op = C; break;
-    case 'U': op = U; break;
-    }
-    const char* cstr = symbol.str.c_str();
-    const char * c = cstr;
+    const char * c = symbol.str.c_str();
     // as long as we're working with utf-8, this should be ok
     for (c +=3; *c != '.' && *c != '@'; c++) { feat.append(c,1); }
     if (*c == '.')
@@ -153,17 +143,11 @@ TransducerAlphabet::get_next_symbol(std::istream& is)
       for (++c; *c != '@'; c++) { val.append(c,1); }
     }
     if (feature_bucket.count(feat) == 0)
-    {
-      feature_bucket[feat] = feat_num;
-      ++feat_num;
-    }
+      feature_bucket[feat] = feature_bucket.size();
     if (value_bucket.count(val) == 0)
-    {
-      value_bucket[val] = val_num;
-      ++val_num;
-    }
+      value_bucket[val] = value_bucket.size()+1;
     
-    symbol.fd_op = FlagDiacriticOperation(op, feature_bucket[feat], value_bucket[val]);
+    symbol.fd_op = FlagDiacriticOperation(op, feature_bucket[feat], value_bucket[val], symbol.str.c_str());
     
     symbol.str = "";
   }
@@ -179,7 +163,7 @@ TransducerAlphabet::print_table() const
   std::cout << "Symbol table containing " << symbol_table.size() << " symbols:" << std::endl;
   for(SymbolNumber i=0;i<symbol_table.size();i++)
   {
-    std::cout << "Symbol: #" << i << ", '" << symbol_to_string(i) << "',"
+    std::cout << "Symbol: #" << i << ", '" << (symbol_table[i].fd_op.isFlag()?symbol_table[i].fd_op.Name():symbol_to_string(i)) << "',"
               << (is_alphabetic(i)?" ":" not ") << "alphabetic, ";
     if(is_lower(i))
     {
