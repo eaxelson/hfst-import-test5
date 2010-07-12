@@ -10,10 +10,10 @@
 class Applicator
 {
  protected:
-  const AbstractTransducer& transducer;
+  const Transducer& transducer;
   TokenIOStream& token_stream;
  public:
-  Applicator(const AbstractTransducer& t, TokenIOStream& ts): transducer(t), token_stream(ts) {}
+  Applicator(const Transducer& t, TokenIOStream& ts): transducer(t), token_stream(ts) {}
   virtual ~Applicator() {}
   
   virtual void apply() = 0;
@@ -27,7 +27,7 @@ class TokenizationApplicator: public Applicator
  private:
   std::string process_token(const Token& t) const;
  public:
-  TokenizationApplicator(const AbstractTransducer& t, TokenIOStream& ts): Applicator(t,ts) {}
+  TokenizationApplicator(const Transducer& t, TokenIOStream& ts): Applicator(t,ts) {}
   void apply();
 };
 
@@ -37,7 +37,7 @@ class AnalysisApplicator: public Applicator
   OutputFormatter& formatter;
   CapitalizationMode caps_mode;
  public:
-  AnalysisApplicator(const AbstractTransducer& t, TokenIOStream& ts,
+  AnalysisApplicator(const Transducer& t, TokenIOStream& ts,
                      OutputFormatter& o, CapitalizationMode c):
     Applicator(t,ts), formatter(o), caps_mode(c) {}
   void apply();
@@ -58,7 +58,7 @@ class GenerationApplicator: public Applicator
   void lookup(const TokenVector& tokens);
 
  public:
-  GenerationApplicator(const AbstractTransducer& t, TokenIOStream& ts,
+  GenerationApplicator(const Transducer& t, TokenIOStream& ts,
                        GenerationMode m, CapitalizationMode c):
     Applicator(t,ts), mode(m), caps_mode(c) {}
   void apply();

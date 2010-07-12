@@ -12,7 +12,7 @@
 class LookupPath
 {
  protected:
- const AbstractTransducer& transducer;
+  const Transducer& transducer;
  
   /**
    * Points to the state in the transition index table or the transition table
@@ -34,7 +34,7 @@ class LookupPath
   SymbolNumberVector output_symbols;
   
  public:
-  LookupPath(const AbstractTransducer& t, const TransitionTableIndex initial): 
+  LookupPath(const Transducer& t, const TransitionTableIndex initial): 
     transducer(t), index(initial), final(false), output_symbols() {}
   
   LookupPath(const LookupPath& o):
@@ -113,7 +113,7 @@ class PathFd
 class LookupPathFd : public LookupPath, PathFd
 {
  public:
-  LookupPathFd(const AbstractTransducer& t, const TransitionTableIndex initial):
+  LookupPathFd(const Transducer& t, const TransitionTableIndex initial):
     LookupPath(t, initial), PathFd(t.get_alphabet().get_state_size(), t.get_alphabet().get_symbol_table()) {}
   LookupPathFd(const LookupPathFd& o): LookupPath(o), PathFd(o) {}
   
@@ -138,7 +138,7 @@ class LookupPathW : public LookupPath
    */
   Weight final_weight;
  public:
-  LookupPathW(const AbstractTransducer& t, const TransitionTableIndex initial): 
+  LookupPathW(const Transducer& t, const TransitionTableIndex initial): 
   	LookupPath(t, initial), weight(0.0f), final_weight(0.0f) {}
   LookupPathW(const LookupPathW& o): LookupPath(o), weight(o.weight),
     final_weight(o.final_weight) {}
@@ -162,7 +162,7 @@ class LookupPathW : public LookupPath
 class LookupPathWFd : public LookupPathW, PathFd
 {
  public:
-  LookupPathWFd(const AbstractTransducer& t, const TransitionTableIndex initial):
+  LookupPathWFd(const Transducer& t, const TransitionTableIndex initial):
     LookupPathW(t, initial), PathFd(t.get_alphabet().get_state_size(), t.get_alphabet().get_symbol_table()){}
   LookupPathWFd(const LookupPathWFd& o): LookupPathW(o), PathFd(o) {}
   

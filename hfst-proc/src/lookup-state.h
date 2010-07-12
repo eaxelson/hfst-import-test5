@@ -13,7 +13,7 @@ class LookupState
   /**
    * The transducer in which the lookup is occurring
    */
-  const AbstractTransducer& transducer;
+  const Transducer& transducer;
   
   /**
    * The active paths in a lookup operation. At the start of a lookup this will
@@ -111,7 +111,7 @@ class LookupState
    * given transducer
    * @param t the transducer in which the lookup will occur
    */
-  LookupState(const AbstractTransducer& t): transducer(t), paths()
+  LookupState(const Transducer& t): transducer(t), paths()
   {
     reset();
   }

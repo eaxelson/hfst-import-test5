@@ -35,11 +35,6 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is,
     print_table();
 }
 
-TransducerAlphabet::TransducerAlphabet(const TransducerAlphabet& o):
-  symbol_table(o.symbol_table), symbolizer(symbol_table),
-  blank_symbol(o.blank_symbol), 
-  feature_bucket(o.feature_bucket), value_bucket(o.value_bucket) {}
-
 TransducerAlphabet::~TransducerAlphabet() {}
 
 void
@@ -482,42 +477,37 @@ Transition::matches(SymbolNumber s) const
 }
 
 
-//////////Function definitions for AbstractTransducer
+//////////Function definitions for Transducer
 
-TransducerCreator AbstractTransducer::creators[2][2] =
-    {{Transducer::create, TransducerFd::create},
-     {TransducerW::create, TransducerWFd::create}};
+TransducerInternalCreator Transducer::creators[2][2] =
+    {{TransducerInternal::create, TransducerFdInternal::create},
+     {TransducerWInternal::create, TransducerWFdInternal::create}};
 
-AbstractTransducer*
-AbstractTransducer::create(std::istream& is, TransducerHeader h)
+Transducer::Transducer(std::istream& is):
+  header(is), alphabet(is, header.symbol_count()),
+  transducer_internal(creators[header.probe_flag(Weighted)][alphabet.get_state_size()>0](is, header, alphabet))
 {
   if(printDebuggingInformationFlag)
-    h.print();
+    header.print();
 
-  if (h.probe_flag(Has_unweighted_input_epsilon_cycles) ||
-      h.probe_flag(Has_input_epsilon_cycles))
+  if (header.probe_flag(Has_unweighted_input_epsilon_cycles) ||
+      header.probe_flag(Has_input_epsilon_cycles))
   {
     std::cerr << "!! Warning: transducer has epsilon cycles                  !!\n"
               << "!! This is currently not handled - if they are encountered !!\n"
               << "!! program *will* segfault.                                !!\n";
   }
   
-  TransducerAlphabet a(is, h.symbol_count());
-  
-  AbstractTransducer* t = creators[h.probe_flag(Weighted)][a.get_state_size()>0](is, h, a);
-  
-  if(t->check_for_blank())
+  if(check_for_blank())
   {
     std::cerr << "!! Warning: transducer accepts input strings consisting of !!\n"
               << "!! just a blank. This is probably a bug in the transducer  !!\n"
               << "!! and will cause strange behavior.                        !!\n";
   }
-  
-  return t;
 }
 
 bool
-AbstractTransducer::check_for_blank() const
+Transducer::check_for_blank() const
 {
   if(verboseFlag)
     std::cout << "Checking whether the transducer accepts a single blank as a word..." << std::endl;
@@ -529,20 +519,20 @@ AbstractTransducer::check_for_blank() const
 
 //////////Function definitions for transducer implementations
 
-LookupPath* Transducer::get_initial_path() const
+LookupPath* TransducerInternal::get_initial_path(const Transducer& t) const
 {
-  return new LookupPath(*this, START_INDEX);
+  return new LookupPath(t, 0);
 }
-LookupPath* TransducerFd::get_initial_path() const
+LookupPath* TransducerFdInternal::get_initial_path(const Transducer& t) const
 {
-  return new LookupPathFd(*this, START_INDEX);
+  return new LookupPathFd(t, 0);
 }
-LookupPath* TransducerW::get_initial_path() const
+LookupPath* TransducerWInternal::get_initial_path(const Transducer& t) const
 {
-  return new LookupPathW(*this, START_INDEX);
+  return new LookupPathW(t, 0);
 }
-LookupPath* TransducerWFd::get_initial_path() const
+LookupPath* TransducerWFdInternal::get_initial_path(const Transducer& t) const
 {
-  return new LookupPathWFd(*this, START_INDEX);
+  return new LookupPathWFd(t, 0);
 }
 

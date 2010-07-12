@@ -292,27 +292,27 @@ int main(int argc, char **argv)
   
   try
   {
-    AbstractTransducer* t = AbstractTransducer::load_transducer(in);
+    Transducer t(in);
     if(verboseFlag)
       std::cout << "Transducer successfully loaded" << std::endl;
     in.close();
     
-    TokenIOStream token_stream(*input, *output, t->get_alphabet(), null_flush);
+    TokenIOStream token_stream(*input, *output, t.get_alphabet(), null_flush);
     Applicator* applicator = NULL;
     OutputFormatter* output_formatter = NULL;
     switch(cmd)
     {
       case 't':
-        applicator = new TokenizationApplicator(*t, token_stream);
+        applicator = new TokenizationApplicator(t, token_stream);
         break;
       case 'g':
-        applicator = new GenerationApplicator(*t, token_stream, gm_unknown, capitalization_mode);
+        applicator = new GenerationApplicator(t, token_stream, gm_unknown, capitalization_mode);
         break;
       case 'n':
-        applicator = new GenerationApplicator(*t, token_stream, gm_clean, capitalization_mode);
+        applicator = new GenerationApplicator(t, token_stream, gm_clean, capitalization_mode);
         break;
       case 'd':
-        applicator = new GenerationApplicator(*t, token_stream, gm_all, capitalization_mode);
+        applicator = new GenerationApplicator(t, token_stream, gm_all, capitalization_mode);
         break;
       case 'a':
       default:
@@ -327,7 +327,7 @@ int main(int argc, char **argv)
           default:
             output_formatter = (OutputFormatter*)new ApertiumOutputFormatter(token_stream, filter_compound_analyses);
         }
-        applicator = new AnalysisApplicator(*t, token_stream, *output_formatter, capitalization_mode);
+        applicator = new AnalysisApplicator(t, token_stream, *output_formatter, capitalization_mode);
         break;
     }
     
@@ -336,7 +336,6 @@ int main(int argc, char **argv)
     delete applicator;
     if(output_formatter != NULL)
       delete output_formatter;
-    delete t;
   }
   catch (std::exception& e)
   {
