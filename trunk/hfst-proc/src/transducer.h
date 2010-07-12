@@ -244,9 +244,7 @@ class TransducerAlphabet
   std::map<std::string, ValueNumber> value_bucket;
   
  public:
-  TransducerAlphabet(std::istream& is, SymbolNumber symbol_count);
-  TransducerAlphabet(const TransducerAlphabet& o);
-  
+  TransducerAlphabet(std::istream& is, SymbolNumber symbol_count);  
   ~TransducerAlphabet();
   
   const SymbolTable& get_symbol_table(void) const { return symbol_table; }
@@ -437,36 +435,44 @@ class TableFromStream
 };
 
 
-class AbstractTransducer;
-typedef AbstractTransducer* (*TransducerCreator)(std::istream&, const TransducerHeader&, const TransducerAlphabet&);
+class Transducer;
 
-class AbstractTransducer
+class TransducerInternalInterface
+{
+ public:
+  virtual ~TransducerInternalInterface() {}
+  
+  virtual LookupPath* get_initial_path(const Transducer& t) const = 0;
+  virtual bool is_epsilon(const Transition& transition) const = 0;
+  virtual const TransitionIndex& get_index(TransitionTableIndex i) const = 0;
+  virtual const Transition& get_transition(TransitionTableIndex i) const = 0;
+};
+
+typedef TransducerInternalInterface* (*TransducerInternalCreator)(std::istream&, const TransducerHeader&, const TransducerAlphabet&);
+
+class Transducer
 {
  protected:
-  static TransducerCreator creators[2][2];
-  static AbstractTransducer* create(std::istream& is, TransducerHeader h);
-  
-  static const TransitionTableIndex START_INDEX = 0;
+  static TransducerInternalCreator creators[2][2];
   
   TransducerHeader header;
   TransducerAlphabet alphabet;
   
-  //Subclasses provide the index_table and transition_table
+  TransducerInternalInterface* transducer_internal;
   
   /**
    * Check if the transducer accepts an input string consisting of just a blank
    */
   bool check_for_blank() const;
  public:
-  AbstractTransducer(TransducerHeader h, TransducerAlphabet a):
-    header(h), alphabet(a) {}  
-  virtual ~AbstractTransducer() {}
+  Transducer(std::istream& is);
+  ~Transducer() {delete transducer_internal;}
   
   const TransducerHeader& get_header() const {return header;}
   const TransducerAlphabet& get_alphabet() const {return alphabet;}
     
-  virtual bool is_epsilon(const Transition& transition) const
-  {return transition.matches(0);}
+  bool is_epsilon(const Transition& transition) const
+  {return transducer_internal->is_epsilon(transition);}
   
   /**
    * Create a new lookup path appropriate for initializing a lookup opeation.
@@ -474,100 +480,99 @@ class AbstractTransducer
    * LookupPath
    * @return a new lookup path pointing to the beginning of the transducer
    */
-  virtual LookupPath* get_initial_path() const = 0;
+  LookupPath* get_initial_path() const
+  {return transducer_internal->get_initial_path(*this);}
   
-  virtual const TransitionIndex& get_index(TransitionTableIndex i) const = 0;
-  virtual const Transition& get_transition(TransitionTableIndex i) const = 0;
-  
-  /**
-   * Create an appropriate transducer instance from the given input stream
-   */
-  static AbstractTransducer* load_transducer(std::istream& is)
-  {return create(is, TransducerHeader(is));}
+  const TransitionIndex& get_index(TransitionTableIndex i) const
+  {return transducer_internal->get_index(i);}
+  const Transition& get_transition(TransitionTableIndex i) const
+  {return transducer_internal->get_transition(i);}
 };
 
-class Transducer : public AbstractTransducer
+class TransducerInternal : public TransducerInternalInterface
 {
  protected:
   TableFromStream<TransitionIndex> index_table;
   TableFromStream<Transition> transition_table;
-  
-  virtual LookupPath* get_initial_path() const;
+  const TransducerAlphabet& alphabet;
  public:
-  Transducer(std::istream& is, TransducerHeader h, TransducerAlphabet a):
-    AbstractTransducer(h, a),
-    index_table(is, header.index_table_size()),
-    transition_table(is, header.target_table_size()) {}
+  TransducerInternal(std::istream& is, const TransducerHeader& h, const TransducerAlphabet& a):
+    index_table(is, h.index_table_size()),
+    transition_table(is, h.target_table_size()), alphabet(a) {}
   
-  static AbstractTransducer* create(std::istream& is,
+  static TransducerInternalInterface* create(std::istream& is,
                                     const TransducerHeader& h,
                                     const TransducerAlphabet& a)
-  {return new Transducer(is, h, a);}
+    {return new TransducerInternal(is, h, a);}
   
+  virtual LookupPath* get_initial_path(const Transducer& t) const;
+  virtual bool is_epsilon(const Transition& transition) const 
+    {return transition.matches(0);}
   virtual const TransitionIndex& get_index(TransitionTableIndex i) const
-  {return index_table[i];}
+    {return index_table[i];}
   virtual const Transition& get_transition(TransitionTableIndex i) const
-  {return transition_table[i];}
+    {return transition_table[i];}
 };
 
-class TransducerFd: public Transducer
+class TransducerFdInternal: public TransducerInternal
 {
-  virtual LookupPath* get_initial_path() const;
  public:
-  TransducerFd(std::istream& is, TransducerHeader h, TransducerAlphabet a):
-    Transducer(is, h, a) {}
+  TransducerFdInternal(std::istream& is, const TransducerHeader& h, const TransducerAlphabet& a):
+    TransducerInternal(is, h, a) {}
   
-  static AbstractTransducer* create(std::istream& is,
+  static TransducerInternalInterface* create(std::istream& is,
                                     const TransducerHeader& h,
                                     const TransducerAlphabet& a)
-  {return new TransducerFd(is, h, a);}
-  	
-	virtual bool is_epsilon(const Transition& transition) const
-	{
-	  return transition.matches(0) ||
+    {return new TransducerFdInternal(is, h, a);}
+  
+  virtual LookupPath* get_initial_path(const Transducer& t) const;
+  virtual bool is_epsilon(const Transition& transition) const
+  {
+    return transition.matches(0) ||
 	         (transition.get_input() != NO_SYMBOL_NUMBER &&
-	            alphabet.get_symbol_table()[transition.get_input()].fd_op.isFlag());
-	}
+              alphabet.get_symbol_table()[transition.get_input()].fd_op.isFlag());
+  }
 };
 
-class TransducerW : public AbstractTransducer
+class TransducerWInternal : public TransducerInternalInterface
 {
  protected:
   TableFromStream<TransitionWIndex> index_table;
   TableFromStream<TransitionW> transition_table;
-  
-  virtual LookupPath* get_initial_path() const;
+  const TransducerAlphabet& alphabet;
  public:
   //NOTE: the old TransitionTableReaderW appended two blank transitions to the
   // end of the transitions list. Is that really necessary to recreate here?
-  TransducerW(std::istream& is, TransducerHeader h, TransducerAlphabet a) :
-    AbstractTransducer(h, a),
-    index_table(is, header.index_table_size()),
-    transition_table(is, header.target_table_size()) {}
+  TransducerWInternal(std::istream& is, const TransducerHeader& h, const TransducerAlphabet& a) :
+    index_table(is, h.index_table_size()),
+    transition_table(is, h.target_table_size()), alphabet(a) {}
   
-  static AbstractTransducer* create(std::istream& is,
+  static TransducerInternalInterface* create(std::istream& is,
                                     const TransducerHeader& h,
                                     const TransducerAlphabet& a)
-  {return new TransducerW(is, h, a);}
+    {return new TransducerWInternal(is, h, a);}
   
+  virtual LookupPath* get_initial_path(const Transducer& t) const;
+  virtual bool is_epsilon(const Transition& transition) const 
+    {return transition.matches(0);}
   virtual const TransitionIndex& get_index(TransitionTableIndex i) const
-  {return index_table[i];}
+    {return index_table[i];}
   virtual const Transition& get_transition(TransitionTableIndex i) const
-  {return transition_table[i];}
+    {return transition_table[i];}
 };
 
-class TransducerWFd: public TransducerW
+class TransducerWFdInternal: public TransducerWInternal
 {
-  virtual LookupPath* get_initial_path() const;
  public:
-  TransducerWFd(std::istream& is, TransducerHeader h, TransducerAlphabet a):
-    TransducerW(is, h, a) {}
+  TransducerWFdInternal(std::istream& is, const TransducerHeader& h, const TransducerAlphabet& a):
+    TransducerWInternal(is, h, a) {}
   
-  static AbstractTransducer* create(std::istream& is,
+  static TransducerInternalInterface* create(std::istream& is,
                                     const TransducerHeader& h,
                                     const TransducerAlphabet& a)
-  {return new TransducerWFd(is, h, a);}
+    {return new TransducerWFdInternal(is, h, a);}
   
+  virtual LookupPath* get_initial_path(const Transducer& t) const;
   virtual bool is_epsilon(const Transition& transition) const
   {
     return transition.matches(0) ||
