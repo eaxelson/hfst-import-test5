@@ -487,9 +487,6 @@ Transducer::Transducer(std::istream& is):
   header(is), alphabet(is, header.symbol_count()),
   transducer_internal(creators[header.probe_flag(Weighted)][alphabet.get_state_size()>0](is, header, alphabet))
 {
-  if(printDebuggingInformationFlag)
-    header.print();
-
   if (header.probe_flag(Has_unweighted_input_epsilon_cycles) ||
       header.probe_flag(Has_input_epsilon_cycles))
   {

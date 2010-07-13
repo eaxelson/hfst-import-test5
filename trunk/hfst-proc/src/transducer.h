@@ -56,7 +56,11 @@ class TransducerHeader
     has_epsilon_epsilon_transitions(read_bool_property(is)),
     has_input_epsilon_transitions(read_bool_property(is)),
     has_input_epsilon_cycles(read_bool_property(is)),
-    has_unweighted_input_epsilon_cycles(read_bool_property(is)) {}
+    has_unweighted_input_epsilon_cycles(read_bool_property(is))
+  {
+    if(printDebuggingInformationFlag)
+      print();
+  }
 
   SymbolNumber symbol_count(void) const { return number_of_symbols; }
   SymbolNumber input_symbol_count(void) const {return number_of_input_symbols;}
