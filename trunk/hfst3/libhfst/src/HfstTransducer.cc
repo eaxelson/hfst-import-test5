@@ -153,6 +153,10 @@ namespace hfst
       case FOMA_TYPE:
 	implementation.foma = foma_interface.create_empty_transducer();
 	break;
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	implementation.hfst_ol = hfst_ol_interface.create_empty_transducer(type==HFST_OLW_TYPE?true:false);
+	break;
       case ERROR_TYPE:
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -318,6 +322,10 @@ namespace hfst
       case FOMA_TYPE:
 	foma_interface.delete_foma(implementation.foma);
 	break;
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	delete implementation.hfst_ol;
+	break;
       case UNSPECIFIED_TYPE:
       case ERROR_TYPE:
       default:
@@ -444,30 +452,7 @@ type(type),anonymous(false),is_trie(false)
 
 
   ImplementationType HfstTransducer::get_type(void) const {
-    switch (this->type)
-      {
-      case SFST_TYPE:
-	return SFST_TYPE;
-	break;
-      case TROPICAL_OFST_TYPE:
-	return TROPICAL_OFST_TYPE;
-	break;
-      case LOG_OFST_TYPE:
-	return LOG_OFST_TYPE;
-	break;
-      case FOMA_TYPE:
-	return FOMA_TYPE;
-	break;
-      case UNSPECIFIED_TYPE:
-	return UNSPECIFIED_TYPE;
-	break;
-      case ERROR_TYPE:
-	return ERROR_TYPE;
-	break;
-      default:
-	throw hfst::exceptions::TransducerHasUnknownTypeException();
-	break;
-      }
+    return this->type;
   }
 
 void HfstTransducer::test_minimize()
@@ -943,6 +928,11 @@ void HfstTransducer::test_minimize()
 	  internal =
 	      hfst::implementations::log_ofst_to_internal_format(t.implementation.log_ofst);
 	    break;
+	  case HFST_OL_TYPE:
+	  case HFST_OLW_TYPE:
+	    internal =
+	      hfst::implementations::hfst_ol_to_internal_format(t.implementation.hfst_ol);
+	      break;
 	case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
@@ -977,6 +967,14 @@ void HfstTransducer::test_minimize()
 	    retval->foma_interface.delete_foma(retval->implementation.foma);
 	    retval->implementation.foma =
 	      hfst::implementations::internal_format_to_foma(internal);
+	    if (t.type != TROPICAL_OFST_TYPE)
+	      delete internal;
+	    break;
+	  case HFST_OL_TYPE:
+	  case HFST_OLW_TYPE:
+	    delete retval->implementation.hfst_ol;
+	    retval->implementation.hfst_ol =
+	      hfst::implementations::internal_format_to_hfst_ol(internal, type==HFST_OLW_TYPE?true:false);
 	    if (t.type != TROPICAL_OFST_TYPE)
 	      delete internal;
 	    break;
@@ -1020,6 +1018,12 @@ void HfstTransducer::test_minimize()
 	      hfst::implementations::log_ofst_to_internal_format(implementation.log_ofst);
 	  delete implementation.log_ofst;
 	    break;
+	  case HFST_OL_TYPE:
+	  case HFST_OLW_TYPE:
+	    internal =
+	    hfst::implementations::hfst_ol_to_internal_format(implementation.hfst_ol);
+      delete implementation.hfst_ol;
+	    break;
 	case ERROR_TYPE:
 	case UNSPECIFIED_TYPE:
 	default:
@@ -1047,6 +1051,12 @@ void HfstTransducer::test_minimize()
 	  case FOMA_TYPE:
 	    implementation.foma =
 	      hfst::implementations::internal_format_to_foma(internal);
+	    delete internal;
+	    break;
+	  case HFST_OL_TYPE:
+	  case HFST_OLW_TYPE:
+	    implementation.hfst_ol =
+	      hfst::implementations::internal_format_to_hfst_ol(internal, this->type==HFST_OLW_TYPE?true:false);
 	    delete internal;
 	    break;
 	case ERROR_TYPE:

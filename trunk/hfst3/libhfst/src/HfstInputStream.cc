@@ -23,6 +23,13 @@ namespace hfst
 	t.implementation.foma =
 	  this->implementation.foma->read_transducer(has_header);
 	break;
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	t.implementation.hfst_ol =
+	  this->implementation.hfst_ol->read_transducer(has_header);
+	if(t.get_type() != type) // weights need to be added or removed
+	  { t.convert(type); }
+	break;
 	  case ERROR_TYPE:
 	  case UNSPECIFIED_TYPE:
 	  default:
@@ -42,6 +49,11 @@ namespace hfst
       { return TROPICAL_OFST_TYPE; }
     if (hfst::implementations::LogWeightInputStream::is_fst(in))
       { return LOG_OFST_TYPE; }
+    int ol_type = hfst::implementations::HfstOlInputStream::is_fst(in);
+    if(ol_type == 1)
+      { return HFST_OL_TYPE; }
+    if(ol_type == 2)
+      { return HFST_OLW_TYPE; }
     return ERROR_TYPE;
   }
   
@@ -60,6 +72,10 @@ namespace hfst
       { return TROPICAL_OFST_TYPE; }
     if (0 == strcmp(fst_type,"LOG_OFST_TYPE"))
       { return LOG_OFST_TYPE; }
+    if (0 == strcmp(fst_type,"HFST_OL_TYPE"))
+      { return HFST_OL_TYPE; }
+    if (0 == strcmp(fst_type,"HFST_OLW_TYPE"))
+      { return HFST_OLW_TYPE; }
     return ERROR_TYPE;
   }
 
@@ -146,6 +162,14 @@ namespace hfst
     case FOMA_TYPE:
       implementation.foma = new hfst::implementations::FomaInputStream;
       break;
+    case HFST_OL_TYPE:
+      implementation.hfst_ol =
+        new hfst::implementations::HfstOlInputStream(false);
+      break;
+    case HFST_OLW_TYPE:
+      implementation.hfst_ol = 
+        new hfst::implementations::HfstOlInputStream(true);
+      break;
     default:
       throw hfst::exceptions::NotTransducerStreamException();
     }
@@ -174,6 +198,12 @@ namespace hfst
     case FOMA_TYPE:
       implementation.foma = new hfst::implementations::FomaInputStream(filename);
       break;
+    case HFST_OL_TYPE:
+      implementation.hfst_ol = new hfst::implementations::HfstOlInputStream(filename, false);
+      break;
+    case HFST_OLW_TYPE:
+      implementation.hfst_ol = new hfst::implementations::HfstOlInputStream(filename, true);
+      break;
     default:
       throw hfst::implementations::NotTransducerStreamException();
     }
@@ -194,6 +224,10 @@ namespace hfst
 	break;
       case FOMA_TYPE:
 	delete implementation.foma;
+	break;
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	delete implementation.hfst_ol;
 	break;
 	  case ERROR_TYPE:
 	  case UNSPECIFIED_TYPE:
@@ -218,6 +252,10 @@ namespace hfst
       case FOMA_TYPE:
 	implementation.foma->open();
 	break;
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	implementation.hfst_ol->open();
+	break;
       default:
 	assert(false);
       }
@@ -239,6 +277,10 @@ namespace hfst
       case FOMA_TYPE:
 	implementation.foma->close();
 	break;
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	implementation.hfst_ol->close();
+	break;
       default:
 	assert(false);
       }
@@ -259,6 +301,10 @@ namespace hfst
 	break;
       case FOMA_TYPE:
 	return implementation.foma->is_open();
+	break;
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	return implementation.hfst_ol->is_open();
 	break;
       default:
 	assert(false);
@@ -282,6 +328,9 @@ namespace hfst
       case FOMA_TYPE:
 	return implementation.foma->is_eof();
 	break;
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	return implementation.hfst_ol->is_eof();
       default:
 	assert(false);
 	return false;
@@ -304,6 +353,10 @@ namespace hfst
       case FOMA_TYPE:
 	return implementation.foma->is_bad();
 	break;
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	return implementation.hfst_ol->is_bad();
+	break;
       default:
 	assert(false);
 	return false;
@@ -325,6 +378,10 @@ namespace hfst
 	break;
       case FOMA_TYPE:
 	return implementation.foma->is_good();
+	break;
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	return implementation.hfst_ol->is_good();
 	break;
       default:
 	assert(false);
