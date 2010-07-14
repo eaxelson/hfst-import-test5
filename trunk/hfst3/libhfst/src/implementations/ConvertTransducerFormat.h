@@ -7,6 +7,7 @@
 #include <fst/fstlib.h>
 #include "HfstExceptions.h"
 #include "SFST/src/fst.h"
+#include "optimized-lookup/transducer.h"
 
 struct fsm;
 
@@ -23,6 +24,7 @@ namespace hfst { namespace implementations {
   typedef std::map<StateId,SFST::Node *> OfstToSfstStateMap;
   typedef std::map<int,StateId> FomaToOfstStateMap;
   typedef std::map<StateId,int> OfstToFomaStateMap;
+  typedef std::map<hfst_ol::TransitionTableIndex,StateId> HfstOlToOfstStateMap;
   typedef fst::ArcTpl<fst::LogWeight> LogArc;
   typedef fst::VectorFst<LogArc> LogFst;
 
@@ -44,6 +46,10 @@ namespace hfst { namespace implementations {
      internal format. */
     InternalTransducer * log_ofst_to_internal_format
       (LogFst * t);
+    
+    /* Read an hfst_ol::Transducer * and return the equivalent transducer in
+       internal format. */
+    InternalTransducer * hfst_ol_to_internal_format(hfst_ol::Transducer * t);
   
     /* Read a transducer in internal format and return the equivalent
        SFST::Transducer *. */
@@ -58,5 +64,9 @@ namespace hfst { namespace implementations {
     /* Read a transducer in internal format and return the equivalent
        LogFst * */
     LogFst * internal_format_to_log_ofst(InternalTransducer * t);
+    
+    /* Read a transducer in internal format and return the equivalent
+       hfst_ol::Transducer * */
+    hfst_ol::Transducer * internal_format_to_hfst_ol(InternalTransducer * t, bool weighted);
 } }
 #endif
