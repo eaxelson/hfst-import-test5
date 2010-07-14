@@ -5,6 +5,7 @@
 #include "implementations/TropicalWeightTransducer.h"
 #include "implementations/LogWeightTransducer.h"
 #include "implementations/FomaTransducer.h"
+#include "implementations/HfstOlTransducer.h"
 #include "implementations/HfstTokenizer.h"
 #include "implementations/ConvertTransducerFormat.h"
 #include "implementations/HfstExceptions.h"
@@ -40,6 +41,7 @@ namespace hfst
   using hfst::implementations::TropicalWeightState;
   using hfst::implementations::TropicalWeightStateIterator;
   using hfst::implementations::LogWeightTransducer;
+  using hfst::implementations::HfstOlTransducer;
   using hfst::WeightedPaths;
   using hfst::WeightedPath;
   using hfst::implementations::FomaTransducer;
@@ -52,6 +54,8 @@ namespace hfst
     TROPICAL_OFST_TYPE, /**< An OpenFst transducer with tropical weights. */
     LOG_OFST_TYPE, /**< An OpenFst transducer with logarithmic weights. */
     FOMA_TYPE, /**< A foma transducer, unweighted. */
+    HFST_OL_TYPE, /**< An HFST optimized lookup transducer, unweighted */
+    HFST_OLW_TYPE, /**< An HFST optimized lookup transducer with weights */
     UNSPECIFIED_TYPE,
     ERROR_TYPE /**< Type not recognised. 
 		  This type might be returned by a function if an error occurs. */
@@ -106,6 +110,7 @@ namespace hfst
       hfst::implementations::TropicalWeightInputStream * tropical_ofst;
       hfst::implementations::LogWeightInputStream * log_ofst;
       hfst::implementations::FomaInputStream * foma;
+      hfst::implementations::HfstOlInputStream * hfst_ol;
     };
 
     ImplementationType type;
@@ -172,6 +177,7 @@ namespace hfst
       hfst::implementations::TropicalWeightOutputStream * tropical_ofst;
       hfst::implementations::SfstOutputStream * sfst;
       hfst::implementations::FomaOutputStream * foma;
+      hfst::implementations::HfstOlOutputStream * hfst_ol;
     };
     ImplementationType type;
     StreamImplementation implementation;
@@ -244,6 +250,7 @@ namespace hfst
       hfst::implementations::StdVectorFst * tropical_ofst;
       hfst::implementations::LogFst * log_ofst;
       fsm * foma;
+      hfst_ol::Transducer * hfst_ol;
       hfst::implementations::StdVectorFst * internal; 
     };
     
@@ -251,6 +258,7 @@ namespace hfst
     static hfst::implementations::TropicalWeightTransducer tropical_ofst_interface;
     static hfst::implementations::LogWeightTransducer log_ofst_interface;
     static hfst::implementations::FomaTransducer foma_interface;
+    static hfst::implementations::HfstOlTransducer hfst_ol_interface;
 
     ImplementationType type;
 

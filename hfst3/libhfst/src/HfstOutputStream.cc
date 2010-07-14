@@ -23,6 +23,14 @@ namespace hfst
 	implementation.foma = 
 	  new hfst::implementations::FomaOutputStream();
 	break;
+      case HFST_OL_TYPE:
+	implementation.hfst_ol =
+	  new hfst::implementations::HfstOlOutputStream(false);
+	break;
+      case HFST_OLW_TYPE:
+	implementation.hfst_ol =
+	  new hfst::implementations::HfstOlOutputStream(true);
+	break;
       default:
 	throw hfst::exceptions::SpecifiedTypeRequiredException();
 	break;
@@ -49,6 +57,14 @@ namespace hfst
 	implementation.foma = 
 	  new hfst::implementations::FomaOutputStream(filename.c_str());
 	break;
+      case HFST_OL_TYPE:
+	implementation.hfst_ol =
+	  new hfst::implementations::HfstOlOutputStream(filename.c_str(), false);
+	break;
+      case HFST_OLW_TYPE:
+	implementation.hfst_ol =
+	  new hfst::implementations::HfstOlOutputStream(filename.c_str(), true);
+	break;
       default:
 	throw hfst::exceptions::SpecifiedTypeRequiredException();
 	break;
@@ -71,6 +87,10 @@ namespace hfst
       case FOMA_TYPE:
 	delete implementation.foma;
 	break;
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	delete implementation.hfst_ol;
+	break;
       default:
 	assert(false);
       }
@@ -87,22 +107,23 @@ namespace hfst
 	implementation.sfst->write_transducer
 	  (transducer.implementation.sfst);
 	return *this;
-	break;
       case TROPICAL_OFST_TYPE:
 	implementation.tropical_ofst->write_transducer
 	  (transducer.implementation.tropical_ofst);
 	return *this;    
-	break;
       case LOG_OFST_TYPE:
 	implementation.log_ofst->write_transducer
 	  (transducer.implementation.log_ofst);
 	return *this;
-	break;
       case FOMA_TYPE:
 	implementation.foma->write_transducer
 	  (transducer.implementation.foma);
 	return *this;
-	break;
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	implementation.hfst_ol->write_transducer
+	  (transducer.implementation.hfst_ol);
+	return *this;
       default:
 	assert(false);
 	return *this;
@@ -124,6 +145,10 @@ namespace hfst
       case FOMA_TYPE:
 	implementation.foma->open();
 	break;
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	implementation.hfst_ol->open();
+	break;
       default:
 	assert(false);
       }
@@ -143,6 +168,10 @@ namespace hfst
 	break;
       case FOMA_TYPE:
 	implementation.foma->close();
+	break;
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	implementation.hfst_ol->close();
 	break;
       default:
 	assert(false);
