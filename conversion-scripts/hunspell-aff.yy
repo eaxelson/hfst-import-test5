@@ -1288,6 +1288,10 @@ main(int argc, char** argv)
          ++s)
     {
         fprintf(symfile, "%s ", s->c_str());
+        if (s->at(0) != '@')
+        {
+            pi.insert(*s);
+        }
     }
     fprintf(symfile, "\nLEXICON Root\n\tHUNSPELL_dic_root\t;\n");
     for (map<string, set<string> >::const_iterator context_sets = deletion_contexts.begin();
@@ -1333,6 +1337,10 @@ main(int argc, char** argv)
     if (!has_key)
     {
         fprintf(keyfile, "LEXICON HUNSPELL_KEY_none\n\t#\t;\n");
+    }
+    if (rep_read == 0)
+    {
+        fprintf(repfile, "LEXICON HUNSPELL_REP_none\n\t#\t;\n");
     }
     if (argc > 1)
     {
