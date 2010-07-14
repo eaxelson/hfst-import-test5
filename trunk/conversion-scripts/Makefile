@@ -111,6 +111,7 @@ hyph-utf8-hfst.tar.gz: $(HYPH_TARGETS)
 		hfst-minimize -v -o $*.dbg.hfst
 	hfst-project -p lower -v $*.dbg.hfst |\
 		hfst-minimize -v -o $@
+	cat $*.1errm.hfst $@ -v > $*.sug.hfst
 
 # hunspell tools
 
