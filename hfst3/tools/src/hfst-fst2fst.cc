@@ -66,6 +66,8 @@ print_usage(const char *program_name)
 	fprintf(message_out, "%-35s%s", "  -f, --foma",           "Write the output in HFST's foma implementation\n");
 	fprintf(message_out, "%-35s%s", "  -t, --tropical-weight","Write the output in HFST's tropical weight (OpenFST) implementation\n");
 	fprintf(message_out, "%-35s%s", "  -l, --log-weight",     "Write the output in HFST's log weight (OpenFST) implementation\n");
+	fprintf(message_out, "%-35s%s", "  -O, --optimized-lookup","Write the output in the HFST optimized-lookup implementation\n");
+	fprintf(message_out, "%-35s%s", "  -w, --optimized-lookup-weighted","Write the output in the HFST optimized-lookup (weighted) implementation\n");
 	fprintf(message_out, "\n");
 	print_common_unary_program_parameter_instructions(message_out);
 	fprintf(stderr, "\n");
@@ -104,11 +106,13 @@ parse_options(int argc, char** argv)
 		  {"foma",            no_argument, 0, 'f'},
 		  {"tropical-weight", no_argument, 0, 't'},
 		  {"log-weight",      no_argument, 0, 'l'},
+		  {"optimized-lookup",no_argument, 0, 'O'},
+		  {"optimized-lookup-weighted",no_argument, 0, 'w'},
 			{0,0,0,0}
 		};
 		int option_index = 0;
 		// add tool-specific options here 
-		char c = getopt_long(argc, argv, "dhi:o:sqvVR:DW:Sftl",
+		char c = getopt_long(argc, argv, "dhi:o:sqvVR:DW:SftlOw",
 							 long_options, &option_index);
 		if (-1 == c)
 		{
@@ -134,6 +138,12 @@ parse_options(int argc, char** argv)
 		case 'l':
 		  output_type = hfst::LOG_OFST_TYPE;
 		  break;
+		case 'O':
+		  output_type = hfst::HFST_OL_TYPE;
+		  break;
+		case 'w':
+		  output_type = hfst::HFST_OLW_TYPE;
+		  break;
 		case '?':
 			fprintf(message_out, "invalid option --%s\n",
 					long_options[option_index].name);
@@ -150,7 +160,7 @@ parse_options(int argc, char** argv)
 	
 	if(output_type == hfst::UNSPECIFIED_TYPE)
 	{
-		fprintf(message_out, "You must specify an output type (one of -S, -f, -t, or -l)\n");
+		fprintf(message_out, "You must specify an output type (one of -S, -f, -t, -l, -O, or -w)\n");
 		print_short_help(argv[0]);
 		return EXIT_FAILURE;
 	}
