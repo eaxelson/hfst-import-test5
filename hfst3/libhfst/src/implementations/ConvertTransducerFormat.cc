@@ -188,6 +188,90 @@ InternalTransducer * log_ofst_to_internal_format
   return u;
 }
 
+
+StateId hfst_ol_to_internal_add_state(hfst_ol::Transducer* t, 
+                                      InternalTransducer* internal_transducer,
+                                      HfstOlToOfstStateMap& state_map,
+                                      bool weighted,
+                                      hfst_ol::TransitionTableIndex index)
+{
+  StateId new_state = internal_transducer->AddState();
+  state_map[index] = new_state;
+  
+  if(hfst_ol::indexes_transition_index_table(index))
+  {
+    const hfst_ol::TransitionIndex& transition_index = t->get_index(index);
+    
+    if(transition_index.final())
+    {
+      internal_transducer->SetFinal(new_state,
+        weighted ? dynamic_cast<const hfst_ol::TransitionWIndex&>(transition_index).final_weight() : 0);
+    }
+  }
+  else // indexes transition table
+  {
+    const hfst_ol::Transition& transition = t->get_transition(index);
+    
+    if(transition.final())
+    {
+      internal_transducer->SetFinal(new_state,
+        weighted ? dynamic_cast<const hfst_ol::TransitionW&>(transition).get_weight() : 0);
+    }
+  }
+  return new_state;
+}
+
+InternalTransducer * hfst_ol_to_internal_format(hfst_ol::Transducer * t)
+{
+  bool weighted = t->get_header().probe_flag(hfst_ol::Weighted);
+  InternalTransducer * internal_transducer = new fst::StdVectorFst();
+  
+  // This contains indices to either (1) the start of a set of entries in the
+  // transition index table, or (2) the boundary before a set of entries in the
+  // transition table; in this case, the following entries will all have the
+  // same input symbol. In either case the index represents a state and may be final
+  // The will already be an entry in state_map for each value in agenda
+  std::vector<hfst_ol::TransitionTableIndex> agenda;
+  HfstOlToOfstStateMap state_map;
+  
+  internal_transducer->SetStart(hfst_ol_to_internal_add_state(t, internal_transducer, state_map, weighted, 0));
+  agenda.push_back(0);
+  while(!agenda.empty())
+  {
+    hfst_ol::TransitionTableIndex current_index = agenda.back();
+    agenda.pop_back();
+    
+    StateId current_state = state_map[current_index];
+    
+    hfst_ol::TransitionTableIndexSet transitions = t->get_transitions_from_state(current_index);
+    for(hfst_ol::TransitionTableIndexSet::const_iterator it=transitions.begin();it!=transitions.end();it++)
+    {
+      const hfst_ol::Transition& transition = t->get_transition(*it);
+      
+      if(state_map.find(transition.get_target()) == state_map.end())
+      {
+        hfst_ol_to_internal_add_state(t, internal_transducer, state_map, weighted, transition.get_target());
+        agenda.push_back(transition.get_target());
+      }
+      
+      internal_transducer->AddArc(current_state,
+        fst::StdArc(transition.get_input_symbol(), 
+                    transition.get_output_symbol(),
+                    weighted ? dynamic_cast<const hfst_ol::TransitionW&>(transition).get_weight() : 0,
+                    state_map[transition.get_target()]));
+    }
+  }
+  
+  //transfer the symbol table
+  fst::SymbolTable *st = new fst::SymbolTable("anonym_hfst3_symbol_table");
+  const hfst_ol::SymbolTable& symbols = t->get_alphabet().get_symbol_table();
+  for(size_t i=0; i<symbols.size(); i++)
+    st->AddSymbol(symbols[i], i);
+  internal_transducer->SetInputSymbols(st);
+  
+  return internal_transducer;
+}
+
 SFST::Transducer *  internal_format_to_sfst
 (InternalTransducer * internal_transducer)
 {
@@ -327,6 +411,12 @@ LogFst * internal_format_to_log_ofst(InternalTransducer * t)
   assert (t->InputSymbols() != NULL);
   u->SetInputSymbols(new fst::SymbolTable(*(t->InputSymbols())));
   return u; }
+
+hfst_ol::Transducer * internal_format_to_hfst_ol(InternalTransducer * t, bool weighted)
+{
+  throw FunctionNotImplementedException();
+}
+
 } }
 #ifdef DEBUG_CONVERT
 /********************************
