@@ -27,7 +27,8 @@ BRIDGE_SRCS=SfstTransducer.cc \
 	TropicalWeightTransducer.cc \
 	LogWeightTransducer.cc \
 	LogFstTrieFunctions.cc \
-	FomaTransducer.cc
+	FomaTransducer.cc \
+	HfstOlTransducer.cc
 
 # underlying backend objects
 SFST_SRCS=\
@@ -56,9 +57,12 @@ foma/determinize.c    foma/lex.cmatrix.c  foma/reverse.c\
 foma/dynarray.c       foma/lexcread.c     foma/rewrite.c\
 foma/extract.c        foma/lex.lexc.c     foma/sigma.c
 
+HFST_OL_SRCS=\
+optimized-lookup/transducer.cc
+
 
 libhfstimplementations_la_SOURCES=$(IMPLEMENTATION_SRCS) $(BRIDGE_SRCS) \
-								  $(SFST_SRCS) $(FOMA_SRCS) # $(OFST_SRCS)
+								  $(SFST_SRCS) $(FOMA_SRCS) $(HFST_OL_SRCS) # $(OFST_SRCS)
 
 # should work like so:
 # libhfstimplementations_la_LIBADD=$(OFST_LIBS)
@@ -71,7 +75,7 @@ implinclude_HEADERS = \
 		ConvertTransducerFormat.h \
 		ExtractStrings.h FomaTransducer.h HfstExceptions.h \
 		HfstTokenizer.h LogFstTrieFunctions.h LogWeightTransducer.h \
-		SfstTransducer.h TropicalWeightTransducer.h # GlobalSymbolTable.h SymbolDefs.h
+		SfstTransducer.h TropicalWeightTransducer.h HfstOlTransducer.h # GlobalSymbolTable.h SymbolDefs.h
 
 # headers of backends to reveal to public...
 # TODO: in ideal case you'd delete these and link to public libs of backends
@@ -79,6 +83,7 @@ implinclude_HEADERS = \
 sfstincludedir = $(implincludedir)/SFST/src
 ofstincludedir = $(implincludedir)/openfst-1.1/src/include/fst
 fomaincludedir = $(implincludedir)/foma
+hfstolincludedir = $(implincludedir)/optimized-lookup
 SFST_DIR = SFST/src
 SFST_HDRS = \
 		$(SFST_DIR)/alphabet.h $(SFST_DIR)/basic.h $(SFST_DIR)/compact.h \
@@ -104,6 +109,11 @@ FOMA_HDRS = \
 		foma/lexc.h
 		foma/regex.tab.h
 
+HFST_OL_DIR = optimized-lookup
+HFST_OL_HDRS = \
+		optimized-lookup/transducer.h
+
 hfstinclude_HEADERS = $(HFST_HDRS)
 sfstinclude_HEADERS = $(SFST_HDRS)
 fomainclude_HEADERS = $(FOMA_HDRS)
+hfstolinclude_HEADERS = $(HFST_OL_HDRS)
