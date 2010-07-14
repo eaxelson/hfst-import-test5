@@ -85,10 +85,7 @@ namespace hfst { namespace implementations
   }
   bool LogWeightInputStream::is_eof(void) const
   {
-    //if (filename.empty())
-    //  { return std::cin.eof(); }
-    //else
-      { return input_stream.peek() == EOF; }
+    return input_stream.peek() == EOF;
   }
   bool LogWeightInputStream::is_bad(void) const
   {
@@ -99,6 +96,8 @@ namespace hfst { namespace implementations
   }
   bool LogWeightInputStream::is_good(void) const
   {
+    if(is_eof())
+      return false;
     if (filename == string())
       { return std::cin.good(); }
     else
