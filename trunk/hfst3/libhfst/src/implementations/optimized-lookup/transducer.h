@@ -56,7 +56,7 @@ class TransducerHeader
   SymbolNumber number_of_symbols;
   TransitionTableIndex size_of_transition_index_table;
   TransitionTableIndex size_of_transition_target_table;
-
+  
   StateIdNumber number_of_states;
   TransitionNumber number_of_transitions;
 
@@ -194,6 +194,8 @@ class TransducerHeader
     write_bool_property(has_input_epsilon_cycles, os);
     write_bool_property(has_unweighted_input_epsilon_cycles, os);
   }
+  
+  friend class ConvertTransducerHeader;
 };
 
 class TransducerAlphabet
@@ -202,17 +204,13 @@ class TransducerAlphabet
   SymbolTable symbol_table;
   SymbolNumberSet flag_diacritics_set;
   
-  static bool is_flag_diacritic(string str)
-  {
-    return str.length() >= 5 && str.at(0) == '@' && 
-           str.at(str.length()-1) == '@' && str.at(2) == '.';
-  }
  public:
   TransducerAlphabet()
   {
     symbol_table.push_back("@0@"); // epsilon
   }
   TransducerAlphabet(istream& is, SymbolNumber symbol_count);
+  TransducerAlphabet(const SymbolTable& st);
   
   void display() const;
   
@@ -225,6 +223,11 @@ class TransducerAlphabet
     }
   }
   
+  static bool is_flag_diacritic(string str)
+  {
+    return str.length() >= 5 && str.at(0) == '@' && 
+           str.at(str.length()-1) == '@' && str.at(2) == '.';
+  }
   bool is_flag_diacritic(SymbolNumber symbol) const
     { return flag_diacritics_set.find(symbol) != flag_diacritics_set.end(); }
   
@@ -238,6 +241,7 @@ class TransitionIndex
   SymbolNumber input_symbol;
   TransitionTableIndex first_transition_index;
  public:
+  TransitionIndex(): input_symbol(NO_SYMBOL_NUMBER), first_transition_index(NO_TABLE_INDEX) {}
   TransitionIndex(SymbolNumber input,
 		 TransitionTableIndex first_transition):
     input_symbol(input), first_transition_index(first_transition) {}
@@ -262,10 +266,7 @@ class TransitionIndex
   SymbolNumber get_input_symbol(void) const {return input_symbol;}
   
   bool matches(const SymbolNumber s) const;
-  virtual bool final(void) const {return first_transition_index == 1;}
-  
-  bool operator<(const TransitionIndex &o) const
-    { return input_symbol < o.input_symbol; }
+  virtual bool final(void) const;
   
   static TransitionIndex create_final()
     { return TransitionIndex(NO_SYMBOL_NUMBER, 1); }
@@ -274,18 +275,14 @@ class TransitionIndex
 class TransitionWIndex : public TransitionIndex
 {
  public:
+  TransitionWIndex(): TransitionIndex() {}
   TransitionWIndex(SymbolNumber input,
 		 TransitionTableIndex first_transition):
     TransitionIndex(input, first_transition) {}
   TransitionWIndex(std::istream& is):
     TransitionIndex(is) {}
-  
-  bool final(void) const
-    { return input_symbol==NO_SYMBOL_NUMBER && 
-            first_transition_index != NO_TABLE_INDEX; }
-  
-  Weight final_weight(void) const
-    { return static_cast<Weight>(first_transition_index); }
+    
+  Weight final_weight(void) const;
   
   static TransitionWIndex create_final()
     { return TransitionWIndex(NO_SYMBOL_NUMBER, 0); }
@@ -299,9 +296,10 @@ class Transition
   TransitionTableIndex target_index;
  public:
   Transition(SymbolNumber input, SymbolNumber output,
-             TransitionTableIndex target):
-    input_symbol(input), output_symbol(output), target_index(target) {}
-  
+             TransitionTableIndex target, Weight bogus=0.0f):
+    input_symbol(input), output_symbol(output), target_index(target) {bogus=0.0f;}
+  Transition(bool final, Weight bogus=0.0f):
+    input_symbol(NO_SYMBOL_NUMBER), output_symbol(NO_SYMBOL_NUMBER), target_index(final?1:NO_TABLE_INDEX) {bogus=0.0f;}
   Transition(std::istream& is):
     input_symbol(NO_SYMBOL_NUMBER), output_symbol(NO_SYMBOL_NUMBER), target_index(0)
   {
@@ -318,18 +316,6 @@ class Transition
     os.write(reinterpret_cast<const char*>(&output_symbol), sizeof(output_symbol));
     os.write(reinterpret_cast<const char*>(&target_index), sizeof(target_index));
   }
-  static void write_empty_transition(ostream& os, bool final)
-  {
-    os.write(reinterpret_cast<const char*>(&NO_SYMBOL_NUMBER), sizeof(SymbolNumber));
-    os.write(reinterpret_cast<const char*>(&NO_SYMBOL_NUMBER), sizeof(SymbolNumber));
-    if(final)
-      os.write(reinterpret_cast<const char*>(&NO_TABLE_INDEX), sizeof(TransitionTableIndex));
-    else
-    {
-      TransitionTableIndex finality = 1;
-      os.write(reinterpret_cast<const char*>(&finality), sizeof(TransitionTableIndex));
-    }
-  }
   
   virtual void display() const;
 
@@ -338,36 +324,7 @@ class Transition
   SymbolNumber get_input_symbol(void) const {return input_symbol;}
   
   bool matches(const SymbolNumber s) const;
-  virtual bool final(void) const {return target_index == 1;}
-  
-  /*bool numerical_cmp(const Transition& o) const
-  {
-    if(input_symbol == o.input_symbol)
-    {
-      if(output_symbol == o.output_symbol)
-        return target_index < o.target_index;
-      else
-        return output_symbol < o.output_symbol;
-    }
-    return input_symbol < o.input_symbol;
-  }
-  virtual bool operator<(const Transition &o) const
-  {
-    if((input_symbol == 0) || is_flag_diacritic(input_symbol))
-    {
-      if((o.input_symbol == 0) || is_flag_diacritic(o.input_symbol))
-        return numerical_cmp(o);
-      else
-        return true;
-    }
-    else
-    {
-      if((o.input_symbol != 0) && !is_flag_diacritic(o.input_symbol))
-        return numerical_cmp(o);
-      else
-        return false;
-    }
-  }*/
+  virtual bool final(void) const;
 };
 
 class TransitionW : public Transition
@@ -377,8 +334,9 @@ class TransitionW : public Transition
  public:
   TransitionW(SymbolNumber input, SymbolNumber output,
               TransitionTableIndex target, Weight w):
-      Transition(input, output, target), transition_weight(w) {}
-
+    Transition(input, output, target), transition_weight(w) {}
+  TransitionW(bool final, Weight w):
+    Transition(final), transition_weight(w) {}
   TransitionW(std::istream& is): Transition(is), transition_weight(0.0f)
   {is.read(reinterpret_cast<char*>(&transition_weight), sizeof(Weight));}
   
@@ -387,25 +345,10 @@ class TransitionW : public Transition
     Transition::write(os);
     os.write(reinterpret_cast<const char*>(&transition_weight), sizeof(transition_weight));
   }
-  static void write_empty_transition(ostream& os, bool final, Weight w)
-  {
-    Transition::write_empty_transition(os, final);
-    os.write(reinterpret_cast<const char*>(&w), sizeof(Weight));
-  }
   
   void display() const;
   
   Weight get_weight(void) const {return transition_weight;}
-  
-  bool final(void) const
-  {
-    return (input_symbol == NO_SYMBOL_NUMBER && 
-            output_symbol == NO_SYMBOL_NUMBER && 
-            transition_weight != INFINITE_WEIGHT);
-  }
-  
-  /*virtual bool operator<(const Transition &o) const
-    { return Transition::operator<(o); }*/
 };
 
 
@@ -416,12 +359,16 @@ class TransducerTable
   vector<T> table;
  public:
   TransducerTable(): table() {}
-  TransducerTable(T entry): table(1, entry) {}
+  TransducerTable(size_t size, const T& entry): table(size, entry) {}
   TransducerTable(std::istream& is, TransitionTableIndex index_count): table()
   {
     for(size_t i=0; i<index_count; i++)
       table.push_back(T(is));
   }
+  TransducerTable(const TransducerTable& t): table(t.table) {}
+  
+  void append(const T& v) {table.push_back(v);}
+  void set(size_t index, const T& v) {table[index] = v;}
   
   const T& operator[](TransitionTableIndex i) const
   {
@@ -465,7 +412,10 @@ class TransducerTables : public TransducerTablesInterface
   TransducerTables(istream& is, TransitionTableIndex index_table_size,
                                 TransitionTableIndex transition_table_size):
     index_table(is, index_table_size), transition_table(is, transition_table_size) {}
-  TransducerTables(): index_table(T1::create_final()), transition_table() {}
+  TransducerTables(): index_table(1, T1::create_final()), transition_table() {}
+  TransducerTables(const TransducerTable<T1>& index_table,
+                   const TransducerTable<T2>& transition_table):
+    index_table(index_table), transition_table(transition_table) {}
   
   const TransitionIndex& get_index(TransitionTableIndex i) const
     {return index_table[i];}
@@ -488,12 +438,20 @@ class Transducer
   TransducerAlphabet alphabet;
   
   TransducerTablesInterface* tables;
+  
+  Transducer(const TransducerHeader& header, const TransducerAlphabet& alphabet,
+             const TransducerTable<TransitionIndex>& index_table,
+             const TransducerTable<Transition>& transition_table);
+  Transducer(const TransducerHeader& header, const TransducerAlphabet& alphabet,
+             const TransducerTable<TransitionWIndex>& index_table,
+             const TransducerTable<TransitionW>& transition_table);
  public:
   Transducer(istream& is);
   Transducer(bool weighted);
   ~Transducer();
   
   void write(ostream& os) const;
+  void display() const;
   
   const TransducerHeader& get_header() const
     { return header; }
@@ -511,6 +469,8 @@ class Transducer
   // This function will return a vector of indices to the transition table,
   // i.e. the arcs from the given state
   TransitionTableIndexSet get_transitions_from_state(TransitionTableIndex state_index) const;
+  
+  friend class ConvertTransducer;
 };
 
 }

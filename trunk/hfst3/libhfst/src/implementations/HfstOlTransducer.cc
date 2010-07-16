@@ -124,7 +124,9 @@ namespace hfst { namespace implementations
       if (has_header)
         skip_hfst_header();
       
-      return new hfst_ol::Transducer(input_stream);
+      hfst_ol::Transducer* t = new hfst_ol::Transducer(input_stream);
+      //t->display();
+      return t;
     }
     catch (TransducerHasWrongTypeException e)
       { throw e; }
