@@ -16,6 +16,16 @@ TransducerAlphabet::TransducerAlphabet(istream& is, SymbolNumber symbol_count)
     throw TransducerHasWrongTypeException();
 }
 
+TransducerAlphabet::TransducerAlphabet(const SymbolTable& st):
+  symbol_table(st)
+{
+  for(SymbolNumber i=0; i<symbol_table.size(); i++)
+  {
+    if(is_flag_diacritic(symbol_table[i]))
+      flag_diacritics_set.insert(i);
+  }
+}
+
 void TransducerAlphabet::display() const
 {
   std::cout << "Transducer alphabet:" << std::endl;
@@ -25,16 +35,16 @@ void TransducerAlphabet::display() const
 
 void TransitionIndex::display() const
 {
-  std::cout << "input_symbol: " << input_symbol << ", target: " << first_transition_index << std::endl;
+  std::cout << "input_symbol: " << input_symbol << ", target: " << first_transition_index << (final()?" (final)":"") << std::endl;
 }
 void Transition::display() const
 {
-  std::cout << "input_symbol: " << input_symbol << ", output_symbol: " << output_symbol << ", target: " << target_index << std::endl;
+  std::cout << "input_symbol: " << input_symbol << ", output_symbol: " << output_symbol << ", target: " << target_index << (final()?" (final)":"") << std::endl;
 }
 void TransitionW::display() const
 {
   std::cout << "input_symbol: " << input_symbol << ", output_symbol: " << output_symbol
-            << ", target: " << target_index << ", weight: " << transition_weight << std::endl;
+            << ", target: " << target_index << ", weight: " << transition_weight << (final()?" (final)":"") << std::endl;
 }
 
 bool TransitionIndex::matches(SymbolNumber s) const
@@ -52,6 +62,26 @@ bool Transition::matches(SymbolNumber s) const
   if(s == NO_SYMBOL_NUMBER)
     return true;
   return input_symbol == s;
+}
+
+bool TransitionIndex::final() const
+{
+  return input_symbol == NO_SYMBOL_NUMBER && first_transition_index != NO_TABLE_INDEX;
+}
+bool Transition::final() const
+{
+  return input_symbol == NO_SYMBOL_NUMBER && output_symbol == NO_SYMBOL_NUMBER && target_index == 1;
+}
+
+Weight TransitionWIndex::final_weight(void) const
+{
+  union to_weight
+  {
+    TransitionTableIndex i;
+    Weight w;
+  } weight;
+  weight.i = first_transition_index;
+  return weight.w;
 }
 
 Transducer::Transducer(istream& is):
@@ -74,6 +104,14 @@ Transducer::Transducer(bool weighted):
   else
     tables = new TransducerTables<TransitionIndex,Transition>();
 }
+Transducer::Transducer(const TransducerHeader& header, const TransducerAlphabet& alphabet,
+                       const TransducerTable<TransitionIndex>& index_table,
+                       const TransducerTable<Transition>& transition_table):
+  header(header), alphabet(alphabet), tables(new TransducerTables<TransitionIndex,Transition>(index_table, transition_table)) {}
+Transducer::Transducer(const TransducerHeader& header, const TransducerAlphabet& alphabet,
+                       const TransducerTable<TransitionWIndex>& index_table,
+                       const TransducerTable<TransitionW>& transition_table):
+  header(header), alphabet(alphabet), tables(new TransducerTables<TransitionWIndex,TransitionW>(index_table, transition_table)) {}
 Transducer::~Transducer() {delete tables;}
 
 void Transducer::write(ostream& os) const
@@ -84,6 +122,15 @@ void Transducer::write(ostream& os) const
     tables->get_index(i).write(os);
   for(size_t i=0;i<header.target_table_size();i++)
     tables->get_transition(i).write(os);
+}
+
+void Transducer::display() const
+{
+  std::cout << "-----Displaying optimized-lookup transducer------" << std::endl;
+  header.display();
+  alphabet.display();
+  tables->display();
+  std::cout << "-------------------------------------------------" << std::endl;
 }
 
 TransitionTableIndexSet Transducer::get_transitions_from_state(TransitionTableIndex state_index) const

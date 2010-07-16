@@ -58,7 +58,7 @@ foma/dynarray.c       foma/lexcread.c     foma/rewrite.c\
 foma/extract.c        foma/lex.lexc.c     foma/sigma.c
 
 HFST_OL_SRCS=\
-optimized-lookup/transducer.cc
+optimized-lookup/transducer.cc optimized-lookup/convert.cc
 
 
 libhfstimplementations_la_SOURCES=$(IMPLEMENTATION_SRCS) $(BRIDGE_SRCS) \

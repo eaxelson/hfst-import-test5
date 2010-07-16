@@ -1,6 +1,7 @@
 #include "ConvertTransducerFormat.h"
 #include <stdbool.h>
 #include "foma/fomalib.h"
+#include "optimized-lookup/convert.h"
 
 namespace hfst { namespace implementations
 {
@@ -414,7 +415,8 @@ LogFst * internal_format_to_log_ofst(InternalTransducer * t)
 
 hfst_ol::Transducer * internal_format_to_hfst_ol(InternalTransducer * t, bool weighted)
 {
-  throw FunctionNotImplementedException();
+  hfst_ol::ConvertTransducer conv(t, weighted);
+  return conv.to_transducer();
 }
 
 } }
