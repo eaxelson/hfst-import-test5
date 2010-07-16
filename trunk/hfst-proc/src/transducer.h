@@ -10,6 +10,7 @@
 class TransducerHeader
 {
  private:
+  bool hfst3;
   SymbolNumber number_of_input_symbols;
   SymbolNumber number_of_symbols;
   TransitionTableIndex size_of_transition_index_table;
@@ -28,6 +29,12 @@ class TransducerHeader
   bool has_input_epsilon_cycles;
   bool has_unweighted_input_epsilon_cycles;
 
+  static void header_error()
+  {
+    throw std::runtime_error("Transducer header is invalid. Wrong or corrupt file?");
+  }
+  
+  static bool check_hfst3_header(std::istream& is);
   template<class T>
   static T read_property(std::istream& is)
   {
@@ -43,10 +50,12 @@ class TransducerHeader
       return false;
     if(prop == 1)
       return true;
-    throw std::runtime_error("Transducer header is invalid. Wrong or corrupt file?");
+    header_error();
+    return false;
   }
  public:
   TransducerHeader(std::istream& is):
+    hfst3(check_hfst3_header(is)),
     number_of_input_symbols(read_property<SymbolNumber>(is)),
     number_of_symbols(read_property<SymbolNumber>(is)),
     size_of_transition_index_table(read_property<TransitionTableIndex>(is)),

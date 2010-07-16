@@ -7,6 +7,42 @@
 #include "tokenizer.h"
 #include "formatter.h"
 
+//////////Function definitions for TransducerHeader
+
+bool TransducerHeader::check_hfst3_header(std::istream& is)
+{
+  const char* header1 = "HFST3";
+  int header_loc = 0; // how much of the header has been found
+  int c;
+  for(header_loc = 0; header_loc<6; header_loc++)
+  {
+    c = is.get();
+    if(c != header1[header_loc])
+      break;
+  }
+  
+  if(header_loc == 6) // we found it
+  {
+    const char* header2[] = {"HFST_OL_TYPE", "HFST_OLW_TYPE"};
+    std::string h_str;
+    std::getline(is, h_str, '\0');
+    
+    if(h_str == header2[0] || h_str == header2[1])
+      return true;
+    header_error();
+    return false;
+  }
+  else // nope. put back what we've taken
+  {
+    is.putback(c); // first the non-matching character
+    for(int i=header_loc-1; i>=0; i--) // then the characters that did match (if any)
+      is.putback(header1[i]);
+    
+    return false;
+  }
+}
+
+
 //////////Function definitions for TransducerAlphabet
 
 TransducerAlphabet::TransducerAlphabet(std::istream& is, 
