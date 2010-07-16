@@ -340,7 +340,7 @@ class TransitionIndex
   TransitionTableIndex target(void) const {return first_transition_index;}
   SymbolNumber get_input(void) const {return input_symbol;}
   
-  virtual bool final(void) const {return first_transition_index == 1;}
+  virtual bool final(void) const;
 };
 
 class TransitionWIndex : public TransitionIndex
@@ -351,13 +351,8 @@ class TransitionWIndex : public TransitionIndex
 	  TransitionIndex(input, first_transition) {}
 
   TransitionWIndex(std::istream& is): TransitionIndex(is) {}
-  
-  bool final(void) const
-  {return input_symbol==NO_SYMBOL_NUMBER && 
-          first_transition_index != NO_TABLE_INDEX;}
-  
-  Weight final_weight(void) const
-  {return static_cast<Weight>(first_transition_index);}
+
+  Weight final_weight(void) const;
 };
 
 
@@ -388,7 +383,7 @@ class Transition
   SymbolNumber get_output(void) const {return output_symbol;}
   SymbolNumber get_input(void) const {return input_symbol;}
   
-  virtual bool final(void) const {return target_index == 1;}
+  virtual bool final(void) const;
 };
 
 class TransitionW : public Transition
@@ -404,15 +399,6 @@ class TransitionW : public Transition
   {is.read(reinterpret_cast<char*>(&transition_weight), sizeof(Weight));}
   
   Weight get_weight(void) const {return transition_weight;}
-
-  bool final(void) const
-  {
-    if (input_symbol != NO_SYMBOL_NUMBER)
-      return false;
-    if (output_symbol != NO_SYMBOL_NUMBER)
-      return false;
-    return transition_weight != INFINITE_WEIGHT;
-  }
 };
 
 

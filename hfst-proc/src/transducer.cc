@@ -476,6 +476,26 @@ Transition::matches(SymbolNumber s) const
   return input_symbol == s;
 }
 
+bool TransitionIndex::final() const
+{
+  return input_symbol == NO_SYMBOL_NUMBER && first_transition_index != NO_TABLE_INDEX;
+}
+bool Transition::final() const
+{
+  return input_symbol == NO_SYMBOL_NUMBER && output_symbol == NO_SYMBOL_NUMBER && target_index == 1;
+}
+
+Weight
+TransitionWIndex::final_weight(void) const
+{
+  union to_weight
+  {
+    TransitionTableIndex i;
+    Weight w;
+  } weight;
+  weight.i = first_transition_index;
+  return weight.w;
+}
 
 //////////Function definitions for Transducer
 
