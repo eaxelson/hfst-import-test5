@@ -68,7 +68,6 @@ typedef std::vector<SymbolProperties> SymbolTable;
 
 const SymbolNumber NO_SYMBOL_NUMBER = std::numeric_limits<SymbolNumber>::max();
 const TransitionTableIndex NO_TABLE_INDEX = std::numeric_limits<TransitionTableIndex>::max();
-const Weight INFINITE_WEIGHT = static_cast<float>(NO_TABLE_INDEX);
 
 // the flag diacritic operators as given in
 // Beesley & Karttunen, Finite State Morphology (U of C Press 2003)

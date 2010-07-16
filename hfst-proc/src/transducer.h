@@ -3,6 +3,7 @@
 
 #include <fstream>
 #include <cstdlib>
+#include <stdexcept>
 #include "hfst-proc.h"
 #include "tokenizer.h"
 
@@ -38,7 +39,11 @@ class TransducerHeader
   {
     unsigned int prop;
     is.read(reinterpret_cast<char*>(&prop), sizeof(unsigned int));
-    return (prop != 0);
+    if(prop == 0)
+      return false;
+    if(prop == 1)
+      return true;
+    throw std::runtime_error("Transducer header is invalid. Wrong or corrupt file?");
   }
  public:
   TransducerHeader(std::istream& is):
