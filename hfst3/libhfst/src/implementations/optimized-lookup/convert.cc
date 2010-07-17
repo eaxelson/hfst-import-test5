@@ -110,9 +110,7 @@ void ConvertTransducerAlphabet::populate_symbol_table(OfstSymbolCountMap &input_
   {
     if(input_symbol_counts.find(it.Value()) == input_symbol_counts.end())
     {
-      if(all_symbol_set.find(it.Symbol()) == all_symbol_set.end())
-        std::cout << "Ignoring symbol " << it.Symbol() << " because it is unused" << std::endl;
-      else
+      if(all_symbol_set.find(it.Symbol()) != all_symbol_set.end())
         symbol_table.push_back(it.Symbol());
     }
   }
