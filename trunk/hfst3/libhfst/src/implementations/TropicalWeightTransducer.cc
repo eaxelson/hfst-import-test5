@@ -796,12 +796,12 @@ namespace hfst { namespace implementations
       { return false; }
     int c = getc(f);
     ungetc(c, f);
-    return c == -42;
+    return c == 0xd6;
   }
   
   bool TropicalWeightInputStream::is_fst(istream &s)
   {
-    return s.good() && (s.peek() == -42);
+    return s.good() && (s.peek() == 0xd6);
   }
 
   bool TropicalWeightInputStream::operator() (void) const
