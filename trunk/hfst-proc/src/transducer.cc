@@ -494,22 +494,14 @@ TransducerAlphabet::get_symbolizer() const { return symbolizer; }
 
 bool
 TransitionIndex::matches(SymbolNumber s) const
-{  
-  if(input_symbol == NO_SYMBOL_NUMBER)
-    return false;
-  if(s == NO_SYMBOL_NUMBER)
-    return true;
-  return input_symbol == s;
+{
+  return input_symbol != NO_SYMBOL_NUMBER && input_symbol == s;
 }
 
 bool
 Transition::matches(SymbolNumber s) const
 {
-  if(input_symbol == NO_SYMBOL_NUMBER)
-    return false;
-  if(s == NO_SYMBOL_NUMBER)
-    return true;
-  return input_symbol == s;
+  return input_symbol != NO_SYMBOL_NUMBER && input_symbol == s;
 }
 
 bool TransitionIndex::final() const
