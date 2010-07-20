@@ -228,7 +228,7 @@ TransducerAlphabet::calculate_caps()
   size_t size = symbol_table.size(); // size before any new symbols added
   for(size_t i=0;i<size;i++)
   {
-    int case_res;
+    int case_res = 0;
     std::string switched;
     if(is_alphabetic(i))
       switched = caps_helper(symbol_table[i].str.c_str(), case_res);
