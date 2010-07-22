@@ -79,7 +79,6 @@ const
   /* The string begins with a multi character symbol */
   if (multi_char_symbol_end != NULL)
     { return multi_char_symbol_end - symbol; }
-
   if ((128 & *symbol) == 0)
     { return 1; }
   else if ((32 & *symbol) == 0)

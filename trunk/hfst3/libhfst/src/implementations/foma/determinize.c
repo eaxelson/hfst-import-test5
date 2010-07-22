@@ -61,12 +61,12 @@ struct T_memo {
     unsigned int set_offset;
 };
 
-struct trans_list {
+static struct trans_list {
     int inout;
     int target;
 } *trans_list;
 
-struct trans_array {
+static struct trans_array {
     struct trans_list *transitions;
     unsigned short int size;
     unsigned short int tail;

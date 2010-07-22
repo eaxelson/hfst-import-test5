@@ -2,6 +2,5 @@
 ## Licence: GPL v3 (not newer)
 
 SUBDIRS = src 
-ACLOCAL_AMFLAGS=-I m4
 
 
