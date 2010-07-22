@@ -17,20 +17,29 @@
 
 AUTOMAKE_OPTIONS=subdir-objects
 noinst_LTLIBRARIES=libhfstimplementations.la
-AM_CPPFLAGS=-Iopenfst-1.1/src/include/
 # HFST bridge specific stuff
 IMPLEMENTATION_SRCS= \
 	HfstTokenizer.cc ConvertTransducerFormat.cc # GlobalSymbolTable.cc SymbolDefs.cc
 
 # the bridges
-BRIDGE_SRCS=SfstTransducer.cc \
-	TropicalWeightTransducer.cc \
-	LogWeightTransducer.cc \
-	LogFstTrieFunctions.cc \
-	FomaTransducer.cc \
-	HfstOlTransducer.cc
+if WANT_SFST
+MAYBE_SFST=SfstTransducer.cc
+endif
+if WANT_OPENFST
+MAYBE_OPENFST=TropicalWeightTransducer.cc LogWeightTransducer.cc \
+			  LogFstTrieFunctions.cc
+endif
+if WANT_FOMA
+MAYBE_FOMA=FomaTransducer.cc
+endif
+if WANT_HFSTOL
+MAYBE_HFSTOL=HfstOlTransducer.cc
+endif
+
+BRIDGE_SRCS=$(MAYBE_SFST) $(MAYBE_OPENFST) $(MAYBE_FOMA) $(MAYBE_HFSTOL)
 
 # underlying backend objects
+if WANT_SFST
 SFST_SRCS=\
 	SFST/src/alphabet.C         \
 	SFST/src/basic.C            \
@@ -40,32 +49,24 @@ SFST_SRCS=\
 	SFST/src/make-compact.C\
 	SFST/src/operators.C\
 	SFST/src/robust.C           SFST/src/utf8.C    SFST/src/expand.C
-OFST_LIBS=openfst-1.1/src/lib/libfst.la
-OFST_SRCS=\
-		  openfst-1.1/src/lib/compat.cc \
-		  openfst-1.1/src/lib/fst.cc \
-		  openfst-1.1/src/lib/properties.cc \
-		  openfst-1.1/src/lib/symbol-table.cc \
-		  openfst-1.1/src/lib/flags.cc \
-		  openfst-1.1/src/lib/util.cc 
+endif
+if WANT_FOMA
 FOMA_SRCS=\
-foma/apply.c          foma/flags.c        foma/spelling.c\
-foma/coaccessible.c   foma/int_stack.c    foma/mem.c        foma/structures.c\
-foma/constructions.c  foma/invert.c       foma/minimize.c   foma/topsort.c\
-foma/define.c         foma/io.c           foma/utf8.c\
-foma/determinize.c    foma/lex.cmatrix.c  foma/reverse.c\
-foma/dynarray.c       foma/lexcread.c     foma/rewrite.c\
-foma/extract.c        foma/lex.lexc.c     foma/sigma.c
-
+		  foma/apply.c          foma/flags.c        foma/spelling.c\
+		  foma/coaccessible.c   foma/int_stack.c    foma/mem.c\
+		  foma/structures.c foma/constructions.c  foma/invert.c\
+		  foma/minimize.c foma/topsort.c foma/define.c         foma/io.c\
+		  foma/utf8.c foma/determinize.c    foma/lex.cmatrix.c\
+		  foma/reverse.c foma/dynarray.c foma/lexcread.c     foma/rewrite.c\
+		  foma/extract.c        foma/lex.lexc.c foma/sigma.c
+endif
+if WANT_HFSTOL
 HFST_OL_SRCS=\
 optimized-lookup/transducer.cc optimized-lookup/convert.cc
-
+endif
 
 libhfstimplementations_la_SOURCES=$(IMPLEMENTATION_SRCS) $(BRIDGE_SRCS) \
-								  $(SFST_SRCS) $(FOMA_SRCS) $(HFST_OL_SRCS) # $(OFST_SRCS)
-
-# should work like so:
-# libhfstimplementations_la_LIBADD=$(OFST_LIBS)
+								  $(SFST_SRCS) $(FOMA_SRCS) $(HFST_OL_SRCS)
 
 # headers of implementation bridge to reveal to public
 hfstincludedir = $(includedir)/hfst
@@ -80,40 +81,18 @@ implinclude_HEADERS = \
 # headers of backends to reveal to public...
 # TODO: in ideal case you'd delete these and link to public libs of backends
 # using public headers of backends
+if WANT_SFST
 sfstincludedir = $(implincludedir)/SFST/src
-ofstincludedir = $(implincludedir)/openfst-1.1/src/include/fst
-fomaincludedir = $(implincludedir)/foma
-hfstolincludedir = $(implincludedir)/optimized-lookup
 SFST_DIR = SFST/src
-SFST_HDRS = \
+sfstinclude_HEADERS = \
 		$(SFST_DIR)/alphabet.h $(SFST_DIR)/basic.h $(SFST_DIR)/compact.h \
 		$(SFST_DIR)/make-compact.h $(SFST_DIR)/fst.h $(SFST_DIR)/mem.h \
 		$(SFST_DIR)/lowmem.h \
 		$(SFST_DIR)/utf8.h 
-# $(SFST_DIR)/tokenize_functions.h 
-# $(SFST_DIR)/binSearch.h $(SFST_DIR)/transducer-conversion.h
-# $(SFST_DIR)/lookup.h $(SFST_DIR)/fst-lex.h $(SFST_DIR)/fst-regression.h
-# $(SFST_DIR)/runtime_conversion.h 
-# $(SFST_DIR)/read_runtime_transducer.h
-# $(SFST_DIR)/runtime_type_defs.h
+endif
 
+if WANT_HFSTOL
+hfstolincludedir = $(implincludedir)/optimized-lookup
+hfstolinclude_HEADERS=optimized-lookup/transducer.h
+endif
 
-OFST_DIR = openfst-1.1/src/include/fst/
-OFST_HDRS = \
-	$(OFST_DIR)/*.h
-
-FOMA_HDRS = \
-		foma/foma.h
-		foma/fomalibconf.h
-		foma/fomalib.h
-		foma/lexc.h
-		foma/regex.tab.h
-
-HFST_OL_DIR = optimized-lookup
-HFST_OL_HDRS = \
-		optimized-lookup/transducer.h
-
-hfstinclude_HEADERS = $(HFST_HDRS)
-sfstinclude_HEADERS = $(SFST_HDRS)
-fomainclude_HEADERS = $(FOMA_HDRS)
-hfstolinclude_HEADERS = $(HFST_OL_HDRS)
