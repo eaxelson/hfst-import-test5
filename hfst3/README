@@ -4,11 +4,11 @@
 
 This package contains a bridging library for multiple FST libraries and toolkits
 and set of tools for processing of finite-state automate especially for
-linguistic systems.
+linguistic systems. HFST library and tools are licenced under GNU GPL licence
+version 3, you may read the full licence in the file named COPYING. The
+authors specified in AUTHORS file may be contacted about licencing issues.
 
-This package is for users who want to configure, build and install them all.
-
-There's a lot of documentation and other information about HFST at
+There's an online wiki-based information source about HFST in
 `Kitwiki HFST pages <https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome>`_.
 
 Installation
@@ -33,17 +33,20 @@ save a considerable amount of space and memory by doing::
 instead of make install. This strips all the symbols from the binaries,
 reducing sizes by a factor of 5-10.
 
-If you would rather install in eg. your home directory
+If you would rather install in e.g. your home directory
 (or aren't the system administrator), you can tell ./configure::
 
         ./configure --prefix=$HOME
 
-Software in this package is variously distributed under the GPL, LGPL and
-Apache licenses. If you want to develop something or include it in your own
-software, check which license(s) apply.
+The HFST library may link to numerous FST handling backends with varying
+licences. If you are going to redistribute the HFST library you compiled, make
+sure there are no clashes in the licences of bundled and linked libraries; all
+of them are free and open source, but under strict interpretation you may not
+be able to redistribute combination of strict GNU GPLv2 and Apache APLv2 in the
+same binary.
 
-If checking out from CVS or SVN you must first create or install the necessary
-autotools files from the host system:
+If you are checking out the development versions from SVN you must first create
+and install the necessary autotools files from the host system:
 
   autoreconf -i
 
@@ -58,8 +61,9 @@ Dependencies
 
 Compilation requirements:
 
-- Underlying transducer libraries *may* impose further restrictions; e.g.
-  OpenFST may require pthreads library
+- For OpenFST backend the OpenFST library must be installed in the current
+  system. Compiling against OpenFST library and linking may require recent
+  GCC version and pthread and m libraries, check OpenFST site for details.
 
 - Versions loaded from version control systems require a relatively new GNU
   tool-chain to build: autoconf >=2.60, automake, libtool >=2.2, >=gettext-0.17.
@@ -74,24 +78,30 @@ Compilation requirements:
 Runtime requirements:
 
 - If the executable is dynamically linked (almost always), the operating system
-  *must* be able to find hfst libraries.
+  *must* be able to find hfst libraries, and libraries of backends that are
+  dynamically linked.
 
 Further information
 -------------------
 
 The `Hfst wiki site
-<https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome>`_ also contains more
+<https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome>`_ also contain more
 details.
 
 Reporting bugs
 --------------
 
-The primary channel for reporting bugs is currently email box
-<hfst-bugs@helsinki.fi>. When reporting, please include at least following:
+Bugs can be reported via email to `HFST team bug mail address
+<hfst-bugs@helsinki.fi>`_, or preferably to `HFST's bug tracking system
+at sourceforge
+<https://sourceforge.net/tracker/?atid=1061990&group_id=224521&func=browse>`_
+When reporting, please include at least following:
 
-* version of software used (hfst-toolname --version)
+* version of software used, if command-line tool (hfst-toolname --version)
 
-* steps to reproduce, attach all related files if possible
+* version of hfst-library, if possible
+
+* steps to reproduce, attach or all related files if possible
 
 * information about platform used (e.g. uname -a)
 

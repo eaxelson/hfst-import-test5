@@ -456,4 +456,7 @@ fi
 if test "x$with_foma" != "xno" -a "x$with_openfst" != "xno"; then
     AC_MSG_WARN([Backends with conflicting licences selected, resulting binary must not be redistributed])
 fi
+if test "x$with_openfst" == "xno"; then
+    AC_MSG_WARN([Disabling openfst backend will severely cripple libhfst])
+fi
 
