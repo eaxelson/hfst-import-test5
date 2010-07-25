@@ -396,7 +396,7 @@ AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strndup strcspn strtol 
 # Checks for system services
 
 # config files
-AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile test/libhfst/Makefile libhfst/Makefile libhfst/src/Makefile libhfst/src/implementations/Makefile libhfst/hfst.pc tools/Makefile tools/src/Makefile man/Makefile])
+AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile test/libhfst/Makefile test/tools/Makefile libhfst/Makefile libhfst/src/Makefile libhfst/src/implementations/Makefile libhfst/hfst.pc tools/Makefile tools/src/Makefile man/Makefile])
 
 # output
 AC_OUTPUT
