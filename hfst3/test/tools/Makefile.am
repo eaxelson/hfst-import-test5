@@ -1,5 +1,3 @@
-## Process this file with automake to generate Makefile.in
-
 ## Process this file with automake to produce Makefile.in
 
 ## Copyright (C) 2010 University of Helsinki
@@ -17,4 +15,8 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS=libhfst tools
+# programs to run for unit etc. testing
+TESTS=hfst-check-version.sh hfst-check-help.sh
+
+# files needed for test programs
+EXTRA_DIST=test.att
