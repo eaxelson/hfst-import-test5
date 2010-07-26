@@ -19,4 +19,4 @@
 TESTS=hfst-check-version.sh hfst-check-help.sh
 
 # files needed for test programs
-EXTRA_DIST=test.att
+#EXTRA_DIST=

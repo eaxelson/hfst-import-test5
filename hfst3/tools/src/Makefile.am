@@ -2,8 +2,8 @@
 ## Author: Tommi A Pirinen <tommi.pirinen@helsinki.fi>
 ## Licence: GPL v3 (not newer)
 
-LDADD = ../../libhfst/src/libhfst.la
-AM_CPPFLAGS = -I../../libhfst/src
+LDADD = $(top_builddir)/lib/libgnu.la $(top_builddir)/libhfst/src/libhfst.la
+AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib
 AM_CXXFLAGS = -Wno-deprecated
 
 if WANT_COMPARE

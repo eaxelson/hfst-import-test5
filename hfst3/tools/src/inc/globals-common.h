@@ -10,3 +10,11 @@
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+// defaults
+bool verbose = false;
+bool silent = false;
+bool debug = false;
+FILE *message_out = stdout;
+char* hfst_tool_version = "Someone forgot to give version";
+char* hfst_tool_wikiname = "Someone forgot to set wiki page";
+

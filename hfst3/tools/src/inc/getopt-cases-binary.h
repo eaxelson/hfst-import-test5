@@ -10,23 +10,37 @@
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-// common-unary-cases.h
-  case 'i':
-  inputfilename = hfst_strdup(optarg);
-  if (strcmp(inputfilename, "-") == 0) {
-    free(inputfilename);
-    inputfilename = hfst_strdup("<stdin>");
-    inputfile = stdin;
+// common-binary-cases.h
+  case '1':
+  firstfilename = hfst_strdup(optarg);
+  if (strcmp(firstfilename, "-") == 0) {
+    free(firstfilename);
+    firstfilename = hfst_strdup("<stdin>");
+    firstfile = stdin;
     is_input_stdin = true;
   }
   else {
-    inputfile = hfst_fopen(inputfilename, "r");
+    firstfile = hfst_fopen(firstfilename, "r");
+    is_input_stdin = false;
+  }
+  break;
+  case '2':
+  secondfilename = hfst_strdup(optarg);
+  if (strcmp(secondfilename, "-") == 0) {
+    free(secondfilename);
+    secondfilename = hfst_strdup("<stdin>");
+    secondfile = stdin;
+    is_input_stdin = true;
+  }
+  else {
+    secondfile = hfst_fopen(firstfilename, "r");
     is_input_stdin = false;
   }
   break;
   case 'o':
   outfilename = hfst_strdup(optarg);
   if (strcmp(outfilename, "-") == 0) {
+    free(outfilename);
     outfilename = hfst_strdup("<stdout>");
     outfile = stdout;
     is_output_stdout = true;

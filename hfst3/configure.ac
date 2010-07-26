@@ -20,7 +20,7 @@ AC_PREREQ([2.60])
 
 # init
 AC_INIT([hfst], [3.0], [hfst-bugs@helsinki.fi], [hfst], [http://hfst.sf.net])
-AC_CONFIG_AUX_DIR([config-aux])
+AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall -Werror std-options foreign])
 AC_REVISION([$Revision: 1.9 $])
 AC_CONFIG_MACRO_DIR([m4])
@@ -88,7 +88,7 @@ AC_ARG_ENABLE([compare],
 			  [AS_HELP_STRING([--enable-compare],
 							  [build compare tool @<:@default=yes@:>@])],
 			  [enable_compare=$enableval],
-			  [enable_compare=yes])
+			  [enable_compare=no])
 AM_CONDITIONAL([WANT_COMPARE], [test x$enable_compare != xno])
 AC_ARG_ENABLE([compose],
 			  [AS_HELP_STRING([--enable-compose],
@@ -142,7 +142,7 @@ AC_ARG_ENABLE([fst2fst],
 			  [AS_HELP_STRING([--enable-fst2fst],
 							  [build fst2fst tool @<:@default=yes@:>@])],
 			  [enable_fst2fst=$enableval],
-			  [enable_fst2fst=yes])
+			  [enable_fst2fst=no])
 AM_CONDITIONAL([WANT_FST2FST], [test x$enable_fst2fst != xno])
 AC_ARG_ENABLE([fst2pairstrings],
 			  [AS_HELP_STRING([--enable-fst2pairstrings],
@@ -160,7 +160,7 @@ AC_ARG_ENABLE([fst2txt],
 			  [AS_HELP_STRING([--enable-fst2txt],
 							  [build fst2txt tool @<:@default=yes@:>@])],
 			  [enable_fst2txt=$enableval],
-			  [enable_fst2txt=yes])
+			  [enable_fst2txt=no])
 AM_CONDITIONAL([WANT_FST2TXT], [test x$enable_fst2txt != xno])
 AC_ARG_ENABLE([head],
 			  [AS_HELP_STRING([--enable-head],
@@ -172,7 +172,7 @@ AC_ARG_ENABLE([invert],
 			  [AS_HELP_STRING([--enable-invert],
 							  [build invert tool @<:@default=yes@:>@])],
 			  [enable_invert=$enableval],
-			  [enable_invert=yes])
+			  [enable_invert=no])
 AM_CONDITIONAL([WANT_INVERT], [test x$enable_invert != xno])
 AC_ARG_ENABLE([lookup],
 			  [AS_HELP_STRING([--enable-lookup],
@@ -250,7 +250,7 @@ AC_ARG_ENABLE([strip_header],
 			  [AS_HELP_STRING([--enable-strip-header],
 							  [build strip-header tool @<:@default=yes@:>@])],
 			  [enable_strip_header=$enableval],
-			  [enable_strip_header=yes])
+			  [enable_strip_header=no])
 AM_CONDITIONAL([WANT_STRIP_HEADER], [test x$enable_strip_header != xno])
 AC_ARG_ENABLE([subtract],
 			  [AS_HELP_STRING([--enable-subtract],
@@ -315,10 +315,11 @@ AM_CONDITIONAL([WANT_OMOR_EVALUATE], [test x$enable_omor_evaluate != xno])
 
 
 # Checks for programs
+AC_PROG_CC
+gl_EARLY
 AC_PROG_CXX
 ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
 AC_PROG_AWK
-AC_PROG_CC
 AC_PROG_CPP
 AC_PROG_YACC
 AC_PROG_LEX
@@ -338,7 +339,7 @@ AC_PROG_MAKE_SET
 AC_PATH_PROG([DOXYGEN], [doxygen], [no])
 AM_CONDITIONAL([CAN_DOXYGEN], [test x$DOXYGEN != xno])
 AC_PATH_PROG([LDCONFIG],[ldconfig],[echo])
-
+gl_INIT
 
 # Checks for libraries
 AC_CHECK_LIB([pthread], [main])
@@ -391,12 +392,17 @@ AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_FUNC_STRTOD
-AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strndup strcspn strtol getline])
+AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strcspn strtol])
 
 # Checks for system services
 
 # config files
-AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile test/libhfst/Makefile test/tools/Makefile libhfst/Makefile libhfst/src/Makefile libhfst/src/implementations/Makefile libhfst/hfst.pc tools/Makefile tools/src/Makefile man/Makefile])
+AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile lib/Makefile
+                 test/libhfst/Makefile test/tools/Makefile
+                 libhfst/Makefile libhfst/src/Makefile
+                 libhfst/src/implementations/Makefile libhfst/hfst.pc
+                 tools/Makefile tools/src/Makefile
+                 man/Makefile])
 
 # output
 AC_OUTPUT

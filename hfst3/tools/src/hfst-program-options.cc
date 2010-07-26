@@ -1,20 +1,30 @@
+//       This program is free software: you can redistribute it and/or modify
+//       it under the terms of the GNU General Public License as published by
+//       the Free Software Foundation, version 3 of the License.
+//
+//       This program is distributed in the hope that it will be useful,
+//       but WITHOUT ANY WARRANTY; without even the implied warranty of
+//       MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+//       GNU General Public License for more details.
+//
+//       You should have received a copy of the GNU General Public License
+//       along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+#include "xprintf.h"
 #include "hfst-program-options.h"
 
 // All programs
 void print_common_program_options(FILE *file) {
 
-  fprintf(file, "%-35s%s", "  -h, --help",    "Print help message\n");
-  fprintf(file, "%-35s%s", "  -V, --version", "Print version info\n");
-  fprintf(file, "%-35s%s", "  -v, --verbose", "Print verbosely while processing\n");
-  fprintf(file, "%-35s%s", "  -q, --quiet",   "Do not print output\n");
-  fprintf(file, "%-35s%s", "  -s, --silent",  "Alias of --quiet\n");
+  fprintf(file, "  -h, --help             Print help message\n"  
+                 "  -V, --version          Print version info\n"  
+                 "  -v, --verbose          Print verbosely while processing\n"
+                 "  -q, --quiet            Do not print output\n"  
+                 "  -s, --silent           Alias of --quiet\n");
    
-}
-
-void print_more_info(FILE *file, const char *toolname) {
-
-  fprintf(file, "More info at <https://kitwiki.csc.fi/twiki/bin/view/KitWiki/Hfst%s>\n", toolname);
-
 }
 
 // One transducer to one transducer:
@@ -34,12 +44,9 @@ void print_more_info(FILE *file, const char *toolname) {
 //   weighted2unweighted
 void print_common_unary_program_options(FILE *file) {
 
-  fprintf(file,	"%-35s%s", "  -i, --input=INFILE",          "Read input transducer from INFILE\n");
-  fprintf(file, "%-35s%s", "  -o, --output=OUTFILE",        "Write output transducer to OUTFILE\n");
-  fprintf(file, "%-35s%s", "  -R, --read-symbols=FILE",     "Read symbol table from FILE\n");
-  fprintf(file, "%-35s%s", "  -D, --do-not-write-symbols",  "Do not write symbol table with the output transducer\n");
-  fprintf(file, "%-35s%s", "  -W, --write-symbols-to=FILE", "Write symbol table to file FILE\n");
-
+  fprintf(file, "  -i, --input=INFILE     Read input transducer from INFILE\n"
+                 "  -o, --output=OUTFILE   Write output transducer to OUTFILE\n"
+  );
 }
 
 void print_common_unary_program_parameter_instructions(FILE *file) {
@@ -58,14 +65,9 @@ void print_common_unary_program_parameter_instructions(FILE *file) {
 //   disjunct, 
 void print_common_binary_program_options(FILE *file) {
 
-  fprintf(file, "%-35s%s", "  -1, --input1=INFILE1",        "Read input transducer from INFILE1\n");
-  fprintf(file, "%-35s%s", "  -2, --input2=INFILE2",        "Read output transducer from INFILE2\n");
-  fprintf(file, "%-35s%s", "  -o, --output=OUTFILE",        "Write results to OUTFILE\n");
-  fprintf(file, "%-35s%s", "  -n, --numbers",               "Use numbers instead of harmonizing transducers\n");
-  fprintf(file, "%-35s%s", "",                              "(symbol table is not written with this option)\n");
-  fprintf(file, "%-35s%s", "  -D, --do-not-write-symbols",  "Do not write symbol table with the output transducer\n");
-  fprintf(file, "%-35s%s", "  -W, --write-symbols-to=FILE", "Write symbol table to FILE\n");
- 
+  fprintf(file, "  -1, --input1=INFILE1   Read input transducer from INFILE1\n"
+                 "  -2, --input2=INFILE2   Read output transducer from INFILE2\n"
+                 "  -o, --output=OUTFILE   Write results to OUTFILE\n");
 }
 
 void print_common_binary_program_parameter_instructions(FILE *file) {
@@ -75,17 +77,8 @@ void print_common_binary_program_parameter_instructions(FILE *file) {
 	  "standard streams will be used.\n"
 	  "INFILE1, INFILE2, or both, must be specified.\n"
 	  "Weightedness of result depends on weightedness of INFILE1\n"
-	  "and INFILE2; both must be either weighted or unweighted.\n"
-	  "Both input files must either have a symbol table or option\n"
-	  "-n must be used.\n"
+	  "and INFILE2; both should be either weighted or unweighted.\n"
 	  );
 
 }
 
-void print_report_bugs(FILE *file) {
-
-  fprintf(file, 
-	  "Report bugs to HFST team <hfst-bugs@helsinki.fi>\n"
-	  );
-
-}
