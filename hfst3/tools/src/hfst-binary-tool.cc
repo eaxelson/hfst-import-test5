@@ -1,6 +1,6 @@
-//! @file hfst-conjunct.cc
+//! @file hfst-binary-tool.cc
 //!
-//! @brief Transducer conjunction tool
+//! @brief Transducer GENERIC BINARY TOOL TEMPLATE tool
 //!
 //! @author HFST Team
 
@@ -48,7 +48,7 @@ print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE1 [INFILE2]]\n"
-             "Conjunct (intersect, AND) two transducers\n"
+             "Do things with two transducers\n"
         "\n", program_name );
         print_common_program_options(message_out);
         print_common_binary_program_options(message_out);
@@ -58,7 +58,7 @@ print_usage()
         fprintf(message_out,
             "\n"
             "Examples:\n"
-            "  %s -o catdog.hfst cat.hfst dog.hfst  intersect transducers\n"
+            "  %s -o catdog.hfst cat.hfst dog.hfst  does things\n"
             "\n",
             program_name );
         print_report_bugs();
@@ -99,7 +99,7 @@ parse_options(int argc, char** argv)
 }
 
 int
-conjunct_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
+binaryoperate_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                     HfstOutputStream& outstream)
 {
     firststream.open();
@@ -118,17 +118,17 @@ conjunct_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
         transducer_n++;
         if (transducer_n == 1)
         {
-            verbose_printf("Intersecting %s and %s...\n", firstfilename, 
+            verbose_printf("Doing things with %s and %s...\n", firstfilename, 
                         secondfilename);
         }
         else
         {
-            verbose_printf("Intersecting %s and %s... %zu\n",
+            verbose_printf("Doing things with %s and %s... %zu\n",
                            firstfilename, secondfilename, transducer_n);
         }
         HfstTransducer first(firststream);
         HfstTransducer second(secondstream);
-        outstream << first.intersect(second);
+        outstream << first.concatenate(second);
         bothInputs = firststream.is_good() && secondstream.is_good();
     }
     
@@ -150,7 +150,7 @@ conjunct_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
 
 
 int main( int argc, char **argv ) {
-    hfst_set_program_name(argv[0], "0.1", "HfstConjunct");
+    hfst_set_program_name(argv[0], "0.1", "HfstGenericBinaryTool");
     int retval = parse_options(argc, argv);
     if (retval != EXIT_CONTINUE)
     {
@@ -192,7 +192,7 @@ int main( int argc, char **argv ) {
         new HfstOutputStream(outfilename, firststream->get_type()) :
         new HfstOutputStream(firststream->get_type());
 
-    retval = conjunct_streams(*firststream, *secondstream, *outstream);
+    retval = concatenate_streams(*firststream, *secondstream, *outstream);
     delete firststream;
     delete secondstream;
     delete outstream;

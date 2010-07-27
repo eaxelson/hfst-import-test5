@@ -41,7 +41,7 @@
 #include <hfst2/string.h>
 #endif
 
-#include "hfst-common-unary-variables.h"
+#include "inc/globals-unary.h"
 
 static char* from_label = 0;
 static char* from_file_name = 0;
@@ -111,9 +111,9 @@ parse_options(int argc, char** argv)
 	{
 		static const struct option long_options[] =
 		{
-#include "hfst-common-options.h"
+		HFST_GETOPT_COMMON_LONG
 		  ,
-#include "hfst-common-unary-options.h"
+		HFST_GETOPT_UNARY_LONG
 		  ,
 		  // add tool-specific options here 
 			{"from-label", required_argument, 0, 'f'},
@@ -133,8 +133,8 @@ parse_options(int argc, char** argv)
 		FILE* f = 0;
 		switch (c)
 		{
-#include "hfst-common-cases.h"
-#include "hfst-common-unary-cases.h"
+#include "inc/getopt-cases-common.h"
+#include "inc/getopt-cases-unary.h"
 		  // add tool-specific cases here
 		case 'f':
 			from_label = hfst_strdup(optarg);
@@ -232,12 +232,12 @@ parse_options(int argc, char** argv)
 int
 process_stream(std::istream& inputstream, std::ostream& outstream)
 {
-	VERBOSE_PRINT("Checking formats of transducers\n");
+	verbose_printf("Checking formats of transducers\n");
 	int format_type = HFST::read_format(inputstream);
     
 	if (format_type == SFST_FORMAT)
 	{
-		VERBOSE_PRINT("Using unweighted format\n");
+		verbose_printf("Using unweighted format\n");
 		try {
 		  
 		  HFST::KeyTable *key_table;
@@ -297,7 +297,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 									sizeof(char), (end - tabspot + 1)));
 						to_label = static_cast<char*>(memcpy(to_label,
 									tabspot+1, (end - tabspot)));
-						VERBOSE_PRINT("Substituting %s with %s...\n", 
+						verbose_printf("Substituting %s with %s...\n", 
 								from_label, to_label);
 						HFST::Key from_key = HFST::stringToKey(from_label,
 								key_table);
@@ -311,7 +311,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				}
 				else if ((from_label != 0) && (to_label != 0))
 				{
-					VERBOSE_PRINT("Substituting %s with %s...\n",
+					verbose_printf("Substituting %s with %s...\n",
 							from_label, to_label);
 					HFST::Key from_key = HFST::stringToKey(from_label,
 							key_table);
@@ -320,7 +320,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				}
 				else if ((from_label != 0) && (to_transducer_filename != 0))
 				{
-					VERBOSE_PRINT("Substituting %s with transducer "
+					verbose_printf("Substituting %s with transducer "
 							"from %s...\n", from_label, to_transducer_filename);
 					HFST::Key from_key = HFST::stringToKey(from_label,
 							key_table);
@@ -368,7 +368,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 	}
 	else if (format_type == OPENFST_FORMAT) 
 	{
-		VERBOSE_PRINT("Using weighted format\n");
+		verbose_printf("Using weighted format\n");
 		try {
 		  HWFST::KeyTable *key_table;
 		  if (read_symbols_from_filename != NULL) {
@@ -427,7 +427,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 									sizeof(char), (end - tabspot + 1)));
 						to_label = static_cast<char*>(memcpy(to_label,
 									tabspot + 1, (end - tabspot)));
-						VERBOSE_PRINT("Substituting %s with %s...\n", 
+						verbose_printf("Substituting %s with %s...\n", 
 								from_label, to_label);
 						HWFST::Key from_key = HWFST::stringToKey(from_label,
 								key_table);
@@ -441,7 +441,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
                 }
 				else if ((from_label != 0) && (to_label != 0))
 				{
-					VERBOSE_PRINT("Substituting %s with %s...\n",
+					verbose_printf("Substituting %s with %s...\n",
 							from_label, to_label);
 					HWFST::Key from_key = HWFST::stringToKey(from_label,
 							key_table);
@@ -450,7 +450,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				}
 				else if ((from_label != 0) && (to_transducer_filename != 0))
 				{
-					VERBOSE_PRINT("Substituting %s with transducer "
+					verbose_printf("Substituting %s with transducer "
 							"from %s...\n", from_label, to_transducer_filename);
 					HWFST::Key from_key = HWFST::stringToKey(from_label,
 							key_table);
@@ -519,7 +519,7 @@ int main( int argc, char **argv ) {
 	{
 		fclose(outfile);
 	}
-	VERBOSE_PRINT("Reading from %s, writing to %s\n", 
+	verbose_printf("Reading from %s, writing to %s\n", 
 		inputfilename, outfilename);
 	// here starts the buffer handling part
 	if (!is_input_stdin)

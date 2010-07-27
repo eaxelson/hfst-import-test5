@@ -34,7 +34,7 @@
 #include "hfst-program-options.h"
 #include <hfst2/hfst.h>
 
-#include "hfst-common-unary-variables.h"
+#include "inc/globals-unary.h"
 // add tools-specific variables here
 
 void
@@ -84,9 +84,9 @@ parse_options(int argc, char** argv)
 	{
 		static const struct option long_options[] =
 		{
-#include "hfst-common-options.h"
+		HFST_GETOPT_COMMON_LONG
 		  ,
-#include "hfst-common-unary-options.h"
+		HFST_GETOPT_UNARY_LONG
 		  ,
 		  // add tool-specific options here 
 			{0,0,0,0}
@@ -102,8 +102,8 @@ parse_options(int argc, char** argv)
 
 		switch (c)
 		{
-#include "hfst-common-cases.h"
-#include "hfst-common-unary-cases.h"
+#include "inc/getopt-cases-common.h"
+#include "inc/getopt-cases-unary.h"
 		  // add tool-specific cases here
 		case '?':
 			fprintf(message_out, "invalid option --%s\n",
@@ -165,12 +165,12 @@ parse_options(int argc, char** argv)
 int
 process_stream(std::istream& inputstream, std::ostream& outstream)
 {
-	VERBOSE_PRINT("Checking formats of transducers\n");
+	verbose_printf("Checking formats of transducers\n");
 	int format_type = HFST::read_format(inputstream);
     
 	if (format_type == SFST_FORMAT)
 	{
-		VERBOSE_PRINT("Using unweighted format\n");
+		verbose_printf("Using unweighted format\n");
 		try {
 		  
 		  HFST::KeyTable *key_table;
@@ -199,7 +199,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 					fprintf(message_out, "stream format mismatch\n");
 					return EXIT_FAILURE;
 				}
-				VERBOSE_PRINT("Summarizing...\n");
+				verbose_printf("Summarizing...\n");
 				// add your code here
 
 				char line[200];
@@ -236,7 +236,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 	}
 	else if (format_type == OPENFST_FORMAT) 
 	{
-		VERBOSE_PRINT("Using weighted format\n");
+		verbose_printf("Using weighted format\n");
 		try {
 		  HWFST::KeyTable *key_table;
 		  if (read_symbols_from_filename != NULL) {
@@ -264,7 +264,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 					fprintf(message_out, "stream format mismatch\n");
 					return EXIT_FAILURE;
 				}
-				VERBOSE_PRINT("Summarizing...\n");
+				verbose_printf("Summarizing...\n");
 				// add your code here
 
 				char line[200];
@@ -322,7 +322,7 @@ int main( int argc, char **argv ) {
 	{
 		fclose(outfile);
 	}
-	VERBOSE_PRINT("Reading from %s, writing to %s\n", 
+	verbose_printf("Reading from %s, writing to %s\n", 
 		inputfilename, outfilename);
 	// here starts the buffer handling part
 	if (!is_input_stdin)

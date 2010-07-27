@@ -19,11 +19,12 @@
 // All programs
 void print_common_program_options(FILE *file) {
 
-  fprintf(file, "  -h, --help             Print help message\n"  
-                 "  -V, --version          Print version info\n"  
-                 "  -v, --verbose          Print verbosely while processing\n"
-                 "  -q, --quiet            Do not print output\n"  
-                 "  -s, --silent           Alias of --quiet\n");
+  fprintf(file, "Common options:\n"
+          "  -h, --help             Print help message\n"  
+          "  -V, --version          Print version info\n"  
+          "  -v, --verbose          Print verbosely while processing\n"
+          "  -q, --quiet            Do not print output\n"  
+          "  -s, --silent           Alias of --quiet\n");
    
 }
 
@@ -44,8 +45,9 @@ void print_common_program_options(FILE *file) {
 //   weighted2unweighted
 void print_common_unary_program_options(FILE *file) {
 
-  fprintf(file, "  -i, --input=INFILE     Read input transducer from INFILE\n"
-                 "  -o, --output=OUTFILE   Write output transducer to OUTFILE\n"
+  fprintf(file, "Input/Output options:\n"
+        "  -i, --input=INFILE     Read input transducer from INFILE\n"
+        "  -o, --output=OUTFILE   Write output transducer to OUTFILE\n"
   );
 }
 
@@ -53,7 +55,7 @@ void print_common_unary_program_parameter_instructions(FILE *file) {
 
   fprintf(file, 
 	  "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
-	  "Weightedness of result depends on weightedness of INFILE\n"
+	  "Format of result depends on format of INFILE\n"
 	  );
 
 }
@@ -65,9 +67,10 @@ void print_common_unary_program_parameter_instructions(FILE *file) {
 //   disjunct, 
 void print_common_binary_program_options(FILE *file) {
 
-  fprintf(file, "  -1, --input1=INFILE1   Read input transducer from INFILE1\n"
-                 "  -2, --input2=INFILE2   Read output transducer from INFILE2\n"
-                 "  -o, --output=OUTFILE   Write results to OUTFILE\n");
+  fprintf(file, "Input/Output options:\n"
+          "  -1, --input1=INFILE1   Read input transducer from INFILE1\n"
+          "  -2, --input2=INFILE2   Read output transducer from INFILE2\n"
+          "  -o, --output=OUTFILE   Write results to OUTFILE\n");
 }
 
 void print_common_binary_program_parameter_instructions(FILE *file) {
@@ -76,7 +79,7 @@ void print_common_binary_program_parameter_instructions(FILE *file) {
 	  "If OUTFILE, or either INFILE1 or INFILE2 is missing or -,\n"
 	  "standard streams will be used.\n"
 	  "INFILE1, INFILE2, or both, must be specified.\n"
-	  "Weightedness of result depends on weightedness of INFILE1\n"
+	  "Format of result depends on format of INFILE1\n"
 	  "and INFILE2; both should be either weighted or unweighted.\n"
 	  );
 

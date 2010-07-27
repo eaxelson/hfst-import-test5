@@ -55,8 +55,6 @@ print_usage()
         fprintf(message_out, "\n");
         print_common_binary_program_parameter_instructions(message_out);
         fprintf(message_out, "\n");
-        print_more_info();
-        fprintf(message_out, "\n");
         fprintf(message_out,
             "\n"
             "Examples:\n"
@@ -67,6 +65,7 @@ print_usage()
             "\n",
             program_name );
         print_report_bugs();
+        print_more_info();
 }
 
 int
@@ -91,15 +90,14 @@ parse_options(int argc, char** argv)
         }
         switch (c)
         {
-#include "hfst-common-cases.h"
+#include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-binary.h"
 #include "inc/getopt-cases-error.h"
         }
     }
 
-#include "inc/common-check-params.h"
-    // rest of arguments are files...
-#include "inc/binary-check-params.h"
+#include "inc/check-params-common.h"
+#include "inc/check-params-binary.h"
     return EXIT_CONTINUE;
 }
 

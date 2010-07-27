@@ -1,6 +1,6 @@
 //! @file hfst-tail.cc
 //!
-//! @brief Transducer archive tailing command line tool
+//! @brief Transducer archive tailing tool
 //!
 //! @author HFST Team
 
@@ -24,6 +24,9 @@
 
 #include <iostream>
 #include <fstream>
+#include <queue>
+
+using std::queue;
 
 #include <cstdio>
 #include <cstdlib>
@@ -32,49 +35,45 @@
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
-#include <hfst2/hfst.h>
+#include "HfstTransducer.h"
 
-#include "hfst-common-unary-variables.h"
+#include "inc/globals-common.h"
+#include "inc/globals-unary.h"
+
+using hfst::HfstTransducer;
+using hfst::HfstInputStream;
+using hfst::HfstOutputStream;
+using hfst::exceptions::NotTransducerStreamException;
+
 // add tools-specific variables here
-static int number_of_transducers=0;
+unsigned long tail_count = 1;
 
 void
-print_usage(const char *program_name)
+print_usage()
 {
-	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
-	fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
-		   "Read n last transducers from input\n"
-		"\n", program_name);
+    // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
+    // Usage line
+    fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
+           "Get last transducers from an archive\n"
+        "\n", program_name);
 
-	print_common_program_options(message_out);
-#               if DEBUG
-	fprintf(message_out,
-		"%-35s%s", "  -d, --debug", "Print debugging messages and results\n"
-		);
-#               endif
-	print_common_unary_program_options(message_out);
-	// fprintf(message_out, (tool-specific options and short descriptions)
-	fprintf(message_out, "%-35s%s", "  -n, --n-last=INT", "Read INT last transducers\n");
-	fprintf(message_out, "\n");
-	print_common_unary_program_parameter_instructions(message_out);
-	fprintf(stderr, "\n");
-	print_more_info(message_out, "Tail");
-	fprintf(stderr, "\n");
-	print_report_bugs(message_out);
+    // options, grouped
+    print_common_program_options(message_out);
+    print_common_unary_program_options(message_out);
+    fprintf(message_out, "Archive options:\n"
+            "  -n, --n-last=NUMBER   Read last NUMBER transducers\n");
+    fprintf(message_out, "\n");
+    // parameter details
+    print_common_unary_program_parameter_instructions(message_out);
+    fprintf(message_out, "NUMBER must be a positive integer as parsed by "
+            "strtoul base 10\n");
+    fprintf(message_out, "\n");
+    // bug report address
+    print_report_bugs();
+    // external docs
+    print_more_info();
 }
 
-void
-print_version(const char* program_name)
-{
-	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dversion
-	fprintf(message_out, "%s 0.1 (" PACKAGE_STRING ")\n"
-		   "Copyright (C) 2008 University of Helsinki,\n"
-		   "License GPLv3: GNU GPL version 3 "
-		   "<http://gnu.org/licenses/gpl.html>\n"
-		   "This is free software: you are free to change and redistribute it.\n"
-		   "There is NO WARRANTY, to the extent permitted by law.\n",
-		program_name);
-}
 
 int
 parse_options(int argc, char** argv)
@@ -84,17 +83,16 @@ parse_options(int argc, char** argv)
 	{
 		static const struct option long_options[] =
 		{
-#include "hfst-common-options.h"
-		  ,
-#include "hfst-common-unary-options.h"
-		  ,
+		  HFST_GETOPT_COMMON_LONG,
+		  HFST_GETOPT_UNARY_LONG,
+          {"n-last", required_argument, 0, 'n'},
 		  // add tool-specific options here 
-			{"n-last", required_argument, 0, 'n'},
 			{0,0,0,0}
 		};
 		int option_index = 0;
 		// add tool-specific options here 
-		char c = getopt_long(argc, argv, "dhi:o:sqvVR:DW:n:",
+		char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
+                             HFST_GETOPT_UNARY_SHORT "n:",
 							 long_options, &option_index);
 		if (-1 == c)
 		{
@@ -103,221 +101,63 @@ parse_options(int argc, char** argv)
 
 		switch (c)
 		{
-#include "hfst-common-cases.h"
-#include "hfst-common-unary-cases.h"
-		  // add tool-specific cases here
-		case 'n':
-			number_of_transducers = atoi(hfst_strdup(optarg));
-			break;
-		case '?':
-			fprintf(message_out, "invalid option --%s\n",
-					long_options[option_index].name);
-			print_short_help(argv[0]);
-			return EXIT_FAILURE;
-			break;
-		default:
-			fprintf(message_out, "invalid option -%c\n", c);
-			print_short_help(argv[0]);
-			return EXIT_FAILURE;
-			break;
+#include "inc/getopt-cases-common.h"
+#include "inc/getopt-cases-unary.h"
+        case 'n':
+          tail_count = hfst_strtoul(optarg, 10);
+          break;
+#include "inc/getopt-cases-error.h"
 		}
 	}
 
-	if (is_output_stdout)
-	{
-			outfilename = hfst_strdup("<stdout>");
-			outfile = stdout;
-			message_out = stderr;
-	}
-	// rest of arguments are files...
-	if (is_input_stdin && ((argc - optind) == 1))
-	{
-		inputfilename = hfst_strdup(argv[optind]);
-		if (strcmp(inputfilename, "-") == 0) {
-		  inputfilename = hfst_strdup("<stdin>");
-		  inputfile = stdin;
-		  is_input_stdin = true;
-		}
-		else {
-		  inputfile = hfst_fopen(inputfilename, "r");
-		  is_input_stdin = false;
-		}
-	}
-	else if (inputfile) {
-
-	}
-	else if ((argc - optind) == 0)
-	{
-		inputfilename = hfst_strdup("<stdin>");
-		inputfile = stdin;
-		is_input_stdin = true;
-	}
-	else if ((argc - optind) > 1)
-	{
-		fprintf(message_out, "Exactly one input transducer file must be given\n");
-		print_short_help(argv[0]);
-		return EXIT_FAILURE;
-	}
-	else
-	{
-		fprintf(message_out, "???\n");
-		return 73;
-	}
+#include "inc/check-params-common.h"
+#include "inc/check-params-unary.h"
 	return EXIT_CONTINUE;
 }
 
 int
-process_stream(std::istream& inputstream, std::ostream& outstream)
+process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 {
-	VERBOSE_PRINT("Checking formats of transducers\n");
-	int format_type = HFST::read_format(inputstream);
-    
-	if (format_type == SFST_FORMAT)
+  instream.open();
+  outstream.open();
+  queue<HfstTransducer> last_n;
+	
+	size_t transducer_n=0;
+	while (instream.is_good())
 	{
-		VERBOSE_PRINT("Using unweighted format\n");
-		try {
-		  
-		  HFST::KeyTable *key_table;
-		  if (read_symbols_from_filename != NULL) {
-		    ifstream is(read_symbols_from_filename);
-		    key_table = HFST::read_symbol_table(is);
-		    is.close();
-		  }
-		  else
-		    key_table = HFST::create_key_table();
-		  bool transducer_has_symbol_table=false;
-			HFST::TransducerHandle input = NULL;
-			vector<HFST::TransducerHandle> output;
-			int n=0;
-			while (true) {
-				int inputformat = HFST::read_format(inputstream);
-				if (inputformat == EOF_FORMAT)
-				{
-					break;
-				}
-				else if (inputformat == SFST_FORMAT)
-				{
-				  if (!transducer_has_symbol_table)
-				    transducer_has_symbol_table = HFST::has_symbol_table(inputstream);
-				  input = HFST::read_transducer(inputstream, key_table);
-				  output.push_back(input);
-				  n++;
-				}
-				else
-				{
-					fprintf(message_out, "stream format mismatch\n");
-					return EXIT_FAILURE;
-				}
-
-			}
-			int index = n - number_of_transducers;  // start from transducer at this index
-			if (index < 0) // if stream does not have enough transducers,
-			  index = 0;   // read all transducers
-
-			while (index < n) {
-			  VERBOSE_PRINT("Writing transducer number %i ...\n", index+1);
-			  if (!write_symbols)
-			    HFST::write_transducer(output[index], outstream);
-			  else if (transducer_has_symbol_table || read_symbols_from_filename != NULL)
-			    HFST::write_transducer(output[index], key_table, outstream);
-			  else
-			    HFST::write_transducer(output[index], outstream);
-			  // HFST::delete_transducer(output[index]);
-			  index++;
-			}
-
-			if (write_symbols_to_filename != NULL) {
-			  ofstream os(write_symbols_to_filename);
-			  HFST::write_symbol_table(key_table, os);
-			  os.close();
-			}
-			delete key_table;
-		}
-		catch (const char *p)
-		{
-			printf("HFST library error: %s\n", p);
-			return EXIT_FAILURE;
-		}
-		return EXIT_SUCCESS;
+		transducer_n++;
+        verbose_printf("Counting %s...%zu\n", inputfilename, transducer_n); 
+		
+		HfstTransducer trans(instream);
+        last_n.push(trans);
+        if (last_n.size() > tail_count)
+          {
+            last_n.pop();
+          }
 	}
-	else if (format_type == OPENFST_FORMAT) 
-	{
-		VERBOSE_PRINT("Using weighted format\n");
-		try {
-		  HWFST::KeyTable *key_table;
-		  if (read_symbols_from_filename != NULL) {
-		    ifstream is(read_symbols_from_filename);
-		    key_table = HWFST::read_symbol_table(is);
-		    is.close();
-		  }
-		  else
-		    key_table = HWFST::create_key_table();
-		  bool transducer_has_symbol_table=false;
-			HWFST::TransducerHandle input = NULL;
-			vector<HWFST::TransducerHandle> output;
-			int n=0;
-			while (true) {
-				int inputformat = HWFST::read_format(inputstream);
-				if (inputformat == EOF_FORMAT)
-				{
-					break;
-				}
-				else if (inputformat == OPENFST_FORMAT)
-				{
-				  if (!transducer_has_symbol_table)
-				    transducer_has_symbol_table = HWFST::has_symbol_table(inputstream);
-				  input = HWFST::read_transducer(inputstream, key_table);
-				  output.push_back(input);
-				  n++;
-				}
-				else
-				{
-					fprintf(message_out, "stream format mismatch\n");
-					return EXIT_FAILURE;
-				}
-
-			}
-
-			int index = n - number_of_transducers;  // start from transducer at this index
-			if (index < 0) // if stream does not have enough transducers,
-			  index = 0;   // read all transducers
-
-			while (index < n) {
-			  VERBOSE_PRINT("Writing transducer number %i ...\n", index+1);
-			  if (!write_symbols)
-			    HWFST::write_transducer(output[index], outstream);
-			  else if (transducer_has_symbol_table || read_symbols_from_filename != NULL)
-			    HWFST::write_transducer(output[index], key_table, outstream);
-			  else
-			    HWFST::write_transducer(output[index], outstream);
-			  // HWFST::delete_transducer(output[index]);
-			  index++;
-			}
-
-			if (write_symbols_to_filename != NULL) {
-			  ofstream os(write_symbols_to_filename);
-			  HWFST::write_symbol_table(key_table, os);
-			  os.close();
-			}
-			delete key_table;
-		}
-		catch (const char *p) {
-			fprintf(message_out, "HFST lib error: %s\n", p);
-			return 1;
-		}
-		return EXIT_SUCCESS;
-	}
-	else
-	{
-		fprintf(message_out, "ERROR: Transducer has wrong type.\n");
-		return EXIT_FAILURE;
-	}
+    if (tail_count < transducer_n)
+      {
+        transducer_n -= (tail_count + 1);
+      }
+    else
+      {
+        transducer_n = 0;
+      }
+    while (!last_n.empty())
+      {
+        transducer_n++;
+        verbose_printf("Forwarding %s...%zu\n", inputfilename, transducer_n);
+        outstream << last_n.front();
+        last_n.pop();
+      }
+	instream.close();
+	outstream.close();
+	return EXIT_SUCCESS;
 }
 
 
 int main( int argc, char **argv ) {
-	message_out = stdout;
-	verbose = false;
+	hfst_set_program_name(argv[0], "0.1", "HfstTail");
 	int retval = parse_options(argc, argv);
 	if (retval != EXIT_CONTINUE)
 	{
@@ -332,44 +172,27 @@ int main( int argc, char **argv ) {
 	{
 		fclose(outfile);
 	}
-	VERBOSE_PRINT("Reading from %s, writing to %s\n", 
+	verbose_printf("Reading from %s, writing to %s\n", 
 		inputfilename, outfilename);
 	// here starts the buffer handling part
-	if (!is_input_stdin)
-	{
-		std::filebuf fbinput;
-		fbinput.open(inputfilename, std::ios::in);
-		std::istream inputstream(&fbinput);
-		if (!is_output_stdout)
-		{
-			std::filebuf fbout;
-			fbout.open(outfilename, std::ios::out);
-			std::ostream outstream(&fbout);
-			retval = process_stream(inputstream, outstream);
-		}
-		else
-		{
-			retval = process_stream(inputstream, std::cout);
-		}
-		return retval;
+	HfstInputStream* instream = NULL;
+	try {
+	  instream = (inputfile != stdin) ?
+	    new HfstInputStream(inputfilename) : new HfstInputStream();
+	} catch (NotTransducerStreamException)	{
+		error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+              inputfilename);
+		return EXIT_FAILURE;
 	}
-	else if (is_input_stdin)
-	{
-		if (!is_output_stdout)
-		{
-			std::filebuf fbout;
-			fbout.open(outfilename, std::ios::out);
-			std::ostream outstream(&fbout);
-			retval = process_stream(std::cin, outstream);
-		}
-		else
-		{
-			retval = process_stream(std::cin, std::cout);
-		}
-		return retval;
-	}
+	HfstOutputStream* outstream = (outfile != stdout) ?
+		new HfstOutputStream(outfilename, instream->get_type()) :
+		new HfstOutputStream(instream->get_type());
+	
+	retval = process_stream(*instream, *outstream);
+	delete instream;
+	delete outstream;
 	free(inputfilename);
 	free(outfilename);
-	return EXIT_SUCCESS;
+	return retval;
 }
 

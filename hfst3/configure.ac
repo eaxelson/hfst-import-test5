@@ -83,18 +83,24 @@ if test "x$with_sfst" == "xno" -a "x$with_openfst" == "xno" -a "x$with_foma" == 
     AC_MSG_ERROR([must build with at least one fst backend])
 fi
 
-# allow programs to be built separately
+# allow programs to be built separately (sort alphabetically)
+AC_ARG_ENABLE([calculate],
+			  [AS_HELP_STRING([--enable-calculate],
+							  [build calculate tool @<:@default=no@:>@])],
+			  [enable_calculate=$enableval],
+			  [enable_calculate=no])
+AM_CONDITIONAL([WANT_CALCULATE], [test x$enable_calculate != xno])
 AC_ARG_ENABLE([compare],
 			  [AS_HELP_STRING([--enable-compare],
 							  [build compare tool @<:@default=yes@:>@])],
 			  [enable_compare=$enableval],
-			  [enable_compare=no])
+			  [enable_compare=yes])
 AM_CONDITIONAL([WANT_COMPARE], [test x$enable_compare != xno])
 AC_ARG_ENABLE([compose],
 			  [AS_HELP_STRING([--enable-compose],
-							  [build compose tool @<:@default=no@:>@])],
+							  [build compose tool @<:@default=yes@:>@])],
 			  [enable_compose=$enableval],
-			  [enable_compose=no])
+			  [enable_compose=yes])
 AM_CONDITIONAL([WANT_COMPOSE], [test x$enable_compose != xno])
 AC_ARG_ENABLE([compose_intersect],
 			  [AS_HELP_STRING([--enable-compose-intersect],
@@ -110,15 +116,15 @@ AC_ARG_ENABLE([concatenate],
 AM_CONDITIONAL([WANT_CONCATENATE], [test x$enable_concatenate != xno])
 AC_ARG_ENABLE([conjunct],
 			  [AS_HELP_STRING([--enable-conjunct],
-							  [build conjunct tool @<:@default=no@:>@])],
+							  [build conjunct tool @<:@default=yes@:>@])],
 			  [enable_conjunct=$enableval],
-			  [enable_conjunct=no])
+			  [enable_conjunct=yes])
 AM_CONDITIONAL([WANT_CONJUNCT], [test x$enable_conjunct != xno])
 AC_ARG_ENABLE([determinize],
 			  [AS_HELP_STRING([--enable-determinize],
-							  [build determinize tool @<:@default=no@:>@])],
+							  [build determinize tool @<:@default=yes@:>@])],
 			  [enable_determinize=$enableval],
-			  [enable_determinize=no])
+			  [enable_determinize=yes])
 AM_CONDITIONAL([WANT_DETERMINIZE], [test x$enable_determinize != xno])
 AC_ARG_ENABLE([diff_test],
 			  [AS_HELP_STRING([--enable-diff-test],
@@ -128,9 +134,9 @@ AC_ARG_ENABLE([diff_test],
 AM_CONDITIONAL([WANT_DIFF_TEST], [test x$enable_diff_test != xno])
 AC_ARG_ENABLE([disjunct],
 			  [AS_HELP_STRING([--enable-disjunct],
-							  [build disjunct tool @<:@default=no@:>@])],
+							  [build disjunct tool @<:@default=yes@:>@])],
 			  [enable_disjunct=$enableval],
-			  [enable_disjunct=no])
+			  [enable_disjunct=yes])
 AM_CONDITIONAL([WANT_DISJUNCT], [test x$enable_disjunct != xno])
 AC_ARG_ENABLE([format],
 			  [AS_HELP_STRING([--enable-format],
@@ -138,11 +144,17 @@ AC_ARG_ENABLE([format],
 			  [enable_format=$enableval],
 			  [enable_format=no])
 AM_CONDITIONAL([WANT_FORMAT], [test x$enable_format != xno])
+AC_ARG_ENABLE([flag_diacritics],
+			  [AS_HELP_STRING([--enable-flag-diacritics],
+							  [build flag diacritic tool @<:@default=no@:>@])],
+			  [enable_flag_diacritics=$enableval],
+			  [enable_flag_diacritics=no])
+AM_CONDITIONAL([WANT_FLAG_DIACRITICS], [test x$enable_flag_diacritics != xno])
 AC_ARG_ENABLE([fst2fst],
 			  [AS_HELP_STRING([--enable-fst2fst],
 							  [build fst2fst tool @<:@default=yes@:>@])],
 			  [enable_fst2fst=$enableval],
-			  [enable_fst2fst=no])
+			  [enable_fst2fst=yes])
 AM_CONDITIONAL([WANT_FST2FST], [test x$enable_fst2fst != xno])
 AC_ARG_ENABLE([fst2pairstrings],
 			  [AS_HELP_STRING([--enable-fst2pairstrings],
@@ -160,19 +172,19 @@ AC_ARG_ENABLE([fst2txt],
 			  [AS_HELP_STRING([--enable-fst2txt],
 							  [build fst2txt tool @<:@default=yes@:>@])],
 			  [enable_fst2txt=$enableval],
-			  [enable_fst2txt=no])
+			  [enable_fst2txt=yes])
 AM_CONDITIONAL([WANT_FST2TXT], [test x$enable_fst2txt != xno])
 AC_ARG_ENABLE([head],
 			  [AS_HELP_STRING([--enable-head],
-							  [build head tool @<:@default=no@:>@])],
+							  [build head tool @<:@default=yes@:>@])],
 			  [enable_head=$enableval],
-			  [enable_head=no])
+			  [enable_head=yes])
 AM_CONDITIONAL([WANT_HEAD], [test x$enable_head != xno])
 AC_ARG_ENABLE([invert],
 			  [AS_HELP_STRING([--enable-invert],
 							  [build invert tool @<:@default=yes@:>@])],
 			  [enable_invert=$enableval],
-			  [enable_invert=no])
+			  [enable_invert=yes])
 AM_CONDITIONAL([WANT_INVERT], [test x$enable_invert != xno])
 AC_ARG_ENABLE([lookup],
 			  [AS_HELP_STRING([--enable-lookup],
@@ -188,21 +200,33 @@ AC_ARG_ENABLE([lookup_optimize],
 AM_CONDITIONAL([WANT_LOOKUP_OPTIMIZE], [test x$enable_lookup_optimize != xno])
 AC_ARG_ENABLE([minimize],
 			  [AS_HELP_STRING([--enable-minimize],
-							  [build minimize tool @<:@default=no@:>@])],
+							  [build minimize tool @<:@default=yes@:>@])],
 			  [enable_minimize=$enableval],
-			  [enable_minimize=no])
+			  [enable_minimize=yes])
 AM_CONDITIONAL([WANT_MINIMIZE], [test x$enable_minimize != xno])
 AC_ARG_ENABLE([pair_test],
 			  [AS_HELP_STRING([--enable-pair-test],
 							  [build pair-test tool @<:@default=no@:>@])],
 			  [enable_pair_test=$enableval],
 			  [enable_pair_test=no])
+AC_ARG_ENABLE([omor_evaluate],
+			  [AS_HELP_STRING([--enable-omor-evaluate],
+							  [build omor evaluation tool @<:@default=no@:>@])],
+			  [enable_omor_evaluate=$enableval],
+			  [enable_omor_evaluate=no])
+AM_CONDITIONAL([WANT_OMOR_EVALUATE], [test x$enable_omor_evaluate != xno])
+AC_ARG_ENABLE([optimized-lookup],
+			  [AS_HELP_STRING([--enable-optimized-lookup],
+							  [build optimized lookup tool @<:@default=no@:>@])],
+			  [enable_optimized_lookup=$enableval],
+			  [enable_optimized_lookup=no])
+AM_CONDITIONAL([WANT_OPTIMIZED_LOOKUP], [test x$enable_optimized_lookup != xno])
 AM_CONDITIONAL([WANT_PAIR_TEST], [test x$enable_pair_test != xno])
 AC_ARG_ENABLE([project],
 			  [AS_HELP_STRING([--enable-project],
-							  [build project tool @<:@default=no@:>@])],
+							  [build project tool @<:@default=yes@:>@])],
 			  [enable_project=$enableval],
-			  [enable_project=no])
+			  [enable_project=yes])
 AM_CONDITIONAL([WANT_PROJECT], [test x$enable_project != xno])
 AC_ARG_ENABLE([push_weights],
 			  [AS_HELP_STRING([--enable-push-weights],
@@ -218,27 +242,27 @@ AC_ARG_ENABLE([regexp2fst],
 AM_CONDITIONAL([WANT_REGEXP2FST], [test x$enable_regexp2fst != xno])
 AC_ARG_ENABLE([remove_epsilons],
 			  [AS_HELP_STRING([--enable-remove-epsilons],
-							  [build remove-epsilons tool @<:@default=no@:>@])],
+							  [build remove-epsilons tool @<:@default=yes@:>@])],
 			  [enable_remove_epsilons=$enableval],
-			  [enable_remove_epsilons=no])
+			  [enable_remove_epsilons=yes])
 AM_CONDITIONAL([WANT_REMOVE_EPSILONS], [test x$enable_remove_epsilons != xno])
 AC_ARG_ENABLE([repeat],
 			  [AS_HELP_STRING([--enable-repeat],
-							  [build repeat tool @<:@default=no@:>@])],
+							  [build repeat tool @<:@default=yes@:>@])],
 			  [enable_repeat=$enableval],
-			  [enable_repeat=no])
+			  [enable_repeat=yes])
 AM_CONDITIONAL([WANT_REPEAT], [test x$enable_repeat != xno])
 AC_ARG_ENABLE([reverse],
 			  [AS_HELP_STRING([--enable-reverse],
-							  [build reverse tool @<:@default=no@:>@])],
+							  [build reverse tool @<:@default=yes@:>@])],
 			  [enable_reverse=$enableval],
-			  [enable_reverse=no])
+			  [enable_reverse=yes])
 AM_CONDITIONAL([WANT_REVERSE], [test x$enable_reverse != xno])
 AC_ARG_ENABLE([split],
 			  [AS_HELP_STRING([--enable-split],
-							  [build split tool @<:@default=no@:>@])],
+							  [build split tool @<:@default=yes@:>@])],
 			  [enable_split=$enableval],
-			  [enable_split=no])
+			  [enable_split=yes])
 AM_CONDITIONAL([WANT_SPLIT], [test x$enable_split != xno])
 AC_ARG_ENABLE([strings2fst],
 			  [AS_HELP_STRING([--enable-strings2fst],
@@ -250,13 +274,19 @@ AC_ARG_ENABLE([strip_header],
 			  [AS_HELP_STRING([--enable-strip-header],
 							  [build strip-header tool @<:@default=yes@:>@])],
 			  [enable_strip_header=$enableval],
-			  [enable_strip_header=no])
+			  [enable_strip_header=yes])
 AM_CONDITIONAL([WANT_STRIP_HEADER], [test x$enable_strip_header != xno])
+AC_ARG_ENABLE([substitute],
+			  [AS_HELP_STRING([--enable-substitute],
+							  [build substitution tool @<:@default=no@:>@])],
+			  [enable_substitute=$enableval],
+			  [enable_substitute=no])
+AM_CONDITIONAL([WANT_SUBSTITUTE], [test x$enable_substitute != xno])
 AC_ARG_ENABLE([subtract],
 			  [AS_HELP_STRING([--enable-subtract],
-							  [build subtract tool @<:@default=no@:>@])],
+							  [build subtract tool @<:@default=yes@:>@])],
 			  [enable_subtract=$enableval],
-			  [enable_subtract=no])
+			  [enable_subtract=yes])
 AM_CONDITIONAL([WANT_SUBTRACT], [test x$enable_subtract != xno])
 AC_ARG_ENABLE([summarize],
 			  [AS_HELP_STRING([--enable-summarize],
@@ -272,9 +302,9 @@ AC_ARG_ENABLE([symbols],
 AM_CONDITIONAL([WANT_SYMBOLS], [test x$enable_symbols != xno])
 AC_ARG_ENABLE([tail],
 			  [AS_HELP_STRING([--enable-tail],
-							  [build tail tool @<:@default=no@:>@])],
+							  [build tail tool @<:@default=yes@:>@])],
 			  [enable_tail=$enableval],
-			  [enable_tail=no])
+			  [enable_tail=yes])
 AM_CONDITIONAL([WANT_TAIL], [test x$enable_tail != xno])
 AC_ARG_ENABLE([txt2fst],
 			  [AS_HELP_STRING([--enable-txt2fst],
@@ -282,36 +312,6 @@ AC_ARG_ENABLE([txt2fst],
 			  [enable_txt2fst=$enableval],
 			  [enable_txt2fst=no])
 AM_CONDITIONAL([WANT_TXT2FST], [test x$enable_txt2fst != xno])
-AC_ARG_ENABLE([calculate],
-			  [AS_HELP_STRING([--enable-calculate],
-							  [build calculate tool @<:@default=no@:>@])],
-			  [enable_calculate=$enableval],
-			  [enable_calculate=no])
-AM_CONDITIONAL([WANT_CALCULATE], [test x$enable_calculate != xno])
-AC_ARG_ENABLE([optimized-lookup],
-			  [AS_HELP_STRING([--enable-optimized-lookup],
-							  [build optimized lookup tool @<:@default=no@:>@])],
-			  [enable_optimized_lookup=$enableval],
-			  [enable_optimized_lookup=no])
-AM_CONDITIONAL([WANT_OPTIMIZED_LOOKUP], [test x$enable_optimized_lookup != xno])
-AC_ARG_ENABLE([substitute],
-			  [AS_HELP_STRING([--enable-substitute],
-							  [build substitution tool @<:@default=no@:>@])],
-			  [enable_substitute=$enableval],
-			  [enable_substitute=no])
-AM_CONDITIONAL([WANT_SUBSTITUTE], [test x$enable_substitute != xno])
-AC_ARG_ENABLE([flag_diacritics],
-			  [AS_HELP_STRING([--enable-flag-diacritics],
-							  [build flag diacritic tool @<:@default=no@:>@])],
-			  [enable_flag_diacritics=$enableval],
-			  [enable_flag_diacritics=no])
-AM_CONDITIONAL([WANT_FLAG_DIACRITICS], [test x$enable_flag_diacritics != xno])
-AC_ARG_ENABLE([omor_evaluate],
-			  [AS_HELP_STRING([--enable-omor-evaluate],
-							  [build omor evaluation tool @<:@default=no@:>@])],
-			  [enable_omor_evaluate=$enableval],
-			  [enable_omor_evaluate=no])
-AM_CONDITIONAL([WANT_OMOR_EVALUATE], [test x$enable_omor_evaluate != xno])
 
 
 # Checks for programs

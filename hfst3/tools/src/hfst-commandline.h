@@ -137,6 +137,8 @@ double hfst_strtoweight(const char *s);
  */
 int hfst_strtonumber(const char *s, bool *infinite);
 
+unsigned long hfst_strtoul(char *s, int base);
+
 #define hfst_strdup xstrdup
 #define hfst_strndup xstrndup
 #define hfst_malloc xmalloc

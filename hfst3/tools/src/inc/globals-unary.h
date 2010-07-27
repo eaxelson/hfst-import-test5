@@ -10,3 +10,14 @@
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+
+  // input transducer
+  static char *inputfilename;
+  static FILE *inputfile;
+  static bool is_input_stdin = true;
+  // result transducer
+  static char *outfilename;
+  static FILE *outfile;
+  static bool is_output_stdout = true;
+  
+  

@@ -232,12 +232,12 @@ parse_options(int argc, char** argv)
 int
 invert_stream(std::istream& inputstream, std::ostream& outstream)
 {
-	VERBOSE_PRINT("Checking formats of transducers\n");
+	verbose_printf("Checking formats of transducers\n");
 	int format_type = HFST::read_format(inputstream);
     
 	if (format_type == SFST_FORMAT)
 	{
-		VERBOSE_PRINT("Using unweighted format\n");
+		verbose_printf("Using unweighted format\n");
 		try {
 			HFST::TransducerHandle input = NULL;
 			HFST::KeyTable *key_table = NULL;
@@ -276,7 +276,7 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 				  outstream << "\n";
 				vector<TransducerHandle> paths;
 				if (nbest < 1) {
-				  VERBOSE_PRINT("Finding all paths...\n");
+				  verbose_printf("Finding all paths...\n");
 				  try {
 				    paths = HFST::find_all_paths(input);
 				  }
@@ -286,7 +286,7 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 				  }
 				}
 				else {
-				  VERBOSE_PRINT("Finding best paths...\n");
+				  verbose_printf("Finding best paths...\n");
 				  HFST::TransducerHandle paths_transducer = HFST::find_best_paths(input, nbest, unique);
 				  paths = HFST::find_all_paths(paths_transducer);
 				}
@@ -312,7 +312,7 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 	}
 	else if (format_type == OPENFST_FORMAT) 
 	{
-		VERBOSE_PRINT("Using weighted format\n");
+		verbose_printf("Using weighted format\n");
 		try {
 			HWFST::TransducerHandle input = NULL;
 			HWFST::KeyTable *key_table = NULL;
@@ -352,7 +352,7 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 				  outstream << "\n";
 				vector<TransducerHandle> paths;
 				if (nbest < 1) {
-				  VERBOSE_PRINT("Finding all paths...\n");
+				  verbose_printf("Finding all paths...\n");
 				  try {
 				    paths = HWFST::find_all_paths(input);
 				  }
@@ -362,7 +362,7 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 				  }
 				}
 				else {
-				  VERBOSE_PRINT("Finding best paths...\n");
+				  verbose_printf("Finding best paths...\n");
 				  HWFST::TransducerHandle paths_transducer = HWFST::find_best_paths(input, nbest, unique);
 				  paths = HWFST::find_all_paths(paths_transducer);
 				}
@@ -410,7 +410,7 @@ int main( int argc, char **argv ) {
 	{
 		fclose(outfile);
 	}
-	VERBOSE_PRINT("Reading from %s, writing to %s\n", 
+	verbose_printf("Reading from %s, writing to %s\n", 
 		inputfilename, outfilename);
 	// here starts the buffer handling part
 	if (!is_input_stdin)

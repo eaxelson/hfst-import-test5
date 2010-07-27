@@ -1,6 +1,6 @@
 //! @file hfst-subtract.cc
 //!
-//! @brief Tranducer subtraction command line tool
+//! @brief Transducer subtraction tool
 //!
 //! @author HFST Team
 
@@ -30,487 +30,175 @@
 #include <cstring>
 #include <getopt.h>
 
+#include "HfstTransducer.h"
+
+using hfst::HfstTransducer;
+using hfst::HfstInputStream;
+using hfst::HfstOutputStream;
+using hfst::ImplementationType;
+using hfst::exceptions::NotTransducerStreamException;
+
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
-#include <hfst2/hfst.h>
-
-
-static bool is_input_stdin = true;
-// left part of composition
-static char *leftfilename;
-static FILE *leftfile;
-static bool leftNamed = false;
-// right part of composition
-static char *rightfilename;
-static FILE *rightfile;
-static bool rightNamed = false;
-// result of composition
-static char *outfilename;
-static FILE *outfile;
-static bool is_output_stdout = true;
-
-static bool use_numbers = false;
-static bool write_symbol_table = true;
-static const char *write_symbols_to;
+#include "inc/globals-common.h"
+#include "inc/globals-binary.h"
 
 void
-print_usage(const char *program_name)
+print_usage()
 {
-	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
-	fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE1 [INFILE2]]\n"
-		   "Subtract two transducers\n"
-		"\n", program_name );
-		print_common_program_options(message_out);
-		print_common_binary_program_options(message_out);
-		fprintf(message_out, "\n");
-#               if DEBUG
-		fprintf(message_out,
-			"%-35s%s", "  -d, --debug            Print debugging messages and results\n");
-#               endif
-		print_common_binary_program_parameter_instructions(message_out);
-		fprintf(stderr, "\n");
-		print_more_info(message_out, "Subtract");
-		fprintf(stderr, "\n");
-		/*fprintf(message_out,
-			"\n"
-			"Examples:\n"
-			"  %s -o catdog.hfst cat.hfst dog.hfst  concatenates "
-			"cat.hfst with dog.hfst\n"
-			"         writing results to catdog.hfst\n"
-			"\n",
-			program_name );*/
-		print_report_bugs(message_out);
-}
-
-void
-print_version(const char* program_name)
-{
-	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dversion
-	fprintf(message_out, "%s 0.1 (" PACKAGE_STRING ")\n"
-		   "Copyright (C) 2009 University of Helsinki,\n"
-		   "License GPLv3: GNU GPL version 3 "
-		   "<http://gnu.org/licenses/gpl.html>\n"
-		   "This is free software: you are free to change and redistribute it.\n"
-		   "There is NO WARRANTY, to the extent permitted by law.\n",
-		program_name);
+    // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
+    fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE1 [INFILE2]]\n"
+             "Subtract (minus) two transducers\n"
+        "\n", program_name );
+        print_common_program_options(message_out);
+        print_common_binary_program_options(message_out);
+        fprintf(message_out, "\n");
+        print_common_binary_program_parameter_instructions(message_out);
+        fprintf(message_out, "\n");
+        fprintf(message_out,
+            "\n"
+            "Examples:\n"
+            "  %s -o catdog.hfst cat.hfst dog.hfst  subtracts transducers\n"
+            "\n",
+            program_name );
+        print_report_bugs();
+        print_more_info();
 }
 
 int
 parse_options(int argc, char** argv)
 {
-	// use of this function requires options are settable on global scope
-	while (true)
-	{
-		static const struct option long_options[] =
-		{
-#include "hfst-common-options.h"
-		  ,
-			{"do-not-write-symbols", no_argument, 0, 'D'},
-		  {"write-symbols-to", required_argument, 0, 'W'},
-		        {"input1", required_argument, 0, '1'},
-			{"input2", required_argument, 0, '2'},
-			{"number", no_argument, 0, 'n'},
-			{"output", required_argument, 0, 'o'},
-			{"version", no_argument, 0, 'V'},
-			{0,0,0,0}
-		};
-		int option_index = 0;
-		char c = getopt_long(argc, argv, "1:2:Ddhno:qvVsW:",
-							 long_options, &option_index);
-		if (-1 == c)
-		{
-			break;
-		}
-		switch (c)
-		{
-#include "hfst-common-cases.h"
-		case 'o':
-			outfilename = hfst_strdup(optarg);
-			outfile = hfst_fopen(outfilename, "w");
-			is_output_stdout = false;
-			message_out = stdout;
-			break;
-		case '1':
-			leftfilename = hfst_strdup(optarg);
-			leftfile = hfst_fopen(leftfilename, "r");
-			is_input_stdin = false;
-			leftNamed = true;
-			break;
-		case '2':
-			rightfilename = hfst_strdup(optarg);
-			rightfile = hfst_fopen(rightfilename, "r");
-			is_input_stdin = false;
-			rightNamed = true;
-			break;
-		case 'n':
-			use_numbers = true;
-			break;
-		case 'W':
-			write_symbols_to = hfst_strdup(optarg);
-			break;
-		case 'D':
-			write_symbol_table = false;
-			break;
-		case '?':
-			fprintf(message_out, "%s: invalid option --%s\n", argv[0], 
-					long_options[option_index].name);
-			fprintf(message_out, "Try ``%s --help'' for more information\n",
-					argv[0]);
-			return EXIT_FAILURE;
-			break;
-		default:
-			fprintf(message_out, "%s: invalid option -%c\n", argv[0], c);
-			fprintf(message_out, "Try ``%s --help'' for more information\n",
-					argv[0]);
-			return EXIT_FAILURE;
-			break;
-		}
-	}
+    // use of this function requires options are settable on global scope
+    while (true)
+    {
+        static const struct option long_options[] =
+        {
+          HFST_GETOPT_COMMON_LONG,
+          HFST_GETOPT_BINARY_LONG,
+          {0,0,0,0}
+        };
+        int option_index = 0;
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
+                             HFST_GETOPT_BINARY_SHORT,
+                             long_options, &option_index);
+        if (-1 == c)
+        {
+            break;
+        }
+        switch (c)
+        {
+#include "inc/getopt-cases-common.h"
+#include "inc/getopt-cases-binary.h"
+#include "inc/getopt-cases-error.h"
+        }
+    }
 
-	if (is_output_stdout)
-	{
-			outfilename = hfst_strdup("<stdout>");
-			outfile = stdout;
-			message_out = stderr;
-	}
-	// rest of arguments are files...
-	if (leftNamed && rightNamed)
-	{
-		;
-	}
-	else if (!leftNamed && !rightNamed)
-	{
-			// neither input given in options:
-			if ((argc - optind) == 2)
-			{
-				leftfilename = hfst_strdup(argv[optind]);
-				leftfile = hfst_fopen(leftfilename, "r");
-				rightfilename = hfst_strdup(argv[optind+1]);
-				rightfile = hfst_fopen(rightfilename, "r");
-				is_input_stdin = false;
-			}
-			else if ((argc - optind) == 1)
-			{
-				leftfilename = hfst_strdup(argv[optind]);
-				leftfile = hfst_fopen(leftfilename, "r");
-				rightfilename = hfst_strdup("<stdin>");
-				rightfile = stdin;
-				is_input_stdin = true;
-			}
-			else
-			{
-				fprintf(message_out, 
-						"%s: exactly two transducer files must be given\n",
-						argv[0]);
-				return EXIT_FAILURE;
-			}
-	}
-	else if (!leftNamed)
-	{
-		if ((argc - optind) == 1)
-		{
-			leftfilename = hfst_strdup(argv[optind]);
-			leftfile = hfst_fopen(leftfilename, "r");
-			is_input_stdin = false;
-		}
-		else if ((argc - optind) == 0)
-		{
-			leftfilename = hfst_strdup("<stdin>");
-			leftfile = stdin;
-			is_input_stdin = true;
-		}
-	}
-	else if (!rightNamed)
-	{
-		if ((argc - optind) == 1)
-		{
-			rightfilename = hfst_strdup(argv[optind]);
-			rightfile = hfst_fopen(rightfilename, "r");
-			is_input_stdin = false;
-		}
-		else if ((argc - optind) == 0)
-		{
-			rightfilename = hfst_strdup("<stdin>");
-			rightfile = stdin;
-			is_input_stdin = true;
-		}
-	}
-	else if (leftNamed && rightNamed) {
-
-	}
-	else
-	{
-		fprintf(message_out,
-				"%s: at least one transducer filename must be given\n",
-				argv[0]);
-		return EXIT_FAILURE;
-	}
-	return EXIT_CONTINUE;
-}
-
-void delete_u(HFST::TransducerHandle t) {
-  if (t != NULL)
-    HFST::delete_transducer(t);
-}
-void delete_w(HWFST::TransducerHandle t) {
-  if (t != NULL)
-    HWFST::delete_transducer(t);
+#include "inc/check-params-common.h"
+#include "inc/check-params-binary.h"
+    return EXIT_CONTINUE;
 }
 
 int
-concatenate_streams(std::istream& leftstream, std::istream& rightstream, std::ostream& outstream)
+subtract_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
+                 HfstOutputStream& outstream)
 {
-	VERBOSE_PRINT("Checking formats of transducers\n");
-	int format_type = get_compatible_fst_format(leftstream, rightstream);
-	size_t nth_stream = 0;
-	if (format_type == SFST_FORMAT)
-	{
-		VERBOSE_PRINT("Using unweighted format\n");
-		try {
-		        HFST::KeyTable *key_table = HFST::create_key_table();
-			HFST::TransducerHandle left = NULL;
-			HFST::TransducerHandle right = NULL;
-			bool left_has_symbols = false;
-			bool right_has_symbols = false;
-
-			while (true) {
-				int leftformat = HFST::read_format(leftstream);
-				int rightformat = HFST::read_format(rightstream);
-				if ((leftformat == EOF_FORMAT) && (rightformat == EOF_FORMAT))
-				{
-				  delete_u(left);
-				  delete_u(right);
-					break;
-				}
-				if (leftformat == SFST_FORMAT)
-				{
-				  delete_u(left);
-				  left_has_symbols = HFST::has_symbol_table(leftstream);
-				  if (left_has_symbols && !use_numbers)
-				    left = HFST::read_transducer(leftstream, key_table);
-				  else
-				    left = HFST::read_transducer(leftstream);
-				}
-				if (rightformat == SFST_FORMAT)
-				{
-				  delete_u(right);
-				  right_has_symbols = HFST::has_symbol_table(rightstream);
-				  if (left_has_symbols && right_has_symbols && !use_numbers)
-				    right = HFST::read_transducer(rightstream, key_table);
-				  else if ( (!left_has_symbols && !right_has_symbols) || use_numbers) {
-				    if (!use_numbers)
-				      fprintf(stderr, "Warning: transducers do not have a symbol table, "
-					              "concatenation done using numbers instead\n");
-				    right = HFST::read_transducer(rightstream);
-				  }
-				  else {
-				    fprintf(message_out, "Only one transducer has a symbol table: "
-					                 "concatenation not well defined\n"
-					                 "Use option -n if necessary\n" );
-				    return EXIT_FAILURE;
-				  }
-				}
-				++nth_stream;
-				if (nth_stream < 2)
-				{
-					VERBOSE_PRINT("Subtracting...\n");
-				}
-				else
-				{
-					VERBOSE_PRINT("Subtracting... %zu\r", nth_stream);
-				}
-				HFST::TransducerHandle comp = 
-				  HFST::subtract(HFST::copy(left), HFST::copy(right));
-				if (write_symbol_table && !use_numbers)
-				  HFST::write_transducer(comp, key_table, outstream);
-				else
-				  HFST::write_transducer(comp, outstream);
-				HFST::delete_transducer(comp);
-			}
-			if (write_symbols_to != NULL) {
-			  ofstream os(write_symbols_to);
-			  HFST::write_symbol_table(key_table, os);
-			  os.close();
-			}
-			delete key_table;
-		}
-		catch (const char *p)
-		{
-			printf("HFST library error: %s\n", p);
-			return EXIT_FAILURE;
-		}
-		return EXIT_SUCCESS;
-	}
-	else if (format_type == OPENFST_FORMAT) 
-	{
-		VERBOSE_PRINT("Using weighted format\n");
-		try {
-		        HWFST::KeyTable *key_table = HWFST::create_key_table();
-			HWFST::TransducerHandle right = NULL;
-			HWFST::TransducerHandle left = NULL;
-			bool left_has_symbols = false;
-			bool right_has_symbols = false;
-
-			while (true) 
-			{
-				int leftformat = HFST::read_format(leftstream);
-				int rightformat = HFST::read_format(rightstream);
-				if ((leftformat == EOF_FORMAT) && (rightformat == EOF_FORMAT))
-				{
-				  delete_w(left);
-				  delete_w(right);
-					break;
-				}
-				if (leftformat == OPENFST_FORMAT)
-				{
-				  delete_w(left);
-				  left_has_symbols = HWFST::has_symbol_table(leftstream);
-				  if (left_has_symbols && !use_numbers)
-				    left = HWFST::read_transducer(leftstream, key_table);
-				  else
-				    left = HWFST::read_transducer(leftstream);
-				}
-				if (rightformat == OPENFST_FORMAT)
-				{
-				  delete_w(right);
-				  right_has_symbols = HWFST::has_symbol_table(rightstream);
-				  if (left_has_symbols && right_has_symbols && !use_numbers)
-				    right = HWFST::read_transducer(rightstream, key_table);
-				  else if ( (!left_has_symbols && !right_has_symbols) || use_numbers) {
-				    if (!use_numbers)
-				      fprintf(stderr, "Warning: transducers do not have a symbol table, "
-					              "concatenation done using numbers instead\n");
-				    right = HWFST::read_transducer(rightstream);
-				  }
-				  else {
-				    fprintf(message_out, "Only one transducer has a symbol table: "
-					                 "concatenation not well defined\n"
-					                 "Use option -n if necessary\n" );
-				    return EXIT_FAILURE;
-				  }
-				}
-				++nth_stream;
-				if (nth_stream < 2)
-				{
-					VERBOSE_PRINT("Concatenating...\n");
-				}
-				else
-				{
-					VERBOSE_PRINT("Concatenating... %zu\n", nth_stream);
-				}
-				HWFST::TransducerHandle comp = 
-				  HWFST::subtract(HWFST::copy(left), HWFST::copy(right));
-				if (write_symbol_table && !use_numbers)
-				  HWFST::write_transducer(comp, key_table, outstream);
-				else
-				  HWFST::write_transducer(comp, outstream);
-				HWFST::delete_transducer(comp);
-			}
-			if (write_symbols_to != NULL) {
-			  ofstream os(write_symbols_to);
-			  HWFST::write_symbol_table(key_table, os);
-			  os.close();
-			}
-			delete key_table;
-		}
-		catch (const char *p) {
-			fprintf(message_out, "HFST lib error: %s\n", p);
-			return 1;
-		}
-		return EXIT_SUCCESS;
-	}
-	else
-	{
-		fprintf(message_out, "ERROR: Transducer has wrong type.\n");
-		return EXIT_FAILURE;
-	}
+    firststream.open();
+    secondstream.open();
+    outstream.open();
+    // should be is_good? 
+    bool bothInputs = firststream.is_good() && secondstream.is_good();
+    if (firststream.get_type() != secondstream.get_type())
+      {
+        warning_printf("Tranducer type mismatch in %s and %s; "
+              "using former type as output\n",
+              firstfilename, secondfilename);
+      }
+    size_t transducer_n = 0;
+    while (bothInputs) {
+        transducer_n++;
+        if (transducer_n == 1)
+        {
+            verbose_printf("Subtracting %s from %s...\n", secondfilename, 
+                        firstfilename);
+        }
+        else
+        {
+            verbose_printf("Subtracting %s from %s... %zu\n",
+                           secondfilename, firstfilename, transducer_n);
+        }
+        HfstTransducer first(firststream);
+        HfstTransducer second(secondstream);
+        outstream << first.subtract(second);
+        bothInputs = firststream.is_good() && secondstream.is_good();
+    }
+    
+    if (firststream.is_good())
+    {
+      warning_printf("Warning: %s contains more transducers than %s; "
+                     "residue skipped\n", firstfilename, secondfilename);
+    }
+    else if (secondstream.is_good())
+    {
+      warning_printf("Warning: %s contains fewer transducers than %s; "
+                     "residue skipped\n", firstfilename, secondfilename);
+    }
+    firststream.close();
+    secondstream.close();
+    outstream.close();
+    return EXIT_SUCCESS;
 }
 
 
 int main( int argc, char **argv ) {
-	message_out = stdout;
-	verbose = false;
-	int retval = parse_options(argc, argv);
-	if (retval != EXIT_CONTINUE)
-	{
-		return retval;
-	}
-	// close buffers, we use streams
-	if (leftfile != stdin)
-	{
-		fclose(leftfile);
-	}
-	if (rightfile != stdin)
-	{
-		fclose(rightfile);
-	}
-	if (outfile != stdout)
-	{
-		fclose(outfile);
-	}
-	VERBOSE_PRINT("Reading from %s and %s, writing to %s\n", 
-		leftfilename, rightfilename, outfilename);
-	// here starts the buffer handling part
-	if ((leftfile != stdin) && (rightfile != stdin))
-	{
-		std::filebuf fbleft;
-		fbleft.open(leftfilename, std::ios::in);
-		std::istream leftstream(&fbleft);
-		std::filebuf fbright;
-		fbright.open(rightfilename, std::ios::in);
-		std::istream rightstream(&fbright);
-		if (outfile != stdout)
-		{
-			std::filebuf fbout;
-			fbout.open(outfilename, std::ios::out);
-			std::ostream outstream(&fbout);
-			retval = concatenate_streams(leftstream, rightstream, outstream);
-		}
-		else
-		{
-			retval = concatenate_streams(leftstream, rightstream, std::cout);
-		}
-		return retval;
-	}
-	else if (leftfile != stdin)
-	{
-		std::filebuf fbleft;
-		fbleft.open(leftfilename, std::ios::in);
-		std::istream leftstream(&fbleft);
-		if (outfile != stdout)
-		{
-			std::filebuf fbout;
-			fbout.open(outfilename, std::ios::out);
-			std::ostream outstream(&fbout);
-			retval = concatenate_streams(leftstream, std::cin, outstream);
-		}
-		else
-		{
-			retval = concatenate_streams(leftstream, std::cin, std::cout);
-		}
-		return retval;
-	}
-	else if (rightfile != stdin)
-	{
-		std::filebuf fbright;
-		fbright.open(rightfilename, std::ios::in);
-		std::istream rightstream(&fbright);
-		if (outfile != stdout)
-		{
-			std::filebuf fbout;
-			fbout.open(outfilename, std::ios::out);
-			std::ostream outstream(&fbout);
-			retval = concatenate_streams(std::cin, rightstream, outstream);
-		}
-		else
-		{
-			retval = concatenate_streams(std::cin, rightstream, std::cout);
-		}
-		return retval;
-	}
-	free(leftfilename);
-	free(rightfilename);
-	free(outfilename);
-	return EXIT_SUCCESS;
+    hfst_set_program_name(argv[0], "0.1", "HfstSubtract");
+    int retval = parse_options(argc, argv);
+    if (retval != EXIT_CONTINUE)
+    {
+        return retval;
+    }
+    // close buffers, we use streams
+    if (firstfile != stdin)
+    {
+        fclose(firstfile);
+    }
+    if (secondfile != stdin)
+    {
+        fclose(secondfile);
+    }
+    if (outfile != stdout)
+    {
+        fclose(outfile);
+    }
+    verbose_printf("Reading from %s and %s, writing to %s\n", 
+        firstfilename, secondfilename, outfilename);
+    // here starts the buffer handling part
+    HfstInputStream* firststream = NULL;
+    HfstInputStream* secondstream = NULL;
+    try {
+        firststream = (firstfile != stdin) ?
+            new HfstInputStream(firstfilename) : new HfstInputStream();
+    } catch(NotTransducerStreamException)   {
+        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+              firstfilename);
+    }
+    try {
+        secondstream = (secondfile != stdin) ?
+            new HfstInputStream(secondfilename) : new HfstInputStream();
+    } catch(NotTransducerStreamException)   {
+        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+              secondfilename);
+    }
+    HfstOutputStream* outstream = (outfile != stdout) ?
+        new HfstOutputStream(outfilename, firststream->get_type()) :
+        new HfstOutputStream(firststream->get_type());
+
+    retval = subtract_streams(*firststream, *secondstream, *outstream);
+    delete firststream;
+    delete secondstream;
+    delete outstream;
+    free(firstfilename);
+    free(secondfilename);
+    free(outfilename);
+    return retval;
 }
 

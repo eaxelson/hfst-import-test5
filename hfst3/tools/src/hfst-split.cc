@@ -1,6 +1,6 @@
 //! @file hfst-split.cc
 //!
-//! @brief Transducer archive splitting command line tool
+//! @brief Transducer archive exploding tool
 //!
 //! @author HFST Team
 
@@ -32,75 +32,70 @@
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
-#include <hfst2/hfst.h>
+#include "HfstTransducer.h"
 
-#include "hfst-common-unary-variables.h"
+#include "inc/globals-common.h"
+#include "inc/globals-unary.h"
+
+using hfst::HfstTransducer;
+using hfst::HfstInputStream;
+using hfst::HfstOutputStream;
+using hfst::exceptions::NotTransducerStreamException;
+
 // add tools-specific variables here
-static char *prefixname;
-static char *extensionname;
+char *prefix;
+char *extension;
 
 void
-print_usage(const char *program_name)
+print_usage()
 {
-	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
-	fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
-		"Split many transducers into separate files\n"
-		"\n", program_name);
+    // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
+    // Usage line
+    fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
+           "Extract transducers from archive with systematic file names\n"
+        "\n", program_name);
 
-	print_common_program_options(message_out);
-#               if DEBUG
-	fprintf(message_out,
-		"%-35s%s", "  -d, --debug", "Print debugging messages and results\n"
-		);
-#               endif
-	fprintf(message_out, "%-35s%s", "  -i, --input=INFILE",          "Read input transducer from INFILE\n");
-	fprintf(message_out, "%-35s%s", "  -R, --read-symbols=FILE", 	 "Read symbol table from FILE\n");  
-	fprintf(message_out, "%-35s%s", "  -D, --do-not-write-symbols",  "Do not write symbol table with the output transducers\n"); 	  
-	fprintf(message_out, "%-35s%s", "  -W, --write-symbols-to=FILE", "Write symbol table to FILE\n");		
-	fprintf(message_out, "%-35s%s", "  -p, --prefix=PRE",            "Use the prefix PRE in naming output files\n");
-	fprintf(message_out, "%-35s%s", "  -e, --extension=EXT",         "Use the extension EXT in naming output files\n");
-	fprintf(message_out, "\n");
-	fprintf(message_out, "If INFILE is omitted or -, standard input will be used.\n");
-	fprintf(message_out, "The output files are named PRE1EXT, PRE2EXT, PRE3EXT, ...\n");
-	fprintf(message_out, "\n");
-	print_more_info(message_out, "Split");
-	fprintf(stderr, "\n");
-	print_report_bugs(message_out);
+    // options, grouped
+    print_common_program_options(message_out);
+    fprintf(message_out, "Input/Output options:\n"
+            "  -i, --input=INFILE    Read input transducer from INFILE\n"
+            "  -p, --prefix=PRE      Use the prefix PRE in "
+            "naming output files\n"
+            "  -e, --extension=EXT   Use the extension EXT in "
+            "naming output files\n");
+    fprintf(message_out, "\n");
+    // parameter details
+    fprintf(message_out, "If INFILE is omitted or -, stdin is used.\n"
+            "If PRE is omitted, no prefix is used. If EXT is omitted, "
+            ".hfst is used.\n");
+    fprintf(message_out, "\n");
+    // bug report address
+    print_report_bugs();
+    // external docs
+    print_more_info();
 }
 
-void
-print_version(const char* program_name)
-{
-	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dversion
-	fprintf(message_out, "%s 0.1 (" PACKAGE_STRING ")\n"
-		   "Copyright (C) 2008 University of Helsinki,\n"
-		   "License GPLv3: GNU GPL version 3 "
-		   "<http://gnu.org/licenses/gpl.html>\n"
-		   "This is free software: you are free to change and redistribute it.\n"
-		   "There is NO WARRANTY, to the extent permitted by law.\n",
-		program_name);
-}
 
 int
 parse_options(int argc, char** argv)
 {
 	// use of this function requires options are settable on global scope
+    extension = hfst_strdup(".hfst");
+    prefix = hfst_strdup("");
 	while (true)
 	{
 		static const struct option long_options[] =
 		{
-#include "hfst-common-options.h"
-		  ,
-#include "hfst-common-unary-options.h"
-		  ,
+		  HFST_GETOPT_COMMON_LONG,
+          {"input", required_argument, 0, 'i'},
+          {"prefix", required_argument, 0, 'p'},
+          {"extension", required_argument, 0, 'e'},
 		  // add tool-specific options here 
-			{"prefix", required_argument, 0, 'p'},
-			{"extension", required_argument, 0, 'e'},
 			{0,0,0,0}
 		};
 		int option_index = 0;
 		// add tool-specific options here 
-		char c = getopt_long(argc, argv, "dhi:o:sqvVR:DW:p:e:",
+		char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "i:p:e:",
 							 long_options, &option_index);
 		if (-1 == c)
 		{
@@ -109,223 +104,71 @@ parse_options(int argc, char** argv)
 
 		switch (c)
 		{
-#include "hfst-common-cases.h"
-#include "hfst-common-unary-cases.h"
-		  // add tool-specific cases here
-		case 'p':
-		        prefixname = hfst_strdup(optarg);
-			break;
-		case 'e':
-		        extensionname = hfst_strdup(optarg);
-			break;
-		case '?':
-			fprintf(message_out, "invalid option --%s\n",
-					long_options[option_index].name);
-			print_short_help(argv[0]);
-			return EXIT_FAILURE;
-			break;
-		default:
-			fprintf(message_out, "invalid option -%c\n", c);
-			print_short_help(argv[0]);
-			return EXIT_FAILURE;
-			break;
+#include "inc/getopt-cases-common.h"
+        case 'i':
+          inputfilename = hfst_strdup(optarg);
+          if (strcmp(inputfilename, "-") == 0) 
+            {
+              free(inputfilename);
+              inputfilename = hfst_strdup("<stdin>");
+              inputfile = stdin;
+              is_input_stdin = true;
+            }
+          else
+            {
+              inputfile = hfst_fopen(inputfilename, "r");
+              is_input_stdin = false;
+            }
+          break;
+        case 'p':
+          free(prefix);
+          prefix = hfst_strdup(optarg);
+          break;
+        case 'e':
+          free(extension);
+          extension = hfst_strdup(optarg);
+          break;
+#include "inc/getopt-cases-error.h"
 		}
 	}
 
-	if (is_output_stdout)
-	{
-			outfilename = hfst_strdup("<stdout>");
-			outfile = stdout;
-			message_out = stderr;
-	}
-	// rest of arguments are files...
-	if (is_input_stdin && ((argc - optind) == 1))
-	{
-		inputfilename = hfst_strdup(argv[optind]);
-		if (strcmp(inputfilename, "-") == 0) {
-		  inputfilename = hfst_strdup("<stdin>");
-		  inputfile = stdin;
-		  is_input_stdin = true;
-		}
-		else {
-		  inputfile = hfst_fopen(inputfilename, "r");
-		  is_input_stdin = false;
-		}
-	}
-	else if (inputfile) {
-
-	}
-	else if ((argc - optind) == 0)
-	{
-		inputfilename = hfst_strdup("<stdin>");
-		inputfile = stdin;
-		is_input_stdin = true;
-	}
-	else if ((argc - optind) > 1)
-	{
-		fprintf(message_out, "Exactly one input transducer file must be given\n");
-		print_short_help(argv[0]);
-		return EXIT_FAILURE;
-	}
-	else
-	{
-		fprintf(message_out, "???\n");
-		return 73;
-	}
+#include "inc/check-params-common.h"
+#include "inc/check-params-unary.h"
 	return EXIT_CONTINUE;
 }
 
 int
-process_stream(std::istream& inputstream)
+process_stream(HfstInputStream& instream)
 {
-	VERBOSE_PRINT("Checking formats of transducers\n");
-	int format_type = HFST::read_format(inputstream);
-    
-	if (format_type == SFST_FORMAT)
+  instream.open();
+	
+	size_t transducer_n=0;
+	while(instream.is_good())
 	{
-		VERBOSE_PRINT("Using unweighted format\n");
-		try {
-		  
-		  HFST::KeyTable *key_table;
-		  if (read_symbols_from_filename != NULL) {
-		    ifstream is(read_symbols_from_filename);
-		    key_table = HFST::read_symbol_table(is);
-		    is.close();
-		  }
-		  else
-		    key_table = HFST::create_key_table();
-		  bool transducer_has_symbol_table=false;
-			HFST::TransducerHandle input = NULL;
-			unsigned int n=0;
-			while (true) {
-			        n++;
-				int inputformat = HFST::read_format(inputstream);
-				if (inputformat == EOF_FORMAT)
-				{
-					break;
-				}
-				else if (inputformat == SFST_FORMAT)
-				{
-				        transducer_has_symbol_table = HFST::has_symbol_table(inputstream);
-					input = HFST::read_transducer(inputstream, key_table);
-				}
-				else
-				{
-					fprintf(message_out, "stream format mismatch\n");
-					return EXIT_FAILURE;
-				}
-				char filename[200];
-				strcpy(filename, prefixname);
-				char number[10];
-				sprintf(number,"%u",n);
-				strcat(filename, number);
-				strcat(filename, extensionname);
-
-				VERBOSE_PRINT("Writing file %s...\n", filename);
-
-				HFST::TransducerHandle result = input;
-
-				ofstream os(filename);
-				if (!write_symbols)
-				  HFST::write_transducer(result, os);
-				else if (transducer_has_symbol_table || read_symbols_from_filename != NULL)
-				  HFST::write_transducer(result, key_table, os);
-				else
-				  HFST::write_transducer(result, os);
-				os.close();
-
-			}
-			if (write_symbols_to_filename != NULL) {
-			  ofstream os(write_symbols_to_filename);
-			  HFST::write_symbol_table(key_table, os);
-			  os.close();
-			}
-			delete key_table;
-		}
-		catch (const char *p)
-		{
-			printf("HFST library error: %s\n", p);
-			return EXIT_FAILURE;
-		}
-		return EXIT_SUCCESS;
+		transducer_n++;
+        outfilename = static_cast<char*>(hfst_malloc(sizeof(char) *
+                             strlen(prefix) + strlen(extension) +
+                             strlen("123456789012345678901234567890")));
+        sprintf(outfilename, "%s%zu%s", prefix, transducer_n,
+                              extension);
+        verbose_printf("Writing %zu of %s to %s...\n", transducer_n,
+                       inputfilename, outfilename); 
+        HfstOutputStream* outstream = new HfstOutputStream(outfilename,
+                                                           instream.get_type()) ;
+        outstream->open();
+        HfstTransducer trans(instream);
+        *outstream << trans;
+        outstream->close();
+        delete outstream;
+        free(outfilename);
 	}
-	else if (format_type == OPENFST_FORMAT) 
-	{
-		VERBOSE_PRINT("Using weighted format\n");
-		try {
-		  HWFST::KeyTable *key_table;
-		  if (read_symbols_from_filename != NULL) {
-		    ifstream is(read_symbols_from_filename);
-		    key_table = HWFST::read_symbol_table(is);
-		    is.close();
-		  }
-		  else
-		    key_table = HWFST::create_key_table();
-		  bool transducer_has_symbol_table=false;
-			HWFST::TransducerHandle input = NULL;
-			unsigned int n=0;
-			while (true) {
-			        n++;
-				int inputformat = HWFST::read_format(inputstream);
-				if (inputformat == EOF_FORMAT)
-				{
-					break;
-				}
-				else if (inputformat == OPENFST_FORMAT)
-				{
-				        transducer_has_symbol_table = HWFST::has_symbol_table(inputstream);
-					input = HWFST::read_transducer(inputstream, key_table);
-				}
-				else
-				{
-					fprintf(message_out, "stream format mismatch\n");
-					return EXIT_FAILURE;
-				}
-				char filename[200];
-				strcpy(filename, prefixname);
-				char number[10];
-				sprintf(number,"%u",n);
-				strcat(filename, number);
-				strcat(filename, extensionname);
-
-				VERBOSE_PRINT("Writing file %s...\n", filename);
-
-				HWFST::TransducerHandle result = input;
-
-				ofstream os(filename);
-				if (!write_symbols)
-				  HWFST::write_transducer(result, os);
-				else if (transducer_has_symbol_table || read_symbols_from_filename != NULL)
-				  HWFST::write_transducer(result, key_table, os);
-				else
-				  HWFST::write_transducer(result, os);
-				os.close();
-
-			}
-			if (write_symbols_to_filename != NULL) {
-			  ofstream os(write_symbols_to_filename);
-			  HWFST::write_symbol_table(key_table, os);
-			  os.close();
-			}
-			delete key_table;
-		}
-		catch (const char *p) {
-			fprintf(message_out, "HFST lib error: %s\n", p);
-			return 1;
-		}
-		return EXIT_SUCCESS;
-	}
-	else
-	{
-		fprintf(message_out, "ERROR: Transducer has wrong type.\n");
-		return EXIT_FAILURE;
-	}
+	instream.close();
+	return EXIT_SUCCESS;
 }
 
 
 int main( int argc, char **argv ) {
-	message_out = stdout;
-	verbose = false;
+	hfst_set_program_name(argv[0], "0.1", "HfstSplit");
 	int retval = parse_options(argc, argv);
 	if (retval != EXIT_CONTINUE)
 	{
@@ -340,24 +183,23 @@ int main( int argc, char **argv ) {
 	{
 		fclose(outfile);
 	}
-	VERBOSE_PRINT("Reading from %s, writing to %s\n", 
-		inputfilename, outfilename);
+	verbose_printf("Reading from %s, writing to %s...%s\n", 
+		inputfilename, prefix, extension);
 	// here starts the buffer handling part
-	if (!is_input_stdin)
-	{
-		std::filebuf fbinput;
-		fbinput.open(inputfilename, std::ios::in);
-		std::istream inputstream(&fbinput);
-		retval = process_stream(inputstream);
-		return retval;
+	HfstInputStream* instream = NULL;
+	try {
+	  instream = (inputfile != stdin) ?
+	    new HfstInputStream(inputfilename) : new HfstInputStream();
+	} catch (NotTransducerStreamException)	{
+		error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+              inputfilename);
+		return EXIT_FAILURE;
 	}
-	else if (is_input_stdin)
-	{
-	  retval = process_stream(std::cin);
-	  return retval;
-	}
+	
+	retval = process_stream(*instream);
+	delete instream;
 	free(inputfilename);
 	free(outfilename);
-	return EXIT_SUCCESS;
+	return retval;
 }
 

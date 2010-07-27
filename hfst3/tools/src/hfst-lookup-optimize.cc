@@ -27,7 +27,7 @@
 #include "hfst-program-options.h"
 #include <hfst2/hfst.h>
 
-#include "hfst-common-unary-variables.h"
+#include "inc/globals-unary.h"
 
 
 void
@@ -74,9 +74,9 @@ parse_options(int argc, char** argv)
 	{
 		static const struct option long_options[] =
 		{
-#include "hfst-common-options.h"
+		HFST_GETOPT_COMMON_LONG
 		  ,
-#include "hfst-common-unary-options.h"
+		HFST_GETOPT_UNARY_LONG
 		  ,
 		  // add tool-specific options here
 			{0,0,0,0}
@@ -93,8 +93,8 @@ parse_options(int argc, char** argv)
 
 		switch (c)
 		{
-#include "hfst-common-cases.h"
-#include "hfst-common-unary-cases.h"
+#include "inc/getopt-cases-common.h"
+#include "inc/getopt-cases-unary.h"
 		  // add tool-specific cases here
 		case '?':
 			fprintf(message_out, "invalid option --%s\n",
@@ -155,12 +155,12 @@ parse_options(int argc, char** argv)
 
 int process_stream(std::istream& inputstream, FILE * outstream)
 {
-  VERBOSE_PRINT("Checking format of transducer\n");
+  verbose_printf("Checking format of transducer\n");
 	int format_type = HFST::read_format(inputstream);
     
 	if (format_type == SFST_FORMAT)
 	{
-		VERBOSE_PRINT("Using unweighted format\n");
+		verbose_printf("Using unweighted format\n");
 		try {
 		  
 		  HFST::KeyTable *key_table;
@@ -195,7 +195,7 @@ int process_stream(std::istream& inputstream, FILE * outstream)
 					fprintf(message_out, "stream format mismatch\n");
 					return EXIT_FAILURE;
 				}
-				VERBOSE_PRINT("Converting to optimized lookup format...\n");
+				verbose_printf("Converting to optimized lookup format...\n");
 				// add your code here
 				HFST::write_runtime_transducer(input,
 							       key_table,
@@ -212,7 +212,7 @@ int process_stream(std::istream& inputstream, FILE * outstream)
 	}
 	else if (format_type == OPENFST_FORMAT) 
 	{
-		VERBOSE_PRINT("Using weighted format\n");
+		verbose_printf("Using weighted format\n");
 		try {
 		  HWFST::KeyTable *key_table;
 		  if (read_symbols_from_filename != NULL) {
@@ -284,7 +284,7 @@ int main( int argc, char **argv ) {
 	{
 		fclose(outfile);
 	}
-	VERBOSE_PRINT("Reading from %s, writing to %s\n", 
+	verbose_printf("Reading from %s, writing to %s\n", 
 		inputfilename, outfilename);
 	// here starts the buffer handling part
 	if (!is_input_stdin)

@@ -35,7 +35,7 @@
 #include "hfst-program-options.h"
 #include <hfst2/hfst.h>
 
-#include "hfst-common-unary-variables.h"
+#include "inc/globals-unary.h"
 
 static const Key EPSILON_KEY=0;
 
@@ -150,9 +150,9 @@ parse_options(int argc, char** argv)
 	{
 		static const struct option long_options[] =
 		{
-#include "hfst-common-options.h"
+		HFST_GETOPT_COMMON_LONG
 		  ,
-#include "hfst-common-unary-options.h"
+		HFST_GETOPT_UNARY_LONG
 		  ,
 		  {"disjunct-strings", no_argument, 0, 'j'},
 		  {"epsilon", required_argument, 0, 'e'},
@@ -174,8 +174,8 @@ parse_options(int argc, char** argv)
 
 		switch (c)
 		{
-#include "hfst-common-cases.h"
-#include "hfst-common-unary-cases.h"
+#include "inc/getopt-cases-common.h"
+#include "inc/getopt-cases-unary.h"
 		case 'e':
 			epsilonname = hfst_strdup(optarg);
 			break;
@@ -407,7 +407,7 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
     size_t nth_line=0;
      if (!is_weighted)
                 {
-		VERBOSE_PRINT("Using unweighted format\n");
+		verbose_printf("Using unweighted format\n");
 		try {
 
 		  HFST::TransducerHandle result = HFST::create_empty_transducer();
@@ -417,7 +417,7 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 		    ifstream is(read_symbols_from_filename);
 		    key_table = HFST::read_symbol_table(is);
 		    is.close();
-		    VERBOSE_PRINT("Symbol table read\n");
+		    verbose_printf("Symbol table read\n");
 		  }
 		  else if (has_spaces && epsilonname) {
 		    key_table = HFST::create_key_table();
@@ -567,11 +567,11 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 		      
               if (nth_line < 2)
                 {
-                  VERBOSE_PRINT("Read one line...\n");
+                  verbose_printf("Read one line...\n");
                 }
               else
                 {
-                  VERBOSE_PRINT("Read one line... %zu\r", nth_line);
+                  verbose_printf("Read one line... %zu\r", nth_line);
                 }
 
 		      if (true) {
@@ -646,7 +646,7 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 	}
         else
 	  {
-	    VERBOSE_PRINT("Using weighted format\n");
+	    verbose_printf("Using weighted format\n");
 	    try {
 
 		  HWFST::TransducerHandle result = HWFST::create_empty_transducer();
@@ -656,7 +656,7 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 		    ifstream is(read_symbols_from_filename);
 		    key_table = HWFST::read_symbol_table(is);
 		    is.close();
-		    VERBOSE_PRINT("Symbol table read\n");
+		    verbose_printf("Symbol table read\n");
 		  }
 		  else if (has_spaces && epsilonname) {
 		    key_table = HWFST::create_key_table();
@@ -798,11 +798,11 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 		      
               if (nth_line < 2)
                 {
-                  VERBOSE_PRINT("Read one line...\n");
+                  verbose_printf("Read one line...\n");
                 }
               else
                 {
-                  VERBOSE_PRINT("Read one line... %zu\r", nth_line);
+                  verbose_printf("Read one line... %zu\r", nth_line);
                 }
 		      
 		      if (true) {
@@ -894,7 +894,7 @@ int main( int argc, char **argv ) {
 	{
 		fclose(outfile);
 	}
-	VERBOSE_PRINT("Reading from %s, writing to %s\n", 
+	verbose_printf("Reading from %s, writing to %s\n", 
 		inputfilename, outfilename);
 	// here starts the buffer handling part
 	if (!is_input_stdin)
