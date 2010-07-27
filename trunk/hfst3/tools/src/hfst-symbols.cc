@@ -34,7 +34,7 @@
 #include "hfst-program-options.h"
 #include <hfst2/hfst.h>
 
-#include "hfst-common-unary-variables.h"
+#include "inc/globals-unary.h"
 
 static char* write_input_symbols_to_filename=NULL;
 static char* write_output_symbols_to_filename=NULL;
@@ -99,9 +99,9 @@ parse_options(int argc, char** argv)
 	{
 		static const struct option long_options[] =
 		{
-#include "hfst-common-options.h"
+		HFST_GETOPT_COMMON_LONG
 		  ,
-#include "hfst-common-unary-options.h"
+		HFST_GETOPT_UNARY_LONG
 		  ,
 		  {"write-input-symbols-to", required_argument, 0, '1'},
 		  {"write-output-symbols-to", required_argument, 0, '2'},
@@ -120,8 +120,8 @@ parse_options(int argc, char** argv)
 
 		switch (c)
 		{
-#include "hfst-common-cases.h"
-#include "hfst-common-unary-cases.h"
+#include "inc/getopt-cases-common.h"
+#include "inc/getopt-cases-unary.h"
 		case '1':
 			write_input_symbols_to_filename = hfst_strdup(optarg);
 			break;
@@ -216,12 +216,12 @@ KeyTable *get_projection_key_table(KeyTable *key_table, KeySet *ks, bool include
 int
 invert_stream(std::istream& inputstream, std::ostream& outstream)
 {
-	VERBOSE_PRINT("Checking formats of transducers\n");
+	verbose_printf("Checking formats of transducers\n");
 	int format_type = HFST::read_format(inputstream);
     
 	if (format_type == SFST_FORMAT)
 	{
-		VERBOSE_PRINT("Using unweighted format\n");
+		verbose_printf("Using unweighted format\n");
 		try {
 		  
 		  HFST::KeyTable *key_table;
@@ -250,7 +250,7 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 					fprintf(message_out, "stream format mismatch\n");
 					return EXIT_FAILURE;
 				}
-				VERBOSE_PRINT("Forwarding...\n");
+				verbose_printf("Forwarding...\n");
 
 				if (!write_symbols)
 				  HFST::write_transducer(input, outstream);
@@ -323,7 +323,7 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 	}
 	else if (format_type == OPENFST_FORMAT) 
 	{
-		VERBOSE_PRINT("Using weighted format\n");
+		verbose_printf("Using weighted format\n");
 		try {
 		  HWFST::KeyTable *key_table;
 		  if (read_symbols_from_filename != NULL) {
@@ -351,7 +351,7 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 					fprintf(message_out, "stream format mismatch\n");
 					return EXIT_FAILURE;
 				}
-				VERBOSE_PRINT("Forwarding...\n");
+				verbose_printf("Forwarding...\n");
 
 				if (!write_symbols)
 				  HWFST::write_transducer(input, outstream);
@@ -446,7 +446,7 @@ int main( int argc, char **argv ) {
 	{
 		fclose(outfile);
 	}
-	VERBOSE_PRINT("Reading from %s, writing to %s\n", 
+	verbose_printf("Reading from %s, writing to %s\n", 
 		inputfilename, outfilename);
 	// here starts the buffer handling part
 	if (!is_input_stdin)

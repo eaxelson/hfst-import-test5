@@ -138,6 +138,23 @@ hfst_strtonumber(const char *s, bool *infinite)
     }
 }
 
+unsigned long
+hfst_strtoul(char *s, int base)
+{
+    errno = 0;
+    char *endptr = "";
+    unsigned long rv = strtoul(s, &endptr, base);
+    if (*endptr == '\0')
+      {
+        return rv;
+      }
+    else
+      {
+        error(EXIT_FAILURE, errno, "%s not a weight", s);
+        return rv;
+      }
+}
+
 // file functions
 FILE*
 hfst_fopen(const char* filename, const char* mode)
@@ -213,11 +230,13 @@ print_short_help()
 
 // print web site reference
 void
-print_more_info() 
+print_more_info()
 {
-    fprintf(message_out, "See also our wiki site at:\n"
-            "<" KITWIKI_URL "/%s> for more info.\n",
-             hfst_tool_wikiname);
+    fprintf(message_out, "%s home page: \n"
+            "<" KITWIKI_URL "/%s>\n",
+            program_name, hfst_tool_wikiname);
+    fprintf(message_out, "General help using HFST software: \n"
+            "<" KITWIKI_URL "/HfstHome>\n");
 }
 
 // print version message

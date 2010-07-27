@@ -1,6 +1,6 @@
-//! @file hfst-invert.cc
+//! @file hfst-unary-tool.cc
 //!
-//! @brief Transducer inversion command line tool
+//! @brief Transducer UNARY OPERATION EXAMPLE tool
 //!
 //! @author HFST Team
 
@@ -50,7 +50,7 @@ print_usage()
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     // Usage line
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
-           "Invert a transducer\n"
+           "Do things to a transducer\n"
         "\n", program_name);
 
     // options, grouped
@@ -115,15 +115,15 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 		transducer_n++;
 		if (transducer_n==1)
 		{
-          verbose_printf("Inverting %s...\n", inputfilename); 
+          verbose_printf("Doing things %s...\n", inputfilename); 
         }
 		else
 		{
-          verbose_printf("Inverting %s...%zu\n", inputfilename, transducer_n); 
+          verbose_printf("Doing things %s...%zu\n", inputfilename, transducer_n); 
         }
 		
 		HfstTransducer trans(instream);
-		outstream << trans.invert();
+		outstream << trans.doStuff();
 	}
 	instream.close();
 	outstream.close();
@@ -132,7 +132,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 
 
 int main( int argc, char **argv ) {
-	hfst_set_program_name(argv[0], "0.1", "HfstInvert");
+	hfst_set_program_name(argv[0], "0.1", "HfstUnaryTool");
 	int retval = parse_options(argc, argv);
 	if (retval != EXIT_CONTINUE)
 	{

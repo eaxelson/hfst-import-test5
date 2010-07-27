@@ -34,7 +34,8 @@
 #include "hfst-program-options.h"
 #include "HfstTransducer.h"
 
-#include "hfst-common-unary-variables.h"
+#include "inc/globals-common.h"
+#include "inc/globals-unary.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
@@ -47,46 +48,27 @@ using hfst::exceptions::NotTransducerStreamException;
 ImplementationType output_type = hfst::UNSPECIFIED_TYPE;
 
 void
-print_usage(const char *program_name)
+print_usage()
 {
 	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
 	fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
-		"Convert transducers between SFST, OpenFst and foma formats\n"
+		"Convert transducers between binary formats\n"
 		"\n", program_name);
 
 	print_common_program_options(message_out);
-#               if DEBUG
-	fprintf(message_out,
-		   "  -d, --debug            Print debugging messages and results\n"
-		);
-#               endif
 	print_common_unary_program_options(message_out);
 	// fprintf(message_out, (tool-specific options and short descriptions)
-	fprintf(message_out, "%-35s%s", "  -S, --sfst",           "Write the output for HFST's SFST implementation\n");
-	fprintf(message_out, "%-35s%s", "  -f, --foma",           "Write the output in HFST's foma implementation\n");
-	fprintf(message_out, "%-35s%s", "  -t, --tropical-weight","Write the output in HFST's tropical weight (OpenFST) implementation\n");
-	fprintf(message_out, "%-35s%s", "  -l, --log-weight",     "Write the output in HFST's log weight (OpenFST) implementation\n");
-	fprintf(message_out, "%-35s%s", "  -O, --optimized-lookup","Write the output in the HFST optimized-lookup implementation\n");
-	fprintf(message_out, "%-35s%s", "  -w, --optimized-lookup-weighted","Write the output in the HFST optimized-lookup (weighted) implementation\n");
-	fprintf(message_out, "\n");
+    fprintf(message_out, "Conversion options:\n"
+	"  -S, --sfst                        Write output in HFST's SFST implementation\n"
+	"  -f, --foma                        Write output in HFST's foma implementation\n"
+	"  -t, --tropical-weight             Write output in HFST's tropical weight (OpenFST) implementation\n"
+	"  -l, --log-weight                  Write output in HFST's log weight (OpenFST) implementation\n"
+	"  -O, --optimized-lookup            Write output in the HFST optimized-lookup implementation\n"
+	"  -w, --optimized-lookup-weighted   Write output in optimized-lookup (weighted) implementation\n");
 	print_common_unary_program_parameter_instructions(message_out);
-	fprintf(stderr, "\n");
-	print_more_info(message_out, "Fst2Fst");
-	fprintf(stderr, "\n");
-	print_report_bugs(message_out);
-}
-
-void
-print_version(const char* program_name)
-{
-	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dversion
-	fprintf(message_out, "%s 0.1 (" PACKAGE_STRING ")\n"
-		   "Copyright (C) 2008 University of Helsinki,\n"
-		   "License GPLv3: GNU GPL version 3 "
-		   "<http://gnu.org/licenses/gpl.html>\n"
-		   "This is free software: you are free to change and redistribute it.\n"
-		   "There is NO WARRANTY, to the extent permitted by law.\n",
-		program_name);
+	fprintf(message_out, "\n");
+	print_report_bugs();
+	print_more_info();
 }
 
 int
@@ -97,10 +79,8 @@ parse_options(int argc, char** argv)
 	{
 		static const struct option long_options[] =
 		{
-#include "hfst-common-options.h"
-		  ,
-#include "hfst-common-unary-options.h"
-		  ,
+		  HFST_GETOPT_COMMON_LONG,
+		  HFST_GETOPT_UNARY_LONG,
 		  // add tool-specific options here 
 		  {"sfst",            no_argument, 0, 'S'},
 		  {"foma",            no_argument, 0, 'f'},
@@ -112,19 +92,19 @@ parse_options(int argc, char** argv)
 		};
 		int option_index = 0;
 		// add tool-specific options here 
-		char c = getopt_long(argc, argv, "dhi:o:sqvVR:DW:SftlOw",
+		char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
+                             HFST_GETOPT_UNARY_SHORT "SftlOw",
 							 long_options, &option_index);
 		if (-1 == c)
 		{
 			break;
 		}
 
-		char *format=NULL;
 
 		switch (c)
 		{
-#include "hfst-common-cases.h"
-#include "hfst-common-unary-cases.h"
+#include "inc/getopt-cases-common.h"
+#include "inc/getopt-cases-unary.h"
 		  // add tool-specific cases here
 		case 'S':
 		  output_type = hfst::SFST_TYPE;
@@ -144,67 +124,19 @@ parse_options(int argc, char** argv)
 		case 'w':
 		  output_type = hfst::HFST_OLW_TYPE;
 		  break;
-		case '?':
-			fprintf(message_out, "invalid option --%s\n",
-					long_options[option_index].name);
-			print_short_help(argv[0]);
-			return EXIT_FAILURE;
-			break;
-		default:
-			fprintf(message_out, "invalid option -%c\n", c);
-			print_short_help(argv[0]);
-			return EXIT_FAILURE;
-			break;
+#include "inc/getopt-cases-error.h"
 		}
 	}
 	
-	if(output_type == hfst::UNSPECIFIED_TYPE)
+	if (output_type == hfst::UNSPECIFIED_TYPE)
 	{
-		fprintf(message_out, "You must specify an output type (one of -S, -f, -t, -l, -O, or -w)\n");
-		print_short_help(argv[0]);
-		return EXIT_FAILURE;
+		error(EXIT_FAILURE, 0, 
+              "You must specify an output type "
+              "(one of -S, -f, -t, -l, -O, or -w)");
 	}
 
-	if (is_output_stdout)
-	{
-			outfilename = hfst_strdup("<stdout>");
-			outfile = stdout;
-			message_out = stderr;
-	}
-	// rest of arguments are files...
-	if (is_input_stdin && ((argc - optind) == 1))
-	{
-		inputfilename = hfst_strdup(argv[optind]);
-		if (strcmp(inputfilename, "-") == 0) {
-		  inputfilename = hfst_strdup("<stdin>");
-		  inputfile = stdin;
-		  is_input_stdin = true;
-		}
-		else {
-		  inputfile = hfst_fopen(inputfilename, "r");
-		  is_input_stdin = false;
-		}
-	}
-	else if (inputfile) {
-
-	}
-	else if ((argc - optind) == 0)
-	{
-		inputfilename = hfst_strdup("<stdin>");
-		inputfile = stdin;
-		is_input_stdin = true;
-	}
-	else if ((argc - optind) > 1)
-	{
-		fprintf(message_out, "Exactly one input transducer file must be given\n");
-		print_short_help(argv[0]);
-		return EXIT_FAILURE;
-	}
-	else
-	{
-		fprintf(message_out, "???\n");
-		return 73;
-	}
+#include "inc/check-params-common.h"
+#include "inc/check-params-unary.h"
 	return EXIT_CONTINUE;
 }
 
@@ -218,11 +150,15 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 	while(instream.is_good())
 	{
 		transducer_n++;
-		if(transducer_n == 1)
-		{ VERBOSE_PRINT("Converting %s...\n", inputfilename); }
-		else
-		{ VERBOSE_PRINT("Converting %s...%zu\n", inputfilename, transducer_n); }
-		
+        if(transducer_n == 1)
+        {
+          verbose_printf("Converting %s...\n", inputfilename); 
+        }
+        else
+        {
+          verbose_printf("Converting %s...%zu\n",
+                         inputfilename, transducer_n);
+        }
 		HfstTransducer orig(instream);
 		outstream << orig.convert(output_type);
 	}
@@ -233,9 +169,8 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 
 
 int main( int argc, char **argv ) {
-	message_out = stdout;
-	verbose = false;
-	int retval = parse_options(argc, argv);
+    hfst_set_program_name(argv[0], "0.1", "HfstFst2Fst");
+    int retval = parse_options(argc, argv);
 	if (retval != EXIT_CONTINUE)
 	{
 		return retval;
@@ -249,15 +184,48 @@ int main( int argc, char **argv ) {
 	{
 		fclose(outfile);
 	}
-	VERBOSE_PRINT("Reading from %s, writing to %s\n", 
+	verbose_printf("Reading from %s, writing to %s\n", 
 		inputfilename, outfilename);
-	// here starts the buffer handling part
+	switch (output_type)
+      {
+      case hfst::SFST_TYPE:
+        verbose_printf("Writing SFST format transducers "
+                       "(with HFST header)\n");
+        break;
+      case hfst::TROPICAL_OFST_TYPE:
+        verbose_printf("Writing OpenFst format transducers, tropical weights "
+                      "(with HFST header)\n");
+        break;
+      case hfst::LOG_OFST_TYPE:
+        verbose_printf("Writing OpenFst format transducers, log weights "
+                      "(with HFST header)\n");
+        break;
+      case hfst::FOMA_TYPE:
+        verbose_printf("Writing foma format transducers "
+                       "(with HFST header)\n");
+        break;
+      case hfst::HFST_OL_TYPE:
+        verbose_printf("Writing HFST optimized lookup transducers, "
+                       "unweighted\n");
+        break;
+      case hfst::HFST_OLW_TYPE:
+        verbose_printf("Writing HFST optimized lookup transducers, "
+                       "weighted\n");
+        break;
+      default:
+        error(EXIT_FAILURE, 0, "Unknown output format\n");
+        return EXIT_FAILURE;
+        break;
+      }
+
+    // here starts the buffer handling part
 	HfstInputStream* instream = NULL;
 	try {
 	  instream = (inputfile != stdin) ?
 	    new HfstInputStream(inputfilename) : new HfstInputStream();
-	} catch(NotTransducerStreamException)	{
-		fprintf(stderr, "%s is not a valid transducer file\n", inputfilename);
+	} catch (NotTransducerStreamException)	{
+		error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+              inputfilename);
 		return EXIT_FAILURE;
 	}
 	HfstOutputStream* outstream = (outfile != stdout) ?

@@ -1,6 +1,6 @@
 //! @file hfst-repeat.cc
 //!
-//! @brief Repeating command line tool
+//! @brief Transducer repetition tool
 //!
 //! @author HFST Team
 
@@ -29,60 +29,55 @@
 #include <cstdlib>
 #include <cstring>
 #include <getopt.h>
-#include <cmath>
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
-#include <hfst2/hfst.h>
+#include "HfstTransducer.h"
 
-#include "hfst-common-unary-variables.h"
+#include "inc/globals-common.h"
+#include "inc/globals-unary.h"
+
+using hfst::HfstTransducer;
+using hfst::HfstInputStream;
+using hfst::HfstOutputStream;
+using hfst::exceptions::NotTransducerStreamException;
+
 // add tools-specific variables here
-// numbers to repeat
-static double from = 0;
-static double to = INFINITY;
+unsigned long at_least = 0;
+unsigned long at_most = UINT_MAX;
+bool from_infinity = false;
+bool to_infinity = true;
 
 void
-print_usage(const char *program_name)
+print_usage()
 {
-	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
-	fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
-		"Repeat a transducer\n"
-		"\n", program_name);
+    // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
+    // Usage line
+    fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
+           "Repeat transducer\n"
+        "\n", program_name);
 
-	print_common_program_options(message_out);
-#               if DEBUG
-	fprintf(message_out,
-		"%-35s%s", "  -d, --debug", "Print debugging messages and results\n"
-		);
-#               endif
-	print_common_unary_program_options(message_out);
-	// fprintf(message_out, (tool-specific options and short descriptions)
-	fprintf(message_out, "%-35s%s", "  -f, --from=NUMBER", "Repeat at least NUMBER times\n");
-	fprintf(message_out, "%-35s%s", "  -t, --to=NUMBER",   "Repeat at most NUMBER times\n");
-	fprintf(message_out, "\n");
-	print_common_unary_program_parameter_instructions(message_out);
-	fprintf(message_out,
-		"NUMBERs must be given in format strtod(3) supports.\n"
-		"If --from parameter is ignored, it defaults to 0,\n"
-		"if --to parameter is ignored, it defaults to infinity\n");
-	fprintf(stderr, "\n");
-	print_more_info(message_out, "Repeat");
-	fprintf(stderr, "\n");
-	print_report_bugs(message_out);
+    // options, grouped
+    print_common_program_options(message_out);
+    print_common_unary_program_options(message_out);
+    fprintf(message_out, "Repetition options:\n"
+            "  -f, --from=FNUM   repeat at least FNUM times\n"
+            "  -t, --to=TNUM     repeat at most TNUM times\n");
+    fprintf(message_out, "\n");
+    // parameter details
+    print_common_unary_program_parameter_instructions(message_out);
+    fprintf(message_out, 
+            "FNUM and TNUM must be positive integers or infinities "
+            "as parsed by strtod(3)\n"
+            "if FNUM is omitted it defaults to 0, if TNUM is omitted it defaults to Inf\n"
+            "FNUM must be less than TNUM\n");
+    fprintf(message_out, "\n");
+    // bug report address
+    print_report_bugs();
+    // external docs
+    print_more_info();
 }
 
-void
-print_version(const char* program_name)
-{
-	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dversion
-	fprintf(message_out, "%s 0.1 (" PACKAGE_STRING ")\n"
-		   "Copyright (C) 2008 University of Helsinki,\n"
-		   "License GPLv3: GNU GPL version 3 "
-		   "<http://gnu.org/licenses/gpl.html>\n"
-		   "This is free software: you are free to change and redistribute it.\n"
-		   "There is NO WARRANTY, to the extent permitted by law.\n",
-		program_name);
-}
 
 int
 parse_options(int argc, char** argv)
@@ -92,18 +87,17 @@ parse_options(int argc, char** argv)
 	{
 		static const struct option long_options[] =
 		{
-#include "hfst-common-options.h"
-		  ,
-#include "hfst-common-unary-options.h"
-		  ,
-		  // add tool-specific options here
-			{"from", required_argument, 0, 'f'}, 
-			{"to", required_argument, 0, 't'}, 
+		  HFST_GETOPT_COMMON_LONG,
+		  HFST_GETOPT_UNARY_LONG,
+          {"from", required_argument, 0, 'f'},
+          {"to", required_argument, 0, 't'},
+		  // add tool-specific options here 
 			{0,0,0,0}
 		};
 		int option_index = 0;
 		// add tool-specific options here 
-		char c = getopt_long(argc, argv, "dhi:o:sqvVR:DW:f:t:",
+		char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
+                             HFST_GETOPT_UNARY_SHORT "f:t:",
 							 long_options, &option_index);
 		if (-1 == c)
 		{
@@ -112,235 +106,113 @@ parse_options(int argc, char** argv)
 
 		switch (c)
 		{
-#include "hfst-common-cases.h"
-#include "hfst-common-unary-cases.h"
-		  // add tool-specific cases here
-		case 'f':
-			from = hfst_strtoweight(optarg);
-			break;
-		case 't':
-			to = hfst_strtoweight(optarg);
-			break;
-		case '?':
-			fprintf(message_out, "invalid option --%s\n",
-					long_options[option_index].name);
-			print_short_help(argv[0]);
-			return EXIT_FAILURE;
-			break;
-		default:
-			fprintf(message_out, "invalid option -%c\n", c);
-			print_short_help(argv[0]);
-			return EXIT_FAILURE;
-			break;
+#include "inc/getopt-cases-common.h"
+#include "inc/getopt-cases-unary.h"
+        case 'f':
+          at_least = hfst_strtonumber(optarg, &from_infinity);
+          break;
+        case 't':
+          at_most = hfst_strtonumber(optarg, &to_infinity);
+          break;
+#include "inc/getopt-cases-error.h"
 		}
 	}
 
-	if (is_output_stdout)
-	{
-			outfilename = hfst_strdup("<stdout>");
-			outfile = stdout;
-			message_out = stderr;
-	}
-	// rest of arguments are files...
-	if (is_input_stdin && ((argc - optind) == 1))
-	{
-		inputfilename = hfst_strdup(argv[optind]);
-		if (strcmp(inputfilename, "-") == 0) {
-		  inputfilename = hfst_strdup("<stdin>");
-		  inputfile = stdin;
-		  is_input_stdin = true;
-		}
-		else {
-		  inputfile = hfst_fopen(inputfilename, "r");
-		  is_input_stdin = false;
-		}
-	}
-	else if (inputfile) {
-
-	}
-	else if ((argc - optind) == 0)
-	{
-		inputfilename = hfst_strdup("<stdin>");
-		inputfile = stdin;
-		is_input_stdin = true;
-	}
-	else if ((argc - optind) > 1)
-	{
-		fprintf(message_out, "Exactly one input transducer file must be given\n");
-		print_short_help(argv[0]);
-		return EXIT_FAILURE;
-	}
-	else
-	{
-		fprintf(message_out, "???\n");
-		return 73;
-	}
+#include "inc/check-params-common.h"
+#include "inc/check-params-unary.h"
+    if (at_least > at_most)
+      {
+        error(EXIT_FAILURE, 0, "Cannot repeat from %lu to %lu times\n",
+              at_least, at_most);
+      }
+    if (from_infinity && !to_infinity)
+      {
+        error(EXIT_FAILURE, 0, "Cannot repeat from infinity to %lu times\n",
+              at_most);
+      }
 	return EXIT_CONTINUE;
 }
 
 int
-process_stream(std::istream& inputstream, std::ostream& outstream)
+process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 {
-	VERBOSE_PRINT("Checking formats of transducers\n");
-	int format_type = HFST::read_format(inputstream);
-    
-	if (format_type == SFST_FORMAT)
+  instream.open();
+  outstream.open();
+	
+	size_t transducer_n=0;
+	while(instream.is_good())
 	{
-		VERBOSE_PRINT("Using unweighted format\n");
-		try {
-		  
-		  HFST::KeyTable *key_table;
-		  if (read_symbols_from_filename != NULL) {
-		    ifstream is(read_symbols_from_filename);
-		    key_table = HFST::read_symbol_table(is);
-		    is.close();
-		  }
-		  else
-		    key_table = HFST::create_key_table();
-		  bool transducer_has_symbol_table=false;
-			HFST::TransducerHandle input = NULL;
-			while (true) {
-				int inputformat = HFST::read_format(inputstream);
-				if (inputformat == EOF_FORMAT)
-				{
-					break;
-				}
-				else if (inputformat == SFST_FORMAT)
-				{
-				        transducer_has_symbol_table = HFST::has_symbol_table(inputstream);
-					input = HFST::read_transducer(inputstream, key_table);
-				}
-				else
-				{
-					fprintf(message_out, "stream format mismatch\n");
-					return EXIT_FAILURE;
-				}
-				VERBOSE_PRINT("Repeating...\n");
-				// add your code here
-
-				HFST::TransducerHandle result;
-
-				HFST::TransducerHandle tr_to;
-				if (to == INFINITY)
-				  tr_to = HFST::repeat_star(HFST::copy(input));
-				else
-				  tr_to = HFST::repeat_le_n(HFST::copy(input), (int)to);
-
-
-				if (from == (double)0)
-				  result = tr_to;
-				else {
-				  HFST::TransducerHandle tr_from = HFST::repeat_le_n(input, ((int)from)-1);
-				  result = HFST::subtract( tr_to, tr_from );
-				}
-
-				if (!write_symbols)
-				  HFST::write_transducer(result, outstream);
-				else if (transducer_has_symbol_table || read_symbols_from_filename != NULL)
-				  HFST::write_transducer(result, key_table, outstream);
-				else
-				  HFST::write_transducer(result, outstream);
-
-			}
-			if (write_symbols_to_filename != NULL) {
-			  ofstream os(write_symbols_to_filename);
-			  HFST::write_symbol_table(key_table, os);
-			  os.close();
-			}
-			delete key_table;
-		}
-		catch (const char *p)
+		transducer_n++;
+		if (transducer_n==1)
 		{
-			printf("HFST library error: %s\n", p);
-			return EXIT_FAILURE;
-		}
-		return EXIT_SUCCESS;
+          if (!from_infinity && !to_infinity)
+            {
+              verbose_printf("Repeating [%lu..%lu] %s...\n", at_least,
+                             at_most, inputfilename);
+            }
+          else if (from_infinity && to_infinity)
+            {
+              verbose_printf("Repeating star %s...\n", inputfilename);
+            }
+          else if (!from_infinity && to_infinity)
+            {
+              verbose_printf("Repeating [%lu..*] %s...\n", at_least,
+                             inputfilename);
+            }
+          else if (from_infinity && to_infinity)
+            {
+              error(EXIT_FAILURE, 0, "Repeating *..%lu?", at_most);
+            }
+        }
+		else
+		{
+          if (!from_infinity && !to_infinity)
+            {
+              verbose_printf("Repeating [%lu..%lu] %s... %zu\n", 
+                             at_least, at_most, inputfilename, transducer_n);
+            }
+          else if (from_infinity && to_infinity)
+            {
+              verbose_printf("Repeating star %s... %zu\n", inputfilename,
+                             transducer_n);
+            }
+          else if (!from_infinity && to_infinity)
+            {
+              verbose_printf("Repeating [%lu..*] %s... %zu\n", at_least,
+                             inputfilename, transducer_n);
+            }
+          else if (from_infinity && to_infinity)
+            {
+              error(EXIT_FAILURE, 0, "Repeating *..%lu?", at_most);
+            }
+        }
+		
+		HfstTransducer trans(instream);
+        if (!from_infinity && !to_infinity)
+          {
+            outstream << trans.repeat_n_to_k(at_least, at_most);
+          }
+        else if (from_infinity && to_infinity)
+          {
+            outstream << trans.repeat_star();
+          }
+        else if (!from_infinity && to_infinity)
+          {
+            outstream << trans.repeat_n_plus(at_least);
+          }
+        else if (from_infinity && to_infinity)
+          {
+          error(EXIT_FAILURE, 0, "Repeating *..%lu?", at_most);
+          }
 	}
-	else if (format_type == OPENFST_FORMAT) 
-	{
-		VERBOSE_PRINT("Using weighted format\n");
-		try {
-		  HWFST::KeyTable *key_table;
-		  if (read_symbols_from_filename != NULL) {
-		    ifstream is(read_symbols_from_filename);
-		    key_table = HWFST::read_symbol_table(is);
-		    is.close();
-		  }
-		  else
-		    key_table = HWFST::create_key_table();
-		  bool transducer_has_symbol_table=false;
-			HWFST::TransducerHandle input = NULL;
-			while (true) 
-			{
-				int inputformat = HFST::read_format(inputstream);
-				if (inputformat == EOF_FORMAT)
-				{
-					break;
-				}
-				else if (inputformat == OPENFST_FORMAT)
-				{
-				        transducer_has_symbol_table = HWFST::has_symbol_table(inputstream);
-					input = HWFST::read_transducer(inputstream, key_table);
-				}
-				else {
-					fprintf(message_out, "stream format mismatch\n");
-					return EXIT_FAILURE;
-				}
-				VERBOSE_PRINT("Repeating...\n");
-				// add your code here
-
-				HWFST::TransducerHandle result;
-
-				HWFST::TransducerHandle tr_to;
-				if (to == INFINITY)
-				  tr_to = HWFST::repeat_star(HWFST::copy(input));
-				else
-				  tr_to = HWFST::repeat_le_n(HWFST::copy(input), (int)to);
-
-				if (from == (double)0)
-				  result = tr_to;
-				else {
-				  HWFST::TransducerHandle tr_from = HWFST::repeat_le_n(input, ((int)from)-1);
-				  //fprintf(stderr, "tr_to and tr_from:\n");
-				  //HWFST::print_transducer_number(tr_to, cerr);
-				  //fprintf(stderr, "--\n");
-				  //HWFST::print_transducer_number(tr_from, cerr);
-
-				  result = HWFST::subtract( tr_to, tr_from );
-				}
-
-
-				if (!write_symbols)
-				  HWFST::write_transducer(result, outstream);
-				else if (transducer_has_symbol_table || read_symbols_from_filename != NULL)
-				  HWFST::write_transducer(result, key_table, outstream);
-				else
-				  HWFST::write_transducer(result, outstream);
-			}
-			if (write_symbols_to_filename != NULL) {
-			  ofstream os(write_symbols_to_filename);
-			  HWFST::write_symbol_table(key_table, os);
-			  os.close();
-			}
-			delete key_table;
-		}
-		catch (const char *p) {
-			fprintf(message_out, "HFST lib error: %s\n", p);
-			return 1;
-		}
-		return EXIT_SUCCESS;
-	}
-	else
-	{
-		fprintf(message_out, "ERROR: Transducer has wrong type.\n");
-		return EXIT_FAILURE;
-	}
+	instream.close();
+	outstream.close();
+	return EXIT_SUCCESS;
 }
 
 
 int main( int argc, char **argv ) {
-	message_out = stdout;
-	verbose = false;
+	hfst_set_program_name(argv[0], "0.1", "HfstRepeat");
 	int retval = parse_options(argc, argv);
 	if (retval != EXIT_CONTINUE)
 	{
@@ -355,44 +227,47 @@ int main( int argc, char **argv ) {
 	{
 		fclose(outfile);
 	}
-	VERBOSE_PRINT("Reading from %s, writing to %s\n", 
+	verbose_printf("Reading from %s, writing to %s\n", 
 		inputfilename, outfilename);
+          if (!from_infinity && !to_infinity)
+            {
+              verbose_printf("Repeating from %lu to %lu times\n",
+                             at_least, at_most);
+            }
+          else if (from_infinity && to_infinity)
+            {
+              verbose_printf("Repeating star infinitely\n");
+            }
+          else if (!from_infinity && to_infinity)
+            {
+              verbose_printf("Repeating from %lu to infinite times\n",
+                             at_least);
+            }
+          else if (from_infinity && to_infinity)
+            {
+              error(EXIT_FAILURE, 0, "Repeating at least infinite but"
+                    "no more than %lu times?", at_most);
+            }
+
 	// here starts the buffer handling part
-	if (!is_input_stdin)
-	{
-		std::filebuf fbinput;
-		fbinput.open(inputfilename, std::ios::in);
-		std::istream inputstream(&fbinput);
-		if (!is_output_stdout)
-		{
-			std::filebuf fbout;
-			fbout.open(outfilename, std::ios::out);
-			std::ostream outstream(&fbout);
-			retval = process_stream(inputstream, outstream);
-		}
-		else
-		{
-			retval = process_stream(inputstream, std::cout);
-		}
-		return retval;
+	HfstInputStream* instream = NULL;
+	try {
+	  instream = (inputfile != stdin) ?
+	    new HfstInputStream(inputfilename) : new HfstInputStream();
+	} catch (NotTransducerStreamException)	{
+		error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+              inputfilename);
+		return EXIT_FAILURE;
 	}
-	else if (is_input_stdin)
-	{
-		if (!is_output_stdout)
-		{
-			std::filebuf fbout;
-			fbout.open(outfilename, std::ios::out);
-			std::ostream outstream(&fbout);
-			retval = process_stream(std::cin, outstream);
-		}
-		else
-		{
-			retval = process_stream(std::cin, std::cout);
-		}
-		return retval;
-	}
+	HfstOutputStream* outstream = (outfile != stdout) ?
+		new HfstOutputStream(outfilename, instream->get_type()) :
+		new HfstOutputStream(instream->get_type());
+	
+	retval = process_stream(*instream, *outstream);
+	delete instream;
+	delete outstream;
 	free(inputfilename);
 	free(outfilename);
-	return EXIT_SUCCESS;
+	return retval;
 }
 

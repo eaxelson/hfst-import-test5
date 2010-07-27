@@ -38,7 +38,7 @@
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 
-#include "hfst-common-unary-variables.h"
+#include "inc/globals-unary.h"
 // add tools-specific variables here
 static char* lookup_file_name;
 static FILE* lookup_file;
@@ -227,9 +227,9 @@ parse_options(int argc, char** argv)
 	{
 		static const struct option long_options[] =
 		{
-#include "hfst-common-options.h"
+		HFST_GETOPT_COMMON_LONG
 		  ,
-#include "hfst-common-unary-options.h"
+		HFST_GETOPT_UNARY_LONG
 		  ,
 		  // add tool-specific options here
 			{"input-strings", required_argument, 0, 'I'},
@@ -250,8 +250,8 @@ parse_options(int argc, char** argv)
 
 		switch (c)
 		{
-#include "hfst-common-cases.h"
-#include "hfst-common-unary-cases.h"
+#include "inc/getopt-cases-common.h"
+#include "inc/getopt-cases-unary.h"
 		  // add tool-specific cases here
 		case 'I':
 			lookup_file_name = hfst_strdup(optarg);
@@ -668,7 +668,7 @@ line_to_keyvector(char** s, KeyTable* kt, char** markup, bool* outside_sigma)
 	// may be NULL
 	if (rv == NULL)
 	{
-		VERBOSE_PRINT("No tokenisations for %s\n", *s);
+		verbose_printf("No tokenisations for %s\n", *s);
         *outside_sigma = true;
 	}
     else
@@ -707,7 +707,7 @@ lookup_unique(KeyVector* kv, TransducerHandle t,
   if (lookups == NULL)
     {
        // no results as empty result
-      VERBOSE_PRINT("Got no results\n");
+      verbose_printf("Got no results\n");
       lookups = new KeyVectorVector;
     }
   for (KeyVectorVector::iterator lkv = lookups->begin();
@@ -718,7 +718,7 @@ lookup_unique(KeyVector* kv, TransducerHandle t,
       KeyVector* filtlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
       if (filtlkv == NULL)
         {
-          VERBOSE_PRINT("Filtered by flag diacritics\n");
+          verbose_printf("Filtered by flag diacritics\n");
           continue;
         }
       filtlkv->erase(remove_if(filtlkv->begin(), filtlkv->end(),
@@ -754,7 +754,7 @@ lookup_cascade_unique(KeyVector* kv, vector<TransducerHandle> cascade,
                                                       cascade[i],
                                                       kt,
                                                       infinity);
-          VERBOSE_PRINT("%zu results @ level %u\n", xyzkvs->size(), i);
+          verbose_printf("%zu results @ level %u\n", xyzkvs->size(), i);
           for (KeyVectorSet::const_iterator xyzkv = xyzkvs->begin();
                xyzkv != xyzkvs->end();
                ++xyzkv)
@@ -932,7 +932,7 @@ line_to_keyvector(char** s, KeyTable* kt, char** markup, bool* outside_sigma)
 	// may be NULL
 	if (rv == NULL)
 	{
-		VERBOSE_PRINT("No tokenisations for %s\n", *s);
+		verbose_printf("No tokenisations for %s\n", *s);
         *outside_sigma = true;
 	}
     else
@@ -971,7 +971,7 @@ lookup_unique(KeyVector* kv, TransducerHandle t,
   if (lookups == NULL)
     {
        // no results as empty result
-      VERBOSE_PRINT("Got no results\n");
+      verbose_printf("Got no results\n");
       lookups = new KeyVectorVector;
     }
   for (KeyVectorVector::iterator lkv = lookups->begin();
@@ -982,7 +982,7 @@ lookup_unique(KeyVector* kv, TransducerHandle t,
       KeyVector* filtlkv = flag_diacritic_table.filter_diacritics(hmmlkv);
       if (filtlkv == NULL)
         {
-          VERBOSE_PRINT("Filtered by flag diacritics\n");
+          verbose_printf("Filtered by flag diacritics\n");
           continue;
         }
       filtlkv->erase(remove_if(filtlkv->begin(), filtlkv->end(),
@@ -1018,7 +1018,7 @@ lookup_cascade_unique(KeyVector* kv, vector<TransducerHandle> cascade,
                                                       cascade[i],
                                                       kt,
                                                       infinity);
-          VERBOSE_PRINT("%zu results @ level %u\n", xyzkvs->size(), i);
+          verbose_printf("%zu results @ level %u\n", xyzkvs->size(), i);
           for (KeyVectorSet::const_iterator xyzkv = xyzkvs->begin();
                xyzkv != xyzkvs->end();
                ++xyzkv)
@@ -1109,11 +1109,11 @@ print_lookups(KeyVectorSet* kvs, KeyTable* kt, const char* s, char* markup,
 int
 process_stream(std::istream& inputstream, std::ostream& outstream)
 {
-	VERBOSE_PRINT("Checking formats of transducers\n");
+	verbose_printf("Checking formats of transducers\n");
 	int format_type = HFST::read_format(inputstream);
 	if (format_type == SFST_FORMAT)
 	{
-		VERBOSE_PRINT("Using unweighted format\n");
+		verbose_printf("Using unweighted format\n");
 		try 
 		{
             sigma = new KeySet;
@@ -1149,18 +1149,18 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				}
 				if (nth_stream < 2)
 				{
-					VERBOSE_PRINT("Reading cascade...\r");
+					verbose_printf("Reading cascade...\r");
 				}
 				else
 				{
-					VERBOSE_PRINT("Reading cascade... %zu\r", nth_stream);
+					verbose_printf("Reading cascade... %zu\r", nth_stream);
 				}
 				// add your code here
 				cascade.push_back(input);
 			}
 			define_flag_diacritics(key_table);
             sigma = HFST::get_key_set(key_table);
-            VERBOSE_PRINT("\n");
+            verbose_printf("\n");
             char* line = NULL;
             size_t llen = 0;
             while (hfst_getline(&line, &llen, lookup_file) != -1)
@@ -1175,7 +1175,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
                     }
                     p++;
                 }
-                VERBOSE_PRINT("Looking up %s...\n", line);
+                verbose_printf("Looking up %s...\n", line);
                 char* markup = 0;
                 bool unknown = false;
                 bool infinite = false;
@@ -1243,7 +1243,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 	}
     else if (format_type == OPENFST_FORMAT) 
     {
-        VERBOSE_PRINT("Using weighted format\n");
+        verbose_printf("Using weighted format\n");
         try
         {
             HWFST::KeyTable *key_table;
@@ -1278,18 +1278,18 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
                 }
                 if (nth_stream < 2)
                 {
-                    VERBOSE_PRINT("Reading cascade...\r");
+                    verbose_printf("Reading cascade...\r");
                 }
                 else
                 {
-                    VERBOSE_PRINT("Reading cascade... %zu\r", nth_stream);
+                    verbose_printf("Reading cascade... %zu\r", nth_stream);
                 }
                 // add your code here
                 cascade.push_back(input);
             }
             define_flag_diacritics(key_table);
             sigma = HWFST::get_key_set(key_table);
-            VERBOSE_PRINT("\n");
+            verbose_printf("\n");
             char* line = NULL;
             size_t llen = 0;
             while (hfst_getline(&line, &llen, lookup_file) != -1)
@@ -1304,7 +1304,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
                     }
                     p++;
                 }
-                VERBOSE_PRINT("Looking up %s...\n", line);
+                verbose_printf("Looking up %s...\n", line);
                 char* markup = 0;
                 bool unknown = false;
                 bool infinite = false;
@@ -1391,9 +1391,9 @@ int main( int argc, char **argv ) {
 	{
 		fclose(inputfile);
 	}
-	VERBOSE_PRINT("Reading from %s, writing to %s\n", 
+	verbose_printf("Reading from %s, writing to %s\n", 
 		inputfilename, outfilename);
-	VERBOSE_PRINT("Output formats:\n"
+	verbose_printf("Output formats:\n"
 			"  regular:`%s'`%s...'`%s',\n"
 			"  unanalysed:`%s'`%s'`%s',\n"
 			"  untokenised:`%s'`%s'`%s',\n"

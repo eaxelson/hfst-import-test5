@@ -36,7 +36,7 @@
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 
-#include "hfst-common-unary-variables.h"
+#include "inc/globals-unary.h"
 // add tools-specific variables here
 static char* relation_file_name;
 static FILE* relation_file;
@@ -106,9 +106,9 @@ parse_options(int argc, char** argv)
 	{
 		static const struct option long_options[] =
 		{
-#include "hfst-common-options.h"
+		HFST_GETOPT_COMMON_LONG
 		  ,
-#include "hfst-common-unary-options.h"
+		HFST_GETOPT_UNARY_LONG
 		  ,
 		  // add tool-specific options here
 			{"relation", required_argument, 0, 'r'},
@@ -128,8 +128,8 @@ parse_options(int argc, char** argv)
 
 		switch (c)
 		{
-#include "hfst-common-cases.h"
-#include "hfst-common-unary-cases.h"
+#include "inc/getopt-cases-common.h"
+#include "inc/getopt-cases-unary.h"
 		  // add tool-specific cases here
 		case 'r':
 			relation_file_name = hfst_strdup(optarg);
@@ -399,7 +399,7 @@ lookup_all(const char* s, KeyTable* kt,
 	// may be NULL
 	if (lookup_orig == NULL)
 	{
-		VERBOSE_PRINT("No tokenisations for %s\n", s);
+		verbose_printf("No tokenisations for %s\n", s);
 		*infinite = false;
 		return NULL;
 	}
@@ -422,11 +422,11 @@ lookup_all(const char* s, KeyTable* kt,
 					++kv)
 			{
 				string* kvstring = keyVectorToString(*kv, kt);
-				VERBOSE_PRINT("Looking up %s from transducer %zu\n",
+				verbose_printf("Looking up %s from transducer %zu\n",
 						kvstring->c_str(), cascade_number);
 				if (is_infinitely_ambiguous(*t,true, *kv))
 				{
-					VERBOSE_PRINT("Got infinite results\n");
+					verbose_printf("Got infinite results\n");
 					*infinite = true;
 					delete current_results;
                     return NULL;
@@ -437,7 +437,7 @@ lookup_all(const char* s, KeyTable* kt,
 					if (lookups == NULL)
 					{
 						// no results as empty result
-						VERBOSE_PRINT("Got no results\n");
+						verbose_printf("Got no results\n");
 						lookups = new KeyVectorVector;
 					}
 					for (KeyVectorVector::iterator lkv = lookups->begin();
@@ -451,7 +451,7 @@ lookup_all(const char* s, KeyTable* kt,
 						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
 											_is_epsilon), hmmlkv->end());
 						string* lkvstring = keyVectorToString(hmmlkv, kt);
-						VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
+						verbose_printf("Got %s\n", lkvstring->c_str());
 						current_results->push_back(hmmlkv);
 						delete lkvstring;
 
@@ -637,7 +637,7 @@ lookup_all(const char* s, KeyTable* kt,
 	// may be NULL
 	if (lookup_orig == NULL)
 	{
-		VERBOSE_PRINT("No tokenisations for %s\n", s);
+		verbose_printf("No tokenisations for %s\n", s);
 		*infinite = false;
 		return NULL;
 	}
@@ -660,11 +660,11 @@ lookup_all(const char* s, KeyTable* kt,
 					++kv)
 			{
 				string* kvstring = keyVectorToString(*kv, kt);
-				VERBOSE_PRINT("Looking up %s from transducer %zu\n",
+				verbose_printf("Looking up %s from transducer %zu\n",
 						kvstring->c_str(), cascade_number);
 				if (is_infinitely_ambiguous(*t,true, *kv))
 				{
-					VERBOSE_PRINT("Got infinite results\n");
+					verbose_printf("Got infinite results\n");
 					*infinite = true;
                     delete current_results;
 					return NULL;
@@ -675,7 +675,7 @@ lookup_all(const char* s, KeyTable* kt,
 					if (lookups == NULL)
 					{
 						// no results as empty result
-						VERBOSE_PRINT("Got no results\n");
+						verbose_printf("Got no results\n");
 						lookups = new KeyVectorVector;
 					}
 					for (KeyVectorVector::const_iterator lkv = lookups->begin();
@@ -689,7 +689,7 @@ lookup_all(const char* s, KeyTable* kt,
 						hmmlkv->erase(remove_if(hmmlkv->begin(), hmmlkv->end(),
 											_is_epsilon), hmmlkv->end());
 						string* lkvstring = keyVectorToString(hmmlkv, kt);
-						VERBOSE_PRINT("Got %s\n", lkvstring->c_str());
+						verbose_printf("Got %s\n", lkvstring->c_str());
 						current_results->push_back(hmmlkv);
 						delete lkvstring;
 					}
@@ -707,12 +707,12 @@ lookup_all(const char* s, KeyTable* kt,
 int
 process_stream(std::istream& inputstream, std::ostream& outstream)
 {
-	VERBOSE_PRINT("Checking formats of transducers\n");
+	verbose_printf("Checking formats of transducers\n");
 	int format_type = HFST::read_format(inputstream);
 	bool any_failures = false;
 	if (format_type == SFST_FORMAT)
 	{
-		VERBOSE_PRINT("Using unweighted format\n");
+		verbose_printf("Using unweighted format\n");
 		try 
 		{
 			HFST::KeyTable *key_table;
@@ -747,17 +747,17 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				}
 				if (nth_stream < 2)
 				{
-					VERBOSE_PRINT("Reading cascade...\r");
+					verbose_printf("Reading cascade...\r");
 				}
 				else
 				{
-					VERBOSE_PRINT("Reading cascade... %zu\r", nth_stream);
+					verbose_printf("Reading cascade... %zu\r", nth_stream);
 				}
 				// add your code here
 				cascade.push_back(input);
 			}
 			HFST::define_flag_diacritics(key_table);
-			VERBOSE_PRINT("\n");
+			verbose_printf("\n");
             size_t len = 0;
 			char* line;
 			while (hfst_getline(&line, &len, relation_file)!= -1)
@@ -772,7 +772,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 					}
 					p++;
 				}
-				VERBOSE_PRINT("Looking up %s...\n", line);
+				verbose_printf("Looking up %s...\n", line);
 				bool infinity = false;
 				HFST::KeyVectorVector* results = HFST::lookup_all(line,
 						key_table, cascade,
@@ -795,7 +795,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 						}
 						q++;
 					}
-					VERBOSE_PRINT("Expecting %s\n", expectedLine);
+					verbose_printf("Expecting %s\n", expectedLine);
 					HFST::KeyVector* expected = NULL;
 					if (space_separated)
 					{
@@ -880,7 +880,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 	}
 	else if (format_type == OPENFST_FORMAT) 
 	{
-		VERBOSE_PRINT("Using weighted format\n");
+		verbose_printf("Using weighted format\n");
 		try 
 		{
 			HWFST::KeyTable *key_table;
@@ -915,17 +915,17 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				}
 				if (nth_stream < 2)
 				{
-					VERBOSE_PRINT("Reading cascade...\r");
+					verbose_printf("Reading cascade...\r");
 				}
 				else
 				{
-					VERBOSE_PRINT("Reading cascade... %zu\r", nth_stream);
+					verbose_printf("Reading cascade... %zu\r", nth_stream);
 				}
 				// add your code here
 				cascade.push_back(input);
 			}
 			HWFST::define_flag_diacritics(key_table);
-			VERBOSE_PRINT("\n");
+			verbose_printf("\n");
 			size_t len;
             char* line;
 			while (hfst_getline(&line, &len, relation_file) != -1)
@@ -940,7 +940,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 					}
 					p++;
 				}
-				VERBOSE_PRINT("Looking up %s...\n", line);
+				verbose_printf("Looking up %s...\n", line);
 				bool infinity = false;
 				HWFST::KeyVectorVector* results = HWFST::lookup_all(line,
 						key_table, cascade,
@@ -963,7 +963,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 						}
 						q++;
 					}
-					VERBOSE_PRINT("Expecting %s\n", expectedLine);
+					verbose_printf("Expecting %s\n", expectedLine);
 					HWFST::KeyVector* expected = NULL;
 					if (space_separated)
 					{
@@ -1072,7 +1072,7 @@ int main( int argc, char **argv ) {
 	{
 		fclose(inputfile);
 	}
-	VERBOSE_PRINT("Reading from %s, writing to %s\n", 
+	verbose_printf("Reading from %s, writing to %s\n", 
 		inputfilename, outfilename);
 	// here starts the buffer handling part
 	if (!is_input_stdin)

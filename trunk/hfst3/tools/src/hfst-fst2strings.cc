@@ -34,7 +34,7 @@
 #include "hfst-program-options.h"
 #include <hfst2/hfst.h>
 
-#include "hfst-common-unary-variables.h"
+#include "inc/globals-unary.h"
 
 // whether spaces are printed between symbol pairs
 static bool print_spaces;
@@ -109,9 +109,9 @@ parse_options(int argc, char** argv)
 	{
 		static const struct option long_options[] =
 		{
-#include "hfst-common-options.h"
+		HFST_GETOPT_COMMON_LONG
 		  ,
-#include "hfst-common-unary-options.h"
+		HFST_GETOPT_UNARY_LONG
 		  ,
 			{"print-epsilons", no_argument, 0, 'e'},
 			{"pairstring", no_argument, 0, 'p'},
@@ -132,8 +132,8 @@ parse_options(int argc, char** argv)
 		//char *level = NULL;
 		switch (c)
 		{
-#include "hfst-common-cases.h"
-#include "hfst-common-unary-cases.h"
+#include "inc/getopt-cases-common.h"
+#include "inc/getopt-cases-unary.h"
 		case 'r':
 		        max_random_strings = atoi(hfst_strdup(optarg));
 		        break;
@@ -215,12 +215,12 @@ parse_options(int argc, char** argv)
 int
 invert_stream(std::istream& inputstream, std::ostream& outstream)
 {
-	VERBOSE_PRINT("Checking formats of transducers\n");
+	verbose_printf("Checking formats of transducers\n");
 	int format_type = HFST::read_format(inputstream);
     
 	if (format_type == SFST_FORMAT)
 	{
-		VERBOSE_PRINT("Using unweighted format\n");
+		verbose_printf("Using unweighted format\n");
 		try {
 			HFST::TransducerHandle input = NULL;
 			HFST::KeyTable *key_table = NULL;
@@ -259,7 +259,7 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 				  outstream << "\n";
 				vector<TransducerHandle> paths;
 				if (nbest_strings < 1 && max_random_strings < 1) {
-				  VERBOSE_PRINT("Finding all paths...\n");
+				  verbose_printf("Finding all paths...\n");
 				  try {
 				    paths = HFST::find_all_paths(input);
 				  }
@@ -269,13 +269,13 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 				  }
 				}
 				else if (max_random_strings > 0) {
-				  VERBOSE_PRINT("Finding a maximum of %i random paths...\n", max_random_strings);
+				  verbose_printf("Finding a maximum of %i random paths...\n", max_random_strings);
 				  HFST::TransducerHandle paths_transducer = HFST::find_random_paths(input, max_random_strings);
 				  paths = HFST::find_all_paths(paths_transducer);
 				  HFST::delete_transducer(paths_transducer);
 				}
 				else {
-				  VERBOSE_PRINT("Finding a maximum of %i paths...\n", nbest_strings);
+				  verbose_printf("Finding a maximum of %i paths...\n", nbest_strings);
 				  HFST::TransducerHandle paths_transducer = HFST::find_best_paths(input, nbest_strings, unique_strings);
 				  paths = HFST::find_all_paths(paths_transducer);
 				}
@@ -315,7 +315,7 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 	}
 	else if (format_type == OPENFST_FORMAT) 
 	{
-		VERBOSE_PRINT("Using weighted format\n");
+		verbose_printf("Using weighted format\n");
 		try {
 			HWFST::TransducerHandle input = NULL;
 			HWFST::KeyTable *key_table = NULL;
@@ -356,7 +356,7 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 
 				vector<TransducerHandle> paths;
 				if (nbest_strings < 1 && max_random_strings < 1) {
-				  VERBOSE_PRINT("Finding all paths...\n");
+				  verbose_printf("Finding all paths...\n");
 				  try {
 				    paths = HWFST::find_all_paths(input);
 				  }
@@ -366,12 +366,12 @@ invert_stream(std::istream& inputstream, std::ostream& outstream)
 				  }
 				}
 				else if (max_random_strings > 0) {
-				  VERBOSE_PRINT("Finding a maximum of %i random paths...\n", max_random_strings);
+				  verbose_printf("Finding a maximum of %i random paths...\n", max_random_strings);
 				  HWFST::TransducerHandle paths_transducer = HWFST::find_random_paths(input, max_random_strings, false);
 				  paths = HWFST::find_all_paths(paths_transducer);
 				}
 				else {
-				  VERBOSE_PRINT("Finding a maximum of %i paths...\n", nbest_strings);
+				  verbose_printf("Finding a maximum of %i paths...\n", nbest_strings);
 				  HWFST::TransducerHandle paths_transducer = HWFST::find_best_paths(input, nbest_strings, unique_strings);
 				  paths = HWFST::find_all_paths(paths_transducer);
 				  HWFST::delete_transducer(paths_transducer);
@@ -437,7 +437,7 @@ int main( int argc, char **argv ) {
 	{
 		fclose(outfile);
 	}
-	VERBOSE_PRINT("Reading from %s, writing to %s\n", 
+	verbose_printf("Reading from %s, writing to %s\n", 
 		inputfilename, outfilename);
 	// here starts the buffer handling part
 	if (!is_input_stdin)

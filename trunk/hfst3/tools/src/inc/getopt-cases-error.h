@@ -17,7 +17,7 @@
         return EXIT_FAILURE;
         break;
     default:
-        error(EXIT_FAILURE,0 , "%s: invalid option -%c\n"
+        error(EXIT_FAILURE,0 , "invalid option -%c\n"
               "Try ``%s --help'' for more information\n",
               c, program_name);
         return EXIT_FAILURE;

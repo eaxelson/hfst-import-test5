@@ -42,7 +42,7 @@
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 
-#include "hfst-common-unary-variables.h"
+#include "inc/globals-unary.h"
 // add tools-specific variables here
 static bool print_flags = false;
 static char* eliminate_flag = 0;
@@ -100,9 +100,9 @@ parse_options(int argc, char** argv)
 	{
 		static const struct option long_options[] =
 		{
-#include "hfst-common-options.h"
+		HFST_GETOPT_COMMON_LONG
 		  ,
-#include "hfst-common-unary-options.h"
+		HFST_GETOPT_UNARY_LONG
 		  ,
 		  // add tool-specific options here
 			{"print-flags", required_argument, 0, 'p'},
@@ -120,8 +120,8 @@ parse_options(int argc, char** argv)
 
 		switch (c)
 		{
-#include "hfst-common-cases.h"
-#include "hfst-common-unary-cases.h"
+#include "inc/getopt-cases-common.h"
+#include "inc/getopt-cases-unary.h"
 		  // add tool-specific cases here
 		case 'p':
 			print_flags = true;
@@ -239,27 +239,27 @@ parse_flags_yet_again(const string& name,
                   {
                   case 'R':
                     r_values.insert("\"" + *s + "\"" );
-                    VERBOSE_PRINT("Require %s == %s spotted\n", 
+                    verbose_printf("Require %s == %s spotted\n", 
                                   name.c_str(), value.c_str());
                     break;
                   case 'D':
                     d_values.insert("\"" + *s + "\"");
-                    VERBOSE_PRINT("Disallow %s == %s spotted\n", 
+                    verbose_printf("Disallow %s == %s spotted\n", 
                                   name.c_str(), value.c_str());
                     break;
                   case 'U':
                     u_values.insert("\"" + *s + "\"");
-                    VERBOSE_PRINT("Unify %s == %s spotted\n", 
+                    verbose_printf("Unify %s == %s spotted\n", 
                                   name.c_str(), value.c_str());
                     break;
                   case 'P':
                     p_values.insert("\"" + *s + "\"");
-                    VERBOSE_PRINT("PSet %s == %s spotted\n", 
+                    verbose_printf("PSet %s == %s spotted\n", 
                                   name.c_str(), value.c_str());
                     break;
                   case 'N':
                     n_values.insert("\"" + *s + "\"");
-                    VERBOSE_PRINT("NSet %s == %s spotted\n", 
+                    verbose_printf("NSet %s == %s spotted\n", 
                                   name.c_str(), value.c_str());
                     break;
                   default:
@@ -273,15 +273,15 @@ parse_flags_yet_again(const string& name,
                   {
                   case 'C':
                     *c_name = true;
-                    VERBOSE_PRINT("Clear %s spotted\n", name.c_str());
+                    verbose_printf("Clear %s spotted\n", name.c_str());
                     break;
                   case 'R':
                     *r_name = true;
-                    VERBOSE_PRINT("Require %s spotted\n", name.c_str());
+                    verbose_printf("Require %s spotted\n", name.c_str());
                     break;
                   case 'D':
                     *d_name = true;
-                    VERBOSE_PRINT("Disallow %s spotted\n", name.c_str());
+                    verbose_printf("Disallow %s spotted\n", name.c_str());
                     break;
                   default:
                     fprintf(stderr, "Couldn't parse flag %s\n", s->c_str());
@@ -297,11 +297,11 @@ parse_flags_yet_again(const string& name,
 int
 process_stream(std::istream& inputstream, std::ostream& outstream)
 {
-	VERBOSE_PRINT("Checking formats of transducers\n");
+	verbose_printf("Checking formats of transducers\n");
 	int format_type = HFST::read_format(inputstream);
 	if (format_type == SFST_FORMAT)
 	{
-		VERBOSE_PRINT("Using unweighted format\n");
+		verbose_printf("Using unweighted format\n");
 		try 
 		{
 			HFST::KeyTable *key_table;
@@ -352,7 +352,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 					}
 					if (eliminate_flag)
 					{
-						VERBOSE_PRINT("Eliminating %s...\n", eliminate_flag);
+						verbose_printf("Eliminating %s...\n", eliminate_flag);
 					}
 				}
 				else
@@ -372,7 +372,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 					}
 					if (eliminate_flag)
 					{
-						VERBOSE_PRINT("Eliminating %s, %zu...\n",
+						verbose_printf("Eliminating %s, %zu...\n",
 								eliminate_flag, nth_stream);
 					}
 				}
@@ -404,7 +404,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 	}
 	else if (format_type == OPENFST_FORMAT) 
 	{
-		VERBOSE_PRINT("Using weighted format\n");
+		verbose_printf("Using weighted format\n");
 		try 
 		{
 			HWFST::KeyTable *key_table;
@@ -454,7 +454,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 				{
 					if (print_flags || verbose)
 					{
-						VERBOSE_PRINT("Printing flags... ");
+						verbose_printf("Printing flags... ");
 						for (HWFST::KeySet::const_iterator k = flag_diacritic_set.begin();
 								k != flag_diacritic_set.end();
 								++k)
@@ -467,26 +467,26 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
 					}
 					if (eliminate_flag)
 					{
-						VERBOSE_PRINT("Eliminating %s...\n", eliminate_flag);
+						verbose_printf("Eliminating %s...\n", eliminate_flag);
 					}
 				}
 				else
 				{
 					if (print_flags || verbose)
 					{
-						VERBOSE_PRINT("Printing flags %zu...\n", nth_stream);
+						verbose_printf("Printing flags %zu...\n", nth_stream);
 						for (HWFST::KeySet::const_iterator k = flag_diacritic_set.begin();
 								k != flag_diacritic_set.end();
 								++k)
 						{
 							string* ks = HWFST::keyToString(*k, key_table);
-							VERBOSE_PRINT("%s ", ks->c_str());
+							verbose_printf("%s ", ks->c_str());
 							delete ks;
 						}
 					}
 					if (eliminate_flag)
 					{
-						VERBOSE_PRINT("Eliminating %s, %zu...\n",
+						verbose_printf("Eliminating %s, %zu...\n",
 								eliminate_flag, nth_stream);
 					}
 				}
@@ -578,14 +578,14 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
                           }
                         r_x_filter += r_x_s;
                         r_x_filter += "]";
-                        VERBOSE_PRINT("Eliminating %s by composition of %s leftwards...\n", 
+                        verbose_printf("Eliminating %s by composition of %s leftwards...\n", 
                                       r_x_s.c_str(), r_x_filter.c_str());
                         HWFST::TransducerHandle r_x_transducer = HWFST::minimize(HWFST::extract_input_language(HWFST::compile_xre(r_x_filter.c_str(),
                                                                                   pi, pi,
                                                                                   key_table)));
                         HWFST::print_transducer(r_x_transducer, key_table, std::cerr);
                         filtered = HWFST::compose(HWFST::copy(r_x_transducer), filtered);
-                        VERBOSE_PRINT("rightwards...\n");
+                        verbose_printf("rightwards...\n");
                         filtered = HWFST::compose(filtered, r_x_transducer);
                     } // if r.x
 
@@ -609,7 +609,7 @@ process_stream(std::istream& inputstream, std::ostream& outstream)
                         filtered = HWFST::substitute_key(filtered, *k, 0);
                       }
                 }
-                VERBOSE_PRINT("Saving to %s\n", outfilename);
+                verbose_printf("Saving to %s\n", outfilename);
                 HWFST::write_transducer(filtered, key_table, outstream);
             }
 		}
@@ -641,7 +641,7 @@ int main( int argc, char **argv ) {
 	{
 		fclose(inputfile);
 	}
-	VERBOSE_PRINT("Reading from %s, writing to %s\n", 
+	verbose_printf("Reading from %s, writing to %s\n", 
 		inputfilename, outfilename);
 	// here starts the buffer handling part
 	if (!is_input_stdin)

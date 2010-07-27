@@ -1,6 +1,19 @@
 ## Process this file with automake to produce Makefile.in
-## Author: Tommi A Pirinen <tommi.pirinen@helsinki.fi>
-## Licence: GPL v3 (not newer)
+
+## Copyright (C) 2010 University of Helsinki
+
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+
+## You should have received a copy of the GNU General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 LDADD = $(top_builddir)/lib/libgnu.la $(top_builddir)/libhfst/src/libhfst.la
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib
@@ -123,14 +136,15 @@ MAYBE_OMOR_EVALUATE=hfst-omor-evaluate
 endif
 
 noinst_HEADERS= \
-	calculate_functions.h hfst-commandline.h hfst-common-cases.h \
-	hfst-common-options.h hfst-common-unary-cases.h \
-	hfst-common-unary-options.h hfst-common-unary-variables.h \
+	calculate_functions.h hfst-commandline.h hfst-program-options.h \
 	hfst-compiler.h \
 	hfst-pair-test-commandline.h \
-	hfst-program-options.h \
-	hfst-optimized-lookup.h
-# hfst-pair-test-transducers.h hwfst-pair-test-transducers.h
+	hfst-optimized-lookup.h \
+	inc/check-params-binary.h inc/check-params-common.h \
+	inc/check-params-unary.h  inc/getopt-cases-binary.h \
+	inc/getopt-cases-common.h inc/getopt-cases-error.h  \
+	inc/getopt-cases-unary.h  inc/globals-binary.h      \
+	inc/globals-common.h      inc/globals-unary.h
 
 bin_PROGRAMS=$(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_COMPOSE_INTERSECT) \
 			 $(MAYBE_CONCATENATE) $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) \
