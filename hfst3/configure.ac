@@ -316,7 +316,6 @@ AM_CONDITIONAL([WANT_TXT2FST], [test x$enable_txt2fst != xno])
 
 # Checks for programs
 AC_PROG_CC
-gl_EARLY
 AC_PROG_CXX
 ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
 AC_PROG_AWK
@@ -339,7 +338,6 @@ AC_PROG_MAKE_SET
 AC_PATH_PROG([DOXYGEN], [doxygen], [no])
 AM_CONDITIONAL([CAN_DOXYGEN], [test x$DOXYGEN != xno])
 AC_PATH_PROG([LDCONFIG],[ldconfig],[echo])
-gl_INIT
 
 # Checks for libraries
 AC_CHECK_LIB([pthread], [main])
@@ -362,7 +360,7 @@ if test "x$with_foma" == "xbundled"; then
 fi
 
 # Checks for header files
-AC_CHECK_HEADERS([limits.h stdlib.h string.h])
+AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h err.h])
 
 AC_LANG_PUSH([C++])
 
@@ -392,12 +390,12 @@ AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_FUNC_STRTOD
-AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strcspn strtol])
+AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strcspn strtol strtoul error error_at_line errc err warnc warn strndup getline getopt_long strtod xstrdup set_program_name setprogname])
 
 # Checks for system services
 
 # config files
-AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile lib/Makefile
+AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
                  test/libhfst/Makefile test/tools/Makefile
                  libhfst/Makefile libhfst/src/Makefile
                  libhfst/src/implementations/Makefile libhfst/hfst.pc

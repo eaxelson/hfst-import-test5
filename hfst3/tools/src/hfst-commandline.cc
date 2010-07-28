@@ -77,18 +77,6 @@ verbose_printf(const char* fmt, ...)
     }
 }
 
-void
-warning_printf(const char* fmt, ...)
-{
-  if (!silent)
-    {
-      va_list ap;
-      va_start(ap, fmt);
-      vfprintf(message_out, fmt, ap);
-      va_end(ap);
-    }
-}
-
 // string functions
 double
 hfst_strtoweight(const char *s)
@@ -203,11 +191,35 @@ ssize_t
 hfst_getline(char** lineptr, size_t* n, FILE* stream)
 {
   errno = 0;
-  ssize_t rv = getline(lineptr, n, stream);
+  ssize_t rv = -1;
+#if HAVE_GETLINE
+  rv = getline(lineptr, n, stream);
   if ((rv < 0) && errno)
     {
       error(EXIT_FAILURE, errno, "getline failed");
     }
+#else
+#define MAX_LEN 4196
+  size_t nn = *n;
+  if (nn == 0)
+    {
+      nn = MAX_LEN;
+    }
+  if (*lineptr == NULL)
+    {
+      *lineptr = static_cast<char*>(malloc(nn));
+      if (*lineptr == NULL)
+        {
+           error(EXIT_FAILURE, errno, "getline failed to malloc");
+        }
+    }
+  *lineptr = fgets(*lineptr, nn, stream);
+  if (*lineptr == NULL)
+    {
+      error(EXIT_FAILURE, errno, "getline fread failed");
+    }
+  rv = strlen(*lineptr);
+#endif
   return rv;
 }
 
@@ -216,9 +228,26 @@ void
 hfst_set_program_name(const char* argv0, const char* version_vector,
                       const char* wikiname)
 {
+#if HAVE_SET_PROGRAM_NAME
   set_program_name(argv0);
-  hfst_tool_version = xstrdup(version_vector);
-  hfst_tool_wikiname = xstrdup(wikiname);
+#else
+// this's gnulib
+  const char *slash;
+  const char *base;
+  slash = strrchr (argv0, '/');
+  base = (slash != NULL ? slash + 1 : argv0);
+  if (base - argv0 >= 7 && strncmp (base - 7, "/.libs/", 7) == 0)
+    {
+      argv0 = base;
+      if (strncmp (base, "lt-", 3) == 0)
+        {
+          argv0 = base + 3;
+        }
+    }
+  program_name = hfst_strdup(argv0);
+#endif
+  hfst_tool_version = hfst_strdup(version_vector);
+  hfst_tool_wikiname = hfst_strdup(wikiname);
 }
 
 void
