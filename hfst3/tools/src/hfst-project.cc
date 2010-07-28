@@ -100,7 +100,8 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-unary.h"
         case 'p':
-          char* level = optarg;
+            {
+              char* level = optarg;
             if ( (strncasecmp(level, "upper", 1) == 0) ||
                  (strncasecmp(level, "input", 1) == 0) ||
                  (strncasecmp(level, "first", 1) == 0) ||
@@ -123,6 +124,7 @@ parse_options(int argc, char** argv)
                       "lower, output, second or generation\n",
                       level);
                 return EXIT_FAILURE;
+            }
             }
 #include "inc/getopt-cases-error.h"
 		}
