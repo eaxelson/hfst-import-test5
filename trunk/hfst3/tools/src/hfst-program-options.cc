@@ -13,7 +13,6 @@
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif
-#include "xprintf.h"
 #include "hfst-program-options.h"
 
 // All programs

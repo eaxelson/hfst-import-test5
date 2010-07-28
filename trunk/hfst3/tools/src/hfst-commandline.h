@@ -31,15 +31,14 @@
 #include <cstdio>
 #include <cstring>
 
+#if HAVE_ERROR_H
+#  include <error.h>
+#elif HAVE_ERR_H
+#  include <err.h>
+#endif
+
 #include "HfstTransducer.h"
 
-#include "error.h"
-#include "progname.h"
-#include "xalloc.h"
-#include "xprintf.h"
-#include "xstrndup.h"
-#include "xstrtod.h"
-#include "xstrtol.h"
 
 /* These variables should be used in all command line programs.
  * In some cases they may be nonsensical; just define something then.
@@ -62,20 +61,22 @@ void debug_printf(const char* format, ...);
 /** print message @c s with parameters @c __VA_ARGS__ if debug is @a true. */
 void verbose_printf(const char* format, ...);
 
-/**
- * print non-fatal error message @c s with parameters @c __VA_ARGS__,
- * if @c verbose is @a true.
- * For error messages use error(int,int,char*, ...)
- */
-void warning_printf(const char* format, ...);
-
 /** @brief set program's name and other infos for reusable messages defined
  * below. This function must be called in beginning of main as the values are
  * used in all error messages as well.
  */
 void hfst_set_program_name(const char* argv0, const char* version,
                            const char* wikipage);
+extern char* program_name;
+#if HAVE_ERRC
+#  define error errc
+#endif
+#if HAVE_WARNC
+#  define warning warnc
+#endif
+
 /**
+ *
  * @brief print standard usage message.
  *
  * @sa http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
@@ -139,11 +140,28 @@ int hfst_strtonumber(const char *s, bool *infinite);
 
 unsigned long hfst_strtoul(char *s, int base);
 
-#define hfst_strdup xstrdup
-#define hfst_strndup xstrndup
-#define hfst_malloc xmalloc
-#define hfst_calloc xcalloc
-#define hfst_realloc xrealloc
+#if HAVE_XSTRDUP
+#  define hfst_strdup xstrdup
+#else
+#  define hfst_strdup strdup
+#endif
+#if HAVE_XSTRNDUP
+#  define hfst_strndup xstrndup
+#elif HAVE_STRNDUP
+#  define hfst_strndup strdnup
+#else
+char* hfst_strndup(const char* s, size_t n);
+#endif
+#if HAVE_XMALLOC
+#  define hfst_malloc xmalloc
+#else
+#  define hfst_malloc malloc
+#endif
+#if HAVE_XCALLOC
+#  define hfst_calloc xcalloc
+#else
+#  define hfst_calloc calloc
+#endif
 
 /**
  * @brief open file, or print informative error message and exit on failure.

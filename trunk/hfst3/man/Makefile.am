@@ -1,6 +1,20 @@
 ## Process this file with automake to produce Makefile.in
-## Author: Tommi A Pirinen <tommi.pirinen@helsinki.fi>
-## Licence: GPL v3 (not newer)
+
+## Copyright (C) 2010 University of Helsinki
+
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+## GNU General Public License for more details.
+
+## You should have received a copy of the GNU General Public License
+## along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 
 bootstrappable=hfst-compare.1 hfst-compose.1 \
 			   hfst-concatenate.1 hfst-determinize.1 hfst-diff-test.1 \
@@ -16,8 +30,6 @@ bootstrappable=hfst-compare.1 hfst-compose.1 \
 			   hfst-unweighted2weighted.1 hfst-weighted2unweighted.1
 broken=hfst-calculate.1 hfst-compose-intersect.1 hfst-pair-test.1
 dist_man1_MANS=$(bootstrappable) $(broken)
-all-local:
-	true
 
 bootstrap: 
 	for f in $(bootstrappable) ; do \

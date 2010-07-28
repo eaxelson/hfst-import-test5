@@ -16,5 +16,4 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = lib libhfst tools test doc man
-EXTRA_DIST=m4/gnulib-cache.m4
+SUBDIRS = libhfst tools test doc man

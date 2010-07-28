@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-LDADD = $(top_builddir)/lib/libgnu.la $(top_builddir)/libhfst/src/libhfst.la
+LDADD = $(top_builddir)/libhfst/src/libhfst.la
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib
 AM_CXXFLAGS = -Wno-deprecated
 

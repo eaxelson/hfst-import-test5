@@ -15,6 +15,8 @@ bool verbose = false;
 bool silent = false;
 bool debug = false;
 FILE *message_out = stdout;
+#if !HAVE_DECL_PROGRAM_NAME
+char* program_name = "Someone forgot to set program name";
+#endif
 char* hfst_tool_version = "Someone forgot to give version";
 char* hfst_tool_wikiname = "Someone forgot to set wiki page";
-
