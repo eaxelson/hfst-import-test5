@@ -33,7 +33,8 @@
 
 #if HAVE_ERROR_H
 #  include <error.h>
-#elif HAVE_ERR_H
+#endif
+#if HAVE_ERR_H
 #  include <err.h>
 #endif
 
@@ -68,11 +69,20 @@ void verbose_printf(const char* format, ...);
 void hfst_set_program_name(const char* argv0, const char* version,
                            const char* wikipage);
 extern char* program_name;
-#if HAVE_ERRC
-#  define error errc
+#ifndef HAVE_ERROR
+#  if HAVE_ERRC
+#    define error errc
+#  elif HAVE_ERR
+#    define error(status, errnum, fmt, ...) err(status, fmt, __VA_ARGS__)
+#  endif
 #endif
-#if HAVE_WARNC
-#  define warning warnc
+#ifndef HAVE_WARNING
+#  if HAVE_WARNC
+#    define warning warnc
+#  elif HAVE_WARN
+#    define warning(status, errnum, fmt, ...) warn(fmt, __VA_ARGS__);\
+    if (status != 0) {exit(status);}
+#  endif
 #endif
 
 /**

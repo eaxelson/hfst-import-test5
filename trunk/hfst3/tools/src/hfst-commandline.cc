@@ -21,12 +21,13 @@
 #  include <config.h>
 #endif
 
-#include <cmath>
-#include <climits>
-#include <cstdlib>
-#include <cstdio>
-#include <cstring>
 #include <cassert>
+#include <climits>
+#include <cmath>
+#include <cstdarg>
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
 #include <errno.h>
 
 #include "hfst-commandline.h"
