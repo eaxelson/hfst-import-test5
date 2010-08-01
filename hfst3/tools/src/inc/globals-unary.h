@@ -13,11 +13,11 @@
 
   // input transducer
   static char *inputfilename;
-  static FILE *inputfile;
+  static FILE *inputfile = stdin;
   static bool is_input_stdin = true;
   // result transducer
   static char *outfilename;
-  static FILE *outfile;
+  static FILE *outfile = stdout;
   static bool is_output_stdout = true;
   
   
