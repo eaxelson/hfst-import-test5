@@ -164,9 +164,9 @@ AC_ARG_ENABLE([fst2pairstrings],
 AM_CONDITIONAL([WANT_FST2PAIRSTRINGS], [test x$enable_fst2pairstrings != xno])
 AC_ARG_ENABLE([fst2strings],
 			  [AS_HELP_STRING([--enable-fst2strings],
-							  [build fst2strings tool @<:@default=no@:>@])],
+							  [build fst2strings tool @<:@default=yes@:>@])],
 			  [enable_fst2strings=$enableval],
-			  [enable_fst2strings=no])
+			  [enable_fst2strings=yes])
 AM_CONDITIONAL([WANT_FST2STRINGS], [test x$enable_fst2strings != xno])
 AC_ARG_ENABLE([fst2txt],
 			  [AS_HELP_STRING([--enable-fst2txt],
