@@ -140,7 +140,7 @@ parse_options(int argc, char** argv)
 		  if(!eval_fd)
 		  {
 		    fprintf(message_out, "Option -f must be used in conjunction with -e\n");
-		    print_short_help(argv[0]);
+		    print_short_help();
 		    return EXIT_FAILURE;
 		  }
 		  filter_fd = true;

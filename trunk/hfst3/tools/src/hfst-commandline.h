@@ -48,8 +48,8 @@ extern bool verbose;
 extern bool silent;
 extern bool debug;
 extern FILE* message_out;
-extern char* hfst_tool_version;
-extern char* hfst_tool_wikiname;
+extern const char* hfst_tool_version;
+extern const char* hfst_tool_wikiname;
 
 /* hfst tools generic helper print functions */
 
@@ -68,7 +68,10 @@ void verbose_printf(const char* format, ...);
  */
 void hfst_set_program_name(const char* argv0, const char* version,
                            const char* wikipage);
-extern char* program_name;
+#ifndef HAVE_DECL_PROGRAM_NAME
+extern const char* program_name;
+#endif
+
 #ifndef HAVE_ERROR
 #  if HAVE_ERRC
 #    define error errc

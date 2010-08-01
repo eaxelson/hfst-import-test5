@@ -308,9 +308,9 @@ AC_ARG_ENABLE([tail],
 AM_CONDITIONAL([WANT_TAIL], [test x$enable_tail != xno])
 AC_ARG_ENABLE([txt2fst],
 			  [AS_HELP_STRING([--enable-txt2fst],
-							  [build txt2fst tool @<:@default=no@:>@])],
+							  [build txt2fst tool @<:@default=yes@:>@])],
 			  [enable_txt2fst=$enableval],
-			  [enable_txt2fst=no])
+			  [enable_txt2fst=yes])
 AM_CONDITIONAL([WANT_TXT2FST], [test x$enable_txt2fst != xno])
 
 
