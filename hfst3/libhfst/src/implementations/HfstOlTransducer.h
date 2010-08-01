@@ -71,6 +71,8 @@ namespace hfst { namespace implementations
   {
    public:
     static hfst_ol::Transducer * create_empty_transducer(bool weighted);
+    
+    static bool is_cyclic(hfst_ol::Transducer* t);
   };
   
 } }

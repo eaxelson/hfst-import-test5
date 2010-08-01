@@ -184,5 +184,8 @@ namespace hfst { namespace implementations
   
   hfst_ol::Transducer * HfstOlTransducer::create_empty_transducer(bool weighted)
   { return new hfst_ol::Transducer(weighted); }
+  
+  bool HfstOlTransducer::is_cyclic(hfst_ol::Transducer* t)
+  { return t->get_header().probe_flag(hfst_ol::Cyclic); }
 
 } }

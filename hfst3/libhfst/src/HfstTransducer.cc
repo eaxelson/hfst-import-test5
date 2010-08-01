@@ -524,9 +524,12 @@ void HfstTransducer::test_minimize()
         return log_ofst_interface.is_cyclic(implementation.log_ofst);
       case FOMA_TYPE:
         return foma_interface.is_cyclic(implementation.foma);
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+        return hfst_ol_interface.is_cyclic(implementation.hfst_ol);
       case ERROR_TYPE:
       default:
-        throw hfst::exceptions::TransducerHasWrongTypeException();
+        throw hfst::exceptions::FunctionNotImplementedException();
         return false;
     }
   }
