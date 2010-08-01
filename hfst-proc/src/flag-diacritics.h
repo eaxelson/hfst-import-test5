@@ -53,7 +53,7 @@ class FdTable
   FdTable();
   void define_diacritic(SymbolNumber symbol, const std::string& str);
   
-  bool num_features() const { return feature_map.size(); }
+  FdFeature num_features() const { return feature_map.size(); }
   bool is_diacritic(SymbolNumber symbol) const;
   const FdOperation* get_operation(SymbolNumber symbol) const;
   
