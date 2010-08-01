@@ -312,8 +312,11 @@ AC_ARG_ENABLE([txt2fst],
 			  [enable_txt2fst=$enableval],
 			  [enable_txt2fst=yes])
 AM_CONDITIONAL([WANT_TXT2FST], [test x$enable_txt2fst != xno])
-
-
+AC_ARG_ENABLE([werrors],
+              [AS_HELP_STRING([--enable-werrors],
+                              [use -Werror and well selected -Wflags @<:@default=yes@:>@])],
+              [enable_werrosr=$enableval],
+              [enable_werrors=yes])
 # Checks for programs
 AC_PROG_CC
 AC_PROG_CXX
@@ -338,6 +341,9 @@ AC_PROG_MAKE_SET
 AC_PATH_PROG([DOXYGEN], [doxygen], [no])
 AM_CONDITIONAL([CAN_DOXYGEN], [test x$DOXYGEN != xno])
 AC_PATH_PROG([LDCONFIG],[ldconfig],[echo])
+if test "x$enable_werrors" != xno ; then
+    AC_SUBST([WERR_CFLAGS], "-Wall -Wextra -Werror -Wno-sign-compare -Wno-deprecated")
+fi
 
 # Checks for libraries
 AC_CHECK_LIB([pthread], [main])
