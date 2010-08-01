@@ -60,18 +60,12 @@ typedef unsigned short SymbolNumber;
 typedef unsigned int TransitionTableIndex;
 typedef unsigned int TransitionNumber;
 typedef unsigned int StateIdNumber;
-typedef short ValueNumber;
 typedef float Weight;
 typedef std::vector<SymbolNumber> SymbolNumberVector;
 typedef std::vector<SymbolProperties> SymbolTable;
 
-
 const SymbolNumber NO_SYMBOL_NUMBER = std::numeric_limits<SymbolNumber>::max();
 const TransitionTableIndex NO_TABLE_INDEX = std::numeric_limits<TransitionTableIndex>::max();
-
-// the flag diacritic operators as given in
-// Beesley & Karttunen, Finite State Morphology (U of C Press 2003)
-enum FlagDiacriticOperator {P, N, R, D, C, U};
 
 enum HeaderFlag {Weighted, Deterministic, Input_deterministic, Minimized,
   	 Cyclic, Has_epsilon_epsilon_transitions,
