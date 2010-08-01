@@ -83,7 +83,7 @@ double
 hfst_strtoweight(const char *s)
 {
     errno = 0;
-    char *endptr = "";
+    char *endptr;
     double rv = strtod(s, &endptr);
     if (*endptr == '\0')
       {
@@ -101,7 +101,7 @@ hfst_strtonumber(const char *s, bool *infinite)
 {
     *infinite = false;
     errno = 0;
-    char *endptr = "";
+    char *endptr;
     double rv = strtod(s, &endptr); 
     if (*endptr == '\0')
       {
@@ -131,7 +131,7 @@ unsigned long
 hfst_strtoul(char *s, int base)
 {
     errno = 0;
-    char *endptr = "";
+    char *endptr;
     unsigned long rv = strtoul(s, &endptr, base);
     if (*endptr == '\0')
       {

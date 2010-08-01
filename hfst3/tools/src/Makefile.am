@@ -17,7 +17,7 @@
 
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib
-AM_CXXFLAGS = -Wno-deprecated
+AM_CXXFLAGS = $(WERR_CFLAGS)
 
 if WANT_COMPARE
 MAYBE_COMPARE=hfst-compare
