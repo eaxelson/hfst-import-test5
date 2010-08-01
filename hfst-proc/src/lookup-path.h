@@ -79,30 +79,13 @@ class PathFd
   /**
    * The values of the flag diacritic features at the end of the path
    */
-  FlagDiacriticState fd_state;
+  FdState fd_state;
   
-  /**
-   * A reference to the symbol table for checking whether a symbol is a flag
-   * diacritic operation
-   */
-  const SymbolTable& symbol_table;
-  
-  /**
-   * Evaluates the given flag diacritic operation, possibly modifying fd_state,
-   * and returning whether the operation is allowed or not
-   */
-  bool evaluate_flag_diacritic(const FlagDiacriticOperation& op);
-  
-  /**
-   * If the given symbol is a flag diacritic, return the result of the other
-   * evaluation method, otherwise return true
-   */
   bool evaluate_flag_diacritic(SymbolNumber s);
   
-  PathFd(int state_size, const SymbolTable& table): 
-    fd_state(state_size, 0), symbol_table(table) {}
-  PathFd(const PathFd& o): fd_state(o.fd_state), 
-                           symbol_table(o.symbol_table) {}
+  PathFd(const FdTable& table):
+    fd_state(table) {}
+  PathFd(const PathFd& o): fd_state(o.fd_state) {}
   virtual ~PathFd() {}
 };
 
@@ -114,7 +97,7 @@ class LookupPathFd : public LookupPath, PathFd
 {
  public:
   LookupPathFd(const Transducer& t, const TransitionTableIndex initial):
-    LookupPath(t, initial), PathFd(t.get_alphabet().get_state_size(), t.get_alphabet().get_symbol_table()) {}
+    LookupPath(t, initial), PathFd(t.get_alphabet().get_fd_table()) {}
   LookupPathFd(const LookupPathFd& o): LookupPath(o), PathFd(o) {}
   
   virtual LookupPath* clone() const {return new LookupPathFd(*this);}
@@ -163,7 +146,7 @@ class LookupPathWFd : public LookupPathW, PathFd
 {
  public:
   LookupPathWFd(const Transducer& t, const TransitionTableIndex initial):
-    LookupPathW(t, initial), PathFd(t.get_alphabet().get_state_size(), t.get_alphabet().get_symbol_table()){}
+    LookupPathW(t, initial), PathFd(t.get_alphabet().get_fd_table()) {}
   LookupPathWFd(const LookupPathWFd& o): LookupPathW(o), PathFd(o) {}
   
   virtual LookupPath* clone() const {return new LookupPathWFd(*this);}

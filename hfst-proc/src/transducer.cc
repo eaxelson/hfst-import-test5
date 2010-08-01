@@ -47,20 +47,16 @@ bool TransducerHeader::check_hfst3_header(std::istream& is)
 
 TransducerAlphabet::TransducerAlphabet(std::istream& is, 
                                        SymbolNumber symbol_count):
-  symbol_table(), symbolizer(), blank_symbol(NO_SYMBOL_NUMBER),
-  feature_bucket(), value_bucket()
+  symbol_table(), fd_table(), symbolizer(), blank_symbol(NO_SYMBOL_NUMBER)
 {
   if(symbol_count == 0)
   {
     std::cerr << "Transducer has empty alphabet; wrong or corrupt file?" << std::endl;
     exit(1);
   }
-  value_bucket[std::string()] = 0; // empty value = neutral
   for(SymbolNumber k=0; k<symbol_count; k++)
     add_symbol(get_next_symbol(is));
   
-  if(verboseFlag && get_state_size()>0)
-    std::cout << "Alphabet contains " << get_state_size() << " flag diacritic feature(s)" << std::endl;
   // assume the first symbol is epsilon which we don't want to print
   symbol_table[0].str = "";
   
@@ -160,31 +156,6 @@ TransducerAlphabet::get_next_symbol(std::istream& is)
     std::cerr << "Could not parse transducer; wrong or corrupt file?" << std::endl;
     exit(1);
   }
-
-  if (symbol.str.length() >= 5 && symbol.str.at(0) == '@' && symbol.str.at(symbol.str.length()-1) == '@' && symbol.str.at(2) == '.')
-  { // a flag diacritic needs to be parsed
-    FlagDiacriticOperator op = FlagDiacriticOperation::char_to_operator(symbol.str.at(1));
-    std::string feat;
-    std::string val;
-    const char * c = symbol.str.c_str();
-    // as long as we're working with utf-8, this should be ok
-    for (c +=3; *c != '.' && *c != '@'; c++) { feat.append(c,1); }
-    if (*c == '.')
-    {
-      for (++c; *c != '@'; c++) { val.append(c,1); }
-    }
-    if (feature_bucket.count(feat) == 0)
-    {
-      SymbolNumber next = feature_bucket.size();
-      feature_bucket[feat] = next;
-    }
-    if (value_bucket.count(val) == 0)
-      value_bucket[val] = value_bucket.size()+1;
-    
-    symbol.fd_op = FlagDiacriticOperation(op, feature_bucket[feat], value_bucket[val], symbol.str.c_str());
-    
-    symbol.str = "";
-  }
   
   symbol.alphabetic = is_alphabetic(symbol.str.c_str());
   
@@ -197,7 +168,8 @@ TransducerAlphabet::print_table() const
   std::cout << "Symbol table containing " << symbol_table.size() << " symbols:" << std::endl;
   for(SymbolNumber i=0;i<symbol_table.size();i++)
   {
-    std::cout << "Symbol: #" << i << ", '" << (symbol_table[i].fd_op.isFlag()?symbol_table[i].fd_op.Name():symbol_to_string(i)) << "',"
+    const FdOperation* fd_op = fd_table.get_operation(i);
+    std::cout << "Symbol: #" << i << ", '" << (fd_op!=NULL?fd_op->Name():symbol_to_string(i)) << "',"
               << (is_alphabetic(i)?" ":" not ") << "alphabetic, ";
     if(is_lower(i))
     {
@@ -211,14 +183,25 @@ TransducerAlphabet::print_table() const
     }
     else
       std::cout << "no case";
+    
+    if(fd_op != NULL)
+      std::cout << " FD - feature: " << fd_op->Feature() << ", value: " << fd_op->Value();
     std::cout << std::endl;
   }
+  
+  if(fd_table.num_features()>0)
+    std::cout << "Alphabet contains " << fd_table.num_features() << " flag diacritic feature(s)" << std::endl;
 }
 
 void
 TransducerAlphabet::add_symbol(const SymbolProperties& symbol)
 {
   symbol_table.push_back(symbol);
+  if(FdOperation::is_diacritic(symbol.str))
+  {
+    fd_table.define_diacritic(symbol_table.size()-1, symbol.str);
+    symbol_table[symbol_table.size()-1].str = "";
+  }
   symbolizer.add_symbol(symbol);
 }
 
@@ -533,7 +516,7 @@ TransducerInternalCreator Transducer::creators[2][2] =
 
 Transducer::Transducer(std::istream& is):
   header(is), alphabet(is, header.symbol_count()),
-  transducer_internal(creators[header.probe_flag(Weighted)][alphabet.get_state_size()>0](is, header, alphabet))
+  transducer_internal(creators[header.probe_flag(Weighted)][alphabet.has_flag_diacritics()](is, header, alphabet))
 {
   if (header.probe_flag(Has_unweighted_input_epsilon_cycles) ||
       header.probe_flag(Has_input_epsilon_cycles))

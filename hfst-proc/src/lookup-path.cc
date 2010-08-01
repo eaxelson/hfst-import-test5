@@ -30,68 +30,9 @@ LookupPath::operator<(const LookupPath& o) const
 //////////Function definitions for class PathFd
 
 bool
-PathFd::evaluate_flag_diacritic(const FlagDiacriticOperation& op)
-{
-  switch (op.Operation()) {
-  case P: // positive set
-    fd_state[op.Feature()] = op.Value();
-    return true;
-    
-  case N: // negative set (literally, in this implementation)
-    fd_state[op.Feature()] = -1*op.Value();
-    return true;
-    
-  case R: // require
-    if (op.Value() == 0) // empty require
-      return (fd_state[op.Feature()] != 0);
-    else // nonempty require
-      return (fd_state[op.Feature()] == op.Value());
-      
-  case D: // disallow
-    if (op.Value() == 0) // empty disallow
-       return (fd_state[op.Feature()] == 0);
-    else // nonempty disallow
-      return (fd_state[op.Feature()] != op.Value());
-      
-  case C: // clear
-    fd_state[op.Feature()] = 0;
-    return true;
-    
-  case U: // unification
-    if(fd_state[op.Feature()] == 0 || // if the feature is unset or
-       fd_state[op.Feature()] == op.Value() || // the feature is at this value already or
-       (fd_state[op.Feature()] < 0 &&
-       (fd_state[op.Feature()]*-1 != op.Value())) // the feature is negatively set to something else
-       )
-    {
-      fd_state[op.Feature()] = op.Value();
-      return true;
-    }
-    return false;
-  }
-  throw; // for the compiler's peace of mind
-}
-
-bool
 PathFd::evaluate_flag_diacritic(SymbolNumber s)
 {
-  if(symbol_table[s].fd_op.isFlag())
-  {
-    if(evaluate_flag_diacritic(symbol_table[s].fd_op))
-    {
-      if(printDebuggingInformationFlag)
-        std::cout << "flag diacritic [" << s << "/" << symbol_table[s].fd_op.Name() << "] allowed" << std::endl;
-      return true;
-    }
-    else
-    {
-      if(printDebuggingInformationFlag)
-        std::cout << "flag diacritic [" << s << "/" << symbol_table[s].fd_op.Name() << "] disallowed" << std::endl;
-      return false;
-    }
-  }
-  else
-    return true;
+  return fd_state.apply_operation(s);
 }
 
 

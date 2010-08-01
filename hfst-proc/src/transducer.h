@@ -6,6 +6,7 @@
 #include <stdexcept>
 #include "hfst-proc.h"
 #include "tokenizer.h"
+#include "flag-diacritics.h"
 
 class TransducerHeader
 {
@@ -123,51 +124,6 @@ class TransducerHeader
   }
 };
 
-class FlagDiacriticOperation
-{
- private:
-  FlagDiacriticOperator operation;
-  SymbolNumber feature;
-  ValueNumber value;
-  std::string name;
- public:
- FlagDiacriticOperation(FlagDiacriticOperator op, SymbolNumber feat, ValueNumber val, const char* str):
-  operation(op), feature(feat), value(val), name(str) {}
-
-  // dummy constructor
- FlagDiacriticOperation():
-  operation(P), feature(NO_SYMBOL_NUMBER), value(0), name() {}
-  
-  bool isFlag(void) const { return feature != NO_SYMBOL_NUMBER; }
-  FlagDiacriticOperator Operation(void) const { return operation; }
-  SymbolNumber Feature(void) const { return feature; }
-  ValueNumber Value(void) const { return value; }
-  std::string Name(void) const { return name; }
-  
-  static FlagDiacriticOperator char_to_operator(char c)
-  {
-    switch (c) {
-    case 'P': return P;
-    case 'N': return N;
-    case 'R': return R;
-    case 'D': return D;
-    case 'C': return C;
-    case 'U': return U;
-    default:
-      throw;
-    }
-  }
-
-#if OL_FULL_DEBUG
-  void print(void)
-  {
-    std::cout << operation << "\t" << feature << "\t" << value << std::endl;
-  }
-#endif
-};
-
-typedef std::vector<ValueNumber> FlagDiacriticState;
-
 /**
  * Various properties of a symbol, mostly used internally by TransducerAlphabet
  */
@@ -197,12 +153,6 @@ struct SymbolProperties
    * symbol has no uppercase form, it will contain NO_SYMBOL_NUMBER
    */
   SymbolNumber upper;
-  
-  /**
-   * Flag diacritic information associated with the symbol. This may be a dummy
-   * operation if the symbol is not a flag diacritic
-   */
-  FlagDiacriticOperation fd_op;
 };
 
 class Symbolizer;
@@ -211,6 +161,7 @@ class TransducerAlphabet
 {
  private:
   SymbolTable symbol_table;
+  FdTable fd_table;
   
   Symbolizer symbolizer;
   
@@ -256,19 +207,19 @@ class TransducerAlphabet
   
   void print_table() const;
   
-  void add_symbol(const SymbolProperties& symbol);
-  
-  std::map<std::string, SymbolNumber> feature_bucket;
-  std::map<std::string, ValueNumber> value_bucket;
-  
+  void add_symbol(const SymbolProperties& symbol);  
  public:
   TransducerAlphabet(std::istream& is, SymbolNumber symbol_count);  
   ~TransducerAlphabet();
   
   const SymbolTable& get_symbol_table(void) const { return symbol_table; }
+  const FdTable& get_fd_table(void) const { return fd_table; }
   const Symbolizer& get_symbolizer(void) const;
-  SymbolNumber get_state_size(void) const { return feature_bucket.size(); }
+  bool has_flag_diacritics() const { return fd_table.num_features() > 0; }
   SymbolNumber get_blank_symbol() const {return blank_symbol;}
+  
+  bool is_flag_diacritic(SymbolNumber symbol) const
+  {return fd_table.is_diacritic(symbol);}
   
   bool is_punctuation(const char* c) const;
   
@@ -534,7 +485,7 @@ class TransducerFdInternal: public TransducerInternal
   {
     return transition.matches(0) ||
 	         (transition.get_input() != NO_SYMBOL_NUMBER &&
-              alphabet.get_symbol_table()[transition.get_input()].fd_op.isFlag());
+              alphabet.is_flag_diacritic(transition.get_input()));
   }
 };
 
@@ -581,7 +532,7 @@ class TransducerWFdInternal: public TransducerWInternal
   {
     return transition.matches(0) ||
            (transition.get_input() != NO_SYMBOL_NUMBER &&
-              alphabet.get_symbol_table()[transition.get_input()].fd_op.isFlag());
+              alphabet.is_flag_diacritic(transition.get_input()));
   }
 };
 
