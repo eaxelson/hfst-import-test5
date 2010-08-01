@@ -12,6 +12,7 @@
 
 #include "SymbolDefs.h"
 #include "HfstExceptions.h"
+#include "FlagDiacritics.h"
 #include <fst/fstlib.h>
 #include "ExtractStrings.h"
 #include <cstdio>
@@ -150,7 +151,7 @@ namespace implementations
       static StdVectorFst * extract_input_language(StdVectorFst * t);
       static StdVectorFst * extract_output_language(StdVectorFst * t);
       static void extract_strings(StdVectorFst * t,
-				  hfst::WeightedPaths<float>::Set &results);
+				  hfst::WeightedPaths<float>::Set &results, FdTable<int64>* fd=NULL, bool filter_fd=false);
       static StdVectorFst * compose(StdVectorFst * t1,
 				   StdVectorFst * t2);
       static StdVectorFst * concatenate(StdVectorFst * t1,
@@ -179,6 +180,8 @@ namespace implementations
       
       static bool are_equivalent(StdVectorFst *one, StdVectorFst *another);
       static bool is_cyclic(StdVectorFst * t);
+      
+      static FdTable<int64>* get_flag_diacritics(StdVectorFst * t);
 
       static StdVectorFst * insert_freely(StdVectorFst * t, const StringPair &symbol_pair);
       static StdVectorFst * substitute(StdVectorFst * t, std::string old_symbol, std::string new_symbol);

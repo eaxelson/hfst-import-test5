@@ -41,4 +41,24 @@ bool FdOperation::is_diacritic(const std::string& diacritic_string)
   return true;
 }
 
+std::string::size_type FdOperation::find_diacritic(const std::string& diacritic_str, 
+                                                 std::string::size_type& length)
+{
+  std::string::size_type start = diacritic_str.find('@');
+  if(start != std::string::npos)
+  {
+    std::string::size_type end = diacritic_str.find('@', start+1);
+    if(end != std::string::npos)
+    {
+      if(is_diacritic(diacritic_str.substr(start, end-start)))
+      {
+        length = end-start;
+        return start;
+      }
+    }
+  }
+  return std::string::npos;
+
+}
+
 }

@@ -187,5 +187,17 @@ namespace hfst { namespace implementations
   
   bool HfstOlTransducer::is_cyclic(hfst_ol::Transducer* t)
   { return t->get_header().probe_flag(hfst_ol::Cyclic); }
+  
+  FdTable<hfst_ol::SymbolNumber>* HfstOlTransducer::get_flag_diacritics(hfst_ol::Transducer* t)
+  {
+    FdTable<hfst_ol::SymbolNumber>* table = new FdTable<hfst_ol::SymbolNumber>();
+    const hfst_ol::SymbolTable& symbols = t->get_alphabet().get_symbol_table();
+    for(size_t i=0; i<symbols.size(); i++)
+    {
+      if(FdOperation::is_diacritic(symbols[i]))
+        table->define_diacritic(i, symbols[i]);
+    }
+    return table;
+  }
 
 } }

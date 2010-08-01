@@ -1,7 +1,7 @@
 #ifndef _FLAG_DIACRITICS_H_
 #define _FLAG_DIACRITICS_H_
 
-
+#include <iostream>
 #include <string>
 #include <map>
 #include <vector>
@@ -30,6 +30,15 @@ namespace hfst {
     FdValue Value(void) const { return value; }
     std::string Name(void) const { return name; }
     
+    void display() const
+    {
+      std::cout << "FdOperation (" << this << "):" << std::endl
+                << "  op: " << op << std::endl
+                << "  feature: " << feature << std::endl
+                << "  value: " << value << std::endl
+                << "  name: " << name << std::endl;
+    }
+    
     static FdOperator char_to_operator(char c)
     {
       switch (c) {
@@ -45,6 +54,8 @@ namespace hfst {
     }
     
     static bool is_diacritic(const std::string& diacritic_str);
+    static std::string::size_type find_diacritic(const std::string& diacritic_str,
+                                                 std::string::size_type& length);
   };
 
   template<class T> class FdState;
@@ -61,6 +72,7 @@ namespace hfst {
     std::map<std::string, FdValue> value_map;
     
     std::map<T, FdOperation> operations;
+    std::map<std::string, T> symbol_map;
    public:
     FdTable(): feature_map(), value_map()
       { value_map[std::string()] = 0; } // empty value = neutral
@@ -92,8 +104,11 @@ namespace hfst {
       
       if(feature_map.count(feat) == 0)
       {
+        std::cout << "[feature_map.size(): " << feature_map.size() << "]" << std::endl;
         FdFeature next = feature_map.size();
         feature_map[feat] = next;
+        std::cout << "[Added " << feat << " as " << next << "]" << std::endl;
+        std::cout << "[feature_map.size(): " << feature_map.size() << "]" << std::endl;
       }
       if(value_map.count(val) == 0)
       {
@@ -102,9 +117,13 @@ namespace hfst {
       }
       
       operations.insert(std::pair<T,FdOperation>(symbol, FdOperation(op, feature_map[feat], value_map[val], str)));
+      symbol_map.insert(std::pair<std::string,T>(str, symbol));
+      std::cout << "Defined the following diacritic to symbol " << symbol << " (table: " << this << ")" << std::endl;
+      operations.find(symbol)->second.display();
+      std::cout << "  num_features is now " << num_features() << std::endl;
     }
     
-    bool num_features() const { return feature_map.size(); }
+    FdFeature num_features() const { return feature_map.size(); }
     bool is_diacritic(T symbol) const
       { return operations.find(symbol) != operations.end(); }
       
@@ -115,6 +134,10 @@ namespace hfst {
       //return (i==operations.end()) ? NULL : &(i->second);
       return (operations.find(symbol)==operations.end()) ? NULL : &(operations.find(symbol)->second);
     }
+    const FdOperation* get_operation(const std::string& symbol) const
+    {
+      return (symbol_map.find(symbol)==symbol_map.end()) ? NULL : get_operation(symbol_map.find(symbol)->second);
+    }
     
     bool is_valid_string(const std::vector<T>& symbols) const
     {
@@ -123,7 +146,27 @@ namespace hfst {
       for(size_t i=0; i<symbols.size(); i++)
       {
         if(!state.apply_operation(symbols[i]))
-          return false;
+          break;
+      }
+      return !state.fails();
+    }
+    
+    bool is_valid_string(const std::string& str) const
+    {
+      FdState<T> state(*this);
+      std::string remaining(str);
+      std::string::size_type length;
+      
+      while(true)
+      {
+        std::string::size_type next_diacritic_pos = FdOperation::find_diacritic(remaining, length);
+        if(next_diacritic_pos = std::string::npos)
+          break;
+        
+        std::string diacritic = remaining.substr(0, length);
+        if(!state.apply_operation(diacritic))
+          break;
+        remaining = remaining.substr(length);
       }
       return !state.fails();
     }
@@ -136,20 +179,31 @@ namespace hfst {
   class FdState
   {
    private:
-    const FdTable<T>& table;
+    const FdTable<T>* table;
     
     // This is indexed with values of type FdFeature
     std::vector<FdValue> values;
     
     bool error_flag;
    public:
-    FdState(const FdTable<T>& table):
-      table(table), values(table.num_features()), error_flag(false) {}
-    FdState(const FdState& o):
-      table(o.table), values(o.values), error_flag(o.error_flag) {}
+    FdState(const FdTable<T>& t):
+      table(&t), values(table->num_features()), error_flag(false)
+    {
+      std::cout << "Creating a new FdState with size of " << values.size() << " (table: " << table << ")" << std::endl;
+    }
+    
+    const FdTable<T>& get_table() const {return *table;}
     
     bool apply_operation(const FdOperation& op)
     {
+      std::cout << "In apply_operation." << std::endl
+                << "  table->num_features: " << table->num_features() << std::endl
+                << "  values.size: " << values.size() << std::endl
+                << "  op.Operator(): " << op.Operator() << std::endl
+                << "  op.Feature(): " << op.Feature() << std::endl
+                << "  op.Value(): " << op.Value() << std::endl
+                << "  op.Name(): " << op.Name() << std::endl
+                << "  values[feature]: " << values[op.Feature()] << std::endl;
       switch(op.Operator()) {
         case Pop: // positive set
           values[op.Feature()] = op.Value();
@@ -192,10 +246,17 @@ namespace hfst {
     
     bool apply_operation(T symbol)
     {
-      const FdOperation* op = table.get_operation(symbol);
+      const FdOperation* op = table->get_operation(symbol);
       if(op)
         return apply_operation(*op);
       return true; // if the symbol isn't a diacritic
+    }
+    bool apply_operation(const std::string& symbol)
+    {
+      const FdOperation* op = table->get_operation(symbol);
+      if(op)
+        return apply_operation(*op);
+      return true;
     }
     
     bool fails() const {return error_flag;}
@@ -203,7 +264,7 @@ namespace hfst {
     {
       error_flag = false;
       values.clear();
-      values.insert(values.begin(), table.num_features(), 0);
+      values.insert(values.begin(), table->num_features(), 0);
     }
   };
 }

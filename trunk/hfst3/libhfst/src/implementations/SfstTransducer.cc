@@ -733,9 +733,9 @@ namespace hfst { namespace implementations {
   { t->complete_alphabet();
     return &t->upper_level(); }
   
-  void SfstTransducer::extract_strings(Transducer * t, hfst::WeightedPaths<float>::Set &results)
+  void SfstTransducer::extract_strings(Transducer * t, hfst::WeightedPaths<float>::Set &results, FdTable<SFST::Character>* fd, bool filter_fd)
   {
-    t->generate_hfst(results, true);
+    t->generate_hfst(results, fd, filter_fd, true);
   }
 
   Transducer * SfstTransducer::insert_freely(Transducer * t, const StringPair &symbol_pair)
@@ -787,6 +787,17 @@ namespace hfst { namespace implementations {
   bool SfstTransducer::is_cyclic(Transducer * t)
   {
     return t->is_cyclic();
+  }
+  
+  FdTable<SFST::Character>* SfstTransducer::get_flag_diacritics(Transducer * t)
+  {
+    FdTable<SFST::Character>* table = new FdTable<SFST::Character>();
+    SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
+    for (SFST::Alphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++) {
+      if(FdOperation::is_diacritic(it->second))
+        table->define_diacritic(it->first, it->second);
+    }
+    return table;
   }
 
     /*

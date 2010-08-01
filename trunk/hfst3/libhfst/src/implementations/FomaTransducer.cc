@@ -502,6 +502,19 @@ namespace hfst { namespace implementations {
   {
     return (t->pathcount == PATHCOUNT_CYCLIC);
   }
+  
+  FdTable<int>* FomaTransducer::get_flag_diacritics(fsm * t)
+  {
+    FdTable<int>* table = new FdTable<int>();
+    for(struct sigma* p = t->sigma; p!=NULL; p=p->next)
+    {
+      if (p->symbol == NULL)
+        break;
+      if(FdOperation::is_diacritic(p->symbol))
+        table->define_diacritic(p->number, p->symbol);
+    }
+    return table;
+  }
 
     /*
   FomaStateIterator::FomaStateIterator(fsm * t):

@@ -11,6 +11,7 @@
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "HfstExceptions.h"
+#include "FlagDiacritics.h"
 #include "SFST/src/fst.h"
 #include <cstdio>
 #include <string>
@@ -91,7 +92,7 @@ namespace hfst { namespace implementations
       static Transducer * reverse(Transducer * transducer);
       static Transducer * extract_input_language(Transducer * t);
       static Transducer * extract_output_language(Transducer * t);
-      static void extract_strings(Transducer * t, hfst::WeightedPaths<float>::Set &results);
+      static void extract_strings(Transducer * t, hfst::WeightedPaths<float>::Set &results, FdTable<SFST::Character>* fd=NULL, bool filter_fd=false);
 
       static Transducer * insert_freely(Transducer *t , const StringPair &symbol_pair);
       static Transducer * substitute(Transducer * t, String old_symbol, String new_symbol);
@@ -110,6 +111,8 @@ namespace hfst { namespace implementations
 
       static bool are_equivalent(Transducer * t1, Transducer * t2);
       static bool is_cyclic(Transducer * t);
+      
+      static FdTable<SFST::Character>* get_flag_diacritics(Transducer * t);
 
       static void print_test(Transducer *t);
 
