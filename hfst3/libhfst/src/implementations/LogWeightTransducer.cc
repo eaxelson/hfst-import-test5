@@ -1049,7 +1049,7 @@ namespace hfst { namespace implementations
   */
 
 
-  void extract_reversed_strings
+  /*void extract_reversed_strings
   (LogFst * t, LogArc::StateId s,
    WeightedPaths<float>::Vector &reversed_results, set<StateId> &states_visited)
   {
@@ -1081,19 +1081,85 @@ namespace hfst { namespace implementations
 				   ("","",t->Final(s).Value())); }
 
     states_visited.erase(s);
+  }*/
+  
+  void extract_strings
+  (LogFst * t, LogArc::StateId s,
+   WeightedPaths<float>::Vector &results, set<StateId> &states_visited,
+   std::vector<hfst::FdState<int64> >* fd_state_stack, bool filter_fd)
+  {
+    if (states_visited.find(s) == states_visited.end())
+      states_visited.insert(s);
+    else
+      throw TransducerIsCyclicException();
+    
+    if(t->Final(s) != LogWeight::Zero())
+      results.push_back(WeightedPath<float>("","",t->Final(s).Value()));
+    
+    for(fst::ArcIterator<LogFst> it(*t,s); !it.Done(); it.Next())
+    {
+      const LogArc &arc = it.Value();
+      
+      std::string istring;
+      std::string ostring;
+      bool added_fd_state = false;
+      
+      if(fd_state_stack != NULL)
+      {
+        if(fd_state_stack->back().get_table().get_operation(arc.ilabel) != NULL)
+        {
+          fd_state_stack->push_back(fd_state_stack->back());
+          if(fd_state_stack->back().apply_operation(arc.ilabel))
+            added_fd_state = true;
+          else {
+            fd_state_stack->pop_back();
+            continue; // don't follow the transition
+          }
+        }
+      }
+      
+      if(arc.ilabel != 0 && (!filter_fd || fd_state_stack->back().get_table().get_operation(arc.ilabel)==NULL))
+        istring = t->InputSymbols()->Find(arc.ilabel);
+      if(arc.olabel != 0 && (!filter_fd || fd_state_stack->back().get_table().get_operation(arc.olabel)==NULL))
+        ostring = t->InputSymbols()->Find(arc.olabel);
+      WeightedPath<float> arc_string(istring,ostring,arc.weight.Value());
+      
+      WeightedPaths<float>::Vector continuations;
+      extract_strings(t,arc.nextstate,continuations,states_visited,fd_state_stack,filter_fd);
+      WeightedPaths<float>::add(arc_string, continuations);
+      results.insert(results.end(),continuations.begin(), continuations.end());
+      
+      if(added_fd_state)
+        fd_state_stack->pop_back();
+    }
+    
+    states_visited.erase(s);
   }
 
 
   void LogWeightTransducer::extract_strings
-  (LogFst * t, WeightedPaths<float>::Set &results)
+  (LogFst * t, WeightedPaths<float>::Set &results, FdTable<int64>* fd, bool filter_fd)
   {
     if (t->Start() == -1)
       { return; }
-    WeightedPaths<float>::Vector reversed_results;
+    WeightedPaths<float>::Vector results_vec;
     set<StateId> states_visited;
-    extract_reversed_strings(t,t->Start(),reversed_results, states_visited);
-    //WeightedStrings<float>::reverse_strings(reversed_results);
-    results.insert(reversed_results.begin(),reversed_results.end());
+    std::vector<hfst::FdState<int64> >* fd_state_stack = (fd==NULL) ? NULL : new std::vector<hfst::FdState<int64> >(1, hfst::FdState<int64>(*fd));
+    
+    hfst::implementations::extract_strings(t,t->Start(),results_vec,states_visited,fd_state_stack,filter_fd);
+    results.insert(results_vec.begin(),results_vec.end());
+  }
+  
+  FdTable<int64>* LogWeightTransducer::get_flag_diacritics(LogFst * t)
+  {
+    FdTable<int64>* table = new FdTable<int64>();
+    fst::SymbolTable* symbols = t->InputSymbols();
+    for(fst::SymbolTableIterator it=fst::SymbolTableIterator(*symbols); !it.Done(); it.Next())
+    {
+      if(FdOperation::is_diacritic(it.Symbol()))
+        table->define_diacritic(it.Value(), it.Symbol());
+    }
+    return table;
   }
   
   }

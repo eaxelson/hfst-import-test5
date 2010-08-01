@@ -554,6 +554,13 @@ fclose(ifile);
 	In the case of a cyclic transducer, use #n_best instead. 
 	@see #n_best */
     void extract_strings(WeightedPaths<float>::Set &results);
+    
+    /** \brief Store to \a results string pairs that are recognized by the transducer
+               and are not invalidated by flag diacritic rules, optionally filtering
+               the flag diacritics themselves out of the result strings
+  The same conditions that apply for the extract_strings function apply also for this one.
+  @see extract_strings */
+    void extract_strings_fd(WeightedPaths<float>::Set &results, bool filter_fd=true);
 
     /** \brief Freely insert symbol pair \a symbol_pair into the transducer. */
 

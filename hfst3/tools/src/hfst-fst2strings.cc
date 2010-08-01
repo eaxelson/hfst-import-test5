@@ -46,6 +46,8 @@ using hfst::WeightedPath;
 static int nbest_strings=-1;
 // print each string at most once
 static bool display_weights=false;
+static bool eval_fd=false;
+static bool filter_fd=false;
 
 void
 print_usage()
@@ -61,10 +63,12 @@ print_usage()
 		);
 #               endif
 	
-	fprintf(message_out, "%-35s%s", "  -o, --output=OUTFILE",    "Write results to OUTFILE\n");
-	fprintf(message_out, "%-35s%s", "  -i, --input=INFILE",      "Read input from INFILE\n");
-	fprintf(message_out, "%-35s%s", "  -n, --nbest=INT",         "The maximum number of strings printed\n");
-	fprintf(message_out, "%-35s%s", "  -w, --print-weights",     "Display the weight for each string\n");
+	fprintf(message_out, "%-35s%s", "  -o, --output=OUTFILE",        "Write results to OUTFILE\n");
+	fprintf(message_out, "%-35s%s", "  -i, --input=INFILE",          "Read input from INFILE\n");
+	fprintf(message_out, "%-35s%s", "  -n, --nbest=INT",             "The maximum number of strings printed\n");
+	fprintf(message_out, "%-35s%s", "  -w, --print-weights",         "Display the weight for each string\n");
+	fprintf(message_out, "%-35s%s", "  -e, --eval-flag-diacritics",  "Only print strings with pass flag diacritic checks\n");
+	fprintf(message_out, "%-35s%s", "  -f, --filter-flag-diacritics","Don't print flag diacritic symbols (only with -e)\n");
 	fprintf(message_out, "\n");
 	print_common_unary_program_parameter_instructions(message_out);
 	/*fprintf(message_out,
@@ -107,10 +111,12 @@ parse_options(int argc, char** argv)
 		  ,
 			{"nbest", required_argument, 0, 'n'},
 			{"print-weights", no_argument, 0, 'w'},
+			{"eval-flag-diacritics", no_argument, 0, 'e'},
+			{"filter-flag-diacritics", no_argument, 0, 'f'},
 			{0,0,0,0}
 		};
 		int option_index = 0;
-		char c = getopt_long(argc, argv, "R:dhi:n:o:qsvVw",
+		char c = getopt_long(argc, argv, "R:dhi:n:o:qsvVwef",
 							 long_options, &option_index);
 		if (-1 == c)
 		{
@@ -127,6 +133,18 @@ parse_options(int argc, char** argv)
 		case 'w':
 			display_weights = true;
 			break;
+		case 'e':
+		  eval_fd = true;
+		  break;
+		case 'f':
+		  if(!eval_fd)
+		  {
+		    fprintf(message_out, "Option -f must be used in conjunction with -e\n");
+		    print_short_help(argv[0]);
+		    return EXIT_FAILURE;
+		  }
+		  filter_fd = true;
+		  break;
 		case '?':
 			fprintf(message_out, "invalid option --%s\n",
 					long_options[option_index].name);
@@ -214,7 +232,10 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
     }
     
     WeightedPaths<float>::Set results;
-    t.extract_strings(results);
+    if(eval_fd)
+      t.extract_strings_fd(results, filter_fd);
+    else
+      t.extract_strings(results);
     
     for(WeightedPaths<float>::Set::const_iterator it = results.begin(); it != results.end(); it++)
 	  {

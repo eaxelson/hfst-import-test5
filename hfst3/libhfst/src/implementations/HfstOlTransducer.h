@@ -13,6 +13,7 @@
 #include <iostream>
 #include <fstream>
 #include "HfstExceptions.h"
+#include "FlagDiacritics.h"
 #include "optimized-lookup/transducer.h"
 
 namespace hfst { namespace implementations
@@ -73,6 +74,8 @@ namespace hfst { namespace implementations
     static hfst_ol::Transducer * create_empty_transducer(bool weighted);
     
     static bool is_cyclic(hfst_ol::Transducer* t);
+    
+    static FdTable<hfst_ol::SymbolNumber>* get_flag_diacritics(hfst_ol::Transducer* t);
   };
   
 } }

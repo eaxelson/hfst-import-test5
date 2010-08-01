@@ -673,6 +673,48 @@ void HfstTransducer::test_minimize()
 	break;
       }
   }
+  
+  void HfstTransducer::extract_strings_fd(WeightedPaths<float>::Set &results, bool filter_fd)
+  {
+    switch (this->type)
+      {
+      case LOG_OFST_TYPE:
+      {
+  FdTable<int64>* t_log_ofst = hfst::implementations::LogWeightTransducer::get_flag_diacritics(implementation.log_ofst);
+	hfst::implementations::LogWeightTransducer::extract_strings
+	  (implementation.log_ofst,results,t_log_ofst,filter_fd);
+  delete t_log_ofst;
+      }
+	break;
+      case TROPICAL_OFST_TYPE:
+      {
+  FdTable<int64>* t_tropical_ofst = hfst::implementations::TropicalWeightTransducer::get_flag_diacritics(implementation.tropical_ofst);
+	hfst::implementations::TropicalWeightTransducer::extract_strings
+	  (implementation.tropical_ofst,results,t_tropical_ofst,filter_fd);
+  delete t_tropical_ofst;
+      }
+	break;
+      case SFST_TYPE:
+      {
+  FdTable<SFST::Character>* t_sfst = hfst::implementations::SfstTransducer::get_flag_diacritics(implementation.sfst);
+	hfst::implementations::SfstTransducer::extract_strings(implementation.sfst, results, t_sfst, filter_fd);
+  delete t_sfst;
+      }
+	break;
+      case FOMA_TYPE:
+	{
+	  HfstTransducer tc = convert(*this, FOMA_TYPE);
+	  FdTable<int64>* t_tropical_ofst = hfst::implementations::TropicalWeightTransducer::get_flag_diacritics(tc.implementation.tropical_ofst);
+	  hfst::implementations::TropicalWeightTransducer::extract_strings
+	    (tc.implementation.tropical_ofst,results,t_tropical_ofst,filter_fd);
+    delete t_tropical_ofst;  
+	  break;
+	}
+      default:
+	throw hfst::exceptions::FunctionNotImplementedException(); 
+	break;
+      }
+  }
 
   HfstTransducer &HfstTransducer::insert_freely(const StringPair &symbol_pair)
   {

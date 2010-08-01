@@ -12,6 +12,7 @@
 
 #include "SymbolDefs.h"
 #include "HfstExceptions.h"
+#include "FlagDiacritics.h"
 #include <stdbool.h>  // foma uses _Bool
 #include "foma/fomalib.h"
 #include "zlib.h"
@@ -102,6 +103,9 @@ namespace hfst {
 			     fsm * t2);
       static fsm * subtract(fsm * t1,
 			    fsm * t2);
+			
+			static FdTable<int>* get_flag_diacritics(fsm * t);
+			
       static void delete_foma(fsm * net);
       static void print_test(fsm * t);
     };

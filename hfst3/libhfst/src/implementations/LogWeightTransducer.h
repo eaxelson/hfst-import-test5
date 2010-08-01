@@ -12,6 +12,7 @@
 
 #include "SymbolDefs.h"
 #include "HfstExceptions.h"
+#include "FlagDiacritics.h"
 #include <fst/fstlib.h>
 #include "LogFstTrieFunctions.h"
 #include "ExtractStrings.h"
@@ -240,7 +241,8 @@ namespace hfst { namespace implementations
       static std::pair<LogFst*, LogFst*> harmonize(StdVectorFst *t1, StdVectorFst *t2);
       //static void print(LogFst * t, KeyTable &key_table, ostream &out);
       static void extract_strings(LogFst * t,
-				  WeightedPaths<float>::Set &results);
+				  WeightedPaths<float>::Set &results, FdTable<int64>* fd=NULL, bool filter_fd=false);
+			static FdTable<int64>* get_flag_diacritics(LogFst * t);
       static void print_test(LogFst *t);
 
     private:

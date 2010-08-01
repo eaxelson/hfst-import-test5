@@ -113,7 +113,8 @@ bool Transducer::generate( FILE *file, bool separate  )
 /*******************************************************************/
 
 bool Transducer::generate_hfst1( Node *node, Node2Int &visitations, char *buffer,
-				 int pos, char *buffer2, int pos2, hfst::WeightedPaths<float>::Set &results)
+				 int pos, char *buffer2, int pos2, hfst::WeightedPaths<float>::Set &results,
+				 std::vector<hfst::FdState<Character> >* fd_state_stack, bool filter_fd)
 {
   bool result = false;
 
@@ -162,17 +163,35 @@ bool Transducer::generate_hfst1( Node *node, Node2Int &visitations, char *buffer
     int p = pos;
     int p2 = pos2;
     Label l = arc[i]->label();
+    bool added_fd_state = false;
+    
+    if (fd_state_stack) {
+      if(fd_state_stack->back().get_table().get_operation(l.lower_char()) != NULL) {
+        fd_state_stack->push_back(fd_state_stack->back());
+        if(fd_state_stack->back().apply_operation(l.lower_char()))
+          added_fd_state = true;
+        else {
+          fd_state_stack->pop_back();
+          continue; // don't follow the transition
+        }
+      }
+    }
+    
     if (buffer2) {
       Character lc=l.lower_char();
       Character uc=l.upper_char();
-      if (lc != Label::epsilon)
+      if (lc != Label::epsilon && (!filter_fd || fd_state_stack->back().get_table().get_operation(lc)==NULL))
 	alphabet.write_char(lc, buffer, &p );
-      if (uc != Label::epsilon)
+      if (uc != Label::epsilon && (!filter_fd || fd_state_stack->back().get_table().get_operation(uc)==NULL))
 	alphabet.write_char(uc, buffer2, &p2 );
-    } else
-      alphabet.write_label(l, buffer, &p );
+    } else {
+      if(!filter_fd || fd_state_stack->back().get_table().get_operation(l.lower_char())==NULL)
+        alphabet.write_label(l, buffer, &p );
+    }
     result |= generate_hfst1( arc[i]->target_node(), visitations, 
-			 buffer, p, buffer2, p2, results);
+			 buffer, p, buffer2, p2, results, fd_state_stack, filter_fd);
+    if(added_fd_state)
+      fd_state_stack->pop_back();
   }
   return result;
 }
@@ -184,19 +203,19 @@ bool Transducer::generate_hfst1( Node *node, Node2Int &visitations, char *buffer
 /*                                                                 */
 /*******************************************************************/
 
-bool Transducer::generate_hfst( hfst::WeightedPaths<float>::Set &results, bool separate)
+bool Transducer::generate_hfst( hfst::WeightedPaths<float>::Set &results, hfst::FdTable<Character>* fd, bool filter_fd, bool separate)
 
 {
   bool result;
   char buffer[BUFFER_SIZE];
   Node2Int visitations;
-
+  std::vector<hfst::FdState<Character> >* fd_state_stack = (fd==NULL) ? NULL : new std::vector<hfst::FdState<Character> >(1, hfst::FdState<Character>(*fd));
   if (separate) {
     char buffer2[BUFFER_SIZE];
-    result = generate_hfst1( root_node(), visitations, buffer, 0, buffer2, 0, results);
+    result = generate_hfst1( root_node(), visitations, buffer, 0, buffer2, 0, results, fd_state_stack, filter_fd);
   }
   else
-    result = generate_hfst1( root_node(), visitations, buffer, 0, NULL, 0, results );
+    result = generate_hfst1( root_node(), visitations, buffer, 0, NULL, 0, results, fd_state_stack, filter_fd);
 
   return result;
 }
