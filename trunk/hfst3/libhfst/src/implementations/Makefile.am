@@ -19,7 +19,7 @@ AUTOMAKE_OPTIONS=subdir-objects
 noinst_LTLIBRARIES=libhfstimplementations.la
 # HFST bridge specific stuff
 IMPLEMENTATION_SRCS= \
-	HfstTokenizer.cc ConvertTransducerFormat.cc # GlobalSymbolTable.cc SymbolDefs.cc
+	HfstTokenizer.cc ConvertTransducerFormat.cc FlagDiacritics.cc # GlobalSymbolTable.cc SymbolDefs.cc
 
 # the bridges
 if WANT_SFST
@@ -74,7 +74,7 @@ implincludedir = $(hfstincludedir)/implementations
 
 implinclude_HEADERS = \
 		ConvertTransducerFormat.h \
-		ExtractStrings.h FomaTransducer.h HfstExceptions.h \
+		ExtractStrings.h FlagDiacritics.h FomaTransducer.h HfstExceptions.h \
 		HfstTokenizer.h LogFstTrieFunctions.h LogWeightTransducer.h \
 		SfstTransducer.h TropicalWeightTransducer.h HfstOlTransducer.h # GlobalSymbolTable.h SymbolDefs.h
 
