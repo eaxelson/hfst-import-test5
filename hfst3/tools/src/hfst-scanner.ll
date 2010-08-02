@@ -168,7 +168,7 @@ FN	[A-Za-z0-9._/\-*+]
 
 \\[0-9]+          { long l=atol(yytext+1); 
 		    if (l <= 1114112) { yylval.value=fst_strdup(int2utf8((unsigned)l)); return UTF8CHAR; }
-		    yyerror("invalid expression");
+		    yyerror(strdup("invalid expression"));
                   }
 
 

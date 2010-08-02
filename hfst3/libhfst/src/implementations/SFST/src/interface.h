@@ -54,6 +54,10 @@ Range *rsvar_value( char *name );
 Character character_code( unsigned int uc );
 Character symbol_code( char *s );
 
+// added to h file
+bool in_range( unsigned int c, Range *r ); // static removed
+Transducer *make_transducer( Range *r1, Range *r2 );  // static removed
+
 Range *add_value( Character, Range*);
 Range *add_var_values( char *name, Range*);
 Range *add_values( unsigned int, unsigned int, Range*);

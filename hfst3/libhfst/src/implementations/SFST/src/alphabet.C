@@ -379,7 +379,6 @@ void Alphabet::copy( const Alphabet &a )
     ls.insert( *it );
 }
 
-
 /*******************************************************************/
 /*                                                                 */
 /*  Alphabet::compose                                              */

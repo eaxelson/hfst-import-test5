@@ -72,7 +72,7 @@ HfstTransducer * Result;
 %left '*' '+'
 %%
 
-ALL:        ASSIGNMENTS RE NEWLINES { Result=HfstCompiler::result($2, Switch); }
+ALL:        ASSIGNMENTS RE NEWLINES { printf("Result is called...\n"); Result=HfstCompiler::result($2, Switch); }
           ;
 
 ASSIGNMENTS: ASSIGNMENTS ASSIGNMENT {}
@@ -105,7 +105,7 @@ RE:       //   RE ARROW CONTEXTS2      { $$ = restriction($1,$2,$3,0); }
           | '{' RANGES '}' ':' RANGE { $$ = HfstCompiler::make_mapping($2,add_range($5,NULL),type); }
           // | RE INSERT CODE ':' CODE  { $$ = freely_insert($1, $3, $5); }
           // | RE INSERT CODE           { $$ = freely_insert($1, $3, $3); }
-          | RANGE ':' RANGE  { $$ = HfstCompiler::new_transducer($1,$3,type); }
+          | RANGE ':' RANGE  { $$ = HfstCompiler::new_transducer($1,$3,type); cerr << *$$; }
           | RANGE            { $$ = HfstCompiler::new_transducer($1,$1,type); }
           // | VAR              { $$ = var_value($1); }
           // | RVAR             { $$ = rvar_value($1); }

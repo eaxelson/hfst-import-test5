@@ -17,7 +17,7 @@
 
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib
-AM_CXXFLAGS = $(WERR_CFLAGS)
+#AM_CXXFLAGS = $(WERR_CFLAGS)
 
 if WANT_COMPARE
 MAYBE_COMPARE=hfst-compare
@@ -200,7 +200,7 @@ hfst_symbols_SOURCES=hfst-symbols.cc $(HFST_COMMON_SRC)
 hfst_tail_SOURCES=hfst-tail.cc $(HFST_COMMON_SRC)
 hfst_txt2fst_SOURCES=hfst-txt2fst.cc $(HFST_COMMON_SRC)
 hfst_substitute_SOURCES=hfst-substitute.cc $(HFST_COMMON_SRC)
-hfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy $(HFST_COMMON_SRC)
+hfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy # $(HFST_COMMON_SRC)
 
 hwfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy $(HFST_COMMON_SRC)
 hfst_optimized_lookup_SOURCES=hfst-optimized-lookup.cc
