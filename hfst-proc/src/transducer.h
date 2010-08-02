@@ -222,9 +222,10 @@ class TransducerAlphabet
   {return fd_table.is_diacritic(symbol);}
   
   bool is_punctuation(const char* c) const;
+  bool is_space(const char* c) const;
   
   bool is_alphabetic(const char* c) const
-  { return (c[0]!='\0' && !isspace(c[0]) && 
+  { return (c[0]!='\0' && !is_space(c) && 
             !is_punctuation(c)); }
   bool is_alphabetic(SymbolNumber symbol) const 
   {return symbol_table[symbol].alphabetic;}
