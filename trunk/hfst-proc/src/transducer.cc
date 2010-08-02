@@ -438,6 +438,15 @@ TransducerAlphabet::is_punctuation(const char* c) const
   return (strstr(individual_chars, c) != NULL);
 }
 
+bool TransducerAlphabet::is_space(const char* c) const
+{
+  // http://en.wikipedia.org/w/index.php?title=Space_%28punctuation%29&oldid=376453673#Table_of_spaces
+  static const char* space_chars = "   ᠎         ​‌‍  ⁠　﻿";
+  if(isspace(c[0]))
+    return true;
+  return (strstr(space_chars, c) != NULL);
+}
+
 bool
 TransducerAlphabet::is_tag(SymbolNumber symbol) const
 {
