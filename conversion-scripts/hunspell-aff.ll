@@ -7,15 +7,6 @@
 
 #include "hunspell-aff.tab.hh"
 
-static
-void
-skip_spaces(char **s)
-{
-    while ((**s != '\0') && (isspace(**s)))
-      {
-        *s++;
-      }
-}
 %}
 
 /* c.f. Unicode Standard 5.1 D92 Table 3-7 */
@@ -59,6 +50,8 @@ CONTCHAR [^\t\n\r /]
 UNINR {U8H}|[\x21-\x22\x24-\x29\x2b-\x2e\x30-\x7e]
 /* any unicode char except space */
 UNI {U8H}|[\x21-\x7e]
+/* any non-reserved */
+NR {UNINR}|[\x7f-\xff]
 
 %%
 
@@ -96,30 +89,50 @@ UNI {U8H}|[\x21-\x7e]
     return KEY_LINE;
 }
 
-^"PFX"{LWSP}+.{LWSP}+("Y"|"N"){LWSP}+{NUMBER}{LWSP}*$ {
-    char* s = strdup(yytext + 8);
-    char* end = yytext;
-    yylval.number = strtoul(s, &end, 10);
-    if (*end != '\0')
+^"PFX"{LWSP}+{NR}+{LWSP}+("Y"|"N"){LWSP}+{NUMBER}{LWSP}*$ {
+    char* s = strdup(yytext+4);
+    while (*s != '\0')
     {
-        fprintf(stderr, "Junk at the end of PFX line: %s\n", end);
+        s += 1;
     }
+    s -= 1;
+    while (isspace(*s))
+    {
+        s -= 1;
+    }
+    while (isdigit(*s))
+    {
+        s -= 1;
+    }
+    s += 1;
+    char* end = s;
+    yylval.number = strtoul(s, &end, 10);
     return PFX_FIRSTLINE;
 }
 
 
-^"SFX"{LWSP}+.{LWSP}+("Y"|"N"){LWSP}+{NUMBER}{LWSP}*$ {
-    char* s = strdup(yytext + 8);
-    char* end = yytext;
-    yylval.number = strtoul(s, &end, 10);
-    if (*end != '\0')
+^"SFX"{LWSP}+{NR}+{LWSP}+("Y"|"N"){LWSP}+{NUMBER}{LWSP}*$ {
+    char* s = strdup(yytext+4);
+    while (*s != '\0')
     {
-        fprintf(stderr, "Junk at the end of SFX line: %s\n", end);
+        s += 1;
     }
+    s -= 1;
+    while (isspace(*s))
+    {
+        s -= 1;
+    }
+    while (isdigit(*s))
+    {
+        s -= 1;
+    }
+    s += 1;
+    char* end = s;
+    yylval.number = strtoul(s, &end, 10);
     return SFX_FIRSTLINE;
 }
 
-^"PFX"{LWSP}+{UNINR}+ {
+^"PFX"{LWSP}+{NR}+ {
     char* s = yytext + 4;
     while (isspace(*s))
     {
@@ -129,7 +142,7 @@ UNI {U8H}|[\x21-\x7e]
     return PFX_LEADER;
 }
 
-^"SFX"{LWSP}+{UNINR}+. {
+^"SFX"{LWSP}+{NR}+ {
     char* s = yytext + 4;
     while (isspace(*s))
     {
@@ -139,10 +152,13 @@ UNI {U8H}|[\x21-\x7e]
     return SFX_LEADER;
 }
 
-^"FLAG"{WSP}+{UNI}+$ {
-    char* s = strdup(yytext + 3);
-    skip_spaces(&s);
-    yylval.string = s;
+^"FLAG"{WSP}+{UNINR}+$ {
+    char* s = yytext + 4;
+    while (isspace(*s))
+    {
+        s += 1;
+    }
+    yylval.string = strdup(s);
     return FLAG_LINE;
 }
 
@@ -153,7 +169,7 @@ UNI {U8H}|[\x21-\x7e]
     return AF_COUNT;
 }
 
-^"AF "[^# \t\r\n]+ {
+^"AF "{NR}+ {
     yylval.string = strdup(yytext + 3);
     return AF_LINE;
 }
@@ -165,7 +181,7 @@ UNI {U8H}|[\x21-\x7e]
     return AM_COUNT;
 }
 
-^"AM "[^#\t\n\r]+ {
+^"AM ".*$ {
     return AM_LINE;
 }
 
@@ -176,36 +192,36 @@ UNI {U8H}|[\x21-\x7e]
     return COMPOUNDMIN_LINE;
 }
 
-^"COMPOUNDFLAG ". {
+^"COMPOUNDFLAG "{NR}+ {
     yylval.string = strdup(yytext + 13);
     return COMPOUNDFLAG_LINE;
 }
 
-^"COMPOUNDBEGIN ". {
+^"COMPOUNDBEGIN "{NR}+ {
     yylval.string = strdup(yytext + 14);
     return COMPOUNDBEGIN_LINE;
 }
 
-^"COMPOUNDEND ". {
+^"COMPOUNDEND "{NR}+ {
     yylval.string = strdup(yytext + 13);
     return COMPOUNDEND_LINE;
 }
 
-^"COMPOUNDMIDDLE ". {
+^"COMPOUNDMIDDLE "{NR}+ {
     yylval.string = strdup(yytext + 16);
     return COMPOUNDMIDDLE_LINE;
 }
 
-^"CIRCUMFIX ". {
+^"CIRCUMFIX "{NR}+ {
     yylval.string = strdup(yytext + 10);
     return CIRCUMFIX_LINE;
 }
 
-^("NOSUGGEST "|"ONLYINCOMPOUND "|"COMPOUNDRULE "|"WORDCHARS "|"PHONE "|"NAME "|"LANG "|"HOME "|"VERSION "|"COMPOUNDSYLLABLE "|"SYLLABLENUM "|"KEEPCASE "|"COMPOUNDFORBIDFLAG "|"COMPOUNDPERMITFLAG "|"COMPOUNDPERMITFLAG "|"COMPOUNDFIRST "|"COMPOUNDLAST "|"ONLYROOT "|"HU_KOTOHANGZO "|"NEEDAFFIX "|"ONLYINCOMPOUND "|"COMPOUNDWORDMAX "|"COMPOUNDROOT "|"CHECKCOMPOUND"|"FORBIDDENWORD "|"SUBSTANDARD "|"GENERATE "|"LEMMA_PRESENT "|"MAP "|"BREAK "|"CHECKSHARPS"|"NOSPLITSUGS"|"SIMPLIFIEDTRIPLE"|"ICONV").*$ {
+^("NOSUGGEST "|"ONLYINCOMPOUND "|"COMPOUNDRULE "|"WORDCHARS "|"PHONE "|"NAME "|"LANG "|"HOME "|"VERSION "|"COMPOUNDSYLLABLE "|"SYLLABLENUM "|"KEEPCASE "|"COMPOUNDFORBIDFLAG "|"COMPOUNDPERMITFLAG "|"COMPOUNDPERMITFLAG "|"COMPOUNDFIRST "|"COMPOUNDLAST "|"ONLYROOT "|"HU_KOTOHANGZO "|"NEEDAFFIX "|"ONLYINCOMPOUND "|"COMPOUNDWORDMAX "|"COMPOUNDROOT "|"CHECKCOMPOUND"|"FORBIDDENWORD "|"SUBSTANDARD "|"GENERATE "|"LEMMA_PRESENT "|"MAP "|"BREAK "|"CHECKSHARPS"|"NOSPLITSUGS"|"SIMPLIFIEDTRIPLE"|"ICONV"|"MAXNGRAMSUGS"|"BREAK").*$ {
     printf("Skipped (known): %s\n", yytext);
 }
 
-"/"{UNINR}+ {
+"/"{NR}+ {
     yylval.string = strdup(yytext+1);
     return CONT_THING;
 }
