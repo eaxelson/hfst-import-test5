@@ -50,7 +50,7 @@ static VarMap VM;
 static SVarMap SVM;
 static RVarSet RS;
 static RVarSet RSS;
-static int Alphabet_Defined=0;
+int Alphabet_Defined=0;  // static removed
 
 
 /*******************************************************************/
@@ -182,7 +182,7 @@ Range *add_var_values( char *name, Range *r )
 /*                                                                 */
 /*******************************************************************/
 
-static bool in_range( unsigned int c, Range *r )
+bool in_range( unsigned int c, Range *r ) // static removed
 
 {
   while (r) {
@@ -295,7 +295,7 @@ Range *complement_range( Range *r )
 /*                                                                 */
 /*******************************************************************/
 
-static Transducer *make_transducer( Range *r1, Range *r2 )
+Transducer *make_transducer( Range *r1, Range *r2 )  // static removed
 
 {
   Transducer *t=new Transducer();

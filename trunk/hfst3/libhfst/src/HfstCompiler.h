@@ -27,6 +27,7 @@ namespace SFST {
   extern bool UTF8;
   extern char *FileName;
   extern SFST::Alphabet TheAlphabet;
+  extern int Alphabet_Defined;
 }
 
 namespace hfst
