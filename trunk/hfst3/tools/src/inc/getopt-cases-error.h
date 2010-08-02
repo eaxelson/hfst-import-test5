@@ -11,15 +11,30 @@
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
     case '?':
-        error(EXIT_FAILURE, 0, "invalid option --%s\n"
-              "Try ``%s --help'' for more information\n",
-                long_options[option_index].name, program_name);
+        print_short_help();
+        if (optopt == 'c')
+          {
+            error(EXIT_FAILURE, 0, "Option -%c requires an argument.\n",
+                  optopt);
+          }
+        else if (isprint (optopt))
+          {
+            error(EXIT_FAILURE, 0, "Unknown option `-%c'.\n", optopt);
+          }
+        else
+          {
+            error(EXIT_FAILURE, 0, "Unknown option");
+          }
+        return EXIT_FAILURE;
+        break;
+    case ':':
+        print_short_help();
+        error(EXIT_FAILURE, 0, "Option -%c requires an argument", optopt);
         return EXIT_FAILURE;
         break;
     default:
-        error(EXIT_FAILURE,0 , "invalid option -%c\n"
-              "Try ``%s --help'' for more information\n",
-              c, program_name);
+        print_short_help();
+        error(EXIT_FAILURE, 0 , "invalid option -%c", c);
         return EXIT_FAILURE;
         break;
 
