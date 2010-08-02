@@ -68,10 +68,16 @@ void verbose_printf(const char* format, ...);
  */
 void hfst_set_program_name(const char* argv0, const char* version,
                            const char* wikipage);
+
+/** @brief program's name is made available through a global. 
+ * This name can be used when printing program error messages.
+ */
 #ifndef HAVE_DECL_PROGRAM_NAME
 extern const char* program_name;
 #endif
 
+/** @brief print standard formatted error message and exit if needed
+ */
 #ifndef HAVE_ERROR
 #  if HAVE_ERRC
 #    define error errc
@@ -79,6 +85,8 @@ extern const char* program_name;
 #    define error(status, errnum, fmt, ...) err(status, fmt, __VA_ARGS__)
 #  endif
 #endif
+/** @brief print standard formatted warning message and exit if needed
+ */
 #ifndef HAVE_WARNING
 #  if HAVE_WARNC
 #    define warning warnc
@@ -138,7 +146,6 @@ void print_report_bugs();
  */
 int parse_options(int argc, char** argv);
 
-// the versions of standard c library functions with error handling included
 /**
  * @brief parse weight from string, or print error message and return zero
  * weight on failure.
@@ -152,6 +159,10 @@ double hfst_strtoweight(const char *s);
 int hfst_strtonumber(const char *s, bool *infinite);
 
 unsigned long hfst_strtoul(char *s, int base);
+
+/** @brief parse string naming transducer format @c s or exit.
+ */
+hfst::ImplementationType hfst_parse_format_name(const char* s);
 
 #if HAVE_XSTRDUP
 #  define hfst_strdup xstrdup

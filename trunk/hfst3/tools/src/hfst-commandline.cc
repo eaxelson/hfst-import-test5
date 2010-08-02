@@ -144,6 +144,42 @@ hfst_strtoul(char *s, int base)
       }
 }
 
+hfst::ImplementationType
+hfst_parse_format_name(const char* s)
+{
+  hfst::ImplementationType rv = hfst::UNSPECIFIED_TYPE;
+    if (strcasecmp(optarg, "sfst") == 0)
+      {
+        rv = hfst::SFST_TYPE;
+      }
+    else if (strcasecmp(optarg, "openfst-tropical") == 0)
+      {
+        rv = hfst::TROPICAL_OFST_TYPE;
+      }
+    else if (strcasecmp(optarg, "openfst-log") == 0)
+      {
+        rv = hfst::LOG_OFST_TYPE;
+      }
+    else if (strcasecmp(optarg, "foma") == 0)
+      {
+        rv = hfst::FOMA_TYPE;
+      }
+    else if (strcasecmp(optarg, "optimized-lookuo") == 0)
+      {
+        rv = hfst::HFST_OL_TYPE;
+      }
+    else if (strcasecmp(optarg, "optimized-lookup-weighted") == 0)
+      {
+        rv = hfst::HFST_OLW_TYPE;
+      }
+    else
+      {
+        error(EXIT_FAILURE, 0, "Could not parse format name from string %s",
+              s);
+      }
+    return rv;
+}
+
 // file functions
 FILE*
 hfst_fopen(const char* filename, const char* mode)
@@ -291,3 +327,5 @@ print_report_bugs()
           "or directly to out bug tracker at:\n"
           "<ttps://sourceforge.net/tracker/?atid=1061990&group_id=224521&func=browse>\n");
 }
+
+
