@@ -17,7 +17,7 @@
 
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib
-#AM_CXXFLAGS = $(WERR_CFLAGS)
+AM_CXXFLAGS = $(WERR_CFLAGS)
 
 if WANT_COMPARE
 MAYBE_COMPARE=hfst-compare
@@ -192,7 +192,8 @@ hfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy # $(HFST_COMMON_SRC)
 hfst_optimized_lookup_SOURCES=hfst-optimized-lookup.cc
 
 BUILT_SOURCES=hfst-compiler.h
-# hwfst-pair-test-transducers.h
+
+hfst_calculate_CXXFLAGS= -Wall
 
 ## YACC and FLEX with autotools argh
 AM_YFLAGS=-d

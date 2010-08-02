@@ -28,9 +28,10 @@
                 is_input_stdin = false;
               }
           }
-        else
+        else if ((argc - optind) > 1)
           {
-            error(EXIT_FAILURE, 0, "one transducer file must be given");
+            error(EXIT_FAILURE, 0, 
+                  "no more than one transducer file may be given");
           }
       }
     else 

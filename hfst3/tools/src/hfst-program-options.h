@@ -14,9 +14,8 @@
 // All programs
 void print_common_program_options(FILE *file);
 // Use in getopt arguments
-#define HFST_GETOPT_COMMON_SHORT "dhVvqs"
-#define HFST_GETOPT_COMMON_LONG {"debug", no_argument, 0, 'd'},\
-  {"help", no_argument, 0, 'h'},\
+#define HFST_GETOPT_COMMON_SHORT ":hVvqs"
+#define HFST_GETOPT_COMMON_LONG  {"help", no_argument, 0, 'h'},\
   {"version", no_argument, 0, 'V'},\
   {"verbose", no_argument, 0, 'v'},\
   {"quiet", no_argument, 0, 'q'},\

@@ -211,10 +211,6 @@ ssize_t hfst_getline(char** lineptr, size_t* n, FILE* stream);
 
 /**
  * @brief determine if next transducers of given streams are compatible.
- * @return @c SFST_FORMAT, if both streams have SFST transducers available,
- * @c OPENFST_FORMAT, if both streams have Open FST transducers available,
- * @c EOF_FORMAT, if both streams have been fully consumed,
- * @c FORMAT_ERROR otherwise.
  * 
  * @deprecated all formats are compatible in HFST3
  */

@@ -75,44 +75,43 @@ print_usage()
 int
 parse_options(int argc, char** argv)
 {
-	// use of this function requires options are settable on global scope
-	while (true)
-	{
-		static const struct option long_options[] =
-		{
-		  HFST_GETOPT_COMMON_LONG,
-		  HFST_GETOPT_UNARY_LONG,
-		  // add tool-specific options here 
-			{0,0,0,0}
-		};
-		int option_index = 0;
-		// add tool-specific options here 
-		char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT,
-							 long_options, &option_index);
-		if (-1 == c)
-		{
-			break;
-		}
+    // use of this function requires options are settable on global scope
+    while (true)
+    {
+        static const struct option long_options[] =
+        {
+          HFST_GETOPT_COMMON_LONG,
+          HFST_GETOPT_UNARY_LONG,
+          // add tool-specific options here 
+          {"project", required_argument, 0, 'p'},
+            {0,0,0,0}
+        };
+        int option_index = 0;
+        // add tool-specific options here 
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
+                             HFST_GETOPT_UNARY_SHORT "p:",
+                             long_options, &option_index);
+        if (-1 == c)
+        {
+            break;
+        }
 
-		switch (c)
-		{
+        switch (c)
+        {
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-unary.h"
         case 'p':
-            {
-              char* level = optarg;
-            if ( (strncasecmp(level, "upper", 1) == 0) ||
-                 (strncasecmp(level, "input", 1) == 0) ||
-                 (strncasecmp(level, "first", 1) == 0) ||
-                 (strncasecmp(level, "analysis", 1) == 0) )
+            if ( (strncasecmp(optarg, "upper", 1) == 0) ||
+                 (strncasecmp(optarg, "input", 1) == 0) ||
+                 (strncasecmp(optarg, "first", 1) == 0) ||
+                 (strncasecmp(optarg, "analysis", 1) == 0) )
             {
                 project_upwards = true;
             }
-            else if ( (strncasecmp(level, "lower", 1) == 0) ||
-                      (strncasecmp(level, "output", 1) == 0) ||
-                      (strncasecmp(level, "second", 1) == 0) ||
-                      (strncasecmp(level, "generation", 1) == 0) )
+            else if ( (strncasecmp(optarg, "lower", 1) == 0) ||
+                      (strncasecmp(optarg, "output", 1) == 0) ||
+                      (strncasecmp(optarg, "second", 1) == 0) ||
+                      (strncasecmp(optarg, "generation", 1) == 0) )
             {
                 project_upwards = false;
             }
@@ -122,17 +121,17 @@ parse_options(int argc, char** argv)
                       "unknown project direction %s\n"
                       "should be one of upper, input, analysis, first, "
                       "lower, output, second or generation\n",
-                      level);
+                      optarg);
                 return EXIT_FAILURE;
             }
-            }
+            break;
 #include "inc/getopt-cases-error.h"
-		}
-	}
+        }
+    }
 
 #include "inc/check-params-common.h"
 #include "inc/check-params-unary.h"
-	return EXIT_CONTINUE;
+    return EXIT_CONTINUE;
 }
 
 int
@@ -140,13 +139,13 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 {
   instream.open();
   outstream.open();
-	
-	size_t transducer_n=0;
-	while(instream.is_good())
-	{
-		transducer_n++;
-		if (transducer_n==1)
-		{
+    
+    size_t transducer_n=0;
+    while(instream.is_good())
+    {
+        transducer_n++;
+        if (transducer_n==1)
+        {
           if (project_upwards)
             {
               verbose_printf("Projecting second %s...\n", inputfilename); 
@@ -156,8 +155,8 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
               verbose_printf("Projecting first %s...\n", inputfilename);
             }
         }
-		else
-		{
+        else
+        {
           if (project_upwards)
             {
               verbose_printf("Projecting second %s... %zu\n", inputfilename,
@@ -169,8 +168,8 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                              transducer_n);
             }
         }
-		
-		HfstTransducer trans(instream);
+        
+        HfstTransducer trans(instream);
         if (project_upwards)
           {
             outstream << trans.output_project();
@@ -179,50 +178,50 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           {
             outstream << trans.input_project();
           }
-	}
-	instream.close();
-	outstream.close();
-	return EXIT_SUCCESS;
+    }
+    instream.close();
+    outstream.close();
+    return EXIT_SUCCESS;
 }
 
 
 int main( int argc, char **argv ) {
-	hfst_set_program_name(argv[0], "0.1", "HfstProject");
-	int retval = parse_options(argc, argv);
-	if (retval != EXIT_CONTINUE)
-	{
-		return retval;
-	}
-	// close buffers, we use streams
-	if (inputfile != stdin)
-	{
-		fclose(inputfile);
-	}
-	if (outfile != stdout)
-	{
-		fclose(outfile);
-	}
-	verbose_printf("Reading from %s, writing to %s\n", 
-		inputfilename, outfilename);
-	// here starts the buffer handling part
-	HfstInputStream* instream = NULL;
-	try {
-	  instream = (inputfile != stdin) ?
-	    new HfstInputStream(inputfilename) : new HfstInputStream();
-	} catch (NotTransducerStreamException)	{
-		error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+    hfst_set_program_name(argv[0], "0.1", "HfstProject");
+    int retval = parse_options(argc, argv);
+    if (retval != EXIT_CONTINUE)
+    {
+        return retval;
+    }
+    // close buffers, we use streams
+    if (inputfile != stdin)
+    {
+        fclose(inputfile);
+    }
+    if (outfile != stdout)
+    {
+        fclose(outfile);
+    }
+    verbose_printf("Reading from %s, writing to %s\n", 
+        inputfilename, outfilename);
+    // here starts the buffer handling part
+    HfstInputStream* instream = NULL;
+    try {
+      instream = (inputfile != stdin) ?
+        new HfstInputStream(inputfilename) : new HfstInputStream();
+    } catch (NotTransducerStreamException)  {
+        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
-		return EXIT_FAILURE;
-	}
-	HfstOutputStream* outstream = (outfile != stdout) ?
-		new HfstOutputStream(outfilename, instream->get_type()) :
-		new HfstOutputStream(instream->get_type());
-	
-	retval = process_stream(*instream, *outstream);
-	delete instream;
-	delete outstream;
-	free(inputfilename);
-	free(outfilename);
-	return retval;
+        return EXIT_FAILURE;
+    }
+    HfstOutputStream* outstream = (outfile != stdout) ?
+        new HfstOutputStream(outfilename, instream->get_type()) :
+        new HfstOutputStream(instream->get_type());
+    
+    retval = process_stream(*instream, *outstream);
+    delete instream;
+    delete outstream;
+    free(inputfilename);
+    free(outfilename);
+    return retval;
 }
 
