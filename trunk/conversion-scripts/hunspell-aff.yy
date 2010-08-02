@@ -18,13 +18,11 @@ int yylex();
 
 static FILE* lexcfile = stdout;
 static FILE* twolcfile = stdout;
-static FILE* repfile = stdout;
+static FILE* errfile = stdout;
 static FILE* symfile = stdout;
-static FILE* tryfile = stdout;
-static FILE* keyfile = stdout;
 static FILE* twolsymfile = stdout;
 
-enum flagtypes {BYTE_FLAG, WORD_FLAG, UTF8_FLAG, NUM_FLAG, AF_FLAG} flagtype;
+enum flagtypes {BYTE_FLAG, WORD_FLAG, UTF8_FLAG, NUM_FLAG, AF_FLAG} flagtype = BYTE_FLAG;
 bool has_afs = false;
 
 static char* compound_flag;
@@ -99,7 +97,7 @@ parse_flag(char** flagstring, flagtypes flagtype)
     switch (flagtype)
     {
     case BYTE_FLAG:
-        flagnumber = static_cast<unsigned int>(**flagstring);
+        flagnumber = static_cast<unsigned int>(static_cast<unsigned char>(**flagstring));
         *flagstring += 1;
         break;
     case WORD_FLAG:
@@ -219,7 +217,7 @@ handle_keyline(const char* keysets)
 {
     char* ks = strdup(keysets);
     char* ed_set = strtok(ks, "|");
-    fprintf(keyfile, "LEXICON HUNSPELL_KEY\n");
+    fprintf(errfile, "LEXICON HUNSPELL_KEY\n");
     while (ed_set != NULL)
     {
         printf("KEY confusion set: %s\n", ed_set);
@@ -234,9 +232,9 @@ handle_keyline(const char* keysets)
             {
                 if (*s1 != *s2)
                 {
-                    fprintf(keyfile, "%s:%s\tHUNSPELL_error_return\t\"weight: 100\"\t;\n",
+                    fprintf(errfile, "%s:%s\tHUNSPELL_error_Sigma_1\t\"weight: 100\"\t;\n",
                             s1->c_str(), s2->c_str());
-                    fprintf(keyfile, "%s:%s\tHUNSPELL_error_return\t\"weight: 100\"\t;\n",
+                    fprintf(errfile, "%s:%s\tHUNSPELL_error_Sigma_1\t\"weight: 100\"\t;\n",
                             s2->c_str(), s1->c_str());
                 }
             }
@@ -252,14 +250,14 @@ handle_tryline(const char* tryset)
 {
     printf("TRY confusion set: %s\n", tryset);
     set<string>* ed_chars = gather_alphabet(tryset);
-    fprintf(tryfile, "LEXICON HUNSPELL_TRY\n");
+    fprintf(errfile, "LEXICON HUNSPELL_TRY\n");
     for (set<string>::const_iterator s1 = ed_chars->begin();
          s1 != ed_chars->end();
          ++s1)
     {
-        fprintf(tryfile, "%s:0\tHUNSPELL_error_return\t\"weight: 1000\"\t;\n",
+        fprintf(errfile, "%s:0\tHUNSPELL_error_Sigma_1\t\"weight: 1000\"\t;\n",
                 s1->c_str());
-        fprintf(tryfile, "0:%s\tHUNSPELL_error_return\t\"weight: 1000\"\t;\n",
+        fprintf(errfile, "0:%s\tHUNSPELL_error_Sigma_1\t\"weight: 1000\"\t;\n",
                 s1->c_str());
         for (set<string>::const_iterator s2 = ed_chars->begin();
              s2 != ed_chars->end();
@@ -267,9 +265,9 @@ handle_tryline(const char* tryset)
         {
             if (*s1 != *s2)
             {
-                fprintf(tryfile, "%s:%s\tHUNSPELL_error_return\t\"weight: 1000\"\t;\n",
+                fprintf(errfile, "%s:%s\tHUNSPELL_error_Sigma_1\t\"weight: 1000\"\t;\n",
                         s1->c_str(), s2->c_str());
-                fprintf(tryfile, "%s:%s\tHUNSPELL_error_return\t\"weight: 1000\"\t;\n",
+                fprintf(errfile, "%s:%s\tHUNSPELL_error_Sigma_1\t\"weight: 1000\"\t;\n",
                         s2->c_str(), s1->c_str());
             }
         }
@@ -284,11 +282,11 @@ handle_repline(const char* orig, const char* repl)
     static double error_weight = 0;
     if (!lexicon_written)
     {
-        fprintf(repfile, "LEXICON HUNSPELL_REP\n");
+        fprintf(errfile, "LEXICON HUNSPELL_REP\n");
         lexicon_written = true;
     }
-    fprintf(repfile, "%s:%s\tHUNSPELL_error_return\t\"weight: %f\"\t;\n", orig, repl,
-            error_weight);
+    fprintf(errfile, "%s:%s\tHUNSPELL_error_Sigma_1\t\"weight: %f\"\t;\n",
+            orig, repl, error_weight);
     error_weight += 0.333;
     rep_read++;
 }
@@ -321,9 +319,9 @@ write_prefix_lexicon_entry(unsigned long cont, const char* morph,
         fprintf(lexcfile, "LEXICON HUNSPELL_pfx\n");
         lexicon_prefixes_written = true;
     }
-    char* incoming_prefix_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@P.NEEDFLAG123456789.ON@0")));
-    char* need_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@P.NEEDFLAG123456789@0")));
-    char* deletion_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("{123456789%%<}0")));
+    char* incoming_prefix_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@P.NEEDFLAG12345678901234567890.ON@0")));
+    char* need_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@P.NEEDFLAG12345678901234567890@0")));
+    char* deletion_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("{12345678901234567890%%<}0")));
     sprintf(incoming_prefix_flag, "@P.NEEDFLAG%lu.ON@", cont);
     sprintf(need_flag, "@D.NEEDFLAG%lu@", cont);
     sprintf(deletion_context_tag, "{%lu%%<}", cont);
@@ -333,7 +331,7 @@ write_prefix_lexicon_entry(unsigned long cont, const char* morph,
     needed_flags.insert(need_flag);
     if (next_cont != 0)
     {
-        char* outgoing_prefix_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@P.NEEDPREFIX123456789@0")));
+        char* outgoing_prefix_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@P.NEEDPREFIX12345678901234567890@0")));
         sprintf(outgoing_prefix_flag, "@P.NEEDPREFIX%lu@", next_cont);
         sigma.insert(outgoing_prefix_flag);
         fprintf(lexcfile, "%s%s%s%s\tHUNSPELL_pfx\t;\n",
@@ -507,6 +505,11 @@ twolize_context(const char* context, bool in_removes = false)
         }
         if (!do_not_print_caret_please)
         {
+            if ((u8len == 1) && ((*s == '-')))
+            {
+                *next_pair = '%';
+                next_pair++;
+            }
             memcpy(next_pair, s, u8len);
         }
         next_pair += u8len;
@@ -535,9 +538,9 @@ void
 save_prefix_deletion_contexts(unsigned long cont, const char* remove,
                               const char* morph, const char* match)
 {
-    char* deletion_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{123456789%%<%%}0")));
+    char* deletion_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{12345678901234567890%%<%%}0")));
     sprintf(deletion_context_tag, "%%{%lu%%<%%}", cont);
-    char* deleted_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{123456789%%<%%}:00")));
+    char* deleted_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{12345678901234567890%%<%%}:00")));
     sprintf(deleted_context_tag, "%%{%lu%%<%%}:0", cont);
     pi.insert(deleted_context_tag);
     char* twol_context_del = twolize_context(remove, true);
@@ -646,14 +649,14 @@ handle_pfx_line_with_conts(const char* cont,
 
 static
 void
-handle_stringed_pfx_line(const char* cont,
+handle_numbered_pfx_line(const char* cont,
                         const char* remove, const char* add, const char* match,
-                        const char* extra)
+                        unsigned long extra)
 {
     static bool warned = false;
     if (!warned)
     {
-        fprintf(stderr, "Morphology AM stuff not supported: %s\n",
+        fprintf(stderr, "Morphology AM stuff not supported: %lu\n",
                 extra);
         warned = true;
     }
@@ -662,14 +665,14 @@ handle_stringed_pfx_line(const char* cont,
 
 static
 void
-handle_stringed_pfx_line_with_conts(const char* cont,
+handle_numbered_pfx_line_with_conts(const char* cont,
                         const char* remove, const char* add, const char* conts,
-                        const char* match, const char* extra)
+                        const char* match, unsigned long extra)
 {
     static bool warned = false;
     if (!warned)
     {
-        fprintf(stderr, "Morphology AM stuff not supported: %s\n",
+        fprintf(stderr, "Morphology AM stuff not supported: %lu\n",
                 extra);
         warned = true;
     }
@@ -688,17 +691,26 @@ write_suffix_lexicon_entry(unsigned long cont, const char* morph,
         fprintf(lexcfile, "LEXICON HUNSPELL_FLAG_%lu\n", cont);
         lexicons_written.insert(cont);
     }
-    char* incoming_suffix_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@C.NEEDFLAG123456789@0")));
-    char* deletion_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("{%%>123456789}0")));
+    char* incoming_suffix_flag = static_cast<char*>(malloc(sizeof(char)*strlen("@C.NEEDFLAG12345678901234567890@0")));
+    char* deletion_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("{%%>12345678901234567890}0")));
     sprintf(incoming_suffix_flag, "@C.NEEDFLAG%lu@", cont);
     sprintf(deletion_context_tag, "{%%>%lu}", cont);
     sigma.insert(incoming_suffix_flag);
     sigma.insert(deletion_context_tag);
     if (nextcont != 0)
     {
-        fprintf(lexcfile, "%s%s\tHUNSPEL_FLAG_%lu\t;\n",
+        if (has_afs)
+        {
+            fprintf(lexcfile, "%s%s\tHUNSPELL_AF_%lu\t;\n",
                 deletion_context_tag, morph,
                 nextcont);
+        }
+        else
+        {
+            fprintf(lexcfile, "%s%s\tHUNSPELL_FLAG_%lu\t;\n",
+                deletion_context_tag, morph,
+                nextcont);
+        }
     }
     else
     {
@@ -714,9 +726,9 @@ void
 save_suffix_deletion_contexts(unsigned long cont, const char* remove,
                               const char* morph, const char* match)
 {
-    char* deletion_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{123456789%%>%%}0")));
+    char* deletion_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{12345678901234567890%%>%%}0")));
     sprintf(deletion_context_tag, "%%{%%>%lu%%}", cont);
-    char* deleted_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{123456789%%>%%}:00")));
+    char* deleted_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{12345678901234567890%%>%%}:00")));
     sprintf(deleted_context_tag, "%%{%%>%lu%%}:0", cont);
     pi.insert(deleted_context_tag);
     char* twol_context_del = twolize_context(remove, true);
@@ -783,9 +795,9 @@ void
 save_suffix_context(unsigned long cont, const char* remove,
                       const char* morph, const char* match)
 {
-    char* deletion_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{123456789%%>%%}0")));
+    char* deletion_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{12345678901234567890%%>%%}0")));
     sprintf(deletion_context_tag, "%%{%%>%lu%%}", cont);
-    char* deleted_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{123456789%%>%%}:00")));
+    char* deleted_context_tag = static_cast<char*>(malloc(sizeof(char)*strlen("%%{12345678901234567890%%>%%}:00")));
     sprintf(deleted_context_tag, "%%{%%>%lu%%}:0", cont);
     pi.insert(deleted_context_tag);
     char* twol_context_del = twolize_context(remove, true);
@@ -831,7 +843,7 @@ handle_sfx_line_with_conts(const char* cont,
                 const char* match)
 {
     // once without continuation
-    handle_pfx_line(cont, remove, add, match);
+    handle_sfx_line(cont, remove, add, match);
     // once for each class
     char* s = strdup(cont);
     unsigned long contnum = parse_flag(&s, flagtype);
@@ -860,14 +872,14 @@ handle_sfx_line_with_conts(const char* cont,
 
 static
 void
-handle_stringed_sfx_line(const char* cont,
+handle_numbered_sfx_line(const char* cont,
                         const char* remove, const char* add, const char* match,
-                        const char* extra)
+                        unsigned long extra)
 {
     static bool warned = false;
     if (!warned)
     {
-        fprintf(stderr, "Morphology AM stuff not supported: %s\n",
+        fprintf(stderr, "Morphology AM stuff not supported: %lu\n",
                 extra);
         warned = true;
     }
@@ -876,14 +888,14 @@ handle_stringed_sfx_line(const char* cont,
 
 static
 void
-handle_stringed_sfx_line_with_conts(const char* cont,
+handle_numbered_sfx_line_with_conts(const char* cont,
                         const char* remove, const char* add, const char* conts,
-                        const char* match, const char* extra)
+                        const char* match, unsigned long extra)
 {
     static bool warned = false;
     if (!warned)
     {
-        fprintf(stderr, "Morphology AM stuff not supported: %s\n",
+        fprintf(stderr, "Morphology AM stuff not supported: %lu\n",
                 extra);
         warned = true;
     }
@@ -1053,17 +1065,20 @@ SFXLINE: SFX_LEADER UTF8_STRING UTF8_STRING UTF8_STRING {
     | SFX_LEADER ZERO ZERO CONT_THING UTF8_STRING {
         handle_sfx_line_with_conts($1, NULL, "", $4, $5);
     }
-    | SFX_LEADER UTF8_STRING UTF8_STRING UTF8_STRING BYTESTRING {
-        handle_stringed_sfx_line($1, $2, $3, $4, $5);
+    | SFX_LEADER UTF8_STRING UTF8_STRING UTF8_STRING COUNT {
+        handle_numbered_sfx_line($1, $2, $3, $4, $5);
     }
-    | SFX_LEADER UTF8_STRING ZERO UTF8_STRING BYTESTRING {
-        handle_stringed_sfx_line($1, $2, "", $4, $5);
+    | SFX_LEADER UTF8_STRING ZERO UTF8_STRING COUNT {
+        handle_numbered_sfx_line($1, $2, "", $4, $5);
     }
-    | SFX_LEADER UTF8_STRING UTF8_STRING CONT_THING UTF8_STRING BYTESTRING {
-        handle_stringed_sfx_line_with_conts($1, $2, $3, $4, $5, $6);
+    | SFX_LEADER UTF8_STRING UTF8_STRING CONT_THING UTF8_STRING COUNT {
+        handle_numbered_sfx_line_with_conts($1, $2, $3, $4, $5, $6);
     }
-    | SFX_LEADER ZERO UTF8_STRING UTF8_STRING BYTESTRING {
-        handle_stringed_sfx_line($1, NULL, $3, $4, $5);
+    | SFX_LEADER ZERO UTF8_STRING UTF8_STRING COUNT {
+        handle_numbered_sfx_line($1, NULL, $3, $4, $5);
+    }
+    | SFX_LEADER ZERO UTF8_STRING CONT_THING UTF8_STRING COUNT {
+        handle_numbered_sfx_line_with_conts($1, NULL, $3, $4, $5, $6);
     }
     ;
 
@@ -1098,17 +1113,20 @@ PFXLINE: PFX_LEADER UTF8_STRING UTF8_STRING UTF8_STRING {
     | PFX_LEADER ZERO ZERO CONT_THING UTF8_STRING {
         handle_pfx_line_with_conts($1, NULL, "", $4, $5);
     }
-    | PFX_LEADER UTF8_STRING UTF8_STRING UTF8_STRING BYTESTRING {
-        handle_stringed_pfx_line($1, $2, $3, $4, $5);
+    | PFX_LEADER UTF8_STRING UTF8_STRING UTF8_STRING COUNT {
+        handle_numbered_pfx_line($1, $2, $3, $4, $5);
     }
-    | PFX_LEADER UTF8_STRING ZERO UTF8_STRING BYTESTRING {
-        handle_stringed_pfx_line($1, $2, "", $4, $5);
+    | PFX_LEADER UTF8_STRING ZERO UTF8_STRING COUNT {
+        handle_numbered_pfx_line($1, $2, "", $4, $5);
     }
-    | PFX_LEADER UTF8_STRING UTF8_STRING CONT_THING UTF8_STRING BYTESTRING {
-        handle_stringed_pfx_line_with_conts($1, $2, $3, $4, $5, $6);
+    | PFX_LEADER UTF8_STRING UTF8_STRING CONT_THING UTF8_STRING COUNT {
+        handle_numbered_pfx_line_with_conts($1, $2, $3, $4, $5, $6);
     }
-    | PFX_LEADER ZERO UTF8_STRING UTF8_STRING BYTESTRING {
-        handle_stringed_pfx_line($1, NULL, $3, $4, $5);
+    | PFX_LEADER ZERO UTF8_STRING UTF8_STRING COUNT {
+        handle_numbered_pfx_line($1, NULL, $3, $4, $5);
+    }
+    | PFX_LEADER ZERO UTF8_STRING CONT_THING UTF8_STRING COUNT {
+        handle_numbered_pfx_line_with_conts($1, NULL, $3, $4, $5, $6);
     }
     ;
 
@@ -1130,10 +1148,8 @@ main(int argc, char** argv)
     char* lexcfilename = 0;
     char* twolcfilename = 0;
     char* twolcsymfilename = 0;
-    char* repfilename = 0;
+    char* errfilename = 0;
     char* symfilename = 0;
-    char* tryfilename = 0;
-    char* keyfilename = 0;
     if (argc > 1)
     {
         if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0))
@@ -1185,9 +1201,9 @@ main(int argc, char** argv)
     }
     if (argc > 4)
     {
-        repfilename = strdup(argv[5]);
-        repfile = fopen(argv[4], "w");
-        if (repfile == NULL)
+        errfilename = strdup(argv[5]);
+        errfile = fopen(argv[4], "w");
+        if (errfile == NULL)
         {
             fprintf(stderr, "Could not open %s for writing\n", argv[4]);
             return EXIT_FAILURE;
@@ -1195,7 +1211,7 @@ main(int argc, char** argv)
     }
     else
     {
-        repfilename = strdup("<stdout>");
+        errfilename = strdup("<stdout>");
     }
     if (argc > 5)
     {
@@ -1213,39 +1229,11 @@ main(int argc, char** argv)
     }
     if (argc > 6)
     {
-        tryfilename = strdup(argv[6]);
-        tryfile = fopen(argv[6], "w");
-        if (tryfile == NULL)
+        twolcsymfilename = strdup(argv[6]);
+        twolsymfile = fopen(argv[6], "w");
+        if (twolsymfile == NULL)
         {
             fprintf(stderr, "Could not open %s for writing\n", argv[6]);
-            return EXIT_FAILURE;
-        }
-    }
-    else
-    {
-        tryfilename = strdup("<stdout>");
-    }
-    if (argc > 7)
-    {
-        keyfilename = strdup(argv[7]);
-        keyfile = fopen(argv[7], "w");
-        if (keyfile == NULL)
-        {
-            fprintf(stderr, "Could not open %s for writing\n", argv[7]);
-            return EXIT_FAILURE;
-        }
-    }
-    else
-    {
-        keyfilename = strdup("<stdout>");
-    }
-    if (argc > 8)
-    {
-        twolcsymfilename = strdup(argv[8]);
-        twolsymfile = fopen(argv[8], "w");
-        if (keyfile == NULL)
-        {
-            fprintf(stderr, "Could not open %s for writing\n", argv[8]);
             return EXIT_FAILURE;
         }
     }
@@ -1254,20 +1242,20 @@ main(int argc, char** argv)
         twolcsymfilename = strdup("<stdout>");
     }
     printf("Reading from %s, writing to %s, %s\n"
-           "%s, %s, %s, %s and %s\n", infilename, lexcfilename, twolcfilename,
-           repfilename, symfilename, tryfilename, keyfilename, twolcsymfilename);
+           "%s, %s and %s\n", infilename, lexcfilename, twolcfilename,
+           errfilename, symfilename, twolcsymfilename);
     fprintf(lexcfile, "! This file contains hunspell %s affixes "
                       "automatically translated to lexc format\n", infilename);
     fprintf(twolcfile, "! This file contains hunspell %s affix deletion rules "
                        "automatically translated to twolc format\n", infilename);
     fprintf(twolcfile, "Rules\n");
     fprintf(twolsymfile, "! This file contains hunspell %s affix deletion rules' symbol pairs\n", infilename);
-    fprintf(repfile, "! This file contains hunspell %s replacements "
+    fprintf(errfile, "! This file contains hunspell %s error models REP, KEY, "
+                     " and TRY "
                      "automatically translated to lexc format\n"
-                     "\n", infilename);
-    fprintf(keyfile, "! This file contains hunspell %s key spec "
-                     "automatically translated to lexc format\n"
-                     "\n", infilename);
+                     "\n"
+                     "LEXICON HUNSPELL_error_root\n"
+                     "  HUNSPELL_error_Sigma_0\t;\n", infilename);
 
 #   if YYDEBUG
     yydebug = 1;
@@ -1293,6 +1281,31 @@ main(int argc, char** argv)
             pi.insert(*s);
         }
     }
+    fprintf(errfile, "\nLEXICON HUNSPELL_error_Sigma_0\n");
+    for (set<string>::const_iterator s = pi.begin();
+         s != pi.end();
+         ++s)
+    {
+        if (s->find(":") == string::npos)
+        {
+            fprintf(errfile, "%s\tHUNSPELL_error_Sigma_0\t;\n", s->c_str());
+        }
+    }
+    fprintf(errfile, "\tHUNSPELL_KEY\t\"weight:1\";\t\n"
+                     "\tHUNSPELL_REP\t\"weight:100\";\t\n"
+                     "\tHUNSPELL_TRY\t\"weight:1000\";\t\n"
+                     "\t#\t;\n");
+    fprintf(errfile, "\nLEXICON HUNSPELL_error_Sigma_1\n");
+    for (set<string>::const_iterator s = pi.begin();
+         s != pi.end();
+         ++s)
+    {
+        if (s->find(":") == string::npos)
+        {
+            fprintf(errfile, "%s\tHUNSPELL_error_Sigma_1\t;\n", s->c_str());
+        }
+    }
+    fprintf(errfile, "\t#\t;\n");
     fprintf(symfile, "\nLEXICON Root\n\tHUNSPELL_dic_root\t;\n");
     for (map<string, set<string> >::const_iterator context_sets = deletion_contexts.begin();
         context_sets != deletion_contexts.end();
@@ -1334,14 +1347,6 @@ main(int argc, char** argv)
         fprintf(twolsymfile, "%s\n", s->c_str());
     }
     fprintf(twolsymfile, ";\n");
-    if (!has_key)
-    {
-        fprintf(keyfile, "LEXICON HUNSPELL_KEY_none\n\t#\t;\n");
-    }
-    if (rep_read == 0)
-    {
-        fprintf(repfile, "LEXICON HUNSPELL_REP_none\n\t#\t;\n");
-    }
     if (argc > 1)
     {
         fclose(yyin);

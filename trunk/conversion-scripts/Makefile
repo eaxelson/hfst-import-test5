@@ -91,7 +91,7 @@ hyph-utf8-hfst.tar.gz: $(HYPH_TARGETS)
 # hunspell compilation
 
 %.hfst: %.aff %.dic
-	if grep -m 1 '^AF' $*.aff; then \
+	if grep -m 1 '^AF' $*.aff > /dev/null ; then \
 		./hunspell-dic2lexc AF $*.dic $*.dic.lexc ; \
 	elif grep -m 1 'FLAG *UTF-8' $*.aff; then \
 		./hunspell-dic2lexc UTF-8 $*.dic $*.dic.lexc ; \
@@ -102,16 +102,17 @@ hyph-utf8-hfst.tar.gz: $(HYPH_TARGETS)
 	else \
 		./hunspell-dic2lexc ASCII $*.dic $*.dic.lexc ; \
 	fi
-	./hunspell-aff2lexc $*.aff $*.aff.lexc $*.rules.twolc $*.rep.lexc $*.symbols.lexc $*.try.lexc $*.key.lexc $*.symbols.twolc
+	./hunspell-aff2lexc $*.aff $*.aff.lexc $*.rules.twolc $*.err.lexc $*.symbols.lexc $*.symbols.twolc
 	hfst-lexc -w -v -o $*.lex.hfst $*.symbols.lexc $*.dic.lexc $*.aff.lexc
-	hfst-lexc -w -v -o $*.1errm.hfst hunspell_one_error.lexc $*.rep.lexc $*.try.lexc $*.key.lexc
+	hfst-lexc -w -v -o $*.1errm.hfst hunspell_one_error.lexc $*.err.lexc
 	cat $*.symbols.twolc $*.rules.twolc > $*.twolc
 	hfst-twolc --resolve -w -v -o $*.twol.hfst $*.twolc
 	hfst-compose-intersect -v -l $*.lex.hfst $*.twol.hfst |\
 		hfst-minimize -v -o $*.dbg.hfst
 	hfst-project -p lower -v $*.dbg.hfst |\
 		hfst-minimize -v -o $@
-	cat $*.1errm.hfst $@ -v > $*.sug.hfst
+	hfst-lookup-optimize -v -i $@ -o $@.ol
+	cat $*.1errm.hfst $@  > $*.sug.hfst
 
 # hunspell tools
 

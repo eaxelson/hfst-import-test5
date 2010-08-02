@@ -39,6 +39,8 @@ CONTCHAR [^\t\n\r /]
 UNINR {U8H}|[\x20-\x2e\x30-\x7e]
 /* any unicode char except space */
 UNI {U8H}|[\x20-\x7e]
+/* any nonreserved char */
+NR {UNINR}|[\x7f-\xff]
 
 LWSP [ \t]
 WSP [ \t\n\r]
@@ -61,7 +63,7 @@ WSP [ \t\n\r]
     return WORD;
 }
 
-"/"{UNINR}+ {
+"/"{NR}+ {
     yylval.string = strdup(yytext+1);
     return CONT_THING;
 }

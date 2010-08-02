@@ -4,6 +4,8 @@
 #include <cstdlib>
 #include <set>
 
+#define YYDEBUG 0
+
 extern int yylineno;
 void yyerror(const char* text);
 int yylex();
@@ -80,7 +82,7 @@ escape_word(const char* word)
     char* p = rv;
     while (*s != '\0')
     {
-        if ((*s == '!') || (*s == ' ') || (*s == '%'))
+        if ((*s == '!') || (*s == ' ') || (*s == '%') || (*s == ';') || (*s == '"') || (*s == '"'))
         {
             *p = '%';
             p++;
@@ -101,7 +103,7 @@ parse_flag(char** flagstring)
     switch (flagtype)
     {
     case BYTE_FLAG:
-        flagnumber = static_cast<unsigned int>(**flagstring);
+        flagnumber = static_cast<unsigned int>(static_cast<unsigned char>(**flagstring));
         *flagstring += 1;
         break;
     case WORD_FLAG:
@@ -250,7 +252,7 @@ handle_stringed_wordline(const char* word, const char* conts,
     static bool error_said = false;
     if (!error_said)
       {
-        fprintf(stderr, "Extra strings at the end of line?\n");
+        fprintf(stderr, "Extra string %s at the end of line?\n", extra);
         error_said = true;
       }
     handle_wordline(word, conts);
@@ -350,6 +352,9 @@ main(int argc, char** argv)
 {
     char* infilename = 0;
     char* lexcfilename = 0;
+#   if YYDEBUG
+    yydebug = 1;
+#   endif
     if (argc > 1)
     {
         if ((strcmp(argv[1], "-h") == 0) || (strcmp(argv[1], "--help") == 0))
