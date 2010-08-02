@@ -17,6 +17,7 @@
 
 # programs to run for unit etc. testing
 TESTS=hfst-check-version.sh hfst-check-help.sh empty-input.sh\
+	  permutate-file-params.sh \
 	  compare-functionality.sh concatenate-functionality.sh \
 	  conjunct-functionality.sh disjunct-functionality.sh \
 	  subtract-functionality.sh \

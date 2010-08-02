@@ -23,6 +23,7 @@
     firstfile = hfst_fopen(firstfilename, "r");
     is_input_stdin = false;
   }
+  firstNamed = true;
   break;
   case '2':
   secondfilename = hfst_strdup(optarg);
@@ -33,9 +34,10 @@
     is_input_stdin = true;
   }
   else {
-    secondfile = hfst_fopen(firstfilename, "r");
+    secondfile = hfst_fopen(secondfilename, "r");
     is_input_stdin = false;
   }
+  secondNamed = true;
   break;
   case 'o':
   outfilename = hfst_strdup(optarg);
