@@ -138,12 +138,6 @@ AC_ARG_ENABLE([disjunct],
 			  [enable_disjunct=$enableval],
 			  [enable_disjunct=yes])
 AM_CONDITIONAL([WANT_DISJUNCT], [test x$enable_disjunct != xno])
-AC_ARG_ENABLE([format],
-			  [AS_HELP_STRING([--enable-format],
-							  [build format tool @<:@default=no@:>@])],
-			  [enable_format=$enableval],
-			  [enable_format=no])
-AM_CONDITIONAL([WANT_FORMAT], [test x$enable_format != xno])
 AC_ARG_ENABLE([flag_diacritics],
 			  [AS_HELP_STRING([--enable-flag-diacritics],
 							  [build flag diacritic tool @<:@default=no@:>@])],
@@ -156,12 +150,6 @@ AC_ARG_ENABLE([fst2fst],
 			  [enable_fst2fst=$enableval],
 			  [enable_fst2fst=yes])
 AM_CONDITIONAL([WANT_FST2FST], [test x$enable_fst2fst != xno])
-AC_ARG_ENABLE([fst2pairstrings],
-			  [AS_HELP_STRING([--enable-fst2pairstrings],
-							  [build fst2pairstrings tool @<:@default=no@:>@])],
-			  [enable_fst2pairstrings=$enableval],
-			  [enable_fst2pairstrings=no])
-AM_CONDITIONAL([WANT_FST2PAIRSTRINGS], [test x$enable_fst2pairstrings != xno])
 AC_ARG_ENABLE([fst2strings],
 			  [AS_HELP_STRING([--enable-fst2strings],
 							  [build fst2strings tool @<:@default=yes@:>@])],
@@ -266,9 +254,9 @@ AC_ARG_ENABLE([split],
 AM_CONDITIONAL([WANT_SPLIT], [test x$enable_split != xno])
 AC_ARG_ENABLE([strings2fst],
 			  [AS_HELP_STRING([--enable-strings2fst],
-							  [build strings2fst tool @<:@default=no@:>@])],
+							  [build strings2fst tool @<:@default=yes@:>@])],
 			  [enable_strings2fst=$enableval],
-			  [enable_strings2fst=no])
+			  [enable_strings2fst=yes])
 AM_CONDITIONAL([WANT_STRINGS2FST], [test x$enable_strings2fst != xno])
 AC_ARG_ENABLE([strip_header],
 			  [AS_HELP_STRING([--enable-strip-header],
@@ -278,9 +266,9 @@ AC_ARG_ENABLE([strip_header],
 AM_CONDITIONAL([WANT_STRIP_HEADER], [test x$enable_strip_header != xno])
 AC_ARG_ENABLE([substitute],
 			  [AS_HELP_STRING([--enable-substitute],
-							  [build substitution tool @<:@default=no@:>@])],
+							  [build substitution tool @<:@default=yes@:>@])],
 			  [enable_substitute=$enableval],
-			  [enable_substitute=no])
+			  [enable_substitute=yes])
 AM_CONDITIONAL([WANT_SUBSTITUTE], [test x$enable_substitute != xno])
 AC_ARG_ENABLE([subtract],
 			  [AS_HELP_STRING([--enable-subtract],
@@ -290,16 +278,10 @@ AC_ARG_ENABLE([subtract],
 AM_CONDITIONAL([WANT_SUBTRACT], [test x$enable_subtract != xno])
 AC_ARG_ENABLE([summarize],
 			  [AS_HELP_STRING([--enable-summarize],
-							  [build summarize tool @<:@default=no@:>@])],
+							  [build summarize tool @<:@default=yes@:>@])],
 			  [enable_summarize=$enableval],
-			  [enable_summarize=no])
+			  [enable_summarize=yes])
 AM_CONDITIONAL([WANT_SUMMARIZE], [test x$enable_summarize != xno])
-AC_ARG_ENABLE([symbols],
-			  [AS_HELP_STRING([--enable-symbols],
-							  [build symbols tool @<:@default=no@:>@])],
-			  [enable_symbols=$enableval],
-			  [enable_symbols=no])
-AM_CONDITIONAL([WANT_SYMBOLS], [test x$enable_symbols != xno])
 AC_ARG_ENABLE([tail],
 			  [AS_HELP_STRING([--enable-tail],
 							  [build tail tool @<:@default=yes@:>@])],

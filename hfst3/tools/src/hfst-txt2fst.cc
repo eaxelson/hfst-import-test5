@@ -114,30 +114,7 @@ break;
             use_numbers = true;
             break;
         case 'f':
-            if (strcasecmp(optarg, "sfst") == 0)
-              {
-                output_format = hfst::SFST_TYPE;
-              }
-            else if (strcasecmp(optarg, "openfst-tropical") == 0)
-              {
-                output_format = hfst::TROPICAL_OFST_TYPE;
-              }
-            else if (strcasecmp(optarg, "openfst-log") == 0)
-              {
-                output_format = hfst::LOG_OFST_TYPE;
-              }
-            else if (strcasecmp(optarg, "foma") == 0)
-              {
-                output_format = hfst::FOMA_TYPE;
-              }
-            else if (strcasecmp(optarg, "optimized-lookuo") == 0)
-              {
-                output_format = hfst::HFST_OL_TYPE;
-              }
-            else if (strcasecmp(optarg, "optimized-lookup-weighted") == 0)
-              {
-                output_format = hfst::HFST_OLW_TYPE;
-              }
+            output_format = hfst_parse_format_name(optarg);
             break;
 #include "inc/getopt-cases-error.h"
           }

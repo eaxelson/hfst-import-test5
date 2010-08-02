@@ -145,17 +145,7 @@ parse_options(int argc, char** argv)
 		  }
 		  filter_fd = true;
 		  break;
-		case '?':
-			fprintf(message_out, "invalid option --%s\n",
-					long_options[option_index].name);
-			print_short_help();
-			return EXIT_FAILURE;
-			break;
-		default:
-			fprintf(message_out, "invalid option -%c\n", c);
-			print_short_help();
-			return EXIT_FAILURE;
-			break;
+#include "inc/getopt-cases-error.h"
 		}
 	}
 
@@ -255,9 +245,8 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
 
 
 int main( int argc, char **argv ) {
-	message_out = stdout;
-	verbose = false;
-	int retval = parse_options(argc, argv);
+  hfst_set_program_name(argv[0], "0.1", "HfstFst2Strings");
+    int retval = parse_options(argc, argv);
 	if (retval != EXIT_CONTINUE)
 	{
 		return retval;
