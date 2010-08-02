@@ -1,9 +1,12 @@
 
-    if (firstNamed && secondNamed && ((argc - optind) > 0))
-    {
-        error(EXIT_FAILURE, 0,
+    if (firstNamed && secondNamed)
+      {
+        if ((argc - optind) > 0)
+          {
+            error(EXIT_FAILURE, 0,
               "No more than two transducer files may be given");
-    }
+          }
+      }
     else if (!firstNamed && !secondNamed)
       {
         // neither input given in options:

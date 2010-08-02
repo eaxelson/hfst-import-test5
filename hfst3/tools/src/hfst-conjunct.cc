@@ -92,7 +92,6 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-error.h"
         }
     }
-
 #include "inc/check-params-common.h"
 #include "inc/check-params-binary.h"
     return EXIT_CONTINUE;

@@ -13,14 +13,14 @@
 
   // input transducers
   char *firstfilename = 0;
-  FILE *firstfile = 0;
+  FILE *firstfile = stdin;
   bool firstNamed = false;
   char *secondfilename = 0;
-  FILE *secondfile = 0;
+  FILE *secondfile = stdin;
   bool secondNamed = false;
   bool is_input_stdin = true;
   // result transducer
   char *outfilename = 0;
-  FILE *outfile = 0;
+  FILE *outfile = stdout;
   bool is_output_stdout = true;
   
