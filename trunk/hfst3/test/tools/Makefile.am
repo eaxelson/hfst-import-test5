@@ -16,7 +16,7 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # programs to run for unit etc. testing
-TESTS=hfst-check-version.sh hfst-check-help.sh
+TESTS=hfst-check-version.sh hfst-check-help.sh empty-input.sh
 
 # files needed for test programs
-#EXTRA_DIST=
+EXTRA_DIST=empty-file
