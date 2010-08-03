@@ -585,15 +585,10 @@ void HfstTransducer::test_minimize()
 
   HfstTransducer &HfstTransducer::repeat_n_plus(unsigned int n)
   { is_trie = false; // This could be done so that is_trie is preserved
-#if 0
-    // cannot do this since copy constructor only copies pointers
     HfstTransducer this_repeat_n = HfstTransducer(*this).repeat_n(n);
     HfstTransducer this_repeat_star = HfstTransducer(*this).repeat_star();
     HfstTransducer &retval = (this_repeat_n).concatenate(this_repeat_star);
     return retval;
-#else
-    throw hfst::exceptions::FunctionNotImplementedException();
-#endif
   }
 
   HfstTransducer &HfstTransducer::repeat_n_minus(unsigned int n)
@@ -607,14 +602,8 @@ void HfstTransducer::test_minimize()
 
   HfstTransducer &HfstTransducer::repeat_n_to_k(unsigned int n, unsigned int k)
   { is_trie = false; // This could be done so that is_trie is preserved
-#if 0
-    // cannot do this since HfstTransducer copy constructor only copies
-    // pointers
     HfstTransducer a(*this);
-    return (this->repeat_n(n).concatenate(a.repeat_n_minus(k-n)));   // FIX: memory leaks? 
-#else
-    throw hfst::exceptions::FunctionNotImplementedException();
-#endif
+    return (a.repeat_n(n).concatenate(this->repeat_n_minus(k)));   // FIX: memory leaks? 
   }
 
   HfstTransducer &HfstTransducer::optionalize()
