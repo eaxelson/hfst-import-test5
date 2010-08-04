@@ -95,6 +95,18 @@ namespace hfst
   HfstCompiler::Range *HfstCompiler::complement_range( Range *r ) {
     return SFST::complement_range(r);
   }
+  
+  bool HfstCompiler::def_svar( char *name, Range *r ) {
+    return SFST::def_svar(name,r);
+  }
+
+  HfstCompiler::Range *HfstCompiler::svar_value( char *name ) {
+    return svar_value(name);
+  }
+
+  HfstCompiler::Range *HfstCompiler::rsvar_value( char *name ) {
+    return rsvar_value(name);
+  }
 
   HfstTransducer * HfstCompiler::make_mapping( Ranges *r1, Ranges *r2, ImplementationType type )
   {
@@ -103,6 +115,7 @@ namespace hfst
   
   HfstTransducer * HfstCompiler::result( HfstTransducer *t, bool)
   {
+    t->minimize(); 
     return t;
   }
   
