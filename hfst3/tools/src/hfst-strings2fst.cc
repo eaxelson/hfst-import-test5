@@ -38,12 +38,14 @@ using std::pair;
 #include <math.h>
 #include <errno.h>
 
+#include "HfstTransducer.h"
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
 
+using hfst::HfstOutputStream;
 
 static char *epsilonname=NULL;
 static bool has_spaces=false;
@@ -129,10 +131,9 @@ print_usage()
             "\n"
        */
         fprintf(message_out, "Examples:\n"
-            "  echo \"cat:dog\" | %s -R symbols  create cat:dog fst\n"
-            "  echo \"c:da:ot:g\" | %s -R symbols -p   same as pairstring\n"
-            "  echo \"c:d a:o t:g\" | %s -e eps -p -S  (no need to give the symbol table)\n"   
-            "\n", program_name, program_name, program_name);
+            "  echo \"cat:dog\" | %s  create cat:dog fst\n"
+            "  echo \"c:da:ot:g\" | %s -p   same as pairstring\n"
+            "\n", program_name, program_name);
         print_report_bugs();
         print_more_info();
         fprintf(message_out, "\n");
@@ -226,11 +227,11 @@ char *parse_output_string_and_weight(char *line, float& weight) {
     if (line[i] == '\\' && line[i+1] == ':') {
       int j=i;
       while (line[i] != '\0') {
-	line[i] = line[i+1];
-	i++;
+    line[i] = line[i+1];
+    i++;
       }
       i=j;
-    }				    
+    }                   
     else if (line[i] == ':') {
       line[i] = '\0';
       ostring = &line[i+1];
@@ -239,7 +240,7 @@ char *parse_output_string_and_weight(char *line, float& weight) {
       line[i] = '\0';
       i++;
       while (line[i] == '\t' || line[i] == ' ')
-	i++;
+    i++;
       weight = (float)atof(&line[i]);
       break;
     }
@@ -258,11 +259,11 @@ vector<char*> parse_pairstring_and_weight(char *line, float& weight) {
     if (line[i] == '\\') {
       int j=i;
       while (line[i] != '\0') {
-	line[i] = line[i+1];
-	i++;
+    line[i] = line[i+1];
+    i++;
       }
       i=j;
-    }				    
+    }                   
     else if (line[i] == ':') {
       line[i] = '\0';
       res.push_back(&line[last_start]);
@@ -294,8 +295,8 @@ vector<pair<char*,char*> > parse_pairstring_with_spaces_and_weight(char *line, f
     if (line[i] == '\\') {
       int j=i;
       while (line[i] != '\0') {
-	line[i] = line[i+1];
-	i++;
+    line[i] = line[i+1];
+    i++;
       }
       i=j;
     }
@@ -307,9 +308,9 @@ vector<pair<char*,char*> > parse_pairstring_with_spaces_and_weight(char *line, f
     else if (line[i] == ' ') {
       line[i] = '\0';
       if (input != NULL) // output of pair
-	res.push_back( pair<char*,char*>(input, &line[last_start]) );
+    res.push_back( pair<char*,char*>(input, &line[last_start]) );
       else // identity pair
-	res.push_back( pair<char*,char*>(&line[last_start], &line[last_start]) );
+    res.push_back( pair<char*,char*>(&line[last_start], &line[last_start]) );
       last_start = i+1;
       input=NULL;
     }
@@ -341,8 +342,8 @@ vector<char*> parse_identity_string_with_spaces(char *line) {
     if (line[i] == '\\') {
       int j=i;
       while (line[i] != '\0') {
-	line[i] = line[i+1];
-	i++;
+    line[i] = line[i+1];
+    i++;
       }
       i=j;
     }
@@ -359,8 +360,32 @@ vector<char*> parse_identity_string_with_spaces(char *line) {
 
 
 int
-process_stream()
+process_stream(HfstOutputStream /*outstream*/)
 {
+  size_t transducer_n = 0;
+  char* line = 0;
+  size_t len = 0;
+  while (hfst_getline(&line, &len, inputfile) != -1)
+    {
+      transducer_n++;
+      if (has_spaces && pairstrings)
+        {
+          return EXIT_FAILURE;
+        }
+      else if (has_spaces && !pairstrings)
+        {
+          return EXIT_FAILURE;
+        }
+      else if (!has_spaces && pairstrings)
+        {
+          return EXIT_FAILURE;
+        }
+      else if (!has_spaces && !pairstrings)
+        {
+          return EXIT_FAILURE;
+        }
+    }
+  free(line);
   return EXIT_SUCCESS;
 }
 
@@ -368,25 +393,29 @@ process_stream()
 int main( int argc, char **argv ) 
 {
   hfst_set_program_name(argv[0], "0.1", "Strings2Fst");
-    int retval = parse_options(argc, argv);
-	if (retval != EXIT_CONTINUE)
-	{
-		return retval;
-	}
-	// close buffers, we use streams
-	if (inputfile != stdin)
-	{
-		fclose(inputfile);
-	}
-	if (outfile != stdout)
-	{
-		fclose(outfile);
-	}
-	verbose_printf("Reading from %s, writing to %s\n", 
-		inputfilename, outfilename);
-	// here starts the buffer handling part
-	free(inputfilename);
-	free(outfilename);
-	return EXIT_SUCCESS;
+  int retval = parse_options(argc, argv);
+  if (retval != EXIT_CONTINUE)
+    {
+      return retval;
+    }
+  // close buffers, we use streams
+  if (inputfile != stdin)
+    {
+      fclose(inputfile);
+    }
+  if (outfile != stdout)
+    {
+      fclose(outfile);
+    }
+  verbose_printf("Reading from %s, writing to %s\n", 
+                 inputfilename, outfilename);
+  // here starts the buffer handling part
+  HfstOutputStream* outstream = (outfile != stdout) ?
+        new HfstOutputStream(outfilename, output_format) :
+        new HfstOutputStream(output_format);
+  process_stream(*outstream);
+  free(inputfilename);
+  free(outfilename);
+  return EXIT_SUCCESS;
 }
 
