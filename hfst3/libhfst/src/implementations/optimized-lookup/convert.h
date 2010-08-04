@@ -294,13 +294,9 @@ public:
 class ConvertTransducerHeader
 {
  private:
-  static void inspect_nodes(StateId n, StateIdSet &visited_nodes, 
-         OfstSymbolSet &input_symbols, TransduceR * tr, TransducerHeader& h);
-  static void find_input_epsilon_cycles(StateId n,StateId t,StateIdSet &epsilon_targets,TransduceR * tr,TransducerHeader& h);
-  static void find_cycles (StateId n,
-		    StateIdSet &visited_nodes,
-		    StateIdSet &checked_nodes,
-		    TransduceR * tr, TransducerHeader& h);
+  static void full_traversal(TransducerHeader& h, TransduceR* tr, StateId n,
+         StateIdSet& visited_nodes, StateIdSet& nodes_in_path, OfstSymbolSet& all_input_symbols);
+  static void find_input_epsilon_cycles(StateId n,StateId t,StateIdSet &epsilon_targets,bool unweighted_only,TransduceR * tr,TransducerHeader& h);
  public:
   static void compute_header(TransducerHeader& header,
       TransduceR * t, SymbolNumber symbol_count,
