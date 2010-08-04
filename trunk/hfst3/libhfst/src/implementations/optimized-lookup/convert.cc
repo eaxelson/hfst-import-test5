@@ -7,16 +7,6 @@ bool check_finality(TransduceR * tr, StateId s)
   return tr->Final(s) != fst::TropicalWeight::Zero();
 }
 
-bool is_deterministic_(TransduceR * tr)
-{
-  return false or (tr == NULL);
-}
-
-bool is_minimised_(TransduceR * tr)
-{
-  return false or (tr == NULL);
-}
-
 void ConvertIdNumberMap::add_node(StateId n, TransduceR *tr)
 {
   if (node_to_id.find(n) == node_to_id.end())
@@ -569,100 +559,96 @@ PlaceHolderVector::size_type ConvertTransitionTableIndices::add_state(ConvertFst
   return UINT_MAX;
 }
 
-
-void ConvertTransducerHeader::inspect_nodes(StateId n, StateIdSet &visited_nodes, 
-         OfstSymbolSet &input_symbols, TransduceR * tr, TransducerHeader& h)
+void ConvertTransducerHeader::full_traversal(TransducerHeader& h, TransduceR* tr,
+        StateId n, StateIdSet& visited_nodes, StateIdSet& nodes_in_path, OfstSymbolSet& all_input_symbols)
 {
-  if (visited_nodes.find(n) != visited_nodes.end())
+  if(visited_nodes.find(n) != visited_nodes.end())
     return;
-  
   visited_nodes.insert(n);
+  nodes_in_path.insert(n);
   
-  for(ArcIterator aiter(*tr,n); !aiter.Done(); aiter.Next())
-  {
-    ++h.number_of_transitions;
-    StdArc a = aiter.Value();
-    if(!TransducerAlphabet::is_flag_diacritic(tr->InputSymbols()->Find(a.ilabel)))
-      { input_symbols.insert(a.ilabel); }
-    inspect_nodes(a.nextstate, visited_nodes, input_symbols, tr, h);
-  }
-}
-
-void ConvertTransducerHeader::find_input_epsilon_cycles(StateId n,StateId t,StateIdSet &epsilon_targets,TransduceR * tr,TransducerHeader& h)
-{
-  for (ArcIterator aiter(*tr,n); !aiter.Done(); aiter.Next())
-  {
-    StdArc a = aiter.Value();
-    if (a.ilabel != 0)
-      continue;
-
-    StateId target = a.nextstate;
-    if (t == target )
-    { 
-      h.has_input_epsilon_cycles = true;
-      return; 
-    }
-
-    if(epsilon_targets.find(target) != epsilon_targets.end())
-    {
-      epsilon_targets.insert(target);
-      find_input_epsilon_cycles(target,t,epsilon_targets,tr, h);
-    }
-
-    if(h.has_input_epsilon_cycles)
-      return;
-  }
-}
-
-void ConvertTransducerHeader::find_cycles (StateId n,
-		    StateIdSet &visited_nodes,
-		    StateIdSet &checked_nodes,
-		    TransduceR * tr, TransducerHeader& h)
-{
-  if(checked_nodes.find(n) != checked_nodes.end())
-    return;
-
-  if(h.has_input_epsilon_cycles)
+  if(h.weighted && !h.has_unweighted_input_epsilon_cycles)
   {
     StateIdSet epsilon_nodes;
-    find_input_epsilon_cycles(n,n,epsilon_nodes,tr,h);
+    find_input_epsilon_cycles(n,n,epsilon_nodes,true,tr,h);
   }
-  checked_nodes.insert(n);
-  visited_nodes.insert(n);
+  if(!h.has_input_epsilon_cycles)
+  {
+    StateIdSet epsilon_nodes;
+    find_input_epsilon_cycles(n,n,epsilon_nodes,false,tr,h);
+  }
   
-  OfstSymbolSet input_symbols;
-  LabelSet all_labels;
+  OfstSymbolSet node_input_symbols;
+  LabelSet transition_labels;
   
-  for (ArcIterator aiter(*tr,n); !aiter.Done(); aiter.Next())
+  for(ArcIterator aiter(*tr,n); !aiter.Done(); aiter.Next())
   {
     StdArc a = aiter.Value();
     transition_label l;
     l.input_symbol = a.ilabel;
     l.output_symbol = a.olabel;
     StateId target = a.nextstate;
-
+    
+    h.number_of_transitions++;
+    if(!TransducerAlphabet::is_flag_diacritic(tr->InputSymbols()->Find(a.ilabel)))
+      all_input_symbols.insert(a.ilabel);
+    
     if(l.input_symbol == 0)
     {
       h.has_input_epsilon_transitions = true;
       if(l.output_symbol == 0)
         h.has_epsilon_epsilon_transitions = true;
     }
-    if(input_symbols.find(l.input_symbol) != input_symbols.end())
+    
+    if(node_input_symbols.find(l.input_symbol) != node_input_symbols.end())
       h.input_deterministic = false;
     else
-      input_symbols.insert(l.input_symbol);
+      node_input_symbols.insert(l.input_symbol);
     
-    if(all_labels.find(l) != all_labels.end())
+    if(transition_labels.find(l) != transition_labels.end())
       h.deterministic = false;
     else
-      all_labels.insert(l);
-
-    if(visited_nodes.find(target) != visited_nodes.end())
+      transition_labels.insert(l);
+    
+    if(nodes_in_path.find(target) != nodes_in_path.end())
       h.cyclic = true;
     
-    find_cycles(target, visited_nodes, checked_nodes, tr, h);
+    full_traversal(h, tr, target, visited_nodes, nodes_in_path, all_input_symbols);
   }
-  visited_nodes.erase(n);
+  nodes_in_path.erase(n);
+}
+
+void ConvertTransducerHeader::find_input_epsilon_cycles(StateId n,StateId start,StateIdSet &epsilon_targets,bool unweighted_only,TransduceR * tr,TransducerHeader& h)
+{
+  for (ArcIterator aiter(*tr,n); !aiter.Done(); aiter.Next())
+  {
+    StdArc a = aiter.Value();
+    if(a.ilabel != 0 || TransducerAlphabet::is_flag_diacritic(tr->InputSymbols()->Find(a.ilabel)))
+      continue;
+    else
+    {
+      if(a.weight != StdArc::Weight::Zero())
+        continue;
+    }
+    
+    StateId target = a.nextstate;
+    if (start == target )
+    {
+      if(unweighted_only)
+        h.has_unweighted_input_epsilon_cycles = true;
+      h.has_input_epsilon_cycles = true;
+      return;
+    }
+    
+    if(epsilon_targets.find(target) != epsilon_targets.end())
+    {
+      epsilon_targets.insert(target);
+      find_input_epsilon_cycles(target,start,epsilon_targets,unweighted_only,tr, h);
+    }
+
+    if(h.has_input_epsilon_cycles || h.has_unweighted_input_epsilon_cycles)
+      return;
+  }
 }
 
 void ConvertTransducerHeader::compute_header(TransducerHeader& header,
@@ -671,45 +657,33 @@ void ConvertTransducerHeader::compute_header(TransducerHeader& header,
 	    TransitionTableIndex number_of_target_table_entries,
 	    bool weighted)
 {
+  //Initial values, many will be modified by the following function calls
+  header.number_of_input_symbols = 0;
   header.number_of_symbols = symbol_count;
   header.size_of_transition_index_table = number_of_index_table_entries;
   header.size_of_transition_target_table = number_of_target_table_entries;
-  
+  header.number_of_states = 0;
+  header.number_of_transitions = 0;
   header.weighted = weighted;
-  header.deterministic = is_deterministic_(t);
-  header.minimized = is_minimised_(t);
-  
-  //These properties are like this, unless evidence for the
-  //contrary is found.
-  header.cyclic = true;
-  header.has_epsilon_epsilon_transitions = true;
-  header.has_input_epsilon_transitions = true;
+  header.deterministic = true;
+  header.input_deterministic = true;
+  header.minimized = false; // TODO: determine this somehow
+  header.cyclic = false;
+  header.has_epsilon_epsilon_transitions = false;
+  header.has_input_epsilon_transitions = false;
   header.has_input_epsilon_cycles = false;
   header.has_unweighted_input_epsilon_cycles = false;
   
-  StateIdSet nodes;
+  StateIdSet nodes, nodes_in_path;
   OfstSymbolSet input_symbols;
   input_symbols.insert(0);
-  header.number_of_transitions = 0;
-  inspect_nodes(t->Start(), nodes, input_symbols, t, header);
+  full_traversal(header, t, t->Start(), nodes, nodes_in_path, input_symbols);
   
   header.number_of_input_symbols = input_symbols.size();
   header.number_of_states = nodes.size();
-  
-  nodes.clear();
-  StateIdSet checked_nodes;
-  nodes.insert(t->Start());
-  //find_cycles(t->Start(),
-  //		nodes,
-  //		checked_nodes,
-  //		t);
-
-  // An unweighted transducer doesn't really have a sensible
-  // interpretation for this.
-  header.has_unweighted_input_epsilon_cycles =
-    //     has_input_epsilon_cycles;
-    false;
-}
+  if(!header.weighted)
+    header.has_unweighted_input_epsilon_cycles = header.has_input_epsilon_cycles;
+}	
 
 
 ConvertTransducer* ConvertTransducer::constructing_transducer = NULL;
