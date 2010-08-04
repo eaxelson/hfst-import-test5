@@ -74,9 +74,9 @@ namespace hfst
     HfstTransducer *read_transducer( char *filename );
     HfstTransducer *var_value( char *name );
     HfstTransducer *rvar_value( char *name );
-    Range *svar_value( char *name );
+    static Range *svar_value( char *name );
     Range *complement_range( Range* );
-    Range *rsvar_value( char *name );
+    static Range *rsvar_value( char *name );
     static Character character_code( unsigned int uc );
     static Character symbol_code( char *s );
     static unsigned int utf8toint( char *s );
