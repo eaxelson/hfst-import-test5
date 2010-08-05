@@ -29,16 +29,7 @@ namespace hfst {
     FdFeature Feature(void) const { return feature; }
     FdValue Value(void) const { return value; }
     std::string Name(void) const { return name; }
-    
-    void display() const
-    {
-      std::cout << "FdOperation (" << this << "):" << std::endl
-                << "  op: " << op << std::endl
-                << "  feature: " << feature << std::endl
-                << "  value: " << value << std::endl
-                << "  name: " << name << std::endl;
-    }
-    
+        
     static FdOperator char_to_operator(char c)
     {
       switch (c) {
@@ -104,11 +95,8 @@ namespace hfst {
       
       if(feature_map.count(feat) == 0)
       {
-        std::cout << "[feature_map.size(): " << feature_map.size() << "]" << std::endl;
         FdFeature next = feature_map.size();
         feature_map[feat] = next;
-        std::cout << "[Added " << feat << " as " << next << "]" << std::endl;
-        std::cout << "[feature_map.size(): " << feature_map.size() << "]" << std::endl;
       }
       if(value_map.count(val) == 0)
       {
@@ -118,9 +106,6 @@ namespace hfst {
       
       operations.insert(std::pair<T,FdOperation>(symbol, FdOperation(op, feature_map[feat], value_map[val], str)));
       symbol_map.insert(std::pair<std::string,T>(str, symbol));
-      std::cout << "Defined the following diacritic to symbol " << symbol << " (table: " << this << ")" << std::endl;
-      operations.find(symbol)->second.display();
-      std::cout << "  num_features is now " << num_features() << std::endl;
     }
     
     FdFeature num_features() const { return feature_map.size(); }
@@ -188,22 +173,12 @@ namespace hfst {
    public:
     FdState(const FdTable<T>& t):
       table(&t), values(table->num_features()), error_flag(false)
-    {
-      std::cout << "Creating a new FdState with size of " << values.size() << " (table: " << table << ")" << std::endl;
-    }
+    {}
     
     const FdTable<T>& get_table() const {return *table;}
     
     bool apply_operation(const FdOperation& op)
     {
-      std::cout << "In apply_operation." << std::endl
-                << "  table->num_features: " << table->num_features() << std::endl
-                << "  values.size: " << values.size() << std::endl
-                << "  op.Operator(): " << op.Operator() << std::endl
-                << "  op.Feature(): " << op.Feature() << std::endl
-                << "  op.Value(): " << op.Value() << std::endl
-                << "  op.Name(): " << op.Name() << std::endl
-                << "  values[feature]: " << values[op.Feature()] << std::endl;
       switch(op.Operator()) {
         case Pop: // positive set
           values[op.Feature()] = op.Value();
