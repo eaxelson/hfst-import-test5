@@ -130,11 +130,9 @@ namespace hfst
       {
       case 0:
         return read_version_3_0_fst_type(*in);
-        break;
       default:
         fprintf(stderr, "stream_fst_type: returning ERROR_TYPE (1)\n");
         return ERROR_TYPE;
-        break;
       }
     }
     else { /* No HFST3 header on the file */
