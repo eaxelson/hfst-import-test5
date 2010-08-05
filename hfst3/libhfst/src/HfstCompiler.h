@@ -87,14 +87,23 @@ namespace hfst
     static Range *add_values( unsigned int, unsigned int, Range*);
     static Range *append_values( Range *r2, Range *r );
     void add_alphabet( HfstTransducer* );  // ?
+
+    static HfstCompiler::Contexts *make_context( HfstTransducer *l, HfstTransducer *r );
+    static HfstCompiler::Contexts *add_context( HfstCompiler::Contexts *nc, HfstCompiler::Contexts *c );    
+
+    static HfstTransducer * negation( HfstTransducer *t );
+
+    static HfstTransducer * explode( HfstTransducer *t );
     
+    static HfstTransducer * replace_in_context(HfstTransducer * mapping, Repl_Type repl_type, Contexts *contexts, bool optional);
+    static HfstTransducer * replace(HfstTransducer * mapping, Repl_Type repl_type, bool optional);
+
     // These functions delete their argument automata
     
     static void def_alphabet( HfstTransducer *a );
     bool def_var( char *name, HfstTransducer *a );
     bool def_rvar( char *name, HfstTransducer *a );
     bool def_svar( char *name, Range *r );
-    HfstTransducer *explode( HfstTransducer *a );
 
     /*
     Transducer *catenate( Transducer *a1, Transducer *a2 );
@@ -120,8 +129,6 @@ namespace hfst
     
     static HfstTransducer *make_mapping( Ranges*, Ranges*, ImplementationType );
     Ranges *add_range( Range*, Ranges* );
-    Contexts *make_context( HfstTransducer *l, HfstTransducer *r );
-    Contexts *add_context( Contexts *nc, Contexts *c );
     static HfstTransducer *result( HfstTransducer*, bool );
 
     //void write_to_file( Transducer*, char *filename);
