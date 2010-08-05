@@ -82,7 +82,10 @@ extern const char* program_name;
 #  if HAVE_ERRC
 #    define error errc
 #  elif HAVE_ERR
-#    define error(status, errnum, fmt, ...) err(status, fmt, __VA_ARGS__)
+#    define error(status, errnum, fmt, ...) err(status, fmt, __VA_ARGS__ )
+#  else
+#    define error(status, errnum, fmt, ...) fprintf(stderr, fmt, _VA_ARGS__ );\
+    if (status > 0) {exit(status);}
 #  endif
 #endif
 /** @brief print standard formatted warning message and exit if needed
@@ -91,8 +94,11 @@ extern const char* program_name;
 #  if HAVE_WARNC
 #    define warning warnc
 #  elif HAVE_WARN
-#    define warning(status, errnum, fmt, ...) warn(fmt, __VA_ARGS__);\
-    if (status != 0) {exit(status);}
+#    define warning(status, errnum, fmt, ...) warn(fmt, __VA_ARGS__ );\
+    if (status > 0) {exit(status);}
+#  else
+#     define warning(status, errnum, fmt, ...) fprintf(message_out, fmt, __VA_ARGS__ );\
+    if (status > 0) {exit(status);}
 #  endif
 #endif
 
@@ -172,7 +178,7 @@ hfst::ImplementationType hfst_parse_format_name(const char* s);
 #if HAVE_XSTRNDUP
 #  define hfst_strndup xstrndup
 #elif HAVE_STRNDUP
-#  define hfst_strndup strdnup
+#  define hfst_strndup strndup
 #else
 char* hfst_strndup(const char* s, size_t n);
 #endif

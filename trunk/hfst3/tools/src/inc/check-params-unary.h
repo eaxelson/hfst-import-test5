@@ -33,6 +33,10 @@
             error(EXIT_FAILURE, 0, 
                   "no more than one transducer file may be given");
           }
+        else
+          {
+            inputfilename = hfst_strdup("<stdin>");
+          }
       }
     else 
       {

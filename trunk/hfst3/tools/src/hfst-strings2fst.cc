@@ -46,6 +46,8 @@ using std::pair;
 #include "inc/globals-unary.h"
 
 using hfst::HfstOutputStream;
+using hfst::HfstTokenizer;
+using hfst::HfstTransducer;
 
 static char *epsilonname=NULL;
 static bool has_spaces=false;
@@ -196,22 +198,18 @@ parse_options(int argc, char** argv)
         case 'f':
             output_format = hfst_parse_format_name(optarg);
             break;
-        case '?':
-            fprintf(message_out, "invalid option --%s\n",
-                    long_options[option_index].name);
-            print_short_help();
-            return EXIT_FAILURE;
-            break;
-        default:
-            fprintf(message_out, "invalid option -%c\n", c);
-            print_short_help();
-            return EXIT_FAILURE;
-            break;
+#include "inc/getopt-cases-error.h"
         }
     }
 
 #include "inc/check-params-common.h"
 #include "inc/check-params-unary.h"
+    if (output_format == hfst::UNSPECIFIED_TYPE)
+      {
+        verbose_printf("Output format not specified, "
+             "defaulting to openfst tropical\n");
+        output_format = hfst::TROPICAL_OFST_TYPE;
+      }
     return EXIT_CONTINUE;
 }
 
@@ -263,7 +261,8 @@ vector<char*> parse_pairstring_and_weight(char *line, float& weight) {
     i++;
       }
       i=j;
-    }                   
+    }           
+
     else if (line[i] == ':') {
       line[i] = '\0';
       res.push_back(&line[last_start]);
@@ -360,11 +359,14 @@ vector<char*> parse_identity_string_with_spaces(char *line) {
 
 
 int
-process_stream(HfstOutputStream /*outstream*/)
+process_stream(HfstOutputStream& outstream)
 {
   size_t transducer_n = 0;
   char* line = 0;
   size_t len = 0;
+  HfstTokenizer tok;
+  HfstTransducer disjunction(output_format);
+  outstream.open();
   while (hfst_getline(&line, &len, inputfile) != -1)
     {
       transducer_n++;
@@ -382,8 +384,64 @@ process_stream(HfstOutputStream /*outstream*/)
         }
       else if (!has_spaces && !pairstrings)
         {
-          return EXIT_FAILURE;
+          const char* colon = strstr(line, ":");
+          while (colon != NULL)
+            {
+              if (colon == line)
+                {
+                  //warning(0, 0, "Line should not start with unescaped :");
+                  colon = strstr(colon + 1, ":");
+                }
+              else if (*(colon-1) == '\\')
+                {
+                  colon = strstr(colon + 1, ":");
+                }
+              else
+                {
+                  break;
+                }
+            }
+          const char* tab = strstr(line, "\t");
+          const char* string_end = tab;
+          if (string_end == NULL)
+            {
+              string_end = line;
+              while ((*string_end != '\0') && (*string_end != '\n'))
+                {
+                  string_end++;
+                }
+            }
+          char* first;
+          char* second;
+          if (colon != NULL)
+            {
+              first = hfst_strndup(line, colon-line);
+              second = hfst_strndup(colon, string_end - colon);
+            }
+          else
+            {
+              first = hfst_strndup(line, string_end-line);
+              second = first;
+            }
+          HfstTransducer trans(first, second, tok, output_format);
+          if (tab != NULL)
+            {
+              double weight = hfst_strtoweight(tab+1);
+              trans.set_final_weights(weight);
+            }
+          if (!disjunct_strings)
+            {
+              outstream << trans;
+            }
+          else
+            {
+              disjunction.disjunct(trans);
+            }
         }
+    }
+  if (disjunct_strings)
+    {
+      outstream << disjunction;
     }
   free(line);
   return EXIT_SUCCESS;
