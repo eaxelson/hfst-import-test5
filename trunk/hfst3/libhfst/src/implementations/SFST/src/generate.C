@@ -130,8 +130,8 @@ bool Transducer::generate_hfst1( Node *node, Node2Int &visitations, char *buffer
       buffer[pos2] = 0;
       results.insert( 
 	  hfst::WeightedPath<float>(
-	  buffer2,
 	  buffer,
+	  buffer2,
 	  0 ) );
 	} 
     else
