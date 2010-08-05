@@ -85,21 +85,21 @@ ASSIGNMENT: // VAR '=' RE              { if (def_var($1,$3)) warn2("assignment o
           SVAR '=' VALUES         { if (def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
           | RSVAR '=' VALUES        { if (def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
           // | RE PRINT STRING         { write_to_file($1, $3); }
-          | ALPHA RE                { HfstCompiler::def_alphabet($2); }
+          | ALPHA RE                { HfstCompiler::def_alphabet($2); delete $2; }
           ;
 
 RE:       //   RE ARROW CONTEXTS2      { $$ = restriction($1,$2,$3,0); }
 	  // | RE '^' ARROW CONTEXTS2  { $$ = restriction($1,$3,$4,1); }
 	  // | RE '_' ARROW CONTEXTS2  { $$ = restriction($1,$3,$4,-1); }
-          // | RE REPLACE CONTEXT2     { $$ = replace_in_context(minimise(explode($1)),$2,$3,false); }
-          // | RE REPLACE '?' CONTEXT2 { $$ = replace_in_context(minimise(explode($1)),$2,$4,true);}
-          // | RE REPLACE '(' ')'      { $$ = replace(minimise(explode($1)), $2, false); }
-          // | RE REPLACE '?' '(' ')'  { $$ = replace(minimise(explode($1)), $2, true); }
+            RE REPLACE CONTEXT2     { $$ = HfstCompiler::replace_in_context((HfstCompiler::explode($1))->minimize(), $2, $3, false); }
+          | RE REPLACE '?' CONTEXT2 { $$ = HfstCompiler::replace_in_context((HfstCompiler::explode($1))->minimize(), $2, $4, true);}
+          | RE REPLACE '(' ')'      { $$ = HfstCompiler::replace((HfstCompiler::explode($1))->minimize(), $2, false); }
+          | RE REPLACE '?' '(' ')'  { $$ = HfstCompiler::replace((HfstCompiler::explode($1))->minimize(), $2, true); }
           // | RE RANGE ARROW RANGE RE { $$ = make_rule($1,$2,$3,$4,$5); }
           // | RE RANGE ARROW RANGE    { $$ = make_rule($1,$2,$3,$4,NULL); }
           // | RANGE ARROW RANGE RE    { $$ = make_rule(NULL,$1,$2,$3,$4); }
           // | RANGE ARROW RANGE       { $$ = make_rule(NULL,$1,$2,$3,NULL); }
-          RE COMPOSE RE    { $1->compose(*$3); delete $3; $$ = $1; }
+          | RE COMPOSE RE    { $1->compose(*$3); delete $3; $$ = $1; }
           | '{' RANGES '}' ':' '{' RANGES '}' { $$ = HfstCompiler::make_mapping($2,$6,type); }
           | RANGE ':' '{' RANGES '}' { $$ = HfstCompiler::make_mapping(add_range($1,NULL),$4,type); }
           | '{' RANGES '}' ':' RANGE { $$ = HfstCompiler::make_mapping($2,add_range($5,NULL),type); }
@@ -113,7 +113,7 @@ RE:       //   RE ARROW CONTEXTS2      { $$ = restriction($1,$2,$3,0); }
           | RE '+'           { $1->repeat_plus(); $$ = $1; }
           | RE '?'           { $1->optionalize(); $$ = $1; }
           | RE RE %prec SEQ  { $1->concatenate(*$2); delete $2; $$ = $1; }
-          // | '!' RE           { $$ = negation($2); }
+          | '!' RE           { $$ = HfstCompiler::negation($2); }
           | SWITCH RE        { $2->invert(); $$ = $2; }
           | '^' RE           { $2->output_project(); $$ = $2; }
           | '_' RE           { $2->input_project(); $$ = $2; }
@@ -140,7 +140,7 @@ CONTEXTS2:  CONTEXTS               { $$ = $1; }
           | '(' CONTEXTS ')'       { $$ = $2; }
           ;
 
-CONTEXTS:   CONTEXT ',' CONTEXTS   { $$ = $3.insert($1)); }
+CONTEXTS:   CONTEXT ',' CONTEXTS   { $$ = HfstCompiler::add_context($1,$3); }
           | CONTEXT                { $$ = $1; }
           ;
 
@@ -148,9 +148,9 @@ CONTEXT2:   CONTEXT                { $$ = $1; }
           | '(' CONTEXT ')'        { $$ = $2; }
           ;
 
-CONTEXT :   RE POS RE              { }// $$ = make_context($1, $3); }
-          |    POS RE              { }// $$ = make_context(NULL, $2); }  // check
-          | RE POS                 { }// $$ = make_context($1, NULL); }  // check
+CONTEXT :   RE POS RE              { $$ = HfstCompiler::make_context($1, $3); }
+          |    POS RE              { $$ = HfstCompiler::make_context(NULL, $2); }
+          | RE POS                 { $$ = HfstCompiler::make_context($1, NULL); }
           ;
 
 VALUES:     VALUE VALUES           { $$=HfstCompiler::append_values($1,$2); }

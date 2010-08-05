@@ -891,8 +891,8 @@ void print(HfstMutableTransducer &t)
 
     HfstTransducer replace_up(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
     HfstTransducer replace_down(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
-    HfstTransducer replace_right(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
-    HfstTransducer replace_left(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    //HfstTransducer replace_right(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    //HfstTransducer replace_left(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
 
     HfstTransducer restriction(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
     HfstTransducer coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
