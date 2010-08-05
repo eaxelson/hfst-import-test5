@@ -24,7 +24,7 @@ TESTS=hfst-check-version.sh hfst-check-help.sh empty-input.sh\
 	  determinize-functionality.sh minimize-functionality.sh \
 	  remove-epsilons-functionality.sh \
 	  invert-functionality.sh project-functionality.sh repeat-functionality.sh \
-	  reverse-functionality.sh \
+	  reverse-functionality.sh substitute-functionality.sh \
 	  strings2fst-functionality.sh fst2strings-functionality.sh
 check_DATA=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   cat2cat_or_CAT_uppercased.hfst cat2CAT_uppercased.hfst cat2dog.hfst \
@@ -34,16 +34,18 @@ check_DATA=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   dog.hfst infinitely_ambiguous.hfst non_minimal.hfst rule1.hfst \
 		   rule2.hfst summarize_test1.hfst summarize_test2.hfst tac.hfst 
 
-FST_SRCS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
+FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
 		 cat2cat_or_CAT_uppercased.txt cat2CAT_uppercased.txt cat2dog.txt \
 		 cat+dog.txt catdog.txt cat_or_dog.txt cat.txt CAT_uppercased2cat.txt \
 		 CAT_uppercased.txt cat_weight_final.txt cat_weight_initial.txt \
 		 cat_weight_middle.txt dog2cat.txt dog.txt infinitely_ambiguous.txt \
 		 non_minimal.txt rule1.txt rule2.txt summarize_test1.txt \
 		 summarize_test2.txt tac.txt 
+FST_STRINGS=cat.strings
+SUBSTITUTE_TXTS=cat2dog.substitute
 
 %.hfst: %.txt
 	${top_builddir}/tools/src/hfst-txt2fst -e '@0@' < $< > $@
 
 # files needed for test programs
-EXTRA_DIST=empty-file $(FST_SRCS)
+EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(SUBSTITUTE_TXTS)
