@@ -508,7 +508,6 @@ void HfstTransducer::test_minimize()
       case ERROR_TYPE:
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
-	break;
       }    
   }
   
@@ -668,6 +667,10 @@ void HfstTransducer::test_minimize()
 	    (tc.implementation.tropical_ofst,results);
 	  break;
 	}
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+  hfst::implementations::HfstOlTransducer::extract_strings(implementation.hfst_ol, results);
+  break;
       default:
 	throw hfst::exceptions::FunctionNotImplementedException(); 
 	break;
@@ -710,6 +713,14 @@ void HfstTransducer::test_minimize()
     delete t_tropical_ofst;  
 	  break;
 	}
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+      {
+  FdTable<hfst_ol::SymbolNumber>* t_hfst_ol = hfst::implementations::HfstOlTransducer::get_flag_diacritics(implementation.hfst_ol);
+  hfst::implementations::HfstOlTransducer::extract_strings(implementation.hfst_ol,results,t_hfst_ol,filter_fd);
+  delete t_hfst_ol;
+      }
+      break;
       default:
 	throw hfst::exceptions::FunctionNotImplementedException(); 
 	break;
