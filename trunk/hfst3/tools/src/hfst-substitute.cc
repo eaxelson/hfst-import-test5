@@ -30,6 +30,13 @@
 #include <cstring>
 #include <getopt.h>
 
+#include "HfstTransducer.h"
+
+using hfst::HfstTransducer;
+using hfst::HfstInputStream;
+using hfst::HfstOutputStream;
+using hfst::exceptions::NotTransducerStreamException;
+
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 
@@ -152,8 +159,94 @@ parse_options(int argc, char** argv)
 }
 
 int
-process_stream()
+process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 {
+  instream.open();
+  outstream.open();
+  size_t transducer_n = 0;
+  HfstTransducer* to_transducer = NULL;
+  if (to_transducer_filename)
+    {
+      try {
+        HfstInputStream tostream(to_transducer_filename);
+        to_transducer = new HfstTransducer(tostream);
+      } catch (NotTransducerStreamException ntse)  
+        {
+          error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+                to_transducer_filename);
+          return EXIT_FAILURE;
+        }
+    }
+  while (instream.is_good())
+    {
+      transducer_n++;
+      HfstTransducer trans(instream);
+      if (from_label && to_label)
+        {
+          if (transducer_n < 2)
+            {
+              verbose_printf("Substituting %s with %s...\n", from_label,
+                             to_label);
+            }
+          else
+            {
+              verbose_printf("Substituting %s with %s... %zu\n", from_label,
+                            to_label, transducer_n);
+            }
+          outstream << trans.substitute(from_label, to_label);
+        }
+      else if (from_label && to_transducer)
+        {
+          if (transducer_n < 2)
+            {
+              verbose_printf("Substituting %s:%s with transducer %s...\n", 
+                             from_label, from_label, to_transducer_filename);
+            }
+          else
+            {
+              verbose_printf("Substituting %s:%s with transducer %s... %zu\n", 
+                             from_label, from_label, to_transducer_filename,
+                             transducer_n);
+            }
+          hfst::StringPair from_arc(from_label, from_label);
+          outstream << trans.substitute(from_arc, *to_transducer);
+        }
+      else if (from_file)
+        {
+          char* line = NULL;
+          size_t len = 0;
+          while (hfst_getline(&line, &len, from_file) != -1)
+            {
+              const char* tab = strstr(line, "\t");
+              if (tab == NULL)
+                {
+                  error(EXIT_FAILURE, 0, "Missing tab in %s", from_file_name);
+                }
+              const char* endstr = tab+1;
+              while ((*endstr != '\0') && (*endstr != '\n'))
+                {
+                  endstr++;
+                }
+              from_label = hfst_strndup(line, tab-line);
+              to_label = hfst_strndup(tab+1, endstr-tab-1);
+              if (transducer_n < 2)
+                {
+                  verbose_printf("Substituting %s with %s...\n", from_label,
+                                 to_label);
+                }
+              else
+                {
+                  verbose_printf("Substituting %s with %s... %zu\n", from_label,
+                                 to_label, transducer_n);
+                }
+              trans.substitute(from_label, to_label);
+              free(from_label);
+              free(to_label);
+            }
+          outstream << trans;
+        }
+    }
+  delete to_transducer;
   return EXIT_SUCCESS;
 }
 
@@ -178,6 +271,19 @@ int main( int argc, char **argv )
     verbose_printf("Reading from %s, writing to %s\n", 
         inputfilename, outfilename);
     // here starts the buffer handling part
+    HfstInputStream* instream = NULL;
+    try {
+      instream = (inputfile != stdin) ?
+        new HfstInputStream(inputfilename) : new HfstInputStream();
+    } catch (NotTransducerStreamException)  {
+            error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+          inputfilename);
+            return EXIT_FAILURE;
+    }
+    HfstOutputStream* outstream = (outfile != stdout) ?
+            new HfstOutputStream(outfilename, instream->get_type()) :
+            new HfstOutputStream(instream->get_type());
+    process_stream(*instream, *outstream);
     free(inputfilename);
     free(outfilename);
     return EXIT_SUCCESS;
