@@ -92,7 +92,7 @@ namespace hfst { namespace implementations
       static Transducer * reverse(Transducer * transducer);
       static Transducer * extract_input_language(Transducer * t);
       static Transducer * extract_output_language(Transducer * t);
-      static void extract_strings(Transducer * t, hfst::WeightedPaths<float>::Set &results, FdTable<SFST::Character>* fd=NULL, bool filter_fd=false);
+      static void extract_strings(Transducer * t, hfst::WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1, FdTable<SFST::Character>* fd=NULL, bool filter_fd=false);
 
       static Transducer * insert_freely(Transducer *t , const StringPair &symbol_pair);
       static Transducer * substitute(Transducer * t, String old_symbol, String new_symbol);

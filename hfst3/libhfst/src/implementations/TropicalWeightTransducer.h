@@ -151,7 +151,8 @@ namespace implementations
       static StdVectorFst * extract_input_language(StdVectorFst * t);
       static StdVectorFst * extract_output_language(StdVectorFst * t);
       static void extract_strings(StdVectorFst * t,
-				  hfst::WeightedPaths<float>::Set &results, FdTable<int64>* fd=NULL, bool filter_fd=false);
+				  hfst::WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1,
+				  FdTable<int64>* fd=NULL, bool filter_fd=false);
       static StdVectorFst * compose(StdVectorFst * t1,
 				   StdVectorFst * t2);
       static StdVectorFst * concatenate(StdVectorFst * t1,

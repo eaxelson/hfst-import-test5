@@ -12,6 +12,7 @@
 
 #include "SymbolDefs.h"
 #include "HfstExceptions.h"
+#include "ExtractStrings.h"
 #include "FlagDiacritics.h"
 #include <stdbool.h>  // foma uses _Bool
 #include "foma/fomalib.h"
@@ -103,6 +104,9 @@ namespace hfst {
 			     fsm * t2);
       static fsm * subtract(fsm * t1,
 			    fsm * t2);
+			
+			static void extract_strings(fsm * t, hfst::WeightedPaths<float>::Set &results,
+            int max_num=-1, int cycles=-1, FdTable<int>* fd=NULL, bool filter_fd=false);
 			
 			static FdTable<int>* get_flag_diacritics(fsm * t);
 			

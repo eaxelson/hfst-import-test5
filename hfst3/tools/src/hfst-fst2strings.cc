@@ -43,8 +43,9 @@ using hfst::WeightedPaths;
 using hfst::WeightedPath;
 
 // the maximum number of strings printed for each transducer
+static int max_strings = -1;
+static int cycles = -1;
 static int nbest_strings=-1;
-// print each string at most once
 static bool display_weights=false;
 static bool eval_fd=false;
 static bool filter_fd=false;
@@ -65,7 +66,9 @@ print_usage()
 	
 	fprintf(message_out, "%-35s%s", "  -o, --output=OUTFILE",        "Write results to OUTFILE\n");
 	fprintf(message_out, "%-35s%s", "  -i, --input=INFILE",          "Read input from INFILE\n");
-	fprintf(message_out, "%-35s%s", "  -n, --nbest=INT",             "The maximum number of strings printed\n");
+	fprintf(message_out, "%-35s%s", "  -n, --max-strings=INT",       "The maximum number of strings printed\n");
+	fprintf(message_out, "%-35s%s", "  -N, --nbest=INT",             "Prune the transducer to a max number of best strings\n");
+	fprintf(message_out, "%-35s%s", "  -c, --cycles=INT",            "How many times to follow cycles. Negative=infinite (default)\n");
 	fprintf(message_out, "%-35s%s", "  -w, --print-weights",         "Display the weight for each string\n");
 	fprintf(message_out, "%-35s%s", "  -e, --eval-flag-diacritics",  "Only print strings with pass flag diacritic checks\n");
 	fprintf(message_out, "%-35s%s", "  -f, --filter-flag-diacritics","Don't print flag diacritic symbols (only with -e)\n");
@@ -109,14 +112,16 @@ parse_options(int argc, char** argv)
 		  ,
 		HFST_GETOPT_UNARY_LONG
 		  ,
-			{"nbest", required_argument, 0, 'n'},
+		  {"nbest", required_argument, 0, 'N'},
+			{"max-strings", required_argument, 0, 'n'},
+			{"cycles", required_argument, 0, 'c'},
 			{"print-weights", no_argument, 0, 'w'},
 			{"eval-flag-diacritics", no_argument, 0, 'e'},
 			{"filter-flag-diacritics", no_argument, 0, 'f'},
 			{0,0,0,0}
 		};
 		int option_index = 0;
-		char c = getopt_long(argc, argv, "R:dhi:n:o:qsvVwef",
+		char c = getopt_long(argc, argv, "R:dhi:N:n:c:o:qsvVwef",
 							 long_options, &option_index);
 		if (-1 == c)
 		{
@@ -128,8 +133,14 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-unary.h"
 		case 'n':
+			max_strings = atoi(hfst_strdup(optarg));
+			break;
+		case 'N':
 			nbest_strings = atoi(hfst_strdup(optarg));
 			break;
+		case 'c':
+		  cycles = atoi(hfst_strdup(optarg));
+		  break;
 		case 'w':
 			display_weights = true;
 			break;
@@ -196,7 +207,7 @@ int
 process_stream(HfstInputStream& instream, std::ostream& outstream)
 {
   instream.open();
-    
+  
   bool first_transducer=true;
   while(instream.is_good())
   {
@@ -208,39 +219,43 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
     
     if(nbest_strings > 0)
     {
-      verbose_printf("Finding a maximum of %i paths...\n", nbest_strings);
+      verbose_printf("Pruning transducer to %i best path(s)...\n", nbest_strings);
       t.n_best(nbest_strings);
     }
     else
     {
-      verbose_printf("Finding all paths...\n");
-      if(t.is_cyclic())
+      if(max_strings <= 0 && cycles < 0 && t.is_cyclic())
       {
-        fprintf(stderr, "Transducer is cyclic. Use the -n option.\n");
+        fprintf(stderr, "Transducer is cyclic. Use one of these options: -n, -N, -c\n");
         return EXIT_FAILURE;
       }
     }
     
+    if(max_strings > 0)
+      verbose_printf("Finding at most %i path(s)...\n", max_strings);
+    else
+      verbose_printf("Finding strings...\n");
+    
     WeightedPaths<float>::Set results;
     if(eval_fd)
-      t.extract_strings_fd(results, filter_fd);
+      t.extract_strings_fd(results, max_strings, cycles, filter_fd);
     else
-      t.extract_strings(results);
+      t.extract_strings(results, max_strings, cycles);
     
     for(WeightedPaths<float>::Set::const_iterator it = results.begin(); it != results.end(); it++)
-	  {
-	    const WeightedPath<float>& wp = *it;
-	    std::cout << wp.istring;
-	    if(wp.ostring != wp.istring)
-	      std::cout << " : " << wp.ostring;
-	    if(display_weights)
-	      std::cout << "\t" << wp.weight;
-	    std::cout << std::endl;
-	  }
-	}
+    {
+      const WeightedPath<float>& wp = *it;
+      std::cout << wp.istring;
+      if(wp.ostring != wp.istring)
+        std::cout << " : " << wp.ostring;
+      if(display_weights)
+        std::cout << "\t" << wp.weight;
+      std::cout << std::endl;
+    }
+  }
 	
-	instream.close();
-	return EXIT_SUCCESS;
+  instream.close();
+  return EXIT_SUCCESS;
 }
 
 

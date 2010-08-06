@@ -495,20 +495,16 @@ void HfstTransducer::test_minimize()
 	one_copy.convert(TROPICAL_OFST_TYPE);
 	another_copy.convert(TROPICAL_OFST_TYPE);
 	return one_copy.tropical_ofst_interface.are_equivalent(one_copy.implementation.tropical_ofst, another_copy.implementation.tropical_ofst);
-	break;
       case TROPICAL_OFST_TYPE:
 	return one_copy.tropical_ofst_interface.are_equivalent(one_copy.implementation.tropical_ofst, another_copy.implementation.tropical_ofst);
-	break;
       case LOG_OFST_TYPE:
 	return one_copy.log_ofst_interface.are_equivalent(one_copy.implementation.log_ofst, another_copy.implementation.log_ofst);
-	break;
       case FOMA_TYPE:
 	return one_copy.foma_interface.are_equivalent(one_copy.implementation.foma, another_copy.implementation.foma);
-	break;
       case ERROR_TYPE:
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
-      }    
+      }
   }
   
   bool HfstTransducer::is_cyclic(void) const
@@ -645,82 +641,82 @@ void HfstTransducer::test_minimize()
        &hfst::implementations::LogWeightTransducer::extract_output_language,
        &hfst::implementations::FomaTransducer::extract_output_language); }
 
-  void HfstTransducer::extract_strings(WeightedPaths<float>::Set &results)
+  void HfstTransducer::extract_strings(WeightedPaths<float>::Set &results, int max_num, int cycles)
   {
+    if(is_cyclic() && max_num < 1 && cycles < 0)
+      throw hfst::exceptions::TransducerIsCyclicException();
+    
     switch (this->type)
       {
       case LOG_OFST_TYPE:
 	hfst::implementations::LogWeightTransducer::extract_strings
-	  (implementation.log_ofst,results);
+	  (implementation.log_ofst,results,max_num,cycles);
 	break;
       case TROPICAL_OFST_TYPE:
 	hfst::implementations::TropicalWeightTransducer::extract_strings
-	  (implementation.tropical_ofst,results);
+	  (implementation.tropical_ofst,results,max_num,cycles);
 	break;
       case SFST_TYPE:
-	hfst::implementations::SfstTransducer::extract_strings(implementation.sfst, results);
+	hfst::implementations::SfstTransducer::extract_strings(implementation.sfst, results, max_num, cycles);
 	break;
       case FOMA_TYPE:
-	{
-	  HfstTransducer tc = convert(*this, FOMA_TYPE);
-	  hfst::implementations::TropicalWeightTransducer::extract_strings
-	    (tc.implementation.tropical_ofst,results);
-	  break;
-	}
+	hfst::implementations::FomaTransducer::extract_strings(implementation.foma, results, max_num, cycles);
+	break;
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
-  hfst::implementations::HfstOlTransducer::extract_strings(implementation.hfst_ol, results);
-  break;
+	hfst::implementations::HfstOlTransducer::extract_strings(implementation.hfst_ol, results, max_num, cycles);
+	break;
       default:
 	throw hfst::exceptions::FunctionNotImplementedException(); 
 	break;
       }
   }
   
-  void HfstTransducer::extract_strings_fd(WeightedPaths<float>::Set &results, bool filter_fd)
+  void HfstTransducer::extract_strings_fd(WeightedPaths<float>::Set &results, int max_num, int cycles, bool filter_fd)
   {
+    if(is_cyclic() && max_num < 1 && cycles < 0)
+      throw hfst::exceptions::TransducerIsCyclicException();
+    
     switch (this->type)
       {
       case LOG_OFST_TYPE:
       {
-  FdTable<int64>* t_log_ofst = hfst::implementations::LogWeightTransducer::get_flag_diacritics(implementation.log_ofst);
+	FdTable<int64>* t_log_ofst = hfst::implementations::LogWeightTransducer::get_flag_diacritics(implementation.log_ofst);
 	hfst::implementations::LogWeightTransducer::extract_strings
-	  (implementation.log_ofst,results,t_log_ofst,filter_fd);
-  delete t_log_ofst;
+	  (implementation.log_ofst,results,max_num,cycles,t_log_ofst,filter_fd);
+	delete t_log_ofst;
       }
 	break;
       case TROPICAL_OFST_TYPE:
       {
-  FdTable<int64>* t_tropical_ofst = hfst::implementations::TropicalWeightTransducer::get_flag_diacritics(implementation.tropical_ofst);
+	FdTable<int64>* t_tropical_ofst = hfst::implementations::TropicalWeightTransducer::get_flag_diacritics(implementation.tropical_ofst);
 	hfst::implementations::TropicalWeightTransducer::extract_strings
-	  (implementation.tropical_ofst,results,t_tropical_ofst,filter_fd);
-  delete t_tropical_ofst;
+	  (implementation.tropical_ofst,results,max_num,cycles,t_tropical_ofst,filter_fd);
+	delete t_tropical_ofst;
       }
 	break;
       case SFST_TYPE:
       {
-  FdTable<SFST::Character>* t_sfst = hfst::implementations::SfstTransducer::get_flag_diacritics(implementation.sfst);
-	hfst::implementations::SfstTransducer::extract_strings(implementation.sfst, results, t_sfst, filter_fd);
-  delete t_sfst;
+	FdTable<SFST::Character>* t_sfst = hfst::implementations::SfstTransducer::get_flag_diacritics(implementation.sfst);
+	hfst::implementations::SfstTransducer::extract_strings(implementation.sfst, results, max_num, cycles, t_sfst, filter_fd);
+	delete t_sfst;
       }
 	break;
       case FOMA_TYPE:
-	{
-	  HfstTransducer tc = convert(*this, FOMA_TYPE);
-	  FdTable<int64>* t_tropical_ofst = hfst::implementations::TropicalWeightTransducer::get_flag_diacritics(tc.implementation.tropical_ofst);
-	  hfst::implementations::TropicalWeightTransducer::extract_strings
-	    (tc.implementation.tropical_ofst,results,t_tropical_ofst,filter_fd);
-    delete t_tropical_ofst;  
-	  break;
-	}
+      {
+	  FdTable<int>* t_foma = hfst::implementations::FomaTransducer::get_flag_diacritics(implementation.foma);
+	  hfst::implementations::FomaTransducer::extract_strings(implementation.foma, results, max_num, cycles, t_foma, filter_fd);
+	  delete t_foma;
+      }
+	break;
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
       {
-  FdTable<hfst_ol::SymbolNumber>* t_hfst_ol = hfst::implementations::HfstOlTransducer::get_flag_diacritics(implementation.hfst_ol);
-  hfst::implementations::HfstOlTransducer::extract_strings(implementation.hfst_ol,results,t_hfst_ol,filter_fd);
-  delete t_hfst_ol;
+	FdTable<hfst_ol::SymbolNumber>* t_hfst_ol = hfst::implementations::HfstOlTransducer::get_flag_diacritics(implementation.hfst_ol);
+	hfst::implementations::HfstOlTransducer::extract_strings(implementation.hfst_ol,results,max_num,cycles,t_hfst_ol,filter_fd);
+	delete t_hfst_ol;
       }
-      break;
+	break;
       default:
 	throw hfst::exceptions::FunctionNotImplementedException(); 
 	break;

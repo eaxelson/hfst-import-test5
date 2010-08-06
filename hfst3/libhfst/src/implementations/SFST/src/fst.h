@@ -302,7 +302,7 @@ class Transducer {
   bool is_cyclic_node( Node*, NodeHashSet &visited );
   bool is_automaton_node( Node* );
   bool generate1( Node*, Node2Int&, char*, int, char*, int, FILE* );
-  bool generate_hfst1( Node*, Node2Int&, char*, int, char*, int, hfst::WeightedPaths<float>::Set &results, std::vector<hfst::FdState<Character> >* fd_state_stack=NULL, bool filter_fd=true); // HFST ADDITION
+  void generate_hfst( Node*, Node2Int&, Node2Int&, std::vector<char>&, int, std::vector<char>&, int, hfst::WeightedPaths<float>::Set &results, int, int, std::vector<hfst::FdState<Character> >* fd_state_stack=NULL, bool filter_fd=true); // HFST ADDITION
   void store_symbols( Node*, SymbolMap&, LabelSet& );
 
   void splice_nodes(Node*, Node*, Label sl, Transducer*, Transducer*);
@@ -352,7 +352,7 @@ class Transducer {
   bool analyze_string( char *s, FILE *file, bool with_brackets=true );
   bool generate_string( char *s, FILE *file, bool with_brackets=true );
   bool generate( FILE *file, bool separate=false );
-  bool generate_hfst( hfst::WeightedPaths<float>::Set &results, hfst::FdTable<Character>* fd=NULL, bool filter_fd=false, bool separate=false); // HFST ADDITION
+  void generate_hfst( hfst::WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1, hfst::FdTable<Character>* fd=NULL, bool filter_fd=false); // HFST ADDITION
 
   void clear( void );      // clears the transducer. The resulting transducer
                            // is like one created with Transducer()
