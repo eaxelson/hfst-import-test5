@@ -1049,65 +1049,46 @@ namespace hfst { namespace implementations
   */
 
 
-  /*void extract_reversed_strings
-  (LogFst * t, LogArc::StateId s,
-   WeightedPaths<float>::Vector &reversed_results, set<StateId> &states_visited)
+  void extract_strings(LogFst * t, LogArc::StateId s,
+    std::map<LogArc::StateId,unsigned short> all_visitations, std::map<LogArc::StateId, unsigned short> path_visitations,
+    std::vector<char>& lbuffer, int lpos, std::vector<char>& ubuffer, int upos, float weight_sum,
+    WeightedPaths<float>::Set &results, int max_num, int cycles,
+    std::vector<hfst::FdState<int64> >* fd_state_stack, bool filter_fd)
   {
-    if (states_visited.find(s) == states_visited.end())
-      states_visited.insert(s);
-    else
-      throw TransducerIsCyclicException();
-
-    WeightedPaths<float>::Vector reversed_continuations;
-    for (fst::ArcIterator<LogFst> it(*t,s); !it.Done(); it.Next())
-      {
-	const LogArc &arc = it.Value();
-	extract_reversed_strings(t,arc.nextstate,reversed_continuations, states_visited);
-	std::string istring;
-	std::string ostring;
-
-	if (arc.ilabel != 0)
-	  { istring = t->InputSymbols()->Find(arc.ilabel); }
-	if (arc.olabel != 0)
-	  { ostring = t->InputSymbols()->Find(arc.olabel); }
-	WeightedPath<float> 
-	  arc_string(istring,ostring,arc.weight.Value());
-	WeightedPaths<float>::add(arc_string,reversed_continuations);
-	WeightedPaths<float>::cat(reversed_results,reversed_continuations);
-	reversed_continuations.clear();
-      }
-    if (t->Final(s) != LogWeight::Zero()) 
-      { reversed_results.push_back(WeightedPath<float>
-				   ("","",t->Final(s).Value())); }
-
-    states_visited.erase(s);
-  }*/
-  
-  void extract_strings
-  (LogFst * t, LogArc::StateId s,
-   WeightedPaths<float>::Vector &results, set<StateId> &states_visited,
-   std::vector<hfst::FdState<int64> >* fd_state_stack, bool filter_fd)
-  {
-    if (states_visited.find(s) == states_visited.end())
-      states_visited.insert(s);
-    else
-      throw TransducerIsCyclicException();
+    if(cycles >= 0 && path_visitations[s] > cycles)
+      return;
+    all_visitations[s]++;
+    path_visitations[s]++;
     
     if(t->Final(s) != LogWeight::Zero())
-      results.push_back(WeightedPath<float>("","",t->Final(s).Value()));
+    {
+      lbuffer[lpos]=0;
+      ubuffer[upos]=0;
+      results.insert(hfst::WeightedPath<float>(lbuffer.data(),ubuffer.data(),weight_sum+t->Final(s).Value()));
+    }
     
+    // sort arcs by number of visitations
+    vector<const LogArc*> arcs;
     for(fst::ArcIterator<LogFst> it(*t,s); !it.Done(); it.Next())
     {
-      const LogArc &arc = it.Value();
-      
-      std::string istring;
-      std::string ostring;
+      const LogArc& a = it.Value();
+      size_t i;
+      for( i=0; i<arcs.size(); i++ )
+        if (all_visitations[a.nextstate] < all_visitations[arcs[i]->nextstate])
+          break;
+      arcs.push_back(NULL);
+      for( size_t k=arcs.size()-1; k>i; k-- )
+        arcs[k] = arcs[k-1];
+      arcs[i] = &a;
+    }
+    
+    for( size_t i=0; i<arcs.size() && results.size() < max_num; i++ )
+    {
+      const LogArc &arc = *(arcs[i]);
       bool added_fd_state = false;
-      
-      if(fd_state_stack != NULL)
-      {
-        if(fd_state_stack->back().get_table().get_operation(arc.ilabel) != NULL)
-        {
+    
+      if (fd_state_stack) {
+        if(fd_state_stack->back().get_table().get_operation(arc.ilabel) != NULL) {
           fd_state_stack->push_back(fd_state_stack->back());
           if(fd_state_stack->back().apply_operation(arc.ilabel))
             added_fd_state = true;
@@ -1118,36 +1099,52 @@ namespace hfst { namespace implementations
         }
       }
       
-      if(arc.ilabel != 0 && (!filter_fd || fd_state_stack->back().get_table().get_operation(arc.ilabel)==NULL))
-        istring = t->InputSymbols()->Find(arc.ilabel);
-      if(arc.olabel != 0 && (!filter_fd || fd_state_stack->back().get_table().get_operation(arc.olabel)==NULL))
-        ostring = t->InputSymbols()->Find(arc.olabel);
-      WeightedPath<float> arc_string(istring,ostring,arc.weight.Value());
+      int lp=lpos;
+      int up=upos;
       
-      WeightedPaths<float>::Vector continuations;
-      extract_strings(t,arc.nextstate,continuations,states_visited,fd_state_stack,filter_fd);
-      WeightedPaths<float>::add(arc_string, continuations);
-      results.insert(results.end(),continuations.begin(), continuations.end());
+      if (arc.ilabel != 0 && (!filter_fd || fd_state_stack->back().get_table().get_operation(arc.ilabel)==NULL))
+      {
+        std::string str = t->InputSymbols()->Find(arc.ilabel);
+        if(lpos+str.length() >= lbuffer.size())
+          lbuffer.resize(lbuffer.size()*2, 0);
+        strcpy(lbuffer.data()+lpos, str.c_str());
+        lp += str.length();
+      }
+      if (arc.olabel != 0 && (!filter_fd || fd_state_stack->back().get_table().get_operation(arc.olabel)==NULL))
+      {
+        std::string str = t->InputSymbols()->Find(arc.olabel);
+        if(upos+str.length() > ubuffer.size())
+          ubuffer.resize(ubuffer.size()*2, 0);
+        strcpy(ubuffer.data()+upos, str.c_str());
+        up += str.length();
+      }
+      
+      extract_strings(t, arc.nextstate, all_visitations, path_visitations,
+          lbuffer,lp, ubuffer,up, weight_sum+arc.weight.Value(), results, max_num, cycles, fd_state_stack, filter_fd);
       
       if(added_fd_state)
         fd_state_stack->pop_back();
     }
     
-    states_visited.erase(s);
+    path_visitations[s]--;
   }
-
-
-  void LogWeightTransducer::extract_strings
-  (LogFst * t, WeightedPaths<float>::Set &results, FdTable<int64>* fd, bool filter_fd)
+  
+  static const int BUFFER_START_SIZE = 64;
+  
+  void LogWeightTransducer::extract_strings(LogFst * t,
+    WeightedPaths<float>::Set &results, int max_num, int cycles,
+    FdTable<int64>* fd, bool filter_fd)
   {
     if (t->Start() == -1)
-      { return; }
-    WeightedPaths<float>::Vector results_vec;
-    set<StateId> states_visited;
+      return;
+    
+    vector<char> lbuffer(BUFFER_START_SIZE, 0);
+    vector<char> ubuffer(BUFFER_START_SIZE, 0);
+    map<LogArc::StateId, unsigned short> all_visitations;
+    map<LogArc::StateId, unsigned short> path_visitations;
     std::vector<hfst::FdState<int64> >* fd_state_stack = (fd==NULL) ? NULL : new std::vector<hfst::FdState<int64> >(1, hfst::FdState<int64>(*fd));
     
-    hfst::implementations::extract_strings(t,t->Start(),results_vec,states_visited,fd_state_stack,filter_fd);
-    results.insert(results_vec.begin(),results_vec.end());
+    hfst::implementations::extract_strings(t,t->Start(),all_visitations,path_visitations,lbuffer,0,ubuffer,0,0.0f,results,max_num,cycles,fd_state_stack,filter_fd);
   }
   
   FdTable<int64>* LogWeightTransducer::get_flag_diacritics(LogFst * t)

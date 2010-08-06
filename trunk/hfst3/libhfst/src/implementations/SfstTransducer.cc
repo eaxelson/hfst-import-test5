@@ -733,9 +733,9 @@ namespace hfst { namespace implementations {
   { t->complete_alphabet();
     return &t->upper_level(); }
   
-  void SfstTransducer::extract_strings(Transducer * t, hfst::WeightedPaths<float>::Set &results, FdTable<SFST::Character>* fd, bool filter_fd)
+  void SfstTransducer::extract_strings(Transducer * t, hfst::WeightedPaths<float>::Set &results, int max_num, int cycles, FdTable<SFST::Character>* fd, bool filter_fd)
   {
-    t->generate_hfst(results, fd, filter_fd, true);
+    t->generate_hfst(results, max_num, cycles, fd, filter_fd);
   }
 
   Transducer * SfstTransducer::insert_freely(Transducer * t, const StringPair &symbol_pair)

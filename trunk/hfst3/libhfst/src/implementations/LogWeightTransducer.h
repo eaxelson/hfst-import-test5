@@ -240,8 +240,9 @@ namespace hfst { namespace implementations
       //static LogFst * harmonize(LogFst * t,KeyMap &key_map);
       static std::pair<LogFst*, LogFst*> harmonize(StdVectorFst *t1, StdVectorFst *t2);
       //static void print(LogFst * t, KeyTable &key_table, ostream &out);
-      static void extract_strings(LogFst * t,
-				  WeightedPaths<float>::Set &results, FdTable<int64>* fd=NULL, bool filter_fd=false);
+      static void extract_strings(LogFst * t,  WeightedPaths<float>::Set &results,
+          int max_num=-1, int cycles=-1,
+          FdTable<int64>* fd=NULL, bool filter_fd=false);
 			static FdTable<int64>* get_flag_diacritics(LogFst * t);
       static void print_test(LogFst *t);
 

@@ -500,7 +500,136 @@ namespace hfst { namespace implementations {
 
   bool FomaTransducer::is_cyclic(fsm * t)
   {
-    return (t->pathcount == PATHCOUNT_CYCLIC);
+    return !(t->is_loop_free);
+    //return (t->pathcount == PATHCOUNT_CYCLIC);
+  }
+  
+  
+  void extract_strings(fsm * t, int state,
+    std::map<int,unsigned short> all_visitations, std::map<int, unsigned short> path_visitations,
+    std::vector<char>& lbuffer, int lpos, std::vector<char>& ubuffer, int upos,
+    WeightedPaths<float>::Set &results, int max_num, int cycles,
+    std::vector<hfst::FdState<int> >* fd_state_stack, bool filter_fd)
+  {
+    if(cycles >= 0 && path_visitations[state] > cycles)
+      return;
+    all_visitations[state]++;
+    path_visitations[state]++;
+    
+    //check finality
+    for(int i=0; ((t->states)+i)->state_no != -1; i++)
+    {
+      fsm_state* s = (t->states)+i;
+      if(s->state_no == state && s->final_state == 1)
+      {
+        lbuffer[lpos] = 0;
+        ubuffer[upos] = 0;
+        results.insert(hfst::WeightedPath<float>(lbuffer.data(),ubuffer.data(),0));
+      }
+    }
+    
+    // find and sort transitions
+    std::vector<fsm_state*> sorted_arcs;
+    for(int i=0; ((t->states)+i)->state_no != -1; i++)
+    {
+      fsm_state* s = (t->states)+i;
+      if(s->state_no == state && s->target != -1)
+      {
+        size_t j;
+        for(j=0; j<sorted_arcs.size(); j++)
+          if (all_visitations[s->target] < all_visitations[sorted_arcs[j]->target])
+            break;
+        sorted_arcs.push_back(NULL);
+        for( size_t k=sorted_arcs.size()-1; k>j; k-- )
+          sorted_arcs[k] = sorted_arcs[k-1];
+        sorted_arcs[j] = s;
+      }
+    }
+    
+    for(size_t i=0; i<sorted_arcs.size() && results.size() < max_num; i++)
+    {
+      fsm_state* arc = sorted_arcs[i];
+      
+      bool added_fd_state = false;
+      
+      if (fd_state_stack) {
+        if(fd_state_stack->back().get_table().get_operation(arc->in) != NULL) {
+          fd_state_stack->push_back(fd_state_stack->back());
+          if(fd_state_stack->back().apply_operation(arc->in))
+            added_fd_state = true;
+          else {
+            fd_state_stack->pop_back();
+            continue; // don't follow the transition
+          }
+        }
+      }
+      
+      int lp=lpos;
+      int up=upos;
+      
+      if(arc->in != 0 && (!filter_fd || fd_state_stack->back().get_table().get_operation(arc->in)==NULL))
+      {
+        //find the key in sigma
+        char* c=NULL;
+        for(struct sigma* sig=t->sigma; sig!=NULL&&sig->symbol!=NULL; sig=sig->next)
+        {
+          if(sig->number == arc->in)
+          {
+            c = sig->symbol;
+            break;
+          }
+        }
+        size_t clen = strlen(c);
+        if(lpos+clen >= lbuffer.size())
+          lbuffer.resize(lbuffer.size()*2, 0);
+        strcpy(lbuffer.data()+lpos, c);
+        lp += clen;
+      }
+      if(arc->out != 0 && (!filter_fd || fd_state_stack->back().get_table().get_operation(arc->out)==NULL))
+      {
+        //find the key in sigma
+        char* c=NULL;
+        for(struct sigma* sig=t->sigma; sig!=NULL&&sig->symbol!=NULL; sig=sig->next)
+        {
+          if(sig->number == arc->out)
+          {
+            c = sig->symbol;
+            break;
+          }
+        }
+        size_t clen = strlen(c);
+        if(upos+clen > ubuffer.size())
+          ubuffer.resize(ubuffer.size()*2, 0);
+        strcpy(ubuffer.data()+upos, c);
+        up += clen;
+      }
+      
+      extract_strings(t, arc->target, all_visitations, path_visitations,
+          lbuffer, lp, ubuffer, up, results, max_num, cycles, fd_state_stack, filter_fd);
+    
+      if(added_fd_state)
+        fd_state_stack->pop_back();
+    }
+    
+    path_visitations[state]--;
+  }
+  
+  static const int BUFFER_START_SIZE = 64;
+  
+  void FomaTransducer::extract_strings(fsm * t,
+    WeightedPaths<float>::Set &results, int max_num, int cycles,
+    FdTable<int>* fd, bool filter_fd)
+  {
+    std::vector<char> lbuffer(BUFFER_START_SIZE, 0);
+    std::vector<char> ubuffer(BUFFER_START_SIZE, 0);
+    std::map<int, unsigned short> all_visitations;
+    std::map<int, unsigned short> path_visitations;
+    std::vector<hfst::FdState<int> >* fd_state_stack = (fd==NULL) ? NULL : new std::vector<hfst::FdState<int> >(1, hfst::FdState<int>(*fd));
+    
+    for (int i=0; ((t->states)+i)->state_no != -1 && results.size() < max_num; i++) {
+      if (((t->states)+i)->start_state == 1)
+        hfst::implementations::extract_strings(t, ((t->states)+i)->state_no, all_visitations, path_visitations, lbuffer, 0, ubuffer, 0, results, max_num, cycles, fd_state_stack, filter_fd);
+    }
   }
   
   FdTable<int>* FomaTransducer::get_flag_diacritics(fsm * t)

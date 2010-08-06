@@ -529,7 +529,7 @@ fclose(ifile);
 	All transition symbol pairs "isymbol:osymbol" are changed to "osymbol:osymbol". */
     HfstTransducer &output_project();
 
-    /** \brief Store to \a results all string pairs that are recognised by the transducer. 
+    /** \brief Store to \a results some or all string pairs that are recognised by the transducer. 
 
 	An example:
 \verbatim
@@ -544,23 +544,22 @@ fclose(ifile);
 	  }
 \endverbatim
 
-        This function is not implemented for FOMA_TYPE.
-	If this function is called by an HfstTransducer of type FOMA_TYPE, it is converted to TROPICAL_OFST,
-	strings are extracted and it is converted back to FOMA_TYPE.
-
-	@pre The transducer is acyclic. 
-	@note If the transducer is cyclic, no guarantees are given how the function will
-	behave. It might get stuck in an infinite loop or return any number of string pairs. 
-	In the case of a cyclic transducer, use #n_best instead. 
+	The total number of resulting strings is capped at \a max_num, with 0 or negative
+	indicating unlimited. The \a cycles parameter indicates how many times a cycle
+	will be followed, with negative numbers indicating unlimited. If this function
+	is called on a cyclic transducer with unlimited values for both max_num and
+	cycles, an exception will be thrown.
+	@throws hfst::exceptions::TransducerIsCyclicException
 	@see #n_best */
-    void extract_strings(WeightedPaths<float>::Set &results);
+    void extract_strings(WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1);
     
     /** \brief Store to \a results string pairs that are recognized by the transducer
                and are not invalidated by flag diacritic rules, optionally filtering
                the flag diacritics themselves out of the result strings
   The same conditions that apply for the extract_strings function apply also for this one.
+  @throws hfst::exceptions::TransducerIsCyclicException
   @see extract_strings */
-    void extract_strings_fd(WeightedPaths<float>::Set &results, bool filter_fd=true);
+    void extract_strings_fd(WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1, bool filter_fd=true);
 
     /** \brief Freely insert symbol pair \a symbol_pair into the transducer. */
 

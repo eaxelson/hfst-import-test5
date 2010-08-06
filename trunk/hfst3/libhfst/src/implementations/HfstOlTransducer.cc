@@ -188,44 +188,73 @@ namespace hfst { namespace implementations
   bool HfstOlTransducer::is_cyclic(hfst_ol::Transducer* t)
   { return t->get_header().probe_flag(hfst_ol::Cyclic); }
   
-  void extract_strings
-  (hfst_ol::Transducer* t, hfst_ol::TransitionTableIndex s,
-   WeightedPaths<float>::Vector &results, std::set<hfst_ol::TransitionTableIndex> &states_visited,
-   std::vector<hfst::FdState<hfst_ol::SymbolNumber> >* fd_state_stack, bool filter_fd)
+  void extract_strings(hfst_ol::Transducer* t, hfst_ol::TransitionTableIndex s,
+    std::map<hfst_ol::TransitionTableIndex,unsigned short> all_visitations, std::map<hfst_ol::TransitionTableIndex, unsigned short> path_visitations,
+    std::vector<char>& lbuffer, int lpos, std::vector<char>& ubuffer, int upos, float weight_sum,
+    WeightedPaths<float>::Set &results, int max_num, int cycles,
+    std::vector<hfst::FdState<hfst_ol::SymbolNumber> >* fd_state_stack, bool filter_fd)
   {
-    if (states_visited.find(s) == states_visited.end())
-      states_visited.insert(s);
-    else
-      throw TransducerIsCyclicException();
+    if(cycles >= 0 && path_visitations[s] > cycles)
+      return;
+    all_visitations[s]++;
+    path_visitations[s]++;
     
     // check for finality
+    bool final=false;
+    float final_weight=0.0f;
     if(hfst_ol::indexes_transition_index_table(s))
     {
       if(t->get_index(s).final())
-        results.push_back(WeightedPath<float>("","",t->get_header().probe_flag(hfst_ol::Weighted) ?
-                dynamic_cast<const hfst_ol::TransitionWIndex&>(t->get_index(s)).final_weight() : 0.0f));
+      {
+        final = true;
+        final_weight = t->get_header().probe_flag(hfst_ol::Weighted) ?
+            dynamic_cast<const hfst_ol::TransitionWIndex&>(t->get_index(s)).final_weight() : 0.0f;
+      }
     }
     else
     {
       if(t->get_transition(s).final())
-        results.push_back(WeightedPath<float>("","",t->get_header().probe_flag(hfst_ol::Weighted) ?
-                dynamic_cast<const hfst_ol::TransitionW&>(t->get_index(s)).get_weight() : 0.0f));
+      {
+        final = true;
+        final_weight = t->get_header().probe_flag(hfst_ol::Weighted) ?
+            dynamic_cast<const hfst_ol::TransitionW&>(t->get_transition(s)).get_weight() : 0.0f;
+      }
     }
     
-    hfst_ol::TransitionTableIndexSet transitions = t->get_transitions_from_state(s);    
+    if(final)
+    {
+      lbuffer[lpos]=0;
+      ubuffer[upos]=0;
+      results.insert(hfst::WeightedPath<float>(lbuffer.data(),ubuffer.data(),weight_sum+final_weight));
+    }
+    
+    // sort arcs by number of visitations
+    hfst_ol::TransitionTableIndexSet transitions = t->get_transitions_from_state(s);
+    std::vector<hfst_ol::TransitionTableIndex> sorted_transitions;
     for(hfst_ol::TransitionTableIndexSet::const_iterator it=transitions.begin();it!=transitions.end();it++)
     {
       const hfst_ol::Transition& transition = t->get_transition(*it);
+      size_t i;
+      for( i=0; i<sorted_transitions.size(); i++ )
+        if(all_visitations[transition.get_target()] < all_visitations[t->get_transition(sorted_transitions[i]).get_target()])
+          break;
+      sorted_transitions.push_back(hfst_ol::NO_TABLE_INDEX);
+      for( size_t k=sorted_transitions.size()-1; k>i; k-- )
+        sorted_transitions[k] = sorted_transitions[k-1];
+      sorted_transitions[i] = *it;
+    }
+    
+    
+    for(size_t i=0; i<sorted_transitions.size() && results.size() < max_num; i++)
+    {
+      const hfst_ol::Transition& transition = t->get_transition(sorted_transitions[i]);
       hfst_ol::SymbolNumber input = transition.get_input_symbol();
       hfst_ol::SymbolNumber output = transition.get_output_symbol();
-      std::string istring;
-      std::string ostring;
+      
       bool added_fd_state = false;
       
-      if(fd_state_stack != NULL)
-      {
-        if(fd_state_stack->back().get_table().get_operation(input) != NULL)
-        {
+      if (fd_state_stack) {
+        if(fd_state_stack->back().get_table().get_operation(input) != NULL) {
           fd_state_stack->push_back(fd_state_stack->back());
           if(fd_state_stack->back().apply_operation(input))
             added_fd_state = true;
@@ -236,35 +265,50 @@ namespace hfst { namespace implementations
         }
       }
       
-      if(input != 0 && (!filter_fd || fd_state_stack->back().get_table().get_operation(input)==NULL))
-        istring = t->get_alphabet().get_symbol_table()[input];
-      if(output != 0 && (!filter_fd || fd_state_stack->back().get_table().get_operation(output)==NULL))
-        ostring = t->get_alphabet().get_symbol_table()[output];
-      WeightedPath<float> arc_string(istring,ostring,t->get_header().probe_flag(hfst_ol::Weighted) ?
-                dynamic_cast<const hfst_ol::TransitionW&>(transition).get_weight() : 0.0f);
+      int lp=lpos;
+      int up=upos;
       
-      WeightedPaths<float>::Vector continuations;
-      extract_strings(t,transition.get_target(),continuations,states_visited,fd_state_stack,filter_fd);
-      WeightedPaths<float>::add(arc_string, continuations);
-      results.insert(results.end(),continuations.begin(), continuations.end());
+      if(input != 0 && (!filter_fd || fd_state_stack->back().get_table().get_operation(input)==NULL))
+      {
+        std::string str = t->get_alphabet().get_symbol_table()[input];
+        if(lpos+str.length() >= lbuffer.size())
+          lbuffer.resize(lbuffer.size()*2, 0);
+        strcpy(lbuffer.data()+lpos, str.c_str());
+        lp += str.length();
+      }
+      if(output != 0 && (!filter_fd || fd_state_stack->back().get_table().get_operation(output)==NULL))
+      {
+        std::string str = t->get_alphabet().get_symbol_table()[output];
+        if(upos+str.length() > ubuffer.size())
+          ubuffer.resize(ubuffer.size()*2, 0);
+        strcpy(ubuffer.data()+upos, str.c_str());
+        up += str.length();
+      }
+      
+      extract_strings(t, transition.get_target(), all_visitations, path_visitations,
+          lbuffer,lp, ubuffer,up, weight_sum + (t->get_header().probe_flag(hfst_ol::Weighted) ? dynamic_cast<const hfst_ol::TransitionW&>(transition).get_weight() : 0.0f),
+          results, max_num, cycles, fd_state_stack, filter_fd);
       
       if(added_fd_state)
         fd_state_stack->pop_back();
     }
     
-    states_visited.erase(s);
+    path_visitations[s]--;
   }
   
+  static const int BUFFER_START_SIZE = 64;
+  
   void HfstOlTransducer::extract_strings(hfst_ol::Transducer * t, hfst::WeightedPaths<float>::Set &results, 
-            FdTable<hfst_ol::SymbolNumber>* fd, bool filter_fd)
+            int max_num, int cycles, FdTable<hfst_ol::SymbolNumber>* fd, bool filter_fd)
   {
-    WeightedPaths<float>::Vector results_vec;
-    std::set<hfst_ol::TransitionTableIndex> states_visited;
+    std::vector<char> lbuffer(BUFFER_START_SIZE, 0);
+    std::vector<char> ubuffer(BUFFER_START_SIZE, 0);
+    std::map<hfst_ol::TransitionTableIndex, unsigned short> all_visitations;
+    std::map<hfst_ol::TransitionTableIndex, unsigned short> path_visitations;
     std::vector<hfst::FdState<hfst_ol::SymbolNumber> >* fd_state_stack = (fd==NULL) ? NULL : 
         new std::vector<hfst::FdState<hfst_ol::SymbolNumber> >(1, hfst::FdState<hfst_ol::SymbolNumber>(*fd));
     
-    hfst::implementations::extract_strings(t,0,results_vec,states_visited,fd_state_stack,filter_fd);
-    results.insert(results_vec.begin(),results_vec.end());
+    hfst::implementations::extract_strings(t,0,all_visitations,path_visitations,lbuffer,0,ubuffer,0,0.0f,results,max_num,cycles,fd_state_stack,filter_fd);
   }
   
   FdTable<hfst_ol::SymbolNumber>* HfstOlTransducer::get_flag_diacritics(hfst_ol::Transducer* t)
