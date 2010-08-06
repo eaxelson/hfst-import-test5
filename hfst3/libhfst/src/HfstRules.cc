@@ -89,9 +89,17 @@ namespace hfst
       HfstTransducer t_copy(t);
       t_copy.insert_freely(StringPair(m2,m2));
       t_copy.insert_freely(StringPair(m1,m1));
+
       // arg1 = .* ( m1 >> ( m2 >> t ))
       HfstTransducer arg1 = universal_fst(alphabet, t.get_type());
+
+      // in foma, t_copy must be minimized
+      // else, nothing is concatenated to arg1 ???
+      //arg1.minimize();
+      t_copy.minimize();
+
       arg1.concatenate(t_copy);
+      exit(0);
 
       // arg2 = !(.* m1)
       HfstTransducer m1_tr(m1, t.get_type());
@@ -119,6 +127,7 @@ namespace hfst
       HfstTransducer disj = neg_ct_mt.disjunct(ct_neg_mt);
       // negation
       HfstTransducer retval = negation_fst(disj, alphabet); 
+
       return retval;
     }
 
@@ -251,6 +260,14 @@ namespace hfst
       if ( not HfstTransducer::are_equivalent(t1_proj, context.first) ||
 	   not HfstTransducer::are_equivalent(t2_proj, context.second) )
 	throw hfst::exceptions::ContextTransducersAreNotAutomataException();
+
+      // TEST
+      /*printf("the alphabet:\n");
+      for (StringPairSet::iterator it = alphabet.begin(); it != alphabet.end(); it++) {
+	StringPair sp = *it;
+	printf("  %s:%s\n", sp.first.c_str(), sp.second.c_str());
+      }
+      printf("\n");*/
       
       std::string leftm("@_LEFT_MARKER_@");
       std::string rightm("@_RIGHT_MARKER_@");
@@ -287,7 +304,8 @@ namespace hfst
       HfstTransducer cbt = negation_fst(tmp, alphabet);
 
       // left context transducer .* (<R> >> (<L> >> LEFT_CONTEXT)) || !(.*<L>)    
-      HfstTransducer lct = replace_context(context.first, leftm, rightm, alphabet);
+      //HfstTransducer lct = replace_context(context.first, leftm, rightm, alphabet);  
+      HfstTransducer lct(context.first.get_type()); // TESTING
 
       // right context transducer:  reversion( (<R> >> (<L> >> reversion(RIGHT_CONTEXT))) .* || !(<R>.*) )
       HfstTransducer right_rev(context.second);

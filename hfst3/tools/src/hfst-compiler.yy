@@ -88,23 +88,23 @@ ASSIGNMENT: // VAR '=' RE              { if (def_var($1,$3)) warn2("assignment o
           | ALPHA RE                { HfstCompiler::def_alphabet($2); delete $2; }
           ;
 
-RE:       //   RE ARROW CONTEXTS2      { $$ = restriction($1,$2,$3,0); }
-	  // | RE '^' ARROW CONTEXTS2  { $$ = restriction($1,$3,$4,1); }
-	  // | RE '_' ARROW CONTEXTS2  { $$ = restriction($1,$3,$4,-1); }
-            RE REPLACE CONTEXT2     { $$ = HfstCompiler::replace_in_context((HfstCompiler::explode($1))->minimize(), $2, $3, false); }
-          | RE REPLACE '?' CONTEXT2 { $$ = HfstCompiler::replace_in_context((HfstCompiler::explode($1))->minimize(), $2, $4, true);}
-          | RE REPLACE '(' ')'      { $$ = HfstCompiler::replace((HfstCompiler::explode($1))->minimize(), $2, false); }
-          | RE REPLACE '?' '(' ')'  { $$ = HfstCompiler::replace((HfstCompiler::explode($1))->minimize(), $2, true); }
-          // | RE RANGE ARROW RANGE RE { $$ = make_rule($1,$2,$3,$4,$5); }
-          // | RE RANGE ARROW RANGE    { $$ = make_rule($1,$2,$3,$4,NULL); }
-          // | RANGE ARROW RANGE RE    { $$ = make_rule(NULL,$1,$2,$3,$4); }
-          // | RANGE ARROW RANGE       { $$ = make_rule(NULL,$1,$2,$3,NULL); }
+RE:         RE ARROW CONTEXTS2      { $$ = HfstCompiler::restriction($1,$2,$3,0); }
+	  | RE '^' ARROW CONTEXTS2  { $$ = HfstCompiler::restriction($1,$3,$4,1); }
+	  | RE '_' ARROW CONTEXTS2  { $$ = HfstCompiler::restriction($1,$3,$4,-1); }
+          | RE REPLACE CONTEXT2     { $$ = HfstCompiler::replace_in_context(HfstCompiler::explode_and_minimize($1), $2, $3, false); }
+          | RE REPLACE '?' CONTEXT2 { $$ = HfstCompiler::replace_in_context(HfstCompiler::explode_and_minimize($1), $2, $4, true);}
+          | RE REPLACE '(' ')'      { $$ = HfstCompiler::replace(HfstCompiler::explode_and_minimize($1), $2, false); }
+          | RE REPLACE '?' '(' ')'  { $$ = HfstCompiler::replace(HfstCompiler::explode_and_minimize($1), $2, true); }
+          | RE RANGE ARROW RANGE RE { $$ = HfstCompiler::make_rule($1,$2,$3,$4,$5); }
+          | RE RANGE ARROW RANGE    { $$ = HfstCompiler::make_rule($1,$2,$3,$4,NULL); }
+          | RANGE ARROW RANGE RE    { $$ = HfstCompiler::make_rule(NULL,$1,$2,$3,$4); }
+          | RANGE ARROW RANGE       { $$ = HfstCompiler::make_rule(NULL,$1,$2,$3,NULL); }
           | RE COMPOSE RE    { $1->compose(*$3); delete $3; $$ = $1; }
           | '{' RANGES '}' ':' '{' RANGES '}' { $$ = HfstCompiler::make_mapping($2,$6,type); }
           | RANGE ':' '{' RANGES '}' { $$ = HfstCompiler::make_mapping(add_range($1,NULL),$4,type); }
           | '{' RANGES '}' ':' RANGE { $$ = HfstCompiler::make_mapping($2,add_range($5,NULL),type); }
-          | RE INSERT CODE ':' CODE  { $1->insert_freely(hfst::StringPair(SFST::TheAlphabet.code2symbol($3), SFST::TheAlphabet.code2symbol($5))); $$ = $1; }
-          | RE INSERT CODE           { $1->insert_freely(hfst::StringPair(SFST::TheAlphabet.code2symbol($3), SFST::TheAlphabet.code2symbol($3))); $$ = $1; }
+          | RE INSERT CODE ':' CODE  { $$ = HfstCompiler::insert_freely($1,$3,$5); }
+          | RE INSERT CODE           { $$ = HfstCompiler::insert_freely($1,$3,$3); }
           | RANGE ':' RANGE  { $$ = HfstCompiler::new_transducer($1,$3,type); }
           | RANGE            { $$ = HfstCompiler::new_transducer($1,$1,type); }
           // | VAR              { $$ = var_value($1); }

@@ -19,9 +19,7 @@ namespace SFST {
 //#ifndef _INTERFACE_H_
 //#define _INTERFACE_H_
 
-//#include "utf8.h"
-//#include "fst.h"
-
+// global variables specific to SFST-PL parser that are defined in file 'SFST/src/interface.C'
 namespace SFST {
   extern bool Verbose;
   extern bool UTF8;
@@ -32,26 +30,14 @@ namespace SFST {
 
 namespace hfst
 {
+  /** A library class that forms a bridge between the SFST programming language parser
+      and the HFST library and contains some extra functions needed by the parser.
+      Most of these functions either directly use the SFST interface or are generalized
+      versions of corresponding SFST functions that work on all types of HfstTransducers. */
   class HfstCompiler {
 
   public:
     HfstCompiler();
-
-    /*
-    typedef enum {twol_left,twol_right,twol_both} Twol_Type;
-    typedef enum {repl_left,repl_right,repl_up,repl_down} Repl_Type;
-    */
-    /*
-    typedef struct range_t {
-      Character character;
-      struct range_t *next;
-    } Range;
-    
-    typedef struct ranges_t {
-      Range  *range;
-      struct ranges_t *next;
-    } Ranges;
-    */    
     
     typedef SFST::Twol_Type Twol_Type;
     typedef SFST::Repl_Type Repl_Type;
@@ -91,41 +77,23 @@ namespace hfst
     static HfstCompiler::Contexts *make_context( HfstTransducer *l, HfstTransducer *r );
     static HfstCompiler::Contexts *add_context( HfstCompiler::Contexts *nc, HfstCompiler::Contexts *c );    
 
+    static HfstTransducer * insert_freely(HfstTransducer *t, Character input, Character output);
     static HfstTransducer * negation( HfstTransducer *t );
 
-    static HfstTransducer * explode( HfstTransducer *t );
+    // expand agreement variable markers and minimize
+    static HfstTransducer * explode_and_minimize( HfstTransducer *t );
     
+    // rule operators
     static HfstTransducer * replace_in_context(HfstTransducer * mapping, Repl_Type repl_type, Contexts *contexts, bool optional);
     static HfstTransducer * replace(HfstTransducer * mapping, Repl_Type repl_type, bool optional);
+    static HfstTransducer * restriction( HfstTransducer * t, Twol_Type type, Contexts *c, int direction );
+    static HfstTransducer * make_rule( HfstTransducer * lc, Range * lower_range, Twol_Type type, 
+				       Range * upper_range, HfstTransducer * rc );
 
-    // These functions delete their argument automata
-    
     static void def_alphabet( HfstTransducer *a );
     bool def_var( char *name, HfstTransducer *a );
     bool def_rvar( char *name, HfstTransducer *a );
     bool def_svar( char *name, Range *r );
-
-    /*
-    Transducer *catenate( Transducer *a1, Transducer *a2 );
-    Transducer *disjunction( Transducer *a1, Transducer *a2 );
-    Transducer *conjunction( Transducer *a1, Transducer *a2 );
-    Transducer *subtraction( Transducer *a1, Transducer *a2 );
-    Transducer *composition( Transducer *a1, Transducer *a2 );
-    Transducer *restriction( Transducer *a, Twol_Type type, Contexts *c, int );
-    Transducer *replace( Transducer *a, Repl_Type type, bool optional );
-    Transducer *replace_in_context( Transducer *a, Repl_Type type, Contexts *c, bool optional );
-    Transducer *negation( Transducer *a );
-    Transducer *upper_level( Transducer *a );
-    Transducer *lower_level( Transducer *a );
-    Transducer *minimise( Transducer *a );
-    Transducer *switch_levels( Transducer *a );
-    Transducer *repetition( Transducer *a );
-    Transducer *repetition2( Transducer *a );
-    Transducer *optional( Transducer *a );
-    Transducer *make_rule( Transducer *lc, Range *r1, Twol_Type type,
-			   Range *r2, Transducer *rc );
-    Transducer *freely_insert( Transducer *a, Character lc, Character uc );
-    */
     
     static HfstTransducer *make_mapping( Ranges*, Ranges*, ImplementationType );
     Ranges *add_range( Range*, Ranges* );
