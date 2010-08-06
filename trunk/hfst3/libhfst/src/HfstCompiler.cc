@@ -9,6 +9,15 @@
 //
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+/**
+
+   This file contains functions that are needed by the SFST programming
+   language parser defined in the file 'hfst-compiler.yy'. The parser is
+   used by the command line program hfst-calculate. 
+
+ **/
+
 #include "HfstCompiler.h"
 
 namespace hfst
@@ -113,8 +122,12 @@ namespace hfst
     return rsvar_value(name);
   }
 
+  HfstTransducer * HfstCompiler::insert_freely(HfstTransducer *t, Character input, Character output) {
+    t->insert_freely(hfst::StringPair(SFST::TheAlphabet.code2symbol(input), SFST::TheAlphabet.code2symbol(output)));
+    return t;
+  }
 
-  HfstCompiler::Contexts *make_context( HfstTransducer *l, HfstTransducer *r )
+  HfstCompiler::Contexts *HfstCompiler::make_context( HfstTransducer *l, HfstTransducer *r )
   {
     if (l->get_type() != r->get_type()) {
       printf("ERROR: in hfst-compiler.yy: context transducers do not have the same type.\n");
@@ -135,7 +148,7 @@ namespace hfst
     return c;
   }
 
-  HfstCompiler::Contexts *add_context( HfstCompiler::Contexts *nc, HfstCompiler::Contexts *c )    
+  HfstCompiler::Contexts *HfstCompiler::add_context( HfstCompiler::Contexts *nc, HfstCompiler::Contexts *c )    
   {
     if (nc->left->get_type() != c->left->get_type() || 
 	nc->right->get_type() != c->right->get_type() ) {
@@ -169,10 +182,81 @@ namespace hfst
   }
 
   // TODO
-  HfstTransducer * HfstCompiler::explode( HfstTransducer *t ) {
+  HfstTransducer * HfstCompiler::explode_and_minimize( HfstTransducer *t ) {
     return t;
   }
-  
+
+  // TODO
+  HfstTransducer * HfstCompiler::restriction( HfstTransducer * t, Twol_Type type, Contexts *c, int direction ) {
+    throw hfst::exceptions::FunctionNotImplementedException();
+  }
+
+  HfstTransducer * HfstCompiler::make_rule( HfstTransducer * lc, Range * lower_range, Twol_Type type, 
+					    Range * upper_range, HfstTransducer * rc ) {
+    /*if (RS.size() > 0 || RSS.size() > 0)
+    cerr << "\nWarning: agreement operation inside of replacement rule!\n";
+    
+    if (!Alphabet_Defined)
+    error("Two level rules require the definition of an alphabet");  */
+
+    HfstTransducerPair tr_pair(*(lc), *(rc));
+    StringPairSet sps;
+    for( SFST::Alphabet::const_iterator it=SFST::TheAlphabet.begin(); it!=SFST::TheAlphabet.end(); it++ ) {
+      SFST::Label l=*it;
+      sps.insert(StringPair( SFST::TheAlphabet.code2symbol(l.lower_char()),
+			     SFST::TheAlphabet.code2symbol(l.upper_char())) );
+    } 
+
+    StringPairSet mappings;
+    Range * r1 = lower_range;
+    Range * r2 = upper_range;
+
+    if (r1 == NULL || r2 == NULL) {
+      if (!SFST::Alphabet_Defined)
+	printf("ERROR: The wildcard symbol '.' requires the definition of an alphabet");
+      
+      // one of the ranges was '.'
+      for(SFST::Alphabet::const_iterator it=SFST::TheAlphabet.begin(); 
+	  it!=SFST::TheAlphabet.end(); it++) {
+	if ((r1 == NULL || SFST::in_range(it->lower_char(), r1)) &&
+	    (r2 == NULL || SFST::in_range(it->upper_char(), r2))) {
+	  mappings.insert( StringPair(
+				      SFST::TheAlphabet.code2symbol(it->lower_char()),
+				      SFST::TheAlphabet.code2symbol(it->upper_char()) ) );
+	}
+      }      
+    }
+    else {
+      for (;;) {
+	mappings.insert( StringPair(
+				    SFST::TheAlphabet.code2symbol(r1->character),
+				    SFST::TheAlphabet.code2symbol(r2->character) ) );
+	if (!r1->next && !r2->next)
+	  break;
+	if (r1->next)
+	  r1 = r1->next;
+	if (r2->next)
+	  r2 = r2->next;
+      }
+    }
+    
+    switch(type)
+      {
+      case SFST::twol_left:
+	return new HfstTransducer(rules::two_level_if(tr_pair, mappings, sps));
+	break;
+      case SFST::twol_right:
+	return new HfstTransducer(rules::two_level_only_if(tr_pair, mappings, sps));
+	break;
+      case SFST::twol_both:
+	return new HfstTransducer(rules::two_level_if_and_only_if(tr_pair, mappings, sps));
+	break;
+      }
+    return NULL;
+
+  }
+
+
   HfstTransducer * HfstCompiler::replace_in_context(HfstTransducer * mapping, Repl_Type repl_type, Contexts *contexts, bool optional) {
     
     HfstTransducerPair tr_pair(*(contexts->left), *(contexts->right));
