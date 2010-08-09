@@ -126,12 +126,6 @@ AC_ARG_ENABLE([determinize],
 			  [enable_determinize=$enableval],
 			  [enable_determinize=yes])
 AM_CONDITIONAL([WANT_DETERMINIZE], [test x$enable_determinize != xno])
-AC_ARG_ENABLE([diff_test],
-			  [AS_HELP_STRING([--enable-diff-test],
-							  [build diff-test tool @<:@default=no@:>@])],
-			  [enable_diff_test=$enableval],
-			  [enable_diff_test=no])
-AM_CONDITIONAL([WANT_DIFF_TEST], [test x$enable_diff_test != xno])
 AC_ARG_ENABLE([disjunct],
 			  [AS_HELP_STRING([--enable-disjunct],
 							  [build disjunct tool @<:@default=yes@:>@])],
@@ -288,6 +282,12 @@ AC_ARG_ENABLE([tail],
 			  [enable_tail=$enableval],
 			  [enable_tail=yes])
 AM_CONDITIONAL([WANT_TAIL], [test x$enable_tail != xno])
+AC_ARG_ENABLE([test],
+			  [AS_HELP_STRING([--enable-test],
+							  [build test tool @<:@default=yes@:>@])],
+			  [enable_diff_test=$enableval],
+			  [enable_diff_test=yes])
+AM_CONDITIONAL([WANT_TEST], [test x$enable_test != xno])
 AC_ARG_ENABLE([txt2fst],
 			  [AS_HELP_STRING([--enable-txt2fst],
 							  [build txt2fst tool @<:@default=yes@:>@])],
@@ -407,22 +407,15 @@ cat <<EOF
     *                 concatenate: $enable_concatenate
     *                 conjunct: $enable_conjunct
     *                 determinize: $enable_determinize
-    *                 diff-test: $enable_diff_test
     *                 disjunct: $enable_disjunct
     *                 flag-diacritics: $enable_flag_diacritics
-    *                 format: $enable_format
     *                 fst2fst: $enable_fst2fst
-    *                 fst2pairstrings: $enable_fst2pairstrings
     *                 fst2strings: $enable_fst2strings
     *                 fst2txt: $enable_fst2txt
     *                 head: $enable_head
     *                 invert: $enable_invert
     *                 lookup: $enable_lookup
-    *                 lookup-optimize: $enable_lookup_optimize
     *                 minimize: $enable_minimize
-    *                 omor-evaluate: $enable_omor_evaluate
-    *                 optimized-lookup: $enable_optimized_lookup
-    *                 pair-test: $enable_pair_test
     *                 project: $enable_project
     *                 push-weights: $enable_push_weights
     *                 regexp2fst: $enable_regexp2fst
@@ -435,8 +428,8 @@ cat <<EOF
     *                 substitute: $enable_substitute
     *                 subtract: $enable_subtract
     *                 summarize: $enable_summarize
-    *                 symbols: $enable_symbols
     *                 tail: $enable_tail
+    *                 test: $enable_test
     *                 txt2fst: $enable_txt2fst
 EOF
 if test "x$with_foma" == "xbundled"; then
