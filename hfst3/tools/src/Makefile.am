@@ -37,9 +37,6 @@ endif
 if WANT_DETERMINIZE
 MAYBE_DETERMINIZE=hfst-determinize
 endif
-if WANT_DIFF_TEST
-MAYBE_DIFF_TEST=hfst-diff-test
-endif
 if WANT_DISJUNCT
 MAYBE_DISJUNCT=hfst-disjunct
 endif
@@ -161,7 +158,6 @@ hfst_compose_intersect_SOURCES=hfst-compose-intersect.cc $(HFST_COMMON_SRC)
 hfst_concatenate_SOURCES=hfst-concatenate.cc $(HFST_COMMON_SRC)
 hfst_conjunct_SOURCES=hfst-conjunct.cc $(HFST_COMMON_SRC)
 hfst_determinize_SOURCES=hfst-determinize.cc $(HFST_COMMON_SRC)
-hfst_diff_test_SOURCES=hfst-diff-test.cc $(HFST_COMMON_SRC)
 hfst_disjunct_SOURCES=hfst-disjunct.cc $(HFST_COMMON_SRC)
 hfst_flag_diacritics_SOURCES=hfst-flag-diacritics.cc $(HFST_COMMON_SRC)
 hfst_fst2fst_SOURCES=hfst-fst2fst.cc $(HFST_COMMON_SRC)

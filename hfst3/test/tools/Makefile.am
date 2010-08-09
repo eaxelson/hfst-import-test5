@@ -26,7 +26,8 @@ TESTS=hfst-check-version.sh hfst-check-help.sh empty-input.sh\
 	  invert-functionality.sh project-functionality.sh repeat-functionality.sh \
 	  reverse-functionality.sh substitute-functionality.sh \
 	  strings2fst-functionality.sh fst2strings-functionality.sh\
-	  txt2fst-functionality.sh fst2txt-functionality.sh
+	  txt2fst-functionality.sh fst2txt-functionality.sh \
+	  summarize-functionality.sh
 check_DATA=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   cat2cat_or_CAT_uppercased.hfst cat2CAT_uppercased.hfst cat2dog.hfst \
 		   cat+dog.hfst catdog.hfst cat_or_dog.hfst cat.hfst \

@@ -30,6 +30,11 @@
 #include <cstring>
 #include <getopt.h>
 
+#include "HfstTransducer.h"
+
+using hfst::HfstTransducer;
+using hfst::HfstInputStream;
+
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 
@@ -93,8 +98,49 @@ parse_options(int argc, char** argv)
 }
 
 int
-process_stream()
+process_stream(HfstInputStream& instream)
 {
+  size_t transducer_n = 0;
+  while (instream.is_good())
+    {
+      if (transducer_n < 2)
+        {
+          verbose_printf("Summarizing...\n");
+        }
+      else
+        {
+          verbose_printf("Summarizing... %zu\n", transducer_n);
+        }
+      HfstTransducer trans(instream);
+      if (transducer_n > 1)
+        {
+          fprintf(outfile, "-- \nTransducer #%zu:\n", transducer_n);
+        }
+      switch (trans.get_type())
+        {
+        case hfst::SFST_TYPE:
+          fprintf(outfile, "format: SFST\n");
+          break;
+        case hfst::TROPICAL_OFST_TYPE:
+          fprintf(outfile, "format: OpenFST tropical weights\n");
+          break;
+        case hfst::LOG_OFST_TYPE:
+          fprintf(outfile, "format: OpenFST logarithmic weights\n");
+          break;
+        case hfst::FOMA_TYPE:
+          fprintf(outfile, "format: Foma\n");
+          break;
+        case hfst::HFST_OL_TYPE:
+          fprintf(outfile, "format: HFST optimized lookup\n");
+          break;
+        case hfst::HFST_OLW_TYPE:
+          fprintf(outfile, "format: HFST optimized lookup with weights\n");
+          break;
+        default:
+          fprintf(outfile, "format: ???\n");
+          break;
+        }
+    }
   return EXIT_SUCCESS;
 }
 
@@ -111,13 +157,23 @@ int main( int argc, char **argv ) {
     {
         fclose(inputfile);
     }
+    verbose_printf("Reading from %s, writing to %s\n", 
+        inputfilename, outfilename);
+    // here starts the buffer handling part
+    HfstInputStream* instream = NULL;
+    try {
+        instream = (inputfile != stdin) ?
+        new HfstInputStream(inputfilename) : new HfstInputStream();
+    } catch (hfst::exceptions::NotTransducerStreamException)  {
+        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+              inputfilename);
+        return EXIT_FAILURE;
+    }
+    retval = process_stream(*instream);
     if (outfile != stdout)
     {
         fclose(outfile);
     }
-    verbose_printf("Reading from %s, writing to %s\n", 
-        inputfilename, outfilename);
-    // here starts the buffer handling part
     free(inputfilename);
     free(outfilename);
     return EXIT_SUCCESS;
