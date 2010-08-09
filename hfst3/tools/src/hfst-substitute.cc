@@ -217,10 +217,22 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           size_t len = 0;
           while (hfst_getline(&line, &len, from_file) != -1)
             {
+              if (*line == '\n')
+                {
+                  continue;
+                }
               const char* tab = strstr(line, "\t");
               if (tab == NULL)
                 {
-                  error(EXIT_FAILURE, 0, "Missing tab in %s", from_file_name);
+                  if (*line == '#')
+                    {
+                      continue;
+                    }
+                  else
+                    {
+                      error(EXIT_FAILURE, 0, "Missing tab in %s",
+                            from_file_name);
+                    }
                 }
               const char* endstr = tab+1;
               while ((*endstr != '\0') && (*endstr != '\n'))
