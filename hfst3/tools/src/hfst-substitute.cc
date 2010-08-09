@@ -215,8 +215,10 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         {
           char* line = NULL;
           size_t len = 0;
+          size_t line_n = 0;
           while (hfst_getline(&line, &len, from_file) != -1)
             {
+              line_n++;
               if (*line == '\n')
                 {
                   continue;
@@ -230,8 +232,8 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                     }
                   else
                     {
-                      error(EXIT_FAILURE, 0, "Missing tab in %s",
-                            from_file_name);
+                      error_at_line(EXIT_FAILURE, 0, from_file_name, line_n,
+                                    "At least one tab required per line");
                     }
                 }
               const char* endstr = tab+1;
