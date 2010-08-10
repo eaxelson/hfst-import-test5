@@ -14,9 +14,10 @@
 
 #include <stdlib.h>
 
-// Hfst addition
+// HFST
 namespace SFST 
 {
+
 #define MEMBUFFER_SIZE 100000
 
 
@@ -73,6 +74,6 @@ public:
   //class MemError {};
 
 };
+
 }
 #endif
-

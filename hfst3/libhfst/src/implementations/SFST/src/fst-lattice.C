@@ -9,18 +9,22 @@
 
 #include "fst.h"
 
-using namespace SFST;
-
 using std::cerr;
 using std::cout;
 
-const int BUFFER_SIZE=1000;
+// HFST
+using namespace SFST;
 
 namespace SFST 
 {
+
+const int BUFFER_SIZE=1000;
+
 int Quiet=0;
 int AnalysisOnly=0;
+
 }
+
 
 /*******************************************************************/
 /*                                                                 */

@@ -10,19 +10,20 @@
 
 #include <stdio.h>
 
-
 #include "make-compact.h"
 using namespace SFST;
+
 #include "interface.h"
 using namespace SFST;
+
 using std::cerr;
 
 extern int  yylineno;
 extern char *yytext;
 
-void yyerror(char *text);
-void warn(char *text);
-void warn2(char *text, char *text2);
+void yyerror( const char *text );
+void warn( const char *text );
+void warn2( const char *text, const char *text2);
 int yylex( void );
 int yyparse( void );
 
@@ -30,7 +31,6 @@ static int Switch=0;
 Transducer *Result;
 %}
 
-/* Slight Hfst addition SFST::... */
 %union {
   int        number;
   SFST::Twol_Type  type;
@@ -53,7 +53,6 @@ Transducer *Result;
 %token <value>  STRING STRING2 UTF8CHAR
 %token <uchar>  CHARACTER
 
-%type  <uchar>      SCHAR
 %type  <longchar>   LCHAR
 %type  <character>  CODE
 %type  <expression> RE
@@ -161,12 +160,27 @@ VALUE:      LCHAR '-' LCHAR	   { $$=add_values($1,$3,NULL); }
           | SVAR                   { $$=svar_value($1); }
           | LCHAR  	           { $$=add_value(character_code($1),NULL); }
           | CODE		   { $$=add_value($1,NULL); }
-	  | SCHAR		   { $$=add_value($1,NULL); }
           ;
 
 LCHAR:      CHARACTER	{ $$=$1; }
           | UTF8CHAR	{ $$=utf8toint($1); free($1); }
-	  | SCHAR       { $$=$1; }
+	  | '.'		{ $$='.'; }
+          | '!'		{ $$='!'; }
+          | '?'		{ $$='?'; }
+          | '{'		{ $$='{'; }
+          | '}'		{ $$='}'; }
+          | ')'		{ $$=')'; }
+          | '('		{ $$='('; }
+          | '&'		{ $$='&'; }
+          | '|'		{ $$='|'; }
+          | '*'		{ $$='*'; }
+          | '+'		{ $$='+'; }
+          | ':'		{ $$=':'; }
+          | ','		{ $$=','; }
+          | '='		{ $$='='; }
+          | '_'		{ $$='_'; }
+          | '^'		{ $$='^'; }
+          | '-'		{ $$='-'; }
           ;
 
 CODE:       CHARACTER	{ $$=character_code($1); }
@@ -174,24 +188,6 @@ CODE:       CHARACTER	{ $$=character_code($1); }
           | SYMBOL	{ $$=symbol_code($1); }
           ;
 
-SCHAR:      '.'		{ $$=(unsigned char)character_code('.'); }
-          | '!'		{ $$=(unsigned char)character_code('!'); }
-          | '?'		{ $$=(unsigned char)character_code('?'); }
-          | '{'		{ $$=(unsigned char)character_code('{'); }
-          | '}'		{ $$=(unsigned char)character_code('}'); }
-          | ')'		{ $$=(unsigned char)character_code(')'); }
-          | '('		{ $$=(unsigned char)character_code('('); }
-          | '&'		{ $$=(unsigned char)character_code('&'); }
-          | '|'		{ $$=(unsigned char)character_code('|'); }
-          | '*'		{ $$=(unsigned char)character_code('*'); }
-          | '+'		{ $$=(unsigned char)character_code('+'); }
-          | ':'		{ $$=(unsigned char)character_code(':'); }
-          | ','		{ $$=(unsigned char)character_code(','); }
-          | '='		{ $$=(unsigned char)character_code('='); }
-          | '_'		{ $$=(unsigned char)character_code('_'); }
-          | '^'		{ $$=(unsigned char)character_code('^'); }
-          | '-'		{ $$=(unsigned char)character_code('-'); }
-          ;
 
 NEWLINES:   NEWLINE NEWLINES     {}
           | /* nothing */        {}
@@ -209,7 +205,7 @@ static int LowMem=0;
 /*                                                                 */
 /*******************************************************************/
 
-void yyerror(char *text)
+void yyerror( const char *text )
 
 {
   cerr << "\n" << FileName << ":" << yylineno << ": " << text << " at: ";
@@ -224,7 +220,7 @@ void yyerror(char *text)
 /*                                                                 */
 /*******************************************************************/
 
-void warn(char *text)
+void warn( const char *text )
 
 {
   cerr << "\n" << FileName << ":" << yylineno << ": warning: " << text << "!\n";
@@ -237,7 +233,7 @@ void warn(char *text)
 /*                                                                 */
 /*******************************************************************/
 
-void warn2(char *text, char *text2)
+void warn2( const char *text, const char *text2)
 
 {
   cerr << "\n" << FileName << ":" << yylineno << ": warning: " << text << ": ";

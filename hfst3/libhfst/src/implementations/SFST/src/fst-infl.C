@@ -9,9 +9,10 @@
 
 #include "fst.h"
 
-
 using std::cerr;
 using std::vector;
+
+// HFST
 using namespace SFST;
 
 const int BUFFER_SIZE=1000;
@@ -150,4 +151,3 @@ int main( int argc, char **argv )
 
   return 0;
 }
-

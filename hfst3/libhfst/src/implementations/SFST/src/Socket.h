@@ -10,11 +10,12 @@
 /*******************************************************************/
 
 
-/*****************  class Socket  **********************************/
-
-// Hfst addition
+// HFST
 namespace SFST 
 {
+
+/*****************  class Socket  **********************************/
+
 class Socket {
   
   int portno;  /* port address */
@@ -57,4 +58,5 @@ class Socket {
     clilen = sizeof(cli_addr);
   }
 };
+
 }

@@ -17,7 +17,9 @@
 
 #include "interface.h"
 #include "fst-compiler.h"
-  using namespace SFST;
+
+// HFST
+using namespace SFST;
 
 #define MAX_INCLUDE_DEPTH 10
   
@@ -26,8 +28,9 @@ YY_BUFFER_STATE Include_Stack[MAX_INCLUDE_DEPTH];
 char *Name_Stack[MAX_INCLUDE_DEPTH];
 int  Lineno_Stack[MAX_INCLUDE_DEPTH];
 
-namespace SFST 
-{
+// HFST
+namespace SFST {
+
 char *FileName;
 
 bool UTF8=true;
@@ -60,7 +63,7 @@ static void print_lineno() {
   fprintf(stderr,"%s: %d", FileName, yylineno);
 }
 
-extern void yyerror(char *text);
+extern void yyerror( const char *text );
 
 %}
 

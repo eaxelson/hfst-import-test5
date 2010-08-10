@@ -7,24 +7,22 @@
 /*                                                                 */
 /*******************************************************************/
 
-#include "interface.h"
 #include <fstream>
 #include <set>
-#include "sgi.h"
 
-// Hfst addition
-namespace SFST 
-{
+#include "interface.h"
+#include "sgi.h"
 
 using std::ifstream;
 using std::ofstream;
-
 using std::set;
-
-
 using std::cerr;
 using std::cout;
 using std::vector;
+
+// HFST addition
+namespace SFST 
+{
 
 struct ltstr {
   bool operator()(const char* s1, const char* s2) const
@@ -50,7 +48,7 @@ static VarMap VM;
 static SVarMap SVM;
 static RVarSet RS;
 static RVarSet RSS;
-int Alphabet_Defined=0;  // static removed
+int Alphabet_Defined=0;  // HFST: static removed
 
 
 /*******************************************************************/
@@ -182,7 +180,8 @@ Range *add_var_values( char *name, Range *r )
 /*                                                                 */
 /*******************************************************************/
 
-bool in_range( unsigned int c, Range *r ) // static removed
+// HFST static removed
+bool in_range( unsigned int c, Range *r )
 
 {
   while (r) {
@@ -200,7 +199,7 @@ bool in_range( unsigned int c, Range *r ) // static removed
 /*                                                                 */
 /*******************************************************************/
 
-//static 
+// HFST static removed
 void free_values( Range *r )
 
 {
@@ -295,7 +294,8 @@ Range *complement_range( Range *r )
 /*                                                                 */
 /*******************************************************************/
 
-Transducer *make_transducer( Range *r1, Range *r2 )  // static removed
+// HFST static removed
+Transducer *make_transducer( Range *r1, Range *r2 )
 
 {
   Transducer *t=new Transducer();
@@ -1845,4 +1845,5 @@ Transducer *result( Transducer *t, bool switch_flag )
   t = minimise(t);
   return t;
 }
+
 }

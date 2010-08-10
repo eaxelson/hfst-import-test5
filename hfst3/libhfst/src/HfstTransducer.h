@@ -685,6 +685,8 @@ fclose(ifile);
 	@see convert(ImplementationType type) */
     static HfstTransducer &convert(const HfstTransducer &t, ImplementationType type);
 
+    HfstTokenizer &create_tokenizer();
+
     HfstTransducer &operator=(const HfstTransducer &another);
     friend std::ostream &operator<<(std::ostream &out, HfstTransducer &t);
     friend class HfstInputStream;

@@ -14,28 +14,23 @@
 
 #include "alphabet.h"
 
-// HFST addition
-#include "../../SymbolDefs.h"
-#include "../../ExtractStrings.h"
-#include "../../FlagDiacritics.h"
-
 
 /*******************************************************************/
 /* include commands                                                */
 /*******************************************************************/
 
 #include <string>
-
 #include <vector>
+#include <map>
+#include <set>
+
+using std::map;
+using std::set;
+using std::vector;
 
 #include "mem.h"
 
-// HFST addition
-#include <map>
-using std::map;
-
-
-// Hfst addition
+// HFST
 namespace SFST
 {
 
@@ -130,11 +125,7 @@ class ArcsIter {
     else
       current_arcp = arcs->first_epsilon_arcp;
   };
-
-  // Hfst addition
-  ArcsIter(void)
-    { current_arcp = more_arcs = NULL; }
-
+  
   void operator++( int ) {
     if (current_arcp) {
       current_arcp = current_arcp->next;
@@ -212,23 +203,23 @@ public:
   };
 };
 
+
 /*****************  class NodeNumbering ****************************/
 
 class NodeNumbering {
 
  private:
-  std::vector<Node*> nodes;
+  vector<Node*> nodes;
   Node2Int nummap;
   void number_node( Node*, Transducer& );
 
  public:
   NodeNumbering( Transducer& );
-  // Hfst addition
-  NodeNumbering( void ) {};
   int operator[]( Node *node ) { return nummap[node]; };
   size_t number_of_nodes( void ) { return nodes.size(); };
   Node *get_node( size_t n ) { return nodes[n]; };
 };
+
 
 /*****************  class PairMapping  ****************************/
 
@@ -290,7 +281,6 @@ class Transducer {
   Node *copy_nodes( Node *n, Transducer *a, 
 		    bool lswitch=false, bool recode=false );
   void rec_cat_nodes( Node*, Node* );
-  void rec_cat_nodes_hfst( Node*, Node* );
   bool productive_node( Node* );
   bool prune_nodes( Node* );
   void negate_nodes( Node*, Node* );
@@ -302,15 +292,14 @@ class Transducer {
   bool is_cyclic_node( Node*, NodeHashSet &visited );
   bool is_automaton_node( Node* );
   bool generate1( Node*, Node2Int&, char*, int, char*, int, FILE* );
-  void generate_hfst( Node*, Node2Int&, Node2Int&, std::vector<char>&, int, std::vector<char>&, int, hfst::WeightedPaths<float>::Set &results, int, int, std::vector<hfst::FdState<Character> >* fd_state_stack=NULL, bool filter_fd=true); // HFST ADDITION
   void store_symbols( Node*, SymbolMap&, LabelSet& );
 
   void splice_nodes(Node*, Node*, Label sl, Transducer*, Transducer*);
   void splice_arc( Node*, Node*, Node*, Transducer* );
-  void enumerate_paths_node( Node*, std::vector<Label>&, NodeHashSet&, 
-			     std::vector<Transducer*>& );
+  void enumerate_paths_node( Node*, vector<Label>&, NodeHashSet&, 
+			     vector<Transducer*>& );
   void replace_char2( Node*, Node*, Character, Character, Transducer* );
-  Node *create_node( std::vector<Node*>&, char*, size_t line );
+  Node *create_node( vector<Node*>&, char*, size_t line );
   void read_transducer_binary( FILE* );
   void read_transducer_text( FILE* );
 
@@ -326,12 +315,12 @@ class Transducer {
   // reads a transducer from a binary or text file
   Transducer( FILE*, bool binary=true );
   // turns a sequence of labels into a transducer
-  Transducer( std::vector<Label>& );
+  Transducer( vector<Label>& );
 
   // HFST additions...
-  Transducer &expand( hfst::StringSet &s );
-  Node *expand_nodes( Node *node, Transducer *a, hfst::StringSet &s );
-  void expand_node( Node *origin, Label &l, Node *target, Transducer *a, hfst::StringSet &s );
+  Transducer &expand( set<char*> &s );
+  Node *expand_nodes( Node *node, Transducer *a, set<char*> &s );
+  void expand_node( Node *origin, Label &l, Node *target, Transducer *a, set<char*> &s );
   void copy_nodes( Node *search_node, Transducer *copy_tr,
 		   Node *start_node,
 		   NodeNumbering &nn, map<int, Node*> &mapper );
@@ -352,7 +341,6 @@ class Transducer {
   bool analyze_string( char *s, FILE *file, bool with_brackets=true );
   bool generate_string( char *s, FILE *file, bool with_brackets=true );
   bool generate( FILE *file, bool separate=false );
-  void generate_hfst( hfst::WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1, hfst::FdTable<Character>* fd=NULL, bool filter_fd=false); // HFST ADDITION
 
   void clear( void );      // clears the transducer. The resulting transducer
                            // is like one created with Transducer()
@@ -373,7 +361,7 @@ class Transducer {
   void store( FILE* );       // stores the transducer in binary format
   void store_lowmem( FILE* );
   void read( FILE* );        // reads an transducer in binary format
-  bool enumerate_paths( std::vector<Transducer*>& );
+  bool enumerate_paths( vector<Transducer*>& );
 
   Transducer &reverse( void );            // reverse language
   Transducer &operator|( Transducer& );   // union, disjunction
@@ -396,5 +384,6 @@ class Transducer {
   friend class MakeCompactTransducer;
   friend std::ostream &operator<<(std::ostream&, Transducer&);
 };
+
 }
 #endif

@@ -11,12 +11,12 @@
 
 #include "fst.h"
 
-// Hfst addition
-namespace SFST 
-{
-
 using std::pair;
 using std::cerr;
+
+// HFST
+namespace SFST 
+{
 
 static void compose_nodes( Node*, Node*, Node*, Transducer*, PairMapping& );
 
@@ -409,24 +409,6 @@ void Transducer::rec_cat_nodes( Node *node, Node *node2 )
   }
 }
 
-void Transducer::rec_cat_nodes_hfst( Node *node, Node *node2 )
-
-{
-  if (!node->was_visited( vmark )) {
-
-    // iterate over all outgoing arcs of node
-    for( ArcsIter p(node->arcs()); p; p++ ) {
-      Arc *arc=p;
-      rec_cat_nodes_hfst( arc->target_node(), node2 );
-    }
-    
-    if (node->is_final()) {
-      // link this node to node2
-      node->add_arc( Label(), node2, this );
-    }
-  }
-}
-
 
 /*******************************************************************/
 /*                                                                 */
@@ -675,7 +657,6 @@ static void conjoin_nodes( Node *n1, Node *n2, Node *node,
 Transducer &Transducer::operator&( Transducer &a )
 
 {
-
   Transducer *tmp1=NULL;
   Transducer *tmp2=NULL;
   Node *r1, *r2;
@@ -825,7 +806,7 @@ Transducer &Transducer::operator||( Transducer &a )
 
 /*******************************************************************/
 /*                                                                 */
-/*  Transducer::operator /                                         */
+/*  Transducer::operator/                                          */
 /*                                                                 */
 /*******************************************************************/
 
@@ -1160,4 +1141,5 @@ void Transducer::replace_char2(Node *node, Node *node2, Character c,
     }
   }
 }
+
 }

@@ -24,7 +24,7 @@ void warn2(char *text, char *text2);
 int yylex( void );
 int yyparse( void );
 
-hfst::ImplementationType type=TROPICAL_OFST_TYPE;
+ImplementationType type;
 
 static int Switch=0;
 HfstTransducer * Result;
@@ -80,9 +80,9 @@ ASSIGNMENTS: ASSIGNMENTS ASSIGNMENT {}
           | /* nothing */           {}
           ;
 
-ASSIGNMENT: // VAR '=' RE              { if (def_var($1,$3)) warn2("assignment of empty transducer to",$1); }
-          // | RVAR '=' RE             { if (def_rvar($1,$3)) warn2("assignment of empty transducer to",$1); }
-          SVAR '=' VALUES         { if (def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
+ASSIGNMENT: VAR '=' RE              { if (HfstCompiler::def_var($1,$3)) warn2("assignment of empty transducer to",$1); }
+          | RVAR '=' RE             { if (HfstCompiler::def_rvar($1,$3)) warn2("assignment of empty transducer to",$1); }
+          | SVAR '=' VALUES         { if (def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
           | RSVAR '=' VALUES        { if (def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
           // | RE PRINT STRING         { write_to_file($1, $3); }
           | ALPHA RE                { HfstCompiler::def_alphabet($2); delete $2; }
@@ -91,10 +91,10 @@ ASSIGNMENT: // VAR '=' RE              { if (def_var($1,$3)) warn2("assignment o
 RE:         RE ARROW CONTEXTS2      { $$ = HfstCompiler::restriction($1,$2,$3,0); }
 	  | RE '^' ARROW CONTEXTS2  { $$ = HfstCompiler::restriction($1,$3,$4,1); }
 	  | RE '_' ARROW CONTEXTS2  { $$ = HfstCompiler::restriction($1,$3,$4,-1); }
-          | RE REPLACE CONTEXT2     { $$ = HfstCompiler::replace_in_context(HfstCompiler::explode_and_minimize($1), $2, $3, false); }
-          | RE REPLACE '?' CONTEXT2 { $$ = HfstCompiler::replace_in_context(HfstCompiler::explode_and_minimize($1), $2, $4, true);}
-          | RE REPLACE '(' ')'      { $$ = HfstCompiler::replace(HfstCompiler::explode_and_minimize($1), $2, false); }
-          | RE REPLACE '?' '(' ')'  { $$ = HfstCompiler::replace(HfstCompiler::explode_and_minimize($1), $2, true); }
+          | RE REPLACE CONTEXT2     { $1 = HfstCompiler::explode($1); $1->minimize(); $$ = HfstCompiler::replace_in_context($1, $2, $3, false); }
+          | RE REPLACE '?' CONTEXT2 { $1 = HfstCompiler::explode($1); $1->minimize(); $$ = HfstCompiler::replace_in_context($1, $2, $4, true); }
+          | RE REPLACE '(' ')'      { $1 = HfstCompiler::explode($1); $1->minimize(); $$ = HfstCompiler::replace($1, $2, false); }
+          | RE REPLACE '?' '(' ')'  { $1 = HfstCompiler::explode($1); $1->minimize(); $$ = HfstCompiler::replace($1, $2, true); }
           | RE RANGE ARROW RANGE RE { $$ = HfstCompiler::make_rule($1,$2,$3,$4,$5); }
           | RE RANGE ARROW RANGE    { $$ = HfstCompiler::make_rule($1,$2,$3,$4,NULL); }
           | RANGE ARROW RANGE RE    { $$ = HfstCompiler::make_rule(NULL,$1,$2,$3,$4); }
@@ -107,8 +107,8 @@ RE:         RE ARROW CONTEXTS2      { $$ = HfstCompiler::restriction($1,$2,$3,0)
           | RE INSERT CODE           { $$ = HfstCompiler::insert_freely($1,$3,$3); }
           | RANGE ':' RANGE  { $$ = HfstCompiler::new_transducer($1,$3,type); }
           | RANGE            { $$ = HfstCompiler::new_transducer($1,$1,type); }
-          // | VAR              { $$ = var_value($1); }
-          // | RVAR             { $$ = rvar_value($1); }
+          | VAR              { $$ = HfstCompiler::var_value($1); }
+          | RVAR             { $$ = HfstCompiler::rvar_value($1,type); }
           | RE '*'           { $1->repeat_star(); $$ = $1; }
           | RE '+'           { $1->repeat_plus(); $$ = $1; }
           | RE '?'           { $1->optionalize(); $$ = $1; }

@@ -80,6 +80,7 @@ namespace hfst
   
   HfstTokenizer::HfstTokenizer() {}
 
+
 int HfstTokenizer::get_next_symbol_size(const char * symbol)
 const
 {

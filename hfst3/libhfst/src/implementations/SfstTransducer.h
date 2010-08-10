@@ -12,6 +12,8 @@
 
 #include "HfstExceptions.h"
 #include "FlagDiacritics.h"
+#include "SymbolDefs.h"
+#include "ExtractStrings.h"
 #include "SFST/src/fst.h"
 #include <cstdio>
 #include <string>
@@ -93,6 +95,11 @@ namespace hfst { namespace implementations
       static Transducer * extract_input_language(Transducer * t);
       static Transducer * extract_output_language(Transducer * t);
       static void extract_strings(Transducer * t, hfst::WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1, FdTable<SFST::Character>* fd=NULL, bool filter_fd=false);
+
+      static void generate_hfst( Transducer *t, Node*, Node2Int&, Node2Int&, std::vector<char>&, int, std::vector<char>&, int, hfst::WeightedPaths<float>::Set &results,
+				 int, int, std::vector<hfst::FdState<Character> >* fd_state_stack=NULL, bool filter_fd=true);
+      static void generate_hfst( Transducer *t, hfst::WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1,
+				 hfst::FdTable<Character>* fd=NULL, bool filter_fd=false);
 
       static Transducer * insert_freely(Transducer *t , const StringPair &symbol_pair);
       static Transducer * substitute(Transducer * t, String old_symbol, String new_symbol);

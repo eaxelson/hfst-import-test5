@@ -18,9 +18,10 @@
 
 #include <vector>
 
-// Hfst addition
+// HFST addition
 namespace SFST
 {
+
 /*****************  class LMArc  ***********************************/
 
 class LMArc {
@@ -80,5 +81,6 @@ public:
 
   void analyze_string( char *string, std::vector<Analysis> &analyses );
 };
+
 }
 #endif

@@ -12,12 +12,13 @@
 #ifndef _UTF8_H_
 #define _UTF8_H_
 
-// Hfst addition
+// HFST
 namespace SFST 
 {
+
 unsigned int utf8toint( char *s );
 unsigned int utf8toint( char **s );
 char *int2utf8( unsigned int );
+
 }
 #endif
-

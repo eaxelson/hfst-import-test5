@@ -18,8 +18,8 @@
 // Hfst addition
 namespace SFST 
 {
-bool Switch_Bytes=false;
 
+bool Switch_Bytes=false;
 
 
 /*******************************************************************/
@@ -84,4 +84,5 @@ size_t read_num( void *p, size_t n, FILE *file )
   }
   return result;
 }
+
 }

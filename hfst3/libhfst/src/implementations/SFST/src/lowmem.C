@@ -13,11 +13,11 @@
 
 #include "lowmem.h"
 
-// Hfst addition
+using std::vector;
+
+// HFST addition
 namespace SFST 
 {
-
-using std::vector;
 
 const int BUFFER_SIZE=1000;
 
@@ -91,4 +91,5 @@ LowMemTransducer::LowMemTransducer( FILE *file )
 
   rootnode = new LMNode(ftell(file), lmafile);
 }
+
 }
