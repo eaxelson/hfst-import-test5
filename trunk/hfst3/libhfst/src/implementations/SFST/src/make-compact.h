@@ -13,9 +13,10 @@
 #include "fst.h"
 #include "compact.h"
 
-// Hfst addition
+// HFST
 namespace SFST
 {
+
 class MakeCompactTransducer : CompactTransducer {
     
 private:
@@ -32,5 +33,6 @@ public:
   void sort( Level );
   void store( FILE *file );
 };
+
 }
 #endif

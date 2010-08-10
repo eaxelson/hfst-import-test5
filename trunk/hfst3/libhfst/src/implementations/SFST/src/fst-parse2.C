@@ -9,11 +9,12 @@
 
 #include "fst.h"
 
-using namespace SFST;
-
 using std::cerr;
 using std::cout;
 using std::vector;
+
+// HFST
+using namespace SFST;
 
 #define BUFFER_SIZE 10000
 

@@ -1244,6 +1244,31 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
 
 }
 
+  HfstTokenizer &HfstTransducer::create_tokenizer() 
+  {
+    HfstTokenizer tok;
+    HfstMutableTransducer t(*this);
+    HfstStateIterator state_it(t);
+    while (not state_it.done()) 
+      {
+	HfstState s = state_it.value();
+	HfstTransitionIterator transition_it(t,s);
+	while (not transition_it.done()) 
+	  {
+	    HfstTransition tr = transition_it.value();
+	    if (tr.isymbol.size() > 1)
+	      tok.add_multichar_symbol(tr.isymbol);
+	    if (tr.isymbol.size() > 1)
+	      tok.add_multichar_symbol(tr.osymbol);
+	    // special symbols are added too (is this a problem?)
+	    transition_it.next();
+	  }
+	state_it.next();
+      }
+    return tok;
+  }
+
+
 std::ostream &operator<<(std::ostream &out,HfstTransducer &t)
   {
     HfstTransducer tc(t);

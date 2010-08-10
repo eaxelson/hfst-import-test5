@@ -13,10 +13,11 @@
 
 #include "compact.h"
 
-using namespace SFST;
-
 using std::cerr;
 using std::vector;
+
+// HFST
+using namespace SFST;
 
 const int BUFFER_SIZE=1000;
 

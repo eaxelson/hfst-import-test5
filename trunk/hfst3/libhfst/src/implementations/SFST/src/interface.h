@@ -13,9 +13,10 @@
 #include "utf8.h"
 #include "fst.h"
 
-// Hfst addition
+// HFST addition
 namespace SFST
 {
+
 typedef enum {twol_left,twol_right,twol_both} Twol_Type;
 
 typedef enum {repl_left,repl_right,repl_up,repl_down} Repl_Type;
@@ -54,9 +55,9 @@ Range *rsvar_value( char *name );
 Character character_code( unsigned int uc );
 Character symbol_code( char *s );
 
-// added to h file
-bool in_range( unsigned int c, Range *r ); // static removed
-Transducer *make_transducer( Range *r1, Range *r2 );  // static removed
+// HFST: functions made externally accessible
+bool in_range( unsigned int c, Range *r );
+Transducer *make_transducer( Range *r1, Range *r2 );
 
 Range *add_value( Character, Range*);
 Range *add_var_values( char *name, Range*);
@@ -96,5 +97,6 @@ Contexts *make_context( Transducer *l, Transducer *r );
 Contexts *add_context( Contexts *nc, Contexts *c );
 Transducer *result( Transducer*, bool );
 void write_to_file( Transducer*, char *filename);
+
 }
 #endif

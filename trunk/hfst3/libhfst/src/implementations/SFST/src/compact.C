@@ -19,10 +19,10 @@
 // Hfst addition
 namespace SFST 
 {
+
 using std::equal_range;
 using std::vector;
 using std::pair;
-
 
 const int BUFFER_SIZE=1000;
 
@@ -618,4 +618,5 @@ void CompactTransducer::compute_probs( vector<CAnalysis> &analyses,
     prob[i] /= sum; // normalization
   }
 }
+
 }

@@ -38,8 +38,7 @@ typedef unsigned CODE_DATA_TYPE Character;
 // on the analysis level (lower) or the surface level (upper)
 typedef enum {upper, lower} Level;
 
-extern char EpsilonString[]; // holds the symbol representing the empty string
-                             // which is usually "<>"
+extern char EpsilonString[]; // empty string symbol (usually "<>")
 
 
 /*****************  class Label  ***********************************/

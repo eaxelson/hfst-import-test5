@@ -9,8 +9,10 @@
 
 #include "fst.h"
 
-using namespace SFST;
 using std::cerr;
+
+// HFST
+using namespace SFST;
 
 bool Upper=false;
 bool Lower=false;

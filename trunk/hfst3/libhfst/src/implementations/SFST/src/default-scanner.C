@@ -618,7 +618,9 @@ char *yytext;
 
 #include "interface.h"
 #include "fst-compiler.h"
-  using namespace SFST;
+
+// HFST
+using namespace SFST;
 
 #define MAX_INCLUDE_DEPTH 10
   
@@ -627,11 +629,14 @@ YY_BUFFER_STATE Include_Stack[MAX_INCLUDE_DEPTH];
 char *Name_Stack[MAX_INCLUDE_DEPTH];
 int  Lineno_Stack[MAX_INCLUDE_DEPTH];
 
- namespace SFST {
-   char *FileName;
+// HFST
+namespace SFST {
 
-   bool UTF8=false;
- }
+char *FileName;
+
+bool UTF8=false;
+}
+
 static char *unquote(char *string, bool del_quote=true) {
   char *s=string, *result=string;
   if (del_quote)
@@ -659,9 +664,9 @@ static void print_lineno() {
   fprintf(stderr,"%s: %d", FileName, yylineno);
 }
 
-extern void yyerror(char *text);
+extern void yyerror( const char *text );
 
-#line 665 "default-scanner.C"
+#line 670 "default-scanner.C"
 
 #define INITIAL 0
 #define incl 1
@@ -852,10 +857,10 @@ YY_DECL
 	register char *yy_cp, *yy_bp;
 	register int yy_act;
     
-#line 73 "default-scanner.ll"
+#line 78 "default-scanner.ll"
 
 
-#line 859 "default-scanner.C"
+#line 864 "default-scanner.C"
 
 	if ( !(yy_init) )
 		{
@@ -947,22 +952,22 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 75 "default-scanner.ll"
+#line 80 "default-scanner.ll"
 BEGIN(incl);
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 76 "default-scanner.ll"
+#line 81 "default-scanner.ll"
 /* eat the whitespace */
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 77 "default-scanner.ll"
+#line 82 "default-scanner.ll"
 { error2("Missing quotes",yytext); }
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 78 "default-scanner.ll"
+#line 83 "default-scanner.ll"
 { /* got the include file name */
                      FILE *file;
                      char *name=fst_strdup(yytext+1);
@@ -990,7 +995,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case YY_STATE_EOF(INITIAL):
 case YY_STATE_EOF(incl):
-#line 102 "default-scanner.ll"
+#line 107 "default-scanner.ll"
 {
                      if (Verbose)
 		       fputc('\n', stderr);
@@ -1008,118 +1013,118 @@ case YY_STATE_EOF(incl):
 case 5:
 /* rule 5 can match eol */
 YY_RULE_SETUP
-#line 117 "default-scanner.ll"
+#line 122 "default-scanner.ll"
 { print_lineno();  /* ignore comments */ }
 	YY_BREAK
 case 6:
 /* rule 6 can match eol */
 YY_RULE_SETUP
-#line 119 "default-scanner.ll"
+#line 124 "default-scanner.ll"
 { print_lineno();  /* ignore comments */ }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 121 "default-scanner.ll"
+#line 126 "default-scanner.ll"
 { /* ignore comments */ }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 124 "default-scanner.ll"
+#line 129 "default-scanner.ll"
 { return ALPHA; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 126 "default-scanner.ll"
+#line 131 "default-scanner.ll"
 { return COMPOSE; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 127 "default-scanner.ll"
+#line 132 "default-scanner.ll"
 { yylval.type = twol_both; return ARROW; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 128 "default-scanner.ll"
+#line 133 "default-scanner.ll"
 { yylval.type = twol_right;return ARROW; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 129 "default-scanner.ll"
+#line 134 "default-scanner.ll"
 { yylval.type = twol_left; return ARROW; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 130 "default-scanner.ll"
+#line 135 "default-scanner.ll"
 { yylval.rtype = repl_up;   return REPLACE; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 131 "default-scanner.ll"
+#line 136 "default-scanner.ll"
 { yylval.rtype = repl_down; return REPLACE; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 132 "default-scanner.ll"
+#line 137 "default-scanner.ll"
 { yylval.rtype = repl_right;return REPLACE; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 133 "default-scanner.ll"
+#line 138 "default-scanner.ll"
 { yylval.rtype = repl_left; return REPLACE; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 134 "default-scanner.ll"
+#line 139 "default-scanner.ll"
 { return PRINT; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 135 "default-scanner.ll"
+#line 140 "default-scanner.ll"
 { return INSERT; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 136 "default-scanner.ll"
+#line 141 "default-scanner.ll"
 { return POS; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 137 "default-scanner.ll"
+#line 142 "default-scanner.ll"
 { return SWITCH; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 139 "default-scanner.ll"
+#line 144 "default-scanner.ll"
 { return yytext[0]; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 141 "default-scanner.ll"
+#line 146 "default-scanner.ll"
 { yylval.name = fst_strdup(yytext); return RVAR; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 143 "default-scanner.ll"
+#line 148 "default-scanner.ll"
 { yylval.name = fst_strdup(yytext); return VAR; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 145 "default-scanner.ll"
+#line 150 "default-scanner.ll"
 { yylval.name = fst_strdup(yytext); return RSVAR; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 147 "default-scanner.ll"
+#line 152 "default-scanner.ll"
 { yylval.name = fst_strdup(yytext); return SVAR; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 149 "default-scanner.ll"
+#line 154 "default-scanner.ll"
 { yylval.name = unquote(yytext,false); return SYMBOL; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 151 "default-scanner.ll"
+#line 156 "default-scanner.ll"
 { 
                     yylval.value = fst_strdup(yytext+2);
 		    yylval.value[strlen(yylval.value)-2] = 0;
@@ -1128,7 +1133,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 157 "default-scanner.ll"
+#line 162 "default-scanner.ll"
 { 
                     yylval.value = fst_strdup(yytext+1);
 		    yylval.value[strlen(yylval.value)-1] = 0;
@@ -1137,24 +1142,24 @@ YY_RULE_SETUP
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 163 "default-scanner.ll"
+#line 168 "default-scanner.ll"
 { /* ignored */ }
 	YY_BREAK
 case 30:
 /* rule 30 can match eol */
 YY_RULE_SETUP
-#line 164 "default-scanner.ll"
+#line 169 "default-scanner.ll"
 { print_lineno(); /* ignored */ }
 	YY_BREAK
 case 31:
 /* rule 31 can match eol */
 YY_RULE_SETUP
-#line 165 "default-scanner.ll"
+#line 170 "default-scanner.ll"
 { print_lineno(); return NEWLINE; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 167 "default-scanner.ll"
+#line 172 "default-scanner.ll"
 { long l=atol(yytext+1); 
 	    if (l <= 255) { yylval.uchar=(unsigned char)l; return CHARACTER; }
 		    yyerror("invalid expression");
@@ -1162,20 +1167,20 @@ YY_RULE_SETUP
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 172 "default-scanner.ll"
+#line 177 "default-scanner.ll"
 { yylval.uchar = yytext[1]; return CHARACTER; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 173 "default-scanner.ll"
+#line 178 "default-scanner.ll"
 { yylval.uchar = yytext[0]; return CHARACTER; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 176 "default-scanner.ll"
+#line 181 "default-scanner.ll"
 ECHO;
 	YY_BREAK
-#line 1179 "default-scanner.C"
+#line 1184 "default-scanner.C"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2186,7 +2191,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 176 "default-scanner.ll"
+#line 181 "default-scanner.ll"
 
 
 

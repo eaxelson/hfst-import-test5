@@ -13,7 +13,6 @@
 #ifndef _HFST_TOKENIZER_H_
 #define _HFST_TOKENIZER_H_
 #include "SymbolDefs.h"
-//#include "GlobalSymbolTable.h"
 #include <iostream>
 #include <climits>
 #include <string>

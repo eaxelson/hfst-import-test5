@@ -14,16 +14,16 @@ namespace SFST
 {
 
   /* Expand a transition according to the previously unknown symbols in s. */
-  void Transducer::expand_node( Node *origin, Label &l, Node *target, Transducer *a, hfst::StringSet &s )
+  void Transducer::expand_node( Node *origin, Label &l, Node *target, Transducer *a, std::set<char*> &s )
 {
   if ( l.lower_char() == 1 && l.upper_char() == 1 )     // cross product "?:?"
     {
-      for (hfst::StringSet::iterator it1 = s.begin(); it1 != s.end(); it1++) 
+      for (std::set<char*>::iterator it1 = s.begin(); it1 != s.end(); it1++) 
 	{
-	  int inumber = alphabet.symbol2code(it1->c_str());
-	  for (hfst::StringSet::iterator it2 = s.begin(); it2 != s.end(); it2++) 
+	  int inumber = alphabet.symbol2code(*it1);
+	  for (std::set<char*>::iterator it2 = s.begin(); it2 != s.end(); it2++) 
 	    {
-	      int onumber = alphabet.symbol2code(it2->c_str());
+	      int onumber = alphabet.symbol2code(*it2);
 	      if (inumber != onumber) {  
 		// add transitions of type x:y (non-identity cross-product of symbols in s)
 		origin->add_arc( Label(inumber, onumber), target, a );
@@ -36,26 +36,26 @@ namespace SFST
     }
   else if (l.lower_char() == 2 && l.upper_char() == 2 )  // identity "?:?"	     
     {
-      for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
+      for (std::set<char*>::iterator it = s.begin(); it != s.end(); it++) 
 	{
-	  int number = alphabet.symbol2code(it->c_str());
+	  int number = alphabet.symbol2code(*it);
 	  // add transitions of type x:x
 	  origin->add_arc( Label(number, number), target, a );
 	}
     }
   else if (l.lower_char() == 1)  // "?:x"
     {
-      for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
+      for (std::set<char*>::iterator it = s.begin(); it != s.end(); it++) 
 	{
-	  int number = alphabet.symbol2code(it->c_str());
+	  int number = alphabet.symbol2code(*it);
 	  origin->add_arc( Label(number, l.upper_char()), target, a );
 	}
     }
   else if (l.upper_char() == 1)  // "x:?"
     {
-      for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
+      for (std::set<char*>::iterator it = s.begin(); it != s.end(); it++) 
 	{
-	  int number = alphabet.symbol2code(it->c_str());
+	  int number = alphabet.symbol2code(*it);
 	  origin->add_arc( Label(l.lower_char(), number), target, a );
 	}
     }  
@@ -73,7 +73,7 @@ namespace SFST
 /*                                                                 */
 /*******************************************************************/
 
-  Node *Transducer::expand_nodes( Node *node, Transducer *a, hfst::StringSet &s )
+  Node *Transducer::expand_nodes( Node *node, Transducer *a, std::set<char*> &s)
 {
   if (!node->was_visited(vmark)) {
     
@@ -107,7 +107,7 @@ namespace SFST
 
   /* Make a copy of this transducer where all transitions are expanded
      according to the previously unknown symbols listed in s. */
-  Transducer &Transducer::expand(hfst::StringSet &s)
+  Transducer &Transducer::expand(std::set<char*> &s)
 
 {
   Transducer *na = new Transducer();

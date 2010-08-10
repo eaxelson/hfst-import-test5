@@ -12,7 +12,7 @@
 
 #include "fst.h"
 
-// Hfst addition
+// HFST 
 namespace SFST 
 {
 
@@ -140,7 +140,7 @@ void Node::clear_visited( NodeHashSet &nodeset )
   if (nodeset.find( this ) == nodeset.end()) {
     visited = 0;
     nodeset.insert( this );
-    fprintf(stderr," %lu", nodeset.size());
+    fprintf(stderr," %lu", (unsigned long)nodeset.size());
     for( ArcsIter p(arcs()); p; p++ ) {
       Arc *arc=p;
       arc->target_node()->clear_visited( nodeset );
@@ -167,6 +167,7 @@ void NodeNumbering::number_node( Node *node, Transducer &a )
     }
   }
 }
+
 
 /*******************************************************************/
 /*                                                                 */
@@ -302,103 +303,6 @@ Transducer::Transducer( istream &is, const Alphabet *a, bool verbose  )
   if (verbose && n >= 10000)
     cerr << "\n";
 }
-
-
-// *************************************************** //
-//                                                     //
-//  EPSILON REMOVAL ALGORITHM written by Erik Axelson  //
-//                                                     //
-// *************************************************** //
-
-
-/* Find the corresponding node in 'copy_tr' for 'node'. If needed, create a new node to 'copy_tr'
-   and update 'mapper' accordingly. */
-
-Node *node_in_copy_tr( Node *node, Transducer *copy_tr, NodeNumbering &nn, map<int, Node*> &mapper ) {
-  int node_number = nn[node];  // node number in original transducer
-  map<int,Node*>::iterator it = mapper.find(node_number); // iterator to associated node in copy_tr
-  if (it == mapper.end()) {
-    Node *associated_node = copy_tr->new_node(); // create new node in copy_tr
-    if (node->is_final())
-      associated_node->set_final(true);
-    mapper[node_number] = associated_node; // and associate it with node_number
-    return associated_node;
-  }
-  else
-    return it->second;
-}; 
-
-
-/* Recursive epsilon removal algorithm. Copies arcs and their
-   target nodes starting from search_node to node copy_tr_start_node
-   in transducer copy_tr. nn and mapper are used to associate nodes
-   with nodes in copy_tr. */
-
-void Transducer::copy_nodes( Node *search_node, Transducer *copy_tr,
-			     Node *copy_tr_start_node,
-			     NodeNumbering &nn, map<int, Node*> &mapper ) {
-
-  // go through all arcs leaving from search node
-  // (the iterator lists the epsilon arcs first)
-  for( ArcsIter it(search_node->arcs()); it; it++ ) {
-    Arc arc=*it;
-
-    if (arc.label().is_epsilon()) {
-      // 'forward', which is originally NULL, is used as a flag
-      // for detecting epsilon transition loops
-      if (search_node->forward() != copy_tr_start_node) { 
-	search_node->set_forward(copy_tr_start_node);  // set epsilon flag
-	if (arc.target_node()->is_final())
-	  copy_tr_start_node->set_final(true);
-	copy_nodes(arc.target_node(), copy_tr, copy_tr_start_node, nn, mapper);
-	search_node->set_forward(NULL);  // remove epsilon flag
-      }
-    }
-
-    else {
-      // target node in copy_tr
-      Node *copy_tr_end_node = node_in_copy_tr(arc.target_node(), copy_tr, nn, mapper);
-      // add arc to copy_tr
-      copy_tr_start_node->add_arc( Label(arc.label().lower_char(),
-					 arc.label().upper_char()),
-				   copy_tr_end_node,
-				   copy_tr );
-      // if the target node is not visited, copy nodes recursively
-      if ( !(arc.target_node()->was_visited(vmark)) )
-	copy_nodes(arc.target_node(), copy_tr, copy_tr_end_node, nn, mapper);
-    }
-
-  }
-};
-
-
-Transducer &Transducer::remove_epsilons() {
-
-  if ( deterministic || minimised )
-    return this->copy();
-
-  NodeNumbering nn(*this);
-  incr_vmark();
-  Transducer *copy_tr = new Transducer();
-  copy_tr->alphabet.copy(alphabet);
-  map<int, Node*> mapper;
-  // mark root node as visited
-  root_node()->was_visited(vmark);
-  // set copy_tr root node final, if needed
-  if (root_node()->is_final())
-    copy_tr->root_node()->set_final(true);
-  // associate the root_nodes in this and copy_tr 
-  // (node numbering for root_node is zero)
-  mapper[0] = copy_tr->root_node();
-
-  copy_nodes(root_node(), copy_tr, copy_tr->root_node(), nn, mapper);
-  incr_vmark();	
-
-  return *copy_tr;
-};
-
-// EPSILON REMOVAL ALGORITHM ENDS
-
 
 
 /*******************************************************************/
@@ -1097,4 +1001,113 @@ Transducer::Transducer( FILE *file, bool binary )
   else
     read_transducer_text( file );
 }
+
+
+/*  EPSILON REMOVAL ALGORITHM written by Erik Axelson starts here  */
+
+/*******************************************************************/
+/*                                                                 */
+/*  node_in_copy_tr                                                */
+/*                                                                 */
+/*******************************************************************/
+
+/* Find the corresponding node in 'copy_tr' for 'node'. If needed, create a new node to 'copy_tr'
+   and update 'mapper' accordingly. */
+
+Node *node_in_copy_tr( Node *node, Transducer *copy_tr, NodeNumbering &nn, map<int, Node*> &mapper ) {
+  int node_number = nn[node];  // node number in original transducer
+  map<int,Node*>::iterator it = mapper.find(node_number); // iterator to associated node in copy_tr
+  if (it == mapper.end()) {
+    Node *associated_node = copy_tr->new_node(); // create new node in copy_tr
+    if (node->is_final())
+      associated_node->set_final(true);
+    mapper[node_number] = associated_node; // and associate it with node_number
+    return associated_node;
+  }
+  else
+    return it->second;
+}; 
+
+
+/*******************************************************************/
+/*                                                                 */
+/*  Transducer::copy_nodes                                         */
+/*                                                                 */
+/*******************************************************************/
+
+/* Recursive epsilon removal algorithm. Copies arcs and their
+   target nodes starting from search_node to node copy_tr_start_node
+   in transducer copy_tr. nn and mapper are used to associate nodes
+   with nodes in copy_tr. */
+
+void Transducer::copy_nodes( Node *search_node, Transducer *copy_tr,
+			     Node *copy_tr_start_node,
+			     NodeNumbering &nn, map<int, Node*> &mapper ) {
+
+  // go through all arcs leaving from search node
+  // (the iterator lists the epsilon arcs first)
+  for( ArcsIter it(search_node->arcs()); it; it++ ) {
+    Arc arc=*it;
+
+    if (arc.label().is_epsilon()) {
+      // 'forward', which is originally NULL, is used as a flag
+      // for detecting epsilon transition loops
+      if (search_node->forward() != copy_tr_start_node) { 
+	search_node->set_forward(copy_tr_start_node);  // set epsilon flag
+	if (arc.target_node()->is_final())
+	  copy_tr_start_node->set_final(true);
+	copy_nodes(arc.target_node(), copy_tr, copy_tr_start_node, nn, mapper);
+	search_node->set_forward(NULL);  // remove epsilon flag
+      }
+    }
+
+    else {
+      // target node in copy_tr
+      Node *copy_tr_end_node = node_in_copy_tr(arc.target_node(), copy_tr, nn, mapper);
+      // add arc to copy_tr
+      copy_tr_start_node->add_arc( Label(arc.label().lower_char(),
+					 arc.label().upper_char()),
+				   copy_tr_end_node,
+				   copy_tr );
+      // if the target node is not visited, copy nodes recursively
+      if ( !(arc.target_node()->was_visited(vmark)) )
+	copy_nodes(arc.target_node(), copy_tr, copy_tr_end_node, nn, mapper);
+    }
+
+  }
+};
+
+
+/*******************************************************************/
+/*                                                                 */
+/*  Transducer::remove_epsilons                                    */
+/*                                                                 */
+/*******************************************************************/
+
+Transducer &Transducer::remove_epsilons() {
+
+  if ( deterministic || minimised )
+    return this->copy();
+
+  NodeNumbering nn(*this);
+  incr_vmark();
+  Transducer *copy_tr = new Transducer();
+  copy_tr->alphabet.copy(alphabet);
+  map<int, Node*> mapper;
+  // mark root node as visited
+  root_node()->was_visited(vmark);
+  // set copy_tr root node final, if needed
+  if (root_node()->is_final())
+    copy_tr->root_node()->set_final(true);
+  // associate the root_nodes in this and copy_tr 
+  // (node numbering for root_node is zero)
+  mapper[0] = copy_tr->root_node();
+
+  copy_nodes(root_node(), copy_tr, copy_tr->root_node(), nn, mapper);
+  incr_vmark();	
+
+  return *copy_tr;
+};
+
+// EPSILON REMOVAL ALGORITHM ENDS
 }

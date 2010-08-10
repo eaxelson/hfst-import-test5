@@ -52,14 +52,8 @@ void Alphabet::add( const char *symbol, Character c )
 Alphabet::Alphabet()
 
 { 
-  /* ORIGINAL
   utf8 = false;
-  add(EpsilonString, Label::epsilon); */
-  // HFST version
-  utf8 = true;
-  add("@_EPSILON_SYMBOL_@", 0);
-  add("@_UNKNOWN_SYMBOL_@", 1);
-  add("@_IDENTITY_SYMBOL_@", 2);
+  add(EpsilonString, Label::epsilon);
 }
 
 
@@ -86,8 +80,15 @@ void Alphabet::clear()
   delete[] s;
 }
 
-// HFST addition
+
+/*******************************************************************/
+/*                                                                 */
+/*  Alphabet::print                                                */
+/*                                                                 */
+/*******************************************************************/
+
 void Alphabet::print(void)
+
 {
   for( CharMap::iterator it=cm.begin(); it!=cm.end(); it++ )
     fprintf(stderr, "%i\t%s\n", it->first, it->second);
@@ -333,9 +334,8 @@ const char *Alphabet::write_label( Label l, bool with_brackets  ) const
 void Alphabet::insert_symbols( const Alphabet &a )
 
 {
-  for( CharMap::const_iterator it=a.cm.begin(); it!=a.cm.end(); it++ ) {
+  for( CharMap::const_iterator it=a.cm.begin(); it!=a.cm.end(); it++ )
     add_symbol(it->second, it->first);
-  }
 }
 
 
@@ -378,6 +378,7 @@ void Alphabet::copy( const Alphabet &a )
   for( LabelSet::const_iterator it=a.begin(); it!=a.end(); it++ )
     ls.insert( *it );
 }
+
 
 /*******************************************************************/
 /*                                                                 */
@@ -730,7 +731,9 @@ int Alphabet::compute_score( Analysis &ana )
       // Is it a participle
       if (c != Label::epsilon) {
 	sym = write_char(c);
-	if (strcmp(sym,"<OLDORTH>") == 0 || strcmp(sym,"<NEWORTH>") == 0) {
+	if (strcmp(sym,"<OLDORTH>") == 0 || 
+	    strcmp(sym,"<NEWORTH>") == 0 || 
+	    strcmp(sym,"<SUFF>") == 0) {
 	  for( k++; k<ana.size(); k++ )
 	    if ((c = ana[k].lower_char()) != Label::epsilon)
 	      break;
@@ -827,9 +830,15 @@ char *Alphabet::print_analysis( Analysis &ana, bool both_layers )
   return result;
 }
 
-// HFST addition
+
+/*******************************************************************/
+/*                                                                 */
+/*  Alphabet::operator==                                           */
+/*                                                                 */
+/*******************************************************************/
 
 bool Alphabet::operator==(const Alphabet &alpha) const
+
 {
   for ( SymbolMap::const_iterator it = this->sm.begin(); it != this->sm.end(); it++ )
     {

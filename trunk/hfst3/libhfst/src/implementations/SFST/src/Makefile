@@ -1,10 +1,13 @@
 
+# TYPE is either debug, prof, static, lib, Sun64bit or the empty string
+TYPE = 
+
 # try different definitions of SGILIB if hash_map is not found
 #SGILIB=
 SGILIB=-DSGI__gnu_cxx
 #SGILIB=-DSGIext
 
-# comment the following lines if readline is not found
+# comment the following line if readline is not found
 READLINE = -DREADLINE
 LREADLINE = -lreadline -lhistory -lncurses
 
@@ -12,21 +15,40 @@ LREADLINE = -lreadline -lhistory -lncurses
 # short is the default
 #CDT=-DCODE_DATA_TYPE=short
 
-# Uncomment this line in order to compile a library and
-# run "make clean" in order to force a recompilation of the object files
-# FPIC = -fPIC
-
 CXX = g++
 WARNING = -Wall -Wcast-qual -Wconversion -std=c++98 -Wno-deprecated -ansi
 
-ifeq ($(findstring CYGWIN,$(shell uname)),CYGWIN)
-EXE = .exe
+ifeq ($(TYPE),debug)
+  DEBUG = -ggdb
+  OPTIMIZATION = -O0
+else
+  DEBUG = -DNDEBUG
+  ifeq ($(TYPE),prof)
+    OPTIMIZATION = -O2
+    PROFILE = -pg
+  else
+    OPTIMIZATION = -O3
+    ifeq ($(TYPE),static)
+      STATIC = -static
+    else
+      ifeq ($(TYPE),Sun64bit)
+        LOPT = -L/usr/lib/64 -L/usr/local/lib/sparcv9 -R/usr/lib/64 -R/usr/local/lib/sparcv9
+	CXX = g++64
+	BITS= -mcpu=v9
+      else
+        ifeq ($(TYPE),lib)
+          LIB = -fPIC
+        endif
+      endif
+    endif
+  endif
 endif
+
 
 CC = g++
 CL = $(CC)
-CFLAGS = -O3 $(WARNING) $(SGILIB) $(CDT) $(READLINE) $(FPIC)
-LDFLAGS =
+CFLAGS = $(DEBUG) $(PROFILE) $(LIB) $(OPTIMIZATION) $(WARNING) $(SGILIB) $(CDT) $(BITS) $(READLINE)
+LDFLAGS = $(DEBUG) $(PROFILE) $(STATIC) $(LOPT)
 
 CXXFLAGS = $(CFLAGS)
 LXXFLAGS = $(LDFLAGS)
@@ -38,79 +60,70 @@ INSTALL_DIR = install -d -m 755
 DESTDIR =
 PREFIX = /usr/local/
 
-PROGRAMS = fst-compiler$(EXE) fst-infl$(EXE) fst-generate$(EXE) fst-print$(EXE)\
-	fst-compare$(EXE) fst-compact$(EXE) fst-infl2$(EXE) fst-lowmem$(EXE)\
-	fst-infl3$(EXE) fst-lattice$(EXE) fst-match$(EXE) fst-parse$(EXE)\
-	fst-parse2$(EXE) fst-train$(EXE) fst-compiler-utf8$(EXE) fst-mor$(EXE) \
-	fst-text2bin$(EXE)
-
+PROGRAMS = fst-compiler fst-infl fst-generate fst-print fst-compare \
+	fst-compact fst-infl2 fst-lowmem fst-infl3 fst-lattice fst-match \
+	fst-parse fst-parse2 fst-train fst-compiler-utf8 fst-text2bin fst-mor
 ALLPROGRAMS = $(PROGRAMS)
 
+ifeq ($(TYPE),lib)
+TARGET = libsfst.tar.gz
+else
+TARGET = strip
+endif
 
-OBJ = basic.o alphabet.o fst.o operators.o determinise.o utf8.o # HFST addition
 
-.PHONY: all clean maintainer-clean install maninstall remake
+OBJ = basic.o alphabet.o fst.o operators.o determinise.o utf8.o
 
-all: $(ALLPROGRAMS)
+.PHONY: all clean realclean archive remake install strip
+
+all: $(TARGET)
+
+strip: $(ALLPROGRAMS)
 	strip $(ALLPROGRAMS)
 
-fst-api.zip: testprogram.C alphabet.C alphabet.h basic.C basic.h compact.C \
+fst-api.zip: test.C alphabet.C alphabet.h basic.C basic.h compact.C \
 	compact.h lowmem.C lowmem.h robust.C
 	zip $@ $^
 
-fst-compact$(EXE): compact.o make-compact.o
+fst-compact: compact.o make-compact.o
 
-fst-generate$(EXE): generate.o
+fst-generate: generate.o
 
-fst-match$(EXE): compact.o
+fst-match: compact.o
 
-fst-train$(EXE): compact.o
+fst-train: compact.o
 
-fst-compiler$(EXE): $(OBJ) compact.o make-compact.o interface.o default-scanner.o
+fst-compiler: $(OBJ) compact.o make-compact.o interface.o default-scanner.o
 
-# added
-#hfst-compiler$(EXE): $(OBJ) compact.o make-compact.o interface.o default-scanner.o ../../../
-
-fst-compiler-utf8$(EXE): $(OBJ) compact.o make-compact.o interface.o \
+fst-compiler-utf8: $(OBJ) compact.o make-compact.o interface.o \
 	utf8-scanner.o fst-compiler.o
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
-# added
-#hfst-compiler-utf8$(EXE): $(OBJ) compact.o make-compact.o interface.o \
-	utf8-scanner.o hfst-compiler.o
-	$(CXX) -o $@ $^ $(LDFLAGS)
-
-fst-mor$(EXE): $(OBJ) fst-mor.o
+fst-mor: $(OBJ) fst-mor.o
 	$(CXX) -o $@ $^ $(LDFLAGS) $(LREADLINE)
 
-fst-text2bin$(EXE): $(OBJ) fst-text2bin.o
+fst-text2bin: $(OBJ) fst-text2bin.o
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
-%$(EXE): $(OBJ) %.o
+%: $(OBJ) %.o
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
-fst-infl2$(EXE): alphabet.o basic.o compact.o robust.o utf8.o fst-infl2.o
+fst-infl2: alphabet.o basic.o compact.o robust.o utf8.o fst-infl2.o
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
-fst-infl2-daemon$(EXE): alphabet.o basic.o compact.o robust.o utf8.o fst-infl2-daemon.o
+fst-infl2-daemon: alphabet.o basic.o compact.o robust.o utf8.o fst-infl2-daemon.o
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
-fst-infl3$(EXE): alphabet.o basic.o utf8.o lowmem.o fst-infl3.o
+fst-infl3: alphabet.o basic.o utf8.o lowmem.o fst-infl3.o
 	$(CXX) -o $@ $^ $(LDFLAGS)
 
-testprogram$(EXE): testprogram.o
-	$(CL) -lsfst -o $@ $^ $(LDFLAGS) || echo "Note that the SFST library libsfst.so must have been installed in order to compile testprogram."
+test: test.o
+	$(CL) -L. -lsfst -o $@ $^ $(LDFLAGS)
 
 fst-compiler.C: fst.h compact.h make-compact.h interface.h fst-compiler.yy
 	bison -d -o $@ fst-compiler.yy
 	if [ -f fst-compiler.C.h ]; then mv fst-compiler.C.h fst-compiler.h; fi
 	if [ -f fst-compiler.H ]; then mv fst-compiler.H fst-compiler.h; fi
-
-# added
-#hfst-compiler.C: fst.h compact.h make-compact.h interface.h fst-compiler.yy
-#	bison -d -o $@ hfst-compiler.yy
-#	if [ -f hfst-compiler.C.h ]; then mv hfst-compiler.C.h hfst-compiler.h; fi
-#	if [ -f hfst-compiler.H ]; then mv hfst-compiler.H hfst-compiler.h; fi
 
 default-scanner.C: fst.h interface.h scanner.ll fst-compiler.C default-scanner.ll
 	flex -o$@ default-scanner.ll
@@ -127,19 +140,19 @@ utf8-scanner.ll: scanner.ll
 libsfst.tar.gz: libsfst.so compact.h alphabet.h basic.h fst.h 
 	tar -zcf $@ $^
 
-libsfst.so: alphabet.o basic.o utf8.o compact.o fst.o operators.o determinise.o generate.o 
+libsfst.so: alphabet.o basic.o utf8.o compact.o fst.o operators.o determinise.o generate.o
 	$(CL) -shared -o $@ $^ $(LDFLAGS)
 
 remake: clean $(ALLPROGRAMS)
 
 clean:
-	-rm *.o Makefile.bak y.tab.h man1/*~ 2>&- > /dev/null
+	-rm -f *.o *~ Makefile.bak y.tab.h man1/*~ 2>&- > /dev/null
 
-maintainer-clean: clean
-	-rm $(ALLPROGRAMS) testprogram 2>&- > /dev/null
+realclean: clean
+	-rm -f $(ALLPROGRAMS) test 2>&- > /dev/null
 
 install: $(PROGRAMS)
-	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)bin
+#	$(INSTALL_DIR) $(DESTDIR)$(PREFIX)bin
 	for p in $(PROGRAMS); do $(INSTALL) $$p $(DESTDIR)$(PREFIX)bin/$$p; done
 
 maninstall:
@@ -147,8 +160,15 @@ maninstall:
 	for m in man1/*.1; do $(INSTALL_MANPAGES) $$m $(DESTDIR)$(PREFIX)man/$$m; done
 
 
+archive: 
+	tar -zhcf VERSION-`date '+%y%m%d'`.tar.gz *.ll *.yy *.[Ch] Makefile man1/*
+
+Makefile: *.C *.ll *.yy *.h
+	-makedepend -Y -- $(CFLAGS) -- *.C 2>/dev/null 
+
 # DO NOT DELETE
 
+TransducerTest.o: Transducer.h
 alphabet.o: utf8.h alphabet.h basic.h sgi.h
 basic.o: basic.h
 compact.o: compact.h alphabet.h basic.h sgi.h
@@ -159,11 +179,6 @@ fst-compact.o: make-compact.h fst.h alphabet.h basic.h sgi.h mem.h compact.h
 fst-compare.o: fst.h alphabet.h basic.h sgi.h mem.h
 fst-compiler.o: make-compact.h fst.h alphabet.h basic.h sgi.h mem.h compact.h
 fst-compiler.o: interface.h utf8.h
-
-# added
-#hfst-compiler.o: make-compact.h fst.h alphabet.h basic.h sgi.h mem.h compact.h
-#hfst-compiler.o: interface.h utf8.h
-
 fst-generate.o: fst.h alphabet.h basic.h sgi.h mem.h
 fst-infl.o: fst.h alphabet.h basic.h sgi.h mem.h
 fst-infl2-daemon.o: Socket.h compact.h alphabet.h basic.h sgi.h
@@ -185,7 +200,7 @@ lowmem.o: lowmem.h alphabet.h basic.h sgi.h
 make-compact.o: make-compact.h fst.h alphabet.h basic.h sgi.h mem.h compact.h
 operators.o: fst.h alphabet.h basic.h sgi.h mem.h
 robust.o: compact.h alphabet.h basic.h sgi.h
-testprogram.o: compact.h alphabet.h basic.h sgi.h
+test.o: compact.h alphabet.h basic.h sgi.h
 utf8-scanner.o: interface.h utf8.h fst.h alphabet.h basic.h sgi.h mem.h
 utf8-scanner.o: fst-compiler.h
 utf8.o: utf8.h

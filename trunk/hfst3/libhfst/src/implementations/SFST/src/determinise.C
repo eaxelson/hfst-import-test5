@@ -305,4 +305,5 @@ Transducer &Transducer::determinise()
   a->deterministic = 1;
   return *a;
 }
+
 }

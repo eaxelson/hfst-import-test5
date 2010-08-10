@@ -11,11 +11,11 @@
 
 #include "compact.h"
 
-// Hfst addition
+using std::vector;
+
+// HFST
 namespace SFST 
 {
-
-using std::vector;
 
 // data structure for a search path
 
@@ -250,4 +250,5 @@ float CompactTransducer::robust_analyze_string( char *string,
   agenda.extract_analyses( analyses );
   return agenda.first_complete_path().errors;
 }
+
 }

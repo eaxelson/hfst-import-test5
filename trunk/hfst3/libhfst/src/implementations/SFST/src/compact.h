@@ -19,6 +19,7 @@
 // Hfst addition
 namespace SFST
 {
+
 typedef std::vector<unsigned int> CAnalysis;
     
 class CompactTransducer {
@@ -97,5 +98,6 @@ public:
   float robust_analyze_string( char *string, std::vector<CAnalysis> &analyses,
 			       float ErrorsAllowed );
 };
+
 }
 #endif

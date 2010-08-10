@@ -13,9 +13,10 @@
 
 #include "utf8.h"
 
-// Hfst addition
+// HFST
 namespace SFST 
 {
+
 const unsigned char get3LSbits=7;
 const unsigned char get4LSbits=15;
 const unsigned char get5LSbits=31;
@@ -147,4 +148,5 @@ unsigned int utf8toint( char *s )
     return result;
   return 0;
 }
+
 }

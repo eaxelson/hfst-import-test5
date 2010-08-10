@@ -9,9 +9,11 @@
 
 #include "fst.h"
 
+using std::cerr;
+
+// HFST
 using namespace SFST;
 
-using std::cerr;
 
 /*******************************************************************/
 /*                                                                 */

@@ -9,9 +9,10 @@
 #include <stdio.h>
 #include <vector>
 
-// Hfst addition
+// HFST
 namespace SFST 
 {
+
 class Transition {
 public:
   char lower;
@@ -99,4 +100,5 @@ public:
     analyze1( 0, s, ana, analyses );
   }
 };
+
 }

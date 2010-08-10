@@ -24,6 +24,8 @@ namespace hfst
 {
  
   HfstCompiler::HfstCompiler() {}
+
+  HfstCompiler::VarMap HfstCompiler::VM;
   
   HfstTransducer * HfstCompiler::make_transducer(Range *r1, Range *r2, ImplementationType type)
   {
@@ -110,6 +112,49 @@ namespace hfst
     return SFST::complement_range(r);
   }
   
+  bool HfstCompiler::def_var( char *name, HfstTransducer *t ) {
+    // delete the old value of the variable
+    VarMap::iterator it=VM.find(name);
+    if (it != VM.end()) {
+      char *n=it->first;
+      HfstTransducer *v=it->second;
+      VM.erase(it);
+      delete v;
+      free(n);
+    }
+    
+    t = explode(t);
+    t->minimize();
+    
+    VM[name] = t;
+    // TODO
+    //return t->is_empty();
+    return false;
+  }
+
+  bool HfstCompiler::def_rvar( char *name, HfstTransducer *t ) {
+    // TODO
+    //if (t->is_cyclic())
+    //error2("cyclic transducer assigned to", name);
+    return def_var( name, t );
+  }
+  
+  HfstTransducer * HfstCompiler::var_value( char *name ) {
+    VarMap::iterator it=VM.find(name);
+    // TODO
+    //if (it == VM.end())
+    //  error2("undefined variable", name);
+    free(name);
+    return new HfstTransducer(*(it->second));
+  }
+
+  HfstTransducer * HfstCompiler::rvar_value( char *name, ImplementationType type ) {
+    if (SFST::RS.find(name) == SFST::RS.end())
+      SFST::RS.insert(SFST::fst_strdup(name));
+    Range *r=SFST::add_value(SFST::symbol_code(name), NULL);
+    return new_transducer(r,r,type); 
+  }
+
   bool HfstCompiler::def_svar( char *name, Range *r ) {
     return SFST::def_svar(name,r);
   }
@@ -182,7 +227,83 @@ namespace hfst
   }
 
   // TODO
-  HfstTransducer * HfstCompiler::explode_and_minimize( HfstTransducer *t ) {
+  HfstTransducer * HfstCompiler::explode( HfstTransducer *t ) {
+
+    if (SFST::RS.size() == 0 && SFST::RSS.size() == 0)
+      return t;
+    
+    t->minimize();
+    
+    // Make a tokenizer that recognizes all multicharacter symbols in t.
+    // It is needed when weighted paths are transformed into transducers.
+    HfstTokenizer TOK = t->create_tokenizer();
+
+    // transducer agreement variable names
+    vector<char*> name;
+    for( SFST::RVarSet::iterator it=SFST::RS.begin(); it!=SFST::RS.end(); it++)
+      name.push_back(*it);
+    SFST::RS.clear();  // ?
+    
+    // replace all agreement variables
+    for( size_t i=0; i<name.size(); i++ ) {
+      HfstTransducer *nt = new HfstTransducer(t->type); // an initially empty transducer
+      
+      // enumerate all paths of the transducer
+      WeightedPaths<float>::Set &paths;
+      vt->extract_strings(paths, -1, -1);
+
+      // transform weighted paths to a vector of transducers
+      vector<HfstTransducer*> transducer_paths;
+      for (WeightedPaths<float>::Set::iterator it = paths.begin(); it != paths.end(); it++) {
+	WeightedPath<float> wp = *it;
+	HfstTransducer * path = new HfstTransducer(wp.istring, wp.ostring, TOK, t->type());
+	path->set_final_weights(wp.weight);
+	transducer_paths->push_back(path);
+      }
+      
+      // insert each path
+      for( size_t j=0; j<transducer_paths.size(); j++ ) {
+	HfstTransducer ti(*t);
+	ti.substitute(std::string(name[i]), *(transducer_paths[j]));
+	delete transducer_paths[j];	
+	nt->disjunct(ti);
+	delete ti;
+      }
+      delete t;
+      t = nt;
+    }
+    
+    /*
+    name.clear();
+    for( RVarSet::iterator it=SFST:RSS.begin(); it!=SFST:RSS.end(); it++)
+      name.push_back(*it);
+    SFST:RSS.clear();
+    
+    // replace all agreement variables
+    for( size_t i=0; i<name.size(); i++ ) {
+      Transducer *nt = NULL;
+      Character c=(Character)TheAlphabet.symbol2code(name[i]);
+      Range *r=svar_value(name[i]);
+      
+      // insert each character
+      while (r != NULL) {
+	
+	// insertion
+	Transducer *t1 = &t->replace_char(c, r->character);
+	
+	if (nt == NULL)
+	  nt = t1;
+	else
+	  nt = disjunction(nt, t1);
+	
+	Range *next = r->next;
+	delete r;
+	r = next;
+      }
+      delete t;
+      t = nt;
+    }
+    */    
     return t;
   }
 
@@ -193,11 +314,11 @@ namespace hfst
 
   HfstTransducer * HfstCompiler::make_rule( HfstTransducer * lc, Range * lower_range, Twol_Type type, 
 					    Range * upper_range, HfstTransducer * rc ) {
-    /*if (RS.size() > 0 || RSS.size() > 0)
-    cerr << "\nWarning: agreement operation inside of replacement rule!\n";
+    if (SFST::RS.size() > 0 || SFST::RSS.size() > 0)
+      cerr << "\nWarning: agreement operation inside of replacement rule!\n";
     
-    if (!Alphabet_Defined)
-    error("Two level rules require the definition of an alphabet");  */
+    if (!SFST::Alphabet_Defined)
+      cerr << "\nERROR: Two level rules require the definition of an alphabet!\n";
 
     HfstTransducerPair tr_pair(*(lc), *(rc));
     StringPairSet sps;

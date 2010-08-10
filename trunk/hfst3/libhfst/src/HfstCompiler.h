@@ -26,10 +26,13 @@ namespace SFST {
   extern char *FileName;
   extern SFST::Alphabet TheAlphabet;
   extern int Alphabet_Defined;
+  extern std::set<char*> RS;
+  extern std::set<char*> RSS;
 }
 
 namespace hfst
 {
+
   /** A library class that forms a bridge between the SFST programming language parser
       and the HFST library and contains some extra functions needed by the parser.
       Most of these functions either directly use the SFST interface or are generalized
@@ -38,7 +41,9 @@ namespace hfst
 
   public:
     HfstCompiler();
-    
+ 
+    ImplementationType compiler_type;
+   
     typedef SFST::Twol_Type Twol_Type;
     typedef SFST::Repl_Type Repl_Type;
     typedef SFST::Range Range;
@@ -50,16 +55,24 @@ namespace hfst
       struct contexts_t *next;
     } Contexts;
 
+    /* For storing transducer variables */
+    struct eqstr {
+      bool operator()(const char* s1, const char* s2) const
+      { return strcmp(s1, s2) == 0; }
+    };
+    typedef map<char*, HfstTransducer*> VarMap;
+
   private:
     static HfstTransducer * make_transducer(Range *r1, Range *r2, ImplementationType type);
-    
+    static VarMap VM; /* Transducer variables */
+
   public:
     void error2( const char *message, char *input );
     static HfstTransducer *new_transducer( Range*, Range*, ImplementationType );
     HfstTransducer *read_words( char *filename );
     HfstTransducer *read_transducer( char *filename );
-    HfstTransducer *var_value( char *name );
-    HfstTransducer *rvar_value( char *name );
+    static HfstTransducer *var_value( char *name );
+    static HfstTransducer *rvar_value( char *name, ImplementationType );
     static Range *svar_value( char *name );
     Range *complement_range( Range* );
     static Range *rsvar_value( char *name );
@@ -69,10 +82,10 @@ namespace hfst
     //static unsigned int utf8toint( char **s );
 
     static Range *add_value( Character, Range*);
-    Range *add_var_values( char *name, Range*);
+    static Range *add_var_values( char *name, Range*);
     static Range *add_values( unsigned int, unsigned int, Range*);
     static Range *append_values( Range *r2, Range *r );
-    void add_alphabet( HfstTransducer* );  // ?
+    static void add_alphabet( HfstTransducer* );  // ?
 
     static HfstCompiler::Contexts *make_context( HfstTransducer *l, HfstTransducer *r );
     static HfstCompiler::Contexts *add_context( HfstCompiler::Contexts *nc, HfstCompiler::Contexts *c );    
@@ -80,8 +93,8 @@ namespace hfst
     static HfstTransducer * insert_freely(HfstTransducer *t, Character input, Character output);
     static HfstTransducer * negation( HfstTransducer *t );
 
-    // expand agreement variable markers and minimize
-    static HfstTransducer * explode_and_minimize( HfstTransducer *t );
+    // expand agreement variable markers
+    static HfstTransducer * explode( HfstTransducer *t );
     
     // rule operators
     static HfstTransducer * replace_in_context(HfstTransducer * mapping, Repl_Type repl_type, Contexts *contexts, bool optional);
@@ -91,12 +104,12 @@ namespace hfst
 				       Range * upper_range, HfstTransducer * rc );
 
     static void def_alphabet( HfstTransducer *a );
-    bool def_var( char *name, HfstTransducer *a );
-    bool def_rvar( char *name, HfstTransducer *a );
-    bool def_svar( char *name, Range *r );
+    static bool def_var( char *name, HfstTransducer *a );
+    static bool def_rvar( char *name, HfstTransducer *a );
+    static bool def_svar( char *name, Range *r );
     
     static HfstTransducer *make_mapping( Ranges*, Ranges*, ImplementationType );
-    Ranges *add_range( Range*, Ranges* );
+    static Ranges *add_range( Range*, Ranges* );
     static HfstTransducer *result( HfstTransducer*, bool );
 
     //void write_to_file( Transducer*, char *filename);

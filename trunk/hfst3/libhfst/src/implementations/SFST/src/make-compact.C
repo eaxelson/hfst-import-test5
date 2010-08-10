@@ -13,13 +13,13 @@
 
 #include "make-compact.h"
 
-// Hfst addition
-namespace SFST 
-{
-
 using std::equal_range;
 using std::sort;
 using std::cerr;
+
+// HFST
+namespace SFST 
+{
 
 class ARC {
 public:
@@ -62,8 +62,8 @@ void MakeCompactTransducer::sort( Level level )
     }
 
     // sort the table
-    // (The SFST is a slight Hfst addition)
-    SFST::sort( arc, arc+l );
+    // HFST: "SFST" added
+    ::sort( arc, arc+l );
 
     // copy the arcs back to the original table
     for( unsigned int i=from; i<to; i++) {
@@ -330,4 +330,5 @@ void MakeCompactTransducer::store( FILE *file )
   if (ferror(file))
     throw "Error encountered while writing transducer to file\n";
 }
+
 }

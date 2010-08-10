@@ -13,7 +13,9 @@ using std::cerr;
 
 bool Switch=false;
 
+// HFST
 using namespace SFST;
+
 
 /*******************************************************************/
 /*                                                                 */

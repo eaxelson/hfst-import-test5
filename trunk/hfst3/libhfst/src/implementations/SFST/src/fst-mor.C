@@ -9,7 +9,6 @@
 
 #include "fst.h"
 
-using namespace SFST;
 using std::cerr;
 using std::cout;
 
@@ -29,6 +28,9 @@ char *readline( const char *prompt ) {
   return buffer;
 }
 #endif
+
+// HFST
+using namespace SFST;
 
 bool WithBrackets=true;
 
