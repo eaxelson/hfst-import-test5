@@ -24,6 +24,7 @@ using std::vector;
 namespace SFST 
 {
 
+  /* HFST: moved to header file
 struct ltstr {
   bool operator()(const char* s1, const char* s2) const
   { return strcmp(s1, s2) < 0; }
@@ -39,6 +40,7 @@ typedef set<char*, ltstr> RVarSet;
 typedef hash_map<char*, Transducer*, hash<const char*>, eqstr> VarMap;
 
 typedef hash_map<char*, Range*, hash<const char*>, eqstr> SVarMap;
+  */
 
 bool Verbose=true;
 
@@ -46,8 +48,8 @@ Alphabet TheAlphabet;
 
 static VarMap VM;
 static SVarMap SVM;
-static RVarSet RS;
-static RVarSet RSS;
+RVarSet RS;  //   HFST: static removed
+RVarSet RSS;  //  HFST: static removed
 int Alphabet_Defined=0;  // HFST: static removed
 
 
@@ -57,7 +59,7 @@ int Alphabet_Defined=0;  // HFST: static removed
 /*                                                                 */
 /*******************************************************************/
 
-static void error( const char *message )
+void error( const char *message ) // HFST: static removed
 
 {
   cerr << "\nError: " << message << "\naborted.\n";
@@ -294,7 +296,7 @@ Range *complement_range( Range *r )
 /*                                                                 */
 /*******************************************************************/
 
-// HFST static removed
+// HFST: static removed
 Transducer *make_transducer( Range *r1, Range *r2 )
 
 {

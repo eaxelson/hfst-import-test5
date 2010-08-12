@@ -105,62 +105,6 @@ namespace hfst { namespace implementations {
       { throw SymbolRedefinedException(); }
   }
 
-    /*  void
-  SfstInputStream::populate_key_table(KeyTable &key_table,
-				      Alphabet &alphabet,
-				      KeyMap &key_map)
-  {
-    Symbol max_symbol_number = 0;
-    StringSymbolMap string_number_map;
-    for (Alphabet::const_iterator it = alphabet.begin();
-	 it != alphabet.end();
-	 it++)
-      {
-	Label l = *it;
-
-	if (max_symbol_number < l.lower_char())
-	  { max_symbol_number = l.lower_char(); }
-
-	if (max_symbol_number < l.upper_char())
-	  { max_symbol_number = l.upper_char(); }
-
-	try 
-	  {
-	    if (l.lower_char() != 0)
-	      { add_symbol(string_number_map,l.lower_char(),alphabet); }
-	    if (l.upper_char() != 0)
-	      { add_symbol(string_number_map,l.upper_char(),alphabet); }
-	  }
-	catch (const SymbolRedefinedException e)
-	  { throw e; }
-      }
-    
-
-    StringSymbolVector string_symbols(max_symbol_number+1,"");
-    for (StringSymbolMap::iterator it = string_number_map.begin();
-	 it != string_number_map.end();
-	 ++it)
-      { string_symbols[it->second] = it->first; }
-
-    StringSymbolVector dummy_symbols;
-    KeyTable transducer_key_table;
-    for (size_t i = 1; i < string_symbols.size(); ++i)
-      {
-	if (string_symbols[i] == "")
-	  { 
-	    ostringstream oss(ostringstream::out);
-	    oss << "@EMPTY@" << i;
-	    transducer_key_table.add_symbol(oss.str().c_str());
-	  }
-	else
-	  { transducer_key_table.add_symbol(string_symbols[i].c_str()); }
-      }
-    try 
-      { transducer_key_table.harmonize(key_map,key_table); }
-    catch (const char * p)
-      { throw p; }
-      }*/
-
   /* Skip the identifier string "SFST_TYPE" */
   void SfstInputStream::skip_identifier_version_3_0(void)
   { 
@@ -315,44 +259,6 @@ namespace hfst { namespace implementations {
   }
 #endif
 
-    /*
-  Transducer * SfstInputStream::read_transducer(KeyTable &key_table)
-  {
-    if (is_eof())
-      { throw FileIsClosedException(); }
-    Transducer * t = NULL;
-    try 
-      {
-	skip_hfst_header();
-	Transducer tt = Transducer(input_file,true);
-	t = &tt.copy();
-      }
-    catch (const char * p)
-      {
-	delete t;
-#ifdef DEBUG
-	std::cerr << p << std::endl;
-#endif
-	throw TransducerHasWrongTypeException();
-      }
-    try
-      {
-	KeyMap key_map;
-	populate_key_table(key_table,
-			   t->alphabet,
-			   key_map);
-	//t = SfstTransducer::harmonize(t,key_map);  // FIX THIS
-	t->alphabet.clear();	
-	return t;
-      }
-    catch (const HfstSymbolsException e)
-      { 
-	delete t;
-	throw e; 
-      }
-    return NULL;
-    }*/
-
   Transducer * SfstInputStream::read_transducer(bool has_header)
   {
     if (is_eof())
@@ -411,197 +317,44 @@ namespace hfst { namespace implementations {
     transducer->store(ofile); 
   }
 
-  // ------------------------------------------------
-
-  
-    /*  SfstState::SfstState(Node * state, Transducer * t) 
-  { 
-    this->state = state; 
-    this->t = t;
-  }
-  
-  SfstState::SfstState(const SfstState &s)
-  { 
-    this->state = s.state; 
-    this->t = s.t;
-  }
-  
-  bool SfstState::get_final_weight(void) const
-  { return state->is_final(); }
-  
-  bool SfstState::operator< (const SfstState &another) const
-  { return state < another.state; };
-  
-  bool SfstState::operator== (const SfstState &another) const 
-  { return state == another.state; };
-  
-  bool SfstState::operator!= (const SfstState &another) const 
-  { return not (*this == another); };
-
-  //TransitionIterator<Transducer,bool> SfstState::begin(void) const 
-  SfstTransitionIterator SfstState::begin(void) const 
-  { return   SfstTransitionIterator(state,t); } 
-  
-  //TransitionIterator<Transducer*,bool> SfstState::end(void) const 
-  SfstTransitionIterator SfstState::end(void) const 
-  { return   SfstTransitionIterator(); } 
-    */
-
   void SfstTransducer::print_test(Transducer *t)
   {
     std::cerr << *t;
   }
 
-    /*    
-  void SfstState::print(KeyTable &key_table, ostream &out,
-			SfstStateIndexer &indexer) const
-  {
-    for (SfstState::const_iterator it = begin();
-	 it != end();
-	 ++it)
-      { 
-	SfstTransition t = *it;
-	t.print(key_table,out,indexer);
-      }
-    if (get_final_weight())
-      { out << indexer[*this] << "\t" << 0 << std::endl; }
+  void SfstTransducer::initialize_alphabet(Transducer *t) {
+
+    return;
+    const char * EPSILON_STRING = "@_EPSILON_SYMBOL_@";
+    const char * UNKNOWN_STRING = "@_UNKNOWN_SYMBOL_@";
+    const char * IDENTITY_STRING = "@_IDENTITY_SYMBOL_@";
+    const unsigned int EPSILON_NUMBER = 0;
+    const unsigned int UNKNOWN_NUMBER = 1;
+    const unsigned int IDENTITY_NUMBER = 2;
+
+    t->alphabet.clear();
+    t->alphabet.utf8 = true;
+    t->alphabet.add_symbol(EPSILON_STRING, EPSILON_NUMBER);
+    t->alphabet.add_symbol(UNKNOWN_STRING, UNKNOWN_NUMBER);
+    t->alphabet.add_symbol(IDENTITY_STRING, IDENTITY_NUMBER);
+    //return;
   }
 
-  SfstTransition::SfstTransition(Arc * arc, Node * n, Transducer * t) 
-  { this->arc = arc; this->source_state = n; this->t = t; }
-  
-  SfstTransition::SfstTransition(const SfstTransition &t)
-  { this->arc = t.arc; this->source_state = t.source_state; this->t = t.t; }
-  
-  Key SfstTransition::get_input_key(void) const
-  { return arc->label().lower_char(); }
-  
-  Key SfstTransition::get_output_key(void) const
-  { return arc->label().upper_char(); }
-  
-  SfstState SfstTransition::get_target_state(void) const
-  { return SfstState(arc->target_node(),t); }
-  
-  SfstState SfstTransition::get_source_state(void) const
-  { return SfstState(source_state,t); }
-
-  bool SfstTransition::get_weight(void) const
-  { return true; }
-
-  void SfstTransition::print(KeyTable &key_table, ostream &out,
-			     SfstStateIndexer &indexer) const
-  {
-    out << indexer[get_source_state()] << "\t"
-    	<< indexer[get_target_state()] << "\t"
-	<< key_table.get_print_name(get_input_key()) << "\t"
-	<< key_table.get_print_name(get_output_key()) << "\t"
-	<< 0 << std::endl;
-  }
-    
-  SfstTransitionIterator::SfstTransitionIterator
-  (Node * state, Transducer * t) : 
-    state(state), arc_iterator(state->arcs()), t(t), end_iterator(false) 
-  { if (not arc_iterator) { end_iterator = true; } }
-  
-  SfstTransitionIterator::SfstTransitionIterator (void) :
-    state(NULL), arc_iterator(), t(NULL), end_iterator(true)
-  {}
-  
-  void SfstTransitionIterator::operator= 
-  (const SfstTransitionIterator &another)
-  {
-    if (&another == this)
-      { return; }
-    state = another.state;
-    arc_iterator = ArcsIter(state->arcs());
-    t = another.t;
-    end_iterator = another.end_iterator;
-    }*/
-  
-  /* This requires the SFST ArcsIter operator* to be
-     const qualified. */
-    /*  bool SfstTransitionIterator::operator== 
-  (const SfstTransitionIterator &another)
-  {
-    if (end_iterator and another.end_iterator)
-      { return true; }
-    if (state != another.state)
-      { return false; }
-    if (end_iterator or another.end_iterator)
-      { return false; }
-#ifdef DEBUG
-    assert(arc_iterator);
-    assert(another.arc_iterator);
-#endif
-    Arc * a_this = arc_iterator;
-    const Arc * a_another = another.arc_iterator;
-    return a_this == a_another;
-  }
-  
-  bool SfstTransitionIterator::operator!= 
-  (const SfstTransitionIterator &another)
-  { return not (*this == another); }
-  
-  
-  const SfstTransition 
-  SfstTransitionIterator::operator* (void)
-  { 
-    if (end_iterator)
-      { throw TransitionIteratorOutOfRangeExeption(); }
-#ifdef DEBUG
-    assert(arc_iterator);
-#endif
-    return SfstTransition(arc_iterator,state,t); 
-  }
-  
-  void SfstTransitionIterator::operator++ (void)
-  {
-    if (end_iterator) { return; }
-#ifdef DEBUG
-    assert(arc_iterator);
-#endif
-    arc_iterator++;
-    if (not arc_iterator) { end_iterator = true; }
-  }
-  
-  void SfstTransitionIterator::operator++ (int)
-  {
-    if (end_iterator) { return; }
-#ifdef DEBUG
-    assert(arc_iterator);
-#endif
-    arc_iterator++;
-    if (not arc_iterator) { end_iterator = true; }
-  }
-    */
   Transducer * SfstTransducer::create_empty_transducer(void)
-  { return new Transducer; }
+  { Transducer * retval = new Transducer(); 
+    initialize_alphabet(retval);
+    return retval;
+  }
   
   Transducer * SfstTransducer::create_epsilon_transducer(void)
   { Transducer * t = new Transducer; 
+    initialize_alphabet(t);
     t->root_node()->set_final(1);
     return t; }
-
-    /*
-    // could these be removed?
-    // Transducer * SfstTransducer::define_transducer(Key k)
-  { Transducer * t = new Transducer; 
-    Node * n = t->new_node();
-    t->root_node()->add_arc(Label(k),n,t);
-    n->set_final(1);
-    return t; }
-  Transducer * SfstTransducer::define_transducer(const KeyPair &kp)
-  { Transducer * t = new Transducer;
-    Node * n = t->new_node();
-    t->root_node()->add_arc(Label(kp.first,kp.second),n,t);
-    n->set_final(1);
-    return t; }
-    */
   
   Transducer * SfstTransducer::define_transducer(unsigned int number)
   { Transducer * t = new Transducer;
-    // TODO: ADD EPSILON, UNKNOWN AND ANY HERE (and to other constructor functions), remove them from alphabet.C
-    // DEFINE ALSO UTF8 HERE
+    initialize_alphabet(t);
     Node * n = t->new_node();
     t->root_node()->add_arc(Label(number),n,t);
     n->set_final(1);
@@ -609,6 +362,7 @@ namespace hfst { namespace implementations {
   
     Transducer * SfstTransducer::define_transducer(unsigned int inumber, unsigned int onumber)
   { Transducer * t = new Transducer;
+    initialize_alphabet(t);
     Node * n = t->new_node();
     t->root_node()->add_arc(Label(inumber, 
 				  onumber),n,t);
@@ -617,7 +371,8 @@ namespace hfst { namespace implementations {
 
 
   Transducer * SfstTransducer::define_transducer(const char *symbol)
-  { Transducer * t = new Transducer; 
+  { Transducer * t = new Transducer;
+    initialize_alphabet(t); 
     Node * n = t->new_node();
     t->root_node()->add_arc(Label(t->alphabet.add_symbol(symbol)),n,t);
     n->set_final(1);
@@ -625,28 +380,16 @@ namespace hfst { namespace implementations {
   
   Transducer * SfstTransducer::define_transducer(const char *isymbol, const char *osymbol)
   { Transducer * t = new Transducer;
+    initialize_alphabet(t);
     Node * n = t->new_node();
     t->root_node()->add_arc(Label(t->alphabet.add_symbol(isymbol), 
 				  t->alphabet.add_symbol(osymbol)),n,t);
     n->set_final(1);
     return t; }
 
-    /*  Transducer * SfstTransducer::define_transducer(const KeyPairVector &kpv)
-  { Transducer * t = new Transducer;
-    Node * n = t->root_node();
-    for (KeyPairVector::const_iterator it = kpv.begin();
-	 it != kpv.end();
-	 ++it)
-      {
-	Node * temp = t->new_node();
-	n->add_arc(Label(it->first,it->second),temp,t);
-	n = temp;
-      }
-    n->set_final(1);
-    return t; }*/
-
   Transducer * SfstTransducer::define_transducer(const StringPairVector &spv)
   { Transducer * t = new Transducer;
+    initialize_alphabet(t);
     Node * n = t->root_node();
     for (StringPairVector::const_iterator it = spv.begin();
 	 it != spv.end();
@@ -661,6 +404,7 @@ namespace hfst { namespace implementations {
 
   Transducer * SfstTransducer::define_transducer(const StringPairSet &sps)
   { Transducer * t = new Transducer;
+    initialize_alphabet(t);
     Node * n = t->root_node();
     if (not sps.empty()) {
       Node * new_node = t->new_node();
@@ -856,20 +600,11 @@ namespace hfst { namespace implementations {
 				     t->alphabet.add_symbol(symbol_pair.second.c_str()) ));
   }
 
-    /*  Transducer * SfstTransducer::substitute(Transducer * t,Key old_key,Key new_key)
-	{ return &t->replace_char(old_key,new_key); }*/
   
   Transducer * SfstTransducer::substitute(Transducer * t,String old_symbol,String new_symbol)
   { Transducer * retval = &t->replace_char(t->alphabet.add_symbol(old_symbol.c_str()),t->alphabet.add_symbol(new_symbol.c_str())); 
     return retval; }
 
-    /*  Transducer * SfstTransducer::substitute
-  (Transducer * t,KeyPair old_key_pair,KeyPair new_key_pair)
-  { 
-    (void)t;
-    (void)old_key_pair;
-    (void)new_key_pair;
-    throw FunctionNotImplementedException(); }*/
   
   Transducer * SfstTransducer::compose
   (Transducer * t1, Transducer * t2)
@@ -913,98 +648,6 @@ namespace hfst { namespace implementations {
     return table;
   }
 
-    /*
-  SfstStateIterator::SfstStateIterator(Transducer * t):
-  node_numbering(*t),t(t),current_state(0),ended(false)
-  {
-    if (node_numbering.number_of_nodes() == 0)
-      { ended = true; }
-  }
-
-  SfstStateIterator::SfstStateIterator(void):
-  node_numbering(),t(NULL),current_state(0),ended(true)
-  {}
-
-  void SfstStateIterator::operator= (const SfstStateIterator &another)
-  {
-    if (&another == this)
-      { return; }
-    this->t = another.t;
-    node_numbering = NodeNumbering(*t);
-    current_state = another.current_state;
-  }
-
-  bool SfstStateIterator::operator== (const SfstStateIterator &another) const
-  {
-    if (ended and another.ended) 
-      { return true; } 
-    if (this->t == another.t)
-      {
-	if (this->current_state == another.current_state)
-	  { return true; }       
-      }
-    return false;
-  }
-
-  bool SfstStateIterator::operator!= (const SfstStateIterator &another) const
-  { return not (*this == another); }
-
-  const SfstState SfstStateIterator::operator* (void)
-  { return SfstState(node_numbering.get_node(current_state),t); }
-
-  void SfstStateIterator::operator++ (void)
-  { 
-    ++current_state;
-    if ((int)node_numbering.number_of_nodes() <= current_state)
-      { ended = true; }
-  }
-
-  void SfstStateIterator::operator++ (int)
-  { 
-    ++current_state; 
-    if ((int)node_numbering.number_of_nodes() <= current_state)
-      { ended = true; }
-  }
-
-  SfstStateIterator SfstTransducer::begin(Transducer * t)
-  { return SfstStateIterator(t); }
-
-  SfstStateIterator SfstTransducer::end(Transducer * t)
-  { (void)t;
-    return SfstStateIterator(); }
-
-  SfstStateIndexer::SfstStateIndexer(Transducer * t):
-    t(t),numbering(*t)
-  {}
-
-  unsigned int SfstStateIndexer::operator[] (const SfstState &state)
-  {
-    if (state.t != t)
-      { throw StateBelongsToAnotherTransducerException(); }
-    return numbering[state.state];
-  }
-
-  const SfstState SfstStateIndexer::operator[] (unsigned int number)
-  {
-    if (numbering.number_of_nodes() <= number)
-      { throw StateIndexOutOfBoundsException(); }
-    return SfstState(numbering.get_node(number),t);
-  }
-
-  void SfstTransducer::print(Transducer * t, 
-			     KeyTable &key_table, ostream &out)
-  {
-    SfstStateIndexer indexer(t);
-    for (SfstStateIterator it = begin(t);
-	 it != end(t);
-	 ++it)
-      {
-	SfstState s = *it;
-	s.print(key_table,out,indexer);
-      }
-      }*/
-
-
   StringSet SfstTransducer::get_string_set(Transducer * t)
   {
     StringSet s;
@@ -1015,17 +658,6 @@ namespace hfst { namespace implementations {
     }
     return s;
   }
-  
-    /*  KeyMap create_mapping(Transducer * t1, Transducer * t2, StringSet &unknown2)
-  {
-    (void)t1;
-    (void)t2;
-    (void)unknown2;
-    KeyMap km;
-    return km;
-    }*/
-
-
 
 } }
 

@@ -15,7 +15,17 @@
 #include "foma/fomalib.h"
 #include "SFST/src/alphabet.h"
 
-namespace hfst { namespace symbols
+/*  const char * EPSILON_STRING = "@_EPSILON_SYMBOL_@";
+    const char * UNKNOWN_STRING = "@_UNKNOWN_SYMBOL_@";
+    const char * IDENTITY_STRING = "@_IDENTITY_SYMBOL_@";
+    
+    const unsigned int EPSILON_NUMBER = 0;
+    const unsigned int UNKNOWN_NUMBER = 1;
+    const unsigned int IDENTITY_NUMBER = 2; */
+
+namespace hfst { 
+
+namespace symbols
 {
 
   void collect_unknown_sets(StringSet &s1, StringSet &unknown1,

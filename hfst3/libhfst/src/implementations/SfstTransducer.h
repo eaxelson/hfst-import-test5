@@ -119,6 +119,7 @@ namespace hfst { namespace implementations
       static void print_test(Transducer *t);
 
     protected:
+      static void initialize_alphabet(Transducer *t);
       static StringSet get_string_set(Transducer *t);
       static Transducer * expand_arcs(Transducer * t, StringSet &unknown);
     };

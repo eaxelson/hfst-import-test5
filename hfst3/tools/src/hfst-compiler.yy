@@ -122,7 +122,7 @@ RE:         RE ARROW CONTEXTS2      { $$ = HfstCompiler::restriction($1,$2,$3,0)
           | RE '|' RE        { $1->disjunct(*$3); delete $3; $$ = $1; }
           | '(' RE ')'       { $$ = $2; }
           // | STRING           { $$ = read_words($1); }
-          // | STRING2          { $$ = read_transducer($1); }
+          | STRING2          { try { $$ = HfstCompiler::read_transducer($1); } catch (hfst::exceptions::HfstInterfaceException e) { printf("\nAn error happened when reading file \"%s\"\n", $1); exit(1); } }
           ;
 
 RANGES:     RANGE RANGES     { $$ = add_range($1,$2); }
@@ -325,7 +325,6 @@ int main( int argc, char *argv[] )
   }
   SFST::FileName = argv[1];
   //Result = NULL;
-  SFST::TheAlphabet.utf8 = SFST::UTF8;
   yyin = file;
   try {
     yyparse();
@@ -345,10 +344,15 @@ int main( int argc, char *argv[] )
     //}
     //else if (LowMem)
     //  Result->store_lowmem(file);
-    else
-      Result->write_in_att_format(file);
+    else {
+      try {
+        HfstCompiler::write_to_file(Result,argv[2]);
+      } catch (hfst::exceptions::HfstInterfaceException e) {
+          printf("\nAn error happened when writing to file \"%s\"\n", argv[2]);
+      }
+    }
     fclose(file);
-    printf("type is: %i\n", Result->get_type());
+    //printf("type is: %i\n", Result->get_type());
     delete Result;
   }
   catch(const char* p) {
