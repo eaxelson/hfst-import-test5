@@ -740,11 +740,115 @@ namespace hfst { namespace implementations {
   Transducer * SfstTransducer::extract_output_language(Transducer * t)
   { t->complete_alphabet();
     return &t->upper_level(); }
-  
-  void SfstTransducer::extract_strings(Transducer * t, hfst::WeightedPaths<float>::Set &results, int max_num, int cycles, FdTable<SFST::Character>* fd, bool filter_fd)
+
+
+  static bool extract_strings(Transducer * t, Node *node,
+           Node2Int &all_visitations, Node2Int &path_visitations,
+           vector<char>& lbuffer, int lpos, std::vector<char>& ubuffer, int upos,
+           hfst::ExtractStringsCb& callback, int cycles,
+           std::vector<hfst::FdState<Character> >* fd_state_stack, bool filter_fd)
   {
-    generate_hfst(t, results, max_num, cycles, fd, filter_fd);
+    if(cycles >= 0 && path_visitations[node] > cycles)
+      return true;
+    all_visitations[node]++;
+    path_visitations[node]++;
+    
+    if(lpos > 0 && upos > 0) {
+      lbuffer[lpos] = 0;
+      ubuffer[upos] = 0;
+      bool final = node->is_final();
+      hfst::WeightedPath<float> path(lbuffer.data(),ubuffer.data(),0);
+      hfst::ExtractStringsCb::RetVal ret = callback(path, final);
+      if(!ret.continueSearch || !ret.continuePath)
+      {
+        path_visitations[node]--;
+        return ret.continueSearch;
+      }
+    }
+    
+    // sort arcs by number of visitations
+    vector<Arc*> arc;
+    for( ArcsIter p(node->arcs()); p; p++ ) {
+      Arc *a=p;
+      Node *n=a->target_node();
+      size_t i;
+      for( i=0; i<arc.size(); i++ )
+        if (all_visitations[n] < all_visitations[arc[i]->target_node()])
+          break;
+      arc.push_back(NULL);
+      for( size_t k=arc.size()-1; k>i; k-- )
+        arc[k] = arc[k-1];
+      arc[i] = a;
+    }
+    
+    bool res = true;
+    for( size_t i=0; i<arc.size() && res == true; i++ ) {
+      Label l = arc[i]->label();
+      bool added_fd_state = false;
+      
+      if (fd_state_stack) {
+        if(fd_state_stack->back().get_table().get_operation(l.lower_char()) != NULL) {
+          fd_state_stack->push_back(fd_state_stack->back());
+          if(fd_state_stack->back().apply_operation(l.lower_char()))
+            added_fd_state = true;
+          else {
+            fd_state_stack->pop_back();
+            continue; // don't follow the transition
+          }
+        }
+      }
+      
+      int lp=lpos;
+      int up=upos;
+      
+      Character lc=l.lower_char();
+      Character uc=l.upper_char();
+      if (lc != Label::epsilon && (!filter_fd || fd_state_stack->back().get_table().get_operation(lc)==NULL))
+      {
+        const char* c = t->alphabet.write_char(lc);
+        size_t clen = strlen(c);
+        if(lpos+clen >= lbuffer.size())
+          lbuffer.resize(lbuffer.size()*2, 0);
+        strcpy(lbuffer.data()+lpos, c);
+        lp += clen;
+      }
+      if (uc != Label::epsilon && (!filter_fd || fd_state_stack->back().get_table().get_operation(uc)==NULL))
+      {
+        const char* c = t->alphabet.write_char(uc);
+        size_t clen = strlen(c);
+        if(upos+clen > ubuffer.size())
+          ubuffer.resize(ubuffer.size()*2, 0);
+        strcpy(ubuffer.data()+upos, c);
+        up += clen;
+      }
+      
+      res = extract_strings(t, arc[i]->target_node(), all_visitations, path_visitations,
+			   lbuffer, lp, ubuffer, up, callback, cycles, fd_state_stack, filter_fd);
+      
+      if(added_fd_state)
+        fd_state_stack->pop_back();
+    }
+    
+    path_visitations[node]--;
+    return res;
   }
+  
+  static const int BUFFER_START_SIZE = 64;
+  
+  void SfstTransducer::extract_strings(Transducer * t, hfst::ExtractStringsCb& callback, int cycles, FdTable<SFST::Character>* fd, bool filter_fd)
+  {
+    if(!t->root_node())
+      return;
+    
+    vector<char> lbuffer(BUFFER_START_SIZE, 0);
+    vector<char> ubuffer(BUFFER_START_SIZE, 0);
+    Node2Int all_visitations;
+    Node2Int path_visitations;
+    vector<hfst::FdState<Character> >* fd_state_stack = (fd==NULL) ? NULL : new std::vector<hfst::FdState<Character> >(1, hfst::FdState<Character>(*fd));
+    
+    hfst::implementations::extract_strings(t, t->root_node(), all_visitations, path_visitations, lbuffer, 0, ubuffer, 0, callback, cycles, fd_state_stack, filter_fd);
+  }
+
 
   Transducer * SfstTransducer::insert_freely(Transducer * t, const StringPair &symbol_pair)
   {
@@ -796,107 +900,6 @@ namespace hfst { namespace implementations {
   {
     return t->is_cyclic();
   }
-  
-    // finds all paths in transducer t, this function is based on SFST's generate(...)
-    void SfstTransducer::generate_hfst( Transducer *t, Node *node, Node2Int &all_visitations, Node2Int &path_visitations,
-				      std::vector<char>& lbuffer, int lpos, std::vector<char>& ubuffer, int upos,
-		      hfst::WeightedPaths<float>::Set &results,
-		      int max_num, int cycles, std::vector<hfst::FdState<Character> >* fd_state_stack, bool filter_fd)
-  {
-    if(cycles >= 0 && path_visitations[node] > cycles)
-      return;
-    all_visitations[node]++;
-    path_visitations[node]++;
-    
-    if (node->is_final()) {
-      lbuffer[lpos] = 0;
-      ubuffer[upos] = 0;
-      results.insert(hfst::WeightedPath<float>(lbuffer.data(),ubuffer.data(),0));
-    }
-    
-    // sort arcs by number of visitations
-    std::vector<Arc*> arc;
-    for( ArcsIter p(node->arcs()); p; p++ ) {
-      Arc *a=p;
-      Node *n=a->target_node();
-      size_t i;
-      for( i=0; i<arc.size(); i++ )
-	if (all_visitations[n] < all_visitations[arc[i]->target_node()])
-	  break;
-      arc.push_back(NULL);
-      for( size_t k=arc.size()-1; k>i; k-- )
-	arc[k] = arc[k-1];
-      arc[i] = a;
-    }
-    
-    for( size_t i=0; i<arc.size() && results.size() < max_num; i++ ) {
-      Label l = arc[i]->label();
-      bool added_fd_state = false;
-      
-      if (fd_state_stack) {
-	if(fd_state_stack->back().get_table().get_operation(l.lower_char()) != NULL) {
-	  fd_state_stack->push_back(fd_state_stack->back());
-	  if(fd_state_stack->back().apply_operation(l.lower_char()))
-	    added_fd_state = true;
-	  else {
-	    fd_state_stack->pop_back();
-	    continue; // don't follow the transition
-	  }
-	}
-      }
-      
-      int lp=lpos;
-      int up=upos;
-      
-      Character lc=l.lower_char();
-      Character uc=l.upper_char();
-      if (lc != Label::epsilon && (!filter_fd || fd_state_stack->back().get_table().get_operation(lc)==NULL))
-	{
-	  const char* c = t->alphabet.write_char(lc);
-	  size_t clen = strlen(c);
-	  if(lpos+clen >= lbuffer.size())
-	    lbuffer.resize(lbuffer.size()*2, 0);
-	  strcpy(lbuffer.data()+lpos, c);
-	  lp += clen;
-	}
-      if (uc != Label::epsilon && (!filter_fd || fd_state_stack->back().get_table().get_operation(uc)==NULL))
-	{
-	  const char* c = t->alphabet.write_char(uc);
-	  size_t clen = strlen(c);
-	  if(upos+clen > ubuffer.size())
-	    ubuffer.resize(ubuffer.size()*2, 0);
-	  strcpy(ubuffer.data()+upos, c);
-	  up += clen;
-	}
-      
-      generate_hfst( t, arc[i]->target_node(), all_visitations, path_visitations,
-		     lbuffer, lp, ubuffer, up, results, max_num, cycles, fd_state_stack, filter_fd);
-      
-      if(added_fd_state)
-	fd_state_stack->pop_back();
-    }
-    
-    path_visitations[node]--;
-  }
-
-  static const int BUFFER_START_SIZE = 64;
-
-  void SfstTransducer::generate_hfst(Transducer *t, hfst::WeightedPaths<float>::Set &results, int max_num, int cycles,
-		     hfst::FdTable<Character>* fd, bool filter_fd)
-    
-  {
-    if(!t->root_node())
-      return;
-    
-    vector<char> lbuffer(BUFFER_START_SIZE, 0);
-    vector<char> ubuffer(BUFFER_START_SIZE, 0);
-    Node2Int all_visitations;
-    Node2Int path_visitations;
-    vector<hfst::FdState<Character> >* fd_state_stack = (fd==NULL) ? NULL : new std::vector<hfst::FdState<Character> >(1, hfst::FdState<Character>(*fd));
-  
-    generate_hfst(t, t->root_node(), all_visitations, path_visitations, lbuffer, 0, ubuffer, 0, results, max_num, cycles, fd_state_stack, filter_fd);
-  }
-
 
 
   FdTable<SFST::Character>* SfstTransducer::get_flag_diacritics(Transducer * t)

@@ -529,20 +529,15 @@ fclose(ifile);
 	All transition symbol pairs "isymbol:osymbol" are changed to "osymbol:osymbol". */
     HfstTransducer &output_project();
 
-    /** \brief Store to \a results some or all string pairs that are recognised by the transducer. 
+    /** \brief Call \a callback with some or all string pairs recognized by the transducer
 
-	An example:
-\verbatim
-	WeightedPaths<float>::Set results;
-	transducer.extract_strings(results);
-	for (WeightedPaths<float>::Set::iterator it = results.begin();
-	  it != results.end(); it++)
-	  {
-	    WeightedPath<float> wp = *it;
-	    // print each string pair and its weight
-	    printf("%s:%s\t%f\n", wp.istring, wp.ostring, wp.weight);
-	  }
-\endverbatim
+	If the callback returns false the search will be terminated. The \a cycles parameter
+	indicates how many times a cycle will be followed, with negative numbers
+	indicating unlimited. Note that if the transducer is cyclic and cycles aren't capped,
+	the search will not end until the callback returns false. */
+	  void extract_strings(ExtractStringsCb& callback, int cycles=-1);
+	  
+	  /** \brief Store extracted strings into \a results.
 
 	The total number of resulting strings is capped at \a max_num, with 0 or negative
 	indicating unlimited. The \a cycles parameter indicates how many times a cycle
@@ -552,6 +547,11 @@ fclose(ifile);
 	@throws hfst::exceptions::TransducerIsCyclicException
 	@see #n_best */
     void extract_strings(WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1);
+    
+    /** \brief Call \a callback with extracted strings that are not invalidated by
+               flag diacritic rules.
+	@see extract_strings */             
+    void extract_strings_fd(ExtractStringsCb& callback, int cycles=-1, bool filter_fd=true);
     
     /** \brief Store to \a results string pairs that are recognized by the transducer
                and are not invalidated by flag diacritic rules, optionally filtering

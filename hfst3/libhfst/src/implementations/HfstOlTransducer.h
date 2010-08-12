@@ -76,9 +76,8 @@ namespace hfst { namespace implementations
     
     static bool is_cyclic(hfst_ol::Transducer* t);
     
-    static void extract_strings(hfst_ol::Transducer * t, hfst::WeightedPaths<float>::Set &results,
-            int max_num=-1, int cycles=-1,
-            FdTable<hfst_ol::SymbolNumber>* fd=NULL, bool filter_fd=false);
+    static void extract_strings(hfst_ol::Transducer * t, hfst::ExtractStringsCb& callback,
+            int cycles=-1, FdTable<hfst_ol::SymbolNumber>* fd=NULL, bool filter_fd=false);
     static FdTable<hfst_ol::SymbolNumber>* get_flag_diacritics(hfst_ol::Transducer* t);
   };
   

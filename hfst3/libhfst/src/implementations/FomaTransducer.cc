@@ -505,26 +505,40 @@ namespace hfst { namespace implementations {
   }
   
   
-  void extract_strings(fsm * t, int state,
+  static bool extract_strings(fsm * t, int state,
     std::map<int,unsigned short> all_visitations, std::map<int, unsigned short> path_visitations,
     std::vector<char>& lbuffer, int lpos, std::vector<char>& ubuffer, int upos,
-    WeightedPaths<float>::Set &results, int max_num, int cycles,
+    ExtractStringsCb& callback, int cycles,
     std::vector<hfst::FdState<int> >* fd_state_stack, bool filter_fd)
   {
     if(cycles >= 0 && path_visitations[state] > cycles)
-      return;
+      return true;
     all_visitations[state]++;
     path_visitations[state]++;
     
-    //check finality
-    for(int i=0; ((t->states)+i)->state_no != -1; i++)
+    if(lpos > 0 && upos > 0)
     {
-      fsm_state* s = (t->states)+i;
-      if(s->state_no == state && s->final_state == 1)
+      lbuffer[lpos] = 0;
+      ubuffer[upos] = 0;
+      
+      //check finality
+      bool final = false;
+      for(int i=0; ((t->states)+i)->state_no != -1; i++)
       {
-        lbuffer[lpos] = 0;
-        ubuffer[upos] = 0;
-        results.insert(hfst::WeightedPath<float>(lbuffer.data(),ubuffer.data(),0));
+        fsm_state* s = (t->states)+i;
+        if(s->state_no == state && s->final_state == 1)
+        {
+          final = true;
+          break;
+        }
+      }
+      
+      hfst::WeightedPath<float> path(lbuffer.data(),ubuffer.data(),0);
+      hfst::ExtractStringsCb::RetVal ret = callback(path, final);
+      if(!ret.continueSearch || !ret.continuePath)
+      {
+        path_visitations[state]--;
+        return ret.continueSearch;
       }
     }
     
@@ -546,7 +560,8 @@ namespace hfst { namespace implementations {
       }
     }
     
-    for(size_t i=0; i<sorted_arcs.size() && results.size() < max_num; i++)
+    bool res = true;
+    for(size_t i=0; i<sorted_arcs.size() && res == true; i++)
     {
       fsm_state* arc = sorted_arcs[i];
       
@@ -604,21 +619,21 @@ namespace hfst { namespace implementations {
         up += clen;
       }
       
-      extract_strings(t, arc->target, all_visitations, path_visitations,
-          lbuffer, lp, ubuffer, up, results, max_num, cycles, fd_state_stack, filter_fd);
+      res = extract_strings(t, arc->target, all_visitations, path_visitations,
+          lbuffer, lp, ubuffer, up, callback, cycles, fd_state_stack, filter_fd);
     
       if(added_fd_state)
         fd_state_stack->pop_back();
     }
     
     path_visitations[state]--;
+    return res;
   }
   
   static const int BUFFER_START_SIZE = 64;
   
-  void FomaTransducer::extract_strings(fsm * t,
-    WeightedPaths<float>::Set &results, int max_num, int cycles,
-    FdTable<int>* fd, bool filter_fd)
+  void FomaTransducer::extract_strings(fsm * t, ExtractStringsCb& callback,
+    int cycles, FdTable<int>* fd, bool filter_fd)
   {
     std::vector<char> lbuffer(BUFFER_START_SIZE, 0);
     std::vector<char> ubuffer(BUFFER_START_SIZE, 0);
@@ -626,9 +641,10 @@ namespace hfst { namespace implementations {
     std::map<int, unsigned short> path_visitations;
     std::vector<hfst::FdState<int> >* fd_state_stack = (fd==NULL) ? NULL : new std::vector<hfst::FdState<int> >(1, hfst::FdState<int>(*fd));
     
-    for (int i=0; ((t->states)+i)->state_no != -1 && results.size() < max_num; i++) {
+    bool res = true;
+    for (int i=0; ((t->states)+i)->state_no != -1 && res == true; i++) {
       if (((t->states)+i)->start_state == 1)
-        hfst::implementations::extract_strings(t, ((t->states)+i)->state_no, all_visitations, path_visitations, lbuffer, 0, ubuffer, 0, results, max_num, cycles, fd_state_stack, filter_fd);
+        res = hfst::implementations::extract_strings(t, ((t->states)+i)->state_no, all_visitations, path_visitations, lbuffer, 0, ubuffer, 0, callback, cycles, fd_state_stack, filter_fd);
     }
   }
   

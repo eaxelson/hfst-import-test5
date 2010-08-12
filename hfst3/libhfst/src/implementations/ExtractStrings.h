@@ -125,5 +125,34 @@ namespace hfst {
 	  { it->reverse(); }
       }
     };
-  }  
+    
+    class ExtractStringsCb
+    {
+     public:
+      class RetVal
+      {
+       public:
+        bool continueSearch;
+        bool continuePath;
+        RetVal(bool s, bool p): continueSearch(s), continuePath(p) {}
+        void operator=(const RetVal& o)
+        {
+          continueSearch = o.continueSearch;
+          continuePath = o.continuePath;
+        }
+      };
+      
+      /**
+       * This function is called by extract_strings after every transition with
+       * the path \a path up to that point, and whether or not the path
+       * ends at a \a final state. The return value determines the future course
+       * of the extraction search.
+       *
+       * @returns A data structure indicating whether the search should continue,
+       *          be broken off immediately, or whether the specific path should
+       *          no longer be followed.
+       */
+      virtual RetVal operator()(WeightedPath<float>& path, bool final) = 0;
+    };
+  }
 #endif

@@ -43,12 +43,16 @@ using hfst::WeightedPaths;
 using hfst::WeightedPath;
 
 // the maximum number of strings printed for each transducer
-static int max_strings = -1;
+static int max_strings = 0;
 static int cycles = -1;
 static int nbest_strings=-1;
 static bool display_weights=false;
 static bool eval_fd=false;
 static bool filter_fd=false;
+static int max_input_length = 0;
+static int max_output_length = 0;
+static std::string input_prefix;
+static std::string output_prefix;
 
 void
 print_usage()
@@ -72,6 +76,10 @@ print_usage()
 	fprintf(message_out, "%-35s%s", "  -w, --print-weights",         "Display the weight for each string\n");
 	fprintf(message_out, "%-35s%s", "  -e, --eval-flag-diacritics",  "Only print strings with pass flag diacritic checks\n");
 	fprintf(message_out, "%-35s%s", "  -f, --filter-flag-diacritics","Don't print flag diacritic symbols (only with -e)\n");
+	fprintf(message_out, "%-35s%s", "  -l, --max-in-length=INT",     "Ignore paths with an input string longer than length\n");
+	fprintf(message_out, "%-35s%s", "  -L, --max-out-length=INT",    "Ignore paths with an output string longer than length\n");
+	fprintf(message_out, "%-35s%s", "  -p, --in-prefix=PREFIX",      "Ignore paths with an input string not beginning with PREFIX\n");
+	fprintf(message_out, "%-35s%s", "  -P, --out-prefix=PREFIX",     "Ignore paths with an output string not beginning with PREFIX\n");
 	fprintf(message_out, "\n");
 	print_common_unary_program_parameter_instructions(message_out);
 	/*fprintf(message_out,
@@ -118,10 +126,14 @@ parse_options(int argc, char** argv)
 			{"print-weights", no_argument, 0, 'w'},
 			{"eval-flag-diacritics", no_argument, 0, 'e'},
 			{"filter-flag-diacritics", no_argument, 0, 'f'},
+			{"max-in-length", required_argument, 0, 'l'},
+			{"max-out-length", required_argument, 0, 'L'},
+			{"in-prefix", required_argument, 0, 'p'},
+			{"out-prefix", required_argument, 0, 'O'},
 			{0,0,0,0}
 		};
 		int option_index = 0;
-		char c = getopt_long(argc, argv, "R:dhi:N:n:c:o:qsvVwef",
+		char c = getopt_long(argc, argv, "R:dhi:N:n:c:o:qsvVwefl:L:p:P:",
 							 long_options, &option_index);
 		if (-1 == c)
 		{
@@ -155,6 +167,18 @@ parse_options(int argc, char** argv)
 		    return EXIT_FAILURE;
 		  }
 		  filter_fd = true;
+		  break;
+		case 'l':
+		  max_input_length = atoi(hfst_strdup(optarg));
+		  break;
+		case 'L':
+		  max_output_length = atoi(hfst_strdup(optarg));
+		  break;
+		case 'p':
+		  input_prefix = optarg;
+		  break;
+		case 'P':
+		  output_prefix = optarg;
 		  break;
 #include "inc/getopt-cases-error.h"
 		}
@@ -203,6 +227,54 @@ parse_options(int argc, char** argv)
 	return EXIT_CONTINUE;
 }
 
+//Print results as they come
+class Callback : public hfst::ExtractStringsCb
+{
+ public:
+  int count;
+  int max_num;
+  
+  Callback(int max): count(0), max_num(max) {}
+  RetVal operator()(WeightedPath<float>& wp, bool final)
+  {
+    if(max_input_length > 0 &&
+       wp.istring.length() > max_input_length)
+      return RetVal(true, false); // continue searching, break off this path
+    if(max_output_length > 0 &&
+       wp.ostring.length() > max_output_length)
+      return RetVal(true, false); // continue searching, break off this path
+    
+    if(input_prefix.length() > 0)
+    {
+      if(wp.istring.length() < input_prefix.length())
+        return RetVal(true, true);
+      if(wp.istring.compare(0, input_prefix.length(), input_prefix) != 0)
+        return RetVal(true, false); // continue searching, break off this path
+    }
+    if(output_prefix.length() > 0)
+    {
+      if(wp.ostring.length() < output_prefix.length())
+        return RetVal(true, true);
+      if(wp.ostring.compare(0, output_prefix.length(), output_prefix) != 0)
+        return RetVal(true, false); // continue searching, break off this path
+    }
+    
+    // the path passed the checks. Print it if it is final
+    if(final)
+    {
+      std::cout << wp.istring;
+      if(wp.ostring != wp.istring)
+        std::cout << " : " << wp.ostring;
+      if(display_weights)
+        std::cout << "\t" << wp.weight;
+      std::cout << std::endl;
+      
+      count++;
+    }
+    return RetVal((max_num < 1) || (count < max_num), true); // continue until we've printed max_num strings
+  }
+};
+
 int
 process_stream(HfstInputStream& instream, std::ostream& outstream)
 {
@@ -217,6 +289,9 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
     
     HfstTransducer t(instream);
     
+    if(input_prefix != "")
+      verbose_printf("input_prefix: '%s'\n", input_prefix.c_str());
+    
     if(nbest_strings > 0)
     {
       verbose_printf("Pruning transducer to %i best path(s)...\n", nbest_strings);
@@ -224,9 +299,9 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
     }
     else
     {
-      if(max_strings <= 0 && cycles < 0 && t.is_cyclic())
+      if(max_strings <= 0 && max_input_length <= 0 && max_output_length <= 0 && cycles < 0 && t.is_cyclic())
       {
-        fprintf(stderr, "Transducer is cyclic. Use one of these options: -n, -N, -c\n");
+        fprintf(stderr, "Transducer is cyclic. Use one or more of these options: -n, -N, -l, -L, -c\n");
         return EXIT_FAILURE;
       }
     }
@@ -236,22 +311,13 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
     else
       verbose_printf("Finding strings...\n");
     
-    WeightedPaths<float>::Set results;
+    Callback cb(max_strings);
     if(eval_fd)
-      t.extract_strings_fd(results, max_strings, cycles, filter_fd);
+      t.extract_strings_fd(cb, cycles, filter_fd);
     else
-      t.extract_strings(results, max_strings, cycles);
+      t.extract_strings(cb, cycles);
     
-    for(WeightedPaths<float>::Set::const_iterator it = results.begin(); it != results.end(); it++)
-    {
-      const WeightedPath<float>& wp = *it;
-      std::cout << wp.istring;
-      if(wp.ostring != wp.istring)
-        std::cout << " : " << wp.ostring;
-      if(display_weights)
-        std::cout << "\t" << wp.weight;
-      std::cout << std::endl;
-    }
+    verbose_printf("Printed %i string(s)", cb.count);
   }
 	
   instream.close();
