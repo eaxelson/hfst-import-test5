@@ -641,30 +641,27 @@ void HfstTransducer::test_minimize()
        &hfst::implementations::LogWeightTransducer::extract_output_language,
        &hfst::implementations::FomaTransducer::extract_output_language); }
 
-  void HfstTransducer::extract_strings(WeightedPaths<float>::Set &results, int max_num, int cycles)
-  {
-    if(is_cyclic() && max_num < 1 && cycles < 0)
-      throw hfst::exceptions::TransducerIsCyclicException();
-    
+  void HfstTransducer::extract_strings(ExtractStringsCb& callback, int cycles)
+  { 
     switch (this->type)
       {
       case LOG_OFST_TYPE:
 	hfst::implementations::LogWeightTransducer::extract_strings
-	  (implementation.log_ofst,results,max_num,cycles);
+	  (implementation.log_ofst,callback,cycles);
 	break;
       case TROPICAL_OFST_TYPE:
 	hfst::implementations::TropicalWeightTransducer::extract_strings
-	  (implementation.tropical_ofst,results,max_num,cycles);
+	  (implementation.tropical_ofst,callback,cycles);
 	break;
       case SFST_TYPE:
-	hfst::implementations::SfstTransducer::extract_strings(implementation.sfst, results, max_num, cycles);
+	hfst::implementations::SfstTransducer::extract_strings(implementation.sfst, callback, cycles);
 	break;
       case FOMA_TYPE:
-	hfst::implementations::FomaTransducer::extract_strings(implementation.foma, results, max_num, cycles);
+	hfst::implementations::FomaTransducer::extract_strings(implementation.foma, callback, cycles);
 	break;
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
-	hfst::implementations::HfstOlTransducer::extract_strings(implementation.hfst_ol, results, max_num, cycles);
+	hfst::implementations::HfstOlTransducer::extract_strings(implementation.hfst_ol, callback, cycles);
 	break;
       default:
 	throw hfst::exceptions::FunctionNotImplementedException(); 
@@ -672,18 +669,15 @@ void HfstTransducer::test_minimize()
       }
   }
   
-  void HfstTransducer::extract_strings_fd(WeightedPaths<float>::Set &results, int max_num, int cycles, bool filter_fd)
-  {
-    if(is_cyclic() && max_num < 1 && cycles < 0)
-      throw hfst::exceptions::TransducerIsCyclicException();
-    
+  void HfstTransducer::extract_strings_fd(ExtractStringsCb& callback, int cycles, bool filter_fd)
+  { 
     switch (this->type)
       {
       case LOG_OFST_TYPE:
       {
 	FdTable<int64>* t_log_ofst = hfst::implementations::LogWeightTransducer::get_flag_diacritics(implementation.log_ofst);
 	hfst::implementations::LogWeightTransducer::extract_strings
-	  (implementation.log_ofst,results,max_num,cycles,t_log_ofst,filter_fd);
+	  (implementation.log_ofst,callback,cycles,t_log_ofst,filter_fd);
 	delete t_log_ofst;
       }
 	break;
@@ -691,21 +685,21 @@ void HfstTransducer::test_minimize()
       {
 	FdTable<int64>* t_tropical_ofst = hfst::implementations::TropicalWeightTransducer::get_flag_diacritics(implementation.tropical_ofst);
 	hfst::implementations::TropicalWeightTransducer::extract_strings
-	  (implementation.tropical_ofst,results,max_num,cycles,t_tropical_ofst,filter_fd);
+	  (implementation.tropical_ofst,callback,cycles,t_tropical_ofst,filter_fd);
 	delete t_tropical_ofst;
       }
 	break;
       case SFST_TYPE:
       {
 	FdTable<SFST::Character>* t_sfst = hfst::implementations::SfstTransducer::get_flag_diacritics(implementation.sfst);
-	hfst::implementations::SfstTransducer::extract_strings(implementation.sfst, results, max_num, cycles, t_sfst, filter_fd);
+	hfst::implementations::SfstTransducer::extract_strings(implementation.sfst, callback, cycles, t_sfst, filter_fd);
 	delete t_sfst;
       }
 	break;
       case FOMA_TYPE:
       {
 	  FdTable<int>* t_foma = hfst::implementations::FomaTransducer::get_flag_diacritics(implementation.foma);
-	  hfst::implementations::FomaTransducer::extract_strings(implementation.foma, results, max_num, cycles, t_foma, filter_fd);
+	  hfst::implementations::FomaTransducer::extract_strings(implementation.foma, callback, cycles, t_foma, filter_fd);
 	  delete t_foma;
       }
 	break;
@@ -713,7 +707,7 @@ void HfstTransducer::test_minimize()
       case HFST_OLW_TYPE:
       {
 	FdTable<hfst_ol::SymbolNumber>* t_hfst_ol = hfst::implementations::HfstOlTransducer::get_flag_diacritics(implementation.hfst_ol);
-	hfst::implementations::HfstOlTransducer::extract_strings(implementation.hfst_ol,results,max_num,cycles,t_hfst_ol,filter_fd);
+	hfst::implementations::HfstOlTransducer::extract_strings(implementation.hfst_ol,callback,cycles,t_hfst_ol,filter_fd);
 	delete t_hfst_ol;
       }
 	break;
@@ -721,6 +715,40 @@ void HfstTransducer::test_minimize()
 	throw hfst::exceptions::FunctionNotImplementedException(); 
 	break;
       }
+  }
+  
+  class ExtractStringsCb_ : public ExtractStringsCb
+  {
+    public:
+      WeightedPaths<float>::Set& paths;
+      int max_num;
+      
+      ExtractStringsCb_(WeightedPaths<float>::Set& p, int max): paths(p), max_num(max) {}
+      RetVal operator()(WeightedPath<float>& path, bool final)
+      {
+        if(final)
+          paths.insert(path);
+        
+        return RetVal((max_num < 1) || (int)paths.size() < max_num, true);
+      }
+  };
+  
+  void HfstTransducer::extract_strings(WeightedPaths<float>::Set &results, int max_num, int cycles)
+  {
+    if(is_cyclic() && max_num < 1 && cycles < 0)
+      throw hfst::exceptions::TransducerIsCyclicException();
+    
+    ExtractStringsCb_ cb(results, max_num);
+    extract_strings(cb, cycles);
+  }
+  
+  void HfstTransducer::extract_strings_fd(WeightedPaths<float>::Set &results, int max_num, int cycles, bool filter_fd)
+  {
+    if(is_cyclic() && max_num < 1 && cycles < 0)
+      throw hfst::exceptions::TransducerIsCyclicException();
+    
+    ExtractStringsCb_ cb(results, max_num);
+    extract_strings_fd(cb, cycles, filter_fd);
   }
 
   HfstTransducer &HfstTransducer::insert_freely(const StringPair &symbol_pair)

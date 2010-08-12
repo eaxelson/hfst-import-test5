@@ -105,8 +105,8 @@ namespace hfst {
       static fsm * subtract(fsm * t1,
 			    fsm * t2);
 			
-			static void extract_strings(fsm * t, hfst::WeightedPaths<float>::Set &results,
-            int max_num=-1, int cycles=-1, FdTable<int>* fd=NULL, bool filter_fd=false);
+			static void extract_strings(fsm * t, hfst::ExtractStringsCb& callback,
+            int cycles=-1, FdTable<int>* fd=NULL, bool filter_fd=false);
 			
 			static FdTable<int>* get_flag_diacritics(fsm * t);
 			

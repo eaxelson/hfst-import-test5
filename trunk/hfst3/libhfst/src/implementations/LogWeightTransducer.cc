@@ -1049,22 +1049,29 @@ namespace hfst { namespace implementations
   */
 
 
-  void extract_strings(LogFst * t, LogArc::StateId s,
+  static bool extract_strings(LogFst * t, LogArc::StateId s,
     std::map<LogArc::StateId,unsigned short> all_visitations, std::map<LogArc::StateId, unsigned short> path_visitations,
     std::vector<char>& lbuffer, int lpos, std::vector<char>& ubuffer, int upos, float weight_sum,
-    WeightedPaths<float>::Set &results, int max_num, int cycles,
+    ExtractStringsCb& callback, int cycles,
     std::vector<hfst::FdState<int64> >* fd_state_stack, bool filter_fd)
-  {
+  {  
     if(cycles >= 0 && path_visitations[s] > cycles)
-      return;
+      return true;
     all_visitations[s]++;
     path_visitations[s]++;
     
-    if(t->Final(s) != LogWeight::Zero())
+    if(lpos > 0 && upos > 0)
     {
       lbuffer[lpos]=0;
       ubuffer[upos]=0;
-      results.insert(hfst::WeightedPath<float>(lbuffer.data(),ubuffer.data(),weight_sum+t->Final(s).Value()));
+      bool final = t->Final(s) != LogWeight::Zero();
+      hfst::WeightedPath<float> path(lbuffer.data(),ubuffer.data(),weight_sum+(final?t->Final(s).Value():0));
+      hfst::ExtractStringsCb::RetVal ret = callback(path, final);
+      if(!ret.continueSearch || !ret.continuePath)
+      {
+        path_visitations[s]--;
+        return ret.continueSearch;
+      }
     }
     
     // sort arcs by number of visitations
@@ -1082,7 +1089,8 @@ namespace hfst { namespace implementations
       arcs[i] = &a;
     }
     
-    for( size_t i=0; i<arcs.size() && results.size() < max_num; i++ )
+    bool res = true;
+    for( size_t i=0; i<arcs.size() && res == true; i++ )
     {
       const LogArc &arc = *(arcs[i]);
       bool added_fd_state = false;
@@ -1119,21 +1127,21 @@ namespace hfst { namespace implementations
         up += str.length();
       }
       
-      extract_strings(t, arc.nextstate, all_visitations, path_visitations,
-          lbuffer,lp, ubuffer,up, weight_sum+arc.weight.Value(), results, max_num, cycles, fd_state_stack, filter_fd);
+      res = extract_strings(t, arc.nextstate, all_visitations, path_visitations,
+          lbuffer,lp, ubuffer,up, weight_sum+arc.weight.Value(), callback, cycles, fd_state_stack, filter_fd);
       
       if(added_fd_state)
         fd_state_stack->pop_back();
     }
     
     path_visitations[s]--;
+    return res;
   }
   
   static const int BUFFER_START_SIZE = 64;
   
-  void LogWeightTransducer::extract_strings(LogFst * t,
-    WeightedPaths<float>::Set &results, int max_num, int cycles,
-    FdTable<int64>* fd, bool filter_fd)
+  void LogWeightTransducer::extract_strings(LogFst * t, ExtractStringsCb& callback,
+    int cycles, FdTable<int64>* fd, bool filter_fd)
   {
     if (t->Start() == -1)
       return;
@@ -1144,7 +1152,7 @@ namespace hfst { namespace implementations
     map<LogArc::StateId, unsigned short> path_visitations;
     std::vector<hfst::FdState<int64> >* fd_state_stack = (fd==NULL) ? NULL : new std::vector<hfst::FdState<int64> >(1, hfst::FdState<int64>(*fd));
     
-    hfst::implementations::extract_strings(t,t->Start(),all_visitations,path_visitations,lbuffer,0,ubuffer,0,0.0f,results,max_num,cycles,fd_state_stack,filter_fd);
+    hfst::implementations::extract_strings(t,t->Start(),all_visitations,path_visitations,lbuffer,0,ubuffer,0,0.0f,callback,cycles,fd_state_stack,filter_fd);
   }
   
   FdTable<int64>* LogWeightTransducer::get_flag_diacritics(LogFst * t)
