@@ -788,15 +788,26 @@ void HfstTransducer::test_minimize()
     return *this;
   }
 
-
-
   HfstTransducer &HfstTransducer::substitute
-  (const std::string &old_symbol, const std::string &new_symbol)
+  (void (*func)(std::string &isymbol, std::string &osymbol))
   {
     ImplementationType original_type = this->type;
     this->convert(TROPICAL_OFST_TYPE);
     fst::StdVectorFst * tropical_ofst_temp =
-      this->tropical_ofst_interface.substitute(implementation.tropical_ofst,old_symbol,new_symbol);
+      this->tropical_ofst_interface.substitute(implementation.tropical_ofst,func);
+    delete implementation.tropical_ofst;
+    implementation.tropical_ofst = tropical_ofst_temp;
+    this->convert(original_type);
+    return *this;
+  }
+
+  HfstTransducer &HfstTransducer::substitute
+  (const std::string &old_symbol, const std::string &new_symbol, bool input_side, bool output_side)
+  {
+    ImplementationType original_type = this->type;
+    this->convert(TROPICAL_OFST_TYPE);
+    fst::StdVectorFst * tropical_ofst_temp =
+      this->tropical_ofst_interface.substitute(implementation.tropical_ofst,old_symbol,new_symbol, input_side, output_side);
     delete implementation.tropical_ofst;
     implementation.tropical_ofst = tropical_ofst_temp;
     this->convert(original_type);
@@ -842,12 +853,18 @@ void HfstTransducer::test_minimize()
     ImplementationType original_type = this->type;
     this->convert(TROPICAL_OFST_TYPE);
     transducer.convert(TROPICAL_OFST_TYPE);
+    printf("HERE\n");
     fst::StdVectorFst * tropical_ofst_temp =
       this->tropical_ofst_interface.substitute(implementation.tropical_ofst,symbol_pair,transducer.implementation.tropical_ofst);
+    printf("DONE\n");
     delete implementation.tropical_ofst;
+    printf("(0)\n");
     implementation.tropical_ofst = tropical_ofst_temp;
+    printf("(1)\n");
     this->convert(original_type);
+    printf("(2)\n");
     transducer.convert(original_type);
+    printf("RETURNING\n");
     return *this;
   }
 
@@ -873,14 +890,56 @@ void HfstTransducer::test_minimize()
     return *this;
   }
 
+  /*
+  void substitute_output_identity_with_unknown(std::string &isymbol, std::string &osymbol) {
+    if (osymbol.compare("@_IDENTITY_SYMBOL_@"))
+      osymbol = std::string("@_UNKNOWN_SYMBOL_@");
+  }
+
+  void substitute_input_identity_with_unknown(std::string &isymbol, std::string &osymbol) {
+    if (isymbol.compare("@_IDENTITY_SYMBOL_@"))
+      isymbol = std::string("@_UNKNOWN_SYMBOL_@");
+  }
+
+  void substitute_single_identitity_with_unknown(std::string &isymbol, std::string &osymbol) {
+    if (isymbol.compare("@_IDENTITY_SYMBOL_@") && (osymbol.compare("@_IDENTITY_SYMBOL_@") == false))
+      isymbol = std::string("@_UNKNOWN_SYMBOL_@");
+    else if (osymbol.compare("@_IDENTITY_SYMBOL_@") && (isymbol.compare("@_IDENTITY_SYMBOL_@") == false))
+      osymbol = std::string("@_UNKNOWN_SYMBOL_@");
+    else
+      return;
+  }
+
+  void substitute_unknown_identity_pair(std::string &isymbol, std::string &osymbol) {
+    if (isymbol.compare("@_UNKNOWN_SYMBOL_@") && isymbol.compare("@_IDENTITY_SYMBOL_@")) {
+      isymbol = std::string();
+      osymbol = std::string();
+    }
+  }
+  */
+
   HfstTransducer &HfstTransducer::compose
   (const HfstTransducer &another)
   { is_trie = false;
+
+    /* if (this->type != FOMA_TYPE) {
+      this->substitute(&substitute_output_identity_with_unknown);
+    }
+    if (another.type != FOMA_TYPE) {
+      (const_cast<HfstTransducer&>(another)).substitute(&substitute_input_identity_with_unknown);
+      }*/
+
     return apply(&hfst::implementations::SfstTransducer::compose,
 		 &hfst::implementations::TropicalWeightTransducer::compose,
 		 &hfst::implementations::LogWeightTransducer::compose,
 		 &hfst::implementations::FomaTransducer::compose,
-		 const_cast<HfstTransducer&>(another)); }
+		 const_cast<HfstTransducer&>(another)); 
+
+    /*
+    (const_cast<HfstTransducer&>(another)).substitute(&substitute_unknown_identity_pair);
+    return this->substitute(&substitute_single_identitity_with_unknown);
+    */
+  }
 
   HfstTransducer &HfstTransducer::concatenate
   (const HfstTransducer &another)
@@ -1272,7 +1331,7 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
 
 }
 
-  HfstTokenizer &HfstTransducer::create_tokenizer() 
+  HfstTokenizer HfstTransducer::create_tokenizer() 
   {
     HfstTokenizer tok;
     HfstMutableTransducer t(*this);
@@ -1284,10 +1343,12 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
 	while (not transition_it.done()) 
 	  {
 	    HfstTransition tr = transition_it.value();
-	    if (tr.isymbol.size() > 1)
+	    if (tr.isymbol.size() > 1) {
 	      tok.add_multichar_symbol(tr.isymbol);
-	    if (tr.isymbol.size() > 1)
+	    }
+	    if (tr.isymbol.size() > 1) {
 	      tok.add_multichar_symbol(tr.osymbol);
+	    }
 	    // special symbols are added too (is this a problem?)
 	    transition_it.next();
 	  }

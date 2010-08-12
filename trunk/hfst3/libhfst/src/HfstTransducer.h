@@ -565,11 +565,16 @@ fclose(ifile);
 
     HfstTransducer &insert_freely(const StringPair &symbol_pair);
 
+    /** \brief Substitute all transition pairs isymbol:osymbol according to function \a func. */
+    HfstTransducer &substitute(void (*func)(std::string &isymbol, std::string &osymbol));
+
     /** \brief Substitute all transition symbols equal to \a old_symbol with symbol \a new_symbol. 
 
 	The transition weights remain the same. */
     HfstTransducer &substitute(const std::string &old_symbol,
-			       const std::string &new_symbol);
+			       const std::string &new_symbol,
+			       bool input_side=true,
+			       bool output_side=true);
 			      
     /** \brief Substitute all transition symbol pairs equal to \a old_symbol_pair with \a new_symbol_pair. 
 
@@ -685,7 +690,7 @@ fclose(ifile);
 	@see convert(ImplementationType type) */
     static HfstTransducer &convert(const HfstTransducer &t, ImplementationType type);
 
-    HfstTokenizer &create_tokenizer();
+    HfstTokenizer create_tokenizer();
 
     HfstTransducer &operator=(const HfstTransducer &another);
     friend std::ostream &operator<<(std::ostream &out, HfstTransducer &t);

@@ -99,7 +99,6 @@ namespace hfst
       t_copy.minimize();
 
       arg1.concatenate(t_copy);
-      exit(0);
 
       // arg2 = !(.* m1)
       HfstTransducer m1_tr(m1, t.get_type());
@@ -262,7 +261,7 @@ namespace hfst
 	throw hfst::exceptions::ContextTransducersAreNotAutomataException();
 
       // TEST
-      /*printf("the alphabet:\n");
+      /*printf("StringPairSet alphabet:\n");
       for (StringPairSet::iterator it = alphabet.begin(); it != alphabet.end(); it++) {
 	StringPair sp = *it;
 	printf("  %s:%s\n", sp.first.c_str(), sp.second.c_str());
@@ -304,8 +303,7 @@ namespace hfst
       HfstTransducer cbt = negation_fst(tmp, alphabet);
 
       // left context transducer .* (<R> >> (<L> >> LEFT_CONTEXT)) || !(.*<L>)    
-      //HfstTransducer lct = replace_context(context.first, leftm, rightm, alphabet);  
-      HfstTransducer lct(context.first.get_type()); // TESTING
+      HfstTransducer lct = replace_context(context.first, leftm, rightm, alphabet);  
 
       // right context transducer:  reversion( (<R> >> (<L> >> reversion(RIGHT_CONTEXT))) .* || !(<R>.*) )
       HfstTransducer right_rev(context.second);
@@ -346,7 +344,7 @@ namespace hfst
       
       if (optional)
 	result.disjunct(universal_fst(alphabet,type));
-      
+
       return result;
     }
 

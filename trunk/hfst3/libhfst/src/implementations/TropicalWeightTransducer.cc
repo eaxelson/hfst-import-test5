@@ -1585,12 +1585,70 @@ namespace hfst { namespace implementations
   }
 
   StdVectorFst * TropicalWeightTransducer::substitute
-  (StdVectorFst * t,unsigned int old_key,unsigned int new_key) 
+  (StdVectorFst *t, void (*func)(std::string &isymbol, std::string &osymbol) ) 
   {
-    LabelPairVector v;
-    v.push_back(LabelPair(old_key,new_key));
-    RelabelFst<StdArc> t_subst(*t,v,v);
-    return new StdVectorFst(t_subst);
+    fst::StdVectorFst * tc = t->Copy();
+    SymbolTable * st = tc->InputSymbols();
+    assert(st != NULL);
+
+    for (fst::StateIterator<StdVectorFst> siter(*tc); 
+	 not siter.Done(); siter.Next())
+      {
+	StateId s = siter.Value();
+	for (fst::MutableArcIterator<StdVectorFst> aiter(tc,s); !aiter.Done(); aiter.Next())
+	  {
+	    const StdArc &arc = aiter.Value(); // current values
+	    StdArc new_arc;                    // new values
+	    
+	    std::string istring = st->Find(arc.ilabel);
+	    std::string ostring = st->Find(arc.olabel);
+	    func(istring,ostring);
+	    new_arc.ilabel = st->AddSymbol(istring);
+	    new_arc.olabel = st->AddSymbol(ostring);
+	    // copy weight and next state as such
+	    new_arc.weight = arc.weight.Value();
+	    new_arc.nextstate = arc.nextstate;
+	    aiter.SetValue(new_arc);
+	  }
+      }
+    return tc;    
+  }
+
+  StdVectorFst * TropicalWeightTransducer::substitute
+  (StdVectorFst * t,unsigned int old_key,unsigned int new_key, bool input_side, bool output_side) 
+  {
+    if (input_side && output_side) {
+      LabelPairVector v;
+      v.push_back(LabelPair(old_key,new_key));
+      RelabelFst<StdArc> t_subst(*t,v,v);
+      return new StdVectorFst(t_subst);
+    }
+    fst::StdVectorFst * tc = t->Copy();
+    for (fst::StateIterator<StdVectorFst> siter(*tc); 
+	 not siter.Done(); siter.Next())
+      {
+	StateId s = siter.Value();
+	for (fst::MutableArcIterator<StdVectorFst> aiter(tc,s); !aiter.Done(); aiter.Next())
+	  {
+	    const StdArc &arc = aiter.Value();
+	    StdArc new_arc;
+
+	    if (input_side && arc.ilabel == old_key)
+	      new_arc.ilabel = new_key;
+	    else
+	      new_arc.ilabel = arc.ilabel;
+
+	    if (output_side && arc.olabel == old_key)
+	      new_arc.olabel = new_key;
+	    else
+	      new_arc.olabel = arc.olabel;
+
+	    new_arc.weight = arc.weight.Value();
+	    new_arc.nextstate = arc.nextstate;
+	    aiter.SetValue(new_arc);
+	  }
+      }
+    return tc;    
   }
   
   StdVectorFst * TropicalWeightTransducer::substitute(StdVectorFst * t,
@@ -1665,11 +1723,13 @@ namespace hfst { namespace implementations
 
   StdVectorFst * TropicalWeightTransducer::substitute(StdVectorFst *t,
 						      std::string old_symbol,
-						      std::string new_symbol)
+						      std::string new_symbol,
+						      bool input_side,
+						      bool output_side)
   {
     SymbolTable * st = t->InputSymbols();
     assert(st != NULL);
-    StdVectorFst * retval = substitute(t, st->AddSymbol(old_symbol), st->AddSymbol(new_symbol));
+    StdVectorFst * retval = substitute(t, st->AddSymbol(old_symbol), st->AddSymbol(new_symbol), input_side, output_side);
     retval->SetInputSymbols( new SymbolTable ( *(t->InputSymbols()) ) );
     return retval;
   }

@@ -37,6 +37,23 @@ typedef struct contexts_t {
   struct contexts_t *next;
 } Contexts;
 
+/* HFST: moved here from interface.C: begins.. */
+struct ltstr {
+  bool operator()(const char* s1, const char* s2) const
+  { return strcmp(s1, s2) < 0; }
+};
+
+struct eqstr {
+  bool operator()(const char* s1, const char* s2) const
+  { return strcmp(s1, s2) == 0; }
+};
+
+typedef set<char*, ltstr> RVarSet;
+
+typedef hash_map<char*, Transducer*, hash<const char*>, eqstr> VarMap;
+
+typedef hash_map<char*, Range*, hash<const char*>, eqstr> SVarMap;
+/* ..ends */
 
 extern bool Verbose;
 extern bool UTF8;
@@ -44,6 +61,7 @@ extern char *FileName;
 extern Alphabet TheAlphabet;
 
 void error2( const char *message, char *input );
+void error( const char *message );
 Transducer *new_transducer( Range*, Range* );
 Transducer *read_words( char *filename );
 Transducer *read_transducer( char *filename );
@@ -58,6 +76,7 @@ Character symbol_code( char *s );
 // HFST: functions made externally accessible
 bool in_range( unsigned int c, Range *r );
 Transducer *make_transducer( Range *r1, Range *r2 );
+void free_values( Range *r );
 
 Range *add_value( Character, Range*);
 Range *add_var_values( char *name, Range*);

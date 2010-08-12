@@ -127,6 +127,7 @@ namespace hfst
     t->minimize();
     
     VM[name] = t;
+    //printf("def_var: defined variable \"%s\"\n", name);
     // TODO
     //return t->is_empty();
     return false;
@@ -141,9 +142,10 @@ namespace hfst
   
   HfstTransducer * HfstCompiler::var_value( char *name ) {
     VarMap::iterator it=VM.find(name);
-    // TODO
-    //if (it == VM.end())
-    //  error2("undefined variable", name);
+    if (it == VM.end()) {
+      printf("undefined variable %s\n", name);
+      exit(1);
+    }
     free(name);
     return new HfstTransducer(*(it->second));
   }
@@ -204,12 +206,16 @@ namespace hfst
     return nc;
   }
 
+  void HfstCompiler::warn(const char *msg) {
+    cerr << "\nWarning: " << msg << "!\n";
+  }
+
   HfstTransducer * HfstCompiler::negation( HfstTransducer *t )    
   {
-    //if (RS.size() > 0 || RSS.size() > 0)
-    //  cerr << "\nWarning: agreement operation inside of negation!\n";
-    //if (!SFST::Alphabet_Defined)
-    //  error("Negation requires the definition of an alphabet");
+    if (SFST::RS.size() > 0 || SFST::RSS.size() > 0)
+      warn("agreement operation inside of negation");
+    if (!SFST::Alphabet_Defined)
+      SFST::error("Negation requires the definition of an alphabet");
 
     // go through all symbol pairs in TheAlphabet and copy them to sps
     StringPairSet sps;
@@ -226,75 +232,87 @@ namespace hfst
     return pi_star;
   }
 
-  // TODO
+
   HfstTransducer * HfstCompiler::explode( HfstTransducer *t ) {
 
+    printf("explode...\n");
     if (SFST::RS.size() == 0 && SFST::RSS.size() == 0)
       return t;
     
     t->minimize();
-    
+
     // Make a tokenizer that recognizes all multicharacter symbols in t.
     // It is needed when weighted paths are transformed into transducers.
     HfstTokenizer TOK = t->create_tokenizer();
 
+    printf("(0)\n");
+
     // transducer agreement variable names
     vector<char*> name;
-    for( SFST::RVarSet::iterator it=SFST::RS.begin(); it!=SFST::RS.end(); it++)
+    for( SFST::RVarSet::iterator it=SFST::RS.begin(); it!=SFST::RS.end(); it++) {
       name.push_back(*it);
+      printf("pushed back %s\n", *it);
+    }
     SFST::RS.clear();  // ?
     
+    printf("(1)\n");
+
     // replace all agreement variables
     for( size_t i=0; i<name.size(); i++ ) {
-      HfstTransducer *nt = new HfstTransducer(t->type); // an initially empty transducer
+      printf("substituting transducer agreement variable \"%s\"\n", name[i]);
+      HfstTransducer *nt = new HfstTransducer(t->get_type()); // an initially empty transducer
       
       // enumerate all paths of the transducer
-      WeightedPaths<float>::Set &paths;
+      HfstTransducer *vt=var_value(strdup(name[i]));
+      WeightedPaths<float>::Set paths;
       vt->extract_strings(paths, -1, -1);
+      delete vt;
 
       // transform weighted paths to a vector of transducers
       vector<HfstTransducer*> transducer_paths;
       for (WeightedPaths<float>::Set::iterator it = paths.begin(); it != paths.end(); it++) {
 	WeightedPath<float> wp = *it;
-	HfstTransducer * path = new HfstTransducer(wp.istring, wp.ostring, TOK, t->type());
+	HfstTransducer * path = new HfstTransducer(wp.istring, wp.ostring, TOK, t->get_type());
 	path->set_final_weights(wp.weight);
-	transducer_paths->push_back(path);
+	transducer_paths.push_back(path);
       }
       
       // insert each path
       for( size_t j=0; j<transducer_paths.size(); j++ ) {
+	printf("substituting transducer agreement variable \"%s\" with transducer:\n", name[i]);
+	cerr << *(transducer_paths[j]);
 	HfstTransducer ti(*t);
-	ti.substitute(std::string(name[i]), *(transducer_paths[j]));
+	printf("in transducer:\n");
+	cerr << ti;
+	ti.substitute(StringPair(std::string(name[i]), std::string(name[i])), *(transducer_paths[j]));
+	printf("...substituted\n");
 	delete transducer_paths[j];	
 	nt->disjunct(ti);
-	delete ti;
       }
       delete t;
       t = nt;
     }
     
-    /*
+    printf("(2)\n");
+
     name.clear();
-    for( RVarSet::iterator it=SFST:RSS.begin(); it!=SFST:RSS.end(); it++)
+    for( SFST::RVarSet::iterator it=SFST::RSS.begin(); it!=SFST::RSS.end(); it++)
       name.push_back(*it);
-    SFST:RSS.clear();
+    SFST::RSS.clear();
     
     // replace all agreement variables
     for( size_t i=0; i<name.size(); i++ ) {
-      Transducer *nt = NULL;
-      Character c=(Character)TheAlphabet.symbol2code(name[i]);
+      HfstTransducer *nt = new HfstTransducer(t->get_type()); 
       Range *r=svar_value(name[i]);
       
       // insert each character
       while (r != NULL) {
 	
 	// insertion
-	Transducer *t1 = &t->replace_char(c, r->character);
-	
-	if (nt == NULL)
-	  nt = t1;
-	else
-	  nt = disjunction(nt, t1);
+	HfstTransducer ti(*t);
+	// agreement variable marker should always appear on both sides of the tape..
+	ti.substitute(std::string(name[i]), SFST::TheAlphabet.code2symbol(r->character));	
+	nt->disjunct(ti);
 	
 	Range *next = r->next;
 	delete r;
@@ -302,8 +320,7 @@ namespace hfst
       }
       delete t;
       t = nt;
-    }
-    */    
+    }    
     return t;
   }
 
@@ -377,15 +394,41 @@ namespace hfst
 
   }
 
+  //HfstTransducer * HfstCompiler::read_words(char *filename) {
+  //}
+
+  HfstTransducer * HfstCompiler::read_transducer(char *filename) {
+    if (SFST::Verbose)
+      fprintf(stderr,"\nreading transducer from %s...", filename);
+    HfstInputStream is(filename);
+    is.open();
+    HfstTransducer *t = new HfstTransducer(is);
+    is.close();
+    free(filename);
+    if (SFST::Verbose)
+      fprintf(stderr,"finished\n");
+    return t;
+  }
+
+  void HfstCompiler::write_to_file(HfstTransducer *t, char* filename) {
+    HfstOutputStream os(std::string(filename), t->get_type());
+    os.open();
+    os << *t;
+    os.close();
+    return;
+  }
 
   HfstTransducer * HfstCompiler::replace_in_context(HfstTransducer * mapping, Repl_Type repl_type, Contexts *contexts, bool optional) {
     
     HfstTransducerPair tr_pair(*(contexts->left), *(contexts->right));
     StringPairSet sps;
+    //printf("inserting pairs:\n");
     for( SFST::Alphabet::const_iterator it=SFST::TheAlphabet.begin(); it!=SFST::TheAlphabet.end(); it++ ) {
       SFST::Label l=*it;
+      //printf("inserting pair %i:%i... ", l.lower_char(), l.upper_char());
       sps.insert(StringPair( SFST::TheAlphabet.code2symbol(l.lower_char()),
 			     SFST::TheAlphabet.code2symbol(l.upper_char())) );
+      //printf("ok\n");
     } 
     switch (repl_type) 
       {
@@ -430,8 +473,27 @@ namespace hfst
     return new HfstTransducer(type);
   }
   
-  HfstTransducer * HfstCompiler::result( HfstTransducer *t, bool) {
-    t->minimize(); 
+  HfstTransducer * HfstCompiler::result( HfstTransducer *t, bool switch_flag) {
+
+    printf("result...\n");
+    t = explode(t);
+    
+    // delete the variable values
+    vector<char*> s;
+    for( VarMap::iterator it=VM.begin(); it != VM.end(); it++ ) {
+      s.push_back(it->first);
+      delete it->second;
+      it->second = NULL;
+    }
+    VM.clear();
+    for( size_t i=0; i<s.size(); i++ )
+      free(s[i]);
+    s.clear();
+    
+    if (switch_flag)
+      t->invert();
+    //add_alphabet(t);
+    t->minimize();
     return t;
   }
   
@@ -458,6 +520,12 @@ namespace hfst
 	state_it.next();
       }
     SFST::Alphabet_Defined = 1;
+
+    //printf("TheAlphabet is now defined as:\n");
+    //for( SFST::Alphabet::const_iterator it=SFST::TheAlphabet.begin(); it!=SFST::TheAlphabet.end(); it++ ) {
+    //  SFST::Label l=*it;
+    //  printf("  %i:%i\n", l.lower_char(), l.upper_char());
+    //}
   }
 
 }

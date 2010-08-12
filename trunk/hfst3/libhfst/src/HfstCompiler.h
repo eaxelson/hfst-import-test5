@@ -11,20 +11,14 @@
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "../../libhfst/src/HfstTransducer.h"
 #include "implementations/SFST/src/interface.h"
-//#include methods in interface.C not declared in interface.h
-namespace SFST {
-  void free_values( Range *r );
-}
 
-//#ifndef _INTERFACE_H_
-//#define _INTERFACE_H_
-
-// global variables specific to SFST-PL parser that are defined in file 'SFST/src/interface.C'
+// global variables and datatypes specific to SFST-PL parser
+// that are defined in file 'SFST/src/interface.C'
 namespace SFST {
-  extern bool Verbose;
-  extern bool UTF8;
-  extern char *FileName;
-  extern SFST::Alphabet TheAlphabet;
+  //extern bool Verbose;
+  //extern bool UTF8;
+  //extern char *FileName;
+  //extern SFST::Alphabet TheAlphabet;
   extern int Alphabet_Defined;
   extern std::set<char*> RS;
   extern std::set<char*> RSS;
@@ -56,21 +50,17 @@ namespace hfst
     } Contexts;
 
     /* For storing transducer variables */
-    struct eqstr {
-      bool operator()(const char* s1, const char* s2) const
-      { return strcmp(s1, s2) == 0; }
-    };
-    typedef map<char*, HfstTransducer*> VarMap;
+    typedef map<char*, HfstTransducer*, SFST::ltstr> VarMap;
 
   private:
     static HfstTransducer * make_transducer(Range *r1, Range *r2, ImplementationType type);
     static VarMap VM; /* Transducer variables */
 
   public:
-    void error2( const char *message, char *input );
+    static void warn(const char *msg);
     static HfstTransducer *new_transducer( Range*, Range*, ImplementationType );
     HfstTransducer *read_words( char *filename );
-    HfstTransducer *read_transducer( char *filename );
+    static HfstTransducer *read_transducer( char *filename );
     static HfstTransducer *var_value( char *name );
     static HfstTransducer *rvar_value( char *name, ImplementationType );
     static Range *svar_value( char *name );
@@ -79,7 +69,8 @@ namespace hfst
     static Character character_code( unsigned int uc );
     static Character symbol_code( char *s );
     static unsigned int utf8toint( char *s );
-    //static unsigned int utf8toint( char **s );
+
+    static void write_to_file(HfstTransducer *t, char* filename);
 
     static Range *add_value( Character, Range*);
     static Range *add_var_values( char *name, Range*);
@@ -112,7 +103,6 @@ namespace hfst
     static Ranges *add_range( Range*, Ranges* );
     static HfstTransducer *result( HfstTransducer*, bool );
 
-    //void write_to_file( Transducer*, char *filename);
   };
 }
 //#endif

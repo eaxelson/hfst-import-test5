@@ -15,13 +15,19 @@
 #include <vector>
 #include <string>
 #include <map>
-//#include <iostream>
-//#include <sstream>
 #include <set>
-//#include "HfstExceptions.h"
+
+/* extern const char * EPSILON_STRING;
+   extern const char * UNKNOWN_STRING;
+   extern const char * IDENTITY_STRING;
+   
+   extern const unsigned int EPSILON_NUMBER;
+   extern const unsigned int UNKNOWN_NUMBER;
+   extern const unsigned int IDENTITY_NUMBER; */
 
 namespace hfst
 {
+
   /* A symbol in a transition. */
   typedef std::string String;
   /* A set of strings. */
