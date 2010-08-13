@@ -63,26 +63,28 @@ def main():
         contexts.append([])
     # collect patterns from file
     while line:
+        line = line.strip()
         if not in_patterns:
-            if line.startswith('\patterns'):
+            print >> stderr, "Not in patterns %s" %(line)
+            if line.startswith('\\patterns'):
                 in_patterns = True
-            elif line.startswith('\hyphenation'):
+            elif line.startswith('\\hyphenation'):
                 print >> stderr, "Explicit hyphenations skipped, sry!"
             elif line.startswith('\\'):
-                print >> stderr, "Illegal TeX function in pattern: %s" % (line.strip())
+                print >> stderr, "Illegal TeX function in pattern: %s" % (line)
                 break
-            line = input_file.readline().strip()
+            line = input_file.readline()
             continue
         if '%' in line:
-            line = line[:line.find('%')].strip()
+            line = line[:line.find('%')]
         if '}' in line:
-            line = line[:line.find('}')].strip()
+            line = line[:line.find('}')]
             in_patterns = False
         if '^^' in line:
             print '^^ found, please replace by proper UTF-8'
             exit(1)
         if not line or line == '':
-            line = input_file.readline().strip()
+            line = input_file.readline()
             continue
         things = line.split()
         for thing in things:
@@ -99,7 +101,7 @@ def main():
                         contexts[i] += [context]
 
                     alphabet.update(set(thing))
-        line = input_file.readline().strip()
+        line = input_file.readline()
     input_file.close()
     # make up alphabets
     for i in range(1,10):
