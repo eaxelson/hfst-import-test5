@@ -62,6 +62,9 @@ hyph-utf8-hfst.tar.gz: $(HYPH_TARGETS)
 	cp -v $(HYPH_TARGETS) README.hyph hyph-utf8-hfst
 	tar zcvf $@ hyph-utf8-hfst
 
+texhyphs: $(HYPH_TARGETS)
+
+hunspells: $(HUNSPELL_TARGETS)
 
 # tex pattern translation
 %.hfst: %.tex
@@ -104,7 +107,7 @@ hyph-utf8-hfst.tar.gz: $(HYPH_TARGETS)
 	fi
 	./hunspell-aff2lexc $*.aff $*.aff.lexc $*.rules.twolc $*.err.lexc $*.symbols.lexc $*.symbols.twolc
 	hfst-lexc -w -v -o $*.lex.hfst $*.symbols.lexc $*.dic.lexc $*.aff.lexc
-	hfst-lexc -w -v -o $*.1errm.hfst hunspell_one_error.lexc $*.err.lexc
+	hfst-lexc -w -v -o $*.1errm.hfst $*.err.lexc
 	cat $*.symbols.twolc $*.rules.twolc > $*.twolc
 	hfst-twolc --resolve -w -v -o $*.twol.hfst $*.twolc
 	hfst-compose-intersect -v -l $*.lex.hfst $*.twol.hfst |\
