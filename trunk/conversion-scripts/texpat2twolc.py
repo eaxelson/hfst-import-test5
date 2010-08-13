@@ -65,7 +65,6 @@ def main():
     while line:
         line = line.strip()
         if not in_patterns:
-            print >> stderr, "Not in patterns %s" %(line)
             if line.startswith('\\patterns'):
                 in_patterns = True
             elif line.startswith('\\hyphenation'):
@@ -91,9 +90,9 @@ def main():
             for i in range(1,10):
                 if str(i) in thing:
                     if i % 2 == 0:
-                        contexts[i] += [' '.join(thing.replace(str(i), '_', 1).replace('-', '%-').replace('1', '').replace('2','').replace('3','').replace('4','').replace('5','').replace('6','').replace('7','').replace('8','').replace('9','').replace('.','#')).replace(' -',' %-')]
+                        contexts[i] += [' '.join(thing.replace(str(i), '_', 1).replace('-', '%-').replace('1', '').replace('2','').replace('3','').replace('4','').replace('5','').replace('6','').replace('7','').replace('8','').replace('9','').replace('.','#')).replace(' -',' %-').replace(' 0',' %0')]
                     else:
-                        context = ' (0:%-) '.join(thing.replace(str(i), '_', 1).replace('1', '').replace('2', '').replace('3', '').replace('4', '').replace('5','').replace('6','').replace('7','').replace('8','').replace('9','').replace('.','#')).replace('(0:%-) _', '_').replace('_ (0:%-)', ' _ ').replace(' -',' %-')
+                        context = ' (0:%-) '.join(thing.replace(str(i), '_', 1).replace('1', '').replace('2', '').replace('3', '').replace('4', '').replace('5','').replace('6','').replace('7','').replace('8','').replace('9','').replace('.','#')).replace('(0:%-) _', '_').replace('_ (0:%-)', ' _ ').replace(' -',' %-').replace(' 0',' %0')
                         if thing.find(str(i)) < 1:
                             context = '\\:%- ' + context
                         elif thing.find(str(i)) > (len(thing) - 2):
@@ -111,7 +110,7 @@ def main():
             print >> htwolc_files[i], '%-:0'
         else:
             print >> htwolc_files[i], '0:%-'
-        print >> htwolc_files[i], ' '.join(alphabet).replace('-', '%-')
+        print >> htwolc_files[i], ' '.join(alphabet).replace('-', '%-').replace('0', '%0')
         print >> htwolc_files[i], ";"
     for i in range(1, 10):
         print >> htwolc_files[i], "Rules"
