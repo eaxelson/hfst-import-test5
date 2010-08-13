@@ -15,6 +15,7 @@
 #include "FlagDiacritics.h"
 #include <fst/fstlib.h>
 #include "ExtractStrings.h"
+#include "TropicalWeightComposeIntersect.h"
 #include <cstdio>
 #include <string>
 #include <sstream>
@@ -204,7 +205,8 @@ namespace implementations
       static StdVectorFst * substitute(StdVectorFst * t,
       				       pair<unsigned int, unsigned int> old_key_pair,
       				       pair<unsigned int, unsigned int> new_key_pair);
-
+      static StdVectorFst * compose_intersect(StdVectorFst * t,
+					      Grammar * grammar);
       //static StdVectorFst * define_transducer(Key k);
       //static StdVectorFst * define_transducer(const KeyPair &kp);
       //static StdVectorFst * define_transducer(const KeyPairVector &kpv);

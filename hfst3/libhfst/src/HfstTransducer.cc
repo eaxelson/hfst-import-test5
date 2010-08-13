@@ -20,6 +20,47 @@ namespace hfst
   HfstTransducer::log_ofst_interface;
   hfst::implementations::FomaTransducer HfstTransducer::foma_interface;
 
+
+  HfstGrammar::HfstGrammar(HfstTransducerVector &rule_vector):
+  first_rule(*(rule_vector.begin()))
+  {
+    for (HfstTransducerVector::iterator it = rule_vector.begin();
+	 it != rule_vector.end();
+	 ++it)
+      {
+	if (it != rule_vector.begin())
+	  {
+	    it->harmonize(first_rule);
+	  }
+	it->convert(TROPICAL_OFST_TYPE);
+      }
+
+    for (HfstTransducerVector::iterator it = rule_vector.begin();
+	 it != rule_vector.end();
+	 ++it)
+      {
+	transducer_vector.push_back(it->implementation.tropical_ofst);
+      }
+    grammar = new hfst::implementations::Grammar(transducer_vector);
+  }
+
+  HfstGrammar::HfstGrammar(HfstTransducer &rule):
+    first_rule(rule)
+  {
+    rule.convert(TROPICAL_OFST_TYPE);
+    transducer_vector.push_back(rule.implementation.tropical_ofst);
+    grammar = new hfst::implementations::Grammar(transducer_vector);
+  }
+    
+  HfstGrammar::~HfstGrammar(void)
+  {
+    delete grammar;
+  }
+
+  HfstTransducer &HfstGrammar::get_first_rule(void)
+  {
+    return first_rule;
+  }
   
   HfstTransitionIterator::HfstTransitionIterator(const HfstMutableTransducer &t, HfstState s):
     tropical_ofst_iterator(hfst::implementations::TropicalWeightTransitionIterator(t.transducer.implementation.tropical_ofst, s)) {}
@@ -939,6 +980,31 @@ void HfstTransducer::test_minimize()
     (const_cast<HfstTransducer&>(another)).substitute(&substitute_unknown_identity_pair);
     return this->substitute(&substitute_single_identitity_with_unknown);
     */
+  }
+
+
+  HfstTransducer &HfstTransducer::compose_intersect
+  (HfstGrammar &grammar)
+  {
+    HfstTransducer rule_copy(grammar.get_first_rule());
+    harmonize(rule_copy);
+    switch (type)
+      {
+      case TROPICAL_OFST_TYPE:
+	{
+	  fst::ArcSort<fst::StdArc,hfst::implementations::StdMyOLabelCompare>
+	    (implementation.tropical_ofst,hfst::implementations::StdMyOLabelCompare());
+	  fst::StdVectorFst * temp = implementation.tropical_ofst;
+	  implementation.tropical_ofst =
+	    hfst::implementations::TropicalWeightTransducer::compose_intersect
+	    (implementation.tropical_ofst,grammar.grammar);
+	  delete temp;
+	  break;
+	}
+      default:
+	throw hfst::exceptions::FunctionNotImplementedException(); 
+      }
+    return *this;
   }
 
   HfstTransducer &HfstTransducer::concatenate
