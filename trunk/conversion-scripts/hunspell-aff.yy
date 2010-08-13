@@ -649,6 +649,38 @@ handle_pfx_line_with_conts(const char* cont,
 
 static
 void
+handle_stringed_pfx_line(const char* cont,
+                        const char* remove, const char* add, const char* match,
+                        const char* extra)
+{
+    static bool warned = false;
+    if (!warned)
+    {
+        fprintf(stderr, "Extra junk at end of line: %s\n",
+                extra);
+        warned = true;
+    }
+    handle_pfx_line(cont, remove, add, match);
+}
+
+static
+void
+handle_stringed_pfx_line_with_conts(const char* cont,
+                        const char* remove, const char* add, const char* conts,
+                        const char* match, const char* extra)
+{
+    static bool warned = false;
+    if (!warned)
+    {
+        fprintf(stderr, "Extra junk at end of line: %s\n",
+                extra);
+        warned = true;
+    }
+    handle_pfx_line_with_conts(cont, remove, add, conts, match);
+}
+
+static
+void
 handle_numbered_pfx_line(const char* cont,
                         const char* remove, const char* add, const char* match,
                         unsigned long extra)
@@ -872,6 +904,38 @@ handle_sfx_line_with_conts(const char* cont,
 
 static
 void
+handle_stringed_sfx_line(const char* cont,
+                        const char* remove, const char* add, const char* match,
+                        const char* extra)
+{
+    static bool warned = false;
+    if (!warned)
+    {
+        fprintf(stderr, "Extra junk at end of line: %s\n",
+                extra);
+        warned = true;
+    }
+    handle_sfx_line(cont, remove, add, match);
+}
+
+static
+void
+handle_stringed_sfx_line_with_conts(const char* cont,
+                        const char* remove, const char* add, const char* conts,
+                        const char* match, const char* extra)
+{
+    static bool warned = false;
+    if (!warned)
+    {
+        fprintf(stderr, "Extra junk at end of line: %s\n",
+                extra);
+        warned = true;
+    }
+    handle_sfx_line_with_conts(cont, remove, add, conts, match);
+}
+
+static
+void
 handle_numbered_sfx_line(const char* cont,
                         const char* remove, const char* add, const char* match,
                         unsigned long extra)
@@ -1053,11 +1117,14 @@ SFXLINE: SFX_LEADER UTF8_STRING UTF8_STRING UTF8_STRING {
     | SFX_LEADER UTF8_STRING ZERO UTF8_STRING {
         handle_sfx_line($1, $2, "", $4);
     }
-    | SFX_LEADER UTF8_STRING UTF8_STRING CONT_THING UTF8_STRING {
-        handle_sfx_line_with_conts($1, $2, $3, $4, $5);
-    }
     | SFX_LEADER ZERO UTF8_STRING UTF8_STRING {
         handle_sfx_line($1, NULL, $3, $4);
+    }
+    | SFX_LEADER ZERO ZERO UTF8_STRING {
+        handle_sfx_line($1, NULL, "", $4);
+    }
+    | SFX_LEADER UTF8_STRING UTF8_STRING CONT_THING UTF8_STRING {
+        handle_sfx_line_with_conts($1, $2, $3, $4, $5);
     }
     | SFX_LEADER ZERO UTF8_STRING CONT_THING UTF8_STRING {
         handle_sfx_line_with_conts($1, NULL, $3, $4, $5);
@@ -1080,6 +1147,30 @@ SFXLINE: SFX_LEADER UTF8_STRING UTF8_STRING UTF8_STRING {
     | SFX_LEADER ZERO UTF8_STRING CONT_THING UTF8_STRING COUNT {
         handle_numbered_sfx_line_with_conts($1, NULL, $3, $4, $5, $6);
     }
+    | SFX_LEADER ZERO ZERO CONT_THING UTF8_STRING COUNT {
+        handle_numbered_sfx_line_with_conts($1, NULL, "", $4, $5, $6);
+    }
+    | SFX_LEADER UTF8_STRING UTF8_STRING UTF8_STRING UTF8_STRING {
+        handle_stringed_sfx_line($1, $2, $3, $4, $5);
+    }
+    | SFX_LEADER UTF8_STRING ZERO UTF8_STRING UTF8_STRING {
+        handle_stringed_sfx_line($1, $2, "", $4, $5);
+    }
+    | SFX_LEADER UTF8_STRING UTF8_STRING CONT_THING UTF8_STRING UTF8_STRING {
+        handle_stringed_sfx_line_with_conts($1, $2, $3, $4, $5, $6);
+    }
+    | SFX_LEADER ZERO UTF8_STRING UTF8_STRING UTF8_STRING {
+        handle_stringed_sfx_line($1, NULL, $3, $4, $5);
+    }
+    | SFX_LEADER ZERO ZERO UTF8_STRING UTF8_STRING{
+        handle_stringed_sfx_line($1, NULL, "", $4, $5);
+    }
+    | SFX_LEADER ZERO UTF8_STRING CONT_THING UTF8_STRING UTF8_STRING {
+        handle_stringed_sfx_line_with_conts($1, NULL, $3, $4, $5, $6);
+    }
+    | SFX_LEADER ZERO ZERO CONT_THING UTF8_STRING UTF8_STRING {
+        handle_stringed_sfx_line_with_conts($1, NULL, "", $4, $5, $6);
+    }
     ;
 
 PFXSECTIONS: PFXSECTIONS PFXSECTION
@@ -1101,11 +1192,14 @@ PFXLINE: PFX_LEADER UTF8_STRING UTF8_STRING UTF8_STRING {
     | PFX_LEADER UTF8_STRING ZERO UTF8_STRING {
         handle_pfx_line($1, $2, "", $4);
     }
-    | PFX_LEADER UTF8_STRING UTF8_STRING CONT_THING UTF8_STRING {
-        handle_pfx_line_with_conts($1, $2, $3, $4, $5);
-    }
     | PFX_LEADER ZERO UTF8_STRING UTF8_STRING {
         handle_pfx_line($1, NULL, $3, $4);
+    }
+    | PFX_LEADER ZERO ZERO UTF8_STRING {
+        handle_pfx_line($1, NULL, "", $4);
+    }
+    | PFX_LEADER UTF8_STRING UTF8_STRING CONT_THING UTF8_STRING {
+        handle_pfx_line_with_conts($1, $2, $3, $4, $5);
     }
     | PFX_LEADER ZERO UTF8_STRING CONT_THING UTF8_STRING {
         handle_pfx_line_with_conts($1, NULL, $3, $4, $5);
@@ -1127,6 +1221,30 @@ PFXLINE: PFX_LEADER UTF8_STRING UTF8_STRING UTF8_STRING {
     }
     | PFX_LEADER ZERO UTF8_STRING CONT_THING UTF8_STRING COUNT {
         handle_numbered_pfx_line_with_conts($1, NULL, $3, $4, $5, $6);
+    }
+    | PFX_LEADER ZERO ZERO CONT_THING UTF8_STRING COUNT {
+        handle_numbered_pfx_line_with_conts($1, NULL, "", $4, $5, $6);
+    }
+    | PFX_LEADER UTF8_STRING UTF8_STRING UTF8_STRING UTF8_STRING {
+        handle_stringed_pfx_line($1, $2, $3, $4, $5);
+    }
+    | PFX_LEADER UTF8_STRING ZERO UTF8_STRING UTF8_STRING {
+        handle_stringed_pfx_line($1, $2, "", $4, $5);
+    }
+    | PFX_LEADER UTF8_STRING UTF8_STRING CONT_THING UTF8_STRING UTF8_STRING {
+        handle_stringed_pfx_line_with_conts($1, $2, $3, $4, $5, $6);
+    }
+    | PFX_LEADER ZERO UTF8_STRING UTF8_STRING UTF8_STRING {
+        handle_stringed_pfx_line($1, NULL, $3, $4, $5);
+    }
+    | PFX_LEADER ZERO ZERO UTF8_STRING UTF8_STRING{
+        handle_stringed_pfx_line($1, NULL, "", $4, $5);
+    }
+    | PFX_LEADER ZERO UTF8_STRING CONT_THING UTF8_STRING UTF8_STRING {
+        handle_stringed_pfx_line_with_conts($1, NULL, $3, $4, $5, $6);
+    }
+    | PFX_LEADER ZERO ZERO CONT_THING UTF8_STRING UTF8_STRING {
+        handle_stringed_pfx_line_with_conts($1, NULL, "", $4, $5, $6);
     }
     ;
 
