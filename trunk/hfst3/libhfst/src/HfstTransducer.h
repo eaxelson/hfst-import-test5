@@ -588,10 +588,8 @@ fclose(ifile);
 
 	The transition weights remain the same. */
     HfstTransducer &substitute(const std::string &old_symbol,
-			       const std::string &new_symbol,
-			       bool input_side=true,
-			       bool output_side=true);
-			      
+			       const std::string &new_symbol);
+						      
     /** \brief Substitute all transition symbol pairs equal to \a old_symbol_pair with \a new_symbol_pair. 
 
 	Implemented only for TROPICAL_OFST_TYPE and LOG_OFST_TYPE.

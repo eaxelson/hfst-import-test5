@@ -185,7 +185,7 @@ namespace implementations
       static FdTable<int64>* get_flag_diacritics(StdVectorFst * t);
 
       static StdVectorFst * insert_freely(StdVectorFst * t, const StringPair &symbol_pair);
-      static StdVectorFst * substitute(StdVectorFst * t, std::string old_symbol, std::string new_symbol, bool input_side=true, bool output_side=true);
+      static StdVectorFst * substitute(StdVectorFst * t, std::string old_symbol, std::string new_symbol);
       static StdVectorFst * substitute(StdVectorFst * t,
 				       StringPair old_symbol_pair,
 				       StringPair new_symbol_pair);
@@ -200,7 +200,7 @@ namespace implementations
       static NumberNumberMap create_mapping(StdVectorFst * t1, StdVectorFst * t2);
       static void recode_symbol_numbers(StdVectorFst * t, hfst::NumberNumberMap &km);      
       static StdVectorFst * expand_arcs(StdVectorFst * t, hfst::StringSet &unknown);
-      static StdVectorFst * substitute(StdVectorFst * t,unsigned int old_key,unsigned int new_key, bool input_side=true, bool output_side=true);
+      static StdVectorFst * substitute(StdVectorFst * t,unsigned int old_key,unsigned int new_key);
       static StdVectorFst * substitute(StdVectorFst *t, void (*func)(std::string &isymbol, std::string &osymbol) );
       static StdVectorFst * substitute(StdVectorFst * t,
       				       pair<unsigned int, unsigned int> old_key_pair,
