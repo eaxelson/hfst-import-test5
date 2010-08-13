@@ -843,12 +843,12 @@ void HfstTransducer::test_minimize()
   }
 
   HfstTransducer &HfstTransducer::substitute
-  (const std::string &old_symbol, const std::string &new_symbol, bool input_side, bool output_side)
+  (const std::string &old_symbol, const std::string &new_symbol)
   {
     ImplementationType original_type = this->type;
     this->convert(TROPICAL_OFST_TYPE);
     fst::StdVectorFst * tropical_ofst_temp =
-      this->tropical_ofst_interface.substitute(implementation.tropical_ofst,old_symbol,new_symbol, input_side, output_side);
+      this->tropical_ofst_interface.substitute(implementation.tropical_ofst,old_symbol,new_symbol);
     delete implementation.tropical_ofst;
     implementation.tropical_ofst = tropical_ofst_temp;
     this->convert(original_type);

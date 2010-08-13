@@ -1616,40 +1616,12 @@ namespace hfst { namespace implementations
   }
 
   StdVectorFst * TropicalWeightTransducer::substitute
-  (StdVectorFst * t,unsigned int old_key,unsigned int new_key, bool input_side, bool output_side) 
+  (StdVectorFst * t,unsigned int old_key,unsigned int new_key)
   {
-    if (input_side && output_side) {
-      LabelPairVector v;
-      v.push_back(LabelPair(old_key,new_key));
-      RelabelFst<StdArc> t_subst(*t,v,v);
-      return new StdVectorFst(t_subst);
-    }
-    fst::StdVectorFst * tc = t->Copy();
-    for (fst::StateIterator<StdVectorFst> siter(*tc); 
-	 not siter.Done(); siter.Next())
-      {
-	StateId s = siter.Value();
-	for (fst::MutableArcIterator<StdVectorFst> aiter(tc,s); !aiter.Done(); aiter.Next())
-	  {
-	    const StdArc &arc = aiter.Value();
-	    StdArc new_arc;
-
-	    if (input_side && arc.ilabel == old_key)
-	      new_arc.ilabel = new_key;
-	    else
-	      new_arc.ilabel = arc.ilabel;
-
-	    if (output_side && arc.olabel == old_key)
-	      new_arc.olabel = new_key;
-	    else
-	      new_arc.olabel = arc.olabel;
-
-	    new_arc.weight = arc.weight.Value();
-	    new_arc.nextstate = arc.nextstate;
-	    aiter.SetValue(new_arc);
-	  }
-      }
-    return tc;    
+    LabelPairVector v;
+    v.push_back(LabelPair(old_key,new_key));
+    RelabelFst<StdArc> t_subst(*t,v,v);
+    return new StdVectorFst(t_subst);
   }
   
   StdVectorFst * TropicalWeightTransducer::substitute(StdVectorFst * t,
@@ -1724,13 +1696,11 @@ namespace hfst { namespace implementations
 
   StdVectorFst * TropicalWeightTransducer::substitute(StdVectorFst *t,
 						      std::string old_symbol,
-						      std::string new_symbol,
-						      bool input_side,
-						      bool output_side)
+						      std::string new_symbol)
   {
     SymbolTable * st = t->InputSymbols();
     assert(st != NULL);
-    StdVectorFst * retval = substitute(t, st->AddSymbol(old_symbol), st->AddSymbol(new_symbol), input_side, output_side);
+    StdVectorFst * retval = substitute(t, st->AddSymbol(old_symbol), st->AddSymbol(new_symbol));
     retval->SetInputSymbols(t->InputSymbols());
     return retval;
   }
