@@ -1535,6 +1535,7 @@ namespace hfst { namespace implementations
     return eps;
   }
 
+
   StdVectorFst * 
   TropicalWeightTransducer::invert(StdVectorFst * t)
   {
@@ -1837,6 +1838,21 @@ namespace hfst { namespace implementations
     ComposeFst<StdArc> compose(*t1,*t2);
     StdVectorFst *result = new StdVectorFst(compose); 
     result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    return result;
+  }
+
+  StdVectorFst * TropicalWeightTransducer::compose_intersect
+  (StdVectorFst * t, Grammar * grammar)
+  {
+    //t->SetInputSymbols(NULL);
+    //t->SetOutputSymbols(NULL);
+    fst::ArcSort<StdArc,fst::OLabelCompare<StdArc> > 
+      (t,OLabelCompare<StdArc>());    
+    ComposeIntersectFst cif(t,*grammar);
+    StdVectorFst * result = cif();
+    result->SetInputSymbols(NULL);
+    result->SetOutputSymbols(NULL);
+    result->SetInputSymbols( new SymbolTable( *(grammar->get_first_rule()->InputSymbols()) ) );
     return result;
   }
 

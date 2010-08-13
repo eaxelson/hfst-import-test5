@@ -216,6 +216,22 @@ namespace hfst
   };
 
 
+  typedef std::vector<HfstTransducer> HfstTransducerVector;
+
+  class HfstGrammar
+  {
+  protected:
+    HfstTransducer &first_rule;
+    hfst::implementations::Grammar * grammar;
+    hfst::implementations::TransducerVector transducer_vector;
+  public:
+    HfstGrammar(HfstTransducerVector &rule_vector);
+    HfstGrammar(HfstTransducer &rule);
+    HfstTransducer &get_first_rule(void);
+    ~HfstGrammar(void);
+    friend class HfstTransducer;
+  };
+
   /** \brief A handle to a state in a HfstMutableTransducer. **/
   typedef hfst::implementations::StateId HfstState;
 
@@ -640,6 +656,9 @@ fclose(ifile);
     /** \brief Compose this transducer with \a another. */
     HfstTransducer &compose(const HfstTransducer &another);
 
+    /** \brief Compose this transducer with \a another. */
+    HfstTransducer &compose_intersect(HfstGrammar &grammar);
+
     /** \brief Concatenate this transducer with \a another. */
     HfstTransducer &concatenate(const HfstTransducer &another);
 
@@ -699,7 +718,7 @@ fclose(ifile);
     friend class HfstMutableTransducer;
     friend class HfstStateIterator;
     friend class HfstTransitionIterator;
-
+    friend class HfstGrammar;
     friend class HfstCompiler;
   };
 
