@@ -212,7 +212,7 @@ namespace implementations
       //static StdVectorFst * define_transducer(const KeyPairVector &kpv);
 
     private:
-      static fst::SymbolTable * create_symbol_table(std::string name);
+      static fst::SymbolTable create_symbol_table(std::string name);
       static void initialize_symbol_tables(StdVectorFst *t);
       
     public:

@@ -637,7 +637,7 @@ namespace hfst { namespace implementations
 	  }
       }
 
-    result->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ) );
+     result->SetInputSymbols(t->InputSymbols());
     return result;
   }
 
@@ -669,7 +669,7 @@ namespace hfst { namespace implementations
 
     // ... replace the symbol table of t1 with a copy of t2's symbol table
     //delete t1->InputSymbols(); this causes problems...
-    t1->SetInputSymbols( new fst::SymbolTable(*(t2->InputSymbols())) );
+    t1->SetInputSymbols(t2->InputSymbols());
 
     // ...and recode the symbol numbers of transducer t1 so that
     //    it follows the new symbol table.
@@ -682,11 +682,11 @@ namespace hfst { namespace implementations
     fst::StdVectorFst *harmonized_t2;
 
     harmonized_t1 = expand_arcs(t1, unknown_t1);
-    harmonized_t1->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    harmonized_t1->SetInputSymbols(t1->InputSymbols());
     delete t1;
 
     harmonized_t2 = expand_arcs(t2, unknown_t2);
-    harmonized_t2->SetInputSymbols( new SymbolTable( *(t2->InputSymbols()) ) );
+    harmonized_t2->SetInputSymbols(t2->InputSymbols());
     delete t2;
 
     //fprintf(stderr, "TWT::harmonize: harmonized t1's and t2's input symbol tables now contain (FINAL):\n");
@@ -1125,17 +1125,17 @@ namespace hfst { namespace implementations
   }
   */
 
-  fst::SymbolTable * TropicalWeightTransducer::create_symbol_table(std::string name) {
-    fst::SymbolTable * st = new fst::SymbolTable(name);
-    st->AddSymbol("@_EPSILON_SYMBOL_@", 0);
-    st->AddSymbol("@_UNKNOWN_SYMBOL_@", 1);
-    st->AddSymbol("@_IDENTITY_SYMBOL_@", 2);
+  fst::SymbolTable TropicalWeightTransducer::create_symbol_table(std::string name) {
+    fst::SymbolTable st(name);
+    st.AddSymbol("@_EPSILON_SYMBOL_@", 0);
+    st.AddSymbol("@_UNKNOWN_SYMBOL_@", 1);
+    st.AddSymbol("@_IDENTITY_SYMBOL_@", 2);
     return st;
   }
   
   void TropicalWeightTransducer::initialize_symbol_tables(StdVectorFst *t) {
-    SymbolTable *st = create_symbol_table("");
-    t->SetInputSymbols(st);
+    SymbolTable st = create_symbol_table("");
+    t->SetInputSymbols(&st);
     //t->SetOutputSymbols(st);
     return;
   }
@@ -1505,7 +1505,7 @@ namespace hfst { namespace implementations
     StdVectorFst * repetition = create_epsilon_transducer();
     for (int i = 0; i < n; ++i)
       { Concat(repetition,*t); }
-    repetition->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ));
+    repetition->SetInputSymbols(t->InputSymbols());
     return repetition;
   }
 
@@ -1522,7 +1522,7 @@ namespace hfst { namespace implementations
 	Concat(repetition,*optional_t);
 	delete optional_t;
       }
-    repetition->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ));
+    repetition->SetInputSymbols(t->InputSymbols());
     return repetition;
   }
 
@@ -1531,7 +1531,7 @@ namespace hfst { namespace implementations
   {
     StdVectorFst * eps = create_epsilon_transducer();
     Union(eps,*t);
-    eps->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ));
+    eps->SetInputSymbols(t->InputSymbols());
     return eps;
   }
 
@@ -1543,7 +1543,7 @@ namespace hfst { namespace implementations
     StdVectorFst * inverse = copy(t);
     assert (inverse->InputSymbols() != NULL);
     Invert(inverse);
-    inverse->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ));
+    inverse->SetInputSymbols(t->InputSymbols());
     assert (inverse->InputSymbols() != NULL);
     return inverse;
   }
@@ -1554,20 +1554,20 @@ namespace hfst { namespace implementations
   {
     StdVectorFst * reversed = new StdVectorFst;
     Reverse<StdArc,StdArc>(*t,reversed);
-    reversed->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ));
+    reversed->SetInputSymbols(t->InputSymbols());
     return reversed;
   }
 
   StdVectorFst * TropicalWeightTransducer::extract_input_language
   (StdVectorFst * t)
   { StdVectorFst * retval =  new StdVectorFst(ProjectFst<StdArc>(*t,PROJECT_INPUT)); 
-    retval->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ));
+    retval->SetInputSymbols(t->InputSymbols());
     return retval; }
 
   StdVectorFst * TropicalWeightTransducer::extract_output_language
   (StdVectorFst * t)
   { StdVectorFst * retval = new StdVectorFst(ProjectFst<StdArc>(*t,PROJECT_OUTPUT)); 
-    retval->SetInputSymbols(new SymbolTable( *(t->InputSymbols()) ));
+    retval->SetInputSymbols(t->InputSymbols());
     return retval; }
   
   typedef std::pair<int,int> LabelPair;
@@ -1731,7 +1731,7 @@ namespace hfst { namespace implementations
     SymbolTable * st = t->InputSymbols();
     assert(st != NULL);
     StdVectorFst * retval = substitute(t, st->AddSymbol(old_symbol), st->AddSymbol(new_symbol), input_side, output_side);
-    retval->SetInputSymbols( new SymbolTable ( *(t->InputSymbols()) ) );
+    retval->SetInputSymbols(t->InputSymbols());
     return retval;
   }
 
@@ -1745,7 +1745,7 @@ namespace hfst { namespace implementations
     pair<unsigned int, unsigned int> new_pair(st->AddSymbol(new_symbol_pair.first),
 					      st->AddSymbol(new_symbol_pair.second));
     StdVectorFst * retval = substitute(t, old_pair, new_pair);
-    retval->SetInputSymbols( new SymbolTable ( *(t->InputSymbols()) ) );
+    retval->SetInputSymbols(t->InputSymbols());
     return retval;
   }
 
@@ -1828,16 +1828,16 @@ namespace hfst { namespace implementations
 			 StdVectorFst * t2)
   {
     if (t1->OutputSymbols() == NULL)
-      t1->SetOutputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+      t1->SetOutputSymbols(t1->InputSymbols());
     if (t2->OutputSymbols() == NULL)
-      t2->SetOutputSymbols( new SymbolTable( *(t2->InputSymbols()) ) );
+      t2->SetOutputSymbols(t2->InputSymbols());
 
     ArcSort(t1, OLabelCompare<StdArc>());
     ArcSort(t2, ILabelCompare<StdArc>());
 
     ComposeFst<StdArc> compose(*t1,*t2);
     StdVectorFst *result = new StdVectorFst(compose); 
-    result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    result->SetInputSymbols(t1->InputSymbols());
     return result;
   }
 
@@ -1852,7 +1852,7 @@ namespace hfst { namespace implementations
     StdVectorFst * result = cif();
     result->SetInputSymbols(NULL);
     result->SetOutputSymbols(NULL);
-    result->SetInputSymbols( new SymbolTable( *(grammar->get_first_rule()->InputSymbols()) ) );
+    result->SetInputSymbols(grammar->get_first_rule()->InputSymbols() );
     return result;
   }
 
@@ -1861,7 +1861,7 @@ namespace hfst { namespace implementations
   {
     ConcatFst<StdArc> concatenate(*t1,*t2);
     StdVectorFst *result = new StdVectorFst(concatenate); 
-    result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    result->SetInputSymbols(t1->InputSymbols());
     return result;
   }
 
@@ -1870,7 +1870,7 @@ namespace hfst { namespace implementations
   {
     UnionFst<StdArc> disjunct(*t1,*t2);
     StdVectorFst *result = new StdVectorFst(disjunct);
-    result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    result->SetInputSymbols(t1->InputSymbols());
     return result;
   }
 
@@ -1878,9 +1878,9 @@ namespace hfst { namespace implementations
 			   StdVectorFst * t2)
   {
     if (t1->OutputSymbols() == NULL)
-      t1->SetOutputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+      t1->SetOutputSymbols(t1->InputSymbols());
     if (t2->OutputSymbols() == NULL)
-      t2->SetOutputSymbols( new SymbolTable( *(t2->InputSymbols()) ) );
+      t2->SetOutputSymbols(t2->InputSymbols());
 
     ArcSort(t1, OLabelCompare<StdArc>());
     ArcSort(t2, ILabelCompare<StdArc>());
@@ -1898,7 +1898,7 @@ namespace hfst { namespace implementations
     DecodeFst<StdArc> decode(*foo, encoder);
     delete foo;
     StdVectorFst *result = new StdVectorFst(decode);
-    result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    result->SetInputSymbols(t1->InputSymbols());
     return result;
   }
 
@@ -1906,9 +1906,9 @@ namespace hfst { namespace implementations
 			  StdVectorFst * t2)
   {
     if (t1->OutputSymbols() == NULL)
-      t1->SetOutputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+      t1->SetOutputSymbols(t1->InputSymbols());
     if (t2->OutputSymbols() == NULL)
-      t2->SetOutputSymbols( new SymbolTable( *(t2->InputSymbols()) ) );
+      t2->SetOutputSymbols(t2->InputSymbols());
 
     ArcSort(t1, OLabelCompare<StdArc>());
     ArcSort(t2, ILabelCompare<StdArc>());
@@ -1929,7 +1929,7 @@ namespace hfst { namespace implementations
 
     //DifferenceFst<StdArc> subtract(enc1,enc2);
     StdVectorFst *result = new StdVectorFst(subtract); 
-    result->SetInputSymbols( new SymbolTable( *(t1->InputSymbols()) ) );
+    result->SetInputSymbols(t1->InputSymbols());
     return result;
   }
 
