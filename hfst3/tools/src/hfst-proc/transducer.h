@@ -9,7 +9,7 @@
 #include "flag-diacritics.h"
 #include "alphabet.h"
 
-#include "../../hfst3/libhfst/src/implementations/optimized-lookup/transducer.h"
+#include "implementations/optimized-lookup/transducer.h"
 
 using namespace hfst_ol;
 

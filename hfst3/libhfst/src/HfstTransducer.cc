@@ -747,7 +747,7 @@ void HfstTransducer::test_minimize()
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
       {
-	FdTable<hfst_ol::SymbolNumber>* t_hfst_ol = hfst::implementations::HfstOlTransducer::get_flag_diacritics(implementation.hfst_ol);
+	const FdTable<hfst_ol::SymbolNumber>* t_hfst_ol = hfst::implementations::HfstOlTransducer::get_flag_diacritics(implementation.hfst_ol);
 	hfst::implementations::HfstOlTransducer::extract_strings(implementation.hfst_ol,callback,cycles,t_hfst_ol,filter_fd);
 	delete t_hfst_ol;
       }

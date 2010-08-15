@@ -28,7 +28,7 @@ bootstrappable=hfst-compare.1 hfst-compose.1 \
 			   hfst-reverse.1 hfst-split.1 hfst-strings2fst.1 \
 			   hfst-subtract.1 hfst-summarize.1 hfst-tail.1 hfst-txt2fst.1 \
 			   hfst-unweighted2weighted.1 hfst-weighted2unweighted.1
-broken=hfst-calculate.1 hfst-compose-intersect.1 hfst-pair-test.1
+broken=hfst-calculate.1 hfst-compose-intersect.1 hfst-pair-test.1 hfst-proc.1
 dist_man1_MANS=$(bootstrappable) $(broken)
 
 bootstrap: 

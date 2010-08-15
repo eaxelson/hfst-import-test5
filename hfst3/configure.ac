@@ -210,6 +210,12 @@ AC_ARG_ENABLE([project],
 			  [enable_project=$enableval],
 			  [enable_project=yes])
 AM_CONDITIONAL([WANT_PROJECT], [test x$enable_project != xno])
+AC_ARG_ENABLE([proc],
+			  [AS_HELP_STRING([--enable-proc],
+							  [build text processing tool @<:@default=no@:>@])],
+			  [enable_proc=$enableval],
+			  [enable_proc=yes])
+AM_CONDITIONAL([WANT_PROC], [test x$enable_proc != xno])
 AC_ARG_ENABLE([push_weights],
 			  [AS_HELP_STRING([--enable-push-weights],
 							  [build push-weights tool @<:@default=no@:>@])],
@@ -387,7 +393,7 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
                  test/libhfst/Makefile test/tools/Makefile
                  libhfst/Makefile libhfst/src/Makefile
                  libhfst/src/implementations/Makefile libhfst/hfst.pc
-                 tools/Makefile tools/src/Makefile
+                 tools/Makefile tools/src/Makefile tools/src/hfst-proc/Makefile
                  man/Makefile])
 
 # output
@@ -416,6 +422,7 @@ cat <<EOF
     *                 invert: $enable_invert
     *                 lookup: $enable_lookup
     *                 minimize: $enable_minimize
+    *                 proc: $enable_proc
     *                 project: $enable_project
     *                 push-weights: $enable_push_weights
     *                 regexp2fst: $enable_regexp2fst

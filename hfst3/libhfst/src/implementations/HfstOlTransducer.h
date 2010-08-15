@@ -77,8 +77,8 @@ namespace hfst { namespace implementations
     static bool is_cyclic(hfst_ol::Transducer* t);
     
     static void extract_strings(hfst_ol::Transducer * t, hfst::ExtractStringsCb& callback,
-            int cycles=-1, FdTable<hfst_ol::SymbolNumber>* fd=NULL, bool filter_fd=false);
-    static FdTable<hfst_ol::SymbolNumber>* get_flag_diacritics(hfst_ol::Transducer* t);
+            int cycles=-1, const FdTable<hfst_ol::SymbolNumber>* fd=NULL, bool filter_fd=false);
+    static const FdTable<hfst_ol::SymbolNumber>* get_flag_diacritics(hfst_ol::Transducer* t);
   };
   
 } }

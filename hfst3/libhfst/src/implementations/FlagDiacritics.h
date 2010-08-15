@@ -29,7 +29,7 @@ namespace hfst {
     FdFeature Feature(void) const { return feature; }
     FdValue Value(void) const { return value; }
     std::string Name(void) const { return name; }
-        
+
     static FdOperator char_to_operator(char c)
     {
       switch (c) {
@@ -43,7 +43,7 @@ namespace hfst {
         throw;
       }
     }
-    
+
     static bool is_diacritic(const std::string& diacritic_str);
     static std::string::size_type find_diacritic(const std::string& diacritic_str,
                                                  std::string::size_type& length);

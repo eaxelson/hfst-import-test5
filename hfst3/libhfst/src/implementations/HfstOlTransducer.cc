@@ -308,7 +308,7 @@ namespace hfst { namespace implementations
   static const int BUFFER_START_SIZE = 64;
   
   void HfstOlTransducer::extract_strings(hfst_ol::Transducer * t, hfst::ExtractStringsCb& callback,
-            int cycles, FdTable<hfst_ol::SymbolNumber>* fd, bool filter_fd)
+            int cycles, const FdTable<hfst_ol::SymbolNumber>* fd, bool filter_fd)
   {
     std::vector<char> lbuffer(BUFFER_START_SIZE, 0);
     std::vector<char> ubuffer(BUFFER_START_SIZE, 0);
@@ -320,16 +320,9 @@ namespace hfst { namespace implementations
     hfst::implementations::extract_strings(t,0,all_visitations,path_visitations,lbuffer,0,ubuffer,0,0.0f,callback,cycles,fd_state_stack,filter_fd);
   }
   
-  FdTable<hfst_ol::SymbolNumber>* HfstOlTransducer::get_flag_diacritics(hfst_ol::Transducer* t)
+  const FdTable<hfst_ol::SymbolNumber>* HfstOlTransducer::get_flag_diacritics(hfst_ol::Transducer* t)
   {
-    FdTable<hfst_ol::SymbolNumber>* table = new FdTable<hfst_ol::SymbolNumber>();
-    const hfst_ol::SymbolTable& symbols = t->get_alphabet().get_symbol_table();
-    for(size_t i=0; i<symbols.size(); i++)
-    {
-      if(FdOperation::is_diacritic(symbols[i]))
-        table->define_diacritic(i, symbols[i]);
-    }
-    return table;
+    return &(t->get_alphabet().get_fd_table());
   }
 
 } }
