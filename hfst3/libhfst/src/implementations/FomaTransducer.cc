@@ -533,7 +533,7 @@ namespace hfst { namespace implementations {
         }
       }
       
-      hfst::WeightedPath<float> path(lbuffer.data(),ubuffer.data(),0);
+      hfst::WeightedPath<float> path(&lbuffer[0],&ubuffer[0],0);
       hfst::ExtractStringsCb::RetVal ret = callback(path, final);
       if(!ret.continueSearch || !ret.continuePath)
       {
@@ -597,7 +597,7 @@ namespace hfst { namespace implementations {
         size_t clen = strlen(c);
         if(lpos+clen >= lbuffer.size())
           lbuffer.resize(lbuffer.size()*2, 0);
-        strcpy(lbuffer.data()+lpos, c);
+        strcpy(&lbuffer[lpos], c);
         lp += clen;
       }
       if(arc->out != 0 && (!filter_fd || fd_state_stack->back().get_table().get_operation(arc->out)==NULL))
@@ -615,7 +615,7 @@ namespace hfst { namespace implementations {
         size_t clen = strlen(c);
         if(upos+clen > ubuffer.size())
           ubuffer.resize(ubuffer.size()*2, 0);
-        strcpy(ubuffer.data()+upos, c);
+        strcpy(&ubuffer[upos], c);
         up += clen;
       }
       
