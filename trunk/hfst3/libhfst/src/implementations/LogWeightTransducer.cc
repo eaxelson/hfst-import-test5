@@ -1065,7 +1065,7 @@ namespace hfst { namespace implementations
       lbuffer[lpos]=0;
       ubuffer[upos]=0;
       bool final = t->Final(s) != LogWeight::Zero();
-      hfst::WeightedPath<float> path(lbuffer.data(),ubuffer.data(),weight_sum+(final?t->Final(s).Value():0));
+      hfst::WeightedPath<float> path(&lbuffer[0],&ubuffer[0],weight_sum+(final?t->Final(s).Value():0));
       hfst::ExtractStringsCb::RetVal ret = callback(path, final);
       if(!ret.continueSearch || !ret.continuePath)
       {
@@ -1115,7 +1115,7 @@ namespace hfst { namespace implementations
         std::string str = t->InputSymbols()->Find(arc.ilabel);
         if(lpos+str.length() >= lbuffer.size())
           lbuffer.resize(lbuffer.size()*2, 0);
-        strcpy(lbuffer.data()+lpos, str.c_str());
+        strcpy(&lbuffer[lpos], str.c_str());
         lp += str.length();
       }
       if (arc.olabel != 0 && (!filter_fd || fd_state_stack->back().get_table().get_operation(arc.olabel)==NULL))
@@ -1123,7 +1123,7 @@ namespace hfst { namespace implementations
         std::string str = t->InputSymbols()->Find(arc.olabel);
         if(upos+str.length() > ubuffer.size())
           ubuffer.resize(ubuffer.size()*2, 0);
-        strcpy(ubuffer.data()+upos, str.c_str());
+        strcpy(&ubuffer[upos], str.c_str());
         up += str.length();
       }
       

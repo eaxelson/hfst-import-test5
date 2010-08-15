@@ -227,7 +227,7 @@ namespace hfst { namespace implementations
       }
       
       
-      hfst::WeightedPath<float> path(lbuffer.data(),ubuffer.data(),weight_sum+final_weight);
+      hfst::WeightedPath<float> path(&lbuffer[0],&ubuffer[0],weight_sum+final_weight);
       hfst::ExtractStringsCb::RetVal ret = callback(path, final);
       if(!ret.continueSearch || !ret.continuePath)
       {
@@ -281,7 +281,7 @@ namespace hfst { namespace implementations
         std::string str = t->get_alphabet().get_symbol_table()[input];
         if(lpos+str.length() >= lbuffer.size())
           lbuffer.resize(lbuffer.size()*2, 0);
-        strcpy(lbuffer.data()+lpos, str.c_str());
+        strcpy(&lbuffer[lpos], str.c_str());
         lp += str.length();
       }
       if(output != 0 && (!filter_fd || fd_state_stack->back().get_table().get_operation(output)==NULL))
@@ -289,7 +289,7 @@ namespace hfst { namespace implementations
         std::string str = t->get_alphabet().get_symbol_table()[output];
         if(upos+str.length() > ubuffer.size())
           ubuffer.resize(ubuffer.size()*2, 0);
-        strcpy(ubuffer.data()+upos, str.c_str());
+        strcpy(&ubuffer[upos], str.c_str());
         up += str.length();
       }
       
