@@ -27,14 +27,15 @@ TESTS=hfst-check-version.sh hfst-check-help.sh empty-input.sh\
 	  reverse-functionality.sh substitute-functionality.sh \
 	  strings2fst-functionality.sh fst2strings-functionality.sh\
 	  txt2fst-functionality.sh fst2txt-functionality.sh \
-	  summarize-functionality.sh
+	  summarize-functionality.sh proc-functionality.sh
 check_DATA=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   cat2cat_or_CAT_uppercased.hfst cat2CAT_uppercased.hfst cat2dog.hfst \
-		   cat+dog.hfst catdog.hfst cat_or_dog.hfst cat.hfst \
-		   CAT_uppercased2cat.hfst CAT_uppercased.hfst cat_weight_final.hfst \
+		   cat+dog.hfst catdog.hfst cat_or_dog.hfst cat.hfst cat2dog.hfst.ol cat2dog.gen.hfst.ol \
+		   CAT_uppercased2cat.hfst CAT_uppercased.hfst cat_weight_final.hfst cat_weight_final.hfst.ol \
 		   cat_weight_initial.hfst cat_weight_middle.hfst dog2cat.hfst \
 		   dog.hfst infinitely_ambiguous.hfst non_minimal.hfst rule1.hfst \
-		   rule2.hfst summarize_test1.hfst summarize_test2.hfst tac.hfst 
+		   rule2.hfst summarize_test1.hfst summarize_test2.hfst tac.hfst  \
+		   proc-caps.hfst.ol proc-caps.gen.hfst.ol
 
 FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
 		 cat2cat_or_CAT_uppercased.txt cat2CAT_uppercased.txt cat2dog.txt \
@@ -42,12 +43,17 @@ FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
 		 CAT_uppercased.txt cat_weight_final.txt cat_weight_initial.txt \
 		 cat_weight_middle.txt dog2cat.txt dog.txt infinitely_ambiguous.txt \
 		 non_minimal.txt rule1.txt rule2.txt summarize_test1.txt \
-		 summarize_test2.txt tac.txt 
-FST_STRINGS=cat.strings
+		 summarize_test2.txt tac.txt proc-caps.txt
+FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-out1.strings \
+		 proc-caps-out2.strings proc-caps-out3.strings proc-caps-out4.strings \
+		 proc-cat-out.strings proc-cat-weighted-out.strings
 SUBSTITUTE_TXTS=cat2dog.substitute
 
 %.hfst: %.txt
 	${top_builddir}/tools/src/hfst-txt2fst -e '@0@' < $< > $@
-
+%.hfst.ol: %.txt
+	${top_builddir}/tools/src/hfst-txt2fst -e '@0@' -i $< | ${top_builddir}/tools/src/hfst-fst2fst -w -o $@
+%.gen.hfst.ol: %.txt
+	${top_builddir}/tools/src/hfst-txt2fst -e '@0@' -i $< | ${top_builddir}/tools/src/hfst-invert | ${top_builddir}/tools/src/hfst-fst2fst -w -o $@
 # files needed for test programs
 EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(SUBSTITUTE_TXTS)

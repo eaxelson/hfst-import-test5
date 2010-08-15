@@ -1,6 +1,6 @@
 #!/bin/sh
 for f in ../../tools/src/hfst-* ; do
-    if [ -x "$f" ] ; then
+    if [ -x "$f" -a ! -d "$f" ] ; then
         if ! "$f" --version > version.out ; then
             rm version.out
             echo $f has broken version

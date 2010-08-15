@@ -3,9 +3,9 @@
 1 2 e e
 2 3 s s
 3 4 t t
-4 9 @0@ +n
+4 9 @_EPSILON_SYMBOL_@ +n
 5 6 e e
 6 7 s s
 7 8 t t
-8 9 @0@ +np
+8 9 @_EPSILON_SYMBOL_@ +np
 9
