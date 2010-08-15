@@ -18,7 +18,6 @@
 #include <stdexcept>
 #include "hfst-proc.h"
 #include "tokenizer.h"
-#include "flag-diacritics.h"
 #include "alphabet.h"
 
 #include "implementations/optimized-lookup/transducer.h"
