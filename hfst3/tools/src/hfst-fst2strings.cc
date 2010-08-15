@@ -53,6 +53,8 @@ static int max_input_length = 0;
 static int max_output_length = 0;
 static std::string input_prefix;
 static std::string output_prefix;
+static std::string input_exclude;
+static std::string output_exclude;
 
 void
 print_usage()
@@ -68,18 +70,21 @@ print_usage()
 		);
 #               endif
 	
-	fprintf(message_out, "%-35s%s", "  -o, --output=OUTFILE",        "Write results to OUTFILE\n");
-	fprintf(message_out, "%-35s%s", "  -i, --input=INFILE",          "Read input from INFILE\n");
-	fprintf(message_out, "%-35s%s", "  -n, --max-strings=INT",       "The maximum number of strings printed\n");
-	fprintf(message_out, "%-35s%s", "  -N, --nbest=INT",             "Prune the transducer to a max number of best strings\n");
-	fprintf(message_out, "%-35s%s", "  -c, --cycles=INT",            "How many times to follow cycles. Negative=infinite (default)\n");
-	fprintf(message_out, "%-35s%s", "  -w, --print-weights",         "Display the weight for each string\n");
-	fprintf(message_out, "%-35s%s", "  -e, --eval-flag-diacritics",  "Only print strings with pass flag diacritic checks\n");
-	fprintf(message_out, "%-35s%s", "  -f, --filter-flag-diacritics","Don't print flag diacritic symbols (only with -e)\n");
-	fprintf(message_out, "%-35s%s", "  -l, --max-in-length=INT",     "Ignore paths with an input string longer than length\n");
-	fprintf(message_out, "%-35s%s", "  -L, --max-out-length=INT",    "Ignore paths with an output string longer than length\n");
-	fprintf(message_out, "%-35s%s", "  -p, --in-prefix=PREFIX",      "Ignore paths with an input string not beginning with PREFIX\n");
-	fprintf(message_out, "%-35s%s", "  -P, --out-prefix=PREFIX",     "Ignore paths with an output string not beginning with PREFIX\n");
+	fprintf(message_out, "%-30s%s", "  -o, --output=OUTFILE",        "Write results to OUTFILE\n");
+	fprintf(message_out, "%-30s%s", "  -i, --input=INFILE",          "Read input from INFILE\n");
+	fprintf(message_out, "%-30s%s", "  -n, --max-strings=INT",       "The maximum number of strings printed\n");
+	fprintf(message_out, "%-30s%s", "  -N, --nbest=INT",             "Prune the transducer to a max number of best strings\n");
+	fprintf(message_out, "%-30s%s", "  -c, --cycles=INT",            "How many times to follow cycles. Negative=infinite (default)\n");
+	fprintf(message_out, "%-30s%s", "  -w, --print-weights",         "Display the weight for each string\n");
+	fprintf(message_out, "%-30s%s", "  -e, --eval-flags",            "Only print strings with pass flag diacritic checks\n");
+	fprintf(message_out, "%-30s%s", "  -f, --filter-flags",          "Don't print flag diacritic symbols (only with -e)\n");
+	fprintf(message_out, "%-30s%s", "  -l, --max-in-length=INT",     "Ignore paths with an input string longer than length\n");
+	fprintf(message_out, "%-30s%s", "  -L, --max-out-length=INT",    "Ignore paths with an output string longer than length\n");
+	fprintf(message_out, "%-30s%s", "  -p, --in-prefix=PREFIX",      "Ignore paths with an input string not beginning with PREFIX\n");
+	fprintf(message_out, "%-30s%s", "  -P, --out-prefix=PREFIX",     "Ignore paths with an output string not beginning with PREFIX\n");
+	fprintf(message_out, "%-30s%s", "  -x, --in-exclude=STR",        "Ignore paths with an input string containing STR\n");
+	fprintf(message_out, "%-30s%s", "  -X, --out-exclude=STR",       "Ignore paths with an output string containing STR\n");
+	
 	fprintf(message_out, "\n");
 	print_common_unary_program_parameter_instructions(message_out);
 	/*fprintf(message_out,
@@ -124,16 +129,18 @@ parse_options(int argc, char** argv)
 			{"max-strings", required_argument, 0, 'n'},
 			{"cycles", required_argument, 0, 'c'},
 			{"print-weights", no_argument, 0, 'w'},
-			{"eval-flag-diacritics", no_argument, 0, 'e'},
-			{"filter-flag-diacritics", no_argument, 0, 'f'},
+			{"eval-flags", no_argument, 0, 'e'},
+			{"filter-flags", no_argument, 0, 'f'},
 			{"max-in-length", required_argument, 0, 'l'},
 			{"max-out-length", required_argument, 0, 'L'},
 			{"in-prefix", required_argument, 0, 'p'},
-			{"out-prefix", required_argument, 0, 'O'},
+			{"out-prefix", required_argument, 0, 'P'},
+			{"in-exclude", required_argument, 0, 'x'},
+			{"out-exclude", required_argument, 0, 'X'},
 			{0,0,0,0}
 		};
 		int option_index = 0;
-		char c = getopt_long(argc, argv, "R:dhi:N:n:c:o:qsvVwefl:L:p:P:",
+		char c = getopt_long(argc, argv, "R:dhi:N:n:c:o:qsvVwefl:L:p:P:x:X:",
 							 long_options, &option_index);
 		if (-1 == c)
 		{
@@ -179,6 +186,12 @@ parse_options(int argc, char** argv)
 		  break;
 		case 'P':
 		  output_prefix = optarg;
+		  break;
+		case 'x':
+		  input_exclude = optarg;
+		  break;
+		case 'X':
+		  output_exclude = optarg;
 		  break;
 #include "inc/getopt-cases-error.h"
 		}
@@ -258,6 +271,11 @@ class Callback : public hfst::ExtractStringsCb
       if(wp.ostring.compare(0, output_prefix.length(), output_prefix) != 0)
         return RetVal(true, false); // continue searching, break off this path
     }
+    
+    if(input_exclude.length() > 0 && wp.istring.find(input_exclude) != std::string::npos)
+      return RetVal(true, false); // continue searching, break off this path
+    if(output_exclude.length() > 0 && wp.ostring.find(output_exclude) != std::string::npos)
+      return RetVal(true, false); // continue searching, break off this path
     
     // the path passed the checks. Print it if it is final
     if(final)
