@@ -57,7 +57,7 @@ void ConvertTransducerAlphabet::inspect_node(StateId n, StateIdSet& visited_node
     StdArc arc = aiter.Value();
     std::string input_symbol_string = transducer->InputSymbols()->Find(arc.ilabel);
     
-    if(!TransducerAlphabet::is_flag_diacritic(input_symbol_string))
+    if(!FdOperation::is_diacritic(input_symbol_string))
       input_symbols.insert(input_symbol_string);
     all_symbol_set.insert(input_symbol_string);
     if(transducer->OutputSymbols() != NULL)
@@ -84,7 +84,7 @@ void ConvertTransducerAlphabet::populate_symbol_table(OfstSymbolCountMap &input_
   std::multimap<unsigned int,int64> count_keys;
   for (OfstSymbolCountMap::iterator it=input_symbol_counts.begin(); it!=input_symbol_counts.end(); ++it)
   {
-    if(!TransducerAlphabet::is_flag_diacritic(ofst_symbol_table->Find(it->first)))
+    if(!FdOperation::is_diacritic(ofst_symbol_table->Find(it->first)))
       count_keys.insert(std::pair<unsigned int,int64>(it->second,it->first));
     else
       count_keys.insert(std::pair<unsigned int,int64>(0,it->first)); 
@@ -188,7 +188,7 @@ SymbolNumber ConvertTransducerAlphabet::lookup_ofst_output_symbol(int64 s) const
 
 bool ConvertTransducerAlphabet::is_flag_diacritic(SymbolNumber symbol) const
 {
-  return TransducerAlphabet::is_flag_diacritic(symbol_table[symbol]);
+  return FdOperation::is_diacritic(symbol_table[symbol]);
 }
 
 TransducerAlphabet ConvertTransducerAlphabet::to_alphabet() const
@@ -590,7 +590,7 @@ void ConvertTransducerHeader::full_traversal(TransducerHeader& h, TransduceR* tr
     StateId target = a.nextstate;
     
     h.number_of_transitions++;
-    if(!TransducerAlphabet::is_flag_diacritic(tr->InputSymbols()->Find(a.ilabel)))
+    if(!FdOperation::is_diacritic(tr->InputSymbols()->Find(a.ilabel)))
       all_input_symbols.insert(a.ilabel);
     
     if(l.input_symbol == 0)
@@ -623,7 +623,7 @@ void ConvertTransducerHeader::find_input_epsilon_cycles(StateId n,StateId start,
   for (ArcIterator aiter(*tr,n); !aiter.Done(); aiter.Next())
   {
     StdArc a = aiter.Value();
-    if(a.ilabel != 0 || TransducerAlphabet::is_flag_diacritic(tr->InputSymbols()->Find(a.ilabel)))
+    if(a.ilabel != 0 || FdOperation::is_diacritic(tr->InputSymbols()->Find(a.ilabel)))
       continue;
     else
     {

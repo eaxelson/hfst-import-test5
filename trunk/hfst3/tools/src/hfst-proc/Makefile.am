@@ -15,28 +15,18 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS=implementations
-AUTOMAKE_OPTIONS=subdir-objects
-lib_LTLIBRARIES = libhfst.la
+LDADD = $(top_builddir)/libhfst/src/libhfst.la
+AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib
+AM_CXXFLAGS = $(WERR_CFLAGS)
 
-AM_CXXFLAGS=-Wno-deprecated -Wall -Wextra
+if WANT_PROC
+MAYBE_PROC=hfst-proc
+endif
 
-# HFST bridge specific stuff
-HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc \
-			 HfstOutputStream.cc HfstRules.cc # HfstCompiler.cc
+noinst_HEADERS = \
+	hfst-proc.h formatter.h lookup-path.h lookup-state.h tokenizer.h \
+	transducer.h buffer.h applicators.h alphabet.h
 
-# libtool takes over
-libhfst_la_SOURCES =  $(HFST_SRCS)
-libhfst_la_LIBADD = implementations/libhfstimplementations.la
+bin_PROGRAMS=$(MAYBE_PROC)
+hfst_proc_SOURCES = hfst-proc.cc formatter.cc lookup-path.cc lookup-state.cc tokenizer.cc transducer.cc applicators.cc alphabet.cc
 
-# we only have one library target but would like a particular includedir
-# structure for various headers, so we do this
-hfstincludedir = $(includedir)/hfst
-
-HFST_HDRS = \
-	HfstTransducer.h \
-	apply_schemas.h
-
-hfstinclude_HEADERS = $(HFST_HDRS)
-
-libhfst_la_LDFLAGS = -no-undefined -version-info 1:0:0

@@ -1,21 +1,3 @@
-/*
-  
-  Copyright 2009 University of Helsinki
-  
-  Licensed under the Apache License, Version 2.0 (the "License");
-  you may not use this file except in compliance with the License.
-  You may obtain a copy of the License at
-  
-  http://www.apache.org/licenses/LICENSE-2.0
-  
-  Unless required by applicable law or agreed to in writing, software
-  distributed under the License is distributed on an "AS IS" BASIS,
-  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-  See the License for the specific language governing permissions and
-  limitations under the License.
-  
-*/
-
 #include <getopt.h>
 #include <fstream>
 #include <cstdlib>
@@ -31,6 +13,39 @@ bool displayUniqueFlag = false;
 int maxAnalyses = std::numeric_limits<int>::max();
 bool preserveDiacriticRepresentationsFlag = false;
 bool printDebuggingInformationFlag = false;
+
+static bool handle_hfst3_header(std::istream& is)
+{
+  const char* header1 = "HFST3";
+  int header_loc = 0; // how much of the header has been found
+  int c;
+  for(header_loc = 0; header_loc<6; header_loc++)
+  {
+    c = is.get();
+    if(c != header1[header_loc])
+      break;
+  }
+  
+  if(header_loc == 6) // we found it
+  {
+    const char* header2[] = {"HFST_OL_TYPE", "HFST_OLW_TYPE"};
+    std::string h_str;
+    std::getline(is, h_str, '\0');
+    
+    if(h_str == header2[0] || h_str == header2[1])
+      return true;
+    throw TransducerHasWrongTypeException();
+    return false;
+  }
+  else // nope. put back what we've taken
+  {
+    is.putback(c); // first the non-matching character
+    for(int i=header_loc-1; i>=0; i--) // then the characters that did match (if any)
+      is.putback(header1[i]);
+    
+    return false;
+  }
+}
 
 void stream_error(const char* e)
 {
@@ -292,6 +307,7 @@ int main(int argc, char **argv)
   
   try
   {
+    handle_hfst3_header(in);
     ProcTransducer t(in);
     if(verboseFlag)
       std::cout << "Transducer successfully loaded" << std::endl;

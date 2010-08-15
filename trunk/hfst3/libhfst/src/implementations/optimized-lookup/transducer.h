@@ -7,6 +7,7 @@
 #include <limits>
 #include <string>
 #include "../HfstExceptions.h"
+#include "../FlagDiacritics.h"
 
 namespace hfst_ol {
 using namespace hfst;
@@ -24,6 +25,7 @@ typedef unsigned int StateIdNumber;
 typedef short ValueNumber;
 typedef float Weight;
 typedef set<SymbolNumber> SymbolNumberSet;
+typedef vector<SymbolNumber> SymbolNumberVector;
 typedef set<TransitionTableIndex> TransitionTableIndexSet;
 typedef vector<string> SymbolTable;
 
@@ -70,6 +72,11 @@ class TransducerHeader
   bool has_input_epsilon_cycles;
   bool has_unweighted_input_epsilon_cycles;
 
+  static void header_error()
+  {
+    throw TransducerHasWrongTypeException();
+  }
+
   template<class T>
   static T read_property(std::istream& is)
   {
@@ -84,7 +91,12 @@ class TransducerHeader
   {
     unsigned int prop;
     is.read(reinterpret_cast<char*>(&prop), sizeof(unsigned int));
-    return (prop != 0);
+    if(prop == 0)
+      return false;
+    if(prop == 1)
+      return true;
+    header_error();
+    return false;
   }
   static void write_bool_property(bool value, std::ostream& os)
   {
@@ -200,14 +212,14 @@ class TransducerHeader
 
 class TransducerAlphabet
 {
- private:
+ protected:
   SymbolTable symbol_table;
-  SymbolNumberSet flag_diacritics_set;
+  FdTable<SymbolNumber> fd_table;
   
  public:
   TransducerAlphabet()
   {
-    symbol_table.push_back("@0@"); // epsilon
+    symbol_table.push_back("@_EPSILON_SYMBOL_@");
   }
   TransducerAlphabet(istream& is, SymbolNumber symbol_count);
   TransducerAlphabet(const SymbolTable& st);
@@ -223,16 +235,15 @@ class TransducerAlphabet
     }
   }
   
-  static bool is_flag_diacritic(string str)
-  {
-    return str.length() >= 5 && str.at(0) == '@' && 
-           str.at(str.length()-1) == '@' && str.at(2) == '.';
-  }
+  bool has_flag_diacritics() const
+    { return fd_table.num_features() > 0; }
   bool is_flag_diacritic(SymbolNumber symbol) const
-    { return flag_diacritics_set.find(symbol) != flag_diacritics_set.end(); }
-  
-  const SymbolTable& get_symbol_table() const 
+    { return fd_table.is_diacritic(symbol); }
+    
+  const SymbolTable& get_symbol_table() const
     { return symbol_table; }
+  const FdTable<SymbolNumber>& get_fd_table() const
+    { return fd_table; }
 };
 
 class TransitionIndex
@@ -434,34 +445,37 @@ class TransducerTables : public TransducerTablesInterface
 class Transducer
 {
  protected:
-  TransducerHeader header;
-  TransducerAlphabet alphabet;
+  TransducerHeader* header;
+  TransducerAlphabet* alphabet;
   
   TransducerTablesInterface* tables;
   
+  Transducer();
   Transducer(const TransducerHeader& header, const TransducerAlphabet& alphabet,
              const TransducerTable<TransitionIndex>& index_table,
              const TransducerTable<Transition>& transition_table);
   Transducer(const TransducerHeader& header, const TransducerAlphabet& alphabet,
              const TransducerTable<TransitionWIndex>& index_table,
              const TransducerTable<TransitionW>& transition_table);
+  
+  void load_tables(istream& is);
  public:
   Transducer(istream& is);
   Transducer(bool weighted);
-  ~Transducer();
-  
+  virtual ~Transducer();
+
   void write(ostream& os) const;
   void display() const;
-  
+
   const TransducerHeader& get_header() const
-    { return header; }
+    { return *header; }
   const TransducerAlphabet& get_alphabet() const
-    { return alphabet; }
+    { return *alphabet; }
   const TransitionIndex& get_index(TransitionTableIndex i) const
     { return tables->get_index(i); }
   const Transition& get_transition(TransitionTableIndex i) const
     { return tables->get_transition(i); }
-  
+
   // state_index must be an index to a state which is defined as either:
   // (1) the start of a set of entries in the transition index table, or
   // (2) the boundary before a set of entries in the transition table, in
@@ -469,7 +483,7 @@ class Transducer
   // This function will return a vector of indices to the transition table,
   // i.e. the arcs from the given state
   TransitionTableIndexSet get_transitions_from_state(TransitionTableIndex state_index) const;
-  
+
   friend class ConvertTransducer;
 };
 

@@ -13,7 +13,7 @@
 #include <config.h>
 #endif
 
-#include "../../hfst3/libhfst/src/implementations/optimized-lookup/transducer.h"
+#include "implementations/optimized-lookup/transducer.h"
 
 #define OL_FULL_DEBUG 0
 

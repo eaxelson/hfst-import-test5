@@ -3,7 +3,7 @@
 
 #include "hfst-proc.h"
 #include "transducer.h"
-#include "../../hfst3/libhfst/src/implementations/FlagDiacritics.h"
+#include "implementations/FlagDiacritics.h"
 
 /**
  * Represents a (possibly partial) path through a transducer. This is used
