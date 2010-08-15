@@ -19,16 +19,24 @@ LookupPath::follow(const TransitionIndex& index)
 {
   this->index = index.get_target();
   final = index.final();
+  if(indexes_transition_index_table(this->index))
+    final = transducer.get_index(this->index).final();
+  else
+    final = transducer.get_transition(this->index).final();
 }
 
 bool
 LookupPath::follow(const Transition& transition)
 {
   index = transition.get_target();
-  final = transition.final();
+  if(indexes_transition_index_table(index))
+    final = transducer.get_index(index).final();
+  else
+    final = transducer.get_transition(index).final();
+
   if(transducer.get_alphabet().symbol_to_string(transition.get_output_symbol()) != "")
     output_symbols.push_back(transition.get_output_symbol());
-  
+
   return true;
 }
 
@@ -64,18 +72,25 @@ LookupPathFd::follow(const Transition& transition)
 void
 LookupPathW::follow(const TransitionIndex& index)
 {
-  final_weight = static_cast<const TransitionWIndex&>(index).final_weight();
-  return LookupPath::follow(index);
+  LookupPath::follow(index);
+  if(indexes_transition_index_table(this->index))
+    final_weight = static_cast<const TransitionWIndex&>(transducer.get_index(this->index)).final_weight();
+  else
+    final_weight = static_cast<const TransitionW&>(transducer.get_transition(this->index)).get_weight();
 }
 
 bool
 LookupPathW::follow(const Transition& transition)
 {
   weight += static_cast<const TransitionW&>(transition).get_weight();
+  bool res = LookupPath::follow(transition);
   //**is this right? I'm not so sure about the precise semantics of weights
   //  and finals in this system**
-  final_weight = static_cast<const TransitionW&>(transition).get_weight();
-  return LookupPath::follow(transition);
+  if(indexes_transition_index_table(index))
+    final_weight = static_cast<const TransitionWIndex&>(transducer.get_index(index)).final_weight();
+  else
+    final_weight = static_cast<const TransitionW&>(transducer.get_transition(index)).get_weight();
+  return res;
 }
 
 bool
