@@ -1723,6 +1723,11 @@ namespace hfst { namespace implementations
 						      const StringPair old_symbol_pair,
 						      StdVectorFst *transducer)
   {
+    //write_in_att_format(t, stderr);
+    //cerr << "--\n";
+    //write_in_att_format(transducer, stderr);
+    //cerr << "----";
+
     int states = t->NumStates();
     for( int i = 0; i < states; ++i ) {
 
@@ -1790,6 +1795,10 @@ namespace hfst { namespace implementations
 	}
       }
     }
+
+    //write_in_att_format(t, stderr);
+    //cerr << "\n\n";
+
     return t;
   }
 

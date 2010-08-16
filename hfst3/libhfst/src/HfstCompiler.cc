@@ -162,11 +162,11 @@ namespace hfst
   }
 
   HfstCompiler::Range *HfstCompiler::svar_value( char *name ) {
-    return svar_value(name);
+    return SFST::svar_value(name);
   }
 
   HfstCompiler::Range *HfstCompiler::rsvar_value( char *name ) {
-    return rsvar_value(name);
+    return SFST::rsvar_value(name);
   }
 
   HfstTransducer * HfstCompiler::insert_freely(HfstTransducer *t, Character input, Character output) {
@@ -235,9 +235,11 @@ namespace hfst
 
   HfstTransducer * HfstCompiler::explode( HfstTransducer *t ) {
 
-    printf("explode...\n");
-    if (SFST::RS.size() == 0 && SFST::RSS.size() == 0)
+    //printf("explode...\n");
+    if (SFST::RS.size() == 0 && SFST::RSS.size() == 0) {
+      //printf("... no need to explode\n");
       return t;
+    }
     
     t->minimize();
 
@@ -245,25 +247,20 @@ namespace hfst
     // It is needed when weighted paths are transformed into transducers.
     HfstTokenizer TOK = t->create_tokenizer();
 
-    printf("(0)\n");
-
     // transducer agreement variable names
     vector<char*> name;
     for( SFST::RVarSet::iterator it=SFST::RS.begin(); it!=SFST::RS.end(); it++) {
       name.push_back(*it);
-      printf("pushed back %s\n", *it);
     }
-    SFST::RS.clear();  // ?
+    SFST::RS.clear();
     
-    printf("(1)\n");
-
     // replace all agreement variables
     for( size_t i=0; i<name.size(); i++ ) {
-      printf("substituting transducer agreement variable \"%s\"\n", name[i]);
+      //printf("substituting transducer agreement variable \"%s\"\n", name[i]);
       HfstTransducer *nt = new HfstTransducer(t->get_type()); // an initially empty transducer
       
       // enumerate all paths of the transducer
-      HfstTransducer *vt=var_value(strdup(name[i]));
+      HfstTransducer *vt=var_value(strdup(name[i])); // var_value frees its argument
       WeightedPaths<float>::Set paths;
       vt->extract_strings(paths, -1, -1);
       delete vt;
@@ -279,22 +276,22 @@ namespace hfst
       
       // insert each path
       for( size_t j=0; j<transducer_paths.size(); j++ ) {
-	printf("substituting transducer agreement variable \"%s\" with transducer:\n", name[i]);
-	cerr << *(transducer_paths[j]);
+	//printf("  substituting transducer agreement variable \"%s\" with transducer:\n", name[i]);
+	//cerr << *(transducer_paths[j]);
 	HfstTransducer ti(*t);
-	printf("in transducer:\n");
-	cerr << ti;
+	//printf("in transducer:\n");
+	//cerr << ti;
 	ti.substitute(StringPair(std::string(name[i]), std::string(name[i])), *(transducer_paths[j]));
-	printf("...substituted\n");
+	//printf("  ...substituted\n");
 	delete transducer_paths[j];	
 	nt->disjunct(ti);
       }
+      free(name[i]); // svar_value was given a copy of name[i], so the value is freed here
+
       delete t;
       t = nt;
     }
     
-    printf("(2)\n");
-
     name.clear();
     for( SFST::RVarSet::iterator it=SFST::RSS.begin(); it!=SFST::RSS.end(); it++)
       name.push_back(*it);
@@ -302,8 +299,9 @@ namespace hfst
     
     // replace all agreement variables
     for( size_t i=0; i<name.size(); i++ ) {
+      //printf("substituting range agreement variable \"%s\"\n", name[i]);
       HfstTransducer *nt = new HfstTransducer(t->get_type()); 
-      Range *r=svar_value(name[i]);
+      Range *r=svar_value(strdup(name[i]));  // svar_value frees its argument
       
       // insert each character
       while (r != NULL) {
@@ -311,6 +309,7 @@ namespace hfst
 	// insertion
 	HfstTransducer ti(*t);
 	// agreement variable marker should always appear on both sides of the tape..
+	//printf("substituting agreement range variable %s with %s\n", name[i], SFST::TheAlphabet.code2symbol(r->character));
 	ti.substitute(std::string(name[i]), SFST::TheAlphabet.code2symbol(r->character));	
 	nt->disjunct(ti);
 	
@@ -318,6 +317,7 @@ namespace hfst
 	delete r;
 	r = next;
       }
+      free(name[i]);  // svar_value was given a copy of name[i], so the value is freed here
       delete t;
       t = nt;
     }    
@@ -475,7 +475,7 @@ namespace hfst
   
   HfstTransducer * HfstCompiler::result( HfstTransducer *t, bool switch_flag) {
 
-    printf("result...\n");
+    //printf("result...\n");
     t = explode(t);
     
     // delete the variable values

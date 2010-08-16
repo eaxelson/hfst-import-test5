@@ -894,18 +894,13 @@ void HfstTransducer::test_minimize()
     ImplementationType original_type = this->type;
     this->convert(TROPICAL_OFST_TYPE);
     transducer.convert(TROPICAL_OFST_TYPE);
-    printf("HERE\n");
-    fst::StdVectorFst * tropical_ofst_temp =
-      this->tropical_ofst_interface.substitute(implementation.tropical_ofst,symbol_pair,transducer.implementation.tropical_ofst);
-    printf("DONE\n");
-    delete implementation.tropical_ofst;
-    printf("(0)\n");
-    implementation.tropical_ofst = tropical_ofst_temp;
-    printf("(1)\n");
+
+    this->harmonize(transducer);
+
+    // substitute modifies its argument
+    this->tropical_ofst_interface.substitute(implementation.tropical_ofst,symbol_pair,transducer.implementation.tropical_ofst);
     this->convert(original_type);
-    printf("(2)\n");
     transducer.convert(original_type);
-    printf("RETURNING\n");
     return *this;
   }
 

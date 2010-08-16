@@ -20,11 +20,13 @@ extern char *yytext;
 
 void yyerror(char *text);
 void warn(char *text);
-void warn2(char *text, char *text2);
+void warn2(const char *text, char *text2);
 int yylex( void );
 int yyparse( void );
 
 ImplementationType type;
+
+bool DEBUG=false;
 
 static int Switch=0;
 HfstTransducer * Result;
@@ -80,12 +82,12 @@ ASSIGNMENTS: ASSIGNMENTS ASSIGNMENT {}
           | /* nothing */           {}
           ;
 
-ASSIGNMENT: VAR '=' RE              { if (HfstCompiler::def_var($1,$3)) warn2("assignment of empty transducer to",$1); }
-          | RVAR '=' RE             { if (HfstCompiler::def_rvar($1,$3)) warn2("assignment of empty transducer to",$1); }
-          | SVAR '=' VALUES         { if (def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
-          | RSVAR '=' VALUES        { if (def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
+ASSIGNMENT: VAR '=' RE              { if (DEBUG) { printf("defining transducer variable \"%s\"..\n", $1); }; if (HfstCompiler::def_var($1,$3)) warn2("assignment of empty transducer to",$1); }
+          | RVAR '=' RE             { if (DEBUG) { printf("defining agreement transducer variable \"%s\"..\n", $1); }; if (HfstCompiler::def_rvar($1,$3)) warn2("assignment of empty transducer to",$1); }
+          | SVAR '=' VALUES         { if (DEBUG) { printf("defining range variable \"%s\"..\n", $1); }; if (def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
+          | RSVAR '=' VALUES        { if (DEBUG) { printf("defining agreement range variable \"%s\"..\n", $1); }; if (def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
           // | RE PRINT STRING         { write_to_file($1, $3); }
-          | ALPHA RE                { HfstCompiler::def_alphabet($2); delete $2; }
+          | ALPHA RE                { if (DEBUG) { printf("defining alphabet..\n"); }; HfstCompiler::def_alphabet($2); delete $2; }
           ;
 
 RE:         RE ARROW CONTEXTS2      { $$ = HfstCompiler::restriction($1,$2,$3,0); }
@@ -107,8 +109,8 @@ RE:         RE ARROW CONTEXTS2      { $$ = HfstCompiler::restriction($1,$2,$3,0)
           | RE INSERT CODE           { $$ = HfstCompiler::insert_freely($1,$3,$3); }
           | RANGE ':' RANGE  { $$ = HfstCompiler::new_transducer($1,$3,type); }
           | RANGE            { $$ = HfstCompiler::new_transducer($1,$1,type); }
-          | VAR              { $$ = HfstCompiler::var_value($1); }
-          | RVAR             { $$ = HfstCompiler::rvar_value($1,type); }
+          | VAR              { if (DEBUG) { printf("calling transducer variable \"%s\"\n", $1); }; $$ = HfstCompiler::var_value($1); }
+          | RVAR             { if (DEBUG) { printf("calling agreement transducer variable \"%s\"\n", $1); }; $$ = HfstCompiler::rvar_value($1,type); }
           | RE '*'           { $1->repeat_star(); $$ = $1; }
           | RE '+'           { $1->repeat_plus(); $$ = $1; }
           | RE '?'           { $1->optionalize(); $$ = $1; }
@@ -131,7 +133,7 @@ RANGES:     RANGE RANGES     { $$ = add_range($1,$2); }
 
 RANGE:      '[' VALUES ']'   { $$=$2; }
           | '[' '^' VALUES ']' { $$=complement_range($3); }
-          | '[' RSVAR ']'    { $$=HfstCompiler::rsvar_value($2); }
+          | '[' RSVAR ']'    { if (DEBUG) { printf("calling agreement range variable \"%s\"\n", $2); }; $$=HfstCompiler::rsvar_value($2); }
           | '.'              { $$=NULL; }
           | CODE             { $$=HfstCompiler::add_value($1,NULL); }
           ;
@@ -158,7 +160,7 @@ VALUES:     VALUE VALUES           { $$=HfstCompiler::append_values($1,$2); }
           ;
 
 VALUE:      LCHAR '-' LCHAR	   { $$=HfstCompiler::add_values($1,$3,NULL); }
-          | SVAR                   { $$=HfstCompiler::svar_value($1); }
+          | SVAR                   { if (DEBUG) { printf("calling range variable \"%s\"", $1); }; $$=HfstCompiler::svar_value($1); }
           | LCHAR  	           { $$=HfstCompiler::add_value(HfstCompiler::character_code($1),NULL); }
           | CODE		   { $$=HfstCompiler::add_value($1,NULL); }
 	  | SCHAR		   { $$=HfstCompiler::add_value($1,NULL); }
@@ -237,7 +239,7 @@ void warn(char *text)
 /*                                                                 */
 /*******************************************************************/
 
-void warn2(char *text, char *text2)
+void warn2(const char *text, char *text2)  // HFST: added const
 
 {
   cerr << "\n" << SFST::FileName << ":" << yylineno << ": warning: " << text << ": ";
