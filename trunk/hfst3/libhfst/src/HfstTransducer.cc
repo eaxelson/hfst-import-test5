@@ -533,9 +533,10 @@ void HfstTransducer::test_minimize()
 	return one_copy.sfst_interface.are_equivalent(one_copy.implementation.sfst, another_copy.implementation.sfst);
 	break;*/
       case SFST_TYPE:
-	one_copy.convert(TROPICAL_OFST_TYPE);
-	another_copy.convert(TROPICAL_OFST_TYPE);
-	return one_copy.tropical_ofst_interface.are_equivalent(one_copy.implementation.tropical_ofst, another_copy.implementation.tropical_ofst);
+	//one_copy.convert(TROPICAL_OFST_TYPE);
+	//another_copy.convert(TROPICAL_OFST_TYPE);
+	//return one_copy.tropical_ofst_interface.are_equivalent(one_copy.implementation.tropical_ofst, another_copy.implementation.tropical_ofst);
+	return one_copy.sfst_interface.are_equivalent(one_copy.implementation.sfst, another_copy.implementation.sfst);
       case TROPICAL_OFST_TYPE:
 	return one_copy.tropical_ofst_interface.are_equivalent(one_copy.implementation.tropical_ofst, another_copy.implementation.tropical_ofst);
       case LOG_OFST_TYPE:

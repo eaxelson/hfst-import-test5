@@ -23,32 +23,30 @@
 namespace hfst
 {
  
-  HfstCompiler::HfstCompiler() {}
-
-  HfstCompiler::VarMap HfstCompiler::VM;
-  
   HfstTransducer * HfstCompiler::make_transducer(Range *r1, Range *r2, ImplementationType type)
   {
+
     HfstTransducer * t = new HfstTransducer(type);
 
-    /*if (type == SFST_TYPE) {
-      t->implementation.sfst = SFST::make_transducer(r1,r2);
-      cerr << *(t->implementation.sfst);
-      return t;
-      }*/
+    /*
+    if (type == SFST_TYPE && SFST_IN_USE) {
+       t->implementation.sfst = sfst_interface->make_transducer(r1,r2);
+       return t;
+    }
+    */
 
     if (r1 == NULL || r2 == NULL) {
-      if (!SFST::Alphabet_Defined)
+      if (!Alphabet_Defined)
 	printf("ERROR: The wildcard symbol '.' requires the definition of an alphabet");
       
       // one of the ranges was '.'
-      for(SFST::Alphabet::const_iterator it=SFST::TheAlphabet.begin(); 
-	  it!=SFST::TheAlphabet.end(); it++) {
-	if ((r1 == NULL || SFST::in_range(it->lower_char(), r1)) &&
-	    (r2 == NULL || SFST::in_range(it->upper_char(), r2))) {
+      for(HfstAlphabet::const_iterator it=TheAlphabet.begin(); 
+	  it!=TheAlphabet.end(); it++) {
+	if ((r1 == NULL || in_range(it->first, r1)) &&
+	    (r2 == NULL || in_range(it->second, r2))) {
 	  HfstTransducer tr(
-			    SFST::TheAlphabet.code2symbol(it->lower_char()),
-			    SFST::TheAlphabet.code2symbol(it->upper_char()),
+			    TheAlphabet.code2symbol(it->first),
+			    TheAlphabet.code2symbol(it->second),
 			    type);
 	  t->disjunct(tr);
 	}
@@ -57,8 +55,8 @@ namespace hfst
     else {
       for (;;) {
 	HfstTransducer tr(
-			  SFST::TheAlphabet.code2symbol(r1->character),
-			  SFST::TheAlphabet.code2symbol(r2->character),
+			  TheAlphabet.code2symbol(r1->character),
+			  TheAlphabet.code2symbol(r2->character),
 			  type);
 	t->disjunct(tr);
 	if (!r1->next && !r2->next)
@@ -77,40 +75,40 @@ namespace hfst
   {
     HfstTransducer * t = make_transducer(r1, r2, type);
     if (r1 != r2)
-      SFST::free_values(r1);
-    SFST::free_values(r2);
+      free_values(r1);
+    free_values(r2);
     return t;
   }
   
-  HfstCompiler::Character HfstCompiler::character_code( unsigned int uc )
-  { return SFST::character_code(uc); }
+  Character HfstCompiler::character_code( unsigned int uc )
+  { return EOF; } // COPY
   
-  HfstCompiler::Character HfstCompiler::symbol_code( char *s )
+  Character HfstCompiler::symbol_code( char *s )
   { // In SFST programming language epsilon is denoted as "<>"
     // but in HFST as "@_EPSILON_SYMBOL_@". That is why it must be
     // treated separately here.
     if (strcmp(s,"<>") == 0)
       return 0;
-    return SFST::symbol_code(s); }
+    return EOF; } // COPY
   
   unsigned int HfstCompiler::utf8toint( char *s )
-  { return SFST::utf8toint(s); }
+  { return EOF; } // COPY
     
-  HfstCompiler::Range *HfstCompiler::add_value( Character c, Range *r) {
-    return SFST::add_value(c,r); }
+  Range * HfstCompiler::add_value( Character c, Range *r) {
+    return NULL; } // COPY
 
-  HfstCompiler::Range *HfstCompiler::add_values( unsigned int i, unsigned int j, Range *r) {
-    return SFST::add_values(i,j,r); }
+  Range * HfstCompiler::add_values( unsigned int i, unsigned int j, Range *r) {
+    return NULL; } // COPY
 
-  HfstCompiler::Range *HfstCompiler::append_values( Range *r1, Range *r2 ) {
-    return SFST::append_values(r1,r2); }
+  Range * HfstCompiler::append_values( Range *r1, Range *r2 ) {
+    return NULL; } // COPY
 
-  HfstCompiler::Ranges *HfstCompiler::add_range( Range *r, Ranges *l ) {
-    return SFST::add_range(r,l); }
+  Ranges * HfstCompiler::add_range( Range *r, Ranges *l ) {
+    return NULL; } // COPY
 
-  HfstCompiler::Range *HfstCompiler::complement_range( Range *r ) {
-    return SFST::complement_range(r);
-  }
+  Range * HfstCompiler::complement_range( Range *r ) {
+    return NULL;
+  } // COPY
   
   bool HfstCompiler::def_var( char *name, HfstTransducer *t ) {
     // delete the old value of the variable
@@ -151,43 +149,50 @@ namespace hfst
   }
 
   HfstTransducer * HfstCompiler::rvar_value( char *name, ImplementationType type ) {
-    if (SFST::RS.find(name) == SFST::RS.end())
-      SFST::RS.insert(SFST::fst_strdup(name));
-    Range *r=SFST::add_value(SFST::symbol_code(name), NULL);
+    if (RS.find(name) == RS.end())
+      RS.insert(fst_strdup(name));
+    Range *r=add_value(symbol_code(name), NULL);
     return new_transducer(r,r,type); 
   }
 
   bool HfstCompiler::def_svar( char *name, Range *r ) {
-    return SFST::def_svar(name,r);
+    return false; // COPY
   }
 
-  HfstCompiler::Range *HfstCompiler::svar_value( char *name ) {
-    return SFST::svar_value(name);
+  Range *HfstCompiler::svar_value( char *name ) {
+    return NULL; // COPY
   }
 
-  HfstCompiler::Range *HfstCompiler::rsvar_value( char *name ) {
-    return SFST::rsvar_value(name);
+  Range *HfstCompiler::rsvar_value( char *name ) {
+    return NULL; // COPY
   }
 
   HfstTransducer * HfstCompiler::insert_freely(HfstTransducer *t, Character input, Character output) {
-    t->insert_freely(hfst::StringPair(SFST::TheAlphabet.code2symbol(input), SFST::TheAlphabet.code2symbol(output)));
+    t->insert_freely(hfst::StringPair(TheAlphabet.code2symbol(input), TheAlphabet.code2symbol(output)));
     return t;
   }
 
-  HfstCompiler::Contexts *HfstCompiler::make_context( HfstTransducer *l, HfstTransducer *r )
+  Contexts *HfstCompiler::make_context( HfstTransducer *l, HfstTransducer *r )
   {
-    if (l->get_type() != r->get_type()) {
-      printf("ERROR: in hfst-compiler.yy: context transducers do not have the same type.\n");
-      exit(1);
+    if (l != NULL && r != NULL) {
+      if (l->get_type() != r->get_type()) {
+	printf("ERROR: in hfst-compiler.yy: context transducers do not have the same type.\n");
+	exit(1);
+      }
     }
-    ImplementationType type = l->get_type();
+
+    ImplementationType type;
+    if (l != NULL)
+      type = l->get_type();
+    else
+      type = r->get_type();
 
     if (l == NULL)
       l = new HfstTransducer(type);
     if (r == NULL)
       r = new HfstTransducer(type);
     
-    HfstCompiler::Contexts *c=new HfstCompiler::Contexts();
+    Contexts *c=new Contexts();
     c->left = l;
     c->right = r;
     c->next = NULL;
@@ -195,7 +200,7 @@ namespace hfst
     return c;
   }
 
-  HfstCompiler::Contexts *HfstCompiler::add_context( HfstCompiler::Contexts *nc, HfstCompiler::Contexts *c )    
+  Contexts *HfstCompiler::add_context( Contexts *nc, Contexts *c )    
   {
     if (nc->left->get_type() != c->left->get_type() || 
 	nc->right->get_type() != c->right->get_type() ) {
@@ -212,17 +217,17 @@ namespace hfst
 
   HfstTransducer * HfstCompiler::negation( HfstTransducer *t )    
   {
-    if (SFST::RS.size() > 0 || SFST::RSS.size() > 0)
+    if (RS.size() > 0 || RSS.size() > 0)
       warn("agreement operation inside of negation");
-    if (!SFST::Alphabet_Defined)
-      SFST::error("Negation requires the definition of an alphabet");
+    if (!Alphabet_Defined)
+      error("Negation requires the definition of an alphabet");
 
     // go through all symbol pairs in TheAlphabet and copy them to sps
     StringPairSet sps;
-    for( SFST::Alphabet::const_iterator it=SFST::TheAlphabet.begin(); it!=SFST::TheAlphabet.end(); it++ ) {
-      SFST::Label l=*it;
-      sps.insert(StringPair( SFST::TheAlphabet.code2symbol(l.lower_char()),
-			     SFST::TheAlphabet.code2symbol(l.upper_char())) );
+    for( HfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
+      NumberPair l=*it;
+      sps.insert(StringPair( TheAlphabet.code2symbol(l->first),
+			     TheAlphabet.code2symbol(l->second)) );
     }
     // construct a universal language transducer
     HfstTransducer * pi_star = new HfstTransducer(sps, t->get_type());
@@ -236,7 +241,7 @@ namespace hfst
   HfstTransducer * HfstCompiler::explode( HfstTransducer *t ) {
 
     //printf("explode...\n");
-    if (SFST::RS.size() == 0 && SFST::RSS.size() == 0) {
+    if (RS.size() == 0 && RSS.size() == 0) {
       //printf("... no need to explode\n");
       return t;
     }
@@ -249,10 +254,10 @@ namespace hfst
 
     // transducer agreement variable names
     vector<char*> name;
-    for( SFST::RVarSet::iterator it=SFST::RS.begin(); it!=SFST::RS.end(); it++) {
+    for( RVarSet::iterator it=RS.begin(); it!=RS.end(); it++) {
       name.push_back(*it);
     }
-    SFST::RS.clear();
+    RS.clear();
     
     // replace all agreement variables
     for( size_t i=0; i<name.size(); i++ ) {
@@ -293,9 +298,9 @@ namespace hfst
     }
     
     name.clear();
-    for( SFST::RVarSet::iterator it=SFST::RSS.begin(); it!=SFST::RSS.end(); it++)
+    for( RVarSet::iterator it=RSS.begin(); it!=RSS.end(); it++)
       name.push_back(*it);
-    SFST::RSS.clear();
+    RSS.clear();
     
     // replace all agreement variables
     for( size_t i=0; i<name.size(); i++ ) {
@@ -309,8 +314,8 @@ namespace hfst
 	// insertion
 	HfstTransducer ti(*t);
 	// agreement variable marker should always appear on both sides of the tape..
-	//printf("substituting agreement range variable %s with %s\n", name[i], SFST::TheAlphabet.code2symbol(r->character));
-	ti.substitute(std::string(name[i]), SFST::TheAlphabet.code2symbol(r->character));	
+	//printf("substituting agreement range variable %s with %s\n", name[i], TheAlphabet.code2symbol(r->character));
+	ti.substitute(std::string(name[i]), TheAlphabet.code2symbol(r->character));	
 	nt->disjunct(ti);
 	
 	Range *next = r->next;
@@ -331,18 +336,18 @@ namespace hfst
 
   HfstTransducer * HfstCompiler::make_rule( HfstTransducer * lc, Range * lower_range, Twol_Type type, 
 					    Range * upper_range, HfstTransducer * rc ) {
-    if (SFST::RS.size() > 0 || SFST::RSS.size() > 0)
+    if (RS.size() > 0 || RSS.size() > 0)
       cerr << "\nWarning: agreement operation inside of replacement rule!\n";
     
-    if (!SFST::Alphabet_Defined)
+    if (!Alphabet_Defined)
       cerr << "\nERROR: Two level rules require the definition of an alphabet!\n";
 
     HfstTransducerPair tr_pair(*(lc), *(rc));
     StringPairSet sps;
-    for( SFST::Alphabet::const_iterator it=SFST::TheAlphabet.begin(); it!=SFST::TheAlphabet.end(); it++ ) {
-      SFST::Label l=*it;
-      sps.insert(StringPair( SFST::TheAlphabet.code2symbol(l.lower_char()),
-			     SFST::TheAlphabet.code2symbol(l.upper_char())) );
+    for( HfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
+      NumberPair l=*it;
+      sps.insert(StringPair( TheAlphabet.code2symbol(l.first),
+			     TheAlphabet.code2symbol(l.second)) );
     } 
 
     StringPairSet mappings;
@@ -350,25 +355,25 @@ namespace hfst
     Range * r2 = upper_range;
 
     if (r1 == NULL || r2 == NULL) {
-      if (!SFST::Alphabet_Defined)
+      if (!Alphabet_Defined)
 	printf("ERROR: The wildcard symbol '.' requires the definition of an alphabet");
       
       // one of the ranges was '.'
-      for(SFST::Alphabet::const_iterator it=SFST::TheAlphabet.begin(); 
-	  it!=SFST::TheAlphabet.end(); it++) {
-	if ((r1 == NULL || SFST::in_range(it->lower_char(), r1)) &&
-	    (r2 == NULL || SFST::in_range(it->upper_char(), r2))) {
+      for(HfstAlphabet::const_iterator it=TheAlphabet.begin(); 
+	  it!=TheAlphabet.end(); it++) {
+	if ((r1 == NULL || in_range(it->lower_char(), r1)) &&
+	    (r2 == NULL || in_range(it->upper_char(), r2))) {
 	  mappings.insert( StringPair(
-				      SFST::TheAlphabet.code2symbol(it->lower_char()),
-				      SFST::TheAlphabet.code2symbol(it->upper_char()) ) );
+				      TheAlphabet.code2symbol(it->lower_char()),
+				      TheAlphabet.code2symbol(it->upper_char()) ) );
 	}
       }      
     }
     else {
       for (;;) {
 	mappings.insert( StringPair(
-				    SFST::TheAlphabet.code2symbol(r1->character),
-				    SFST::TheAlphabet.code2symbol(r2->character) ) );
+				    TheAlphabet.code2symbol(r1->character),
+				    TheAlphabet.code2symbol(r2->character) ) );
 	if (!r1->next && !r2->next)
 	  break;
 	if (r1->next)
@@ -380,13 +385,13 @@ namespace hfst
     
     switch(type)
       {
-      case SFST::twol_left:
+      case twol_left:
 	return new HfstTransducer(rules::two_level_if(tr_pair, mappings, sps));
 	break;
-      case SFST::twol_right:
+      case twol_right:
 	return new HfstTransducer(rules::two_level_only_if(tr_pair, mappings, sps));
 	break;
-      case SFST::twol_both:
+      case twol_both:
 	return new HfstTransducer(rules::two_level_if_and_only_if(tr_pair, mappings, sps));
 	break;
       }
@@ -398,14 +403,14 @@ namespace hfst
   //}
 
   HfstTransducer * HfstCompiler::read_transducer(char *filename) {
-    if (SFST::Verbose)
+    if (Verbose)
       fprintf(stderr,"\nreading transducer from %s...", filename);
     HfstInputStream is(filename);
     is.open();
     HfstTransducer *t = new HfstTransducer(is);
     is.close();
     free(filename);
-    if (SFST::Verbose)
+    if (Verbose)
       fprintf(stderr,"finished\n");
     return t;
   }
@@ -423,25 +428,25 @@ namespace hfst
     HfstTransducerPair tr_pair(*(contexts->left), *(contexts->right));
     StringPairSet sps;
     //printf("inserting pairs:\n");
-    for( SFST::Alphabet::const_iterator it=SFST::TheAlphabet.begin(); it!=SFST::TheAlphabet.end(); it++ ) {
-      SFST::Label l=*it;
+    for( HfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
+      NumberPair l=*it;
       //printf("inserting pair %i:%i... ", l.lower_char(), l.upper_char());
-      sps.insert(StringPair( SFST::TheAlphabet.code2symbol(l.lower_char()),
-			     SFST::TheAlphabet.code2symbol(l.upper_char())) );
+      sps.insert(StringPair( TheAlphabet.code2symbol(l.first),
+			     TheAlphabet.code2symbol(l.second)) );
       //printf("ok\n");
     } 
     switch (repl_type) 
       {
-      case SFST::repl_up:
+      case repl_up:
 	return new HfstTransducer(rules::replace_up(tr_pair, *mapping, optional, sps));
 	break;
-      case SFST::repl_down:
+      case repl_down:
 	return new HfstTransducer(rules::replace_down(tr_pair, *mapping, optional, sps));
 	break;
-      case SFST::repl_left:
+      case repl_left:
 	return new HfstTransducer(rules::replace_left(tr_pair, *mapping, optional, sps));
 	break;
-      case SFST::repl_right:
+      case repl_right:
 	return new HfstTransducer(rules::replace_right(tr_pair, *mapping, optional, sps));
 	break;
       }
@@ -451,17 +456,17 @@ namespace hfst
   HfstTransducer * HfstCompiler::replace(HfstTransducer * mapping, Repl_Type repl_type, bool optional) {
     
     StringPairSet sps;
-    for( SFST::Alphabet::const_iterator it=SFST::TheAlphabet.begin(); it!=SFST::TheAlphabet.end(); it++ ) {
-      SFST::Label l=*it;
-      sps.insert(StringPair( SFST::TheAlphabet.code2symbol(l.lower_char()),
-			     SFST::TheAlphabet.code2symbol(l.upper_char())) );
+    for( HfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
+      NumberPair l=*it;
+      sps.insert(StringPair( TheAlphabet.code2symbol(l.first),
+			     TheAlphabet.code2symbol(l.second)) );
     } 
     switch (repl_type) 
       {
-      case SFST::repl_up:
+      case repl_up:
 	return new HfstTransducer(rules::replace_up(*mapping, optional, sps));
 	break;
-      case SFST::repl_down:
+      case repl_down:
 	return new HfstTransducer(rules::replace_down(*mapping, optional, sps));
 	break;
       default:
@@ -501,7 +506,7 @@ namespace hfst
   {
     // explode, minimize
 
-    SFST::TheAlphabet.clear_char_pairs();
+    TheAlphabet.clear_char_pairs();
     //TheAlphabet.copy(t->alphabet);
 
     HfstMutableTransducer t(*tr);
@@ -513,16 +518,16 @@ namespace hfst
 	while (not transition_it.done()) 
 	  {
 	    HfstTransition tr = transition_it.value();
-	    SFST::TheAlphabet.insert(SFST::Label(SFST::TheAlphabet.symbol2code(tr.isymbol.c_str()),
-						 SFST::TheAlphabet.symbol2code(tr.osymbol.c_str())));
+	    TheAlphabet.insert(NumberPair(TheAlphabet.symbol2code(tr.isymbol.c_str()),
+					  TheAlphabet.symbol2code(tr.osymbol.c_str())));
 	    transition_it.next();
 	  }
 	state_it.next();
       }
-    SFST::Alphabet_Defined = 1;
+    Alphabet_Defined = 1;
 
     //printf("TheAlphabet is now defined as:\n");
-    //for( SFST::Alphabet::const_iterator it=SFST::TheAlphabet.begin(); it!=SFST::TheAlphabet.end(); it++ ) {
+    //for( SFST::Alphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
     //  SFST::Label l=*it;
     //  printf("  %i:%i\n", l.lower_char(), l.upper_char());
     //}

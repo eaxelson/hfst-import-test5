@@ -1,10 +1,9 @@
 %{
 /*******************************************************************/
 /*                                                                 */
-/*  FILE     fst-compiler.yy                                       */
-/*  MODULE   fst-compiler                                          */
-/*  PROGRAM  SFST                                                  */
-/*  AUTHOR   Helmut Schmid, IMS, University of Stuttgart           */
+/*  FILE     hfst-compiler.yy                                       */
+/*  MODULE   hfst-compiler                                          */
+/*  PROGRAM  HFST                                                  */     
 /*                                                                 */
 /*******************************************************************/
 
@@ -86,7 +85,7 @@ ASSIGNMENT: VAR '=' RE              { if (DEBUG) { printf("defining transducer v
           | RVAR '=' RE             { if (DEBUG) { printf("defining agreement transducer variable \"%s\"..\n", $1); }; if (HfstCompiler::def_rvar($1,$3)) warn2("assignment of empty transducer to",$1); }
           | SVAR '=' VALUES         { if (DEBUG) { printf("defining range variable \"%s\"..\n", $1); }; if (def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
           | RSVAR '=' VALUES        { if (DEBUG) { printf("defining agreement range variable \"%s\"..\n", $1); }; if (def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
-          // | RE PRINT STRING         { write_to_file($1, $3); }
+          | RE PRINT STRING         { HfstCompiler::write_to_file($1, $3); }
           | ALPHA RE                { if (DEBUG) { printf("defining alphabet..\n"); }; HfstCompiler::def_alphabet($2); delete $2; }
           ;
 
