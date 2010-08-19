@@ -9,10 +9,11 @@
 
 #include <stdio.h>
 
-#include "../../libhfst/src/HfstCompiler.h"
-//#include "make-compact.h"
-using namespace hfst;
+#include "hfst-scanner.h"
+#include "HfstCompiler.h"
+
 using std::cerr;
+using namespace hfst;
 
 extern int  yylineno;
 extern char *yytext;
@@ -23,28 +24,30 @@ void warn2(const char *text, char *text2);
 int yylex( void );
 int yyparse( void );
 
-ImplementationType type;
+static int Switch=0;
+HfstCompiler * compiler;
+HfstTransducer * Result;
 
+ImplementationType type;
 bool DEBUG=false;
 
-static int Switch=0;
-HfstTransducer * Result;
+
 %}
 
 /* Slight Hfst addition SFST::... */
 %union {
   int        number;
-  HfstCompiler::Twol_Type  type;
-  HfstCompiler::Repl_Type  rtype;
+  hfst::Twol_Type  type;
+  hfst::Repl_Type  rtype;
   char       *name;
   char       *value;
   unsigned char uchar;
   unsigned int  longchar;
-  HfstCompiler::Character  character;
-  HfstTransducer   *expression;
-  HfstCompiler::Range      *range;
-  HfstCompiler::Ranges     *ranges;
-  HfstCompiler::Contexts   *contexts;
+  hfst::Character  character;
+  hfst::HfstTransducer   *expression;
+  hfst::Range      *range;
+  hfst::Ranges     *ranges;
+  hfst::Contexts   *contexts;
 }
 
 %token <number> NEWLINE ALPHA COMPOSE PRINT POS INSERT SWITCH
@@ -73,7 +76,7 @@ HfstTransducer * Result;
 %left '*' '+'
 %%
 
-ALL:        ASSIGNMENTS RE NEWLINES { Result=HfstCompiler::result($2, Switch); }
+ALL:        ASSIGNMENTS RE NEWLINES { Result=compiler->result($2, Switch); }
           ;
 
 ASSIGNMENTS: ASSIGNMENTS ASSIGNMENT {}
@@ -81,40 +84,40 @@ ASSIGNMENTS: ASSIGNMENTS ASSIGNMENT {}
           | /* nothing */           {}
           ;
 
-ASSIGNMENT: VAR '=' RE              { if (DEBUG) { printf("defining transducer variable \"%s\"..\n", $1); }; if (HfstCompiler::def_var($1,$3)) warn2("assignment of empty transducer to",$1); }
-          | RVAR '=' RE             { if (DEBUG) { printf("defining agreement transducer variable \"%s\"..\n", $1); }; if (HfstCompiler::def_rvar($1,$3)) warn2("assignment of empty transducer to",$1); }
-          | SVAR '=' VALUES         { if (DEBUG) { printf("defining range variable \"%s\"..\n", $1); }; if (def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
-          | RSVAR '=' VALUES        { if (DEBUG) { printf("defining agreement range variable \"%s\"..\n", $1); }; if (def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
-          | RE PRINT STRING         { HfstCompiler::write_to_file($1, $3); }
-          | ALPHA RE                { if (DEBUG) { printf("defining alphabet..\n"); }; HfstCompiler::def_alphabet($2); delete $2; }
+ASSIGNMENT: VAR '=' RE              { if (DEBUG) { printf("defining transducer variable \"%s\"..\n", $1); }; if (compiler->def_var($1,$3)) warn2("assignment of empty transducer to",$1); }
+          | RVAR '=' RE             { if (DEBUG) { printf("defining agreement transducer variable \"%s\"..\n", $1); }; if (compiler->def_rvar($1,$3)) warn2("assignment of empty transducer to",$1); }
+          | SVAR '=' VALUES         { if (DEBUG) { printf("defining range variable \"%s\"..\n", $1); }; if (compiler->def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
+          | RSVAR '=' VALUES        { if (DEBUG) { printf("defining agreement range variable \"%s\"..\n", $1); }; if (compiler->def_svar($1,$3)) warn2("assignment of empty symbol range to",$1); }
+          | RE PRINT STRING         { compiler->write_to_file($1, $3); }
+          | ALPHA RE                { if (DEBUG) { printf("defining alphabet..\n"); }; compiler->def_alphabet($2); delete $2; }
           ;
 
-RE:         RE ARROW CONTEXTS2      { $$ = HfstCompiler::restriction($1,$2,$3,0); }
-	  | RE '^' ARROW CONTEXTS2  { $$ = HfstCompiler::restriction($1,$3,$4,1); }
-	  | RE '_' ARROW CONTEXTS2  { $$ = HfstCompiler::restriction($1,$3,$4,-1); }
-          | RE REPLACE CONTEXT2     { $1 = HfstCompiler::explode($1); $1->minimize(); $$ = HfstCompiler::replace_in_context($1, $2, $3, false); }
-          | RE REPLACE '?' CONTEXT2 { $1 = HfstCompiler::explode($1); $1->minimize(); $$ = HfstCompiler::replace_in_context($1, $2, $4, true); }
-          | RE REPLACE '(' ')'      { $1 = HfstCompiler::explode($1); $1->minimize(); $$ = HfstCompiler::replace($1, $2, false); }
-          | RE REPLACE '?' '(' ')'  { $1 = HfstCompiler::explode($1); $1->minimize(); $$ = HfstCompiler::replace($1, $2, true); }
-          | RE RANGE ARROW RANGE RE { $$ = HfstCompiler::make_rule($1,$2,$3,$4,$5); }
-          | RE RANGE ARROW RANGE    { $$ = HfstCompiler::make_rule($1,$2,$3,$4,NULL); }
-          | RANGE ARROW RANGE RE    { $$ = HfstCompiler::make_rule(NULL,$1,$2,$3,$4); }
-          | RANGE ARROW RANGE       { $$ = HfstCompiler::make_rule(NULL,$1,$2,$3,NULL); }
+RE:         RE ARROW CONTEXTS2      { $$ = compiler->restriction($1,$2,$3,0); }
+	  | RE '^' ARROW CONTEXTS2  { $$ = compiler->restriction($1,$3,$4,1); }
+	  | RE '_' ARROW CONTEXTS2  { $$ = compiler->restriction($1,$3,$4,-1); }
+          | RE REPLACE CONTEXT2     { $1 = compiler->explode($1); $1->minimize(); $$ = compiler->replace_in_context($1, $2, $3, false); }
+          | RE REPLACE '?' CONTEXT2 { $1 = compiler->explode($1); $1->minimize(); $$ = compiler->replace_in_context($1, $2, $4, true); }
+          | RE REPLACE '(' ')'      { $1 = compiler->explode($1); $1->minimize(); $$ = compiler->replace($1, $2, false); }
+          | RE REPLACE '?' '(' ')'  { $1 = compiler->explode($1); $1->minimize(); $$ = compiler->replace($1, $2, true); }
+          | RE RANGE ARROW RANGE RE { $$ = compiler->make_rule($1,$2,$3,$4,$5); }
+          | RE RANGE ARROW RANGE    { $$ = compiler->make_rule($1,$2,$3,$4,NULL); }
+          | RANGE ARROW RANGE RE    { $$ = compiler->make_rule(NULL,$1,$2,$3,$4); }
+          | RANGE ARROW RANGE       { $$ = compiler->make_rule(NULL,$1,$2,$3,NULL); }
           | RE COMPOSE RE    { $1->compose(*$3); delete $3; $$ = $1; }
-          | '{' RANGES '}' ':' '{' RANGES '}' { $$ = HfstCompiler::make_mapping($2,$6,type); }
-          | RANGE ':' '{' RANGES '}' { $$ = HfstCompiler::make_mapping(add_range($1,NULL),$4,type); }
-          | '{' RANGES '}' ':' RANGE { $$ = HfstCompiler::make_mapping($2,add_range($5,NULL),type); }
-          | RE INSERT CODE ':' CODE  { $$ = HfstCompiler::insert_freely($1,$3,$5); }
-          | RE INSERT CODE           { $$ = HfstCompiler::insert_freely($1,$3,$3); }
-          | RANGE ':' RANGE  { $$ = HfstCompiler::new_transducer($1,$3,type); }
-          | RANGE            { $$ = HfstCompiler::new_transducer($1,$1,type); }
-          | VAR              { if (DEBUG) { printf("calling transducer variable \"%s\"\n", $1); }; $$ = HfstCompiler::var_value($1); }
-          | RVAR             { if (DEBUG) { printf("calling agreement transducer variable \"%s\"\n", $1); }; $$ = HfstCompiler::rvar_value($1,type); }
+          | '{' RANGES '}' ':' '{' RANGES '}' { $$ = compiler->make_mapping($2,$6,type); }
+          | RANGE ':' '{' RANGES '}' { $$ = compiler->make_mapping(compiler->add_range($1,NULL),$4,type); }
+          | '{' RANGES '}' ':' RANGE { $$ = compiler->make_mapping($2,compiler->add_range($5,NULL),type); }
+          | RE INSERT CODE ':' CODE  { $$ = compiler->insert_freely($1,$3,$5); }
+          | RE INSERT CODE           { $$ = compiler->insert_freely($1,$3,$3); }
+          | RANGE ':' RANGE  { $$ = compiler->new_transducer($1,$3,type); }
+          | RANGE            { $$ = compiler->new_transducer($1,$1,type); }
+          | VAR              { if (DEBUG) { printf("calling transducer variable \"%s\"\n", $1); }; $$ = compiler->var_value($1); }
+          | RVAR             { if (DEBUG) { printf("calling agreement transducer variable \"%s\"\n", $1); }; $$ = compiler->rvar_value($1,type); }
           | RE '*'           { $1->repeat_star(); $$ = $1; }
           | RE '+'           { $1->repeat_plus(); $$ = $1; }
           | RE '?'           { $1->optionalize(); $$ = $1; }
           | RE RE %prec SEQ  { $1->concatenate(*$2); delete $2; $$ = $1; }
-          | '!' RE           { $$ = HfstCompiler::negation($2); }
+          | '!' RE           { $$ = compiler->negation($2); }
           | SWITCH RE        { $2->invert(); $$ = $2; }
           | '^' RE           { $2->output_project(); $$ = $2; }
           | '_' RE           { $2->input_project(); $$ = $2; }
@@ -123,25 +126,25 @@ RE:         RE ARROW CONTEXTS2      { $$ = HfstCompiler::restriction($1,$2,$3,0)
           | RE '|' RE        { $1->disjunct(*$3); delete $3; $$ = $1; }
           | '(' RE ')'       { $$ = $2; }
           // | STRING           { $$ = read_words($1); }
-          | STRING2          { try { $$ = HfstCompiler::read_transducer($1); } catch (hfst::exceptions::HfstInterfaceException e) { printf("\nAn error happened when reading file \"%s\"\n", $1); exit(1); } }
+          | STRING2          { try { $$ = compiler->read_transducer($1); } catch (hfst::exceptions::HfstInterfaceException e) { printf("\nAn error happened when reading file \"%s\"\n", $1); exit(1); } }
           ;
 
-RANGES:     RANGE RANGES     { $$ = add_range($1,$2); }
+RANGES:     RANGE RANGES     { $$ = compiler->add_range($1,$2); }
           |                  { $$ = NULL; }
           ;
 
 RANGE:      '[' VALUES ']'   { $$=$2; }
-          | '[' '^' VALUES ']' { $$=complement_range($3); }
-          | '[' RSVAR ']'    { if (DEBUG) { printf("calling agreement range variable \"%s\"\n", $2); }; $$=HfstCompiler::rsvar_value($2); }
+          | '[' '^' VALUES ']' { $$=compiler->complement_range($3); }
+          | '[' RSVAR ']'    { if (DEBUG) { printf("calling agreement range variable \"%s\"\n", $2); }; $$=compiler->rsvar_value($2); }
           | '.'              { $$=NULL; }
-          | CODE             { $$=HfstCompiler::add_value($1,NULL); }
+          | CODE             { $$=compiler->add_value($1,NULL); }
           ;
 
 CONTEXTS2:  CONTEXTS               { $$ = $1; }
           | '(' CONTEXTS ')'       { $$ = $2; }
           ;
 
-CONTEXTS:   CONTEXT ',' CONTEXTS   { $$ = HfstCompiler::add_context($1,$3); }
+CONTEXTS:   CONTEXT ',' CONTEXTS   { $$ = compiler->add_context($1,$3); }
           | CONTEXT                { $$ = $1; }
           ;
 
@@ -149,49 +152,49 @@ CONTEXT2:   CONTEXT                { $$ = $1; }
           | '(' CONTEXT ')'        { $$ = $2; }
           ;
 
-CONTEXT :   RE POS RE              { $$ = HfstCompiler::make_context($1, $3); }
-          |    POS RE              { $$ = HfstCompiler::make_context(NULL, $2); }
-          | RE POS                 { $$ = HfstCompiler::make_context($1, NULL); }
+CONTEXT :   RE POS RE              { $$ = compiler->make_context($1, $3); }
+          |    POS RE              { $$ = compiler->make_context(NULL, $2); }
+          | RE POS                 { $$ = compiler->make_context($1, NULL); }
           ;
 
-VALUES:     VALUE VALUES           { $$=HfstCompiler::append_values($1,$2); }
+VALUES:     VALUE VALUES           { $$=compiler->append_values($1,$2); }
           | VALUE                  { $$ = $1; }
           ;
 
-VALUE:      LCHAR '-' LCHAR	   { $$=HfstCompiler::add_values($1,$3,NULL); }
-          | SVAR                   { if (DEBUG) { printf("calling range variable \"%s\"", $1); }; $$=HfstCompiler::svar_value($1); }
-          | LCHAR  	           { $$=HfstCompiler::add_value(HfstCompiler::character_code($1),NULL); }
-          | CODE		   { $$=HfstCompiler::add_value($1,NULL); }
-	  | SCHAR		   { $$=HfstCompiler::add_value($1,NULL); }
+VALUE:      LCHAR '-' LCHAR	   { $$=compiler->add_values($1,$3,NULL); }
+          | SVAR                   { if (DEBUG) { printf("calling range variable \"%s\"", $1); }; $$=compiler->svar_value($1); }
+          | LCHAR  	           { $$=compiler->add_value(compiler->character_code($1),NULL); }
+          | CODE		   { $$=compiler->add_value($1,NULL); }
+	  | SCHAR		   { $$=compiler->add_value($1,NULL); }
           ;
 
 LCHAR:      CHARACTER	{ $$=$1; }
-          | UTF8CHAR	{ $$=HfstCompiler::utf8toint($1); free($1); }
+          | UTF8CHAR	{ $$=compiler->utf8toint($1); free($1); }
 	  | SCHAR       { $$=$1; }
           ;
 
-CODE:       CHARACTER	{ $$=HfstCompiler::character_code($1); }
-          | UTF8CHAR	{ $$=HfstCompiler::symbol_code($1); }
-          | SYMBOL	{ $$=HfstCompiler::symbol_code($1); }
+CODE:       CHARACTER	{ $$=compiler->character_code($1); }
+          | UTF8CHAR	{ $$=compiler->symbol_code($1); }
+          | SYMBOL	{ $$=compiler->symbol_code($1); }
           ;
 
-SCHAR:      '.'		{ $$=(unsigned char)HfstCompiler::character_code('.'); }
-          | '!'		{ $$=(unsigned char)HfstCompiler::character_code('!'); }
-          | '?'		{ $$=(unsigned char)HfstCompiler::character_code('?'); }
-          | '{'		{ $$=(unsigned char)HfstCompiler::character_code('{'); }
-          | '}'		{ $$=(unsigned char)HfstCompiler::character_code('}'); }
-          | ')'		{ $$=(unsigned char)HfstCompiler::character_code(')'); }
-          | '('		{ $$=(unsigned char)HfstCompiler::character_code('('); }
-          | '&'		{ $$=(unsigned char)HfstCompiler::character_code('&'); }
-          | '|'		{ $$=(unsigned char)HfstCompiler::character_code('|'); }
-          | '*'		{ $$=(unsigned char)HfstCompiler::character_code('*'); }
-          | '+'		{ $$=(unsigned char)HfstCompiler::character_code('+'); }
-          | ':'		{ $$=(unsigned char)HfstCompiler::character_code(':'); }
-          | ','		{ $$=(unsigned char)HfstCompiler::character_code(','); }
-          | '='		{ $$=(unsigned char)HfstCompiler::character_code('='); }
-          | '_'		{ $$=(unsigned char)HfstCompiler::character_code('_'); }
-          | '^'		{ $$=(unsigned char)HfstCompiler::character_code('^'); }
-          | '-'		{ $$=(unsigned char)HfstCompiler::character_code('-'); }
+SCHAR:      '.'		{ $$=(unsigned char)compiler->character_code('.'); }
+          | '!'		{ $$=(unsigned char)compiler->character_code('!'); }
+          | '?'		{ $$=(unsigned char)compiler->character_code('?'); }
+          | '{'		{ $$=(unsigned char)compiler->character_code('{'); }
+          | '}'		{ $$=(unsigned char)compiler->character_code('}'); }
+          | ')'		{ $$=(unsigned char)compiler->character_code(')'); }
+          | '('		{ $$=(unsigned char)compiler->character_code('('); }
+          | '&'		{ $$=(unsigned char)compiler->character_code('&'); }
+          | '|'		{ $$=(unsigned char)compiler->character_code('|'); }
+          | '*'		{ $$=(unsigned char)compiler->character_code('*'); }
+          | '+'		{ $$=(unsigned char)compiler->character_code('+'); }
+          | ':'		{ $$=(unsigned char)compiler->character_code(':'); }
+          | ','		{ $$=(unsigned char)compiler->character_code(','); }
+          | '='		{ $$=(unsigned char)compiler->character_code('='); }
+          | '_'		{ $$=(unsigned char)compiler->character_code('_'); }
+          | '^'		{ $$=(unsigned char)compiler->character_code('^'); }
+          | '-'		{ $$=(unsigned char)compiler->character_code('-'); }
           ;
 
 NEWLINES:   NEWLINE NEWLINES     {}
@@ -213,7 +216,7 @@ static int LowMem=0;
 void yyerror(char *text)
 
 {
-  cerr << "\n" << SFST::FileName << ":" << yylineno << ": " << text << " at: ";
+  cerr << "\n" << FileName << ":" << yylineno << ": " << text << " at: ";
   cerr << yytext << "\naborted.\n";
   exit(1);
 }
@@ -228,7 +231,7 @@ void yyerror(char *text)
 void warn(char *text)
 
 {
-  cerr << "\n" << SFST::FileName << ":" << yylineno << ": warning: " << text << "!\n";
+  cerr << "\n" << FileName << ":" << yylineno << ": warning: " << text << "!\n";
 }
 
 
@@ -241,7 +244,7 @@ void warn(char *text)
 void warn2(const char *text, char *text2)  // HFST: added const
 
 {
-  cerr << "\n" << SFST::FileName << ":" << yylineno << ": warning: " << text << ": ";
+  cerr << "\n" << FileName << ":" << yylineno << ": warning: " << text << ": ";
   cerr << text2 << "\n";
 }
 
@@ -265,7 +268,7 @@ void get_flags( int *argc, char **argv )
       argv[i] = NULL;
     }
     else if (strcmp(argv[i],"-q") == 0) {
-      SFST::Verbose = 0;
+      Verbose = 0;
       argv[i] = NULL;
     }
     else if (strcmp(argv[i],"-s") == 0) {
@@ -324,9 +327,10 @@ int main( int argc, char *argv[] )
     fprintf(stderr,"\nError: Cannot open grammar file \"%s\"\n\n", argv[1]);
     exit(1);
   }
-  SFST::FileName = argv[1];
+  FileName = argv[1];
   //Result = NULL;
-  yyin = file;
+  yyin = file;  
+  compiler = new HfstCompiler(type, Verbose);
   try {
     yyparse();
     //Result->alphabet.utf8 = UTF8;
@@ -347,7 +351,7 @@ int main( int argc, char *argv[] )
     //  Result->store_lowmem(file);
     else {
       try {
-        HfstCompiler::write_to_file(Result,argv[2]);
+        compiler->write_to_file(Result,argv[2]);
       } catch (hfst::exceptions::HfstInterfaceException e) {
           printf("\nAn error happened when writing to file \"%s\"\n", argv[2]);
       }
@@ -355,6 +359,7 @@ int main( int argc, char *argv[] )
     fclose(file);
     //printf("type is: %i\n", Result->get_type());
     delete Result;
+    // delete compiler;
   }
   catch(const char* p) {
       cerr << "\n" << p << "\n\n";

@@ -8,16 +8,18 @@
 /*                                                                 */
 /*  FILE     scanner.ll                                            */
 /*  MODULE   scanner                                               */
-/*  PROGRAM  SFST                                                  */
-/*  AUTHOR   Helmut Schmid, IMS, University of Stuttgart           */
+/*  PROGRAM  HFST                                                  */
 /*                                                                 */
 /*******************************************************************/
 
 #include <string.h>
 
-#include "../../libhfst/src/implementations/SFST/src/interface.h"
-#include "../../libhfst/src/implementations/SFST/src/fst-compiler.h"
-  using namespace SFST;
+#include "HfstCompiler.h"
+#include "hfst-compiler.h"
+#include "hfst-scanner.h"
+
+using namespace hfst;
+using namespace HfstBasic;
 
 #define MAX_INCLUDE_DEPTH 10
   
@@ -26,12 +28,9 @@ YY_BUFFER_STATE Include_Stack[MAX_INCLUDE_DEPTH];
 char *Name_Stack[MAX_INCLUDE_DEPTH];
 int  Lineno_Stack[MAX_INCLUDE_DEPTH];
 
-namespace SFST 
-{
-char *FileName;
-
+bool Verbose=true;
+char *FileName=NULL;
 bool UTF8=true;
-}
 
 static char *unquote(char *string, bool del_quote=true) {
   char *s=string, *result=string;
@@ -76,7 +75,7 @@ FN	[A-Za-z0-9._/\-*+]
 
 #include           BEGIN(incl);
 <incl>[ \t]*       /* eat the whitespace */
-<incl>{FN}+        { error2("Missing quotes",yytext); }
+<incl>{FN}+        { HfstCompiler::error2("Missing quotes",yytext); }
 <incl>\"{FN}+\"    { /* got the include file name */
                      FILE *file;
                      char *name=fst_strdup(yytext+1);
@@ -88,7 +87,7 @@ FN	[A-Za-z0-9._/\-*+]
 		     if (Verbose) fputc('\n', stderr);
 		     file = fopen( name, "rt" );
 		     if (!file)
-                       error2("Can't open include file", name);
+                       HfstCompiler::error2("Can't open include file", name);
                      else {
                        Name_Stack[Include_Stack_Ptr] = FileName;
                        FileName = name;
@@ -167,7 +166,7 @@ FN	[A-Za-z0-9._/\-*+]
 \r?\n             { print_lineno(); return NEWLINE; }
 
 \\[0-9]+          { long l=atol(yytext+1); 
-		    if (l <= 1114112) { yylval.value=fst_strdup(int2utf8((unsigned)l)); return UTF8CHAR; }
+		    if (l <= 1114112) { yylval.value=fst_strdup(HfstUtf8::int2utf8((unsigned)l)); return UTF8CHAR; }
 		    yyerror(strdup("invalid expression"));
                   }
 
