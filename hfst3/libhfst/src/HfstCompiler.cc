@@ -14,7 +14,11 @@
 
    This file contains functions that are needed by the SFST programming
    language parser defined in the file 'hfst-compiler.yy'. The parser is
-   used by the command line program hfst-calculate. 
+   used by the command line program 'hfst-calculate'. 
+
+   This file is based on SFST's file 'interface.C'. Some functions are
+   copied as such and some are less or more modified so that they work
+   properly with the HFST interface.
 
  **/
 
@@ -80,35 +84,113 @@ namespace hfst
     return t;
   }
   
-  Character HfstCompiler::character_code( unsigned int uc )
-  { return EOF; } // COPY
+  Character HfstCompiler::character_code( unsigned int uc ) {
+    //if (TheAlphabet.utf8)
+    return symbol_code(HfstBasic::fst_strdup(HfstUtf8::int2utf8(uc)));
+
+    /* unsigned char *buffer=(unsigned char*)malloc(2);
+       buffer[0] = (unsigned char)uc;
+       buffer[1] = 0;      
+       return symbol_code((char*)buffer); */
+  }
+
+  void HfstCompiler::free_values( Range *r ) {
+    if (r) {
+      free_values(r->next);
+      delete r;
+    }
+  }
+
+  void HfstCompiler::free_values( Ranges *r ) {
+    if (r) {
+      free_values(r->next);
+      delete r;
+    }
+  }
+
+  void HfstCompiler::error( const char *message ) {
+    cerr << "\nError: " << message << "\naborted.\n";
+    exit(1);
+  }
+
+  void HfstCompiler::error2( const char *message, char *input ) {
+    cerr << "\nError: " << message << ": " << input << "\naborted.\n";
+    exit(1);
+  }
   
-  Character HfstCompiler::symbol_code( char *s )
+  Character HfstCompiler::symbol_code( char *symbol )
   { // In SFST programming language epsilon is denoted as "<>"
     // but in HFST as "@_EPSILON_SYMBOL_@". That is why it must be
     // treated separately here.
-    if (strcmp(s,"<>") == 0)
+    if (strcmp(symbol,"<>") == 0)
       return 0;
-    return EOF; } // COPY
+    int c=TheAlphabet.symbol2code(symbol);
+    if (c == EOF)
+      c = TheAlphabet.add_symbol( symbol );
+    free(symbol);
+    return (Character)c;
+  }
   
-  unsigned int HfstCompiler::utf8toint( char *s )
-  { return EOF; } // COPY
-    
+  unsigned int HfstCompiler::utf8toint( char *s ) { 
+    return HfstUtf8::utf8toint(s);
+  }
+
+  bool HfstCompiler::in_range( unsigned int c, Range *r ) {
+    while (r) {
+      if (r->character == c)
+	return true;
+      r = r->next;
+    }
+    return false;
+  }
+
   Range * HfstCompiler::add_value( Character c, Range *r) {
-    return NULL; } // COPY
+    Range *result=new Range;
+    result->character = c;
+    result->next = r;
+    return result;
+  }
 
-  Range * HfstCompiler::add_values( unsigned int i, unsigned int j, Range *r) {
-    return NULL; } // COPY
+  Range * HfstCompiler::add_values( unsigned int c1, unsigned int c2, Range *r) {
+    for( unsigned int c=c2; c>=c1; c-- )
+      r = add_value(character_code(c), r);
+    return r;
+  }
 
-  Range * HfstCompiler::append_values( Range *r1, Range *r2 ) {
-    return NULL; } // COPY
+  Range * HfstCompiler::append_values( Range *r2, Range *r ) {
+    if (r2 == NULL)
+      return r;
+    return add_value(r2->character, append_values(r2->next, r));
+  }
 
   Ranges * HfstCompiler::add_range( Range *r, Ranges *l ) {
-    return NULL; } // COPY
+    Ranges *result = new Ranges;
+    result->range = r;
+    result->next = l;
+    return result;
+  }
 
   Range * HfstCompiler::complement_range( Range *r ) {
-    return NULL;
-  } // COPY
+    vector<Character> sym;
+    for( Range *p=r; p; p=p->next)
+      sym.push_back( p->character );
+    free_values( r );
+
+    TheAlphabet.complement(sym);  // TODO!
+    if (sym.size() == 0)
+      error("Empty character range!");
+    
+
+    Range *result=NULL;
+    for( size_t i=0; i<sym.size(); i++ ) {
+      Range *tmp = new Range;
+      tmp->character = sym[i];
+      tmp->next = result;
+      result = tmp;
+    }
+
+    return result;
+  }
   
   bool HfstCompiler::def_var( char *name, HfstTransducer *t ) {
     // delete the old value of the variable
@@ -150,21 +232,43 @@ namespace hfst
 
   HfstTransducer * HfstCompiler::rvar_value( char *name, ImplementationType type ) {
     if (RS.find(name) == RS.end())
-      RS.insert(fst_strdup(name));
+      RS.insert(HfstBasic::fst_strdup(name));
     Range *r=add_value(symbol_code(name), NULL);
     return new_transducer(r,r,type); 
   }
 
   bool HfstCompiler::def_svar( char *name, Range *r ) {
-    return false; // COPY
+    // delete the old value of the variable
+    SVarMap::iterator it=SVM.find(name);
+    if (it != SVM.end()) {
+      char *n=it->first;
+      Range *v=it->second;
+      SVM.erase(it);
+      delete v;
+      free(n);
+    }
+    SVM[name] = r;
+    return r == NULL;
+  }
+
+  Range *HfstCompiler::copy_values( const Range *r ) {
+    if (r == NULL)
+      return NULL;
+    return add_value( r->character, copy_values(r->next));
   }
 
   Range *HfstCompiler::svar_value( char *name ) {
-    return NULL; // COPY
+    SVarMap::iterator it=SVM.find(name);
+    if (it == SVM.end())
+      error2("undefined variable", name);
+    free(name);
+    return copy_values(it->second);
   }
 
   Range *HfstCompiler::rsvar_value( char *name ) {
-    return NULL; // COPY
+    if (RSS.find(name) == RSS.end())
+      RSS.insert(HfstBasic::fst_strdup(name));
+    return add_value(symbol_code(name), NULL);
   }
 
   HfstTransducer * HfstCompiler::insert_freely(HfstTransducer *t, Character input, Character output) {
@@ -225,9 +329,9 @@ namespace hfst
     // go through all symbol pairs in TheAlphabet and copy them to sps
     StringPairSet sps;
     for( HfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
-      NumberPair l=*it;
-      sps.insert(StringPair( TheAlphabet.code2symbol(l->first),
-			     TheAlphabet.code2symbol(l->second)) );
+      HfstAlphabet::NumberPair l=*it;
+      sps.insert(StringPair( TheAlphabet.code2symbol(l.first),
+			     TheAlphabet.code2symbol(l.second)) );
     }
     // construct a universal language transducer
     HfstTransducer * pi_star = new HfstTransducer(sps, t->get_type());
@@ -345,7 +449,7 @@ namespace hfst
     HfstTransducerPair tr_pair(*(lc), *(rc));
     StringPairSet sps;
     for( HfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
-      NumberPair l=*it;
+      HfstAlphabet::NumberPair l=*it;
       sps.insert(StringPair( TheAlphabet.code2symbol(l.first),
 			     TheAlphabet.code2symbol(l.second)) );
     } 
@@ -361,11 +465,11 @@ namespace hfst
       // one of the ranges was '.'
       for(HfstAlphabet::const_iterator it=TheAlphabet.begin(); 
 	  it!=TheAlphabet.end(); it++) {
-	if ((r1 == NULL || in_range(it->lower_char(), r1)) &&
-	    (r2 == NULL || in_range(it->upper_char(), r2))) {
+	if ((r1 == NULL || in_range(it->first, r1)) &&
+	    (r2 == NULL || in_range(it->second, r2))) {
 	  mappings.insert( StringPair(
-				      TheAlphabet.code2symbol(it->lower_char()),
-				      TheAlphabet.code2symbol(it->upper_char()) ) );
+				      TheAlphabet.code2symbol(it->first),
+				      TheAlphabet.code2symbol(it->second) ) );
 	}
       }      
     }
@@ -399,8 +503,9 @@ namespace hfst
 
   }
 
-  //HfstTransducer * HfstCompiler::read_words(char *filename) {
-  //}
+  HfstTransducer * HfstCompiler::read_words(char *filename) {
+    return NULL;  // TODO!
+  }
 
   HfstTransducer * HfstCompiler::read_transducer(char *filename) {
     if (Verbose)
@@ -429,7 +534,7 @@ namespace hfst
     StringPairSet sps;
     //printf("inserting pairs:\n");
     for( HfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
-      NumberPair l=*it;
+      HfstAlphabet::NumberPair l=*it;
       //printf("inserting pair %i:%i... ", l.lower_char(), l.upper_char());
       sps.insert(StringPair( TheAlphabet.code2symbol(l.first),
 			     TheAlphabet.code2symbol(l.second)) );
@@ -457,7 +562,7 @@ namespace hfst
     
     StringPairSet sps;
     for( HfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
-      NumberPair l=*it;
+      HfstAlphabet::NumberPair l=*it;
       sps.insert(StringPair( TheAlphabet.code2symbol(l.first),
 			     TheAlphabet.code2symbol(l.second)) );
     } 
@@ -475,12 +580,11 @@ namespace hfst
   }
 
   HfstTransducer * HfstCompiler::make_mapping( Ranges *r1, Ranges *r2, ImplementationType type ) {
-    return new HfstTransducer(type);
+    return new HfstTransducer(type);  // TODO!
   }
   
   HfstTransducer * HfstCompiler::result( HfstTransducer *t, bool switch_flag) {
 
-    //printf("result...\n");
     t = explode(t);
     
     // delete the variable values
@@ -504,9 +608,10 @@ namespace hfst
   
   void HfstCompiler::def_alphabet( HfstTransducer *tr )
   {
-    // explode, minimize
+    tr = explode(tr);
+    tr->minimize();
 
-    TheAlphabet.clear_char_pairs();
+    TheAlphabet.clear_pairs();
     //TheAlphabet.copy(t->alphabet);
 
     HfstMutableTransducer t(*tr);
@@ -518,19 +623,203 @@ namespace hfst
 	while (not transition_it.done()) 
 	  {
 	    HfstTransition tr = transition_it.value();
-	    TheAlphabet.insert(NumberPair(TheAlphabet.symbol2code(tr.isymbol.c_str()),
-					  TheAlphabet.symbol2code(tr.osymbol.c_str())));
+	    TheAlphabet.insert(HfstAlphabet::NumberPair(TheAlphabet.symbol2code(tr.isymbol.c_str()),
+							TheAlphabet.symbol2code(tr.osymbol.c_str())));
 	    transition_it.next();
 	  }
 	state_it.next();
       }
     Alphabet_Defined = 1;
-
-    //printf("TheAlphabet is now defined as:\n");
-    //for( SFST::Alphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
-    //  SFST::Label l=*it;
-    //  printf("  %i:%i\n", l.lower_char(), l.upper_char());
-    //}
   }
+
+  namespace HfstUtf8 {
+
+  /*******************************************************************/
+  /*                                                                 */
+  /*  int2utf8                                                       */
+  /*                                                                 */
+  /*******************************************************************/
+
+  char *int2utf8( unsigned int sym )
+
+  {
+    static unsigned char ch[5];
+
+    if (sym < 128) {
+      // 1-byte UTF8 symbol, 7 bits
+      ch[0] = (unsigned char)sym;
+      ch[1] = 0;
+    }
+  
+    else if (sym < 2048) {
+      // 2-byte UTF8 symbol, 5+6 bits
+      ch[0] = (unsigned char)((sym >> 6) | set2MSbits);
+      ch[1] = (unsigned char)((sym & get6LSbits) | set1MSbits);
+      ch[2] = 0;
+    }
+  
+    else if (sym < 65536) {
+      // 3-byte UTF8 symbol, 4+6+6 bits
+      ch[0] = (unsigned char)((sym >> 12) | set3MSbits);
+      ch[1] = (unsigned char)(((sym >> 6) & get6LSbits) | set1MSbits);
+      ch[2] = (unsigned char)((sym & get6LSbits) | set1MSbits);
+      ch[3] = 0;
+    }
+  
+    else if (sym < 2097152) {
+      // 4-byte UTF8 symbol, 3+6+6+6 bits
+      ch[0] = (unsigned char)((sym >> 18) | set4MSbits);
+      ch[1] = (unsigned char)(((sym >> 12) & get6LSbits) | set1MSbits);
+      ch[2] = (unsigned char)(((sym >> 6) & get6LSbits) | set1MSbits);
+      ch[3] = (unsigned char)((sym & get6LSbits) | set1MSbits);
+      ch[4] = 0;
+    }
+  
+    else
+      return NULL;
+
+    return (char*)ch;
+  }
+
+
+  /*******************************************************************/
+  /*                                                                 */
+  /*  utf8toint                                                      */
+  /*                                                                 */
+  /*******************************************************************/
+
+  unsigned int utf8toint( char **s )
+
+  {
+    int bytes_to_come;
+    unsigned int result=0;
+    unsigned char c=(unsigned char)**s;
+
+    if (c >= (unsigned char)set4MSbits) { // 1111xxxx
+      bytes_to_come = 3;
+      result = (result << 3) | (c & get3LSbits);
+    }
+      
+    else if (c >= (unsigned char) set3MSbits) { // 1110xxxx
+      // start of a three-byte symbol
+      bytes_to_come = 2;
+      result = (result << 4) | (c & get4LSbits);
+    }
+      
+    else if (c >= (unsigned char) set2MSbits) { // 1100xxxx
+      // start of a two-byte symbol
+      bytes_to_come = 1;
+      result = (result << 5) | (c & get5LSbits);
+    }
+      
+    else if (c < (unsigned char) set1MSbits) { // 0100xxxx
+      // one-byte symbol
+      bytes_to_come = 0;
+      result = c;
+    }
+
+    else
+      return 0; // error
+
+    while (bytes_to_come > 0) {
+      bytes_to_come--;
+      (*s)++;
+      c = (unsigned char)**s;
+      if (c < (unsigned char) set2MSbits &&
+	  c >= (unsigned char) set1MSbits)    // 1000xxxx
+	{
+	  result = (result << 6) | (c & get6LSbits);
+	}
+      else
+	return 0;
+    }
+
+    (*s)++;
+    return result;
+  }
+
+  /*******************************************************************/
+  /*                                                                 */
+  /*  utf8toint                                                      */
+  /*                                                                 */
+  /*******************************************************************/
+
+  unsigned int utf8toint( char *s )
+
+  {
+    unsigned int result = utf8toint( &s );
+    if (*s == 0) // all bytes converted?
+      return result;
+    return 0;
+  }
+
+  }
+
+    namespace HfstBasic {
+
+  /*******************************************************************/
+  /*                                                                 */
+  /*  fst_strdup                                                     */
+  /*                                                                 */
+  /*******************************************************************/
+
+  char* fst_strdup(const char* pString)
+
+  {
+    char* pStringCopy = (char*)malloc(strlen(pString) + 1);
+    if (pStringCopy == NULL) {
+      fprintf(stderr, "\nError: out of memory (malloc failed)\naborted.\n");
+      exit(1);
+    }
+    strcpy(pStringCopy, pString);
+    return pStringCopy;
+  }
+
+
+  /*******************************************************************/
+  /*                                                                 */
+  /*  read_string                                                    */
+  /*                                                                 */
+  /*******************************************************************/
+
+  int read_string( char *buffer, int size, FILE *file )
+
+  {
+    for( int i=0; i<size; i++ ) {
+      int c=fgetc(file);
+      if (c == EOF || c == 0) {
+	buffer[i] = 0;
+	return (c==0);
+      }
+      buffer[i] = (char)c;
+    }
+    buffer[size-1] = 0;
+    return 0;
+  }
+
+
+  /*******************************************************************/
+  /*                                                                 */
+  /*  read_num                                                       */
+  /*                                                                 */
+  /*******************************************************************/
+
+  size_t read_num( void *p, size_t n, FILE *file )
+
+  {
+    char *pp=(char*)p;
+    size_t result=fread( pp, 1, n, file );
+    //if (Switch_Bytes) {
+    if (false) {
+      size_t e=n/2;
+      for( size_t i=0; i<e; i++ ) {
+	char tmp=pp[i];
+	pp[i] = pp[--n];
+	pp[n] = tmp;
+      }
+    }
+    return result;
+  }  
+    }
 
 }
