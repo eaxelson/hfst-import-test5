@@ -72,9 +72,7 @@ void hfst_set_program_name(const char* argv0, const char* version,
 /** @brief program's name is made available through a global. 
  * This name can be used when printing program error messages.
  */
-#ifndef HAVE_DECL_PROGRAM_NAME
 extern const char* program_name;
-#endif
 
 /** @brief print standard formatted error message and exit if needed
  */
