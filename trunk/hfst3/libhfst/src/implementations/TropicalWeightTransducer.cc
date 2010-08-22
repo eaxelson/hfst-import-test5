@@ -352,7 +352,7 @@ namespace hfst { namespace implementations
   void TropicalWeightTransducer::write_in_att_format_number(StdVectorFst *t, std::ostream &os)
   {
 
-    SymbolTable *sym = t->InputSymbols();
+    SymbolTable* sym = t->InputSymbols();
 
     // this takes care that initial state is always printed as number zero
     // and state number zero (if it is not initial) is printed as another number

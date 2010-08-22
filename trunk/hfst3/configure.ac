@@ -375,6 +375,7 @@ ifdef([AC_HEADER_ASSERT], [AC_HEADER_ASSERT], [AC_CHECK_HEADERS([assert.h])])
 AC_TYPE_SIZE_T
 
 # Checks for structures
+AC_CHECK_DECLS([program_name, program_invocation_name, program_invocation_short_name])
 
 # Checks for compiler characteristics
 AC_C_INLINE
