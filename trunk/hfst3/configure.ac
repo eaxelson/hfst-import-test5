@@ -104,9 +104,9 @@ AC_ARG_ENABLE([compose],
 AM_CONDITIONAL([WANT_COMPOSE], [test x$enable_compose != xno])
 AC_ARG_ENABLE([compose_intersect],
 			  [AS_HELP_STRING([--enable-compose-intersect],
-							  [build compose-intersect tool @<:@default=no@:>@])],
+							  [build compose-intersect tool @<:@default=yes@:>@])],
 			  [enable_compose_intersect=$enableval],
-			  [enable_compose_intersect=no])
+			  [enable_compose_intersect=yes])
 AM_CONDITIONAL([WANT_COMPOSE_INTERSECT], [test x$enable_compose_intersect != xno])
 AC_ARG_ENABLE([concatenate],
 			  [AS_HELP_STRING([--enable-concatenate],
