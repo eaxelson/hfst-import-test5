@@ -34,6 +34,11 @@
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
+using hfst::HfstMutableTransducer;
+using hfst::HfstStateIterator;
+using hfst::HfstTransitionIterator;
+using hfst::HfstState;
+using hfst::HfstTransition;
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
@@ -112,34 +117,195 @@ process_stream(HfstInputStream& instream)
           verbose_printf("Summarizing... %zu\n", transducer_n);
         }
       HfstTransducer trans(instream);
+      HfstMutableTransducer mutt(trans);
+      size_t states = 0;
+      size_t final_states = 0;
+      //size_t paths = 0;
+      size_t arcs = 0;
+      //size_t sccs = 0;
+      size_t io_epsilons = 0;
+      size_t input_epsilons = 0;
+      size_t output_epsilons = 0;
+      // others
+      size_t densest_arcs = 0;
+      size_t sparsest_arcs = 1<<31;
+      size_t uniq_input_arcs = 0;
+      size_t uniq_output_arcs = 0;
+      pair<string,unsigned int> most_ambiguous_input;
+      pair<string,unsigned int> most_ambiguous_output;
+      HfstState initial_state = mutt.get_initial_state();
+      // iterate states in random orderd
+      for (HfstStateIterator stateIt(mutt);
+           !stateIt.done();
+           stateIt.next())
+        {
+          HfstState s = stateIt.value();
+          ++states;
+          if (mutt.is_final(s))
+            {
+              ++final_states;
+            }
+          size_t arcs_here = 0;
+          map<string,unsigned int> input_ambiguity;
+          map<string,unsigned int> output_ambiguity;
+          for (HfstTransitionIterator arcIt(mutt, s);
+               !arcIt.done();
+               arcIt.next())
+            {
+              HfstTransition a = arcIt.value();
+              arcs++;
+              arcs_here++;
+              if ( (a.isymbol == "@0@") && (a.osymbol == "@0@"))
+                {
+                  io_epsilons++;
+                  input_epsilons++;
+                  output_epsilons++;
+                }
+              else if (a.isymbol == "@0@")
+                {
+                  input_epsilons++;
+                }
+              else if (a.osymbol == "@0@")
+                {
+                  output_epsilons++;
+                }
+              if (input_ambiguity.find(a.isymbol) == input_ambiguity.end())
+                {
+                  input_ambiguity[a.isymbol] = 0;
+                }
+              if (output_ambiguity.find(a.osymbol) == output_ambiguity.end())
+                {
+                  output_ambiguity[a.osymbol] = 0;
+                }
+              input_ambiguity[a.isymbol]++;
+              output_ambiguity[a.osymbol]++;
+            }
+          if (arcs_here > densest_arcs)
+            {
+              densest_arcs = arcs_here;
+            }
+          if (arcs_here < sparsest_arcs)
+            {
+              sparsest_arcs = arcs_here;
+            }
+          for (map<string, unsigned int>::iterator ambit = input_ambiguity.begin();
+               ambit != input_ambiguity.end();
+               ++ambit)
+            {
+              if (ambit->second > most_ambiguous_input.second)
+                {
+                  most_ambiguous_input.first = ambit->first;
+                  most_ambiguous_input.second = ambit->second;
+                }
+              uniq_input_arcs++;
+            }
+          for (map<string, unsigned int>::iterator ambit = output_ambiguity.begin();
+               ambit != output_ambiguity.end();
+               ++ambit)
+            {
+              if (ambit->second > most_ambiguous_output.second)
+                {
+                  most_ambiguous_output.first = ambit->first;
+                  most_ambiguous_output.second = ambit->second;
+                }
+              uniq_output_arcs++;
+            }
+        }
+      // traverse
+      
+      // count physical size
+      
+      // average calculations
+      double average_arcs_per_state = static_cast<double>(arcs)/static_cast<float>(states);
+      double average_input_epsilons = static_cast<double>(input_epsilons)/static_cast<double>(states);
+      double average_input_ambiguity = static_cast<double>(arcs)/static_cast<double>(uniq_input_arcs);
+      double average_output_ambiguity = static_cast<double>(arcs)/static_cast<double>(uniq_output_arcs);
       if (transducer_n > 1)
         {
           fprintf(outfile, "-- \nTransducer #%zu:\n", transducer_n);
         }
+      // next is printed as in OpenFST's fstinfo
+      // do not modify for compatibility
       switch (trans.get_type())
         {
         case hfst::SFST_TYPE:
-          fprintf(outfile, "format: SFST\n");
+          fprintf(outfile, "fst type: SFST\n"
+                  "arc type: SFST\n");
           break;
         case hfst::TROPICAL_OFST_TYPE:
-          fprintf(outfile, "format: OpenFST tropical weights\n");
+          fprintf(outfile, "fst type: OpenFST\n"
+                  "arc type: tropical\n");
           break;
         case hfst::LOG_OFST_TYPE:
-          fprintf(outfile, "format: OpenFST logarithmic weights\n");
+          fprintf(outfile, "fst type: OpenFST\n"
+                  "arc type: log\n");
           break;
         case hfst::FOMA_TYPE:
-          fprintf(outfile, "format: Foma\n");
+          fprintf(outfile, "fst type: foma\n"
+                  "arc type: foma\n");
           break;
         case hfst::HFST_OL_TYPE:
-          fprintf(outfile, "format: HFST optimized lookup\n");
+          fprintf(outfile, "fst type: HFST optimized lookup\n"
+                  "arc type: unweigheted\n");
           break;
         case hfst::HFST_OLW_TYPE:
-          fprintf(outfile, "format: HFST optimized lookup with weights\n");
+          fprintf(outfile, "fst type: HFST optimized lookup\n"
+                  "arc type: weighted\n");
           break;
         default:
-          fprintf(outfile, "format: ???\n");
+          fprintf(outfile, "fst type: ???\n"
+                  "arc type: ???\n");
           break;
         }
+      fprintf(outfile, "input symbol table: ???\n"
+              "output symbol table: ???\n"
+              "# of states: %zu\n"
+              "# of arcs: %zu\n"
+              "initial state: %ld\n"
+              "# of final states: %zu\n"
+              "# of input/output epsilons: %zu\n"
+              "# of input epsilons: %zu\n"
+              "# of output epsilons: %zu\n"
+              "# of ... accessible states: ???\n"
+              "# of ... coaccessible states: ???\n"
+              "# of ... connected states: ???\n"
+              "# of ... strongly conn components: ???\n",
+              states, arcs, 
+              static_cast<long int>(initial_state),
+              final_states, io_epsilons,
+              input_epsilons, output_epsilons);
+      // other names from properties...
+      fprintf(outfile, "expanded: ???\n"
+              "mutable: ???\n"
+              "acceptor: ???\n"
+              "input deterministic: ???\n"
+              "output deterministic: ???\n"
+              "input label sorted: ???\n"
+              "output label sorted: ???\n"
+              "weighted: ???\n"
+              "cyclic: ???\n"
+              "cyclic at initial state: ???\n"
+              "topologically sorted: ???\n"
+              "accessible: ???\n"
+              "coaccessible: ????\n"
+              "string: ???\n"
+              "minimised: ???\n");
+      // our extensions for nice statistics maybe
+      fprintf(outfile,
+              "number of arcs in sparsest state: %zu\n"
+              "number of arcs in densest state: %zu\n"
+              "average arcs per state: %f\n"
+              "average input epsilons per state: %f\n"
+              "most ambiguous input: %s %u\n"
+              "most ambiguous output: %s %u\n"
+              "average input ambiguity: %f\n"
+              "average output ambiguity: %f\n",
+              sparsest_arcs, densest_arcs,
+              average_arcs_per_state,
+              average_input_epsilons,
+              most_ambiguous_input.first.c_str(), most_ambiguous_input.second,
+              most_ambiguous_output.first.c_str(), most_ambiguous_output.second,
+              average_input_ambiguity, average_output_ambiguity);
     }
   return EXIT_SUCCESS;
 }
