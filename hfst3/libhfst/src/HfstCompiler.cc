@@ -176,7 +176,7 @@ namespace hfst
       sym.push_back( p->character );
     free_values( r );
 
-    TheAlphabet.complement(sym);  // TODO!
+    TheAlphabet.complement(sym);
     if (sym.size() == 0)
       error("Empty character range!");
     
@@ -214,9 +214,8 @@ namespace hfst
   }
 
   bool HfstCompiler::def_rvar( char *name, HfstTransducer *t ) {
-    // TODO
-    //if (t->is_cyclic())
-    //error2("cyclic transducer assigned to", name);
+    if (t->is_cyclic())
+      error2("cyclic transducer assigned to", name);
     return def_var( name, t );
   }
   
@@ -292,9 +291,9 @@ namespace hfst
       type = r->get_type();
 
     if (l == NULL)
-      l = new HfstTransducer(type);
+      l = new HfstTransducer("@_EPSILON_SYMBOL_@",type);
     if (r == NULL)
-      r = new HfstTransducer(type);
+      r = new HfstTransducer("@_EPSILON_SYMBOL_@",type);
     
     Contexts *c=new Contexts();
     c->left = l;
@@ -579,9 +578,69 @@ namespace hfst
       }
   }
 
-  HfstTransducer * HfstCompiler::make_mapping( Ranges *r1, Ranges *r2, ImplementationType type ) {
-    return new HfstTransducer(type);  // TODO!
+  HfstTransducer * HfstCompiler::make_mapping( Ranges *list1, Ranges *list2, ImplementationType type ) {
+
+    //Transducer *Interface::make_mapping( Ranges *list1, Ranges *list2 )
+
+    Ranges *l1=list1;
+    Ranges *l2=list2;
+    HfstTransducer *t=new HfstTransducer(0, type); // an epsilon transducer
+
+    //Node *node=t->root_node();
+    while (l1 && l2) {
+      //Node *nn=t->new_node();
+      HfstTransducer disj(type); // an empty transducer
+      for( Range *r1=l1->range; r1; r1=r1->next )
+	for( Range *r2=l2->range; r2; r2=r2->next ) {
+	  //node->add_arc( Label(r1->character, r2->character), nn, t );
+	  HfstTransducer tr(TheAlphabet.code2symbol(r1->character), 
+			    TheAlphabet.code2symbol(r2->character),
+			    type);
+	  disj.disjunct(tr);
+	}
+      //node = nn;
+      t->concatenate(disj);
+      l1 = l1->next;
+      l2 = l2->next;
+    }
+    while (l1) {
+      //Node *nn=t->new_node();
+      HfstTransducer disj(type); // an empty transducer
+      for( Range *r1=l1->range; r1; r1=r1->next ) {
+	//node->add_arc( Label(r1->character, Label::epsilon), nn, t );
+	  HfstTransducer tr(TheAlphabet.code2symbol(r1->character), 
+			    TheAlphabet.code2symbol(0),
+			    type);
+	  disj.disjunct(tr);
+      }
+      //node = nn;
+      t->concatenate(disj);
+      l1 = l1->next;
+    }
+    while (l2) {
+      //Node *nn=t->new_node();
+      HfstTransducer disj(type); // an empty transducer
+      for( Range *r2=l2->range; r2; r2=r2->next ) {
+	//node->add_arc( Label(Label::epsilon, r2->character), nn, t );
+	  HfstTransducer tr(TheAlphabet.code2symbol(0), 
+			    TheAlphabet.code2symbol(r2->character),
+			    type);
+	  disj.disjunct(tr);
+      }
+      //node = nn;
+      t->concatenate(disj);
+      l2 = l2->next;
+    }
+    //node->set_final(1);
+
+    free_values(list1);
+    free_values(list2);
+    
+    t->minimize();
+
+    return t;
   }
+
   
   HfstTransducer * HfstCompiler::result( HfstTransducer *t, bool switch_flag) {
 
@@ -614,6 +673,7 @@ namespace hfst
     TheAlphabet.clear_pairs();
     //TheAlphabet.copy(t->alphabet);
 
+    // check that OpenFst is available
     HfstMutableTransducer t(*tr);
     HfstStateIterator state_it(t);
     while (not state_it.done()) 

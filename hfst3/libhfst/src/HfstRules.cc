@@ -20,18 +20,21 @@ namespace hfst
     {
       HfstTransducer retval(alphabet, type);
       retval.repeat_star();
+      retval.minimize();
       return retval;
     }
 
     HfstTransducer negation_fst(HfstTransducer &t, const StringPairSet &alphabet)
     {
-      bool DEBUG=true;
+      bool DEBUG=false;
 
       if (DEBUG) printf("     negation_fst..\n");
 
       HfstTransducer retval = universal_fst(alphabet, t.get_type());
 
-      if (DEBUG) printf("     (1)\n");
+      retval.minimize();
+
+      /*if (DEBUG)*/ printf("     (1) negation_fst: subtracting\n");
 
       retval.subtract(t);
 
@@ -95,7 +98,7 @@ namespace hfst
     {
       // ct = .* ( m1 >> ( m2 >> t ))  ||  !(.* m1)
 
-      bool DEBUG=true;
+      bool DEBUG=false;
 
       if (DEBUG) printf("    replace_context..\n");
 
@@ -104,10 +107,14 @@ namespace hfst
       t_copy.insert_freely(StringPair(m2,m2));
       t_copy.insert_freely(StringPair(m1,m1));
 
+      t_copy.minimize();
+
       if (DEBUG) printf("    (1)\n");
 
       // arg1 = .* ( m1 >> ( m2 >> t ))
       HfstTransducer arg1 = universal_fst(alphabet, t.get_type());
+
+      arg1.minimize();
 
       if (DEBUG) printf("    (2)\n");
 
@@ -120,6 +127,8 @@ namespace hfst
 
       arg1.concatenate(t_copy);
 
+      arg1.minimize();
+
       if (DEBUG) printf("    (3)\n");
 
       // arg2 = !(.* m1)
@@ -130,6 +139,7 @@ namespace hfst
       // ct = .* ( m1 >> ( m2 >> t ))  ||  !(.* m1)
       HfstTransducer ct = arg1.compose(arg2);
 
+      ct.minimize();
 
       if (DEBUG) printf("    (4)\n");
 
@@ -139,6 +149,8 @@ namespace hfst
       mt.concatenate(m1_tr);
       mt.concatenate(universal_fst(alphabet,t.get_type()));
 
+      mt.minimize();
+
       // !( (!ct mt) | (ct !mt) )
 
       if (DEBUG) printf("    (5)\n");
@@ -147,17 +159,26 @@ namespace hfst
       HfstTransducer ct_neg_mt(ct);
       ct_neg_mt.concatenate(negation_fst(mt, alphabet));
 
+      ct_neg_mt.minimize();
+
       if (DEBUG) printf("    (6)\n");
 
       // !ct mt
       HfstTransducer neg_ct_mt = negation_fst(ct, alphabet).concatenate(mt) ;
+
+      neg_ct_mt.minimize();
 
       if (DEBUG) printf("    (7)\n");
 
       // disjunction
       HfstTransducer disj = neg_ct_mt.disjunct(ct_neg_mt);
 
+      disj.minimize();
+
       if (DEBUG) printf("    (8)\n");
+
+      //printf("before negation:\n");
+      //cerr << disj;
 
       // negation
       HfstTransducer retval = negation_fst(disj, alphabet); 
@@ -282,7 +303,7 @@ namespace hfst
     HfstTransducer replace_in_context(HfstTransducerPair &context, ReplaceType repl_type, HfstTransducer &t, bool optional, StringPairSet &alphabet)
     {
 
-      bool DEBUG=true;
+      bool DEBUG=false;
 
       if (DEBUG) printf("replace_in_context...\n");
 

@@ -10,6 +10,9 @@
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef _SFST_TRANSDUCER_H_
+#define _SFST_TRANSDUCER_H_
+
 #include "HfstExceptions.h"
 #include "FlagDiacritics.h"
 #include "SymbolDefs.h"
@@ -124,3 +127,4 @@ namespace hfst { namespace implementations
       static Transducer * expand_arcs(Transducer * t, StringSet &unknown);
     };
 } }
+#endif

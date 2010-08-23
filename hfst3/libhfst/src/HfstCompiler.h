@@ -96,6 +96,12 @@ namespace hfst
       NumberPairSet pairs;
       
     public:
+      HfstAlphabet() {
+	add("@_EPSILON_SYMBOL_@",0);
+	add("@_UNKNOWN_SYMBOL_@",1);
+	add("@_IDENTITY_SYMBOL_@",2);
+      }
+
       typedef NumberPairSet::const_iterator const_iterator;
       const_iterator begin() const { return pairs.begin(); }
       const_iterator end() const { return pairs.end(); };
@@ -190,10 +196,15 @@ namespace hfst
       bool Alphabet_Defined;
       HfstAlphabet TheAlphabet;
       ImplementationType compiler_type;
+#ifdef SFST
+      
+#endif
       
     HfstCompiler( ImplementationType type, bool verbose=false ) :
       Verbose(verbose), Alphabet_Defined(false), compiler_type(type)
-      {}
+      {
+	
+      }
       
     public:
       HfstTransducer * make_transducer(Range *r1, Range *r2, ImplementationType type);
@@ -240,7 +251,7 @@ namespace hfst
       bool def_rvar( char *name, HfstTransducer *a );
       bool def_svar( char *name, Range *r );
       
-      HfstTransducer *make_mapping( Ranges*, Ranges*, ImplementationType ); // TODO!
+      HfstTransducer *make_mapping( Ranges*, Ranges*, ImplementationType );
       HfstTransducer *result( HfstTransducer*, bool );
       
       // from SFST's interface.C

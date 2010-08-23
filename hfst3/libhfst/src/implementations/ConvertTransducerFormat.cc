@@ -11,8 +11,6 @@
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "ConvertTransducerFormat.h"
-#include <stdbool.h>
-#include "foma/fomalib.h"
 #include "optimized-lookup/convert.h"
 
 namespace hfst { namespace implementations
@@ -339,7 +337,7 @@ SFST::Transducer *  internal_format_to_sfst
   
   for ( fst::SymbolTableIterator it = fst::SymbolTableIterator(*internal_transducer->InputSymbols());
 	not it.Done(); it.Next() ) {
-    t->alphabet.add_symbol( it.Symbol(), (SFST::Character)it.Value() );
+    t->alphabet.add_symbol( it.Symbol().c_str(), (SFST::Character)it.Value() );
   }
   
   }
@@ -376,7 +374,7 @@ struct fsm * internal_format_to_foma
 	{
 	  const fst::StdArc &arc = aiter.Value();
 	  
-	  fst::SymbolTable * isymbols = internal_transducer->InputSymbols();
+	  const fst::SymbolTable * isymbols = internal_transducer->InputSymbols();
 	  std::string istring = isymbols->Find((int64)arc.ilabel);  // if not found, SEGFAULT
 	  char *in = strdup(istring.c_str());
 
@@ -396,7 +394,7 @@ struct fsm * internal_format_to_foma
   for (fst::SymbolTableIterator it = fst::SymbolTableIterator(*internal_transducer->InputSymbols());
        not it.Done(); it.Next()) 
     {
-      char * symbol = strdup( it.Symbol() );
+      char * symbol = strdup( it.Symbol().c_str() );
       if ( fsm_construct_check_symbol(h,symbol) == -1 ) // not found
 	fsm_construct_add_symbol(h,symbol);
     }
@@ -430,6 +428,55 @@ hfst_ol::Transducer * internal_format_to_hfst_ol(InternalTransducer * t, bool we
   hfst_ol::ConvertTransducer conv(t, weighted);
   return conv.to_transducer();
 }
+
+
+
+/* -----------------
+   The new functions.
+   ----------------- */
+
+#ifdef LIBSFST
+HfstInternalTransducer * sfst_to_internal_hfst_format(SFST::Transducer * t) {
+  return NULL; }
+#endif
+
+#ifdef FOMA
+HfstInternalTransducer * foma_to_internal_hfst_format(struct fsm * t) {
+  return NULL; }
+#endif
+
+#ifdef OPENFST
+HfstInternalTransducer * tropical_ofst_to_internal_hfst_format(fst::StdVectorFst * t) {
+  return NULL; }
+
+HfstInternalTransducer * log_ofst_to_internal_hfst_format(LogFst * t) {
+  return NULL; }
+
+HfstInternalTransducer * hfst_ol_to_internal_hfst_format(hfst_ol::Transducer * t) {
+  return NULL; }
+#endif
+
+#ifdef LIBSFST
+SFST::Transducer * hfst_internal_format_to_sfst(HfstInternalTransducer * t) {
+  return NULL; }
+#endif
+
+#ifdef FOMA
+struct fsm * hfst_internal_format_to_foma(InternalTransducer * t) {
+  return NULL; }
+#endif
+
+#ifdef OPENFST
+fst::StdVectorFst * hfst_internal_format_to_openfst(HfstInternalTransducer * t) {
+  return NULL; }
+
+LogFst * hfst_internal_format_to_log_ofst(HfstInternalTransducer * t) {
+  return NULL; }
+
+hfst_ol::Transducer * hfst_internal_format_to_hfst_ol(HfstInternalTransducer * t, bool weighted) {
+  return NULL; }
+#endif
+
 
 } }
 #ifdef DEBUG_CONVERT

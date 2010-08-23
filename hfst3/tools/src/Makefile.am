@@ -18,7 +18,7 @@
 SUBDIRS=hfst-proc
 
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
-AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib
+AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib -DLIBSFST -DOPENFST -DFOMA
 AM_CXXFLAGS = $(WERR_CFLAGS)
 
 if WANT_COMPARE
