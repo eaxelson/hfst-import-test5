@@ -12,18 +12,22 @@
 #ifndef _HFST_TRANSDUCER_H_
 #define _HFST_TRANSDUCER_H_
 
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include "implementations/SymbolDefs.h"
 
-#ifdef LIBSFST
+#if HAVE_SFST
 #include "implementations/SfstTransducer.h"
 #endif
 
-#ifdef OPENFST
+#if HAVE_OPENFST
 #include "implementations/TropicalWeightTransducer.h"
 #include "implementations/LogWeightTransducer.h"
 #endif
 
-#ifdef FOMA
+#if HAVE_FOMA
 #include "implementations/FomaTransducer.h"
 #endif
 
@@ -58,11 +62,11 @@ The examples use Xerox transducer notations ( http://www.xrce.xerox.com/Research
 namespace hfst
 {
 
-#ifdef LIBSFST
+#if HAVE_SFST
   using hfst::implementations::SfstTransducer;
 #endif
 
-#ifdef OPENFST
+#if HAVE_OPENFST
   using hfst::implementations::TropicalWeightTransducer;
   using hfst::implementations::TropicalWeightState;
   using hfst::implementations::TropicalWeightStateIterator;
@@ -73,7 +77,7 @@ namespace hfst
   using hfst::WeightedPaths;
   using hfst::WeightedPath;
 
-#ifdef FOMA
+#if HAVE_FOMA
   using hfst::implementations::FomaTransducer;
 #endif
 
@@ -98,7 +102,7 @@ namespace hfst
   typedef std::pair <HfstTransducer,HfstTransducer> HfstTransducerPair;
   typedef std::set <HfstTransducerPair> HfstTransducerPairSet;
 
-#ifdef OPENFST
+#if HAVE_OPENFST
   class HfstMutableTransducer;
 #endif
 
@@ -138,14 +142,14 @@ namespace hfst
 
     union StreamImplementation
     {
-#ifdef LIBSFST
+#if HAVE_SFST
       hfst::implementations::SfstInputStream * sfst;
 #endif
-#ifdef OPENFST
+#if HAVE_OPENFST
       hfst::implementations::TropicalWeightInputStream * tropical_ofst;
       hfst::implementations::LogWeightInputStream * log_ofst;
 #endif
-#ifdef FOMA
+#if HAVE_FOMA
       hfst::implementations::FomaInputStream * foma;
 #endif
       hfst::implementations::HfstOlInputStream * hfst_ol;
@@ -211,14 +215,14 @@ namespace hfst
   protected:
     union StreamImplementation
     {
-#ifdef OPENFST
+#if HAVE_OPENFST
       hfst::implementations::LogWeightOutputStream * log_ofst;
       hfst::implementations::TropicalWeightOutputStream * tropical_ofst;
 #endif
-#ifdef LIBSFST
+#if HAVE_SFST
       hfst::implementations::SfstOutputStream * sfst;
 #endif
-#ifdef FOMA
+#if HAVE_FOMA
       hfst::implementations::FomaOutputStream * foma;
 #endif
       hfst::implementations::HfstOlOutputStream * hfst_ol;
@@ -251,7 +255,7 @@ namespace hfst
 
   typedef std::vector<HfstTransducer> HfstTransducerVector;
 
-#ifdef OPENFST
+#if HAVE_OPENFST
   class HfstGrammar
   {
   protected:
@@ -269,7 +273,7 @@ namespace hfst
 
 
   /** \brief A handle to a state in a HfstMutableTransducer. **/
-#ifdef OPENFST
+#if HAVE_OPENFST
   typedef hfst::implementations::StateId HfstState;
 #endif
 
@@ -311,30 +315,30 @@ namespace hfst
   protected:
     union TransducerImplementation
     {
-#ifdef LIBSFST
+#if HAVE_SFST
       hfst::implementations::Transducer * sfst;
 #endif
-#ifdef OPENFST
+#if HAVE_OPENFST
       hfst::implementations::StdVectorFst * tropical_ofst;
       hfst::implementations::LogFst * log_ofst;
 #endif
-#ifdef FOMA
+#if HAVE_FOMA
       fsm * foma;
 #endif
       hfst_ol::Transducer * hfst_ol;
-#ifdef OPENFST
+#if HAVE_OPENFST
       hfst::implementations::StdVectorFst * internal;
 #endif 
     };
     
-#ifdef LIBSFST
+#if HAVE_SFST
     static hfst::implementations::SfstTransducer sfst_interface;
 #endif
-#ifdef OPENFST
+#if HAVE_OPENFST
     static hfst::implementations::TropicalWeightTransducer tropical_ofst_interface;
     static hfst::implementations::LogWeightTransducer log_ofst_interface;
 #endif
-#ifdef FOMA
+#if HAVE_FOMA
     static hfst::implementations::FomaTransducer foma_interface;
 #endif
     static hfst::implementations::HfstOlTransducer hfst_ol_interface;
@@ -421,7 +425,7 @@ namespace hfst
     /** \brief Create a deep copy of transducer \a another. **/
     HfstTransducer(const HfstTransducer &another);
     /** \brief Create an ordinary transducer equivalent to mutable transducer \a t. **/
-#ifdef OPENFST
+#if HAVE_OPENFST
     HfstTransducer(const HfstMutableTransducer &t);
 #endif
     /** \brief Delete operator for HfstTransducer. **/
@@ -709,7 +713,7 @@ fclose(ifile);
     HfstTransducer &compose(const HfstTransducer &another);
 
     /** \brief Compose this transducer with \a another. */
-#ifdef OPENFST
+#if HAVE_OPENFST
     HfstTransducer &compose_intersect(HfstGrammar &grammar);
 #endif
 
@@ -767,7 +771,7 @@ fclose(ifile);
     friend std::ostream &operator<<(std::ostream &out, HfstTransducer &t);
     friend class HfstInputStream;
     friend class HfstOutputStream;
-#ifdef OPENFST
+#if HAVE_OPENFST
     friend class HfstMutableTransducer;
     friend class HfstStateIterator;
     friend class HfstTransitionIterator;
@@ -829,7 +833,7 @@ void print(HfstMutableTransducer &t)
      in OpenFst, it is chosen as the only implementation type.
      A separate mutable and iterable transducer class is also safer because
      it does not interact with other operations. */
-#ifdef OPENFST
+#if HAVE_OPENFST
   class HfstMutableTransducer
   {
   protected:
@@ -870,7 +874,7 @@ void print(HfstMutableTransducer &t)
       For an example of iterating through states, see \ref iterator_example "this".
 
       @see HfstMutableTransducer */
-#ifdef OPENFST
+#if HAVE_OPENFST
   class HfstStateIterator
   {
   protected:
@@ -895,7 +899,7 @@ void print(HfstMutableTransducer &t)
       For an example of using transitions, see \ref iterator_example "this". 
 
       @see HfstTransitionIterator HfstMutableTransducer */
-#ifdef OPENFST
+#if HAVE_OPENFST
   class HfstTransition
   {
   public:
@@ -928,7 +932,7 @@ void print(HfstMutableTransducer &t)
       For an example of iterating through states, see \ref iterator_example "this".
 
       @see HfstMutableTransducer */
-#ifdef OPENFST
+#if HAVE_OPENFST
   class HfstTransitionIterator
   {
   protected:
