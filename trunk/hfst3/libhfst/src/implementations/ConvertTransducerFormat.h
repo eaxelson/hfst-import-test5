@@ -16,10 +16,34 @@
 #include <iostream>
 #include <vector>
 #include <map>
+
+#ifdef OPENFST
+#ifndef _FSTLIB_H_
+#define _FSTLIB_H_
 #include <fst/fstlib.h>
-#include "HfstExceptions.h"
+#endif
+#endif
+
+#ifdef LIBSFST
+#ifndef _FST_H_
+#define _FST_H__
 #include "SFST/src/fst.h"
+#endif
+#endif
+
+#ifdef FOMA
+#ifndef _FOMALIB_H_
+#define _FOMALIB_H_
+#include <stdbool.h>
+#include "foma/fomalib.h"
+#endif
+#endif
+
+#include "HfstExceptions.h"
+
 #include "optimized-lookup/transducer.h"
+
+#include "InternalTransducer.h"
 
 struct fsm;
 
@@ -80,5 +104,63 @@ namespace hfst { namespace implementations {
     /* Read a transducer in internal format and return the equivalent
        hfst_ol::Transducer * */
     hfst_ol::Transducer * internal_format_to_hfst_ol(InternalTransducer * t, bool weighted);
+
+
+
+    /* -------------------------------------------------
+       Conversion through an internal transducer format.
+       These functions will replace the old ones. 
+       ------------------------------------------------- */
+    
+    /* Read an SFST::Transducer * and return the equivalent transducer in
+       internal format. */
+#ifdef SFST
+    HfstInternalTransducer * sfst_to_internal_hfst_format(SFST::Transducer * t);
+#endif
+
+#ifdef FOMA
+    HfstInternalTransducer * foma_to_internal_hfst_format(struct fsm * t);
+#endif  
+
+  /* Read an fst::StdVectorFst * and return the equivalent transducer in
+     internal format. */
+#ifdef OPENFST
+    HfstInternalTransducer * tropical_ofst_to_internal_hfst_format
+      (fst::StdVectorFst * t);
+
+  /* Read a LogFst * and return the equivalent transducer in
+     internal format. */
+    HfstInternalTransducer * log_ofst_to_internal_hfst_format
+      (LogFst * t);
+    
+    /* Read an hfst_ol::Transducer * and return the equivalent transducer in
+       internal format. */
+    HfstInternalTransducer * hfst_ol_to_internal_hfst_format(hfst_ol::Transducer * t);
+#endif  
+
+    /* Read a transducer in internal format and return the equivalent
+       SFST::Transducer *. */
+#ifdef LIBSFST
+    SFST::Transducer * hfst_internal_format_to_sfst(HfstInternalTransducer * t);
+#endif
+
+#ifdef FOMA
+    struct fsm * hfst_internal_format_to_foma(InternalTransducer * t);
+#endif    
+
+    /* Read a transducer in internal format and return the equivalent
+       fst::StdVectorFst * */
+#ifdef OPENFST
+    fst::StdVectorFst * hfst_internal_format_to_openfst(HfstInternalTransducer * t);
+
+    /* Read a transducer in internal format and return the equivalent
+       LogFst * */
+    LogFst * hfst_internal_format_to_log_ofst(HfstInternalTransducer * t);
+    
+    /* Read a transducer in internal format and return the equivalent
+       hfst_ol::Transducer * */
+    hfst_ol::Transducer * hfst_internal_format_to_hfst_ol(HfstInternalTransducer * t, bool weighted);
+#endif
+
 } }
 #endif

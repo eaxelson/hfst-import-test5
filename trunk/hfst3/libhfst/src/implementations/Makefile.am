@@ -17,6 +17,9 @@
 
 AUTOMAKE_OPTIONS=subdir-objects
 noinst_LTLIBRARIES=libhfstimplementations.la
+
+AM_CXXFLAGS=-DLIBSFST -DOPENFST -DFOMA
+
 # HFST bridge specific stuff
 IMPLEMENTATION_SRCS= \
 	HfstTokenizer.cc ConvertTransducerFormat.cc FlagDiacritics.cc # GlobalSymbolTable.cc SymbolDefs.cc

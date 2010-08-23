@@ -9,28 +9,34 @@
 //
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
+#ifndef _LOG_WEIGHT_TRANSDUCER_H_
+#define _LOG_WEIGHT_TRANSDUCER_H_
+
 
 #include "SymbolDefs.h"
 #include "HfstExceptions.h"
 #include "FlagDiacritics.h"
 #include <fst/fstlib.h>
-#include "LogFstTrieFunctions.h"
 #include "ExtractStrings.h"
+#include "LogFstTrieFunctions.h"
 #include <cstdio>
 #include <string>
 #include <sstream>
 #include <iostream>
  
-namespace hfst { namespace implementations
+namespace hfst { 
+namespace implementations
 {
   using namespace fst;
   using namespace hfst::exceptions;
+
   typedef ArcTpl<LogWeight>::StateId StateId;
   typedef ArcTpl<LogWeight> LogArc;
   typedef VectorFst<LogArc> LogFst;
 
   using std::ostream;
   using std::ostringstream;
+  using std::stringstream;
 
   //extern GlobalSymbolTable global_symbol_table;
   class LogWeightInputStream 
@@ -39,7 +45,6 @@ namespace hfst { namespace implementations
     std::string filename;
     ifstream i_stream;
     istream &input_stream;
-    bool first_read;
     /*void populate_key_table(KeyTable &key_table,
 			    const SymbolTable * i_symbol_table,
 			    const SymbolTable * o_symbol_table,
@@ -48,7 +53,7 @@ namespace hfst { namespace implementations
     void skip_hfst_header(void);
   public:
     LogWeightInputStream(void);
-    LogWeightInputStream(const char * fn);
+    LogWeightInputStream(const char * filename);
     void open(void);
     void close(void);
     bool is_open(void) const;
@@ -57,7 +62,6 @@ namespace hfst { namespace implementations
     bool is_good(void) const;
     bool is_fst(void) const;
     bool operator() (void) const;
-    //LogFst * read_transducer(KeyTable &key_table);
     LogFst * read_transducer(bool has_header);
     
     static bool is_fst(FILE * f);
@@ -70,57 +74,29 @@ namespace hfst { namespace implementations
     std::string filename;
     ofstream o_stream;
     ostream &output_stream;
-    //void set_symbols(LogFst * transducer, KeyTable &key_table);
     void write_3_0_library_header(std::ostream &out);
   public:
     LogWeightOutputStream(void); 
     LogWeightOutputStream(const char * filename);
     void open(void);
     void close(void);
-    //void write_transducer(LogFst * transducer, KeyTable &key_table);
     void write_transducer(LogFst * transducer);
   };
 
-  /*
   class LogWeightTransitionIterator;
-  class LogWeightStateIndexer;
-  class LogWeightState
-  {
-    protected:
-      StateId state;
-      LogFst * t;
-      friend class LogWeightStateIndexer;
-    public:
-      LogWeightState(StateId state, LogFst * t);
-      LogWeightState(const LogWeightState &s);
-      LogWeight get_final_weight(void) const;
-      bool operator< (const LogWeightState &another) const;
-      bool operator== (const LogWeightState &another) const;
-      bool operator!= (const LogWeightState &another) const;
-      typedef LogWeightTransitionIterator const_iterator; 
-      const_iterator begin(void) const;
-      const_iterator end(void) const;
-      void print(KeyTable &key_table, ostream &out,
-      		 LogWeightStateIndexer &indexer) const;
-  };
+
+  typedef StateId LogWeightState;
 
   class LogWeightStateIterator 
     {
     protected:
-      LogFst * t;
       StateIterator<LogFst> * iterator;
-      int current_state;
-      bool ended;
     public:
       LogWeightStateIterator(LogFst * t);
-      LogWeightStateIterator(void);
       ~LogWeightStateIterator(void);
-      void operator= (const LogWeightStateIterator &another);
-      bool operator== (const LogWeightStateIterator &another) const;
-      bool operator!= (const LogWeightStateIterator &another) const;
-      const LogWeightState operator* (void);
-      void operator++ (void);
-      void operator++ (int);
+      void next(void);
+      bool done(void);
+      LogWeightState value(void);
     };
  
 
@@ -128,64 +104,43 @@ namespace hfst { namespace implementations
     {
     protected:
       LogArc arc;
-      StateId source_state;
       LogFst * t;
     public:
-      LogWeightTransition(const LogArc &arc, 
-			       StateId source_state, 
-			       LogFst * t);
-      Key get_input_key(void) const;
-      Key get_output_key(void) const;
+      LogWeightTransition(const LogArc &arc, LogFst *t);
+      ~LogWeightTransition(void);
+      std::string get_input_symbol(void) const;
+      std::string get_output_symbol(void) const;
       LogWeightState get_target_state(void) const;
-      LogWeightState get_source_state(void) const;
       LogWeight get_weight(void) const;
-      void print(KeyTable &key_table, ostream &out,
-		 LogWeightStateIndexer &indexer) const;
     };
+
 
   class LogWeightTransitionIterator
     {
     protected:
       ArcIterator<LogFst> * arc_iterator;
-      StateId state;
       LogFst * t;
-      bool end_iterator;
     public:
-      LogWeightTransitionIterator(StateId state,LogFst * t);
-      LogWeightTransitionIterator(void);
+      LogWeightTransitionIterator(LogFst * t, StateId state);
       ~LogWeightTransitionIterator(void);
-      void operator=  (const LogWeightTransitionIterator &another);
-      bool operator== (const LogWeightTransitionIterator &another);
-      bool operator!= (const LogWeightTransitionIterator &another);
-      const LogWeightTransition operator* (void);
-      void operator++ (void);
-      void operator++ (int);
+      void next(void);
+      bool done(void);
+      LogWeightTransition value(void);
     };
- 
-  class LogWeightStateIndexer
-    {
-    protected:
-      LogFst * t;
-    public:
-      LogWeightStateIndexer(LogFst * t);
-      unsigned int operator[](const LogWeightState &state);
-      const LogWeightState operator[](unsigned int number);
-    };
-  */
+  
+
   class LogWeightTransducer
     {
     public:
       static LogFst * create_empty_transducer(void);
       static LogFst * create_epsilon_transducer(void);
-      //static LogFst * define_transducer(unsigned int k);
+      static LogFst * define_transducer(const std::string &symbol);
+      static LogFst * define_transducer(const std::string &isymbol, const std::string &osymbol);
 
+      /* TEST */
       static LogFst * define_transducer(unsigned int number);
       static LogFst * define_transducer(unsigned int inumber, unsigned int onumber);
 
-      static LogFst * define_transducer(const std::string& symbol);
-      static LogFst * define_transducer(const std::string& isymbol, const std::string& osymbol);
-      //static LogFst * define_transducer(const pair<unsigned int, unsigned int> &kp);
-      //static LogFst * define_transducer(const KeyPairVector &kpv);
       static LogFst * define_transducer(const hfst::StringPairVector &spv);
       static LogFst * define_transducer(const hfst::StringPairSet &sps);
       static LogFst * copy(LogFst * t);
@@ -202,52 +157,84 @@ namespace hfst { namespace implementations
       static LogFst * reverse(LogFst * transducer);
       static LogFst * extract_input_language(LogFst * t);
       static LogFst * extract_output_language(LogFst * t);
-
-      static LogFst * insert_freely(LogFst * t, const StringPair &symbol_pair);
-
-      static LogFst * substitute(LogFst * t,unsigned int old_key,unsigned int new_key);
-      static LogFst * substitute(LogFst * t,
-				 pair<unsigned int, unsigned int> old_key_pair,
-				 pair<unsigned int, unsigned int> new_key_pair);
-
-      static LogFst * substitute(LogFst * t, String old_symbol, String new_symbol);
-      static LogFst * substitute(LogFst * t,
-				 hfst::StringPair old_symbol_pair,
-				 hfst::StringPair new_symbol_pair);
-
+      static void extract_strings(LogFst * t, hfst::ExtractStringsCb& callback,
+          int cycles=-1, FdTable<int64>* fd=NULL, bool filter_fd=false);
       static LogFst * compose(LogFst * t1,
 				   LogFst * t2);
       static LogFst * concatenate(LogFst * t1,
 					LogFst * t2);
       static LogFst * disjunct(LogFst * t1,
 			      LogFst * t2);
-      static void disjunct_as_tries(LogFst &t1,
-				    const LogFst * t2);
       static LogFst * intersect(LogFst * t1,
 			     LogFst * t2);
       static LogFst * subtract(LogFst * t1,
 			    LogFst * t2);
-
-      static bool are_equivalent(LogFst * t1, LogFst * t2);
-      static bool is_cyclic(LogFst * t);
-
-      //static LogFst * set_weight(LogFst * t,float f);
+      static LogFst * set_weight(LogFst * t,float f);
       static LogFst * set_final_weights(LogFst * t, float weight);
-      static LogFst * transform_weights(LogFst * t,float(*func)(float));
-      //typedef LogWeightStateIterator const_iterator;
-      //static const_iterator begin(LogFst * t);
-      //static const_iterator end(LogFst * t);
-      //static LogFst * harmonize(LogFst * t,KeyMap &key_map);
-      static std::pair<LogFst*, LogFst*> harmonize(StdVectorFst *t1, StdVectorFst *t2);
-      //static void print(LogFst * t, KeyTable &key_table, ostream &out);
-      static void extract_strings(LogFst * t,  ExtractStringsCb& callback,
-          int cycles=-1, FdTable<int64>* fd=NULL, bool filter_fd=false);
-			static FdTable<int64>* get_flag_diacritics(LogFst * t);
-      static void print_test(LogFst *t);
+      static LogFst * transform_weights(LogFst * t,float (*func)(float f));
+
+      static std::pair<LogFst*, LogFst*> harmonize(LogFst *t1, LogFst *t2);
+
+      static void write_in_att_format(LogFst * t, FILE *ofile);
+      static void write_in_att_format_number(LogFst * t, FILE *ofile);
+      
+      static void test_minimize(void);
+
+      static void write_in_att_format(LogFst * t, std::ostream &os);
+      static void write_in_att_format_number(LogFst * t, std::ostream &os);
+
+      static LogFst * read_in_att_format(FILE *ifile);
+      
+      static bool are_equivalent(LogFst *one, LogFst *another);
+      static bool is_cyclic(LogFst * t);
+      
+      static FdTable<int64>* get_flag_diacritics(LogFst * t);
+
+      static LogFst * insert_freely(LogFst * t, const StringPair &symbol_pair);
+      static LogFst * substitute(LogFst * t, std::string old_symbol, std::string new_symbol);
+      static LogFst * substitute(LogFst * t,
+				       StringPair old_symbol_pair,
+				       StringPair new_symbol_pair);
+      static LogFst * substitute(LogFst * t,
+				       StringPair old_symbol_pair,
+				       StringPairSet new_symbol_pair_set);
+      static LogFst * substitute(LogFst * t,
+				       const StringPair old_symbol_pair,
+				       LogFst *transducer);
+
+      static StringSet get_string_set(LogFst *t);
+      static NumberNumberMap create_mapping(LogFst * t1, LogFst * t2);
+      static void recode_symbol_numbers(LogFst * t, hfst::NumberNumberMap &km);      
+      static LogFst * expand_arcs(LogFst * t, hfst::StringSet &unknown);
+      static LogFst * substitute(LogFst * t,unsigned int old_key,unsigned int new_key);
+      static LogFst * substitute(LogFst *t, void (*func)(std::string &isymbol, std::string &osymbol) );
+      static LogFst * substitute(LogFst * t,
+      				       pair<unsigned int, unsigned int> old_key_pair,
+      				       pair<unsigned int, unsigned int> new_key_pair);
+      static void disjunct_as_tries(LogFst &t1,
+				    const LogFst * t2);
+      //      static LogFst * compose_intersect(LogFst * t,
+      //				      Grammar * grammar);
+      //static LogFst * define_transducer(Key k);
+      //static LogFst * define_transducer(const KeyPair &kp);
+      //static LogFst * define_transducer(const KeyPairVector &kpv);
 
     private:
-      static fst::SymbolTable * create_symbol_table(std::string name);
+      static fst::SymbolTable create_symbol_table(std::string name);
       static void initialize_symbol_tables(LogFst *t);
+      
+    public:
+      /* For HfstMutableTransducer */
+      static StateId add_state(LogFst *t);
+      static void set_final_weight(LogFst *t, StateId s, float w);
+      static void add_transition(LogFst *t, StateId source,
+				 std::string &isymbol, std::string &osymbol, float w, StateId target);
+      static float get_final_weight(LogFst *t, StateId s);
+      static float is_final(LogFst *t, StateId s);
+      static StateId get_initial_state(LogFst *t);
+      static void represent_empty_transducer_as_having_one_state(LogFst *t);      
+
     };
 
 } }
+#endif

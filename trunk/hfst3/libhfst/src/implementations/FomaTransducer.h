@@ -10,12 +10,20 @@
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef _FOMA_TRANSDUCER_H_
+#define _FOMA_TRANSDUCER_H_
+
 #include "SymbolDefs.h"
 #include "HfstExceptions.h"
 #include "ExtractStrings.h"
 #include "FlagDiacritics.h"
 #include <stdbool.h>  // foma uses _Bool
+
+#ifndef _FOMALIB_H_
+#define _FOMALIB_H_
 #include "foma/fomalib.h"
+#endif
+
 #include "zlib.h"
 #include <cstdio>
 #include <string>
@@ -115,3 +123,4 @@ namespace hfst {
     };
 
 } }
+#endif
