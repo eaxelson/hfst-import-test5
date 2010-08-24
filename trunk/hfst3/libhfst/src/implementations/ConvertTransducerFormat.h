@@ -50,18 +50,34 @@ namespace hfst { namespace implementations {
 
   using namespace hfst::exceptions;
 
+  // for testing
+  typedef fst::StdVectorFst InternalTransducer;
+
+#if HAVE_OPENFST
   typedef fst::StdArc::StateId StateId;
   typedef fst::ArcIterator<fst::StdVectorFst> StdArcIterator;
-  typedef fst::StdVectorFst InternalTransducer;
+  //typedef fst::StdVectorFst InternalTransducer;
+#endif
+#if HAVE_SFST
   typedef std::vector<SFST::Node *> SfstStateVector;
+  typedef std::map<SFST::Node *,unsigned int> SfstToInternalStateMap;
+#endif
+#if HAVE_OPENFST
   typedef std::vector<StateId> OfstStateVector;
+#endif
+
+  /* Not needed.. */
   typedef std::map<SFST::Node *,StateId> SfstToOfstStateMap;
   typedef std::map<StateId,SFST::Node *> OfstToSfstStateMap;
   typedef std::map<int,StateId> FomaToOfstStateMap;
   typedef std::map<StateId,int> OfstToFomaStateMap;
+  /* .. not needed ends. */
+
+#if HAVE_OPENFST
   typedef std::map<hfst_ol::TransitionTableIndex,StateId> HfstOlToOfstStateMap;
   typedef fst::ArcTpl<fst::LogWeight> LogArc;
   typedef fst::VectorFst<LogArc> LogFst;
+#endif
 
     /* SFST::Transducer * is the sfst transducer format.
        fst::StdVectorFst * is the openfst transducer format. */
@@ -113,7 +129,7 @@ namespace hfst { namespace implementations {
     
     /* Read an SFST::Transducer * and return the equivalent transducer in
        internal format. */
-#ifdef SFST
+#if HAVE_SFST
     HfstInternalTransducer * sfst_to_internal_hfst_format(SFST::Transducer * t);
 #endif
 

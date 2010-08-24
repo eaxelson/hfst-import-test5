@@ -34,7 +34,7 @@ namespace hfst
 
       retval.minimize();
 
-      /*if (DEBUG)*/ printf("     (1) negation_fst: subtracting\n");
+      if (DEBUG) printf("     (1) negation_fst: subtracting\n");
 
       retval.subtract(t);
 

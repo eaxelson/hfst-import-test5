@@ -117,7 +117,6 @@ InternalTransducer * foma_to_internal_format(struct fsm * t)
       // If there are several initial states in foma transducer,
       else {
 	// throw an exception.
-	fprintf(stderr, "FOO\n");
 	throw TransducerHasMoreThanOneStartStateException();
       }
     }
@@ -435,17 +434,95 @@ hfst_ol::Transducer * internal_format_to_hfst_ol(InternalTransducer * t, bool we
    The new functions.
    ----------------- */
 
-#ifdef LIBSFST
+
+#if HAVE_SFST
+void sfst_to_internal( SFST::Node *node, SFST::NodeNumbering &index, 
+		       std::set<SFST::Node*> visited_nodes, HfstInternalTransducer *internal ) {
+
+  if (visited_nodes.find(node) == visited_nodes.end() ) { // if node has not been visited
+    visited_nodes.insert(node);
+    SFST::Arcs *arcs=node->arcs();
+    for( SFST::ArcsIter p(arcs); p; p++ ) {
+      SFST::Arc *arc=p;
+      internal->add_line(index[node], index[arc->target_node()],
+			 arc->label().lower_char(), arc->label().upper_char(), 0);
+    }
+    if (node->is_final())
+      internal->add_line(index[node],0);
+    for( SFST::ArcsIter p(arcs); p; p++ ) {
+      SFST::Arc *arc=p;
+      sfst_to_internal( arc->target_node(), index, visited_nodes, internal);
+    }
+  }
+}
+
 HfstInternalTransducer * sfst_to_internal_hfst_format(SFST::Transducer * t) {
-  return NULL; }
+  
+  HfstInternalTransducer * internal_transducer = new HfstInternalTransducer();
+  SFST::NodeNumbering index(*t);
+  std::set<SFST::Node*> visited_nodes;
+  sfst_to_internal(t->root_node(), index, visited_nodes, internal_transducer);
+
+  HfstAlphabet * alpha = new HfstAlphabet();
+  SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
+  for (SFST::Alphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++)
+    alpha->add_symbol(it->second, it->first);
+  internal_transducer->alphabet = alpha;
+
+  // testing
+  //internal_transducer->print_symbol(stderr);
+
+  return internal_transducer;
+}
 #endif
 
-#ifdef FOMA
+#if HAVE_SFST
+SFST::Transducer * hfst_internal_format_to_sfst(HfstInternalTransducer * internal) {
+
+  SFST::Transducer * t = new SFST::Transducer();
+  if (internal->has_no_lines())
+    return t;
+
+  std::map<unsigned int,SFST::Node*> state_map;
+  state_map[0] = t->root_node();
+
+  std::vector<InternalTransducerLine> *lines = internal->get_lines();
+  for (std::vector<InternalTransducerLine>::iterator it = lines->begin();
+       it != lines->end(); it++)
+    {
+      if (it->final_line) 
+	{
+	  if (state_map.find(it->origin) == state_map.end())
+	    state_map[it->origin] = t->new_node();	    
+	  state_map[it->origin]->set_final(1);
+	}
+      else 
+	{
+	  if (state_map.find(it->origin) == state_map.end())
+	    state_map[it->origin] = t->new_node();
+	  if (state_map.find(it->target) == state_map.end())
+	    state_map[it->target] = t->new_node();
+	  state_map[it->origin]->add_arc(SFST::Label(it->isymbol,it->osymbol),
+					 state_map[it->target],t);
+	}
+    }
+  
+  HfstAlphabet::CharMap cm = internal->alphabet->get_char_map();
+  for (HfstAlphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++)
+    t->alphabet.add_symbol(it->second, it->first);
+
+  return t;
+}
+#endif
+
+
+
+#if HAVE_FOMA
 HfstInternalTransducer * foma_to_internal_hfst_format(struct fsm * t) {
   return NULL; }
 #endif
 
-#ifdef OPENFST
+#if HAVE_OPENFST
 HfstInternalTransducer * tropical_ofst_to_internal_hfst_format(fst::StdVectorFst * t) {
   return NULL; }
 
@@ -456,17 +533,13 @@ HfstInternalTransducer * hfst_ol_to_internal_hfst_format(hfst_ol::Transducer * t
   return NULL; }
 #endif
 
-#ifdef LIBSFST
-SFST::Transducer * hfst_internal_format_to_sfst(HfstInternalTransducer * t) {
-  return NULL; }
-#endif
 
-#ifdef FOMA
+#if HAVE_FOMA
 struct fsm * hfst_internal_format_to_foma(InternalTransducer * t) {
   return NULL; }
 #endif
 
-#ifdef OPENFST
+#if HAVE_OPENFST
 fst::StdVectorFst * hfst_internal_format_to_openfst(HfstInternalTransducer * t) {
   return NULL; }
 

@@ -10,8 +10,11 @@
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#ifndef _HFST_COMPILER_H_
+#define _HFST_COMPILER_H_
+
 #include "HfstTransducer.h"
-#include <ext/hash_map>
+#include "implementations/HfstAlphabet.h"
 
 
 namespace hfst
@@ -63,107 +66,7 @@ namespace hfst
       int read_string( char *buffer, int size, FILE *file );
       size_t read_num( void *p, size_t n, FILE *file );
 
-    }
-
-
-    /* copied from SFST's alphabet.h|C */
-
-    class HfstAlphabet {
-      
-    public:
-      typedef std::pair<Character,Character> NumberPair;
-      
-    private:
-      // string comparison operators needed to stored strings in a hash table
-      struct eqstr {
-	bool operator()(const char* s1, const char* s2) const {
-	  return strcmp(s1, s2) == 0;
-	}
-      };
-      
-      // hash table used to map the symbols to their codes
-      typedef __gnu_cxx::hash_map<const char*, Character, __gnu_cxx::hash<const char*>,eqstr> SymbolMap;
-      // hash table used to map the codes back to the symbols
-      typedef __gnu_cxx::hash_map<Character, char*> CharMap;
-      // set of symbol pairs
-      typedef std::set<NumberPair> NumberPairSet;
-      
-      SymbolMap sm; // maps symbols to codes
-      CharMap  cm; // maps codes to symbols
-      
-      
-      // The set of string pairs
-      NumberPairSet pairs;
-      
-    public:
-      HfstAlphabet() {
-	add("@_EPSILON_SYMBOL_@",0);
-	add("@_UNKNOWN_SYMBOL_@",1);
-	add("@_IDENTITY_SYMBOL_@",2);
-      }
-
-      typedef NumberPairSet::const_iterator const_iterator;
-      const_iterator begin() const { return pairs.begin(); }
-      const_iterator end() const { return pairs.end(); };
-      size_t size() const { return pairs.size(); };
-      
-      //bool contains_special_symbols(StringPair sp);  TODO!
-      
-      void insert(NumberPair sp) { /* check special symbols */ pairs.insert(sp); };  // TODO!
-      void clear_pairs() { pairs.clear(); };
-      
-      void add( const char *symbol, Character c ) {
-	char *s = HfstBasic::fst_strdup(symbol);
-	cm[c] = s;
-	sm[s] = c;
-      }
-
-      int symbol2code( const char * s ) const {
-	SymbolMap::const_iterator p = sm.find(s);
-	if (p != sm.end()) return p->second;
-	return EOF;	
-      }
-
-      const char *code2symbol( Character c ) const {
-	CharMap::const_iterator p=cm.find(c);
-	if (p == cm.end())
-	  return NULL;
-	else
-	  return p->second;
-      }
-
-      unsigned int add_symbol(const char * symbol) {
-	if (sm.find(symbol) != sm.end())
-	  return sm[symbol];
-	
-	// assign the symbol to some unused character
-	for(Character i=1; i!=0; i++)
-	  if (cm.find(i) == cm.end()) {
-	    add(symbol, i);
-	    return i;
-	  }
-	
-	throw "Error: too many symbols in transducer definition";
-      }
-      
-      void complement( vector<Character> &sym ) {
-	vector<Character> result;
-	for( CharMap::const_iterator it=cm.begin(); it!=cm.end(); it++ ) {
-	  Character c = it->first;
-	  if (c != 0) { // Label::epsilon
-	    size_t i;
-	    for( i=0; i<sym.size(); i++ )
-	      if (sym[i] == c)
-		break;
-	    if (i == sym.size())
-	      result.push_back(c);
-	  }
-	}
-	sym.swap(result);
-      }
-      
-    };
-    
+    }    
     
     /** A library class that forms a bridge between the SFST programming language parser
 	and the HFST library and contains some extra functions needed by the parser.
@@ -194,17 +97,13 @@ namespace hfst
     public:
       bool Verbose;
       bool Alphabet_Defined;
-      HfstAlphabet TheAlphabet;
+      implementations::HfstAlphabet TheAlphabet;
       ImplementationType compiler_type;
-#ifdef SFST
-      
-#endif
+
       
     HfstCompiler( ImplementationType type, bool verbose=false ) :
       Verbose(verbose), Alphabet_Defined(false), compiler_type(type)
-      {
-	
-      }
+      {}
       
     public:
       HfstTransducer * make_transducer(Range *r1, Range *r2, ImplementationType type);
@@ -268,5 +167,6 @@ namespace hfst
     };    
 }
 
+#endif
   
 

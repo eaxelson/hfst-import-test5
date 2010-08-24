@@ -27,6 +27,8 @@
 namespace hfst
 {
  
+  using namespace implementations;
+
   HfstTransducer * HfstCompiler::make_transducer(Range *r1, Range *r2, ImplementationType type)
   {
 
@@ -662,6 +664,13 @@ namespace hfst
       t->invert();
     //add_alphabet(t);
     t->minimize();
+
+    //printf("testing conversion:\n");
+    /*HfstInternalTransducer *internal = sfst_to_internal_hfst_format(t->implementation.sfst);
+    delete t->implementation.sfst;
+    t->implementation.sfst = hfst_internal_format_to_sfst(internal);
+    delete internal;*/
+
     return t;
   }
   
