@@ -1,3 +1,10 @@
+#ifndef _INTERNAL_TRANSDUCER_H_
+#define _INTERNAL_TRANSDUCER_H_
+
+#include <string>
+#include <vector>
+#include "HfstAlphabet.h"
+
 namespace hfst {
   namespace implementations {
   
@@ -6,33 +13,38 @@ namespace hfst {
       bool final_line;
       unsigned int origin;
       unsigned int target;
-      std::string isymbol;
-      std::string osymbol;
+      unsigned int isymbol;
+      unsigned int osymbol;
       float weight;
       
-      InternalTransducerLine():
+    InternalTransducerLine():
       final_line(false), origin(0), target(0), 
-	isymbol(std::string("")), osymbol(std::string("")),
+	isymbol(0), osymbol(0),
 	weight((float)0) 
 	  {};
-      ~InternalTransducerLine() 
-	{};
     };
     
     class HfstInternalTransducer;
 
     class HfstInternalTransducer {
     public:
-      InternalTransducerLine line;
-      HfstInternalTransducer * next;    
+      std::vector<InternalTransducerLine> lines;
+      HfstAlphabet * alphabet;
 
-      HfstInternalTransducer(): line(InternalTransducerLine()), next(NULL) {};
-      ~HfstInternalTransducer() {
-	while (next != NULL)
-	  delete next;
-      }
+      HfstInternalTransducer();
+      ~HfstInternalTransducer();
 
+      void add_line(unsigned int final_state, float final_weight); 
+      void add_line(unsigned int origin_state, unsigned int target_state,
+		    unsigned int isymbol, unsigned int osymbol,
+		    float weight);
+      bool has_no_lines();
+      std::vector<InternalTransducerLine> *get_lines();
+      void print_number(FILE*);
+      void print_symbol(FILE*);
     };
 
   }
 }
+#endif
+

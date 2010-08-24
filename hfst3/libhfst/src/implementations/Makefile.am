@@ -18,11 +18,11 @@
 AUTOMAKE_OPTIONS=subdir-objects
 noinst_LTLIBRARIES=libhfstimplementations.la
 
-AM_CXXFLAGS=-DLIBSFST -DOPENFST -DFOMA
+# AM_CXXFLAGS=-DLIBSFST -DOPENFST -DFOMA
 
 # HFST bridge specific stuff
 IMPLEMENTATION_SRCS= \
-	HfstTokenizer.cc ConvertTransducerFormat.cc FlagDiacritics.cc # GlobalSymbolTable.cc SymbolDefs.cc
+	HfstTokenizer.cc ConvertTransducerFormat.cc FlagDiacritics.cc InternalTransducer.cc HfstAlphabet.cc # GlobalSymbolTable.cc SymbolDefs.cc
 
 # the bridges
 if WANT_SFST
@@ -79,7 +79,7 @@ implinclude_HEADERS = \
 		ConvertTransducerFormat.h \
 		ExtractStrings.h FlagDiacritics.h FomaTransducer.h HfstExceptions.h \
 		HfstTokenizer.h LogFstTrieFunctions.h LogWeightTransducer.h \
-		SfstTransducer.h TropicalWeightTransducer.h HfstOlTransducer.h # GlobalSymbolTable.h SymbolDefs.h
+		SfstTransducer.h TropicalWeightTransducer.h HfstOlTransducer.h InternalTransducer.h # GlobalSymbolTable.h SymbolDefs.h
 
 # headers of backends to reveal to public...
 # TODO: in ideal case you'd delete these and link to public libs of backends

@@ -276,6 +276,7 @@ class Transducer {
       vmark = 1;
     }
   };
+ private:
   void reverse_node( Node *old_node, Transducer *new_node );
   Label recode_label( Label, bool lswitch, bool recode, Alphabet& );
   Node *copy_nodes( Node *n, Transducer *a, 

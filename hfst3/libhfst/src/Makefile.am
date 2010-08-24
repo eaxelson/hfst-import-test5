@@ -19,7 +19,7 @@ SUBDIRS=implementations
 AUTOMAKE_OPTIONS=subdir-objects
 lib_LTLIBRARIES = libhfst.la
 
-AM_CXXFLAGS=-Wno-deprecated -Wall -Wextra -DLIBSFST -DOPENFST -DFOMA
+AM_CXXFLAGS=-Wno-deprecated -Wall -Wextra
 
 # HFST bridge specific stuff
 HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc \

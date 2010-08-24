@@ -1918,7 +1918,7 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::subtract(StdVectorFst * t1,
 			  StdVectorFst * t2)
   {
-    bool DEBUG=true;
+    bool DEBUG=false;
 
     if (DEBUG) printf("Tropical subtract...\n");
 
