@@ -665,11 +665,23 @@ namespace hfst
     //add_alphabet(t);
     t->minimize();
 
-    //printf("testing conversion:\n");
-    /*HfstInternalTransducer *internal = sfst_to_internal_hfst_format(t->implementation.sfst);
-    delete t->implementation.sfst;
+    // testing conversion
+    printf("testing_conversion:\n");
+    HfstInternalTransducer *internal = tropical_ofst_to_internal_hfst_format(t->implementation.tropical_ofst);
+    printf("  ..TROPICAL -> INTERNAL\n");
     t->implementation.sfst = hfst_internal_format_to_sfst(internal);
-    delete internal;*/
+    printf("  ..INTERNAL -> SFST\n");
+    delete internal;
+    internal = sfst_to_internal_hfst_format(t->implementation.sfst);
+    printf("  ..SFST -> INTERNAL\n");
+    t->implementation.foma = hfst_internal_format_to_foma(internal);
+    printf("  ..INTERNAL -> FOMA\n");
+    delete internal;
+    internal = foma_to_internal_hfst_format(t->implementation.foma);
+    printf("  ..FOMA -> INTERNAL\n");
+    t->implementation.tropical_ofst = hfst_internal_format_to_tropical_ofst(internal);
+    printf("  ..INTERNAL -> TROPICAL\n");
+    delete internal;
 
     return t;
   }
