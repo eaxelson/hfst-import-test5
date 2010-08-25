@@ -1,6 +1,6 @@
 //! @file hfst-regexp2fst.cc
 //!
-//! @brief Regular expression reading command line tool
+//! @brief regular expression compiling command line tool
 //!
 //! @author HFST Team
 
@@ -25,602 +25,241 @@
 #include <iostream>
 #include <fstream>
 
+#include <vector>
+#include <map>
+
+using std::vector;
+using std::pair;
+
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <getopt.h>
 #include <math.h>
+#include <errno.h>
 
-#include <sstream>
-
-#include <hfst2/hfst.h>
-
-#if NESTED_BUILD
-#include <hfst2/regexp/regexp.h>
-#endif
-
-#if !NESTED_BUILD
-#include <hfst2/regexp.h>
-#endif
-
+#include "HfstTransducer.h"
+#include "implementations/XreCompiler.h"
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 
+#include "inc/globals-common.h"
 #include "inc/globals-unary.h"
 
+using hfst::HfstOutputStream;
+using hfst::HfstTokenizer;
+using hfst::HfstTransducer;
+using hfst::xre::XreCompiler;
 
-static bool is_weighted=false;
+static char *epsilonname=NULL;
 static bool disjunct_expressions=false;
-static char *expression=NULL;
+static bool line_separated = true;
+
+//static unsigned int sum_of_weights=0;
+static bool sum_weights=false;
+static bool normalize_weights=false;
+static bool logarithmic_weights=false;
+
+static hfst::ImplementationType output_format = hfst::UNSPECIFIED_TYPE;
 
 void
-print_usage(const char *program_name)
+print_usage()
 {
-	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
-	printf("USAGE: %s [OPTIONS] INFILE\n"
-		"Parses regular expressions and produces HFST transducers\n"
-	       "\n", program_name);
-		print_common_program_options(message_out);
-#               if DEBUG
-		fprintf(message_out,
-			"%-35s%s", "-d, --debug", "Print debugging messages and results\n"
-			);
-#               endif
-		  
-		fprintf(message_out, "%-35s%s",	"  -i, --input=INFILE",  	"Read input regular expressions from INFILE\n");
-		fprintf(message_out, "%-35s%s",	"  -o, --output=OUTFILE", 	"Write output transducer(s) to OUTFILE\n");
-		fprintf(message_out, "%-35s%s",	"  -R, --read-symbols=FILE", 	"Read symbol table from FILE\n");
-		fprintf(message_out, "%-35s%s",	"  -D, --do-not-write-symbols", "Do not write symbol table with the output transducer(s)\n");
-		fprintf(message_out, "%-35s%s",	"  -W, --write-symbols-to=FILE","Write symbol table to file FILE\n");
-		fprintf(message_out, "%-35s%s",	"  -w, --weighted",         "Write result in weighted format\n");
-		fprintf(message_out, "\n");
-		fprintf(message_out, "%-35s%s",	"  -e, --expression",         "The regular expression\n");
-		fprintf(message_out, "%-35s%s",	"  -j, --disjunct-expressions", "Disjunct all regular expressions instead of transforming each of them into a separate transducer\n"); 
-		fprintf(message_out, "\n");
+    // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
+    fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
+        "Compile string pairs and pair-strings into transducer(s)\n"
+        "\n", program_name); 
+        print_common_program_options(message_out);
+        print_common_unary_program_options(message_out); 
+        fprintf(message_out, "String and format options:\n"
+                "  -f, --format=FMT          Write result in FMT format\n"
+                "  -j, --disjunct-strings    Disjunct all strings instead of "
+                    "transforming each string into a separate transducer\n"
+                "      --sum                 Sum weights of duplicate strings "
+                    "instead of taking minimum\n"
+                "      --norm                Divide each weight by sum "
+                    "of all weights\n"
+                "      --log                 Take negative logarithm "
+                    "of each weight\n"
+                "  -l, --line                Input is line separated\n"
+                "  -S, --semicolon           Input is semicolon separated\n"
+                "  -e, --epsilon=EPS         Map EPS as zero.\n");
+        fprintf(message_out, "\n");
 
-		fprintf(message_out, 
-			"If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
-			);
-		fprintf(stderr, "\n");
-		print_more_info(message_out, "Regexp2Fst");
-		fprintf(stderr, "\n");
-		print_report_bugs(message_out);
+        fprintf(message_out, 
+            "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
+            "FMT must be name of a format usable by libhfst, such as "
+            "openfst-tropical, sfst, foma or hfst-optimized-weighted\n"
+            "If EPS is not defined, the default representation of @0@ is used\n"
+            );
+
+        /*fprintf(message_out,
+            "The input consists of strings separated by newlines. Each string is transformed into a transducer\n"
+            "and written to output. If option -j is used, all resulting transducers are disjuncted instead of writing each\n"
+            "transducer separately to output.\n"
+            "\n"
+            "The input string format is by default input_string:output_string. Both strings are tokenized separately\n"
+            "and the i:th token of input string is matched against the i:th token of output string. If the strings do not\n"
+            "have an equal amount of tokens, epsilon is matched against the rest of the tokens of the longer string.\n"
+            "\n"
+            "If the input string is in pairstring format, option -p must be used. In the pairstring format the token pairs\n"
+            "are written one after another separated by a ':'.\n"
+            "\n"
+            "A symbol table must be defined with option -R, so the program knows how to tokenize the input\n"
+            "(that might contain multicharacter symbols).\n"
+            "If options -p and -S are used (i.e. the input is already tokenized), the symbol table parameter is optional,\n"
+            "but the epsilon symbol must be defined with option -e in order to be correctly mapped to number zero.\n"
+            "\n"
+       */
+        fprintf(message_out, "Examples:\n"
+            "  echo \"c:d a:o t:g\" | %s -l      create cat:dog fst\n"
+            "  echo \"c:d a:o t:g ;\" | %s -S    same as pairstring\n"
+            "\n", program_name, program_name);
+        print_report_bugs();
+        print_more_info();
+        fprintf(message_out, "\n");
 }
-
-void
-print_version(const char* program_name)
-{
-	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dversion
-	fprintf(message_out, "%s 0.1 (" PACKAGE_STRING ")\n"
-		   "Copyright (C) 2008 University of Helsinki,\n"
-		   "License GPLv3: GNU GPL version 3 "
-		   "<http://gnu.org/licenses/gpl.html>\n"
-		   "This is free software: you are free to change and redistribute it.\n"
-		   "There is NO WARRANTY, to the extent permitted by law.\n",
-		program_name);
-}
-
 
 int
 parse_options(int argc, char** argv)
 {
-	// use of this function requires options are settable on global scope
-	while (true)
-	{
-		static const struct option long_options[] =
-		{
-		HFST_GETOPT_COMMON_LONG
-		  ,
-		HFST_GETOPT_UNARY_LONG
-		  ,
-		  {"expression", required_argument, 0, 'e'},
-		  {"disjunct-expressions", no_argument, 0, 'j'},
-		  {"weighted", no_argument, 0, 'w'},
-		  {0,0,0,0}
-		};
-		int option_index = 0;
-		char c = getopt_long(argc, argv, "R:dhi:o:qvVwW:Djse:",
-							 long_options, &option_index);
-		if (-1 == c)
-		{
-			break;
-		}
+    // use of this function requires options are settable on global scope
+    while (true)
+    {
+        static const struct option long_options[] =
+        {
+        HFST_GETOPT_COMMON_LONG,
+        HFST_GETOPT_UNARY_LONG,
+          {"disjunct-strings", no_argument, 0, 'j'},
+          {"epsilon", required_argument, 0, 'e'},
+          {"sum", no_argument, 0, '1'},
+          {"norm", no_argument, 0, '2'},
+          {"log", no_argument, 0, '3'},
+          {"line", no_argument, 0, 'l'},
+          {"semicolon", no_argument, 0, 'S'},
+          {"format", required_argument, 0, 'f'},
+          {0,0,0,0}
+        };
+        int option_index = 0;
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
+                             HFST_GETOPT_UNARY_SHORT "je:123lSf:",
+                             long_options, &option_index);
+        if (-1 == c)
+        {
+            break;
+        }
 
-		switch (c)
-		{
+        switch (c)
+        {
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-unary.h"
-		case 'e':
-		  expression = hfst_strdup(optarg);
-		  break;
-		case 'j':
-			disjunct_expressions = true;
-			break;
-		case 'w':
-			is_weighted = true;
-			break;
-		case '?':
-			fprintf(message_out, "invalid option --%s\n",
-					long_options[option_index].name);
-			print_short_help(argv[0]);
-			return EXIT_FAILURE;
-			break;
-		default:
-			fprintf(message_out, "invalid option -%c\n", c);
-			print_short_help(argv[0]);
-			return EXIT_FAILURE;
-			break;
-		}
-	}
+        case 'e':
+            epsilonname = hfst_strdup(optarg);
+            break;
+        case '1':
+            sum_weights = true;
+            break;
+        case '2':
+            normalize_weights = true;
+            break;
+        case '3':
+            logarithmic_weights = true;
+            break;
+        case 'j':
+            disjunct_expressions = true;
+            break;
+        case 'S':
+            line_separated = false;
+            break;
+        case 'l':
+            line_separated = true;
+            break;
+        case 'f':
+            output_format = hfst_parse_format_name(optarg);
+            break;
+#include "inc/getopt-cases-error.h"
+        }
+    }
 
-	if (is_output_stdout)
-	{
-			outfilename = hfst_strdup("<stdout>");
-			outfile = stdout;
-			message_out = stderr;
-	}
-	// rest of arguments are files...
-	if (is_input_stdin && ((argc - optind) == 1))
-	{
-		inputfilename = hfst_strdup(argv[optind]);
-		if (strcmp(inputfilename, "-") == 0) {
-		  inputfilename = hfst_strdup("<stdin>");
-		  inputfile = stdin;
-		  is_input_stdin = true;
-		}
-		else {
-		  inputfile = hfst_fopen(inputfilename, "r");
-		  is_input_stdin = false;
-		}
-	}
-	else if (inputfile) {
-
-	}
-	else if ((argc - optind) == 0)
-	{
-		inputfilename = hfst_strdup("<stdin>");
-		inputfile = stdin;
-		is_input_stdin = true;
-	}
-	else if ((argc - optind) > 1)
-	{
-		fprintf(message_out, "Exactly one input transducer file must be given\n");
-		print_short_help(argv[0]);
-		return EXIT_FAILURE;
-	}
-	else
-	{
-		fprintf(message_out, "???\n");
-		return 73;
-	}
-	return EXIT_CONTINUE;
+#include "inc/check-params-common.h"
+#include "inc/check-params-unary.h"
+    if (output_format == hfst::UNSPECIFIED_TYPE)
+      {
+        verbose_printf("Output format not specified, "
+             "defaulting to openfst tropical\n");
+        output_format = hfst::TROPICAL_OFST_TYPE;
+      }
+    return EXIT_CONTINUE;
 }
-
-
 
 int
-invert_stream(std::istream& inputstream, std::ostream& outstream)
+process_stream(HfstOutputStream& outstream)
 {
-     if (!is_weighted)
-                {
-		verbose_printf("Using unweighted format\n");
-		try {
-
-		  HFST::TransducerHandle result = HFST::create_empty_transducer();
-		  
-		  HFST::KeyTable *key_table = NULL;
-		  if (read_symbols_from_filename) {
-		    ifstream is(read_symbols_from_filename);
-		    key_table = HFST::read_symbol_table(is);
-		    is.close();
-		    verbose_printf("Symbol table read\n");
-		  }
-		  else {
-		    key_table = HFST::create_key_table();
-		    HFST::associate_key(0, key_table, HFST::define_symbol("@0@"));
-		  }
-
-		  HFST::KeyPairSet *negation_pi = HFST::create_empty_keypair_set();
-		  HFST::KeyPairSet *creation_pi = HFST::create_empty_keypair_set();
-
-		  negation_pi = HFST::insert_keypair( HFST::define_keypair(0, 0),
-						      negation_pi );
-		  creation_pi = HFST::insert_keypair( HFST::define_keypair(0, 0),
-						      creation_pi );
-
-		  if (read_symbols_from_filename) {
-	    
-		    HFST::KeySet *key_set1 = HFST::get_key_set(key_table);
-		    HFST::KeySet *key_set2 = HFST::get_key_set(key_table);		    
-		    HFST::KeySet::iterator it1;
-		    HFST::KeySet::iterator it2;	    
-
-		    for (it1=key_set1->begin(); it1!=key_set1->end(); ++it1) {
-		      for (it2=key_set2->begin(); it2!=key_set2->end(); ++it2) {
-			negation_pi = HFST::insert_keypair( HFST::define_keypair(*it1, *it2),
-							    negation_pi );
-			creation_pi = HFST::insert_keypair( HFST::define_keypair(*it1, *it2),
-							    creation_pi );
-		      }
-		    }
-		  }
-
-		  if (expression) {
-
-		    char *regex_data = HFST::string_copy(expression);
-
-		    verbose_printf("Compiling unweighted transducer\n");
-		    HFST::TransducerHandle heavyDucer;
-		    heavyDucer = HFST::compile_xre(regex_data, 
-						   negation_pi, 
-						   creation_pi, 
-						   key_table);
-		    free(regex_data);
-		    verbose_printf("Calculating symbol mappings\n");
-		    HFST::KeyTable* symbolmap = HFST::xre_get_last_key_table();
-		    if (NULL == heavyDucer)
-		      {
-			fprintf(message_out, "ERROR: null returned");
-			return 2;
-		      }
-		    if (HFST::is_empty(heavyDucer))
-		      {
-			verbose_printf("Resulting transducer is empty!\n");
-		      }
-		    if (verbose)
-		      {
-			fprintf(message_out, "The regular expression contained symbols: ");
-			bool first = true;
-			HFST::KeySet* keys = HFST::xre_get_last_key_set();
-			for (HFST::KeyIterator k = HFST::begin_sigma_key(keys);
-			     k != HFST::end_sigma_key(keys); ++k)
-			  {
-			    if (!first)
-			      {
-				fprintf(message_out, ", ");
-			      }
-			    fprintf(message_out, "%s", HFST::get_symbol_name(
-									     HFST::get_key_symbol(*k, symbolmap)));
-			    first = false;
-			  }
-			fprintf(message_out, "\n");
-		      }
-		    
-		    if (write_symbols)
-		      HFST::write_transducer(heavyDucer, key_table, outstream);
-		    else
-		      HFST::write_transducer(heavyDucer, outstream);
-		  }
-
-
-		  else {
-		    inputstream.peek();
-
-		    while (!inputstream.eof()) {
-		      std::string input_line;
-		      std::getline(inputstream,input_line);
-		      const char * line = input_line.c_str();
-		      if (strcmp(line,"") == 0) // an empty line
-			continue;
-
-		      char *regex_data = HFST::string_copy(line);
-		      
-		      verbose_printf("Compiling unweighted transducer\n");
-		      HFST::TransducerHandle heavyDucer;
-		      heavyDucer = HFST::compile_xre(regex_data, 
-						     negation_pi, 
-						     creation_pi, 
-						     key_table);
-		      free(regex_data);
-		      verbose_printf("Calculating symbol mappings\n");
-		      HFST::KeyTable* symbolmap = HFST::xre_get_last_key_table();
-		      if (NULL == heavyDucer)
-			{
-			  fprintf(message_out, "ERROR: null returned");
-			  return 2;
-			}
-		      if (HFST::is_empty(heavyDucer))
-			{
-			  verbose_printf("Resulting transducer is empty!\n");
-			}
-		      if (verbose)
-			{
-			  fprintf(message_out, "The regular expression contained symbols: ");
-			  bool first = true;
-			  HFST::KeySet* keys = HFST::xre_get_last_key_set();
-			  for (HFST::KeyIterator k = HFST::begin_sigma_key(keys);
-			       k != HFST::end_sigma_key(keys); ++k)
-			    {
-			      if (!first)
-				{
-				  fprintf(message_out, ", ");
-				}
-			      fprintf(message_out, "%s", HFST::get_symbol_name(
-									       HFST::get_key_symbol(*k, symbolmap)));
-			      first = false;
-			    }
-			  fprintf(message_out, "\n");
-			}
-		    
-		      result = HFST::disjunct(result, heavyDucer);
-
-		      if (!disjunct_expressions) {
-			if (write_symbols)
-			  HFST::write_transducer(result, key_table, outstream);
-			else
-			  HFST::write_transducer(result, outstream);
-			result = HFST::create_empty_transducer();
-		      }
-		    
-		      inputstream.peek();
-		  		       
-		    }
-
-		    if (disjunct_expressions) {
-			
-		      if (write_symbols)
-			HFST::write_transducer(result, key_table, outstream);
-		      else
-			HFST::write_transducer(result, outstream);
-		    }
-		  }
-
-		  if (write_symbols_to_filename != NULL) {
-		    ofstream os(write_symbols_to_filename);
-		    HFST::write_symbol_table(key_table, os);
-		    os.close();
-		  }
-		  delete key_table;
-		  
-		}
-		catch (const char *p)
-		{
-			printf("HFST library error: %s\n", p);
-			return EXIT_FAILURE;
-		}
-		return EXIT_SUCCESS;
-	}
-        else
-	  {
-	    verbose_printf("Using weighted format\n");
-		try {
-
-		  HWFST::TransducerHandle result = HWFST::create_empty_transducer();
-		  
-		  HWFST::KeyTable *key_table = NULL;
-		  if (read_symbols_from_filename) {
-		    ifstream is(read_symbols_from_filename);
-		    key_table = HWFST::read_symbol_table(is);
-		    is.close();
-		    verbose_printf("Symbol table read\n");
-		  }
-		  else {
-		    key_table = HWFST::create_key_table();
-		    HWFST::associate_key(0, key_table, HWFST::define_symbol("@0@"));
-		  }
-
-		  HWFST::KeyPairSet *negation_pi = HWFST::create_empty_keypair_set();
-		  HWFST::KeyPairSet *creation_pi = HWFST::create_empty_keypair_set();
-
-		  negation_pi = HWFST::insert_keypair( HWFST::define_keypair(0, 0),
-						      negation_pi );
-		  creation_pi = HWFST::insert_keypair( HWFST::define_keypair(0, 0),
-						      creation_pi );
-
-		  if (read_symbols_from_filename) {
-	    
-		    HWFST::KeySet *key_set1 = HWFST::get_key_set(key_table);
-		    HWFST::KeySet *key_set2 = HWFST::get_key_set(key_table);		    
-		    HWFST::KeySet::iterator it1;
-		    HWFST::KeySet::iterator it2;	    
-
-		    for (it1=key_set1->begin(); it1!=key_set1->end(); it1++) {
-		      for (it2=key_set2->begin(); it2!=key_set2->end(); it2++) {
-			negation_pi = HWFST::insert_keypair( HWFST::define_keypair(*it1, *it2),
-							    negation_pi );
-			creation_pi = HWFST::insert_keypair( HWFST::define_keypair(*it1, *it2),
-							    creation_pi );
-		      }
-		    }
-		  }
-
-		  if (expression) {
-
-		    char *regex_data = HFST::string_copy(expression);
-
-		    verbose_printf("Compiling unweighted transducer\n");
-		    HWFST::TransducerHandle heavyDucer;
-		    heavyDucer = HWFST::compile_xre(regex_data, 
-						    negation_pi, 
-						    creation_pi, 
-						    key_table);
-		    free(regex_data);
-		    verbose_printf("Calculating symbol mappings\n");
-		    HWFST::KeyTable* symbolmap = HWFST::xre_get_last_key_table();
-		    if (NULL == heavyDucer)
-		      {
-			fprintf(message_out, "ERROR: null returned");
-			return 2;
-		      }
-		    if (HWFST::is_empty(heavyDucer))
-		      {
-			verbose_printf("Resulting transducer is empty!\n");
-		      }
-		    if (verbose)
-		      {
-			fprintf(message_out, "The regular expression contained symbols: ");
-			bool first = true;
-			HWFST::KeySet* keys = HWFST::xre_get_last_key_set();
-			for (HWFST::KeyIterator k = HWFST::begin_sigma_key(keys);
-			     k != HWFST::end_sigma_key(keys); ++k)
-			  {
-			    if (!first)
-			      {
-				fprintf(message_out, ", ");
-			      }
-			    fprintf(message_out, "%s", HWFST::get_symbol_name(
-									     HWFST::get_key_symbol(*k, symbolmap)));
-			    first = false;
-			  }
-			fprintf(message_out, "\n");
-		      }
-		    
-		    if (write_symbols)
-		      HWFST::write_transducer(heavyDucer, key_table, outstream);
-		    else
-		      HWFST::write_transducer(heavyDucer, outstream);
-		  }
-
-
-		  else {
-		    inputstream.peek();
-
-		    while (!inputstream.eof()) {
-		      std::string input_line;
-		      std::getline(inputstream,input_line);
-		      const char * line = input_line.c_str();
-
-		      if (strcmp(line,"") == 0) // an empty line
-			continue;
-		      
-		      char *regex_data = HFST::string_copy(line);
-		      
-		      verbose_printf("Compiling unweighted transducer\n");
-		      HWFST::TransducerHandle heavyDucer;
-		      heavyDucer = HWFST::compile_xre(regex_data, 
-						      negation_pi, 
-						      creation_pi, 
-						      key_table);
-		      free(regex_data);
-		      verbose_printf("Calculating symbol mappings\n");
-		      HWFST::KeyTable* symbolmap = HWFST::xre_get_last_key_table();
-		      if (NULL == heavyDucer)
-			{
-			  fprintf(message_out, "ERROR: null returned");
-			  return 2;
-			}
-		      if (HWFST::is_empty(heavyDucer))
-			{
-			  verbose_printf("Resulting transducer is empty!\n");
-			}
-		      if (verbose)
-			{
-			  fprintf(message_out, "The regular expression contained symbols: ");
-			  bool first = true;
-			  HWFST::KeySet* keys = HWFST::xre_get_last_key_set();
-			  for (HWFST::KeyIterator k = HWFST::begin_sigma_key(keys);
-			       k != HWFST::end_sigma_key(keys); ++k)
-			    {
-			      if (!first)
-				{
-				  fprintf(message_out, ", ");
-				}
-			      fprintf(message_out, "%s", HWFST::get_symbol_name(
-									       HWFST::get_key_symbol(*k, symbolmap)));
-			      first = false;
-			    }
-			  fprintf(message_out, "\n");
-			}
-		    
-		      result = HWFST::disjunct(result, heavyDucer);
-
-		      if (!disjunct_expressions) {
-			if (write_symbols)
-			  HWFST::write_transducer(result, key_table, outstream);
-			else
-			  HWFST::write_transducer(result, outstream);
-			result = HWFST::create_empty_transducer();
-		      }
-		    
-		      inputstream.peek();
-		  		       
-		    }
-
-		    if (disjunct_expressions) {
-			
-		      if (write_symbols)
-			HWFST::write_transducer(result, key_table, outstream);
-		      else
-			HWFST::write_transducer(result, outstream);
-		    }
-		  }
-
-		  if (write_symbols_to_filename != NULL) {
-		    ofstream os(write_symbols_to_filename);
-		    HWFST::write_symbol_table(key_table, os);
-		    os.close();
-		  }
-		  delete key_table;
-		  
-		}
-		catch (const char *p)
-		{
-			printf("HFST library error: %s\n", p);
-			return EXIT_FAILURE;
-		}	    
-
-		return EXIT_SUCCESS;
-	  }
+  size_t transducer_n = 0;
+  char* line = 0;
+  size_t len = 0;
+  unsigned int line_count = 0;
+  XreCompiler comp(output_format);
+  HfstTransducer disjunction(output_format);
+  outstream.open();
+  while (hfst_getline(&line, &len, inputfile) != -1)
+    {
+      transducer_n++;
+      line_count++;
+      HfstTransducer* compiled;
+      if (line_separated)
+        {
+          compiled = comp.compile(line);
+        }
+      else
+        {
+          return EXIT_FAILURE;
+        }
+      if (disjunct_expressions)
+        {
+          disjunction.disjunct(*compiled);
+        }
+      else
+        {
+          outstream << *compiled;
+        }
+      delete compiled;
+    }
+  if (disjunct_expressions)
+    {
+      outstream << disjunction;
+    }
+  free(line);
+  return EXIT_SUCCESS;
 }
 
-extern int xredebug;
 
-int main( int argc, char **argv ) {
-  //xredebug = 1;
-	message_out = stdout;
-	verbose = false;
-	int retval = parse_options(argc, argv);
-	if (retval != EXIT_CONTINUE)
-	{
-		return retval;
-	}
-	// close buffers, we use streams
-	if (inputfile != stdin)
-	{
-		fclose(inputfile);
-	}
-	if (outfile != stdout)
-	{
-		fclose(outfile);
-	}
-	verbose_printf("Reading from %s, writing to %s\n", 
-		inputfilename, outfilename);
-	// here starts the buffer handling part
-	if (!is_input_stdin)
-	{
-		std::filebuf fbinput;
-		fbinput.open(inputfilename, std::ios::in);
-		std::istream inputstream(&fbinput);
-		if (!is_output_stdout)
-		{
-			std::filebuf fbout;
-			fbout.open(outfilename, std::ios::out);
-			std::ostream outstream(&fbout);
-			retval = invert_stream(inputstream, outstream);
-		}
-		else
-		{
-			retval = invert_stream(inputstream, std::cout);
-		}
-		return retval;
-	}
-	else if (is_input_stdin)
-	{
-		if (!is_output_stdout)
-		{
-			std::filebuf fbout;
-			fbout.open(outfilename, std::ios::out);
-			std::ostream outstream(&fbout);
-			retval = invert_stream(std::cin, outstream);
-		}
-		else
-		{
-			retval = invert_stream(std::cin, std::cout);
-		}
-		return retval;
-	}
-	free(inputfilename);
-	free(outfilename);
-	return EXIT_SUCCESS;
+int main( int argc, char **argv ) 
+{
+  hfst_set_program_name(argv[0], "0.1", "Regexp2Fst");
+  int retval = parse_options(argc, argv);
+  if (retval != EXIT_CONTINUE)
+    {
+      return retval;
+    }
+  // close buffers, we use streams
+  if (inputfile != stdin)
+    {
+      fclose(inputfile);
+    }
+  if (outfile != stdout)
+    {
+      fclose(outfile);
+    }
+  verbose_printf("Reading from %s, writing to %s\n", 
+                 inputfilename, outfilename);
+  // here starts the buffer handling part
+  HfstOutputStream* outstream = (outfile != stdout) ?
+        new HfstOutputStream(outfilename, output_format) :
+        new HfstOutputStream(output_format);
+  process_stream(*outstream);
+  free(inputfilename);
+  free(outfilename);
+  return EXIT_SUCCESS;
 }
 

@@ -83,6 +83,12 @@ if test "x$with_sfst" == "xno" -a "x$with_openfst" == "xno" -a "x$with_foma" == 
     AC_MSG_ERROR([must build with at least one fst backend])
 fi
 
+AC_ARG_ENABLE([xre],
+              [AS_HELP_STRING([--enable-xre],
+                              [build xerox reg.exp. parser @<:@default=yes@:>@])],
+              [enable_xre=$enableval],
+              [enable_xre=yes])
+AM_CONDITIONAL([WANT_XRE], [test "x$enable_xre" != xyes])
 # allow programs to be built separately (sort alphabetically)
 AC_ARG_ENABLE([calculate],
 			  [AS_HELP_STRING([--enable-calculate],
@@ -224,10 +230,13 @@ AC_ARG_ENABLE([push_weights],
 AM_CONDITIONAL([WANT_PUSH_WEIGHTS], [test x$enable_push_weights != xno])
 AC_ARG_ENABLE([regexp2fst],
 			  [AS_HELP_STRING([--enable-regexp2fst],
-							  [build regexp2fst tool @<:@default=no@:>@])],
+							  [build regexp2fst tool @<:@default=yes@:>@])],
 			  [enable_regexp2fst=$enableval],
-			  [enable_regexp2fst=no])
+			  [enable_regexp2fst=yes])
 AM_CONDITIONAL([WANT_REGEXP2FST], [test x$enable_regexp2fst != xno])
+if test x$enable_regexp2fst != xno -a x$enable_xre == xno ; then
+    AC_MSG_ERROR([regexp2fst requires xre])
+fi
 AC_ARG_ENABLE([remove_epsilons],
 			  [AS_HELP_STRING([--enable-remove-epsilons],
 							  [build remove-epsilons tool @<:@default=yes@:>@])],
