@@ -153,7 +153,7 @@ LWSP [\t\r\n ]
     return READ_PROLOG;
 }
 
-"@re\""[^""]+"\"" [
+"@re\""[^""]+"\"" {
     xrelval.label = hfst::xre::get_quoted(xretext);
     return READ_RE;
 }
