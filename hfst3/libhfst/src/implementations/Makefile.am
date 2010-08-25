@@ -68,8 +68,17 @@ HFST_OL_SRCS=\
 optimized-lookup/transducer.cc optimized-lookup/convert.cc
 endif
 
+if WANT_XRE
+XRE_SRCS=xre_lex.ll xre_parse.yy xre_utils.cc XreCompiler.cc
+XRE_HDRS=XreCompiler.h xre_utils.h
+BUILT_SOURCES=xre_parse.h
+endif
+AM_YFLAGS=-d
+AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
+
 libhfstimplementations_la_SOURCES=$(IMPLEMENTATION_SRCS) $(BRIDGE_SRCS) \
-								  $(SFST_SRCS) $(FOMA_SRCS) $(HFST_OL_SRCS)
+								  $(SFST_SRCS) $(FOMA_SRCS) $(HFST_OL_SRCS) \
+								  $(XRE_SRCS)
 
 # headers of implementation bridge to reveal to public
 hfstincludedir = $(includedir)/hfst
@@ -79,7 +88,8 @@ implinclude_HEADERS = \
 		ConvertTransducerFormat.h \
 		ExtractStrings.h FlagDiacritics.h FomaTransducer.h HfstExceptions.h \
 		HfstTokenizer.h LogFstTrieFunctions.h LogWeightTransducer.h \
-		SfstTransducer.h TropicalWeightTransducer.h HfstOlTransducer.h InternalTransducer.h # GlobalSymbolTable.h SymbolDefs.h
+		SfstTransducer.h TropicalWeightTransducer.h HfstOlTransducer.h InternalTransducer.h \
+		$(XRE_HDRS)
 
 # headers of backends to reveal to public...
 # TODO: in ideal case you'd delete these and link to public libs of backends
