@@ -88,7 +88,7 @@ AC_ARG_ENABLE([xre],
                               [build xerox reg.exp. parser @<:@default=yes@:>@])],
               [enable_xre=$enableval],
               [enable_xre=yes])
-AM_CONDITIONAL([WANT_XRE], [test "x$enable_xre" != xyes])
+AM_CONDITIONAL([WANT_XRE], [test "x$enable_xre" != xno])
 # allow programs to be built separately (sort alphabetically)
 AC_ARG_ENABLE([calculate],
 			  [AS_HELP_STRING([--enable-calculate],

@@ -46,7 +46,7 @@ std::map<std::string,hfst::HfstTransducer> definitions;
 char* startptr;
 hfst::HfstTransducer* last_compiled;
 hfst::ImplementationType format;
-unsigned int len;
+size_t len;
 
 int*
 get_n_to_k(const char* s)
