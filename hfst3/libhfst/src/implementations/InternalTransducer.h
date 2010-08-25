@@ -4,6 +4,7 @@
 #include <string>
 #include <vector>
 #include "HfstAlphabet.h"
+#include "SymbolDefs.h"
 
 namespace hfst {
   namespace implementations {
@@ -40,8 +41,11 @@ namespace hfst {
 		    float weight);
       bool has_no_lines();
       std::vector<InternalTransducerLine> *get_lines();
+
       void print_number(FILE*);
       void print_symbol(FILE*);
+      void substitute(void (*func)(std::string &isymbol, std::string &osymbol));   
+      void insert_freely(const StringPair &symbol_pair);
     };
 
   }

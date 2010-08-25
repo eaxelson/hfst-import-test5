@@ -74,6 +74,9 @@ namespace hfst { namespace implementations {
   /* .. not needed ends. */
 
 #if HAVE_OPENFST
+  // added
+  typedef std::map<hfst_ol::TransitionTableIndex,unsigned int> HfstOlToInternalStateMap;
+
   typedef std::map<hfst_ol::TransitionTableIndex,StateId> HfstOlToOfstStateMap;
   typedef fst::ArcTpl<fst::LogWeight> LogArc;
   typedef fst::VectorFst<LogArc> LogFst;
