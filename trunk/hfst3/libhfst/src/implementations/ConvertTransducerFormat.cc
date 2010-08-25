@@ -517,14 +517,172 @@ SFST::Transducer * hfst_internal_format_to_sfst(HfstInternalTransducer * interna
 
 
 
+
+
 #if HAVE_FOMA
+// Both input and output symbol tables of internal format will contain
+// all symbols in the sigma of the foma transducer
 HfstInternalTransducer * foma_to_internal_hfst_format(struct fsm * t) {
-  return NULL; }
+
+  HfstInternalTransducer * internal_transducer = new HfstInternalTransducer();
+  struct fsm_state *fsm;
+  fsm = t->states;
+  int start_state_id=0;
+  bool start_state_found=false;
+
+  // For every line in foma transducer:
+  for (int i=0; (fsm+i)->state_no != -1; i++) {    
+
+    // 1. If the source state is an initial state in foma:
+    if ((fsm+i)->start_state == 1) {
+      // If the start state has not yet been encountered.
+      if (not start_state_found) {
+	start_state_id = (fsm+i)->state_no;
+	if (start_state_id != 0) {
+	  printf("ERROR: in foma transducer: start state is not numbered as zero\n");
+	  throw ErrorException();
+	}
+	start_state_found=true;
+      }
+      // If the start state is encountered again, 
+      else if ((fsm+i)->state_no == start_state_id) {
+	// do nothing.
+      }
+      // If there are several initial states in foma transducer,
+      else {
+	// throw an exception.
+	throw TransducerHasMoreThanOneStartStateException();
+      }
+    }
+
+    // 2. If there are transitions leaving from the state,
+    if ((fsm+i)->target != -1) {  
+      internal_transducer->add_line((fsm+i)->state_no, (fsm+i)->target, (fsm+i)->in, (fsm+i)->out, 0);
+    }
+    
+    // 3. If the source state is final in foma,
+    if ((fsm+i)->final_state == 1) {
+      internal_transducer->add_line((fsm+i)->state_no, 0);
+    }
+
+  }
+
+  // If there was not an initial state in foma transducer,
+  if (not start_state_found) {
+    // throw an exception.
+    throw TransducerHasNoStartStateException();
+  }
+
+  HfstAlphabet * alpha = new HfstAlphabet();
+  // is this needed?
+  alpha->add_symbol("@_EPSILON_SYMBOL_@", 0);
+  alpha->add_symbol("@_UNKNOWN_SYMBOL_@", 1);
+  alpha->add_symbol("@_IDENTITY_SYMBOL_@", 2);
+
+  struct sigma * p = t->sigma;
+  while (p != NULL) {
+    if (p->symbol == NULL)
+      break;
+    alpha->add_symbol(p->symbol, p->number);
+    p = p->next;
+  }
+  internal_transducer->alphabet = alpha;
+
+  return internal_transducer;
+}
 #endif
+
+
+
+
 
 #if HAVE_OPENFST
 HfstInternalTransducer * tropical_ofst_to_internal_hfst_format(fst::StdVectorFst * t) {
-  return NULL; }
+
+  HfstInternalTransducer * internal_transducer = new HfstInternalTransducer();
+
+  // this takes care that initial state is always printed as number zero
+  // and state number zero (if it is not initial) is printed as another number
+  // (basically as the number of the initial state in that case, i.e.
+  // the numbers of initial state and state number zero are swapped)
+  StateId zero_print=0;
+  StateId initial_state = t->Start();
+  if (initial_state != 0) {
+    zero_print = initial_state;
+  }
+  
+  for (fst::StateIterator<fst::StdVectorFst> siter(*t); 
+       not siter.Done(); siter.Next()) 
+    {
+      StateId s = siter.Value();
+      if (s == initial_state) {
+	int origin;  // how origin state is printed, see the first comment
+	if (s == 0)
+	  origin = zero_print;
+	else if (s == initial_state)
+	  origin = 0;
+	else
+	  origin = (int)s;
+	for (fst::ArcIterator<fst::StdVectorFst> aiter(*t,s); 
+	     !aiter.Done(); aiter.Next())
+	  {
+	    const fst::StdArc &arc = aiter.Value();
+	    int target;  // how target state is printed, see the first comment
+	    if (arc.nextstate == 0)
+	      target = zero_print;
+	    else if (arc.nextstate == initial_state)
+	      target = 0;
+	    else
+	      target = (int)arc.nextstate;
+	    internal_transducer->add_line(origin, target,
+	      arc.ilabel, arc.olabel, arc.weight.Value() );
+	  }
+	if (t->Final(s) != fst::TropicalWeight::Zero())
+	  internal_transducer->add_line(origin, t->Final(s).Value());
+	break;
+	}
+      }
+
+    for (fst::StateIterator<fst::StdVectorFst> siter(*t); 
+	 not siter.Done(); siter.Next())
+      {
+	StateId s = siter.Value();
+	if (s != initial_state) {
+	  int origin;  // how origin state is printed, see the first comment
+	  if (s == 0)
+	    origin = zero_print;
+	  else if (s == initial_state)
+	    origin = 0;
+	  else
+	    origin = (int)s;
+	  for (fst::ArcIterator<fst::StdVectorFst> aiter(*t,s); 
+	       !aiter.Done(); aiter.Next())
+	    {
+	      const fst::StdArc &arc = aiter.Value();
+	      int target;  // how target state is printed, see the first comment
+	      if (arc.nextstate == 0)
+		target = zero_print;
+	      else if (arc.nextstate == initial_state)
+		target = 0;
+	      else
+		target = (int)arc.nextstate;
+	      internal_transducer->add_line(origin, target,
+		arc.ilabel, arc.olabel, arc.weight.Value());
+	    }
+	  if (t->Final(s) != fst::TropicalWeight::Zero())
+	    internal_transducer->add_line(origin, t->Final(s).Value());
+	}
+      }
+
+    HfstAlphabet * alpha = new HfstAlphabet();
+    for ( fst::SymbolTableIterator it = fst::SymbolTableIterator(*(t->InputSymbols()));
+	  not it.Done(); it.Next() ) {
+      alpha->add_symbol( it.Symbol().c_str(), (unsigned int)it.Value() );
+    }    
+    internal_transducer->alphabet = alpha;
+
+    return internal_transducer;
+}
 
 HfstInternalTransducer * log_ofst_to_internal_hfst_format(LogFst * t) {
   return NULL; }
@@ -535,13 +693,93 @@ HfstInternalTransducer * hfst_ol_to_internal_hfst_format(hfst_ol::Transducer * t
 
 
 #if HAVE_FOMA
-struct fsm * hfst_internal_format_to_foma(InternalTransducer * t) {
-  return NULL; }
+// SymbolTable is converted to sigma, but the string-to-number
+// relations are changed...
+struct fsm * hfst_internal_format_to_foma(HfstInternalTransducer * internal_transducer) {
+
+  struct fsm_construct_handle *h;
+  struct fsm *net;
+  h = fsm_construct_init(strdup(std::string("").c_str()));
+
+  std::vector<InternalTransducerLine> *lines = internal_transducer->get_lines();
+  for (std::vector<InternalTransducerLine>::iterator it = lines->begin();
+       it != lines->end(); it++) 
+    {
+      if (it->final_line)
+	fsm_construct_set_final(h, (int)it->origin);
+      else 
+	{
+	  char *in = strdup(internal_transducer->alphabet->code2symbol(it->isymbol));
+	  char *out = strdup(internal_transducer->alphabet->code2symbol(it->osymbol));
+	  fsm_construct_add_arc(h, (int)it->origin, (int)it->target, in, out);
+	  // not clear whether in and out should be freed...
+	}
+    }
+  
+  // Add symbols that are in the symbol table but do not occur in the transducer
+  HfstAlphabet::CharMap cm = internal_transducer->alphabet->get_char_map();
+  for (HfstAlphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++)
+    {
+      char *symbol = strdup(it->second);
+      if ( fsm_construct_check_symbol(h,symbol) == -1 ) // not found
+	fsm_construct_add_symbol(h,symbol);
+      // free symbol?
+    }
+
+  fsm_construct_set_initial(h, 0);
+  // not clear what happens if start state is not number zero...
+  net = fsm_construct_done(h);
+  fsm_count(net);
+  net = fsm_topsort(net);
+
+  return net;      
+}
 #endif
 
 #if HAVE_OPENFST
-fst::StdVectorFst * hfst_internal_format_to_openfst(HfstInternalTransducer * t) {
-  return NULL; }
+fst::StdVectorFst * hfst_internal_format_to_tropical_ofst(HfstInternalTransducer * internal_transducer) {
+
+  fst::StdVectorFst * t = new fst::StdVectorFst();
+  StateId start_state = t->AddState();
+  t->SetStart(start_state);
+
+  if (internal_transducer->has_no_lines())
+    return t;
+
+  std::map<unsigned int,unsigned int> state_map;
+  state_map[0] = start_state;
+
+  std::vector<InternalTransducerLine> *lines = internal_transducer->get_lines();
+  for (std::vector<InternalTransducerLine>::iterator it = lines->begin();
+       it != lines->end(); it++)
+    {
+      if (it->final_line) 
+	{
+	  if (state_map.find(it->origin) == state_map.end())
+	    state_map[it->origin] = t->AddState();	    
+	  t->SetFinal(state_map[it->origin],it->weight);
+	}
+      else 
+	{
+	  if (state_map.find(it->origin) == state_map.end())
+	    state_map[it->origin] = t->AddState();
+	  if (state_map.find(it->target) == state_map.end())
+	    state_map[it->target] = t->AddState();
+	  t->AddArc(state_map[it->origin],
+		    fst::StdArc(it->isymbol, it->osymbol,
+				it->weight, state_map[it->target]));
+	}
+    }
+
+  fst::SymbolTable *st = new fst::SymbolTable("anonym_hfst3_symbol_table");
+  HfstAlphabet::CharMap cm = internal_transducer->alphabet->get_char_map();
+  for (HfstAlphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++)
+    st->AddSymbol(std::string(it->second), (int64)it->first);    
+  t->SetInputSymbols(st);
+  delete st;
+
+  return t;  
+}
 
 LogFst * hfst_internal_format_to_log_ofst(HfstInternalTransducer * t) {
   return NULL; }
