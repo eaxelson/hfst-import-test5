@@ -605,6 +605,13 @@ namespace hfst { namespace implementations {
   { Transducer * retval = &t->replace_char(t->alphabet.add_symbol(old_symbol.c_str()),t->alphabet.add_symbol(new_symbol.c_str())); 
     return retval; }
 
+  Transducer * SfstTransducer::substitute(Transducer *t, const StringPair &symbol_pair, Transducer *tr)
+  { Transducer * retval = &t->splice( Label(
+					t->alphabet.add_symbol(symbol_pair.first.c_str()),
+					t->alphabet.add_symbol(symbol_pair.second.c_str()) ), tr );
+    return retval;
+  }
+
   
   Transducer * SfstTransducer::compose
   (Transducer * t1, Transducer * t2)

@@ -2,7 +2,7 @@
 #define _INTERNAL_TRANSDUCER_H_
 
 #include <string>
-#include <vector>
+#include <set>
 #include "HfstAlphabet.h"
 #include "SymbolDefs.h"
 
@@ -23,13 +23,15 @@ namespace hfst {
 	isymbol(0), osymbol(0),
 	weight((float)0) 
 	  {};
+
+      bool operator<(const InternalTransducerLine &another) const;
     };
     
     class HfstInternalTransducer;
 
     class HfstInternalTransducer {
     public:
-      std::vector<InternalTransducerLine> lines;
+      std::set<InternalTransducerLine> lines;
       HfstAlphabet * alphabet;
 
       HfstInternalTransducer();
@@ -40,11 +42,17 @@ namespace hfst {
 		    unsigned int isymbol, unsigned int osymbol,
 		    float weight);
       bool has_no_lines();
-      std::vector<InternalTransducerLine> *get_lines();
+      std::set<InternalTransducerLine> *get_lines();
+      unsigned int max_state_number();
 
       void print_number(FILE*);
       void print_symbol(FILE*);
-      void substitute(void (*func)(std::string &isymbol, std::string &osymbol));   
+      void substitute(const StringPair &sp, const StringPairSet &sps);
+      void substitute(void (*func)(std::string &isymbol, std::string &osymbol) );   
+      void substitute(const StringPair &sp, HfstInternalTransducer &transducer);
+      void substitute(const std::string &old_symbol, const std::string &new_symbol,
+		      bool input_side=true, bool output_side=true);
+      void substitute(const StringPair &old_pair, const StringPair &new_pair); 
       void insert_freely(const StringPair &symbol_pair);
     };
 

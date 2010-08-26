@@ -33,6 +33,10 @@ public HfstSymbolsException {};
 class HfstInterfaceException 
 {};
 
+/** \brief The implementation type requested is not linked to HFST. */
+class ImplementationTypeNotAvailableException :
+public HfstInterfaceException {};
+
 /** \brief File cannot be read. */
 class FileNotReadableException :
 public HfstInterfaceException {};

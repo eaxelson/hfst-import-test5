@@ -323,6 +323,11 @@ namespace hfst { namespace implementations {
     return fsm_empty_string();
   }
   
+  void FomaTransducer::harmonize(struct fsm *net1, struct fsm *net2)
+  {
+    fsm_merge_sigma(net1, net2);
+  }
+
   void FomaTransducer::delete_foma(struct fsm * net)
   {
     fsm_destroy(net);

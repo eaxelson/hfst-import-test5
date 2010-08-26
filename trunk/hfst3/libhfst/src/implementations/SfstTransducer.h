@@ -101,6 +101,7 @@ namespace hfst { namespace implementations
 
       static Transducer * insert_freely(Transducer *t , const StringPair &symbol_pair);
       static Transducer * substitute(Transducer * t, String old_symbol, String new_symbol);
+      static Transducer * substitute(Transducer *t, const StringPair &symbol_pair, Transducer *tr);
 
       static Transducer * compose(Transducer * t1,
 			   Transducer * t2);
