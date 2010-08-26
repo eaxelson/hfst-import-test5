@@ -666,7 +666,7 @@ namespace hfst
     t->minimize();
 
     // testing conversion
-    printf("testing_conversion:\n");
+    /*printf("testing_conversion:\n");
     HfstInternalTransducer *internal = tropical_ofst_to_internal_hfst_format(t->implementation.tropical_ofst);
     printf("  ..TROPICAL -> INTERNAL\n");
     t->implementation.sfst = hfst_internal_format_to_sfst(internal);
@@ -681,7 +681,7 @@ namespace hfst
     printf("  ..FOMA -> INTERNAL\n");
     t->implementation.tropical_ofst = hfst_internal_format_to_tropical_ofst(internal);
     printf("  ..INTERNAL -> TROPICAL\n");
-    delete internal;
+    delete internal;*/
 
     return t;
   }

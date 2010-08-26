@@ -113,10 +113,12 @@ namespace hfst {
       static fsm * subtract(fsm * t1,
 			    fsm * t2);
 			
-			static void extract_strings(fsm * t, hfst::ExtractStringsCb& callback,
-            int cycles=-1, FdTable<int>* fd=NULL, bool filter_fd=false);
-			
-			static FdTable<int>* get_flag_diacritics(fsm * t);
+      static void extract_strings(fsm * t, hfst::ExtractStringsCb& callback,
+				  int cycles=-1, FdTable<int>* fd=NULL, bool filter_fd=false);
+      
+      static FdTable<int>* get_flag_diacritics(fsm * t);
+      
+      static void harmonize(fsm *net1, fsm *net2);
 			
       static void delete_foma(fsm * net);
       static void print_test(fsm * t);

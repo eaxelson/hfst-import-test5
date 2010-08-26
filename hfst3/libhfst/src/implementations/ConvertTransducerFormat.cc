@@ -486,8 +486,8 @@ SFST::Transducer * hfst_internal_format_to_sfst(HfstInternalTransducer * interna
   std::map<unsigned int,SFST::Node*> state_map;
   state_map[0] = t->root_node();
 
-  std::vector<InternalTransducerLine> *lines = internal->get_lines();
-  for (std::vector<InternalTransducerLine>::iterator it = lines->begin();
+  std::set<InternalTransducerLine> *lines = internal->get_lines();
+  for (std::set<InternalTransducerLine>::iterator it = lines->begin();
        it != lines->end(); it++)
     {
       if (it->final_line) 
@@ -866,8 +866,8 @@ struct fsm * hfst_internal_format_to_foma(HfstInternalTransducer * internal_tran
   struct fsm *net;
   h = fsm_construct_init(strdup(std::string("").c_str()));
 
-  std::vector<InternalTransducerLine> *lines = internal_transducer->get_lines();
-  for (std::vector<InternalTransducerLine>::iterator it = lines->begin();
+  std::set<InternalTransducerLine> *lines = internal_transducer->get_lines();
+  for (std::set<InternalTransducerLine>::iterator it = lines->begin();
        it != lines->end(); it++) 
     {
       if (it->final_line)
@@ -914,8 +914,8 @@ fst::StdVectorFst * hfst_internal_format_to_tropical_ofst(HfstInternalTransducer
   std::map<unsigned int,unsigned int> state_map;
   state_map[0] = start_state;
 
-  std::vector<InternalTransducerLine> *lines = internal_transducer->get_lines();
-  for (std::vector<InternalTransducerLine>::iterator it = lines->begin();
+  std::set<InternalTransducerLine> *lines = internal_transducer->get_lines();
+  for (std::set<InternalTransducerLine>::iterator it = lines->begin();
        it != lines->end(); it++)
     {
       if (it->final_line) 
@@ -958,8 +958,8 @@ LogFst * hfst_internal_format_to_log_ofst(HfstInternalTransducer * internal_tran
   std::map<unsigned int,unsigned int> state_map;
   state_map[0] = start_state;
 
-  std::vector<InternalTransducerLine> *lines = internal_transducer->get_lines();
-  for (std::vector<InternalTransducerLine>::iterator it = lines->begin();
+  std::set<InternalTransducerLine> *lines = internal_transducer->get_lines();
+  for (std::set<InternalTransducerLine>::iterator it = lines->begin();
        it != lines->end(); it++)
     {
       if (it->final_line) 

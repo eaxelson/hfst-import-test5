@@ -646,7 +646,9 @@ fclose(ifile);
 
 	The transition weights remain the same. */
     HfstTransducer &substitute(const std::string &old_symbol,
-			       const std::string &new_symbol);
+			       const std::string &new_symbol,
+			       bool input_side=true,
+			       bool output_side=true);
 						      
     /** \brief Substitute all transition symbol pairs equal to \a old_symbol_pair with \a new_symbol_pair. 
 
