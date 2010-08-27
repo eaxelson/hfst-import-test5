@@ -5,6 +5,8 @@
 #include <set>
 #include "HfstAlphabet.h"
 #include "SymbolDefs.h"
+#include "HfstExceptions.h"
+#include <cassert>
 
 namespace hfst {
   namespace implementations {
@@ -45,6 +47,8 @@ namespace hfst {
       std::set<InternalTransducerLine> *get_lines();
       unsigned int max_state_number();
 
+      void read_number(FILE*);
+      void read_symbol(FILE*);
       void print_number(FILE*);
       void print_symbol(FILE*);
       void substitute(const StringPair &sp, const StringPairSet &sps);

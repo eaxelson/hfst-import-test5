@@ -556,12 +556,14 @@ HfstInternalTransducer * foma_to_internal_hfst_format(struct fsm * t) {
     }
 
     // 2. If there are transitions leaving from the state,
-    if ((fsm+i)->target != -1) {  
+    if ((fsm+i)->target != -1) {
+      //printf("add_line\n");
       internal_transducer->add_line((fsm+i)->state_no, (fsm+i)->target, (fsm+i)->in, (fsm+i)->out, 0);
     }
     
     // 3. If the source state is final in foma,
     if ((fsm+i)->final_state == 1) {
+      //printf("add_final_line\n");
       internal_transducer->add_line((fsm+i)->state_no, 0);
     }
 

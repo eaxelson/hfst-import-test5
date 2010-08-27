@@ -134,6 +134,7 @@ FN	[A-Za-z0-9._/\-*+]
 "\\->"            { yylval.rtype = repl_left; return REPLACE; }
 ">>"              { return PRINT; }
 "<<"              { return INSERT; }
+"<<<"             { return SUBSTITUTE; }
 "__"              { return POS; }
 "^_"              { return SWITCH; }
 
