@@ -277,6 +277,27 @@ namespace hfst
     return t;
   }
 
+  HfstTransducer * HfstCompiler::substitute(HfstTransducer *t, Character old_char, Character new_char) {
+    t->substitute(std::string(TheAlphabet.code2symbol(old_char)), std::string(TheAlphabet.code2symbol(new_char)));
+    return t;
+  }
+
+  HfstTransducer * HfstCompiler::substitute(HfstTransducer *t, Character old_char_in, Character old_char_out,
+					    Character new_char_in, Character new_char_out) {
+    t->substitute( hfst::StringPair(TheAlphabet.code2symbol(old_char_in), 
+				    TheAlphabet.code2symbol(old_char_out)),
+		   hfst::StringPair(TheAlphabet.code2symbol(new_char_in), 
+				    TheAlphabet.code2symbol(new_char_out)) );
+    return t;
+  }
+
+  HfstTransducer * HfstCompiler::substitute(HfstTransducer *t, Character old_char_in, Character old_char_out,
+					    HfstTransducer *tr) {
+    t->substitute( hfst::StringPair(TheAlphabet.code2symbol(old_char_in),
+				    TheAlphabet.code2symbol(old_char_out)), *tr );
+    return t;
+  }
+
   Contexts *HfstCompiler::make_context( HfstTransducer *l, HfstTransducer *r )
   {
     if (l != NULL && r != NULL) {
@@ -682,6 +703,9 @@ namespace hfst
     t->implementation.tropical_ofst = hfst_internal_format_to_tropical_ofst(internal);
     printf("  ..INTERNAL -> TROPICAL\n");
     delete internal;*/
+
+    // testing substitute
+    printf("\n");
 
     return t;
   }

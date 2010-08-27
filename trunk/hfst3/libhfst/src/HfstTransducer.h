@@ -767,6 +767,10 @@ fclose(ifile);
 	@see convert(ImplementationType type) */
     static HfstTransducer &convert(const HfstTransducer &t, ImplementationType type);
 
+    static HfstTransducer * internal_to_hfst_transducer(
+							hfst::implementations::HfstInternalTransducer * internal_transducer, 
+							ImplementationType type);
+
     HfstTokenizer create_tokenizer();
 
     HfstTransducer &operator=(const HfstTransducer &another);

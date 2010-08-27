@@ -50,7 +50,7 @@ bool DEBUG=false;
   hfst::Contexts   *contexts;
 }
 
-%token <number> NEWLINE ALPHA COMPOSE PRINT POS INSERT SWITCH
+%token <number> NEWLINE ALPHA COMPOSE PRINT POS INSERT SUBSTITUTE SWITCH
 %token <type>   ARROW
 %token <rtype>  REPLACE
 %token <name>   SYMBOL VAR SVAR RVAR RSVAR
@@ -65,7 +65,7 @@ bool DEBUG=false;
 %type  <ranges>     RANGES
 %type  <contexts>   CONTEXT CONTEXT2 CONTEXTS CONTEXTS2
 
-%left PRINT INSERT
+%left PRINT INSERT SUBSTITUTE
 %left ARROW REPLACE
 %left COMPOSE
 %left '|'
@@ -109,6 +109,9 @@ RE:         RE ARROW CONTEXTS2      { $$ = compiler->restriction($1,$2,$3,0); }
           | '{' RANGES '}' ':' RANGE { $$ = compiler->make_mapping($2,compiler->add_range($5,NULL),type); }
           | RE INSERT CODE ':' CODE  { $$ = compiler->insert_freely($1,$3,$5); }
           | RE INSERT CODE           { $$ = compiler->insert_freely($1,$3,$3); }
+	  | RE SUBSTITUTE CODE ':' CODE  { $$ = compiler->substitute($1,$3,$5); }
+	  | RE SUBSTITUTE CODE ':' CODE ':' CODE ':' CODE { $$ = compiler->substitute($1,$3,$5,$7,$9); }
+	  | RE SUBSTITUTE CODE ':' CODE '(' RE ')' { $$ = compiler->substitute($1,$3,$5,$7); }
           | RANGE ':' RANGE  { $$ = compiler->new_transducer($1,$3,type); }
           | RANGE            { $$ = compiler->new_transducer($1,$1,type); }
           | VAR              { if (DEBUG) { printf("calling transducer variable \"%s\"\n", $1); }; $$ = compiler->var_value($1); }

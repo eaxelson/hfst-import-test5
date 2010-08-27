@@ -5,7 +5,38 @@ namespace hfst {
     
     bool InternalTransducerLine::operator<(const InternalTransducerLine &another) const 
     {
-      return( this->origin < another.origin );
+      if (this->final_line && another.final_line) {
+	if ( this->origin < another.origin )
+	  return true;
+	return false;
+      }
+      if (this->final_line) {
+	if (this->origin < another.origin)
+	  return true;
+	return false;
+      }
+      if (another.final_line) {
+	if (this->origin <= another.origin)
+	  return true;
+	return false;
+      }
+
+      if ( this->origin < another.origin ) return true;
+      if ( this->origin > another.origin ) return false;
+
+      if ( this->target < another.target ) return true;
+      if ( this->target > another.target ) return false;
+
+      if ( this->isymbol < another.isymbol ) return true;
+      if ( this->isymbol > another.isymbol ) return false;
+
+      if ( this->osymbol < another.osymbol ) return true;
+      if ( this->osymbol > another.osymbol ) return false;
+
+      if ( this->weight < another.weight ) return true;
+      if ( this->weight > another.weight ) return false;
+
+      return false;
     }
 
 
@@ -52,6 +83,63 @@ namespace hfst {
       return max;
     }
 
+    void HfstInternalTransducer::read_number(FILE *file) 
+    {
+      char line [255];
+      while ( fgets(line, 255, file) != NULL ) 
+	{
+	  if (*line == '-') // transducer separator
+	    return;
+	  char a1 [100]; char a2 [100]; char a3 [100]; char a4 [100]; char a5 [100];
+	  int n = sscanf(line, "%s\t%s\t%s\t%s\t%s", a1, a2, a3, a4, a5);
+
+	  // set value of weight
+	  float weight = 0;
+	  if (n == 2)
+	    weight = atof(a2);
+	  if (n == 5)
+	    weight = atof(a5);
+
+	  if (n == 1 || n == 2)  // final state line
+	    add_line( atoi(a1), weight );
+
+	  else if (n == 4 || n == 5)  // transition line
+	    add_line( atoi(a1), atoi(a2), atoi(a3), atoi(a4), weight );
+	  
+	  else  // line could not be parsed
+	    throw hfst::exceptions::NotValidAttFormatException();       
+	}
+    }
+
+    void HfstInternalTransducer::read_symbol(FILE *file) 
+    {
+      assert(alphabet != NULL);
+      char line [255];
+      while ( fgets(line, 255, file) != NULL ) 
+	{
+	  if (*line == '-') // transducer separator
+	    return;
+	  char a1 [100]; char a2 [100]; char a3 [100]; char a4 [100]; char a5 [100];
+	  int n = sscanf(line, "%s\t%s\t%s\t%s\t%s", a1, a2, a3, a4, a5);
+
+	  // set value of weight
+	  float weight = 0;
+	  if (n == 2)
+	    weight = atof(a2);
+	  if (n == 5)
+	    weight = atof(a5);
+
+	  if (n == 1 || n == 2)  // final state line
+	    add_line( atoi(a1), weight );
+
+	  else if (n == 4 || n == 5)  // transition line
+	    add_line( atoi(a1), atoi(a2), alphabet->add_symbol(a3), alphabet->add_symbol(a4), weight );
+	  
+	  else  // line could not be parsed
+	    throw hfst::exceptions::NotValidAttFormatException();       
+	}
+    }
+
     void HfstInternalTransducer::print_number(FILE *file) {
       for (std::set<InternalTransducerLine>::iterator it = lines.begin(); 
 	   it != lines.end(); it++) {
@@ -68,15 +156,22 @@ namespace hfst {
 	   it != lines.end(); it++) {
 	if (it->final_line)
 	  fprintf(file, "%i\t%f\n", it->origin, it->weight);
-	else
-	  fprintf(file, "%i\t%i\t%s\t%s\t%f\n", it->origin, it->target, 
-		  alphabet->code2symbol(it->isymbol), alphabet->code2symbol(it->osymbol),
-		  it->weight);
+	else {
+	  if (alphabet != NULL)
+	    fprintf(file, "%i\t%i\t%s\t%s\t%f\n", it->origin, it->target, 
+		    alphabet->code2symbol(it->isymbol), alphabet->code2symbol(it->osymbol),
+		    it->weight);
+	  else
+	    fprintf(file, "%i\t%i\t\\%i\t\\%i\t%f\n", it->origin, it->target, 
+		    it->isymbol, it->osymbol,
+		    it->weight);
+	    }
       }
     }
 
     void HfstInternalTransducer::substitute(const StringPair &sp, const StringPairSet &sps) 
     {
+      assert(alphabet != NULL);
       HfstInternalTransducer new_transducer;
       unsigned int inumber = alphabet->symbol2code(sp.first.c_str());
       unsigned int onumber = alphabet->symbol2code(sp.second.c_str());
@@ -105,6 +200,7 @@ namespace hfst {
 
     void HfstInternalTransducer::substitute(void (*func)(std::string &isymbol, std::string &osymbol)) 
     {
+      assert(alphabet != NULL);
       HfstInternalTransducer new_transducer;
       for (std::set<InternalTransducerLine>::iterator it = lines.begin(); 
 	   it != lines.end(); it++) {	
@@ -123,19 +219,22 @@ namespace hfst {
       lines.clear(); // is this needed?
       lines=new_transducer.lines;
     }
-
+    
     void HfstInternalTransducer::substitute(const StringPair &old_pair, const StringPair &new_pair) 
     {
+      assert(alphabet != NULL);
       HfstInternalTransducer new_transducer;
       for (std::set<InternalTransducerLine>::iterator it = lines.begin(); 
 	   it != lines.end(); it++) 
 	{
-	  if (it->final_line)  // final lines are added as such
+	  if (it->final_line) { // final lines are added as such
 	    new_transducer.add_line(it->origin, it->weight);
+	    //printf("..added final line\n");
+	  }
 	  else {
 	    std::string istring(alphabet->code2symbol(it->isymbol));
 	    std::string ostring(alphabet->code2symbol(it->osymbol));
-	    if(istring.compare(old_pair.first) && ostring.compare(old_pair.second)) 
+	    if( (istring.compare(old_pair.first) == 0) && (ostring.compare(old_pair.second) == 0) ) 
 	      {
 		istring = new_pair.first;
 		ostring = new_pair.second;		
@@ -144,6 +243,7 @@ namespace hfst {
 				    alphabet->add_symbol(istring.c_str()),
 				    alphabet->add_symbol(ostring.c_str()),
 				    it->weight);
+	    //printf("..added line\n");
 	  }
 	}
       lines.clear(); // is this needed?
@@ -153,6 +253,7 @@ namespace hfst {
     void HfstInternalTransducer::substitute(const std::string &old_symbol, const std::string &new_symbol,
 					    bool input_side, bool output_side) 
     {
+      assert(alphabet != NULL);
       HfstInternalTransducer new_transducer;
       for (std::set<InternalTransducerLine>::iterator it = lines.begin(); 
 	   it != lines.end(); it++) 
@@ -162,16 +263,16 @@ namespace hfst {
 	  else {
 	    std::string istring(alphabet->code2symbol(it->isymbol));
 	    std::string ostring(alphabet->code2symbol(it->osymbol));
-
+	    
 	    if (input_side) {
-	      if (istring.compare(old_symbol))
+	      if (istring.compare(old_symbol) == 0)
 		istring = new_symbol;
 	    }
 	    if (output_side) {
-	      if (ostring.compare(old_symbol))
+	      if (ostring.compare(old_symbol) == 0)
 		ostring = new_symbol;
 	    }
-
+	    
 	    new_transducer.add_line(it->origin, it->target, 
 				    alphabet->add_symbol(istring.c_str()),
 				    alphabet->add_symbol(ostring.c_str()),
@@ -183,10 +284,10 @@ namespace hfst {
     }      
 
     
-    /* new symbols in the alphabet of transducer? harmonization? */
-    /* */
+    /* harmonization must be done before calling this function. */
     void HfstInternalTransducer::substitute(const StringPair &sp, HfstInternalTransducer &transducer) 
     {
+      assert(alphabet != NULL);
       HfstInternalTransducer new_transducer;
       unsigned int inumber = alphabet->symbol2code(sp.first.c_str());
       unsigned int onumber = alphabet->symbol2code(sp.second.c_str());
@@ -223,11 +324,6 @@ namespace hfst {
 	}
       }
 
-      /* not needed if harmonization is done */
-      /*HfstAlphabet::CharMap cm = transducer.alphabet->get_char_map();
-      for (HfstAlphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++)
-      alphabet.add_symbol(it->second);      */
-
       lines.clear(); // is this needed?
       lines=new_transducer.lines;
     }
@@ -235,10 +331,14 @@ namespace hfst {
     /* zero weights inserted, does not handle non-final states that lead nowhere */
     void HfstInternalTransducer::insert_freely(const StringPair &symbol_pair) 
     {
-      printf("HfstInternalTransducer::insert_freely..\n");
-      print_symbol(stderr);
-      printf("--\n");
+      bool DEBUG=false;
+      if (DEBUG) {
+	printf("HfstInternalTransducer::insert_freely..\n");
+	print_symbol(stderr);
+	printf("--\n");
+      }
 
+      assert(alphabet != NULL);
       HfstInternalTransducer new_transducer;
       std::set<unsigned int> visited_states;
       unsigned int in = alphabet->add_symbol(symbol_pair.first.c_str());
@@ -249,6 +349,8 @@ namespace hfst {
 	if (visited_states.find(it->origin) == visited_states.end()) {
 	  visited_states.insert(it->origin);
 	  new_transducer.add_line(it->origin, it->origin, in, out, 0);
+	  if (DEBUG)
+	    printf("  ..inserted freely state number %i\n", it->origin);
 	}
 	if (it->final_line)
 	  new_transducer.add_line(it->origin, it->weight);
@@ -257,7 +359,8 @@ namespace hfst {
       }
       lines.clear(); // is this needed?
       lines=new_transducer.lines;
-      print_symbol(stderr);
+      if (DEBUG)
+	print_symbol(stderr);
     }
     
   }

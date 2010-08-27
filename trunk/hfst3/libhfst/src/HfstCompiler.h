@@ -132,6 +132,12 @@ namespace hfst
       static Contexts *make_context( HfstTransducer *l, HfstTransducer *r );
       static Contexts *add_context( Contexts *nc, Contexts *c );    
       
+      HfstTransducer * substitute(HfstTransducer *t, Character old_char, Character new_char);
+      HfstTransducer * substitute(HfstTransducer *t, Character old_char_in, Character old_char_out,
+				  Character new_char_in, Character new_char_out);      
+      HfstTransducer * substitute(HfstTransducer *t, Character old_char_in, Character old_char_out,
+				  HfstTransducer *tr);
+
       HfstTransducer * insert_freely(HfstTransducer *t, Character input, Character output);
       HfstTransducer * negation( HfstTransducer *t );
       

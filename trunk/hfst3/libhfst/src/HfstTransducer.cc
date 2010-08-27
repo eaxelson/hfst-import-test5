@@ -39,7 +39,6 @@ namespace hfst
 	  {
 	    it->harmonize(first_rule);
 	  }
-	// check that OpenFst is available
 	it->convert(TROPICAL_OFST_TYPE);
       }
 
@@ -55,7 +54,6 @@ namespace hfst
   HfstGrammar::HfstGrammar(HfstTransducer &rule):
     first_rule(rule)
   {
-    // check that OpenFst is available
     rule.convert(TROPICAL_OFST_TYPE);
     transducer_vector.push_back(rule.implementation.tropical_ofst);
     grammar = new hfst::implementations::Grammar(transducer_vector);
@@ -208,7 +206,6 @@ namespace hfst
   HfstTransducer::HfstTransducer(ImplementationType type):
     type(type),anonymous(false),is_trie(true)
   {
-    // check that the library required by the type is available
     switch (type)
       {
 #if HAVE_SFST
@@ -237,6 +234,13 @@ namespace hfst
       case HFST_OLW_TYPE:
 	implementation.hfst_ol = hfst_ol_interface.create_empty_transducer(type==HFST_OLW_TYPE?true:false);
 	break;
+	/*
+      case SFST_TYPE:
+      case TROPICAL_OFST_TYPE:
+      case LOG_OFST_TYPE:
+      case FOMA_TYPE:
+	throw hfst::exceptions::ImplementationTypeNotAvailableException();
+	*/
       case ERROR_TYPE:
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -250,7 +254,6 @@ namespace hfst
 				 ImplementationType type):
     type(type),anonymous(false),is_trie(true)
   {
-    // check that the library required by the type is available
     StringPairVector * spv = 
       multichar_symbol_tokenizer.tokenize(utf8_str);
     switch (type)
@@ -278,6 +281,12 @@ namespace hfst
 	  foma_interface.define_transducer(*spv);
 	break;
 #endif
+	/*
+      case SFST_TYPE:
+      case TROPICAL_OFST_TYPE:
+      case LOG_OFST_TYPE:
+      case FOMA_TYPE:
+      throw hfst::exceptions::ImplementationTypeNotAvailableException();*/
       case ERROR_TYPE:
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -288,7 +297,6 @@ namespace hfst
   HfstTransducer::HfstTransducer(const StringPairSet & sps, ImplementationType type):
     type(type),anonymous(false),is_trie(false)
   {
-    // check that the library required by the type is available
     switch (type)
       {
 #if HAVE_SFST
@@ -317,6 +325,11 @@ namespace hfst
 	this->type = FOMA_TYPE;
 	break;
 #endif
+	/*      case SFST_TYPE:
+      case TROPICAL_OFST_TYPE:
+      case LOG_OFST_TYPE:
+      case FOMA_TYPE:
+      throw hfst::exceptions::ImplementationTypeNotAvailableException(); */
       case ERROR_TYPE:
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -330,7 +343,6 @@ namespace hfst
 				 ImplementationType type):
     type(type),anonymous(false),is_trie(true)
   {
-    // check that the library required by the type is available
     StringPairVector * spv = 
       multichar_symbol_tokenizer.tokenize
       (upper_utf8_str,lower_utf8_str); //,key_table);
@@ -359,6 +371,11 @@ namespace hfst
 	  foma_interface.define_transducer(*spv);
 	break;
 #endif
+	/*      case SFST_TYPE:
+      case TROPICAL_OFST_TYPE:
+      case LOG_OFST_TYPE:
+      case FOMA_TYPE:
+      throw hfst::exceptions::ImplementationTypeNotAvailableException(); */
       case ERROR_TYPE:
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -367,7 +384,6 @@ namespace hfst
   }
 
 
-  // check that the library required by the type is available
   HfstTransducer::HfstTransducer(HfstInputStream &in):
     type(in.type), anonymous(false),is_trie(false)
   { in.read_transducer(*this); }
@@ -397,6 +413,11 @@ namespace hfst
 	implementation.foma = foma_interface.copy(another.implementation.foma);
 	break;
 #endif
+	/*      case SFST_TYPE:
+      case TROPICAL_OFST_TYPE:
+      case LOG_OFST_TYPE:
+      case FOMA_TYPE:
+      throw hfst::exceptions::ImplementationTypeNotAvailableException();*/
       case UNSPECIFIED_TYPE:
       case ERROR_TYPE:
       default:
@@ -448,7 +469,6 @@ namespace hfst
       }
   }
 
-    // check that the library required by the type is available
 HfstTransducer::HfstTransducer(unsigned int number, ImplementationType type): 
 type(type),anonymous(true),is_trie(false)
   {
@@ -478,6 +498,11 @@ type(type),anonymous(true),is_trie(false)
 	  break;
 	}
 #endif
+	/*      case SFST_TYPE:
+      case TROPICAL_OFST_TYPE:
+      case LOG_OFST_TYPE:
+      case FOMA_TYPE:
+      throw hfst::exceptions::ImplementationTypeNotAvailableException();*/
       case ERROR_TYPE:
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -485,7 +510,6 @@ type(type),anonymous(true),is_trie(false)
       }
   }
 
-    // check that the library required by the type is available
 HfstTransducer::HfstTransducer(unsigned int inumber, unsigned int onumber, ImplementationType type):
 type(type),anonymous(true),is_trie(false)
   {
@@ -517,6 +541,11 @@ type(type),anonymous(true),is_trie(false)
 	  break;
 	}
 #endif
+	/*      case SFST_TYPE:
+      case TROPICAL_OFST_TYPE:
+      case LOG_OFST_TYPE:
+      case FOMA_TYPE:
+      throw hfst::exceptions::ImplementationTypeNotAvailableException();*/
       case ERROR_TYPE:
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -524,7 +553,6 @@ type(type),anonymous(true),is_trie(false)
       }
   }
 
-    // check that the library required by the type is available
 HfstTransducer::HfstTransducer(const std::string &symbol, ImplementationType type): 
 type(type),anonymous(false),is_trie(false)
   {
@@ -551,13 +579,18 @@ type(type),anonymous(false),is_trie(false)
 	// should the char* be deleted?
 	break;
 #endif
+	/*      case SFST_TYPE:
+      case TROPICAL_OFST_TYPE:
+      case LOG_OFST_TYPE:
+      case FOMA_TYPE:
+      throw hfst::exceptions::ImplementationTypeNotAvailableException();*/
       case ERROR_TYPE:
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
 	break;
       }
   }
-    // check that the library required by the type is available
+
 HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type):
 type(type),anonymous(false),is_trie(false)
   {
@@ -584,6 +617,11 @@ type(type),anonymous(false),is_trie(false)
 	// should the char*:s be deleted?
 	break;
 #endif
+	/*      case SFST_TYPE:
+      case TROPICAL_OFST_TYPE:
+      case LOG_OFST_TYPE:
+      case FOMA_TYPE:
+      throw hfst::exceptions::ImplementationTypeNotAvailableException();*/
       case ERROR_TYPE:
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -1226,18 +1264,12 @@ type(type),anonymous(false),is_trie(false)
 #if HAVE_OPENFST
     if (this->type == TROPICAL_OFST_TYPE)
       {
-	//fst::StdVectorFst * tropical_ofst_temp =
 	this->tropical_ofst_interface.substitute(implementation.tropical_ofst,symbol_pair,transducer.implementation.tropical_ofst);
-	//delete implementation.tropical_ofst;
-	//implementation.tropical_ofst = tropical_ofst_temp;
 	return *this;
       }
     if (this->type == LOG_OFST_TYPE)
       {
-	//hfst::implementations::LogFst * log_ofst_temp =
 	this->log_ofst_interface.substitute(implementation.log_ofst,symbol_pair,transducer.implementation.log_ofst);
-	//delete implementation.log_ofst;
-	//implementation.log_ofst = log_ofst_temp;
 	return *this;
       }
 #endif
@@ -1395,7 +1427,6 @@ type(type),anonymous(false),is_trie(false)
     ImplementationType original_type = this->type;
 #if HAVE_OPENFST
     if (original_type == SFST_TYPE || original_type == FOMA_TYPE) {
-      // check that OpenFst is available
       this->convert(TROPICAL_OFST_TYPE);
     }
 #endif
@@ -1471,8 +1502,6 @@ type(type),anonymous(false),is_trie(false)
     if (type == t.type)
       { return *(new HfstTransducer(t)); }
 
-    // check that the library required by the type is available
-
     // the return value, contains an empty transducer that is later deleted
     HfstTransducer * retval = new HfstTransducer(type);
 
@@ -1508,6 +1537,11 @@ type(type),anonymous(false),is_trie(false)
 	    internal =
 	      hfst::implementations::hfst_ol_to_internal_format(t.implementation.hfst_ol);
 	      break;
+	      /*	  case SFST_TYPE:
+	  case TROPICAL_OFST_TYPE:
+	  case LOG_OFST_TYPE:
+	  case FOMA_TYPE:
+	  throw hfst::exceptions::ImplementationTypeNotAvailableException();*/
 	case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
@@ -1576,8 +1610,6 @@ type(type),anonymous(false),is_trie(false)
     if (type == this->type)
       { return *this; }
 
-    // check that the library required by the type is available
-
     try 
       {
 	hfst::implementations::InternalTransducer * internal;
@@ -1611,8 +1643,13 @@ type(type),anonymous(false),is_trie(false)
 	  case HFST_OLW_TYPE:
 	    internal =
 	    hfst::implementations::hfst_ol_to_internal_format(implementation.hfst_ol);
-      delete implementation.hfst_ol;
+	    delete implementation.hfst_ol;
 	    break;
+	    /*	  case SFST_TYPE:
+	  case TROPICAL_OFST_TYPE:
+	  case LOG_OFST_TYPE:
+	  case FOMA_TYPE:
+	  throw hfst::exceptions::ImplementationTypeNotAvailableException();*/
 	case ERROR_TYPE:
 	case UNSPECIFIED_TYPE:
 	default:
@@ -1664,6 +1701,54 @@ type(type),anonymous(false),is_trie(false)
     return *this;
   }
 
+  HfstTransducer * HfstTransducer::internal_to_hfst_transducer(
+							       hfst::implementations::HfstInternalTransducer * internal_transducer, 
+		     ImplementationType type)
+  {
+    HfstTransducer * retval = new HfstTransducer(type);
+    switch(retval->type)
+      {
+#if HAVE_SFST
+      case SFST_TYPE:
+	delete retval->implementation.sfst;
+	retval->implementation.sfst = 
+	  hfst::implementations::hfst_internal_format_to_sfst(internal_transducer);
+	break;
+#endif
+#if HAVE_OPENFST
+      case TROPICAL_OFST_TYPE:
+	delete retval->implementation.tropical_ofst;
+	retval->implementation.tropical_ofst = 
+	  hfst::implementations::hfst_internal_format_to_tropical_ofst(internal_transducer);
+	break;
+      case LOG_OFST_TYPE:
+	delete retval->implementation.log_ofst;
+	retval->implementation.log_ofst = 
+	  hfst::implementations::hfst_internal_format_to_log_ofst(internal_transducer);
+	break;
+#endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+	retval->foma_interface.delete_foma(retval->implementation.foma);
+	retval->implementation.foma = 
+	  hfst::implementations::hfst_internal_format_to_foma(internal_transducer);
+	break;
+#endif
+	/*      case SFST_TYPE:
+      case FOMA_TYPE:
+      case TROPICAL_OFST_TYPE:
+      case LOG_OFST_TYPE:
+      throw hfst::exceptions::ImplementationTypeNotAvailableException();*/
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	throw hfst::exceptions::FunctionNotImplementedException();
+      case ERROR_TYPE:
+      default:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+      }
+    return retval;
+  }
+
 void HfstTransducer::write_in_att_format(const char * filename)
 {
   FILE * ofile = fopen(filename, "wb");
@@ -1689,7 +1774,7 @@ void HfstTransducer::write_in_att_format(FILE * ofile)
       (conv.implementation.tropical_ofst, ofile);
   else
     this->tropical_ofst_interface.write_in_att_format
-      (conv.implementation.tropical_ofst, ofile);
+    (conv.implementation.tropical_ofst, ofile);
 }
 
 HfstTransducer &HfstTransducer::read_in_att_format(const char * filename, ImplementationType type)
@@ -1711,11 +1796,11 @@ HfstTransducer &HfstTransducer::read_in_att_format(const char * filename, Implem
 
 HfstTransducer &HfstTransducer::read_in_att_format(FILE * ifile, ImplementationType type)
 {
-  // check that OpenFst is available
-  HfstTransducer * retval = new HfstTransducer(TROPICAL_OFST_TYPE);
-  retval->implementation.tropical_ofst = TropicalWeightTransducer::read_in_att_format(ifile);
-  // check that the library required by type is available  
-  retval->convert(type);
+  hfst::implementations::HfstInternalTransducer * internal_transducer = new hfst::implementations::HfstInternalTransducer();
+  internal_transducer->alphabet = new hfst::implementations::HfstAlphabet();
+  internal_transducer->read_symbol(ifile);
+  HfstTransducer *retval = internal_to_hfst_transducer(internal_transducer,type);
+  delete internal_transducer;
   return *retval;
 }
 

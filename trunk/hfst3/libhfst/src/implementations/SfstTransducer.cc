@@ -602,13 +602,15 @@ namespace hfst { namespace implementations {
 
   
   Transducer * SfstTransducer::substitute(Transducer * t,String old_symbol,String new_symbol)
-  { Transducer * retval = &t->replace_char(t->alphabet.add_symbol(old_symbol.c_str()),t->alphabet.add_symbol(new_symbol.c_str())); 
+  { Transducer * retval = &t->replace_char(t->alphabet.add_symbol(old_symbol.c_str()),t->alphabet.add_symbol(new_symbol.c_str()));
+    retval->alphabet.copy(t->alphabet);
     return retval; }
 
   Transducer * SfstTransducer::substitute(Transducer *t, const StringPair &symbol_pair, Transducer *tr)
   { Transducer * retval = &t->splice( Label(
 					t->alphabet.add_symbol(symbol_pair.first.c_str()),
 					t->alphabet.add_symbol(symbol_pair.second.c_str()) ), tr );
+    retval->alphabet.copy(t->alphabet);
     return retval;
   }
 
