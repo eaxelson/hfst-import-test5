@@ -7,6 +7,7 @@
 #include "SymbolDefs.h"
 #include "HfstExceptions.h"
 #include <cassert>
+#include <iostream>
 
 namespace hfst {
   namespace implementations {
@@ -51,6 +52,8 @@ namespace hfst {
       void read_symbol(FILE*);
       void print_number(FILE*);
       void print_symbol(FILE*);
+      void print_number(std::ostream&);
+      void print_symbol(std::ostream&);
       void substitute(const StringPair &sp, const StringPairSet &sps);
       void substitute(void (*func)(std::string &isymbol, std::string &osymbol) );   
       void substitute(const StringPair &sp, HfstInternalTransducer &transducer);

@@ -41,6 +41,10 @@ public HfstInterfaceException {};
 class FileNotReadableException :
 public HfstInterfaceException {};
 
+/** \brief File cannot be written. */
+class FileCannotBeWrittenException :
+public HfstInterfaceException {};
+
 /** \brief File is closed. */
 class FileIsClosedException :
 public HfstInterfaceException {};

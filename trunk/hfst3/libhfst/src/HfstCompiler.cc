@@ -704,8 +704,12 @@ namespace hfst
     printf("  ..INTERNAL -> TROPICAL\n");
     delete internal;*/
 
-    // testing substitute
-    printf("\n");
+    /*    printf("testing write_att and read_att:\n");
+    std::cerr << *t;
+    printf("--\n");
+    t->write_in_att_format("FOOBAR");
+    HfstTransducer tr = HfstTransducer::read_in_att_format("FOOBAR", t->type);
+    tr.write_in_att_format(stderr);*/
 
     return t;
   }

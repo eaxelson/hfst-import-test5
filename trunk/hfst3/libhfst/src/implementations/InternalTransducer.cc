@@ -169,6 +169,37 @@ namespace hfst {
       }
     }
 
+    void HfstInternalTransducer::print_number(std::ostream &os) {
+      for (std::set<InternalTransducerLine>::iterator it = lines.begin(); 
+	   it != lines.end(); it++) {
+	if (it->final_line)
+	  os << it->origin << "\t" << it->weight << "\n";
+	else
+	  os << it->origin << "\t" << it->target << "\t" 
+	     << it->isymbol << "\t" << it->osymbol << "\t" 
+	     << it->weight << "\n";
+      }
+    }
+
+    void HfstInternalTransducer::print_symbol(std::ostream &os) {
+      for (std::set<InternalTransducerLine>::iterator it = lines.begin(); 
+	   it != lines.end(); it++) {
+	if (it->final_line)
+	  os << it->origin << "\t" << it->weight << "\n";
+	else {
+	  if (alphabet != NULL)
+	    os << it->origin << "\t" << it->target << "\t" 
+	       << alphabet->code2symbol(it->isymbol) << "\t"
+	       << alphabet->code2symbol(it->osymbol) << "\t"
+	       << it->weight << "\n";
+	  else
+	    os << it->origin << "\t" << it->target << "\t" 
+	       << "\\" << it->isymbol << "\t" << "\\" << it->osymbol << "\t"
+	       << it->weight << "\n";
+	    }
+      }
+    }
+
     void HfstInternalTransducer::substitute(const StringPair &sp, const StringPairSet &sps) 
     {
       assert(alphabet != NULL);
