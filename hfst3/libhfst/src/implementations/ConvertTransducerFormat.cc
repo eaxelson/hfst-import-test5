@@ -463,14 +463,9 @@ HfstInternalTransducer * sfst_to_internal_hfst_format(SFST::Transducer * t) {
   std::set<SFST::Node*> visited_nodes;
   sfst_to_internal(t->root_node(), index, visited_nodes, internal_transducer);
 
-  HfstAlphabet * alpha = new HfstAlphabet();
   SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
   for (SFST::Alphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++)
-    alpha->add_symbol(it->second, it->first);
-  internal_transducer->alphabet = alpha;
-
-  // testing
-  //internal_transducer->print_symbol(stderr);
+    internal_transducer->alphabet->add_symbol(it->second, it->first);
 
   return internal_transducer;
 }
@@ -575,20 +570,13 @@ HfstInternalTransducer * foma_to_internal_hfst_format(struct fsm * t) {
     throw TransducerHasNoStartStateException();
   }
 
-  HfstAlphabet * alpha = new HfstAlphabet();
-  // is this needed?
-  alpha->add_symbol("@_EPSILON_SYMBOL_@", 0);
-  alpha->add_symbol("@_UNKNOWN_SYMBOL_@", 1);
-  alpha->add_symbol("@_IDENTITY_SYMBOL_@", 2);
-
   struct sigma * p = t->sigma;
   while (p != NULL) {
     if (p->symbol == NULL)
       break;
-    alpha->add_symbol(p->symbol, p->number);
+    internal_transducer->alphabet->add_symbol(p->symbol, p->number);
     p = p->next;
   }
-  internal_transducer->alphabet = alpha;
 
   return internal_transducer;
 }
@@ -676,12 +664,10 @@ HfstInternalTransducer * tropical_ofst_to_internal_hfst_format(fst::StdVectorFst
 	}
       }
 
-    HfstAlphabet * alpha = new HfstAlphabet();
     for ( fst::SymbolTableIterator it = fst::SymbolTableIterator(*(t->InputSymbols()));
 	  not it.Done(); it.Next() ) {
-      alpha->add_symbol( it.Symbol().c_str(), (unsigned int)it.Value() );
+      internal_transducer->alphabet->add_symbol( it.Symbol().c_str(), (unsigned int)it.Value() );
     }    
-    internal_transducer->alphabet = alpha;
 
     return internal_transducer;
 }
@@ -763,12 +749,10 @@ HfstInternalTransducer * log_ofst_to_internal_hfst_format(LogFst * t) {
 	}
       }
 
-    HfstAlphabet * alpha = new HfstAlphabet();
     for ( fst::SymbolTableIterator it = fst::SymbolTableIterator(*(t->InputSymbols()));
 	  not it.Done(); it.Next() ) {
-      alpha->add_symbol( it.Symbol().c_str(), (unsigned int)it.Value() );
+      internal_transducer->alphabet->add_symbol( it.Symbol().c_str(), (unsigned int)it.Value() );
     }    
-    internal_transducer->alphabet = alpha;
 
     return internal_transducer;
 }

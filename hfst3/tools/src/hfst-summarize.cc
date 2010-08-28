@@ -34,11 +34,11 @@
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
-using hfst::HfstMutableTransducer;
-using hfst::HfstStateIterator;
-using hfst::HfstTransitionIterator;
-using hfst::HfstState;
-using hfst::HfstTransition;
+using hfst::implementations::HfstInternalTransducer;
+using hfst::implementations::HfstStateIterator;
+using hfst::implementations::HfstTransitionIterator;
+//using hfst::HfstState;
+using hfst::implementations::HfstTransition;
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
@@ -117,7 +117,8 @@ process_stream(HfstInputStream& instream)
           verbose_printf("Summarizing... %zu\n", transducer_n);
         }
       HfstTransducer trans(instream);
-      HfstMutableTransducer mutt(trans);
+      std::cerr << trans;
+      HfstInternalTransducer * mutt = HfstTransducer::hfst_transducer_to_internal(&trans);
       size_t states = 0;
       size_t final_states = 0;
       //size_t paths = 0;
@@ -133,22 +134,22 @@ process_stream(HfstInputStream& instream)
       size_t uniq_output_arcs = 0;
       pair<string,unsigned int> most_ambiguous_input;
       pair<string,unsigned int> most_ambiguous_output;
-      HfstState initial_state = mutt.get_initial_state();
+      unsigned int initial_state = 0; // mutt.get_initial_state();
       // iterate states in random orderd
-      for (HfstStateIterator stateIt(mutt);
+      for (HfstStateIterator stateIt(*mutt);
            !stateIt.done();
            stateIt.next())
         {
-          HfstState s = stateIt.value();
+          unsigned int s = stateIt.value();
           ++states;
-          if (mutt.is_final(s))
+          if (mutt->is_final_state(s))
             {
               ++final_states;
             }
           size_t arcs_here = 0;
           map<string,unsigned int> input_ambiguity;
           map<string,unsigned int> output_ambiguity;
-          for (HfstTransitionIterator arcIt(mutt, s);
+          for (HfstTransitionIterator arcIt(*mutt, s);
                !arcIt.done();
                arcIt.next())
             {

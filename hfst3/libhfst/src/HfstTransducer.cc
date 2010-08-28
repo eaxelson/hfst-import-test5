@@ -70,7 +70,7 @@ namespace hfst
   }
 #endif  
 
-#if HAVE_OPENFST
+#if HAVE_MUTABLE
   HfstTransitionIterator::HfstTransitionIterator(const HfstMutableTransducer &t, HfstState s):
     tropical_ofst_iterator(hfst::implementations::TropicalWeightTransitionIterator(t.transducer.implementation.tropical_ofst, s)) {}
 
@@ -92,7 +92,9 @@ namespace hfst
   void HfstTransitionIterator::next() { tropical_ofst_iterator.next(); }
 
   HfstStateIterator::HfstStateIterator(const HfstMutableTransducer &t):
-    tropical_ofst_iterator(hfst::implementations::TropicalWeightStateIterator(t.transducer.implementation.tropical_ofst)) {}
+    {
+     
+    }
 
   
   HfstStateIterator::~HfstStateIterator(void) {}
@@ -416,7 +418,7 @@ namespace hfst
       }
   }
 
-#if HAVE_OPENFST
+#if HAVE_MUTABLE
   HfstTransducer::HfstTransducer(const HfstMutableTransducer &another):
     type(TROPICAL_OFST_TYPE), anonymous(another.transducer.anonymous), 
     is_trie(another.transducer.is_trie)
@@ -1328,7 +1330,6 @@ type(type),anonymous(false),is_trie(false)
     */
   }
 
-
 #if HAVE_OPENFST
   HfstTransducer &HfstTransducer::compose_intersect
   (HfstGrammar &grammar)
@@ -1399,6 +1400,9 @@ type(type),anonymous(false),is_trie(false)
   HfstTransducer &HfstTransducer::n_best
   (unsigned int n)
   {
+    if (not is_implementation_type_available(TROPICAL_OFST_TYPE))
+      throw hfst::exceptions::FunctionNotImplementedException();
+
     ImplementationType original_type = this->type;
 #if HAVE_OPENFST
     if (original_type == SFST_TYPE || original_type == FOMA_TYPE) {
@@ -1416,7 +1420,6 @@ type(type),anonymous(false),is_trie(false)
 	    (implementation.tropical_ofst,(int)n);
 	  delete implementation.tropical_ofst;
 	  implementation.tropical_ofst = temp;
-	  return *this;
 	  break;
       }
       case LOG_OFST_TYPE:
@@ -1426,10 +1429,14 @@ type(type),anonymous(false),is_trie(false)
 	    (implementation.log_ofst,(int)n);
 	  delete implementation.log_ofst;
 	  implementation.log_ofst = temp;
-	  return *this;
 	  break;
 	}
 #endif
+      case UNSPECIFIED_TYPE:
+      case ERROR_TYPE:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
       default:
 	throw hfst::exceptions::FunctionNotImplementedException();
 	break;       
@@ -1437,6 +1444,7 @@ type(type),anonymous(false),is_trie(false)
 #if HAVE_OPENFST
     this->convert(original_type);
 #endif
+    return *this;
   }
 
   HfstTransducer &HfstTransducer::disjunct
@@ -1863,7 +1871,8 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
 
   HfstTokenizer HfstTransducer::create_tokenizer() 
   {
-    HfstTokenizer tok;
+    throw hfst::exceptions::FunctionNotImplementedException();
+    /*    HfstTokenizer tok;
     HfstMutableTransducer t(*this);
     HfstStateIterator state_it(t);
     while (not state_it.done()) 
@@ -1884,7 +1893,7 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
 	  }
 	state_it.next();
       }
-    return tok;
+      return tok;*/
   }
 
 
@@ -1898,7 +1907,7 @@ std::ostream &operator<<(std::ostream &out,HfstTransducer &t)
   }
 
 
-#if HAVE_OPENFST
+#if HAVE_MUTABLE
   // check that OpenFst is available
   HfstMutableTransducer::HfstMutableTransducer(void):
     transducer(HfstTransducer(TROPICAL_OFST_TYPE))
@@ -1957,7 +1966,7 @@ std::ostream &operator<<(std::ostream &out,HfstTransducer &t)
     return this->transducer.tropical_ofst_interface.get_initial_state(
 	     this->transducer.implementation.tropical_ofst);
   }
-#endif  /* OPENFST */
+#endif  /* MUTABLE */
 
 }
 #ifdef DEBUG_MAIN

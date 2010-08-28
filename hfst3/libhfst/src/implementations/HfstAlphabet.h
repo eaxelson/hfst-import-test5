@@ -47,6 +47,7 @@ namespace hfst {
       
     public:
       HfstAlphabet();
+      HfstAlphabet(const HfstAlphabet &alpha);
       ~HfstAlphabet();
 
       typedef NumberPairSet::const_iterator const_iterator;
