@@ -40,9 +40,13 @@ namespace hfst {
     }
 
 
-    HfstInternalTransducer::HfstInternalTransducer(): alphabet(NULL) {}
+    HfstInternalTransducer::HfstInternalTransducer(): alphabet(new HfstAlphabet()) {}
 
     HfstInternalTransducer::~HfstInternalTransducer() { delete alphabet; }
+
+    void HfstInternalTransducer::add_final_state(unsigned int s, float weight) {
+      add_line(s, weight);
+    }
 
     void HfstInternalTransducer::add_line(unsigned int final_state, float final_weight) {
       InternalTransducerLine line; 
@@ -50,6 +54,19 @@ namespace hfst {
       line.origin=final_state; 
       line.weight=final_weight; 
       lines.insert(line); 
+      final_states.insert(std::pair<unsigned int,float>(final_state,final_weight));
+    }
+
+    void HfstInternalTransducer::add_transition(HfstTransition &transition) {
+      assert(alphabet != NULL);
+      InternalTransducerLine line;
+      line.final_line = false;
+      line.origin = transition.source;
+      line.target = transition.target;
+      line.isymbol = alphabet->add_symbol(transition.isymbol.c_str());
+      line.osymbol = alphabet->add_symbol(transition.osymbol.c_str());
+      line.weight = transition.weight;
+      lines.insert(line);
     }
 
     void HfstInternalTransducer::add_line(unsigned int origin_state, unsigned int target_state,
@@ -393,6 +410,104 @@ namespace hfst {
       if (DEBUG)
 	print_symbol(stderr);
     }
+   
+    bool HfstInternalTransducer::is_final_state(unsigned int s) {
+      for (std::set<std::pair<unsigned int, float> >::iterator it = final_states.begin(); 
+	   it != final_states.end(); it++) {	      
+	if (it->first == s)
+	  return true;
+      }
+      return false;
+    }
     
+    float HfstInternalTransducer::get_final_weight(unsigned int s) {
+      for (std::set<std::pair<unsigned int, float> >::iterator it = final_states.begin(); 
+	   it != final_states.end(); it++) {	      
+	if (it->first == s)
+	  return it->second;
+      }
+      throw hfst::exceptions::StateIsNotFinalException();
+    }
+
+    HfstInternalTransducer::HfstInternalTransducer( const HfstInternalTransducer &transducer)
+    {
+      HfstInternalTransducer * retval = new HfstInternalTransducer();
+      lines = transducer.lines;
+      final_states = transducer.final_states;
+      HfstAlphabet * alpha = new HfstAlphabet(*(transducer.alphabet));
+      alphabet = alpha;
+    }
+
+    HfstStateIterator::HfstStateIterator(const HfstInternalTransducer &transducer)
+    {
+      for (std::set<InternalTransducerLine>::iterator it1 = transducer.lines.begin(); 
+	   it1 != transducer.lines.end(); it1++) {
+	state_set.insert(it1->origin);
+	state_set.insert(it1->target);
+      }   
+      this->it = state_set.begin();
+    }
+
+    unsigned int HfstStateIterator::value() {
+      return *it;
+    }
+
+    void HfstStateIterator::next() {
+      it++;
+    }
+
+    bool HfstStateIterator::done() {
+      return (it == state_set.end());
+    }
+
+    bool HfstTransition::operator<(const HfstTransition &another) const {
+      if (this->source < another.source) return true;
+      if (this->source > another.source) return false;
+
+      if (this->target < another.target) return true;
+      if (this->target > another.target) return false;
+      
+      if (this->isymbol.compare(another.isymbol) < 0) return true;
+      if (this->isymbol.compare(another.isymbol) > 0) return false;
+
+      if (this->osymbol.compare(another.osymbol) < 0) return true;
+      if (this->osymbol.compare(another.osymbol) > 0) return false;
+
+      if ( this->weight < another.weight ) return true;
+      if ( this->weight > another.weight ) return false;
+
+      return false;
+    }
+
+    HfstTransitionIterator::HfstTransitionIterator(const HfstInternalTransducer &transducer, unsigned int s) 
+    {
+      assert(transducer.alphabet != NULL);
+      for (std::set<InternalTransducerLine>::iterator it1 = transducer.lines.begin(); 
+	   it1 != transducer.lines.end(); it1++) {
+	if (it1->origin == s) {
+	  HfstTransition transition;
+	  transition.source = it1->origin;
+	  transition.target = it1->target;
+	  transition.isymbol = std::string(transducer.alphabet->code2symbol(it1->isymbol));
+	  transition.osymbol = std::string(transducer.alphabet->code2symbol(it1->osymbol));
+	  transition.weight = it1->weight;
+	  transition_set.insert(transition);
+	}   
+      }
+      this->it = transition_set.begin();
+    }
+
+    HfstTransition HfstTransitionIterator::value() {
+      return *it;
+    }
+
+    void HfstTransitionIterator::next() {
+      it++;
+    }
+
+    bool HfstTransitionIterator::done() {
+      return (it == transition_set.end());
+    }
+
   }
 }

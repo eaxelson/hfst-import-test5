@@ -704,7 +704,7 @@ namespace hfst
     printf("  ..INTERNAL -> TROPICAL\n");
     delete internal;*/
 
-    /*    printf("testing write_att and read_att:\n");
+    /*printf("testing write_att and read_att:\n");
     std::cerr << *t;
     printf("--\n");
     t->write_in_att_format("FOOBAR");
@@ -722,13 +722,13 @@ namespace hfst
     TheAlphabet.clear_pairs();
     //TheAlphabet.copy(t->alphabet);
 
-    // check that OpenFst is available
-    HfstMutableTransducer t(*tr);
-    HfstStateIterator state_it(t);
+    HfstInternalTransducer * t  = HfstTransducer::hfst_transducer_to_internal(tr);
+    
+    HfstStateIterator state_it(*t);
     while (not state_it.done()) 
       {
-	HfstState s = state_it.value();
-	HfstTransitionIterator transition_it(t,s);
+	unsigned int s = state_it.value();
+	HfstTransitionIterator transition_it(*t,s);
 	while (not transition_it.done()) 
 	  {
 	    HfstTransition tr = transition_it.value();
@@ -738,7 +738,7 @@ namespace hfst
 	  }
 	state_it.next();
       }
-    Alphabet_Defined = 1;
+      Alphabet_Defined = 1;
   }
 
   namespace HfstUtf8 {

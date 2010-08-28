@@ -102,7 +102,7 @@ namespace hfst
   typedef std::pair <HfstTransducer,HfstTransducer> HfstTransducerPair;
   typedef std::set <HfstTransducerPair> HfstTransducerPairSet;
 
-#if HAVE_OPENFST
+#if HAVE_MUTABLE
   class HfstMutableTransducer;
 #endif
 
@@ -273,8 +273,8 @@ namespace hfst
 
 
   /** \brief A handle to a state in a HfstMutableTransducer. **/
-#if HAVE_OPENFST
-  typedef hfst::implementations::StateId HfstState;
+#if HAVE_MUTABLE
+  typedef unsigned int HfstState;
 #endif
 
   /** \brief A synchronous finite-state transducer.
@@ -424,10 +424,12 @@ namespace hfst
     HfstTransducer(HfstInputStream &in);
     /** \brief Create a deep copy of transducer \a another. **/
     HfstTransducer(const HfstTransducer &another);
+
+#if HAVE_MUTABLE
     /** \brief Create an ordinary transducer equivalent to mutable transducer \a t. **/
-#if HAVE_OPENFST
     HfstTransducer(const HfstMutableTransducer &t);
 #endif
+
     /** \brief Delete operator for HfstTransducer. **/
     ~HfstTransducer(void);
 
@@ -714,8 +716,8 @@ fclose(ifile);
     /** \brief Compose this transducer with \a another. */
     HfstTransducer &compose(const HfstTransducer &another);
 
-    /** \brief Compose this transducer with \a another. */
 #if HAVE_OPENFST
+    /** \brief Compose this transducer with \a another. */
     HfstTransducer &compose_intersect(HfstGrammar &grammar);
 #endif
 
@@ -783,10 +785,12 @@ fclose(ifile);
     friend std::ostream &operator<<(std::ostream &out, HfstTransducer &t);
     friend class HfstInputStream;
     friend class HfstOutputStream;
-#if HAVE_OPENFST
+#if HAVE_MUTABLE
     friend class HfstMutableTransducer;
     friend class HfstStateIterator;
     friend class HfstTransitionIterator;
+#endif
+#if HAVE_OPENFST
     friend class HfstGrammar;
 #endif
     friend class HfstCompiler;
@@ -845,11 +849,11 @@ void print(HfstMutableTransducer &t)
      in OpenFst, it is chosen as the only implementation type.
      A separate mutable and iterable transducer class is also safer because
      it does not interact with other operations. */
-#if HAVE_OPENFST
+#if HAVE_MUTABLE
   class HfstMutableTransducer
   {
   protected:
-    HfstTransducer transducer;
+    hfst::implementations::HfstInternalTransducer transducer;
   public:
     /** \brief Create an empty mutable transducer, 
 	i.e. a transducer with one non-final initial state. */
@@ -886,11 +890,11 @@ void print(HfstMutableTransducer &t)
       For an example of iterating through states, see \ref iterator_example "this".
 
       @see HfstMutableTransducer */
-#if HAVE_OPENFST
+#if HAVE_MUTABLE
   class HfstStateIterator
   {
   protected:
-    hfst::implementations::TropicalWeightStateIterator tropical_ofst_iterator;
+    std::set<unsigned int> state_set;
   public:
     /** \brief Create a state iterator for mutable transducer \a t. */
     HfstStateIterator(const HfstMutableTransducer &t);
@@ -911,7 +915,7 @@ void print(HfstMutableTransducer &t)
       For an example of using transitions, see \ref iterator_example "this". 
 
       @see HfstTransitionIterator HfstMutableTransducer */
-#if HAVE_OPENFST
+#if HAVE_MUTABLE
   class HfstTransition
   {
   public:
@@ -944,11 +948,11 @@ void print(HfstMutableTransducer &t)
       For an example of iterating through states, see \ref iterator_example "this".
 
       @see HfstMutableTransducer */
-#if HAVE_OPENFST
+#if HAVE_MUTABLE
   class HfstTransitionIterator
   {
   protected:
-    hfst::implementations::TropicalWeightTransitionIterator tropical_ofst_iterator;
+    std::set<hfst::implementations::InternalTransducerLine> transition_set;
   public:
     /** \brief Create a transition iterator for state \a s in the mutable transducer \a t. */
     HfstTransitionIterator(const HfstMutableTransducer &t, HfstState s);

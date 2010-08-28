@@ -9,6 +9,12 @@ namespace hfst {
       add("@_IDENTITY_SYMBOL_@",2);
     }
     
+    HfstAlphabet::HfstAlphabet(const HfstAlphabet &alpha) {
+      sm = alpha.sm;
+      cm = alpha.cm;
+      pairs = alpha.pairs;
+    }
+
     HfstAlphabet::~HfstAlphabet() {
       char **s=new char*[cm.size()];
       pairs.clear();

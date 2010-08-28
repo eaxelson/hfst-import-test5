@@ -73,8 +73,11 @@ class NotValidAttFormatException :
 public HfstInterfaceException {};
 
 class StateTransitionIteratorOutOfRangeExeption : 
-public HfstInterfaceException 
-{};
+public HfstInterfaceException {};
+
+/** \brief State is not final (and cannot have a final weight). */
+class StateIsNotFinalException :
+public HfstInterfaceException {};
 
 /** \brief Function has not been implemented (yet). */
 class FunctionNotImplementedException :
