@@ -767,9 +767,15 @@ fclose(ifile);
 	@see convert(ImplementationType type) */
     static HfstTransducer &convert(const HfstTransducer &t, ImplementationType type);
 
-    static HfstTransducer * internal_to_hfst_transducer(
-							hfst::implementations::HfstInternalTransducer * internal_transducer, 
-							ImplementationType type);
+    static HfstTransducer * 
+      internal_to_hfst_transducer(
+	hfst::implementations::HfstInternalTransducer * internal_transducer, 
+	ImplementationType type);
+    static hfst::implementations::HfstInternalTransducer * 
+      hfst_transducer_to_internal(
+	HfstTransducer *transducer);
+
+    static bool is_implementation_type_available(ImplementationType type);
 
     HfstTokenizer create_tokenizer();
 
