@@ -1,6 +1,15 @@
 //! @file XreCompiler.h
 //!
-//! @brief Functions for building transducers from Xerox regexps
+//! @brief A class that encapsulates compilation of Xerox compatible regular
+//!        expressions into HFST automata.
+//!
+//!        Xerox compatible regular expressions are a dialect of regular
+//!        expressions commonly used for two-level finite state morphologies.
+//!        The details can be found in Finite state morphology (2004) by
+//!        Beesley and Karttunen.
+//!
+//!        This class is merely a wrapper around lex and yacc functions handling
+//!        the parsing.
 
 //       This program is free software: you can redistribute it and/or modify
 //       it under the terms of the GNU General Public License as published by
@@ -24,19 +33,26 @@
 #include <string>
 #include "../HfstTransducer.h"
 
-namespace hfst { namespace xre {
-//! @brief A compiler holding information contained in lexc style lexicons.
+namespace hfst { 
+//! @brief hfst::xre namespace is used for all functions related to XRE parsing.
+namespace xre {
+//! @brief A compiler holding information needed to compile XREs.
 class XreCompiler
 {
   public:
-  //! @brief create compiler 
+  //! @brief Construct compiler for unknown format transducers.
   XreCompiler();
+  //! @brief Create compiler for @a impl format transducers
   XreCompiler(hfst::ImplementationType impl);
 
-  //! @brief add @a alphabet to sigma set.
+  //! @brief Add a definition macro.
+  //!        Compilers will replace arcs labeled @a name, with the transducer
+  //!        defined by @a xre in later phases of compilation.
   void define(const std::string& name, const std::string& xre);
 
-  //! @brief compile an expression
+  //! @brief Compile a transducer defined by @a xre.
+  //!        May return a pointer to @e empty transducer on non-fatal error.
+  //!        A null pointer is returned on fatal error, if abort is not called.
   HfstTransducer* compile(const std::string& xre);
 
   private:
