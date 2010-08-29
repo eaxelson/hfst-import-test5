@@ -34,11 +34,10 @@
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
-using hfst::implementations::HfstInternalTransducer;
-using hfst::implementations::HfstStateIterator;
-using hfst::implementations::HfstTransitionIterator;
-//using hfst::HfstState;
-using hfst::implementations::HfstTransition;
+using hfst::HfstMutableTransducer;
+using hfst::HfstStateIterator;
+using hfst::HfstTransitionIterator;
+using hfst::HfstTransition;
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
@@ -118,7 +117,7 @@ process_stream(HfstInputStream& instream)
         }
       HfstTransducer trans(instream);
       std::cerr << trans;
-      HfstInternalTransducer * mutt = HfstTransducer::hfst_transducer_to_internal(&trans);
+      HfstMutableTransducer * mutt = HfstTransducer::hfst_transducer_to_internal(&trans);
       size_t states = 0;
       size_t final_states = 0;
       //size_t paths = 0;

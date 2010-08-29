@@ -44,17 +44,17 @@ namespace hfst {
 
     HfstInternalTransducer::~HfstInternalTransducer() { delete alphabet; }
 
-    void HfstInternalTransducer::add_final_state(unsigned int s, float weight) {
+    void HfstInternalTransducer::add_final_state(HfstState s, float weight) {
       add_line(s, weight);
     }
 
-    void HfstInternalTransducer::add_line(unsigned int final_state, float final_weight) {
+    void HfstInternalTransducer::add_line(HfstState final_state, float final_weight) {
       InternalTransducerLine line; 
       line.final_line=true; 
       line.origin=final_state; 
       line.weight=final_weight; 
       lines.insert(line); 
-      final_states.insert(std::pair<unsigned int,float>(final_state,final_weight));
+      final_states.insert(std::pair<HfstState,float>(final_state,final_weight));
     }
 
     void HfstInternalTransducer::add_transition(HfstTransition &transition) {
@@ -69,8 +69,8 @@ namespace hfst {
       lines.insert(line);
     }
 
-    void HfstInternalTransducer::add_line(unsigned int origin_state, unsigned int target_state,
-					  unsigned int isymbol, unsigned int osymbol,
+    void HfstInternalTransducer::add_line(HfstState origin_state, HfstState target_state,
+					  HfstState isymbol, HfstState osymbol,
 					  float weight) {
       InternalTransducerLine line;
       line.final_line=false;
@@ -88,8 +88,8 @@ namespace hfst {
     std::set<InternalTransducerLine> * HfstInternalTransducer::get_lines() { 
       return &lines; }
 
-    unsigned int HfstInternalTransducer::max_state_number() {
-      unsigned int max=0;
+    HfstState HfstInternalTransducer::max_state_number() {
+      HfstState max=0;
       for (std::set<InternalTransducerLine>::iterator it = lines.begin(); 
 	   it != lines.end(); it++) {
 	if (it->origin > max)
@@ -221,8 +221,8 @@ namespace hfst {
     {
       assert(alphabet != NULL);
       HfstInternalTransducer new_transducer;
-      unsigned int inumber = alphabet->symbol2code(sp.first.c_str());
-      unsigned int onumber = alphabet->symbol2code(sp.second.c_str());
+      HfstState inumber = alphabet->symbol2code(sp.first.c_str());
+      HfstState onumber = alphabet->symbol2code(sp.second.c_str());
 
       for (std::set<InternalTransducerLine>::iterator it = lines.begin(); 
 	   it != lines.end(); it++) {	
@@ -337,11 +337,11 @@ namespace hfst {
     {
       assert(alphabet != NULL);
       HfstInternalTransducer new_transducer;
-      unsigned int inumber = alphabet->symbol2code(sp.first.c_str());
-      unsigned int onumber = alphabet->symbol2code(sp.second.c_str());
-      unsigned int max = max_state_number();
-      unsigned int max_tr = transducer.max_state_number();
-      unsigned int n=0; // this variable is incremented every time a substitution is made
+      HfstState inumber = alphabet->symbol2code(sp.first.c_str());
+      HfstState onumber = alphabet->symbol2code(sp.second.c_str());
+      HfstState max = max_state_number();
+      HfstState max_tr = transducer.max_state_number();
+      HfstState n=0; // this variable is incremented every time a substitution is made
 
       for (std::set<InternalTransducerLine>::iterator it = lines.begin(); 
 	   it != lines.end(); it++) {	
@@ -352,7 +352,7 @@ namespace hfst {
 	  // transitions that match sp are substituted with a copy of transducer
 	  if ((it->isymbol == inumber) && (it->osymbol == onumber)) 
 	    {
-	      unsigned int offset = (max + 1) + n*(max_tr + 1);
+	      HfstState offset = (max + 1) + n*(max_tr + 1);
 	      // epsilon transition to the initial state of the substituting transducer
 	      new_transducer.add_line(it->origin, offset, 0, 0, it->weight);
 
@@ -388,9 +388,9 @@ namespace hfst {
 
       assert(alphabet != NULL);
       HfstInternalTransducer new_transducer;
-      std::set<unsigned int> visited_states;
-      unsigned int in = alphabet->add_symbol(symbol_pair.first.c_str());
-      unsigned int out = alphabet->add_symbol(symbol_pair.second.c_str());
+      std::set<HfstState> visited_states;
+      HfstState in = alphabet->add_symbol(symbol_pair.first.c_str());
+      HfstState out = alphabet->add_symbol(symbol_pair.second.c_str());
 
       for (std::set<InternalTransducerLine>::iterator it = lines.begin(); 
 	   it != lines.end(); it++) {	
@@ -411,8 +411,8 @@ namespace hfst {
 	print_symbol(stderr);
     }
    
-    bool HfstInternalTransducer::is_final_state(unsigned int s) {
-      for (std::set<std::pair<unsigned int, float> >::iterator it = final_states.begin(); 
+    bool HfstInternalTransducer::is_final_state(HfstState s) {
+      for (std::set<std::pair<HfstState, float> >::iterator it = final_states.begin(); 
 	   it != final_states.end(); it++) {	      
 	if (it->first == s)
 	  return true;
@@ -420,8 +420,8 @@ namespace hfst {
       return false;
     }
     
-    float HfstInternalTransducer::get_final_weight(unsigned int s) {
-      for (std::set<std::pair<unsigned int, float> >::iterator it = final_states.begin(); 
+    float HfstInternalTransducer::get_final_weight(HfstState s) {
+      for (std::set<std::pair<HfstState, float> >::iterator it = final_states.begin(); 
 	   it != final_states.end(); it++) {	      
 	if (it->first == s)
 	  return it->second;
@@ -448,7 +448,7 @@ namespace hfst {
       this->it = state_set.begin();
     }
 
-    unsigned int HfstStateIterator::value() {
+    HfstState HfstStateIterator::value() {
       return *it;
     }
 
@@ -479,7 +479,7 @@ namespace hfst {
       return false;
     }
 
-    HfstTransitionIterator::HfstTransitionIterator(const HfstInternalTransducer &transducer, unsigned int s) 
+    HfstTransitionIterator::HfstTransitionIterator(const HfstInternalTransducer &transducer, HfstState s) 
     {
       assert(transducer.alphabet != NULL);
       for (std::set<InternalTransducerLine>::iterator it1 = transducer.lines.begin(); 

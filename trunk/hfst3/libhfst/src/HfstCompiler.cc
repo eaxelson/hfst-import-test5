@@ -27,7 +27,7 @@
 namespace hfst
 {
  
-  using namespace implementations;
+  //using namespace implementations;
 
   HfstTransducer * HfstCompiler::make_transducer(Range *r1, Range *r2, ImplementationType type)
   {
@@ -722,7 +722,7 @@ namespace hfst
     TheAlphabet.clear_pairs();
     //TheAlphabet.copy(t->alphabet);
 
-    HfstInternalTransducer * t  = HfstTransducer::hfst_transducer_to_internal(tr);
+    HfstMutableTransducer * t  = HfstTransducer::hfst_transducer_to_internal(tr);
     
     HfstStateIterator state_it(*t);
     while (not state_it.done()) 
