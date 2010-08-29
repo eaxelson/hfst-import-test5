@@ -1,6 +1,6 @@
-//! @file hfst-concatenate.cc
+//! @file hfst-lexc-compiler.cc
 //!
-//! @brief Transducer concatenation command line tool
+//! @brief Lexc compilation command line tool
 //!
 //! @author HFST Team
 
@@ -31,39 +31,55 @@
 #include <getopt.h>
 
 #include "HfstTransducer.h"
+#include "implementations/LexcCompiler.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 using hfst::ImplementationType;
 using hfst::exceptions::NotTransducerStreamException;
+using hfst::lexc::LexcCompiler;
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
+
+
 #include "inc/globals-common.h"
-#include "inc/globals-binary.h"
+static char** lexcfilenames = 0;
+static FILE** lexcfiles = 0;
+static unsigned int lexccount = 0;
+static char* outfilename = 0;
+static FILE* outfile = 0;
+static bool is_input_stdin = true;
+static bool is_output_stdout = true;
+static ImplementationType format = hfst::UNSPECIFIED_TYPE;
 
 void
 print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
-    fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE1 [INFILE2]]\n"
-             "Concatenate two transducers\n"
+    fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE1...]]\n"
+             "Compile lexc files into transducer\n"
         "\n", program_name );
         print_common_program_options(message_out);
-        print_common_binary_program_options(message_out);
+        fprintf(message_out, "Input/Output options:\n"
+               "  -f, --format=FORMAT     compile into FORMAT transducer\n"
+               "  -o, --output=OUTFILE    write result into OUTFILE\n");
         fprintf(message_out, "\n");
-        print_common_binary_program_parameter_instructions(message_out);
-        fprintf(message_out, "\n");
+        fprintf(message_out,
+                "If INFILE or OUTFILE are omitted or -, standard streams will "
+                "be used\n"
+                "FORMAT must be one of supported transducer formats, such as "
+                "openfst-tropical, sfst, foma, etc.\n");
         fprintf(message_out,
             "\n"
             "Examples:\n"
-            "  %s -o catdog.hfst cat.hfst dog.hfst  concatenates "
-            "cat.hfst with dog.hfst\n"
-            "                                       writing results to "
-            "catdog.hfst\n"
+            "  %s -o cat.hfst cat.lexc               Compile single-file "
+            "lexicon\n"
+            "  %s -o L.hfst Root.lexc 2.lexc 3.lexc  Compile multi-file "
+            "lexicon\n"
             "\n",
-            program_name );
+            program_name, program_name );
         print_report_bugs();
         print_more_info();
 }
@@ -77,12 +93,13 @@ parse_options(int argc, char** argv)
         static const struct option long_options[] =
         {
           HFST_GETOPT_COMMON_LONG,
-          HFST_GETOPT_BINARY_LONG,
+          {"format", required_argument, 0, 'f'},
+          {"output", required_argument, 0, 'o'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_BINARY_SHORT,
+                             "f:o:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -91,116 +108,123 @@ parse_options(int argc, char** argv)
         switch (c)
         {
 #include "inc/getopt-cases-common.h"
-#include "inc/getopt-cases-binary.h"
+        case 'o':
+          outfilename = hfst_strdup(optarg);
+          if (strcmp(outfilename, "-") == 0) {
+            free(outfilename);
+            outfilename = hfst_strdup("<stdout>");
+            outfile = stdout;
+            is_output_stdout = true;
+            message_out = stderr;
+          }
+          else {
+            outfile = hfst_fopen(outfilename, "w");
+            is_output_stdout = false;
+            message_out = stdout;
+          }
+          break;
+        case 'f':
+          format = hfst_parse_format_name(optarg);
+          break;
 #include "inc/getopt-cases-error.h"
         }
     }
 
 #include "inc/check-params-common.h"
-#include "inc/check-params-binary.h"
+    if (format == hfst::UNSPECIFIED_TYPE)
+      {
+        verbose_printf("Defaulting to OpenFst tropical type\n");
+        format = hfst::TROPICAL_OFST_TYPE;
+      }
+    if (argc - optind > 0)
+      {
+        lexcfilenames = static_cast<char**>(malloc(sizeof(char*)*(argc-optind)));
+        lexcfiles = static_cast<FILE**>(malloc(sizeof(char*)*(argc-optind)));
+        while (optind < argc)
+          {
+            lexcfilenames[lexccount] = hfst_strdup(argv[optind]);
+            lexcfiles[lexccount] = hfst_fopen(argv[optind], "r");
+            lexccount++;
+            optind++;
+          }
+        is_input_stdin = false;
+      }
+    else
+      {
+        lexcfilenames = static_cast<char**>(malloc(sizeof(char*)));
+        lexcfiles = static_cast<FILE**>(malloc(sizeof(FILE*)));
+        lexcfilenames[0] = hfst_strdup("<stdin>");
+        lexcfiles[0] = stdin;
+        is_input_stdin = true;
+        lexccount++;
+      }
     return EXIT_CONTINUE;
 }
 
 int
-concatenate_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
-                    HfstOutputStream& outstream)
+lexc_streams(LexcCompiler& lexc, HfstOutputStream& outstream)
 {
-    firststream.open();
-    secondstream.open();
     outstream.open();
-    // should be is_good? 
-    bool bothInputs = firststream.is_good() && secondstream.is_good();
-    if (firststream.get_type() != secondstream.get_type())
+    for (unsigned int i = 0; i < lexccount; i++)
       {
-        warning(0, 0, "Tranducer type mismatch in %s and %s; "
-              "using former type as output\n",
-              firstfilename, secondfilename);
-      }
-    size_t transducer_n = 0;
-    while (bothInputs) {
-        transducer_n++;
-        if (transducer_n == 1)
-        {
-            verbose_printf("Concatenating %s and %s...\n", firstfilename, 
-                        secondfilename);
-        }
+        verbose_printf("Parsing lexc file %s\n", lexcfilenames[i]);
+        if (lexcfiles[i] == stdin)
+          {
+            lexc.parse_stdin();
+          }
         else
-        {
-            verbose_printf("Concatenating %s and %s... %zu\n", firstfilename,
-                           secondfilename, transducer_n);
-        }
-        HfstTransducer first(firststream);
-        HfstTransducer second(secondstream);
-        outstream << first.concatenate(second);
-        bothInputs = firststream.is_good() && secondstream.is_good();
-    }
-    
-    if (firststream.is_good())
-    {
-      warning(0, 0, "Warning: %s contains more transducers than %s; "
-                     "residue skipped\n", firstfilename, secondfilename);
-    }
-    else if (secondstream.is_good())
-    {
-      warning(0, 0, "Warning: %s contains fewer transducers than %s; "
-                     "residue skipped\n", firstfilename, secondfilename);
-    }
-    firststream.close();
-    secondstream.close();
+          {
+            lexc.parse(lexcfilenames[i]);
+          }
+      }
+    verbose_printf("Compiling... ");
+    HfstTransducer* res = lexc.compileLexical();
+    verbose_printf("\nWriting... ");
+    outstream << *res;
+    verbose_printf("done\n");
+    delete res;
     outstream.close();
     return EXIT_SUCCESS;
 }
 
 
 int main( int argc, char **argv ) {
-    hfst_set_program_name(argv[0], "0.1", "HfstConcatenate");
+    hfst_set_program_name(argv[0], "0.1", "HfstLexcCompiler");
     int retval = parse_options(argc, argv);
     if (retval != EXIT_CONTINUE)
     {
         return retval;
     }
     // close buffers, we use streams
-    if (firstfile != stdin)
-    {
-        fclose(firstfile);
-    }
-    if (secondfile != stdin)
-    {
-        fclose(secondfile);
-    }
+    for (unsigned int i = 0; i < lexccount; i++)
+      {
+        if (lexcfiles[i] != stdin)
+          {
+            fclose(lexcfiles[i]);
+          }
+      }
     if (outfile != stdout)
     {
         fclose(outfile);
     }
-    verbose_printf("Reading from %s and %s, writing to %s\n", 
-        firstfilename, secondfilename, outfilename);
+    verbose_printf("Reading from %s..., writing to %s\n", 
+        lexcfilenames[0], outfilename);
     // here starts the buffer handling part
-    HfstInputStream* firststream = NULL;
-    HfstInputStream* secondstream = NULL;
-    try {
-        firststream = (firstfile != stdin) ?
-            new HfstInputStream(firstfilename) : new HfstInputStream();
-    } catch(NotTransducerStreamException)   {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              firstfilename);
-    }
-    try {
-        secondstream = (secondfile != stdin) ?
-            new HfstInputStream(secondfilename) : new HfstInputStream();
-    } catch(NotTransducerStreamException)   {
-        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
-              secondfilename);
-    }
     HfstOutputStream* outstream = (outfile != stdout) ?
-        new HfstOutputStream(outfilename, firststream->get_type()) :
-        new HfstOutputStream(firststream->get_type());
-
-    retval = concatenate_streams(*firststream, *secondstream, *outstream);
-    delete firststream;
-    delete secondstream;
+        new HfstOutputStream(outfilename, format) :
+        new HfstOutputStream(format);
+    LexcCompiler lexc(format);
+    if (silent)
+      {
+        lexc.setVerbosity(false);
+      }
+    else
+      {
+        lexc.setVerbosity(verbose);
+      }
+    retval = lexc_streams(lexc, *outstream);
     delete outstream;
-    free(firstfilename);
-    free(secondfilename);
+    free(lexcfilenames);
     free(outfilename);
     return retval;
 }
