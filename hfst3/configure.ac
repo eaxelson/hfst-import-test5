@@ -83,6 +83,7 @@ if test "x$with_sfst" == "xno" -a "x$with_openfst" == "xno" -a "x$with_foma" == 
     AC_MSG_ERROR([must build with at least one fst backend])
 fi
 
+# some extensions
 AC_ARG_ENABLE([xre],
               [AS_HELP_STRING([--enable-xre],
                               [build xerox reg.exp. parser @<:@default=yes@:>@])],
@@ -91,10 +92,10 @@ AC_ARG_ENABLE([xre],
 AM_CONDITIONAL([WANT_XRE], [test "x$enable_xre" != xno])
 AC_ARG_ENABLE([lexc],
               [AS_HELP_STRING([--enable-lexc],
-                              [build xerox lexc parser @<:@default=yes@:>@])],
+                              [build xerox lexc parser @<:@default=no@:>@])],
               [enable_lexc=$enableval],
-              [enable_lexc=yes])
-AM_CONDITIONAL([WANT_LEXC], [test "x$enable_xre" != xno])
+              [enable_lexc=no])
+AM_CONDITIONAL([WANT_LEXC], [test "x$enable_lexc" != xno])
 # allow programs to be built separately (sort alphabetically)
 AC_ARG_ENABLE([calculate],
 			  [AS_HELP_STRING([--enable-calculate],
@@ -182,9 +183,9 @@ AC_ARG_ENABLE([invert],
 AM_CONDITIONAL([WANT_INVERT], [test x$enable_invert != xno])
 AC_ARG_ENABLE([lexc-compiler],
               [AS_HELP_STRING([--enable-lexc-compiler],
-                              [build lexc compiler @<:@default=yes@:>@])],
+                              [build lexc compiler @<:@default=no@:>@])],
               [enable_lexc_compiler=$enableval],
-              [enable_lexc_compiler=yes])
+              [enable_lexc_compiler=no])
 AM_CONDITIONAL([WANT_LEXC_COMPILER], [test "x$enable_lexc_compiler" != xno])
 AC_ARG_ENABLE([lookup],
 			  [AS_HELP_STRING([--enable-lookup],
@@ -299,9 +300,9 @@ AC_ARG_ENABLE([subtract],
 AM_CONDITIONAL([WANT_SUBTRACT], [test x$enable_subtract != xno])
 AC_ARG_ENABLE([summarize],
 			  [AS_HELP_STRING([--enable-summarize],
-							  [build summarize tool @<:@default=yes@:>@])],
+							  [build summarize tool @<:@default=no@:>@])],
 			  [enable_summarize=$enableval],
-			  [enable_summarize=yes])
+			  [enable_summarize=no])
 AM_CONDITIONAL([WANT_SUMMARIZE], [test x$enable_summarize != xno])
 AC_ARG_ENABLE([tail],
 			  [AS_HELP_STRING([--enable-tail],
@@ -361,7 +362,6 @@ AC_CHECK_LIB([dl], [main])
 if test "x$with_openfst" != "xno"; then
     AC_CHECK_LIB([fst], [main], [],
                  [AC_MSG_FAILURE([openfst test failed (--without-openfst to disable)])])
-    AC_CHECK_LIB([fstmain], [main])
     AC_CHECK_LIB([m], [main])
 fi
 
