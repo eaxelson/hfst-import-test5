@@ -19,6 +19,7 @@
 
 namespace hfst
 {
+  using implementations::HfstAlphabet;
 
   typedef unsigned int Character;
 
@@ -97,7 +98,7 @@ namespace hfst
     public:
       bool Verbose;
       bool Alphabet_Defined;
-      implementations::HfstAlphabet TheAlphabet;
+      HfstAlphabet TheAlphabet;
       ImplementationType compiler_type;
 
       

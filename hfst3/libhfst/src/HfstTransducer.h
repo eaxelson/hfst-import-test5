@@ -105,6 +105,11 @@ namespace hfst
 #if HAVE_MUTABLE
   class HfstMutableTransducer;
 #endif
+  typedef class hfst::implementations::HfstInternalTransducer HfstMutableTransducer;
+  typedef class hfst::implementations::HfstTransition HfstTransition;
+  typedef class hfst::implementations::HfstStateIterator HfstStateIterator;
+  typedef class hfst::implementations::HfstTransitionIterator HfstTransitionIterator;
+  typedef hfst::implementations::HfstState HfstState;
 
   /** \brief A stream for reading binary transducers. 
 

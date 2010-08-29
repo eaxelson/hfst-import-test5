@@ -751,9 +751,9 @@ namespace hfst { namespace implementations
       { throw p; }
       }*/
 
-  /* Skip the identifier string "TROPICAL_OFST_TYPE" */
+  /* Skip the identifier string "LOG_OFST_TYPE" */
   void LogWeightInputStream::skip_identifier_version_3_0(void)
-  { input_stream.ignore(19); }
+  { input_stream.ignore(14); }
 
   void LogWeightInputStream::skip_hfst_header(void)
   {
@@ -2189,7 +2189,7 @@ namespace hfst { namespace implementations
       fprintf(stderr, "LogWeightOutputStream: ERROR: failbit set (2).\n");
     out.write("HFST3",6);
     //out.put(0);
-    out.write("TROPICAL_OFST_TYPE",19);
+    out.write("LOG_OFST_TYPE",14);
     //out.put(0);
   }
 

@@ -12,13 +12,15 @@
 namespace hfst {
   namespace implementations {
   
+    typedef unsigned int HfstState;
+
     class InternalTransducerLine {
     public:
       bool final_line;
-      unsigned int origin;
-      unsigned int target;
-      unsigned int isymbol;
-      unsigned int osymbol;
+      HfstState origin;
+      HfstState target;
+      HfstState isymbol;
+      HfstState osymbol;
       float weight;
       
     InternalTransducerLine():
@@ -34,8 +36,8 @@ namespace hfst {
 
     class HfstTransition {
     public:
-      unsigned int source;
-      unsigned int target;
+      HfstState source;
+      HfstState target;
       std::string isymbol;
       std::string osymbol;
       float weight;
@@ -46,26 +48,26 @@ namespace hfst {
     class HfstInternalTransducer {
     public:
       std::set<InternalTransducerLine> lines;
-      std::set<std::pair<unsigned int,float> > final_states;
+      std::set<std::pair<HfstState,float> > final_states;
       HfstAlphabet * alphabet;
 
       HfstInternalTransducer();
       ~HfstInternalTransducer();
       HfstInternalTransducer(const HfstInternalTransducer &transducer);
 
-      void add_line(unsigned int final_state, float final_weight); 
-      void add_line(unsigned int origin_state, unsigned int target_state,
-		    unsigned int isymbol, unsigned int osymbol,
+      void add_line(HfstState final_state, float final_weight); 
+      void add_line(HfstState origin_state, HfstState target_state,
+		    HfstState isymbol, HfstState osymbol,
 		    float weight);
       bool has_no_lines();
       std::set<InternalTransducerLine> *get_lines();
-      unsigned int max_state_number();
+      HfstState max_state_number();
 
       void add_transition(HfstTransition &transition);
-      void add_final_state(unsigned int s, float weight);
+      void add_final_state(HfstState s, float weight);
 
-      bool is_final_state(unsigned int);
-      float get_final_weight(unsigned int);
+      bool is_final_state(HfstState);
+      float get_final_weight(HfstState);
       void read_number(FILE*);
       void read_symbol(FILE*);
       void print_number(FILE*);
@@ -86,11 +88,11 @@ namespace hfst {
 
     class HfstStateIterator {
     protected:
-      std::set<unsigned int> state_set;
-      std::set<unsigned int>::iterator it;
+      std::set<HfstState> state_set;
+      std::set<HfstState>::iterator it;
     public:
       HfstStateIterator(const HfstInternalTransducer &transducer);
-      unsigned int value();
+      HfstState value();
       void next();
       bool done();
     };
@@ -100,7 +102,7 @@ namespace hfst {
       std::set<HfstTransition> transition_set;
       std::set<HfstTransition>::iterator it;
     public:
-      HfstTransitionIterator(const HfstInternalTransducer &transducer, unsigned int s);
+      HfstTransitionIterator(const HfstInternalTransducer &transducer, HfstState s);
       HfstTransition value();
       void next();
       bool done();
