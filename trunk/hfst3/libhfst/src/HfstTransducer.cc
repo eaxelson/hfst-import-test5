@@ -1279,18 +1279,7 @@ type(type),anonymous(false),is_trie(false)
     return *this;
   }
 
-  /*
-  void substitute_output_identity_with_unknown(std::string &isymbol, std::string &osymbol) {
-    if (osymbol.compare("@_IDENTITY_SYMBOL_@"))
-      osymbol = std::string("@_UNKNOWN_SYMBOL_@");
-  }
-
-  void substitute_input_identity_with_unknown(std::string &isymbol, std::string &osymbol) {
-    if (isymbol.compare("@_IDENTITY_SYMBOL_@"))
-      isymbol = std::string("@_UNKNOWN_SYMBOL_@");
-  }
-
-  void substitute_single_identitity_with_unknown(std::string &isymbol, std::string &osymbol) {
+  void substitute_single_identity_with_unknown(std::string &isymbol, std::string &osymbol) {
     if (isymbol.compare("@_IDENTITY_SYMBOL_@") && (osymbol.compare("@_IDENTITY_SYMBOL_@") == false))
       isymbol = std::string("@_UNKNOWN_SYMBOL_@");
     else if (osymbol.compare("@_IDENTITY_SYMBOL_@") && (isymbol.compare("@_IDENTITY_SYMBOL_@") == false))
@@ -1299,19 +1288,81 @@ type(type),anonymous(false),is_trie(false)
       return;
   }
 
-  void substitute_unknown_identity_pair(std::string &isymbol, std::string &osymbol) {
+  void substitute_unknown_identity_pairs(std::string &isymbol, std::string &osymbol) {
     if (isymbol.compare("@_UNKNOWN_SYMBOL_@") && isymbol.compare("@_IDENTITY_SYMBOL_@")) {
-      isymbol = std::string();
-      osymbol = std::string();
+      isymbol = std::string("@_IDENTITY_SYMBOL_@");
+      osymbol = std::string("@_IDENTITY_SYMBOL_@");
     }
   }
-  */
 
   HfstTransducer &HfstTransducer::compose
   (const HfstTransducer &another)
   { is_trie = false;
+    
+    if (this->type != another.type)
+      throw hfst::exceptions::TransducerTypeMismatchException();
 
-    /* if (this->type != FOMA_TYPE) {
+    this->harmonize(const_cast<HfstTransducer&>(another));
+
+    if (this->type != FOMA_TYPE) 
+      {
+	this->substitute("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",false,true);
+	(const_cast<HfstTransducer&>(another)).substitute("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",true,false);
+      }
+
+    switch (this->type)
+      {
+      case SFST_TYPE:
+        {
+	  SFST::Transducer * sfst_temp =
+            this->sfst_interface.compose(implementation.sfst,another.implementation.sfst);
+          delete implementation.sfst;
+          implementation.sfst = sfst_temp;
+          break;
+        }
+      case TROPICAL_OFST_TYPE:
+        {
+	  fst::StdVectorFst * tropical_ofst_temp =
+            this->tropical_ofst_interface.compose(this->implementation.tropical_ofst,
+                                another.implementation.tropical_ofst);
+          delete implementation.tropical_ofst;
+          implementation.tropical_ofst = tropical_ofst_temp;
+          break;
+        }
+      case LOG_OFST_TYPE:
+        {
+	  hfst::implementations::LogFst * log_ofst_temp =
+            this->log_ofst_interface.compose(implementation.log_ofst,
+                           another.implementation.log_ofst);
+          delete implementation.log_ofst;
+          implementation.log_ofst = log_ofst_temp;
+          break;
+        }
+      case FOMA_TYPE:
+        {
+          fsm * foma_temp =
+            this->foma_interface.compose(implementation.foma,another.implementation.foma);
+          this->foma_interface.delete_foma(implementation.foma);
+          implementation.foma = foma_temp;
+          break;
+        }
+      case UNSPECIFIED_TYPE:
+      case ERROR_TYPE:
+      default:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+      }
+
+    if (this->type != FOMA_TYPE) 
+      {
+	this->substitute(*substitute_single_identity_with_unknown);
+	(const_cast<HfstTransducer&>(another)).substitute(*substitute_unknown_identity_pairs);
+      }
+
+    return *this;
+
+
+
+    /*    if (this->type != FOMA_TYPE) {
       this->substitute(&substitute_output_identity_with_unknown);
     }
     if (another.type != FOMA_TYPE) {
