@@ -71,14 +71,21 @@ endif
 if WANT_XRE
 XRE_SRCS=xre_lex.ll xre_parse.yy xre_utils.cc XreCompiler.cc
 XRE_HDRS=XreCompiler.h xre_utils.h
-BUILT_SOURCES=xre_parse.h
+XRE_BUILT=xre_parse.h
 endif
+if WANT_LEXC
+LEXC_SRCS=lexc-lexer.ll lexc-parser.yy lexc-utils.cc LexcCompiler.cc
+LEXC_HDRS=LexcCompiler.h lexc-utils.h
+LEXC_BUILT=lexc-parser.h
+endif
+BUILT_SOURCES=$(XRE_BUILT) $(LEXC_BUILT)
+
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 
 libhfstimplementations_la_SOURCES=$(IMPLEMENTATION_SRCS) $(BRIDGE_SRCS) \
 								  $(SFST_SRCS) $(FOMA_SRCS) $(HFST_OL_SRCS) \
-								  $(XRE_SRCS)
+								  $(XRE_SRCS) $(LEXC_SRCS)
 
 # headers of implementation bridge to reveal to public
 hfstincludedir = $(includedir)/hfst

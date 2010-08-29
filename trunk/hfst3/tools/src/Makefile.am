@@ -21,6 +21,7 @@ LDADD = $(top_builddir)/libhfst/src/libhfst.la
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib
 AM_CXXFLAGS = $(WERR_CFLAGS)
 
+# sort alphabetically:
 if WANT_COMPARE
 MAYBE_COMPARE=hfst-compare
 endif
@@ -56,6 +57,9 @@ MAYBE_HEAD=hfst-head
 endif
 if WANT_INVERT
 MAYBE_INVERT=hfst-invert
+endif
+if WANT_LEXC_COMPILER
+MAYBE_LEXC_COMPILER=hfst-lexc-compiler
 endif
 if WANT_LOOKUP
 MAYBE_LOOKUP=hfst-lookup
@@ -136,6 +140,7 @@ noinst_HEADERS= \
 	inc/getopt-cases-unary.h  inc/globals-binary.h      \
 	inc/globals-common.h      inc/globals-unary.h
 
+# sort alphabetically
 bin_PROGRAMS=$(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_COMPOSE_INTERSECT) \
 			 $(MAYBE_CONCATENATE) $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) \
 			 $(MAYBE_DIFF_TEST) $(MAYBE_DISJUNCT) \
@@ -151,9 +156,11 @@ bin_PROGRAMS=$(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_COMPOSE_INTERSECT) \
 			 $(MAYBE_UNWEIGHTED2WEIGHTED) $(MAYBE_WEIGHTED2UNWEIGHTED) \
 			 $(MAYBE_UNWEIGHTED_CALCULATE) $(MAYBE_WEIGHTED_CALCULATE) \
 			 $(MAYBE_OPTIMIZED_LOOKUP) $(MAYBE_SUBSTITUTE) \
-			 $(MAYBE_FLAG_DIACRITICS) $(MAYBE_OMOR_EVALUATE)
+			 $(MAYBE_FLAG_DIACRITICS) $(MAYBE_OMOR_EVALUATE) \
+			 $(MAYBE_LEXC_COMPILER)
 
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc
+# sort alphabetically
 hfst_compare_SOURCES=hfst-compare.cc $(HFST_COMMON_SRC)
 hfst_compose_SOURCES=hfst-compose.cc $(HFST_COMMON_SRC)
 hfst_compose_intersect_SOURCES=hfst-compose-intersect.cc $(HFST_COMMON_SRC)
@@ -167,11 +174,12 @@ hfst_fst2strings_SOURCES=hfst-fst2strings.cc $(HFST_COMMON_SRC)
 hfst_fst2txt_SOURCES=hfst-fst2txt.cc $(HFST_COMMON_SRC)
 hfst_head_SOURCES=hfst-head.cc $(HFST_COMMON_SRC)
 hfst_invert_SOURCES=hfst-invert.cc $(HFST_COMMON_SRC)
+hfst_lexc_compiler_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC)
 hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC)
 hfst_lookup_optimize_SOURCES=hfst-lookup-optimize.cc $(HFST_COMMON_SRC)
 hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
 hfst_omor_evaluate_SOURCES=hfst-omor-evaluate.cc $(HFST_COMMON_SRC)
-hfst_pair_test_SOURCES=hfst-pair-test.cc $(HFST_COMMON_SRC) # hwfst-pair-test-transducers.h
+hfst_pair_test_SOURCES=hfst-pair-test.cc $(HFST_COMMON_SRC)
 hfst_project_SOURCES=hfst-project.cc $(HFST_COMMON_SRC)
 hfst_push_weights_SOURCES=hfst-push-weights.cc $(HFST_COMMON_SRC)
 hfst_regexp2fst_SOURCES=hfst-regexp2fst.cc $(HFST_COMMON_SRC)
@@ -191,7 +199,7 @@ hfst_optimized_lookup_SOURCES=hfst-optimized-lookup.cc
 
 BUILT_SOURCES=hfst-compiler.h
 
-hfst_calculate_CXXFLAGS= -Wall
+hfst_calculate_CXXFLAGS= -Wall -Wno-error
 
 ## YACC and FLEX with autotools argh
 AM_YFLAGS=-d

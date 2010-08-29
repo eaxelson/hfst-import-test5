@@ -29,7 +29,13 @@
 #endif
 
 #include <string>
-#include "HfstTransducer.h"
+
+#include "../HfstTransducer.h"
+#include "XreCompiler.h"
+
+namespace hfst {
+//! @brief Namespace for Xerox LexC related specific functions and classes.
+namespace lexc {
 
 //! @brief A compiler holding information contained in lexc style lexicons.
 //! A single LexcCompiler can be extended by adding entries to it, but little
@@ -37,72 +43,85 @@
 class LexcCompiler
 {
   public:
-  //! @brief create compiler for initial lexicon @c Root and
-  //! final lexicon @c #.
+  //! @brief create a lexc compiler for unspecified transducer format.
   LexcCompiler();
 
-  //! @brief add @a alphabet to sigma set.
-  void addAlphabet(const std::string& alphabet);
+  //! @brief create a lexc compiler with @c impl as transducer format.
+  LexcCompiler(hfst::ImplementationType impl);
+
+  //! @brief compile lexc description from @c stdin into current compiler
+  LexcCompiler& parse_stdin();
+
+  //! @brief compile lexc description from file @a filename into current
+  //!        compiler.
+  LexcCompiler& parse(const char* filename);
+
+  //! @brief set verbosity options
+  LexcCompiler& setVerbosity(bool verbose);
+
+  //! @brief add @a alphabet to multicharacter symbol set.
+  //!        This may include regular expression ? for backends that do not
+  //!        support open alphabets.
+  LexcCompiler& addAlphabet(const std::string& alphabet);
 
   //! @brief set current processing lexicon name to @a lexicon_name.
-  void setCurrentLexiconName(const std::string& lexicon_name);
+  LexcCompiler& setCurrentLexiconName(const std::string& lexicon_name);
 
   //! @brief add entry defined by a @a entry to current lexicon, pointing to
   //! @a continuation weighing @a weight to current lexicon.
-  void addStringEntry(const std::string& entry, const std::string& continuation,
-          const double weight);
+  LexcCompiler& addStringEntry(const std::string& entry, const std::string& continuation,
+                      const double weight);
 
   //! @brief add entry defined by @a upper:@a lower, pointing to
   //! @a continuation weighing @a weight to current lexicon.
-  void addStringPairEntry(const std::string& upper, const std::string& lower,
+  LexcCompiler& addStringPairEntry(const std::string& upper, const std::string& lower,
           const std::string& continuation, const double weight);
 
   //! @brief add entry defined by regular expression @a xre, pointing to
   //! @a continuation weighing @a weight to current lexicon.
-  void addXreEntry(const std::string& xre, const std::string& continuation, 
-          const double weight);
+  LexcCompiler& addXreEntry(const std::string& xre, const std::string& continuation, 
+                   const double weight);
 
   //! @brief add macro definition named @a name matching regular expression
   //! @a xre to known xerox regular expressions.
-  void addXreDefinition(const std::string& name, const std::string& xre);
+  LexcCompiler& addXreDefinition(const std::string& name, const std::string& xre);
 
   //! @brief set start lexicon's name to @a lexicon_name.
-  void setInitialLexiconName(const std::string& lexicon_name);
-
-  //! @brief set end lexicon's name to @a lexicon_name.
-  void setFinalLexiconName(const std::string& lexicon_name);
+  LexcCompiler& setInitialLexiconName(const std::string& lexicon_name);
 
   //! @brief create final usable version of current lexicons and entries.
-  const hfst::HfstTransducer& compileLexical();
+  hfst::HfstTransducer* compileLexical();
 
   //! @brief get trie formed by current string entries
-  const std::map<std::string,hfst::HfstTransducer>& getStringTrie() const;
+  const std::map<std::string,hfst::HfstTransducer>& getStringTries() const;
 
   //! @brief get union formed by current regular expression entries
-  const std::map<std::string,hfst::HfstTransducer>& getRegexpUnion() const;
-
-  //! @brief compile morphotax to limit star union of compiled entries.
-  const hfst::HfstTransducer& compileMorphotax();
+  const std::map<std::string,hfst::HfstTransducer>& getRegexpUnions() const;
 
   //! @brief check that current morphotax is connected and print anomalies.
   //! Works like xerox lexc, for compatibility.
-  void printConnectedness() const;
-
-  //! @brief dumps debugging data
-  void dumpDebugString() const;
+  const LexcCompiler& printConnectedness() const;
 
   private:
-  hfst::HfstTransducer lexical_;
-  std::map<std::string,hfst::HfstTransducer> stringTrie_;
-  std::map<std::string,hfst::HfstTransducer> regexpUnion_;
-  hfst::HfstTransducer morphotax_;
+  bool quiet_;
+  hfst::ImplementationType format_;
+  hfst::HfstTokenizer tokenizer_;
+  hfst::xre::XreCompiler xre_;
+  std::string initialLexiconName_;
+  std::map<std::string,hfst::HfstTransducer> stringTries_;
+  std::map<std::string,hfst::HfstTransducer> regexps_;
   std::set<std::string> lexiconNames_;
   std::set<std::string> continuations_;
-  bool closedSigma_;
-  bool hasRegExps_;
-  bool hasStrings_;
+  std::string currentLexiconName_;
+  size_t totalEntries_;
+  size_t currentEntries_;
 }
 ;
+
+// ugh, the global
+extern LexcCompiler* lexc_;
+} }
+
 // vim:set ft=cpp.doxygen:
 #endif
 

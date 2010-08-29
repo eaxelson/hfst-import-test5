@@ -17,3 +17,8 @@
 
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = libhfst tools test doc man
+
+if CAN_DOXYGEN
+doxygen:
+	doxygen Doxyfile
+endif

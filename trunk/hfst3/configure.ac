@@ -89,6 +89,12 @@ AC_ARG_ENABLE([xre],
               [enable_xre=$enableval],
               [enable_xre=yes])
 AM_CONDITIONAL([WANT_XRE], [test "x$enable_xre" != xno])
+AC_ARG_ENABLE([lexc],
+              [AS_HELP_STRING([--enable-lexc],
+                              [build xerox lexc parser @<:@default=yes@:>@])],
+              [enable_lexc=$enableval],
+              [enable_lexc=yes])
+AM_CONDITIONAL([WANT_LEXC], [test "x$enable_xre" != xno])
 # allow programs to be built separately (sort alphabetically)
 AC_ARG_ENABLE([calculate],
 			  [AS_HELP_STRING([--enable-calculate],
@@ -174,6 +180,12 @@ AC_ARG_ENABLE([invert],
 			  [enable_invert=$enableval],
 			  [enable_invert=yes])
 AM_CONDITIONAL([WANT_INVERT], [test x$enable_invert != xno])
+AC_ARG_ENABLE([lexc-compiler],
+              [AS_HELP_STRING([--enable-lexc-compiler],
+                              [build lexc compiler @<:@default=yes@:>@])],
+              [enable_lexc_compiler=$enableval],
+              [enable_lexc_compiler=yes])
+AM_CONDITIONAL([WANT_LEXC_COMPILER], [test "x$enable_lexc_compiler" != xno])
 AC_ARG_ENABLE([lookup],
 			  [AS_HELP_STRING([--enable-lookup],
 							  [build lookup tool @<:@default=no@:>@])],
