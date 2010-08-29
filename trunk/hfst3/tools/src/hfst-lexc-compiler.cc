@@ -207,8 +207,12 @@ int main( int argc, char **argv ) {
     {
         fclose(outfile);
     }
-    verbose_printf("Reading from %s..., writing to %s\n", 
-        lexcfilenames[0], outfilename);
+    verbose_printf("Reading from ");
+    for (unsigned int i = 0; i < lexccount; i++)
+      {
+        verbose_printf("%s, ", lexcfilenames[i]);
+      }
+    verbose_printf("writing to %s\n", outfilename);
     // here starts the buffer handling part
     HfstOutputStream* outstream = (outfile != stdout) ?
         new HfstOutputStream(outfilename, format) :

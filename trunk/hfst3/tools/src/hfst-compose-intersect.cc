@@ -236,8 +236,13 @@ int main( int argc, char **argv ) {
     {
         fclose(outfile);
     }
-    verbose_printf("Reading from %s and %s, writing to %s\n", 
-        lexiconfilename, rulefilenames[0], outfilename);
+    verbose_printf("Reading from %s and ", 
+        lexiconfilename);
+    for (unsigned int i = 0; i < rulecount; i++)
+      {
+        verbose_printf("%s, ", rulefilenames[i]);
+      }
+    verbose_printf("writing to %s\n", outfilename);
     // here starts the buffer handling part
     HfstInputStream* lexiconstream = NULL;
     HfstInputStream* rulestream = NULL;
