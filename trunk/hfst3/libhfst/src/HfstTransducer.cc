@@ -1957,6 +1957,13 @@ std::ostream &operator<<(std::ostream &out,HfstTransducer &t)
     return out;
   }
 
+void HfstTransducer::print_alphabet()
+{
+  if (this->type == SFST_TYPE)
+    this->sfst_interface.print_alphabet(this->implementation.sfst);
+  return;
+}
+
 
 #if HAVE_MUTABLE
   // check that OpenFst is available

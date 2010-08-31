@@ -112,7 +112,7 @@ RE:         RE ARROW CONTEXTS2      { $$ = compiler->restriction($1,$2,$3,0); }
 	  | RE SUBSTITUTE CODE ':' CODE  { $$ = compiler->substitute($1,$3,$5); }
 	  | RE SUBSTITUTE CODE ':' CODE ':' CODE ':' CODE { $$ = compiler->substitute($1,$3,$5,$7,$9); }
 	  | RE SUBSTITUTE CODE ':' CODE '(' RE ')' { $$ = compiler->substitute($1,$3,$5,$7); }
-          | RANGE ':' RANGE  { $$ = compiler->new_transducer($1,$3,type); }
+          | RANGE ':' RANGE  { $$ = compiler->new_transducer($1,$3,type); } 
           | RANGE            { $$ = compiler->new_transducer($1,$1,type); }
           | VAR              { if (DEBUG) { printf("calling transducer variable \"%s\"\n", $1); }; $$ = compiler->var_value($1); }
           | RVAR             { if (DEBUG) { printf("calling agreement transducer variable \"%s\"\n", $1); }; $$ = compiler->rvar_value($1,type); }
@@ -354,10 +354,16 @@ int main( int argc, char *argv[] )
     //  Result->store_lowmem(file);
     else {
       try {
+      bool DEBUG=false;
+      if (DEBUG) { printf("writing to file..\n");
+         	   //std::cerr << *Result;
+		   Result->print_alphabet();
+      }
         compiler->write_to_file(Result,argv[2]);
       } catch (hfst::exceptions::HfstInterfaceException e) {
           printf("\nAn error happened when writing to file \"%s\"\n", argv[2]);
       }
+	if (DEBUG) printf("..done\n");
     }
     fclose(file);
     //printf("type is: %i\n", Result->get_type());

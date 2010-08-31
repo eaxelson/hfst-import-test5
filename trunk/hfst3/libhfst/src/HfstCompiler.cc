@@ -668,7 +668,7 @@ namespace hfst
   HfstTransducer * HfstCompiler::result( HfstTransducer *t, bool switch_flag) {
 
     t = explode(t);
-    
+
     // delete the variable values
     vector<char*> s;
     for( VarMap::iterator it=VM.begin(); it != VM.end(); it++ ) {

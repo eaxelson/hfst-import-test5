@@ -35,6 +35,13 @@ namespace hfst {
     size_t HfstAlphabet::size() const { return pairs.size(); };
     
     //bool HfstAlphabet::contains_special_symbols(StringPair sp);  TODO!
+
+    void HfstAlphabet::print() {
+      printf("alphabet..\n");
+      for( CharMap::iterator it=cm.begin(); it!=cm.end(); it++ )
+	printf("%i\t%s\n",it->first,it->second);
+      printf("..alphabet\n");
+    }
     
     void HfstAlphabet::insert(NumberPair sp) { /* check special symbols */ pairs.insert(sp); };  // TODO!
     void HfstAlphabet::clear_pairs() { pairs.clear(); };

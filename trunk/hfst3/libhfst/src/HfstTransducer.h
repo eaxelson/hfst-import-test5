@@ -448,6 +448,7 @@ namespace hfst
     HfstTransducer(unsigned int number, ImplementationType type);
     HfstTransducer(unsigned int inumber, unsigned int onumber, ImplementationType type);
 
+    void print_alphabet();
 
     /** \brief Whether transducers \a tr1 and \a tr2 are equivalent.
 
