@@ -184,6 +184,17 @@ hfst_parse_format_name(const char* s)
 FILE*
 hfst_fopen(const char* filename, const char* mode)
 {
+    if (strcmp(filename, "-") == 0)
+      {
+        if (strcmp(mode, "r") == 0)
+          {
+            return stdin;
+          }
+        else if (strcmp(mode, "w") == 0)
+          {
+            return stdout;
+          }
+      }
     errno = 0;
     FILE *f = fopen(filename, mode);
     if (NULL != f)
