@@ -59,6 +59,9 @@ static bool sum_weights=false;
 static bool normalize_weights=false;
 static bool logarithmic_weights=false;
 
+static char* symbolfilename = 0;
+static FILE* symbolfile = 0;
+
 static hfst::ImplementationType output_format = hfst::UNSPECIFIED_TYPE;
 
 float divide_by_sum_of_weights(float weight) {
@@ -110,7 +113,7 @@ print_usage()
         fprintf(message_out, 
             "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
             "FMT must be name of a format usable by libhfst, such as "
-            "openfst-tropical, sfst, foma or hfst-optimized-weighted\n"
+            "openfst-tropical, sfst or foma\n"
             "If EPS is not defined, the default representation of @0@ is used\n"
             );
 
@@ -133,9 +136,10 @@ print_usage()
             "\n"
        */
         fprintf(message_out, "Examples:\n"
-            "  echo \"cat:dog\" | %s  create cat:dog fst\n"
+            "  echo \"cat:dog\" | %s        create cat:dog fst\n"
             "  echo \"c:da:ot:g\" | %s -p   same as pairstring\n"
-            "\n", program_name, program_name);
+            "  echo \"c:d a:o t:g | %s -S   same with spaces\n"
+            "\n", program_name, program_name, program_name);
         print_report_bugs();
         print_more_info();
         fprintf(message_out, "\n");
@@ -159,11 +163,12 @@ parse_options(int argc, char** argv)
           {"pairstrings", no_argument, 0, 'p'},
           {"spaces", no_argument, 0, 'S'},
           {"format", required_argument, 0, 'f'},
+          {"read-symbols", required_argument, 0, 'R'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "je:123pSf:",
+                             HFST_GETOPT_UNARY_SHORT "je:123pSf:R:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -198,6 +203,10 @@ parse_options(int argc, char** argv)
         case 'f':
             output_format = hfst_parse_format_name(optarg);
             break;
+        case 'R':
+            symbolfilename = hfst_strdup(optarg);
+            symbolfile = hfst_fopen(optarg, "r");
+            break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -210,152 +219,12 @@ parse_options(int argc, char** argv)
              "defaulting to openfst tropical\n");
         output_format = hfst::TROPICAL_OFST_TYPE;
       }
+    if (epsilonname == 0)
+      {
+        epsilonname = hfst_strdup("@0@");
+      }
     return EXIT_CONTINUE;
 }
-
-
-
-
-char *parse_output_string_and_weight(char *line, float& weight) {
-  
-  char *ostring=NULL;
-
-  for (int i=0; line[i] != '\0'; i++) {
-    // ':' does not need to be escaped anymore
-    if (line[i] == '\\' && line[i+1] == ':') {
-      int j=i;
-      while (line[i] != '\0') {
-    line[i] = line[i+1];
-    i++;
-      }
-      i=j;
-    }                   
-    else if (line[i] == ':') {
-      line[i] = '\0';
-      ostring = &line[i+1];
-    }
-    else if (line[i] == '\t') {
-      line[i] = '\0';
-      i++;
-      while (line[i] == '\t' || line[i] == ' ')
-    i++;
-      weight = (float)atof(&line[i]);
-      break;
-    }
-  }
-  return ostring;
-}
-
-// if input is "c:da:ot:g" returns c, da, ot, g
-vector<char*> parse_pairstring_and_weight(char *line, float& weight) {
-
-  vector<char*> res;
-  int last_start=0;
-
-  int i;
-  for (i=0; line[i] != '\0' && line[i] != '\t'; i++) {
-    if (line[i] == '\\') {
-      int j=i;
-      while (line[i] != '\0') {
-    line[i] = line[i+1];
-    i++;
-      }
-      i=j;
-    }           
-
-    else if (line[i] == ':') {
-      line[i] = '\0';
-      res.push_back(&line[last_start]);
-      last_start = i+1;
-    }
-  }
-  res.push_back(&line[last_start]);
-  if (line[i] == '\0')
-    weight=0;
-  else {
-    line[i] = '\0';
-    i++;
-    while (line[i] == '\t' || line[i] == ' ')
-      i++;
-    weight = (float)atof(&line[i]);
-  }
-  return res;
-}
-
-// if input is "a:b c:d e:f" returns pairs (a,b); (c,d) and (e,f)
-vector<pair<char*,char*> > parse_pairstring_with_spaces_and_weight(char *line, float& weight) {
-
-  vector<pair<char*,char*> > res;
-  int last_start=0;
-  char *input=NULL;
-
-  int i;
-  for (i=0; line[i] != '\0' && line[i] != '\t'; i++) {
-    if (line[i] == '\\') {
-      int j=i;
-      while (line[i] != '\0') {
-    line[i] = line[i+1];
-    i++;
-      }
-      i=j;
-    }
-    else if (line[i] == ':') {
-      line[i] = '\0';
-      input = &line[last_start]; // input of pair
-      last_start = i+1;
-    }
-    else if (line[i] == ' ') {
-      line[i] = '\0';
-      if (input != NULL) // output of pair
-    res.push_back( pair<char*,char*>(input, &line[last_start]) );
-      else // identity pair
-    res.push_back( pair<char*,char*>(&line[last_start], &line[last_start]) );
-      last_start = i+1;
-      input=NULL;
-    }
-  }
-  if (input != NULL) // output of last pair
-    res.push_back( pair<char*,char*>(input, &line[last_start]) ); 
-  else // last identity pair
-    res.push_back( pair<char*,char*>(&line[last_start], &line[last_start]) );
-  input=NULL;
-
-  if (line[i] == '\0')
-    weight=0;
-  else {
-    line[i] = '\0';
-    i++;
-    while (line[i] == '\t' || line[i] == ' ')
-      i++;
-    weight = (float)atof(&line[i]);
-  }
-  return res;
-}
-
-vector<char*> parse_identity_string_with_spaces(char *line) {
-  vector<char*> res;
-  int last_start=0;
-
-  int i;
-  for (i=0; line[i] != '\0' && line[i] != '\t'; i++) {
-    if (line[i] == '\\') {
-      int j=i;
-      while (line[i] != '\0') {
-    line[i] = line[i+1];
-    i++;
-      }
-      i=j;
-    }
-    else if (line[i] == ' ') {
-      line[i] = '\0';
-      res.push_back( &line[last_start] );
-      last_start = i+1;
-    }
-  }
-  res.push_back( &line[last_start] );
-  return res;
-}
-
 
 
 int
@@ -367,19 +236,70 @@ process_stream(HfstOutputStream& outstream)
   HfstTokenizer tok;
   HfstTransducer disjunction(output_format);
   outstream.open();
+  size_t line_n = 0;
   while (hfst_getline(&line, &len, inputfile) != -1)
     {
       transducer_n++;
+      line_n++;
+      // parse line end and weight
+      char* tab = strstr(line, "\t");
+      char* string_end = tab;
+      double weight = 0.0;
+      bool weighted = false;
+      if (tab == NULL)
+        {
+          string_end = line;
+          while ((*string_end != '\0') && (*string_end != '\n'))
+            {
+              string_end++;
+            }
+        }
+      else
+        {
+          weight = hfst_strtoweight(tab+1);
+          weighted = true;
+        }
+      *string_end = '\0';
+      HfstTransducer parsed(0, output_format);
       if (has_spaces && pairstrings)
         {
-          return EXIT_FAILURE;
+          char* pair = strtok(line, " ");
+          while (pair != NULL)
+            {
+              char* colon = strchr(pair, ':');
+              char* pair_end = pair;
+              while (*pair_end != '\0')
+                {
+                  pair_end++;
+                }
+              if (colon != NULL)
+                {
+                  char* upper = hfst_strndup(pair, colon - pair);
+                  char* lower = hfst_strndup(colon, pair_end - colon);
+                  HfstTransducer new_pair(upper, lower, output_format);
+                  parsed.concatenate(new_pair).minimize();
+                }
+              else
+                {
+                  HfstTransducer new_pair(pair, output_format);
+                  parsed.concatenate(new_pair).minimize();
+                }
+              strtok(NULL, " ");
+            }
         }
       else if (has_spaces && !pairstrings)
         {
-          return EXIT_FAILURE;
+          char* pair = strtok(line, " ");
+          while (pair != NULL)
+            {
+              HfstTransducer new_pair(pair, output_format);
+              parsed.concatenate(new_pair).minimize();
+              pair = strtok(NULL, " ");
+            }
         }
       else if (!has_spaces && pairstrings)
         {
+          fprintf(stderr, "FIXME: unimplemented !has_spaces && pairstrings\n");
           return EXIT_FAILURE;
         }
       else if (!has_spaces && !pairstrings)
@@ -389,7 +309,8 @@ process_stream(HfstOutputStream& outstream)
             {
               if (colon == line)
                 {
-                  //warning(0, 0, "Line should not start with unescaped :");
+                  error_at_line(0, 0, inputfilename, line_n, 
+                                "line may not start with unescaped colon");
                   colon = strstr(colon + 1, ":");
                 }
               else if (*(colon-1) == '\\')
@@ -399,16 +320,6 @@ process_stream(HfstOutputStream& outstream)
               else
                 {
                   break;
-                }
-            }
-          const char* tab = strstr(line, "\t");
-          const char* string_end = tab;
-          if (string_end == NULL)
-            {
-              string_end = line;
-              while ((*string_end != '\0') && (*string_end != '\n'))
-                {
-                  string_end++;
                 }
             }
           char* first;
@@ -423,20 +334,19 @@ process_stream(HfstOutputStream& outstream)
               first = hfst_strndup(line, string_end-line);
               second = first;
             }
-          HfstTransducer trans(first, second, tok, output_format);
-          if (tab != NULL)
-            {
-              double weight = hfst_strtoweight(tab+1);
-              trans.set_final_weights(weight);
-            }
-          if (!disjunct_strings)
-            {
-              outstream << trans;
-            }
-          else
-            {
-              disjunction.disjunct(trans);
-            }
+          parsed = HfstTransducer(first, second, tok, output_format);
+        }
+      if (weighted)
+        {
+          parsed.set_final_weights(weight);
+        }
+      if (!disjunct_strings)
+        {
+          outstream << parsed;
+        }
+      else
+        {
+          disjunction.disjunct(parsed);
         }
     }
   if (disjunct_strings)

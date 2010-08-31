@@ -368,7 +368,7 @@ namespace hfst
 
     /** \brief Create an empty transducer, i.e. a transducer that does not recognize any string. 
 
-	@note Use HfstTransducer("") to create an epsilon transducer.
+	@note Use HfstTransducer(0) to create an epsilon transducer.
      **/
     HfstTransducer(ImplementationType type);
     /** \brief Create a transducer by tokenizing the utf8 string \a utf8_string
