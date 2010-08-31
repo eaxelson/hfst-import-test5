@@ -121,6 +121,7 @@ namespace hfst { namespace implementations
       static FdTable<SFST::Character>* get_flag_diacritics(Transducer * t);
 
       static void print_test(Transducer *t);
+      static void print_alphabet(Transducer *t);
 
     protected:
       static void initialize_alphabet(Transducer *t);

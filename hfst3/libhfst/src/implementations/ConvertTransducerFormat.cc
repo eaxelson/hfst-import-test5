@@ -464,8 +464,10 @@ HfstInternalTransducer * sfst_to_internal_hfst_format(SFST::Transducer * t) {
   sfst_to_internal(t->root_node(), index, visited_nodes, internal_transducer);
 
   SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
-  for (SFST::Alphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++)
-    internal_transducer->alphabet->add_symbol(it->second, it->first);
+  for (SFST::Alphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++) {
+    if (it->first != 0) // "<>" is not inserted
+      internal_transducer->alphabet->add_symbol(it->second, it->first);
+  }
 
   return internal_transducer;
 }
@@ -503,8 +505,10 @@ SFST::Transducer * hfst_internal_format_to_sfst(HfstInternalTransducer * interna
     }
   
   HfstAlphabet::CharMap cm = internal->alphabet->get_char_map();
-  for (HfstAlphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++)
-    t->alphabet.add_symbol(it->second, it->first);
+  for (HfstAlphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++) {
+    if (it->first != 0) // "@_EPSILON_SYMBOL_@" is not inserted
+      t->alphabet.add_symbol(it->second, it->first);
+  }
 
   return t;
 }

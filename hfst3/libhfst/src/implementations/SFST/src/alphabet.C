@@ -52,11 +52,11 @@ void Alphabet::add( const char *symbol, Character c )
 Alphabet::Alphabet()
 
 { 
-  utf8 = true;  // TEST
-  //add(EpsilonString, Label::epsilon); TEST
-  add("@_EPSILON_SYMBOL_@", 0);
-  add("@_UNKNOWN_SYMBOL_@", 1);
-  add("@_IDENTITY_SYMBOL_@", 2);
+  utf8 = false;
+  add(EpsilonString, Label::epsilon);
+  //add("@_EPSILON_SYMBOL_@", 0);
+  //add("@_UNKNOWN_SYMBOL_@", 1);
+  //add("@_IDENTITY_SYMBOL_@", 2);
 }
 
 

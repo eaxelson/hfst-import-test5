@@ -56,7 +56,9 @@ namespace hfst {
       size_t size() const;
       
       //bool contains_special_symbols(StringPair sp);  TODO!
-      
+
+      void print();
+
       void insert(NumberPair sp);
       void clear_pairs();
       CharMap get_char_map();
