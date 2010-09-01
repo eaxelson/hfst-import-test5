@@ -48,10 +48,7 @@ static bool lexiconNamed = false;
 static char** rulefilenames = 0;
 static FILE** rulefiles = 0;
 static unsigned int rulecount = 0;
-static char* outfilename = 0;
-static FILE* outfile = 0;
 static bool is_input_stdin = true;
-static bool is_output_stdout = true;
 
 void
 print_usage()
@@ -107,32 +104,13 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-common.h"
         case 'l':
           lexiconfilename = hfst_strdup(optarg);
-          if (strcmp(lexiconfilename, "-") == 0) {
+          lexiconfile = hfst_fopen(lexiconfilename, "r");
+          if (lexiconfile == stdin) {
             free(lexiconfilename);
             lexiconfilename = hfst_strdup("<stdin>");
-            lexiconfile = stdin;
             is_input_stdin = true;
           }
-          else {
-            lexiconfile = hfst_fopen(lexiconfilename, "r");
-            is_input_stdin = false;
-          }
           lexiconNamed = true;
-          break;
-        case 'o':
-          outfilename = hfst_strdup(optarg);
-          if (strcmp(outfilename, "-") == 0) {
-            free(outfilename);
-            outfilename = hfst_strdup("<stdout>");
-            outfile = stdout;
-            is_output_stdout = true;
-            message_out = stderr;
-          }
-          else {
-            outfile = hfst_fopen(outfilename, "w");
-            is_output_stdout = false;
-            message_out = stdout;
-          }
           break;
 #include "inc/getopt-cases-error.h"
         }

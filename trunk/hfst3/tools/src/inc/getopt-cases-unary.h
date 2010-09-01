@@ -11,30 +11,12 @@
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 // common-unary-cases.h
-  case 'i':
+case 'i':
   inputfilename = hfst_strdup(optarg);
-  if (strcmp(inputfilename, "-") == 0) {
-    free(inputfilename);
-    inputfilename = hfst_strdup("<stdin>");
-    inputfile = stdin;
-    is_input_stdin = true;
-  }
-  else {
-    inputfile = hfst_fopen(inputfilename, "r");
-    is_input_stdin = false;
-  }
-  break;
-  case 'o':
-  outfilename = hfst_strdup(optarg);
-  if (strcmp(outfilename, "-") == 0) {
-    outfilename = hfst_strdup("<stdout>");
-    outfile = stdout;
-    is_output_stdout = true;
-    message_out = stderr;
-  }
-  else {
-    outfile = hfst_fopen(outfilename, "w");
-    is_output_stdout = false;
-    message_out = stdout;
-  }
+  inputfile = hfst_fopen(inputfilename, "r");
+  if (inputfile == stdin) 
+    {
+      free(inputfilename);
+      inputfilename = hfst_strdup("<stdin>");
+    }
   break;

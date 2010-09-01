@@ -121,6 +121,7 @@ break;
     }
 
 #include "inc/check-params-common.h"
+#include "inc/check-params-unary.h"
     if (epsilonname == NULL)
       {
         epsilonname = hfst_strdup("@0@");
@@ -130,7 +131,7 @@ break;
     if (output_format == hfst::UNSPECIFIED_TYPE)
       {
         output_format = hfst::TROPICAL_OFST_TYPE;
-        fprintf(message_out,  "Defaulting to outputting with OpenFst "
+        verbose_printf("Using default output format OpenFst "
                 "with tropical weight class\n");
       }
 

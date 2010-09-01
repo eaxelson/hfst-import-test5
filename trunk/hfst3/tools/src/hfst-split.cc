@@ -79,45 +79,39 @@ print_usage()
 int
 parse_options(int argc, char** argv)
 {
-	// use of this function requires options are settable on global scope
+    // use of this function requires options are settable on global scope
     extension = hfst_strdup(".hfst");
     prefix = hfst_strdup("");
-	while (true)
-	{
-		static const struct option long_options[] =
-		{
-		  HFST_GETOPT_COMMON_LONG,
+    while (true)
+    {
+        static const struct option long_options[] =
+        {
+          HFST_GETOPT_COMMON_LONG,
           {"input", required_argument, 0, 'i'},
           {"prefix", required_argument, 0, 'p'},
           {"extension", required_argument, 0, 'e'},
-		  // add tool-specific options here 
-			{0,0,0,0}
-		};
-		int option_index = 0;
-		// add tool-specific options here 
-		char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "i:p:e:",
-							 long_options, &option_index);
-		if (-1 == c)
-		{
-			break;
-		}
+          // add tool-specific options here 
+            {0,0,0,0}
+        };
+        int option_index = 0;
+        // add tool-specific options here 
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT "i:p:e:",
+                             long_options, &option_index);
+        if (-1 == c)
+        {
+            break;
+        }
 
-		switch (c)
-		{
+        switch (c)
+        {
 #include "inc/getopt-cases-common.h"
         case 'i':
           inputfilename = hfst_strdup(optarg);
-          if (strcmp(inputfilename, "-") == 0) 
+          inputfile = hfst_fopen(inputfilename, "r");
+          if (inputfile == stdin) 
             {
               free(inputfilename);
               inputfilename = hfst_strdup("<stdin>");
-              inputfile = stdin;
-              is_input_stdin = true;
-            }
-          else
-            {
-              inputfile = hfst_fopen(inputfilename, "r");
-              is_input_stdin = false;
             }
           break;
         case 'p':
@@ -129,23 +123,23 @@ parse_options(int argc, char** argv)
           extension = hfst_strdup(optarg);
           break;
 #include "inc/getopt-cases-error.h"
-		}
-	}
+        }
+    }
 
 #include "inc/check-params-common.h"
 #include "inc/check-params-unary.h"
-	return EXIT_CONTINUE;
+    return EXIT_CONTINUE;
 }
 
 int
 process_stream(HfstInputStream& instream)
 {
   instream.open();
-	
-	size_t transducer_n=0;
-	while(instream.is_good())
-	{
-		transducer_n++;
+    
+    size_t transducer_n=0;
+    while(instream.is_good())
+    {
+        transducer_n++;
         outfilename = static_cast<char*>(hfst_malloc(sizeof(char) *
                              strlen(prefix) + strlen(extension) +
                              strlen("123456789012345678901234567890")));
@@ -161,45 +155,45 @@ process_stream(HfstInputStream& instream)
         outstream->close();
         delete outstream;
         free(outfilename);
-	}
-	instream.close();
-	return EXIT_SUCCESS;
+    }
+    instream.close();
+    return EXIT_SUCCESS;
 }
 
 
 int main( int argc, char **argv ) {
-	hfst_set_program_name(argv[0], "0.1", "HfstSplit");
-	int retval = parse_options(argc, argv);
-	if (retval != EXIT_CONTINUE)
-	{
-		return retval;
-	}
-	// close buffers, we use streams
-	if (inputfile != stdin)
-	{
-		fclose(inputfile);
-	}
-	if (outfile != stdout)
-	{
-		fclose(outfile);
-	}
-	verbose_printf("Reading from %s, writing to %s...%s\n", 
-		inputfilename, prefix, extension);
-	// here starts the buffer handling part
-	HfstInputStream* instream = NULL;
-	try {
-	  instream = (inputfile != stdin) ?
-	    new HfstInputStream(inputfilename) : new HfstInputStream();
-	} catch (NotTransducerStreamException)	{
-		error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+    hfst_set_program_name(argv[0], "0.1", "HfstSplit");
+    int retval = parse_options(argc, argv);
+    if (retval != EXIT_CONTINUE)
+    {
+        return retval;
+    }
+    // close buffers, we use streams
+    if (inputfile != stdin)
+    {
+        fclose(inputfile);
+    }
+    if (outfile != stdout)
+    {
+        fclose(outfile);
+    }
+    verbose_printf("Reading from %s, writing to %s...%s\n", 
+        inputfilename, prefix, extension);
+    // here starts the buffer handling part
+    HfstInputStream* instream = NULL;
+    try {
+      instream = (inputfile != stdin) ?
+        new HfstInputStream(inputfilename) : new HfstInputStream();
+    } catch (NotTransducerStreamException)  {
+        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
-		return EXIT_FAILURE;
-	}
-	
-	retval = process_stream(*instream);
-	delete instream;
-	free(inputfilename);
-	free(outfilename);
-	return retval;
+        return EXIT_FAILURE;
+    }
+    
+    retval = process_stream(*instream);
+    delete instream;
+    free(inputfilename);
+    free(outfilename);
+    return retval;
 }
 

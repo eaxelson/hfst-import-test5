@@ -13,20 +13,32 @@
 case 'd':
   debug = true;
   break;
-  case 'h':
+case 'h':
   print_usage();
   return EXIT_SUCCESS;
   break;
-  case 'V':
+case 'V':
   print_version();
   return EXIT_SUCCESS;
   break;
-  case 'v':
+case 'v':
   verbose = true;
   silent = false;
   break;
-  case 'q':
-  case 's':
+case 'q':
+case 's':
   verbose = false;
   silent = false;
   break;
+case 'o':
+  outfilename = hfst_strdup(optarg);
+  outfile = hfst_fopen(outfilename, "w");
+  if (outfile == stdout) 
+    {
+      free(outfilename);
+      outfilename = hfst_strdup("<stdout>");
+      message_out = stderr;
+    }
+  outputNamed = true;
+  break;
+

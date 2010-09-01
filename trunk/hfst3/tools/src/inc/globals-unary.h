@@ -14,10 +14,6 @@
   // input transducer
   static char *inputfilename;
   static FILE *inputfile = stdin;
-  static bool is_input_stdin = true;
-  // result transducer
-  static char *outfilename;
-  static FILE *outfile = stdout;
-  static bool is_output_stdout = true;
+  static bool inputNamed = false;
   
   

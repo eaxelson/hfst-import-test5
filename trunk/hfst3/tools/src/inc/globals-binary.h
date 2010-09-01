@@ -19,8 +19,4 @@
   FILE *secondfile = stdin;
   bool secondNamed = false;
   bool is_input_stdin = true;
-  // result transducer
-  char *outfilename = 0;
-  FILE *outfile = stdout;
-  bool is_output_stdout = true;
   
