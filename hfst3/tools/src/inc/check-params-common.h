@@ -1,5 +1,5 @@
 
-    if (is_output_stdout)
+    if (!outputNamed)
     {
         outfilename = hfst_strdup("<stdout>");
         outfile = stdout;

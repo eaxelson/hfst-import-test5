@@ -16,7 +16,10 @@ bool silent = false;
 bool debug = false;
 FILE *message_out = stdout;
 #if !HAVE_DECL_PROGRAM_NAME
-const char* program_name = "Someone forgot to set program name";
+const char* program_name = 0;
 #endif
-const char* hfst_tool_version = "Someone forgot to give version";
-const char* hfst_tool_wikiname = "Someone forgot to set wiki page";
+const char* hfst_tool_version = 0;
+const char* hfst_tool_wikiname = 0;
+char* outfilename = 0;
+FILE* outfile = 0;
+bool outputNamed = false;

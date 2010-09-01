@@ -10,22 +10,16 @@
 //  You should have received a copy of the GNU General Public License
 //  along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-    if (is_input_stdin)
+    if (!inputNamed)
       {
         if ((argc - optind) == 1)
           {
             inputfilename = hfst_strdup(argv[optind]);
-            if (strcmp(inputfilename, "-") == 0) 
+            inputfile = hfst_fopen(inputfilename, "r");
+            if (inputfile == stdin)  
               {
                 free(inputfilename);
                 inputfilename = hfst_strdup("<stdin>");
-                inputfile = stdin;
-                is_input_stdin = true;
-              }
-            else 
-              {
-                inputfile = hfst_fopen(inputfilename, "r");
-                is_input_stdin = false;
               }
           }
         else if ((argc - optind) > 1)
@@ -35,6 +29,7 @@
           }
         else
           {
+            inputfile = stdin;
             inputfilename = hfst_strdup("<stdin>");
           }
       }

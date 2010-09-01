@@ -59,185 +59,130 @@ static std::string output_exclude;
 void
 print_usage()
 {
-	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
-	fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
-		"Display the strings recognized by a transducer\n"
-		"\n", program_name);
-	print_common_program_options(message_out);
+    // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
+    fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
+        "Display the strings recognized by a transducer\n"
+        "\n", program_name);
+    print_common_program_options(message_out);
 #               if DEBUG
-	fprintf(message_out,
-		"%-35s%s", "  -d, --debug", "Print debugging messages and results\n"
-		);
+    fprintf(message_out,
+        "%-35s%s", "  -d, --debug", "Print debugging messages and results\n"
+        );
 #               endif
-	
-	fprintf(message_out, "%-30s%s", "  -o, --output=OUTFILE",        "Write results to OUTFILE\n");
-	fprintf(message_out, "%-30s%s", "  -i, --input=INFILE",          "Read input from INFILE\n");
-	fprintf(message_out, "%-30s%s", "  -n, --max-strings=INT",       "The maximum number of strings printed\n");
-	fprintf(message_out, "%-30s%s", "  -N, --nbest=INT",             "Prune the transducer to a max number of best strings\n");
-	fprintf(message_out, "%-30s%s", "  -c, --cycles=INT",            "How many times to follow cycles. Negative=infinite (default)\n");
-	fprintf(message_out, "%-30s%s", "  -w, --print-weights",         "Display the weight for each string\n");
-	fprintf(message_out, "%-30s%s", "  -e, --eval-flags",            "Only print strings with pass flag diacritic checks\n");
-	fprintf(message_out, "%-30s%s", "  -f, --filter-flags",          "Don't print flag diacritic symbols (only with -e)\n");
-	fprintf(message_out, "%-30s%s", "  -l, --max-in-length=INT",     "Ignore paths with an input string longer than length\n");
-	fprintf(message_out, "%-30s%s", "  -L, --max-out-length=INT",    "Ignore paths with an output string longer than length\n");
-	fprintf(message_out, "%-30s%s", "  -p, --in-prefix=PREFIX",      "Ignore paths with an input string not beginning with PREFIX\n");
-	fprintf(message_out, "%-30s%s", "  -P, --out-prefix=PREFIX",     "Ignore paths with an output string not beginning with PREFIX\n");
-	fprintf(message_out, "%-30s%s", "  -x, --in-exclude=STR",        "Ignore paths with an input string containing STR\n");
-	fprintf(message_out, "%-30s%s", "  -X, --out-exclude=STR",       "Ignore paths with an output string containing STR\n");
-	
-	fprintf(message_out, "\n");
-	print_common_unary_program_parameter_instructions(message_out);
-	/*fprintf(message_out,
-		"INFILE cannot be cyclic\n"
-		"Option -n defaults to infinity, i.e. all strings are printed\n"
-		"\n"
-		"Examples:\n"
-		"  %s  lexical.hfst  generates all forms of lexical.hfst\n"
-		"\n", program_name);*/
-	fprintf(stderr, "\n");
-	print_more_info();
-	fprintf(stderr, "\n");
-	print_report_bugs();
-}
-
-void
-print_version(const char* program_name)
-{
-	// c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dversion
-	fprintf(message_out, "%s 0.1 (" PACKAGE_STRING ")\n"
-		   "Copyright (C) 2009 University of Helsinki,\n"
-		   "License GPLv3: GNU GPL version 3 "
-		   "<http://gnu.org/licenses/gpl.html>\n"
-		   "This is free software: you are free to change and redistribute it.\n"
-		   "There is NO WARRANTY, to the extent permitted by law.\n",
-		program_name);
+    
+    fprintf(message_out, "%-30s%s", "  -o, --output=OUTFILE",        "Write results to OUTFILE\n");
+    fprintf(message_out, "%-30s%s", "  -i, --input=INFILE",          "Read input from INFILE\n");
+    fprintf(message_out, "%-30s%s", "  -n, --max-strings=INT",       "The maximum number of strings printed\n");
+    fprintf(message_out, "%-30s%s", "  -N, --nbest=INT",             "Prune the transducer to a max number of best strings\n");
+    fprintf(message_out, "%-30s%s", "  -c, --cycles=INT",            "How many times to follow cycles. Negative=infinite (default)\n");
+    fprintf(message_out, "%-30s%s", "  -w, --print-weights",         "Display the weight for each string\n");
+    fprintf(message_out, "%-30s%s", "  -e, --eval-flags",            "Only print strings with pass flag diacritic checks\n");
+    fprintf(message_out, "%-30s%s", "  -f, --filter-flags",          "Don't print flag diacritic symbols (only with -e)\n");
+    fprintf(message_out, "%-30s%s", "  -l, --max-in-length=INT",     "Ignore paths with an input string longer than length\n");
+    fprintf(message_out, "%-30s%s", "  -L, --max-out-length=INT",    "Ignore paths with an output string longer than length\n");
+    fprintf(message_out, "%-30s%s", "  -p, --in-prefix=PREFIX",      "Ignore paths with an input string not beginning with PREFIX\n");
+    fprintf(message_out, "%-30s%s", "  -P, --out-prefix=PREFIX",     "Ignore paths with an output string not beginning with PREFIX\n");
+    fprintf(message_out, "%-30s%s", "  -x, --in-exclude=STR",        "Ignore paths with an input string containing STR\n");
+    fprintf(message_out, "%-30s%s", "  -X, --out-exclude=STR",       "Ignore paths with an output string containing STR\n");
+    
+    fprintf(message_out, "\n");
+    print_common_unary_program_parameter_instructions(message_out);
+    fprintf(message_out,
+        "\n"
+        "Examples:\n"
+        "  %s  lexical.hfst  generates all forms of lexical.hfst\n"
+        "\n", program_name);
+    print_report_bugs();
+    print_more_info();
 }
 
 int
 parse_options(int argc, char** argv)
 {
-	// use of this function requires options are settable on global scope
-	while (true)
-	{
-		static const struct option long_options[] =
-		{
-		HFST_GETOPT_COMMON_LONG
-		  ,
-		HFST_GETOPT_UNARY_LONG
-		  ,
-		  {"nbest", required_argument, 0, 'N'},
-			{"max-strings", required_argument, 0, 'n'},
-			{"cycles", required_argument, 0, 'c'},
-			{"print-weights", no_argument, 0, 'w'},
-			{"eval-flags", no_argument, 0, 'e'},
-			{"filter-flags", no_argument, 0, 'f'},
-			{"max-in-length", required_argument, 0, 'l'},
-			{"max-out-length", required_argument, 0, 'L'},
-			{"in-prefix", required_argument, 0, 'p'},
-			{"out-prefix", required_argument, 0, 'P'},
-			{"in-exclude", required_argument, 0, 'x'},
-			{"out-exclude", required_argument, 0, 'X'},
-			{0,0,0,0}
-		};
-		int option_index = 0;
-		char c = getopt_long(argc, argv, "R:dhi:N:n:c:o:qsvVwefl:L:p:P:x:X:",
-							 long_options, &option_index);
-		if (-1 == c)
-		{
-			break;
-		}
-		//char *level = NULL;
-		switch (c)
-		{
+    // use of this function requires options are settable on global scope
+    while (true)
+    {
+        static const struct option long_options[] =
+        {
+        HFST_GETOPT_COMMON_LONG
+          ,
+        HFST_GETOPT_UNARY_LONG
+          ,
+          {"nbest", required_argument, 0, 'N'},
+            {"max-strings", required_argument, 0, 'n'},
+            {"cycles", required_argument, 0, 'c'},
+            {"print-weights", no_argument, 0, 'w'},
+            {"eval-flags", no_argument, 0, 'e'},
+            {"filter-flags", no_argument, 0, 'f'},
+            {"max-in-length", required_argument, 0, 'l'},
+            {"max-out-length", required_argument, 0, 'L'},
+            {"in-prefix", required_argument, 0, 'p'},
+            {"out-prefix", required_argument, 0, 'P'},
+            {"in-exclude", required_argument, 0, 'x'},
+            {"out-exclude", required_argument, 0, 'X'},
+            {0,0,0,0}
+        };
+        int option_index = 0;
+        char c = getopt_long(argc, argv, "R:dhi:N:n:c:o:qsvVwefl:L:p:P:x:X:",
+                             long_options, &option_index);
+        if (-1 == c)
+        {
+            break;
+        }
+        //char *level = NULL;
+        switch (c)
+        {
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-unary.h"
-		case 'n':
-			max_strings = atoi(hfst_strdup(optarg));
-			break;
-		case 'N':
-			nbest_strings = atoi(hfst_strdup(optarg));
-			break;
-		case 'c':
-		  cycles = atoi(hfst_strdup(optarg));
-		  break;
-		case 'w':
-			display_weights = true;
-			break;
-		case 'e':
-		  eval_fd = true;
-		  break;
-		case 'f':
-		  if(!eval_fd)
-		  {
-		    fprintf(message_out, "Option -f must be used in conjunction with -e\n");
-		    print_short_help();
-		    return EXIT_FAILURE;
-		  }
-		  filter_fd = true;
-		  break;
-		case 'l':
-		  max_input_length = atoi(hfst_strdup(optarg));
-		  break;
-		case 'L':
-		  max_output_length = atoi(hfst_strdup(optarg));
-		  break;
-		case 'p':
-		  input_prefix = optarg;
-		  break;
-		case 'P':
-		  output_prefix = optarg;
-		  break;
-		case 'x':
-		  input_exclude = optarg;
-		  break;
-		case 'X':
-		  output_exclude = optarg;
-		  break;
+        case 'n':
+            max_strings = atoi(hfst_strdup(optarg));
+            break;
+        case 'N':
+            nbest_strings = atoi(hfst_strdup(optarg));
+            break;
+        case 'c':
+          cycles = atoi(hfst_strdup(optarg));
+          break;
+        case 'w':
+            display_weights = true;
+            break;
+        case 'e':
+          eval_fd = true;
+          break;
+        case 'f':
+          if(!eval_fd)
+          {
+            fprintf(message_out, "Option -f must be used in conjunction with -e\n");
+            print_short_help();
+            return EXIT_FAILURE;
+          }
+          filter_fd = true;
+          break;
+        case 'l':
+          max_input_length = atoi(hfst_strdup(optarg));
+          break;
+        case 'L':
+          max_output_length = atoi(hfst_strdup(optarg));
+          break;
+        case 'p':
+          input_prefix = optarg;
+          break;
+        case 'P':
+          output_prefix = optarg;
+          break;
+        case 'x':
+          input_exclude = optarg;
+          break;
+        case 'X':
+          output_exclude = optarg;
+          break;
 #include "inc/getopt-cases-error.h"
-		}
-	}
+        }
+    }
 
-	if (is_output_stdout)
-	{
-			outfilename = hfst_strdup("<stdout>");
-			outfile = stdout;
-			message_out = stderr;
-	}
-	// rest of arguments are files...
-	if (is_input_stdin && ((argc - optind) == 1))
-	{
-		inputfilename = hfst_strdup(argv[optind]);
-		if (strcmp(inputfilename, "-") == 0) {
-		  inputfilename = hfst_strdup("<stdin>");
-		  inputfile = stdin;
-		  is_input_stdin = true;
-		}
-		else {
-		  inputfile = hfst_fopen(inputfilename, "r");
-		  is_input_stdin = false;
-		}
-	}
-	else if (inputfile) {
-
-	}
-	else if ((argc - optind) == 0)
-	{
-		inputfilename = hfst_strdup("<stdin>");
-		inputfile = stdin;
-		is_input_stdin = true;
-	}
-	else if ((argc - optind) > 1)
-	{
-		fprintf(message_out, "Exactly one input transducer file must be given\n");
-		print_short_help();
-		return EXIT_FAILURE;
-	}
-	else
-	{
-		fprintf(message_out, "???\n");
-		return 73;
-	}
-	return EXIT_CONTINUE;
+#include "inc/check-params-common.h"
+#include "inc/check-params-unary.h"
+    return EXIT_CONTINUE;
 }
 
 //Print results as they come
@@ -337,7 +282,7 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
     
     verbose_printf("Printed %i string(s)", cb.count);
   }
-	
+    
   instream.close();
   return EXIT_SUCCESS;
 }
@@ -346,42 +291,42 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
 int main( int argc, char **argv ) {
   hfst_set_program_name(argv[0], "0.1", "HfstFst2Strings");
     int retval = parse_options(argc, argv);
-	if (retval != EXIT_CONTINUE)
-	{
-		return retval;
-	}
-	// close buffers, we use streams
-	if (inputfile != stdin)
-	{
-		fclose(inputfile);
-	}
-	if (outfile != stdout)
-	{
-		fclose(outfile);
-	}
-	verbose_printf("Reading from %s, writing to %s\n", 
-		inputfilename, outfilename);
-	// here starts the buffer handling part
-	HfstInputStream* instream = NULL;
-	try {
-	  instream = (inputfile != stdin) ?
-	    new HfstInputStream(inputfilename) : new HfstInputStream();
-	} catch(NotTransducerStreamException)	{
-		fprintf(stderr, "%s is not a valid transducer file\n", inputfilename);
-		return EXIT_FAILURE;
-	}
-	
-	if(!is_output_stdout)
-	{
-	  std::ofstream outstream(outfilename);
-	  retval = process_stream(*instream, outstream);
-	}
-	else
-	  retval = process_stream(*instream, std::cout);
-	
-	delete instream;
-	free(inputfilename);
-	free(outfilename);
-	return retval;
+    if (retval != EXIT_CONTINUE)
+    {
+        return retval;
+    }
+    // close buffers, we use streams
+    if (inputfile != stdin)
+    {
+        fclose(inputfile);
+    }
+    if (outfile != stdout)
+    {
+        fclose(outfile);
+    }
+    verbose_printf("Reading from %s, writing to %s\n", 
+        inputfilename, outfilename);
+    // here starts the buffer handling part
+    HfstInputStream* instream = NULL;
+    try {
+      instream = (inputfile != stdin) ?
+        new HfstInputStream(inputfilename) : new HfstInputStream();
+    } catch(NotTransducerStreamException)   {
+        fprintf(stderr, "%s is not a valid transducer file\n", inputfilename);
+        return EXIT_FAILURE;
+    }
+    
+    if (outfile == stdout)
+    {
+      std::ofstream outstream(outfilename);
+      retval = process_stream(*instream, outstream);
+    }
+    else
+      retval = process_stream(*instream, std::cout);
+    
+    delete instream;
+    free(inputfilename);
+    free(outfilename);
+    return retval;
 }
 
