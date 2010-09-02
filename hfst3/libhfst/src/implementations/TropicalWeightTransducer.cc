@@ -83,6 +83,18 @@ namespace hfst { namespace implementations
     return t;
   }
 
+  StdVectorFst * TropicalWeightTransducer::push_weights(StdVectorFst * t, bool to_initial_state)
+  {
+    assert (t->InputSymbols() != NULL);
+    fst::StdVectorFst * retval = new fst::StdVectorFst();
+    if (to_initial_state)
+      fst::Push<StdArc, REWEIGHT_TO_INITIAL>(*t, retval, fst::kPushWeights);
+    else
+      fst::Push<StdArc, REWEIGHT_TO_FINAL>(*t, retval, fst::kPushWeights);
+    retval->SetInputSymbols(t->InputSymbols());
+    return retval;
+  }
+
   StdVectorFst * TropicalWeightTransducer::transform_weights(StdVectorFst * t,float (*func)(float f))
   {
     for (fst::StateIterator<StdVectorFst> siter(*t); 

@@ -1266,6 +1266,29 @@ type(type),anonymous(false),is_trie(false)
     return *this;
   }
 
+  HfstTransducer &HfstTransducer::push_weights(PushType push_type)
+  {
+#if HAVE_OPENFST
+    bool to_initial_state = (push_type == TO_INITIAL_STATE);
+    if (this->type == TROPICAL_OFST_TYPE) 
+      {
+	hfst::implementations::StdVectorFst * tmp  =
+	  this->tropical_ofst_interface.push_weights(this->implementation.tropical_ofst, to_initial_state);
+	delete this->implementation.tropical_ofst;
+	this->implementation.tropical_ofst = tmp;
+      }
+    if (this->type == LOG_OFST_TYPE)
+      {
+	hfst::implementations::LogFst * tmp =
+	  this->log_ofst_interface.push_weights(this->implementation.log_ofst, to_initial_state);
+	delete this->implementation.log_ofst;
+	this->implementation.log_ofst = tmp;
+      }
+#endif
+    return *this;
+  }
+
+
   HfstTransducer &HfstTransducer::transform_weights(float (*func)(float))
   {
 #if HAVE_OPENFST
@@ -1646,6 +1669,7 @@ type(type),anonymous(false),is_trie(false)
     if (type == TROPICAL_OFST_TYPE || type == LOG_OFST_TYPE)
       return false;
 #endif
+    (void)type; 
     return true;
   }
 

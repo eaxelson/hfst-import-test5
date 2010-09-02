@@ -18,8 +18,6 @@
 AUTOMAKE_OPTIONS=subdir-objects
 noinst_LTLIBRARIES=libhfstimplementations.la
 
-# AM_CXXFLAGS=-DLIBSFST -DOPENFST -DFOMA
-
 # HFST bridge specific stuff
 IMPLEMENTATION_SRCS= \
 	HfstTokenizer.cc ConvertTransducerFormat.cc FlagDiacritics.cc InternalTransducer.cc HfstAlphabet.cc # GlobalSymbolTable.cc SymbolDefs.cc
@@ -53,16 +51,16 @@ SFST_SRCS=\
 	SFST/src/operators.C\
 	SFST/src/robust.C           SFST/src/utf8.C    SFST/src/expand.C
 endif
-if WANT_FOMA
-FOMA_SRCS=\
-		  foma/apply.c          foma/flags.c        foma/spelling.c\
-		  foma/coaccessible.c   foma/int_stack.c    foma/mem.c\
-		  foma/structures.c foma/constructions.c  foma/invert.c\
-		  foma/minimize.c foma/topsort.c foma/define.c         foma/io.c\
-		  foma/utf8.c foma/determinize.c    foma/lex.cmatrix.c\
-		  foma/reverse.c foma/dynarray.c foma/lexcread.c     foma/rewrite.c\
-		  foma/extract.c        foma/lex.lexc.c foma/sigma.c
-endif
+#if WANT_FOMA
+#FOMA_SRCS=\
+#		  foma/apply.c          foma/flags.c        foma/spelling.c\
+#		  foma/coaccessible.c   foma/int_stack.c    foma/mem.c\
+#		  foma/structures.c foma/constructions.c  foma/invert.c\
+#		  foma/minimize.c foma/topsort.c foma/define.c         foma/io.c\
+#		  foma/utf8.c foma/determinize.c    foma/lex.cmatrix.c\
+#		  foma/reverse.c foma/dynarray.c foma/lexcread.c     foma/rewrite.c\
+#		  foma/extract.c        foma/lex.lexc.c foma/sigma.c
+#endif
 if WANT_HFSTOL
 HFST_OL_SRCS=\
 optimized-lookup/transducer.cc optimized-lookup/convert.cc
@@ -84,7 +82,7 @@ AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 
 libhfstimplementations_la_SOURCES=$(IMPLEMENTATION_SRCS) $(BRIDGE_SRCS) \
-								  $(SFST_SRCS) $(FOMA_SRCS) $(HFST_OL_SRCS) \
+								  $(SFST_SRCS) $(HFST_OL_SRCS) \
 								  $(XRE_SRCS) $(LEXC_SRCS)
 
 # headers of implementation bridge to reveal to public

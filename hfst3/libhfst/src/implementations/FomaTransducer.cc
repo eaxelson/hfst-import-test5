@@ -135,7 +135,7 @@ namespace hfst { namespace implementations {
       return NULL;
     if (has_header)
       skip_hfst_header();
-    struct fsm * t = read_net_hfst(input_file);
+    struct fsm * t = FomaTransducer::read_net(input_file);
     if (t == NULL)
       throw NotTransducerStreamException();
     return t;
@@ -190,7 +190,7 @@ namespace hfst { namespace implementations {
   void FomaOutputStream::write_transducer(struct fsm * transducer) 
   { 
     write_3_0_library_header(ofile);
-    if (1 != write_net_hfst(transducer, ofile))
+    if (1 != FomaTransducer::write_net(transducer, ofile))
       throw hfst::exceptions::HfstInterfaceException();
   }
 
@@ -735,6 +735,236 @@ namespace hfst { namespace implementations {
   {
     net_print_att(t, stdout);
   }
+
+    // HFST additions
+
+    static int io_gets(FILE *infile, char *target);
+    static inline int explode_line (char *buf, int *values);
+
+  /* Read foma transducer . */
+    struct fsm * FomaTransducer::read_net(FILE *infile) {
+      
+    unsigned int READ_BUF_SIZE=4096; 
+    char buf[READ_BUF_SIZE];
+    struct fsm *net;
+    struct fsm_state *fsm;
+    
+    char *new_symbol;
+    int i, items, new_symbol_number, laststate, lineint[5], *cm;
+    char last_final;
+
+    if (io_gets(infile, buf) == 0) {
+        return NULL;
+    }
+    
+    net = fsm_create("");
+
+    if (strcmp(buf, "##foma-net 1.0##") != 0) {
+        printf("File format error foma!\n");
+        return NULL;
+    }
+    io_gets(infile, buf);
+    if (strcmp(buf, "##props##") != 0) {
+        printf("File format error props!\n");
+        return NULL;
+    }
+    /* Properties */
+    io_gets(infile, buf);
+    sscanf(buf, "%i %i %i %i %i %lld %i %i %i %i %i %i %s", &net->arity, &net->arccount, &net->statecount, &net->linecount, &net->finalcount, &net->pathcount, &net->is_deterministic, &net->is_pruned, &net->is_minimized, &net->is_epsilon_free, &net->is_loop_free, &net->is_completed, buf);
+    strcpy(net->name, buf);
+    //*net_name = strdup(buf);
+    io_gets(infile, buf);
+
+    /* Sigma */
+    if (strcmp(buf, "##sigma##") != 0) {
+        printf("File format error sigma!\n");
+        return NULL;
+    }
+    net->sigma = sigma_create();
+    for (;;) {
+      io_gets(infile, buf);
+        if (buf[0] == '#') break;
+        new_symbol = strstr(buf, " ");
+        new_symbol[0] = '\0';
+        new_symbol++;
+        sscanf(buf,"%i", &new_symbol_number);
+        sigma_add_number(net->sigma, new_symbol, new_symbol_number);
+    }
+    /* States */
+    if (strcmp(buf, "##states##") != 0) {
+        printf("File format error!\n");
+        return NULL;
+    }
+    net->states = (fsm_state*) xxmalloc(net->linecount*sizeof(struct fsm_state));
+    fsm = net->states;
+    laststate = -1;
+    for (i=0; ;i++) {
+      io_gets(infile, buf);
+        if (buf[0] == '#') break;
+
+        /* scanf is just too slow here */
+
+        //items = sscanf(buf, "%i %i %i %i %i",&lineint[0], &lineint[1], &lineint[2], &lineint[3], &lineint[4]);
+
+        items = explode_line(buf, &lineint[0]);
+
+        switch (items) {
+        case 2:
+            (fsm+i)->state_no = laststate;
+            (fsm+i)->in = lineint[0];
+            (fsm+i)->out = lineint[0];
+            (fsm+i)->target = lineint[1];
+            (fsm+i)->final_state = last_final;
+            break;
+        case 3:
+            (fsm+i)->state_no = laststate;
+            (fsm+i)->in = lineint[0];
+            (fsm+i)->out = lineint[1];
+            (fsm+i)->target = lineint[2];
+            (fsm+i)->final_state = last_final;
+            break;
+        case 4:
+            (fsm+i)->state_no = lineint[0];
+            (fsm+i)->in = lineint[1];
+            (fsm+i)->out = lineint[1];
+            (fsm+i)->target = lineint[2];
+            (fsm+i)->final_state = lineint[3];
+            laststate = lineint[0];
+            last_final = lineint[3];
+            break;
+        case 5:
+            (fsm+i)->state_no = lineint[0];
+            (fsm+i)->in = lineint[1];
+            (fsm+i)->out = lineint[2];
+            (fsm+i)->target = lineint[3];
+            (fsm+i)->final_state = lineint[4];
+            laststate = lineint[0];
+            last_final = lineint[4];
+            break;
+        default:
+            printf("File format error\n");
+            return NULL;
+        }
+        if (laststate > 0) {
+            (fsm+i)->start_state = 0;
+        } else if (laststate == -1) {
+            (fsm+i)->start_state = -1;
+        } else {
+            (fsm+i)->start_state = 1;
+        }
+
+    }
+    if (strcmp(buf, "##cmatrix##") == 0) {
+        cmatrix_init(net);
+        cm = net->medlookup->confusion_matrix;
+        for (;;) {
+	  io_gets(infile, buf);
+            if (buf[0] == '#') break;
+            sscanf(buf,"%i", &i);
+            *cm = i;
+            cm++;
+        }     
+    }
+    if (strcmp(buf, "##end##") != 0) {
+        printf("File format error!\n");
+        return NULL;
+    }
+    return(net);
+}
+
+static int io_gets(FILE *infile, char *target) {
+    int i;
+    int c = getc(infile);
+    for (i = 0; c != '\n' && c != '\0'; i++) {
+        *(target+i) = c;
+	c = getc(infile);
+    }   
+    *(target+i) = '\0';
+    if (c == '\0')
+      ungetc(c, infile);
+    return(i);
+}
+
+static inline int explode_line (char *buf, int *values) {
+
+    int i, j, items;
+    j = i = items = 0;
+    for (;;) {
+        for (i = j; *(buf+j) != ' ' && *(buf+j) != '\0'; j++) { }
+        if (*(buf+j) == '\0') {
+            *(values+items) = atoi(buf+i);
+            items++;
+            break;
+        } else{
+            *(buf+j) = '\0';
+            *(values+items) = atoi(buf+i);
+            items++;
+            j++;
+            i = j;
+        }
+    }
+    return(items);
+}
+
+    int FomaTransducer::write_net(fsm * net, FILE * outfile) {
+
+    struct sigma *sigma;
+    struct fsm_state *fsm;
+    int i, maxsigma, laststate, *cm;
+
+    /* Header */
+    fprintf(outfile, "%s","##foma-net 1.0##\n");
+
+    /* Properties */
+    fprintf(outfile, "%s","##props##\n");
+    fprintf(outfile, "%i %i %i %i %i %lld %i %i %i %i %i %i %s\n",net->arity, net->arccount, net->statecount, net->linecount, net->finalcount, net->pathcount, net->is_deterministic, net->is_pruned, net->is_minimized, net->is_epsilon_free, net->is_loop_free, net->is_completed, net->name);
+    
+    /* Sigma */
+    fprintf(outfile, "%s","##sigma##\n");
+    for (sigma = net->sigma; sigma != NULL && sigma->number != -1; sigma = sigma->next) {
+        fprintf(outfile, "%i %s\n",sigma->number, sigma->symbol);
+    }
+
+    /* State array */
+    laststate = -1;
+    fsm = net->states;
+    fprintf(outfile, "%s","##states##\n");
+    for (fsm = net->states; fsm->state_no !=-1; fsm++) {
+        if (fsm->state_no != laststate) {
+            if (fsm->in != fsm->out) {
+                fprintf(outfile, "%i %i %i %i %i\n",fsm->state_no, fsm->in, fsm->out, fsm->target, fsm->final_state);
+            } else {
+                fprintf(outfile, "%i %i %i %i\n",fsm->state_no, fsm->in, fsm->target, fsm->final_state);
+            }
+        } else {
+            if (fsm->in != fsm->out) {
+                fprintf(outfile, "%i %i %i\n", fsm->in, fsm->out, fsm->target);
+            } else {
+                fprintf(outfile, "%i %i\n", fsm->in, fsm->target);
+            }
+        }
+        laststate = fsm->state_no;
+    }
+    /* Sentinel for states */
+    fprintf(outfile, "-1 -1 -1 -1 -1\n");
+
+    /* Store confusion matrix */
+    if (net->medlookup != NULL && net->medlookup->confusion_matrix != NULL) {
+
+        fprintf(outfile, "%s","##cmatrix##\n");
+        cm = net->medlookup->confusion_matrix;
+        maxsigma = sigma_max(net->sigma)+1;
+        fprintf(outfile, "maxsigma is: %i\n",maxsigma);
+        for (i=0; i < maxsigma*maxsigma; i++) {
+            fprintf(outfile, "%i\n", *(cm+i));
+        }
+    }
+
+    /* End */
+    fprintf(outfile, "%s","##end##\n");
+    return(1);
+
+    }
 
   } }
 

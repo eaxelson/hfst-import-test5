@@ -18,10 +18,11 @@
 #include "ExtractStrings.h"
 #include "FlagDiacritics.h"
 #include <stdbool.h>  // foma uses _Bool
+#include <stdlib.h>
 
 #ifndef _FOMALIB_H_
 #define _FOMALIB_H_
-#include "foma/fomalib.h"
+#include "fomalib.h"
 #endif
 
 #include "zlib.h"
@@ -119,6 +120,9 @@ namespace hfst {
       static FdTable<int>* get_flag_diacritics(fsm * t);
       
       static void harmonize(fsm *net1, fsm *net2);
+
+      static fsm * read_net(FILE * file);
+      static int write_net(fsm * net, FILE * file);
 			
       static void delete_foma(fsm * net);
       static void print_test(fsm * t);

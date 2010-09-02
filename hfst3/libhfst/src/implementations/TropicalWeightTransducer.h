@@ -168,6 +168,7 @@ namespace implementations
       static StdVectorFst * set_weight(StdVectorFst * t,float f);
       static StdVectorFst * set_final_weights(StdVectorFst * t, float weight);
       static StdVectorFst * transform_weights(StdVectorFst * t,float (*func)(float f));
+      static StdVectorFst * push_weights(StdVectorFst * t, bool to_initial_state);
 
       static std::pair<StdVectorFst*, StdVectorFst*> harmonize(StdVectorFst *t1, StdVectorFst *t2);
 

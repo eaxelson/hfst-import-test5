@@ -12,8 +12,9 @@
 
 #include "SymbolDefs.h"
 #include <stdbool.h>
-#include "foma/fomalib.h"
-#include "SFST/src/alphabet.h"
+#include "fomalib.h"
+
+//#include "SFST/src/alphabet.h"
 
 /*  const char * EPSILON_STRING = "@_EPSILON_SYMBOL_@";
     const char * UNKNOWN_STRING = "@_UNKNOWN_SYMBOL_@";

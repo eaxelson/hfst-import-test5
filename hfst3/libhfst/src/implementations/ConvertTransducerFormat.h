@@ -34,7 +34,7 @@
 #ifndef _FOMALIB_H_
 #define _FOMALIB_H_
 #include <stdbool.h>
-#include "foma/fomalib.h"
+#include "fomalib.h"
 #endif
 #endif
 
