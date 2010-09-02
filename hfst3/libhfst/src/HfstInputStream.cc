@@ -40,6 +40,14 @@ namespace hfst
 	  this->implementation.hfst_ol->read_transducer(has_header);
 	if(t.get_type() != type) // weights need to be added or removed
 	  { t.convert(type); }
+    break;
+      case HFST2_TYPE:
+#ifndef NDEBUG
+        fprintf(stderr, "HFST 2 transducers must be converted before use "
+                "(transducer conversion not implemented)\n");
+#endif
+        throw hfst::exceptions::TransducerHasWrongTypeException();
+        break;
 	break;
 	  case ERROR_TYPE:
 	  case UNSPECIFIED_TYPE:
@@ -65,8 +73,37 @@ namespace hfst
       { return HFST_OL_TYPE; }
     if(ol_type == 2)
       { return HFST_OLW_TYPE; }
+    // also. guess HFST2 type?
+    char c = 0;
+    in.get(c);
+    switch (c)
+      {
+      case 'A':
+        in.unget();
+        return HFST2_TYPE;
+        break;
+      case 'P':
+        in.get(c);
+        if (c == '2')
+          {
+            return HFST2_TYPE;
+          }
+        else
+          {
+            return ERROR_TYPE;
+          }
+        break;
+      default:
+        // still failed
+        in.unget();
+        return ERROR_TYPE;
+      }
+    in.unget();
     return ERROR_TYPE;
   }
+
+
+
   
   ImplementationType HfstInputStream::read_version_3_0_fst_type
   (std::istream &in) 
@@ -179,6 +216,13 @@ namespace hfst
       implementation.hfst_ol = 
         new hfst::implementations::HfstOlInputStream(true);
       break;
+      case HFST2_TYPE:
+#ifndef NDEBUG
+        fprintf(stderr, "HFST 2 transducers must be converted before use "
+                "(transducer conversion not implemented)\n");
+#endif
+        throw hfst::exceptions::TransducerHasWrongTypeException();
+        break;
     default:
       throw hfst::exceptions::NotTransducerStreamException();
     }
@@ -213,6 +257,13 @@ namespace hfst
     case HFST_OLW_TYPE:
       implementation.hfst_ol = new hfst::implementations::HfstOlInputStream(filename, true);
       break;
+      case HFST2_TYPE:
+#ifndef NDEBUG
+        fprintf(stderr, "HFST 2 transducers must be converted before use "
+                "(transducer conversion not implemented)\n");
+#endif
+        throw hfst::exceptions::TransducerHasWrongTypeException();
+        break;
     default:
       throw hfst::implementations::NotTransducerStreamException();
     }
@@ -238,6 +289,13 @@ namespace hfst
       case HFST_OLW_TYPE:
 	delete implementation.hfst_ol;
 	break;
+      case HFST2_TYPE:
+#ifndef NDEBUG
+        fprintf(stderr, "HFST 2 transducers must be converted before use "
+                "(transducer conversion not implemented)\n");
+#endif
+        throw hfst::exceptions::TransducerHasWrongTypeException();
+        break;
 	  case ERROR_TYPE:
 	  case UNSPECIFIED_TYPE:
 	  default:
