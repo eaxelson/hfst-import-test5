@@ -96,6 +96,12 @@ namespace hfst
 		  This type might be returned by a function if an error occurs. */
   };
 
+  enum PushType
+  {
+    TO_INITIAL_STATE,
+    TO_FINAL_STATE
+  };
+
   class HfstCompiler;
 
   class HfstTransducer;
@@ -719,6 +725,8 @@ fclose(ifile);
     If the HfstTransducer is of unweighted type (SFST_TYPE or FOMA_TYPE), nothing is done.
     */
     HfstTransducer &transform_weights(float (*func)(float));
+
+    HfstTransducer &push_weights(PushType type);
 
     /** \brief Compose this transducer with \a another. */
     HfstTransducer &compose(const HfstTransducer &another);

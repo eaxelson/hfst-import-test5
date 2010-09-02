@@ -66,7 +66,7 @@ AC_ARG_WITH([foma],
             [AS_HELP_STRING([--with-foma],
                             [process unweighted fsts with foma @<:@default=bundled@:>@])],
             [],
-            [with_foma=bundled])
+            [with_foma=check])
 AS_IF([test "x$with_foma" != xno], [AC_DEFINE([HAVE_FOMA], [1],
                                               [Define to compile foma support in HFST])])
 AM_CONDITIONAL([WANT_FOMA], [test x$with_foma != xno])
@@ -99,9 +99,9 @@ AM_CONDITIONAL([WANT_LEXC], [test "x$enable_lexc" != xno])
 # allow programs to be built separately (sort alphabetically)
 AC_ARG_ENABLE([calculate],
 			  [AS_HELP_STRING([--enable-calculate],
-							  [build calculate tool @<:@default=no@:>@])],
+							  [build calculate tool @<:@default=yes@:>@])],
 			  [enable_calculate=$enableval],
-			  [enable_calculate=no])
+			  [enable_calculate=yes])
 AM_CONDITIONAL([WANT_CALCULATE], [test x$enable_calculate != xno])
 AC_ARG_ENABLE([compare],
 			  [AS_HELP_STRING([--enable-compare],
@@ -366,9 +366,9 @@ if test "x$with_openfst" != "xno"; then
 fi
 
 if test "x$with_foma" == "xcheck"; then
+    AC_CHECK_LIB([z], [main])
     AC_CHECK_LIB([foma], [main], [],
                  [AC_MSG_FAILURE([foma test failed (--without-foma to disable)])])
-    AC_CHECK_LIB([z], [main])
 fi
 if test "x$with_foma" == "xbundled"; then
     AC_CHECK_LIB([z], [main])
