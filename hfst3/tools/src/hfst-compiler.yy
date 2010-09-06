@@ -9,8 +9,10 @@
 
 #include <stdio.h>
 
-#include "hfst-scanner.h"
 #include "HfstCompiler.h"
+
+extern char* FileName;
+extern bool Verbose;
 
 using std::cerr;
 using namespace hfst;

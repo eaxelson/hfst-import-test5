@@ -10,6 +10,10 @@
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include "ConvertTransducerFormat.h"
 #include "optimized-lookup/convert.h"
 
@@ -77,6 +81,7 @@ InternalTransducer * sfst_to_internal_format(SFST::Transducer * t)
 
 // Both input and output symbol tables of internal format will contain
 // all symbols in the sigma of the foma transducer
+#if HAVE_FOMA
 InternalTransducer * foma_to_internal_format(struct fsm * t)
 {
   InternalTransducer * internal_transducer = new fst::StdVectorFst();
@@ -178,7 +183,7 @@ InternalTransducer * foma_to_internal_format(struct fsm * t)
 
   return internal_transducer;
 }
-
+#endif
 
 InternalTransducer * 
 tropical_ofst_to_internal_format(fst::StdVectorFst * t)
@@ -348,6 +353,7 @@ SFST::Transducer *  internal_format_to_sfst
 
 // SymbolTable is converted to sigma, but the string-to-number
 // relations are changed...
+#if HAVE_FOMA
 struct fsm * internal_format_to_foma
 (InternalTransducer * internal_transducer)
 { 
@@ -406,6 +412,7 @@ struct fsm * internal_format_to_foma
 
   return net;      
 }
+#endif
 
 fst::StdVectorFst * internal_format_to_openfst(InternalTransducer * t)
 { fst::StdVectorFst *retval = new fst::StdVectorFst(*t); 

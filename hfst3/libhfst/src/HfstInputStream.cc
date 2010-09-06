@@ -31,9 +31,13 @@ namespace hfst
 	  this->implementation.log_ofst->read_transducer(has_header);
 	break;
       case FOMA_TYPE:
-	t.implementation.foma =
+#if HAVE_FOMA
+    t.implementation.foma =
 	  this->implementation.foma->read_transducer(has_header);
-	break;
+#else
+    throw hfst::exceptions::ImplementationTypeNotAvailableException();
+#endif
+    break;
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	t.implementation.hfst_ol =
@@ -62,8 +66,10 @@ namespace hfst
   {
     if (hfst::implementations::SfstInputStream::is_fst(in))
       { return SFST_TYPE; }
+#if HAVE_FOMA
     if (hfst::implementations::FomaInputStream::is_fst(in))
       { return FOMA_TYPE; }
+#endif
     if (hfst::implementations::TropicalWeightInputStream::is_fst(in))
       { return TROPICAL_OFST_TYPE; }
     if (hfst::implementations::LogWeightInputStream::is_fst(in))
@@ -206,7 +212,11 @@ namespace hfst
 	new hfst::implementations::LogWeightInputStream;
       break;
     case FOMA_TYPE:
+#if HAVE_FOMA
       implementation.foma = new hfst::implementations::FomaInputStream;
+#else
+    throw hfst::exceptions::ImplementationTypeNotAvailableException();
+#endif
       break;
     case HFST_OL_TYPE:
       implementation.hfst_ol =
@@ -249,7 +259,11 @@ namespace hfst
 	new hfst::implementations::LogWeightInputStream(filename);
       break;
     case FOMA_TYPE:
+#if HAVE_FOMA
       implementation.foma = new hfst::implementations::FomaInputStream(filename);
+#else
+    throw hfst::exceptions::ImplementationTypeNotAvailableException();
+#endif
       break;
     case HFST_OL_TYPE:
       implementation.hfst_ol = new hfst::implementations::HfstOlInputStream(filename, false);
@@ -283,7 +297,11 @@ namespace hfst
 	delete implementation.log_ofst;
 	break;
       case FOMA_TYPE:
+#if HAVE_FOMA
 	delete implementation.foma;
+#else
+    throw hfst::exceptions::ImplementationTypeNotAvailableException();
+#endif
 	break;
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
@@ -317,7 +335,11 @@ namespace hfst
 	implementation.log_ofst->open();
 	break;
       case FOMA_TYPE:
+#if HAVE_FOMA
 	implementation.foma->open();
+#else
+    throw hfst::exceptions::ImplementationTypeNotAvailableException();
+#endif
 	break;
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
@@ -342,7 +364,11 @@ namespace hfst
 	implementation.log_ofst->close();
 	break;
       case FOMA_TYPE:
+#if HAVE_FOMA
 	implementation.foma->close();
+#else
+    throw hfst::exceptions::ImplementationTypeNotAvailableException();
+#endif
 	break;
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
@@ -367,7 +393,11 @@ namespace hfst
 	return implementation.log_ofst->is_open();
 	break;
       case FOMA_TYPE:
+#if HAVE_FOMA
 	return implementation.foma->is_open();
+#else
+    throw hfst::exceptions::ImplementationTypeNotAvailableException();
+#endif
 	break;
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
@@ -393,7 +423,11 @@ namespace hfst
 	return implementation.log_ofst->is_eof();
 	break;
       case FOMA_TYPE:
+#if HAVE_FOMA
 	return implementation.foma->is_eof();
+#else
+    throw hfst::exceptions::ImplementationTypeNotAvailableException();
+#endif
 	break;
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
@@ -418,7 +452,11 @@ namespace hfst
 	return implementation.log_ofst->is_bad();
 	break;
       case FOMA_TYPE:
+#if HAVE_FOMA
 	return implementation.foma->is_bad();
+#else
+    throw hfst::exceptions::ImplementationTypeNotAvailableException();
+#endif
 	break;
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
@@ -444,7 +482,11 @@ namespace hfst
 	return implementation.log_ofst->is_good();
 	break;
       case FOMA_TYPE:
+#if HAVE_FOMA
 	return implementation.foma->is_good();
+#else
+    throw hfst::exceptions::ImplementationTypeNotAvailableException();
+#endif
 	break;
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:

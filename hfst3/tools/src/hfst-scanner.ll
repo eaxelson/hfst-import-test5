@@ -1,4 +1,4 @@
-%option 8Bit batch yylineno noyywrap
+%option 8Bit batch yylineno nounput noyywrap header-file="hfst-scanner.h"
 
 /* the "incl" state is used to pick up the name of an include file */
 %x incl
@@ -16,7 +16,6 @@
 
 #include "HfstCompiler.h"
 #include "hfst-compiler.h"
-#include "hfst-scanner.h"
 
 using namespace hfst;
 using namespace HfstBasic;
