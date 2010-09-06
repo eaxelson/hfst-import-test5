@@ -38,7 +38,7 @@
 #include <config.h>
 #endif
 
-#define OL_FULL_DEBUG 0
+#include <config.h>
 
 enum OutputType {HFST, xerox};
 OutputType outputType = xerox;
@@ -222,7 +222,6 @@ class TransducerAlphabet
   SymbolNumber number_of_symbols;
   KeyTable * kt;
   OperationVector operations;
-  std::vector<SymbolNumber> operation_peek;
 
   void get_next_symbol(FILE * f, SymbolNumber k);
 
@@ -257,9 +256,6 @@ class TransducerAlphabet
 
   OperationVector get_operation_vector(void)
   { return operations; }
-
-  std::vector<SymbolNumber> get_operation_peek(void)
-    { return operation_peek; }
 
   SymbolNumber get_state_size(void)
   { return feature_bucket.size(); }
@@ -1013,7 +1009,6 @@ class TransducerWFd: public TransducerW
 {
   FlagDiacriticStateStack statestack;
   OperationVector operations;
-  std::vector<SymbolNumber> operation_peek;
 
   void try_epsilon_transitions(SymbolNumber * input_symbol,
 			       SymbolNumber * output_symbol,
@@ -1027,8 +1022,7 @@ class TransducerWFd: public TransducerW
  TransducerWFd(FILE * f, TransducerHeader h, TransducerAlphabet a):
   TransducerW(f, h, a),
     statestack(1, FlagDiacriticState (a.get_state_size(), 0)),
-    operations(a.get_operation_vector()),
-    operation_peek(a.get_operation_peek())
+    operations(a.get_operation_vector())
       {}
 };
 
