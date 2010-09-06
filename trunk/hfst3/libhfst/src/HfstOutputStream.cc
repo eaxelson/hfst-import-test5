@@ -30,10 +30,12 @@ namespace hfst
 	implementation.log_ofst = 
 	  new hfst::implementations::LogWeightOutputStream();
 	break;
+#if HAVE_FOMA
       case FOMA_TYPE:
 	implementation.foma = 
 	  new hfst::implementations::FomaOutputStream();
 	break;
+#endif
       case HFST_OL_TYPE:
 	implementation.hfst_ol =
 	  new hfst::implementations::HfstOlOutputStream(false);
@@ -64,10 +66,12 @@ namespace hfst
 	implementation.log_ofst = 
 	  new hfst::implementations::LogWeightOutputStream(filename.c_str());
 	break;
+#if HAVE_FOMA
       case FOMA_TYPE:
 	implementation.foma = 
 	  new hfst::implementations::FomaOutputStream(filename.c_str());
 	break;
+#endif
       case HFST_OL_TYPE:
 	implementation.hfst_ol =
 	  new hfst::implementations::HfstOlOutputStream(filename.c_str(), false);
@@ -95,9 +99,11 @@ namespace hfst
       case LOG_OFST_TYPE:
 	delete implementation.log_ofst;
 	break;
+#if HAVE_FOMA
       case FOMA_TYPE:
 	delete implementation.foma;
 	break;
+#endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	delete implementation.hfst_ol;
@@ -126,10 +132,12 @@ namespace hfst
 	implementation.log_ofst->write_transducer
 	  (transducer.implementation.log_ofst);
 	return *this;
+#if HAVE_FOMA
       case FOMA_TYPE:
 	implementation.foma->write_transducer
 	  (transducer.implementation.foma);
 	return *this;
+#endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	implementation.hfst_ol->write_transducer
@@ -153,9 +161,11 @@ namespace hfst
       case LOG_OFST_TYPE:
 	implementation.log_ofst->open();
 	break;
+#if HAVE_FOMA
       case FOMA_TYPE:
 	implementation.foma->open();
 	break;
+#endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	implementation.hfst_ol->open();
@@ -177,9 +187,11 @@ namespace hfst
       case LOG_OFST_TYPE:
 	implementation.log_ofst->close();
 	break;
+#if HAVE_FOMA
       case FOMA_TYPE:
 	implementation.foma->close();
 	break;
+#endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	implementation.hfst_ol->close();

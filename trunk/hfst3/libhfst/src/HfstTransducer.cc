@@ -692,40 +692,60 @@ type(type),anonymous(false),is_trie(false)
     return apply 
       (&hfst::implementations::SfstTransducer::remove_epsilons,
        &hfst::implementations::TropicalWeightTransducer::remove_epsilons,
-       &hfst::implementations::LogWeightTransducer::remove_epsilons,
-       &hfst::implementations::FomaTransducer::remove_epsilons); }
+       &hfst::implementations::LogWeightTransducer::remove_epsilons
+#if HAVE_FOMA
+       ,
+       &hfst::implementations::FomaTransducer::remove_epsilons
+#endif
+       ); }
 
   HfstTransducer &HfstTransducer::determinize()
   { is_trie = false;
     return apply 
       (&hfst::implementations::SfstTransducer::determinize,
        &hfst::implementations::TropicalWeightTransducer::determinize,
-       &hfst::implementations::LogWeightTransducer::determinize,
-       &hfst::implementations::FomaTransducer::determinize); }
+       &hfst::implementations::LogWeightTransducer::determinize
+#if HAVE_FOMA
+       ,
+       &hfst::implementations::FomaTransducer::determinize
+#endif
+       ); }
 
   HfstTransducer &HfstTransducer::minimize()
   { is_trie = false;
     return apply 
       (&hfst::implementations::SfstTransducer::minimize,
        &hfst::implementations::TropicalWeightTransducer::minimize,
-       &hfst::implementations::LogWeightTransducer::minimize,
-       &hfst::implementations::FomaTransducer::minimize); }
+       &hfst::implementations::LogWeightTransducer::minimize
+#if HAVE_FOMA
+       ,
+       &hfst::implementations::FomaTransducer::minimize
+#endif
+       ); }
 
   HfstTransducer &HfstTransducer::repeat_star()
   { is_trie = false;
     return apply 
       (&hfst::implementations::SfstTransducer::repeat_star,
        &hfst::implementations::TropicalWeightTransducer::repeat_star,
-       &hfst::implementations::LogWeightTransducer::repeat_star,
-       &hfst::implementations::FomaTransducer::repeat_star); }
+       &hfst::implementations::LogWeightTransducer::repeat_star
+#if HAVE_FOMA
+       ,
+       &hfst::implementations::FomaTransducer::repeat_star
+#endif
+       ); }
 
   HfstTransducer &HfstTransducer::repeat_plus()
   { is_trie = false;
     return apply 
       (&hfst::implementations::SfstTransducer::repeat_plus,
        &hfst::implementations::TropicalWeightTransducer::repeat_plus,
-       &hfst::implementations::LogWeightTransducer::repeat_plus,
-       &hfst::implementations::FomaTransducer::repeat_plus); }
+       &hfst::implementations::LogWeightTransducer::repeat_plus
+#if HAVE_FOMA
+       ,
+       &hfst::implementations::FomaTransducer::repeat_plus
+#endif
+       ); }
 
   HfstTransducer &HfstTransducer::repeat_n(unsigned int n)
   { is_trie = false; // This could be done so that is_trie is preserved
@@ -733,7 +753,9 @@ type(type),anonymous(false),is_trie(false)
       (&hfst::implementations::SfstTransducer::repeat_n,
        &hfst::implementations::TropicalWeightTransducer::repeat_n,
        &hfst::implementations::LogWeightTransducer::repeat_n,
+#if HAVE_FOMA
        &hfst::implementations::FomaTransducer::repeat_n,
+#endif
        n); }
 
   HfstTransducer &HfstTransducer::repeat_n_plus(unsigned int n)
@@ -750,7 +772,9 @@ type(type),anonymous(false),is_trie(false)
       (&hfst::implementations::SfstTransducer::repeat_le_n,
        &hfst::implementations::TropicalWeightTransducer::repeat_le_n,
        &hfst::implementations::LogWeightTransducer::repeat_le_n,
+#if HAVE_FOMA
        &hfst::implementations::FomaTransducer::repeat_le_n,
+#endif
        n); }
 
   HfstTransducer &HfstTransducer::repeat_n_to_k(unsigned int n, unsigned int k)
@@ -764,40 +788,67 @@ type(type),anonymous(false),is_trie(false)
     return apply 
       (&hfst::implementations::SfstTransducer::optionalize,
        &hfst::implementations::TropicalWeightTransducer::optionalize,
-       &hfst::implementations::LogWeightTransducer::optionalize,
-       &hfst::implementations::FomaTransducer::optionalize); }
+       &hfst::implementations::LogWeightTransducer::optionalize
+#if HAVE_FOMA
+       ,
+       &hfst::implementations::FomaTransducer::optionalize
+#endif
+      );
+  }
+
 
   HfstTransducer &HfstTransducer::invert()
   { is_trie = false; // This could be done so that is_trie is preserved
     return apply 
       (&hfst::implementations::SfstTransducer::invert,
        &hfst::implementations::TropicalWeightTransducer::invert,
-       &hfst::implementations::LogWeightTransducer::invert,
-       &hfst::implementations::FomaTransducer::invert); }
+       &hfst::implementations::LogWeightTransducer::invert
+#if HAVE_FOMA
+       ,
+       &hfst::implementations::FomaTransducer::invert
+#endif
+      );
+  }
 
   HfstTransducer &HfstTransducer::reverse()
   { is_trie = false; // This could be done so that is_trie is preserved
     return apply 
       (&hfst::implementations::SfstTransducer::reverse,
        &hfst::implementations::TropicalWeightTransducer::reverse,
-       &hfst::implementations::LogWeightTransducer::reverse,
-       &hfst::implementations::FomaTransducer::reverse); }
+       &hfst::implementations::LogWeightTransducer::reverse
+#if HAVE_FOMA
+       ,
+       &hfst::implementations::FomaTransducer::reverse
+#endif
+      );
+  }
 
   HfstTransducer &HfstTransducer::input_project()
   { is_trie = false; // This could be done so that is_trie is preserved
     return apply 
       (&hfst::implementations::SfstTransducer::extract_input_language,
        &hfst::implementations::TropicalWeightTransducer::extract_input_language,
-       &hfst::implementations::LogWeightTransducer::extract_input_language,
-       &hfst::implementations::FomaTransducer::extract_input_language); }
+       &hfst::implementations::LogWeightTransducer::extract_input_language
+#if HAVE_FOMA
+       ,
+       &hfst::implementations::FomaTransducer::extract_input_language
+#endif
+      );
+  }
 
   HfstTransducer &HfstTransducer::output_project()
   { is_trie = false; // This could be done so that is_trie is preserved
     return apply 
       (&hfst::implementations::SfstTransducer::extract_output_language,
        &hfst::implementations::TropicalWeightTransducer::extract_output_language,
-       &hfst::implementations::LogWeightTransducer::extract_output_language,
-       &hfst::implementations::FomaTransducer::extract_output_language); }
+       &hfst::implementations::LogWeightTransducer::extract_output_language
+#if HAVE_FOMA
+       ,
+       &hfst::implementations::FomaTransducer::extract_output_language
+#endif
+      )
+      ;
+  }
 
   void HfstTransducer::extract_strings(ExtractStringsCb& callback, int cycles)
   { 
@@ -1363,11 +1414,13 @@ type(type),anonymous(false),is_trie(false)
         }
       case FOMA_TYPE:
         {
+#if HAVE_FOMA
           fsm * foma_temp =
             this->foma_interface.compose(implementation.foma,another.implementation.foma);
           this->foma_interface.delete_foma(implementation.foma);
           implementation.foma = foma_temp;
           break;
+#endif
         }
       case UNSPECIFIED_TYPE:
       case ERROR_TYPE:
@@ -1375,11 +1428,13 @@ type(type),anonymous(false),is_trie(false)
 	throw hfst::exceptions::TransducerHasWrongTypeException();
       }
 
+#if HAVE_FOMA
     if (this->type != FOMA_TYPE) 
       {
 	this->substitute(*substitute_single_identity_with_unknown);
 	(const_cast<HfstTransducer&>(another)).substitute(*substitute_unknown_identity_pairs);
       }
+#endif
 
     return *this;
 
@@ -1395,7 +1450,9 @@ type(type),anonymous(false),is_trie(false)
     return apply(&hfst::implementations::SfstTransducer::compose,
 		 &hfst::implementations::TropicalWeightTransducer::compose,
 		 &hfst::implementations::LogWeightTransducer::compose,
+#if HAVE_FOMA
 		 &hfst::implementations::FomaTransducer::compose,
+#endif
 		 const_cast<HfstTransducer&>(another)); 
 
     /*
@@ -1436,7 +1493,9 @@ type(type),anonymous(false),is_trie(false)
     return apply(&hfst::implementations::SfstTransducer::concatenate,
 		 &hfst::implementations::TropicalWeightTransducer::concatenate,
 		 &hfst::implementations::LogWeightTransducer::concatenate,
+#if HAVE_FOMA
 		 &hfst::implementations::FomaTransducer::concatenate,
+#endif
 		 const_cast<HfstTransducer&>(another)); }
 
   HfstTransducer &HfstTransducer::disjunct_as_tries(HfstTransducer &another,
@@ -1528,7 +1587,9 @@ type(type),anonymous(false),is_trie(false)
     return apply(&hfst::implementations::SfstTransducer::disjunct,
 		 &hfst::implementations::TropicalWeightTransducer::disjunct,
 		 &hfst::implementations::LogWeightTransducer::disjunct,
+#if HAVE_FOMA
 		 &hfst::implementations::FomaTransducer::disjunct,
+#endif
 		 const_cast<HfstTransducer&>(another)); }
 
   HfstTransducer &HfstTransducer::intersect
@@ -1537,7 +1598,9 @@ type(type),anonymous(false),is_trie(false)
     return apply(&hfst::implementations::SfstTransducer::intersect,
 		 &hfst::implementations::TropicalWeightTransducer::intersect,
 		 &hfst::implementations::LogWeightTransducer::intersect,
+#if HAVE_FOMA
 		 &hfst::implementations::FomaTransducer::intersect,
+#endif
 		 const_cast<HfstTransducer&>(another)); }
 
   HfstTransducer &HfstTransducer::subtract
@@ -1546,7 +1609,9 @@ type(type),anonymous(false),is_trie(false)
     return apply(&hfst::implementations::SfstTransducer::subtract,
 		 &hfst::implementations::TropicalWeightTransducer::subtract,
 		 &hfst::implementations::LogWeightTransducer::subtract,
+#if HAVE_FOMA
 		 &hfst::implementations::FomaTransducer::subtract,
+#endif
 		 const_cast<HfstTransducer&>(another)); }
 
 
@@ -1784,9 +1849,11 @@ type(type),anonymous(false),is_trie(false)
       case LOG_OFST_TYPE:
 	internal_transducer = hfst::implementations::log_ofst_to_internal_hfst_format(transducer->implementation.log_ofst);
 	break;
+#if HAVE_FOMA
       case FOMA_TYPE:
 	internal_transducer = hfst::implementations::foma_to_internal_hfst_format(transducer->implementation.foma);
 	break;
+#endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	throw hfst::exceptions::FunctionNotImplementedException();
@@ -1895,9 +1962,11 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
   // Delete old transducer.
   switch (this->type)
     {
+#if HAVE_FOMA
     case FOMA_TYPE:
       delete implementation.foma;
       break;
+#endif
     case SFST_TYPE:
       delete implementation.sfst;
       break;
@@ -1921,10 +1990,12 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
   type = another.type;
   switch (type)
     {
+#if HAVE_FOMA
     case FOMA_TYPE:
       implementation.foma = 
 	foma_interface.copy(another_1.implementation.foma);
       break;
+#endif
     case SFST_TYPE:
       implementation.sfst = 
 	sfst_interface.copy(another_1.implementation.sfst);
