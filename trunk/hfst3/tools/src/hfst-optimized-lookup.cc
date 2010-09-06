@@ -216,7 +216,7 @@ void TransducerAlphabet::get_next_symbol(FILE * f, SymbolNumber k)
     }
   *sym = 0;
   if (strlen(line) >= 5 && line[0] == '@' && line[strlen(line) - 1] == '@' && line[2] == '.')
-    { // a flag diacritic needs to be parsed
+    { // a special symbol needs to be parsed
       std::string feat;
       std::string val;
       FlagDiacriticOperator op = P; // g++ worries about this falling through uninitialized
@@ -246,11 +246,10 @@ void TransducerAlphabet::get_next_symbol(FILE * f, SymbolNumber k)
 	  ++val_num;
 	}
       operations.push_back(FlagDiacriticOperation(op, feature_bucket[feat], value_bucket[val]));
-      operation_peek.push_back(k);
       kt->operator[](k) = strdup("");
       
 #if OL_FULL_DEBUG
-      std::cout << "symbol number " << k << " (flag) is " << line << std::endl;
+      std::cout << "symbol number " << k << " (flag) is \"" << line << "\"" << std::endl;
       kt->operator[](k) = strdup(line);
 #endif
       
@@ -259,7 +258,7 @@ void TransducerAlphabet::get_next_symbol(FILE * f, SymbolNumber k)
   operations.push_back(FlagDiacriticOperation()); // dummy flag
 
 #if OL_FULL_DEBUG
-  std::cout << "symbol number " << k << " is " << line << std::endl;
+  std::cout << "symbol number " << k << " is \"" << line << "\"" << std::endl;
 #endif
   
   kt->operator[](k) = strdup(line);
@@ -326,8 +325,8 @@ SymbolNumber Encoder::find_key(char ** p)
 template <class genericTransducer>
 void runTransducer (genericTransducer T)
 {
-  SymbolNumber * input_string = (SymbolNumber*)(malloc(20000));
-  for (int i = 0; i < 10000; ++i)
+  SymbolNumber * input_string = (SymbolNumber*)(malloc(2000));
+  for (int i = 0; i < 1000; ++i)
     {
       input_string[i] = NO_SYMBOL_NUMBER;
     }
@@ -1177,12 +1176,12 @@ void TransducerWFd::try_epsilon_transitions(SymbolNumber * input_symbol,
 		       output_symbol+1,
 		       original_output_string,
 		       transitions[i]->target());
-	  current_weight += transitions[i]->get_weight();
+	  current_weight -= transitions[i]->get_weight();
 	  ++i;
 	} else if (transitions[i]->get_input() != NO_SYMBOL_NUMBER &&
 		   operations[transitions[i]->get_input()].isFlag())
 	{
-	  if (PushState(operations[transitions[i]->get_input()]))
+	    if (PushState(operations[transitions[i]->get_input()]))
 	    {
 #if OL_FULL_DEBUG
 	      std::cout << "flag diacritic " <<
