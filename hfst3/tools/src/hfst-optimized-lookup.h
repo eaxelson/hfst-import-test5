@@ -38,7 +38,7 @@
 #include <config.h>
 #endif
 
-#define OL_FULL_DEBUG 0
+#include <config.h>
 
 enum OutputType {HFST, xerox};
 OutputType outputType = xerox;
@@ -222,7 +222,6 @@ class TransducerAlphabet
   SymbolNumber number_of_symbols;
   KeyTable * kt;
   OperationVector operations;
-  std::vector<SymbolNumber> operation_peek;
 
   void get_next_symbol(FILE * f, SymbolNumber k);
 
@@ -258,9 +257,6 @@ class TransducerAlphabet
   OperationVector get_operation_vector(void)
   { return operations; }
 
-  std::vector<SymbolNumber> get_operation_peek(void)
-    { return operation_peek; }
-
   SymbolNumber get_state_size(void)
   { return feature_bucket.size(); }
   
@@ -277,7 +273,7 @@ class LetterTrie
 
  public:
  LetterTrie(void):
-  letters(UCHAR_MAX, static_cast<LetterTrie*>(NULL)),
+  letters(UCHAR_MAX, (LetterTrie*) NULL),
     symbols(UCHAR_MAX,NO_SYMBOL_NUMBER)
       {}
 
@@ -576,11 +572,11 @@ class Transducer
     transition_reader(f,header.target_table_size()),
     encoder(keys,header.input_symbol_count()),
     display_vector(),
-    output_string((SymbolNumber*)(malloc(20000))),
+    output_string((SymbolNumber*)(malloc(2000))),
     indices(index_reader()),
     transitions(transition_reader())
       {
-	for (int i = 0; i < 10000; ++i)
+	for (int i = 0; i < 1000; ++i)
 	  {
 	    output_string[i] = NO_SYMBOL_NUMBER;
 	  }
@@ -964,12 +960,12 @@ class TransducerW
     transition_reader(f,header.target_table_size()),
     encoder(keys,header.input_symbol_count()),
     display_map(),
-    output_string((SymbolNumber*)(malloc(20000))),
+    output_string((SymbolNumber*)(malloc(2000))),
     indices(index_reader()),
     transitions(transition_reader()),
     current_weight(0.0)
       {
-	for (int i = 0; i < 10000; ++i)
+	for (int i = 0; i < 1000; ++i)
 	  {
 	    output_string[i] = NO_SYMBOL_NUMBER;
 	  }
@@ -1013,7 +1009,6 @@ class TransducerWFd: public TransducerW
 {
   FlagDiacriticStateStack statestack;
   OperationVector operations;
-  std::vector<SymbolNumber> operation_peek;
 
   void try_epsilon_transitions(SymbolNumber * input_symbol,
 			       SymbolNumber * output_symbol,
@@ -1027,8 +1022,7 @@ class TransducerWFd: public TransducerW
  TransducerWFd(FILE * f, TransducerHeader h, TransducerAlphabet a):
   TransducerW(f, h, a),
     statestack(1, FlagDiacriticState (a.get_state_size(), 0)),
-    operations(a.get_operation_vector()),
-    operation_peek(a.get_operation_peek())
+    operations(a.get_operation_vector())
       {}
 };
 
