@@ -147,15 +147,16 @@ namespace hfst { namespace implementations {
 
   Transducer * SfstTransducer::expand_arcs(Transducer * t, StringSet &unknown)
   {
-    std::set<char*> unknown_c_str;
-    for (StringSet::iterator it = unknown.begin(); it != unknown.end(); it++) {
-      unknown_c_str.insert(strdup(it->c_str()));
-    }
-    Transducer &retval = t->expand(unknown_c_str);
-    for (std::set<char*>::iterator it = unknown_c_str.begin(); it != unknown_c_str.end(); it++) {
-      free(*it); // FIX: double delete?
-    }
-    return &retval; // FIX: memory error?
+    //std::set<char*> unknown_c_str;
+    //for (StringSet::iterator it = unknown.begin(); it != unknown.end(); it++) {
+    //  unknown_c_str.insert(strdup(it->c_str()));
+    //}
+    Transducer &tc = t->copy();
+    SfstTransducer::expand(&tc, unknown);
+    //for (std::set<char*>::iterator it = unknown_c_str.begin(); it != unknown_c_str.end(); it++) {
+    //7  free(*it);
+    //}
+    return &tc;
   }
 
 
@@ -714,6 +715,88 @@ namespace hfst { namespace implementations {
     return s;
   }
 
+  /* Expand a transition according to the previously unknown symbols in s. */
+  void SfstTransducer::expand_node( Transducer *t, Node *origin, Label &l, Node *target, hfst::StringSet &s )
+  {
+    if ( l.lower_char() == 1 && l.upper_char() == 1 )     // cross product "?:?"
+      {
+	for (hfst::StringSet::iterator it1 = s.begin(); it1 != s.end(); it1++) 
+	  {
+	    int inumber = t->alphabet.symbol2code(it1->c_str());
+	    for (hfst::StringSet::iterator it2 = s.begin(); it2 != s.end(); it2++) 
+	      {
+		int onumber = t->alphabet.symbol2code(it2->c_str());
+		if (inumber != onumber) {  
+		  // add transitions of type x:y (non-identity cross-product of symbols in s)
+		  origin->add_arc( Label(inumber, onumber), target, t );
+		}
+	      }
+	    // add transitions of type x:? and ?:x here
+	    origin->add_arc( Label(inumber, 1), target, t );
+	    origin->add_arc( Label(1, inumber), target, t );
+	  }
+      }
+    else if (l.lower_char() == 2 && l.upper_char() == 2 )  // identity "?:?"	     
+      {
+	for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
+	  {
+	    int number = t->alphabet.symbol2code(it->c_str());
+	    // add transitions of type x:x
+	    origin->add_arc( Label(number, number), target, t );
+	  }
+      }
+    else if (l.lower_char() == 1)  // "?:x"
+      {
+	for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
+	  {
+	    int number = t->alphabet.symbol2code(it->c_str());
+	    origin->add_arc( Label(number, l.upper_char()), target, t );
+	  }
+      }
+    else if (l.upper_char() == 1)  // "x:?"
+      {
+	for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
+	  {
+	    int number = t->alphabet.symbol2code(it->c_str());
+	    origin->add_arc( Label(l.lower_char(), number), target, t );
+	  }
+      }  
+    // keep the original transition in all cases
+    return;
+  }
+
+  /*******************************************************************/
+  /*                                                                 */
+  /*  HFST addition                                                  */
+  /*  Transducer::expand_nodes                                       */
+  /*                                                                 */
+  /*******************************************************************/
+
+  void SfstTransducer::expand2( 
+			       Transducer *t, Node *node,
+			       hfst::StringSet &new_symbols, std::set<Node*> &visited_nodes )
+  {
+    if (visited_nodes.find(node) == visited_nodes.end()) {
+      visited_nodes.insert(node);
+      // iterate over all outgoing arcs of node
+      for( ArcsIter p(node->arcs()); p; p++ ) {
+	Arc *arc=p;
+	expand2(t, arc->target_node(), new_symbols, visited_nodes);
+	Label l = arc->label();
+	expand_node( t, node, l, arc->target_node(), new_symbols);
+      }
+    }
+    return;
+  }
+    
+  /* Expand all transitions according to the previously unknown symbols
+     listed in new_symbols. */
+  void SfstTransducer::expand(Transducer *t, hfst::StringSet &new_symbols)
+  {
+    std::set<Node*> visited_nodes;
+    expand2(t, t->root_node(), new_symbols, visited_nodes);
+  }
+
 } }
 
 #ifdef DEBUG_MAIN
@@ -982,3 +1065,5 @@ int main(int argc, char * argv[])
 
 }
 #endif
+
+
