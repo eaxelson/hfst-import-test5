@@ -17,7 +17,7 @@
 #include "FlagDiacritics.h"
 #include "SymbolDefs.h"
 #include "ExtractStrings.h"
-#include "SFST/src/fst.h"
+#include "sfst/fst.h"
 #include <cstdio>
 #include <string>
 #include <sstream>
@@ -127,6 +127,13 @@ namespace hfst { namespace implementations
       static void initialize_alphabet(Transducer *t);
       static StringSet get_string_set(Transducer *t);
       static Transducer * expand_arcs(Transducer * t, StringSet &unknown);
+
+      static void expand_node( Transducer *t, Node *origin, Label &l, 
+			       Node *target, hfst::StringSet &s );
+      static void expand2( Transducer *t, Node *node,
+			    hfst::StringSet &new_symbols, std::set<Node*> &visited_nodes );
+      static void expand(Transducer *t, hfst::StringSet &new_symbols);
+
     };
 } }
 #endif
