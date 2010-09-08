@@ -47,12 +47,12 @@ AC_SUBST(LIBHFST_NAME)
 # allow backends to be removed
 AC_ARG_WITH([sfst],
             [AS_HELP_STRING([--with-sfst],
-                            [process unweighted fsts with SFST @<:@default=bundled@:>@])],
+                            [process unweighted fsts with SFST @<:@default=check@:>@])],
             [],
-            [with_sfst=bundled])
+            [with_sfst=check])
 AS_IF([test "x$with_sfst" != xno], [AC_DEFINE([HAVE_SFST], [1],
-                                              [Define to compile SFST support in HFST])],
-      [AC_MSG_FAILURE([cannot disable SFST yet])])
+                                              [Define to compile SFST support in HFST])])
+#      [AC_MSG_FAILURE([cannot disable SFST yet])])
 AM_CONDITIONAL([WANT_SFST], [test x$with_sfst != xno])
 AC_ARG_WITH([openfst],
             [AS_HELP_STRING([--with-openfst],
@@ -64,7 +64,7 @@ AS_IF([test "x$with_openfst" != xno], [AC_DEFINE([HAVE_OPENFST], [1],
 AM_CONDITIONAL([WANT_OPENFST], [test x$with_openfst != xno])
 AC_ARG_WITH([foma],
             [AS_HELP_STRING([--with-foma],
-                            [process unweighted fsts with foma @<:@default=bundled@:>@])],
+                            [process unweighted fsts with foma @<:@default=check@:>@])],
             [],
             [with_foma=check])
 AS_IF([test "x$with_foma" != xno], [AC_DEFINE([HAVE_FOMA], [1],
@@ -117,9 +117,9 @@ AC_ARG_ENABLE([compose],
 AM_CONDITIONAL([WANT_COMPOSE], [test x$enable_compose != xno])
 AC_ARG_ENABLE([compose_intersect],
 			  [AS_HELP_STRING([--enable-compose-intersect],
-							  [build compose-intersect tool @<:@default=yes@:>@])],
+							  [build compose-intersect tool @<:@default=no@:>@])],
 			  [enable_compose_intersect=$enableval],
-			  [enable_compose_intersect=yes])
+			  [enable_compose_intersect=no])
 AM_CONDITIONAL([WANT_COMPOSE_INTERSECT], [test x$enable_compose_intersect != xno])
 AC_ARG_ENABLE([concatenate],
 			  [AS_HELP_STRING([--enable-concatenate],
@@ -365,6 +365,11 @@ if test "x$with_openfst" != "xno"; then
     AC_CHECK_LIB([m], [main])
 fi
 
+if test "x$with_sfst" != "xno"; then
+    AC_CHECK_LIB([sfst], [main], [],
+                 [AC_MSG_FAILURE([sfst test failed (--without-sfst to disable)])])
+fi
+
 if test "x$with_foma" == "xcheck"; then
     AC_CHECK_LIB([z], [main])
     AC_CHECK_LIB([foma], [main], [],
@@ -424,7 +429,7 @@ AC_OUTPUT
 ## keep the list alphabetically sorted (vim; !sort)
 cat <<EOF
 -- Building $PACKAGE_STRING:
-    * libhfst with sfst: forced
+    * libhfst with sfst: $with_sfst
     *         with openfst: $with_openfst
     *         with foma: $with_foma
     *         with optimized lookup: $with_hfstol

@@ -85,7 +85,7 @@ namespace hfst
 	{ return strcmp(s1, s2) == 0; }
       };
       
-      typedef set<char*, ltstr> RVarSet;
+      typedef std::set<char*, ltstr> RVarSet;
       typedef __gnu_cxx::hash_map<char*, HfstTransducer*, __gnu_cxx::hash<const char*>, eqstr> VarMap;
       typedef __gnu_cxx::hash_map<char*, Range*, __gnu_cxx::hash<const char*>, eqstr> SVarMap;
       

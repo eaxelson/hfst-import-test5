@@ -111,12 +111,12 @@ namespace hfst
   }
 
   void HfstCompiler::error( const char *message ) {
-    cerr << "\nError: " << message << "\naborted.\n";
+    std::cerr << "\nError: " << message << "\naborted.\n";
     exit(1);
   }
 
   void HfstCompiler::error2( const char *message, char *input ) {
-    cerr << "\nError: " << message << ": " << input << "\naborted.\n";
+    std::cerr << "\nError: " << message << ": " << input << "\naborted.\n";
     exit(1);
   }
   
@@ -173,7 +173,7 @@ namespace hfst
   }
 
   Range * HfstCompiler::complement_range( Range *r ) {
-    vector<Character> sym;
+    std::vector<Character> sym;
     for( Range *p=r; p; p=p->next)
       sym.push_back( p->character );
     free_values( r );
@@ -338,7 +338,7 @@ namespace hfst
   }
 
   void HfstCompiler::warn(const char *msg) {
-    cerr << "\nWarning: " << msg << "!\n";
+    std::cerr << "\nWarning: " << msg << "!\n";
   }
 
   HfstTransducer * HfstCompiler::negation( HfstTransducer *t )    
@@ -379,7 +379,7 @@ namespace hfst
     HfstTokenizer TOK = t->create_tokenizer();
 
     // transducer agreement variable names
-    vector<char*> name;
+    std::vector<char*> name;
     for( RVarSet::iterator it=RS.begin(); it!=RS.end(); it++) {
       name.push_back(*it);
     }
@@ -397,7 +397,7 @@ namespace hfst
       delete vt;
 
       // transform weighted paths to a vector of transducers
-      vector<HfstTransducer*> transducer_paths;
+      std::vector<HfstTransducer*> transducer_paths;
       for (WeightedPaths<float>::Set::iterator it = paths.begin(); it != paths.end(); it++) {
 	WeightedPath<float> wp = *it;
 	HfstTransducer * path = new HfstTransducer(wp.istring, wp.ostring, TOK, t->get_type());
@@ -463,10 +463,10 @@ namespace hfst
   HfstTransducer * HfstCompiler::make_rule( HfstTransducer * lc, Range * lower_range, Twol_Type type, 
 					    Range * upper_range, HfstTransducer * rc ) {
     if (RS.size() > 0 || RSS.size() > 0)
-      cerr << "\nWarning: agreement operation inside of replacement rule!\n";
+      std::cerr << "\nWarning: agreement operation inside of replacement rule!\n";
     
     if (!Alphabet_Defined)
-      cerr << "\nERROR: Two level rules require the definition of an alphabet!\n";
+      std::cerr << "\nERROR: Two level rules require the definition of an alphabet!\n";
 
     HfstTransducerPair tr_pair(*(lc), *(rc));
     StringPairSet sps;
@@ -670,7 +670,7 @@ namespace hfst
     t = explode(t);
 
     // delete the variable values
-    vector<char*> s;
+    std::vector<char*> s;
     for( VarMap::iterator it=VM.begin(); it != VM.end(); it++ ) {
       s.push_back(it->first);
       delete it->second;

@@ -16,6 +16,10 @@
 #include <cassert>
 #endif
 
+namespace SFST {
+  bool Transducer::hopcroft_minimisation=true;
+}
+
 namespace hfst { namespace implementations {
     /** Create an SfstInputStream that reads from stdin. */
   SfstInputStream::SfstInputStream(void)

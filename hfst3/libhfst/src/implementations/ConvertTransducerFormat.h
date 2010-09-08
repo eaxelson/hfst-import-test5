@@ -27,7 +27,7 @@
 #endif
 
 #if HAVE_SFST
-#include "SFST/src/fst.h"
+#include "sfst/fst.h"
 #endif
 
 #if HAVE_FOMA
@@ -51,7 +51,7 @@ namespace hfst { namespace implementations {
   using namespace hfst::exceptions;
 
   // for testing
-  typedef fst::StdVectorFst InternalTransducer;
+  //typedef fst::StdVectorFst InternalTransducer;
 
 #if HAVE_OPENFST
   typedef fst::StdArc::StateId StateId;
@@ -67,10 +67,10 @@ namespace hfst { namespace implementations {
 #endif
 
   /* Not needed.. */
-  typedef std::map<SFST::Node *,StateId> SfstToOfstStateMap;
-  typedef std::map<StateId,SFST::Node *> OfstToSfstStateMap;
-  typedef std::map<int,StateId> FomaToOfstStateMap;
-  typedef std::map<StateId,int> OfstToFomaStateMap;
+  //typedef std::map<SFST::Node *,StateId> SfstToOfstStateMap;
+  //typedef std::map<StateId,SFST::Node *> OfstToSfstStateMap;
+  //typedef std::map<int,StateId> FomaToOfstStateMap;
+  //typedef std::map<StateId,int> OfstToFomaStateMap;
   /* .. not needed ends. */
 
 #if HAVE_OPENFST
@@ -82,6 +82,7 @@ namespace hfst { namespace implementations {
   typedef fst::VectorFst<LogArc> LogFst;
 #endif
 
+#ifdef FOO
     /* SFST::Transducer * is the sfst transducer format.
        fst::StdVectorFst * is the openfst transducer format. */
     
@@ -122,7 +123,7 @@ namespace hfst { namespace implementations {
     /* Read a transducer in internal format and return the equivalent
        hfst_ol::Transducer * */
     hfst_ol::Transducer * internal_format_to_hfst_ol(InternalTransducer * t, bool weighted);
-
+#endif
 
 
     /* -------------------------------------------------

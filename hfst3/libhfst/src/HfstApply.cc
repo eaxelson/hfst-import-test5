@@ -34,19 +34,23 @@ namespace hfst
     return true;
   }
 
-  HfstTransducer &HfstTransducer::apply
-  (SFST::Transducer * (*sfst_funct)(SFST::Transducer *),
-   fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *),
-   hfst::implementations::LogFst * (*log_ofst_funct)
-   (hfst::implementations::LogFst *)
-#if HAVE_FOMA
-   ,
-   fsm * (*foma_funct)(fsm *) 
+  HfstTransducer &HfstTransducer::apply(
+#if HAVE_SFST
+ SFST::Transducer * (*sfst_funct)(SFST::Transducer *), 
 #endif
-  )
+#if HAVE_OPENFST
+ fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *),
+ hfst::implementations::LogFst * (*log_ofst_funct)(hfst::implementations::LogFst *),
+#endif
+#if HAVE_FOMA
+ fsm * (*foma_funct)(fsm *),
+#endif
+  bool foo )
     {
+      (void)foo;
     switch(this->type)
       {
+#if HAVE_SFST
       case SFST_TYPE:
 	{
 	  SFST::Transducer * sfst_temp = 
@@ -55,6 +59,8 @@ namespace hfst
 	  implementation.sfst = sfst_temp;
 	  break;
 	}
+#endif
+#if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	{
 	  fst::StdVectorFst * tropical_ofst_temp =
@@ -71,16 +77,17 @@ namespace hfst
 	  implementation.log_ofst = log_ofst_temp;
 	  break;
 	}
+#endif
+#if HAVE_FOMA
       case FOMA_TYPE:
 	{
-#if HAVE_FOMA
       fsm * foma_temp =
 	    foma_funct(implementation.foma);
 	  this->foma_interface.delete_foma(implementation.foma);
 	  implementation.foma = foma_temp;
 	  break;
-#endif
     }
+#endif
       case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
@@ -90,10 +97,15 @@ namespace hfst
   }
 
   HfstTransducer &HfstTransducer::apply
-  (SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
+  (
+#if HAVE_SFST
+SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
+#endif
+#if HAVE_OPENFST
    fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *, int n),
    hfst::implementations::LogFst * (*log_ofst_funct)
    (hfst::implementations::LogFst *, int n),
+#endif
 #if HAVE_FOMA
    fsm * (*foma_funct)(fsm *,int n),
 #endif
@@ -101,6 +113,7 @@ namespace hfst
   {
     switch(this->type)
       {
+#if HAVE_SFST
       case SFST_TYPE:
 	{
 	  SFST::Transducer * sfst_temp = 
@@ -109,6 +122,8 @@ namespace hfst
 	  implementation.sfst = sfst_temp;
 	  break;
 	}
+#endif
+#if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	{
 	  fst::StdVectorFst * tropical_ofst_temp =
@@ -125,16 +140,17 @@ namespace hfst
           implementation.log_ofst = log_ofst_temp;
           break;
         }
+#endif
+#if HAVE_FOMA
       case FOMA_TYPE:
 	{
-#if HAVE_FOMA
       fsm * foma_temp = 
 	    foma_funct(implementation.foma,n);
 	  this->foma_interface.delete_foma(implementation.foma);
 	  implementation.foma = foma_temp;
 	  break;
-#endif
     }
+#endif
 	case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
@@ -144,11 +160,16 @@ namespace hfst
   }
 
   HfstTransducer &HfstTransducer::apply
-  (SFST::Transducer * (*sfst_funct)(SFST::Transducer *, String, String),
+  (
+#if HAVE_SFST
+   SFST::Transducer * (*sfst_funct)(SFST::Transducer *, String, String),
+#endif
+#if HAVE_OPENFST
    fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,String, 
 					      String),
    hfst::implementations::LogFst * (*log_ofst_funct)
    (hfst::implementations::LogFst *,String, String),
+#endif
 #if HAVE_FOMA
    fsm * (*foma_funct)(fsm *, String, String),
 #endif
@@ -156,6 +177,7 @@ namespace hfst
   {
     switch(this->type)
       {
+#if HAVE_SFST
       case SFST_TYPE:
 	{
 	  SFST::Transducer * sfst_temp = 
@@ -164,6 +186,8 @@ namespace hfst
 	  implementation.sfst = sfst_temp;
 	  break;
 	}
+#endif
+#if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	{
 	  fst::StdVectorFst * tropical_ofst_temp =
@@ -180,16 +204,17 @@ namespace hfst
           implementation.log_ofst = log_ofst_temp;
           break;
         }
+#endif
+#if HAVE_FOMA
       case FOMA_TYPE:
 	{
-#if HAVE_FOMA
       fsm * foma_temp = 
 	    foma_funct(implementation.foma,s1,s2);
 	  this->foma_interface.delete_foma(implementation.foma);
 	  implementation.foma = foma_temp;
-#endif
       break;
 	}
+#endif
 	case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
@@ -198,69 +223,18 @@ namespace hfst
     return *this;
   }
 
-  /*
-  HfstTransducer &HfstTransducer::apply
-  (SFST::Transducer * (*sfst_funct)(SFST::Transducer *, KeyPair, 
-				    KeyPair),
-   fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,KeyPair, 
-					      KeyPair),
-   hfst::implementations::LogFst * (*log_ofst_funct)
-   (hfst::implementations::LogFst *,KeyPair, KeyPair),
-   fsm * (*foma_funct)(fsm *, KeyPair, 
-				    KeyPair),
-   KeyPair kp1, KeyPair kp2,ImplementationType type)
-  {
-    if (type != UNSPECIFIED_TYPE)
-      { convert(type); }
-    switch(this->type)
-      {
-      case SFST_TYPE:
-	{
-	  SFST::Transducer * sfst_temp = 
-	    sfst_funct(implementation.sfst,kp1,kp2);
-	  delete implementation.sfst;
-	  implementation.sfst = sfst_temp;
-	  break;
-	}
-      case TROPICAL_OFST_TYPE:
-	{
-	  fst::StdVectorFst * tropical_ofst_temp =
-	    tropical_ofst_funct(implementation.tropical_ofst,kp1,kp2);
-	  delete implementation.tropical_ofst;
-	  implementation.tropical_ofst = tropical_ofst_temp;
-	  break;
-	}
-      case LOG_OFST_TYPE:
-        {
-	  hfst::implementations::LogFst * log_ofst_temp =
-            log_ofst_funct(implementation.log_ofst,kp1,kp2);
-          delete implementation.log_ofst;
-          implementation.log_ofst = log_ofst_temp;
-          break;
-        }
-      case FOMA_TYPE:
-	{
-	  fsm * foma_temp = 
-	    foma_funct(implementation.foma,kp1,kp2);
-	  this->foma_interface.delete_foma(implementation.foma);
-	  implementation.foma = foma_temp;
-	  break;
-	}
- 	case UNSPECIFIED_TYPE:
-	case ERROR_TYPE:
-	default:
-	  throw hfst::exceptions::TransducerHasWrongTypeException();
-     }
-    return *this;
-    }*/
 
-  HfstTransducer &HfstTransducer::apply
-  (SFST::Transducer * (*sfst_funct)(SFST::Transducer *,
+  HfstTransducer &HfstTransducer::apply(
+#if HAVE_SFST
+   SFST::Transducer * (*sfst_funct)(SFST::Transducer *,
 				    SFST::Transducer *),
+#endif
+#if HAVE_OPENFST
    fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,
 					      fst::StdVectorFst *),
    hfst::implementations::LogFst * (*log_ofst_funct)
    (hfst::implementations::LogFst *,hfst::implementations::LogFst *),
+#endif
 #if HAVE_FOMA
    fsm * (*foma_funct)(fsm *,
 				    fsm *),
@@ -276,6 +250,7 @@ namespace hfst
 
     switch (this->type)
       {
+#if HAVE_SFST
       case SFST_TYPE:
 	{
 	  SFST::Transducer * sfst_temp = 
@@ -284,6 +259,8 @@ namespace hfst
 	  implementation.sfst = sfst_temp;
 	  break;
 	}
+#endif
+#if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	{
 	  fst::StdVectorFst * tropical_ofst_temp =
@@ -302,16 +279,17 @@ namespace hfst
           implementation.log_ofst = log_ofst_temp;
           break;
         }
+#endif
+#if HAVE_FOMA
       case FOMA_TYPE:
 	{
-#if HAVE_FOMA
 	  fsm * foma_temp = 
 	    foma_funct(implementation.foma,another.implementation.foma);
 	  delete implementation.foma;
 	  implementation.foma = foma_temp;
 	  break;
-#endif
 	}
+#endif
 	case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:

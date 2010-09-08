@@ -16,12 +16,18 @@ namespace hfst
   HfstOutputStream::HfstOutputStream(ImplementationType type):
   type(type)
   { 
+    if (not HfstTransducer::is_implementation_type_available(type))
+      throw hfst::exceptions::ImplementationTypeNotAvailableException();
+
     switch(type)
       {
+#if HAVE_SFST
       case SFST_TYPE:
 	implementation.sfst = 
 	  new hfst::implementations::SfstOutputStream();
 	break;
+#endif
+#if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	implementation.tropical_ofst = 
 	  new hfst::implementations::TropicalWeightOutputStream();
@@ -30,6 +36,7 @@ namespace hfst
 	implementation.log_ofst = 
 	  new hfst::implementations::LogWeightOutputStream();
 	break;
+#endif
 #if HAVE_FOMA
       case FOMA_TYPE:
 	implementation.foma = 
@@ -52,12 +59,18 @@ namespace hfst
   HfstOutputStream::HfstOutputStream(const std::string &filename,ImplementationType type):
   type(type)
   { 
+    if (not HfstTransducer::is_implementation_type_available(type))
+      throw hfst::exceptions::ImplementationTypeNotAvailableException();
+
     switch(type)
       {
+#if HAVE_SFST
       case SFST_TYPE:
 	implementation.sfst = 
 	  new hfst::implementations::SfstOutputStream(filename.c_str());
 	break;
+#endif
+#if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	implementation.tropical_ofst = 
 	  new hfst::implementations::TropicalWeightOutputStream(filename.c_str());
@@ -66,6 +79,7 @@ namespace hfst
 	implementation.log_ofst = 
 	  new hfst::implementations::LogWeightOutputStream(filename.c_str());
 	break;
+#endif
 #if HAVE_FOMA
       case FOMA_TYPE:
 	implementation.foma = 
@@ -90,15 +104,19 @@ namespace hfst
   {
     switch (type)
       {
+#if HAVE_SFST
       case SFST_TYPE:
 	delete implementation.sfst;
 	break;
+#endif
+#if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	delete implementation.tropical_ofst;
 	break;
       case LOG_OFST_TYPE:
 	delete implementation.log_ofst;
 	break;
+#endif
 #if HAVE_FOMA
       case FOMA_TYPE:
 	delete implementation.foma;
@@ -120,10 +138,13 @@ namespace hfst
 
     switch (type)
       {
+#if HAVE_SFST
       case SFST_TYPE:
 	implementation.sfst->write_transducer
 	  (transducer.implementation.sfst);
 	return *this;
+#endif
+#if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	implementation.tropical_ofst->write_transducer
 	  (transducer.implementation.tropical_ofst);
@@ -132,6 +153,7 @@ namespace hfst
 	implementation.log_ofst->write_transducer
 	  (transducer.implementation.log_ofst);
 	return *this;
+#endif
 #if HAVE_FOMA
       case FOMA_TYPE:
 	implementation.foma->write_transducer
@@ -152,15 +174,19 @@ namespace hfst
   void HfstOutputStream::open(void) {
     switch (type)
       {
+#if HAVE_SFST
       case SFST_TYPE:
 	implementation.sfst->open();
 	break;
+#endif
+#if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	implementation.tropical_ofst->open();
 	break;
       case LOG_OFST_TYPE:
 	implementation.log_ofst->open();
 	break;
+#endif
 #if HAVE_FOMA
       case FOMA_TYPE:
 	implementation.foma->open();
@@ -178,15 +204,19 @@ namespace hfst
   void HfstOutputStream::close(void) {
     switch (type)
       {
+#if HAVE_SFST
       case SFST_TYPE:
 	implementation.sfst->close();
 	break;
+#endif
+#if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	implementation.tropical_ofst->close();
 	break;
       case LOG_OFST_TYPE:
 	implementation.log_ofst->close();
 	break;
+#endif
 #if HAVE_FOMA
       case FOMA_TYPE:
 	implementation.foma->close();
