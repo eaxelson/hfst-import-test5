@@ -18,10 +18,13 @@ namespace hfst
     bool has_header = stream_has_headers && (!header_eaten);
     switch (type)
       {
+#if HAVE_SFST
       case SFST_TYPE:
 	t.implementation.sfst =
 	  this->implementation.sfst->read_transducer(has_header);
 	break;
+#endif
+#if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	t.implementation.tropical_ofst =
 	  this->implementation.tropical_ofst->read_transducer(has_header);
@@ -30,14 +33,13 @@ namespace hfst
 	t.implementation.log_ofst =
 	  this->implementation.log_ofst->read_transducer(has_header);
 	break;
-      case FOMA_TYPE:
+#endif
 #if HAVE_FOMA
+      case FOMA_TYPE:
     t.implementation.foma =
 	  this->implementation.foma->read_transducer(has_header);
-#else
-    throw hfst::exceptions::ImplementationTypeNotAvailableException();
-#endif
     break;
+#endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	t.implementation.hfst_ol =
@@ -64,16 +66,20 @@ namespace hfst
 
   ImplementationType HfstInputStream::guess_fst_type(std::istream &in)
   {
+#if HAVE_SFST
     if (hfst::implementations::SfstInputStream::is_fst(in))
       { return SFST_TYPE; }
+#endif
 #if HAVE_FOMA
     if (hfst::implementations::FomaInputStream::is_fst(in))
       { return FOMA_TYPE; }
 #endif
+#if HAVE_OPENFST
     if (hfst::implementations::TropicalWeightInputStream::is_fst(in))
       { return TROPICAL_OFST_TYPE; }
     if (hfst::implementations::LogWeightInputStream::is_fst(in))
       { return LOG_OFST_TYPE; }
+#endif
     int ol_type = hfst::implementations::HfstOlInputStream::is_fst(in);
     if(ol_type == 1)
       { return HFST_OL_TYPE; }
@@ -162,7 +168,7 @@ namespace hfst
       in = &ifs;
     }
     else
-      in = &cin;
+      in = &std::cin;
     
     if (not in->good())
       { throw hfst::implementations::FileNotReadableException(); }
@@ -197,12 +203,17 @@ namespace hfst
     try { type = stream_fst_type(""); }
     catch (hfst::implementations::FileNotReadableException e)
       { throw e; }
+    if ( not HfstTransducer::is_implementation_type_available(type))
+      throw hfst::exceptions::ImplementationTypeNotAvailableException();
 
     switch (type)
     {
+#if HAVE_SFST
     case SFST_TYPE:
       implementation.sfst = new hfst::implementations::SfstInputStream;
       break;
+#endif
+#if HAVE_OPENFST
     case TROPICAL_OFST_TYPE:
       implementation.tropical_ofst = 
 	new hfst::implementations::TropicalWeightInputStream;
@@ -211,13 +222,13 @@ namespace hfst
       implementation.log_ofst = 
 	new hfst::implementations::LogWeightInputStream;
       break;
-    case FOMA_TYPE:
-#if HAVE_FOMA
-      implementation.foma = new hfst::implementations::FomaInputStream;
-#else
-    throw hfst::exceptions::ImplementationTypeNotAvailableException();
 #endif
+#if HAVE_FOMA
+    case FOMA_TYPE:
+      implementation.foma = new hfst::implementations::FomaInputStream;
       break;
+#endif
+
     case HFST_OL_TYPE:
       implementation.hfst_ol =
         new hfst::implementations::HfstOlInputStream(false);
@@ -244,12 +255,17 @@ namespace hfst
     try { type = stream_fst_type(filename); }
     catch (hfst::implementations::FileNotReadableException e)
       { throw e; }
+    if ( not HfstTransducer::is_implementation_type_available(type))
+      throw hfst::exceptions::ImplementationTypeNotAvailableException();
 
     switch (type)
     {
+#if HAVE_SFST
     case SFST_TYPE:
       implementation.sfst = new hfst::implementations::SfstInputStream(filename);
       break;
+#endif
+#if HAVE_OPENFST
     case TROPICAL_OFST_TYPE:
       implementation.tropical_ofst = 
 	new hfst::implementations::TropicalWeightInputStream(filename);
@@ -258,13 +274,13 @@ namespace hfst
       implementation.log_ofst = 
 	new hfst::implementations::LogWeightInputStream(filename);
       break;
-    case FOMA_TYPE:
-#if HAVE_FOMA
-      implementation.foma = new hfst::implementations::FomaInputStream(filename);
-#else
-    throw hfst::exceptions::ImplementationTypeNotAvailableException();
 #endif
+#if HAVE_FOMA
+    case FOMA_TYPE:
+      implementation.foma = new hfst::implementations::FomaInputStream(filename);
       break;
+#endif
+
     case HFST_OL_TYPE:
       implementation.hfst_ol = new hfst::implementations::HfstOlInputStream(filename, false);
       break;
@@ -287,22 +303,24 @@ namespace hfst
   { 
     switch (type)
       {
+#if HAVE_SFST
       case SFST_TYPE:
 	delete implementation.sfst;
 	break;
+#endif
+#if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	delete implementation.tropical_ofst;
 	break;
       case LOG_OFST_TYPE:
 	delete implementation.log_ofst;
 	break;
-      case FOMA_TYPE:
-#if HAVE_FOMA
-	delete implementation.foma;
-#else
-    throw hfst::exceptions::ImplementationTypeNotAvailableException();
 #endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+	delete implementation.foma;
 	break;
+#endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	delete implementation.hfst_ol;
@@ -325,22 +343,24 @@ namespace hfst
   {
     switch (type)
       {
+#if HAVE_SFST
       case SFST_TYPE:
 	implementation.sfst->open();
 	break;
+#endif
+#if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	implementation.tropical_ofst->open();
 	break;
       case LOG_OFST_TYPE:
 	implementation.log_ofst->open();
 	break;
-      case FOMA_TYPE:
-#if HAVE_FOMA
-	implementation.foma->open();
-#else
-    throw hfst::exceptions::ImplementationTypeNotAvailableException();
 #endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+	implementation.foma->open();
 	break;
+#endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	implementation.hfst_ol->open();
@@ -354,22 +374,24 @@ namespace hfst
   {
     switch (type)
       {
+#if HAVE_SFST
       case SFST_TYPE:
 	implementation.sfst->close();
 	break;
+#endif
+#if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	implementation.tropical_ofst->close();
 	break;
       case LOG_OFST_TYPE:
 	implementation.log_ofst->close();
 	break;
-      case FOMA_TYPE:
-#if HAVE_FOMA
-	implementation.foma->close();
-#else
-    throw hfst::exceptions::ImplementationTypeNotAvailableException();
 #endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+	implementation.foma->close();
 	break;
+#endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	implementation.hfst_ol->close();
@@ -383,22 +405,24 @@ namespace hfst
   {
     switch (type)
       {
+#if HAVE_SFST
       case SFST_TYPE:
 	return implementation.sfst->is_open();
 	break;
+#endif
+#if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	return implementation.tropical_ofst->is_open();
 	break;
       case LOG_OFST_TYPE:
 	return implementation.log_ofst->is_open();
 	break;
-      case FOMA_TYPE:
-#if HAVE_FOMA
-	return implementation.foma->is_open();
-#else
-    throw hfst::exceptions::ImplementationTypeNotAvailableException();
 #endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+	return implementation.foma->is_open();
 	break;
+#endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	return implementation.hfst_ol->is_open();
@@ -413,22 +437,24 @@ namespace hfst
   {
     switch (type)
       {
+#if HAVE_SFST
       case SFST_TYPE:
 	return implementation.sfst->is_eof();
 	break;
+#endif
+#if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	return implementation.tropical_ofst->is_eof();
 	break;
       case LOG_OFST_TYPE:
 	return implementation.log_ofst->is_eof();
 	break;
-      case FOMA_TYPE:
-#if HAVE_FOMA
-	return implementation.foma->is_eof();
-#else
-    throw hfst::exceptions::ImplementationTypeNotAvailableException();
 #endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+	return implementation.foma->is_eof();
 	break;
+#endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	return implementation.hfst_ol->is_eof();
@@ -442,22 +468,24 @@ namespace hfst
   {
     switch (type)
       {
+#if HAVE_SFST
       case SFST_TYPE:
 	return implementation.sfst->is_bad();
 	break;
+#endif
+#if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	return implementation.tropical_ofst->is_bad();
 	break;
       case LOG_OFST_TYPE:
 	return implementation.log_ofst->is_bad();
 	break;
-      case FOMA_TYPE:
-#if HAVE_FOMA
-	return implementation.foma->is_bad();
-#else
-    throw hfst::exceptions::ImplementationTypeNotAvailableException();
 #endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+	return implementation.foma->is_bad();
 	break;
+#endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	return implementation.hfst_ol->is_bad();
@@ -472,22 +500,24 @@ namespace hfst
   {
     switch (type)
       {
+#if HAVE_SFST
       case SFST_TYPE:
 	return implementation.sfst->is_good();
 	break;
+#endif
+#if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	return implementation.tropical_ofst->is_good();
 	break;
       case LOG_OFST_TYPE:
 	return implementation.log_ofst->is_good();
 	break;
-      case FOMA_TYPE:
-#if HAVE_FOMA
-	return implementation.foma->is_good();
-#else
-    throw hfst::exceptions::ImplementationTypeNotAvailableException();
 #endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+	return implementation.foma->is_good();
 	break;
+#endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	return implementation.hfst_ol->is_good();

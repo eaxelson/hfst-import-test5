@@ -255,7 +255,7 @@ get_weight(const char *s)
 }
 
 HfstTransducer*
-compile(const string& xre, map<string,HfstTransducer>& defs,
+compile(const std::string& xre, std::map<std::string,HfstTransducer>& defs,
         ImplementationType impl)
 {
     // lock here?

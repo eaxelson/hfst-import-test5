@@ -16,7 +16,7 @@ namespace hfst { namespace xre {
 extern char* data;
 extern char* startptr;
 extern size_t len;
-extern std::map<string,hfst::HfstTransducer> definitions;
+extern std::map<std::string,hfst::HfstTransducer> definitions;
 extern HfstTransducer* last_compiled;
 extern ImplementationType format;
 

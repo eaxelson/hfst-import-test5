@@ -19,6 +19,7 @@
 
 namespace hfst { namespace implementations
 {
+#ifdef FOO
 InternalTransducer * sfst_to_internal_format(SFST::Transducer * t)
 {
   InternalTransducer * internal_transducer = new fst::StdVectorFst();
@@ -81,7 +82,7 @@ InternalTransducer * sfst_to_internal_format(SFST::Transducer * t)
 
 // Both input and output symbol tables of internal format will contain
 // all symbols in the sigma of the foma transducer
-#if HAVE_FOMA
+
 InternalTransducer * foma_to_internal_format(struct fsm * t)
 {
   InternalTransducer * internal_transducer = new fst::StdVectorFst();
@@ -183,7 +184,6 @@ InternalTransducer * foma_to_internal_format(struct fsm * t)
 
   return internal_transducer;
 }
-#endif
 
 InternalTransducer * 
 tropical_ofst_to_internal_format(fst::StdVectorFst * t)
@@ -353,7 +353,7 @@ SFST::Transducer *  internal_format_to_sfst
 
 // SymbolTable is converted to sigma, but the string-to-number
 // relations are changed...
-#if HAVE_FOMA
+
 struct fsm * internal_format_to_foma
 (InternalTransducer * internal_transducer)
 { 
@@ -412,7 +412,7 @@ struct fsm * internal_format_to_foma
 
   return net;      
 }
-#endif
+
 
 fst::StdVectorFst * internal_format_to_openfst(InternalTransducer * t)
 { fst::StdVectorFst *retval = new fst::StdVectorFst(*t); 
@@ -434,7 +434,7 @@ hfst_ol::Transducer * internal_format_to_hfst_ol(InternalTransducer * t, bool we
   hfst_ol::ConvertTransducer conv(t, weighted);
   return conv.to_transducer();
 }
-
+#endif
 
 
 /* -----------------
@@ -775,7 +775,7 @@ StateId hfst_ol_to_internal_add_state(hfst_ol::Transducer* t,
                                       hfst_ol::TransitionTableIndex index,
 				      unsigned int state_number)
 {
-  unsigned int new_state = state_number; // internal_transducer->AddState();
+  unsigned int new_state = state_number;
   state_map[index] = new_state;
   
   if(hfst_ol::indexes_transition_index_table(index))

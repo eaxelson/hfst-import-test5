@@ -40,8 +40,8 @@ endif
 BRIDGE_SRCS=$(MAYBE_SFST) $(MAYBE_OPENFST) $(MAYBE_FOMA) $(MAYBE_HFSTOL)
 
 # underlying backend objects
-if WANT_SFST
-SFST_SRCS=\
+#if WANT_SFST
+#SFST_SRCS=\
 	SFST/src/alphabet.C         \
 	SFST/src/basic.C            \
 	SFST/src/compact.C          SFST/src/fst.C     SFST/src/generate.C\
@@ -50,7 +50,7 @@ SFST_SRCS=\
 	SFST/src/make-compact.C\
 	SFST/src/operators.C\
 	SFST/src/robust.C           SFST/src/utf8.C    SFST/src/expand.C
-endif
+#endif
 #if WANT_FOMA
 #FOMA_SRCS=\
 #		  foma/apply.c          foma/flags.c        foma/spelling.c\
@@ -99,15 +99,15 @@ implinclude_HEADERS = \
 # headers of backends to reveal to public...
 # TODO: in ideal case you'd delete these and link to public libs of backends
 # using public headers of backends
-if WANT_SFST
-sfstincludedir = $(implincludedir)/SFST/src
-SFST_DIR = SFST/src
-sfstinclude_HEADERS = \
+#if WANT_SFST
+#sfstincludedir = $(implincludedir)/SFST/src
+#SFST_DIR = SFST/src
+#sfstinclude_HEADERS = \
 		$(SFST_DIR)/alphabet.h $(SFST_DIR)/basic.h $(SFST_DIR)/compact.h \
 		$(SFST_DIR)/make-compact.h $(SFST_DIR)/fst.h $(SFST_DIR)/mem.h \
 		$(SFST_DIR)/lowmem.h \
 		$(SFST_DIR)/utf8.h 
-endif
+#endif
 
 if WANT_HFSTOL
 hfstolincludedir = $(implincludedir)/optimized-lookup
