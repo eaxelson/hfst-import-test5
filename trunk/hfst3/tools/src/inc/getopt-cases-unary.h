@@ -19,4 +19,5 @@ case 'i':
       free(inputfilename);
       inputfilename = hfst_strdup("<stdin>");
     }
+  inputNamed = true;
   break;

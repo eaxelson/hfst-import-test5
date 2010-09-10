@@ -196,7 +196,7 @@ hfst_substitute_SOURCES=hfst-substitute.cc $(HFST_COMMON_SRC)
 hfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy # $(HFST_COMMON_SRC)
 hfst_optimized_lookup_SOURCES=hfst-optimized-lookup.cc
 
-BUILT_SOURCES=hfst-compiler.h
+BUILT_SOURCES=hfst-scanner.h hfst-compiler.h
 
 hfst_calculate_CXXFLAGS= -Wall -Wno-error
 
