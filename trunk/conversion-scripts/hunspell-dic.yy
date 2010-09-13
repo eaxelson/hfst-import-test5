@@ -3,6 +3,10 @@
 #include <cstring>
 #include <cstdlib>
 #include <set>
+#include <vector>
+#include <string>
+using std::set;
+using std::string;
 
 #define YYDEBUG 0
 
@@ -13,8 +17,11 @@ int yylex();
 enum flagtypes {BYTE_FLAG, WORD_FLAG, UTF8_FLAG, NUM_FLAG, AF_FLAG} flagtype;
 
 static FILE* lexcfile = stdout;
+static FILE* symbolfile = stdout;
 static unsigned long expected_strings = 0;
 static unsigned long words_read = 0;
+
+static set<string> sigma;
 
 bool
 strCmp(char* s, char* q)
@@ -82,7 +89,7 @@ escape_word(const char* word)
     char* p = rv;
     while (*s != '\0')
     {
-        if ((*s == '!') || (*s == ' ') || (*s == '%') || (*s == ';') || (*s == '"') || (*s == '"'))
+        if ((*s == '!') || (*s == ' ') || (*s == '%') || (*s == ';') || (*s == '"') || (*s == '<'))
         {
             *p = '%';
             p++;
@@ -157,6 +164,7 @@ parse_flag(char** flagstring)
         {
             fprintf(stderr, "Suspicious numstring %s in parser?\n", *flagstring);
             *flagstring = endptr;
+exit(EXIT_FAILURE);
         }
         break;
       }
@@ -186,23 +194,39 @@ static
 void
 handle_wordline(const char* word, const char* conts)
 {
-    char* flags = strdup(conts);
     words_read++;
     char* escaped_word = escape_word(word);
-    fprintf(lexcfile, "%s\tHUNSPELL_FIN\t;\n", escaped_word);
     unsigned long flag = 0;
-    while (*flags != '\0')
-      {
-        flag = parse_flag(&flags);
+    char* s = strdup(conts);
+    char* flagstring = static_cast<char*>(calloc(sizeof(char),strlen("@C.NEEDFLAG012345678901234567890@")*strlen(s)+1));
+    char* fs = flagstring;
+    std::vector<unsigned long> flags;
+    while (*s != '\0')
+    {
+        char* flagflag = static_cast<char*>(malloc(sizeof(char)*strlen("@C.NEEDFLAG012345678901234567890@")+1));
+        unsigned long d = parse_flag(&s);
+        flags.push_back(d);
+        sprintf(fs, "@C.NEEDFLAG%lu@", d);
+        sprintf(flagflag, "@C.NEEDFLAG%lu@", d);
+        sigma.insert(flagflag);
+        while (*fs != '\0') { ++fs; }
+    }
+    for (std::vector<unsigned long>::const_iterator i = flags.begin();
+         i != flags.end();
+         ++i)
+    {
         if (flagtype == AF_FLAG)
         {
-            fprintf(lexcfile, "%s\tHUNSPELL_AF_%lu\t;\n", escaped_word, flag);
+            fprintf(lexcfile, "%s%s\tHUNSPELL_AF_%lu\t;\n", flagstring, 
+                    escaped_word, *i);
         }
         else
         {
-            fprintf(lexcfile, "%s\tHUNSPELL_FLAG_%lu\t;\n", escaped_word, flag);
+            fprintf(lexcfile, "%s%s\tHUNSPELL_FLAG_%lu\t;\n", flagstring,
+                    escaped_word, *i);
         }
       }
+    fprintf(lexcfile, "%s%s\tHUNSPELL_FIN\t;\n", flagstring, escaped_word);
     free(escaped_word);
 }
 
@@ -352,6 +376,7 @@ main(int argc, char** argv)
 {
     char* infilename = 0;
     char* lexcfilename = 0;
+    char* symbolfilename = 0;
 #   if YYDEBUG
     yydebug = 1;
 #   endif
@@ -419,7 +444,22 @@ main(int argc, char** argv)
     {
         lexcfilename = strdup("<stdout>");
     }
-    printf("Reading from %s, writing to %s\n", infilename, lexcfilename);
+    if (argc > 4)
+    {
+        symbolfilename = strdup(argv[4]);
+        symbolfile = fopen(symbolfilename, "w");
+        if (symbolfile == NULL)
+        {
+            fprintf(stderr, "Could not open %s for writing\n", symbolfilename);
+            return EXIT_FAILURE;
+        }
+    }
+    else
+    {
+        symbolfilename = strdup("<stdout>");
+    }
+    printf("Reading from %s, writing to %s and %s\n", infilename, lexcfilename,
+           symbolfilename);
     fprintf(lexcfile, "! This file contains hunspell %s dictionary "
                       "automatically translated to lexc format\n\n"
                       "LEXICON HUNSPELL_dic_root\n"
@@ -427,6 +467,15 @@ main(int argc, char** argv)
                       "\tHUNSPELL_pfx\t;\n\n"
                       "LEXICON HUNSPELL_dic\n", infilename);
     yyparse();
+    fprintf(symbolfile, "! This file contains hunspell %s dictionary "
+            "flags\n"
+            "Multichar_Symbols\n", infilename);
+    for (set<string>::const_iterator s = sigma.begin();
+         s != sigma.end();
+         ++s)
+    {
+        fprintf(symbolfile, "%s ", s->c_str());
+    }
     if (argc > 1)
     {
         fclose(yyin);
@@ -434,6 +483,10 @@ main(int argc, char** argv)
     if (argc > 2)
     {
         fclose(lexcfile);
+    }
+    if (argc > 3)
+    {
+        fclose(symbolfile);
     }
     if (yynerrs > 0)
     {

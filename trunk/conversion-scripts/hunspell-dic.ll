@@ -63,7 +63,7 @@ WSP [ \t\n\r]
     return WORD;
 }
 
-"/"{NR}+ {
+"/"{NR}* {
     yylval.string = strdup(yytext+1);
     return CONT_THING;
 }
