@@ -69,6 +69,8 @@ def main():
                 in_patterns = True
             elif line.startswith('\\hyphenation'):
                 print >> stderr, "Explicit hyphenations skipped, sry!"
+            elif line.startswith('\\message'):
+                print >> stderr, "TeX %s" % (line)
             elif line.startswith('\\'):
                 print >> stderr, "Illegal TeX function in pattern: %s" % (line)
                 break
