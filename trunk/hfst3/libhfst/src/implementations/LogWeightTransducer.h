@@ -220,6 +220,8 @@ namespace implementations
       //static LogFst * define_transducer(const KeyPair &kp);
       //static LogFst * define_transducer(const KeyPairVector &kpv);
 
+      static LogFst * remove_from_alphabet(LogFst *t, const std::string &symbol);
+
     private:
       static fst::SymbolTable create_symbol_table(std::string name);
       static void initialize_symbol_tables(LogFst *t);

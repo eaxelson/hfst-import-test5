@@ -426,6 +426,7 @@ namespace hfst
 
 
     HfstTransducer(const StringPairSet & sps, ImplementationType type);
+    HfstTransducer(const StringPairVector & spv, ImplementationType type);
 
     /** \brief Read a binary transducer from transducer stream \a in. 
 
@@ -538,7 +539,7 @@ fclose(ifile);
 @throws hfst::exceptions::NotValidAttFormatException
 @see write_in_att_format
 **/
-    static HfstTransducer &read_in_att_format(FILE * ifile, ImplementationType type);
+    static HfstTransducer &read_in_att_format(FILE * ifile, ImplementationType type, const std::string &epsilon_symbol);
 
     /** \brief \brief Write the transducer in AT & T format to FILE named \a filename. 
 
@@ -552,7 +553,7 @@ fclose(ifile);
 	@pre The file exists, otherwise an exception is thrown.
 	@see read_in_att_format(FILE*,ImplementationType)
 	@throws hfst::exceptions::FileNotReadableException hfst::exceptions::NotValidAttFormatException */
-    static HfstTransducer &read_in_att_format(const char * filename, ImplementationType type);
+    static HfstTransducer &read_in_att_format(const char * filename, ImplementationType type, const std::string &epsilon_symbol);
 
     /** \brief Remove all epsilon:epsilon transitions from this transducer. */
     HfstTransducer &remove_epsilons();
@@ -773,6 +774,8 @@ fclose(ifile);
     /** \brief The type of the transducer. */
     ImplementationType get_type(void) const;
 
+    //HfstTransducer &remove_from_alphabet(const HfstTransducer &t, const std::string &symbol);
+
     /** \brief Convert this transducer into an equivalent transducer in format \a type. 
 
 	If a weighted transducer is converted into an unweighted one, all weights are lost. 
@@ -790,7 +793,7 @@ fclose(ifile);
 	ImplementationType type);
     static hfst::implementations::HfstInternalTransducer * 
       hfst_transducer_to_internal(
-	HfstTransducer *transducer);
+	const HfstTransducer *transducer);
 
     static bool is_implementation_type_available(ImplementationType type);
 

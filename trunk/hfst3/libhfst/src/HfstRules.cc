@@ -26,7 +26,7 @@ namespace hfst
 
     HfstTransducer negation_fst(HfstTransducer &t, const StringPairSet &alphabet)
     {
-      bool DEBUG=false;
+      bool DEBUG=true;
 
       if (DEBUG) printf("     negation_fst..\n");
 
@@ -98,7 +98,7 @@ namespace hfst
     {
       // ct = .* ( m1 >> ( m2 >> t ))  ||  !(.* m1)
 
-      bool DEBUG=false;
+      bool DEBUG=true;
 
       if (DEBUG) printf("    replace_context..\n");
 
@@ -303,7 +303,7 @@ namespace hfst
     HfstTransducer replace_in_context(HfstTransducerPair &context, ReplaceType repl_type, HfstTransducer &t, bool optional, StringPairSet &alphabet)
     {
 
-      bool DEBUG=false;
+      bool DEBUG=true;
 
       if (DEBUG) printf("replace_in_context...\n");
 
@@ -390,6 +390,7 @@ namespace hfst
       right_rev.reverse();
       HfstTransducer rct = replace_context(right_rev, rightm, leftm, alphabet);
       rct.reverse();
+      rct.minimize(); // ADDED
 
       if (DEBUG) printf("  ..rct created\n");
 
@@ -400,27 +401,40 @@ namespace hfst
       else
 	rt = replace_transducer( t, leftm, rightm, REPL_DOWN, alphabet );
 
-      if (DEBUG) printf("  ..rt created\n");
+      if (DEBUG) printf("  ..rt createD\n");
 
-      // build the conditional replacement transducer 
+      // build the conditional replacement transducer
       HfstTransducer result(ibt);
+      if (DEBUG) printf("#0\n");
       result.compose(cbt);
       
+      if (DEBUG) printf("#1\n");
+
       if (repl_type == REPL_UP || repl_type == REPL_RIGHT)
 	result.compose(rct);
 
       if (repl_type == REPL_UP || repl_type == REPL_LEFT)
 	result.compose(lct);
       
+      if (DEBUG) printf("#2\n");
+
+      result.minimize();  // ADDED
       result.compose(rt);
       
+      if (DEBUG) printf("#3\n");
+
       if (repl_type == REPL_DOWN || repl_type == REPL_RIGHT)
 	result.compose(lct);
 
       if (repl_type == REPL_DOWN || repl_type == REPL_LEFT)
 	result.compose(rct);
       
+      if (DEBUG) printf("#4\n");
+
+      result.minimize();  // ADDED
       result.compose(rbt);
+
+      if (DEBUG) printf("#5\n");
 
       // Remove the markers from the alphabet
       alphabet.erase(StringPair(leftm,leftm));
@@ -428,6 +442,8 @@ namespace hfst
       
       if (optional)
 	result.disjunct(universal_fst(alphabet,type));
+
+      if (DEBUG) printf("...replace_in_context\n");
 
       return result;
     }

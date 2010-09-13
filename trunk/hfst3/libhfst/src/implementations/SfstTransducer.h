@@ -123,6 +123,8 @@ namespace hfst { namespace implementations
       static void print_test(Transducer *t);
       static void print_alphabet(Transducer *t);
 
+      static Transducer * remove_from_alphabet(Transducer *t, const std::string &symbol);
+
     protected:
       static void initialize_alphabet(Transducer *t);
       static StringSet get_string_set(Transducer *t);

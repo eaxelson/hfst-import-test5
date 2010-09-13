@@ -128,13 +128,13 @@ namespace hfst {
 	}
     }
 
-    void HfstInternalTransducer::read_symbol(FILE *file) 
+    void HfstInternalTransducer::read_symbol(FILE *file, const std::string &epsilon_symbol) 
     {
       assert(alphabet != NULL);
       char line [255];
       while ( fgets(line, 255, file) != NULL ) 
 	{
-	  if (*line == '-') // transducer separator
+	  if (*line == '-') // transducer separator line is "--"
 	    return;
 	  char a1 [100]; char a2 [100]; char a3 [100]; char a4 [100]; char a5 [100];
 	  int n = sscanf(line, "%s\t%s\t%s\t%s\t%s", a1, a2, a3, a4, a5);
@@ -149,8 +149,20 @@ namespace hfst {
 	  if (n == 1 || n == 2)  // final state line
 	    add_line( atoi(a1), weight );
 
-	  else if (n == 4 || n == 5)  // transition line
-	    add_line( atoi(a1), atoi(a2), alphabet->add_symbol(a3), alphabet->add_symbol(a4), weight );
+	  else if (n == 4 || n == 5) { // transition line
+	    unsigned int inputnumber, outputnumber;
+	    if (epsilon_symbol.compare(std::string(a3)) == 0)
+	      inputnumber=0;
+	    else
+	      inputnumber = alphabet->add_symbol(a3);
+
+	    if (epsilon_symbol.compare(std::string(a4)) == 0)
+	      outputnumber=0;
+	    else
+	      outputnumber = alphabet->add_symbol(a4);
+
+	    add_line( atoi(a1), atoi(a2), inputnumber, outputnumber, weight );
+	  }
 	  
 	  else  // line could not be parsed
 	    throw hfst::exceptions::NotValidAttFormatException();       

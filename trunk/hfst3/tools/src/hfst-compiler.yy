@@ -130,8 +130,8 @@ RE:         RE ARROW CONTEXTS2      { $$ = compiler->restriction($1,$2,$3,0); }
           | RE '-' RE        { $1->subtract(*$3); delete $3; $$ = $1; }
           | RE '|' RE        { $1->disjunct(*$3); delete $3; $$ = $1; }
           | '(' RE ')'       { $$ = $2; }
-          // | STRING           { $$ = read_words($1); }
-          | STRING2          { try { $$ = compiler->read_transducer($1); } catch (hfst::exceptions::HfstInterfaceException e) { printf("\nAn error happened when reading file \"%s\"\n", $1); exit(1); } }
+          | STRING           { $$ = compiler->read_words($1, type); }
+          | STRING2          { try { $$ = compiler->read_transducer($1, type); } catch (hfst::exceptions::HfstInterfaceException e) { printf("\nAn error happened when reading file \"%s\"\n", $1); exit(1); } }
           ;
 
 RANGES:     RANGE RANGES     { $$ = compiler->add_range($1,$2); }

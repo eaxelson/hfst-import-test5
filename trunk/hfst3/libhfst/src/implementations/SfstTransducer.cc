@@ -426,11 +426,13 @@ namespace hfst { namespace implementations {
 	Node * temp = t->new_node();
 
 	unsigned int inumber,onumber;
-	if (strcmp(it->first.c_str(),"@_EPSILON_SYMBOL_@") == 0)
+	if (strcmp(it->first.c_str(),"@_EPSILON_SYMBOL_@") == 0 || 
+	    strcmp(it->first.c_str(),"<>") == 0 )
 	  inumber=0;
 	else
 	  inumber=t->alphabet.add_symbol(it->first.c_str());
-	if (strcmp(it->second.c_str(),"@_EPSILON_SYMBOL_@") == 0)
+	if (strcmp(it->second.c_str(),"@_EPSILON_SYMBOL_@") == 0 ||
+	    strcmp(it->second.c_str(),"<>") == 0 )
 	  onumber=0;
 	else
 	  onumber=t->alphabet.add_symbol(it->second.c_str());
@@ -668,7 +670,11 @@ namespace hfst { namespace implementations {
   
   Transducer * SfstTransducer::compose
   (Transducer * t1, Transducer * t2)
-  { return &t1->operator||(*t2); }
+  { printf("Sfst::compose:\n");
+    print_test(t1);
+    printf("--\n");
+    print_test(t2);
+    return &t1->operator||(*t2); }
 
   Transducer * SfstTransducer::concatenate
   (Transducer * t1, Transducer * t2)

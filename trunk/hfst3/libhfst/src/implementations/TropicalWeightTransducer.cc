@@ -660,7 +660,7 @@ namespace hfst { namespace implementations
   (StdVectorFst *t1, StdVectorFst *t2)
   {
 
-    // fprintf(stderr, "TWT::harmonize...\n");
+    //fprintf(stderr, "TWT::harmonize...\n");
 
     // 1. Calculate the set of unknown symbols for transducers t1 and t2.
 
@@ -701,19 +701,18 @@ namespace hfst { namespace implementations
 
     harmonized_t1 = expand_arcs(t1, unknown_t1);
     harmonized_t1->SetInputSymbols(t1->InputSymbols());
-    delete t1;
 
     harmonized_t2 = expand_arcs(t2, unknown_t2);
     harmonized_t2->SetInputSymbols(t2->InputSymbols());
-    delete t2;
 
-    //fprintf(stderr, "TWT::harmonize: harmonized t1's and t2's input symbol tables now contain (FINAL):\n");
-    //harmonized_t1->InputSymbols()->WriteText(std::cerr);
-    //std::cerr << "--\n";
-    //harmonized_t2->InputSymbols()->WriteText(std::cerr);
-    //std::cerr << "\n";
+    /*
+    fprintf(stderr, "TWT::harmonize: harmonized t1's and t2's input symbol tables now contain (FINAL):\n");
+    harmonized_t1->InputSymbols()->WriteText(std::cerr);
+    std::cerr << "--\n";
+    harmonized_t2->InputSymbols()->WriteText(std::cerr);
+    std::cerr << "\n";
 
-    // fprintf(stderr, "...TWT::harmonize\n");
+    fprintf(stderr, "...TWT::harmonize\n");*/
 
     return std::pair<StdVectorFst*, StdVectorFst*>(harmonized_t1, harmonized_t2);
 
