@@ -69,7 +69,7 @@ namespace hfst {
       bool is_final_state(HfstState);
       float get_final_weight(HfstState);
       void read_number(FILE*);
-      void read_symbol(FILE*);
+      void read_symbol(FILE*, const std::string &epsilon_symbol);
       void print_number(FILE*);
       void print_symbol(FILE*);
       void print_number(std::ostream&);

@@ -72,6 +72,12 @@ public HfstInterfaceException {};
 class NotValidAttFormatException :
 public HfstInterfaceException {};
 
+/** \brief The string is not in valid format. 
+
+    hfst-calculate can throw this exception */
+class NotValidStringFormatException :
+public HfstInterfaceException {};
+
 class StateTransitionIteratorOutOfRangeExeption : 
 public HfstInterfaceException {};
 

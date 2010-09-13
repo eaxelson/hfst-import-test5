@@ -15,7 +15,8 @@
 
 #include "HfstTransducer.h"
 #include "implementations/HfstAlphabet.h"
-
+#include <iostream>
+#include <fstream>
 
 namespace hfst
 {
@@ -110,8 +111,8 @@ namespace hfst
       HfstTransducer * make_transducer(Range *r1, Range *r2, ImplementationType type);
       static void warn(const char *msg);
       HfstTransducer *new_transducer( Range*, Range*, ImplementationType );
-      HfstTransducer *read_words( char *filename );  // TODO
-      HfstTransducer *read_transducer( char *filename );
+      HfstTransducer *read_words( char *filename, ImplementationType type);
+      HfstTransducer *read_transducer( char *filename, ImplementationType type );
       HfstTransducer *var_value( char *name );
       HfstTransducer *rvar_value( char *name, ImplementationType );
       Range *svar_value( char *name );

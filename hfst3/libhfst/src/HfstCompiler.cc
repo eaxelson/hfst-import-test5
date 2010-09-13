@@ -457,6 +457,10 @@ namespace hfst
 
   // TODO
   HfstTransducer * HfstCompiler::restriction( HfstTransducer * t, Twol_Type type, Contexts *c, int direction ) {
+    (void)t;
+    (void)type;
+    (void)c;
+    (void)direction;
     throw hfst::exceptions::FunctionNotImplementedException();
   }
 
@@ -525,11 +529,159 @@ namespace hfst
 
   }
 
-  HfstTransducer * HfstCompiler::read_words(char *filename) {
-    return NULL;  // TODO!
+  /* All multicharacter symbols must be defined in TheAlphabet. */
+  HfstTransducer * HfstCompiler::read_words(char *filename, ImplementationType type) {
+    if (Verbose)
+      fprintf(stderr,"\nreading words from %s...", filename);
+    std::ifstream is(filename);
+    if (!is.is_open())
+      throw hfst::exceptions::FileNotReadableException(); 
+    free( filename );
+
+    bool DEBUG=false;
+
+    char buffer[10000]; // MAX WORD LENGTH
+    HfstTokenizer tok;
+    HfstAlphabet::CharMap cm = TheAlphabet.get_char_map();
+    for (HfstAlphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++) {
+      tok.add_multichar_symbol(std::string(it->second));
+    }
+    if (type == SFST_TYPE)
+      tok.add_multichar_symbol(std::string("<>"));
+
+    HfstTransducer * retval = new HfstTransducer(type);
+
+    while (is.getline(buffer, 10000)) {
+      // delete final whitespace characters
+      int l;
+      for( l=(int)strlen(buffer)-1; l>=0; l-- )
+	if ((buffer[l] != ' ' && buffer[l] != '\t' && buffer[l] != '\r') ||
+	    (l > 0 && buffer[l-1] == '\\'))
+	  break;
+      buffer[l+1] = 0;
+
+      // find multichar symbols and add them to tok
+      char mcs[1000]; // MAX SIZE OF SUBSTRING
+      int i=0;
+      while(buffer[i] != '\0') {
+	if (buffer[i] == '>') // unmatched '>'
+	  throw hfst::exceptions::NotValidStringFormatException();	      
+	if (buffer[i] == '<') {
+	  int j=0;
+	  while(buffer[i] != '>') {
+	    mcs[j] = buffer[i];
+	    i++;
+	    j++;
+	    if (buffer[i] == '<')
+	      throw hfst::exceptions::NotValidStringFormatException();	      
+	  }
+	  mcs[j] = '>';
+	  mcs[j+1] = '\0';
+	  tok.add_multichar_symbol(std::string(mcs));
+	  //printf("..added multichar symbol %s\n", mcs);
+	}
+	i++;
+      }
+
+      if (DEBUG) printf("..multicharacter symbols added\n");
+
+      // only one level
+      if (std::string(buffer).find(std::string(":")) == std::string::npos) {
+	if (DEBUG) printf("..one-level word\n");
+	HfstTransducer word(std::string(buffer), tok, type);
+	if (DEBUG) printf(" ..word created:\n");
+	std::cerr << word;
+	retval->disjunct(word);
+	if (DEBUG) printf(" ..word disjuncted\n");
+      }
+      // at least one ':'
+      else {
+
+	if (DEBUG) printf("..two-level word\n");
+
+	std::vector<std::string> substrings;
+	{
+	  // find substrings separated by ':'
+	  char substring[10000];  // MAX WORD LENGTH
+	  int i=0;
+	  int j=0;
+	  while(buffer[i] != '\0') {
+	    if (buffer[i] != ':') {
+	      substring[j] = buffer[i];
+	      j++;
+	    }
+	    else {
+	      substring[j] = '\0';
+	      substrings.push_back(std::string(substring));
+	      //printf("..pushed back substring %s\n", substring);
+	      j=0;
+	    }
+	    i++;
+	  }
+	  substring[j] = '\0';
+	  substrings.push_back(std::string(substring));
+	  //printf("..pushed back substring %s\n", substring);
+	}
+	if (substrings.size() < 2)
+	  throw hfst::exceptions::NotValidStringFormatException();
+
+	if (DEBUG) printf("...substrings found\n");
+
+	StringPairVector foo;
+	{
+	  std::string last_string("");
+	  // tokenize substrings
+	  // the number of substrings is at least 2
+	  for (int i=0; i<(int)substrings.size(); i++) {
+	    if (substrings[i].empty())
+	      throw hfst::exceptions::NotValidStringFormatException();
+	    StringPairVector * spv =
+	      tok.tokenize(substrings[i]);
+	    if (spv->size() == 0)
+	      throw hfst::exceptions::NotValidStringFormatException();
+	    
+	    for (int j=0; j<(int)spv->size(); j++) {
+
+	      if (last_string.compare(std::string("")) != 0) { // unmatched input symbol
+		foo.push_back(StringPair(last_string, spv->at(j).first));
+		last_string = std::string("");
+	      }
+	      else if ( j == (((int)spv->size())-1) &&    // last symbol in substring
+			i<((int)substrings.size()-1) ) {  // and not last substring
+		last_string = spv->at(j).first;
+	      }
+	      else {
+		foo.push_back(StringPair(spv->at(j).first, spv->at(j).first));
+	      }
+	    }
+	  }
+	}
+
+	if (DEBUG)  { printf("...all substrings matched:\n");
+
+	for(StringPairVector::iterator it = foo.begin(); it != foo.end(); it++) {
+	  if (it->first.compare(it->second) == 0)
+	    printf("%s", it->first.c_str());
+	  else
+	    printf("%s:%s", it->first.c_str(), it->second.c_str());
+	}
+	printf("\n"); }
+
+	HfstTransducer word(foo, type);
+	retval->disjunct(word);
+      }
+    }
+
+    is.close();
+    if (Verbose)
+      fprintf(stderr,"finished\n");
+    if (type != SFST_TYPE) {
+      retval->substitute("<>" ,"@_EPSILON_SYMBOL_@");
+    }
+    return retval;
   }
 
-  HfstTransducer * HfstCompiler::read_transducer(char *filename) {
+  HfstTransducer * HfstCompiler::read_transducer(char *filename, ImplementationType type) {
     if (Verbose)
       fprintf(stderr,"\nreading transducer from %s...", filename);
     HfstInputStream is(filename);
@@ -539,6 +691,7 @@ namespace hfst
     free(filename);
     if (Verbose)
       fprintf(stderr,"finished\n");
+    t->convert(type);
     return t;
   }
 
@@ -552,6 +705,27 @@ namespace hfst
 
   HfstTransducer * HfstCompiler::replace_in_context(HfstTransducer * mapping, Repl_Type repl_type, Contexts *contexts, bool optional) {
     
+#ifdef FOO
+    if (mapping->get_type() == SFST_TYPE) {
+
+      interface
+
+      HfstTransducer * sfst_mapping = new HfstTransducer(*mapping);
+      mapping = explode(mapping);
+      mapping.minimize();
+
+      HfstTransducer * left_context = new HfstTransducer(*(contexts->left));
+      HfstTransducer * right_context = new HfstTransducer(*(contexts->right));
+      SFST::Contexts *sfst_contexts = interface.make_context(left_context->implementation.sfst, 
+							     right_context->implementation.sfst);
+
+      return interface.replace_in_context(sfst_mapping->implementation.sfst,
+					  repl_type,
+					  sfst_contexts,
+					  optional);
+    }
+#endif
+
     HfstTransducerPair tr_pair(*(contexts->left), *(contexts->right));
     StringPairSet sps;
     //printf("inserting pairs:\n");

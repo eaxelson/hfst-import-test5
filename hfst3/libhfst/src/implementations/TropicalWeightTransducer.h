@@ -214,6 +214,8 @@ namespace implementations
       //static StdVectorFst * define_transducer(const KeyPair &kp);
       //static StdVectorFst * define_transducer(const KeyPairVector &kpv);
 
+      static StdVectorFst * remove_from_alphabet(StdVectorFst *t, const std::string &symbol);
+
     private:
       static fst::SymbolTable create_symbol_table(std::string name);
       static void initialize_symbol_tables(StdVectorFst *t);

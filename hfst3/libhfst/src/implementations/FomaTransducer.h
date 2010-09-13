@@ -126,6 +126,8 @@ namespace hfst {
 			
       static void delete_foma(fsm * net);
       static void print_test(fsm * t);
+
+      static fsm * remove_from_alphabet(fsm * t, const std::string &symbol);
     };
 
 } }
