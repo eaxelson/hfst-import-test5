@@ -500,7 +500,7 @@ This will yield a file "testfile.att" that looks as follows:
 \endverbatim
 
 	@see hfst::operator<<(std::ostream &out,HfstTransducer &t) read_in_att_format **/
-    void write_in_att_format(FILE * ofile);
+    void write_in_att_format(FILE * ofile, bool write_weights=true);
 
     /** \brief Create a transducer of type \a type as defined in AT & T format in FILE \a ifile.
 	
@@ -546,7 +546,7 @@ fclose(ifile);
 	If the file exists, it is overwritten. If the file does not exist, it is created. 
 
 	@see write_in_att_format(FILE*) */
-    void write_in_att_format(const char * filename);
+    void write_in_att_format(const char * filename, bool write_weights=true);
 
     /** \brief Create a transducer of type \a type as defined in AT & T format in file named \a filename.
 

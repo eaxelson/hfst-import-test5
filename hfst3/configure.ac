@@ -300,9 +300,9 @@ AC_ARG_ENABLE([subtract],
 AM_CONDITIONAL([WANT_SUBTRACT], [test x$enable_subtract != xno])
 AC_ARG_ENABLE([summarize],
 			  [AS_HELP_STRING([--enable-summarize],
-							  [build summarize tool @<:@default=no@:>@])],
+							  [build summarize tool @<:@default=yes@:>@])],
 			  [enable_summarize=$enableval],
-			  [enable_summarize=no])
+			  [enable_summarize=yes])
 AM_CONDITIONAL([WANT_SUMMARIZE], [test x$enable_summarize != xno])
 AC_ARG_ENABLE([tail],
 			  [AS_HELP_STRING([--enable-tail],

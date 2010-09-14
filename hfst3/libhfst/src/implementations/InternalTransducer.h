@@ -70,10 +70,10 @@ namespace hfst {
       float get_final_weight(HfstState);
       void read_number(FILE*);
       void read_symbol(FILE*, const std::string &epsilon_symbol);
-      void print_number(FILE*);
-      void print_symbol(FILE*);
-      void print_number(std::ostream&);
-      void print_symbol(std::ostream&);
+      void print_number(FILE*, bool print_weights);
+      void print_symbol(FILE*, bool print_weights);
+      void print_number(std::ostream&, bool print_weights);
+      void print_symbol(std::ostream&, bool print_weights);
       void substitute(const StringPair &sp, const StringPairSet &sps);
       void substitute(void (*func)(std::string &isymbol, std::string &osymbol) );   
       void substitute(const StringPair &sp, HfstInternalTransducer &transducer);

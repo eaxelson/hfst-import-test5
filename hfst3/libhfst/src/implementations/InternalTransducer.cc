@@ -169,63 +169,103 @@ namespace hfst {
 	}
     }
 
-    void HfstInternalTransducer::print_number(FILE *file) {
+    void HfstInternalTransducer::print_number(FILE *file, bool print_weights) {
       for (std::set<InternalTransducerLine>::iterator it = lines.begin(); 
 	   it != lines.end(); it++) {
-	if (it->final_line)
-	  fprintf(file, "%i\t%f\n", it->origin, it->weight);
-	else
-	  fprintf(file, "%i\t%i\t%i\t%i\t%f\n", it->origin, it->target, 
-		  it->isymbol, it->osymbol, it->weight);
-      }
-    }
-
-    void HfstInternalTransducer::print_symbol(FILE *file) {
-      for (std::set<InternalTransducerLine>::iterator it = lines.begin(); 
-	   it != lines.end(); it++) {
-	if (it->final_line)
-	  fprintf(file, "%i\t%f\n", it->origin, it->weight);
+	if (it->final_line) {
+	  if (print_weights)
+	    fprintf(file, "%i\t%f\n", it->origin, it->weight);
+	  else 
+	    fprintf(file, "%i\n", it->origin);
+	}
 	else {
-	  if (alphabet != NULL)
-	    fprintf(file, "%i\t%i\t%s\t%s\t%f\n", it->origin, it->target, 
-		    alphabet->code2symbol(it->isymbol), alphabet->code2symbol(it->osymbol),
-		    it->weight);
+	  if (print_weights)
+	    fprintf(file, "%i\t%i\t%i\t%i\t%f\n", it->origin, it->target, 
+		    it->isymbol, it->osymbol, it->weight);
 	  else
-	    fprintf(file, "%i\t%i\t\\%i\t\\%i\t%f\n", it->origin, it->target, 
-		    it->isymbol, it->osymbol,
-		    it->weight);
-	    }
+	    fprintf(file, "%i\t%i\t%i\t%i\n", it->origin, it->target, 
+		    it->isymbol, it->osymbol);
+	}
       }
     }
 
-    void HfstInternalTransducer::print_number(std::ostream &os) {
+    void HfstInternalTransducer::print_symbol(FILE *file, bool print_weights) {
       for (std::set<InternalTransducerLine>::iterator it = lines.begin(); 
 	   it != lines.end(); it++) {
-	if (it->final_line)
-	  os << it->origin << "\t" << it->weight << "\n";
-	else
-	  os << it->origin << "\t" << it->target << "\t" 
-	     << it->isymbol << "\t" << it->osymbol << "\t" 
-	     << it->weight << "\n";
-      }
-    }
-
-    void HfstInternalTransducer::print_symbol(std::ostream &os) {
-      for (std::set<InternalTransducerLine>::iterator it = lines.begin(); 
-	   it != lines.end(); it++) {
-	if (it->final_line)
-	  os << it->origin << "\t" << it->weight << "\n";
+	if (it->final_line) {
+	  if (print_weights)
+	    fprintf(file, "%i\t%f\n", it->origin, it->weight);
+	  else
+	    fprintf(file, "%i\n", it->origin);
+	}
 	else {
-	  if (alphabet != NULL)
+	  if (alphabet != NULL) {
+	    if (print_weights)
+	      fprintf(file, "%i\t%i\t%s\t%s\t%f\n", it->origin, it->target, 
+		      alphabet->code2symbol(it->isymbol), alphabet->code2symbol(it->osymbol),
+		      it->weight);
+	    else
+	      fprintf(file, "%i\t%i\t%s\t%s\n", it->origin, it->target, 
+		      alphabet->code2symbol(it->isymbol), alphabet->code2symbol(it->osymbol));
+	  }
+	  else {
+	    if (print_weights)
+	      fprintf(file, "%i\t%i\t\\%i\t\\%i\t%f\n", it->origin, it->target, 
+		      it->isymbol, it->osymbol,
+		      it->weight);
+	    else
+	      fprintf(file, "%i\t%i\t\\%i\t\\%i\n", it->origin, it->target, 
+		      it->isymbol, it->osymbol);
+	  }
+	}
+      }
+    }
+
+    void HfstInternalTransducer::print_number(std::ostream &os, bool print_weights) {
+      for (std::set<InternalTransducerLine>::iterator it = lines.begin(); 
+	   it != lines.end(); it++) {
+	if (it->final_line) {
+	  os << it->origin;
+	  if (print_weights)
+	    os << "\t" << it->weight;
+	  os << "\n";
+	}
+	else {
+	  os << it->origin << "\t" << it->target << "\t" 
+	     << it->isymbol << "\t" << it->osymbol;
+	  if (print_weights)
+	    os << "\t" << it->weight;
+	  os << "\n";
+	}
+      }
+    }
+
+    void HfstInternalTransducer::print_symbol(std::ostream &os, bool print_weights) {
+      for (std::set<InternalTransducerLine>::iterator it = lines.begin(); 
+	   it != lines.end(); it++) {
+	if (it->final_line) {
+	  os << it->origin;
+	  if (print_weights)
+	    os << "\t" << it->weight;
+	  os << "\n";
+	}
+	else {
+	  if (alphabet != NULL) {
 	    os << it->origin << "\t" << it->target << "\t" 
 	       << alphabet->code2symbol(it->isymbol) << "\t"
-	       << alphabet->code2symbol(it->osymbol) << "\t"
-	       << it->weight << "\n";
-	  else
+	       << alphabet->code2symbol(it->osymbol);
+	    if (print_weights)
+	      os << "\t" << it->weight;
+	    os << "\n";
+	  }
+	  else {
 	    os << it->origin << "\t" << it->target << "\t" 
-	       << "\\" << it->isymbol << "\t" << "\\" << it->osymbol << "\t"
-	       << it->weight << "\n";
-	    }
+	       << "\\" << it->isymbol << "\t" << "\\" << it->osymbol;
+	    if (print_weights)
+	      os << "\t" << it->weight;
+	    os << "\n";
+	  }
+	}
       }
     }
 
@@ -394,7 +434,7 @@ namespace hfst {
       bool DEBUG=false;
       if (DEBUG) {
 	printf("HfstInternalTransducer::insert_freely..\n");
-	print_symbol(stderr);
+	print_symbol(stderr,true);
 	printf("--\n");
       }
 
@@ -420,7 +460,7 @@ namespace hfst {
       lines.clear(); // is this needed?
       lines=new_transducer.lines;
       if (DEBUG)
-	print_symbol(stderr);
+	print_symbol(stderr,true);
     }
    
     bool HfstInternalTransducer::is_final_state(HfstState s) {

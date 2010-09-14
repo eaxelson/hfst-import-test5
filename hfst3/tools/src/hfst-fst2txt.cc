@@ -42,6 +42,9 @@ using hfst::HfstInputStream;
 using hfst::exceptions::NotTransducerStreamException;
 
 // add tools-specific variables here
+static bool use_numbers=false;
+static bool print_weights=false;
+static bool do_not_print_weights=false;
 
 void
 print_usage()
@@ -53,8 +56,19 @@ print_usage()
 
 	print_common_program_options(message_out);
 	print_common_unary_program_options(message_out);
-	print_common_unary_program_parameter_instructions(message_out);
-    fprintf(message_out, "\n");
+	fprintf(message_out, "Text format options:\n"
+		"  -n, --number           If numbers are used instead of symbol names (TODO)\n"
+		"  -w, --print-weights    If weights are printed in all cases\n"
+		"  -D, --do-not-print-weights   If weights are not printed in any case\n");
+	fprintf(message_out, "\n");
+	fprintf(message_out,
+          "If OUTFILE or INFILE is missing or -, "
+	  "standard streams will be used.\n"
+          "Unless explicitly requested with option -w or -D, "
+	  "weights are printed\n" 
+          "if and only if the transducer is in weighted format.\n"
+	);
+	fprintf(message_out, "\n");
 	print_report_bugs();
 	print_more_info();
 }
@@ -70,12 +84,15 @@ parse_options(int argc, char** argv)
         HFST_GETOPT_COMMON_LONG,
         HFST_GETOPT_UNARY_LONG,
           // add tool-specific options here
+            {"print-weights", no_argument, 0, 'w'},
+            {"do-not-print-weights", no_argument, 0, 'D'},
+	    {"use-numbers", no_argument, 0, 'n'},
             {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT,
+                             HFST_GETOPT_UNARY_SHORT "wD",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -87,6 +104,15 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-unary.h"
           // add tool-specific cases here
+        case 'w':
+            print_weights = true;
+            break;
+	case 'D':
+	    do_not_print_weights = true;
+	    break;
+	case 'n':
+	    use_numbers = true;
+	    break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -116,7 +142,21 @@ process_stream(HfstInputStream& instream, FILE* outf)
         HfstTransducer t(instream);
         if(transducer_n > 1)
             fprintf(outf, "--\n");
-        t.write_in_att_format(outf);
+
+	bool printw; // whether weights are printed
+	hfst::ImplementationType type = t.get_type();
+	if (print_weights)
+	  printw=true;
+	else if (do_not_print_weights)
+	  printw=false;
+	else if ( (type == hfst::SFST_TYPE || type == hfst::FOMA_TYPE) )
+	  printw = false;
+	else if ( (type == hfst::TROPICAL_OFST_TYPE || type == hfst::LOG_OFST_TYPE) )
+	  printw = true;
+	else  // this should not happen
+	  printw = true;
+
+	t.write_in_att_format(outf,printw);
     }
     instream.close();
     if (outf != stdout)
