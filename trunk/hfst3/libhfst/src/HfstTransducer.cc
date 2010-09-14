@@ -804,10 +804,8 @@ type(type),anonymous(false),is_trie(false)
 
   HfstTransducer &HfstTransducer::repeat_n_plus(unsigned int n)
   { is_trie = false; // This could be done so that is_trie is preserved
-    HfstTransducer this_repeat_n = HfstTransducer(*this).repeat_n(n);
-    HfstTransducer this_repeat_star = HfstTransducer(*this).repeat_star();
-    HfstTransducer &retval = (this_repeat_n).concatenate(this_repeat_star);
-    return retval;
+    HfstTransducer a(*this);
+    return (this->repeat_n(n).concatenate(a.repeat_star()));
   }
 
   HfstTransducer &HfstTransducer::repeat_n_minus(unsigned int n)
@@ -828,7 +826,7 @@ type(type),anonymous(false),is_trie(false)
   HfstTransducer &HfstTransducer::repeat_n_to_k(unsigned int n, unsigned int k)
   { is_trie = false; // This could be done so that is_trie is preserved
     HfstTransducer a(*this);
-    return (a.repeat_n(n).concatenate(this->repeat_n_minus(k)));   // FIX: memory leaks? 
+    return (this->repeat_n(n).concatenate(a.repeat_n_minus(k-n)));
   }
 
   HfstTransducer &HfstTransducer::optionalize()
@@ -1922,7 +1920,7 @@ type(type),anonymous(false),is_trie(false)
 
   hfst::implementations::HfstInternalTransducer * 
   HfstTransducer::hfst_transducer_to_internal(
-		   const HfstTransducer *transducer) {
+                    const HfstTransducer *transducer) {
     hfst::implementations::HfstInternalTransducer * internal_transducer;
     switch(transducer->type)
       {
@@ -1955,6 +1953,7 @@ type(type),anonymous(false),is_trie(false)
       }
     return internal_transducer;
   }
+
 
   HfstTransducer * HfstTransducer::internal_to_hfst_transducer(
 		     hfst::implementations::HfstInternalTransducer * internal_transducer, 
@@ -1999,20 +1998,20 @@ type(type),anonymous(false),is_trie(false)
     return retval;
   }
 
-void HfstTransducer::write_in_att_format(const char * filename)
+void HfstTransducer::write_in_att_format(const char * filename, bool print_weights)
 {
   FILE * ofile = fopen(filename, "wb");
   if (ofile == NULL)
     throw hfst::exceptions::FileCannotBeWrittenException();
-  write_in_att_format(ofile);
+  write_in_att_format(ofile,print_weights);
   fclose(ofile);
 }
 
-void HfstTransducer::write_in_att_format(FILE * ofile)
+void HfstTransducer::write_in_att_format(FILE * ofile, bool print_weights)
 {
   hfst::implementations::HfstInternalTransducer * internal_transducer = 
     hfst_transducer_to_internal(this);
-  internal_transducer->print_symbol(ofile);
+  internal_transducer->print_symbol(ofile, print_weights);
   delete internal_transducer;
 }
 
@@ -2147,7 +2146,12 @@ std::ostream &operator<<(std::ostream &out,HfstTransducer &t)
   {
     hfst::implementations::HfstInternalTransducer * internal_transducer =
       HfstTransducer::hfst_transducer_to_internal(&t);
-    internal_transducer->print_symbol(out);
+    bool write_weights;
+    if (t.type == SFST_TYPE || t.type == FOMA_TYPE)
+      write_weights=false;
+    else
+      write_weights=true;
+    internal_transducer->print_symbol(out, write_weights);
     delete internal_transducer;
     return out;
   }

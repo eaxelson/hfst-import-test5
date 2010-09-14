@@ -252,7 +252,7 @@ namespace hfst
   HfstInputStream::HfstInputStream(const char* filename):
     header_eaten(false)
   {
-    try { type = stream_fst_type(filename); printf("#1\n"); }
+    try { type = stream_fst_type(filename); }
     catch (hfst::implementations::FileNotReadableException e)
       { throw e; }
     if ( not HfstTransducer::is_implementation_type_available(type))

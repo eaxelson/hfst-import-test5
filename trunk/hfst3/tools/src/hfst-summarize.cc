@@ -116,7 +116,7 @@ process_stream(HfstInputStream& instream)
           verbose_printf("Summarizing... %zu\n", transducer_n);
         }
       HfstTransducer trans(instream);
-      std::cerr << trans;
+      //std::cerr << trans;
       HfstMutableTransducer * mutt = HfstTransducer::hfst_transducer_to_internal(&trans);
       size_t states = 0;
       size_t final_states = 0;
