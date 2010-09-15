@@ -481,7 +481,7 @@ HfstInternalTransducer * sfst_to_internal_hfst_format(SFST::Transducer * t) {
 #endif
 
 #if HAVE_SFST
-SFST::Transducer * hfst_internal_format_to_sfst(HfstInternalTransducer * internal) {
+SFST::Transducer * hfst_internal_format_to_sfst(const HfstInternalTransducer * internal) {
 
   SFST::Transducer * t = new SFST::Transducer();
   if (internal->has_no_lines())
@@ -490,7 +490,7 @@ SFST::Transducer * hfst_internal_format_to_sfst(HfstInternalTransducer * interna
   std::map<unsigned int,SFST::Node*> state_map;
   state_map[0] = t->root_node();
 
-  std::set<InternalTransducerLine> *lines = internal->get_lines();
+  const std::set<InternalTransducerLine> *lines = internal->get_lines();
   for (std::set<InternalTransducerLine>::iterator it = lines->begin();
        it != lines->end(); it++)
     {
@@ -857,13 +857,13 @@ HfstInternalTransducer * hfst_ol_to_internal_hfst_format(hfst_ol::Transducer * t
 #if HAVE_FOMA
 // SymbolTable is converted to sigma, but the string-to-number
 // relations are changed...
-struct fsm * hfst_internal_format_to_foma(HfstInternalTransducer * internal_transducer) {
+struct fsm * hfst_internal_format_to_foma(const HfstInternalTransducer * internal_transducer) {
 
   struct fsm_construct_handle *h;
   struct fsm *net;
   h = fsm_construct_init(strdup(std::string("").c_str()));
 
-  std::set<InternalTransducerLine> *lines = internal_transducer->get_lines();
+  const std::set<InternalTransducerLine> *lines = internal_transducer->get_lines();
   for (std::set<InternalTransducerLine>::iterator it = lines->begin();
        it != lines->end(); it++) 
     {
@@ -899,7 +899,7 @@ struct fsm * hfst_internal_format_to_foma(HfstInternalTransducer * internal_tran
 #endif
 
 #if HAVE_OPENFST
-fst::StdVectorFst * hfst_internal_format_to_tropical_ofst(HfstInternalTransducer * internal_transducer) {
+fst::StdVectorFst * hfst_internal_format_to_tropical_ofst(const HfstInternalTransducer * internal_transducer) {
 
   fst::StdVectorFst * t = new fst::StdVectorFst();
   StateId start_state = t->AddState();
@@ -911,7 +911,7 @@ fst::StdVectorFst * hfst_internal_format_to_tropical_ofst(HfstInternalTransducer
   std::map<unsigned int,unsigned int> state_map;
   state_map[0] = start_state;
 
-  std::set<InternalTransducerLine> *lines = internal_transducer->get_lines();
+  const std::set<InternalTransducerLine> *lines = internal_transducer->get_lines();
   for (std::set<InternalTransducerLine>::iterator it = lines->begin();
        it != lines->end(); it++)
     {
@@ -943,7 +943,7 @@ fst::StdVectorFst * hfst_internal_format_to_tropical_ofst(HfstInternalTransducer
   return t;  
 }
 
-LogFst * hfst_internal_format_to_log_ofst(HfstInternalTransducer * internal_transducer) {
+LogFst * hfst_internal_format_to_log_ofst(const HfstInternalTransducer * internal_transducer) {
   
   LogFst * t = new LogFst();
   StateId start_state = t->AddState();
@@ -955,7 +955,7 @@ LogFst * hfst_internal_format_to_log_ofst(HfstInternalTransducer * internal_tran
   std::map<unsigned int,unsigned int> state_map;
   state_map[0] = start_state;
 
-  std::set<InternalTransducerLine> *lines = internal_transducer->get_lines();
+  const std::set<InternalTransducerLine> *lines = internal_transducer->get_lines();
   for (std::set<InternalTransducerLine>::iterator it = lines->begin();
        it != lines->end(); it++)
     {

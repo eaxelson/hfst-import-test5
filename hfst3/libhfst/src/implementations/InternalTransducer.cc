@@ -1,5 +1,7 @@
 #include "InternalTransducer.h"
 
+#include "../HfstTransducer.h"
+
 namespace hfst {
   namespace implementations {
     
@@ -82,13 +84,13 @@ namespace hfst {
       lines.insert(line);
     }
     
-    bool HfstInternalTransducer::has_no_lines() { 
+    bool HfstInternalTransducer::has_no_lines() const {
       return (lines.size() == 0); } 
     
-    std::set<InternalTransducerLine> * HfstInternalTransducer::get_lines() { 
+    const std::set<InternalTransducerLine> * HfstInternalTransducer::get_lines() const {
       return &lines; }
 
-    HfstState HfstInternalTransducer::max_state_number() {
+    HfstState HfstInternalTransducer::max_state_number() const {
       HfstState max=0;
       for (std::set<InternalTransducerLine>::iterator it = lines.begin(); 
 	   it != lines.end(); it++) {
@@ -408,7 +410,7 @@ namespace hfst {
 	      // epsilon transition to the initial state of the substituting transducer
 	      new_transducer.add_line(it->origin, offset, 0, 0, it->weight);
 
-	      std::set<InternalTransducerLine> * tr_lines = transducer.get_lines();
+	      const std::set<InternalTransducerLine> * tr_lines = transducer.get_lines();
 	      for (std::set<InternalTransducerLine>::iterator it2 = tr_lines->begin(); it2 != tr_lines->end(); it2++)
 		{
 		  if (it2->final_line)  // epsilon transition to the target state of the transition being substituted
@@ -483,11 +485,51 @@ namespace hfst {
 
     HfstInternalTransducer::HfstInternalTransducer( const HfstInternalTransducer &transducer)
     {
-      HfstInternalTransducer * retval = new HfstInternalTransducer();
+      //HfstInternalTransducer * retval = new HfstInternalTransducer();
       lines = transducer.lines;
       final_states = transducer.final_states;
       HfstAlphabet * alpha = new HfstAlphabet(*(transducer.alphabet));
       alphabet = alpha;
+    }
+
+    HfstInternalTransducer::HfstInternalTransducer(const HfstTransducer &transducer)
+    {
+      HfstInternalTransducer *tmp;
+
+      switch(transducer.type)
+	{
+#if HAVE_SFST
+	case SFST_TYPE:
+	  tmp = sfst_to_internal_hfst_format(transducer.implementation.sfst);
+	  break;
+#endif
+#if HAVE_OPENFST
+	case TROPICAL_OFST_TYPE:
+	  tmp = tropical_ofst_to_internal_hfst_format(transducer.implementation.tropical_ofst);
+	  break;
+	case LOG_OFST_TYPE:
+	  tmp = log_ofst_to_internal_hfst_format(transducer.implementation.log_ofst);
+	  break;
+#endif
+#if HAVE_FOMA
+	case FOMA_TYPE:
+	  tmp = foma_to_internal_hfst_format(transducer.implementation.foma);
+	  break;
+#endif
+	case HFST_OL_TYPE:
+	case HFST_OLW_TYPE:
+	  throw hfst::exceptions::FunctionNotImplementedException();
+	  break;
+	case UNSPECIFIED_TYPE:
+	case ERROR_TYPE:
+	default:
+	  throw hfst::exceptions::TransducerHasWrongTypeException();
+	  break;
+	}
+      lines = tmp->lines;
+      final_states = tmp->final_states;
+      alphabet = new HfstAlphabet(*(tmp->alphabet));
+      delete tmp;
     }
 
     HfstStateIterator::HfstStateIterator(const HfstInternalTransducer &transducer)

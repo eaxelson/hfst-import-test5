@@ -438,10 +438,8 @@ namespace hfst
     /** \brief Create a deep copy of transducer \a another. **/
     HfstTransducer(const HfstTransducer &another);
 
-#if HAVE_MUTABLE
     /** \brief Create an ordinary transducer equivalent to mutable transducer \a t. **/
-    HfstTransducer(const HfstMutableTransducer &t);
-#endif
+    HfstTransducer(const HfstMutableTransducer &t, ImplementationType type);
 
     /** \brief Delete operator for HfstTransducer. **/
     ~HfstTransducer(void);
@@ -787,13 +785,13 @@ fclose(ifile);
 	@see convert(ImplementationType type) */
     static HfstTransducer &convert(const HfstTransducer &t, ImplementationType type);
 
-    static HfstTransducer * 
+    /*    static HfstTransducer * 
       internal_to_hfst_transducer(
 	hfst::implementations::HfstInternalTransducer * internal_transducer, 
 	ImplementationType type);
     static hfst::implementations::HfstInternalTransducer * 
       hfst_transducer_to_internal(
-	const HfstTransducer *transducer);
+      const HfstTransducer *transducer);*/
 
     static bool is_implementation_type_available(ImplementationType type);
 
@@ -803,11 +801,13 @@ fclose(ifile);
     friend std::ostream &operator<<(std::ostream &out, HfstTransducer &t);
     friend class HfstInputStream;
     friend class HfstOutputStream;
-#if HAVE_MUTABLE
-    friend class HfstMutableTransducer;
-    friend class HfstStateIterator;
-    friend class HfstTransitionIterator;
-#endif
+    friend class hfst::implementations::HfstInternalTransducer;
+
+    //#if HAVE_MUTABLE
+    //friend class HfstMutableTransducer;
+    //friend class HfstStateIterator;
+    //friend class HfstTransitionIterator;
+    //#endif
 #if HAVE_OPENFST
     friend class HfstGrammar;
 #endif

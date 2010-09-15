@@ -9,9 +9,14 @@ namespace hfst {
       add("@_IDENTITY_SYMBOL_@",2);
     }
     
-    HfstAlphabet::HfstAlphabet(const HfstAlphabet &alpha) {
-      sm = alpha.sm;
-      cm = alpha.cm;
+    HfstAlphabet::HfstAlphabet(const HfstAlphabet &alpha) 
+    {
+      for (CharMap::const_iterator it = alpha.cm.begin(); it != alpha.cm.end(); it++) {
+	cm[it->first] = HfstBasic::fst_strdup(it->second);
+      }
+      for (SymbolMap::const_iterator it = alpha.sm.begin(); it != alpha.sm.end(); it++) {
+	sm[HfstBasic::fst_strdup(it->first)] = it->second;
+      }
       pairs = alpha.pairs;
     }
 
