@@ -18,13 +18,13 @@ void print(HfstMutableTransducer &t)
     HfstTransitionIterator IT(t,s);
     while (not IT.done()) {
       HfstTransition tr = IT.value();
-      cout << s << "\t" << tr.get_target_state() << "\t"
-	   << tr.get_input_symbol() << "\t" << tr.get_output_symbol()
-	   << "\t" << tr.get_weight();
+      cout << s << "\t" << tr.target << "\t"
+	   << tr.isymbol << "\t" << tr.osymbol
+	   << "\t" << tr.weight;
       cout << "\n";
       IT.next();
     }
-    if ( t.is_final(s) )
+    if ( t.is_final_state(s) )
       cout << s << "\t" << t.get_final_weight(s) << "\n";
     it.next();
   }
@@ -126,7 +126,7 @@ int main(int argc, char **argv) {
     HfstTransducer anon2(4,1,TROPICAL_OFST_TYPE);
     anon1.disjunct(anon2);
     anon1.minimize();
-    std::cerr << anon1 << "\n";
+    //std::cerr << anon1 << "\n";
   }
 
   {
@@ -134,7 +134,7 @@ int main(int argc, char **argv) {
     HfstTransducer anon2(4,1,LOG_OFST_TYPE);
     anon1.disjunct(anon2);
     anon1.minimize();
-    std::cerr << anon1 << "\n";
+    //std::cerr << anon1 << "\n";
   }
 
   {
@@ -142,7 +142,7 @@ int main(int argc, char **argv) {
     HfstTransducer anon2(4,1,SFST_TYPE);
     anon1.disjunct(anon2);
     anon1.minimize();
-    std::cerr << anon1 << "\n";
+    //std::cerr << anon1 << "\n";
   }
 
   {
@@ -150,7 +150,7 @@ int main(int argc, char **argv) {
     HfstTransducer anon2(4,1,FOMA_TYPE);
     anon1.disjunct(anon2);
     anon1.minimize();
-    std::cerr << anon1 << "\n";
+    //std::cerr << anon1 << "\n";
   }
 
   // HfstTransducer two_level_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet, ImplementationType type);
@@ -208,6 +208,7 @@ int main(int argc, char **argv) {
   assert( HfstTransducer::are_equivalent(*rule_transducers3[0], *rule_transducers3[1]) );
   assert( HfstTransducer::are_equivalent(*rule_transducers3[0], *rule_transducers3[2]) );
 
+
   // HfstTransducer & replace_in_context(HfstTransducerPair &context, ReplaceType repl_type, HfstTransducer &t, bool optional, StringPairSet &alphabet)
 
   {
@@ -224,18 +225,16 @@ int main(int argc, char **argv) {
     alphabet.insert(StringPair("c","c"));
     HfstTransducer rule = rules::replace_up(context, mapping, false, alphabet);
     rule.minimize();
-    std::cerr << rule << "\n";
+    //std::cerr << rule << "\n";
   }
 
-  exit(0);
-
-#ifdef FOO
 
   //HfstTransducer t(TROPICAL_OFST_TYPE);
   //t.test_minimize();
   //exit(0);
 
-  ImplementationType types[] = {SFST_TYPE, TROPICAL_OFST_TYPE, LOG_OFST_TYPE, FOMA_TYPE};
+
+  //ImplementationType types[] = {SFST_TYPE, TROPICAL_OFST_TYPE, LOG_OFST_TYPE, FOMA_TYPE};
   for (int i=0; i<4; i++) {
     {
       // Test the empty transducer constructors for all implementation types.
@@ -243,15 +242,14 @@ int main(int argc, char **argv) {
       assert (tr.get_type() == types[i]);
       for (int j=0; j<4; j++) {
 	// Test the conversions.
-	HfstTransducer trconv = tr.convert(types[j]);
-	assert (tr.get_type() == types[j]);
-	std::cerr << tr << "--\n" << trconv;
+	HfstTransducer trconv = HfstTransducer::convert(tr, types[j]);
+	assert (trconv.get_type() == types[j]);
 	assert (HfstTransducer::are_equivalent(tr, trconv));
 	HfstTransducer tranother(types[j]);
 	assert (HfstTransducer::are_equivalent(tr, tranother));
       }
       HfstMutableTransducer mut(tr);
-      HfstTransducer foo(mut);
+      HfstTransducer foo(mut,types[i]);
       assert (HfstTransducer::are_equivalent(tr, foo));
     }
     //printf("Empty constructors tested on transducers of type %i.\n", types[i]);
@@ -268,7 +266,7 @@ int main(int argc, char **argv) {
 	assert (HfstTransducer::are_equivalent(tr, tranother));
       }
       HfstMutableTransducer mut(tr);
-      HfstTransducer foo(mut);
+      HfstTransducer foo(mut, types[i]);
       assert (HfstTransducer::are_equivalent(tr, foo));
     }
     //printf("One-transition constructors tested on transducers of type %i.\n", types[i]);
@@ -285,11 +283,11 @@ int main(int argc, char **argv) {
 	assert (HfstTransducer::are_equivalent(tr, tranother));
 	// test the att format
 	tr.write_in_att_format("testfile");
-	HfstTransducer foo = HfstTransducer::read_in_att_format("testfile");  // WrongTypeException
+	HfstTransducer foo = HfstTransducer::read_in_att_format("testfile", types[i], "@_EPSILON_SYMBOL_@");  // WrongTypeException
 	assert (HfstTransducer::are_equivalent(tr, foo));
       }
       HfstMutableTransducer mut(tr);
-      HfstTransducer foo(mut);
+      HfstTransducer foo(mut, types[i]);
       assert (HfstTransducer::are_equivalent(tr, foo));
     }
     //printf("Two-transition constructors tested on transducers of type %i.\n", types[i]);
@@ -312,7 +310,7 @@ int main(int argc, char **argv) {
 	assert (HfstTransducer::are_equivalent(tr, tranother));
       }
       HfstMutableTransducer mut(tr);
-      HfstTransducer foo(mut);
+      HfstTransducer foo(mut, types[i]);
       assert (HfstTransducer::are_equivalent(tr, foo));
     }
     //printf("One-string constructors tested on transducers of type %i.\n", types[i]);
@@ -332,7 +330,7 @@ int main(int argc, char **argv) {
 	assert (HfstTransducer::are_equivalent(tr, tranother));
       }
       HfstMutableTransducer mut(tr);
-      HfstTransducer foo(mut);
+      HfstTransducer foo(mut, types[i]);
       assert (HfstTransducer::are_equivalent(tr, foo));
     }
     //printf("Two-string constructors tested on transducers of type %i.\n", types[i]);
@@ -342,6 +340,11 @@ int main(int argc, char **argv) {
     }
     printf("Constructors and delete tested on transducers of type %i.\n", types[i]);
   }
+
+  exit(0);
+}
+
+#ifdef FOO
 
   {
       HfstTransducer foo = HfstTransducer::read_in_att_format("test_transducer.att");
@@ -674,11 +677,9 @@ int main(int argc, char **argv) {
 
   return 0;
 
-#endif
-
 }
 
-
+#endif
 #ifdef FOO
 
   // create transducer t1

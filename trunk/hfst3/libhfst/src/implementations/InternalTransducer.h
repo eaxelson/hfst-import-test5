@@ -10,6 +10,10 @@
 #include <iostream>
 
 namespace hfst {
+  class HfstTransducer;
+}
+
+namespace hfst {
   namespace implementations {
   
     typedef unsigned int HfstState;
@@ -54,14 +58,15 @@ namespace hfst {
       HfstInternalTransducer();
       ~HfstInternalTransducer();
       HfstInternalTransducer(const HfstInternalTransducer &transducer);
+      HfstInternalTransducer(const HfstTransducer &transducer);
 
       void add_line(HfstState final_state, float final_weight); 
       void add_line(HfstState origin_state, HfstState target_state,
 		    HfstState isymbol, HfstState osymbol,
 		    float weight);
-      bool has_no_lines();
-      std::set<InternalTransducerLine> *get_lines();
-      HfstState max_state_number();
+      bool has_no_lines() const;
+      const std::set<InternalTransducerLine> *get_lines() const;
+      HfstState max_state_number() const;
 
       void add_transition(HfstTransition &transition);
       void add_final_state(HfstState s, float weight);

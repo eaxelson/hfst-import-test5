@@ -896,13 +896,13 @@ namespace hfst
     TheAlphabet.clear_pairs();
     //TheAlphabet.copy(t->alphabet);
 
-    HfstMutableTransducer * t  = HfstTransducer::hfst_transducer_to_internal(tr);
+    HfstMutableTransducer t(*tr);
     
-    HfstStateIterator state_it(*t);
+    HfstStateIterator state_it(t);
     while (not state_it.done()) 
       {
 	unsigned int s = state_it.value();
-	HfstTransitionIterator transition_it(*t,s);
+	HfstTransitionIterator transition_it(t,s);
 	while (not transition_it.done()) 
 	  {
 	    HfstTransition tr = transition_it.value();

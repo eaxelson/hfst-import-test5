@@ -160,21 +160,21 @@ namespace hfst { namespace implementations {
     /* Read a transducer in internal format and return the equivalent
        SFST::Transducer *. */
 #if HAVE_SFST
-    SFST::Transducer * hfst_internal_format_to_sfst(HfstInternalTransducer * t);
+    SFST::Transducer * hfst_internal_format_to_sfst(const HfstInternalTransducer * t);
 #endif
 
 #if HAVE_FOMA
-    struct fsm * hfst_internal_format_to_foma(HfstInternalTransducer * t);
+    struct fsm * hfst_internal_format_to_foma(const HfstInternalTransducer * t);
 #endif    
 
     /* Read a transducer in internal format and return the equivalent
        fst::StdVectorFst * */
 #if HAVE_OPENFST
-    fst::StdVectorFst * hfst_internal_format_to_tropical_ofst(HfstInternalTransducer * t);
+    fst::StdVectorFst * hfst_internal_format_to_tropical_ofst(const HfstInternalTransducer * t);
 
     /* Read a transducer in internal format and return the equivalent
        LogFst * */
-    LogFst * hfst_internal_format_to_log_ofst(HfstInternalTransducer * t);
+    LogFst * hfst_internal_format_to_log_ofst(const HfstInternalTransducer * t);
     
     /* Read a transducer in internal format and return the equivalent
        hfst_ol::Transducer * */

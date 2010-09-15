@@ -670,10 +670,7 @@ namespace hfst { namespace implementations {
   
   Transducer * SfstTransducer::compose
   (Transducer * t1, Transducer * t2)
-  { printf("Sfst::compose:\n");
-    print_test(t1);
-    printf("--\n");
-    print_test(t2);
+  { 
     return &t1->operator||(*t2); }
 
   Transducer * SfstTransducer::concatenate
@@ -694,7 +691,7 @@ namespace hfst { namespace implementations {
 
   bool SfstTransducer::are_equivalent(Transducer * t1, Transducer * t2)
   {
-    return (t1 == t2);
+    return (*t1 == *t2);
   }
   
   bool SfstTransducer::is_cyclic(Transducer * t)

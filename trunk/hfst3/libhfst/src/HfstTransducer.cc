@@ -409,6 +409,41 @@ namespace hfst
       }
   }
 
+  HfstTransducer::HfstTransducer(const HfstMutableTransducer &mut, ImplementationType type):
+    type(type),anonymous(mut.alphabet == NULL),is_trie(false)
+  {
+    if (not is_implementation_type_available(type))
+      throw hfst::exceptions::ImplementationTypeNotAvailableException();
+
+    switch (type)
+      {
+#if HAVE_SFST
+      case SFST_TYPE:
+	implementation.sfst = hfst_internal_format_to_sfst(&mut);
+	break;
+#endif
+#if HAVE_OPENFST
+      case TROPICAL_OFST_TYPE:
+	implementation.tropical_ofst = hfst_internal_format_to_tropical_ofst(&mut);
+	  
+	break;
+      case LOG_OFST_TYPE:
+	implementation.log_ofst = hfst_internal_format_to_log_ofst(&mut);	  
+	break;
+#endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+	implementation.foma = hfst_internal_format_to_foma(&mut);
+	break;
+#endif
+      case UNSPECIFIED_TYPE:
+      case ERROR_TYPE:
+      default:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+      }
+  }
+
+
   HfstTransducer::~HfstTransducer(void)
   {
     if (not is_implementation_type_available(type))
@@ -1697,11 +1732,9 @@ type(type),anonymous(false),is_trie(false)
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();    
 
-    hfst::implementations::HfstInternalTransducer * internal_transducer =
-      HfstTransducer::hfst_transducer_to_internal(&t);    
+    hfst::implementations::HfstInternalTransducer internal_transducer(t);    
 
-    HfstTransducer * retval = 
-      HfstTransducer::internal_to_hfst_transducer(
+    HfstTransducer * retval = new HfstTransducer(
 	internal_transducer, type);    
 
     return *retval;
@@ -1918,6 +1951,7 @@ type(type),anonymous(false),is_trie(false)
     return *this;
   }
 
+/*
   hfst::implementations::HfstInternalTransducer * 
   HfstTransducer::hfst_transducer_to_internal(
                     const HfstTransducer *transducer) {
@@ -1954,7 +1988,8 @@ type(type),anonymous(false),is_trie(false)
     return internal_transducer;
   }
 
-
+*/
+/*
   HfstTransducer * HfstTransducer::internal_to_hfst_transducer(
 		     hfst::implementations::HfstInternalTransducer * internal_transducer, 
 		     ImplementationType type)
@@ -1997,6 +2032,7 @@ type(type),anonymous(false),is_trie(false)
       }
     return retval;
   }
+*/
 
 void HfstTransducer::write_in_att_format(const char * filename, bool print_weights)
 {
@@ -2009,10 +2045,8 @@ void HfstTransducer::write_in_att_format(const char * filename, bool print_weigh
 
 void HfstTransducer::write_in_att_format(FILE * ofile, bool print_weights)
 {
-  hfst::implementations::HfstInternalTransducer * internal_transducer = 
-    hfst_transducer_to_internal(this);
-  internal_transducer->print_symbol(ofile, print_weights);
-  delete internal_transducer;
+  hfst::implementations::HfstInternalTransducer internal_transducer(*this);
+  internal_transducer.print_symbol(ofile, print_weights);
 }
 
 HfstTransducer &HfstTransducer::read_in_att_format(const char * filename, ImplementationType type, const std::string &epsilon_symbol)
@@ -2032,7 +2066,7 @@ HfstTransducer &HfstTransducer::read_in_att_format(FILE * ifile, ImplementationT
   hfst::implementations::HfstInternalTransducer * internal_transducer = new hfst::implementations::HfstInternalTransducer();
   internal_transducer->alphabet = new hfst::implementations::HfstAlphabet();
   internal_transducer->read_symbol(ifile, epsilon_symbol);
-  HfstTransducer *retval = internal_to_hfst_transducer(internal_transducer,type);
+  HfstTransducer *retval = new HfstTransducer(*internal_transducer,type);
   delete internal_transducer;
   return *retval;
 }
@@ -2116,13 +2150,12 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
   {
     throw hfst::exceptions::FunctionNotImplementedException();
     HfstTokenizer tok;
-    HfstMutableTransducer * t = 
-      HfstTransducer::hfst_transducer_to_internal(this);
-    HfstStateIterator state_it(*t);
+    HfstMutableTransducer t(*this);
+    HfstStateIterator state_it(t);
     while (not state_it.done()) 
       {
 	HfstState s = state_it.value();
-	HfstTransitionIterator transition_it(*t,s);
+	HfstTransitionIterator transition_it(t,s);
 	while (not transition_it.done()) 
 	  {
 	    HfstTransition tr = transition_it.value();
@@ -2137,22 +2170,19 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
 	  }
 	state_it.next();
       }
-    delete t;
     return tok;
   }
 
 
 std::ostream &operator<<(std::ostream &out,HfstTransducer &t)
   {
-    hfst::implementations::HfstInternalTransducer * internal_transducer =
-      HfstTransducer::hfst_transducer_to_internal(&t);
+    hfst::implementations::HfstInternalTransducer internal_transducer(t);
     bool write_weights;
     if (t.type == SFST_TYPE || t.type == FOMA_TYPE)
       write_weights=false;
     else
       write_weights=true;
-    internal_transducer->print_symbol(out, write_weights);
-    delete internal_transducer;
+    internal_transducer.print_symbol(out, write_weights);
     return out;
   }
 

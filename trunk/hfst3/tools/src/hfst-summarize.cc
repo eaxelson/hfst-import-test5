@@ -117,7 +117,7 @@ process_stream(HfstInputStream& instream)
         }
       HfstTransducer trans(instream);
       //std::cerr << trans;
-      HfstMutableTransducer * mutt = HfstTransducer::hfst_transducer_to_internal(&trans);
+      HfstMutableTransducer mutt(trans);
       size_t states = 0;
       size_t final_states = 0;
       //size_t paths = 0;
@@ -135,20 +135,20 @@ process_stream(HfstInputStream& instream)
       pair<string,unsigned int> most_ambiguous_output;
       unsigned int initial_state = 0; // mutt.get_initial_state();
       // iterate states in random orderd
-      for (HfstStateIterator stateIt(*mutt);
+      for (HfstStateIterator stateIt(mutt);
            !stateIt.done();
            stateIt.next())
         {
           unsigned int s = stateIt.value();
           ++states;
-          if (mutt->is_final_state(s))
+          if (mutt.is_final_state(s))
             {
               ++final_states;
             }
           size_t arcs_here = 0;
           map<string,unsigned int> input_ambiguity;
           map<string,unsigned int> output_ambiguity;
-          for (HfstTransitionIterator arcIt(*mutt, s);
+          for (HfstTransitionIterator arcIt(mutt, s);
                !arcIt.done();
                arcIt.next())
             {
