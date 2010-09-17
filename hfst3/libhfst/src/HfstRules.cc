@@ -104,8 +104,8 @@ namespace hfst
 
       // m1 >> ( m2 >> t )
       HfstTransducer t_copy(t);
-      t_copy.insert_freely(StringPair(m2,m2));
       t_copy.insert_freely(StringPair(m1,m1));
+      t_copy.insert_freely(StringPair(m2,m2));
 
       t_copy.minimize();
 
@@ -303,7 +303,7 @@ namespace hfst
     HfstTransducer replace_in_context(HfstTransducerPair &context, ReplaceType repl_type, HfstTransducer &t, bool optional, StringPairSet &alphabet)
     {
 
-      bool DEBUG=false;
+      bool DEBUG=true;
 
       if (DEBUG) printf("replace_in_context...\n");
 
@@ -351,6 +351,7 @@ namespace hfst
       ibt.disjunct(eps_to_leftm);
       ibt.disjunct(eps_to_rightm);
       ibt.repeat_star();
+      ibt.minimize();
 
       if (DEBUG) printf("  ..ibt created\n");
 
@@ -361,6 +362,7 @@ namespace hfst
       rbt.disjunct(leftm_to_eps);
       rbt.disjunct(rightm_to_eps);
       rbt.repeat_star();
+      rbt.minimize();
 
       if (DEBUG) printf("  ..rbt created\n");
 
@@ -377,21 +379,30 @@ namespace hfst
       tmp.concatenate(rightm_to_rightm);
       tmp.concatenate(universal_fst(alphabet,type));
       HfstTransducer cbt = negation_fst(tmp, alphabet);
-
+      cbt.minimize();
+      if (DEBUG) cbt.write_in_att_format("compiler_cbt.hfst",false);
       if (DEBUG) printf("  ..cbt created\n");
 
       // left context transducer .* (<R> >> (<L> >> LEFT_CONTEXT)) || !(.*<L>)    
-      HfstTransducer lct = replace_context(context.first, leftm, rightm, alphabet);  
-
+      HfstTransducer lct = replace_context(context.first, leftm, rightm, alphabet); 
+      lct.write_in_att_format("lct.att",true);
+      lct.minimize();
+      if (DEBUG) lct.write_in_att_format("compiler_lct.hfst",false);
       if (DEBUG) printf("  ..lct created\n");
 
       // right context transducer:  reversion( (<R> >> (<L> >> reversion(RIGHT_CONTEXT))) .* || !(<R>.*) )
       HfstTransducer right_rev(context.second);
-      right_rev.reverse();
+      if (DEBUG) right_rev.write_in_att_format("right_context.att",true);
+      if (DEBUG) printf("(1)\n");
+      right_rev.reverse();  // MINIMIZATION TAKES LONG! // *** HERE ***
+      if (DEBUG) printf("(2)\n");
       HfstTransducer rct = replace_context(right_rev, rightm, leftm, alphabet);
+      if (DEBUG) printf("(3)\n");
       rct.reverse();
+      if (DEBUG) printf("(4)\n");
       rct.minimize(); // ADDED
-
+      if (DEBUG) printf("(5)\n");
+      if (DEBUG) rct.write_in_att_format("compiler_rct.hfst",false);
       if (DEBUG) printf("  ..rct created\n");
 
       // unconditional replace transducer      
@@ -400,6 +411,7 @@ namespace hfst
 	rt = replace_transducer( t, leftm, rightm, REPL_UP, alphabet );
       else
 	rt = replace_transducer( t, leftm, rightm, REPL_DOWN, alphabet );
+      rt.minimize();
 
       if (DEBUG) printf("  ..rt createD\n");
 
@@ -407,6 +419,7 @@ namespace hfst
       HfstTransducer result(ibt);
       if (DEBUG) printf("#0\n");
       result.compose(cbt);
+      result.minimize(); // added
       
       if (DEBUG) printf("#1\n");
 

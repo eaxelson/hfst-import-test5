@@ -102,6 +102,46 @@ namespace hfst {
       return max;
     }
 
+    void HfstInternalTransducer::swap_states(unsigned int s1, unsigned int s2) {
+      HfstInternalTransducer new_transducer;
+      for (std::set<InternalTransducerLine>::iterator it = lines.begin(); 
+	   it != lines.end(); it++) {	
+	if (it->final_line) {
+	  unsigned int new_state_number;
+	  if (it->origin == s1)
+	    new_state_number=s2;
+	  else if (it->origin == s2)
+	    new_state_number=s1;
+	  else
+	    new_state_number = it->origin;
+	  new_transducer.add_line(new_state_number, it->weight);
+	}
+	else {
+	  unsigned int new_origin_number, new_target_number;
+
+	  if (it->origin == s1)
+	    new_origin_number=s2;
+	  else if (it->origin == s2)
+	    new_origin_number=s1;
+	  else
+	    new_origin_number = it->origin;
+
+	  if (it->target == s1)
+	    new_target_number=s2;
+	  else if (it->target == s2)
+	    new_target_number=s1;
+	  else
+	    new_target_number = it->target;
+
+	  new_transducer.add_line(new_origin_number, new_target_number, 
+				  it->isymbol, it->osymbol,
+				  it->weight);
+	}
+      }
+      lines.clear(); // is this needed?
+      lines=new_transducer.lines;
+    }
+
     void HfstInternalTransducer::read_number(FILE *file) 
     {
       char line [255];

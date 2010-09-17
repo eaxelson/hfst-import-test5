@@ -2148,7 +2148,7 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
 
   HfstTokenizer HfstTransducer::create_tokenizer() 
   {
-    throw hfst::exceptions::FunctionNotImplementedException();
+    //throw hfst::exceptions::FunctionNotImplementedException();
     HfstTokenizer tok;
     HfstMutableTransducer t(*this);
     HfstStateIterator state_it(t);

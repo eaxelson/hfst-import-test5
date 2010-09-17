@@ -533,7 +533,7 @@ HfstInternalTransducer * foma_to_internal_hfst_format(struct fsm * t) {
   HfstInternalTransducer * internal_transducer = new HfstInternalTransducer();
   struct fsm_state *fsm;
   fsm = t->states;
-  int start_state_id=0;
+  int start_state_id;
   bool start_state_found=false;
 
   // For every line in foma transducer:
@@ -544,10 +544,10 @@ HfstInternalTransducer * foma_to_internal_hfst_format(struct fsm * t) {
       // If the start state has not yet been encountered.
       if (not start_state_found) {
 	start_state_id = (fsm+i)->state_no;
-	if (start_state_id != 0) {
-	  printf("ERROR: in foma transducer: start state is not numbered as zero\n");
-	  throw ErrorException();
-	}
+	//	if (start_state_id != 0) {
+	//  printf("ERROR: in foma transducer: start state is not numbered as zero\n");
+	//  throw ErrorException();
+	//}
 	start_state_found=true;
       }
       // If the start state is encountered again, 
@@ -580,6 +580,11 @@ HfstInternalTransducer * foma_to_internal_hfst_format(struct fsm * t) {
     // throw an exception.
     throw TransducerHasNoStartStateException();
   }
+  
+  // If start state number (N) is not zero, swap state numbers N and zero 
+  // in internal transducer.
+  if (start_state_id != 0)
+    internal_transducer->swap_states(start_state_id,0);
 
   struct sigma * p = t->sigma;
   while (p != NULL) {

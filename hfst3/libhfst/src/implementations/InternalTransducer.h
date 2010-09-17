@@ -67,6 +67,7 @@ namespace hfst {
       bool has_no_lines() const;
       const std::set<InternalTransducerLine> *get_lines() const;
       HfstState max_state_number() const;
+      void swap_states(unsigned int s1, unsigned int s2);
 
       void add_transition(HfstTransition &transition);
       void add_final_state(HfstState s, float weight);
