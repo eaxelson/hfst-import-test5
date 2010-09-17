@@ -32,14 +32,7 @@ namespace hfst
   HfstTransducer * HfstCompiler::make_transducer(Range *r1, Range *r2, ImplementationType type)
   {
 
-    HfstTransducer * t = new HfstTransducer(type);
-
-    /*
-    if (type == SFST_TYPE && SFST_IN_USE) {
-       t->implementation.sfst = sfst_interface->make_transducer(r1,r2);
-       return t;
-    }
-    */
+    StringPairSet sps;
 
     if (r1 == NULL || r2 == NULL) {
       if (!Alphabet_Defined)
@@ -50,21 +43,19 @@ namespace hfst
 	  it!=TheAlphabet.end(); it++) {
 	if ((r1 == NULL || in_range(it->first, r1)) &&
 	    (r2 == NULL || in_range(it->second, r2))) {
-	  HfstTransducer tr(
-			    TheAlphabet.code2symbol(it->first),
-			    TheAlphabet.code2symbol(it->second),
-			    type);
-	  t->disjunct(tr);
+
+	  sps.insert(StringPair(
+		      std::string(TheAlphabet.code2symbol(it->first)),
+		      std::string(TheAlphabet.code2symbol(it->second)) ) );
 	}
       }      
     }
     else {
       for (;;) {
-	HfstTransducer tr(
-			  TheAlphabet.code2symbol(r1->character),
-			  TheAlphabet.code2symbol(r2->character),
-			  type);
-	t->disjunct(tr);
+	  sps.insert(StringPair(
+		      std::string(TheAlphabet.code2symbol(r1->character)),
+		      std::string(TheAlphabet.code2symbol(r2->character)) ) );
+
 	if (!r1->next && !r2->next)
 	  break;
 	if (r1->next)
@@ -74,7 +65,7 @@ namespace hfst
       }
     }
 
-    return t;    
+    return new HfstTransducer(sps, type);    
   }
   
   HfstTransducer * HfstCompiler::new_transducer( Range *r1, Range *r2, ImplementationType type )

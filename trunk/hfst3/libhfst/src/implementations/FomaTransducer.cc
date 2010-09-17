@@ -374,6 +374,7 @@ namespace hfst { namespace implementations {
     return retval;
   }
 
+    // 
   fsm * FomaTransducer::define_transducer(const StringPairSet &sps)
   {
     if (sps.empty())
@@ -388,6 +389,7 @@ namespace hfst { namespace implementations {
 	  retval = fsm_cross_product( fsm_symbol(strdup(it->first.c_str())), fsm_symbol(strdup(it->second.c_str())) );
 	else
 	  retval = fsm_union( retval, fsm_cross_product( fsm_symbol(strdup(it->first.c_str())), fsm_symbol(strdup(it->second.c_str())) ) );
+	retval = fsm_minimize(retval); // if minimization is not done regularly, minimizing is really slow at the end
       }
     return retval;
   }
