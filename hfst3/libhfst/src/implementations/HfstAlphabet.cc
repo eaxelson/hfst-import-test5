@@ -17,7 +17,9 @@ namespace hfst {
       for (SymbolMap::const_iterator it = alpha.sm.begin(); it != alpha.sm.end(); it++) {
 	sm[HfstBasic::fst_strdup(it->first)] = it->second;
       }
-      pairs = alpha.pairs;
+      for (NumberPairSet::const_iterator it = alpha.pairs.begin(); it != alpha.pairs.end(); it++) {
+	pairs.insert(NumberPair(it->first, it->second));
+      }
     }
 
     HfstAlphabet::~HfstAlphabet() {
@@ -124,7 +126,7 @@ namespace hfst {
       std::vector<unsigned int> result;
       for( CharMap::const_iterator it=cm.begin(); it!=cm.end(); it++ ) {
 	unsigned int c = it->first;
-	if (c != 0) { // Label::epsilon
+	if (c != 0 && c != 1 && c != 2) { // no special symbols
 	  size_t i;
 	  for( i=0; i<sym.size(); i++ )
 	    if (sym[i] == c)
