@@ -141,6 +141,8 @@ namespace hfst
 
       ct.minimize();
 
+      // return ct;  // DIFFER
+
       if (DEBUG) printf("    (4)\n");
 
       // mt = m2* m1 .*
@@ -316,7 +318,6 @@ namespace hfst
       if (DEBUG) printf("  ..transducers have the same type\n");
 
 
-
       // test that both context transducers are automata
       // this could be done more efficiently...
       /*HfstTransducer t1_proj(context.first);
@@ -352,7 +353,7 @@ namespace hfst
       ibt.disjunct(eps_to_rightm);
       ibt.repeat_star();
       ibt.minimize();
-
+      //return ibt;
       if (DEBUG) printf("  ..ibt created\n");
 
       // Create the remove boundary transducer (.|<L>:<>|<R>:<>)*    
@@ -363,7 +364,7 @@ namespace hfst
       rbt.disjunct(rightm_to_eps);
       rbt.repeat_star();
       rbt.minimize();
-
+      //return rbt;
       if (DEBUG) printf("  ..rbt created\n");
 
       // Add the markers to the alphabet
@@ -382,13 +383,14 @@ namespace hfst
       cbt.minimize();
       if (DEBUG) cbt.write_in_att_format("compiler_cbt.hfst",false);
       if (DEBUG) printf("  ..cbt created\n");
-
+      //return cbt;
       // left context transducer .* (<R> >> (<L> >> LEFT_CONTEXT)) || !(.*<L>)    
       HfstTransducer lct = replace_context(context.first, leftm, rightm, alphabet); 
       lct.write_in_att_format("lct.att",true);
       lct.minimize();
       if (DEBUG) lct.write_in_att_format("compiler_lct.hfst",false);
       if (DEBUG) printf("  ..lct created\n");
+      // return lct; // EQUAL
 
       // right context transducer:  reversion( (<R> >> (<L> >> reversion(RIGHT_CONTEXT))) .* || !(<R>.*) )
       HfstTransducer right_rev(context.second);
@@ -404,6 +406,7 @@ namespace hfst
       if (DEBUG) printf("(5)\n");
       if (DEBUG) rct.write_in_att_format("compiler_rct.hfst",false);
       if (DEBUG) printf("  ..rct created\n");
+      // return rct; // EQUAL
 
       // unconditional replace transducer      
       HfstTransducer rt(type);
@@ -412,8 +415,9 @@ namespace hfst
       else
 	rt = replace_transducer( t, leftm, rightm, REPL_DOWN, alphabet );
       rt.minimize();
-
+      // return rt;  // TEST
       if (DEBUG) printf("  ..rt createD\n");
+
 
       // build the conditional replacement transducer
       HfstTransducer result(ibt);
@@ -445,6 +449,7 @@ namespace hfst
       if (DEBUG) printf("#4\n");
 
       result.minimize();  // ADDED
+
       result.compose(rbt);
 
       if (DEBUG) printf("#5\n");
