@@ -1478,12 +1478,22 @@ type(type),anonymous(false),is_trie(false)
     if (this->type != another.type)
       throw hfst::exceptions::TransducerTypeMismatchException();
 
+    bool DEBUG=false;
+
+    if (DEBUG) printf("harmonizing for composition..\n");
+
     this->harmonize(const_cast<HfstTransducer&>(another));
+
+    if (DEBUG) printf("..done\n");
 
     if (this->type != FOMA_TYPE) 
       {
+	if (DEBUG) printf("substituting for composition..\n");
+
 	this->substitute("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",false,true);
 	(const_cast<HfstTransducer&>(another)).substitute("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",true,false);
+
+	if (DEBUG) printf("..done\n");
       }
 
     switch (this->type)
@@ -1537,8 +1547,12 @@ type(type),anonymous(false),is_trie(false)
 #if HAVE_FOMA
     if (this->type != FOMA_TYPE) 
       {
+	if (DEBUG) printf("substituting after composition..\n");
+
 	this->substitute(*substitute_single_identity_with_unknown);
 	(const_cast<HfstTransducer&>(another)).substitute(*substitute_unknown_identity_pairs);
+
+	if (DEBUG) printf("..done\n");
       }
 #endif
 

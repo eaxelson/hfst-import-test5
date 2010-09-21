@@ -43,6 +43,11 @@ namespace hfst {
     
     //bool HfstAlphabet::contains_special_symbols(StringPair sp);  TODO!
 
+    void HfstAlphabet::print_pairs(FILE *file) {
+      for (NumberPairSet::const_iterator it = pairs.begin(); it != pairs.end(); it++)
+	fprintf(file, "%s:%s\n", code2symbol(it->first), code2symbol(it->second));
+    }
+
     void HfstAlphabet::print() {
       printf("alphabet..\n");
       for( CharMap::iterator it=cm.begin(); it!=cm.end(); it++ )

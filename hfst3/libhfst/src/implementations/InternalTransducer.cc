@@ -178,6 +178,7 @@ namespace hfst {
 	{
 	  if (*line == '-') // transducer separator line is "--"
 	    return;
+
 	  char a1 [100]; char a2 [100]; char a3 [100]; char a4 [100]; char a5 [100];
 	  int n = sscanf(line, "%s\t%s\t%s\t%s\t%s", a1, a2, a3, a4, a5);
 
@@ -618,10 +619,13 @@ namespace hfst {
       assert(transducer.alphabet != NULL);
       for (std::set<InternalTransducerLine>::iterator it1 = transducer.lines.begin(); 
 	   it1 != transducer.lines.end(); it1++) {
-	if (it1->origin == s) {
+	if (it1->origin == s && not it1->final_line ) {
 	  HfstTransition transition;
 	  transition.source = it1->origin;
 	  transition.target = it1->target;
+
+	  //printf("transition_iterator::value: %i:%i %s:%s\n", it1->isymbol, it1->osymbol, transducer.alphabet->code2symbol(it1->isymbol), transducer.alphabet->code2symbol(it1->osymbol));
+
 	  transition.isymbol = std::string(transducer.alphabet->code2symbol(it1->isymbol));
 	  transition.osymbol = std::string(transducer.alphabet->code2symbol(it1->osymbol));
 	  transition.weight = it1->weight;

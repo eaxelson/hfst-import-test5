@@ -45,6 +45,10 @@ namespace hfst
 
     HfstTransducer replace( HfstTransducer &t, ReplaceType repl_type, bool optional, StringPairSet &alphabet ) 
     {
+      bool DEBUG=false;
+
+      if (DEBUG) printf("replcae..\n");
+
       ImplementationType type = t.get_type();
 
       HfstTransducer t_proj(t);
@@ -72,11 +76,17 @@ namespace hfst
       if (optional)
 	retval.disjunct(universal_fst(alphabet, type));
 
+      if (DEBUG) printf("..replcae\n");
+
       return retval;
     }
 
     HfstTransducer replace_transducer(HfstTransducer &t, std::string lm, std::string rm, ReplaceType repl_type, StringPairSet &alphabet)
     {
+      bool DEBUG=false;
+
+      if (DEBUG) printf("replcae_transducer..\n");
+
       ImplementationType type = t.get_type();
 
       // tm = ( L (L >> (R >> t)) R )
@@ -88,7 +98,11 @@ namespace hfst
       tm.concatenate(tc);
       tm.concatenate(rmtr);
 
+      tm.minimize(); // ADDED
       HfstTransducer retval = replace(tm, repl_type, false, alphabet);
+
+      if (DEBUG) printf("..replcae_transducer\n");
+
       return retval;
     }
 
@@ -305,9 +319,17 @@ namespace hfst
     HfstTransducer replace_in_context(HfstTransducerPair &context, ReplaceType repl_type, HfstTransducer &t, bool optional, StringPairSet &alphabet)
     {
 
-      bool DEBUG=true;
+      bool DEBUG=false;
 
       if (DEBUG) printf("replace_in_context...\n");
+
+      /*
+      if (DEBUG) {
+	for (StringPairSet::iterator it = alphabet.begin(); it != alphabet.end(); it++)
+	  fprintf(stderr, "%s:%s\n", it->first.c_str(), it->second.c_str());
+	std::cerr << "--\n";
+      }
+      */
 
       // test that all transducers have the same type
       if (context.first.get_type() != context.second.get_type() || 
@@ -404,8 +426,8 @@ namespace hfst
       if (DEBUG) printf("(4)\n");
       rct.minimize(); // ADDED
       if (DEBUG) printf("(5)\n");
-      if (DEBUG) rct.write_in_att_format("compiler_rct.hfst",false);
-      if (DEBUG) printf("  ..rct created\n");
+      //if (DEBUG) rct.write_in_att_format("compiler_rct.hfst",false);
+      //if (DEBUG) printf("  ..rct created\n");
       // return rct; // EQUAL
 
       // unconditional replace transducer      
@@ -414,6 +436,7 @@ namespace hfst
 	rt = replace_transducer( t, leftm, rightm, REPL_UP, alphabet );
       else
 	rt = replace_transducer( t, leftm, rightm, REPL_DOWN, alphabet );
+      if (DEBUG) printf("  minimizing rt\n");
       rt.minimize();
       // return rt;  // TEST
       if (DEBUG) printf("  ..rt createD\n");

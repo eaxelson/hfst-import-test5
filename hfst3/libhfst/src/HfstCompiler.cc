@@ -888,7 +888,7 @@ namespace hfst
     //TheAlphabet.copy(t->alphabet);
 
     HfstMutableTransducer t(*tr);
-    
+
     HfstStateIterator state_it(t);
     while (not state_it.done()) 
       {
@@ -899,6 +899,7 @@ namespace hfst
 	    HfstTransition tr = transition_it.value();
 	    TheAlphabet.insert(HfstAlphabet::NumberPair(TheAlphabet.symbol2code(tr.isymbol.c_str()),
 							TheAlphabet.symbol2code(tr.osymbol.c_str())));
+	    //printf("inserted to TheAlphabet pair %s:%s\n", tr.isymbol.c_str(), tr.osymbol.c_str());
 	    transition_it.next();
 	  }
 	state_it.next();
