@@ -58,6 +58,7 @@ namespace hfst {
       //bool contains_special_symbols(StringPair sp);  TODO!
 
       void print();
+      void print_pairs(FILE *file);
 
       void insert(NumberPair sp);
       void clear_pairs();

@@ -923,7 +923,7 @@ fst::StdVectorFst * hfst_internal_format_to_tropical_ofst(const HfstInternalTran
       if (it->final_line) 
 	{
 	  if (state_map.find(it->origin) == state_map.end())
-	    state_map[it->origin] = t->AddState();	    
+	    state_map[it->origin] = t->AddState();
 	  t->SetFinal(state_map[it->origin],it->weight);
 	}
       else 
