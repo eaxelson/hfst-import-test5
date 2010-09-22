@@ -349,6 +349,9 @@ int main( int argc, char *argv[] )
   FileName = argv[1];
   //Result = NULL;
   yyin = file;  
+
+  hfst::set_unknown_symbols_in_use(false);
+
   compiler = new HfstCompiler(type, Verbose);
   try {
     yyparse();

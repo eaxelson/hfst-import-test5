@@ -20,7 +20,7 @@ namespace hfst
     {
       HfstTransducer retval(alphabet, type);
       retval.repeat_star();
-      retval.minimize();
+      //retval.minimize();
       return retval;
     }
 
@@ -32,7 +32,7 @@ namespace hfst
 
       HfstTransducer retval = universal_fst(alphabet, t.get_type());
 
-      retval.minimize();
+      //retval.minimize();
 
       if (DEBUG) printf("     (1) negation_fst: subtracting\n");
 
@@ -98,7 +98,7 @@ namespace hfst
       tm.concatenate(tc);
       tm.concatenate(rmtr);
 
-      tm.minimize(); // ADDED
+      //tm.minimize(); // ADDED
       HfstTransducer retval = replace(tm, repl_type, false, alphabet);
 
       if (DEBUG) printf("..replcae_transducer\n");
@@ -121,14 +121,14 @@ namespace hfst
       t_copy.insert_freely(StringPair(m1,m1));
       t_copy.insert_freely(StringPair(m2,m2));
 
-      t_copy.minimize();
+      //t_copy.minimize();
 
       if (DEBUG) printf("    (1)\n");
 
       // arg1 = .* ( m1 >> ( m2 >> t ))
       HfstTransducer arg1 = universal_fst(alphabet, t.get_type());
 
-      arg1.minimize();
+      //arg1.minimize();
 
       if (DEBUG) printf("    (2)\n");
 
@@ -141,7 +141,7 @@ namespace hfst
 
       arg1.concatenate(t_copy);
 
-      arg1.minimize();
+      //arg1.minimize();
 
       if (DEBUG) printf("    (3)\n");
 
@@ -153,7 +153,7 @@ namespace hfst
       // ct = .* ( m1 >> ( m2 >> t ))  ||  !(.* m1)
       HfstTransducer ct = arg1.compose(arg2);
 
-      ct.minimize();
+      //ct.minimize();
 
       // return ct;  // DIFFER
 
@@ -165,7 +165,7 @@ namespace hfst
       mt.concatenate(m1_tr);
       mt.concatenate(universal_fst(alphabet,t.get_type()));
 
-      mt.minimize();
+      //mt.minimize();
 
       // !( (!ct mt) | (ct !mt) )
 
@@ -175,21 +175,21 @@ namespace hfst
       HfstTransducer ct_neg_mt(ct);
       ct_neg_mt.concatenate(negation_fst(mt, alphabet));
 
-      ct_neg_mt.minimize();
+      //ct_neg_mt.minimize();
 
       if (DEBUG) printf("    (6)\n");
 
       // !ct mt
       HfstTransducer neg_ct_mt = negation_fst(ct, alphabet).concatenate(mt) ;
 
-      neg_ct_mt.minimize();
+      //neg_ct_mt.minimize();
 
       if (DEBUG) printf("    (7)\n");
 
       // disjunction
       HfstTransducer disj = neg_ct_mt.disjunct(ct_neg_mt);
 
-      disj.minimize();
+      //disj.minimize();
 
       if (DEBUG) printf("    (8)\n");
 
@@ -200,6 +200,8 @@ namespace hfst
       HfstTransducer retval = negation_fst(disj, alphabet); 
 
       if (DEBUG) printf("    (9)\n");
+
+      retval.minimize();
 
       return retval;
     }
@@ -402,15 +404,15 @@ namespace hfst
       tmp.concatenate(rightm_to_rightm);
       tmp.concatenate(universal_fst(alphabet,type));
       HfstTransducer cbt = negation_fst(tmp, alphabet);
-      cbt.minimize();
+      //cbt.minimize();
       if (DEBUG) cbt.write_in_att_format("compiler_cbt.hfst",false);
       if (DEBUG) printf("  ..cbt created\n");
       //return cbt;
       // left context transducer .* (<R> >> (<L> >> LEFT_CONTEXT)) || !(.*<L>)    
       HfstTransducer lct = replace_context(context.first, leftm, rightm, alphabet); 
-      lct.write_in_att_format("lct.att",true);
-      lct.minimize();
-      if (DEBUG) lct.write_in_att_format("compiler_lct.hfst",false);
+      //lct.write_in_att_format("lct.att",true);
+      //lct.minimize();
+      //if (DEBUG) lct.write_in_att_format("compiler_lct.hfst",false);
       if (DEBUG) printf("  ..lct created\n");
       // return lct; // EQUAL
 
@@ -424,7 +426,7 @@ namespace hfst
       if (DEBUG) printf("(3)\n");
       rct.reverse();
       if (DEBUG) printf("(4)\n");
-      rct.minimize(); // ADDED
+      //rct.minimize(); // ADDED
       if (DEBUG) printf("(5)\n");
       //if (DEBUG) rct.write_in_att_format("compiler_rct.hfst",false);
       //if (DEBUG) printf("  ..rct created\n");
@@ -437,7 +439,7 @@ namespace hfst
       else
 	rt = replace_transducer( t, leftm, rightm, REPL_DOWN, alphabet );
       if (DEBUG) printf("  minimizing rt\n");
-      rt.minimize();
+      //rt.minimize();
       // return rt;  // TEST
       if (DEBUG) printf("  ..rt createD\n");
 
@@ -446,7 +448,7 @@ namespace hfst
       HfstTransducer result(ibt);
       if (DEBUG) printf("#0\n");
       result.compose(cbt);
-      result.minimize(); // added
+      //result.minimize(); // added
       
       if (DEBUG) printf("#1\n");
 
@@ -458,7 +460,7 @@ namespace hfst
       
       if (DEBUG) printf("#2\n");
 
-      result.minimize();  // ADDED
+      //result.minimize();  // ADDED
       result.compose(rt);
       
       if (DEBUG) printf("#3\n");
@@ -471,7 +473,7 @@ namespace hfst
       
       if (DEBUG) printf("#4\n");
 
-      result.minimize();  // ADDED
+      //result.minimize();  // ADDED
 
       result.compose(rbt);
 

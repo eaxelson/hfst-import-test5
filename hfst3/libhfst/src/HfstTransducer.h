@@ -106,6 +106,25 @@ namespace hfst
 
   class HfstTransducer;
 
+  enum MinimizationAlgorithm
+  {
+    HOPCROFT,
+    BRZOZOWSKI
+  };
+
+  /* Which minimization algorithm is used. 
+     In foma, Hopcroft is always used. 
+     In OpenFst and SFST, the default algorithm is Brzozowski. */
+  void set_minimization_algorithm(MinimizationAlgorithm);
+  MinimizationAlgorithm get_minimization_algorithm(); 
+
+  /* Whether unknown and identity symbols are used. By default, they are used.
+     These symbols are always reserved for use and included in alphabets of transducers,
+     but code optimization is possible if it is known that they do not appear
+     in transducer transitions. */
+  void set_unknown_symbols_in_use(bool);
+  bool get_unknown_symbols_in_use();
+
   typedef std::pair <HfstTransducer,HfstTransducer> HfstTransducerPair;
   typedef std::set <HfstTransducerPair> HfstTransducerPairSet;
 

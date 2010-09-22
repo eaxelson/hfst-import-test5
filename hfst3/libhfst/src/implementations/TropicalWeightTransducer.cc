@@ -14,6 +14,11 @@
 
 namespace hfst { namespace implementations
 {
+  bool openfst_tropical_use_hopcroft=false;
+
+  void openfst_tropical_set_hopcroft(bool value) {
+    openfst_tropical_use_hopcroft=value;
+  }
 
   void initialize_symbol_tables(StdVectorFst *t);
 

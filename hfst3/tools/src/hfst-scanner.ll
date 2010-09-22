@@ -72,6 +72,10 @@ FN	[A-Za-z0-9._/\-*+]
 
 %%
 
+^[ \t]*\#use[ \t]*hopcroft[ \t]*\n { hfst::set_minimization_algorithm(hfst::HOPCROFT);};
+^[ \t]*\#use[ \t]*default[ \t]*\n { hfst::set_minimization_algorithm(hfst::BRZOZOWSKI);};
+
+
 #include           BEGIN(incl);
 <incl>[ \t]*       /* eat the whitespace */
 <incl>{FN}+        { HfstCompiler::error2("Missing quotes",yytext); }

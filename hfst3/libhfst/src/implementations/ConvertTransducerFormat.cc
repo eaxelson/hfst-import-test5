@@ -465,6 +465,10 @@ void sfst_to_internal( SFST::Node *node, SFST::NodeNumbering &index,
 
 HfstInternalTransducer * sfst_to_internal_hfst_format(SFST::Transducer * t) {
   
+  bool DEBUG=false;
+
+  if (DEBUG) printf("sfst_to_internal_hfst_format..\n");
+
   HfstInternalTransducer * internal_transducer = new HfstInternalTransducer();
   SFST::NodeNumbering index(*t);
   std::set<SFST::Node*> visited_nodes;
@@ -475,6 +479,8 @@ HfstInternalTransducer * sfst_to_internal_hfst_format(SFST::Transducer * t) {
     if (it->first != 0) // "<>" is not inserted
       internal_transducer->alphabet->add_symbol(it->second, it->first);
   }
+
+  if (DEBUG) printf("..done\n");
 
   return internal_transducer;
 }

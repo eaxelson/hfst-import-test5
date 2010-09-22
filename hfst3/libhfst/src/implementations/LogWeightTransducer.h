@@ -38,6 +38,8 @@ namespace implementations
   using std::ostringstream;
   using std::stringstream;
 
+  void openfst_log_set_hopcroft(bool value);
+
   //extern GlobalSymbolTable global_symbol_table;
   class LogWeightInputStream 
   {

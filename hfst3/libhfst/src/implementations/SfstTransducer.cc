@@ -16,11 +16,12 @@
 #include <cassert>
 #endif
 
-namespace SFST {
-  bool Transducer::hopcroft_minimisation=true;
-}
-
 namespace hfst { namespace implementations {
+
+  void sfst_set_hopcroft(bool value) {
+    SFST::Transducer::hopcroft_minimisation=value;
+  }
+
     /** Create an SfstInputStream that reads from stdin. */
   SfstInputStream::SfstInputStream(void)
   {
