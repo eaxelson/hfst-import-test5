@@ -343,8 +343,15 @@ namespace hfst {
 
     void HfstInternalTransducer::substitute(void (*func)(std::string &isymbol, std::string &osymbol)) 
     {
+      bool DEBUG=false;
+
+      if (DEBUG) printf("HfstInternalTransducer::substitute...\n");
+
       assert(alphabet != NULL);
       HfstInternalTransducer new_transducer;
+
+      if (DEBUG) printf("  iterating through transducer lines..\n");
+
       for (std::set<InternalTransducerLine>::iterator it = lines.begin(); 
 	   it != lines.end(); it++) {	
 	if (it->final_line)  // final lines are added as such
@@ -359,8 +366,16 @@ namespace hfst {
 				  it->weight);
 	}
       }
+
+      if (DEBUG) printf("  clearing lines..\n");
+
       lines.clear(); // is this needed?
+
+      if (DEBUG) printf("  copying lines..\n");
+
       lines=new_transducer.lines;
+
+      if (DEBUG) printf("...done\n");
     }
     
     void HfstInternalTransducer::substitute(const StringPair &old_pair, const StringPair &new_pair) 

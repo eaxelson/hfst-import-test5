@@ -27,7 +27,39 @@ namespace hfst
   hfst::implementations::FomaTransducer HfstTransducer::foma_interface;
 #endif
 
+  MinimizationAlgorithm minimization_algorithm=HOPCROFT;
 
+  void set_minimization_algorithm(MinimizationAlgorithm a) {
+    minimization_algorithm=a; 
+#if HAVE_SFST
+    if (minimization_algorithm == HOPCROFT)
+      hfst::implementations::sfst_set_hopcroft(true);
+    else
+      hfst::implementations::sfst_set_hopcroft(false);
+#endif
+#if HAVE_OPENFST
+    if (minimization_algorithm == HOPCROFT)
+      hfst::implementations::openfst_tropical_set_hopcroft(true);
+    else
+      hfst::implementations::openfst_tropical_set_hopcroft(false);
+    if (minimization_algorithm == HOPCROFT)
+      hfst::implementations::openfst_log_set_hopcroft(true);
+    else
+      hfst::implementations::openfst_log_set_hopcroft(false);
+#endif
+    // in foma, Hopcroft is always used
+  }
+
+  MinimizationAlgorithm get_minimization_algorithm() {
+    return minimization_algorithm; }
+
+  bool unknown_symbols_in_use=true;
+
+  void set_unknown_symbols_in_use(bool value) {
+    unknown_symbols_in_use=value; }
+
+  bool get_unknown_symbols_in_use() {
+    return unknown_symbols_in_use; }
 
 #if HAVE_OPENFST
   HfstGrammar::HfstGrammar(HfstTransducerVector &rule_vector):
@@ -1486,7 +1518,7 @@ type(type),anonymous(false),is_trie(false)
 
     if (DEBUG) printf("..done\n");
 
-    if (this->type != FOMA_TYPE) 
+    if ( (this->type != FOMA_TYPE) && unknown_symbols_in_use) 
       {
 	if (DEBUG) printf("substituting for composition..\n");
 
@@ -1545,7 +1577,7 @@ type(type),anonymous(false),is_trie(false)
       }
 
 #if HAVE_FOMA
-    if (this->type != FOMA_TYPE) 
+    if ( (this->type != FOMA_TYPE) && unknown_symbols_in_use) 
       {
 	if (DEBUG) printf("substituting after composition..\n");
 

@@ -15,6 +15,12 @@
 namespace hfst { namespace implementations
 {
 
+  bool openfst_log_use_hopcroft=false;
+
+  void openfst_log_set_hopcroft(bool value) {
+    openfst_log_use_hopcroft=value;
+  }
+
   void initialize_symbol_tables(LogFst *t);
 
   LogWeightInputStream::LogWeightInputStream(void):

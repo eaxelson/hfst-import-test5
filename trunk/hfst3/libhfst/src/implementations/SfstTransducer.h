@@ -30,6 +30,8 @@ namespace hfst { namespace implementations
   using std::ostream;
   using std::ostringstream;
 
+  void sfst_set_hopcroft(bool);
+
   class SfstInputStream 
   {
   private:
