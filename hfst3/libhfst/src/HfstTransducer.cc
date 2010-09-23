@@ -1114,6 +1114,10 @@ type(type),anonymous(false),is_trie(false)
 #if HAVE_FOMA
       case FOMA_TYPE:
 	{
+	  hfst::implementations::FomaTransducer::insert_freely
+	    (implementation.foma,symbol_pair);
+	    break;
+	    /*
 	  hfst::implementations::HfstInternalTransducer * internal_transducer = 
 	    hfst::implementations::foma_to_internal_hfst_format(implementation.foma);
 	  this->foma_interface.delete_foma(implementation.foma);
@@ -1122,6 +1126,7 @@ type(type),anonymous(false),is_trie(false)
 	    hfst::implementations::hfst_internal_format_to_foma(internal_transducer);
 	  delete internal_transducer;
 	  break;
+	    */
 	}
 #endif
 #if HAVE_SFST

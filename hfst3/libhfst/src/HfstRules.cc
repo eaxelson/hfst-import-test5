@@ -85,6 +85,9 @@ namespace hfst
     {
       bool DEBUG=false;
 
+      t.minimize();
+      if (DEBUG) t.write_in_att_format("compiler_t.att",true);
+
       if (DEBUG) printf("replcae_transducer..\n");
 
       ImplementationType type = t.get_type();
@@ -98,7 +101,7 @@ namespace hfst
       tm.concatenate(tc);
       tm.concatenate(rmtr);
 
-      //tm.minimize(); // ADDED
+      tm.minimize(); // ADDED
       HfstTransducer retval = replace(tm, repl_type, false, alphabet);
 
       if (DEBUG) printf("..replcae_transducer\n");
@@ -136,8 +139,8 @@ namespace hfst
       // else, nothing is concatenated to arg1 ???
       //arg1.minimize();
 
-      if (t_copy.get_type() == FOMA_TYPE)
-	t_copy.minimize();
+      //if (t_copy.get_type() == FOMA_TYPE)
+      //	t_copy.minimize();
 
       arg1.concatenate(t_copy);
 
@@ -404,32 +407,34 @@ namespace hfst
       tmp.concatenate(rightm_to_rightm);
       tmp.concatenate(universal_fst(alphabet,type));
       HfstTransducer cbt = negation_fst(tmp, alphabet);
-      //cbt.minimize();
-      if (DEBUG) cbt.write_in_att_format("compiler_cbt.hfst",false);
+      cbt.minimize();
+      if (DEBUG) cbt.write_in_att_format("compiler_cbt.att",false);
       if (DEBUG) printf("  ..cbt created\n");
       //return cbt;
       // left context transducer .* (<R> >> (<L> >> LEFT_CONTEXT)) || !(.*<L>)    
       HfstTransducer lct = replace_context(context.first, leftm, rightm, alphabet); 
       //lct.write_in_att_format("lct.att",true);
-      //lct.minimize();
-      //if (DEBUG) lct.write_in_att_format("compiler_lct.hfst",false);
+      lct.minimize();
+      if (DEBUG) lct.write_in_att_format("compiler_lct.att",false);
       if (DEBUG) printf("  ..lct created\n");
       // return lct; // EQUAL
 
       // right context transducer:  reversion( (<R> >> (<L> >> reversion(RIGHT_CONTEXT))) .* || !(<R>.*) )
       HfstTransducer right_rev(context.second);
-      if (DEBUG) right_rev.write_in_att_format("right_context.att",true);
       if (DEBUG) printf("(1)\n");
       right_rev.reverse();  // MINIMIZATION TAKES LONG! // *** HERE ***
       if (DEBUG) printf("(2)\n");
+      right_rev.minimize();
+      if (DEBUG) right_rev.write_in_att_format("right_rev.att",true);
+
       HfstTransducer rct = replace_context(right_rev, rightm, leftm, alphabet);
       if (DEBUG) printf("(3)\n");
       rct.reverse();
       if (DEBUG) printf("(4)\n");
-      //rct.minimize(); // ADDED
+      rct.minimize(); // ADDED
       if (DEBUG) printf("(5)\n");
-      //if (DEBUG) rct.write_in_att_format("compiler_rct.hfst",false);
-      //if (DEBUG) printf("  ..rct created\n");
+      if (DEBUG) rct.write_in_att_format("compiler_rct.att",false);
+      if (DEBUG) printf("  ..rct created\n");
       // return rct; // EQUAL
 
       // unconditional replace transducer      
@@ -439,7 +444,8 @@ namespace hfst
       else
 	rt = replace_transducer( t, leftm, rightm, REPL_DOWN, alphabet );
       if (DEBUG) printf("  minimizing rt\n");
-      //rt.minimize();
+      rt.minimize();
+      if (DEBUG) rt.write_in_att_format("rt.att",true);
       // return rt;  // TEST
       if (DEBUG) printf("  ..rt createD\n");
 
@@ -448,8 +454,10 @@ namespace hfst
       HfstTransducer result(ibt);
       if (DEBUG) printf("#0\n");
       result.compose(cbt);
-      //result.minimize(); // added
+      result.minimize(); // added
       
+      if (DEBUG) result.write_in_att_format("result0.att", true);
+
       if (DEBUG) printf("#1\n");
 
       if (repl_type == REPL_UP || repl_type == REPL_RIGHT)
@@ -460,7 +468,10 @@ namespace hfst
       
       if (DEBUG) printf("#2\n");
 
-      //result.minimize();  // ADDED
+      result.minimize();  // ADDED
+
+      if (DEBUG) result.write_in_att_format("result2.att", true);
+
       result.compose(rt);
       
       if (DEBUG) printf("#3\n");
@@ -473,7 +484,9 @@ namespace hfst
       
       if (DEBUG) printf("#4\n");
 
-      //result.minimize();  // ADDED
+      result.minimize();  // ADDED
+
+      if (DEBUG) result.write_in_att_format("result4.att", true);
 
       result.compose(rbt);
 
@@ -485,6 +498,9 @@ namespace hfst
       
       if (optional)
 	result.disjunct(universal_fst(alphabet,type));
+
+      result.minimize();
+      if (DEBUG) result.write_in_att_format("result.att",true);
 
       if (DEBUG) printf("...replace_in_context\n");
 
