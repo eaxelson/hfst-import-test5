@@ -98,6 +98,8 @@ namespace hfst {
       static fsm * extract_input_language(fsm * t);
       static fsm * extract_output_language(fsm * t);
 
+      static fsm * insert_freely(fsm * t, const StringPair &symbol_pair);
+
       static bool are_equivalent(fsm *t1, fsm *t2);
       static bool is_cyclic(fsm * t);
 

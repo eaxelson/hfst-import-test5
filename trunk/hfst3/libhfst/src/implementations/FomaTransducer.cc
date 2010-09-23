@@ -467,6 +467,22 @@ namespace hfst { namespace implementations {
     return fsm_substitute_symbol(t, strdup(old_symbol.c_str()), strdup(new_symbol.c_str()));
   }
   
+  fsm * FomaTransducer::insert_freely(fsm * t, const StringPair &symbol_pair)
+  {
+    fsm * eps_marked = t; //fsm_substitute_symbol(t, "@_EPSILON_SYMBOL_@", 
+    //	     "@_EPSILON_SYMBOL_MARKER_@");
+    fsm * ins = fsm_kleene_star( 
+		  fsm_union( fsm_symbol("@_IDENTITY_SYMBOL_@"), 
+			     fsm_cross_product( fsm_symbol("@_EPSILON_SYMBOL_@"),
+						fsm_symbol(strdup(symbol_pair.second.c_str())) ) ) );
+    fsm * comp = fsm_substitute_symbol( fsm_compose(eps_marked, ins),
+					"@_EPSILON_SYMBOL_@",
+					strdup(symbol_pair.first.c_str()) );
+    return fsm_minimize(comp); //fsm_substitute_symbol( comp,
+    //	  "@_EPSILON_SYMBOL_MARKER_@",
+    //			  "@_EPSILON_SYMBOL_@");
+    // marker should be removed from sigma..
+  }
   
   fsm * FomaTransducer::compose
   (fsm * t1, fsm * t2)

@@ -31,7 +31,6 @@ namespace hfst
 
   HfstTransducer * HfstCompiler::make_transducer(Range *r1, Range *r2, ImplementationType type)
   {
-
     StringPairSet sps;
 
     if (r1 == NULL || r2 == NULL) {
@@ -772,7 +771,7 @@ namespace hfst
 
     Ranges *l1=list1;
     Ranges *l2=list2;
-    HfstTransducer *t=new HfstTransducer(0, type); // an epsilon transducer
+    HfstTransducer *t=new HfstTransducer("@_EPSILON_SYMBOL_@", type); // an epsilon transducer
 
     //Node *node=t->root_node();
     while (l1 && l2) {
