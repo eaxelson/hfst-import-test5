@@ -520,6 +520,7 @@ namespace hfst
   }
 
   /* All multicharacter symbols must be defined in TheAlphabet. */
+  // TODO: this is very slow!
   HfstTransducer * HfstCompiler::read_words(char *filename, ImplementationType type) {
     if (Verbose)
       fprintf(stderr,"\nreading words from %s...", filename);
@@ -540,6 +541,7 @@ namespace hfst
       tok.add_multichar_symbol(std::string("<>"));
 
     HfstTransducer * retval = new HfstTransducer(type);
+    int words_read=0;
 
     while (is.getline(buffer, 10000)) {
       // delete final whitespace characters
@@ -554,16 +556,18 @@ namespace hfst
       char mcs[1000]; // MAX SIZE OF SUBSTRING
       int i=0;
       while(buffer[i] != '\0') {
-	if (buffer[i] == '>') // unmatched '>'
-	  throw hfst::exceptions::NotValidStringFormatException();	      
+	if (buffer[i] == '>') { // unmatched '>'
+	  printf("#1\n");
+	  throw hfst::exceptions::NotValidStringFormatException(); }	      
 	if (buffer[i] == '<') {
 	  int j=0;
 	  while(buffer[i] != '>') {
 	    mcs[j] = buffer[i];
 	    i++;
 	    j++;
-	    if (buffer[i] == '<')
-	      throw hfst::exceptions::NotValidStringFormatException();	      
+	    if (buffer[i] == '<') {
+	      printf("#2\n");
+	      throw hfst::exceptions::NotValidStringFormatException(); }	      
 	  }
 	  mcs[j] = '>';
 	  mcs[j+1] = '\0';
@@ -580,9 +584,14 @@ namespace hfst
 	if (DEBUG) printf("..one-level word\n");
 	HfstTransducer word(std::string(buffer), tok, type);
 	if (DEBUG) printf(" ..word created:\n");
-	std::cerr << word;
+	//std::cerr << word;
 	retval->disjunct(word);
 	if (DEBUG) printf(" ..word disjuncted\n");
+
+	words_read++;
+
+	if (Verbose)
+	  fprintf(stderr, "%i words read\n", words_read);
       }
       // at least one ':'
       else {
@@ -659,6 +668,10 @@ namespace hfst
 
 	HfstTransducer word(foo, type);
 	retval->disjunct(word);
+	words_read++;
+
+	if (Verbose)
+	  fprintf(stderr, "%i words read\n", words_read);
       }
     }
 
