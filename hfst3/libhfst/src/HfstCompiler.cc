@@ -23,6 +23,8 @@
  **/
 
 #include "HfstCompiler.h"
+#include "HfstUtf8.h"
+#include "HfstBasic.h"
 
 namespace hfst
 {
@@ -519,31 +521,29 @@ namespace hfst
 
   }
 
-  /* All multicharacter symbols must be defined in TheAlphabet. */
-  // TODO: this is very slow!
   HfstTransducer * HfstCompiler::read_words(char *filename, ImplementationType type) {
+
     if (Verbose)
       fprintf(stderr,"\nreading words from %s...", filename);
     std::ifstream is(filename);
-    if (!is.is_open())
-      throw hfst::exceptions::FileNotReadableException(); 
+    if (!is.is_open()) {
+      static char message[1000];
+      sprintf(message,"Error: Cannot open file \"%s\"!", filename);
+      throw message;
+    }
     free( filename );
 
-    bool DEBUG=false;
-
-    char buffer[10000]; // MAX WORD LENGTH
-    HfstTokenizer tok;
-    HfstAlphabet::CharMap cm = TheAlphabet.get_char_map();
-    for (HfstAlphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++) {
-      tok.add_multichar_symbol(std::string(it->second));
-    }
-    if (type == SFST_TYPE)
-      tok.add_multichar_symbol(std::string("<>"));
-
     HfstTransducer * retval = new HfstTransducer(type);
-    int words_read=0;
+
+    int n=0;
+    char buffer[10000];
 
     while (is.getline(buffer, 10000)) {
+      if (Verbose && ++n % 10000 == 0) {
+	if (n == 10000)
+	  cerr << "\n";
+	cerr << "\r" << n << " words";
+      }
       // delete final whitespace characters
       int l;
       for( l=(int)strlen(buffer)-1; l>=0; l-- )
@@ -552,135 +552,25 @@ namespace hfst
 	  break;
       buffer[l+1] = 0;
 
-      // find multichar symbols and add them to tok
-      char mcs[1000]; // MAX SIZE OF SUBSTRING
-      int i=0;
-      while(buffer[i] != '\0') {
-	if (buffer[i] == '>') { // unmatched '>'
-	  printf("#1\n");
-	  throw hfst::exceptions::NotValidStringFormatException(); }	      
-	if (buffer[i] == '<') {
-	  int j=0;
-	  while(buffer[i] != '>') {
-	    mcs[j] = buffer[i];
-	    i++;
-	    j++;
-	    if (buffer[i] == '<') {
-	      printf("#2\n");
-	      throw hfst::exceptions::NotValidStringFormatException(); }	      
-	  }
-	  mcs[j] = '>';
-	  mcs[j+1] = '\0';
-	  tok.add_multichar_symbol(std::string(mcs));
-	  //printf("..added multichar symbol %s\n", mcs);
-	}
-	i++;
+      StringPairVector spv;
+      char *bufptr = buffer;
+
+      std::pair<unsigned int, unsigned int> np = TheAlphabet.next_label(bufptr, true);
+      while (np.first != 0 && np.second != 0) {
+	spv.push_back(StringPair(std::string(TheAlphabet.code2symbol(np.first)), 
+				 std::string(TheAlphabet.code2symbol(np.second)) ) );
+	np = TheAlphabet.next_label(bufptr, true);
       }
 
-      if (DEBUG) printf("..multicharacter symbols added\n");
+      retval->disjunct(spv);
 
-      // only one level
-      if (std::string(buffer).find(std::string(":")) == std::string::npos) {
-	if (DEBUG) printf("..one-level word\n");
-	HfstTransducer word(std::string(buffer), tok, type);
-	if (DEBUG) printf(" ..word created:\n");
-	//std::cerr << word;
-	retval->disjunct(word);
-	if (DEBUG) printf(" ..word disjuncted\n");
-
-	words_read++;
-
-	if (Verbose)
-	  fprintf(stderr, "%i words read\n", words_read);
-      }
-      // at least one ':'
-      else {
-
-	if (DEBUG) printf("..two-level word\n");
-
-	std::vector<std::string> substrings;
-	{
-	  // find substrings separated by ':'
-	  char substring[10000];  // MAX WORD LENGTH
-	  int i=0;
-	  int j=0;
-	  while(buffer[i] != '\0') {
-	    if (buffer[i] != ':') {
-	      substring[j] = buffer[i];
-	      j++;
-	    }
-	    else {
-	      substring[j] = '\0';
-	      substrings.push_back(std::string(substring));
-	      //printf("..pushed back substring %s\n", substring);
-	      j=0;
-	    }
-	    i++;
-	  }
-	  substring[j] = '\0';
-	  substrings.push_back(std::string(substring));
-	  //printf("..pushed back substring %s\n", substring);
-	}
-	if (substrings.size() < 2)
-	  throw hfst::exceptions::NotValidStringFormatException();
-
-	if (DEBUG) printf("...substrings found\n");
-
-	StringPairVector foo;
-	{
-	  std::string last_string("");
-	  // tokenize substrings
-	  // the number of substrings is at least 2
-	  for (int i=0; i<(int)substrings.size(); i++) {
-	    if (substrings[i].empty())
-	      throw hfst::exceptions::NotValidStringFormatException();
-	    StringPairVector * spv =
-	      tok.tokenize(substrings[i]);
-	    if (spv->size() == 0)
-	      throw hfst::exceptions::NotValidStringFormatException();
-	    
-	    for (int j=0; j<(int)spv->size(); j++) {
-
-	      if (last_string.compare(std::string("")) != 0) { // unmatched input symbol
-		foo.push_back(StringPair(last_string, spv->at(j).first));
-		last_string = std::string("");
-	      }
-	      else if ( j == (((int)spv->size())-1) &&    // last symbol in substring
-			i<((int)substrings.size()-1) ) {  // and not last substring
-		last_string = spv->at(j).first;
-	      }
-	      else {
-		foo.push_back(StringPair(spv->at(j).first, spv->at(j).first));
-	      }
-	    }
-	  }
-	}
-
-	if (DEBUG)  { printf("...all substrings matched:\n");
-
-	for(StringPairVector::iterator it = foo.begin(); it != foo.end(); it++) {
-	  if (it->first.compare(it->second) == 0)
-	    printf("%s", it->first.c_str());
-	  else
-	    printf("%s:%s", it->first.c_str(), it->second.c_str());
-	}
-	printf("\n"); }
-
-	HfstTransducer word(foo, type);
-	retval->disjunct(word);
-	words_read++;
-
-	if (Verbose)
-	  fprintf(stderr, "%i words read\n", words_read);
-      }
     }
+    if (Verbose && n >= 10000)
+      cerr << "\n";
 
     is.close();
     if (Verbose)
       fprintf(stderr,"finished\n");
-    if (type != SFST_TYPE) {
-      retval->substitute("<>" ,"@_EPSILON_SYMBOL_@");
-    }
     return retval;
   }
 
@@ -918,195 +808,5 @@ namespace hfst
       }
       Alphabet_Defined = 1;
   }
-
-  namespace HfstUtf8 {
-
-  /*******************************************************************/
-  /*                                                                 */
-  /*  int2utf8                                                       */
-  /*                                                                 */
-  /*******************************************************************/
-
-  char *int2utf8( unsigned int sym )
-
-  {
-    static unsigned char ch[5];
-
-    if (sym < 128) {
-      // 1-byte UTF8 symbol, 7 bits
-      ch[0] = (unsigned char)sym;
-      ch[1] = 0;
-    }
-  
-    else if (sym < 2048) {
-      // 2-byte UTF8 symbol, 5+6 bits
-      ch[0] = (unsigned char)((sym >> 6) | set2MSbits);
-      ch[1] = (unsigned char)((sym & get6LSbits) | set1MSbits);
-      ch[2] = 0;
-    }
-  
-    else if (sym < 65536) {
-      // 3-byte UTF8 symbol, 4+6+6 bits
-      ch[0] = (unsigned char)((sym >> 12) | set3MSbits);
-      ch[1] = (unsigned char)(((sym >> 6) & get6LSbits) | set1MSbits);
-      ch[2] = (unsigned char)((sym & get6LSbits) | set1MSbits);
-      ch[3] = 0;
-    }
-  
-    else if (sym < 2097152) {
-      // 4-byte UTF8 symbol, 3+6+6+6 bits
-      ch[0] = (unsigned char)((sym >> 18) | set4MSbits);
-      ch[1] = (unsigned char)(((sym >> 12) & get6LSbits) | set1MSbits);
-      ch[2] = (unsigned char)(((sym >> 6) & get6LSbits) | set1MSbits);
-      ch[3] = (unsigned char)((sym & get6LSbits) | set1MSbits);
-      ch[4] = 0;
-    }
-  
-    else
-      return NULL;
-
-    return (char*)ch;
-  }
-
-
-  /*******************************************************************/
-  /*                                                                 */
-  /*  utf8toint                                                      */
-  /*                                                                 */
-  /*******************************************************************/
-
-  unsigned int utf8toint( char **s )
-
-  {
-    int bytes_to_come;
-    unsigned int result=0;
-    unsigned char c=(unsigned char)**s;
-
-    if (c >= (unsigned char)set4MSbits) { // 1111xxxx
-      bytes_to_come = 3;
-      result = (result << 3) | (c & get3LSbits);
-    }
-      
-    else if (c >= (unsigned char) set3MSbits) { // 1110xxxx
-      // start of a three-byte symbol
-      bytes_to_come = 2;
-      result = (result << 4) | (c & get4LSbits);
-    }
-      
-    else if (c >= (unsigned char) set2MSbits) { // 1100xxxx
-      // start of a two-byte symbol
-      bytes_to_come = 1;
-      result = (result << 5) | (c & get5LSbits);
-    }
-      
-    else if (c < (unsigned char) set1MSbits) { // 0100xxxx
-      // one-byte symbol
-      bytes_to_come = 0;
-      result = c;
-    }
-
-    else
-      return 0; // error
-
-    while (bytes_to_come > 0) {
-      bytes_to_come--;
-      (*s)++;
-      c = (unsigned char)**s;
-      if (c < (unsigned char) set2MSbits &&
-	  c >= (unsigned char) set1MSbits)    // 1000xxxx
-	{
-	  result = (result << 6) | (c & get6LSbits);
-	}
-      else
-	return 0;
-    }
-
-    (*s)++;
-    return result;
-  }
-
-  /*******************************************************************/
-  /*                                                                 */
-  /*  utf8toint                                                      */
-  /*                                                                 */
-  /*******************************************************************/
-
-  unsigned int utf8toint( char *s )
-
-  {
-    unsigned int result = utf8toint( &s );
-    if (*s == 0) // all bytes converted?
-      return result;
-    return 0;
-  }
-
-  }
-
-    namespace HfstBasic {
-
-  /*******************************************************************/
-  /*                                                                 */
-  /*  fst_strdup                                                     */
-  /*                                                                 */
-  /*******************************************************************/
-
-  char* fst_strdup(const char* pString)
-
-  {
-    char* pStringCopy = (char*)malloc(strlen(pString) + 1);
-    if (pStringCopy == NULL) {
-      fprintf(stderr, "\nError: out of memory (malloc failed)\naborted.\n");
-      exit(1);
-    }
-    strcpy(pStringCopy, pString);
-    return pStringCopy;
-  }
-
-
-  /*******************************************************************/
-  /*                                                                 */
-  /*  read_string                                                    */
-  /*                                                                 */
-  /*******************************************************************/
-
-  int read_string( char *buffer, int size, FILE *file )
-
-  {
-    for( int i=0; i<size; i++ ) {
-      int c=fgetc(file);
-      if (c == EOF || c == 0) {
-	buffer[i] = 0;
-	return (c==0);
-      }
-      buffer[i] = (char)c;
-    }
-    buffer[size-1] = 0;
-    return 0;
-  }
-
-
-  /*******************************************************************/
-  /*                                                                 */
-  /*  read_num                                                       */
-  /*                                                                 */
-  /*******************************************************************/
-
-  size_t read_num( void *p, size_t n, FILE *file )
-
-  {
-    char *pp=(char*)p;
-    size_t result=fread( pp, 1, n, file );
-    //if (Switch_Bytes) {
-    if (false) {
-      size_t e=n/2;
-      for( size_t i=0; i<e; i++ ) {
-	char tmp=pp[i];
-	pp[i] = pp[--n];
-	pp[n] = tmp;
-      }
-    }
-    return result;
-  }  
-    }
 
 }

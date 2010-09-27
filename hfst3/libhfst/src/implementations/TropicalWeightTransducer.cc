@@ -1903,6 +1903,43 @@ namespace hfst { namespace implementations
     return result;
   }
 
+  StdVectorFst * TropicalWeightTransducer::disjunct
+  (StdVectorFst * t, const StringPairVector &spv)
+  {
+    SymbolTable * st = t->InputSymbols()->Copy();
+    assert(st != NULL);
+
+    StateId s = t->Start();
+
+    for (StringPairVector::const_iterator it = spv.begin(); it != spv.end(); it++) 
+      {
+	unsigned int inumber = st->AddSymbol(it->first.c_str());
+	unsigned int onumber = st->AddSymbol(it->second.c_str());
+
+	bool transition_found=false;
+	for(fst::ArcIterator<StdVectorFst> it(*t,s); !it.Done(); it.Next())
+	  {
+	    const StdArc& a = it.Value();
+	    if (a.ilabel == inumber && a.olabel == onumber) {
+	      transition_found=true;
+	      s = a.nextstate;
+	      break;
+	    }
+	  }
+
+	if (not transition_found) {
+	  StateId new_state = t->AddState();
+	  t->AddArc(s, StdArc(inumber,onumber,0,new_state));
+	  s = new_state;
+	}
+      }
+
+    t->SetFinal(s,0);
+    
+    t->SetInputSymbols(st);
+    return t;
+  }
+
   StdVectorFst * TropicalWeightTransducer::intersect(StdVectorFst * t1,
 			   StdVectorFst * t2)
   {

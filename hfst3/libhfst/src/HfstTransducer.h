@@ -760,6 +760,8 @@ fclose(ifile);
     /** \brief Disjunct this transducer with \a another. */
     HfstTransducer &disjunct(const HfstTransducer &another);
 
+    HfstTransducer &disjunct(const StringPairVector &spv);
+
     /** \brief Intersect this transducer with \a another. */
     HfstTransducer &intersect(const HfstTransducer &another);
 

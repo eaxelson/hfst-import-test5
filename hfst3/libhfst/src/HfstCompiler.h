@@ -42,33 +42,6 @@ namespace hfst
     typedef enum {twol_left,twol_right,twol_both} Twol_Type;
     typedef enum {repl_left,repl_right,repl_up,repl_down} Repl_Type;
 
-
-    namespace HfstUtf8 {
-
-      const unsigned char get3LSbits=7;
-      const unsigned char get4LSbits=15;
-      const unsigned char get5LSbits=31;
-      const unsigned char get6LSbits=63;
-      
-      const unsigned char set1MSbits=128;
-      const unsigned char set2MSbits=192;
-      const unsigned char set3MSbits=224;
-      const unsigned char set4MSbits=240;
-
-      char *int2utf8( unsigned int sym );
-      unsigned int utf8toint( char **s );
-      unsigned int utf8toint( char *s );
-    }
-
-    namespace HfstBasic {
-      
-      //bool Switch_Bytes=false;
-
-      char* fst_strdup(const char* pString);
-      int read_string( char *buffer, int size, FILE *file );
-      size_t read_num( void *p, size_t n, FILE *file );
-
-    }    
     
     /** A library class that forms a bridge between the SFST programming language parser
 	and the HFST library and contains some extra functions needed by the parser.

@@ -682,6 +682,26 @@ namespace hfst { namespace implementations {
   (Transducer * t1, Transducer * t2)
   { return &t1->operator|(*t2); }
 
+  Transducer * SfstTransducer::disjunct
+  (Transducer * t, const StringPairVector &spv)
+  {
+    Node *node= t->root_node();
+    for (StringPairVector::const_iterator it = spv.begin(); it != spv.end(); it++) 
+      {
+	Label l(t->alphabet.add_symbol(it->first.c_str()),
+		t->alphabet.add_symbol(it->second.c_str()) );
+	t->alphabet.insert(l);
+	Arcs *arcs=node->arcs();
+	node = arcs->target_node( l );
+	if (node == NULL) {
+	  node = t->new_node();
+	  arcs->add_arc( l, node, t );
+	}
+    }
+    node->set_final(1);
+    return t;
+  }
+
   Transducer * SfstTransducer::intersect
   (Transducer * t1, Transducer * t2)
   { return &t1->operator&(*t2); }
