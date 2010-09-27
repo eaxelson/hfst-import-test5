@@ -7,13 +7,6 @@
 #include <string.h>
 #include <stdio.h>
 
-// header file would be better..
-namespace hfst {
-  namespace HfstBasic {
-    char* fst_strdup(const char* pString);
-  }
-}
-
 namespace hfst {
   namespace implementations {
 
@@ -70,6 +63,10 @@ namespace hfst {
       const char *code2symbol( unsigned int c ) const;
       unsigned int add_symbol(const char * symbol);
       void complement( std::vector<unsigned int> &sym );
+
+      std::pair<unsigned int, unsigned int> next_label(char *&, bool extended=true);
+      int next_code( char* &string, bool extended=true, bool insert=true );
+      int next_mcsym( char* &string, bool insert=true );
     };
 
   }

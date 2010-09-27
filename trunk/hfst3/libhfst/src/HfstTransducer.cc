@@ -1638,6 +1638,32 @@ type(type),anonymous(false),is_trie(false)
 #endif
 		 const_cast<HfstTransducer&>(another)); }
 
+  HfstTransducer &HfstTransducer::disjunct(const StringPairVector &spv)
+  {
+    switch (this->type)
+      {
+#if HAVE_SFST
+      case SFST_TYPE:
+	sfst_interface.disjunct(implementation.sfst, spv);
+	break;
+#endif
+#if HAVE_OPENFST
+      case TROPICAL_OFST_TYPE:
+	tropical_ofst_interface.disjunct(implementation.tropical_ofst, spv);
+	break;
+      case LOG_OFST_TYPE:
+	throw hfst::exceptions::FunctionNotImplementedException();
+	break;
+#endif
+      case FOMA_TYPE:
+	throw hfst::exceptions::FunctionNotImplementedException();
+	break;
+      default:
+	assert(false);
+      }
+    return *this; 
+  }
+
   HfstTransducer &HfstTransducer::disjunct_as_tries(HfstTransducer &another,
 						    ImplementationType type)
   {
@@ -1652,10 +1678,10 @@ type(type),anonymous(false),is_trie(false)
       case SFST_TYPE:
 	throw hfst::exceptions::FunctionNotImplementedException();
 	break;
+#if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	throw hfst::exceptions::FunctionNotImplementedException();
 	break;
-#if HAVE_OPENFST
       case LOG_OFST_TYPE:
 	hfst::implementations::LogWeightTransducer::disjunct_as_tries
 	  (*implementation.log_ofst,another.implementation.log_ofst);

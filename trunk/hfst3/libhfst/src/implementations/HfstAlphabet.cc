@@ -1,4 +1,6 @@
 #include "HfstAlphabet.h"
+#include "../HfstBasic.h"
+#include "../HfstUtf8.h"
 
 namespace hfst {
   namespace implementations {
@@ -141,6 +143,110 @@ namespace hfst {
 	}
       }
       sym.swap(result);
+    }
+
+    /*******************************************************************/
+    /*                                                                 */
+    /*  Alphabet::next_mcsym                                           */
+    /*                                                                 */
+    /*  recognizes multi-character symbols which are enclosed with     */
+    /*  angle brackets <...>. If the argument flag insert is true,     */
+    /*  the multi-character symbol must be already in the lexicon in   */
+    /*  order to be recognized.                                        */
+    /*                                                                 */
+    /*******************************************************************/
+    
+    int HfstAlphabet::next_mcsym( char* &string, bool insert )
+      
+    {
+      char *start=string;
+      
+      if (*start == '<')
+	// symbol might start here
+	for( char *end=start+1; *end; end++ )
+	  if (*end == '>') {
+	    // matching pair of angle brackets found
+	    // mark the end of the substring with \0
+	    char lastc = *(++end);
+	    *end = 0;
+	    
+	    int c;
+	    if (insert)
+	      c = add_symbol( start );
+	    else
+	      c = symbol2code(start);
+	    // restore the original string
+	    *end = lastc;
+	    
+	    if (c != EOF) {
+	      // symbol found
+	      // return its code
+	      string = end;
+	      return (unsigned int)c;
+	    }
+	    else
+	      // not a complex character
+	      break;
+	  }
+      return EOF;
+    }
+
+    int HfstAlphabet::next_code( char* &string, bool extended, bool insert )
+      
+    {
+      if (*string == 0)
+	return EOF; // finished
+      
+      int c = next_mcsym(string, insert);
+      if (c != EOF)
+	return c;
+      
+      if (extended && *string == '\\')
+	string++; // remove quotation
+      
+      //if (utf8) {
+      {
+	unsigned int c = HfstUtf8::utf8toint( &string );
+	return (int)add_symbol(HfstUtf8::int2utf8(c));
+      }
+      //}
+      /*else {
+	char buffer[2];
+	buffer[0] = *string;
+	buffer[1] = 0;
+	string++;
+	return (int)add_symbol(buffer);
+	}*/
+    }
+
+    std::pair<unsigned int, unsigned int> HfstAlphabet::next_label(char * &string, bool extended) 
+    {
+      // read first character
+      int c = next_code( string, extended );
+      if (c == EOF) {
+	return std::pair<unsigned int, unsigned int>(0,0); // end of string reached
+      }
+      
+      unsigned int lc=(unsigned int)c;
+      if (!extended || *string != ':') { // single character?
+	if (lc == 0)
+	  return next_label(string, extended); // ignore epsilon
+	return std::pair<unsigned int, unsigned int>(lc,lc);
+      }
+      
+      // read second character
+      string++; // jump over ':'
+      c = next_code( string );
+      if (c == EOF) {
+	static char buffer[1000];
+	sprintf(buffer,"Error: incomplete symbol in input file: %s", string);
+	throw buffer;
+      }
+      
+      std::pair<unsigned int, unsigned int> retval(lc, (unsigned int)c);
+      if (retval.first == 0 && retval.second == 0)
+	return next_label(string, extended); // ignore epsilon transitions
+      return retval; 
     }
     
   }

@@ -163,6 +163,9 @@ namespace implementations
 					StdVectorFst * t2);
       static StdVectorFst * disjunct(StdVectorFst * t1,
 			      StdVectorFst * t2);
+
+      static StdVectorFst * disjunct(StdVectorFst * t, const StringPairVector &spv);
+
       static StdVectorFst * intersect(StdVectorFst * t1,
 			     StdVectorFst * t2);
       static StdVectorFst * subtract(StdVectorFst * t1,
