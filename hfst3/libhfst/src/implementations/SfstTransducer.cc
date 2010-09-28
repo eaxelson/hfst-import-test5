@@ -688,8 +688,19 @@ namespace hfst { namespace implementations {
     Node *node= t->root_node();
     for (StringPairVector::const_iterator it = spv.begin(); it != spv.end(); it++) 
       {
-	Label l(t->alphabet.add_symbol(it->first.c_str()),
-		t->alphabet.add_symbol(it->second.c_str()) );
+	unsigned int inumber,onumber;
+	if (strcmp(it->first.c_str(),"@_EPSILON_SYMBOL_@") == 0 || 
+	    strcmp(it->first.c_str(),"<>") == 0 )
+	  inumber=0;
+	else
+	  inumber=t->alphabet.add_symbol(it->first.c_str());
+	if (strcmp(it->second.c_str(),"@_EPSILON_SYMBOL_@") == 0 ||
+	    strcmp(it->second.c_str(),"<>") == 0 )
+	  onumber=0;
+	else
+	  onumber=t->alphabet.add_symbol(it->second.c_str());
+
+	Label l(inumber, onumber);
 	t->alphabet.insert(l);
 	Arcs *arcs=node->arcs();
 	node = arcs->target_node( l );

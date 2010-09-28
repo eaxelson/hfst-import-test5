@@ -171,10 +171,17 @@ namespace hfst {
 	    *end = 0;
 	    
 	    int c;
-	    if (insert)
-	      c = add_symbol( start );
-	    else
-	      c = symbol2code(start);
+
+	    // handle epsilon symbol "<>" here
+	    if (strcmp(start,"<>") == 0) {
+	      c = 0;
+	    }
+	    else {
+	      if (insert)
+		c = add_symbol( start );
+	      else
+		c = symbol2code(start);
+	    }
 	    // restore the original string
 	    *end = lastc;
 	    
