@@ -556,7 +556,7 @@ namespace hfst
       char *bufptr = buffer;
 
       std::pair<unsigned int, unsigned int> np = TheAlphabet.next_label(bufptr, true);
-      while (np.first != 0 && np.second != 0) {
+      while (np.first != 0 || np.second != 0) {
 	spv.push_back(StringPair(std::string(TheAlphabet.code2symbol(np.first)), 
 				 std::string(TheAlphabet.code2symbol(np.second)) ) );
 	np = TheAlphabet.next_label(bufptr, true);
