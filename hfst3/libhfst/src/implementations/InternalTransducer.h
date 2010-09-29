@@ -18,6 +18,32 @@ namespace hfst {
   
     typedef unsigned int HfstState;
 
+    class HfstTrieState {
+    public:
+      bool final;
+      unsigned int state_number;
+      std::set< std::pair < std::pair<unsigned int, unsigned int>, HfstTrieState * > > transitions;
+
+      HfstTrieState(unsigned int);
+      ~HfstTrieState();
+      void print(const HfstAlphabet * alphabet);
+      void add_transition(unsigned int inumber, unsigned int onumber, HfstTrieState * target_state);
+      HfstTrieState * find(unsigned int, unsigned int);      
+    };
+
+    class HfstTrie {
+    public:
+      HfstTrieState * initial_state;
+      HfstAlphabet * alphabet;
+      unsigned int max_state_number;
+      std::vector<HfstTrieState *> states;
+
+      HfstTrie();
+      ~HfstTrie();
+      void add_path(const StringPairVector &spv);
+      void print();
+    };
+
     class InternalTransducerLine {
     public:
       bool final_line;
@@ -54,11 +80,13 @@ namespace hfst {
       std::set<InternalTransducerLine> lines;
       std::set<std::pair<HfstState,float> > final_states;
       HfstAlphabet * alphabet;
+      unsigned int disjunct_max_state_number;
 
       HfstInternalTransducer();
       ~HfstInternalTransducer();
       HfstInternalTransducer(const HfstInternalTransducer &transducer);
       HfstInternalTransducer(const HfstTransducer &transducer);
+      HfstInternalTransducer(const HfstTrie &trie);
 
       void add_line(HfstState final_state, float final_weight); 
       void add_line(HfstState origin_state, HfstState target_state,
@@ -87,6 +115,8 @@ namespace hfst {
 		      bool input_side=true, bool output_side=true);
       void substitute(const StringPair &old_pair, const StringPair &new_pair); 
       void insert_freely(const StringPair &symbol_pair);
+      
+      void disjunct(const StringPairVector &spv);
 
       friend class HfstStateIterator;
       friend class HfstTransitionIterator;

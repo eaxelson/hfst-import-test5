@@ -25,6 +25,7 @@
 #include "HfstCompiler.h"
 #include "HfstUtf8.h"
 #include "HfstBasic.h"
+#include "implementations/InternalTransducer.h"
 
 namespace hfst
 {
@@ -533,7 +534,11 @@ namespace hfst
     }
     free( filename );
 
-    HfstTransducer * retval = new HfstTransducer(type);
+    HfstTransducer * retval_hfst = NULL;
+    hfst::implementations::HfstTrie retval_internal;
+
+    if (type != FOMA_TYPE)
+      retval_hfst = new HfstTransducer(type);
 
     int n=0;
     char buffer[10000];
@@ -562,7 +567,10 @@ namespace hfst
 	np = TheAlphabet.next_label(bufptr, true);
       }
 
-      retval->disjunct(spv);
+      if (type != FOMA_TYPE)
+	retval_hfst->disjunct(spv);
+      else
+	retval_internal.add_path(spv);
 
     }
     if (Verbose && n >= 10000)
@@ -571,7 +579,13 @@ namespace hfst
     is.close();
     if (Verbose)
       fprintf(stderr,"finished\n");
-    return retval;
+
+    if (type != FOMA_TYPE)
+      return retval_hfst;
+    else {
+      HfstMutableTransducer internal(retval_internal);
+      return new HfstTransducer(internal, FOMA_TYPE);
+    }
   }
 
   HfstTransducer * HfstCompiler::read_transducer(char *filename, ImplementationType type) {
