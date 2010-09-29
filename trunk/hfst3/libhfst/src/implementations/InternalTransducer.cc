@@ -5,6 +5,114 @@
 namespace hfst {
   namespace implementations {
     
+    //      bool final;
+    // std::set< std::pair<unsigned int, unsigned int>, HfstTrieState * target_state > transitions;
+
+    HfstTrieState::HfstTrieState(unsigned int state_number): final(false), state_number(state_number) {}
+
+    HfstTrieState::~HfstTrieState() { 
+      for( std::set< std::pair< std::pair<unsigned int, unsigned int>, HfstTrieState *> >::iterator it = transitions.begin();
+	   it != transitions.end(); it++ ) 
+	delete it->second;
+    }
+
+    void HfstTrieState::print(const HfstAlphabet * alphabet)
+    {
+      for( std::set< std::pair< std::pair<unsigned int, unsigned int>, HfstTrieState *> >::iterator it = transitions.begin();
+	   it != transitions.end(); it++ ) 
+	{
+	  fprintf(stderr, "%i\t%i\t%s\t%s\n", 
+		  state_number,
+		  it->second->state_number,
+		  alphabet->code2symbol(it->first.first),
+		  alphabet->code2symbol(it->first.second) );
+	}
+      if (final)
+	fprintf(stderr, "%i\n", state_number);
+    }
+
+    void HfstTrieState::add_transition(unsigned int inumber, unsigned int onumber, HfstTrieState * target_state)
+    {
+      transitions.insert( std::pair< std::pair<unsigned int, unsigned int>, HfstTrieState * >( std::pair<unsigned int, unsigned int>(inumber,onumber), target_state ) );
+    }
+
+    HfstTrieState * HfstTrieState::find(unsigned int inumber, unsigned int onumber) {
+      for( std::set< std::pair< std::pair<unsigned int, unsigned int>, HfstTrieState *> >::iterator it = transitions.begin();
+	   it != transitions.end(); it++ )
+	if ( it->first.first == inumber && it->first.second == onumber)
+	  return it->second;
+      return NULL;
+    }      
+
+
+    // HfstTrieState * initial_state;
+    //  HfstAlphabet * alpha;
+
+    HfstTrie::HfstTrie(): initial_state(NULL), alphabet(new HfstAlphabet()), max_state_number(0) {}
+
+    HfstTrie::~HfstTrie() { delete initial_state; delete alphabet; }
+
+    void HfstTrie::print()
+    {
+      if (initial_state == NULL)
+	return;
+      for (std::vector<HfstTrieState *>::iterator it = states.begin(); it != states.end(); it++)
+	{
+	  (*it)->print(alphabet);
+	}
+    }
+
+    void HfstTrie::add_path(const StringPairVector &spv) 
+    {
+      if (spv.size() == 0)
+	return;
+      if (initial_state == NULL) {
+	initial_state = new HfstTrieState(max_state_number);
+	states.push_back(initial_state);
+      }
+
+      // transition that is being searched 
+      StringPairVector::const_iterator path = spv.begin();
+      unsigned int inumber = alphabet->add_symbol(path->first.c_str());
+      unsigned int onumber = alphabet->add_symbol(path->second.c_str());
+      HfstTrieState * state = initial_state;
+
+      while (true) 
+	{
+	  HfstTrieState * target = state->find(inumber,onumber);
+	  if (target == NULL)
+	    break;
+	  else {
+	    path++;
+	    if (path == spv.end()) {
+	      target->final = true;
+	      return;
+	    }
+	    state = target;
+	    inumber = alphabet->add_symbol(path->first.c_str());
+	    onumber = alphabet->add_symbol(path->second.c_str());
+	  }
+	}
+
+      while (true)
+	{
+	  max_state_number++;
+	  HfstTrieState * new_state = new HfstTrieState(max_state_number);
+	  states.push_back(new_state);
+	  state->add_transition(inumber, onumber, new_state);
+
+	  path++;
+	  if (path == spv.end()) {
+	    new_state->final = true;
+	    break;
+	  }
+	  state = new_state;
+	  inumber = alphabet->add_symbol(path->first.c_str());
+	  onumber = alphabet->add_symbol(path->second.c_str());
+	}
+    }
+
+
     bool InternalTransducerLine::operator<(const InternalTransducerLine &another) const 
     {
       if (this->final_line && another.final_line) {
@@ -42,7 +150,7 @@ namespace hfst {
     }
 
 
-    HfstInternalTransducer::HfstInternalTransducer(): alphabet(new HfstAlphabet()) {}
+    HfstInternalTransducer::HfstInternalTransducer(): alphabet(new HfstAlphabet()), disjunct_max_state_number(0) {}
 
     HfstInternalTransducer::~HfstInternalTransducer() { delete alphabet; }
 
@@ -486,6 +594,71 @@ namespace hfst {
       lines=new_transducer.lines;
     }
 
+
+    void HfstInternalTransducer::disjunct(const StringPairVector &spv) 
+    {
+      if (spv.size() == 0)
+	return;
+
+      // transition that is being searched 
+      StringPairVector::const_iterator path = spv.begin();
+      unsigned int inumber = alphabet->add_symbol(path->first.c_str());
+      unsigned int onumber = alphabet->add_symbol(path->second.c_str());
+
+      unsigned int state=0;  // state that is being searched
+      unsigned int add_from=0; // state where new transitions are added (if necessary)
+
+      // (1) go through the trie as long as possible
+      for (std::set<InternalTransducerLine>::const_iterator it = lines.begin(); 
+	   it != lines.end(); it++) {
+	if (it->origin < state) // state number is smaller than searched, so skip it
+	  ;
+	else if (it->origin > state)  // transition not found
+	  break;
+	else {  // state found
+	  if (it->final_line) { // final line reached
+	    add_from = it->origin;
+	    break;
+	  }
+	  if ( (it->isymbol == inumber) && (it->osymbol == onumber) ) { // transition found
+	    path++; // advance the path iterator
+	    if (path == spv.end()) {
+	      add_line(it->target,0);
+	      return;
+	    }
+	    else {
+	      state = it->target;  // update state that is being searched             
+	      inumber = alphabet->add_symbol(path->first.c_str());
+	      onumber = alphabet->add_symbol(path->second.c_str());
+	    }
+	  }
+	  else // in case transition is not found, new transitions are added to this state
+	    add_from = it->origin; 
+	}
+      }
+      
+      // (2) add new transitions
+      unsigned int add_state = max_state_number() + 1;
+      while (true)
+	{
+	  add_line(add_from, add_state, inumber, onumber, 0);
+	  path++;
+	  if (path == spv.end()) {
+	    add_line(add_state,0);
+	    disjunct_max_state_number = add_state;
+	    return;
+	  }
+	  else {
+	    add_from = add_state;
+	    add_state++;
+	    inumber = alphabet->add_symbol(path->first.c_str());
+	    onumber = alphabet->add_symbol(path->second.c_str());
+	  }
+	}
+
+    }
+
+
     /* zero weights inserted, does not handle non-final states that lead nowhere */
     void HfstInternalTransducer::insert_freely(const StringPair &symbol_pair) 
     {
@@ -541,11 +714,37 @@ namespace hfst {
 
     HfstInternalTransducer::HfstInternalTransducer( const HfstInternalTransducer &transducer)
     {
-      //HfstInternalTransducer * retval = new HfstInternalTransducer();
       lines = transducer.lines;
       final_states = transducer.final_states;
       HfstAlphabet * alpha = new HfstAlphabet(*(transducer.alphabet));
       alphabet = alpha;
+    }
+
+    HfstInternalTransducer::HfstInternalTransducer( const HfstTrie &trie )
+    {
+      HfstAlphabet * alpha = new HfstAlphabet(*(trie.alphabet));
+      alphabet = alpha;
+
+      if (trie.initial_state != NULL) 
+	{
+	  for (std::vector<HfstTrieState *>::const_iterator it1 = trie.states.begin(); 
+	       it1 != trie.states.end(); it1++)
+	    {
+	      HfstTrieState * s = *it1;
+	      for( std::set< std::pair< std::pair<unsigned int, unsigned int>, HfstTrieState *> >::iterator it2 = s->transitions.begin();
+		   it2 != s->transitions.end(); it2++ ) 
+		{
+		  add_line(
+			   s->state_number,
+			   it2->second->state_number,
+			   it2->first.first,
+			   it2->first.second,
+			   0 );
+		}
+	      if (s->final)
+		add_line(s->state_number, 0);	      
+	    }
+	}
     }
 
     HfstInternalTransducer::HfstInternalTransducer(const HfstTransducer &transducer)
