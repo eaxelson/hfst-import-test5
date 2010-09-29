@@ -45,6 +45,7 @@ namespace hfst
 
     HfstTransducer replace( HfstTransducer &t, ReplaceType repl_type, bool optional, StringPairSet &alphabet ) 
     {
+
       bool DEBUG=false;
 
       if (DEBUG) printf("replcae..\n");
@@ -105,6 +106,8 @@ namespace hfst
       HfstTransducer retval = replace(tm, repl_type, false, alphabet);
 
       if (DEBUG) printf("..replcae_transducer\n");
+
+      retval.minimize();
 
       return retval;
     }
@@ -324,6 +327,15 @@ namespace hfst
     HfstTransducer replace_in_context(HfstTransducerPair &context, ReplaceType repl_type, HfstTransducer &t, bool optional, StringPairSet &alphabet)
     {
 
+      /*      fprintf(stderr, "replace_in_context arguments:\n");
+      fprintf(stderr, "left context:\n");
+      std::cerr << context.first;
+      fprintf(stderr, "right context:\n");
+      std::cerr << context.second;
+      fprintf(stderr, "mapping:\n");
+      std::cerr << t;*/
+
+
       bool DEBUG=false;
 
       if (DEBUG) printf("replace_in_context...\n");
@@ -445,8 +457,7 @@ namespace hfst
 	rt = replace_transducer( t, leftm, rightm, REPL_DOWN, alphabet );
       if (DEBUG) printf("  minimizing rt\n");
       rt.minimize();
-      if (DEBUG) rt.write_in_att_format("rt.att",true);
-      // return rt;  // TEST
+      if (true) rt.write_in_att_format("rt.att",true);
       if (DEBUG) printf("  ..rt createD\n");
 
 
