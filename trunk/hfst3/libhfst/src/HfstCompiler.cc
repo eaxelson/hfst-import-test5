@@ -537,7 +537,9 @@ namespace hfst
     HfstTransducer * retval_hfst = NULL;
     hfst::implementations::HfstTrie retval_internal;
 
-    if (type != FOMA_TYPE)
+    if (type != FOMA_TYPE && 
+	type != TROPICAL_OFST_TYPE &&
+	type != LOG_OFST_TYPE)
       retval_hfst = new HfstTransducer(type);
 
     int n=0;
@@ -567,7 +569,9 @@ namespace hfst
 	np = TheAlphabet.next_label(bufptr, true);
       }
 
-      if (type != FOMA_TYPE)
+      if (type != FOMA_TYPE &&
+	  type != TROPICAL_OFST_TYPE &&
+	  type != LOG_OFST_TYPE)
 	retval_hfst->disjunct(spv);
       else
 	retval_internal.add_path(spv);
@@ -580,11 +584,13 @@ namespace hfst
     if (Verbose)
       fprintf(stderr,"finished\n");
 
-    if (type != FOMA_TYPE)
+    if (type != FOMA_TYPE &&
+	type != TROPICAL_OFST_TYPE &&
+	type != LOG_OFST_TYPE)
       return retval_hfst;
     else {
       HfstMutableTransducer internal(retval_internal);
-      return new HfstTransducer(internal, FOMA_TYPE);
+      return new HfstTransducer(internal, type);
     }
   }
 

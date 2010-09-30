@@ -1350,20 +1350,26 @@ namespace hfst { namespace implementations
   TropicalWeightTransducer::copy(StdVectorFst * t)
   { return new StdVectorFst(*t); }
 
-  StdVectorFst * 
-  TropicalWeightTransducer::determinize(StdVectorFst * t)
-  {
-    RmEpsilonFst<StdArc> rm(*t);
-    EncodeMapper<StdArc> encode_mapper(0x0001,ENCODE);
-    EncodeFst<StdArc> enc(rm,
-			  &encode_mapper);
-    DeterminizeFst<StdArc> det(enc);
-    DecodeFst<StdArc> dec(det,
-			  encode_mapper);
-    return new StdVectorFst(dec);
+
+#ifdef FOO
+  fst::StdVectorFst * TropicalWeightTransducer::minimize(StdVectorFst * t) {
+    fst::RmEpsilon(t);
+    fst::EncodeMapper<fst::StdArc> mapper(0x00011,fst::EncodeType(1)); // 3 = Labels and Weights ?, ENCODE = 1
+    
+    fst::EncodeFst<fst::StdArc> TEncode(*t, &mapper);
+    fst::StdVectorFst Encoded_T(TEncode);
+
+    fst::StdVectorFst *Determinized_T = new fst::StdVectorFst();
+    fst::Determinize(Encoded_T, Determinized_T);
+
+    fst::Minimize(Determinized_T);
+
+    fst::DecodeFst<fst::StdArc> D1(*Determinized_T, mapper);
+    fst::StdVectorFst *DecodedT = new fst::StdVectorFst(D1);
+    delete Determinized_T;
+    return DecodedT;
   }
   
-#ifdef FOO
   fst::StdVectorFst * TropicalWeightTransducer::minimize(StdVectorFst * t) {
     fst::RmEpsilon(t);
     fst::EncodeMapper<fst::StdArc> mapper(0x0001,fst::EncodeType(1)); //
@@ -1381,25 +1387,65 @@ namespace hfst { namespace implementations
     delete Determinized_T;
     return DecodedT;
   }
-#endif
 
   StdVectorFst * TropicalWeightTransducer::minimize
   (StdVectorFst * t)
   {
     StdVectorFst * determinized_t = determinize(t);
 
-    EncodeMapper<StdArc> encode_mapper(0x0001,ENCODE);
+    EncodeMapper<StdArc> encode_mapper(0x00011,ENCODE);  // TEST 11
     EncodeFst<StdArc> enc(*determinized_t,
 			  &encode_mapper);
     StdVectorFst fst_enc(enc);
     Minimize<StdArc>(&fst_enc);
-    fst::RmEpsilon(&fst_enc);  // For some reason, Minimize creates extra epsilons!
+    //fst::RmEpsilon(&fst_enc);  // For some reason, Minimize creates extra epsilons! SLOW?
 
     Decode<StdArc>(&fst_enc, encode_mapper);
     delete determinized_t;
 
     return new StdVectorFst(fst_enc);
   }
+
+  StdVectorFst * 
+  TropicalWeightTransducer::determinize(StdVectorFst * t)
+  {
+    RmEpsilonFst<StdArc> rm(*t);
+    EncodeMapper<StdArc> encode_mapper(0x0001,ENCODE);
+    EncodeFst<StdArc> enc(rm,
+			  &encode_mapper);
+    DeterminizeFst<StdArc> det(enc);
+    DecodeFst<StdArc> dec(det,
+			  encode_mapper);
+    return new StdVectorFst(dec);
+  }
+#endif
+
+  StdVectorFst * 
+  TropicalWeightTransducer::determinize(StdVectorFst * t)
+  {
+    RmEpsilon<StdArc>(t);
+    EncodeMapper<StdArc> encode_mapper(kEncodeLabels|kEncodeWeights,ENCODE);  // TEST
+    Encode(t, &encode_mapper);
+    StdVectorFst * det = new StdVectorFst();
+    Determinize<StdArc>(*t, det);
+    Decode(det, encode_mapper);
+    return det;
+  }
+
+
+  StdVectorFst * TropicalWeightTransducer::minimize
+  (StdVectorFst * t)
+  {
+    RmEpsilon<StdArc>(t);
+    EncodeMapper<StdArc> encode_mapper(kEncodeLabels|kEncodeWeights,ENCODE);  // TEST
+    Encode(t, &encode_mapper);
+    StdVectorFst * det = new StdVectorFst();
+    Determinize<StdArc>(*t, det);
+    Minimize<StdArc>(det);
+    Decode(det, encode_mapper);
+    return det;
+  }
+
 
   void print_att_number(StdVectorFst *t, FILE * ofile) {
     fprintf(ofile, "initial state: %i\n", t->Start());
@@ -1861,11 +1907,15 @@ namespace hfst { namespace implementations
     if (t2->OutputSymbols() == NULL)
       t2->SetOutputSymbols(t2->InputSymbols());
 
-    ArcSort(t1, OLabelCompare<StdArc>());
-    ArcSort(t2, ILabelCompare<StdArc>());
+    ArcSort(t1, StdOLabelCompare());
+    ArcSort(t2, StdILabelCompare());
 
+    /* SLOW?
     ComposeFst<StdArc> compose(*t1,*t2);
-    StdVectorFst *result = new StdVectorFst(compose); 
+    StdVectorFst *result = new StdVectorFst(compose); */
+
+    StdVectorFst *result = new StdVectorFst();
+    Compose(*t1, *t2, result);
     result->SetInputSymbols(t1->InputSymbols());
     return result;
   }

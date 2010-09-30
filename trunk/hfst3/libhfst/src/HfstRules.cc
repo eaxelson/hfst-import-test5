@@ -457,7 +457,6 @@ namespace hfst
 	rt = replace_transducer( t, leftm, rightm, REPL_DOWN, alphabet );
       if (DEBUG) printf("  minimizing rt\n");
       rt.minimize();
-      if (true) rt.write_in_att_format("rt.att",true);
       if (DEBUG) printf("  ..rt createD\n");
 
 
