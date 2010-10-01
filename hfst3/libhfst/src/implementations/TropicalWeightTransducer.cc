@@ -1323,25 +1323,26 @@ namespace hfst { namespace implementations
   }
 
   StdVectorFst * TropicalWeightTransducer::define_transducer
-  (const StringPairSet &sps)
+  (const StringPairSet &sps, bool cyclic)
   {
     StdVectorFst * t = new StdVectorFst;
     SymbolTable st = create_symbol_table("");
 
-    StateId s1 = t->AddState();
+    StateId s1 = t->AddState();  // start state
     t->SetStart(s1);
+    StateId s2=s1;               // final state
 
     if (not sps.empty()) {
-      StateId s2 = t->AddState();
+      if (not cyclic)
+	s2 = t->AddState();
       for (StringPairSet::const_iterator it = sps.begin();
 	   it != sps.end();
 	   ++it)
 	{
 	  t->AddArc(s1,StdArc(st.AddSymbol(it->first),st.AddSymbol(it->second),0,s2));
 	}
-      s1 = s2;
     }
-    t->SetFinal(s1,0);
+    t->SetFinal(s2,0);
     t->SetInputSymbols(&st);
     return t;
   }

@@ -144,7 +144,7 @@ namespace implementations
       static LogFst * define_transducer(unsigned int inumber, unsigned int onumber);
 
       static LogFst * define_transducer(const hfst::StringPairVector &spv);
-      static LogFst * define_transducer(const hfst::StringPairSet &sps);
+      static LogFst * define_transducer(const hfst::StringPairSet &sps, bool cyclic=false);
       static LogFst * copy(LogFst * t);
       static LogFst * determinize(LogFst * t);
       static LogFst * minimize(LogFst * t);
