@@ -312,7 +312,7 @@ namespace hfst
       }
   }
 
-  HfstTransducer::HfstTransducer(const StringPairSet & sps, ImplementationType type):
+  HfstTransducer::HfstTransducer(const StringPairSet & sps, ImplementationType type, bool cyclic):
     type(type),anonymous(false),is_trie(false)
   {
     if (not is_implementation_type_available(type))
@@ -322,7 +322,7 @@ namespace hfst
       {
 #if HAVE_SFST
       case SFST_TYPE:
-	implementation.sfst = sfst_interface.define_transducer(sps);
+	implementation.sfst = sfst_interface.define_transducer(sps,cyclic);
 	this->type = SFST_TYPE;
 	break;
 #endif
@@ -330,19 +330,19 @@ namespace hfst
       case TROPICAL_OFST_TYPE:
       case UNSPECIFIED_TYPE:
 	implementation.tropical_ofst = 
-	  tropical_ofst_interface.define_transducer(sps);
+	  tropical_ofst_interface.define_transducer(sps,cyclic);
 	this->type = TROPICAL_OFST_TYPE;
 	break;
       case LOG_OFST_TYPE:
 	implementation.log_ofst = 
-	  log_ofst_interface.define_transducer(sps);
+	  log_ofst_interface.define_transducer(sps,cyclic);
 	this->type = LOG_OFST_TYPE;
 	break;
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
 	implementation.foma =
-	  foma_interface.define_transducer(sps);
+	  foma_interface.define_transducer(sps,cyclic);
 	this->type = FOMA_TYPE;
 	break;
 #endif

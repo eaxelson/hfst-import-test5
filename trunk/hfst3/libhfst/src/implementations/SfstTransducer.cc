@@ -444,12 +444,14 @@ namespace hfst { namespace implementations {
     n->set_final(1);
     return t; }
 
-  Transducer * SfstTransducer::define_transducer(const StringPairSet &sps)
+    Transducer * SfstTransducer::define_transducer(const StringPairSet &sps, bool cyclic)
   { Transducer * t = new Transducer;
     initialize_alphabet(t);
     Node * n = t->root_node();
+    Node * new_node = n;
     if (not sps.empty()) {
-      Node * new_node = t->new_node();
+      if (not cyclic)
+	new_node = t->new_node();
       for (StringPairSet::const_iterator it = sps.begin();
 	   it != sps.end();
 	   ++it)
@@ -466,9 +468,8 @@ namespace hfst { namespace implementations {
 
 	  n->add_arc(Label(inumber,onumber),new_node,t);
 	}
-      n = new_node;
     }
-    n->set_final(1);
+    new_node->set_final(1);
     return t; }
 
 

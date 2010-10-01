@@ -60,13 +60,18 @@ namespace hfst
       else
 	throw hfst::exceptions::ImpossibleReplaceTypeException();
 
+      HfstTransducer pi_star(alphabet, type, true);
+      //pi_star.repeat_star();
+      //pi_star.minimize();
+
       // tc = ( .* t_proj .* )
-      HfstTransducer tc = universal_fst(alphabet, type);
+      HfstTransducer tc(pi_star);
       tc.concatenate(t_proj);
-      tc.concatenate(universal_fst(alphabet, type));
+      tc.concatenate(pi_star);
 		     
       // tc_neg = ! ( .* t_proj .* )
-      HfstTransducer tc_neg = negation_fst(tc, alphabet);
+      HfstTransducer tc_neg(pi_star);
+      tc_neg.subtract(tc);
 
       // retval = ( tc_neg t )* tc_neg
       HfstTransducer retval(tc_neg);
@@ -75,7 +80,7 @@ namespace hfst
       retval.concatenate(tc_neg);
 
       if (optional)
-	retval.disjunct(universal_fst(alphabet, type));
+	retval.disjunct(pi_star);
 
       if (DEBUG) printf("..replcae\n");
 
@@ -131,8 +136,12 @@ namespace hfst
 
       if (DEBUG) printf("    (1)\n");
 
+      HfstTransducer pi_star(alphabet, t.get_type(), true);
+      //pi_star.repeat_star();
+      //pi_star.minimize();
+
       // arg1 = .* ( m1 >> ( m2 >> t ))
-      HfstTransducer arg1 = universal_fst(alphabet, t.get_type());
+      HfstTransducer arg1(pi_star);
 
       //arg1.minimize();
 
@@ -153,8 +162,10 @@ namespace hfst
 
       // arg2 = !(.* m1)
       HfstTransducer m1_tr(m1, t.get_type());
-      HfstTransducer arg2 = negation_fst(universal_fst(alphabet, t.get_type()).concatenate(m1_tr),
-					 alphabet);
+      HfstTransducer tmp(pi_star);
+      tmp.concatenate(m1_tr);
+      HfstTransducer arg2(pi_star);
+      arg2.subtract(tmp);
 
       // ct = .* ( m1 >> ( m2 >> t ))  ||  !(.* m1)
       HfstTransducer ct = arg1.compose(arg2);
@@ -169,7 +180,7 @@ namespace hfst
       HfstTransducer mt(m2, t.get_type());
       mt.repeat_star();
       mt.concatenate(m1_tr);
-      mt.concatenate(universal_fst(alphabet,t.get_type()));
+      mt.concatenate(pi_star);
 
       //mt.minimize();
 
@@ -178,15 +189,19 @@ namespace hfst
       if (DEBUG) printf("    (5)\n");
 
       // ct !mt
+      HfstTransducer tmp2(pi_star);
+      tmp2.subtract(mt);
       HfstTransducer ct_neg_mt(ct);
-      ct_neg_mt.concatenate(negation_fst(mt, alphabet));
+      ct_neg_mt.concatenate(tmp2);
 
       //ct_neg_mt.minimize();
 
       if (DEBUG) printf("    (6)\n");
 
       // !ct mt
-      HfstTransducer neg_ct_mt = negation_fst(ct, alphabet).concatenate(mt) ;
+      HfstTransducer neg_ct_mt(pi_star);
+      neg_ct_mt.subtract(ct);
+      neg_ct_mt.concatenate(mt);
 
       //neg_ct_mt.minimize();
 
@@ -203,7 +218,8 @@ namespace hfst
       //cerr << disj;
 
       // negation
-      HfstTransducer retval = negation_fst(disj, alphabet); 
+      HfstTransducer retval(pi_star);
+      retval.subtract(disj);
 
       if (DEBUG) printf("    (9)\n");
 
@@ -384,25 +400,33 @@ namespace hfst
       std::string rightm("@_RIGHT_MARKER_@");
       std::string epsilon("@_EPSILON_SYMBOL_@");
 
+      // HfstTransducer pi(alphabet, type);
+
       // Create the insert boundary transducer (.|<>:<L>|<>:<R>)*    
-      HfstTransducer ibt(alphabet, type);
-      HfstTransducer eps_to_leftm(epsilon, leftm, type);
-      HfstTransducer eps_to_rightm(epsilon, rightm, type);
-      ibt.disjunct(eps_to_leftm);
-      ibt.disjunct(eps_to_rightm);
-      ibt.repeat_star();
-      ibt.minimize();
+      StringPairSet pi1 = alphabet;
+      pi1.insert(StringPair("@_EPSILON_SYMBOL_@", leftm));
+      pi1.insert(StringPair("@_EPSILON_SYMBOL_@", rightm));
+      HfstTransducer ibt(pi1, type, true);
+      //HfstTransducer eps_to_leftm(epsilon, leftm, type);
+      //HfstTransducer eps_to_rightm(epsilon, rightm, type);
+      //ibt.disjunct(eps_to_leftm);
+      //ibt.disjunct(eps_to_rightm);
+      //ibt.repeat_star();
+      //ibt.minimize();
       //return ibt;
       if (DEBUG) printf("  ..ibt created\n");
 
       // Create the remove boundary transducer (.|<L>:<>|<R>:<>)*    
-      HfstTransducer rbt(alphabet, type);
-      HfstTransducer leftm_to_eps(leftm, epsilon, type);
-      HfstTransducer rightm_to_eps(rightm, epsilon, type);
-      rbt.disjunct(leftm_to_eps);
-      rbt.disjunct(rightm_to_eps);
-      rbt.repeat_star();
-      rbt.minimize();
+      StringPairSet pi2 = alphabet;
+      pi2.insert(StringPair(leftm, "@_EPSILON_SYMBOL_@"));
+      pi2.insert(StringPair(rightm, "@_EPSILON_SYMBOL_@"));
+      HfstTransducer rbt(pi2, type, true);
+      //HfstTransducer leftm_to_eps(leftm, epsilon, type);
+      //HfstTransducer rightm_to_eps(rightm, epsilon, type);
+      //rbt.disjunct(leftm_to_eps);
+      //rbt.disjunct(rightm_to_eps);
+      //rbt.repeat_star();
+      //rbt.minimize();
       //return rbt;
       if (DEBUG) printf("  ..rbt created\n");
 
@@ -410,15 +434,19 @@ namespace hfst
       alphabet.insert(StringPair(leftm,leftm));
       alphabet.insert(StringPair(rightm,rightm));
 
+      HfstTransducer pi_star(alphabet,type,true);
+      //pi_star.repeat_star();
+      //pi_star.minimize();
+
       // Create the constrain boundary transducer !(.*<L><R>.*)
       HfstTransducer leftm_to_leftm(leftm, leftm, type);
       HfstTransducer rightm_to_rightm(rightm, rightm, type);
-      HfstTransducer tmp(type);
-      tmp = universal_fst(alphabet,type);
+      HfstTransducer tmp(pi_star);
       tmp.concatenate(leftm_to_leftm);
       tmp.concatenate(rightm_to_rightm);
-      tmp.concatenate(universal_fst(alphabet,type));
-      HfstTransducer cbt = negation_fst(tmp, alphabet);
+      tmp.concatenate(pi_star);
+      HfstTransducer cbt(pi_star);
+      cbt.subtract(tmp);
       cbt.minimize();
       if (DEBUG) cbt.write_in_att_format("compiler_cbt.att",false);
       if (DEBUG) printf("  ..cbt created\n");
@@ -506,8 +534,12 @@ namespace hfst
       alphabet.erase(StringPair(leftm,leftm));
       alphabet.erase(StringPair(rightm,rightm));
       
-      if (optional)
-	result.disjunct(universal_fst(alphabet,type));
+      if (optional) {
+	HfstTransducer pi_star_(alphabet, type, true);
+	//pi_star_.repeat_star();
+	//pi_star_.minimize();
+	result.disjunct(pi_star_);
+      }
 
       result.minimize();
       if (DEBUG) result.write_in_att_format("result.att",true);

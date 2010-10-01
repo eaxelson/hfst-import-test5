@@ -375,7 +375,7 @@ namespace hfst { namespace implementations {
   }
 
     // 
-  fsm * FomaTransducer::define_transducer(const StringPairSet &sps)
+    fsm * FomaTransducer::define_transducer(const StringPairSet &sps, bool cyclic)
   {
     if (sps.empty())
       return fsm_empty_string();
@@ -390,6 +390,8 @@ namespace hfst { namespace implementations {
 	else
 	  retval = fsm_union( retval, fsm_cross_product( fsm_symbol(strdup(it->first.c_str())), fsm_symbol(strdup(it->second.c_str())) ) );
       }
+    if (cyclic)
+      retval = fsm_kleene_star(retval);
     return fsm_minimize(retval);
   }
 

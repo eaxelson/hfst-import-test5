@@ -1325,7 +1325,7 @@ namespace hfst { namespace implementations
   }
 
   LogFst * LogWeightTransducer::define_transducer
-  (const StringPairSet &sps)
+  (const StringPairSet &sps, bool cyclic)
   {
     LogFst * t = new LogFst;
     SymbolTable st = create_symbol_table("");

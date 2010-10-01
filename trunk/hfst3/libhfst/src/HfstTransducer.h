@@ -444,7 +444,7 @@ namespace hfst
 		   ImplementationType type);
 
 
-    HfstTransducer(const StringPairSet & sps, ImplementationType type);
+    HfstTransducer(const StringPairSet & sps, ImplementationType type, bool cyclic=false);
     HfstTransducer(const StringPairVector & spv, ImplementationType type);
 
     /** \brief Read a binary transducer from transducer stream \a in. 

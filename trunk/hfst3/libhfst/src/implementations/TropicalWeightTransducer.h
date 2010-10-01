@@ -140,7 +140,7 @@ namespace implementations
       static StdVectorFst * define_transducer(unsigned int inumber, unsigned int onumber);
 
       static StdVectorFst * define_transducer(const hfst::StringPairVector &spv);
-      static StdVectorFst * define_transducer(const hfst::StringPairSet &sps);
+      static StdVectorFst * define_transducer(const hfst::StringPairSet &sps, bool cyclic=false);
       static StdVectorFst * copy(StdVectorFst * t);
       static StdVectorFst * determinize(StdVectorFst * t);
       static StdVectorFst * minimize(StdVectorFst * t);
