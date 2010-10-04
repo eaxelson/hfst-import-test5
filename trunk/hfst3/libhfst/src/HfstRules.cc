@@ -254,28 +254,29 @@ namespace hfst
 		}
 	    }
 	}
+
       // center == [ a:. ]
       HfstTransducer center(input_to_any, type);
 
       // calculate [ .* - a:b ]
-      HfstTransducer neg_mappings(alphabet, type);
-      neg_mappings.repeat_star();
+      HfstTransducer neg_mappings(alphabet, type, true);
+      //neg_mappings.repeat_star();
 
       HfstTransducer mappings_tr(mappings, type);
       neg_mappings.subtract(mappings_tr);
 
       // center == [ a:. & !a:b ]
-      center.intersect(neg_mappings);  // ERROR
+      center.intersect(neg_mappings);
 
       // left context == [ .* l ]
-      HfstTransducer left_context(alphabet, type);
-      left_context.repeat_star();
+      HfstTransducer left_context(alphabet, type, true);
+      //left_context.repeat_star();
       left_context.concatenate(context.first);
 
       // right_context == [ r .* ]
       HfstTransducer right_context(context.second);
-      HfstTransducer universal(alphabet, type);
-      universal.repeat_star();
+      HfstTransducer universal(alphabet, type, true);
+      //universal.repeat_star();
       right_context.concatenate(universal);
 
       HfstTransducer inside(left_context.concatenate(center).concatenate(right_context));
@@ -301,20 +302,20 @@ namespace hfst
       HfstTransducer center(mappings, type);
 
       // left_neg = !(.* l)
-      HfstTransducer left(alphabet, type);
-      left.repeat_star();
+      HfstTransducer left(alphabet, type, true);
+      //left.repeat_star();
       left.concatenate(context.first);
-      HfstTransducer left_neg(alphabet, type);
-      left_neg.repeat_star();
+      HfstTransducer left_neg(alphabet, type, true);
+      //left_neg.repeat_star();
       left_neg.subtract(left);
 
       // right_neg = !(r .*)
-      HfstTransducer universal(alphabet, type);
-      universal.repeat_star();
+      HfstTransducer universal(alphabet, type, true);
+      //universal.repeat_star();
       HfstTransducer right(context.second);
       right.concatenate(universal);
-      HfstTransducer right_neg(alphabet, type);
-      right_neg.repeat_star();
+      HfstTransducer right_neg(alphabet, type, true);
+      //right_neg.repeat_star();
       right_neg.subtract(right);
 
       // left_neg + center + universal  |  universal + center + right_neg
@@ -326,8 +327,8 @@ namespace hfst
       rule_right.concatenate(right_neg);
       rule.disjunct(rule_right);
 
-      HfstTransducer rule_neg(alphabet, type);
-      rule_neg.repeat_star();
+      HfstTransducer rule_neg(alphabet, type, true);
+      //rule_neg.repeat_star();
       rule_neg.subtract(rule);
 
       return rule_neg;
