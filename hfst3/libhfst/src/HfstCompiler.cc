@@ -458,14 +458,21 @@ namespace hfst
   }
 
   HfstTransducer * HfstCompiler::make_rule( HfstTransducer * lc, Range * lower_range, Twol_Type type, 
-					    Range * upper_range, HfstTransducer * rc ) {
+					    Range * upper_range, HfstTransducer * rc, ImplementationType implementation_type ) {
+
     if (RS.size() > 0 || RSS.size() > 0)
       std::cerr << "\nWarning: agreement operation inside of replacement rule!\n";
     
     if (!Alphabet_Defined)
       std::cerr << "\nERROR: Two level rules require the definition of an alphabet!\n";
 
+    if (lc == NULL)
+      lc = new HfstTransducer("@_EPSILON_SYMBOL_@", implementation_type);
+    if (rc == NULL)
+      rc = new HfstTransducer("@_EPSILON_SYMBOL_@", implementation_type);
+
     HfstTransducerPair tr_pair(*(lc), *(rc));
+
     StringPairSet sps;
     for( HfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
       HfstAlphabet::NumberPair l=*it;

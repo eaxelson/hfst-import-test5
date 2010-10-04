@@ -333,21 +333,10 @@ namespace hfst { namespace implementations {
     fsm_destroy(net);
   }
 
-  // remove?
-  /*fsm * FomaTransducer::define_transducer(Key k)
-    {     throw hfst::exceptions::FunctionNotImplementedException();}*/
-
   fsm * FomaTransducer::define_transducer(char *symbol)
   {     
     return fsm_symbol(symbol);
   }
-
-  
-  // remove?
-  /*fsm * FomaTransducer::define_transducer(const KeyPair &kp)
-  { 
-    throw hfst::exceptions::FunctionNotImplementedException();
-    }*/
 
   fsm * FomaTransducer::define_transducer(char *isymbol, char *osymbol)
   { 
@@ -355,13 +344,63 @@ namespace hfst { namespace implementations {
     // should either argument be deleted?
   }
   
-    /*
-  fsm * FomaTransducer::define_transducer(const KeyPairVector &kpv)
+  fsm * FomaTransducer::define_transducer(const StringPairVector &spv)
   {
-    throw hfst::exceptions::FunctionNotImplementedException();
-    }*/
+    if (spv.empty())
+      return fsm_empty_string();
+    
+    int state_number=0;
 
-    // This could be much more efficient...
+    struct fsm_construct_handle *h;
+    struct fsm *net;
+    h = fsm_construct_init(strdup(std::string("").c_str()));
+    
+    for (StringPairVector::const_iterator it = spv.begin(); it != spv.end(); it++) 
+      {
+	char *in = strdup(it->first.c_str());
+	char *out = strdup(it->second.c_str());
+	fsm_construct_add_arc(h, state_number, ++state_number, in, out);
+      }
+    
+    fsm_construct_set_initial(h, 0);
+    fsm_construct_set_final(h, state_number);    
+
+    net = fsm_construct_done(h);
+    fsm_count(net);
+    
+    return net;      
+  }
+
+  fsm * FomaTransducer::define_transducer(const StringPairSet &sps, bool cyclic)
+  {
+    if (sps.empty())
+      return fsm_empty_string();
+    
+    int source=0;
+    int target = (cyclic) ? 0 : 1;
+
+    struct fsm_construct_handle *h;
+    struct fsm *net;
+    h = fsm_construct_init(strdup(std::string("").c_str()));
+    
+    for (StringPairSet::const_iterator it = sps.begin(); it != sps.end(); it++) 
+      {
+	char *in = strdup(it->first.c_str());
+	char *out = strdup(it->second.c_str());
+	fsm_construct_add_arc(h, source, target, in, out);
+      }
+    
+    fsm_construct_set_initial(h, source);
+    fsm_construct_set_final(h, target);    
+
+    net = fsm_construct_done(h);
+    fsm_count(net);
+    //net = fsm_topsort(net);
+    
+    return net;      
+  }
+
+    /* SLOW
   fsm * FomaTransducer::define_transducer(const StringPairVector &spv)
   {
     struct fsm * retval = fsm_empty_string();
@@ -374,12 +413,7 @@ namespace hfst { namespace implementations {
     return retval;  // should we minimize?
   }
 
-    // 
-    fsm * FomaTransducer::define_transducer(const StringPairSet &sps, bool cyclic)
-  {
-    if (sps.empty())
-      return fsm_empty_string();
-
+  SLOW!
     struct fsm * retval = NULL;
     for (StringPairSet::const_iterator it = sps.begin();
 	 it != sps.end();
@@ -392,8 +426,7 @@ namespace hfst { namespace implementations {
       }
     if (cyclic)
       retval = fsm_kleene_star(retval);
-    return fsm_minimize(retval);
-  }
+      return fsm_minimize(retval);*/
 
 
   fsm * FomaTransducer::copy(fsm * t)
