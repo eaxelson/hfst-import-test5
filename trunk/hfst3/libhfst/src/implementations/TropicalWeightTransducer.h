@@ -22,7 +22,8 @@
 #include <string>
 #include <sstream>
 #include <iostream>
- 
+
+
 namespace hfst { 
 namespace implementations
 {
@@ -141,6 +142,7 @@ namespace implementations
 
       static StdVectorFst * define_transducer(const hfst::StringPairVector &spv);
       static StdVectorFst * define_transducer(const hfst::StringPairSet &sps, bool cyclic=false);
+      static StdVectorFst * define_transducer(const std::vector<StringPairSet> &spsv);
       static StdVectorFst * copy(StdVectorFst * t);
       static StdVectorFst * determinize(StdVectorFst * t);
       static StdVectorFst * minimize(StdVectorFst * t);
@@ -175,7 +177,7 @@ namespace implementations
       static StdVectorFst * transform_weights(StdVectorFst * t,float (*func)(float f));
       static StdVectorFst * push_weights(StdVectorFst * t, bool to_initial_state);
 
-      static std::pair<StdVectorFst*, StdVectorFst*> harmonize(StdVectorFst *t1, StdVectorFst *t2);
+      static std::pair<StdVectorFst*, StdVectorFst*> harmonize(StdVectorFst *t1, StdVectorFst *t2, bool unknown_symbols_in_use=true);
 
       static void write_in_att_format(StdVectorFst * t, FILE *ofile);
       static void write_in_att_format_number(StdVectorFst * t, FILE *ofile);

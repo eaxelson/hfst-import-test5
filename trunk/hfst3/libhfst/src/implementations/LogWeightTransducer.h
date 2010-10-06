@@ -145,6 +145,7 @@ namespace implementations
 
       static LogFst * define_transducer(const hfst::StringPairVector &spv);
       static LogFst * define_transducer(const hfst::StringPairSet &sps, bool cyclic=false);
+      static LogFst * define_transducer(const std::vector<StringPairSet> &spsv);
       static LogFst * copy(LogFst * t);
       static LogFst * determinize(LogFst * t);
       static LogFst * minimize(LogFst * t);
@@ -176,7 +177,7 @@ namespace implementations
       static LogFst * transform_weights(LogFst * t,float (*func)(float f));
       static LogFst * push_weights(LogFst * t, bool to_initial_state);
 
-      static std::pair<LogFst*, LogFst*> harmonize(LogFst *t1, LogFst *t2);
+      static std::pair<LogFst*, LogFst*> harmonize(LogFst *t1, LogFst *t2, bool unknown_symbols_in_use=true);
 
       static void write_in_att_format(LogFst * t, FILE *ofile);
       static void write_in_att_format_number(LogFst * t, FILE *ofile);
