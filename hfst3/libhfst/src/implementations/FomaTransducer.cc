@@ -400,6 +400,36 @@ namespace hfst { namespace implementations {
     return net;      
   }
 
+  fsm * FomaTransducer::define_transducer(const std::vector<StringPairSet> &spsv)
+  {
+    if (spsv.empty())
+      return fsm_empty_string();
+    
+    int state_number=0;
+
+    struct fsm_construct_handle *h;
+    struct fsm *net;
+    h = fsm_construct_init(strdup(std::string("").c_str()));
+    
+    for (std::vector<StringPairSet>::const_iterator it = spsv.begin(); it != spsv.end(); it++) 
+      {
+	for (StringPairSet::const_iterator it2 = (*it).begin(); it2 != (*it).end(); it2++ ) {
+	  char *in = strdup(it2->first.c_str());
+	  char *out = strdup(it2->second.c_str());
+	  fsm_construct_add_arc(h, state_number, state_number+1, in, out);
+	}
+	state_number++;
+      }
+    
+    fsm_construct_set_initial(h, 0);
+    fsm_construct_set_final(h, state_number);    
+
+    net = fsm_construct_done(h);
+    fsm_count(net);
+    
+    return net;      
+  }
+
     /* SLOW
   fsm * FomaTransducer::define_transducer(const StringPairVector &spv)
   {

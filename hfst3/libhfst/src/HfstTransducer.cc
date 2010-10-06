@@ -137,7 +137,8 @@ namespace hfst
 	  std::pair <SFST::Transducer*, SFST::Transducer*> result;
 	  result =
 	    sfst_interface.harmonize(this->implementation.sfst,
-				     another.implementation.sfst);
+				     another.implementation.sfst,
+				     unknown_symbols_in_use);
 	  this->implementation.sfst = result.first;
 	  another.implementation.sfst = result.second;
 	  break;
@@ -154,7 +155,8 @@ namespace hfst
 	  std::pair <fst::StdVectorFst*, fst::StdVectorFst*> result;
 	  result =
 	    tropical_ofst_interface.harmonize(this->implementation.tropical_ofst,
-					      another.implementation.tropical_ofst);
+					      another.implementation.tropical_ofst,
+					      unknown_symbols_in_use);
 	  delete this->implementation.tropical_ofst;
 	  delete another.implementation.tropical_ofst;
 	  this->implementation.tropical_ofst = result.first;
@@ -166,7 +168,8 @@ namespace hfst
 	  std::pair <hfst::implementations::LogFst*, hfst::implementations::LogFst*> result;
 	  result =
 	    log_ofst_interface.harmonize(this->implementation.log_ofst,
-					      another.implementation.log_ofst);
+					 another.implementation.log_ofst,
+					 unknown_symbols_in_use);
 	  delete this->implementation.log_ofst;
 	  delete another.implementation.log_ofst;
 	  this->implementation.log_ofst = result.first;
@@ -343,6 +346,46 @@ namespace hfst
       case FOMA_TYPE:
 	implementation.foma =
 	  foma_interface.define_transducer(sps,cyclic);
+	this->type = FOMA_TYPE;
+	break;
+#endif
+      case ERROR_TYPE:
+      default:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+      }
+  }
+
+  HfstTransducer::HfstTransducer(const std::vector<StringPairSet> & spsv, ImplementationType type):
+    type(type),anonymous(false),is_trie(false)
+  {
+    if (not is_implementation_type_available(type))
+      throw hfst::exceptions::ImplementationTypeNotAvailableException();
+
+    switch (type)
+      {
+#if HAVE_SFST
+      case SFST_TYPE:
+	implementation.sfst = sfst_interface.define_transducer(spsv);
+	this->type = SFST_TYPE;
+	break;
+#endif
+#if HAVE_OPENFST
+      case TROPICAL_OFST_TYPE:
+      case UNSPECIFIED_TYPE:
+	implementation.tropical_ofst = 
+	  tropical_ofst_interface.define_transducer(spsv);
+	this->type = TROPICAL_OFST_TYPE;
+	break;
+      case LOG_OFST_TYPE:
+	implementation.log_ofst = 
+	  log_ofst_interface.define_transducer(spsv);
+	this->type = LOG_OFST_TYPE;
+	break;
+#endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+	implementation.foma =
+	  foma_interface.define_transducer(spsv);
 	this->type = FOMA_TYPE;
 	break;
 #endif

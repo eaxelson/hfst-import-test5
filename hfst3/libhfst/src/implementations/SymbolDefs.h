@@ -42,8 +42,9 @@ namespace hfst
   typedef std::vector<StringPair> StringPairVector;
   /** \brief A set of symbol pairs used in substituting symbol pairs. 
 
-      @see HfstTransducer::substitute(const StringPair&, const StringPairSet &) */
+     @see HfstTransducer::substitute(const StringPair&, const StringPairSet &) */
   typedef std::set<StringPair> StringPairSet;
+
   /* Maps strings to numbers. */
   typedef std::map<String,unsigned int> StringNumberMap;
   /* Maps numbers to numbers. */

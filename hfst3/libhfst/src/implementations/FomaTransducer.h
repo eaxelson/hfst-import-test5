@@ -82,6 +82,7 @@ namespace hfst {
       static fsm * create_epsilon_transducer(void);
       static fsm * define_transducer(const hfst::StringPairVector &spv);
       static fsm * define_transducer(const hfst::StringPairSet &sps, bool cyclic=false);
+      static fsm * define_transducer(const std::vector<StringPairSet> &spsv);
       static fsm * define_transducer(char *symbol);                     
       static fsm * define_transducer(char *isymbol, char *osymbol);       
       static fsm * copy(fsm * t);

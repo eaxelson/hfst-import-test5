@@ -695,57 +695,74 @@ namespace hfst
       }
   }
 
+  // slow!
   HfstTransducer * HfstCompiler::make_mapping( Ranges *list1, Ranges *list2, ImplementationType type ) {
 
     //Transducer *Interface::make_mapping( Ranges *list1, Ranges *list2 )
 
     Ranges *l1=list1;
     Ranges *l2=list2;
-    HfstTransducer *t=new HfstTransducer("@_EPSILON_SYMBOL_@", type); // an epsilon transducer
+    //HfstTransducer *t=new HfstTransducer("@_EPSILON_SYMBOL_@", type); // an epsilon transducer
+    std::vector<StringPairSet> spsv;
 
     //Node *node=t->root_node();
     while (l1 && l2) {
       //Node *nn=t->new_node();
-      HfstTransducer disj(type); // an empty transducer
+      //HfstTransducer disj(type); // an empty transducer
+      StringPairSet sps;
       for( Range *r1=l1->range; r1; r1=r1->next )
 	for( Range *r2=l2->range; r2; r2=r2->next ) {
 	  //node->add_arc( Label(r1->character, r2->character), nn, t );
-	  HfstTransducer tr(TheAlphabet.code2symbol(r1->character), 
-			    TheAlphabet.code2symbol(r2->character),
-			    type);
-	  disj.disjunct(tr);
+	  //HfstTransducer tr(TheAlphabet.code2symbol(r1->character), 
+	  //		    TheAlphabet.code2symbol(r2->character),
+	  //		    type);
+	  //disj.disjunct(tr);
+	  sps.insert(StringPair(TheAlphabet.code2symbol(r1->character), 
+				TheAlphabet.code2symbol(r2->character)) );
 	}
       //node = nn;
-      t->concatenate(disj);
+      //HfstTransducer disj(sps, type);
+      //t->concatenate(disj);
+      spsv.push_back(sps);
       l1 = l1->next;
       l2 = l2->next;
     }
     while (l1) {
       //Node *nn=t->new_node();
-      HfstTransducer disj(type); // an empty transducer
+      //HfstTransducer disj(type); // an empty transducer
+      StringPairSet sps;
       for( Range *r1=l1->range; r1; r1=r1->next ) {
 	//node->add_arc( Label(r1->character, Label::epsilon), nn, t );
-	  HfstTransducer tr(TheAlphabet.code2symbol(r1->character), 
-			    TheAlphabet.code2symbol(0),
-			    type);
-	  disj.disjunct(tr);
+	//HfstTransducer tr(TheAlphabet.code2symbol(r1->character), 
+	//		    TheAlphabet.code2symbol(0),
+	//		    type);
+	// disj.disjunct(tr);
+	sps.insert(StringPair(TheAlphabet.code2symbol(r1->character), 
+			      TheAlphabet.code2symbol(0)) );
       }
       //node = nn;
-      t->concatenate(disj);
+      //HfstTransducer disj(sps, type);
+      //t->concatenate(disj);
+      spsv.push_back(sps);
       l1 = l1->next;
     }
     while (l2) {
       //Node *nn=t->new_node();
-      HfstTransducer disj(type); // an empty transducer
+      //HfstTransducer disj(type); // an empty transducer
+      StringPairSet sps;
       for( Range *r2=l2->range; r2; r2=r2->next ) {
 	//node->add_arc( Label(Label::epsilon, r2->character), nn, t );
-	  HfstTransducer tr(TheAlphabet.code2symbol(0), 
-			    TheAlphabet.code2symbol(r2->character),
-			    type);
-	  disj.disjunct(tr);
+	//HfstTransducer tr(TheAlphabet.code2symbol(0), 
+	//	    TheAlphabet.code2symbol(r2->character),
+	//	    type);
+	// disj.disjunct(tr);
+	sps.insert(StringPair(TheAlphabet.code2symbol(0), 
+			      TheAlphabet.code2symbol(r2->character)) );
       }
       //node = nn;
-      t->concatenate(disj);
+      //HfstTransducer disj(sps, type);
+      //t->concatenate(disj);
+      spsv.push_back(sps);
       l2 = l2->next;
     }
     //node->set_final(1);
@@ -753,9 +770,10 @@ namespace hfst
     free_values(list1);
     free_values(list2);
     
-    t->minimize();
+    return new HfstTransducer(spsv, type);
 
-    return t;
+    //    t->minimize();
+    // return t;
   }
 
   

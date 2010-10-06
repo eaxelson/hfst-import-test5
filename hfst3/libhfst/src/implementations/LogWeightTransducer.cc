@@ -663,8 +663,10 @@ namespace hfst { namespace implementations
   }
 
   std::pair<LogFst*, LogFst*> LogWeightTransducer::harmonize
-  (LogFst *t1, LogFst *t2)
+  (LogFst *t1, LogFst *t2, bool unknown_symbols_in_use)
   {
+
+    assert(unknown_symbols_in_use);
 
     // fprintf(stderr, "TWT::harmonize...\n");
 
@@ -1343,6 +1345,29 @@ namespace hfst { namespace implementations
 	}
       s1 = s2;
     }
+    t->SetFinal(s1,0);
+    t->SetInputSymbols(&st);
+    return t;
+  }
+
+  LogFst * LogWeightTransducer::define_transducer
+  (const std::vector<StringPairSet> &spsv)
+  {
+    LogFst * t = new LogFst;
+    SymbolTable st = create_symbol_table("");
+
+    StateId s1 = t->AddState();
+    t->SetStart(s1);
+    for (std::vector<StringPairSet>::const_iterator it = spsv.begin();
+	 it != spsv.end();
+	 ++it)
+      {
+	StateId s2 = t->AddState();
+	for (StringPairSet::const_iterator it2 = (*it).begin(); it2 != (*it).end(); it2++ ) {
+	  t->AddArc(s1,LogArc(st.AddSymbol(it2->first),st.AddSymbol(it2->second),0,s2));
+	}
+	s1 = s2;
+      }
     t->SetFinal(s1,0);
     t->SetInputSymbols(&st);
     return t;

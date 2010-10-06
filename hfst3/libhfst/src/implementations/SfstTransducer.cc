@@ -166,17 +166,20 @@ namespace hfst { namespace implementations {
 
 
   std::pair<Transducer*, Transducer*> SfstTransducer::harmonize 
-  (Transducer *t1, Transducer *t2) 
+  (Transducer *t1, Transducer *t2, bool unknown_symbols_in_use) 
   {
 
     // 1. Calculate the set of unknown symbols for transducers t1 and t2.
 
     StringSet unknown_t1;    // symbols known to another but not this
     StringSet unknown_t2;    // and vice versa
-    StringSet t1_symbols = get_string_set(t1);
-    StringSet t2_symbols = get_string_set(t2);
-    collect_unknown_sets(t1_symbols, unknown_t1,
-			 t2_symbols, unknown_t2);
+
+    if (unknown_symbols_in_use) {
+      StringSet t1_symbols = get_string_set(t1);
+      StringSet t2_symbols = get_string_set(t2);
+      collect_unknown_sets(t1_symbols, unknown_t1,
+			   t2_symbols, unknown_t2);
+    }
 
     Transducer * new_t1 = &t1->copy(false, &t2->alphabet);
     t2->alphabet.insert_symbols(new_t1->alphabet);
@@ -210,11 +213,17 @@ namespace hfst { namespace implementations {
     Transducer *harmonized_t1;
     Transducer *harmonized_t2;
 
-    harmonized_t1 = expand_arcs(t1, unknown_t1);
-    delete t1;
-
-    harmonized_t2 = expand_arcs(t2, unknown_t2);
-    delete t2;
+    if (unknown_symbols_in_use) {
+      harmonized_t1 = expand_arcs(t1, unknown_t1);
+      delete t1;
+      
+      harmonized_t2 = expand_arcs(t2, unknown_t2);
+      delete t2;
+    }
+    else {
+      harmonized_t1 = &t1->copy();
+      harmonized_t2 = &t2->copy();
+    }
 
     // fprintf(stderr, "...TWT::harmonize\n");
 
@@ -472,6 +481,37 @@ namespace hfst { namespace implementations {
     new_node->set_final(1);
     return t; }
 
+  Transducer * SfstTransducer::define_transducer(const std::vector<StringPairSet> &spsv)
+  { Transducer * t = new Transducer;
+    initialize_alphabet(t);
+    Node * n = t->root_node();
+    for (std::vector<StringPairSet>::const_iterator it = spsv.begin();
+	 it != spsv.end();
+	 ++it)
+      {
+	Node * temp = t->new_node();
+
+	for (StringPairSet::const_iterator it2 = (*it).begin(); it2 != (*it).end(); it2++ ) 
+	  {
+	    unsigned int inumber,onumber;
+	    if (strcmp(it2->first.c_str(),"@_EPSILON_SYMBOL_@") == 0 || 
+		strcmp(it2->first.c_str(),"<>") == 0 )
+	      inumber=0;
+	    else
+	      inumber=t->alphabet.add_symbol(it2->first.c_str());
+	    if (strcmp(it2->second.c_str(),"@_EPSILON_SYMBOL_@") == 0 ||
+		strcmp(it2->second.c_str(),"<>") == 0 )
+	      onumber=0;
+	    else
+	      onumber=t->alphabet.add_symbol(it2->second.c_str());
+	    
+	    n->add_arc(Label(inumber,onumber),temp,t);
+	  }
+
+	n = temp;
+      }
+    n->set_final(1);
+    return t; }
 
   Transducer * SfstTransducer::copy(Transducer * t)
   { return &t->copy(); }

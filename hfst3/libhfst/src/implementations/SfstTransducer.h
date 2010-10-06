@@ -22,8 +22,10 @@
 #include <string>
 #include <sstream>
 #include <iostream>
- 
-namespace hfst { namespace implementations
+
+
+namespace hfst { 
+namespace implementations
 {
   using namespace SFST;
   using namespace hfst::exceptions;
@@ -86,6 +88,7 @@ namespace hfst { namespace implementations
       static Transducer * define_transducer(const char *isymbol, const char *osymbol);
       static Transducer * define_transducer(const StringPairVector &spv);
       static Transducer * define_transducer(const StringPairSet &sps, bool cyclic=false);
+      static Transducer * define_transducer(const std::vector<StringPairSet> &spsv);
       static Transducer * copy(Transducer * t);
       static Transducer * determinize(Transducer * t);
       static Transducer * minimize(Transducer * t);
@@ -115,7 +118,7 @@ namespace hfst { namespace implementations
 			     Transducer * t2);
       static Transducer * subtract(Transducer * t1,
 			    Transducer * t2);
-      static std::pair<Transducer*, Transducer*> harmonize(Transducer *t1, Transducer *t2);
+      static std::pair<Transducer*, Transducer*> harmonize(Transducer *t1, Transducer *t2, bool unknown_symbols_in_use=true);
 
       static bool are_equivalent(Transducer * t1, Transducer * t2);
       static bool is_cyclic(Transducer * t);

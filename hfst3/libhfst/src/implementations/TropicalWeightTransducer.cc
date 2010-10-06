@@ -662,7 +662,7 @@ namespace hfst { namespace implementations
   }
 
   std::pair<StdVectorFst*, StdVectorFst*> TropicalWeightTransducer::harmonize
-  (StdVectorFst *t1, StdVectorFst *t2)
+  (StdVectorFst *t1, StdVectorFst *t2, bool unknown_symbols_in_use)
   {
 
     //fprintf(stderr, "TWT::harmonize...\n");
@@ -671,6 +671,7 @@ namespace hfst { namespace implementations
 
     StringSet unknown_t1;    // symbols known to another but not this
     StringSet unknown_t2;    // and vice versa
+
     StringSet t1_symbols = get_string_set(t1);
     StringSet t2_symbols = get_string_set(t2);
     collect_unknown_sets(t1_symbols, unknown_t1,
@@ -704,12 +705,21 @@ namespace hfst { namespace implementations
     fst::StdVectorFst *harmonized_t1;
     fst::StdVectorFst *harmonized_t2;
 
-    harmonized_t1 = expand_arcs(t1, unknown_t1);
-    harmonized_t1->SetInputSymbols(t1->InputSymbols());
+    if (true || unknown_symbols_in_use) {
+      harmonized_t1 = expand_arcs(t1, unknown_t1);
+      harmonized_t1->SetInputSymbols(t1->InputSymbols());
+      
+      harmonized_t2 = expand_arcs(t2, unknown_t2);
+      harmonized_t2->SetInputSymbols(t2->InputSymbols());
+    }
+    else {
+      harmonized_t1 = t1->Copy();
+      harmonized_t1->SetInputSymbols(t1->InputSymbols()->Copy());
 
-    harmonized_t2 = expand_arcs(t2, unknown_t2);
-    harmonized_t2->SetInputSymbols(t2->InputSymbols());
-
+      harmonized_t2 = t2->Copy();
+      harmonized_t2->SetInputSymbols(t2->InputSymbols()->Copy());
+    }
+    
     /*
     fprintf(stderr, "TWT::harmonize: harmonized t1's and t2's input symbol tables now contain (FINAL):\n");
     harmonized_t1->InputSymbols()->WriteText(std::cerr);
@@ -1347,6 +1357,29 @@ namespace hfst { namespace implementations
     return t;
   }
 
+  StdVectorFst * TropicalWeightTransducer::define_transducer
+  (const std::vector<StringPairSet> &spsv)
+  {
+    StdVectorFst * t = new StdVectorFst;
+    SymbolTable st = create_symbol_table("");
+
+    StateId s1 = t->AddState();
+    t->SetStart(s1);
+    for (std::vector<StringPairSet>::const_iterator it = spsv.begin();
+	 it != spsv.end();
+	 ++it)
+      {
+	StateId s2 = t->AddState();
+	for (StringPairSet::const_iterator it2 = (*it).begin(); it2 != (*it).end(); it2++ ) {
+	  t->AddArc(s1,StdArc(st.AddSymbol(it2->first),st.AddSymbol(it2->second),0,s2));
+	}
+	s1 = s2;
+      }
+    t->SetFinal(s1,0);
+    t->SetInputSymbols(&st);
+    return t;
+  }
+
   StdVectorFst * 
   TropicalWeightTransducer::copy(StdVectorFst * t)
   { return new StdVectorFst(*t); }
@@ -1939,8 +1972,10 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::concatenate(StdVectorFst * t1,
 						       StdVectorFst * t2)
   {
-    ConcatFst<StdArc> concatenate(*t1,*t2);
-    StdVectorFst *result = new StdVectorFst(concatenate); 
+    //ConcatFst<StdArc> concatenate(*t1,*t2);
+    //StdVectorFst *result = new StdVectorFst(concatenate); 
+    StdVectorFst * result = new StdVectorFst(*t1);
+    Concat(result,*t2);
     result->SetInputSymbols(t1->InputSymbols());
     return result;
   }
