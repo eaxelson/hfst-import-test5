@@ -43,43 +43,40 @@ public class Transducer implements HfstOptimizedLookup.transducer
 	public int getInput()
 	{ return inputSymbol; }
     }
-    
-    
-    
+
+
     /**
      * On instantiation reads the transducer's index table and provides an interface
      * to it.
      */
     public class IndexTable
     {
-	private Hashtable<Long, TransitionIndex> indices;
+	private TransitionIndex[] indices;
 	
 	public IndexTable(FileInputStream filestream,
-			  long indicesCount) throws java.io.IOException
+			  Integer indicesCount) throws java.io.IOException
 	{
 	    ByteArray b = new ByteArray((int) indicesCount*6);
 	    filestream.read(b.bytes);
 	    // each index entry is a unsigned short followed by an unsigned int
-	    indices = new Hashtable<Long, TransitionIndex>();
+	    indices = new TransitionIndex[indicesCount];
 
-	    long i = 0;
+	    Integer i = 0;
 	    while (i < indicesCount)
 		{
-		    indices.put(i, new TransitionIndex(b.getUShort(), b.getUInt()));
+		    indices[i] = new TransitionIndex(b.getUShort(), b.getUInt());
 		    i++;
 		}
 	}
 
-	public Boolean isFinal(long index)
-	{ return indices.get(index).isFinal(); }
+	public Boolean isFinal(Integer index)
+	{ return indices[index].isFinal(); }
 
-	public TransitionIndex at(long index)
-	{ return indices.get(index); }
+	public TransitionIndex at(Integer index)
+	{ return indices[index]; }
 
-	public Hashtable<Long, TransitionIndex> getIndices()
-	{ return indices; }
     }
-    
+
     public class Transition
     {
 	protected int inputSymbol;
@@ -118,88 +115,40 @@ public class Transducer implements HfstOptimizedLookup.transducer
      * On instantiation reads the transducer's transition table and provides an
      * interface to it.
      */
-    public class TransitionTable
+        public class TransitionTable
     {
-	private Hashtable<Long, Transition> transitions;
-	private long position;
+	private Transition[] transitions;
 
 	public TransitionTable(FileInputStream filestream,
-			       long transitionCount) throws java.io.IOException
+			       Integer transitionCount) throws java.io.IOException
 	{
 	    ByteArray b = new ByteArray((int) transitionCount*8);
-	    filestream.read(b.bytes);
-	    transitions = new Hashtable<Long, Transition>();
-	    position = 0;
 	    // each transition entry is two unsigned shorts and an unsigned int
-	    long i = 0;
+	    filestream.read(b.bytes);
+	    transitions = new Transition[transitionCount];
+	    Integer i = 0;
 	    while (i < transitionCount)
 		{
-		    transitions.put(i, new Transition(b.getUShort(), b.getUShort(), b.getUInt()));
+		    transitions[i] = new Transition(b.getUShort(), b.getUShort(), b.getUInt());
 		    i++;
 		}
 	}
 
-	public void set(long pos)
-	{
-	    if (pos >= HfstOptimizedLookup.TRANSITION_TARGET_TABLE_START)
-		{
-		    position = pos - HfstOptimizedLookup.TRANSITION_TARGET_TABLE_START;
-		} else
-		{
-		    position = pos;
-		}
-	}
+	public Transition at(Integer pos)
+	{ return transitions[pos]; }
 
-	public Transition at(long pos)
-	{ return transitions.get(pos-HfstOptimizedLookup.TRANSITION_TARGET_TABLE_START); }
+	public Integer size()
+	{ return transitions.length; }
 
-	public void next()
-	{ ++position; }
-
-	public Boolean matches(int symbol)
-	{ return transitions.get(position).matches(symbol); }
-
-	public long getTarget()
-	{ return transitions.get(position).target(); }
-
-	public int getOutput()
-	{ return transitions.get(position).getOutput(); }
-
-	public int getInput()
-	{ return transitions.get(position).getInput(); }
-
-	public Boolean isFinal(long pos)
-	{
-	    if (pos >= HfstOptimizedLookup.TRANSITION_TARGET_TABLE_START)
-		{ return transitions.get((pos - HfstOptimizedLookup.TRANSITION_TARGET_TABLE_START)).isFinal(); }
-	    else { return transitions.get((pos)).isFinal(); }
-	}
-
-	public Hashtable<Long, Transition> getTransitions()
-	{ return transitions; }
-    }
-
-    private class FlagState
-    {
-	public String value;
-	public Boolean polarity;
-
-	public FlagState(String val, Boolean pol)
-	{
-	    value = val;
-	    polarity = pol;
-	}
     }
 
     protected TransducerHeader header;
     protected TransducerAlphabet alphabet;
-    protected Stack< Hashtable <String, FlagState> > stateStack;
+    protected Stack< int[] > stateStack;
     protected Hashtable<Integer, FlagDiacriticOperation> operations;
     protected LetterTrie letterTrie;
     protected IndexTable indexTable;
-    protected Hashtable<Long, TransitionIndex> indices;
     protected TransitionTable transitionTable;
-    protected Hashtable<Long, Transition> transitions;
     protected Vector<String> displayVector;
     protected int[] outputString;
     protected Vector<Integer> inputString;
@@ -210,8 +159,12 @@ public class Transducer implements HfstOptimizedLookup.transducer
     {
 	header = h;
 	alphabet = a;
-	stateStack = new Stack< Hashtable <String, FlagState> >();
-	stateStack.push(new Hashtable <String, FlagState>());
+	stateStack = new Stack<int[]>();
+	int[] neutral = new int[alphabet.features];
+	for (int i = 0; i < neutral.length; ++i) {
+	    neutral[i] = 0;
+	}
+	stateStack.push(neutral);
 	operations = alphabet.operations;
 	letterTrie = new LetterTrie();
 	int i = 0;
@@ -221,9 +174,7 @@ public class Transducer implements HfstOptimizedLookup.transducer
 		i++;
 	    }
 	indexTable = new IndexTable(file, header.getIndexTableSize());
-	indices = indexTable.getIndices();
 	transitionTable = new TransitionTable(file, header.getTargetTableSize());
-	transitions = transitionTable.getTransitions();
 	displayVector = new Vector<String>();
 	outputString = new int[1000];
 	for (i = 0; i < 1000; i++)
@@ -232,39 +183,47 @@ public class Transducer implements HfstOptimizedLookup.transducer
 	outputPointer = 0;
 	inputPointer = 0;
     }
-    
-    private void tryEpsilonIndices(long index)
+
+        private int pivot(long i)
     {
-	if (indices.get(index).getInput() == 0)
+	if (i >= HfstOptimizedLookup.TRANSITION_TARGET_TABLE_START) {
+	    return (int) (i - HfstOptimizedLookup.TRANSITION_TARGET_TABLE_START);
+	}
+	return (int) i;
+    }
+    
+    private void tryEpsilonIndices(int index)
+    {
+	if (indexTable.at(index).getInput() == 0)
 	    {
-		tryEpsilonTransitions(indices.get(index).target() - HfstOptimizedLookup.TRANSITION_TARGET_TABLE_START);
+		tryEpsilonTransitions(pivot(indexTable.at(index).target()));
 	    }
     }
 
-    private void tryEpsilonTransitions(long index)
+    private void tryEpsilonTransitions(int index)
     {
 	while (true)
 	    {
 		// first test for flag
-		if (operations.containsKey(transitions.get(index).getInput())) {
-		    if (!pushState(operations.get(transitions.get(index).getInput())))
+		if (operations.containsKey(transitionTable.at(index).getInput())) {
+		    if (!pushState(operations.get(transitionTable.at(index).getInput())))
 			{
 			    ++index;
 			    continue;
 			} else {
-			outputString[outputPointer] = transitions.get(index).getOutput();
+			outputString[outputPointer] = transitionTable.at(index).getOutput();
 			++outputPointer;
-			getAnalyses(transitions.get(index).target());
+			getAnalyses(transitionTable.at(index).target());
 			--outputPointer;
 			++index;
 			stateStack.pop();
 			continue;
 		    }
-		} else if (transitions.get(index).getInput() == 0)
+		} else if (transitionTable.at(index).getInput() == 0)
 		    { // epsilon transitions
-			outputString[outputPointer] = transitions.get(index).getOutput();
+			outputString[outputPointer] = transitionTable.at(index).getOutput();
 			++outputPointer;
-			getAnalyses(transitions.get(index).target());
+			getAnalyses(transitionTable.at(index).target());
 			--outputPointer;
 			++index;
 		    }
@@ -275,23 +234,23 @@ public class Transducer implements HfstOptimizedLookup.transducer
 	    }
     }
 
-    private void findIndex(long index)
+    private void findIndex(int index)
     {
-	if (indices.get(index + (inputString.get(inputPointer - 1))).getInput() == inputString.get(inputPointer - 1))
+	if (indexTable.at(index + (inputString.get(inputPointer - 1))).getInput() == inputString.get(inputPointer - 1))
 	    {
-		findTransitions(indices.get(index + (inputString.get(inputPointer - 1))).target() - HfstOptimizedLookup.TRANSITION_TARGET_TABLE_START);
+		findTransitions(pivot(indexTable.at(index + (inputString.get(inputPointer - 1))).target()));
 	    }
     }
 
-    private void findTransitions(long index)
+    private void findTransitions(int index)
     {
-	while (transitions.get(index).getInput() != HfstOptimizedLookup.NO_SYMBOL_NUMBER)
+	while (transitionTable.at(index).getInput() != HfstOptimizedLookup.NO_SYMBOL_NUMBER)
 	    {
-		if (transitions.get(index).getInput() == inputString.get(inputPointer - 1))
+		if (transitionTable.at(index).getInput() == inputString.get(inputPointer - 1))
 		    {
-			outputString[outputPointer] = transitions.get(index).getOutput();
+			outputString[outputPointer] = transitionTable.at(index).getOutput();
 			++outputPointer;
-			getAnalyses(transitions.get(index).target());
+			getAnalyses(transitionTable.at(index).target());
 			--outputPointer;
 		    } else
 		    {
@@ -301,15 +260,15 @@ public class Transducer implements HfstOptimizedLookup.transducer
 	    }
     }
 
-    private void getAnalyses(long index)
+    private void getAnalyses(long idx)
     {
-	if (index >= HfstOptimizedLookup.TRANSITION_TARGET_TABLE_START)
+	if (idx >= HfstOptimizedLookup.TRANSITION_TARGET_TABLE_START)
 	    {
-		index -= HfstOptimizedLookup.TRANSITION_TARGET_TABLE_START;
+		int index = pivot(idx);
 		tryEpsilonTransitions(index + 1);
 		if (inputString.get(inputPointer) == HfstOptimizedLookup.NO_SYMBOL_NUMBER)
 		    { // end of input string
-			if (transitionTable.isFinal(index))
+			if (transitionTable.at(index).isFinal())
 			    { noteAnalysis(); }
 			outputString[outputPointer] = HfstOptimizedLookup.NO_SYMBOL_NUMBER;
 			return;
@@ -318,6 +277,7 @@ public class Transducer implements HfstOptimizedLookup.transducer
 		findTransitions(index + 1);
 	    } else
 	    {
+		int index = pivot(idx);
 		tryEpsilonIndices(index + 1);
 		if (inputString.get(inputPointer) == HfstOptimizedLookup.NO_SYMBOL_NUMBER)
 		    { // end of input string
@@ -373,78 +333,76 @@ public class Transducer implements HfstOptimizedLookup.transducer
 	    { System.out.println(it.next()); }
     }
 
-    private Boolean pushState(FlagDiacriticOperation flag)
+            private Boolean pushState(FlagDiacriticOperation flag)
     {
-	if (flag.operation.equals("P")) { // positive set
-	    stateStack.push(stateStack.peek());
-	    stateStack.peek().put(flag.feature, new FlagState(flag.value, true));
+	int[] top = new int[alphabet.features];
+	System.arraycopy(stateStack.peek(), 0, top, 0, alphabet.features);
+	if (flag.op == HfstOptimizedLookup.FlagDiacriticOperator.P) { // positive set
+	    stateStack.push(top);
+	    stateStack.peek()[flag.feature] = flag.value;
 	    return true;
-	} else if (flag.operation.equals("N")) { // negative set
-	    stateStack.push(stateStack.peek());
-	    stateStack.peek().put(flag.feature, new FlagState(flag.value, false));
+	} else if (flag.op == HfstOptimizedLookup.FlagDiacriticOperator.N) { // negative set
+	    stateStack.push(top);
+	    stateStack.peek()[flag.feature] = -1*flag.value;
 	    return true;
-	} else if (flag.operation.equals("R")) { // require
-	    if (flag.value.equals("")) // empty require
+	} else if (flag.op == HfstOptimizedLookup.FlagDiacriticOperator.R) { // require
+	    if (flag.value == 0) // empty require
 		{
-		    if (stateStack.peek().get(flag.feature).value.equals(""))
+		    if (stateStack.peek()[flag.feature] == 0)
 			{
 			    return false;
 			}
 		    else
 			{
-			    stateStack.push(stateStack.peek());
+			    stateStack.push(top);
 			    return true;
 			}
 		}
-	    if (stateStack.peek().containsKey(flag.feature))
-		{
-		    if (stateStack.peek().get(flag.feature).value == flag.value &&
-			stateStack.peek().get(flag.feature).polarity == true)
-			{
-			    stateStack.push(stateStack.peek());
-			    return true;
-			}
-		}
-	    return false;
-	} else if (flag.operation.equals("D")) { // disallow
-	    if (flag.value.equals("")) // empty disallow
-		{
-		    if (stateStack.peek().get(flag.feature).value.equals(""))
-			{
-			    return false;
-			}
-		    else
-			{
-			    stateStack.push(stateStack.peek());
-			    return true;
-			}
-		}
-	    if (stateStack.peek().containsKey(flag.feature))
-		{
-		    if (stateStack.peek().get(flag.feature).value == flag.value &&
-			stateStack.peek().get(flag.feature).polarity == true)
-			{
-			    return false;
-			}
-		}
-	    stateStack.push(stateStack.peek());
-	    return true;
-	} else if (flag.operation.equals("C")) { // clear
-	    stateStack.push(stateStack.peek());
-	    stateStack.peek().remove(flag.feature);
-	} else if (flag.operation.equals("U")) { // unification
-	    if (!(stateStack.peek().containsKey(flag.feature)) ||
-		(stateStack.peek().get(flag.feature).value == flag.value &&
-		 stateStack.peek().get(flag.feature).polarity == true) ||
-		(stateStack.peek().get(flag.feature).value != flag.value &&
-		 stateStack.peek().get(flag.feature).polarity == false))
-		{
+	    else {
+		if (stateStack.peek()[flag.feature] == flag.value) {
 		    stateStack.push(stateStack.peek());
-		    stateStack.peek().put(flag.feature, new FlagState(flag.value, true));
+		    return true;
+		}
+	    }
+	    return false;
+	} else if (flag.op == HfstOptimizedLookup.FlagDiacriticOperator.D) { // disallow
+	    if (flag.value == 0) // empty disallow
+		{
+		    if (stateStack.peek()[flag.feature] == 0)
+			{
+			    return false;
+			}
+		    else
+			{
+			    stateStack.push(top);
+			    return true;
+			}
+		}
+	    else {
+		if (stateStack.peek()[flag.feature] == flag.value) {
+			return false;
+		}
+	    }
+	    stateStack.push(top);
+	    return true;
+	} else if (flag.op == HfstOptimizedLookup.FlagDiacriticOperator.C) { // clear
+	    stateStack.push(top);
+	    stateStack.peek()[flag.feature] = 0;
+	    return true;
+	} else if (flag.op == HfstOptimizedLookup.FlagDiacriticOperator.U) { // unification
+	    if ((stateStack.peek()[flag.feature] == 0) ||
+		(stateStack.peek()[flag.feature] == flag.value &&
+		 stateStack.peek()[flag.feature] > 0 ||
+		 (stateStack.peek()[flag.feature] == flag.value &&
+		  stateStack.peek()[flag.feature] < 0))) {
+		
+		    stateStack.push(top);
+		    stateStack.peek()[flag.feature] = flag.value;
 		    return true;
 		}
 	    return false;
 	}
 	return false; // compiler sanity
     }
+
 }

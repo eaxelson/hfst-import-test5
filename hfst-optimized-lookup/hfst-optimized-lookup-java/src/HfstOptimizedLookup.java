@@ -18,6 +18,7 @@ import java.io.Console;
  */
 public class HfstOptimizedLookup {
     public final static long TRANSITION_TARGET_TABLE_START = 2147483648l; // 2^31 or UINT_MAX/2 rounded up
+    
     public final static float INFINITE_WEIGHT = (float) 4294967295l; // this is hopefully the same as
     // static_cast<float>(UINT_MAX) in C++
     public final static int NO_SYMBOL_NUMBER = 65535; // this is USHRT_MAX

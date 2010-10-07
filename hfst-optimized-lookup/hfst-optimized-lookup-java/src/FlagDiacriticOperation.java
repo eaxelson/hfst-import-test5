@@ -4,13 +4,26 @@
 
 public class FlagDiacriticOperation
 {
-    public String operation;
-    public String feature;
-    public String value;
-    public FlagDiacriticOperation(String op, String feat, String val)
+    public HfstOptimizedLookup.FlagDiacriticOperator op;
+    public Integer feature;
+    public Integer value;
+    public FlagDiacriticOperation(HfstOptimizedLookup.FlagDiacriticOperator operation,
+				  Integer feat, Integer val)
     {
-	operation = op;
+	op = operation;
 	feature = feat;
 	value = val;
+    }
+
+    public FlagDiacriticOperation()
+    {
+	op = HfstOptimizedLookup.FlagDiacriticOperator.P;
+	feature = HfstOptimizedLookup.NO_SYMBOL_NUMBER;
+	value = 0;
+    }
+
+    public Boolean isFlag()
+    {
+	return feature != HfstOptimizedLookup.NO_SYMBOL_NUMBER;
     }
 }
