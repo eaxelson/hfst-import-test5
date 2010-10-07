@@ -10,12 +10,17 @@ public class TransducerAlphabet
 {
     public Vector<String> keyTable;
     public Hashtable<Integer, FlagDiacriticOperation> operations;
-
+    public Integer features;
     public TransducerAlphabet(DataInputStream charstream,
 		    int number_of_symbols) throws java.io.IOException
     {
 	keyTable = new Vector<String>();
 	operations = new Hashtable<Integer, FlagDiacriticOperation>();
+	Hashtable<String, Integer> feature_bucket = new Hashtable<String, Integer>();
+	Hashtable<String, Integer> value_bucket = new Hashtable<String, Integer>();
+	features = 0;
+	Integer values = 1;
+	value_bucket.put("", 0); // neutral value
 	int i = 0;
 	int charindex;
 	byte[] chars = new byte[1000]; // FIXME magic number
@@ -31,24 +36,47 @@ public class TransducerAlphabet
 		String ustring = new String(chars, 0, charindex, "UTF-8");
 		if (ustring.length() > 5 && ustring.charAt(0) == '@' && ustring.charAt(ustring.length()-1) == '@' && ustring.charAt(2) == '.')
 		    { // flag diacritic identified
-			String op;
-			String feat;
-			String val;
+			HfstOptimizedLookup.FlagDiacriticOperator op;
 			String[] parts = ustring.substring(1,ustring.length()-1).split("\\.");
-			op = parts[0];
-			feat = parts[1];
+			String ops = parts[0];
+			String feats = parts[1];
+			String vals;
 			if (parts.length == 3) {
-			    val = parts[2];
+			    vals = parts[2];
 			} else {
-			    val = "";
+			    vals = "";
 			}
-			operations.put(i, new FlagDiacriticOperation(op, feat, val));
-			keyTable.add("#");
+			if (ops.equals("P")) {
+			    op = HfstOptimizedLookup.FlagDiacriticOperator.P;
+			} else if (ops.equals("N")) {
+			    op = HfstOptimizedLookup.FlagDiacriticOperator.N;
+			} else if (ops.equals("R")) {
+				op = HfstOptimizedLookup.FlagDiacriticOperator.R;
+			} else if (ops.equals("D")) {
+			    op = HfstOptimizedLookup.FlagDiacriticOperator.D;
+			} else if (ops.equals("C")) {
+			    op = HfstOptimizedLookup.FlagDiacriticOperator.C;
+			} else { // ALARM ALARM we don't do any checking for bogus flag diacritics
+			    op = HfstOptimizedLookup.FlagDiacriticOperator.U;
+			}
+			if (value_bucket.containsKey(vals) == false) {
+				value_bucket.put(vals, values);
+				values++;
+			    }
+			if (feature_bucket.containsKey(feats) == false) {
+			    feature_bucket.put(feats, features);
+			    features++;
+			}
+			operations.put(i, new FlagDiacriticOperation(op,
+								     feature_bucket.get(feats),
+								     value_bucket.get(vals)));
+			keyTable.add("");
 			i++;
 			continue;
 		    }
 		keyTable.add(ustring);
 		i++;
 	    }
+	keyTable.set(0, ""); // epsilon is zero
     }
 }

@@ -9,10 +9,10 @@ public class TransducerHeader
 {
     private int number_of_input_symbols;
     private int number_of_symbols;
-    private long size_of_transition_index_table;
-    private long size_of_transition_target_table;
-    private long number_of_states;
-    private long number_of_transitions;
+    private int size_of_transition_index_table;
+    private int size_of_transition_target_table;
+    private int number_of_states;
+    private int number_of_transitions;
 
     private Boolean weighted;
     private Boolean deterministic;
@@ -35,10 +35,10 @@ public class TransducerHeader
 	
 	number_of_input_symbols = b.getUShort();
 	number_of_symbols = b.getUShort();
-	size_of_transition_index_table = b.getUInt();
-	size_of_transition_target_table = b.getUInt();
-	number_of_states = b.getUInt();
-	number_of_transitions = b.getUInt();
+	size_of_transition_index_table = (int) b.getUInt();
+	size_of_transition_target_table = (int) b.getUInt();
+	number_of_states = (int) b.getUInt();
+	number_of_transitions = (int) b.getUInt();
 
 	weighted = b.getBool();
 	deterministic = b.getBool();
@@ -57,10 +57,10 @@ public class TransducerHeader
     public int getSymbolCount()
     { return number_of_symbols; }
 
-    public long getIndexTableSize()
+    public int getIndexTableSize()
     { return size_of_transition_index_table; }
 
-    public long getTargetTableSize()
+    public int getTargetTableSize()
     { return size_of_transition_target_table; }
 
     public Boolean isWeighted()
