@@ -38,6 +38,12 @@ public class TransducerAlphabet
 		    { // flag diacritic identified
 			HfstOptimizedLookup.FlagDiacriticOperator op;
 			String[] parts = ustring.substring(1,ustring.length()-1).split("\\.");
+			/* Not a flag diacritic after all, ignore it */
+			if (parts.length < 2) {
+			    keyTable.add("");
+			    i++;
+			    continue;
+			}
 			String ops = parts[0];
 			String feats = parts[1];
 			String vals;
@@ -56,8 +62,12 @@ public class TransducerAlphabet
 			    op = HfstOptimizedLookup.FlagDiacriticOperator.D;
 			} else if (ops.equals("C")) {
 			    op = HfstOptimizedLookup.FlagDiacriticOperator.C;
-			} else { // ALARM ALARM we don't do any checking for bogus flag diacritics
+			} else if (ops.equals("U")) {
 			    op = HfstOptimizedLookup.FlagDiacriticOperator.U;
+			} else { // Not a valid operator, ignore the operation
+			    keyTable.add("");
+			    i++;
+			    continue;
 			}
 			if (value_bucket.containsKey(vals) == false) {
 				value_bucket.put(vals, values);
