@@ -11,8 +11,6 @@ import java.io.Console;
  * This is essentially a Java port of hfst-runtime-reader
  * written by Miikka Silfverberg in C++.
  *
- * Last changed: 5.8.2009
- *
  * @author sam.hardwick@iki.fi
  *
  */

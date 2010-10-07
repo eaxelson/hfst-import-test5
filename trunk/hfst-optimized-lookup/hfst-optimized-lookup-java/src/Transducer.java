@@ -226,6 +226,7 @@ public class Transducer implements HfstOptimizedLookup.transducer
 			getAnalyses(transitionTable.at(index).target());
 			--outputPointer;
 			++index;
+			continue;
 		    }
 		else
 		    {

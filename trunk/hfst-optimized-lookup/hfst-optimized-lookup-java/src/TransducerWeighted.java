@@ -262,6 +262,7 @@ public class TransducerWeighted implements HfstOptimizedLookup.transducer
 			current_weight -= transitionTable.at(index).getWeight();
 			--outputPointer;
 			++index;
+			continue;
 		    }
 		else
 		    {
