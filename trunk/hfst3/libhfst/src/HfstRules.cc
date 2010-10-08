@@ -16,33 +16,6 @@ namespace hfst
   namespace rules
   {
 
-    HfstTransducer universal_fst(const StringPairSet &alphabet, ImplementationType type)
-    {
-      HfstTransducer retval(alphabet, type);
-      retval.repeat_star();
-      //retval.minimize();
-      return retval;
-    }
-
-    HfstTransducer negation_fst(HfstTransducer &t, const StringPairSet &alphabet)
-    {
-      bool DEBUG=false;
-
-      if (DEBUG) printf("     negation_fst..\n");
-
-      HfstTransducer retval = universal_fst(alphabet, t.get_type());
-
-      //retval.minimize();
-
-      if (DEBUG) printf("     (1) negation_fst: subtracting\n");
-
-      retval.subtract(t);
-
-      if (DEBUG) printf("     (2)\n");
-
-      return retval;
-    }
-
     HfstTransducer replace( HfstTransducer &t, ReplaceType repl_type, bool optional, StringPairSet &alphabet ) 
     {
 
@@ -61,8 +34,6 @@ namespace hfst
 	throw hfst::exceptions::ImpossibleReplaceTypeException();
 
       HfstTransducer pi_star(alphabet, type, true);
-      //pi_star.repeat_star();
-      //pi_star.minimize();
 
       // tc = ( .* t_proj .* )
       HfstTransducer tc(pi_star);
@@ -107,7 +78,7 @@ namespace hfst
       tm.concatenate(tc);
       tm.concatenate(rmtr);
 
-      tm.minimize(); // ADDED
+      tm.minimize();
       HfstTransducer retval = replace(tm, repl_type, false, alphabet);
 
       if (DEBUG) printf("..replcae_transducer\n");
@@ -132,31 +103,16 @@ namespace hfst
       t_copy.insert_freely(StringPair(m1,m1));
       t_copy.insert_freely(StringPair(m2,m2));
 
-      //t_copy.minimize();
-
       if (DEBUG) printf("    (1)\n");
 
       HfstTransducer pi_star(alphabet, t.get_type(), true);
-      //pi_star.repeat_star();
-      //pi_star.minimize();
-
+ 
       // arg1 = .* ( m1 >> ( m2 >> t ))
       HfstTransducer arg1(pi_star);
 
-      //arg1.minimize();
+       if (DEBUG) printf("    (2)\n");
 
-      if (DEBUG) printf("    (2)\n");
-
-      // in foma, t_copy must be minimized
-      // else, nothing is concatenated to arg1 ???
-      //arg1.minimize();
-
-      //if (t_copy.get_type() == FOMA_TYPE)
-      //	t_copy.minimize();
-
-      arg1.concatenate(t_copy);
-
-      //arg1.minimize();
+       arg1.concatenate(t_copy);
 
       if (DEBUG) printf("    (3)\n");
 
@@ -170,10 +126,6 @@ namespace hfst
       // ct = .* ( m1 >> ( m2 >> t ))  ||  !(.* m1)
       HfstTransducer ct = arg1.compose(arg2);
 
-      //ct.minimize();
-
-      // return ct;  // DIFFER
-
       if (DEBUG) printf("    (4)\n");
 
       // mt = m2* m1 .*
@@ -182,7 +134,6 @@ namespace hfst
       mt.concatenate(m1_tr);
       mt.concatenate(pi_star);
 
-      //mt.minimize();
 
       // !( (!ct mt) | (ct !mt) )
 
@@ -194,7 +145,6 @@ namespace hfst
       HfstTransducer ct_neg_mt(ct);
       ct_neg_mt.concatenate(tmp2);
 
-      //ct_neg_mt.minimize();
 
       if (DEBUG) printf("    (6)\n");
 
@@ -203,19 +153,13 @@ namespace hfst
       neg_ct_mt.subtract(ct);
       neg_ct_mt.concatenate(mt);
 
-      //neg_ct_mt.minimize();
 
       if (DEBUG) printf("    (7)\n");
 
       // disjunction
       HfstTransducer disj = neg_ct_mt.disjunct(ct_neg_mt);
 
-      //disj.minimize();
-
       if (DEBUG) printf("    (8)\n");
-
-      //printf("before negation:\n");
-      //cerr << disj;
 
       // negation
       HfstTransducer retval(pi_star);
@@ -270,13 +214,11 @@ namespace hfst
 
       // left context == [ .* l ]
       HfstTransducer left_context(alphabet, type, true);
-      //left_context.repeat_star();
       left_context.concatenate(context.first);
 
       // right_context == [ r .* ]
       HfstTransducer right_context(context.second);
       HfstTransducer universal(alphabet, type, true);
-      //universal.repeat_star();
       right_context.concatenate(universal);
 
       HfstTransducer inside(left_context.concatenate(center).concatenate(right_context));
@@ -303,19 +245,15 @@ namespace hfst
 
       // left_neg = !(.* l)
       HfstTransducer left(alphabet, type, true);
-      //left.repeat_star();
       left.concatenate(context.first);
       HfstTransducer left_neg(alphabet, type, true);
-      //left_neg.repeat_star();
       left_neg.subtract(left);
 
       // right_neg = !(r .*)
       HfstTransducer universal(alphabet, type, true);
-      //universal.repeat_star();
       HfstTransducer right(context.second);
       right.concatenate(universal);
       HfstTransducer right_neg(alphabet, type, true);
-      //right_neg.repeat_star();
       right_neg.subtract(right);
 
       // left_neg + center + universal  |  universal + center + right_neg
@@ -328,7 +266,6 @@ namespace hfst
       rule.disjunct(rule_right);
 
       HfstTransducer rule_neg(alphabet, type, true);
-      //rule_neg.repeat_star();
       rule_neg.subtract(rule);
 
       return rule_neg;
@@ -344,26 +281,9 @@ namespace hfst
     HfstTransducer replace_in_context(HfstTransducerPair &context, ReplaceType repl_type, HfstTransducer &t, bool optional, StringPairSet &alphabet)
     {
 
-      /*      fprintf(stderr, "replace_in_context arguments:\n");
-      fprintf(stderr, "left context:\n");
-      std::cerr << context.first;
-      fprintf(stderr, "right context:\n");
-      std::cerr << context.second;
-      fprintf(stderr, "mapping:\n");
-      std::cerr << t;*/
-
-
       bool DEBUG=false;
 
       if (DEBUG) printf("replace_in_context...\n");
-
-      /*
-      if (DEBUG) {
-	for (StringPairSet::iterator it = alphabet.begin(); it != alphabet.end(); it++)
-	  fprintf(stderr, "%s:%s\n", it->first.c_str(), it->second.c_str());
-	std::cerr << "--\n";
-      }
-      */
 
       // test that all transducers have the same type
       if (context.first.get_type() != context.second.get_type() || 
@@ -388,14 +308,6 @@ namespace hfst
 	throw hfst::exceptions::ContextTransducersAreNotAutomataException();
 
 	if (DEBUG) printf("  ..context transducers are automata\n");*/
-
-      // TEST
-      /*printf("StringPairSet alphabet:\n");
-      for (StringPairSet::iterator it = alphabet.begin(); it != alphabet.end(); it++) {
-	StringPair sp = *it;
-	printf("  %s:%s\n", sp.first.c_str(), sp.second.c_str());
-      }
-      printf("\n");*/
       
       std::string leftm("@_LEFT_MARKER_@");
       std::string rightm("@_RIGHT_MARKER_@");
@@ -408,13 +320,7 @@ namespace hfst
       pi1.insert(StringPair("@_EPSILON_SYMBOL_@", leftm));
       pi1.insert(StringPair("@_EPSILON_SYMBOL_@", rightm));
       HfstTransducer ibt(pi1, type, true);
-      //HfstTransducer eps_to_leftm(epsilon, leftm, type);
-      //HfstTransducer eps_to_rightm(epsilon, rightm, type);
-      //ibt.disjunct(eps_to_leftm);
-      //ibt.disjunct(eps_to_rightm);
-      //ibt.repeat_star();
-      //ibt.minimize();
-      //return ibt;
+
       if (DEBUG) printf("  ..ibt created\n");
 
       // Create the remove boundary transducer (.|<L>:<>|<R>:<>)*    
@@ -422,13 +328,7 @@ namespace hfst
       pi2.insert(StringPair(leftm, "@_EPSILON_SYMBOL_@"));
       pi2.insert(StringPair(rightm, "@_EPSILON_SYMBOL_@"));
       HfstTransducer rbt(pi2, type, true);
-      //HfstTransducer leftm_to_eps(leftm, epsilon, type);
-      //HfstTransducer rightm_to_eps(rightm, epsilon, type);
-      //rbt.disjunct(leftm_to_eps);
-      //rbt.disjunct(rightm_to_eps);
-      //rbt.repeat_star();
-      //rbt.minimize();
-      //return rbt;
+
       if (DEBUG) printf("  ..rbt created\n");
 
       // Add the markers to the alphabet
@@ -436,8 +336,6 @@ namespace hfst
       alphabet.insert(StringPair(rightm,rightm));
 
       HfstTransducer pi_star(alphabet,type,true);
-      //pi_star.repeat_star();
-      //pi_star.minimize();
 
       // Create the constrain boundary transducer !(.*<L><R>.*)
       HfstTransducer leftm_to_leftm(leftm, leftm, type);
@@ -451,19 +349,18 @@ namespace hfst
       cbt.minimize();
       if (DEBUG) cbt.write_in_att_format("compiler_cbt.att",false);
       if (DEBUG) printf("  ..cbt created\n");
-      //return cbt;
+
       // left context transducer .* (<R> >> (<L> >> LEFT_CONTEXT)) || !(.*<L>)    
       HfstTransducer lct = replace_context(context.first, leftm, rightm, alphabet); 
-      //lct.write_in_att_format("lct.att",true);
+
       lct.minimize();
       if (DEBUG) lct.write_in_att_format("compiler_lct.att",false);
       if (DEBUG) printf("  ..lct created\n");
-      // return lct; // EQUAL
 
       // right context transducer:  reversion( (<R> >> (<L> >> reversion(RIGHT_CONTEXT))) .* || !(<R>.*) )
       HfstTransducer right_rev(context.second);
       if (DEBUG) printf("(1)\n");
-      right_rev.reverse();  // MINIMIZATION TAKES LONG! // *** HERE ***
+      right_rev.reverse();
       if (DEBUG) printf("(2)\n");
       right_rev.minimize();
       if (DEBUG) right_rev.write_in_att_format("right_rev.att",true);
@@ -472,11 +369,10 @@ namespace hfst
       if (DEBUG) printf("(3)\n");
       rct.reverse();
       if (DEBUG) printf("(4)\n");
-      rct.minimize(); // ADDED
+      rct.minimize();
       if (DEBUG) printf("(5)\n");
       if (DEBUG) rct.write_in_att_format("compiler_rct.att",false);
       if (DEBUG) printf("  ..rct created\n");
-      // return rct; // EQUAL
 
       // unconditional replace transducer      
       HfstTransducer rt(type);
@@ -537,8 +433,6 @@ namespace hfst
       
       if (optional) {
 	HfstTransducer pi_star_(alphabet, type, true);
-	//pi_star_.repeat_star();
-	//pi_star_.minimize();
 	result.disjunct(pi_star_);
       }
 
