@@ -547,11 +547,17 @@ namespace hfst { namespace implementations
      are expanded according to the StringSymbolSet 'unknown' that lists all symbols previously
      unknown to this transducer.
   */
-  StdVectorFst * TropicalWeightTransducer::expand_arcs(StdVectorFst * t, StringSet &unknown)
+  StdVectorFst * TropicalWeightTransducer::expand_arcs(StdVectorFst * t, StringSet &unknown,
+						       bool unknown_symbols_in_use)
   {
+
     //fprintf(stderr, "TropicalWeightTransducer::expand_arcs...\n");
     StdVectorFst * result = new StdVectorFst();
-    std::map<StateId,StateId> state_map;   // maps states of this to states of result
+    //std::map<StateId,StateId> state_map;   // maps states of this to states of result
+
+    for (fst::StateIterator<StdVectorFst> siter(*t); 
+	 not siter.Done(); siter.Next())
+      result->AddState();
 
     // go through all states in this
     for (fst::StateIterator<StdVectorFst> siter(*t); 
@@ -559,8 +565,8 @@ namespace hfst { namespace implementations
       {
 	// create new state in result, if needed
 	StateId s = siter.Value();
-	StateId result_s;
-	{
+	StateId result_s=s;
+	/*	{
 	map<StateId,StateId>::const_iterator it = state_map.find(s); 
 	if ( it == state_map.end() )
 	      {
@@ -569,7 +575,7 @@ namespace hfst { namespace implementations
 	      }
 	    else 
 	      result_s = it->second;
-	}
+	      }*/
 
 	// make the new state initial, if needed
 	if (t->Start() == s)
@@ -586,21 +592,23 @@ namespace hfst { namespace implementations
 	    const StdArc &arc = aiter.Value();
 
 	    // find the corresponding target state in result or, if not found, create a new state
-	    StateId result_nextstate;
-	    map<StateId,StateId>::const_iterator it = state_map.find(arc.nextstate); 
+	    StateId result_nextstate=arc.nextstate;
+	    /*map<StateId,StateId>::const_iterator it = state_map.find(arc.nextstate); 
 	    if ( it == state_map.end() )
 	      {
 		result_nextstate = result->AddState();
 		state_map[arc.nextstate] = result_nextstate;
 	      }
 	    else 
-	      result_nextstate = it->second;
+	    result_nextstate = it->second;*/
 
 	    // expand the transitions, if needed
 	    
 	    const fst::SymbolTable *is = t->InputSymbols(); 
 
 	    //fprintf(stderr, "ilabel: %i,    olabel: %i\n", arc.ilabel, arc.olabel);
+
+	    if (unknown_symbols_in_use) {
 
 	    if ( arc.ilabel == 1 &&       // cross-product "?:?"
 		 arc.olabel == 1 )
@@ -650,6 +658,7 @@ namespace hfst { namespace implementations
 		    //fprintf(stderr, "added transition %i:%i\n", (int)arc.ilabel, (int)number);
 		  }
 	      }
+	    }
 
 	    // the original transition is copied in all cases
 	    result->AddArc(result_s, StdArc(arc.ilabel, arc.olabel, arc.weight, result_nextstate));		
@@ -660,6 +669,21 @@ namespace hfst { namespace implementations
      result->SetInputSymbols(t->InputSymbols());
     return result;
   }
+
+
+  /*
+    template <class Arc>
+    void Relabel(
+    MutableFst<Arc> *fst,
+    const vector<pair<typename Arc::Label, typename A::Label> >& ipairs,
+    const vector<pair<typename Arc::Label, typename A::Label> >& opairs);
+
+    template<class Arc>
+    void Relabel(
+    MutableFst<Arc> *fst,
+    const SymbolTable* new_isymbols,
+    const SymbolTable* new_osymbols);     
+  */
 
   std::pair<StdVectorFst*, StdVectorFst*> TropicalWeightTransducer::harmonize
   (StdVectorFst *t1, StdVectorFst *t2, bool unknown_symbols_in_use)
@@ -688,6 +712,16 @@ namespace hfst { namespace implementations
     t2->SetInputSymbols(st2);
     delete st2;
 
+    /*
+    if (not unknown_symbols_in_use) 
+      {
+	Relabel(t1,t2->InputSymbols(),t2->InputSymbols());
+	StdVectorFst * t1_retval = t1->Copy();
+	StdVectorFst * t2_retval = t2->Copy();
+	t1_retval->SetInputSymbols(t2->InputSymbols()->Copy());
+	return std::pair<StdVectorFst*,StdVectorFst*>(t1_retval,t2_retval);
+      }*/
+
     // ...calculate the number mappings needed in harmonization...
     NumberNumberMap km = create_mapping(t1, t2);
 
@@ -705,20 +739,11 @@ namespace hfst { namespace implementations
     fst::StdVectorFst *harmonized_t1;
     fst::StdVectorFst *harmonized_t2;
 
-    if (true || unknown_symbols_in_use) {
-      harmonized_t1 = expand_arcs(t1, unknown_t1);
-      harmonized_t1->SetInputSymbols(t1->InputSymbols());
-      
-      harmonized_t2 = expand_arcs(t2, unknown_t2);
-      harmonized_t2->SetInputSymbols(t2->InputSymbols());
-    }
-    else {
-      harmonized_t1 = t1->Copy();
-      harmonized_t1->SetInputSymbols(t1->InputSymbols()->Copy());
+    harmonized_t1 = expand_arcs(t1, unknown_t1, unknown_symbols_in_use);
+    harmonized_t1->SetInputSymbols(t1->InputSymbols());
 
-      harmonized_t2 = t2->Copy();
-      harmonized_t2->SetInputSymbols(t2->InputSymbols()->Copy());
-    }
+    harmonized_t2 = expand_arcs(t2, unknown_t2, unknown_symbols_in_use);    
+    harmonized_t2->SetInputSymbols(t2->InputSymbols());
     
     /*
     fprintf(stderr, "TWT::harmonize: harmonized t1's and t2's input symbol tables now contain (FINAL):\n");
@@ -1983,8 +2008,10 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::disjunct(StdVectorFst * t1,
 						    StdVectorFst * t2)
   {
-    UnionFst<StdArc> disjunct(*t1,*t2);
-    StdVectorFst *result = new StdVectorFst(disjunct);
+    //UnionFst<StdArc> disjunct(*t1,*t2);
+    //StdVectorFst *result = new StdVectorFst(disjunct);
+    StdVectorFst * result = new StdVectorFst(*t1);
+    Union(result,*t2);
     result->SetInputSymbols(t1->InputSymbols());
     return result;
   }
@@ -2037,11 +2064,17 @@ namespace hfst { namespace implementations
     ArcSort(t1, OLabelCompare<StdArc>());
     ArcSort(t2, ILabelCompare<StdArc>());
 
-    RmEpsilonFst<StdArc> rm1(*t1);
-    RmEpsilonFst<StdArc> rm2(*t2);
+    //RmEpsilonFst<StdArc> rm1(*t1);
+    //RmEpsilonFst<StdArc> rm2(*t2);
+
+    RmEpsilon(t1);
+    RmEpsilon(t2);
+
     EncodeMapper<StdArc> encoder(0x0001,ENCODE);
-    EncodeFst<StdArc> enc1(rm1, &encoder);
-    EncodeFst<StdArc> enc2(rm2, &encoder);
+    //EncodeFst<StdArc> enc1(rm1, &encoder);
+    //EncodeFst<StdArc> enc2(rm2, &encoder);
+    EncodeFst<StdArc> enc1(*t1, &encoder);
+    EncodeFst<StdArc> enc2(*t2, &encoder);
     DeterminizeFst<StdArc> det1(enc1);
     DeterminizeFst<StdArc> det2(enc2);
 
@@ -2069,14 +2102,19 @@ namespace hfst { namespace implementations
     ArcSort(t1, OLabelCompare<StdArc>());
     ArcSort(t2, ILabelCompare<StdArc>());
 
-    RmEpsilonFst<StdArc> rm1(*t1);
-    RmEpsilonFst<StdArc> rm2(*t2);
+    //RmEpsilonFst<StdArc> rm1(*t1);
+    //RmEpsilonFst<StdArc> rm2(*t2);
+
+    RmEpsilon(t1);
+    RmEpsilon(t2);
 
     if (DEBUG) printf("  ..epsilons removed\n");
 
     EncodeMapper<StdArc> encoder(0x0003,ENCODE); // t2 must be unweighted
-    EncodeFst<StdArc> enc1(rm1, &encoder);
-    EncodeFst<StdArc> enc2(rm2, &encoder);
+    //EncodeFst<StdArc> enc1(rm1, &encoder);
+    //EncodeFst<StdArc> enc2(rm2, &encoder);
+    EncodeFst<StdArc> enc1(*t1, &encoder);
+    EncodeFst<StdArc> enc2(*t2, &encoder);
     DeterminizeFst<StdArc> det1(enc1);
     DeterminizeFst<StdArc> det2(enc2);
 
