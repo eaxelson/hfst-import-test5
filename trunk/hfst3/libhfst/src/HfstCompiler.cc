@@ -29,12 +29,17 @@
 
 namespace hfst
 {
+
+  typedef std::pair<unsigned int, unsigned int> NumberPair;
+  typedef std::set<NumberPair> NumberPairSet;
+  typedef std::vector<NumberPair> NumberPairVector;
  
   //using namespace implementations;
 
   HfstTransducer * HfstCompiler::make_transducer(Range *r1, Range *r2, ImplementationType type)
   {
     StringPairSet sps;
+    //NumberPairSet nps;
 
     if (r1 == NULL || r2 == NULL) {
       if (!Alphabet_Defined)
@@ -49,6 +54,7 @@ namespace hfst
 	  sps.insert(StringPair(
 		      std::string(TheAlphabet.code2symbol(it->first)),
 		      std::string(TheAlphabet.code2symbol(it->second)) ) );
+	  //nps.insert(NumberPair(it->first, it->second));
 	}
       }      
     }
@@ -57,6 +63,7 @@ namespace hfst
 	  sps.insert(StringPair(
 		      std::string(TheAlphabet.code2symbol(r1->character)),
 		      std::string(TheAlphabet.code2symbol(r2->character)) ) );
+	  //nps.insert(NumberPair(it->first, it->second));
 
 	if (!r1->next && !r2->next)
 	  break;
@@ -67,7 +74,7 @@ namespace hfst
       }
     }
 
-    return new HfstTransducer(sps, type);    
+    return new HfstTransducer(sps, type);    // HERE
   }
   
   HfstTransducer * HfstCompiler::new_transducer( Range *r1, Range *r2, ImplementationType type )
@@ -264,6 +271,8 @@ namespace hfst
       RSS.insert(HfstBasic::fst_strdup(name));
     return add_value(symbol_code(name), NULL);
   }
+
+  // HERE...
 
   HfstTransducer * HfstCompiler::insert_freely(HfstTransducer *t, Character input, Character output) {
     t->insert_freely(hfst::StringPair(TheAlphabet.code2symbol(input), TheAlphabet.code2symbol(output)));
@@ -529,6 +538,7 @@ namespace hfst
 
   }
 
+  // HERE
   HfstTransducer * HfstCompiler::read_words(char *filename, ImplementationType type) {
 
     if (Verbose)
@@ -567,12 +577,14 @@ namespace hfst
       buffer[l+1] = 0;
 
       StringPairVector spv;
+      // NumberPairVector npv;
       char *bufptr = buffer;
 
       std::pair<unsigned int, unsigned int> np = TheAlphabet.next_label(bufptr, true);
       while (np.first != 0 || np.second != 0) {
 	spv.push_back(StringPair(std::string(TheAlphabet.code2symbol(np.first)), 
 				 std::string(TheAlphabet.code2symbol(np.second)) ) );
+	//npv.push_back(NumberPair(np.first, np.second));
 	np = TheAlphabet.next_label(bufptr, true);
       }
 
@@ -601,6 +613,7 @@ namespace hfst
     }
   }
 
+  // HERE?
   HfstTransducer * HfstCompiler::read_transducer(char *filename, ImplementationType type) {
     if (Verbose)
       fprintf(stderr,"\nreading transducer from %s...", filename);
@@ -625,36 +638,12 @@ namespace hfst
 
   HfstTransducer * HfstCompiler::replace_in_context(HfstTransducer * mapping, Repl_Type repl_type, Contexts *contexts, bool optional) {
     
-#ifdef FOO
-    if (mapping->get_type() == SFST_TYPE) {
-
-      interface
-
-      HfstTransducer * sfst_mapping = new HfstTransducer(*mapping);
-      mapping = explode(mapping);
-      mapping.minimize();
-
-      HfstTransducer * left_context = new HfstTransducer(*(contexts->left));
-      HfstTransducer * right_context = new HfstTransducer(*(contexts->right));
-      SFST::Contexts *sfst_contexts = interface.make_context(left_context->implementation.sfst, 
-							     right_context->implementation.sfst);
-
-      return interface.replace_in_context(sfst_mapping->implementation.sfst,
-					  repl_type,
-					  sfst_contexts,
-					  optional);
-    }
-#endif
-
     HfstTransducerPair tr_pair(*(contexts->left), *(contexts->right));
     StringPairSet sps;
-    //printf("inserting pairs:\n");
     for( HfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
       HfstAlphabet::NumberPair l=*it;
-      //printf("inserting pair %i:%i... ", l.lower_char(), l.upper_char());
       sps.insert(StringPair( TheAlphabet.code2symbol(l.first),
 			     TheAlphabet.code2symbol(l.second)) );
-      //printf("ok\n");
     } 
     switch (repl_type) 
       {
@@ -695,7 +684,7 @@ namespace hfst
       }
   }
 
-  // slow!
+  // HERE
   HfstTransducer * HfstCompiler::make_mapping( Ranges *list1, Ranges *list2, ImplementationType type ) {
 
     //Transducer *Interface::make_mapping( Ranges *list1, Ranges *list2 )
@@ -704,12 +693,14 @@ namespace hfst
     Ranges *l2=list2;
     //HfstTransducer *t=new HfstTransducer("@_EPSILON_SYMBOL_@", type); // an epsilon transducer
     std::vector<StringPairSet> spsv;
+    //std::vector<NumberPairSet> npsv;
 
     //Node *node=t->root_node();
     while (l1 && l2) {
       //Node *nn=t->new_node();
       //HfstTransducer disj(type); // an empty transducer
       StringPairSet sps;
+      //NumberPairSet nps;
       for( Range *r1=l1->range; r1; r1=r1->next )
 	for( Range *r2=l2->range; r2; r2=r2->next ) {
 	  //node->add_arc( Label(r1->character, r2->character), nn, t );
@@ -719,11 +710,13 @@ namespace hfst
 	  //disj.disjunct(tr);
 	  sps.insert(StringPair(TheAlphabet.code2symbol(r1->character), 
 				TheAlphabet.code2symbol(r2->character)) );
+	  //nps.insert(NumberPair(r1->character, r2->character));
 	}
       //node = nn;
       //HfstTransducer disj(sps, type);
       //t->concatenate(disj);
       spsv.push_back(sps);
+      //npsv.push_back(nps);
       l1 = l1->next;
       l2 = l2->next;
     }
@@ -731,6 +724,7 @@ namespace hfst
       //Node *nn=t->new_node();
       //HfstTransducer disj(type); // an empty transducer
       StringPairSet sps;
+      //NumberPairSet nps;
       for( Range *r1=l1->range; r1; r1=r1->next ) {
 	//node->add_arc( Label(r1->character, Label::epsilon), nn, t );
 	//HfstTransducer tr(TheAlphabet.code2symbol(r1->character), 
@@ -739,17 +733,20 @@ namespace hfst
 	// disj.disjunct(tr);
 	sps.insert(StringPair(TheAlphabet.code2symbol(r1->character), 
 			      TheAlphabet.code2symbol(0)) );
+	//nps.insert(NumberPair(r1->character, 0));
       }
       //node = nn;
       //HfstTransducer disj(sps, type);
       //t->concatenate(disj);
       spsv.push_back(sps);
+      //npsv.push_back(nps);
       l1 = l1->next;
     }
     while (l2) {
       //Node *nn=t->new_node();
       //HfstTransducer disj(type); // an empty transducer
       StringPairSet sps;
+      //NumberPairSet nps;
       for( Range *r2=l2->range; r2; r2=r2->next ) {
 	//node->add_arc( Label(Label::epsilon, r2->character), nn, t );
 	//HfstTransducer tr(TheAlphabet.code2symbol(0), 
@@ -758,11 +755,13 @@ namespace hfst
 	// disj.disjunct(tr);
 	sps.insert(StringPair(TheAlphabet.code2symbol(0), 
 			      TheAlphabet.code2symbol(r2->character)) );
+	//nps.insert(NumberPair(0, r2->character));
       }
       //node = nn;
       //HfstTransducer disj(sps, type);
       //t->concatenate(disj);
       spsv.push_back(sps);
+      //npsv.push_back(nps);
       l2 = l2->next;
     }
     //node->set_final(1);
@@ -825,7 +824,8 @@ namespace hfst
 
     return t;
   }
-  
+
+  // HERE?
   void HfstCompiler::def_alphabet( HfstTransducer *tr )
   {
     tr = explode(tr);

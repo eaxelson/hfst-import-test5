@@ -36,14 +36,22 @@ namespace hfst
 
       @see HfstTransducer::substitute(const StringPair&, const StringPair&) and other substitute functions */
   typedef std::pair<std::string, std::string> StringPair;
+
+  typedef std::pair<unsigned int, unsigned int> NumberPair;
+
   /** \brief A vector of transitions that represents a path in a transducer. 
 
       @see HfstTokenizer */
   typedef std::vector<StringPair> StringPairVector;
+
+  typedef std::vector<NumberPair> NumberPairVector;
+
   /** \brief A set of symbol pairs used in substituting symbol pairs. 
 
      @see HfstTransducer::substitute(const StringPair&, const StringPairSet &) */
   typedef std::set<StringPair> StringPairSet;
+
+  typedef std::set<NumberPair> NumberPairSet;
 
   /* Maps strings to numbers. */
   typedef std::map<String,unsigned int> StringNumberMap;
