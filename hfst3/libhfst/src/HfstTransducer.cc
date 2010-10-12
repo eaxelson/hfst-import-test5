@@ -157,8 +157,10 @@ namespace hfst
 	    tropical_ofst_interface.harmonize(this->implementation.tropical_ofst,
 					      another.implementation.tropical_ofst,
 					      unknown_symbols_in_use);
+	  if (unknown_symbols_in_use) {
+	    delete another.implementation.tropical_ofst;
+	  }
 	  delete this->implementation.tropical_ofst;
-	  delete another.implementation.tropical_ofst;
 	  this->implementation.tropical_ofst = result.first;
 	  another.implementation.tropical_ofst = result.second;
 	  break;
