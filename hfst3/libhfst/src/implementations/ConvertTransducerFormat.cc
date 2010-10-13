@@ -357,6 +357,8 @@ HfstInternalTransducer * log_ofst_to_internal_hfst_format(LogFst * t) {
     return internal_transducer;
 }
 
+#endif // HAVE_OPENFST
+
 StateId hfst_ol_to_internal_add_state(hfst_ol::Transducer* t, 
                                       HfstInternalTransducer* internal_transducer,
                                       HfstOlToInternalStateMap& state_map,
@@ -389,8 +391,6 @@ StateId hfst_ol_to_internal_add_state(hfst_ol::Transducer* t,
   }
   return new_state;
 }
-
-#endif // HAVE_OPENFST
 
 HfstInternalTransducer * hfst_ol_to_internal_hfst_format(hfst_ol::Transducer * t) 
 {
