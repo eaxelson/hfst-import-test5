@@ -1,5 +1,5 @@
-hfst-optimized-lookup-java: use a fast morphological transducer to
-analyze words.
+hfst-optimized-lookup-java: a demo utility for lookup on hfst-optimized-lookup
+transducers.
 
 You need the Java runtime, a transducer in a special fast-lookup format
 (made with separate hfst tools) and this package.
