@@ -82,50 +82,6 @@ namespace hfst { namespace implementations {
   typedef fst::VectorFst<LogArc> LogFst;
 #endif
 
-#ifdef FOO
-    /* SFST::Transducer * is the sfst transducer format.
-       fst::StdVectorFst * is the openfst transducer format. */
-    
-    /* Read an SFST::Transducer * and return the equivalent transducer in
-       internal format. */
-    InternalTransducer * sfst_to_internal_format(SFST::Transducer * t);
-
-    InternalTransducer * foma_to_internal_format(struct fsm * t);
-  
-  /* Read an fst::StdVectorFst * and return the equivalent transducer in
-     internal format. */
-    InternalTransducer * tropical_ofst_to_internal_format
-      (fst::StdVectorFst * t);
-
-  /* Read a LogFst * and return the equivalent transducer in
-     internal format. */
-    InternalTransducer * log_ofst_to_internal_format
-      (LogFst * t);
-    
-    /* Read an hfst_ol::Transducer * and return the equivalent transducer in
-       internal format. */
-    InternalTransducer * hfst_ol_to_internal_format(hfst_ol::Transducer * t);
-  
-    /* Read a transducer in internal format and return the equivalent
-       SFST::Transducer *. */
-    SFST::Transducer * internal_format_to_sfst(InternalTransducer * t);
-
-    struct fsm * internal_format_to_foma(InternalTransducer * t);
-    
-    /* Read a transducer in internal format and return the equivalent
-       fst::StdVectorFst * */
-    fst::StdVectorFst * internal_format_to_openfst(InternalTransducer * t);
-
-    /* Read a transducer in internal format and return the equivalent
-       LogFst * */
-    LogFst * internal_format_to_log_ofst(InternalTransducer * t);
-    
-    /* Read a transducer in internal format and return the equivalent
-       hfst_ol::Transducer * */
-    hfst_ol::Transducer * internal_format_to_hfst_ol(InternalTransducer * t, bool weighted);
-#endif
-
-
     /* -------------------------------------------------
        Conversion through an internal transducer format.
        These functions will replace the old ones. 
