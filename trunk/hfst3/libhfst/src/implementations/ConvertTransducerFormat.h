@@ -84,7 +84,6 @@ namespace hfst { namespace implementations {
 
     /* -------------------------------------------------
        Conversion through an internal transducer format.
-       These functions will replace the old ones. 
        ------------------------------------------------- */
     
     /* Read an SFST::Transducer * and return the equivalent transducer in
