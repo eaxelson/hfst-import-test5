@@ -390,6 +390,8 @@ StateId hfst_ol_to_internal_add_state(hfst_ol::Transducer* t,
   return new_state;
 }
 
+#endif // HAVE_OPENFST
+
 HfstInternalTransducer * hfst_ol_to_internal_hfst_format(hfst_ol::Transducer * t) 
 {
   bool weighted = t->get_header().probe_flag(hfst_ol::Weighted);
@@ -440,7 +442,6 @@ HfstInternalTransducer * hfst_ol_to_internal_hfst_format(hfst_ol::Transducer * t
   
   return internal_transducer;
 }
-#endif
 
 
 #if HAVE_FOMA
