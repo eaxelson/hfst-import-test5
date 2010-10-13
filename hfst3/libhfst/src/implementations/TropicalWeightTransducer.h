@@ -222,7 +222,9 @@ namespace implementations
 
       static StringSet get_string_set(StdVectorFst *t);
       static NumberNumberMap create_mapping(StdVectorFst * t1, StdVectorFst * t2);
+      //static std::vector<unsigned int> create_mapping(StdVectorFst * t1, StdVectorFst * t2);
       static void recode_symbol_numbers(StdVectorFst * t, hfst::NumberNumberMap &km);      
+      //static void recode_symbol_numbers(StdVectorFst * t, std::vector<unsigned int> &km);      
       static StdVectorFst * expand_arcs(StdVectorFst * t, hfst::StringSet &unknown, bool unknown_symbols_in_use);
 
       static StdVectorFst * compose_intersect(StdVectorFst * t,

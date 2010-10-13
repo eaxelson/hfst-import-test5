@@ -664,7 +664,7 @@ namespace hfst { namespace implementations
 	  }
       }
 
-    result->SetInputSymbols(t->InputSymbols());
+    //result->SetInputSymbols(t->InputSymbols());
     return result;
   }
 
@@ -708,8 +708,12 @@ namespace hfst { namespace implementations
     fst::StdVectorFst *harmonized_t1;
     fst::StdVectorFst *harmonized_t2;
 
-    harmonized_t1 = expand_arcs(t1, unknown_t1, unknown_symbols_in_use);
-    harmonized_t1->SetInputSymbols(t1->InputSymbols());
+    if (not unknown_symbols_in_use)
+      harmonized_t1 = t1;
+    else {
+      harmonized_t1 = expand_arcs(t1, unknown_t1, unknown_symbols_in_use);
+      harmonized_t1->SetInputSymbols(t1->InputSymbols());
+    }
 
     if (not unknown_symbols_in_use)
       harmonized_t2 = t2;
@@ -1755,6 +1759,7 @@ namespace hfst { namespace implementations
     return t;
   }
 
+#ifdef FOO
   StdVectorFst * TropicalWeightTransducer::compose(StdVectorFst * t1,
 			 StdVectorFst * t2)
   {
@@ -1772,6 +1777,49 @@ namespace hfst { namespace implementations
 
     StdVectorFst *result = new StdVectorFst();
     Compose(*t1, *t2, result);
+    result->SetInputSymbols(t1->InputSymbols());
+    return result;
+  }
+
+  StdVectorFst * TropicalWeightTransducer::compose(StdVectorFst * t1,
+			 StdVectorFst * t2)
+  {
+    StringSet foo;
+    // a copy of t1 is created so that its symbol table check sum is the same as t2's
+    // (else OpenFst complains about non-matching check sums... )
+    StdVectorFst * t1_ = expand_arcs(t1, foo, false);
+    t1_->SetOutputSymbols(t2->InputSymbols());
+    //StdVectorFst * t2_ = expand_arcs(t2, foo, false);
+    
+    ArcSort(t1_, StdOLabelCompare());
+    ArcSort(t2, StdILabelCompare());
+
+    StdVectorFst *result = new StdVectorFst();
+    Compose(*t1_, *t2, result);
+    delete t1_;
+    //delete t2_;
+    result->SetInputSymbols(t1->InputSymbols());
+    return result;
+  }
+#endif
+
+  StdVectorFst * TropicalWeightTransducer::compose(StdVectorFst * t1,
+			 StdVectorFst * t2)
+  {
+    StringSet foo;
+    // a copy of t2 is created so that its symbol table check sum is the same as t1's
+    // (else OpenFst complains about non-matching check sums... )
+    StdVectorFst * t2_ = expand_arcs(t2, foo, false);
+    t2_->SetInputSymbols(t1->InputSymbols());
+    t1->SetOutputSymbols(t1->InputSymbols());
+    
+    ArcSort(t1, StdOLabelCompare());
+    ArcSort(t2_, StdILabelCompare());
+
+    StdVectorFst *result = new StdVectorFst();
+    Compose(*t1, *t2_, result);
+    delete t2_;
+
     result->SetInputSymbols(t1->InputSymbols());
     return result;
   }

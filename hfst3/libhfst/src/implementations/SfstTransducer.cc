@@ -186,27 +186,6 @@ namespace hfst { namespace implementations {
     delete t1;
     t1 = new_t1;
 
-#ifdef foo
-    // 2. Add new symbols from transducer t1 to the symbol table of transducer t2...
-
-    for ( StringSet::const_iterator it = unknown_t2.begin();
-	  it != unknown_t2.end(); it++ ) {
-	t2->InputSymbols()->AddSymbol(*it);
-	//fprintf(stderr, "added %s to the set of symbols unknown to t2\n", (*it).c_str());
-    }
-    // ...calculate the number mappings needed in harmonization...
-    KeyMap km = create_mapping(t1, t2);
-
-    // ... replace the symbol table of t1 with a copy of t2's symbol table
-    delete t1->InputSymbols();
-    t1->SetInputSymbols( new fst::SymbolTable(*(t2->InputSymbols())) );
-
-    // ...and recode the symbol numbers of transducer t1 so that
-    //    it follows the new symbol table.
-    recode_symbol_numbers(t1, km);
-#endif
-
-
     // 3. Calculate the set of symbol pairs to which a non-identity "?:?"
     //    transition is expanded for both transducers.
     
@@ -225,54 +204,9 @@ namespace hfst { namespace implementations {
       harmonized_t2 = &t2->copy();
     }
 
-    // fprintf(stderr, "...TWT::harmonize\n");
-
     return std::pair<Transducer*, Transducer*>(harmonized_t1, harmonized_t2);
 
   }
-
-
-#ifdef foo
-  Transducer * SfstTransducer::harmonize(Transducer * t, KeyMap &key_map)
-  {
-    Key no_key_number = 0;
-    for (KeyMap::const_iterator it = key_map.begin();
-	 it != key_map.end();
-	 ++it)
-      { if (no_key_number < it->first) { no_key_number = it->first; }
-	if (no_key_number < it->second) { no_key_number = it->second; } }
-    ++no_key_number;
-
-    KeyMap temp_keys;
-
-    /* Every permutation is a product of transpositions... 
-       Only three times as slow as converting by an optimal
-       method and way more fun. */
-    for (KeyMap::const_iterator it = key_map.begin();
-	 it != key_map.end();
-	 ++it)
-      {
-	if (it->first != it->second)
-	  { 
-	    Key first = it->first;
-	    Key second = it->second;
-	    if (temp_keys.find(first) != temp_keys.end())
-	      { first = temp_keys[first]; }
-	    temp_keys[second] = first;
-	    Transducer * temp = substitute(t,second,no_key_number);
-	    delete t;
-	    t = temp;
-	    temp = substitute(t,first,second);
-	    delete t;
-	    t = temp;
-	    temp = substitute(t,no_key_number,first);
-	    delete t;
-	    t = temp;
-	  }
-      }
-    return t;
-  }
-#endif
 
   Transducer * SfstInputStream::read_transducer(bool has_header)
   {
