@@ -643,8 +643,10 @@ fclose(ifile);
 	indicates how many times a cycle will be followed, with negative numbers
 	indicating unlimited. Note that if the transducer is cyclic and cycles aren't capped,
 	the search will not end until the callback returns false. */
-	  void extract_strings(ExtractStringsCb& callback, int cycles=-1);
+    void extract_strings(ExtractStringsCb& callback, int cycles=-1);
 	  
+    std::vector<HfstTransducer*> extract_paths();
+
 	  /** \brief Store extracted strings into \a results.
 
 	The total number of resulting strings is capped at \a max_num, with 0 or negative
@@ -793,6 +795,8 @@ fclose(ifile);
 
     /** \brief The type of the transducer. */
     ImplementationType get_type(void) const;
+
+    StringPairSet get_symbol_pairs();
 
     //HfstTransducer &remove_from_alphabet(const HfstTransducer &t, const std::string &symbol);
 

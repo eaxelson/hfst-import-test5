@@ -1759,50 +1759,6 @@ namespace hfst { namespace implementations
     return t;
   }
 
-#ifdef FOO
-  StdVectorFst * TropicalWeightTransducer::compose(StdVectorFst * t1,
-			 StdVectorFst * t2)
-  {
-    if (t1->OutputSymbols() == NULL)
-      t1->SetOutputSymbols(t1->InputSymbols());
-    if (t2->OutputSymbols() == NULL)
-      t2->SetOutputSymbols(t2->InputSymbols());
-    
-    ArcSort(t1, StdOLabelCompare());
-    ArcSort(t2, StdILabelCompare());
-
-    /* SLOW?
-    ComposeFst<StdArc> compose(*t1,*t2);
-    StdVectorFst *result = new StdVectorFst(compose); */
-
-    StdVectorFst *result = new StdVectorFst();
-    Compose(*t1, *t2, result);
-    result->SetInputSymbols(t1->InputSymbols());
-    return result;
-  }
-
-  StdVectorFst * TropicalWeightTransducer::compose(StdVectorFst * t1,
-			 StdVectorFst * t2)
-  {
-    StringSet foo;
-    // a copy of t1 is created so that its symbol table check sum is the same as t2's
-    // (else OpenFst complains about non-matching check sums... )
-    StdVectorFst * t1_ = expand_arcs(t1, foo, false);
-    t1_->SetOutputSymbols(t2->InputSymbols());
-    //StdVectorFst * t2_ = expand_arcs(t2, foo, false);
-    
-    ArcSort(t1_, StdOLabelCompare());
-    ArcSort(t2, StdILabelCompare());
-
-    StdVectorFst *result = new StdVectorFst();
-    Compose(*t1_, *t2, result);
-    delete t1_;
-    //delete t2_;
-    result->SetInputSymbols(t1->InputSymbols());
-    return result;
-  }
-#endif
-
   StdVectorFst * TropicalWeightTransducer::compose(StdVectorFst * t1,
 			 StdVectorFst * t2)
   {
@@ -1827,8 +1783,6 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::compose_intersect
   (StdVectorFst * t, Grammar * grammar)
   {
-    //t->SetInputSymbols(NULL);
-    //t->SetOutputSymbols(NULL);
     fst::ArcSort<StdArc,fst::OLabelCompare<StdArc> > 
       (t,OLabelCompare<StdArc>());    
     ComposeIntersectFst cif(t,*grammar);
@@ -1842,8 +1796,6 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::concatenate(StdVectorFst * t1,
 						       StdVectorFst * t2)
   {
-    //ConcatFst<StdArc> concatenate(*t1,*t2);
-    //StdVectorFst *result = new StdVectorFst(concatenate); 
     StdVectorFst * result = new StdVectorFst(*t1);
     Concat(result,*t2);
     result->SetInputSymbols(t1->InputSymbols());
@@ -1853,8 +1805,6 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::disjunct(StdVectorFst * t1,
 						    StdVectorFst * t2)
   {
-    //UnionFst<StdArc> disjunct(*t1,*t2);
-    //StdVectorFst *result = new StdVectorFst(disjunct);
     StdVectorFst * result = new StdVectorFst(*t1);
     Union(result,*t2);
     result->SetInputSymbols(t1->InputSymbols());

@@ -102,6 +102,7 @@ namespace implementations
       static Transducer * reverse(Transducer * transducer);
       static Transducer * extract_input_language(Transducer * t);
       static Transducer * extract_output_language(Transducer * t);
+      static std::vector<Transducer*> extract_paths(Transducer *t);
       static void extract_strings(Transducer * t, hfst::ExtractStringsCb& callback, int cycles=-1, FdTable<SFST::Character>* fd=NULL, bool filter_fd=false);
 
       static Transducer * insert_freely(Transducer *t , const StringPair &symbol_pair);
@@ -131,6 +132,8 @@ namespace implementations
       static Transducer * remove_from_alphabet(Transducer *t, const std::string &symbol);
 
       static Transducer * disjunct(Transducer * t, const StringPairVector &spv);
+
+      static StringPairSet get_symbol_pairs(Transducer *t);
 
     protected:
       static void initialize_alphabet(Transducer *t);

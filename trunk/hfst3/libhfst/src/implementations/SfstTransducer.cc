@@ -514,6 +514,11 @@ namespace hfst { namespace implementations {
   { t->complete_alphabet();
     return &t->upper_level(); }
 
+  std::vector<Transducer*> SfstTransducer::extract_paths(Transducer *t)
+  { vector<Transducer*> paths;
+    t->enumerate_paths(paths);
+    return paths;
+  }
 
   static bool extract_strings(Transducer * t, Node *node,
            Node2Int &all_visitations, Node2Int &path_visitations,
@@ -726,6 +731,33 @@ namespace hfst { namespace implementations {
 	  it != cm.end(); it++ ) {
       s.insert( std::string(it->second) );
     }
+    return s;
+  }
+
+  StringPairSet SfstTransducer::get_symbol_pairs(Transducer *t)
+  {
+    StringPairSet s;
+    t->alphabet.clear_char_pairs();
+    t->complete_alphabet();
+    for (SFST::Alphabet::const_iterator it = t->alphabet.begin();
+	 it != t->alphabet.end(); it++)
+      {
+	const char * isymbol = t->alphabet.code2symbol(it->lower_char());
+	const char * osymbol = t->alphabet.code2symbol(it->upper_char());
+
+	if (isymbol == NULL) {
+	  fprintf(stderr, "ERROR: input number %i not found\n", it->lower_char());
+	  exit(1);
+	}
+	if (osymbol == NULL) {
+	  fprintf(stderr, "ERROR: input number %i not found\n", it->upper_char());
+	  exit(1);
+	}
+
+	s.insert(StringPair(std::string(isymbol),
+			    std::string(osymbol)
+			    ));
+      }
     return s;
   }
 

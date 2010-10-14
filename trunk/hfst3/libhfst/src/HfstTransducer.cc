@@ -100,6 +100,14 @@ namespace hfst
     return first_rule; }
 #endif 
 
+  StringPairSet HfstTransducer::get_symbol_pairs()
+  {
+    if (this->type == SFST_TYPE)
+      return sfst_interface.get_symbol_pairs(this->implementation.sfst);
+    else
+      throw hfst::exceptions::FunctionNotImplementedException();
+  }
+
   /* Insert to unknown1 strings that are found in s2 but not in s1 and vice versa. */
   void collect_unknown_sets(StringSet &s1, StringSet &unknown1,
 			    StringSet &s2, StringSet &unknown2)
@@ -639,48 +647,6 @@ type(type),anonymous(true),is_trie(false)
       }
   }
 
-  /*
-  HfstTransducer &HfstTransducer::remove_from_alphabet(const HfstTransducer &t, const std::string &symbol) 
-  {
-    switch(this->type)
-      {
-#if HAVE_SFST
-      case SFST_TYPE:
-	{
-	  implementation.sfst =
-	    sfst_interface.remove_from_alphabet(implementation.sfst, symbol);
-	  break;
-	}
-#endif
-#if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
-	{
-	  implementation.tropical_ofst =
-	    tropical_ofst_interface.remove_from_alphabet(implementation.tropical_ofst, symbol);
-	  break;
-	}
-      case LOG_OFST_TYPE:
-	{
-	  implementation.log_ofst =
-	    log_ofst_interface.remove_from_alphabet(implementation.log_ofst, symbol);
-	  break;
-	}
-#endif
-#if HAVE_FOMA
-      case FOMA_TYPE:
-	{
-	  implementation.foma =
-	    foma_interface_interface.remove_from_alphabet(implementation.foma, symbol);
-	  break;
-	}
-#endif
-      case ERROR_TYPE:
-      default:
-	throw hfst::exceptions::TransducerHasWrongTypeException();
-	break;
-      }
-    return *this;
-    }*/
 
 HfstTransducer::HfstTransducer(const std::string &symbol, ImplementationType type): 
 type(type),anonymous(false),is_trie(false)
@@ -1015,6 +981,23 @@ type(type),anonymous(false),is_trie(false)
        &hfst::implementations::FomaTransducer::extract_output_language,
 #endif
        false ); }    
+
+  std::vector<HfstTransducer*> HfstTransducer::extract_paths()
+  {
+    if (this->type != SFST_TYPE)
+      throw hfst::exceptions::FunctionNotImplementedException();
+
+    std::vector<SFST::Transducer*> sfst_paths = sfst_interface.extract_paths(this->implementation.sfst);
+    std::vector<HfstTransducer*> hfst_paths;
+    for (std::vector<SFST::Transducer*>::iterator it = sfst_paths.begin(); it != sfst_paths.end(); it++)
+      {
+	HfstTransducer *tr = new HfstTransducer(SFST_TYPE);
+	delete tr->implementation.sfst;
+	tr->implementation.sfst = *it;
+	hfst_paths.push_back(tr);
+      }
+    return hfst_paths;
+  }
 
   void HfstTransducer::extract_strings(ExtractStringsCb& callback, int cycles)
   { 
@@ -1862,100 +1845,6 @@ type(type),anonymous(false),is_trie(false)
     return *retval;
   }
 
-#ifdef FOO
-    try 
-      {
-	// make a new intermediate transducer of type internal hfst type
-	hfst::implementations::HfstInternalTransducer * internal;
-	switch (t.type)
-	  {
-#if HAVE_FOMA
-	  case FOMA_TYPE:
-	    internal =
-	      hfst::implementations::foma_to_internal_hfst_format(t.implementation.foma);
-	    break;
-#endif
-#if HAVE_SFST
-	  case SFST_TYPE:
-	    internal = 
-	      hfst::implementations::sfst_to_internal_hfst_format(t.implementation.sfst);
-	    break;
-#endif
-#if HAVE_OPENFST
-	  case TROPICAL_OFST_TYPE:
-	  internal =
-	      hfst::implementations::tropical_ofst_to_internal_hfst_format(t.implementation.tropical_ofst);
-	    break;
-	  case LOG_OFST_TYPE:
-	  internal =
-	      hfst::implementations::log_ofst_to_internal_hfst_format(t.implementation.log_ofst);
-	    break;
-	  case HFST_OL_TYPE:
-	  case HFST_OLW_TYPE:
-	    internal =
-	      hfst::implementations::hfst_ol_to_internal_hfst_format(t.implementation.hfst_ol);
-	      break;
-#endif
-	case UNSPECIFIED_TYPE:
-	case ERROR_TYPE:
-	default:
-	  throw hfst::exceptions::TransducerHasWrongTypeException();
-	  }
-
-	// transform the intermediate transducer into format defined by 'type'
-	// and assign it as a value of retval
-	switch (type)
-	  {
-#if HAVE_SFST
-	  case SFST_TYPE:
-	    delete retval->implementation.sfst;  // delete the empty transducer
-	    retval->implementation.sfst = 
-	      hfst::implementations::hfst_internal_format_to_sfst(internal);
-	    if (t.type != TROPICAL_OFST_TYPE)  // if a new intermediate transducer was created,
-	      delete internal;                  // delete it
-	    break;
-#endif
-#if HAVE_OPENFST
-	  case TROPICAL_OFST_TYPE:
-	  case UNSPECIFIED_TYPE:
-	    delete retval->implementation.tropical_ofst;
-	    retval->implementation.tropical_ofst =
-	      hfst::implementations::hfst_internal_format_to_tropical_ofst(internal);
-	    delete internal;
-	    break;
-	  case LOG_OFST_TYPE:
-	    delete retval->implementation.log_ofst;
-	    retval->implementation.log_ofst =
-	      hfst::implementations::hfst_internal_format_to_log_ofst(internal);
-	      delete internal;
-	    break;
-	  case HFST_OL_TYPE:
-	  case HFST_OLW_TYPE:
-	    delete retval->implementation.hfst_ol;
-	    retval->implementation.hfst_ol =
-	      hfst::implementations::hfst_internal_format_to_hfst_ol(internal, type==HFST_OLW_TYPE?true:false);
-	      delete internal;
-	    break;
-#endif
-#if HAVE_FOMA
-	  case FOMA_TYPE:
-	    retval->foma_interface.delete_foma(retval->implementation.foma);
-	    retval->implementation.foma =
-	      hfst::implementations::hfst_internal_format_to_foma(internal);
-	      delete internal;
-	    break;
-#endif
-	case ERROR_TYPE:
-	default:
-	  throw hfst::exceptions::TransducerHasWrongTypeException();
-	  }
-      }
-    catch (hfst::implementations::HfstInterfaceException e)
-      { throw e; }
-    return *retval;
-  }
-
-#endif
 
   /* ERROR_TYPE or UNSPECIFIED_TYPE returns true, so they must be handled separately */
   bool HfstTransducer::is_implementation_type_available(ImplementationType type) {
@@ -2073,88 +1962,6 @@ type(type),anonymous(false),is_trie(false)
     return *this;
   }
 
-/*
-  hfst::implementations::HfstInternalTransducer * 
-  HfstTransducer::hfst_transducer_to_internal(
-                    const HfstTransducer *transducer) {
-    hfst::implementations::HfstInternalTransducer * internal_transducer;
-    switch(transducer->type)
-      {
-#if HAVE_SFST
-      case SFST_TYPE:
-	internal_transducer = hfst::implementations::sfst_to_internal_hfst_format(transducer->implementation.sfst);
-	break;
-#endif
-#if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
-	internal_transducer = hfst::implementations::tropical_ofst_to_internal_hfst_format(transducer->implementation.tropical_ofst);
-	break;
-      case LOG_OFST_TYPE:
-	internal_transducer = hfst::implementations::log_ofst_to_internal_hfst_format(transducer->implementation.log_ofst);
-	break;
-#endif
-#if HAVE_FOMA
-      case FOMA_TYPE:
-	internal_transducer = hfst::implementations::foma_to_internal_hfst_format(transducer->implementation.foma);
-	break;
-#endif
-      case HFST_OL_TYPE:
-      case HFST_OLW_TYPE:
-	throw hfst::exceptions::FunctionNotImplementedException();
-	break;
-      case UNSPECIFIED_TYPE:
-      case ERROR_TYPE:
-      default:
-	throw hfst::exceptions::TransducerHasWrongTypeException();
-      }
-    return internal_transducer;
-  }
-
-*/
-/*
-  HfstTransducer * HfstTransducer::internal_to_hfst_transducer(
-		     hfst::implementations::HfstInternalTransducer * internal_transducer, 
-		     ImplementationType type)
-  {
-    HfstTransducer * retval = new HfstTransducer(type);
-    switch(retval->type)
-      {
-#if HAVE_SFST
-      case SFST_TYPE:
-	delete retval->implementation.sfst;
-	retval->implementation.sfst = 
-	  hfst::implementations::hfst_internal_format_to_sfst(internal_transducer);
-	break;
-#endif
-#if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
-	delete retval->implementation.tropical_ofst;
-	retval->implementation.tropical_ofst = 
-	  hfst::implementations::hfst_internal_format_to_tropical_ofst(internal_transducer);
-	break;
-      case LOG_OFST_TYPE:
-	delete retval->implementation.log_ofst;
-	retval->implementation.log_ofst = 
-	  hfst::implementations::hfst_internal_format_to_log_ofst(internal_transducer);
-	break;
-#endif
-#if HAVE_FOMA
-      case FOMA_TYPE:
-	retval->foma_interface.delete_foma(retval->implementation.foma);
-	retval->implementation.foma = 
-	  hfst::implementations::hfst_internal_format_to_foma(internal_transducer);
-	break;
-#endif
-      case HFST_OL_TYPE:
-      case HFST_OLW_TYPE:
-	throw hfst::exceptions::FunctionNotImplementedException();
-      case ERROR_TYPE:
-      default:
-	throw hfst::exceptions::TransducerHasWrongTypeException();
-      }
-    return retval;
-  }
-*/
 
 void HfstTransducer::write_in_att_format(const char * filename, bool print_weights)
 {
@@ -2270,8 +2077,22 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
 
   HfstTokenizer HfstTransducer::create_tokenizer() 
   {
-    //throw hfst::exceptions::FunctionNotImplementedException();
     HfstTokenizer tok;
+
+    if (this->type == SFST_TYPE) 
+      {
+	StringPairSet sps = this->get_symbol_pairs();
+	for (StringPairSet::const_iterator it = sps.begin(); it != sps.end(); it++)
+	  {
+	    if (it->first.size() > 1)
+	      tok.add_multichar_symbol(it->first);
+	    if (it->second.size() > 1)
+	      tok.add_multichar_symbol(it->second);
+	  }
+      }
+
+    else {
+
     HfstMutableTransducer t(*this);
     HfstStateIterator state_it(t);
     while (not state_it.done()) 
@@ -2292,6 +2113,9 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
 	  }
 	state_it.next();
       }
+
+    }
+
     return tok;
   }
 
