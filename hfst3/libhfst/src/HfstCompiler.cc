@@ -376,16 +376,16 @@ namespace hfst
     
     t->minimize();
 
-    // Make a tokenizer that recognizes all multicharacter symbols in t.
-    // It is needed when weighted paths are transformed into transducers.
-    HfstTokenizer TOK = t->create_tokenizer();
-
     // transducer agreement variable names
     std::vector<char*> name;
     for( RVarSet::iterator it=RS.begin(); it!=RS.end(); it++) {
       name.push_back(*it);
     }
     RS.clear();
+
+    // Make a tokenizer that recognizes all multicharacter symbols in t.
+    // It is needed when weighted paths are transformed into transducers.
+    HfstTokenizer TOK = t->create_tokenizer(); // no effect on performance
     
     // replace all agreement variables
     for( size_t i=0; i<name.size(); i++ ) {
@@ -394,17 +394,24 @@ namespace hfst
       
       // enumerate all paths of the transducer
       HfstTransducer *vt=var_value(strdup(name[i])); // var_value frees its argument
-      WeightedPaths<float>::Set paths;
-      vt->extract_strings(paths, -1, -1);
-      delete vt;
-
-      // transform weighted paths to a vector of transducers
       std::vector<HfstTransducer*> transducer_paths;
-      for (WeightedPaths<float>::Set::iterator it = paths.begin(); it != paths.end(); it++) {
-	WeightedPath<float> wp = *it;
-	HfstTransducer * path = new HfstTransducer(wp.istring, wp.ostring, TOK, t->get_type());
-	path->set_final_weights(wp.weight);
-	transducer_paths.push_back(path);
+
+      if (t->type == SFST_TYPE) {
+	transducer_paths = vt->extract_paths();
+	delete vt;
+      }
+      else {
+	WeightedPaths<float>::Set paths;
+	vt->extract_strings(paths, -1, -1);
+	delete vt;
+
+	// transform weighted paths to a vector of transducers
+	for (WeightedPaths<float>::Set::iterator it = paths.begin(); it != paths.end(); it++) {
+	  WeightedPath<float> wp = *it;
+	  HfstTransducer * path = new HfstTransducer(wp.istring, wp.ostring, TOK, t->get_type());
+	  path->set_final_weights(wp.weight);
+	  transducer_paths.push_back(path);
+	}
       }
       
       // insert each path
@@ -424,6 +431,7 @@ namespace hfst
       delete t;
       t = nt;
     }
+
     
     name.clear();
     for( RVarSet::iterator it=RSS.begin(); it!=RSS.end(); it++)
@@ -832,26 +840,50 @@ namespace hfst
     tr->minimize();
 
     TheAlphabet.clear_pairs();
-    //TheAlphabet.copy(t->alphabet);
 
-    HfstMutableTransducer t(*tr);
-
-    HfstStateIterator state_it(t);
-    while (not state_it.done()) 
+    // no effect on performance in OMorFi, but in Morphisto?
+    if (false || tr->type == SFST_TYPE)
       {
-	unsigned int s = state_it.value();
-	HfstTransitionIterator transition_it(t,s);
-	while (not transition_it.done()) 
+	StringPairSet sps = tr->get_symbol_pairs();
+	for (StringPairSet::const_iterator it = sps.begin(); it != sps.end(); it ++)
 	  {
-	    HfstTransition tr = transition_it.value();
-	    TheAlphabet.insert(HfstAlphabet::NumberPair(TheAlphabet.symbol2code(tr.isymbol.c_str()),
-							TheAlphabet.symbol2code(tr.osymbol.c_str())));
-	    //printf("inserted to TheAlphabet pair %s:%s\n", tr.isymbol.c_str(), tr.osymbol.c_str());
-	    transition_it.next();
+	    unsigned int inumber, onumber;
+	    
+	    if (it->first.compare("<>") == 0)
+	      inumber=0;
+	    else
+	      inumber = TheAlphabet.symbol2code(it->first.c_str()); 
+	    if (it->second.compare("<>") == 0)
+	      onumber=0;
+	    else
+	      onumber = TheAlphabet.symbol2code(it->second.c_str());
+
+	    TheAlphabet.insert(HfstAlphabet::NumberPair(inumber,onumber));
 	  }
-	state_it.next();
+	Alphabet_Defined = 1;
       }
+ 
+    else {
+      
+      HfstMutableTransducer t(*tr);
+      
+      HfstStateIterator state_it(t);
+      while (not state_it.done()) 
+	{
+	  unsigned int s = state_it.value();
+	  HfstTransitionIterator transition_it(t,s);
+	  while (not transition_it.done()) 
+	    {
+	      HfstTransition tr = transition_it.value();
+	      TheAlphabet.insert(HfstAlphabet::NumberPair(TheAlphabet.symbol2code(tr.isymbol.c_str()),
+							  TheAlphabet.symbol2code(tr.osymbol.c_str())));
+	      //printf("inserted to TheAlphabet pair %s:%s\n", tr.isymbol.c_str(), tr.osymbol.c_str());
+	      transition_it.next();
+	    }
+	  state_it.next();
+	}
       Alphabet_Defined = 1;
+    }
   }
 
 }
