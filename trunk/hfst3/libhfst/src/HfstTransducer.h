@@ -31,6 +31,7 @@
 #include "implementations/FomaTransducer.h"
 #endif
 
+#include "implementations/HfstAlphabet.h"
 #include "implementations/HfstOlTransducer.h"
 #include "implementations/HfstTokenizer.h"
 #include "implementations/ConvertTransducerFormat.h"
@@ -376,6 +377,7 @@ namespace hfst
 
     ImplementationType type;
 
+    hfst::implementations::HfstAlphabet * alpha;
     bool anonymous;
     bool is_trie;
 
