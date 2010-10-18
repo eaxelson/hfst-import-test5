@@ -249,6 +249,7 @@ namespace hfst
     }
   }
 
+  // FIX: HfstOutputStream takes a string parameter, HfstInputStream a const char*
   HfstInputStream::HfstInputStream(const char* filename):
     header_eaten(false)
   {
@@ -267,8 +268,12 @@ namespace hfst
 #endif
 #if HAVE_OPENFST
     case TROPICAL_OFST_TYPE:
-      implementation.tropical_ofst = 
-	new hfst::implementations::TropicalWeightInputStream(filename);
+      if (strcmp(filename,"") == 0)  // FIX: this should be done in TropicalWeight layer
+	implementation.tropical_ofst = 
+	  new hfst::implementations::TropicalWeightInputStream();
+      else
+	implementation.tropical_ofst = 
+	  new hfst::implementations::TropicalWeightInputStream(filename);
       break;
     case LOG_OFST_TYPE:
       implementation.log_ofst = 

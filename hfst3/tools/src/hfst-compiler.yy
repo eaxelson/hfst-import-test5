@@ -8,8 +8,19 @@
 /*******************************************************************/
 
 #include <stdio.h>
-
 #include "HfstCompiler.h"
+
+#include <cstdio>
+#include <cstdlib>
+#include <cstring>
+#include <getopt.h>
+#include <errno.h>
+
+#include "hfst-commandline.h"
+#include "hfst-program-options.h"
+
+#include "inc/globals-common.h"
+#include "inc/globals-unary.h"
 
 extern char* FileName;
 extern bool Verbose;
@@ -30,7 +41,7 @@ static int Switch=0;
 HfstCompiler * compiler;
 HfstTransducer * Result;
 
-ImplementationType type;
+static hfst::ImplementationType output_format = hfst::UNSPECIFIED_TYPE;
 bool DEBUG=false;
 
 
@@ -101,23 +112,23 @@ RE:         RE ARROW CONTEXTS2      { $$ = compiler->restriction($1,$2,$3,0); }
           | RE REPLACE '?' CONTEXT2 { $1 = compiler->explode($1); $1->minimize(); $$ = compiler->replace_in_context($1, $2, $4, true); }
           | RE REPLACE '(' ')'      { $1 = compiler->explode($1); $1->minimize(); $$ = compiler->replace($1, $2, false); }
           | RE REPLACE '?' '(' ')'  { $1 = compiler->explode($1); $1->minimize(); $$ = compiler->replace($1, $2, true); }
-          | RE RANGE ARROW RANGE RE { $$ = compiler->make_rule($1,$2,$3,$4,$5, type); }
-          | RE RANGE ARROW RANGE    { $$ = compiler->make_rule($1,$2,$3,$4,NULL, type); }
-          | RANGE ARROW RANGE RE    { $$ = compiler->make_rule(NULL,$1,$2,$3,$4, type); }
-          | RANGE ARROW RANGE       { $$ = compiler->make_rule(NULL,$1,$2,$3,NULL, type); }
+          | RE RANGE ARROW RANGE RE { $$ = compiler->make_rule($1,$2,$3,$4,$5, output_format); }
+          | RE RANGE ARROW RANGE    { $$ = compiler->make_rule($1,$2,$3,$4,NULL, output_format); }
+          | RANGE ARROW RANGE RE    { $$ = compiler->make_rule(NULL,$1,$2,$3,$4, output_format); }
+          | RANGE ARROW RANGE       { $$ = compiler->make_rule(NULL,$1,$2,$3,NULL, output_format); }
           | RE COMPOSE RE    { $1->compose(*$3); delete $3; $$ = $1; }
-          | '{' RANGES '}' ':' '{' RANGES '}' { $$ = compiler->make_mapping($2,$6,type); }
-          | RANGE ':' '{' RANGES '}' { $$ = compiler->make_mapping(compiler->add_range($1,NULL),$4,type); }
-          | '{' RANGES '}' ':' RANGE { $$ = compiler->make_mapping($2,compiler->add_range($5,NULL),type); }
+          | '{' RANGES '}' ':' '{' RANGES '}' { $$ = compiler->make_mapping($2,$6,output_format); }
+          | RANGE ':' '{' RANGES '}' { $$ = compiler->make_mapping(compiler->add_range($1,NULL),$4,output_format); }
+          | '{' RANGES '}' ':' RANGE { $$ = compiler->make_mapping($2,compiler->add_range($5,NULL),output_format); }
           | RE INSERT CODE ':' CODE  { $$ = compiler->insert_freely($1,$3,$5); }
           | RE INSERT CODE           { $$ = compiler->insert_freely($1,$3,$3); }
 	  | RE SUBSTITUTE CODE ':' CODE  { $$ = compiler->substitute($1,$3,$5); }
 	  | RE SUBSTITUTE CODE ':' CODE ':' CODE ':' CODE { $$ = compiler->substitute($1,$3,$5,$7,$9); }
 	  | RE SUBSTITUTE CODE ':' CODE '(' RE ')' { $$ = compiler->substitute($1,$3,$5,$7); }
-          | RANGE ':' RANGE  { $$ = compiler->new_transducer($1,$3,type); } 
-          | RANGE            { $$ = compiler->new_transducer($1,$1,type); }
+          | RANGE ':' RANGE  { $$ = compiler->new_transducer($1,$3,output_format); } 
+          | RANGE            { $$ = compiler->new_transducer($1,$1,output_format); }
           | VAR              { if (DEBUG) { printf("calling transducer variable \"%s\"\n", $1); }; $$ = compiler->var_value($1); }
-          | RVAR             { if (DEBUG) { printf("calling agreement transducer variable \"%s\"\n", $1); }; $$ = compiler->rvar_value($1,type); }
+          | RVAR             { if (DEBUG) { printf("calling agreement transducer variable \"%s\"\n", $1); }; $$ = compiler->rvar_value($1,output_format); }
           | RE '*'           { $1->repeat_star(); $$ = $1; }
           | RE '+'           { $1->repeat_plus(); $$ = $1; }
           | RE '?'           { $1->optionalize(); $$ = $1; }
@@ -130,8 +141,8 @@ RE:         RE ARROW CONTEXTS2      { $$ = compiler->restriction($1,$2,$3,0); }
           | RE '-' RE        { $1->subtract(*$3); delete $3; $$ = $1; }
           | RE '|' RE        { $1->disjunct(*$3); delete $3; $$ = $1; }
           | '(' RE ')'       { $$ = $2; }
-          | STRING           { $$ = compiler->read_words($1, type); }
-          | STRING2          { try { $$ = compiler->read_transducer($1, type); } catch (hfst::exceptions::HfstInterfaceException e) { printf("\nAn error happened when reading file \"%s\"\n", $1); exit(1); } }
+          | STRING           { $$ = compiler->read_words($1, output_format); }
+          | STRING2          { try { $$ = compiler->read_transducer($1, output_format); } catch (hfst::exceptions::HfstInterfaceException e) { printf("\nAn error happened when reading file \"%s\"\n", $1); exit(1); } }
           ;
 
 RANGES:     RANGE RANGES     { $$ = compiler->add_range($1,$2); }
@@ -256,14 +267,98 @@ void warn2(const char *text, char *text2)  // HFST: added const
 
 /* print_usage */
 
-void print_usage(FILE *file) {
+/*void print_usage(FILE *file) {
     fprintf(file,"\nUsage: %s [options] infile outfile\n", "hfst-calculate");
     fprintf(file,"\nOPTIONS:\n");
     fprintf(file,"-c\tStore the transducer in fst-infl2 format.\n");
     fprintf(file,"-l\tStore the transducer in fst-infl3 format.\n");
     fprintf(file,"-s\tSwitch the upper and lower levels producing a transducer for generation rather than recognition.\n");
     fprintf(file,"-q\tquiet mode\n\n");  
+}*/
+
+void
+print_usage()
+{
+    // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
+    fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
+        "Compile a file written with SFST programming language into a transducer.\n"
+        "\n", program_name); 
+        print_common_program_options(message_out);
+	fprintf(message_out, "Input/Output options:\n"
+                "  -i, --input=INFILE     Read input from INFILE\n"
+                "  -o, --output=OUTFILE   Write output transducer to OUTFILE\n");	      
+        fprintf(message_out, "String and format options:\n"
+                "  -f, --format=FMT       Write result in FMT format\n");
+        fprintf(message_out, "\n");
+
+        fprintf(message_out, 
+            "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
+            "FMT must be name of a format usable by libhfst, such as "
+            "openfst-tropical, sfst or foma\n"
+            );
+        fprintf(message_out, "\n");
+        fprintf(message_out, "Examples:\n"
+            "  echo \"[a-z]*\" | %s -f foma > az.foma\n"
+	    "    create a foma transducer accepting any number of consecutive\n"
+	    "    characters between a and z, inclusive\n"
+	    "\n"
+            "  echo \"a:b (a:<>)+\" > ab.sfst-pl ; %s -f openfst-tropical -i ab.sfst-pl -o ab.tropical\n"
+	    "    create a tropical OpenFst transducer that accepts two or more\n"
+	    "    consecutive 'a's and maps them into string \"b\"\n"
+             "\n", program_name, program_name);
+        print_report_bugs();
+        print_more_info();
+        fprintf(message_out, "\n");
 }
+
+
+int
+parse_options(int argc, char** argv)
+{
+    // use of this function requires options are settable on global scope
+    while (true)
+    {
+        static const struct option long_options[] =
+        {
+        HFST_GETOPT_COMMON_LONG,
+        HFST_GETOPT_UNARY_LONG,
+          {"format", required_argument, 0, 'f'},
+          {0,0,0,0}
+        };
+        int option_index = 0;
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
+                             HFST_GETOPT_UNARY_SHORT "f:",
+                             long_options, &option_index);
+        if (-1 == c)
+        {
+            break;
+        }
+
+        switch (c)
+        {
+#include "inc/getopt-cases-common.h"
+#include "inc/getopt-cases-unary.h"
+        case 'f':
+            output_format = hfst_parse_format_name(optarg);
+            break;
+#include "inc/getopt-cases-error.h"
+        }
+    }
+
+#include "inc/check-params-common.h"
+#include "inc/check-params-unary.h"
+    if (output_format == hfst::UNSPECIFIED_TYPE)
+      {
+        verbose_printf("Output format not specified, "
+             "defaulting to openfst tropical\n");
+        output_format = hfst::TROPICAL_OFST_TYPE;
+      }
+    Verbose = (verbose) ? 0 : 1;
+    FileName = strdup(inputfilename);        
+
+    return EXIT_CONTINUE;
+}
+
 
 /*******************************************************************/
 /*                                                                 */
@@ -288,7 +383,7 @@ void get_flags( int *argc, char **argv )
       argv[i] = NULL;
     }
     else if (strcmp(argv[i],"-h") == 0 || strcmp(argv[i],"--help") == 0) {
-      print_usage(stdout);
+      print_usage();
       exit(0);
     }
     else if (strcmp(argv[i],"-v") == 0 || strcmp(argv[i],"--version") == 0) {
@@ -301,19 +396,19 @@ void get_flags( int *argc, char **argv )
     }
     // hfst addition
     else if (strcmp(argv[i],"-sfst") == 0) {
-      type = SFST_TYPE;
+      output_format = SFST_TYPE;
       argv[i] = NULL;
     }
     else if (strcmp(argv[i],"-tropical") == 0) {
-      type = TROPICAL_OFST_TYPE;
+      output_format = TROPICAL_OFST_TYPE;
       argv[i] = NULL;
     }
     else if (strcmp(argv[i],"-log") == 0) {
-      type = LOG_OFST_TYPE;
+      output_format = LOG_OFST_TYPE;
       argv[i] = NULL;
     }
     else if (strcmp(argv[i],"-foma") == 0) {
-      type = FOMA_TYPE;
+      output_format = FOMA_TYPE;
       argv[i] = NULL;
     }
   }
@@ -335,35 +430,46 @@ void get_flags( int *argc, char **argv )
 int main( int argc, char *argv[] )
 
 {
-  FILE *file;
+  //FILE *file;
 
-  get_flags(&argc, argv);
-  if (argc < 3) {
-    print_usage(stderr);
-    exit(1);
-  }
-  if ((file = fopen(argv[1],"rt")) == NULL) {
-    fprintf(stderr,"\nError: Cannot open grammar file \"%s\"\n\n", argv[1]);
-    exit(1);
-  }
-  FileName = argv[1];
+  hfst_set_program_name(argv[0], "0.1", "HfstCalculate");
+  int retval = parse_options(argc, argv);
+  if (retval != EXIT_CONTINUE)
+    {
+      return retval;
+    }
+  //get_flags(&argc, argv);
+  //if (argc < 3) {
+  //  print_usage();
+  //  exit(1);
+  //}
+  //if ((file = fopen(argv[1],"rt")) == NULL) {
+  //  fprintf(stderr,"\nError: Cannot open grammar file \"%s\"\n\n", argv[1]);
+  //  exit(1);
+  //}
+  //FileName = argv[1];
   //Result = NULL;
-  yyin = file;  
+  yyin = inputfile;  
+  if (strcmp(outfilename,"<stdout>") != 0)
+    fclose(outfile); // stream is used when writing the result
 
+  // Unknown symbols cannot be used in SFST-PL syntax.
+  // If the HFST library is aware of this, some optimization can be done.
   hfst::set_unknown_symbols_in_use(false);
+  compiler = new HfstCompiler(output_format, Verbose);
 
-  compiler = new HfstCompiler(type, Verbose);
   try {
     yyparse();
+    fclose(inputfile);
     //Result->alphabet.utf8 = UTF8;
     //if (Verbose)
     //  cerr << "\n";
     //if (Result->is_empty()) 
     //  warn("resulting transducer is empty"); 
-    if ((file = fopen(argv[2],"wb")) == NULL) {
-	fprintf(stderr,"\nError: Cannot open output file %s\n\n", argv[2]);
-	exit(1);
-    }
+    //if ((file = fopen(argv[2],"wb")) == NULL) {
+    //	fprintf(stderr,"\nError: Cannot open output file %s\n\n", argv[2]);
+    //	exit(1);
+    //}
     //if (Compact) {
     //  MakeCompactTransducer ca(*Result);
     //  delete Result;
@@ -371,20 +477,18 @@ int main( int argc, char *argv[] )
     //}
     //else if (LowMem)
     //  Result->store_lowmem(file);
-    else {
       try {
-      bool DEBUG=false;
+      /*bool DEBUG=false;
       if (DEBUG) { printf("writing to file..\n");
          	   //std::cerr << *Result;
 		   Result->print_alphabet();
-      }
-        compiler->write_to_file(Result,argv[2]);
+      }*/
+        if (strcmp(outfilename,"<stdout>") == 0)
+          compiler->write_to_file(Result, "");
+	else
+          compiler->write_to_file(Result, strdup(outfilename));
       } catch (hfst::exceptions::HfstInterfaceException e) {
-          printf("\nAn error happened when writing to file \"%s\"\n", argv[2]);
-      }
-	if (DEBUG) printf("..done\n");
-    }
-    fclose(file);
+          printf("\nAn error happened when writing to file \"%s\"\n", outfilename); }
     //printf("type is: %i\n", Result->get_type());
     delete Result;
     // delete compiler;

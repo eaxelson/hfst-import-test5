@@ -38,6 +38,7 @@ using hfst::HfstMutableTransducer;
 using hfst::HfstStateIterator;
 using hfst::HfstTransitionIterator;
 using hfst::HfstTransition;
+using hfst::implementations::HfstInterfaceException;
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
@@ -115,9 +116,21 @@ process_stream(HfstInputStream& instream)
         {
           verbose_printf("Summarizing... %zu\n", transducer_n);
         }
-      HfstTransducer trans(instream);
+      HfstTransducer *trans;
+      try {	
+	trans = new HfstTransducer(instream);
+      } catch (HfstInterfaceException e) {
+	fprintf(stderr,"An error happened when reading transducer from stream.\n");
+	exit(1);
+      }
       //std::cerr << trans;
-      HfstMutableTransducer mutt(trans);
+      HfstMutableTransducer *mutt;
+      try {
+	mutt = new HfstMutableTransducer(*trans);
+      } catch (HfstInterfaceException e) {
+	fprintf(stderr,"An error happened when converting transducer to internal format.\n");
+	exit(1);
+      }
       size_t states = 0;
       size_t final_states = 0;
       //size_t paths = 0;
@@ -135,27 +148,27 @@ process_stream(HfstInputStream& instream)
       pair<string,unsigned int> most_ambiguous_output;
       unsigned int initial_state = 0; // mutt.get_initial_state();
       // iterate states in random orderd
-      for (HfstStateIterator stateIt(mutt);
+      for (HfstStateIterator stateIt(*mutt);
            !stateIt.done();
            stateIt.next())
         {
           unsigned int s = stateIt.value();
           ++states;
-          if (mutt.is_final_state(s))
+          if (mutt->is_final_state(s))
             {
               ++final_states;
             }
           size_t arcs_here = 0;
           map<string,unsigned int> input_ambiguity;
           map<string,unsigned int> output_ambiguity;
-          for (HfstTransitionIterator arcIt(mutt, s);
+          for (HfstTransitionIterator arcIt(*mutt, s);
                !arcIt.done();
                arcIt.next())
             {
               HfstTransition a = arcIt.value();
               arcs++;
               arcs_here++;
-              if ( (a.isymbol == "@0@") && (a.osymbol == "@0@"))
+              if ( (a.isymbol == "@0@") && (a.osymbol == "@0@")) // change to "@_EPSILON_SYMBOL_@"
                 {
                   io_epsilons++;
                   input_epsilons++;
@@ -211,6 +224,7 @@ process_stream(HfstInputStream& instream)
               uniq_output_arcs++;
             }
         }
+      delete mutt;
       // traverse
       
       // count physical size
@@ -226,7 +240,7 @@ process_stream(HfstInputStream& instream)
         }
       // next is printed as in OpenFST's fstinfo
       // do not modify for compatibility
-      switch (trans.get_type())
+      switch (trans->get_type())
         {
         case hfst::SFST_TYPE:
           fprintf(outfile, "fst type: SFST\n"
@@ -257,6 +271,7 @@ process_stream(HfstInputStream& instream)
                   "arc type: ???\n");
           break;
         }
+      delete trans;
       fprintf(outfile, "input symbol table: ???\n"
               "output symbol table: ???\n"
               "# of states: %zu\n"

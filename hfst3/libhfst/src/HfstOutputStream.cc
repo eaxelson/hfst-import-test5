@@ -56,6 +56,7 @@ namespace hfst
 	break;
       }
   }
+  // FIX: HfstOutputStream takes a string parameter, HfstInputStream a const char*
   HfstOutputStream::HfstOutputStream(const std::string &filename,ImplementationType type):
   type(type)
   { 
@@ -72,8 +73,12 @@ namespace hfst
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
-	implementation.tropical_ofst = 
-	  new hfst::implementations::TropicalWeightOutputStream(filename.c_str());
+	if (filename.compare("") == 0) // FIX: this should be done in TropicalWeight layer
+	  implementation.tropical_ofst = 
+	    new hfst::implementations::TropicalWeightOutputStream();
+	else
+	  implementation.tropical_ofst = 
+	    new hfst::implementations::TropicalWeightOutputStream(filename.c_str());
 	break;
       case LOG_OFST_TYPE:
 	implementation.log_ofst = 

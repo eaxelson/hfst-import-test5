@@ -1488,7 +1488,7 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::substitute
   (StdVectorFst * t,unsigned int old_key,unsigned int new_key)
   {
-    assert(not openfst_use_symbol_tables);
+    //assert(not openfst_use_symbol_tables);
 
     LabelPairVector v;
     v.push_back(LabelPair(old_key,new_key));
@@ -2136,9 +2136,7 @@ namespace hfst { namespace implementations
     if (!out)
       fprintf(stderr, "TropicalWeightOutputStream: ERROR: failbit set (2).\n");
     out.write("HFST3",6);
-    //out.put(0);
     out.write("TROPICAL_OFST_TYPE",19);
-    //out.put(0);
   }
 
   void TropicalWeightOutputStream::write_transducer(StdVectorFst * transducer) 

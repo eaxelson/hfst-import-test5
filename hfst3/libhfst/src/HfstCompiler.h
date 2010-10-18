@@ -95,7 +95,7 @@ namespace hfst
       Character symbol_code( char *s );
       //static unsigned int utf8toint( char *s );
       
-      void write_to_file(HfstTransducer *t, char* filename);
+      void write_to_file(HfstTransducer *t, char *filename);
       
       static Range *add_value( Character, Range*);
       static Range *add_var_values( char *name, Range*);
