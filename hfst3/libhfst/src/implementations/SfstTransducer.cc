@@ -217,9 +217,9 @@ namespace hfst { namespace implementations {
       {
 	if (has_header)
 	  skip_hfst_header();
-	Transducer tt = Transducer(input_file,true);
+	Transducer * t = new Transducer(input_file,true);
 	//tt.alphabet.clear();
-	t = &tt.copy();
+	//t = &tt.copy();
 	return t;
       }
     catch (const char * p)

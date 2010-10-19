@@ -193,7 +193,6 @@ int main( int argc, char **argv ) {
     retval = process_stream(*instream);
     delete instream;
     free(inputfilename);
-    free(outfilename);
     return retval;
 }
 

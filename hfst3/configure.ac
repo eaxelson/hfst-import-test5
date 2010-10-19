@@ -237,9 +237,9 @@ AC_ARG_ENABLE([proc],
 AM_CONDITIONAL([WANT_PROC], [test x$enable_proc != xno])
 AC_ARG_ENABLE([push_weights],
 			  [AS_HELP_STRING([--enable-push-weights],
-							  [build push-weights tool @<:@default=no@:>@])],
+							  [build push-weights tool @<:@default=yes@:>@])],
 			  [enable_push_weights=$enableval],
-			  [enable_push_weights=no])
+			  [enable_push_weights=yes])
 AM_CONDITIONAL([WANT_PUSH_WEIGHTS], [test x$enable_push_weights != xno])
 AC_ARG_ENABLE([regexp2fst],
 			  [AS_HELP_STRING([--enable-regexp2fst],
