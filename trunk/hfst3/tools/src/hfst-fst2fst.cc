@@ -59,13 +59,19 @@ print_usage()
 	print_common_unary_program_options(message_out);
 	// fprintf(message_out, (tool-specific options and short descriptions)
     fprintf(message_out, "Conversion options:\n"
+	"  -f, --format=FMT                  Write result in FMT format\n"
+        " shorter options for defining format:\n"
 	"  -S, --sfst                        Write output in HFST's SFST implementation\n"
-	"  -f, --foma                        Write output in HFST's foma implementation\n"
+	"  -F, --foma                        Write output in HFST's foma implementation\n"
 	"  -t, --tropical-weight             Write output in HFST's tropical weight (OpenFST) implementation\n"
 	"  -l, --log-weight                  Write output in HFST's log weight (OpenFST) implementation\n"
 	"  -O, --optimized-lookup            Write output in the HFST optimized-lookup implementation\n"
 	"  -w, --optimized-lookup-weighted   Write output in optimized-lookup (weighted) implementation\n");
+	fprintf(message_out, "\n");
 	print_common_unary_program_parameter_instructions(message_out);
+        fprintf(message_out, 
+            "FMT must be name of a format usable by libhfst, such as "
+		"openfst-tropical, sfst or foma\n");
 	fprintf(message_out, "\n");
 	print_report_bugs();
 	print_more_info();
@@ -82,18 +88,19 @@ parse_options(int argc, char** argv)
 		  HFST_GETOPT_COMMON_LONG,
 		  HFST_GETOPT_UNARY_LONG,
 		  // add tool-specific options here 
+		  {"format",    required_argument, 0, 'f'},
 		  {"sfst",            no_argument, 0, 'S'},
-		  {"foma",            no_argument, 0, 'f'},
+		  {"foma",            no_argument, 0, 'F'},
 		  {"tropical-weight", no_argument, 0, 't'},
 		  {"log-weight",      no_argument, 0, 'l'},
 		  {"optimized-lookup",no_argument, 0, 'O'},
 		  {"optimized-lookup-weighted",no_argument, 0, 'w'},
-			{0,0,0,0}
+		  {0,0,0,0}
 		};
 		int option_index = 0;
 		// add tool-specific options here 
 		char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "SftlOw",
+                             HFST_GETOPT_UNARY_SHORT "SFtlOwf:",
 							 long_options, &option_index);
 		if (-1 == c)
 		{
@@ -106,10 +113,13 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-unary.h"
 		  // add tool-specific cases here
+                case 'f':
+		  output_type = hfst_parse_format_name(optarg);
+		  break;
 		case 'S':
 		  output_type = hfst::SFST_TYPE;
 		  break;
-		case 'f':
+		case 'F':
 		  output_type = hfst::FOMA_TYPE;
 		  break;
 		case 't':

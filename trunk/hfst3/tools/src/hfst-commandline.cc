@@ -164,7 +164,7 @@ hfst_parse_format_name(const char* s)
       {
         rv = hfst::FOMA_TYPE;
       }
-    else if (strcasecmp(optarg, "optimized-lookuo") == 0)
+    else if (strcasecmp(optarg, "optimized-lookup") == 0)
       {
         rv = hfst::HFST_OL_TYPE;
       }

@@ -43,7 +43,7 @@ using hfst::HfstOutputStream;
 using hfst::exceptions::NotTransducerStreamException;
 
 // add tools-specific variables here
-bool project_upwards = false;
+static bool push_initial = false;
 
 void
 print_usage()
@@ -51,19 +51,19 @@ print_usage()
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     // Usage line
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
-           "Project (extract a level) transducer\n"
+           "Push weights of transducer\n"
         "\n", program_name);
 
     // options, grouped
     print_common_program_options(message_out);
     print_common_unary_program_options(message_out);
-    fprintf(message_out, "Projection options:\n"
-            "  -p, --project=LEVEL   project extracting tape LEVEL\n");
+    fprintf(message_out, "Push options:\n"
+            "  -p, --push=DIRECTION   push to DIRECTION\n");
     fprintf(message_out, "\n");
     // parameter details
     print_common_unary_program_parameter_instructions(message_out);
-    fprintf(message_out, "LEVEL must be one of upper, input, first, analysis "
-            "or lower, output, second, generation\n");
+    fprintf(message_out, "DIRECTION must be one of start, initial, begin "
+            "or end, final\n");
     fprintf(message_out, "\n");
     // bug report address
     print_report_bugs();
@@ -83,12 +83,13 @@ parse_options(int argc, char** argv)
 		  HFST_GETOPT_COMMON_LONG,
 		  HFST_GETOPT_UNARY_LONG,
 		  // add tool-specific options here 
-			{0,0,0,0}
+		  {"push", required_argument, 0, 'p'},
+		  {0,0,0,0}
 		};
 		int option_index = 0;
 		// add tool-specific options here 
 		char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT,
+                             HFST_GETOPT_UNARY_SHORT "p:",
 							 long_options, &option_index);
 		if (-1 == c)
 		{
@@ -100,15 +101,14 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-unary.h"
         case 'p':
-          char* direction = optarg;
-            if ( (strncasecmp(direction, "start", 1) == 0) ||
-                 (strncasecmp(direction, "initial", 1) == 0) ||
-                 (strncasecmp(direction, "begin", 1) == 0) )
+            if ( (strncasecmp(optarg, "start", 1) == 0) ||
+                 (strncasecmp(optarg, "initial", 1) == 0) ||
+                 (strncasecmp(optarg, "begin", 1) == 0) )
             {
                 push_initial = true;
             }
-            else if ( (strncasecmp(direction, "end", 1) == 0) ||
-                      (strncasecmp(direction, "final", 1) == 0))
+            else if ( (strncasecmp(optarg, "end", 1) == 0) ||
+                      (strncasecmp(optarg, "final", 1) == 0))
             {
                 push_initial = false;
             }
@@ -117,8 +117,10 @@ parse_options(int argc, char** argv)
                 error(EXIT_FAILURE, 0,
                       "unknown push direction %s\n"
                       "should be one of start, initial, begin, end or final.\n",
-                      direction);
+                      optarg);
                 return EXIT_FAILURE;
+	    }
+	    break;
 #include "inc/getopt-cases-error.h"
 		}
 	}
@@ -166,11 +168,11 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 		HfstTransducer trans(instream);
         if (push_initial)
           {
-            outstream << trans.push();
+            outstream << trans.push_weights(hfst::TO_INITIAL_STATE);
           }
         else
           {
-            outstream << trans.push();
+            outstream << trans.push_weights(hfst::TO_FINAL_STATE);
           }
 	}
 	instream.close();
