@@ -151,6 +151,12 @@ AC_ARG_ENABLE([flag_diacritics],
 			  [enable_flag_diacritics=$enableval],
 			  [enable_flag_diacritics=no])
 AM_CONDITIONAL([WANT_FLAG_DIACRITICS], [test x$enable_flag_diacritics != xno])
+AC_ARG_ENABLE([format],
+			  [AS_HELP_STRING([--enable-format],
+							  [build format tool @<:@default=yes@:>@])],
+			  [enable_format=$enableval],
+			  [enable_format=yes])
+AM_CONDITIONAL([WANT_FORMAT], [test x$enable_format != xno])
 AC_ARG_ENABLE([fst2fst],
 			  [AS_HELP_STRING([--enable-fst2fst],
 							  [build fst2fst tool @<:@default=yes@:>@])],
@@ -442,6 +448,7 @@ cat <<EOF
     *                 determinize: $enable_determinize
     *                 disjunct: $enable_disjunct
     *                 flag-diacritics: $enable_flag_diacritics
+    *                 format: $enable_format
     *                 fst2fst: $enable_fst2fst
     *                 fst2strings: $enable_fst2strings
     *                 fst2txt: $enable_fst2txt

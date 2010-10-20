@@ -42,8 +42,9 @@ namespace implementations
     void add_symbol(StringNumberMap &string_number_map,
 		    Character c,
 		    Alphabet &alphabet);
-    void skip_identifier_version_3_0(void);
-    void skip_hfst_header(void);
+    bool skip_identifier_version_3_0(void);
+    bool skip_hfst_header(void);
+    bool skip_minimality_identifier(void);
 
   public:
     SfstInputStream(void);
@@ -66,7 +67,7 @@ namespace implementations
   private:
     std::string filename;
     FILE *ofile;
-    void write_3_0_library_header(FILE *file);
+    void write_3_0_library_header(FILE *file, bool is_minimal);
   public:
     SfstOutputStream(void); 
     SfstOutputStream(const char * filename);

@@ -347,13 +347,13 @@ parse_options(int argc, char** argv)
 
 #include "inc/check-params-common.h"
 #include "inc/check-params-unary.h"
+    Verbose = verbose;	 
     if (output_format == hfst::UNSPECIFIED_TYPE)
       {
         verbose_printf("Output format not specified, "
              "defaulting to openfst tropical\n");
         output_format = hfst::TROPICAL_OFST_TYPE;
       }
-    Verbose = (verbose) ? 0 : 1;
     FileName = strdup(inputfilename);        
 
     return EXIT_CONTINUE;
@@ -497,4 +497,5 @@ int main( int argc, char *argv[] )
       cerr << "\n" << p << "\n\n";
       exit(1);
   }
+  exit(0);
 }

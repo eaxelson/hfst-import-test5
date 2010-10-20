@@ -28,7 +28,7 @@ case 'v':
 case 'q':
 case 's':
   verbose = false;
-  silent = false;
+  silent = true;
   break;
 case 'o':
   outfilename = hfst_strdup(optarg);

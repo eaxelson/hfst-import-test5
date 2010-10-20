@@ -43,6 +43,9 @@ endif
 if WANT_DISJUNCT
 MAYBE_DISJUNCT=hfst-disjunct
 endif
+if WANT_FORMAT
+MAYBE_FORMAT=hfst-format
+endif
 if WANT_FST2FST
 MAYBE_FST2FST=hfst-fst2fst
 endif
@@ -156,7 +159,7 @@ bin_PROGRAMS=$(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_COMPOSE_INTERSECT) \
 			 $(MAYBE_UNWEIGHTED_CALCULATE) $(MAYBE_WEIGHTED_CALCULATE) \
 			 $(MAYBE_OPTIMIZED_LOOKUP) $(MAYBE_SUBSTITUTE) \
 			 $(MAYBE_FLAG_DIACRITICS) $(MAYBE_OMOR_EVALUATE) \
-			 $(MAYBE_LEXC_COMPILER)
+			 $(MAYBE_LEXC_COMPILER) $(MAYBE_FORMAT)
 
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc
 # sort alphabetically
@@ -168,6 +171,7 @@ hfst_conjunct_SOURCES=hfst-conjunct.cc $(HFST_COMMON_SRC)
 hfst_determinize_SOURCES=hfst-determinize.cc $(HFST_COMMON_SRC)
 hfst_disjunct_SOURCES=hfst-disjunct.cc $(HFST_COMMON_SRC)
 hfst_flag_diacritics_SOURCES=hfst-flag-diacritics.cc $(HFST_COMMON_SRC)
+hfst_format_SOURCES=hfst-format.cc $(HFST_COMMON_SRC)
 hfst_fst2fst_SOURCES=hfst-fst2fst.cc $(HFST_COMMON_SRC)
 hfst_fst2strings_SOURCES=hfst-fst2strings.cc $(HFST_COMMON_SRC)
 hfst_fst2txt_SOURCES=hfst-fst2txt.cc $(HFST_COMMON_SRC)
