@@ -21,18 +21,23 @@
 #  include <config.h>
 #endif
 
-
-#include <hfst2/hfst.h>
 #include <cstdio>
+#include <cstdlib>
 #include <cstring>
-#include <iostream>
-#include <fstream>
 #include <getopt.h>
+
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
+#include "HfstTransducer.h"
+
+#include "inc/globals-common.h"
+#include "inc/globals-unary.h"
 
 using std::ifstream;
 using std::ios;
+
+//using hfst::ImplementationType;
+//using hfst::HfstInputStream;
 
 char * input_file_name = NULL;
 //bool verbose = false;
@@ -57,7 +62,7 @@ print_usage()
 }
 
 void
-print_version()
+print_version_()
 {
         // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dversion
         fprintf(message_out, "HFSTFormat 0.0 (%s)\n"
@@ -101,7 +106,7 @@ parse_options(int argc, char** argv)
 			exit(0);
 			break;
 		case 'V':
-			print_version();
+			print_version_();
 			exit(0);
 			break;
 		case 'v':
@@ -123,6 +128,12 @@ parse_options(int argc, char** argv)
 		  break;
 		}
 	}
+
+	// ImplementationType guess_fst_type(std::istream &in);
+
+	(void)inputfilename;
+	(void)inputNamed;
+
 	if (input_file_name == NULL)
 	  {
 	    if ((argc - optind) == 0)
@@ -131,23 +142,49 @@ parse_options(int argc, char** argv)
 		  {
 		    fprintf(stderr,"Reading input transducer from STDIN.\n");
 		  }
-		return HFST::read_format();
+		hfst::HfstInputStream is("");
+		return is.get_type();
 	      }
 	    else
 	      {
 		input_file_name = argv[optind];
 	      }	    
 	  }
-	ifstream input_file(input_file_name,ios::in);
-	int exit_code = HFST::read_format(input_file);
-	input_file.close();
-	return exit_code;
+	hfst::HfstInputStream is(input_file_name);
+	return is.get_type();
 }
 
 
 int main (int argc, char * argv[])
 {
-  int exit_code =
-    parse_options(argc,argv);
-  exit(exit_code);
+  int type = parse_options(argc,argv);
+  switch (type)
+    {
+    case hfst::SFST_TYPE:
+      fprintf(stdout, "SFST_TYPE\n");
+      break;
+    case hfst::TROPICAL_OFST_TYPE:
+      fprintf(stdout, "OPENFST_TROPICAL_TYPE\n");
+      break;
+    case hfst::LOG_OFST_TYPE:
+      fprintf(stdout, "OPENFST_LOG_TYPE\n");
+      break;
+    case hfst::FOMA_TYPE:
+      fprintf(stdout, "FOMA_TYPE\n");
+      break;
+    case hfst::HFST_OL_TYPE:
+      fprintf(stdout, "HFST_OL_TYPE\n");
+      break;
+    case hfst::HFST_OLW_TYPE:
+      fprintf(stdout, "HFST_OLW_TYPE\n");
+      break;
+    case hfst::HFST2_TYPE:
+      fprintf(stdout, "HFST_TYPE\n");
+      break;
+    case hfst::ERROR_TYPE:
+    case hfst::UNSPECIFIED_TYPE:
+    default:
+      fprintf(stdout, "ERROR: Not transducer stream.\n");
+      exit(1);
+    }
 }

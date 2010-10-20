@@ -1,7 +1,4 @@
 #!/bin/sh
-# does not work until a bug in SFST is fixed 
-# (functions reading transducers in binary or text format assume that they are minimal)
-
 for i in foma openfst-tropical sfst # openfst-log
   do
 if ! echo "catcatcat(cat)+" | ../../tools/src/hfst-calculate -f $i > test.hfst ; then
