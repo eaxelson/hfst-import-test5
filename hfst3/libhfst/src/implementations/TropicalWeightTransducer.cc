@@ -1785,11 +1785,12 @@ namespace hfst { namespace implementations
   {
     fst::ArcSort<StdArc,fst::OLabelCompare<StdArc> > 
       (t,OLabelCompare<StdArc>());    
+
     ComposeIntersectFst cif(t,*grammar);
     StdVectorFst * result = cif();
     result->SetInputSymbols(NULL);
     result->SetOutputSymbols(NULL);
-    result->SetInputSymbols(grammar->get_first_rule()->InputSymbols() );
+    result->SetInputSymbols(t->InputSymbols() );
     return result;
   }
 

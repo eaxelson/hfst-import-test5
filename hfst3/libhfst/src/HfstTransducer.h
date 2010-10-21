@@ -297,7 +297,7 @@ namespace hfst
   public:
     HfstGrammar(HfstTransducerVector &rule_vector);
     HfstGrammar(HfstTransducer &rule);
-    HfstTransducer &get_first_rule(void);
+    HfstTransducer get_first_rule(void);
     ~HfstGrammar(void);
     friend class HfstTransducer;
   };

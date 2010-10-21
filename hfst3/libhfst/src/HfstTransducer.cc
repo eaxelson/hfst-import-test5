@@ -82,6 +82,7 @@ namespace hfst
       {
 	transducer_vector.push_back(it->implementation.tropical_ofst);
       }
+
     grammar = new hfst::implementations::Grammar(transducer_vector);
   }
 
@@ -96,7 +97,7 @@ namespace hfst
   HfstGrammar::~HfstGrammar(void) {
     delete grammar; }
 
-  HfstTransducer &HfstGrammar::get_first_rule(void) {
+  HfstTransducer HfstGrammar::get_first_rule(void) {
     return first_rule; }
 #endif 
 
@@ -1630,8 +1631,12 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
   HfstTransducer &HfstTransducer::compose_intersect
   (HfstGrammar &grammar)
   {
-    HfstTransducer rule_copy(grammar.get_first_rule());
-    harmonize(rule_copy);
+    //HfstTransducer rule_copy(grammar.get_first_rule());
+    //harmonize(rule_copy);
+
+    HfstTransducer rule = grammar.get_first_rule();
+    harmonize(rule);
+
     switch (type)
       {
       case TROPICAL_OFST_TYPE:
@@ -1641,13 +1646,14 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	  fst::StdVectorFst * temp = implementation.tropical_ofst;
 	  implementation.tropical_ofst =
 	    hfst::implementations::TropicalWeightTransducer::compose_intersect
-	    (implementation.tropical_ofst,grammar.grammar);
+	    (implementation.tropical_ofst,grammar.grammar);	
 	  delete temp;
 	  break;
 	}
       default:
 	throw hfst::exceptions::FunctionNotImplementedException(); 
       }
+
     return *this;
   }
 #endif
