@@ -12,6 +12,18 @@ Noteworthy changes in 3.0
 
 * brand new foma backend for unweighted transducer handling
 
+* preliminary hfst-xfst-compiler
+
+* hfst-lexc was dropped in favor of hfst-lexc-compiler command line tool
+
+* preliminary support for unknown character classes
+
+* optimized-lookup backend supported in library
+
+* hfst-proc tool to emulate lt-proc, cg-proc
+
+* 
+
 Noteworthy changes in 2.4.1
 ---------------------------
 
