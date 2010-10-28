@@ -49,8 +49,8 @@ class LexcCompiler
   //! @brief create a lexc compiler with @c impl as transducer format.
   LexcCompiler(hfst::ImplementationType impl);
 
-  //! @brief compile lexc description from @c stdin into current compiler
-  LexcCompiler& parse_stdin();
+  //! @brief compile lexc description from @c infile into current compiler
+  LexcCompiler& parse(FILE* infile);
 
   //! @brief compile lexc description from file @a filename into current
   //!        compiler.

@@ -130,6 +130,9 @@ endif
 if WANT_OMOR_EVALUATE
 MAYBE_OMOR_EVALUATE=hfst-omor-evaluate
 endif
+if WANT_XFST_COMPILER
+MAYBE_XFST_COMPILER=hfst-xfst-compiler
+endif
 
 noinst_HEADERS= \
 	calculate_functions.h hfst-commandline.h hfst-program-options.h \
@@ -159,13 +162,15 @@ bin_PROGRAMS=$(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_COMPOSE_INTERSECT) \
 			 $(MAYBE_UNWEIGHTED_CALCULATE) $(MAYBE_WEIGHTED_CALCULATE) \
 			 $(MAYBE_OPTIMIZED_LOOKUP) $(MAYBE_SUBSTITUTE) \
 			 $(MAYBE_FLAG_DIACRITICS) $(MAYBE_OMOR_EVALUATE) \
-			 $(MAYBE_LEXC_COMPILER) $(MAYBE_FORMAT)
+			 $(MAYBE_LEXC_COMPILER) $(MAYBE_XFST_COMPILER)
+			 $(MAYBE_FORMAT)
 
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc
 # sort alphabetically
+hfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy # $(HFST_COMMON_SRC)
 hfst_compare_SOURCES=hfst-compare.cc $(HFST_COMMON_SRC)
-hfst_compose_SOURCES=hfst-compose.cc $(HFST_COMMON_SRC)
 hfst_compose_intersect_SOURCES=hfst-compose-intersect.cc $(HFST_COMMON_SRC)
+hfst_compose_SOURCES=hfst-compose.cc $(HFST_COMMON_SRC)
 hfst_concatenate_SOURCES=hfst-concatenate.cc $(HFST_COMMON_SRC)
 hfst_conjunct_SOURCES=hfst-conjunct.cc $(HFST_COMMON_SRC)
 hfst_determinize_SOURCES=hfst-determinize.cc $(HFST_COMMON_SRC)
@@ -178,10 +183,11 @@ hfst_fst2txt_SOURCES=hfst-fst2txt.cc $(HFST_COMMON_SRC)
 hfst_head_SOURCES=hfst-head.cc $(HFST_COMMON_SRC)
 hfst_invert_SOURCES=hfst-invert.cc $(HFST_COMMON_SRC)
 hfst_lexc_compiler_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC)
-hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC)
 hfst_lookup_optimize_SOURCES=hfst-lookup-optimize.cc $(HFST_COMMON_SRC)
+hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC)
 hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
 hfst_omor_evaluate_SOURCES=hfst-omor-evaluate.cc $(HFST_COMMON_SRC)
+hfst_optimized_lookup_SOURCES=hfst-optimized-lookup.cc
 hfst_pair_test_SOURCES=hfst-pair-test.cc $(HFST_COMMON_SRC)
 hfst_project_SOURCES=hfst-project.cc $(HFST_COMMON_SRC)
 hfst_push_weights_SOURCES=hfst-push-weights.cc $(HFST_COMMON_SRC)
@@ -192,10 +198,12 @@ hfst_reverse_SOURCES=hfst-reverse.cc $(HFST_COMMON_SRC)
 hfst_split_SOURCES=hfst-split.cc $(HFST_COMMON_SRC)
 hfst_strings2fst_SOURCES=hfst-strings2fst.cc $(HFST_COMMON_SRC)
 hfst_strip_header_SOURCES=hfst-strip-header.cc $(HFST_COMMON_SRC)
+hfst_substitute_SOURCES=hfst-substitute.cc $(HFST_COMMON_SRC)
 hfst_subtract_SOURCES=hfst-subtract.cc $(HFST_COMMON_SRC)
 hfst_summarize_SOURCES=hfst-summarize.cc $(HFST_COMMON_SRC)
 hfst_tail_SOURCES=hfst-tail.cc $(HFST_COMMON_SRC)
 hfst_txt2fst_SOURCES=hfst-txt2fst.cc $(HFST_COMMON_SRC)
+hfst_xfst_compiler_SOURCES=hfst-xfst-compiler.cc $(HFST_COMMON_SRC)
 hfst_substitute_SOURCES=hfst-substitute.cc $(HFST_COMMON_SRC)
 hfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy $(HFST_COMMON_SRC)
 hfst_optimized_lookup_SOURCES=hfst-optimized-lookup.cc

@@ -42,7 +42,7 @@ namespace xre
 {
 
 char* data;
-std::map<std::string,hfst::HfstTransducer> definitions;
+std::map<std::string,hfst::HfstTransducer*> definitions;
 char* startptr;
 hfst::HfstTransducer* last_compiled;
 hfst::ImplementationType format;
@@ -255,7 +255,7 @@ get_weight(const char *s)
 }
 
 HfstTransducer*
-compile(const std::string& xre, std::map<std::string,HfstTransducer>& defs,
+compile(const string& xre, map<string,HfstTransducer*>& defs,
         ImplementationType impl)
 {
     // lock here?

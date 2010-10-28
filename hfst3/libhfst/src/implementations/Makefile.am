@@ -76,14 +76,19 @@ LEXC_SRCS=lexc-lexer.ll lexc-parser.yy lexc-utils.cc LexcCompiler.cc
 LEXC_HDRS=LexcCompiler.h lexc-utils.h
 LEXC_BUILT=lexc-parser.h
 endif
-BUILT_SOURCES=$(XRE_BUILT) $(LEXC_BUILT)
+if WANT_XFST
+XFST_SRCS=xfst-lexer.ll xfst-parser.yy xfst-utils.cc XfstCompiler.cc
+XFST_HDRS=XfstCompiler.h xfst-utils.h
+XFST_BUILT=xfst-parser.h
+endif
+BUILT_SOURCES=$(XRE_BUILT) $(LEXC_BUILT) $(XFST_BUILT)
 
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 
 libhfstimplementations_la_SOURCES=$(IMPLEMENTATION_SRCS) $(BRIDGE_SRCS) \
 								  $(SFST_SRCS) $(HFST_OL_SRCS) \
-								  $(XRE_SRCS) $(LEXC_SRCS)
+								  $(XRE_SRCS) $(LEXC_SRCS) $(XFST_SRCS)
 
 # headers of implementation bridge to reveal to public
 hfstincludedir = $(includedir)/hfst
@@ -94,7 +99,7 @@ implinclude_HEADERS = \
 		ExtractStrings.h FlagDiacritics.h FomaTransducer.h HfstExceptions.h \
 		HfstTokenizer.h LogFstTrieFunctions.h LogWeightTransducer.h \
 		SfstTransducer.h TropicalWeightTransducer.h HfstOlTransducer.h InternalTransducer.h \
-		$(XRE_HDRS)
+		$(XRE_HDRS) $(LEXC_HDRS) $(XFST_HDRS)
 
 # headers of backends to reveal to public...
 # TODO: in ideal case you'd delete these and link to public libs of backends

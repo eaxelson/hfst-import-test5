@@ -261,7 +261,8 @@ EXP: EXP CROSS_PRODUCT EXP {
         if (hfst::xre::definitions.find($1) != hfst::xre::definitions.end())
           {
             // label alone may be sneaky definition macro
-            $$ = new HfstTransducer(hfst::xre::definitions[$1]);
+            HfstTransducer* def = hfst::xre::definitions[$1];
+            $$ = new HfstTransducer(*def);
           }
         else
           {

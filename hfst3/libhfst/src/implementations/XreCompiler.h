@@ -56,7 +56,7 @@ class XreCompiler
   HfstTransducer* compile(const std::string& xre);
 
   private:
-  std::map<std::string,hfst::HfstTransducer> definitions_;
+  std::map<std::string,hfst::HfstTransducer*> definitions_;
   hfst::ImplementationType format_;
 
 }

@@ -71,10 +71,10 @@ LexcCompiler::LexcCompiler(ImplementationType impl) :
 }
 
 
-LexcCompiler& LexcCompiler::parse_stdin()
+LexcCompiler& LexcCompiler::parse(FILE* infile)
 {
     lexc_ = this;
-    hlexcin = stdin;
+    hlexcin = infile;
     hlexcparse();
     return *this;
 }
@@ -289,9 +289,11 @@ LexcCompiler::compileLexical()
       }
     // build initial states
     map<string,HfstState> starts;
+    HfstState first_free = 0;
     string startEnc(initialLexiconName_);
     joinerEncode(startEnc);
-    starts[startEnc] = rebuilt.get_initial_state();
+    starts[startEnc] = first_free;
+    first_free++;
     for (map<string,HfstTransducer>::const_iterator lex = lexicons.begin();
          lex != lexicons.end();
          ++lex)
@@ -300,16 +302,18 @@ LexcCompiler::compileLexical()
         joinerEncode(nameEnc);
         if (nameEnc != startEnc)
           {
-            HfstState new_start = rebuilt.add_state();
-            starts[nameEnc] = new_start;
+            starts[nameEnc] = first_free;
+            first_free++;
           }
       }
     string ender("#");
     joinerEncode(ender);
-    HfstState new_end = rebuilt.add_state();
-    rebuilt.set_final_weight(new_end, 0);
+    HfstState new_end = first_free;
+    first_free++;
+    rebuilt.add_line(new_end, 0);
     starts[startEnc] = new_end;
-    HfstState sink = rebuilt.add_state();
+    HfstState sink = first_free;
+    first_free++;
     // connect lexicons
     for (map<string,HfstTransducer>::const_iterator lex = lexicons.begin();
          lex != lexicons.end();
@@ -322,7 +326,7 @@ LexcCompiler::compileLexical()
         string nameEnc(lex->first);
         joinerEncode(nameEnc);
         HfstState start_nu = starts[nameEnc];
-        HfstState start_old = mut.get_initial_state();
+        HfstState start_old = 0;
         rebuildMap[start_old] = start_nu;
         // clone all states
         for (HfstStateIterator state(mut);
@@ -339,7 +343,8 @@ LexcCompiler::compileLexical()
             else
               {
                 // create new
-                nu_state = rebuilt.add_state();
+                nu_state = first_free;
+                first_free++;
                 rebuildMap[old_state] = nu_state;
               }
             // clone all transitions
@@ -353,7 +358,7 @@ LexcCompiler::compileLexical()
                 string nu_osymbol;
                 string nu_isymbol;
                 float nu_weight = old_transition.weight;
-                HfstState old_target = old_transition.target_state;
+                HfstState old_target = old_transition.target;
                 HfstState nu_target;
                 if (old_osymbol.substr(0, 5) == "@LEXC")
                   {
@@ -384,12 +389,14 @@ LexcCompiler::compileLexical()
                     else
                       {
                         // new target, rebuild asap
-                        nu_target = mut.add_state();
+                        nu_target = free_state;
+                        free_state++;
                         rebuildMap[old_target] = nu_target;
                       }
                   }
-                rebuilt.add_transition(nu_state, nu_isymbol, nu_osymbol,
-                                       nu_weight, nu_target);
+                rebuilt.add_line(nu_state, nu_target,
+                                 nu_isymbol, nu_osymbol,
+                                 nu_weight);
               }
           }
       }

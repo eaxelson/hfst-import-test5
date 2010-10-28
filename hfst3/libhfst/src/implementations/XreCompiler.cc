@@ -20,8 +20,7 @@ void
 XreCompiler::define(const std::string& name, const std::string& xre)
 {
   HfstTransducer* compiled = compile(xre);
-  definitions_[name] = *compiled;
-  delete compiled;
+  definitions_[name] = compiled;
 }
 
 HfstTransducer*
