@@ -16,7 +16,7 @@ namespace hfst { namespace xre {
 extern char* data;
 extern char* startptr;
 extern size_t len;
-extern std::map<std::string,hfst::HfstTransducer> definitions;
+extern std::map<string,hfst::HfstTransducer*> definitions;
 extern HfstTransducer* last_compiled;
 extern ImplementationType format;
 
@@ -44,7 +44,7 @@ double get_weight(const char* s);
  * @brief compile new transducer
  */
 HfstTransducer* compile(const std::string& xre,
-                        std::map<std::string,hfst::HfstTransducer>& defs,
+                        std::map<std::string,hfst::HfstTransducer*>& defs,
                         hfst::ImplementationType type);
 
 } } // namespaces
