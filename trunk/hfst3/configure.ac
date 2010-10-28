@@ -388,7 +388,7 @@ fi
 # Checks for header files
 AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h err.h])
 
-AC_LANG_PUSH([C++])
+AC_LANG([C++])
 
 if test "x$with_sfst" != "xno"; then
     AC_CHECK_HEADERS([backward/hash_set ext/hash_set hash_set])
@@ -399,7 +399,6 @@ if test "x$with_openfst" != "xno"; then
     AC_CHECK_HEADERS([fst/fstlib.h])
 fi
 
-AC_LANG_POP
 AC_HEADER_STDBOOL
 ifdef([AC_HEADER_ASSERT], [AC_HEADER_ASSERT], [AC_CHECK_HEADERS([assert.h])])
 

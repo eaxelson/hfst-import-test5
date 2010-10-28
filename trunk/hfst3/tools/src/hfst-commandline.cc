@@ -32,7 +32,21 @@
 
 #include "hfst-commandline.h"
 
-
+#ifndef HAVE_ERROR_AT_LINE
+void error_at_line(int status, int errnum, const char* filename, 
+                   unsigned int linenum, const char* fmt, ...)
+{
+  fprintf(stderr, "%s.%u: ", filename, linenum);
+  va_list ap;
+  va_start(ap, fmt);
+  vfprintf(stderr, fmt, ap);
+  va_end(ap);
+  if (status != 0)
+    {
+      exit(status);
+    }
+}
+#endif
 // deprecated; everything's compatible
 int get_compatible_fst_format(std::istream& , std::istream& ) {
     assert(false);
@@ -234,6 +248,22 @@ hfst_ftell(FILE* stream)
         return -1;
     }
 }
+
+#ifndef HAVE_STRNDUP
+char*
+hfst_strndup(const char* s, size_t n)
+{
+  char* rv = static_cast<char*>(malloc(sizeof(char)*n+1));
+  if (rv == NULL)
+    {
+      fprintf(stderr, "strndup failed to malloc\n");
+      exit(EXIT_FAILURE);
+    }
+  rv = static_cast<char*>(memcpy(rv, s, n));
+  rv[n] = '\0';
+  return rv;
+}
+#endif
 
 ssize_t
 hfst_getline(char** lineptr, size_t* n, FILE* stream)
