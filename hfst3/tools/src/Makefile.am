@@ -149,6 +149,7 @@ noinst_HEADERS= \
 bin_PROGRAMS=$(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_COMPOSE_INTERSECT) \
 			 $(MAYBE_CONCATENATE) $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) \
 			 $(MAYBE_DIFF_TEST) $(MAYBE_DISJUNCT) \
+			 $(MAYBE_FORMAT) \
 			 $(MAYBE_FST2FST) \
 			 $(MAYBE_FST2STRINGS) $(MAYBE_FST2TXT) \
 			 $(MAYBE_HEAD) $(MAYBE_INVERT) $(MAYBE_LOOKUP) \
@@ -167,7 +168,7 @@ bin_PROGRAMS=$(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_COMPOSE_INTERSECT) \
 
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc
 # sort alphabetically
-hfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy # $(HFST_COMMON_SRC)
+hfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy $(HFST_COMMON_SRC)
 hfst_compare_SOURCES=hfst-compare.cc $(HFST_COMMON_SRC)
 hfst_compose_intersect_SOURCES=hfst-compose-intersect.cc $(HFST_COMMON_SRC)
 hfst_compose_SOURCES=hfst-compose.cc $(HFST_COMMON_SRC)
@@ -204,9 +205,6 @@ hfst_summarize_SOURCES=hfst-summarize.cc $(HFST_COMMON_SRC)
 hfst_tail_SOURCES=hfst-tail.cc $(HFST_COMMON_SRC)
 hfst_txt2fst_SOURCES=hfst-txt2fst.cc $(HFST_COMMON_SRC)
 hfst_xfst_compiler_SOURCES=hfst-xfst-compiler.cc $(HFST_COMMON_SRC)
-hfst_substitute_SOURCES=hfst-substitute.cc $(HFST_COMMON_SRC)
-hfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy $(HFST_COMMON_SRC)
-hfst_optimized_lookup_SOURCES=hfst-optimized-lookup.cc
 
 BUILT_SOURCES=hfst-scanner.h hfst-compiler.h
 

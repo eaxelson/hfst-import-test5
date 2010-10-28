@@ -83,19 +83,32 @@ if test "x$with_sfst" == "xno" -a "x$with_openfst" == "xno" -a "x$with_foma" == 
     AC_MSG_ERROR([must build with at least one fst backend])
 fi
 
+
 # some extensions
 AC_ARG_ENABLE([xre],
               [AS_HELP_STRING([--enable-xre],
                               [build xerox reg.exp. parser @<:@default=yes@:>@])],
               [enable_xre=$enableval],
               [enable_xre=yes])
+AS_IF([test "x$enable_xre" != xno], [AC_DEFINE([HAVE_XRE], [1],
+                                              [Define to compile xerox regular expression parser in HFST])])
 AM_CONDITIONAL([WANT_XRE], [test "x$enable_xre" != xno])
 AC_ARG_ENABLE([lexc],
               [AS_HELP_STRING([--enable-lexc],
                               [build xerox lexc parser @<:@default=no@:>@])],
               [enable_lexc=$enableval],
               [enable_lexc=no])
+AS_IF([test "x$enable_lexc" != xno], [AC_DEFINE([HAVE_LEXC], [1],
+                                              [Define to compile xerox lexc parser in HFST])])
 AM_CONDITIONAL([WANT_LEXC], [test "x$enable_lexc" != xno])
+AC_ARG_ENABLE([xfst],
+              [AS_HELP_STRING([--enable-xfst],
+                              [build xerox xfst parser @<:@default=no@:>@])],
+              [enable_xfst=$enableval],
+              [enable_xfst=no])
+AS_IF([test "x$enable_xfst" != xno], [AC_DEFINE([HAVE_XFST], [1],
+                                              [Define to compile xerox FST script parser in HFST])])
+AM_CONDITIONAL([WANT_XFST], [test "x$enable_xfst" != xno])
 # allow programs to be built separately (sort alphabetically)
 AC_ARG_ENABLE([calculate],
 			  [AS_HELP_STRING([--enable-calculate],
@@ -328,6 +341,13 @@ AC_ARG_ENABLE([txt2fst],
 			  [enable_txt2fst=$enableval],
 			  [enable_txt2fst=yes])
 AM_CONDITIONAL([WANT_TXT2FST], [test x$enable_txt2fst != xno])
+AC_ARG_ENABLE([xfst-compiler],
+			  [AS_HELP_STRING([--enable-xfst-compiler],
+							  [build xfst-compiler tool @<:@default=yes@:>@])],
+			  [enable_xfst_compiler=$enableval],
+			  [enable_xfst_compiler=yes])
+AM_CONDITIONAL([WANT_XFST_COMPILER], [test x$enable_xfst_compiler != xno])
+
 AC_ARG_ENABLE([werrors],
               [AS_HELP_STRING([--enable-werrors],
                               [use -Werror and well selected -Wflags @<:@default=yes@:>@])],
@@ -386,7 +406,7 @@ if test "x$with_foma" == "xbundled"; then
 fi
 
 # Checks for header files
-AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h err.h])
+AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h err.h glob.h])
 
 AC_LANG([C++])
 
@@ -438,6 +458,9 @@ cat <<EOF
     *         with openfst: $with_openfst
     *         with foma: $with_foma
     *         with optimized lookup: $with_hfstol
+    * compiler for Xerox regular expressions: $enable_xre
+    *              lexc: $enable_lexc
+    *              xfst: $enable_xfst
     * tools including calculate: $enable_calculate
     *                 compare: $enable_compare
     *                 compose: $enable_compose
@@ -471,6 +494,8 @@ cat <<EOF
     *                 tail: $enable_tail
     *                 test: $enable_test
     *                 txt2fst: $enable_txt2fst
+    *                 xfst-compiler: $enable_xfst_compiler
+    * compiling tools with -Werror: $enable_werrors
 EOF
 if test "x$with_foma" == "xbundled"; then
     AC_MSG_WARN([bundled external foma included, please fix; security and licensing issues!])
