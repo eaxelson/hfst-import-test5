@@ -40,10 +40,10 @@ If you would rather install in e.g. your home directory
 
 The HFST library may link to numerous FST handling backends with varying
 licences. If you are going to redistribute the HFST library you compiled, make
-sure there are no clashes in the licences of bundled and linked libraries; all
+sure there are no clashes in the licences of the linked libraries; all
 of them are free and open source, but under strict interpretation you may not
 be able to redistribute combination of strict GNU GPLv2 and Apache APLv2 in the
-same binary.
+same binary (e.g. foma and OpenFST).
 
 If you are checking out the development versions from SVN you must first create
 and install the necessary autotools files from the host system:
@@ -61,19 +61,59 @@ Dependencies
 
 Compilation requirements:
 
-- For OpenFST backend the OpenFST library must be installed in the current
-  system. Compiling against OpenFST library and linking may require recent
-  GCC version and pthread and m libraries, check OpenFST site for details.
+- For OpenFST backend:
+ 
+  - the OpenFST library version 1.2 or newer must be installed in running
+    system
+  
+  - compiling against OpenFST library and linking may require recent
+    GCC version and pthread and m libraries, check OpenFST site for details
+
+  - to disable OpenFST support, configure switch ``--without-openfst`` may
+    be used
+
+- For SFST backend:
+
+  - the SFST library version 1.4 or newer must be installed in the running
+    system. The library installation of SFST is done by explicit command
+    ``make libinstall``.
+
+  - SFST requires readline and ncurses, check SFST site for details
+
+  - to disable SFST backend, configure switch ``--without-sfst`` may be used
+
+- For foma backend:
+
+  - the foma library version 0.9.13alpha or newer must be installed in the
+    running system
+
+  - to disable foma backend, configure switch ``--without-foma`` may be used
 
 - Versions loaded from version control systems require a relatively new GNU
-  tool-chain to build: autoconf >=2.60, automake, libtool >=2.2, >=gettext-0.17.
-  GNU tool-chain is also needed with distributed packages if the user wishes to
-  modify Makefile.am or configure.ac files.
+  tool-chain to build: 
+  
+ - autoconf >=2.60, 
 
-- Versions loaded from version control systems require GNU flex 2.5.35 and
-  relatively new bison or compatible. Especially flex 2.5.33 will choke on
-  perfectly valid rules used in hfst. Flex and bison are needed with
-  distribution versions as well if the user wishes to modify .yy or .ll files.
+ - automake,
+
+ - libtool >=2.2,
+  
+ - >=gettext-0.17.
+
+ - GNU tool-chain is also needed with distributed packages if the user wishes to
+   modify Makefile.am or configure.ac files.
+
+- Versions loaded from version control system may require parser generator 
+  system:
+  
+   - GNU flex 2.5.35 and
+     
+   - relatively new bison or compatible. 
+     
+   - Especially flex 2.5.33 will choke on perfectly valid rules used in hfst. 
+   
+   - Flex and bison are needed with distribution versions as well if the user
+     wishes to modify .yy or .ll files.
 
 Runtime requirements:
 
@@ -85,7 +125,7 @@ Further information
 -------------------
 
 The `Hfst wiki site
-<https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome>`_ also contain more
+<https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome>`_ also contains more
 details.
 
 Reporting bugs
