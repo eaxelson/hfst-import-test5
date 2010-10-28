@@ -100,6 +100,10 @@ extern const char* program_name;
 #  endif
 #endif
 
+#ifndef HAVE_ERROR_AT_LINE
+void error_at_line(int tatus, int errnum, const char* filename, unsigned int linenum, const char* fmt, ...);
+#endif
+
 /**
  *
  * @brief print standard usage message.

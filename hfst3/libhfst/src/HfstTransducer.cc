@@ -103,9 +103,11 @@ namespace hfst
 
   StringPairSet HfstTransducer::get_symbol_pairs()
   {
+#if HAVE_SFST
     if (this->type == SFST_TYPE)
       return sfst_interface.get_symbol_pairs(this->implementation.sfst);
     else
+#endif
       throw hfst::exceptions::FunctionNotImplementedException();
   }
 
@@ -990,6 +992,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
     if (this->type != SFST_TYPE)
       throw hfst::exceptions::FunctionNotImplementedException();
 
+#if HAVE_SFST
     std::vector<SFST::Transducer*> sfst_paths = sfst_interface.extract_paths(this->implementation.sfst);
     std::vector<HfstTransducer*> hfst_paths;
     for (std::vector<SFST::Transducer*>::iterator it = sfst_paths.begin(); it != sfst_paths.end(); it++)
@@ -1000,6 +1003,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	hfst_paths.push_back(tr);
       }
     return hfst_paths;
+#endif
   }
 
   void HfstTransducer::extract_strings(ExtractStringsCb& callback, int cycles)

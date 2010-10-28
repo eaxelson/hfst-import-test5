@@ -24,6 +24,9 @@
 
 #include <iostream>
 #include <fstream>
+#include <map>
+
+using std::map;
 
 #include <cstdio>
 #include <cstdlib>
