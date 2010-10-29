@@ -88,6 +88,9 @@ Compilation requirements:
     running system. MacOSX note: only the source tarball compiles, the svn
     version does not compile.
 
+  - foma requires editline, termcap and zlib libraries to compile, check foma
+    site for details
+
   - to disable foma backend, configure switch ``--without-foma`` may be used
 
 - Versions loaded from version control systems require a relatively new GNU
