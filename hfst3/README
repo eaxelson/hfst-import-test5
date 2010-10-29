@@ -64,7 +64,7 @@ Compilation requirements:
 - For OpenFST backend:
  
   - the OpenFST library version 1.2 or newer must be installed in running
-    system
+    system (on MacOS X: 1.2.2 does not compile, 1.2.4 or later does)
   
   - compiling against OpenFST library and linking may require recent
     GCC version and pthread and m libraries, check OpenFST site for details
@@ -85,7 +85,8 @@ Compilation requirements:
 - For foma backend:
 
   - the foma library version 0.9.13alpha or newer must be installed in the
-    running system
+    running system. MacOSX note: only the source tarball compiles, the svn
+    version does not compile.
 
   - to disable foma backend, configure switch ``--without-foma`` may be used
 
