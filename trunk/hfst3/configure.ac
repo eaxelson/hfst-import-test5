@@ -205,7 +205,7 @@ AC_ARG_ENABLE([lexc-compiler],
                               [build lexc compiler @<:@default=no@:>@])],
               [enable_lexc_compiler=$enableval],
               [enable_lexc_compiler=no])
-AM_CONDITIONAL([WANT_LEXC_COMPILER], [test "x$enable_lexc_compiler" != xno])
+AM_CONDITIONAL([WANT_LEXC_COMPILER], [test "x$enable_lexc_compiler" != xno -a x$enable_lexc != xno])
 AC_ARG_ENABLE([lookup],
 			  [AS_HELP_STRING([--enable-lookup],
 							  [build lookup tool @<:@default=no@:>@])],
@@ -346,7 +346,7 @@ AC_ARG_ENABLE([xfst-compiler],
 							  [build xfst-compiler tool @<:@default=yes@:>@])],
 			  [enable_xfst_compiler=$enableval],
 			  [enable_xfst_compiler=yes])
-AM_CONDITIONAL([WANT_XFST_COMPILER], [test x$enable_xfst_compiler != xno])
+AM_CONDITIONAL([WANT_XFST_COMPILER], [test x$enable_xfst_compiler != xno -a x$enable_xfst != xno])
 
 AC_ARG_ENABLE([werrors],
               [AS_HELP_STRING([--enable-werrors],

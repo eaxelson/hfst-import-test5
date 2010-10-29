@@ -48,10 +48,7 @@ using hfst::xfst::XfstCompiler;
 static char** xfstfilenames = 0;
 static FILE** xfstfiles = 0;
 static unsigned int xfstcount = 0;
-static char* outfilename = 0;
-static FILE* outfile = 0;
 static bool is_input_stdin = true;
-static bool is_output_stdout = true;
 static ImplementationType format = hfst::UNSPECIFIED_TYPE;
 
 void
@@ -108,21 +105,6 @@ parse_options(int argc, char** argv)
         switch (c)
         {
 #include "inc/getopt-cases-common.h"
-        case 'o':
-          outfilename = hfst_strdup(optarg);
-          if (strcmp(outfilename, "-") == 0) {
-            free(outfilename);
-            outfilename = hfst_strdup("<stdout>");
-            outfile = stdout;
-            is_output_stdout = true;
-            message_out = stderr;
-          }
-          else {
-            outfile = hfst_fopen(outfilename, "w");
-            is_output_stdout = false;
-            message_out = stdout;
-          }
-          break;
         case 'f':
           format = hfst_parse_format_name(optarg);
           break;
