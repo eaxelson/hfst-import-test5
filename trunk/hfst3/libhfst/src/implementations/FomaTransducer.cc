@@ -24,23 +24,21 @@ namespace hfst { namespace implementations {
     /** Create a FomaInputStream that reads from stdin. */
   FomaInputStream::FomaInputStream(void)
   {
-    this->input_file = stdin;
+    input_file = stdin;
   }
     /** Create a FomaInputStream that reads from file \a filename. */
-  FomaInputStream::FomaInputStream(const char * filename):
-  filename(filename)
-  {
-    input_file = NULL;
-  }
-    /** Open the stream. */
-  void FomaInputStream::open(void)
+  FomaInputStream::FomaInputStream(const char * filename_):
+  filename(filename_)
   {
     if (filename == std::string())
-      { return; }
-    input_file = fopen(filename.c_str(),"r");
-    if (input_file == NULL)
-      { throw FileNotReadableException(); }
+      { input_file = stdin; }
+    else {
+      input_file = fopen(filename.c_str(),"r");
+      if (input_file == NULL)
+	{ throw FileNotReadableException(); }
+    }
   }
+
     /** Close the stream. */
   void FomaInputStream::close(void)
   {
@@ -52,16 +50,9 @@ namespace hfst { namespace implementations {
 	input_file = NULL;
       }
   }
-    /** Whether the stream is open. */
-  bool FomaInputStream::is_open(void)
-  {
-    return input_file != NULL;
-  }
   
   bool FomaInputStream::is_eof(void)
   {
-    if (not is_open())
-      { return true; }
     int c = getc(input_file);
     bool retval = (feof(input_file) != 0);
     ungetc(c, input_file);
@@ -127,14 +118,16 @@ namespace hfst { namespace implementations {
     //}
   }
 
-  fsm * FomaInputStream::read_transducer(bool has_header)
+    void FomaInputStream::ignore(unsigned int n)
+    { 
+      for (unsigned int i=0; i<n; i++)
+	fgetc(input_file);
+    }
+
+  fsm * FomaInputStream::read_transducer()
   {
-    if ( (not is_open()) )
-      throw FileIsClosedException();
     if (is_eof())
       return NULL;
-    if (has_header)
-      skip_hfst_header();
     struct fsm * t = FomaTransducer::read_net(input_file);
     if (t == NULL)
       throw NotTransducerStreamException();
@@ -161,11 +154,11 @@ namespace hfst { namespace implementations {
   // ---------- FomaOutputStream functions ----------
 
   FomaOutputStream::FomaOutputStream(void)
-  {}
+  { ofile = stdout; }
+
   FomaOutputStream::FomaOutputStream(const char * str):
     filename(str)
-  {}
-  void FomaOutputStream::open(void) {
+  {
     if (filename != std::string()) {
       ofile = fopen(filename.c_str(), "wb");
       if (ofile == NULL)
@@ -175,11 +168,13 @@ namespace hfst { namespace implementations {
       ofile = stdout;
     }
   }
+
   void FomaOutputStream::close(void) 
   {
     if (filename != std::string())
       { fclose(ofile); }
   }
+    /*
   void FomaOutputStream::write_3_0_library_header(FILE *file)
   {
     fputs("HFST3",file);
@@ -187,9 +182,14 @@ namespace hfst { namespace implementations {
     fputs("FOMA_TYPE",file);
     fputc(0, file);
   }
-  void FomaOutputStream::write_transducer(struct fsm * transducer) 
+    */
+    void FomaOutputStream::write(const char &c)
+    {
+      fputc(c,ofile);
+    }
+
+    void FomaOutputStream::write_transducer(struct fsm * transducer) 
   { 
-    write_3_0_library_header(ofile);
     if (1 != FomaTransducer::write_net(transducer, ofile))
       throw hfst::exceptions::HfstInterfaceException();
   }

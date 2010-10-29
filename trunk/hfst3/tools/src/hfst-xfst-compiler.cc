@@ -164,7 +164,7 @@ parse_options(int argc, char** argv)
 int
 xfst_streams(XfstCompiler& xfst, HfstOutputStream& outstream)
 {
-    outstream.open();
+  //outstream.open();
     for (unsigned int i = 0; i < xfstcount; i++)
       {
         verbose_printf("Parsing xfst file %s\n", xfstfilenames[i]);

@@ -747,17 +747,10 @@ namespace hfst { namespace implementations
     //}
   }
   
-  void TropicalWeightInputStream::open(void) {}
   void TropicalWeightInputStream::close(void)
   {
     if (filename != string())
       { i_stream.close(); }
-  }
-  bool TropicalWeightInputStream::is_open(void) const
-  { 
-    if (filename != string())
-      { return i_stream.is_open(); }
-    return true;
   }
   bool TropicalWeightInputStream::is_eof(void) const
   {
@@ -802,7 +795,10 @@ namespace hfst { namespace implementations
   bool TropicalWeightInputStream::operator() (void) const
   { return is_good(); }
 
-  StdVectorFst * TropicalWeightInputStream::read_transducer(bool has_header)
+  void TropicalWeightInputStream::ignore(unsigned int n)
+  { input_stream.ignore(n); }
+
+  StdVectorFst * TropicalWeightInputStream::read_transducer()
   {
     if (is_eof())
       { throw FileIsClosedException(); }
@@ -810,8 +806,6 @@ namespace hfst { namespace implementations
     FstHeader header;
     try 
       {
-	if (has_header)
-	  skip_hfst_header();
 	if (filename == string())
 	  {
 	    header.Read(input_stream,"STDIN");			    
@@ -2132,6 +2126,7 @@ namespace hfst { namespace implementations
     filename(str),o_stream(str,std::ios::out),output_stream(o_stream)
   {}
 
+  /*
   void TropicalWeightOutputStream::write_3_0_library_header(std::ostream &out)
   {
     if (!out)
@@ -2139,15 +2134,18 @@ namespace hfst { namespace implementations
     out.write("HFST3",6);
     out.write("TROPICAL_OFST_TYPE",19);
   }
+  */
+
+  void TropicalWeightOutputStream::write(const char &c)
+  {
+    output_stream.put(char(c));
+  }
 
   void TropicalWeightOutputStream::write_transducer(StdVectorFst * transducer) 
   { 
     if (!output_stream)
       fprintf(stderr, "TropicalWeightOutputStream: ERROR: failbit set (1).\n");
-    write_3_0_library_header(output_stream);
     transducer->Write(output_stream,FstWriteOptions()); }
-
-  void TropicalWeightOutputStream::open(void) {}
 
   void TropicalWeightOutputStream::close(void) 
   {

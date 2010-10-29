@@ -105,9 +105,9 @@ int
 concatenate_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                     HfstOutputStream& outstream)
 {
-    firststream.open();
-    secondstream.open();
-    outstream.open();
+  //firststream.open();
+  // secondstream.open();
+  //outstream.open();
     // should be is_good? 
     bool bothInputs = firststream.is_good() && secondstream.is_good();
     if (firststream.get_type() != secondstream.get_type())

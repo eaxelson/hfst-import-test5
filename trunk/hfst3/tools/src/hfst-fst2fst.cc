@@ -46,6 +46,7 @@ using hfst::exceptions::NotTransducerStreamException;
 // tool-specific variables
 
 ImplementationType output_type = hfst::UNSPECIFIED_TYPE;
+bool hfst_format = true;
 
 void
 print_usage()
@@ -60,11 +61,12 @@ print_usage()
 	// fprintf(message_out, (tool-specific options and short descriptions)
     fprintf(message_out, "Conversion options:\n"
 	"  -f, --format=FMT                  Write result in FMT format\n"
+	"  -b, --use-backend-format          Write result in implementation format, without any HFST wrappers\n"
         " shorter options for defining format:\n"
-	"  -S, --sfst                        Write output in HFST's SFST implementation\n"
-	"  -F, --foma                        Write output in HFST's foma implementation\n"
-	"  -t, --tropical-weight             Write output in HFST's tropical weight (OpenFST) implementation\n"
-	"  -l, --log-weight                  Write output in HFST's log weight (OpenFST) implementation\n"
+	"  -S, --sfst                        Write output in (HFST's) SFST implementation\n"
+	"  -F, --foma                        Write output in (HFST's) foma implementation\n"
+	"  -t, --tropical-weight             Write output in (HFST's) tropical weight (OpenFST) implementation\n"
+	"  -l, --log-weight                  Write output in (HFST's) log weight (OpenFST) implementation\n"
 	"  -O, --optimized-lookup            Write output in the HFST optimized-lookup implementation\n"
 	"  -w, --optimized-lookup-weighted   Write output in optimized-lookup (weighted) implementation\n");
 	fprintf(message_out, "\n");
@@ -88,19 +90,20 @@ parse_options(int argc, char** argv)
 		  HFST_GETOPT_COMMON_LONG,
 		  HFST_GETOPT_UNARY_LONG,
 		  // add tool-specific options here 
-		  {"format",    required_argument, 0, 'f'},
-		  {"sfst",            no_argument, 0, 'S'},
-		  {"foma",            no_argument, 0, 'F'},
-		  {"tropical-weight", no_argument, 0, 't'},
-		  {"log-weight",      no_argument, 0, 'l'},
-		  {"optimized-lookup",no_argument, 0, 'O'},
+		  {"use-backend-format", no_argument, 0, 'b'},
+		  {"format",       required_argument, 0, 'f'},
+		  {"sfst",               no_argument, 0, 'S'},
+		  {"foma",               no_argument, 0, 'F'},
+		  {"tropical-weight",    no_argument, 0, 't'},
+		  {"log-weight",         no_argument, 0, 'l'},
+		  {"optimized-lookup",   no_argument, 0, 'O'},
 		  {"optimized-lookup-weighted",no_argument, 0, 'w'},
 		  {0,0,0,0}
 		};
 		int option_index = 0;
 		// add tool-specific options here 
 		char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "SFtlOwf:",
+                             HFST_GETOPT_UNARY_SHORT "SFtlOwf:b",
 							 long_options, &option_index);
 		if (-1 == c)
 		{
@@ -115,6 +118,9 @@ parse_options(int argc, char** argv)
 		  // add tool-specific cases here
                 case 'f':
 		  output_type = hfst_parse_format_name(optarg);
+		  break;
+		case 'b':
+		  hfst_format=false;
 		  break;
 		case 'S':
 		  output_type = hfst::SFST_TYPE;
@@ -153,8 +159,8 @@ parse_options(int argc, char** argv)
 int
 process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 {
-	instream.open();
-	outstream.open();
+  //instream.open();
+  //	outstream.open();
 	
 	size_t transducer_n = 0;
 	while(instream.is_good())
@@ -239,8 +245,8 @@ int main( int argc, char **argv ) {
 		return EXIT_FAILURE;
 	}
 	HfstOutputStream* outstream = (outfile != stdout) ?
-		new HfstOutputStream(outfilename, output_type) :
-		new HfstOutputStream(output_type);
+	  new HfstOutputStream(outfilename, output_type, hfst_format) :
+	  new HfstOutputStream(output_type, hfst_format);
 	
 	retval = process_stream(*instream, *outstream);
 	delete instream;

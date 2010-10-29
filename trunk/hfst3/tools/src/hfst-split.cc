@@ -134,7 +134,7 @@ parse_options(int argc, char** argv)
 int
 process_stream(HfstInputStream& instream)
 {
-  instream.open();
+  //instream.open();
     
     size_t transducer_n=0;
     while(instream.is_good())
@@ -149,7 +149,7 @@ process_stream(HfstInputStream& instream)
                        inputfilename, outfilename); 
         HfstOutputStream* outstream = new HfstOutputStream(outfilename,
                                                            instream.get_type()) ;
-        outstream->open();
+        //outstream->open();
         HfstTransducer trans(instream);
         *outstream << trans;
         outstream->close();

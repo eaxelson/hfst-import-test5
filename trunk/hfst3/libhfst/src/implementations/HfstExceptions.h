@@ -113,6 +113,9 @@ This exception suggests that the StateId argument is not from HfstStateIterator.
 class StateIndexOutOfBoundsException :
 public HfstInterfaceException {};
 
+class TransducerHeaderException :
+public HfstInterfaceException {};
+
 /** \brief Transducer has no start state.
 
 This exception suggests that there is something wrong in the HFST code. */

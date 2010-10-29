@@ -101,8 +101,8 @@ parse_options(int argc, char** argv)
 int
 compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
 {
-    firststream.open();
-    secondstream.open();
+  //firststream.open();
+  //secondstream.open();
     // should be is_good? 
     bool bothInputs = firststream.is_good() && secondstream.is_good();
     size_t transducer_n = 0;

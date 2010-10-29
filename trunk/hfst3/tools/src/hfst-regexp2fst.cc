@@ -201,7 +201,7 @@ process_stream(HfstOutputStream& outstream)
   unsigned int line_count = 0;
   XreCompiler comp(output_format);
   HfstTransducer disjunction(output_format);
-  outstream.open();
+  //outstream.open();
   while (hfst_getline(&line, &len, inputfile) != -1)
     {
       transducer_n++;

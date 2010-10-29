@@ -49,15 +49,14 @@ namespace implementations
   public:
     TropicalWeightInputStream(void);
     TropicalWeightInputStream(const char * filename);
-    void open(void);
     void close(void);
-    bool is_open(void) const;
     bool is_eof(void) const;
     bool is_bad(void) const;
     bool is_good(void) const;
     bool is_fst(void) const;
     bool operator() (void) const;
-    StdVectorFst * read_transducer(bool has_header);
+    void ignore(unsigned int);
+    StdVectorFst * read_transducer();
     
     static bool is_fst(FILE * f);
     static bool is_fst(istream &s);
@@ -69,12 +68,12 @@ namespace implementations
     std::string filename;
     ofstream o_stream;
     ostream &output_stream;
-    void write_3_0_library_header(std::ostream &out);
+    //void write_3_0_library_header(std::ostream &out);
   public:
     TropicalWeightOutputStream(void); 
     TropicalWeightOutputStream(const char * filename);
-    void open(void);
     void close(void);
+    void write(const char &c);
     void write_transducer(StdVectorFst * transducer);
   };
 

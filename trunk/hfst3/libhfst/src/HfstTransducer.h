@@ -187,35 +187,65 @@ namespace hfst
       hfst::implementations::HfstOlInputStream * hfst_ol;
     };
 
-    ImplementationType type;
     StreamImplementation implementation;
-    bool stream_has_headers;
-    bool header_eaten;
+    ImplementationType type;
+    unsigned int bytes_to_skip;
+    std::string filename;
+    /* A special case where an OpenFst transducer has no symbol tables but an
+       SFST alphabet is appended at the end. Should not occur very often, but
+       possible when converting old transducers into version 3.0. transducers.. */
+    bool hfst_version_2_weighted_transducer;
+
+    /* Skip n bytes of input stream. */
+    void ignore(unsigned int n);
+
+    /* The type of a transducer not supported directly by HFST version 3.0 
+       but which can occur in conversion functions. */
+    enum TransducerType { 
+      HFST_VERSION_2_WEIGHTED, /* See the above variable. */
+      HFST_VERSION_2_UNWEIGHTED_WITHOUT_ALPHABET, /* An SFST transducer with no alphabet,
+						     not supported. */
+      HFST_VERSION_2_UNWEIGHTED, /* Old header + ordinary SFST transducer. */               
+      OPENFST_, /* An OpenFst transducer, can cause problems if it does not have symbol tables. */
+      SFST_,  /* An SFST transducer. */
+      FOMA_, /* A foma transducer. */
+      ERROR_TYPE_ /* Transducer type not recognized. */
+    };
+
     void read_transducer(HfstTransducer &t);
     ImplementationType stream_fst_type(const char *filename);
-    int read_library_header(std::istream &in);
-    ImplementationType read_version_3_0_fst_type(std::istream &in);
-    ImplementationType guess_fst_type(std::istream &in);
+    TransducerType guess_fst_type(std::istream &in, int &bytes_read);
+
+    bool read_hfst_header(std::istream &in, int &bytes_read);
+
+    bool read_library_header(std::istream &in, int &bytes_read);
+    int get_header_size(std::istream &in, int &bytes_read);                        // throws error
+    StringPairVector get_header_data(std::istream &in, int header_size);                // throws error
+    void process_header_data(StringPairVector &header_data, bool warnings=false);   // throws error
+    bool set_implementation_specific_header_data(StringPairVector &data, unsigned int index);
+
+    bool read_library_header_beta(std::istream &in, int &bytes_read);
+    ImplementationType get_fst_type_beta(std::istream &in, int &bytes_read);       // throws error
+
   public:
 
     /** \brief Create a stream to standard in for reading binary transducers. */
     HfstInputStream(void);
-    /** \brief Create a stream to file \a filename in for reading binary transducers. 
+
+    /** \brief Open a stream to file \a filename in for reading binary transducers. 
 
 	@pre The file exists. Otherwise, an exception is thrown.
 	@throws hfst::exceptions::FileNotReadableException */
     HfstInputStream(const char* filename);
-    ~HfstInputStream(void);
-    /** \brief Open the stream. 
 
-	If the stream points to standard in, nothing is done. */
-    void open(void);
+    /** Delete the stream. */
+    ~HfstInputStream(void);
+
     /** \brief Close the stream.
 
 	If the stream points to standard in, nothing is done. */
     void close(void);
-    /** \brief Whether the stream is open. */
-    bool is_open(void);
+
     /** \brief Whether the stream is at the end. */
     bool is_eof(void);
     /** \brief Whether badbit is set. */
@@ -227,6 +257,7 @@ namespace hfst
     
     /** \brief The type of the first transducer in the stream. */
     ImplementationType get_type(void) const;
+
     friend class HfstTransducer;
   };
 
@@ -235,7 +266,6 @@ namespace hfst
       An example:
 \verbatim
       HfstOutputStream out("testfile", FOMA_TYPE);
-      out.open();
       out << foma_transducer1 
           << foma_transducer2 
 	   << foma_transducer3;
@@ -260,24 +290,38 @@ namespace hfst
       hfst::implementations::HfstOlOutputStream * hfst_ol;
     };
     ImplementationType type;
+    bool hfst_format;
     StreamImplementation implementation;
 
+    // append string s to vector str and a '\0'
+    static void append(std::vector<char> &str, const std::string &s);
+
+    // write data to stream
+    void write(const std::string &s);
+    void write(const std::vector<char> &s);
+    void write(const char &c);
+
+    void append_hfst_header_data(std::vector<char> &header);
+    void append_implementation_specific_header_data(std::vector<char> &header, HfstTransducer &transducer);
+
   public:
-    /** \brief Create a stream to standard out for writing binary transducers of type \a type. */
-    HfstOutputStream(ImplementationType type);  // stdout
-    /** \brief Create a stream to file \a filename for writing binary transducers of type \a type. 
+
+    /** \brief Create a stream to standard out for writing binary transducers of type \a type. 
+	\a hfst_format defines whether transducers are written in hfst format or as such in their backend format. */
+    HfstOutputStream(ImplementationType type, bool hfst_format=true);
+
+    /** \brief Open a stream to file \a filename for writing binary transducers of type \a type. 
+	\a hfst_format defines whether transducers are written in hfst format or as such in their backend format.
 
 	If the file exists, it is overwritten. */
-    HfstOutputStream(const std::string &filename,ImplementationType type);
+    HfstOutputStream(const std::string &filename,ImplementationType type, bool hfst_format=true);
+
+    /** \brief Delete the stream. */
     ~HfstOutputStream(void);  
-    /** \brief Write the transducer \a transducer in binary format to the stream. 
 
-	@pre The stream has been opened, unless it points to standard out. */
+    /** \brief Write the transducer \a transducer in binary format to the stream. */
     HfstOutputStream &operator<< (HfstTransducer &transducer);
-    /** \brief Open the stream. 
 
-	If the stream points to standard out, nothing is done. */
-    void open(void);
     /** \brief Close the stream. 
 
 	If the stream points to standard out, nothing is done. */

@@ -142,7 +142,7 @@ int
 process_stream(HfstOutputStream& outstream)
 {
   size_t transducer_n = 0;
-  outstream.open();
+  //outstream.open();
   while (!feof(inputfile))
     {
       transducer_n++;
