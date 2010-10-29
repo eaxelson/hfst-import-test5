@@ -411,12 +411,19 @@ AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h err.h glob.h])
 AC_LANG([C++])
 
 if test "x$with_sfst" != "xno"; then
+    AC_CHECK_HEADERS([sfst/fst.h])
     AC_CHECK_HEADERS([backward/hash_set ext/hash_set hash_set])
     AC_CHECK_HEADERS([backward/hash_map ext/hash_map hash_map])
 fi
 
 if test "x$with_openfst" != "xno"; then
     AC_CHECK_HEADERS([fst/fstlib.h])
+fi
+
+if test "x$with_foma" != "xno"; then
+    AC_LANG_PUSH([C])
+    AC_CHECK_HEADERS([fomalib.h])
+    AC_LANG_POP
 fi
 
 AC_HEADER_STDBOOL
@@ -497,14 +504,8 @@ cat <<EOF
     *                 xfst-compiler: $enable_xfst_compiler
     * compiling tools with -Werror: $enable_werrors
 EOF
-if test "x$with_foma" == "xbundled"; then
-    AC_MSG_WARN([bundled external foma included, please fix; security and licensing issues!])
-fi
-if test "x$with_sfst" == "xbundled"; then
-    AC_MSG_WARN([bundled external sfst included, please fix; security and licensing issues!])
-fi
 if test "x$with_foma" != "xno" -a "x$with_openfst" != "xno"; then
-    AC_MSG_WARN([Backends with conflicting licences selected, resulting binary must not be redistributed])
+    AC_MSG_WARN([Backends with conflicting licences selected (foma GPLv2 and OpenFst Apache), resulting binary must not be redistributed])
 fi
 if test "x$with_openfst" == "xno"; then
     AC_MSG_WARN([Disabling openfst backend will severely cripple libhfst])
