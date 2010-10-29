@@ -23,25 +23,24 @@ namespace hfst { namespace implementations {
   }
 
     /** Create an SfstInputStream that reads from stdin. */
-  SfstInputStream::SfstInputStream(void)
+    SfstInputStream::SfstInputStream(void):
+      is_minimal(false)
   {
     this->input_file = stdin;
   }
     /** Create an SfstInputStream that reads from file \a filename. */
-  SfstInputStream::SfstInputStream(const char * filename):
-  filename(filename)
-  {
-    input_file = NULL;
-  }
-    /** Open the stream. */
-  void SfstInputStream::open(void)
+  SfstInputStream::SfstInputStream(const char * filename_):
+    filename(filename_), is_minimal(false)
   {
     if (filename == std::string())
-      { return; }
-    input_file = fopen(filename.c_str(),"r");
-    if (input_file == NULL)
-      { throw FileNotReadableException(); }
+      { input_file = stdin; }
+    else {
+      input_file = fopen(filename.c_str(),"r");
+      if (input_file == NULL)
+	{ throw FileNotReadableException(); }
+    }
   }
+
     /** Close the stream. */
   void SfstInputStream::close(void)
   {
@@ -53,16 +52,9 @@ namespace hfst { namespace implementations {
 	input_file = NULL;
       }
   }
-    /** Whether the stream is open. */
-  bool SfstInputStream::is_open(void)
-  {
-    return input_file != NULL;
-  }
   
   bool SfstInputStream::is_eof(void)
   {
-    if (not is_open())
-      { return true; }
     int c = getc(input_file);
     bool retval = (feof(input_file) != 0);
     ungetc(c, input_file);
@@ -110,21 +102,25 @@ namespace hfst { namespace implementations {
       { throw SymbolRedefinedException(); }
   }
 
+#ifdef FOO
   /* Skip the identifier string "MINIMAL" */
   bool SfstInputStream::skip_minimality_identifier(void)
   {
     char c = getc(input_file);
     ungetc(c,input_file);
+    fprintf(stderr, "skip_minimality_identifier: c == %c\n", c);
     if ( c != 'M') 
 	return false;
     else 
       {
 	char minimality_identifier[8];
 	int count = fread(minimality_identifier,8,1,input_file);
-	if (count != 1)
+	if (count != 1) {
 	  throw NotTransducerStreamException();
-	if (0 != strcmp(minimality_identifier,"MINIMAL"))
+	}
+	if (0 != strcmp(minimality_identifier,"MINIMAL")) {
 	  throw NotTransducerStreamException();
+	}
 	return true;
       }
   }
@@ -135,9 +131,11 @@ namespace hfst { namespace implementations {
     char sfst_identifier[10];
     int sfst_id_count = fread(sfst_identifier,10,1,input_file);
     if (sfst_id_count != 1)
-      { throw NotTransducerStreamException(); }
+      { fprintf(stderr, "#2\n");
+	throw NotTransducerStreamException(); }
     if (0 != strcmp(sfst_identifier,"SFST_TYPE"))
-      { throw NotTransducerStreamException(); }
+      { fprintf(stderr, "#3: %s\n", sfst_identifier);
+	throw NotTransducerStreamException(); }
     return skip_minimality_identifier();
   }
   
@@ -146,11 +144,14 @@ namespace hfst { namespace implementations {
     char hfst_header[6];
     int header_count = fread(hfst_header,6,1,input_file);
     if (header_count != 1)
-      { throw NotTransducerStreamException(); }
+      { fprintf(stderr, "#1\n");
+	throw NotTransducerStreamException(); }
     try { return skip_identifier_version_3_0(); }
     catch (NotTransducerStreamException e) { throw e; }
   }
-  
+#endif // FOO  
+
+
 #ifdef foo
   void SfstTransducer::harmonize(Transducer * t1, Transducer * t2)
   {
@@ -220,16 +221,37 @@ namespace hfst { namespace implementations {
 
   }
 
-    Transducer * SfstInputStream::read_transducer(bool has_header)
+    void SfstInputStream::ignore(unsigned int n)
+    { 
+      for (unsigned int i=0; i<n; i++)
+	fgetc(input_file);
+    }
+
+    bool SfstInputStream::set_implementation_specific_header_data(StringPairVector &header_data, unsigned int index)
+    {
+      if (index != (header_data.size()-1) )
+	return false;
+
+      if ( not ( strcmp("minimal", header_data[index].first.c_str()) == 0) )
+	return false;
+
+      if ( strcmp("true", header_data[index].second.c_str()) == 0 )
+	;//is_minimal=true;  // SEGFAULT?
+      else if ( strcmp("false", header_data[index].second.c_str()) == 0 )
+	;//is_minimal=false;
+      else
+	return false;
+
+      return true;
+    }
+
+    Transducer * SfstInputStream::read_transducer()
   {
     if (is_eof())
       { throw FileIsClosedException(); }
     Transducer * t = NULL;
     try 
       {
-	bool is_minimal=false;
-	if (has_header)
-	  is_minimal = skip_hfst_header();
 	Transducer * t = new Transducer(input_file,true);
 	//tt.alphabet.clear();
 	//t = &tt.copy();
@@ -251,25 +273,45 @@ namespace hfst { namespace implementations {
   // ---------- SfstOutputStream functions ----------
 
   SfstOutputStream::SfstOutputStream(void)
-  {}
+  { ofile = stdout; }
+
   SfstOutputStream::SfstOutputStream(const char * str):
     filename(str)
-  {}
-  void SfstOutputStream::open(void) {
+  {
     if (filename != std::string()) {
       ofile = fopen(filename.c_str(), "wb");
       if (ofile == NULL)
 	throw FileNotReadableException();
     } 
-    else {
+    else
       ofile = stdout;
-    }
   }
+
   void SfstOutputStream::close(void) 
   {
     if (filename != std::string())
       { fclose(ofile); }
   }
+
+    void SfstOutputStream::append_implementation_specific_header_data(std::vector<char> &header, Transducer *t)
+    {
+      std::string min("minimal");
+      for (unsigned int i=0; i<min.length(); i++)
+	header.push_back(min[i]);
+      header.push_back('\0');
+
+      std::string min_value;
+      if (t->minimised && t->deterministic)
+	min_value = std::string("true");
+      else
+	min_value = std::string("false");
+
+      for (unsigned int i=0; i<min_value.length(); i++)
+	header.push_back(min_value[i]);
+      header.push_back('\0');
+    }
+
+    /*
     void SfstOutputStream::write_3_0_library_header(FILE *file, bool is_minimal)
   {
     fputs("HFST3",file);
@@ -281,11 +323,15 @@ namespace hfst { namespace implementations {
       fputc(0, file); 
     }
   }
+    */
 
-  void SfstOutputStream::write_transducer(Transducer * transducer) 
+    void SfstOutputStream::write(const char &c)
+    {
+      fputc(c,ofile);
+    }
+
+    void SfstOutputStream::write_transducer(Transducer * transducer)
   { 
-    bool is_minimal = (transducer->minimised && transducer->deterministic)? true : false;
-    write_3_0_library_header(ofile, is_minimal);
     transducer->store(ofile); 
   }
 

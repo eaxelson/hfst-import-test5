@@ -125,7 +125,7 @@ parse_options(int argc, char** argv)
 int
 process_stream(HfstInputStream& instream, FILE* outf)
 {
-    instream.open();
+  //instream.open();
     size_t transducer_n = 0;
     while(instream.is_good())
     {
@@ -139,7 +139,9 @@ process_stream(HfstInputStream& instream, FILE* outf)
           verbose_printf("Converting %s...%zu\n", inputfilename,
                          transducer_n); 
         }
+
         HfstTransducer t(instream);
+
         if(transducer_n > 1)
             fprintf(outf, "--\n");
 
@@ -195,6 +197,7 @@ int main( int argc, char **argv )
 	}
 	
 	retval = process_stream(*instream, outfile);
+
 	delete instream;
 	free(inputfilename);
 	free(outfilename);

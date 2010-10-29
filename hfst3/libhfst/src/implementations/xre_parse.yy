@@ -228,7 +228,7 @@ EXP: EXP CROSS_PRODUCT EXP {
     | READ_BIN
     {
         hfst::HfstInputStream instream($1);
-        instream.open();
+        //instream.open();
         $$ = new HfstTransducer(instream);
         free($1);
     }

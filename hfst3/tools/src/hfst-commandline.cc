@@ -60,7 +60,7 @@ debug_save_transducer(hfst::HfstTransducer t, const char* name)
     if (debug)
       {
         hfst::HfstOutputStream debugOut(name, t.get_type());
-        debugOut.open();
+        //debugOut.open();
         debug_printf("*** DEBUG (%s): saving current transducer to %s\n",
                  program_name, name);
         debugOut << t;

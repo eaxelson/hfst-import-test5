@@ -48,14 +48,13 @@ namespace hfst {
   public:
     FomaInputStream(void);
     FomaInputStream(const char * filename);
-    void open(void);
     void close(void);
-    bool is_open(void);
     bool is_eof(void);
     bool is_bad(void);
     bool is_good(void);
     bool is_fst(void);
-    fsm * read_transducer(bool has_header);
+    void ignore(unsigned int);
+    fsm * read_transducer();
     
     static bool is_fst(FILE * f);
     static bool is_fst(std::istream &s);
@@ -66,12 +65,12 @@ namespace hfst {
   private:
     std::string filename;
     FILE *ofile;
-    void write_3_0_library_header(FILE *file);
+    //void write_3_0_library_header(FILE *file);
   public:
     FomaOutputStream(void); 
     FomaOutputStream(const char * filename);
-    void open(void);
     void close(void);
+    void write(const char &c);
     void write_transducer(fsm * transducer);
   };
 

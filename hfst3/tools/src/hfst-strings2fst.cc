@@ -235,7 +235,7 @@ process_stream(HfstOutputStream& outstream)
   size_t len = 0;
   HfstTokenizer tok;
   HfstTransducer disjunction(output_format);
-  outstream.open();
+  //outstream.open();
   size_t line_n = 0;
   while (hfst_getline(&line, &len, inputfile) != -1)
     {

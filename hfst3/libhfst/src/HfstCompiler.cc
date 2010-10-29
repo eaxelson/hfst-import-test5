@@ -626,7 +626,7 @@ namespace hfst
     if (Verbose)
       fprintf(stderr,"\nreading transducer from %s...", filename);
     HfstInputStream is(filename);
-    is.open();
+    //is.open();
     HfstTransducer *t = new HfstTransducer(is);
     is.close();
     free(filename);
@@ -638,7 +638,7 @@ namespace hfst
 
   void HfstCompiler::write_to_file(HfstTransducer *t, char* filename) {
     HfstOutputStream os(std::string(filename), t->get_type());
-    os.open();
+    //os.open();
     os << *t;
     os.close();
     return;

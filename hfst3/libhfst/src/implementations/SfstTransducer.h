@@ -39,24 +39,26 @@ namespace implementations
   private:
     std::string filename;
     FILE * input_file;
+    bool is_minimal;  // whether the next transducer in the stream is minimal
+                      // this can be said in the header
     void add_symbol(StringNumberMap &string_number_map,
 		    Character c,
 		    Alphabet &alphabet);
-    bool skip_identifier_version_3_0(void);
-    bool skip_hfst_header(void);
-    bool skip_minimality_identifier(void);
+    //bool skip_identifier_version_3_0(void);
+    //bool skip_hfst_header(void);
+    //bool skip_minimality_identifier(void);
 
   public:
     SfstInputStream(void);
     SfstInputStream(const char * filename);
-    void open(void);
     void close(void);
-    bool is_open(void);
     bool is_eof(void);
     bool is_bad(void);
     bool is_good(void);
     bool is_fst(void);
-    Transducer * read_transducer(bool has_header);
+    void ignore(unsigned int);
+    bool set_implementation_specific_header_data(StringPairVector &data, unsigned int index);
+    Transducer * read_transducer();
     
     static bool is_fst(FILE * f);
     static bool is_fst(std::istream &s);
@@ -67,12 +69,13 @@ namespace implementations
   private:
     std::string filename;
     FILE *ofile;
-    void write_3_0_library_header(FILE *file, bool is_minimal);
+    //void write_3_0_library_header(FILE *file, bool is_minimal);
   public:
     SfstOutputStream(void); 
     SfstOutputStream(const char * filename);
-    void open(void);
     void close(void);
+    void write(const char &c);
+    void append_implementation_specific_header_data(std::vector<char> &header, Transducer *t);
     void write_transducer(Transducer * transducer);
   };
   

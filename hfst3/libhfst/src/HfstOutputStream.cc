@@ -13,8 +13,8 @@
 
 namespace hfst
 {
-  HfstOutputStream::HfstOutputStream(ImplementationType type):
-  type(type)
+  HfstOutputStream::HfstOutputStream(ImplementationType type, bool hfst_format):
+    type(type), hfst_format(hfst_format)
   { 
     if (not HfstTransducer::is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -57,8 +57,8 @@ namespace hfst
       }
   }
   // FIX: HfstOutputStream takes a string parameter, HfstInputStream a const char*
-  HfstOutputStream::HfstOutputStream(const std::string &filename,ImplementationType type):
-  type(type)
+  HfstOutputStream::HfstOutputStream(const std::string &filename,ImplementationType type, bool hfst_format):
+    type(type), hfst_format(hfst_format)
   { 
     if (not HfstTransducer::is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -136,10 +136,127 @@ namespace hfst
       }
   }
 
+  void HfstOutputStream::append(std::vector<char> &str, const std::string &s)
+  {
+    for (unsigned int i=0; i<s.length(); i++)
+      str.push_back(s[i]);
+    str.push_back('\0');
+  }
+
+  void HfstOutputStream::write(const std::string &s)
+  {
+    for (unsigned int i=0; i<s.length(); i++)
+      write(s[i]);
+  }
+
+  void HfstOutputStream::write(const std::vector<char> &s)
+  {
+    for (unsigned int i=0; i<s.size(); i++)
+      write(s[i]);
+  }
+
+  void HfstOutputStream::write(const char &c)
+  {
+    switch(type)
+      {
+#if HAVE_SFST
+      case SFST_TYPE:
+	implementation.sfst->write(c);
+	break;
+#endif
+#if HAVE_OPENFST
+      case TROPICAL_OFST_TYPE:
+	implementation.tropical_ofst->write(c);
+	break;
+      case LOG_OFST_TYPE:
+	implementation.log_ofst->write(c);
+	break;
+#endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+	implementation.foma->write(c);
+	break;
+#endif
+      default:
+	assert(false);
+      }
+  }
+
+  void HfstOutputStream::append_hfst_header_data(std::vector<char> &header)
+  {
+    append(header, "version");
+    append(header, "3.0");
+    append(header, "type");
+
+    std::string type_value;
+
+    switch(type)
+      {
+#if HAVE_SFST
+      case SFST_TYPE:
+	type_value=std::string("SFST");
+	break;
+#endif
+#if HAVE_OPENFST
+      case TROPICAL_OFST_TYPE:
+	type_value=std::string("TROPICAL_OPENFST");
+	break;
+      case LOG_OFST_TYPE:
+	type_value=std::string("LOG_OPENFST");
+	break;
+#endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+	type_value=std::string("FOMA");
+	break;
+#endif
+      default:
+	assert(false);
+      }
+
+    append(header, type_value);
+  }
+
+  void HfstOutputStream::append_implementation_specific_header_data(std::vector<char> &header, HfstTransducer &transducer)
+  {
+    switch(type)
+      {
+#if HAVE_SFST
+      case SFST_TYPE:
+	implementation.sfst->append_implementation_specific_header_data(header, transducer.implementation.sfst);
+	break;
+#endif
+      default:
+	break;
+      }
+  }
+
   HfstOutputStream &HfstOutputStream::operator<< (HfstTransducer &transducer)
   {
     if (type != transducer.type)
       { throw hfst::exceptions::TransducerHasWrongTypeException(); }
+
+    if (hfst_format) {
+      const int MAX_HEADER_LENGTH=65535;
+      std::vector<char> header;
+      append_hfst_header_data(header);
+      append_implementation_specific_header_data(header, transducer);
+
+      write("HFST");
+      write('\0');
+
+      int header_length = (int)header.size();
+      if (header_length > MAX_HEADER_LENGTH) {
+	fprintf(stderr, "ERROR: transducer header is too long\n");
+	exit(1);
+      }	
+      // write header length using two bytes
+      write((char)header_length/256);
+      write((char)header_length%256);
+
+      write('\0');
+      write(header);
+    }
 
     switch (type)
       {
@@ -173,36 +290,6 @@ namespace hfst
       default:
 	assert(false);
 	return *this;
-      }
-  }
-
-  void HfstOutputStream::open(void) {
-    switch (type)
-      {
-#if HAVE_SFST
-      case SFST_TYPE:
-	implementation.sfst->open();
-	break;
-#endif
-#if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
-	implementation.tropical_ofst->open();
-	break;
-      case LOG_OFST_TYPE:
-	implementation.log_ofst->open();
-	break;
-#endif
-#if HAVE_FOMA
-      case FOMA_TYPE:
-	implementation.foma->open();
-	break;
-#endif
-      case HFST_OL_TYPE:
-      case HFST_OLW_TYPE:
-	implementation.hfst_ol->open();
-	break;
-      default:
-	assert(false);
       }
   }
 

@@ -241,7 +241,7 @@ class Callback : public hfst::ExtractStringsCb
 int
 process_stream(HfstInputStream& instream, std::ostream& outstream)
 {
-  instream.open();
+  //instream.open();
   
   bool first_transducer=true;
   while(instream.is_good())

@@ -118,8 +118,8 @@ parse_options(int argc, char** argv)
 int
 process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 {
-  instream.open();
-  outstream.open();
+  //instream.open();
+  //outstream.open();
   queue<HfstTransducer> last_n;
 	
 	size_t transducer_n=0;

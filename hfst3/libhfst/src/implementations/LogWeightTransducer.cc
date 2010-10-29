@@ -790,18 +790,12 @@ namespace hfst { namespace implementations
     //}
   }
   
-  void LogWeightInputStream::open(void) {}
   void LogWeightInputStream::close(void)
   {
     if (filename != string())
       { i_stream.close(); }
   }
-  bool LogWeightInputStream::is_open(void) const
-  { 
-    if (filename != string())
-      { return i_stream.is_open(); }
-    return true;
-  }
+
   bool LogWeightInputStream::is_eof(void) const
   {
     return input_stream.peek() == EOF;
@@ -845,7 +839,10 @@ namespace hfst { namespace implementations
   bool LogWeightInputStream::operator() (void) const
   { return is_good(); }
 
-  LogFst * LogWeightInputStream::read_transducer(bool has_header)
+  void LogWeightInputStream::ignore(unsigned int n)
+  { input_stream.ignore(n); }
+
+  LogFst * LogWeightInputStream::read_transducer()
   {
     if (is_eof())
       { throw FileIsClosedException(); }
@@ -853,8 +850,6 @@ namespace hfst { namespace implementations
     FstHeader header;
     try 
       {
-	if (has_header)
-	  skip_hfst_header();
 	if (filename == string())
 	  {
 	    header.Read(input_stream,"STDIN");			    
@@ -2226,6 +2221,7 @@ namespace hfst { namespace implementations
     filename(str),o_stream(str,std::ios::out),output_stream(o_stream)
   {}
 
+  /*
   void LogWeightOutputStream::write_3_0_library_header(std::ostream &out)
   {
     if (!out)
@@ -2235,15 +2231,18 @@ namespace hfst { namespace implementations
     out.write("LOG_OFST_TYPE",14);
     //out.put(0);
   }
+  */
+
+  void LogWeightOutputStream::write(const char &c)
+  {
+    output_stream.put(char(c));
+  }
 
   void LogWeightOutputStream::write_transducer(LogFst * transducer) 
   { 
     if (!output_stream)
       fprintf(stderr, "LogWeightOutputStream: ERROR: failbit set (1).\n");
-    write_3_0_library_header(output_stream);
     transducer->Write(output_stream,FstWriteOptions()); }
-
-  void LogWeightOutputStream::open(void) {}
 
   void LogWeightOutputStream::close(void) 
   {
