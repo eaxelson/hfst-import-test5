@@ -207,6 +207,8 @@ hfst_txt2fst_SOURCES=hfst-txt2fst.cc $(HFST_COMMON_SRC)
 hfst_xfst_compiler_SOURCES=hfst-xfst-compiler.cc $(HFST_COMMON_SRC)
 
 BUILT_SOURCES=hfst-scanner.h hfst-compiler.h
+# make make realise headers automatically follow from flexing
+hfst-scanner.h: hfst-scanner.cc
 
 hfst_calculate_CXXFLAGS= -Wall -Wno-error
 
