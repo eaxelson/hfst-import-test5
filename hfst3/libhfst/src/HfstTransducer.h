@@ -421,9 +421,9 @@ namespace hfst
 
     ImplementationType type;
 
-    hfst::implementations::HfstAlphabet * alpha;
     bool anonymous;
     bool is_trie;
+    hfst::implementations::HfstAlphabet * alpha;
 
     TransducerImplementation implementation; 
 

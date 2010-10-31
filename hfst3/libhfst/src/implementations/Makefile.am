@@ -21,7 +21,7 @@ noinst_LTLIBRARIES=libhfstimplementations.la
 # HFST bridge specific stuff
 IMPLEMENTATION_SRCS= \
 	HfstTokenizer.cc ConvertTransducerFormat.cc FlagDiacritics.cc InternalTransducer.cc HfstAlphabet.cc # GlobalSymbolTable.cc SymbolDefs.cc
-
+AM_CXXFLAGS=-Wno-deprecated
 # the bridges
 if WANT_SFST
 MAYBE_SFST=SfstTransducer.cc
