@@ -364,8 +364,8 @@ LexcCompiler::compileLexical()
                   {
                     // quasitransition to new lexicon 
                     nu_weight += mut.get_final_weight(old_target);
-                    nu_osymbol = "@0@";
-                    nu_isymbol = "@0@";
+                    nu_osymbol = "@_EPSILON_SYMBOL_@";
+                    nu_isymbol = "@_EPSILON_SYMBOL_@";
                     if (starts.find(nu_osymbol) != starts.end())
                       {
                         nu_target = starts[nu_osymbol];
@@ -389,18 +389,23 @@ LexcCompiler::compileLexical()
                     else
                       {
                         // new target, rebuild asap
-                        nu_target = free_state;
-                        free_state++;
+                        nu_target = first_free;
+                        first_free++;
                         rebuildMap[old_target] = nu_target;
                       }
                   }
+                HfstState nu_icode = rebuilt.alphabet->add_symbol(nu_isymbol.c_str());
+                HfstState nu_ocode = rebuilt.alphabet->add_symbol(nu_osymbol.c_str());
+
                 rebuilt.add_line(nu_state, nu_target,
-                                 nu_isymbol, nu_osymbol,
+                                 nu_icode, nu_ocode,
                                  nu_weight);
               }
           }
       }
-    HfstTransducer* rv = new HfstTransducer(rebuilt);
+    // FIXME: howto create HfstTransducer from internal?
+    HfstTransducer* rv = new HfstTransducer(rebuilt, format_);
+
     rv->minimize();
     return rv;
 }

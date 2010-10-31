@@ -48,10 +48,7 @@ using hfst::lexc::LexcCompiler;
 static char** lexcfilenames = 0;
 static FILE** lexcfiles = 0;
 static unsigned int lexccount = 0;
-static char* outfilename = 0;
-static FILE* outfile = 0;
 static bool is_input_stdin = true;
-static bool is_output_stdout = true;
 static ImplementationType format = hfst::UNSPECIFIED_TYPE;
 
 void
@@ -108,21 +105,6 @@ parse_options(int argc, char** argv)
         switch (c)
         {
 #include "inc/getopt-cases-common.h"
-        case 'o':
-          outfilename = hfst_strdup(optarg);
-          if (strcmp(outfilename, "-") == 0) {
-            free(outfilename);
-            outfilename = hfst_strdup("<stdout>");
-            outfile = stdout;
-            is_output_stdout = true;
-            message_out = stderr;
-          }
-          else {
-            outfile = hfst_fopen(outfilename, "w");
-            is_output_stdout = false;
-            message_out = stdout;
-          }
-          break;
         case 'f':
           format = hfst_parse_format_name(optarg);
           break;
@@ -164,13 +146,12 @@ parse_options(int argc, char** argv)
 int
 lexc_streams(LexcCompiler& lexc, HfstOutputStream& outstream)
 {
-    outstream.open();
     for (unsigned int i = 0; i < lexccount; i++)
       {
         verbose_printf("Parsing lexc file %s\n", lexcfilenames[i]);
         if (lexcfiles[i] == stdin)
           {
-            lexc.parse_stdin();
+            lexc.parse(stdin);
           }
         else
           {
