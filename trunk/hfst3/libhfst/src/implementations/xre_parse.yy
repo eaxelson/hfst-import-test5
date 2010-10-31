@@ -15,7 +15,7 @@ extern int xrelex();
 
 %}
 
-%name-prefix "xre"
+%name-prefix="xre"
 %error-verbose
 
 %union {

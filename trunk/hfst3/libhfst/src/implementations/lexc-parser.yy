@@ -140,7 +140,7 @@ handle_end()
 %}
 
 // ouch
-%name-prefix "hlexc"
+%name-prefix="hlexc"
 // yup, nice messages
 %error-verbose
 // just cos I use the llloc struct
