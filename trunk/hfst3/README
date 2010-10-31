@@ -110,12 +110,15 @@ Compilation requirements:
 - Versions loaded from version control system may require parser generator 
   system:
   
-   - GNU flex 2.5.35 and
+   - GNU flex 2.5.35 or compatible and
      
-   - relatively new bison or compatible. 
+   - GNU bison 1.31 (2.4 suggested) or compatible
      
-   - Especially flex 2.5.33 will choke on perfectly valid rules used in hfst. 
+   - flex 2.5.4-2.5.33 will choke on perfectly valid rules used in hfst
    
+   - bison older than 1.31 do not support name-prefix needed for having
+     multiple parsers in one library
+
    - Flex and bison are needed with distribution versions as well if the user
      wishes to modify .yy or .ll files.
 
