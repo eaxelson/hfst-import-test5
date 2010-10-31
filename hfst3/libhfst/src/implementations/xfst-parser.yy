@@ -40,7 +40,7 @@ int hxfstlex(void);
 %}
 
 // ouch
-%name-prefix "hxfst"
+%name-prefix="hxfst"
 // yup, nice messages
 %error-verbose
 // just cos I use the llloc struct
