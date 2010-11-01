@@ -477,29 +477,37 @@ namespace hfst
 
 
     HfstTransducer restriction(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet) 
-    { (void)contexts; (void)mapping; (void)alphabet;
+    { void)contexts; (void)mapping; (void)alphabet;
       throw hfst::exceptions::FunctionNotImplementedException(); } 
+
     HfstTransducer coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet) 
     { (void)contexts; (void)mapping; (void)alphabet;
       throw hfst::exceptions::FunctionNotImplementedException(); } 
+
     HfstTransducer restriction_and_coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet) 
     { (void)contexts; (void)mapping; (void)alphabet;
       throw hfst::exceptions::FunctionNotImplementedException(); } 
+
     HfstTransducer surface_restriction(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet) 
     { (void)contexts; (void)mapping; (void)alphabet;
       throw hfst::exceptions::FunctionNotImplementedException(); } 
+
     HfstTransducer surface_coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet) 
     { (void)contexts; (void)mapping; (void)alphabet;
       throw hfst::exceptions::FunctionNotImplementedException(); } 
+
     HfstTransducer surface_restriction_and_coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet) 
     { (void)contexts; (void)mapping; (void)alphabet;
       throw hfst::exceptions::FunctionNotImplementedException(); } 
+
     HfstTransducer deep_restriction(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet) 
     { (void)contexts; (void)mapping; (void)alphabet;
       throw hfst::exceptions::FunctionNotImplementedException(); } 
+
     HfstTransducer deep_coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet) 
     { (void)contexts; (void)mapping; (void)alphabet;
       throw hfst::exceptions::FunctionNotImplementedException(); } 
+
     HfstTransducer deep_restriction_and_coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet) 
     { (void)contexts; (void)mapping; (void)alphabet;
       throw hfst::exceptions::FunctionNotImplementedException(); } 

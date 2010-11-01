@@ -171,8 +171,8 @@ int
 compose_intersect_streams(HfstInputStream& lexiconstream, HfstGrammar& rules,
                     HfstOutputStream& outstream)
 {
-    lexiconstream.open();
-    outstream.open();
+  //lexiconstream.open();
+  //  outstream.open();
     // should be is_good? 
     size_t transducer_n = 0;
     while (lexiconstream.is_good()) {
@@ -239,7 +239,7 @@ int main( int argc, char **argv ) {
         try {
           rulestream = (rulefile != stdin) ?
             new HfstInputStream(rulefilenames[i]) : new HfstInputStream();
-          rulestream->open();
+          //rulestream->open();
           while (rulestream->is_good())
             {
               rule_n++;

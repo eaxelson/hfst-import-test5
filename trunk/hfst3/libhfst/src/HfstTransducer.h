@@ -190,6 +190,7 @@ namespace hfst
     StreamImplementation implementation;
     ImplementationType type;
     unsigned int bytes_to_skip;
+    bool header_eaten;
     std::string filename;
     /* A special case where an OpenFst transducer has no symbol tables but an
        SFST alphabet is appended at the end. Should not occur very often, but
