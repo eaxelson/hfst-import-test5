@@ -64,9 +64,13 @@ namespace hfst
   void HfstInputStream::read_transducer(HfstTransducer &t)
   {
     // if header bytes have been read from a file, skip these bytes
-    if ( (bytes_to_skip > 0) && 
-	 (strcmp(filename.c_str(), "") != 0) ) {
+    if (strcmp(filename.c_str(), "") == 0) {
+      if (!header_eaten)
+	ignore(bytes_to_skip);
+    }
+    else {
       ignore(bytes_to_skip);
+      /*fprintf(stderr, "bytes skipped: %i\n", bytes_to_skip);*/
     }
 
     switch (type)
@@ -107,8 +111,7 @@ namespace hfst
 	throw hfst::exceptions::NotTransducerStreamException();
 	break;
       }
-
-    bytes_to_skip=0;
+    header_eaten=false;
   }
 
   HfstInputStream::TransducerType HfstInputStream::guess_fst_type(std::istream &in, int &bytes_read)
@@ -234,11 +237,12 @@ namespace hfst
       StringPairVector header_info = 
 	get_header_data(in, header_size);
       process_header_data(header_info, false);           // throws error
-      fprintf(stderr, "header_bytes + size_bytes + header_size: %i + %i + %i\n",
-	      header_bytes, size_bytes, header_size);
+      /*fprintf(stderr, "header_bytes + size_bytes + header_size: %i + %i + %i\n",
+	header_bytes, size_bytes, header_size);*/
       bytes_read = header_bytes + size_bytes + header_size;
       return true;
       }
+    header_bytes=0;
     if (read_library_header_beta(in, header_bytes)) 
       {
       int type_bytes=0;
@@ -248,6 +252,7 @@ namespace hfst
 	throw hfst::exceptions::NotTransducerStreamException();
       }
       bytes_read = header_bytes + type_bytes;
+      /*fprintf(stderr, "bytes_read: %i == %i + %i\n", bytes_read, header_bytes, type_bytes);*/
       return true;
       }
     return false;
@@ -384,6 +389,7 @@ namespace hfst
     // whether the stream contains an HFST version 3.0 transducer
     if (read_hfst_header(*in, bytes_read)) {
       bytes_to_skip=bytes_read;
+      /*fprintf(stderr, "bytes_to_skip == %i\n", bytes_to_skip);*/
       return type;
     }
 
@@ -425,9 +431,12 @@ namespace hfst
      The implementation type of the stream is defined by 
      the type of the first transducer in the stream. */
   HfstInputStream::HfstInputStream(void):
-    bytes_to_skip(0), filename(std::string()), hfst_version_2_weighted_transducer(false)
+    bytes_to_skip(0), filename(std::string()), hfst_version_2_weighted_transducer(false), header_eaten(false)
   {
-    try { type = stream_fst_type(""); }
+    try { 
+      type = stream_fst_type(""); 
+      header_eaten=true; 
+    }
     catch (hfst::implementations::FileNotReadableException e)
       { throw e; }
     if ( not HfstTransducer::is_implementation_type_available(type))
@@ -472,9 +481,12 @@ namespace hfst
 
   // FIX: HfstOutputStream takes a string parameter, HfstInputStream a const char*
   HfstInputStream::HfstInputStream(const char* filename):
-    bytes_to_skip(0), filename(std::string(filename)), hfst_version_2_weighted_transducer(false)
+    bytes_to_skip(0), filename(std::string(filename)), hfst_version_2_weighted_transducer(false), header_eaten(false)
   {
-    try { type = stream_fst_type(filename); }
+    try { 
+      type = stream_fst_type(filename);
+      header_eaten=true;
+    }
     catch (hfst::implementations::FileNotReadableException e)
       { throw e; }
     if ( not HfstTransducer::is_implementation_type_available(type))
