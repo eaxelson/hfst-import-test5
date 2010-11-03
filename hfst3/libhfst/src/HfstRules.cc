@@ -476,6 +476,151 @@ namespace hfst
     }
 
 
+    HfstTransducer restriction(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet,
+			       TwolType twol_type, int direction ) 
+    { //(void)contexts; (void)mapping; (void)alphabet;
+      //throw hfst::exceptions::FunctionNotImplementedException(); } 
+
+      // Make sure that contexts contains at least one transducer pair and that all
+      // transducers in the set have the same type.
+      ImplementationType type;
+      bool type_defined=false;
+      for (HfstTransducerPairSet::const_iterator it = contexts.begin(); it != contexts.end(); it++)
+	{
+	  if (not type_defined) {
+	    type = it->first.get_type();
+	    type_defined=true;
+	  } 
+	  else { 
+	    if (type != it->first.get_type())
+	      throw hfst::exceptions::TransducerTypeMismatchException();
+	  }
+	  if (type != it->second.get_type())
+	    throw hfst::exceptions::TransducerTypeMismatchException();
+ 	}
+      if (not type_defined)
+	throw hfst::exceptions::EmptySetOfContextsException();
+
+      std::string marker("@_MARKER_@");
+      HfstTransducer mt(marker, type);
+      HfstTransducer pi_star(alphabet, type, true);
+      
+      // center transducer
+      HfstTransducer l1("@_EPSILON_SYMBOL_@", type);
+      l1.concatenate(pi_star);
+      l1.concatenate(mt);
+      l1.concatenate(mapping);
+      l1.concatenate(mt);
+      l1.concatenate(pi_star);
+
+      HfstTransducer tmp(type);
+      if (direction == 0)
+	tmp = pi_star;
+      else if (direction == 1)
+	tmp = mapping.input_project().compose(pi_star);
+      else {
+	tmp = pi_star;
+	tmp.compose(mapping.output_project());
+      }
+
+      // context transducer pi_star + left[i] + mt + tmp + mt + + right[i] + pi_star
+      HfstTransducer l2(type);
+      for (HfstTransducerPairSet::const_iterator it = contexts.begin(); it != contexts.end(); it++)
+	{
+	  HfstTransducer ct("@_EPSILON_SYMBOL_@", type);
+	  ct.concatenate(pi_star);
+	  ct.concatenate(it->first);
+	  ct.concatenate(mt);	  
+	  ct.concatenate(tmp);
+	  ct.concatenate(mt);
+	  ct.concatenate(it->second);
+	  ct.concatenate(pi_star);
+	  l2.disjunct(ct);
+	}
+
+      HfstTransducer result(type);
+      
+      if (twol_type == twol_right) {
+	// TheAlphabet - ( l1 - l2 ).substitute(marker,epsilon)
+	HfstTransducer retval(alphabet, type, true);
+	HfstTransducer tmp1(l1);
+	tmp1.subtract(l2);
+	tmp1.substitute(marker,"@_EPSILON_SYMBOL_@");
+	retval.subtract(tmp1);
+	return retval;
+      }
+      else if (twol_type == twol_left) {
+	// TheAlphabet - ( l2 - l1 ).substitute(marker,epsilon)
+	HfstTransducer retval(alphabet, type, true);
+	HfstTransducer tmp1(l2);
+	tmp1.subtract(l1);
+	tmp1.substitute(marker,"@_EPSILON_SYMBOL_@");
+	retval.subtract(tmp1);
+	return retval;
+      }
+      else if (twol_type == twol_both) {
+	// TheAlphabet - ( l1 - l2 ).substitute(marker,epsilon)
+	// TheAlphabet - ( l2 - l1 ).substitute(marker,epsilon)
+	// intersect
+	HfstTransducer retval1(alphabet, type, true);
+	HfstTransducer tmp1(l1);
+	tmp1.subtract(l2);
+	tmp1.substitute(marker,"@_EPSILON_SYMBOL_@");
+	retval1.subtract(tmp1);
+
+	HfstTransducer retval2(alphabet, type, true);
+	HfstTransducer tmp2(l2);
+	tmp2.subtract(l1);
+	tmp2.substitute(marker,"@_EPSILON_SYMBOL_@");
+	retval2.subtract(tmp2);
+
+	return retval1.intersect(retval2);
+      }
+      else
+	assert(false);
+
+    }
+
+      //Transducer *result=result_transducer( l1, l2, type, marker );
+      /*
+  Transducer *Interface::result_transducer( Transducer *l1, Transducer *l2,
+					    Twol_Type type, Character marker )
+  {
+    Transducer *result=NULL;
+    if (type == twol_right)
+      result = restriction_transducer( l1, l2, marker );
+    else if (type == twol_left)
+      result = restriction_transducer( l2, l1, marker );
+    else if (type == twol_both) {
+      Transducer *t1 = restriction_transducer( l1, l2, marker );
+      Transducer *t2 = restriction_transducer( l2, l1, marker );
+      result = &(*t1 & *t2);
+      delete t1;
+      delete t2;
+    }
+
+    return result;
+    }
+
+  // TheAlphabet - ( l1 - l2 ).substitute(marker,epsilon)
+  Transducer *Interface::restriction_transducer( Transducer *l1, Transducer *l2,
+						 Character marker )
+  {
+    l1->alphabet.copy(TheAlphabet);
+    Transducer *t1 = &(*l1 / *l2);
+
+    Transducer *t2 = &t1->replace_char(marker, Label::epsilon);
+    delete t1;
+
+    t2->alphabet.copy(TheAlphabet);
+    t1 = &(!*t2);
+    delete t2;
+
+    return t1;
+  }
+*/
+
+
     HfstTransducer restriction(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet) 
     { (void)contexts; (void)mapping; (void)alphabet;
       throw hfst::exceptions::FunctionNotImplementedException(); } 

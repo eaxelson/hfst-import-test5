@@ -1065,6 +1065,7 @@ void print(HfstMutableTransducer &t)
   namespace rules
   {
     enum ReplaceType {REPL_UP, REPL_DOWN, REPL_RIGHT, REPL_LEFT};
+    enum TwolType {twol_right, twol_left, twol_both};
 
     /* helping methods */
     HfstTransducer universal_fst(const StringPairSet &alphabet, ImplementationType type);
@@ -1090,6 +1091,9 @@ void print(HfstMutableTransducer &t)
     HfstTransducer replace_down(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
     //HfstTransducer replace_right(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
     //HfstTransducer replace_left(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+
+    HfstTransducer restriction(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet,
+			       TwolType twol_type, int direction ); 
 
     HfstTransducer restriction(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
     HfstTransducer coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
