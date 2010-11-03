@@ -132,6 +132,10 @@ public HfstInterfaceException {};
 class TransducerTypeMismatchException :
 public HfstInterfaceException {};
 
+/** \brief The set of transducer pairs is empty. */
+class EmptySetOfContextsException :
+public HfstInterfaceException {};
+
 /* \brief ... */
 class SpecifiedTypeRequiredException :
 public HfstInterfaceException {};
