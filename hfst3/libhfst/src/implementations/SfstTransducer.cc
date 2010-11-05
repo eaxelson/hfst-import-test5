@@ -52,6 +52,39 @@ namespace hfst { namespace implementations {
 	input_file = NULL;
       }
   }
+
+  char SfstInputStream::stream_get() {
+    return (char) fgetc(input_file); }
+
+  void SfstInputStream::stream_unget(char c) {
+    ungetc ( (int)c, input_file ); }
+
+    /*
+  void SfstInputStream::stream_putback(char c) {
+    if (EOF == ungetc(c, input_file))
+      assert(false); }
+
+  void SfstInputStream::stream_getline(char* s, streamsize n, char delim) {
+    if ((int)n == 0)
+      assert(false);
+    unsigned int i=0;
+    while(true)
+      {
+	if (i == ((unsigned int)n-1) ) {
+	  s[i] = '\0';
+	  break;
+	}
+	int c = getc(input_file);
+	if (feof(input_file) || (c == delim)) {
+	  s[i] = '\0';
+	  break;
+	}
+	else
+	  s[i] = delim;
+	i++;
+      }
+      }*/
+
   
   bool SfstInputStream::is_eof(void)
   {
@@ -108,7 +141,7 @@ namespace hfst { namespace implementations {
   {
     char c = getc(input_file);
     ungetc(c,input_file);
-    fprintf(stderr, "skip_minimality_identifier: c == %c\n", c);
+    //fprintf(stderr, "skip_minimality_identifier: c == %c\n", c);
     if ( c != 'M') 
 	return false;
     else 
@@ -131,10 +164,10 @@ namespace hfst { namespace implementations {
     char sfst_identifier[10];
     int sfst_id_count = fread(sfst_identifier,10,1,input_file);
     if (sfst_id_count != 1)
-      { fprintf(stderr, "#2\n");
+      { //fprintf(stderr, "#2\n");
 	throw NotTransducerStreamException(); }
     if (0 != strcmp(sfst_identifier,"SFST_TYPE"))
-      { fprintf(stderr, "#3: %s\n", sfst_identifier);
+      { //fprintf(stderr, "#3: %s\n", sfst_identifier);
 	throw NotTransducerStreamException(); }
     return skip_minimality_identifier();
   }
@@ -144,7 +177,7 @@ namespace hfst { namespace implementations {
     char hfst_header[6];
     int header_count = fread(hfst_header,6,1,input_file);
     if (header_count != 1)
-      { fprintf(stderr, "#1\n");
+      { //fprintf(stderr, "#1\n");
 	throw NotTransducerStreamException(); }
     try { return skip_identifier_version_3_0(); }
     catch (NotTransducerStreamException e) { throw e; }
@@ -236,9 +269,9 @@ namespace hfst { namespace implementations {
 	return false;
 
       if ( strcmp("true", header_data[index].second.c_str()) == 0 )
-	;//is_minimal=true;  // SEGFAULT?
+	is_minimal=true;  // SEGFAULT?
       else if ( strcmp("false", header_data[index].second.c_str()) == 0 )
-	;//is_minimal=false;
+	is_minimal=false;
       else
 	return false;
 

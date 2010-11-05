@@ -51,6 +51,12 @@ namespace hfst { namespace implementations {
       }
   }
   
+  char FomaInputStream::stream_get() {
+    return (char) fgetc(input_file); }
+
+  void FomaInputStream::stream_unget(char c) {
+    ungetc ( (int)c, input_file ); }
+
   bool FomaInputStream::is_eof(void)
   {
     int c = getc(input_file);

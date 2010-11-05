@@ -57,6 +57,10 @@ namespace implementations
     bool is_good(void);
     bool is_fst(void);
     void ignore(unsigned int);
+
+    char stream_get();
+    void stream_unget(char c);
+
     bool set_implementation_specific_header_data(StringPairVector &data, unsigned int index);
     Transducer * read_transducer();
     
