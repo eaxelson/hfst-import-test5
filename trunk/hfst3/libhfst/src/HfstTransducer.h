@@ -128,6 +128,7 @@ namespace hfst
 
   typedef std::pair <HfstTransducer,HfstTransducer> HfstTransducerPair;
   typedef std::set <HfstTransducerPair> HfstTransducerPairSet;
+  typedef std::vector <HfstTransducerPair> HfstTransducerPairVector;
 
 #if HAVE_MUTABLE
   class HfstMutableTransducer;
@@ -190,15 +191,23 @@ namespace hfst
     StreamImplementation implementation;
     ImplementationType type;
     unsigned int bytes_to_skip;
-    bool header_eaten;
     std::string filename;
+    std::istream * input_stream; // if not NULL, first transducer in the stream
+
     /* A special case where an OpenFst transducer has no symbol tables but an
        SFST alphabet is appended at the end. Should not occur very often, but
        possible when converting old transducers into version 3.0. transducers.. */
     bool hfst_version_2_weighted_transducer;
 
-    /* Skip n bytes of input stream. */
+    /* The stream implementation ignores n bytes. */
     void ignore(unsigned int n);
+
+    /* Basic stream operators, work on input_stream (if not NULL) or on the stream implementation. */
+    char stream_get();
+    void stream_unget(char c);
+    bool stream_eof();
+    std::string stream_getstring();
+    char stream_peek();
 
     /* The type of a transducer not supported directly by HFST version 3.0 
        but which can occur in conversion functions. */
@@ -214,19 +223,19 @@ namespace hfst
     };
 
     void read_transducer(HfstTransducer &t);
-    ImplementationType stream_fst_type(const char *filename);
-    TransducerType guess_fst_type(std::istream &in, int &bytes_read);
+    ImplementationType stream_fst_type();
+    TransducerType guess_fst_type(int &bytes_read);
 
-    bool read_hfst_header(std::istream &in, int &bytes_read);
+    bool read_hfst_header(int &bytes_read);
 
-    bool read_library_header(std::istream &in, int &bytes_read);
-    int get_header_size(std::istream &in, int &bytes_read);                        // throws error
-    StringPairVector get_header_data(std::istream &in, int header_size);                // throws error
+    bool read_library_header(int &bytes_read);
+    int get_header_size(int &bytes_read);                        // throws error
+    StringPairVector get_header_data(int header_size);                // throws error
     void process_header_data(StringPairVector &header_data, bool warnings=false);   // throws error
     bool set_implementation_specific_header_data(StringPairVector &data, unsigned int index);
 
-    bool read_library_header_beta(std::istream &in, int &bytes_read);
-    ImplementationType get_fst_type_beta(std::istream &in, int &bytes_read);       // throws error
+    bool read_library_header_beta(int &bytes_read);
+    ImplementationType get_fst_type_beta(int &bytes_read);       // throws error
 
   public:
 
@@ -1092,18 +1101,18 @@ void print(HfstMutableTransducer &t)
     //HfstTransducer replace_right(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
     //HfstTransducer replace_left(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
 
-    HfstTransducer restriction(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet,
+    HfstTransducer restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet,
 			       TwolType twol_type, int direction ); 
 
-    HfstTransducer restriction(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
-    HfstTransducer coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
-    HfstTransducer restriction_and_coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
-    HfstTransducer surface_restriction(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
-    HfstTransducer surface_coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
-    HfstTransducer surface_restriction_and_coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
-    HfstTransducer deep_restriction(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
-    HfstTransducer deep_coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
-    HfstTransducer deep_restriction_and_coercion(HfstTransducerPairSet &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer restriction_and_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer surface_restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer surface_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer surface_restriction_and_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer deep_restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer deep_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer deep_restriction_and_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
   }
 
 }

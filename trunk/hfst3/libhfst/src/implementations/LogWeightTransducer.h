@@ -64,6 +64,9 @@ namespace implementations
     bool operator() (void) const;
     void ignore(unsigned int);
     LogFst * read_transducer();
+
+    char stream_get();
+    void stream_unget(char c);
     
     static bool is_fst(FILE * f);
     static bool is_fst(istream &s);

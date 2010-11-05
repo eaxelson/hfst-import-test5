@@ -100,6 +100,18 @@ extern const char* program_name;
 #  endif
 #endif
 
+#ifndef HAVE_WARNC
+#  if HAVE_WARNING
+#    define warnc warning
+#  elif HAVE_WARN
+#    define warning(status, errnum, fmt, ...) warn(fmt, __VA_ARGS__ );\
+    if (status > 0) {exit(status);}
+#  else
+#     define warning(status, errnum, fmt, ...) fprintf(message_out, fmt, __VA_ARGS__ );\
+    if (status > 0) {exit(status);}
+#  endif
+#endif
+
 #ifndef HAVE_ERROR_AT_LINE
 void error_at_line(int tatus, int errnum, const char* filename, unsigned int linenum, const char* fmt, ...);
 #endif

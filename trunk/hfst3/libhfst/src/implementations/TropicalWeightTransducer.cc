@@ -35,6 +35,12 @@ namespace hfst { namespace implementations
     filename(filename),i_stream(filename),input_stream(i_stream)
   {}
 
+  char TropicalWeightInputStream::stream_get() {
+    return (char) input_stream.get(); }
+
+  void TropicalWeightInputStream::stream_unget(char c) {
+    input_stream.putback(c); }
+
   void TropicalWeightTransducer::add_symbol_table(StdVectorFst *t, HfstAlphabet &alpha) 
   {
     assert(not openfst_use_symbol_tables);

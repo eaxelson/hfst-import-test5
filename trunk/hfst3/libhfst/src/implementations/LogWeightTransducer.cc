@@ -30,6 +30,12 @@ namespace hfst { namespace implementations
     filename(filename),i_stream(filename),input_stream(i_stream)
   {}
 
+  char LogWeightInputStream::stream_get() {
+    return (char) input_stream.get(); }
+
+  void LogWeightInputStream::stream_unget(char c) {
+    input_stream.putback(c); }
+
   StringSet LogWeightTransducer::get_string_set(LogFst *t)
   {
     assert(t->InputSymbols() != NULL);

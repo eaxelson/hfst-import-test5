@@ -467,11 +467,26 @@ namespace hfst
 
   // TODO
   HfstTransducer * HfstCompiler::restriction( HfstTransducer * t, Twol_Type type, Contexts *c, int direction ) {
-    (void)t;
-    (void)type;
-    (void)c;
-    (void)direction;
-    throw hfst::exceptions::FunctionNotImplementedException();
+
+    StringPairSet sps;
+    for( HfstAlphabet::const_iterator it=TheAlphabet.begin(); it!=TheAlphabet.end(); it++ ) {
+      HfstAlphabet::NumberPair l=*it;
+      sps.insert(StringPair( TheAlphabet.code2symbol(l.first),
+			     TheAlphabet.code2symbol(l.second)) );
+    } 
+
+    HfstTransducerPairVector contexts;
+    Contexts *p = c;
+    while (p != NULL)
+      {
+	HfstTransducerPair tr_pair(*(p->left),*(p->right));
+	contexts.push_back(tr_pair);
+	p = p->next;
+      }
+
+    return new HfstTransducer( hfst::rules::restriction(
+		 contexts, *t, sps,
+		 (hfst::rules::TwolType)type, direction ) ); 
   }
 
   HfstTransducer * HfstCompiler::make_rule( HfstTransducer * lc, Range * lower_range, Twol_Type type, 
