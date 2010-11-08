@@ -11,12 +11,19 @@
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "SfstTransducer.h"
+#include <time.h>
 
 #ifdef DEBUG
 #include <cassert>
 #endif
 
 namespace hfst { namespace implementations {
+
+    float sfst_seconds_in_harmonize=0;
+
+    float SfstTransducer::get_profile_seconds() {
+      return sfst_seconds_in_harmonize;
+    }
 
   void sfst_set_hopcroft(bool value) {
     SFST::Transducer::hopcroft_minimisation=value;
@@ -215,6 +222,8 @@ namespace hfst { namespace implementations {
   (Transducer *t1, Transducer *t2, bool unknown_symbols_in_use) 
   {
 
+    clock_t startclock = clock();
+
     // 1. Calculate the set of unknown symbols for transducers t1 and t2.
 
     StringSet unknown_t1;    // symbols known to another but not this
@@ -249,6 +258,11 @@ namespace hfst { namespace implementations {
       harmonized_t1 = &t1->copy();
       harmonized_t2 = &t2->copy();
     }
+
+    clock_t endclock = clock();
+
+    sfst_seconds_in_harmonize = sfst_seconds_in_harmonize + 
+      ( (float)(endclock - startclock) / CLOCKS_PER_SEC);
 
     return std::pair<Transducer*, Transducer*>(harmonized_t1, harmonized_t2);
 

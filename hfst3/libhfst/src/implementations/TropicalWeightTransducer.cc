@@ -14,6 +14,12 @@
 
 namespace hfst { namespace implementations
 {
+  float tropical_seconds_in_harmonize=0;
+
+    float TropicalWeightTransducer::get_profile_seconds() {
+      return tropical_seconds_in_harmonize;
+    }
+
   bool openfst_tropical_use_hopcroft=false;
 
   bool openfst_use_symbol_tables=true;
@@ -677,6 +683,7 @@ namespace hfst { namespace implementations
   std::pair<StdVectorFst*, StdVectorFst*> TropicalWeightTransducer::harmonize
   (StdVectorFst *t1, StdVectorFst *t2, bool unknown_symbols_in_use)
   {
+    clock_t startclock = clock();
 
     // 1. Calculate the set of unknown symbols for transducers t1 and t2.
 
@@ -727,6 +734,11 @@ namespace hfst { namespace implementations
       harmonized_t2 = expand_arcs(t2, unknown_t2, unknown_symbols_in_use);
       harmonized_t2->SetInputSymbols(t2->InputSymbols());
     }
+
+    clock_t endclock = clock();
+
+    tropical_seconds_in_harmonize = tropical_seconds_in_harmonize + 
+      ( (float)(endclock - startclock) / CLOCKS_PER_SEC);
 
     return std::pair<StdVectorFst*, StdVectorFst*>(harmonized_t1, harmonized_t2);
 

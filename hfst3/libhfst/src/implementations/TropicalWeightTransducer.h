@@ -234,6 +234,8 @@ namespace implementations
 
       static StdVectorFst * remove_from_alphabet(StdVectorFst *t, const std::string &symbol);
 
+      float get_profile_seconds();
+
     private:
       static fst::SymbolTable create_symbol_table(std::string name);
       static void initialize_symbol_tables(StdVectorFst *t);

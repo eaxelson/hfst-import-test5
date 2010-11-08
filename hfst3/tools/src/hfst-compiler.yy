@@ -491,6 +491,7 @@ int main( int argc, char *argv[] )
           printf("\nAn error happened when writing to file \"%s\"\n", outfilename); }
     //printf("type is: %i\n", Result->get_type());
     delete Result;
+    fprintf(stderr, "seconds spent in SFST::harmonize: %f\n", HfstTransducer::get_profile_seconds(output_format));
     // delete compiler;
   }
   catch(const char* p) {

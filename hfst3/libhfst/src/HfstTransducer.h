@@ -50,18 +50,35 @@ HFST - The Helsinki Finite-State Transducer technology is intended for creating 
 
 Currently HFST has been implemented using the SFST, OpenFst and foma software libraries.
 Other versions may be added in some future release. 
-The SFST and foma implementations are unweighted and the OpenFst implementations weighted.
+SFST and foma implementations are unweighted and OpenFst implementation is weighted.
 More info on SFST tools is in http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html,
 OpenFst in http://www.openfst.org and foma in http://www.aclweb.org/anthology/E/E09/E09-2008.pdf.
 
 The examples use Xerox transducer notations ( http://www.xrce.xerox.com/Research-Development/Publications/1997-005/(language) ).
 
+The HFST API is written in the namespace hfst that contains the following classes and namespaces:
+
+   - hfst::HfstTransducer: a class for creating transducers and performing operations on them.
+
+   - hfst::HfstTransducer::rules: a namespace that contains functions to create two-level, replace, restriction and coercion rules.
+
+   - hfst::HfstInputStream and hfst::HfstOutputStream: classes for writing and reading binary transducers.
+
+   - hfst::HfstMutableTransducer, hfst::HfstTransition, hfst::HfstTransitionIterator and hfst::HfstStateIterator: classes for creating transducers from scratch and iterating through their states and transitions.
+
+   - hfst::HfstGrammar ?
+
+   - hfst::exceptions: a namespace for exceptions.
+
 */
 
 
-/** \brief A namespace for the HFST functions and datatypes. */
+/** \brief A namespace for HFST functions and datatypes. */
 namespace hfst
 {
+  using hfst::implementations::HfstOlTransducer;
+  using hfst::WeightedPaths;
+  using hfst::WeightedPath;
 
 #if HAVE_SFST
   using hfst::implementations::SfstTransducer;
@@ -74,16 +91,12 @@ namespace hfst
   using hfst::implementations::LogWeightTransducer;
 #endif
 
-  using hfst::implementations::HfstOlTransducer;
-  using hfst::WeightedPaths;
-  using hfst::WeightedPath;
-
 #if HAVE_FOMA
   using hfst::implementations::FomaTransducer;
 #endif
 
   /** \brief The type of an HfstTransducer. */
-  enum ImplementationType
+  enum ImplementationType 
   {
     SFST_TYPE, /**< An SFST transducer, unweighted. */
     TROPICAL_OFST_TYPE, /**< An OpenFst transducer with tropical weights. */
@@ -91,28 +104,21 @@ namespace hfst
     FOMA_TYPE, /**< A foma transducer, unweighted. */
     HFST_OL_TYPE, /**< An HFST optimized lookup transducer, unweighted */
     HFST_OLW_TYPE, /**< An HFST optimized lookup transducer with weights */
-    HFST2_TYPE, /**< HFST2 header present, conversion required */
-    UNSPECIFIED_TYPE, /**< Format left open by e.g. default constructor */
+    //    HFST2_TYPE, /**< HFST2 header present, conversion required */
+    //    UNSPECIFIED_TYPE, /**< Format left open by e.g. default constructor */
     ERROR_TYPE /**< Type not recognised. 
-		  This type might be returned by a function if an error occurs. */
+		  This type might be returned by a function if an error occurs. */ 
   };
 
+  /** \brief The type of a push operation.
+      @see hfst::implementations::HfstTransducer::push_weights */
   enum PushType
-  {
-    TO_INITIAL_STATE,
-    TO_FINAL_STATE
+  { 
+    TO_INITIAL_STATE /* Push weights towards initial state. */,
+    TO_FINAL_STATE /* Push weights towards final state(s). */ 
   };
 
-  class HfstCompiler;
-
-  class HfstTransducer;
-
-  enum MinimizationAlgorithm
-  {
-    HOPCROFT,
-    BRZOZOWSKI
-  };
-
+  enum MinimizationAlgorithm { HOPCROFT, BRZOZOWSKI };
   /* Which minimization algorithm is used. 
      In foma, Hopcroft is always used. 
      In OpenFst and SFST, the default algorithm is Brzozowski. */
@@ -125,6 +131,11 @@ namespace hfst
      in transducer transitions. */
   void set_unknown_symbols_in_use(bool);
   bool get_unknown_symbols_in_use();
+
+
+  class HfstCompiler;
+  class HfstTransducer;
+
 
   typedef std::pair <HfstTransducer,HfstTransducer> HfstTransducerPair;
   typedef std::set <HfstTransducerPair> HfstTransducerPairSet;
@@ -149,7 +160,6 @@ namespace hfst
          printf("ERROR: File does not exist.\n");
          exit(1);
        }
-       in.open();
        int n=0;
        while (not in.is_eof()) {
          if (in.is_bad()) {
@@ -188,26 +198,32 @@ namespace hfst
       hfst::implementations::HfstOlInputStream * hfst_ol;
     };
 
-    StreamImplementation implementation;
-    ImplementationType type;
-    unsigned int bytes_to_skip;
-    std::string filename;
-    std::istream * input_stream; // if not NULL, first transducer in the stream
+    StreamImplementation implementation; // the backend inplementation
+    ImplementationType type;             // implementation type
+    std::string name;                    // name of next transducer, given in the hfst header
+    unsigned int bytes_to_skip;          // how many bytes have been already read by the function
+                                         // processing the hfst header
+    std::string filename;                // the name of the file, if stdin, name is ""
 
     /* A special case where an OpenFst transducer has no symbol tables but an
        SFST alphabet is appended at the end. Should not occur very often, but
        possible when converting old transducers into version 3.0. transducers.. */
     bool hfst_version_2_weighted_transducer;
-
-    /* The stream implementation ignores n bytes. */
-    void ignore(unsigned int n);
+ 
+    /* the stream that the reading operations use
+       this stream is used when reading the first transducer, when the type of the transducer is not known
+       and thus there is no backend implementation whose reading functions could be used
+       if input_stream==NULL, the backend implementation is used */
+    std::istream * input_stream;
 
     /* Basic stream operators, work on input_stream (if not NULL) or on the stream implementation. */
-    char stream_get();
-    void stream_unget(char c);
-    bool stream_eof();
-    std::string stream_getstring();
-    char stream_peek();
+    char stream_get(); // extract one character from the stream
+    void stream_unget(char c); // return character c to the stream
+    bool stream_eof(); // whether the stream is at end
+    std::string stream_getstring(); // get a string from the stream
+    char stream_peek();     // return the next character in the stream without extracting it
+    /* The stream implementation ignores n bytes. */
+    void ignore(unsigned int n);
 
     /* The type of a transducer not supported directly by HFST version 3.0 
        but which can occur in conversion functions. */
@@ -222,27 +238,28 @@ namespace hfst
       ERROR_TYPE_ /* Transducer type not recognized. */
     };
 
+    /* Read a transducer from the stream. */
     void read_transducer(HfstTransducer &t);
+    /* Type of next transducer in the stream. */
     ImplementationType stream_fst_type();
+
+    // methods used by function stream_fst_type
     TransducerType guess_fst_type(int &bytes_read);
-
     bool read_hfst_header(int &bytes_read);
-
     bool read_library_header(int &bytes_read);
-    int get_header_size(int &bytes_read);                        // throws error
-    StringPairVector get_header_data(int header_size);                // throws error
-    void process_header_data(StringPairVector &header_data, bool warnings=false);   // throws error
+    int get_header_size(int &bytes_read);                        
+    StringPairVector get_header_data(int header_size);                
+    void process_header_data(StringPairVector &header_data, bool warnings=false); 
     bool set_implementation_specific_header_data(StringPairVector &data, unsigned int index);
-
     bool read_library_header_beta(int &bytes_read);
-    ImplementationType get_fst_type_beta(int &bytes_read);       // throws error
+    ImplementationType get_fst_type_beta(int &bytes_read); 
 
   public:
 
     /** \brief Create a stream to standard in for reading binary transducers. */
     HfstInputStream(void);
 
-    /** \brief Open a stream to file \a filename in for reading binary transducers. 
+    /** \brief Open a stream to file \a filename for reading binary transducers. 
 
 	@pre The file exists. Otherwise, an exception is thrown.
 	@throws hfst::exceptions::FileNotReadableException */
@@ -265,7 +282,10 @@ namespace hfst
     /** \brief Whether the next element in the stream is an HfstTransducer. */
     bool is_fst(void);
     
-    /** \brief The type of the first transducer in the stream. */
+    /** \brief The type of the first transducer in the stream. 
+
+	By default, all transducers in a stream have the same type, else
+	an hfst::exceptions::TransducerTypeMismatchException is thrown. */
     ImplementationType get_type(void) const;
 
     friend class HfstTransducer;
@@ -299,20 +319,21 @@ namespace hfst
 #endif
       hfst::implementations::HfstOlOutputStream * hfst_ol;
     };
-    ImplementationType type;
-    bool hfst_format;
-    StreamImplementation implementation;
-
-    // append string s to vector str and a '\0'
-    static void append(std::vector<char> &str, const std::string &s);
+    ImplementationType type; // type of the stream implementation
+    bool hfst_format;  // whether an hfst header is written before every transducer
+    StreamImplementation implementation; // backend implementation
 
     // write data to stream
     void write(const std::string &s);
     void write(const std::vector<char> &s);
     void write(const char &c);
 
+    // append string s to vector str and a '\0'
+    static void append(std::vector<char> &str, const std::string &s);
+
     void append_hfst_header_data(std::vector<char> &header);
     void append_implementation_specific_header_data(std::vector<char> &header, HfstTransducer &transducer);
+
 
   public:
 
@@ -329,7 +350,10 @@ namespace hfst
     /** \brief Delete the stream. */
     ~HfstOutputStream(void);  
 
-    /** \brief Write the transducer \a transducer in binary format to the stream. */
+    /** \brief Write the transducer \a transducer in binary format to the stream. 
+
+	By default, all transducers must have the same type, else an
+	hfst::exceptions::TransducerHasWrongTypeException is thrown. */
     HfstOutputStream &operator<< (HfstTransducer &transducer);
 
     /** \brief Close the stream. 
@@ -417,6 +441,7 @@ namespace hfst
 #endif 
     };
     
+    // interfaces through which the backend implementations can be accessed
 #if HAVE_SFST
     static hfst::implementations::SfstTransducer sfst_interface;
 #endif
@@ -429,30 +454,40 @@ namespace hfst
 #endif
     static hfst::implementations::HfstOlTransducer hfst_ol_interface;
 
-    ImplementationType type;
+    ImplementationType type; // the backend implementation type of the transducer
 
-    bool anonymous;
-    bool is_trie;
-    hfst::implementations::HfstAlphabet * alpha;
+    bool anonymous; // currently not used
+    bool is_trie;   // currently not used
+    hfst::implementations::HfstAlphabet * alpha;  // TODO: remove
+    std::string name; // the name of the transducer
 
-    TransducerImplementation implementation; 
+    TransducerImplementation implementation; // the backend implementation
 
+    /* Harmonize transducers this and another. In harmonization, the symbol-to-number
+       correspondencies of this transducer are recoded so that they are equivalent to the ones
+       used in transducer another. Then the unknown and identity symbols are expanded
+       in both transducers. */
     void harmonize(HfstTransducer &another);
+
+    // currently not implemented, TODO
     HfstTransducer &disjunct_as_tries(HfstTransducer &another,
 				      ImplementationType type);  
 
 #include "apply_schemas.h"
 
+    // whether the conversion requested can be done without losing any information
     bool static is_safe_conversion(ImplementationType original, ImplementationType conversion);
 
   public:
     HfstTransducer();
 
-    /** \brief Create an empty transducer, i.e. a transducer that does not recognize any string. 
+    /** \brief Create an empty transducer, i.e. a transducer that does not recognize any string.
+	The type of the transducer is befined by \a type.
 
-	@note Use HfstTransducer(0) to create an epsilon transducer.
+	@note Use HfstTransducer("@_EPSILON_SYMBOL_@") to create an epsilon transducer.
      **/
     HfstTransducer(ImplementationType type);
+
     /** \brief Create a transducer by tokenizing the utf8 string \a utf8_string
 	with tokenizer \a multichar_symbol_tokenizer.
 	The type of the transducer is defined by \a type. 
@@ -473,6 +508,7 @@ namespace hfst
     HfstTransducer(const std::string& utf8_str, 
     		   const HfstTokenizer &multichar_symbol_tokenizer,
 		   ImplementationType type);
+
     /** \brief Create a transducer by tokenizing 
 	the utf8 input string \a input_utf8_string
 	and output string \a output_utf8_string
@@ -499,7 +535,7 @@ namespace hfst
     		   const HfstTokenizer &multichar_symbol_tokenizer,
 		   ImplementationType type);
 
-
+    // TODO: documentation?
     HfstTransducer(const StringPairSet & sps, ImplementationType type, bool cyclic=false);
     HfstTransducer(const StringPairVector & spv, ImplementationType type);
     HfstTransducer(const std::vector<StringPairSet> & spsv, ImplementationType type);
@@ -514,10 +550,11 @@ namespace hfst
     /** \brief Create a deep copy of transducer \a another. **/
     HfstTransducer(const HfstTransducer &another);
 
-    /** \brief Create an ordinary transducer equivalent to mutable transducer \a t. **/
+    /** \brief Create an ordinary transducer equivalent to mutable transducer \a t.
+	The type of the transducer is defined by \a type.  **/
     HfstTransducer(const HfstMutableTransducer &t, ImplementationType type);
 
-    /** \brief Delete operator for HfstTransducer. **/
+    /** \brief Delete the HfstTransducer. **/
     ~HfstTransducer(void);
 
     /** \brief Create a transducer that recognizes the string pair [symbol:symbol]. The type of the transducer is defined by \a type. **/
@@ -529,25 +566,32 @@ namespace hfst
     /* TEST */
     HfstTransducer(unsigned int number, ImplementationType type);
     HfstTransducer(unsigned int inumber, unsigned int onumber, ImplementationType type);
-
     void print_alphabet();
+
+    /** \brief Set the name of the transducer as \a name. */
+    void set_name(std::string &name);
+    /** \brief Get the name of the transducer. */
+    std::string get_name();
 
     /** \brief Whether transducers \a tr1 and \a tr2 are equivalent.
 
-	Two transducers are equivalent iff they accept the same input/output string pairs with the same weights. **/
+	Two transducers are equivalent iff they accept the same input/output string pairs with the same weights. 
+	(TODO?: Change to bool HfstTransducer::compare(HfstTransducer)) **/
     static bool are_equivalent(const HfstTransducer &tr1, const HfstTransducer &tr2);
 
-    /** \brief Write the transducer in AT & T format to FILE \a ofile. 
+    /** \brief Write the transducer in AT&T format to FILE \a ofile. \a write_weights
+	defines whether weights are written.
 
 	If several transducers are written in the same file, they must be separated by a line
 	of two consecutive hyphens "--".
 
 An example:
 \verbatim
-HfstTransducer foobar("foo","bar");
-HfstTransducer epsilon("");
-HfstTransducer empty();
-HfstTransducer a_star("a");
+ImplementationType type = FOMA_TYPE;
+HfstTransducer foobar("foo","bar",type);
+HfstTransducer epsilon("@_EPSILON_SYMBOL_@",type);
+HfstTransducer empty(type);
+HfstTransducer a_star("a",type);
 a_star.repeat_star();
 
 FILE * ofile = fopen("testfile.att", "wb");
@@ -576,7 +620,8 @@ This will yield a file "testfile.att" that looks as follows:
 	@see hfst::operator<<(std::ostream &out,HfstTransducer &t) read_in_att_format **/
     void write_in_att_format(FILE * ofile, bool write_weights=true);
 
-    /** \brief Create a transducer of type \a type as defined in AT & T format in FILE \a ifile.
+    /** \brief Create a transducer of type \a type as defined in AT&T format in FILE \a ifile.
+	\a epsilon_symbol defines how epsilons are represented.
 	
 	Lines are of the form "source_state TAB destination_state TAB input_symbol TAB output_symbol (TAB weight)"
 	or "final_state (TAB weight)". If several transducers are listed in the same file, they are separated
@@ -598,16 +643,19 @@ An example:
 	epsilon transducer, one empty transducer and one transducer accepting any number of 'a's. The transducers
 	can be read with the following commands (from a file named "testfile.att"):
 \verbatim
+std::vector<HfstTransducer> transducers;
 FILE * ifile = fopen("testfile.att", "rb");
 try {
   while (not eof(ifile))
     {
     HfstTransducer t = HfstTransducer::read_in_att_format(ifile);
+    transducers.push_back(t);
     printf("read one transducer\n");
     }
 } catch (NotValidAttFormatException e) {
     printf("Error reading transducer: not valid AT&T format.\n"); }
 fclose(ifile);
+fprintf(stderr, "Read %i transducers in total.\n", (int)transducers.size());
 \endverbatim
 
 @throws hfst::exceptions::NotValidAttFormatException
@@ -615,7 +663,8 @@ fclose(ifile);
 **/
     static HfstTransducer &read_in_att_format(FILE * ifile, ImplementationType type, const std::string &epsilon_symbol);
 
-    /** \brief \brief Write the transducer in AT & T format to FILE named \a filename. 
+    /** \brief \brief Write the transducer in AT&T format to FILE named \a filename. \a write_weights
+	defines whether weights are written.
 
 	If the file exists, it is overwritten. If the file does not exist, it is created. 
 
@@ -623,6 +672,7 @@ fclose(ifile);
     void write_in_att_format(const char * filename, bool write_weights=true);
 
     /** \brief Create a transducer of type \a type as defined in AT & T format in file named \a filename.
+	\a epsilon_symbol defines how epsilons are represented.
 
 	@pre The file exists, otherwise an exception is thrown.
 	@see read_in_att_format(FILE*,ImplementationType)
@@ -631,17 +681,20 @@ fclose(ifile);
 
     /** \brief Remove all epsilon:epsilon transitions from this transducer. */
     HfstTransducer &remove_epsilons();
+
     /** \brief Determinize this transducer.
 
 	Determinizing a transducer yields an equivalent transducer that has
 	no state with two or more transitions whose input:output symbol pairs are the same. */
     HfstTransducer &determinize();
+
     /** \brief Minimize this transducer.
 
 	Minimizing a transducer yields an equivalent transducer with the smallest number of states. 
      
-	@bug OpenFst's minimization algorithm seems to add epsilon transitions to weighted transducers. */
+	@bug OpenFst's minimization algorithm seems to add epsilon transitions to weighted transducers? */
     HfstTransducer &minimize();
+
     /** \brief Extract \a n best paths of this transducer. 
 
 	In the case of a weighted transducer (TROPICAL_OFST_TYPE or LOG_OFST_TYPE), best paths are defined as paths with the lowest weight.
@@ -693,7 +746,7 @@ fclose(ifile);
 	All transition symbol pairs "isymbol:osymbol" are changed to "osymbol:osymbol". */
     HfstTransducer &output_project();
 
-    /** \brief Call \a callback with some or all string pairs recognized by the transducer
+    /** \brief Call \a callback with some or all string pairs recognized by the transducer?
 
 	If the callback returns false the search will be terminated. The \a cycles parameter
 	indicates how many times a cycle will be followed, with negative numbers
@@ -728,13 +781,35 @@ fclose(ifile);
     void extract_strings_fd(WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1, bool filter_fd=true);
 
     /** \brief Freely insert symbol pair \a symbol_pair into the transducer. */
-
     HfstTransducer &insert_freely(const StringPair &symbol_pair);
 
-    /** \brief Substitute all transition pairs isymbol:osymbol according to function \a func. */
+    /** \brief Substitute all transition pairs isymbol:osymbol according to function \a func. 
+
+	An example:
+\verbatim
+void function(std::string &isymbol, std::string &osymbol) {
+  if (osymbol.compare(isymbol) != 0)
+    return;
+  if (osymbol.compare("a") == 0 ||
+      osymbol.compare("o") == 0 ||
+      osymbol.compare("u") == 0)
+    osymbol = std::string("<back_wovel>");
+  if (osymbol.compare("e") == 0 ||
+      osymbol.compare("i") == 0)
+    osymbol = std::string("<front_wovel>");
+}
+
+...
+
+// For all transitions in transducer t whose input and output wovels are equivalent, substitute the output wovel
+// with a symbol that defines whether the wovel in question is a front or back wovel.
+t.substitute(&func);
+\endverbatim       	
+*/
     HfstTransducer &substitute(void (*func)(std::string &isymbol, std::string &osymbol));
 
-    /** \brief Substitute all transition symbols equal to \a old_symbol with symbol \a new_symbol. 
+    /** \brief Substitute all transition symbols equal to \a old_symbol with symbol \a new_symbol.
+	\a input_side and \a output_side define whether the substitution is made on input and output sides.
 
 	The transition weights remain the same. */
     HfstTransducer &substitute(const std::string &old_symbol,
@@ -744,9 +819,9 @@ fclose(ifile);
 						      
     /** \brief Substitute all transition symbol pairs equal to \a old_symbol_pair with \a new_symbol_pair. 
 
-	Implemented only for TROPICAL_OFST_TYPE and LOG_OFST_TYPE.
 	The transition weights remain the same.
 
+	Implemented only for TROPICAL_OFST_TYPE and LOG_OFST_TYPE.
 	If this function is called by an unweighted HfstTransducer, it is converted to weighted one,
 	substitution is done and it is converted back to the original format.
 
@@ -757,9 +832,9 @@ fclose(ifile);
     /** \brief Substitute all transitions whose symbol pairs are equal to \a old_symbol_pair 
 	with a set of transitions whose symbol pairs are equal to \a new_symbol_pair_set. 
 
-	Implemented only for TROPICAL_OFST_TYPE and LOG_OFST_TYPE.
 	The weight of the original transition is copied to all new transitions.
 
+	Implemented only for TROPICAL_OFST_TYPE and LOG_OFST_TYPE.
 	If this function is called by an unweighted HfstTransducer (SFST_TYPE or FOMA_TYPE), it is converted to TROPICAL_OFST,
 	substitution is done and it is converted back to the original format.
 
@@ -769,10 +844,10 @@ fclose(ifile);
 
     /** \brief Substitute all transitions equal to \a symbol_pair with a copy of transducer \a transducer. 
 
-	Implemented only for TROPICAL_OFST_TYPE and LOG_OFST_TYPE.
 	A copy of \a transducer is attached between the source and target states of the original transition with epsilon transitions.
 	The weight of the original transition is copied to the epsilon transition leaving from the source state.
 
+	Implemented only for TROPICAL_OFST_TYPE and LOG_OFST_TYPE.
 	If this function is called by an unweighted HfstTransducer (SFST_TYPE or FOMA_TYPE), it is converted to TROPICAL_OFST,
 	substitution is done and it is converted back to the original format.
 
@@ -794,6 +869,8 @@ fclose(ifile);
       return 2*f + 0.5; 
     }
 
+    ...
+
     // All transition and final weights are multiplied by two and summed with 0.5.
     HfstTransducer t_transformed =
       t.transform_weights(&func);
@@ -803,6 +880,11 @@ fclose(ifile);
     */
     HfstTransducer &transform_weights(float (*func)(float));
 
+    /** \brief Push weights towards initial or final state(s).
+
+	If the HfstTransducer is of unweighted type (SFST_TYPE or FOMA_TYPE), nothing is done.
+	@see PushType
+    */
     HfstTransducer &push_weights(PushType type);
 
     /** \brief Compose this transducer with \a another. */
@@ -828,6 +910,8 @@ fclose(ifile);
     HfstTransducer &subtract(const HfstTransducer &another);
 
 
+    // are these needed?
+
     /* \brief Compose this transducer with another. */
     static HfstTransducer &compose(HfstTransducer &t1, HfstTransducer &t2,
 				   ImplementationType type=UNSPECIFIED_TYPE);
@@ -849,12 +933,15 @@ fclose(ifile);
     /** \brief Whether \a t is cyclic. */
     bool is_cyclic(void) const;
 
-    /** \brief The type of the transducer. */
+    /** \brief The implementation type of the transducer. */
     ImplementationType get_type(void) const;
 
-    StringPairSet get_symbol_pairs();
 
-    //HfstTransducer &remove_from_alphabet(const HfstTransducer &t, const std::string &symbol);
+    /* TEST */
+    static float get_profile_seconds(ImplementationType type);
+
+    /* Get all symbol pairs that occur in the transitions of this transducer. */
+    StringPairSet get_symbol_pairs();
 
     /** \brief Convert this transducer into an equivalent transducer in format \a type. 
 
@@ -867,14 +954,6 @@ fclose(ifile);
 	@see convert(ImplementationType type) */
     static HfstTransducer &convert(const HfstTransducer &t, ImplementationType type);
 
-    /*    static HfstTransducer * 
-      internal_to_hfst_transducer(
-	hfst::implementations::HfstInternalTransducer * internal_transducer, 
-	ImplementationType type);
-    static hfst::implementations::HfstInternalTransducer * 
-      hfst_transducer_to_internal(
-      const HfstTransducer *transducer);*/
-
     static bool is_implementation_type_available(ImplementationType type);
 
     HfstTokenizer create_tokenizer();
@@ -885,11 +964,6 @@ fclose(ifile);
     friend class HfstOutputStream;
     friend class hfst::implementations::HfstInternalTransducer;
 
-    //#if HAVE_MUTABLE
-    //friend class HfstMutableTransducer;
-    //friend class HfstStateIterator;
-    //friend class HfstTransitionIterator;
-    //#endif
 #if HAVE_OPENFST
     friend class HfstGrammar;
 #endif
@@ -1086,11 +1160,13 @@ void print(HfstMutableTransducer &t)
     HfstTransducer replace_in_context(HfstTransducerPair &context, ReplaceType repl_type, HfstTransducer &t, bool optional, StringPairSet &alphabet);
 
 
+    // maybe enum TWO_LEVEL_RULE { IF_RULE, ONLY_IF_RULE, IF_AND_ONLY_IF_RULE }
     /** \brief ... */
     HfstTransducer two_level_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
     HfstTransducer two_level_only_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
     HfstTransducer two_level_if_and_only_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
 
+    // maybe enum REPLACE_RULE { REPLACE_UP, REPLACE_DOWN, REPLACE_RIGHT, REPLACE_LEFT }
     HfstTransducer replace_up(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
     HfstTransducer replace_down(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
     HfstTransducer replace_right(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
@@ -1098,12 +1174,12 @@ void print(HfstMutableTransducer &t)
 
     HfstTransducer replace_up(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
     HfstTransducer replace_down(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
-    //HfstTransducer replace_right(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
-    //HfstTransducer replace_left(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
 
+    /* Used by hfst-calculate. */
     HfstTransducer restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet,
 			       TwolType twol_type, int direction ); 
 
+    // maybe enum ?
     HfstTransducer restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
     HfstTransducer coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
     HfstTransducer restriction_and_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
