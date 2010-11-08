@@ -143,6 +143,8 @@ namespace implementations
 
       static StringPairSet get_symbol_pairs(Transducer *t);
 
+      float get_profile_seconds();
+
     protected:
       static void initialize_alphabet(Transducer *t);
       static StringSet get_string_set(Transducer *t);

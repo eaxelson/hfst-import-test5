@@ -12,26 +12,23 @@
 #ifndef _LOG_WEIGHT_TRANSDUCER_H_
 #define _LOG_WEIGHT_TRANSDUCER_H_
 
-
 #include "SymbolDefs.h"
 #include "HfstExceptions.h"
 #include "FlagDiacritics.h"
 #include <fst/fstlib.h>
 #include "ExtractStrings.h"
-#include "LogFstTrieFunctions.h"
 #include <cstdio>
 #include <string>
 #include <sstream>
 #include <iostream>
- 
+#include "HfstAlphabet.h"
+
 namespace hfst { 
 namespace implementations
 {
   using namespace fst;
   using namespace hfst::exceptions;
-
-  typedef ArcTpl<LogWeight>::StateId StateId;
-  typedef ArcTpl<LogWeight> LogArc;
+  typedef LogArc::StateId StateId;
   typedef VectorFst<LogArc> LogFst;
 
   using std::ostream;
@@ -39,18 +36,14 @@ namespace implementations
   using std::stringstream;
 
   void openfst_log_set_hopcroft(bool value);
+  void openfst_log_set_use_symbol_tables(bool value);
 
-  //extern GlobalSymbolTable global_symbol_table;
   class LogWeightInputStream 
   {
   private:
     std::string filename;
     ifstream i_stream;
     istream &input_stream;
-    /*void populate_key_table(KeyTable &key_table,
-			    const SymbolTable * i_symbol_table,
-			    const SymbolTable * o_symbol_table,
-			    KeyMap &key_map);*/
     void skip_identifier_version_3_0(void);
     void skip_hfst_header(void);
   public:
@@ -138,16 +131,21 @@ namespace implementations
     public:
       static LogFst * create_empty_transducer(void);
       static LogFst * create_epsilon_transducer(void);
+
+      // string versions
       static LogFst * define_transducer(const std::string &symbol);
       static LogFst * define_transducer(const std::string &isymbol, const std::string &osymbol);
-
-      /* TEST */
-      static LogFst * define_transducer(unsigned int number);
-      static LogFst * define_transducer(unsigned int inumber, unsigned int onumber);
-
       static LogFst * define_transducer(const hfst::StringPairVector &spv);
       static LogFst * define_transducer(const hfst::StringPairSet &sps, bool cyclic=false);
       static LogFst * define_transducer(const std::vector<StringPairSet> &spsv);
+
+      // number versions
+      static LogFst * define_transducer(unsigned int number);
+      static LogFst * define_transducer(unsigned int inumber, unsigned int onumber);
+      static LogFst * define_transducer(const hfst::NumberPairVector &npv);
+      static LogFst * define_transducer(const hfst::NumberPairSet &nps, bool cyclic=false);
+      static LogFst * define_transducer(const std::vector<NumberPairSet> &npsv);
+
       static LogFst * copy(LogFst * t);
       static LogFst * determinize(LogFst * t);
       static LogFst * minimize(LogFst * t);
@@ -170,6 +168,10 @@ namespace implementations
 					LogFst * t2);
       static LogFst * disjunct(LogFst * t1,
 			      LogFst * t2);
+
+      static LogFst * disjunct(LogFst * t, const StringPairVector &spv);
+      static LogFst * disjunct(LogFst * t, const NumberPairVector &npv);
+
       static LogFst * intersect(LogFst * t1,
 			     LogFst * t2);
       static LogFst * subtract(LogFst * t1,
@@ -196,6 +198,7 @@ namespace implementations
       
       static FdTable<int64>* get_flag_diacritics(LogFst * t);
 
+      // string versions
       static LogFst * insert_freely(LogFst * t, const StringPair &symbol_pair);
       static LogFst * substitute(LogFst * t, std::string old_symbol, std::string new_symbol);
       static LogFst * substitute(LogFst * t,
@@ -207,30 +210,35 @@ namespace implementations
       static LogFst * substitute(LogFst * t,
 				       const StringPair old_symbol_pair,
 				       LogFst *transducer);
+      static LogFst * substitute(LogFst *t, void (*func)(std::string &isymbol, std::string &osymbol) );
+
+      // number versions
+      static LogFst * insert_freely(LogFst * t, const NumberPair &number_pair);
+      static LogFst * substitute(LogFst * t, unsigned int, unsigned int);
+      static LogFst * substitute(LogFst * t,
+				       NumberPair old_number_pair,
+				       NumberPair new_number_pair);
+      static LogFst * substitute(LogFst * t,
+				       const NumberPair old_number_pair,
+				       LogFst *transducer);
 
       static StringSet get_string_set(LogFst *t);
       static NumberNumberMap create_mapping(LogFst * t1, LogFst * t2);
+      //static std::vector<unsigned int> create_mapping(LogFst * t1, LogFst * t2);
       static void recode_symbol_numbers(LogFst * t, hfst::NumberNumberMap &km);      
-      static LogFst * expand_arcs(LogFst * t, hfst::StringSet &unknown);
-      static LogFst * substitute(LogFst * t,unsigned int old_key,unsigned int new_key);
-      static LogFst * substitute(LogFst *t, void (*func)(std::string &isymbol, std::string &osymbol) );
-      static LogFst * substitute(LogFst * t,
-      				       pair<unsigned int, unsigned int> old_key_pair,
-      				       pair<unsigned int, unsigned int> new_key_pair);
-      static void disjunct_as_tries(LogFst &t1,
-				    const LogFst * t2);
-      //      static LogFst * compose_intersect(LogFst * t,
-      //				      Grammar * grammar);
-      //static LogFst * define_transducer(Key k);
-      //static LogFst * define_transducer(const KeyPair &kp);
-      //static LogFst * define_transducer(const KeyPairVector &kpv);
+      //static void recode_symbol_numbers(LogFst * t, std::vector<unsigned int> &km);      
+      static LogFst * expand_arcs(LogFst * t, hfst::StringSet &unknown, bool unknown_symbols_in_use);
 
       static LogFst * remove_from_alphabet(LogFst *t, const std::string &symbol);
+
+      float get_profile_seconds();
 
     private:
       static fst::SymbolTable create_symbol_table(std::string name);
       static void initialize_symbol_tables(LogFst *t);
-      
+      static void add_symbol_table(LogFst *t, HfstAlphabet &alpha); 
+      static void remove_symbol_table(LogFst *t);      
+
     public:
       /* For HfstMutableTransducer */
       static StateId add_state(LogFst *t);

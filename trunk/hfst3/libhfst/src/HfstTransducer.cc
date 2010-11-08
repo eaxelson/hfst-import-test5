@@ -202,12 +202,12 @@ namespace hfst
   // *** Transducer constructors and destructor *** //
 
   HfstTransducer::HfstTransducer():
-    type(UNSPECIFIED_TYPE),anonymous(false),is_trie(true),alpha(NULL)
+    type(UNSPECIFIED_TYPE),anonymous(false),is_trie(true),alpha(NULL), name("")
   {}
 
 
   HfstTransducer::HfstTransducer(ImplementationType type):
-    type(type),anonymous(false),is_trie(true),alpha(NULL)
+    type(type),anonymous(false),is_trie(true),alpha(NULL), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -251,7 +251,7 @@ namespace hfst
 				 const HfstTokenizer 
 				 &multichar_symbol_tokenizer,
 				 ImplementationType type):
-    type(type),anonymous(false),is_trie(true),alpha(NULL)
+    type(type),anonymous(false),is_trie(true),alpha(NULL), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -290,8 +290,17 @@ namespace hfst
     delete spv;
   }
 
+  float HfstTransducer::get_profile_seconds(ImplementationType type)
+  {
+    if (type == SFST_TYPE)
+      return sfst_interface.get_profile_seconds();
+    if (type == TROPICAL_OFST_TYPE)
+      return tropical_ofst_interface.get_profile_seconds();
+    return 0;
+  }
+
   HfstTransducer::HfstTransducer(const StringPairVector & spv, ImplementationType type):
-    type(type), anonymous(false), is_trie(false),alpha(NULL)
+    type(type), anonymous(false), is_trie(false),alpha(NULL), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -331,7 +340,7 @@ namespace hfst
   }
 
   HfstTransducer::HfstTransducer(const StringPairSet & sps, ImplementationType type, bool cyclic):
-    type(type),anonymous(false),is_trie(false),alpha(NULL)
+    type(type),anonymous(false),is_trie(false),alpha(NULL), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -371,7 +380,7 @@ namespace hfst
   }
 
   HfstTransducer::HfstTransducer(const std::vector<StringPairSet> & spsv, ImplementationType type):
-    type(type),anonymous(false),is_trie(false),alpha(NULL)
+    type(type),anonymous(false),is_trie(false),alpha(NULL), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -415,7 +424,7 @@ namespace hfst
 				 const HfstTokenizer 
 				 &multichar_symbol_tokenizer,
 				 ImplementationType type):
-    type(type),anonymous(false),is_trie(true),alpha(NULL)
+    type(type),anonymous(false),is_trie(true),alpha(NULL), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -457,7 +466,7 @@ namespace hfst
 
 
   HfstTransducer::HfstTransducer(HfstInputStream &in):
-    type(in.type), anonymous(false),is_trie(false),alpha(NULL)
+    type(in.type), anonymous(false),is_trie(false),alpha(NULL), name("")
   { 
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -465,7 +474,7 @@ namespace hfst
   }
 
   HfstTransducer::HfstTransducer(const HfstTransducer &another):
-    type(another.type),anonymous(another.anonymous),is_trie(another.is_trie),alpha(NULL)
+    type(another.type),anonymous(another.anonymous),is_trie(another.is_trie),alpha(NULL), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -500,7 +509,7 @@ namespace hfst
   }
 
   HfstTransducer::HfstTransducer(const HfstMutableTransducer &mut, ImplementationType type):
-    type(type),anonymous(mut.alphabet == NULL),is_trie(false),alpha(NULL)
+    type(type),anonymous(mut.alphabet == NULL),is_trie(false),alpha(NULL), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -570,9 +579,18 @@ namespace hfst
       }
   }
 
+  void HfstTransducer::set_name(std::string &name) {
+    this->name = name;
+  }
+   
+  std::string HfstTransducer::get_name() {
+    return this->name;
+  }
+
+
   /* For internal use. */
 HfstTransducer::HfstTransducer(unsigned int number, ImplementationType type): 
-  type(type),anonymous(true),is_trie(false),alpha(NULL)
+  type(type),anonymous(true),is_trie(false),alpha(NULL), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -612,7 +630,7 @@ HfstTransducer::HfstTransducer(unsigned int number, ImplementationType type):
 
   /* For internal use. */
 HfstTransducer::HfstTransducer(unsigned int inumber, unsigned int onumber, ImplementationType type):
-  type(type),anonymous(true),is_trie(false),alpha(NULL)
+  type(type),anonymous(true),is_trie(false),alpha(NULL), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -654,7 +672,7 @@ HfstTransducer::HfstTransducer(unsigned int inumber, unsigned int onumber, Imple
 
 
 HfstTransducer::HfstTransducer(const std::string &symbol, ImplementationType type): 
-  type(type),anonymous(false),is_trie(false),alpha(NULL)
+  type(type),anonymous(false),is_trie(false),alpha(NULL), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -690,7 +708,7 @@ HfstTransducer::HfstTransducer(const std::string &symbol, ImplementationType typ
   }
 
 HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type):
-  type(type),anonymous(false),is_trie(false),alpha(NULL)
+  type(type),anonymous(false),is_trie(false),alpha(NULL), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -1723,8 +1741,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	throw hfst::exceptions::FunctionNotImplementedException();
 	break;
       case LOG_OFST_TYPE:
-	hfst::implementations::LogWeightTransducer::disjunct_as_tries
-	  (*implementation.log_ofst,another.implementation.log_ofst);
+	throw hfst::exceptions::FunctionNotImplementedException();
 	break;
 #endif
       case FOMA_TYPE:

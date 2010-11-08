@@ -120,7 +120,7 @@ namespace hfst
 
   std::string HfstInputStream::stream_getstring()
   {
-    std::string retval;
+    std::string retval("");
     while (true) {
       char c = stream_get();
       if (stream_eof())
@@ -209,6 +209,8 @@ namespace hfst
 	throw hfst::exceptions::NotTransducerStreamException();
 	break;
       }
+
+    t.set_name(name);
   }
 
   HfstInputStream::TransducerType HfstInputStream::guess_fst_type(int &bytes_read)
@@ -320,12 +322,24 @@ namespace hfst
     else
       throw hfst::exceptions::TransducerHeaderException();
 
-    // (3) an optional pair "minimal", ("true"|"false") if type == SFST_TYPE
-    // FIX: forward this information to SfstInputStream's transducer
     if (header_data.size() == 2)
       return;
 
-    if (not (set_implementation_specific_header_data(header_data, 2)) && warnings)
+    // (3) third optional pair "name", (string)
+    if (header_data[2].first.compare("name") == 0) {
+      name = header_data[2].second;
+    }
+    // (3) an optional pair "minimal", ("true"|"false") if type == SFST_TYPE
+    // FIX: forward this information to SfstInputStream's transducer
+    else {
+      if (not (set_implementation_specific_header_data(header_data, 2)) && warnings)
+	fprintf(stderr, "Warning: Transducer header has extra data that cannot be used.\n");
+    }
+
+    if (header_data.size() == 3)
+      return;
+    
+    if (not (set_implementation_specific_header_data(header_data, 3)) && warnings)
       fprintf(stderr, "Warning: Transducer header has extra data that cannot be used.\n");
   }
 

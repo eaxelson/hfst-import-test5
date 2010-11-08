@@ -240,6 +240,8 @@ namespace hfst
       const int MAX_HEADER_LENGTH=65535;
       std::vector<char> header;
       append_hfst_header_data(header);
+      append(header, "name");
+      append(header, transducer.name);
       append_implementation_specific_header_data(header, transducer);
 
       write("HFST");
