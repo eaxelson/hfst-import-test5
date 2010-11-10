@@ -6,6 +6,8 @@
 
 #include <map>
 
+using std::map;
+
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
