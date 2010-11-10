@@ -34,9 +34,6 @@
 #if HAVE_ERROR_H
 #  include <error.h>
 #endif
-#if HAVE_ERR_H
-#  include <err.h>
-#endif
 
 #include "HfstTransducer.h"
 
@@ -77,43 +74,18 @@ extern const char* program_name;
 /** @brief print standard formatted error message and exit if needed
  */
 #ifndef HAVE_ERROR
-#  if HAVE_ERRC
-#    define error errc
-#  elif HAVE_ERR
-#    define error(status, errnum, fmt, ...) err(status, fmt, __VA_ARGS__ )
-#  else
-#    define error(status, errnum, fmt, ...) fprintf(stderr, fmt, _VA_ARGS__ );\
+#  define error(status, errnum, fmt, ...) fprintf(stderr, fmt, _VA_ARGS__ );\
     if (status > 0) {exit(status);}
-#  endif
 #endif
 /** @brief print standard formatted warning message and exit if needed
  */
 #ifndef HAVE_WARNING
-#  if HAVE_WARNC
-#    define warning warnc
-#  elif HAVE_WARN
-#    define warning(status, errnum, fmt, ...) warn(fmt, __VA_ARGS__ );\
+#  define warning(status, errnum, fmt, ...) fprintf(message_out, fmt, __VA_ARGS__ );\
     if (status > 0) {exit(status);}
-#  else
-#     define warning(status, errnum, fmt, ...) fprintf(message_out, fmt, __VA_ARGS__ );\
-    if (status > 0) {exit(status);}
-#  endif
-#endif
-
-#ifndef HAVE_WARNC
-#  if HAVE_WARNING
-#    define warnc warning
-#  elif HAVE_WARN
-#    define warning(status, errnum, fmt, ...) warn(fmt, __VA_ARGS__ );\
-    if (status > 0) {exit(status);}
-#  else
-#     define warning(status, errnum, fmt, ...) fprintf(message_out, fmt, __VA_ARGS__ );\
-    if (status > 0) {exit(status);}
-#  endif
 #endif
 
 #ifndef HAVE_ERROR_AT_LINE
-void error_at_line(int tatus, int errnum, const char* filename, unsigned int linenum, const char* fmt, ...);
+void error_at_line(int status, int errnum, const char* filename, unsigned int linenum, const char* fmt, ...);
 #endif
 
 /**
