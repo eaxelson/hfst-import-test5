@@ -104,7 +104,7 @@ namespace hfst
     FOMA_TYPE, /**< A foma transducer, unweighted. */
     HFST_OL_TYPE, /**< An HFST optimized lookup transducer, unweighted */
     HFST_OLW_TYPE, /**< An HFST optimized lookup transducer with weights */
-    //    HFST2_TYPE, /**< HFST2 header present, conversion required */
+    HFST2_TYPE, /**< HFST2 header present, conversion required */
     UNSPECIFIED_TYPE, /**< Format left open by e.g. default constructor */
     ERROR_TYPE /**< Type not recognised. 
 		  This type might be returned by a function if an error occurs. */ 
