@@ -406,7 +406,7 @@ if test "x$with_foma" == "xbundled"; then
 fi
 
 # Checks for header files
-AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h err.h glob.h])
+AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h])
 
 AC_LANG([C++])
 
@@ -443,7 +443,7 @@ AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_FUNC_STRTOD
-AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strcspn strtol strtoul error error_at_line errc err warnc warn strndup getline getopt_long strtod xstrdup set_program_name setprogname])
+AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strcspn strtol strtoul error error_at_line strndup getline getopt_long strtod xstrdup set_program_name setprogname])
 
 # Checks for system services
 
