@@ -292,10 +292,14 @@ namespace hfst
 
   float HfstTransducer::get_profile_seconds(ImplementationType type)
   {
+#if HAVE_SFST
     if (type == SFST_TYPE)
       return sfst_interface.get_profile_seconds();
+#endif
+#if HAVE_OPENFST
     if (type == TROPICAL_OFST_TYPE)
       return tropical_ofst_interface.get_profile_seconds();
+#endif
     return 0;
   }
 
