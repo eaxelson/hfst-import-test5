@@ -1014,9 +1014,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
     if (this->type != SFST_TYPE)
       throw hfst::exceptions::FunctionNotImplementedException();
 
+    std::vector<HfstTransducer*> hfst_paths;
 #if HAVE_SFST
     std::vector<SFST::Transducer*> sfst_paths = sfst_interface.extract_paths(this->implementation.sfst);
-    std::vector<HfstTransducer*> hfst_paths;
     for (std::vector<SFST::Transducer*>::iterator it = sfst_paths.begin(); it != sfst_paths.end(); it++)
       {
 	HfstTransducer *tr = new HfstTransducer(SFST_TYPE);
@@ -1024,8 +1024,8 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	tr->implementation.sfst = *it;
 	hfst_paths.push_back(tr);
       }
-    return hfst_paths;
 #endif
+    return hfst_paths;
   }
 
   void HfstTransducer::extract_strings(ExtractStringsCb& callback, int cycles)
