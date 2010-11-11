@@ -378,8 +378,8 @@ namespace hfst
 	//fprintf(stderr, "#4#\n");
       int type_bytes=0;
       type = get_fst_type_beta(type_bytes); // throws error
+      fprintf(stderr, "type is %i\n", type);
       if (type == ERROR_TYPE) {
-	error("#4");
 	throw hfst::exceptions::NotTransducerStreamException();
       }
       bytes_read = header_bytes + type_bytes;
@@ -396,17 +396,17 @@ namespace hfst
       	error("#5");
       throw hfst::exceptions::NotTransducerStreamException();
     }
-    if (fst_type.compare("SFST_TYPE") != 0)
+    if (fst_type.compare("SFST_TYPE") == 0)
       { bytes_read=10; return SFST_TYPE; }
-    if (fst_type.compare("FOMA_TYPE") != 0)
+    if (fst_type.compare("FOMA_TYPE") == 0)
       { bytes_read=10; return FOMA_TYPE; }
-    if (fst_type.compare("TROPICAL_OFST_TYPE") != 0)
+    if (fst_type.compare("TROPICAL_OFST_TYPE") == 0)
       { bytes_read=19; return TROPICAL_OFST_TYPE; }
-    if (fst_type.compare("LOG_OFST_TYPE") != 0)
+    if (fst_type.compare("LOG_OFST_TYPE") == 0)
       { bytes_read=14; return LOG_OFST_TYPE; }
-    if (fst_type.compare("HFST_OL_TYPE") != 0)
+    if (fst_type.compare("HFST_OL_TYPE") == 0)
       { bytes_read=13; return HFST_OL_TYPE; }
-    if (fst_type.compare("HFST_OLW_TYPE") != 0)
+    if (fst_type.compare("HFST_OLW_TYPE") == 0)
       { bytes_read=14; return HFST_OLW_TYPE; }
     return ERROR_TYPE;
   }

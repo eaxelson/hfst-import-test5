@@ -777,7 +777,7 @@ fprintf(stderr, "Read %i transducers in total.\n", (int)transducers.size());
 	All transition symbol pairs "isymbol:osymbol" are changed to "osymbol:osymbol". */
     HfstTransducer &output_project();
 
-    /** \brief Call \a callback with some or all string pairs recognized by the transducer?
+    /* \brief Call \a callback with some or all string pairs recognized by the transducer?
 
 	If the callback returns false the search will be terminated. The \a cycles parameter
 	indicates how many times a cycle will be followed, with negative numbers
@@ -798,7 +798,7 @@ fprintf(stderr, "Read %i transducers in total.\n", (int)transducers.size());
 	@see #n_best */
     void extract_strings(WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1);
     
-    /** \brief Call \a callback with extracted strings that are not invalidated by
+    /* \brief Call \a callback with extracted strings that are not invalidated by
                flag diacritic rules.
 	@see extract_strings */             
     void extract_strings_fd(ExtractStringsCb& callback, int cycles=-1, bool filter_fd=true);
