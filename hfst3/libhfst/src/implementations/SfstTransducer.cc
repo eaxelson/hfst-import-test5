@@ -30,7 +30,7 @@ namespace hfst { namespace implementations {
   }
 
     /** Create an SfstInputStream that reads from stdin. */
-    SfstInputStream::SfstInputStream(void):
+  SfstInputStream::SfstInputStream(void):
       is_minimal(false)
   {
     this->input_file = stdin;
@@ -630,9 +630,29 @@ namespace hfst { namespace implementations {
   { t->complete_alphabet();
     return &t->upper_level(); }
 
+  std::pair<Transducer*, Transducer*> SfstTransducer::harmonize 
+  (Transducer *t1, Transducer *t2, bool unknown_symbols_in_use) ;
+
   std::vector<Transducer*> SfstTransducer::extract_paths(Transducer *t)
   { vector<Transducer*> paths;
+    //fprintf(stderr, "enumerating paths from transducer:\n");
+    //std::cerr << *t;
     t->enumerate_paths(paths);
+    //fprintf(stderr, "paths enumerated\n");
+    // paths contains vectors whose alphabet does not have special symbols
+    Transducer *foo = define_transducer("@_EPSILON_SYMBOL_@");
+    for (unsigned int i=0; i<(unsigned int)paths.size(); i++) {
+      (paths[i])->alphabet.copy(t->alphabet);
+      //fprintf(stderr, "harmonizing transducer\n");
+      //std::cerr << *paths[i];  // prints symbol "\3"
+      //fprintf(stderr, "according to transducer\n");
+      //std::cerr << *foo;
+      std::pair<Transducer*,Transducer*> harm = harmonize(paths[i],foo,false);
+      //delete paths[i];
+      paths[i] = harm.first;
+      //delete harm.second;
+    }
+    delete foo;
     return paths;
   }
 
@@ -957,6 +977,12 @@ namespace hfst { namespace implementations {
   {
     std::set<Node*> visited_nodes;
     expand2(t, t->root_node(), new_symbols, visited_nodes);
+  }
+
+  unsigned int SfstTransducer::number_of_states(Transducer *t)
+  {
+    NodeNumbering nn(*t);
+    return (unsigned int) nn.number_of_nodes();
   }
 
 } }

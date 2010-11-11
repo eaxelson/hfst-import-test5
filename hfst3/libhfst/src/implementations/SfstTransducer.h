@@ -144,6 +144,7 @@ namespace implementations
       static StringPairSet get_symbol_pairs(Transducer *t);
 
       float get_profile_seconds();
+      static unsigned int number_of_states(Transducer *t);
 
     protected:
       static void initialize_alphabet(Transducer *t);

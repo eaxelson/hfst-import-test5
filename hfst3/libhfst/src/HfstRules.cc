@@ -181,9 +181,9 @@ namespace hfst
 	throw hfst::exceptions::TransducerTypeMismatchException();
       ImplementationType type = context.first.get_type();
 
-      assert(context.first.get_type() != UNSPECIFIED_TYPE);
+      //assert(context.first.get_type() != UNSPECIFIED_TYPE);
       assert(context.second.get_type() != ERROR_TYPE);
-      assert(context.first.get_type() != UNSPECIFIED_TYPE);
+      //assert(context.first.get_type() != UNSPECIFIED_TYPE);
       assert(context.second.get_type() != ERROR_TYPE);
 
       // calculate [ a:. ]
@@ -235,9 +235,9 @@ namespace hfst
 	throw hfst::exceptions::TransducerTypeMismatchException();
       ImplementationType type = context.first.get_type();
 
-      assert(context.first.get_type() != UNSPECIFIED_TYPE);
+      //assert(context.first.get_type() != UNSPECIFIED_TYPE);
       assert(context.second.get_type() != ERROR_TYPE);
-      assert(context.first.get_type() != UNSPECIFIED_TYPE);
+      //assert(context.first.get_type() != UNSPECIFIED_TYPE);
       assert(context.second.get_type() != ERROR_TYPE);
 
       // center = a:b

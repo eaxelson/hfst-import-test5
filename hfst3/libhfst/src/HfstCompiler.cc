@@ -368,9 +368,9 @@ namespace hfst
 
   HfstTransducer * HfstCompiler::explode( HfstTransducer *t ) {
 
-    //printf("explode...\n");
+    //fprintf(stderr,"explode...\n");
     if (RS.size() == 0 && RSS.size() == 0) {
-      //printf("... no need to explode\n");
+      //fprintf(stderr, "... no need to explode\n");
       return t;
     }
     
@@ -389,7 +389,7 @@ namespace hfst
     
     // replace all agreement variables
     for( size_t i=0; i<name.size(); i++ ) {
-      //printf("substituting transducer agreement variable \"%s\"\n", name[i]);
+      //fprintf(stderr, "substituting transducer agreement variable \"%s\"\n", name[i]);
       HfstTransducer *nt = new HfstTransducer(t->get_type()); // an initially empty transducer
       
       // enumerate all paths of the transducer
@@ -397,7 +397,10 @@ namespace hfst
       std::vector<HfstTransducer*> transducer_paths;
 
       if (t->type == SFST_TYPE) {
+	//fprintf(stderr, "extracting paths in transducer: ...\n");
+	//cerr << *vt;
 	transducer_paths = vt->extract_paths();
+	//fprintf(stderr, "...extracted\n");
 	delete vt;
       }
       else {
@@ -414,15 +417,16 @@ namespace hfst
 	}
       }
       
+
       // insert each path
       for( size_t j=0; j<transducer_paths.size(); j++ ) {
-	//printf("  substituting transducer agreement variable \"%s\" with transducer:\n", name[i]);
+	//fprintf(stderr, "  substituting transducer agreement variable \"%s\" with transducer:\n", name[i]);
 	//cerr << *(transducer_paths[j]);
 	HfstTransducer ti(*t);
 	//printf("in transducer:\n");
 	//cerr << ti;
 	ti.substitute(StringPair(std::string(name[i]), std::string(name[i])), *(transducer_paths[j]));
-	//printf("  ...substituted\n");
+	//fprintf(stderr, "  ...substituted\n");
 	delete transducer_paths[j];	
 	nt->disjunct(ti);
       }
@@ -855,6 +859,8 @@ namespace hfst
     tr->minimize();
 
     TheAlphabet.clear_pairs();
+    TheAlphabet.add("@_UNKNOWN_SYMBOL_@", 1);
+    TheAlphabet.add("@_IDENTITY_SYMBOL_@", 2);
 
     // no effect on performance in OMorFi, but in Morphisto?
     if (false || tr->type == SFST_TYPE)

@@ -775,7 +775,7 @@ namespace hfst {
 	case HFST_OLW_TYPE:
 	  throw hfst::exceptions::FunctionNotImplementedException();
 	  break;
-	case UNSPECIFIED_TYPE:
+	  //case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
 	  throw hfst::exceptions::TransducerHasWrongTypeException();

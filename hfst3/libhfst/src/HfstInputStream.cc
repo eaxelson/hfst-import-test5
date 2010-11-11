@@ -203,7 +203,7 @@ namespace hfst
 	  { t.convert(type); }
 	break;
       case ERROR_TYPE:
-      case UNSPECIFIED_TYPE:
+	//case UNSPECIFIED_TYPE:
       default:
 	error("#1");
 	throw hfst::exceptions::NotTransducerStreamException();
@@ -692,7 +692,7 @@ namespace hfst
 	delete implementation.hfst_ol;
 	break;
       case ERROR_TYPE:
-      case UNSPECIFIED_TYPE:
+	//case UNSPECIFIED_TYPE:
       default:
 	error("#11");
 	throw hfst::exceptions::NotTransducerStreamException();

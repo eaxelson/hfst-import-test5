@@ -41,7 +41,7 @@ static int Switch=0;
 HfstCompiler * compiler;
 HfstTransducer * Result;
 
-static hfst::ImplementationType output_format = hfst::UNSPECIFIED_TYPE;
+static hfst::ImplementationType output_format = hfst::ERROR_TYPE; // = hfst::UNSPECIFIED_TYPE;
 bool DEBUG=false;
 
 
@@ -323,11 +323,12 @@ parse_options(int argc, char** argv)
         HFST_GETOPT_COMMON_LONG,
         HFST_GETOPT_UNARY_LONG,
           {"format", required_argument, 0, 'f'},
+	  {"harmonize-smaller", no_argument, 0, 'H'},	  
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "f:",
+                             HFST_GETOPT_UNARY_SHORT "f:H",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -341,6 +342,9 @@ parse_options(int argc, char** argv)
         case 'f':
             output_format = hfst_parse_format_name(optarg);
             break;
+	case 'H':
+	    hfst::set_harmonize_smaller(true);
+	    break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -348,7 +352,7 @@ parse_options(int argc, char** argv)
 #include "inc/check-params-common.h"
 #include "inc/check-params-unary.h"
     Verbose = verbose;	 
-    if (output_format == hfst::UNSPECIFIED_TYPE)
+    if (output_format == hfst::ERROR_TYPE)
       {
         verbose_printf("Output format not specified, "
              "defaulting to openfst tropical\n");
@@ -435,20 +439,8 @@ int main( int argc, char *argv[] )
   hfst_set_program_name(argv[0], "0.1", "HfstCalculate");
   int retval = parse_options(argc, argv);
   if (retval != EXIT_CONTINUE)
-    {
-      return retval;
-    }
-  //get_flags(&argc, argv);
-  //if (argc < 3) {
-  //  print_usage();
-  //  exit(1);
-  //}
-  //if ((file = fopen(argv[1],"rt")) == NULL) {
-  //  fprintf(stderr,"\nError: Cannot open grammar file \"%s\"\n\n", argv[1]);
-  //  exit(1);
-  //}
-  //FileName = argv[1];
-  //Result = NULL;
+    return retval;
+
   yyin = inputfile;  
   if (strcmp(outfilename,"<stdout>") != 0)
     fclose(outfile); // stream is used when writing the result
@@ -461,28 +453,7 @@ int main( int argc, char *argv[] )
   try {
     yyparse();
     fclose(inputfile);
-    //Result->alphabet.utf8 = UTF8;
-    //if (Verbose)
-    //  cerr << "\n";
-    //if (Result->is_empty()) 
-    //  warn("resulting transducer is empty"); 
-    //if ((file = fopen(argv[2],"wb")) == NULL) {
-    //	fprintf(stderr,"\nError: Cannot open output file %s\n\n", argv[2]);
-    //	exit(1);
-    //}
-    //if (Compact) {
-    //  MakeCompactTransducer ca(*Result);
-    //  delete Result;
-    //  ca.store(file);
-    //}
-    //else if (LowMem)
-    //  Result->store_lowmem(file);
       try {
-      /*bool DEBUG=false;
-      if (DEBUG) { printf("writing to file..\n");
-         	   //std::cerr << *Result;
-		   Result->print_alphabet();
-      }*/
         if (strcmp(outfilename,"<stdout>") == 0)
           compiler->write_to_file(Result, "");
 	else
@@ -491,7 +462,7 @@ int main( int argc, char *argv[] )
           printf("\nAn error happened when writing to file \"%s\"\n", outfilename); }
     //printf("type is: %i\n", Result->get_type());
     delete Result;
-    fprintf(stderr, "seconds spent in SFST::harmonize: %f\n", HfstTransducer::get_profile_seconds(output_format));
+    // fprintf(stderr, "seconds spent in SFST::harmonize: %f\n", HfstTransducer::get_profile_seconds(output_format));
     // delete compiler;
   }
   catch(const char* p) {

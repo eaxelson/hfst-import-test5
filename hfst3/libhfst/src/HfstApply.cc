@@ -88,7 +88,7 @@ namespace hfst
 	  break;
     }
 #endif
-      case UNSPECIFIED_TYPE:
+	//case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -151,7 +151,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
 	  break;
     }
 #endif
-	case UNSPECIFIED_TYPE:
+	//case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -215,7 +215,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
       break;
 	}
 #endif
-	case UNSPECIFIED_TYPE:
+	//case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -246,7 +246,8 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
 
     // harmonize this according to symbol coding of another
     // and expand unknowns and identities of both transducers
-    this->harmonize(another);
+    //this->harmonize(another);
+    another.harmonize(*this);  // faster?
 
     switch (this->type)
       {
@@ -290,7 +291,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
 	  break;
 	}
 #endif
-	case UNSPECIFIED_TYPE:
+	//case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
 	  throw hfst::exceptions::TransducerHasWrongTypeException();

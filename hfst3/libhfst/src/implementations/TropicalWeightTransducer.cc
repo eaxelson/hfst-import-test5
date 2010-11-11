@@ -680,6 +680,15 @@ namespace hfst { namespace implementations
     return result;
   }
 
+  unsigned int TropicalWeightTransducer::number_of_states(const StdVectorFst *t)
+  {
+    unsigned int retval=0;
+    for (fst::StateIterator<StdVectorFst> siter(*t); 
+	 not siter.Done(); siter.Next())
+      retval++;
+    return retval;
+  }
+
   std::pair<StdVectorFst*, StdVectorFst*> TropicalWeightTransducer::harmonize
   (StdVectorFst *t1, StdVectorFst *t2, bool unknown_symbols_in_use)
   {

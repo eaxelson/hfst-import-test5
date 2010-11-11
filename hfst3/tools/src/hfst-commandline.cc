@@ -161,7 +161,7 @@ hfst_strtoul(char *s, int base)
 hfst::ImplementationType
 hfst_parse_format_name(const char* s)
 {
-  hfst::ImplementationType rv = hfst::UNSPECIFIED_TYPE;
+  hfst::ImplementationType rv; // = hfst::UNSPECIFIED_TYPE;
     if (strcasecmp(optarg, "sfst") == 0)
       {
         rv = hfst::SFST_TYPE;
