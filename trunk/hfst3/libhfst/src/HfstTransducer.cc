@@ -28,6 +28,13 @@ namespace hfst
 #endif
 
   MinimizationAlgorithm minimization_algorithm=HOPCROFT;
+  bool harmonize_smaller=false;
+
+  void set_harmonize_smaller(bool value) {
+    harmonize_smaller=value; }
+
+  bool get_harmonize_smaller(void) {
+    return harmonize_smaller; }
 
   void set_minimization_algorithm(MinimizationAlgorithm a) {
     minimization_algorithm=a; 
@@ -146,12 +153,24 @@ namespace hfst
       case (SFST_TYPE):
 	{
 	  std::pair <SFST::Transducer*, SFST::Transducer*> result;
-	  result =
-	    sfst_interface.harmonize(this->implementation.sfst,
-				     another.implementation.sfst,
-				     unknown_symbols_in_use);
-	  this->implementation.sfst = result.first;
-	  another.implementation.sfst = result.second;
+	  if ( harmonize_smaller && 
+	       sfst_interface.number_of_states(this->implementation.sfst) >
+	       sfst_interface.number_of_states(another.implementation.sfst) ) {
+	    result =
+	      sfst_interface.harmonize(another.implementation.sfst,
+				       this->implementation.sfst,
+				       unknown_symbols_in_use);
+	    this->implementation.sfst = result.second;
+	    another.implementation.sfst = result.first;
+	  }
+	  else {
+	    result =
+	      sfst_interface.harmonize(this->implementation.sfst,
+				       another.implementation.sfst,
+				       unknown_symbols_in_use);
+	    this->implementation.sfst = result.first;
+	    another.implementation.sfst = result.second;
+	  }
 	  break;
 	}
 #endif
@@ -166,16 +185,33 @@ namespace hfst
 	  std::pair <fst::StdVectorFst*, fst::StdVectorFst*> result;
 	  if (this->alpha != NULL && (this->alpha == another.alpha) && not unknown_symbols_in_use)
 	    break;
-	  result =
-	    tropical_ofst_interface.harmonize(this->implementation.tropical_ofst,
-					      another.implementation.tropical_ofst,
-					      unknown_symbols_in_use);	  
-	  if (unknown_symbols_in_use) {  // new transducers are created
-	    delete another.implementation.tropical_ofst;
-	    delete this->implementation.tropical_ofst; 
+
+	  if ( harmonize_smaller && 
+	       tropical_ofst_interface.number_of_states(this->implementation.tropical_ofst) >
+	       tropical_ofst_interface.number_of_states(another.implementation.tropical_ofst) ) {
+	    result =
+	      tropical_ofst_interface.harmonize(another.implementation.tropical_ofst,
+						this->implementation.tropical_ofst,
+						unknown_symbols_in_use);	  
+	    if (unknown_symbols_in_use) {  // new transducers are created
+	      delete another.implementation.tropical_ofst;
+	      delete this->implementation.tropical_ofst; 
+	    }
+	    this->implementation.tropical_ofst = result.second;
+	    another.implementation.tropical_ofst = result.first;
 	  }
-	  this->implementation.tropical_ofst = result.first;
-	  another.implementation.tropical_ofst = result.second;
+	  else {
+	    result =
+	      tropical_ofst_interface.harmonize(this->implementation.tropical_ofst,
+						another.implementation.tropical_ofst,
+						unknown_symbols_in_use);	  
+	    if (unknown_symbols_in_use) {  // new transducers are created
+	      delete another.implementation.tropical_ofst;
+	      delete this->implementation.tropical_ofst; 
+	    }
+	    this->implementation.tropical_ofst = result.first;
+	    another.implementation.tropical_ofst = result.second;
+	  }
 	  break;
 	}
       case (LOG_OFST_TYPE):
@@ -192,7 +228,7 @@ namespace hfst
 	  break;
 	}
 #endif
-      case (UNSPECIFIED_TYPE):
+	//case (UNSPECIFIED_TYPE):
       case (ERROR_TYPE):
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -202,7 +238,7 @@ namespace hfst
   // *** Transducer constructors and destructor *** //
 
   HfstTransducer::HfstTransducer():
-    type(UNSPECIFIED_TYPE),anonymous(false),is_trie(true),alpha(NULL), name("")
+    type(ERROR_TYPE),anonymous(false),is_trie(true),alpha(NULL), name("")
   {}
 
 
@@ -221,7 +257,7 @@ namespace hfst
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
-      case UNSPECIFIED_TYPE:
+	//case UNSPECIFIED_TYPE:
 	implementation.tropical_ofst = 
 	  tropical_ofst_interface.create_empty_transducer();
 	this->type = TROPICAL_OFST_TYPE;
@@ -267,7 +303,7 @@ namespace hfst
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
-      case UNSPECIFIED_TYPE:
+	//case UNSPECIFIED_TYPE:
 	implementation.tropical_ofst = 
 	  tropical_ofst_interface.define_transducer(*spv);
 	this->type = TROPICAL_OFST_TYPE;
@@ -319,7 +355,7 @@ namespace hfst
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
-      case UNSPECIFIED_TYPE:
+	//case UNSPECIFIED_TYPE:
 	implementation.tropical_ofst = 
 	  tropical_ofst_interface.define_transducer(spv);
 	this->type = TROPICAL_OFST_TYPE;
@@ -359,7 +395,7 @@ namespace hfst
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
-      case UNSPECIFIED_TYPE:
+	//case UNSPECIFIED_TYPE:
 	implementation.tropical_ofst = 
 	  tropical_ofst_interface.define_transducer(sps,cyclic);
 	this->type = TROPICAL_OFST_TYPE;
@@ -399,7 +435,7 @@ namespace hfst
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
-      case UNSPECIFIED_TYPE:
+	//case UNSPECIFIED_TYPE:
 	implementation.tropical_ofst = 
 	  tropical_ofst_interface.define_transducer(spsv);
 	this->type = TROPICAL_OFST_TYPE;
@@ -445,7 +481,7 @@ namespace hfst
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
-      case UNSPECIFIED_TYPE:
+	//case UNSPECIFIED_TYPE:
 	implementation.tropical_ofst = 
 	  tropical_ofst_interface.define_transducer(*spv);
 	this->type = TROPICAL_OFST_TYPE;
@@ -505,7 +541,7 @@ namespace hfst
 	implementation.foma = foma_interface.copy(another.implementation.foma);
 	break;
 #endif
-      case UNSPECIFIED_TYPE:
+	//case UNSPECIFIED_TYPE:
       case ERROR_TYPE:
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -539,7 +575,7 @@ namespace hfst
 	implementation.foma = hfst_internal_format_to_foma(&mut);
 	break;
 #endif
-      case UNSPECIFIED_TYPE:
+	//case UNSPECIFIED_TYPE:
       case ERROR_TYPE:
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -576,7 +612,7 @@ namespace hfst
       case HFST_OLW_TYPE:
 	delete implementation.hfst_ol;
 	break;
-      case UNSPECIFIED_TYPE:
+      // case UNSPECIFIED_TYPE:
       case ERROR_TYPE:
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -608,7 +644,7 @@ HfstTransducer::HfstTransducer(unsigned int number, ImplementationType type):
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
-      case UNSPECIFIED_TYPE:
+      // case UNSPECIFIED_TYPE:
 	implementation.tropical_ofst = tropical_ofst_interface.define_transducer(number);
 	this->type = TROPICAL_OFST_TYPE;
 	break;
@@ -648,7 +684,7 @@ HfstTransducer::HfstTransducer(unsigned int inumber, unsigned int onumber, Imple
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
-      case UNSPECIFIED_TYPE:
+      // case UNSPECIFIED_TYPE:
 	implementation.tropical_ofst = tropical_ofst_interface.define_transducer(inumber, onumber);
 	this->type = TROPICAL_OFST_TYPE;
 	break;
@@ -690,7 +726,7 @@ HfstTransducer::HfstTransducer(const std::string &symbol, ImplementationType typ
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
-      case UNSPECIFIED_TYPE:
+      // case UNSPECIFIED_TYPE:
 	implementation.tropical_ofst = tropical_ofst_interface.define_transducer(symbol);
 	this->type = TROPICAL_OFST_TYPE;
 	break;
@@ -726,7 +762,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
-      case UNSPECIFIED_TYPE:
+      // case UNSPECIFIED_TYPE:
 	implementation.tropical_ofst = tropical_ofst_interface.define_transducer(isymbol, osymbol);
 	this->type = TROPICAL_OFST_TYPE;
 	break;
@@ -750,6 +786,44 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 
   ImplementationType HfstTransducer::get_type(void) const {
     return this->type;
+  }
+
+  bool HfstTransducer::compare(const HfstTransducer &another) const
+  {
+    if (this->type != another.type)
+      throw hfst::exceptions::TransducerTypeMismatchException();
+
+    HfstTransducer one_copy(*this);
+    HfstTransducer another_copy(another);
+    one_copy.harmonize(another_copy);
+    one_copy.minimize();
+    another_copy.minimize();
+
+    switch (one_copy.type)
+      {
+#if HAVE_SFST
+      case SFST_TYPE:
+	return one_copy.sfst_interface.are_equivalent(
+                 one_copy.implementation.sfst, another_copy.implementation.sfst);
+#endif
+#if HAVE_OPENFST
+      case TROPICAL_OFST_TYPE:
+	return one_copy.tropical_ofst_interface.are_equivalent(
+                 one_copy.implementation.tropical_ofst, another_copy.implementation.tropical_ofst);
+      case LOG_OFST_TYPE:
+	return one_copy.log_ofst_interface.are_equivalent(
+                 one_copy.implementation.log_ofst, another_copy.implementation.log_ofst);
+#endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+	return one_copy.foma_interface.are_equivalent(
+                 one_copy.implementation.foma, another_copy.implementation.foma);
+#endif
+      case ERROR_TYPE:
+      default:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+      }
+
   }
 
   bool HfstTransducer::are_equivalent(const HfstTransducer &one, const HfstTransducer &another) 
@@ -1437,7 +1511,13 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
   { 
     if (this->type != transducer.type)
       throw hfst::exceptions::TransducerTypeMismatchException ();   
+
+    bool harm = harmonize_smaller;
+    harmonize_smaller=false;
+    //fprintf(stderr,"HARMONIZING...\n");
     this->harmonize(transducer);
+    //fprintf(stderr,"...HARMONIZED\n");
+    harmonize_smaller=harm;
 
 #if HAVE_FOMA
     if (this->type == FOMA_TYPE)
@@ -1565,6 +1645,15 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
     }
   }
 
+  unsigned int HfstTransducer::number_of_states() const
+  {
+    if (type != TROPICAL_OFST_TYPE)
+      return 0;
+    else
+      return this->tropical_ofst_interface.number_of_states
+	(this->implementation.tropical_ofst);
+  }
+
   HfstTransducer &HfstTransducer::compose
   (const HfstTransducer &another)
   { is_trie = false;
@@ -1575,7 +1664,6 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
     bool DEBUG=false;
 
     if (DEBUG) printf("harmonizing for composition..\n");
-
     this->harmonize(const_cast<HfstTransducer&>(another));
 
     if (DEBUG) printf("..done\n");
@@ -1632,7 +1720,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
           break;
         }
 #endif
-      case UNSPECIFIED_TYPE:
+      // case UNSPECIFIED_TYPE:
       case ERROR_TYPE:
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -1729,36 +1817,29 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
   HfstTransducer &HfstTransducer::disjunct_as_tries(HfstTransducer &another,
 						    ImplementationType type)
   {
-    if (type != UNSPECIFIED_TYPE)
-      { 
-	convert(type);
-	if (type != another.type)
-	  { another = HfstTransducer(another).convert(type); }
-      }
+    convert(type);
+    if (type != another.type)
+      { another = HfstTransducer(another).convert(type); }
+
     switch (this->type)
       {
       case SFST_TYPE:
-	throw hfst::exceptions::FunctionNotImplementedException();
-	break;
+	throw hfst::exceptions::FunctionNotImplementedException(); break;
 #if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
-	throw hfst::exceptions::FunctionNotImplementedException();
-	break;
+	throw hfst::exceptions::FunctionNotImplementedException(); break;
       case LOG_OFST_TYPE:
-	throw hfst::exceptions::FunctionNotImplementedException();
-	break;
+	throw hfst::exceptions::FunctionNotImplementedException(); break;
 #endif
       case FOMA_TYPE:
-	throw hfst::exceptions::FunctionNotImplementedException();
-	break;
+	throw hfst::exceptions::FunctionNotImplementedException(); break;
       default:
 	assert(false);
       }
     return *this; 
   }
 
-  HfstTransducer &HfstTransducer::n_best
-  (unsigned int n)
+  HfstTransducer &HfstTransducer::n_best(unsigned int n) 
   {
     if (not is_implementation_type_available(TROPICAL_OFST_TYPE)) {
       (void)n;
@@ -1794,7 +1875,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	  break;
 	}
 #endif
-      case UNSPECIFIED_TYPE:
+      // case UNSPECIFIED_TYPE:
       case ERROR_TYPE:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
       case HFST_OL_TYPE:
@@ -1863,7 +1944,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 
   HfstTransducer &HfstTransducer::convert(const HfstTransducer &t, ImplementationType type)
   {
-    if (type == UNSPECIFIED_TYPE)
+    if (type == ERROR_TYPE)
       { throw hfst::implementations::SpecifiedTypeRequiredException(); }
     if (type == t.type)
       { return *(new HfstTransducer(t)); }
@@ -1899,7 +1980,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 
   HfstTransducer &HfstTransducer::convert(ImplementationType type)
   {
-    if (type == UNSPECIFIED_TYPE)
+    if (type == ERROR_TYPE)
       { throw hfst::implementations::SpecifiedTypeRequiredException(); }
     if (type == this->type)
       { return *this; }
@@ -1944,7 +2025,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	    break;
 #endif
 	case ERROR_TYPE:
-	case UNSPECIFIED_TYPE:
+	// case UNSPECIFIED_TYPE:
 	default:
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
 	  }
@@ -1961,7 +2042,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #endif
 #if HAVE_OPENFST
 	  case TROPICAL_OFST_TYPE:
-	  case UNSPECIFIED_TYPE:
+	  // case UNSPECIFIED_TYPE:
 	    implementation.tropical_ofst =
 	      hfst::implementations::hfst_internal_format_to_tropical_ofst(internal);
 	    delete internal;
@@ -1996,7 +2077,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
   }
 
 
-void HfstTransducer::write_in_att_format(const char * filename, bool print_weights)
+void HfstTransducer::write_in_att_format(const char * filename, bool print_weights) const
 {
   FILE * ofile = fopen(filename, "wb");
   if (ofile == NULL)
@@ -2005,10 +2086,49 @@ void HfstTransducer::write_in_att_format(const char * filename, bool print_weigh
   fclose(ofile);
 }
 
-void HfstTransducer::write_in_att_format(FILE * ofile, bool print_weights)
+void HfstTransducer::write_in_att_format(FILE * ofile, bool print_weights) const
 {
   hfst::implementations::HfstInternalTransducer internal_transducer(*this);
   internal_transducer.print_symbol(ofile, print_weights);
+}
+
+HfstTransducer::HfstTransducer(FILE * ifile, ImplementationType type, const std::string &epsilon_symbol):
+  type(type),anonymous(false),is_trie(false),alpha(NULL), name("")
+{
+  if (not is_implementation_type_available(type))
+    throw hfst::exceptions::ImplementationTypeNotAvailableException();
+  hfst::implementations::HfstInternalTransducer * internal_transducer = new hfst::implementations::HfstInternalTransducer();
+  internal_transducer->alphabet = new hfst::implementations::HfstAlphabet();
+  internal_transducer->read_symbol(ifile, epsilon_symbol);
+
+  switch (type)
+      {
+#if HAVE_SFST
+      case SFST_TYPE:
+	implementation.sfst = hfst_internal_format_to_sfst(internal_transducer);
+	break;
+#endif
+#if HAVE_OPENFST
+      case TROPICAL_OFST_TYPE:
+	implementation.tropical_ofst = hfst_internal_format_to_tropical_ofst(internal_transducer);
+	  
+	break;
+      case LOG_OFST_TYPE:
+	implementation.log_ofst = hfst_internal_format_to_log_ofst(internal_transducer);	  
+	break;
+#endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+	implementation.foma = hfst_internal_format_to_foma(internal_transducer);
+	break;
+#endif
+      // case UNSPECIFIED_TYPE:
+      case ERROR_TYPE:
+      default:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+      }
+
+  delete internal_transducer;
 }
 
 HfstTransducer &HfstTransducer::read_in_att_format(const char * filename, ImplementationType type, const std::string &epsilon_symbol)
@@ -2065,7 +2185,7 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
       delete implementation.log_ofst;
       break;
 #endif
-    case UNSPECIFIED_TYPE:
+    // case UNSPECIFIED_TYPE:
     case ERROR_TYPE:
     default:
       throw hfst::exceptions::TransducerHasWrongTypeException();

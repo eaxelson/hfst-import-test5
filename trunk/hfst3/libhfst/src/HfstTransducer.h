@@ -60,7 +60,7 @@ The HFST API is written in the namespace hfst that contains the following classe
 
    - hfst::HfstTransducer: a class for creating transducers and performing operations on them.
 
-   - hfst::HfstTransducer::rules: a namespace that contains functions to create two-level, replace, restriction and coercion rules.
+   - hfst::rules: a namespace that contains functions to create two-level, replace, restriction and coercion rules.
 
    - hfst::HfstInputStream and hfst::HfstOutputStream: classes for writing and reading binary transducers.
 
@@ -114,8 +114,8 @@ namespace hfst
       @see hfst::implementations::HfstTransducer::push_weights */
   enum PushType
   { 
-    TO_INITIAL_STATE /* Push weights towards initial state. */,
-    TO_FINAL_STATE /* Push weights towards final state(s). */ 
+    TO_INITIAL_STATE /**< Push weights towards initial state. */,
+    TO_FINAL_STATE /**< Push weights towards final state(s). */ 
   };
 
   enum MinimizationAlgorithm { HOPCROFT, BRZOZOWSKI };
@@ -124,6 +124,9 @@ namespace hfst
      In OpenFst and SFST, the default algorithm is Brzozowski. */
   void set_minimization_algorithm(MinimizationAlgorithm);
   MinimizationAlgorithm get_minimization_algorithm(); 
+
+  void set_harmonize_smaller(bool);
+  bool get_harmonize_smaller(void);
 
   /* Whether unknown and identity symbols are used. By default, they are used.
      These symbols are always reserved for use and included in alphabets of transducers,
@@ -419,6 +422,27 @@ namespace hfst
     Transducers can also be created from scratch with hfst::HfstMutableTransducer and converted to an HfstTransducer.
     More complex transducers can be combined from simple ones with various functions.
 
+    \section special_symbols Special symbols
+
+    Strings "@_EPSILON_SYMBOL_@", "@_UNKNOWN_SYMBOL_@" and "@_IDENTITY_SYMBOL_@" are reserved.
+    "@_EPSILON_SYMBOL_@" denotes the epsilon. "@_UNKNOWN_SYMBOL_@" denotes an unknown symbol, 
+    i.e. any symbol that does not occur or has not occurred in the transducer. "@_IDENTITY_SYMBOL_@"
+    denotese any unknown symbol that is the same on the input and output side of a transition.
+    More on unknown and identity handling in (link).
+
+An example:
+\verbatim
+ImplementationType type = SFST_TYPE;
+HfstTransducer unk_eps("@_UNKNOWN_SYMBOL_@", "foo");
+HfstTransducer id_bar("@_IDENTITY_SYMBOL_@");
+HfstTransducer bar("bar");
+id_bar.concatenate(bar); 
+
+// id_bar is expanded to [ [ @_IDENTITY_SYMBOL_@:@_IDENTITY_SYMBOL_@ | foo:foo ] [ bar:bar ] ]
+// unk_eps is expanded to [ @_UNKNOWN_SYMBOL_@:foo | bar:foo ]
+unk_eps.disjunct(id);
+\endverbatim
+
   */
   class HfstTransducer
   {
@@ -462,6 +486,8 @@ namespace hfst
     std::string name; // the name of the transducer
 
     TransducerImplementation implementation; // the backend implementation
+
+    unsigned int number_of_states() const;
 
     /* Harmonize transducers this and another. In harmonization, the symbol-to-number
        correspondencies of this transducer are recoded so that they are equivalent to the ones
@@ -573,11 +599,14 @@ namespace hfst
     /** \brief Get the name of the transducer. */
     std::string get_name();
 
-    /** \brief Whether transducers \a tr1 and \a tr2 are equivalent.
+    /** \brief Whether this transducer and \a another are equivalent.
 
 	Two transducers are equivalent iff they accept the same input/output string pairs with the same weights. 
-	(TODO?: Change to bool HfstTransducer::compare(HfstTransducer)) **/
+    */
+    bool compare(const HfstTransducer &another) const;
+
     static bool are_equivalent(const HfstTransducer &tr1, const HfstTransducer &tr2);
+
 
     /** \brief Write the transducer in AT&T format to FILE \a ofile. \a write_weights
 	defines whether weights are written.
@@ -618,7 +647,7 @@ This will yield a file "testfile.att" that looks as follows:
 \endverbatim
 
 	@see hfst::operator<<(std::ostream &out,HfstTransducer &t) read_in_att_format **/
-    void write_in_att_format(FILE * ofile, bool write_weights=true);
+    void write_in_att_format(FILE * ofile, bool write_weights=true) const;
 
     /** \brief Create a transducer of type \a type as defined in AT&T format in FILE \a ifile.
 	\a epsilon_symbol defines how epsilons are represented.
@@ -648,7 +677,7 @@ FILE * ifile = fopen("testfile.att", "rb");
 try {
   while (not eof(ifile))
     {
-    HfstTransducer t = HfstTransducer::read_in_att_format(ifile);
+    HfstTransducer t(ifile, TROPICAL_OFST_TYPE, "<epsilon>");
     transducers.push_back(t);
     printf("read one transducer\n");
     }
@@ -661,6 +690,8 @@ fprintf(stderr, "Read %i transducers in total.\n", (int)transducers.size());
 @throws hfst::exceptions::NotValidAttFormatException
 @see write_in_att_format
 **/
+    HfstTransducer(FILE * ifile, ImplementationType type, const std::string &epsilon_symbol);
+
     static HfstTransducer &read_in_att_format(FILE * ifile, ImplementationType type, const std::string &epsilon_symbol);
 
     /** \brief \brief Write the transducer in AT&T format to FILE named \a filename. \a write_weights
@@ -669,9 +700,9 @@ fprintf(stderr, "Read %i transducers in total.\n", (int)transducers.size());
 	If the file exists, it is overwritten. If the file does not exist, it is created. 
 
 	@see write_in_att_format(FILE*) */
-    void write_in_att_format(const char * filename, bool write_weights=true);
+    void write_in_att_format(const char * filename, bool write_weights=true) const;
 
-    /** \brief Create a transducer of type \a type as defined in AT & T format in file named \a filename.
+    /* \brief Create a transducer of type \a type as defined in AT & T format in file named \a filename.
 	\a epsilon_symbol defines how epsilons are represented.
 
 	@pre The file exists, otherwise an exception is thrown.
@@ -880,7 +911,7 @@ t.substitute(&func);
     */
     HfstTransducer &transform_weights(float (*func)(float));
 
-    /** \brief Push weights towards initial or final state(s).
+    /** \brief Push weights towards initial or final state(s) as defined by \a type.
 
 	If the HfstTransducer is of unweighted type (SFST_TYPE or FOMA_TYPE), nothing is done.
 	@see PushType
@@ -912,6 +943,7 @@ t.substitute(&func);
 
     // are these needed?
 
+#ifdef foo
     /* \brief Compose this transducer with another. */
     static HfstTransducer &compose(HfstTransducer &t1, HfstTransducer &t2,
 				   ImplementationType type=UNSPECIFIED_TYPE);
@@ -927,7 +959,7 @@ t.substitute(&func);
     /* \brief Subtract another transducer from this transducer. */
     static HfstTransducer &subtract(HfstTransducer &t1, HfstTransducer &t2,
 				    ImplementationType type=UNSPECIFIED_TYPE);
-
+#endif
 
     
     /** \brief Whether \a t is cyclic. */
@@ -1145,6 +1177,7 @@ void print(HfstMutableTransducer &t)
       @see HfstTransducer::write_in_att_format(FILE*) */
   std::ostream &operator<<(std::ostream &out,HfstTransducer &t);
 
+  /** \brief A namespace for functions that create two-level, replace, restriction and coercion rule transducers. */
   namespace rules
   {
     enum ReplaceType {REPL_UP, REPL_DOWN, REPL_RIGHT, REPL_LEFT};
