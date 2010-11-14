@@ -41,12 +41,17 @@ void error_at_line(int status, int errnum, const char* filename,
   va_start(ap, fmt);
   vfprintf(stderr, fmt, ap);
   va_end(ap);
+  if (errnum != 0)
+    {
+      fprintf(stderr, "%s", strerror(errnum));
+    }
   if (status != 0)
     {
       exit(status);
     }
 }
 #endif
+
 // deprecated; everything's compatible
 int get_compatible_fst_format(std::istream& , std::istream& ) {
     assert(false);
@@ -73,10 +78,12 @@ debug_printf(const char* fmt, ...)
 {
   if (debug)
     {
+      fprintf(stderr, "\nDEBUG: ");
       va_list ap;
       va_start(ap, fmt);
       vfprintf(stderr, fmt, ap);
       va_end(ap);
+      fprintf(stderr, "\n");
     }
 }
 
@@ -161,30 +168,48 @@ hfst_strtoul(char *s, int base)
 hfst::ImplementationType
 hfst_parse_format_name(const char* s)
 {
-  hfst::ImplementationType rv; // = hfst::UNSPECIFIED_TYPE;
-    if (strcasecmp(optarg, "sfst") == 0)
+    hfst::ImplementationType rv; // = hfst::UNSPECIFIED_TYPE;
+    if (strcasecmp(s, "sfst") == 0)
       {
         rv = hfst::SFST_TYPE;
       }
-    else if (strcasecmp(optarg, "openfst-tropical") == 0)
+    else if ((strcasecmp(s, "openfst-tropical") == 0) ||
+             (strcasecmp(s, "ofst-tropical") == 0))
       {
         rv = hfst::TROPICAL_OFST_TYPE;
       }
-    else if (strcasecmp(optarg, "openfst-log") == 0)
+    else if ((strcasecmp(s, "openfst-log") == 0) ||
+             (strcasecmp(s, "ofst-log") == 0))
       {
         rv = hfst::LOG_OFST_TYPE;
       }
-    else if (strcasecmp(optarg, "foma") == 0)
+    else if ((strcasecmp(s, "openfst") == 0) ||
+             (strcasecmp(s, "ofst") == 0))
+      {
+        rv = hfst::TROPICAL_OFST_TYPE;
+        warning(0, 0, "Ambiguous format name %s, guessing openfst-tropical",
+                s);
+      }
+    else if (strcasecmp(s, "foma") == 0)
       {
         rv = hfst::FOMA_TYPE;
       }
-    else if (strcasecmp(optarg, "optimized-lookup") == 0)
+    else if ((strcasecmp(s, "optimized-lookup-unweighted") == 0) ||
+             (strcasecmp(s, "olu") == 0))
       {
         rv = hfst::HFST_OL_TYPE;
       }
-    else if (strcasecmp(optarg, "optimized-lookup-weighted") == 0)
+    else if ((strcasecmp(s, "optimized-lookup-weighted") == 0) ||
+             (strcasecmp(s, "olw") == 0))
       {
         rv = hfst::HFST_OLW_TYPE;
+      }
+    else if ((strcasecmp(s, "optimized-lookup") == 0) ||
+             (strcasecmp(s, "ol") == 0))
+      {
+        rv = hfst::HFST_OLW_TYPE;
+        warning(0, 0, "Ambiguous format name %s, guessing "
+                "optimized-lookup-weighted", s);
       }
     else
       {
@@ -365,8 +390,8 @@ void
 print_report_bugs()
 {
   fprintf(message_out, "Report bugs to <" PACKAGE_BUGREPORT "> "
-          "or directly to out bug tracker at:\n"
-          "<ttps://sourceforge.net/tracker/?atid=1061990&group_id=224521&func=browse>\n");
+          "or directly to our bug tracker at:\n"
+          "<https://sourceforge.net/tracker/?atid=1061990&group_id=224521&func=browse>\n");
 }
 
 
