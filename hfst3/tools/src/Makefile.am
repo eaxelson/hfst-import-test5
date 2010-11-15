@@ -67,14 +67,8 @@ endif
 if WANT_LOOKUP
 MAYBE_LOOKUP=hfst-lookup
 endif
-if WANT_LOOKUP_OPTIMIZE
-MAYBE_LOOKUP_OPTIMIZE=hfst-lookup-optimize
-endif
 if WANT_MINIMIZE
 MAYBE_MINIMIZE=hfst-minimize
-endif
-if WANT_PAIR_TEST
-MAYBE_PAIR_TEST=hfst-pair-test
 endif
 if WANT_PROJECT
 MAYBE_PROJECT=hfst-project
@@ -118,17 +112,11 @@ endif
 if WANT_CALCULATE
 MAYBE_UNWEIGHTED_CALCULATE=hfst-calculate
 endif
-if WANT_OPTIMIZED_LOOKUP
-MAYBE_OPTIMIZED_LOOKUP=hfst-optimized-lookup
-endif
 if WANT_SUBSTITUTE
 MAYBE_SUBSTITUTE=hfst-substitute
 endif
 if WANT_FLAG_DIACRITICS
 MAYBE_FLAG_DIACRITICS=hfst-flag-diacritics
-endif
-if WANT_OMOR_EVALUATE
-MAYBE_OMOR_EVALUATE=hfst-omor-evaluate
 endif
 if WANT_XFST_COMPILER
 MAYBE_XFST_COMPILER=hfst-xfst-compiler
@@ -137,8 +125,6 @@ endif
 noinst_HEADERS= \
 	calculate_functions.h hfst-commandline.h hfst-program-options.h \
 	hfst-compiler.h \
-	hfst-pair-test-commandline.h \
-	hfst-optimized-lookup.h \
 	inc/check-params-binary.h inc/check-params-common.h \
 	inc/check-params-unary.h  inc/getopt-cases-binary.h \
 	inc/getopt-cases-common.h inc/getopt-cases-error.h  \
@@ -153,16 +139,16 @@ bin_PROGRAMS=$(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_COMPOSE_INTERSECT) \
 			 $(MAYBE_FST2FST) \
 			 $(MAYBE_FST2STRINGS) $(MAYBE_FST2TXT) \
 			 $(MAYBE_HEAD) $(MAYBE_INVERT) $(MAYBE_LOOKUP) \
-			 $(MAYBE_LOOKUP_OPTIMIZE) $(MAYBE_MINIMIZE) \
-			 $(MAYBE_PAIR_TEST) $(MAYBE_PROJECT) $(MAYBE_PUSH_WEIGHTS) \
+			 $(MAYBE_MINIMIZE) \
+			 $(MAYBE_PROJECT) $(MAYBE_PUSH_WEIGHTS) \
 			 $(MAYBE_REGEXP2FST) $(MAYBE_REMOVE_EPSILONS) \
 			 $(MAYBE_REPEAT) $(MAYBE_REVERSE) $(MAYBE_SPLIT) \
 			 $(MAYBE_STRINGS2FST) $(MAYBE_STRIP_HEADER) $(MAYBE_SUBTRACT) \
 			 $(MAYBE_SUMMARIZE) $(MAYBE_TAIL) $(MAYBE_TXT2FST) \
 			 $(MAYBE_UNWEIGHTED2WEIGHTED) $(MAYBE_WEIGHTED2UNWEIGHTED) \
 			 $(MAYBE_UNWEIGHTED_CALCULATE) $(MAYBE_WEIGHTED_CALCULATE) \
-			 $(MAYBE_OPTIMIZED_LOOKUP) $(MAYBE_SUBSTITUTE) \
-			 $(MAYBE_FLAG_DIACRITICS) $(MAYBE_OMOR_EVALUATE) \
+			 $(MAYBE_SUBSTITUTE) \
+			 $(MAYBE_FLAG_DIACRITICS) \
 			 $(MAYBE_LEXC_COMPILER) $(MAYBE_XFST_COMPILER)
 			 $(MAYBE_FORMAT)
 
@@ -184,12 +170,8 @@ hfst_fst2txt_SOURCES=hfst-fst2txt.cc $(HFST_COMMON_SRC)
 hfst_head_SOURCES=hfst-head.cc $(HFST_COMMON_SRC)
 hfst_invert_SOURCES=hfst-invert.cc $(HFST_COMMON_SRC)
 hfst_lexc_compiler_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC)
-hfst_lookup_optimize_SOURCES=hfst-lookup-optimize.cc $(HFST_COMMON_SRC)
 hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC)
 hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
-hfst_omor_evaluate_SOURCES=hfst-omor-evaluate.cc $(HFST_COMMON_SRC)
-hfst_optimized_lookup_SOURCES=hfst-optimized-lookup.cc
-hfst_pair_test_SOURCES=hfst-pair-test.cc $(HFST_COMMON_SRC)
 hfst_project_SOURCES=hfst-project.cc $(HFST_COMMON_SRC)
 hfst_push_weights_SOURCES=hfst-push-weights.cc $(HFST_COMMON_SRC)
 hfst_regexp2fst_SOURCES=hfst-regexp2fst.cc $(HFST_COMMON_SRC)
