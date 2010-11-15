@@ -130,9 +130,9 @@ AC_ARG_ENABLE([compose],
 AM_CONDITIONAL([WANT_COMPOSE], [test x$enable_compose != xno])
 AC_ARG_ENABLE([compose_intersect],
 			  [AS_HELP_STRING([--enable-compose-intersect],
-							  [build compose-intersect tool @<:@default=no@:>@])],
+							  [build compose-intersect tool @<:@default=yes@:>@])],
 			  [enable_compose_intersect=$enableval],
-			  [enable_compose_intersect=no])
+			  [enable_compose_intersect=yes])
 AM_CONDITIONAL([WANT_COMPOSE_INTERSECT], [test x$enable_compose_intersect != xno])
 AC_ARG_ENABLE([concatenate],
 			  [AS_HELP_STRING([--enable-concatenate],
@@ -208,9 +208,9 @@ AC_ARG_ENABLE([lexc-compiler],
 AM_CONDITIONAL([WANT_LEXC_COMPILER], [test "x$enable_lexc_compiler" != xno -a x$enable_lexc != xno])
 AC_ARG_ENABLE([lookup],
 			  [AS_HELP_STRING([--enable-lookup],
-							  [build lookup tool @<:@default=no@:>@])],
+							  [build lookup tool @<:@default=yes@:>@])],
 			  [enable_lookup=$enableval],
-			  [enable_lookup=no])
+			  [enable_lookup=yes])
 AM_CONDITIONAL([WANT_LOOKUP], [test x$enable_lookup != xno])
 AC_ARG_ENABLE([lookup_optimize],
 			  [AS_HELP_STRING([--enable-lookup-optimize],
@@ -235,13 +235,6 @@ AC_ARG_ENABLE([omor_evaluate],
 			  [enable_omor_evaluate=$enableval],
 			  [enable_omor_evaluate=no])
 AM_CONDITIONAL([WANT_OMOR_EVALUATE], [test x$enable_omor_evaluate != xno])
-AC_ARG_ENABLE([optimized-lookup],
-			  [AS_HELP_STRING([--enable-optimized-lookup],
-							  [build optimized lookup tool @<:@default=no@:>@])],
-			  [enable_optimized_lookup=$enableval],
-			  [enable_optimized_lookup=no])
-AM_CONDITIONAL([WANT_OPTIMIZED_LOOKUP], [test x$enable_optimized_lookup != xno])
-AM_CONDITIONAL([WANT_PAIR_TEST], [test x$enable_pair_test != xno])
 AC_ARG_ENABLE([project],
 			  [AS_HELP_STRING([--enable-project],
 							  [build project tool @<:@default=yes@:>@])],

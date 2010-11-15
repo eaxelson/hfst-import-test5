@@ -140,9 +140,22 @@ namespace hfst
   class HfstTransducer;
 
 
+  //! @brief A pair of transducer, used for ???
   typedef std::pair <HfstTransducer,HfstTransducer> HfstTransducerPair;
+  //! @brief A set of transducer pairs, used for ???
   typedef std::set <HfstTransducerPair> HfstTransducerPairSet;
+  //! @brief A vector of transducer pairs, used for ???
   typedef std::vector <HfstTransducerPair> HfstTransducerPairVector;
+
+  typedef std::vector<std::string> HfstArcPath;
+  //! @brief A path of one level of arcs with collected weight,
+  //!
+  //! Used as the source and result data type for lookups and downs.
+  typedef std::pair<HfstArcPath,float> HfstLookupPath;
+  //! @brief A set of simple paths.
+  //!
+  //! Used as return type of lookup with multiple, unique results.
+  typedef std::set<HfstLookupPath> HfstLookupPaths;
 
 #if HAVE_MUTABLE
   class HfstMutableTransducer;
@@ -989,6 +1002,59 @@ t.substitute(&func);
     static bool is_implementation_type_available(ImplementationType type);
 
     HfstTokenizer create_tokenizer();
+
+    //! @brief Lookup or apply a single string.
+    //!
+    //! Traverse all paths on logical first level of the transducer to produce
+    //! all possible outputs on the second.
+    //! This is in effect a fast composition of single path from left
+    //! hand side.
+    //!
+    //! @arg results  output parameter to store unique results
+    //! @arg s  string to look up
+    //! @arg limit  number of strings to extract. -1 tries to extract all and
+    //!             may get stuck if infinitely ambiguous
+    void lookup(HfstLookupPaths& results, const HfstLookupPath& s,
+                ssize_t limit = -1);
+
+    //! @brief Lookup or apply a single string minding flag diacritics properly.
+    //! 
+    //! This is a version of lookup that handles flag diacritics as epsilons
+    //! and validates the sequences prior to outputting.
+    //!
+    //! @sa lookup
+    void lookup_fd(HfstLookupPaths& results, const HfstLookupPath& s,
+                   ssize_t limit = -1);
+
+    //! @brief Lookdown a single string.
+    //!
+    //! Traverse all paths on logical second level of the transducer to produce
+    //! all possible inputs on the first.
+    //! This is in effect a fast composition of single
+    //! path from left hand side.
+    //!
+    //! @arg results  output parameter to store unique results
+    //! @arg s  string to look down
+    //! @arg tok  tokenizer to split string in arcs
+    //! @arg limit  number of strings to extract. -1 tries to extract all and
+    //!             may get stuck if infinitely ambiguous
+    void lookdown(HfstLookupPaths& results, const HfstLookupPath& s,
+                  ssize_t limit = -1);
+
+    //! @brief Lookdown a single string minding flag diacritics properly.
+    //! 
+    //! This is a version of lookdown that handles flag diacritics as epsilons
+    //! and validates the sequences prior to outputting.
+    //!
+    //! @sa lookdown
+    void lookdown_fd(HfstLookupPaths& results, HfstLookupPath& s,
+                     ssize_t limit = -1);
+
+    //! @brief Whether lookup will have infinite results.
+    bool is_lookup_infinitely_ambiguous(const HfstLookupPath& s);
+
+    //! @brief Whether lookdown will have infinite results.
+    bool is_lookdown_infinitely_ambiguous(const HfstLookupPath& s);
 
     HfstTransducer &operator=(const HfstTransducer &another);
     friend std::ostream &operator<<(std::ostream &out, HfstTransducer &t);
