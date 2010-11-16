@@ -291,6 +291,11 @@ namespace hfst { namespace implementations {
 
       return true;
     }
+    
+    unsigned int SfstTransducer::number_of_states(Transducer *t)
+    {
+      return (unsigned int) t->size();
+    }
 
     Transducer * SfstInputStream::read_transducer()
   {
@@ -979,11 +984,6 @@ namespace hfst { namespace implementations {
     expand2(t, t->root_node(), new_symbols, visited_nodes);
   }
 
-  unsigned int SfstTransducer::number_of_states(Transducer *t)
-  {
-    NodeNumbering nn(*t);
-    return (unsigned int) nn.number_of_nodes();
-  }
 
 } }
 

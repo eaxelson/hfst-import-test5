@@ -260,7 +260,8 @@ process_stream(HfstOutputStream& outstream)
           weighted = true;
         }
       *string_end = '\0';
-      HfstTransducer parsed(0, output_format);
+      //HfstTransducer parsed(0, output_format);
+      HfstTransducer parsed("@_EPSILON_SYMBOL_@", output_format);
       if (has_spaces && pairstrings)
         {
           char* pair = strtok(line, " ");

@@ -22,12 +22,6 @@ namespace hfst { namespace implementations
 
   bool openfst_tropical_use_hopcroft=false;
 
-  bool openfst_use_symbol_tables=true;
-
-  void openfst_tropical_set_use_symbol_tables(bool value) {
-    openfst_use_symbol_tables=value;
-  }
-
   void openfst_tropical_set_hopcroft(bool value) {
     openfst_tropical_use_hopcroft=value;
   }
@@ -49,8 +43,6 @@ namespace hfst { namespace implementations
 
   void TropicalWeightTransducer::add_symbol_table(StdVectorFst *t, HfstAlphabet &alpha) 
   {
-    assert(not openfst_use_symbol_tables);
-
     fst::SymbolTable *st = new fst::SymbolTable("anonym_hfst3_symbol_table");
     HfstAlphabet::CharMap cm = alpha.get_char_map();
     for (HfstAlphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++)
@@ -61,7 +53,6 @@ namespace hfst { namespace implementations
 
   void TropicalWeightTransducer::remove_symbol_table(StdVectorFst *t)
   {
-    assert(not openfst_use_symbol_tables);
     t->SetInputSymbols(NULL);
   }
 
@@ -950,11 +941,8 @@ namespace hfst { namespace implementations
   }
   
   void TropicalWeightTransducer::initialize_symbol_tables(StdVectorFst *t) {
-    if (openfst_use_symbol_tables) {
-      SymbolTable st = create_symbol_table("");
-      t->SetInputSymbols(&st);
-    }
-    return;
+    SymbolTable st = create_symbol_table("");
+    t->SetInputSymbols(&st);
   }
 
   StdVectorFst * TropicalWeightTransducer::create_empty_transducer(void)
@@ -1003,8 +991,6 @@ namespace hfst { namespace implementations
 
   StdVectorFst * TropicalWeightTransducer::define_transducer(const std::string &symbol)
   {
-    assert(openfst_use_symbol_tables);
-
     StdVectorFst * t = new StdVectorFst;
     SymbolTable st = create_symbol_table("");
 
@@ -1021,8 +1007,6 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::define_transducer
     (const std::string &isymbol, const std::string &osymbol)
   {
-    assert(openfst_use_symbol_tables);
-
     StdVectorFst * t = new StdVectorFst;
     SymbolTable st = create_symbol_table("");
 
@@ -1061,8 +1045,6 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::define_transducer
   (const StringPairVector &spv)
   {
-    assert(openfst_use_symbol_tables);
-
     StdVectorFst * t = new StdVectorFst;
     SymbolTable st = create_symbol_table("");
 
@@ -1084,8 +1066,6 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::define_transducer
   (const StringPairSet &sps, bool cyclic)
   {
-    assert(openfst_use_symbol_tables);
-
     StdVectorFst * t = new StdVectorFst;
     SymbolTable st = create_symbol_table("");
 
@@ -1111,8 +1091,6 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::define_transducer
   (const std::vector<StringPairSet> &spsv)
   {
-    assert(openfst_use_symbol_tables);
-
     StdVectorFst * t = new StdVectorFst;
     SymbolTable st = create_symbol_table("");
 
@@ -1137,8 +1115,6 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::define_transducer
   (const NumberPairVector &npv)
   {
-    assert(not openfst_use_symbol_tables);
-
     StdVectorFst * t = new StdVectorFst;
 
     StateId s1 = t->AddState();
@@ -1158,8 +1134,6 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::define_transducer
   (const NumberPairSet &nps, bool cyclic)
   {
-    assert(not openfst_use_symbol_tables);
-
     StdVectorFst * t = new StdVectorFst;
 
     StateId s1 = t->AddState();  // start state
@@ -1183,8 +1157,6 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::define_transducer
   (const std::vector<NumberPairSet> &npsv)
   {
-    assert(not openfst_use_symbol_tables);
-
     StdVectorFst * t = new StdVectorFst;
 
     StateId s1 = t->AddState();
@@ -1311,8 +1283,6 @@ namespace hfst { namespace implementations
   void 
   TropicalWeightTransducer::add_transition(StdVectorFst *t, StateId source, std::string &isymbol, std::string &osymbol, float w, StateId target)
   {
-    assert(openfst_use_symbol_tables);
-
     SymbolTable *st = t->InputSymbols()->Copy();
     /*if (t->InputSymbols() != t->OutputSymbols()) {
       fprintf(stderr, "ERROR:  TropicalWeightTransducer::add_transition:  input and output symbols are not the same\n"); 
@@ -1465,8 +1435,6 @@ namespace hfst { namespace implementations
 
   static StdVectorFst * insert_freely(StdVectorFst * t, const NumberPair &number_pair) 
   {
-    assert(not openfst_use_symbol_tables);
-
     for (fst::StateIterator<fst::StdFst> siter(*t); !siter.Done(); siter.Next()) {
       StateId state_id = siter.Value();
       t->AddArc(state_id, fst::StdArc(number_pair.first, number_pair.second, 0, state_id));
@@ -1509,8 +1477,6 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::substitute
   (StdVectorFst * t,unsigned int old_key,unsigned int new_key)
   {
-    //assert(not openfst_use_symbol_tables);
-
     LabelPairVector v;
     v.push_back(LabelPair(old_key,new_key));
     RelabelFst<StdArc> t_subst(*t,v,v);
@@ -1521,8 +1487,6 @@ namespace hfst { namespace implementations
 						      pair<unsigned int, unsigned int> old_key_pair,
 						      pair<unsigned int, unsigned int> new_key_pair)
   {
-    assert(not openfst_use_symbol_tables);
-
     EncodeMapper<StdArc> encode_mapper(0x0001,ENCODE);
     EncodeFst<StdArc> enc(*t,&encode_mapper);
 
@@ -1695,9 +1659,6 @@ namespace hfst { namespace implementations
       }
     }
 
-    //write_in_att_format(t, stderr);
-    //cerr << "\n\n";
-
     t->SetInputSymbols(st);
     delete st;
     return t;
@@ -1707,7 +1668,6 @@ namespace hfst { namespace implementations
 						      const NumberPair old_number_pair,
 						      StdVectorFst *transducer)
   {
-    assert(not openfst_use_symbol_tables);
 
     int states = t->NumStates();
     for( int i = 0; i < states; ++i ) {
