@@ -421,8 +421,8 @@ namespace hfst
         stream_unget(c);
         if(i > 0) {
           for(int j=i-1; j>=0; j--) {
-            stream_unget(id[j]);
-          }
+            stream_unget(id[j]); 
+	  }
         }
 	bytes_read=0;
         return false;

@@ -121,7 +121,7 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
         }
         HfstTransducer first(firststream);
         HfstTransducer second(secondstream);
-        if (HfstTransducer::are_equivalent(first, second))
+        if (first.compare(second))
           {
             fprintf(outfile, "%s[%zu] == %s[%zu]\n",
                     firstfilename, transducer_n, secondfilename, transducer_n);

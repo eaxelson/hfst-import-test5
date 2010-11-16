@@ -36,7 +36,6 @@ namespace implementations
   using std::stringstream;
 
   void openfst_tropical_set_hopcroft(bool value);
-  void openfst_tropical_set_use_symbol_tables(bool value);
 
   class TropicalWeightInputStream 
   {

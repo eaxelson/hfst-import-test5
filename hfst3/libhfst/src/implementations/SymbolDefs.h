@@ -28,7 +28,16 @@
 namespace hfst
 {
 
-  /* A symbol in a transition. */
+  /** \brief A symbol in a transition. 
+
+    Strings <i>"@_EPSILON_SYMBOL_@"</i>, <i>"@_UNKNOWN_SYMBOL_@"</i> and <i>"@_IDENTITY_SYMBOL_@"</i> are reserved.
+
+    - <i>"@_EPSILON_SYMBOL_@"</i> denotes the epsilon. 
+    - <i>"@_UNKNOWN_SYMBOL_@"</i> denotes an unknown symbol, i.e. any symbol that 
+      does not occur or has not occurred in the transducer. 
+    - <i>"@_IDENTITY_SYMBOL_@"</i> denotes any unknown symbol that is the same
+      on the input and output side of a transition.
+   */
   typedef std::string String;
   /* A set of strings. */
   typedef std::set<String> StringSet;

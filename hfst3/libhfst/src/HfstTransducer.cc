@@ -183,8 +183,6 @@ namespace hfst
       case (TROPICAL_OFST_TYPE):
 	{
 	  std::pair <fst::StdVectorFst*, fst::StdVectorFst*> result;
-	  if (this->alpha != NULL && (this->alpha == another.alpha) && not unknown_symbols_in_use)
-	    break;
 
 	  if ( harmonize_smaller && 
 	       tropical_ofst_interface.number_of_states(this->implementation.tropical_ofst) >
@@ -235,15 +233,59 @@ namespace hfst
       }
   }
 
+
+  void HfstTransducer::lookup(HfstLookupPaths& results, const HfstLookupPath& s,
+			      ssize_t limit) {
+    (void)results;
+    (void)s;
+    (void)limit;
+    throw hfst::exceptions::FunctionNotImplementedException();
+  }
+
+    void HfstTransducer::lookup_fd(HfstLookupPaths& results, const HfstLookupPath& s,
+				   ssize_t limit) {
+    (void)results;
+    (void)s;
+    (void)limit;
+    throw hfst::exceptions::FunctionNotImplementedException();
+  }
+
+    void HfstTransducer::lookdown(HfstLookupPaths& results, const HfstLookupPath& s,
+				  ssize_t limit) {
+    (void)results;
+    (void)s;
+    (void)limit;
+    throw hfst::exceptions::FunctionNotImplementedException();
+  }
+
+    void HfstTransducer::lookdown_fd(HfstLookupPaths& results, HfstLookupPath& s,
+				     ssize_t limit) {
+    (void)results;
+    (void)s;
+    (void)limit;
+    throw hfst::exceptions::FunctionNotImplementedException();
+  }
+
+  bool HfstTransducer::is_lookup_infinitely_ambiguous(const HfstLookupPath& s) {
+    (void)s;
+    throw hfst::exceptions::FunctionNotImplementedException();
+  }
+
+  bool HfstTransducer::is_lookdown_infinitely_ambiguous(const HfstLookupPath& s) {
+    (void)s;
+    throw hfst::exceptions::FunctionNotImplementedException();
+  }
+
+
   // *** Transducer constructors and destructor *** //
 
   HfstTransducer::HfstTransducer():
-    type(ERROR_TYPE),anonymous(false),is_trie(true),alpha(NULL), name("")
+    type(ERROR_TYPE),anonymous(false),is_trie(true), name("")
   {}
 
 
   HfstTransducer::HfstTransducer(ImplementationType type):
-    type(type),anonymous(false),is_trie(true),alpha(NULL), name("")
+    type(type),anonymous(false),is_trie(true), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -287,7 +329,7 @@ namespace hfst
 				 const HfstTokenizer 
 				 &multichar_symbol_tokenizer,
 				 ImplementationType type):
-    type(type),anonymous(false),is_trie(true),alpha(NULL), name("")
+    type(type),anonymous(false),is_trie(true), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -340,7 +382,7 @@ namespace hfst
   }
 
   HfstTransducer::HfstTransducer(const StringPairVector & spv, ImplementationType type):
-    type(type), anonymous(false), is_trie(false),alpha(NULL), name("")
+    type(type), anonymous(false), is_trie(false), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -380,7 +422,7 @@ namespace hfst
   }
 
   HfstTransducer::HfstTransducer(const StringPairSet & sps, ImplementationType type, bool cyclic):
-    type(type),anonymous(false),is_trie(false),alpha(NULL), name("")
+    type(type),anonymous(false),is_trie(false), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -420,7 +462,7 @@ namespace hfst
   }
 
   HfstTransducer::HfstTransducer(const std::vector<StringPairSet> & spsv, ImplementationType type):
-    type(type),anonymous(false),is_trie(false),alpha(NULL), name("")
+    type(type),anonymous(false),is_trie(false), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -464,7 +506,7 @@ namespace hfst
 				 const HfstTokenizer 
 				 &multichar_symbol_tokenizer,
 				 ImplementationType type):
-    type(type),anonymous(false),is_trie(true),alpha(NULL), name("")
+    type(type),anonymous(false),is_trie(true), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -506,7 +548,7 @@ namespace hfst
 
 
   HfstTransducer::HfstTransducer(HfstInputStream &in):
-    type(in.type), anonymous(false),is_trie(false),alpha(NULL), name("")
+    type(in.type), anonymous(false),is_trie(false), name("")
   { 
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -514,7 +556,7 @@ namespace hfst
   }
 
   HfstTransducer::HfstTransducer(const HfstTransducer &another):
-    type(another.type),anonymous(another.anonymous),is_trie(another.is_trie),alpha(NULL), name("")
+    type(another.type),anonymous(another.anonymous),is_trie(another.is_trie), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -549,7 +591,7 @@ namespace hfst
   }
 
   HfstTransducer::HfstTransducer(const HfstMutableTransducer &mut, ImplementationType type):
-    type(type),anonymous(mut.alphabet == NULL),is_trie(false),alpha(NULL), name("")
+    type(type),anonymous(false),is_trie(false), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -629,8 +671,8 @@ namespace hfst
 
 
   /* For internal use. */
-HfstTransducer::HfstTransducer(unsigned int number, ImplementationType type): 
-  type(type),anonymous(true),is_trie(false),alpha(NULL), name("")
+  /*HfstTransducer::HfstTransducer(unsigned int number, ImplementationType type): 
+  type(type),anonymous(true),is_trie(false), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -667,10 +709,10 @@ HfstTransducer::HfstTransducer(unsigned int number, ImplementationType type):
 	break;
       }
   }
-
+  */
   /* For internal use. */
-HfstTransducer::HfstTransducer(unsigned int inumber, unsigned int onumber, ImplementationType type):
-  type(type),anonymous(true),is_trie(false),alpha(NULL), name("")
+  /*HfstTransducer::HfstTransducer(unsigned int inumber, unsigned int onumber, ImplementationType type):
+  type(type),anonymous(true),is_trie(false), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -708,11 +750,11 @@ HfstTransducer::HfstTransducer(unsigned int inumber, unsigned int onumber, Imple
 	throw hfst::exceptions::TransducerHasWrongTypeException();
 	break;
       }
-  }
+      }*/
 
 
 HfstTransducer::HfstTransducer(const std::string &symbol, ImplementationType type): 
-  type(type),anonymous(false),is_trie(false),alpha(NULL), name("")
+  type(type),anonymous(false),is_trie(false), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -748,7 +790,7 @@ HfstTransducer::HfstTransducer(const std::string &symbol, ImplementationType typ
   }
 
 HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type):
-  type(type),anonymous(false),is_trie(false),alpha(NULL), name("")
+  type(type),anonymous(false),is_trie(false), name("")
   {
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -826,7 +868,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 
   }
 
-  bool HfstTransducer::are_equivalent(const HfstTransducer &one, const HfstTransducer &another) 
+  /*  bool HfstTransducer::are_equivalent(const HfstTransducer &one, const HfstTransducer &another) 
   {
     if (one.type != another.type)
       throw hfst::exceptions::TransducerTypeMismatchException();
@@ -861,7 +903,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
       }
-  }
+      }*/
   
   bool HfstTransducer::is_cyclic(void) const
   {
@@ -2093,7 +2135,7 @@ void HfstTransducer::write_in_att_format(FILE * ofile, bool print_weights) const
 }
 
 HfstTransducer::HfstTransducer(FILE * ifile, ImplementationType type, const std::string &epsilon_symbol):
-  type(type),anonymous(false),is_trie(false),alpha(NULL), name("")
+  type(type),anonymous(false),is_trie(false), name("")
 {
   if (not is_implementation_type_available(type))
     throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -2243,32 +2285,29 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
 	      tok.add_multichar_symbol(it->second);
 	  }
       }
-
-    else {
-
-    HfstMutableTransducer t(*this);
-    HfstStateIterator state_it(t);
-    while (not state_it.done()) 
+    else 
       {
-	HfstState s = state_it.value();
-	HfstTransitionIterator transition_it(t,s);
-	while (not transition_it.done()) 
+	HfstMutableTransducer t(*this);
+	HfstStateIterator state_it(t);
+	while (not state_it.done()) 
 	  {
-	    HfstTransition tr = transition_it.value();
-	    if (tr.isymbol.size() > 1) {
-	      tok.add_multichar_symbol(tr.isymbol);
-	    }
-	    if (tr.isymbol.size() > 1) {
-	      tok.add_multichar_symbol(tr.osymbol);
-	    }
-	    // special symbols are added too (is this a problem?)
-	    transition_it.next();
+	    HfstState s = state_it.value();
+	    HfstTransitionIterator transition_it(t,s);
+	    while (not transition_it.done()) 
+	      {
+		HfstTransition tr = transition_it.value();
+		if (tr.isymbol.size() > 1) {
+		  tok.add_multichar_symbol(tr.isymbol);
+		}
+		if (tr.isymbol.size() > 1) {
+		  tok.add_multichar_symbol(tr.osymbol);
+		}
+		// special symbols are added too
+		transition_it.next();
+	      }
+	    state_it.next();
 	  }
-	state_it.next();
       }
-
-    }
-
     return tok;
   }
 
