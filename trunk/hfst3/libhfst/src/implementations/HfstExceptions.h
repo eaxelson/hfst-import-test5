@@ -49,6 +49,7 @@ public HfstInterfaceException {};
 class FileIsClosedException :
 public HfstInterfaceException {};
 
+
 /** \brief Transducer has wrong type. */
 class TransducerHasWrongTypeException :
 public HfstInterfaceException {};
@@ -56,6 +57,7 @@ public HfstInterfaceException {};
 /** \brief Transducer has unknown type. */
 class TransducerHasUnknownTypeException :
 public HfstInterfaceException {};
+
 
 /** \brief Transducer is cyclic. */
 class TransducerIsCyclicException :
