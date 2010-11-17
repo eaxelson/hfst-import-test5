@@ -325,6 +325,12 @@ parse_options(int argc, char** argv)
       return EXIT_FAILURE;
       break;
     }
+
+    if (!lookup_given)
+      {
+        lookup_file = stdin;
+        lookup_file_name = strdup("<stdin>");
+      }
 #include "inc/check-params-common.h"
 #include "inc/check-params-unary.h"
     return EXIT_CONTINUE;
@@ -754,6 +760,27 @@ print_lookups(const HfstLookupPaths& kvs,
       }
 }
 
+HfstLookupPaths*
+perform_lookups(HfstLookupPath& origin, vector<HfstTransducer>& cascade, bool unknown, bool* infinite)
+{
+  HfstLookupPaths* kvs;
+    if (!unknown)
+      {
+        if (cascade.size() == 1)
+          {
+            kvs = lookup_simple(origin, cascade[0], infinite);
+          }
+        else
+         {
+            kvs = lookup_cascading(origin, cascade, infinite);
+         }
+      }
+    else
+      {
+        kvs = new HfstLookupPaths;
+      }
+    return kvs;
+}
 
 int
 process_stream(HfstInputStream& inputstream, FILE* outstream)
@@ -799,20 +826,17 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
         HfstLookupPath* kv = line_to_lookup_path(&line, tok, &markup,
                                                  &unknown);
         HfstLookupPaths* kvs;
-        if (!unknown)
+        try 
           {
-            if (cascade.size() == 1)
-              {
-                kvs = lookup_simple(*kv, cascade[0], &infinite);
-              }
-            else
-             {
-                kvs = lookup_cascading(*kv, cascade, &infinite);
-             }
+            kvs = perform_lookups(*kv, cascade, unknown, &infinite);
           }
-        else
+        catch (hfst::exceptions::FunctionNotImplementedException)
           {
-            kvs = new HfstLookupPaths;
+            // TODO: implement compose and strings here
+            error(EXIT_FAILURE, 0, "Lookup not supported on this automata "
+                  "format\n"
+                  "Try compose and fst2strings instead\n");
+            return EXIT_FAILURE;
           }
         print_lookups(*kvs, line, markup, unknown, infinite);
         delete kv;
@@ -870,7 +894,7 @@ int main( int argc, char **argv ) {
               inputfilename);
         return EXIT_FAILURE;
       }
-
+    process_stream(*instream, outfile);
     if (outfile != stdout)
     {
         fclose(outfile);

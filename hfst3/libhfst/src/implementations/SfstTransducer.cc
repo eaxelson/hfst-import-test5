@@ -292,9 +292,9 @@ namespace hfst { namespace implementations {
       return true;
     }
     
-    unsigned int SfstTransducer::number_of_states(Transducer *t)
+    unsigned int SfstTransducer::number_of_states(Transducer* )
     {
-      return (unsigned int) t->size();
+      return -1;
     }
 
     Transducer * SfstInputStream::read_transducer()

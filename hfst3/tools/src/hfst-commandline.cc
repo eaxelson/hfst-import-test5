@@ -45,6 +45,48 @@ void error_at_line(int status, int errnum, const char* filename,
     {
       fprintf(stderr, "%s", strerror(errnum));
     }
+  fprintf(stderr, "\n");
+  if (status != 0)
+    {
+      exit(status);
+    }
+}
+#endif
+
+#ifndef HAVE_ERROR
+void
+error(int status, int errnum, const char* fmt, ...)
+{
+  fprintf(stderr, "%s: ", program_name);
+  va_list ap;
+  va_start(ap, fmt);
+  vfprintf(stderr, fmt, ap);
+  va_end(ap);
+  if (errnum != 0)
+    {
+      fprintf(stderr, "%s", strerror(errnum));
+    }
+  fprintf(stderr, "\n");
+  if (status != 0)
+    {
+      exit(status);
+    }
+}
+#endif
+#ifndef HAVE_WARNING
+void
+warning(int status, int errnum, const char* fmt, ...)
+{
+  fprintf(stderr, "%s: warning: ", program_name);
+  va_list ap;
+  va_start(ap, fmt);
+  vfprintf(stderr, fmt, ap);
+  va_end(ap);
+  if (errnum != 0)
+    {
+      fprintf(stderr, "%s", strerror(errnum));
+    }
+  fprintf(stderr, "\n");
   if (status != 0)
     {
       exit(status);
