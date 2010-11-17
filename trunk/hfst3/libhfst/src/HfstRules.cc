@@ -621,41 +621,43 @@ namespace hfst
 */
 
 
-    HfstTransducer restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet) 
-    { (void)contexts; (void)mapping; (void)alphabet;
-      throw hfst::exceptions::FunctionNotImplementedException(); } 
+    HfstTransducer restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet) {
+      return restriction(contexts, mapping, alphabet, twol_right, 0); 
+    }
 
-    HfstTransducer coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet) 
-    { (void)contexts; (void)mapping; (void)alphabet;
-      throw hfst::exceptions::FunctionNotImplementedException(); } 
+    HfstTransducer coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet) { 
+      return restriction(contexts, mapping, alphabet, twol_left, 0); 
+    }
 
-    HfstTransducer restriction_and_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet) 
-    { (void)contexts; (void)mapping; (void)alphabet;
-      throw hfst::exceptions::FunctionNotImplementedException(); } 
+    HfstTransducer restriction_and_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet) {
+      return restriction(contexts, mapping, alphabet, twol_both, 0); 
+    }
 
-    HfstTransducer surface_restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet) 
-    { (void)contexts; (void)mapping; (void)alphabet;
-      throw hfst::exceptions::FunctionNotImplementedException(); } 
 
-    HfstTransducer surface_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet) 
-    { (void)contexts; (void)mapping; (void)alphabet;
-      throw hfst::exceptions::FunctionNotImplementedException(); } 
+    HfstTransducer surface_restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet) { 
+      return restriction(contexts, mapping, alphabet, twol_right, 1); 
+    }
 
-    HfstTransducer surface_restriction_and_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet) 
-    { (void)contexts; (void)mapping; (void)alphabet;
-      throw hfst::exceptions::FunctionNotImplementedException(); } 
+    HfstTransducer surface_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet) { 
+      return restriction(contexts, mapping, alphabet, twol_left, 1); 
+    }
 
-    HfstTransducer deep_restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet) 
-    { (void)contexts; (void)mapping; (void)alphabet;
-      throw hfst::exceptions::FunctionNotImplementedException(); } 
+    HfstTransducer surface_restriction_and_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet) {  
+      return restriction(contexts, mapping, alphabet, twol_both, 1); 
+    }
 
-    HfstTransducer deep_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet) 
-    { (void)contexts; (void)mapping; (void)alphabet;
-      throw hfst::exceptions::FunctionNotImplementedException(); } 
 
-    HfstTransducer deep_restriction_and_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet) 
-    { (void)contexts; (void)mapping; (void)alphabet;
-      throw hfst::exceptions::FunctionNotImplementedException(); } 
+    HfstTransducer deep_restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet) {  
+      return restriction(contexts, mapping, alphabet, twol_right, -1); 
+    }
+
+    HfstTransducer deep_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet) {  
+      return restriction(contexts, mapping, alphabet, twol_left, -1); 
+    }
+
+    HfstTransducer deep_restriction_and_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet) {  
+      return restriction(contexts, mapping, alphabet, twol_both, -1); 
+    }
 
   }
 

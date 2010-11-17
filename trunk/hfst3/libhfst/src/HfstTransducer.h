@@ -199,28 +199,28 @@ and the following namespaces:
 
       An example:
 \verbatim
-      try {
-        HfstInputStream in("testfile");
-       } catch (FileNotReadableException e) {
-         printf("ERROR: File does not exist.\n");
-         exit(1);
-       }
-       int n=0;
-       while (not in.is_eof()) {
-         if (in.is_bad()) {
-	   printf("ERROR: Stream to file cannot be read.\n");
-	   exit(1); 
-	 }
-	 if (not in.is_fst()) {
-	   printf("ERROR: Stream to file cannot be read.\n");
-	   exit(1); 
-	 }
-         HfstTransducer t(in);
-	 printf("One transducer succesfully read.\n");
-	 n++;
-       }
-       printf("\nRead %i transducers in total.\n", n);
-       in.close();
+try {
+  HfstInputStream in("testfile");
+} catch (FileNotReadableException e) {
+    printf("ERROR: File does not exist.\n");
+    exit(1);
+}
+int n=0;
+while (not in.is_eof()) {
+  if (in.is_bad()) {
+    printf("ERROR: Stream cannot be read.\n");
+    exit(1); 
+  }
+  if (not in.is_fst()) {
+    printf("ERROR: Stream does not contain transducers.\n");
+    exit(1); 
+  }
+  HfstTransducer t(in);
+  printf("One transducer succesfully read.\n");
+  n++;
+}
+printf("\nRead %i transducers in total.\n", n);
+in.close();
 \endverbatim
 
       @see HfstTransducer::HfstTransducer(HfstInputStream &in) **/
@@ -425,9 +425,9 @@ and the following namespaces:
     HfstGrammar(HfstTransducerVector &rule_vector);
     /** \brief Convert \a rule into an HfstGrammar. */
     HfstGrammar(HfstTransducer &rule);
-    /** \brief Get first rule of this grammar. */
+    /** \brief Get the first rule of the grammar. */
     HfstTransducer get_first_rule(void);
-    /** \brief Delete this grammar. */
+    /** \brief Delete the grammar. */
     ~HfstGrammar(void);
     friend class HfstTransducer;
   };
@@ -1109,18 +1109,18 @@ HfstTransducer t_transformed;
 
      An example of constructing a transducer from scratch:
 \verbatim
-     HfstMutableTransducer t;       // Create an empty transducer with one start state that is not final.
-     HfstState initial = 
-        t.get_initial_state();      // Get a handle for the start state.
-     HfstState s = t.add_state();   // Add a second state that is initially not final.
-     t.set_final_weight(s, 0.5);    // Set the second state final with weight 0.5.
-     t.add_transition(initial,      // Add a transition leading from the first state
-                     "foo",         // with input symbol "foo",
-		      "bar",         // output symbol "bar"
-		      0.3,           // and weight 0.3
-		      s);            // to the second state.
+HfstMutableTransducer t;       // Create an empty transducer with one start state that is not final.
+HfstState initial = 
+  t.get_initial_state();       // Get a handle to the start state.
+HfstState s = t.add_state();   // Add a second state that is initially not final.
+t.set_final_weight(s, 0.5);    // Set the second state final with weight 0.5.
+t.add_transition(initial,      // Add a transition leading from the first state
+                 "foo",        // with input symbol "foo",
+		 "bar",        // output symbol "bar"
+		 0.3,          // and weight 0.3
+		 s);           // to the second state.
 
-     // Now t accepts the string pair "foo":"bar" with weight 0.8.
+// Now t accepts the string pair "foo":"bar" with weight 0.8.
 \endverbatim
 
      \anchor iterator_example An example of iterating through states and transitions:
@@ -1136,21 +1136,23 @@ void print(HfstMutableTransducer &t)
       while (not transition_it.done()) 
         {
           HfstTransition tr = transition_it.value();
-          cout << s << "\t" << tr.target_state << "\t"
-	        << tr.isymbol << "\t" 
+          cout << s << "\t" 
+	       << tr.target_state << "\t"
+	       << tr.isymbol << "\t" 
                << tr.osymbol
-	        << "\t" << tr.weight << "\n";
+	       << "\t" << tr.weight << "\n";
           transition_it.next();
         }
       if ( t.is_final(s) )
-        cout << s << "\t" << t.get_final_weight(s) << "\n";
+        cout << s << "\t" 
+	     << t.get_final_weight(s) << "\n";
       state_it.next();
     }
   return;
 }
 \endverbatim
 
-     @see HfstStateIterator HfstTransitionIterator
+     @see HfstStateIterator HfstTransitionIterator HfstTransition
      */
   /*! \internal This class is basically a wrapper for a TROPICAL_OFST_TYPE HfstTransducer.
      Since creating new states and transitions and modifying them is easiest
@@ -1166,25 +1168,25 @@ void print(HfstMutableTransducer &t)
     /** \brief Create an empty mutable transducer, 
 	i.e. a transducer with one non-final initial state. */
     HfstMutableTransducer(void);
-    /** \brief Create a mutable transducer equivalent to \a t. */
+    /** \brief Create a mutable transducer equivalent to HfstTransducer \a t. */
     HfstMutableTransducer(const HfstTransducer &t);
     /** \brief Create a deep copy of mutable transducer \a t. */
     HfstMutableTransducer(const HfstMutableTransducer &t);
-    /** \brief Delete mutable transducer. */
+    /** \brief Delete the mutable transducer. */
     ~HfstMutableTransducer(void);
-    /** \brief Add a state to this mutable transducer and return a handle to that state. */
+    /** \brief Add a state to the mutable transducer and return a handle to that state. */
     HfstState add_state();
-    /** \brief Set the value of the final weight of state \a s in this mutable transducer to \a w. */
+    /** \brief Set the value of the final weight of state \a s in the mutable transducer to \a w. */
     void set_final_weight(HfstState s, float w);
-    /** \brief Whether state \a s in this mutable transducer is final. */
+    /** \brief Whether state \a s in the mutable transducer is final. */
     bool is_final(HfstState s);
-    /** \brief Return a handle to the initial state in this mutable transducer. */
+    /** \brief Return a handle to the initial state in the mutable transducer. */
     HfstState get_initial_state();
-    /** \brief The final weight of state \a s in this mutable transducer. 
+    /** \brief The final weight of state \a s in the mutable transducer. 
 	@pre State \a s must be final. */
     float get_final_weight(HfstState s);
     /** \brief Add transition with input and output symbols \a isymbol and \a osymbol and weight \a w
-	between states \a source and \a target in this mutable transducer. 
+	between states \a source and \a target in the mutable transducer. 
 
 	@see String */
     void add_transition(HfstState source, std::string isymbol, std::string osymbol, float w, HfstState target);
@@ -1296,14 +1298,24 @@ void print(HfstMutableTransducer &t)
     HfstTransducer replace_context(HfstTransducer &t, std::string m1, std::string m2, StringPairSet &alphabet);
     HfstTransducer replace_in_context(HfstTransducerPair &context, ReplaceType repl_type, HfstTransducer &t, bool optional, StringPairSet &alphabet);
 
+    /* Used by hfst-calculate. */
+    HfstTransducer restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet,
+			       TwolType twol_type, int direction ); 
 
-    // maybe enum TWO_LEVEL_RULE { IF_RULE, ONLY_IF_RULE, IF_AND_ONLY_IF_RULE }
-    /** \brief ... */
+
+    /** \brief A transducer that obligatorily performs the mappings defined by \a mappings in the context \a context
+	when the alphabet is \a alphabet. */
     HfstTransducer two_level_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
+
+    /** \brief A transducer that allows the mappings defined by \a mappings only in the context \a context,
+	when the alphabet is \a alphabet. */
     HfstTransducer two_level_only_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
+
+    /** \brief A transducer that always performs the mappings defined by \a mappings in the context \a context
+	and only in that context, when the alphabet is \a alphabet. */
     HfstTransducer two_level_if_and_only_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
 
-    // maybe enum REPLACE_RULE { REPLACE_UP, REPLACE_DOWN, REPLACE_RIGHT, REPLACE_LEFT }
+
     HfstTransducer replace_up(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
     HfstTransducer replace_down(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
     HfstTransducer replace_right(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
@@ -1312,11 +1324,6 @@ void print(HfstMutableTransducer &t)
     HfstTransducer replace_up(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
     HfstTransducer replace_down(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
 
-    /* Used by hfst-calculate. */
-    HfstTransducer restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet,
-			       TwolType twol_type, int direction ); 
-
-    // maybe enum ?
     HfstTransducer restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
     HfstTransducer coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
     HfstTransducer restriction_and_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
