@@ -52,7 +52,7 @@ namespace hfst
       For example, if the tokenizer contains a multicharacter symbol "foo" and a skip symbol "fo",
       the string "foo" is tokenized as "foo:foo".
       If the tokenizer contains a multicharacter symbol "fo" and a skip symbol "foo",
-      the string "foo" is tokenized as an empty string (check this).
+      the string "foo" is tokenized as an empty string.
 
       An example:
 \verbatim
@@ -66,8 +66,7 @@ namespace hfst
 \endverbatim
 
       @note The tokenizer only tokenizes utf-8 strings. 
-      <a href="classhfst_1_1HfstTransducer.html#symbols">Special symbols</a> 
-      are not included in the tokenizer unless added to it.*/
+      Special symbols (see #String) are not included in the tokenizer unless added to it.*/
   class HfstTokenizer
   {  
   private:

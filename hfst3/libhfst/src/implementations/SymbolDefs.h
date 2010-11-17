@@ -55,9 +55,9 @@ namespace hfst
 
   typedef std::vector<NumberPair> NumberPairVector;
 
-  /** \brief A set of symbol pairs used in substituting symbol pairs. 
+  /** \brief A set of symbol pairs used in substituting symbol pairs and in rule functions. 
 
-     @see HfstTransducer::substitute(const StringPair&, const StringPairSet &) */
+     @see HfstTransducer::substitute(const StringPair&, const StringPairSet &) #hfst::rules */
   typedef std::set<StringPair> StringPairSet;
 
   typedef std::set<NumberPair> NumberPairSet;
