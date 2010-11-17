@@ -52,28 +52,40 @@ namespace hfst
 /** \mainpage 
 
 HFST - The Helsinki Finite-State Transducer technology is intended for creating and manipulating weighted or unweighted synchronic transducers implementing regular relations.
-
-Currently HFST has been implemented using the SFST, OpenFst and foma software libraries.
+Currently HFST has been implemented using the 
+<a href="http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html">SFST</a>, 
+<a href="http:://www.openfst.org">OpenFst</a> and 
+<a href="http://foma.sourceforge.net/">foma</a> software libraries.
 Other versions may be added in some future release. 
 SFST and foma implementations are unweighted and OpenFst implementation is weighted.
-More info on SFST tools is in http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html,
-OpenFst in http://www.openfst.org and foma in http://www.aclweb.org/anthology/E/E09/E09-2008.pdf.
+The examples given in this documentation use <a href="http://www.xrce.xerox.com/Research-Development/Publications/1997-005/(language)">Xerox transducer notation</a>.
+<!-- More info on SFST tools is in http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html,
+OpenFst in http://www.openfst.org and foma in http://www.aclweb.org/anthology/E/E09/E09-2008.pdf. -->
 
-The examples use Xerox transducer notations ( http://www.xrce.xerox.com/Research-Development/Publications/1997-005/(language) ).
 
-The HFST API is written in the namespace #hfst that contains the following classes and namespaces:
+<b>TODO: A quick start</b>
 
-   - HfstTransducer: a class for creating transducers and performing operations on them.
+The HFST API is written in the namespace #hfst that contains the following classes:
 
-   - \link hfst::rules rules\endlink: a namespace that contains functions to create two-level, replace, restriction and coercion rules.
+   - HfstTransducer: A class for creating transducers and performing operations on them.
 
-   - HfstInputStream and HfstOutputStream: classes for writing and reading binary transducers.
+   - HfstInputStream and HfstOutputStream: Classes for writing and reading binary transducers.
 
-   - HfstMutableTransducer, HfstTransition, HfstTransitionIterator and HfstStateIterator: classes for creating transducers from scratch and iterating through their states and transitions.
+   - HfstMutableTransducer, HfstTransition, HfstTransitionIterator and HfstStateIterator: Classes for creating transducers from scratch and iterating through their states and transitions.
 
-   - HfstGrammar ?
+   - HfstGrammar: A class used in \link HfstTransducer::compose_intersect intersecting composition\endlink.
 
-   - \link hfst::exceptions exceptions\endlink: a namespace for exceptions.
+and the following namespaces:
+
+   - \link hfst::rules rules\endlink: A namespace that contains functions to create two-level, replace, restriction and coercion rules.
+
+   - \link hfst::xfst xfst\endlink: ?
+
+   - \link hfst::lexc lexc\endlink: A namespace for Xerox LexC related specific functions and classes.
+
+   - \link hfst::xre xre\endlink: A namespace for functions related to regular expression parsing.
+
+   - \link hfst::exceptions exceptions\endlink: A namespace for exceptions.
 
 */
 
@@ -118,7 +130,7 @@ The HFST API is written in the namespace #hfst that contains the following class
   };
 
   /** \brief The type of a push operation.
-      @see hfst::implementations::HfstTransducer::push_weights */
+      @see HfstTransducer::push_weights */
   enum PushType
   { 
     TO_INITIAL_STATE /**< Push weights towards initial state. */,
@@ -399,7 +411,7 @@ The HFST API is written in the namespace #hfst that contains the following class
   typedef std::vector<HfstTransducer> HfstTransducerVector;
 
 #if HAVE_OPENFST
-  /** \brief A set of transducers used in function compose_intersect. 
+  /** \brief A set of transducers used in function HfstTransducer::compose_intersect. 
 
       @see HfstTransducer::compose_intersect */
   class HfstGrammar
@@ -431,12 +443,12 @@ The HFST API is written in the namespace #hfst that contains the following class
 
     \section argument_handling Argument handling
 
-    Transducer functions modify their calling object and return a pointer to it, unless otherwise said.
+    Transducer functions modify their calling object and return a reference to it, unless otherwise said.
+    Transducer arguments are usually not modified.
 \verbatim
-    transducer.reverse();                                    // these lines do
-    transducer = transducer.reverse();                       // the same thing
+    transducer.reverse();                                    // transducer is now reversed
 
-    tr1 = tr1.disjunct(tr2);                                 // tr2 is not modified, but a copy of it is disjuncted with t1
+    tr1.disjunct(tr2);                                       // tr2 is not modified, but a copy of it is disjuncted with t1
 
     tr.reverse().determinize().reverse().determinize();      // a chain of functions is possible
 \endverbatim
@@ -468,14 +480,17 @@ The HFST API is written in the namespace #hfst that contains the following class
 An example:
 \verbatim
 ImplementationType type = SFST_TYPE;
-HfstTransducer unk_eps("@_UNKNOWN_SYMBOL_@", "foo");
-HfstTransducer id_bar("@_IDENTITY_SYMBOL_@");
-HfstTransducer bar("bar");
-id_bar.concatenate(bar); 
+HfstTransducer tr1("@_UNKNOWN_SYMBOL_@", "foo", type);
+// tr1 is [ @_UNKNOWN_SYMBOL_@:foo ]
 
-// id_bar is expanded to [ [ @_IDENTITY_SYMBOL_@:@_IDENTITY_SYMBOL_@ | foo:foo ] [ bar:bar ] ]
-// unk_eps is expanded to [ @_UNKNOWN_SYMBOL_@:foo | bar:foo ]
-unk_eps.disjunct(id);
+HfstTransducer tr2("@_IDENTITY_SYMBOL_@", type);
+HfstTransducer tmp("bar", type);
+tr2.concatenate(tmp); 
+// tr is [ [ @_IDENTITY_SYMBOL_@:@_IDENTITY_SYMBOL_@ ] [ bar:bar ] ]
+
+tr1.disjunct(tr2);
+// tr1 is expanded to [ @_UNKNOWN_SYMBOL_@:foo | bar:foo ]
+// tr2 is expanded to [ [ @_IDENTITY_SYMBOL_@:@_IDENTITY_SYMBOL_@ | foo:foo ] [ bar:bar ] ]
 \endverbatim
 
   */
@@ -557,11 +572,10 @@ unk_eps.disjunct(id);
 
 	An example:
 \verbatim
-       std::string input = "foo";
-	std::string output = "bar";
-	HfstTokenizer TOK;
-       HfstTransducer tr(input, output, TOK, LOG_OFST_TYPE);
-	// tr now contains one path [f:b o:a o:r]
+       std::string ustring = "foobar";
+       HfstTokenizer TOK;
+       HfstTransducer tr(ustring, TOK, LOG_OFST_TYPE);
+       // tr now contains one path [f o o b a r]
 \endverbatim
 
 	@see HfstTokenizer **/
@@ -583,10 +597,10 @@ unk_eps.disjunct(id);
 	An example:
 \verbatim
        std::string input = "foo";
-	std::string output = "barr";
-	HfstTokenizer TOK;
+       std::string output = "barr";
+       HfstTokenizer TOK;
        HfstTransducer tr(input, output, TOK, SFST_TYPE);
-	// tr now contains one path [f:b o:a o:r 0:r]
+       // tr now contains one path [f:b o:a o:r 0:r]
 \endverbatim
 
 	@see HfstTokenizer **/
@@ -752,23 +766,23 @@ The argument \a epsilon_symbol only denotes how epsilons are represented in \a i
 	@throws hfst::exceptions::FileNotReadableException hfst::exceptions::NotValidAttFormatException */
     static HfstTransducer &read_in_att_format(const char * filename, ImplementationType type, const std::string &epsilon_symbol);
 
-    /** \brief Remove all epsilon:epsilon transitions from this transducer. */
+    /** \brief Remove all <i>epsilon:epsilon</i> transitions from the transducer. */
     HfstTransducer &remove_epsilons();
 
-    /** \brief Determinize this transducer.
+    /** \brief Determinize the transducer.
 
 	Determinizing a transducer yields an equivalent transducer that has
 	no state with two or more transitions whose input:output symbol pairs are the same. */
     HfstTransducer &determinize();
 
-    /** \brief Minimize this transducer.
+    /** \brief Minimize the transducer.
 
 	Minimizing a transducer yields an equivalent transducer with the smallest number of states. 
      
 	@bug OpenFst's minimization algorithm seems to add epsilon transitions to weighted transducers? */
     HfstTransducer &minimize();
 
-    /** \brief Extract \a n best paths of this transducer. 
+    /** \brief Extract \a n best paths of the transducer. 
 
 	In the case of a weighted transducer (#TROPICAL_OFST_TYPE or #LOG_OFST_TYPE), best paths are defined as paths with the lowest weight.
 	In the case of an unweighted transducer (#SFST_TYPE or #FOMA_TYPE), best paths are defined as paths with the smallest number of transitions, i.e. the shortest paths. 
@@ -779,10 +793,10 @@ The argument \a epsilon_symbol only denotes how epsilons are represented in \a i
     */
     HfstTransducer &n_best(unsigned int n);
 
-    /** \brief A concatenation of n transducers where n is any number from zero to infinity. */
+    /** \brief A concatenation of N transducers where N is any number from zero to infinity. */
     HfstTransducer &repeat_star();
 
-    /** \brief A concatenation of n transducers where n is any number from one to infinity. */
+    /** \brief A concatenation of N transducers where N is any number from one to infinity. */
     HfstTransducer &repeat_plus();
 
     /** \brief A concatenation of \a n transducers. */
@@ -797,26 +811,26 @@ The argument \a epsilon_symbol only denotes how epsilons are represented in \a i
     /** \brief A concatenation of N transducers where N is any number from \a n to \a k, inclusive.*/
     HfstTransducer& repeat_n_to_k(unsigned int n, unsigned int k);
 
-    /** \brief Disjunct this transducer with an epsilon transducer. */
+    /** \brief Disjunct the transducer with an epsilon transducer. */
     HfstTransducer &optionalize();
 
-    /** \brief Swap the input and output labels of each transition in this transducer. */
+    /** \brief Swap the input and output labels of each transition in the transducer. */
     HfstTransducer &invert();
 
-    /** \brief Reverse this transducer. 
+    /** \brief Reverse the transducer. 
 
 	A reverted transducer accepts the string "n(0) n(1) ... n(N)" iff the original
 	transducer accepts the string "n(N) n(N-1) ... n(0)" */
     HfstTransducer &reverse();
 
-    /** \brief Extract the input language of this transducer. 
+    /** \brief Extract the input language of the transducer. 
 
-	All transition symbol pairs "isymbol:osymbol" are changed to "isymbol:isymbol". */
+	All transition symbol pairs <i>isymbol:osymbol</i> are changed to <i>isymbol:isymbol</i>. */
     HfstTransducer &input_project();
 
-    /** \brief Extract the output language of this transducer.
+    /** \brief Extract the output language of the transducer.
 
-	All transition symbol pairs "isymbol:osymbol" are changed to "osymbol:osymbol". */
+	All transition symbol pairs <i>isymbol:osymbol</i> are changed to <i>osymbol:osymbol</i>. */
     HfstTransducer &output_project();
 
     /* \brief Call \a callback with some or all string pairs recognized by the transducer?
@@ -830,13 +844,13 @@ The argument \a epsilon_symbol only denotes how epsilons are represented in \a i
     std::vector<HfstTransducer*> extract_paths();
 
 	  /** \brief Extract a maximum of \a max_num string pairs that are recognized by the transducer
-	      following a maximum of \a cycles cycles and store them into \a results.
+	      following a maximum of \a cycles cycles and store the string pairs into \a results.
 
 	The total number of resulting strings is capped at \a max_num, with 0 or negative
 	indicating unlimited. The \a cycles parameter indicates how many times a cycle
 	will be followed, with negative numbers indicating unlimited. If this function
-	is called on a cyclic transducer with unlimited values for both max_num and
-	cycles, an exception will be thrown.
+	is called on a cyclic transducer with unlimited values for both \a max_num and
+	\a cycles, an exception will be thrown.
 	@throws hfst::exceptions::TransducerIsCyclicException
 	@see #n_best */
     void extract_strings(WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1);
@@ -857,7 +871,7 @@ The argument \a epsilon_symbol only denotes how epsilons are represented in \a i
     /** \brief Freely insert symbol pair \a symbol_pair into the transducer. */
     HfstTransducer &insert_freely(const StringPair &symbol_pair);
 
-    /** \brief Substitute all transition pairs <i>isymbol</i>:<i>osymbol</i> according to function \a func. 
+    /** \brief Substitute all transition pairs <i>isymbol</i>:<i>osymbol</i> as defined in function \a func. 
 
 	An example:
 \verbatim
@@ -908,8 +922,8 @@ t.substitute(&func);
     HfstTransducer &substitute(const StringPair &old_symbol_pair,
 			       const StringPair &new_symbol_pair);
 
-    /** \brief Substitute all transitions whose symbol pairs are equal to \a old_symbol_pair 
-	with a set of transitions whose symbol pairs are equal to \a new_symbol_pair_set. 
+    /** \brief Substitute all transitions equal to \a old_symbol_pair 
+	with a set of transitions equal to \a new_symbol_pair_set. 
 
 	The weight of the original transition is copied to all new transitions.
 
@@ -924,7 +938,7 @@ t.substitute(&func);
 
     /** \brief Substitute all transitions equal to \a symbol_pair with a copy of transducer \a transducer. 
 
-	A copy of \a transducer is attached between the source and target states of the original transition with epsilon transitions.
+	A copy of \a transducer is attached (using epsilon transitions) between the source and target states of the transition to be substituted.
 	The weight of the original transition is copied to the epsilon transition leaving from the source state.
 
 	Implemented only for #TROPICAL_OFST_TYPE and #LOG_OFST_TYPE.
@@ -942,19 +956,18 @@ t.substitute(&func);
     */
     HfstTransducer &set_final_weights(float weight);
 
-    /** \brief Transform all transition and state weights according to the function pointer \a func. 
+    /** \brief Transform all transition and state weights as defined in \a func. 
 
      An example:
 \verbatim
-    float func(float f) { 
-      return 2*f + 0.5; 
-    }
+float func(float f) { 
+  return 2*f + 0.5; 
+}
 
-    ...
+...
 
-    // All transition and final weights are multiplied by two and summed with 0.5.
-    HfstTransducer t_transformed =
-      t.transform_weights(&func);
+// All transition and final weights are multiplied by two and summed with 0.5.
+HfstTransducer t_transformed;
 \endverbatim 
 
     If the HfstTransducer is of unweighted type (#SFST_TYPE or #FOMA_TYPE), nothing is done.
@@ -975,7 +988,9 @@ t.substitute(&func);
     /** \brief Compose this transducer with the intersection of rule transducers in \a grammar. 
 
 	The algorithm used by this function is faster than intersecting 
-	all transducers one by one and then composing this transducer with the intersection. */
+	all transducers one by one and then composing this transducer with the intersection. 
+
+	@see HfstGrammar */
     HfstTransducer &compose_intersect(HfstGrammar &grammar);
 #endif
 
@@ -994,7 +1009,7 @@ t.substitute(&func);
     HfstTransducer &subtract(const HfstTransducer &another);
 
     
-    /** \brief Whether \a t is cyclic. */
+    /** \brief Whether the transducer is cyclic. */
     bool is_cyclic(void) const;
 
     /** \brief The implementation type of the transducer. */
@@ -1003,14 +1018,14 @@ t.substitute(&func);
 
     /* TEST */
     static float get_profile_seconds(ImplementationType type);
-    /* Get all symbol pairs that occur in the transitions of this transducer. */
+    /* Get all symbol pairs that occur in the transitions of the transducer. */
     StringPairSet get_symbol_pairs();
     /* Whether HFST is linked to the transducer library needed by implementation type \a type. */
     static bool is_implementation_type_available(ImplementationType type);
-    /* Create a tokenizer that recognizes all symbols that occur in this transducer. */
+    /* Create a tokenizer that recognizes all symbols that occur in the transducer. */
     HfstTokenizer create_tokenizer();
 
-    /** \brief Convert this transducer into an equivalent transducer in format \a type. 
+    /** \brief Convert the transducer into an equivalent transducer in format \a type. 
 
 	If a weighted transducer is converted into an unweighted one, all weights are lost. 
 	In the reverse case, all weights are initialized to the semiring's one. */
@@ -1022,16 +1037,17 @@ t.substitute(&func);
     static HfstTransducer &convert(const HfstTransducer &t, ImplementationType type);
 
 
-    //! @brief Lookup or apply a single string.
+    //! @brief Lookup or apply a single string \a s and store a maximum of 
+    //! \a limit results to \a results.
     //!
     //! Traverse all paths on logical first level of the transducer to produce
     //! all possible outputs on the second.
     //! This is in effect a fast composition of single path from left
     //! hand side.
     //!
-    //! @arg results  output parameter to store unique results
-    //! @arg s  string to look up
-    //! @arg limit  number of strings to extract. -1 tries to extract all and
+    //! @param results  output parameter to store unique results
+    //! @param s  string to look up
+    //! @param limit  number of strings to extract. -1 tries to extract all and
     //!             may get stuck if infinitely ambiguous
     void lookup(HfstLookupPaths& results, const HfstLookupPath& s,
                 ssize_t limit = -1);
@@ -1045,17 +1061,18 @@ t.substitute(&func);
     void lookup_fd(HfstLookupPaths& results, const HfstLookupPath& s,
                    ssize_t limit = -1);
 
-    //! @brief Lookdown a single string.
+    //! @brief Lookdown a single string \a s and store a maximum of 
+    //! \a limit results to \a results.
     //!
     //! Traverse all paths on logical second level of the transducer to produce
     //! all possible inputs on the first.
     //! This is in effect a fast composition of single
     //! path from left hand side.
     //!
-    //! @arg results  output parameter to store unique results
-    //! @arg s  string to look down
-    //! @arg tok  tokenizer to split string in arcs
-    //! @arg limit  number of strings to extract. -1 tries to extract all and
+    //! @param results  output parameter to store unique results
+    //! @param s  string to look down
+    //! @param tok  tokenizer to split string in arcs?
+    //! @param limit  number of strings to extract. -1 tries to extract all and
     //!             may get stuck if infinitely ambiguous
     void lookdown(HfstLookupPaths& results, const HfstLookupPath& s,
                   ssize_t limit = -1);
@@ -1069,10 +1086,10 @@ t.substitute(&func);
     void lookdown_fd(HfstLookupPaths& results, HfstLookupPath& s,
                      ssize_t limit = -1);
 
-    //! @brief Whether lookup will have infinite results.
+    //! @brief Whether lookup of path \a s will have infinite results.
     bool is_lookup_infinitely_ambiguous(const HfstLookupPath& s);
 
-    //! @brief Whether lookdown will have infinite results.
+    //! @brief Whether lookdown of path \a s will have infinite results.
     bool is_lookdown_infinitely_ambiguous(const HfstLookupPath& s);
 
     HfstTransducer &operator=(const HfstTransducer &another);
@@ -1259,7 +1276,7 @@ void print(HfstMutableTransducer &t)
   };
 #endif
 
-  /** \brief The same as HfstTransducer::write_in_att_format 
+  /** \brief Write the transducer \a t in binary format to ostream \a out. The same as HfstTransducer::write_in_att_format 
 
       @see HfstTransducer::write_in_att_format */
   std::ostream &operator<<(std::ostream &out,HfstTransducer &t);
