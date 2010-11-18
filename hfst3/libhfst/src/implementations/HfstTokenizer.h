@@ -66,7 +66,9 @@ namespace hfst
 \endverbatim
 
       @note The tokenizer only tokenizes utf-8 strings. 
-      Special symbols (see #String) are not included in the tokenizer unless added to it.*/
+      Special symbols (see #String) are not included in the tokenizer unless added to it.
+
+      @see #hfst::HfstTransducer::HfstTransducer(const std::string&, const HfstTokenizer&, ImplementationType type) */
   class HfstTokenizer
   {  
   private:

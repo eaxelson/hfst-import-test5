@@ -24,36 +24,67 @@ class HfstSymbolsException {};
 /** \brief A superclass for all HFST exceptions. */
 class HfstInterfaceException {};
 
-/** \brief ... */
+/** \brief An argument does not satisfy preconditions. */
 class HfstArgumentException :
 public HfstInterfaceException {};
 
-/** \brief The library required by the implementation type requested is not linked to HFST. */
+/** \brief The library required by the implementation type requested is not linked to HFST. 
+
+An example:
+\verbatim
+try {
+  HfstTransducer("foo", "bar", type);
+} catch (ImplementationTypeNotAvailableException e) {
+  fprintf(stderr, "ERROR: Type requested is not available.\n");
+} 
+\endverbatim
+*/
 class ImplementationTypeNotAvailableException :
 public HfstInterfaceException {};
 
-/** \brief ... */
+/** \brief Error in transducer, text stream or string format. */
 class HfstInputException :
 public HfstInterfaceException {};
 
 
-/** \brief ... */
+/** \brief Error in file handling. 
+
+An example:
+\verbatim
+try {
+  HfstInputStream in("testfile1");
+  HfstTransducer t(in);
+  HfstOutputStream out("testfile2");
+  out << t;
+} catch (HfstFileException e) {
+    fprintf(stderr, "Error in file handling.\n");
+    exit(1);
+}
+\endverbatim
+*/
 class HfstFileException :
 public HfstInterfaceException {};
 
-/** \brief File cannot be read. */
+/** \brief File cannot be read. 
+
+An example:
+\verbatim
+try {
+  HfstInputStream in("testfile");
+} catch (FileNotReadableException e) {
+  fprintf(stderr, "ERROR: file cannot be read.\n");
+}  
+\endverbatim
+*/
 class FileNotReadableException :
-//public HfstInterfaceException {};
 public HfstFileException {};
 
 /** \brief File cannot be written. */
 class FileCannotBeWrittenException :
-//public HfstInterfaceException {};
 public HfstFileException {};
 
 /** \brief File is closed. */
 class FileIsClosedException :
-//public HfstInterfaceException {};
 public HfstFileException {};
 
 
@@ -64,36 +95,41 @@ public HfstFileException {};
 
 /** \brief Transducer is cyclic. 
 
-    thrown by */
+    thrown by HfstTransducer::extract_strings. An example:
+\verbatim
+try {
+  WeightedPaths<float>::Set results;
+  transducer.extract_strings(results);
+  fprintf(stderr, "The transducer has %i paths\n", results.size());
+} catch (TransducerIsCyclicException e) {
+    fprintf(stderr, "The transducer is cyclic and has an infinite number of paths.\n");
+}
+\endverbatim
+*/
 class TransducerIsCyclicException :
-//public HfstInterfaceException {};
 public HfstArgumentException {};
 
 /** \brief The stream does not contain transducers. */
 class NotTransducerStreamException :
-//public HfstInterfaceException {};
 public HfstInputException {};
 
 /** \brief The stream is not in valid AT&T format. 
 
-    thrown by #hfst::HfstTransducer(FILE *, ImplementationType, const std::string&);
+    thrown by #hfst::HfstTransducer::HfstTransducer(FILE *, ImplementationType, const std::string&);
 */
 class NotValidAttFormatException :
-//public HfstInterfaceException {};
 public HfstInputException {};
 
 /** \brief The string is not in valid format. 
 
     The tool hfst-calculate can throw this exception */
 class NotValidStringFormatException :
-//public HfstInterfaceException {};
 public HfstInputException {};
 
 /** \brief State is not final (and cannot have a final weight). 
 
     Thrown by HfstMutableTransducer::get_final_weight. */
 class StateIsNotFinalException :
-//public HfstInterfaceException {};
 public HfstArgumentException {};
 
 /** \brief Function has not been implemented (yet). */
@@ -103,30 +139,26 @@ public HfstInterfaceException {};
 
 /** \brief Context transducers are not automata.
 
-    Thrown by hfst::rules::replace_in_context. */
+    Thrown by #hfst::rules::replace_up(HfstTransducerPair&, HfstTransducer&, bool, StringPairSet&) and similar functions. */
 class ContextTransducersAreNotAutomataException :
-//public HfstInterfaceException {};
 public HfstArgumentException {};
 
 /** \brief Transducer cannot be catenated the number of times requested.
 
     Thrown by HfstTransducer::repeat_n and similar functions. */
 class ImpossibleTransducerPowerException :
-//public HfstInterfaceException {};
 public HfstArgumentException {};
 
 /** \brief The StateId argument is not valid.
 
     This exception suggests that a StateId argument is not from HfstStateIterator. */
 class StateIndexOutOfBoundsException :
-//public HfstInterfaceException {};
 public HfstArgumentException {};
 
 /** \brief Transducer has a malformed HFST header. 
 
     Thrown by HfstTransducer(HfstInputStream&). */
 class TransducerHeaderException :
-//public HfstInterfaceException {};
 public HfstInputException {};
 
 /** \brief The calling and/or called transducer do not have the same type. 
@@ -146,7 +178,6 @@ public HfstInterfaceException {};
 
     Thrown by rule functions in namespace #hfst::rules */
 class EmptySetOfContextsException :
-//public HfstInterfaceException {};
 public HfstArgumentException {};
 
 /* \brief The type of a transducer is not specified. */
@@ -164,7 +195,7 @@ class ErrorException :
 public HfstInterfaceException {};
 
 
-/** \brief ... */
+/** \brief An error happened probably due to a bug in the HFST code. */
 class HfstFatalException :
 public HfstInterfaceException {};
 
@@ -176,21 +207,18 @@ public HfstFatalException {};
 
     This exception suggests that there is something wrong in the HFST code. */
 class SymbolRedefinedException : 
-//public HfstSymbolsException {};
 public HfstFatalException {};
 
 /** \brief Transducer has no start state.
 
 This exception suggests that there is something wrong in the HFST code. */
 class TransducerHasNoStartStateException :
-//public HfstInterfaceException {};
 public HfstFatalException {};
 
 /** \brief Transducer has more than one start state. 
 
 This exception suggests that there is something wrong in the HFST code. */
 class TransducerHasMoreThanOneStartStateException :
-//public HfstInterfaceException {};
 public HfstFatalException {};
 
 

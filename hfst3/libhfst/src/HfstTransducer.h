@@ -73,6 +73,8 @@ The HFST API is written in the namespace #hfst that contains the following class
 
    - HfstMutableTransducer, HfstTransition, HfstTransitionIterator and HfstStateIterator: Classes for creating transducers from scratch and iterating through their states and transitions.
 
+   - HfstTokenizer: A class used in creating transducers from UTF-8 strings.
+
    - HfstGrammar: A class used in \link HfstTransducer::compose_intersect intersecting composition\endlink.
 
 and the following namespaces:
@@ -199,28 +201,30 @@ and the following namespaces:
 
       An example:
 \verbatim
+HfstInputStream *in;
 try {
-  HfstInputStream in("testfile");
+  in = new HfstInputStream("testfile");
 } catch (FileNotReadableException e) {
     printf("ERROR: File does not exist.\n");
     exit(1);
 }
 int n=0;
-while (not in.is_eof()) {
-  if (in.is_bad()) {
+while (not in->is_eof()) {
+  if (in->is_bad()) {
     printf("ERROR: Stream cannot be read.\n");
     exit(1); 
   }
-  if (not in.is_fst()) {
+  if (not in->is_fst()) {
     printf("ERROR: Stream does not contain transducers.\n");
     exit(1); 
   }
-  HfstTransducer t(in);
+  HfstTransducer t(*in);
   printf("One transducer succesfully read.\n");
   n++;
 }
 printf("\nRead %i transducers in total.\n", n);
-in.close();
+in->close();
+delete in;
 \endverbatim
 
       @see HfstTransducer::HfstTransducer(HfstInputStream &in) **/
@@ -744,7 +748,7 @@ Epsilon will be represented as "@_EPSILON_SYMBOL_@" in the resulting transducer.
 The argument \a epsilon_symbol only denotes how epsilons are represented in \a ifile.
 
 @throws hfst::exceptions::NotValidAttFormatException
-@see write_in_att_format(FILE*,bool) String
+@see #write_in_att_format(FILE*,bool)const String
 **/
     HfstTransducer(FILE * ifile, ImplementationType type, const std::string &epsilon_symbol);
 
@@ -1303,35 +1307,172 @@ void print(HfstMutableTransducer &t)
 			       TwolType twol_type, int direction ); 
 
 
+
     /** \brief A transducer that obligatorily performs the mappings defined by \a mappings in the context \a context
-	when the alphabet is \a alphabet. */
+	when the alphabet is \a alphabet. 
+
+	For example, a transducer yielded by the following arguments
+\verbatim
+context = pair( [c|d], [e] )
+mappings = set(a:b)
+alphabet = set(a, a:b, b, c, d, e, ...)
+\endverbatim
+	obligatorily maps the symbol a to b if c or d precedes and e follows. (Elsewhere,
+	the mapping of a to b is optional)
+	This expression is identical to ![.* [c|d] [a:. & !a:b] [e] .*]
+	Note that the alphabet must contain the pair a:b here.
+	
+	@see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>
+    */
     HfstTransducer two_level_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
 
     /** \brief A transducer that allows the mappings defined by \a mappings only in the context \a context,
-	when the alphabet is \a alphabet. */
+	when the alphabet is \a alphabet. 
+	
+	If called with the same arguments as in the example of #two_level_if, the transducer
+	allows the mapping of symbol a to b only if c or d precedes and e follows. The
+	mapping of a to b is optional in this context but cannot occur in any other context.
+	The expression is equivalent to ![  [ ![.* [c|d]] a:b .* ] | [ .* a:b ![[e] .*] ]  ]
+	
+	@see #two_level_if
+    */
     HfstTransducer two_level_only_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
 
     /** \brief A transducer that always performs the mappings defined by \a mappings in the context \a context
-	and only in that context, when the alphabet is \a alphabet. */
+	and only in that context, when the alphabet is \a alphabet. 
+
+	If called with the same arguments as in the example of #two_level_if, the transducer
+	maps symbol a to b only and only if c or d precedes and e follows.
+	The mapping of a to b is obligatory in this context and cannot occur in any other context.
+	The expression is equivalent to ![.* [c|d] [a:. & !a:b] [e] .*]  &
+	![  [ ![.* [c|d]] a:b .* ] | [ .* a:b ![[e] .*] ]  ]
+	
+	@see #two_level_if
+    */
     HfstTransducer two_level_if_and_only_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
 
 
+
+    /** \brief A transducer that performs an upward mapping \a mapping in the context \a context when the alphabet is \a alphabet.
+	\a optional defines whether the mapping is optional. 
+
+	Each substring s of the input string which is in the input language
+	of the transducer \a mapping and whose left context is matched by the expression
+	[.* l] (where l is the first element of \a context) and whose right context is matched by [r .*] 
+	(where r is the second element in the context) is mapped to the respective
+	surface strings defined by transducer \a mapping. Any other character is mapped to
+	the characters specified in \a alphabet. The left and right contexts must
+	be automata (i.e. transducers which map strings onto themselves).
+
+	For example, a transducer yielded by the following arguments
+\verbatim
+context = pair( [c], [c] )
+mappings = [ a:b a:b ]
+alphabet = set(a, b, c)
+\endverbatim
+	would map the string "caacac" to "cbbcac".
+
+	Note that the alphabet must contain the characters a and b, but not the pair
+	a:b (unless this replacement is to be allowed everywhere in the context).
+
+	Note that replace operations (unlike the two-level rules) have to be combined by composition
+	rather than intersection.
+
+	@see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>
+    */
     HfstTransducer replace_up(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+
+    /** \brief The same as replace_up, but matching is done on the output side of \a mapping 
+
+	@see replace_up <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
     HfstTransducer replace_down(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+
+    /** \brief The same as replace_up, but left context matching is done on the output side of \a mapping
+	and right context on the input side of \a mapping 
+
+	@see replace_up <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
     HfstTransducer replace_right(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+
+    /** \brief The same as replace_up, but left context matching is done on the input side of \a mapping
+	and right context on the output side of \a mapping. 
+
+	@see replace_up <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
     HfstTransducer replace_left(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
 
+    /** \brief The same as replace_up but \a mapping is performed in every context. 
+
+	@see replace_up */
     HfstTransducer replace_up(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+
+    /** \brief The same as replace_down but \a mapping is performed in every context.
+
+	@see replace_up */
     HfstTransducer replace_down(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
 
+
+
+    /** \brief A transducer that allows any (substring) mapping defined by \a mapping
+	only if it occurs in any of the contexts in \a contexts. Symbols outside of the matching
+	substrings are mapped to any symbol allowed by \a alphabet. 
+
+	@see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
     HfstTransducer restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+
+    /** \brief A transducer that requires that one of the mappings defined by \a mapping
+	must occur in each context in \a contexts. Symbols outside of the matching
+	substrings are mapped to any symbol allowed by \a alphabet.
+
+	@see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
     HfstTransducer coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+
+    /** \brief A transducer that is equivalent to the intersection of restriction and coercion
+	and requires that the mappings defined by \a mapping occur always and only in the
+	given contexts in \a contexts. Symbols outside of the matching
+	substrings are mapped to any symbol allowed by \a alphabet.
+
+	@see #restriction(HfstTransducerPairVector&, HfstTransducer&, StringPairSet&) #coercion <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a> */
     HfstTransducer restriction_and_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+
+    /** \brief A transducer that specifies that a string from the input language of the
+	transducer \a mapping may only be mapped to one of its output strings (according
+	to transducer \a mapping) if it appears in any of the contexts in \a contexts.
+	Symbols outside of the matching substrings are mapped to any symbol allowed by \a alphabet.
+
+	@see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
     HfstTransducer surface_restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+
+    /** \brief A transducer that specifies that a string from the input language of the transducer
+	\a mapping always has to the mapped to one of its output strings according to
+	transducer \a mapping if it appears in any of the contexts in \a contexts.
+	Symbols outside of the matching substrings are mapped to any symbol allowed by \a alphabet.
+
+	@see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
     HfstTransducer surface_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+
+    /** \brief A transducer that is equivalent to the intersection of surface_restriction and surface_coercion.
+
+	@see #surface_restriction #surface_coercion <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
     HfstTransducer surface_restriction_and_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+
+    /** \brief A transducer that specifies that a string from the output language of the transducer
+	\a mapping may only be mapped to one of its input strings (according to transducer \a mappings)
+	if it appears in any of the contexts in \a contexts.
+	Symbols outside of the matching substrings are mapped to any symbol allowed by \a alphabet.
+
+	@see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
     HfstTransducer deep_restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+
+    /** \brief A transducer that specifies that a string from the output language of the transducer
+	\a mapping always has to be mapped to one of its input strings (according to transducer \a mappings)
+	if it appears in any of the contexts in \a contexts.
+	Symbols outside of the matching substrings are mapped to any symbol allowed by \a alphabet.
+
+	@see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
     HfstTransducer deep_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+
+    /** \brief A transducer that is equivalent to the intersection of deep_restriction and deep_coercion.
+
+	@see #deep_restriction #deep_coercion <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
     HfstTransducer deep_restriction_and_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
   }
 
