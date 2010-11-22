@@ -154,6 +154,9 @@ unsigned long hfst_strtoul(char *s, int base);
  */
 hfst::ImplementationType hfst_parse_format_name(const char* s);
 
+/** @brief allocate new string describing type of transducer format */
+char* hfst_strformat(hfst::ImplementationType format);
+
 #if HAVE_XSTRDUP
 #  define hfst_strdup xstrdup
 #else

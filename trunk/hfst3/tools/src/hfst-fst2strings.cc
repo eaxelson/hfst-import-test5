@@ -33,14 +33,17 @@
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 #include "HfstTransducer.h"
-#include "inc/globals-common.h"
-#include "inc/globals-unary.h"
+#include "HfstInputStream.h"
+#include "HfstOutputStream.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::exceptions::NotTransducerStreamException;
 using hfst::WeightedPaths;
 using hfst::WeightedPath;
+
+#include "inc/globals-common.h"
+#include "inc/globals-unary.h"
 
 // the maximum number of strings printed for each transducer
 static int max_strings = 0;

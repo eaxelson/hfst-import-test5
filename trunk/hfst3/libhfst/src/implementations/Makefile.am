@@ -39,56 +39,13 @@ endif
 
 BRIDGE_SRCS=$(MAYBE_SFST) $(MAYBE_OPENFST) $(MAYBE_FOMA) $(MAYBE_HFSTOL)
 
-# underlying backend objects
-#if WANT_SFST
-#SFST_SRCS=\
-	SFST/src/alphabet.C         \
-	SFST/src/basic.C            \
-	SFST/src/compact.C          SFST/src/fst.C     SFST/src/generate.C\
-	SFST/src/interface.C\
-	SFST/src/determinise.C      SFST/src/lowmem.C\
-	SFST/src/make-compact.C\
-	SFST/src/operators.C\
-	SFST/src/robust.C           SFST/src/utf8.C    SFST/src/expand.C
-#endif
-#if WANT_FOMA
-#FOMA_SRCS=\
-#		  foma/apply.c          foma/flags.c        foma/spelling.c\
-#		  foma/coaccessible.c   foma/int_stack.c    foma/mem.c\
-#		  foma/structures.c foma/constructions.c  foma/invert.c\
-#		  foma/minimize.c foma/topsort.c foma/define.c         foma/io.c\
-#		  foma/utf8.c foma/determinize.c    foma/lex.cmatrix.c\
-#		  foma/reverse.c foma/dynarray.c foma/lexcread.c     foma/rewrite.c\
-#		  foma/extract.c        foma/lex.lexc.c foma/sigma.c
-#endif
 if WANT_HFSTOL
 HFST_OL_SRCS=\
 optimized-lookup/transducer.cc optimized-lookup/convert.cc
 endif
 
-if WANT_XRE
-XRE_SRCS=xre_lex.ll xre_parse.yy xre_utils.cc XreCompiler.cc
-XRE_HDRS=XreCompiler.h xre_utils.h
-XRE_BUILT=xre_parse.h
-endif
-if WANT_LEXC
-LEXC_SRCS=lexc-lexer.ll lexc-parser.yy lexc-utils.cc LexcCompiler.cc
-LEXC_HDRS=LexcCompiler.h lexc-utils.h
-LEXC_BUILT=lexc-parser.h
-endif
-if WANT_XFST
-XFST_SRCS=xfst-lexer.ll xfst-parser.yy xfst-utils.cc XfstCompiler.cc
-XFST_HDRS=XfstCompiler.h xfst-utils.h
-XFST_BUILT=xfst-parser.h
-endif
-BUILT_SOURCES=$(XRE_BUILT) $(LEXC_BUILT) $(XFST_BUILT)
-
-AM_YFLAGS=-d
-AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
-
 libhfstimplementations_la_SOURCES=$(IMPLEMENTATION_SRCS) $(BRIDGE_SRCS) \
-								  $(SFST_SRCS) $(HFST_OL_SRCS) \
-								  $(XRE_SRCS) $(LEXC_SRCS) $(XFST_SRCS)
+								  $(SFST_SRCS) $(HFST_OL_SRCS)
 
 # headers of implementation bridge to reveal to public
 hfstincludedir = $(includedir)/hfst
@@ -98,21 +55,7 @@ implinclude_HEADERS = \
 		ConvertTransducerFormat.h \
 		ExtractStrings.h FlagDiacritics.h FomaTransducer.h HfstExceptions.h \
 		HfstTokenizer.h LogFstTrieFunctions.h LogWeightTransducer.h \
-		SfstTransducer.h TropicalWeightTransducer.h HfstOlTransducer.h InternalTransducer.h \
-		$(XRE_HDRS) $(LEXC_HDRS) $(XFST_HDRS)
-
-# headers of backends to reveal to public...
-# TODO: in ideal case you'd delete these and link to public libs of backends
-# using public headers of backends
-#if WANT_SFST
-#sfstincludedir = $(implincludedir)/SFST/src
-#SFST_DIR = SFST/src
-#sfstinclude_HEADERS = \
-		$(SFST_DIR)/alphabet.h $(SFST_DIR)/basic.h $(SFST_DIR)/compact.h \
-		$(SFST_DIR)/make-compact.h $(SFST_DIR)/fst.h $(SFST_DIR)/mem.h \
-		$(SFST_DIR)/lowmem.h \
-		$(SFST_DIR)/utf8.h 
-#endif
+		SfstTransducer.h TropicalWeightTransducer.h HfstOlTransducer.h InternalTransducer.h
 
 if WANT_HFSTOL
 hfstolincludedir = $(implincludedir)/optimized-lookup

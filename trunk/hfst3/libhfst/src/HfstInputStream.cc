@@ -10,12 +10,15 @@
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "HfstTransducer.h"
+#include "HfstInputStream.h"
 
 namespace hfst
 {
-  void error(const char *msg)
+  void debug_error(const char *msg)
   {
+#if PRINT_DEBUG_MESSAGES
     fprintf(stderr, "%s\n", msg);
+#endif
   }
 
   void HfstInputStream::ignore(unsigned int n)
@@ -140,7 +143,7 @@ namespace hfst
     return is_eof();
   }
 
-  bool HfstInputStream::set_implementation_specific_header_data(StringPairVector &data, unsigned int index)
+  bool HfstInputStream::set_implementation_specific_header_data(StringPairVector& /* data */, unsigned int /* index*/)
   {
     switch (type)
       {
@@ -166,7 +169,6 @@ namespace hfst
     else {
       ImplementationType stype = stream_fst_type();
       if (stype != type) {
-	fprintf(stderr, "previous type %i, next type %i\n", type, stype);
 	throw hfst::exceptions::TransducerTypeMismatchException();
       }
     }
@@ -205,7 +207,7 @@ namespace hfst
       case ERROR_TYPE:
 	//case UNSPECIFIED_TYPE:
       default:
-	error("#1");
+	debug_error("#1");
 	throw hfst::exceptions::NotTransducerStreamException();
 	break;
       }
@@ -256,7 +258,7 @@ namespace hfst
 	  unsigned int prop_length= i1*256 + i2;
 	  bytes_read=2;
 	  if (prop_length != 2) {
-	    error("#2");
+	    debug_error("#2");
 	    throw hfst::exceptions::NotTransducerStreamException();
 	  }
 	  char c2=stream_get();
@@ -269,7 +271,7 @@ namespace hfst
 	    return HFST_VERSION_2_UNWEIGHTED;
 	  }
 	  else {
-	    	error("#3");
+	    	debug_error("#3");
 	    throw hfst::exceptions::NotTransducerStreamException();
 	  }
 	  break;
@@ -378,7 +380,6 @@ namespace hfst
 	//fprintf(stderr, "#4#\n");
       int type_bytes=0;
       type = get_fst_type_beta(type_bytes); // throws error
-      fprintf(stderr, "type is %i\n", type);
       if (type == ERROR_TYPE) {
 	throw hfst::exceptions::NotTransducerStreamException();
       }
@@ -393,7 +394,7 @@ namespace hfst
   {
     std::string fst_type = stream_getstring();
     if (stream_eof()) {
-      	error("#5");
+      	debug_error("#5");
       throw hfst::exceptions::NotTransducerStreamException();
     }
     if (fst_type.compare("SFST_TYPE") == 0)
@@ -461,7 +462,7 @@ namespace hfst
     int c2 = stream_get();
     int c = stream_get();
     if (c != 0) {
-      error("#6");
+      debug_error("#6");
       throw hfst::exceptions::NotTransducerStreamException();
     }
     header_size = (c1 * 256) + c2;
@@ -486,12 +487,12 @@ namespace hfst
 	bytes_read = bytes_read + (int)str1.length() + (int)str2.length() + 2; 
 
 	if (bytes_read > header_size) {
-	  error("#7");
+	  debug_error("#7");
 	  fprintf(stderr, "%i > %i\n", bytes_read, header_size);
 	  throw hfst::exceptions::NotTransducerStreamException();
 	}
 	if (stream_eof()) {
-	  error("#8");
+	  debug_error("#8");
 	  throw hfst::exceptions::NotTransducerStreamException();
 	}
 
@@ -601,7 +602,7 @@ namespace hfst
         new hfst::implementations::HfstOlInputStream(true);
       break;
     default:
-      error("#9");
+      debug_error("#9");
       throw hfst::exceptions::NotTransducerStreamException();
     }
   }
@@ -660,7 +661,7 @@ namespace hfst
       implementation.hfst_ol = new hfst::implementations::HfstOlInputStream(filename, true);
       break;
     default:
-      error("#10");
+      debug_error("#10");
       throw hfst::implementations::NotTransducerStreamException();
     }
   }
@@ -694,7 +695,7 @@ namespace hfst
       case ERROR_TYPE:
 	//case UNSPECIFIED_TYPE:
       default:
-	error("#11");
+	debug_error("#11");
 	throw hfst::exceptions::NotTransducerStreamException();
       }
   }

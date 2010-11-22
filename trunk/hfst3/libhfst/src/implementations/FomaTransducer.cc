@@ -883,7 +883,7 @@ namespace hfst { namespace implementations {
         printf("File format error!\n");
         return NULL;
     }
-    net->states = (fsm_state*) xxmalloc(net->linecount*sizeof(struct fsm_state));
+    net->states = (fsm_state*) malloc(net->linecount*sizeof(struct fsm_state));
     fsm = net->states;
     laststate = -1;
     for (i=0; ;i++) {

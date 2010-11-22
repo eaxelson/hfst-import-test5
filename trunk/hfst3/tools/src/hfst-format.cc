@@ -29,6 +29,8 @@
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 #include "HfstTransducer.h"
+#include "HfstInputStream.h"
+#include "HfstOutputStream.h"
 
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
@@ -39,152 +41,95 @@ using std::ios;
 //using hfst::ImplementationType;
 //using hfst::HfstInputStream;
 
-char * input_file_name = NULL;
 //bool verbose = false;
 
 void
 print_usage()
 {
         // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
-        fprintf(message_out, "Usage: hfst-format [OPTIONS...] [INFILE]\n"
+        fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
                    "determine HFST transducer format\n"
-                "\n");
+                "\n", program_name);
 
         print_common_program_options(message_out);
-        fprintf(message_out,
-                   "\n"
-                   "If OUTFILE or INFILE is missing or -, "
-                   "standard streams will be used.\n"
-                   "\n"
-                   "More info at <https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstFormat>\n"
-                   "\n"
-                   "Report bugs to HFST team <hfst-bugs@helsinki.fi>\n");
-}
-
-void
-print_version_()
-{
-        // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dversion
-        fprintf(message_out, "HFSTFormat 0.0 (%s)\n"
-                   "Copyright (C) 2009 University of Helsinki,\n"
-                   "License GPLv3: GNU GPL version 3 "
-                   "<http://gnu.org/licenses/gpl.html>\n"
-                   "This is free software: you are free to change and redistribute it.\n"
-                   "There is NO WARRANTY, to the extent permitted by law.\n",
-                PACKAGE_STRING);
+        print_common_unary_program_options(message_out);
+        fprintf(message_out, "\n");
+    print_common_unary_program_parameter_instructions(message_out);
+    fprintf(message_out, "\n");
+    print_report_bugs();
+    print_more_info();
 }
 
 
 int
 parse_options(int argc, char** argv)
 {
-	// use of this function requires options are settable on global scope
-	while (true)
-	{
-		static const struct option long_options[] =
-		{
-			{"help", no_argument, 0, 'h'},
-			{"version", no_argument, 0, 'V'},
-			{"verbose", no_argument, 0, 'v'},
-			{"input", required_argument, 0, 'i'},
-			{"input1", required_argument, 0, '1'},
-			{"input2", required_argument, 0, '2'},
-			{"lexicon", required_argument, 0, 'l'},
-			{0,0,0,0}
-		};
-		int option_index = 0;
-		char c = getopt_long(argc, argv, ":i:1:2:l:vhV",
-							 long_options, &option_index);
-		if (-1 == c)
-		{
-			break;
-		}
-		switch (c)
-		{
-		case 'h':
-			print_usage();
-			exit(0);
-			break;
-		case 'V':
-			print_version_();
-			exit(0);
-			break;
-		case 'v':
-		  verbose = true;
-		  break;
-		case 'i':
-		  input_file_name = strdup(optarg);
-		  break;
-		case '1':
-		  input_file_name = strdup(optarg);
-		  break;
-		case '2':
-		  input_file_name = strdup(optarg);
-		  break;
-		case 'l':
-		  input_file_name = strdup(optarg);
-		  break;
-		default:
-		  break;
-		}
-	}
+    // use of this function requires options are settable on global scope
+    while (true)
+    {
+        static const struct option long_options[] =
+        {
+          HFST_GETOPT_COMMON_LONG,
+          HFST_GETOPT_UNARY_LONG,
+          {"input1", required_argument, 0, '1'},
+          {"input2", required_argument, 0, '2'},
+          {"lexicon", required_argument, 0, 'l'},
+          {0,0,0,0}
+        };
+        int option_index = 0;
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
+                             HFST_GETOPT_UNARY_SHORT "1:2:l:",
+                             long_options, &option_index);
+        if (-1 == c)
+        {
+            break;
+        }
+        switch (c)
+        {
+#include "inc/getopt-cases-common.h"
+#include "inc/getopt-cases-unary.h"
+        case '1':
+          inputfilename = strdup(optarg);
+          break;
+        case '2':
+          inputfilename = strdup(optarg);
+          break;
+        case 'l':
+          inputfilename = strdup(optarg);
+          break;
+        default:
+          // I suppose it's crucial for this tool to ignore other options
+          break;
+        }
+    }
 
-	// ImplementationType guess_fst_type(std::istream &in);
 
-	(void)inputfilename;
-	(void)inputNamed;
+    (void)inputfilename;
+    (void)inputNamed;
 
-	if (input_file_name == NULL)
-	  {
-	    if ((argc - optind) == 0)
-	      {
-		if (verbose)
-		  {
-		    fprintf(stderr,"Reading input transducer from STDIN.\n");
-		  }
-		hfst::HfstInputStream is("");
-		return is.get_type();
-	      }
-	    else
-	      {
-		input_file_name = argv[optind];
-	      }	    
-	  }
-	hfst::HfstInputStream is(input_file_name);
-	return is.get_type();
+    if (inputfilename == NULL)
+      {
+        if ((argc - optind) == 0)
+          {
+            inputfilename = strdup("<stdin>");
+            hfst::HfstInputStream is("");
+            return is.get_type();
+          }
+        else if ((argc - optind) == 1)
+          {
+            inputfilename = argv[optind];
+          }     
+      }
+    hfst::HfstInputStream is(inputfilename);
+    return is.get_type();
 }
 
 
 int main (int argc, char * argv[])
 {
-  int type = parse_options(argc,argv);
-  switch (type)
-    {
-    case hfst::SFST_TYPE:
-      fprintf(stdout, "SFST_TYPE\n");
-      break;
-    case hfst::TROPICAL_OFST_TYPE:
-      fprintf(stdout, "OPENFST_TROPICAL_TYPE\n");
-      break;
-    case hfst::LOG_OFST_TYPE:
-      fprintf(stdout, "OPENFST_LOG_TYPE\n");
-      break;
-    case hfst::FOMA_TYPE:
-      fprintf(stdout, "FOMA_TYPE\n");
-      break;
-    case hfst::HFST_OL_TYPE:
-      fprintf(stdout, "HFST_OL_TYPE\n");
-      break;
-    case hfst::HFST_OLW_TYPE:
-      fprintf(stdout, "HFST_OLW_TYPE\n");
-      break;
-    case hfst::HFST2_TYPE:
-      fprintf(stdout, "HFST_TYPE\n");
-      break;
-    case hfst::ERROR_TYPE:
-    case hfst::UNSPECIFIED_TYPE:
-    default:
-      fprintf(stdout, "ERROR: Not transducer stream.\n");
-      exit(1);
-    }
+  hfst_set_program_name(argv[0], "0.1", "HfstFormat");
+  verbose = true;
+  hfst::ImplementationType type = static_cast<hfst::ImplementationType>(parse_options(argc,argv));
+  verbose_printf("Transducers in %s are of type %s\n", inputfilename,
+                 hfst_strformat(type));
 }

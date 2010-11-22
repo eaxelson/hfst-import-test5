@@ -31,6 +31,7 @@
 #include <errno.h>
 
 #include "hfst-commandline.h"
+#include "HfstOutputStream.h"
 
 #ifndef HAVE_ERROR_AT_LINE
 void error_at_line(int status, int errnum, const char* filename, 
@@ -261,6 +262,40 @@ hfst_parse_format_name(const char* s)
     return rv;
 }
 
+char*
+hfst_strformat(hfst::ImplementationType format)
+{
+  switch (format)
+    {
+    case hfst::SFST_TYPE:
+      return strdup("SFST (1.4 compatible)");
+      break;
+    case hfst::TROPICAL_OFST_TYPE:
+      return strdup("OpenFST, std arc, tropical semiring");
+      break;
+    case hfst::LOG_OFST_TYPE:
+      return strdup("OpenFST, std arc, log semiring");
+      break;
+    case hfst::FOMA_TYPE:
+      return strdup("foma");
+      break;
+    case hfst::HFST_OL_TYPE:
+      return strdup("Hfst's lookup optimized, unweighted");
+      break;
+    case hfst::HFST_OLW_TYPE:
+      return strdup("Hfst's lookup optimized, weighted");
+      break;
+    case hfst::HFST2_TYPE:
+      return strdup("Hfst 2 legacy (deprecated)");
+      break;
+    case hfst::ERROR_TYPE:
+    case hfst::UNSPECIFIED_TYPE:
+    default:
+      return strdup("ERROR (not a HFST supported transducer)");
+      exit(1);
+    }
+
+}
 // file functions
 FILE*
 hfst_fopen(const char* filename, const char* mode)

@@ -39,6 +39,8 @@ using std::pair;
 #include <errno.h>
 
 #include "HfstTransducer.h"
+#include "HfstInputStream.h"
+#include "HfstOutputStream.h"
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 
