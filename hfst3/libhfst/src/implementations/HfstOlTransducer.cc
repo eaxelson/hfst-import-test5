@@ -124,6 +124,13 @@ namespace hfst { namespace implementations
     return res;
   }
 
+  char HfstOlInputStream::stream_get() {
+    return (char) input_stream.get(); }
+
+  void HfstOlInputStream::stream_unget(char c) {
+    input_stream.putback(c); }
+
+
   bool HfstOlInputStream::operator() (void) const
   { return is_good(); }
 
@@ -156,22 +163,10 @@ namespace hfst { namespace implementations
       fprintf(stderr, "HfstOlOutputStream: ERROR: failbit set (3).\n");
   }
 
-  void HfstOlOutputStream::write_3_0_library_header(std::ostream &out)
-  {
-    if (!out)
-      fprintf(stderr, "HfstOlOutputStream: ERROR: failbit set (2).\n");
-    out.write("HFST3",6);
-    if(!weighted)
-      out.write("HFST_OL_TYPE",13);
-    else
-      out.write("HFST_OLW_TYPE",14);
-  }
-  
   void HfstOlOutputStream::write_transducer(hfst_ol::Transducer * transducer) 
   {
     if (!output_stream)
       fprintf(stderr, "HfstOlOutputStream: ERROR: failbit set (1).\n");
-    write_3_0_library_header(output_stream);
     transducer->write(output_stream);
   }
   
@@ -181,6 +176,12 @@ namespace hfst { namespace implementations
     if (filename != string())
       { o_stream.close(); }
   }
+
+  void HfstOlOutputStream::write(const char &c)
+  {
+    output_stream.put(char(c));
+  }
+
   
   hfst_ol::Transducer * HfstOlTransducer::create_empty_transducer(bool weighted)
   { return new hfst_ol::Transducer(weighted); }

@@ -73,6 +73,12 @@ namespace hfst
 	return this->implementation.foma->stream_get();
 	break;
 #endif
+#if HAVE_HFST_OL:
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	  return this->implementation.hfst_ol->stream_get();
+	  break;
+#endif
       default:
 	assert(false);
 	break;
@@ -105,6 +111,13 @@ namespace hfst
 	this->implementation.foma->stream_unget(c);
 	break;
 #endif
+#if HAVE_HFST_OL:
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	  return this->implementation.hfst_ol->stream_unget();
+	  break;
+#endif
+
       default:
 	assert(false);
 	break;
