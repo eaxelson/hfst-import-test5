@@ -117,6 +117,22 @@ and the following namespaces:
 
 
 
+#ifdef foo
+  /** \brief The type of an HfstTransducer. */
+  enum ImplementationType 
+  {
+    SFST_TYPE, /**< An SFST transducer, unweighted. */
+    TROPICAL_OFST_TYPE, /**< An OpenFst transducer with tropical weights. */
+    LOG_OFST_TYPE, /**< An OpenFst transducer with logarithmic weights. */
+    FOMA_TYPE, /**< A foma transducer, unweighted. */
+    HFST_OL_TYPE, /**< An HFST optimized lookup transducer, unweighted */
+    HFST_OLW_TYPE, /**< An HFST optimized lookup transducer with weights */
+    HFST2_TYPE, /**< HFST2 header present, conversion required (Conversion is done automatically, so maybe this could be removed?) */
+    UNSPECIFIED_TYPE, /**< Format left open by e.g. default constructor */
+    ERROR_TYPE /**< Type not recognised. 
+		  This type might be returned by a function if an error occurs. */ 
+  };
+#endif
 
   // TESTING AND OPTIMIZATION...
 
@@ -566,9 +582,14 @@ The argument \a epsilon_symbol only denotes how epsilons are represented in \a i
     /** \brief Store to \a results string pairs that are recognized by the transducer
                and are not invalidated by flag diacritic rules, optionally filtering
                the flag diacritics themselves out of the result strings.
-  The same conditions that apply for the extract_strings function apply also for this one.
+
+  The same conditions that apply for the #extract_strings function apply also for this one.
+  Flag diacritics are of the form @[A-Z][.][A-Z]+([.][A-Z]+)?@ An example:
+\verbatim
+TODO...
+\endverbatim
   @throws hfst::exceptions::TransducerIsCyclicException
-  @see #extract_strings(WeightedPaths<float>::Set&, int, int) */
+  @see extract_strings(WeightedPaths<float>::Set&, int, int) */
     void extract_strings_fd(WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1, bool filter_fd=true);
 
     /** \brief Freely insert symbol pair \a symbol_pair into the transducer. */
@@ -925,7 +946,8 @@ alphabet = set(a, b, c)
 	@see replace_up */
     HfstTransducer replace_up(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
 
-    /** \brief The same as replace_down but \a mapping is performed in every context.
+    /** \brief The same as #replace_down(HfstTransducerPair&, HfstTransducer&, bool, StringPairSet&)
+	but \a mapping is performed in every context.
 
 	@see replace_up */
     HfstTransducer replace_down(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);

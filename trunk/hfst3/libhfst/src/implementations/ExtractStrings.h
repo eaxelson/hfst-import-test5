@@ -23,6 +23,8 @@ namespace hfst {
 
   /** \brief A weighted string pair that represents a path in a transducer.
 
+      HfstLookupPath is the same with W == float, is there a need for two similar datatypes?
+
       @see WeightedPaths */
   template<class W> class WeightedPath
     {
