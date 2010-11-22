@@ -43,10 +43,10 @@ namespace hfst
     typedef enum {repl_left,repl_right,repl_up,repl_down} Repl_Type;
 
     
-    /** A library class that forms a bridge between the SFST programming language parser
-	and the HFST library and contains some extra functions needed by the parser.
-	Most of these functions either directly use the SFST interface or are generalized
-	versions of corresponding SFST functions that work on all types of HfstTransducers. */
+    /* A library class that forms a bridge between the SFST programming language parser
+       and the HFST library and contains some extra functions needed by the parser.
+       Most of these functions either directly use the SFST interface or are generalized
+       versions of corresponding SFST functions that work on all types of HfstTransducers. */
     class HfstCompiler {
       
       struct ltstr {

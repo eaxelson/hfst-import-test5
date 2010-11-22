@@ -37,6 +37,9 @@ namespace hfst
       does not occur or has not occurred in the transducer. 
     - <i>"@_IDENTITY_SYMBOL_@"</i> denotes any unknown symbol that is the same
       on the input and output side of a transition.
+
+    Strings of form <CODE> @[A-Z][.][A-Z]+([.][A-Z]+)?@ </CODE> are reserved for flag diacritics.
+    For an example of flag diacritics, see #hfst::HfstTransducer::extract_strings_fd(WeightedPaths<float>::Set&, int, int, bool)
    */
   typedef std::string String;
   /* A set of strings. */

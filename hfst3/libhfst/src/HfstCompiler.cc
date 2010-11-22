@@ -10,7 +10,7 @@
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-/**
+/*
 
    This file contains functions that are needed by the SFST programming
    language parser defined in the file 'hfst-compiler.yy'. The parser is
@@ -20,7 +20,7 @@
    copied as such and some are less or more modified so that they work
    properly with the HFST interface.
 
- **/
+ */
 
 #include "HfstCompiler.h"
 #include "HfstUtf8.h"
