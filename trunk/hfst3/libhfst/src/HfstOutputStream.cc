@@ -178,7 +178,7 @@ namespace hfst
 	implementation.foma->write(c);
 	break;
 #endif
-#if HAVE_HFST_OL:
+#if HAVE_HFST_OL
 	implementation.hfst_ol->write(c);
 	break;
 #endif
