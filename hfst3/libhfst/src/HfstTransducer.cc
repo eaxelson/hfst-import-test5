@@ -11,6 +11,8 @@
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "HfstTransducer.h"
+#include "HfstInputStream.h"
+#include "HfstGrammar.h"
 
 namespace hfst
 {
@@ -67,46 +69,6 @@ namespace hfst
 
   bool get_unknown_symbols_in_use() {
     return unknown_symbols_in_use; }
-
-#if HAVE_OPENFST
-  HfstGrammar::HfstGrammar(HfstTransducerVector &rule_vector):
-  first_rule(*(rule_vector.begin()))
-  {
-    for (HfstTransducerVector::iterator it = rule_vector.begin();
-	 it != rule_vector.end();
-	 ++it)
-      {
-	if (it != rule_vector.begin())
-	  {
-	    it->harmonize(first_rule);
-	  }
-	it->convert(TROPICAL_OFST_TYPE);
-      }
-
-    for (HfstTransducerVector::iterator it = rule_vector.begin();
-	 it != rule_vector.end();
-	 ++it)
-      {
-	transducer_vector.push_back(it->implementation.tropical_ofst);
-      }
-
-    grammar = new hfst::implementations::Grammar(transducer_vector);
-  }
-
-  HfstGrammar::HfstGrammar(HfstTransducer &rule):
-    first_rule(rule)
-  {
-    rule.convert(TROPICAL_OFST_TYPE);
-    transducer_vector.push_back(rule.implementation.tropical_ofst);
-    grammar = new hfst::implementations::Grammar(transducer_vector);
-  }
-    
-  HfstGrammar::~HfstGrammar(void) {
-    delete grammar; }
-
-  HfstTransducer HfstGrammar::get_first_rule(void) {
-    return first_rule; }
-#endif 
 
   StringPairSet HfstTransducer::get_symbol_pairs()
   {

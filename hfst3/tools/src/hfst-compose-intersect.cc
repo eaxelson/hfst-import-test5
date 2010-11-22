@@ -31,6 +31,9 @@
 #include <getopt.h>
 
 #include "HfstTransducer.h"
+#include "HfstInputStream.h"
+#include "HfstOutputStream.h"
+#include "HfstGrammar.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;

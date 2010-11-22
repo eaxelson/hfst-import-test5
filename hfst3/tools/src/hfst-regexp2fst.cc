@@ -39,7 +39,9 @@ using std::pair;
 #include <errno.h>
 
 #include "HfstTransducer.h"
-#include "implementations/XreCompiler.h"
+#include "HfstInputStream.h"
+#include "HfstOutputStream.h"
+#include "extensions/XreCompiler.h"
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 

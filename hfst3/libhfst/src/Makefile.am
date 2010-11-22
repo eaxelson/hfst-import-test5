@@ -15,20 +15,21 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS=implementations
+SUBDIRS=implementations extensions
 AUTOMAKE_OPTIONS=subdir-objects
 lib_LTLIBRARIES = libhfst.la
 
 AM_CXXFLAGS=-Wno-deprecated -Wall -Wextra
 
 # HFST bridge specific stuff
-HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc \
-			 HfstOutputStream.cc HfstRules.cc \
-	           	HfstCompiler.cc HfstBasic.cc HfstUtf8.cc
+HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc HfstOutputStream.cc\
+		  HfstRules.cc HfstCompiler.cc HfstBasic.cc HfstUtf8.cc \
+		  HfstGrammar.cc
 
 # libtool takes over
 libhfst_la_SOURCES =  $(HFST_SRCS)
-libhfst_la_LIBADD = implementations/libhfstimplementations.la
+libhfst_la_LIBADD = implementations/libhfstimplementations.la\
+					extensions/libhfstextensions.la
 
 # we only have one library target but would like a particular includedir
 # structure for various headers, so we do this

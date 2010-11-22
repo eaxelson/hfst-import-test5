@@ -7,6 +7,7 @@
 #include <assert.h>
 #include <fstream>
 
+#if 0
 using namespace hfst;
 using namespace hfst::exceptions;
 
@@ -118,10 +119,10 @@ void test_extract_strings( HfstTransducer &t )
   catch (HfstInterfaceException e) { 
     assert(false); }
 }
-
+#endif
 int main(int argc, char **argv) {
 
-  {
+#if 0
     HfstTransducer anon1(3,4,TROPICAL_OFST_TYPE);
     HfstTransducer anon2(4,1,TROPICAL_OFST_TYPE);
     anon1.disjunct(anon2);
@@ -342,9 +343,11 @@ int main(int argc, char **argv) {
   }
 
   exit(0);
+#else
+  return 0;
+#endif
 }
-
-#ifdef FOO
+#if 0
 
   {
       HfstTransducer foo = HfstTransducer::read_in_att_format("test_transducer.att");
@@ -680,7 +683,7 @@ int main(int argc, char **argv) {
 }
 
 #endif
-#ifdef FOO
+#if 0
 
   // create transducer t1
   HfstMutableTransducer t1;
@@ -804,8 +807,6 @@ int main(int argc, char **argv) {
     }
 
   return 0;
-}
-
 #endif
 
 
@@ -813,7 +814,8 @@ int main(int argc, char **argv) {
 
 
 
-#ifdef foo
+
+#if 0
 
     HfstTransducer &remove_epsilons(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &determinize(ImplementationType type=UNSPECIFIED_TYPE);

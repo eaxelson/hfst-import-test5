@@ -4,6 +4,7 @@
 #include <assert.h>
 
 #include "../HfstTransducer.h"
+#include "../HfstInputStream.h"
 
 using hfst::HfstTransducer;
 

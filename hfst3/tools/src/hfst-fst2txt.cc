@@ -33,6 +33,8 @@
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 #include "HfstTransducer.h"
+#include "HfstInputStream.h"
+#include "HfstOutputStream.h"
 
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
