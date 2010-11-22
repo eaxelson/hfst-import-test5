@@ -48,6 +48,10 @@ namespace hfst { namespace implementations
     bool is_bad(void) const;
     bool is_good(void) const;
     bool is_fst(void) const;
+
+    char stream_get();
+    void stream_unget(char c);
+    
     bool operator() (void) const;
     hfst_ol::Transducer * read_transducer(bool has_header);
     
@@ -63,12 +67,12 @@ namespace hfst { namespace implementations
     ofstream o_stream;
     ostream &output_stream;
     bool weighted;
-    void write_3_0_library_header(std::ostream &out);
   public:
     HfstOlOutputStream(bool weighted);
     HfstOlOutputStream(const char * filename, bool weighted);
     void open(void);
     void close(void);
+    void write(const char &c);
     void write_transducer(hfst_ol::Transducer * transducer);
   };
   
