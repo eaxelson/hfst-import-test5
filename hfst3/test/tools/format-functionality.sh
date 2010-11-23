@@ -5,7 +5,7 @@ fi
 if ! ../../tools/src/hfst-format test.hfst > TMP1 ; then
     exit 1
 fi
-echo "SFST_TYPE" > TMP2
+echo "Transducers in test.hfst are of type SFST (1.4 compatible)" > TMP2
 if ! diff TMP1 TMP2 ; then
     exit 1
 fi
@@ -15,7 +15,7 @@ fi
 if ! ../../tools/src/hfst-format test.hfst > TMP1 ; then
     exit 1
 fi
-echo "OPENFST_TROPICAL_TYPE" > TMP2
+echo "Transducers in test.hfst are of type OpenFST, std arc, tropical semiring" > TMP2
 if ! diff TMP1 TMP2 ; then
     exit 1
 fi
@@ -25,7 +25,7 @@ fi
 if ! ../../tools/src/hfst-format test.hfst > TMP1 ; then
     exit 1
 fi
-echo "FOMA_TYPE" > TMP2
+echo "Transducers in test.hfst are of type foma" > TMP2
 if ! diff TMP1 TMP2 ; then
     exit 1
 fi

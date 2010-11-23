@@ -42,6 +42,10 @@
 #include "inc/globals-unary.h"
 
 using hfst::HfstTransducer;
+using hfst::HFST_OL_TYPE;
+using hfst::HFST_OLW_TYPE;
+using hfst::HfstState;
+using hfst::HfstMutableTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 using hfst::HfstTokenizer;
@@ -54,7 +58,7 @@ static char* lookup_file_name;
 static FILE* lookup_file;
 static size_t linen = 0;
 static bool lookup_given = false;
-static size_t infinite_cutoff = 5;
+//static size_t infinite_cutoff = 5;
 
 enum lookup_input_format
 {
@@ -650,10 +654,36 @@ line_to_lookup_path(char** s, const hfst::HfstTokenizer& /* tok */,
     return rv;
 }
 
+template<class T> HfstLookupPaths*
+lookup_simple(const HfstLookupPath& s, T& t, bool* infinity)
+{
+  HfstLookupPaths* results = new HfstLookupPaths;
+
+  (void)s;
+  (void)t;
+  (void)infinity;
+
+  if (results->size() == 0)
+    {
+       // no results as empty result
+      verbose_printf("Got no results\n");
+    }
+  return results;
+}
+
+bool is_lookup_infinitely_ambiguous(HfstMutableTransducer &t, const HfstLookupPath& s)
+{
+  (void)t;
+  (void)s;
+  return false;
+}
+
+#ifdef foo
 HfstLookupPaths*
 lookup_simple(const HfstLookupPath& s, HfstTransducer& t, bool* infinity)
 {
   HfstLookupPaths* results = new HfstLookupPaths;
+
   if (t.is_lookup_infinitely_ambiguous(s))
     {
       warning(0, 0, "Got infinite results, using %zu first",
@@ -665,6 +695,7 @@ lookup_simple(const HfstLookupPath& s, HfstTransducer& t, bool* infinity)
     {
       t.lookup_fd(*results, s);
     }
+
   if (results->size() == 0)
     {
        // no results as empty result
@@ -673,8 +704,92 @@ lookup_simple(const HfstLookupPath& s, HfstTransducer& t, bool* infinity)
   return results;
 }
 
+void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLookupPath& s, unsigned int& index, 
+	       unsigned int& cycle_limit,
+	       unsigned int& cycles, std::set<HfstState>& visited_states, HfstLookupPath& path, HfstState state)
+{ 
+  bool only_epsilons=false;
+  if ( (unsigned int)s.size() =< index )
+    {
+      only_epsilons=true;
+      if ( t.is_final_state(state) )
+	{
+	  
+	}
+    }
+
+
+  if ( t.is_final_state(state) &&
+       ( (unsigned int)s.size() == index) )
+    {
+      results.insert(path);
+    }
+
+  // loop: transition iterator for state
+  {
+    if (visited_states.find(it->target_state) != visited_states.end())
+      cycles++;
+    else
+      visited_states.insert(state);
+    
+    if (cycles =< cycle_limit)
+      {
+	path.first.push_back(transition.osymbol);
+	path.second = path.second + transition.weight;
+	lookup_fd(t, results, s, cycle_limit, cycles, visited_states, path, it->target_state);
+      }
+    cycles--;
+  }
+  //path.first.remove_last_element()
+  //path.second = path.second - weight ?
+}
+
+void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLookupPath& s, ssize_t limit = -1)
+{
+  HfstLookupPath path;
+  path.second=0;
+  std::set<HfstState> visited_states;
+  visited_states.insert(t->get_initial_state());
+  unsigned int cycles=0;
+  unsigned int cycle_limit;
+  if (limit == -1)
+    cycle_limit=0;
+  else
+    cycle_limit = (unsigned int)limit;
+
+  lookup_fd(t, results, s, cycle_limit, cycles, visited_states, path, t->get_initial_state());
+}
+
 HfstLookupPaths*
-lookup_cascading(const HfstLookupPath& s, vector<HfstTransducer> cascade,
+lookup_simple(const HfstLookupPath& s, HfstMutableTransducer& t, bool* infinity)
+{
+  HfstLookupPaths* results = new HfstLookupPaths;
+
+  if (is_lookup_infinitely_ambiguous(t,s))
+    {
+      warning(0, 0, "Got infinite results, using %zu first",
+              infinite_cutoff);
+      lookup_fd(t, *results, s, infinite_cutoff);
+      *infinity = true;
+    }
+  else
+    {
+      lookup_fd(t, *results, s);
+    }
+
+  if (results->size() == 0)
+    {
+       // no results as empty result
+      verbose_printf("Got no results\n");
+    }
+
+  return results;
+}
+
+#endif // foo
+
+template<class T> HfstLookupPaths*
+lookup_cascading(const HfstLookupPath& s, vector<T> cascade,
                  bool* infinity)
 {
   HfstLookupPaths* kvs = new HfstLookupPaths;
@@ -687,8 +802,8 @@ lookup_cascading(const HfstLookupPath& s, vector<HfstTransducer> cascade,
            ckv != kvs->end();
            ++ckv)
         {
-          HfstLookupPaths* xyzkvs = lookup_simple(*ckv, cascade[i],
-                                                  infinity);
+          HfstLookupPaths* xyzkvs = lookup_simple<T>(*ckv, cascade[i],
+						     infinity);
           if (infinity)
             {
               verbose_printf("Inf results @ level %u, using %zu\n",
@@ -762,19 +877,19 @@ print_lookups(const HfstLookupPaths& kvs,
       }
 }
 
-HfstLookupPaths*
-perform_lookups(HfstLookupPath& origin, vector<HfstTransducer>& cascade, bool unknown, bool* infinite)
+template<class T> HfstLookupPaths*
+perform_lookups(HfstLookupPath& origin, std::vector<T>& cascade, bool unknown, bool* infinite)
 {
   HfstLookupPaths* kvs;
     if (!unknown)
       {
         if (cascade.size() == 1)
           {
-            kvs = lookup_simple(origin, cascade[0], infinite);
+            kvs = lookup_simple<T>(origin, cascade[0], infinite);
           }
         else
          {
-            kvs = lookup_cascading(origin, cascade, infinite);
+	   kvs = lookup_cascading<T>(origin, cascade, infinite);
          }
       }
     else
@@ -788,6 +903,9 @@ int
 process_stream(HfstInputStream& inputstream, FILE* outstream)
 {
     std::vector<HfstTransducer> cascade;
+    std::vector<HfstMutableTransducer> cascade_mut;
+    bool mutable_transducers=false;
+
     size_t transducer_n=0;
     HfstTokenizer tok;
     while (inputstream.is_good())
@@ -806,6 +924,20 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
         cascade.push_back(trans);
       }
     inputstream.close();
+
+    // if transducer type is other than optimized_lookup,
+    // convert to HfstMutableTransducer
+    if ( inputstream.get_type() != HFST_OL_TYPE && 
+	 inputstream.get_type() != HFST_OLW_TYPE ) 
+      {
+	for (unsigned int i=0; i<cascade.size(); i++) 
+	  {
+	    HfstMutableTransducer mut(cascade[i]);
+	    cascade_mut.push_back(mut);
+	  }
+	mutable_transducers=true;
+      }
+
     char* line = 0;
     size_t llen = 0;
     while (hfst_getline(&line, &llen, lookup_file) != -1)
@@ -830,7 +962,10 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
         HfstLookupPaths* kvs;
         try 
           {
-            kvs = perform_lookups(*kv, cascade, unknown, &infinite);
+	    if (mutable_transducers)
+	      kvs = perform_lookups<HfstMutableTransducer>(*kv, cascade_mut, unknown, &infinite);
+	    else
+	      kvs = perform_lookups<HfstTransducer>(*kv, cascade, unknown, &infinite);
           }
         catch (hfst::exceptions::FunctionNotImplementedException)
           {

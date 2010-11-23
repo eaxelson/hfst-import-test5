@@ -195,6 +195,15 @@ namespace hfst
       }
   }
 
+  //typedef std::vector<std::string> HfstArcPath;
+  //! @brief A path of one level of arcs with collected weight,
+  //!
+  //! Used as the source and result data type for lookups and downs.
+  //typedef std::pair<HfstArcPath,float> HfstLookupPath;
+  //! @brief A set of simple paths.
+  //!
+  //! Used as return type of lookup with multiple, unique results.
+  //typedef std::set<HfstLookupPath> HfstLookupPaths;
 
   void HfstTransducer::lookup(HfstLookupPaths& results, const HfstLookupPath& s,
 			      ssize_t limit) {

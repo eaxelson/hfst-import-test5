@@ -578,7 +578,7 @@ LogFst * hfst_internal_format_to_log_ofst(const HfstInternalTransducer * interna
 }
 
 hfst_ol::Transducer * hfst_internal_format_to_hfst_ol(HfstInternalTransducer * , bool ) {
-  return NULL;
+  throw hfst::exceptions::FunctionNotImplementedException();
 }
 #endif
 
