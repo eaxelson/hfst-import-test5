@@ -44,7 +44,6 @@ namespace hfst {
       return NULL;
     }      
 
-
     // HfstTrieState * initial_state;
     //  HfstAlphabet * alpha;
 
@@ -190,6 +189,10 @@ namespace hfst {
       line.osymbol=osymbol;
       line.weight=weight;
       lines.insert(line);
+    }
+
+    HfstState HfstInternalTransducer::get_initial_state() {
+      return 0;
     }
     
     bool HfstInternalTransducer::has_no_lines() const {
