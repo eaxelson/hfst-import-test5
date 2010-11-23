@@ -120,8 +120,13 @@ parse_options(int argc, char** argv)
             inputfilename = argv[optind];
           }     
       }
-    hfst::HfstInputStream is(inputfilename);
-    return is.get_type();
+    try {
+      hfst::HfstInputStream is(inputfilename);
+      return is.get_type();
+    } catch (hfst::exceptions::NotTransducerStreamException e) {
+      fprintf(stderr, "ERROR: The file/stream does not contain transducers.\n");
+      exit(1);
+    }
 }
 
 
