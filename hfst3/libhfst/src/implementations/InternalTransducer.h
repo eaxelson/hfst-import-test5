@@ -88,6 +88,8 @@ namespace hfst {
       HfstInternalTransducer(const HfstTransducer &transducer);
       HfstInternalTransducer(const HfstTrie &trie);
 
+      HfstState get_initial_state();
+
       void add_line(HfstState final_state, float final_weight); 
       void add_line(HfstState origin_state, HfstState target_state,
 		    HfstState isymbol, HfstState osymbol,
