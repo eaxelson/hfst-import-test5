@@ -17,8 +17,7 @@
 #endif
 
 #include "HfstDataTypes.h"
-
-#include "implementations/SymbolDefs.h"
+#include "SymbolDefs.h"
 
 #if HAVE_SFST
 #include "implementations/SfstTransducer.h"

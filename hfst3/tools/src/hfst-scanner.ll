@@ -20,9 +20,7 @@
 #include "HfstUtf8.h"
 
 using namespace hfst;
-using namespace HfstBasic;
-using namespace HfstUtf8;
-
+using namespace basic;
 
 #define MAX_INCLUDE_DEPTH 10
   
@@ -174,7 +172,7 @@ FN	[A-Za-z0-9._/\-*+]
 \r?\n             { print_lineno(); return NEWLINE; }
 
 \\[0-9]+          { long l=atol(yytext+1); 
-		    if (l <= 1114112) { yylval.value=fst_strdup(int2utf8((unsigned)l)); return UTF8CHAR; }
+		    if (l <= 1114112) { yylval.value=fst_strdup(hfst_utf8::int2utf8((unsigned)l)); return UTF8CHAR; }
 		    yyerror(strdup("invalid expression"));
                   }
 

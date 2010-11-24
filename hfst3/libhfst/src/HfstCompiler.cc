@@ -90,7 +90,7 @@ namespace hfst
   
   Character HfstCompiler::character_code( unsigned int uc ) {
     //if (TheAlphabet.utf8)
-    return symbol_code(HfstBasic::fst_strdup(HfstUtf8::int2utf8(uc)));
+    return symbol_code(basic::fst_strdup(hfst_utf8::int2utf8(uc)));
 
     /* unsigned char *buffer=(unsigned char*)malloc(2);
        buffer[0] = (unsigned char)uc;
@@ -136,7 +136,7 @@ namespace hfst
   }
   
   unsigned int HfstCompiler::utf8toint( char *s ) { 
-    return HfstUtf8::utf8toint(s);
+    return hfst_utf8::utf8toint(s);
   }
 
   bool HfstCompiler::in_range( unsigned int c, Range *r ) {
@@ -235,7 +235,7 @@ namespace hfst
 
   HfstTransducer * HfstCompiler::rvar_value( char *name, ImplementationType type ) {
     if (RS.find(name) == RS.end())
-      RS.insert(HfstBasic::fst_strdup(name));
+      RS.insert(basic::fst_strdup(name));
     Range *r=add_value(symbol_code(name), NULL);
     return new_transducer(r,r,type); 
   }
@@ -270,7 +270,7 @@ namespace hfst
 
   Range *HfstCompiler::rsvar_value( char *name ) {
     if (RSS.find(name) == RSS.end())
-      RSS.insert(HfstBasic::fst_strdup(name));
+      RSS.insert(basic::fst_strdup(name));
     return add_value(symbol_code(name), NULL);
   }
 

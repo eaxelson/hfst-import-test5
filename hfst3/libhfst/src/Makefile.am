@@ -24,12 +24,14 @@ AM_CXXFLAGS=-Wno-deprecated -Wall -Wextra
 # HFST bridge specific stuff
 HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc HfstOutputStream.cc\
 		  HfstRules.cc HfstCompiler.cc HfstBasic.cc HfstUtf8.cc \
-		  HfstGrammar.cc
+		  HfstGrammar.cc SymbolDefs.cc
 
 # libtool takes over
 libhfst_la_SOURCES =  $(HFST_SRCS)
 libhfst_la_LIBADD = implementations/libhfstimplementations.la\
 					extensions/libhfstextensions.la
+
+AM_CPPFLAGS = -I./implementations
 
 # we only have one library target but would like a particular includedir
 # structure for various headers, so we do this

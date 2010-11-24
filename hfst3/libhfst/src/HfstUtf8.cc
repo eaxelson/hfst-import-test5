@@ -13,7 +13,8 @@
 
 #include "HfstUtf8.h"
 
-namespace HfstUtf8 {
+namespace hfst {
+namespace hfst_utf8 {
 
   const unsigned char get3LSbits=7;
   const unsigned char get4LSbits=15;
@@ -147,4 +148,5 @@ namespace HfstUtf8 {
     return 0;
   }
 
+}
 }

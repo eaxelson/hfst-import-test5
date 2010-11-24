@@ -39,6 +39,8 @@ AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 
 libhfstextensions_la_SOURCES=$(SFST_SRCS) $(XRE_SRCS) $(LEXC_SRCS) $(XFST_SRCS)
 
+AM_CPPFLAGS = -I..
+
 # headers of extensions
 hfstincludedir = $(includedir)/hfst
 extincludedir = $(hfstincludedir)/extensions
