@@ -659,7 +659,6 @@ line_to_lookup_path(char** s, const hfst::HfstTokenizer& /* tok */,
 template<class T> HfstLookupPaths*
 lookup_simple(const HfstLookupPath& s, T& t, bool* infinity)
 {
-  fprintf(stderr, "HERE3??\n");
   HfstLookupPaths* results = new HfstLookupPaths;
 
   (void)s;
@@ -708,45 +707,62 @@ lookup_simple(const HfstLookupPath& s, HfstTransducer& t, bool* infinity)
 }
 #endif // foo
 
-// no cycles, no weights
+/*
+  @param t        The transducer where lookup is performed.
+  @param results  The resulting set of output strings.
+  @param s        The input string that is looked up.
+  @param index    An index that points to the intput symbol in \a s
+                  that is being matched next.
+  @param path     The output string that \a s has yielded so far.
+  @param state    The state in \a t where we are.
+
+  @pre Transducer \a t has no cycles or weights.
+
+  @todo Support cycles and weights. 
+ */
 void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLookupPath& s, unsigned int& index, 
 	       HfstLookupPath& path, HfstState state)
 { 
-  fprintf(stderr, "lookup_fd called with the following parameters:\n\n");
-  fprintf(stderr, "index: %i\n", index);
-  fprintf(stderr, "state: %i\n", state);
-
-  fprintf(stderr, "#2\n");
+  // Whether the end of the lookup path s has been reached
   bool only_epsilons=false;
   if ((unsigned int)s.first.size() == index)
     only_epsilons=true;
 
+  // If the end of the lookup path s has been reached
+  // and we are in a final state, add the traversed path to results
   if (only_epsilons && t.is_final_state(state))
     results.insert(path);
 
+  // Go through all transitions in this state
   HfstTransitionIterator transition_it(t,state);
   while (not transition_it.done()) 
     {
       HfstTransition tr = transition_it.value();
+
+      // Input epsilons do not consume a symbol in the lookup path s,
+      // so they can be added freely.
       if (tr.isymbol.compare("@_EPSILON_SYMBOL_@") == 0)
 	{
-	  path.first.push_back(tr.osymbol);
+	  path.first.push_back(tr.osymbol); // add an output symbol to the traversed path   
 	  lookup_fd(t, results, s, index, path, tr.target);
+	  path.first.pop_back(); // remove the output symbol from the traversed path
 	}
+
+      // Other input symbols consume a symbol in the lookup path s,
+      // so they can be added only if the end of the lookup path s has not been reached.
       else if (not only_epsilons)
 	{
 	  if (tr.isymbol.compare(s.first[index]) == 0)
 	    {
-	      index++;
-	      path.first.push_back(tr.osymbol);
+	      index++; // consume an input symbol in the lookup path s
+	      path.first.push_back(tr.osymbol); // add an output symbol to the traversed path   
 	      lookup_fd(t, results, s, index, path, tr.target);
-	      path.first.pop_back();
-	      index--;
+	      path.first.pop_back(); // remove the output symbol from the traversed path
+	      index--; // add the input symbol back to the lookup path s
 	    }
 	}
       transition_it.next();
     }
-  fprintf(stderr, "..lookup_fd\n");
 }
 
   typedef std::vector<std::string> HfstArcPath;
@@ -761,26 +777,23 @@ void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLoo
 
 void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLookupPath& s, ssize_t limit = -1)
 {
-  fprintf(stderr, "#1\n");
   HfstLookupPath path;
   path.second=0;
   (void)limit;
   unsigned int index=0;
   lookup_fd(t, results, s, index, 
 	    path, t.get_initial_state());
-  fprintf(stderr, "##\n");
-  fprintf(stderr, "results:\n\n");
+  // Print results here until the segfault in print_lookups has been fixed.
   for (HfstLookupPaths::const_iterator it = results.begin(); it != results.end(); it++) {
     for (HfstArcPath::const_iterator it2 = it->first.begin(); it2 != it->first.end(); it2++ )
-      fprintf(stderr, "%s ", it2->c_str());
+      fprintf(stderr, "%s", it2->c_str());
+    fprintf(stderr, "\n");
   }
-  fprintf(stderr, "\n");
 }
 
 HfstLookupPaths*
 lookup_simple(const HfstLookupPath& s, HfstMutableTransducer& t, bool* infinity)
 {
-  fprintf(stderr, "HERE3...\n");
   HfstLookupPaths* results = new HfstLookupPaths;
 
   if (is_lookup_infinitely_ambiguous(t,s))
@@ -902,7 +915,6 @@ perform_lookups(HfstLookupPath& origin, std::vector<T>& cascade, bool unknown, b
       {
         if (cascade.size() == 1)
           {
-	    fprintf(stderr, "HERE2...\n");
             kvs = lookup_simple(origin, cascade[0], infinite);
           }
         else
@@ -981,11 +993,9 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
         try 
           {
 	    if (mutable_transducers) {
-	      fprintf(stderr, "HERE...\n");
 	      kvs = perform_lookups<HfstMutableTransducer>(*kv, cascade_mut, unknown, &infinite);
 	    }
 	    else {
-	      fprintf(stderr, "HERE???\n");
 	      kvs = perform_lookups<HfstTransducer>(*kv, cascade, unknown, &infinite);
 	    }
           }
@@ -997,7 +1007,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                   "Try compose and fst2strings instead\n");
             return EXIT_FAILURE;
           }
-        print_lookups(*kvs, line, markup, unknown, infinite);
+	//print_lookups(*kvs, line, markup, unknown, infinite); TEST
         delete kv;
         delete kvs;
       } // while lines in input
