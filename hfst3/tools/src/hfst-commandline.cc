@@ -258,6 +258,8 @@ hfst_parse_format_name(const char* s)
       {
         error(EXIT_FAILURE, 0, "Could not parse format name from string %s",
               s);
+        rv = hfst::UNSPECIFIED_TYPE;
+        return rv;
       }
     return rv;
 }
