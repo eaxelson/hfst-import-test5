@@ -207,8 +207,10 @@ int main( int argc, char **argv )
         return EXIT_FAILURE;
       }
     // here starts the buffer handling part
-    HfstOutputStream outstream(output_format);
-    process_stream(outstream);
+    HfstOutputStream* outstream = (outfile != stdout) ?
+                new HfstOutputStream(outfilename, output_format) :
+                new HfstOutputStream(output_format);
+    process_stream(*outstream);
     if (inputfile != stdin)
       {
         fclose(inputfile);
