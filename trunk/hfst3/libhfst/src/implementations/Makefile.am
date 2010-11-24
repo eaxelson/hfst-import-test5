@@ -20,7 +20,7 @@ noinst_LTLIBRARIES=libhfstimplementations.la
 
 # HFST bridge specific stuff
 IMPLEMENTATION_SRCS= \
-	HfstTokenizer.cc ConvertTransducerFormat.cc FlagDiacritics.cc InternalTransducer.cc HfstAlphabet.cc # GlobalSymbolTable.cc SymbolDefs.cc
+	HfstTokenizer.cc ConvertTransducerFormat.cc FlagDiacritics.cc InternalTransducer.cc HfstAlphabet.cc
 AM_CXXFLAGS=-Wno-deprecated
 # the bridges
 if WANT_SFST
@@ -46,6 +46,8 @@ endif
 
 libhfstimplementations_la_SOURCES=$(IMPLEMENTATION_SRCS) $(BRIDGE_SRCS) \
 								  $(SFST_SRCS) $(HFST_OL_SRCS)
+
+AM_CPPFLAGS = -I..
 
 # headers of implementation bridge to reveal to public
 hfstincludedir = $(includedir)/hfst

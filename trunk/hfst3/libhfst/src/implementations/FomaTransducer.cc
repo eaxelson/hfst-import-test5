@@ -1059,7 +1059,7 @@ static inline int explode_line (char *buf, int *values) {
 #ifdef DEBUG_MAIN
 using namespace hfst::implementations;
 #include <iostream>
-hfst::symbols::GlobalSymbolTable KeyTable::global_symbol_table;
+//hfst::symbols::GlobalSymbolTable KeyTable::global_symbol_table;
 int main(int argc, char * argv[]) 
 {
   fprintf(stderr, "Testing FomaTransducer.cc functions:\n");

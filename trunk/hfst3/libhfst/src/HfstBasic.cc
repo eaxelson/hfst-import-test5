@@ -1,21 +1,10 @@
-
-/*******************************************************************/
-/*                                                                 */
-/*  FILE     basic.C                                               */
-/*  MODULE   basic                                                 */
-/*  PROGRAM  SFST                                                  */
-/*  AUTHOR   Helmut Schmid, IMS, University of Stuttgart           */
-/*                                                                 */
-/*  PURPOSE                                                        */
-/*                                                                 */
-/*******************************************************************/
-
 #include <stdlib.h>
 #include <string.h>
 
 #include "HfstBasic.h"
 
-namespace HfstBasic {
+namespace hfst {
+  namespace basic {
 
   bool Switch_Bytes=false;
 
@@ -81,5 +70,7 @@ namespace HfstBasic {
       }
     }
     return result;
+  }
+
   }
 }

@@ -990,7 +990,7 @@ namespace hfst { namespace implementations {
 #ifdef DEBUG_MAIN
 using namespace hfst::implementations;
 #include <iostream>
-hfst::symbols::GlobalSymbolTable KeyTable::global_symbol_table;
+//hfst::symbols::GlobalSymbolTable KeyTable::global_symbol_table;
 int main(int argc, char * argv[]) 
 {
   SfstTransducer sfst;

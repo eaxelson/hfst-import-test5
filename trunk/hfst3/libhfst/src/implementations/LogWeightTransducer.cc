@@ -2125,7 +2125,7 @@ namespace hfst { namespace implementations
 
 #ifdef DEBUG_MAIN
 using namespace hfst::implementations;
-hfst::symbols::GlobalSymbolTable KeyTable::global_symbol_table;
+//hfst::symbols::GlobalSymbolTable KeyTable::global_symbol_table;
 int main(void) 
 {
   LogWeightTransducer ofst;
