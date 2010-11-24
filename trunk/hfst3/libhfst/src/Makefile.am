@@ -23,7 +23,7 @@ AM_CXXFLAGS=-Wno-deprecated -Wall -Wextra
 
 # HFST bridge specific stuff
 HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc HfstOutputStream.cc\
-		  HfstRules.cc HfstCompiler.cc HfstBasic.cc HfstUtf8.cc \
+		  HfstRules.cc HfstBasic.cc HfstUtf8.cc \
 		  HfstGrammar.cc SymbolDefs.cc
 
 # libtool takes over
