@@ -27,7 +27,7 @@
 #include "HfstBasic.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
-#include "implementations/InternalTransducer.h"
+#include "implementations/HfstInternalTransducer.h"
 
 namespace hfst
 {
