@@ -18,6 +18,9 @@
 
 #include "HfstTransducer.h"
 
+/** \file  
+    \brief ...
+ */
 
 namespace hfst
 {

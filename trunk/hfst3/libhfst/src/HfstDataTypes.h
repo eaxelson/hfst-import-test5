@@ -39,9 +39,13 @@
 
 #include "implementations/HfstAlphabet.h"
 #include "implementations/HfstOlTransducer.h"
-#include "implementations/HfstTokenizer.h"
+#include "HfstTokenizer.h"
 #include "implementations/ConvertTransducerFormat.h"
 #include "HfstExceptions.h"
+
+/** \file  
+    \brief ...
+ */
 
 namespace hfst
 {
