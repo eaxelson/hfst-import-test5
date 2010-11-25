@@ -17,6 +17,10 @@
 #include <iostream>
 #include <sstream>
 #include <set>
+
+/** @file ExtractStrings.h
+    \brief Classes WeightedPath and WeightsPaths */
+
 namespace hfst {
   using std::stringstream;
   using std::ios;

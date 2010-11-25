@@ -23,6 +23,10 @@
 #include <iostream>
 #include "HfstAlphabet.h"
 
+/** @file LogWeightTransducer.h
+    \brief Declarations of functions and datatypes that form a bridge between
+    HFST API and OpenFst's transducers with logarithmic weights. */
+
 namespace hfst { 
 namespace implementations
 {

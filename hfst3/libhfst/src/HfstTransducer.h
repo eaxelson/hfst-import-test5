@@ -45,6 +45,10 @@
 #include <map>
 #include <set>
 
+/** @file HfstTransducer.h
+    \brief Declarations of HFST API functions and datatypes. 
+
+    This file must be included to a program that uses the HFST API. */
 
 /** \brief A namespace for HFST functions and datatypes. */
 namespace hfst
@@ -114,24 +118,11 @@ and the following namespaces:
   using hfst::implementations::FomaTransducer;
 #endif
 
-
-
-#ifdef foo
-  /** \brief The type of an HfstTransducer. */
-  enum ImplementationType 
-  {
-    SFST_TYPE, /**< An SFST transducer, unweighted. */
-    TROPICAL_OFST_TYPE, /**< An OpenFst transducer with tropical weights. */
-    LOG_OFST_TYPE, /**< An OpenFst transducer with logarithmic weights. */
-    FOMA_TYPE, /**< A foma transducer, unweighted. */
-    HFST_OL_TYPE, /**< An HFST optimized lookup transducer, unweighted */
-    HFST_OLW_TYPE, /**< An HFST optimized lookup transducer with weights */
-    HFST2_TYPE, /**< HFST2 header present, conversion required (Conversion is done automatically, so maybe this could be removed?) */
-    UNSPECIFIED_TYPE, /**< Format left open by e.g. default constructor */
-    ERROR_TYPE /**< Type not recognised. 
-		  This type might be returned by a function if an error occurs. */ 
-  };
+  // New transducer type
+#if HAVE_FOO
+  using hfst::implementations::FooTransducer;
 #endif
+
 
   // TESTING AND OPTIMIZATION...
 
@@ -227,6 +218,11 @@ tr1.disjunct(tr2);
 #if HAVE_FOMA
       fsm * foma;
 #endif
+
+#if HAVE_FOO
+      hfst::implementations::FooTransducer * foo;
+#endif
+
       hfst_ol::Transducer * hfst_ol;
 #if HAVE_OPENFST
       hfst::implementations::StdVectorFst * internal;
@@ -245,6 +241,10 @@ tr1.disjunct(tr2);
     static hfst::implementations::FomaTransducer foma_interface;
 #endif
     static hfst::implementations::HfstOlTransducer hfst_ol_interface;
+
+#if HAVE_FOO
+    static hfst::implementations::FooTransducer foo_interface;
+#endif
 
     ImplementationType type; // the backend implementation type of the transducer
 

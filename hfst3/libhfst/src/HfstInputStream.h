@@ -18,8 +18,8 @@
 
 #include "HfstTransducer.h"
 
-/** \file  
-    \brief ...
+/** @file HfstInputStream.h 
+    \brief Declaration of class HfstInputStream.
  */
 
 namespace hfst
@@ -71,6 +71,11 @@ delete in;
 #if HAVE_FOMA
       hfst::implementations::FomaInputStream * foma;
 #endif
+
+#if HAVE_FOO
+      hfst::implementations::FooInputStream * foo;
+#endif
+
       hfst::implementations::HfstOlInputStream * hfst_ol;
     };
 
@@ -111,6 +116,7 @@ delete in;
       OPENFST_, /* An OpenFst transducer, can cause problems if it does not have symbol tables. */
       SFST_,  /* An SFST transducer. */
       FOMA_, /* A foma transducer. */
+      // FOO_, /* A new type */
       ERROR_TYPE_ /* Transducer type not recognized. */
     };
 

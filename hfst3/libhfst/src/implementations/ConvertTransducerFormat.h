@@ -39,12 +39,13 @@
 #endif
 
 #include "HfstExceptions.h"
-
 #include "optimized-lookup/transducer.h"
-
 #include "HfstInternalTransducer.h"
 
 struct fsm;
+
+/** @file ConvertTransducerFormat.h
+    \brief Declarations of functions for converting between transducer backend formats. */
 
 namespace hfst { namespace implementations {
 

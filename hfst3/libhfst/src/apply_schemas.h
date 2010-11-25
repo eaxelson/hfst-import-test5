@@ -10,6 +10,9 @@
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+/** @file apply_schemas.h
+    \brief declarations for HFST functions that take two or more parameters */
+
 HfstTransducer &apply(
 #if HAVE_SFST
  SFST::Transducer * (*sfst_funct)(SFST::Transducer *),
@@ -21,8 +24,14 @@ HfstTransducer &apply(
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *),
 #endif
- bool foo );  // foo makes sure there is always a parameter after the function pointer parameters,
-           // so commas between parameters are easier to handle
+
+#if HAVE_FOO
+ FooTransducer * (*foo_funct)(FooTransducer *),
+#endif
+
+ bool foo /* makes sure there is always a parameter after the function pointer parameters,
+	   * so commas between parameters are easier to handle */
+);  
 
 HfstTransducer &apply(
 #if HAVE_SFST

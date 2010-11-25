@@ -31,6 +31,10 @@
 #include <sstream>
 #include <iostream>
 
+/** @file FomaTransducer.h
+    \brief Declarations of functions and datatypes that form a bridge between
+    HFST API and foma. */
+
 namespace hfst {
   namespace implementations
 {

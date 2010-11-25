@@ -23,6 +23,9 @@
 #include <sstream>
 #include <iostream>
 
+/** @file SfstTransducer.h
+    \brief Declarations of functions and datatypes that form a bridge between
+    HFST API and SFST. */
 
 namespace hfst { 
 namespace implementations
@@ -44,9 +47,6 @@ namespace implementations
     void add_symbol(StringNumberMap &string_number_map,
 		    Character c,
 		    Alphabet &alphabet);
-    //bool skip_identifier_version_3_0(void);
-    //bool skip_hfst_header(void);
-    //bool skip_minimality_identifier(void);
 
   public:
     SfstInputStream(void);

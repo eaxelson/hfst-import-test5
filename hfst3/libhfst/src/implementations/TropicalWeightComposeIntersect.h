@@ -10,6 +10,12 @@
 #include <climits>
 #include <string>
 
+/** @file TropicalWeightComposeIntersect.h
+    \brief Composing intersect algorithm implemented for OpenFst's transducers 
+    with tropical weights.
+
+    Currently this is the only implementation of this algorithm. */
+
 namespace hfst
 {
   namespace implementations

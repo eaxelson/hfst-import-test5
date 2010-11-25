@@ -50,6 +50,11 @@ namespace hfst
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *),
 #endif
+
+#if HAVE_FOO
+ FooTransducer * (*foo_funct)(FooTransducer *),
+#endif
+
   bool foo )
     {
       (void)foo;
@@ -91,8 +96,20 @@ namespace hfst
 	  this->foma_interface.delete_foma(implementation.foma);
 	  implementation.foma = foma_temp;
 	  break;
-    }
+	}
 #endif
+
+#if HAVE_FOO
+      case FOO_TYPE:
+	{
+	  FooTransducer * foo_temp =
+	    foo_funct(implementation.foo);
+	  delete implementation.foo;
+	  implementation.foo = foo_temp;
+	  break;
+	}
+#endif
+
 	//case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:

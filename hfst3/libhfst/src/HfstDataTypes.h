@@ -43,9 +43,8 @@
 #include "implementations/ConvertTransducerFormat.h"
 #include "HfstExceptions.h"
 
-/** \file  
-    \brief ...
- */
+/** @file HfstDataTypes.h  
+    \brief Datatypes that are needed when using the HFST API. */
 
 namespace hfst
 {
@@ -67,6 +66,7 @@ namespace hfst
     TROPICAL_OFST_TYPE, /**< An OpenFst transducer with tropical weights. */
     LOG_OFST_TYPE, /**< An OpenFst transducer with logarithmic weights. */
     FOMA_TYPE, /**< A foma transducer, unweighted. */
+    // FOO_TYPE, /* A new transducer type */
     HFST_OL_TYPE, /**< An HFST optimized lookup transducer, unweighted */
     HFST_OLW_TYPE, /**< An HFST optimized lookup transducer with weights */
     HFST2_TYPE, /**< HFST2 header present, conversion required */
