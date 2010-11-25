@@ -15,10 +15,5 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-ACLOCAL_AMFLAGS = -I m4
-SUBDIRS = libhfst tools test doc man scripts
+bin_SCRIPTS = hfst-foma-wrapper.sh hfst-xfst
 
-if CAN_DOXYGEN
-doxygen:
-	doxygen Doxyfile
-endif

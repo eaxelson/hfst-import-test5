@@ -1,0 +1,38 @@
+#!/bin/sh
+function print_usage() {
+    echo "usage: $0 [-e command] [-f scriptfile] [-h] [-l startscript] [-s binaryfile] [-q] [-v] [-F hfst_format]"
+}
+
+function print_help() {
+    echo "Imitates xfst using foma and a wrapper script"
+    echo
+    echo "  -h   print this help"
+    echo "  -V   print version info"
+    echo "  -F   parameter is HFST3 format name"
+    echo
+    echo "All other parameters imitate foma/xfst parameters as possible"
+}
+
+tmpfile=$$.tmp
+echo > $tmpfile
+while getopts "e:f:hl:s:qvF:" flag ; do
+    case $flag in
+        h) print_help; exit 0;;
+        V) print_version; exit 0;;
+        v) realopts=$realopts -v;;
+        q) realopts=$realopts -q;;
+        f) realfile=$OPTARG;;
+        l) realfile=$OPTARG;;
+        e) echo $OPTARG >> $tmpfile; realfile=$tmpfile;;
+        F) realopts=$realopts -f $OPTARG;;
+        ?) echo "Unknown command line switch $OPTARG, try -h for help"; print_usage; exit 1;;
+    esac
+done
+
+if ! hfst-foma-wrapper.sh $realopts $realfile ; then
+    echo "Foma wrapper failed"
+    exit 1
+fi
+if [ -f $tmpfile ] ; then
+    rm $tmpfile
+fi

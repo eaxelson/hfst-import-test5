@@ -354,6 +354,7 @@ AC_PROG_AWK
 AC_PROG_CPP
 AC_PROG_YACC
 AC_PROG_LEX
+AC_PATH_PROG([FOMACLI], [foma])
 # if flex 3.X ever comes out, this breaks :)
 LEX_VERSION=`$LEX --version`
 if test -z "`echo "$LEX_VERSION" | grep 'flex 2\.[[5-9]]\.[[3-9][4-9]]'`"
@@ -447,7 +448,8 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
                  libhfst/src/implementations/Makefile libhfst/src/extensions/Makefile
                  libhfst/hfst.pc
                  tools/Makefile tools/src/Makefile tools/src/hfst-proc/Makefile
-                 man/Makefile])
+                 man/Makefile
+                 scripts/Makefile scripts/hfst-foma-wrapper.sh])
 
 # output
 AC_OUTPUT
@@ -496,10 +498,11 @@ cat <<EOF
     *                 test: $enable_test
     *                 txt2fst: $enable_txt2fst
     *                 xfst-compiler: $enable_xfst_compiler
+    *                 foma/xfst: -> $FOMACLI
     * compiling tools with -Werror: $enable_werrors
 EOF
 if test "x$with_foma" != "xno" -a "x$with_openfst" != "xno"; then
-    AC_MSG_WARN([Backends with conflicting licences selected (foma GPLv2 and OpenFst Apache), resulting binary must not be redistributed])
+    AC_MSG_WARN([Backends with conflicting licences selected (foma: GPLv2 conflicts OpenFst: Apache), resulting binary must not be redistributed])
 fi
 if test "x$with_openfst" == "xno"; then
     AC_MSG_WARN([Disabling openfst backend will severely cripple libhfst])

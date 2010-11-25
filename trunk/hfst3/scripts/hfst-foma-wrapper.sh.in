@@ -1,0 +1,96 @@
+#!/bin/sh
+foma_exec=@FOMACLI@
+if [ ! -x $foma_exec ] ; then
+    echo "$0 could not find foma from $foma_exec"
+    exit 1
+fi
+
+function print_usage() {
+    echo "Usage: $0 [-h|-V] [-v|-s|-q] [-f FORMAT] [-F STACK_FILES]"
+}
+
+function print_help() {
+    echo "Uses foma to parse xfst scripts converts results to HFST3 format"
+    echo
+    echo "  -h   print this help text"
+    echo "  -V   print script version"
+    echo "  -v   print verbosely while processing"
+    echo "  -q   do not print while processing"
+    echo "  -s   alias of -q"
+    echo "  -f   select output format as HFST3 supported format names"
+    echo "  -F   list files which xfst script saves as stacks that can be converted to HFST3 format"
+    echo
+    echo "Input is read from stdin or free parameters of command line"
+    echo "Output is written to stdout"
+    echo "If -f is omitted, HFST3 default is used"
+    echo "If -F is omitted, we try to guess files to convert automatically"
+}
+
+function print_version() {
+    echo "hfst-foma-wrapper 0.1"
+    echo "Copyright (c) 2010 University of Helsinki"
+    echo "Licence GPLv3: GNU GPL version 3 <http://gnu.org/licenses/gpl.html>"
+    echo "This is free software: you are free to change and redistribute it."
+    echo "There is NO WARRANTY, to the extent permitted by law."
+}
+
+while getopts "vqshVf:F:" flag ; do
+    case $flag in
+        h) print_help; exit 0;;
+        V) print_version; exit 0;;
+        v) verbose=-v;;
+        s,q) quiet=-q;;
+        f) format=-f $OPTARG;;
+        F) files=$OPTARG;;
+        ?) echo "Unknown command line switch $OPTARG, try -h for help"; print_usage; exit 1;;
+    esac
+done
+shift $(($OPTIND-1))
+if [ -z $@ ] ; then
+    if [ "x$verbose" == "x-v" ] ; then
+        echo "running $foma_exec"
+    fi
+    if ! $foma_exec ; then 
+        echo "$foma_exec failed"
+        exit 1
+    fi
+fi
+for f in $@ ; do
+    if [ "x$verbose" == "x-v" ] ; then
+        echo "running $foma_exec -f $f"
+    fi
+    if ! $foma_exec -f "$f" ; then
+        echo "$foma_exec -f $f failed"
+        exit 1
+    fi
+done
+
+
+if [ -z $files ] ; then
+    for f in $@ ; do
+        files=$(egrep '^(save stack|ss)' $f | sed -e 's/.*\(save stack\|ss\) //') $files
+    done
+    if [ "x$verbose" == "x-v" ] ; then
+        echo "discovered stack files $files"
+    fi
+fi
+if [ -z $files ] ; then
+    echo "Unable to find saved stack files to convert; use -F!"
+    exit 1
+fi
+for f in $files ; do
+    if [ "x$verbose" == "x-v" ] ; then
+        echo "converting $f"
+    fi
+    printf "load stack $f\nwatt $f.att\nquit" > $f.tmpscript
+    if ! $foma_exec -f $f.tmpscript ; then
+        echo "converting $f from foma to text failed"
+        exit 1
+    fi
+    if ! hfst-txt2fst -e '@0@' $format $quiet $verbose -i "$f.att" -o "$f" ; then
+        echo "converting $f from text to HFST3 failed"
+        exit 1
+    fi
+    rm $f.tmpscript $f.att
+done
+
