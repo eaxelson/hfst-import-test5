@@ -36,7 +36,7 @@
 #include "implementations/HfstOlTransducer.h"
 #include "implementations/HfstTokenizer.h"
 #include "implementations/ConvertTransducerFormat.h"
-#include "implementations/HfstExceptions.h"
+#include "HfstExceptions.h"
 
 #include <string>
 #include <cassert>

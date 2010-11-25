@@ -18,7 +18,7 @@
 #include <iostream>
 #include <limits>
 #include <string>
-#include "../HfstExceptions.h"
+#include "../../HfstExceptions.h"
 #include "../FlagDiacritics.h"
 
 namespace hfst_ol {

@@ -55,9 +55,10 @@ implincludedir = $(hfstincludedir)/implementations
 
 implinclude_HEADERS = \
 		ConvertTransducerFormat.h \
-		ExtractStrings.h FlagDiacritics.h FomaTransducer.h HfstExceptions.h \
+		FlagDiacritics.h FomaTransducer.h \
 		HfstTokenizer.h LogFstTrieFunctions.h LogWeightTransducer.h \
 		SfstTransducer.h TropicalWeightTransducer.h HfstOlTransducer.h InternalTransducer.h
+# HfstExceptions.h ExtractStrings.h
 
 if WANT_HFSTOL
 hfstolincludedir = $(implincludedir)/optimized-lookup
