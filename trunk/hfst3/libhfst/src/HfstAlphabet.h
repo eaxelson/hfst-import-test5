@@ -7,6 +7,9 @@
 #include <string.h>
 #include <stdio.h>
 
+/** @file HfstAlphabet.h
+    \brief Declaration of class HfstAlphabet. */
+
 namespace hfst {
   namespace implementations {
 

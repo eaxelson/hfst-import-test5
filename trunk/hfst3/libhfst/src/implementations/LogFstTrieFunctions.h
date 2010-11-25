@@ -15,6 +15,9 @@
 #include <fst/fstlib.h>
 #include <vector>
 
+/** @file LogFstTrieFunctions.h
+    \brief This file will be replaced by file HfstTrieFunctions.h */
+
 namespace HFST_IMPLEMENTATIONS
 {
   using namespace fst;

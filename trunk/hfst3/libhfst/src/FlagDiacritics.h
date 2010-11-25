@@ -7,6 +7,9 @@
 #include <vector>
 #include <cassert>
 
+/** @file FlagDiacritics.h
+    \brief Class declarations for flag diacritic handling. */
+
 namespace hfst {
 
   enum FdOperator {Pop, Nop, Rop, Dop, Cop, Uop};

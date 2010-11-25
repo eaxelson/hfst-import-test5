@@ -18,12 +18,14 @@
 
 #include "HfstTransducer.h"
 
+/** @file HfstGrammar.h
+    \brief Declaration of class HfstGrammar. */
 
 namespace hfst
 {
 #if HAVE_OPENFST
-  /** \brief A set of transducers used in function HfstTransducer::compose_inte
-rsect. 
+  /** \brief A set of transducers used in function 
+      HfstTransducer::compose_intersect. 
 
       @see HfstTransducer::compose_intersect */
 

@@ -13,6 +13,9 @@ namespace hfst {
   class HfstTransducer;
 }
 
+/** @file HfstInternalTransducer.h
+    \brief Declaration of classes needed by HFST's internal transducer format. */
+
 namespace hfst {
   namespace implementations {
   

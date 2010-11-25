@@ -16,6 +16,10 @@
 #include <iostream>
 #include <climits>
 #include <string>
+
+/** @file HfstTokenizer.h
+    \brief Declaration of class #HfstTokenizer. */
+
 namespace hfst
 {
   using hfst::String;

@@ -25,6 +25,9 @@
    extern const unsigned int UNKNOWN_NUMBER;
    extern const unsigned int IDENTITY_NUMBER; */
 
+/** @file SymbolDefs.h
+    \brief Typedefs and functions for symbols, symbol pairs and sets of symbols. */
+
 namespace hfst
 {
 
@@ -71,6 +74,6 @@ namespace hfst
   typedef std::map<unsigned int,unsigned int> NumberNumberMap;
 
   void collect_unknown_sets(StringSet &s1, StringSet &unknown1,
-			    StringSet &s2, StringSet &unknown2);
+  		    StringSet &s2, StringSet &unknown2);
 }
 #endif

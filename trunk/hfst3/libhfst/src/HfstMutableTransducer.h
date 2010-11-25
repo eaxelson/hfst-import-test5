@@ -16,6 +16,12 @@
 #  include <config.h>
 #endif
 
+/** @file HfstMutableTransducer.h
+    \brief This file is only for doxygen documentation.
+
+    All functions and datatypes are implemented in files HfstInternalTransducer.h
+    and HfstInternalTransducer.cc and typedefed in file HfstTransducer.h. */
+
 namespace hfst
 {
 

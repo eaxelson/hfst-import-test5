@@ -20,6 +20,9 @@
 #include "ExtractStrings.h"
 #include "optimized-lookup/transducer.h"
 
+/** @file HfstOlTransducer.h
+    \brief Declaration of classes for HFST's optimized lookup transducer format. */
+
 namespace hfst { namespace implementations
 {
   using std::ostream;

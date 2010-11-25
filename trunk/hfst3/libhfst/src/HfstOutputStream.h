@@ -18,6 +18,9 @@
 
 #include "HfstTransducer.h"
 
+/** @file HfstOutputStream.h
+ \brief Declaration of class HfstOutputStream. */
+
 namespace hfst
 {
 
@@ -48,6 +51,11 @@ namespace hfst
 #if HAVE_FOMA
       hfst::implementations::FomaOutputStream * foma;
 #endif
+
+#if HAVE_FOO
+      hfst::implementations::FooOutputStream * foo;
+#endif
+
       hfst::implementations::HfstOlOutputStream * hfst_ol;
     };
     ImplementationType type; // type of the stream implementation

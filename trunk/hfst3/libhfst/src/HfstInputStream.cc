@@ -43,6 +43,12 @@ namespace hfst
 	this->implementation.foma->ignore(n);
 	break;
 #endif
+
+#if HAVE_FOO
+      case FOO_TYPE:
+	this->implementation.foo->ignore(n);
+#endif
+
       default:
 	assert(false);
 	break;
@@ -126,11 +132,8 @@ namespace hfst
 
   char HfstInputStream::stream_peek()
   {
-    //fprintf(stderr, "#1\n");
     char c = stream_get();
-    //fprintf(stderr, "#2\n");
     stream_unget(c);
-    //fprintf(stderr, "#3\n");
     return c;
   }
 
@@ -145,7 +148,6 @@ namespace hfst
 	break;
       retval.append(1,c);
     }
-    //fprintf(stderr, "stream_getstring: returning string: \"%s\"\n", retval.c_str());
     return retval;
   }
 
@@ -236,7 +238,7 @@ namespace hfst
 
     switch(c)
       {
-      case (char)0xd6:
+      case (char)0xd6: // OpenFst
 	{
 	  char chars_read[26];
 	  for (unsigned int i=0; i<26; i++) {
@@ -256,12 +258,17 @@ namespace hfst
 	  //return OPENFST_;
 	  break;
 	}
-      case '#':
+      case '#':  // foma
 	return FOMA_;
 	break;
-      case 'a':
+      case 'a':  // SFST
 	return SFST_;
 	break;
+	/*
+	  case 'f':  // Foo (replace 'f' byt the first char in a binary FooTransducer)
+	    return FOO_;
+	    break;
+	 */
       case 'P':
 	{
 	  // extract HFST version 2 header
@@ -334,6 +341,10 @@ namespace hfst
       type = HFST_OL_TYPE;
     else if (strcmp("HFST_OLW", header_data[1].second.c_str()) == 0 )
       type = HFST_OLW_TYPE;
+    /*
+      else if (strcmp("FOO_TYPE", header_data[1].second.c_str()) == 0 )
+        type = FOO_TYPE;
+     */
     else
       throw hfst::exceptions::TransducerHeaderException();
 
@@ -561,6 +572,11 @@ namespace hfst
       case FOMA_:
 	return FOMA_TYPE;
 	break;
+	/*
+	  case FOO_:
+	    return FOO_TYPE;
+	    break;
+	 */
       case ERROR_TYPE_:
       default:
 	return ERROR_TYPE;

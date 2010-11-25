@@ -12,6 +12,10 @@
 
 #ifndef _HFST_EXCEPTIONS_H_
 #define _HFST_EXCEPTIONS_H_
+
+/** @file HfstExceptions.h
+    \brief Exceptions that are thrown by the HFST API. */
+
 namespace hfst
 { 
 

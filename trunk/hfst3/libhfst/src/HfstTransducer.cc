@@ -10,9 +10,11 @@
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-/** @file
- * ...
- * ... */
+/** @file HfstTransducer.cc
+    \brief Implementations of functions declared in file HfstTransducer.h 
+
+    The implementations call backend implementations that are declared in
+    files in the directory implementations. */
 
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
@@ -31,6 +33,10 @@ namespace hfst
 #endif
 #if HAVE_FOMA
   hfst::implementations::FomaTransducer HfstTransducer::foma_interface;
+#endif
+
+#if HAVE_FOO
+  hfst::implementations::FooTransducer HfstTransducer::foo_interface;
 #endif
 
   MinimizationAlgorithm minimization_algorithm=HOPCROFT;
@@ -180,6 +186,7 @@ namespace hfst
 	}
       case (LOG_OFST_TYPE):
 	{
+	  // TODO: add harmonize_smaller etc.
 	  std::pair <hfst::implementations::LogFst*, hfst::implementations::LogFst*> result;
 	  result =
 	    log_ofst_interface.harmonize(this->implementation.log_ofst,
@@ -199,15 +206,7 @@ namespace hfst
       }
   }
 
-  //typedef std::vector<std::string> HfstArcPath;
-  //! @brief A path of one level of arcs with collected weight,
-  //!
-  //! Used as the source and result data type for lookups and downs.
-  //typedef std::pair<HfstArcPath,float> HfstLookupPath;
-  //! @brief A set of simple paths.
-  //!
-  //! Used as return type of lookup with multiple, unique results.
-  //typedef std::set<HfstLookupPath> HfstLookupPaths;
+  // TODO: add HfstOlTransducer implementations when they are ready.
 
   void HfstTransducer::lookup(HfstLookupPaths& results, const HfstLookupPath& s,
 			      ssize_t limit) {
@@ -289,6 +288,13 @@ namespace hfst
 	implementation.foma = foma_interface.create_empty_transducer();
 	break;
 #endif
+
+#if HAVE_FOO
+      case FOO_TYPE:
+	implementation.foo = foo_interface.create_empty_transducer();
+	break;
+#endif
+
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	implementation.hfst_ol = hfst_ol_interface.create_empty_transducer(type==HFST_OLW_TYPE?true:false);
@@ -645,89 +651,6 @@ namespace hfst
   }
 
 
-  /* For internal use. */
-  /*HfstTransducer::HfstTransducer(unsigned int number, ImplementationType type): 
-  type(type),anonymous(true),is_trie(false), name("")
-  {
-    if (not is_implementation_type_available(type))
-      throw hfst::exceptions::ImplementationTypeNotAvailableException();
-
-    switch (this->type)
-      {
-#if HAVE_SFST
-      case SFST_TYPE:
-	implementation.sfst = sfst_interface.define_transducer(number);
-	break;
-#endif
-#if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
-      // case UNSPECIFIED_TYPE:
-	implementation.tropical_ofst = tropical_ofst_interface.define_transducer(number);
-	this->type = TROPICAL_OFST_TYPE;
-	break;
-      case LOG_OFST_TYPE:
-	implementation.log_ofst = log_ofst_interface.define_transducer(number);
-	break;
-#endif
-#if HAVE_FOMA
-      case FOMA_TYPE:
-	{
-	  char buf [255];
-	  sprintf(buf, "\\%i", number);
-	  implementation.foma = foma_interface.define_transducer(buf);
-	  break;
-	}
-#endif
-      case ERROR_TYPE:
-      default:
-	throw hfst::exceptions::TransducerHasWrongTypeException();
-	break;
-      }
-  }
-  */
-  /* For internal use. */
-  /*HfstTransducer::HfstTransducer(unsigned int inumber, unsigned int onumber, ImplementationType type):
-  type(type),anonymous(true),is_trie(false), name("")
-  {
-    if (not is_implementation_type_available(type))
-      throw hfst::exceptions::ImplementationTypeNotAvailableException();
-
-    switch (this->type)
-      {
-#if HAVE_SFST
-      case SFST_TYPE:
-	implementation.sfst = sfst_interface.define_transducer(inumber, onumber);
-	break;
-#endif
-#if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
-      // case UNSPECIFIED_TYPE:
-	implementation.tropical_ofst = tropical_ofst_interface.define_transducer(inumber, onumber);
-	this->type = TROPICAL_OFST_TYPE;
-	break;
-      case LOG_OFST_TYPE:
-	implementation.log_ofst = log_ofst_interface.define_transducer(inumber, onumber);
-	break;
-#endif
-#if HAVE_FOMA
-      case FOMA_TYPE:
-	{
-	  char ibuf [255];
-	  sprintf(ibuf, "\\%i", inumber);
-	  char obuf [255];
-	  sprintf(obuf, "\\%i", onumber);
-	  implementation.foma = foma_interface.define_transducer( ibuf, obuf );
-	  break;
-	}
-#endif
-      case ERROR_TYPE:
-      default:
-	throw hfst::exceptions::TransducerHasWrongTypeException();
-	break;
-      }
-      }*/
-
-
 HfstTransducer::HfstTransducer(const std::string &symbol, ImplementationType type): 
   type(type),anonymous(false),is_trie(false), name("")
   {
@@ -921,6 +844,11 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #if HAVE_FOMA
        &hfst::implementations::FomaTransducer::remove_epsilons,
 #endif
+
+#if HAVE_FOO
+       &hfst::implementations::FooTransducer::remove_epsilons,
+#endif
+
        false ); }
 
   HfstTransducer &HfstTransducer::determinize()
