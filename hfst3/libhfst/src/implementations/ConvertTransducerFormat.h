@@ -42,7 +42,7 @@
 
 #include "optimized-lookup/transducer.h"
 
-#include "InternalTransducer.h"
+#include "HfstInternalTransducer.h"
 
 struct fsm;
 

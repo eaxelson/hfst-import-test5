@@ -1,4 +1,4 @@
-#include "InternalTransducer.h"
+#include "HfstInternalTransducer.h"
 
 #include "../HfstTransducer.h"
 
