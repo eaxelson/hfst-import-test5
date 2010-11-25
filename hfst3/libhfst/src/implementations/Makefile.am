@@ -20,7 +20,7 @@ noinst_LTLIBRARIES=libhfstimplementations.la
 
 # HFST bridge specific stuff
 IMPLEMENTATION_SRCS= \
-	HfstTokenizer.cc ConvertTransducerFormat.cc FlagDiacritics.cc InternalTransducer.cc HfstAlphabet.cc
+	ConvertTransducerFormat.cc FlagDiacritics.cc InternalTransducer.cc HfstAlphabet.cc
 AM_CXXFLAGS=-Wno-deprecated
 # the bridges
 if WANT_SFST
@@ -56,9 +56,9 @@ implincludedir = $(hfstincludedir)/implementations
 implinclude_HEADERS = \
 		ConvertTransducerFormat.h \
 		FlagDiacritics.h FomaTransducer.h \
-		HfstTokenizer.h LogFstTrieFunctions.h LogWeightTransducer.h \
+		LogFstTrieFunctions.h LogWeightTransducer.h \
 		SfstTransducer.h TropicalWeightTransducer.h HfstOlTransducer.h InternalTransducer.h
-# HfstExceptions.h ExtractStrings.h
+
 
 if WANT_HFSTOL
 hfstolincludedir = $(implincludedir)/optimized-lookup

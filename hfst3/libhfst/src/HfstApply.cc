@@ -9,6 +9,11 @@
 //
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+/** \file HfstApply.cc 
+    \brief HFST transducer functions that take several parameters are handled here. 
+ */
+
 #include "HfstTransducer.h"
 namespace hfst
 {
@@ -244,10 +249,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
     if (this->type != another.type)
       throw hfst::exceptions::TransducerTypeMismatchException();
 
-    // harmonize this according to symbol coding of another
-    // and expand unknowns and identities of both transducers
-    //this->harmonize(another);
-    another.harmonize(*this);  // faster?
+    this->harmonize(another);
 
     switch (this->type)
       {
