@@ -15,7 +15,7 @@
 
 #include "hfst-proc.h"
 #include "transducer.h"
-#include "implementations/FlagDiacritics.h"
+#include "FlagDiacritics.h"
 
 /**
  * Represents a (possibly partial) path through a transducer. This is used
