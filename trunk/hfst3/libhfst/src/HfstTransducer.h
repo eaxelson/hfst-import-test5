@@ -32,7 +32,7 @@
 #include "implementations/FomaTransducer.h"
 #endif
 
-#include "implementations/HfstAlphabet.h"
+#include "HfstAlphabet.h"
 #include "implementations/HfstOlTransducer.h"
 #include "HfstTokenizer.h"
 #include "implementations/ConvertTransducerFormat.h"
