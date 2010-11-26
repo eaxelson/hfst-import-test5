@@ -215,6 +215,12 @@ namespace hfst
 	type_value=std::string("FOMA");
 	break;
 #endif
+      case HFST_OL_TYPE:
+	type_value=std::string("HFST_OL");
+	break;
+      case HFST_OLW_TYPE:
+	type_value=std::string("HFST_OLW");
+	break;
       default:
 	assert(false);
       }

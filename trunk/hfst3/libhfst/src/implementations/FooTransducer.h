@@ -13,22 +13,26 @@
 #ifndef _FOO_TRANSDUCER_H_
 #define _FOO_TRANSDUCER_H_
 
+/** @file FooTransducer.h
+    \brief Declarations of functions and datatypes that form a bridge between
+    HFST API and library Foo. 
+
+    This file lists the classes and functions that a new library must implement
+    before added under the HFST API. Write implementations in file 
+    FooTransducer.cc */
+
 #include "HfstExceptions.h"
 #include "FlagDiacritics.h"
 #include "SymbolDefs.h"
 #include "ExtractStrings.h"
 
-// all relevant header files of library Foo
+/* Include all relevant header files of library Foo here */
 //#include ...
 
 #include <cstdio>
 #include <string>
 #include <sstream>
 #include <iostream>
-
-/** @file FooTransducer.h
-    \brief Declarations of functions and datatypes that form a bridge between
-    HFST API and library Foo. */
 
 namespace hfst { 
 namespace implementations
@@ -38,47 +42,95 @@ namespace implementations
   using std::ostream;
   using std::ostringstream;
 
+  /* A class for reading binary FooTransducers from a stream. 
+
+     If your transducer read function uses C FILEs, see class SfstInputStream
+     or FomaInputStream for an example how to implement the functions
+     in class FooInputStream. If your transducer read function uses C++ streams,
+     see class TropicalWeightInputStream or LogWeightInputStream.
+   */
   class FooInputStream 
   {
   private:
     std::string filename;
+
+    // if the library uses C FILEs, you probably need this
     FILE * input_file;
-    // relevant variables and functions...
+    // if the library uses C++ streams, you probably need this
+    ifstream i_stream;
+    istream &input_stream;
 
   public:
+    /* Create and open a stream to standard in. */
     FooInputStream(void);
+    /* Create and open a stream to file filename. */
     FooInputStream(const char * filename);
+    /* Close the stream. If it points to standard in, nothing is done. */
     void close(void);
+    /* */
     bool is_eof(void);
+    /* */
     bool is_bad(void);
+    /* */
     bool is_good(void);
+    /* */
     bool is_fst(void);
+    /* is this needed? */
     void ignore(unsigned int);
 
+    /* Extract a char from the stream. */
     char stream_get();
+    /* Put back a char to the stream. */
     void stream_unget(char c);
 
-    //bool set_implementation_specific_header_data(StringPairVector &data, unsigned int index);
+    /* Optional: if you want to extract implementation specific data from the header. */
+    bool set_implementation_specific_header_data(StringPairVector &data, unsigned int index);
+
+    /* Read a FooTransducer from the stream. */
     FooTransducer * read_transducer();
     
-    static bool is_fst(FILE * f);
-    static bool is_fst(std::istream &s);
+    // ?
+    //static bool is_fst(FILE * f);
+    //static bool is_fst(std::istream &s);
   };
 
+  /* A class for writing binary FooTransducers to a stream. 
+
+     If your transducer write function uses C FILEs, see class SfstOutputStream
+     or FomaOuputStream for an example how to implement the functions
+     in class FooOutputStream. If your transducer write function uses C++ streams,
+     see class TropicalWeightOutputStream or LogWeightOutputStream.
+  */
   class FooOutputStream 
   {
   private:
     std::string filename;
+
+    // if the library uses C FILEs, you probably need this
     FILE *ofile;
+
+    // if the library uses C++ streams, you probably need this
+    ofstream o_stream;
+    ostream &output_stream;
+
   public:
+    /* Create and open a stream to standard out. */
     FooOutputStream(void); 
+    /* Create and open a stream to file filename. */
     FooOutputStream(const char * filename);
+    /* Close the stream. If it points to standard out, nothig is done. */
     void close(void);
+    /* Write a char to the stream. */
     void write(const char &c);
-    //void append_implementation_specific_header_data(std::vector<char> &header, Transducer *t);
+
+    /* Optional: if you want to store implementation specific data to the header. */
+    void append_implementation_specific_header_data(std::vector<char> &header, Transducer *t);
+
+    /* Write a FooTransducer to the stream. */
     void write_transducer(FooTransducer * transducer);
   };
   
+  /* A library class that contains operations for FooTransducers. */
   class FooTransducer
     {
     public:
@@ -136,28 +188,45 @@ namespace implementations
       /* TODO: document */
       static void extract_strings(FooTransducer * t, hfst::ExtractStringsCb& callback, int cycles=-1, FdTable<SFST::Character>* fd=NULL, bool filter_fd=false);
 
-      /* Create a transducer that */
+      /* Create a transducer that accepts string pair of [ A:B* s A:B* t A:B* r A:B* i A:B* n A:B* g A:B* 1:2 A:B* ] 
+	 (where A and B are input and output symbol of symbol_pair) iff transducer t accepts string pair string1:string2. */
       static FooTransducer * insert_freely(FooTransducer *t , const StringPair &symbol_pair);
+      /* Create a transducer equivalent to transducer t but where all symbols old_symbol are substituted with new_symbol. */
       static FooTransducer * substitute(FooTransducer * t, String old_symbol, String new_symbol);
+      /* Create a transducer equivalent to transducer t but where all symbol pairs symbol_pair are substituted with
+	 a copy of transducer tr. */
       static FooTransducer * substitute(FooTransducer *t, const StringPair &symbol_pair, FooTransducer *tr);
 
+      /* Create a transducer that accepts string pair string1:string3 iff t1 accepts string pair string1:string2
+	 and t2 accepts string pair string2:string3, where string2 is any string. */
       static FooTransducer * compose(FooTransducer * t1,
 			   FooTransducer * t2);
+      /* Create a transducer that accepts a concatenation of any string pair accepted by t1
+	 and any string pair accepted by t2. */
       static FooTransducer * concatenate(FooTransducer * t1,
 			       FooTransducer * t2);
+      /* Create a transducer that accepts any string pair accepted by t1 or t2. */
       static FooTransducer * disjunct(FooTransducer * t1,
 			    FooTransducer * t2);
+      /* Create a transducer that accepts any string pair accepted by both t1 and t2. */
       static FooTransducer * intersect(FooTransducer * t1,
 			     FooTransducer * t2);
+      /* Create a transducer that accepts any string pair accepted by t1 but not t2. */
       static FooTransducer * subtract(FooTransducer * t1,
 			    FooTransducer * t2);
+
+
       static std::pair<Transducer*, Transducer*> harmonize(FooTransducer *t1, FooTransducer *t2, bool unknown_symbols_in_use=true);
 
+      /* Whether transducers t1 an t2 are equivalent. */
       static bool are_equivalent(FooTransducer * t1, FooTransducer * t2);
+      /* Whether transducer t is cyclic. */
       static bool is_cyclic(FooTransducer * t);
       
+      /* A table of FooTransitionNumbers that represent flag diacritics in transducer t. */
       static FdTable<FooTransitionNumber>* get_flag_diacritics(FooTransducer * t);
 
+      /* Remove symbol symbol from the alphabet of transducer t. */
       static FooTransducer * remove_from_alphabet(FooTransducer *t, const std::string &symbol);
 
       static FooTransducer * disjunct(FooTransducer * t, const StringPairVector &spv);
@@ -165,17 +234,18 @@ namespace implementations
       static StringPairSet get_symbol_pairs(FooTransducer *t);
 
       float get_profile_seconds();
+
+      /* The number of states in transducer t. */
       static unsigned int number_of_states(FooTransducer *t);
 
     protected:
+      /* Add the following number-to-symbol correspondencies to the alphabet of transducer t: 
+	 0 : "@_EPSILON_SYMBOL_@"
+	 1 : "@_UNKNOWN_SYMBOL_@"
+	 2 : "@_IDENTITY_SYMBOL_@"  */
       static void initialize_alphabet(FooTransducer *t);
       static StringSet get_string_set(FooTransducer *t);
       static FooTransducer * expand_arcs(FooTransducer * t, StringSet &unknown);
-
-      static void expand_node( FooTransducer *t, Node *origin, Label &l, 
-			       Node *target, hfst::StringSet &s );
-      static void expand2( FooTransducer *t, Node *node,
-			    hfst::StringSet &new_symbols, std::set<Node*> &visited_nodes );
       static void expand(FooTransducer *t, hfst::StringSet &new_symbols);
 
     };
