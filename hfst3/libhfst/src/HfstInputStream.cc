@@ -376,10 +376,8 @@ namespace hfst
      the header data cannot be parsed. */
   bool HfstInputStream::read_hfst_header(int &bytes_read)
   {
-    //fprintf(stderr, "#2#\n");
-    //fprintf(stderr, "read_hfst_header...\n");
     char c =stream_peek();
-    //fprintf(stderr, "  char read\n");
+
     if (c != 'H') {
       bytes_read=0;
       return false;
@@ -387,28 +385,25 @@ namespace hfst
     int header_bytes=0;
     if (read_library_header(header_bytes)) 
       {
-	//fprintf(stderr, "#3#\n");
       int size_bytes=0;
       int header_size = get_header_size(size_bytes); // throws error
       StringPairVector header_info = 
 	get_header_data(header_size);
       process_header_data(header_info, false);           // throws error
-      /*fprintf(stderr, "header_bytes + size_bytes + header_size: %i + %i + %i\n",
-	header_bytes, size_bytes, header_size);*/
+
       bytes_read = header_bytes + size_bytes + header_size;
       return true;
       }
     header_bytes=0;
     if (read_library_header_beta(header_bytes)) 
       {
-	//fprintf(stderr, "#4#\n");
       int type_bytes=0;
       type = get_fst_type_beta(type_bytes); // throws error
       if (type == ERROR_TYPE) {
 	throw hfst::exceptions::NotTransducerStreamException();
       }
       bytes_read = header_bytes + type_bytes;
-      /*fprintf(stderr, "bytes_read: %i == %i + %i\n", bytes_read, header_bytes, type_bytes);*/
+
       return true;
       }
     return false;
@@ -491,7 +486,7 @@ namespace hfst
     }
     header_size = (c1 * 256) + c2;
     bytes_read=3;
-    //fprintf(stderr, "get_header_size: returning: %i\n", header_size);
+
     return header_size;
   }
 
@@ -504,9 +499,6 @@ namespace hfst
       {
 	std::string str1 = stream_getstring();
 	std::string str2 = stream_getstring();
-
-	//fprintf(stderr, "str1: \"%s\"\n", str1.c_str());
-	//fprintf(stderr, "str2: \"%s\"\n", str2.c_str());
 
 	bytes_read = bytes_read + (int)str1.length() + (int)str2.length() + 2; 
 
@@ -532,15 +524,11 @@ namespace hfst
   /* The implementation type of the first transducer in the stream. */
   ImplementationType HfstInputStream::stream_fst_type()
   { 
-    //fprintf(stderr, "stream_fst_type...\n");
-
     int bytes_read=0;
 
     // whether the stream contains an HFST version 3.0 transducer
     if (read_hfst_header(bytes_read)) {
-      //fprintf(stderr, "#1#\n");
       bytes_to_skip=bytes_read;
-      /*fprintf(stderr, "bytes_to_skip == %i\n", bytes_to_skip);*/
       return type;
     }
 
@@ -592,7 +580,6 @@ namespace hfst
     try { 
       input_stream = &std::cin;
       type = stream_fst_type();
-      //fprintf(stderr, "type is %i\n", type);
     }
     catch (hfst::implementations::FileNotReadableException e)
       { throw e; }
