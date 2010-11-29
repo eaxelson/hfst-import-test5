@@ -1,5 +1,7 @@
 #!/bin/sh
-if ! ../../tools/src/hfst-regexp2fst < cats_and_dogs.xre > test.hfst ; then
+for i in sfst openfst-tropical foma; do
+if ! ../../tools/src/hfst-regexp2fst -f $i < cats_and_dogs.xre > test.hfst ; then
     exit 1
 fi
-rm test.hfst
+rm test.hfst;
+done

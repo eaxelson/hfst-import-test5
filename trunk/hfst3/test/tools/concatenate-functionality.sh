@@ -1,8 +1,10 @@
 #!/bin/sh
-if ! ../../tools/src/hfst-concatenate cat.hfst dog.hfst > test.hfst ; then
+for i in "" .sfst .ofst .foma; do
+if ! ../../tools/src/hfst-concatenate cat.hfst$i dog.hfst$i > test.hfst ; then
     exit 1
 fi
-if ! ../../tools/src/hfst-compare test.hfst catdog.hfst > /dev/null 2>&1 ; then
+if ! ../../tools/src/hfst-compare test.hfst catdog.hfst$i > /dev/null 2>&1 ; then
     exit 1
 fi
-rm test.hfst
+rm test.hfst;
+done

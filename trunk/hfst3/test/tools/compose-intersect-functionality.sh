@@ -1,5 +1,5 @@
 #!/bin/sh
-for i in openfst-tropical # foma sfst # openfst-log
+for i in openfst-tropical foma sfst # openfst-log
   do
 if ! echo "cat|dog" | ../../tools/src/hfst-calculate -f $i > lexicon.hfst ; then
     exit 1
