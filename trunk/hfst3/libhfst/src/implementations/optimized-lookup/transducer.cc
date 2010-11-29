@@ -88,7 +88,7 @@ Weight TransitionWIndex::final_weight(void) const
     return weight.w;
 }
 
-void LetterTrie::add_string(const char * p, SymbolNumber symbol_key)
+void OlLetterTrie::add_string(const char * p, SymbolNumber symbol_key)
 {
     if (*(p+1) == 0)
     {
@@ -97,12 +97,12 @@ void LetterTrie::add_string(const char * p, SymbolNumber symbol_key)
     }
     if (letters[(unsigned char)(*p)] == NULL)
     {
-	letters[(unsigned char)(*p)] = new LetterTrie();
+	letters[(unsigned char)(*p)] = new OlLetterTrie();
     }
     letters[(unsigned char)(*p)]->add_string(p+1,symbol_key);
 }
 
-SymbolNumber LetterTrie::find_key(char ** p)
+SymbolNumber OlLetterTrie::find_key(char ** p)
 {
     const char * old_p = *p;
     ++(*p);
