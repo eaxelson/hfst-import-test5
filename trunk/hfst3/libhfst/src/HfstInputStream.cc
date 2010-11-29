@@ -47,7 +47,13 @@ namespace hfst
 #if HAVE_FOO
       case FOO_TYPE:
 	this->implementation.foo->ignore(n);
+	break;
 #endif
+
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	  this->implementation.hfst_ol->ignore(n);
+	  break;
 
       default:
 	assert(false);
@@ -79,12 +85,12 @@ namespace hfst
 	return this->implementation.foma->stream_get();
 	break;
 #endif
-#if HAVE_HFST_OL
+
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	  return this->implementation.hfst_ol->stream_get();
 	  break;
-#endif
+
       default:
 	assert(false);
 	break;
@@ -117,12 +123,12 @@ namespace hfst
 	this->implementation.foma->stream_unget(c);
 	break;
 #endif
-#if HAVE_HFST_OL
+
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
-	  return this->implementation.hfst_ol->stream_unget();
+	  return this->implementation.hfst_ol->stream_unget(c);
 	  break;
-#endif
+
 
       default:
 	assert(false);
@@ -227,7 +233,9 @@ namespace hfst
 	break;
       }
 
+
     t.set_name(name);
+
   }
 
   HfstInputStream::TransducerType HfstInputStream::guess_fst_type(int &bytes_read)

@@ -604,6 +604,7 @@ public:
     virtual ~Transducer();
 
     void write(std::ostream& os) const;
+    Transducer * copy(Transducer * t);
     void display() const;
 
     const TransducerHeader& get_header() const
