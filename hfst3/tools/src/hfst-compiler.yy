@@ -293,8 +293,8 @@ print_usage()
 
         fprintf(message_out, 
             "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
-            "FMT must be name of a format usable by libhfst, such as "
-            "openfst-tropical, sfst or foma\n"
+            "FMT must be one of the following: "
+            "{openfst-tropical, openfst-log, sfst, foma}\n"
             );
         fprintf(message_out, "\n");
         fprintf(message_out, "Examples:\n"
