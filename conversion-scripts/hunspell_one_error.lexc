@@ -1,7 +1,0 @@
-LEXICON HUNSPELL_error_root
-    HUNSPELL_KEY ;
-    HUNSPELL_REP ;
-    HUNSPELL_TRY ;
-
-LEXICON HUNSPELL_error_return
-    #   ;
