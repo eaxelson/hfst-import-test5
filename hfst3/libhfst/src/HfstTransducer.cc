@@ -541,9 +541,10 @@ namespace hfst
 
   HfstTransducer::HfstTransducer(HfstInputStream &in):
     type(in.type), anonymous(false),is_trie(false), name("")
-  { 
-    if (not is_implementation_type_available(type))
-      throw hfst::exceptions::ImplementationTypeNotAvailableException();
+  {
+      if (not is_implementation_type_available(type)) {
+	  throw hfst::exceptions::ImplementationTypeNotAvailableException();
+      }
     in.read_transducer(*this); 
   }
 
@@ -576,6 +577,10 @@ namespace hfst
 	break;
 #endif
 	//case UNSPECIFIED_TYPE:
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	  implementation.hfst_ol = another.implementation.hfst_ol->copy(another.implementation.hfst_ol);
+	  break;
       case ERROR_TYPE:
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();

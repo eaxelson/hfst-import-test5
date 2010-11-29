@@ -446,6 +446,10 @@ void Transducer::write(std::ostream& os) const
 	tables->get_transition(i).write(os);
 }
 
+Transducer * Transducer::copy(Transducer * t)
+{ return new Transducer(*t); }
+
+
 void Transducer::display() const
 {
     std::cout << "-----Displaying optimized-lookup transducer------" << std::endl;

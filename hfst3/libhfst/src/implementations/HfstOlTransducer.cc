@@ -130,6 +130,10 @@ namespace hfst { namespace implementations
   void HfstOlInputStream::stream_unget(char c) {
     input_stream.putback(c); }
 
+void HfstOlInputStream::ignore(unsigned int n)
+{
+    input_stream.ignore(n);
+}
 
   bool HfstOlInputStream::operator() (void) const
   { return is_good(); }
@@ -142,13 +146,13 @@ namespace hfst { namespace implementations
     {
       if (has_header)
         skip_hfst_header();
-      
+
       hfst_ol::Transducer* t = new hfst_ol::Transducer(input_stream);
       //t->display();
       return t;
     }
     catch (TransducerHasWrongTypeException e)
-      { throw e; }
+    { throw e; }
   }
   
   
@@ -182,7 +186,7 @@ namespace hfst { namespace implementations
     output_stream.put(char(c));
   }
 
-  
+ 
   hfst_ol::Transducer * HfstOlTransducer::create_empty_transducer(bool weighted)
   { return new hfst_ol::Transducer(weighted); }
   

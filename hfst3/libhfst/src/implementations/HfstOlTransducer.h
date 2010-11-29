@@ -54,6 +54,7 @@ namespace hfst { namespace implementations
 
     char stream_get();
     void stream_unget(char c);
+    void ignore(unsigned int n);
     
     bool operator() (void) const;
     hfst_ol::Transducer * read_transducer(bool has_header);
