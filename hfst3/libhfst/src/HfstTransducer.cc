@@ -218,6 +218,17 @@ namespace hfst
 
     void HfstTransducer::lookup_fd(HfstLookupPaths& results, const HfstLookupPath& s,
 				   ssize_t limit) {
+	switch(this->type) {
+#if HAVE_HFST_OL
+	case (HFST_OL_TYPE):
+	    results = this->implementation.hfst_ol.lookup_fd(s.first().c_str());
+	    return;
+#endif
+	case (ERROR_TYPE):
+	    throw hfst::exceptions::TransducerHasWrongTypeException();
+	default:
+	    throw hfst::exceptions::FunctionNotImplementedException();
+	}
     (void)results;
     (void)s;
     (void)limit;

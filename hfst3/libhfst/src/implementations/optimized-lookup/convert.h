@@ -18,8 +18,6 @@
 
 namespace hfst_ol {
 
-using hfst::FdOperation;
-
 typedef fst::StdArc::StateId StateId;
 typedef fst::StdArc StdArc;
 typedef fst::StdVectorFst TransduceR;

@@ -24,12 +24,17 @@
 #include <climits>
 #include <utility>
 
-#include "../HfstExceptions.h"
-#include "../FlagDiacritics.h"
+#include "../../HfstExceptions.h"
+#include "../../FlagDiacritics.h"
 
 namespace hfst_ol {
+using hfst::FdOperation;
+using hfst::FdState;
+using hfst::FdTable;
+using namespace hfst::exceptions;
+
 //    using namespace hfst;
-//    using namespace hfst::exceptions;
+
 
 typedef unsigned short SymbolNumber;
 typedef unsigned int TransitionTableIndex;
@@ -496,18 +501,18 @@ public:
 
 // There follow some classes for implementing lookup
     
-class LetterTrie;
-typedef std::vector<LetterTrie*> LetterTrieVector;
+class OlLetterTrie;
+typedef std::vector<OlLetterTrie*> OlLetterTrieVector;
 
-class LetterTrie
+class OlLetterTrie
 {
 private:
-    LetterTrieVector letters;
+    OlLetterTrieVector letters;
     SymbolNumberVector symbols;
     
 public:
-    LetterTrie(void):
-	letters(UCHAR_MAX, static_cast<LetterTrie*>(NULL)),
+    OlLetterTrie(void):
+	letters(UCHAR_MAX, static_cast<OlLetterTrie*>(NULL)),
 	symbols(UCHAR_MAX,NO_SYMBOL_NUMBER)
 	{}
     
@@ -521,7 +526,7 @@ class Encoder {
     
 private:
     SymbolNumber number_of_input_symbols;
-    LetterTrie letters;
+    OlLetterTrie letters;
     SymbolNumberVector ascii_symbols;
     
     void read_input_symbols(const SymbolTable & kt);
