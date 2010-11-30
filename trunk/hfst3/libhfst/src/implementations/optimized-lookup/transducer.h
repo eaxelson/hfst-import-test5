@@ -48,8 +48,8 @@ typedef std::set<TransitionTableIndex> TransitionTableIndexSet;
 typedef std::vector<std::string> SymbolTable;
 
 // for lookup
-typedef std::pair<std::string, Weight> OutputPair;
-typedef std::vector<OutputPair> OutputVector;
+typedef std::pair<std::vector<std::string>, Weight> HfstLookupPath;
+typedef std::set<HfstLookupPath> HfstLookupPaths;
 
 const SymbolNumber NO_SYMBOL_NUMBER = std::numeric_limits<SymbolNumber>::max();
 const TransitionTableIndex NO_TABLE_INDEX = std::numeric_limits<TransitionTableIndex>::max();
@@ -563,7 +563,7 @@ protected:
 
     // for lookup
     Weight current_weight;
-    OutputVector output_vector;
+    HfstLookupPaths lookup_paths;
     Encoder * encoder;
     SymbolNumber * input_tape;
     SymbolNumber * output_tape;
@@ -615,6 +615,10 @@ public:
 	{ return tables->get_index(i); }
     const Transition& get_transition(TransitionTableIndex i) const
 	{ return tables->get_transition(i); }
+    bool is_infinitely_ambiguous(void) const
+	{
+	    return header->probe_flag(Has_input_epsilon_cycles);
+	}
 
     // state_index must be an index to a state which is defined as either:
     // (1) the start of a set of entries in the transition index table, or
@@ -626,7 +630,7 @@ public:
 
 
     bool initialize_input(char * input_str);
-    OutputVector lookup_fd(char * input_str);
+    HfstLookupPaths lookup_fd(char * input_str);
     void note_analysis(SymbolNumber * whole_output_tape);
 
     friend class ConvertTransducer;
