@@ -95,9 +95,9 @@ AS_IF([test "x$enable_xre" != xno], [AC_DEFINE([HAVE_XRE], [1],
 AM_CONDITIONAL([WANT_XRE], [test "x$enable_xre" != xno])
 AC_ARG_ENABLE([lexc],
               [AS_HELP_STRING([--enable-lexc],
-                              [build xerox lexc parser @<:@default=no@:>@])],
+                              [build xerox lexc parser @<:@default=yes@:>@])],
               [enable_lexc=$enableval],
-              [enable_lexc=no])
+              [enable_lexc=yes])
 AS_IF([test "x$enable_lexc" != xno], [AC_DEFINE([HAVE_LEXC], [1],
                                               [Define to compile xerox lexc parser in HFST])])
 AM_CONDITIONAL([WANT_LEXC], [test "x$enable_lexc" != xno])
@@ -202,9 +202,9 @@ AC_ARG_ENABLE([invert],
 AM_CONDITIONAL([WANT_INVERT], [test x$enable_invert != xno])
 AC_ARG_ENABLE([lexc-compiler],
               [AS_HELP_STRING([--enable-lexc-compiler],
-                              [build lexc compiler @<:@default=no@:>@])],
+                              [build lexc compiler @<:@default=yes@:>@])],
               [enable_lexc_compiler=$enableval],
-              [enable_lexc_compiler=no])
+              [enable_lexc_compiler=yes])
 AM_CONDITIONAL([WANT_LEXC_COMPILER], [test "x$enable_lexc_compiler" != xno -a x$enable_lexc != xno])
 AC_ARG_ENABLE([lookup],
 			  [AS_HELP_STRING([--enable-lookup],
