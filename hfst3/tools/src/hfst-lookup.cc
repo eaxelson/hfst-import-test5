@@ -680,7 +680,6 @@ bool is_lookup_infinitely_ambiguous(HfstMutableTransducer &t, const HfstLookupPa
   return true;
 }
 
-#ifdef foo
 HfstLookupPaths*
 lookup_simple(const HfstLookupPath& s, HfstTransducer& t, bool* infinity)
 {
@@ -705,7 +704,7 @@ lookup_simple(const HfstLookupPath& s, HfstTransducer& t, bool* infinity)
     }
   return results;
 }
-#endif // foo
+
 
 /*
   @param t        The transducer where lookup is performed.
@@ -1011,12 +1010,13 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
         HfstTransducer trans(inputstream);
         cascade.push_back(trans);
       }
+
     inputstream.close();
 
     // if transducer type is other than optimized_lookup,
     // convert to HfstMutableTransducer
     if ( inputstream.get_type() != HFST_OL_TYPE && 
-	 inputstream.get_type() != HFST_OLW_TYPE ) 
+	 inputstream.get_type() != HFST_OLW_TYPE )
       {
 	for (unsigned int i=0; i<cascade.size(); i++) 
 	  {
