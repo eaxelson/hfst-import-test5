@@ -365,14 +365,20 @@ namespace hfst { namespace implementations {
       {
 	char *in = strdup(it->first.c_str());
 	char *out = strdup(it->second.c_str());
-	fsm_construct_add_arc(h, state_number, ++state_number, in, out);
+	fsm_construct_add_arc(h, state_number, state_number+1, in, out);
+	state_number++;
       }
     
-    fsm_construct_set_initial(h, 0);
+    //fsm_construct_set_initial(h, 0);
     fsm_construct_set_final(h, state_number);    
 
     net = fsm_construct_done(h);
     fsm_count(net);
+    //fsm_topsort(net);
+
+    sigma_add_special (0, net->sigma);
+    sigma_add_special (1, net->sigma);
+    sigma_add_special (2, net->sigma);
     
     return net;      
   }
