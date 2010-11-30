@@ -219,20 +219,21 @@ namespace hfst
     void HfstTransducer::lookup_fd(HfstLookupPaths& results, const HfstLookupPath& s,
 				   ssize_t limit) {
 	switch(this->type) {
-#if HAVE_HFST_OL
+
 	case (HFST_OL_TYPE):
-	    results = this->implementation.hfst_ol.lookup_fd(s.first().c_str());
+	case (HFST_OLW_TYPE):
+	    // FIXME: have we decided what to do with the other strings in s.first?
+	    results = this->implementation.hfst_ol->lookup_fd(const_cast<char *>((s.first)[0].c_str()));
 	    return;
-#endif
+
 	case (ERROR_TYPE):
 	    throw hfst::exceptions::TransducerHasWrongTypeException();
 	default:
+	    (void)results;
+	    (void)s;
+	    (void)limit;
 	    throw hfst::exceptions::FunctionNotImplementedException();
 	}
-    (void)results;
-    (void)s;
-    (void)limit;
-    throw hfst::exceptions::FunctionNotImplementedException();
   }
 
     void HfstTransducer::lookdown(HfstLookupPaths& results, const HfstLookupPath& s,
@@ -252,8 +253,14 @@ namespace hfst
   }
 
   bool HfstTransducer::is_lookup_infinitely_ambiguous(const HfstLookupPath& s) {
-    (void)s;
-    throw hfst::exceptions::FunctionNotImplementedException();
+      switch(this->type) {
+      case (HFST_OL_TYPE):
+      case (HFST_OLW_TYPE):
+	  return this->implementation.hfst_ol->is_infinitely_ambiguous();
+      default:
+	  (void)s;
+	  throw hfst::exceptions::FunctionNotImplementedException();	  
+      }
   }
 
   bool HfstTransducer::is_lookdown_infinitely_ambiguous(const HfstLookupPath& s) {

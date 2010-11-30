@@ -161,15 +161,15 @@ bool Transducer::initialize_input(char * input_str)
     return true;
 }
 
-OutputVector Transducer::lookup_fd(char * input_str)
+HfstLookupPaths Transducer::lookup_fd(char * input_str)
 {
-    output_vector.clear();
+    lookup_paths.clear();
     if (!initialize_input(input_str)) {
-	OutputVector no_result;
+	HfstLookupPaths no_result;
 	return no_result;
     }
     get_analyses(input_tape, output_tape, output_tape, 0);
-    return output_vector;
+    return lookup_paths;
 
 }
 
@@ -351,19 +351,19 @@ void Transducer::note_analysis(SymbolNumber * whole_output_tape)
     {
 	str.append(alphabet->string_from_symbol(*num));
     }
-    output_vector.push_back(OutputPair(str, current_weight));
+    lookup_paths.insert(HfstLookupPath(std::vector<std::string>(1, str), current_weight));
 }
 
 
 
 Transducer::Transducer(): header(NULL), alphabet(NULL), tables(NULL),
-			  output_vector(), input_tape(NULL), output_tape(NULL),
+			  lookup_paths(), input_tape(NULL), output_tape(NULL),
 			  encoder(NULL), flag_state() {}
 
 Transducer::Transducer(std::istream& is):
     header(new TransducerHeader(is)),
     alphabet(new TransducerAlphabet(is, header->symbol_count())),
-    tables(NULL), output_vector(),
+    tables(NULL), lookup_paths(),
     input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     encoder(new Encoder(alphabet->get_symbol_table(), header->input_symbol_count())),
@@ -376,7 +376,7 @@ Transducer::Transducer(std::istream& is):
 Transducer::Transducer(bool weighted):
     header(new TransducerHeader(weighted)),
     alphabet(new TransducerAlphabet()),
-    output_vector(),
+    lookup_paths(),
     input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     encoder(new Encoder(alphabet->get_symbol_table(), header->input_symbol_count())),
@@ -394,7 +394,7 @@ Transducer::Transducer(const TransducerHeader& header, const TransducerAlphabet&
     header(new TransducerHeader(header)),
     alphabet(new TransducerAlphabet(alphabet)),
     tables(new TransducerTables<TransitionIndex,Transition>(index_table, transition_table)),
-    output_vector(),
+    lookup_paths(),
     input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     encoder(new Encoder(alphabet.get_symbol_table(), header.input_symbol_count())),
@@ -407,7 +407,7 @@ Transducer::Transducer(const TransducerHeader& header, const TransducerAlphabet&
     header(new TransducerHeader(header)),
     alphabet(new TransducerAlphabet(alphabet)),
     tables(new TransducerTables<TransitionWIndex,TransitionW>(index_table, transition_table)),
-    output_vector(),
+    lookup_paths(),
     input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     encoder(new Encoder(alphabet.get_symbol_table(), header.input_symbol_count())),
@@ -432,6 +432,9 @@ void Transducer::load_tables(std::istream& is)
     else
 	tables = new TransducerTables<TransitionIndex,Transition>(
 	    is, header->index_table_size(),header->target_table_size());
+    if (is.get() != '\n') { // the stream tends to have a spurious newline
+	is.unget();         // should really find out why...
+    }                       // but this guarantees we'll be at EOF if we ought to
     if(!is)
 	throw hfst::exceptions::TransducerHasWrongTypeException();
 }
