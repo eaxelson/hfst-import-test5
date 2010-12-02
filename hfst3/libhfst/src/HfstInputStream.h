@@ -133,8 +133,10 @@ delete in;
     StringPairVector get_header_data(int header_size);                
     void process_header_data(StringPairVector &header_data, bool warnings=false); 
     bool set_implementation_specific_header_data(StringPairVector &data, unsigned int index);
-    bool read_library_header_beta(int &bytes_read);
-    ImplementationType get_fst_type_beta(int &bytes_read); 
+
+
+    bool read_library_header_old(int &bytes_read);
+    ImplementationType get_fst_type_old(int &bytes_read); 
 
   public:
 

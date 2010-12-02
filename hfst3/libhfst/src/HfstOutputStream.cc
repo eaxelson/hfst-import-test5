@@ -247,27 +247,59 @@ namespace hfst
     if (type != transducer.type)
       { throw hfst::exceptions::TransducerHasWrongTypeException(); }
 
+    /* Write the HFST header. The header has the following structure:
+       
+       - the first four chars identify an HFST header:  "HFST"
+       - the fifth char is a separator:                 "\0"
+       - the sixth and seventh char tell the length of the rest of the header
+         (beginning after the eighth char)
+       - the eighth char is a separator and is not counted to the header length: "\0"
+       - the rest of the header consists of pairs of attributes and their values
+         that are each separated by a char "\0"
+
+       An example:
+
+       "HFST\0"
+       "\0\x1c\0"
+       "version\0"  "3.0\0"
+       "type\0"     "FOMA\0"
+       "name\0"     "\0"
+       
+       This is the header of a version 3.0 HFST transducer whose implementation 
+       type is foma and whose name is not defined, i.e. is the empty string "". 
+       The two bytes "\0\x1c" that form the length field tell that the length of
+       the rest of the header (i.e. the sequence of bytes
+       "version\03.0\0type\0FOMA\0name\0\0") is 0 * 256 + 28 * 1 = 28 bytes.
+
+       HFST version 3.0 header must contain at least the attributes 'version', 'type'
+       and 'name' and their values. Implementation-specific attributes can
+       follow after these obligatory attributes.
+     */
     if (hfst_format) {
       const int MAX_HEADER_LENGTH=65535;
+
+      // collect the header data here
       std::vector<char> header;
-      append_hfst_header_data(header);
+      append_hfst_header_data(header); // attributes "version" and "type"
       append(header, "name");
       append(header, transducer.name);
       append_implementation_specific_header_data(header, transducer);
 
+      // write the field that identifies the header as an HFST header
       write("HFST");
       write('\0');
 
+      // write header length using two bytes
       int header_length = (int)header.size();
       if (header_length > MAX_HEADER_LENGTH) {
 	fprintf(stderr, "ERROR: transducer header is too long\n");
 	exit(1);
       }	
-      // write header length using two bytes
       write((char)header_length/256);
       write((char)header_length%256);
-
       write('\0');
+
+      // write the rest of the header
       write(header);
     }
 

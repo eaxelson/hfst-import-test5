@@ -62,7 +62,7 @@ HfstInternalTransducer * sfst_to_internal_hfst_format(SFST::Transducer * t) {
 
   return internal_transducer;
 }
-#endif
+#endif // HAVE_SFST
 
 #if HAVE_SFST
 SFST::Transducer * hfst_internal_format_to_sfst(const HfstInternalTransducer * internal) {
@@ -103,7 +103,7 @@ SFST::Transducer * hfst_internal_format_to_sfst(const HfstInternalTransducer * i
 
   return t;
 }
-#endif
+#endif // HAVE_SFST
 
 
 
@@ -180,7 +180,7 @@ HfstInternalTransducer * foma_to_internal_hfst_format(struct fsm * t) {
 
   return internal_transducer;
 }
-#endif
+#endif // HAVE_FOMA
 
 
 
@@ -486,7 +486,7 @@ struct fsm * hfst_internal_format_to_foma(const HfstInternalTransducer * interna
 
   return net;      
 }
-#endif
+#endif // HAVE_FOMA
 
 #if HAVE_OPENFST
 fst::StdVectorFst * hfst_internal_format_to_tropical_ofst(const HfstInternalTransducer * internal_transducer) {
@@ -580,7 +580,22 @@ LogFst * hfst_internal_format_to_log_ofst(const HfstInternalTransducer * interna
 hfst_ol::Transducer * hfst_internal_format_to_hfst_ol(HfstInternalTransducer * , bool ) {
   throw hfst::exceptions::FunctionNotImplementedException();
 }
-#endif
+#endif // HAVE_OPENFST
+
+
+#if HAVE_FOO
+
+HfstInternalTransducer * foo_to_internal_hfst_format(Foo::FooTransducer * t) {
+  (void)t;
+  throw hfst::exceptions::FunctionNotImplementedException();
+}
+
+Foo::FooTransducer * hfst_internal_format_to_foo(const HfstInternalTransducer * t) {
+  (void)t;
+  throw hfst::exceptions::FunctionNotImplementedException();
+}
+
+#endif // HAVE_FOO
 
 
 } }

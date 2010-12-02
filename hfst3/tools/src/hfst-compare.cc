@@ -60,9 +60,12 @@ print_usage()
         fprintf(message_out,
             "\n"
             "Examples:\n"
-            "  %s cat.hfst dog.hfst  compares transducers\n"
+            "  $ %s cat.hfst dog.hfst\n"
+	    "  cat.hfst[1] != dog.hfst[1]\n"	
+            "  $ %s cat.hfst cat.hfst\n"
+	    "  cat.hfst[1] == cat.hfst[1]\n"	
             "\n",
-            program_name );
+		program_name, program_name );
         print_report_bugs();
         print_more_info();
 }

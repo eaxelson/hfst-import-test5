@@ -60,7 +60,7 @@ print_usage()
         fprintf(message_out,
             "\n"
             "Examples:\n"
-            "  %s -o catdog.hfst cat.hfst dog.hfst  compose transducers\n"
+            "  %s -o cat2dog.hfst cat2mouse.hfst mouse2dog.hfst\n"
             "\n",
             program_name );
         print_report_bugs();

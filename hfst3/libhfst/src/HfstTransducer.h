@@ -54,6 +54,27 @@
 namespace hfst
 {
 
+  /** \page QuickStart.html
+
+      <b>This page is still under construction...</b>
+
+      \section installing_library Installing the HFST API library
+      
+      \section using_hfst Using HFST in your own code
+
+      Include file HfstTransducer.h to your file.
+
+\verbatim
+#include "HfstTransducer.h"
+
+int main() {
+  HfstTransducer("foo", "bar", SFST_TYPE);
+  ...  
+}
+\endverbatim
+
+   */
+
 /** \mainpage 
 
 HFST - The Helsinki Finite-State Transducer technology is intended for creating and manipulating weighted or unweighted synchronic transducers implementing regular relations.
@@ -67,8 +88,13 @@ The examples given in this documentation use <a href="http://www.xrce.xerox.com/
 <!-- More info on SFST tools is in http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html,
 OpenFst in http://www.openfst.org and foma in http://www.aclweb.org/anthology/E/E09/E09-2008.pdf. -->
 
+   - A <a href="QuickStart.html">quick start</a> to the HFST interface with examples (TODO)
 
-<b>TODO: A quick start</b>
+   - <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstOutline">Examples</a> of programs implemented using the HFST interface
+
+   - <a href="http://sourceforge.net/projects/hfst/files/hfst">Download</a> the HFST interface 
+
+<br></br>
 
 The HFST API is written in the namespace #hfst that contains the following classes:
 

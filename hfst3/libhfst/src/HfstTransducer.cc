@@ -848,9 +848,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
       case HFST_OLW_TYPE:
         return hfst_ol_interface.is_cyclic(implementation.hfst_ol);
       case ERROR_TYPE:
-      default:
         throw hfst::exceptions::TransducerHasWrongTypeException();
-        return false;
+      default:
+        throw hfst::exceptions::FunctionNotImplementedException("is_cyclic");
     }
   }
 

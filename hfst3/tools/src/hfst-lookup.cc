@@ -177,18 +177,23 @@ print_usage()
         "\n", program_name);
 
     print_common_program_options(message_out);
-    print_common_unary_program_options(message_out);
+    fprintf(message_out, 
+	    "Input/Output options:\n"
+	    "  -i, --input=INFILE     Read input transducer from INFILE\n"
+	    "  -o, --output=OUTFILE   Write output to OUTFILE\n");
+
     fprintf(message_out, "Lookup options:\n"
             "  -I, --input-strings=SFILE        Read lookup strings from SFILE\n"
-            "  -O, --output-format=OFORMAT      Use OFORMAT printing results sets\n"
-            "  -F, --input-format=IFORMAT       Use IFORMAT parsing input\n"
+            "  -O, --output-format=OFORMAT      Use OFORMAT printing results sets (TODO)\n"
+            "  -F, --input-format=IFORMAT       Use IFORMAT parsing input (TODO)\n"
             "  -x, --statistics                 Print statistics\n");
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
     fprintf(message_out, "OFORMAT is one of {xerox,cg,apertium}, "
            "xerox being default\n"
            "IFORMAT is one of {text,spaced,apertium}, "
-           "default being text, unless OFORMAT is apertium\n");
+           "default being text, unless OFORMAT is apertium\n"
+	    "\nTODO: Currently both OFORMAT and IFORMAT are in plain UTF-8 text format\n");
     fprintf(message_out, "\n");
     // bug report address
     print_report_bugs();

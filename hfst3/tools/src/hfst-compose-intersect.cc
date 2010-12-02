@@ -73,7 +73,7 @@ print_usage()
         fprintf(message_out,
             "\n"
             "Examples:\n"
-            "  %s -o fi_FI.hfst -l fi_FI.lex.hfst fi_FI.twol.hfst  "
+            "  %s -o fi_FI.hfst -l fi_FI.lex.hfst fi_FI.twol.hfst\n"
             "compose single ruleset with lexicon\n"
             "\n",
             program_name );

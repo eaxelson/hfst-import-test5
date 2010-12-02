@@ -37,10 +37,7 @@
 namespace hfst { 
 namespace implementations
 {
-  using namespace Foo;
-  using namespace hfst::exceptions;
-  using std::ostream;
-  using std::ostringstream;
+  //using namespace Foo;
 
   /* A class for reading binary FooTransducers from a stream. 
 
@@ -52,13 +49,15 @@ namespace implementations
   class FooInputStream 
   {
   private:
-    std::string filename;
+    // you probably need
+    //std::string filename;
 
     // if the library uses C FILEs, you probably need this
-    FILE * input_file;
+    //FILE * input_file;
+
     // if the library uses C++ streams, you probably need this
-    ifstream i_stream;
-    istream &input_stream;
+    //ifstream i_stream;
+    //istream &input_stream;
 
   public:
     /* Create and open a stream to standard in. */
@@ -75,8 +74,6 @@ namespace implementations
     bool is_good(void);
     /* */
     bool is_fst(void);
-    /* is this needed? */
-    void ignore(unsigned int);
 
     /* Extract a char from the stream. */
     char stream_get();
@@ -89,9 +86,6 @@ namespace implementations
     /* Read a FooTransducer from the stream. */
     FooTransducer * read_transducer();
     
-    // ?
-    //static bool is_fst(FILE * f);
-    //static bool is_fst(std::istream &s);
   };
 
   /* A class for writing binary FooTransducers to a stream. 
@@ -104,14 +98,15 @@ namespace implementations
   class FooOutputStream 
   {
   private:
-    std::string filename;
+    // you probably need this
+    //std::string filename;
 
     // if the library uses C FILEs, you probably need this
-    FILE *ofile;
+    //FILE *ofile;
 
     // if the library uses C++ streams, you probably need this
-    ofstream o_stream;
-    ostream &output_stream;
+    //ofstream o_stream;
+    //ostream &output_stream;
 
   public:
     /* Create and open a stream to standard out. */
@@ -138,10 +133,6 @@ namespace implementations
       static FooTransducer * create_empty_transducer(void);
       /* Create a transducer that recognises the empty string. */
       static FooTransducer * create_epsilon_transducer(void);
-
-      // static FooTransducer * define_transducer(unsigned int number);
-      // static FooTransducer * define_transducer(unsigned int inumber, unsigned int onumber);
-
       /* Create a transducer that recognises the symbol pair symbol:symbol */
       static FooTransducer * define_transducer(const char *symbol);
       /* Create a transducer that recognises the symbol pair isymbol:osymbol */
@@ -177,7 +168,7 @@ namespace implementations
       /* Create a transducer that accepts string pair string2:string1 iff transducer t accepts string pair string1:string2. */
       static FooTransducer * invert(FooTransducer * t);
       /* Create a transducer that accepts string pair 1gnirts:2gnirts iff transducer t accepts string pair string1:string2. */
-      static FooTransducer * reverse(FooTransducer * transducer);
+      static FooTransducer * reverse(FooTransducer * t);
 
       /* Create a transducer that accepts string pair string1:string1 iff transducer t accepts string pair string1:string2. */
       static FooTransducer * extract_input_language(FooTransducer * t);
@@ -215,7 +206,7 @@ namespace implementations
       static FooTransducer * subtract(FooTransducer * t1,
 			    FooTransducer * t2);
 
-
+      /* */
       static std::pair<Transducer*, Transducer*> harmonize(FooTransducer *t1, FooTransducer *t2, bool unknown_symbols_in_use=true);
 
       /* Whether transducers t1 an t2 are equivalent. */
@@ -229,24 +220,24 @@ namespace implementations
       /* Remove symbol symbol from the alphabet of transducer t. */
       static FooTransducer * remove_from_alphabet(FooTransducer *t, const std::string &symbol);
 
+      /* */
       static FooTransducer * disjunct(FooTransducer * t, const StringPairVector &spv);
 
+      /* Get all symbol pairs that occur in transitions of transducer t. */
       static StringPairSet get_symbol_pairs(FooTransducer *t);
-
-      float get_profile_seconds();
 
       /* The number of states in transducer t. */
       static unsigned int number_of_states(FooTransducer *t);
 
+      // you probably need also these functions
     protected:
       /* Add the following number-to-symbol correspondencies to the alphabet of transducer t: 
 	 0 : "@_EPSILON_SYMBOL_@"
 	 1 : "@_UNKNOWN_SYMBOL_@"
 	 2 : "@_IDENTITY_SYMBOL_@"  */
       static void initialize_alphabet(FooTransducer *t);
+      /* Get all symbols that occur in transitions of transducer t. */
       static StringSet get_string_set(FooTransducer *t);
-      static FooTransducer * expand_arcs(FooTransducer * t, StringSet &unknown);
-      static void expand(FooTransducer *t, hfst::StringSet &new_symbols);
 
     };
 } }

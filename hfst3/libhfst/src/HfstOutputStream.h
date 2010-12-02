@@ -70,7 +70,9 @@ namespace hfst
     // append string s to vector str and a '\0'
     static void append(std::vector<char> &str, const std::string &s);
 
+    // append obligatory HFST header data to \a header
     void append_hfst_header_data(std::vector<char> &header);
+    // append implementation-specific header data collected from \a transducer to \a header
     void append_implementation_specific_header_data(std::vector<char> &header, HfstTransducer &transducer);
 
 

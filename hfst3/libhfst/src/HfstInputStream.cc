@@ -391,6 +391,7 @@ namespace hfst
       return false;
     }
     int header_bytes=0;
+    // try to read an HFST version 3.0 header
     if (read_library_header(header_bytes)) 
       {
       int size_bytes=0;
@@ -403,10 +404,11 @@ namespace hfst
       return true;
       }
     header_bytes=0;
-    if (read_library_header_beta(header_bytes)) 
+    // try to read a pre-release HFST version 3.0 header
+    if (read_library_header_old(header_bytes)) 
       {
       int type_bytes=0;
-      type = get_fst_type_beta(type_bytes); // throws error
+      type = get_fst_type_old(type_bytes); // throws error
       if (type == ERROR_TYPE) {
 	throw hfst::exceptions::NotTransducerStreamException();
       }
@@ -417,7 +419,7 @@ namespace hfst
     return false;
   }
 
-  ImplementationType HfstInputStream::get_fst_type_beta(int &bytes_read)
+  ImplementationType HfstInputStream::get_fst_type_old(int &bytes_read)
   {
     std::string fst_type = stream_getstring();
     if (stream_eof()) {
@@ -439,7 +441,7 @@ namespace hfst
     return ERROR_TYPE;
   }
 
-  bool HfstInputStream::read_library_header_beta(int &bytes_read) 
+  bool HfstInputStream::read_library_header_old(int &bytes_read) 
   {
     const char *id = "HFST3";
     

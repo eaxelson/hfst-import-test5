@@ -13,6 +13,8 @@
 #ifndef _HFST_EXCEPTIONS_H_
 #define _HFST_EXCEPTIONS_H_
 
+#include <string>
+
 /** @file HfstExceptions.h
     \brief Exceptions that are thrown by the HFST API. */
 
@@ -26,7 +28,14 @@ class HfstSymbolsException {};
 
 
 /** \brief A superclass for all HFST exceptions. */
-class HfstInterfaceException {};
+class HfstInterfaceException {
+ protected:
+  std::string message;
+ public:
+  HfstInterfaceException();
+  HfstInterfaceException(const std::string msg);
+  std::string get_message();
+};
 
 /** \brief An argument does not satisfy preconditions. */
 class HfstArgumentException :
@@ -138,7 +147,12 @@ public HfstArgumentException {};
 
 /** \brief Function has not been implemented (yet). */
 class FunctionNotImplementedException :
-public HfstInterfaceException {};
+protected HfstInterfaceException {
+ public:
+ FunctionNotImplementedException(const std::string msg) : HfstInterfaceException(msg) {};
+ FunctionNotImplementedException() : HfstInterfaceException() {};
+
+};
 
 
 /** \brief Context transducers are not automata.

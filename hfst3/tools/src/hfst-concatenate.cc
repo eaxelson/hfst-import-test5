@@ -60,10 +60,8 @@ print_usage()
         fprintf(message_out,
             "\n"
             "Examples:\n"
-            "  %s -o catdog.hfst cat.hfst dog.hfst  concatenates "
-            "cat.hfst with dog.hfst\n"
-            "                                       writing results to "
-            "catdog.hfst\n"
+            "  %s -o catdog.hfst cat.hfst dog.hfst\n"
+            "concatenates cat.hfst with dog.hfst and writes results to catdog.hfst\n"
             "\n",
             program_name );
         print_report_bugs();
