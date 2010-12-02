@@ -67,9 +67,16 @@ print_usage()
             "naming output files\n");
     fprintf(message_out, "\n");
     // parameter details
-    fprintf(message_out, "If INFILE is omitted or -, stdin is used.\n"
-            "If PRE is omitted, no prefix is used. If EXT is omitted, "
-            ".hfst is used.\n");
+    fprintf(message_out, 
+	    "If INFILE is omitted or -, stdin is used.\n"
+            "If PRE is omitted, no prefix is used.\n"
+	    "If EXT is omitted, .hfst is used.\n"
+	    "The extracted files are named \"PRE\" + N + \"EXT\",\n"
+	    "where N is the number of the transducer in the archive.\n\n"
+	    "An example:\n"
+	    "   cat transducer_a transducer_b | hfst-split -p \"rule\" -e \".tr\"\n\n"
+	    "This command creates files \"rule1.tr\" (equivalent to transducer_a)\n"
+	    "and \"rule2.tr\" (equivalent to transducer_b). \n");
     fprintf(message_out, "\n");
     // bug report address
     print_report_bugs();

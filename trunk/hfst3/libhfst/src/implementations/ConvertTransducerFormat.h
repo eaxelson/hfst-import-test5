@@ -38,6 +38,10 @@
 #endif
 #endif
 
+#if HAVE_FOO
+//#include ... // include relevant header files here
+#endif
+
 #include "HfstExceptions.h"
 #include "optimized-lookup/transducer.h"
 #include "HfstInternalTransducer.h"
@@ -51,13 +55,9 @@ namespace hfst { namespace implementations {
 
   using namespace hfst::exceptions;
 
-  // for testing
-  //typedef fst::StdVectorFst InternalTransducer;
-
 #if HAVE_OPENFST
   typedef fst::StdArc::StateId StateId;
   typedef fst::ArcIterator<fst::StdVectorFst> StdArcIterator;
-  //typedef fst::StdVectorFst InternalTransducer;
 #endif
 #if HAVE_SFST
   typedef std::vector<SFST::Node *> SfstStateVector;
@@ -67,15 +67,8 @@ namespace hfst { namespace implementations {
   typedef std::vector<StateId> OfstStateVector;
 #endif
 
-  /* Not needed.. */
-  //typedef std::map<SFST::Node *,StateId> SfstToOfstStateMap;
-  //typedef std::map<StateId,SFST::Node *> OfstToSfstStateMap;
-  //typedef std::map<int,StateId> FomaToOfstStateMap;
-  //typedef std::map<StateId,int> OfstToFomaStateMap;
-  /* .. not needed ends. */
 
 #if HAVE_OPENFST
-  // added
   typedef std::map<hfst_ol::TransitionTableIndex,unsigned int> HfstOlToInternalStateMap;
 
   typedef std::map<hfst_ol::TransitionTableIndex,StateId> HfstOlToOfstStateMap;
@@ -83,35 +76,43 @@ namespace hfst { namespace implementations {
   typedef fst::VectorFst<LogArc> LogFst;
 #endif
 
-    /* -------------------------------------------------
-       Conversion through an internal transducer format.
-       ------------------------------------------------- */
     
-    /* Read an SFST::Transducer * and return the equivalent transducer in
-       internal format. */
+  /* Read an SFST::Transducer * and return the equivalent transducer in
+     internal format. */
 #if HAVE_SFST
-    HfstInternalTransducer * sfst_to_internal_hfst_format(SFST::Transducer * t);
+  HfstInternalTransducer * sfst_to_internal_hfst_format(SFST::Transducer * t);
 #endif
-
+  
+  /* Read an fsm * and return the equivalent transducer in
+     internal format. */
+  
 #if HAVE_FOMA
-    HfstInternalTransducer * foma_to_internal_hfst_format(struct fsm * t);
+  HfstInternalTransducer * foma_to_internal_hfst_format(struct fsm * t);
 #endif  
-
+  
   /* Read an fst::StdVectorFst * and return the equivalent transducer in
      internal format. */
 #if HAVE_OPENFST
-    HfstInternalTransducer * tropical_ofst_to_internal_hfst_format
-      (fst::StdVectorFst * t);
-
+  HfstInternalTransducer * tropical_ofst_to_internal_hfst_format
+    (fst::StdVectorFst * t);
+  
   /* Read a LogFst * and return the equivalent transducer in
      internal format. */
-    HfstInternalTransducer * log_ofst_to_internal_hfst_format
-      (LogFst * t);
-    
-    /* Read an hfst_ol::Transducer * and return the equivalent transducer in
-       internal format. */
-    HfstInternalTransducer * hfst_ol_to_internal_hfst_format(hfst_ol::Transducer * t);
+  HfstInternalTransducer * log_ofst_to_internal_hfst_format
+    (LogFst * t);
+  
+  /* Read an hfst_ol::Transducer * and return the equivalent transducer in
+     internal format. */
+  HfstInternalTransducer * hfst_ol_to_internal_hfst_format(hfst_ol::Transducer * t);
 #endif  
+  
+  /* Read an Foo::FooTransducer * and return the equivalent transducer in
+     internal format. */
+#if HAVE_FOO
+  HfstInternalTransducer * foo_to_internal_hfst_format(Foo::FooTransducer * t);
+#endif
+
+
 
     /* Read a transducer in internal format and return the equivalent
        SFST::Transducer *. */
@@ -119,6 +120,8 @@ namespace hfst { namespace implementations {
     SFST::Transducer * hfst_internal_format_to_sfst(const HfstInternalTransducer * t);
 #endif
 
+    /* Read a transducer in internal format and return the equivalent
+       fsm *. */
 #if HAVE_FOMA
     struct fsm * hfst_internal_format_to_foma(const HfstInternalTransducer * t);
 #endif    
@@ -135,6 +138,10 @@ namespace hfst { namespace implementations {
     /* Read a transducer in internal format and return the equivalent
        hfst_ol::Transducer * */
     hfst_ol::Transducer * hfst_internal_format_to_hfst_ol(HfstInternalTransducer * t, bool weighted);
+#endif
+
+#if HAVE_FOO
+    Foo::FooTransducer * hfst_internal_format_to_foo(const HfstInternalTransducer * t);
 #endif
 
 } }

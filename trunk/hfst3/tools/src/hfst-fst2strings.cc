@@ -72,15 +72,18 @@ print_usage()
         "%-35s%s", "  -d, --debug", "Print debugging messages and results\n"
         );
 #               endif
-    
+    fprintf(message_out, "Input/Output options:\n");
     fprintf(message_out, "%-30s%s", "  -o, --output=OUTFILE",        "Write results to OUTFILE\n");
     fprintf(message_out, "%-30s%s", "  -i, --input=INFILE",          "Read input from INFILE\n");
+
+    fprintf(message_out, "Tool-specific options:\n");
     fprintf(message_out, "%-30s%s", "  -n, --max-strings=INT",       "The maximum number of strings printed\n");
     fprintf(message_out, "%-30s%s", "  -N, --nbest=INT",             "Prune the transducer to a max number of best strings\n");
     fprintf(message_out, "%-30s%s", "  -c, --cycles=INT",            "How many times to follow cycles. Negative=infinite (default)\n");
     fprintf(message_out, "%-30s%s", "  -w, --print-weights",         "Display the weight for each string\n");
     fprintf(message_out, "%-30s%s", "  -e, --eval-flags",            "Only print strings with pass flag diacritic checks\n");
     fprintf(message_out, "%-30s%s", "  -f, --filter-flags",          "Don't print flag diacritic symbols (only with -e)\n");
+    fprintf(message_out, " Ignore options:\n");
     fprintf(message_out, "%-30s%s", "  -l, --max-in-length=INT",     "Ignore paths with an input string longer than length\n");
     fprintf(message_out, "%-30s%s", "  -L, --max-out-length=INT",    "Ignore paths with an output string longer than length\n");
     fprintf(message_out, "%-30s%s", "  -p, --in-prefix=PREFIX",      "Ignore paths with an input string not beginning with PREFIX\n");

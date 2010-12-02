@@ -25,7 +25,7 @@ AM_CXXFLAGS=-Wno-deprecated -Wall -Wextra
 HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc HfstOutputStream.cc\
 		  HfstRules.cc HfstBasic.cc HfstUtf8.cc \
 		  HfstGrammar.cc SymbolDefs.cc HfstTokenizer.cc \
-		  FlagDiacritics.cc HfstAlphabet.cc
+		  FlagDiacritics.cc HfstAlphabet.cc HfstExceptions.cc
 
 # libtool takes over
 libhfst_la_SOURCES =  $(HFST_SRCS)
