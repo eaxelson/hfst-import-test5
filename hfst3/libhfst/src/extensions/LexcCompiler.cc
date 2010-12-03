@@ -23,9 +23,11 @@
 
 #include <string>
 #include <map>
+#include <set>
 
 using std::string;
 using std::map;
+using std::set;
 
 #include "LexcCompiler.h"
 #include "../HfstTransducer.h"
@@ -132,7 +134,7 @@ LexcCompiler::addStringEntry(const string& data,
       {
         if ((currentEntries_ % 10000) == 0)
           {
-            fprintf(stderr, "%d...", currentEntries_);
+            fprintf(stderr, "%zu...", currentEntries_);
           }
       }
     return *this;
@@ -164,7 +166,7 @@ LexcCompiler::addStringPairEntry(const string& upper, const string& lower,
       {
         if ((currentEntries_ % 10000) == 0)
           {
-            fprintf(stderr, "%d...", currentEntries_);
+            fprintf(stderr, "%zu...", currentEntries_);
           }
       }
     return *this;
@@ -198,7 +200,7 @@ LexcCompiler::addXreEntry(const string& regexp, const string& continuation,
       {
         if ((currentEntries_ % 10000) == 0)
           {
-            fprintf(stderr, "%d...", currentEntries_);
+            fprintf(stderr, "%zu...", currentEntries_);
           }
       }
     return *this;
@@ -246,7 +248,7 @@ LexcCompiler::setCurrentLexiconName(const string& lexiconName)
           }
         if (!firstLexicon)
           {
-            fprintf(stderr, "%d ", currentEntries_);
+            fprintf(stderr, "%zu ", currentEntries_);
           }
         fprintf(stderr, "%s...", lexiconName.c_str());
         firstLexicon = false;
