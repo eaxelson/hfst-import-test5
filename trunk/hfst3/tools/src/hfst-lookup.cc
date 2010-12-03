@@ -678,11 +678,61 @@ lookup_simple(const HfstLookupPath& s, T& t, bool* infinity)
   return results;
 }
 
+bool is_lookup_infinitely_ambiguous(HfstMutableTransducer &t, const HfstLookupPath& s, 
+				    unsigned int& index, HfstState state, 
+				    std::set<HfstState> &epsilon_path_states) 
+{
+  // Whether the end of the lookup path s has been reached
+  bool only_epsilons=false;
+  if ((unsigned int)s.first.size() == index)
+    only_epsilons=true;
+
+  // Go through all transitions in this state
+  HfstTransitionIterator transition_it(t,state);
+  while (not transition_it.done()) 
+    {
+      HfstTransition tr = transition_it.value();
+
+      // CASE 1: Input epsilons do not consume a symbol in the lookup path s,
+      //         so they can be added freely.
+      if (tr.isymbol.compare("@_EPSILON_SYMBOL_@") == 0)
+	{
+	  epsilon_path_states.insert(state);
+	  if (epsilon_path_states.find(tr.target) != epsilon_path_states.end())
+	    return true;
+	  if (is_lookup_infinitely_ambiguous(t, s, index, tr.target, epsilon_path_states))
+	    return true;
+	  epsilon_path_states.erase(state);
+	}
+
+      // CASE 2: Other input symbols consume a symbol in the lookup path s,
+      //         so they can be added only if the end of the lookup path s has not been reached.
+      //         (This code is almost the same as in case 1, but has three extra lines
+      //         marked with the comment /***/. The whole function would probably benefit from
+      //         reorganizing the if/else blocks...)
+      else if (not only_epsilons)
+	{
+	  if (tr.isymbol.compare(s.first[index]) == 0) /***/
+	    {
+	      index++; // consume an input symbol in the lookup path s /***/
+	      std::set<HfstState> empty_set;
+	      if (is_lookup_infinitely_ambiguous(t, s, index, tr.target, empty_set))
+		return true;
+	      index--; // add the input symbol back to the lookup path s. /***/
+	    }
+	}
+      transition_it.next();
+    }  
+  return false;
+}
+
 bool is_lookup_infinitely_ambiguous(HfstMutableTransducer &t, const HfstLookupPath& s)
 {
-  (void)t;
-  (void)s;
-  return true;
+  std::set<HfstState> epsilon_path_states;
+  epsilon_path_states.insert(t.get_initial_state());
+  unsigned int index=0;
+  return is_lookup_infinitely_ambiguous(t, s, index, t.get_initial_state(), 
+					epsilon_path_states);
 }
 
 HfstLookupPaths*
@@ -719,19 +769,14 @@ lookup_simple(const HfstLookupPath& s, HfstTransducer& t, bool* infinity)
                   that is being matched next.
   @param path     The output string that \a s has yielded so far.
   @param state    The state in \a t where we are.
-  @param visited_states  The set of states that have been visited on a lookup path.
-  @param path_states     The vector of states that have been visited on a lookup path,
-                         used for cycle detection.
-  @param cycles   The number of cycles traversed on a lookup path.
-  @param cycle_limit     The maximum number of cycles on any lookup path.
 
   @pre The transducer \a t has tropical weights or no weights.
 
   @todo Support flag diacritics(?) and log weights(?)
  */
 void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLookupPath& s, unsigned int& index, 
-	       HfstLookupPath& path, HfstState state, std::set<HfstState> &visited_states, std::vector<HfstState> &path_states,
-	       unsigned int &cycles, unsigned int &cycle_limit)
+	       HfstLookupPath& path, HfstState state, std::set<HfstState>& visited_states, std::vector<HfstState>& epsilon_path,
+	       unsigned int& cycles)
 { 
   // Whether the end of the lookup path s has been reached
   bool only_epsilons=false;
@@ -756,31 +801,45 @@ void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLoo
       //         so they can be added freely.
       if (tr.isymbol.compare("@_EPSILON_SYMBOL_@") == 0)
 	{
-	  // Update the set of visited states and check
-	  // if this transition increases the number of cycles.
-	  bool cycles_increased=false;
-	  if (visited_states.find(tr.target) != visited_states.end()) {
-	    cycles++;
-	    cycles_increased=true;
-	  }
+
+	  if (visited_states.find(tr.target) != visited_states.end() &&
+	      cycles >= 5 ) {}
+
 	  else {
-	    visited_states.insert(tr.target);
-	    path_states.push_back(tr.target);
-	  }
+
+	    epsilon_path.push_back(state);
+	    visited_states.insert(state);
+	    bool cycles_increased=false;
+	    std::vector<HfstState> removed_states;
 	    
-	  // If we have not exceeded the maximum number of cycles,
-	  if (cycles <= cycle_limit) {
+	    if (visited_states.find(tr.target) != visited_states.end()) {
+	      cycles_increased=true;
+	      cycles++;	  
+	      for (unsigned int i=epsilon_path.size()-1; epsilon_path[i] != tr.target; i--) {
+		//fprintf(stderr, "removing state %i\n", epsilon_path[i]);
+		removed_states.push_back(epsilon_path[i]);
+		visited_states.erase(epsilon_path[i]);
+		epsilon_path.pop_back();
+	      }	    
+	    }
+	    
 	    path.first.push_back(tr.osymbol); // add an output symbol to the traversed path
 	    path.second = path.second + tr.weight; // add the transition weight
-	    lookup_fd(t, results, s, index, path, tr.target, visited_states, path_states, cycles, cycle_limit);
+	    lookup_fd(t, results, s, index, path, tr.target, visited_states, epsilon_path, cycles);
 	    path.first.pop_back(); // remove the output symbol from the traversed path
 	    path.second = path.second - tr.weight; // subtract the transition weight
+	    
+	    epsilon_path.pop_back();
+	    visited_states.erase(state);
+	    if (cycles_increased) {
+	      cycles--;
+	      for(int i=removed_states.size()-1; i>=0; i--) {
+		//fprintf(stderr, "readding state %i\n", removed_states[i]);
+		epsilon_path.push_back(removed_states[i]);
+		visited_states.insert(removed_states[i]);
+	      }
+	    }
 	  }
-	  // Update the set of visited states and number of cycles traversed
-	  if (cycles_increased)
-	    cycles--;
-	  visited_states.erase(tr.target);
-	  path_states.pop_back();
 	}
 
       // CASE 2: Other input symbols consume a symbol in the lookup path s,
@@ -792,35 +851,15 @@ void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLoo
 	{
 	  if (tr.isymbol.compare(s.first[index]) == 0) /***/
 	    {
-	      // Update the set of visited states and check
-	      // if this transition increases the number of cycles.
-	      bool cycles_increased=false;
-	      if (visited_states.find(tr.target) != visited_states.end()) {
-		cycles++;
-		cycles_increased=true;
-		// Remove from visited_states all states that were on the path from
-		// state tr.target to itself.
-	      }
-	      else {
-		visited_states.insert(tr.target);
-		path_states.push_back(tr.target);
-	      }
-
-	      // If we have not exceeded the maximum number of cycles,
-	      if(cycles <= cycle_limit) {
-		index++; // consume an input symbol in the lookup path s /***/
-		path.first.push_back(tr.osymbol); // add an output symbol to the traversed path
-		path.second = path.second + tr.weight; // add the transition weight   
-		lookup_fd(t, results, s, index, path, tr.target, visited_states, path_states, cycles, cycle_limit);
-		path.first.pop_back(); // remove the output symbol from the traversed path
-		path.second = path.second - tr.weight; // subtract the transition weight
-		index--; // add the input symbol back to the lookup path s. /***/
-	      }
-	      // Update the set of visited states and number of cycles traversed
-	      if (cycles_increased)
-		cycles--;
-	      visited_states.erase(tr.target);
-	      path_states.pop_back();
+	      index++; // consume an input symbol in the lookup path s /***/
+	      path.first.push_back(tr.osymbol); // add an output symbol to the traversed path
+	      path.second = path.second + tr.weight; // add the transition weight
+	      std::set<HfstState> empty_set;
+	      std::vector<HfstState> empty_path;
+	      lookup_fd(t, results, s, index, path, tr.target, empty_set, empty_path, cycles);
+	      path.first.pop_back(); // remove the output symbol from the traversed path
+	      path.second = path.second - tr.weight; // subtract the transition weight
+	      index--; // add the input symbol back to the lookup path s. /***/
 	    }
 	}
       transition_it.next();
@@ -844,19 +883,14 @@ void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLoo
   (void)limit;
   unsigned int index=0;
   std::set<HfstState> visited_states;
-  std::vector<HfstState> path_states;
-
+  visited_states.insert(t.get_initial_state());
+  std::vector<HfstState> epsilon_path;
+  epsilon_path.push_back(t.get_initial_state());
   unsigned int cycles=0;
-  unsigned int cycle_limit;
-  if (limit == -1)
-    cycle_limit=0; // t is acyclic
-  else
-    cycle_limit=(unsigned int)limit;
-      
+
   lookup_fd(t, results, s, index, 
 	    path, t.get_initial_state(),
-	    visited_states, path_states, 
-	    cycles, cycle_limit);
+	    visited_states, epsilon_path, cycles);
 
   // Print results here until the segfault in print_lookups has been fixed.
   for (HfstLookupPaths::const_iterator it = results.begin(); it != results.end(); it++) {
