@@ -846,8 +846,10 @@ void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLoo
 	    visited_states, cycles, cycle_limit);
   // Print results here until the segfault in print_lookups has been fixed.
   for (HfstLookupPaths::const_iterator it = results.begin(); it != results.end(); it++) {
-    for (HfstArcPath::const_iterator it2 = it->first.begin(); it2 != it->first.end(); it2++ )
-      fprintf(stderr, "%s", it2->c_str());
+    for (HfstArcPath::const_iterator it2 = it->first.begin(); it2 != it->first.end(); it2++ ) {
+      if (it2->compare("@_EPSILON_SYMBOL_@") != 0)
+	fprintf(stderr, "%s", it2->c_str());
+    }
     fprintf(stderr, "\t%f", it->second);
     fprintf(stderr, "\n");
   }
