@@ -31,7 +31,8 @@
 #include <getopt.h>
 
 #include "HfstTransducer.h"
-#include "implementations/LexcCompiler.h"
+#include "HfstOutputStream.h"
+#include "../../libhfst/src/extensions/LexcCompiler.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
