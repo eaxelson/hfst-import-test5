@@ -29,6 +29,10 @@ namespace hfst
 
       An example:
 \verbatim
+#include "HfstOutputStream.h"
+
+      ...
+
       HfstOutputStream out("testfile", FOMA_TYPE);
       out << foma_transducer1 
           << foma_transducer2 
