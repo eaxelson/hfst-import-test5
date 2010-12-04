@@ -398,7 +398,14 @@ hfst_getline(char** lineptr, size_t* n, FILE* stream)
   *lineptr = fgets(*lineptr, nn, stream);
   if (*lineptr == NULL)
     {
-      error(EXIT_FAILURE, errno, "getline fread failed");
+      if (feof(stream))
+        {
+          return -1;
+        }
+      else
+        {
+          error(EXIT_FAILURE, errno, "getline fread failed");
+        }
     }
   rv = strlen(*lineptr);
 #endif
