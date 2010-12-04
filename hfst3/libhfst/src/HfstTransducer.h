@@ -58,21 +58,62 @@ namespace hfst
 
       <b>This page is still under construction...</b>
 
+
       \section installing_library Installing the HFST API library
       
+      You need gcc version ?? or newer..
+
+      You can download the source code from here..
+
+      To successfully use the HFST library, you should have at least one of the backend libraries
+      (SFST, OpenFst or foma) installed on your computer. The internal transducer format of HFST
+      is very limited in its operations and used mainly for conversion between different binary
+      and text formats. The optimized lookup format of HFST is very useful in fast lookup
+      of strings in a transducer but creating the transducers needs many operations not found
+      in the HFST core code.
+
+
       \section using_hfst Using HFST in your own code
 
-      Include file HfstTransducer.h to your file.
+      Include file HfstTransducer.h and other relevant h-files to the beginning of your file.
 
+      For example, if you have SFST installed on your computer, the following simple program
 \verbatim
+#include <cstdio>
 #include "HfstTransducer.h"
 
-int main() {
-  HfstTransducer("foo", "bar", SFST_TYPE);
-  ...  
+int main() 
+{
+  HfstTransducer tr1("foo", "bar", SFST_TYPE);
+  HfstTransducer tr2("bar", "baz", SFST_TYPE);
+  tr1.compose(tr2);
+  tr1.write_in_att_format(stdout);
+  return 0;
 }
 \endverbatim
 
+should print to standard out the following text:
+
+\verbatim
+0      1     foo    baz
+1
+\endverbatim
+
+
+      \section adding_library Adding your own library under HFST intarface
+
+      If you want to add a transducer library as a part of HFST,
+      file FooTransducer.h lists the functions that your library should implement.
+
+      A new enumerator should be added to the datatype hfst::ImplementationType defined in 
+      file HfstTransducer.h. The file also has some other comments of changes that you must do
+      in order to add your own library to HFST.
+
+      You must also add a separate case for each function in classes HfstTransducer, HfstOutputStream
+      and HfstInputStream where your own function is called if the ImplementationType requires it.
+      This should be quite straightforward and is probably partially automatizable.
+
+      
    */
 
 /** \mainpage 

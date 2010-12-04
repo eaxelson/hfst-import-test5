@@ -775,7 +775,7 @@ lookup_simple(const HfstLookupPath& s, HfstTransducer& t, bool* infinity)
   @todo Support flag diacritics(?) and log weights(?)
  */
 void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLookupPath& s, unsigned int& index, 
-	       HfstLookupPath& path, HfstState state, std::set<HfstState>& visited_states, std::vector<HfstState>& epsilon_path,
+	       HfstLookupPath& path, HfstState state, std::multiset<HfstState>& visited_states, std::vector<HfstState>& epsilon_path,
 	       unsigned int& cycles)
 { 
   // Whether the end of the lookup path s has been reached
@@ -818,7 +818,7 @@ void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLoo
 	      for (unsigned int i=epsilon_path.size()-1; epsilon_path[i] != tr.target; i--) {
 		//fprintf(stderr, "removing state %i\n", epsilon_path[i]);
 		removed_states.push_back(epsilon_path[i]);
-		visited_states.erase(epsilon_path[i]);
+		visited_states.erase(visited_states.find(epsilon_path[i]));
 		epsilon_path.pop_back();
 	      }	    
 	    }
@@ -830,7 +830,7 @@ void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLoo
 	    path.second = path.second - tr.weight; // subtract the transition weight
 	    
 	    epsilon_path.pop_back();
-	    visited_states.erase(state);
+	    visited_states.erase(visited_states.find(state));
 	    if (cycles_increased) {
 	      cycles--;
 	      for(int i=removed_states.size()-1; i>=0; i--) {
@@ -854,9 +854,9 @@ void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLoo
 	      index++; // consume an input symbol in the lookup path s /***/
 	      path.first.push_back(tr.osymbol); // add an output symbol to the traversed path
 	      path.second = path.second + tr.weight; // add the transition weight
-	      std::set<HfstState> empty_set;
+	      //std::multiset<HfstState> empty_set;
 	      std::vector<HfstState> empty_path;
-	      lookup_fd(t, results, s, index, path, tr.target, empty_set, empty_path, cycles);
+	      lookup_fd(t, results, s, index, path, tr.target, visited_states, empty_path, cycles);
 	      path.first.pop_back(); // remove the output symbol from the traversed path
 	      path.second = path.second - tr.weight; // subtract the transition weight
 	      index--; // add the input symbol back to the lookup path s. /***/
@@ -882,7 +882,7 @@ void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLoo
   path.second=0;
   (void)limit;
   unsigned int index=0;
-  std::set<HfstState> visited_states;
+  std::multiset<HfstState> visited_states;
   visited_states.insert(t.get_initial_state());
   std::vector<HfstState> epsilon_path;
   epsilon_path.push_back(t.get_initial_state());

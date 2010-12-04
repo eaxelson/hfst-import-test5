@@ -28,6 +28,10 @@ namespace hfst
 
       An example:
 \verbatim
+#include "HfstInputStream.h"
+
+...
+
 HfstInputStream *in;
 try {
   in = new HfstInputStream("testfile");
