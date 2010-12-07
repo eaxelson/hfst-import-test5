@@ -223,7 +223,7 @@ namespace hfst
 	t.implementation.hfst_ol =
 	  this->implementation.hfst_ol->read_transducer(false);  // FIX: has_header
 	if(t.get_type() != type) // weights need to be added or removed
-	  { t.convert(type); }
+	{ t.convert(type); }
 	break;
       case ERROR_TYPE:
 	//case UNSPECIFIED_TYPE:
