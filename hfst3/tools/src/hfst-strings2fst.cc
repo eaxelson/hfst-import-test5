@@ -258,6 +258,14 @@ process_stream(HfstOutputStream& outstream)
         }
       else
         {
+	  // change '\n' to '\0'
+	  char *p = tab;
+	  while (p != '\0') {
+	    if (*p == '\n')
+	      *p = '\0';
+	    p++;
+	  }
+
           weight = hfst_strtoweight(tab+1);
           weighted = true;
         }
