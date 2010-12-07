@@ -45,3 +45,11 @@ HFST_HDRS = \
 hfstinclude_HEADERS = $(HFST_HDRS)
 
 libhfst_la_LDFLAGS = -no-undefined -version-info 1:0:0
+
+
+
+# unit tests: add one per class/file/anything
+
+check_PROGRAMS = HfstTransducer
+HfstTransducer_SOURCES=HfstTransducer.cc
+HfstTransducer_CXXFLAGS=-DDEBUG_MAIN

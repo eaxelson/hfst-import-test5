@@ -2266,19 +2266,10 @@ void HfstTransducer::print_alphabet()
 using namespace hfst;
 int main(void)
 {
-  KeyTable key_table;
-  key_table.add_symbol("a");
-  key_table.add_symbol("b");
   HfstTransducer sfst(SFST_TYPE);
-  HfstTransducer sfst_kt(key_table,SFST_TYPE);
   HfstTransducer ofst(TROPICAL_OFST_TYPE);
-  HfstTransducer ofst_kt(key_table,TROPICAL_OFST_TYPE);
-  HfstTransducer sfst_copy(sfst_kt);
   HfstTransducer foma(FOMA_TYPE);
   std::cout << sfst << std::endl;
-  KeyTable key_table_c = sfst_kt.get_key_table();
-  assert(key_table_c["a"] == 1);
-  assert(key_table_c["b"] == 2);
   HfstTokenizer tokenizer;
   HfstTransducer str_fst_ofst("äläkkä",tokenizer,TROPICAL_OFST_TYPE);
   HfstTransducer str_fst_ofst2("äläkKä","äläkkä",tokenizer,TROPICAL_OFST_TYPE);
@@ -2300,76 +2291,6 @@ int main(void)
   str_fst_sfst_test.disjunct(str_fst_sfst_test);
   str_fst_ofst2.repeat_plus().compose(str_fst_sfst.convert(SFST_TYPE));
   std::cout << str_fst_ofst2.minimize() << std::endl;
-  str_fst_ofst2.convert(TROPICAL_OFST_TYPE).set_final_weight<float>(2);
-  std::cout << str_fst_ofst2 << std::endl;
   bool failed = false;
-  try
-    {
-      str_fst_ofst2.convert(SFST_TYPE).set_final_weight<bool>(2);
-    }
-  catch (hfst::implementations::FunctionNotImplementedException e)
-    { failed = true; }
-  assert(failed);
-  failed = false;
-  try
-    {
-      str_fst_ofst2.set_final_weight<float>(2);
-    }
-  catch (hfst::implementations::WeightTypeMismatchException e)
-    { failed = true; }
-  assert(failed);
-  failed = false;
-  HfstTransducer sfst_ducer("kala",tokenizer,SFST_TYPE);
-  KeyTable &kt = sfst_ducer.get_key_table();
-  for (SfstTransducer::const_iterator it = sfst_ducer.begin<SfstTransducer>();
-       it != sfst_ducer.end<SfstTransducer>();
-       ++it)
-    { 
-      SfstState s = *it;
-      for (SfstState::const_iterator jt = s.begin();
-	   jt != s.end();
-	   ++jt)
-	{ 
-	  SfstTransition tr = *jt;	  
-	  std::cerr << "Transition with pair: " 
-		    << kt[tr.get_input_key()] << " " 
-		    << kt[tr.get_output_key()]
-		    << std::endl;
-	}
-      if (s.get_final_weight())
-	{ std::cerr << "Final state" << std::endl; }
-    }
-  //HfstInputStream in1("fst.sfst");
-  //in1.open();
-  //HfstTransducer t1(in1);
-  //std::cout << t1 << std::endl;
-  HfstInputStream in("fst.std.hfst");
-  in.open();
-  HfstTransducer t(in);
-  std::cout << t << std::endl;
-  in.close();
-  HfstInputStream in2("fst.log.hfst");
-  in2.open();
-  HfstTransducer t2(in2);
-  std::cout << t2 << std::endl;
-  in2.close();
-  HfstInputStream in3("fst.log.2.hfst");
-  in3.open();
-  HfstTransducer t3(in3);
-  HfstTransducer t4(in3);
-  t3.intersect(t4);
-  t3.determinize();
-  std::cout << t3 << std::endl;
-  in3.close();
-  HfstInputStream in4("fst.sfst.hfst");
-  in4.open();
-  HfstTransducer t5(in4);
-  std::cout << t5 << std::endl;
-  in4.close();
-
-  HfstTransducer ala("ala",tokenizer,TROPICAL_OFST_TYPE);
-  ala.concatenate(ala);
-  ala.minimize();
-  std::cout << ala << std::endl;
 }
 #endif
