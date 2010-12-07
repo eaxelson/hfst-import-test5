@@ -161,16 +161,25 @@ bool Transducer::initialize_input(char * input_str)
     return true;
 }
 
-HfstLookupPaths Transducer::lookup_fd(char * input_str)
+HfstLookupPaths Transducer::lookup_fd(const HfstLookupPath & s)
 {
     lookup_paths.clear();
-    if (!initialize_input(input_str)) {
+    std::string input_str;
+//    std::vector<std::string>::iterator it;
+//    for (it = s.first.begin(); it < s.first.end(); ++it) {
+//	input_str.append(*it);
+//    }
+    for (int i = 0; i < s.first.size(); ++i) {
+	input_str.append((s.first)[i]);
+    }
+    if (!initialize_input(const_cast<char *>(input_str.c_str()))) {
 	HfstLookupPaths no_result;
 	return no_result;
     }
+    current_weight += s.second;
     get_analyses(input_tape, output_tape, output_tape, 0);
+    current_weight -= s.second;
     return lookup_paths;
-
 }
 
 void Transducer::try_epsilon_transitions(SymbolNumber * input_symbol,
@@ -178,6 +187,8 @@ void Transducer::try_epsilon_transitions(SymbolNumber * input_symbol,
 					 SymbolNumber * original_output_tape,
 					 TransitionTableIndex i)
 {
+    //    std::cerr << "try_epsilon_transitions, index " << i << std::endl;
+
   
     while (true)
     {
@@ -216,6 +227,7 @@ void Transducer::try_epsilon_indices(SymbolNumber * input_symbol,
 				     SymbolNumber * original_output_tape,
 				     TransitionTableIndex i)
 {
+//    std::cerr << "try_epsilon_indices, index " << i << std::endl;
     if (tables->get_index_input(i) == 0)
     {
 	try_epsilon_transitions(input_symbol,
@@ -346,12 +358,13 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
 
 void Transducer::note_analysis(SymbolNumber * whole_output_tape)
 {
-    std::string str = "";
+    HfstLookupPath result;
     for (SymbolNumber * num = whole_output_tape; *num != NO_SYMBOL_NUMBER; ++num)
     {
-	str.append(alphabet->string_from_symbol(*num));
+	result.first.push_back(alphabet->string_from_symbol(*num));
     }
-    lookup_paths.insert(HfstLookupPath(std::vector<std::string>(1, str), current_weight));
+    result.second = current_weight;
+    lookup_paths.insert(result);
 }
 
 
@@ -424,6 +437,56 @@ Transducer::~Transducer()
     free(output_tape);
 }
 
+TransducerTable<TransitionWIndex> & Transducer::copy_windex_table()
+{
+    if (!header->probe_flag(Weighted)) {
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+    }
+    TransducerTable<TransitionWIndex> * another = new TransducerTable<TransitionWIndex>;
+    for (unsigned int i = 0; i < header->index_table_size(); ++i) {
+	another->append(TransitionWIndex(tables->get_index_input(i),
+					tables->get_index_target(i)));
+    }
+    return *another;
+}
+TransducerTable<TransitionW> & Transducer::copy_transitionw_table()
+{
+    if (!header->probe_flag(Weighted)) {
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+    }
+    TransducerTable<TransitionW> * another = new TransducerTable<TransitionW>;
+    for (unsigned int i = 0; i < header->target_table_size(); ++i) {
+	another->append(TransitionW(tables->get_transition_input(i),
+				   tables->get_transition_output(i),
+				   tables->get_transition_target(i),
+				   tables->get_weight(i)));
+    }
+    return *another;
+}
+TransducerTable<TransitionIndex> & Transducer::copy_index_table()
+{
+    if (header->probe_flag(Weighted)) {
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+    }
+    TransducerTable<TransitionIndex> * another = new TransducerTable<TransitionIndex>;
+    for (unsigned int i = 0; i < header->index_table_size(); ++i) {
+	another->append(tables->get_index(i));
+    }
+    return *another;
+}
+TransducerTable<Transition> & Transducer::copy_transition_table()
+{
+    if (header->probe_flag(Weighted)) {
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+    }
+    TransducerTable<Transition> * another = new TransducerTable<Transition>();
+    for (unsigned int i = 0; i < header->target_table_size(); ++i) {
+	another->append(tables->get_transition(i));
+    }
+    return *another;
+}
+
+
 void Transducer::load_tables(std::istream& is)
 {
     if(header->probe_flag(Weighted))
@@ -432,9 +495,6 @@ void Transducer::load_tables(std::istream& is)
     else
 	tables = new TransducerTables<TransitionIndex,Transition>(
 	    is, header->index_table_size(),header->target_table_size());
-    if (is.get() != '\n') { // the stream tends to have a spurious newline
-	is.unget();         // should really find out why...
-    }                       // but this guarantees we'll be at EOF if we ought to
     if(!is)
 	throw hfst::exceptions::TransducerHasWrongTypeException();
 }
@@ -449,9 +509,18 @@ void Transducer::write(std::ostream& os) const
 	tables->get_transition(i).write(os);
 }
 
-Transducer * Transducer::copy(Transducer * t)
-{ return new Transducer(*t); }
-
+Transducer * Transducer::copy(Transducer * t, bool weighted)
+{
+    Transducer * another;
+    if (weighted) {
+	another = new Transducer(t->get_header(), t->get_alphabet(),
+				 t->copy_windex_table(), t->copy_transitionw_table());
+    } else {
+	another = new Transducer(t->get_header(), t->get_alphabet(),
+				 t->copy_index_table(), t->copy_transition_table());
+    }
+    return another;
+}
 
 void Transducer::display() const
 {

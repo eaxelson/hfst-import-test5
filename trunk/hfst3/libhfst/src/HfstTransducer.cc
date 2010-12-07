@@ -222,8 +222,7 @@ namespace hfst
 
 	case (HFST_OL_TYPE):
 	case (HFST_OLW_TYPE):
-	    // FIXME: have we decided what to do with the other strings in s.first?
-	    results = this->implementation.hfst_ol->lookup_fd(const_cast<char *>((s.first)[0].c_str()));
+	    results = this->implementation.hfst_ol->lookup_fd(s);
 	    return;
 
 	case (ERROR_TYPE):
@@ -585,8 +584,10 @@ namespace hfst
 #endif
 	//case UNSPECIFIED_TYPE:
       case HFST_OL_TYPE:
+	  implementation.hfst_ol = another.implementation.hfst_ol->copy(another.implementation.hfst_ol, false);
+	  break;
       case HFST_OLW_TYPE:
-	  implementation.hfst_ol = another.implementation.hfst_ol->copy(another.implementation.hfst_ol);
+	  implementation.hfst_ol = another.implementation.hfst_ol->copy(another.implementation.hfst_ol, true);
 	  break;
       case ERROR_TYPE:
       default:

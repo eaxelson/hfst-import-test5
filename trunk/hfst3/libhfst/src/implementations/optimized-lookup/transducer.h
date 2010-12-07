@@ -164,7 +164,7 @@ public:
 	    if(!is)
 		throw hfst::exceptions::TransducerHasWrongTypeException();
 	}
-  
+    
     SymbolNumber symbol_count(void) const { return number_of_symbols; }
     SymbolNumber input_symbol_count(void) const {return number_of_input_symbols;}
   
@@ -458,13 +458,13 @@ protected:
 public:
     TransducerTables(std::istream& is, TransitionTableIndex index_table_size,
 		     TransitionTableIndex transition_table_size):
-	index_table(is, index_table_size), transition_table(is, transition_table_size) {}
+	index_table(is, index_table_size), transition_table(is, transition_table_size) { }
 	
     TransducerTables(): index_table(1, T1::create_final()), transition_table() {}
     TransducerTables(const TransducerTable<T1>& index_table,
 		     const TransducerTable<T2>& transition_table):
 	index_table(index_table), transition_table(transition_table) {}
-  
+
     const TransitionIndex& get_index(TransitionTableIndex i) const
 	{return index_table[i];}
     const Transition& get_transition(TransitionTableIndex i) const
@@ -601,10 +601,11 @@ protected:
 public:
     Transducer(std::istream& is);
     Transducer(bool weighted);
+    Transducer(Transducer * t);
     virtual ~Transducer();
 
     void write(std::ostream& os) const;
-    Transducer * copy(Transducer * t);
+    Transducer * copy(Transducer * t, bool weighted = false);
     void display() const;
 
     const TransducerHeader& get_header() const
@@ -619,6 +620,10 @@ public:
 	{
 	    return header->probe_flag(Has_input_epsilon_cycles);
 	}
+    TransducerTable<TransitionWIndex> & copy_windex_table();
+    TransducerTable<TransitionW> & copy_transitionw_table();
+    TransducerTable<TransitionIndex> & copy_index_table();
+    TransducerTable<Transition> & copy_transition_table();
 
     // state_index must be an index to a state which is defined as either:
     // (1) the start of a set of entries in the transition index table, or
@@ -630,7 +635,7 @@ public:
 
 
     bool initialize_input(char * input_str);
-    HfstLookupPaths lookup_fd(char * input_str);
+    HfstLookupPaths lookup_fd(const HfstLookupPath & s);
     void note_analysis(SymbolNumber * whole_output_tape);
 
     friend class ConvertTransducer;
