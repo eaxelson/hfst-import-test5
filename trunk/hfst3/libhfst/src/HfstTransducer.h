@@ -61,17 +61,21 @@ namespace hfst
 
       \section installing_library Installing the HFST API library
       
-      You need gcc version ?? or newer..
+      You can download the source code from the sourceforge
+      <a href="http://sourceforge.net/projects/hfst/files/hfst/">download page</a>.
 
-      You can download the source code from here..
+      HFST is written with C++ so you need gcc version ?? or newer and
+      the following libraries: ???.
 
       To successfully use the HFST library, you should have at least one of the backend libraries
-      (SFST, OpenFst or foma) installed on your computer. The internal transducer format of HFST
+      (<a href="http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html">SFST</a>, 
+      <a href="http:://www.openfst.org">OpenFst</a> or 
+      <a href="http://foma.sourceforge.net/">foma</a>) 
+      installed on your computer. The internal transducer format of HFST
       is very limited in its operations and used mainly for conversion between different binary
-      and text formats. The optimized lookup format of HFST is very useful in fast lookup
-      of strings in a transducer but creating the transducers needs many operations not found
-      in the HFST core code.
-
+      and text formats. The HFST optimized lookup transducer format comes with the source code,
+      but it has also a very limited selection of operations as its main purpose is fast lookup
+      of strings.
 
       \section using_hfst Using HFST in your own code
 
@@ -99,11 +103,36 @@ should print to standard out the following text:
 1
 \endverbatim
 
+The HFST API is written in the namespace #hfst that contains the following classes:
 
-      \section adding_library Adding your own library under HFST intarface
+   - HfstTransducer: A class for creating transducers and performing operations on them.
+
+   - HfstInputStream and HfstOutputStream: Classes for writing and reading binary transducers.
+
+   - HfstMutableTransducer, HfstTransition, HfstTransitionIterator and HfstStateIterator: Classes for creating transducers from scratch and iterating through their states and transitions.
+
+   - HfstTokenizer: A class used in creating transducers from UTF-8 strings.
+
+   - HfstGrammar: A class used in \link HfstTransducer::compose_intersect intersecting composition\endlink.
+
+and the following namespaces:
+
+   - \link hfst::rules rules\endlink: A namespace that contains functions to create two-level, replace, restriction and coercion rules.
+
+   - \link hfst::xfst xfst\endlink: ?
+
+   - \link hfst::lexc lexc\endlink: A namespace for Xerox LexC related specific functions and classes.
+
+   - \link hfst::xre xre\endlink: A namespace for functions related to regular expression parsing.
+
+   - \link hfst::exceptions exceptions\endlink: A namespace for exceptions.
+
+
+   <a name="adding_library"></a>
+      \section adding_library Adding your own library under HFST interface
 
       If you want to add a transducer library as a part of HFST,
-      file FooTransducer.h lists the functions that your library should implement.
+      the file FooTransducer.h lists the functions that your library should implement.
 
       A new enumerator should be added to the datatype hfst::ImplementationType defined in 
       file HfstTransducer.h. The file also has some other comments of changes that you must do
@@ -129,37 +158,43 @@ The examples given in this documentation use <a href="http://www.xrce.xerox.com/
 <!-- More info on SFST tools is in http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html,
 OpenFst in http://www.openfst.org and foma in http://www.aclweb.org/anthology/E/E09/E09-2008.pdf. -->
 
-   - A <a href="QuickStart.html">quick start</a> to the HFST interface with examples (TODO)
+
+\section what_is_new What is new in version 3.0
+
+   - A third transducer library, <a href="http://foma.sourceforge.net/">foma</a>, is included
+
+   - <a href="QuickStart.html#adding_library">Adding</a> your own transducer library under the HFST interface is easy
+
+   - Unknown and identity symbols are supported
+
+
+\section features Features
+
+   - Create transducers \link hfst::HfstMutableTransducer from scratch\endlink
+
+   - Iterate through a transducer's \link hfst::HfstStateIterator states\endlink and \link hfst::HfstTransitionIterator transitions\endlink
+
+   - Create transducers by \link hfst::HfstTokenizer tokenizing\endlink UTF-8 strings with multicharacter symbols
+
+   - Apply two-level, replace, restriction and coercion \link hfst::rules rules\endlink
+
+   - Create transducers from \link hfst::xre regular expressions\endlink
+
+
+\section tutorial Tutorial
+
+   - A <a href="QuickStart.html">quick start</a> to the HFST interface with examples
+
+
+\section links Links
 
    - <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstOutline">Examples</a> of programs implemented using the HFST interface
 
-   - <a href="http://sourceforge.net/projects/hfst/files/hfst">Download</a> the HFST interface 
+   - <a href="http://sourceforge.net/projects/hfst/files/hfst">Download</a> the HFST interface and commandline tools
 
-<br></br>
+   - <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome">Documentation</a> of the HFST project
 
-The HFST API is written in the namespace #hfst that contains the following classes:
-
-   - HfstTransducer: A class for creating transducers and performing operations on them.
-
-   - HfstInputStream and HfstOutputStream: Classes for writing and reading binary transducers.
-
-   - HfstMutableTransducer, HfstTransition, HfstTransitionIterator and HfstStateIterator: Classes for creating transducers from scratch and iterating through their states and transitions.
-
-   - HfstTokenizer: A class used in creating transducers from UTF-8 strings.
-
-   - HfstGrammar: A class used in \link HfstTransducer::compose_intersect intersecting composition\endlink.
-
-and the following namespaces:
-
-   - \link hfst::rules rules\endlink: A namespace that contains functions to create two-level, replace, restriction and coercion rules.
-
-   - \link hfst::xfst xfst\endlink: ?
-
-   - \link hfst::lexc lexc\endlink: A namespace for Xerox LexC related specific functions and classes.
-
-   - \link hfst::xre xre\endlink: A namespace for functions related to regular expression parsing.
-
-   - \link hfst::exceptions exceptions\endlink: A namespace for exceptions.
+   <br></br>
 
 */
 

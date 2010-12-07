@@ -186,7 +186,9 @@ print_usage()
             "  -I, --input-strings=SFILE        Read lookup strings from SFILE\n"
             "  -O, --output-format=OFORMAT      Use OFORMAT printing results sets (TODO)\n"
             "  -F, --input-format=IFORMAT       Use IFORMAT parsing input (TODO)\n"
-            "  -x, --statistics                 Print statistics\n");
+            "  -x, --statistics                 Print statistics\n"
+            "  -c, --cycles=INT                 How many times to follow input epsilon cycles\n"
+	    "                                   (default: 5)\n");  
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
     fprintf(message_out, "OFORMAT is one of {xerox,cg,apertium}, "
@@ -216,12 +218,13 @@ parse_options(int argc, char** argv)
             {"output-format", required_argument, 0, 'O'},
             {"input-format", required_argument, 0, 'F'},
             {"statistics", no_argument, 0, 'x'},
+	    {"cycles", required_argument, 0, 'c'},
             {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "I:O:F:x",
+                             HFST_GETOPT_UNARY_SHORT "I:O:F:xc:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -284,6 +287,9 @@ parse_options(int argc, char** argv)
         case 'x':
             print_statistics = true;
             break;
+	case 'c':
+	    infinite_cutoff = (size_t)atoi(hfst_strdup(optarg));
+	    break;
 
 #include "inc/getopt-cases-error.h"
         }
@@ -742,8 +748,10 @@ lookup_simple(const HfstLookupPath& s, HfstTransducer& t, bool* infinity)
 
   if (t.is_lookup_infinitely_ambiguous(s))
     {
-      warning(0, 0, "Got infinite results, using %zu first",
-              infinite_cutoff);
+      if (!silent && infinite_cutoff > 0) {
+	warning(0, 0, "Got infinite results, number of cycles limited to %zu",
+		infinite_cutoff);
+      }
       t.lookup_fd(*results, s, infinite_cutoff);
       *infinity = true;
     }
@@ -769,6 +777,10 @@ lookup_simple(const HfstLookupPath& s, HfstTransducer& t, bool* infinity)
                   that is being matched next.
   @param path     The output string that \a s has yielded so far.
   @param state    The state in \a t where we are.
+  @param visited_states  A multiset of states that have been already visited
+                         Used for cycle detection.
+  @param epsilon_path    The path of consecutive input epsilon transitions.
+  @param cycles   The number of cycles followed.
 
   @pre The transducer \a t has tropical weights or no weights.
 
@@ -802,8 +814,12 @@ void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLoo
       if (tr.isymbol.compare("@_EPSILON_SYMBOL_@") == 0)
 	{
 
-	  if (visited_states.find(tr.target) != visited_states.end() &&
-	      cycles >= 5 ) {}
+	  // If the target state is a visited state or the target state is
+	  // the current state, there is a cycle and we must check
+	  // that the maximum number of cycles is not going to be exceeded.
+	  if ( (visited_states.find(tr.target) != visited_states.end() ||
+		state == tr.target) &&
+	       cycles >= (unsigned int)infinite_cutoff ) {}
 
 	  else {
 
@@ -812,11 +828,14 @@ void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLoo
 	    bool cycles_increased=false;
 	    std::vector<HfstState> removed_states;
 	    
+	    // If there is a cycle... 
 	    if (visited_states.find(tr.target) != visited_states.end()) {
 	      cycles_increased=true;
 	      cycles++;	  
 	      for (unsigned int i=epsilon_path.size()-1; epsilon_path[i] != tr.target; i--) {
 		//fprintf(stderr, "removing state %i\n", epsilon_path[i]);
+		// ...remove the states that lead to the cycle so
+		// they will not increase the number of cycles many times
 		removed_states.push_back(epsilon_path[i]);
 		visited_states.erase(visited_states.find(epsilon_path[i]));
 		epsilon_path.pop_back();
@@ -854,7 +873,6 @@ void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLoo
 	      index++; // consume an input symbol in the lookup path s /***/
 	      path.first.push_back(tr.osymbol); // add an output symbol to the traversed path
 	      path.second = path.second + tr.weight; // add the transition weight
-	      //std::multiset<HfstState> empty_set;
 	      std::vector<HfstState> empty_path;
 	      lookup_fd(t, results, s, index, path, tr.target, visited_states, empty_path, cycles);
 	      path.first.pop_back(); // remove the output symbol from the traversed path
@@ -910,8 +928,10 @@ lookup_simple(const HfstLookupPath& s, HfstMutableTransducer& t, bool* infinity)
 
   if (is_lookup_infinitely_ambiguous(t,s))
     {
-      warning(0, 0, "Got infinite results, using %zu first",
-              infinite_cutoff);
+      if (!silent && infinite_cutoff > 0) {
+	warning(0, 0, "Got infinite results, number of cycles limited to %zu",
+		infinite_cutoff);
+      }
       lookup_fd(t, *results, s, infinite_cutoff);
       *infinity = true;
     }
