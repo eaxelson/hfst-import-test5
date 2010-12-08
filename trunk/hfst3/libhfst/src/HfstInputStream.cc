@@ -204,19 +204,79 @@ namespace hfst
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
-	t.implementation.tropical_ofst =
-	  this->implementation.tropical_ofst->read_transducer();
+	{
+	  t.implementation.tropical_ofst =
+	    this->implementation.tropical_ofst->read_transducer();
+	  if (hfst_version_2_weighted_transducer) // an SFST alphabet follows
+	    {
+	      stream_get(); // UTF8
+	      
+	      // read the symbol mapping
+	      unsigned short n=0;
+	      n = n + (unsigned short)stream_get() * 1;
+	      n = n + (unsigned short)stream_get() * 256;
+	      
+	      //fprintf(stderr, "alphabet size is %i\n", (int)n );
+
+	      // special symbol-to-number mappings
+	      std::vector<std::pair<unsigned short, std::string> > special_cases;
+
+	      for( unsigned i=0; i<n; i++) {
+
+		unsigned short symbol_number=0;
+		symbol_number = symbol_number + (unsigned short)stream_get() * 1;
+		symbol_number = symbol_number + (unsigned short)stream_get() * 256;
+		
+		std::string symbol_string("");
+		char c = stream_get();
+		while (c != '\0') {
+		  symbol_string = symbol_string + std::string(1,c);
+		  c = stream_get();
+		}
+
+		//fprintf(stderr, "read number %i and symbol %s\n", (int)symbol_number, symbol_string.c_str());
+
+		// epsilon
+		if (symbol_number == 0)
+		  t.tropical_ofst_interface.add_symbol_table_entry(t.implementation.tropical_ofst, 
+								   symbol_number, symbol_string);
+
+		// 1 and 2 are reserved for unknown and identity symbols
+		if (symbol_number == 1 || symbol_number == 2)
+
+		t.tropical_ofst_interface.add_symbol_table_entry(t.implementation.tropical_ofst, 
+								 symbol_number, symbol_string);
+	      }
+
+	      // skip the character pairs
+	      unsigned short to_skip=0;
+	      to_skip = to_skip + (unsigned short)stream_get() * 1;
+	      to_skip = to_skip + (unsigned short)stream_get() * 256;
+	      unsigned int to_skip_ = 4 * (unsigned int)to_skip;
+
+	      fprintf(stderr, "skipping %i bytes\n", (int)to_skip_);
+
+	      for( unsigned int i=0; i<to_skip_; i++)
+		stream_get();
+
+	    }
 	break;
+	}
       case LOG_OFST_TYPE:
 	t.implementation.log_ofst =
 	  this->implementation.log_ofst->read_transducer();
+	if (hfst_version_2_weighted_transducer) // this should not happen
+	  { 
+	    fprintf(stderr, "ERROR: not transducer stream\n");
+	    exit(1);
+	  }
 	break;
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
-    t.implementation.foma =
+	t.implementation.foma =
 	  this->implementation.foma->read_transducer();
-    break;
+	break;
 #endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
@@ -231,12 +291,11 @@ namespace hfst
 	debug_error("#1");
 	throw hfst::exceptions::NotTransducerStreamException();
 	break;
-      }
-
-
-    t.set_name(name);
-
   }
+  
+  t.set_name(name);
+  
+}
 
   HfstInputStream::TransducerType HfstInputStream::guess_fst_type(int &bytes_read)
   {
