@@ -53,3 +53,5 @@ libhfst_la_LDFLAGS = -no-undefined -version-info 1:0:0
 check_PROGRAMS = HfstTransducer
 HfstTransducer_SOURCES=HfstTransducer.cc
 HfstTransducer_CXXFLAGS=-DDEBUG_MAIN
+HfstTransducer_LDADD=libhfst.la
+TESTS=HfstTransducer
