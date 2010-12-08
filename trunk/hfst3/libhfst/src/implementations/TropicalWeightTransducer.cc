@@ -1483,6 +1483,19 @@ namespace hfst { namespace implementations
     return new StdVectorFst(t_subst);
   }
   
+  void TropicalWeightTransducer::set_symbol_table(StdVectorFst * t, 
+						  std::vector<std::pair<unsigned short, std::string> > symbol_mappings)
+  {
+    SymbolTable st = create_symbol_table("");
+    for (unsigned int i=0; i<symbol_mappings.size(); i++)
+      {
+	st.AddSymbol(symbol_mappings[i].second, 
+		     symbol_mappings[i].first);
+      }
+    t->SetInputSymbols(&st);
+  }
+
+
   StdVectorFst * TropicalWeightTransducer::substitute(StdVectorFst * t,
 						      pair<unsigned int, unsigned int> old_key_pair,
 						      pair<unsigned int, unsigned int> new_key_pair)
