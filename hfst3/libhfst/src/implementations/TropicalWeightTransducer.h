@@ -241,6 +241,9 @@ namespace implementations
 
       static unsigned int number_of_states(const StdVectorFst * t);
 
+      // for HFST version 2 transducer handling
+      static void set_symbol_table(StdVectorFst * t, std::vector<std::pair<unsigned short, std::string> > symbol_mappings);
+
     private:
       static fst::SymbolTable create_symbol_table(std::string name);
       static void initialize_symbol_tables(StdVectorFst *t);

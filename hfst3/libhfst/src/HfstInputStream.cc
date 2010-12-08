@@ -221,7 +221,14 @@ namespace hfst
 	      // special symbol-to-number mappings
 	      std::vector<std::pair<unsigned short, std::string> > special_cases;
 
+	      // normal symbol-to-number mappings
+	      std::vector<std::pair<unsigned short, std::string> > symbol_mappings;
+
+	      unsigned short max_number=0;
+
 	      for( unsigned i=0; i<n; i++) {
+
+		max_number++;
 
 		unsigned short symbol_number=0;
 		symbol_number = symbol_number + (unsigned short)stream_get() * 1;
@@ -234,19 +241,39 @@ namespace hfst
 		  c = stream_get();
 		}
 
-		//fprintf(stderr, "read number %i and symbol %s\n", (int)symbol_number, symbol_string.c_str());
+		//fprintf(stderr, "read number %hu and symbol %s\n", symbol_number, symbol_string.c_str());
 
-		// epsilon
-		if (symbol_number == 0)
-		  t.tropical_ofst_interface.add_symbol_table_entry(t.implementation.tropical_ofst, 
-								   symbol_number, symbol_string);
-
-		// 1 and 2 are reserved for unknown and identity symbols
-		if (symbol_number == 1 || symbol_number == 2)
-
-		t.tropical_ofst_interface.add_symbol_table_entry(t.implementation.tropical_ofst, 
-								 symbol_number, symbol_string);
+		// epsilon, unknown and identity numbers must be handled separately
+		if (symbol_number == 0 || symbol_number == 1 || symbol_number == 2) {
+		  special_cases.push_back(std::pair<unsigned short, std::string>(symbol_number,symbol_string));
+		}
+		else {
+		  symbol_mappings.push_back(std::pair<unsigned short, std::string>(symbol_number, symbol_string));
+		}
 	      }
+
+	      max_number--;
+
+	      // handle special symbol cases
+	      for (unsigned int i=0; i<special_cases.size(); i++) {
+		if (special_cases[i].first == 0) {
+		}
+		else {
+		  //fprintf(stderr, "substituting number %hu with %hu...\n", special_cases[i].first, max_number+1);
+		  fst::StdVectorFst * tmp = 
+		    t.tropical_ofst_interface.substitute(t.implementation.tropical_ofst, 
+							 special_cases[i].first, 
+							 (unsigned short)++max_number);
+		  t.implementation.tropical_ofst = tmp;
+		  //delete t.implementation.tropical_ofst;
+
+		  symbol_mappings.push_back(std::pair<unsigned short, std::string>(
+					      max_number, special_cases[i].second));
+		  //fprintf(stderr, "...substituted\n");
+		}
+	      }
+
+	      t.tropical_ofst_interface.set_symbol_table(t.implementation.tropical_ofst, symbol_mappings);
 
 	      // skip the character pairs
 	      unsigned short to_skip=0;
@@ -254,7 +281,7 @@ namespace hfst
 	      to_skip = to_skip + (unsigned short)stream_get() * 256;
 	      unsigned int to_skip_ = 4 * (unsigned int)to_skip;
 
-	      fprintf(stderr, "skipping %i bytes\n", (int)to_skip_);
+	      //fprintf(stderr, "skipping %i bytes\n", (int)to_skip_);
 
 	      for( unsigned int i=0; i<to_skip_; i++)
 		stream_get();
