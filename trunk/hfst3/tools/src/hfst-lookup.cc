@@ -106,43 +106,43 @@ static bool print_statistics = false;
 // word     word N SG
 // word     word V PRES
 static const char* XEROX_BEGIN_SETF = "";
-static const char* XEROX_LOOKUPF = "%i\t%l%n";
+static const char* XEROX_LOOKUPF = "%i\t%l\t%w%n";
 static const char* XEROX_END_SETF = "%n";
 // notaword notaword+?
 static const char* XEROX_EMPTY_BEGIN_SETF = "";
-static const char* XEROX_EMPTY_LOOKUPF = "%i\t%i\t+?%n";
+static const char* XEROX_EMPTY_LOOKUPF = "%i\t%i\t+?\tInf%n";
 static const char* XEROX_EMPTY_END_SETF = "%n";
 // ¶    ¶+?
 static const char* XEROX_UNKNOWN_BEGIN_SETF = "";
-static const char* XEROX_UNKNOWN_LOOKUPF = "%i\t%i\t+?%n";
+static const char* XEROX_UNKNOWN_LOOKUPF = "%i\t%i\t+?\tInf%n";
 static const char* XEROX_UNKNOWN_END_SETF = "%n";
 // 0    0 NUM SG
 // 0    [...cyclic...]
 static const char* XEROX_INFINITE_BEGIN_SETF = "";
-static const char* XEROX_INFINITE_LOOKUPF = "%i\t%l%n";
+static const char* XEROX_INFINITE_LOOKUPF = "%i\t%l\t%w%n";
 static const char* XEROX_INFINITE_END_SETF = "%i\t[...cyclic...]%n%n";
 // CG:
 // "<word>"
 //      "word"  N SG
 //      "word"  V PRES
 static const char* CG_BEGIN_SETF = "\"<%i>\"%n";
-static const char* CG_LOOKUPF = "\t\"%b\"%a%n";
+static const char* CG_LOOKUPF = "\t\"%b\"%a\t%w%n";
 static const char* CG_END_SETF = "%n";
 // "<notaword>"
 //      "notaword" ?
 static const char* CG_EMPTY_BEGIN_SETF = "\"<%i>\"%n";
-static const char* CG_EMPTY_LOOKUPF = "\t\"%i\" ?%n";
+static const char* CG_EMPTY_LOOKUPF = "\t\"%i\" ?\tInf%n";
 static const char* CG_EMPTY_END_SETF = "%n";
 // "<¶>"
 //      "¶" ?
 static const char* CG_UNKNOWN_BEGIN_SETF = "\"<%i>\"%n";
-static const char* CG_UNKNOWN_LOOKUPF = "\t\"%i\"\t ?%n";
+static const char* CG_UNKNOWN_LOOKUPF = "\t\"%i\"\t ?\tInf%n";
 static const char* CG_UNKNOWN_END_SETF = "%n";
 // "<0>"
 //      "0" NUM SG
 //      "0" [...cyclic...]
 static const char* CG_INFINITE_BEGIN_SETF = "\"<%i>\"%n";
-static const char* CG_INFINITE_LOOKUPF = "\t\"%b\"%a%n";
+static const char* CG_INFINITE_LOOKUPF = "\t\"%b\"%a\t%w%n";
 static const char* CG_INFINITE_END_SETF = "\t\"%i\"...cyclic...%n%n";
 // apertium:
 // ^word/word N SG/word V PRES$[apertium superblank markup]
@@ -371,7 +371,7 @@ lookup_printf(const char* format, const char* inputform,
              ++s)
           {
             lookup_len += s->size();
-            p = strdup(s->c_str());
+            p = strcpy(p, s->c_str());
             p += s->size();
           }
         *p = '\0';
@@ -386,6 +386,7 @@ lookup_printf(const char* format, const char* inputform,
       {
         space += 2 * strlen(markup);
       }
+    space += strlen("0.12345678901234567890");
     char* res = static_cast<char*>(calloc(sizeof(char), space + 1));
     size_t space_left = space;
     const char* src = format;
@@ -395,7 +396,11 @@ lookup_printf(const char* format, const char* inputform,
     char* b; // %b
     char* a; // %a
     char* m; // %m
-    float w = result->second; // %w
+    float w = 0.0f;
+    if (result != NULL)
+      {
+        w = result->second; // %w
+      }
     i = strdup(inputform);
     if (lookupform != NULL)
     {
@@ -910,15 +915,6 @@ void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLoo
 	    path, t.get_initial_state(),
 	    visited_states, epsilon_path, cycles);
 
-  // Print results here until the segfault in print_lookups has been fixed.
-  for (HfstLookupPaths::const_iterator it = results.begin(); it != results.end(); it++) {
-    for (HfstArcPath::const_iterator it2 = it->first.begin(); it2 != it->first.end(); it2++ ) {
-      if (it2->compare("@_EPSILON_SYMBOL_@") != 0)
-	fprintf(stderr, "%s", it2->c_str());
-    }
-    fprintf(stderr, "\t%f", it->second);
-    fprintf(stderr, "\n");
-  }
 }
 
 HfstLookupPaths*
@@ -1090,16 +1086,6 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
 
     // if transducer type is other than optimized_lookup,
     // convert to HfstMutableTransducer
-    if ( inputstream.get_type() != HFST_OL_TYPE && 
-	 inputstream.get_type() != HFST_OLW_TYPE )
-      {
-	for (unsigned int i=0; i<cascade.size(); i++) 
-	  {
-	    HfstMutableTransducer mut(cascade[i]);
-	    cascade_mut.push_back(mut);
-	  }
-	mutable_transducers=true;
-      }
 
     char* line = 0;
     size_t llen = 0;
@@ -1125,22 +1111,27 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
         HfstLookupPaths* kvs;
         try 
           {
-	    if (mutable_transducers) {
-	      kvs = perform_lookups<HfstMutableTransducer>(*kv, cascade_mut, unknown, &infinite);
-	    }
-	    else {
-	      kvs = perform_lookups<HfstTransducer>(*kv, cascade, unknown, &infinite);
-	    }
+            kvs = perform_lookups<HfstTransducer>(*kv, cascade, unknown,
+                                                  &infinite);
           }
         catch (hfst::exceptions::FunctionNotImplementedException)
           {
-            // TODO: implement compose and strings here
-            error(EXIT_FAILURE, 0, "Lookup not supported on this automata "
-                  "format\n"
-                  "Try compose and fst2strings instead\n");
-            return EXIT_FAILURE;
+            if (!mutable_transducers)
+              {
+                warning(0, 0, "Lookup not supported on this automata "
+                      "format: converting to internal format and trying\n");
+                for (unsigned int i=0; i<cascade.size(); i++) 
+                  {
+                    HfstMutableTransducer mut(cascade[i]);
+                    cascade_mut.push_back(mut);
+                  }
+                mutable_transducers = true;
+              }
+            kvs = perform_lookups<HfstMutableTransducer>(*kv, cascade_mut,
+                                                         unknown,
+                                                         &infinite);
           }
-	//print_lookups(*kvs, line, markup, unknown, infinite); TEST
+        print_lookups(*kvs, line, markup, unknown, infinite);
         delete kv;
         delete kvs;
       } // while lines in input
