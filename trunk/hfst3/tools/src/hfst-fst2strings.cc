@@ -92,6 +92,9 @@ print_usage()
     fprintf(message_out, "%-30s%s", "  -X, --out-exclude=STR",       "Ignore paths with an output string containing STR\n");
     
     fprintf(message_out, "\n");
+    fprintf(message_out, "Option -N overrides options -n and -c.\n");
+    fprintf(message_out, "\n");
+
     print_common_unary_program_parameter_instructions(message_out);
     fprintf(message_out,
         "\n"
@@ -253,11 +256,11 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
   while(instream.is_good())
   {
     if (!first_transducer)
-      outstream << "\n";
+      outstream << "--\n";
     first_transducer=false;
     
     HfstTransducer t(instream);
-    
+ 
     if(input_prefix != "")
       verbose_printf("input_prefix: '%s'\n", input_prefix.c_str());
     
@@ -286,7 +289,7 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
     else
       t.extract_strings(cb, cycles);
     
-    verbose_printf("Printed %i string(s)", cb.count);
+    verbose_printf("Printed %i string(s)\n", cb.count);
   }
     
   instream.close();
@@ -322,7 +325,7 @@ int main( int argc, char **argv ) {
         return EXIT_FAILURE;
     }
     
-    if (outfile == stdout)
+    if (outfile != stdout)
     {
       std::ofstream outstream(outfilename);
       retval = process_stream(*instream, outstream);

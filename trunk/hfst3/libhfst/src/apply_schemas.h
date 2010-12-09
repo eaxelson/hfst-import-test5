@@ -24,13 +24,11 @@ HfstTransducer &apply(
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *),
 #endif
-
 #if HAVE_FOO
  FooTransducer * (*foo_funct)(FooTransducer *),
 #endif
-
- bool foo /* makes sure there is always a parameter after the function pointer parameters,
-	   * so commas between parameters are easier to handle */
+ bool dummy /* makes sure there is always a parameter after the function pointer parameters,
+	     * so commas between parameters are easier to handle */
 );  
 
 HfstTransducer &apply(
@@ -43,6 +41,9 @@ HfstTransducer &apply(
 #endif
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *,int),
+#endif
+#if HAVE_FOO
+ FooTransducer * (*foo_funct)(FooTransducer *,int),
 #endif
  int n);
 
@@ -58,6 +59,9 @@ HfstTransducer &apply(
 #endif
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *, String, String),
+#endif
+#if HAVE_FOO
+ FooTransducer * (*foo_funct)(FooTransducer *, String, String),
 #endif
  String k1, String k2);
 
@@ -75,5 +79,8 @@ HfstTransducer &apply(
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *,
 		     fsm *),
+#endif
+#if HAVE_FOO
+ FooTransducer * (*foo_funct)(FooTransducer *, FooTransducer *),
 #endif
  HfstTransducer &another );

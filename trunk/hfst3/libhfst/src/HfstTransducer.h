@@ -32,6 +32,11 @@
 #include "implementations/FomaTransducer.h"
 #endif
 
+// A new transducer library
+#if HAVE_FOO
+#include "implementations/FooTransducer.h"
+#endif
+
 #include "HfstAlphabet.h"
 #include "implementations/HfstOlTransducer.h"
 #include "HfstTokenizer.h"
@@ -76,7 +81,7 @@ namespace hfst
   using hfst::implementations::FomaTransducer;
 #endif
 
-  // New transducer type
+  // A new transducer type
 #if HAVE_FOO
   using hfst::implementations::FooTransducer;
 #endif
@@ -201,7 +206,7 @@ tr1.disjunct(tr2);
     static hfst::implementations::HfstOlTransducer hfst_ol_interface;
 
 #if HAVE_FOO
-    static hfst::implementations::FooTransducer foo_interface;
+    static hfst::implementations::FooTransducer_ foo_interface;
 #endif
 
     ImplementationType type; // the backend implementation type of the transducer

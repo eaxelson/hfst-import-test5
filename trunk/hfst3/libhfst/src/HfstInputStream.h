@@ -120,7 +120,7 @@ delete in;
       OPENFST_, /* An OpenFst transducer, can cause problems if it does not have symbol tables. */
       SFST_,  /* An SFST transducer. */
       FOMA_, /* A foma transducer. */
-      // FOO_, /* A new type */
+      FOO_, /* A new type */
       ERROR_TYPE_ /* Transducer type not recognized. */
     };
 

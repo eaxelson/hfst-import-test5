@@ -17,25 +17,38 @@
 #include "HfstTransducer.h"
 namespace hfst
 {
+  // Whether weights or other information are lost in the conversion.
   bool HfstTransducer::is_safe_conversion(ImplementationType original, ImplementationType converted) {
+    if (original == converted)
+      return true;
     if (original == TROPICAL_OFST_TYPE && converted == LOG_OFST_TYPE) {
-      printf("TROPICAL -> LOG\n");
       return false;
     }
     if (original == LOG_OFST_TYPE && converted == TROPICAL_OFST_TYPE) {
-      printf("LOG -> TROPICAL\n");
       return false;
     }
     if (original == TROPICAL_OFST_TYPE || original == LOG_OFST_TYPE) {
       if (converted == SFST_TYPE) {
-	printf("WEIGHTED -> SFST\n");
 	return false;
       }
       if (converted == FOMA_TYPE) {
-	printf("WEIGHTED -> FOMA\n");
 	return false;
       }
     }
+#ifdef HAVE_FOO
+    if (original == FOO_TYPE) {
+      // From foo to weighted
+      if ( converted == TROPICAL_OFST_TYPE || converted == LOG_OFST_TYPE) {
+	return true;  // if foo supports weights
+	return false; // if foo does not support weights
+      }
+      // From foo to unweighted
+      else {
+	return true;  // if foo does not support weights
+	return false; // if foo supports weights
+      }
+    }
+#endif
     return true;
   }
 
@@ -50,11 +63,9 @@ namespace hfst
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *),
 #endif
-
 #if HAVE_FOO
  FooTransducer * (*foo_funct)(FooTransducer *),
 #endif
-
   bool foo )
     {
       (void)foo;
@@ -98,7 +109,6 @@ namespace hfst
 	  break;
 	}
 #endif
-
 #if HAVE_FOO
       case FOO_TYPE:
 	{
@@ -109,7 +119,6 @@ namespace hfst
 	  break;
 	}
 #endif
-
 	//case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
@@ -130,6 +139,9 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
 #endif
 #if HAVE_FOMA
    fsm * (*foma_funct)(fsm *,int n),
+#endif
+#if HAVE_FOO
+   FooTransducer * (*foo_funct)(FooTransducer *,int n),
 #endif
    int n )
   {
@@ -173,6 +185,16 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
 	  break;
     }
 #endif
+#if HAVE_FOO
+      case FOO_TYPE:
+	{
+      FooTransducer * foo_temp = 
+	    foo_funct(implementation.foo,n);
+	  delete (implementation.foo);
+	  implementation.foo = foo_temp;
+	  break;
+    }
+#endif
 	//case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
@@ -194,6 +216,9 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
 #endif
 #if HAVE_FOMA
    fsm * (*foma_funct)(fsm *, String, String),
+#endif
+#if HAVE_FOO
+   FooTransducer * (*foo_funct)(FooTransducer *, String, String),
 #endif
    String s1, String s2)
   {
@@ -237,6 +262,16 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
       break;
 	}
 #endif
+#if HAVE_FOO
+      case FOO_TYPE:
+	{
+      FooTransducer * foo_temp = 
+	    foo_funct(implementation.foo,s1,s2);
+	  delete(implementation.foo);
+	  implementation.foo = foo_temp;
+      break;
+	}
+#endif
 	//case UNSPECIFIED_TYPE:
 	case ERROR_TYPE:
 	default:
@@ -260,6 +295,10 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
 #if HAVE_FOMA
    fsm * (*foma_funct)(fsm *,
 				    fsm *),
+#endif
+#if HAVE_FOO
+   FooTransducer * (*foo_funct)(FooTransducer *,
+				    FooTransducer *),
 #endif
    HfstTransducer &another)
   {
@@ -307,6 +346,16 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
 	    foma_funct(implementation.foma,another.implementation.foma);
 	  delete implementation.foma;
 	  implementation.foma = foma_temp;
+	  break;
+	}
+#endif
+#if HAVE_FOO
+      case FOO_TYPE:
+	{
+	  FooTransducer * foo_temp = 
+	    foo_funct(implementation.foo,another.implementation.foo);
+	  delete implementation.foo;
+	  implementation.foo = foo_temp;
 	  break;
 	}
 #endif

@@ -44,6 +44,12 @@ namespace hfst
 	  new hfst::implementations::FomaOutputStream();
 	break;
 #endif
+#if HAVE_FOO
+      case FOO_TYPE:
+	implementation.foo = 
+	  new hfst::implementations::FooOutputStream();
+	break;
+#endif
       case HFST_OL_TYPE:
 	implementation.hfst_ol =
 	  new hfst::implementations::HfstOlOutputStream(false);
@@ -92,6 +98,12 @@ namespace hfst
 	  new hfst::implementations::FomaOutputStream(filename.c_str());
 	break;
 #endif
+#if HAVE_FOO
+      case FOO_TYPE:
+	implementation.foo =
+	  new hfst::implementations::FooOutputStream(filename.c_str());
+	break;
+#endif
       case HFST_OL_TYPE:
 	implementation.hfst_ol =
 	  new hfst::implementations::HfstOlOutputStream(filename.c_str(), false);
@@ -126,6 +138,11 @@ namespace hfst
 #if HAVE_FOMA
       case FOMA_TYPE:
 	delete implementation.foma;
+	break;
+#endif
+#if HAVE_FOO
+      case FOO_TYPE:
+	delete implementation.foo;
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -178,6 +195,11 @@ namespace hfst
 	implementation.foma->write(c);
 	break;
 #endif
+#if HAVE_FOO
+      case FOO_TYPE:
+	implementation.foo->write(c);
+	break;
+#endif
 #if HAVE_HFST_OL
 	implementation.hfst_ol->write(c);
 	break;
@@ -215,6 +237,11 @@ namespace hfst
 	type_value=std::string("FOMA");
 	break;
 #endif
+#if HAVE_FOO
+      case FOO_TYPE:
+	type_value=std::string("FOO");
+	break;
+#endif
       case HFST_OL_TYPE:
 	type_value=std::string("HFST_OL");
 	break;
@@ -245,7 +272,7 @@ namespace hfst
   HfstOutputStream &HfstOutputStream::operator<< (HfstTransducer &transducer)
   {
     if (type != transducer.type)
-      { throw hfst::exceptions::TransducerHasWrongTypeException(); }
+      { throw hfst::exceptions::TransducerHasWrongTypeException(); }  // message...
 
     /* Write the HFST header. The header has the following structure:
        
@@ -327,6 +354,11 @@ namespace hfst
 	  (transducer.implementation.foma);
 	return *this;
 #endif
+#if HAVE_FOO
+      case FOO_TYPE:
+	implementation.foo->write_transducer
+	  ((Foo::FooTransducer*)transducer.implementation.foo);
+#endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	implementation.hfst_ol->write_transducer
@@ -357,6 +389,11 @@ namespace hfst
 #if HAVE_FOMA
       case FOMA_TYPE:
 	implementation.foma->close();
+	break;
+#endif
+#if HAVE_FOO
+      case FOO_TYPE:
+	implementation.foo->close();
 	break;
 #endif
       case HFST_OL_TYPE:

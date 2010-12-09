@@ -27,7 +27,10 @@
 #include "ExtractStrings.h"
 
 /* Include all relevant header files of library Foo here */
-//#include ...
+#ifndef _FOOLIB_H_
+#define _FOOLIB_H_
+#include "foo/FooTransducer.h"
+#endif
 
 #include <cstdio>
 #include <string>
@@ -37,7 +40,9 @@
 namespace hfst { 
 namespace implementations
 {
-  //using namespace Foo;
+  /* If library FOO is written in namespace Foo, it must be visible
+     as hfst::implementations::Foo */
+  using namespace Foo;
 
   /* A class for reading binary FooTransducers from a stream. 
 
@@ -79,6 +84,8 @@ namespace implementations
     char stream_get();
     /* Put back a char to the stream. */
     void stream_unget(char c);
+    /* Extract n chars and ignore them. */
+    void ignore(unsigned int n);
 
     /* Optional: if you want to extract implementation specific data from the header. */
     bool set_implementation_specific_header_data(StringPairVector &data, unsigned int index);
@@ -119,14 +126,14 @@ namespace implementations
     void write(const char &c);
 
     /* Optional: if you want to store implementation specific data to the header. */
-    void append_implementation_specific_header_data(std::vector<char> &header, Transducer *t);
+    void append_implementation_specific_header_data(std::vector<char> &header, FooTransducer *t);
 
     /* Write a FooTransducer to the stream. */
     void write_transducer(FooTransducer * transducer);
   };
   
   /* A library class that contains operations for FooTransducers. */
-  class FooTransducer
+  class FooTransducer_
     {
     public:
       /* Create a transducer that does not recognise any string. */
@@ -177,7 +184,7 @@ namespace implementations
       /* A vector of transducers that each accept one string pair accepted by transducer t. t cannot be cyclic. */
       static std::vector<FooTransducer*> extract_paths(FooTransducer *t);
       /* TODO: document */
-      static void extract_strings(FooTransducer * t, hfst::ExtractStringsCb& callback, int cycles=-1, FdTable<SFST::Character>* fd=NULL, bool filter_fd=false);
+      static void extract_strings(FooTransducer * t, hfst::ExtractStringsCb& callback, int cycles=-1, FdTable<unsigned int>* fd=NULL, bool filter_fd=false);
 
       /* Create a transducer that accepts string pair of [ A:B* s A:B* t A:B* r A:B* i A:B* n A:B* g A:B* 1:2 A:B* ] 
 	 (where A and B are input and output symbol of symbol_pair) iff transducer t accepts string pair string1:string2. */
@@ -191,23 +198,38 @@ namespace implementations
       /* Create a transducer that accepts string pair string1:string3 iff t1 accepts string pair string1:string2
 	 and t2 accepts string pair string2:string3, where string2 is any string. */
       static FooTransducer * compose(FooTransducer * t1,
-			   FooTransducer * t2);
+				     FooTransducer * t2);
       /* Create a transducer that accepts a concatenation of any string pair accepted by t1
 	 and any string pair accepted by t2. */
       static FooTransducer * concatenate(FooTransducer * t1,
-			       FooTransducer * t2);
+					 FooTransducer * t2);
       /* Create a transducer that accepts any string pair accepted by t1 or t2. */
       static FooTransducer * disjunct(FooTransducer * t1,
-			    FooTransducer * t2);
+				      FooTransducer * t2);
       /* Create a transducer that accepts any string pair accepted by both t1 and t2. */
       static FooTransducer * intersect(FooTransducer * t1,
-			     FooTransducer * t2);
+				       FooTransducer * t2);
       /* Create a transducer that accepts any string pair accepted by t1 but not t2. */
       static FooTransducer * subtract(FooTransducer * t1,
-			    FooTransducer * t2);
+				      FooTransducer * t2);
 
-      /* */
-      static std::pair<Transducer*, Transducer*> harmonize(FooTransducer *t1, FooTransducer *t2, bool unknown_symbols_in_use=true);
+      /* Return a harmonized copy of transducers t1 and t2. 
+
+	 First, all string symbols that are found in t2's alphabet but not in t1's alphabet
+	 are added to the alphabet of t1 to the next free positions (numbers).
+	 Then a copy of t2 is created where the string-to-number mappings are the same as
+	 in t1.
+
+	 Next all unknown and identity symbols of t1 and t2 are expanded according to
+	 the alphabets of the transducers, i.e. an unknown or identity symbol in t2 is expanded 
+	 to a set of all symbols known to t1 but unknown to t2 and vice versa.
+	 
+	 Unknown and identity symbols are explained in more detail in (Ref.). 
+
+	 A false value of unknown_symbols_in_use may be used for optimization as no unknown
+	 or identoty expanding is needed in that case. */
+      static std::pair<FooTransducer*, FooTransducer*> harmonize(FooTransducer *t1, FooTransducer *t2,
+								 bool unknown_symbols_in_use=true);
 
       /* Whether transducers t1 an t2 are equivalent. */
       static bool are_equivalent(FooTransducer * t1, FooTransducer * t2);
@@ -215,12 +237,12 @@ namespace implementations
       static bool is_cyclic(FooTransducer * t);
       
       /* A table of FooTransitionNumbers that represent flag diacritics in transducer t. */
-      static FdTable<FooTransitionNumber>* get_flag_diacritics(FooTransducer * t);
+      static FdTable<unsigned int>* get_flag_diacritics(FooTransducer * t);
 
       /* Remove symbol symbol from the alphabet of transducer t. */
       static FooTransducer * remove_from_alphabet(FooTransducer *t, const std::string &symbol);
 
-      /* */
+      /* Disjunct t with a path transducer spv. */
       static FooTransducer * disjunct(FooTransducer * t, const StringPairVector &spv);
 
       /* Get all symbol pairs that occur in transitions of transducer t. */
