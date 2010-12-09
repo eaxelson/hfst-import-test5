@@ -39,7 +39,10 @@
 #endif
 
 #if HAVE_FOO
-//#include ... // include relevant header files here
+#ifndef _FOOLIB_H_
+#define _FOOLIB_H_
+#include "foo/FooTransducer.h"
+#endif
 #endif
 
 #include "HfstExceptions.h"
@@ -84,12 +87,11 @@ namespace hfst { namespace implementations {
 #endif
   
   /* Read an fsm * and return the equivalent transducer in
-     internal format. */
-  
+     internal format. */  
 #if HAVE_FOMA
   HfstInternalTransducer * foma_to_internal_hfst_format(struct fsm * t);
 #endif  
-  
+
   /* Read an fst::StdVectorFst * and return the equivalent transducer in
      internal format. */
 #if HAVE_OPENFST
@@ -140,6 +142,7 @@ namespace hfst { namespace implementations {
     hfst_ol::Transducer * hfst_internal_format_to_hfst_ol(HfstInternalTransducer * t, bool weighted);
 #endif
 
+    /* Read a transducer in internal format and return the equivalent FooTransducer. */
 #if HAVE_FOO
     Foo::FooTransducer * hfst_internal_format_to_foo(const HfstInternalTransducer * t);
 #endif

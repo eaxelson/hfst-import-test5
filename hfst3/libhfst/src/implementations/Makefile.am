@@ -33,11 +33,14 @@ endif
 if WANT_FOMA
 MAYBE_FOMA=FomaTransducer.cc
 endif
+if WANT_FOO
+MAYBE_FOO=FooTransducer.cc
+endif
 if WANT_HFSTOL
 MAYBE_HFSTOL=HfstOlTransducer.cc
 endif
 
-BRIDGE_SRCS=$(MAYBE_SFST) $(MAYBE_OPENFST) $(MAYBE_FOMA) $(MAYBE_HFSTOL)
+BRIDGE_SRCS=$(MAYBE_SFST) $(MAYBE_OPENFST) $(MAYBE_FOMA) $(MAYBE_FOO) $(MAYBE_HFSTOL)
 
 if WANT_HFSTOL
 HFST_OL_SRCS=\
@@ -57,7 +60,8 @@ implinclude_HEADERS = \
 		ConvertTransducerFormat.h \
 		FomaTransducer.h \
 		LogFstTrieFunctions.h LogWeightTransducer.h \
-		SfstTransducer.h TropicalWeightTransducer.h HfstOlTransducer.h HfstInternalTransducer.h
+		SfstTransducer.h TropicalWeightTransducer.h HfstOlTransducer.h HfstInternalTransducer.h \
+		FooTransducer.h
 
 
 if WANT_HFSTOL

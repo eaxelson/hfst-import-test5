@@ -43,13 +43,11 @@ namespace hfst
 	this->implementation.foma->ignore(n);
 	break;
 #endif
-
 #if HAVE_FOO
       case FOO_TYPE:
 	this->implementation.foo->ignore(n);
 	break;
 #endif
-
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	  this->implementation.hfst_ol->ignore(n);
@@ -85,7 +83,11 @@ namespace hfst
 	return this->implementation.foma->stream_get();
 	break;
 #endif
-
+#if HAVE_FOO
+      case FOO_TYPE:
+	return this->implementation.foo->stream_get();
+	break;
+#endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	  return this->implementation.hfst_ol->stream_get();
@@ -123,13 +125,15 @@ namespace hfst
 	this->implementation.foma->stream_unget(c);
 	break;
 #endif
-
+#if HAVE_FOO
+      case FOO_TYPE:
+	this->implementation.foo->stream_unget(c);
+	break;
+#endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	  return this->implementation.hfst_ol->stream_unget(c);
 	  break;
-
-
       default:
 	assert(false);
 	break;
@@ -207,6 +211,8 @@ namespace hfst
 	{
 	  t.implementation.tropical_ofst =
 	    this->implementation.tropical_ofst->read_transducer();
+
+	  // A special case: HFST version 2 transducer
 	  if (hfst_version_2_weighted_transducer) // an SFST alphabet follows
 	    {
 	      stream_get(); // UTF8
@@ -305,6 +311,12 @@ namespace hfst
 	  this->implementation.foma->read_transducer();
 	break;
 #endif
+#if HAVE_FOO
+      case FOO_TYPE:
+	t.implementation.foo =
+	  (hfst::implementations::FooTransducer*)this->implementation.foo->read_transducer();
+	break;
+#endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	t.implementation.hfst_ol =
@@ -358,11 +370,11 @@ namespace hfst
       case 'a':  // SFST
 	return SFST_;
 	break;
-	/*
-	  case 'f':  // Foo (replace 'f' byt the first char in a binary FooTransducer)
+#ifdef HAVE_FOO
+	  case 'f':  // Foo (replace 'f' with the first char in a binary FooTransducer)
 	    return FOO_;
 	    break;
-	 */
+#endif
       case 'P':
 	{
 	  // extract HFST version 2 header
@@ -431,14 +443,14 @@ namespace hfst
       type = TROPICAL_OFST_TYPE;
     else if (strcmp("LOG_OPENFST", header_data[1].second.c_str()) == 0 )
       type = LOG_OFST_TYPE;
+#if HAVE_FOO
+    else if (strcmp("FOO", header_data[1].second.c_str()) == 0 )
+      type = FOO_TYPE;
+#endif
     else if (strcmp("HFST_OL", header_data[1].second.c_str()) == 0 )
       type = HFST_OL_TYPE;
     else if (strcmp("HFST_OLW", header_data[1].second.c_str()) == 0 )
       type = HFST_OLW_TYPE;
-    /*
-      else if (strcmp("FOO_TYPE", header_data[1].second.c_str()) == 0 )
-        type = FOO_TYPE;
-     */
     else
       throw hfst::exceptions::TransducerHeaderException();
 
@@ -656,11 +668,11 @@ namespace hfst
       case FOMA_:
 	return FOMA_TYPE;
 	break;
-	/*
-	  case FOO_:
-	    return FOO_TYPE;
-	    break;
-	 */
+#if HAVE_FOO
+      case FOO_:
+	return FOO_TYPE;
+	break;
+#endif
       case ERROR_TYPE_:
       default:
 	return ERROR_TYPE;
@@ -704,7 +716,11 @@ namespace hfst
       implementation.foma = new hfst::implementations::FomaInputStream;
       break;
 #endif
-
+#if HAVE_FOO
+    case FOO_TYPE:
+      implementation.foo = new hfst::implementations::FooInputStream;
+      break;
+#endif
     case HFST_OL_TYPE:
       implementation.hfst_ol =
         new hfst::implementations::HfstOlInputStream(false);
@@ -765,7 +781,11 @@ namespace hfst
       implementation.foma = new hfst::implementations::FomaInputStream(filename);
       break;
 #endif
-
+#if HAVE_FOO
+    case FOO_TYPE:
+      implementation.foo = new hfst::implementations::FooInputStream(filename);
+      break;
+#endif
     case HFST_OL_TYPE:
       implementation.hfst_ol = new hfst::implementations::HfstOlInputStream(filename, false);
       break;
@@ -798,6 +818,11 @@ namespace hfst
 #if HAVE_FOMA
       case FOMA_TYPE:
 	delete implementation.foma;
+	break;
+#endif
+#if HAVE_FOO
+      case FOO_TYPE:
+	delete implementation.foo;
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -834,6 +859,11 @@ namespace hfst
 	implementation.foma->close();
 	break;
 #endif
+#if HAVE_FOO
+      case FOO_TYPE:
+	implementation.foo->close();
+	break;
+#endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	implementation.hfst_ol->close();
@@ -863,6 +893,11 @@ namespace hfst
 #if HAVE_FOMA
       case FOMA_TYPE:
 	return implementation.foma->is_eof();
+	break;
+#endif
+#if HAVE_FOO
+      case FOO_TYPE:
+	return implementation.foo->is_eof();
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -896,6 +931,11 @@ namespace hfst
 	return implementation.foma->is_bad();
 	break;
 #endif
+#if HAVE_FOO
+      case FOO_TYPE:
+	return implementation.foo->is_bad();
+	break;
+#endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	return implementation.hfst_ol->is_bad();
@@ -926,6 +966,11 @@ namespace hfst
 #if HAVE_FOMA
       case FOMA_TYPE:
 	return implementation.foma->is_good();
+	break;
+#endif
+#if HAVE_FOO
+      case FOO_TYPE:
+	return implementation.foo->is_good();
 	break;
 #endif
       case HFST_OL_TYPE:

@@ -23,6 +23,9 @@
 #if !DEBUG_MAIN
 namespace hfst
 {
+
+  // *** INTERFACES THROUGH WHICH THE BACKEND LIBRARIES ARE CALLED ***
+
 #if HAVE_SFST
   hfst::implementations::SfstTransducer HfstTransducer::sfst_interface;
 #endif
@@ -35,10 +38,12 @@ namespace hfst
 #if HAVE_FOMA
   hfst::implementations::FomaTransducer HfstTransducer::foma_interface;
 #endif
-
 #if HAVE_FOO
-  hfst::implementations::FooTransducer HfstTransducer::foo_interface;
+  hfst::implementations::FooTransducer_ HfstTransducer::foo_interface;
 #endif
+
+
+  // *** TESTING AND OPTIMIZATION FUNCTIONS... ***
 
   MinimizationAlgorithm minimization_algorithm=HOPCROFT;
   bool harmonize_smaller=false;
@@ -81,6 +86,23 @@ namespace hfst
   bool get_unknown_symbols_in_use() {
     return unknown_symbols_in_use; }
 
+  float HfstTransducer::get_profile_seconds(ImplementationType type)
+  {
+#if HAVE_SFST
+    if (type == SFST_TYPE)
+      return sfst_interface.get_profile_seconds();
+#endif
+#if HAVE_OPENFST
+    if (type == TROPICAL_OFST_TYPE)
+      return tropical_ofst_interface.get_profile_seconds();
+#endif
+    return 0;
+  }
+
+  // *** ...TESTING AND OPTIMIZATION FUNCTIONS ENDS ***
+
+
+  // used only for SFST_TYPE
   StringPairSet HfstTransducer::get_symbol_pairs()
   {
 #if HAVE_SFST
@@ -90,6 +112,10 @@ namespace hfst
 #endif
       throw hfst::exceptions::FunctionNotImplementedException();
   }
+
+
+
+  // *** HARMONIZATION FUNCTIONS... ***
 
   /* Insert to unknown1 strings that are found in s2 but not in s1 and vice versa. */
   void collect_unknown_sets(StringSet &s1, StringSet &unknown1,
@@ -207,8 +233,12 @@ namespace hfst
       }
   }
 
-  // TODO: add HfstOlTransducer implementations when they are ready.
+  // *** ...HARMONIZATION FUNCTIONS ENDS ***
 
+
+  // *** LOOKUP FUNCTIONS... Implemented only for HFST_OL and HFST_OLW transducers ***
+
+  // TODO: add HfstOlTransducer implementations when they are ready.
   void HfstTransducer::lookup(HfstLookupPaths& results, const HfstLookupPath& s,
 			      ssize_t limit) {
     (void)results;
@@ -268,8 +298,10 @@ namespace hfst
     throw hfst::exceptions::FunctionNotImplementedException();
   }
 
+  // *** ...LOOKUP FUNCTIONS ENDS ***
 
-  // *** Transducer constructors and destructor *** //
+
+  // *** Transducer constructors and destructor... *** //
 
   HfstTransducer::HfstTransducer():
     type(ERROR_TYPE),anonymous(false),is_trie(true), name("")
@@ -291,7 +323,6 @@ namespace hfst
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
-	//case UNSPECIFIED_TYPE:
 	implementation.tropical_ofst = 
 	  tropical_ofst_interface.create_empty_transducer();
 	this->type = TROPICAL_OFST_TYPE;
@@ -306,13 +337,11 @@ namespace hfst
 	implementation.foma = foma_interface.create_empty_transducer();
 	break;
 #endif
-
 #if HAVE_FOO
       case FOO_TYPE:
 	implementation.foo = foo_interface.create_empty_transducer();
 	break;
 #endif
-
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	implementation.hfst_ol = hfst_ol_interface.create_empty_transducer(type==HFST_OLW_TYPE?true:false);
@@ -344,7 +373,6 @@ namespace hfst
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
-	//case UNSPECIFIED_TYPE:
 	implementation.tropical_ofst = 
 	  tropical_ofst_interface.define_transducer(*spv);
 	this->type = TROPICAL_OFST_TYPE;
@@ -365,19 +393,6 @@ namespace hfst
 	throw hfst::exceptions::TransducerHasWrongTypeException();
       }
     delete spv;
-  }
-
-  float HfstTransducer::get_profile_seconds(ImplementationType type)
-  {
-#if HAVE_SFST
-    if (type == SFST_TYPE)
-      return sfst_interface.get_profile_seconds();
-#endif
-#if HAVE_OPENFST
-    if (type == TROPICAL_OFST_TYPE)
-      return tropical_ofst_interface.get_profile_seconds();
-#endif
-    return 0;
   }
 
   HfstTransducer::HfstTransducer(const StringPairVector & spv, ImplementationType type):
@@ -667,14 +682,6 @@ namespace hfst
       }
   }
 
-  void HfstTransducer::set_name(std::string &name) {
-    this->name = name;
-  }
-   
-  std::string HfstTransducer::get_name() {
-    return this->name;
-  }
-
 
 HfstTransducer::HfstTransducer(const std::string &symbol, ImplementationType type): 
   type(type),anonymous(false),is_trie(false), name("")
@@ -748,10 +755,20 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
       }
   }
 
+  // *** ...Transducer constructors and destructor ends *** //
+
+
+  // *** Set and get transducer attributes... *** //
 
   ImplementationType HfstTransducer::get_type(void) const {
-    return this->type;
-  }
+    return this->type; }
+  void HfstTransducer::set_name(std::string &name) {
+    this->name = name; }   
+  std::string HfstTransducer::get_name() {
+    return this->name; }
+
+  // *** ...Set and get transducer attributes ends *** //
+
 
   bool HfstTransducer::compare(const HfstTransducer &another) const
   {
@@ -790,43 +807,6 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
       }
 
   }
-
-  /*  bool HfstTransducer::are_equivalent(const HfstTransducer &one, const HfstTransducer &another) 
-  {
-    if (one.type != another.type)
-      throw hfst::exceptions::TransducerTypeMismatchException();
-    
-    HfstTransducer one_copy(one);
-    HfstTransducer another_copy(another);
-    one_copy.harmonize(another_copy);
-    one_copy.minimize();
-    another_copy.minimize();
-
-    switch (one_copy.type)
-      {
-#if HAVE_SFST
-      case SFST_TYPE:
-	return one_copy.sfst_interface.are_equivalent(
-                 one_copy.implementation.sfst, another_copy.implementation.sfst);
-#endif
-#if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
-	return one_copy.tropical_ofst_interface.are_equivalent(
-                 one_copy.implementation.tropical_ofst, another_copy.implementation.tropical_ofst);
-      case LOG_OFST_TYPE:
-	return one_copy.log_ofst_interface.are_equivalent(
-                 one_copy.implementation.log_ofst, another_copy.implementation.log_ofst);
-#endif
-#if HAVE_FOMA
-      case FOMA_TYPE:
-	return one_copy.foma_interface.are_equivalent(
-                 one_copy.implementation.foma, another_copy.implementation.foma);
-#endif
-      case ERROR_TYPE:
-      default:
-	throw hfst::exceptions::TransducerHasWrongTypeException();
-      }
-      }*/
   
   bool HfstTransducer::is_cyclic(void) const
   {
@@ -869,11 +849,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #if HAVE_FOMA
        &hfst::implementations::FomaTransducer::remove_epsilons,
 #endif
-
 #if HAVE_FOO
-       &hfst::implementations::FooTransducer::remove_epsilons,
+       &hfst::implementations::FooTransducer_::remove_epsilons,
 #endif
-
        false ); }
 
   HfstTransducer &HfstTransducer::determinize()
@@ -888,6 +866,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #endif
 #if HAVE_FOMA
        &hfst::implementations::FomaTransducer::determinize,
+#endif
+#if HAVE_FOO
+       &hfst::implementations::FooTransducer_::determinize,
 #endif
        false ); } 
 
@@ -904,6 +885,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #if HAVE_FOMA
        &hfst::implementations::FomaTransducer::minimize,
 #endif
+#if HAVE_FOO
+       &hfst::implementations::FooTransducer_::minimize,
+#endif
        false ); } 
 
   HfstTransducer &HfstTransducer::repeat_star()
@@ -918,6 +902,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #endif
 #if HAVE_FOMA
        &hfst::implementations::FomaTransducer::repeat_star,
+#endif
+#if HAVE_FOO
+       &hfst::implementations::FooTransducer_::repeat_star,
 #endif
        false ); }  
 
@@ -934,6 +921,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #if HAVE_FOMA
        &hfst::implementations::FomaTransducer::repeat_plus,
 #endif
+#if HAVE_FOO
+       &hfst::implementations::FooTransducer_::repeat_plus,
+#endif
        false ); }  
 
   HfstTransducer &HfstTransducer::repeat_n(unsigned int n)
@@ -948,6 +938,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #endif
 #if HAVE_FOMA
        &hfst::implementations::FomaTransducer::repeat_n,
+#endif
+#if HAVE_FOO
+       &hfst::implementations::FooTransducer_::repeat_n,
 #endif
        (int)n ); }  
 
@@ -970,6 +963,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #if HAVE_FOMA
        &hfst::implementations::FomaTransducer::repeat_le_n,
 #endif
+#if HAVE_FOO
+       &hfst::implementations::FooTransducer_::repeat_le_n,
+#endif
        (int)n ); }   
 
   HfstTransducer &HfstTransducer::repeat_n_to_k(unsigned int n, unsigned int k)
@@ -991,6 +987,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #if HAVE_FOMA
        &hfst::implementations::FomaTransducer::optionalize,
 #endif
+#if HAVE_FOO
+       &hfst::implementations::FooTransducer_::optionalize,
+#endif
        false ); }   
 
   HfstTransducer &HfstTransducer::invert()
@@ -1005,6 +1004,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #endif
 #if HAVE_FOMA
        &hfst::implementations::FomaTransducer::invert,
+#endif
+#if HAVE_FOO
+       &hfst::implementations::FooTransducer_::invert,
 #endif
        false ); }    
 
@@ -1021,6 +1023,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #if HAVE_FOMA
        &hfst::implementations::FomaTransducer::reverse,
 #endif
+#if HAVE_FOO
+       &hfst::implementations::FooTransducer_::reverse,
+#endif
        false ); }    
 
   HfstTransducer &HfstTransducer::input_project()
@@ -1036,6 +1041,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #if HAVE_FOMA
        &hfst::implementations::FomaTransducer::extract_input_language,
 #endif
+#if HAVE_FOO
+       &hfst::implementations::FooTransducer_::extract_input_language,
+#endif
        false ); }    
 
   HfstTransducer &HfstTransducer::output_project()
@@ -1050,6 +1058,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #endif
 #if HAVE_FOMA
        &hfst::implementations::FomaTransducer::extract_output_language,
+#endif
+#if HAVE_FOO
+       &hfst::implementations::FooTransducer_::extract_output_language,
 #endif
        false ); }    
 
@@ -1094,6 +1105,11 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #if HAVE_FOMA
       case FOMA_TYPE:
 	hfst::implementations::FomaTransducer::extract_strings(implementation.foma, callback, cycles);
+	break;
+#endif
+#if HAVE_FOO
+      case FOO_TYPE:
+	hfst::implementations::FooTransducer_::extract_strings(implementation.foo, callback, cycles);
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -1144,6 +1160,11 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	  hfst::implementations::FomaTransducer::extract_strings(implementation.foma, callback, cycles, t_foma, filter_fd);
 	  delete t_foma;
       }
+	break;
+#endif
+#if HAVE_FOO
+      case FOO_TYPE:
+	throw hfst::exceptions::FunctionNotImplementedException(); 
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -1218,16 +1239,6 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	  hfst::implementations::FomaTransducer::insert_freely
 	    (implementation.foma,symbol_pair);
 	    break;
-	    /*
-	  hfst::implementations::HfstInternalTransducer * internal_transducer = 
-	    hfst::implementations::foma_to_internal_hfst_format(implementation.foma);
-	  this->foma_interface.delete_foma(implementation.foma);
-	  internal_transducer->insert_freely(symbol_pair);
-	  implementation.foma = 
-	    hfst::implementations::hfst_internal_format_to_foma(internal_transducer);
-	  delete internal_transducer;
-	  break;
-	    */
 	}
 #endif
 #if HAVE_SFST
@@ -1239,6 +1250,14 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	  delete implementation.sfst;
 	  implementation.sfst = temp;
 	  break;
+	}
+#endif
+#if HAVE_FOO
+      case FOO_TYPE:
+	{
+	  hfst::implementations::FooTransducer_::insert_freely
+	    (implementation.foo,symbol_pair);
+	    break;
 	}
 #endif
       default:
@@ -1293,6 +1312,19 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	  this->log_ofst_interface.substitute(implementation.log_ofst,func);
 	delete implementation.log_ofst;
 	implementation.log_ofst = log_ofst_temp;
+	return *this;
+      }
+#endif
+#if HAVE_FOO
+    if (this->type == FOO_TYPE)
+      {
+	hfst::implementations::HfstInternalTransducer * internal_transducer = 
+	  hfst::implementations::foo_to_internal_hfst_format((Foo::FooTransducer*)implementation.foo);
+	delete(implementation.foo);
+	internal_transducer->substitute(func);
+	implementation.foo = 
+	  (hfst::implementations::FooTransducer*)hfst::implementations::hfst_internal_format_to_foo(internal_transducer);
+	delete internal_transducer;
 	return *this;
       }
 #endif
@@ -1484,9 +1516,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 
     bool harm = harmonize_smaller;
     harmonize_smaller=false;
-    //fprintf(stderr,"HARMONIZING...\n");
     this->harmonize(transducer);
-    //fprintf(stderr,"...HARMONIZED\n");
     harmonize_smaller=harm;
 
 #if HAVE_FOMA
@@ -1642,6 +1672,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
       {
 	if (DEBUG) printf("substituting for composition..\n");
 
+	// comment...
 	this->substitute("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",false,true);
 	(const_cast<HfstTransducer&>(another)).substitute("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",true,false);
 
@@ -1701,6 +1732,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
       {
 	if (DEBUG) printf("substituting after composition..\n");
 
+	// comment...
 	this->substitute(*substitute_single_identity_with_unknown);
 	(const_cast<HfstTransducer&>(another)).substitute(*substitute_unknown_identity_pairs);
 
@@ -1756,6 +1788,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #if HAVE_FOMA
 		 &hfst::implementations::FomaTransducer::concatenate,
 #endif
+#if HAVE_FOO
+		 &hfst::implementations::FooTransducer_::concatenate,
+#endif
 		 const_cast<HfstTransducer&>(another)); }
 
   HfstTransducer &HfstTransducer::disjunct(const StringPairVector &spv)
@@ -1778,12 +1813,18 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
       case FOMA_TYPE:
 	throw hfst::exceptions::FunctionNotImplementedException();
 	break;
+#if HAVE_FOO
+      case FOO_TYPE:
+	foo_interface.disjunct(implementation.foo, spv);
+	break;
+#endif
       default:
 	assert(false);
       }
     return *this; 
   }
 
+  // TODO...
   HfstTransducer &HfstTransducer::disjunct_as_tries(HfstTransducer &another,
 						    ImplementationType type)
   {
@@ -1875,6 +1916,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #if HAVE_FOMA
 		 &hfst::implementations::FomaTransducer::disjunct,
 #endif
+#if HAVE_FOO
+		 &hfst::implementations::FooTransducer_::disjunct,
+#endif
 		 const_cast<HfstTransducer&>(another)); }
 
   HfstTransducer &HfstTransducer::intersect
@@ -1891,6 +1935,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #if HAVE_FOMA
 		 &hfst::implementations::FomaTransducer::intersect,
 #endif
+#if HAVE_FOO
+		 &hfst::implementations::FooTransducer_::intersect,
+#endif
 		 const_cast<HfstTransducer&>(another)); }
 
   HfstTransducer &HfstTransducer::subtract
@@ -1906,6 +1953,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #endif
 #if HAVE_FOMA
 		 &hfst::implementations::FomaTransducer::subtract,
+#endif
+#if HAVE_FOO
+		 &hfst::implementations::FooTransducer_::subtract,
 #endif
 		 const_cast<HfstTransducer&>(another)); }
 
@@ -1944,6 +1994,10 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
     if (type == TROPICAL_OFST_TYPE || type == LOG_OFST_TYPE)
       return false;
 #endif
+#if !HAVE_FOO
+    if (type == FOO_TYPE)
+      return false;
+#endif
     (void)type; 
     return true;
   }
@@ -1967,6 +2021,13 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	    internal =
 	      hfst::implementations::foma_to_internal_hfst_format(implementation.foma);
 	    foma_interface.delete_foma(implementation.foma);
+	    break;
+#endif
+#if HAVE_FOO
+	  case FOO_TYPE:
+	    internal =
+	      hfst::implementations::foo_to_internal_hfst_format((Foo::FooTransducer*)implementation.foo);
+	    delete(implementation.foo);
 	    break;
 #endif
 #if HAVE_SFST
@@ -2007,6 +2068,13 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	  case SFST_TYPE:
 	    implementation.sfst = 
 	      hfst::implementations::hfst_internal_format_to_sfst(internal);
+	    delete internal;
+	    break;
+#endif
+#if HAVE_FOO
+	  case FOO_TYPE:
+	    implementation.foo = 
+	      (hfst::implementations::FooTransducer*)hfst::implementations::hfst_internal_format_to_foo(internal);
 	    delete internal;
 	    break;
 #endif
@@ -2058,6 +2126,7 @@ void HfstTransducer::write_in_att_format(const char * filename, bool print_weigh
 
 void HfstTransducer::write_in_att_format(FILE * ofile, bool print_weights) const
 {
+  // Implemented only for internal transducer format.
   hfst::implementations::HfstInternalTransducer internal_transducer(*this);
   internal_transducer.print_symbol(ofile, print_weights);
 }
@@ -2067,10 +2136,12 @@ HfstTransducer::HfstTransducer(FILE * ifile, ImplementationType type, const std:
 {
   if (not is_implementation_type_available(type))
     throw hfst::exceptions::ImplementationTypeNotAvailableException();
+  // Implemented only for internal transducer format.
   hfst::implementations::HfstInternalTransducer * internal_transducer = new hfst::implementations::HfstInternalTransducer();
   internal_transducer->alphabet = new hfst::implementations::HfstAlphabet();
   internal_transducer->read_symbol(ifile, epsilon_symbol);
 
+  // Conversion is done here.
   switch (type)
       {
 #if HAVE_SFST
@@ -2090,6 +2161,11 @@ HfstTransducer::HfstTransducer(FILE * ifile, ImplementationType type, const std:
 #if HAVE_FOMA
       case FOMA_TYPE:
 	implementation.foma = hfst_internal_format_to_foma(internal_transducer);
+	break;
+#endif
+#if HAVE_FOO
+      case FOO_TYPE:
+	implementation.foo = (hfst::implementations::FooTransducer*)hfst_internal_format_to_foo(internal_transducer);
 	break;
 #endif
       // case UNSPECIFIED_TYPE:
@@ -2130,7 +2206,7 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
   if (&another == this)
     { return *this; }
   
-  // set some features and the key table.
+  // set some features
   anonymous = another.anonymous;
   is_trie = another.is_trie;
   
@@ -2153,6 +2229,11 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
       break;
     case LOG_OFST_TYPE:
       delete implementation.log_ofst;
+      break;
+#endif
+#if HAVE_FOO
+    case FOO_TYPE:
+      delete implementation.foo;
       break;
 #endif
     // case UNSPECIFIED_TYPE:
@@ -2191,6 +2272,12 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
 	log_ofst_interface.copy(another_1.implementation.log_ofst);
       break;
 #endif
+#if HAVE_FOO
+    case FOO_TYPE:
+      implementation.foo =
+	foo_interface.copy(another_1.implementation.foo);
+      break;
+#endif
     default:
       (void)1;
     }
@@ -2198,6 +2285,7 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
 
 }
 
+// document... 
   HfstTokenizer HfstTransducer::create_tokenizer() 
   {
     HfstTokenizer tok;
@@ -2242,6 +2330,7 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
 
 std::ostream &operator<<(std::ostream &out,HfstTransducer &t)
   {
+    // Implemented only for internal transducer format.
     hfst::implementations::HfstInternalTransducer internal_transducer(t);
     bool write_weights;
     if (t.type == SFST_TYPE || t.type == FOMA_TYPE)

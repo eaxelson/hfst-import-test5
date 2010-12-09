@@ -56,8 +56,8 @@ static bool has_spaces=false;
 static bool disjunct_strings=false;
 static bool pairstrings=false;
 
-static unsigned int sum_of_weights=0;
-static bool sum_weights=false;
+static float sum_of_weights=0;
+//static bool sum_weights=false;
 static bool normalize_weights=false;
 static bool logarithmic_weights=false;
 
@@ -71,6 +71,11 @@ float divide_by_sum_of_weights(float weight) {
     return 0;
   return weight/sum_of_weights;
 }
+float divide_by_sum_of_weights_log(float weight) {
+  if (sum_of_weights == 0)
+    return weight;
+  return weight + log(sum_of_weights);
+}
 float take_negative_logarithm(float weight) {
   float result;
   if (weight == 0)
@@ -78,7 +83,7 @@ float take_negative_logarithm(float weight) {
   else
     {
       errno = 0;
-      result = -log10(weight);
+      result = -log(weight);
       if (errno != 0)
         {
           error(EXIT_FAILURE, errno, "unable to take negative logarithm");
@@ -100,23 +105,25 @@ print_usage()
                 "  -f, --format=FMT          Write result in FMT format\n"
                 "  -j, --disjunct-strings    Disjunct all strings instead of "
                     "transforming each string into a separate transducer\n"
-                "      --sum                 Sum weights of duplicate strings "
-                    "instead of taking minimum\n"
+                /*"      --sum                 Sum weights of duplicate strings "
+		  "instead of taking minimum\n"*/
                 "      --norm                Divide each weight by sum "
-                    "of all weights\n"
+                    "of all weights (with option -j)\n"
                 "      --log                 Take negative logarithm "
                     "of each weight\n"
                 "  -p, --pairstring          Input is in pairstring format\n"
                 "  -S, --spaces              Input has spaces between "
                     "transitions\n"
-                "  -e, --epsilon=EPS         Map EPS as zero.\n");
+                "  -e, --epsilon=EPS         How epsilon is represented.\n");
         fprintf(message_out, "\n");
 
         fprintf(message_out, 
             "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
             "FMT must be name of a format usable by libhfst, such as "
             "openfst-tropical, sfst or foma\n"
-            "If EPS is not defined, the default representation of @0@ is used\n"
+            "If EPS is not defined, the default representation of @0@ is used.\n"
+	    "Option --log precedes option --norm.\n"
+	    "\n"
             );
 
         /*fprintf(message_out,
@@ -159,7 +166,7 @@ parse_options(int argc, char** argv)
         HFST_GETOPT_UNARY_LONG,
           {"disjunct-strings", no_argument, 0, 'j'},
           {"epsilon", required_argument, 0, 'e'},
-          {"sum", no_argument, 0, '1'},
+	//{"sum", no_argument, 0, '1'},
           {"norm", no_argument, 0, '2'},
           {"log", no_argument, 0, '3'},
           {"pairstrings", no_argument, 0, 'p'},
@@ -170,7 +177,7 @@ parse_options(int argc, char** argv)
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "je:123pSf:R:",
+                             HFST_GETOPT_UNARY_SHORT "je:23pSf:R:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -184,9 +191,9 @@ parse_options(int argc, char** argv)
         case 'e':
             epsilonname = hfst_strdup(optarg);
             break;
-        case '1':
-            sum_weights = true;
-            break;
+	    //case '1':
+            //sum_weights = true;
+            //break;
         case '2':
             normalize_weights = true;
             break;
@@ -260,7 +267,7 @@ process_stream(HfstOutputStream& outstream)
         {
 	  // change '\n' to '\0'
 	  char *p = tab;
-	  while (p != '\0') {
+	  while (*p != '\0') {
 	    if (*p == '\n')
 	      *p = '\0';
 	    p++;
@@ -349,7 +356,12 @@ process_stream(HfstOutputStream& outstream)
         }
       if (weighted)
         {
-          parsed.set_final_weights(weight);
+	  sum_of_weights = sum_of_weights + weight;
+
+	  if (!logarithmic_weights)
+	    parsed.set_final_weights(weight);
+	  else
+	    parsed.set_final_weights(take_negative_logarithm(weight));
         }
       if (!disjunct_strings)
         {
@@ -362,6 +374,12 @@ process_stream(HfstOutputStream& outstream)
     }
   if (disjunct_strings)
     {
+      if (normalize_weights) {
+	if (!logarithmic_weights)
+	  disjunction.transform_weights(&divide_by_sum_of_weights);
+	else
+	  disjunction.transform_weights(&divide_by_sum_of_weights_log);
+      }
       outstream << disjunction;
     }
   free(line);
