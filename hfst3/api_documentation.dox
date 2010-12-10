@@ -48,16 +48,36 @@
 
       \section adding_library Adding your own library under the HFST interface
 
-      Suppose your library is named Foo, and the transducer class FooTransducer.
+      a very simple transducer library 
+      in directory new_library
+      My Finite-State Transducer Library - MFSTL
+      a transducer class MyFst that contains some functions
+      written in namespace mfstl
+      
+      See file README for installation of the MFSTL library.
+
+\verbatim      
+      make && make libinstall
+\endverbatim
+
+      should be enough
+
+      If you want to use the library in HFST,
+
+\verbatim
+      ./configure --with-mfstl=true
+\endverbatim
+
+      By default the MFSTL library is not installed or linked to HFST.
 
       \section The backend implementation
 
       in directory libhfst/src/implementations there are skeleton files
-      FooTransducer.h and FooTransducer.cc. File FooTransducer.h declares classes
-      FooTransducer, FooInputStream and FooOutputStream. Class FooTransducer contains
-      static functions that operate on FooTransducers. Classes FooInputStream and FooOutputStream
+      MfstlTransducer.h and MfstlTransducer.cc. File MfstlTransducer.h declares classes
+      MfstlTransducer, MfstlInputStream and MfstlOutputStream. Class MfstlTransducer contains
+      static functions that operate on MyFsts. Classes MfstlInputStream and MfstlOutputStream
       represent input and output streams to files or standard streams. They are used
-      for reading or writing binary transducers to/from streams.
+      for reading or writing MyFst binary transducers to/from streams.
 
       \section How HFST can access the backend implementation
 

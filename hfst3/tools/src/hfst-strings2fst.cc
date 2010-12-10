@@ -50,6 +50,10 @@ using std::pair;
 using hfst::HfstOutputStream;
 using hfst::HfstTokenizer;
 using hfst::HfstTransducer;
+using hfst::HfstMutableTransducer;
+using hfst::implementations::HfstTrie;
+using hfst::StringPairVector;
+using hfst::StringPair;
 
 static char *epsilonname=NULL;
 static bool has_spaces=false;
@@ -60,9 +64,6 @@ static float sum_of_weights=0;
 //static bool sum_weights=false;
 static bool normalize_weights=false;
 static bool logarithmic_weights=false;
-
-static char* symbolfilename = 0;
-static FILE* symbolfile = 0;
 
 static hfst::ImplementationType output_format = hfst::UNSPECIFIED_TYPE;
 
@@ -172,12 +173,11 @@ parse_options(int argc, char** argv)
           {"pairstrings", no_argument, 0, 'p'},
           {"spaces", no_argument, 0, 'S'},
           {"format", required_argument, 0, 'f'},
-          {"read-symbols", required_argument, 0, 'R'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "je:23pSf:R:",
+                             HFST_GETOPT_UNARY_SHORT "je:23pSf:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -212,10 +212,6 @@ parse_options(int argc, char** argv)
         case 'f':
             output_format = hfst_parse_format_name(optarg);
             break;
-        case 'R':
-            symbolfilename = hfst_strdup(optarg);
-            symbolfile = hfst_fopen(optarg, "r");
-            break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -243,8 +239,9 @@ process_stream(HfstOutputStream& outstream)
   char* line = 0;
   size_t len = 0;
   HfstTokenizer tok;
-  HfstTransducer disjunction(output_format);
+  //HfstTransducer disjunction(output_format);
   //outstream.open();
+  HfstTrie disjunction;
   size_t line_n = 0;
   while (hfst_getline(&line, &len, inputfile) != -1)
     {
@@ -278,7 +275,8 @@ process_stream(HfstOutputStream& outstream)
         }
       *string_end = '\0';
       //HfstTransducer parsed(0, output_format);
-      HfstTransducer parsed("@_EPSILON_SYMBOL_@", output_format);
+      //HfstTransducer parsed("@_EPSILON_SYMBOL_@", output_format);
+      StringPairVector spv;
       if (has_spaces && pairstrings)
         {
           char* pair = strtok(line, " ");
@@ -294,13 +292,15 @@ process_stream(HfstOutputStream& outstream)
                 {
                   char* upper = hfst_strndup(pair, colon - pair);
                   char* lower = hfst_strndup(colon, pair_end - colon);
-                  HfstTransducer new_pair(upper, lower, output_format);
-                  parsed.concatenate(new_pair).minimize();
+                  //HfstTransducer new_pair(upper, lower, output_format);
+                  //parsed.concatenate(new_pair).minimize();
+		  spv.push_back(StringPair(std::string(upper), std::string(lower)));
                 }
               else
                 {
-                  HfstTransducer new_pair(pair, output_format);
-                  parsed.concatenate(new_pair).minimize();
+                  //HfstTransducer new_pair(pair, output_format);
+                  //parsed.concatenate(new_pair).minimize();
+		  spv.push_back(StringPair(std::string(pair), std::string(pair)));
                 }
               strtok(NULL, " ");
             }
@@ -310,8 +310,9 @@ process_stream(HfstOutputStream& outstream)
           char* pair = strtok(line, " ");
           while (pair != NULL)
             {
-              HfstTransducer new_pair(pair, output_format);
-              parsed.concatenate(new_pair).minimize();
+              //HfstTransducer new_pair(pair, output_format);
+              //parsed.concatenate(new_pair).minimize();
+	      spv.push_back(StringPair(std::string(pair), std::string(pair)));
               pair = strtok(NULL, " ");
             }
         }
@@ -322,6 +323,9 @@ process_stream(HfstOutputStream& outstream)
         }
       else if (!has_spaces && !pairstrings)
         {
+          fprintf(stderr, "FIXME: unimplemented !has_spaces && !pairstrings\n");
+          return EXIT_FAILURE;
+
           const char* colon = strstr(line, ":");
           while (colon != NULL)
             {
@@ -352,35 +356,52 @@ process_stream(HfstOutputStream& outstream)
               first = hfst_strndup(line, string_end-line);
               second = first;
             }
-          parsed = HfstTransducer(first, second, tok, output_format);
+          //parsed = HfstTransducer(first, second, tok, output_format);
         }
+
+      float path_weight=0;
+
       if (weighted)
         {
 	  sum_of_weights = sum_of_weights + weight;
 
-	  if (!logarithmic_weights)
-	    parsed.set_final_weights(weight);
-	  else
-	    parsed.set_final_weights(take_negative_logarithm(weight));
+	  if (!logarithmic_weights) {
+	    //parsed.set_final_weights(weight);
+	    path_weight=weight;
+	  }
+	  else {
+	    //parsed.set_final_weights(take_negative_logarithm(weight));
+	    path_weight=take_negative_logarithm(weight);
+	  }
         }
+
       if (!disjunct_strings)
         {
-          outstream << parsed;
+          //outstream << parsed;
+	  HfstTrie tr;
+	  tr.add_path(spv, path_weight);
+	  HfstMutableTransducer mut(tr);
+	  HfstTransducer res(mut, output_format);
+	  outstream << res;
         }
       else
         {
-          disjunction.disjunct(parsed);
+          //disjunction.disjunct(parsed);
+	  disjunction.add_path(spv, path_weight);
         }
     }
   if (disjunct_strings)
     {
+      HfstMutableTransducer mut(disjunction);
+      HfstTransducer res(mut, output_format);
+
       if (normalize_weights) {
 	if (!logarithmic_weights)
-	  disjunction.transform_weights(&divide_by_sum_of_weights);
+	  res.transform_weights(&divide_by_sum_of_weights);
 	else
-	  disjunction.transform_weights(&divide_by_sum_of_weights_log);
+	  res.transform_weights(&divide_by_sum_of_weights_log);
       }
-      outstream << disjunction;
+      outstream << res;
     }
   free(line);
   return EXIT_SUCCESS;
@@ -395,11 +416,7 @@ int main( int argc, char **argv )
     {
       return retval;
     }
-  // close buffers, we use streams
-  if (inputfile != stdin)
-    {
-      fclose(inputfile);
-    }
+  // close output buffers, we use output streams
   if (outfile != stdout)
     {
       fclose(outfile);

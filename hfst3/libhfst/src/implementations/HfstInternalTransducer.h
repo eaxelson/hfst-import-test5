@@ -24,6 +24,7 @@ namespace hfst {
     class HfstTrieState {
     public:
       bool final;
+      float weight;
       unsigned int state_number;
       std::set< std::pair < std::pair<unsigned int, unsigned int>, HfstTrieState * > > transitions;
 
@@ -43,7 +44,7 @@ namespace hfst {
 
       HfstTrie();
       ~HfstTrie();
-      void add_path(const StringPairVector &spv);
+      void add_path(const StringPairVector &spv, float weight=0);
       void print();
     };
 
