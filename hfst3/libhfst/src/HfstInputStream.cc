@@ -43,9 +43,9 @@ namespace hfst
 	this->implementation.foma->ignore(n);
 	break;
 #endif
-#if HAVE_FOO
-      case FOO_TYPE:
-	this->implementation.foo->ignore(n);
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
+	this->implementation.mfstl->ignore(n);
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -83,9 +83,9 @@ namespace hfst
 	return this->implementation.foma->stream_get();
 	break;
 #endif
-#if HAVE_FOO
-      case FOO_TYPE:
-	return this->implementation.foo->stream_get();
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
+	return this->implementation.mfstl->stream_get();
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -125,9 +125,9 @@ namespace hfst
 	this->implementation.foma->stream_unget(c);
 	break;
 #endif
-#if HAVE_FOO
-      case FOO_TYPE:
-	this->implementation.foo->stream_unget(c);
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
+	this->implementation.mfstl->stream_unget(c);
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -311,10 +311,10 @@ namespace hfst
 	  this->implementation.foma->read_transducer();
 	break;
 #endif
-#if HAVE_FOO
-      case FOO_TYPE:
-	t.implementation.foo =
-	  (hfst::implementations::FooTransducer*)this->implementation.foo->read_transducer();
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
+	t.implementation.mfstl =
+	  this->implementation.mfstl->read_transducer();
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -370,9 +370,9 @@ namespace hfst
       case 'a':  // SFST
 	return SFST_;
 	break;
-#ifdef HAVE_FOO
-	  case 'f':  // Foo (replace 'f' with the first char in a binary FooTransducer)
-	    return FOO_;
+#ifdef HAVE_MFSTL
+	  case 'f':  // Mfstl (replace 'f' with the first char in a binary MyFst)
+	    return MFSTL_;
 	    break;
 #endif
       case 'P':
@@ -443,9 +443,9 @@ namespace hfst
       type = TROPICAL_OFST_TYPE;
     else if (strcmp("LOG_OPENFST", header_data[1].second.c_str()) == 0 )
       type = LOG_OFST_TYPE;
-#if HAVE_FOO
-    else if (strcmp("FOO", header_data[1].second.c_str()) == 0 )
-      type = FOO_TYPE;
+#if HAVE_MFSTL
+    else if (strcmp("MFSTL", header_data[1].second.c_str()) == 0 )
+      type = MFSTL_TYPE;
 #endif
     else if (strcmp("HFST_OL", header_data[1].second.c_str()) == 0 )
       type = HFST_OL_TYPE;
@@ -668,9 +668,9 @@ namespace hfst
       case FOMA_:
 	return FOMA_TYPE;
 	break;
-#if HAVE_FOO
-      case FOO_:
-	return FOO_TYPE;
+#if HAVE_MFSTL
+      case MFSTL_:
+	return MFSTL_TYPE;
 	break;
 #endif
       case ERROR_TYPE_:
@@ -716,9 +716,9 @@ namespace hfst
       implementation.foma = new hfst::implementations::FomaInputStream;
       break;
 #endif
-#if HAVE_FOO
-    case FOO_TYPE:
-      implementation.foo = new hfst::implementations::FooInputStream;
+#if HAVE_MFSTL
+    case MFSTL_TYPE:
+      implementation.mfstl = new hfst::implementations::MfstlInputStream;
       break;
 #endif
     case HFST_OL_TYPE:
@@ -781,9 +781,9 @@ namespace hfst
       implementation.foma = new hfst::implementations::FomaInputStream(filename);
       break;
 #endif
-#if HAVE_FOO
-    case FOO_TYPE:
-      implementation.foo = new hfst::implementations::FooInputStream(filename);
+#if HAVE_MFSTL
+    case MFSTL_TYPE:
+      implementation.mfstl = new hfst::implementations::MfstlInputStream(filename);
       break;
 #endif
     case HFST_OL_TYPE:
@@ -820,9 +820,9 @@ namespace hfst
 	delete implementation.foma;
 	break;
 #endif
-#if HAVE_FOO
-      case FOO_TYPE:
-	delete implementation.foo;
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
+	delete implementation.mfstl;
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -859,9 +859,9 @@ namespace hfst
 	implementation.foma->close();
 	break;
 #endif
-#if HAVE_FOO
-      case FOO_TYPE:
-	implementation.foo->close();
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
+	implementation.mfstl->close();
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -895,9 +895,9 @@ namespace hfst
 	return implementation.foma->is_eof();
 	break;
 #endif
-#if HAVE_FOO
-      case FOO_TYPE:
-	return implementation.foo->is_eof();
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
+	return implementation.mfstl->is_eof();
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -931,9 +931,9 @@ namespace hfst
 	return implementation.foma->is_bad();
 	break;
 #endif
-#if HAVE_FOO
-      case FOO_TYPE:
-	return implementation.foo->is_bad();
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
+	return implementation.mfstl->is_bad();
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -968,9 +968,9 @@ namespace hfst
 	return implementation.foma->is_good();
 	break;
 #endif
-#if HAVE_FOO
-      case FOO_TYPE:
-	return implementation.foo->is_good();
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
+	return implementation.mfstl->is_good();
 	break;
 #endif
       case HFST_OL_TYPE:

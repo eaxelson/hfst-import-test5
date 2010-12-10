@@ -71,14 +71,14 @@ AS_IF([test "x$with_foma" != xno], [AC_DEFINE([HAVE_FOMA], [1],
                                               [Define to compile foma support in HFST])])
 AM_CONDITIONAL([WANT_FOMA], [test x$with_foma != xno])
 ### ADDED ###
-AC_ARG_WITH([foo],
-            [AS_HELP_STRING([--with-foo],
-                            [process unweighted fsts with foo @<:@default=no@:>@])],
+AC_ARG_WITH([mfstl],
+            [AS_HELP_STRING([--with-mfstl],
+                            [process unweighted fsts with mfstl @<:@default=no@:>@])],
             [],
-            [with_foo=no])
-AS_IF([test "x$with_foo" != xno], [AC_DEFINE([HAVE_FOO], [1],
-                                              [Define to compile Foo support in HFST])])
-AM_CONDITIONAL([WANT_FOO], [test x$with_foo != xno])
+            [with_mfstl=no])
+AS_IF([test "x$with_mfstl" != xno], [AC_DEFINE([HAVE_MFSTL], [1],
+                                              [Define to compile MFSTL support in HFST])])
+AM_CONDITIONAL([WANT_MFSTL], [test x$with_mfstl != xno])
 ### ADDED ENDS ###
 AC_ARG_WITH([hfstol],
             [AS_HELP_STRING([--with-hfstol],
@@ -409,9 +409,9 @@ if test "x$with_foma" == "xbundled"; then
     AC_CHECK_LIB([z], [main])
 fi
 
-if test "x$with_foo" != "xno"; then
-   AC_CHECK_LIB([foo], [main], [],
-   		[AC_MSG_FAILURE([foo test failed (--without-foo to disable)])])
+if test "x$with_mfstl" != "xno"; then
+   AC_CHECK_LIB([mfstl], [main], [],
+   		[AC_MSG_FAILURE([mfstl test failed (--without-mfstl to disable)])])
 fi
 
 # Checks for header files
@@ -435,8 +435,8 @@ if test "x$with_foma" != "xno"; then
     AC_LANG_POP
 fi
 
-if test "x$with_foo" != "xno"; then
-    AC_CHECK_HEADERS([foo/FooTransducer.h])
+if test "x$with_mfstl" != "xno"; then
+    AC_CHECK_HEADERS([mfstl/MyFst.h])
 fi
 
 AC_HEADER_STDBOOL
@@ -480,7 +480,7 @@ cat <<EOF
     *         with openfst: $with_openfst
     *         with foma: $with_foma
     *         with optimized lookup: $with_hfstol
-    *         with foo: $with_foo
+    *         with mfstl: $with_mfstl
     * compiler for Xerox regular expressions: $enable_xre
     *              lexc: $enable_lexc
     *              xfst: $enable_xfst

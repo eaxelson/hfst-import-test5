@@ -583,19 +583,19 @@ hfst_ol::Transducer * hfst_internal_format_to_hfst_ol(HfstInternalTransducer * ,
 #endif // HAVE_OPENFST
 
 
-#if HAVE_FOO
+#if HAVE_MFSTL
 
-HfstInternalTransducer * foo_to_internal_hfst_format(Foo::FooTransducer * t) {
+HfstInternalTransducer * mfstl_to_internal_hfst_format(mfstl::MyFst * t) {
   (void)t;
   throw hfst::exceptions::FunctionNotImplementedException();
 }
 
-Foo::FooTransducer * hfst_internal_format_to_foo(const HfstInternalTransducer * t) {
+mfstl::MyFst * hfst_internal_format_to_mfstl(const HfstInternalTransducer * t) {
   (void)t;
   throw hfst::exceptions::FunctionNotImplementedException();
 }
 
-#endif // HAVE_FOO
+#endif // HAVE_MFSTL
 
 
 } }

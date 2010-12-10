@@ -35,17 +35,17 @@ namespace hfst
 	return false;
       }
     }
-#ifdef HAVE_FOO
-    if (original == FOO_TYPE) {
-      // From foo to weighted
+#ifdef HAVE_MFSTL
+    if (original == MFSTL_TYPE) {
+      // From mfstl to weighted
       if ( converted == TROPICAL_OFST_TYPE || converted == LOG_OFST_TYPE) {
-	return true;  // if foo supports weights
-	return false; // if foo does not support weights
+	return true;  // if mfstl supports weights
+	return false; // if mfstl does not support weights
       }
-      // From foo to unweighted
+      // From mfstl to unweighted
       else {
-	return true;  // if foo does not support weights
-	return false; // if foo supports weights
+	return true;  // if mfstl does not support weights
+	return false; // if mfstl supports weights
       }
     }
 #endif
@@ -63,8 +63,8 @@ namespace hfst
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *),
 #endif
-#if HAVE_FOO
- FooTransducer * (*foo_funct)(FooTransducer *),
+#if HAVE_MFSTL
+ mfstl::MyFst * (*mfstl_funct)(mfstl::MyFst *),
 #endif
   bool foo )
     {
@@ -109,13 +109,13 @@ namespace hfst
 	  break;
 	}
 #endif
-#if HAVE_FOO
-      case FOO_TYPE:
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
 	{
-	  FooTransducer * foo_temp =
-	    foo_funct(implementation.foo);
-	  delete implementation.foo;
-	  implementation.foo = foo_temp;
+	  mfstl::MyFst * mfstl_temp =
+	    mfstl_funct(implementation.mfstl);
+	  delete implementation.mfstl;
+	  implementation.mfstl = mfstl_temp;
 	  break;
 	}
 #endif
@@ -140,8 +140,8 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
 #if HAVE_FOMA
    fsm * (*foma_funct)(fsm *,int n),
 #endif
-#if HAVE_FOO
-   FooTransducer * (*foo_funct)(FooTransducer *,int n),
+#if HAVE_MFSTL
+   mfstl::MyFst * (*mfstl_funct)(mfstl::MyFst *,int n),
 #endif
    int n )
   {
@@ -185,13 +185,13 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
 	  break;
     }
 #endif
-#if HAVE_FOO
-      case FOO_TYPE:
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
 	{
-      FooTransducer * foo_temp = 
-	    foo_funct(implementation.foo,n);
-	  delete (implementation.foo);
-	  implementation.foo = foo_temp;
+      mfstl::MyFst * mfstl_temp = 
+	    mfstl_funct(implementation.mfstl,n);
+	  delete (implementation.mfstl);
+	  implementation.mfstl = mfstl_temp;
 	  break;
     }
 #endif
@@ -217,8 +217,8 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
 #if HAVE_FOMA
    fsm * (*foma_funct)(fsm *, String, String),
 #endif
-#if HAVE_FOO
-   FooTransducer * (*foo_funct)(FooTransducer *, String, String),
+#if HAVE_MFSTL
+   mfstl::MyFst * (*mfstl_funct)(mfstl::MyFst *, String, String),
 #endif
    String s1, String s2)
   {
@@ -262,13 +262,13 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
       break;
 	}
 #endif
-#if HAVE_FOO
-      case FOO_TYPE:
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
 	{
-      FooTransducer * foo_temp = 
-	    foo_funct(implementation.foo,s1,s2);
-	  delete(implementation.foo);
-	  implementation.foo = foo_temp;
+      mfstl::MyFst * mfstl_temp = 
+	    mfstl_funct(implementation.mfstl,s1,s2);
+	  delete(implementation.mfstl);
+	  implementation.mfstl = mfstl_temp;
       break;
 	}
 #endif
@@ -296,9 +296,9 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
    fsm * (*foma_funct)(fsm *,
 				    fsm *),
 #endif
-#if HAVE_FOO
-   FooTransducer * (*foo_funct)(FooTransducer *,
-				    FooTransducer *),
+#if HAVE_MFSTL
+   mfstl::MyFst * (*mfstl_funct)(mfstl::MyFst *,
+				    mfstl::MyFst *),
 #endif
    HfstTransducer &another)
   {
@@ -349,13 +349,13 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
 	  break;
 	}
 #endif
-#if HAVE_FOO
-      case FOO_TYPE:
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
 	{
-	  FooTransducer * foo_temp = 
-	    foo_funct(implementation.foo,another.implementation.foo);
-	  delete implementation.foo;
-	  implementation.foo = foo_temp;
+	  mfstl::MyFst * mfstl_temp = 
+	    mfstl_funct(implementation.mfstl,another.implementation.mfstl);
+	  delete implementation.mfstl;
+	  implementation.mfstl = mfstl_temp;
 	  break;
 	}
 #endif

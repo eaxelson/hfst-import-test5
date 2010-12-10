@@ -24,8 +24,8 @@ HfstTransducer &apply(
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *),
 #endif
-#if HAVE_FOO
- FooTransducer * (*foo_funct)(FooTransducer *),
+#if HAVE_MFSTL
+ mfstl::MyFst * (*mfstl_funct)(mfstl::MyFst *),
 #endif
  bool dummy /* makes sure there is always a parameter after the function pointer parameters,
 	     * so commas between parameters are easier to handle */
@@ -42,8 +42,8 @@ HfstTransducer &apply(
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *,int),
 #endif
-#if HAVE_FOO
- FooTransducer * (*foo_funct)(FooTransducer *,int),
+#if HAVE_MFSTL
+ mfstl::MyFst * (*mfstl_funct)(mfstl::MyFst *,int),
 #endif
  int n);
 
@@ -60,8 +60,8 @@ HfstTransducer &apply(
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *, String, String),
 #endif
-#if HAVE_FOO
- FooTransducer * (*foo_funct)(FooTransducer *, String, String),
+#if HAVE_MFSTL
+ mfstl::MyFst * (*mfstl_funct)(mfstl::MyFst *, String, String),
 #endif
  String k1, String k2);
 
@@ -80,7 +80,7 @@ HfstTransducer &apply(
  fsm * (*foma_funct)(fsm *,
 		     fsm *),
 #endif
-#if HAVE_FOO
- FooTransducer * (*foo_funct)(FooTransducer *, FooTransducer *),
+#if HAVE_MFSTL
+ mfstl::MyFst * (*mfstl_funct)(mfstl::MyFst *, mfstl::MyFst *),
 #endif
  HfstTransducer &another );
