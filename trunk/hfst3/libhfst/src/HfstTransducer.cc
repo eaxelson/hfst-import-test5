@@ -1859,7 +1859,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 
 #if HAVE_OPENFST
     ImplementationType original_type = this->type;
-    if (original_type == SFST_TYPE || original_type == FOMA_TYPE) {
+    if ((original_type == SFST_TYPE) || (original_type == FOMA_TYPE)) {
       this->convert(TROPICAL_OFST_TYPE);
     }
 #endif
@@ -2359,360 +2359,440 @@ using namespace hfst;
 int main(void)
 {
   std::cout << "Unit tests for " __FILE__ ":";
-  try 
-    {
-      std::cout << std::endl << "Testing constructors...";
-      HfstTransducer defaultConstructed();
+  std::cout << std::endl << "Testing constructors...";
+  std::cout << " ()...";
+  HfstTransducer defaultConstructed();
 #if HAVE_SFST
-      HfstTransducer sfstEmpty(SFST_TYPE);
+  std::cout << " (SFST)...";
+  HfstTransducer sfstEmpty(SFST_TYPE);
 #endif
 #if HAVE_OPENFST
-      HfstTransducer ofsttEmpty(TROPICAL_OFST_TYPE);
-      HfstTransducer ofstlEmpty(LOG_OFST_TYPE);
+  std::cout << " (OpenFst tropical)...";
+  HfstTransducer ofsttEmpty(TROPICAL_OFST_TYPE);
+  std::cout << " (OpenFst log)...";
+  HfstTransducer ofstlEmpty(LOG_OFST_TYPE);
 #endif
 #if HAVE_FOMA
-      HfstTransducer fomaEmpty(FOMA_TYPE);
+  std::cout << " (foma)...";
+  HfstTransducer fomaEmpty(FOMA_TYPE);
 #endif
-      HfstTokenizer tokenizer;
+  HfstTokenizer tokenizer;
 #if HAVE_SFST
-      HfstTransducer sfstUtf8("äläkkä", tokenizer, SFST_TYPE);
+  std::cout << " (äläkkä, t, SFST)...";
+  HfstTransducer sfstUtf8("äläkkä", tokenizer, SFST_TYPE);
 #endif
 #if HAVE_OPENFST
-      HfstTransducer ofsttUtf8("äläkkä", tokenizer, TROPICAL_OFST_TYPE);
-      HfstTransducer ofstlUtf8("äläkkä", tokenizer, LOG_OFST_TYPE);
+  std::cout << " (äläkkä, t, OpenFst tropical)...";
+  HfstTransducer ofsttUtf8("äläkkä", tokenizer, TROPICAL_OFST_TYPE);
+  std::cout << " (äläkkä, t, OpenFst log)...";
+  HfstTransducer ofstlUtf8("äläkkä", tokenizer, LOG_OFST_TYPE);
 #endif
 #if HAVE_FOMA
-      HfstTransducer fomaUtf8("äläkkä", tokenizer, FOMA_TYPE);
+  std::cout << " (äläkkä, t, foma)...";
+  HfstTransducer fomaUtf8("äläkkä", tokenizer, FOMA_TYPE);
 #endif
 #if HAVE_SFST
-      HfstTransducer sfstAppleBanana("apple", "banana", tokenizer, 
-                                     SFST_TYPE);
+  std::cout << " (apple, banana, t, SFST)...";
+  HfstTransducer sfstAppleBanana("apple", "banana", tokenizer, 
+                                 SFST_TYPE);
 #endif
 #if HAVE_OPENFST
-      HfstTransducer ofsttAppleBanana("apple", "banana", tokenizer, 
-                                     TROPICAL_OFST_TYPE);
-      HfstTransducer ofstlAppleBanana("apple", "banana", tokenizer, 
-                                     LOG_OFST_TYPE);
+  std::cout << " (apple, banana, t, OpenFst Tropical)...";
+  HfstTransducer ofsttAppleBanana("apple", "banana", tokenizer, 
+                                 TROPICAL_OFST_TYPE);
+  std::cout << " (apple, banana, t, OpenFst log)...";
+  HfstTransducer ofstlAppleBanana("apple", "banana", tokenizer, 
+                                 LOG_OFST_TYPE);
 #endif
 #if HAVE_FOMA
-      HfstTransducer fomaAppleBanana("apple", "banana", tokenizer, 
-                                     FOMA_TYPE);
+  std::cout << " (apple, banana, t, foma)...";
+  HfstTransducer fomaAppleBanana("apple", "banana", tokenizer, 
+                                 FOMA_TYPE);
 #endif
 #if HAVE_SFST
-      HfstTransducer sfstAppleBanana1("apple", "banana", SFST_TYPE);
+  std::cout << " (apple, banana, SFST)...";
+  HfstTransducer sfstAppleBanana1("apple", "banana", SFST_TYPE);
 #endif
 #if HAVE_OPENFST
-      HfstTransducer ofsttAppleBanana1("apple", "banana", 
-                                      TROPICAL_OFST_TYPE);
-      HfstTransducer ofstlAppleBanana1("apple", "banana", 
-                                     LOG_OFST_TYPE);
+  std::cout << " (apple, banana, OpenFst Tropical)...";
+  HfstTransducer ofsttAppleBanana1("apple", "banana", 
+                                  TROPICAL_OFST_TYPE);
+  std::cout << " (apple, banana, OpenFst log)...";
+  HfstTransducer ofstlAppleBanana1("apple", "banana", 
+                                 LOG_OFST_TYPE);
 #endif
 #if HAVE_FOMA
-      HfstTransducer fomaAppleBanana1("apple", "banana", FOMA_TYPE);
+  std::cout << " (apple, banana, foma)...";
+  HfstTransducer fomaAppleBanana1("apple", "banana", FOMA_TYPE);
 #endif
-      // FIXME: untested: string sets and vectors, input streams
+  // FIXME: untested: string sets and vectors, input streams
 #if HAVE_SFST
-      HfstTransducer sfstCopy(sfstAppleBanana);
+  std::cout << " (sfst copy)...";
+  HfstTransducer sfstCopy(sfstAppleBanana);
 #endif
 #if HAVE_OPENFST
-      HfstTransducer ofsttCopy(ofsttAppleBanana);
-      HfstTransducer ofstlCopy(ofstlAppleBanana);
+  std::cout << " (OpenFst copy)...";
+  HfstTransducer ofsttCopy(ofsttAppleBanana);
+  std::cout << " (OpenFst copy)...";
+  HfstTransducer ofstlCopy(ofstlAppleBanana);
 #endif
 #if HAVE_FOMA
-      HfstTransducer fomaCopy(fomaAppleBanana);
+  std::cout << " (foma copy)...";
+  HfstTransducer fomaCopy(fomaAppleBanana);
 #endif
-      std::cout << std::endl << "Destructors... ";
+  std::cout << std::endl << "Destructors... ";
 #if HAVE_SFST
-      delete new HfstTransducer(SFST_TYPE);
-      delete new HfstTransducer(sfstCopy);
+  std::cout << " (sfst)...";
+  delete new HfstTransducer(SFST_TYPE);
+  delete new HfstTransducer(sfstCopy);
 #endif
 #if HAVE_OPENFST
-      delete new HfstTransducer(TROPICAL_OFST_TYPE);
-      delete new HfstTransducer(ofsttCopy);
-      delete new HfstTransducer(LOG_OFST_TYPE);
-      delete new HfstTransducer(ofstlCopy);
+  std::cout << " (OpenFst Tropical)...";
+  delete new HfstTransducer(TROPICAL_OFST_TYPE);
+  delete new HfstTransducer(ofsttCopy);
+  std::cout << " (OpenFst log)...";
+  delete new HfstTransducer(LOG_OFST_TYPE);
+  delete new HfstTransducer(ofstlCopy);
 #endif
 #if HAVE_FOMA
-      delete new HfstTransducer(FOMA_TYPE);
-      delete new HfstTransducer(fomaCopy);
+  std::cout << " (foma)...";
+  delete new HfstTransducer(FOMA_TYPE);
+  delete new HfstTransducer(fomaCopy);
 #endif
-      std::cout << std::endl << "Reading and writing AT&T format...";
-      char* temporary_filename = strdup("/tmp/hfst.XXXXXX");
-      int temporary_fd = mkstemp(temporary_filename);
-      if (temporary_fd == -1)
-        {
-          std::cerr << "could not create temporary file for writing: " << 
-            strerror(errno) << std::endl;
-          return EXIT_FAILURE;
-        }
-      FILE* temporary = fdopen(temporary_fd, "w");
-      if (temporary == NULL)
-        {
-          std::cerr << "could not open temporary file for writing: " <<
-            strerror(errno) << std::endl;
-          return EXIT_FAILURE;
-        }
+  std::cout << std::endl << 
+    "Minimise, determinise and remove epsilons...";
 #if HAVE_SFST
-      sfstCopy.write_in_att_format(temporary, false);
-      fclose(temporary);
-      temporary = fopen(temporary_filename, "r");
-      HfstTransducer sfstReadAtt(temporary, SFST_TYPE, "@0@");
-      fclose(temporary);
+  std::cout << " sfst.rm0.det.min...";
+  sfstCopy.remove_epsilons().determinize().minimize();
 #endif
 #if HAVE_OPENFST
-      free(temporary_filename);
-      temporary_filename = strdup("/tmp/hfst.XXXXXX");
-      temporary_fd = mkstemp(temporary_filename);
-      if (temporary_fd == -1)
-        {
-          std::cerr << "could not create temporary file for writing: " << 
-            strerror(errno) << std::endl;
-          return EXIT_FAILURE;
-        }
-      temporary = fdopen(temporary_fd, "w");
-      if (temporary == NULL)
-        {
-          std::cerr << "could not open temporary file for writing: " <<
-            strerror(errno) << std::endl;
-          return EXIT_FAILURE;
-        }
-      ofsttCopy.write_in_att_format(temporary, true);
-      fclose(temporary);
-      temporary = fopen(temporary_filename, "r");
-      HfstTransducer ofsttReadAtt(temporary, TROPICAL_OFST_TYPE, "@0@");
-      fclose(temporary);
+  std::cout << " ofstt.rm0.det.min...";
+  ofsttCopy.remove_epsilons().determinize().minimize();
+  std::cout << " ofstl.rm0.det.min...";
+  ofstlCopy.remove_epsilons().determinize().minimize();
 #endif
 #if HAVE_FOMA
-      free(temporary_filename);
-      temporary_filename = strdup("/tmp/hfst.XXXXXX");
-      temporary_fd = mkstemp(temporary_filename);
-      if (temporary_fd == -1)
-        {
-          std::cerr << "could not create temporary file for writing: " << 
-            strerror(errno) << std::endl;
-          return EXIT_FAILURE;
-        }
-      temporary = fdopen(temporary_fd, "w");
-      if (temporary == NULL)
-        {
-          std::cerr << "could not open temporary file for writing: " <<
-            strerror(errno) << std::endl;
-          return EXIT_FAILURE;
-        }
-      fomaCopy.write_in_att_format(temporary, false);
-      fclose(temporary);
-      temporary = fopen(temporary_filename, "r");
-      HfstTransducer fomaReadAtt(temporary, FOMA_TYPE, "@0@");
-      fclose(temporary);
-#endif
-      std::cout << std::endl << 
-        "Minimise, determinise and remove epsilons...";
-#if HAVE_SFST
-      sfstCopy.remove_epsilons().determinize().minimize();
-#endif
-#if HAVE_OPENFST
-      ofsttCopy.remove_epsilons().determinize().minimize();
-      ofstlCopy.remove_epsilons().determinize().minimize();
-#endif
-#if HAVE_FOMA
-      fomaCopy.remove_epsilons().determinize().minimize();
+  std::cout << " foma.rm0.det.min...";
+  fomaCopy.remove_epsilons().determinize().minimize();
 #endif
 
-      std::cout << std::endl << "n best...";
+  std::cout << std::endl << "n best...";
+#if HAVE_OPENFST
+  HfstTransducer ofsttNbest(ofsttCopy);
+  std::cout << " ofstt.n_best(5)...";
+  ofsttNbest.n_best(5);
+#endif
+  std::cout << std::endl << "repeating...";
 #if HAVE_SFST
-      HfstTransducer sfstNbest(sfstCopy);
-      sfstNbest.n_best(5);
+  std::cout << " sfst.*...";
+  HfstTransducer sfstStar(sfstCopy);
+  sfstStar.repeat_star();
+  std::cout << " +...";
+  HfstTransducer sfstPlus(sfstCopy);
+  sfstPlus.repeat_plus();
+  std::cout << " n(3)...";
+  HfstTransducer sfstThrice(sfstCopy);
+  sfstThrice.repeat_n(3);
+  std::cout << " n-(5)...";
+  HfstTransducer sfstFiveMinus(sfstCopy);
+  sfstFiveMinus.repeat_n_minus(5);
+  std::cout << " n+(5)...";
+  HfstTransducer sfstFivePlus(sfstCopy);
+  sfstFivePlus.repeat_n_plus(5);
+  std::cout << " n-k(3, 5)...";
+  HfstTransducer sfstThreeToFive(sfstCopy);
+  sfstThreeToFive.repeat_n_to_k(3, 5);
+  std::cout << " ?...";
+  HfstTransducer sfstOptional(sfstCopy);
+  sfstOptional.optionalize();
 #endif
 #if HAVE_OPENFST
-      HfstTransducer ofsttNbest(ofsttCopy);
-      ofsttNbest.n_best(5);
+  std::cout << " ofst.*...";
+  HfstTransducer ofsttStar(ofsttCopy);
+  ofsttStar.repeat_star();
+  std::cout << " +...";
+  HfstTransducer ofsttPlus(ofsttCopy);
+  ofsttPlus.repeat_plus();
+  std::cout << " n(3)...";
+  HfstTransducer ofsttThrice(ofsttCopy);
+  ofsttThrice.repeat_n(3);
+  std::cout << " n-(5)...";
+  HfstTransducer ofsttFiveMinus(ofsttCopy);
+  ofsttFiveMinus.repeat_n_minus(5);
+  std::cout << " n+(5)...";
+  HfstTransducer ofsttFivePlus(ofsttCopy);
+  ofsttFivePlus.repeat_n_plus(5);
+  std::cout << " n-k(3, 5)...";
+  HfstTransducer ofsttThreeToFive(ofsttCopy);
+  ofsttThreeToFive.repeat_n_to_k(3, 5);
+  std::cout << " ?...";
+  HfstTransducer ofsttOptional(ofsttCopy);
+  ofsttOptional.optionalize();
 #endif
 #if HAVE_FOMA
-      HfstTransducer fomaNbest(fomaCopy);
-      fomaNbest.n_best(5);
+  std::cout << " foma.*...";
+  HfstTransducer fomaStar(fomaCopy);
+  fomaStar.repeat_star();
+  std::cout << " +...";
+  HfstTransducer fomaPlus(fomaCopy);
+  fomaPlus.repeat_plus();
+  std::cout << " n(3)...";
+  HfstTransducer fomaThrice(fomaCopy);
+  fomaThrice.repeat_n(3);
+  std::cout << " n-(5)...";
+  HfstTransducer fomaFiveMinus(fomaCopy);
+  fomaFiveMinus.repeat_n_minus(5);
+  std::cout << " n+(5)...";
+  HfstTransducer fomaFivePlus(fomaCopy);
+  fomaFivePlus.repeat_n_plus(5);
+  std::cout << " n-k(3, 5)...";
+  HfstTransducer fomaThreeToFive(fomaCopy);
+  fomaThreeToFive.repeat_n_to_k(3, 5);
+  std::cout << " ?...";
+  HfstTransducer fomaOptional(fomaCopy);
+  fomaOptional.optionalize();
 #endif
-      std::cout << std::endl << "repeating...";
+  std::cout << std::endl << "invert, reverse...";
 #if HAVE_SFST
-      HfstTransducer sfstStar(sfstCopy);
-      sfstStar.repeat_star();
-      HfstTransducer sfstPlus(sfstCopy);
-      sfstPlus.repeat_plus();
-      HfstTransducer sfstThrice(sfstCopy);
-      sfstThrice.repeat_n(3);
-      HfstTransducer sfstFiveMinus(sfstCopy);
-      sfstFiveMinus.repeat_n_minus(5);
-      HfstTransducer sfstFivePlus(sfstCopy);
-      sfstFivePlus.repeat_n_plus(5);
-      HfstTransducer sfstThreeToFive(sfstCopy);
-      sfstThreeToFive.repeat_n_to_k(3, 5);
-      HfstTransducer sfstOptional(sfstCopy);
-      sfstOptional.optionalize();
+  std::cout << " sfst.invert...";
+  HfstTransducer sfstInvert(sfstCopy);
+  sfstInvert.invert();
+  std::cout << " .reverse...";
+  HfstTransducer sfstReverse(sfstCopy);
+  sfstReverse.reverse();
 #endif
 #if HAVE_OPENFST
-      HfstTransducer ofsttStar(ofsttCopy);
-      ofsttStar.repeat_star();
-      HfstTransducer ofsttPlus(ofsttCopy);
-      ofsttPlus.repeat_plus();
-      HfstTransducer ofsttThrice(ofsttCopy);
-      ofsttThrice.repeat_n(3);
-      HfstTransducer ofsttFiveMinus(ofsttCopy);
-      ofsttFiveMinus.repeat_n_minus(5);
-      HfstTransducer ofsttFivePlus(ofsttCopy);
-      ofsttFivePlus.repeat_n_plus(5);
-      HfstTransducer ofsttThreeToFive(ofsttCopy);
-      ofsttThreeToFive.repeat_n_to_k(3, 5);
-      HfstTransducer ofsttOptional(ofsttCopy);
-      ofsttOptional.optionalize();
+  std::cout << " ofst.invert...";
+  HfstTransducer ofsttInvert(ofsttCopy);
+  ofsttInvert.invert();
+  std::cout << " .reverse...";
+  HfstTransducer ofsttReverse(ofsttCopy);
+  ofsttReverse.reverse();
+#endif
+#if HAVE_SFST
+  std::cout << " foma.invert...";
+  HfstTransducer fomaInvert(fomaCopy);
+  fomaInvert.invert();
+  std::cout << " .reverse...";
+  HfstTransducer fomaReverse(fomaCopy);
+  fomaReverse.reverse();
+#endif
+  std::cout << std::endl << "projection...";
+#if HAVE_SFST
+  std::cout << " sfst.input...";
+  HfstTransducer sfstInput(sfstCopy);
+  sfstInput.input_project();
+  std::cout << " .output...";
+  HfstTransducer sfstOutput(sfstCopy);
+  sfstOutput.output_project();
+#endif
+#if HAVE_OPENFST
+  std::cout << " ofst.input...";
+  HfstTransducer ofsttInput(ofsttCopy);
+  ofsttInput.input_project();
+  std::cout << " .output...";
+  HfstTransducer ofsttOutput(ofsttCopy);
+  ofsttOutput.output_project();
 #endif
 #if HAVE_FOMA
-      HfstTransducer fomaStar(fomaCopy);
-      fomaStar.repeat_star();
-      HfstTransducer fomaPlus(fomaCopy);
-      fomaPlus.repeat_plus();
-      HfstTransducer fomaThrice(fomaCopy);
-      fomaThrice.repeat_n(3);
-      HfstTransducer fomaFiveMinus(fomaCopy);
-      fomaFiveMinus.repeat_n_minus(5);
-      HfstTransducer fomaFivePlus(fomaCopy);
-      fomaFivePlus.repeat_n_plus(5);
-      HfstTransducer fomaThreeToFive(fomaCopy);
-      fomaThreeToFive.repeat_n_to_k(3, 5);
-      HfstTransducer fomaOptional(fomaCopy);
-      fomaOptional.optionalize();
+  std::cout << " foma.input...";
+  HfstTransducer fomaInput(fomaCopy);
+  fomaInput.input_project();
+  std::cout << " .output...";
+  HfstTransducer fomaOutput(fomaCopy);
+  fomaOutput.output_project();
 #endif
-      std::cout << std::endl << "invert, reverse...";
+  // FIXME: skipped extractions
+  std::cout << std::endl << "inserting freely...";
 #if HAVE_SFST
-      HfstTransducer sfstInvert(sfstCopy);
-      sfstInvert.invert();
-      HfstTransducer sfstReverse(sfstCopy);
-      sfstReverse.reverse();
+  HfstTransducer sfstInserted(sfstCopy);
+  std::cout << " sfst.freely(a, b)...";
+  sfstInserted.insert_freely(StringPair("a", "b"));
 #endif
 #if HAVE_OPENFST
-      HfstTransducer ofsttInvert(ofsttCopy);
-      ofsttInvert.invert();
-      HfstTransducer ofsttReverse(ofsttCopy);
-      ofsttReverse.reverse();
-#endif
-#if HAVE_SFST
-      HfstTransducer fomaInvert(fomaCopy);
-      fomaInvert.invert();
-      HfstTransducer fomaReverse(fomaCopy);
-      fomaReverse.reverse();
-#endif
-      std::cout << std::endl << "projection...";
-#if HAVE_SFST
-      HfstTransducer sfstInput(sfstCopy);
-      sfstInput.input_project();
-      HfstTransducer sfstOutput(sfstCopy);
-      sfstOutput.output_project();
-#endif
-#if HAVE_OPENFST
-      HfstTransducer ofsttInput(ofsttCopy);
-      ofsttInput.input_project();
-      HfstTransducer ofsttOutput(ofsttCopy);
-      ofsttOutput.output_project();
+  std::cout << " ofst.freely(a, b)...";
+  HfstTransducer ofsttInserted(ofsttCopy);
+  ofsttInserted.insert_freely(StringPair("a", "b"));
 #endif
 #if HAVE_FOMA
-      HfstTransducer fomaInput(fomaCopy);
-      fomaInput.input_project();
-      HfstTransducer fomaOutput(fomaCopy);
-      fomaOutput.output_project();
+  std::cout << " foma.freely(a, b)...";
+  HfstTransducer fomaInserted(fomaCopy);
+  fomaInserted.insert_freely(StringPair("a", "b"));
 #endif
-      // FIXME: skipped extractions
-      std::cout << std::endl << "inserting freely...";
+  std::cout << std::endl << "substitution...";
 #if HAVE_SFST
-      HfstTransducer sfstInserted(sfstCopy);
-      sfstInserted.insert_freely(StringPair("a", "b"));
+  std::cout << " sfst.sub(k, t)...";
+  HfstTransducer sfstSubstituted(sfstUtf8);
+  sfstSubstituted.substitute("k", "t");
 #endif
 #if HAVE_OPENFST
-      HfstTransducer ofsttInserted(ofsttCopy);
-      ofsttInserted.insert_freely(StringPair("a", "b"));
+  std::cout << " ofst.sub(k, t)...";
+  HfstTransducer ofsttSubstituted(ofsttUtf8);
+  ofsttSubstituted.substitute("k", "t");
 #endif
 #if HAVE_FOMA
-      HfstTransducer fomaInserted(fomaCopy);
-      fomaInserted.insert_freely(StringPair("a", "b"));
+  std::cout << " foma.sub(k, t)...";
+  HfstTransducer fomaSubstituted(fomaUtf8);
+  fomaSubstituted.substitute("k", "t");
 #endif
-      std::cout << std::endl << "substitution...";
+  // FIXME: weights missing
+  std::cout << std::endl << "basic algebra";
 #if HAVE_SFST
-      HfstTransducer sfstSubstituted(sfstUtf8);
-      sfstSubstituted.substitute("k", "t");
+  HfstTransducer sfstAB("a", "b", SFST_TYPE);
+  HfstTransducer sfstBC("b", "c", SFST_TYPE);
+  std::cout << " sfst.compose...";
+  sfstAB.compose(sfstBC);
+  std::cout << " concatenate...";
+  sfstAB.concatenate(sfstBC);
+  std::cout << " disjunct...";
+  sfstAB.disjunct(sfstBC);
+  std::cout << " intersect...";
+  sfstAB.intersect(sfstBC);
+  std::cout << " subtract...";
+  sfstAB.subtract(sfstBC);
 #endif
 #if HAVE_OPENFST
-      HfstTransducer ofsttSubstituted(ofsttUtf8);
-      ofsttSubstituted.substitute("k", "t");
+  HfstTransducer ofsttAB("a", "b", TROPICAL_OFST_TYPE);
+  HfstTransducer ofsttBC("b", "c", TROPICAL_OFST_TYPE);
+  std::cout << " ofst.compose...";
+  ofsttAB.compose(ofsttBC);
+  std::cout << " concatenate...";
+  ofsttAB.concatenate(ofsttBC);
+  std::cout << " disjunct...";
+  ofsttAB.disjunct(ofsttBC);
+  std::cout << " intersect...";
+  ofsttAB.intersect(ofsttBC);
+  std::cout << " subtract...";
+  ofsttAB.subtract(ofsttBC);
 #endif
 #if HAVE_FOMA
-      HfstTransducer fomaSubstituted(fomaUtf8);
-      fomaSubstituted.substitute("k", "t");
+  HfstTransducer fomaAB("a", "b", FOMA_TYPE);
+  HfstTransducer fomaBC("b", "c", FOMA_TYPE);
+  std::cout << " foma.compose...";
+  fomaAB.compose(fomaBC);
+  std::cout << " concatenate...";
+  fomaAB.concatenate(fomaBC);
+  std::cout << " disjunct...";
+  fomaAB.disjunct(fomaBC);
+  std::cout << " intersect...";
+  fomaAB.intersect(fomaBC);
+  std::cout << " subtract...";
+  fomaAB.subtract(fomaBC);
 #endif
-      // FIXME: weights missing
-      std::cout << std::endl << "basic algebra";
-#if HAVE_SFST
-      HfstTransducer sfstAB("a", "b", SFST_TYPE);
-      HfstTransducer sfstBC("b", "c", SFST_TYPE);
-      sfstAB.compose(sfstBC);
-      sfstAB.concatenate(sfstBC);
-      sfstAB.disjunct(sfstBC);
-      sfstAB.intersect(sfstBC);
-      sfstAB.subtract(sfstBC);
-#endif
-#if HAVE_OPENFST
-      HfstTransducer ofsttAB("a", "b", TROPICAL_OFST_TYPE);
-      HfstTransducer ofsttBC("b", "c", TROPICAL_OFST_TYPE);
-      ofsttAB.compose(ofsttBC);
-      ofsttAB.concatenate(ofsttBC);
-      ofsttAB.disjunct(ofsttBC);
-      ofsttAB.intersect(ofsttBC);
-      ofsttAB.subtract(ofsttBC);
-#endif
-#if HAVE_FOMA
-      HfstTransducer fomaAB("a", "b", FOMA_TYPE);
-      HfstTransducer fomaBC("b", "c", FOMA_TYPE);
-      fomaAB.compose(fomaBC);
-      fomaAB.concatenate(fomaBC);
-      fomaAB.disjunct(fomaBC);
-      fomaAB.intersect(fomaBC);
-      fomaAB.subtract(fomaBC);
-#endif
-      // FIXME: compose intersect missing
-      std::cout << std::endl << "conversion...";
+  // FIXME: compose intersect missing
+  std::cout << std::endl << "conversion...";
 #if HAVE_SFST
 #if HAVE_OPENFST
-      HfstTransducer sfstToOfst(sfstCopy);
-      sfstToOfst.convert(TROPICAL_OFST_TYPE);
+  std::cout << " sfst -> TROPICAL_OFST...";
+  HfstTransducer sfstToOfst(sfstCopy);
+  sfstToOfst.convert(TROPICAL_OFST_TYPE);
 #endif
 #if HAVE_FOMA
-      HfstTransducer sfstToFoma(sfstCopy);
-      sfstToFoma.convert(FOMA_TYPE);
+  std::cout << " sfst -> FOMA...";
+  HfstTransducer sfstToFoma(sfstCopy);
+  sfstToFoma.convert(FOMA_TYPE);
 #endif
 #endif
 #if HAVE_OPENFST
 #if HAVE_SFST
-      HfstTransducer ofstlToSfst(ofstlCopy);
-      ofstlToSfst.convert(SFST_TYPE);
+  std::cout << " OpenFst Log -> SFST...";
+  HfstTransducer ofstlToSfst(ofstlCopy);
+  ofstlToSfst.convert(SFST_TYPE);
 #endif
 #if HAVE_FOMA
-      HfstTransducer ofstlToFoma(ofstlCopy);
-      ofstlToFoma.convert(FOMA_TYPE);
+  std::cout << " OpenFst Log -> FOMA...";
+  HfstTransducer ofstlToFoma(ofstlCopy);
+  ofstlToFoma.convert(FOMA_TYPE);
 #endif
 #endif
 #if HAVE_FOMA
 #if HAVE_SFST
-      HfstTransducer fomaToSfst(fomaCopy);
-      fomaToSfst.convert(SFST_TYPE);
+  std::cout << " foma -> SFST...";
+  HfstTransducer fomaToSfst(fomaCopy);
+  fomaToSfst.convert(SFST_TYPE);
 #endif
 #if HAVE_OPENFST
-      HfstTransducer fomaToOfst(fomaCopy);
-      fomaToOfst.convert(TROPICAL_OFST_TYPE);
+  std::cout << " foma -> TROPICAL_OFST...";
+  HfstTransducer fomaToOfst(fomaCopy);
+  fomaToOfst.convert(TROPICAL_OFST_TYPE);
 #endif
 #endif
-
-    }
-  catch (hfst::exceptions::FileNotReadableException fnre)
+  std::cout << std::endl << "Reading and writing AT&T format...";
+  char* temporary_filename = strdup("/tmp/hfst.XXXXXX");
+  int temporary_fd = mkstemp(temporary_filename);
+  if (temporary_fd == -1)
     {
-      std::cerr << "unreadable files" << std::endl;
+      std::cerr << "could not create temporary file for writing: " << 
+        strerror(errno) << std::endl;
       return EXIT_FAILURE;
     }
+  FILE* temporary = fdopen(temporary_fd, "w");
+  if (temporary == NULL)
+    {
+      std::cerr << "could not open temporary file for writing: " <<
+        strerror(errno) << std::endl;
+      return EXIT_FAILURE;
+    }
+#if HAVE_SFST
+  std::cout << " sfst.watt(F, f)...";
+  sfstCopy.write_in_att_format(temporary, false);
+  fclose(temporary);
+  temporary = fopen(temporary_filename, "r");
+  std::cout << " (f, sfst, @0@)...";
+  HfstTransducer sfstReadAtt(temporary, SFST_TYPE, "@0@");
+  fclose(temporary);
+#endif
+#if HAVE_OPENFST
+  free(temporary_filename);
+  temporary_filename = strdup("/tmp/hfst.XXXXXX");
+  temporary_fd = mkstemp(temporary_filename);
+  if (temporary_fd == -1)
+    {
+      std::cerr << "could not create temporary file for writing: " << 
+        strerror(errno) << std::endl;
+      return EXIT_FAILURE;
+    }
+  temporary = fdopen(temporary_fd, "w");
+  if (temporary == NULL)
+    {
+      std::cerr << "could not open temporary file for writing: " <<
+        strerror(errno) << std::endl;
+      return EXIT_FAILURE;
+    }
+  std::cout << " ofstt.watt(F, f)...";
+  ofsttCopy.write_in_att_format(temporary, true);
+  fclose(temporary);
+  temporary = fopen(temporary_filename, "r");
+  std::cout << " (f, TROPICAL_OFST, @0@)...";
+  HfstTransducer ofsttReadAtt(temporary, TROPICAL_OFST_TYPE, "@0@");
+  fclose(temporary);
+#endif
+#if HAVE_FOMA
+  free(temporary_filename);
+  temporary_filename = strdup("/tmp/hfst.XXXXXX");
+  temporary_fd = mkstemp(temporary_filename);
+  if (temporary_fd == -1)
+    {
+      std::cerr << "could not create temporary file for writing: " << 
+        strerror(errno) << std::endl;
+      return EXIT_FAILURE;
+    }
+  temporary = fdopen(temporary_fd, "w");
+  if (temporary == NULL)
+    {
+      std::cerr << "could not open temporary file for writing: " <<
+        strerror(errno) << std::endl;
+      return EXIT_FAILURE;
+    }
+  std::cout << " foma.watt(F, f)...";
+  fomaCopy.write_in_att_format(temporary, false);
+  fclose(temporary);
+  temporary = fopen(temporary_filename, "r");
+  std::cout << " (f, FOMA, @0@)...";
+  HfstTransducer fomaReadAtt(temporary, FOMA_TYPE, "@0@");
+  fclose(temporary);
+#endif
+
   return EXIT_SUCCESS;
 }
 #endif
