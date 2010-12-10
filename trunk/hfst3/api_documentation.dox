@@ -1,0 +1,290 @@
+
+  /** \page VersionDifferences.html 
+
+      <b>This page is still under construction...</b>
+
+      If you need documentation on HFST version 2, you find it <a href="http://hfst.sourceforge.net/hfst2/index.html">here</a>.
+      The page is no longer updated and it is recommended to update to version 3.0.
+
+      Some changes:
+
+      - Namespace HFST and HWFST -> Namespace hfst and ImplementationType argument
+
+      - KeyLayer and SymbolLayer -> functions take a string argument, string-to-number mapping is done automatically
+
+      - TransducerLayer -> HfstTransducer, RuleLayer -> namespace hfst::rules,  CoreExtensionLayer -> HfstMutableTransducer
+ 
+      - Functions delete their transducer arguments -> Functions modify their calling object and do not change their arguments
+
+      - unknown and identity symbols!
+
+   */
+
+
+  /** \page InstallHfst.html
+
+      <b>This page is still under construction...</b>
+
+      \section installing_library Installing the HFST API library
+      
+      You can download the source code from the sourceforge
+      <a href="http://sourceforge.net/projects/hfst/files/hfst/">download page</a>.
+
+      To successfully use the HFST library, you should have at least one of the backend libraries
+      (<a href="http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html">SFST</a>, 
+      <a href="http:://www.openfst.org">OpenFst</a> or 
+      <a href="http://foma.sourceforge.net/">foma</a>) 
+      installed on your computer. The internal transducer format of HFST
+      is very limited in its operations and used mainly for conversion between different binary
+      and text formats. The HFST optimized lookup transducer format comes with the source code,
+      but it has also a very limited selection of operations as its main purpose is fast lookup
+      of strings.  
+      */
+
+
+  /** \page AddingYourLibrary.html 
+
+      <b>This page is still under construction...</b>
+
+      \section adding_library Adding your own library under the HFST interface
+
+      Suppose your library is named Foo, and the transducer class FooTransducer.
+
+      \section The backend implementation
+
+      in directory libhfst/src/implementations there are skeleton files
+      FooTransducer.h and FooTransducer.cc. File FooTransducer.h declares classes
+      FooTransducer, FooInputStream and FooOutputStream. Class FooTransducer contains
+      static functions that operate on FooTransducers. Classes FooInputStream and FooOutputStream
+      represent input and output streams to files or standard streams. They are used
+      for reading or writing binary transducers to/from streams.
+
+      \section How HFST can access the backend implementation
+
+      Fist of all, HFST must be aware of a new transducer type. In file HfstDataTypes.h
+      is defined an enum ImplementationType where a new enumerator must be added:
+
+\verbatim
+FOO_TYPE
+\endverbatim
+
+        To file HfstTransducer.h: 
+      
+        In the beginning the h-file must be included:
+
+\verbatim
+#if HAVE_FOO
+#include "implementations/FooTransducer.h"
+#endif
+\endverbatim
+	
+      To namespace hfst:
+
+\verbatim
+#if HAVE_FOO
+  using hfst::implementations::FooTransducer;
+#endif
+\endverbatim
+
+     union TransducerImplementation has a new enumerator:
+
+\verbatim
+#if HAVE_FOO
+  hfst::implementations::FooTransducer * foo;
+#endif
+\endverbatim
+
+    interface through which the backend library can be accessed.
+
+\verbatim
+#if HAVE_FOO
+    static hfst::implementations::FooTransducer foo_interface;
+#endif
+\endverbatim
+    
+    To file HfstTransducer.cc:
+
+#if HAVE_FOO
+  hfst::implementations::FooTransducer HfstTransducer::foo_interface;
+#endif
+
+	To files HfstApply.cc apply_schemas.h HfstInputStream.h HfstInputStream.cc
+	HfstOutputStream.h HfstOutputStream.cc
+
+	union StreamImplementation:
+
+#if HAVE_FOO
+      hfst::implementations::FooInputStream * foo;
+#endif
+
+	enum TransducerType:
+
+FOO_
+
+	function guess_fst_type
+
+#ifdef HAVE_FOO
+	  case 'f':  // Foo (replace 'f'  the first char in a binary FooTransducer)
+	    return FOO_;
+	    break;
+#endif
+
+	union StreamImplementation:
+
+
+#if HAVE_FOO
+      hfst::implementations::FooOutputStream * foo;
+#endif
+
+	append_hfst_header_data:
+
+#if HAVE_FOO
+      case FOO_TYPE:
+	type_value=std::string("FOO");
+	break;
+#endif
+
+      If you want to add a transducer library as a part of HFST,
+      the file FooTransducer.h lists the functions that your library should implement.
+
+      You must also add a separate case for each function in classes HfstTransducer, HfstOutputStream
+      and HfstInputStream where your own function is called if the ImplementationType requires it.
+      This should be quite straightforward and is probably partially automatizable.
+
+   */
+
+namespace hfst {
+
+  /** \page QuickStart.html
+
+      <b>This page is still under construction...</b>
+
+      \section hfst_structure Structure of the API
+
+The HFST API is written in the namespace #hfst that contains the following classes:
+
+   - HfstTransducer: A class for creating transducers and performing operations on them.
+
+   - HfstInputStream and HfstOutputStream: Classes for writing and reading binary transducers.
+
+   - HfstMutableTransducer, HfstTransition, HfstTransitionIterator and HfstStateIterator: Classes for creating transducers from scratch and iterating through their states and transitions.
+
+   - HfstTokenizer: A class used in creating transducers from UTF-8 strings.
+
+   - HfstGrammar: A class used in \link HfstTransducer::compose_intersect intersecting composition\endlink.
+
+and the following namespaces:
+
+   - \link hfst::rules rules\endlink: A namespace that contains functions to create two-level, replace, restriction and coercion rules.
+
+   - \link hfst::xfst xfst\endlink: ?
+
+   - \link hfst::lexc lexc\endlink: A namespace for Xerox LexC related specific functions and classes.
+
+   - \link hfst::xre xre\endlink: A namespace for functions related to regular expression parsing.
+
+   - \link hfst::exceptions exceptions\endlink: A namespace for exceptions.
+
+
+      \section using_hfst Using HFST in your own code
+
+      Include file HfstTransducer.h and other relevant h-files to the beginning of your file.
+
+      For example, if you have SFST installed on your computer, the following simple program
+\verbatim
+#include <cstdio>
+#include "HfstTransducer.h"
+
+int main() 
+{
+  HfstTransducer tr1("foo", "bar", SFST_TYPE);
+  HfstTransducer tr2("bar", "baz", SFST_TYPE);
+  tr1.compose(tr2);
+  tr1.write_in_att_format(stdout);
+  return 0;
+}
+\endverbatim
+
+should print to standard out the following text:
+
+\verbatim
+0      1     foo    baz
+1
+\endverbatim
+      
+   */
+
+}
+
+/** \mainpage 
+
+HFST - The Helsinki Finite-State Transducer technology is intended for creating and manipulating weighted or unweighted synchronic transducers implementing regular relations.
+Currently HFST has been implemented using the 
+<a href="http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html">SFST</a>, 
+<a href="http:://www.openfst.org">OpenFst</a> and 
+<a href="http://foma.sourceforge.net/">foma</a> software libraries.
+Other versions may be added in some future release. 
+SFST and foma implementations are unweighted and OpenFst implementation is weighted.
+
+Some of the HFST interface functionalities have also been implemented for 
+internal HFST and HFST optimized lookup transducer formats. The previous is
+useful for converting between transducer formats and storing transducers
+in an implementation-independent format. The latter is used for fast lookup
+of strings in a transducer.
+
+All implementations work according to the same interface, so it is possible
+to compile the same piece of code using different backend libraries.
+It is also possible to add your own transducer library under the HFST interface.
+
+The examples given in this documentation use <a href="http://www.xrce.xerox.com/Research-Development/Publications/1997-005/(language)">Xerox transducer notation</a>.
+<!-- More info on SFST tools is in http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html,
+OpenFst in http://www.openfst.org and foma in http://www.aclweb.org/anthology/E/E09/E09-2008.pdf. -->
+
+<br></br>
+
+\section what_is_new What is new in version 3.0
+
+   - A third transducer library, <a href="http://foma.sourceforge.net/">foma</a>, is included
+
+   - <a href="AddingYourLibrary.html">Adding</a> your own transducer library under the HFST interface is easy
+
+   - Unknown and identity symbols are supported
+
+
+\section features Features
+
+   - Create transducers \link hfst::HfstMutableTransducer from scratch\endlink
+
+   - Iterate through a transducer's \link hfst::HfstStateIterator states\endlink and \link hfst::HfstTransitionIterator transitions\endlink
+
+   - Create transducers by \link hfst::HfstTokenizer tokenizing\endlink UTF-8 strings with multicharacter symbols
+
+   - Apply two-level, replace, restriction and coercion \link hfst::rules rules\endlink
+
+   - Create transducers from \link hfst::xre regular expressions\endlink
+
+
+\section tutorial Tutorial
+
+   - A <a href="QuickStart.html">quick start</a> to the HFST interface with examples
+
+   - <a href="AddingYourLibrary.html">Adding</a> your own implementation of HFST
+
+   - <a href="VersionDifferences.html">Differences</a> between HFST version 2 and 3...
+
+
+\section download_hfst Download
+
+   - <a href="http://sourceforge.net/projects/hfst/files/hfst">Download</a> and 
+   <a href="InstallHfst.html">install</a> the HFST interface and commandline tools
+
+
+\section links Links
+
+   - <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstOutline">Examples</a> of programs implemented using the HFST interface
+
+   - <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome">Documentation</a> of the HFST project
+
+   <br></br>
+
+*/
