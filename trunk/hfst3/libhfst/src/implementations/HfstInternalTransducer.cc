@@ -8,7 +8,7 @@ namespace hfst {
     //      bool final;
     // std::set< std::pair<unsigned int, unsigned int>, HfstTrieState * target_state > transitions;
 
-    HfstTrieState::HfstTrieState(unsigned int state_number): final(false), state_number(state_number) {}
+    HfstTrieState::HfstTrieState(unsigned int state_number): final(false), weight(0), state_number(state_number) {}
 
     HfstTrieState::~HfstTrieState() { 
       for( std::set< std::pair< std::pair<unsigned int, unsigned int>, HfstTrieState *> >::iterator it = transitions.begin();
@@ -28,7 +28,7 @@ namespace hfst {
 		  alphabet->code2symbol(it->first.second) );
 	}
       if (final)
-	fprintf(stderr, "%i\n", state_number);
+	fprintf(stderr, "%i\t%f\n", state_number, weight);
     }
 
     void HfstTrieState::add_transition(unsigned int inumber, unsigned int onumber, HfstTrieState * target_state)
@@ -61,7 +61,7 @@ namespace hfst {
 	}
     }
 
-    void HfstTrie::add_path(const StringPairVector &spv) 
+    void HfstTrie::add_path(const StringPairVector &spv, float weight) 
     {
       if (spv.size() == 0)
 	return;
@@ -84,6 +84,13 @@ namespace hfst {
 	  else {
 	    path++;
 	    if (path == spv.end()) {
+	      if (not target->final) {
+		target->weight = weight;
+	      }
+	      else {
+		if (target->weight > weight)
+		  target->weight = weight;
+	      }
 	      target->final = true;
 	      return;
 	    }
@@ -103,6 +110,7 @@ namespace hfst {
 	  path++;
 	  if (path == spv.end()) {
 	    new_state->final = true;
+	    new_state->weight = weight;
 	    break;
 	  }
 	  state = new_state;
@@ -744,8 +752,9 @@ namespace hfst {
 			   it2->first.second,
 			   0 );
 		}
-	      if (s->final)
-		add_line(s->state_number, 0);	      
+	      if (s->final) {
+		add_line(s->state_number, s->weight);
+	      }	      
 	    }
 	}
     }

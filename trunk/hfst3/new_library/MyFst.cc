@@ -1,6 +1,12 @@
 #include "MyFst.h"
 #include <stdio.h>
 
+/** @file MyFst.cc
+    @brief Contains a very simple transducer library,
+    My Finite-State Transducer Library - MFSTL, which is used 
+    to exemplify how a new library is added under HFST.
+*/
+
 namespace mfstl {
 
   MyFst::MyFst() :

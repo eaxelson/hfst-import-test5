@@ -15,11 +15,14 @@
 
 /** @file MfstlTransducer.h
     \brief Declarations of functions and datatypes that form a bridge between
-    HFST API and library MFSTL. 
+    HFST API and the example transducer library MFSTL. 
 
     This file lists the classes and functions that a new library must implement
     before added under the HFST API. Write implementations in file 
-    MfstlTransducer.cc */
+    MfstlTransducer.cc 
+
+    @see MyFst.h MyFst.cc
+*/
 
 #include "HfstExceptions.h"
 #include "FlagDiacritics.h"
@@ -44,7 +47,7 @@ namespace implementations
      as hfst::implementations::mfstl */
   using namespace mfstl;
 
-  /* A class for reading binary MyFsts from a stream. 
+  /** @brief A class for reading binary MyFsts from a stream. 
 
      If your transducer read function uses C FILEs, see class SfstInputStream
      or FomaInputStream for an example how to implement the functions
@@ -65,32 +68,32 @@ namespace implementations
     //istream &input_stream;
 
   public:
-    /* Create and open a stream to standard in. */
+    /** @brief Create and open a stream to standard in. */
     MfstlInputStream(void);
-    /* Create and open a stream to file filename. */
+    /** @brief Create and open a stream to file filename. */
     MfstlInputStream(const char * filename);
-    /* Close the stream. If it points to standard in, nothing is done. */
+    /** @brief Close the stream. If it points to standard in, nothing is done. */
     void close(void);
-    /* */
+    /** @brief Whether the stream is at end. */
     bool is_eof(void);
-    /* */
+    /** @brief Whether the stream's badbit has been set. */
     bool is_bad(void);
-    /* */
+    /** @brief Whether the stream is good for input operations. */
     bool is_good(void);
-    /* */
+    /** @brief Whether the next object in the stream is a MyFst */
     bool is_fst(void);
 
-    /* Extract a char from the stream. */
+    /** @brief Extract a char from the stream. */
     char stream_get();
-    /* Put back a char to the stream. */
+    /** @brief Put back a char to the stream. */
     void stream_unget(char c);
-    /* Extract n chars and ignore them. */
+    /** @brief Extract n chars and ignore them. */
     void ignore(unsigned int n);
 
-    /* Optional: if you want to extract implementation specific data from the header. */
+    /** @brief Optional: if you want to extract implementation specific data from the header. */
     bool set_implementation_specific_header_data(StringPairVector &data, unsigned int index);
 
-    /* Read a MyFst from the stream. */
+    /** @brief Read a MyFst from the stream. */
     MyFst * read_transducer();
     
   };
@@ -116,104 +119,106 @@ namespace implementations
     //ostream &output_stream;
 
   public:
-    /* Create and open a stream to standard out. */
+    /** @brief Create and open a stream to standard out. */
     MfstlOutputStream(void); 
-    /* Create and open a stream to file filename. */
+    /** @brief Create and open a stream to file filename. */
     MfstlOutputStream(const char * filename);
-    /* Close the stream. If it points to standard out, nothig is done. */
+    /** @brief Close the stream. If it points to standard out, nothig is done. */
     void close(void);
-    /* Write a char to the stream. */
+    /** @brief Write a char to the stream. */
     void write(const char &c);
 
-    /* Optional: if you want to store implementation specific data to the header. */
+    /** @brief Optional: if you want to store implementation specific data to the header. */
     void append_implementation_specific_header_data(std::vector<char> &header, MyFst *t);
 
-    /* Write a MyFst to the stream. */
+    /** @brief Write a MyFst to the stream. */
     void write_transducer(MyFst * transducer);
   };
   
-  /* A library class that contains operations for MyFsts. */
+  /** @brief A library class that contains operations for MyFst transducers. 
+
+      A transducer library that is added under HFST must implement these operations. */
   class MfstlTransducer
     {
     public:
-      /* Create a transducer that does not recognise any string. */
+      /** @brief Create a transducer that does not recognise any string. */
       static MyFst * create_empty_transducer(void);
-      /* Create a transducer that recognises the empty string. */
+      /** @brief Create a transducer that recognises the empty string. */
       static MyFst * create_epsilon_transducer(void);
-      /* Create a transducer that recognises the symbol pair symbol:symbol */
+      /** @brief Create a transducer that recognises the symbol pair symbol:symbol */
       static MyFst * define_transducer(const char *symbol);
-      /* Create a transducer that recognises the symbol pair isymbol:osymbol */
+      /** @brief Create a transducer that recognises the symbol pair isymbol:osymbol */
       static MyFst * define_transducer(const char *isymbol, const char *osymbol);
-      /* Create a transducer that recognises the concatenation of symbol pairs in spv */
+      /** @brief Create a transducer that recognises the concatenation of symbol pairs in spv */
       static MyFst * define_transducer(const StringPairVector &spv);
-      /* Create a transducer that recognises the union of symbol pairs in sps 
+      /** @brief Create a transducer that recognises the union of symbol pairs in sps 
 	 If cyclic is true, any number of consecutive symbol pairs is recognised. */
       static MyFst * define_transducer(const StringPairSet &sps, bool cyclic=false);
-      /* Crate a transducer that recognises the concatenation of symbol pair unions in spsv. */
+      /** @brief Crate a transducer that recognises the concatenation of symbol pair unions in spsv. */
       static MyFst * define_transducer(const std::vector<StringPairSet> &spsv);
 
-      /* Create a deep copy of transducer t. */
+      /** @brief Create a deep copy of transducer t. */
       static MyFst * copy(MyFst * t);
-      /* Create a deterministic transducer equivalent to transducer t. */
+      /** @brief Create a deterministic transducer equivalent to transducer t. */
       static MyFst * determinize(MyFst * t);
-      /* Create a minimal transducer equivalent to transducer t. */
+      /** @brief Create a minimal transducer equivalent to transducer t. */
       static MyFst * minimize(MyFst * t);
-      /* Create an epsilon-free transducer equivalent to transducer t. */
+      /** @brief Create an epsilon-free transducer equivalent to transducer t. */
       static MyFst * remove_epsilons(MyFst * t);
 
-      /* Create a transducer that accepts any number of consecutive string pairs accepted by transducer t. */
+      /** @brief Create a transducer that accepts any number of consecutive string pairs accepted by transducer t. */
       static MyFst * repeat_star(MyFst * t);
-      /* Create a transducer that accepts one or more consecutive string pairs accepted by transducer t. */
+      /** @brief Create a transducer that accepts one or more consecutive string pairs accepted by transducer t. */
       static MyFst * repeat_plus(MyFst * t);
-      /* Create a transducer that accepts n consecutive string pairs accepted by transducer t. */
+      /** @brief Create a transducer that accepts n consecutive string pairs accepted by transducer t. */
       static MyFst * repeat_n(MyFst * t,int n);
-      /* Create a transducer that accepts from zero to n consecutive string pairs accepted by transducer t. */
+      /** @brief Create a transducer that accepts from zero to n consecutive string pairs accepted by transducer t. */
       static MyFst * repeat_le_n(MyFst * t,int n);
 
-      /* Create a transducer that accepts string pairs accepted by transducer t or an empty string. */
+      /** @brief Create a transducer that accepts string pairs accepted by transducer t or an empty string. */
       static MyFst * optionalize(MyFst * t);
-      /* Create a transducer that accepts string pair string2:string1 iff transducer t accepts string pair string1:string2. */
+      /** @brief Create a transducer that accepts string pair string2:string1 iff transducer t accepts string pair string1:string2. */
       static MyFst * invert(MyFst * t);
-      /* Create a transducer that accepts string pair 1gnirts:2gnirts iff transducer t accepts string pair string1:string2. */
+      /** @brief Create a transducer that accepts string pair 1gnirts:2gnirts iff transducer t accepts string pair string1:string2. */
       static MyFst * reverse(MyFst * t);
 
-      /* Create a transducer that accepts string pair string1:string1 iff transducer t accepts string pair string1:string2. */
+      /** @brief Create a transducer that accepts string pair string1:string1 iff transducer t accepts string pair string1:string2. */
       static MyFst * extract_input_language(MyFst * t);
-      /* Create a transducer that accepts string pair string2:string2 iff transducer t accepts string pair string1:string2. */
+      /** @brief Create a transducer that accepts string pair string2:string2 iff transducer t accepts string pair string1:string2. */
       static MyFst * extract_output_language(MyFst * t);
-      /* A vector of transducers that each accept one string pair accepted by transducer t. t cannot be cyclic. */
+      /** @brief A vector of transducers that each accept one string pair accepted by transducer t. t cannot be cyclic. */
       static std::vector<MyFst*> extract_paths(MyFst *t);
-      /* TODO: document */
+      /** @brief TODO: document */
       static void extract_strings(MyFst * t, hfst::ExtractStringsCb& callback, int cycles=-1, FdTable<unsigned int>* fd=NULL, bool filter_fd=false);
 
-      /* Create a transducer that accepts string pair of [ A:B* s A:B* t A:B* r A:B* i A:B* n A:B* g A:B* 1:2 A:B* ] 
+      /** @brief Create a transducer that accepts string pair of [ A:B* s A:B* t A:B* r A:B* i A:B* n A:B* g A:B* 1:2 A:B* ] 
 	 (where A and B are input and output symbol of symbol_pair) iff transducer t accepts string pair string1:string2. */
       static MyFst * insert_freely(MyFst *t , const StringPair &symbol_pair);
-      /* Create a transducer equivalent to transducer t but where all symbols old_symbol are substituted with new_symbol. */
+      /** @brief Create a transducer equivalent to transducer t but where all symbols old_symbol are substituted with new_symbol. */
       static MyFst * substitute(MyFst * t, String old_symbol, String new_symbol);
-      /* Create a transducer equivalent to transducer t but where all symbol pairs symbol_pair are substituted with
+      /** @brief Create a transducer equivalent to transducer t but where all symbol pairs symbol_pair are substituted with
 	 a copy of transducer tr. */
       static MyFst * substitute(MyFst *t, const StringPair &symbol_pair, MyFst *tr);
 
-      /* Create a transducer that accepts string pair string1:string3 iff t1 accepts string pair string1:string2
+      /** @brief Create a transducer that accepts string pair string1:string3 iff t1 accepts string pair string1:string2
 	 and t2 accepts string pair string2:string3, where string2 is any string. */
       static MyFst * compose(MyFst * t1,
 				     MyFst * t2);
-      /* Create a transducer that accepts a concatenation of any string pair accepted by t1
+      /** @brief Create a transducer that accepts a concatenation of any string pair accepted by t1
 	 and any string pair accepted by t2. */
       static MyFst * concatenate(MyFst * t1,
 					 MyFst * t2);
-      /* Create a transducer that accepts any string pair accepted by t1 or t2. */
+      /** @brief Create a transducer that accepts any string pair accepted by t1 or t2. */
       static MyFst * disjunct(MyFst * t1,
 				      MyFst * t2);
-      /* Create a transducer that accepts any string pair accepted by both t1 and t2. */
+      /** @brief Create a transducer that accepts any string pair accepted by both t1 and t2. */
       static MyFst * intersect(MyFst * t1,
 				       MyFst * t2);
-      /* Create a transducer that accepts any string pair accepted by t1 but not t2. */
+      /** @brief Create a transducer that accepts any string pair accepted by t1 but not t2. */
       static MyFst * subtract(MyFst * t1,
 				      MyFst * t2);
 
-      /* Return a harmonized copy of transducers t1 and t2. 
+      /** @brief Return a harmonized copy of transducers t1 and t2. 
 
 	 First, all string symbols that are found in t2's alphabet but not in t1's alphabet
 	 are added to the alphabet of t1 to the next free positions (numbers).
@@ -231,34 +236,34 @@ namespace implementations
       static std::pair<MyFst*, MyFst*> harmonize(MyFst *t1, MyFst *t2,
 								 bool unknown_symbols_in_use=true);
 
-      /* Whether transducers t1 an t2 are equivalent. */
+      /** @brief Whether transducers t1 an t2 are equivalent. */
       static bool are_equivalent(MyFst * t1, MyFst * t2);
-      /* Whether transducer t is cyclic. */
+      /** @brief Whether transducer t is cyclic. */
       static bool is_cyclic(MyFst * t);
       
-      /* A table of MfstlTransitionNumbers that represent flag diacritics in transducer t. */
+      /** @brief A table of MfstlTransitionNumbers that represent flag diacritics in transducer t. */
       static FdTable<unsigned int>* get_flag_diacritics(MyFst * t);
 
-      /* Remove symbol symbol from the alphabet of transducer t. */
+      /** @brief Remove symbol symbol from the alphabet of transducer t. */
       static MyFst * remove_from_alphabet(MyFst *t, const std::string &symbol);
 
-      /* Disjunct t with a path transducer spv. */
+      /** @brief Disjunct t with a path transducer spv. */
       static MyFst * disjunct(MyFst * t, const StringPairVector &spv);
 
-      /* Get all symbol pairs that occur in transitions of transducer t. */
+      /** @brief Get all symbol pairs that occur in transitions of transducer t. */
       static StringPairSet get_symbol_pairs(MyFst *t);
 
-      /* The number of states in transducer t. */
+      /** @brief The number of states in transducer t. */
       static unsigned int number_of_states(MyFst *t);
 
       // you probably need also these functions
     protected:
-      /* Add the following number-to-symbol correspondencies to the alphabet of transducer t: 
+      /** @brief Add the following number-to-symbol correspondencies to the alphabet of transducer t: 
 	 0 : "@_EPSILON_SYMBOL_@"
 	 1 : "@_UNKNOWN_SYMBOL_@"
 	 2 : "@_IDENTITY_SYMBOL_@"  */
       static void initialize_alphabet(MyFst *t);
-      /* Get all symbols that occur in transitions of transducer t. */
+      /** @brief Get all symbols that occur in transitions of transducer t. */
       static StringSet get_string_set(MyFst *t);
 
     };
