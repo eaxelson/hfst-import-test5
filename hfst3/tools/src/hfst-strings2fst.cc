@@ -323,9 +323,6 @@ process_stream(HfstOutputStream& outstream)
         }
       else if (!has_spaces && !pairstrings)
         {
-          fprintf(stderr, "FIXME: unimplemented !has_spaces && !pairstrings\n");
-          return EXIT_FAILURE;
-
           const char* colon = strstr(line, ":");
           while (colon != NULL)
             {
@@ -349,7 +346,7 @@ process_stream(HfstOutputStream& outstream)
           if (colon != NULL)
             {
               first = hfst_strndup(line, colon-line);
-              second = hfst_strndup(colon, string_end - colon);
+              second = hfst_strndup(colon+1, string_end - colon);
             }
           else
             {
@@ -357,6 +354,9 @@ process_stream(HfstOutputStream& outstream)
               second = first;
             }
           //parsed = HfstTransducer(first, second, tok, output_format);
+	  StringPairVector * spv_tok = tok.tokenize(std::string(first), std::string(second));
+	  spv = *(spv_tok);
+	  delete spv_tok;
         }
 
       float path_weight=0;
