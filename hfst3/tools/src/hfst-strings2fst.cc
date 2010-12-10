@@ -54,14 +54,16 @@ using hfst::HfstMutableTransducer;
 using hfst::implementations::HfstTrie;
 using hfst::StringPairVector;
 using hfst::StringPair;
+using hfst::StringSet;
 
-static char *epsilonname=NULL;
+static char *epsilonname=NULL; // FIX: use this
 static bool has_spaces=false;
 static bool disjunct_strings=false;
 static bool pairstrings=false;
+static char *multichar_symbol_filename=NULL;
+static StringSet multichar_symbols;
 
 static float sum_of_weights=0;
-//static bool sum_weights=false;
 static bool normalize_weights=false;
 static bool logarithmic_weights=false;
 
@@ -115,7 +117,9 @@ print_usage()
                 "  -p, --pairstring          Input is in pairstring format\n"
                 "  -S, --spaces              Input has spaces between "
                     "transitions\n"
-                "  -e, --epsilon=EPS         How epsilon is represented.\n");
+                "  -e, --epsilon=EPS         How epsilon is represented.\n"
+		"  -m, --multichar-symbols=FILE   Strings that must be tokenized as one symbol.\n"
+		);
         fprintf(message_out, "\n");
 
         fprintf(message_out, 
@@ -124,6 +128,7 @@ print_usage()
             "openfst-tropical, sfst or foma\n"
             "If EPS is not defined, the default representation of @0@ is used.\n"
 	    "Option --log precedes option --norm.\n"
+	    "The FILE of option -m lists all multichar-symbols, each symbol on its own line."	
 	    "\n"
             );
 
@@ -167,17 +172,17 @@ parse_options(int argc, char** argv)
         HFST_GETOPT_UNARY_LONG,
           {"disjunct-strings", no_argument, 0, 'j'},
           {"epsilon", required_argument, 0, 'e'},
-	//{"sum", no_argument, 0, '1'},
           {"norm", no_argument, 0, '2'},
           {"log", no_argument, 0, '3'},
           {"pairstrings", no_argument, 0, 'p'},
           {"spaces", no_argument, 0, 'S'},
+	  {"multichar-symbols", required_argument, 0, 'm'},
           {"format", required_argument, 0, 'f'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "je:23pSf:",
+                             HFST_GETOPT_UNARY_SHORT "je:23pSm:f:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -191,9 +196,6 @@ parse_options(int argc, char** argv)
         case 'e':
             epsilonname = hfst_strdup(optarg);
             break;
-	    //case '1':
-            //sum_weights = true;
-            //break;
         case '2':
             normalize_weights = true;
             break;
@@ -209,6 +211,9 @@ parse_options(int argc, char** argv)
         case 'p':
             pairstrings = true;
             break;
+	case 'm':
+	    multichar_symbol_filename = hfst_strdup(optarg);
+	    break;
         case 'f':
             output_format = hfst_parse_format_name(optarg);
             break;
@@ -239,10 +244,16 @@ process_stream(HfstOutputStream& outstream)
   char* line = 0;
   size_t len = 0;
   HfstTokenizer tok;
-  //HfstTransducer disjunction(output_format);
-  //outstream.open();
   HfstTrie disjunction;
   size_t line_n = 0;
+
+  // add multicharater symbols to tokenizer
+  for(StringSet::const_iterator it=multichar_symbols.begin();
+      it != multichar_symbols.end(); it++ ) 
+    {
+      tok.add_multichar_symbol(*it);
+    }
+
   while (hfst_getline(&line, &len, inputfile) != -1)
     {
       transducer_n++;
@@ -274,8 +285,7 @@ process_stream(HfstOutputStream& outstream)
           weighted = true;
         }
       *string_end = '\0';
-      //HfstTransducer parsed(0, output_format);
-      //HfstTransducer parsed("@_EPSILON_SYMBOL_@", output_format);
+
       StringPairVector spv;
       if (has_spaces && pairstrings)
         {
@@ -292,14 +302,10 @@ process_stream(HfstOutputStream& outstream)
                 {
                   char* upper = hfst_strndup(pair, colon - pair);
                   char* lower = hfst_strndup(colon, pair_end - colon);
-                  //HfstTransducer new_pair(upper, lower, output_format);
-                  //parsed.concatenate(new_pair).minimize();
 		  spv.push_back(StringPair(std::string(upper), std::string(lower)));
                 }
               else
                 {
-                  //HfstTransducer new_pair(pair, output_format);
-                  //parsed.concatenate(new_pair).minimize();
 		  spv.push_back(StringPair(std::string(pair), std::string(pair)));
                 }
               strtok(NULL, " ");
@@ -310,8 +316,6 @@ process_stream(HfstOutputStream& outstream)
           char* pair = strtok(line, " ");
           while (pair != NULL)
             {
-              //HfstTransducer new_pair(pair, output_format);
-              //parsed.concatenate(new_pair).minimize();
 	      spv.push_back(StringPair(std::string(pair), std::string(pair)));
               pair = strtok(NULL, " ");
             }
@@ -353,7 +357,7 @@ process_stream(HfstOutputStream& outstream)
               first = hfst_strndup(line, string_end-line);
               second = first;
             }
-          //parsed = HfstTransducer(first, second, tok, output_format);
+
 	  StringPairVector * spv_tok = tok.tokenize(std::string(first), std::string(second));
 	  spv = *(spv_tok);
 	  delete spv_tok;
@@ -366,18 +370,15 @@ process_stream(HfstOutputStream& outstream)
 	  sum_of_weights = sum_of_weights + weight;
 
 	  if (!logarithmic_weights) {
-	    //parsed.set_final_weights(weight);
 	    path_weight=weight;
 	  }
 	  else {
-	    //parsed.set_final_weights(take_negative_logarithm(weight));
 	    path_weight=take_negative_logarithm(weight);
 	  }
         }
 
       if (!disjunct_strings)
         {
-          //outstream << parsed;
 	  HfstTrie tr;
 	  tr.add_path(spv, path_weight);
 	  HfstMutableTransducer mut(tr);
@@ -386,7 +387,6 @@ process_stream(HfstOutputStream& outstream)
         }
       else
         {
-          //disjunction.disjunct(parsed);
 	  disjunction.add_path(spv, path_weight);
         }
     }
@@ -416,6 +416,30 @@ int main( int argc, char **argv )
     {
       return retval;
     }
+
+  if (multichar_symbol_filename != NULL)
+    {
+      FILE *file = fopen(multichar_symbol_filename, "rb");
+      if (file == NULL) {
+	fprintf(stderr, "ERROR: multichar symbol file %s could not be opened\n",
+		multichar_symbol_filename);
+	return EXIT_FAILURE;
+      }
+      char line[512];
+      while(not feof(file))
+	{
+	  if (fgets(line, 511, file) != NULL) {
+	    for (unsigned int i=0; i<512; i++) {
+	      if (line[i] == '\n') {
+		line[i]='\0';
+		break;
+	      }
+	    }	  
+	    multichar_symbols.insert(std::string(line));
+	  }
+	}
+    }
+
   // close output buffers, we use output streams
   if (outfile != stdout)
     {
