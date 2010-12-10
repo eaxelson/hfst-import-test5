@@ -56,8 +56,8 @@ namespace hfst
       hfst::implementations::FomaOutputStream * foma;
 #endif
 
-#if HAVE_FOO
-      hfst::implementations::FooOutputStream * foo;
+#if HAVE_MFSTL
+      hfst::implementations::MfstlOutputStream * mfstl;
 #endif
 
       hfst::implementations::HfstOlOutputStream * hfst_ol;

@@ -38,10 +38,10 @@
 #endif
 #endif
 
-#if HAVE_FOO
-#ifndef _FOOLIB_H_
-#define _FOOLIB_H_
-#include "foo/FooTransducer.h"
+#if HAVE_MFSTL
+#ifndef _MFSTLLIB_H_
+#define _MFSTLLIB_H_
+#include "mfstl/MyFst.h"
 #endif
 #endif
 
@@ -108,10 +108,10 @@ namespace hfst { namespace implementations {
   HfstInternalTransducer * hfst_ol_to_internal_hfst_format(hfst_ol::Transducer * t);
 #endif  
   
-  /* Read an Foo::FooTransducer * and return the equivalent transducer in
+  /* Read an mfstl::MyFst * and return the equivalent transducer in
      internal format. */
-#if HAVE_FOO
-  HfstInternalTransducer * foo_to_internal_hfst_format(Foo::FooTransducer * t);
+#if HAVE_MFSTL
+  HfstInternalTransducer * mfstl_to_internal_hfst_format(mfstl::MyFst * t);
 #endif
 
 
@@ -142,9 +142,9 @@ namespace hfst { namespace implementations {
     hfst_ol::Transducer * hfst_internal_format_to_hfst_ol(HfstInternalTransducer * t, bool weighted);
 #endif
 
-    /* Read a transducer in internal format and return the equivalent FooTransducer. */
-#if HAVE_FOO
-    Foo::FooTransducer * hfst_internal_format_to_foo(const HfstInternalTransducer * t);
+    /* Read a transducer in internal format and return the equivalent MyFst. */
+#if HAVE_MFSTL
+    mfstl::MyFst * hfst_internal_format_to_mfstl(const HfstInternalTransducer * t);
 #endif
 
 } }

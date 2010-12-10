@@ -44,10 +44,10 @@ namespace hfst
 	  new hfst::implementations::FomaOutputStream();
 	break;
 #endif
-#if HAVE_FOO
-      case FOO_TYPE:
-	implementation.foo = 
-	  new hfst::implementations::FooOutputStream();
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
+	implementation.mfstl = 
+	  new hfst::implementations::MfstlOutputStream();
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -98,10 +98,10 @@ namespace hfst
 	  new hfst::implementations::FomaOutputStream(filename.c_str());
 	break;
 #endif
-#if HAVE_FOO
-      case FOO_TYPE:
-	implementation.foo =
-	  new hfst::implementations::FooOutputStream(filename.c_str());
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
+	implementation.mfstl =
+	  new hfst::implementations::MfstlOutputStream(filename.c_str());
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -140,9 +140,9 @@ namespace hfst
 	delete implementation.foma;
 	break;
 #endif
-#if HAVE_FOO
-      case FOO_TYPE:
-	delete implementation.foo;
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
+	delete implementation.mfstl;
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -195,9 +195,9 @@ namespace hfst
 	implementation.foma->write(c);
 	break;
 #endif
-#if HAVE_FOO
-      case FOO_TYPE:
-	implementation.foo->write(c);
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
+	implementation.mfstl->write(c);
 	break;
 #endif
 #if HAVE_HFST_OL
@@ -237,9 +237,9 @@ namespace hfst
 	type_value=std::string("FOMA");
 	break;
 #endif
-#if HAVE_FOO
-      case FOO_TYPE:
-	type_value=std::string("FOO");
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
+	type_value=std::string("MFSTL");
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -354,10 +354,10 @@ namespace hfst
 	  (transducer.implementation.foma);
 	return *this;
 #endif
-#if HAVE_FOO
-      case FOO_TYPE:
-	implementation.foo->write_transducer
-	  ((Foo::FooTransducer*)transducer.implementation.foo);
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
+	implementation.mfstl->write_transducer
+	  (transducer.implementation.mfstl);
 #endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
@@ -391,9 +391,9 @@ namespace hfst
 	implementation.foma->close();
 	break;
 #endif
-#if HAVE_FOO
-      case FOO_TYPE:
-	implementation.foo->close();
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
+	implementation.mfstl->close();
 	break;
 #endif
       case HFST_OL_TYPE:

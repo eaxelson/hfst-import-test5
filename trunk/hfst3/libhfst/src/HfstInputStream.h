@@ -76,8 +76,8 @@ delete in;
       hfst::implementations::FomaInputStream * foma;
 #endif
 
-#if HAVE_FOO
-      hfst::implementations::FooInputStream * foo;
+#if HAVE_MFSTL
+      hfst::implementations::MfstlInputStream * mfstl;
 #endif
 
       hfst::implementations::HfstOlInputStream * hfst_ol;
@@ -120,7 +120,7 @@ delete in;
       OPENFST_, /* An OpenFst transducer, can cause problems if it does not have symbol tables. */
       SFST_,  /* An SFST transducer. */
       FOMA_, /* A foma transducer. */
-      FOO_, /* A new type */
+      MFSTL_, /* A new type */
       ERROR_TYPE_ /* Transducer type not recognized. */
     };
 
