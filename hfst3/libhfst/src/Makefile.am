@@ -50,8 +50,25 @@ libhfst_la_LDFLAGS = -no-undefined -version-info 1:0:0
 
 # unit tests: add one per class/file/anything
 
-check_PROGRAMS = HfstTransducer
+check_PROGRAMS = HfstTransducer FlagDiacritics HfstGrammar HfstInputStream \
+				 HfstOutputStream HfstTokenizer
 HfstTransducer_SOURCES=HfstTransducer.cc
 HfstTransducer_CXXFLAGS=-DDEBUG_MAIN
 HfstTransducer_LDADD=libhfst.la
-TESTS=HfstTransducer
+FlagDiacritics_SOURCES=FlagDiacritics.cc
+FlagDiacritics_CXXFLAGS=-DDEBUG_MAIN
+FlagDiacritics_LDADD=libhfst.la
+HfstGrammar_SOURCES=HfstGrammar.cc
+HfstGrammar_CXXFLAGS=-DDEBUG_MAIN
+HfstGrammar_LDADD=libhfst.la
+HfstInputStream_SOURCES=HfstInputStream.cc
+HfstInputStream_CXXFLAGS=-DDEBUG_MAIN
+HfstInputStream_LDADD=libhfst.la
+HfstOutputStream_SOURCES=HfstOutputStream.cc
+HfstOutputStream_CXXFLAGS=-DDEBUG_MAIN
+HfstOutputStream_LDADD=libhfst.la
+HfstTokenizer_SOURCES=HfstTokenizer.cc
+HfstTokenizer_CXXFLAGS=-DDEBUG_MAIN
+HfstTokenizer_LDADD=libhfst.la
+TESTS=HfstTransducer FlagDiacritics HfstGrammar HfstInputStream \
+	  HfstOutputStream HfstTokenizer

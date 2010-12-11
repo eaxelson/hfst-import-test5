@@ -12,6 +12,7 @@
 #include "HfstTransducer.h"
 #include "HfstOutputStream.h"
 
+#ifndef DEBUG_MAIN
 namespace hfst
 {
   HfstOutputStream::HfstOutputStream(ImplementationType type, bool hfst_format):
@@ -406,3 +407,46 @@ namespace hfst
   }
 
 }
+#else
+#include <iostream>
+
+using namespace hfst;
+
+int
+main(int argc, char** argv)
+{
+  std::cout << "Unit tests for " __FILE__ ":";
+  std::cout << std::endl << "constructors: ";
+#if HAVE_SFST
+  std::cout << " (F, SFST)...";
+  HfstOutputStream sfststream("HfstOutputStream_SFST.hfst", hfst::SFST_TYPE);
+#endif
+#if HAVE_OPENFST
+  std::cout << " (F, OPENFST)...";
+  HfstOutputStream ofststream("HfstInputStream_OFST.hfst",
+                             hfst::TROPICAL_OFST_TYPE);
+#endif
+#if HAVE_FOMA
+  std::cout << " (F, FOMA)...";
+  HfstOutputStream fomastream("HfstInputStream_FOMA.hfst", hfst::FOMA_TYPE);
+#endif
+  std::cout << std::endl <<  "<<:";
+#if HAVE_SFST
+  std::cout << " <<(HfstTransducer(a, SFST))...";
+  HfstTransducer sfst("a", hfst::SFST_TYPE);
+  sfststream << sfst;
+#endif
+#if HAVE_OPENFST
+  std::cout << " <<(HfstTransducer(a, OFST))...";
+  HfstTransducer ofst("a", hfst::TROPICAL_OFST_TYPE);
+  ofststream << ofst;
+#endif
+#if HAVE_FOMA
+  std::cout << " <<(HfstTransducer(a, FOMA))...";
+  HfstTransducer foma("a", hfst::FOMA_TYPE);
+  fomastream << foma;
+#endif
+  std::cout << "ok" << std::endl;
+  return EXIT_SUCCESS;
+}
+#endif
