@@ -68,6 +68,8 @@ std::string::size_type FdOperation::find_diacritic(const std::string& diacritic_
 #include "FlagDiacritics.h"
 #include <iostream>
 #include <cassert>
+#include <cstdlib>
+
 int
 main(int argc, char** argv)
 {

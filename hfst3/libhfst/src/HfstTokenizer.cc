@@ -183,7 +183,7 @@ StringPairVector * HfstTokenizer::tokenize
 #else
 #include <iostream>
 #include <cstring>
-//hfst::symbols::GlobalSymbolTable hfst::KeyTable::global_symbol_table;
+#include <cstdlib>
 
 int main(void)
 {
