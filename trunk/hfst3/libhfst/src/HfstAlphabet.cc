@@ -2,6 +2,8 @@
 #include "../HfstBasic.h"
 #include "../HfstUtf8.h"
 
+#ifndef DEBUG_MAIN
+
 namespace hfst {
   namespace implementations {
     
@@ -258,3 +260,23 @@ namespace hfst {
     
   }
 }
+#else
+#include <iostream>
+int
+main(int argc, char** argv)
+{
+  std::cout << "Unit tests for " __FILE__ ":";
+  std::cout << std::endl << "constructors: ";
+  std::cout << " default()...";
+  HfstAlphabet defaultAlpha;
+  std::cout << " (copy)...";
+  HfstAlphabet copyAlpha(defaultAlpha);
+  std::cout << std::endl << "destructor: ";
+    delete new HfstAlphabet();
+    delete new HfstAlphabet(defaultAlpha);
+    // FIXME: alpha 
+    std::cout << std::endl << "rest skipped...";
+    std::cout << "ok" << std::endl;
+    return EXIT_SUCCESS;
+}
+#endif

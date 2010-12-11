@@ -13,6 +13,7 @@
 #include "HfstTransducer.h"
 #include "HfstGrammar.h"
 
+#ifndef DEBUG_MAIN
 namespace hfst
 {
 #if HAVE_OPENFST
@@ -55,4 +56,42 @@ namespace hfst
     return first_rule; }
 #endif 
 }
+#else
+#include <iostream>
+#include "HfstDataTypes.h"
 
+using namespace hfst;
+
+int
+main(int argc, char** argv)
+{
+  std::cout << "Unit tests for " __FILE__ ":";
+  hfst::HfstTransducerVector rules;
+#if HAVE_OPENFST
+  HfstTransducer rule(TROPICAL_OFST_TYPE);
+  for (int i = 0; i <= 10; i++)
+    {
+      char* n = static_cast<char*>(malloc(sizeof(char)*3));
+      if (sprintf(n, "%d", i) < 1)
+        {
+          std::cerr << "sprintf fail" << std::endl;
+          return EXIT_FAILURE;
+        }
+      HfstTransducer numberedRule(n, TROPICAL_OFST_TYPE);
+      rules.push_back(numberedRule);
+    }
+  std::cout << std::endl << "constructors:";
+  std::cout << " (vector)...";
+  HfstGrammar vecRules(rules);
+  std::cout << " (transducer)...";
+  HfstGrammar aRule(rule);
+  std::cout << std::endl << " destructor:";
+  delete new HfstGrammar(rules);
+  std::cout << std::endl << "get first rule:";
+  HfstTransducer firstVec = vecRules.get_first_rule();
+  HfstTransducer firstRule = aRule.get_first_rule();
+  std::cout << "ok" << std::endl;
+#endif
+  return EXIT_SUCCESS;
+}
+#endif

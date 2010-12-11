@@ -12,12 +12,15 @@
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 
+#ifndef DEBUG_MAIN
 namespace hfst
 {
   void debug_error(const char *msg)
   {
 #if PRINT_DEBUG_MESSAGES
     fprintf(stderr, "%s\n", msg);
+#else
+    (void)msg;
 #endif
   }
 
@@ -989,32 +992,86 @@ namespace hfst
   }
 }
 
-#ifdef DEBUG_MAIN_STREAM
+#else
+#include "HfstOutputStream.h"
+
+using namespace hfst;
+
 int main(void)
 {
-  hfst::HfstInputStream sfst_stdin_input(hfst::SFST_TYPE);
-  sfst_stdin_input.open();
-  sfst_stdin_input.close();
-  hfst::HfstInputStream ofst_stdin_input(hfst::TROPICAL_OFST_TYPE);
-  ofst_stdin_input.open();
-  ofst_stdin_input.close();
-  // This succeeds only if the files stream_test and
-  // stream_test_ne exist
-  hfst::HfstInputStream sfst_file_input("stream_test",hfst::SFST_TYPE);
-  sfst_file_input.open();
-  sfst_file_input.close();
-  assert(sfst_file_input.is_eof());
-  hfst::HfstInputStream sfst_ne_file_input("stream_test_ne",hfst::SFST_TYPE);
-  sfst_ne_file_input.open();
-  assert(not sfst_ne_file_input.is_eof());
-  sfst_ne_file_input.close();
-  hfst::HfstInputStream ofst_file_input("stream_test",hfst::TROPICAL_OFST_TYPE);
-  ofst_file_input.open();
-  ofst_file_input.close();
-  assert(ofst_file_input.is_eof());
-  hfst::HfstInputStream ofst_ne_file_input("stream_test_ne",hfst::TROPICAL_OFST_TYPE);
-  ofst_ne_file_input.open();
-  assert(not ofst_ne_file_input.is_eof());
-  ofst_ne_file_input.close();
+  std::cout << "Unit tests for " __FILE__ ":";
+  FILE* check_existence = 0;
+#if HAVE_SFST
+  check_existence = fopen("HfstInputStream_SFST.hfst", "r");
+  if (NULL == check_existence)
+    {
+      HfstOutputStream outstream("HfstInputStream_SFST.hfst", hfst::SFST_TYPE);
+      HfstTransducer t("a", hfst::SFST_TYPE);
+      outstream << t;
+    }
+  else 
+    {
+      fclose(check_existence);
+    }
+#endif
+#if HAVE_OPENFST
+  check_existence = fopen("HfstInputStream_OFST.hfst", "r");
+  if (NULL == check_existence)
+    {
+      HfstOutputStream outstream("HfstInputStream_OFST.hfst",
+                                 hfst::TROPICAL_OFST_TYPE);
+      HfstTransducer t("a", hfst::TROPICAL_OFST_TYPE);
+      outstream << t;
+    }
+  else 
+    {
+      fclose(check_existence);
+    }
+#endif
+#if HAVE_FOMA
+  check_existence = fopen("HfstInputStream_FOMA.hfst", "r");
+  if (NULL == check_existence)
+    {
+      HfstOutputStream outstream("HfstInputStream_FOMA.hfst", hfst::FOMA_TYPE);
+      HfstTransducer t("a", hfst::FOMA_TYPE);
+      outstream << t;
+    }
+  else 
+    {
+      fclose(check_existence);
+    }
+#endif
+  std::cout << std::endl << "Constructors: ";
+  std::cout << " (default)...";
+  hfst::HfstInputStream defaultInput();
+#if HAVE_SFST
+  std::cout << " (SFST)...";
+  hfst::HfstInputStream sfstFileInput("HfstInputStream_SFST.hfst");
+#endif
+#if HAVE_OPENFST
+  std::cout << " (OpenFST)...";
+  hfst::HfstInputStream ofstFileInput("HfstInputStream_OFST.hfst");
+#endif
+#if HAVE_FOMA
+  std::cout << " (foma)...";
+  hfst::HfstInputStream fomaFileInput("HfstInputStream_FOMA.hfst");
+#endif
+  std::cout << std::endl << "Destructor: ";
+  delete new HfstInputStream();
+  std::cout << std::endl << "HfstTransducer constructor: ";
+#if HAVE_SFST
+  std::cout << " sfst(input stream)...";
+  HfstTransducer sfstTransducer(sfstFileInput);
+#endif
+#if HAVE_OPENFST
+  std::cout << " OpenFst(input stream)...";
+  HfstTransducer ofstTransducer(ofstFileInput);
+#endif
+#if HAVE_FOMA
+  std::cout << " foma(input stream)...";
+  HfstTransducer fomaTransducer(fomaFileInput);
+#endif
+  std::cout << "ok" << std::endl;
+  return EXIT_SUCCESS;
 }
 #endif
