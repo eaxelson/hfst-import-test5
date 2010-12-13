@@ -2,6 +2,7 @@
 
 #include "../HfstTransducer.h"
 
+#ifndef DEBUG_MAIN
 namespace hfst {
   namespace implementations {
     
@@ -875,3 +876,38 @@ namespace hfst {
 
   }
 }
+
+#else
+#include <cstdlib>
+#include <cassert>
+#include <iostream>
+using namespace hfst::implementations;
+
+int
+main(int argc, char** argv)
+  {
+    std::cout << "Unit tests for " __FILE__ ":";
+    std::cout << std::endl << "constructors:";
+    std::cout << " (default)";
+    HfstInternalTransducer internal;
+    std::cout << std::endl << "add lines:";
+    std::cout << " (0, 1, 1, 1, 1)";
+    internal.add_line(0, 1, 1, 1, 1);
+    std::cout << " (1, 2)";
+    internal.add_line(1, 2);
+    std::cout << std::endl << "has no lines:";
+    assert(!internal.has_no_lines());
+    std::cout << std::endl << "get lines:";
+    assert(internal.get_lines()->size() > 0);
+    std::cout << std::endl << "max state number:";
+    assert(internal.max_state_number() > -1);
+    std::cout << std::endl << "swap states:";
+    internal.swap_states(0, 1);
+    std::cout << std::endl << "is final";
+    assert(internal.is_final_state(0));
+    std::cout << std::endl << "get final weight";
+    assert(internal.get_final_weight(0) > 0);
+    std::cout << std::endl << "ok" << std::endl;
+    return EXIT_SUCCESS;
+  }
+#endif

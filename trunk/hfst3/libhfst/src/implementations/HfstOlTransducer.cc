@@ -13,6 +13,7 @@
 #include <cstring>
 #include "HfstOlTransducer.h"
 
+#ifndef DEBUG_MAIN
 namespace hfst { namespace implementations
 {
   HfstOlInputStream::HfstOlInputStream(bool weighted):
@@ -331,3 +332,18 @@ void HfstOlInputStream::ignore(unsigned int n)
   }
 
 } }
+
+#else
+#include <cstdlib>
+#include <cassert>
+#include <iostream>
+using namespace hfst::implementations;
+
+int main(int argc, char * argv[]) 
+{
+    std::cout << "Unit tests for " __FILE__ ":";
+    std::cout << std::endl << "ok" << std::endl;
+    return EXIT_SUCCESS;
+}
+#endif
+
