@@ -69,3 +69,48 @@ hfstolincludedir = $(implincludedir)/optimized-lookup
 hfstolinclude_HEADERS=optimized-lookup/transducer.h
 endif
 
+if WANT_FOMA
+FOMA_TSTS=FomaTransducer
+endif
+if WANT_HFSTOL
+HFSTOL_TSTS=HfstOlTransducer
+endif
+if WANT_OPENFST
+OFST_TSTS=LogWeightTransducer TropicalWeightTransducer
+endif
+if WANT_SFST
+SFST_TSTS=SfstTransducer
+endif
+if WANT_MFSTL
+MFSTL_TSTS=MfstlTransducer
+endif
+check_PROGRAMS=ConvertTransducerFormat HfstInternalTransducer \
+			   $(FOMA_TSTS) $(HFSTOL_TSTS) $(OFST_TSTS) $(SFST_TSTS) \
+			   $(MFSTL_TSTS)
+ConvertTransducerFormat_SOURCES=ConvertTransducerFormat.cc
+ConvertTransducerFormat_CXXFLAGS=-DDEBUG_MAIN
+ConvertTransducerFormat_LDADD=../libhfst.la
+FomaTransducer_SOURCES=FomaTransducer.cc
+FomaTransducer_CXXFLAGS=-DDEBUG_MAIN
+FomaTransducer_LDADD=../libhfst.la
+HfstInternalTransducer_SOURCES=HfstInternalTransducer.cc
+HfstInternalTransducer_CXXFLAGS=-DDEBUG_MAIN
+HfstInternalTransducer_LDADD=../libhfst.la
+HfstOlTransducer_SOURCES=HfstOlTransducer.cc
+HfstOlTransducer_CXXFLAGS=-DDEBUG_MAIN
+HfstOlTransducer_LDADD=../libhfst.la
+LogWeightTransducer_SOURCES=LogWeightTransducer.cc
+LogWeightTransducer_CXXFLAGS=-DDEBUG_MAIN
+LogWeightTransducer_LDADD=../libhfst.la
+MfstlTransducer_SOURCES=MfstlTransducer.cc
+MfstlTransducer_CXXFLAGS=-DDEBUG_MAIN
+MfstlTransducer_LDADD=../libhfst.la
+SfstTransducer_SOURCES=SfstTransducer.cc
+SfstTransducer_CXXFLAGS=-DDEBUG_MAIN
+SfstTransducer_LDADD=../libhfst.la
+TropicalWeightTransducer_SOURCES=TropicalWeightTransducer.cc
+TropicalWeightTransducer_CXXFLAGS=-DDEBUG_MAIN
+TropicalWeightTransducer_LDADD=../libhfst.la
+TESTS=ConvertTransducerFormat HfstInternalTransducer \
+	  $(FOMA_TSTS) $(HFSTOL_TSTS) $(OFST_TSTS) $(SFST_TSTS) $(MFSTL_TSTS)
+

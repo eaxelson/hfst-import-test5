@@ -17,6 +17,7 @@
 #include "ConvertTransducerFormat.h"
 #include "optimized-lookup/convert.h"
 
+#ifndef DEBUG_MAIN
 namespace hfst { namespace implementations
 {
 
@@ -117,7 +118,7 @@ HfstInternalTransducer * foma_to_internal_hfst_format(struct fsm * t) {
   HfstInternalTransducer * internal_transducer = new HfstInternalTransducer();
   struct fsm_state *fsm;
   fsm = t->states;
-  int start_state_id;
+  int start_state_id = -1;
   bool start_state_found=false;
 
   // For every line in foma transducer:
@@ -599,42 +600,41 @@ mfstl::MyFst * hfst_internal_format_to_mfstl(const HfstInternalTransducer * t) {
 
 
 } }
-#ifdef DEBUG_CONVERT
-/********************************
- *                              *
- *          TEST MAIN           *
- *                              *
- ********************************/
+#else
+#include <cstdlib>
+#include <cassert>
+
+using namespace hfst;
+using namespace hfst::implementations;
+
 int main(void)
-{
-  hfst::KeyTable * key_table = hfst::create_key_table();
-  hfst::TransducerHandle t;
-  HWFST::TransducerHandle tw;
-  if (hfst::read_format() == 0)
-    {
-      try
-	{
-	  t = hfst::read_transducer(std::cin,key_table);
-	}
-      catch (const char * p)
-	{
-	  std::cerr << "ERROR: " << p << std::endl;
-	}
-      tw = sfst_to_internal_format(t);
-      HWFST::write_transducer(tw,key_table);
-    }
-  else
-    {
-      try
-	{
-	  tw = HWFST::read_transducer(std::cin,key_table);
-	}
-      catch (const char * p)
-	{
-	  std::cerr << "ERROR: " << p << std::endl;
-	}
-      t = internal_format_to_sfst(tw);
-      hfst::write_transducer(t,key_table);
-    }
-}
+  {
+    std::cout << "Unit tests for " __FILE__ ":";
+    HfstInternalTransducer internal;
+    internal.add_line(0, 1, 1, 1, 1);
+    internal.add_line(1, 2, 2, 2, 2);
+    internal.add_line(2, 3, 3, 3, 3);
+    internal.add_line(3, 4);
+    std::cout << std::endl << "Conversions: ";
+#if HAVE_SFST
+    std::cout << " internal->sfst...";
+    SFST::Transducer* sfst = hfst_internal_format_to_sfst(&internal);
+    std::cout << " sfst->internal...";
+    assert(sfst_to_internal_hfst_format(sfst) != 0);
+#endif
+#if HAVE_OFST
+    std::cout << " internal->ofst...";
+    fst::StdVectorFst* ofst = hfst_internal_format_to_ofst(&internal);
+    std::cout << " ofst->internal...";
+    assert(ofst_to_internal_hfst_format(ofst) != 0);
+#endif
+#if HAVE_FOMA
+    std::cout << " internal->foma...";
+    struct fsm* foma = hfst_internal_format_to_foma(&internal);
+    std::cout << " foma->internal...";
+    assert(foma_to_internal_hfst_format(foma) != 0);
+#endif
+    std::cout << "ok!" << std::endl;
+    return EXIT_SUCCESS;
+  }
 #endif

@@ -12,6 +12,7 @@
 
 #include "TropicalWeightTransducer.h"
 
+#ifndef DEBUG_MAIN
 namespace hfst { namespace implementations
 {
   float tropical_seconds_in_harmonize=0;
@@ -2160,69 +2161,22 @@ namespace hfst { namespace implementations
 
 
 
-#ifdef DEBUG_MAIN
+#else
+#include <cassert>
+#include <cstdlib>
+#include <iostream>
+
 using namespace hfst::implementations;
-//hfst::symbols::GlobalSymbolTable KeyTable::global_symbol_table;
+
 int main(void) 
 {
+    std::cout << "Unit tests for " __FILE__ ":";
   TropicalWeightTransducer ofst;
   StdVectorFst * t = ofst.create_empty_transducer();
-  for (TropicalWeightTransducer::const_iterator it = ofst.begin(t);
-       it != ofst.end(t);
-       ++it)
-    {
-      TropicalWeightState s = *it;
-    }
   delete t;
   t = ofst.create_epsilon_transducer();
-  for (TropicalWeightTransducer::const_iterator it = ofst.begin(t);
-       it != ofst.end(t);
-       ++it)
-    {
-      TropicalWeightState s = *it;
-    }
   delete t;
-  KeyTable key_table;
-  key_table.add_symbol("a");
-  key_table.add_symbol("b");
-  t = ofst.define_transducer(key_table["a"]);
-  ofst.print(t,key_table,std::cerr);
-  delete t;
-  t = ofst.define_transducer(KeyPair(key_table["a"],
-				     key_table["b"]));
-  ofst.print(t,key_table,std::cerr);
-  StdVectorFst * tt;
-  tt = ofst.copy(t);
-  tt->AddArc(0,StdArc(0,0,0,1));
-  ofst.print(tt,key_table,std::cerr);
-  StdVectorFst * tt_det = ofst.minimize(tt);
-  ofst.print(tt_det,key_table,std::cerr);
-  delete t;
-  t = ofst.invert(tt);
-  delete t;
-  delete tt;
-  delete tt_det;
-  std::cerr << "Test substitution" << std::endl;
-  StdVectorFst * fst = ofst.define_transducer(KeyPair(key_table["a"],
-						      key_table["b"]));
-  std::cerr << "Print a:b" << std::endl;
-  ofst.print(fst,key_table,std::cerr);
-  key_table.add_symbol("c");
-  StdVectorFst * fst1 = ofst.substitute(fst,key_table["a"],key_table["c"]);
-  std::cerr << "Print c:b" << std::endl;
-  ofst.print(fst1,key_table,std::cerr);
-  StdVectorFst * fst2 = 
-    ofst.substitute(fst,
-		    KeyPair(key_table["a"],key_table["b"]),
-		    KeyPair(key_table["c"],key_table["c"]));
-  std::cerr << "Print c:c" << std::endl;
-  ofst.print(fst2,key_table,std::cerr);
-  delete fst;
-  delete fst1;
-  delete fst2;
-  TropicalWeightInputStream input;
-  StdVectorFst * input_fst = input.read_transducer(key_table);
-  ofst.print(input_fst,key_table,std::cerr);
-  delete input_fst;
+    std::cout << std::endl << "ok" << std::endl;
+    return EXIT_SUCCESS;
 }
 #endif

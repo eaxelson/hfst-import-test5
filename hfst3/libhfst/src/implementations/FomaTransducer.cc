@@ -12,10 +12,7 @@
 
 #include "FomaTransducer.h"
 
-#ifdef DEBUG
-#include <cassert>
-#endif
-
+#ifndef DEBUG_MAIN
 namespace hfst { namespace implementations {
 
 
@@ -1062,44 +1059,16 @@ static inline int explode_line (char *buf, int *values) {
 
   } }
 
-#ifdef DEBUG_MAIN
-using namespace hfst::implementations;
+#else
+#include <cstdlib>
+#include <cassert>
 #include <iostream>
-//hfst::symbols::GlobalSymbolTable KeyTable::global_symbol_table;
+using namespace hfst::implementations;
+
 int main(int argc, char * argv[]) 
 {
-  fprintf(stderr, "Testing FomaTransducer.cc functions:\n");
-
-  // reading from file
-  const char *filename = "foo.foma";
-  FomaInputStream in(filename);
-  in.open();
-  assert(in.is_open());
-  in.close();
-  in.open();
-
-  // reading from stdin
-  FomaInputStream in2;
-  in2.open();
-  assert(in2.is_open());
-  struct fsm * t2;
-  while (not in2.is_eof()) {
-    t2 = in2.read_transducer();
-    fprintf(stderr, "  One transducer read from stdin.\n");
-  }
-  in2.close();
-  assert(not in2.is_open());
-
-  struct fsm * t;
-  assert(not in.is_eof());
-  while (not in.is_eof()) {
-    t = in.read_transducer();
-    fprintf(stderr, "  One transducer read from file.\n");
-  }
-  in.close();
-  assert(not in.is_open());
-
-  fprintf(stderr, "Test ends.\n");
-  return 0;
+    std::cout << "Unit tests for " __FILE__ ":";
+    std::cout << std::endl << "ok" << std::endl;
+    return EXIT_SUCCESS;
 }
 #endif

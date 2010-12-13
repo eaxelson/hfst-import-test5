@@ -16,6 +16,7 @@
 
 #include "MfstlTransducer.h"
 
+#ifndef DEBUG_MAIN
 namespace hfst { 
 namespace implementations
 {
@@ -345,5 +346,18 @@ namespace implementations
 }
 }
 
+#else
+#include <cstdlib>
+#include <cassert>
+#include <iostream>
+
+int
+main(void)
+  {
+    std::cout << "Unit tests for " __FILE__ ":";
+    std::cout << std::endl << "ok" << std::endl;
+    return EXIT_SUCCESS;
+  }
+#endif
 
 
