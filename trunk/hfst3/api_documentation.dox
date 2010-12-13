@@ -16,7 +16,7 @@
  
       - Functions delete their transducer arguments -> Functions modify their calling object and do not change their arguments
 
-      - unknown and identity symbols!
+      - unknown and identity symbols
 
    */
 
@@ -46,130 +46,394 @@
 
       <b>This page is still under construction...</b>
 
-      \section adding_library Adding your own library under the HFST interface
+      <H2>Adding your own library under the HFST interface</H2>
 
-      a very simple transducer library 
-      in directory new_library
-      My Finite-State Transducer Library - MFSTL
-      a transducer class MyFst that contains some functions
-      written in namespace mfstl
-      
-      See file README for installation of the MFSTL library.
+      There is a very simple transducer library My Finite-State Transducer Library - MFSTL
+      in directory new_library. The library defines a transducer class MyFst that contains some functions
+      written in namespace mfstl. MFSTL is not meant to be used as a backend implementation
+      but to give an example of how you can add your own transducer library under HFST.      
+
+      If you want to install MFSTL, go to directory new_library and run the commands:
 
 \verbatim      
       make && make libinstall
 \endverbatim
 
-      should be enough
-
-      If you want to use the library in HFST,
+      By default the MFSTL library is not installed or linked to HFST.
+      If you want to use MFSTL, go to the directory where you have your copy of HFST
+      and run the command:
 
 \verbatim
       ./configure --with-mfstl=true
 \endverbatim
 
-      By default the MFSTL library is not installed or linked to HFST.
+      <BR></BR>	
+      <H2>Configuring</H2>
 
-      \section The backend implementation
+      In the file configure.ac there are the following lines of code that take care of linking
+      to the MFSTL library if the user wants to use it:
 
-      in directory libhfst/src/implementations there are skeleton files
-      MfstlTransducer.h and MfstlTransducer.cc. File MfstlTransducer.h declares classes
+\verbatim
+AC_ARG_WITH([mfstl],
+            [AS_HELP_STRING([--with-mfstl],
+                            [process unweighted fsts with mfstl @<:@default=no@:>@])],
+            [],
+            [with_mfstl=no])
+AS_IF([test "x$with_mfstl" != xno], [AC_DEFINE([HAVE_MFSTL], [1],
+                                              [Define to compile MFSTL support in HFST])])
+AM_CONDITIONAL([WANT_MFSTL], [test x$with_mfstl != xno])
+
+...
+
+if test "x$with_mfstl" != "xno"; then
+   AC_CHECK_LIB([mfstl], [main], [],
+   		[AC_MSG_FAILURE([mfstl test failed (--without-mfstl to disable)])])
+fi
+
+...
+
+if test "x$with_mfstl" != "xno"; then
+    AC_CHECK_HEADERS([mfstl/MyFst.h])
+fi
+
+...
+
+    *         with mfstl: $with_mfstl
+\endverbatim
+
+      When adding your own library you should write the same definitions and tests in file
+      configure.ac for your library.
+
+      <BR></BR>
+      <H2>Interaction between HFST and your library</H2>
+
+      There are files MfstlTransducer.h and MfstlTransducer.cc in directory
+      libhfst/src/implementations. These files form a bridge between MFSTL and HFST libraries.
+      They define classes that are needed in cooperation between MFSTL and HFST: 
       MfstlTransducer, MfstlInputStream and MfstlOutputStream. Class MfstlTransducer contains
-      static functions that operate on MyFsts. Classes MfstlInputStream and MfstlOutputStream
-      represent input and output streams to files or standard streams. They are used
-      for reading or writing MyFst binary transducers to/from streams.
-
-      \section How HFST can access the backend implementation
-
-      Fist of all, HFST must be aware of a new transducer type. In file HfstDataTypes.h
-      is defined an enum ImplementationType where a new enumerator must be added:
+      static functions that operate on MyFsts, for instance:
 
 \verbatim
-FOO_TYPE
+    class MfstlTransducer {
+      public:
+
+      /** @brief Create a transducer that recognises the symbol pair isymbol:osymbol */
+        static MyFst * define_transducer(const char *isymbol, const char *osymbol);
+
+      /** @brief Create a deep copy of transducer t. */
+        static MyFst * copy(MyFst * t);
+
+      /** @brief Create a transducer that accepts any number of consecutive string pairs accepted by transducer t. */
+        static MyFst * repeat_star(MyFst * t);
+
+      /** @brief Create a transducer that accepts string pair string1:string3 iff t1 accepts string pair string1:string2
+	  and t2 accepts string pair string2:string3, where string2 is any string. */
+        static MyFst * compose(MyFst * t1, MyFst * t2);
+
+      /** @brief Whether transducers t1 an t2 are equivalent. */
+        static bool are_equivalent(MyFst * t1, MyFst * t2);
+
+      /** @brief The number of states in transducer t. */
+        static unsigned int number_of_states(MyFst *t);
+
+      ...
+    };
 \endverbatim
 
-        To file HfstTransducer.h: 
-      
-        In the beginning the h-file must be included:
+      Classes MfstlInputStream and MfstlOutputStream represent input and output streams 
+      to files or standard streams. They are used for reading or writing MyFst binary transducers to/from streams,
+      for example:
 
 \verbatim
-#if HAVE_FOO
-#include "implementations/FooTransducer.h"
+  class MfstlInputStream  {
+    public:
+      /** @brief Create and open a stream to file filename. */
+      MfstlInputStream(const char * filename);
+      /** @brief Whether the stream is at end. */
+      bool is_eof(void);
+      /** @brief Extract a char from the stream. */
+      char stream_get();
+      /** @brief Put back a char to the stream. */
+      void stream_unget(char c);
+      /** @brief Read a MyFst from the stream. */
+      MyFst * read_transducer();    
+      ...
+  };
+
+  class MfstlOutputStream {
+    public:
+      /** @brief Create and open a stream to standard out. */
+      MfstlOutputStream(void); 
+      /** @brief Create and open a stream to file filename. */
+      MfstlOutputStream(const char * filename);
+      /** @brief Write a char to the stream. */
+      void write(const char &c);
+      /** @brief Write a MyFst to the stream. */
+      void write_transducer(MyFst * transducer);
+      ...
+  };
+\endverbatim
+
+	Since MFSTL has only few functionalities, most implementations of functions defined in file MfstlTransducer.h
+        return a hfst::exceptions::FunctionNotImplementedError. This is also the way how you probably should begin
+	to write your implementation. 
+
+	Conversion from MFSTL to internal transducer format and vice versa are defined
+	in files ConvertTransducerFormat.h and ConvertTransducerFormat.cc in directory libhfst/src/implementations.
+	Add also your own conversion functions here.	
+
+	MFSTL is handled in the Makefiles of directories libhfst/src/ and libhfst/src/implementations/.
+	The former has the following lines:
+
+\verbatim
+HFST_HDRS = \
+        HfstTransducer.h apply_schemas.h HfstDataTypes.h SymbolDefs.h \
+        implementations/ConvertTransducerFormat.h \
+        implementations/SfstTransducer.h implementations/TropicalWeightTransducer.h \
+        implementations/LogWeightTransducer.h implementations/FomaTransducer.h \
+	implementations/HfstOlTransducer.h \	      
+        implementations/MfstlTransducer.h \
+        HfstAlphabet.h HfstTokenizer.h \
+        HfstExceptions.h FlagDiacritics.h HfstInputStream.h HfstOutputStream.h
+\endverbatim
+
+      You should add your header file (file that corresponds to MfstlTransducer.h)
+      to HFST_HDRS.
+
+      In file libhfst/src/implementations/Makefile.am there are the following lines
+      that refer to the MFSTL library:
+
+\verbatim
+if WANT_MFSTL
+MAYBE_MFSTL=MfstlTransducer.cc
+endif
+
+...
+
+BRIDGE_SRCS=$(MAYBE_SFST) $(MAYBE_OPENFST) $(MAYBE_FOMA) $(MAYBE_MFSTL) $(MAYBE_HFSTOL)
+
+...
+
+if WANT_MFSTL
+MFSTL_TSTS=MfstlTransducer
+endif
+check_PROGRAMS=ConvertTransducerFormat HfstInternalTransducer \
+			   $(FOMA_TSTS) $(HFSTOL_TSTS) $(OFST_TSTS) $(SFST_TSTS) \
+			   $(MFSTL_TSTS)
+
+...
+
+TESTS=ConvertTransducerFormat HfstInternalTransducer \
+	  $(FOMA_TSTS) $(HFSTOL_TSTS) $(OFST_TSTS) $(SFST_TSTS) $(MFSTL_TSTS)
+\endverbatim
+
+	You should handle your library in the Makefile similarly.
+
+      <BR></BR>
+      <H2>Adding your library as a part of the HFST interface</H2>
+
+      HFST must be aware of a new transducer type. In file HfstDataTypes.h
+      there is defined an enum ImplementationType where a new enumerator MFSTL_TYPE is be added:
+
+\verbatim
+MFSTL_TYPE
+\endverbatim
+
+        Some changes must be done in file HfstTransducer.h. The new library header file
+	must be included:
+
+\verbatim
+#if HAVE_MFSTL
+#include "implementations/MfstlTransducer.h"
 #endif
-\endverbatim
-	
-      To namespace hfst:
+
+...
 
 \verbatim
-#if HAVE_FOO
-  using hfst::implementations::FooTransducer;
+#if HAVE_MFSTL
+  using hfst::implementations::MfstlTransducer;
 #endif
 \endverbatim
 
      union TransducerImplementation has a new enumerator:
 
 \verbatim
-#if HAVE_FOO
-  hfst::implementations::FooTransducer * foo;
+#if HAVE_MFSTL
+  hfst::implementations::MfstlTransducer * mfstl;
 #endif
 \endverbatim
 
-    interface through which the backend library can be accessed.
+    An interface through which the backend library can be accessed:
 
 \verbatim
-#if HAVE_FOO
-    static hfst::implementations::FooTransducer foo_interface;
+#if HAVE_MFSTL
+    static hfst::implementations::MfstlTransducer mfstl_interface;
 #endif
 \endverbatim
-    
-    To file HfstTransducer.cc:
 
-#if HAVE_FOO
-  hfst::implementations::FooTransducer HfstTransducer::foo_interface;
+
+	The unions StreamImplementation in files HfstInputStream.h and HfstOutputStream.h
+	have a new enumerator:
+
+\verbatim
+#if HAVE_MFSTL
+      hfst::implementations::MfstlOutputStream * mfstl;
 #endif
+\endverbatim
 
-	To files HfstApply.cc apply_schemas.h HfstInputStream.h HfstInputStream.cc
-	HfstOutputStream.h HfstOutputStream.cc
-
-	union StreamImplementation:
-
-#if HAVE_FOO
-      hfst::implementations::FooInputStream * foo;
+\verbatim
+#if HAVE_MFSTL
+      hfst::implementations::MfstlInputStream * mfstl;
 #endif
+\endverbatim
 
-	enum TransducerType:
+	enum TransducerType in file HfstInputStream.h also has a new enumerator:
 
-FOO_
+\verbatim
+MFSTL_
+\endverbatim
 
-	function guess_fst_type
 
-#ifdef HAVE_FOO
-	  case 'f':  // Foo (replace 'f'  the first char in a binary FooTransducer)
-	    return FOO_;
-	    break;
+    The following addition must be done to file HfstTransducer.cc:
+
+\verbatim
+#if HAVE_MFSTL
+  hfst::implementations::MfstlTransducer MfstlTransducer::mfstl_interface;
 #endif
+\endverbatim
 
-	union StreamImplementation:
 
 
-#if HAVE_FOO
-      hfst::implementations::FooOutputStream * foo;
-#endif
+The function append_hfst_header_data in file HfstOutputStream.cc must handle the case
+when we write MFSTL binary transducers and need to have a string in the HFST header
+that identifies the transducer's implementation type:
 
-	append_hfst_header_data:
-
-#if HAVE_FOO
-      case FOO_TYPE:
-	type_value=std::string("FOO");
+\verbatim
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
+	type_value=std::string("MFSTL");
 	break;
 #endif
+\endverbatim
 
-      If you want to add a transducer library as a part of HFST,
-      the file FooTransducer.h lists the functions that your library should implement.
+Similarly we need to identify an HFST binary transducer in MFSTL binary format
+from the HFST header:
+
+\verbatim
+#if HAVE_MFSTL
+    else if (strcmp("MFSTL", header_data[1].second.c_str()) == 0 )
+      type = MFSTL_TYPE;
+#endif
+\endverbatim
+
+	Function guess_fst_type in file HfstInputStream.cc tries to guess what is the format
+	of the next transducer in an input stream. We suppose that the first char in a MyFst is 'm'.
+	You must of course replace 'm' with the first char in your binary transducer format.
+	If the first char is not enough to recognize the transducer type, you must
+	extract more chars and put them back to the stream. See for example how an
+	OpenFst transducer is recognized.
+
+\verbatim
+#ifdef HAVE_MFSTL
+	/* We suppose that the first char in a MyFst is 'm'. */
+	  case 'm':  // Mfstl
+	    return MFSTL_;
+	    break;
+#endif
+\endverbatim
+
 
       You must also add a separate case for each function in classes HfstTransducer, HfstOutputStream
       and HfstInputStream where your own function is called if the ImplementationType requires it.
-      This should be quite straightforward and is probably partially automatizable.
+      An example from file HfstTransducer.cc:
+
+\verbatim
+HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type):
+  type(type),anonymous(false),is_trie(false), name("")
+  {
+    if (not is_implementation_type_available(type))
+      throw hfst::exceptions::ImplementationTypeNotAvailableException();
+
+    switch (this->type)
+      {
+#if HAVE_SFST
+      case SFST_TYPE:
+	implementation.sfst = sfst_interface.define_transducer(isymbol.c_str(), osymbol.c_str());
+	break;
+#endif
+#if HAVE_OPENFST
+      case TROPICAL_OFST_TYPE:
+	implementation.tropical_ofst = tropical_ofst_interface.define_transducer(isymbol, osymbol);
+	this->type = TROPICAL_OFST_TYPE;
+	break;
+      case LOG_OFST_TYPE:
+	implementation.log_ofst = log_ofst_interface.define_transducer(isymbol, osymbol);
+	break;
+#endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+	implementation.foma = foma_interface.define_transducer( strdup(isymbol.c_str()), strdup(osymbol.c_str()) );
+	break;
+#endif
+#if HAVE_MFSTL
+      case MFSTL_TYPE:
+	implementation.mfstl = mfstl_interface.define_transducer( isymbol, osymbol );
+	break;
+#endif
+      case ERROR_TYPE:
+      default:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+	break;
+      }
+  }
+\endverbatim
+
+	You must also modify files apply_schemas.h and HfstApply.cc in the same way.
+	Many functions in HfstTransducer.cc call a function defined in apply_schemas.h.
+	The functions take as their arguments function pointers to the backend libraries.
+	For example the determinization function
+
+\verbatim
+HfstTransducer &HfstTransducer::determinize()
+  { is_trie = false;
+    return apply(
+#if HAVE_SFST
+       &hfst::implementations::SfstTransducer::determinize,
+#endif
+#if HAVE_OPENFST
+       &hfst::implementations::TropicalWeightTransducer::determinize,
+       &hfst::implementations::LogWeightTransducer::determinize,
+#endif
+#if HAVE_FOMA
+       &hfst::implementations::FomaTransducer::determinize,
+#endif
+#if HAVE_MFSTL
+       &hfst::implementations::MfstlTransducer::determinize,
+#endif
+       false ); } 
+\endverbatim
+
+	calls the function
+
+\verbatim
+HfstTransducer &apply(
+#if HAVE_SFST
+ SFST::Transducer * (*sfst_funct)(SFST::Transducer *),
+#endif
+#if HAVE_OPENFST
+ fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *),
+ hfst::implementations::LogFst * (*log_ofst_funct)(hfst::implementations::LogFst *),
+#endif
+#if HAVE_FOMA
+ fsm * (*foma_funct)(fsm *),
+#endif
+#if HAVE_MFSTL
+ mfstl::MyFst * (*mfstl_funct)(mfstl::MyFst *),
+#endif
+ bool dummy /* makes sure there is always a parameter after the function pointer parameters,
+	     * so commas between parameters are easier to handle */
+);  
+\endverbatim
 
    */
 

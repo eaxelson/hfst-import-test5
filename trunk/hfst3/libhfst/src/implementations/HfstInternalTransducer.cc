@@ -851,8 +851,6 @@ namespace hfst {
 	  transition.source = it1->origin;
 	  transition.target = it1->target;
 
-	  //printf("transition_iterator::value: %i:%i %s:%s\n", it1->isymbol, it1->osymbol, transducer.alphabet->code2symbol(it1->isymbol), transducer.alphabet->code2symbol(it1->osymbol));
-
 	  transition.isymbol = std::string(transducer.alphabet->code2symbol(it1->isymbol));
 	  transition.osymbol = std::string(transducer.alphabet->code2symbol(it1->osymbol));
 	  transition.weight = it1->weight;
@@ -900,7 +898,7 @@ main(int argc, char** argv)
     std::cout << std::endl << "get lines:";
     assert(internal.get_lines()->size() > 0);
     std::cout << std::endl << "max state number:";
-    assert(internal.max_state_number() > -1);
+    //assert(internal.max_state_number() > -1);  // unsigned int!
     std::cout << std::endl << "swap states:";
     internal.swap_states(0, 1);
     std::cout << std::endl << "is final";

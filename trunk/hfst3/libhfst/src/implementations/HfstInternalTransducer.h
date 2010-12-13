@@ -3,9 +3,9 @@
 
 #include <string>
 #include <set>
-#include "HfstAlphabet.h"
-#include "SymbolDefs.h"
-#include "HfstExceptions.h"
+#include "../HfstAlphabet.h"
+#include "../SymbolDefs.h"
+#include "../HfstExceptions.h"
 #include <cassert>
 #include <iostream>
 

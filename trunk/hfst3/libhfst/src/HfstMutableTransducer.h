@@ -101,14 +101,14 @@ void print(HfstMutableTransducer &t)
     HfstMutableTransducer(const HfstMutableTransducer &t);
     /** \brief Delete the mutable transducer. */
     ~HfstMutableTransducer(void);
-    /** \brief Add a state to the mutable transducer and return a handle to that state. */
-    HfstState add_state();
     /** \brief Set the value of the final weight of state \a s in the mutable transducer to \a w. */
     void set_final_weight(HfstState s, float w);
     /** \brief Whether state \a s in the mutable transducer is final. */
     bool is_final(HfstState s);
     /** \brief Return a handle to the initial state in the mutable transducer. */
     HfstState get_initial_state();
+    /** \brief Get the biggest state number in the mutable transducer. */
+    HfstState max_state_number() const;    
     /** \brief The final weight of state \a s in the mutable transducer. 
 	@pre State \a s must be final. */
     float get_final_weight(HfstState s);

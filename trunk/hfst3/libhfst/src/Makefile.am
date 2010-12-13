@@ -40,7 +40,22 @@ hfstincludedir = $(includedir)/hfst
 
 HFST_HDRS = \
 	HfstTransducer.h \
-	apply_schemas.h
+	apply_schemas.h \
+	HfstDataTypes.h \
+	SymbolDefs.h \
+	implementations/SfstTransducer.h \
+	implementations/TropicalWeightTransducer.h \
+	implementations/LogWeightTransducer.h \
+	implementations/FomaTransducer.h \
+	implementations/MfstlTransducer.h \
+	HfstAlphabet.h \
+	implementations/HfstOlTransducer.h \
+	HfstTokenizer.h \
+	implementations/ConvertTransducerFormat.h \
+	HfstExceptions.h \
+	FlagDiacritics.h \
+	HfstInputStream.h \
+	HfstOutputStream.h
 
 hfstinclude_HEADERS = $(HFST_HDRS)
 

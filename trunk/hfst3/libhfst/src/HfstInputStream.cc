@@ -374,7 +374,8 @@ namespace hfst
 	return SFST_;
 	break;
 #ifdef HAVE_MFSTL
-	  case 'f':  // Mfstl (replace 'f' with the first char in a binary MyFst)
+	/* We suppose that the first char in a MyFst is 'm'. */
+	  case 'm':  // Mfstl
 	    return MFSTL_;
 	    break;
 #endif
