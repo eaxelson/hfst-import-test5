@@ -56,12 +56,14 @@ class LexcCompiler
   //!        compiler.
   LexcCompiler& parse(const char* filename);
 
-  //! @brief set verbosity options
+  //! @brief set verbosity options.
+  //! When verbose is true, LexcCompiler will output the messages that Xerox
+  //! lexc compiler does.
   LexcCompiler& setVerbosity(bool verbose);
 
   //! @brief add @a alphabet to multicharacter symbol set.
-  //!        This may include regular expression ? for backends that do not
-  //!        support open alphabets.
+  //! These symbolse may be used for regular expression ? for backends that do
+  //! not support open alphabets.
   LexcCompiler& addAlphabet(const std::string& alphabet);
 
   //! @brief set current processing lexicon name to @a lexicon_name.
@@ -69,22 +71,27 @@ class LexcCompiler
 
   //! @brief add entry defined by a @a entry to current lexicon, pointing to
   //! @a continuation weighing @a weight to current lexicon.
-  LexcCompiler& addStringEntry(const std::string& entry, const std::string& continuation,
-                      const double weight);
+  LexcCompiler& addStringEntry(const std::string& entry,
+                               const std::string& continuation,
+                               const double weight);
 
   //! @brief add entry defined by @a upper:@a lower, pointing to
   //! @a continuation weighing @a weight to current lexicon.
-  LexcCompiler& addStringPairEntry(const std::string& upper, const std::string& lower,
-          const std::string& continuation, const double weight);
+  LexcCompiler& addStringPairEntry(const std::string& upper,
+                                   const std::string& lower,
+                                   const std::string& continuation,
+                                   const double weight);
 
   //! @brief add entry defined by regular expression @a xre, pointing to
   //! @a continuation weighing @a weight to current lexicon.
-  LexcCompiler& addXreEntry(const std::string& xre, const std::string& continuation, 
-                   const double weight);
+  LexcCompiler& addXreEntry(const std::string& xre,
+                            const std::string& continuation, 
+                            const double weight);
 
   //! @brief add macro definition named @a name matching regular expression
   //! @a xre to known xerox regular expressions.
-  LexcCompiler& addXreDefinition(const std::string& name, const std::string& xre);
+  LexcCompiler& addXreDefinition(const std::string& name,
+                                 const std::string& xre);
 
   //! @brief set start lexicon's name to @a lexicon_name.
   LexcCompiler& setInitialLexiconName(const std::string& lexicon_name);

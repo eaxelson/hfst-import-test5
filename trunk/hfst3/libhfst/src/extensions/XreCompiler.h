@@ -34,7 +34,8 @@
 #include "../HfstTransducer.h"
 
 namespace hfst { 
-//! @brief hfst::xre namespace is used for all functions related to XRE parsing.
+//! @brief hfst::xre namespace is used for all functions related to Xerox 
+//! Regular Expresisions (XRE) parsing.
 namespace xre {
 //! @brief A compiler holding information needed to compile XREs.
 class XreCompiler

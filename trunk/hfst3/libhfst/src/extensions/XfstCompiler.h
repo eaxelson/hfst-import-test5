@@ -42,9 +42,10 @@
 #endif
 
 namespace hfst { 
-//! @brief hfst::xre namespace is used for all functions related to XRE parsing.
+//! @brief hfst::xfst namespace contains all functions needed to parse XFST scritpts
 namespace xfst {
-//! @brief A compiler holding information needed to compile XREs.
+//! @brief Xfst compiler contains all the methods and variables a session of
+//! XFST script parser needs.
 class XfstCompiler
 {
   public:

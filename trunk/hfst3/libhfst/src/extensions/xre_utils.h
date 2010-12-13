@@ -31,6 +31,11 @@ int getinput(char *buf, int maxlen);
 char* strip_percents(const char *s);
 
 /**
+ * @brief add percents to string to form valid XRE symbol.
+ */
+char* add_percents(const char* s);
+
+/**
  * @brief find first quoted segment from strign @a s.
  */
 char* get_quoted(const char *s);

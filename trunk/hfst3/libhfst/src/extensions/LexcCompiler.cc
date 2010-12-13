@@ -34,6 +34,7 @@ using std::set;
 #include "XreCompiler.h"
 #include "lexc-utils.h"
 #include "lexc-parser.h"
+#include "xre_utils.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstMutableTransducer;
@@ -47,12 +48,16 @@ using hfst::xre::XreCompiler;
 extern FILE* hlexcin;
 extern int hlexcparse();
 
+#ifndef DEBUG_MAIN
+
 namespace hfst { namespace lexc {
 
 LexcCompiler* lexc_ = 0;
 
 LexcCompiler::LexcCompiler() :
     quiet_(false),
+    format_(TROPICAL_OFST_TYPE),
+    xre_(TROPICAL_OFST_TYPE),
     initialLexiconName_("Root"),
     totalEntries_(0),
     currentEntries_(0)
@@ -61,6 +66,7 @@ LexcCompiler::LexcCompiler() :
 LexcCompiler::LexcCompiler(ImplementationType impl) :
     quiet_(false),
     format_(impl),
+    xre_(impl),
     initialLexiconName_("Root"),
     totalEntries_(0),
     currentEntries_(0)
@@ -183,7 +189,10 @@ LexcCompiler::addXreEntry(const string& regexp, const string& continuation,
     string encodedCont = string(continuation);
     encodedCont = joinerEncode(encodedCont);
     tokenizer_.add_multichar_symbol(encodedCont);
-    HfstTransducer* newPaths = xre_.compile(regexp + " "  + encodedCont);
+    char* xre_encoded = hfst::xre::add_percents(encodedCont.c_str());
+    fprintf(stderr, "\nDBG: actually parsing XRE %s %s\n", regexp.c_str(),
+            xre_encoded);
+    HfstTransducer* newPaths = xre_.compile(regexp + " "  + string(xre_encoded));
     if (weight != 0)
       {
         newPaths->set_final_weights(weight);
@@ -365,7 +374,10 @@ LexcCompiler::compileLexical()
                 if (old_osymbol.substr(0, 5) == "@LEXC")
                   {
                     // quasitransition to new lexicon 
-                    nu_weight += mut.get_final_weight(old_target);
+                    if (mut.is_final_state(old_target))
+                      {
+                        nu_weight += mut.get_final_weight(old_target);
+                      }
                     nu_osymbol = "@_EPSILON_SYMBOL_@";
                     nu_isymbol = "@_EPSILON_SYMBOL_@";
                     if (starts.find(nu_osymbol) != starts.end())
@@ -454,5 +466,177 @@ LexcCompiler::printConnectedness() const
 
 } }
 
+#else
+#include <cassert>
+#include <cstdlib>
+#include <iostream>
+
+using namespace hfst;
+using hfst::lexc::LexcCompiler;
+
+int
+main(int argc, char** argv)
+  {
+    std::cout << "Unit tests for " __FILE__ ":";
+    std::cout << std::endl << "constructors: ";
+    std::cout << " (default)...";
+    LexcCompiler lexcDefault();
+#if HAVE_SFST
+    std::cout << " (SFST)...";
+    LexcCompiler lexcSfst(SFST_TYPE);
+#endif
+#if HAVE_OPENFST
+    std::cout << " (OpenFST)...";
+    LexcCompiler lexcOfst(TROPICAL_OFST_TYPE);
+#endif
+#if HAVE_FOMA
+    std::cout << " (foma)...";
+    LexcCompiler lexcFoma(FOMA_TYPE);
+#endif
+    std::cout << std::endl << "set verbose:";
+#if HAVE_SFST
+    lexcSfst.setVerbosity(true);
+    lexcSfst.setVerbosity(false);
+#endif
+#if HAVE_OFST
+    lexcOfst.setVerbosity(true);
+    lexcOfst.setVerbosity(false);
+#endif
+#if HAVE_FOMA
+    lexcFoma.setVerbosity(true);
+    lexcFoma.setVerbosity(false);
+#endif
+    FILE* existence_check = fopen("LexcCompiler_test.lexc", "r");
+    if (existence_check == NULL)
+      {
+        existence_check = fopen("LexcCompiler_test.lexc", "w");
+        assert(existence_check != NULL);
+        fprintf(existence_check, "LEXICON Root\ncat # ;\ndog Plural ;\n");
+        fclose(existence_check);
+      }
+    existence_check = fopen("LexcCompiler_test2.lexc", "r");
+    if (existence_check == NULL)
+      {
+        existence_check = fopen("LexcCompiler_test2.lexc", "w");
+        assert(existence_check != NULL);
+        fprintf(existence_check, "LEXICON Plural\ns # ;\n");
+        fclose(existence_check);
+      }
+    std::cout << std::endl << "parsing: ";
+#if HAVE_SFST
+    std::cout << "sfst parse(FILE)...";
+    FILE* sfstFile = fopen("LexcCompiler_test.lexc", "r");
+    lexcSfst.parse(sfstFile);
+    fclose(sfstFile);
+    std::cout << "parse(filename)...";
+    lexcSfst.parse("LexcCompiler_test2.lexc");
+#endif
+#if HAVE_OPENFST
+    std::cout << "ofst parse(FILE)...";
+    FILE* ofstFile = fopen("LexcCompiler_test.lexc", "r");
+    lexcOfst.parse(ofstFile);
+    fclose(ofstFile);
+    std::cout << "parse(filename)...";
+    lexcOfst.parse("LexcCompiler_test2.lexc");
+#endif
+#if HAVE_FOMA
+    std::cout << "foma parse(FILE)...";
+    FILE* fomaFile = fopen("LexcCompiler_test.lexc", "r");
+    lexcFoma.parse(fomaFile);
+    fclose(fomaFile);
+    std::cout << "parse(filename)...";
+    lexcFoma.parse("LexcCompiler_test2.lexc");
+#endif
+      
+    std::cout << std::endl << "add multichars:";
+#if HAVE_SFST
+    lexcSfst.addAlphabet("foo");
+    lexcSfst.addAlphabet("bar");
+#endif
+#if HAVE_OFST
+    lexcOfst.addAlphabet("foo");
+    lexcOfst.addAlphabet("bar");
+#endif
+#if HAVE_FOMA
+    lexcFoma.addAlphabet("foo");
+    lexcFoma.addAlphabet("bar");
+#endif
+    std::cout << std::endl << "set lexicon name:";
+#if HAVE_SFST
+    lexcSfst.setCurrentLexiconName("Root");
+#endif
+#if HAVE_OFST
+    lexcOfst.setCurrentLexiconName("Root");
+#endif
+#if HAVE_FOMA
+    lexcFoma.setCurrentLexiconName("Root");
+#endif
+    std::cout << std::endl << "add entries:";
+#if HAVE_SFST
+    std::cout << " sfst string(dog, #)...";
+    lexcSfst.addStringEntry("dog", "#", 0);
+    std::cout << " sfst string(banana, apple, #)...";
+    lexcSfst.addStringPairEntry("banana", "apple", "#", 0);
+    std::cout << " sfst xre(f i:o 0:u g h t, #)...";
+    lexcSfst.addXreEntry("f i:o 0:u g h t", "#", 0);
+#endif
+#if HAVE_OFST
+    std::cout << " ofst string(dog, #)...";
+    lexcOfst.addStringEntry("dog", "#", 0);
+    std::cout << " ofst string(banana, apple, #)...";
+    lexcOfst.addStringPairEntry("banana", "apple", "#", 0);
+    std::cout << " ofst xre(f i:o 0:u g h t, #)...";
+    lexcOfst.addXreEntry("f i:o 0:u g h t", "#", 0);
+#endif
+#if HAVE_FOMA
+    std::cout << " foma string(dog, #)...";
+    lexcFoma.addStringEntry("dog", "#", 0);
+    std::cout << " foma string(banana, apple, #)...";
+    lexcFoma.addStringPairEntry("banana", "apple", "#", 0);
+    std::cout << " foma xre(f i:o 0:u g h t, #)...";
+    lexcFoma.addXreEntry("f i:o 0:u g h t", "#", 0);
+#endif
+    std::cout << std::endl << "add definitions:";
+#if HAVE_SFST
+    std::cout << " sfst define(vowels, a | e | i | o | u | y)...";
+    lexcSfst.addXreDefinition("Vowels", "a | e | i | o | u | y");
+#endif
+#if HAVE_OFST
+    std::cout << " ofst define(vowels, a | e | i | o | u | y)...";
+    lexcOfst.addXreDefinition("Vowels", "a | e | i | o | u | y");
+#endif
+#if HAVE_FOMA
+    std::cout << " foma define(vowels, a | e | i | o | u | y)...";
+    lexcFoma.addXreDefinition("Vowels", "a | e | i | o | u | y");
+#endif
+    std::cout << std::endl << "set initial lexicon name:";
+#if HAVE_SFST
+    std::cout << " sfst initial(Root)...";
+    lexcSfst.setInitialLexiconName("Root");
+#endif
+#if HAVE_OFST
+    std::cout << " ofst initial(Root)...";
+    lexcOfst.setInitialLexiconName("Root");
+#endif
+#if HAVE_FOMA
+    std::cout << " foma initial(Root)...";
+    lexcFoma.setInitialLexiconName("Root");
+#endif
+    std::cout << std::endl << "compile:";
+#if HAVE_SFST
+    std::cout << " sfst compile...";
+    assert(lexcSfst.compileLexical() != NULL);
+#endif
+#if HAVE_OFST
+    std::cout << " ofst compile...";
+    assert(lexcOfst.compileLexical() != NULL);
+#endif
+#if HAVE_FOMA
+    std::cout << " foma compile...";
+    assert(lexcFoma.compileLexical() != NULL);
+#endif
+    return EXIT_SUCCESS;
+  }
+#endif
 // vim: set ft=cpp.doxygen:
 

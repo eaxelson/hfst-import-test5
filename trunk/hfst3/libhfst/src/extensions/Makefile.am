@@ -21,16 +21,19 @@ if WANT_XRE
 XRE_SRCS=xre_lex.ll xre_parse.yy xre_utils.cc XreCompiler.cc
 XRE_HDRS=XreCompiler.h xre_utils.h
 XRE_BUILT=xre_parse.h
+XRE_TSTS=XreCompiler
 endif
 if WANT_LEXC
 LEXC_SRCS=lexc-lexer.ll lexc-parser.yy lexc-utils.cc LexcCompiler.cc
 LEXC_HDRS=LexcCompiler.h lexc-utils.h
 LEXC_BUILT=lexc-parser.h
+LEXC_TSTS=LexcCompiler
 endif
 if WANT_XFST
 XFST_SRCS=xfst-lexer.ll xfst-parser.yy xfst-utils.cc XfstCompiler.cc
 XFST_HDRS=XfstCompiler.h xfst-utils.h
 XFST_BUILT=xfst-parser.h
+XFST_TSTS=XfstCompiler
 endif
 BUILT_SOURCES=$(XRE_BUILT) $(LEXC_BUILT) $(XFST_BUILT)
 
@@ -47,3 +50,14 @@ extincludedir = $(hfstincludedir)/extensions
 
 extinclude_HEADERS = $(XRE_HDRS) $(LEXC_HDRS) $(XFST_HDRS)
 
+check_PROGRAMS=$(XRE_TSTS) $(LEXC_TSTS) $(XFST_TSTS)
+LexcCompiler_SOURCES=LexcCompiler.cc
+LexcCompiler_CXXFLAGS=-DDEBUG_MAIN
+LexcCompiler_LDADD=../libhfst.la
+XreCompiler_SOURCES=XreCompiler.cc
+XreCompiler_CXXFLAGS=-DDEBUG_MAIN
+XreCompiler_LDADD=../libhfst.la
+XfstCompiler_SOURCES=XfstCompiler.cc
+XfstCompiler_LDADD=../libhfst.la
+XfstCompiler_CXXFLAGS=-DDEBUG_MAIN
+TESTS=$(XRE_TSTS) $(LEXC_TSTS) $(XFST_TSTS)
