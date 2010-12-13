@@ -119,6 +119,33 @@ strip_percents(const char *s)
     return stripped;
 }
 
+char*
+add_percents(const char *s)
+  {
+    char* ns = static_cast<char*>(malloc(sizeof(char)*strlen(s)*2+1));
+    char* p = ns;
+    fprintf(stderr, "\nDBG: adding percents to %s\n", s);
+    while (*s != '\0')
+      {
+        if ((*s == '@') || (*s == '-') || (*s == ' ') || (*s == '|') ||
+            (*s == '!') || (*s == ':') || (*s == ';') || (*s == '0') ||
+            (*s == '\\') || (*s == '&') || (*s == '?') || (*s == '$') ||
+            (*s == '+') || (*s == '*') || (*s == '/') || (*s == '/') ||
+            (*s == '_') || (*s == '(') || (*s == ')') || (*s == '{') ||
+            (*s == '}') || (*s == '[') || (*s == ']'))
+          {
+            *p = '%';
+            p++;
+          }
+        *p = *s;
+        p++;
+        s++;
+      }
+    *p = '\0';
+    fprintf(stderr, "\nDBG: got %s\n", ns);
+    return ns;
+  }
+
 char *
 get_quoted(const char *s)
 {

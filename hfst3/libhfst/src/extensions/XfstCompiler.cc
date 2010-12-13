@@ -39,6 +39,7 @@ using std::stack;
 #include "xfst-utils.h"
 #include "xfst-parser.h"
 
+#ifndef DEBUG_MAIN
 extern FILE* hxfstin;
 extern int hxfstparse(void);
 
@@ -1836,4 +1837,33 @@ XfstCompiler* xfst_ = 0;
 
 }}
 
+#else
+#include <cstdlib>
+#include <cassert>
 
+using namespace hfst;
+using namespace hfst::xfst;
+
+int
+main(int argc, char** argv)
+  {
+    std::cout << "Unit tests for " __FILE__ ":";
+    std::cout << std::endl << "constructors:";
+    std::cout << " (default)";
+    XfstCompiler defaultXfst();
+#if HAVE_SFST
+    std::cout << " (SFST)";
+    XfstCompiler sfstXfst(SFST_TYPE);
+#endif
+#if HAVE_OPENFST
+    std::cout << " (OpenFst)";
+    XfstCompiler ofstXfst(TROPICAL_OFST_TYPE);
+#endif
+#if HAVE_SFST
+    std::cout << " (foma)";
+    XfstCompiler fomaXfst(FOMA_TYPE);
+#endif
+    // FIXME: test as implemented.
+    return EXIT_SUCCESS;
+  }
+#endif
