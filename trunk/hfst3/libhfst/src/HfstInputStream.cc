@@ -1042,8 +1042,6 @@ int main(void)
     }
 #endif
   std::cout << std::endl << "Constructors: ";
-  std::cout << " (default)...";
-  hfst::HfstInputStream defaultInput();
 #if HAVE_SFST
   std::cout << " (SFST)...";
   hfst::HfstInputStream sfstFileInput("HfstInputStream_SFST.hfst");
@@ -1057,7 +1055,18 @@ int main(void)
   hfst::HfstInputStream fomaFileInput("HfstInputStream_FOMA.hfst");
 #endif
   std::cout << std::endl << "Destructor: ";
-  delete new HfstInputStream();
+#if HAVE_SFST
+  std::cout << " (SFST)";
+  delete new HfstInputStream("HfstInputStream_SFST.hfst");
+#endif
+#if HAVE_OPENFST
+  std::cout << " (OpenFst)";
+  delete new HfstInputStream("HfstInputStream_OFST.hfst");
+#endif
+#if HAVE_SFST
+  std::cout << " (foma)";
+  delete new HfstInputStream("HfstInputStream_FOMA.hfst");
+#endif
   std::cout << std::endl << "HfstTransducer constructor: ";
 #if HAVE_SFST
   std::cout << " sfst(input stream)...";
