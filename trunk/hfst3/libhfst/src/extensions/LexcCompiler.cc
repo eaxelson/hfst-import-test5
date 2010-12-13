@@ -190,8 +190,6 @@ LexcCompiler::addXreEntry(const string& regexp, const string& continuation,
     encodedCont = joinerEncode(encodedCont);
     tokenizer_.add_multichar_symbol(encodedCont);
     char* xre_encoded = hfst::xre::add_percents(encodedCont.c_str());
-    fprintf(stderr, "\nDBG: actually parsing XRE %s %s\n", regexp.c_str(),
-            xre_encoded);
     HfstTransducer* newPaths = xre_.compile(regexp + " "  + string(xre_encoded));
     if (weight != 0)
       {
@@ -286,6 +284,10 @@ LexcCompiler::compileLexical()
          s != lexiconNames_.end();
          ++s)
       {
+        if (*s == "#")
+          {
+            continue;
+          }
         HfstTransducer lexicon(format_);
         if (stringTries_.find(*s) != stringTries_.end())
           {
@@ -295,7 +297,7 @@ LexcCompiler::compileLexical()
           {
             lexicon.disjunct(regexps_[*s]);
           }
-        lexicon.minimize();
+        lexicon.determinize();
         lexicons.insert(pair<string,HfstTransducer>(*s, lexicon));
       }
     // build initial states
@@ -322,7 +324,7 @@ LexcCompiler::compileLexical()
     HfstState new_end = first_free;
     first_free++;
     rebuilt.add_line(new_end, 0);
-    starts[startEnc] = new_end;
+    starts[ender] = new_end;
     HfstState sink = first_free;
     first_free++;
     // connect lexicons
@@ -378,17 +380,17 @@ LexcCompiler::compileLexical()
                       {
                         nu_weight += mut.get_final_weight(old_target);
                       }
-                    nu_osymbol = "@_EPSILON_SYMBOL_@";
-                    nu_isymbol = "@_EPSILON_SYMBOL_@";
-                    if (starts.find(nu_osymbol) != starts.end())
+                    if (starts.find(old_osymbol) != starts.end())
                       {
-                        nu_target = starts[nu_osymbol];
+                        nu_target = starts[old_osymbol];
                       }
                     else
                       {
                         // non-existent continuation, kill path
                         nu_target = sink;
                       }
+                    nu_osymbol = "@_EPSILON_SYMBOL_@";
+                    nu_isymbol = "@_EPSILON_SYMBOL_@";
                   }
                 else
                   {
@@ -417,7 +419,6 @@ LexcCompiler::compileLexical()
               }
           }
       }
-    // FIXME: howto create HfstTransducer from internal?
     HfstTransducer* rv = new HfstTransducer(rebuilt, format_);
 
     rv->minimize();
