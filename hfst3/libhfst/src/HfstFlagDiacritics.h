@@ -8,7 +8,7 @@
 #include <cassert>
 #include <utility>
 
-/** @file FlagDiacritics.h
+/** @file HfstFlagDiacritics.h
     \brief Class declarations for flag diacritic handling. */
 
 namespace hfst {

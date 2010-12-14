@@ -25,9 +25,9 @@
 */
 
 #include "HfstExceptions.h"
-#include "FlagDiacritics.h"
-#include "SymbolDefs.h"
-#include "ExtractStrings.h"
+#include "HfstFlagDiacritics.h"
+#include "HfstSymbolDefs.h"
+#include "HfstExtractStrings.h"
 
 /* Include all relevant header files of library MFSTL here */
 #ifndef _MFSTLLIB_H_
@@ -71,7 +71,7 @@ namespace implementations
     /** @brief Create and open a stream to standard in. */
     MfstlInputStream(void);
     /** @brief Create and open a stream to file filename. */
-    MfstlInputStream(const char * filename);
+    MfstlInputStream(const std::string &filename);
     /** @brief Close the stream. If it points to standard in, nothing is done. */
     void close(void);
     /** @brief Whether the stream is at end. */
@@ -122,7 +122,7 @@ namespace implementations
     /** @brief Create and open a stream to standard out. */
     MfstlOutputStream(void); 
     /** @brief Create and open a stream to file filename. */
-    MfstlOutputStream(const char * filename);
+    MfstlOutputStream(const std::string &filename);
     /** @brief Close the stream. If it points to standard out, nothig is done. */
     void close(void);
     /** @brief Write a char to the stream. */
@@ -146,9 +146,9 @@ namespace implementations
       /** @brief Create a transducer that recognises the empty string. */
       static MyFst * create_epsilon_transducer(void);
       /** @brief Create a transducer that recognises the symbol pair symbol:symbol */
-      static MyFst * define_transducer(const char *symbol);
+      static MyFst * define_transducer(const std::string &symbol);
       /** @brief Create a transducer that recognises the symbol pair isymbol:osymbol */
-      static MyFst * define_transducer(const char *isymbol, const char *osymbol);
+      static MyFst * define_transducer(const std::string &isymbol, const std::string &osymbol);
       /** @brief Create a transducer that recognises the concatenation of symbol pairs in spv */
       static MyFst * define_transducer(const StringPairVector &spv);
       /** @brief Create a transducer that recognises the union of symbol pairs in sps 

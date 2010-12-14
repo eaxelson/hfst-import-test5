@@ -18,7 +18,7 @@
 #include <sstream>
 #include <set>
 
-/** @file ExtractStrings.h
+/** @file HfstExtractStrings.h
     \brief Classes WeightedPath and WeightsPaths */
 
 namespace hfst {

@@ -12,11 +12,11 @@
 #ifndef _LOG_WEIGHT_TRANSDUCER_H_
 #define _LOG_WEIGHT_TRANSDUCER_H_
 
-#include "SymbolDefs.h"
+#include "HfstSymbolDefs.h"
 #include "HfstExceptions.h"
-#include "FlagDiacritics.h"
+#include "HfstFlagDiacritics.h"
 #include <fst/fstlib.h>
-#include "ExtractStrings.h"
+#include "HfstExtractStrings.h"
 #include <cstdio>
 #include <string>
 #include <sstream>
@@ -51,7 +51,7 @@ namespace implementations
     void skip_hfst_header(void);
   public:
     LogWeightInputStream(void);
-    LogWeightInputStream(const char * filename);
+    LogWeightInputStream(const std::string &filename);
     void close(void);
     bool is_eof(void) const;
     bool is_bad(void) const;
@@ -77,7 +77,7 @@ namespace implementations
     //void write_3_0_library_header(std::ostream &out);
   public:
     LogWeightOutputStream(void); 
-    LogWeightOutputStream(const char * filename);
+    LogWeightOutputStream(const std::string &filename);
     void close(void);
     void write(const char &c);
     void write_transducer(LogFst * transducer);
@@ -243,7 +243,6 @@ namespace implementations
       static void remove_symbol_table(LogFst *t);      
 
     public:
-      /* For HfstMutableTransducer */
       static StateId add_state(LogFst *t);
       static void set_final_weight(LogFst *t, StateId s, float w);
       static void add_transition(LogFst *t, StateId source,

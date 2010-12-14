@@ -32,8 +32,8 @@ namespace hfst { namespace implementations
   LogWeightInputStream::LogWeightInputStream(void):
     i_stream(),input_stream(cin)
   {}
-  LogWeightInputStream::LogWeightInputStream(const char * filename):
-    filename(filename),i_stream(filename),input_stream(i_stream)
+  LogWeightInputStream::LogWeightInputStream(const std::string &filename_):
+    filename(std::string(filename_)),i_stream(filename.c_str()),input_stream(i_stream)
   {}
 
   char LogWeightInputStream::stream_get() {
@@ -2086,8 +2086,8 @@ namespace hfst { namespace implementations
       fprintf(stderr, "LogWeightOutputStream: ERROR: failbit set (3).\n");
   }
 
-  LogWeightOutputStream::LogWeightOutputStream(const char * str):
-    filename(str),o_stream(str,std::ios::out),output_stream(o_stream)
+  LogWeightOutputStream::LogWeightOutputStream(const std::string &str):
+    filename(std::string(str)),o_stream(str.c_str(),std::ios::out),output_stream(o_stream)
   {}
 
   /*

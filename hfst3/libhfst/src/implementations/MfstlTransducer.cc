@@ -27,7 +27,7 @@ namespace implementations
     throw FunctionNotImplementedException(); }    
   
   /* Create and open a stream to file filename. */
-  MfstlInputStream::MfstlInputStream(const char * filename) {
+  MfstlInputStream::MfstlInputStream(const std::string &filename) {
     (void)filename;
     throw FunctionNotImplementedException(); }      
   
@@ -82,7 +82,7 @@ namespace implementations
     throw FunctionNotImplementedException(); }
 
   /* Create and open a stream to file filename. */
-  MfstlOutputStream::MfstlOutputStream(const char * filename) {
+  MfstlOutputStream::MfstlOutputStream(const std::string &filename) {
     (void)filename;
     throw FunctionNotImplementedException(); }
   
@@ -117,12 +117,12 @@ namespace implementations
     throw FunctionNotImplementedException(); }
     
   /* Create a transducer that recognises the symbol pair symbol:symbol */
-  MyFst * MfstlTransducer::define_transducer(const char *symbol) {
+  MyFst * MfstlTransducer::define_transducer(const std::string &symbol) {
     (void)symbol;
     throw FunctionNotImplementedException(); }
 
   /* Create a transducer that recognises the symbol pair isymbol:osymbol */
-  MyFst * MfstlTransducer::define_transducer(const char *isymbol, const char *osymbol) {
+  MyFst * MfstlTransducer::define_transducer(const std::string &isymbol, const std::string &osymbol) {
     (void)isymbol;
     (void)osymbol;
     throw FunctionNotImplementedException(); }

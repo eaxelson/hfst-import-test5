@@ -106,10 +106,7 @@ namespace hfst
   //! Used as return type of lookup with multiple, unique results.
   typedef std::set<HfstLookupPath> HfstLookupPaths;
 
-#if HAVE_MUTABLE
-  class HfstMutableTransducer;
-#endif
-  typedef class hfst::implementations::HfstInternalTransducer HfstMutableTransducer;
+  typedef class hfst::implementations::HfstInternalTransducer HfstInternalTransducer;
   typedef class hfst::implementations::HfstTransition HfstTransition;
   typedef class hfst::implementations::HfstStateIterator HfstStateIterator;
   typedef class hfst::implementations::HfstTransitionIterator HfstTransitionIterator;

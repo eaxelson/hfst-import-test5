@@ -1,4 +1,4 @@
-#include "FlagDiacritics.h"
+#include "HfstFlagDiacritics.h"
 
 #ifndef DEBUG_MAIN
 namespace hfst {
@@ -65,7 +65,7 @@ std::string::size_type FdOperation::find_diacritic(const std::string& diacritic_
 }
 #else
 
-#include "FlagDiacritics.h"
+#include "HfstFlagDiacritics.h"
 #include <iostream>
 #include <cassert>
 #include <cstdlib>

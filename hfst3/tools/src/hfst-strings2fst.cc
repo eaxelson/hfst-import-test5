@@ -50,7 +50,7 @@ using std::pair;
 using hfst::HfstOutputStream;
 using hfst::HfstTokenizer;
 using hfst::HfstTransducer;
-using hfst::HfstMutableTransducer;
+using hfst::HfstInternalTransducer;
 using hfst::implementations::HfstTrie;
 using hfst::StringPairVector;
 using hfst::StringPair;
@@ -381,7 +381,7 @@ process_stream(HfstOutputStream& outstream)
         {
 	  HfstTrie tr;
 	  tr.add_path(spv, path_weight);
-	  HfstMutableTransducer mut(tr);
+	  HfstInternalTransducer mut(tr);
 	  HfstTransducer res(mut, output_format);
 	  outstream << res;
         }
@@ -392,7 +392,7 @@ process_stream(HfstOutputStream& outstream)
     }
   if (disjunct_strings)
     {
-      HfstMutableTransducer mut(disjunction);
+      HfstInternalTransducer mut(disjunction);
       HfstTransducer res(mut, output_format);
 
       if (normalize_weights) {

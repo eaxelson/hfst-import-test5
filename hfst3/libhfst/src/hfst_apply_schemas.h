@@ -10,7 +10,7 @@
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-/** @file apply_schemas.h
+/** @file hfst_apply_schemas.h
     \brief declarations for HFST functions that take two or more parameters */
 
 HfstTransducer &apply(

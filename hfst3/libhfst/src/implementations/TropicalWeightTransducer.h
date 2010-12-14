@@ -12,11 +12,11 @@
 #ifndef _TROPICAL_WEIGHT_TRANSDUCER_H_
 #define _TROPICAL_WEIGHT_TRANSDUCER_H_
 
-#include "SymbolDefs.h"
+#include "HfstSymbolDefs.h"
 #include "HfstExceptions.h"
-#include "FlagDiacritics.h"
+#include "HfstFlagDiacritics.h"
 #include <fst/fstlib.h>
-#include "ExtractStrings.h"
+#include "HfstExtractStrings.h"
 #include "TropicalWeightComposeIntersect.h"
 #include <cstdio>
 #include <string>
@@ -51,7 +51,7 @@ namespace implementations
     void skip_hfst_header(void);
   public:
     TropicalWeightInputStream(void);
-    TropicalWeightInputStream(const char * filename);
+    TropicalWeightInputStream(const std::string &filename);
     void close(void);
     bool is_eof(void) const;
     bool is_bad(void) const;
@@ -77,7 +77,7 @@ namespace implementations
     //void write_3_0_library_header(std::ostream &out);
   public:
     TropicalWeightOutputStream(void); 
-    TropicalWeightOutputStream(const char * filename);
+    TropicalWeightOutputStream(const std::string &filename);
     void close(void);
     void write(const char &c);
     void write_transducer(StdVectorFst * transducer);
@@ -251,7 +251,6 @@ namespace implementations
       static void remove_symbol_table(StdVectorFst *t);      
 
     public:
-      /* For HfstMutableTransducer */
       static StateId add_state(StdVectorFst *t);
       static void set_final_weight(StdVectorFst *t, StateId s, float w);
       static void add_transition(StdVectorFst *t, StateId source,

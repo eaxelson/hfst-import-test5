@@ -17,7 +17,7 @@
 #endif
 
 #include "HfstDataTypes.h"
-#include "SymbolDefs.h"
+#include "HfstSymbolDefs.h"
 
 #if HAVE_SFST
 #include "implementations/SfstTransducer.h"
@@ -140,7 +140,7 @@ namespace hfst
     \section creating_transducers Creating transducers
 
     With HfstTransducer constructors it is possible to create empty, epsilon, one-transition and single-path transducers.
-    Transducers can also be created from scratch with HfstMutableTransducer and converted to an HfstTransducer.
+    Transducers can also be created from scratch with HfstInternalTransducer and converted to an HfstTransducer.
     More complex transducers can be combined from simple ones with various functions.
     
     <a name="symbols"></a> 
@@ -229,7 +229,7 @@ tr1.disjunct(tr2);
     HfstTransducer &disjunct_as_tries(HfstTransducer &another,
 				      ImplementationType type);  
 
-#include "apply_schemas.h"
+#include "hfst_apply_schemas.h"
 
     // whether the conversion requested can be done without losing any information
     bool static is_safe_conversion(ImplementationType original, ImplementationType conversion);
@@ -304,9 +304,9 @@ tr1.disjunct(tr2);
     /** \brief Create a deep copy of transducer \a another. **/
     HfstTransducer(const HfstTransducer &another);
 
-    /** \brief Create an ordinary transducer equivalent to mutable transducer \a t.
+    /** \brief Create an ordinary transducer equivalent to internal transducer \a t.
 	The type of the transducer is defined by \a type.  **/
-    HfstTransducer(const HfstMutableTransducer &t, ImplementationType type);
+    HfstTransducer(const HfstInternalTransducer &t, ImplementationType type);
 
     /** \brief Delete the HfstTransducer. **/
     ~HfstTransducer(void);
@@ -437,7 +437,7 @@ The argument \a epsilon_symbol only denotes how epsilons are represented in \a i
 	If the file exists, it is overwritten. If the file does not exist, it is created. 
 
 	@see #write_in_att_format */
-    void write_in_att_format(const char * filename, bool write_weights=true) const;
+    void write_in_att_format(const std::string &filename, bool write_weights=true) const;
 
     /* \brief Create a transducer of type \a type as defined in AT & T format in file named \a filename.
 	\a epsilon_symbol defines how epsilons are represented.
@@ -445,7 +445,7 @@ The argument \a epsilon_symbol only denotes how epsilons are represented in \a i
 	@pre The file exists, otherwise an exception is thrown.
 	@see HfstTransducer(FILE, ImplementationType, const std::string&)
 	@throws hfst::exceptions::FileNotReadableException hfst::exceptions::NotValidAttFormatException */
-    static HfstTransducer &read_in_att_format(const char * filename, ImplementationType type, const std::string &epsilon_symbol);
+    static HfstTransducer &read_in_att_format(const std::string &filename, ImplementationType type, const std::string &epsilon_symbol);
 
     /** \brief Remove all <i>epsilon:epsilon</i> transitions from the transducer. */
     HfstTransducer &remove_epsilons();

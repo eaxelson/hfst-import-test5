@@ -611,7 +611,7 @@ namespace hfst
       }
   }
 
-  HfstTransducer::HfstTransducer(const HfstMutableTransducer &mut, ImplementationType type):
+  HfstTransducer::HfstTransducer(const HfstInternalTransducer &internal, ImplementationType type):
     type(type),anonymous(false),is_trie(false), name("")
   {
     if (not is_implementation_type_available(type))
@@ -621,21 +621,21 @@ namespace hfst
       {
 #if HAVE_SFST
       case SFST_TYPE:
-	implementation.sfst = hfst_internal_format_to_sfst(&mut);
+	implementation.sfst = hfst_internal_format_to_sfst(&internal);
 	break;
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
-	implementation.tropical_ofst = hfst_internal_format_to_tropical_ofst(&mut);
+	implementation.tropical_ofst = hfst_internal_format_to_tropical_ofst(&internal);
 	  
 	break;
       case LOG_OFST_TYPE:
-	implementation.log_ofst = hfst_internal_format_to_log_ofst(&mut);	  
+	implementation.log_ofst = hfst_internal_format_to_log_ofst(&internal);	  
 	break;
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
-	implementation.foma = hfst_internal_format_to_foma(&mut);
+	implementation.foma = hfst_internal_format_to_foma(&internal);
 	break;
 #endif
 	//case UNSPECIFIED_TYPE:
@@ -693,7 +693,7 @@ HfstTransducer::HfstTransducer(const std::string &symbol, ImplementationType typ
       {
 #if HAVE_SFST
       case SFST_TYPE:
-	implementation.sfst = sfst_interface.define_transducer(symbol.c_str());
+	implementation.sfst = sfst_interface.define_transducer(symbol);
 	break;
 #endif
 #if HAVE_OPENFST
@@ -708,7 +708,7 @@ HfstTransducer::HfstTransducer(const std::string &symbol, ImplementationType typ
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
-	implementation.foma = foma_interface.define_transducer(strdup(symbol.c_str()));
+	implementation.foma = foma_interface.define_transducer(symbol);
 	// should the char* be deleted?
 	break;
 #endif
@@ -729,7 +729,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
       {
 #if HAVE_SFST
       case SFST_TYPE:
-	implementation.sfst = sfst_interface.define_transducer(isymbol.c_str(), osymbol.c_str());
+	implementation.sfst = sfst_interface.define_transducer(isymbol, osymbol);
 	break;
 #endif
 #if HAVE_OPENFST
@@ -744,7 +744,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
-	implementation.foma = foma_interface.define_transducer( strdup(isymbol.c_str()), strdup(osymbol.c_str()) );
+	implementation.foma = foma_interface.define_transducer(isymbol, osymbol);
 	// should the char*:s be deleted?
 	break;
 #endif
@@ -2115,9 +2115,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
   }
 
 
-void HfstTransducer::write_in_att_format(const char * filename, bool print_weights) const
+  void HfstTransducer::write_in_att_format(const std::string &filename, bool print_weights) const
 {
-  FILE * ofile = fopen(filename, "wb");
+  FILE * ofile = fopen(filename.c_str(), "wb");
   if (ofile == NULL)
     throw hfst::exceptions::FileCannotBeWrittenException();
   write_in_att_format(ofile,print_weights);
@@ -2177,9 +2177,9 @@ HfstTransducer::HfstTransducer(FILE * ifile, ImplementationType type, const std:
   delete internal_transducer;
 }
 
-HfstTransducer &HfstTransducer::read_in_att_format(const char * filename, ImplementationType type, const std::string &epsilon_symbol)
+HfstTransducer &HfstTransducer::read_in_att_format(const std::string &filename, ImplementationType type, const std::string &epsilon_symbol)
 {
-  FILE * ifile = fopen(filename, "rb");
+  FILE * ifile = fopen(filename.c_str(), "rb");
   if (ifile == NULL)
     throw hfst::exceptions::FileNotReadableException();
   HfstTransducer &retval = read_in_att_format(ifile, type, epsilon_symbol);
@@ -2303,7 +2303,7 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
       }
     else 
       {
-	HfstMutableTransducer t(*this);
+	HfstInternalTransducer t(*this);
 	HfstStateIterator state_it(t);
 	while (not state_it.done()) 
 	  {

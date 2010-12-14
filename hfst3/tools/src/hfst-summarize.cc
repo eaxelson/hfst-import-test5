@@ -39,7 +39,7 @@ using std::map;
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
-using hfst::HfstMutableTransducer;
+using hfst::HfstInternalTransducer;
 using hfst::HfstStateIterator;
 using hfst::HfstTransitionIterator;
 using hfst::HfstTransition;
@@ -129,9 +129,9 @@ process_stream(HfstInputStream& instream)
 	exit(1);
       }
       //std::cerr << trans;
-      HfstMutableTransducer *mutt;
+      HfstInternalTransducer *mutt;
       try {
-	mutt = new HfstMutableTransducer(*trans);
+	mutt = new HfstInternalTransducer(*trans);
       } catch (HfstInterfaceException e) {
 	fprintf(stderr,"An error happened when converting transducer to internal format.\n");
 	exit(1);

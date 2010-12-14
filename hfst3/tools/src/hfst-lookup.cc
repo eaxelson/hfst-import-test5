@@ -45,7 +45,7 @@ using hfst::HfstTransducer;
 using hfst::HFST_OL_TYPE;
 using hfst::HFST_OLW_TYPE;
 using hfst::HfstState;
-using hfst::HfstMutableTransducer;
+using hfst::HfstInternalTransducer;
 using hfst::HfstTransitionIterator;
 using hfst::HfstTransition;
 using hfst::HfstInputStream;
@@ -689,7 +689,7 @@ lookup_simple(const HfstLookupPath& s, T& t, bool* infinity)
   return results;
 }
 
-bool is_lookup_infinitely_ambiguous(HfstMutableTransducer &t, const HfstLookupPath& s, 
+bool is_lookup_infinitely_ambiguous(HfstInternalTransducer &t, const HfstLookupPath& s, 
 				    unsigned int& index, HfstState state, 
 				    std::set<HfstState> &epsilon_path_states) 
 {
@@ -737,7 +737,7 @@ bool is_lookup_infinitely_ambiguous(HfstMutableTransducer &t, const HfstLookupPa
   return false;
 }
 
-bool is_lookup_infinitely_ambiguous(HfstMutableTransducer &t, const HfstLookupPath& s)
+bool is_lookup_infinitely_ambiguous(HfstInternalTransducer &t, const HfstLookupPath& s)
 {
   std::set<HfstState> epsilon_path_states;
   epsilon_path_states.insert(t.get_initial_state());
@@ -791,7 +791,7 @@ lookup_simple(const HfstLookupPath& s, HfstTransducer& t, bool* infinity)
 
   @todo Support flag diacritics(?) and log weights(?)
  */
-void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLookupPath& s, unsigned int& index, 
+void lookup_fd(HfstInternalTransducer &t, HfstLookupPaths& results, const HfstLookupPath& s, unsigned int& index, 
 	       HfstLookupPath& path, HfstState state, std::multiset<HfstState>& visited_states, std::vector<HfstState>& epsilon_path,
 	       unsigned int& cycles)
 { 
@@ -899,7 +899,7 @@ void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLoo
   //! Used as return type of lookup with multiple, unique results.
   typedef std::set<HfstLookupPath> HfstLookupPaths;
 
-void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLookupPath& s, ssize_t limit = -1)
+void lookup_fd(HfstInternalTransducer &t, HfstLookupPaths& results, const HfstLookupPath& s, ssize_t limit = -1)
 {
   HfstLookupPath path;
   path.second=0;
@@ -918,7 +918,7 @@ void lookup_fd(HfstMutableTransducer &t, HfstLookupPaths& results, const HfstLoo
 }
 
 HfstLookupPaths*
-lookup_simple(const HfstLookupPath& s, HfstMutableTransducer& t, bool* infinity)
+lookup_simple(const HfstLookupPath& s, HfstInternalTransducer& t, bool* infinity)
 {
   HfstLookupPaths* results = new HfstLookupPaths;
 
@@ -1061,8 +1061,8 @@ int
 process_stream(HfstInputStream& inputstream, FILE* outstream)
 {
     std::vector<HfstTransducer> cascade;
-    std::vector<HfstMutableTransducer> cascade_mut;
-    bool mutable_transducers=false;
+    std::vector<HfstInternalTransducer> cascade_mut;
+    bool internal_transducers=false;
 
     size_t transducer_n=0;
     HfstTokenizer tok;
@@ -1085,7 +1085,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     inputstream.close();
 
     // if transducer type is other than optimized_lookup,
-    // convert to HfstMutableTransducer
+    // convert to HfstInternalTransducer
 
     char* line = 0;
     size_t llen = 0;
@@ -1116,18 +1116,18 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
           }
         catch (hfst::exceptions::FunctionNotImplementedException)
           {
-            if (!mutable_transducers)
+            if (!internal_transducers)
               {
                 warning(0, 0, "Lookup not supported on this automata "
                       "format: converting to internal format and trying\n");
                 for (unsigned int i=0; i<cascade.size(); i++) 
                   {
-                    HfstMutableTransducer mut(cascade[i]);
+                    HfstInternalTransducer mut(cascade[i]);
                     cascade_mut.push_back(mut);
                   }
-                mutable_transducers = true;
+                internal_transducers = true;
               }
-            kvs = perform_lookups<HfstMutableTransducer>(*kv, cascade_mut,
+            kvs = perform_lookups<HfstInternalTransducer>(*kv, cascade_mut,
                                                          unknown,
                                                          &infinite);
           }

@@ -13,10 +13,10 @@
 #ifndef _FOMA_TRANSDUCER_H_
 #define _FOMA_TRANSDUCER_H_
 
-#include "SymbolDefs.h"
+#include "HfstSymbolDefs.h"
 #include "HfstExceptions.h"
-#include "ExtractStrings.h"
-#include "FlagDiacritics.h"
+#include "HfstExtractStrings.h"
+#include "HfstFlagDiacritics.h"
 #include <stdbool.h>  // foma uses _Bool
 #include <stdlib.h>
 
@@ -51,7 +51,7 @@ namespace hfst {
     void skip_hfst_header(void);
   public:
     FomaInputStream(void);
-    FomaInputStream(const char * filename);
+    FomaInputStream(const std::string &filename);
     void close(void);
     bool is_eof(void);
     bool is_bad(void);
@@ -75,7 +75,7 @@ namespace hfst {
     //void write_3_0_library_header(FILE *file);
   public:
     FomaOutputStream(void); 
-    FomaOutputStream(const char * filename);
+    FomaOutputStream(const std::string &filename);
     void close(void);
     void write(const char &c);
     void write_transducer(fsm * transducer);
@@ -89,8 +89,8 @@ namespace hfst {
       static fsm * define_transducer(const hfst::StringPairVector &spv);
       static fsm * define_transducer(const hfst::StringPairSet &sps, bool cyclic=false);
       static fsm * define_transducer(const std::vector<StringPairSet> &spsv);
-      static fsm * define_transducer(char *symbol);                     
-      static fsm * define_transducer(char *isymbol, char *osymbol);       
+      static fsm * define_transducer(const std::string &symbol);                     
+      static fsm * define_transducer(const std::string &isymbol, const std::string &osymbol);       
       static fsm * copy(fsm * t);
       static fsm * determinize(fsm * t);
       static fsm * minimize(fsm * t);
