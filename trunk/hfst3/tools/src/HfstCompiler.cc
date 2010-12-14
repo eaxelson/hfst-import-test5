@@ -637,7 +637,7 @@ namespace hfst
 	type != LOG_OFST_TYPE)
       return retval_hfst;
     else {
-      HfstMutableTransducer internal(retval_internal);
+      HfstInternalTransducer internal(retval_internal);
       return new HfstTransducer(internal, type);
     }
   }
@@ -888,7 +888,7 @@ namespace hfst
  
     else {
       
-      HfstMutableTransducer t(*tr);
+      HfstInternalTransducer t(*tr);
       
       HfstStateIterator state_it(t);
       while (not state_it.done()) 

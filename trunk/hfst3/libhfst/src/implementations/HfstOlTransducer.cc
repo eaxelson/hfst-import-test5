@@ -19,8 +19,8 @@ namespace hfst { namespace implementations
   HfstOlInputStream::HfstOlInputStream(bool weighted):
     i_stream(),input_stream(std::cin), weighted(weighted)
   {}
-  HfstOlInputStream::HfstOlInputStream(const char * filename, bool weighted):
-    filename(filename),i_stream(filename),input_stream(i_stream),weighted(weighted)
+  HfstOlInputStream::HfstOlInputStream(const std::string &filename, bool weighted):
+    filename(std::string(filename)),i_stream(filename.c_str()),input_stream(i_stream),weighted(weighted)
   {}
   
   /* Skip the identifier string "HFST_OL_TYPE" or "HFST_OLW_TYPE" */
@@ -161,8 +161,8 @@ void HfstOlInputStream::ignore(unsigned int n)
     filename(std::string()), output_stream(std::cout), weighted(weighted)
   {}
 
-  HfstOlOutputStream::HfstOlOutputStream(const char * str, bool weighted):
-    filename(str),o_stream(str,std::ios::out),output_stream(o_stream), weighted(weighted)
+  HfstOlOutputStream::HfstOlOutputStream(const std::string &str, bool weighted):
+    filename(std::string(str)),o_stream(str.c_str(),std::ios::out),output_stream(o_stream), weighted(weighted)
   {
     if (!output_stream)
       fprintf(stderr, "HfstOlOutputStream: ERROR: failbit set (3).\n");

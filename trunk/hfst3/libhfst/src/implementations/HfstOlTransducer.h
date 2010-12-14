@@ -16,8 +16,8 @@
 #include <iostream>
 #include <fstream>
 #include "HfstExceptions.h"
-#include "FlagDiacritics.h"
-#include "ExtractStrings.h"
+#include "HfstFlagDiacritics.h"
+#include "HfstExtractStrings.h"
 #include "optimized-lookup/transducer.h"
 
 /** @file HfstOlTransducer.h
@@ -43,7 +43,7 @@ namespace hfst { namespace implementations
     void skip_hfst_header(void);
   public:
     HfstOlInputStream(bool weighted);
-    HfstOlInputStream(const char * filename, bool weighted);
+    HfstOlInputStream(const std::string &filename, bool weighted);
     void open(void);
     void close(void);
     bool is_open(void) const;
@@ -73,7 +73,7 @@ namespace hfst { namespace implementations
     bool weighted;
   public:
     HfstOlOutputStream(bool weighted);
-    HfstOlOutputStream(const char * filename, bool weighted);
+    HfstOlOutputStream(const std::string &filename, bool weighted);
     void open(void);
     void close(void);
     void write(const char &c);

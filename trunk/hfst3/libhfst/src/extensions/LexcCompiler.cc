@@ -37,7 +37,7 @@ using std::set;
 #include "xre_utils.h"
 
 using hfst::HfstTransducer;
-using hfst::HfstMutableTransducer;
+using hfst::HfstInternalTransducer;
 using hfst::HfstState;
 using hfst::HfstStateIterator;
 using hfst::HfstTransitionIterator;
@@ -277,7 +277,7 @@ HfstTransducer*
 LexcCompiler::compileLexical()
 {
     printConnectedness();
-    HfstMutableTransducer rebuilt;
+    HfstInternalTransducer rebuilt;
     map<string,HfstTransducer> lexicons;
     // combine tries with reg.exps and minimize
     for (set<string>::const_iterator s = lexiconNames_.begin();
@@ -333,7 +333,7 @@ LexcCompiler::compileLexical()
          ++lex)
       {
         // help structures
-        HfstMutableTransducer mut(lex->second);
+        HfstInternalTransducer mut(lex->second);
         map<HfstState,HfstState> rebuildMap;
         // connect start states
         string nameEnc(lex->first);

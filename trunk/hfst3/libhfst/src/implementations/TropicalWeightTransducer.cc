@@ -32,8 +32,8 @@ namespace hfst { namespace implementations
   TropicalWeightInputStream::TropicalWeightInputStream(void):
     i_stream(),input_stream(cin)
   {}
-  TropicalWeightInputStream::TropicalWeightInputStream(const char * filename):
-    filename(filename),i_stream(filename),input_stream(i_stream)
+  TropicalWeightInputStream::TropicalWeightInputStream(const std::string &filename_):
+    filename(std::string(filename_)),i_stream(filename.c_str()),input_stream(i_stream)
   {}
 
   char TropicalWeightInputStream::stream_get() {
@@ -2123,8 +2123,8 @@ namespace hfst { namespace implementations
       fprintf(stderr, "TropicalWeightOutputStream: ERROR: failbit set (3).\n");
   }
 
-  TropicalWeightOutputStream::TropicalWeightOutputStream(const char * str):
-    filename(str),o_stream(str,std::ios::out),output_stream(o_stream)
+  TropicalWeightOutputStream::TropicalWeightOutputStream(const std::string &str):
+    filename(std::string(str)),o_stream(str.c_str(),std::ios::out),output_stream(o_stream)
   {}
 
   /*

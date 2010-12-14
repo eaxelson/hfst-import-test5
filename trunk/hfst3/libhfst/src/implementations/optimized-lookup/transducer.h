@@ -25,7 +25,7 @@
 #include <utility>
 
 #include "../../HfstExceptions.h"
-#include "../../FlagDiacritics.h"
+#include "../../HfstFlagDiacritics.h"
 
 namespace hfst_ol {
 using hfst::FdOperation;

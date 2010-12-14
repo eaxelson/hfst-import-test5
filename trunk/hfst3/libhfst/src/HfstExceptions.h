@@ -141,7 +141,7 @@ public HfstInputException {};
 
 /** \brief State is not final (and cannot have a final weight). 
 
-    Thrown by HfstMutableTransducer::get_final_weight. */
+    Thrown by HfstInternalTransducer::get_final_weight. */
 class StateIsNotFinalException :
 public HfstArgumentException {};
 

@@ -24,8 +24,8 @@ namespace hfst { namespace implementations {
     input_file = stdin;
   }
     /** Create a FomaInputStream that reads from file \a filename. */
-  FomaInputStream::FomaInputStream(const char * filename_):
-  filename(filename_)
+    FomaInputStream::FomaInputStream(const std::string &filename_):
+      filename(std::string(filename_))
   {
     if (filename == std::string())
       { input_file = stdin; }
@@ -159,8 +159,8 @@ namespace hfst { namespace implementations {
   FomaOutputStream::FomaOutputStream(void)
   { ofile = stdout; }
 
-  FomaOutputStream::FomaOutputStream(const char * str):
-    filename(str)
+    FomaOutputStream::FomaOutputStream(const std::string &str):
+      filename(std::string(str))
   {
     if (filename != std::string()) {
       ofile = fopen(filename.c_str(), "wb");
@@ -336,14 +336,14 @@ namespace hfst { namespace implementations {
     fsm_destroy(net);
   }
 
-  fsm * FomaTransducer::define_transducer(char *symbol)
+    fsm * FomaTransducer::define_transducer(const std::string &symbol)
   {     
-    return fsm_symbol(symbol);
+    return fsm_symbol(strdup(symbol.c_str()));
   }
 
-  fsm * FomaTransducer::define_transducer(char *isymbol, char *osymbol)
+    fsm * FomaTransducer::define_transducer(const std::string &isymbol, const std::string &osymbol)
   { 
-    return fsm_cross_product( fsm_symbol(isymbol), fsm_symbol(osymbol) );
+    return fsm_cross_product( fsm_symbol(strdup(isymbol.c_str())), fsm_symbol(strdup(osymbol.c_str())) );
     // should either argument be deleted?
   }
   

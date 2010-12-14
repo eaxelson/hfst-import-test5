@@ -151,7 +151,7 @@ delete in;
 
 	@pre The file exists. Otherwise, an exception is thrown.
 	@throws hfst::exceptions::FileNotReadableException */
-    HfstInputStream(const char* filename);
+    HfstInputStream(const std::string &filename);
 
     /** Delete the stream. */
     ~HfstInputStream(void);

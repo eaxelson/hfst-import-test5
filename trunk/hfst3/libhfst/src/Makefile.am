@@ -24,8 +24,8 @@ AM_CXXFLAGS=-Wno-deprecated -Wall -Wextra
 # HFST bridge specific stuff
 HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc HfstOutputStream.cc\
 		  HfstRules.cc HfstBasic.cc HfstUtf8.cc \
-		  HfstGrammar.cc SymbolDefs.cc HfstTokenizer.cc \
-		  FlagDiacritics.cc HfstAlphabet.cc HfstExceptions.cc
+		  HfstGrammar.cc HfstSymbolDefs.cc HfstTokenizer.cc \
+		  HfstFlagDiacritics.cc HfstAlphabet.cc HfstExceptions.cc
 
 # libtool takes over
 libhfst_la_SOURCES =  $(HFST_SRCS)
@@ -40,9 +40,9 @@ hfstincludedir = $(includedir)/hfst
 
 HFST_HDRS = \
 	HfstTransducer.h \
-	apply_schemas.h \
+	hfst_apply_schemas.h \
 	HfstDataTypes.h \
-	SymbolDefs.h \
+	HfstSymbolDefs.h \
 	implementations/SfstTransducer.h \
 	implementations/TropicalWeightTransducer.h \
 	implementations/LogWeightTransducer.h \
@@ -53,7 +53,7 @@ HFST_HDRS = \
 	HfstTokenizer.h \
 	implementations/ConvertTransducerFormat.h \
 	HfstExceptions.h \
-	FlagDiacritics.h \
+	HfstFlagDiacritics.h \
 	HfstInputStream.h \
 	HfstOutputStream.h
 
@@ -65,14 +65,14 @@ libhfst_la_LDFLAGS = -no-undefined -version-info 1:0:0
 
 # unit tests: add one per class/file/anything
 
-check_PROGRAMS = HfstTransducer FlagDiacritics HfstGrammar HfstInputStream \
+check_PROGRAMS = HfstTransducer HfstFlagDiacritics HfstGrammar HfstInputStream \
 				 HfstOutputStream HfstTokenizer
 HfstTransducer_SOURCES=HfstTransducer.cc
 HfstTransducer_CXXFLAGS=-DDEBUG_MAIN
 HfstTransducer_LDADD=libhfst.la
-FlagDiacritics_SOURCES=FlagDiacritics.cc
-FlagDiacritics_CXXFLAGS=-DDEBUG_MAIN
-FlagDiacritics_LDADD=libhfst.la
+HfstFlagDiacritics_SOURCES=HfstFlagDiacritics.cc
+HfstFlagDiacritics_CXXFLAGS=-DDEBUG_MAIN
+HfstFlagDiacritics_LDADD=libhfst.la
 HfstGrammar_SOURCES=HfstGrammar.cc
 HfstGrammar_CXXFLAGS=-DDEBUG_MAIN
 HfstGrammar_LDADD=libhfst.la
@@ -85,5 +85,5 @@ HfstOutputStream_LDADD=libhfst.la
 HfstTokenizer_SOURCES=HfstTokenizer.cc
 HfstTokenizer_CXXFLAGS=-DDEBUG_MAIN
 HfstTokenizer_LDADD=libhfst.la
-TESTS=HfstTransducer FlagDiacritics HfstGrammar HfstInputStream \
+TESTS=HfstTransducer HfstFlagDiacritics HfstGrammar HfstInputStream \
 	  HfstOutputStream HfstTokenizer

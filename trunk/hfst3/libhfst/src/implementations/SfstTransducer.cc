@@ -33,8 +33,8 @@ namespace hfst { namespace implementations {
     this->input_file = stdin;
   }
     /** Create an SfstInputStream that reads from file \a filename. */
-  SfstInputStream::SfstInputStream(const char * filename_):
-    filename(filename_), is_minimal(false)
+    SfstInputStream::SfstInputStream(const std::string &filename_):
+      filename(std::string(filename_)), is_minimal(false)
   {
     if (filename == std::string())
       { input_file = stdin; }
@@ -324,8 +324,8 @@ namespace hfst { namespace implementations {
   SfstOutputStream::SfstOutputStream(void)
   { ofile = stdout; }
 
-  SfstOutputStream::SfstOutputStream(const char * str):
-    filename(str)
+    SfstOutputStream::SfstOutputStream(const std::string &str):
+    filename(std::string(str))
   {
     if (filename != std::string()) {
       ofile = fopen(filename.c_str(), "wb");
@@ -443,35 +443,35 @@ namespace hfst { namespace implementations {
     return t; }
 
 
-  Transducer * SfstTransducer::define_transducer(const char *symbol)
+    Transducer * SfstTransducer::define_transducer(const std::string &symbol)
   { Transducer * t = new Transducer;
     initialize_alphabet(t); 
     Node * n = t->new_node();
 
     unsigned int number;
-    if (strcmp(symbol,"@_EPSILON_SYMBOL_@") == 0)
+    if (strcmp(symbol.c_str(),"@_EPSILON_SYMBOL_@") == 0)
       number=0;
     else
-      number=t->alphabet.add_symbol(symbol);
+      number=t->alphabet.add_symbol(symbol.c_str());
 
     t->root_node()->add_arc(Label(number),n,t);
     n->set_final(1);
     return t; }
   
-  Transducer * SfstTransducer::define_transducer(const char *isymbol, const char *osymbol)
+    Transducer * SfstTransducer::define_transducer(const std::string &isymbol, const std::string &osymbol)
   { Transducer * t = new Transducer;
     initialize_alphabet(t);
     Node * n = t->new_node();
 
     unsigned int inumber,onumber;
-    if (strcmp(isymbol,"@_EPSILON_SYMBOL_@") == 0)
+    if (strcmp(isymbol.c_str(),"@_EPSILON_SYMBOL_@") == 0)
       inumber=0;
     else
-      inumber=t->alphabet.add_symbol(isymbol);
-    if (strcmp(osymbol,"@_EPSILON_SYMBOL_@") == 0)
+      inumber=t->alphabet.add_symbol(isymbol.c_str());
+    if (strcmp(osymbol.c_str(),"@_EPSILON_SYMBOL_@") == 0)
       onumber=0;
     else
-      onumber=t->alphabet.add_symbol(osymbol);
+      onumber=t->alphabet.add_symbol(osymbol.c_str());
 
     t->root_node()->add_arc(Label(inumber,onumber),n,t);
     n->set_final(1);

@@ -14,9 +14,9 @@
 #define _SFST_TRANSDUCER_H_
 
 #include "HfstExceptions.h"
-#include "FlagDiacritics.h"
-#include "SymbolDefs.h"
-#include "ExtractStrings.h"
+#include "HfstFlagDiacritics.h"
+#include "HfstSymbolDefs.h"
+#include "HfstExtractStrings.h"
 #include "sfst/fst.h"
 #include <cstdio>
 #include <string>
@@ -50,7 +50,7 @@ namespace implementations
 
   public:
     SfstInputStream(void);
-    SfstInputStream(const char * filename);
+    SfstInputStream(const std::string &filename);
     void close(void);
     bool is_eof(void);
     bool is_bad(void);
@@ -76,7 +76,7 @@ namespace implementations
     //void write_3_0_library_header(FILE *file, bool is_minimal);
   public:
     SfstOutputStream(void); 
-    SfstOutputStream(const char * filename);
+    SfstOutputStream(const std::string &filename);
     void close(void);
     void write(const char &c);
     void append_implementation_specific_header_data(std::vector<char> &header, Transducer *t);
@@ -92,8 +92,8 @@ namespace implementations
       static Transducer * define_transducer(unsigned int number);
       static Transducer * define_transducer(unsigned int inumber, unsigned int onumber);
 
-      static Transducer * define_transducer(const char *symbol);
-      static Transducer * define_transducer(const char *isymbol, const char *osymbol);
+      static Transducer * define_transducer(const std::string &symbol);
+      static Transducer * define_transducer(const std::string &isymbol, const std::string &osymbol);
       static Transducer * define_transducer(const StringPairVector &spv);
       static Transducer * define_transducer(const StringPairSet &sps, bool cyclic=false);
       static Transducer * define_transducer(const std::vector<StringPairSet> &spsv);

@@ -25,7 +25,7 @@
    extern const unsigned int UNKNOWN_NUMBER;
    extern const unsigned int IDENTITY_NUMBER; */
 
-/** @file SymbolDefs.h
+/** @file HfstSymbolDefs.h
     \brief Typedefs and functions for symbols, symbol pairs and sets of symbols. */
 
 namespace hfst

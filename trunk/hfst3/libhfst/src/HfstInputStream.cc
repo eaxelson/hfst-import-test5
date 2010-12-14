@@ -740,12 +740,12 @@ namespace hfst
   }
 
   // FIX: HfstOutputStream takes a string parameter, HfstInputStream a const char*
-  HfstInputStream::HfstInputStream(const char* filename):
+  HfstInputStream::HfstInputStream(const std::string &filename):
     bytes_to_skip(0), filename(std::string(filename)), hfst_version_2_weighted_transducer(false)
   {
     try { 
-      if (strcmp("",filename) != 0) {
-	std::ifstream ifs(filename);
+      if (strcmp("",filename.c_str()) != 0) {
+	std::ifstream ifs(filename.c_str());
 	input_stream = &ifs;
 	type = stream_fst_type();
       }
@@ -768,7 +768,7 @@ namespace hfst
 #endif
 #if HAVE_OPENFST
     case TROPICAL_OFST_TYPE:
-      if (strcmp(filename,"") == 0)  // FIX: this should be done in TropicalWeight layer
+      if (strcmp(filename.c_str(),"") == 0)  // FIX: this should be done in TropicalWeight layer
 	implementation.tropical_ofst = 
 	  new hfst::implementations::TropicalWeightInputStream();
       else

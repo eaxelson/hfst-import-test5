@@ -8,7 +8,7 @@
 
 using namespace hfst;
 
-void print(HfstMutableTransducer &t)
+void print(HfstInternalTransducer &t)
 {
   HfstStateIterator it(t);
   while (not it.done()) {
@@ -48,7 +48,7 @@ int main(int argc, char **argv) {
 	HfstTransducer tranother(types[j]);
 	assert (HfstTransducer::test_equivalence(tr, tranother));
       }
-      HfstMutableTransducer mut(tr);
+      HfstInternalTransducer mut(tr);
       HfstTransducer foo(mut);
       assert (HfstTransducer::test_equivalence(tr, foo));
     }
@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
 	HfstTransducer tranother("foo", types[j]);
 	assert (HfstTransducer::test_equivalence(tr, tranother));
       }
-      HfstMutableTransducer mut(tr);
+      HfstInternalTransducer mut(tr);
       HfstTransducer foo(mut);
       assert (HfstTransducer::test_equivalence(tr, foo));
     }
@@ -86,7 +86,7 @@ int main(int argc, char **argv) {
 	HfstTransducer foo = HfstTransducer::read_in_att_format("testfile");
 	assert (HfstTransducer::test_equivalence(tr, foo));
       }
-      HfstMutableTransducer mut(tr);
+      HfstInternalTransducer mut(tr);
       HfstTransducer foo(mut);
       assert (HfstTransducer::test_equivalence(tr, foo));
     }
@@ -106,7 +106,7 @@ int main(int argc, char **argv) {
 	HfstTransducer tranother("foobar", tok, types[j]);
 	assert (HfstTransducer::test_equivalence(tr, tranother));
       }
-      HfstMutableTransducer mut(tr);
+      HfstInternalTransducer mut(tr);
       HfstTransducer foo(mut);
       assert (HfstTransducer::test_equivalence(tr, foo));
     }
@@ -126,7 +126,7 @@ int main(int argc, char **argv) {
 	HfstTransducer tranother("fofoo", "barbarba", tok, types[j]);
 	assert (HfstTransducer::test_equivalence(tr, tranother));
       }
-      HfstMutableTransducer mut(tr);
+      HfstInternalTransducer mut(tr);
       HfstTransducer foo(mut);
       assert (HfstTransducer::test_equivalence(tr, foo));
     }
@@ -307,7 +307,7 @@ int main(int argc, char **argv) {
 #ifdef FOO
 
   // create transducer t1
-  HfstMutableTransducer t1;
+  HfstInternalTransducer t1;
   HfstState second_state1 = t1.add_state();
   HfstState third_state1 = t1.add_state();
   t1.set_final_weight(second_state1, 0.5);
@@ -316,7 +316,7 @@ int main(int argc, char **argv) {
   t1.add_transition(third_state1, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0.1, second_state1);
 
   // create transducer t2
-  HfstMutableTransducer t2;
+  HfstInternalTransducer t2;
   HfstState second_state2 = t2.add_state();
   t2.set_final_weight(second_state2, 0.3);
   t2.add_transition(0, "@_UNKNOWN_SYMBOL_@", "baz", 1.6, second_state2);
@@ -484,8 +484,8 @@ int main(int argc, char **argv) {
 
   fprintf(stderr, "disjunction done\n");
 
-  HfstMutableTransducer Disj = HfstMutableTransducer(DISJ);
-  fprintf(stderr, "converted to mutable\n");
+  HfstInternalTransducer Disj = HfstInternalTransducer(DISJ);
+  fprintf(stderr, "converted to internal\n");
   print(Disj);
 
 
