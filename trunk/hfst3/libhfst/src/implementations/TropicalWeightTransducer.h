@@ -35,6 +35,10 @@ namespace implementations
   using namespace hfst::exceptions;
   typedef StdArc::StateId StateId;
 
+  typedef std::vector<StdArc> StdArcVector;
+  struct StdArcLessThan { 
+    bool operator() (const StdArc &arc1,const StdArc &arc2) const; };
+
   using std::ostream;
   using std::ostringstream;
   using std::stringstream;
@@ -249,6 +253,19 @@ namespace implementations
       static void initialize_symbol_tables(StdVectorFst *t);
       static void add_symbol_table(StdVectorFst *t, HfstAlphabet &alpha); 
       static void remove_symbol_table(StdVectorFst *t);      
+
+      static int has_arc(StdVectorFst &t,
+		  StdArc::StateId sourcestate,			  
+		  StdArc::Label ilabel, 
+		  StdArc::Label olabel);
+      static void disjunct_as_tries(StdVectorFst &t1,
+			     StateId t1_state,
+			     const StdVectorFst * t2,
+			     StateId t2_state);
+      static void add_sub_trie(StdVectorFst &t1,
+			StateId t1_state,
+			const StdVectorFst * t2,
+			StateId t2_state);
 
     public:
       static StateId add_state(StdVectorFst *t);

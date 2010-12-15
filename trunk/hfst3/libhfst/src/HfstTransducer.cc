@@ -226,7 +226,6 @@ namespace hfst
 	  break;
 	}
 #endif
-	//case (UNSPECIFIED_TYPE):
       case (ERROR_TYPE):
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -347,8 +346,9 @@ namespace hfst
 	implementation.hfst_ol = hfst_ol_interface.create_empty_transducer(type==HFST_OLW_TYPE?true:false);
 	break;
       case ERROR_TYPE:
-      default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
+      default:
+	throw hfst::exceptions::FunctionNotImplementedException();
       }
   }
 
@@ -389,8 +389,9 @@ namespace hfst
 	break;
 #endif
       case ERROR_TYPE:
-      default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
+      default:
+	throw hfst::exceptions::FunctionNotImplementedException();
       }
     delete spv;
   }
@@ -430,8 +431,9 @@ namespace hfst
 	break;
 #endif
       case ERROR_TYPE:
-      default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
+      default:
+	throw hfst::exceptions::FunctionNotImplementedException();
       }
   }
 
@@ -470,8 +472,9 @@ namespace hfst
 	break;
 #endif
       case ERROR_TYPE:
-      default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
+      default:
+	throw hfst::exceptions::FunctionNotImplementedException();
       }
   }
 
@@ -510,8 +513,9 @@ namespace hfst
 	break;
 #endif
       case ERROR_TYPE:
-      default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
+      default:
+	throw hfst::exceptions::FunctionNotImplementedException();
       }
   }
 
@@ -554,8 +558,9 @@ namespace hfst
 	break;
 #endif
       case ERROR_TYPE:
-      default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
+      default:
+	throw hfst::exceptions::FunctionNotImplementedException();
       }
     delete spv;
   }
@@ -606,8 +611,9 @@ namespace hfst
 	  implementation.hfst_ol = another.implementation.hfst_ol->copy(another.implementation.hfst_ol, true);
 	  break;
       case ERROR_TYPE:
-      default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
+      default:
+	throw hfst::exceptions::FunctionNotImplementedException();
       }
   }
 
@@ -638,10 +644,10 @@ namespace hfst
 	implementation.foma = hfst_internal_format_to_foma(&internal);
 	break;
 #endif
-	//case UNSPECIFIED_TYPE:
       case ERROR_TYPE:
-      default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
+      default:
+	throw hfst::exceptions::FunctionNotImplementedException();
       }
   }
 
@@ -675,10 +681,10 @@ namespace hfst
       case HFST_OLW_TYPE:
 	delete implementation.hfst_ol;
 	break;
-      // case UNSPECIFIED_TYPE:
       case ERROR_TYPE:
-      default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
+      default:
+	throw hfst::exceptions::FunctionNotImplementedException();
       }
   }
 
@@ -713,9 +719,9 @@ HfstTransducer::HfstTransducer(const std::string &symbol, ImplementationType typ
 	break;
 #endif
       case ERROR_TYPE:
-      default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
-	break;
+      default:
+	throw hfst::exceptions::FunctionNotImplementedException();
       }
   }
 
@@ -749,9 +755,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	break;
 #endif
       case ERROR_TYPE:
-      default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
-	break;
+      default:
+	throw hfst::exceptions::FunctionNotImplementedException();
       }
   }
 
@@ -802,8 +808,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
                  one_copy.implementation.foma, another_copy.implementation.foma);
 #endif
       case ERROR_TYPE:
-      default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
+      default:
+	throw hfst::exceptions::FunctionNotImplementedException();
       }
 
   }
@@ -1116,9 +1123,10 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
       case HFST_OLW_TYPE:
 	hfst::implementations::HfstOlTransducer::extract_strings(implementation.hfst_ol, callback, cycles);
 	break;
+      case ERROR_TYPE:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
       default:
-	throw hfst::exceptions::FunctionNotImplementedException(); 
-	break;
+	throw hfst::exceptions::FunctionNotImplementedException();
       }
   }
   
@@ -1175,9 +1183,10 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	delete t_hfst_ol;
       }
 	break;
+      case ERROR_TYPE:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
       default:
-	throw hfst::exceptions::FunctionNotImplementedException(); 
-	break;
+	throw hfst::exceptions::FunctionNotImplementedException();
       }
   }
   
@@ -1260,9 +1269,10 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	    break;
 	}
 #endif
+      case ERROR_TYPE:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
       default:
 	throw hfst::exceptions::FunctionNotImplementedException();
-	break;       
       }
 
     return *this;
@@ -1328,6 +1338,8 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	return *this;
       }
 #endif
+    if (this->type == ERROR_TYPE)
+      throw hfst::exceptions::TransducerHasWrongTypeException();
     throw hfst::exceptions::FunctionNotImplementedException();
   }
 
@@ -1402,6 +1414,8 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	return *this;
       }
 #endif
+    if (this->type == ERROR_TYPE)
+      throw hfst::exceptions::TransducerHasWrongTypeException();
     throw hfst::exceptions::FunctionNotImplementedException();
   }
 
@@ -1453,6 +1467,8 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	return *this;
       }
 #endif
+    if (this->type == ERROR_TYPE)
+      throw hfst::exceptions::TransducerHasWrongTypeException();
     throw hfst::exceptions::FunctionNotImplementedException();
   }
 
@@ -1504,6 +1520,8 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	return *this;
       }
 #endif
+    if (this->type == ERROR_TYPE)
+      throw hfst::exceptions::TransducerHasWrongTypeException();
     throw hfst::exceptions::FunctionNotImplementedException();
   }
 
@@ -1564,6 +1582,8 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	return *this;
       }
 #endif
+    if (this->type == ERROR_TYPE)
+      throw hfst::exceptions::TransducerHasWrongTypeException();
     throw hfst::exceptions::FunctionNotImplementedException();
   }
 
@@ -1647,11 +1667,13 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 
   unsigned int HfstTransducer::number_of_states() const
   {
-    if (type != TROPICAL_OFST_TYPE)
-      return 0;
-    else
+    if (type == TROPICAL_OFST_TYPE)
       return this->tropical_ofst_interface.number_of_states
 	(this->implementation.tropical_ofst);
+    if (type == SFST_TYPE)
+      return this->sfst_interface.number_of_states
+	(this->implementation.sfst);
+    return 0;
   }
 
   HfstTransducer &HfstTransducer::compose
@@ -1721,10 +1743,10 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
           break;
         }
 #endif
-      // case UNSPECIFIED_TYPE:
       case ERROR_TYPE:
-      default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
+      default:
+	throw hfst::exceptions::FunctionNotImplementedException();
       }
 
 #if HAVE_FOMA

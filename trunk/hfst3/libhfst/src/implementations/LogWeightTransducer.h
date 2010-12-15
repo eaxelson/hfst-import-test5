@@ -35,6 +35,10 @@ namespace implementations
   typedef LogArc::StateId StateId;
   typedef VectorFst<LogArc> LogFst;
 
+  typedef std::vector<LogArc> LogArcVector;
+  struct LogArcLessThan { 
+    bool operator() (const LogArc &arc1,const LogArc &arc2) const; };
+
   using std::ostream;
   using std::ostringstream;
   using std::stringstream;
@@ -241,6 +245,19 @@ namespace implementations
       static void initialize_symbol_tables(LogFst *t);
       static void add_symbol_table(LogFst *t, HfstAlphabet &alpha); 
       static void remove_symbol_table(LogFst *t);      
+      
+      static int has_arc(LogFst &t,
+		  LogArc::StateId sourcestate,			  
+		  LogArc::Label ilabel, 
+		  LogArc::Label olabel);
+      static void disjunct_as_tries(LogFst &t1,
+			     StateId t1_state,
+			     const LogFst * t2,
+			     StateId t2_state);
+      static void add_sub_trie(LogFst &t1,
+			StateId t1_state,
+			const LogFst * t2,
+			StateId t2_state);
 
     public:
       static StateId add_state(LogFst *t);
