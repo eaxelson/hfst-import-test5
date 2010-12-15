@@ -12,7 +12,7 @@
 
       - KeyLayer and SymbolLayer -> functions take a string argument, string-to-number mapping is done automatically
 
-      - TransducerLayer -> HfstTransducer, RuleLayer -> namespace hfst::rules,  CoreExtensionLayer -> HfstMutableTransducer
+      - TransducerLayer -> HfstTransducer, RuleLayer -> namespace hfst::rules,  CoreExtensionLayer -> HfstInternalTransducer
  
       - Functions delete their transducer arguments -> Functions modify their calling object and do not change their arguments
 
@@ -451,7 +451,7 @@ The HFST API is written in the namespace #hfst that contains the following class
 
    - HfstInputStream and HfstOutputStream: Classes for writing and reading binary transducers.
 
-   - HfstMutableTransducer, HfstTransition, HfstTransitionIterator and HfstStateIterator: Classes for creating transducers from scratch and iterating through their states and transitions.
+   - HfstInternalTransducer, HfstTransition, HfstTransitionIterator and HfstStateIterator: Classes for creating transducers from scratch and iterating through their states and transitions.
 
    - HfstTokenizer: A class used in creating transducers from UTF-8 strings.
 
@@ -537,7 +537,7 @@ OpenFst in http://www.openfst.org and foma in http://www.aclweb.org/anthology/E/
 
 \section features Features
 
-   - Create transducers \link hfst::HfstMutableTransducer from scratch\endlink
+   - Create transducers \link hfst::HfstInternalTransducer from scratch\endlink
 
    - Iterate through a transducer's \link hfst::HfstStateIterator states\endlink and \link hfst::HfstTransitionIterator transitions\endlink
 

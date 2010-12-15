@@ -14,38 +14,66 @@ namespace hfst {
 }
 
 /** @file HfstInternalTransducer.h
-    \brief Declaration of classes needed by HFST's internal transducer format. */
+    \brief Declaration of classes needed by HFST's 
+    internal transducer format. */
 
 namespace hfst {
   namespace implementations {
-  
+
+    /** @brief The number of a state in an HfstInternalTransducer. */
     typedef unsigned int HfstState;
 
     class HfstTrieState {
-    public:
+    protected:
+      typedef std::set< std::pair < std::pair<unsigned int, unsigned int>,
+	HfstTrieState * > > HfstTrieStateTransitions;
+
       bool final;
       float weight;
       unsigned int state_number;
-      std::set< std::pair < std::pair<unsigned int, unsigned int>, HfstTrieState * > > transitions;
+      HfstTrieStateTransitions transitions;
 
       HfstTrieState(unsigned int);
       ~HfstTrieState();
       void print(const HfstAlphabet * alphabet);
-      void add_transition(unsigned int inumber, unsigned int onumber, HfstTrieState * target_state);
+      void add_transition(unsigned int inumber, unsigned int onumber, 
+			  HfstTrieState * target_state);
       HfstTrieState * find(unsigned int, unsigned int);      
+
+      friend class HfstTrie;
+      friend class HfstInternalTransducer;
     };
 
+    /** @brief A transducer format for fast disjunction of
+	one-path transducers.
+
+	This format supports only disjunction of one-path
+	transducers. For a more extensive set of operations,
+	an HfstTrie can be converted to an HfstInternalTransducer
+	and again to an HfstTransdcuer.
+ */
     class HfstTrie {
-    public:
+    protected:
+      typedef std::vector<HfstTrieState *> HfstTrieStateVector;
       HfstTrieState * initial_state;
       HfstAlphabet * alphabet;
       unsigned int max_state_number;
-      std::vector<HfstTrieState *> states;
+      HfstTrieStateVector states;
 
+    public:
+      /** @brief Create an empty trie.
+
+	  The trie has one state that is not final. */
       HfstTrie();
+      /** @brief Delete the trie. */
       ~HfstTrie();
+      /** @brief Add a one-path transducer as defined with \a spv 
+	  with weight \a weight to the trie. */
       void add_path(const StringPairVector &spv, float weight=0);
+
       void print();
+
+      friend class HfstInternalTransducer;
     };
 
     class InternalTransducerLine {
@@ -53,8 +81,8 @@ namespace hfst {
       bool final_line;
       HfstState origin;
       HfstState target;
-      HfstState isymbol;
-      HfstState osymbol;
+      unsigned int isymbol;
+      unsigned int osymbol;
       float weight;
       
     InternalTransducerLine():
@@ -68,46 +96,94 @@ namespace hfst {
     
     class HfstInternalTransducer;
 
+    /** @brief A transition in a HfstInternalTransducer. */
     class HfstTransition {
     public:
+      /** @brief The source state of the transition. */
       HfstState source;
+      /** @brief The target state of the transition. */
       HfstState target;
+      /** @brief The input symbol of the transition. */
       std::string isymbol;
+      /** @brief The output symbol of the transition. */
       std::string osymbol;
+      /** @brief The weight of the transition. */
       float weight;
       
       bool operator<(const HfstTransition &another) const;
     };
-    
+
+    /** @brief A simple transducer format that supports adding states
+	and transitions and iterating through them. 
+	
+	This format is used internally for conversion between transducer formats.
+	This could also be used for writing binary transducers in an
+	implementation-independent format.. (TODO) 
+
+	This format is essentially a text-based representation of a
+	transducer. It contains a set of HfstTransitions and final
+	states. State number zero is always the start state.
+
+	The operations offered by this class are very limited.
+	Convert an HfstInternalTransducer into an HfstTransducer
+	if you need more operations.
+     */
     class HfstInternalTransducer {
     public:
-      std::set<InternalTransducerLine> lines;
-      std::set<std::pair<HfstState,float> > final_states;
-      HfstAlphabet * alphabet;
-      unsigned int disjunct_max_state_number;
+      typedef std::set<InternalTransducerLine> InternalTransducerLineSet;
+      typedef std::set<std::pair<HfstState,float> > FinalStateSet;
 
+      InternalTransducerLineSet lines;
+      FinalStateSet final_states;
+      unsigned int disjunct_max_state_number;
+      HfstAlphabet * alphabet;
+
+    public:
+      /** @brief Create an empty transducer. */
       HfstInternalTransducer();
+      /** @brief Delete the transducer. */
       ~HfstInternalTransducer();
+      /** @brief Create a deep copy of transducer \a transducer. */
       HfstInternalTransducer(const HfstInternalTransducer &transducer);
+      /** @brief Create a new internal transducer equivalent to \a
+	  transducer. */
       HfstInternalTransducer(const HfstTransducer &transducer);
+      /** @brief Create a new internal transducer equivalent to \a
+	  trie. */
       HfstInternalTransducer(const HfstTrie &trie);
 
+      /** @brief Add \a transition to the transducer. */
+      void add_transition(HfstTransition &transition);
+      /** @brief Set state \a s final with weight \a weight. 	  
+	  @todo change name to "set_final_state" */
+      void add_final_state(HfstState s, float weight);
+
+      /** @brief Get the number of start state in this
+	  transducer. Returns always zero. */
       HfstState get_initial_state();
+      /** @brief Whether state \a s is final. */
+      bool is_final_state(HfstState s);
+      /** @brief Get the final weight of state \a s.
+	  @pre \a s is a final state. 
+	  @see #get_initial_state */
+      float get_final_weight(HfstState s);
+      /** @brief get the biggest state number in the transducer.
+	  @note The return value is not necessarily the smallest
+	  available state number. */
+      HfstState max_state_number() const;
+
 
       void add_line(HfstState final_state, float final_weight); 
       void add_line(HfstState origin_state, HfstState target_state,
 		    HfstState isymbol, HfstState osymbol,
 		    float weight);
+
+    public:
       bool has_no_lines() const;
-      const std::set<InternalTransducerLine> *get_lines() const;
-      HfstState max_state_number() const;
+      const InternalTransducerLineSet *get_lines() const;
       void swap_states(unsigned int s1, unsigned int s2);
 
-      void add_transition(HfstTransition &transition);
-      void add_final_state(HfstState s, float weight);
-
-      bool is_final_state(HfstState);
-      float get_final_weight(HfstState);
+    public:
       void read_number(FILE*);
       void read_symbol(FILE*, const std::string &epsilon_symbol);
       void print_number(FILE*, bool print_weights);
@@ -128,25 +204,43 @@ namespace hfst {
       friend class HfstTransitionIterator;
     };
 
+    /** @brief An iterator to the states of an internal transducer.
+
+	If the an internal transducer is empty, the iterator
+	HfstStateIterator it(transducer) is at end just after it has been created:
+	it.done() == true
+    */
     class HfstStateIterator {
     protected:
-      std::set<HfstState> state_set;
-      std::set<HfstState>::iterator it;
+      typedef std::set<HfstState> HfstStateSet;
+      HfstStateSet state_set;
+      HfstStateSet::iterator it;
     public:
+      /** @brief Create an iterator to the states of \a transducer. */
       HfstStateIterator(const HfstInternalTransducer &transducer);
+      /** @brief Get the value pointed by the iterator. */
       HfstState value();
+      /** @brief Advance the iterator to the next state. */
       void next();
+      /** @brief Whether the iterator is at end. */
       bool done();
     };
 
+    /** @brief An iterator to the transitions of a given state in an internal transducer. */
     class HfstTransitionIterator {
     protected:
-      std::set<HfstTransition> transition_set;
-      std::set<HfstTransition>::iterator it;
+      typedef std::set<HfstTransition> HfstTransitionSet;
+      HfstTransitionSet transition_set;
+      HfstTransitionSet::iterator it;
     public:
+      /** @brief Create an iterator to the transitions leaving from state \a s in 
+	  internal transducer \a transducer. */
       HfstTransitionIterator(const HfstInternalTransducer &transducer, HfstState s);
+      /** @brief Get the value pointed by the iterator. */
       HfstTransition value();
+      /** @brief Advance the iterator to the next transition. */
       void next();
+      /** @brief Whether the iterator is at end. */
       bool done();
     };
 

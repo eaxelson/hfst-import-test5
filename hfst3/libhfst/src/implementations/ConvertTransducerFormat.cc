@@ -22,7 +22,7 @@ namespace hfst { namespace implementations
 {
 
 #if HAVE_SFST
-void sfst_to_internal( SFST::Node *node, SFST::NodeNumbering &index, 
+  void sfst_to_internal( SFST::Node *node, SFST::NodeNumbering &index, 
 		       std::set<SFST::Node*> &visited_nodes, HfstInternalTransducer *internal ) {
   
   if (visited_nodes.find(node) == visited_nodes.end() ) { // if node has not been visited before
@@ -42,7 +42,7 @@ void sfst_to_internal( SFST::Node *node, SFST::NodeNumbering &index,
   }
 }
 
-HfstInternalTransducer * sfst_to_internal_hfst_format(SFST::Transducer * t) {
+  HfstInternalTransducer * sfst_to_internal_hfst_format(SFST::Transducer * t) {
   
   bool DEBUG=false;
 
@@ -66,7 +66,7 @@ HfstInternalTransducer * sfst_to_internal_hfst_format(SFST::Transducer * t) {
 #endif // HAVE_SFST
 
 #if HAVE_SFST
-SFST::Transducer * hfst_internal_format_to_sfst(const HfstInternalTransducer * internal) {
+  SFST::Transducer * hfst_internal_format_to_sfst(const HfstInternalTransducer * internal) {
 
   SFST::Transducer * t = new SFST::Transducer();
   if (internal->has_no_lines())
@@ -113,7 +113,7 @@ SFST::Transducer * hfst_internal_format_to_sfst(const HfstInternalTransducer * i
 #if HAVE_FOMA
 // Both input and output symbol tables of internal format will contain
 // all symbols in the sigma of the foma transducer
-HfstInternalTransducer * foma_to_internal_hfst_format(struct fsm * t) {
+  HfstInternalTransducer * foma_to_internal_hfst_format(struct fsm * t) {
 
   HfstInternalTransducer * internal_transducer = new HfstInternalTransducer();
   struct fsm_state *fsm;
@@ -188,7 +188,7 @@ HfstInternalTransducer * foma_to_internal_hfst_format(struct fsm * t) {
 
 
 #if HAVE_OPENFST
-HfstInternalTransducer * tropical_ofst_to_internal_hfst_format(fst::StdVectorFst * t) {
+  HfstInternalTransducer * tropical_ofst_to_internal_hfst_format(fst::StdVectorFst * t) {
 
   HfstInternalTransducer * internal_transducer = new HfstInternalTransducer();
 

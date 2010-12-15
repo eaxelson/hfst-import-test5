@@ -1962,30 +1962,90 @@ namespace hfst { namespace implementations
       }
     return t_copy;
   }
-  /*
-  TropicalWeightTransducer::const_iterator 
-  TropicalWeightTransducer::begin(StdVectorFst * t)
-  { return TropicalWeightStateIterator(t); }
+  
 
-  TropicalWeightTransducer::const_iterator 
-  TropicalWeightTransducer::end(StdVectorFst * t)
-  { (void)t;
-    return TropicalWeightStateIterator(); }
+  // ----- TRIE FUNCTIONS BEGINS -----
 
-  void TropicalWeightTransducer::print
-  (StdVectorFst * t, KeyTable &key_table, ostream &out) 
+  int TropicalWeightTransducer::has_arc(fst::StdVectorFst &t,
+	      StdArc::StateId sourcestate,			  
+	      StdArc::Label ilabel, 
+	      StdArc::Label olabel)
   {
-    TropicalWeightStateIndexer indexer(t);
-    for (TropicalWeightTransducer::const_iterator it = begin(t);
-	 it != end(t);
-	 ++it)
-      { 
-	TropicalWeightState s = *it;
-	s.print(key_table,out,indexer);
+    for (fst::ArcIterator<StdVectorFst> aiter(t,sourcestate);
+	 !aiter.Done();
+	 aiter.Next())
+      {
+	if ((aiter.Value().ilabel == ilabel) and 
+	    (aiter.Value().olabel == olabel))
+	  { return aiter.Position(); }
+      }
+
+    return -1;    
+  }
+
+  void TropicalWeightTransducer::disjunct_as_tries(fst::StdVectorFst &t1,
+			 StateId t1_state,
+			 const fst::StdVectorFst * t2,
+			 StateId t2_state)
+  {
+    if (t2->Final(t2_state) != fst::TropicalWeight::Zero())
+      {
+	t1.SetFinal(t1_state,
+		    Plus(t1.Final(t1_state),
+			 t2->Final(t2_state)));
+      }
+    for (fst::ArcIterator<StdVectorFst> aiter(*t2,t2_state);
+	 !aiter.Done();
+	 aiter.Next())
+      {
+	const StdArc &arc = aiter.Value();
+	int arc_index = has_arc(t1,t1_state,arc.ilabel,arc.olabel);
+	if (arc_index == -1)
+	  {
+	    StdArc::StateId new_state = t1.AddState();
+	    t1.AddArc(t1_state,StdArc(arc.ilabel,
+				      arc.olabel,
+				      arc.weight,
+				      new_state));
+	    add_sub_trie(t1,new_state,t2,arc.nextstate);
+	  }
+	else
+	  {
+	    MutableArcIterator<fst::StdVectorFst> ajter(&t1,t1_state);
+	    ajter.Seek(arc_index);
+	    disjunct_as_tries(t1,ajter.Value().nextstate,t2,arc.nextstate);
+	  }
       }
   }
-  */
   
+  void TropicalWeightTransducer::add_sub_trie(fst::StdVectorFst &t1,
+		  StateId t1_state,
+		  const fst::StdVectorFst * t2,
+		  StateId t2_state)
+  {
+    if (t2->Final(t2_state) != fst::TropicalWeight::Zero())
+      {
+	t1.SetFinal(t1_state,
+		    Plus(t1.Final(t1_state),
+			 t2->Final(t2_state)));
+      }
+    for (fst::ArcIterator<fst::StdVectorFst> aiter(*t2,t2_state);
+	 !aiter.Done();
+	 aiter.Next())
+      {
+	const StdArc &arc = aiter.Value();
+	StdArc::StateId new_state = t1.AddState();
+	t1.AddArc(t1_state,fst::StdArc(arc.ilabel,
+				  arc.olabel,
+				  arc.weight,
+				  new_state));
+	add_sub_trie(t1,new_state,t2,arc.nextstate);
+      }
+  }
+
+  // ----- TRIE FUNCTIONS END -----
+
+
   static bool extract_strings(StdVectorFst * t, StdArc::StateId s,
     std::map<StateId,unsigned short> all_visitations, std::map<StateId, unsigned short> path_visitations,
     std::vector<char>& lbuffer, int lpos, std::vector<char>& ubuffer, int upos, float weight_sum,
