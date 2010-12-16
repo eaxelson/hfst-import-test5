@@ -96,8 +96,8 @@ namespace hfst {
     
     class HfstInternalTransducer;
 
-    /** @brief A transition in a HfstInternalTransducer. */
-    class HfstTransition {
+    /** @brief A transition in an HfstInternalTransducer. */
+    struct HfstTransition {
     public:
       /** @brief The source state of the transition. */
       HfstState source;
@@ -110,7 +110,44 @@ namespace hfst {
       /** @brief The weight of the transition. */
       float weight;
       
-      bool operator<(const HfstTransition &another) const;
+      /** @brief Create an uninitialized HfstTransition. */
+      HfstTransition() {};
+
+      /** @brief Create an HfstTransition from state \a source
+	  to state \a target with input string \a isymbol,
+	  output string \a osymbol and weight \a weight. */
+      HfstTransition(HfstState source,
+		     HfstState target,
+		     std::string &isymbol,
+		     std::string &osymbol,
+		     float weight) {
+	this->source = source;
+	this->target = target;
+	this->isymbol = isymbol;
+	this->osymbol = osymbol;
+	this->weight = weight;
+      }
+
+      /* A less-than operator used for storing Transitions in a set. */
+      bool operator<(const HfstTransition &another) const {
+	if (this->source < another.source) return true;
+	if (this->source > another.source) return false;
+	
+	if (this->target < another.target) return true;
+	if (this->target > another.target) return false;
+	
+	if (this->isymbol.compare(another.isymbol) < 0) return true;
+	if (this->isymbol.compare(another.isymbol) > 0) return false;
+	
+	if (this->osymbol.compare(another.osymbol) < 0) return true;
+	if (this->osymbol.compare(another.osymbol) > 0) return false;
+	
+	if ( this->weight < another.weight ) return true;
+	if ( this->weight > another.weight ) return false;
+	
+	return false;
+      }
+
     };
 
     /** @brief A simple transducer format that supports adding states
