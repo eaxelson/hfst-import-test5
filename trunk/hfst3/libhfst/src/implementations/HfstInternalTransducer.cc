@@ -974,13 +974,13 @@ main(int argc, char** argv)
     std::cout << std::endl << "get lines:";
     assert(internal.get_lines()->size() > 0);
     std::cout << std::endl << "max state number:";
-    //assert(internal.max_state_number() > -1);  // unsigned int!
+    assert(internal.max_state_number() >= 0);
+    std::cout << std::endl << "is final";
+    assert(internal.is_final_state(1));
+    std::cout << std::endl << "get final weight";
+    assert(internal.get_final_weight(1) > 0);
     std::cout << std::endl << "swap states:";
     internal.swap_states(0, 1);
-    std::cout << std::endl << "is final";
-    assert(internal.is_final_state(0));
-    std::cout << std::endl << "get final weight";
-    assert(internal.get_final_weight(0) > 0);
     std::cout << std::endl << "ok" << std::endl;
     return EXIT_SUCCESS;
   }
