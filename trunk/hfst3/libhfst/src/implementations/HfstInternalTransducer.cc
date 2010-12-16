@@ -823,24 +823,6 @@ namespace hfst {
       return (it == state_set.end());
     }
 
-    bool HfstTransition::operator<(const HfstTransition &another) const {
-      if (this->source < another.source) return true;
-      if (this->source > another.source) return false;
-
-      if (this->target < another.target) return true;
-      if (this->target > another.target) return false;
-      
-      if (this->isymbol.compare(another.isymbol) < 0) return true;
-      if (this->isymbol.compare(another.isymbol) > 0) return false;
-
-      if (this->osymbol.compare(another.osymbol) < 0) return true;
-      if (this->osymbol.compare(another.osymbol) > 0) return false;
-
-      if ( this->weight < another.weight ) return true;
-      if ( this->weight > another.weight ) return false;
-
-      return false;
-    }
 
     HfstTransitionIterator::HfstTransitionIterator(const HfstInternalTransducer &transducer, HfstState s) 
     {
