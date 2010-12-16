@@ -15,9 +15,9 @@
 
 #include <iostream>
 #include <fstream>
-#include "HfstExceptions.h"
-#include "HfstFlagDiacritics.h"
-#include "HfstExtractStrings.h"
+#include "../HfstExceptions.h"
+#include "../HfstFlagDiacritics.h"
+#include "../HfstExtractStrings.h"
 #include "optimized-lookup/transducer.h"
 
 /** @file HfstOlTransducer.h

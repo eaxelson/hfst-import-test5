@@ -1226,6 +1226,11 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 
   HfstTransducer &HfstTransducer::insert_freely(const StringPair &symbol_pair)
   {
+    /* Add symbols in symbol_pair to the alphabet of this transducer
+       and expand unknown and epsilon symbols accordingly. */
+    HfstTransducer tmp(symbol_pair.first, symbol_pair.second, this->type);
+    tmp.harmonize(*this);
+
     switch (this->type)    
       {
 #if HAVE_OPENFST

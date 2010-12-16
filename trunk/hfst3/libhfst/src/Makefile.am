@@ -53,6 +53,7 @@ HFST_HDRS = \
 	HfstTokenizer.h \
 	implementations/ConvertTransducerFormat.h \
 	HfstExceptions.h \
+	HfstExtractStrings.h \
 	HfstFlagDiacritics.h \
 	HfstInputStream.h \
 	HfstOutputStream.h
