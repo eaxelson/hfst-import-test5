@@ -149,7 +149,9 @@ namespace hfst { namespace implementations
     // 2. If there are transitions leaving from the state,
     if ((fsm+i)->target != -1) {
       //printf("add_line\n");
-      internal_transducer->add_line((fsm+i)->state_no, (fsm+i)->target, (fsm+i)->in, (fsm+i)->out, 0);
+      internal_transducer
+	->add_line((fsm+i)->state_no,
+		   (fsm+i)->target, (fsm+i)->in, (fsm+i)->out, 0);
     }
     
     // 3. If the source state is final in foma,
@@ -188,16 +190,20 @@ namespace hfst { namespace implementations
 
 
 #if HAVE_OPENFST
-  HfstInternalTransducer * tropical_ofst_to_internal_hfst_format(fst::StdVectorFst * t) {
+  HfstInternalTransducer * tropical_ofst_to_internal_hfst_format
+  (fst::StdVectorFst * t) {
 
-  HfstInternalTransducer * internal_transducer = new HfstInternalTransducer();
+  HfstInternalTransducer * internal_transducer = 
+    new HfstInternalTransducer();
 
   // an empty transducer
   if (t->Start() == fst::kNoStateId)
     {      
-      for ( fst::SymbolTableIterator it = fst::SymbolTableIterator(*(t->InputSymbols()));
+      for ( fst::SymbolTableIterator it = 
+	      fst::SymbolTableIterator(*(t->InputSymbols()));
 	    not it.Done(); it.Next() ) {
-	internal_transducer->alphabet->add_symbol( it.Symbol().c_str(), (unsigned int)it.Value() );
+	internal_transducer->alphabet
+	  ->add_symbol( it.Symbol().c_str(), (unsigned int)it.Value() );
       }    
       return internal_transducer;
     }      
@@ -275,9 +281,11 @@ namespace hfst { namespace implementations
 	}
       }
 
-    for ( fst::SymbolTableIterator it = fst::SymbolTableIterator(*(t->InputSymbols()));
+    for ( fst::SymbolTableIterator it = 
+	    fst::SymbolTableIterator(*(t->InputSymbols()));
 	  not it.Done(); it.Next() ) {
-      internal_transducer->alphabet->add_symbol( it.Symbol().c_str(), (unsigned int)it.Value() );
+      internal_transducer->alphabet
+	->add_symbol( it.Symbol().c_str(), (unsigned int)it.Value() );
     }    
 
     return internal_transducer;

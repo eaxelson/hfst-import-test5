@@ -50,7 +50,7 @@ namespace hfst {
 	This format supports only disjunction of one-path
 	transducers. For a more extensive set of operations,
 	an HfstTrie can be converted to an HfstInternalTransducer
-	and again to an HfstTransdcuer.
+	and again to an HfstTransducer.
  */
     class HfstTrie {
     protected:
@@ -150,6 +150,94 @@ namespace hfst {
 
     };
 
+
+    // A new version of HfstInternalTransducer
+
+    template <class W> struct HfstInternalState
+      {
+	HfstState state_number;
+	W final_weight;
+    };
+
+    struct TransitionData {
+      std::string input_symbol;
+      std::string output_symbol;
+      float weight;
+    };
+
+    // Not parametrized with class W, it is the user's 
+    // responsibility to use the same weight type in
+    // transitions and final states.
+    template <class C> class HfstInternalTransition 
+      {
+      protected:
+	HfstState target_state;
+	C transition_data;
+      public:
+
+        HfstInternalTransition(): target_state(0)
+	  {}
+
+      HfstInternalTransition(const HfstInternalTransition<C> &another): 
+	target_state(another.target_state), transition_data(transition_data) {}
+
+	bool operator<(const HfstInternalTransition<C> &another) const {
+	  if (target_state == another.target_state)
+	    return (transition_data < another.transition_data);
+	  return (target_state < another.target_state);
+	}
+
+	void operator=(const HfstInternalTransition<C> &another) const {
+	  target_state = another.target_state;
+	  transition_data = transition_data;
+	}
+
+	HfstState get_target_state() const {
+	  return target_state;
+	}
+
+	const C & get_transition_data() const {
+	  return transition_data;
+	}
+
+      };
+
+
+    template <class C, class W> class HfstInternalTransducer_ 
+      {
+      protected:
+	typedef std::map<HfstInternalState<W>, 
+	  std::set<HfstInternalTransition<C> > >
+	  HfstStateMap_;
+	HfstStateMap_ state_map;
+
+      public:
+	typedef typename HfstStateMap_::iterator iterator;
+	typedef typename HfstStateMap_::const_iterator const_iterator;
+
+	iterator begin() {
+	  state_map.begin();
+	}
+
+	const_iterator begin() const {
+	  state_map.begin();
+	}
+
+	iterator end() {
+	  state_map.end();
+	}
+
+	const_iterator end() const {
+	  state_map.end();
+	}
+
+	friend class hfst::HfstTransducer;
+      };
+
+    typedef HfstInternalTransducer_ <TransitionData, float> HfstInternalTransducer__;
+   
+
+
     /** @brief A simple transducer format that supports adding states
 	and transitions and iterating through them. 
 	
@@ -169,6 +257,7 @@ namespace hfst {
     public:
       typedef std::set<InternalTransducerLine> InternalTransducerLineSet;
       typedef std::set<std::pair<HfstState,float> > FinalStateSet;
+      typedef InternalTransducerLineSet::const_iterator const_iterator;
 
       InternalTransducerLineSet lines;
       FinalStateSet final_states;
@@ -209,6 +298,12 @@ namespace hfst {
 	  available state number. */
       HfstState max_state_number() const;
 
+      /** @brief Get an iterator to the first state in the transducer. */
+      const_iterator begin() const;
+
+      /** @brief Get an iterator that has just passed the last state 
+	  in the transducer. */
+      const_iterator end() const;
 
       void add_line(HfstState final_state, float final_weight); 
       void add_line(HfstState origin_state, HfstState target_state,

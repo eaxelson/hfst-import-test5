@@ -208,7 +208,7 @@ namespace hfst {
     bool HfstInternalTransducer::has_no_lines() const {
       return (lines.size() == 0); } 
     
-    const std::set<InternalTransducerLine> * HfstInternalTransducer::get_lines() const {
+    const HfstInternalTransducer::InternalTransducerLineSet * HfstInternalTransducer::get_lines() const {
       return &lines; }
 
     HfstState HfstInternalTransducer::max_state_number() const {
@@ -533,7 +533,35 @@ namespace hfst {
 					    bool input_side, bool output_side) 
     {
       assert(alphabet != NULL);
+
+      // The symbol to be substituted is equal to the substituting
+      // symbol, return.
+      if (strcmp(old_symbol.c_str(), new_symbol.c_str()) == 0)
+	return;
+
+      // Whether new_symbol is a new symbol to this->alphabet and
+      // whether old_symbol is known to this->alphabet
+      bool is_new_symbol=true;
+      bool is_old_symbol_known=false;
+      HfstAlphabet::CharMap cm = alphabet->get_char_map();
+      for (HfstAlphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++) {
+	if (strcmp(it->second, new_symbol.c_str()) == 0) {
+	  is_new_symbol=false;
+	}
+	if (strcmp(it->second, old_symbol.c_str()) == 0) {
+	  is_old_symbol_known=true;
+	}
+      }  
+
+      // The symbol to be substituted is not known to the transducer,
+      // return without inserting new_symbol to the alphabet.
+      if (not is_old_symbol_known)
+	return;
+
+      // Make substitution and expand unknowns and identities
+      // if the substituting symbol was a new symbol to this->alphabet.
       HfstInternalTransducer new_transducer;
+      HfstAlphabet * new_alphabet = new HfstAlphabet();
       for (InternalTransducerLineSet::const_iterator it = lines.begin(); 
 	   it != lines.end(); it++) 
 	{
@@ -543,23 +571,78 @@ namespace hfst {
 	    std::string istring(alphabet->code2symbol(it->isymbol));
 	    std::string ostring(alphabet->code2symbol(it->osymbol));
 	    
+	    bool was_substitution_made=false;
+
 	    if (input_side) {
-	      if (istring.compare(old_symbol) == 0)
+	      if (istring.compare(old_symbol) == 0) {
 		istring = new_symbol;
+		was_substitution_made=true;
+	      }
 	    }
 	    if (output_side) {
-	      if (ostring.compare(old_symbol) == 0)
+	      if (ostring.compare(old_symbol) == 0) {
 		ostring = new_symbol;
+		was_substitution_made=true;
+	      }
 	    }
 	    
 	    new_transducer.add_line(it->origin, it->target, 
-				    alphabet->add_symbol(istring.c_str()),
-				    alphabet->add_symbol(ostring.c_str()),
+				    new_alphabet->add_symbol(istring.c_str()),
+				    new_alphabet->add_symbol(ostring.c_str()),
 				    it->weight);
+
+	    // Unknowns are expanded only if new_symbol was previously unknown
+	    // to this->alphabet and no substitution was made in this transition.
+	    // For example if we substitute a with b in [a:?], the result is
+	    // [b:?], not [b:b | b:?].
+	    if (is_new_symbol && not was_substitution_made) 
+	      {
+		// unknown on both sides, do nothing
+		if (strcmp(istring.c_str(), "@_UNKNOWN_SYMBOL_@") == 0 &&
+		    strcmp(ostring.c_str(), "@_UNKNOWN_SYMBOL_@") == 0)
+		  {}
+		// identity, add a transition new_symbol:new_symbol
+		else if (strcmp(istring.c_str(), "@_IDENTITY_SYMBOL_@") == 0 &&
+			 strcmp(ostring.c_str(), "@_IDENTITY_SYMBOL_@") == 0) 
+		  {
+		    new_transducer.add_line(it->origin, it->target, 
+					    new_alphabet->add_symbol(new_symbol.c_str()),
+					    new_alphabet->add_symbol(new_symbol.c_str()),
+					    it->weight);
+		  }
+		// unknown on input side
+		else if(strcmp(istring.c_str(), "@_UNKNOWN_SYMBOL_@") == 0) 
+		  {
+		    new_transducer.add_line(it->origin, it->target, 
+					    new_alphabet->add_symbol(new_symbol.c_str()),
+					    new_alphabet->add_symbol(ostring.c_str()),
+					    it->weight);
+		  }
+		// unknown on output side
+		else if(strcmp(ostring.c_str(), "@_UNKNOWN_SYMBOL_@") == 0) 
+		  {
+		    new_transducer.add_line(it->origin, it->target, 
+					    new_alphabet->add_symbol(istring.c_str()),
+					    new_alphabet->add_symbol(new_symbol.c_str()),
+					    it->weight);
+		  }
+		else {}
+		
+	      }
 	  }
 	}
       lines.clear(); // is this needed?
       lines=new_transducer.lines;
+
+      // Make sure that all symbols present in this->alphabet,
+      // except old_symbol, are added to new_alphabet.
+      for (HfstAlphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++) {
+	if (strcmp(it->second, old_symbol.c_str()) != 0)
+	  new_alphabet->add_symbol(it->second);
+      }      
+
+      delete alphabet;
+      alphabet = new_alphabet;
     }      
 
     
@@ -688,7 +771,7 @@ namespace hfst {
       HfstState in = alphabet->add_symbol(symbol_pair.first.c_str());
       HfstState out = alphabet->add_symbol(symbol_pair.second.c_str());
 
-      for (std::set<InternalTransducerLine>::const_iterator it = lines.begin(); 
+      for (InternalTransducerLineSet::const_iterator it = lines.begin(); 
 	   it != lines.end(); it++) {	
 	if (visited_states.find(it->origin) == visited_states.end()) {
 	  visited_states.insert(it->origin);
@@ -801,9 +884,19 @@ namespace hfst {
       delete tmp;
     }
 
+    HfstInternalTransducer::const_iterator HfstInternalTransducer::begin() const {
+      return lines.begin();
+      //throw hfst::exceptions::FunctionNotImplementedException();
+    }
+
+    HfstInternalTransducer::const_iterator HfstInternalTransducer::end() const {
+      return lines.end();
+      //throw hfst::exceptions::FunctionNotImplementedException();
+    }
+
     HfstStateIterator::HfstStateIterator(const HfstInternalTransducer &transducer)
     {
-      for (std::set<InternalTransducerLine>::const_iterator it1 = transducer.lines.begin(); 
+      for (HfstInternalTransducer::InternalTransducerLineSet::const_iterator it1 = transducer.lines.begin(); 
 	   it1 != transducer.lines.end(); it1++) {
 	state_set.insert(it1->origin);
 	state_set.insert(it1->target);
