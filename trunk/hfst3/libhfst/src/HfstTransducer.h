@@ -781,7 +781,7 @@ HfstTransducer t_transformed;
     bool is_lookdown_infinitely_ambiguous(const HfstLookupPath& s);
 
     HfstTransducer &operator=(const HfstTransducer &another);
-    friend std::ostream &operator<<(std::ostream &out, HfstTransducer &t);
+    friend std::ostream &operator<<(std::ostream &out, const HfstTransducer &t);
     friend class HfstInputStream;
     friend class HfstOutputStream;
     friend class hfst::implementations::HfstInternalTransducer;

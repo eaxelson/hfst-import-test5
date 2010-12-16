@@ -2359,7 +2359,7 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
   }
 
 
-std::ostream &operator<<(std::ostream &out,HfstTransducer &t)
+std::ostream &operator<<(std::ostream &out,const HfstTransducer &t)
   {
     // Implemented only for internal transducer format.
     hfst::implementations::HfstInternalTransducer internal_transducer(t);
