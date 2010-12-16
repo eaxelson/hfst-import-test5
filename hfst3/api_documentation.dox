@@ -451,7 +451,7 @@ The HFST API is written in the namespace #hfst that contains the following class
 
    - HfstInputStream and HfstOutputStream: Classes for writing and reading binary transducers.
 
-   - HfstInternalTransducer, HfstTransition, HfstTransitionIterator and HfstStateIterator: Classes for creating transducers from scratch and iterating through their states and transitions.
+   - implementations::HfstInternalTransducer, implementations::HfstTransition, implementations::HfstTransitionIterator and implementations::HfstStateIterator: Classes for creating transducers from scratch and iterating through their states and transitions.
 
    - HfstTokenizer: A class used in creating transducers from UTF-8 strings.
 
@@ -537,9 +537,9 @@ OpenFst in http://www.openfst.org and foma in http://www.aclweb.org/anthology/E/
 
 \section features Features
 
-   - Create transducers \link hfst::HfstInternalTransducer from scratch\endlink
+   - Create transducers \link hfst::implementations::HfstInternalTransducer from scratch\endlink
 
-   - Iterate through a transducer's \link hfst::HfstStateIterator states\endlink and \link hfst::HfstTransitionIterator transitions\endlink
+   - Iterate through a transducer's \link hfst::implementations::HfstStateIterator states\endlink and \link hfst::implementations::HfstTransitionIterator transitions\endlink
 
    - Create transducers by \link hfst::HfstTokenizer tokenizing\endlink UTF-8 strings with multicharacter symbols
 
@@ -571,4 +571,20 @@ OpenFst in http://www.openfst.org and foma in http://www.aclweb.org/anthology/E/
 
    <br></br>
 
+*/
+
+/** 
+    @dir libhfst/src 
+    @brief A directory for the HFST interface. 
+*/
+
+/** 
+    @dir libhfst/src/implementations 
+    @brief A directory for the different backend implementations.
+    
+    The files in this directory act as a bridge between the HFST
+    interface and the backend libraries.
+    Basicly this directory contains two files per implementation,
+    for example the files SfstTransducer.h and SfstTransducer.cc 
+    define the SFST implementation. 
 */

@@ -192,6 +192,16 @@ namespace hfst { namespace implementations
 
   HfstInternalTransducer * internal_transducer = new HfstInternalTransducer();
 
+  // an empty transducer
+  if (t->Start() == fst::kNoStateId)
+    {      
+      for ( fst::SymbolTableIterator it = fst::SymbolTableIterator(*(t->InputSymbols()));
+	    not it.Done(); it.Next() ) {
+	internal_transducer->alphabet->add_symbol( it.Symbol().c_str(), (unsigned int)it.Value() );
+      }    
+      return internal_transducer;
+    }      
+
   // this takes care that initial state is always printed as number zero
   // and state number zero (if it is not initial) is printed as another number
   // (basically as the number of the initial state in that case, i.e.
@@ -276,6 +286,16 @@ namespace hfst { namespace implementations
 HfstInternalTransducer * log_ofst_to_internal_hfst_format(LogFst * t) {
 
   HfstInternalTransducer * internal_transducer = new HfstInternalTransducer();
+
+  // an empty transducer
+  if (t->Start() == fst::kNoStateId)
+    {      
+      for ( fst::SymbolTableIterator it = fst::SymbolTableIterator(*(t->InputSymbols()));
+	    not it.Done(); it.Next() ) {
+	internal_transducer->alphabet->add_symbol( it.Symbol().c_str(), (unsigned int)it.Value() );
+      }    
+      return internal_transducer;
+    }      
 
   // this takes care that initial state is always printed as number zero
   // and state number zero (if it is not initial) is printed as another number
@@ -490,14 +510,22 @@ struct fsm * hfst_internal_format_to_foma(const HfstInternalTransducer * interna
 #endif // HAVE_FOMA
 
 #if HAVE_OPENFST
-fst::StdVectorFst * hfst_internal_format_to_tropical_ofst(const HfstInternalTransducer * internal_transducer) {
+fst::StdVectorFst * hfst_internal_format_to_tropical_ofst(
+		      const HfstInternalTransducer * internal_transducer) {
 
   fst::StdVectorFst * t = new fst::StdVectorFst();
   StateId start_state = t->AddState();
   t->SetStart(start_state);
 
-  if (internal_transducer->has_no_lines())
+  if (internal_transducer->has_no_lines()) {
+    fst::SymbolTable *st = new fst::SymbolTable("anonym_hfst3_symbol_table");
+    HfstAlphabet::CharMap cm = internal_transducer->alphabet->get_char_map();
+    for (HfstAlphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++)
+      st->AddSymbol(std::string(it->second), (int64)it->first);    
+    t->SetInputSymbols(st);
+    delete st;
     return t;
+  }
 
   std::map<unsigned int,unsigned int> state_map;
   state_map[0] = start_state;
@@ -540,8 +568,15 @@ LogFst * hfst_internal_format_to_log_ofst(const HfstInternalTransducer * interna
   StateId start_state = t->AddState();
   t->SetStart(start_state);
 
-  if (internal_transducer->has_no_lines())
+  if (internal_transducer->has_no_lines()) {
+    fst::SymbolTable *st = new fst::SymbolTable("anonym_hfst3_symbol_table");
+    HfstAlphabet::CharMap cm = internal_transducer->alphabet->get_char_map();
+    for (HfstAlphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++)
+      st->AddSymbol(std::string(it->second), (int64)it->first);    
+    t->SetInputSymbols(st);
+    delete st;
     return t;
+  }
 
   std::map<unsigned int,unsigned int> state_map;
   state_map[0] = start_state;

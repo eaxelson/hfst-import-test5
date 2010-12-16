@@ -42,6 +42,8 @@
 #include "HfstTokenizer.h"
 #include "implementations/ConvertTransducerFormat.h"
 #include "HfstExceptions.h"
+#include "HfstInputStream.h"
+#include "HfstOutputStream.h"
 
 #include <string>
 #include <cassert>
@@ -309,7 +311,7 @@ tr1.disjunct(tr2);
     HfstTransducer(const HfstInternalTransducer &t, ImplementationType type);
 
     /** \brief Delete the HfstTransducer. **/
-    ~HfstTransducer(void);
+    virtual ~HfstTransducer(void);
 
     /** \brief Create a transducer that recognizes the string pair [symbol:symbol]. The type of the transducer is defined by \a type. 
 
