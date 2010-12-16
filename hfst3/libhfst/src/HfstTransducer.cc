@@ -1667,12 +1667,16 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 
   unsigned int HfstTransducer::number_of_states() const
   {
+#if HAVE_OPENFST
     if (type == TROPICAL_OFST_TYPE)
       return this->tropical_ofst_interface.number_of_states
 	(this->implementation.tropical_ofst);
+#endif
+#if HAVE_SFST
     if (type == SFST_TYPE)
       return this->sfst_interface.number_of_states
 	(this->implementation.sfst);
+#endif
     return 0;
   }
 
