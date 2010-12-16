@@ -153,11 +153,13 @@ namespace hfst {
 
     // A new version of HfstInternalTransducer
 
+    /*
     template <class W> struct HfstInternalState
       {
 	HfstState state_number;
 	W final_weight;
     };
+    */
 
     struct TransitionData {
       std::string input_symbol;
@@ -206,14 +208,20 @@ namespace hfst {
     template <class C, class W> class HfstInternalTransducer_ 
       {
       protected:
-	typedef std::map<HfstInternalState<W>, 
+	typedef std::map<HfstState, 
 	  std::set<HfstInternalTransition<C> > >
 	  HfstStateMap_;
 	HfstStateMap_ state_map;
+	std::map<HfstState,W> final_weight_map;
 
       public:
 	typedef typename HfstStateMap_::iterator iterator;
 	typedef typename HfstStateMap_::const_iterator const_iterator;
+
+	/** Create a transducer with one state that is not a final state. */
+	HfstInternalTransducer_(void) {
+	  state_map[0]=std::set<HfstInternalTransition <C> >();
+	}
 
 	iterator begin() {
 	  state_map.begin();
@@ -230,6 +238,12 @@ namespace hfst {
 	const_iterator end() const {
 	  state_map.end();
 	}
+
+	std::set<HfstInternalTransition<C> > & operator[](HfstState);
+
+	W get_final_weight(HfstState s) const;
+
+	void set_final_weight(HfstState s, const W & weight);
 
 	friend class hfst::HfstTransducer;
       };
