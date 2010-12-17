@@ -1,5 +1,5 @@
-#ifndef _INTERNAL_TRANSDUCER_H_
-#define _INTERNAL_TRANSDUCER_H_
+#ifndef _HFST_NET_H_
+#define _HFST_NET_H_
 
 #include <string>
 #include <set>
@@ -149,6 +149,135 @@ namespace hfst {
       }
 
     };
+
+    /* One implementation of template class C. */
+    struct TransitionData {
+      std::string input_symbol;
+      std::string output_symbol;
+      float weight;
+
+      bool operator<(const HfstTransition<C> &another) const {
+	if (input_symbol.compare(another.input_symbol) < 0)
+	  return true;
+	if (input_symbol.compare(another.input_symbol) > 0)
+	  return false;
+	if (output_symbol.compare(another.output_symbol) < 0)
+	  return true;
+	if (output_symbol.compare(another.output_symbol) > 0)
+	  return false;
+	return (weight < another.weight);
+      }
+    };
+
+    /* A transition consists of a target state and transition data
+       represented by class C. 
+
+       HfstTransition is not parametrized with class W, it is the user's 
+       responsibility to use the same weight type in
+       transitions and final states.*/
+    template <class C> class HfstTransition 
+      {
+      protected:
+	HfstState target_state;
+	C transition_data;
+      public:
+
+        HfstTransition(): target_state(0)
+	  {}
+
+      HfstTransition(const HfstTransition<C> &another): 
+	target_state(another.target_state), transition_data(transition_data) {}
+
+	bool operator<(const HfstTransition<C> &another) const {
+	  if (target_state == another.target_state)
+	    return (transition_data < another.transition_data);
+	  return (target_state < another.target_state);
+	}
+
+	void operator=(const HfstTransition<C> &another) const {
+	  target_state = another.target_state;
+	  transition_data = transition_data;
+	}
+
+	HfstState get_target_state() const {
+	  return target_state;
+	}
+
+	const C & get_transition_data() const {
+	  return transition_data;
+	}
+
+      };
+
+
+    /* An HfstNet contains a map, where each state is mapped
+       to a set of that state's transitions (class C), and a map, where
+       each final state is mapped to its final weight (class W). 
+       Class W must use the weight type W. */
+    template <class C, class W> class HfstNet 
+      {
+      protected:
+	typedef std::map<HfstState, 
+	  std::set<HfstTransition<C> > >
+	  HfstStateMap_;
+	HfstStateMap_ state_map;
+	std::map<HfstState,W> final_weight_map;
+
+      public:
+	/** An iterator type that points to the map of states in the net. 
+	    The value pointed by the iterator is of type 
+	    std::pair<HfstState, std::set<HfstTransition<C> > >. */
+	typedef typename HfstStateMap_::iterator iterator;
+	/** A const iterator type that points to the map of states in the net.
+	    The value pointed by the iterator is of type 
+	    std::pair<HfstState, std::set<HfstTransition<C> > >. */
+	typedef typename HfstStateMap_::const_iterator const_iterator;
+
+	/** Create a transducer with one state that is not a final state,
+	    i.e. an empty transducer. */
+	HfstNet(void) {
+	  state_map[0]=std::set<HfstTransition <C> >();
+	}
+
+	/** Get an iterator to the beginning of the map of states in 
+	    the net. */
+	iterator begin() {
+	  state_map.begin();
+	}
+
+	/** Get a const iterator to the beginning of the map of states in 
+	    the net. */
+	const_iterator begin() const {
+	  state_map.begin();
+	}
+
+	/** Get an iterator to the end of the map of states in
+	    the net. */
+	iterator end() {
+	  state_map.end();
+	}
+
+	/** Get a const iterator to the end of the map of states in
+	    the net. */
+	const_iterator end() const {
+	  state_map.end();
+	}
+
+	/** Get the set of transitions of state \a s in this net. */
+	std::set<HfstTransition<C> > & operator[](HfstState s);
+
+	/** Get the final weight of state \a s in this net. */
+	W get_final_weight(HfstState s) const;
+
+	/** Set the final weight of state \a s in this net to \a weight. */
+	void set_final_weight(HfstState s, const W & weight);
+
+	friend class hfst::HfstTransducer;
+      };
+
+    /** An HfstNet with transitions of type TransitionData. */
+    typedef HfstNet <TransitionData, float> HfstFsm;
+   
 
 
     /** @brief A simple transducer format that supports adding states
