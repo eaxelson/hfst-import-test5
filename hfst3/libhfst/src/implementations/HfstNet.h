@@ -13,150 +13,62 @@ namespace hfst {
   class HfstTransducer;
 }
 
-/** @file HfstInternalTransducer.h
-    \brief Declaration of classes needed by HFST's 
-    internal transducer format. */
+/** @file HfstNet.h
+    @brief Declaration of classes needed by HFST's 
+    own transducer format. */
 
 namespace hfst {
   namespace implementations {
 
-    /** @brief The number of a state in an HfstInternalTransducer. */
+    /** @brief The number of a state in an HfstNet. */
     typedef unsigned int HfstState;
 
-    class HfstTrieState {
-    protected:
-      typedef std::set< std::pair < std::pair<unsigned int, unsigned int>,
-	HfstTrieState * > > HfstTrieStateTransitions;
-
-      bool final;
-      float weight;
-      unsigned int state_number;
-      HfstTrieStateTransitions transitions;
-
-      HfstTrieState(unsigned int);
-      ~HfstTrieState();
-      void print(const HfstAlphabet * alphabet);
-      void add_transition(unsigned int inumber, unsigned int onumber, 
-			  HfstTrieState * target_state);
-      HfstTrieState * find(unsigned int, unsigned int);      
-
-      friend class HfstTrie;
-      friend class HfstInternalTransducer;
-    };
-
-    /** @brief A transducer format for fast disjunction of
-	one-path transducers.
-
-	This format supports only disjunction of one-path
-	transducers. For a more extensive set of operations,
-	an HfstTrie can be converted to an HfstInternalTransducer
-	and again to an HfstTransducer.
- */
-    class HfstTrie {
-    protected:
-      typedef std::vector<HfstTrieState *> HfstTrieStateVector;
-      HfstTrieState * initial_state;
-      HfstAlphabet * alphabet;
-      unsigned int max_state_number;
-      HfstTrieStateVector states;
-
-    public:
-      /** @brief Create an empty trie.
-
-	  The trie has one state that is not final. */
-      HfstTrie();
-      /** @brief Delete the trie. */
-      ~HfstTrie();
-      /** @brief Add a one-path transducer as defined with \a spv 
-	  with weight \a weight to the trie. */
-      void add_path(const StringPairVector &spv, float weight=0);
-
-      void print();
-
-      friend class HfstInternalTransducer;
-    };
-
-    class InternalTransducerLine {
-    public:
-      bool final_line;
-      HfstState origin;
-      HfstState target;
-      unsigned int isymbol;
-      unsigned int osymbol;
-      float weight;
-      
-    InternalTransducerLine():
-      final_line(false), origin(0), target(0), 
-	isymbol(0), osymbol(0),
-	weight((float)0) 
-	  {};
-
-      bool operator<(const InternalTransducerLine &another) const;
-    };
-    
-    class HfstInternalTransducer;
-
-    /** @brief A transition in an HfstInternalTransducer. */
-    struct HfstTransition {
-    public:
-      /** @brief The source state of the transition. */
-      HfstState source;
-      /** @brief The target state of the transition. */
-      HfstState target;
-      /** @brief The input symbol of the transition. */
-      std::string isymbol;
-      /** @brief The output symbol of the transition. */
-      std::string osymbol;
-      /** @brief The weight of the transition. */
-      float weight;
-      
-      /** @brief Create an uninitialized HfstTransition. */
-      HfstTransition() {};
-
-      /** @brief Create an HfstTransition from state \a source
-	  to state \a target with input string \a isymbol,
-	  output string \a osymbol and weight \a weight. */
-      HfstTransition(HfstState source,
-		     HfstState target,
-		     std::string &isymbol,
-		     std::string &osymbol,
-		     float weight) {
-	this->source = source;
-	this->target = target;
-	this->isymbol = isymbol;
-	this->osymbol = osymbol;
-	this->weight = weight;
-      }
-
-      /* A less-than operator used for storing Transitions in a set. */
-      bool operator<(const HfstTransition &another) const {
-	if (this->source < another.source) return true;
-	if (this->source > another.source) return false;
-	
-	if (this->target < another.target) return true;
-	if (this->target > another.target) return false;
-	
-	if (this->isymbol.compare(another.isymbol) < 0) return true;
-	if (this->isymbol.compare(another.isymbol) > 0) return false;
-	
-	if (this->osymbol.compare(another.osymbol) < 0) return true;
-	if (this->osymbol.compare(another.osymbol) > 0) return false;
-	
-	if ( this->weight < another.weight ) return true;
-	if ( this->weight > another.weight ) return false;
-	
-	return false;
-      }
-
-    };
 
     /* One implementation of template class C. */
     struct TransitionData {
-      std::string input_symbol;
-      std::string output_symbol;
-      float weight;
+      typedef std::string SymbolType;
+      typedef float WeightType;
+      SymbolType input_symbol;
+      SymbolType output_symbol;
+      WeightType weight;
 
-      bool operator<(const HfstTransition<C> &another) const {
+      TransitionData() {
+	input_symbol="";
+	output_symbol="";
+	weight=0;
+      }
+
+      TransitionData(const TransitionData &data) {
+	input_symbol = data.input_symbol;
+	output_symbol = data.output_symbol;
+	weight = data.weight;
+      }
+
+      TransitionData(SymbolType isymbol,
+		     SymbolType osymbol,
+		     WeightType weight) {
+	input_symbol=isymbol;
+	output_symbol=osymbol;
+	this->weight=weight;
+      }
+
+      void operator=(const TransitionData &data) {
+	input_symbol = data.input_symbol;
+	output_symbol = data.output_symbol;
+	weight = data.weight;
+      }
+
+      static bool is_epsilon(const SymbolType &symbol) {
+	return (symbol.compare("@_EPSILON_SYMBOL_@") == 0);
+      }
+      static bool is_unknown(const SymbolType &symbol) {
+	return (symbol.compare("@_UNKNOWN_SYMBOL_@") == 0);
+      }
+      static bool is_identity(const SymbolType &symbol) {
+	return (symbol.compare("@_IDENTITY_SYMBOL_@") == 0);
+      }
+
+      bool operator<(const TransitionData &another) const {
 	if (input_symbol.compare(another.input_symbol) < 0)
 	  return true;
 	if (input_symbol.compare(another.input_symbol) > 0)
@@ -175,26 +87,33 @@ namespace hfst {
        HfstTransition is not parametrized with class W, it is the user's 
        responsibility to use the same weight type in
        transitions and final states.*/
-    template <class C> class HfstTransition 
+    template <class C> class HfstTransition_ 
       {
       protected:
 	HfstState target_state;
 	C transition_data;
       public:
 
-        HfstTransition(): target_state(0)
+        HfstTransition_(): target_state(0)
 	  {}
 
-      HfstTransition(const HfstTransition<C> &another): 
-	target_state(another.target_state), transition_data(transition_data) {}
+	HfstTransition_(HfstState s, 
+			typename C::SymbolType isymbol, 
+			typename C::SymbolType osymbol, 
+			typename C::WeightType weight):
+	target_state(s), transition_data(isymbol, osymbol, weight)
+	  {}
 
-	bool operator<(const HfstTransition<C> &another) const {
+      HfstTransition_(const HfstTransition_<C> &another): 
+	target_state(another.target_state), transition_data(another.transition_data) {}
+
+	bool operator<(const HfstTransition_<C> &another) const {
 	  if (target_state == another.target_state)
 	    return (transition_data < another.transition_data);
 	  return (target_state < another.target_state);
 	}
 
-	void operator=(const HfstTransition<C> &another) const {
+	void operator=(const HfstTransition_<C> &another) const {
 	  target_state = another.target_state;
 	  transition_data = transition_data;
 	}
@@ -209,6 +128,7 @@ namespace hfst {
 
       };
 
+    typedef HfstTransition_<TransitionData> HfstArc;
 
     /* An HfstNet contains a map, where each state is mapped
        to a set of that state's transitions (class C), and a map, where
@@ -218,10 +138,11 @@ namespace hfst {
       {
       protected:
 	typedef std::map<HfstState, 
-	  std::set<HfstTransition<C> > >
+	  std::set<HfstTransition_<C> > >
 	  HfstStateMap_;
 	HfstStateMap_ state_map;
 	std::map<HfstState,W> final_weight_map;
+	std::set<typename C::SymbolType> alphabet;
 
       public:
 	/** An iterator type that points to the map of states in the net. 
@@ -233,44 +154,84 @@ namespace hfst {
 	    std::pair<HfstState, std::set<HfstTransition<C> > >. */
 	typedef typename HfstStateMap_::const_iterator const_iterator;
 
-	/** Create a transducer with one state that is not a final state,
-	    i.e. an empty transducer. */
+	typedef std::set<HfstTransition_<C> > HfstTransitionSet;
+
+	/** Create a transducer with one initial state that has state
+	    number zero and is not a final state, i.e. an empty transducer. */
 	HfstNet(void) {
-	  state_map[0]=std::set<HfstTransition <C> >();
+	  state_map[0]=std::set<HfstTransition_ <C> >();
+	}
+
+	/** Create a deep copy of HfstNet \a net. */
+	HfstNet(const HfstNet &net) {
+	  state_map = net.state_map;
+	  final_weight_map = net.final_weight_map;
+	  alphabet = alphabet;
+	}
+
+	/** Create an HfstNet equivalent to HfstTransducer \a transducer. */
+	HfstNet(const HfstTransducer &transducer) {
+	  throw hfst::exceptions::FunctionNotImplementedException
+	    ("HfstNet(const HfstTransducer &transducer)");
+	}
+
+	/** Add a state \a s to this net. 
+	    If the state already exists, it is not added again. */
+	void add_state(HfstState s) {
+	  if (state_map.find(s) == state_map.end())
+	    state_map[s]=std::set<HfstTransition_ <C> >();
+	}
+
+	/** Add a transition \a transition to state \a s. 
+	    If state \a s does not exist, it is created. */
+	void add_transition(HfstState s, HfstTransition_<C> transition) {
+
+	  C data = transition.get_transition_data();
+	  add_state(s);
+	  add_state(transition.get_target_state());
+	  alphabet.insert(data.input_symbol);
+	  alphabet.insert(data.output_symbol);
+	  state_map[s].insert(transition);
+	}
+
+	/** Whether state \a s is final. */
+	bool is_final_state(HfstState s) const {
+	  return (final_weight_map.find(s) != final_weight_map.end());
+	}
+
+	/** Get the final weight of state \a s in this net. */
+	W get_final_weight(HfstState s) {
+	  if (final_weight_map.find(s) != final_weight_map.end())
+	    return final_weight_map[s];
+	}
+
+	/** Set the final weight of state \a s in this net to \a weight. 
+	    If the state does not exist, it is created. */
+	void set_final_weight(HfstState s, const W & weight) {
+	  final_weight_map[s] = weight;
 	}
 
 	/** Get an iterator to the beginning of the map of states in 
 	    the net. */
-	iterator begin() {
-	  state_map.begin();
-	}
+	iterator begin() { return state_map.begin(); }
 
 	/** Get a const iterator to the beginning of the map of states in 
 	    the net. */
-	const_iterator begin() const {
-	  state_map.begin();
-	}
+	const_iterator begin() const { return state_map.begin(); }
 
 	/** Get an iterator to the end of the map of states in
 	    the net. */
-	iterator end() {
-	  state_map.end();
-	}
+	iterator end() { return state_map.end(); }
 
 	/** Get a const iterator to the end of the map of states in
 	    the net. */
-	const_iterator end() const {
-	  state_map.end();
-	}
+	const_iterator end() const { return state_map.end(); }
 
-	/** Get the set of transitions of state \a s in this net. */
-	std::set<HfstTransition<C> > & operator[](HfstState s);
-
-	/** Get the final weight of state \a s in this net. */
-	W get_final_weight(HfstState s) const;
-
-	/** Set the final weight of state \a s in this net to \a weight. */
-	void set_final_weight(HfstState s, const W & weight);
+	/** Get the set of transitions of state \a s in this net. 
+	    If the state does not exist, it is created. */
+	std::set<HfstTransition_<C> > & operator[](HfstState s) {
+	  return state_map[s];
+	}	
 
 	friend class hfst::HfstTransducer;
       };
@@ -280,45 +241,7 @@ namespace hfst {
    
 
 
-    /** @brief A simple transducer format that supports adding states
-	and transitions and iterating through them. 
-	
-	This format is used internally for conversion between transducer formats.
-	This could also be used for writing binary transducers in an
-	implementation-independent format.. (TODO) 
-
-	This format is essentially a text-based representation of a
-	transducer. It contains a set of HfstTransitions and final
-	states. State number zero is always the start state.
-
-	The operations offered by this class are very limited.
-	Convert an HfstInternalTransducer into an HfstTransducer
-	if you need more operations.
-     */
-    class HfstInternalTransducer {
-    public:
-      typedef std::set<InternalTransducerLine> InternalTransducerLineSet;
-      typedef std::set<std::pair<HfstState,float> > FinalStateSet;
-      typedef InternalTransducerLineSet::const_iterator const_iterator;
-
-      InternalTransducerLineSet lines;
-      FinalStateSet final_states;
-      unsigned int disjunct_max_state_number;
-      HfstAlphabet * alphabet;
-
-    public:
-      /** @brief Create an empty transducer. */
-      HfstInternalTransducer();
-      /** @brief Delete the transducer. */
-      ~HfstInternalTransducer();
-      /** @brief Create a deep copy of transducer \a transducer. */
-      HfstInternalTransducer(const HfstInternalTransducer &transducer);
-      /** @brief Create a new internal transducer equivalent to \a
-	  transducer. */
-      HfstInternalTransducer(const HfstTransducer &transducer);
-      /** @brief Create a new internal transducer equivalent to \a
-	  trie. */
-      HfstInternalTransducer(const HfstTrie &trie);
+#ifdef FOO
 
       /** @brief Add \a transition to the transducer. */
       void add_transition(HfstTransition &transition);
@@ -376,47 +299,8 @@ namespace hfst {
 
       friend class HfstStateIterator;
       friend class HfstTransitionIterator;
-    };
 
-    /** @brief An iterator to the states of an internal transducer.
-
-	If the an internal transducer is empty, the iterator
-	HfstStateIterator it(transducer) is at end just after it has been created:
-	it.done() == true
-    */
-    class HfstStateIterator {
-    protected:
-      typedef std::set<HfstState> HfstStateSet;
-      HfstStateSet state_set;
-      HfstStateSet::iterator it;
-    public:
-      /** @brief Create an iterator to the states of \a transducer. */
-      HfstStateIterator(const HfstInternalTransducer &transducer);
-      /** @brief Get the value pointed by the iterator. */
-      HfstState value();
-      /** @brief Advance the iterator to the next state. */
-      void next();
-      /** @brief Whether the iterator is at end. */
-      bool done();
-    };
-
-    /** @brief An iterator to the transitions of a given state in an internal transducer. */
-    class HfstTransitionIterator {
-    protected:
-      typedef std::set<HfstTransition> HfstTransitionSet;
-      HfstTransitionSet transition_set;
-      HfstTransitionSet::iterator it;
-    public:
-      /** @brief Create an iterator to the transitions leaving from state \a s in 
-	  internal transducer \a transducer. */
-      HfstTransitionIterator(const HfstInternalTransducer &transducer, HfstState s);
-      /** @brief Get the value pointed by the iterator. */
-      HfstTransition value();
-      /** @brief Advance the iterator to the next transition. */
-      void next();
-      /** @brief Whether the iterator is at end. */
-      bool done();
-    };
+#endif // FOO
 
   }
 }
