@@ -145,16 +145,16 @@ namespace hfst {
 	std::set<typename C::SymbolType> alphabet;
 
       public:
+	/** A set of transitions of a state in an HfstNet. */
+	typedef std::set<HfstTransition_<C> > HfstTransitionSet;
 	/** An iterator type that points to the map of states in the net. 
 	    The value pointed by the iterator is of type 
-	    std::pair<HfstState, std::set<HfstTransition<C> > >. */
+	    std::pair<HfstState, HfstTransitionSet >. */
 	typedef typename HfstStateMap_::iterator iterator;
 	/** A const iterator type that points to the map of states in the net.
 	    The value pointed by the iterator is of type 
-	    std::pair<HfstState, std::set<HfstTransition<C> > >. */
+	    std::pair<HfstState, HfstTransitionSet >. */
 	typedef typename HfstStateMap_::const_iterator const_iterator;
-
-	typedef std::set<HfstTransition_<C> > HfstTransitionSet;
 
 	/** Create a transducer with one initial state that has state
 	    number zero and is not a final state, i.e. an empty transducer. */
@@ -173,6 +173,15 @@ namespace hfst {
 	HfstNet(const HfstTransducer &transducer) {
 	  throw hfst::exceptions::FunctionNotImplementedException
 	    ("HfstNet(const HfstTransducer &transducer)");
+	}
+
+	/** @brief Create an HfstNet as defined in AT&T format in istream \a is.
+	    @pre \a is not at end, otherwise an exception is thrown. 
+	    @note Multiple AT&T transducer definitions are separated with 
+	    the line "--". */
+	HfstNet(std::istream &is) {
+	  throw hfst::exceptions::FunctionNotImplementedException
+	    ("HfstNet(std::istream &is)");
 	}
 
 	/** Add a state \a s to this net. 
@@ -233,6 +242,36 @@ namespace hfst {
 	  return state_map[s];
 	}	
 
+	/** Write the net in AT&T format to ostream \a os.
+	    \a write_weights defines whether weights are printed. */
+	void write_in_att_format(std::ostream &os, bool write_weights=true) 
+	{
+	  for (iterator it = begin(); it != end(); it++)
+	    {
+	      for (typename HfstTransitionSet::iterator tr_it
+		     = it->second.begin();
+		   tr_it != it->second.end(); tr_it++)
+		{
+		  C data = tr_it->get_transition_data();
+		  
+		  os <<  it->first << "\t" 
+		     <<  tr_it->get_target_state() << "\t"
+		     <<	 data.input_symbol.c_str() << "\t"
+		     <<	 data.output_symbol.c_str();
+		  if (write_weights)
+		    os <<  "\t" << data.weight; 
+		  os << "\n";
+		}
+	      if (is_final_state(it->first))
+		{
+		  os <<  it->first;
+		  if (write_weights)
+		    os << "\t" <<  get_final_weight(it->first);
+		  os << "\n";
+		}
+	    }	  
+	}
+	
 	friend class hfst::HfstTransducer;
       };
 
