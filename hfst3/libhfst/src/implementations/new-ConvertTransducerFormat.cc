@@ -22,84 +22,105 @@ namespace hfst { namespace implementations
 {
 
 #if HAVE_SFST
-  void sfst_to_internal( SFST::Node *node, SFST::NodeNumbering &index, 
-		       std::set<SFST::Node*> &visited_nodes, HfstInternalTransducer *internal ) {
+  void sfst_to_hfst_net( SFST::Node *node, SFST::NodeNumbering &index, 
+			 std::set<SFST::Node*> &visited_nodes, 
+			 HfstFsm *net, SFST::Alphabet &alphabet ) {
   
-  if (visited_nodes.find(node) == visited_nodes.end() ) { // if node has not been visited before
-    visited_nodes.insert(node);
-    SFST::Arcs *arcs=node->arcs();
-    for( SFST::ArcsIter p(arcs); p; p++ ) {
-      SFST::Arc *arc=p;
-      internal->add_line(index[node], index[arc->target_node()],
-			 arc->label().lower_char(), arc->label().upper_char(), 0);
-    }
-    if (node->is_final())
-      internal->add_line(index[node],0);
-    for( SFST::ArcsIter p(arcs); p; p++ ) {
-      SFST::Arc *arc=p;
-      sfst_to_internal( arc->target_node(), index, visited_nodes, internal);
+    // if node has not been visited before
+    if (visited_nodes.find(node) == visited_nodes.end() ) { 
+      visited_nodes.insert(node);
+      SFST::Arcs *arcs=node->arcs();
+      for( SFST::ArcsIter p(arcs); p; p++ ) {
+	SFST::Arc *arc=p;
+	net->add_transition(index[node], 
+			    HfstArc
+			    (index[arc->target_node()],
+			     std::string(alphabet->code2symbol
+					 (arc->label().lower_char())),
+			     std::string(alphabet->code2symbol
+					 (arc->label().upper_char())),
+			     0));
+      }
+      if (node->is_final())
+	net->set_final(index[node],0);
+      for( SFST::ArcsIter p(arcs); p; p++ ) {
+	SFST::Arc *arc=p;
+	sfst_to_internal(arc->target_node(), index, 
+			 visited_nodes, 
+			 internal, alphabet);
+      }
     }
   }
-}
 
-  HfstInternalTransducer * sfst_to_internal_hfst_format(SFST::Transducer * t) {
+  HfstFsm * sfst_to_hfst_net(SFST::Transducer * t) {
   
-  bool DEBUG=false;
-
-  if (DEBUG) printf("sfst_to_internal_hfst_format..\n");
-
-  HfstInternalTransducer * internal_transducer = new HfstInternalTransducer();
-  SFST::NodeNumbering index(*t);
-  std::set<SFST::Node*> visited_nodes;
-  sfst_to_internal(t->root_node(), index, visited_nodes, internal_transducer);
-
-  SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
-  for (SFST::Alphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++) {
-    if (it->first != 0) // "<>" is not inserted
-      internal_transducer->alphabet->add_symbol(it->second, it->first);
+    HfstFsm * net = new HfstFsm();
+    SFST::NodeNumbering index(*t);
+    std::set<SFST::Node*> visited_nodes;
+    sfst_to_internal(t->root_node(), index, 
+		     visited_nodes, 
+		     net, t->alphabet);
+    
+    SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
+    for (SFST::Alphabet::CharMap::const_iterator it 
+	   = cm.begin(); it != cm.end(); it++) {
+      if (it->first != 0) // "<>" is not inserted
+	net->alphabet->insert(std::string(it->second));
+      // this function must be a friend of HfstNet
+    }
+    
+    return net;
   }
 
-  if (DEBUG) printf("..done\n");
 
-  return internal_transducer;
-}
-
-  SFST::Transducer * hfst_internal_format_to_sfst(const HfstInternalTransducer * internal) {
+  SFST::Transducer * hfst_net_to_sfst(const HfstFsm * net) {
 
   SFST::Transducer * t = new SFST::Transducer();
-  if (internal->has_no_lines())
-    return t;
 
   std::map<unsigned int,SFST::Node*> state_map;
   state_map[0] = t->root_node();
 
-  const std::set<InternalTransducerLine> *lines = internal->get_lines();
-  for (std::set<InternalTransducerLine>::const_iterator it = lines->begin();
-       it != lines->end(); it++)
+  // Go through all states
+  for (HfstFsm::iterator it = net->begin();
+       it != net->end(); it++)
     {
-      if (it->final_line) 
+      // Go through the set of transitions in each state
+      for (HfstFsm::HfstTransitionSet::iterator tr_it = it->second.begin();
+	   tr_it != it->second.end(); tr_it++)
 	{
-	  if (state_map.find(it->origin) == state_map.end())
-	    state_map[it->origin] = t->new_node();	    
-	  state_map[it->origin]->set_final(1);
-	}
-      else 
-	{
-	  if (state_map.find(it->origin) == state_map.end())
-	    state_map[it->origin] = t->new_node();
-	  if (state_map.find(it->target) == state_map.end())
-	    state_map[it->target] = t->new_node();
-	  state_map[it->origin]->add_arc(SFST::Label(it->isymbol,it->osymbol),
-					 state_map[it->target],t);
+	  TransitionData data = tr_it->get_transition_data();
+
+	  if (state_map.find(it->first) == state_map.end())
+	    state_map[it->first] = t->new_node();
+
+	  if (state_map.find(tr_it->get_target_state()) == state_map.end())
+	    state_map[tr_it->get_target_state()] = t->new_node();
+
+	  SFST::Label l
+	    (t->alphabet.add_symbol(data.input_symbol.c_str()),
+	     t->alphabet.add_symbol(data.output_symbol.c_str()));
+
+	  state_map[it->first]->add_arc(l,
+					state_map[tr_it->get_target_state()],
+					t);
 	}
     }
-  
-  HfstAlphabet::CharMap cm = internal->alphabet->get_char_map();
-  for (HfstAlphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++) {
-    if (it->first != 0) // "@_EPSILON_SYMBOL_@" is not inserted
-      t->alphabet.add_symbol(it->second, it->first);
-  }
 
+  // Go through the final states
+  for (HfstFsm::FinalWeightMap::iterator it = net->final_weight_map.begin();
+       it != net->final_weight_map.end(); it++) 
+    {
+      if (state_map.find(it->first) == state_map.end())
+	state_map[it->first] = t->new_node();
+      state_map[it->first]->set_final(1);
+    }
+
+  // Add symbols that occur in HfstFsm's alphabet but not in
+  // any of its transition to SFST::Transducer's alphabet
+  for (HfstFsm::HfstNetAlphabet::iterator it = net->alphabet.begin();
+       it != net->alphabet.end(); it++)
+    t->alphabet.add_symbol(it->c_str());
+  
   return t;
 }
 #endif // HAVE_SFST
