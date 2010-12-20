@@ -36,7 +36,8 @@ TESTS=hfst-check-version.sh hfst-check-help.sh empty-input.sh\
 	  split-functionality.sh head-functionality.sh tail-functionality.sh \
 	  calculate-functionality.sh format-functionality.sh \
 	  compose-intersect-functionality.sh lookup-functionality.sh \
-	  lexc-compiler-functionality.sh xfst-functionality.sh
+	  lexc-compiler-functionality.sh xfst-functionality.sh \
+	  lexc-functionality.sh
 check_DATA=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   cat2cat_or_CAT_uppercased.hfst cat2CAT_uppercased.hfst cat2dog.hfst \
 		   cat+dog.hfst catdog.hfst cat_or_dog.hfst cat.hfst \
@@ -97,3 +98,6 @@ XFST_TXTS=cat-regex.xfst
 	${top_builddir}/tools/src/hfst-txt2fst -e '@0@' -i $< | ${top_builddir}/tools/src/hfst-invert | ${top_builddir}/tools/src/hfst-fst2fst -w -o $@
 # files needed for test programs
 EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(SUBSTITUTE_TXTS) $(XRE_TXTS) $(XFST_TXTS)
+
+clean-local:
+	-rm -f $(check_DATA)
