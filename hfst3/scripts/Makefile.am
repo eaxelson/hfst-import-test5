@@ -15,5 +15,5 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-bin_SCRIPTS = hfst-foma-wrapper.sh hfst-xfst
+bin_SCRIPTS = hfst-foma-wrapper.sh hfst-xfst hfst-lexc
 

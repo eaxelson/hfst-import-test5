@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 function print_usage() {
     echo 'usage: $0 [-utf8|-latin1] [-e "command"] [-f scriptfile] [-h] [-l startscript] [-s binaryfile] [-q] [-v] [-F hfst_format] [-V]'
 }
@@ -11,6 +11,14 @@ function print_help() {
     echo "  -F   parameter is HFST3 format name"
     echo
     echo "All other parameters imitate foma/xfst parameters as possible"
+}
+
+function print_version() {
+    echo "hfst-xfst 0.0 (foma 0.9.13)"
+    echo "Copyright (c) 2010 University of Helsinki"
+    echo "Licence GPLv3: GNU GPL version 3 <http://gnu.org/licenses/gpl.html>"
+    echo "This is free software: you are free to change and redistribute it."
+    echo "There is NO WARRANTY, to the extent permitted by law."
 }
 
 extraopts="-p"
@@ -52,7 +60,7 @@ if test "x$ffile" = "x-f lush" ; then
     extraopts="$extraopts -flush"
 fi
 
-if ! hfst-foma-wrapper.sh $wrapopts -X "$ffile $efile $lfile $extraopts"; then
+if ! hfst-foma-wrapper.sh $wrapopts -X"$ffile $efile $lfile $extraopts"; then
     echo "Foma wrapper failed"
     exit 1
 fi

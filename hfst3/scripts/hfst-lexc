@@ -1,0 +1,68 @@
+#!/bin/bash
+function print_usage() {
+    echo "$0 [-h | -V | -f format | -latin1] ROOT [LEXICON...]"
+}
+
+function print_help() {
+    echo "Imitates lexc using foma and a wrapper script"
+    echo
+    echo "  -h        print this help"
+    echo "  -V        print version info"
+    echo "  -f        parameter is HFST3 format name"
+    echo "  -o        output file name"
+    echo "  -latin1   convert input to UTF-8 for processing"
+    echo
+    echo "At least one script parameter is required"
+    echo "Output file name is required"
+    echo "All unrecognised options are passed to foma verbatim"
+}
+
+function print_version() {
+    echo "hfst-lexc 0.50.0 (foma 0.9.13)"
+    echo "Copyright (c) 2010 University of Helsinki"
+    echo "Licence GPLv3: GNU GPL version 3 <http://gnu.org/licenses/gpl.html>"
+    echo "This is free software: you are free to change and redistribute it."
+    echo "There is NO WARRANTY, to the extent permitted by law."
+}
+
+extraopts="-p"
+while getopts "hvVqF:l:o:u:" flag ; do
+    case $flag in
+    h) print_help; exit 0;;
+    V) print_version; exit 0;;
+    v) wrapopts="$wrapopts -v";;
+    q) wrapopts="$wrapopts -q";;
+    l) latin1=latin1;;
+    f) wrapopts="$wrapopts -f $OPTARG";;
+    u) utf8=utf8;;
+    o) outfile="$OPTARG";;
+    ?) echo "Unknown command line switch -$flag$OPTARG, passing on"; extraopts=$extraopts -$flag$OPTARG;;
+    esac
+done
+
+shift $(($OPTIND-1))
+if test -z "$outfile" ; then
+    echo "-o required"
+    exit 1
+fi
+if test x$utf8 =  xutf8 ; then
+    echo "UTF-8 is already default in $0"
+fi
+if test "x$latin1" = "xlatin1" ; then
+    for f in $@ ; do
+        if type recode ; then
+            recode l1..u8 $f
+        else
+            echo "missing recode, cannot use latin1"
+            exit 1
+        fi
+    done
+fi
+
+cat $@ > $outfile.tmp.lexc
+printf "read lexc $outfile.tmp.lexc\nsave stack $outfile" > $outfile.tmp.lexcscript
+
+if ! hfst-foma-wrapper.sh $wrapopts -X"-f $outfile.tmp.lexcscript $extraopts"; then
+    echo "Foma wrapper failed"
+    exit 1
+fi
