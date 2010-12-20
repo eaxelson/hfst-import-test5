@@ -16,10 +16,13 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # programs to run for unit etc. testing
+# prefer alphabetical order, except for core tests others depend upon
+# If compare doesn't function 99 % of other tests will fail anyways
 TESTS=hfst-check-version.sh hfst-check-help.sh empty-input.sh\
 	  permutate-file-params.sh \
+	  compare-functionality.sh \
+	  concatenate-functionality.sh \
 	  compose-functionality.sh \
-	  compare-functionality.sh concatenate-functionality.sh \
 	  conjunct-functionality.sh disjunct-functionality.sh \
 	  subtract-functionality.sh \
 	  determinize-functionality.sh minimize-functionality.sh \
@@ -33,7 +36,7 @@ TESTS=hfst-check-version.sh hfst-check-help.sh empty-input.sh\
 	  split-functionality.sh head-functionality.sh tail-functionality.sh \
 	  calculate-functionality.sh format-functionality.sh \
 	  compose-intersect-functionality.sh lookup-functionality.sh \
-	  lexc-compiler-functionality.sh
+	  lexc-compiler-functionality.sh xfst-functionality.sh
 check_DATA=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   cat2cat_or_CAT_uppercased.hfst cat2CAT_uppercased.hfst cat2dog.hfst \
 		   cat+dog.hfst catdog.hfst cat_or_dog.hfst cat.hfst \
@@ -78,6 +81,7 @@ FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-out1.strings \
 		 proc-cat-out.strings proc-cat-weighted-out.strings
 SUBSTITUTE_TXTS=cat2dog.substitute
 XRE_TXTS=cats_and_dogs.xre
+XFST_TXTS=cat-regex.xfst
 
 %.hfst: %.txt
 	${top_builddir}/tools/src/hfst-txt2fst -e '@0@' < $< > $@
@@ -92,4 +96,4 @@ XRE_TXTS=cats_and_dogs.xre
 %.gen.hfst.ol: %.txt
 	${top_builddir}/tools/src/hfst-txt2fst -e '@0@' -i $< | ${top_builddir}/tools/src/hfst-invert | ${top_builddir}/tools/src/hfst-fst2fst -w -o $@
 # files needed for test programs
-EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(SUBSTITUTE_TXTS)
+EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(SUBSTITUTE_TXTS) $(XRE_TXTS) $(XFST_TXTS)
