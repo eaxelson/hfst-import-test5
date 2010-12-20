@@ -19,6 +19,8 @@ SUBDIRS=implementations extensions
 AUTOMAKE_OPTIONS=subdir-objects
 lib_LTLIBRARIES = libhfst.la
 
+EXTRA_DIST=coding-style.sh
+
 AM_CXXFLAGS=-Wno-deprecated -Wall -Wextra
 
 # HFST bridge specific stuff
@@ -87,4 +89,5 @@ HfstTokenizer_SOURCES=HfstTokenizer.cc
 HfstTokenizer_CXXFLAGS=-DDEBUG_MAIN
 HfstTokenizer_LDADD=libhfst.la
 TESTS=HfstTransducer HfstFlagDiacritics HfstGrammar HfstInputStream \
-	  HfstOutputStream HfstTokenizer
+	  HfstOutputStream HfstTokenizer \
+	  coding-style.sh
