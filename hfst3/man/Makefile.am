@@ -27,10 +27,10 @@ bootstrappable=hfst-compare.1 hfst-compose.1 \
 			   hfst-remove-epsilons.1 hfst-repeat.1 \
 			   hfst-reverse.1 hfst-split.1 hfst-strings2fst.1 \
 			   hfst-subtract.1 hfst-summarize.1 hfst-tail.1 hfst-txt2fst.1 \
-			   hfst-calculate.1 hfst-compose-intersect.1 hfst-proc.1 \
+			   hfst-calculate.1 hfst-compose-intersect.1 \
 			   hfst-lexc-compiler.1 hfst-xfst-compiler.1 \
 			   hfst-lookup.1
-broken=hfst-xfst.1 hfst-foma-wrapper.1 hfst-proc.1
+broken=hfst-xfst.1 hfst-foma-wrapper.1 hfst-proc.1 hfst-lexc.1
 dist_man1_MANS=$(bootstrappable) $(broken)
 
 bootstrap: 

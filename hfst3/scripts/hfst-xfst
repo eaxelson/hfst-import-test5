@@ -1,6 +1,6 @@
 #!/bin/sh
 function print_usage() {
-    echo "usage: $0 [-e command] [-f scriptfile] [-h] [-l startscript] [-s binaryfile] [-q] [-v] [-F hfst_format]"
+    echo 'usage: $0 [-utf8|-latin1] [-e "command"] [-f scriptfile] [-h] [-l startscript] [-s binaryfile] [-q] [-v] [-F hfst_format] [-V]'
 }
 
 function print_help() {
@@ -13,26 +13,46 @@ function print_help() {
     echo "All other parameters imitate foma/xfst parameters as possible"
 }
 
-tmpfile=$$.tmp
-echo > $tmpfile
-while getopts "e:f:hl:s:qvF:" flag ; do
+extraopts="-p"
+while getopts "e:f:hl:s:qvF:u:" flag ; do
     case $flag in
-        h) print_help; exit 0;;
-        V) print_version; exit 0;;
-        v) realopts=$realopts -v;;
-        q) realopts=$realopts -q;;
-        f) realfile=$OPTARG;;
-        l) realfile=$OPTARG;;
-        e) echo $OPTARG >> $tmpfile; realfile=$tmpfile;;
-        F) realopts=$realopts -f $OPTARG;;
-        ?) echo "Unknown command line switch $OPTARG, try -h for help"; print_usage; exit 1;;
+    h) print_help; exit 0;;
+    V) print_version; exit 0;;
+    v) wrapopts="$wrapopts -v";;
+    q) wrapopts="$wrapopts -q";;
+    f) ffile="-f $OPTARG";;
+    l) lfile="-l $OPTARG";;
+    e) extraopts="$extraopts -e \"$OPTARG\"";;
+    F) wrapopts="$wrapopts -f $OPTARG";;
+    u) utf8=utf8;;
+    s) echo "Cannot use XFST automata binaries"; exit 1;;
+    ?) echo "Unknown command line switch -$flag$OPTARG, passing on"; extraopts=$extraopts -$flag$OPTARG;;
     esac
 done
 
-if ! hfst-foma-wrapper.sh $realopts $realfile ; then
+if test x$utf8 =  xutf8 ; then
+    echo "UTF-8 is already default in $0"
+fi
+if test "x$lfile" = "x-l atin1" ; then
+    if test ! -z $ffile ; then
+        if type recode ; then
+            recode l1..u8 `echo $ffile | sed 's/-f //'`
+        else
+            echo "missing recode, cannot use latin1"
+            exit 1
+        fi
+    else
+        echo "cannot use latin1 in stdin or pipes"
+        exit 1
+    fi
+    lfile=
+fi
+if test "x$ffile" = "x-f lush" ; then
+    ffile=
+    extraopts="$extraopts -flush"
+fi
+
+if ! hfst-foma-wrapper.sh $wrapopts -X "$ffile $efile $lfile $extraopts"; then
     echo "Foma wrapper failed"
     exit 1
-fi
-if [ -f $tmpfile ] ; then
-    rm $tmpfile
 fi

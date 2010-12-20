@@ -1,0 +1,75 @@
+.TH HFST-XFST "1" "December 2010" "HFST" "User Commands"
+.SH NAME
+hfst-xfst.sh \- manual page for hfst-xfst 0.1 (hfst 3.0)
+.SH SYNOPSIS
+.B hfst-xfst
+[\fIOPTIONS\fR...] [\fIINFILE\fR]
+.SH DESCRIPTION
+Parse xfst scripts with foma and convert saved stacks to hfst format
+.TP
+The options imitate Xerox's version of xfst:
+.TP
+\fB\-h\fR
+Print help message
+.TP
+\fB\-V\fR
+Print version info
+.TP
+\fB\-v\fR
+Print verbosely while processing
+.TP
+\fB\-q\fR
+Do not print output
+.TP
+\fB\-e command\fR
+execute the command before starting application
+.TP
+\fB\-f command\fR
+execute the commands in scriptfile and exit
+.TP
+\fB\-l command\fR
+execute the commands in scriptfile and launch interactive interface
+.TP
+\fB\-utf8\fR
+Treat input files as UTF-8 (default)
+.TP
+\fB\-latin1\fR
+Treat input files as latin1 (convert if possible)
+.TP
+\fB\-F\fR\fIFORMAT\fR
+Convert into HFST transducer format FORMAT
+.PP
+If OUTFILES is missing the script tries hard to guess automata files from
+the script contents. If script is parsed from standard input, the OUTFILES is
+required.
+.PP
+Unrecognised commands may be passed to foma verbatim
+.SH EXAMPLES
+.TP
+hfst-xfst -F openfst-tropical -f uppercase.xfst
+Compile uppercase script and convert saved stacks to openfst format
+.TP
+hfst-foma-wrapper.sh -F foma -o -f cat.fst cat.xfst
+Compile cat script and only convert cat.fst to HFST foma format
+.SH "REPORTING BUGS"
+Report bugs to <hfst\-bugs@helsinki.fi> or directly to our bug tracker at:
+<https://sourceforge.net/tracker/?atid=1061990&group_id=224521&func=browse>
+.SH "SEE ALSO"
+hfst-xfst(1), hfst-lexc(1),
+.br
+hfst\-foma\-wrapper.sh home page:
+<https://kitwiki.csc.fi/twiki/bin/view/KitWiki//HfstXfst>
+.br
+General help using HFST software:
+<https://kitwiki.csc.fi/twiki/bin/view/KitWiki//HfstHome>
+.SH BUGS
+Options -flush and -stop are not supported. Xfst binartyfile loading is not
+supported. Latin1 support depends on recode and only works with input files,
+not stdin input (working in latin1 environments has been deprecated forever
+already).
+.SH COPYRIGHT
+Copyright \(co 2010 University of Helsinki,
+License GPLv3: GNU GPL version 3 <http://gnu.org/licenses/gpl.html>
+.br
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.
