@@ -451,7 +451,7 @@ The HFST API is written in the namespace #hfst that contains the following class
 
    - HfstInputStream and HfstOutputStream: Classes for writing and reading binary transducers.
 
-   - implementations::HfstInternalTransducer, implementations::HfstTransition, implementations::HfstTransitionIterator and implementations::HfstStateIterator: Classes for creating transducers from scratch and iterating through their states and transitions.
+   - implementations::HfstNet: Class for creating transducers from scratch and iterating through their states and transitions.
 
    - HfstTokenizer: A class used in creating transducers from UTF-8 strings.
 
@@ -537,9 +537,9 @@ OpenFst in http://www.openfst.org and foma in http://www.aclweb.org/anthology/E/
 
 \section features Features
 
-   - Create transducers \link hfst::implementations::HfstInternalTransducer from scratch\endlink
+   - Create transducers \link hfst::implementations::HfstNet from scratch\endlink
 
-   - Iterate through a transducer's \link hfst::implementations::HfstStateIterator states\endlink and \link hfst::implementations::HfstTransitionIterator transitions\endlink
+   - Iterate through a transducer's \link hfst::implementations::HfstNet states\endlink and \link hfst::implementations::HfstNet transitions\endlink
 
    - Create transducers by \link hfst::HfstTokenizer tokenizing\endlink UTF-8 strings with multicharacter symbols
 
