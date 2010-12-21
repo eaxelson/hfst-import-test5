@@ -57,6 +57,7 @@ print_usage()
     print_common_unary_program_parameter_instructions(message_out);
     fprintf(message_out, "\n");
     print_report_bugs();
+    fprintf(message_out, "\n");
     print_more_info();
 }
 

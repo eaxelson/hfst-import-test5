@@ -59,12 +59,10 @@ print_usage()
     print_common_program_options(message_out);
     print_common_unary_program_options(message_out);
     fprintf(message_out, "\n");
-    // parameter details
     print_common_unary_program_parameter_instructions(message_out);
     fprintf(message_out, "\n");
-    // bug report address
     print_report_bugs();
-    // external docs
+    fprintf(message_out, "\n");
     print_more_info();
 }
 

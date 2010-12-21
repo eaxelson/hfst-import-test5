@@ -52,12 +52,9 @@ void
 print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
-    // Usage line
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
            "Extract transducers from archive with systematic file names\n"
         "\n", program_name);
-
-    // options, grouped
     print_common_program_options(message_out);
     fprintf(message_out, "Input/Output options:\n"
             "  -i, --input=INFILE    Read input transducer from INFILE\n"
@@ -66,7 +63,6 @@ print_usage()
             "  -e, --extension=EXT   Use the extension EXT in "
             "naming output files\n");
     fprintf(message_out, "\n");
-    // parameter details
     fprintf(message_out, 
 	    "If INFILE is omitted or -, stdin is used.\n"
             "If PRE is omitted, no prefix is used.\n"
@@ -78,9 +74,8 @@ print_usage()
 	    "This command creates files \"rule1.tr\" (equivalent to transducer_a)\n"
 	    "and \"rule2.tr\" (equivalent to transducer_b). \n");
     fprintf(message_out, "\n");
-    // bug report address
     print_report_bugs();
-    // external docs
+    fprintf(message_out, "\n");
     print_more_info();
 }
 

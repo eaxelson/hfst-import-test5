@@ -197,9 +197,8 @@ print_usage()
            "default being text, unless OFORMAT is apertium\n"
 	    "\nTODO: Currently both OFORMAT and IFORMAT are in plain UTF-8 text format\n");
     fprintf(message_out, "\n");
-    // bug report address
     print_report_bugs();
-    // external docs
+    fprintf(message_out, "\n");
     print_more_info();
 }
 

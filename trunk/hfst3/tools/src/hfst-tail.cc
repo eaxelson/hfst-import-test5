@@ -54,25 +54,21 @@ void
 print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
-    // Usage line
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
            "Get last transducers from an archive\n"
         "\n", program_name);
 
-    // options, grouped
     print_common_program_options(message_out);
     print_common_unary_program_options(message_out);
     fprintf(message_out, "Archive options:\n"
             "  -n, --n-last=NUMBER   Read last NUMBER transducers\n");
     fprintf(message_out, "\n");
-    // parameter details
     print_common_unary_program_parameter_instructions(message_out);
     fprintf(message_out, "NUMBER must be a positive integer as parsed by "
             "strtoul base 10\n");
     fprintf(message_out, "\n");
-    // bug report address
     print_report_bugs();
-    // external docs
+    fprintf(message_out, "\n");
     print_more_info();
 }
 
