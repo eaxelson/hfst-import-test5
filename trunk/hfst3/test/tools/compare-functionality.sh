@@ -1,6 +1,5 @@
 #!/bin/sh
-comparables="cat.hfst dog.hfst tac.hfst cat2dog.hfst dog2cat.hfst "\
-    "cat_or_dog.hfst catdog.hfst"
+comparables="cat.hfst dog.hfst tac.hfst cat2dog.hfst dog2cat.hfst cat_or_dog.hfst catdog.hfst"
 for f in $comparables; do
     if ! ../../tools/src/hfst-compare $f $f > /dev/null 2>&1 ; then
         echo hfst-compare mismatches $f $f
