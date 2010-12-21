@@ -228,10 +228,6 @@ int main( int argc, char **argv )
       return retval;
     }
   // close buffers, we use streams
-  if (inputfile != stdin)
-    {
-      fclose(inputfile);
-    }
   if (outfile != stdout)
     {
       fclose(outfile);
