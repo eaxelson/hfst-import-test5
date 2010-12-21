@@ -21,7 +21,7 @@ bootstrappable=hfst-compare.1 hfst-compose.1 \
 			   hfst-disjunct.1 \
 			   hfst-fst2fst.1 hfst-fst2strings.1 \
 			   hfst-fst2txt.1 \
-			   hfst-head.1 hfst-intersect.1 \
+			   hfst-head.1 hfst-conjunct.1 \
 			   hfst-invert.1 hfst-minimize.1 hfst-project.1 \
 			   hfst-push-weights.1 hfst-regexp2fst.1 \
 			   hfst-remove-epsilons.1 hfst-repeat.1 \
