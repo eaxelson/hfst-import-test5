@@ -16,7 +16,7 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # autoconf requirements
-AC_PREREQ([2.60])
+AC_PREREQ([2.62])
 
 # init
 AC_INIT([hfst], [3.0], [hfst-bugs@helsinki.fi], [hfst], [http://hfst.sf.net])
@@ -31,14 +31,13 @@ AC_CONFIG_HEADERS([config.h])
 HFST_NAME=hfst
 HFST_MAJOR=3
 HFST_MINOR=0
-HFST_EXTENSION=_alpha
+HFST_EXTENSION=_beta
 HFST_VERSION=$HFST_MAJOR.$HFST_MINOR$HFST_EXTENSION
 # for package-config pc file
 LIBHFST_NAME=hfst
 LIBHFST_MAJOR=3
 LIBHFST_MINOR=0
-LIBHFST_EXTENSION=_alpha
-LIBHFST_VERSION=$LIBHFST_MAJOR.$LIBHFST_MINOR$LIBHFST_EXTENSION
+LIBHFST_VERSION=$LIBHFST_MAJOR.$LIBHFST_MINOR
 AC_SUBST(LIBHFST_MAJOR)
 AC_SUBST(LIBHFST_MINOR)
 AC_SUBST(LIBHFST_VERSION)
@@ -52,7 +51,6 @@ AC_ARG_WITH([sfst],
             [with_sfst=check])
 AS_IF([test "x$with_sfst" != xno], [AC_DEFINE([HAVE_SFST], [1],
                                               [Define to compile SFST support in HFST])])
-#      [AC_MSG_FAILURE([cannot disable SFST yet])])
 AM_CONDITIONAL([WANT_SFST], [test x$with_sfst != xno])
 AC_ARG_WITH([openfst],
             [AS_HELP_STRING([--with-openfst],
@@ -405,9 +403,6 @@ if test "x$with_foma" == "xcheck"; then
     AC_CHECK_LIB([foma], [main], [],
                  [AC_MSG_FAILURE([foma test failed (--without-foma to disable)])])
 fi
-if test "x$with_foma" == "xbundled"; then
-    AC_CHECK_LIB([z], [main])
-fi
 
 if test "x$with_mfstl" != "xno"; then
    AC_CHECK_LIB([mfstl], [main], [],
@@ -440,7 +435,7 @@ if test "x$with_mfstl" != "xno"; then
 fi
 
 AC_HEADER_STDBOOL
-ifdef([AC_HEADER_ASSERT], [AC_HEADER_ASSERT], [AC_CHECK_HEADERS([assert.h])])
+AC_HEADER_ASSERT
 
 # Checks for types
 AC_TYPE_SIZE_T
