@@ -78,6 +78,7 @@ print_usage()
             "\n",
             program_name );
         print_report_bugs();
+        fprintf(message_out, "\n");
         print_more_info();
 }
 

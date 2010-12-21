@@ -102,6 +102,7 @@ print_usage()
         "  %s  lexical.hfst  generates all forms of lexical.hfst\n"
         "\n", program_name);
     print_report_bugs();
+    fprintf(message_out, "\n");
     print_more_info();
 }
 

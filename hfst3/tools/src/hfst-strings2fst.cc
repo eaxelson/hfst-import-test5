@@ -132,30 +132,13 @@ print_usage()
 	    "\n"
             );
 
-        /*fprintf(message_out,
-            "The input consists of strings separated by newlines. Each string is transformed into a transducer\n"
-            "and written to output. If option -j is used, all resulting transducers are disjuncted instead of writing each\n"
-            "transducer separately to output.\n"
-            "\n"
-            "The input string format is by default input_string:output_string. Both strings are tokenized separately\n"
-            "and the i:th token of input string is matched against the i:th token of output string. If the strings do not\n"
-            "have an equal amount of tokens, epsilon is matched against the rest of the tokens of the longer string.\n"
-            "\n"
-            "If the input string is in pairstring format, option -p must be used. In the pairstring format the token pairs\n"
-            "are written one after another separated by a ':'.\n"
-            "\n"
-            "A symbol table must be defined with option -R, so the program knows how to tokenize the input\n"
-            "(that might contain multicharacter symbols).\n"
-            "If options -p and -S are used (i.e. the input is already tokenized), the symbol table parameter is optional,\n"
-            "but the epsilon symbol must be defined with option -e in order to be correctly mapped to number zero.\n"
-            "\n"
-       */
         fprintf(message_out, "Examples:\n"
             "  echo \"cat:dog\" | %s        create cat:dog fst\n"
             "  echo \"c:da:ot:g\" | %s -p   same as pairstring\n"
             "  echo \"c:d a:o t:g | %s -S   same with spaces\n"
             "\n", program_name, program_name, program_name);
         print_report_bugs();
+        fprintf(message_out, "\n");
         print_more_info();
         fprintf(message_out, "\n");
 }

@@ -79,6 +79,7 @@ print_usage()
 	    "  optimized-lookup-weighted, optimized-lookup-unweighted }.\n");
 	fprintf(message_out, "\n");
 	print_report_bugs();
+    fprintf(message_out, "\n");
 	print_more_info();
 }
 

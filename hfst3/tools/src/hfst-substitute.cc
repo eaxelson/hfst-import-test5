@@ -71,14 +71,14 @@ print_usage()
     print_common_unary_program_parameter_instructions(message_out);
     fprintf(message_out, "LABEL must be a symbol name of single arc in "
             "transducer\n");
-    /*fprintf(message_out,
+    fprintf(message_out,
            "\n"
            "Examples:\n"
-           "  %s -o deterministic.hfst indeterministic.hfst  determinizes "
-           "indeterministic.hfst \n"
-           "         writing results to deterministic.hfst\n"
-           "\n", program_name);*/
+           "  %s -o cg.hfst -F omor2cg.relabel omor.hfst  transform omor tags "
+           "cg \n"
+           "\n", program_name);
     print_report_bugs();
+    fprintf(message_out, "\n");
     print_more_info();
 
 }
