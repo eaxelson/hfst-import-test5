@@ -223,7 +223,8 @@ namespace hfst {
 
 	/** @brief Create a deep copy of transition \a another. */
       HfstTransition_(const HfstTransition_<C> &another): 
-	target_state(another.target_state), transition_data(another.transition_data) {}
+	target_state(another.target_state), transition_data(another.transition_data) 
+	  {}
 
 	/** @brief Whether this transition is less than transition \a
 	    another. Needed for storing transitions in a set. */
@@ -536,7 +537,8 @@ namespace hfst {
 	      return retval;
 
 	    // scan one line that can have a maximum of five fields
-	    char a1 [100]; char a2 [100]; char a3 [100]; char a4 [100]; char a5 [100];
+	    char a1 [100]; char a2 [100]; char a3 [100]; 
+	    char a4 [100]; char a5 [100];
 	    // how many fields could be parsed
 	    int n = sscanf(line, "%s\t%s\t%s\t%s\t%s", a1, a2, a3, a4, a5);
 	    
@@ -671,15 +673,16 @@ namespace hfst {
 	  // (all states handled)
 	}
 
+      protected:
 	struct substitution_data 
 	{
 	  HfstState origin_state;
 	  HfstState target_state;
 	  W weight;
-
-	  public substitution_data(HfstState origin, 
-				   HfstState target,
-				   W weight)
+	  
+	  substitution_data(HfstState origin, 
+			    HfstState target,
+			    W weight)
 	  {
 	    origin_state=origin;
 	    target_state=target;
@@ -687,24 +690,54 @@ namespace hfst {
 	  }
 	};
 
+	/* Add a copy of \a transducer with epsilon transitions between 
+	   states and with weight as defined in \a sub. */
 	void add_substitution(substitution_data &sub, HfstNet &transducer) {
-	  /*
-	  // Epsilon transition
+
+	  // Epsilon transition to initial state of \a transducer
 	  max_state++;
 	  HfstTransition_ <C> epsilon_transition
-	    (max_state, "@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@", sub.weight);
+	    (max_state, "@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@", 
+	     sub.weight);
 	  add_transition(sub.origin_state, epsilon_transition);
 
-	  // Copy \a transducer
-	  for (iterator it = transducer.begin(); it != transducer.end(); it++)
-	    {
-	      
+	  /* Offset between state numbers */
+	  unsigned int offset = max_state;
 
+	  // Copy \a transducer
+	  for (iterator it = transducer.begin(); 
+	       it != transducer.end(); it++)
+	    {
+	      for (typename HfstTransitionSet::iterator tr_it
+		     = it->second.begin();
+		   tr_it != it->second.end(); tr_it++)
+		{
+		  C data = tr_it->get_transition_data();
+		  
+		  HfstTransition_ <C> transition
+		    (tr_it->get_target_state() + offset, 
+		     data.get_input_symbol(),
+		     data.get_output_symbol(),
+		     data.get_weight());
+
+		  add_transition(it->first + offset, transition);
+		}
 	    }
 
-	  // Epsilon transitions
-	  */
+	  // Epsilon transitions from final states of \a transducer
+	  for (typename FinalWeightMap::iterator it 
+		 = transducer.final_weight_map.begin();
+	       it != transducer.final_weight_map.end(); it++)
+	    {
+	      HfstTransition_ <C> epsilon_transition
+		(sub.target_state, "@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@",
+		 it->second);
+	      add_transition(it->first + offset, epsilon_transition);
+	    }
 	}
+
+
+      public:
 
 	/** @brief Substitute all transitions \a old_symbol : \a new_symbol
 	    with a copy of \a transducer.
@@ -730,8 +763,8 @@ namespace hfst {
 	  
 	  // If neither symbol to be substituted is known to the transducer,
 	  // do nothing.
-	  if (alphabet.find(sp->first) == alphabet.end() && 
-	      alphabet.find(sp->second) == alphabet.end())
+	  if (alphabet.find(sp.first) == alphabet.end() && 
+	      alphabet.find(sp.second) == alphabet.end())
 	    return;
 
 	  // Where the substituting copies of \a transducer
@@ -755,14 +788,14 @@ namespace hfst {
 
 		  // Whether there is anything to substitute 
 		  // in this transition
-		  if (data.get_input_symbol().compare(sp->first) == 0 &&
-		      data.get_output_symbol().compare(sp->second) == 0) 
+		  if (data.get_input_symbol().compare(sp.first) == 0 &&
+		      data.get_output_symbol().compare(sp.second) == 0) 
 		    {
 		      // schedule a substitution
 		      substitutions.push_back(substitution_data
 					      (it->first, 
 					       tr_it->get_target_state(), 
-					       data->get_weight()))
+					       data.get_weight()));
 		      // schedule the old transition to be deleted
 		      old_transitions.push_back(tr_it);
 		    }
@@ -782,7 +815,7 @@ namespace hfst {
 	  // (all states gone trough)
 
 	  // Add the substitutions
-	  for (std::vector<substitution_data>::iterator IT 
+	  for (typename std::vector<substitution_data>::iterator IT 
 		 = substitutions.begin();
 	       IT != substitutions.end(); IT++)
 	    {
@@ -797,12 +830,15 @@ namespace hfst {
 	void substitute(const StringPair &old_pair, const StringPair &new_pair) {} 
 
 	/** @brief Insert freely any number of \a symbol_pair in 
-	    the transducer. */
-	void insert_freely(const StringPair &symbol_pair) 
+	    the transducer with weight \a weight. */
+	void insert_freely(const StringPair &symbol_pair, W weight) 
 	{	  
+	  alphabet.insert(symbol_pair.first);
+	  alphabet.insert(symbol_pair.second);
+
 	  for (iterator it = begin(); it != end(); it++) {
 	      HfstTransition_ <C> tr( it->first, symbol_pair.first, 
-				      symbol_pair.second, 0 );	      
+				      symbol_pair.second, weight );	      
 	      it->second.insert(tr);
 	    }
 	}
