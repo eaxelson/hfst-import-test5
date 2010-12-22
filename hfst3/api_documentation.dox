@@ -3,20 +3,26 @@
 
       <b>This page is still under construction...</b>
 
-      If you need documentation on HFST version 2, you find it <a href="http://hfst.sourceforge.net/hfst2/index.html">here</a>.
+      If you need documentation on HFST version 2, you find it 
+      <a href="http://hfst.sourceforge.net/hfst2/index.html">here</a>.
       The page is no longer updated and it is recommended to update to version 3.0.
 
-      Some changes:
+      Some changes from version 2 to 3:
 
-      - Namespace HFST and HWFST -> Namespace hfst and ImplementationType argument
+      - Namespaces HFST and HWFST: namespace hfst and an ImplementationType argument
 
-      - KeyLayer and SymbolLayer -> functions take a string argument, string-to-number mapping is done automatically
+      - KeyLayer and SymbolLayer: functions take a string argument, 
+      string-to-number mapping is done internally and automatically
 
-      - TransducerLayer -> HfstTransducer, RuleLayer -> namespace hfst::rules,  CoreExtensionLayer -> HfstInternalTransducer
+      - TransducerLayer, Rule Layer, CoreExtensionLayer: 
+      HfstTransducer, namespace hfst::rules, class HfstNet
  
-      - Functions delete their transducer arguments -> Functions modify their calling object and do not change their arguments
+      - Functions delete their transducer arguments: 
+      Functions modify their calling object and do not change their arguments
+      (unless otherwise said)
 
-      - unknown and identity symbols
+      - No unknown or identity symbols: unknown and identity symbols are supported
+      in all implementation formats
 
    */
 
@@ -27,18 +33,55 @@
 
       \section installing_library Installing the HFST API library
       
-      You can download the source code from the sourceforge
+      You can download the source code packet hfst-3.0.tar.gz from the sourceforge
       <a href="http://sourceforge.net/projects/hfst/files/hfst/">download page</a>.
+      Extract all files with the command
+
+\verbatim
+tar -xzvf hfst-3.0.tar.gz
+\endverbatim
+
+      move to directory hfst-3.0 and run the commands
+
+\verbatim
+autoreconf -i && ./configure && make && make install
+\endverbatim
 
       To successfully use the HFST library, you should have at least one of the backend libraries
       (<a href="http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html">SFST</a>, 
       <a href="http:://www.openfst.org">OpenFst</a> or 
       <a href="http://foma.sourceforge.net/">foma</a>) 
-      installed on your computer. The internal transducer format of HFST
+      installed on your computer. The in-built HfstNet format
       is very limited in its operations and used mainly for conversion between different binary
-      and text formats. The HFST optimized lookup transducer format comes with the source code,
+      and text formats. The HFST optimized lookup transducer format also comes with the source code,
       but it has also a very limited selection of operations as its main purpose is fast lookup
-      of strings.  
+      of strings. By default, the configure script will make HFST compile the interface
+      with all the backend implementations that are available on the computer. If you do not
+      want an implementation, you can specify it with configure options. For example
+
+\verbatim
+./configure --with-sfst=false
+\endverbatim
+
+      will exclude the SFST implementation. If the implementation is requested 
+
+\verbatim
+HfstTransducer tr("a", "b", SFST_TYPE);
+\endverbatim
+
+      an hfst::exceptions::ImplementationTypeNotAvailableException is thrown.
+
+      The command make will compile all the API and commandline tools and install
+      will install them to /usr/local. If you would rather install in eg. your home directory, 
+      you can tell ./configure:
+
+\verbatim
+./configure --prefix=${HOME}
+\endverbatim
+
+      If you want to compile or install just the API library without the
+      commandline tools, ... ?
+      
       */
 
 
@@ -443,6 +486,42 @@ namespace hfst {
 
       <b>This page is still under construction...</b>
 
+
+      \section using_hfst Using HFST in your own code
+
+      After <a href="InstallHfst.html">installing</a> HFST to your computer,
+      include file HfstTransducer.h to the beginning of your program file and link to the
+      HFST library.
+
+      For example, if you have SFST installed on your computer, the following simple program
+      named test.cc
+\verbatim
+#include <cstdio>
+#include "HfstTransducer.h"
+
+int main() 
+{
+  hfst::HfstTransducer tr1("foo", "bar", SFST_TYPE);
+  hfst::HfstTransducer tr2("bar", "baz", SFST_TYPE);
+  tr1.compose(tr2);
+  tr1.write_in_att_format(stdout);
+}
+\endverbatim
+
+compiled with the command (this may vary on different computers)
+
+\verbatim
+gcc test.cc -lhfst -o test
+\endverbatim
+
+should print to standard out the following text when run:
+
+\verbatim
+0      1     foo    baz
+1
+\endverbatim
+
+
       \section hfst_structure Structure of the API
 
 The HFST API is written in the namespace #hfst that contains the following classes:
@@ -470,31 +549,9 @@ and the following namespaces:
    - \link hfst::exceptions exceptions\endlink: A namespace for exceptions.
 
 
-      \section using_hfst Using HFST in your own code
+   \section hfst_examples Examples of HFST functionalities
 
-      Include file HfstTransducer.h and other relevant h-files to the beginning of your file.
-
-      For example, if you have SFST installed on your computer, the following simple program
-\verbatim
-#include <cstdio>
-#include "HfstTransducer.h"
-
-int main() 
-{
-  HfstTransducer tr1("foo", "bar", SFST_TYPE);
-  HfstTransducer tr2("bar", "baz", SFST_TYPE);
-  tr1.compose(tr2);
-  tr1.write_in_att_format(stdout);
-  return 0;
-}
-\endverbatim
-
-should print to standard out the following text:
-
-\verbatim
-0      1     foo    baz
-1
-\endverbatim
+   ...
       
    */
 
@@ -502,7 +559,10 @@ should print to standard out the following text:
 
 /** \mainpage 
 
-HFST - The Helsinki Finite-State Transducer technology is intended for creating and manipulating weighted or unweighted synchronic transducers implementing regular relations.
+<b>This page is still under construction...</b>
+
+HFST - The Helsinki Finite-State Transducer technology is intended for creating and 
+manipulating weighted or unweighted synchronic transducers implementing regular relations.
 Currently HFST has been implemented using the 
 <a href="http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html">SFST</a>, 
 <a href="http:://www.openfst.org">OpenFst</a> and 
@@ -511,16 +571,18 @@ Other versions may be added in some future release.
 SFST and foma implementations are unweighted and OpenFst implementation is weighted.
 
 Some of the HFST interface functionalities have also been implemented for 
-internal HFST and HFST optimized lookup transducer formats. The previous is
-useful for converting between transducer formats and storing transducers
+HFST's own two transducer formats, HfstNet and optimized lookup format.
+The previous is useful for converting between transducer formats and storing transducers
 in an implementation-independent format. The latter is used for fast lookup
 of strings in a transducer.
 
 All implementations work according to the same interface, so it is possible
 to compile the same piece of code using different backend libraries.
-It is also possible to add your own transducer library under the HFST interface.
+It is also possible to <a href="AddingYourLibrary.html">add</a> 
+your own transducer library under the HFST interface.
 
-The examples given in this documentation use <a href="http://www.xrce.xerox.com/Research-Development/Publications/1997-005/(language)">Xerox transducer notation</a>.
+The examples given in this documentation use 
+<a href="http://www.xrce.xerox.com/Research-Development/Publications/1997-005/(language)">Xerox transducer notation</a>.
 <!-- More info on SFST tools is in http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html,
 OpenFst in http://www.openfst.org and foma in http://www.aclweb.org/anthology/E/E09/E09-2008.pdf. -->
 
@@ -532,14 +594,14 @@ OpenFst in http://www.openfst.org and foma in http://www.aclweb.org/anthology/E/
 
    - <a href="AddingYourLibrary.html">Adding</a> your own transducer library under the HFST interface is easy
 
-   - Unknown and identity symbols are supported
+   - Unknown and identity \link hfst::String symbols\endlink are supported
 
 
 \section features Features
 
    - Create transducers \link hfst::implementations::HfstNet from scratch\endlink
 
-   - Iterate through a transducer's \link hfst::implementations::HfstNet states\endlink and \link hfst::implementations::HfstNet transitions\endlink
+   - \link hfst::implementations::HfstNet::iterator Iterate\endlink through a transducer's states and transitions
 
    - Create transducers by \link hfst::HfstTokenizer tokenizing\endlink UTF-8 strings with multicharacter symbols
 
@@ -554,7 +616,7 @@ OpenFst in http://www.openfst.org and foma in http://www.aclweb.org/anthology/E/
 
    - <a href="AddingYourLibrary.html">Adding</a> your own implementation of HFST
 
-   - <a href="VersionDifferences.html">Differences</a> between HFST version 2 and 3...
+   - <a href="VersionDifferences.html">Differences</a> between HFST version 2 and 3
 
 
 \section download_hfst Download

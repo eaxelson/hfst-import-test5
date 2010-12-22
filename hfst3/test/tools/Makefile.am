@@ -36,8 +36,8 @@ TESTS=hfst-check-version.sh hfst-check-help.sh empty-input.sh\
 	  split-functionality.sh head-functionality.sh tail-functionality.sh \
 	  calculate-functionality.sh format-functionality.sh \
 	  compose-intersect-functionality.sh lookup-functionality.sh \
-	  lexc-compiler-functionality.sh xfst-functionality.sh \
-	  lexc-functionality.sh
+	  lexc-compiler-functionality.sh \
+	  lexc-functionality.sh # xfst-functionality.sh
 check_DATA=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   cat2cat_or_CAT_uppercased.hfst cat2CAT_uppercased.hfst cat2dog.hfst \
 		   cat+dog.hfst catdog.hfst cat_or_dog.hfst cat.hfst \
@@ -82,7 +82,7 @@ FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-out1.strings \
 		 proc-cat-out.strings proc-cat-weighted-out.strings
 SUBSTITUTE_TXTS=cat2dog.substitute
 XRE_TXTS=cats_and_dogs.xre
-XFST_TXTS=cat-regex.xfst
+#XFST_TXTS=cat-regex.xfst
 
 %.hfst: %.txt
 	${top_builddir}/tools/src/hfst-txt2fst -e '@0@' < $< > $@

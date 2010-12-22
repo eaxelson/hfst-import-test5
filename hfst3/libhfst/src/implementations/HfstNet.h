@@ -18,40 +18,91 @@ namespace hfst {
     own transducer format. */
 
 namespace hfst {
+
+  /** @brief A namespace for all code that forms a bridge between
+      backend libraries and HFST or is not else directly accessible
+      through the HFST API. */
   namespace implementations {
 
     /** @brief The number of a state in an HfstNet. */
     typedef unsigned int HfstState;
 
+    // Needed by class TransitionData
+    struct string_comparison {
+      bool operator() (const std::string &str1, const std::string &str2) const {
+	return (str1.compare(str2) < 0);
+      }
+    };
 
     /** @brief One implementation of template class C in 
 	HfstTransition. 
 
+	A TransitionData has an input symbol and an output symbol of type
+	SymbolType (string) and a weight of type WeightType (float).
+
+	\internal Actually a TransitionData has an input and an output number
+	of type unsigned int, but this implementation is hidden from the user.
+	The class has two static maps and functions that take care of conversion
+	between strings and internal numbers.
+
 	@see HfstTransition HfstArc */
-    struct TransitionData {
+    class TransitionData {
+    public:
       /** @brief The input and output symbol type. */
       typedef std::string SymbolType;
       /** @brief The weight type. */
       typedef float WeightType;
-      /** @brief The input symbol. */
-      SymbolType input_symbol;
-      /** @brief The output symbol. */
-      SymbolType output_symbol;
-      /** @brief The transition weight. */
+
+      typedef std::map<unsigned int, SymbolType> Number2SymbolMap;
+      typedef std::map<SymbolType, unsigned int, string_comparison> Symbol2NumberMap;
+
+    public: /* Fix this */
+      /* Maps that contain information of the mappings between strings and numbers */
+      static Number2SymbolMap number2symbol_map;
+      static Symbol2NumberMap symbol2number_map;
+      /* Next free number */
+      static unsigned int max_number;
+
+    protected:
+      /* Get the symbol that is mapped as number */
+      static std::string get_symbol(unsigned int number) {
+	Number2SymbolMap::iterator it = number2symbol_map.find(number);
+	if (it == number2symbol_map.end()) {
+	  fprintf(stderr, "ERROR: TransitionData::get_symbol(unsigned int number) "
+		          "number is not mapped to any symbol\n");
+	  throw hfst::exceptions::HfstInterfaceException();
+	}
+	return it->second;
+      }
+
+      /* Get the number that is used to represent the symbol */
+      static unsigned int get_number(const std::string &symbol) {
+	Symbol2NumberMap::iterator it = symbol2number_map.find(symbol);
+	if (it == symbol2number_map.end()) {
+	  max_number++;
+	  symbol2number_map[symbol] = max_number;
+	  number2symbol_map[max_number] = symbol;
+	  return max_number;
+	}
+	return it->second;
+      }
+
+    private:
+      /* The actual transition data */
+      unsigned int input_number;
+      unsigned int output_number;
       WeightType weight;
 
-      /** @brief Create a TransitionData with empty input and output
+    public:
+
+      /** @brief Create a TransitionData with epsilon input and output
 	  strings and weight zero. */
-      TransitionData() {
-	input_symbol="";
-	output_symbol="";
-	weight=0;
-      }
+    TransitionData(): input_number(0), output_number(0), weight(0) {}
 
       /** @brief Create a deep copy of TransitionData \a data. */
       TransitionData(const TransitionData &data) {
-	input_symbol = data.input_symbol;
-	output_symbol = data.output_symbol;
+	input_number = data.input_number;
+	output_number = data.output_number;
 	weight = data.weight;
       }
 
@@ -60,11 +111,24 @@ namespace hfst {
       TransitionData(SymbolType isymbol,
 		     SymbolType osymbol,
 		     WeightType weight) {
-	input_symbol=isymbol;
-	output_symbol=osymbol;
-	this->weight=weight;
+	input_number = get_number(isymbol);
+	output_number = get_number(osymbol);
+	this->weight = weight;
       }
 
+      SymbolType get_input_symbol() {
+	return get_symbol(input_number);
+      }
+
+      SymbolType get_output_symbol() {
+	return get_symbol(output_number);
+      }
+
+      WeightType get_weight() {
+	return weight;
+      }
+
+      /* Are these needed? */
       static bool is_epsilon(const SymbolType &symbol) {
 	return (symbol.compare("@_EPSILON_SYMBOL_@") == 0);
       }
@@ -76,19 +140,54 @@ namespace hfst {
       }
 
       /** @brief Whether this transition is less than transition 
-	  \a another. */
+	  \a another. 
+
+	  /internal is it too slow if strin comparison is used instead?
+      */
       bool operator<(const TransitionData &another) const {
-	if (input_symbol.compare(another.input_symbol) < 0)
+	if (input_number < another.input_number )
 	  return true;
-	if (input_symbol.compare(another.input_symbol) > 0)
+	if (input_number > another.input_number)
 	  return false;
-	if (output_symbol.compare(another.output_symbol) < 0)
+	if (output_number < another.output_number)
 	  return true;
-	if (output_symbol.compare(another.output_symbol) > 0)
+	if (output_number > another.output_number)
 	  return false;
 	return (weight < another.weight);
       }
+
+      friend class Number2SymbolMapInitializer;
+      friend class Symbol2NumberMapInitializer;
     };
+
+    // Initialization of static members in class TransitionData..
+    class Number2SymbolMapInitializer {
+    public:
+      Number2SymbolMapInitializer(TransitionData::Number2SymbolMap &map) {
+	map[0] = std::string("@_EPSILON_SYMBOL_@");
+	map[1] = std::string("@_UNKNOWN_SYMBOL_@");
+	map[2] = std::string("@_IDENTITY_SYMBOL_@");
+      }
+    };
+
+    class Symbol2NumberMapInitializer {
+    public:
+      Symbol2NumberMapInitializer(TransitionData::Symbol2NumberMap &map) {
+	map["@_EPSILON_SYMBOL_@"] = 0;
+	map["@_UNKNOWN_SYMBOL_@"] = 1;
+	map["@_IDENTITY_SYMBOL_@"] = 2;
+      }
+    };
+
+    TransitionData::Number2SymbolMap TransitionData::number2symbol_map;
+    Number2SymbolMapInitializer dummy1(TransitionData::number2symbol_map);
+
+    TransitionData::Symbol2NumberMap TransitionData::symbol2number_map;
+    Symbol2NumberMapInitializer dummy2(TransitionData::symbol2number_map);
+
+    unsigned int TransitionData::max_number=2;
+    // ..initialization done
+
 
     /** @brief A transition that consists of a target state and 
 	transition data represented by class C. 
@@ -249,6 +348,7 @@ namespace hfst {
 	/** @brief Create a transducer with one initial state that has state
 	    number zero and is not a final state, i.e. an empty transducer. */
 	HfstNet(void) {
+	  initialize_alphabet(alphabet);
 	  state_map[0]=std::set<HfstTransition_ <C> >();
 	}
 
@@ -261,8 +361,61 @@ namespace hfst {
 
 	/** @brief Create an HfstNet equivalent to HfstTransducer \a transducer. */
 	HfstNet(const HfstTransducer &transducer) {
+	  initialize_alphabet(alphabet);
 	  throw hfst::exceptions::FunctionNotImplementedException
 	    ("HfstNet(const HfstTransducer &transducer)");
+	}
+
+	void initialize_alphabet(HfstNetAlphabet &alpha) {
+	  alpha.insert("@_EPSILON_SYMBOL_@");
+	  alpha.insert("@_UNKNOWN_SYMBOL_@");
+	  alpha.insert("@_IDENTITY_SYMBOL_@");
+	}
+
+	/** @brief Add a symbol to the alphabet of the transducer. */
+	void add_symbol_to_alphabet(const std::string &symbol) {
+	  alphabet.insert(symbol);
+	}
+
+	/** @brief Remove all symbols that do not occur in transitions of
+	    the transducer from its alphabet. */
+	void prune_alphabet() {
+
+	  // Which symbols occur in the transducer
+	  HfstNetAlphabet symbols_found;
+	  initialize_alphabet(symbols_found); /* special symbols are always known */
+
+	  for (iterator it = begin(); it != end(); it++)
+	    {
+	      for (typename HfstTransitionSet::iterator tr_it
+		     = it->second.begin();
+		   tr_it != it->second.end(); tr_it++)
+		{
+		  C data = tr_it->get_transition_data();
+		  
+		  symbols_found.insert(data.get_input_symbol());
+		  symbols_found.insert(data.get_output_symbol());
+		}
+	    }
+	  
+	  // Which symbols in the transducer's alphabet did not occur in 
+	  // the transducer
+	  HfstNetAlphabet symbols_not_found;
+
+	  for (typename HfstNetAlphabet::iterator it = alphabet.begin();
+	       it != alphabet.end(); it++) 
+	    {
+	      if (symbols_found.find(*it) == symbols_found.end())
+		symbols_not_found.insert(*it);
+	    }
+
+	  // Remove the symbols that did not occur in the transducer
+	  // from its alphabet
+	  for (typename HfstNetAlphabet::iterator it = symbols_not_found.begin();
+	       it != symbols_not_found.end(); it++)
+	    {
+	      alphabet.erase(*it);
+	    }
 	}
 
 	/** @brief Add a state \a s to this net.
@@ -278,11 +431,11 @@ namespace hfst {
 	    If state \a s does not exist, it is created. */
 	void add_transition(HfstState s, HfstTransition_<C> transition) {
 
-	  const C data = transition.get_transition_data();
+	  C data = transition.get_transition_data();
 	  add_state(s);
 	  add_state(transition.get_target_state());
-	  alphabet.insert(data.input_symbol);
-	  alphabet.insert(data.output_symbol);
+	  alphabet.insert(data.get_input_symbol());
+	  alphabet.insert(data.get_output_symbol());
 	  state_map[s].insert(transition);
 	}
 
@@ -344,10 +497,10 @@ namespace hfst {
 		  
 		  os <<  it->first << "\t" 
 		     <<  tr_it->get_target_state() << "\t"
-		     <<	 data.input_symbol.c_str() << "\t"
-		     <<	 data.output_symbol.c_str();
+		     <<	 data.get_input_symbol().c_str() << "\t"
+		     <<	 data.get_output_symbol().c_str();
 		  if (write_weights)
-		    os <<  "\t" << data.weight; 
+		    os <<  "\t" << data.get_weight(); 
 		  os << "\n";
 		}
 	      if (is_final_state(it->first))
@@ -451,7 +604,7 @@ namespace hfst {
 		     = it->second.begin();
 		   tr_it != it->second.end(); tr_it++)
 		{
-		  const C data = tr_it->get_transition_data();
+		  C data = tr_it->get_transition_data();
 
 		  // Whether there is anything to substitute 
 		  // in this transition
@@ -460,20 +613,20 @@ namespace hfst {
 		  std::string new_output_symbol;
 
 		  if (input_side && 
-		      data.input_symbol.compare(old_symbol) == 0) {
+		      data.get_input_symbol().compare(old_symbol) == 0) {
 		    new_input_symbol = new_symbol;
 		    substitution_made=true;
 		  }
 		  else
-		    new_input_symbol=data.input_symbol;
+		    new_input_symbol=data.get_input_symbol();
 
 		  if (output_side && 
-		      data.output_symbol.compare(old_symbol) == 0) {
+		      data.get_output_symbol().compare(old_symbol) == 0) {
 		    new_output_symbol = new_symbol;
 		    substitution_made=true;
 		  }
 		  else
-		    new_output_symbol=data.output_symbol;
+		    new_output_symbol=data.get_output_symbol();
 
 		  // If there is something to substitute,
 		  if (substitution_made) {
@@ -481,7 +634,7 @@ namespace hfst {
 		      (tr_it->get_target_state(),
 		       new_input_symbol,
 		       new_output_symbol,
-		       data.weight);
+		       data.get_weight());
 
 		    // schedule the old transition to be deleted and
 		    // the new transition to be added
@@ -519,14 +672,18 @@ namespace hfst {
 
 	/** @brief Insert freely any number of \a symbol_pair in 
 	    the transducer. */
-	void insert_freely(const StringPair &symbol_pair) {
-	  return;
+	void insert_freely(const StringPair &symbol_pair) 
+	{	  
+	  for (iterator it = begin(); it != end(); it++) {
+	      HfstTransition_ <C> tr( it->first, symbol_pair.first, 
+				      symbol_pair.second, 0 );	      
+	      it->second.insert(tr);
+	    }
 	}
       
 	/** @brief Disjunct this transducer with a one-path transducer 
 	    defined by string pair vector \a spv. */
 	void disjunct(const StringPairVector &spv) {
-	  return;
 	}	
 
 	friend class hfst::HfstTransducer;

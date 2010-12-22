@@ -18,7 +18,8 @@
 #include "optimized-lookup/convert.h"
 
 #ifndef DEBUG_MAIN
-namespace hfst { namespace implementations
+namespace hfst { 
+namespace implementations
 {
 
 #if HAVE_SFST

@@ -132,9 +132,9 @@ namespace hfst { namespace implementations
 #if HAVE_FOMA
 // Both input and output symbol tables of internal format will contain
 // all symbols in the sigma of the foma transducer
-  HfstInternalTransducer * foma_to_internal_hfst_format(struct fsm * t) {
+  HfstFsm * foma_to_hfst_net(struct fsm * t) {
 
-  HfstInternalTransducer * internal_transducer = new HfstInternalTransducer();
+  HfstFsm * net = new HfstFsm();
   struct fsm_state *fsm;
   fsm = t->states;
   int start_state_id = -1;
