@@ -330,6 +330,7 @@ namespace hfst {
 	FinalWeightMap final_weight_map;
 	typedef std::set<typename C::SymbolType> HfstNetAlphabet;
 	HfstNetAlphabet alphabet;
+	unsigned int max_state;
 
       public:
 	/** @brief A set of transitions of a state in an HfstNet. */
@@ -347,13 +348,13 @@ namespace hfst {
 
 	/** @brief Create a transducer with one initial state that has state
 	    number zero and is not a final state, i.e. an empty transducer. */
-	HfstNet(void) {
+        HfstNet(void): max_state(0) {
 	  initialize_alphabet(alphabet);
 	  state_map[0]=std::set<HfstTransition_ <C> >();
 	}
 
 	/** @brief Create a deep copy of HfstNet \a net. */
-	HfstNet(const HfstNet &net) {
+        HfstNet(const HfstNet &net): max_state(net.max_state) {
 	  state_map = net.state_map;
 	  final_weight_map = net.final_weight_map;
 	  alphabet = alphabet;
@@ -424,6 +425,8 @@ namespace hfst {
 	void add_state(HfstState s) {
 	  if (state_map.find(s) == state_map.end())
 	    state_map[s]=std::set<HfstTransition_ <C> >();
+	  if (max_state < s)
+	    max_state=s;
 	}
 
 	/** @brief Add a transition \a transition to state \a s. 
@@ -454,6 +457,8 @@ namespace hfst {
 
 	    If the state does not exist, it is created. */
 	void set_final_weight(HfstState s, const W & weight) {
+	  if (s > max_state)
+	    max_state=s;
 	  final_weight_map[s] = weight;
 	}
 
@@ -480,6 +485,8 @@ namespace hfst {
 	    If the state does not exist, it is created. The created
 	    state has an empty set of transitions. */
 	std::set<HfstTransition_<C> > & operator[](HfstState s) {
+	  if (s > max_state)
+	    max_state=s;
 	  return state_map[s];
 	}	
 
@@ -664,10 +671,129 @@ namespace hfst {
 	  // (all states handled)
 	}
 
+	struct substitution_data 
+	{
+	  HfstState origin_state;
+	  HfstState target_state;
+	  W weight;
+
+	  public substitution_data(HfstState origin, 
+				   HfstState target,
+				   W weight)
+	  {
+	    origin_state=origin;
+	    target_state=target;
+	    this->weight=weight;
+	  }
+	};
+
+	void add_substitution(substitution_data &sub, HfstNet &transducer) {
+	  /*
+	  // Epsilon transition
+	  max_state++;
+	  HfstTransition_ <C> epsilon_transition
+	    (max_state, "@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@", sub.weight);
+	  add_transition(sub.origin_state, epsilon_transition);
+
+	  // Copy \a transducer
+	  for (iterator it = transducer.begin(); it != transducer.end(); it++)
+	    {
+	      
+
+	    }
+
+	  // Epsilon transitions
+	  */
+	}
+
+	/** @brief Substitute all transitions \a old_symbol : \a new_symbol
+	    with a copy of \a transducer.
+
+	    Copies of \a transducer are attached to this transducer with
+	    epsilon transitions. 
+	    
+	    The weights of the transitions to be substituted are copied
+	    to epsilon transitions leaving from the source state of
+	    the transitions to be substituted to the initial state
+	    of a copy of \a transducer.
+
+	    The final weights in \a 
+	    transducer are copied to epsilon transitions leading from
+	    the final states (after substitution non-final states)
+	    of \a transducer to target states of transitions
+	    \a old_symbol : \a new_symbol (that are substituted)
+	    in this transducer.
+	    
+	    @pre This transducer and \a transducer are harmonized.
+	*/
+	void substitute(const StringPair &sp, HfstNet &transducer) {
+	  
+	  // If neither symbol to be substituted is known to the transducer,
+	  // do nothing.
+	  if (alphabet.find(sp->first) == alphabet.end() && 
+	      alphabet.find(sp->second) == alphabet.end())
+	    return;
+
+	  // Where the substituting copies of \a transducer
+	  // are inserted (source state, target state, weight)
+	  std::vector<substitution_data> substitutions;
+
+	  // Go through all states
+	  for (iterator it = begin(); it != end(); it++)
+	    {
+
+	      // The transitions that are substituted, i.e. removed
+	      std::vector<typename HfstTransitionSet::iterator> 
+		old_transitions;
+
+	      // Go through all transitions
+	      for (typename HfstTransitionSet::iterator tr_it
+		     = it->second.begin();
+		   tr_it != it->second.end(); tr_it++)
+		{
+		  C data = tr_it->get_transition_data();
+
+		  // Whether there is anything to substitute 
+		  // in this transition
+		  if (data.get_input_symbol().compare(sp->first) == 0 &&
+		      data.get_output_symbol().compare(sp->second) == 0) 
+		    {
+		      // schedule a substitution
+		      substitutions.push_back(substitution_data
+					      (it->first, 
+					       tr_it->get_target_state(), 
+					       data->get_weight()))
+		      // schedule the old transition to be deleted
+		      old_transitions.push_back(tr_it);
+		    }
+		  // (one transition gone through)
+		} 
+	      // (all transitions in a state gone through)
+
+	      // Remove the substituted transitions
+	      for (typename std::vector<typename 
+		     HfstTransitionSet::iterator>::iterator IT =
+		     old_transitions.begin(); 
+		   IT != old_transitions.end(); IT++) {
+		it->second.erase(*IT);
+	      }
+
+	    }
+	  // (all states gone trough)
+
+	  // Add the substitutions
+	  for (std::vector<substitution_data>::iterator IT 
+		 = substitutions.begin();
+	       IT != substitutions.end(); IT++)
+	    {
+	      add_substitution(*IT, transducer);
+	    }
+	}
+
+
 	// TODO:
 	void substitute(const StringPair &sp, const StringPairSet &sps) {}
 	void substitute(void (*func)(std::string &isymbol, std::string &osymbol) ) { }  
-	void substitute(const StringPair &sp, HfstNet &transducer) {}
 	void substitute(const StringPair &old_pair, const StringPair &new_pair) {} 
 
 	/** @brief Insert freely any number of \a symbol_pair in 
@@ -681,11 +807,79 @@ namespace hfst {
 	    }
 	}
       
-	/** @brief Disjunct this transducer with a one-path transducer 
-	    defined by string pair vector \a spv. */
-	void disjunct(const StringPairVector &spv) {
-	}	
+      protected:
+	/* Disjunct the transition of path \a spv pointed by \a it
+	   to state \a s. If the transition does not exist in the transducer,
+	   it is created as well as its target state.
 
+	   @return The final state of path \a spv, when \a it is at end. */
+	HfstState disjunct(const StringPairVector &spv, 
+			   StringPairVector::const_iterator &it,
+			   HfstState s)
+	{
+	  // Path inserted, return the final state on this path
+	  if (it == spv.end()) {
+	    return s;
+	  }
+
+	  HfstTransitionSet tr = state_map[s];
+	  bool transition_found=false;
+	  /* The target state of the transition followed or added */
+	  HfstState next_state; 
+
+	  // Find the transition
+	  // (Searching is slow..)
+	  for (typename HfstTransitionSet::iterator tr_it = tr.begin();
+	       tr_it != tr.end(); tr_it++)
+	    {
+	      C data = tr_it->get_transition_data();
+	      if (data.get_input_symbol().compare(it->first) == 0 &&
+		  data.get_output_symbol().compare(it->second) == 0)
+		{
+		  transition_found=true;
+		  next_state = tr_it->get_target_state();
+		  break;
+		}
+	    }
+
+	  // If not found, create the transition
+	  if (not transition_found)
+	    {
+	      max_state++;
+	      next_state = max_state;
+	      HfstTransition_ <C> transition(next_state, it->first,
+					     it-> second, 0);
+	      add_transition(s, transition);
+	    }
+
+	  // Advance to the next transition on path
+	  it++;
+	  return disjunct(spv, it, next_state);
+	}
+	
+      public:
+	
+	/** @brief Disjunct this transducer with a one-path transducer 
+	    defined by string pair vector \a spv with weight \a weight. 
+	    
+	    @pre This transducer must be a trie where all weights are in
+	    final states, i.e. all transitions have a zero weight. */
+	void disjunct(const StringPairVector &spv, W weight) 
+	{
+	  StringPairVector::const_iterator it = spv.begin();
+	  HfstState initial_state = 0;
+	  HfstState final_state = disjunct(spv, it, initial_state);
+
+	  // Set weight of final state
+	  if (is_final_state(final_state)) 
+	    {
+	      float old_weight = get_final_weight(final_state);
+	      if (old_weight < weight) 
+		return; /* The same path with smaller weight remains */
+	    }
+	  set_final_weight(final_state, weight);
+	}	
+	
 	friend class hfst::HfstTransducer;
       };
 
