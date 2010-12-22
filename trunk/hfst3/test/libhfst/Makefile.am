@@ -13,4 +13,4 @@ test_SOURCES=test.cc
 TESTS=test
 
 # files needed for test programs
-EXTRA_DIST=test.att
+# EXTRA_DIST=test.att
