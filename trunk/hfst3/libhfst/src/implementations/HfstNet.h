@@ -491,6 +491,11 @@ namespace hfst {
 	  return state_map[s];
 	}	
 
+	/* TODO: Change state numbers s1 to s2 and vice versa. */
+	void swap_state_numbers(HfstState s1, HfstState s2) {
+	  throw hfst::exceptions::FunctionNotImplementedException();
+	}
+
 	/** @brief Write the net in AT&T format to ostream \a os.
 	    \a write_weights defines whether weights are printed. */
 	void write_in_att_format(std::ostream &os, bool write_weights=true) 

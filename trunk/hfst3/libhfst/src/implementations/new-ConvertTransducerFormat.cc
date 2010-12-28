@@ -22,14 +22,25 @@ namespace hfst { namespace implementations
 {
 
 #if HAVE_SFST
+  /* Recursively copy all transitions of \a node to \a net.
+     Used by function sfst_to_hfst_net(SFST::Transducer * t).
+
+     @param node  The current node in the SFST transducer
+     @param index  A map that maps nodes to integers
+     @param visited_nodes  Which nodes have already been visited
+     @param net  The HfstFsm that is being created
+     @param alphabet  The alphabet of the SFST transducer
+  */
   void sfst_to_hfst_net( SFST::Node *node, SFST::NodeNumbering &index, 
 			 std::set<SFST::Node*> &visited_nodes, 
 			 HfstFsm *net, SFST::Alphabet &alphabet ) {
   
-    // if node has not been visited before
+    // If node has not been visited before
     if (visited_nodes.find(node) == visited_nodes.end() ) { 
       visited_nodes.insert(node);
       SFST::Arcs *arcs=node->arcs();
+
+      // Go through all transitions and copy them to \a net
       for( SFST::ArcsIter p(arcs); p; p++ ) {
 	SFST::Arc *arc=p;
 	net->add_transition(index[node], 
@@ -41,8 +52,12 @@ namespace hfst { namespace implementations
 					 (arc->label().upper_char())),
 			     0));
       }
+
       if (node->is_final())
 	net->set_final(index[node],0);
+
+      // Call this function recursively for all target nodes
+      // of the transitions
       for( SFST::ArcsIter p(arcs); p; p++ ) {
 	SFST::Arc *arc=p;
 	sfst_to_internal(arc->target_node(), index, 
@@ -52,32 +67,42 @@ namespace hfst { namespace implementations
     }
   }
 
+  /* Create an HfstFsm equivalent to an SFST transducer \a t. */
   HfstFsm * sfst_to_hfst_net(SFST::Transducer * t) {
   
     HfstFsm * net = new HfstFsm();
+    // A map that maps nodes to integers
     SFST::NodeNumbering index(*t);
+    // The set of nodes that have been visited
     std::set<SFST::Node*> visited_nodes;
+   
     sfst_to_internal(t->root_node(), index, 
 		     visited_nodes, 
 		     net, t->alphabet);
     
+    // Make sure that also symbols that occur in the alphabet of the
+    // transducer t but not in its transitions are inserted to net
     SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
     for (SFST::Alphabet::CharMap::const_iterator it 
-	   = cm.begin(); it != cm.end(); it++) {
-      if (it->first != 0) // "<>" is not inserted
-	net->alphabet->insert(std::string(it->second));
-      // this function must be a friend of HfstNet
-    }
+	   = cm.begin(); it != cm.end(); it++) 
+      {
+	if (it->first != 0) // The epsilon symbol "<>" is not inserted
+	  {
+	    net->alphabet->insert(std::string(it->second));
+	  }
+      }
     
     return net;
   }
 
 
+  /* Create an SFST::Transducer equivalent to HfstFsm \a net. */
   SFST::Transducer * hfst_net_to_sfst(const HfstFsm * net) {
 
   SFST::Transducer * t = new SFST::Transducer();
 
-  std::map<unsigned int,SFST::Node*> state_map;
+  // Map that maps states of \a net to SFST nodes
+  std::map<HfstState, SFST::Node*> state_map;
   state_map[0] = t->root_node();
 
   // Go through all states
@@ -90,6 +115,7 @@ namespace hfst { namespace implementations
 	{
 	  TransitionData data = tr_it->get_transition_data();
 
+	  // Create new nodes, if needed
 	  if (state_map.find(it->first) == state_map.end())
 	    state_map[it->first] = t->new_node();
 
@@ -99,7 +125,8 @@ namespace hfst { namespace implementations
 	  SFST::Label l
 	    (t->alphabet.add_symbol(data.input_symbol.c_str()),
 	     t->alphabet.add_symbol(data.output_symbol.c_str()));
-
+	  
+	  // Copy transition to node
 	  state_map[it->first]->add_arc(l,
 					state_map[tr_it->get_target_state()],
 					t);
@@ -115,8 +142,8 @@ namespace hfst { namespace implementations
       state_map[it->first]->set_final(1);
     }
 
-  // Add symbols that occur in HfstFsm's alphabet but not in
-  // any of its transition to SFST::Transducer's alphabet
+  // Make sure that also symbols that occur in the alphabet of the
+  // HfstFsm but not in its transitions are inserted to the SFST transducer
   for (HfstFsm::HfstNetAlphabet::iterator it = net->alphabet.begin();
        it != net->alphabet.end(); it++)
     t->alphabet.add_symbol(it->c_str());
@@ -165,18 +192,21 @@ namespace hfst { namespace implementations
       }
     }
 
+char *sigma_string(int number, struct sigma *sigma) {
+
     // 2. If there are transitions leaving from the state,
     if ((fsm+i)->target != -1) {
-      //printf("add_line\n");
-      internal_transducer
-	->add_line((fsm+i)->state_no,
-		   (fsm+i)->target, (fsm+i)->in, (fsm+i)->out, 0);
+      net->add_transition((fsm+i)->state_no,
+			  HfstArc
+			  ((fsm+i)->target,
+			   std::string (sigma_string((fsm+i)->in, t->sigma)), 
+			   std::string (sigma_string((fsm+i)->out, t->sigma)),
+			   0));      
     }
     
     // 3. If the source state is final in foma,
     if ((fsm+i)->final_state == 1) {
-      //printf("add_final_line\n");
-      internal_transducer->add_line((fsm+i)->state_no, 0);
+      net->set_final_weight((fsm+i)->state_no, 0);
     }
 
   }
@@ -188,19 +218,19 @@ namespace hfst { namespace implementations
   }
   
   // If start state number (N) is not zero, swap state numbers N and zero 
-  // in internal transducer.
+  // in internal transducer. TODO
   if (start_state_id != 0)
-    internal_transducer->swap_states(start_state_id,0);
+    net->swap_state_numbers(start_state_id,0);
 
   struct sigma * p = t->sigma;
   while (p != NULL) {
     if (p->symbol == NULL)
       break;
-    internal_transducer->alphabet->add_symbol(p->symbol, p->number);
+    net->alphabet->insert(std::string(p->symbol));
     p = p->next;
   }
 
-  return internal_transducer;
+  return net;
 }
 #endif // HAVE_FOMA
 
@@ -209,11 +239,10 @@ namespace hfst { namespace implementations
 
 
 #if HAVE_OPENFST
-  HfstInternalTransducer * tropical_ofst_to_internal_hfst_format
+  HfstFsm * tropical_ofst_to_hfst_net
   (fst::StdVectorFst * t) {
 
-  HfstInternalTransducer * internal_transducer = 
-    new HfstInternalTransducer();
+  HfstFsm * net = new HfstFsm();
 
   // an empty transducer
   if (t->Start() == fst::kNoStateId)
@@ -221,10 +250,9 @@ namespace hfst { namespace implementations
       for ( fst::SymbolTableIterator it = 
 	      fst::SymbolTableIterator(*(t->InputSymbols()));
 	    not it.Done(); it.Next() ) {
-	internal_transducer->alphabet
-	  ->add_symbol( it.Symbol().c_str(), (unsigned int)it.Value() );
+	net->alphabet.insert( it.Symbol() );
       }    
-      return internal_transducer;
+      return net;
     }      
 
   // this takes care that initial state is always printed as number zero
@@ -260,11 +288,18 @@ namespace hfst { namespace implementations
 	      target = 0;
 	    else
 	      target = (int)arc.nextstate;
-	    internal_transducer->add_line(origin, target,
-	      arc.ilabel, arc.olabel, arc.weight.Value() );
+
+	    net->add_transition(origin, 
+				HfstArc
+				(target,
+				 t->InputSymbols()->Find(arc.ilabel),
+				 t->InputSymbols()->Find(arc.olabel),
+				 arc.weight.Value()
+				 ));
 	  }
-	if (t->Final(s) != fst::TropicalWeight::Zero())
-	  internal_transducer->add_line(origin, t->Final(s).Value());
+	if (t->Final(s) != fst::TropicalWeight::Zero()) {
+	  net->set_final_weight(origin, t->Final(s).Value());
+	}
 	break;
 	}
       }
@@ -292,22 +327,27 @@ namespace hfst { namespace implementations
 		target = 0;
 	      else
 		target = (int)arc.nextstate;
-	      internal_transducer->add_line(origin, target,
-		arc.ilabel, arc.olabel, arc.weight.Value());
+
+	      net->add_transition(origin, 
+				  HfstArc
+				  (target,
+				   t->InputSymbols()->Find(arc.ilabel),
+				   t->InputSymbols()->Find(arc.olabel),
+				   arc.weight.Value()
+				   ));
 	    }
 	  if (t->Final(s) != fst::TropicalWeight::Zero())
-	    internal_transducer->add_line(origin, t->Final(s).Value());
+	    net->set_final_weight(origin, t->Final(s).Value());
 	}
       }
 
     for ( fst::SymbolTableIterator it = 
 	    fst::SymbolTableIterator(*(t->InputSymbols()));
 	  not it.Done(); it.Next() ) {
-      internal_transducer->alphabet
-	->add_symbol( it.Symbol().c_str(), (unsigned int)it.Value() );
+      net->alphabet->insert( it.Symbol() );
     }    
 
-    return internal_transducer;
+    return net;
 }
 
 HfstInternalTransducer * log_ofst_to_internal_hfst_format(LogFst * t) {
@@ -495,32 +535,43 @@ HfstInternalTransducer * hfst_ol_to_internal_hfst_format(hfst_ol::Transducer * t
 #if HAVE_FOMA
 // SymbolTable is converted to sigma, but the string-to-number
 // relations are changed...
-struct fsm * hfst_internal_format_to_foma(const HfstInternalTransducer * internal_transducer) {
+struct fsm * hfst_net_to_foma(const HfstFsm * hfst_fsm) {
 
   struct fsm_construct_handle *h;
   struct fsm *net;
   h = fsm_construct_init(strdup(std::string("").c_str()));
 
-  const std::set<InternalTransducerLine> *lines = internal_transducer->get_lines();
-  for (std::set<InternalTransducerLine>::const_iterator it = lines->begin();
-       it != lines->end(); it++) 
+  // Go through all states
+  for (HfstFsm::iterator it = hfst_fsm->begin();
+       it != hfst_fsm->end(); it++)
     {
-      if (it->final_line)
-	fsm_construct_set_final(h, (int)it->origin);
-      else 
+      // Go through the set of transitions in each state
+      for (HfstFsm::HfstTransitionSet::iterator tr_it = it->second.begin();
+	   tr_it != it->second.end(); tr_it++)
 	{
-	  char *in = strdup(internal_transducer->alphabet->code2symbol(it->isymbol));
-	  char *out = strdup(internal_transducer->alphabet->code2symbol(it->osymbol));
-	  fsm_construct_add_arc(h, (int)it->origin, (int)it->target, in, out);
-	  // not clear whether in and out should be freed...
+	  TransitionData data = tr_it->get_transition_data();
+	  
+	  fsm_construct_add_arc(h, 
+				(int)it->first, 
+				(int)tr_it->get_target_state(),
+				data.input_symbol.c_str(),
+				data.output_symbol.c_str());
 	}
     }
-  
-  // Add symbols that are in the symbol table but do not occur in the transducer
-  HfstAlphabet::CharMap cm = internal_transducer->alphabet->get_char_map();
-  for (HfstAlphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++)
+
+  // Go through the final states
+  for (HfstFsm::FinalWeightMap::iterator it = hfst_fsm->final_weight_map.begin();
+       it != hfst_fsm->final_weight_map.end(); it++) 
     {
-      char *symbol = strdup(it->second);
+      fsm_construct_set_final(h, (int)it->first);
+    }
+
+  // Add symbols that occur in HfstFsm's alphabet but not in
+  // any of its transition to foma's alphabet
+  for (HfstFsm::HfstNetAlphabet::iterator it = hfst_fsm->alphabet.begin();
+       it != hfst_fsm->alphabet.end(); it++)
+    {
+      char *symbol = strdup(it->c_str());
       if ( fsm_construct_check_symbol(h,symbol) == -1 ) // not found
 	fsm_construct_add_symbol(h,symbol);
       // free symbol?
@@ -536,56 +587,72 @@ struct fsm * hfst_internal_format_to_foma(const HfstInternalTransducer * interna
 }
 #endif // HAVE_FOMA
 
+
 #if HAVE_OPENFST
-fst::StdVectorFst * hfst_internal_format_to_tropical_ofst(
-		      const HfstInternalTransducer * internal_transducer) {
+
+ fst::StateId hfst_state_to_state_id
+   (HfstState s, std::map<HfstState, fst::StateId> &state_map, fst::StdVectorFst * t)
+ {
+   std::map<HfstState, fst::StateId>::iterator it = state_map.find(s);
+   if (it == state_map.end())
+     {
+       fst::StateId retval t->AddState();
+       state_map[s] = retval;
+       return retval;
+     }
+   return *it;
+ }
+
+fst::StdVectorFst * hfst_net_to_tropical_ofst
+  (const HfstFsm * net) {
 
   fst::StdVectorFst * t = new fst::StdVectorFst();
   StateId start_state = t->AddState();
   t->SetStart(start_state);
 
-  if (internal_transducer->has_no_lines()) {
-    fst::SymbolTable *st = new fst::SymbolTable("anonym_hfst3_symbol_table");
-    HfstAlphabet::CharMap cm = internal_transducer->alphabet->get_char_map();
-    for (HfstAlphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++)
-      st->AddSymbol(std::string(it->second), (int64)it->first);    
-    t->SetInputSymbols(st);
-    delete st;
-    return t;
-  }
-
-  std::map<unsigned int,unsigned int> state_map;
+  std::map<HfstState, fst::StateId> state_map;
   state_map[0] = start_state;
 
-  const std::set<InternalTransducerLine> *lines = internal_transducer->get_lines();
-  for (std::set<InternalTransducerLine>::const_iterator it = lines->begin();
-       it != lines->end(); it++)
+  fst::SymbolTable st("");
+  st.AddSymbol("@_EPSILON_SYMBOL_@", 0);
+  st.AddSymbol("@_UNKNOWN_SYMBOL_@", 1);
+  st.AddSymbol("@_IDENTITY_SYMBOL_@", 2);
+
+  // Go through all states
+  for (HfstFsm::iterator it = net->begin();
+       it != net->end(); it++)
     {
-      if (it->final_line) 
+      // Go through the set of transitions in each state
+      for (HfstFsm::HfstTransitionSet::iterator tr_it = it->second.begin();
+	   tr_it != it->second.end(); tr_it++)
 	{
-	  if (state_map.find(it->origin) == state_map.end())
-	    state_map[it->origin] = t->AddState();
-	  t->SetFinal(state_map[it->origin],it->weight);
-	}
-      else 
-	{
-	  if (state_map.find(it->origin) == state_map.end())
-	    state_map[it->origin] = t->AddState();
-	  if (state_map.find(it->target) == state_map.end())
-	    state_map[it->target] = t->AddState();
-	  t->AddArc(state_map[it->origin],
-		    fst::StdArc(it->isymbol, it->osymbol,
-				it->weight, state_map[it->target]));
+	  TransitionData data = tr_it->get_transition_data();
+	  
+	  t->AddArc( hfst_state_to_state_id(it->first, state_map, t), 
+		     fst::StdArc
+		      ( st.AddSymbol(data.input_symbol),
+			st.AddSymbol(data.output_symbol),
+			data.weight,
+			hfst_state_to_state_id
+ 			 (tr_it->get_target_state(), state_map, t)) );
 	}
     }
 
-  fst::SymbolTable *st = new fst::SymbolTable("anonym_hfst3_symbol_table");
-  HfstAlphabet::CharMap cm = internal_transducer->alphabet->get_char_map();
-  for (HfstAlphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++)
-    st->AddSymbol(std::string(it->second), (int64)it->first);    
-  t->SetInputSymbols(st);
-  delete st;
+  // Go through the final states
+  for (HfstFsm::FinalWeightMap::iterator it = net->final_weight_map.begin();
+       it != net->final_weight_map.end(); it++) 
+    {
+      t->SetFinal(it->first, it->second);
+    }
 
+  // Add symbols that do not occur in transitions
+  for (HfstFsm::HfstNetAlphabet::iterator it = net->alphabet.begin();
+       it != net->alphabet.end(); it++)
+    {
+      st.AddSymbol(*it);
+    }
+
+  t->SetInputSymbols(&st);
   return t;  
 }
 
