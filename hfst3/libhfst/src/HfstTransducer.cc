@@ -1250,9 +1250,16 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #if HAVE_FOMA
       case FOMA_TYPE:
 	{
-	  hfst::implementations::FomaTransducer::insert_freely
-	    (implementation.foma,symbol_pair);
-	    break;
+	hfst::implementations::HfstInternalTransducer * internal_transducer = 
+	  hfst::implementations::foma_to_internal_hfst_format(implementation.foma);
+	this->foma_interface.delete_foma(implementation.foma);
+	internal_transducer->insert_freely(symbol_pair);
+	implementation.foma = 
+	  hfst::implementations::hfst_internal_format_to_foma(internal_transducer);
+	delete internal_transducer;
+	/*  hfst::implementations::FomaTransducer::insert_freely
+	    (implementation.foma,symbol_pair); */
+	break;
 	}
 #endif
 #if HAVE_SFST
@@ -1391,13 +1398,15 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	if (input_side && output_side)
 	  {
 	    fst::StdVectorFst * tmp =
-	      this->tropical_ofst_interface.substitute(implementation.tropical_ofst, old_symbol, new_symbol);
+	      this->tropical_ofst_interface.substitute
+	      (implementation.tropical_ofst, old_symbol, new_symbol);
 	    delete implementation.tropical_ofst;
 	    implementation.tropical_ofst = tmp;
 	    return *this;
 	  }
 	fst::StdVectorFst * tropical_ofst_temp =
-	  this->tropical_ofst_interface.substitute(implementation.tropical_ofst, old_symbol, new_symbol);
+	  this->tropical_ofst_interface.substitute
+	  (implementation.tropical_ofst, old_symbol, new_symbol);
 	delete implementation.tropical_ofst;
 	implementation.tropical_ofst = tropical_ofst_temp;
 	return *this;
@@ -1407,13 +1416,15 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	if (input_side && output_side)
 	  {
 	    hfst::implementations::LogFst * tmp =
-	      this->log_ofst_interface.substitute(implementation.log_ofst, old_symbol, new_symbol);
+	      this->log_ofst_interface.substitute
+	      (implementation.log_ofst, old_symbol, new_symbol);
 	    delete implementation.log_ofst;
 	    implementation.log_ofst = tmp;
 	    return *this;
 	  }
 	hfst::implementations::LogFst * log_ofst_temp =
-	  this->log_ofst_interface.substitute(implementation.log_ofst, old_symbol, new_symbol);
+	  this->log_ofst_interface.substitute
+	  (implementation.log_ofst, old_symbol, new_symbol);
 	delete implementation.log_ofst;
 	implementation.log_ofst = log_ofst_temp;
 	return *this;
@@ -1458,7 +1469,8 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
     if (this->type == TROPICAL_OFST_TYPE)
       {
 	fst::StdVectorFst * tropical_ofst_temp =
-	  this->tropical_ofst_interface.substitute(implementation.tropical_ofst,old_symbol_pair, new_symbol_pair);
+	  this->tropical_ofst_interface.substitute
+	  (implementation.tropical_ofst,old_symbol_pair, new_symbol_pair);
 	delete implementation.tropical_ofst;
 	implementation.tropical_ofst = tropical_ofst_temp;
 	return *this;
@@ -1466,7 +1478,8 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
     if (this->type == LOG_OFST_TYPE)
       {
 	hfst::implementations::LogFst * log_ofst_temp =
-	  this->log_ofst_interface.substitute(implementation.log_ofst,old_symbol_pair,new_symbol_pair);
+	  this->log_ofst_interface.substitute
+	  (implementation.log_ofst,old_symbol_pair,new_symbol_pair);
 	delete implementation.log_ofst;
 	implementation.log_ofst = log_ofst_temp;
 	return *this;
@@ -1511,7 +1524,8 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
     if (this->type == TROPICAL_OFST_TYPE)
       {
 	fst::StdVectorFst * tropical_ofst_temp =
-	  this->tropical_ofst_interface.substitute(implementation.tropical_ofst,old_symbol_pair, new_symbol_pair_set);
+	  this->tropical_ofst_interface.substitute
+	  (implementation.tropical_ofst,old_symbol_pair, new_symbol_pair_set);
 	delete implementation.tropical_ofst;
 	implementation.tropical_ofst = tropical_ofst_temp;
 	return *this;
@@ -1519,7 +1533,8 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
     if (this->type == LOG_OFST_TYPE)
       {
 	hfst::implementations::LogFst * log_ofst_temp =
-	  this->log_ofst_interface.substitute(implementation.log_ofst,old_symbol_pair, new_symbol_pair_set);
+	  this->log_ofst_interface.substitute
+	  (implementation.log_ofst,old_symbol_pair, new_symbol_pair_set);
 	delete implementation.log_ofst;
 	implementation.log_ofst = log_ofst_temp;
 	return *this;
@@ -1550,12 +1565,18 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	// Now we need to harmonize because we are using internal transducers.
 	this->foma_interface.harmonize(implementation.foma,transducer.implementation.foma);
 
+	//fprintf(stderr, "#####1\n");
+
 	hfst::implementations::HfstInternalTransducer * internal_transducer = 
 	  hfst::implementations::foma_to_internal_hfst_format(implementation.foma);
 	this->foma_interface.delete_foma(implementation.foma);
 
+	//fprintf(stderr, "#####2\n");
+
 	hfst::implementations::HfstInternalTransducer * internal_substituting_transducer = 
 	  hfst::implementations::foma_to_internal_hfst_format(transducer.implementation.foma);
+
+	//fprintf(stderr, "#####3\n");
 
 	internal_transducer->substitute(symbol_pair, *internal_substituting_transducer);
 	delete internal_substituting_transducer;
@@ -1569,7 +1590,8 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
     if (this->type == SFST_TYPE)
       {
 	hfst::implementations::Transducer * tmp =
-	  this->sfst_interface.substitute(implementation.sfst, symbol_pair, transducer.implementation.sfst);
+	  this->sfst_interface.substitute
+	  (implementation.sfst, symbol_pair, transducer.implementation.sfst);
 	delete implementation.sfst;
 	implementation.sfst = tmp;
 	return *this;
@@ -1578,12 +1600,14 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #if HAVE_OPENFST
     if (this->type == TROPICAL_OFST_TYPE)
       {
-	this->tropical_ofst_interface.substitute(implementation.tropical_ofst,symbol_pair,transducer.implementation.tropical_ofst);
+	this->tropical_ofst_interface.substitute
+	  (implementation.tropical_ofst,symbol_pair,transducer.implementation.tropical_ofst);
 	return *this;
       }
     if (this->type == LOG_OFST_TYPE)
       {
-	this->log_ofst_interface.substitute(implementation.log_ofst,symbol_pair,transducer.implementation.log_ofst);
+	this->log_ofst_interface.substitute
+	  (implementation.log_ofst,symbol_pair,transducer.implementation.log_ofst);
 	return *this;
       }
 #endif
@@ -1617,7 +1641,8 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
     if (this->type == TROPICAL_OFST_TYPE) 
       {
 	hfst::implementations::StdVectorFst * tmp  =
-	  this->tropical_ofst_interface.push_weights(this->implementation.tropical_ofst, to_initial_state);
+	  this->tropical_ofst_interface.push_weights
+	  (this->implementation.tropical_ofst, to_initial_state);
 	delete this->implementation.tropical_ofst;
 	this->implementation.tropical_ofst = tmp;
 	return *this;
@@ -1625,7 +1650,8 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
     if (this->type == LOG_OFST_TYPE)
       {
 	hfst::implementations::LogFst * tmp =
-	  this->log_ofst_interface.push_weights(this->implementation.log_ofst, to_initial_state);
+	  this->log_ofst_interface.push_weights
+	  (this->implementation.log_ofst, to_initial_state);
 	delete this->implementation.log_ofst;
 	this->implementation.log_ofst = tmp;
 	return *this;
@@ -1654,17 +1680,24 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
     return *this;
   }
 
-  void substitute_single_identity_with_unknown(std::string &isymbol, std::string &osymbol) {
-    if (isymbol.compare("@_IDENTITY_SYMBOL_@") && (osymbol.compare("@_IDENTITY_SYMBOL_@") == false))
+  void substitute_single_identity_with_unknown
+  (std::string &isymbol, std::string &osymbol) {
+    if (isymbol.compare("@_IDENTITY_SYMBOL_@") && 
+	(osymbol.compare("@_IDENTITY_SYMBOL_@") == false)) {
       isymbol = std::string("@_UNKNOWN_SYMBOL_@");
-    else if (osymbol.compare("@_IDENTITY_SYMBOL_@") && (isymbol.compare("@_IDENTITY_SYMBOL_@") == false))
+    }
+    else if (osymbol.compare("@_IDENTITY_SYMBOL_@") && 
+	     (isymbol.compare("@_IDENTITY_SYMBOL_@") == false)) {
       osymbol = std::string("@_UNKNOWN_SYMBOL_@");
+    }
     else
       return;
   }
 
-  void substitute_unknown_identity_pairs(std::string &isymbol, std::string &osymbol) {
-    if (isymbol.compare("@_UNKNOWN_SYMBOL_@") && isymbol.compare("@_IDENTITY_SYMBOL_@")) {
+  void substitute_unknown_identity_pairs
+  (std::string &isymbol, std::string &osymbol) {
+    if (isymbol.compare("@_UNKNOWN_SYMBOL_@") && 
+	isymbol.compare("@_IDENTITY_SYMBOL_@")) {
       isymbol = std::string("@_IDENTITY_SYMBOL_@");
       osymbol = std::string("@_IDENTITY_SYMBOL_@");
     }
@@ -1705,7 +1738,8 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 
 	// comment...
 	this->substitute("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",false,true);
-	(const_cast<HfstTransducer&>(another)).substitute("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",true,false);
+	(const_cast<HfstTransducer&>(another)).substitute
+	  ("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",true,false);
 
 	if (DEBUG) printf("..done\n");
       }
@@ -2071,12 +2105,14 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #if HAVE_OPENFST
 	  case TROPICAL_OFST_TYPE:
 	    internal =
-	      hfst::implementations::tropical_ofst_to_internal_hfst_format(implementation.tropical_ofst);
+	      hfst::implementations::tropical_ofst_to_internal_hfst_format
+	      (implementation.tropical_ofst);
 	    delete implementation.tropical_ofst;
 	    break;
 	  case LOG_OFST_TYPE:
 	  internal =
-	      hfst::implementations::log_ofst_to_internal_hfst_format(implementation.log_ofst);
+	    hfst::implementations::log_ofst_to_internal_hfst_format
+	    (implementation.log_ofst);
 	  delete implementation.log_ofst;
 	    break;
 	  case HFST_OL_TYPE:

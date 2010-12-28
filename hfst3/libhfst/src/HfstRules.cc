@@ -110,9 +110,9 @@ namespace hfst
       // arg1 = .* ( m1 >> ( m2 >> t ))
       HfstTransducer arg1(pi_star);
 
-       if (DEBUG) printf("    (2)\n");
-
-       arg1.concatenate(t_copy);
+      if (DEBUG) printf("    (2)\n");
+      
+      arg1.concatenate(t_copy);
 
       if (DEBUG) printf("    (3)\n");
 
