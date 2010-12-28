@@ -128,10 +128,10 @@ namespace implementations
       // If the start state has not yet been encountered.
       if (not start_state_found) {
 	start_state_id = (fsm+i)->state_no;
-	//	if (start_state_id != 0) {
-	//  printf("ERROR: in foma transducer: start state is not numbered as zero\n");
-	//  throw ErrorException();
-	//}
+	if (start_state_id != 0) {
+	  printf("ERROR: in foma transducer: start state is not numbered as zero\n");
+	  throw ErrorException();
+	}
 	start_state_found=true;
       }
       // If the start state is encountered again, 
@@ -480,6 +480,7 @@ struct fsm * hfst_internal_format_to_foma(const HfstInternalTransducer * interna
   struct fsm_construct_handle *h;
   struct fsm *net;
   h = fsm_construct_init(strdup(std::string("").c_str()));
+  fsm_construct_set_initial(h, 0);
 
   const std::set<InternalTransducerLine> *lines = internal_transducer->get_lines();
   for (std::set<InternalTransducerLine>::const_iterator it = lines->begin();
@@ -506,7 +507,7 @@ struct fsm * hfst_internal_format_to_foma(const HfstInternalTransducer * interna
       // free symbol?
     }
 
-  fsm_construct_set_initial(h, 0);
+  //fsm_construct_set_initial(h, 0);
   // not clear what happens if start state is not number zero...
   net = fsm_construct_done(h);
   fsm_count(net);

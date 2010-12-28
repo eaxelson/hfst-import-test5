@@ -214,6 +214,16 @@ namespace hfst
     //printf("def_var: defined variable \"%s\"\n", name);
     // TODO
     //return t->is_empty();
+
+    //fprintf(stderr, "def_var %s: \n", name);
+    //t->write_in_att_format(stderr);
+
+    // TEST
+    std::string foo(name);
+    HfstOutputStream os(foo, t->get_type());
+    os << *t;
+    os.close();
+
     return false;
   }
 
@@ -468,6 +478,7 @@ namespace hfst
       delete t;
       t = nt;
     }    
+    //fprintf(stderr, "..exploded\n");
     return t;
   }
 

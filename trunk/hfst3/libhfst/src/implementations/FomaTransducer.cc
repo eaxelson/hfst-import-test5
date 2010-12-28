@@ -366,7 +366,7 @@ namespace hfst { namespace implementations {
 	state_number++;
       }
     
-    //fsm_construct_set_initial(h, 0);
+    fsm_construct_set_initial(h, 0);
     fsm_construct_set_final(h, state_number);    
 
     net = fsm_construct_done(h);
