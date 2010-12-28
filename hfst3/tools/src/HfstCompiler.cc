@@ -219,10 +219,10 @@ namespace hfst
     //t->write_in_att_format(stderr);
 
     // TEST
-    std::string foo(name);
-    HfstOutputStream os(foo, t->get_type());
-    os << *t;
-    os.close();
+    //std::string foo(name);
+    //HfstOutputStream os(foo, t->get_type());
+    //os << *t;
+    //os.close();
 
     return false;
   }

@@ -94,6 +94,10 @@ namespace hfst
     {
       // ct = .* ( m1 >> ( m2 >> t ))  ||  !(.* m1)
 
+      // TEST
+      //fprintf(stderr, "replace_context: HfstTransducer t:\n");
+      //cerr << t << "--\n";
+
       bool DEBUG=false;
 
       if (DEBUG) printf("    replace_context..\n");
@@ -168,6 +172,10 @@ namespace hfst
       if (DEBUG) printf("    (9)\n");
 
       retval.minimize();
+
+      // TEST
+      //fprintf(stderr, "replace_context:\n");
+      //cerr << retval << "--\n";
 
       return retval;
     }
@@ -359,10 +367,16 @@ namespace hfst
 
       // right context transducer:  reversion( (<R> >> (<L> >> reversion(RIGHT_CONTEXT))) .* || !(<R>.*) )
       HfstTransducer right_rev(context.second);
+
       if (DEBUG) printf("(1)\n");
       right_rev.reverse();
+
+      // Bug?: in foma, if context.second is an epsilon-transducer
+      // reverting it yields an empty transducer.
+
       if (DEBUG) printf("(2)\n");
       right_rev.minimize();
+
       if (DEBUG) right_rev.write_in_att_format("right_rev.att",true);
 
       HfstTransducer rct = replace_context(right_rev, rightm, leftm, alphabet);
