@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS=hfst-proc
+SUBDIRS=hfst-proc parsers
 
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib

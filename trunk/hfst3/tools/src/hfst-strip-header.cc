@@ -95,7 +95,7 @@ process_stream(FILE* f_in, FILE* f_out)
     int c = getc(f_in);
     if(c == EOF)
       return EXIT_SUCCESS;
-    
+    verbose_printf("Stripping...\n");
     if(c == header[header_loc])
     {
       if(header_loc == 5) // we've found the whole header (incl. null terminator)

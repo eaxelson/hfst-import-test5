@@ -201,8 +201,8 @@ class Callback : public hfst::ExtractStringsCb
  public:
   int count;
   int max_num;
-  
-  Callback(int max): count(0), max_num(max) {}
+  std::ostream* out_;
+  Callback(int max, std::ostream* out): count(0), max_num(max), out_(out) {}
   RetVal operator()(WeightedPath<float>& wp, bool final)
   {
     if(max_input_length > 0 &&
@@ -235,12 +235,12 @@ class Callback : public hfst::ExtractStringsCb
     // the path passed the checks. Print it if it is final
     if(final)
     {
-      std::cout << wp.istring;
+      *out_ << wp.istring;
       if(wp.ostring != wp.istring)
-        std::cout << " : " << wp.ostring;
+        *out_ << " : " << wp.ostring;
       if(display_weights)
-        std::cout << "\t" << wp.weight;
-      std::cout << std::endl;
+        *out_ << "\t" << wp.weight;
+      *out_ << std::endl;
       
       count++;
     }
@@ -274,7 +274,9 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
     {
       if(max_strings <= 0 && max_input_length <= 0 && max_output_length <= 0 && cycles < 0 && t.is_cyclic())
       {
-        fprintf(stderr, "Transducer is cyclic. Use one or more of these options: -n, -N, -l, -L, -c\n");
+        error(EXIT_FAILURE, 0,
+              "Transducer is cyclic. Use one or more of these options: "
+              "-n, -N, -l, -L, -c");
         return EXIT_FAILURE;
       }
     }
@@ -284,7 +286,7 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
     else
       verbose_printf("Finding strings...\n");
     
-    Callback cb(max_strings);
+    Callback cb(max_strings, &outstream);
     if(eval_fd)
       t.extract_strings_fd(cb, cycles, filter_fd);
     else

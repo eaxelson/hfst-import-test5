@@ -198,7 +198,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           {
             outstream << trans.repeat_n_plus(at_least);
           }
-        else if (from_infinity && to_infinity)
+        else if (from_infinity && !to_infinity)
           {
           error(EXIT_FAILURE, 0, "Repeating *..%lu?", at_most);
           }
@@ -241,7 +241,7 @@ int main( int argc, char **argv ) {
               verbose_printf("Repeating from %lu to infinite times\n",
                              at_least);
             }
-          else if (from_infinity && to_infinity)
+          else if (from_infinity && !to_infinity)
             {
               error(EXIT_FAILURE, 0, "Repeating at least infinite but"
                     "no more than %lu times?", at_most);

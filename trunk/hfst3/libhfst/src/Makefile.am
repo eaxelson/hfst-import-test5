@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS=implementations extensions
+SUBDIRS=implementations
 AUTOMAKE_OPTIONS=subdir-objects
 lib_LTLIBRARIES = libhfst.la
 
@@ -31,8 +31,7 @@ HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc HfstOutputStream.cc\
 
 # libtool takes over
 libhfst_la_SOURCES =  $(HFST_SRCS)
-libhfst_la_LIBADD = implementations/libhfstimplementations.la\
-					extensions/libhfstextensions.la
+libhfst_la_LIBADD = implementations/libhfstimplementations.la
 
 AM_CPPFLAGS = -I./implementations
 
