@@ -194,6 +194,7 @@ process_stream(HfstOutputStream& outstream)
       HfstTransducer* compiled;
       if (line_separated)
         {
+          verbose_printf("Compiling line %u\n", line_count);
           compiled = comp.compile(line);
         }
       else

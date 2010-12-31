@@ -5,7 +5,7 @@
 
 #include <string.h>
 
-#include "../HfstTransducer.h"
+#include "HfstTransducer.h"
 
 #include "xre_parse.h"
 #include "xre_utils.h"

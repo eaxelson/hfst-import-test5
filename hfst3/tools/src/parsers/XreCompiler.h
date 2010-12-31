@@ -31,7 +31,7 @@
 #endif
 
 #include <string>
-#include "../HfstTransducer.h"
+#include "HfstTransducer.h"
 
 namespace hfst { 
 //! @brief hfst::xre namespace is used for all functions related to Xerox 

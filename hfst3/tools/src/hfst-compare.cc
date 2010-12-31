@@ -129,13 +129,29 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
         HfstTransducer second(secondstream);
         if (first.compare(second))
           {
-            fprintf(outfile, "%s[%zu] == %s[%zu]\n",
-                    firstfilename, transducer_n, secondfilename, transducer_n);
+            if (transducer_n == 1)
+              {
+                fprintf(outfile, "%s == %s\n", firstfilename, secondfilename);
+              }
+            else
+              {
+                fprintf(outfile, "%s[%zu] == %s[%zu]\n",
+                        firstfilename, transducer_n,
+                        secondfilename, transducer_n);
+              }
           }
         else
           {
-            fprintf(outfile, "%s[%zu] != %s[%zu]\n",
-                    firstfilename, transducer_n, secondfilename, transducer_n);
+            if (transducer_n == 1)
+              {
+                fprintf(outfile, "%s != %s\n", firstfilename, secondfilename);
+              }
+            else
+              {
+                fprintf(outfile, "%s[%zu] != %s[%zu]\n",
+                        firstfilename, transducer_n, 
+                        secondfilename, transducer_n);
+              }
             mismatches++;
           }
         bothInputs = firststream.is_good() && secondstream.is_good();

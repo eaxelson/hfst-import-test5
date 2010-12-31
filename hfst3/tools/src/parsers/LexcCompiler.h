@@ -30,7 +30,7 @@
 
 #include <string>
 
-#include "../HfstTransducer.h"
+#include "HfstTransducer.h"
 #include "XreCompiler.h"
 
 namespace hfst {

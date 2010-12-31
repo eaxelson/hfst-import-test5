@@ -30,7 +30,7 @@ using std::map;
 using std::set;
 
 #include "LexcCompiler.h"
-#include "../HfstTransducer.h"
+#include "HfstTransducer.h"
 #include "XreCompiler.h"
 #include "lexc-utils.h"
 #include "lexc-parser.h"

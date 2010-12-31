@@ -13,7 +13,7 @@ using std::map;
 #include <cstring>
 
 #include "xre_utils.h"
-#include "../HfstTransducer.h"
+#include "HfstTransducer.h"
 
 extern char* xretext;
 extern int xreparse();

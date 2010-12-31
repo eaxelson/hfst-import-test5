@@ -92,31 +92,6 @@ if test "x$with_sfst" == "xno" -a "x$with_openfst" == "xno" -a "x$with_foma" == 
 fi
 
 
-# some extensions
-AC_ARG_ENABLE([xre],
-              [AS_HELP_STRING([--enable-xre],
-                              [build xerox reg.exp. parser @<:@default=yes@:>@])],
-              [enable_xre=$enableval],
-              [enable_xre=yes])
-AS_IF([test "x$enable_xre" != xno], [AC_DEFINE([HAVE_XRE], [1],
-                                              [Define to compile xerox regular expression parser in HFST])])
-AM_CONDITIONAL([WANT_XRE], [test "x$enable_xre" != xno])
-AC_ARG_ENABLE([lexc],
-              [AS_HELP_STRING([--enable-lexc],
-                              [build xerox lexc parser @<:@default=yes@:>@])],
-              [enable_lexc=$enableval],
-              [enable_lexc=yes])
-AS_IF([test "x$enable_lexc" != xno], [AC_DEFINE([HAVE_LEXC], [1],
-                                              [Define to compile xerox lexc parser in HFST])])
-AM_CONDITIONAL([WANT_LEXC], [test "x$enable_lexc" != xno])
-AC_ARG_ENABLE([xfst],
-              [AS_HELP_STRING([--enable-xfst],
-                              [build xerox xfst parser @<:@default=no@:>@])],
-              [enable_xfst=$enableval],
-              [enable_xfst=no])
-AS_IF([test "x$enable_xfst" != xno], [AC_DEFINE([HAVE_XFST], [1],
-                                              [Define to compile xerox FST script parser in HFST])])
-AM_CONDITIONAL([WANT_XFST], [test "x$enable_xfst" != xno])
 # allow programs to be built separately (sort alphabetically)
 AC_ARG_ENABLE([calculate],
 			  [AS_HELP_STRING([--enable-calculate],
@@ -459,7 +434,8 @@ AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strcspn strtol strtoul 
 AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
                  test/libhfst/Makefile test/tools/Makefile
                  libhfst/Makefile libhfst/src/Makefile
-                 libhfst/src/implementations/Makefile libhfst/src/extensions/Makefile
+                 libhfst/src/implementations/Makefile 
+                 tools/src/parsers/Makefile
                  libhfst/hfst.pc
                  tools/Makefile tools/src/Makefile tools/src/hfst-proc/Makefile
                  man/Makefile
@@ -476,9 +452,6 @@ cat <<EOF
     *         with foma: $with_foma
     *         with optimized lookup: $with_hfstol
     *         with mfstl: $with_mfstl
-    * compiler for Xerox regular expressions: $enable_xre
-    *              lexc: $enable_lexc
-    *              xfst: $enable_xfst
     * tools including calculate: $enable_calculate
     *                 compare: $enable_compare
     *                 compose: $enable_compose
