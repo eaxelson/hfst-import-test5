@@ -16,7 +16,7 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 SUBDIRS=hfst-proc parsers
-
+AUTOMAKE_OPTIONS=std-options subdir-objects
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib
 AM_CXXFLAGS = $(WERR_CFLAGS)
@@ -62,7 +62,7 @@ if WANT_INVERT
 MAYBE_INVERT=hfst-invert
 endif
 if WANT_LEXC_COMPILER
-MAYBE_LEXC_COMPILER=hfst-lexc-compiler
+MAYBE_LEXC_COMPILER=hfst-lexc2fst
 endif
 if WANT_LOOKUP
 MAYBE_LOOKUP=hfst-lookup
@@ -119,7 +119,7 @@ if WANT_FLAG_DIACRITICS
 MAYBE_FLAG_DIACRITICS=hfst-flag-diacritics
 endif
 if WANT_XFST_COMPILER
-MAYBE_XFST_COMPILER=hfst-xfst-compiler
+MAYBE_XFST_COMPILER=hfst-xfst2fst
 endif
 
 noinst_HEADERS= \
@@ -169,12 +169,18 @@ hfst_fst2strings_SOURCES=hfst-fst2strings.cc $(HFST_COMMON_SRC)
 hfst_fst2txt_SOURCES=hfst-fst2txt.cc $(HFST_COMMON_SRC)
 hfst_head_SOURCES=hfst-head.cc $(HFST_COMMON_SRC)
 hfst_invert_SOURCES=hfst-invert.cc $(HFST_COMMON_SRC)
-hfst_lexc_compiler_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC)
+hfst_lexc2fst_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC) \
+					  parsers/LexcCompiler.cc parsers/lexc-parser.yy \
+					  parsers/lexc-lexer.ll parsers/lexc-utils.cc \
+					  parsers/XreCompiler.cc parsers/xre_parse.yy \
+					  parsers/xre_lex.ll parsers/xre_utils.cc
 hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC)
 hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
 hfst_project_SOURCES=hfst-project.cc $(HFST_COMMON_SRC)
 hfst_push_weights_SOURCES=hfst-push-weights.cc $(HFST_COMMON_SRC)
-hfst_regexp2fst_SOURCES=hfst-regexp2fst.cc $(HFST_COMMON_SRC)
+hfst_regexp2fst_SOURCES=hfst-regexp2fst.cc $(HFST_COMMON_SRC) \
+						parsers/XreCompiler.cc parsers/xre_parse.yy \
+						parsers/xre_lex.ll parsers/xre_utils.cc
 hfst_remove_epsilons_SOURCES=hfst-remove-epsilons.cc $(HFST_COMMON_SRC)
 hfst_repeat_SOURCES=hfst-repeat.cc $(HFST_COMMON_SRC)
 hfst_reverse_SOURCES=hfst-reverse.cc $(HFST_COMMON_SRC)
@@ -186,7 +192,13 @@ hfst_subtract_SOURCES=hfst-subtract.cc $(HFST_COMMON_SRC)
 hfst_summarize_SOURCES=hfst-summarize.cc $(HFST_COMMON_SRC)
 hfst_tail_SOURCES=hfst-tail.cc $(HFST_COMMON_SRC)
 hfst_txt2fst_SOURCES=hfst-txt2fst.cc $(HFST_COMMON_SRC)
-hfst_xfst_compiler_SOURCES=hfst-xfst-compiler.cc $(HFST_COMMON_SRC)
+hfst_xfst2fst_SOURCES=hfst-xfst-compiler.cc $(HFST_COMMON_SRC) \
+					  parsers/XfstCompiler.cc parsers/xfst-parser.yy \
+					  parsers/xfst-lexer.ll parsers/xfst-utils.cc \
+					  parsers/LexcCompiler.cc parsers/lexc-parser.yy \
+					  parsers/lexc-lexer.ll parsers/lexc-utils.cc \
+					  parsers/XreCompiler.cc parsers/xre_parse.yy \
+					  parsers/xre_lex.ll parsers/xre_utils.cc
 
 BUILT_SOURCES=hfst-scanner.h hfst-compiler.h
 # make make realise headers automatically follow from flexing

@@ -38,7 +38,6 @@ using std::string;
 
 // flex stuffa
 extern int hxfstlineno;
-static char* hxfstfilename = 0;
 extern char* hxfsttext;
 extern YYLTYPE hxfstlloc;
 
@@ -46,15 +45,16 @@ namespace hfst { namespace xfst {
 
 #ifndef HAVE_GETLINE
     ssize_t
-    getline(char** s, size_t n, FILE* f)
+    getline(char** s, size_t* n, FILE* f)
       {
-        s = static_cast<char*>(calloc(sizeof(char),MAX_FILE_SIZE));
-        char* r = fgets(*s, MAX_FILE_SIZE, infile);
+        *s = static_cast<char*>(calloc(sizeof(char),*n));
+        char* r = fgets(*s, *n, f);
         if (r == 0)
           {
             fprintf(stderr, "unable to read in substitute getline\n");
             return -1;
           }
+        return *n;
        }
 #endif
 

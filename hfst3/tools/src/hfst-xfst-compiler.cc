@@ -31,7 +31,7 @@
 #include <getopt.h>
 
 #include "HfstTransducer.h"
-#include "implementations/XfstCompiler.h"
+#include "parsers/XfstCompiler.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;

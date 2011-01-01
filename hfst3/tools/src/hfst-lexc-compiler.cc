@@ -32,7 +32,7 @@
 
 #include "HfstTransducer.h"
 #include "HfstOutputStream.h"
-#include "../../libhfst/src/extensions/LexcCompiler.h"
+#include "parsers/LexcCompiler.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;

@@ -41,7 +41,7 @@ using std::pair;
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
-#include "extensions/XreCompiler.h"
+#include "parsers/XreCompiler.h"
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 
