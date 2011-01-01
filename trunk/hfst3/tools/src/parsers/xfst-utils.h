@@ -28,7 +28,7 @@ namespace hfst { namespace xfst {
 
 #ifndef HAVE_GETLINE
 #   define MAX_LINE_SIZE 12345678
-ssize_t getline(char** line, size_t n, FILE* f);
+ssize_t getline(char** line, size_t* n, FILE* f);
 #endif
 
 //! @brief Open file and print XFSTish stuff

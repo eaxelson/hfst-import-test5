@@ -33,13 +33,9 @@
 #include <map>
 #include <stack>
 
-#include "../HfstTransducer.h"
-#if HAVE_XRE
-#  include "XreCompiler.h"
-#endif
-#if HAVE_LEXC
-#  include "LexcCompiler.h"
-#endif
+#include "HfstTransducer.h"
+#include "XreCompiler.h"
+#include "LexcCompiler.h"
 
 namespace hfst { 
 //! @brief hfst::xfst namespace contains all functions needed to parse XFST scritpts
@@ -421,12 +417,8 @@ class XfstCompiler
   XfstCompiler& apply_med_line(char* line);
   XfstCompiler& read_prop_line(char* line);
 
-#if HAVE_XRE
   hfst::xre::XreCompiler xre_;
-#endif
-#if HAVE_LEXC
   hfst::lexc::LexcCompiler lexc_;
-#endif
 #if HAVE_TWOLC
   hfst::twolc::TwolcCompiler twolc_;
 #endif

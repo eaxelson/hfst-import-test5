@@ -563,7 +563,6 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
                   infile);
           return *this;
         }
-      instream->open();
       while (instream->is_good())
         {
           HfstTransducer* t = new HfstTransducer(*instream);
@@ -1173,7 +1172,6 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       HfstOutputStream* outstream = (outfile != 0) ?
         new HfstOutputStream(outfile, format_):
         new HfstOutputStream(format_);
-      outstream->open();
       *outstream << *(definitions_[name]);
       outstream->close();
       delete outstream;
@@ -1188,7 +1186,6 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
       HfstOutputStream* outstream = (outfile != 0) ?
         new HfstOutputStream(outfile, format_):
         new HfstOutputStream(format_);
-      outstream->open();
       for (map<string,HfstTransducer*>::iterator def = definitions_.begin();
            def != definitions_.end();
            ++def)
@@ -1765,11 +1762,7 @@ XfstCompiler::XfstCompiler(hfst::ImplementationType impl) :
   XfstCompiler&
   XfstCompiler::read_lexc(FILE* infile)
     {
-#if HAVE_LEXC
       lexc_.parse(infile);
-#else
-      fprintf(stderr, "hfst-lexc was disabled from libhfst!!\n");
-#endif
       prompt();
       return *this;
     }
