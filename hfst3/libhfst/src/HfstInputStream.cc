@@ -1064,7 +1064,7 @@ int main(void)
   std::cout << " (OpenFst)";
   delete new HfstInputStream("HfstInputStream_OFST.hfst");
 #endif
-#if HAVE_SFST
+#if HAVE_FOMA
   std::cout << " (foma)";
   delete new HfstInputStream("HfstInputStream_FOMA.hfst");
 #endif
