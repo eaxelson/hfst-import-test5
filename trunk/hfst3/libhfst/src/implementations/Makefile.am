@@ -20,7 +20,7 @@ noinst_LTLIBRARIES=libhfstimplementations.la
 
 # HFST bridge specific stuff
 IMPLEMENTATION_SRCS= \
-	ConvertTransducerFormat.cc HfstInternalTransducer.cc
+	HfstNet.cc ConvertTransducerFormat.cc
 AM_CXXFLAGS=-Wno-deprecated
 # the bridges
 if WANT_SFST
@@ -60,7 +60,8 @@ implinclude_HEADERS = \
 		ConvertTransducerFormat.h \
 		FomaTransducer.h \
 		LogWeightTransducer.h \
-		SfstTransducer.h TropicalWeightTransducer.h HfstOlTransducer.h HfstInternalTransducer.h \
+		SfstTransducer.h TropicalWeightTransducer.h \
+		HfstOlTransducer.h HfstNet.h \
 		MfstlTransducer.h
 
 
@@ -84,7 +85,7 @@ endif
 if WANT_MFSTL
 MFSTL_TSTS=MfstlTransducer
 endif
-check_PROGRAMS=ConvertTransducerFormat HfstInternalTransducer \
+check_PROGRAMS=ConvertTransducerFormat \
 			   $(FOMA_TSTS) $(HFSTOL_TSTS) $(OFST_TSTS) $(SFST_TSTS) \
 			   $(MFSTL_TSTS)
 ConvertTransducerFormat_SOURCES=ConvertTransducerFormat.cc
@@ -93,9 +94,6 @@ ConvertTransducerFormat_LDADD=../libhfst.la
 FomaTransducer_SOURCES=FomaTransducer.cc
 FomaTransducer_CXXFLAGS=-DDEBUG_MAIN
 FomaTransducer_LDADD=../libhfst.la
-HfstInternalTransducer_SOURCES=HfstInternalTransducer.cc
-HfstInternalTransducer_CXXFLAGS=-DDEBUG_MAIN
-HfstInternalTransducer_LDADD=../libhfst.la
 HfstOlTransducer_SOURCES=HfstOlTransducer.cc
 HfstOlTransducer_CXXFLAGS=-DDEBUG_MAIN
 HfstOlTransducer_LDADD=../libhfst.la
@@ -111,6 +109,6 @@ SfstTransducer_LDADD=../libhfst.la
 TropicalWeightTransducer_SOURCES=TropicalWeightTransducer.cc
 TropicalWeightTransducer_CXXFLAGS=-DDEBUG_MAIN
 TropicalWeightTransducer_LDADD=../libhfst.la
-TESTS=ConvertTransducerFormat HfstInternalTransducer \
+TESTS=ConvertTransducerFormat \
 	  $(FOMA_TSTS) $(HFSTOL_TSTS) $(OFST_TSTS) $(SFST_TSTS) $(MFSTL_TSTS)
 
