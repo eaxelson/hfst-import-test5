@@ -19,8 +19,7 @@ AUTOMAKE_OPTIONS=subdir-objects
 noinst_LTLIBRARIES=libhfstimplementations.la
 
 # HFST bridge specific stuff
-IMPLEMENTATION_SRCS= \
-	HfstNet.cc ConvertTransducerFormat.cc
+IMPLEMENTATION_SRCS=HfstNet.cc ConvertTransducerFormat.cc
 AM_CXXFLAGS=-Wno-deprecated
 # the bridges
 if WANT_SFST

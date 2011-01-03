@@ -16,8 +16,8 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 
-AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib
-
+AM_CPPFLAGS= -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib
+AM_CXXFLAGS= -Wno-deprecated
 noinst_LTLIBRARIES=libhfstsillyparsers.la
 
 XRE_SRCS=xre_lex.ll xre_parse.yy xre_utils.cc XreCompiler.cc

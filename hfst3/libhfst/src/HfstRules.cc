@@ -497,7 +497,7 @@ namespace hfst
 
       // Make sure that contexts contains at least one transducer pair and that all
       // transducers in the set have the same type.
-      ImplementationType type;
+      ImplementationType type=ERROR_TYPE;
       bool type_defined=false;
       for (HfstTransducerPairVector::const_iterator it = contexts.begin(); it != contexts.end(); it++)
 	{
