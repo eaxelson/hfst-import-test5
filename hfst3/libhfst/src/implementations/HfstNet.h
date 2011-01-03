@@ -67,7 +67,7 @@ namespace hfst {
     protected:
       /* Get the symbol that is mapped as number */
       static std::string get_symbol(unsigned int number) {
-	Number2SymbolMap::iterator it = number2symbol_map.find(number);
+	Number2SymbolMap::const_iterator it = number2symbol_map.find(number);
 	if (it == number2symbol_map.end()) {
 	  fprintf(stderr, "ERROR: TransitionData::get_symbol(unsigned int number) "
 		          "number is not mapped to any symbol\n");
@@ -117,15 +117,15 @@ namespace hfst {
 	this->weight = weight;
       }
 
-      SymbolType get_input_symbol() {
+      SymbolType get_input_symbol() const {
 	return get_symbol(input_number);
       }
 
-      SymbolType get_output_symbol() {
+      SymbolType get_output_symbol() const {
 	return get_symbol(output_number);
       }
 
-      WeightType get_weight() {
+      WeightType get_weight() const {
 	return weight;
       }
 
@@ -433,14 +433,19 @@ namespace hfst {
 	  return alphabet;
 	}
 
+	/** @brief Add a new state to this net. */
+	HfstState add_state(void)
+	{ return add_state(max_state+1); }
+
 	/** @brief Add a state \a s to this net.
  
 	    If the state already exists, it is not added again. */
-	void add_state(HfstState s) {
+	HfstState add_state(HfstState s) {
 	  if (state_map.find(s) == state_map.end())
 	    state_map[s]=std::set<HfstTransition_ <C> >();
 	  if (max_state < s)
 	    max_state=s;
+	  return s;
 	}
 
 	/** @brief Add a transition \a transition to state \a s. 
