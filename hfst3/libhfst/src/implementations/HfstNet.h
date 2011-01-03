@@ -6,18 +6,19 @@
 #include "../HfstAlphabet.h"
 #include "../HfstSymbolDefs.h"
 #include "../HfstExceptions.h"
+#include "../HfstTransducer.h"
+#include "ConvertTransducerFormat.h"
 #include <cassert>
 #include <iostream>
 
-namespace hfst {
-  class HfstTransducer;
-}
 
 /** @file HfstNet.h
     @brief Declaration of classes needed by HFST's 
     own transducer format. */
 
 namespace hfst {
+
+  class HfstTransducer;
 
   /** @brief A namespace for all code that forms a bridge between
       backend libraries and HFST or is not else directly accessible
@@ -179,6 +180,7 @@ namespace hfst {
       }
     };
 
+    /*
     TransitionData::Number2SymbolMap TransitionData::number2symbol_map;
     Number2SymbolMapInitializer dummy1(TransitionData::number2symbol_map);
 
@@ -186,6 +188,7 @@ namespace hfst {
     Symbol2NumberMapInitializer dummy2(TransitionData::symbol2number_map);
 
     unsigned int TransitionData::max_number=2;
+    */
     // ..initialization done
 
 
@@ -362,10 +365,14 @@ namespace hfst {
 	}
 
 	/** @brief Create an HfstNet equivalent to HfstTransducer \a transducer. */
-	HfstNet(const HfstTransducer &transducer) {
-	  initialize_alphabet(alphabet);
-	  throw hfst::exceptions::FunctionNotImplementedException
-	    ("HfstNet(const HfstTransducer &transducer)");
+	HfstNet(const hfst::HfstTransducer &transducer) {
+	  HfstNet<TransitionData, float> *fsm = 
+	    ConversionFunctions::hfst_transducer_to_hfst_net(transducer);
+	  max_state = fsm->max_state;
+	  state_map = fsm->state_map;
+	  final_weight_map = fsm->final_weight_map;
+	  alphabet = fsm->alphabet;
+	  delete fsm;
 	}
 
 	void initialize_alphabet(HfstNetAlphabet &alpha) {
@@ -420,6 +427,12 @@ namespace hfst {
 	    }
 	}
 
+	/** @brief Get the set of SymbolTypes that occur in the alphabet 
+	    of the transducer. */
+	std::set<typename C::SymbolType> get_alphabet() {
+	  return alphabet;
+	}
+
 	/** @brief Add a state \a s to this net.
  
 	    If the state already exists, it is not added again. */
@@ -452,6 +465,7 @@ namespace hfst {
 	W get_final_weight(HfstState s) {
 	  if (final_weight_map.find(s) != final_weight_map.end())
 	    return final_weight_map[s];
+	  throw hfst::exceptions::HfstInterfaceException();
 	}
 
 	/** @brief Set the final weight of state \a s in this net to \a weight. 
@@ -526,6 +540,43 @@ namespace hfst {
 	    }	  
 	}
 
+	/** @brief Write the net in AT&T format to FILE \a file.
+	    \a write_weights defines whether weights are printed. 
+
+	    @todo Combine with the stream version using templates. */
+	void write_in_att_format(FILE *file, bool write_weights=true) 
+	{
+	  for (iterator it = begin(); it != end(); it++)
+	    {
+	      for (typename HfstTransitionSet::iterator tr_it
+		     = it->second.begin();
+		   tr_it != it->second.end(); tr_it++)
+		{
+		  C data = tr_it->get_transition_data();
+		  
+		  fprintf(file, "%i\t%i\t%s\t%s",
+			  it->first,
+			  tr_it->get_target_state(),
+			  data.get_input_symbol().c_str(),
+			  data.get_output_symbol().c_str()			  
+			  );
+
+		  if (write_weights)
+		    fprintf(file, "\t%f",
+			    data.get_weight()); 
+		  fprintf(file, "\n");
+		}
+	      if (is_final_state(it->first))
+		{
+		  fprintf(file, "%i", it->first);
+		  if (write_weights)
+		    fprintf(file, "\t%f", 
+			    get_final_weight(it->first));
+		  fprintf(file, "\n");
+		}
+	    }	  
+	}
+
 	/** @brief Create an HfstNet as defined in AT&T format in istream \a is.
 	    @pre \a is not at end, otherwise an exception is thrown. 
 	    @note Multiple AT&T transducer definitions are separated with 
@@ -537,6 +588,60 @@ namespace hfst {
 	  HfstNet retval;
 	  char line [255];
 	  while(not is.getline(line,255).eof()) {
+
+	    if (*line == '-') // transducer separator line is "--"
+	      return retval;
+
+	    // scan one line that can have a maximum of five fields
+	    char a1 [100]; char a2 [100]; char a3 [100]; 
+	    char a4 [100]; char a5 [100];
+	    // how many fields could be parsed
+	    int n = sscanf(line, "%s\t%s\t%s\t%s\t%s", a1, a2, a3, a4, a5);
+	    
+	    // set value of weight
+	    float weight = 0;
+	    if (n == 2) // a final state line with weight
+	      weight = atof(a2);
+	    if (n == 5) // a transition line with weight
+	      weight = atof(a5);
+	    
+	    if (n == 1 || n == 2)  // a final state line
+	      retval.set_final_weight( atoi(a1), weight );
+	    
+	    else if (n == 4 || n == 5) { // a transition line
+	      std::string input_symbol=std::string(a3);
+	      std::string output_symbol=std::string(a4);
+	      if (epsilon_symbol.compare(input_symbol) == 0)
+		input_symbol="@_EPSILON_SYMBOL_@";
+	      if (epsilon_symbol.compare(output_symbol) == 0)
+		output_symbol="@_EPSILON_SYMBOL_@";
+	      
+	      HfstTransition_ <C> tr( atoi(a2), input_symbol, 
+				      output_symbol, weight );
+	      retval.add_transition( atoi(a1), tr );
+	    }
+	    
+	    else  // line could not be parsed
+	      throw hfst::exceptions::NotValidAttFormatException();       
+	  }
+	  return retval;
+	}
+
+
+	/** @brief Create an HfstNet as defined in AT&T format in FILE \a file.
+	    @pre \a is not at end, otherwise an exception is thrown. 
+	    @note Multiple AT&T transducer definitions are separated with 
+	    the line "--". 
+
+	    @todo Combine with the stream version using templates. */
+	static HfstNet read_in_att_format(FILE *file, 
+					  std::string epsilon_symbol=
+					  std::string("@_EPSILON_SYMBOL_@")) {
+
+	  HfstNet retval;
+	  char line [255];
+
+	  while(NULL != fgets(line, 255, file)) {
 
 	    if (*line == '-') // transducer separator line is "--"
 	      return retval;
@@ -830,9 +935,22 @@ namespace hfst {
 
 
 	// TODO:
-	void substitute(const StringPair &sp, const StringPairSet &sps) {}
-	void substitute(void (*func)(std::string &isymbol, std::string &osymbol) ) { }  
-	void substitute(const StringPair &old_pair, const StringPair &new_pair) {} 
+	void substitute(const StringPair &sp, const StringPairSet &sps) {
+	  (void) sp;
+	  (void) sps;
+	  throw hfst::exceptions::FunctionNotImplementedException();
+	}
+
+	void substitute(void (*func)(std::string &isymbol, std::string &osymbol) ) { 
+	  (void) func;
+	  throw hfst::exceptions::FunctionNotImplementedException();
+	}
+  
+	void substitute(const StringPair &old_pair, const StringPair &new_pair) {
+	  (void) old_pair;
+	  (void) new_pair;
+	  throw hfst::exceptions::FunctionNotImplementedException();
+	} 
 
 	/** @brief Insert freely any number of \a symbol_pair in 
 	    the transducer with weight \a weight. */
@@ -921,12 +1039,13 @@ namespace hfst {
 	  set_final_weight(final_state, weight);
 	}	
 	
-	friend class hfst::HfstTransducer;
+	//friend class hfst::HfstTransducer;
+	friend class ConversionFunctions;
       };
 
     /** @brief An HfstNet with transitions of type TransitionData and 
 	weight type float.
-
+	
 	This is probably the most useful kind of HfstNet. */
     typedef HfstNet <TransitionData, float> HfstFsm;
 

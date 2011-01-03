@@ -41,6 +41,7 @@ using std::pair;
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
+#include "implementations/HfstNet.h"
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 
@@ -50,8 +51,9 @@ using std::pair;
 using hfst::HfstOutputStream;
 using hfst::HfstTokenizer;
 using hfst::HfstTransducer;
-using hfst::HfstInternalTransducer;
-using hfst::implementations::HfstTrie;
+using hfst::implementations::HfstFsm;
+//using hfst::HfstInternalTransducer;
+//using hfst::implementations::HfstTrie;
 using hfst::StringPairVector;
 using hfst::StringPair;
 using hfst::StringSet;
@@ -227,7 +229,7 @@ process_stream(HfstOutputStream& outstream)
   char* line = 0;
   size_t len = 0;
   HfstTokenizer tok;
-  HfstTrie disjunction;
+  HfstFsm disjunction;
   size_t line_n = 0;
 
   // add multicharater symbols to tokenizer
@@ -366,21 +368,19 @@ process_stream(HfstOutputStream& outstream)
 
       if (!disjunct_strings)
         {
-          HfstTrie tr;
-          tr.add_path(spv, path_weight);
-          HfstInternalTransducer mut(tr);
-          HfstTransducer res(mut, output_format);
+          HfstFsm tr;
+          tr.disjunct(spv, path_weight);
+          HfstTransducer res(tr, output_format);
           outstream << res;
         }
       else
         {
-          disjunction.add_path(spv, path_weight);
+          disjunction.disjunct(spv, path_weight);
         }
     }
   if (disjunct_strings)
     {
-      HfstInternalTransducer mut(disjunction);
-      HfstTransducer res(mut, output_format);
+      HfstTransducer res(disjunction, output_format);
 
       if (normalize_weights) 
         {

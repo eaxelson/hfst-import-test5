@@ -27,7 +27,11 @@
 #include "HfstBasic.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
-#include "implementations/HfstInternalTransducer.h"
+#include "implementations/HfstNet.h"
+
+using hfst::implementations::HfstFsm;
+using hfst::implementations::TransitionData;
+using hfst::implementations::HfstState;
 
 namespace hfst
 {
@@ -592,7 +596,7 @@ namespace hfst
     free( filename );
 
     HfstTransducer * retval_hfst = NULL;
-    hfst::implementations::HfstTrie retval_internal;
+    hfst::implementations::HfstFsm retval_fsm;
 
     if (type != FOMA_TYPE && 
 	type != TROPICAL_OFST_TYPE &&
@@ -633,7 +637,7 @@ namespace hfst
 	  type != LOG_OFST_TYPE)
 	retval_hfst->disjunct(spv);
       else
-	retval_internal.add_path(spv);
+	retval_fsm.disjunct(spv,0);
 
     }
     if (Verbose && n >= 10000)
@@ -648,8 +652,8 @@ namespace hfst
 	type != LOG_OFST_TYPE)
       return retval_hfst;
     else {
-      HfstInternalTransducer internal(retval_internal);
-      return new HfstTransducer(internal, type);
+      //HfstFsm internal(retval_internal);
+      return new HfstTransducer(retval_fsm, type);
     }
   }
 
@@ -899,22 +903,26 @@ namespace hfst
  
     else {
       
-      HfstInternalTransducer t(*tr);
+      HfstFsm t(*tr);
       
-      HfstStateIterator state_it(t);
-      while (not state_it.done()) 
+      for (HfstFsm::const_iterator it = t.begin();
+	   it != t.end(); it++)
 	{
-	  unsigned int s = state_it.value();
-	  HfstTransitionIterator transition_it(t,s);
-	  while (not transition_it.done()) 
+	  for (HfstFsm::HfstTransitionSet::iterator tr_it = it->second.begin();
+	       tr_it != it->second.end(); tr_it++)
 	    {
-	      HfstTransition tr = transition_it.value();
-	      TheAlphabet.insert(HfstAlphabet::NumberPair(TheAlphabet.symbol2code(tr.isymbol.c_str()),
-							  TheAlphabet.symbol2code(tr.osymbol.c_str())));
-	      //printf("inserted to TheAlphabet pair %s:%s\n", tr.isymbol.c_str(), tr.osymbol.c_str());
-	      transition_it.next();
+	      TransitionData data = tr_it->get_transition_data();
+
+	      TheAlphabet.insert(HfstAlphabet::NumberPair
+				  (
+				   TheAlphabet.symbol2code
+				   (data.get_input_symbol().c_str())
+				   ,
+				   TheAlphabet.symbol2code
+				   (data.get_output_symbol().c_str())
+				   )
+				 );
 	    }
-	  state_it.next();
 	}
       Alphabet_Defined = 1;
     }

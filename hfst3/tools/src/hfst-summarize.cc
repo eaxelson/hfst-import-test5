@@ -36,13 +36,17 @@ using std::map;
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
+#include "implementations/HfstNet.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
-using hfst::HfstInternalTransducer;
-using hfst::HfstStateIterator;
-using hfst::HfstTransitionIterator;
-using hfst::HfstTransition;
+using hfst::implementations::HfstFsm;
+using hfst::implementations::TransitionData;
+using hfst::implementations::HfstState;
+//using hfst::HfstInternalTransducer;
+//using hfst::HfstStateIterator;
+//using hfst::HfstTransitionIterator;
+//using hfst::HfstTransition;
 using hfst::implementations::HfstInterfaceException;
 
 #include "hfst-commandline.h"
@@ -131,9 +135,9 @@ process_stream(HfstInputStream& instream)
 	exit(1);
       }
       //std::cerr << trans;
-      HfstInternalTransducer *mutt;
+      HfstFsm *mutt;
       try {
-	mutt = new HfstInternalTransducer(*trans);
+	mutt = new HfstFsm(*trans);
       } catch (HfstInterfaceException e) {
 	fprintf(stderr,"An error happened when converting transducer to internal format.\n");
 	exit(1);
@@ -155,11 +159,10 @@ process_stream(HfstInputStream& instream)
       pair<string,unsigned int> most_ambiguous_output;
       unsigned int initial_state = 0; // mutt.get_initial_state();
       // iterate states in random orderd
-      for (HfstStateIterator stateIt(*mutt);
-           !stateIt.done();
-           stateIt.next())
-        {
-          unsigned int s = stateIt.value();
+      for (HfstFsm::const_iterator it = mutt->begin();
+	   it != mutt->end(); it++)
+	{
+          HfstState s = it->first;
           ++states;
           if (mutt->is_final_state(s))
             {
@@ -168,37 +171,39 @@ process_stream(HfstInputStream& instream)
           size_t arcs_here = 0;
           map<string,unsigned int> input_ambiguity;
           map<string,unsigned int> output_ambiguity;
-          for (HfstTransitionIterator arcIt(*mutt, s);
-               !arcIt.done();
-               arcIt.next())
-            {
-              HfstTransition a = arcIt.value();
+
+	  for (HfstFsm::HfstTransitionSet::iterator tr_it = it->second.begin();
+	       tr_it != it->second.end(); tr_it++)
+	    {
+	      TransitionData data = tr_it->get_transition_data();
+	      
               arcs++;
               arcs_here++;
-              if ( (a.isymbol == "@0@") && (a.osymbol == "@0@")) // change to "@_EPSILON_SYMBOL_@"
+              if ( (data.get_input_symbol() == "@_EPSILON_SYMBOL_@") && 
+		   (data.get_output_symbol() == "@_EPSILON_SYMBOL_@") )
                 {
                   io_epsilons++;
                   input_epsilons++;
                   output_epsilons++;
                 }
-              else if (a.isymbol == "@0@")
+              else if (data.get_input_symbol() == "@_EPSILON_SYMBOL_@")
                 {
                   input_epsilons++;
                 }
-              else if (a.osymbol == "@0@")
+              else if (data.get_output_symbol() == "@_EPSILON_SYMBOL_@")
                 {
                   output_epsilons++;
                 }
-              if (input_ambiguity.find(a.isymbol) == input_ambiguity.end())
+              if (input_ambiguity.find(data.get_input_symbol()) == input_ambiguity.end())
                 {
-                  input_ambiguity[a.isymbol] = 0;
+                  input_ambiguity[data.get_input_symbol()] = 0;
                 }
-              if (output_ambiguity.find(a.osymbol) == output_ambiguity.end())
+              if (output_ambiguity.find(data.get_output_symbol()) == output_ambiguity.end())
                 {
-                  output_ambiguity[a.osymbol] = 0;
+                  output_ambiguity[data.get_output_symbol()] = 0;
                 }
-              input_ambiguity[a.isymbol]++;
-              output_ambiguity[a.osymbol]++;
+              input_ambiguity[data.get_input_symbol()]++;
+              output_ambiguity[data.get_output_symbol()]++;
             }
           if (arcs_here > densest_arcs)
             {

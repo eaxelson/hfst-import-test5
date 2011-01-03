@@ -30,17 +30,20 @@ using std::map;
 using std::set;
 
 #include "LexcCompiler.h"
-#include "HfstTransducer.h"
+#include "../../../libhfst/src/HfstTransducer.h"
+#include "../../../libhfst/src/implementations/HfstNet.h"
 #include "XreCompiler.h"
 #include "lexc-utils.h"
 #include "lexc-parser.h"
 #include "xre_utils.h"
 
 using hfst::HfstTransducer;
-using hfst::HfstInternalTransducer;
-using hfst::HfstState;
-using hfst::HfstStateIterator;
-using hfst::HfstTransitionIterator;
+using hfst::implementations::HfstFsm;
+using hfst::implementations::HfstState;
+using hfst::implementations::TransitionData;
+using hfst::implementations::HfstArc;
+//using hfst::HfstStateIterator;
+//using hfst::HfstTransitionIterator;
 using hfst::ImplementationType;
 using hfst::xre::XreCompiler;
 
@@ -277,7 +280,7 @@ HfstTransducer*
 LexcCompiler::compileLexical()
 {
     printConnectedness();
-    HfstInternalTransducer rebuilt;
+    HfstFsm rebuilt;
     map<string,HfstTransducer> lexicons;
     // combine tries with reg.exps and minimize
     for (set<string>::const_iterator s = lexiconNames_.begin();
@@ -323,7 +326,7 @@ LexcCompiler::compileLexical()
     joinerEncode(ender);
     HfstState new_end = first_free;
     first_free++;
-    rebuilt.add_line(new_end, 0);
+    rebuilt.set_final_weight(new_end, 0);
     starts[ender] = new_end;
     HfstState sink = first_free;
     first_free++;
@@ -333,7 +336,7 @@ LexcCompiler::compileLexical()
          ++lex)
       {
         // help structures
-        HfstInternalTransducer mut(lex->second);
+        HfstFsm mut(lex->second);
         map<HfstState,HfstState> rebuildMap;
         // connect start states
         string nameEnc(lex->first);
@@ -342,11 +345,11 @@ LexcCompiler::compileLexical()
         HfstState start_old = 0;
         rebuildMap[start_old] = start_nu;
         // clone all states
-        for (HfstStateIterator state(mut);
-             !state.done();
-             state.next())
+        for (HfstFsm::iterator state = mut.begin();
+             state != mut.end();
+             state++)
           {
-            HfstState old_state = state.value();
+            HfstState old_state = state->first;
             HfstState nu_state;
             if (rebuildMap.find(old_state) != rebuildMap.end())
               {
@@ -361,17 +364,19 @@ LexcCompiler::compileLexical()
                 rebuildMap[old_state] = nu_state;
               }
             // clone all transitions
-            for (HfstTransitionIterator transition(mut, old_state);
-                 !transition.done();
-                 transition.next())
+	    HfstFsm::HfstTransitionSet transitions = mut[old_state];
+	    for ( HfstFsm::HfstTransitionSet::iterator transition 
+		    = transitions.begin(); 
+		  transition != transitions.end();
+		  transition++ )
               {
-                HfstTransition old_transition = transition.value();
-                string old_osymbol = old_transition.osymbol;
-                string old_isymbol = old_transition.isymbol;
+                TransitionData old_transition = transition->get_transition_data();
+                string old_osymbol = old_transition.get_input_symbol();
+                string old_isymbol = old_transition.get_output_symbol();
                 string nu_osymbol;
                 string nu_isymbol;
-                float nu_weight = old_transition.weight;
-                HfstState old_target = old_transition.target;
+                float nu_weight = old_transition.get_weight();
+                HfstState old_target = transition->get_target_state();
                 HfstState nu_target;
                 if (old_osymbol.substr(0, 5) == "@LEXC")
                   {
@@ -410,12 +415,17 @@ LexcCompiler::compileLexical()
                         rebuildMap[old_target] = nu_target;
                       }
                   }
-                HfstState nu_icode = rebuilt.alphabet->add_symbol(nu_isymbol.c_str());
-                HfstState nu_ocode = rebuilt.alphabet->add_symbol(nu_osymbol.c_str());
+                //HfstState nu_icode = rebuilt.alphabet->add_symbol(nu_isymbol.c_str());
+                //HfstState nu_ocode = rebuilt.alphabet->add_symbol(nu_osymbol.c_str());
 
-                rebuilt.add_line(nu_state, nu_target,
+		/*                rebuilt.add_line(nu_state, nu_target,
                                  nu_icode, nu_ocode,
-                                 nu_weight);
+                                 nu_weight); */
+		rebuilt.add_transition(nu_state, HfstArc
+				       (nu_target,
+					nu_isymbol,
+					nu_osymbol,
+					nu_weight));
               }
           }
       }

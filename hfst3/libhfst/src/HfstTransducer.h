@@ -18,6 +18,7 @@
 
 #include "HfstDataTypes.h"
 #include "HfstSymbolDefs.h"
+//#include "implementations/HfstNet.h"
 
 #if HAVE_SFST
 #include "implementations/SfstTransducer.h"
@@ -61,6 +62,11 @@
 namespace hfst
 {
 
+  namespace implementations {    
+    template <class T, class W> class HfstNet;
+    class TransitionData;
+    typedef HfstNet<TransitionData, float> HfstFsm; 
+  }
   class HfstCompiler;
   class HfstTransducer;
 
@@ -142,7 +148,7 @@ namespace hfst
     \section creating_transducers Creating transducers
 
     With HfstTransducer constructors it is possible to create empty, epsilon, one-transition and single-path transducers.
-    Transducers can also be created from scratch with HfstInternalTransducer and converted to an HfstTransducer.
+    Transducers can also be created from scratch with HfstFsm and converted to an HfstTransducer.
     More complex transducers can be combined from simple ones with various functions.
     
     <a name="symbols"></a> 
@@ -308,8 +314,9 @@ tr1.disjunct(tr2);
 
     /** \brief Create an ordinary transducer equivalent to internal transducer \a t.
 	The type of the transducer is defined by \a type.  **/
-    HfstTransducer(const HfstInternalTransducer &t, ImplementationType type);
+    HfstTransducer(const hfst::implementations::HfstFsm &t, ImplementationType type);
 
+    public:
     /** \brief Delete the HfstTransducer. **/
     virtual ~HfstTransducer(void);
 
@@ -784,12 +791,13 @@ HfstTransducer t_transformed;
     friend std::ostream &operator<<(std::ostream &out, const HfstTransducer &t);
     friend class HfstInputStream;
     friend class HfstOutputStream;
-    friend class hfst::implementations::HfstInternalTransducer;
+    friend class hfst::implementations::HfstNet<class C, class W>;
 
 #if HAVE_OPENFST
     friend class HfstGrammar;
 #endif
     friend class HfstCompiler;
+    friend class hfst::implementations::ConversionFunctions;
   };
 
 
