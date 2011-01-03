@@ -18,7 +18,7 @@
 
 #include "HfstDataTypes.h"
 #include "HfstSymbolDefs.h"
-//#include "implementations/HfstNet.h"
+#include "implementations/HfstNet.h"
 
 #if HAVE_SFST
 #include "implementations/SfstTransducer.h"

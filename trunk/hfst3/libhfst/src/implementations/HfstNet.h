@@ -467,9 +467,9 @@ namespace hfst {
 	}
 
 	/** Get the final weight of state \a s in this net. */
-	W get_final_weight(HfstState s) {
+	W get_final_weight(HfstState s) const {
 	  if (final_weight_map.find(s) != final_weight_map.end())
-	    return final_weight_map[s];
+	    return final_weight_map.find(s)->second;
 	  throw hfst::exceptions::HfstInterfaceException();
 	}
 
