@@ -256,7 +256,17 @@ namespace hfst
     append(header, type_value);
   }
 
-  void HfstOutputStream::append_implementation_specific_header_data(std::vector<char> &header, HfstTransducer &transducer)
+#if HAVE_SFST
+void
+HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&
+                                                             header,
+                                                             HfstTransducer&
+                                                             transducer)
+#else
+void 
+HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
+                                                             HfstTransducer&)
+#endif
   {
     switch(type)
       {

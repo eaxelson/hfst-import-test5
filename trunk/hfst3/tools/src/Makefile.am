@@ -19,8 +19,9 @@ SUBDIRS=hfst-proc parsers
 AUTOMAKE_OPTIONS=std-options subdir-objects
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib
-AM_CXXFLAGS = $(WERR_CFLAGS)
+AM_CXXFLAGS = -Wno-deprecated
 
+MAYBE_ALIASES=
 # sort alphabetically:
 if WANT_COMPARE
 MAYBE_COMPARE=hfst-compare
@@ -36,12 +37,15 @@ MAYBE_CONCATENATE=hfst-concatenate
 endif
 if WANT_CONJUNCT
 MAYBE_CONJUNCT=hfst-conjunct
+MAYBE_ALIASES+=hfst-intersect
 endif
 if WANT_DETERMINIZE
 MAYBE_DETERMINIZE=hfst-determinize
+MAYBE_ALIASES+=hfst-determinise
 endif
 if WANT_DISJUNCT
 MAYBE_DISJUNCT=hfst-disjunct
+MAYBE_ALIASES+=hfst-union
 endif
 if WANT_FORMAT
 MAYBE_FORMAT=hfst-format
@@ -51,6 +55,7 @@ MAYBE_FST2FST=hfst-fst2fst
 endif
 if WANT_FST2STRINGS
 MAYBE_FST2STRINGS=hfst-fst2strings
+MAYBE_ALIASES+=hfst-expand
 endif
 if WANT_FST2TXT
 MAYBE_FST2TXT=hfst-fst2txt
@@ -69,6 +74,7 @@ MAYBE_LOOKUP=hfst-lookup
 endif
 if WANT_MINIMIZE
 MAYBE_MINIMIZE=hfst-minimize
+MAYBE_ALIASES+=hfst-minimise
 endif
 if WANT_PROJECT
 MAYBE_PROJECT=hfst-project
@@ -99,9 +105,11 @@ MAYBE_STRIP_HEADER=hfst-strip-header
 endif
 if WANT_SUBTRACT
 MAYBE_SUBTRACT=hfst-subtract
+MAYBE_ALIASES+=hfst-minus
 endif
 if WANT_SUMMARIZE
 MAYBE_SUMMARIZE=hfst-summarize
+MAYBE_ALIASES+=hfst-summarise
 endif
 if WANT_TAIL
 MAYBE_TAIL=hfst-tail
@@ -110,7 +118,8 @@ if WANT_TXT2FST
 MAYBE_TXT2FST=hfst-txt2fst
 endif
 if WANT_CALCULATE
-MAYBE_UNWEIGHTED_CALCULATE=hfst-calculate
+MAYBE_CALCULATE=hfst-calculate
+MAYBE_ALIASES+=hfst-sfstpl2fst
 endif
 if WANT_SUBSTITUTE
 MAYBE_SUBSTITUTE=hfst-substitute
@@ -134,7 +143,7 @@ noinst_HEADERS= \
 # sort alphabetically
 bin_PROGRAMS=$(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_COMPOSE_INTERSECT) \
 			 $(MAYBE_CONCATENATE) $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) \
-			 $(MAYBE_DIFF_TEST) $(MAYBE_DISJUNCT) \
+			 $(MAYBE_DISJUNCT) \
 			 $(MAYBE_FORMAT) \
 			 $(MAYBE_FST2FST) \
 			 $(MAYBE_FST2STRINGS) $(MAYBE_FST2TXT) \
@@ -145,12 +154,12 @@ bin_PROGRAMS=$(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_COMPOSE_INTERSECT) \
 			 $(MAYBE_REPEAT) $(MAYBE_REVERSE) $(MAYBE_SPLIT) \
 			 $(MAYBE_STRINGS2FST) $(MAYBE_STRIP_HEADER) $(MAYBE_SUBTRACT) \
 			 $(MAYBE_SUMMARIZE) $(MAYBE_TAIL) $(MAYBE_TXT2FST) \
-			 $(MAYBE_UNWEIGHTED2WEIGHTED) $(MAYBE_WEIGHTED2UNWEIGHTED) \
-			 $(MAYBE_UNWEIGHTED_CALCULATE) $(MAYBE_WEIGHTED_CALCULATE) \
+			 $(MAYBE_CALCULATE) \
 			 $(MAYBE_SUBSTITUTE) \
 			 $(MAYBE_FLAG_DIACRITICS) \
 			 $(MAYBE_LEXC_COMPILER) $(MAYBE_XFST_COMPILER)
 			 $(MAYBE_FORMAT)
+bin_SCRIPTS=$(MAYBE_ALIASES)
 
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc
 # sort alphabetically
@@ -199,6 +208,31 @@ hfst_xfst2fst_SOURCES=hfst-xfst-compiler.cc $(HFST_COMMON_SRC) \
 					  parsers/lexc-lexer.ll parsers/lexc-utils.cc \
 					  parsers/XreCompiler.cc parsers/xre_parse.yy \
 					  parsers/xre_lex.ll parsers/xre_utils.cc
+
+# aliases:
+hfst-determinise$(EXEEXT): hfst-determinize$(EXEEXT)
+	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
+
+hfst-expand$(EXEEXT): hfst-fst2strings$(EXEEXT)
+	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
+
+hfst-intersect$(EXEEXT): hfst-conjunct$(EXEEXT)
+	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
+
+hfst-minimise$(EXEEXT): hfst-minimize$(EXEEXT)
+	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
+
+hfst-minus$(EXEEXT): hfst-subtract$(EXEEXT)
+	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
+
+hfst-sfstpl2fst$(EXEEXT): hfst-calculate$(EXEEXT)
+	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
+
+hfst-summarise$(EXEEXT): hfst-summarize$(EXEEXT)
+	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
+
+hfst-union$(EXEEXT): hfst-disjunct$(EXEEXT)
+	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
 
 BUILT_SOURCES=hfst-scanner.h hfst-compiler.h
 # make make realise headers automatically follow from flexing

@@ -21,7 +21,8 @@ AC_PREREQ([2.62])
 # init
 AC_INIT([hfst], [3.0], [hfst-bugs@helsinki.fi], [hfst], [http://hfst.sf.net])
 AC_CONFIG_AUX_DIR([build-aux])
-AM_INIT_AUTOMAKE([-Wall -Werror std-options foreign])
+AM_INIT_AUTOMAKE([-Wall -Werror std-options foreign check-news color-tests silent-rules 1.11])
+AM_SILENT_RULES([yes])
 AC_REVISION([$Revision: 1.9 $])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([libhfst/src/HfstTransducer.h])
@@ -87,9 +88,7 @@ AS_IF([test "x$with_hfstol" != xno], [AC_DEFINE([HAVE_HFSTOL], [1],
                                               [Define to compile optimized lookup support in HFST])])
 AM_CONDITIONAL([WANT_HFSTOL], [test x$with_hfstol != xno])
 
-if test "x$with_sfst" == "xno" -a "x$with_openfst" == "xno" -a "x$with_foma" == "xno" -a "x$with_hfstol" == "xno" ; then
-    AC_MSG_ERROR([must build with at least one fst backend])
-fi
+AS_IF([test "x$with_sfst" == "xno" -a "x$with_openfst" == "xno" -a "x$with_foma" == "xno" -a "x$with_hfstol" == "xno"], [AC_MSG_ERROR([must build with at least one fst backend])])
 
 
 # allow programs to be built separately (sort alphabetically)
@@ -185,39 +184,22 @@ AC_ARG_ENABLE([invert],
 AM_CONDITIONAL([WANT_INVERT], [test x$enable_invert != xno])
 AC_ARG_ENABLE([lexc-compiler],
               [AS_HELP_STRING([--enable-lexc-compiler],
-                              [build lexc compiler @<:@default=yes@:>@])],
+                              [build lexc2fst cli @<:@default=no@:>@])],
               [enable_lexc_compiler=$enableval],
-              [enable_lexc_compiler=yes])
-AM_CONDITIONAL([WANT_LEXC_COMPILER], [test "x$enable_lexc_compiler" != xno -a x$enable_lexc != xno])
+              [enable_lexc_compiler=no])
+AM_CONDITIONAL([WANT_LEXC_COMPILER], [test "x$enable_lexc_compiler" != xno])
 AC_ARG_ENABLE([lookup],
 			  [AS_HELP_STRING([--enable-lookup],
 							  [build lookup tool @<:@default=yes@:>@])],
 			  [enable_lookup=$enableval],
 			  [enable_lookup=yes])
 AM_CONDITIONAL([WANT_LOOKUP], [test x$enable_lookup != xno])
-AC_ARG_ENABLE([lookup_optimize],
-			  [AS_HELP_STRING([--enable-lookup-optimize],
-							  [build lookup-optimize tool @<:@default=no@:>@])],
-			  [enable_lookup_optimize=$enableval],
-			  [enable_lookup_optimize=no])
-AM_CONDITIONAL([WANT_LOOKUP_OPTIMIZE], [test x$enable_lookup_optimize != xno])
 AC_ARG_ENABLE([minimize],
 			  [AS_HELP_STRING([--enable-minimize],
 							  [build minimize tool @<:@default=yes@:>@])],
 			  [enable_minimize=$enableval],
 			  [enable_minimize=yes])
 AM_CONDITIONAL([WANT_MINIMIZE], [test x$enable_minimize != xno])
-AC_ARG_ENABLE([pair_test],
-			  [AS_HELP_STRING([--enable-pair-test],
-							  [build pair-test tool @<:@default=no@:>@])],
-			  [enable_pair_test=$enableval],
-			  [enable_pair_test=no])
-AC_ARG_ENABLE([omor_evaluate],
-			  [AS_HELP_STRING([--enable-omor-evaluate],
-							  [build omor evaluation tool @<:@default=no@:>@])],
-			  [enable_omor_evaluate=$enableval],
-			  [enable_omor_evaluate=no])
-AM_CONDITIONAL([WANT_OMOR_EVALUATE], [test x$enable_omor_evaluate != xno])
 AC_ARG_ENABLE([project],
 			  [AS_HELP_STRING([--enable-project],
 							  [build project tool @<:@default=yes@:>@])],
@@ -242,9 +224,6 @@ AC_ARG_ENABLE([regexp2fst],
 			  [enable_regexp2fst=$enableval],
 			  [enable_regexp2fst=yes])
 AM_CONDITIONAL([WANT_REGEXP2FST], [test x$enable_regexp2fst != xno])
-if test x$enable_regexp2fst != xno -a x$enable_xre == xno ; then
-    AC_MSG_ERROR([regexp2fst requires xre])
-fi
 AC_ARG_ENABLE([remove_epsilons],
 			  [AS_HELP_STRING([--enable-remove-epsilons],
 							  [build remove-epsilons tool @<:@default=yes@:>@])],
@@ -308,8 +287,8 @@ AM_CONDITIONAL([WANT_TAIL], [test x$enable_tail != xno])
 AC_ARG_ENABLE([test],
 			  [AS_HELP_STRING([--enable-test],
 							  [build test tool @<:@default=yes@:>@])],
-			  [enable_diff_test=$enableval],
-			  [enable_diff_test=yes])
+			  [enable_test=$enableval],
+			  [enable_test=yes])
 AM_CONDITIONAL([WANT_TEST], [test x$enable_test != xno])
 AC_ARG_ENABLE([txt2fst],
 			  [AS_HELP_STRING([--enable-txt2fst],
@@ -319,20 +298,15 @@ AC_ARG_ENABLE([txt2fst],
 AM_CONDITIONAL([WANT_TXT2FST], [test x$enable_txt2fst != xno])
 AC_ARG_ENABLE([xfst-compiler],
 			  [AS_HELP_STRING([--enable-xfst-compiler],
-							  [build xfst-compiler tool @<:@default=yes@:>@])],
+							  [build xfst2fst cli tool @<:@default=no@:>@])],
 			  [enable_xfst_compiler=$enableval],
-			  [enable_xfst_compiler=yes])
-AM_CONDITIONAL([WANT_XFST_COMPILER], [test x$enable_xfst_compiler != xno -a x$enable_xfst != xno])
+			  [enable_xfst_compiler=no])
+AM_CONDITIONAL([WANT_XFST_COMPILER], [test x$enable_xfst_compiler != xno])
 
-AC_ARG_ENABLE([werrors],
-              [AS_HELP_STRING([--enable-werrors],
-                              [use -Werror and well selected -Wflags @<:@default=yes@:>@])],
-              [enable_werrosr=$enableval],
-              [enable_werrors=yes])
 # Checks for programs
 AC_PROG_CC
 AC_PROG_CXX
-ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
+m4_ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
 AC_PROG_AWK
 AC_PROG_CPP
 AC_PROG_YACC
@@ -340,74 +314,54 @@ AC_PROG_LEX
 AC_PATH_PROG([FOMACLI], [foma])
 # if flex 3.X ever comes out, this breaks :)
 LEX_VERSION=`$LEX --version`
-if test -z "`echo "$LEX_VERSION" | grep 'flex 2\.[[5-9]]\.[[3-9][4-9]]'`"
-then
-	AC_MSG_WARN([
-!! Building hfst successfully requires flex newer than
-!! 2.5.33 on some platforms. Unless you're building with
-!! pre-flex-generated sources, building will probably fail.])
-fi
-# ' <- cos syntax higlighting in macvim is old and buggy
+AS_IF([test -z "`echo "$LEX_VERSION" | grep 'flex 2\.[[5-9]]\.[[3-9][4-9]]'`"],
+      [AC_MSG_WARN([Building hfst successfully requires flex newer than 2.5.33 on some platforms. Unless you're building with pre-flex-generated sources, building will probably fail.])])
+
 AC_PROG_INSTALL
 AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PATH_PROG([DOXYGEN], [doxygen], [no])
 AM_CONDITIONAL([CAN_DOXYGEN], [test x$DOXYGEN != xno])
-AC_PATH_PROG([LDCONFIG],[ldconfig],[echo])
-if test "x$enable_werrors" != xno ; then
-    AC_SUBST([WERR_CFLAGS], "-Wall -Wextra -Werror -Wno-sign-compare -Wno-deprecated")
-fi
 
 # Checks for libraries
 AC_CHECK_LIB([pthread], [main])
 AC_CHECK_LIB([dl], [main])
 
-if test "x$with_openfst" != "xno"; then
-    AC_CHECK_LIB([fst], [main], [],
-                 [AC_MSG_FAILURE([openfst test failed (--without-openfst to disable)])])
-    AC_CHECK_LIB([m], [main])
-fi
+AS_IF([test "x$with_openfst" != "xno"], 
+      [AC_CHECK_LIB([fst], [main], [],
+                 [AC_MSG_FAILURE([openfst test failed (--without-openfst to disable)])])]
+      [AC_CHECK_LIB([m], [main])])
 
-if test "x$with_sfst" != "xno"; then
-    AC_CHECK_LIB([sfst], [main], [],
-                 [AC_MSG_FAILURE([sfst test failed (--without-sfst to disable)])])
-fi
+AS_IF([test "x$with_sfst" != "xno"],
+      [AC_CHECK_LIB([sfst], [main], [],
+                 [AC_MSG_FAILURE([sfst test failed (--without-sfst to disable)])])])
 
-if test "x$with_foma" == "xcheck"; then
-    AC_CHECK_LIB([z], [main])
-    AC_CHECK_LIB([foma], [main], [],
-                 [AC_MSG_FAILURE([foma test failed (--without-foma to disable)])])
-fi
+AS_IF([test "x$with_foma" == "xcheck"],
+      [AC_CHECK_LIB([z], [main])]
+      [AC_CHECK_LIB([foma], [main], [],
+                 [AC_MSG_FAILURE([foma test failed (--without-foma to disable)])])])
 
-if test "x$with_mfstl" != "xno"; then
-   AC_CHECK_LIB([mfstl], [main], [],
-   		[AC_MSG_FAILURE([mfstl test failed (--without-mfstl to disable)])])
-fi
+AS_IF([test "x$with_mfstl" != "xno"],
+      [AC_CHECK_LIB([mfstl], [main], [],
+                [AC_MSG_FAILURE([mfstl test failed (--without-mfstl to disable)])])])
 
 # Checks for header files
 AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h])
 
 AC_LANG([C++])
 
-if test "x$with_sfst" != "xno"; then
-    AC_CHECK_HEADERS([sfst/fst.h])
-    AC_CHECK_HEADERS([backward/hash_set ext/hash_set hash_set])
-    AC_CHECK_HEADERS([backward/hash_map ext/hash_map hash_map])
-fi
-
-if test "x$with_openfst" != "xno"; then
-    AC_CHECK_HEADERS([fst/fstlib.h])
-fi
-
-if test "x$with_foma" != "xno"; then
-    AC_LANG_PUSH([C])
-    AC_CHECK_HEADERS([fomalib.h])
-    AC_LANG_POP
-fi
-
-if test "x$with_mfstl" != "xno"; then
-    AC_CHECK_HEADERS([mfstl/MyFst.h])
-fi
+AS_IF([test "x$with_sfst" != "xno"],
+      [AC_CHECK_HEADERS([sfst/fst.h])]
+      [AC_CHECK_HEADERS([backward/hash_set ext/hash_set hash_set])]
+      [AC_CHECK_HEADERS([backward/hash_map ext/hash_map hash_map])])
+AS_IF([test "x$with_openfst" != "xno"],
+      [AC_CHECK_HEADERS([fst/fstlib.h])])
+AS_IF([test "x$with_foma" != "xno"],
+      [AC_LANG_PUSH([C])]
+      [AC_CHECK_HEADERS([fomalib.h])]
+      [AC_LANG_POP])
+AS_IF([test "x$with_mfstl" != "xno"],
+      [AC_CHECK_HEADERS([mfstl/MyFst.h])])
 
 AC_HEADER_STDBOOL
 AC_HEADER_ASSERT
@@ -452,23 +406,24 @@ cat <<EOF
     *         with foma: $with_foma
     *         with optimized lookup: $with_hfstol
     *         with mfstl: $with_mfstl
-    * tools including calculate: $enable_calculate
+    * tools including calculate: $enable_calculate (sfst-compiler)
     *                 compare: $enable_compare
     *                 compose: $enable_compose
     *                 compose-intersect: $enable_compose_intersect
     *                 concatenate: $enable_concatenate
-    *                 conjunct: $enable_conjunct
-    *                 determinize: $enable_determinize
-    *                 disjunct: $enable_disjunct
+    *                 conjunct: $enable_conjunct (intersect)
+    *                 determinize: $enable_determinize (determinise)
+    *                 disjunct: $enable_disjunct (union)
     *                 flag-diacritics: $enable_flag_diacritics
     *                 format: $enable_format
     *                 fst2fst: $enable_fst2fst
-    *                 fst2strings: $enable_fst2strings
+    *                 fst2strings: $enable_fst2strings (expand)
     *                 fst2txt: $enable_fst2txt
     *                 head: $enable_head
     *                 invert: $enable_invert
+    *                 lexc2fst: $enable_lexc_compiler
     *                 lookup: $enable_lookup
-    *                 minimize: $enable_minimize
+    *                 minimize: $enable_minimize (minimise)
     *                 proc: $enable_proc
     *                 project: $enable_project
     *                 push-weights: $enable_push_weights
@@ -480,19 +435,19 @@ cat <<EOF
     *                 strings2fst: $enable_strings2fst
     *                 strip-header: $enable_strip_header
     *                 substitute: $enable_substitute
-    *                 subtract: $enable_subtract
-    *                 summarize: $enable_summarize
+    *                 subtract: $enable_subtract (minus)
+    *                 summarize: $enable_summarize (summarise)
     *                 tail: $enable_tail
     *                 test: $enable_test
     *                 txt2fst: $enable_txt2fst
-    *                 xfst-compiler: $enable_xfst_compiler
-    *                 foma/xfst: -> $FOMACLI
-    * compiling tools with -Werror: $enable_werrors
+    *                 xfst2fst: $enable_xfst_compiler
+    *                 foma=xfst/lexc: -> $FOMACLI
 EOF
-if test "x$with_foma" != "xno" -a "x$with_openfst" != "xno"; then
-    AC_MSG_WARN([Backends with conflicting licences selected (foma: GPLv2 conflicts OpenFst: Apache), resulting binary must not be redistributed])
-fi
-if test "x$with_openfst" == "xno"; then
-    AC_MSG_WARN([Disabling openfst backend will severely cripple libhfst])
-fi
+dnl important licencing information
+dnl according to GNU GPLv2 strict (not plus) is incompatible with Apache
+AS_IF([test "x$with_foma" != "xno" -a "x$with_openfst" != "xno"],
+      [AC_MSG_WARN([Backends with conflicting licences selected (foma: GPLv2 conflicts OpenFst: Apache), resulting binary must not be redistributed])])
+dnl hope end users never disable ofst 
+AS_IF([test "x$with_openfst" == "xno"],
+      [AC_MSG_WARN([Disabling openfst backend will severely cripple libhfst])])
 
