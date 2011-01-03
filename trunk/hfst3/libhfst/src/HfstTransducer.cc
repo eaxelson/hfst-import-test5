@@ -2644,7 +2644,7 @@ int main(void)
   HfstTransducer ofsttReverse(ofsttCopy);
   ofsttReverse.reverse();
 #endif
-#if HAVE_SFST
+#if HAVE_FOMA
   std::cout << " foma.invert...";
   HfstTransducer fomaInvert(fomaCopy);
   fomaInvert.invert();
