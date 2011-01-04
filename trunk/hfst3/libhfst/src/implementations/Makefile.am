@@ -60,6 +60,7 @@ implinclude_HEADERS = \
 		FomaTransducer.h \
 		LogWeightTransducer.h \
 		SfstTransducer.h TropicalWeightTransducer.h \
+		TropicalWeightComposeIntersect.h \
 		HfstOlTransducer.h HfstNet.h \
 		MfstlTransducer.h
 
