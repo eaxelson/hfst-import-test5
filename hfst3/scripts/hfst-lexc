@@ -1,19 +1,24 @@
 #!/bin/bash
+if ! type hfst-foma-wrapper.sh > /dev/null ; then
+    echo "Cannot find hfst-foma-wrapper installed"
+    exit 1
+fi
 function print_usage() {
-    echo "$0 [-h | -V | -f format | -latin1] ROOT [LEXICON...]"
+    echo "$0 [-h | -V | -f format | -latin1] [ROOT [LEXICON...]]"
 }
 
 function print_help() {
+    print_usage
     echo "Imitates lexc using foma and a wrapper script"
     echo
-    echo "  -h        print this help"
-    echo "  -V        print version info"
-    echo "  -f        parameter is HFST3 format name"
-    echo "  -o        output file name"
-    echo "  -latin1   convert input to UTF-8 for processing"
+    echo "  -h          print this help"
+    echo "  -V          print version info"
+    echo "  -f format   parameter is HFST3 format name"
+    echo "  -o          output file name"
+    echo "  -latin1     convert input to UTF-8 for processing"
     echo
-    echo "At least one script parameter is required"
-    echo "Output file name is required"
+    echo "If ROOT file is not given, the root lexicon is read from stdin"
+    echo "before starting"
     echo "All unrecognised options are passed to foma verbatim"
 }
 
@@ -25,7 +30,6 @@ function print_version() {
     echo "There is NO WARRANTY, to the extent permitted by law."
 }
 
-extraopts="-p"
 while getopts "hvVqF:l:o:u:" flag ; do
     case $flag in
     h) print_help; exit 0;;
@@ -63,6 +67,8 @@ cat $@ > $outfile.tmp.lexc
 printf "read lexc $outfile.tmp.lexc\nsave stack $outfile" > $outfile.tmp.lexcscript
 
 if ! hfst-foma-wrapper.sh $wrapopts -X"-f $outfile.tmp.lexcscript $extraopts"; then
+    rm -f $outfile.tmp.lexcscript $outfile $outfile.tmp.lexc
     echo "Foma wrapper failed"
     exit 1
 fi
+rm -f $outfile.tmp.lexcscript $outfile.tmp.lexc
