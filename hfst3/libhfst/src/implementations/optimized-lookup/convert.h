@@ -393,8 +393,10 @@ public:
   static ConvertTransducer* constructing_transducer; // exposed to this module during the constructor
 };
 
+#endif // HAVE_OPENFST
+
 }
 
-#endif // HAVE_OPENFST
+
 
 #endif // include guard
