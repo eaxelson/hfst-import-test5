@@ -47,6 +47,11 @@ while getopts "vqshVf:F:X:" flag ; do
     ?) echo "Unknown command line switch $OPTARG, try -h for help"; print_usage; exit 1;;
     esac
 done
+hfstopts="$quiet $verbose $format"
+if [ x$verbose != x-v -a x$quiet != x-q ] ; then
+    fomaopts="$fomaopts -p"
+    hfstopts=-v
+fi
 shift $(($OPTIND-1))
 if [ -z $@ ] ; then
     if [ "x$verbose" == "x-v" ] ; then
@@ -81,7 +86,7 @@ if [ -z $files ] ; then
       fi
     done
     if [ "x$verbose" == "x-v" ] ; then
-        echo "discovered stack files $files"
+        echo "discovered stack files: $files"
     fi
 fi
 if [ -z "$files" ] ; then
@@ -93,11 +98,11 @@ for f in $files ; do
         echo "converting $f"
     fi
     printf "load stack $f\nwatt $f.att\nquit" > $f.tmpscript
-    if ! $foma_exec -f $f.tmpscript ; then
+    if ! $foma_exec -q -f $f.tmpscript ; then
         echo "converting $f from foma to text failed"
         exit 1
     fi
-    if ! hfst-txt2fst -e '@0@' $format $quiet $verbose -i "$f.att" -o "$f" ; then
+    if ! hfst-txt2fst -e '@0@' $hfstopts $format -i "$f.att" -o "$f" ; then
         echo "converting $f from text to HFST3 failed"
         exit 1
     fi
