@@ -60,7 +60,8 @@ HFST_HDRS = \
 	HfstInputStream.h \
 	HfstOutputStream.h \
 	HfstGrammar.h \
-	HfstBasic.h
+	HfstBasic.h \
+	HfstUtf8.h
 
 hfstinclude_HEADERS = $(HFST_HDRS)
 
