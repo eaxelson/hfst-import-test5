@@ -68,7 +68,7 @@ implinclude_HEADERS = \
 if WANT_HFSTOL
 hfstolincludedir = $(implincludedir)/optimized-lookup
 hfstolinclude_HEADERS = \
-		optimized-lookup/transducer.h
+		optimized-lookup/transducer.h \
 		optimized-lookup/convert.h
 endif
 
