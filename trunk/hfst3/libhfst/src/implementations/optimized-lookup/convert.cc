@@ -14,6 +14,8 @@
 
 namespace hfst_ol {
 
+#if HAVE_OPENFST
+
 bool check_finality(TransduceR * tr, StateId s)
 {
   return tr->Final(s) != fst::TropicalWeight::Zero();
@@ -897,3 +899,5 @@ Transducer* ConvertTransducer::to_transducer() const
 }
 
 }
+
+#endif // HAVE_OPENFST

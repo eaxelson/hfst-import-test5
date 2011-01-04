@@ -13,11 +13,44 @@
 #ifndef _HFST_OL_CONVERT_H_
 #define _HFST_OL_CONVERT_H_
 
+#if HAVE_OPENFST
 #include <fst/fstlib.h>
+#endif // HAVE_OPENFST
+
 #include "transducer.h"
 
 namespace hfst_ol {
 
+struct TransitionPlaceholder {
+    unsigned int target;
+    SymbolNumber output;
+    float weight;
+TransitionPlaceholder(unsigned int t, SymbolNumber o, float w):
+    target(t),
+	output(o),
+	weight(w)
+	{}
+};
+
+struct StatePlaceholder {
+    unsigned int state_number;
+    unsigned int start_index;
+    std::map<SymbolNumber, std::vector<TransitionPlaceholder> > inputs;
+    bool final;
+    float final_weight;
+    StatePlaceholder (unsigned int state, bool finality):
+    state_number(state),
+	start_index(UINT_MAX),
+	final(finality),
+	final_weight(0.0)
+	{}
+    bool is_simple()
+	{
+	    return inputs.size() < 2;
+	}
+};
+
+#if HAVE_OPENFST // this goes on until the end of file
 typedef fst::StdArc::StateId StateId;
 typedef fst::StdArc StdArc;
 typedef fst::StdVectorFst TransduceR;
@@ -28,6 +61,7 @@ typedef std::set<int64> OfstSymbolSet;
 const StateIdNumber NO_ID_NUMBER = UINT_MAX;
 const StateId NO_STATE_ID = UINT_MAX;
 const SymbolNumber BIG_STATE_LIMIT = 1;
+
 
 struct transition_label
 {
@@ -361,4 +395,6 @@ public:
 
 }
 
-#endif
+#endif // HAVE_OPENFST
+
+#endif // include guard
