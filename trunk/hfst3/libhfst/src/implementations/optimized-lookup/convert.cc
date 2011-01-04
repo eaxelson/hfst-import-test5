@@ -897,7 +897,8 @@ Transducer* ConvertTransducer::to_transducer() const
   else
     return new Transducer(header, alphabet.to_alphabet(), make_index_table<TransitionIndex>(index_table_size), make_transition_table<Transition>());
 }
+#endif // HAVE_OPENFST
 
 }
 
-#endif // HAVE_OPENFST
+
