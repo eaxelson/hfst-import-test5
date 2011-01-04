@@ -87,13 +87,24 @@ namespace hfst { namespace implementations
       // Go through all transitions and copy them to \a net
       for( SFST::ArcsIter p(arcs); p; p++ ) {
 	SFST::Arc *arc=p;
+
+	std::string istring
+	  (alphabet.code2symbol(arc->label().lower_char()));
+	std::string ostring
+	  (alphabet.code2symbol(arc->label().upper_char()));
+
+	if (istring.compare("<>") == 0) {
+	  istring = std::string("@_EPSILON_SYMBOL_@");
+	}
+	if (ostring.compare("<>") == 0) {
+	  ostring = std::string("@_EPSILON_SYMBOL_@");
+	}
+
 	net->add_transition(index[node], 
 			    HfstArc
 			    (index[arc->target_node()],
-			     std::string(alphabet.code2symbol
-					 (arc->label().lower_char())),
-			     std::string(alphabet.code2symbol
-					 (arc->label().upper_char())),
+			     istring,
+			     ostring,
 			     0));
       }
 
@@ -169,9 +180,20 @@ namespace hfst { namespace implementations
 	  if (state_map.find(tr_it->get_target_state()) == state_map.end())
 	    state_map[tr_it->get_target_state()] = t->new_node();
 
+	  std::string istring(data.get_input_symbol());
+	  std::string ostring(data.get_output_symbol());
+
+	  if (data.get_input_symbol().compare("@_EPSILON_SYMBOL_@") == 0) {
+	    istring = std::string("<>");
+	  }
+
+	  if (data.get_output_symbol().compare("@_EPSILON_SYMBOL_@") == 0) {
+	    ostring = std::string("<>");
+	  }
+
 	  SFST::Label l
-	    (t->alphabet.add_symbol(data.get_input_symbol().c_str()),
-	     t->alphabet.add_symbol(data.get_output_symbol().c_str()));
+	    (t->alphabet.add_symbol(istring.c_str()),
+	     t->alphabet.add_symbol(ostring.c_str()));
 	  
 	  // Copy transition to node
 	  state_map[it->first]->add_arc(l,
@@ -192,8 +214,10 @@ namespace hfst { namespace implementations
   // Make sure that also symbols that occur in the alphabet of the
   // HfstFsm but not in its transitions are inserted to the SFST transducer
   for (HfstFsm::HfstNetAlphabet::iterator it = net->alphabet.begin();
-       it != net->alphabet.end(); it++)
-    t->alphabet.add_symbol(it->c_str());
+       it != net->alphabet.end(); it++) {
+    if (it->compare("@_EPSILON_SYMBOL_@") != 0)
+      t->alphabet.add_symbol(it->c_str());
+  }
   
   return t;
 }
@@ -546,10 +570,12 @@ namespace hfst { namespace implementations
       }
     
     // Go through the final states
-    for (HfstFsm::FinalWeightMap::const_iterator it = net->final_weight_map.begin();
+    for (HfstFsm::FinalWeightMap::const_iterator it 
+	   = net->final_weight_map.begin();
 	 it != net->final_weight_map.end(); it++) 
       {
-	t->SetFinal(it->first, it->second);
+	t->SetFinal(hfst_state_to_state_id(it->first, state_map, t), 
+		    it->second);
       }
     
     // Add also symbols that do not occur in transitions

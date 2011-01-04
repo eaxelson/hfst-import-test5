@@ -204,7 +204,7 @@ namespace hfst {
 
        @see HfstArc
     */
-    template <class C> class HfstTransition_ 
+    template <class C> class HfstTransition 
       {
       protected:
 	HfstState target_state;
@@ -212,12 +212,12 @@ namespace hfst {
       public:
 
 	/** @brief Create an uninitialized transition. */
-        HfstTransition_(): target_state(0)
+        HfstTransition(): target_state(0)
 	  {}
 
 	/** @brief Create a transition leading to state \a s with input symbol
 	    \a isymbol, output_symbol \a osymbol and weight \a weight. */
-	HfstTransition_(HfstState s, 
+	HfstTransition(HfstState s, 
 			typename C::SymbolType isymbol, 
 			typename C::SymbolType osymbol, 
 			typename C::WeightType weight):
@@ -225,13 +225,13 @@ namespace hfst {
 	  {}
 
 	/** @brief Create a deep copy of transition \a another. */
-      HfstTransition_(const HfstTransition_<C> &another): 
+      HfstTransition(const HfstTransition<C> &another): 
 	target_state(another.target_state), transition_data(another.transition_data) 
 	  {}
 
 	/** @brief Whether this transition is less than transition \a
 	    another. Needed for storing transitions in a set. */
-	bool operator<(const HfstTransition_<C> &another) const {
+	bool operator<(const HfstTransition<C> &another) const {
 	  if (target_state == another.target_state)
 	    return (transition_data < another.transition_data);
 	  return (target_state < another.target_state);
@@ -239,7 +239,7 @@ namespace hfst {
 
 	/** @brief Assign this transition the same value as transition 
 	    \a another. */
-	void operator=(const HfstTransition_<C> &another) const {
+	void operator=(const HfstTransition<C> &another) const {
 	  target_state = another.target_state;
 	  transition_data = transition_data;
 	}
@@ -260,7 +260,7 @@ namespace hfst {
 	TransitionData. 
 
 	@see TransitionData */
-    typedef HfstTransition_<TransitionData> HfstArc;
+    typedef HfstTransition<TransitionData> HfstArc;
 
     /** @brief A simple transducer format.
 
@@ -327,7 +327,7 @@ namespace hfst {
       {
       protected:
 	typedef std::map<HfstState, 
-	  std::set<HfstTransition_<C> > >
+	  std::set<HfstTransition<C> > >
 	  HfstStateMap_;
 	HfstStateMap_ state_map;
 	typedef std::map<HfstState,W> FinalWeightMap;
@@ -338,7 +338,7 @@ namespace hfst {
 
       public:
 	/** @brief A set of transitions of a state in an HfstNet. */
-	typedef std::set<HfstTransition_<C> > HfstTransitionSet;
+	typedef std::set<HfstTransition<C> > HfstTransitionSet;
 	/** @brief An iterator type that points to the map of states in the net. 
 
 	    The value pointed by the iterator is of type 
@@ -354,7 +354,7 @@ namespace hfst {
 	    number zero and is not a final state, i.e. an empty transducer. */
         HfstNet(void): max_state(0) {
 	  initialize_alphabet(alphabet);
-	  state_map[0]=std::set<HfstTransition_ <C> >();
+	  state_map[0]=std::set<HfstTransition <C> >();
 	}
 
 	/** @brief Create a deep copy of HfstNet \a net. */
@@ -442,7 +442,7 @@ namespace hfst {
 	    If the state already exists, it is not added again. */
 	HfstState add_state(HfstState s) {
 	  if (state_map.find(s) == state_map.end())
-	    state_map[s]=std::set<HfstTransition_ <C> >();
+	    state_map[s]=std::set<HfstTransition <C> >();
 	  if (max_state < s)
 	    max_state=s;
 	  return s;
@@ -451,7 +451,7 @@ namespace hfst {
 	/** @brief Add a transition \a transition to state \a s. 
 
 	    If state \a s does not exist, it is created. */
-	void add_transition(HfstState s, HfstTransition_<C> transition) {
+	void add_transition(HfstState s, HfstTransition<C> transition) {
 
 	  C data = transition.get_transition_data();
 	  add_state(s);
@@ -504,7 +504,7 @@ namespace hfst {
 
 	    If the state does not exist, it is created. The created
 	    state has an empty set of transitions. */
-	std::set<HfstTransition_<C> > & operator[](HfstState s) {
+	std::set<HfstTransition<C> > & operator[](HfstState s) {
 	  if (s > max_state)
 	    max_state=s;
 	  return state_map[s];
@@ -621,7 +621,7 @@ namespace hfst {
 	      if (epsilon_symbol.compare(output_symbol) == 0)
 		output_symbol="@_EPSILON_SYMBOL_@";
 	      
-	      HfstTransition_ <C> tr( atoi(a2), input_symbol, 
+	      HfstTransition <C> tr( atoi(a2), input_symbol, 
 				      output_symbol, weight );
 	      retval.add_transition( atoi(a1), tr );
 	    }
@@ -675,7 +675,7 @@ namespace hfst {
 	      if (epsilon_symbol.compare(output_symbol) == 0)
 		output_symbol="@_EPSILON_SYMBOL_@";
 	      
-	      HfstTransition_ <C> tr( atoi(a2), input_symbol, 
+	      HfstTransition <C> tr( atoi(a2), input_symbol, 
 				      output_symbol, weight );
 	      retval.add_transition( atoi(a1), tr );
 	    }
@@ -754,7 +754,7 @@ namespace hfst {
 
 		  // If there is something to substitute,
 		  if (substitution_made) {
-		    HfstTransition_ <C> new_transition
+		    HfstTransition <C> new_transition
 		      (tr_it->get_target_state(),
 		       new_input_symbol,
 		       new_output_symbol,
@@ -811,7 +811,7 @@ namespace hfst {
 
 	  // Epsilon transition to initial state of \a transducer
 	  max_state++;
-	  HfstTransition_ <C> epsilon_transition
+	  HfstTransition <C> epsilon_transition
 	    (max_state, "@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@", 
 	     sub.weight);
 	  add_transition(sub.origin_state, epsilon_transition);
@@ -829,7 +829,7 @@ namespace hfst {
 		{
 		  C data = tr_it->get_transition_data();
 		  
-		  HfstTransition_ <C> transition
+		  HfstTransition <C> transition
 		    (tr_it->get_target_state() + offset, 
 		     data.get_input_symbol(),
 		     data.get_output_symbol(),
@@ -844,7 +844,7 @@ namespace hfst {
 		 = transducer.final_weight_map.begin();
 	       it != transducer.final_weight_map.end(); it++)
 	    {
-	      HfstTransition_ <C> epsilon_transition
+	      HfstTransition <C> epsilon_transition
 		(sub.target_state, "@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@",
 		 it->second);
 	      add_transition(it->first + offset, epsilon_transition);
@@ -965,7 +965,7 @@ namespace hfst {
 	  alphabet.insert(symbol_pair.second);
 
 	  for (iterator it = begin(); it != end(); it++) {
-	      HfstTransition_ <C> tr( it->first, symbol_pair.first, 
+	      HfstTransition <C> tr( it->first, symbol_pair.first, 
 				      symbol_pair.second, weight );	      
 	      it->second.insert(tr);
 	    }
@@ -1011,7 +1011,7 @@ namespace hfst {
 	    {
 	      max_state++;
 	      next_state = max_state;
-	      HfstTransition_ <C> transition(next_state, it->first,
+	      HfstTransition <C> transition(next_state, it->first,
 					     it-> second, 0);
 	      add_transition(s, transition);
 	    }

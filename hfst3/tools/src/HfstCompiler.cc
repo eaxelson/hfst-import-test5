@@ -223,10 +223,12 @@ namespace hfst
     //t->write_in_att_format(stderr);
 
     // TEST
-    //std::string foo(name);
-    //HfstOutputStream os(foo, t->get_type());
-    //os << *t;
-    //os.close();
+    /*std::string foo(name);
+    foo = std::string("VAR_") + foo;
+    HfstOutputStream os(foo, TROPICAL_OFST_TYPE);
+    HfstTransducer T(*t, TROPICAL_OFST_TYPE);
+    os << T;
+    os.close();*/
 
     return false;
   }
