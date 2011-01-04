@@ -59,7 +59,8 @@ HFST_HDRS = \
 	HfstFlagDiacritics.h \
 	HfstInputStream.h \
 	HfstOutputStream.h \
-	HfstGrammar.h
+	HfstGrammar.h \
+	HfstBasic.h
 
 hfstinclude_HEADERS = $(HFST_HDRS)
 
