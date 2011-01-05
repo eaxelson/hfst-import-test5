@@ -217,7 +217,7 @@ namespace implementations
       static StdVectorFst * substitute(StdVectorFst * t,
 				       const StringPair old_symbol_pair,
 				       StdVectorFst *transducer);
-      static StdVectorFst * substitute(StdVectorFst *t, void (*func)(std::string &isymbol, std::string &osymbol) );
+      // static StdVectorFst * substitute(StdVectorFst *t, bool (*func)(const StringPair &sp, StringPairSet &sps) );
 
       // number versions
       static StdVectorFst * insert_freely(StdVectorFst * t, const NumberPair &number_pair);

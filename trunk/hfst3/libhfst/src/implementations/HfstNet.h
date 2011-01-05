@@ -54,11 +54,14 @@ namespace hfst {
       /** @brief The weight type. */
       typedef float WeightType;
 
-      typedef std::map<unsigned int, SymbolType> Number2SymbolMap;
-      typedef std::map<SymbolType, unsigned int, string_comparison> Symbol2NumberMap;
+      typedef std::map<unsigned int, SymbolType> 
+	Number2SymbolMap;
+      typedef std::map<SymbolType, unsigned int, string_comparison> 
+	Symbol2NumberMap;
 
     public: /* Fix this */
-      /* Maps that contain information of the mappings between strings and numbers */
+      /* Maps that contain information of the mappings between strings 
+	 and numbers */
       static Number2SymbolMap number2symbol_map;
       static Symbol2NumberMap symbol2number_map;
       /* Next free number */
@@ -69,8 +72,9 @@ namespace hfst {
       static std::string get_symbol(unsigned int number) {
 	Number2SymbolMap::const_iterator it = number2symbol_map.find(number);
 	if (it == number2symbol_map.end()) {
-	  fprintf(stderr, "ERROR: TransitionData::get_symbol(unsigned int number) "
-		          "number is not mapped to any symbol\n");
+	  fprintf(stderr, "ERROR: "
+		  "TransitionData::get_symbol(unsigned int number) "
+		  "number is not mapped to any symbol\n");
 	  throw hfst::exceptions::HfstInterfaceException();
 	}
 	return it->second;
@@ -226,7 +230,8 @@ namespace hfst {
 
 	/** @brief Create a deep copy of transition \a another. */
       HfstTransition(const HfstTransition<C> &another): 
-	target_state(another.target_state), transition_data(another.transition_data) 
+	target_state(another.target_state), 
+	  transition_data(another.transition_data) 
 	  {}
 
 	/** @brief Whether this transition is less than transition \a
@@ -339,12 +344,14 @@ namespace hfst {
       public:
 	/** @brief A set of transitions of a state in an HfstNet. */
 	typedef std::set<HfstTransition<C> > HfstTransitionSet;
-	/** @brief An iterator type that points to the map of states in the net. 
+	/** @brief An iterator type that points to the map of states 
+	    in the net. 
 
 	    The value pointed by the iterator is of type 
 	    std::pair<HfstState, HfstTransitionSet >. */
 	typedef typename HfstStateMap_::iterator iterator;
-	/** @brief A const iterator type that points to the map of states in the net.
+	/** @brief A const iterator type that points to the map of states
+	    in the net.
 
 	    The value pointed by the iterator is of type 
 	    std::pair<HfstState, HfstTransitionSet >. */
@@ -364,7 +371,8 @@ namespace hfst {
 	  alphabet = alphabet;
 	}
 
-	/** @brief Create an HfstNet equivalent to HfstTransducer \a transducer. */
+	/** @brief Create an HfstNet equivalent to HfstTransducer 
+	    \a transducer. */
 	HfstNet(const hfst::HfstTransducer &transducer) {
 	  HfstNet<TransitionData, float> *fsm = 
 	    ConversionFunctions::hfst_transducer_to_hfst_net(transducer);
@@ -392,7 +400,8 @@ namespace hfst {
 
 	  // Which symbols occur in the transducer
 	  HfstNetAlphabet symbols_found;
-	  initialize_alphabet(symbols_found); /* special symbols are always known */
+	  initialize_alphabet(symbols_found); /* special symbols are 
+						 always known */
 
 	  for (iterator it = begin(); it != end(); it++)
 	    {
@@ -420,7 +429,8 @@ namespace hfst {
 
 	  // Remove the symbols that did not occur in the transducer
 	  // from its alphabet
-	  for (typename HfstNetAlphabet::iterator it = symbols_not_found.begin();
+	  for (typename HfstNetAlphabet::iterator it 
+		 = symbols_not_found.begin();
 	       it != symbols_not_found.end(); it++)
 	    {
 	      alphabet.erase(*it);
@@ -488,8 +498,8 @@ namespace hfst {
 	    For an example, see #HfstNet */
 	iterator begin() { return state_map.begin(); }
 
-	/** @brief Get a const iterator to the beginning of the map of states in 
-	    the net. */
+	/** @brief Get a const iterator to the beginning of the map of 
+	    states in the net. */
 	const_iterator begin() const { return state_map.begin(); }
 
 	/** @brief Get an iterator to the end of the map of states in
@@ -563,7 +573,7 @@ namespace hfst {
 			  it->first,
 			  tr_it->get_target_state(),
 			  data.get_input_symbol().c_str(),
-			  data.get_output_symbol().c_str()			  
+			  data.get_output_symbol().c_str()	  
 			  );
 
 		  if (write_weights)
@@ -686,32 +696,129 @@ namespace hfst {
 	  return retval;
 	}
 
-	/** @brief Substitute \a old_symbol with \a new_symbol in 
-	    all transitions. \a input_side and \a output_side define
-	    whether the substitution is made on input and output sides. 
+	/** */
+	void substitute(const StringPair &sp, const StringPairSet &sps) {
+	  substituter subs(sp, sps);
+	  substitute(subs);
+	}
+  
+	/** */
+	void substitute(const StringPair &old_pair, 
+			const StringPair &new_pair) {
+	  StringPairSet new_pair_set;
+	  new_pair_set.insert(new_pair);
+	  substitute(old_pair, new_pair_set);
+	} 
 
-	    @todo Unknown and identity symbols must be handled correctly */
-	void substitute(const std::string &old_symbol, 
-			const std::string &new_symbol,
-			bool input_side=true, 
-			bool output_side=true) {
+	/** */
+	void substitute(bool (*func)
+			(const StringPair &sp, StringPairSet &sps) ) { 
+	  substituter subs(func);
+	  substitute(subs);
+	}
 
-	  // If a symbol is substituted with itself, do nothing.
-	  if (old_symbol.compare(new_symbol) == 0)
-	    return;
-	  // If the old symbol is not known to the transducer, do nothing.
-	  if (alphabet.find(old_symbol) == alphabet.end())
-	    return;
+      protected:
 
-	  // Whether the substituting symbol is unknown to the transducer
-	  bool is_new_symbol_unknown=false;
-	  if (alphabet.find(new_symbol) == alphabet.end())
-	    is_new_symbol_unknown=true;
+	/* Used by function substitute(substituter&) */
+	struct substituter {
 
-	  // Remove the symbol to be substituted from the alphabet
-	  // and insert to substituting symbol to the alphabet
-	  alphabet.erase(old_symbol);
-	  alphabet.insert(new_symbol);
+	  /* Whether one symbol is substituted with another symbol. */
+	  bool substitute_symbol;
+	  std::string old_symbol;
+	  std::string new_symbol;
+	  bool input_side;
+	  bool output_side;
+
+	  /* Whether a symbol pair is substituted with a set of symbol pairs. */
+	  bool substitute_symbol_pair;
+	  StringPair SP;
+	  StringPairSet SPS;
+
+	  /* Whether substitution is made according to a function. */
+	  bool substitute_using_function;
+	  bool (*func) (const StringPair &sp, StringPairSet &sps);
+
+	  substituter(const std::string &old_symbol_,
+		      const std::string &new_symbol_, 
+		      bool input_side_=true,
+		      bool output_side_=true)
+	  {
+	    old_symbol = old_symbol_;
+	    new_symbol = new_symbol_;
+	    input_side = input_side_;
+	    output_side = output_side_;
+	    substitute_symbol =true;
+	  }
+
+	  substituter(const StringPair &sp, const StringPairSet &sps)
+	  {
+	    SP = sp;
+	    SPS = sps;
+	    substitute_symbol_pair = true;
+	  }
+
+	  substituter(bool (*func_) (const StringPair &sp, StringPairSet &sps))
+	  {
+	    func = func_;
+	    substitute_using_function = true;
+	  }
+
+	  /* Stores to \a sps the transitions with which the transition \a sp
+	     must be substituted and returns whether any substitutions must
+	     be made, i.e. whether any transitions were inserted in \a sps. */
+	  bool substitute(const StringPair &sp, StringPairSet &sps)
+	  {
+	    if (substitute_symbol)
+	      {
+		std::string isymbol = sp.first;
+		std::string osymbol = sp.second;
+		bool substitution_made=false;
+		
+		if (input_side && isymbol.compare(old_symbol)) {
+		  isymbol = new_symbol;
+		  substitution_made=true;
+		}
+		if (output_side && osymbol.compare(old_symbol)) {
+		  osymbol = new_symbol;
+		  substitution_made=true;
+		}
+		
+		if (substitution_made) {
+		  sps.insert(StringPair(isymbol, osymbol));
+		  return true;
+		}
+		return false;
+	      }
+
+	    if (substitute_symbol_pair)
+	      {
+		if ( sp.first.compare(SP.first) == 0 &&
+		     sp.second.compare(SP.second) == 0 )
+		  {
+		    for (StringPairSet::const_iterator it = SPS.begin();
+			 it != SPS.end(); it ++)
+		      {
+			sps.insert(*it);
+		      }
+		    return true;
+		  }
+		return false;
+	      }
+
+	    if (substitute_using_function)
+	      {
+		return func(sp, sps);
+	      }
+	    
+	    return false;
+	    
+	  }
+	};
+
+  public:
+
+	/* Substitute all transitions according to substituter \a subs. */
+	void substitute(substituter &subs) { 
 
 	  // Go through all states
 	  for (iterator it = begin(); it != end(); it++)
@@ -732,37 +839,32 @@ namespace hfst {
 
 		  // Whether there is anything to substitute 
 		  // in this transition
-		  bool substitution_made=false;
-		  std::string new_input_symbol;
-		  std::string new_output_symbol;
+		  StringPair sp(data.get_input_symbol(), 
+				data.get_output_symbol());
+		  StringPairSet sps;
 
-		  if (input_side && 
-		      data.get_input_symbol().compare(old_symbol) == 0) {
-		    new_input_symbol = new_symbol;
-		    substitution_made=true;
-		  }
-		  else
-		    new_input_symbol=data.get_input_symbol();
-
-		  if (output_side && 
-		      data.get_output_symbol().compare(old_symbol) == 0) {
-		    new_output_symbol = new_symbol;
-		    substitution_made=true;
-		  }
-		  else
-		    new_output_symbol=data.get_output_symbol();
+		  // Find out whether there is a need to substitute
+		  // and which are the substituting transitions
+		  bool substitution_made = 
+		    subs.substitute(sp, sps);
 
 		  // If there is something to substitute,
 		  if (substitution_made) {
-		    HfstTransition <C> new_transition
-		      (tr_it->get_target_state(),
-		       new_input_symbol,
-		       new_output_symbol,
-		       data.get_weight());
 
-		    // schedule the old transition to be deleted and
-		    // the new transition to be added
-		    new_transitions.insert(new_transition);
+		    // schedule the new transitions to be added
+		    for (StringPairSet::const_iterator sps_it = sps.begin();
+			 sps_it != sps.end(); sps_it++)
+		      {
+			HfstTransition <C> new_transition
+			  (tr_it->get_target_state(),
+			   sps_it->first,
+			   sps_it->second,
+			   data.get_weight());
+			
+			new_transitions.insert(new_transition);
+		      }
+
+		    // and the old transition to be deleted
 		    old_transitions.push_back(tr_it);
 		  }
 
@@ -786,9 +888,43 @@ namespace hfst {
 	      // (all transitions in a state substituted)
 	    }
 	  // (all states handled)
+
+	}
+
+
+	/** @brief Substitute \a old_symbol with \a new_symbol in 
+	    all transitions. \a input_side and \a output_side define
+	    whether the substitution is made on input and output sides. 
+
+	    @todo Unknown and identity symbols must be handled correctly */
+	void substitute(const std::string &old_symbol, 
+			const std::string &new_symbol,
+			bool input_side=true, 
+			bool output_side=true) {
+
+	  // If a symbol is substituted with itself, do nothing.
+	  if (old_symbol.compare(new_symbol) == 0)
+	    return;
+	  // If the old symbol is not known to the transducer, do nothing.
+	  if (alphabet.find(old_symbol) == alphabet.end())
+	    return;
+
+	  // Remove the symbol to be substituted from the alphabet
+	  // and insert to substituting symbol to the alphabet
+	  alphabet.erase(old_symbol);
+	  alphabet.insert(new_symbol);
+
+	  // Create a substituter
+	  substituter subs
+	    (old_symbol, new_symbol,
+	     input_side, output_side);
+	  // and perform the substitutions
+	  substitute(subs);
 	}
 
       protected:
+	/* Used in function 
+	   substitute(const StringPair&, HfstNet&) */
 	struct substitution_data 
 	{
 	  HfstState origin_state;
@@ -938,24 +1074,6 @@ namespace hfst {
 	    }
 	}
 
-
-	// TODO:
-	void substitute(const StringPair &sp, const StringPairSet &sps) {
-	  (void) sp;
-	  (void) sps;
-	  throw hfst::exceptions::FunctionNotImplementedException();
-	}
-
-	void substitute(void (*func)(std::string &isymbol, std::string &osymbol) ) { 
-	  (void) func;
-	  throw hfst::exceptions::FunctionNotImplementedException();
-	}
-  
-	void substitute(const StringPair &old_pair, const StringPair &new_pair) {
-	  (void) old_pair;
-	  (void) new_pair;
-	  throw hfst::exceptions::FunctionNotImplementedException();
-	} 
 
 	/** @brief Insert freely any number of \a symbol_pair in 
 	    the transducer with weight \a weight. */
