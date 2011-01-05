@@ -33,12 +33,12 @@ XFST_HDRS=XfstCompiler.h xfst-utils.h
 XFST_BUILT=xfst-parser.h
 XFST_TSTS=XfstCompiler
 BUILT_SOURCES=$(XRE_BUILT) $(LEXC_BUILT) $(XFST_BUILT)
+noinst_HEADERS=$(XRE_HDRS) $(LEXC_HDRS) $(XFST_HDRS)
 
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 
 libhfstsillyparsers_la_SOURCES=$(SFST_SRCS) $(XRE_SRCS) $(LEXC_SRCS) $(XFST_SRCS)
-
 
 check_PROGRAMS=$(XRE_TSTS) $(LEXC_TSTS) $(XFST_TSTS)
 LexcCompiler_SOURCES=LexcCompiler.cc
