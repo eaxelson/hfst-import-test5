@@ -1296,7 +1296,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
   }
 
   HfstTransducer &HfstTransducer::substitute
-  (void (*func)(std::string &isymbol, std::string &osymbol))
+  (bool (*func)(const StringPair &sp, StringPairSet &sps))
   {
 #if HAVE_SFST
     if (this->type == SFST_TYPE)
@@ -1327,18 +1327,24 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 #if HAVE_OPENFST
     if (this->type == TROPICAL_OFST_TYPE)
       {
-	fst::StdVectorFst * tropical_ofst_temp =
-	  this->tropical_ofst_interface.substitute(implementation.tropical_ofst,func);
+	hfst::implementations::HfstFsm * net = 
+	  ConversionFunctions::tropical_ofst_to_hfst_net(implementation.tropical_ofst);
 	delete implementation.tropical_ofst;
-	implementation.tropical_ofst = tropical_ofst_temp;
+	net->substitute(func);
+	implementation.tropical_ofst = 
+	  ConversionFunctions::hfst_net_to_tropical_ofst(net);
+	delete net;
 	return *this;
       }
     if (this->type == LOG_OFST_TYPE)
       {
-	hfst::implementations::LogFst * log_ofst_temp =
-	  this->log_ofst_interface.substitute(implementation.log_ofst,func);
+	hfst::implementations::HfstFsm * net = 
+	  ConversionFunctions::log_ofst_to_hfst_net(implementation.log_ofst);
 	delete implementation.log_ofst;
-	implementation.log_ofst = log_ofst_temp;
+	net->substitute(func);
+	implementation.log_ofst = 
+	  ConversionFunctions::hfst_net_to_log_ofst(net);
+	delete net;
 	return *this;
       }
 #endif
@@ -1679,27 +1685,42 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
     return *this;
   }
 
-  void substitute_single_identity_with_unknown
-  (std::string &isymbol, std::string &osymbol) {
+  bool substitute_single_identity_with_unknown
+  (const StringPair &sp, StringPairSet &sps)
+  {
+    std::string isymbol = sp.first;
+    std::string osymbol = sp.second;
+    
     if (isymbol.compare("@_IDENTITY_SYMBOL_@") && 
 	(osymbol.compare("@_IDENTITY_SYMBOL_@") == false)) {
       isymbol = std::string("@_UNKNOWN_SYMBOL_@");
+      sps.insert(StringPair(isymbol, osymbol));
+      return true;
     }
     else if (osymbol.compare("@_IDENTITY_SYMBOL_@") && 
 	     (isymbol.compare("@_IDENTITY_SYMBOL_@") == false)) {
       osymbol = std::string("@_UNKNOWN_SYMBOL_@");
+      sps.insert(StringPair(isymbol, osymbol));
+      return true;
     }
     else
-      return;
+      return false;
   }
 
-  void substitute_unknown_identity_pairs
-  (std::string &isymbol, std::string &osymbol) {
+  bool substitute_unknown_identity_pairs
+  (const StringPair &sp, StringPairSet &sps)
+  {
+    std::string isymbol = sp.first;
+    std::string osymbol = sp.second;
+
     if (isymbol.compare("@_UNKNOWN_SYMBOL_@") && 
 	isymbol.compare("@_IDENTITY_SYMBOL_@")) {
       isymbol = std::string("@_IDENTITY_SYMBOL_@");
       osymbol = std::string("@_IDENTITY_SYMBOL_@");
+      sps.insert(StringPair(isymbol, osymbol));
+      return true;
     }
+    return false;
   }
 
   unsigned int HfstTransducer::number_of_states() const
@@ -1797,8 +1818,8 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
 	if (DEBUG) printf("substituting after composition..\n");
 
 	// comment...
-	this->substitute(*substitute_single_identity_with_unknown);
-	(const_cast<HfstTransducer&>(another)).substitute(*substitute_unknown_identity_pairs);
+	this->substitute(&substitute_single_identity_with_unknown);
+	(const_cast<HfstTransducer&>(another)).substitute(&substitute_unknown_identity_pairs);
 
 	if (DEBUG) printf("..done\n");
       }

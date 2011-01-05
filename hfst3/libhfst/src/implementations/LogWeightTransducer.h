@@ -217,7 +217,7 @@ namespace implementations
       static LogFst * substitute(LogFst * t,
 				       const StringPair old_symbol_pair,
 				       LogFst *transducer);
-      static LogFst * substitute(LogFst *t, void (*func)(std::string &isymbol, std::string &osymbol) );
+      // static LogFst * substitute(LogFst *t, void (*func)(std::string &isymbol, std::string &osymbol) );
 
       // number versions
       static LogFst * insert_freely(LogFst * t, const NumberPair &number_pair);

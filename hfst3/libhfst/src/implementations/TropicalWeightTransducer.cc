@@ -1443,8 +1443,9 @@ namespace hfst { namespace implementations
     return t;
   }
 
+  /*
   StdVectorFst * TropicalWeightTransducer::substitute
-  (StdVectorFst *t, void (*func)(std::string &isymbol, std::string &osymbol) ) 
+  (StdVectorFst *t, bool (*func)(const StringPair &sp, StringPairSet &sps))
   {
     fst::StdVectorFst * tc = t->Copy();
     SymbolTable * st = tc->InputSymbols()->Copy();
@@ -1461,19 +1462,27 @@ namespace hfst { namespace implementations
 	    
 	    std::string istring = st->Find(arc.ilabel);
 	    std::string ostring = st->Find(arc.olabel);
-	    func(istring,ostring);
-	    new_arc.ilabel = st->AddSymbol(istring);
-	    new_arc.olabel = st->AddSymbol(ostring);
-	    // copy weight and next state as such
-	    new_arc.weight = arc.weight.Value();
-	    new_arc.nextstate = arc.nextstate;
-	    aiter.SetValue(new_arc);
+	    
+	    StringPair sp(istring, ostring);
+	    StringPairSet sps;
+	    bool substitution_made = func(sp, sps);
+
+	    if (substitution_made) {
+
+	      new_arc.ilabel = st->AddSymbol(istring);
+	      new_arc.olabel = st->AddSymbol(ostring);
+	      // copy weight and next state as such
+	      new_arc.weight = arc.weight.Value();
+	      new_arc.nextstate = arc.nextstate;
+	      aiter.SetValue(new_arc);
+	    }
 	  }
       }
     tc->SetInputSymbols(st);
     delete st;
     return tc;    
   }
+  */
 
   StdVectorFst * TropicalWeightTransducer::substitute
   (StdVectorFst * t,unsigned int old_key,unsigned int new_key)

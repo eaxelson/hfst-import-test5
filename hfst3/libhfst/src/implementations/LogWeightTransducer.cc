@@ -1434,6 +1434,7 @@ namespace hfst { namespace implementations
     return t;
   }
 
+  /*
   LogFst * LogWeightTransducer::substitute
   (LogFst *t, void (*func)(std::string &isymbol, std::string &osymbol) ) 
   {
@@ -1465,6 +1466,7 @@ namespace hfst { namespace implementations
     delete st;
     return tc;    
   }
+  */
 
   LogFst * LogWeightTransducer::substitute
   (LogFst * t,unsigned int old_key,unsigned int new_key)

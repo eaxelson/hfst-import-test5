@@ -566,20 +566,29 @@ TODO...
     /** \brief Freely insert symbol pair \a symbol_pair into the transducer. */
     HfstTransducer &insert_freely(const StringPair &symbol_pair);
 
-    /** \brief Substitute all transition pairs <i>isymbol</i>:<i>osymbol</i> as defined in function \a func. 
+    /** \brief Substitute all transition \a sp with transitions \a sps 
+	as defined by function \a func. 
 
 	An example:
 \verbatim
-void function(std::string &isymbol, std::string &osymbol) {
-  if (osymbol.compare(isymbol) != 0)
-    return;
-  if (osymbol.compare("a") == 0 ||
-      osymbol.compare("o") == 0 ||
-      osymbol.compare("u") == 0)
+bool function(const StringPair &sp, StringPairSet &sps) 
+{
+  if (sp.second.compare(sp.first) != 0)
+    return false;
+
+  std::string isymbol = sp.first;
+  std::string osymbol;
+
+  if (sp.second.compare("a") == 0 ||
+      sp.second.compare("o") == 0 ||
+      sp.second.compare("u") == 0)
     osymbol = std::string("<back_wovel>");
-  if (osymbol.compare("e") == 0 ||
-      osymbol.compare("i") == 0)
+  if (sp.second.compare("e") == 0 ||
+      sp.second.compare("i") == 0)
     osymbol = std::string("<front_wovel>");
+
+  sps.insert(StringPair(isymbol, osymbol));
+  return true;
 }
 
 ...
@@ -591,7 +600,7 @@ t.substitute(&func);
 
 @see String
 */
-    HfstTransducer &substitute(void (*func)(std::string &isymbol, std::string &osymbol));
+    HfstTransducer &substitute(bool (*func)(const StringPair &sp, StringPairSet &sps));
 
     /** \brief Substitute all transition symbols equal to \a old_symbol with symbol \a new_symbol.
 	\a input_side and \a output_side define whether the substitution is made on input and output sides.
