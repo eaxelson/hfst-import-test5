@@ -21,6 +21,7 @@ noinst_LTLIBRARIES=libhfstimplementations.la
 # HFST bridge specific stuff
 IMPLEMENTATION_SRCS=HfstNet.cc ConvertTransducerFormat.cc
 AM_CXXFLAGS=-Wno-deprecated
+AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
 # the bridges
 if WANT_SFST
 MAYBE_SFST=SfstTransducer.cc
@@ -49,7 +50,6 @@ endif
 libhfstimplementations_la_SOURCES=$(IMPLEMENTATION_SRCS) $(BRIDGE_SRCS) \
 								  $(SFST_SRCS) $(HFST_OL_SRCS)
 
-AM_CPPFLAGS = -I..
 
 # headers of implementation bridge to reveal to public
 hfstincludedir = $(includedir)/hfst

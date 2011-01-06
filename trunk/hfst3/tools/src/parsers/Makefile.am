@@ -15,39 +15,3 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-
-AM_CPPFLAGS= -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib
-AM_CXXFLAGS= -Wno-deprecated
-noinst_LTLIBRARIES=libhfstsillyparsers.la
-
-XRE_SRCS=xre_lex.ll xre_parse.yy xre_utils.cc XreCompiler.cc
-XRE_HDRS=XreCompiler.h xre_utils.h
-XRE_BUILT=xre_parse.h
-XRE_TSTS=XreCompiler
-LEXC_SRCS=lexc-lexer.ll lexc-parser.yy lexc-utils.cc LexcCompiler.cc
-LEXC_HDRS=LexcCompiler.h lexc-utils.h
-LEXC_BUILT=lexc-parser.h
-LEXC_TSTS=LexcCompiler
-XFST_SRCS=xfst-lexer.ll xfst-parser.yy xfst-utils.cc XfstCompiler.cc
-XFST_HDRS=XfstCompiler.h xfst-utils.h
-XFST_BUILT=xfst-parser.h
-XFST_TSTS=XfstCompiler
-BUILT_SOURCES=$(XRE_BUILT) $(LEXC_BUILT) $(XFST_BUILT)
-noinst_HEADERS=$(XRE_HDRS) $(LEXC_HDRS) $(XFST_HDRS)
-
-AM_YFLAGS=-d
-AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
-
-libhfstsillyparsers_la_SOURCES=$(SFST_SRCS) $(XRE_SRCS) $(LEXC_SRCS) $(XFST_SRCS)
-
-check_PROGRAMS=$(XRE_TSTS) $(LEXC_TSTS) $(XFST_TSTS)
-LexcCompiler_SOURCES=LexcCompiler.cc
-LexcCompiler_CXXFLAGS=-DDEBUG_MAIN
-LexcCompiler_LDADD=../libhfst.la
-XreCompiler_SOURCES=XreCompiler.cc
-XreCompiler_CXXFLAGS=-DDEBUG_MAIN
-XreCompiler_LDADD=../libhfst.la
-XfstCompiler_SOURCES=XfstCompiler.cc
-XfstCompiler_LDADD=../libhfst.la
-XfstCompiler_CXXFLAGS=-DDEBUG_MAIN
-TESTS=$(XRE_TSTS) $(LEXC_TSTS) $(XFST_TSTS)
