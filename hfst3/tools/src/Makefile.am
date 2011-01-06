@@ -15,10 +15,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS=hfst-proc parsers
+SUBDIRS=hfst-proc
 AUTOMAKE_OPTIONS=std-options subdir-objects
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
-AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib
+AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
 AM_CXXFLAGS = -Wno-deprecated
 
 MAYBE_ALIASES=

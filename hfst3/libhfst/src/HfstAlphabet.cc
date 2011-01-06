@@ -1,6 +1,6 @@
 #include "HfstAlphabet.h"
-#include "../HfstBasic.h"
-#include "../HfstUtf8.h"
+#include "HfstBasic.h"
+#include "HfstUtf8.h"
 
 #ifndef DEBUG_MAIN
 

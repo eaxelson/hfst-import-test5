@@ -22,6 +22,7 @@ lib_LTLIBRARIES = libhfst.la
 EXTRA_DIST=coding-style.sh
 
 AM_CXXFLAGS=-Wno-deprecated -Wall -Wextra
+AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
 
 # HFST bridge specific stuff
 HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc HfstOutputStream.cc\
@@ -32,8 +33,6 @@ HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc HfstOutputStream.cc\
 # libtool takes over
 libhfst_la_SOURCES =  $(HFST_SRCS)
 libhfst_la_LIBADD = implementations/libhfstimplementations.la
-
-AM_CPPFLAGS = -I./implementations
 
 # we only have one library target but would like a particular includedir
 # structure for various headers, so we do this
