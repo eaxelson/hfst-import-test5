@@ -184,27 +184,12 @@ namespace hfst {
       }
     };
 
-    /*
-    HfstTransitionData::Number2SymbolMap HfstTransitionData::number2symbol_map;
-    Number2SymbolMapInitializer dummy1(HfstTransitionData::number2symbol_map);
-
-    HfstTransitionData::Symbol2NumberMap HfstTransitionData::symbol2number_map;
-    Symbol2NumberMapInitializer dummy2(HfstTransitionData::symbol2number_map);
-
-    unsigned int HfstTransitionData::max_number=2;
-    */
-    // ..initialization done
-
-
     /** @brief A transition that consists of a target state and 
 	transition data represented by class C. 
 
-       HfstTransition is not parametrized with class W, it is the user's 
-       responsibility to use the same weight type in
-       transitions and final states.
-
        The easiest way to use this template is to choose the 
-       ready-templated HfstBasicTransition.
+       the implementation HfstBasicTransition which is compatible with
+       HfstBasicTransducer.
 
        @see HfstBasicTransition
     */
@@ -279,7 +264,9 @@ namespace hfst {
     /** @brief An HfstTransition with transition data of type
 	HfstNameThis. 
 
-	@see HfstNameThis */
+	This implementation is compatible with HfstBasicTransducer.
+
+	@see HfstNameThis HfstBasicTransducer */
     typedef HfstTransition<HfstNameThis> HfstBasicTransition;
 
     /** @brief A simple transition graph format that consists of
@@ -289,12 +276,12 @@ namespace hfst {
        to a set of that state's transitions (class HfstTransition<class C>),
        and a map, where each final state is mapped to its 
        final weight (class W). Class C must use the weight type W. 
-
        A state's transition (class HfstTransition<class C>) contains
        a target state and transition data (class C).
 
        Probably the easiest way to use this template is to choose
-       the implementations HfstBasicTransducer (HfstTransitionGraph<HfstNameThis, float>)
+       the implementations HfstBasicTransducer 
+       (HfstTransitionGraph<HfstNameThis, float>)
        and HfstBasicTransition (HfstTransition<HfstNameThis>).
        HfstBasicTransducer is the implementation that is
        used as an example in this documentation.
@@ -303,10 +290,11 @@ namespace hfst {
        with weight 0.4 from scratch:
 
 \verbatim
-  // Create an empty net
-  // The net has initially one start state (number zero) that is not final
+  // Create an empty transducer
+  // The transducer has initially one start state (number zero) 
+  // that is not final
   HfstBasicTransducer net;
-  // Add two states to the net
+  // Add two states to the transducer
   net.add_state(1);
   net.add_state(2);
   // Create a transition [foo:bar] leading to state 1 with weight 0.1 ...
@@ -332,14 +320,12 @@ namespace hfst {
              it->second.begin();
 	   tr_it != it->second.end(); tr_it++)
 	{
-	  HfstNameThis data = tr_it->get_transition_data();
-
 	  fprintf(stderr, "%i\t%i\t%s\t%s\t%f\n",
 		  it->first,
 		  tr_it->get_target_state(),
-		  data.input_symbol.c_str(),
-		  data.output_symbol.c_str(),
-		  data.weight
+		  tr_it->get_input_symbol().c_str(),
+		  tr_it->get_output_symbol().c_str(),
+		  tr_it->get_weight()
 		  );
 	}
       if (net.is_final_state(it->first))
@@ -351,7 +337,7 @@ namespace hfst {
     }
 \endverbatim
 
-       @see #HfstBasicTransducer HfstNameThis */
+       @see #HfstBasicTransducer HfstBasicTransition */
     template <class C, class W> class HfstTransitionGraph 
       {
       protected:
@@ -389,7 +375,8 @@ namespace hfst {
 	}
 
 	/** @brief Create a deep copy of HfstTransitionGraph \a net. */
-        HfstTransitionGraph(const HfstTransitionGraph &net): max_state(net.max_state) {
+        HfstTransitionGraph(const HfstTransitionGraph &net): 
+	max_state(net.max_state) {
 	  state_map = net.state_map;
 	  final_weight_map = net.final_weight_map;
 	  alphabet = alphabet;
@@ -445,7 +432,8 @@ namespace hfst {
 	  // the transducer
 	  HfstTransitionGraphAlphabet symbols_not_found;
 
-	  for (typename HfstTransitionGraphAlphabet::iterator it = alphabet.begin();
+	  for (typename HfstTransitionGraphAlphabet::iterator it 
+		 = alphabet.begin();
 	       it != alphabet.end(); it++) 
 	    {
 	      if (symbols_found.find(*it) == symbols_found.end())
@@ -581,9 +569,7 @@ namespace hfst {
 	}
 
 	/** @brief Write the net in AT&T format to FILE \a file.
-	    \a write_weights defines whether weights are printed. 
-
-	    @todo Combine with the stream version using templates. */
+	    \a write_weights defines whether weights are printed. */
 	void write_in_att_format(FILE *file, bool write_weights=true) 
 	{
 	  for (iterator it = begin(); it != end(); it++)
@@ -617,134 +603,115 @@ namespace hfst {
 	    }	  
 	}
 
-	/** @brief Create an HfstTransitionGraph as defined in AT&T format in istream \a is.
+	/* Create an HfstTransitionGraph as defined in AT&T format 
+	   in istream \a is or FILE \a file. \a epsilon_symbol defines
+	   how epsilon is represented. 
+
+	   The functions is called by functions 
+	   read_in_att_format(istream&, std::string) and
+	   read_in_att_format(FILE*, std::string). 
+	   If \a file is NULL, it is ignored and \a is is used.
+	   If \a file is not NULL, it is used and \a is is ignored. */
+	static HfstTransitionGraph read_in_att_format
+	  (std::istream &is,
+	   FILE *file,
+	   std::string epsilon_symbol=
+	   std::string("@_EPSILON_SYMBOL_@")) {
+
+	  HfstTransitionGraph retval;
+	  char line [255];
+	  while(true) {
+
+	    if (file == NULL) { /* we use streams */
+	      if (not is.getline(line,255).eof())
+		break;
+	    }
+	    else { /* we use FILEs */	    
+	      if (NULL != fgets(line, 255, file))
+		break;
+	    }
+
+	    if (*line == '-') // transducer separator line is "--"
+	      return retval;
+
+	    // scan one line that can have a maximum of five fields
+	    char a1 [100]; char a2 [100]; char a3 [100]; 
+	    char a4 [100]; char a5 [100];
+	    // how many fields could be parsed
+	    int n = sscanf(line, "%s\t%s\t%s\t%s\t%s", a1, a2, a3, a4, a5);
+	    
+	    // set value of weight
+	    float weight = 0;
+	    if (n == 2) // a final state line with weight
+	      weight = atof(a2);
+	    if (n == 5) // a transition line with weight
+	      weight = atof(a5);
+	    
+	    if (n == 1 || n == 2)  // a final state line
+	      retval.set_final_weight( atoi(a1), weight );
+	    
+	    else if (n == 4 || n == 5) { // a transition line
+	      std::string input_symbol=std::string(a3);
+	      std::string output_symbol=std::string(a4);
+	      if (epsilon_symbol.compare(input_symbol) == 0)
+		input_symbol="@_EPSILON_SYMBOL_@";
+	      if (epsilon_symbol.compare(output_symbol) == 0)
+		output_symbol="@_EPSILON_SYMBOL_@";
+	      
+	      HfstTransition <C> tr( atoi(a2), input_symbol, 
+				      output_symbol, weight );
+	      retval.add_transition( atoi(a1), tr );
+	    }
+	    
+	    else  // line could not be parsed
+	      throw hfst::exceptions::NotValidAttFormatException();       
+	  }
+	  return retval;
+	}
+
+
+	/** @brief Create an HfstTransitionGraph as defined in AT&T format 
+	    in istream \a is. \a epsilon_symbol defines how epsilon is
+	    represented. 
 	    @pre \a is not at end, otherwise an exception is thrown. 
 	    @note Multiple AT&T transducer definitions are separated with 
 	    the line "--". */
-	static HfstTransitionGraph read_in_att_format(std::istream &is, 
-					  std::string epsilon_symbol=
-					  std::string("@_EPSILON_SYMBOL_@")) {
-
-	  HfstTransitionGraph retval;
-	  char line [255];
-	  while(not is.getline(line,255).eof()) {
-
-	    if (*line == '-') // transducer separator line is "--"
-	      return retval;
-
-	    // scan one line that can have a maximum of five fields
-	    char a1 [100]; char a2 [100]; char a3 [100]; 
-	    char a4 [100]; char a5 [100];
-	    // how many fields could be parsed
-	    int n = sscanf(line, "%s\t%s\t%s\t%s\t%s", a1, a2, a3, a4, a5);
-	    
-	    // set value of weight
-	    float weight = 0;
-	    if (n == 2) // a final state line with weight
-	      weight = atof(a2);
-	    if (n == 5) // a transition line with weight
-	      weight = atof(a5);
-	    
-	    if (n == 1 || n == 2)  // a final state line
-	      retval.set_final_weight( atoi(a1), weight );
-	    
-	    else if (n == 4 || n == 5) { // a transition line
-	      std::string input_symbol=std::string(a3);
-	      std::string output_symbol=std::string(a4);
-	      if (epsilon_symbol.compare(input_symbol) == 0)
-		input_symbol="@_EPSILON_SYMBOL_@";
-	      if (epsilon_symbol.compare(output_symbol) == 0)
-		output_symbol="@_EPSILON_SYMBOL_@";
-	      
-	      HfstTransition <C> tr( atoi(a2), input_symbol, 
-				      output_symbol, weight );
-	      retval.add_transition( atoi(a1), tr );
-	    }
-	    
-	    else  // line could not be parsed
-	      throw hfst::exceptions::NotValidAttFormatException();       
-	  }
-	  return retval;
+	static HfstTransitionGraph read_in_att_format
+	  (std::istream &is,
+	   std::string epsilon_symbol=
+	     std::string("@_EPSILON_SYMBOL_@")) 
+	{
+	  return read_in_att_format
+	    (is, NULL /* a dummy variable */,
+	     epsilon_symbol);
 	}
 
-
-	/** @brief Create an HfstTransitionGraph as defined in AT&T format in FILE \a file.
+	/** @brief Create an HfstTransitionGraph as defined 
+	    in AT&T format in FILE \a file. \a epsilon_symbol defines 
+	    how epsilon is represented. 
 	    @pre \a is not at end, otherwise an exception is thrown. 
 	    @note Multiple AT&T transducer definitions are separated with 
-	    the line "--". 
-
-	    @todo Combine with the stream version using templates. */
-	static HfstTransitionGraph read_in_att_format(FILE *file, 
-					  std::string epsilon_symbol=
-					  std::string("@_EPSILON_SYMBOL_@")) {
-
-	  HfstTransitionGraph retval;
-	  char line [255];
-
-	  while(NULL != fgets(line, 255, file)) {
-
-	    if (*line == '-') // transducer separator line is "--"
-	      return retval;
-
-	    // scan one line that can have a maximum of five fields
-	    char a1 [100]; char a2 [100]; char a3 [100]; 
-	    char a4 [100]; char a5 [100];
-	    // how many fields could be parsed
-	    int n = sscanf(line, "%s\t%s\t%s\t%s\t%s", a1, a2, a3, a4, a5);
-	    
-	    // set value of weight
-	    float weight = 0;
-	    if (n == 2) // a final state line with weight
-	      weight = atof(a2);
-	    if (n == 5) // a transition line with weight
-	      weight = atof(a5);
-	    
-	    if (n == 1 || n == 2)  // a final state line
-	      retval.set_final_weight( atoi(a1), weight );
-	    
-	    else if (n == 4 || n == 5) { // a transition line
-	      std::string input_symbol=std::string(a3);
-	      std::string output_symbol=std::string(a4);
-	      if (epsilon_symbol.compare(input_symbol) == 0)
-		input_symbol="@_EPSILON_SYMBOL_@";
-	      if (epsilon_symbol.compare(output_symbol) == 0)
-		output_symbol="@_EPSILON_SYMBOL_@";
-	      
-	      HfstTransition <C> tr( atoi(a2), input_symbol, 
-				      output_symbol, weight );
-	      retval.add_transition( atoi(a1), tr );
-	    }
-	    
-	    else  // line could not be parsed
-	      throw hfst::exceptions::NotValidAttFormatException();       
-	  }
-	  return retval;
+	    the line "--". */
+	static HfstTransitionGraph read_in_att_format
+	  (FILE *file, 
+	   std::string epsilon_symbol=
+	     std::string("@_EPSILON_SYMBOL_@")) 
+	{
+	  return read_in_att_format
+	    (std::cin /* a dummy variable */,
+	     file, epsilon_symbol);
 	}
 
-	/** */
-	void substitute(const StringPair &sp, const StringPairSet &sps) {
-	  substituter subs(sp, sps);
-	  substitute(subs);
-	}
-  
-	/** */
-	void substitute(const StringPair &old_pair, 
-			const StringPair &new_pair) {
-	  StringPairSet new_pair_set;
-	  new_pair_set.insert(new_pair);
-	  substitute(old_pair, new_pair_set);
-	} 
 
-	/** */
-	void substitute(bool (*func)
-			(const StringPair &sp, StringPairSet &sps) ) { 
-	  substituter subs(func);
-	  substitute(subs);
-	}
+	/* ----------------------
+	   Substitution functions
+	   ---------------------- */
 
       protected:
 
-	/* Used by function substitute(substituter&) */
+	/* *************************************************
+	   A class used by function substitute(substituter&) 
+	   *************************************************  */
 	struct substituter {
 
 	  /* Whether one symbol is substituted with another symbol. */
@@ -763,6 +730,8 @@ namespace hfst {
 	  bool substitute_using_function;
 	  bool (*func) (const StringPair &sp, StringPairSet &sps);
 
+	  /* Create a substituter that substitutes one symbol with
+	     another symbol. */
 	  substituter(const std::string &old_symbol_,
 		      const std::string &new_symbol_, 
 		      bool input_side_=true,
@@ -775,6 +744,8 @@ namespace hfst {
 	    substitute_symbol =true;
 	  }
 
+	  /* Create a substituter that substitutes a symbol pair with
+	     a set of symbol pairs. */
 	  substituter(const StringPair &sp, const StringPairSet &sps)
 	  {
 	    SP = sp;
@@ -782,6 +753,8 @@ namespace hfst {
 	    substitute_symbol_pair = true;
 	  }
 
+	  /* Create a substituter that substitutes transitions according
+	     to a function. */
 	  substituter(bool (*func_) (const StringPair &sp, StringPairSet &sps))
 	  {
 	    func = func_;
@@ -835,14 +808,15 @@ namespace hfst {
 		return func(sp, sps);
 	      }
 	    
-	    return false;
-	    
+	    return false;	    
 	  }
 	};
 
-  public:
 
-	/* Substitute all transitions according to substituter \a subs. */
+	/* ************************************************************
+	   A function used by the public substitution functions. 
+	   Substitute all transitions according to substituter \a subs. 
+	   ************************************************************ */
 	void substitute(substituter &subs) { 
 
 	  // Go through all states
@@ -917,6 +891,12 @@ namespace hfst {
 	}
 
 
+      public:
+
+	/* **********************************
+	   The public substitution functions.
+	   ********************************** */
+
 	/** @brief Substitute \a old_symbol with \a new_symbol in 
 	    all transitions. \a input_side and \a output_side define
 	    whether the substitution is made on input and output sides. 
@@ -947,6 +927,34 @@ namespace hfst {
 	  substitute(subs);
 	}
 
+	/** */
+	void substitute(const StringPair &sp, const StringPairSet &sps) {
+	  substituter subs(sp, sps);
+	  substitute(subs);
+	}
+  
+	/** */
+	void substitute(const StringPair &old_pair, 
+			const StringPair &new_pair) {
+	  StringPairSet new_pair_set;
+	  new_pair_set.insert(new_pair);
+	  substitute(old_pair, new_pair_set);
+	} 
+
+	/** */
+	void substitute(bool (*func)
+			(const StringPair &sp, StringPairSet &sps) ) { 
+	  substituter subs(func);
+	  substitute(subs);
+	}
+
+
+
+
+	/* ----------------------------------------------	   
+	   Substitute string pair with a transition graph
+	   ---------------------------------------------- */
+
       protected:
 	/* Used in function 
 	   substitute(const StringPair&, HfstTransitionGraph&) */
@@ -966,9 +974,12 @@ namespace hfst {
 	  }
 	};
 
-	/* Add a copy of \a transducer with epsilon transitions between 
+	/* Used in function substitute(const StringPair&, 
+	                               HfstTransitionGraph&)
+	   Add a copy of \a transducer with epsilon transitions between 
 	   states and with weight as defined in \a sub. */
-	void add_substitution(substitution_data &sub, HfstTransitionGraph &transducer) {
+	void add_substitution(substitution_data &sub, 
+			      HfstTransitionGraph &transducer) {
 
 	  // Epsilon transition to initial state of \a transducer
 	  max_state++;
@@ -1113,6 +1124,11 @@ namespace hfst {
 	      it->second.insert(tr);
 	    }
 	}
+
+	
+	/* ---------------------
+	   Disjunction functions
+	   --------------------- */
       
       protected:
 	/* Disjunct the transition of path \a spv pointed by \a it

@@ -42,7 +42,6 @@ using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::implementations::HfstTransitionGraph;
 using hfst::implementations::HfstBasicTransducer;
-using hfst::implementations::HfstNameThis;
 using hfst::implementations::HfstState;
 using hfst::implementations::HfstInterfaceException;
 
@@ -172,35 +171,33 @@ process_stream(HfstInputStream& instream)
 	  for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it = it->second.begin();
 	       tr_it != it->second.end(); tr_it++)
 	    {
-	      HfstNameThis data = tr_it->get_transition_data();
-	      
               arcs++;
               arcs_here++;
-              if ( (data.get_input_symbol() == "@_EPSILON_SYMBOL_@") && 
-		   (data.get_output_symbol() == "@_EPSILON_SYMBOL_@") )
+              if ( (tr_it->get_input_symbol() == "@_EPSILON_SYMBOL_@") && 
+		   (tr_it->get_output_symbol() == "@_EPSILON_SYMBOL_@") )
                 {
                   io_epsilons++;
                   input_epsilons++;
                   output_epsilons++;
                 }
-              else if (data.get_input_symbol() == "@_EPSILON_SYMBOL_@")
+              else if (tr_it->get_input_symbol() == "@_EPSILON_SYMBOL_@")
                 {
                   input_epsilons++;
                 }
-              else if (data.get_output_symbol() == "@_EPSILON_SYMBOL_@")
+              else if (tr_it->get_output_symbol() == "@_EPSILON_SYMBOL_@")
                 {
                   output_epsilons++;
                 }
-              if (input_ambiguity.find(data.get_input_symbol()) == input_ambiguity.end())
+              if (input_ambiguity.find(tr_it->get_input_symbol()) == input_ambiguity.end())
                 {
-                  input_ambiguity[data.get_input_symbol()] = 0;
+                  input_ambiguity[tr_it->get_input_symbol()] = 0;
                 }
-              if (output_ambiguity.find(data.get_output_symbol()) == output_ambiguity.end())
+              if (output_ambiguity.find(tr_it->get_output_symbol()) == output_ambiguity.end())
                 {
-                  output_ambiguity[data.get_output_symbol()] = 0;
+                  output_ambiguity[tr_it->get_output_symbol()] = 0;
                 }
-              input_ambiguity[data.get_input_symbol()]++;
-              output_ambiguity[data.get_output_symbol()]++;
+              input_ambiguity[tr_it->get_input_symbol()]++;
+              output_ambiguity[tr_it->get_output_symbol()]++;
             }
           if (arcs_here > densest_arcs)
             {
