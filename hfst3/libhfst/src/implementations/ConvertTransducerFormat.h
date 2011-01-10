@@ -47,7 +47,6 @@
 
 #include "HfstExceptions.h"
 #include "optimized-lookup/transducer.h"
-//#include "HfstNet.h"
 
 struct fsm;
 
@@ -60,9 +59,9 @@ namespace hfst {
 
 namespace implementations {
 
-    template <class T, class W> class HfstNet;
-    class TransitionData;
-    typedef HfstNet<TransitionData, float> HfstFsm; 
+    template <class T, class W> class HfstTransitionGraph;
+    class HfstNameThis;
+    typedef HfstTransitionGraph<HfstNameThis, float> HfstBasicTransducer; 
     typedef unsigned int HfstState;
 
   using namespace hfst::exceptions;
@@ -70,20 +69,7 @@ namespace implementations {
 #if HAVE_OPENFST
   typedef fst::StdArc::StateId StateId;
   typedef fst::ArcIterator<fst::StdVectorFst> StdArcIterator;
-#endif
-#if HAVE_SFST
-  //typedef std::vector<SFST::Node *> SfstStateVector;
-  //typedef std::map<SFST::Node *,unsigned int> SfstToInternalStateMap;
-#endif
-#if HAVE_OPENFST
-  //typedef std::vector<StateId> OfstStateVector;
-#endif
 
-
-#if HAVE_OPENFST
-  //typedef std::map<hfst_ol::TransitionTableIndex,unsigned int> HfstOlToInternalStateMap;
-
-  //typedef std::map<hfst_ol::TransitionTableIndex,StateId> HfstOlToOfstStateMap;
   typedef fst::ArcTpl<fst::LogWeight> LogArc;
   typedef fst::VectorFst<LogArc> LogFst;
 #endif
@@ -93,53 +79,53 @@ namespace implementations {
 
   public:
 
-    static HfstFsm * hfst_transducer_to_hfst_net(const hfst::HfstTransducer &t);
+    static HfstBasicTransducer * hfst_transducer_to_hfst_basic_transducer(const hfst::HfstTransducer &t);
 
 #if HAVE_SFST
-  static void sfst_to_hfst_net( SFST::Node *node, SFST::NodeNumbering &index, 
+  static void sfst_to_hfst_basic_transducer( SFST::Node *node, SFST::NodeNumbering &index, 
 				std::set<SFST::Node*> &visited_nodes, 
-				HfstFsm *net, SFST::Alphabet &alphabet );
+				HfstBasicTransducer *net, SFST::Alphabet &alphabet );
 
-  static HfstFsm * sfst_to_hfst_net(SFST::Transducer * t);
+  static HfstBasicTransducer * sfst_to_hfst_basic_transducer(SFST::Transducer * t);
 
-  static SFST::Transducer * hfst_net_to_sfst(const HfstFsm * t);
+  static SFST::Transducer * hfst_basic_transducer_to_sfst(const HfstBasicTransducer * t);
 #endif // HAVE_SFST
   
 #if HAVE_FOMA
-  static HfstFsm * foma_to_hfst_net(struct fsm * t);
+  static HfstBasicTransducer * foma_to_hfst_basic_transducer(struct fsm * t);
 
-  static struct fsm * hfst_net_to_foma(const HfstFsm * t);
+  static struct fsm * hfst_basic_transducer_to_foma(const HfstBasicTransducer * t);
 #endif // HAVE_FOMA
 
 #if HAVE_OPENFST
-  static HfstFsm * tropical_ofst_to_hfst_net
+  static HfstBasicTransducer * tropical_ofst_to_hfst_basic_transducer
     (fst::StdVectorFst * t);
   
   static StateId hfst_state_to_state_id
     (HfstState s, std::map<HfstState, StateId> &state_map, 
      fst::StdVectorFst * t);
 
-  static fst::StdVectorFst * hfst_net_to_tropical_ofst
-    (const HfstFsm * t);
+  static fst::StdVectorFst * hfst_basic_transducer_to_tropical_ofst
+    (const HfstBasicTransducer * t);
 
-  static HfstFsm * log_ofst_to_hfst_net
+  static HfstBasicTransducer * log_ofst_to_hfst_basic_transducer
     (LogFst * t);
   
-  static LogFst * hfst_net_to_log_ofst
-    (const HfstFsm * t);
+  static LogFst * hfst_basic_transducer_to_log_ofst
+    (const HfstBasicTransducer * t);
 #endif // HAVE_OPENFST 
   
 
-  static HfstFsm * hfst_ol_to_hfst_net(hfst_ol::Transducer * t);
+  static HfstBasicTransducer * hfst_ol_to_hfst_basic_transducer(hfst_ol::Transducer * t);
 
-  static hfst_ol::Transducer * hfst_net_to_hfst_ol
-    (HfstFsm * t, bool weighted);
+  static hfst_ol::Transducer * hfst_basic_transducer_to_hfst_ol
+    (HfstBasicTransducer * t, bool weighted);
 
 
 #if HAVE_MFSTL
-  static HfstFsm * mfstl_to_hfst_net(mfstl::MyFst * t);
+  static HfstBasicTransducer * mfstl_to_hfst_basic_transducer(mfstl::MyFst * t);
 
-  static mfstl::MyFst * hfst_net_to_mfstl(const HfstFsm * t);
+  static mfstl::MyFst * hfst_basic_transducer_to_mfstl(const HfstBasicTransducer * t);
 #endif // HAVE_MFSTL
 
   };

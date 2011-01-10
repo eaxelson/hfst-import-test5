@@ -36,17 +36,14 @@ using std::map;
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
-#include "implementations/HfstNet.h"
+#include "implementations/HfstTransitionGraph.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
-using hfst::implementations::HfstFsm;
-using hfst::implementations::TransitionData;
+using hfst::implementations::HfstTransitionGraph;
+using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstNameThis;
 using hfst::implementations::HfstState;
-//using hfst::HfstInternalTransducer;
-//using hfst::HfstStateIterator;
-//using hfst::HfstTransitionIterator;
-//using hfst::HfstTransition;
 using hfst::implementations::HfstInterfaceException;
 
 #include "hfst-commandline.h"
@@ -135,9 +132,9 @@ process_stream(HfstInputStream& instream)
 	exit(1);
       }
       //std::cerr << trans;
-      HfstFsm *mutt;
+      HfstBasicTransducer *mutt;
       try {
-	mutt = new HfstFsm(*trans);
+	mutt = new HfstBasicTransducer(*trans);
       } catch (HfstInterfaceException e) {
 	fprintf(stderr,"An error happened when converting transducer to internal format.\n");
 	exit(1);
@@ -159,7 +156,7 @@ process_stream(HfstInputStream& instream)
       pair<string,unsigned int> most_ambiguous_output;
       unsigned int initial_state = 0; // mutt.get_initial_state();
       // iterate states in random orderd
-      for (HfstFsm::const_iterator it = mutt->begin();
+      for (HfstBasicTransducer::const_iterator it = mutt->begin();
 	   it != mutt->end(); it++)
 	{
           HfstState s = it->first;
@@ -172,10 +169,10 @@ process_stream(HfstInputStream& instream)
           map<string,unsigned int> input_ambiguity;
           map<string,unsigned int> output_ambiguity;
 
-	  for (HfstFsm::HfstTransitionSet::iterator tr_it = it->second.begin();
+	  for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it = it->second.begin();
 	       tr_it != it->second.end(); tr_it++)
 	    {
-	      TransitionData data = tr_it->get_transition_data();
+	      HfstNameThis data = tr_it->get_transition_data();
 	      
               arcs++;
               arcs_here++;

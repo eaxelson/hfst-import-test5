@@ -27,10 +27,11 @@
 #include "HfstBasic.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
-#include "implementations/HfstNet.h"
+#include "implementations/HfstTransitionGraph.h"
 
-using hfst::implementations::HfstFsm;
-using hfst::implementations::TransitionData;
+using hfst::implementations::HfstTransitionGraph;
+using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstNameThis;
 using hfst::implementations::HfstState;
 
 namespace hfst
@@ -598,7 +599,7 @@ namespace hfst
     free( filename );
 
     HfstTransducer * retval_hfst = NULL;
-    hfst::implementations::HfstFsm retval_fsm;
+    hfst::implementations::HfstBasicTransducer retval_fsm;
 
     if (type != FOMA_TYPE && 
 	type != TROPICAL_OFST_TYPE &&
@@ -654,7 +655,6 @@ namespace hfst
 	type != LOG_OFST_TYPE)
       return retval_hfst;
     else {
-      //HfstFsm internal(retval_internal);
       return new HfstTransducer(retval_fsm, type);
     }
   }
@@ -905,15 +905,15 @@ namespace hfst
  
     else {
       
-      HfstFsm t(*tr);
+      HfstBasicTransducer t(*tr);
       
-      for (HfstFsm::const_iterator it = t.begin();
+      for (HfstBasicTransducer::const_iterator it = t.begin();
 	   it != t.end(); it++)
 	{
-	  for (HfstFsm::HfstTransitionSet::iterator tr_it = it->second.begin();
+	  for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it = it->second.begin();
 	       tr_it != it->second.end(); tr_it++)
 	    {
-	      TransitionData data = tr_it->get_transition_data();
+	      HfstNameThis data = tr_it->get_transition_data();
 
 	      TheAlphabet.insert(HfstAlphabet::NumberPair
 				  (

@@ -5,11 +5,13 @@
 
       If you need documentation on HFST version 2, you find it 
       <a href="http://hfst.sourceforge.net/hfst2/index.html">here</a>.
-      The page is no longer updated and it is recommended to update to version 3.0.
+      The page is no longer updated and it is recommended to update
+      to version 3.0.
 
       Some changes from version 2 to 3:
 
-      - Namespaces HFST and HWFST: namespace hfst and an ImplementationType argument
+      - Namespaces HFST and HWFST: namespace hfst and an 
+      ImplementationType argument
 
       - KeyLayer and SymbolLayer: functions take a string argument, 
       string-to-number mapping is done internally and automatically
@@ -21,8 +23,8 @@
       Functions modify their calling object and do not change their arguments
       (unless otherwise said)
 
-      - No unknown or identity symbols: unknown and identity symbols are supported
-      in all implementation formats
+      - No unknown or identity symbols: unknown and identity symbols 
+      are supported in all implementation formats
 
    */
 
@@ -47,17 +49,21 @@ tar -xzvf hfst-3.0.tar.gz
 autoreconf -i && ./configure && make && make install
 \endverbatim
 
-      To successfully use the HFST library, you should have at least one of the backend libraries
-      (<a href="http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html">SFST</a>, 
-      <a href="http:://www.openfst.org">OpenFst</a> or 
-      <a href="http://foma.sourceforge.net/">foma</a>) 
+      To successfully use the HFST library, you should have at least one 
+      of the backend libraries
+      (<a href="http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html">SFST</a> (version 1.4.2), 
+      <a href="http:://www.openfst.org">OpenFst</a> (version 1.2.6) or 
+      <a href="http://foma.sourceforge.net/">foma</a> (version 0.9.13) ) 
       installed on your computer. The in-built HfstNet format
-      is very limited in its operations and used mainly for conversion between different binary
-      and text formats. The HFST optimized lookup transducer format also comes with the source code,
-      but it has also a very limited selection of operations as its main purpose is fast lookup
-      of strings. By default, the configure script will make HFST compile the interface
-      with all the backend implementations that are available on the computer. If you do not
-      want an implementation, you can specify it with configure options. For example
+      is very limited in its operations and used mainly for conversion 
+      between different binary and text formats. The HFST optimized lookup
+      transducer format also comes with the source code,
+      but it has also a very limited selection of operations 
+      as its main purpose is fast lookup of strings.
+      By default, the configure script will make HFST compile the interface
+      with all the backend implementations that are available on the computer.
+      If you do not want an implementation, you can specify it 
+      with configure options. For example
 
 \verbatim
 ./configure --with-sfst=false
@@ -91,20 +97,23 @@ HfstTransducer tr("a", "b", SFST_TYPE);
 
       <H2>Adding your own library under the HFST interface</H2>
 
-      There is a very simple transducer library My Finite-State Transducer Library - MFSTL
-      in directory new_library. The library defines a transducer class MyFst that contains some functions
-      written in namespace mfstl. MFSTL is not meant to be used as a backend implementation
-      but to give an example of how you can add your own transducer library under HFST.      
+      There is a very simple transducer library 
+      My Finite-State Transducer Library - MFSTL in directory new_library.
+      The library defines a transducer class MyFst that contains some functions
+      written in namespace mfstl. MFSTL is not meant to be used 
+      as a backend implementation but to give an example of how you can
+       add your own transducer library under HFST.      
 
-      If you want to install MFSTL, go to directory new_library and run the commands:
+      If you want to install MFSTL, go to directory new_library and 
+      run the commands:
 
 \verbatim      
       make && make libinstall
 \endverbatim
 
       By default the MFSTL library is not installed or linked to HFST.
-      If you want to use MFSTL, go to the directory where you have your copy of HFST
-      and run the command:
+      If you want to use MFSTL, go to the directory where you have your 
+      copy of HFST and run the command:
 
 \verbatim
       ./configure --with-mfstl=true
@@ -113,7 +122,8 @@ HfstTransducer tr("a", "b", SFST_TYPE);
       <BR></BR>	
       <H2>Configuring</H2>
 
-      In the file configure.ac there are the following lines of code that take care of linking
+      In the file configure.ac there are the following lines of code 
+      that take care of linking
       to the MFSTL library if the user wants to use it:
 
 \verbatim
@@ -144,16 +154,20 @@ fi
     *         with mfstl: $with_mfstl
 \endverbatim
 
-      When adding your own library you should write the same definitions and tests in file
+      When adding your own library you should write the same 
+      definitions and tests in file
       configure.ac for your library.
 
       <BR></BR>
       <H2>Interaction between HFST and your library</H2>
 
       There are files MfstlTransducer.h and MfstlTransducer.cc in directory
-      libhfst/src/implementations. These files form a bridge between MFSTL and HFST libraries.
-      They define classes that are needed in cooperation between MFSTL and HFST: 
-      MfstlTransducer, MfstlInputStream and MfstlOutputStream. Class MfstlTransducer contains
+      libhfst/src/implementations. These files form a bridge between 
+      MFSTL and HFST libraries.
+      They define classes that are needed in cooperation between 
+      MFSTL and HFST: 
+      MfstlTransducer, MfstlInputStream and MfstlOutputStream. 
+      Class MfstlTransducer contains
       static functions that operate on MyFsts, for instance:
 
 \verbatim
@@ -183,8 +197,10 @@ fi
     };
 \endverbatim
 
-      Classes MfstlInputStream and MfstlOutputStream represent input and output streams 
-      to files or standard streams. They are used for reading or writing MyFst binary transducers to/from streams,
+      Classes MfstlInputStream and MfstlOutputStream represent 
+      input and output streams 
+      to files or standard streams. They are used for reading or writing 
+      MyFst binary transducers to/from streams,
       for example:
 
 \verbatim
@@ -217,15 +233,20 @@ fi
   };
 \endverbatim
 
-	Since MFSTL has only few functionalities, most implementations of functions defined in file MfstlTransducer.h
-        return a hfst::exceptions::FunctionNotImplementedError. This is also the way how you probably should begin
+	Since MFSTL has only few functionalities, most implementations 
+	of functions defined in file MfstlTransducer.h
+        return a hfst::exceptions::FunctionNotImplementedError. 
+	This is also the way how you probably should begin
 	to write your implementation. 
 
-	Conversion from MFSTL to internal transducer format and vice versa are defined
-	in files ConvertTransducerFormat.h and ConvertTransducerFormat.cc in directory libhfst/src/implementations.
+	Conversion from MFSTL to internal transducer format and 
+	vice versa are defined
+	in files ConvertTransducerFormat.h and ConvertTransducerFormat.cc 
+	in directory libhfst/src/implementations.
 	Add also your own conversion functions here.	
 
-	MFSTL is handled in the Makefiles of directories libhfst/src/ and libhfst/src/implementations/.
+	MFSTL is handled in the Makefiles of directories libhfst/src/ 
+	and libhfst/src/implementations/.
 	The former has the following lines:
 
 \verbatim
@@ -270,19 +291,21 @@ TESTS=ConvertTransducerFormat HfstInternalTransducer \
 	  $(FOMA_TSTS) $(HFSTOL_TSTS) $(OFST_TSTS) $(SFST_TSTS) $(MFSTL_TSTS)
 \endverbatim
 
-	You should handle your library in the Makefile similarly.
+      You should handle your library in the Makefile similarly.
 
       <BR></BR>
       <H2>Adding your library as a part of the HFST interface</H2>
 
       HFST must be aware of a new transducer type. In file HfstDataTypes.h
-      there is defined an enum ImplementationType where a new enumerator MFSTL_TYPE is be added:
+      there is defined an enum ImplementationType where a new enumerator 
+      MFSTL_TYPE is be added:
 
 \verbatim
 MFSTL_TYPE
 \endverbatim
 
-        Some changes must be done in file HfstTransducer.h. The new library header file
+        Some changes must be done in file HfstTransducer.h. 
+	The new library header file
 	must be included:
 
 \verbatim
@@ -315,7 +338,8 @@ MFSTL_TYPE
 \endverbatim
 
 
-	The unions StreamImplementation in files HfstInputStream.h and HfstOutputStream.h
+	The unions StreamImplementation in files HfstInputStream.h 
+	and HfstOutputStream.h
 	have a new enumerator:
 
 \verbatim
@@ -347,9 +371,11 @@ MFSTL_
 
 
 
-The function append_hfst_header_data in file HfstOutputStream.cc must handle the case
-when we write MFSTL binary transducers and need to have a string in the HFST header
-that identifies the transducer's implementation type:
+    The function append_hfst_header_data in file HfstOutputStream.cc must 
+    handle the case
+    when we write MFSTL binary transducers and need to have a string 
+    in the HFST header
+    that identifies the transducer's implementation type:
 
 \verbatim
 #if HAVE_MFSTL
@@ -369,11 +395,16 @@ from the HFST header:
 #endif
 \endverbatim
 
-	Function guess_fst_type in file HfstInputStream.cc tries to guess what is the format
-	of the next transducer in an input stream. We suppose that the first char in a MyFst is 'm'.
-	You must of course replace 'm' with the first char in your binary transducer format.
-	If the first char is not enough to recognize the transducer type, you must
-	extract more chars and put them back to the stream. See for example how an
+	Function guess_fst_type in file HfstInputStream.cc tries to 
+	guess what is the format
+	of the next transducer in an input stream. We suppose that 
+	the first char in a MyFst is 'm'.
+	You must of course replace 'm' with the first char in 
+	your binary transducer format.
+	If the first char is not enough to recognize the transducer type,
+	you must
+	extract more chars and put them back to the stream. See for example 
+	how an
 	OpenFst transducer is recognized.
 
 \verbatim
@@ -386,8 +417,10 @@ from the HFST header:
 \endverbatim
 
 
-      You must also add a separate case for each function in classes HfstTransducer, HfstOutputStream
-      and HfstInputStream where your own function is called if the ImplementationType requires it.
+      You must also add a separate case for each function in classes 
+      HfstTransducer, HfstOutputStream
+      and HfstInputStream where your own function is called if the 
+      ImplementationType requires it.
       An example from file HfstTransducer.cc:
 
 \verbatim
@@ -431,9 +464,12 @@ HfstTransducer::HfstTransducer(const std::string &isymbol, const std::string &os
   }
 \endverbatim
 
-	You must also modify files apply_schemas.h and HfstApply.cc in the same way.
-	Many functions in HfstTransducer.cc call a function defined in apply_schemas.h.
-	The functions take as their arguments function pointers to the backend libraries.
+	You must also modify files apply_schemas.h and HfstApply.cc 
+	in the same way.
+	Many functions in HfstTransducer.cc call a function defined in 
+	apply_schemas.h.
+	The functions take as their arguments function pointers 
+	to the backend libraries.
 	For example the determinization function
 
 \verbatim
