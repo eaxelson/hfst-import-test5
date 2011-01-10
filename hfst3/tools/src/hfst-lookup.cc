@@ -47,7 +47,6 @@ using hfst::HFST_OL_TYPE;
 using hfst::HFST_OLW_TYPE;
 using hfst::implementations::HfstState;
 using hfst::implementations::HfstBasicTransducer;
-using hfst::implementations::HfstNameThis;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 using hfst::HfstTokenizer;
@@ -702,11 +701,9 @@ bool is_lookup_infinitely_ambiguous(HfstBasicTransducer &t, const HfstLookupPath
   for (HfstBasicTransducer::HfstTransitionSet::iterator it = transitions.begin();
        it != transitions.end(); it++)
     {
-      HfstNameThis data = it->get_transition_data();
-
       // CASE 1: Input epsilons do not consume a symbol in the lookup path s,
       //         so they can be added freely.
-      if (data.get_input_symbol().compare("@_EPSILON_SYMBOL_@") == 0)
+      if (it->get_input_symbol().compare("@_EPSILON_SYMBOL_@") == 0)
 	{
 	  epsilon_path_states.insert(state);
 	  if (epsilon_path_states.find(it->get_target_state()) != epsilon_path_states.end())
@@ -723,7 +720,7 @@ bool is_lookup_infinitely_ambiguous(HfstBasicTransducer &t, const HfstLookupPath
       //         reorganizing the if/else blocks...)
       else if (not only_epsilons)
 	{
-	  if (data.get_input_symbol().compare(s.first[index]) == 0) /***/
+	  if (it->get_input_symbol().compare(s.first[index]) == 0) /***/
 	    {
 	      index++; // consume an input symbol in the lookup path s /***/
 	      std::set<HfstState> empty_set;
@@ -815,11 +812,9 @@ void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results, const HfstLooku
   for (HfstBasicTransducer::HfstTransitionSet::iterator it = transitions.begin();
        it != transitions.end(); it++)
     {
-      HfstNameThis data = it->get_transition_data();
-
       // CASE 1: Input epsilons do not consume a symbol in the lookup path s,
       //         so they can be added freely.
-      if (data.get_input_symbol().compare("@_EPSILON_SYMBOL_@") == 0)
+      if (it->get_input_symbol().compare("@_EPSILON_SYMBOL_@") == 0)
 	{
 
 	  // If the target state is a visited state or the target state is
@@ -850,11 +845,11 @@ void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results, const HfstLooku
 	      }	    
 	    }
 	    
-	    path.first.push_back(data.get_output_symbol()); // add an output symbol to the traversed path
-	    path.second = path.second + data.get_weight(); // add the transition weight
+	    path.first.push_back(it->get_output_symbol()); // add an output symbol to the traversed path
+	    path.second = path.second + it->get_weight(); // add the transition weight
 	    lookup_fd(t, results, s, index, path, it->get_target_state(), visited_states, epsilon_path, cycles);
 	    path.first.pop_back(); // remove the output symbol from the traversed path
-	    path.second = path.second - data.get_weight(); // subtract the transition weight
+	    path.second = path.second - it->get_weight(); // subtract the transition weight
 	    
 	    epsilon_path.pop_back();
 	    visited_states.erase(visited_states.find(state));
@@ -876,15 +871,15 @@ void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results, const HfstLooku
       //         reorganizing the if/else blocks...)
       else if (not only_epsilons)
 	{
-	  if (data.get_input_symbol().compare(s.first[index]) == 0) /***/
+	  if (it->get_input_symbol().compare(s.first[index]) == 0) /***/
 	    {
 	      index++; // consume an input symbol in the lookup path s /***/
-	      path.first.push_back(data.get_input_symbol()); // add an output symbol to the traversed path
-	      path.second = path.second + data.get_weight(); // add the transition weight
+	      path.first.push_back(it->get_input_symbol()); // add an output symbol to the traversed path
+	      path.second = path.second + it->get_weight(); // add the transition weight
 	      std::vector<HfstState> empty_path;
 	      lookup_fd(t, results, s, index, path, it->get_target_state(), visited_states, empty_path, cycles);
 	      path.first.pop_back(); // remove the output symbol from the traversed path
-	      path.second = path.second - data.get_weight(); // subtract the transition weight
+	      path.second = path.second - it->get_weight(); // subtract the transition weight
 	      index--; // add the input symbol back to the lookup path s. /***/
 	    }
 	}

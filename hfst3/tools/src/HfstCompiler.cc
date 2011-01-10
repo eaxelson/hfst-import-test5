@@ -31,7 +31,6 @@
 
 using hfst::implementations::HfstTransitionGraph;
 using hfst::implementations::HfstBasicTransducer;
-using hfst::implementations::HfstNameThis;
 using hfst::implementations::HfstState;
 
 namespace hfst
@@ -913,15 +912,13 @@ namespace hfst
 	  for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it = it->second.begin();
 	       tr_it != it->second.end(); tr_it++)
 	    {
-	      HfstNameThis data = tr_it->get_transition_data();
-
 	      TheAlphabet.insert(HfstAlphabet::NumberPair
 				  (
 				   TheAlphabet.symbol2code
-				   (data.get_input_symbol().c_str())
+				   (tr_it->get_input_symbol().c_str())
 				   ,
 				   TheAlphabet.symbol2code
-				   (data.get_output_symbol().c_str())
+				   (tr_it->get_output_symbol().c_str())
 				   )
 				 );
 	    }

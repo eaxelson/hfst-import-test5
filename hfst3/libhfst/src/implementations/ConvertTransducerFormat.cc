@@ -171,8 +171,6 @@ namespace hfst { namespace implementations
       for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it = it->second.begin();
 	   tr_it != it->second.end(); tr_it++)
 	{
-	  HfstNameThis data = tr_it->get_transition_data();
-
 	  // Create new nodes, if needed
 	  if (state_map.find(it->first) == state_map.end())
 	    state_map[it->first] = t->new_node();
@@ -180,14 +178,14 @@ namespace hfst { namespace implementations
 	  if (state_map.find(tr_it->get_target_state()) == state_map.end())
 	    state_map[tr_it->get_target_state()] = t->new_node();
 
-	  std::string istring(data.get_input_symbol());
-	  std::string ostring(data.get_output_symbol());
+	  std::string istring(tr_it->get_input_symbol());
+	  std::string ostring(tr_it->get_output_symbol());
 
-	  if (data.get_input_symbol().compare("@_EPSILON_SYMBOL_@") == 0) {
+	  if (istring.compare("@_EPSILON_SYMBOL_@") == 0) {
 	    istring = std::string("<>");
 	  }
 
-	  if (data.get_output_symbol().compare("@_EPSILON_SYMBOL_@") == 0) {
+	  if (ostring.compare("@_EPSILON_SYMBOL_@") == 0) {
 	    ostring = std::string("<>");
 	  }
 
@@ -335,14 +333,12 @@ namespace hfst { namespace implementations
 	       = it->second.begin();
 	     tr_it != it->second.end(); tr_it++)
 	  {
-	    HfstNameThis data = tr_it->get_transition_data();
-
 	    // Copy the transition
 	    fsm_construct_add_arc(h, 
 				  (int)it->first, 
 				  (int)tr_it->get_target_state(),
-				  strdup(data.get_input_symbol().c_str()),
-				  strdup(data.get_output_symbol().c_str()) );
+				  strdup(tr_it->get_input_symbol().c_str()),
+				  strdup(tr_it->get_output_symbol().c_str()) );
 	  }
       }
     
@@ -556,14 +552,12 @@ namespace hfst { namespace implementations
 	for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it = it->second.begin();
 	     tr_it != it->second.end(); tr_it++)
 	  {
-	    HfstNameThis data = tr_it->get_transition_data();
-	    
 	    // Copy the transition
 	    t->AddArc( hfst_state_to_state_id(it->first, state_map, t), 
 		       fst::StdArc
-		       ( st.AddSymbol(data.get_input_symbol()),
-			 st.AddSymbol(data.get_output_symbol()),
-			 data.get_weight(),
+		       ( st.AddSymbol(tr_it->get_input_symbol()),
+			 st.AddSymbol(tr_it->get_output_symbol()),
+			 tr_it->get_weight(),
 			 hfst_state_to_state_id
  			 (tr_it->get_target_state(), state_map, t)) );
 	  }
