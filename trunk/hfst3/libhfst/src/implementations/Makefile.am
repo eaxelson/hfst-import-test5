@@ -19,7 +19,7 @@ AUTOMAKE_OPTIONS=subdir-objects
 noinst_LTLIBRARIES=libhfstimplementations.la
 
 # HFST bridge specific stuff
-IMPLEMENTATION_SRCS=HfstNet.cc ConvertTransducerFormat.cc
+IMPLEMENTATION_SRCS=HfstTransitionGraph.cc ConvertTransducerFormat.cc
 AM_CXXFLAGS=-Wno-deprecated
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
 # the bridges
@@ -61,7 +61,7 @@ implinclude_HEADERS = \
 		LogWeightTransducer.h \
 		SfstTransducer.h TropicalWeightTransducer.h \
 		TropicalWeightComposeIntersect.h \
-		HfstOlTransducer.h HfstNet.h \
+		HfstOlTransducer.h HfstTransitionGraph.h \
 		MfstlTransducer.h
 
 

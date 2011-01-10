@@ -37,7 +37,7 @@
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
-#include "implementations/HfstNet.h"
+#include "implementations/HfstTransitionGraph.h"
 
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
@@ -46,11 +46,8 @@ using hfst::HfstTransducer;
 using hfst::HFST_OL_TYPE;
 using hfst::HFST_OLW_TYPE;
 using hfst::implementations::HfstState;
-using hfst::implementations::HfstFsm;
-using hfst::implementations::TransitionData;
-//using hfst::HfstInternalTransducer;
-//using hfst::HfstTransitionIterator;
-//using hfst::HfstTransition;
+using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstNameThis;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 using hfst::HfstTokenizer;
@@ -691,7 +688,7 @@ lookup_simple(const HfstLookupPath& s, T& t, bool* infinity)
   return results;
 }
 
-bool is_lookup_infinitely_ambiguous(HfstFsm &t, const HfstLookupPath& s, 
+bool is_lookup_infinitely_ambiguous(HfstBasicTransducer &t, const HfstLookupPath& s, 
 				    unsigned int& index, HfstState state, 
 				    std::set<HfstState> &epsilon_path_states) 
 {
@@ -701,11 +698,11 @@ bool is_lookup_infinitely_ambiguous(HfstFsm &t, const HfstLookupPath& s,
     only_epsilons=true;
 
   // Go through all transitions in this state
-  HfstFsm::HfstTransitionSet transitions = t[state];
-  for (HfstFsm::HfstTransitionSet::iterator it = transitions.begin();
+  HfstBasicTransducer::HfstTransitionSet transitions = t[state];
+  for (HfstBasicTransducer::HfstTransitionSet::iterator it = transitions.begin();
        it != transitions.end(); it++)
     {
-      TransitionData data = it->get_transition_data();
+      HfstNameThis data = it->get_transition_data();
 
       // CASE 1: Input epsilons do not consume a symbol in the lookup path s,
       //         so they can be added freely.
@@ -739,7 +736,7 @@ bool is_lookup_infinitely_ambiguous(HfstFsm &t, const HfstLookupPath& s,
   return false;
 }
 
-bool is_lookup_infinitely_ambiguous(HfstFsm &t, const HfstLookupPath& s)
+bool is_lookup_infinitely_ambiguous(HfstBasicTransducer &t, const HfstLookupPath& s)
 {
   std::set<HfstState> epsilon_path_states;
   //epsilon_path_states.insert(t.get_initial_state());
@@ -796,7 +793,7 @@ lookup_simple(const HfstLookupPath& s, HfstTransducer& t, bool* infinity)
 
   @todo Support flag diacritics(?) and log weights(?)
  */
-void lookup_fd(HfstFsm &t, HfstLookupPaths& results, const HfstLookupPath& s, unsigned int& index, 
+void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results, const HfstLookupPath& s, unsigned int& index, 
 	       HfstLookupPath& path, HfstState state, std::multiset<HfstState>& visited_states, std::vector<HfstState>& epsilon_path,
 	       unsigned int& cycles)
 { 
@@ -814,11 +811,11 @@ void lookup_fd(HfstFsm &t, HfstLookupPaths& results, const HfstLookupPath& s, un
   }
 
   // Go through all transitions in this state
-  HfstFsm::HfstTransitionSet transitions = t[state];
-  for (HfstFsm::HfstTransitionSet::iterator it = transitions.begin();
+  HfstBasicTransducer::HfstTransitionSet transitions = t[state];
+  for (HfstBasicTransducer::HfstTransitionSet::iterator it = transitions.begin();
        it != transitions.end(); it++)
     {
-      TransitionData data = it->get_transition_data();
+      HfstNameThis data = it->get_transition_data();
 
       // CASE 1: Input epsilons do not consume a symbol in the lookup path s,
       //         so they can be added freely.
@@ -904,7 +901,7 @@ void lookup_fd(HfstFsm &t, HfstLookupPaths& results, const HfstLookupPath& s, un
   //! Used as return type of lookup with multiple, unique results.
   typedef std::set<HfstLookupPath> HfstLookupPaths;
 
-void lookup_fd(HfstFsm &t, HfstLookupPaths& results, const HfstLookupPath& s, ssize_t limit = -1)
+void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results, const HfstLookupPath& s, ssize_t limit = -1)
 {
   HfstLookupPath path;
   path.second=0;
@@ -926,7 +923,7 @@ void lookup_fd(HfstFsm &t, HfstLookupPaths& results, const HfstLookupPath& s, ss
 }
 
 HfstLookupPaths*
-lookup_simple(const HfstLookupPath& s, HfstFsm& t, bool* infinity)
+lookup_simple(const HfstLookupPath& s, HfstBasicTransducer& t, bool* infinity)
 {
   HfstLookupPaths* results = new HfstLookupPaths;
 
@@ -1069,7 +1066,7 @@ int
 process_stream(HfstInputStream& inputstream, FILE* outstream)
 {
     std::vector<HfstTransducer> cascade;
-    std::vector<HfstFsm> cascade_mut;
+    std::vector<HfstBasicTransducer> cascade_mut;
     bool internal_transducers=false;
 
     size_t transducer_n=0;
@@ -1093,7 +1090,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     inputstream.close();
 
     // if transducer type is other than optimized_lookup,
-    // convert to HfstFsm
+    // convert to HfstBasicTransducer
 
     char* line = 0;
     size_t llen = 0;
@@ -1130,12 +1127,12 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                       "format: converting to internal format and trying\n");
                 for (unsigned int i=0; i<cascade.size(); i++) 
                   {
-                    HfstFsm mut(cascade[i]);
+                    HfstBasicTransducer mut(cascade[i]);
                     cascade_mut.push_back(mut);
                   }
                 internal_transducers = true;
               }
-            kvs = perform_lookups<HfstFsm>(*kv, cascade_mut,
+            kvs = perform_lookups<HfstBasicTransducer>(*kv, cascade_mut,
                                                          unknown,
                                                          &infinite);
           }

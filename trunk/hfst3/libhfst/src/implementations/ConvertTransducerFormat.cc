@@ -16,7 +16,7 @@
 
 #include "ConvertTransducerFormat.h"
 #include "optimized-lookup/convert.h"
-#include "HfstNet.h"
+#include "HfstTransitionGraph.h"
 #include "HfstTransducer.h"
 
 #ifndef DEBUG_MAIN
@@ -24,33 +24,33 @@ namespace hfst { namespace implementations
 {
 
 
-  HfstFsm * ConversionFunctions::hfst_transducer_to_hfst_net
+  HfstBasicTransducer * ConversionFunctions::hfst_transducer_to_hfst_basic_transducer
   (const hfst::HfstTransducer &t) {
 
 #if HAVE_SFST
     if (t.type == SFST_TYPE)
-      return sfst_to_hfst_net(t.implementation.sfst); 
+      return sfst_to_hfst_basic_transducer(t.implementation.sfst); 
 #endif // HAVE_SFST
 
 #if HAVE_OPENFST
     if (t.type == TROPICAL_OFST_TYPE)
-      return tropical_ofst_to_hfst_net(t.implementation.tropical_ofst); 
+      return tropical_ofst_to_hfst_basic_transducer(t.implementation.tropical_ofst); 
     if (t.type == LOG_OFST_TYPE)
-      return log_ofst_to_hfst_net(t.implementation.log_ofst); 
+      return log_ofst_to_hfst_basic_transducer(t.implementation.log_ofst); 
 #endif // HAVE_SFST
 
 #if HAVE_FOMA
     if (t.type == FOMA_TYPE)
-      return foma_to_hfst_net(t.implementation.foma); 
+      return foma_to_hfst_basic_transducer(t.implementation.foma); 
 #endif // HAVE_SFST
 
 #if HAVE_MFSTL
     if (t.type == MFSTL_TYPE)
-      return mfstl_to_hfst_net(t.implementation.mfstl); 
+      return mfstl_to_hfst_basic_transducer(t.implementation.mfstl); 
 #endif // HAVE_SFST
 
     if (t.type == HFST_OL_TYPE || t.type == HFST_OLW_TYPE)
-      return hfst_ol_to_hfst_net(t.implementation.hfst_ol);
+      return hfst_ol_to_hfst_basic_transducer(t.implementation.hfst_ol);
 
     throw hfst::exceptions::FunctionNotImplementedException();
   }
@@ -58,7 +58,7 @@ namespace hfst { namespace implementations
 
   /* -----------------------------------------------------------
 
-      Conversion functions between HfstFsm and SFST transducer. 
+      Conversion functions between HfstBasicTransducer and SFST transducer. 
 
      ----------------------------------------------------------- */
 
@@ -66,18 +66,18 @@ namespace hfst { namespace implementations
 #if HAVE_SFST
 
   /* Recursively copy all transitions of \a node to \a net.
-     Used by function sfst_to_hfst_net(SFST::Transducer * t).
+     Used by function sfst_to_hfst_basic_transducer(SFST::Transducer * t).
 
      @param node  The current node in the SFST transducer
      @param index  A map that maps nodes to integers
      @param visited_nodes  Which nodes have already been visited
-     @param net  The HfstFsm that is being created
+     @param net  The HfstBasicTransducer that is being created
      @param alphabet  The alphabet of the SFST transducer
   */
   void ConversionFunctions::
-  sfst_to_hfst_net( SFST::Node *node, SFST::NodeNumbering &index, 
+  sfst_to_hfst_basic_transducer( SFST::Node *node, SFST::NodeNumbering &index, 
 		    std::set<SFST::Node*> &visited_nodes, 
-		    HfstFsm *net, SFST::Alphabet &alphabet ) {
+		    HfstBasicTransducer *net, SFST::Alphabet &alphabet ) {
   
     // If node has not been visited before
     if (visited_nodes.find(node) == visited_nodes.end() ) { 
@@ -101,7 +101,7 @@ namespace hfst { namespace implementations
 	}
 
 	net->add_transition(index[node], 
-			    HfstArc
+			    HfstBasicTransition
 			    (index[arc->target_node()],
 			     istring,
 			     ostring,
@@ -115,7 +115,7 @@ namespace hfst { namespace implementations
       // of the transitions
       for( SFST::ArcsIter p(arcs); p; p++ ) {
 	SFST::Arc *arc=p;
-	sfst_to_hfst_net(arc->target_node(), index, 
+	sfst_to_hfst_basic_transducer(arc->target_node(), index, 
 			 visited_nodes, 
 			 net, alphabet);
       }
@@ -123,17 +123,17 @@ namespace hfst { namespace implementations
   }
 
 
-  /* Create an HfstFsm equivalent to an SFST transducer \a t. */
-  HfstFsm * ConversionFunctions::
-  sfst_to_hfst_net(SFST::Transducer * t) {
+  /* Create an HfstBasicTransducer equivalent to an SFST transducer \a t. */
+  HfstBasicTransducer * ConversionFunctions::
+  sfst_to_hfst_basic_transducer(SFST::Transducer * t) {
   
-    HfstFsm * net = new HfstFsm();
+    HfstBasicTransducer * net = new HfstBasicTransducer();
     // A map that maps nodes to integers
     SFST::NodeNumbering index(*t);
     // The set of nodes that have been visited
     std::set<SFST::Node*> visited_nodes;
    
-    sfst_to_hfst_net(t->root_node(), index, 
+    sfst_to_hfst_basic_transducer(t->root_node(), index, 
 		     visited_nodes, 
 		     net, t->alphabet);
     
@@ -153,9 +153,9 @@ namespace hfst { namespace implementations
   }
 
 
-  /* Create an SFST::Transducer equivalent to HfstFsm \a net. */
+  /* Create an SFST::Transducer equivalent to HfstBasicTransducer \a net. */
   SFST::Transducer * ConversionFunctions::
-  hfst_net_to_sfst(const HfstFsm * net) {
+  hfst_basic_transducer_to_sfst(const HfstBasicTransducer * net) {
 
   SFST::Transducer * t = new SFST::Transducer();
 
@@ -164,14 +164,14 @@ namespace hfst { namespace implementations
   state_map[0] = t->root_node();
 
   // Go through all states
-  for (HfstFsm::const_iterator it = net->begin();
+  for (HfstBasicTransducer::const_iterator it = net->begin();
        it != net->end(); it++)
     {
       // Go through the set of transitions in each state
-      for (HfstFsm::HfstTransitionSet::iterator tr_it = it->second.begin();
+      for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it = it->second.begin();
 	   tr_it != it->second.end(); tr_it++)
 	{
-	  TransitionData data = tr_it->get_transition_data();
+	  HfstNameThis data = tr_it->get_transition_data();
 
 	  // Create new nodes, if needed
 	  if (state_map.find(it->first) == state_map.end())
@@ -203,7 +203,7 @@ namespace hfst { namespace implementations
     }
 
   // Go through the final states
-  for (HfstFsm::FinalWeightMap::const_iterator it = net->final_weight_map.begin();
+  for (HfstBasicTransducer::FinalWeightMap::const_iterator it = net->final_weight_map.begin();
        it != net->final_weight_map.end(); it++) 
     {
       if (state_map.find(it->first) == state_map.end())
@@ -212,8 +212,8 @@ namespace hfst { namespace implementations
     }
 
   // Make sure that also symbols that occur in the alphabet of the
-  // HfstFsm but not in its transitions are inserted to the SFST transducer
-  for (HfstFsm::HfstNetAlphabet::iterator it = net->alphabet.begin();
+  // HfstBasicTransducer but not in its transitions are inserted to the SFST transducer
+  for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it = net->alphabet.begin();
        it != net->alphabet.end(); it++) {
     if (it->compare("@_EPSILON_SYMBOL_@") != 0)
       t->alphabet.add_symbol(it->c_str());
@@ -229,18 +229,18 @@ namespace hfst { namespace implementations
 
   /* -----------------------------------------------------------
 
-      Conversion functions between HfstFsm and foma transducer. 
+      Conversion functions between HfstBasicTransducer and foma transducer. 
 
       ---------------------------------------------------------- */
 
 
 #if HAVE_FOMA
 
-  /* Create an HfstFsm equivalent to foma transducer \a t. */
-  HfstFsm * ConversionFunctions::
-  foma_to_hfst_net(struct fsm * t) {
+  /* Create an HfstBasicTransducer equivalent to foma transducer \a t. */
+  HfstBasicTransducer * ConversionFunctions::
+  foma_to_hfst_basic_transducer(struct fsm * t) {
 
-  HfstFsm * net = new HfstFsm();
+  HfstBasicTransducer * net = new HfstBasicTransducer();
   struct fsm_state *fsm;
   fsm = t->states;
   int start_state_id = -1;
@@ -277,7 +277,7 @@ namespace hfst { namespace implementations
 	// copy the transition.
 	net->add_transition
 	  ((fsm+i)->state_no,
-	   HfstArc
+	   HfstBasicTransition
 	   ((fsm+i)->target,
 	    std::string (sigma_string((fsm+i)->in, t->sigma)), 
 	    std::string (sigma_string((fsm+i)->out, t->sigma)),
@@ -318,24 +318,24 @@ namespace hfst { namespace implementations
 }
 
 
-  /* Create a foma transducer equivalent to HfstFsm \a hfst_fsm. */
+  /* Create a foma transducer equivalent to HfstBasicTransducer \a hfst_fsm. */
   struct fsm * ConversionFunctions::
-    hfst_net_to_foma(const HfstFsm * hfst_fsm) {
+    hfst_basic_transducer_to_foma(const HfstBasicTransducer * hfst_fsm) {
     
     struct fsm_construct_handle *h;
     struct fsm *net;
     h = fsm_construct_init(strdup(std::string("").c_str()));
     
     // Go through all states
-    for (HfstFsm::const_iterator it = hfst_fsm->begin();
+    for (HfstBasicTransducer::const_iterator it = hfst_fsm->begin();
 	 it != hfst_fsm->end(); it++)
       {
 	// Go through the set of transitions in each state
-	for (HfstFsm::HfstTransitionSet::iterator tr_it 
+	for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it 
 	       = it->second.begin();
 	     tr_it != it->second.end(); tr_it++)
 	  {
-	    TransitionData data = tr_it->get_transition_data();
+	    HfstNameThis data = tr_it->get_transition_data();
 
 	    // Copy the transition
 	    fsm_construct_add_arc(h, 
@@ -347,7 +347,7 @@ namespace hfst { namespace implementations
       }
     
     // Go through the final states
-    for (HfstFsm::FinalWeightMap::const_iterator it 
+    for (HfstBasicTransducer::FinalWeightMap::const_iterator it 
 	   = hfst_fsm->final_weight_map.begin();
 	 it != hfst_fsm->final_weight_map.end(); it++) 
       {
@@ -357,7 +357,7 @@ namespace hfst { namespace implementations
     
     /* Make sure that also the symbols that occur only in the alphabet
        but not in transitions are copied. */
-    for (HfstFsm::HfstNetAlphabet::iterator it 
+    for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it 
 	   = hfst_fsm->alphabet.begin();
 	 it != hfst_fsm->alphabet.end(); it++)
       {
@@ -382,7 +382,7 @@ namespace hfst { namespace implementations
 
   /* --------------------------------------------------------------
 
-      Conversion functions between HfstFsm and OpenFst transducers 
+      Conversion functions between HfstBasicTransducer and OpenFst transducers 
 
       ------------------------------------------------------------- */
 
@@ -390,13 +390,13 @@ namespace hfst { namespace implementations
 #if HAVE_OPENFST
 
 
-  /* Create an HfstFsm equivalent to an OpenFst tropical weight
+  /* Create an HfstBasicTransducer equivalent to an OpenFst tropical weight
      transducer \a t. */  
-  HfstFsm * ConversionFunctions::
-  tropical_ofst_to_hfst_net
+  HfstBasicTransducer * ConversionFunctions::
+  tropical_ofst_to_hfst_basic_transducer
   (fst::StdVectorFst * t) {
 
-  HfstFsm * net = new HfstFsm();
+  HfstBasicTransducer * net = new HfstBasicTransducer();
 
   // An empty transducer
   if (t->Start() == fst::kNoStateId)
@@ -448,7 +448,7 @@ namespace hfst { namespace implementations
 
 	    // Copy the transition
 	    net->add_transition(origin, 
-				HfstArc
+				HfstBasicTransition
 				(target,
 				 t->InputSymbols()->Find(arc.ilabel),
 				 t->InputSymbols()->Find(arc.olabel),
@@ -488,7 +488,7 @@ namespace hfst { namespace implementations
 		target = (int)arc.nextstate;
 
 	      net->add_transition(origin, 
-				  HfstArc
+				  HfstBasicTransition
 				  (target,
 				   t->InputSymbols()->Find(arc.ilabel),
 				   t->InputSymbols()->Find(arc.olabel),
@@ -515,7 +515,7 @@ namespace hfst { namespace implementations
 
   /* Get a state id for a state in transducer \a t that corresponds
      to HfstState s as defined in \a state_map.     
-     Used by function hfst_net_to_tropical_ofst. */
+     Used by function hfst_basic_transducer_to_tropical_ofst. */
   StateId ConversionFunctions::hfst_state_to_state_id
   (HfstState s, std::map<HfstState, StateId> &state_map, 
    fst::StdVectorFst * t)
@@ -531,15 +531,15 @@ namespace hfst { namespace implementations
     return it->second;
   }
 
-  /* Create an OpenFst transducer equivalent to HfstFsm \a net. */
-  fst::StdVectorFst * ConversionFunctions::hfst_net_to_tropical_ofst
-  (const HfstFsm * net) {
+  /* Create an OpenFst transducer equivalent to HfstBasicTransducer \a net. */
+  fst::StdVectorFst * ConversionFunctions::hfst_basic_transducer_to_tropical_ofst
+  (const HfstBasicTransducer * net) {
     
     fst::StdVectorFst * t = new fst::StdVectorFst();
     StateId start_state = t->AddState();
     t->SetStart(start_state);
     
-    // The mapping between states in HfstFsm and StdVectorFst
+    // The mapping between states in HfstBasicTransducer and StdVectorFst
     std::map<HfstState, StateId> state_map;
     state_map[0] = start_state;
     
@@ -549,14 +549,14 @@ namespace hfst { namespace implementations
     st.AddSymbol("@_IDENTITY_SYMBOL_@", 2);
     
     // Go through all states
-    for (HfstFsm::const_iterator it = net->begin();
+    for (HfstBasicTransducer::const_iterator it = net->begin();
 	 it != net->end(); it++)
       {
 	// Go through the set of transitions in each state
-	for (HfstFsm::HfstTransitionSet::iterator tr_it = it->second.begin();
+	for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it = it->second.begin();
 	     tr_it != it->second.end(); tr_it++)
 	  {
-	    TransitionData data = tr_it->get_transition_data();
+	    HfstNameThis data = tr_it->get_transition_data();
 	    
 	    // Copy the transition
 	    t->AddArc( hfst_state_to_state_id(it->first, state_map, t), 
@@ -570,7 +570,7 @@ namespace hfst { namespace implementations
       }
     
     // Go through the final states
-    for (HfstFsm::FinalWeightMap::const_iterator it 
+    for (HfstBasicTransducer::FinalWeightMap::const_iterator it 
 	   = net->final_weight_map.begin();
 	 it != net->final_weight_map.end(); it++) 
       {
@@ -579,7 +579,7 @@ namespace hfst { namespace implementations
       }
     
     // Add also symbols that do not occur in transitions
-    for (HfstFsm::HfstNetAlphabet::iterator it = net->alphabet.begin();
+    for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it = net->alphabet.begin();
 	 it != net->alphabet.end(); it++)
       {
 	st.AddSymbol(*it);
@@ -590,9 +590,9 @@ namespace hfst { namespace implementations
   }
 
 
-  /* Create an HfstFsm equivalent to an OpenFst log weight
+  /* Create an HfstBasicTransducer equivalent to an OpenFst log weight
      transducer \a t. TODO */  
-  HfstFsm * ConversionFunctions::log_ofst_to_hfst_net
+  HfstBasicTransducer * ConversionFunctions::log_ofst_to_hfst_basic_transducer
   (LogFst * t) 
   {
     (void)t;
@@ -600,9 +600,9 @@ namespace hfst { namespace implementations
   }
 
   /* Create an OpenFst log weight transducer equivalent to
-     HfstFsm \a t. TODO */    
-  LogFst * ConversionFunctions::hfst_net_to_log_ofst
-  (const HfstFsm * t) 
+     HfstBasicTransducer \a t. TODO */    
+  LogFst * ConversionFunctions::hfst_basic_transducer_to_log_ofst
+  (const HfstBasicTransducer * t) 
   {
     (void)t;
     throw hfst::exceptions::FunctionNotImplementedException(); 
@@ -615,24 +615,24 @@ namespace hfst { namespace implementations
 
   /* -----------------------------------------------------------
 
-      Conversion functions between HfstFsm and 
+      Conversion functions between HfstBasicTransducer and 
       optimized lookup transducers 
 
       ---------------------------------------------------------- */
 
-  /* Create an HfstFsm equivalent to hfst_ol::Transducer \a t . */
-  HfstFsm * ConversionFunctions::
-  hfst_ol_to_hfst_net(hfst_ol::Transducer * t)
+  /* Create an HfstBasicTransducer equivalent to hfst_ol::Transducer \a t . */
+  HfstBasicTransducer * ConversionFunctions::
+  hfst_ol_to_hfst_basic_transducer(hfst_ol::Transducer * t)
   {
     (void)t;
     throw hfst::exceptions::FunctionNotImplementedException();
   }
 
-  /* Create an hfst_ol::Transducer equivalent to HfstFsm \a t.
+  /* Create an hfst_ol::Transducer equivalent to HfstBasicTransducer \a t.
      \a weighted defined whether the created transducer is weighted. */
   hfst_ol::Transducer * ConversionFunctions::
-  hfst_net_to_hfst_ol
-  (HfstFsm * t, bool weighted)
+  hfst_basic_transducer_to_hfst_ol
+  (HfstBasicTransducer * t, bool weighted)
   {
     (void)t;
     throw hfst::exceptions::FunctionNotImplementedException();
@@ -643,14 +643,14 @@ namespace hfst { namespace implementations
 
 #if HAVE_MFSTL
 
-  HfstFsm * ConversionFunctions::
-  mfstl_to_hfst_net(mfstl::MyFst * t) {
+  HfstBasicTransducer * ConversionFunctions::
+  mfstl_to_hfst_basic_transducer(mfstl::MyFst * t) {
   (void)t;
   throw hfst::exceptions::FunctionNotImplementedException();
 }
 
   mfstl::MyFst * ConversionFunctions::
-  hfst_net_to_mfstl(const HfstFsm * t) {
+  hfst_basic_transducer_to_mfstl(const HfstBasicTransducer * t) {
   (void)t;
   throw hfst::exceptions::FunctionNotImplementedException();
 }
@@ -670,10 +670,10 @@ using namespace hfst::implementations;
 int main(void)
   {
     std::cout << "Unit tests for " __FILE__ ":";
-    HfstFsm net;
-    net.add_transition(0, HfstArc(1, "c", "d", 1));
-    net.add_transition(1, HfstArc(2, "a", "o", 2));
-    net.add_transition(2, HfstArc(3, "t", "g", 3));
+    HfstBasicTransducer net;
+    net.add_transition(0, HfstBasicTransition(1, "c", "d", 1));
+    net.add_transition(1, HfstBasicTransition(2, "a", "o", 2));
+    net.add_transition(2, HfstBasicTransition(3, "t", "g", 3));
     net.set_final_weight(3, 4);
     std::cout << std::endl << "Conversions: ";
     std::cout << "skipped everything " <<

@@ -18,7 +18,7 @@
 
 #include "HfstDataTypes.h"
 #include "HfstSymbolDefs.h"
-#include "implementations/HfstNet.h"
+#include "implementations/HfstTransitionGraph.h"
 
 #if HAVE_SFST
 #include "implementations/SfstTransducer.h"
@@ -63,9 +63,9 @@ namespace hfst
 {
 
   namespace implementations {    
-    template <class T, class W> class HfstNet;
-    class TransitionData;
-    typedef HfstNet<TransitionData, float> HfstFsm; 
+    template <class T, class W> class HfstTransitionGraph;
+    class HfstNameThis;
+    typedef HfstTransitionGraph<HfstNameThis, float> HfstBasicTransducer; 
   }
   class HfstCompiler;
   class HfstTransducer;
@@ -109,9 +109,9 @@ namespace hfst
   bool get_harmonize_smaller(void);
 
   /* Whether unknown and identity symbols are used. By default, they are used.
-     These symbols are always reserved for use and included in alphabets of transducers,
-     but code optimization is possible if it is known that they do not appear
-     in transducer transitions. */
+     These symbols are always reserved for use and included in alphabets 
+     of transducers, but code optimization is possible if it is known 
+     that they do not appear in transducer transitions. */
   void set_unknown_symbols_in_use(bool);
   bool get_unknown_symbols_in_use();
 
@@ -123,7 +123,8 @@ namespace hfst
 
     \section argument_handling Argument handling
 
-    Transducer functions modify their calling object and return a reference to it, unless otherwise said.
+    Transducer functions modify their calling object and return 
+    a reference to it, unless otherwise said.
     Transducer arguments are usually not modified.
 \verbatim
     transducer.reverse();                                    // transducer is now reversed
@@ -148,7 +149,7 @@ namespace hfst
     \section creating_transducers Creating transducers
 
     With HfstTransducer constructors it is possible to create empty, epsilon, one-transition and single-path transducers.
-    Transducers can also be created from scratch with HfstFsm and converted to an HfstTransducer.
+    Transducers can also be created from scratch with HfstBasicTransducer and converted to an HfstTransducer.
     More complex transducers can be combined from simple ones with various functions.
     
     <a name="symbols"></a> 
@@ -205,7 +206,8 @@ tr1.disjunct(tr2);
     static hfst::implementations::SfstTransducer sfst_interface;
 #endif
 #if HAVE_OPENFST
-    static hfst::implementations::TropicalWeightTransducer tropical_ofst_interface;
+    static hfst::implementations::TropicalWeightTransducer 
+      tropical_ofst_interface;
     static hfst::implementations::LogWeightTransducer log_ofst_interface;
 #endif
 #if HAVE_FOMA
@@ -217,7 +219,8 @@ tr1.disjunct(tr2);
     static hfst::implementations::MfstlTransducer mfstl_interface;
 #endif
 
-    ImplementationType type; // the backend implementation type of the transducer
+    // the backend implementation type of the transducer
+    ImplementationType type; 
 
     bool anonymous; // currently not used
     bool is_trie;   // currently not used
@@ -227,9 +230,10 @@ tr1.disjunct(tr2);
 
     unsigned int number_of_states() const;
 
-    /* Harmonize transducers this and another. In harmonization, the symbol-to-number
-       correspondencies of this transducer are recoded so that they are equivalent to the ones
-       used in transducer another. Then the unknown and identity symbols are expanded
+    /* Harmonize transducers this and another. In harmonization, 
+       the symbol-to-number correspondencies of this transducer are recoded
+       so that they are equivalent to the ones used in transducer another.
+       Then the unknown and identity symbols are expanded
        in both transducers. */
     void harmonize(HfstTransducer &another);
 
@@ -239,16 +243,18 @@ tr1.disjunct(tr2);
 
 #include "hfst_apply_schemas.h"
 
-    // whether the conversion requested can be done without losing any information
+    // whether the conversion requested can be done without losing 
+    // any information
     bool static is_safe_conversion(ImplementationType original, ImplementationType conversion);
 
   public:
     HfstTransducer();
 
-    /** \brief Create an empty transducer, i.e. a transducer that does not recognize any string.
-	The type of the transducer is befined by \a type.
+    /** \brief Create an empty transducer, i.e. a transducer that does not 
+	recognize any string. The type of the transducer is befined by \a type.
 
-	@note Use HfstTransducer("@_EPSILON_SYMBOL_@") to create an epsilon transducer.
+	@note Use HfstTransducer("@_EPSILON_SYMBOL_@") 
+	to create an epsilon transducer.
      **/
     HfstTransducer(ImplementationType type);
 
@@ -314,7 +320,7 @@ tr1.disjunct(tr2);
 
     /** \brief Create an ordinary transducer equivalent to internal transducer \a t.
 	The type of the transducer is defined by \a type.  **/
-    HfstTransducer(const hfst::implementations::HfstFsm &t, ImplementationType type);
+    HfstTransducer(const hfst::implementations::HfstBasicTransducer &t, ImplementationType type);
 
     public:
     /** \brief Delete the HfstTransducer. **/
@@ -800,7 +806,7 @@ HfstTransducer t_transformed;
     friend std::ostream &operator<<(std::ostream &out, const HfstTransducer &t);
     friend class HfstInputStream;
     friend class HfstOutputStream;
-    friend class hfst::implementations::HfstNet<class C, class W>;
+    friend class hfst::implementations::HfstTransitionGraph<class C, class W>;
 
 #if HAVE_OPENFST
     friend class HfstGrammar;

@@ -41,7 +41,7 @@ using std::pair;
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
-#include "implementations/HfstNet.h"
+#include "implementations/HfstTransitionGraph.h"
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 
@@ -51,7 +51,7 @@ using std::pair;
 using hfst::HfstOutputStream;
 using hfst::HfstTokenizer;
 using hfst::HfstTransducer;
-using hfst::implementations::HfstFsm;
+using hfst::implementations::HfstBasicTransducer;
 //using hfst::HfstInternalTransducer;
 //using hfst::implementations::HfstTrie;
 using hfst::StringPairVector;
@@ -229,7 +229,7 @@ process_stream(HfstOutputStream& outstream)
   char* line = 0;
   size_t len = 0;
   HfstTokenizer tok;
-  HfstFsm disjunction;
+  HfstBasicTransducer disjunction;
   size_t line_n = 0;
 
   // add multicharater symbols to tokenizer
@@ -368,7 +368,7 @@ process_stream(HfstOutputStream& outstream)
 
       if (!disjunct_strings)
         {
-          HfstFsm tr;
+          HfstBasicTransducer tr;
           tr.disjunct(spv, path_weight);
           HfstTransducer res(tr, output_format);
           outstream << res;

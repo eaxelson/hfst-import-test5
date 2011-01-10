@@ -40,7 +40,7 @@ using std::set;
 using hfst::HfstTransducer;
 using hfst::implementations::HfstFsm;
 using hfst::implementations::HfstState;
-using hfst::implementations::TransitionData;
+using hfst::implementations::HfstTransitionData;
 using hfst::implementations::HfstArc;
 //using hfst::HfstStateIterator;
 //using hfst::HfstTransitionIterator;
@@ -370,7 +370,7 @@ LexcCompiler::compileLexical()
 		  transition != transitions.end();
 		  transition++ )
               {
-                TransitionData old_transition = transition->get_transition_data();
+                HfstTransitionData old_transition = transition->get_transition_data();
                 string old_osymbol = old_transition.get_input_symbol();
                 string old_isymbol = old_transition.get_output_symbol();
                 string nu_osymbol;

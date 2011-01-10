@@ -52,7 +52,7 @@ HFST_HDRS = \
 	implementations/HfstOlTransducer.h \
 	HfstTokenizer.h \
 	implementations/ConvertTransducerFormat.h \
-	implementations/HfstNet.h \
+	implementations/HfstTransitionGraph.h \
 	HfstExceptions.h \
 	HfstExtractStrings.h \
 	HfstFlagDiacritics.h \

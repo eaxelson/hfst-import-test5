@@ -1,5 +1,5 @@
-#ifndef _HFST_NET_H_
-#define _HFST_NET_H_
+#ifndef _HFST_TRANSITION_GRAPH_H_
+#define _HFST_TRANSITION_GRAPH_H_
 
 #include <string>
 #include <set>
@@ -12,9 +12,9 @@
 #include <iostream>
 
 
-/** @file HfstNet.h
+/** @file HfstTransitionGraph.h
     @brief Declaration of classes needed by HFST's 
-    own transducer format. */
+    own simple transducer format. */
 
 namespace hfst {
 
@@ -25,10 +25,10 @@ namespace hfst {
       through the HFST API. */
   namespace implementations {
 
-    /** @brief The number of a state in an HfstNet. */
+    /** @brief The number of a state in an HfstTransitionGraph. */
     typedef unsigned int HfstState;
 
-    // Needed by class TransitionData
+    // Needed by class HfstNameThis
     struct string_comparison {
       bool operator() (const std::string &str1, const std::string &str2) const {
 	return (str1.compare(str2) < 0);
@@ -38,16 +38,16 @@ namespace hfst {
     /** @brief One implementation of template class C in 
 	HfstTransition. 
 
-	A TransitionData has an input symbol and an output symbol of type
+	A HfstNameThis has an input symbol and an output symbol of type
 	SymbolType (string) and a weight of type WeightType (float).
 
-	\internal Actually a TransitionData has an input and an output number
+	\internal Actually a HfstNameThis has an input and an output number
 	of type unsigned int, but this implementation is hidden from the user.
 	The class has two static maps and functions that take care of conversion
 	between strings and internal numbers.
 
-	@see HfstTransition HfstArc */
-    class TransitionData {
+	@see HfstTransition HfstBasicTransition */
+    class HfstNameThis {
     public:
       /** @brief The input and output symbol type. */
       typedef std::string SymbolType;
@@ -73,7 +73,7 @@ namespace hfst {
 	Number2SymbolMap::const_iterator it = number2symbol_map.find(number);
 	if (it == number2symbol_map.end()) {
 	  fprintf(stderr, "ERROR: "
-		  "TransitionData::get_symbol(unsigned int number) "
+		  "HfstNameThis::get_symbol(unsigned int number) "
 		  "number is not mapped to any symbol\n");
 	  throw hfst::exceptions::HfstInterfaceException();
 	}
@@ -100,20 +100,20 @@ namespace hfst {
 
     public:
 
-      /** @brief Create a TransitionData with epsilon input and output
+      /** @brief Create a HfstNameThis with epsilon input and output
 	  strings and weight zero. */
-    TransitionData(): input_number(0), output_number(0), weight(0) {}
+    HfstNameThis(): input_number(0), output_number(0), weight(0) {}
 
-      /** @brief Create a deep copy of TransitionData \a data. */
-      TransitionData(const TransitionData &data) {
+      /** @brief Create a deep copy of HfstNameThis \a data. */
+      HfstNameThis(const HfstNameThis &data) {
 	input_number = data.input_number;
 	output_number = data.output_number;
 	weight = data.weight;
       }
 
-      /** @brief Create a TransitionData with input symbol \a 
+      /** @brief Create a HfstNameThis with input symbol \a 
 	  isymbol, output symbol \a osymbol and weight \a weight. */
-      TransitionData(SymbolType isymbol,
+      HfstNameThis(SymbolType isymbol,
 		     SymbolType osymbol,
 		     WeightType weight) {
 	input_number = get_number(isymbol);
@@ -149,7 +149,7 @@ namespace hfst {
 
 	  /internal is it too slow if strin comparison is used instead?
       */
-      bool operator<(const TransitionData &another) const {
+      bool operator<(const HfstNameThis &another) const {
 	if (input_number < another.input_number )
 	  return true;
 	if (input_number > another.input_number)
@@ -165,10 +165,10 @@ namespace hfst {
       friend class Symbol2NumberMapInitializer;
     };
 
-    // Initialization of static members in class TransitionData..
+    // Initialization of static members in class HfstNameThis..
     class Number2SymbolMapInitializer {
     public:
-      Number2SymbolMapInitializer(TransitionData::Number2SymbolMap &map) {
+      Number2SymbolMapInitializer(HfstNameThis::Number2SymbolMap &map) {
 	map[0] = std::string("@_EPSILON_SYMBOL_@");
 	map[1] = std::string("@_UNKNOWN_SYMBOL_@");
 	map[2] = std::string("@_IDENTITY_SYMBOL_@");
@@ -177,7 +177,7 @@ namespace hfst {
 
     class Symbol2NumberMapInitializer {
     public:
-      Symbol2NumberMapInitializer(TransitionData::Symbol2NumberMap &map) {
+      Symbol2NumberMapInitializer(HfstNameThis::Symbol2NumberMap &map) {
 	map["@_EPSILON_SYMBOL_@"] = 0;
 	map["@_UNKNOWN_SYMBOL_@"] = 1;
 	map["@_IDENTITY_SYMBOL_@"] = 2;
@@ -185,13 +185,13 @@ namespace hfst {
     };
 
     /*
-    TransitionData::Number2SymbolMap TransitionData::number2symbol_map;
-    Number2SymbolMapInitializer dummy1(TransitionData::number2symbol_map);
+    HfstTransitionData::Number2SymbolMap HfstTransitionData::number2symbol_map;
+    Number2SymbolMapInitializer dummy1(HfstTransitionData::number2symbol_map);
 
-    TransitionData::Symbol2NumberMap TransitionData::symbol2number_map;
-    Symbol2NumberMapInitializer dummy2(TransitionData::symbol2number_map);
+    HfstTransitionData::Symbol2NumberMap HfstTransitionData::symbol2number_map;
+    Symbol2NumberMapInitializer dummy2(HfstTransitionData::symbol2number_map);
 
-    unsigned int TransitionData::max_number=2;
+    unsigned int HfstTransitionData::max_number=2;
     */
     // ..initialization done
 
@@ -204,9 +204,9 @@ namespace hfst {
        transitions and final states.
 
        The easiest way to use this template is to choose the 
-       ready-templated HfstArc.
+       ready-templated HfstBasicTransition.
 
-       @see HfstArc
+       @see HfstBasicTransition
     */
     template <class C> class HfstTransition 
       {
@@ -259,56 +259,80 @@ namespace hfst {
 	  return transition_data;
 	}
 
+	/** @brief Get the input symbol of the transition. */
+	typename C::SymbolType get_input_symbol() const {
+	  return transition_data.get_input_symbol();
+	}
+
+	/** @brief Get the output symbol of the transition. */
+	typename C::SymbolType get_output_symbol() const {
+	  return transition_data.get_output_symbol();
+	}
+
+	/** @brief Get the weight of the transition. */
+	typename C::WeightType get_weight() const {
+	  return transition_data.get_weight();
+	}
+
       };
 
     /** @brief An HfstTransition with transition data of type
-	TransitionData. 
+	HfstNameThis. 
 
-	@see TransitionData */
-    typedef HfstTransition<TransitionData> HfstArc;
+	@see HfstNameThis */
+    typedef HfstTransition<HfstNameThis> HfstBasicTransition;
 
-    /** @brief A simple transducer format.
+    /** @brief A simple transition graph format that consists of
+	states and transitions between those states.
 
-       An HfstNet contains a map, where each state is mapped
-       to a set of that state's transitions (class C), and a map, where
-       each final state is mapped to its final weight (class W). 
-       Class C must use the weight type W. 
+       An HfstTransitionGraph contains a map, where each state is mapped
+       to a set of that state's transitions (class HfstTransition<class C>),
+       and a map, where each final state is mapped to its 
+       final weight (class W). Class C must use the weight type W. 
+
+       A state's transition (class HfstTransition<class C>) contains
+       a target state and transition data (class C).
 
        Probably the easiest way to use this template is to choose
-       the ready-templated HfstFsm. HfstFsm is the implementation that is
+       the implementations HfstBasicTransducer (HfstTransitionGraph<HfstNameThis, float>)
+       and HfstBasicTransition (HfstTransition<HfstNameThis>).
+       HfstBasicTransducer is the implementation that is
        used as an example in this documentation.
 
-       An example of creating a HfstFsm [foo:bar baz:baz] with weight 0.4
-       from scratch:
+       An example of creating a HfstBasicTransducer [foo:bar baz:baz] 
+       with weight 0.4 from scratch:
+
 \verbatim
   // Create an empty net
   // The net has initially one start state (number zero) that is not final
-  HfstFsm net;
+  HfstBasicTransducer net;
   // Add two states to the net
   net.add_state(1);
   net.add_state(2);
   // Create a transition [foo:bar] leading to state 1 with weight 0.1 ...
-  HfstArc arc(1, "foo", "bar", 0.1);
+  HfstBasicTransition tr(1, "foo", "bar", 0.1);
   // ... and add it to state zero
-  net.add_transition(0, arc);
+  net.add_transition(0, tr);
   // Add a transition [baz:baz] with weight 0 from state 1 to state 2 
-  net.add_transition(1, HfstArc(2, "baz", "baz", 0.0));
+  net.add_transition(1, HfstBasicTransition(2, "baz", "baz", 0.0));
   // Set state 2 as final with weight 0.3
   net.set_final_weight(2, 0.3);
 \endverbatim
 
-       An example of iterating through a HfstFsm's states and transitions
-       when printing it in AT&T format to stderr:
+       An example of iterating through a HfstBasicTransducer's states
+       and transitions when printing it in AT&T format to stderr:
+
 \verbatim
   // Go through all states
-  for (HfstFsm::iterator it = net.begin();
+  for (HfstBasicTransducer::iterator it = net.begin();
        it != net.end(); it++)
     {
       // Go through the set of transitions in each state
-      for (HfstFsm::HfstTransitionSet::iterator tr_it = it->second.begin();
+      for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it = 
+             it->second.begin();
 	   tr_it != it->second.end(); tr_it++)
 	{
-	  TransitionData data = tr_it->get_transition_data();
+	  HfstNameThis data = tr_it->get_transition_data();
 
 	  fprintf(stderr, "%i\t%i\t%s\t%s\t%f\n",
 		  it->first,
@@ -327,55 +351,56 @@ namespace hfst {
     }
 \endverbatim
 
-       @see #HfstFsm TransitionData */
-    template <class C, class W> class HfstNet 
+       @see #HfstBasicTransducer HfstNameThis */
+    template <class C, class W> class HfstTransitionGraph 
       {
       protected:
 	typedef std::map<HfstState, 
 	  std::set<HfstTransition<C> > >
-	  HfstStateMap_;
-	HfstStateMap_ state_map;
+	  HfstStateMap;
+	HfstStateMap state_map;
 	typedef std::map<HfstState,W> FinalWeightMap;
 	FinalWeightMap final_weight_map;
-	typedef std::set<typename C::SymbolType> HfstNetAlphabet;
-	HfstNetAlphabet alphabet;
+	typedef std::set<typename C::SymbolType> HfstTransitionGraphAlphabet;
+	HfstTransitionGraphAlphabet alphabet;
 	unsigned int max_state;
 
       public:
-	/** @brief A set of transitions of a state in an HfstNet. */
+	/** @brief A set of transitions of a state in an HfstTransitionGraph. */
 	typedef std::set<HfstTransition<C> > HfstTransitionSet;
 	/** @brief An iterator type that points to the map of states 
 	    in the net. 
 
 	    The value pointed by the iterator is of type 
 	    std::pair<HfstState, HfstTransitionSet >. */
-	typedef typename HfstStateMap_::iterator iterator;
+	typedef typename HfstStateMap::iterator iterator;
 	/** @brief A const iterator type that points to the map of states
 	    in the net.
 
 	    The value pointed by the iterator is of type 
 	    std::pair<HfstState, HfstTransitionSet >. */
-	typedef typename HfstStateMap_::const_iterator const_iterator;
+	typedef typename HfstStateMap::const_iterator const_iterator;
 
 	/** @brief Create a transducer with one initial state that has state
 	    number zero and is not a final state, i.e. an empty transducer. */
-        HfstNet(void): max_state(0) {
+        HfstTransitionGraph(void): max_state(0) {
 	  initialize_alphabet(alphabet);
 	  state_map[0]=std::set<HfstTransition <C> >();
 	}
 
-	/** @brief Create a deep copy of HfstNet \a net. */
-        HfstNet(const HfstNet &net): max_state(net.max_state) {
+	/** @brief Create a deep copy of HfstTransitionGraph \a net. */
+        HfstTransitionGraph(const HfstTransitionGraph &net): max_state(net.max_state) {
 	  state_map = net.state_map;
 	  final_weight_map = net.final_weight_map;
 	  alphabet = alphabet;
 	}
 
-	/** @brief Create an HfstNet equivalent to HfstTransducer 
+	/** @brief Create an HfstTransitionGraph equivalent to HfstTransducer 
 	    \a transducer. */
-	HfstNet(const hfst::HfstTransducer &transducer) {
-	  HfstNet<TransitionData, float> *fsm = 
-	    ConversionFunctions::hfst_transducer_to_hfst_net(transducer);
+	HfstTransitionGraph(const hfst::HfstTransducer &transducer) {
+	  HfstTransitionGraph<HfstNameThis, float> *fsm = 
+	    ConversionFunctions::
+	      hfst_transducer_to_hfst_basic_transducer(transducer);
 	  max_state = fsm->max_state;
 	  state_map = fsm->state_map;
 	  final_weight_map = fsm->final_weight_map;
@@ -383,7 +408,7 @@ namespace hfst {
 	  delete fsm;
 	}
 
-	void initialize_alphabet(HfstNetAlphabet &alpha) {
+	void initialize_alphabet(HfstTransitionGraphAlphabet &alpha) {
 	  alpha.insert("@_EPSILON_SYMBOL_@");
 	  alpha.insert("@_UNKNOWN_SYMBOL_@");
 	  alpha.insert("@_IDENTITY_SYMBOL_@");
@@ -399,7 +424,7 @@ namespace hfst {
 	void prune_alphabet() {
 
 	  // Which symbols occur in the transducer
-	  HfstNetAlphabet symbols_found;
+	  HfstTransitionGraphAlphabet symbols_found;
 	  initialize_alphabet(symbols_found); /* special symbols are 
 						 always known */
 
@@ -418,9 +443,9 @@ namespace hfst {
 	  
 	  // Which symbols in the transducer's alphabet did not occur in 
 	  // the transducer
-	  HfstNetAlphabet symbols_not_found;
+	  HfstTransitionGraphAlphabet symbols_not_found;
 
-	  for (typename HfstNetAlphabet::iterator it = alphabet.begin();
+	  for (typename HfstTransitionGraphAlphabet::iterator it = alphabet.begin();
 	       it != alphabet.end(); it++) 
 	    {
 	      if (symbols_found.find(*it) == symbols_found.end())
@@ -429,7 +454,7 @@ namespace hfst {
 
 	  // Remove the symbols that did not occur in the transducer
 	  // from its alphabet
-	  for (typename HfstNetAlphabet::iterator it 
+	  for (typename HfstTransitionGraphAlphabet::iterator it 
 		 = symbols_not_found.begin();
 	       it != symbols_not_found.end(); it++)
 	    {
@@ -495,7 +520,7 @@ namespace hfst {
 	/** @brief Get an iterator to the beginning of the map of states in 
 	    the net. 
 
-	    For an example, see #HfstNet */
+	    For an example, see #HfstTransitionGraph */
 	iterator begin() { return state_map.begin(); }
 
 	/** @brief Get a const iterator to the beginning of the map of 
@@ -592,15 +617,15 @@ namespace hfst {
 	    }	  
 	}
 
-	/** @brief Create an HfstNet as defined in AT&T format in istream \a is.
+	/** @brief Create an HfstTransitionGraph as defined in AT&T format in istream \a is.
 	    @pre \a is not at end, otherwise an exception is thrown. 
 	    @note Multiple AT&T transducer definitions are separated with 
 	    the line "--". */
-	static HfstNet read_in_att_format(std::istream &is, 
+	static HfstTransitionGraph read_in_att_format(std::istream &is, 
 					  std::string epsilon_symbol=
 					  std::string("@_EPSILON_SYMBOL_@")) {
 
-	  HfstNet retval;
+	  HfstTransitionGraph retval;
 	  char line [255];
 	  while(not is.getline(line,255).eof()) {
 
@@ -643,17 +668,17 @@ namespace hfst {
 	}
 
 
-	/** @brief Create an HfstNet as defined in AT&T format in FILE \a file.
+	/** @brief Create an HfstTransitionGraph as defined in AT&T format in FILE \a file.
 	    @pre \a is not at end, otherwise an exception is thrown. 
 	    @note Multiple AT&T transducer definitions are separated with 
 	    the line "--". 
 
 	    @todo Combine with the stream version using templates. */
-	static HfstNet read_in_att_format(FILE *file, 
+	static HfstTransitionGraph read_in_att_format(FILE *file, 
 					  std::string epsilon_symbol=
 					  std::string("@_EPSILON_SYMBOL_@")) {
 
-	  HfstNet retval;
+	  HfstTransitionGraph retval;
 	  char line [255];
 
 	  while(NULL != fgets(line, 255, file)) {
@@ -924,7 +949,7 @@ namespace hfst {
 
       protected:
 	/* Used in function 
-	   substitute(const StringPair&, HfstNet&) */
+	   substitute(const StringPair&, HfstTransitionGraph&) */
 	struct substitution_data 
 	{
 	  HfstState origin_state;
@@ -943,7 +968,7 @@ namespace hfst {
 
 	/* Add a copy of \a transducer with epsilon transitions between 
 	   states and with weight as defined in \a sub. */
-	void add_substitution(substitution_data &sub, HfstNet &transducer) {
+	void add_substitution(substitution_data &sub, HfstTransitionGraph &transducer) {
 
 	  // Epsilon transition to initial state of \a transducer
 	  max_state++;
@@ -1010,7 +1035,7 @@ namespace hfst {
 	    
 	    @pre This transducer and \a transducer are harmonized.
 	*/
-	void substitute(const StringPair &sp, HfstNet &transducer) {
+	void substitute(const StringPair &sp, HfstTransitionGraph &transducer) {
 	  
 	  // If neither symbol to be substituted is known to the transducer,
 	  // do nothing.
@@ -1166,15 +1191,15 @@ namespace hfst {
 	friend class ConversionFunctions;
       };
 
-    /** @brief An HfstNet with transitions of type TransitionData and 
+    /** @brief An HfstTransitionGraph with transitions of type HfstNameThis and 
 	weight type float.
 	
-	This is probably the most useful kind of HfstNet. */
-    typedef HfstNet <TransitionData, float> HfstFsm;
+	This is probably the most useful kind of HfstTransitionGraph. */
+    typedef HfstTransitionGraph <HfstNameThis, float> HfstBasicTransducer;
 
   }
    
 }
-#endif // #ifndef _HFST_NET_H_
+#endif // #ifndef _HFST_TRANSITION_GRAPH_H_
 
 
