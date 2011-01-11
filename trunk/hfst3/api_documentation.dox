@@ -10,21 +10,37 @@
 
       Some changes from version 2 to 3:
 
-      - Namespaces HFST and HWFST: namespace hfst and an 
-      ImplementationType argument
+      <table>
+      <tr>
+      <th>HFST version 2</th>
+      <th>HFST version 3</th>
+      </tr>
+      <tr>  
+      <td>Namespaces HFST and HWFST</td>
+      <td>Namespace hfst and an ImplementationType argument</td>
+      </tr>
+      <tr>
+      <td>KeyLayer and SymbolLayer</td>
+      <td>Functions take a string argument, string-to-number mapping
+      is done internally and automatically</td>
+      </tr>
+      <tr>
+      <td>TransducerLayer, Rule Layer, CoreExtensionLayer</td>	
+      <td>HfstTransducer, namespace hfst::rules, class HfstTransitionGraph</td>
+      </tr>
+      <tr>
+      <td>Functions delete their transducer arguments</td> 
+      <td>Functions modify their calling object and do not change 
+      their arguments (unless otherwise said)</td>
+      </tr>
+      <tr>
+      <td>No unknown or identity symbols</td>
+      <td>Unknown and identity symbols are supported 
+      in all implementation formats</td>
+      </tr>
+      </table> 
 
-      - KeyLayer and SymbolLayer: functions take a string argument, 
-      string-to-number mapping is done internally and automatically
-
-      - TransducerLayer, Rule Layer, CoreExtensionLayer: 
-      HfstTransducer, namespace hfst::rules, class HfstTransitionGraph
- 
-      - Functions delete their transducer arguments: 
-      Functions modify their calling object and do not change their arguments
-      (unless otherwise said)
-
-      - No unknown or identity symbols: unknown and identity symbols 
-      are supported in all implementation formats
+      <BR></BR>	
 
    */
 
@@ -51,7 +67,8 @@ autoreconf -i && ./configure && make && make install
 
       To successfully use the HFST library, you should have at least one 
       of the backend libraries
-      (<a href="http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html">SFST</a> (version 1.4.2), 
+      (<a href="http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html">SFST</a> 
+      (version 1.4.2), 
       <a href="http:://www.openfst.org">OpenFst</a> (version 1.2.6) or 
       <a href="http://foma.sourceforge.net/">foma</a> (version 0.9.13) ) 
       installed on your computer. The in-built HfstTransitionGraph format
@@ -580,8 +597,6 @@ and the following namespaces:
 
    - \link hfst::lexc lexc\endlink: A namespace for Xerox LexC related specific functions and classes.
 
-   - \link hfst::xre xre\endlink: A namespace for functions related to regular expression parsing.
-
    - \link hfst::exceptions exceptions\endlink: A namespace for exceptions.
 
 
@@ -599,7 +614,8 @@ and the following namespaces:
 
 HFST - The Helsinki Finite-State Transducer technology is intended for creating and 
 manipulating weighted or unweighted synchronic transducers implementing regular relations.
-Currently HFST has been implemented using the 
+UTF-8 is chosen as the character encoding used in the HFST software.
+Currently HFST has been implemented using the
 <a href="http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html">SFST</a>, 
 <a href="http:://www.openfst.org">OpenFst</a> and 
 <a href="http://foma.sourceforge.net/">foma</a> software libraries.
@@ -643,8 +659,6 @@ OpenFst in http://www.openfst.org and foma in http://www.aclweb.org/anthology/E/
 
    - Apply two-level, replace, restriction and coercion \link hfst::rules rules\endlink
 
-   - Create transducers from \link hfst::xre regular expressions\endlink
-
 
 \section tutorial Tutorial
 
@@ -686,3 +700,4 @@ OpenFst in http://www.openfst.org and foma in http://www.aclweb.org/anthology/E/
     for example the files SfstTransducer.h and SfstTransducer.cc 
     define the SFST implementation. 
 */
+ 

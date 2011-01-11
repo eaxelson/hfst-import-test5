@@ -121,14 +121,17 @@ namespace hfst {
 	this->weight = weight;
       }
 
+      /** @brief Get the input symbol. */
       SymbolType get_input_symbol() const {
 	return get_symbol(input_number);
       }
 
+      /** @brief Get the output symbol. */
       SymbolType get_output_symbol() const {
 	return get_symbol(output_number);
       }
 
+      /** @brief Get the weight. */
       WeightType get_weight() const {
 	return weight;
       }
@@ -188,8 +191,8 @@ namespace hfst {
 	transition data represented by class C. 
 
        The easiest way to use this template is to choose the 
-       the implementation HfstBasicTransition which is compatible with
-       HfstBasicTransducer.
+       the implementation #HfstBasicTransition which is compatible with
+       #HfstBasicTransducer.
 
        @see HfstBasicTransition
     */
@@ -264,7 +267,7 @@ namespace hfst {
     /** @brief An HfstTransition with transition data of type
 	HfstNameThis. 
 
-	This implementation is compatible with HfstBasicTransducer.
+	This implementation is compatible with #HfstBasicTransducer.
 
 	@see HfstNameThis HfstBasicTransducer */
     typedef HfstTransition<HfstNameThis> HfstBasicTransition;
@@ -272,18 +275,19 @@ namespace hfst {
     /** @brief A simple transition graph format that consists of
 	states and transitions between those states.
 
-       An HfstTransitionGraph contains a map, where each state is mapped
-       to a set of that state's transitions (class HfstTransition<class C>),
-       and a map, where each final state is mapped to its 
-       final weight (class W). Class C must use the weight type W. 
-       A state's transition (class HfstTransition<class C>) contains
-       a target state and transition data (class C).
+       An HfstTransitionGraph contains two maps. One maps each state
+       to a set of that state's transitions (that are of type class 
+       HfstTransition<class C>). The other maps each final state to its 
+       final weight (that is of type class W). Class C must use the weight
+       type W. A state's transition (class HfstTransition<class C>) contains
+       a target state and a transition data field (that is of type class C).
 
        Probably the easiest way to use this template is to choose
-       the implementations HfstBasicTransducer 
+       the implementations #HfstBasicTransducer 
        (HfstTransitionGraph<HfstNameThis, float>)
-       and HfstBasicTransition (HfstTransition<HfstNameThis>).
-       HfstBasicTransducer is the implementation that is
+       and #HfstBasicTransition (HfstTransition<HfstNameThis>).
+       The class HfstNameThis contains an input string, an output string
+       and a float weight. HfstBasicTransducer is the implementation that is
        used as an example in this documentation.
 
        An example of creating a HfstBasicTransducer [foo:bar baz:baz] 
@@ -293,18 +297,18 @@ namespace hfst {
   // Create an empty transducer
   // The transducer has initially one start state (number zero) 
   // that is not final
-  HfstBasicTransducer net;
+  HfstBasicTransducer fsm;
   // Add two states to the transducer
-  net.add_state(1);
-  net.add_state(2);
+  fsm.add_state(1);
+  fsm.add_state(2);
   // Create a transition [foo:bar] leading to state 1 with weight 0.1 ...
   HfstBasicTransition tr(1, "foo", "bar", 0.1);
   // ... and add it to state zero
-  net.add_transition(0, tr);
+  fsm.add_transition(0, tr);
   // Add a transition [baz:baz] with weight 0 from state 1 to state 2 
-  net.add_transition(1, HfstBasicTransition(2, "baz", "baz", 0.0));
+  fsm.add_transition(1, HfstBasicTransition(2, "baz", "baz", 0.0));
   // Set state 2 as final with weight 0.3
-  net.set_final_weight(2, 0.3);
+  fsm.set_final_weight(2, 0.3);
 \endverbatim
 
        An example of iterating through a HfstBasicTransducer's states
@@ -312,8 +316,8 @@ namespace hfst {
 
 \verbatim
   // Go through all states
-  for (HfstBasicTransducer::iterator it = net.begin();
-       it != net.end(); it++)
+  for (HfstBasicTransducer::iterator it = fsm.begin();
+       it != fsm.end(); it++)
     {
       // Go through the set of transitions in each state
       for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it = 
@@ -328,11 +332,11 @@ namespace hfst {
 		  tr_it->get_weight()
 		  );
 	}
-      if (net.is_final_state(it->first))
+      if (fsm.is_final_state(it->first))
 	{
 	  fprintf(stderr, "%i\t%f\n",
 		  it->first,
-		  net.get_final_weight(it->first));
+		  fsm.get_final_weight(it->first));
 	}
     }
 \endverbatim
@@ -349,36 +353,36 @@ namespace hfst {
 	FinalWeightMap final_weight_map;
 	typedef std::set<typename C::SymbolType> HfstTransitionGraphAlphabet;
 	HfstTransitionGraphAlphabet alphabet;
-	unsigned int max_state;
+	unsigned int max_state; /* The biggest state number in use. */
 
       public:
 	/** @brief A set of transitions of a state in an HfstTransitionGraph. */
 	typedef std::set<HfstTransition<C> > HfstTransitionSet;
 	/** @brief An iterator type that points to the map of states 
-	    in the net. 
+	    in the graph. 
 
 	    The value pointed by the iterator is of type 
 	    std::pair<HfstState, HfstTransitionSet >. */
 	typedef typename HfstStateMap::iterator iterator;
 	/** @brief A const iterator type that points to the map of states
-	    in the net.
+	    in the graph.
 
 	    The value pointed by the iterator is of type 
 	    std::pair<HfstState, HfstTransitionSet >. */
 	typedef typename HfstStateMap::const_iterator const_iterator;
 
-	/** @brief Create a transducer with one initial state that has state
-	    number zero and is not a final state, i.e. an empty transducer. */
+	/** @brief Create a graph with one initial state that has state
+	    number zero and is not a final state, i.e. an empty graph. */
         HfstTransitionGraph(void): max_state(0) {
 	  initialize_alphabet(alphabet);
 	  state_map[0]=std::set<HfstTransition <C> >();
 	}
 
-	/** @brief Create a deep copy of HfstTransitionGraph \a net. */
-        HfstTransitionGraph(const HfstTransitionGraph &net): 
-	max_state(net.max_state) {
-	  state_map = net.state_map;
-	  final_weight_map = net.final_weight_map;
+	/** @brief Create a deep copy of HfstTransitionGraph \a graph. */
+        HfstTransitionGraph(const HfstTransitionGraph &graph): 
+	max_state(graph.max_state) {
+	  state_map = graph.state_map;
+	  final_weight_map = graph.final_weight_map;
 	  alphabet = alphabet;
 	}
 
@@ -401,16 +405,19 @@ namespace hfst {
 	  alpha.insert("@_IDENTITY_SYMBOL_@");
 	}
 
-	/** @brief Add a symbol to the alphabet of the transducer. */
+	/** @brief Add a symbol to the alphabet of the graph. */
 	void add_symbol_to_alphabet(const std::string &symbol) {
 	  alphabet.insert(symbol);
 	}
 
 	/** @brief Remove all symbols that do not occur in transitions of
-	    the transducer from its alphabet. */
+	    the graph from its alphabet. 
+
+	    Epsilon, unknown and identity \link hfst::String symbols\endlink
+	    are always included in the alphabet. */
 	void prune_alphabet() {
 
-	  // Which symbols occur in the transducer
+	  // Which symbols occur in the graph
 	  HfstTransitionGraphAlphabet symbols_found;
 	  initialize_alphabet(symbols_found); /* special symbols are 
 						 always known */
@@ -428,8 +435,8 @@ namespace hfst {
 		}
 	    }
 	  
-	  // Which symbols in the transducer's alphabet did not occur in 
-	  // the transducer
+	  // Which symbols in the graph's alphabet did not occur in 
+	  // the graph
 	  HfstTransitionGraphAlphabet symbols_not_found;
 
 	  for (typename HfstTransitionGraphAlphabet::iterator it 
@@ -440,7 +447,7 @@ namespace hfst {
 		symbols_not_found.insert(*it);
 	    }
 
-	  // Remove the symbols that did not occur in the transducer
+	  // Remove the symbols that did not occur in the graph
 	  // from its alphabet
 	  for (typename HfstTransitionGraphAlphabet::iterator it 
 		 = symbols_not_found.begin();
@@ -450,19 +457,26 @@ namespace hfst {
 	    }
 	}
 
-	/** @brief Get the set of SymbolTypes that occur in the alphabet 
-	    of the transducer. */
+	/** @brief Get the set of SymbolTypes in the alphabet 
+	    of the graph. 
+
+	    The SymbolTypes do not necessarily occur in any transitions
+	    of the graph. Epsilon, unknown and identity \link 
+	    hfst::String symbols\endlink are always included in the alphabet. */
 	std::set<typename C::SymbolType> get_alphabet() {
 	  return alphabet;
 	}
 
-	/** @brief Add a new state to this net. */
+	/** @brief Add a new state to this graph and return its number.
+
+	    @return The next (smallest) free state number. */
 	HfstState add_state(void)
 	{ return add_state(max_state+1); }
 
-	/** @brief Add a state \a s to this net.
+	/** @brief Add a state \a s to this graph.
  
-	    If the state already exists, it is not added again. */
+	    If the state already exists, it is not added again. 
+	    @return \a s*/
 	HfstState add_state(HfstState s) {
 	  if (state_map.find(s) == state_map.end())
 	    state_map[s]=std::set<HfstTransition <C> >();
@@ -489,14 +503,15 @@ namespace hfst {
 	  return (final_weight_map.find(s) != final_weight_map.end());
 	}
 
-	/** Get the final weight of state \a s in this net. */
+	/** Get the final weight of state \a s in this graph. */
 	W get_final_weight(HfstState s) const {
 	  if (final_weight_map.find(s) != final_weight_map.end())
 	    return final_weight_map.find(s)->second;
 	  throw hfst::exceptions::HfstInterfaceException();
 	}
 
-	/** @brief Set the final weight of state \a s in this net to \a weight. 
+	/** @brief Set the final weight of state \a s in this graph 
+	    to \a weight. 
 
 	    If the state does not exist, it is created. */
 	void set_final_weight(HfstState s, const W & weight) {
@@ -506,24 +521,24 @@ namespace hfst {
 	}
 
 	/** @brief Get an iterator to the beginning of the map of states in 
-	    the net. 
+	    the graph. 
 
 	    For an example, see #HfstTransitionGraph */
 	iterator begin() { return state_map.begin(); }
 
 	/** @brief Get a const iterator to the beginning of the map of 
-	    states in the net. */
+	    states in the graph. */
 	const_iterator begin() const { return state_map.begin(); }
 
 	/** @brief Get an iterator to the end of the map of states in
-	    the net. */
+	    the graph. */
 	iterator end() { return state_map.end(); }
 
 	/** @brief Get a const iterator to the end of the map of states in
-	    the net. */
+	    the graph. */
 	const_iterator end() const { return state_map.end(); }
 
-	/** @brief Get the set of transitions of state \a s in this net. 
+	/** @brief Get the set of transitions of state \a s in this graph. 
 
 	    If the state does not exist, it is created. The created
 	    state has an empty set of transitions. */
@@ -538,7 +553,7 @@ namespace hfst {
 	  throw hfst::exceptions::FunctionNotImplementedException();
 	}
 
-	/** @brief Write the net in AT&T format to ostream \a os.
+	/** @brief Write the graph in AT&T format to ostream \a os.
 	    \a write_weights defines whether weights are printed. */
 	void write_in_att_format(std::ostream &os, bool write_weights=true) 
 	{
@@ -568,7 +583,7 @@ namespace hfst {
 	    }	  
 	}
 
-	/** @brief Write the net in AT&T format to FILE \a file.
+	/** @brief Write the graph in AT&T format to FILE \a file.
 	    \a write_weights defines whether weights are printed. */
 	void write_in_att_format(FILE *file, bool write_weights=true) 
 	{
@@ -670,9 +685,9 @@ namespace hfst {
 	}
 
 
-	/** @brief Create an HfstTransitionGraph as defined in AT&T format 
-	    in istream \a is. \a epsilon_symbol defines how epsilon is
-	    represented. 
+	/** @brief Create an HfstTransitionGraph as defined in AT&T 
+	    transducer format in istream \a is. \a epsilon_symbol 
+	    defines how epsilon is represented. 
 	    @pre \a is not at end, otherwise an exception is thrown. 
 	    @note Multiple AT&T transducer definitions are separated with 
 	    the line "--". */
@@ -687,8 +702,8 @@ namespace hfst {
 	}
 
 	/** @brief Create an HfstTransitionGraph as defined 
-	    in AT&T format in FILE \a file. \a epsilon_symbol defines 
-	    how epsilon is represented. 
+	    in AT&T transducer format in FILE \a file. 
+	    \a epsilon_symbol defines how epsilon is represented. 
 	    @pre \a is not at end, otherwise an exception is thrown. 
 	    @note Multiple AT&T transducer definitions are separated with 
 	    the line "--". */
@@ -703,15 +718,16 @@ namespace hfst {
 	}
 
 
-	/* ----------------------
-	   Substitution functions
-	   ---------------------- */
+
+	/* ----------------------------
+	      Substitution functions
+	   ---------------------------- */
 
       protected:
 
-	/* *************************************************
-	   A class used by function substitute(substituter&) 
-	   *************************************************  */
+	/* -------------------------------------------------------
+	      A class used by function substitute(substituter&) 
+	   -------------------------------------------------------  */
 	struct substituter {
 
 	  /* Whether one symbol is substituted with another symbol. */
@@ -813,10 +829,10 @@ namespace hfst {
 	};
 
 
-	/* ************************************************************
+	/* ------------------------------------------------------------
 	   A function used by the public substitution functions. 
 	   Substitute all transitions according to substituter \a subs. 
-	   ************************************************************ */
+	   ------------------------------------------------------------ */
 	void substitute(substituter &subs) { 
 
 	  // Go through all states
@@ -893,9 +909,9 @@ namespace hfst {
 
       public:
 
-	/* **********************************
-	   The public substitution functions.
-	   ********************************** */
+	/* ----------------------------------------
+	      The public substitution functions.
+	   ---------------------------------------- */
 
 	/** @brief Substitute \a old_symbol with \a new_symbol in 
 	    all transitions. \a input_side and \a output_side define
@@ -910,7 +926,7 @@ namespace hfst {
 	  // If a symbol is substituted with itself, do nothing.
 	  if (old_symbol.compare(new_symbol) == 0)
 	    return;
-	  // If the old symbol is not known to the transducer, do nothing.
+	  // If the old symbol is not known to the graph, do nothing.
 	  if (alphabet.find(old_symbol) == alphabet.end())
 	    return;
 
@@ -927,13 +943,15 @@ namespace hfst {
 	  substitute(subs);
 	}
 
-	/** */
+	/** @brief Substitute all transitions \a sp with a set of transitions
+	    \a sps. */
 	void substitute(const StringPair &sp, const StringPairSet &sps) {
 	  substituter subs(sp, sps);
 	  substitute(subs);
 	}
   
-	/** */
+	/** @brief Substitute all transitions \a old_pair with 
+	    \a new_pair. */
 	void substitute(const StringPair &old_pair, 
 			const StringPair &new_pair) {
 	  StringPairSet new_pair_set;
@@ -941,7 +959,14 @@ namespace hfst {
 	  substitute(old_pair, new_pair_set);
 	} 
 
-	/** */
+	/** @brief Substitute all transitions with a set of transitions as
+	    defined by function \a func. 
+
+	    \a func takes as its argument a transition \a sp and inserts
+	    into the set of transitions \a sps the transitions with which
+	    the original transition \a sp must be replaced. \a func returns
+	    a value indicating whether any substitution must be made, i.e.
+	    whether any transition was inserted into \a sps. */
 	void substitute(bool (*func)
 			(const StringPair &sp, StringPairSet &sps) ) { 
 	  substituter subs(func);
@@ -951,9 +976,9 @@ namespace hfst {
 
 
 
-	/* ----------------------------------------------	   
-	   Substitute string pair with a transition graph
-	   ---------------------------------------------- */
+	/* ----------------------------------------------------	   
+	      Substitute string pair with a transition graph
+	   ---------------------------------------------------- */
 
       protected:
 	/* Used in function 
@@ -976,12 +1001,12 @@ namespace hfst {
 
 	/* Used in function substitute(const StringPair&, 
 	                               HfstTransitionGraph&)
-	   Add a copy of \a transducer with epsilon transitions between 
+	   Add a copy of \a graph with epsilon transitions between 
 	   states and with weight as defined in \a sub. */
 	void add_substitution(substitution_data &sub, 
-			      HfstTransitionGraph &transducer) {
+			      HfstTransitionGraph &graph) {
 
-	  // Epsilon transition to initial state of \a transducer
+	  // Epsilon transition to initial state of \a graph
 	  max_state++;
 	  HfstTransition <C> epsilon_transition
 	    (max_state, "@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@", 
@@ -991,9 +1016,9 @@ namespace hfst {
 	  /* Offset between state numbers */
 	  unsigned int offset = max_state;
 
-	  // Copy \a transducer
-	  for (iterator it = transducer.begin(); 
-	       it != transducer.end(); it++)
+	  // Copy \a graph
+	  for (iterator it = graph.begin(); 
+	       it != graph.end(); it++)
 	    {
 	      for (typename HfstTransitionSet::iterator tr_it
 		     = it->second.begin();
@@ -1011,10 +1036,10 @@ namespace hfst {
 		}
 	    }
 
-	  // Epsilon transitions from final states of \a transducer
+	  // Epsilon transitions from final states of \a graph
 	  for (typename FinalWeightMap::iterator it 
-		 = transducer.final_weight_map.begin();
-	       it != transducer.final_weight_map.end(); it++)
+		 = graph.final_weight_map.begin();
+	       it != graph.final_weight_map.end(); it++)
 	    {
 	      HfstTransition <C> epsilon_transition
 		(sub.target_state, "@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@",
@@ -1027,34 +1052,34 @@ namespace hfst {
       public:
 
 	/** @brief Substitute all transitions \a old_symbol : \a new_symbol
-	    with a copy of \a transducer.
+	    with a copy of \a graph.
 
-	    Copies of \a transducer are attached to this transducer with
+	    Copies of \a graph are attached to this graph with
 	    epsilon transitions. 
 	    
 	    The weights of the transitions to be substituted are copied
 	    to epsilon transitions leaving from the source state of
 	    the transitions to be substituted to the initial state
-	    of a copy of \a transducer.
+	    of a copy of \a graph.
 
 	    The final weights in \a 
-	    transducer are copied to epsilon transitions leading from
+	    graph are copied to epsilon transitions leading from
 	    the final states (after substitution non-final states)
-	    of \a transducer to target states of transitions
+	    of \a graph to target states of transitions
 	    \a old_symbol : \a new_symbol (that are substituted)
-	    in this transducer.
-	    
-	    @pre This transducer and \a transducer are harmonized.
+	    in this graph.	    
+
+	    @todo Handle unknown and identity symbols correctly.
 	*/
-	void substitute(const StringPair &sp, HfstTransitionGraph &transducer) {
+	void substitute(const StringPair &sp, HfstTransitionGraph &graph) {
 	  
-	  // If neither symbol to be substituted is known to the transducer,
+	  // If neither symbol to be substituted is known to the graph,
 	  // do nothing.
 	  if (alphabet.find(sp.first) == alphabet.end() && 
 	      alphabet.find(sp.second) == alphabet.end())
 	    return;
 
-	  // Where the substituting copies of \a transducer
+	  // Where the substituting copies of \a graph
 	  // are inserted (source state, target state, weight)
 	  std::vector<substitution_data> substitutions;
 
@@ -1106,13 +1131,13 @@ namespace hfst {
 		 = substitutions.begin();
 	       IT != substitutions.end(); IT++)
 	    {
-	      add_substitution(*IT, transducer);
+	      add_substitution(*IT, graph);
 	    }
 	}
 
 
 	/** @brief Insert freely any number of \a symbol_pair in 
-	    the transducer with weight \a weight. */
+	    the graph with weight \a weight. */
 	void insert_freely(const StringPair &symbol_pair, W weight) 
 	{	  
 	  alphabet.insert(symbol_pair.first);
@@ -1126,13 +1151,13 @@ namespace hfst {
 	}
 
 	
-	/* ---------------------
-	   Disjunction functions
-	   --------------------- */
+	/* -------------------------------
+	        Disjunction functions
+	   ------------------------------- */
       
       protected:
 	/* Disjunct the transition of path \a spv pointed by \a it
-	   to state \a s. If the transition does not exist in the transducer,
+	   to state \a s. If the transition does not exist in the graph,
 	   it is created as well as its target state.
 
 	   @return The final state of path \a spv, when \a it is at end. */
@@ -1151,7 +1176,7 @@ namespace hfst {
 	  HfstState next_state; 
 
 	  // Find the transition
-	  // (Searching is slow..)
+	  // (Searching is slow?)
 	  for (typename HfstTransitionSet::iterator tr_it = tr.begin();
 	       tr_it != tr.end(); tr_it++)
 	    {
@@ -1182,10 +1207,10 @@ namespace hfst {
 	
       public:
 	
-	/** @brief Disjunct this transducer with a one-path transducer 
+	/** @brief Disjunct this graph with a one-path graph 
 	    defined by string pair vector \a spv with weight \a weight. 
 	    
-	    @pre This transducer must be a trie where all weights are in
+	    @pre This graph must be a trie where all weights are in
 	    final states, i.e. all transitions have a zero weight. */
 	void disjunct(const StringPairVector &spv, W weight) 
 	{
@@ -1203,7 +1228,6 @@ namespace hfst {
 	  set_final_weight(final_state, weight);
 	}	
 	
-	//friend class hfst::HfstTransducer;
 	friend class ConversionFunctions;
       };
 
