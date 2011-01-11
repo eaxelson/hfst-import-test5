@@ -17,21 +17,13 @@
 #include <map>
 #include <set>
 
-/* extern const char * EPSILON_STRING;
-   extern const char * UNKNOWN_STRING;
-   extern const char * IDENTITY_STRING;
-   
-   extern const unsigned int EPSILON_NUMBER;
-   extern const unsigned int UNKNOWN_NUMBER;
-   extern const unsigned int IDENTITY_NUMBER; */
-
 /** @file HfstSymbolDefs.h
     \brief Typedefs and functions for symbols, symbol pairs and sets of symbols. */
 
 namespace hfst
 {
 
-  /** \brief A symbol in a transition. 
+  /** \brief A UTF-8 symbol in a transition. 
 
     Strings <i>"@_EPSILON_SYMBOL_@"</i>, <i>"@_UNKNOWN_SYMBOL_@"</i> and <i>"@_IDENTITY_SYMBOL_@"</i> are reserved.
 
@@ -45,35 +37,33 @@ namespace hfst
     For an example of flag diacritics, see #hfst::HfstTransducer::extract_strings_fd(WeightedPaths<float>::Set&, int, int, bool)
    */
   typedef std::string String;
+
   /* A set of strings. */
   typedef std::set<String> StringSet;
+
   /** \brief A symbol pair in a transition. 
 
       @see HfstTransducer::substitute(const StringPair&, const StringPair&) and other substitute functions */
-  typedef std::pair<std::string, std::string> StringPair;
-
-  typedef std::pair<unsigned int, unsigned int> NumberPair;
+  typedef std::pair<String, String> StringPair;
 
   /** \brief A vector of transitions that represents a path in a transducer. 
 
       @see HfstTokenizer */
   typedef std::vector<StringPair> StringPairVector;
 
-  typedef std::vector<NumberPair> NumberPairVector;
-
   /** \brief A set of symbol pairs used in substituting symbol pairs and in rule functions. 
 
      @see HfstTransducer::substitute(const StringPair&, const StringPairSet &) #hfst::rules */
   typedef std::set<StringPair> StringPairSet;
 
+
+  /* For internal use */
+  typedef std::pair<unsigned int, unsigned int> NumberPair;
+  typedef std::vector<NumberPair> NumberPairVector;
   typedef std::set<NumberPair> NumberPairSet;
-
-  /* Maps strings to numbers. */
   typedef std::map<String,unsigned int> StringNumberMap;
-  /* Maps numbers to numbers. */
   typedef std::map<unsigned int,unsigned int> NumberNumberMap;
-
   void collect_unknown_sets(StringSet &s1, StringSet &unknown1,
-  		    StringSet &s2, StringSet &unknown2);
+			    StringSet &s2, StringSet &unknown2);
 }
 #endif

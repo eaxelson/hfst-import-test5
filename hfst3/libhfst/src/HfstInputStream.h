@@ -58,6 +58,8 @@ in->close();
 delete in;
 \endverbatim
 
+For documentation on the HFST binary transducer format, see #hfst::HfstOutputStream.
+
       @see HfstTransducer::HfstTransducer(HfstInputStream &in) **/
   class HfstInputStream
   {
