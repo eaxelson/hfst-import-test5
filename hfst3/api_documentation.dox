@@ -634,7 +634,7 @@ It is also possible to <a href="AddingYourLibrary.html">add</a>
 your own transducer library under the HFST interface.
 
 The examples given in this documentation use 
-<a href="http://www.xrce.xerox.com/Research-Development/Publications/1997-005/(language)">Xerox transducer notation</a>.
+<a href="http://www.xrce.xerox.com/print/Research-Development/Publications/1997-0052">Xerox transducer notation</a>.
 <!-- More info on SFST tools is in http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html,
 OpenFst in http://www.openfst.org and foma in http://www.aclweb.org/anthology/E/E09/E09-2008.pdf. -->
 
