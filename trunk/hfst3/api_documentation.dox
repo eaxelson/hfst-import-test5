@@ -593,16 +593,15 @@ and the following namespaces:
 
    - \link hfst::rules rules\endlink: A namespace that contains functions to create two-level, replace, restriction and coercion rules.
 
-   - \link hfst::xfst xfst\endlink: ?
-
-   - \link hfst::lexc lexc\endlink: A namespace for Xerox LexC related specific functions and classes.
-
    - \link hfst::exceptions exceptions\endlink: A namespace for exceptions.
 
 
    \section hfst_examples Examples of HFST functionalities
 
    ...
+\verbatim
+
+\endverbatim
       
    */
 

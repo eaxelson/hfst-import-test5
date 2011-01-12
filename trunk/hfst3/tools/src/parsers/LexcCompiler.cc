@@ -31,19 +31,16 @@ using std::set;
 
 #include "LexcCompiler.h"
 #include "../../../libhfst/src/HfstTransducer.h"
-#include "../../../libhfst/src/implementations/HfstNet.h"
+#include "../../../libhfst/src/implementations/HfstTransitionGraph.h"
 #include "XreCompiler.h"
 #include "lexc-utils.h"
 #include "lexc-parser.h"
 #include "xre_utils.h"
 
 using hfst::HfstTransducer;
-using hfst::implementations::HfstFsm;
+using hfst::implementations::HfstBasicTransducer;
 using hfst::implementations::HfstState;
-using hfst::implementations::HfstTransitionData;
-using hfst::implementations::HfstArc;
-//using hfst::HfstStateIterator;
-//using hfst::HfstTransitionIterator;
+using hfst::implementations::HfstBasicTransition;
 using hfst::ImplementationType;
 using hfst::xre::XreCompiler;
 
@@ -280,7 +277,7 @@ HfstTransducer*
 LexcCompiler::compileLexical()
 {
     printConnectedness();
-    HfstFsm rebuilt;
+    HfstBasicTransducer rebuilt;
     map<string,HfstTransducer> lexicons;
     // combine tries with reg.exps and minimize
     for (set<string>::const_iterator s = lexiconNames_.begin();
@@ -336,7 +333,7 @@ LexcCompiler::compileLexical()
          ++lex)
       {
         // help structures
-        HfstFsm mut(lex->second);
+        HfstBasicTransducer mut(lex->second);
         map<HfstState,HfstState> rebuildMap;
         // connect start states
         string nameEnc(lex->first);
@@ -345,7 +342,7 @@ LexcCompiler::compileLexical()
         HfstState start_old = 0;
         rebuildMap[start_old] = start_nu;
         // clone all states
-        for (HfstFsm::iterator state = mut.begin();
+        for (HfstBasicTransducer::iterator state = mut.begin();
              state != mut.end();
              state++)
           {
@@ -364,18 +361,18 @@ LexcCompiler::compileLexical()
                 rebuildMap[old_state] = nu_state;
               }
             // clone all transitions
-	    HfstFsm::HfstTransitionSet transitions = mut[old_state];
-	    for ( HfstFsm::HfstTransitionSet::iterator transition 
+	    HfstBasicTransducer::HfstTransitionSet transitions = mut[old_state];
+	    for ( HfstBasicTransducer::HfstTransitionSet::iterator transition 
 		    = transitions.begin(); 
 		  transition != transitions.end();
 		  transition++ )
               {
-                HfstTransitionData old_transition = transition->get_transition_data();
-                string old_osymbol = old_transition.get_input_symbol();
-                string old_isymbol = old_transition.get_output_symbol();
+                //HfstTransitionData old_transition = transition->get_transition_data();
+                string old_osymbol = transition->get_input_symbol();
+                string old_isymbol = transition->get_output_symbol();
                 string nu_osymbol;
                 string nu_isymbol;
-                float nu_weight = old_transition.get_weight();
+                float nu_weight = transition->get_weight();
                 HfstState old_target = transition->get_target_state();
                 HfstState nu_target;
                 if (old_osymbol.substr(0, 5) == "@LEXC")
@@ -421,7 +418,7 @@ LexcCompiler::compileLexical()
 		/*                rebuilt.add_line(nu_state, nu_target,
                                  nu_icode, nu_ocode,
                                  nu_weight); */
-		rebuilt.add_transition(nu_state, HfstArc
+		rebuilt.add_transition(nu_state, HfstBasicTransition
 				       (nu_target,
 					nu_isymbol,
 					nu_osymbol,

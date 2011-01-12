@@ -158,6 +158,8 @@ namespace hfst { namespace implementations
   hfst_basic_transducer_to_sfst(const HfstBasicTransducer * net) {
 
   SFST::Transducer * t = new SFST::Transducer();
+  t->alphabet.add_symbol("@_UNKNOWN_SYMBOL_@", 1);
+  t->alphabet.add_symbol("@_IDENTITY_SYMBOL_@", 2);
 
   // Map that maps states of \a net to SFST nodes
   std::map<HfstState, SFST::Node*> state_map;
