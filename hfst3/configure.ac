@@ -389,7 +389,6 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
                  test/libhfst/Makefile test/tools/Makefile
                  libhfst/Makefile libhfst/src/Makefile
                  libhfst/src/implementations/Makefile 
-                 tools/src/parsers/Makefile
                  libhfst/hfst.pc
                  tools/Makefile tools/src/Makefile tools/src/hfst-proc/Makefile
                  man/Makefile
