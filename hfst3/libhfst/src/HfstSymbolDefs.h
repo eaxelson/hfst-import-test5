@@ -35,6 +35,12 @@ namespace hfst
 
     Strings of form <CODE> @[A-Z][.][A-Z]+([.][A-Z]+)?@ </CODE> are reserved for flag diacritics.
     For an example of flag diacritics, see #hfst::HfstTransducer::extract_strings_fd(WeightedPaths<float>::Set&, int, int, bool)
+
+    An example of unknown and identity symbols:
+
+\verbatim
+
+\endverbatim
    */
   typedef std::string String;
 

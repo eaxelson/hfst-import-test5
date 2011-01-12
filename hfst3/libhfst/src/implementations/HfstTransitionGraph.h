@@ -642,7 +642,7 @@ namespace hfst {
 		break;
 	    }
 	    else { /* we use FILEs */	    
-	      if (NULL != fgets(line, 255, file))
+	      if (NULL == fgets(line, 255, file))
 		break;
 	    }
 

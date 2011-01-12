@@ -219,7 +219,9 @@ namespace hfst { namespace implementations {
   (Transducer *t1, Transducer *t2, bool unknown_symbols_in_use) 
   {
 
-    clock_t startclock = clock();
+    //clock_t startclock = clock();
+
+    //std::cerr << *t1 << "--\n" << *t2;
 
     // 1. Calculate the set of unknown symbols for transducers t1 and t2.
 
@@ -237,6 +239,8 @@ namespace hfst { namespace implementations {
     t2->alphabet.insert_symbols(new_t1->alphabet);
     delete t1;
     t1 = new_t1;
+
+    //std::cerr << *t1 << "--\n" << *t2;
 
     // 3. Calculate the set of symbol pairs to which a non-identity "?:?"
     //    transition is expanded for both transducers.
@@ -256,10 +260,10 @@ namespace hfst { namespace implementations {
       harmonized_t2 = &t2->copy();
     }
 
-    clock_t endclock = clock();
+    //clock_t endclock = clock();
 
-    sfst_seconds_in_harmonize = sfst_seconds_in_harmonize + 
-      ( (float)(endclock - startclock) / CLOCKS_PER_SEC);
+    /* sfst_seconds_in_harmonize = sfst_seconds_in_harmonize + 
+       ( (float)(endclock - startclock) / CLOCKS_PER_SEC); */
 
     return std::pair<Transducer*, Transducer*>(harmonized_t1, harmonized_t2);
 
