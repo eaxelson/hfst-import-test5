@@ -29,9 +29,9 @@ endif
 if WANT_COMPOSE
 MAYBE_COMPOSE=hfst-compose
 endif
-if WANT_COMPOSE_INTERSECT
-MAYBE_COMPOSE_INTERSECT=hfst-compose-intersect
-endif
+#if WANT_COMPOSE_INTERSECT
+#MAYBE_COMPOSE_INTERSECT=hfst-compose-intersect
+#endif
 if WANT_CONCATENATE
 MAYBE_CONCATENATE=hfst-concatenate
 endif
@@ -141,7 +141,7 @@ noinst_HEADERS= \
 	inc/globals-common.h      inc/globals-unary.h
 
 # sort alphabetically
-bin_PROGRAMS=$(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_COMPOSE_INTERSECT) \
+bin_PROGRAMS=$(MAYBE_COMPARE) $(MAYBE_COMPOSE) \
 			 $(MAYBE_CONCATENATE) $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) \
 			 $(MAYBE_DISJUNCT) \
 			 $(MAYBE_FORMAT) \
@@ -165,7 +165,7 @@ HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc
 # sort alphabetically
 hfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy HfstCompiler.cc $(HFST_COMMON_SRC)
 hfst_compare_SOURCES=hfst-compare.cc $(HFST_COMMON_SRC)
-hfst_compose_intersect_SOURCES=hfst-compose-intersect.cc $(HFST_COMMON_SRC)
+#hfst_compose_intersect_SOURCES=hfst-compose-intersect.cc $(HFST_COMMON_SRC)
 hfst_compose_SOURCES=hfst-compose.cc $(HFST_COMMON_SRC)
 hfst_concatenate_SOURCES=hfst-concatenate.cc $(HFST_COMMON_SRC)
 hfst_conjunct_SOURCES=hfst-conjunct.cc $(HFST_COMMON_SRC)

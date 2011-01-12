@@ -3,7 +3,6 @@
 
 #include <string>
 #include <set>
-#include "../HfstAlphabet.h"
 #include "../HfstSymbolDefs.h"
 #include "../HfstExceptions.h"
 #include "../HfstTransducer.h"
@@ -717,8 +716,6 @@ namespace hfst {
 	     file, epsilon_symbol);
 	}
 
-
-
 	/* ----------------------------
 	      Substitution functions
 	   ---------------------------- */
@@ -745,6 +742,10 @@ namespace hfst {
 	  /* Whether substitution is made according to a function. */
 	  bool substitute_using_function;
 	  bool (*func) (const StringPair &sp, StringPairSet &sps);
+
+	  /* Whether substitution is expanding unknown and identity symbols. */
+	  bool substitute_expand;
+	  StringSet unknown_set;
 
 	  /* Create a substituter that substitutes one symbol with
 	     another symbol. */
@@ -776,6 +777,18 @@ namespace hfst {
 	    func = func_;
 	    substitute_using_function = true;
 	  }
+
+	  /* Create a substituter that expands unknown and identity symbols. */
+	  substituter(HfstTransitionGraphAlphabet &alpha)
+	  {
+	    for (typename HfstTransitionGraphAlphabet::const_iterator it
+		   = alpha.begin; it != alpha.end(); it++)
+	      {
+		unknown_set.insert(*it);
+	      }
+	    substitute_expand=true;
+	  }
+
 
 	  /* Stores to \a sps the transitions with which the transition \a sp
 	     must be substituted and returns whether any substitutions must
@@ -824,6 +837,74 @@ namespace hfst {
 		return func(sp, sps);
 	      }
 	    
+	    if (substitute_expand)
+	      {
+		// Identity
+		if (sp.first.compare("@_IDENTITY_SYMBOL_@") == 0 &&
+		    sp.second.compare("@_IDENTITY_SYMBOL_@") == 0)
+		  {
+		    for (StringSet::const_iterator it = unknown_set.begin();
+			 it != unknown_set.end(); it++)
+		      {
+			sps.insert(StringPair(*it, *it));
+		      }
+		    sps.insert(StringPair("@_IDENTITY_SYMBOL_@", 
+					  "@_IDENTITY_SYMBOL_@"));
+		    return true;
+		  }
+
+		// Unknown to unknown
+		if (sp.first.compare("@_UNKNOWN_SYMBOL_@") == 0 &&
+		    sp.second.compare("@_UNKNOWN_SYMBOL_@") == 0)
+		  {
+		    for (StringSet::const_iterator it1 = unknown_set.begin();
+			 it1 != unknown_set.end(); it1++)
+		      {
+			for (StringSet::const_iterator it2 = unknown_set.begin();
+			     it2 != unknown_set.end(); it2++)
+			  {
+			    if (it1->compare(*it2) != 0)
+			      {
+				sps.insert(StringPair(*it1, *it2));
+			      }
+			    // add transitions x:? and ?:x
+			    sps.insert(StringPair(*it1, "@_UNKNOWN_SYMBOL_@"));
+			    sps.insert(StringPair("@_UNKNOWN_SYMBOL_@", *it1));
+			  }
+		      }
+		    sps.insert(StringPair("@_UNKNOWN_SYMBOL_@", 
+					  "@_UNKNOWN_SYMBOL_@"));
+		    return true;
+		  }
+
+		// Unknown to not unknown
+		if (sp.first.compare("@_UNKNOWN_SYMBOL_@") == 0)
+		  {
+		    for (StringSet::const_iterator it = unknown_set.begin();
+			 it != unknown_set.end(); it++)
+		      {
+			sps.insert(StringPair(*it, sp.second));
+		      }
+		    sps.insert(StringPair("@_UNKNOWN_SYMBOL_@", sp.second));
+		    return true;
+		  }
+
+		// Not unknown to unknown
+		if (sp.second.compare("@_UNKNOWN_SYMBOL_@") == 0)
+		  {
+		    for (StringSet::const_iterator it = unknown_set.begin();
+			 it != unknown_set.end(); it++)
+		      {
+			sps.insert(StringPair(sp.first, *it));
+		      }
+		    sps.insert(StringPair(sp.first, "@_UNKNOWN_SYMBOL_@"));
+		    return true;
+		  }
+
+		// Other cases, no need to expand.
+		return false;
+	      }
+
 	    return false;	    
 	  }
 	};
@@ -1075,8 +1156,6 @@ namespace hfst {
 	    of \a graph to target states of transitions
 	    \a old_symbol : \a new_symbol (that are substituted)
 	    in this graph.	    
-
-	    @todo Handle unknown and identity symbols correctly.
 	*/
 	void substitute(const StringPair &sp, HfstTransitionGraph &graph) {
 	  
@@ -1157,7 +1236,73 @@ namespace hfst {
 	    }
 	}
 
+
+	/* -------------------------------
+	       Harmonization function
+	   ------------------------------- */
+
+	/** @brief Harmonize this HfstTransitionGraph and \a another.
+
+	    In harmonization the unknown and identity symbols in 
+	    transitions of both graphs are expanded according to
+	    the symbols that are previously unknown to the graph. 
+
+	    For example the graphs
+\verbatim 
+   [a:b ?:?]
+   [c:d ? ?:c]
+\endverbatim
+	    are expanded to
+\verbatim
+   [ a:b [?:? | ?:c | ?:d | c:d | d:c | c:? | d:?] ] 
+   [ c:d [? | a | b] [?:c| a:c | b:?] ]
+\endverbatim
+            when harmonized.
+ 	    The symbol "?" means \@_UNKNOWN_SYMBOL_\@ in either or 
+	    both sides of a transition (transitions of type [?:x], [x:?] and [?:?]).
+	    The transition [?] means [\@_IDENTITY_SYMBOL_\@].
+
+	    @note This function is always called for arguments of functions
+	    that take two or more graphs as their arguments, unless otherwise
+	    said.
+	    @todo See that the note is always true..
+	*/
+	void harmonize(HfstTransitionGraph &another) {
+
+	  /* Collect symbols previously unknown to graphs this and another. */
+	  HfstTransitionGraphAlphabet unknown_this;
+	  HfstTransitionGraphAlphabet unknown_another;
+
+	  for (typename HfstTransitionGraphAlphabet::const_iterator it
+		 = another.alphabet.begin();
+	       it != another.alphabet.end(); it++)
+	    {
+	      if (alphabet.find(*it) == alphabet.end())
+		unknown_this.insert(*it);
+	    }
+	  for (typename HfstTransitionGraphAlphabet::const_iterator it
+		 = alphabet.begin();
+	       it != alphabet.end(); it++)
+	    {
+	      if (another.alphabet.find(*it) == another.alphabet.end())
+		unknown_another.insert(*it);
+	    }
+	  
+	  /* No need to harmonize. */
+	  if (unknown_this.size() == 0 &&
+	      unknown_another.size() == 0) {
+	    return;
+	  }
+
+	  /* Expand the unknowns. */
+	  substituter subs_this(unknown_this);
+	  substitute(subs_this);
+
+	  substituter subs_another(unknown_another);
+	  another.substitute(subs_another);
+	}
 	
+
 	/* -------------------------------
 	        Disjunction functions
 	   ------------------------------- */

@@ -35,7 +35,7 @@ TESTS=hfst-check-version.sh hfst-check-help.sh empty-input.sh\
 	  regexp2fst-functionality.sh \
 	  split-functionality.sh head-functionality.sh tail-functionality.sh \
 	  calculate-functionality.sh format-functionality.sh \
-	  compose-intersect-functionality.sh lookup-functionality.sh \
+	  lookup-functionality.sh \
 	  lexc-compiler-functionality.sh \
 	  lexc-functionality.sh # xfst-functionality.sh
 check_DATA=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \

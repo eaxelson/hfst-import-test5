@@ -17,7 +17,6 @@
 #include "HfstFlagDiacritics.h"
 #include <fst/fstlib.h>
 #include "HfstExtractStrings.h"
-#include "TropicalWeightComposeIntersect.h"
 #include <cstdio>
 #include <string>
 #include <sstream>
@@ -236,8 +235,10 @@ namespace implementations
       //static void recode_symbol_numbers(StdVectorFst * t, std::vector<unsigned int> &km);      
       static StdVectorFst * expand_arcs(StdVectorFst * t, hfst::StringSet &unknown, bool unknown_symbols_in_use);
 
+#ifdef FOO
       static StdVectorFst * compose_intersect(StdVectorFst * t,
 					      Grammar * grammar);
+#endif
 
       static StdVectorFst * remove_from_alphabet(StdVectorFst *t, const std::string &symbol);
 

@@ -408,7 +408,6 @@ cat <<EOF
     * tools including calculate: $enable_calculate (sfst-compiler)
     *                 compare: $enable_compare
     *                 compose: $enable_compose
-    *                 compose-intersect: $enable_compose_intersect
     *                 concatenate: $enable_concatenate
     *                 conjunct: $enable_conjunct (intersect)
     *                 determinize: $enable_determinize (determinise)
