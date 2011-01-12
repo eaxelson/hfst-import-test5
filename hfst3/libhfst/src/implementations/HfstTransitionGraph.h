@@ -788,11 +788,11 @@ namespace hfst {
 		std::string osymbol = sp.second;
 		bool substitution_made=false;
 		
-		if (input_side && isymbol.compare(old_symbol)) {
+		if (input_side && isymbol.compare(old_symbol) == 0) {
 		  isymbol = new_symbol;
 		  substitution_made=true;
 		}
-		if (output_side && osymbol.compare(old_symbol)) {
+		if (output_side && osymbol.compare(old_symbol) == 0) {
 		  osymbol = new_symbol;
 		  substitution_made=true;
 		}
@@ -931,8 +931,15 @@ namespace hfst {
 	    return;
 
 	  // Remove the symbol to be substituted from the alphabet
-	  // and insert to substituting symbol to the alphabet
-	  alphabet.erase(old_symbol);
+	  // if the substitution is made on both sides.
+	  if (input_side && output_side) {
+	    /* Special symbols are always included in the alphabet */
+	    if (old_symbol.compare("@_EPSILON_SYMBOL_@") != 0 && 
+		old_symbol.compare("@_UNKNOWN_SYMBOL_@") != 0 &&
+		old_symbol.compare("@_IDENTITY_SYMBOL_@") != 0)
+	      alphabet.erase(old_symbol);
+	  }
+	  // Insert the substituting symbol to the alphabet.
 	  alphabet.insert(new_symbol);
 
 	  // Create a substituter
