@@ -27,7 +27,7 @@ AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
 # HFST bridge specific stuff
 HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc HfstOutputStream.cc\
 		  HfstRules.cc HfstBasic.cc HfstUtf8.cc \
-		  HfstGrammar.cc HfstSymbolDefs.cc HfstTokenizer.cc \
+		  HfstSymbolDefs.cc HfstTokenizer.cc \
 		  HfstFlagDiacritics.cc HfstAlphabet.cc HfstExceptions.cc
 
 # libtool takes over
@@ -58,7 +58,6 @@ HFST_HDRS = \
 	HfstFlagDiacritics.h \
 	HfstInputStream.h \
 	HfstOutputStream.h \
-	HfstGrammar.h \
 	HfstBasic.h \
 	HfstUtf8.h
 
@@ -70,7 +69,7 @@ libhfst_la_LDFLAGS = -no-undefined -version-info 1:0:0
 
 # unit tests: add one per class/file/anything
 
-check_PROGRAMS = HfstTransducer HfstFlagDiacritics HfstGrammar HfstInputStream \
+check_PROGRAMS = HfstTransducer HfstFlagDiacritics HfstInputStream \
 				 HfstOutputStream HfstTokenizer
 HfstTransducer_SOURCES=HfstTransducer.cc
 HfstTransducer_CXXFLAGS=-DDEBUG_MAIN
@@ -78,9 +77,9 @@ HfstTransducer_LDADD=libhfst.la
 HfstFlagDiacritics_SOURCES=HfstFlagDiacritics.cc
 HfstFlagDiacritics_CXXFLAGS=-DDEBUG_MAIN
 HfstFlagDiacritics_LDADD=libhfst.la
-HfstGrammar_SOURCES=HfstGrammar.cc
-HfstGrammar_CXXFLAGS=-DDEBUG_MAIN
-HfstGrammar_LDADD=libhfst.la
+#HfstGrammar_SOURCES=HfstGrammar.cc
+#HfstGrammar_CXXFLAGS=-DDEBUG_MAIN
+#HfstGrammar_LDADD=libhfst.la
 HfstInputStream_SOURCES=HfstInputStream.cc
 HfstInputStream_CXXFLAGS=-DDEBUG_MAIN
 HfstInputStream_LDADD=libhfst.la
@@ -90,6 +89,6 @@ HfstOutputStream_LDADD=libhfst.la
 HfstTokenizer_SOURCES=HfstTokenizer.cc
 HfstTokenizer_CXXFLAGS=-DDEBUG_MAIN
 HfstTokenizer_LDADD=libhfst.la
-TESTS=HfstTransducer HfstFlagDiacritics HfstGrammar HfstInputStream \
+TESTS=HfstTransducer HfstFlagDiacritics HfstInputStream \
 	  HfstOutputStream HfstTokenizer \
 	  coding-style.sh

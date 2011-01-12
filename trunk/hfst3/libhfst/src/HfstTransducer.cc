@@ -18,7 +18,6 @@
 
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
-#include "HfstGrammar.h"
 #include "implementations/HfstTransitionGraph.h"
 
 using hfst::implementations::ConversionFunctions;
@@ -1903,7 +1902,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
     return *this;
   }
 
-#if HAVE_OPENFST
+#ifdef FOO
   HfstTransducer &HfstTransducer::compose_intersect
   (HfstGrammar &grammar)
   {

@@ -1784,6 +1784,7 @@ namespace hfst { namespace implementations
     return result;
   }
 
+#ifdef FOO
   StdVectorFst * TropicalWeightTransducer::compose_intersect
   (StdVectorFst * t, Grammar * grammar)
   {
@@ -1797,6 +1798,7 @@ namespace hfst { namespace implementations
     result->SetInputSymbols(t->InputSymbols() );
     return result;
   }
+#endif
 
   StdVectorFst * TropicalWeightTransducer::concatenate(StdVectorFst * t1,
 						       StdVectorFst * t2)

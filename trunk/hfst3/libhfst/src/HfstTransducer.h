@@ -694,7 +694,7 @@ HfstTransducer t_transformed;
     /** \brief Compose this transducer with \a another. */
     HfstTransducer &compose(const HfstTransducer &another);
 
-#if HAVE_OPENFST
+#ifdef FOO
     /** \brief Compose this transducer with the intersection of rule transducers in \a grammar. 
 
 	The algorithm used by this function is faster than intersecting 
@@ -808,7 +808,7 @@ HfstTransducer t_transformed;
     friend class HfstOutputStream;
     friend class hfst::implementations::HfstTransitionGraph<class C, class W>;
 
-#if HAVE_OPENFST
+#ifdef FOO
     friend class HfstGrammar;
 #endif
     friend class HfstCompiler;

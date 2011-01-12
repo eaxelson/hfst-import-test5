@@ -27,8 +27,7 @@ if WANT_SFST
 MAYBE_SFST=SfstTransducer.cc
 endif
 if WANT_OPENFST
-MAYBE_OPENFST=TropicalWeightTransducer.cc LogWeightTransducer.cc \
-			  TropicalWeightComposeIntersect.cc
+MAYBE_OPENFST=TropicalWeightTransducer.cc LogWeightTransducer.cc
 endif
 if WANT_FOMA
 MAYBE_FOMA=FomaTransducer.cc
@@ -60,7 +59,6 @@ implinclude_HEADERS = \
 		FomaTransducer.h \
 		LogWeightTransducer.h \
 		SfstTransducer.h TropicalWeightTransducer.h \
-		TropicalWeightComposeIntersect.h \
 		HfstOlTransducer.h HfstTransitionGraph.h \
 		MfstlTransducer.h
 
