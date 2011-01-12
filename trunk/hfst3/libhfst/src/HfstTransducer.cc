@@ -1809,29 +1809,32 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   HfstTransducer &HfstTransducer::compose
   (const HfstTransducer &another)
   { is_trie = false;
-    
+
     if (this->type != another.type)
       throw hfst::exceptions::TransducerTypeMismatchException();
 
     bool DEBUG=false;
 
-    if (DEBUG) printf("harmonizing for composition..\n");
-    this->harmonize(const_cast<HfstTransducer&>(another));
-
-    if (DEBUG) printf("..done\n");
-
+    /* Substitution requires conversion to HfstBasicTransducer
+       which can change the symbol-to-number mappings. 
+       That is why it must be done before harmonizing. */
     if ( (this->type != FOMA_TYPE) && unknown_symbols_in_use) 
       {
-	if (DEBUG) printf("substituting for composition..\n");
+	if (DEBUG) fprintf(stderr,"substituting for composition..\n");
 
 	// comment...
 	this->substitute("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",false,true);
 	(const_cast<HfstTransducer&>(another)).substitute
 	  ("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",true,false);
 
-	if (DEBUG) printf("..done\n");
+	if (DEBUG) fprintf(stderr,"..done\n");
       }
 
+    if (DEBUG) fprintf(stderr, "harmonizing for composition..\n");
+    this->harmonize(const_cast<HfstTransducer&>(another));
+
+    if (DEBUG) fprintf(stderr,"..done\n");
+    
     switch (this->type)
       {
 #if HAVE_SFST
@@ -1886,14 +1889,14 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 #if HAVE_FOMA
     if ( (this->type != FOMA_TYPE) && unknown_symbols_in_use) 
       {
-	if (DEBUG) printf("substituting after composition..\n");
+	if (DEBUG) fprintf(stderr,"substituting after composition..\n");
 
 	// comment...
 	this->substitute(&substitute_single_identity_with_unknown);
 	(const_cast<HfstTransducer&>(another)).
 	  substitute(&substitute_unknown_identity_pairs);
 
-	if (DEBUG) printf("..done\n");
+	if (DEBUG) fprintf(stderr,"..done\n");
       }
 #endif
 
