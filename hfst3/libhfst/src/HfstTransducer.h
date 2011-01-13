@@ -136,9 +136,12 @@ namespace hfst
 
     \section implementation_types Implementation types
 
-    Currently, an HfstTransducer has four implementation types as defined by the enumeration ImplementationType.
-    When an HfstTransducer is created, its type is defined with an ImplementationType argument.
-    For functions that take a transducer as an argument, the type of the calling transducer
+    Currently, an HfstTransducer has four implementation types as 
+    defined by the enumeration ImplementationType.
+    When an HfstTransducer is created, its type is defined with an 
+    ImplementationType argument.
+    For functions that take a transducer as an argument, the type of 
+    the calling transducer
     must be the same as the type of the argument transducer:
 \verbatim
     log_transducer.disjunct(sfst_transducer);                        // this will cause an error
@@ -148,14 +151,18 @@ namespace hfst
 
     \section creating_transducers Creating transducers
 
-    With HfstTransducer constructors it is possible to create empty, epsilon, one-transition and single-path transducers.
-    Transducers can also be created from scratch with HfstBasicTransducer and converted to an HfstTransducer.
-    More complex transducers can be combined from simple ones with various functions.
+    With HfstTransducer constructors it is possible to create empty, 
+    epsilon, one-transition and single-path transducers.
+    Transducers can also be created from scratch with HfstBasicTransducer
+    and converted to an HfstTransducer.
+    More complex transducers can be combined from simple ones with various 
+    functions.
     
     <a name="symbols"></a> 
     \section special_symbols Special symbols
 
-    The HFST transducers support transitions with epsilon, unknown and identity symbols.
+    The HFST transducers support transitions with epsilon, unknown 
+    and identity symbols.
     The special symbols are explained in documentation of datatype #String.
 
 An example:
@@ -241,11 +248,12 @@ tr1.disjunct(tr2);
     HfstTransducer &disjunct_as_tries(HfstTransducer &another,
 				      ImplementationType type);  
 
-#include "hfst_apply_schemas.h"
-
     // whether the conversion requested can be done without losing 
     // any information
-    bool static is_safe_conversion(ImplementationType original, ImplementationType conversion);
+    bool static is_safe_conversion(ImplementationType original, 
+				   ImplementationType conversion);
+
+#include "hfst_apply_schemas.h"
 
   public:
     HfstTransducer();
@@ -262,8 +270,10 @@ tr1.disjunct(tr2);
 	with tokenizer \a multichar_symbol_tokenizer.
 	The type of the transducer is defined by \a type. 
 
-	\a utf8_str is read one token at a time and for each token a new transition is created in the resulting
-	transducer. The input and output symbols of that transition are the same as the token read.
+	\a utf8_str is read one token at a time and for each token 
+	a new transition is created in the resulting
+	transducer. The input and output symbols of that transition are 
+	the same as the token read.
 
 	An example:
 \verbatim
@@ -284,9 +294,12 @@ tr1.disjunct(tr2);
 	with tokenizer \a multichar_symbol_tokenizer.
 	The type of the transducer is defined by \a type. 
 
-	\a input_utf8_str and \a output_utf8_str are read one token at a time and for each token a new transition 
-	is created in the resulting transducer. The input and output symbols of that transition are the same as 
-	the input and output tokens read. If either string contains less tokens than another, epsilons are used
+	\a input_utf8_str and \a output_utf8_str are read one token at a time
+	and for each token a new transition 
+	is created in the resulting transducer. The input and output symbols
+	of that transition are the same as 
+	the input and output tokens read. If either string contains less tokens
+	than another, epsilons are used
 	as transition symbols for the shorter string.
 
 	An example:
@@ -304,9 +317,12 @@ tr1.disjunct(tr2);
     		   const HfstTokenizer &multichar_symbol_tokenizer,
 		   ImplementationType type);
 
-    HfstTransducer(const StringPairSet & sps, ImplementationType type, bool cyclic=false);
+    // Used by HfstCompiler.cc
+    HfstTransducer(const StringPairSet & sps, ImplementationType type, 
+		   bool cyclic=false);
     HfstTransducer(const StringPairVector & spv, ImplementationType type);
-    HfstTransducer(const std::vector<StringPairSet> & spsv, ImplementationType type);
+    HfstTransducer(const std::vector<StringPairSet> & spsv, 
+		   ImplementationType type);
 
     /** \brief Read a binary transducer from transducer stream \a in. 
 
@@ -318,48 +334,51 @@ tr1.disjunct(tr2);
     /** \brief Create a deep copy of transducer \a another. **/
     HfstTransducer(const HfstTransducer &another);
 
-    /** \brief Create an ordinary transducer equivalent to internal transducer \a t.
-	The type of the transducer is defined by \a type.  **/
-    HfstTransducer(const hfst::implementations::HfstBasicTransducer &t, ImplementationType type);
+    /** \brief Create an ordinary transducer equivalent to 
+	internal transducer \a t. The type of the transducer is defined 
+	by \a type.  **/
+    HfstTransducer(const hfst::implementations::HfstBasicTransducer &t, 
+		   ImplementationType type);
 
     public:
     /** \brief Delete the HfstTransducer. **/
     virtual ~HfstTransducer(void);
 
-    /** \brief Create a transducer that recognizes the string pair [symbol:symbol]. The type of the transducer is defined by \a type. 
-
+    /** \brief Create a transducer that recognizes the string pair 
+	[symbol:symbol]. The type of the transducer is defined by \a type. 
 	@see String **/
     HfstTransducer(const std::string &symbol, ImplementationType type);
-    /** \brief Create a transducer that recognizes the string pair [isymbol:osymbol]. The type of the transducer is defined by \a type. 
 
+    /** \brief Create a transducer that recognizes the string pair 
+	[isymbol:osymbol]. The type of the transducer is defined by \a type. 
 	@see String **/
-    HfstTransducer(const std::string &isymbol, const std::string &osymbol, ImplementationType type);
+    HfstTransducer(const std::string &isymbol, const std::string &osymbol, 
+		   ImplementationType type);
 
-
-    /* TEST */
-    //HfstTransducer(unsigned int number, ImplementationType type);
-    //HfstTransducer(unsigned int inumber, unsigned int onumber, ImplementationType type);
+    // for debugging
     void print_alphabet();
 
-    /** \brief Set the name of the transducer as \a name. */
+    /** \brief Set the name of the transducer as \a name. 
+	@see get_name */
     void set_name(std::string &name);
-    /** \brief Get the name of the transducer. */
+
+    /** \brief Get the name of the transducer. 
+	@see set_name */
     std::string get_name();
 
     /** \brief Whether this transducer and \a another are equivalent.
 
-	Two transducers are equivalent iff they accept the same input/output string pairs with the same weights
+	Two transducers are equivalent iff they accept the same input/output
+	string pairs with the same weights
 	and the same alignments. 
     */
     bool compare(const HfstTransducer &another) const;
 
-    //static bool are_equivalent(const HfstTransducer &tr1, const HfstTransducer &tr2);
+    /** \brief Write the transducer in AT&T format to FILE \a ofile. 
+	\a write_weights defines whether weights are written.
 
-
-    /** \brief Write the transducer in AT&T format to FILE \a ofile. \a write_weights
-	defines whether weights are written.
-
-	If several transducers are written in the same file, they must be separated by a line
+	If several transducers are written in the same file, they must 
+	be separated by a line
 	of two consecutive hyphens "--".
 
 An example:
@@ -397,12 +416,16 @@ This will yield a file "testfile.att" that looks as follows:
 	@see hfst::operator<<(std::ostream &out,HfstTransducer &t) HfstTransducer(FILE*, ImplementationType, const std::string&) */
     void write_in_att_format(FILE * ofile, bool write_weights=true) const;
 
-    /** \brief Create a transducer of type \a type as defined in AT&T format in FILE \a ifile.
-	\a epsilon_symbol defines how epsilons are represented.
+    /** \brief Create a transducer of type \a type as defined in AT&T format 
+	in FILE \a ifile. \a epsilon_symbol defines how epsilons 
+	are represented.
 	
-	Lines are of the form "source_state TAB destination_state TAB input_symbol TAB output_symbol (TAB weight)"
-	or "final_state (TAB weight)". If several transducers are listed in the same file, they are separated
-	by lines of two consecutive hyphens "--".
+	Lines are of the form 
+	"source_state TAB destination_state TAB input_symbol TAB 
+	output_symbol (TAB weight)"
+	or "final_state (TAB weight)". If several transducers are listed 
+	in the same file, they are separated by lines of 
+	two consecutive hyphens "--".
 
 An example:
 \verbatim
@@ -416,10 +439,13 @@ An example:
 0      0      a        <eps>    0.2
 \endverbatim
 
-        The example lists four transducers in AT&T format: one transducer accepting the string pair "foo:bar", one
-	epsilon transducer, one empty transducer and one transducer that accepts any number of 'a's and produces an empty string
+        The example lists four transducers in AT&T format: 
+	one transducer accepting the string pair "foo:bar", one
+	epsilon transducer, one empty transducer and one transducer 
+	that accepts any number of 'a's and produces an empty string
 	in all cases. The transducers
-	can be read with the following commands (from a file named "testfile.att"):
+	can be read with the following commands (from a file named 
+	"testfile.att"):
 \verbatim
 std::vector<HfstTransducer> transducers;
 FILE * ifile = fopen("testfile.att", "rb");
@@ -437,137 +463,182 @@ fprintf(stderr, "Read %i transducers in total.\n", (int)transducers.size());
 \endverbatim
 
 Epsilon will be represented as "@_EPSILON_SYMBOL_@" in the resulting transducer.
-The argument \a epsilon_symbol only denotes how epsilons are represented in \a ifile.
+The argument \a epsilon_symbol only denotes how epsilons are represented 
+in \a ifile.
 
 @throws hfst::exceptions::NotValidAttFormatException
 @see #write_in_att_format(FILE*,bool)const String
 **/
-    HfstTransducer(FILE * ifile, ImplementationType type, const std::string &epsilon_symbol);
+    HfstTransducer(FILE * ifile, ImplementationType type, 
+		   const std::string &epsilon_symbol);
 
-    static HfstTransducer &read_in_att_format(FILE * ifile, ImplementationType type, const std::string &epsilon_symbol);
+    // for internal use
+    static HfstTransducer &read_in_att_format
+      (FILE * ifile, ImplementationType type, 
+       const std::string &epsilon_symbol);
 
-    /** \brief \brief Write the transducer in AT&T format to FILE named \a filename. \a write_weights
+    /** \brief \brief Write the transducer in AT&T format to FILE 
+	named \a filename. \a write_weights
 	defines whether weights are written.
 
-	If the file exists, it is overwritten. If the file does not exist, it is created. 
+	If the file exists, it is overwritten. 
+	If the file does not exist, it is created. 
 
 	@see #write_in_att_format */
-    void write_in_att_format(const std::string &filename, bool write_weights=true) const;
+    void write_in_att_format(const std::string &filename, 
+			     bool write_weights=true) const;
 
-    /* \brief Create a transducer of type \a type as defined in AT & T format in file named \a filename.
+    /* \brief Create a transducer of type \a type as defined in AT&T 
+       format in file named \a filename.
 	\a epsilon_symbol defines how epsilons are represented.
 
 	@pre The file exists, otherwise an exception is thrown.
 	@see HfstTransducer(FILE, ImplementationType, const std::string&)
 	@throws hfst::exceptions::FileNotReadableException hfst::exceptions::NotValidAttFormatException */
-    static HfstTransducer &read_in_att_format(const std::string &filename, ImplementationType type, const std::string &epsilon_symbol);
+    static HfstTransducer &read_in_att_format
+      (const std::string &filename, ImplementationType type, 
+       const std::string &epsilon_symbol);
 
-    /** \brief Remove all <i>epsilon:epsilon</i> transitions from the transducer. */
+    /** \brief Remove all <i>epsilon:epsilon</i> transitions 
+	from the transducer. */
     HfstTransducer &remove_epsilons();
 
     /** \brief Determinize the transducer.
 
 	Determinizing a transducer yields an equivalent transducer that has
-	no state with two or more transitions whose input:output symbol pairs are the same. */
+	no state with two or more transitions whose input:output symbol
+	pairs are the same. */
     HfstTransducer &determinize();
 
     /** \brief Minimize the transducer.
 
-	Minimizing a transducer yields an equivalent transducer with the smallest number of states. 
+	Minimizing a transducer yields an equivalent transducer with 
+	the smallest number of states. 
      
-	@bug OpenFst's minimization algorithm seems to add epsilon transitions to weighted transducers? */
+	@bug OpenFst's minimization algorithm seems to add epsilon 
+	transitions to weighted transducers? */
     HfstTransducer &minimize();
 
     /** \brief Extract \a n best paths of the transducer. 
 
-	In the case of a weighted transducer (#TROPICAL_OFST_TYPE or #LOG_OFST_TYPE), best paths are defined as paths with the lowest weight.
-	In the case of an unweighted transducer (#SFST_TYPE or #FOMA_TYPE), best paths are defined as paths with the smallest number of transitions, i.e. the shortest paths. 
+	In the case of a weighted transducer (#TROPICAL_OFST_TYPE or 
+	#LOG_OFST_TYPE), best paths are defined as paths with the lowest weight.
+	In the case of an unweighted transducer (#SFST_TYPE or #FOMA_TYPE), 
+	best paths are defined as paths with the smallest number of 
+	transitions, i.e. the shortest paths. 
 
         This function is not implemented for #FOMA_TYPE or #SFST_TYPE.
-	If this function is called by an HfstTransducer of type #FOMA_TYPE or #SFST_TYPE, it is converted to #TROPICAL_OFST_TYPE,
-	strings are extracted and it is converted back to #FOMA_TYPE or #SFST_TYPE.
+	If this function is called by an HfstTransducer of type #FOMA_TYPE 
+	or #SFST_TYPE, it is converted to #TROPICAL_OFST_TYPE,
+	strings are extracted and it is converted back to #FOMA_TYPE or 
+	#SFST_TYPE.
     */
     HfstTransducer &n_best(unsigned int n);
 
-    /** \brief A concatenation of N transducers where N is any number from zero to infinity. */
+    /** \brief A concatenation of N transducers where N is any number 
+	from zero to infinity. */
     HfstTransducer &repeat_star();
 
-    /** \brief A concatenation of N transducers where N is any number from one to infinity. */
+    /** \brief A concatenation of N transducers where N is any number 
+	from one to infinity. */
     HfstTransducer &repeat_plus();
 
     /** \brief A concatenation of \a n transducers. */
     HfstTransducer &repeat_n(unsigned int n);
 
-    /** \brief A concatenation of N transducers where N is any number from zero to \a n, inclusive.*/
+    /** \brief A concatenation of N transducers where N is any number 
+	from zero to \a n, inclusive.*/
     HfstTransducer &repeat_n_minus(unsigned int n);
 
-    /** \brief A concatenation of N transducers where N is any number from \a n to infinity, inclusive.*/
+    /** \brief A concatenation of N transducers where N is any number 
+	from \a n to infinity, inclusive.*/
     HfstTransducer &repeat_n_plus(unsigned int n);
 
-    /** \brief A concatenation of N transducers where N is any number from \a n to \a k, inclusive.*/
+    /** \brief A concatenation of N transducers where N is any number 
+	from \a n to \a k, inclusive.*/
     HfstTransducer& repeat_n_to_k(unsigned int n, unsigned int k);
 
     /** \brief Disjunct the transducer with an epsilon transducer. */
     HfstTransducer &optionalize();
 
-    /** \brief Swap the input and output labels of each transition in the transducer. */
+    /** \brief Swap the input and output labels of each transition 
+	in the transducer. */
     HfstTransducer &invert();
 
     /** \brief Reverse the transducer. 
 
-	A reverted transducer accepts the string "n(0) n(1) ... n(N)" iff the original
+	A reverted transducer accepts the string "n(0) n(1) ... n(N)" 
+	iff the original
 	transducer accepts the string "n(N) n(N-1) ... n(0)" */
     HfstTransducer &reverse();
 
     /** \brief Extract the input language of the transducer. 
 
-	All transition symbol pairs <i>isymbol:osymbol</i> are changed to <i>isymbol:isymbol</i>. */
+	All transition symbol pairs <i>isymbol:osymbol</i> are changed 
+	to <i>isymbol:isymbol</i>. */
     HfstTransducer &input_project();
 
     /** \brief Extract the output language of the transducer.
 
-	All transition symbol pairs <i>isymbol:osymbol</i> are changed to <i>osymbol:osymbol</i>. */
+	All transition symbol pairs <i>isymbol:osymbol</i> are changed 
+	to <i>osymbol:osymbol</i>. */
     HfstTransducer &output_project();
 
-    /* \brief Call \a callback with some or all string pairs recognized by the transducer?
+    /* \brief Call \a callback with some or all string pairs recognized 
+       by the transducer?
 
-	If the callback returns false the search will be terminated. The \a cycles parameter
+	If the callback returns false the search will be terminated. 
+	The \a cycles parameter
 	indicates how many times a cycle will be followed, with negative numbers
-	indicating unlimited. Note that if the transducer is cyclic and cycles aren't capped,
+	indicating unlimited. Note that if the transducer is cyclic and 
+	cycles aren't capped,
 	the search will not end until the callback returns false. */
     void extract_strings(ExtractStringsCb& callback, int cycles=-1);
 	  
     std::vector<HfstTransducer*> extract_paths();
 
-	  /** \brief Extract a maximum of \a max_num string pairs that are recognized by the transducer
-	      following a maximum of \a cycles cycles and store the string pairs into \a results.
-
-	The total number of resulting strings is capped at \a max_num, with 0 or negative
-	indicating unlimited. The \a cycles parameter indicates how many times a cycle
-	will be followed, with negative numbers indicating unlimited. If this function
-	is called on a cyclic transducer with unlimited values for both \a max_num and
+    /** \brief Extract a maximum of \a max_num string pairs that are 
+	recognized by the transducer
+	following a maximum of \a cycles cycles and store the 
+	string pairs into \a results.
+	
+	The total number of resulting strings is capped at \a max_num, 
+	with 0 or negative
+	indicating unlimited. The \a cycles parameter indicates how many 
+	times a cycle
+	will be followed, with negative numbers indicating unlimited. 
+	If this function
+	is called on a cyclic transducer with unlimited values for 
+	both \a max_num and
 	\a cycles, an exception will be thrown.
 	@throws hfst::exceptions::TransducerIsCyclicException
 	@see #n_best */
-    void extract_strings(WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1);
+    void extract_strings
+      (WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1);
     
-    /* \brief Call \a callback with extracted strings that are not invalidated by
-               flag diacritic rules.
-	@see #extract_strings(WeightedPaths<float>::Set&, int, int) */             
-    void extract_strings_fd(ExtractStringsCb& callback, int cycles=-1, bool filter_fd=true);
+    /* \brief Call \a callback with extracted strings that are not 
+       invalidated by
+       flag diacritic rules.
+	@see #extract_strings(WeightedPaths<float>::Set&, int, int) */          
+    void extract_strings_fd
+      (ExtractStringsCb& callback, int cycles=-1, bool filter_fd=true);
     
-    /** \brief Store to \a results string pairs that are recognized by the transducer
-               and are not invalidated by flag diacritic rules, optionally filtering
-               the flag diacritics themselves out of the result strings.
+    /** \brief Store to \a results string pairs that are recognized 
+	by the transducer
+	and are not invalidated by flag diacritic rules, optionally filtering
+	the flag diacritics themselves out of the result strings.
 
-  The same conditions that apply for the #extract_strings function apply also for this one.
-  Flag diacritics are of the form @[A-Z][.][A-Z]+([.][A-Z]+)?@ An example:
+	The same conditions that apply for the #extract_strings function
+	apply also for this one.
+	Flag diacritics are of the form @[A-Z][.][A-Z]+([.][A-Z]+)?@ An example:
 \verbatim
 TODO...
 \endverbatim
   @throws hfst::exceptions::TransducerIsCyclicException
   @see extract_strings(WeightedPaths<float>::Set&, int, int) */
-    void extract_strings_fd(WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1, bool filter_fd=true);
+    void extract_strings_fd
+      (WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1, 
+       bool filter_fd=true);
 
     /** \brief Freely insert symbol pair \a symbol_pair into the transducer. */
     HfstTransducer &insert_freely(const StringPair &symbol_pair);
@@ -606,10 +677,13 @@ t.substitute(&func);
 
 @see String
 */
-    HfstTransducer &substitute(bool (*func)(const StringPair &sp, StringPairSet &sps));
+  HfstTransducer &substitute
+  (bool (*func)(const StringPair &sp, StringPairSet &sps));
 
-    /** \brief Substitute all transition symbols equal to \a old_symbol with symbol \a new_symbol.
-	\a input_side and \a output_side define whether the substitution is made on input and output sides.
+    /** \brief Substitute all transition symbols equal to \a old_symbol 
+	with symbol \a new_symbol.
+	\a input_side and \a output_side define whether 
+	the substitution is made on input and output sides.
 
 	The transition weights remain the same. 
 
@@ -619,12 +693,14 @@ t.substitute(&func);
 			       bool input_side=true,
 			       bool output_side=true);
 						      
-    /** \brief Substitute all transition symbol pairs equal to \a old_symbol_pair with \a new_symbol_pair. 
+    /** \brief Substitute all transition symbol pairs equal to 
+	\a old_symbol_pair with \a new_symbol_pair. 
 
 	The transition weights remain the same.
 
 	Implemented only for #TROPICAL_OFST_TYPE and #LOG_OFST_TYPE.
-	If this function is called by an unweighted HfstTransducer, it is converted to weighted one,
+	If this function is called by an unweighted HfstTransducer, 
+	it is converted to weighted one,
 	substitution is done and it is converted back to the original format.
 
 	@see String
@@ -638,7 +714,8 @@ t.substitute(&func);
 	The weight of the original transition is copied to all new transitions.
 
 	Implemented only for #TROPICAL_OFST_TYPE and #LOG_OFST_TYPE.
-	If this function is called by an unweighted HfstTransducer (#SFST_TYPE or #FOMA_TYPE), it is converted to #TROPICAL_OFST_TYPE,
+	If this function is called by an unweighted HfstTransducer 
+	(#SFST_TYPE or #FOMA_TYPE), it is converted to #TROPICAL_OFST_TYPE,
 	substitution is done and it is converted back to the original format.
 
 	@see String
@@ -646,13 +723,18 @@ t.substitute(&func);
     HfstTransducer &substitute(const StringPair &old_symbol_pair,
 			       const StringPairSet &new_symbol_pair_set);
 
-    /** \brief Substitute all transitions equal to \a symbol_pair with a copy of transducer \a transducer. 
+    /** \brief Substitute all transitions equal to \a symbol_pair 
+	with a copy of transducer \a transducer. 
 
-	A copy of \a transducer is attached (using epsilon transitions) between the source and target states of the transition to be substituted.
-	The weight of the original transition is copied to the epsilon transition leaving from the source state.
+	A copy of \a transducer is attached (using epsilon transitions) 
+	between the source and target states of the transition 
+	to be substituted.
+	The weight of the original transition is copied to 
+	the epsilon transition leaving from the source state.
 
 	Implemented only for #TROPICAL_OFST_TYPE and #LOG_OFST_TYPE.
-	If this function is called by an unweighted HfstTransducer (#SFST_TYPE or #FOMA_TYPE), it is converted to #TROPICAL_OFST_TYPE,
+	If this function is called by an unweighted HfstTransducer 
+	(#SFST_TYPE or #FOMA_TYPE), it is converted to #TROPICAL_OFST_TYPE,
 	substitution is done and it is converted back to the original format.
 
 	@see String
@@ -662,11 +744,13 @@ t.substitute(&func);
 
     /** \brief Set the weights of all final states to \a weight. 
 
-	If the HfstTransducer is of unweighted type (#SFST_TYPE or #FOMA_TYPE), nothing is done.
+	If the HfstTransducer is of unweighted type 
+	(#SFST_TYPE or #FOMA_TYPE), nothing is done.
     */
     HfstTransducer &set_final_weights(float weight);
 
-    /** \brief Transform all transition and state weights as defined in \a func. 
+    /** \brief Transform all transition and state weights as defined 
+	in \a func. 
 
      An example:
 \verbatim
@@ -680,13 +764,16 @@ float func(float f) {
 HfstTransducer t_transformed;
 \endverbatim 
 
-    If the HfstTransducer is of unweighted type (#SFST_TYPE or #FOMA_TYPE), nothing is done.
+    If the HfstTransducer is of unweighted type 
+    (#SFST_TYPE or #FOMA_TYPE), nothing is done.
     */
     HfstTransducer &transform_weights(float (*func)(float));
 
-    /** \brief Push weights towards initial or final state(s) as defined by \a type.
+    /** \brief Push weights towards initial or final state(s) 
+	as defined by \a type.
 
-	If the HfstTransducer is of unweighted type (#SFST_TYPE or #FOMA_TYPE), nothing is done.
+	If the HfstTransducer is of unweighted type 
+	(#SFST_TYPE or #FOMA_TYPE), nothing is done.
 	@see PushType
     */
     HfstTransducer &push_weights(PushType type);
@@ -695,10 +782,12 @@ HfstTransducer t_transformed;
     HfstTransducer &compose(const HfstTransducer &another);
 
 #ifdef FOO
-    /** \brief Compose this transducer with the intersection of rule transducers in \a grammar. 
+    /** \brief Compose this transducer with the intersection of 
+	rule transducers in \a grammar. 
 
 	The algorithm used by this function is faster than intersecting 
-	all transducers one by one and then composing this transducer with the intersection. 
+	all transducers one by one and then composing this transducer 
+	with the intersection. 
 
 	@see HfstGrammar */
     HfstTransducer &compose_intersect(HfstGrammar &grammar);
@@ -730,21 +819,27 @@ HfstTransducer t_transformed;
     static float get_profile_seconds(ImplementationType type);
     /* Get all symbol pairs that occur in the transitions of the transducer. */
     StringPairSet get_symbol_pairs();
-    /* Whether HFST is linked to the transducer library needed by implementation type \a type. */
+    /* Whether HFST is linked to the transducer library needed 
+       by implementation type \a type. */
     static bool is_implementation_type_available(ImplementationType type);
-    /* Create a tokenizer that recognizes all symbols that occur in the transducer. */
+    /* Create a tokenizer that recognizes all symbols that occur 
+       in the transducer. */
     HfstTokenizer create_tokenizer();
 
-    /** \brief Convert the transducer into an equivalent transducer in format \a type. 
+    /** \brief Convert the transducer into an equivalent transducer 
+	in format \a type. 
 
-	If a weighted transducer is converted into an unweighted one, all weights are lost. 
-	In the reverse case, all weights are initialized to the semiring's one. */
+	If a weighted transducer is converted into an unweighted one, 
+	all weights are lost. 
+	In the reverse case, all weights are initialized to the 
+	semiring's one. */
     HfstTransducer &convert(ImplementationType type);
 
     /* \brief Create a new transducer equivalent to \a t in format \a type. 
 
 	@see convert(ImplementationType type) */
-    static HfstTransducer &convert(const HfstTransducer &t, ImplementationType type);
+    static HfstTransducer &convert
+      (const HfstTransducer &t, ImplementationType type);
 
 
     //! @brief Lookup or apply a single string \a s and store a maximum of 
@@ -816,28 +911,41 @@ HfstTransducer t_transformed;
   };
 
 
-  /** \brief A namespace for functions that create two-level, replace, restriction and coercion rule transducers. */
+  /** \brief A namespace for functions that create two-level, replace, 
+      restriction and coercion rule transducers. */
   namespace rules
   {
     enum ReplaceType {REPL_UP, REPL_DOWN, REPL_RIGHT, REPL_LEFT};
     enum TwolType {twol_right, twol_left, twol_both};
 
     /* helping methods */
-    HfstTransducer universal_fst(const StringPairSet &alphabet, ImplementationType type);
-    HfstTransducer negation_fst(const HfstTransducer &t, const StringPairSet &alphabet);
+    HfstTransducer universal_fst
+      (const StringPairSet &alphabet, ImplementationType type);
+    HfstTransducer negation_fst
+      (const HfstTransducer &t, const StringPairSet &alphabet);
 
-    HfstTransducer replace(HfstTransducer &t, ReplaceType repl_type, bool optional, StringPairSet &alphabet);
-    HfstTransducer replace_transducer(HfstTransducer &t, std::string lm, std::string rm, ReplaceType repl_type, StringPairSet &alphabet);
-    HfstTransducer replace_context(HfstTransducer &t, std::string m1, std::string m2, StringPairSet &alphabet);
-    HfstTransducer replace_in_context(HfstTransducerPair &context, ReplaceType repl_type, HfstTransducer &t, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace
+      (HfstTransducer &t, ReplaceType repl_type, bool optional, 
+       StringPairSet &alphabet);
+    HfstTransducer replace_transducer
+      (HfstTransducer &t, std::string lm, std::string rm, 
+       ReplaceType repl_type, StringPairSet &alphabet);
+    HfstTransducer replace_context
+      (HfstTransducer &t, std::string m1, std::string m2, 
+       StringPairSet &alphabet);
+    HfstTransducer replace_in_context
+      (HfstTransducerPair &context, ReplaceType repl_type, 
+       HfstTransducer &t, bool optional, StringPairSet &alphabet);
 
     /* Used by hfst-calculate. */
-    HfstTransducer restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet,
-			       TwolType twol_type, int direction ); 
+    HfstTransducer restriction
+      (HfstTransducerPairVector &contexts, HfstTransducer &mapping, 
+       StringPairSet &alphabet,	TwolType twol_type, int direction ); 
 
 
 
-    /** \brief A transducer that obligatorily performs the mappings defined by \a mappings in the context \a context
+    /** \brief A transducer that obligatorily performs the mappings 
+	defined by \a mappings in the context \a context
 	when the alphabet is \a alphabet. 
 
 	For example, a transducer yielded by the following arguments
@@ -846,51 +954,71 @@ context = pair( [c|d], [e] )
 mappings = set(a:b)
 alphabet = set(a, a:b, b, c, d, e, ...)
 \endverbatim
-	obligatorily maps the symbol a to b if c or d precedes and e follows. (Elsewhere,
+	obligatorily maps the symbol a to b if c or d precedes 
+	and e follows. (Elsewhere,
 	the mapping of a to b is optional)
 	This expression is identical to ![.* [c|d] [a:. & !a:b] [e] .*]
 	Note that the alphabet must contain the pair a:b here.
 	
 	@see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>
     */
-    HfstTransducer two_level_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
+    HfstTransducer two_level_if(HfstTransducerPair &context, 
+				StringPairSet &mappings, 
+				StringPairSet &alphabet);
 
-    /** \brief A transducer that allows the mappings defined by \a mappings only in the context \a context,
+    /** \brief A transducer that allows the mappings defined by 
+	\a mappings only in the context \a context,
 	when the alphabet is \a alphabet. 
 	
-	If called with the same arguments as in the example of #two_level_if, the transducer
-	allows the mapping of symbol a to b only if c or d precedes and e follows. The
-	mapping of a to b is optional in this context but cannot occur in any other context.
-	The expression is equivalent to ![  [ ![.* [c|d]] a:b .* ] | [ .* a:b ![[e] .*] ]  ]
+	If called with the same arguments as in the example of 
+	#two_level_if, the transducer
+	allows the mapping of symbol a to b only if c or d precedes 
+	and e follows. The
+	mapping of a to b is optional in this context but cannot occur 
+	in any other context.
+	The expression is equivalent to 
+	![  [ ![.* [c|d]] a:b .* ] | [ .* a:b ![[e] .*] ]  ]
 	
 	@see #two_level_if
     */
-    HfstTransducer two_level_only_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
+    HfstTransducer two_level_only_if(HfstTransducerPair &context, 
+				     StringPairSet &mappings, 
+				     StringPairSet &alphabet);
 
-    /** \brief A transducer that always performs the mappings defined by \a mappings in the context \a context
+    /** \brief A transducer that always performs the mappings defined 
+	by \a mappings in the context \a context
 	and only in that context, when the alphabet is \a alphabet. 
 
-	If called with the same arguments as in the example of #two_level_if, the transducer
+	If called with the same arguments as in the example of 
+	#two_level_if, the transducer
 	maps symbol a to b only and only if c or d precedes and e follows.
-	The mapping of a to b is obligatory in this context and cannot occur in any other context.
+	The mapping of a to b is obligatory in this context and cannot 
+	occur in any other context.
 	The expression is equivalent to ![.* [c|d] [a:. & !a:b] [e] .*]  &
 	![  [ ![.* [c|d]] a:b .* ] | [ .* a:b ![[e] .*] ]  ]
 	
 	@see #two_level_if
     */
-    HfstTransducer two_level_if_and_only_if(HfstTransducerPair &context, StringPairSet &mappings, StringPairSet &alphabet);
+    HfstTransducer two_level_if_and_only_if(HfstTransducerPair &context, 
+					    StringPairSet &mappings, 
+					    StringPairSet &alphabet);
 
 
-
-    /** \brief A transducer that performs an upward mapping \a mapping in the context \a context when the alphabet is \a alphabet.
+    /** \brief A transducer that performs an upward mapping \a mapping 
+	in the context \a context when the alphabet is \a alphabet.
 	\a optional defines whether the mapping is optional. 
 
 	Each substring s of the input string which is in the input language
-	of the transducer \a mapping and whose left context is matched by the expression
-	[.* l] (where l is the first element of \a context) and whose right context is matched by [r .*] 
-	(where r is the second element in the context) is mapped to the respective
-	surface strings defined by transducer \a mapping. Any other character is mapped to
-	the characters specified in \a alphabet. The left and right contexts must
+	of the transducer \a mapping and whose left context is matched 
+	by the expression
+	[.* l] (where l is the first element of \a context) and 
+	whose right context is matched by [r .*] 
+	(where r is the second element in the context) is mapped 
+	to the respective
+	surface strings defined by transducer \a mapping. Any other 
+	character is mapped to
+	the characters specified in \a alphabet. The left and right 
+	contexts must
 	be automata (i.e. transducers which map strings onto themselves).
 
 	For example, a transducer yielded by the following arguments
@@ -901,113 +1029,176 @@ alphabet = set(a, b, c)
 \endverbatim
 	would map the string "caacac" to "cbbcac".
 
-	Note that the alphabet must contain the characters a and b, but not the pair
-	a:b (unless this replacement is to be allowed everywhere in the context).
+	Note that the alphabet must contain the characters a and b, 
+	but not the pair
+	a:b (unless this replacement is to be allowed everywhere 
+	in the context).
 
-	Note that replace operations (unlike the two-level rules) have to be combined by composition
+	Note that replace operations (unlike the two-level rules) 
+	have to be combined by composition
 	rather than intersection.
 
 	@see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>
     */
-    HfstTransducer replace_up(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_up(HfstTransducerPair &context, 
+			      HfstTransducer &mapping, 
+			      bool optional, 
+			      StringPairSet &alphabet);
 
-    /** \brief The same as replace_up, but matching is done on the output side of \a mapping 
+    /** \brief The same as replace_up, but matching is done on 
+	the output side of \a mapping 
 
 	@see replace_up <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
-    HfstTransducer replace_down(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_down(HfstTransducerPair &context, 
+				HfstTransducer &mapping, 
+				bool optional, 
+				StringPairSet &alphabet);
 
-    /** \brief The same as replace_up, but left context matching is done on the output side of \a mapping
+    /** \brief The same as replace_up, but left context matching is 
+	done on the output side of \a mapping
 	and right context on the input side of \a mapping 
 
 	@see replace_up <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
-    HfstTransducer replace_right(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_right(HfstTransducerPair &context, 
+				 HfstTransducer &mapping, 
+				 bool optional, 
+				 StringPairSet &alphabet);
 
-    /** \brief The same as replace_up, but left context matching is done on the input side of \a mapping
+    /** \brief The same as replace_up, but left context matching is 
+	done on the input side of \a mapping
 	and right context on the output side of \a mapping. 
 
 	@see replace_up <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
-    HfstTransducer replace_left(HfstTransducerPair &context, HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_left(HfstTransducerPair &context, 
+				HfstTransducer &mapping, 
+				bool optional, 
+				StringPairSet &alphabet);
 
-    /** \brief The same as replace_up but \a mapping is performed in every context. 
+    /** \brief The same as replace_up but \a mapping is performed 
+	in every context. 
 
 	@see replace_up */
-    HfstTransducer replace_up(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_up(HfstTransducer &mapping, 
+			      bool optional, 
+			      StringPairSet &alphabet);
 
     /** \brief The same as #replace_down(HfstTransducerPair&, HfstTransducer&, bool, StringPairSet&)
 	but \a mapping is performed in every context.
 
 	@see replace_up */
-    HfstTransducer replace_down(HfstTransducer &mapping, bool optional, StringPairSet &alphabet);
+    HfstTransducer replace_down(HfstTransducer &mapping, 
+				bool optional, 
+				StringPairSet &alphabet);
 
-
-
-    /** \brief A transducer that allows any (substring) mapping defined by \a mapping
-	only if it occurs in any of the contexts in \a contexts. Symbols outside of the matching
+    /** \brief A transducer that allows any (substring) mapping defined 
+	by \a mapping
+	only if it occurs in any of the contexts in \a contexts. 
+	Symbols outside of the matching
 	substrings are mapped to any symbol allowed by \a alphabet. 
 
 	@see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
-    HfstTransducer restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer restriction(HfstTransducerPairVector &contexts, 
+			       HfstTransducer &mapping, 
+			       StringPairSet &alphabet);
 
-    /** \brief A transducer that requires that one of the mappings defined by \a mapping
-	must occur in each context in \a contexts. Symbols outside of the matching
+    /** \brief A transducer that requires that one of the mappings 
+	defined by \a mapping
+	must occur in each context in \a contexts. Symbols outside of 
+	the matching
 	substrings are mapped to any symbol allowed by \a alphabet.
 
 	@see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
-    HfstTransducer coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer coercion(HfstTransducerPairVector &contexts, 
+			    HfstTransducer &mapping, 
+			    StringPairSet &alphabet);
 
-    /** \brief A transducer that is equivalent to the intersection of restriction and coercion
-	and requires that the mappings defined by \a mapping occur always and only in the
+    /** \brief A transducer that is equivalent to the intersection 
+	of restriction and coercion
+	and requires that the mappings defined by \a mapping occur 
+	always and only in the
 	given contexts in \a contexts. Symbols outside of the matching
 	substrings are mapped to any symbol allowed by \a alphabet.
 
 	@see #restriction(HfstTransducerPairVector&, HfstTransducer&, StringPairSet&) #coercion <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a> */
-    HfstTransducer restriction_and_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer restriction_and_coercion(HfstTransducerPairVector &contexts,
+					    HfstTransducer &mapping, 
+					    StringPairSet &alphabet);
 
-    /** \brief A transducer that specifies that a string from the input language of the
-	transducer \a mapping may only be mapped to one of its output strings (according
-	to transducer \a mapping) if it appears in any of the contexts in \a contexts.
-	Symbols outside of the matching substrings are mapped to any symbol allowed by \a alphabet.
-
-	@see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
-    HfstTransducer surface_restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
-
-    /** \brief A transducer that specifies that a string from the input language of the transducer
-	\a mapping always has to the mapped to one of its output strings according to
-	transducer \a mapping if it appears in any of the contexts in \a contexts.
-	Symbols outside of the matching substrings are mapped to any symbol allowed by \a alphabet.
+    /** \brief A transducer that specifies that a string from 
+	the input language of the
+	transducer \a mapping may only be mapped to one of its 
+	output strings (according
+	to transducer \a mapping) if it appears in any of the contexts 
+	in \a contexts.
+	Symbols outside of the matching substrings are mapped
+	to any symbol allowed by \a alphabet.
 
 	@see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
-    HfstTransducer surface_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer surface_restriction(HfstTransducerPairVector &contexts, 
+				       HfstTransducer &mapping, 
+				       StringPairSet &alphabet);
 
-    /** \brief A transducer that is equivalent to the intersection of surface_restriction and surface_coercion.
+    /** \brief A transducer that specifies that a string from 
+	the input language of the transducer
+	\a mapping always has to the mapped to one of its output 
+	strings according to
+	transducer \a mapping if it appears in any of the contexts 
+	in \a contexts.
+	Symbols outside of the matching substrings are mapped to 
+	any symbol allowed by \a alphabet.
+
+	@see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
+    HfstTransducer surface_coercion(HfstTransducerPairVector &contexts, 
+				    HfstTransducer &mapping, 
+				    StringPairSet &alphabet);
+
+    /** \brief A transducer that is equivalent to the intersection of 
+	surface_restriction and surface_coercion.
 
 	@see #surface_restriction #surface_coercion <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
-    HfstTransducer surface_restriction_and_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer surface_restriction_and_coercion
+      (HfstTransducerPairVector &contexts, 
+       HfstTransducer &mapping, 
+       StringPairSet &alphabet);
 
-    /** \brief A transducer that specifies that a string from the output language of the transducer
-	\a mapping may only be mapped to one of its input strings (according to transducer \a mappings)
+    /** \brief A transducer that specifies that a string from 
+	the output language of the transducer
+	\a mapping may only be mapped to one of its input strings 
+	(according to transducer \a mappings)
 	if it appears in any of the contexts in \a contexts.
-	Symbols outside of the matching substrings are mapped to any symbol allowed by \a alphabet.
+	Symbols outside of the matching substrings are mapped 
+	to any symbol allowed by \a alphabet.
 
 	@see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
-    HfstTransducer deep_restriction(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer deep_restriction(HfstTransducerPairVector &contexts, 
+				    HfstTransducer &mapping, 
+				    StringPairSet &alphabet);
 
-    /** \brief A transducer that specifies that a string from the output language of the transducer
-	\a mapping always has to be mapped to one of its input strings (according to transducer \a mappings)
+    /** \brief A transducer that specifies that a string from 
+	the output language of the transducer
+	\a mapping always has to be mapped to one of its input strings 
+	(according to transducer \a mappings)
 	if it appears in any of the contexts in \a contexts.
-	Symbols outside of the matching substrings are mapped to any symbol allowed by \a alphabet.
+	Symbols outside of the matching substrings are mapped 
+	to any symbol allowed by \a alphabet.
 
 	@see <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
-    HfstTransducer deep_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer deep_coercion(HfstTransducerPairVector &contexts, 
+				 HfstTransducer &mapping, 
+				 StringPairSet &alphabet);
 
-    /** \brief A transducer that is equivalent to the intersection of deep_restriction and deep_coercion.
+    /** \brief A transducer that is equivalent to the intersection 
+	of deep_restriction and deep_coercion.
 
 	@see #deep_restriction #deep_coercion <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">SFST manual</a>. */
-    HfstTransducer deep_restriction_and_coercion(HfstTransducerPairVector &contexts, HfstTransducer &mapping, StringPairSet &alphabet);
+    HfstTransducer deep_restriction_and_coercion
+      (HfstTransducerPairVector &contexts, 
+       HfstTransducer &mapping, 
+       StringPairSet &alphabet);
   }
 
 }
 
 
 // vim: set ft=cpp.doxygen:
-#endif
+#endif // #ifndef _HFST_TRANSDUCER_H_
