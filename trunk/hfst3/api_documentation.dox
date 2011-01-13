@@ -552,10 +552,12 @@ namespace hfst {
 #include <cstdio>
 #include "HfstTransducer.h"
 
+using namespace hfst;
+
 int main() 
 {
-  hfst::HfstTransducer tr1("foo", "bar", SFST_TYPE);
-  hfst::HfstTransducer tr2("bar", "baz", SFST_TYPE);
+  HfstTransducer tr1("foo", "bar", SFST_TYPE);
+  HfstTransducer tr2("bar", "baz", SFST_TYPE);
   tr1.compose(tr2);
   tr1.write_in_att_format(stdout);
 }
@@ -574,6 +576,7 @@ should print to standard out the following text when run:
 1
 \endverbatim
 
+<BR></BR>
 
       \section hfst_structure Structure of the API
 
@@ -583,11 +586,9 @@ The HFST API is written in the namespace #hfst that contains the following class
 
    - HfstInputStream and HfstOutputStream: Classes for writing and reading binary transducers.
 
-   - implementations::HfstTransitionGraph: Class for creating transducers from scratch and iterating through their states and transitions.
+   - implementations::HfstTransitionGraph: A class for creating transducers from scratch and iterating through their states and transitions.
 
    - HfstTokenizer: A class used in creating transducers from UTF-8 strings.
-
-   - HfstGrammar: A class used in \link HfstTransducer::compose_intersect intersecting composition\endlink.
 
 and the following namespaces:
 
@@ -595,13 +596,98 @@ and the following namespaces:
 
    - \link hfst::exceptions exceptions\endlink: A namespace for exceptions.
 
+<BR></BR>
 
    \section hfst_examples Examples of HFST functionalities
 
-   ...
-\verbatim
+   An example of creating a simple transducer from scratch
+   and converting between transducer formats and testing
+   transducer properties and handling exceptions.
 
+\verbatim
+/* Create a HFST basic transducer [a:b] with transition weight 0.3 and 
+   final weight 0.5. */
+HfstBasicTransducer t;
+t.add_state(1);
+t.add_transition(0, HfstBasicTransition(1, "a", "b", 0.3));
+t.set_final_weight(1, 0.5);
+
+/* Convert to tropical OpenFst format and push weights 
+   toward final state. */
+HfstTransducer T(t, TROPICAL_OFST_TYPE);
+T.push_weights(TO_FINAL_STATE);
+
+/* Convert back to HFST basic transducer. */
+HfstBasicTransducer tc(T);
+try {
+  /* Rounding might affect the precision. */  
+  if (0.79 < tc.get_final_weight(1) &&
+      tc.get_final_weight(1) < 0.81) {
+      fprintf(stderr, "TEST OK\n");
+      exit(0);
+  }
+  fprintf(stderr, "TEST FAILED\n");
+  exit(1);
+} 
+/* If the state does not exist or is not final */
+catch (HfstInterfaceException e) {
+  fprintf(stderr, "TEST FAILED: An exception thrown.\n");
+  exit(1);
+}
 \endverbatim
+
+
+An example of creating transducers from strings and applying
+rules to them.
+
+\verbatim
+  ImplementationType type=FOMA_TYPE;
+  HfstTokenizer tok;
+  tok.add_multichar_symbol("foo");
+  tok.add_multichar_symbol("bar");
+  tok.add_multichar_symbol("baz");
+  
+  HfstTransducer words("foobarfoo", tok, type);
+  HfstTransducer t("foobarbaz", tok, type);
+  words.disjunct(t);
+  
+  HfstTransducerPair context
+    (HfstTransducer("foo", type),
+     HfstTransducer("foo", type) );
+  HfstTransducer mapping
+    ("bar", "baz", type);
+  bool optional=true;
+  
+  StringPairSet alphabet;
+  alphabet.insert(StringPair("foo", "foo"));
+  alphabet.insert(StringPair("bar", "bar"));
+  alphabet.insert(StringPair("baz", "baz"));
+  
+  HfstTransducer rule = rules::replace_up
+    (context, mapping, optional, alphabet);
+  
+  words.compose(rule);
+  
+  WeightedPaths<float>::Set results;
+  
+  try {
+    words.extract_strings(results);
+    for (WeightedPaths<float>::Set::const_iterator it = results.begin();
+	 it != results.end(); it++)
+      {
+	fprintf(stderr, "%s : %s\n", 
+		it->istring.c_str(), 
+		it->ostring.c_str());
+      }
+  } catch (hfst::exceptions::TransducerIsCyclicException e)
+    {
+      /* This should not happen because transducer is not cyclic. */
+      fprintf(stderr, "TEST FAILED\n");
+      exit(1);
+    }
+\endverbatim
+
+<BR></BR>
       
    */
 
