@@ -45,10 +45,6 @@ while (not in->is_eof()) {
     printf("ERROR: Stream cannot be read.\n");
     exit(1); 
   }
-  if (not in->is_fst()) {
-    printf("ERROR: Stream does not contain transducers.\n");
-    exit(1); 
-  }
   HfstTransducer t(*in);
   printf("One transducer succesfully read.\n");
   n++;
@@ -169,8 +165,6 @@ For documentation on the HFST binary transducer format, see #hfst::HfstOutputStr
     bool is_bad(void);
     /** \brief Whether the state of the stream is good for input operations. */
     bool is_good(void);
-    /** \brief Whether the next element in the stream is an HfstTransducer. */
-    bool is_fst(void);
     
     /** \brief The type of the first transducer in the stream. 
 
