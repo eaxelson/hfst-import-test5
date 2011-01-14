@@ -51,7 +51,8 @@
 
       \section installing_library Installing the HFST API library
       
-      You can download the source code packet hfst-3.0.tar.gz from the sourceforge
+      You can download the source code packet hfst-3.0.tar.gz
+      (will be published during January 2011) from the sourceforge
       <a href="http://sourceforge.net/projects/hfst/files/hfst/">download page</a>.
       Extract all files with the command
 
@@ -580,7 +581,7 @@ should print to standard out the following text when run:
 
       \section hfst_structure Structure of the API
 
-The HFST API is written in the namespace #hfst that contains the following classes:
+The HFST API is written in the namespace #hfst that includes the following classes:
 
    - HfstTransducer: A class for creating transducers and performing operations on them.
 
@@ -602,9 +603,13 @@ and the following namespaces:
 
    An example of creating a simple transducer from scratch
    and converting between transducer formats and testing
-   transducer properties and handling exceptions.
+   transducer properties and handling exceptions:
 
 \verbatim
+using namespace hfst;
+using implementations::HfstBasicTransducer;
+using implementations::HfstBasicTransition;
+
 /* Create a HFST basic transducer [a:b] with transition weight 0.3 and 
    final weight 0.5. */
 HfstBasicTransducer t;
@@ -630,18 +635,24 @@ try {
   exit(1);
 } 
 /* If the state does not exist or is not final */
-catch (HfstInterfaceException e) {
+catch (exceptions::HfstInterfaceException e) {
   fprintf(stderr, "TEST FAILED: An exception thrown.\n");
   exit(1);
 }
 \endverbatim
 
 
-An example of creating transducers from strings and applying
-rules to them.
+An example of creating transducers from strings, applying rules to them
+an printing the resulting transducer.
 
 \verbatim
+  using namespace hfst;
+
   ImplementationType type=FOMA_TYPE;
+
+  /* Create a simple lexicon transducer 
+     [[foo bar foo] | [foo bar baz]]. */
+
   HfstTokenizer tok;
   tok.add_multichar_symbol("foo");
   tok.add_multichar_symbol("bar");
@@ -650,7 +661,11 @@ rules to them.
   HfstTransducer words("foobarfoo", tok, type);
   HfstTransducer t("foobarbaz", tok, type);
   words.disjunct(t);
+
   
+  /* Create a rule transducer that optionally replaces 
+     "bar" with "baz" between "foo" and "foo". */
+
   HfstTransducerPair context
     (HfstTransducer("foo", type),
      HfstTransducer("foo", type) );
@@ -665,26 +680,59 @@ rules to them.
   
   HfstTransducer rule = rules::replace_up
     (context, mapping, optional, alphabet);
-  
+
+
+  /* Apply the rule transducer to the lexicon. */  
   words.compose(rule);
   
+  
+  /* Extract all string pairs from the result and print
+     them to stdout. */
+
   WeightedPaths<float>::Set results;
   
   try {
     words.extract_strings(results);
-    for (WeightedPaths<float>::Set::const_iterator it = results.begin();
-	 it != results.end(); it++)
-      {
-	fprintf(stderr, "%s : %s\n", 
-		it->istring.c_str(), 
-		it->ostring.c_str());
-      }
-  } catch (hfst::exceptions::TransducerIsCyclicException e)
+  } 
+  catch (hfst::exceptions::TransducerIsCyclicException e)
     {
       /* This should not happen because transducer is not cyclic. */
       fprintf(stderr, "TEST FAILED\n");
       exit(1);
     }
+
+  for (WeightedPaths<float>::Set::const_iterator it = results.begin();
+         it != results.end(); it++)
+    {
+    fprintf(stdout, "%s : %s\n", 
+            it->istring.c_str(), 
+            it->ostring.c_str());
+    }
+\endverbatim
+
+An example of reading binary transducers from stdin,
+converting them to SFST format and writing them to stdout
+and in AT&T format to file "testfile.att":
+
+\verbatim
+  HfstInputStream in;
+  HfstOutputStream out(SFST_TYPE);
+  FILE * file = fopen("testfile.att", "wb");
+  bool first_transducer=true;
+
+  while (not in.is_eof()) 
+  {
+    if (not first_transducer)
+      fprintf(file, "--\n"); /* AT&T format separator. */
+    HfstTransducer t(in);
+    HfstTransducer tc(t, SFST_TYPE);
+    out << tc;
+    tc.write_in_att_format(file);
+    first_transducer=false;
+  }
+  in.close();
+  out.close();
+  fclose(file);
 \endverbatim
 
 <BR></BR>
@@ -751,7 +799,7 @@ OpenFst in http://www.openfst.org and foma in http://www.aclweb.org/anthology/E/
 
    - <a href="AddingYourLibrary.html">Adding</a> your own implementation of HFST
 
-   - <a href="VersionDifferences.html">Differences</a> between HFST version 2 and 3
+   - <a href="VersionDifferences.html">Differences</a> between HFST versions 2 and 3
 
 
 \section download_hfst Download
