@@ -144,6 +144,33 @@ public:
 	has_input_epsilon_cycles(false),
 	has_unweighted_input_epsilon_cycles(false)
 	{}
+
+    // a basic constructor that's only told information we
+    // actually use at the moment
+    TransducerHeader(
+	SymbolNumber input_symbols,
+	SymbolNumber symbols,
+	TransitionTableIndex transition_index_table,
+	TransitionTableIndex transition_table,
+	bool weights):
+	number_of_input_symbols(input_symbols),
+	number_of_symbols(symbols), // epsilon
+	size_of_transition_index_table(transition_index_table),
+	size_of_transition_target_table(transition_table),
+	number_of_states(0),
+	number_of_transitions(0),
+	weighted(weights),
+	deterministic(true),
+	input_deterministic(true),
+	minimized(true),
+	cyclic(false),
+	has_epsilon_epsilon_transitions(false),
+	has_input_epsilon_transitions(false),
+	has_input_epsilon_cycles(false),
+	has_unweighted_input_epsilon_cycles(false)
+	{ }
+
+
     TransducerHeader(std::istream& is):
 	number_of_input_symbols(read_property<SymbolNumber>(is)),
 	number_of_symbols(read_property<SymbolNumber>(is)),
@@ -347,13 +374,16 @@ public:
   
     virtual ~Transition() {}
   
-    virtual void write(std::ostream& os) const
+    virtual void write(std::ostream& os, bool weighted) const
 	{
 	    os.write(reinterpret_cast<const char*>(&input_symbol), sizeof(input_symbol));
 	    os.write(reinterpret_cast<const char*>(&output_symbol), sizeof(output_symbol));
 	    os.write(reinterpret_cast<const char*>(&target_index), sizeof(target_index));
+	    if (weighted) {
+		os << 0.0f;
+	    }
 	}
-  
+
     virtual void display() const;
 
     TransitionTableIndex get_target(void) const {return target_index;}
@@ -378,10 +408,12 @@ public:
     TransitionW(std::istream& is): Transition(is), transition_weight(0.0f)
 	{is.read(reinterpret_cast<char*>(&transition_weight), sizeof(Weight));}
   
-    void write(std::ostream& os) const
+    void write(std::ostream& os, bool weighted) const
 	{
-	    Transition::write(os);
-	    os.write(reinterpret_cast<const char*>(&transition_weight), sizeof(transition_weight));
+	    Transition::write(os, false);
+	    if (weighted) {
+		os.write(reinterpret_cast<const char*>(&transition_weight), sizeof(transition_weight));
+	    }
 	}
   
     void display() const;
@@ -551,14 +583,7 @@ protected:
     
     TransducerTablesInterface* tables;
     
-    Transducer();
-    Transducer(const TransducerHeader& header, const TransducerAlphabet& alphabet,
-	       const TransducerTable<TransitionIndex>& index_table,
-	       const TransducerTable<Transition>& transition_table);
-    Transducer(const TransducerHeader& header, const TransducerAlphabet& alphabet,
-	       const TransducerTable<TransitionWIndex>& index_table,
-	       const TransducerTable<TransitionW>& transition_table);
-  
+ 
     void load_tables(std::istream& is);
 
     // for lookup
@@ -602,6 +627,13 @@ public:
     Transducer(std::istream& is);
     Transducer(bool weighted);
     Transducer(Transducer * t);
+    Transducer();
+    Transducer(const TransducerHeader& header, const TransducerAlphabet& alphabet,
+	       const TransducerTable<TransitionIndex>& index_table,
+	       const TransducerTable<Transition>& transition_table);
+    Transducer(const TransducerHeader& header, const TransducerAlphabet& alphabet,
+	       const TransducerTable<TransitionWIndex>& index_table,
+	       const TransducerTable<TransitionW>& transition_table);
     virtual ~Transducer();
 
     void write(std::ostream& os) const;

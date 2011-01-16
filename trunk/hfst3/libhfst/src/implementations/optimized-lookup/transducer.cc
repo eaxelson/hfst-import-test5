@@ -506,7 +506,7 @@ void Transducer::write(std::ostream& os) const
     for(size_t i=0;i<header->index_table_size();i++)
 	tables->get_index(i).write(os);
     for(size_t i=0;i<header->target_table_size();i++)
-	tables->get_transition(i).write(os);
+	tables->get_transition(i).write(os, header->probe_flag(Weighted));
 }
 
 Transducer * Transducer::copy(Transducer * t, bool weighted)

@@ -44,10 +44,35 @@ struct StatePlaceholder {
 	final(finality),
 	final_weight(0.0)
 	{}
+    StatePlaceholder ():
+    state_number(UINT_MAX),
+    start_index(UINT_MAX),
+	final(false),
+	final_weight(0.0)
+	{ }
     bool is_simple()
 	{
 	    return inputs.size() < 2;
 	}
+    unsigned int number_of_transitions(void) {
+	unsigned int count = 0;
+	for(std::map<SymbolNumber, std::vector<TransitionPlaceholder> >
+		::iterator it = inputs.begin(); it != inputs.end(); ++it) {
+	    count += it->second.size();
+	}
+	return count;
+    }
+    unsigned int symbol_offset(SymbolNumber symbol) {
+	unsigned int offset = 0;
+	for(std::map<SymbolNumber, std::vector<TransitionPlaceholder> >
+		::iterator it = inputs.begin(); it!= inputs.end(); ++it) {
+	    if (symbol == it->first) {
+		return offset;
+	    }
+	    offset += it->second.size();
+	}
+	throw HfstFatalException();
+    }
 };
 
 #if HAVE_OPENFST // this goes on until the end of file
@@ -396,7 +421,5 @@ public:
 #endif // HAVE_OPENFST
 
 }
-
-
 
 #endif // include guard
