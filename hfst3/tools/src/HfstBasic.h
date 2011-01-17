@@ -3,8 +3,8 @@
 
 #include <stdio.h>
 
-/** @file HfstBasic.h
-    \brief Basic functions for string handling. */
+/* @file HfstBasic.h
+   \brief Basic functions for string handling. */
 
 namespace hfst {
 namespace basic {

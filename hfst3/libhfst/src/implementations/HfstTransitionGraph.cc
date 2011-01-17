@@ -3,13 +3,13 @@
 namespace hfst { 
   namespace implementations {
 
-    HfstNameThis::Number2SymbolMap HfstNameThis::number2symbol_map;
-    Number2SymbolMapInitializer dummy1(HfstNameThis::number2symbol_map);
+    HfstTropicalTransducerTransitionData::Number2SymbolMap HfstTropicalTransducerTransitionData::number2symbol_map;
+    Number2SymbolMapInitializer dummy1(HfstTropicalTransducerTransitionData::number2symbol_map);
     
-    HfstNameThis::Symbol2NumberMap HfstNameThis::symbol2number_map;
-    Symbol2NumberMapInitializer dummy2(HfstNameThis::symbol2number_map);
+    HfstTropicalTransducerTransitionData::Symbol2NumberMap HfstTropicalTransducerTransitionData::symbol2number_map;
+    Symbol2NumberMapInitializer dummy2(HfstTropicalTransducerTransitionData::symbol2number_map);
     
-    unsigned int HfstNameThis::max_number=2;
+    unsigned int HfstTropicalTransducerTransitionData::max_number=2;
 
   }
 }

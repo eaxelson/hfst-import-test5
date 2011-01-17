@@ -17,16 +17,20 @@
       </tr>
       <tr>  
       <td>Namespaces HFST and HWFST</td>
-      <td>Namespace hfst and an ImplementationType argument</td>
+      <td>Namespace #hfst and an 
+      \link hfst::ImplementationType ImplementationType\endlink argument</td>
       </tr>
       <tr>
       <td>KeyLayer and SymbolLayer</td>
-      <td>Functions take a string argument, string-to-number mapping
+      <td>Functions take a \link hfst::String String\endlink argument, 
+      string-to-number mapping
       is done internally and automatically</td>
       </tr>
       <tr>
       <td>TransducerLayer, Rule Layer, CoreExtensionLayer</td>	
-      <td>HfstTransducer, namespace hfst::rules, class HfstTransitionGraph</td>
+      <td>\link hfst::HfstTransducer HfstTransducer\endlink, 
+      namespace \link hfst::rules rules\endlink, 
+      class \link hfst::implementations::HfstTransitionGraph HfstTransitionGraph\endlink</td>
       </tr>
       <tr>
       <td>Functions delete their transducer arguments</td> 
@@ -35,7 +39,7 @@
       </tr>
       <tr>
       <td>No unknown or identity symbols</td>
-      <td>Unknown and identity symbols are supported 
+      <td>Unknown and identity \link hfst::String symbols\endlink are supported 
       in all implementation formats</td>
       </tr>
       </table> 
@@ -597,6 +601,8 @@ and the following namespaces:
 
    - \link hfst::exceptions exceptions\endlink: A namespace for exceptions.
 
+   - \link hfst::implementations implementations\endlink: A namespace that contains HFST's own transducer format.
+
 <BR></BR>
 
    \section hfst_examples Examples of HFST functionalities
@@ -821,6 +827,9 @@ OpenFst in http://www.openfst.org and foma in http://www.aclweb.org/anthology/E/
 /** 
     @dir libhfst/src 
     @brief A directory for the HFST interface. 
+
+    The files in this directory contain the public interface
+    of HFST and internal code that is not implementation-specific.
 */
 
 /** 
@@ -832,5 +841,7 @@ OpenFst in http://www.openfst.org and foma in http://www.aclweb.org/anthology/E/
     Basicly this directory contains two files per implementation,
     for example the files SfstTransducer.h and SfstTransducer.cc 
     define the SFST implementation. 
+
+    What about HFST optimized lookup format?
 */
  
