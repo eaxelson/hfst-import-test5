@@ -21,7 +21,7 @@
 #include <string>
 #include <sstream>
 #include <iostream>
-#include "HfstAlphabet.h"
+//#include "HfstAlphabet.h"
 
 /** @file LogWeightTransducer.h
     \brief Declarations of functions and datatypes that form a bridge between
@@ -243,7 +243,7 @@ namespace implementations
     private:
       static fst::SymbolTable create_symbol_table(std::string name);
       static void initialize_symbol_tables(LogFst *t);
-      static void add_symbol_table(LogFst *t, HfstAlphabet &alpha); 
+      //static void add_symbol_table(LogFst *t, HfstAlphabet &alpha); 
       static void remove_symbol_table(LogFst *t);      
       
       static int has_arc(LogFst &t,

@@ -42,6 +42,7 @@ namespace hfst { namespace implementations
   void TropicalWeightInputStream::stream_unget(char c) {
     input_stream.putback(c); }
 
+#ifdef FOO
   void TropicalWeightTransducer::add_symbol_table(StdVectorFst *t, HfstAlphabet &alpha) 
   {
     fst::SymbolTable *st = new fst::SymbolTable("anonym_hfst3_symbol_table");
@@ -51,6 +52,7 @@ namespace hfst { namespace implementations
     t->SetInputSymbols(st);
     delete st;
   }
+#endif
 
   void TropicalWeightTransducer::remove_symbol_table(StdVectorFst *t)
   {

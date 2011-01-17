@@ -26,9 +26,9 @@ AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
 
 # HFST bridge specific stuff
 HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc HfstOutputStream.cc\
-		  HfstRules.cc HfstBasic.cc HfstUtf8.cc \
+		  HfstRules.cc \
 		  HfstSymbolDefs.cc HfstTokenizer.cc \
-		  HfstFlagDiacritics.cc HfstAlphabet.cc HfstExceptions.cc
+		  HfstFlagDiacritics.cc HfstExceptions.cc
 
 # libtool takes over
 libhfst_la_SOURCES =  $(HFST_SRCS)
@@ -48,7 +48,6 @@ HFST_HDRS = \
 	implementations/LogWeightTransducer.h \
 	implementations/FomaTransducer.h \
 	implementations/MfstlTransducer.h \
-	HfstAlphabet.h \
 	implementations/HfstOlTransducer.h \
 	HfstTokenizer.h \
 	implementations/ConvertTransducerFormat.h \
@@ -57,9 +56,7 @@ HFST_HDRS = \
 	HfstExtractStrings.h \
 	HfstFlagDiacritics.h \
 	HfstInputStream.h \
-	HfstOutputStream.h \
-	HfstBasic.h \
-	HfstUtf8.h
+	HfstOutputStream.h
 
 hfstinclude_HEADERS = $(HFST_HDRS)
 

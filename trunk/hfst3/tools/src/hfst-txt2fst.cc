@@ -157,9 +157,9 @@ process_stream(HfstOutputStream& outstream)
         {
           verbose_printf("Reading transducer table %zu...\n", transducer_n);
         }
-      HfstTransducer t = HfstTransducer::read_in_att_format(inputfile,
-                                                            output_format,
-							    std::string(epsilonname));
+      HfstTransducer t(inputfile,
+		       output_format,
+		       std::string(epsilonname));
       outstream << t;
     }
   outstream.close();
