@@ -75,7 +75,7 @@ struct StatePlaceholder {
     }
 };
 
-#if HAVE_OPENFST // this goes on until the end of file
+#if HAVE_OPENFST // Covers remainder of file
 typedef fst::StdArc::StateId StateId;
 typedef fst::StdArc StdArc;
 typedef fst::StdVectorFst TransduceR;

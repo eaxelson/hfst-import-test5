@@ -630,6 +630,7 @@ namespace hfst { namespace implementations
   hfst_basic_transducer_to_hfst_ol
   (HfstBasicTransducer * t, bool weighted)
   {
+      const unsigned int TA_OFFSET = 2147483648u;
       const std::string epstr = "@_EPSILON_SYMBOL_@";
       std::set<std::string> flag_diacritic_symbols;
       std::set<std::string> input_symbols;
@@ -648,7 +649,7 @@ namespace hfst { namespace implementations
 	  }
       }
       
-      hfst_ol::SymbolNumber seen_input_symbols = 1;
+      hfst_ol::SymbolNumber seen_input_symbols = 1; // epsilon always present
       hfst_ol::SymbolTable symbol_table;
       symbol_table.push_back(epstr);
       for (std::set<std::string>::iterator it = flag_diacritic_symbols.begin();
@@ -658,18 +659,19 @@ namespace hfst { namespace implementations
       }
       for (std::set<std::string>::iterator it = input_symbols.begin();
 	   it != input_symbols.end(); ++it) {
-	  if (!it->compare(epstr) and flag_diacritic_symbols.count(*it) == 0) {
+	  if (it->compare(epstr) and flag_diacritic_symbols.count(*it) == 0) {
 	    symbol_table.push_back(*it);
 	    ++seen_input_symbols;
 	  }
       }
       for (std::set<std::string>::iterator it = other_symbols.begin();
 	   it != other_symbols.end(); ++it) {
-	  if (!it->compare(epstr) and flag_diacritic_symbols.count(*it) and
+	  if (it->compare(epstr) and flag_diacritic_symbols.count(*it) == 0 and
 	      input_symbols.count(*it) == 0) {
 	    symbol_table.push_back(*it);
 	  }
       }
+
 
     std::map<std::string, hfst_ol::SymbolNumber> string_symbol_map;
     for (hfst_ol::SymbolTable::iterator it = symbol_table.begin();
@@ -744,13 +746,15 @@ namespace hfst { namespace implementations
     // For every state (in the TIA) thereafter, we check each available
     // starting index to see if it fits.
 
-    state_placeholders[0].start_index = 0;
-    unsigned int first_available_index = 1;
+    // The first state is special because it will have a TIA entry even if it's
+    // simple, so we deal with it every time.
+    
+    unsigned int first_available_index = 0;
     unsigned int last_used_index = 0;
     for (std::map<unsigned int, hfst_ol::StatePlaceholder>::iterator it =
 	     state_placeholders.begin();
 	 it != state_placeholders.end(); ++it) {
-	if (it->second.is_simple() or it->second.start_index != UINT_MAX) {
+	if (it->second.is_simple() and it != state_placeholders.begin()) {
 	    continue;
 	}
 	unsigned int i = first_available_index;
@@ -790,7 +794,7 @@ namespace hfst { namespace implementations
     // Now for each index entry we write its input symbol and target
 
     hfst_ol::TransducerTable<hfst_ol::TransitionWIndex> windex_table;
-    windex_table.append(hfst_ol::TransitionWIndex());
+//    windex_table.append(hfst_ol::TransitionWIndex());
     hfst_ol::TransducerTable<hfst_ol::TransitionW> wtransition_table;
 
     for(Indices::iterator it = used_indices.begin();
@@ -799,7 +803,7 @@ namespace hfst { namespace implementations
 				it->second.second,
 				first_transition_vector[it->second.first] +
 				state_placeholders[it->second.first]
-				.symbol_offset(it->second.second)));
+				.symbol_offset(it->second.second) + TA_OFFSET));
     }
     for (int i = 0; i < symbol_table.size(); ++i) {
 	windex_table.append(hfst_ol::TransitionWIndex()); // padding
@@ -814,11 +818,19 @@ namespace hfst { namespace implementations
 		 it->second.inputs.begin(); sym_it != it->second.inputs.end(); ++sym_it) {
 	    for (std::vector<hfst_ol::TransitionPlaceholder>::iterator tr_it
 		     = sym_it->second.begin(); tr_it != sym_it->second.end(); ++tr_it) {
+		// before writing each transition, find out whether its
+		// target is simple (ie. should point directly to TA entry)
+		unsigned int target;
+		if (state_placeholders[tr_it->target].is_simple()) {
+		    target = first_transition_vector[tr_it->target] + TA_OFFSET;
+		} else {
+		    target = state_placeholders[tr_it->target].start_index;
+		}
 		wtransition_table.append(
 		    hfst_ol::TransitionW(
 			sym_it->first,
 			tr_it->output,
-			state_placeholders[tr_it->target].start_index,
+			target,
 			tr_it->weight));
 	    }
 	}
