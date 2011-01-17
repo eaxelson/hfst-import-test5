@@ -38,7 +38,6 @@
 #include "implementations/MfstlTransducer.h"
 #endif
 
-#include "HfstAlphabet.h"
 #include "implementations/HfstOlTransducer.h"
 #include "HfstTokenizer.h"
 #include "implementations/ConvertTransducerFormat.h"
@@ -184,7 +183,19 @@ tr1.disjunct(tr2);
   */
   class HfstTransducer
   {
+
+    // ***** PROTECTED VARIABLES AND INTERFACE *****
+
   protected:
+
+    /* The backend implementation type of the transducer */
+    ImplementationType type; 
+
+    bool anonymous;    // currently not used
+    bool is_trie;      // currently not used
+    std::string name;  /* The name of the transducer */
+
+    /* The union of possible backend implementations. */
     union TransducerImplementation
     {
 #if HAVE_SFST
@@ -207,8 +218,11 @@ tr1.disjunct(tr2);
       hfst::implementations::StdVectorFst * internal;
 #endif 
     };
-    
-    // interfaces through which the backend implementations can be accessed
+
+    /* The backend implementation */
+    TransducerImplementation implementation;
+
+    /* Interfaces through which the backend implementations can be accessed */
 #if HAVE_SFST
     static hfst::implementations::SfstTransducer sfst_interface;
 #endif
@@ -226,15 +240,9 @@ tr1.disjunct(tr2);
     static hfst::implementations::MfstlTransducer mfstl_interface;
 #endif
 
-    // the backend implementation type of the transducer
-    ImplementationType type; 
 
-    bool anonymous; // currently not used
-    bool is_trie;   // currently not used
-    std::string name; // the name of the transducer
-
-    TransducerImplementation implementation; // the backend implementation
-
+    /* The number of states in the transducer. 
+       Used by the harmonization function. */
     unsigned int number_of_states() const;
 
     /* Harmonize transducers this and another. In harmonization, 
@@ -244,18 +252,58 @@ tr1.disjunct(tr2);
        in both transducers. */
     void harmonize(HfstTransducer &another);
 
-    // currently not implemented, TODO
+    /* Disjunct trie transducers efficiently so that the result is also
+       a trie.
+       Currently not implemented, TODO */
     HfstTransducer &disjunct_as_tries(HfstTransducer &another,
 				      ImplementationType type);  
 
-    // whether the conversion requested can be done without losing 
-    // any information
+    /* Whether the conversion requested can be done without losing 
+       any information */
     bool static is_safe_conversion(ImplementationType original, 
 				   ImplementationType conversion);
 
+    /* For debugging */
+    void print_alphabet();
+
+    /* For internal use */
+    static HfstTransducer &read_in_att_format
+      (FILE *ifile, ImplementationType type, const std::string &epsilon_symbol);
+
+    /* For internal use: whether HFST is linked to the transducer library 
+       needed by implementation type \a type. */
+    static bool is_implementation_type_available(ImplementationType type);
+
+    /* For internal use: Create a tokenizer that recognizes all symbols 
+       that occur in the transducer. */
+    HfstTokenizer create_tokenizer();
+
+    /* For internal use. Implemented only for SFST_TYPE.
+       Get all symbol pairs that occur in the transitions of the transducer. */
+    StringPairSet get_symbol_pairs();
+
+    /* For internal use, implemented only for SFST_TYPE. */	  
+    std::vector<HfstTransducer*> extract_paths();
+
+    /* For debugging. */
+    static float get_profile_seconds(ImplementationType type);
+
+    /* For internal use:
+       Create a new transducer equivalent to \a t in format \a type. */
+    static HfstTransducer &convert
+      (const HfstTransducer &t, ImplementationType type);
+
+
 #include "hfst_apply_schemas.h"
 
+
+
+    // ***** THE PUBLIC INTERFACE *****
+
   public:
+    /* This constructor should be used only inside the HfstTransducer class
+       or its friends since it leaves the backend implementation variable
+       uninitialized. */
     HfstTransducer();
 
     /** \brief Create an empty transducer, i.e. a transducer that does not 
@@ -317,7 +365,9 @@ tr1.disjunct(tr2);
     		   const HfstTokenizer &multichar_symbol_tokenizer,
 		   ImplementationType type);
 
-    // Used by HfstCompiler.cc
+    /* Constructors used by HfstCompiler.cc 
+       These contructors could be documented, since they are in the 
+       public interface.. */
     HfstTransducer(const StringPairSet & sps, ImplementationType type, 
 		   bool cyclic=false);
     HfstTransducer(const StringPairVector & spv, ImplementationType type);
@@ -331,6 +381,7 @@ tr1.disjunct(tr2);
 	@throws hfst::exceptions::NotTransducerStreamException
 	@see HfstInputStream **/
     HfstTransducer(HfstInputStream &in);
+
     /** \brief Create a deep copy of transducer \a another. **/
     HfstTransducer(const HfstTransducer &another);
 
@@ -340,9 +391,12 @@ tr1.disjunct(tr2);
     HfstTransducer(const hfst::implementations::HfstBasicTransducer &t, 
 		   ImplementationType type);
 
-    public:
     /** \brief Delete the HfstTransducer. **/
     virtual ~HfstTransducer(void);
+
+    /** @brief Assign this transducer a new value equivalent to transducer
+	\a another. */
+    HfstTransducer &operator=(const HfstTransducer &another);
 
     /** \brief Create a transducer that recognizes the string pair 
 	[symbol:symbol]. The type of the transducer is defined by \a type. 
@@ -354,9 +408,6 @@ tr1.disjunct(tr2);
 	@see String **/
     HfstTransducer(const std::string &isymbol, const std::string &osymbol, 
 		   ImplementationType type);
-
-    // for debugging
-    void print_alphabet();
 
     /** \brief Set the name of the transducer as \a name. 
 	@see get_name */
@@ -471,11 +522,6 @@ in \a ifile.
 **/
     HfstTransducer(FILE * ifile, ImplementationType type, 
 		   const std::string &epsilon_symbol);
-
-    // for internal use
-    static HfstTransducer &read_in_att_format
-      (FILE * ifile, ImplementationType type, 
-       const std::string &epsilon_symbol);
 
     /** \brief \brief Write the transducer in AT&T format to FILE 
 	named \a filename. \a write_weights
@@ -594,8 +640,6 @@ in \a ifile.
 	cycles aren't capped,
 	the search will not end until the callback returns false. */
     void extract_strings(ExtractStringsCb& callback, int cycles=-1);
-	  
-    std::vector<HfstTransducer*> extract_paths();
 
     /** \brief Extract a maximum of \a max_num string pairs that are 
 	recognized by the transducer
@@ -781,7 +825,7 @@ HfstTransducer t_transformed;
     /** \brief Compose this transducer with \a another. */
     HfstTransducer &compose(const HfstTransducer &another);
 
-#ifdef FOO
+#ifdef COMPOSE_INTERSECT_IMPLEMENTED
     /** \brief Compose this transducer with the intersection of 
 	rule transducers in \a grammar. 
 
@@ -791,7 +835,7 @@ HfstTransducer t_transformed;
 
 	@see HfstGrammar */
     HfstTransducer &compose_intersect(HfstGrammar &grammar);
-#endif
+#endif // COMPOSE_INTERSECT_IMPLEMENTED
 
     /** \brief Concatenate this transducer with \a another. */
     HfstTransducer &concatenate(const HfstTransducer &another);
@@ -814,18 +858,6 @@ HfstTransducer t_transformed;
     /** \brief The implementation type of the transducer. */
     ImplementationType get_type(void) const;
 
-
-    /* TEST */
-    static float get_profile_seconds(ImplementationType type);
-    /* Get all symbol pairs that occur in the transitions of the transducer. */
-    StringPairSet get_symbol_pairs();
-    /* Whether HFST is linked to the transducer library needed 
-       by implementation type \a type. */
-    static bool is_implementation_type_available(ImplementationType type);
-    /* Create a tokenizer that recognizes all symbols that occur 
-       in the transducer. */
-    HfstTokenizer create_tokenizer();
-
     /** \brief Convert the transducer into an equivalent transducer 
 	in format \a type. 
 
@@ -834,12 +866,6 @@ HfstTransducer t_transformed;
 	In the reverse case, all weights are initialized to the 
 	semiring's one. */
     HfstTransducer &convert(ImplementationType type);
-
-    /* \brief Create a new transducer equivalent to \a t in format \a type. 
-
-	@see convert(ImplementationType type) */
-    static HfstTransducer &convert
-      (const HfstTransducer &t, ImplementationType type);
 
 
     //! @brief Lookup or apply a single string \a s and store a maximum of 
@@ -897,17 +923,17 @@ HfstTransducer t_transformed;
     //! @brief Whether lookdown of path \a s will have infinite results.
     bool is_lookdown_infinitely_ambiguous(const HfstLookupPath& s);
 
-    HfstTransducer &operator=(const HfstTransducer &another);
+    // *** Friends **** //
+
     friend std::ostream &operator<<(std::ostream &out, const HfstTransducer &t);
     friend class HfstInputStream;
     friend class HfstOutputStream;
     friend class hfst::implementations::HfstTransitionGraph<class C, class W>;
-
-#ifdef FOO
-    friend class HfstGrammar;
-#endif
     friend class HfstCompiler;
     friend class hfst::implementations::ConversionFunctions;
+#ifdef COMPOSE_INTERSECT_IMPLEMENTED
+    friend class HfstGrammar;
+#endif // COMPOSE_INTERSECT_IMPLEMENTED
   };
 
 
@@ -944,6 +970,8 @@ HfstTransducer t_transformed;
 
 
 
+    // ***** THE PUBLIC INTERFACE *****
+
     /** \brief A transducer that obligatorily performs the mappings 
 	defined by \a mappings in the context \a context
 	when the alphabet is \a alphabet. 
@@ -965,7 +993,7 @@ alphabet = set(a, a:b, b, c, d, e, ...)
     HfstTransducer two_level_if(HfstTransducerPair &context, 
 				StringPairSet &mappings, 
 				StringPairSet &alphabet);
-
+    
     /** \brief A transducer that allows the mappings defined by 
 	\a mappings only in the context \a context,
 	when the alphabet is \a alphabet. 

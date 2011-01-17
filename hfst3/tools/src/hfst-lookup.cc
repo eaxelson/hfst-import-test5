@@ -355,7 +355,8 @@ parse_options(int argc, char** argv)
 
 int
 lookup_printf(const char* format, const char* inputform,
-              const HfstLookupPath* result, const char* markup)
+              const HfstLookupPath* result, const char* markup,
+	      FILE * ofile)
 {
     size_t space = 2 * strlen(format) +
         2 * strlen(inputform) + 10;
@@ -531,7 +532,7 @@ lookup_printf(const char* format, const char* inputform,
     free(b);
     free(i);
     free(m);
-    int rv = fprintf(message_out, "%s", res);
+    int rv = fprintf(ofile, "%s", res);
     free(res);
     return rv;
 }
@@ -988,50 +989,50 @@ lookup_cascading(const HfstLookupPath& s, vector<T> cascade,
 void
 print_lookups(const HfstLookupPaths& kvs,
               const char* s, char* markup,
-              bool outside_sigma, bool inf)
+              bool outside_sigma, bool inf, FILE * ofile)
 {
     if (outside_sigma)
       {
-        lookup_printf(unknown_begin_setf, s, NULL, markup);
-        lookup_printf(unknown_lookupf, s, NULL, markup);
-        lookup_printf(unknown_end_setf, s, NULL, markup);
+        lookup_printf(unknown_begin_setf, s, NULL, markup, ofile);
+        lookup_printf(unknown_lookupf, s, NULL, markup, ofile);
+        lookup_printf(unknown_end_setf, s, NULL, markup, ofile);
         no_analyses++;
       }
     else if (kvs.size() == 0)
       {
-        lookup_printf(empty_begin_setf, s, NULL, markup);
-        lookup_printf(empty_lookupf, s, NULL, markup);
-        lookup_printf(empty_end_setf, s, NULL, markup);
+        lookup_printf(empty_begin_setf, s, NULL, markup, ofile);
+        lookup_printf(empty_lookupf, s, NULL, markup, ofile);
+        lookup_printf(empty_end_setf, s, NULL, markup, ofile);
         no_analyses++;
       }
     else if (inf)
       {
         analysed++;
-        lookup_printf(infinite_begin_setf, s, NULL, markup);
+        lookup_printf(infinite_begin_setf, s, NULL, markup, ofile);
         for (HfstLookupPaths::const_iterator lkv = kvs.begin();
                 lkv != kvs.end();
                 ++lkv)
           {
             HfstLookupPath lup = *lkv;
-            lookup_printf(infinite_lookupf, s, &lup, markup);
+            lookup_printf(infinite_lookupf, s, &lup, markup, ofile);
             analyses++;
           }
-        lookup_printf(infinite_end_setf, s, NULL, markup);
+        lookup_printf(infinite_end_setf, s, NULL, markup, ofile);
       }
     else
       {
         analysed++;
 
-        lookup_printf(begin_setf, s, NULL, markup);
+        lookup_printf(begin_setf, s, NULL, markup, ofile);
         for (HfstLookupPaths::const_iterator lkv = kvs.begin();
                 lkv != kvs.end();
                 ++lkv)
           {
             HfstLookupPath lup = *lkv;
-            lookup_printf(lookupf, s, &lup, markup);
+            lookup_printf(lookupf, s, &lup, markup, ofile);
             analyses++;
         }
-        lookup_printf(end_setf, s, NULL, markup);
+        lookup_printf(end_setf, s, NULL, markup, ofile);
       }
 }
 
@@ -1131,7 +1132,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                                                          unknown,
                                                          &infinite);
           }
-        print_lookups(*kvs, line, markup, unknown, infinite);
+        print_lookups(*kvs, line, markup, unknown, infinite, outstream);
         delete kv;
         delete kvs;
       } // while lines in input

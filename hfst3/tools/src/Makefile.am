@@ -133,7 +133,7 @@ endif
 
 noinst_HEADERS= \
 	calculate_functions.h hfst-commandline.h hfst-program-options.h \
-	hfst-compiler.h HfstCompiler.h parsers/XreCompiler.h \
+	hfst-compiler.h HfstCompiler.h HfstBasic.h HfstAlphabet.h HfstUtf8.h parsers/XreCompiler.h \
 	parsers/xre_utils.h \
 	inc/check-params-binary.h inc/check-params-common.h \
 	inc/check-params-unary.h  inc/getopt-cases-binary.h \
@@ -164,7 +164,7 @@ bin_SCRIPTS=$(MAYBE_ALIASES)
 
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc
 # sort alphabetically
-hfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy HfstCompiler.cc $(HFST_COMMON_SRC)
+hfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy HfstCompiler.cc HfstBasic.cc HfstAlphabet.cc HfstUtf8.cc $(HFST_COMMON_SRC)
 hfst_compare_SOURCES=hfst-compare.cc $(HFST_COMMON_SRC)
 #hfst_compose_intersect_SOURCES=hfst-compose-intersect.cc $(HFST_COMMON_SRC)
 hfst_compose_SOURCES=hfst-compose.cc $(HFST_COMMON_SRC)
