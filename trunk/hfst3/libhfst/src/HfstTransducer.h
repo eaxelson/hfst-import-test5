@@ -63,8 +63,8 @@ namespace hfst
 
   namespace implementations {    
     template <class T, class W> class HfstTransitionGraph;
-    class HfstNameThis;
-    typedef HfstTransitionGraph<HfstNameThis, float> HfstBasicTransducer; 
+    class HfstTropicalTransducerTransitionData;
+    typedef HfstTransitionGraph<HfstTropicalTransducerTransitionData, float> HfstBasicTransducer; 
   }
   class HfstCompiler;
   class HfstTransducer;

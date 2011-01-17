@@ -20,14 +20,19 @@ namespace hfst {
   class HfstTransducer;
 
   /** @brief A namespace for all code that forms a bridge between
-      backend libraries and HFST or is not else directly accessible
-      through the HFST API. */
+      backend libraries and HFST.
+
+      Most code in this namespace is not intended to be accessed
+      by the user of the HFST interface. An exception is HFST's
+      own transducer class #HfstTransitionGraph and classes that
+      are needed to use it.
+  */
   namespace implementations {
 
     /** @brief The number of a state in an HfstTransitionGraph. */
     typedef unsigned int HfstState;
 
-    // Needed by class HfstNameThis
+    // Needed by class HfstTropicalTransducerTransitionData
     struct string_comparison {
       bool operator() (const std::string &str1, const std::string &str2) const {
 	return (str1.compare(str2) < 0);
@@ -37,16 +42,16 @@ namespace hfst {
     /** @brief One implementation of template class C in 
 	HfstTransition. 
 
-	A HfstNameThis has an input symbol and an output symbol of type
+	A HfstTropicalTransducerTransitionData has an input symbol and an output symbol of type
 	SymbolType (string) and a weight of type WeightType (float).
 
-	\internal Actually a HfstNameThis has an input and an output number
+	\internal Actually a HfstTropicalTransducerTransitionData has an input and an output number
 	of type unsigned int, but this implementation is hidden from the user.
 	The class has two static maps and functions that take care of conversion
 	between strings and internal numbers.
 
 	@see HfstTransition HfstBasicTransition */
-    class HfstNameThis {
+    class HfstTropicalTransducerTransitionData {
     public:
       /** @brief The input and output symbol type. */
       typedef std::string SymbolType;
@@ -72,7 +77,7 @@ namespace hfst {
 	Number2SymbolMap::const_iterator it = number2symbol_map.find(number);
 	if (it == number2symbol_map.end()) {
 	  fprintf(stderr, "ERROR: "
-		  "HfstNameThis::get_symbol(unsigned int number) "
+		  "HfstTropicalTransducerTransitionData::get_symbol(unsigned int number) "
 		  "number is not mapped to any symbol\n");
 	  throw hfst::exceptions::HfstInterfaceException();
 	}
@@ -99,20 +104,20 @@ namespace hfst {
 
     public:
 
-      /** @brief Create a HfstNameThis with epsilon input and output
+      /** @brief Create a HfstTropicalTransducerTransitionData with epsilon input and output
 	  strings and weight zero. */
-    HfstNameThis(): input_number(0), output_number(0), weight(0) {}
+    HfstTropicalTransducerTransitionData(): input_number(0), output_number(0), weight(0) {}
 
-      /** @brief Create a deep copy of HfstNameThis \a data. */
-      HfstNameThis(const HfstNameThis &data) {
+      /** @brief Create a deep copy of HfstTropicalTransducerTransitionData \a data. */
+      HfstTropicalTransducerTransitionData(const HfstTropicalTransducerTransitionData &data) {
 	input_number = data.input_number;
 	output_number = data.output_number;
 	weight = data.weight;
       }
 
-      /** @brief Create a HfstNameThis with input symbol \a 
+      /** @brief Create a HfstTropicalTransducerTransitionData with input symbol \a 
 	  isymbol, output symbol \a osymbol and weight \a weight. */
-      HfstNameThis(SymbolType isymbol,
+      HfstTropicalTransducerTransitionData(SymbolType isymbol,
 		     SymbolType osymbol,
 		     WeightType weight) {
 	input_number = get_number(isymbol);
@@ -151,7 +156,7 @@ namespace hfst {
 
 	  /internal is it too slow if strin comparison is used instead?
       */
-      bool operator<(const HfstNameThis &another) const {
+      bool operator<(const HfstTropicalTransducerTransitionData &another) const {
 	if (input_number < another.input_number )
 	  return true;
 	if (input_number > another.input_number)
@@ -167,10 +172,10 @@ namespace hfst {
       friend class Symbol2NumberMapInitializer;
     };
 
-    // Initialization of static members in class HfstNameThis..
+    // Initialization of static members in class HfstTropicalTransducerTransitionData..
     class Number2SymbolMapInitializer {
     public:
-      Number2SymbolMapInitializer(HfstNameThis::Number2SymbolMap &map) {
+      Number2SymbolMapInitializer(HfstTropicalTransducerTransitionData::Number2SymbolMap &map) {
 	map[0] = std::string("@_EPSILON_SYMBOL_@");
 	map[1] = std::string("@_UNKNOWN_SYMBOL_@");
 	map[2] = std::string("@_IDENTITY_SYMBOL_@");
@@ -179,7 +184,7 @@ namespace hfst {
 
     class Symbol2NumberMapInitializer {
     public:
-      Symbol2NumberMapInitializer(HfstNameThis::Symbol2NumberMap &map) {
+      Symbol2NumberMapInitializer(HfstTropicalTransducerTransitionData::Symbol2NumberMap &map) {
 	map["@_EPSILON_SYMBOL_@"] = 0;
 	map["@_UNKNOWN_SYMBOL_@"] = 1;
 	map["@_IDENTITY_SYMBOL_@"] = 2;
@@ -264,12 +269,12 @@ namespace hfst {
       };
 
     /** @brief An HfstTransition with transition data of type
-	HfstNameThis. 
+	HfstTropicalTransducerTransitionData. 
 
 	This implementation is compatible with #HfstBasicTransducer.
 
-	@see HfstNameThis HfstBasicTransducer */
-    typedef HfstTransition<HfstNameThis> HfstBasicTransition;
+	@see HfstTropicalTransducerTransitionData HfstBasicTransducer */
+    typedef HfstTransition<HfstTropicalTransducerTransitionData> HfstBasicTransition;
 
     /** @brief A simple transition graph format that consists of
 	states and transitions between those states.
@@ -283,9 +288,9 @@ namespace hfst {
 
        Probably the easiest way to use this template is to choose
        the implementations #HfstBasicTransducer 
-       (HfstTransitionGraph<HfstNameThis, float>)
-       and #HfstBasicTransition (HfstTransition<HfstNameThis>).
-       The class HfstNameThis contains an input string, an output string
+       (HfstTransitionGraph<HfstTropicalTransducerTransitionData, float>)
+       and #HfstBasicTransition (HfstTransition<HfstTropicalTransducerTransitionData>).
+       The class HfstTropicalTransducerTransitionData contains an input string, an output string
        and a float weight. HfstBasicTransducer is the implementation that is
        used as an example in this documentation.
 
@@ -388,7 +393,7 @@ namespace hfst {
 	/** @brief Create an HfstTransitionGraph equivalent to HfstTransducer 
 	    \a transducer. */
 	HfstTransitionGraph(const hfst::HfstTransducer &transducer) {
-	  HfstTransitionGraph<HfstNameThis, float> *fsm = 
+	  HfstTransitionGraph<HfstTropicalTransducerTransitionData, float> *fsm = 
 	    ConversionFunctions::
 	      hfst_transducer_to_hfst_basic_transducer(transducer);
 	  max_state = fsm->max_state;
@@ -860,7 +865,8 @@ namespace hfst {
 		    for (StringSet::const_iterator it1 = unknown_set.begin();
 			 it1 != unknown_set.end(); it1++)
 		      {
-			for (StringSet::const_iterator it2 = unknown_set.begin();
+			for (StringSet::const_iterator it2 
+			       = unknown_set.begin();
 			     it2 != unknown_set.end(); it2++)
 			  {
 			    if (it1->compare(*it2) != 0)
@@ -1259,7 +1265,8 @@ namespace hfst {
 \endverbatim
             when harmonized.
  	    The symbol "?" means \@_UNKNOWN_SYMBOL_\@ in either or 
-	    both sides of a transition (transitions of type [?:x], [x:?] and [?:?]).
+	    both sides of a transition 
+	    (transitions of type [?:x], [x:?] and [?:?]).
 	    The transition [?] means [\@_IDENTITY_SYMBOL_\@].
 
 	    @note This function is always called for arguments of functions
@@ -1383,11 +1390,11 @@ namespace hfst {
 	friend class ConversionFunctions;
       };
 
-    /** @brief An HfstTransitionGraph with transitions of type HfstNameThis and 
+    /** @brief An HfstTransitionGraph with transitions of type HfstTropicalTransducerTransitionData and 
 	weight type float.
 	
 	This is probably the most useful kind of HfstTransitionGraph. */
-    typedef HfstTransitionGraph <HfstNameThis, float> HfstBasicTransducer;
+    typedef HfstTransitionGraph <HfstTropicalTransducerTransitionData, float> HfstBasicTransducer;
 
   }
    

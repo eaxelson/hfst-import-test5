@@ -2320,7 +2320,7 @@ HfstTransducer::HfstTransducer(FILE * ifile,
   // Implemented only for internal transducer format.
   hfst::implementations::HfstBasicTransducer net =
     hfst::implementations::HfstTransitionGraph<hfst::implementations::
-      HfstNameThis,float>::
+      HfstTropicalTransducerTransitionData,float>::
         read_in_att_format(ifile, std::string(epsilon_symbol));
 
   // Conversion is done here.
@@ -2380,7 +2380,7 @@ HfstTransducer &HfstTransducer::read_in_att_format
     throw hfst::exceptions::ImplementationTypeNotAvailableException();
   hfst::implementations::HfstBasicTransducer net =
     hfst::implementations::HfstTransitionGraph<hfst::implementations::
-      HfstNameThis,float>
+      HfstTropicalTransducerTransitionData,float>
         ::read_in_att_format(ifile, std::string(epsilon_symbol));
   HfstTransducer *retval = new HfstTransducer(net,type);
   return *retval;
