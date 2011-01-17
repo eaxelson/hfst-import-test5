@@ -670,6 +670,8 @@ namespace hfst { namespace implementations
 	    symbol_table.push_back(*it);
 	  }
       }
+
+      std::cerr << "1\n";
       
     std::map<std::string, hfst_ol::SymbolNumber> string_symbol_map;
     for (hfst_ol::SymbolTable::iterator it = symbol_table.begin();
@@ -707,6 +709,8 @@ namespace hfst { namespace implementations
 		.inputs[string_symbol_map[tr_it->get_input_symbol()]].push_back(trans);
 	}
     }
+
+    std::cerr << "2\n";
 	
     class Indices: public std::map<unsigned int,
 	std::pair<unsigned int, hfst_ol::SymbolNumber> >
@@ -775,6 +779,8 @@ namespace hfst { namespace implementations
 	}
     }
 
+    std::cerr << "3\n";
+
     // Now we figure out where each state in the transition array begins.
     
     std::vector<unsigned int> first_transition_vector;
@@ -786,6 +792,8 @@ namespace hfst { namespace implementations
 	    first_transition_vector[it->first] +
 	    it->second.number_of_transitions() + 1);
     }
+
+    std::cerr << "4\n";
 
     // Now for each index entry we write its input symbol and target
 
@@ -805,13 +813,15 @@ namespace hfst { namespace implementations
 	windex_table.append(hfst_ol::TransitionWIndex()); // padding
     }
 
+    std::cerr << "5\n";
+
     //  For each state, write its entries in the transition array.
 
     for (std::map<unsigned int, hfst_ol::StatePlaceholder>::iterator it =
 	     state_placeholders.begin(); it != state_placeholders.end(); ++it) {
 	for (std::map<hfst_ol::SymbolNumber,
 		 std::vector<hfst_ol::TransitionPlaceholder> >::iterator sym_it =
-		 it->second.inputs.begin(); sym_it != it->second.inputs.end(); sym_it) {
+		 it->second.inputs.begin(); sym_it != it->second.inputs.end(); ++sym_it) {
 	    for (std::vector<hfst_ol::TransitionPlaceholder>::iterator tr_it
 		     = sym_it->second.begin(); tr_it != sym_it->second.end(); ++tr_it) {
 		wtransition_table.append(
@@ -827,6 +837,8 @@ namespace hfst { namespace implementations
 		it->second.final, it->second.final_weight));
     }
 
+    std::cerr << "6\n";
+
     hfst_ol::TransducerAlphabet alphabet(symbol_table);
     hfst_ol::TransducerHeader header(seen_input_symbols,
 				     symbol_table.size(),
@@ -838,6 +850,8 @@ namespace hfst { namespace implementations
 				   alphabet,
 				   windex_table,
 				   wtransition_table);
+
+    std::cerr << "7\n";
 
   }
 
