@@ -201,10 +201,12 @@ namespace hfst
 	implementation.mfstl->write(c);
 	break;
 #endif
-#if HAVE_HFST_OL
+	// we always have HFST_OL, right?
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
 	implementation.hfst_ol->write(c);
 	break;
-#endif
+	
       default:
 	assert(false);
       }
