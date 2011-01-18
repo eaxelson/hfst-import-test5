@@ -21,13 +21,7 @@
 #  include <config.h>
 #endif
 
-
-#include <iostream>
 #include <fstream>
-#include <map>
-
-using std::map;
-
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
@@ -37,6 +31,9 @@ using std::map;
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
 #include "implementations/HfstTransitionGraph.h"
+
+using std::map;
+using std::string;
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
