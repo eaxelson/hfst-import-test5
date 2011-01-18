@@ -4,16 +4,15 @@
  * @brief implements xre routines.
  */
 
-#include <map>
-
-using std::map;
-
 #include <cassert>
 #include <cstdlib>
 #include <cstring>
 
 #include "xre_utils.h"
 #include "HfstTransducer.h"
+
+using std::string;
+using std::map;
 
 extern char* xretext;
 extern int xreparse();
