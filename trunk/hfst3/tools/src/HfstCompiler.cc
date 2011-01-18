@@ -33,6 +33,8 @@ using hfst::implementations::HfstTransitionGraph;
 using hfst::implementations::HfstBasicTransducer;
 using hfst::implementations::HfstState;
 
+using std::cerr;
+
 namespace hfst
 {
 
