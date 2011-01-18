@@ -54,6 +54,9 @@ using hfst::HfstLookupPath;
 using hfst::HfstLookupPaths;
 using hfst::exceptions::NotTransducerStreamException;
 
+using std::string;
+using std::vector;
+
 // add tools-specific variables here
 static char* lookup_file_name;
 static FILE* lookup_file;
