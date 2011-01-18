@@ -793,19 +793,31 @@ namespace hfst { namespace implementations
 
     // Now for each index entry we write its input symbol and target
 
+
     hfst_ol::TransducerTable<hfst_ol::TransitionWIndex> windex_table;
-//    windex_table.append(hfst_ol::TransitionWIndex());
+    // First we note the finality of the starting state
+    if (state_placeholders[0].final) {
+	windex_table.append(hfst_ol::TransitionWIndex::create_final());
+    } else {
+	windex_table.append(hfst_ol::TransitionWIndex());
+    }
     hfst_ol::TransducerTable<hfst_ol::TransitionW> wtransition_table;
 
-    for(Indices::iterator it = used_indices.begin();
-	it != used_indices.end(); ++it) {
-	windex_table.append(hfst_ol::TransitionWIndex(
-				it->second.second,
-				first_transition_vector[it->second.first] +
-				state_placeholders[it->second.first]
-				.symbol_offset(it->second.second) + TA_OFFSET));
+    Indices::iterator tmp_it = used_indices.end();
+    --tmp_it;
+    for(unsigned int i = 0; i <= tmp_it->first; ++i) {
+	if (used_indices.count(i) == 0) { // blank entries
+	    windex_table.append(hfst_ol::TransitionWIndex());
+	} else { // nonblank entries
+	    windex_table.append(hfst_ol::TransitionWIndex(
+				    used_indices[i].second,
+				    first_transition_vector[used_indices[i].first] +
+				    state_placeholders[used_indices[i].first]
+				    .symbol_offset(used_indices[i].second) + TA_OFFSET));
+	}
     }
-    for (int i = 0; i < symbol_table.size(); ++i) {
+    
+    for (unsigned int i = 0; i <= symbol_table.size(); ++i) {
 	windex_table.append(hfst_ol::TransitionWIndex()); // padding
     }
 
@@ -813,16 +825,27 @@ namespace hfst { namespace implementations
 
     for (std::map<unsigned int, hfst_ol::StatePlaceholder>::iterator it =
 	     state_placeholders.begin(); it != state_placeholders.end(); ++it) {
+
+	// Write a finality marker unless this is the first state,
+	// the finality of which is determined by the index table
+	if (it->first != 0) {
+	    wtransition_table.append(
+		hfst_ol::TransitionW(
+		    it->second.final, it->second.final_weight));
+	}
+	
+	// Then we iterate through the symbols each state has
 	for (std::map<hfst_ol::SymbolNumber,
 		 std::vector<hfst_ol::TransitionPlaceholder> >::iterator sym_it =
 		 it->second.inputs.begin(); sym_it != it->second.inputs.end(); ++sym_it) {
+	    // And write each transition
 	    for (std::vector<hfst_ol::TransitionPlaceholder>::iterator tr_it
 		     = sym_it->second.begin(); tr_it != sym_it->second.end(); ++tr_it) {
 		// before writing each transition, find out whether its
 		// target is simple (ie. should point directly to TA entry)
 		unsigned int target;
 		if (state_placeholders[tr_it->target].is_simple()) {
-		    target = first_transition_vector[tr_it->target] + TA_OFFSET;
+		    target = first_transition_vector[tr_it->target] + TA_OFFSET - 1;
 		} else {
 		    target = state_placeholders[tr_it->target].start_index;
 		}
@@ -834,10 +857,10 @@ namespace hfst { namespace implementations
 			tr_it->weight));
 	    }
 	}
-	wtransition_table.append(
-	    hfst_ol::TransitionW(
-		it->second.final, it->second.final_weight));
     }
+    // one final padding transition
+    wtransition_table.append(hfst_ol::TransitionW(
+				 false, hfst_ol::INFINITE_WEIGHT));
 
     hfst_ol::TransducerAlphabet alphabet(symbol_table);
     hfst_ol::TransducerHeader header(seen_input_symbols,
