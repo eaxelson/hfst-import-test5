@@ -813,7 +813,7 @@ namespace hfst { namespace implementations
   LogFst * LogWeightInputStream::read_transducer()
   {
     if (is_eof())
-      { throw FileIsClosedException(); }
+      { throw StreamIsClosedException(); }
     LogFst * t;
     FstHeader header;
     try 

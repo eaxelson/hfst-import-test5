@@ -693,7 +693,7 @@ namespace hfst
       input_stream = &std::cin;
       type = stream_fst_type();
     }
-    catch (hfst::implementations::FileNotReadableException e)
+    catch (hfst::implementations::StreamNotReadableException e)
       { throw e; }
     if ( not HfstTransducer::is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
@@ -754,7 +754,7 @@ namespace hfst
 	type = stream_fst_type();
       }
     }
-    catch (hfst::implementations::FileNotReadableException e)
+    catch (hfst::implementations::StreamNotReadableException e)
       { throw e; }
     if ( not HfstTransducer::is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();

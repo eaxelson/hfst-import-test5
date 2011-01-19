@@ -822,7 +822,7 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightInputStream::read_transducer()
   {
     if (is_eof())
-      { throw FileIsClosedException(); }
+      { throw StreamIsClosedException(); }
     StdVectorFst * t;
     FstHeader header;
     try 

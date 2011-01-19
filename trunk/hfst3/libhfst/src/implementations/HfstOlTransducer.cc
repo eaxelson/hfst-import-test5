@@ -142,7 +142,7 @@ void HfstOlInputStream::ignore(unsigned int n)
   hfst_ol::Transducer * HfstOlInputStream::read_transducer(bool has_header)
   {
     if (is_eof())
-      { throw FileIsClosedException(); }
+      { throw StreamIsClosedException(); }
     try 
     {
       if (has_header)

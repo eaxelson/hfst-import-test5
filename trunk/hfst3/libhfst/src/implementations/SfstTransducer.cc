@@ -41,7 +41,7 @@ namespace hfst { namespace implementations {
     else {
       input_file = fopen(filename.c_str(),"r");
       if (input_file == NULL)
-	{ throw FileNotReadableException(); }
+	{ throw StreamNotReadableException(); }
     }
   }
 
@@ -301,7 +301,7 @@ namespace hfst { namespace implementations {
     Transducer * SfstInputStream::read_transducer()
   {
     if (is_eof())
-      { throw FileIsClosedException(); }
+      { throw StreamIsClosedException(); }
     Transducer * t = NULL;
     try 
       {
@@ -334,7 +334,7 @@ namespace hfst { namespace implementations {
     if (filename != std::string()) {
       ofile = fopen(filename.c_str(), "wb");
       if (ofile == NULL)
-	throw FileNotReadableException();
+	throw StreamNotReadableException();
     } 
     else
       ofile = stdout;

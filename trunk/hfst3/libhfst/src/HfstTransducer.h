@@ -552,7 +552,7 @@ in \a ifile.
 
 	@pre The file exists, otherwise an exception is thrown.
 	@see HfstTransducer(FILE, ImplementationType, const std::string&)
-	@throws hfst::exceptions::FileNotReadableException hfst::exceptions::NotValidAttFormatException */
+	@throws hfst::exceptions::StreamNotReadableException hfst::exceptions::NotValidAttFormatException */
     static HfstTransducer &read_in_att_format
       (const std::string &filename, ImplementationType type, 
        const std::string &epsilon_symbol);
@@ -686,7 +686,7 @@ in \a ifile.
 
 	The same conditions that apply for the #extract_strings function
 	apply also for this one.
-	Flag diacritics are of the form @[A-Z][.][A-Z]+([.][A-Z]+)?@ An example:
+	Flag diacritics are of the form @[PNDRCU][.][A-Z]+([.][A-Z]+)?@ An example:
 \verbatim
 TODO...
 \endverbatim

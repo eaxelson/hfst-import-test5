@@ -10,8 +10,8 @@
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-/** \file HfstApply.cc 
-    \brief HFST transducer functions that take several parameters are handled here. 
+/* \file HfstApply.cc 
+   \brief HFST transducer functions that take several parameters are handled here. 
  */
 
 #include "HfstTransducer.h"
