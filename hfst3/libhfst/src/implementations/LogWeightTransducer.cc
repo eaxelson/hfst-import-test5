@@ -59,7 +59,7 @@ namespace hfst { namespace implementations
     t->SetInputSymbols(NULL);
   }
 
-  StringSet LogWeightTransducer::get_string_set(LogFst *t)
+  StringSet LogWeightTransducer::get_alphabet(LogFst *t)
   {
     assert(t->InputSymbols() != NULL);
     StringSet s;
@@ -684,8 +684,8 @@ namespace hfst { namespace implementations
     StringSet unknown_t1;    // symbols known to another but not this
     StringSet unknown_t2;    // and vice versa
 
-    StringSet t1_symbols = get_string_set(t1);
-    StringSet t2_symbols = get_string_set(t2);
+    StringSet t1_symbols = get_alphabet(t1);
+    StringSet t2_symbols = get_alphabet(t2);
     collect_unknown_sets(t1_symbols, unknown_t1,
 			 t2_symbols, unknown_t2);
     

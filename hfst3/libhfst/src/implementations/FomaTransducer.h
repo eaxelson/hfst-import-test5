@@ -127,6 +127,8 @@ namespace hfst {
 				  int cycles=-1, FdTable<int>* fd=NULL, bool filter_fd=false);
       
       static FdTable<int>* get_flag_diacritics(fsm * t);
+
+      static StringSet get_alphabet(fsm *t);
       
       static void harmonize(fsm *net1, fsm *net2);
 

@@ -146,9 +146,10 @@ namespace implementations
       float get_profile_seconds();
       static unsigned int number_of_states(Transducer *t);
 
+      static StringSet get_alphabet(Transducer *t);
+
     protected:
       static void initialize_alphabet(Transducer *t);
-      static StringSet get_string_set(Transducer *t);
       static Transducer * expand_arcs(Transducer * t, StringSet &unknown);
 
       static void expand_node( Transducer *t, Node *origin, Label &l, 
