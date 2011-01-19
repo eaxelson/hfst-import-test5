@@ -229,7 +229,7 @@ namespace implementations
 				       const NumberPair old_number_pair,
 				       LogFst *transducer);
 
-      static StringSet get_string_set(LogFst *t);
+      static StringSet get_alphabet(LogFst *t);
       static NumberNumberMap create_mapping(LogFst * t1, LogFst * t2);
       //static std::vector<unsigned int> create_mapping(LogFst * t1, LogFst * t2);
       static void recode_symbol_numbers(LogFst * t, hfst::NumberNumberMap &km);      

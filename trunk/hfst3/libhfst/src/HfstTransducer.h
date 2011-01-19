@@ -252,6 +252,16 @@ tr1.disjunct(tr2);
        in both transducers. */
     void harmonize(HfstTransducer &another);
 
+    /* Check if transducer \a another has in its alphabet flag diacritics
+       that are not found in the alphabet of this transducer and insert
+       all missing flag diacritics to \a missing_flags. 
+       \a return_on_first_miss defines whether the function returns as soon as
+       a missing flag is found so that only that flag is inserted to
+       \a missing flags. */
+    bool check_for_missing_flags_in(const HfstTransducer &another,
+				    StringSet &missing_flags,
+				    bool return_on_first_miss) const;
+
     /* Disjunct trie transducers efficiently so that the result is also
        a trie.
        Currently not implemented, TODO */
@@ -281,6 +291,8 @@ tr1.disjunct(tr2);
     /* For internal use. Implemented only for SFST_TYPE.
        Get all symbol pairs that occur in the transitions of the transducer. */
     StringPairSet get_symbol_pairs();
+
+    StringSet get_alphabet() const;
 
     /* For internal use, implemented only for SFST_TYPE. */	  
     std::vector<HfstTransducer*> extract_paths();
@@ -683,6 +695,18 @@ TODO...
     void extract_strings_fd
       (WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1, 
        bool filter_fd=true);
+
+    /* For commandline programs. */
+
+    /* For each flag diacritic fd that is included in the alphabet of
+       transducer \a another but not in the alphabet of this transducer,
+       insert freely a transition fd:fd in this transducer. */
+    void insert_freely_missing_flags_from
+      (const HfstTransducer &another);
+
+    /* Whether the alphabet of transducer \a another includes flag diacritics
+       that are not included in the alphabet of this transducer. */
+    bool check_for_missing_flags_in(const HfstTransducer &another) const;
 
     /** \brief Freely insert symbol pair \a symbol_pair into the transducer. */
     HfstTransducer &insert_freely(const StringPair &symbol_pair);

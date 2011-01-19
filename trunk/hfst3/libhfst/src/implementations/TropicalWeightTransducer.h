@@ -228,7 +228,7 @@ namespace implementations
 				       const NumberPair old_number_pair,
 				       StdVectorFst *transducer);
 
-      static StringSet get_string_set(StdVectorFst *t);
+      static StringSet get_alphabet(StdVectorFst *t);
       static NumberNumberMap create_mapping(StdVectorFst * t1, StdVectorFst * t2);
       //static std::vector<unsigned int> create_mapping(StdVectorFst * t1, StdVectorFst * t2);
       static void recode_symbol_numbers(StdVectorFst * t, hfst::NumberNumberMap &km);      

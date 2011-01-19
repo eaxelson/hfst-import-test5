@@ -115,6 +115,33 @@ namespace hfst
       throw hfst::exceptions::FunctionNotImplementedException();
   }
 
+  StringSet HfstTransducer::get_alphabet() const
+  {
+    switch(type)
+      {
+#if HAVE_SFST
+      case SFST_TYPE:
+        return sfst_interface.get_alphabet(implementation.sfst);
+#endif
+#if HAVE_OPENFST
+      case TROPICAL_OFST_TYPE:
+        return tropical_ofst_interface.get_alphabet
+	  (implementation.tropical_ofst);
+      case LOG_OFST_TYPE:
+        return log_ofst_interface.get_alphabet(implementation.log_ofst);
+#endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+        return foma_interface.get_alphabet(implementation.foma);
+#endif
+      case ERROR_TYPE:
+        throw hfst::exceptions::TransducerHasWrongTypeException();
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+      default:
+        throw hfst::exceptions::FunctionNotImplementedException("get_alphabet");
+    }    
+  }
 
 
   // *** HARMONIZATION FUNCTIONS... ***
@@ -1280,6 +1307,53 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
     
     ExtractStringsCb_ cb(results, max_num);
     extract_strings_fd(cb, cycles, filter_fd);
+  }
+
+  bool HfstTransducer::check_for_missing_flags_in
+  (const HfstTransducer &another,
+   StringSet &missing_flags,
+   bool return_on_first_miss) const
+  {
+    bool retval=false;
+    StringSet this_alphabet = get_alphabet();
+    StringSet another_alphabet = another.get_alphabet();
+
+    for (StringSet::const_iterator it = another_alphabet.begin();
+	 it != another_alphabet.end(); it++)
+      {
+	if ( FdOperation::is_diacritic(*it) && 
+	     (this_alphabet.find(*it) == this_alphabet.end()) )
+	  {
+	    missing_flags.insert(*it);
+	    retval = true;
+	    if (return_on_first_miss)
+	      return retval;
+	  }
+      }
+    return retval;
+  }
+
+  void HfstTransducer::insert_freely_missing_flags_from
+    (const HfstTransducer &another) 
+  {
+    StringSet missing_flags;
+    if (check_for_missing_flags_in(another, missing_flags,
+				   false /* do not return on first miss */ ))
+      {
+	for (StringSet::const_iterator it = missing_flags.begin();
+	     it != missing_flags.end(); it++)
+	  {
+	    insert_freely(StringPair(*it, *it));
+	  }
+      }
+  }
+
+  bool HfstTransducer::check_for_missing_flags_in
+    (const HfstTransducer &another) const
+  {
+    StringSet foo; /* An obligatory argument that is not used. */
+    return check_for_missing_flags_in(another, foo, 
+				      true /* return on first miss */);
   }
 
   HfstTransducer &HfstTransducer::insert_freely

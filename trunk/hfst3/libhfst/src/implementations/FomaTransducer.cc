@@ -744,6 +744,18 @@ namespace hfst { namespace implementations {
     }
   }
   
+  StringSet FomaTransducer::get_alphabet(fsm *t)
+  {
+    StringSet alpha;
+    for(struct sigma* p = t->sigma; p!=NULL; p=p->next)
+    {
+      if (p->symbol == NULL)
+        break;
+      alpha.insert(std::string(p->symbol));
+    }
+    return alpha;
+  }
+
   FdTable<int>* FomaTransducer::get_flag_diacritics(fsm * t)
   {
     FdTable<int>* table = new FdTable<int>();

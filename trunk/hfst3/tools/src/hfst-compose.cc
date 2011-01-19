@@ -45,6 +45,8 @@ using hfst::exceptions::NotTransducerStreamException;
 #include "inc/globals-common.h"
 #include "inc/globals-binary.h"
 
+static bool insert_missing_flags=false;
+
 void
 print_usage()
 {
@@ -54,6 +56,11 @@ print_usage()
         "\n", program_name );
         print_common_program_options(message_out);
         print_common_binary_program_options(message_out);
+	fprintf(message_out,
+		"Flag diacritics:\n"
+		"  -F, --insert-missing-flags  Insert missing flag "
+		"diacritics from\n                              "
+		"one transducer to another\n"); 
         fprintf(message_out, "\n");
         print_common_binary_program_parameter_instructions(message_out);
         fprintf(message_out, "\n");
@@ -78,11 +85,12 @@ parse_options(int argc, char** argv)
         {
           HFST_GETOPT_COMMON_LONG,
           HFST_GETOPT_BINARY_LONG,
+	  {"insert-missing-flags", no_argument, 0, 'F'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_BINARY_SHORT,
+                             HFST_GETOPT_BINARY_SHORT "F",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -92,6 +100,9 @@ parse_options(int argc, char** argv)
         {
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-binary.h"
+	case 'F':
+	  insert_missing_flags=true;
+	  break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -131,6 +142,39 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
         }
         HfstTransducer first(firststream);
         HfstTransducer second(secondstream);
+
+	if (first.check_for_missing_flags_in(second)) 
+	  {
+	    if (not insert_missing_flags)
+	      {
+		if (not silent) 
+		  {
+		    warning(0, 0, "Warning: %s contains flag diacritics not "
+			    "found in %s\n", secondfilename, firstfilename);
+		}
+	      }
+	    else
+	      {
+		first.insert_freely_missing_flags_from(second);
+	      }
+	}
+
+	if (second.check_for_missing_flags_in(first)) 
+	  {
+	    if (not insert_missing_flags)
+	      {
+		if (not silent)
+		  {
+		    warning(0, 0, "Warning: %s contains flag diacritics not "
+			    "found in %s\n", firstfilename, secondfilename);
+		  }
+	      }
+	    else
+	      {
+		second.insert_freely_missing_flags_from(first);
+	      }
+	}
+
         outstream << first.compose(second);
         bothInputs = firststream.is_good() && secondstream.is_good();
     }

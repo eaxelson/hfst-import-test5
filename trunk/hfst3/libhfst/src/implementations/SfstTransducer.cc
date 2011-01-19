@@ -229,8 +229,8 @@ namespace hfst { namespace implementations {
     StringSet unknown_t2;    // and vice versa
 
     if (unknown_symbols_in_use) {
-      StringSet t1_symbols = get_string_set(t1);
-      StringSet t2_symbols = get_string_set(t2);
+      StringSet t1_symbols = get_alphabet(t1);
+      StringSet t2_symbols = get_alphabet(t2);
       collect_unknown_sets(t1_symbols, unknown_t1,
 			   t2_symbols, unknown_t2);
     }
@@ -858,14 +858,15 @@ namespace hfst { namespace implementations {
   {
     FdTable<SFST::Character>* table = new FdTable<SFST::Character>();
     SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
-    for (SFST::Alphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++) {
+    for (SFST::Alphabet::CharMap::const_iterator it 
+	   = cm.begin(); it != cm.end(); it++) {
       if(FdOperation::is_diacritic(it->second))
         table->define_diacritic(it->first, it->second);
     }
     return table;
   }
 
-  StringSet SfstTransducer::get_string_set(Transducer * t)
+  StringSet SfstTransducer::get_alphabet(Transducer * t)
   {
     StringSet s;
     SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
