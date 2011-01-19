@@ -35,7 +35,7 @@ namespace hfst
 HfstInputStream *in;
 try {
   in = new HfstInputStream("testfile");
-} catch (FileNotReadableException e) {
+} catch (StreamNotReadableException e) {
     printf("ERROR: File does not exist.\n");
     exit(1);
 }
@@ -148,7 +148,7 @@ For documentation on the HFST binary transducer format, see #hfst::HfstOutputStr
     /** \brief Open a stream to file \a filename for reading binary transducers. 
 
 	@pre The file exists. Otherwise, an exception is thrown.
-	@throws hfst::exceptions::FileNotReadableException */
+	@throws hfst::exceptions::StreamNotReadableException */
     HfstInputStream(const std::string &filename);
 
     /** Delete the stream. */

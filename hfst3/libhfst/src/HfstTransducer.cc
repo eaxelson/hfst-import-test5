@@ -2371,7 +2371,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 {
   FILE * ofile = fopen(filename.c_str(), "wb");
   if (ofile == NULL)
-    throw hfst::exceptions::FileCannotBeWrittenException();
+    throw hfst::exceptions::StreamCannotBeWrittenException();
   write_in_att_format(ofile,print_weights);
   fclose(ofile);
 }
@@ -2441,7 +2441,7 @@ HfstTransducer &HfstTransducer::read_in_att_format
 {
   FILE * ifile = fopen(filename.c_str(), "rb");
   if (ifile == NULL)
-    throw hfst::exceptions::FileNotReadableException();
+    throw hfst::exceptions::StreamNotReadableException();
   HfstTransducer &retval = read_in_att_format(ifile, type, epsilon_symbol);
   fclose(ifile);
   return retval;

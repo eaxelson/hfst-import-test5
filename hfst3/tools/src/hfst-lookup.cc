@@ -1122,8 +1122,9 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
           {
             if (!internal_transducers)
               {
-                warning(0, 0, "Lookup not supported on this automata "
-                      "format: converting to internal format and trying\n");
+                warning(0, 0, "Lookup not supported on this automaton "
+                      "format: converting to HFST basic transducer "
+		      "and trying\n");
                 for (unsigned int i=0; i<cascade.size(); i++) 
                   {
                     HfstBasicTransducer mut(cascade[i]);

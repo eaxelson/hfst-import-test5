@@ -41,7 +41,8 @@ class HfstInterfaceException {
 class HfstArgumentException :
 public HfstInterfaceException {};
 
-/** \brief The library required by the implementation type requested is not linked to HFST. 
+/** \brief The library required by the implementation type requested 
+    is not linked to HFST. 
 
 An example:
 \verbatim
@@ -60,7 +61,7 @@ class HfstInputException :
 public HfstInterfaceException {};
 
 
-/** \brief Error in file handling. 
+/** \brief Error in stream handling. 
 
 An example:
 \verbatim
@@ -69,36 +70,36 @@ try {
   HfstTransducer t(in);
   HfstOutputStream out("testfile2");
   out << t;
-} catch (HfstFileException e) {
+} catch (HfstStreamException e) {
     fprintf(stderr, "Error in file handling.\n");
     exit(1);
 }
 \endverbatim
 */
-class HfstFileException :
+class HfstStreamException :
 public HfstInterfaceException {};
 
-/** \brief File cannot be read. 
+/** \brief Stream cannot be read. 
 
 An example:
 \verbatim
 try {
   HfstInputStream in("testfile");
-} catch (FileNotReadableException e) {
+} catch (StreamNotReadableException e) {
   fprintf(stderr, "ERROR: file cannot be read.\n");
 }  
 \endverbatim
 */
-class FileNotReadableException :
-public HfstFileException {};
+class StreamNotReadableException :
+public HfstStreamException {};
 
-/** \brief File cannot be written. */
-class FileCannotBeWrittenException :
-public HfstFileException {};
+/** \brief Stream cannot be written. */
+class StreamCannotBeWrittenException :
+public HfstStreamException {};
 
-/** \brief File is closed. */
-class FileIsClosedException :
-public HfstFileException {};
+/** \brief Stream is closed. */
+class StreamIsClosedException :
+public HfstStreamException {};
 
 
 /* \brief Transducer has unknown type. */
@@ -149,7 +150,8 @@ public HfstArgumentException {};
 class FunctionNotImplementedException :
 protected HfstInterfaceException {
  public:
- FunctionNotImplementedException(const std::string msg) : HfstInterfaceException(msg) {};
+ FunctionNotImplementedException(const std::string msg) : 
+  HfstInterfaceException(msg) {};
  FunctionNotImplementedException() : HfstInterfaceException() {};
 
 };
@@ -169,7 +171,8 @@ public HfstArgumentException {};
 
 /** \brief The StateId argument is not valid.
 
-    This exception suggests that a StateId argument is not from HfstStateIterator. */
+    This exception suggests that a StateId argument is not from 
+    HfstStateIterator. */
 class StateIndexOutOfBoundsException :
 public HfstArgumentException {};
 
@@ -217,7 +220,10 @@ public HfstInterfaceException {};
 class HfstFatalException :
 public HfstInterfaceException {};
 
-/** \brief Transducer has wrong type. */
+/** \brief Transducer has wrong type. 
+
+    This exception suggests that an HfstTransducer has not been properly
+    initialized, probably due to a bug in the HFST library. */
 class TransducerHasWrongTypeException :
 public HfstFatalException {};
 
@@ -244,18 +250,6 @@ public HfstFatalException {};
 class ImpossibleReplaceTypeException :
 public HfstInterfaceException {};
 
-//class SymbolNotDefinedException : 
-//public HfstSymbolsException {};
-//class KeyNotDefinedException : 
-//public HfstSymbolsException {};
-//class StateTransitionIteratorOutOfRangeExeption : 
-//public HfstInterfaceException {};
-//class TransducerHasNoAlphabetException :
-//public HfstInterfaceException {};
-//class TransitionIteratorOutOfRangeException :
-//public HfstInterfaceException {};
-//class StateBelongsToAnotherTransducerException :
-//public HfstInterfaceException {};
 
 
 } }
