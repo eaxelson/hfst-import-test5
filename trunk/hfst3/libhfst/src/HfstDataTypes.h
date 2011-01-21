@@ -24,23 +24,6 @@
 #include <map>
 #include <set>
 
-#if HAVE_SFST
-#include "implementations/SfstTransducer.h"
-#endif
-
-#if HAVE_OPENFST
-#include "implementations/TropicalWeightTransducer.h"
-#include "implementations/LogWeightTransducer.h"
-#endif
-
-#if HAVE_FOMA
-#include "implementations/FomaTransducer.h"
-#endif
-
-#include "implementations/HfstOlTransducer.h"
-#include "HfstTokenizer.h"
-#include "implementations/ConvertTransducerFormat.h"
-#include "HfstExceptions.h"
 
 /** @file HfstDataTypes.h  
     \brief Datatypes that are needed when using the HFST API. */
@@ -65,7 +48,8 @@ namespace hfst
     TROPICAL_OFST_TYPE, /**< An OpenFst transducer with tropical weights. */
     LOG_OFST_TYPE, /**< An OpenFst transducer with logarithmic weights. */
     FOMA_TYPE, /**< A foma transducer, unweighted. */
-    MFSTL_TYPE, /**< An MFSTL transducer, an example of a transducer library that is added to HFST. */
+    /* Add an enumerator for your transducer type here. */
+    //MY_TRANSDUCER_LIBRARY_TYPE, 
     HFST_OL_TYPE, /**< An HFST optimized lookup transducer, unweighted */
     HFST_OLW_TYPE, /**< An HFST optimized lookup transducer with weights */
     HFST2_TYPE, /**< HFST2 header present, conversion required */

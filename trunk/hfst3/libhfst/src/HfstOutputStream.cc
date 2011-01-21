@@ -45,10 +45,10 @@ namespace hfst
 	  new hfst::implementations::FomaOutputStream();
 	break;
 #endif
-#if HAVE_MFSTL
-      case MFSTL_TYPE:
-	implementation.mfstl = 
-	  new hfst::implementations::MfstlOutputStream();
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      case MY_TRANSDUCER_LIBRARY_TYPE:
+	implementation.my_transducer_library = 
+	  new hfst::implementations::MyTransducerLibraryOutputStream();
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -99,10 +99,10 @@ namespace hfst
 	  new hfst::implementations::FomaOutputStream(filename);
 	break;
 #endif
-#if HAVE_MFSTL
-      case MFSTL_TYPE:
-	implementation.mfstl =
-	  new hfst::implementations::MfstlOutputStream(filename);
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      case MY_TRANSDUCER_LIBRARY_TYPE:
+	implementation.my_transducer_library =
+	  new hfst::implementations::MyTransducerLibraryOutputStream(filename);
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -141,9 +141,9 @@ namespace hfst
 	delete implementation.foma;
 	break;
 #endif
-#if HAVE_MFSTL
-      case MFSTL_TYPE:
-	delete implementation.mfstl;
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      case MY_TRANSDUCER_LIBRARY_TYPE:
+	delete implementation.my_transducer_library;
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -196,9 +196,9 @@ namespace hfst
 	implementation.foma->write(c);
 	break;
 #endif
-#if HAVE_MFSTL
-      case MFSTL_TYPE:
-	implementation.mfstl->write(c);
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      case MY_TRANSDUCER_LIBRARY_TYPE:
+	implementation.my_transducer_library->write(c);
 	break;
 #endif
 	// we always have HFST_OL, right?
@@ -240,9 +240,9 @@ namespace hfst
 	type_value=std::string("FOMA");
 	break;
 #endif
-#if HAVE_MFSTL
-      case MFSTL_TYPE:
-	type_value=std::string("MFSTL");
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      case MY_TRANSDUCER_LIBRARY_TYPE:
+	type_value=std::string("MY_TRANSDUCER_LIBRARY");
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -367,10 +367,10 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
 	  (transducer.implementation.foma);
 	return *this;
 #endif
-#if HAVE_MFSTL
-      case MFSTL_TYPE:
-	implementation.mfstl->write_transducer
-	  (transducer.implementation.mfstl);
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      case MY_TRANSDUCER_LIBRARY_TYPE:
+	implementation.my_transducer_library->write_transducer
+	  (transducer.implementation.my_transducer_library);
 #endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
@@ -404,9 +404,9 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
 	implementation.foma->close();
 	break;
 #endif
-#if HAVE_MFSTL
-      case MFSTL_TYPE:
-	implementation.mfstl->close();
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      case MY_TRANSDUCER_LIBRARY_TYPE:
+	implementation.my_transducer_library->close();
 	break;
 #endif
       case HFST_OL_TYPE:

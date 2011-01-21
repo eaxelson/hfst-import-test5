@@ -33,10 +33,11 @@
 #include "implementations/FomaTransducer.h"
 #endif
 
-// A new transducer library
-#if HAVE_MFSTL
-#include "implementations/MfstlTransducer.h"
-#endif
+/* Include here the header file of the files that take care 
+   of the interaction between HFST and your transducer library. */
+//#if HAVE_MY_TRANSDUCER_LIBRARY
+//#include "implementations/MyTransducerLibraryTransducer.h"
+//#endif
 
 #include "implementations/HfstOlTransducer.h"
 #include "HfstTokenizer.h"
@@ -64,7 +65,8 @@ namespace hfst
   namespace implementations {    
     template <class T, class W> class HfstTransitionGraph;
     class HfstTropicalTransducerTransitionData;
-    typedef HfstTransitionGraph<HfstTropicalTransducerTransitionData, float> HfstBasicTransducer; 
+    typedef HfstTransitionGraph<HfstTropicalTransducerTransitionData, float> 
+      HfstBasicTransducer; 
   }
   class HfstCompiler;
   class HfstTransducer;
@@ -75,37 +77,38 @@ namespace hfst
 
 #if HAVE_SFST
   using hfst::implementations::SfstTransducer;
-#endif
+#endif // #if HAVE_SFST
 
 #if HAVE_OPENFST
   using hfst::implementations::TropicalWeightTransducer;
   using hfst::implementations::TropicalWeightState;
   using hfst::implementations::TropicalWeightStateIterator;
   using hfst::implementations::LogWeightTransducer;
-#endif
+#endif // #if HAVE_OPENFST
 
 #if HAVE_FOMA
   using hfst::implementations::FomaTransducer;
-#endif
+#endif // #if HAVE_FOMA
 
-  // A new transducer type
-#if HAVE_MFSTL
-  using hfst::implementations::MfstlTransducer;
-#endif
+  /* Add here the transducer class of your transducer library. */
+  //#if HAVE_MY_TRANSDUCER_LIBRARY
+  //  using hfst::implementations::MyTransducerLibraryTransducer;
+  //#endif // #if HAVE_MY_TRANSDUCER_LIBRARY
 
 
-  // TESTING AND OPTIMIZATION...
+  // *** TESTING AND OPTIMIZATION...
 
   enum MinimizationAlgorithm { HOPCROFT, BRZOZOWSKI };
   /* Which minimization algorithm is used. 
      In foma, Hopcroft is always used. 
-     In OpenFst and SFST, the default algorithm is Brzozowski. */
+     In OpenFst and SFST, the default algorithm is Hopcroft. */
   void set_minimization_algorithm(MinimizationAlgorithm);
   MinimizationAlgorithm get_minimization_algorithm(); 
 
-  // for testing
+  /* Whether in harmonization the smaller transducer is always harmonized
+     according to the bigger transducer. */
   void set_harmonize_smaller(bool);
-  bool get_harmonize_smaller(void);
+  bool get_harmonize_smaller();
 
   /* Whether unknown and identity symbols are used. By default, they are used.
      These symbols are always reserved for use and included in alphabets 
@@ -114,8 +117,7 @@ namespace hfst
   void set_unknown_symbols_in_use(bool);
   bool get_unknown_symbols_in_use();
 
-  // ...TESTING AND OPTIMIZATION
-
+  // *** ...TESTING AND OPTIMIZATION
 
 
   /** \brief A synchronous finite-state transducer.
@@ -209,12 +211,14 @@ tr1.disjunct(tr2);
       fsm * foma;
 #endif
 
-#if HAVE_MFSTL
-      hfst::implementations::MyFst * mfstl;
-#endif
+      /* Add here your own transducer backend implementation. */
+      //#if HAVE_MY_TRANSDUCER_LIBRARY
+      //      hfst::implementations::MyFst * my_transducer_library;
+      //#endif
 
       hfst_ol::Transducer * hfst_ol;
-#if HAVE_OPENFST
+
+#if HAVE_OPENFST // is this needed?
       hfst::implementations::StdVectorFst * internal;
 #endif 
     };
@@ -236,9 +240,12 @@ tr1.disjunct(tr2);
 #endif
     static hfst::implementations::HfstOlTransducer hfst_ol_interface;
 
-#if HAVE_MFSTL
-    static hfst::implementations::MfstlTransducer mfstl_interface;
-#endif
+    /* Add here the class that takes care of the interaction between
+       HFST and your transducer library. */
+    //#if HAVE_MY_TRANSDUCER_LIBRARY
+    //static hfst::implementations::MyTransducerLibraryTransducer
+    //  my_transducer_library_interface;
+    //#endif
 
 
     /* The number of states in the transducer. 
@@ -273,9 +280,6 @@ tr1.disjunct(tr2);
     bool static is_safe_conversion(ImplementationType original, 
 				   ImplementationType conversion);
 
-    /* For debugging */
-    void print_alphabet();
-
     /* For internal use */
     static HfstTransducer &read_in_att_format
       (FILE *ifile, ImplementationType type, const std::string &epsilon_symbol);
@@ -292,19 +296,21 @@ tr1.disjunct(tr2);
        Get all symbol pairs that occur in the transitions of the transducer. */
     StringPairSet get_symbol_pairs();
 
+    /* Get the alphabet of the transducer. */
     StringSet get_alphabet() const;
 
     /* For internal use, implemented only for SFST_TYPE. */	  
     std::vector<HfstTransducer*> extract_paths();
-
-    /* For debugging. */
-    static float get_profile_seconds(ImplementationType type);
 
     /* For internal use:
        Create a new transducer equivalent to \a t in format \a type. */
     static HfstTransducer &convert
       (const HfstTransducer &t, ImplementationType type);
 
+
+    /* For debugging */
+    void print_alphabet();
+    static float get_profile_seconds(ImplementationType type);
 
 #include "hfst_apply_schemas.h"
 
@@ -313,6 +319,12 @@ tr1.disjunct(tr2);
     // ***** THE PUBLIC INTERFACE *****
 
   public:
+
+
+    // ------------------------------------------------
+    // ----- Constructors, destructor, assignment -----
+    // ------------------------------------------------
+
     /* This constructor should be used only inside the HfstTransducer class
        or its friends since it leaves the backend implementation variable
        uninitialized. */
@@ -403,13 +415,6 @@ tr1.disjunct(tr2);
     HfstTransducer(const hfst::implementations::HfstBasicTransducer &t, 
 		   ImplementationType type);
 
-    /** \brief Delete the HfstTransducer. **/
-    virtual ~HfstTransducer(void);
-
-    /** @brief Assign this transducer a new value equivalent to transducer
-	\a another. */
-    HfstTransducer &operator=(const HfstTransducer &another);
-
     /** \brief Create a transducer that recognizes the string pair 
 	[symbol:symbol]. The type of the transducer is defined by \a type. 
 	@see String **/
@@ -420,64 +425,6 @@ tr1.disjunct(tr2);
 	@see String **/
     HfstTransducer(const std::string &isymbol, const std::string &osymbol, 
 		   ImplementationType type);
-
-    /** \brief Set the name of the transducer as \a name. 
-	@see get_name */
-    void set_name(std::string &name);
-
-    /** \brief Get the name of the transducer. 
-	@see set_name */
-    std::string get_name();
-
-    /** \brief Whether this transducer and \a another are equivalent.
-
-	Two transducers are equivalent iff they accept the same input/output
-	string pairs with the same weights
-	and the same alignments. 
-    */
-    bool compare(const HfstTransducer &another) const;
-
-    /** \brief Write the transducer in AT&T format to FILE \a ofile. 
-	\a write_weights defines whether weights are written.
-
-	If several transducers are written in the same file, they must 
-	be separated by a line
-	of two consecutive hyphens "--".
-
-An example:
-\verbatim
-ImplementationType type = FOMA_TYPE;
-HfstTransducer foobar("foo","bar",type);
-HfstTransducer epsilon("@_EPSILON_SYMBOL_@",type);
-HfstTransducer empty(type);
-HfstTransducer a_star("a",type);
-a_star.repeat_star();
-
-FILE * ofile = fopen("testfile.att", "wb");
-foobar.write_in_att_format(ofile);
-fprintf(ofile, "--\n");
-epsilon.write_in_att_format(ofile);
-fprintf(ofile, "--\n");
-empty.write_in_att_format(ofile);
-fprintf(ofile, "--\n");
-a_star.write_in_att_format(ofile);
-fclose(ofile);
-\endverbatim
-
-This will yield a file "testfile.att" that looks as follows:
-\verbatim
-0    1    foo  bar  0.0
-1    0.0
---
-0    0.0
---
---
-0    0.0
-0    0    a    a    0.0
-\endverbatim
-
-	@see hfst::operator<<(std::ostream &out,HfstTransducer &t) HfstTransducer(FILE*, ImplementationType, const std::string&) */
-    void write_in_att_format(FILE * ofile, bool write_weights=true) const;
 
     /** \brief Create a transducer of type \a type as defined in AT&T format 
 	in FILE \a ifile. \a epsilon_symbol defines how epsilons 
@@ -535,6 +482,98 @@ in \a ifile.
     HfstTransducer(FILE * ifile, ImplementationType type, 
 		   const std::string &epsilon_symbol);
 
+
+    /** \brief Delete the HfstTransducer. **/
+    virtual ~HfstTransducer(void);
+
+    /** @brief Assign this transducer a new value equivalent to transducer
+	\a another. */
+    HfstTransducer &operator=(const HfstTransducer &another);
+
+
+    // ------------------------------------------------------------
+    // ----------- Properties, comparison, conversion -------------
+    // ------------------------------------------------------------
+
+    /** \brief Set the name of the transducer as \a name. 
+	@see get_name */
+    void set_name(std::string &name);
+
+    /** \brief Get the name of the transducer. 
+	@see set_name */
+    std::string get_name();
+
+    /** \brief Whether the transducer is cyclic. */
+    bool is_cyclic(void) const;
+
+    /** \brief The implementation type of the transducer. */
+    ImplementationType get_type(void) const;
+
+    /** \brief Whether this transducer and \a another are equivalent.
+
+	Two transducers are equivalent iff they accept the same input/output
+	string pairs with the same weights
+	and the same alignments. 
+    */
+    bool compare(const HfstTransducer &another) const;
+
+    /** \brief Convert the transducer into an equivalent transducer 
+	in format \a type. 
+
+	If a weighted transducer is converted into an unweighted one, 
+	all weights are lost. 
+	In the reverse case, all weights are initialized to the 
+	semiring's one. */
+    HfstTransducer &convert(ImplementationType type);
+
+
+    // --------------------------------------------------------
+    // --- String lookup and conversion to/from AT&T format ---
+    // --------------------------------------------------------
+
+    /** \brief Write the transducer in AT&T format to FILE \a ofile. 
+	\a write_weights defines whether weights are written.
+
+	If several transducers are written in the same file, they must 
+	be separated by a line
+	of two consecutive hyphens "--".
+
+An example:
+\verbatim
+ImplementationType type = FOMA_TYPE;
+HfstTransducer foobar("foo","bar",type);
+HfstTransducer epsilon("@_EPSILON_SYMBOL_@",type);
+HfstTransducer empty(type);
+HfstTransducer a_star("a",type);
+a_star.repeat_star();
+
+FILE * ofile = fopen("testfile.att", "wb");
+foobar.write_in_att_format(ofile);
+fprintf(ofile, "--\n");
+epsilon.write_in_att_format(ofile);
+fprintf(ofile, "--\n");
+empty.write_in_att_format(ofile);
+fprintf(ofile, "--\n");
+a_star.write_in_att_format(ofile);
+fclose(ofile);
+\endverbatim
+
+This will yield a file "testfile.att" that looks as follows:
+\verbatim
+0    1    foo  bar  0.0
+1    0.0
+--
+0    0.0
+--
+--
+0    0.0
+0    0    a    a    0.0
+\endverbatim
+
+	@see hfst::operator<<(std::ostream &out,HfstTransducer &t) HfstTransducer(FILE*, ImplementationType, const std::string&) */
+    void write_in_att_format(FILE * ofile, bool write_weights=true) const;
+
+
     /** \brief \brief Write the transducer in AT&T format to FILE 
 	named \a filename. \a write_weights
 	defines whether weights are written.
@@ -546,8 +585,8 @@ in \a ifile.
     void write_in_att_format(const std::string &filename, 
 			     bool write_weights=true) const;
 
-    /* \brief Create a transducer of type \a type as defined in AT&T 
-       format in file named \a filename.
+    /* \brief For internal use: Create a transducer of type \a type as 
+       defined in AT&T format in file named \a filename.
 	\a epsilon_symbol defines how epsilons are represented.
 
 	@pre The file exists, otherwise an exception is thrown.
@@ -556,6 +595,122 @@ in \a ifile.
     static HfstTransducer &read_in_att_format
       (const std::string &filename, ImplementationType type, 
        const std::string &epsilon_symbol);
+
+    /* \brief Call \a callback with some or all string pairs recognized 
+       by the transducer?
+
+	If the callback returns false the search will be terminated. 
+	The \a cycles parameter
+	indicates how many times a cycle will be followed, with negative numbers
+	indicating unlimited. Note that if the transducer is cyclic and 
+	cycles aren't capped,
+	the search will not end until the callback returns false. */
+    void extract_strings(ExtractStringsCb& callback, int cycles=-1);
+
+    /** \brief Extract a maximum of \a max_num string pairs that are 
+	recognized by the transducer
+	following a maximum of \a cycles cycles and store the 
+	string pairs into \a results.
+	
+	The total number of resulting strings is capped at \a max_num, 
+	with 0 or negative
+	indicating unlimited. The \a cycles parameter indicates how many 
+	times a cycle
+	will be followed, with negative numbers indicating unlimited. 
+	If this function
+	is called on a cyclic transducer with unlimited values for 
+	both \a max_num and
+	\a cycles, an exception will be thrown.
+	@throws hfst::exceptions::TransducerIsCyclicException
+	@see #n_best */
+    void extract_strings
+      (WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1);
+    
+    /* \brief Call \a callback with extracted strings that are not 
+       invalidated by
+       flag diacritic rules.
+       @see extract_strings(WeightedPaths<float>::Set&, int, int) */
+    void extract_strings_fd
+      (ExtractStringsCb& callback, int cycles=-1, bool filter_fd=true);
+    
+    /** \brief Store to \a results string pairs that are recognized 
+	by the transducer
+	and are not invalidated by flag diacritic rules, optionally filtering
+	the flag diacritics themselves out of the result strings.
+
+	The same conditions that apply for the function
+	#extract_strings(WeightedPaths<float>::Set&, int, int)
+	apply also for this one.
+	Flag diacritics are of the form @[PNDRCU][.][A-Z]+([.][A-Z]+)?@ An example:
+\verbatim
+TODO...
+\endverbatim
+  @throws hfst::exceptions::TransducerIsCyclicException
+  @see extract_strings(WeightedPaths<float>::Set&, int, int) */
+    void extract_strings_fd
+      (WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1, 
+       bool filter_fd=true);
+
+    //! @brief Lookup or apply a single string \a s and store a maximum of 
+    //! \a limit results to \a results.
+    //!
+    //! Traverse all paths on logical first level of the transducer to produce
+    //! all possible outputs on the second.
+    //! This is in effect a fast composition of single path from left
+    //! hand side.
+    //!
+    //! @param results  output parameter to store unique results
+    //! @param s  string to look up
+    //! @param limit  number of strings to extract. -1 tries to extract all and
+    //!             may get stuck if infinitely ambiguous
+    void lookup(HfstLookupPaths& results, const HfstLookupPath& s,
+                ssize_t limit = -1);
+
+    //! @brief Lookup or apply a single string minding flag diacritics properly.
+    //! 
+    //! This is a version of lookup that handles flag diacritics as epsilons
+    //! and validates the sequences prior to outputting.
+    //!
+    //! @sa lookup
+    void lookup_fd(HfstLookupPaths& results, const HfstLookupPath& s,
+                   ssize_t limit = -1);
+
+    //! @brief Lookdown a single string \a s and store a maximum of 
+    //! \a limit results to \a results.
+    //!
+    //! Traverse all paths on logical second level of the transducer to produce
+    //! all possible inputs on the first.
+    //! This is in effect a fast composition of single
+    //! path from left hand side.
+    //!
+    //! @param results  output parameter to store unique results
+    //! @param s  string to look down
+    //! <!-- @param tok  tokenizer to split string in arcs? -->
+    //! @param limit  number of strings to extract. -1 tries to extract all and
+    //!             may get stuck if infinitely ambiguous
+    void lookdown(HfstLookupPaths& results, const HfstLookupPath& s,
+                  ssize_t limit = -1);
+
+    //! @brief Lookdown a single string minding flag diacritics properly.
+    //! 
+    //! This is a version of lookdown that handles flag diacritics as epsilons
+    //! and validates the sequences prior to outputting.
+    //!
+    //! @sa lookdown
+    void lookdown_fd(HfstLookupPaths& results, HfstLookupPath& s,
+                     ssize_t limit = -1);
+
+    //! @brief Whether lookup of path \a s will have infinite results.
+    bool is_lookup_infinitely_ambiguous(const HfstLookupPath& s);
+
+    //! @brief Whether lookdown of path \a s will have infinite results.
+    bool is_lookdown_infinitely_ambiguous(const HfstLookupPath& s);
+
+
+
+    // -------------------------------------------
+    // --------- Optimization operations ---------
+    // -------------------------------------------
 
     /** \brief Remove all <i>epsilon:epsilon</i> transitions 
 	from the transducer. */
@@ -589,9 +744,15 @@ in \a ifile.
 	If this function is called by an HfstTransducer of type #FOMA_TYPE 
 	or #SFST_TYPE, it is converted to #TROPICAL_OFST_TYPE,
 	strings are extracted and it is converted back to #FOMA_TYPE or 
-	#SFST_TYPE.
+	#SFST_TYPE. If HFST is not linked to OpenFst library, an
+	hfst::exceptions::ImplementationTypeNotAvailable is thrown.
     */
     HfstTransducer &n_best(unsigned int n);
+
+
+    // ------------------------------------------------
+    // ------------- Algebraic operations -------------
+    // ------------------------------------------------
 
     /** \brief A concatenation of N transducers where N is any number 
 	from zero to infinity. */
@@ -642,71 +803,40 @@ in \a ifile.
 	to <i>osymbol:osymbol</i>. */
     HfstTransducer &output_project();
 
-    /* \brief Call \a callback with some or all string pairs recognized 
-       by the transducer?
+    /** \brief Compose this transducer with \a another. */
+    HfstTransducer &compose(const HfstTransducer &another);
 
-	If the callback returns false the search will be terminated. 
-	The \a cycles parameter
-	indicates how many times a cycle will be followed, with negative numbers
-	indicating unlimited. Note that if the transducer is cyclic and 
-	cycles aren't capped,
-	the search will not end until the callback returns false. */
-    void extract_strings(ExtractStringsCb& callback, int cycles=-1);
+#ifdef COMPOSE_INTERSECT_IMPLEMENTED
+    /** \brief Compose this transducer with the intersection of 
+	rule transducers in \a grammar. 
 
-    /** \brief Extract a maximum of \a max_num string pairs that are 
-	recognized by the transducer
-	following a maximum of \a cycles cycles and store the 
-	string pairs into \a results.
-	
-	The total number of resulting strings is capped at \a max_num, 
-	with 0 or negative
-	indicating unlimited. The \a cycles parameter indicates how many 
-	times a cycle
-	will be followed, with negative numbers indicating unlimited. 
-	If this function
-	is called on a cyclic transducer with unlimited values for 
-	both \a max_num and
-	\a cycles, an exception will be thrown.
-	@throws hfst::exceptions::TransducerIsCyclicException
-	@see #n_best */
-    void extract_strings
-      (WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1);
-    
-    /* \brief Call \a callback with extracted strings that are not 
-       invalidated by
-       flag diacritic rules.
-	@see #extract_strings(WeightedPaths<float>::Set&, int, int) */          
-    void extract_strings_fd
-      (ExtractStringsCb& callback, int cycles=-1, bool filter_fd=true);
-    
-    /** \brief Store to \a results string pairs that are recognized 
-	by the transducer
-	and are not invalidated by flag diacritic rules, optionally filtering
-	the flag diacritics themselves out of the result strings.
+	The algorithm used by this function is faster than intersecting 
+	all transducers one by one and then composing this transducer 
+	with the intersection. 
 
-	The same conditions that apply for the #extract_strings function
-	apply also for this one.
-	Flag diacritics are of the form @[PNDRCU][.][A-Z]+([.][A-Z]+)?@ An example:
-\verbatim
-TODO...
-\endverbatim
-  @throws hfst::exceptions::TransducerIsCyclicException
-  @see extract_strings(WeightedPaths<float>::Set&, int, int) */
-    void extract_strings_fd
-      (WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1, 
-       bool filter_fd=true);
+	@see HfstGrammar */
+    HfstTransducer &compose_intersect(HfstGrammar &grammar);
+#endif // COMPOSE_INTERSECT_IMPLEMENTED
 
-    /* For commandline programs. */
+    /** \brief Concatenate this transducer with \a another. */
+    HfstTransducer &concatenate(const HfstTransducer &another);
 
-    /* For each flag diacritic fd that is included in the alphabet of
-       transducer \a another but not in the alphabet of this transducer,
-       insert freely a transition fd:fd in this transducer. */
-    void insert_freely_missing_flags_from
-      (const HfstTransducer &another);
+    /** \brief Disjunct this transducer with \a another. */
+    HfstTransducer &disjunct(const HfstTransducer &another);
 
-    /* Whether the alphabet of transducer \a another includes flag diacritics
-       that are not included in the alphabet of this transducer. */
-    bool check_for_missing_flags_in(const HfstTransducer &another) const;
+    /* For HfstCompiler: Optimized disjunction function. */
+    HfstTransducer &disjunct(const StringPairVector &spv);
+
+    /** \brief Intersect this transducer with \a another. */
+    HfstTransducer &intersect(const HfstTransducer &another);
+
+    /** \brief Subtract transducer \a another from this transducer. */
+    HfstTransducer &subtract(const HfstTransducer &another);
+
+
+    // ------------------------------------------------
+    // ---------- Insertion and substitution ----------
+    // ------------------------------------------------
 
     /** \brief Freely insert symbol pair \a symbol_pair into the transducer. */
     HfstTransducer &insert_freely(const StringPair &symbol_pair);
@@ -810,6 +940,11 @@ t.substitute(&func);
     HfstTransducer &substitute(const StringPair &symbol_pair,
 			       HfstTransducer &transducer);
 
+
+    // -----------------------------------------------
+    // --------------- Weight handling --------------- 
+    // -----------------------------------------------
+
     /** \brief Set the weights of all final states to \a weight. 
 
 	If the HfstTransducer is of unweighted type 
@@ -846,106 +981,19 @@ HfstTransducer t_transformed;
     */
     HfstTransducer &push_weights(PushType type);
 
-    /** \brief Compose this transducer with \a another. */
-    HfstTransducer &compose(const HfstTransducer &another);
 
-#ifdef COMPOSE_INTERSECT_IMPLEMENTED
-    /** \brief Compose this transducer with the intersection of 
-	rule transducers in \a grammar. 
+    // *** For commandline programs. ***
 
-	The algorithm used by this function is faster than intersecting 
-	all transducers one by one and then composing this transducer 
-	with the intersection. 
+    /* For each flag diacritic fd that is included in the alphabet of
+       transducer \a another but not in the alphabet of this transducer,
+       insert freely a transition fd:fd in this transducer. */
+    void insert_freely_missing_flags_from
+      (const HfstTransducer &another);
 
-	@see HfstGrammar */
-    HfstTransducer &compose_intersect(HfstGrammar &grammar);
-#endif // COMPOSE_INTERSECT_IMPLEMENTED
+    /* Whether the alphabet of transducer \a another includes flag diacritics
+       that are not included in the alphabet of this transducer. */
+    bool check_for_missing_flags_in(const HfstTransducer &another) const;
 
-    /** \brief Concatenate this transducer with \a another. */
-    HfstTransducer &concatenate(const HfstTransducer &another);
-
-    /** \brief Disjunct this transducer with \a another. */
-    HfstTransducer &disjunct(const HfstTransducer &another);
-
-    HfstTransducer &disjunct(const StringPairVector &spv);
-
-    /** \brief Intersect this transducer with \a another. */
-    HfstTransducer &intersect(const HfstTransducer &another);
-
-    /** \brief Subtract transducer \a another from this transducer. */
-    HfstTransducer &subtract(const HfstTransducer &another);
-
-    
-    /** \brief Whether the transducer is cyclic. */
-    bool is_cyclic(void) const;
-
-    /** \brief The implementation type of the transducer. */
-    ImplementationType get_type(void) const;
-
-    /** \brief Convert the transducer into an equivalent transducer 
-	in format \a type. 
-
-	If a weighted transducer is converted into an unweighted one, 
-	all weights are lost. 
-	In the reverse case, all weights are initialized to the 
-	semiring's one. */
-    HfstTransducer &convert(ImplementationType type);
-
-
-    //! @brief Lookup or apply a single string \a s and store a maximum of 
-    //! \a limit results to \a results.
-    //!
-    //! Traverse all paths on logical first level of the transducer to produce
-    //! all possible outputs on the second.
-    //! This is in effect a fast composition of single path from left
-    //! hand side.
-    //!
-    //! @param results  output parameter to store unique results
-    //! @param s  string to look up
-    //! @param limit  number of strings to extract. -1 tries to extract all and
-    //!             may get stuck if infinitely ambiguous
-    void lookup(HfstLookupPaths& results, const HfstLookupPath& s,
-                ssize_t limit = -1);
-
-    //! @brief Lookup or apply a single string minding flag diacritics properly.
-    //! 
-    //! This is a version of lookup that handles flag diacritics as epsilons
-    //! and validates the sequences prior to outputting.
-    //!
-    //! @sa lookup
-    void lookup_fd(HfstLookupPaths& results, const HfstLookupPath& s,
-                   ssize_t limit = -1);
-
-    //! @brief Lookdown a single string \a s and store a maximum of 
-    //! \a limit results to \a results.
-    //!
-    //! Traverse all paths on logical second level of the transducer to produce
-    //! all possible inputs on the first.
-    //! This is in effect a fast composition of single
-    //! path from left hand side.
-    //!
-    //! @param results  output parameter to store unique results
-    //! @param s  string to look down
-    //! @param tok  tokenizer to split string in arcs?
-    //! @param limit  number of strings to extract. -1 tries to extract all and
-    //!             may get stuck if infinitely ambiguous
-    void lookdown(HfstLookupPaths& results, const HfstLookupPath& s,
-                  ssize_t limit = -1);
-
-    //! @brief Lookdown a single string minding flag diacritics properly.
-    //! 
-    //! This is a version of lookdown that handles flag diacritics as epsilons
-    //! and validates the sequences prior to outputting.
-    //!
-    //! @sa lookdown
-    void lookdown_fd(HfstLookupPaths& results, HfstLookupPath& s,
-                     ssize_t limit = -1);
-
-    //! @brief Whether lookup of path \a s will have infinite results.
-    bool is_lookup_infinitely_ambiguous(const HfstLookupPath& s);
-
-    //! @brief Whether lookdown of path \a s will have infinite results.
-    bool is_lookdown_infinitely_ambiguous(const HfstLookupPath& s);
 
     // *** Friends **** //
 

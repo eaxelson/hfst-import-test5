@@ -110,9 +110,8 @@ const
 
 void
 
-HfstTokenizer::add_multichar_symbol(const string& symbol) // ,KeyTable &key_table)
-{ //key_table.add_symbol(symbol.c_str());
-  multi_char_symbols.add(symbol.c_str()); }
+HfstTokenizer::add_multichar_symbol(const string& symbol)
+{  multi_char_symbols.add(symbol.c_str()); }
 
 void
 HfstTokenizer::add_skip_symbol(const std::string &symbol)
@@ -121,9 +120,8 @@ HfstTokenizer::add_skip_symbol(const std::string &symbol)
   multi_char_symbols.add(symbol.c_str()); 
   skip_symbol_set.insert(symbol.c_str()); }
 
-//KeyPairVector * 
 StringPairVector * HfstTokenizer::tokenize
-(const string& input_string) const // ,KeyTable &key_table) const
+(const string& input_string) const
 {
   StringPairVector * spv = new StringPairVector;
   const char* s = input_string.c_str();

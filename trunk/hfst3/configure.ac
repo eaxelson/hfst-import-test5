@@ -69,16 +69,17 @@ AC_ARG_WITH([foma],
 AS_IF([test "x$with_foma" != xno], [AC_DEFINE([HAVE_FOMA], [1],
                                               [Define to compile foma support in HFST])])
 AM_CONDITIONAL([WANT_FOMA], [test x$with_foma != xno])
-### ADDED ###
-AC_ARG_WITH([mfstl],
-            [AS_HELP_STRING([--with-mfstl],
-                            [process unweighted fsts with mfstl @<:@default=no@:>@])],
-            [],
-            [with_mfstl=no])
-AS_IF([test "x$with_mfstl" != xno], [AC_DEFINE([HAVE_MFSTL], [1],
-                                              [Define to compile MFSTL support in HFST])])
-AM_CONDITIONAL([WANT_MFSTL], [test x$with_mfstl != xno])
-### ADDED ENDS ###
+
+### Add here your library ###
+#AC_ARG_WITH([my_transducer_library],
+#            [AS_HELP_STRING([--with-my-transducer-library],
+#                            [process unweighted fsts with my transducer library @<:@default=no@:>@])],
+#            [],
+#            [with_my_transducer_library=no])
+#AS_IF([test "x$with_my_transducer_library" != xno], [AC_DEFINE([HAVE_MY_TRANSDUCER_LIBRARY], [1],
+#                                              [Define to compile my transducer library support in HFST])])
+#AM_CONDITIONAL([WANT_MY_TRANSDUCER_LIBRARY], [test x$with_my_transducer_library != xno])
+
 AC_ARG_WITH([hfstol],
             [AS_HELP_STRING([--with-hfstol],
                             [run fsts with hfst optimized lookup library @<:@default=bundled@:>@])],
@@ -341,9 +342,10 @@ AS_IF([test "x$with_foma" == "xcheck"],
       [AC_CHECK_LIB([foma], [main], [],
                  [AC_MSG_FAILURE([foma test failed (--without-foma to disable)])])])
 
-AS_IF([test "x$with_mfstl" != "xno"],
-      [AC_CHECK_LIB([mfstl], [main], [],
-                [AC_MSG_FAILURE([mfstl test failed (--without-mfstl to disable)])])])
+### Add here your library ###
+#AS_IF([test "x$with_my_transducer_library" != "xno"],
+#      [AC_CHECK_LIB([my_transducer_library], [main], [],
+#                [AC_MSG_FAILURE([my transducer library test failed (--without-my-transducer-library to disable)])])])
 
 # Checks for header files
 AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h])
@@ -360,8 +362,9 @@ AS_IF([test "x$with_foma" != "xno"],
       [AC_LANG_PUSH([C])]
       [AC_CHECK_HEADERS([fomalib.h])]
       [AC_LANG_POP])
-AS_IF([test "x$with_mfstl" != "xno"],
-      [AC_CHECK_HEADERS([mfstl/MyFst.h])])
+### Add here your library ###
+#AS_IF([test "x$with_my_transducer_library" != "xno"],
+#      [AC_CHECK_HEADERS([my_transducer_library/MyTransducerLibrary.h])])
 
 AC_HEADER_STDBOOL
 AC_HEADER_ASSERT
@@ -404,7 +407,8 @@ cat <<EOF
     *         with openfst: $with_openfst
     *         with foma: $with_foma
     *         with optimized lookup: $with_hfstol
-    *         with mfstl: $with_mfstl
+### Add here your library ###
+#    *         with my transducer library: $with_my_transducer_library
     * tools including calculate: $enable_calculate (sfst-compiler)
     *                 compare: $enable_compare
     *                 compose: $enable_compose

@@ -35,20 +35,21 @@ namespace hfst
 	return false;
       }
     }
-#ifdef HAVE_MFSTL
-    if (original == MFSTL_TYPE) {
-      // From mfstl to weighted
-      if ( converted == TROPICAL_OFST_TYPE || converted == LOG_OFST_TYPE) {
-	return true;  // if mfstl supports weights
-	return false; // if mfstl does not support weights
-      }
-      // From mfstl to unweighted
-      else {
-	return true;  // if mfstl does not support weights
-	return false; // if mfstl supports weights
-      }
-    }
-#endif
+    /* Add here your library. */
+    //#ifdef HAVE_MY_TRANSDUCER_LIBRARY
+    //if (original == MY_TRANSDUCER_LIBRARY_TYPE) {
+    //  // From my transducer to weighted transducer
+    //  if ( converted == TROPICAL_OFST_TYPE || converted == LOG_OFST_TYPE) {
+    //	return true;  // if your library supports weights
+    //	return false; // if your library does not support weights
+    //  }
+    //  // From my transducer to unweighted
+    //  else {
+    //	return true;  // if your library does not support weights
+    //	return false; // if your library supports weights
+    // }
+    //}
+    //#endif
     return true;
   }
 
@@ -63,9 +64,10 @@ namespace hfst
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *),
 #endif
-#if HAVE_MFSTL
- mfstl::MyFst * (*mfstl_funct)(mfstl::MyFst *),
-#endif
+ /* Add your library. */
+ //#if HAVE_MY_TRANSDUCER_LIBRARY
+ //my_namespace::MyFst * (*my_transducer_library_funct)(my_namespace::MyFst *),
+ //#endif
   bool foo )
     {
       (void)foo;
@@ -109,17 +111,17 @@ namespace hfst
 	  break;
 	}
 #endif
-#if HAVE_MFSTL
-      case MFSTL_TYPE:
-	{
-	  mfstl::MyFst * mfstl_temp =
-	    mfstl_funct(implementation.mfstl);
-	  delete implementation.mfstl;
-	  implementation.mfstl = mfstl_temp;
-	  break;
-	}
-#endif
-	//case UNSPECIFIED_TYPE:
+	/* Add your library here. */
+	//#if HAVE_MY_TRANSDUCER_LIBRARY
+	//case MY_TRANSDUCER_LIBRARY_TYPE:
+	//{
+	//  my_namespace::MyFst * my_fst_temp =
+	//  my_transducer_library_funct(implementation.my_transducer_library);
+	//delete implementation.my_transducer_library;
+	//implementation.my_transducer_library = my_fst_temp;
+	//break;
+	//}
+	//#endif
 	case ERROR_TYPE:
 	default:
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -140,9 +142,10 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
 #if HAVE_FOMA
    fsm * (*foma_funct)(fsm *,int n),
 #endif
-#if HAVE_MFSTL
-   mfstl::MyFst * (*mfstl_funct)(mfstl::MyFst *,int n),
-#endif
+/* Add your library here. */
+//#if HAVE_MY_TRANSDUCER_LIBRARY
+//   my_namespace::MyFst * (*my_transducer_library_funct)(my_namespace::MyFst *,int n),
+//#endif
    int n )
   {
     switch(this->type)
@@ -185,17 +188,17 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
 	  break;
     }
 #endif
-#if HAVE_MFSTL
-      case MFSTL_TYPE:
-	{
-      mfstl::MyFst * mfstl_temp = 
-	    mfstl_funct(implementation.mfstl,n);
-	  delete (implementation.mfstl);
-	  implementation.mfstl = mfstl_temp;
-	  break;
-    }
-#endif
-	//case UNSPECIFIED_TYPE:
+	/* Add your library here. */
+	//#if HAVE_MY_TRANSDUCER_LIBRARY
+	//case MY_TRANSDUCER_LIBRARY_TYPE:
+	//{
+	//my_namespace::MyFst * my_fst_temp = 
+	//  my_transducer_library_funct(implementation.my_transducer_library,n);
+	//delete (implementation.my_transducer_library);
+	//implementation.my_transducer_library = my_fst_temp;
+	//break;
+	//}
+	//#endif
 	case ERROR_TYPE:
 	default:
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -217,9 +220,10 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
 #if HAVE_FOMA
    fsm * (*foma_funct)(fsm *, String, String),
 #endif
-#if HAVE_MFSTL
-   mfstl::MyFst * (*mfstl_funct)(mfstl::MyFst *, String, String),
-#endif
+   /* Add your library here. */
+   //#if HAVE_MY_TRANSDUCER_LIBRARY
+   //my_namespace::MyFst * (*my_transducer_library_funct)(my_namespace::MyFst *, String, String),
+   //#endif
    String s1, String s2)
   {
     switch(this->type)
@@ -262,17 +266,17 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
       break;
 	}
 #endif
-#if HAVE_MFSTL
-      case MFSTL_TYPE:
-	{
-      mfstl::MyFst * mfstl_temp = 
-	    mfstl_funct(implementation.mfstl,s1,s2);
-	  delete(implementation.mfstl);
-	  implementation.mfstl = mfstl_temp;
-      break;
-	}
-#endif
-	//case UNSPECIFIED_TYPE:
+	/* Add your library here. */
+	//#if HAVE_MY_TRANSDUCER_LIBRARY
+	//case MY_TRANSDUCER_LIBRARY_TYPE:
+	//{
+	//my_namespace::MyFst * my_fst_temp = 
+	//  my_transducer_library_funct(implementation.my_transducer_library,s1,s2);
+	//delete(implementation.my_transducer_library);
+	//implementation.my_transducer_library = my_fst_temp;
+	//break;
+	//}
+	//#endif
 	case ERROR_TYPE:
 	default:
 	  throw hfst::exceptions::TransducerHasWrongTypeException();
@@ -296,10 +300,11 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
    fsm * (*foma_funct)(fsm *,
 				    fsm *),
 #endif
-#if HAVE_MFSTL
-   mfstl::MyFst * (*mfstl_funct)(mfstl::MyFst *,
-				    mfstl::MyFst *),
-#endif
+   /* Add your library here. */
+   //#if HAVE_MY_TRANSDUCER_LIBRARY
+   //my_namespace::MyFst * (*my_transducer_library_funct)(my_namespace::MyFst *,
+   //				    my_namespace::MyFst *),
+   //#endif
    HfstTransducer &another)
   {
     if (this->type != another.type)
@@ -349,17 +354,19 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
 	  break;
 	}
 #endif
-#if HAVE_MFSTL
-      case MFSTL_TYPE:
-	{
-	  mfstl::MyFst * mfstl_temp = 
-	    mfstl_funct(implementation.mfstl,another.implementation.mfstl);
-	  delete implementation.mfstl;
-	  implementation.mfstl = mfstl_temp;
-	  break;
-	}
-#endif
-	//case UNSPECIFIED_TYPE:
+	/* Add your library here. */
+	//#if HAVE_MY_TRANSDUCER_LIBRARY
+	//case MY_TRANSDUCER_LIBRARY_TYPE:
+	//{
+	//  my_namespace::MyFst * my_fst_temp = 
+	//    my_transducer_library_funct
+	//      (implementation.my_transducer_library,
+	//       another.implementation.my_transducer_library);
+	//  delete implementation.my_transducer_library;
+	//  implementation.my_transducer_library = my_fst_temp;
+	//  break;
+	//}
+	//#endif
 	case ERROR_TYPE:
 	default:
 	  throw hfst::exceptions::TransducerHasWrongTypeException();

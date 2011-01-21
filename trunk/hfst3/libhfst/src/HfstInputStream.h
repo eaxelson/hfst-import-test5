@@ -74,8 +74,9 @@ For documentation on the HFST binary transducer format, see #hfst::HfstOutputStr
       hfst::implementations::FomaInputStream * foma;
 #endif
 
-#if HAVE_MFSTL
-      hfst::implementations::MfstlInputStream * mfstl;
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      hfst::implementations::MyTransducerLibraryInputStream * 
+        my_transducer_library;
 #endif
 
       hfst::implementations::HfstOlInputStream * hfst_ol;
@@ -118,7 +119,7 @@ For documentation on the HFST binary transducer format, see #hfst::HfstOutputStr
       OPENFST_, /* An OpenFst transducer, can cause problems if it does not have symbol tables. */
       SFST_,  /* An SFST transducer. */
       FOMA_, /* A foma transducer. */
-      MFSTL_, /* A new type */
+      MY_TRANSDUCER_LIBRARY_, /* Your transducer type */
       ERROR_TYPE_ /* Transducer type not recognized. */
     };
 

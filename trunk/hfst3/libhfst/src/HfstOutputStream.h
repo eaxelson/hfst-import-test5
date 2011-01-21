@@ -88,8 +88,9 @@ follow after these obligatory attributes.
       hfst::implementations::FomaOutputStream * foma;
 #endif
 
-#if HAVE_MFSTL
-      hfst::implementations::MfstlOutputStream * mfstl;
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      hfst::implementations::MyTransducerLibraryOutputStream * 
+        my_transducer_library;
 #endif
 
       hfst::implementations::HfstOlOutputStream * hfst_ol;

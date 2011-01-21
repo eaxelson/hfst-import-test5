@@ -46,9 +46,9 @@ namespace hfst
 	this->implementation.foma->ignore(n);
 	break;
 #endif
-#if HAVE_MFSTL
-      case MFSTL_TYPE:
-	this->implementation.mfstl->ignore(n);
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      case MY_TRANSDUCER_LIBRARY_TYPE:
+	this->implementation.my_transducer_library->ignore(n);
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -86,9 +86,9 @@ namespace hfst
 	return this->implementation.foma->stream_get();
 	break;
 #endif
-#if HAVE_MFSTL
-      case MFSTL_TYPE:
-	return this->implementation.mfstl->stream_get();
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      case MY_TRANSDUCER_LIBRARY_TYPE:
+	return this->implementation.my_transducer_library->stream_get();
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -128,9 +128,9 @@ namespace hfst
 	this->implementation.foma->stream_unget(c);
 	break;
 #endif
-#if HAVE_MFSTL
-      case MFSTL_TYPE:
-	this->implementation.mfstl->stream_unget(c);
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      case MY_TRANSDUCER_LIBRARY_TYPE:
+	this->implementation.my_transducer_library->stream_unget(c);
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -314,10 +314,10 @@ namespace hfst
 	  this->implementation.foma->read_transducer();
 	break;
 #endif
-#if HAVE_MFSTL
-      case MFSTL_TYPE:
-	t.implementation.mfstl =
-	  this->implementation.mfstl->read_transducer();
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      case MY_TRANSDUCER_LIBRARY_TYPE:
+	t.implementation.my_transducer_library =
+	  this->implementation.my_transducer_library->read_transducer();
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -373,10 +373,10 @@ namespace hfst
       case 'a':  // SFST
 	return SFST_;
 	break;
-#ifdef HAVE_MFSTL
+#ifdef HAVE_MY_TRANSDUCER_LIBRARY
 	/* We suppose that the first char in a MyFst is 'm'. */
-	  case 'm':  // Mfstl
-	    return MFSTL_;
+	  case 'm':  // MyFst
+	    return MY_TRANSDUCER_LIBRARY_;
 	    break;
 #endif
       case 'P':
@@ -447,9 +447,9 @@ namespace hfst
       type = TROPICAL_OFST_TYPE;
     else if (strcmp("LOG_OPENFST", header_data[1].second.c_str()) == 0 )
       type = LOG_OFST_TYPE;
-#if HAVE_MFSTL
-    else if (strcmp("MFSTL", header_data[1].second.c_str()) == 0 )
-      type = MFSTL_TYPE;
+#if HAVE_MY_TRANSDUCER_LIBRARY
+    else if (strcmp("MY_TRANSDUCER_LIBRARY", header_data[1].second.c_str()) == 0 )
+      type = MY_TRANSDUCER_LIBRARY_TYPE;
 #endif
     else if (strcmp("HFST_OL", header_data[1].second.c_str()) == 0 )
       type = HFST_OL_TYPE;
@@ -672,9 +672,9 @@ namespace hfst
       case FOMA_:
 	return FOMA_TYPE;
 	break;
-#if HAVE_MFSTL
-      case MFSTL_:
-	return MFSTL_TYPE;
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      case MY_TRANSDUCER_LIBRARY_:
+	return MY_TRANSDUCER_LIBRARY_TYPE;
 	break;
 #endif
       case ERROR_TYPE_:
@@ -720,9 +720,9 @@ namespace hfst
       implementation.foma = new hfst::implementations::FomaInputStream;
       break;
 #endif
-#if HAVE_MFSTL
-    case MFSTL_TYPE:
-      implementation.mfstl = new hfst::implementations::MfstlInputStream;
+#if HAVE_MY_TRANSDUCER_LIBRARY
+    case MY_TRANSDUCER_LIBRARY_TYPE:
+      implementation.my_transducer_library = new hfst::implementations::MyTransducerLibraryInputStream;
       break;
 #endif
     case HFST_OL_TYPE:
@@ -785,9 +785,9 @@ namespace hfst
       implementation.foma = new hfst::implementations::FomaInputStream(filename);
       break;
 #endif
-#if HAVE_MFSTL
-    case MFSTL_TYPE:
-      implementation.mfstl = new hfst::implementations::MfstlInputStream(filename);
+#if HAVE_MY_TRANSDUCER_LIBRARY
+    case MY_TRANSDUCER_LIBRARY_TYPE:
+      implementation.my_transducer_library = new hfst::implementations::MyTransducerLibraryInputStream(filename);
       break;
 #endif
     case HFST_OL_TYPE:
@@ -824,9 +824,9 @@ namespace hfst
 	delete implementation.foma;
 	break;
 #endif
-#if HAVE_MFSTL
-      case MFSTL_TYPE:
-	delete implementation.mfstl;
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      case MY_TRANSDUCER_LIBRARY_TYPE:
+	delete implementation.my_transducer_library;
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -863,9 +863,9 @@ namespace hfst
 	implementation.foma->close();
 	break;
 #endif
-#if HAVE_MFSTL
-      case MFSTL_TYPE:
-	implementation.mfstl->close();
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      case MY_TRANSDUCER_LIBRARY_TYPE:
+	implementation.my_transducer_library->close();
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -899,9 +899,9 @@ namespace hfst
 	return implementation.foma->is_eof();
 	break;
 #endif
-#if HAVE_MFSTL
-      case MFSTL_TYPE:
-	return implementation.mfstl->is_eof();
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      case MY_TRANSDUCER_LIBRARY_TYPE:
+	return implementation.my_transducer_library->is_eof();
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -935,9 +935,9 @@ namespace hfst
 	return implementation.foma->is_bad();
 	break;
 #endif
-#if HAVE_MFSTL
-      case MFSTL_TYPE:
-	return implementation.mfstl->is_bad();
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      case MY_TRANSDUCER_LIBRARY_TYPE:
+	return implementation.my_transducer_library->is_bad();
 	break;
 #endif
       case HFST_OL_TYPE:
@@ -972,9 +972,9 @@ namespace hfst
 	return implementation.foma->is_good();
 	break;
 #endif
-#if HAVE_MFSTL
-      case MFSTL_TYPE:
-	return implementation.mfstl->is_good();
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      case MY_TRANSDUCER_LIBRARY_TYPE:
+	return implementation.my_transducer_library->is_good();
 	break;
 #endif
       case HFST_OL_TYPE:

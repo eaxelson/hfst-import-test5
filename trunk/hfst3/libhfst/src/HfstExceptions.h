@@ -159,7 +159,7 @@ protected HfstInterfaceException {
 
 /** \brief Context transducers are not automata.
 
-    Thrown by #hfst::rules::replace_up(HfstTransducerPair&, HfstTransducer&, bool, StringPairSet&) and similar functions. */
+    Thrown by hfst::rules::replace_up(HfstTransducerPair&, HfstTransducer&, bool, StringPairSet&) */
 class ContextTransducersAreNotAutomataException :
 public HfstArgumentException {};
 
