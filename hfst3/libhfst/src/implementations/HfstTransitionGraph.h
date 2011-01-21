@@ -24,7 +24,7 @@ namespace hfst {
 
       Most code in this namespace is not intended to be accessed
       by the user of the HFST interface. An exception is HFST's
-      own transducer class #HfstTransitionGraph and classes that
+      own transducer class hfst::HfstTransitionGraph and classes that
       are needed to use it.
   */
   namespace implementations {

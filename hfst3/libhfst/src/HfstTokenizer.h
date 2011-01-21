@@ -18,7 +18,7 @@
 #include <string>
 
 /** @file HfstTokenizer.h
-    \brief Declaration of class #HfstTokenizer. */
+    \brief Declaration of class #hfst::HfstTokenizer. */
 
 namespace hfst
 {

@@ -47,7 +47,6 @@ HFST_HDRS = \
 	implementations/TropicalWeightTransducer.h \
 	implementations/LogWeightTransducer.h \
 	implementations/FomaTransducer.h \
-	implementations/MfstlTransducer.h \
 	implementations/HfstOlTransducer.h \
 	HfstTokenizer.h \
 	implementations/ConvertTransducerFormat.h \
@@ -57,6 +56,8 @@ HFST_HDRS = \
 	HfstFlagDiacritics.h \
 	HfstInputStream.h \
 	HfstOutputStream.h
+### Add your library here ###
+#	implementations/MyTransducerLibraryTransducer.h
 
 hfstinclude_HEADERS = $(HFST_HDRS)
 

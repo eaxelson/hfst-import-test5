@@ -38,12 +38,13 @@
 #endif // _FOMALIB_H_
 #endif // HAVE_FOMA
 
-#if HAVE_MFSTL
-#ifndef _MFSTLLIB_H_
-#define _MFSTLLIB_H_
-#include "mfstl/MyFst.h"
-#endif // _MFSTLLIB_H_
-#endif // HAVE_MFSTL
+/* Add here your transducer library header (and possibly a guard). */
+//#if HAVE_MY_TRANSDUCER_LIBRARY
+//#ifndef _MY_TRANSDUCER_LIBRARY_LIB_H_
+//#define _MY_TRANSDUCER_LIBRARY_LIB_H_
+//#include "my_transducer_library/MyTransducerLibrary.h"
+//#endif // _MY_TRANSDUCER_LIBRARY_LIB_H_
+//#endif // HAVE_MY_TRANSDUCER_LIBRARY
 
 #include "HfstExceptions.h"
 #include "optimized-lookup/transducer.h"
@@ -121,12 +122,17 @@ namespace implementations {
   static hfst_ol::Transducer * hfst_basic_transducer_to_hfst_ol
     (HfstBasicTransducer * t, bool weighted);
 
-
-#if HAVE_MFSTL
-  static HfstBasicTransducer * mfstl_to_hfst_basic_transducer(mfstl::MyFst * t);
-
-  static mfstl::MyFst * hfst_basic_transducer_to_mfstl(const HfstBasicTransducer * t);
-#endif // HAVE_MFSTL
+  /* Define here the functions that convert between HfstBasicTransducer and 
+     your transducer class. */
+  //#if HAVE_MY_TRANSDUCER_LIBRARY
+  //static HfstBasicTransducer * 
+  //  my_transducer_library_transducer_to_hfst_basic_transducer
+  //    (my_namespace::MyFst * t);
+  //
+  //static my_namespace::MyFst * 
+  //  hfst_basic_transducer_to_my_transducer_library_transducer
+  //    (const HfstBasicTransducer * t);
+  //#endif // HAVE_MY_TRANSDUCER_LIBRARY
 
   };
 

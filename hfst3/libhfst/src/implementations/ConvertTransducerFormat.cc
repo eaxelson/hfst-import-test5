@@ -37,17 +37,19 @@ namespace hfst { namespace implementations
       return tropical_ofst_to_hfst_basic_transducer(t.implementation.tropical_ofst); 
     if (t.type == LOG_OFST_TYPE)
       return log_ofst_to_hfst_basic_transducer(t.implementation.log_ofst); 
-#endif // HAVE_SFST
+#endif // HAVE_OPENFST
 
 #if HAVE_FOMA
     if (t.type == FOMA_TYPE)
       return foma_to_hfst_basic_transducer(t.implementation.foma); 
-#endif // HAVE_SFST
+#endif // HAVE_FOMA
 
-#if HAVE_MFSTL
-    if (t.type == MFSTL_TYPE)
-      return mfstl_to_hfst_basic_transducer(t.implementation.mfstl); 
-#endif // HAVE_SFST
+    /* Add here your implementation. */
+    //#if HAVE_MY_TRANSDUCER_LIBRARY
+    //    if (t.type == MY_TRANSDUCER_LIBRARY_TYPE)
+    //      return my_transducer_library_transducer_to_hfst_basic_transducer
+    //        (t.implementation.my_transducer_library); 
+    //#endif // HAVE_MY_TRANSDUCER_LIBRARY
 
     if (t.type == HFST_OL_TYPE || t.type == HFST_OLW_TYPE)
       return hfst_ol_to_hfst_basic_transducer(t.implementation.hfst_ol);
@@ -877,21 +879,22 @@ namespace hfst { namespace implementations
   }
 
 
-#if HAVE_MFSTL
+  /* Add here your conversion functions. */
+  //#if HAVE_MY_TRANSDUCER_LIBRARY
+  //
+  //HfstBasicTransducer * ConversionFunctions::
+  //my_transducer_library_transducer_to_hfst_basic_transducer(my_namespace::MyFst * t) {
+  //(void)t;
+  //throw hfst::exceptions::FunctionNotImplementedException();
+  //}
 
-  HfstBasicTransducer * ConversionFunctions::
-  mfstl_to_hfst_basic_transducer(mfstl::MyFst * t) {
-  (void)t;
-  throw hfst::exceptions::FunctionNotImplementedException();
-}
-
-  mfstl::MyFst * ConversionFunctions::
-  hfst_basic_transducer_to_mfstl(const HfstBasicTransducer * t) {
-  (void)t;
-  throw hfst::exceptions::FunctionNotImplementedException();
-}
-
-#endif // HAVE_MFSTL
+  //my_namespace::MyFst * ConversionFunctions::
+  //hfst_basic_transducer_to_my_transducer_library_transducer
+  //  (const HfstBasicTransducer * t) {
+  //(void)t;
+  //throw hfst::exceptions::FunctionNotImplementedException();
+  //}
+  //#endif // HAVE_MY_TRANSDUCER_LIBRARY
 
 
 } }

@@ -32,14 +32,15 @@ endif
 if WANT_FOMA
 MAYBE_FOMA=FomaTransducer.cc
 endif
-if WANT_MFSTL
-MAYBE_MFSTL=MfstlTransducer.cc
-endif
+# Add here your transducer library
+#if WANT_MY_TRANSDUCER_LIBRARY
+#MAYBE_MY_TRANSDUCER_LIBRARY=MyTransducerLibraryTransducer.cc
+#endif
 if WANT_HFSTOL
 MAYBE_HFSTOL=HfstOlTransducer.cc
 endif
 
-BRIDGE_SRCS=$(MAYBE_SFST) $(MAYBE_OPENFST) $(MAYBE_FOMA) $(MAYBE_MFSTL) $(MAYBE_HFSTOL)
+BRIDGE_SRCS=$(MAYBE_SFST) $(MAYBE_OPENFST) $(MAYBE_FOMA) $(MAYBE_HFSTOL) # $(MAYBE_MY_TRANSDUCER_LIBRARY)
 
 if WANT_HFSTOL
 HFST_OL_SRCS=\
@@ -59,8 +60,9 @@ implinclude_HEADERS = \
 		FomaTransducer.h \
 		LogWeightTransducer.h \
 		SfstTransducer.h TropicalWeightTransducer.h \
-		HfstOlTransducer.h HfstTransitionGraph.h \
-		MfstlTransducer.h
+		HfstOlTransducer.h HfstTransitionGraph.h
+### Add here your library ###
+#		MyTransducerLibraryTransducer.h
 
 
 if WANT_HFSTOL
@@ -82,12 +84,12 @@ endif
 if WANT_SFST
 SFST_TSTS=SfstTransducer
 endif
-if WANT_MFSTL
-MFSTL_TSTS=MfstlTransducer
-endif
+# Add here your library test
+#if WANT_MY_TRANSDUCER_LIBRARY
+#MY_TRANSDUCER_LIBRARY_TSTS=MyTransducerLibraryTransducer
+#endif
 check_PROGRAMS=ConvertTransducerFormat \
-			   $(FOMA_TSTS) $(HFSTOL_TSTS) $(OFST_TSTS) $(SFST_TSTS) \
-			   $(MFSTL_TSTS)
+			   $(FOMA_TSTS) $(HFSTOL_TSTS) $(OFST_TSTS) $(SFST_TSTS) # $(MY_TRANSDUCER_LIBRARY_TSTS)
 ConvertTransducerFormat_SOURCES=ConvertTransducerFormat.cc
 ConvertTransducerFormat_CXXFLAGS=-DDEBUG_MAIN
 ConvertTransducerFormat_LDADD=../libhfst.la
@@ -100,9 +102,10 @@ HfstOlTransducer_LDADD=../libhfst.la
 LogWeightTransducer_SOURCES=LogWeightTransducer.cc
 LogWeightTransducer_CXXFLAGS=-DDEBUG_MAIN
 LogWeightTransducer_LDADD=../libhfst.la
-MfstlTransducer_SOURCES=MfstlTransducer.cc
-MfstlTransducer_CXXFLAGS=-DDEBUG_MAIN
-MfstlTransducer_LDADD=../libhfst.la
+### Add here your library tests ###
+# MyTransducerLibraryTransducer_SOURCES=MyTransducerLibraryTransducer.cc
+# MyTransducerLibraryTransducer_CXXFLAGS=-DDEBUG_MAIN
+# MyTransducerLibraryTransducer_LDADD=../libhfst.la
 SfstTransducer_SOURCES=SfstTransducer.cc
 SfstTransducer_CXXFLAGS=-DDEBUG_MAIN
 SfstTransducer_LDADD=../libhfst.la
@@ -110,5 +113,5 @@ TropicalWeightTransducer_SOURCES=TropicalWeightTransducer.cc
 TropicalWeightTransducer_CXXFLAGS=-DDEBUG_MAIN
 TropicalWeightTransducer_LDADD=../libhfst.la
 TESTS=ConvertTransducerFormat \
-	  $(FOMA_TSTS) $(HFSTOL_TSTS) $(OFST_TSTS) $(SFST_TSTS) $(MFSTL_TSTS)
+	  $(FOMA_TSTS) $(HFSTOL_TSTS) $(OFST_TSTS) $(SFST_TSTS) # $(MY_TRANSDUCER_LIBRARY_TSTS)
 

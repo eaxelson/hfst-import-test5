@@ -24,9 +24,10 @@ HfstTransducer &apply(
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *),
 #endif
-#if HAVE_MFSTL
- mfstl::MyFst * (*mfstl_funct)(mfstl::MyFst *),
-#endif
+ /* Add your library here */
+ //#if HAVE_MY_TRANSDUCER_LIBRARY
+ //my_namespace::MyFst * (*my_transducer_library_funct)(my_namespace::MyFst *),
+ //#endif
  bool dummy /* makes sure there is always a parameter after the function pointer parameters,
 	     * so commas between parameters are easier to handle */
 );  
@@ -42,9 +43,10 @@ HfstTransducer &apply(
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *,int),
 #endif
-#if HAVE_MFSTL
- mfstl::MyFst * (*mfstl_funct)(mfstl::MyFst *,int),
-#endif
+ /* Add your library here */
+ //#if HAVE_MY_TRANSDUCER_LIBRARY
+ //my_namespace::MyFst * (*my_transducer_library_funct)(my_namespace::MyFst *,int),
+ //#endif
  int n);
 
 HfstTransducer &apply(
@@ -60,9 +62,10 @@ HfstTransducer &apply(
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *, String, String),
 #endif
-#if HAVE_MFSTL
- mfstl::MyFst * (*mfstl_funct)(mfstl::MyFst *, String, String),
-#endif
+ /* Add your library here */
+ //#if HAVE_MY_TRANSDUCER_LIBRARY
+ //my_namespace::MyFst * (*my_transducer_library_funct)(my_namespace::MyFst *, String, String),
+ //#endif
  String k1, String k2);
 
 HfstTransducer &apply(
@@ -80,7 +83,8 @@ HfstTransducer &apply(
  fsm * (*foma_funct)(fsm *,
 		     fsm *),
 #endif
-#if HAVE_MFSTL
- mfstl::MyFst * (*mfstl_funct)(mfstl::MyFst *, mfstl::MyFst *),
-#endif
+ /* Add your library here */
+ //#if HAVE_MY_TRANSDUCER_LIBRARY
+ //my_namespace::MyFst * (*my_transducer_library_funct)(my_namespace::MyFst *, my_namespace::MyFst *),
+ //#endif
  HfstTransducer &another );
