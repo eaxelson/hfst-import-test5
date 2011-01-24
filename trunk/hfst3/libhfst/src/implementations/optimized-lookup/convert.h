@@ -415,7 +415,8 @@ public:
   
   Transducer* to_transducer() const;
   
-  static ConvertTransducer* constructing_transducer; // exposed to this module during the constructor
+  // exposed to this module during the constructor
+  static ConvertTransducer* constructing_transducer; 
 };
 
 #endif // HAVE_OPENFST
