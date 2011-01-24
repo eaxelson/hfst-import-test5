@@ -117,63 +117,59 @@ HfstTransducer tr("a", "b", SFST_TYPE);
 
       <b>This page is still under construction...</b>
 
-      <H2>Adding your own library under the HFST interface</H2>
 
-      When adding your library under HFST, you must do some modifications 
-      to the HFST files.
-      The places where you must make modifications, i.e. add your own code,
-      are marked in the files inside comments.
+      <H2>Adding your own library under the HFST API</H2>
 
-      <H2>Configuring</H2>
+      The HFST library is designed in a way that makes it possible to
+      easily add a new implementation under the HFST API. There are some
+      places in the code where you must make modifications but they are all
+      clearly marked in the files inside comments. Most of these modifications
+      just make HFST aware that there is a new implementation available and are
+      quite straightforward to carry out. The new backend implementation itself
+      is written in a separate file that must fulfil an interface common to all
+      backend implementations. This interface defines functions that create and
+      operate on transducers and datatypes for writing and reading binary transducers.
+      This interface is used for cooperation between the different transducer libraries
+      and the HFST API that is visible to the end-user.
 
-      The configuration file must be aware of the new library.
-      You have to add the following pieces of code to the file configure.ac
-      (change "MY_TRANSDUCER_LIBRARY" etc. to the name of your transducer library):
+      We first tell what functions and datatypes your library
+      must implement and were they must be written 
+      so that your library can be connected as a part of the HFST API.
+      We then go through the modifications that you must do to the code when connecting your
+      implementation to the HFST API. All these modifications are also indicated in the
+      code inside comments, so we do not handle each change here but advise
+      you to see the files.
+      Finally we tell what changes are needed in the configuration file. 
 
-      \verbatim
-AC_ARG_WITH([my_transducer_library],
-            [AS_HELP_STRING([--with-my-transducer-library],
-                            [process unweighted fsts with my transducer library @<:@default=no@:>@])],
-            [],
-            [with_my_transducer_library=no])
-AS_IF([test "x$with_my_transducer_library" != xno], [AC_DEFINE([HAVE_MY_TRANSDUCER_LIBRARY], [1],
-                                              [Define to compile my transducer library support in HFST])])
-AM_CONDITIONAL([WANT_MY_TRANSDUCER_LIBRARY], [test x$with_my_transducer_library != xno])
-      \endverbatim
-
-      \verbatim
-AS_IF([test "x$with_my_transducer_library" != "xno"],
-      [AC_CHECK_LIB([my_transducer_library], [main], [],
-                [AC_MSG_FAILURE([my transducer library test failed (--without-my-transducer-library to disable)])])])
-      \endverbatim
-
-      \verbatim
-AS_IF([test "x$with_my_transducer_library" != "xno"],
-      [AC_CHECK_HEADERS([my_transducer_library/MyTransducerLibrary.h])])
-      \endverbatim
-
-      \verbatim
-    *         with my transducer library: $with_my_transducer_library
-     \endverbatim
-
-     <BR>
+      <BR>
 
      <H2>The interaction between HFST and your library</H2>
 
-     In directory libhfst/src/implementations there are skeleton files
+     The directory libhfst/src/implementations contains two files per each
+     library that is added under HFST. For instance for SFST there are files
+     SfstTransducer.h and SfstTransducer.cc. 
+     If a library offers more than one
+     transducer format, there are separate files for each format. For instance
+     for OpenFst there are files TropicalWeightTransducer.cc and .h and
+     LogWeightTransducer.cc and .h. Each pair of files contains
+     three static classes that act as an interface between HFST and the
+     library in question. For instance the files FomaTransducer.h and FomaTransducer.cc
+     contain classes FomaTransducer, FomaInputStream and FomaOutputStream that
+     take care of interoperation between foma library and HFST.     
+
+     The directory contains skeleton files
      MyTransducerLibraryTransducer.h and MyTransducerLibraryTransducer.cc.
      These files define <a href="group__AddingLibrary.html">a group of static classes</a>
      MyTransducerLibraryTransducer, MyTransducerLibraryInputStream
      and MyTransducerLibraryOutputStream that
      contain functions that operate on transducers and streams.
      These classes act as an interface between HFST and your library.
-     The HFST interface will access your library through these classes.
-     These are the files where you should write your implementations.
+     You should write your implementations to these files.
      The assumption is that most of the functionalities are found already in your library
      and you just have to modify them a little so that thay can be accessed 
      via a standardized interface that works similarily for all implementations.
 
-     All functions return an hfst::exceptions::FunctionNotImplementedException
+     All functions in the skeleton files return an hfst::exceptions::FunctionNotImplementedException
      as they have no implementation. When starting to add your own implementations,
      you can also return the same exception for all functions that you have not 
      yet implemented.
@@ -220,60 +216,302 @@ BRIDGE_SRCS=$(MAYBE_SFST) $(MAYBE_OPENFST) $(MAYBE_FOMA) $(MAYBE_HFSTOL) # $(MAY
 
      <H2>Using your implementation in HFST</H2>
 
-     HfstDataTypes.h
-
-     enum ImplementationType needs a new enumerator):
+     In file HfstDataTypes.h there is an enum ImplementationType that
+     lists all possible HfstTransducer implementation types.
+     If needs a new enumerator:
 
 \verbatim
      MY_TRANSDUCER_LIBRARY_TYPE, 
 \endverbatim
 
-     In file HfstTransducer.h:
+     In file HfstTransducer.h you must include the header file 
+     MyTransducerLibraryTransducer.h.
 
 \verbatim
-/* Include here the header file of the files that take care 
-   of the interaction between HFST and your transducer library. */
-//#if HAVE_MY_TRANSDUCER_LIBRARY
-//#include "implementations/MyTransducerLibraryTransducer.h"
-//#endif
+#if HAVE_MY_TRANSDUCER_LIBRARY
+#include "implementations/MyTransducerLibraryTransducer.h"
+#endif
+\endverbatim
 
-  /* Add here the transducer class of your transducer library. */
-  //#if HAVE_MY_TRANSDUCER_LIBRARY
-  //  using hfst::implementations::MyTransducerLibraryTransducer;
-  //#endif // #if HAVE_MY_TRANSDUCER_LIBRARY
+     and declare that you are using the static class MyTransducerLibraryTransducer:
+
+\verbatim
+#if HAVE_MY_TRANSDUCER_LIBRARY
+  using hfst::implementations::MyTransducerLibraryTransducer;
+#endif // #if HAVE_MY_TRANSDUCER_LIBRARY
+\endverbatim
+
+You must add your own transducer type to TransducerImplementation,
+the union of possible transducer backend implementations:
+
+\verbatim
+#if HAVE_MY_TRANSDUCER_LIBRARY
+  hfst::implementations::MyFst * my_transducer_library;
+#endif
+\endverbatim
+
+  This is the only thing that HFST is directly aware of in your library.
+  All other functionalities are accessed through classes MyTransducerLibraryTransducer,
+  MyTransducerLibraryInputStream and MyTransducerLibraryOutputStream.
+
+  You also need and interface to the class MyTransducerLibraryTransducer:
+
+\verbatim
+#if HAVE_MY_TRANSDUCER_LIBRARY
+  static hfst::implementations::MyTransducerLibraryTransducer
+    my_transducer_library_interface;
+#endif
+\endverbatim
+
+  In file HfstTransducer.cc, you must define the interface between
+  HFST and your transducer library: 
+
+\verbatim
+#if HAVE_MY_TRANSDUCER_LIBRARY
+  hfst::implementations::MyTransducerLibraryTransducer 
+    HfstTransducer::my_transducer_library_interface;
+#endif
+\endverbatim
+
+  For all functions and HfstTransducer constructors and destructor,
+  you must add a piece of code that calls the implementation of
+  that functionality in the class MyTransducerLibraryTransducer.
+  For some functions you have to call two or more MyTransducerLibraryTransducer
+  functions. Usually more complex functions are implemented
+  with HFST API basic functions, so they do not have to be implemented
+  separately for each library. By default all functionalities throw
+  an hfst::exceptions::FunctionNotImplementedException if the implementation
+  type requested is not handled as a separate case in the function.
+
+  An example of a constructor that creates an empty HfstTransducer:
+
+\verbatim
+  HfstTransducer::HfstTransducer(ImplementationType type):
+    type(type),anonymous(false),is_trie(true), name("")
+  {
+    if (not is_implementation_type_available(type))
+      throw hfst::exceptions::ImplementationTypeNotAvailableException();
+
+    switch (type)
+      {
+#if HAVE_SFST
+      case SFST_TYPE:
+	implementation.sfst = sfst_interface.create_empty_transducer();
+	break;
+#endif
+#if HAVE_OPENFST
+      case TROPICAL_OFST_TYPE:
+	implementation.tropical_ofst = 
+	  tropical_ofst_interface.create_empty_transducer();
+	this->type = TROPICAL_OFST_TYPE;
+	break;
+      case LOG_OFST_TYPE:
+	implementation.log_ofst = 
+	  log_ofst_interface.create_empty_transducer();
+	break;
+#endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+	implementation.foma = foma_interface.create_empty_transducer();
+	break;
+#endif
+	/* Add here your implementation. */
+	//#if HAVE_MY_TRANSDUCER_LIBRARY
+      //case MY_TRANSDUCER_LIBRARY_TYPE:
+	//implementation.my_transducer_library 
+	//  = my_transducer_library_interface.create_empty_transducer();
+	//break;
+	//#endif
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	implementation.hfst_ol = hfst_ol_interface.create_empty_transducer
+	  (type==HFST_OLW_TYPE?true:false);
+	break;
+      case ERROR_TYPE:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+      default:
+	throw hfst::exceptions::FunctionNotImplementedException();
+      }
+  }
+\endverbatim
+
+  Many functions call a function in file HfstApply.cc that takes
+  as parameters pointers to all backend implementation functions
+  that are available. For example the function remove_epsilons
+
+\verbatim
+  HfstTransducer &HfstTransducer::remove_epsilons()
+  { is_trie = false;
+    return apply(
+#if HAVE_SFST
+       &hfst::implementations::SfstTransducer::remove_epsilons,
+#endif
+#if HAVE_OPENFST
+       &hfst::implementations::TropicalWeightTransducer::remove_epsilons,
+       &hfst::implementations::LogWeightTransducer::remove_epsilons,
+#endif
+#if HAVE_FOMA
+       &hfst::implementations::FomaTransducer::remove_epsilons,
+#endif
+       /* Add here your implementation. */
+       //#if HAVE_MY_TRANSDUCER_LIBRARY
+       //&hfst::implementations::MyTransducerLibraryTransducer::remove_epsilons,
+       //#endif
+       false ); }
+
+\endverbatim
+
+  calls the function
+
+\verbatim
+HfstTransducer &apply(
+#if HAVE_SFST
+ SFST::Transducer * (*sfst_funct)(SFST::Transducer *),
+#endif
+#if HAVE_OPENFST
+ fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *),
+ hfst::implementations::LogFst * (*log_ofst_funct)(hfst::implementations::LogFst *),
+#endif
+#if HAVE_FOMA
+ fsm * (*foma_funct)(fsm *),
+#endif
+ /* Add your library here */
+ //#if HAVE_MY_TRANSDUCER_LIBRARY
+ //my_namespace::MyFst * (*my_transducer_library_funct)(my_namespace::MyFst *),
+ //#endif
+ bool dummy /* makes sure there is always a parameter after the function pointer parameters,
+	     * so commas between parameters are easier to handle */
+);  
+\endverbatim
+
+  Then the function apply chooses the right function pointer to use
+  according to the type of the transducer:
+
+\verbatim
+  HfstTransducer &HfstTransducer::apply(
+#if HAVE_SFST
+ SFST::Transducer * (*sfst_funct)(SFST::Transducer *), 
+#endif
+#if HAVE_OPENFST
+ fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *),
+ hfst::implementations::LogFst * (*log_ofst_funct)(hfst::implementations::LogFst *),
+#endif
+#if HAVE_FOMA
+ fsm * (*foma_funct)(fsm *),
+#endif
+ /* Add your library. */
+ //#if HAVE_MY_TRANSDUCER_LIBRARY
+ //my_namespace::MyFst * (*my_transducer_library_funct)(my_namespace::MyFst *),
+ //#endif
+  bool foo )
+    {
+      (void)foo;
+    switch(this->type)
+      {
+#if HAVE_SFST
+      case SFST_TYPE:
+	{
+	  SFST::Transducer * sfst_temp = 
+	    sfst_funct(implementation.sfst);
+	  delete implementation.sfst;
+	  implementation.sfst = sfst_temp;
+	  break;
+	}
+#endif
+#if HAVE_OPENFST
+      case TROPICAL_OFST_TYPE:
+	{
+	  fst::StdVectorFst * tropical_ofst_temp =
+	    tropical_ofst_funct(implementation.tropical_ofst);
+	  delete implementation.tropical_ofst;
+	  implementation.tropical_ofst = tropical_ofst_temp;
+	  break;
+	}
+      case LOG_OFST_TYPE:
+	{
+	  hfst::implementations::LogFst * log_ofst_temp =
+	    log_ofst_funct(implementation.log_ofst);
+	  delete implementation.log_ofst;
+	  implementation.log_ofst = log_ofst_temp;
+	  break;
+	}
+#endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+	{
+      fsm * foma_temp =
+	    foma_funct(implementation.foma);
+	  this->foma_interface.delete_foma(implementation.foma);
+	  implementation.foma = foma_temp;
+	  break;
+	}
+#endif
+	/* Add your library here. */
+	//#if HAVE_MY_TRANSDUCER_LIBRARY
+	//case MY_TRANSDUCER_LIBRARY_TYPE:
+	//{
+	//  my_namespace::MyFst * my_fst_temp =
+	//  my_transducer_library_funct(implementation.my_transducer_library);
+	//delete implementation.my_transducer_library;
+	//implementation.my_transducer_library = my_fst_temp;
+	//break;
+	//}
+	//#endif
+	case ERROR_TYPE:
+	default:
+	  throw hfst::exceptions::TransducerHasWrongTypeException();
+      }
+    return *this;
+  }
+\endverbatim
+
+  Files HfstInputStream.h, HfstOutputStream.h,
+    	HfstInputStream.cc, HfstOutputStream.cc.
+    	hfst_apply_schemas.h and HfstApply.cc
+  work similarly as files HfstTransducer.h and HfstTransducer.cc,
+  so we will not go through all of them here.
+  See instead the comments of these files that tell
+  you how they must be modified if a new library is added.
+
+  Finally, in file libhfst/src/Makefile.am you must add your library to the list HFST_HDRS:
+
+\verbatim
+	implementations/MyTransducerLibraryTransducer.h
 \endverbatim
 
 
-The transducer class of your library.	
-  This is the only thing that HFST is aware of in your library.
-All other functionalities are accessed through classes MyTransducerLibraryTransducer,
-MyTransducerLibraryInputStream and MyTransducerLibraryOutputStream.
+      <H2>Configuring</H2>
 
-\verbatim
-      /* Add here your own transducer backend implementation. */
-      //#if HAVE_MY_TRANSDUCER_LIBRARY
-      //      hfst::implementations::MyFst * my_transducer_library;
-      //#endif
+      The configuration file must be aware of the new library.
+      You have to add the following pieces of code to the file configure.ac
+      (change "MY_TRANSDUCER_LIBRARY" etc. to the name of your transducer library):
 
-    /* Add here an interface that takes care of the interaction between
-       HFST and your transducer library. */
-    //#if HAVE_MY_TRANSDUCER_LIBRARY
-    //static hfst::implementations::MyTransducerLibraryTransducer
-    //  my_transducer_library_interface;
-    //#endif
-\endverbatim
+      \verbatim
+AC_ARG_WITH([my_transducer_library],
+            [AS_HELP_STRING([--with-my-transducer-library],
+                            [process unweighted fsts with my transducer library @<:@default=no@:>@])],
+            [],
+            [with_my_transducer_library=no])
+AS_IF([test "x$with_my_transducer_library" != xno], [AC_DEFINE([HAVE_MY_TRANSDUCER_LIBRARY], [1],
+                                              [Define to compile my transducer library support in HFST])])
+AM_CONDITIONAL([WANT_MY_TRANSDUCER_LIBRARY], [test x$with_my_transducer_library != xno])
+      \endverbatim
 
-    HfstTransducer.cc, HfstInputStream.h, HfstOutputStream.h,
-    HfstInputStream.cc, HfstOutputStream.cc.
+      \verbatim
+AS_IF([test "x$with_my_transducer_library" != "xno"],
+      [AC_CHECK_LIB([my_transducer_library], [main], [],
+                [AC_MSG_FAILURE([my transducer library test failed (--without-my-transducer-library to disable)])])])
+      \endverbatim
 
-    hfst_apply_schemas.h, HfstApply.cc
+      \verbatim
+AS_IF([test "x$with_my_transducer_library" != "xno"],
+      [AC_CHECK_HEADERS([my_transducer_library/MyTransducerLibrary.h])])
+      \endverbatim
 
-    libhfst/src/Makefile.am the list HFST_HDRS:
+      \verbatim
+    *         with my transducer library: $with_my_transducer_library
+     \endverbatim
 
-\verbatim
-### Add your library here ###
-#	implementations/MyTransducerLibraryTransducer.h
-\endverbatim
 
    */
 

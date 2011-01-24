@@ -162,7 +162,8 @@ parse_options(int argc, char** argv)
         case 'f':
           if(!eval_fd)
           {
-            fprintf(message_out, "Option -f must be used in conjunction with -e\n");
+            fprintf(message_out, "Option -f must be used in conjunction"
+		    " with -e\n");
             print_short_help();
             return EXIT_FAILURE;
           }
@@ -227,9 +228,11 @@ class Callback : public hfst::ExtractStringsCb
         return RetVal(true, false); // continue searching, break off this path
     }
     
-    if(input_exclude.length() > 0 && wp.istring.find(input_exclude) != std::string::npos)
+    if(input_exclude.length() > 0 && 
+       wp.istring.find(input_exclude) != std::string::npos)
       return RetVal(true, false); // continue searching, break off this path
-    if(output_exclude.length() > 0 && wp.ostring.find(output_exclude) != std::string::npos)
+    if(output_exclude.length() > 0 && 
+       wp.ostring.find(output_exclude) != std::string::npos)
       return RetVal(true, false); // continue searching, break off this path
     
     // the path passed the checks. Print it if it is final
@@ -244,7 +247,8 @@ class Callback : public hfst::ExtractStringsCb
       
       count++;
     }
-    return RetVal((max_num < 1) || (count < max_num), true); // continue until we've printed max_num strings
+    // continue until we've printed max_num strings
+    return RetVal((max_num < 1) || (count < max_num), true); 
   }
 };
 
@@ -267,12 +271,14 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
     
     if(nbest_strings > 0)
     {
-      verbose_printf("Pruning transducer to %i best path(s)...\n", nbest_strings);
+      verbose_printf("Pruning transducer to %i best path(s)...\n", 
+		     nbest_strings);
       t.n_best(nbest_strings);
     }
     else
     {
-      if(max_strings <= 0 && max_input_length <= 0 && max_output_length <= 0 && cycles < 0 && t.is_cyclic())
+      if(max_strings <= 0 && max_input_length <= 0 && max_output_length <= 0 &&
+	 cycles < 0 && t.is_cyclic())
       {
         error(EXIT_FAILURE, 0,
               "Transducer is cyclic. Use one or more of these options: "
