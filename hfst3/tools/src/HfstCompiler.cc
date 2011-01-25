@@ -587,7 +587,8 @@ namespace hfst
   }
 
   // HERE
-  HfstTransducer * HfstCompiler::read_words(char *filename, ImplementationType type) {
+  HfstTransducer * HfstCompiler::read_words(char *filename, 
+					    ImplementationType type) {
 
     if (Verbose)
       fprintf(stderr,"\nreading words from %s...", filename);
@@ -628,10 +629,12 @@ namespace hfst
       // NumberPairVector npv;
       char *bufptr = buffer;
 
-      std::pair<unsigned int, unsigned int> np = TheAlphabet.next_label(bufptr, true);
+      std::pair<unsigned int, unsigned int> np = 
+	TheAlphabet.next_label(bufptr, true);
       while (np.first != 0 || np.second != 0) {
-	spv.push_back(StringPair(std::string(TheAlphabet.code2symbol(np.first)), 
-				 std::string(TheAlphabet.code2symbol(np.second)) ) );
+	spv.push_back(StringPair
+		      (std::string(TheAlphabet.code2symbol(np.first)), 
+		       std::string(TheAlphabet.code2symbol(np.second)) ) );
 	//npv.push_back(NumberPair(np.first, np.second));
 	np = TheAlphabet.next_label(bufptr, true);
       }

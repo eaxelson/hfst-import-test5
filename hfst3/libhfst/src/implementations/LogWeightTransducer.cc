@@ -1313,10 +1313,8 @@ namespace hfst { namespace implementations
   { return new LogFst(RmEpsilonFst<LogArc>(*t)); }
 
   LogFst * 
-  LogWeightTransducer::n_best(LogFst * t,int n)
+  LogWeightTransducer::n_best(LogFst * t, unsigned int n)
   { 
-    if (n < 0)
-      { throw ImpossibleTransducerPowerException(); }
     LogFst * n_best_fst = new LogFst(); 
     fst::ShortestPath(*t,n_best_fst,(size_t)n);
     return n_best_fst;
@@ -1331,9 +1329,9 @@ namespace hfst { namespace implementations
   { return new LogFst(ClosureFst<LogArc>(*t,CLOSURE_PLUS)); }
 
   LogFst *
-  LogWeightTransducer::repeat_n(LogFst * t,int n)
+  LogWeightTransducer::repeat_n(LogFst * t, unsigned int n)
   {
-    if (n <= 0)
+    if (n == 0)
       { return create_epsilon_transducer(); }
 
     LogFst * repetition = create_epsilon_transducer();
@@ -1344,9 +1342,9 @@ namespace hfst { namespace implementations
   }
 
   LogFst *
-  LogWeightTransducer::repeat_le_n(LogFst * t,int n)
+  LogWeightTransducer::repeat_le_n(LogFst * t, unsigned int n)
   {
-    if (n <= 0)
+    if (n == 0)
       { return create_epsilon_transducer(); }
 
     LogFst * repetition = create_epsilon_transducer();

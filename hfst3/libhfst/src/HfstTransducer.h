@@ -495,13 +495,13 @@ in \a ifile.
     // ----------- Properties, comparison, conversion -------------
     // ------------------------------------------------------------
 
-    /** \brief Set the name of the transducer as \a name. 
+    /** \brief Rename the transducer \a name. 
 	@see get_name */
     void set_name(std::string &name);
 
     /** \brief Get the name of the transducer. 
 	@see set_name */
-    std::string get_name();
+    std::string get_name() const;
 
     /** \brief Whether the transducer is cyclic. */
     bool is_cyclic(void) const;
@@ -605,7 +605,7 @@ This will yield a file "testfile.att" that looks as follows:
 	indicating unlimited. Note that if the transducer is cyclic and 
 	cycles aren't capped,
 	the search will not end until the callback returns false. */
-    void extract_strings(ExtractStringsCb& callback, int cycles=-1);
+    void extract_strings(ExtractStringsCb& callback, int cycles=-1) const;
 
     /** \brief Extract a maximum of \a max_num string pairs that are 
 	recognized by the transducer
@@ -624,14 +624,14 @@ This will yield a file "testfile.att" that looks as follows:
 	@throws hfst::exceptions::TransducerIsCyclicException
 	@see #n_best */
     void extract_strings
-      (WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1);
+      (WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1) const;
     
     /* \brief Call \a callback with extracted strings that are not 
        invalidated by
        flag diacritic rules.
        @see extract_strings(WeightedPaths<float>::Set&, int, int) */
     void extract_strings_fd
-      (ExtractStringsCb& callback, int cycles=-1, bool filter_fd=true);
+      (ExtractStringsCb& callback, int cycles=-1, bool filter_fd=true) const;
     
     /** \brief Store to \a results string pairs that are recognized 
 	by the transducer
@@ -649,7 +649,7 @@ TODO...
   @see extract_strings(WeightedPaths<float>::Set&, int, int) */
     void extract_strings_fd
       (WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1, 
-       bool filter_fd=true);
+       bool filter_fd=true) const;
 
     //! @brief Lookup or apply a single string \a s and store a maximum of 
     //! \a limit results to \a results.
@@ -664,7 +664,7 @@ TODO...
     //! @param limit  number of strings to extract. -1 tries to extract all and
     //!             may get stuck if infinitely ambiguous
     void lookup(HfstLookupPaths& results, const HfstLookupPath& s,
-                ssize_t limit = -1);
+                ssize_t limit = -1) const;
 
     //! @brief Lookup or apply a single string minding flag diacritics properly.
     //! 
@@ -673,7 +673,7 @@ TODO...
     //!
     //! @sa lookup
     void lookup_fd(HfstLookupPaths& results, const HfstLookupPath& s,
-                   ssize_t limit = -1);
+                   ssize_t limit = -1) const;
 
     //! @brief Lookdown a single string \a s and store a maximum of 
     //! \a limit results to \a results.
@@ -689,7 +689,7 @@ TODO...
     //! @param limit  number of strings to extract. -1 tries to extract all and
     //!             may get stuck if infinitely ambiguous
     void lookdown(HfstLookupPaths& results, const HfstLookupPath& s,
-                  ssize_t limit = -1);
+                  ssize_t limit = -1) const;
 
     //! @brief Lookdown a single string minding flag diacritics properly.
     //! 
@@ -698,13 +698,13 @@ TODO...
     //!
     //! @sa lookdown
     void lookdown_fd(HfstLookupPaths& results, HfstLookupPath& s,
-                     ssize_t limit = -1);
+                     ssize_t limit = -1) const;
 
     //! @brief Whether lookup of path \a s will have infinite results.
-    bool is_lookup_infinitely_ambiguous(const HfstLookupPath& s);
+    bool is_lookup_infinitely_ambiguous(const HfstLookupPath& s) const;
 
     //! @brief Whether lookdown of path \a s will have infinite results.
-    bool is_lookdown_infinitely_ambiguous(const HfstLookupPath& s);
+    bool is_lookdown_infinitely_ambiguous(const HfstLookupPath& s) const;
 
 
 

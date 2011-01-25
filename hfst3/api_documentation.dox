@@ -113,64 +113,64 @@ HfstTransducer tr("a", "b", SFST_TYPE);
       */
 
 
-  /** \page AddingYourLibrary.html 
+  /** \page AddingYourImplementation.html 
 
       <b>This page is still under construction...</b>
 
 
-      <H2>Adding your own library under the HFST API</H2>
+      <H2>Adding your own implementation under the HFST API</H2>
 
-      The HFST library is designed in a way that makes it possible to
-      easily add a new implementation under the HFST API. There are some
-      places in the code where you must make modifications but they are all
+      The HFST API is currently implemented with three finite-state libraries,
+      SFST, OpenFst and foma. The API is designed so that it is relatively easy to
+      add a new implementation to it. 
+      There are some places in the code where you must make modifications but they are all
       clearly marked in the files inside comments. Most of these modifications
       just make HFST aware that there is a new implementation available and are
       quite straightforward to carry out. The new backend implementation itself
       is written in a separate file that must fulfil an interface common to all
       backend implementations. This interface defines functions that create and
-      operate on transducers and datatypes for writing and reading binary transducers.
-      This interface is used for cooperation between the different transducer libraries
+      operate on transducers as well as datatypes for writing and reading binary transducers.
+      This interface is used for cooperation between the different finite-state libraries
       and the HFST API that is visible to the end-user.
 
-      We first tell what functions and datatypes your library
-      must implement and were they must be written 
-      so that your library can be connected as a part of the HFST API.
-      We then go through the modifications that you must do to the code when connecting your
-      implementation to the HFST API. All these modifications are also indicated in the
+      We first tell what functions and datatypes your implementation must 
+      must offer so that it can be connected as a part of the HFST API.
+      We then go through the modifications that you must do to the code when adding
+      your implementation to the HFST API. All these modifications are also indicated in the
       code inside comments, so we do not handle each change here but advise
-      you to see the files.
-      Finally we tell what changes are needed in the configuration file. 
+      you to see the files instead. Finally we tell what changes must be done 
+      in the configuration file. 
 
       <BR>
 
-     <H2>The interaction between HFST and your library</H2>
+     <H2>The interaction between HFST and the new finite-state library</H2>
 
      The directory libhfst/src/implementations contains two files per each
      library that is added under HFST. For instance for SFST there are files
      SfstTransducer.h and SfstTransducer.cc. 
-     If a library offers more than one
-     transducer format, there are separate files for each format. For instance
-     for OpenFst there are files TropicalWeightTransducer.cc and .h and
+     If a library offers more than one transducer format, there are separate files 
+     for each format. For example for OpenFst there are files TropicalWeightTransducer.cc and .h and
      LogWeightTransducer.cc and .h. Each pair of files contains
      three static classes that act as an interface between HFST and the
-     library in question. For instance the files FomaTransducer.h and FomaTransducer.cc
+     finite-state library in question. For instance the files FomaTransducer.h and FomaTransducer.cc
      contain classes FomaTransducer, FomaInputStream and FomaOutputStream that
-     take care of interoperation between foma library and HFST.     
+     take care of interoperation between the foma library and HFST.     
 
      The directory contains skeleton files
      MyTransducerLibraryTransducer.h and MyTransducerLibraryTransducer.cc.
-     These files define <a href="group__AddingLibrary.html">a group of static classes</a>
+     These files define a group of static classes
      MyTransducerLibraryTransducer, MyTransducerLibraryInputStream
      and MyTransducerLibraryOutputStream that
      contain functions that operate on transducers and streams.
      These classes act as an interface between HFST and your library.
      You should write your implementations to these files.
-     The assumption is that most of the functionalities are found already in your library
-     and you just have to modify them a little so that thay can be accessed 
-     via a standardized interface that works similarily for all implementations.
+     The assumption is that most of the functionalities are found already in the
+     finite-state library that you are using and you just have to modify them a little 
+     so that thay can be accessed via a standardized interface that works similarily 
+     for all implementations.
 
      All functions in the skeleton files return an hfst::exceptions::FunctionNotImplementedException
-     as they have no implementation. When starting to add your own implementations,
+     as they have no implementation. When starting to write your own implementation,
      you can also return the same exception for all functions that you have not 
      yet implemented.
 
@@ -214,11 +214,14 @@ BRIDGE_SRCS=$(MAYBE_SFST) $(MAYBE_OPENFST) $(MAYBE_FOMA) $(MAYBE_HFSTOL) # $(MAY
      <BR>
 
 
-     <H2>Using your implementation in HFST</H2>
+     <H2>Making HFST aware of your implementation</H2>
+
+     When you have written your implementation, you must connect it to
+     HFST.
 
      In file HfstDataTypes.h there is an enum ImplementationType that
      lists all possible HfstTransducer implementation types.
-     If needs a new enumerator:
+     It needs a new enumerator:
 
 \verbatim
      MY_TRANSDUCER_LIBRARY_TYPE, 
@@ -241,8 +244,8 @@ BRIDGE_SRCS=$(MAYBE_SFST) $(MAYBE_OPENFST) $(MAYBE_FOMA) $(MAYBE_HFSTOL) # $(MAY
 #endif // #if HAVE_MY_TRANSDUCER_LIBRARY
 \endverbatim
 
-You must add your own transducer type to TransducerImplementation,
-the union of possible transducer backend implementations:
+You must add the transducer type of the finite-state library that you are using
+to TransducerImplementation, the union of possible transducer backend implementations:
 
 \verbatim
 #if HAVE_MY_TRANSDUCER_LIBRARY
@@ -250,7 +253,7 @@ the union of possible transducer backend implementations:
 #endif
 \endverbatim
 
-  This is the only thing that HFST is directly aware of in your library.
+  The transducer type is the only thing that HFST is directly aware of the new finite-state library.
   All other functionalities are accessed through classes MyTransducerLibraryTransducer,
   MyTransducerLibraryInputStream and MyTransducerLibraryOutputStream.
 
@@ -273,15 +276,60 @@ the union of possible transducer backend implementations:
 #endif
 \endverbatim
 
-  For all functions and HfstTransducer constructors and destructor,
+  In file HfstInputStream.h union StreamImplementation needs a new value:
+
+\verbatim
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      hfst::implementations::MyTransducerLibraryInputStream * 
+        my_transducer_library;
+#endif
+\endverbatim
+
+  as well as enum TransducerType:
+
+\verbatim
+      MY_TRANSDUCER_LIBRARY_, /* Your transducer type */
+\endverbatim
+
+  In file HfstOutputStream.h union StreamImplementation needs a new value:
+
+\verbatim
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      hfst::implementations::MyTransducerLibraryOutputStream * 
+        my_transducer_library;
+#endif
+\endverbatim
+
+  The function declarations in file hfst_apply_schemas.h and their
+  implementations in file HfstApply.cc need an additional
+  argument which is a pointer to a function of the new implementation. See
+  the comments in the files for more information.
+
+     <BR>
+
+  <H2>Using your implementation in HFST</H2>
+
+  For all functions, constructors and destructors of classes
+  HfstTransducer, HfstInputStream and HfstOutputStream as well as
+  functions defined in file HfstApply.cc,
   you must add a piece of code that calls the implementation of
-  that functionality in the class MyTransducerLibraryTransducer.
+  that functionality in the class MyTransducerLibraryTransducer,
+  MyTransducerLibraryInputStream or MyTransducerLibraryOutputStream.
   For some functions you have to call two or more MyTransducerLibraryTransducer
-  functions. Usually more complex functions are implemented
+  functions. However, usually more complex functions are implemented
   with HFST API basic functions, so they do not have to be implemented
   separately for each library. By default all functionalities throw
   an hfst::exceptions::FunctionNotImplementedException if the implementation
   type requested is not handled as a separate case in the function.
+  This should make it easy for you to start adding your implementations
+  gradually.
+
+  You shoud go through carefully files HfstTransducer.cc, HfstInputStream.cc,
+  HfstOutputStream.cc and HfstApply.cc and add for each functionality
+  add a case that calls the implementation of the new finite-state library 
+  if the implementation type requires it. We give here some examples of
+  the pattern that it used in HFST to handle different cases and choose
+  the right implementation.
 
   An example of a constructor that creates an empty HfstTransducer:
 
@@ -384,7 +432,7 @@ HfstTransducer &apply(
 );  
 \endverbatim
 
-  Then the function apply chooses the right function pointer to use
+  Then the function 'apply' chooses the right function pointer to use
   according to the type of the transducer:
 
 \verbatim
@@ -465,13 +513,6 @@ HfstTransducer &apply(
   }
 \endverbatim
 
-  Files HfstInputStream.h, HfstOutputStream.h,
-    	HfstInputStream.cc, HfstOutputStream.cc.
-    	hfst_apply_schemas.h and HfstApply.cc
-  work similarly as files HfstTransducer.h and HfstTransducer.cc,
-  so we will not go through all of them here.
-  See instead the comments of these files that tell
-  you how they must be modified if a new library is added.
 
   Finally, in file libhfst/src/Makefile.am you must add your library to the list HFST_HDRS:
 
@@ -480,9 +521,11 @@ HfstTransducer &apply(
 \endverbatim
 
 
+      <BR>
+
       <H2>Configuring</H2>
 
-      The configuration file must be aware of the new library.
+      The configuration file must be aware of the new implementation and the finite-state library.
       You have to add the following pieces of code to the file configure.ac
       (change "MY_TRANSDUCER_LIBRARY" etc. to the name of your transducer library):
 
@@ -746,8 +789,8 @@ of strings in a transducer.
 
 All implementations work according to the same interface, so it is possible
 to compile the same piece of code using different backend libraries.
-It is also possible to <a href="AddingYourLibrary.html">add</a> 
-your own transducer library under the HFST interface.
+It is also possible to <a href="AddingYourImplementation.html">add</a> 
+your own implementation under the HFST interface.
 
 The examples given in this documentation use 
 <a href="http://www.xrce.xerox.com/print/Research-Development/Publications/1997-0052">Xerox transducer notation</a>.
@@ -758,7 +801,7 @@ The examples given in this documentation use
 
    - A third transducer library, <a href="http://foma.sourceforge.net/">foma</a>, is included
 
-   - <a href="AddingYourLibrary.html">Adding</a> your own transducer library under the HFST interface is easy
+   - <a href="AddingYourImplementation.html">Adding</a> your own implementation under the HFST interface is easy
 
    - Unknown and identity \link hfst::String symbols\endlink are supported
 
@@ -778,7 +821,7 @@ The examples given in this documentation use
 
    - A <a href="QuickStart.html">quick start</a> to the HFST interface with examples
 
-   - <a href="AddingYourLibrary.html">Adding</a> your own implementation of HFST
+   - <a href="AddingYourImplementation.html">Adding</a> your own implementation of HFST
 
    - <a href="VersionDifferences.html">Differences</a> between HFST versions 2 and 3
 

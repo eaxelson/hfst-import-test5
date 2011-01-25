@@ -345,9 +345,8 @@ process_stream(HfstOutputStream& outstream)
             }
 
           verbose_printf("Found %s:%s...\n", first, second);
-      StringPairVector * spv_tok = tok.tokenize(std::string(first), std::string(second));
-      spv = *(spv_tok);
-      delete spv_tok;
+      StringPairVector spv_tok = tok.tokenize(std::string(first), std::string(second));
+      spv = spv_tok;
         }
 
       float path_weight=0;

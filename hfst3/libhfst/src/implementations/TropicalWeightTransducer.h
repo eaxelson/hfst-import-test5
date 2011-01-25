@@ -156,11 +156,11 @@ namespace implementations
       static StdVectorFst * determinize(StdVectorFst * t);
       static StdVectorFst * minimize(StdVectorFst * t);
       static StdVectorFst * remove_epsilons(StdVectorFst * t);
-      static StdVectorFst * n_best(StdVectorFst * t,int n);
+      static StdVectorFst * n_best(StdVectorFst * t, unsigned int n);
       static StdVectorFst * repeat_star(StdVectorFst * t);
       static StdVectorFst * repeat_plus(StdVectorFst * t);
-      static StdVectorFst * repeat_n(StdVectorFst * t,int n);
-      static StdVectorFst * repeat_le_n(StdVectorFst * t,int n);
+      static StdVectorFst * repeat_n(StdVectorFst * t, unsigned int n);
+      static StdVectorFst * repeat_le_n(StdVectorFst * t, unsigned int n);
       static StdVectorFst * optionalize(StdVectorFst * t);
       static StdVectorFst * invert(StdVectorFst * t);
       static StdVectorFst * reverse(StdVectorFst * transducer);

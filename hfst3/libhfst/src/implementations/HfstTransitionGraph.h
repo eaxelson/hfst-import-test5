@@ -1,6 +1,7 @@
 #ifndef _HFST_TRANSITION_GRAPH_H_
 #define _HFST_TRANSITION_GRAPH_H_
 
+#include <cstdio>
 #include <string>
 #include <set>
 #include "../HfstSymbolDefs.h"
@@ -42,11 +43,13 @@ namespace hfst {
     /** @brief One implementation of template class C in 
 	HfstTransition. 
 
-	A HfstTropicalTransducerTransitionData has an input symbol and an output symbol of type
-	SymbolType (string) and a weight of type WeightType (float).
+	A HfstTropicalTransducerTransitionData has an input symbol and an 
+	output symbol of type SymbolType (string) and a weight of type 
+	WeightType (float).
 
-	\internal Actually a HfstTropicalTransducerTransitionData has an input and an output number
-	of type unsigned int, but this implementation is hidden from the user.
+	\internal Actually a HfstTropicalTransducerTransitionData has an 
+	input and an output number of type unsigned int, but this 
+	implementation is hidden from the user.
 	The class has two static maps and functions that take care of conversion
 	between strings and internal numbers.
 
@@ -77,7 +80,8 @@ namespace hfst {
 	Number2SymbolMap::const_iterator it = number2symbol_map.find(number);
 	if (it == number2symbol_map.end()) {
 	  fprintf(stderr, "ERROR: "
-		  "HfstTropicalTransducerTransitionData::get_symbol(unsigned int number) "
+		  "HfstTropicalTransducerTransitionData::get_symbol"
+		  "(unsigned int number) "
 		  "number is not mapped to any symbol\n");
 	  throw hfst::exceptions::HfstInterfaceException();
 	}
@@ -207,7 +211,9 @@ namespace hfst {
 	C transition_data;
       public:
 
-	/** @brief Create an uninitialized transition. */
+	/** @brief Create a transition leading to state zero with input and
+	    output symbols and weight as given by default constructors
+	    of C::SymbolType and C::WeightType. */
         HfstTransition(): target_state(0)
 	  {}
 
@@ -236,7 +242,7 @@ namespace hfst {
 
 	/** @brief Assign this transition the same value as transition 
 	    \a another. */
-	void operator=(const HfstTransition<C> &another) const {
+	void operator=(const HfstTransition<C> &another) {
 	  target_state = another.target_state;
 	  transition_data = transition_data;
 	}
@@ -409,7 +415,10 @@ namespace hfst {
 	  alpha.insert("@_IDENTITY_SYMBOL_@");
 	}
 
-	/** @brief Add a symbol to the alphabet of the graph. */
+	/** @brief Explicitly add a symbol to the alphabet of the graph.
+
+	    Usually the user does not have to take care of the alphabet
+	    of a graph. This function can be useful in some special cases. */
 	void add_symbol_to_alphabet(const std::string &symbol) {
 	  alphabet.insert(symbol);
 	}
@@ -467,7 +476,7 @@ namespace hfst {
 	    The SymbolTypes do not necessarily occur in any transitions
 	    of the graph. Epsilon, unknown and identity \link 
 	    hfst::String symbols\endlink are always included in the alphabet. */
-	std::set<typename C::SymbolType> get_alphabet() {
+	std::set<typename C::SymbolType> get_alphabet() const {
 	  return alphabet;
 	}
 
@@ -777,7 +786,8 @@ namespace hfst {
 
 	  /* Create a substituter that substitutes transitions according
 	     to a function. */
-	  substituter(bool (*func_) (const StringPair &sp, StringPairSet &sps))
+	  substituter(bool (*func_) (const StringPair &sp, 
+				     StringPairSet &sps))
 	  {
 	    func = func_;
 	    substitute_using_function = true;
@@ -1005,17 +1015,18 @@ namespace hfst {
 	    whether the substitution is made on input and output sides. 
 
 	    @todo Unknown and identity symbols must be handled correctly */
-	void substitute(const std::string &old_symbol, 
-			const std::string &new_symbol,
-			bool input_side=true, 
-			bool output_side=true) {
+	HfstTransitionGraph &
+	  substitute(const std::string &old_symbol, 
+		     const std::string &new_symbol,
+		     bool input_side=true, 
+		     bool output_side=true) {
 
 	  // If a symbol is substituted with itself, do nothing.
 	  if (old_symbol.compare(new_symbol) == 0)
-	    return;
+	    return *this;
 	  // If the old symbol is not known to the graph, do nothing.
 	  if (alphabet.find(old_symbol) == alphabet.end())
-	    return;
+	    return *this;
 
 	  // Remove the symbol to be substituted from the alphabet
 	  // if the substitution is made on both sides.
@@ -1035,22 +1046,30 @@ namespace hfst {
 	     input_side, output_side);
 	  // and perform the substitutions
 	  substitute(subs);
+	  
+	  return *this;
 	}
 
 	/** @brief Substitute all transitions \a sp with a set of transitions
 	    \a sps. */
-	void substitute(const StringPair &sp, const StringPairSet &sps) {
+	HfstTransitionGraph &substitute
+	  (const StringPair &sp, const StringPairSet &sps) 
+	{
 	  substituter subs(sp, sps);
 	  substitute(subs);
+	  return *this;
 	}
   
 	/** @brief Substitute all transitions \a old_pair with 
 	    \a new_pair. */
-	void substitute(const StringPair &old_pair, 
-			const StringPair &new_pair) {
+	HfstTransitionGraph &substitute
+	  (const StringPair &old_pair, 
+	   const StringPair &new_pair) 
+	{
 	  StringPairSet new_pair_set;
 	  new_pair_set.insert(new_pair);
 	  substitute(old_pair, new_pair_set);
+	  return *this;
 	} 
 
 	/** @brief Substitute all transitions with a set of transitions as
@@ -1061,10 +1080,13 @@ namespace hfst {
 	    the original transition \a sp must be replaced. \a func returns
 	    a value indicating whether any substitution must be made, i.e.
 	    whether any transition was inserted into \a sps. */
-	void substitute(bool (*func)
-			(const StringPair &sp, StringPairSet &sps) ) { 
+	HfstTransitionGraph &
+	  substitute(bool (*func)
+		     (const StringPair &sp, StringPairSet &sps) ) 
+	{ 
 	  substituter subs(func);
 	  substitute(subs);
+	  return *this;
 	}
 
 
@@ -1163,13 +1185,14 @@ namespace hfst {
 	    \a old_symbol : \a new_symbol (that are substituted)
 	    in this graph.	    
 	*/
-	void substitute(const StringPair &sp, HfstTransitionGraph &graph) {
+	HfstTransitionGraph &
+	  substitute(const StringPair &sp, HfstTransitionGraph &graph) {
 	  
 	  // If neither symbol to be substituted is known to the graph,
 	  // do nothing.
 	  if (alphabet.find(sp.first) == alphabet.end() && 
 	      alphabet.find(sp.second) == alphabet.end())
-	    return;
+	    return *this;
 
 	  // Where the substituting copies of \a graph
 	  // are inserted (source state, target state, weight)
@@ -1225,12 +1248,14 @@ namespace hfst {
 	    {
 	      add_substitution(*IT, graph);
 	    }
+	  return *this;
 	}
 
 
 	/** @brief Insert freely any number of \a symbol_pair in 
 	    the graph with weight \a weight. */
-	void insert_freely(const StringPair &symbol_pair, W weight) 
+	HfstTransitionGraph &insert_freely
+	  (const StringPair &symbol_pair, W weight) 
 	{	  
 	  alphabet.insert(symbol_pair.first);
 	  alphabet.insert(symbol_pair.second);
@@ -1240,6 +1265,7 @@ namespace hfst {
 				      symbol_pair.second, weight );	      
 	      it->second.insert(tr);
 	    }
+	  return *this;
 	}
 
 
@@ -1274,7 +1300,7 @@ namespace hfst {
 	    said.
 	    @todo See that the note is always true..
 	*/
-	void harmonize(HfstTransitionGraph &another) {
+	HfstTransitionGraph &harmonize(HfstTransitionGraph &another) {
 
 	  /* Collect symbols previously unknown to graphs this and another. */
 	  HfstTransitionGraphAlphabet unknown_this;
@@ -1298,7 +1324,7 @@ namespace hfst {
 	  /* No need to harmonize. */
 	  if (unknown_this.size() == 0 &&
 	      unknown_another.size() == 0) {
-	    return;
+	    return *this;
 	  }
 
 	  /* Expand the unknowns. */
@@ -1307,6 +1333,8 @@ namespace hfst {
 
 	  substituter subs_another(unknown_another);
 	  another.substitute(subs_another);
+
+	  return *this;
 	}
 	
 
@@ -1370,8 +1398,23 @@ namespace hfst {
 	    defined by string pair vector \a spv with weight \a weight. 
 	    
 	    @pre This graph must be a trie where all weights are in
-	    final states, i.e. all transitions have a zero weight. */
-	void disjunct(const StringPairVector &spv, W weight) 
+	    final states, i.e. all transitions have a zero weight. 
+
+	    There is no way to test whether a graph is a trie, so the use
+	    of this function is probably limited to fast construction 
+	    of a lexicon. Here is an example: 
+
+	    \verbatim
+	    HfstBasicTransducer lexicon;
+	    HfstTokenizer TOK;
+	    lexicon.disjunct(TOK.tokenize("dog"), 0.3);
+	    lexicon.disjunct(TOK.tokenize("cat"), 0.5);
+	    lexicon.disjunct(TOK.tokenize("elephant"), 1.6);
+	    \endverbatim
+
+	*/
+	HfstTransitionGraph &disjunct
+	  (const StringPairVector &spv, W weight) 
 	{
 	  StringPairVector::const_iterator it = spv.begin();
 	  HfstState initial_state = 0;
@@ -1382,9 +1425,10 @@ namespace hfst {
 	    {
 	      float old_weight = get_final_weight(final_state);
 	      if (old_weight < weight) 
-		return; /* The same path with smaller weight remains */
+		return *this; /* The same path with smaller weight remains */
 	    }
 	  set_final_weight(final_state, weight);
+	  return *this;
 	}	
 	
 	friend class ConversionFunctions;

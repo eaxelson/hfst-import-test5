@@ -501,12 +501,12 @@ namespace hfst { namespace implementations {
     return fsm_kleene_plus(fsm_copy(t));
   }
   
-  fsm * FomaTransducer::repeat_n(fsm * t,int n)
+  fsm * FomaTransducer::repeat_n(fsm * t, unsigned int n)
   {     
     return fsm_concat_n(t, n);
   }
   
-  fsm * FomaTransducer::repeat_le_n(fsm * t,int n)
+  fsm * FomaTransducer::repeat_le_n(fsm * t, unsigned int n)
   { 
     return fsm_concat_m_n(t,0,n);
   }

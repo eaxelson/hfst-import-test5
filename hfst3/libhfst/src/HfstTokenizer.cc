@@ -120,10 +120,10 @@ HfstTokenizer::add_skip_symbol(const std::string &symbol)
   multi_char_symbols.add(symbol.c_str()); 
   skip_symbol_set.insert(symbol.c_str()); }
 
-StringPairVector * HfstTokenizer::tokenize
+StringPairVector HfstTokenizer::tokenize
 (const string& input_string) const
 {
-  StringPairVector * spv = new StringPairVector;
+  StringPairVector spv;
   const char* s = input_string.c_str();
   while (*s)
     {
@@ -132,47 +132,43 @@ StringPairVector * HfstTokenizer::tokenize
       s += symbol_size;
       if (is_skip_symbol(symbol))
 	{ continue; }
-      //Key k = key_table.add_symbol(symbol);
-      spv->push_back(StringPair(symbol,symbol));
+      spv.push_back(StringPair(symbol,symbol));
     }
   return spv;
 }
 
-//KeyPairVector *
-StringPairVector * HfstTokenizer::tokenize
-(const string& input_string,const string& output_string) const // ,KeyTable &key_table)
+StringPairVector HfstTokenizer::tokenize
+(const string& input_string,const string& output_string) const
 {
-  StringPairVector * spv = new StringPairVector;
+  StringPairVector spv;
   
-  StringPairVector * input_spv = tokenize(input_string.c_str()); //,key_table);
-  StringPairVector * output_spv = tokenize(output_string.c_str()); //,key_table);
+  StringPairVector input_spv = tokenize(input_string.c_str());
+  StringPairVector output_spv = tokenize(output_string.c_str());
 
-  if (input_spv->size() < output_spv->size())
+  if (input_spv.size() < output_spv.size())
     {
-      StringPairVector::iterator jt = output_spv->begin();
-      for (StringPairVector::iterator it = input_spv->begin();
-	   it != input_spv->end();
+      StringPairVector::iterator jt = output_spv.begin();
+      for (StringPairVector::iterator it = input_spv.begin();
+	   it != input_spv.end();
 	   ++it)
-	{ spv->push_back(StringPair(it->first,
+	{ spv.push_back(StringPair(it->first,
 				    jt->first));
 	  ++jt; }
-      for ( ; jt != output_spv->end(); ++jt)
-	{ spv->push_back(StringPair("@_EPSILON_SYMBOL_@",jt->first)); }
+      for ( ; jt != output_spv.end(); ++jt)
+	{ spv.push_back(StringPair("@_EPSILON_SYMBOL_@",jt->first)); }
     }
   else
     {
-      StringPairVector::iterator it = input_spv->begin();
-      for (StringPairVector::iterator jt = output_spv->begin();
-	   jt != output_spv->end();
+      StringPairVector::iterator it = input_spv.begin();
+      for (StringPairVector::iterator jt = output_spv.begin();
+	   jt != output_spv.end();
 	   ++jt)
-	{ spv->push_back(StringPair(it->first,
-				    jt->first));
+	{ spv.push_back(StringPair(it->first,
+				   jt->first));
 	  ++it; }
-      for ( ; it != input_spv->end(); ++it)
-	{ spv->push_back(StringPair(it->first,"@_EPSILON_SYMBOL_@")); }
+      for ( ; it != input_spv.end(); ++it)
+	{ spv.push_back(StringPair(it->first,"@_EPSILON_SYMBOL_@")); }
     }
-  delete input_spv;
-  delete output_spv;
   return spv;
 }
 

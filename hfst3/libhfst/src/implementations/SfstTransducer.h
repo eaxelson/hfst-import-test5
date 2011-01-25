@@ -103,8 +103,8 @@ namespace implementations
       static Transducer * remove_epsilons(Transducer * t);
       static Transducer * repeat_star(Transducer * t);
       static Transducer * repeat_plus(Transducer * t);
-      static Transducer * repeat_n(Transducer * t,int n);
-      static Transducer * repeat_le_n(Transducer * t,int n);
+      static Transducer * repeat_n(Transducer * t,unsigned int n);
+      static Transducer * repeat_le_n(Transducer * t,unsigned int n);
       static Transducer * optionalize(Transducer * t);
       static Transducer * invert(Transducer * t);
       static Transducer * reverse(Transducer * transducer);

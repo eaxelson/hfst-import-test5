@@ -157,11 +157,11 @@ namespace implementations
       static LogFst * determinize(LogFst * t);
       static LogFst * minimize(LogFst * t);
       static LogFst * remove_epsilons(LogFst * t);
-      static LogFst * n_best(LogFst * t,int n);
+      static LogFst * n_best(LogFst * t, unsigned int n);
       static LogFst * repeat_star(LogFst * t);
       static LogFst * repeat_plus(LogFst * t);
-      static LogFst * repeat_n(LogFst * t,int n);
-      static LogFst * repeat_le_n(LogFst * t,int n);
+      static LogFst * repeat_n(LogFst * t, unsigned int n);
+      static LogFst * repeat_le_n(LogFst * t, unsigned int n);
       static LogFst * optionalize(LogFst * t);
       static LogFst * invert(LogFst * t);
       static LogFst * reverse(LogFst * transducer);

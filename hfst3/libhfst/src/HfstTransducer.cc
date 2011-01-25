@@ -278,7 +278,7 @@ namespace hfst
 
   // TODO: add HfstOlTransducer implementations when they are ready.
   void HfstTransducer::lookup(HfstLookupPaths& results, const HfstLookupPath& s,
-			      ssize_t limit) {
+			      ssize_t limit) const {
     (void)results;
     (void)s;
     (void)limit;
@@ -287,7 +287,7 @@ namespace hfst
 
     void HfstTransducer::lookup_fd(HfstLookupPaths& results, 
 				   const HfstLookupPath& s,
-				   ssize_t limit) {
+				   ssize_t limit) const {
 	switch(this->type) {
 
 	case (HFST_OL_TYPE):
@@ -307,7 +307,7 @@ namespace hfst
 
     void HfstTransducer::lookdown(HfstLookupPaths& results, 
 				  const HfstLookupPath& s,
-				  ssize_t limit) {
+				  ssize_t limit) const {
     (void)results;
     (void)s;
     (void)limit;
@@ -316,14 +316,15 @@ namespace hfst
 
     void HfstTransducer::lookdown_fd(HfstLookupPaths& results, 
 				     HfstLookupPath& s,
-				     ssize_t limit) {
+				     ssize_t limit) const {
     (void)results;
     (void)s;
     (void)limit;
     throw hfst::exceptions::FunctionNotImplementedException();
   }
 
-  bool HfstTransducer::is_lookup_infinitely_ambiguous(const HfstLookupPath& s) {
+  bool HfstTransducer::is_lookup_infinitely_ambiguous(const HfstLookupPath& s)
+    const {
       switch(this->type) {
       case (HFST_OL_TYPE):
       case (HFST_OLW_TYPE):
@@ -335,7 +336,7 @@ namespace hfst
   }
 
   bool HfstTransducer::is_lookdown_infinitely_ambiguous
-  (const HfstLookupPath& s) {
+  (const HfstLookupPath& s) const {
     (void)s;
     throw hfst::exceptions::FunctionNotImplementedException();
   }
@@ -408,30 +409,30 @@ namespace hfst
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
 
-    StringPairVector * spv = 
+    StringPairVector spv = 
       multichar_symbol_tokenizer.tokenize(utf8_str);
     switch (type)
       {
 #if HAVE_SFST
       case SFST_TYPE:
-	implementation.sfst = sfst_interface.define_transducer(*spv);
+	implementation.sfst = sfst_interface.define_transducer(spv);
 	break;
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	implementation.tropical_ofst = 
-	  tropical_ofst_interface.define_transducer(*spv);
+	  tropical_ofst_interface.define_transducer(spv);
 	this->type = TROPICAL_OFST_TYPE;
 	break;
       case LOG_OFST_TYPE:
 	implementation.log_ofst = 
-	  log_ofst_interface.define_transducer(*spv);
+	  log_ofst_interface.define_transducer(spv);
 	break;
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
 	implementation.foma =
-	  foma_interface.define_transducer(*spv);
+	  foma_interface.define_transducer(spv);
 	break;
 #endif
       case ERROR_TYPE:
@@ -439,7 +440,6 @@ namespace hfst
       default:
 	throw hfst::exceptions::FunctionNotImplementedException();
       }
-    delete spv;
   }
 
   HfstTransducer::HfstTransducer(const StringPairVector & spv, 
@@ -576,31 +576,31 @@ namespace hfst
     if (not is_implementation_type_available(type))
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
 
-    StringPairVector * spv = 
+    StringPairVector spv = 
       multichar_symbol_tokenizer.tokenize
       (upper_utf8_str,lower_utf8_str);
     switch (type)
       {
 #if HAVE_SFST
       case SFST_TYPE:
-	implementation.sfst = sfst_interface.define_transducer(*spv);
+	implementation.sfst = sfst_interface.define_transducer(spv);
 	break;
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	implementation.tropical_ofst = 
-	  tropical_ofst_interface.define_transducer(*spv);
+	  tropical_ofst_interface.define_transducer(spv);
 	this->type = TROPICAL_OFST_TYPE;
 	break;
       case LOG_OFST_TYPE:
 	implementation.log_ofst = 
-	  log_ofst_interface.define_transducer(*spv);
+	  log_ofst_interface.define_transducer(spv);
 	break;
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
 	implementation.foma =
-	  foma_interface.define_transducer(*spv);
+	  foma_interface.define_transducer(spv);
 	break;
 #endif
       case ERROR_TYPE:
@@ -608,7 +608,6 @@ namespace hfst
       default:
 	throw hfst::exceptions::FunctionNotImplementedException();
       }
-    delete spv;
   }
 
 
@@ -830,7 +829,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
     return this->type; }
   void HfstTransducer::set_name(std::string &name) {
     this->name = name; }   
-  std::string HfstTransducer::get_name() {
+  std::string HfstTransducer::get_name() const {
     return this->name; }
 
   // *** ...Set and get transducer attributes ends *** //
@@ -1007,7 +1006,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
        //#if HAVE_MY_TRANSDUCER_LIBRARY
        //&hfst::implementations::MyTransducerLibraryTransducer::repeat_n,
        //#endif
-       (int)n ); }  
+       n ); }  
 
   HfstTransducer &HfstTransducer::repeat_n_plus(unsigned int n)
   { is_trie = false; // This could be done so that is_trie is preserved
@@ -1029,7 +1028,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
        &hfst::implementations::FomaTransducer::repeat_le_n,
 #endif
        /* Add here your implementation. */
-       (int)n ); }   
+       n ); }   
 
   HfstTransducer &HfstTransducer::repeat_n_to_k(unsigned int n, unsigned int k)
   { is_trie = false; // This could be done so that is_trie is preserved
@@ -1140,6 +1139,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   }
 
   void HfstTransducer::extract_strings(ExtractStringsCb& callback, int cycles)
+    const
   { 
     switch (this->type)
       {
@@ -1180,6 +1180,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   
   void HfstTransducer::extract_strings_fd(ExtractStringsCb& callback, 
 					  int cycles, bool filter_fd)
+    const
   { 
     switch (this->type)
       {
@@ -1267,7 +1268,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   };
   
   void HfstTransducer::extract_strings(WeightedPaths<float>::Set &results,
-				       int max_num, int cycles)
+				       int max_num, int cycles) const
   {
     if(is_cyclic() && max_num < 1 && cycles < 0)
       throw hfst::exceptions::TransducerIsCyclicException();
@@ -1278,7 +1279,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   
   void HfstTransducer::extract_strings_fd(WeightedPaths<float>::Set &results,
 					  int max_num, int cycles,
-					  bool filter_fd)
+					  bool filter_fd) const
   {
     if(is_cyclic() && max_num < 1 && cycles < 0)
       throw hfst::exceptions::TransducerIsCyclicException();
