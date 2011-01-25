@@ -136,7 +136,7 @@ public HfstInputException {};
 
 /** \brief The string is not in valid format. 
 
-    The tool hfst-calculate can throw this exception */
+    This exception is thrown by the commandline tool hfst-calculate. */
 class NotValidStringFormatException :
 public HfstInputException {};
 
@@ -161,12 +161,6 @@ protected HfstInterfaceException {
 
     Thrown by hfst::rules::replace_up(HfstTransducerPair&, HfstTransducer&, bool, StringPairSet&) */
 class ContextTransducersAreNotAutomataException :
-public HfstArgumentException {};
-
-/** \brief Transducer cannot be catenated the number of times requested.
-
-    Thrown by HfstTransducer::repeat_n and similar functions. */
-class ImpossibleTransducerPowerException :
 public HfstArgumentException {};
 
 /** \brief The StateId argument is not valid.

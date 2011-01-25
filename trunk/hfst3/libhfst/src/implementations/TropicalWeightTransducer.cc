@@ -1322,10 +1322,8 @@ namespace hfst { namespace implementations
   { return new StdVectorFst(RmEpsilonFst<StdArc>(*t)); }
 
   StdVectorFst * 
-  TropicalWeightTransducer::n_best(StdVectorFst * t,int n)
+  TropicalWeightTransducer::n_best(StdVectorFst * t, unsigned int n)
   { 
-    if (n < 0)
-      { throw ImpossibleTransducerPowerException(); }
     StdVectorFst * n_best_fst = new StdVectorFst(); 
     fst::ShortestPath(*t,n_best_fst,(size_t)n);
     return n_best_fst;
@@ -1340,9 +1338,9 @@ namespace hfst { namespace implementations
   { return new StdVectorFst(ClosureFst<StdArc>(*t,CLOSURE_PLUS)); }
 
   StdVectorFst *
-  TropicalWeightTransducer::repeat_n(StdVectorFst * t,int n)
+  TropicalWeightTransducer::repeat_n(StdVectorFst * t, unsigned int n)
   {
-    if (n <= 0)
+    if (n == 0)
       { return create_epsilon_transducer(); }
 
     StdVectorFst * repetition = create_epsilon_transducer();
@@ -1353,9 +1351,9 @@ namespace hfst { namespace implementations
   }
 
   StdVectorFst *
-  TropicalWeightTransducer::repeat_le_n(StdVectorFst * t,int n)
+  TropicalWeightTransducer::repeat_le_n(StdVectorFst * t, unsigned int n)
   {
-    if (n <= 0)
+    if (n == 0)
       { return create_epsilon_transducer(); }
 
     StdVectorFst * repetition = create_epsilon_transducer();

@@ -97,8 +97,8 @@ namespace hfst {
       static fsm * remove_epsilons(fsm * t);
       static fsm * repeat_star(fsm * t);
       static fsm * repeat_plus(fsm * t);
-      static fsm * repeat_n(fsm * t,int n);
-      static fsm * repeat_le_n(fsm * t,int n);
+      static fsm * repeat_n(fsm * t, unsigned int n);
+      static fsm * repeat_le_n(fsm * t, unsigned int n);
       static fsm * optionalize(fsm * t);
       static fsm * invert(fsm * t);
       static fsm * reverse(fsm * t);

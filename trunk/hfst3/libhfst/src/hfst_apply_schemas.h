@@ -34,20 +34,22 @@ HfstTransducer &apply(
 
 HfstTransducer &apply(
 #if HAVE_SFST
- SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int),
+ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int),
 #endif
 #if HAVE_OPENFST
- fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,int),
- hfst::implementations::LogFst * (*log_ofst_funct)(hfst::implementations::LogFst *,int),
+ fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *, unsigned int),
+ hfst::implementations::LogFst * (*log_ofst_funct)
+ (hfst::implementations::LogFst *, unsigned int),
 #endif
 #if HAVE_FOMA
- fsm * (*foma_funct)(fsm *,int),
+ fsm * (*foma_funct)(fsm *, unsigned int),
 #endif
  /* Add your library here */
  //#if HAVE_MY_TRANSDUCER_LIBRARY
- //my_namespace::MyFst * (*my_transducer_library_funct)(my_namespace::MyFst *,int),
+ //my_namespace::MyFst * (*my_transducer_library_funct)
+ //(my_namespace::MyFst *, unsigned int),
  //#endif
- int n);
+ unsigned int n);
 
 HfstTransducer &apply(
 #if HAVE_SFST

@@ -592,8 +592,8 @@ namespace hfst { namespace implementations {
     delete star;
     return t; }
   
-  Transducer * SfstTransducer::repeat_n(Transducer * t,int n)
-  { if (n < 0) { throw ImpossibleTransducerPowerException(); }
+  Transducer * SfstTransducer::repeat_n(Transducer * t, unsigned int n)
+  {
     Transducer * power = create_epsilon_transducer();
     for (int i = 0; i < n; ++i)
       {
@@ -603,8 +603,8 @@ namespace hfst { namespace implementations {
       }
     return power; }
   
-  Transducer * SfstTransducer::repeat_le_n(Transducer * t,int n)
-  { if (n < 0) { throw ImpossibleTransducerPowerException(); }
+  Transducer * SfstTransducer::repeat_le_n(Transducer * t, unsigned int n)
+  {
     Transducer * result = create_empty_transducer();
     for (int i = 0; i < n+1; ++i)
       {

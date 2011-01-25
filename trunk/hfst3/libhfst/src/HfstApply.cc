@@ -132,21 +132,21 @@ namespace hfst
   HfstTransducer &HfstTransducer::apply
   (
 #if HAVE_SFST
-SFST::Transducer * (*sfst_funct)(SFST::Transducer *,int n),
+SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
 #endif
 #if HAVE_OPENFST
-   fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *, int n),
+   fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *, unsigned int n),
    hfst::implementations::LogFst * (*log_ofst_funct)
-   (hfst::implementations::LogFst *, int n),
+   (hfst::implementations::LogFst *, unsigned int n),
 #endif
 #if HAVE_FOMA
-   fsm * (*foma_funct)(fsm *,int n),
+   fsm * (*foma_funct)(fsm *, unsigned int n),
 #endif
 /* Add your library here. */
 //#if HAVE_MY_TRANSDUCER_LIBRARY
 //   my_namespace::MyFst * (*my_transducer_library_funct)(my_namespace::MyFst *,int n),
 //#endif
-   int n )
+   unsigned int n )
   {
     switch(this->type)
       {

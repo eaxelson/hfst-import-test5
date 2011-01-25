@@ -43,15 +43,6 @@ namespace hfst {
 namespace implementations
 {
 
-/**
- * \defgroup AddingLibrary Adding an implementation to HFST
- * 
- * This module contains skeleton files that exemplify how
- * a new implementation is added under the HFST interface.
- *
- * @{
- */
-
   /* If your library is written in namespace my_namespace, it must be visible
      as hfst::implementations::my_namespace */
   using namespace my_namespace;
@@ -204,10 +195,10 @@ namespace implementations
       static MyFst * repeat_plus(MyFst * t);
       /** @brief Create a transducer that accepts n consecutive string pairs 
 	  accepted by transducer t. */
-      static MyFst * repeat_n(MyFst * t,int n);
+      static MyFst * repeat_n(MyFst * t, unsigned int n);
       /** @brief Create a transducer that accepts from zero to n consecutive 
 	  string pairs accepted by transducer t. */
-      static MyFst * repeat_le_n(MyFst * t,int n);
+      static MyFst * repeat_le_n(MyFst * t, unsigned int n);
 
       /** @brief Create a transducer that accepts string pairs accepted by 
 	  transducer t or an empty string. */
@@ -318,7 +309,6 @@ namespace implementations
 
     };
 
-/**@}*/ // doxygen: defgroup AddingLibrary
 
 } }
 
