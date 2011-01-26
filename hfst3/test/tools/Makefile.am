@@ -38,43 +38,60 @@ TESTS=hfst-check-version.sh hfst-check-help.sh empty-input.sh\
 	  lookup-functionality.sh \
 	  lexc-compiler-functionality.sh \
 	  lexc-functionality.sh # xfst-functionality.sh
-check_DATA=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
+DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   cat2cat_or_CAT_uppercased.hfst cat2CAT_uppercased.hfst cat2dog.hfst \
 		   cat+dog.hfst catdog.hfst cat_or_dog.hfst cat.hfst \
 		   CAT_uppercased2cat.hfst CAT_uppercased.hfst cat_weight_final.hfst \
 		   cat_weight_initial.hfst cat_weight_middle.hfst dog2cat.hfst \
 		   dog.hfst infinitely_ambiguous.hfst non_minimal.hfst rule1.hfst \
 		   rule2.hfst summarize_test1.hfst summarize_test2.hfst tac.hfst \
-	0to3cats.hfst.sfst 2to4cats.hfst.sfst 4cats.hfst.sfst 4toINFcats.hfst.sfst \
-		   cat2cat_or_CAT_uppercased.hfst.sfst cat2CAT_uppercased.hfst.sfst cat2dog.hfst.sfst \
-		   cat+dog.hfst.sfst catdog.hfst.sfst cat_or_dog.hfst.sfst cat.hfst.sfst \
-		   CAT_uppercased2cat.hfst.sfst CAT_uppercased.hfst.sfst cat_weight_final.hfst.sfst \
-		   cat_weight_initial.hfst.sfst cat_weight_middle.hfst.sfst dog2cat.hfst.sfst \
-		   dog.hfst.sfst infinitely_ambiguous.hfst.sfst non_minimal.hfst.sfst rule1.hfst.sfst \
-		   rule2.hfst.sfst summarize_test1.hfst.sfst summarize_test2.hfst.sfst tac.hfst.sfst \
-	0to3cats.hfst.ofst 2to4cats.hfst.ofst 4cats.hfst.ofst 4toINFcats.hfst.ofst \
-		   cat2cat_or_CAT_uppercased.hfst.ofst cat2CAT_uppercased.hfst.ofst cat2dog.hfst.ofst \
-		   cat+dog.hfst.ofst catdog.hfst.ofst cat_or_dog.hfst.ofst cat.hfst.ofst \
-		   CAT_uppercased2cat.hfst.ofst CAT_uppercased.hfst.ofst cat_weight_final.hfst.ofst \
-		   cat_weight_initial.hfst.ofst cat_weight_middle.hfst.ofst dog2cat.hfst.ofst \
-		   dog.hfst.ofst infinitely_ambiguous.hfst.ofst non_minimal.hfst.ofst rule1.hfst.ofst \
-		   rule2.hfst.ofst summarize_test1.hfst.ofst summarize_test2.hfst.ofst tac.hfst.ofst \
-	0to3cats.hfst.foma 2to4cats.hfst.foma 4cats.hfst.foma 4toINFcats.hfst.foma \
-		   cat2cat_or_CAT_uppercased.hfst.foma cat2CAT_uppercased.hfst.foma cat2dog.hfst.foma \
-		   cat+dog.hfst.foma catdog.hfst.foma cat_or_dog.hfst.foma cat.hfst.foma \
-		   CAT_uppercased2cat.hfst.foma CAT_uppercased.hfst.foma cat_weight_final.hfst.foma \
-		   cat_weight_initial.hfst.foma cat_weight_middle.hfst.foma dog2cat.hfst.foma \
-		   dog.hfst.foma infinitely_ambiguous.hfst.foma non_minimal.hfst.foma rule1.hfst.foma \
-		   rule2.hfst.foma summarize_test1.hfst.foma summarize_test2.hfst.foma tac.hfst.foma
+		   epsilon.hfst epsilon2cat.hfst cat2epsilon.hfst
+if WANT_SFST
+SFST_CHECKS=0to3cats.hfst.sfst 2to4cats.hfst.sfst 4cats.hfst.sfst\
+			4toINFcats.hfst.sfst cat2cat_or_CAT_uppercased.hfst.sfst \
+			cat2CAT_uppercased.hfst.sfst cat2dog.hfst.sfst \
+			cat+dog.hfst.sfst catdog.hfst.sfst cat_or_dog.hfst.sfst \
+			cat.hfst.sfst CAT_uppercased2cat.hfst.sfst CAT_uppercased.hfst.sfst\
+			cat_weight_final.hfst.sfst cat_weight_initial.hfst.sfst \
+			cat_weight_middle.hfst.sfst dog2cat.hfst.sfst dog.hfst.sfst \
+			infinitely_ambiguous.hfst.sfst non_minimal.hfst.sfst \
+			rule1.hfst.sfst rule2.hfst.sfst summarize_test1.hfst.sfst \
+			summarize_test2.hfst.sfst tac.hfst.sfst 
+endif
+if WANT_OPENFST
+OFST_CHECKS=0to3cats.hfst.ofst \
+			2to4cats.hfst.ofst 4cats.hfst.ofst 4toINFcats.hfst.ofst \
+			cat2cat_or_CAT_uppercased.hfst.ofst cat2CAT_uppercased.hfst.ofst \
+			cat2dog.hfst.ofst cat+dog.hfst.ofst catdog.hfst.ofst \
+			cat_or_dog.hfst.ofst cat.hfst.ofst CAT_uppercased2cat.hfst.ofst \
+			CAT_uppercased.hfst.ofst cat_weight_final.hfst.ofst \
+			cat_weight_initial.hfst.ofst cat_weight_middle.hfst.ofst \
+			dog2cat.hfst.ofst dog.hfst.ofst infinitely_ambiguous.hfst.ofst \
+			non_minimal.hfst.ofst rule1.hfst.ofst rule2.hfst.ofst \
+			summarize_test1.hfst.ofst summarize_test2.hfst.ofst tac.hfst.ofst
+endif
+if WANT_FOMA
+FOMA_CHECKS=0to3cats.hfst.foma 2to4cats.hfst.foma 4cats.hfst.foma \
+			4toINFcats.hfst.foma cat2cat_or_CAT_uppercased.hfst.foma \
+			cat2CAT_uppercased.hfst.foma cat2dog.hfst.foma \
+			cat+dog.hfst.foma catdog.hfst.foma cat_or_dog.hfst.foma \
+			cat.hfst.foma CAT_uppercased2cat.hfst.foma \
+			CAT_uppercased.hfst.foma cat_weight_final.hfst.foma \
+			cat_weight_initial.hfst.foma cat_weight_middle.hfst.foma \
+			dog2cat.hfst.foma dog.hfst.foma infinitely_ambiguous.hfst.foma \
+			non_minimal.hfst.foma rule1.hfst.foma rule2.hfst.foma \
+			summarize_test1.hfst.foma summarize_test2.hfst.foma tac.hfst.foma
+endif
 
-#		   cat2dog.hfst.ol cat2dog.gen.hfst.ol cat_weight_final.hfst.ol	
-#		   proc-caps.hfst.ol proc-caps.gen.hfst.ol
+check_DATA=$(DEFAULT_CHECKS) $(SFST_CHECKS) $(OFST_CHECKS) $(FOMA_CHECKS)
 
 FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
-		 cat2cat_or_CAT_uppercased.txt cat2CAT_uppercased.txt cat2dog.txt \
+		 cat2cat_or_CAT_uppercased.txt cat2CAT_uppercased.txt 
+		 cat2epsilon.txt cat2dog.txt \
 		 cat+dog.txt catdog.txt cat_or_dog.txt cat.txt CAT_uppercased2cat.txt \
 		 CAT_uppercased.txt cat_weight_final.txt cat_weight_initial.txt \
-		 cat_weight_middle.txt dog2cat.txt dog.txt infinitely_ambiguous.txt \
+		 cat_weight_middle.txt dog2cat.txt dog.txt\
+		 epsilon.txt epsilon2cat.txt infinitely_ambiguous.txt \
 		 non_minimal.txt rule1.txt rule2.txt summarize_test1.txt \
 		 summarize_test2.txt tac.txt proc-caps.txt
 FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-out1.strings \
