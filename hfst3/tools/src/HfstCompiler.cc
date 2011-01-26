@@ -42,16 +42,18 @@ namespace hfst
   typedef std::set<NumberPair> NumberPairSet;
   typedef std::vector<NumberPair> NumberPairVector;
  
-  //using namespace implementations;
-
-  HfstTransducer * HfstCompiler::make_transducer(Range *r1, Range *r2, ImplementationType type)
+  HfstTransducer * HfstCompiler::make_transducer
+  (Range *r1, Range *r2, ImplementationType type)
   {
     StringPairSet sps;
-    //NumberPairSet nps;
 
     if (r1 == NULL || r2 == NULL) {
-      if (!Alphabet_Defined)
-	printf("ERROR: The wildcard symbol '.' requires the definition of an alphabet");
+      if (!Alphabet_Defined) {
+	fprintf(stderr, 
+		"ERROR: The wildcard symbol '.'"
+		" requires the definition of an alphabet");
+	exit(1);
+      }
       
       // one of the ranges was '.'
       for(HfstAlphabet::const_iterator it=TheAlphabet.begin(); 
@@ -62,7 +64,6 @@ namespace hfst
 	  sps.insert(StringPair(
 		      std::string(TheAlphabet.code2symbol(it->first)),
 		      std::string(TheAlphabet.code2symbol(it->second)) ) );
-	  //nps.insert(NumberPair(it->first, it->second));
 	}
       }      
     }
@@ -71,7 +72,6 @@ namespace hfst
 	  sps.insert(StringPair(
 		      std::string(TheAlphabet.code2symbol(r1->character)),
 		      std::string(TheAlphabet.code2symbol(r2->character)) ) );
-	  //nps.insert(NumberPair(it->first, it->second));
 
 	if (!r1->next && !r2->next)
 	  break;
@@ -82,7 +82,7 @@ namespace hfst
       }
     }
 
-    return new HfstTransducer(sps, type);    // HERE
+    return new HfstTransducer(sps, type);
   }
   
   HfstTransducer * HfstCompiler::new_transducer( Range *r1, Range *r2, ImplementationType type )
@@ -95,13 +95,8 @@ namespace hfst
   }
   
   Character HfstCompiler::character_code( unsigned int uc ) {
-    //if (TheAlphabet.utf8)
+    // UTF-8 is always used
     return symbol_code(basic::fst_strdup(hfst_utf8::int2utf8(uc)));
-
-    /* unsigned char *buffer=(unsigned char*)malloc(2);
-       buffer[0] = (unsigned char)uc;
-       buffer[1] = 0;      
-       return symbol_code((char*)buffer); */
   }
 
   void HfstCompiler::free_values( Range *r ) {
@@ -217,20 +212,6 @@ namespace hfst
     t->minimize();
     
     VM[name] = t;
-    //printf("def_var: defined variable \"%s\"\n", name);
-    // TODO
-    //return t->is_empty();
-
-    //fprintf(stderr, "def_var %s: \n", name);
-    //t->write_in_att_format(stderr);
-
-    // TEST
-    /*std::string foo(name);
-    foo = std::string("VAR_") + foo;
-    HfstOutputStream os(foo, TROPICAL_OFST_TYPE);
-    HfstTransducer T(*t, TROPICAL_OFST_TYPE);
-    os << T;
-    os.close();*/
 
     return false;
   }
@@ -324,7 +305,8 @@ namespace hfst
   {
     if (l != NULL && r != NULL) {
       if (l->get_type() != r->get_type()) {
-	printf("ERROR: in hfst-compiler.yy: context transducers do not have the same type.\n");
+	fprintf(stderr, "ERROR: in hfst-compiler.yy:"
+		" context transducers do not have the same type.\n");
 	exit(1);
       }
     }
@@ -352,7 +334,8 @@ namespace hfst
   {
     if (nc->left->get_type() != c->left->get_type() || 
 	nc->right->get_type() != c->right->get_type() ) {
-      printf("ERROR: in hfst-compiler.yy: context transducers do not have the same type.\n");
+      fprintf(stderr, "ERROR: in hfst-compiler.yy:"
+	      " context transducers do not have the same type.\n");
       exit(1);
     }
     nc->next = c;
@@ -486,11 +469,10 @@ namespace hfst
       delete t;
       t = nt;
     }    
-    //fprintf(stderr, "..exploded\n");
+
     return t;
   }
 
-  // TODO
   HfstTransducer * HfstCompiler::restriction( HfstTransducer * t, Twol_Type type, Contexts *c, int direction ) {
 
     StringPairSet sps;
@@ -520,8 +502,11 @@ namespace hfst
     if (RS.size() > 0 || RSS.size() > 0)
       std::cerr << "\nWarning: agreement operation inside of replacement rule!\n";
     
-    if (!Alphabet_Defined)
-      std::cerr << "\nERROR: Two level rules require the definition of an alphabet!\n";
+    if (!Alphabet_Defined) {
+      fprintf(stderr, "\nERROR:"
+	      " Two level rules require the definition of an alphabet!\n");
+      exit(1);
+    }
 
     if (lc == NULL)
       lc = new HfstTransducer("@_EPSILON_SYMBOL_@", implementation_type);
@@ -542,8 +527,11 @@ namespace hfst
     Range * r2 = upper_range;
 
     if (r1 == NULL || r2 == NULL) {
-      if (!Alphabet_Defined)
-	printf("ERROR: The wildcard symbol '.' requires the definition of an alphabet");
+      if (!Alphabet_Defined) {
+	fprintf(stderr, "ERROR: The wildcard symbol '.'"
+		" requires the definition of an alphabet");
+	exit(1);
+      }
       
       // one of the ranges was '.'
       for(HfstAlphabet::const_iterator it=TheAlphabet.begin(); 
@@ -586,7 +574,6 @@ namespace hfst
 
   }
 
-  // HERE
   HfstTransducer * HfstCompiler::read_words(char *filename, 
 					    ImplementationType type) {
 
@@ -626,7 +613,6 @@ namespace hfst
       buffer[l+1] = 0;
 
       StringPairVector spv;
-      // NumberPairVector npv;
       char *bufptr = buffer;
 
       std::pair<unsigned int, unsigned int> np = 
@@ -635,7 +621,6 @@ namespace hfst
 	spv.push_back(StringPair
 		      (std::string(TheAlphabet.code2symbol(np.first)), 
 		       std::string(TheAlphabet.code2symbol(np.second)) ) );
-	//npv.push_back(NumberPair(np.first, np.second));
 	np = TheAlphabet.next_label(bufptr, true);
       }
 
@@ -663,7 +648,6 @@ namespace hfst
     }
   }
 
-  // HERE?
   HfstTransducer * HfstCompiler::read_transducer(char *filename, ImplementationType type) {
     if (Verbose)
       fprintf(stderr,"\nreading transducer from %s...", filename);
@@ -730,99 +714,52 @@ namespace hfst
 	return new HfstTransducer(rules::replace_down(*mapping, optional, sps));
 	break;
       default:
-	return NULL;
+	fprintf(stderr, "ERROR: invalid replace type requested\n");
+	exit(1);
       }
   }
 
-  // HERE
   HfstTransducer * HfstCompiler::make_mapping( Ranges *list1, Ranges *list2, ImplementationType type ) {
-
-    //Transducer *Interface::make_mapping( Ranges *list1, Ranges *list2 )
 
     Ranges *l1=list1;
     Ranges *l2=list2;
-    //HfstTransducer *t=new HfstTransducer("@_EPSILON_SYMBOL_@", type); // an epsilon transducer
     std::vector<StringPairSet> spsv;
-    //std::vector<NumberPairSet> npsv;
 
-    //Node *node=t->root_node();
     while (l1 && l2) {
-      //Node *nn=t->new_node();
-      //HfstTransducer disj(type); // an empty transducer
       StringPairSet sps;
-      //NumberPairSet nps;
       for( Range *r1=l1->range; r1; r1=r1->next )
 	for( Range *r2=l2->range; r2; r2=r2->next ) {
-	  //node->add_arc( Label(r1->character, r2->character), nn, t );
-	  //HfstTransducer tr(TheAlphabet.code2symbol(r1->character), 
-	  //		    TheAlphabet.code2symbol(r2->character),
-	  //		    type);
-	  //disj.disjunct(tr);
 	  sps.insert(StringPair(TheAlphabet.code2symbol(r1->character), 
 				TheAlphabet.code2symbol(r2->character)) );
-	  //nps.insert(NumberPair(r1->character, r2->character));
 	}
-      //node = nn;
-      //HfstTransducer disj(sps, type);
-      //t->concatenate(disj);
       spsv.push_back(sps);
-      //npsv.push_back(nps);
       l1 = l1->next;
       l2 = l2->next;
     }
     while (l1) {
-      //Node *nn=t->new_node();
-      //HfstTransducer disj(type); // an empty transducer
       StringPairSet sps;
-      //NumberPairSet nps;
       for( Range *r1=l1->range; r1; r1=r1->next ) {
-	//node->add_arc( Label(r1->character, Label::epsilon), nn, t );
-	//HfstTransducer tr(TheAlphabet.code2symbol(r1->character), 
-	//		    TheAlphabet.code2symbol(0),
-	//		    type);
-	// disj.disjunct(tr);
 	sps.insert(StringPair(TheAlphabet.code2symbol(r1->character), 
 			      TheAlphabet.code2symbol(0)) );
-	//nps.insert(NumberPair(r1->character, 0));
       }
-      //node = nn;
-      //HfstTransducer disj(sps, type);
-      //t->concatenate(disj);
       spsv.push_back(sps);
-      //npsv.push_back(nps);
       l1 = l1->next;
     }
     while (l2) {
-      //Node *nn=t->new_node();
-      //HfstTransducer disj(type); // an empty transducer
       StringPairSet sps;
-      //NumberPairSet nps;
       for( Range *r2=l2->range; r2; r2=r2->next ) {
-	//node->add_arc( Label(Label::epsilon, r2->character), nn, t );
-	//HfstTransducer tr(TheAlphabet.code2symbol(0), 
-	//	    TheAlphabet.code2symbol(r2->character),
-	//	    type);
-	// disj.disjunct(tr);
 	sps.insert(StringPair(TheAlphabet.code2symbol(0), 
 			      TheAlphabet.code2symbol(r2->character)) );
-	//nps.insert(NumberPair(0, r2->character));
       }
-      //node = nn;
-      //HfstTransducer disj(sps, type);
-      //t->concatenate(disj);
       spsv.push_back(sps);
-      //npsv.push_back(nps);
       l2 = l2->next;
     }
-    //node->set_final(1);
 
     free_values(list1);
     free_values(list2);
     
     return new HfstTransducer(spsv, type);
 
-    //    t->minimize();
-    // return t;
   }
 
   
@@ -846,36 +783,9 @@ namespace hfst
       t->invert();
     //add_alphabet(t);
     t->minimize();
-
-    // testing conversion
-    /*printf("testing_conversion:\n");
-    HfstInternalTransducer *internal = tropical_ofst_to_internal_hfst_format(t->implementation.tropical_ofst);
-    printf("  ..TROPICAL -> INTERNAL\n");
-    t->implementation.sfst = hfst_internal_format_to_sfst(internal);
-    printf("  ..INTERNAL -> SFST\n");
-    delete internal;
-    internal = sfst_to_internal_hfst_format(t->implementation.sfst);
-    printf("  ..SFST -> INTERNAL\n");
-    t->implementation.foma = hfst_internal_format_to_foma(internal);
-    printf("  ..INTERNAL -> FOMA\n");
-    delete internal;
-    internal = foma_to_internal_hfst_format(t->implementation.foma);
-    printf("  ..FOMA -> INTERNAL\n");
-    t->implementation.tropical_ofst = hfst_internal_format_to_tropical_ofst(internal);
-    printf("  ..INTERNAL -> TROPICAL\n");
-    delete internal;*/
-
-    /*printf("testing write_att and read_att:\n");
-    std::cerr << *t;
-    printf("--\n");
-    t->write_in_att_format("FOOBAR");
-    HfstTransducer tr = HfstTransducer::read_in_att_format("FOOBAR", t->type);
-    tr.write_in_att_format(stderr);*/
-
     return t;
   }
 
-  // HERE?
   void HfstCompiler::def_alphabet( HfstTransducer *tr )
   {
     tr = explode(tr);

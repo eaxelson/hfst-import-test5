@@ -143,7 +143,7 @@ For documentation on the HFST binary transducer format, see #hfst::HfstOutputStr
 
   public:
 
-    /** \brief Create a stream to standard in for reading binary transducers. */
+    /** \brief Create a stream to standard input for reading binary transducers. */
     HfstInputStream(void);
 
     /** \brief Open a stream to file \a filename for reading binary transducers. 
@@ -152,12 +152,12 @@ For documentation on the HFST binary transducer format, see #hfst::HfstOutputStr
 	@throws hfst::exceptions::StreamNotReadableException */
     HfstInputStream(const std::string &filename);
 
-    /** Delete the stream. */
+    /** \brief Destructor. */
     ~HfstInputStream(void);
 
     /** \brief Close the stream.
 
-	If the stream points to standard in, nothing is done. */
+	If the stream points to standard input, nothing is done. */
     void close(void);
 
     /** \brief Whether the stream is at the end. */

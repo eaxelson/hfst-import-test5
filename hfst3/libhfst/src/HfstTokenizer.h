@@ -85,13 +85,32 @@ namespace hfst
 
     /** \brief Create a tokenizer that recognizes utf-8 symbols. */
     HfstTokenizer();
-    /** \brief Add a symbol to be skipped to this tokenizer. */
+
+    /** \brief Add a symbol to be skipped to this tokenizer. 
+
+	After skipping a symbol, tokenization is always started again.
+	For example if we have a multicharacter symbol "foo" and a 
+	skip symbol "bar", the string "fobaro" will be tokenized 
+	"f" "o" "o", not "foo". */
     void add_skip_symbol(const std::string &symbol);
-    /** \brief Add a multicharacter symbol \a symbol to this tokenizer. */
+
+    /** \brief Add a multicharacter symbol \a symbol to this tokenizer. 
+
+	If a multicharacter symbol has a skip symbol inside it, it is
+	not considered a multicharacter symbol. For example if we have 
+	a multicharacter symbol "foo" and a skip symbol "bar", the string
+	"fobaro" will be tokenized "f" "o" "o", not "foo". */
     void add_multichar_symbol(const std::string& symbol);
+
     /** \brief Tokenize the string \a input_string. */
     StringPairVector tokenize(const std::string &input_string) const;
-    /** \brief Tokenize the string pair \a input_string : \a output_string. */
+
+    /** \brief Tokenize the string pair \a input_string : \a output_string. 
+
+	If one string has more tokens than the other, epsilons will be
+	inserted to the end of the tokenized string with less tokens
+	so that both tokenized strings have the same number of tokens.
+     */
     StringPairVector tokenize(const std::string &input_string,
 			      const std::string &output_string) const;
 

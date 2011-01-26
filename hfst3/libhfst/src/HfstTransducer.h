@@ -325,9 +325,11 @@ tr1.disjunct(tr2);
     // ----- Constructors, destructor, assignment -----
     // ------------------------------------------------
 
-    /* This constructor should be used only inside the HfstTransducer class
-       or its friends since it leaves the backend implementation variable
-       uninitialized. */
+    /* \brief Create an uninitialized transducer (use with care). 
+
+       @note This constructor leaves the backend implementation variable
+       uninitialized. An uninitialized transducer is likely to cause an
+       hfst::exceptions::TransducerHasWrongTypeException at some point. */
     HfstTransducer();
 
     /** \brief Create an empty transducer, i.e. a transducer that does not 
@@ -483,7 +485,7 @@ in \a ifile.
 		   const std::string &epsilon_symbol);
 
 
-    /** \brief Delete the HfstTransducer. **/
+    /** \brief Destructor. **/
     virtual ~HfstTransducer(void);
 
     /** @brief Assign this transducer a new value equivalent to transducer
