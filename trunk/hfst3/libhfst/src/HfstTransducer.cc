@@ -393,7 +393,7 @@ namespace hfst
 	  (type==HFST_OLW_TYPE?true:false);
 	break;
       case ERROR_TYPE:
-	throw hfst::exceptions::TransducerHasWrongTypeException();
+	throw hfst::exceptions::SpecifiedTypeRequiredException();
       default:
 	throw hfst::exceptions::FunctionNotImplementedException();
       }
@@ -436,7 +436,7 @@ namespace hfst
 	break;
 #endif
       case ERROR_TYPE:
-	throw hfst::exceptions::TransducerHasWrongTypeException();
+	throw hfst::exceptions::SpecifiedTypeRequiredException();
       default:
 	throw hfst::exceptions::FunctionNotImplementedException();
       }
@@ -477,7 +477,7 @@ namespace hfst
 	break;
 #endif
       case ERROR_TYPE:
-	throw hfst::exceptions::TransducerHasWrongTypeException();
+	throw hfst::exceptions::SpecifiedTypeRequiredException();
       default:
 	throw hfst::exceptions::FunctionNotImplementedException();
       }
@@ -519,7 +519,7 @@ namespace hfst
 	break;
 #endif
       case ERROR_TYPE:
-	throw hfst::exceptions::TransducerHasWrongTypeException();
+	throw hfst::exceptions::SpecifiedTypeRequiredException();
       default:
 	throw hfst::exceptions::FunctionNotImplementedException();
       }
@@ -560,7 +560,7 @@ namespace hfst
 	break;
 #endif
       case ERROR_TYPE:
-	throw hfst::exceptions::TransducerHasWrongTypeException();
+	throw hfst::exceptions::SpecifiedTypeRequiredException();
       default:
 	throw hfst::exceptions::FunctionNotImplementedException();
       }
@@ -604,7 +604,7 @@ namespace hfst
 	break;
 #endif
       case ERROR_TYPE:
-	throw hfst::exceptions::TransducerHasWrongTypeException();
+	throw hfst::exceptions::SpecifiedTypeRequiredException();
       default:
 	throw hfst::exceptions::FunctionNotImplementedException();
       }
@@ -699,7 +699,7 @@ namespace hfst
 	break;
 #endif
       case ERROR_TYPE:
-	throw hfst::exceptions::TransducerHasWrongTypeException();
+	throw hfst::exceptions::SpecifiedTypeRequiredException();
       default:
 	throw hfst::exceptions::FunctionNotImplementedException();
       }
@@ -773,7 +773,7 @@ HfstTransducer::HfstTransducer(const std::string &symbol,
 	break;
 #endif
       case ERROR_TYPE:
-	throw hfst::exceptions::TransducerHasWrongTypeException();
+	throw hfst::exceptions::SpecifiedTypeRequiredException();
       default:
 	throw hfst::exceptions::FunctionNotImplementedException();
       }
@@ -814,7 +814,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	break;
 #endif
       case ERROR_TYPE:
-	throw hfst::exceptions::TransducerHasWrongTypeException();
+	throw hfst::exceptions::SpecifiedTypeRequiredException();
       default:
 	throw hfst::exceptions::FunctionNotImplementedException();
       }
@@ -2405,6 +2405,7 @@ HfstTransducer::HfstTransducer(FILE * ifile,
 	//break;
 	//#endif
       case ERROR_TYPE:
+	throw hfst::exceptions::SpecifiedTypeRequiredException();
       default:
 	throw hfst::exceptions::TransducerHasWrongTypeException();
       }
