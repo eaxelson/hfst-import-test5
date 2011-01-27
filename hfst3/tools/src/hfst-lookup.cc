@@ -57,6 +57,10 @@ using hfst::exceptions::NotTransducerStreamException;
 using std::string;
 using std::vector;
 
+typedef std::vector<std::string> HfstArcPath;
+typedef std::pair<HfstArcPath,float> HfstLookupPath;
+typedef std::set<HfstLookupPath> HfstLookupPaths;
+
 // add tools-specific variables here
 static char* lookup_file_name;
 static FILE* lookup_file;
@@ -80,6 +84,16 @@ enum lookup_output_format
 
 static lookup_input_format input_format = UTF8_TOKEN_INPUT;
 static lookup_output_format output_format = XEROX_OUTPUT;
+
+// XFST variables for apply
+static bool show_flags = false;
+static bool obey_flags = true;
+static bool print_pairs = false;
+static bool print_space = false;
+static bool quote_special = false;
+
+static char* epsilon_format = "";
+static char* space_format = "";
 
 // the formats for lookup cases go like so:
 //  BEGIN LOOKUP LOOKUP LOOKUP... END
@@ -112,11 +126,11 @@ static const char* XEROX_LOOKUPF = "%i\t%l\t%w%n";
 static const char* XEROX_END_SETF = "%n";
 // notaword notaword+?
 static const char* XEROX_EMPTY_BEGIN_SETF = "";
-static const char* XEROX_EMPTY_LOOKUPF = "%i\t%i\t+?\tInf%n";
+static const char* XEROX_EMPTY_LOOKUPF = "%i\t%i+?\t%w%n";
 static const char* XEROX_EMPTY_END_SETF = "%n";
-// ¶    ¶+?
+// ¶    ¶+? 
 static const char* XEROX_UNKNOWN_BEGIN_SETF = "";
-static const char* XEROX_UNKNOWN_LOOKUPF = "%i\t%i\t+?\tInf%n";
+static const char* XEROX_UNKNOWN_LOOKUPF = "%i\t%i+?\t%w%n";
 static const char* XEROX_UNKNOWN_END_SETF = "%n";
 // 0    0 NUM SG
 // 0    [...cyclic...]
@@ -180,24 +194,26 @@ print_usage()
 
     print_common_program_options(message_out);
     fprintf(message_out, 
-	    "Input/Output options:\n"
-	    "  -i, --input=INFILE     Read input transducer from INFILE\n"
-	    "  -o, --output=OUTFILE   Write output to OUTFILE\n");
+        "Input/Output options:\n"
+        "  -i, --input=INFILE     Read input transducer from INFILE\n"
+        "  -o, --output=OUTFILE   Write output to OUTFILE\n");
 
     fprintf(message_out, "Lookup options:\n"
             "  -I, --input-strings=SFILE        Read lookup strings from SFILE\n"
-            "  -O, --output-format=OFORMAT      Use OFORMAT printing results sets (TODO)\n"
+            "  -O, --output-format=OFORMAT      Use OFORMAT printing results sets\n"
             "  -F, --input-format=IFORMAT       Use IFORMAT parsing input (TODO)\n"
             "  -x, --statistics                 Print statistics\n"
+            "  -X, --xfst=VARIABLE              Toggle xfst VARIABLE\n"
             "  -c, --cycles=INT                 How many times to follow input epsilon cycles\n"
-	    "                                   (default: 5)\n");  
+        "                                   (default: 5)\n");  
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
     fprintf(message_out, "OFORMAT is one of {xerox,cg,apertium}, "
            "xerox being default\n"
            "IFORMAT is one of {text,spaced,apertium}, "
            "default being text, unless OFORMAT is apertium\n"
-	    "\nTODO: Currently both OFORMAT and IFORMAT are in plain UTF-8 text format\n");
+           "VARIABLEs relevant to lookup are {print-pairs,print-space,"
+           "quote-special,show-flags,obey-flags}");
     fprintf(message_out, "\n");
     print_report_bugs();
     fprintf(message_out, "\n");
@@ -219,13 +235,14 @@ parse_options(int argc, char** argv)
             {"output-format", required_argument, 0, 'O'},
             {"input-format", required_argument, 0, 'F'},
             {"statistics", no_argument, 0, 'x'},
-	    {"cycles", required_argument, 0, 'c'},
+            {"cycles", required_argument, 0, 'c'},
+            {"xfst", required_argument, 0, 'X'},
             {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "I:O:F:xc:",
+                             HFST_GETOPT_UNARY_SHORT "I:O:F:xc:X:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -288,9 +305,33 @@ parse_options(int argc, char** argv)
         case 'x':
             print_statistics = true;
             break;
-	case 'c':
-	    infinite_cutoff = (size_t)atoi(hfst_strdup(optarg));
-	    break;
+        case 'X':
+            if (strcmp(optarg, "print-pairs") == 0)
+              {
+                print_pairs = true;
+                error(EXIT_FAILURE, 0, "Unimplemented pair printing");
+              }
+            else if (strcmp(optarg, "print-space") == 0)
+              {
+                print_space = true;
+                space_format = strdup(" ");
+              }
+            else if (strcmp(optarg, "show-flags") == 0)
+              {
+                show_flags = true;
+              }
+            else if (strcmp(optarg, "quote-special") == 0)
+              {
+                quote_special = true;
+              }
+            else 
+              {
+                error(EXIT_FAILURE, 0, "Xfst variable %s unrecognised",
+                      optarg);
+              }
+        case 'c':
+            infinite_cutoff = (size_t)atoi(hfst_strdup(optarg));
+            break;
 
 #include "inc/getopt-cases-error.h"
         }
@@ -356,39 +397,238 @@ parse_options(int argc, char** argv)
     return EXIT_CONTINUE;
 }
 
+
+// local flag handling
+bool
+is_flag_diacritic(const std::string& label)
+  {
+    const char* p = label.c_str();
+    if (*p == '\0') 
+      {
+        return false;
+      }
+    if (*p != '@')
+      {
+        return false;
+      }
+    p++;
+    if (*p == '\0') 
+      {
+        return false;
+      }
+    if ((*p != 'P') && (*p != 'D') && (*p != 'C') && (*p != 'R') &&
+        (*p != 'U') && (*p != 'N'))
+      {
+        return false;
+      }
+    p++;
+    if (*p == '\0') 
+      {
+        return false;
+      }
+    if (*p != '.')
+      {
+        return false;
+      }
+    while (*p != '\0')
+      {
+        p++;
+      }
+    if (*(p-1) != '@')
+      {
+       return false;
+      }
+    return true;
+  } 
+
+bool
+is_valid_flag_diacritic_path(HfstArcPath arcs)
+  {
+    fprintf(stderr, "Allowing all flag paths!\n");
+    return true;
+  }
+
+
+
 int
-lookup_printf(const char* format, const char* inputform,
+lookup_printf(const char* format, const HfstLookupPath* input,
               const HfstLookupPath* result, const char* markup,
-	      FILE * ofile)
+              FILE * ofile)
 {
-    size_t space = 2 * strlen(format) +
-        2 * strlen(inputform) + 10;
-    char* lookupform = strdup("");
+    size_t space = 0;
+    size_t input_len = 0;
+    size_t lookup_len = 0;
     if (result != NULL)
       {
-        size_t lookup_len = 0;
-        char* p = lookupform;
+        bool first = true;
         for (vector<string>::const_iterator s = result->first.begin();
              s != result->first.end();
              ++s)
           {
-            lookup_len += s->size();
-            p = strcpy(p, s->c_str());
-            p += s->size();
+            if (!first && print_space)
+              {
+                lookup_len += strlen(space_format);
+              }
+            if (s->compare("@_EPSILON_SYMBOL_@") == 0)
+              {
+                lookup_len += strlen(epsilon_format);
+              }
+            else if (is_flag_diacritic(*s))
+              {
+                if (show_flags)
+                  {
+                    lookup_len += s->size();
+                  }
+              }
+            else
+              {
+                lookup_len += s->size();
+              }
+          }
+      }
+    if (input != NULL)
+      {
+        bool first = true;
+        for (vector<string>::const_iterator s = input->first.begin();
+             s != input->first.end();
+             ++s)
+          {
+            if (!first && print_space)
+              {
+                input_len += strlen(space_format);
+              }
+            if (s->compare("@_EPSILON_SYMBOL_@") == 0)
+              {
+                input_len += strlen(epsilon_format);
+              }
+            else if (is_flag_diacritic(*s))
+              {
+                if (show_flags)
+                  {
+                    input_len += s->size();
+                  }
+              }
+            else
+              {
+                input_len += s->size();
+              }
+            first = false;
+          }
+      }
+    for (const char *f = format; *f != '\0'; f++)
+      {
+        if (*f == '%')
+          {
+            f++;
+            if (*f == 'i')
+              {
+                space += input_len;
+              }
+            else if (*f == 'l')
+              {
+                space += lookup_len;
+              }
+            else if (*f == 'w')
+              {
+                space += strlen("0.012345678901234567890");
+              }
+            else if (*f == '\0')
+              {
+                break;
+              }
+            else
+              {
+                space++;
+              }
+          }
+        space++;
+      }
+    char* lookupform = strdup("");
+    if (result != NULL)
+      {
+        lookupform = static_cast<char*>(malloc(sizeof(char)*lookup_len+1));
+        char* p = lookupform;
+        bool first = true;
+        for (vector<string>::const_iterator s = result->first.begin();
+             s != result->first.end();
+             ++s)
+          {
+            if (!first && print_space)
+              {
+                p = strcpy(p, space_format);
+                p += strlen(space_format);
+              }
+            if (s->compare("@_EPSILON_SYMBOL_@") == 0)
+              {
+                p = strcpy(p, epsilon_format);
+                p += strlen(epsilon_format);
+              }
+            else if (is_flag_diacritic(*s))
+              {
+                if (show_flags)
+                  {
+                    p = strcpy(p, s->c_str());
+                    p += s->size();
+                  }
+              }
+            else
+              {
+                p = strcpy(p, s->c_str());
+                p += s->size();
+              }
+            first = false;
           }
         *p = '\0';
-        lookup_len += 1;
-        space += 2 * strlen(lookupform);
       }
     else
       {
         lookupform = strdup("");
       }
+    char* inputform = strdup("");
+    if (input != NULL)
+      {
+        inputform = static_cast<char*>(malloc(sizeof(char)*input_len+1));
+        char* p = inputform;
+        bool first = true;
+        for (vector<string>::const_iterator s = input->first.begin();
+             s != input->first.end();
+             ++s)
+          {
+            if (!first && print_space)
+              {
+                p = strcpy(p, space_format);
+                p += strlen(space_format);
+              }
+            if (s->compare("@_EPSILON_SYMBOL_@") == 0)
+              {
+                p = strcpy(p, epsilon_format);
+                p += strlen(epsilon_format);
+              }
+            else if (is_flag_diacritic(*s))
+              {
+                if (show_flags)
+                  {
+                    p = strcpy(p, s->c_str());
+                    p += s->size();
+                  }
+              }
+            else
+              {
+                p = strcpy(p, s->c_str());
+                p += s->size();
+              }
+            first = false;
+          }
+        *p = '\0';
+      }
+    else
+      {
+        inputform = strdup("");
+      }
     if (markup != NULL)
       {
         space += 2 * strlen(markup);
       }
-    space += strlen("0.12345678901234567890");
     char* res = static_cast<char*>(calloc(sizeof(char), space + 1));
     size_t space_left = space;
     const char* src = format;
@@ -402,6 +642,10 @@ lookup_printf(const char* format, const char* inputform,
     if (result != NULL)
       {
         w = result->second; // %w
+      }
+    else
+      {
+        w = INFINITY;
       }
     i = strdup(inputform);
     if (lookupform != NULL)
@@ -682,7 +926,6 @@ lookup_simple(const HfstLookupPath& s, T& t, bool* infinity)
   (void)s;
   (void)t;
   (void)infinity;
-
   if (results->size() == 0)
     {
        // no results as empty result
@@ -692,8 +935,8 @@ lookup_simple(const HfstLookupPath& s, T& t, bool* infinity)
 }
 
 bool is_lookup_infinitely_ambiguous(HfstBasicTransducer &t, const HfstLookupPath& s, 
-				    unsigned int& index, HfstState state, 
-				    std::set<HfstState> &epsilon_path_states) 
+                    unsigned int& index, HfstState state, 
+                    std::set<HfstState> &epsilon_path_states) 
 {
   // Whether the end of the lookup path s has been reached
   bool only_epsilons=false;
@@ -708,14 +951,14 @@ bool is_lookup_infinitely_ambiguous(HfstBasicTransducer &t, const HfstLookupPath
       // CASE 1: Input epsilons do not consume a symbol in the lookup path s,
       //         so they can be added freely.
       if (it->get_input_symbol().compare("@_EPSILON_SYMBOL_@") == 0)
-	{
-	  epsilon_path_states.insert(state);
-	  if (epsilon_path_states.find(it->get_target_state()) != epsilon_path_states.end())
-	    return true;
-	  if (is_lookup_infinitely_ambiguous(t, s, index, it->get_target_state(), epsilon_path_states))
-	    return true;
-	  epsilon_path_states.erase(state);
-	}
+    {
+      epsilon_path_states.insert(state);
+      if (epsilon_path_states.find(it->get_target_state()) != epsilon_path_states.end())
+        return true;
+      if (is_lookup_infinitely_ambiguous(t, s, index, it->get_target_state(), epsilon_path_states))
+        return true;
+      epsilon_path_states.erase(state);
+    }
 
       // CASE 2: Other input symbols consume a symbol in the lookup path s,
       //         so they can be added only if the end of the lookup path s has not been reached.
@@ -723,16 +966,16 @@ bool is_lookup_infinitely_ambiguous(HfstBasicTransducer &t, const HfstLookupPath
       //         marked with the comment /***/. The whole function would probably benefit from
       //         reorganizing the if/else blocks...)
       else if (not only_epsilons)
-	{
-	  if (it->get_input_symbol().compare(s.first[index]) == 0) /***/
-	    {
-	      index++; // consume an input symbol in the lookup path s /***/
-	      std::set<HfstState> empty_set;
-	      if (is_lookup_infinitely_ambiguous(t, s, index, it->get_target_state(), empty_set))
-		return true;
-	      index--; // add the input symbol back to the lookup path s. /***/
-	    }
-	}
+    {
+      if (it->get_input_symbol().compare(s.first[index]) == 0) /***/
+        {
+          index++; // consume an input symbol in the lookup path s /***/
+          std::set<HfstState> empty_set;
+          if (is_lookup_infinitely_ambiguous(t, s, index, it->get_target_state(), empty_set))
+        return true;
+          index--; // add the input symbol back to the lookup path s. /***/
+        }
+    }
     }  
   return false;
 }
@@ -746,19 +989,18 @@ bool is_lookup_infinitely_ambiguous(HfstBasicTransducer &t, const HfstLookupPath
   HfstState initial_state=0;
 
   return is_lookup_infinitely_ambiguous(t, s, index, initial_state, 
-					epsilon_path_states);
+                    epsilon_path_states);
 }
 
 HfstLookupPaths*
 lookup_simple(const HfstLookupPath& s, HfstTransducer& t, bool* infinity)
 {
   HfstLookupPaths* results = new HfstLookupPaths;
-
   if (t.is_lookup_infinitely_ambiguous(s))
     {
       if (!silent && infinite_cutoff > 0) {
-	warning(0, 0, "Got infinite results, number of cycles limited to %zu",
-		infinite_cutoff);
+    warning(0, 0, "Got infinite results, number of cycles limited to %zu",
+        infinite_cutoff);
       }
       t.lookup_fd(*results, s, infinite_cutoff);
       *infinity = true;
@@ -795,14 +1037,13 @@ lookup_simple(const HfstLookupPath& s, HfstTransducer& t, bool* infinity)
   @todo Support flag diacritics(?) and log weights(?)
  */
 void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results, const HfstLookupPath& s, unsigned int& index, 
-	       HfstLookupPath& path, HfstState state, std::multiset<HfstState>& visited_states, std::vector<HfstState>& epsilon_path,
-	       unsigned int& cycles)
+           HfstLookupPath& path, HfstState state, std::multiset<HfstState>& visited_states, std::vector<HfstState>& epsilon_path,
+           unsigned int& cycles)
 { 
   // Whether the end of the lookup path s has been reached
   bool only_epsilons=false;
   if ((unsigned int)s.first.size() == index)
     only_epsilons=true;
-
   // If the end of the lookup path s has been reached
   // and we are in a final state, add the traversed path to results
   if (only_epsilons && t.is_final_state(state)) {
@@ -818,55 +1059,54 @@ void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results, const HfstLooku
     {
       // CASE 1: Input epsilons do not consume a symbol in the lookup path s,
       //         so they can be added freely.
-      if (it->get_input_symbol().compare("@_EPSILON_SYMBOL_@") == 0)
-	{
+      if ((it->get_input_symbol().compare("@_EPSILON_SYMBOL_@") == 0) ||
+          (is_flag_diacritic(it->get_input_symbol())) )
+    {
 
-	  // If the target state is a visited state or the target state is
-	  // the current state, there is a cycle and we must check
-	  // that the maximum number of cycles is not going to be exceeded.
-	  if ( (visited_states.find(it->get_target_state()) != visited_states.end() ||
-		state == it->get_target_state()) &&
-	       cycles >= (unsigned int)infinite_cutoff ) {}
+      // If the target state is a visited state or the target state is
+      // the current state, there is a cycle and we must check
+      // that the maximum number of cycles is not going to be exceeded.
+      if ( (visited_states.find(it->get_target_state()) != visited_states.end() ||
+        state == it->get_target_state()) &&
+           cycles >= (unsigned int)infinite_cutoff ) {}
 
-	  else {
-
-	    epsilon_path.push_back(state);
-	    visited_states.insert(state);
-	    bool cycles_increased=false;
-	    std::vector<HfstState> removed_states;
-	    
-	    // If there is a cycle... 
-	    if (visited_states.find(it->get_target_state()) != visited_states.end()) {
-	      cycles_increased=true;
-	      cycles++;	  
-	      for (unsigned int i=epsilon_path.size()-1; epsilon_path[i] != it->get_target_state(); i--) {
-		//fprintf(stderr, "removing state %i\n", epsilon_path[i]);
-		// ...remove the states that lead to the cycle so
-		// they will not increase the number of cycles many times
-		removed_states.push_back(epsilon_path[i]);
-		visited_states.erase(visited_states.find(epsilon_path[i]));
-		epsilon_path.pop_back();
-	      }	    
-	    }
-	    
-	    path.first.push_back(it->get_output_symbol()); // add an output symbol to the traversed path
-	    path.second = path.second + it->get_weight(); // add the transition weight
-	    lookup_fd(t, results, s, index, path, it->get_target_state(), visited_states, epsilon_path, cycles);
-	    path.first.pop_back(); // remove the output symbol from the traversed path
-	    path.second = path.second - it->get_weight(); // subtract the transition weight
-	    
-	    epsilon_path.pop_back();
-	    visited_states.erase(visited_states.find(state));
-	    if (cycles_increased) {
-	      cycles--;
-	      for(int i=removed_states.size()-1; i>=0; i--) {
-		//fprintf(stderr, "readding state %i\n", removed_states[i]);
-		epsilon_path.push_back(removed_states[i]);
-		visited_states.insert(removed_states[i]);
-	      }
-	    }
-	  }
-	}
+      else {
+        epsilon_path.push_back(state);
+        visited_states.insert(state);
+        bool cycles_increased=false;
+        std::vector<HfstState> removed_states;
+        
+        // If there is a cycle... 
+        if (visited_states.find(it->get_target_state()) != visited_states.end()) {
+          cycles_increased=true;
+          cycles++;   
+          for (unsigned int i=epsilon_path.size()-1; epsilon_path[i] != it->get_target_state(); i--) {
+        //fprintf(stderr, "removing state %i\n", epsilon_path[i]);
+        // ...remove the states that lead to the cycle so
+        // they will not increase the number of cycles many times
+        removed_states.push_back(epsilon_path[i]);
+        visited_states.erase(visited_states.find(epsilon_path[i]));
+        epsilon_path.pop_back();
+          }     
+        }
+        path.first.push_back(it->get_output_symbol()); // add an output symbol to the traversed path
+        path.second = path.second + it->get_weight(); // add the transition weight
+        lookup_fd(t, results, s, index, path, it->get_target_state(), visited_states, epsilon_path, cycles);
+        path.first.pop_back(); // remove the output symbol from the traversed path
+        path.second = path.second - it->get_weight(); // subtract the transition weight
+        
+        epsilon_path.pop_back();
+        visited_states.erase(visited_states.find(state));
+        if (cycles_increased) {
+          cycles--;
+          for(int i=removed_states.size()-1; i>=0; i--) {
+        //fprintf(stderr, "readding state %i\n", removed_states[i]);
+        epsilon_path.push_back(removed_states[i]);
+        visited_states.insert(removed_states[i]);
+          }
+        }
+      }
+    }
 
       // CASE 2: Other input symbols consume a symbol in the lookup path s,
       //         so they can be added only if the end of the lookup path s has not been reached.
@@ -874,31 +1114,21 @@ void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results, const HfstLooku
       //         marked with the comment /***/. The whole function would probably benefit from
       //         reorganizing the if/else blocks...)
       else if (not only_epsilons)
-	{
-	  if (it->get_input_symbol().compare(s.first[index]) == 0) /***/
-	    {
-	      index++; // consume an input symbol in the lookup path s /***/
-	      path.first.push_back(it->get_input_symbol()); // add an output symbol to the traversed path
-	      path.second = path.second + it->get_weight(); // add the transition weight
-	      std::vector<HfstState> empty_path;
-	      lookup_fd(t, results, s, index, path, it->get_target_state(), visited_states, empty_path, cycles);
-	      path.first.pop_back(); // remove the output symbol from the traversed path
-	      path.second = path.second - it->get_weight(); // subtract the transition weight
-	      index--; // add the input symbol back to the lookup path s. /***/
-	    }
-	}
+    {
+      if (it->get_input_symbol().compare(s.first[index]) == 0) /***/
+        {
+          index++; // consume an input symbol in the lookup path s /***/
+          path.first.push_back(it->get_output_symbol()); // add an output symbol to the traversed path
+          path.second = path.second + it->get_weight(); // add the transition weight
+          std::vector<HfstState> empty_path;
+          lookup_fd(t, results, s, index, path, it->get_target_state(), visited_states, empty_path, cycles);
+          path.first.pop_back(); // remove the output symbol from the traversed path
+          path.second = path.second - it->get_weight(); // subtract the transition weight
+          index--; // add the input symbol back to the lookup path s. /***/
+        }
+    }
     }
 }
-
-  typedef std::vector<std::string> HfstArcPath;
-  //! @brief A path of one level of arcs with collected weight,
-  //!
-  //! Used as the source and result data type for lookups and downs.
-  typedef std::pair<HfstArcPath,float> HfstLookupPath;
-  //! @brief A set of simple paths.
-  //!
-  //! Used as return type of lookup with multiple, unique results.
-  typedef std::set<HfstLookupPath> HfstLookupPaths;
 
 void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results, const HfstLookupPath& s, ssize_t limit = -1)
 {
@@ -916,9 +1146,29 @@ void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results, const HfstLooku
   HfstState initial_state=0;
 
   lookup_fd(t, results, s, index, 
-	    path, initial_state,
-	    visited_states, epsilon_path, cycles);
-
+        path, initial_state,
+        visited_states, epsilon_path, cycles);
+  HfstLookupPaths filtered;
+  for (HfstLookupPaths::iterator res = results.begin();
+       res != results.end();
+       ++res)
+    {
+      if (is_valid_flag_diacritic_path(res->first) || !obey_flags)
+        {
+          HfstArcPath unflagged;
+          for (HfstArcPath::const_iterator arc = res->first.begin();
+               arc != res->first.end();
+               arc++)
+            {
+              if (show_flags || !is_flag_diacritic(*arc))
+                {
+                  unflagged.push_back(*arc);
+                }
+            }
+          filtered.insert(HfstLookupPath(unflagged, res->second));
+        }
+    }
+  results = filtered;
 }
 
 HfstLookupPaths*
@@ -929,8 +1179,8 @@ lookup_simple(const HfstLookupPath& s, HfstBasicTransducer& t, bool* infinity)
   if (is_lookup_infinitely_ambiguous(t,s))
     {
       if (!silent && infinite_cutoff > 0) {
-	warning(0, 0, "Got infinite results, number of cycles limited to %zu",
-		infinite_cutoff);
+    warning(0, 0, "Got infinite results, number of cycles limited to %zu",
+        infinite_cutoff);
       }
       lookup_fd(t, *results, s, infinite_cutoff);
       *infinity = true;
@@ -950,6 +1200,7 @@ lookup_simple(const HfstLookupPath& s, HfstBasicTransducer& t, bool* infinity)
 }
 
 
+
 template<class T> HfstLookupPaths*
 lookup_cascading(const HfstLookupPath& s, vector<T> cascade,
                  bool* infinity)
@@ -965,7 +1216,7 @@ lookup_cascading(const HfstLookupPath& s, vector<T> cascade,
            ++ckv)
         {
           HfstLookupPaths* xyzkvs = lookup_simple<T>(*ckv, cascade[i],
-						     infinity);
+                             infinity);
           if (infinity)
             {
               verbose_printf("Inf results @ level %u, using %zu\n",
@@ -991,51 +1242,51 @@ lookup_cascading(const HfstLookupPath& s, vector<T> cascade,
 
 void
 print_lookups(const HfstLookupPaths& kvs,
-              const char* s, char* markup,
+              const HfstLookupPath& kv, char* markup,
               bool outside_sigma, bool inf, FILE * ofile)
 {
     if (outside_sigma)
       {
-        lookup_printf(unknown_begin_setf, s, NULL, markup, ofile);
-        lookup_printf(unknown_lookupf, s, NULL, markup, ofile);
-        lookup_printf(unknown_end_setf, s, NULL, markup, ofile);
+        lookup_printf(unknown_begin_setf, &kv, NULL, markup, ofile);
+        lookup_printf(unknown_lookupf, &kv, NULL, markup, ofile);
+        lookup_printf(unknown_end_setf, &kv, NULL, markup, ofile);
         no_analyses++;
       }
     else if (kvs.size() == 0)
       {
-        lookup_printf(empty_begin_setf, s, NULL, markup, ofile);
-        lookup_printf(empty_lookupf, s, NULL, markup, ofile);
-        lookup_printf(empty_end_setf, s, NULL, markup, ofile);
+        lookup_printf(empty_begin_setf, &kv, NULL, markup, ofile);
+        lookup_printf(empty_lookupf, &kv, NULL, markup, ofile);
+        lookup_printf(empty_end_setf, &kv, NULL, markup, ofile);
         no_analyses++;
       }
     else if (inf)
       {
         analysed++;
-        lookup_printf(infinite_begin_setf, s, NULL, markup, ofile);
+        lookup_printf(infinite_begin_setf, &kv, NULL, markup, ofile);
         for (HfstLookupPaths::const_iterator lkv = kvs.begin();
                 lkv != kvs.end();
                 ++lkv)
           {
             HfstLookupPath lup = *lkv;
-            lookup_printf(infinite_lookupf, s, &lup, markup, ofile);
+            lookup_printf(infinite_lookupf, &kv, &lup, markup, ofile);
             analyses++;
           }
-        lookup_printf(infinite_end_setf, s, NULL, markup, ofile);
+        lookup_printf(infinite_end_setf, &kv, NULL, markup, ofile);
       }
     else
       {
         analysed++;
 
-        lookup_printf(begin_setf, s, NULL, markup, ofile);
+        lookup_printf(begin_setf, &kv, NULL, markup, ofile);
         for (HfstLookupPaths::const_iterator lkv = kvs.begin();
                 lkv != kvs.end();
                 ++lkv)
           {
             HfstLookupPath lup = *lkv;
-            lookup_printf(lookupf, s, &lup, markup, ofile);
+            lookup_printf(lookupf, &kv, &lup, markup, ofile);
             analyses++;
         }
-        lookup_printf(end_setf, s, NULL, markup, ofile);
+        lookup_printf(end_setf, &kv, NULL, markup, ofile);
       }
 }
 
@@ -1051,7 +1302,7 @@ perform_lookups(HfstLookupPath& origin, std::vector<T>& cascade, bool unknown, b
           }
         else
          {
-	   kvs = lookup_cascading<T>(origin, cascade, infinite);
+       kvs = lookup_cascading<T>(origin, cascade, infinite);
          }
       }
     else
@@ -1124,7 +1375,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
               {
                 warning(0, 0, "Lookup not supported on this automaton "
                       "format: converting to HFST basic transducer "
-		      "and trying\n");
+              "and trying\n");
                 for (unsigned int i=0; i<cascade.size(); i++) 
                   {
                     HfstBasicTransducer mut(cascade[i]);
@@ -1136,7 +1387,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                                                          unknown,
                                                          &infinite);
           }
-        print_lookups(*kvs, line, markup, unknown, infinite, outstream);
+        print_lookups(*kvs, *kv, markup, unknown, infinite, outstream);
         delete kv;
         delete kvs;
       } // while lines in input
@@ -1173,11 +1424,13 @@ int main( int argc, char **argv ) {
             "  regular:`%s'`%s...'`%s',\n"
             "  unanalysed:`%s'`%s'`%s',\n"
             "  untokenised:`%s'`%s'`%s',\n"
-            "  infinite:`%s'`%s'`%s\n",
+            "  infinite:`%s'`%s'`%s\n"
+            "  epsilon: `%s', space: `%s', flags: %d\n",
             begin_setf, lookupf, end_setf,
             empty_begin_setf, empty_lookupf, empty_end_setf,
             unknown_begin_setf, unknown_lookupf, unknown_end_setf,
-            infinite_begin_setf, infinite_lookupf, infinite_end_setf);
+            infinite_begin_setf, infinite_lookupf, infinite_end_setf,
+            epsilon_format, space_format, show_flags);
     // here starts the buffer handling part
     HfstInputStream* instream = NULL;
     try 
