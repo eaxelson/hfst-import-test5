@@ -34,21 +34,21 @@ class Alphabet:
                 byte = file.read(1)
                 if byte == '\0': # a symbol has ended
                     symbol = unicode(symbol, "utf-8")
-                    if len(symbol) > 2:
-                        if symbol[0] == '@' and symbol [-1] == '@' and symbol[2] == '.':
-                            # this is a flag diacritic
-                            op = feat = val = u""
-                            parts = symbol[1:-1].split(u'.')
-                            if len(parts) == 2:
-                                op, feat = parts
-                            elif len(parts) == 3:
-                                op, feat, val = parts
-                            else:
-                                self.keyTable.append(symbol)
-                                break
-                            self.flagDiacriticOperations[x] = FlagDiacriticOperation(op, feat, val)
-                            self.keyTable.append(u"")
+                    if len(symbol) > 4 and symbol[0] == '@' and\
+                    symbol [-1] == '@' and symbol[2] == '.' and symbol[1] in "PNRDCU":
+                        # this is a flag diacritic
+                        op = feat = val = u""
+                        parts = symbol[1:-1].split(u'.')
+                        if len(parts) == 2:
+                            op, feat = parts
+                        elif len(parts) == 3:
+                            op, feat, val = parts
+                        else:
+                            self.keyTable.append(symbol)
                             break
+                        self.flagDiacriticOperations[x] = FlagDiacriticOperation(op, feat, val)
+                        self.keyTable.append(u"")
+                        break
                     self.keyTable.append(symbol)
                     break
                 symbol += byte
