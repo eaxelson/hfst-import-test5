@@ -605,7 +605,7 @@ namespace hfst { namespace implementations {
     std::map<int,unsigned short> all_visitations, std::map<int, unsigned short> path_visitations,
     std::vector<char>& lbuffer, int lpos, std::vector<char>& ubuffer, int upos,
     ExtractStringsCb& callback, int cycles,
-    std::vector<hfst::FdState<int> >* fd_state_stack, bool filter_fd)
+			      std::vector<hfst::FdState<int> >* fd_state_stack, bool filter_fd, bool include_spv, StringPairVector &spv)
   {
     if(cycles >= 0 && path_visitations[state] > cycles)
       return true;
@@ -630,6 +630,8 @@ namespace hfst { namespace implementations {
       }
       
       hfst::WeightedPath<float> path(&lbuffer[0],&ubuffer[0],0);
+      if (include_spv)
+	path.set_string_pair_vector(spv);
       hfst::ExtractStringsCb::RetVal ret = callback(path, final);
       if(!ret.continueSearch || !ret.continuePath)
       {
@@ -715,9 +717,37 @@ namespace hfst { namespace implementations {
         up += clen;
       }
       
+      /* Handle spv here. Special symbols (flags, epsilons) are always inserted. */
+      if (include_spv) {
+	
+        //find the key in sigma
+        char* c_in=NULL;
+        for(struct sigma* sig=t->sigma; sig!=NULL&&sig->symbol!=NULL; sig=sig->next)
+	  { if(sig->number == arc->in) {
+	      c_in = sig->symbol;
+	      break; }
+	  }
+
+        //find the key in sigma
+        char* c_out=NULL;
+        for(struct sigma* sig=t->sigma; sig!=NULL&&sig->symbol!=NULL; sig=sig->next) {
+          if(sig->number == arc->out) {
+            c_out = sig->symbol;
+            break; }
+        }
+
+	StringPair string_pair(std::string(strdup(c_in)),
+			       std::string(strdup(c_out)));
+	spv.push_back(string_pair);
+      }
+
       res = extract_strings(t, arc->target, all_visitations, path_visitations,
-          lbuffer, lp, ubuffer, up, callback, cycles, fd_state_stack, filter_fd);
+			    lbuffer, lp, ubuffer, up, callback, cycles, fd_state_stack, filter_fd,
+			    include_spv, spv);
     
+      if (include_spv)
+	spv.pop_back();
+
       if(added_fd_state)
         fd_state_stack->pop_back();
     }
@@ -729,18 +759,18 @@ namespace hfst { namespace implementations {
   static const int BUFFER_START_SIZE = 64;
   
   void FomaTransducer::extract_strings(fsm * t, ExtractStringsCb& callback,
-    int cycles, FdTable<int>* fd, bool filter_fd)
-  {
+				       int cycles, FdTable<int>* fd, bool filter_fd, bool include_spv)  {
     std::vector<char> lbuffer(BUFFER_START_SIZE, 0);
     std::vector<char> ubuffer(BUFFER_START_SIZE, 0);
     std::map<int, unsigned short> all_visitations;
     std::map<int, unsigned short> path_visitations;
     std::vector<hfst::FdState<int> >* fd_state_stack = (fd==NULL) ? NULL : new std::vector<hfst::FdState<int> >(1, hfst::FdState<int>(*fd));
     
+    StringPairVector spv;
     bool res = true;
     for (int i=0; ((t->states)+i)->state_no != -1 && res == true; i++) {
       if (((t->states)+i)->start_state == 1)
-        res = hfst::implementations::extract_strings(t, ((t->states)+i)->state_no, all_visitations, path_visitations, lbuffer, 0, ubuffer, 0, callback, cycles, fd_state_stack, filter_fd);
+        res = hfst::implementations::extract_strings(t, ((t->states)+i)->state_no, all_visitations, path_visitations, lbuffer, 0, ubuffer, 0, callback, cycles, fd_state_stack, filter_fd, include_spv, spv);
     }
   }
   

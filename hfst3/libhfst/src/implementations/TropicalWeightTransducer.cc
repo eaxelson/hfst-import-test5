@@ -2061,7 +2061,7 @@ namespace hfst { namespace implementations
     std::map<StateId,unsigned short> all_visitations, std::map<StateId, unsigned short> path_visitations,
     std::vector<char>& lbuffer, int lpos, std::vector<char>& ubuffer, int upos, float weight_sum,
     hfst::ExtractStringsCb& callback, int cycles,
-    std::vector<hfst::FdState<int64> >* fd_state_stack, bool filter_fd)
+			      std::vector<hfst::FdState<int64> >* fd_state_stack, bool filter_fd, bool include_spv, StringPairVector &spv)
   { 
     if(cycles >= 0 && path_visitations[s] > cycles)
       return true;
@@ -2074,6 +2074,8 @@ namespace hfst { namespace implementations
       ubuffer[upos]=0;
       bool final = t->Final(s) != TropicalWeight::Zero();
       hfst::WeightedPath<float> path(&lbuffer[0],&ubuffer[0],weight_sum+(final?t->Final(s).Value():0));
+      if (include_spv)
+	path.set_string_pair_vector(spv);
       hfst::ExtractStringsCb::RetVal ret = callback(path, final);
       if(!ret.continueSearch || !ret.continuePath)
       {
@@ -2135,9 +2137,20 @@ namespace hfst { namespace implementations
         up += str.length();
       }
       
+      /* Handle spv here. Special symbols (flags, epsilons) are always inserted. */
+      if (include_spv) {
+	StringPair string_pair(t->InputSymbols()->Find(arc.ilabel),
+			       t->InputSymbols()->Find(arc.olabel));
+	spv.push_back(string_pair);
+      }
+
       res = extract_strings(t, arc.nextstate, all_visitations, path_visitations,
-          lbuffer,lp, ubuffer,up, weight_sum+arc.weight.Value(), callback, cycles, fd_state_stack, filter_fd);
+			    lbuffer,lp, ubuffer,up, weight_sum+arc.weight.Value(), callback, cycles, fd_state_stack, filter_fd,
+			    include_spv, spv);
       
+      if (include_spv)
+	spv.pop_back();
+
       if(added_fd_state)
         fd_state_stack->pop_back();
     }
@@ -2149,7 +2162,7 @@ namespace hfst { namespace implementations
   static const int BUFFER_START_SIZE = 64;
   
   void TropicalWeightTransducer::extract_strings(StdVectorFst * t, hfst::ExtractStringsCb& callback,
-      int cycles, FdTable<int64>* fd, bool filter_fd)
+      int cycles, FdTable<int64>* fd, bool filter_fd, bool include_spv)
   {
     if (t->Start() == -1)
       return;
@@ -2160,8 +2173,10 @@ namespace hfst { namespace implementations
     map<StateId, unsigned short> path_visitations;
     std::vector<hfst::FdState<int64> >* fd_state_stack = (fd==NULL) ? NULL : new std::vector<hfst::FdState<int64> >(1, hfst::FdState<int64>(*fd));
     
+    StringPairVector spv;
     hfst::implementations::extract_strings(t,t->Start(),all_visitations,path_visitations,
-            lbuffer,0,ubuffer,0,0.0f,callback,cycles,fd_state_stack,filter_fd);
+					   lbuffer,0,ubuffer,0,0.0f,callback,cycles,fd_state_stack,filter_fd, 
+					   include_spv, spv);
   }
   
   FdTable<int64>* TropicalWeightTransducer::get_flag_diacritics(StdVectorFst * t)

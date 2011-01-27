@@ -12,6 +12,7 @@
 
 #ifndef _EXTRACT_STRINGS_H_
 #define _EXTRACT_STRINGS_H_
+#include "HfstSymbolDefs.h"
 #include <string>
 #include <vector>
 #include <iostream>
@@ -27,11 +28,15 @@ namespace hfst {
 
   /** \brief A weighted string pair that represents a path in a transducer.
 
-      HfstLookupPath is the same with W == float, is there a need for two similar datatypes?
+      HfstLookupPath is the same with W == float, 
+      is there a need for two similar datatypes?
 
       @see WeightedPaths */
   template<class W> class WeightedPath
     {
+    private:
+      /* Whether the StringPairVector representation is in use. */
+      bool is_spv_in_use;
     public:
       /** \brief The input string of the path. */
       std::string istring;
@@ -39,14 +44,38 @@ namespace hfst {
       std::string ostring;
       /** \brief The weight of the path. */
       W weight;
-      
+      /** \brief An optional StringPairVector representation of the path. 
+
+	  This can be used when we are interested in the exact alignment of
+	  symbols in a given path. The value of this member can be set with
+	  function #set_string_pair_vector. */
+      StringPairVector spv;
+
       WeightedPath(const std::string &is,const std::string &os,W w)
-	{ weight = w; istring = is; ostring = os; }
+	{ weight = w; istring = is; ostring = os; is_spv_in_use=false; }
 
       bool operator< (const WeightedPath &another) const
 	{ if (weight == another.weight)
 	    { if (istring == another.istring)
-		{ return ostring < another.ostring; }
+		{ if (ostring == another.ostring) 
+		  { /* Handle here spv. */
+		    if (not is_spv_in_use)
+		      return false; /* paths are equivalent */
+		    unsigned int common_length 
+		      = (spv.size()<another.spv.size())? 
+		      spv.size() : another.spv.size();
+		    /* Go through string pairs. */
+		    for (unsigned int i=0; i<common_length; i++) {
+		      if (spv[i].first == another.spv[i].first)
+			{ if (spv[i].second == another.spv[i].second)
+			    { continue; }
+			  return (spv[i].second < another.spv[i].second); }
+		      return (spv[i].first < another.spv[i].first);
+		    }
+		    /* Shorter path is smaller. */
+		    return (spv.size() < another.spv.size());
+		  }
+		  return ostring < another.ostring; }
 	      return istring < another.istring; }
 	  return weight < another.weight; }
       
@@ -90,6 +119,12 @@ namespace hfst {
 	  this->istring = another.istring;
 	  this->ostring = another.ostring;
 	  this->weight = another.weight; }
+
+      /** \brief Set the value of the string pair vector representation 
+	  equal to \a spv. */
+      void set_string_pair_vector(const StringPairVector &spv)
+      { this->spv = spv; 
+	is_spv_in_use=true; }
     };
 
   /** \brief A class for storing weighted string pairs that represent paths in a transducer. 

@@ -1138,7 +1138,8 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
     return hfst_paths;
   }
 
-  void HfstTransducer::extract_strings(ExtractStringsCb& callback, int cycles)
+  void HfstTransducer::extract_strings(ExtractStringsCb& callback, int cycles,
+				       bool include_spv)
     const
   { 
     switch (this->type)
@@ -1146,23 +1147,23 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 #if HAVE_OPENFST
       case LOG_OFST_TYPE:
 	hfst::implementations::LogWeightTransducer::extract_strings
-	  (implementation.log_ofst,callback,cycles);
+	  (implementation.log_ofst,callback,cycles,NULL,false,include_spv);
 	break;
       case TROPICAL_OFST_TYPE:
 	hfst::implementations::TropicalWeightTransducer::extract_strings
-	  (implementation.tropical_ofst,callback,cycles);
+	  (implementation.tropical_ofst,callback,cycles,NULL,false,include_spv);
 	break;
 #endif
 #if HAVE_SFST
       case SFST_TYPE:
 	hfst::implementations::SfstTransducer::extract_strings
-	  (implementation.sfst, callback, cycles);
+	  (implementation.sfst, callback, cycles,NULL,false,include_spv);
 	break;
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
 	hfst::implementations::FomaTransducer::extract_strings
-	  (implementation.foma, callback, cycles);
+	  (implementation.foma, callback, cycles,NULL,false,include_spv);
 	break;
 #endif
        /* Add here your implementation. */
@@ -1179,7 +1180,8 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   }
   
   void HfstTransducer::extract_strings_fd(ExtractStringsCb& callback, 
-					  int cycles, bool filter_fd)
+					  int cycles, bool filter_fd,
+					  bool include_spv)
     const
   { 
     switch (this->type)
@@ -1191,7 +1193,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	  = hfst::implementations::LogWeightTransducer::get_flag_diacritics
 	  (implementation.log_ofst);
 	hfst::implementations::LogWeightTransducer::extract_strings
-	  (implementation.log_ofst,callback,cycles,t_log_ofst,filter_fd);
+	  (implementation.log_ofst,callback,cycles,t_log_ofst,filter_fd,include_spv);
 	delete t_log_ofst;
       }
 	break;
@@ -1202,7 +1204,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	    get_flag_diacritics(implementation.tropical_ofst);
 	hfst::implementations::TropicalWeightTransducer::extract_strings
 	  (implementation.tropical_ofst,callback,cycles,
-	   t_tropical_ofst,filter_fd);
+	   t_tropical_ofst,filter_fd,include_spv);
 	delete t_tropical_ofst;
       }
 	break;
@@ -1214,7 +1216,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	  = hfst::implementations::SfstTransducer::get_flag_diacritics
 	  (implementation.sfst);
 	hfst::implementations::SfstTransducer::extract_strings
-	  (implementation.sfst, callback, cycles, t_sfst, filter_fd);
+	  (implementation.sfst, callback, cycles, t_sfst, filter_fd,include_spv);
 	delete t_sfst;
       }
 	break;
@@ -1226,7 +1228,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	    = hfst::implementations::FomaTransducer::get_flag_diacritics
 	    (implementation.foma);
 	  hfst::implementations::FomaTransducer::extract_strings
-	    (implementation.foma, callback, cycles, t_foma, filter_fd);
+	    (implementation.foma, callback, cycles, t_foma, filter_fd,include_spv);
 	  delete t_foma;
       }
 	break;
@@ -1268,24 +1270,26 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   };
   
   void HfstTransducer::extract_strings(WeightedPaths<float>::Set &results,
-				       int max_num, int cycles) const
+				       int max_num, int cycles,
+				       bool include_spv) const
   {
     if(is_cyclic() && max_num < 1 && cycles < 0)
       throw hfst::exceptions::TransducerIsCyclicException();
     
     ExtractStringsCb_ cb(results, max_num);
-    extract_strings(cb, cycles);
+    extract_strings(cb, cycles,include_spv);
   }
   
   void HfstTransducer::extract_strings_fd(WeightedPaths<float>::Set &results,
 					  int max_num, int cycles,
-					  bool filter_fd) const
+					  bool filter_fd,
+					  bool include_spv) const
   {
     if(is_cyclic() && max_num < 1 && cycles < 0)
       throw hfst::exceptions::TransducerIsCyclicException();
     
     ExtractStringsCb_ cb(results, max_num);
-    extract_strings_fd(cb, cycles, filter_fd);
+    extract_strings_fd(cb, cycles, filter_fd,include_spv);
   }
 
   bool HfstTransducer::check_for_missing_flags_in
