@@ -2118,7 +2118,7 @@ namespace hfst { namespace implementations
       int lp=lpos;
       int up=upos;
       
-      if (arc.ilabel != 0 && (!filter_fd || fd_state_stack->back().get_table().get_operation(arc.ilabel)==NULL))
+      if ((!filter_fd || fd_state_stack->back().get_table().get_operation(arc.ilabel)==NULL))
       {
         std::string str = t->InputSymbols()->Find(arc.ilabel);
         if(lpos+str.length() >= lbuffer.size())
@@ -2126,7 +2126,7 @@ namespace hfst { namespace implementations
         strcpy(&lbuffer[lpos], str.c_str());
         lp += str.length();
       }
-      if (arc.olabel != 0 && (!filter_fd || fd_state_stack->back().get_table().get_operation(arc.olabel)==NULL))
+      if ( (!filter_fd || fd_state_stack->back().get_table().get_operation(arc.olabel)==NULL))
       {
         std::string str = t->InputSymbols()->Find(arc.olabel);
         if(upos+str.length() > ubuffer.size())

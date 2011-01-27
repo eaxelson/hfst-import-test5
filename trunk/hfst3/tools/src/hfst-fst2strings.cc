@@ -67,29 +67,20 @@ print_usage()
         "Display the strings recognized by a transducer\n"
         "\n", program_name);
     print_common_program_options(message_out);
-#               if DEBUG
-    fprintf(message_out,
-        "%-35s%s", "  -d, --debug", "Print debugging messages and results\n"
-        );
-#               endif
-    fprintf(message_out, "Input/Output options:\n");
-    fprintf(message_out, "%-30s%s", "  -o, --output=OUTFILE",        "Write results to OUTFILE\n");
-    fprintf(message_out, "%-30s%s", "  -i, --input=INFILE",          "Read input from INFILE\n");
-
-    fprintf(message_out, "Tool-specific options:\n");
-    fprintf(message_out, "%-30s%s", "  -n, --max-strings=INT",       "The maximum number of strings printed\n");
-    fprintf(message_out, "%-30s%s", "  -N, --nbest=INT",             "Prune the transducer to a max number of best strings\n");
-    fprintf(message_out, "%-30s%s", "  -c, --cycles=INT",            "How many times to follow cycles. Negative=infinite (default)\n");
-    fprintf(message_out, "%-30s%s", "  -w, --print-weights",         "Display the weight for each string\n");
-    fprintf(message_out, "%-30s%s", "  -e, --eval-flags",            "Only print strings with pass flag diacritic checks\n");
-    fprintf(message_out, "%-30s%s", "  -f, --filter-flags",          "Don't print flag diacritic symbols (only with -e)\n");
-    fprintf(message_out, " Ignore options:\n");
-    fprintf(message_out, "%-30s%s", "  -l, --max-in-length=INT",     "Ignore paths with an input string longer than length\n");
-    fprintf(message_out, "%-30s%s", "  -L, --max-out-length=INT",    "Ignore paths with an output string longer than length\n");
-    fprintf(message_out, "%-30s%s", "  -p, --in-prefix=PREFIX",      "Ignore paths with an input string not beginning with PREFIX\n");
-    fprintf(message_out, "%-30s%s", "  -P, --out-prefix=PREFIX",     "Ignore paths with an output string not beginning with PREFIX\n");
-    fprintf(message_out, "%-30s%s", "  -x, --in-exclude=STR",        "Ignore paths with an input string containing STR\n");
-    fprintf(message_out, "%-30s%s", "  -X, --out-exclude=STR",       "Ignore paths with an output string containing STR\n");
+    fprintf(message_out, "Fst2strings options:\n");
+    fprintf(message_out, "  -n, --max-strings=INT      The maximum number of strings printed\n");
+    fprintf(message_out, "  -N, --nbest=INT            Prune the transducer to a max number of best strings\n");
+    fprintf(message_out, "  -c, --cycles=INT           How many times to follow cycles. Negative=infinite (default)\n");
+    fprintf(message_out, "  -w, --print-weights        Display the weight for each string\n");
+    fprintf(message_out, "  -e, --eval-flags           Only print strings with pass flag diacritic checks\n");
+    fprintf(message_out, "  -f, --filter-flags         Don't print flag diacritic symbols (only with -e)\n");
+    fprintf(message_out, "Ignore options:\n");
+    fprintf(message_out, "  -l, --max-in-length=INT    Ignore paths with an input string longer than length\n");
+    fprintf(message_out, "  -L, --max-out-length=INT   Ignore paths with an output string longer than length\n");
+    fprintf(message_out, "  -p, --in-prefix=PREFIX     Ignore paths with an input string not beginning with PREFIX\n");
+    fprintf(message_out, "  -P, --out-prefix=PREFIX    Ignore paths with an output string not beginning with PREFIX\n");
+    fprintf(message_out, "  -x, --in-exclude=STR       Ignore paths with an input string containing STR\n");
+    fprintf(message_out, "  -X, --out-exclude=STR      Ignore paths with an output string containing STR\n");
     
     fprintf(message_out, "\n");
     fprintf(message_out, "Option -N overrides options -n and -c.\n");
@@ -160,13 +151,6 @@ parse_options(int argc, char** argv)
           eval_fd = true;
           break;
         case 'f':
-          if(!eval_fd)
-          {
-            fprintf(message_out, "Option -f must be used in conjunction"
-		    " with -e\n");
-            print_short_help();
-            return EXIT_FAILURE;
-          }
           filter_fd = true;
           break;
         case 'l':
@@ -191,6 +175,12 @@ parse_options(int argc, char** argv)
         }
     }
 
+      if (!eval_fd && filter_fd)
+      {
+        error(0, 0, "Option -f must be used in conjunction with -e\n");
+        print_short_help();
+        return EXIT_FAILURE;
+      }
 #include "inc/check-params-common.h"
 #include "inc/check-params-unary.h"
     return EXIT_CONTINUE;
@@ -206,11 +196,11 @@ class Callback : public hfst::ExtractStringsCb
   Callback(int max, std::ostream* out): count(0), max_num(max), out_(out) {}
   RetVal operator()(WeightedPath<float>& wp, bool final)
   {
-    if(max_input_length > 0 &&
-       wp.istring.length() > max_input_length)
+    if( (max_input_length > 0) &&
+       (wp.istring.length() > max_input_length))
       return RetVal(true, false); // continue searching, break off this path
-    if(max_output_length > 0 &&
-       wp.ostring.length() > max_output_length)
+    if((max_output_length > 0) &&
+       (wp.ostring.length() > max_output_length))
       return RetVal(true, false); // continue searching, break off this path
     
     if(input_prefix.length() > 0)
@@ -240,7 +230,7 @@ class Callback : public hfst::ExtractStringsCb
     {
       *out_ << wp.istring;
       if(wp.ostring != wp.istring)
-        *out_ << " : " << wp.ostring;
+        *out_ << "\t" << wp.ostring;
       if(display_weights)
         *out_ << "\t" << wp.weight;
       *out_ << std::endl;

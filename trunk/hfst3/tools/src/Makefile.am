@@ -18,7 +18,7 @@
 SUBDIRS=hfst-proc
 AUTOMAKE_OPTIONS=std-options subdir-objects
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
-AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
+AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/tools/src/parsers
 AM_CXXFLAGS = -Wno-deprecated
 
 MAYBE_ALIASES=
