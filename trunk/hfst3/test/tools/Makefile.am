@@ -23,7 +23,8 @@ TESTS=hfst-check-version.sh hfst-check-help.sh empty-input.sh\
 	  compare-functionality.sh \
 	  concatenate-functionality.sh \
 	  compose-functionality.sh \
-	  conjunct-functionality.sh disjunct-functionality.sh \
+	  conjunct-functionality.sh \
+	  disjunct-functionality.sh \
 	  subtract-functionality.sh \
 	  determinize-functionality.sh minimize-functionality.sh \
 	  remove-epsilons-functionality.sh \

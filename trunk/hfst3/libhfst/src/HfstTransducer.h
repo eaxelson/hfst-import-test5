@@ -606,39 +606,93 @@ This will yield a file "testfile.att" that looks as follows:
 	indicates how many times a cycle will be followed, with negative numbers
 	indicating unlimited. Note that if the transducer is cyclic and 
 	cycles aren't capped,
-	the search will not end until the callback returns false. */
-    void extract_strings(ExtractStringsCb& callback, int cycles=-1) const;
+	the search will not end until the callback returns false.
+	\a include_spv defines whether a StringPairVector representation
+	of the extracted strings will be included in the WeightedPaths. */
+    void extract_strings(ExtractStringsCb& callback, int cycles=-1, 
+			 bool include_spv=false) const;
 
     /** \brief Extract a maximum of \a max_num string pairs that are 
 	recognized by the transducer
 	following a maximum of \a cycles cycles and store the 
-	string pairs into \a results.
+	string pairs into \a results. \a include_spv defines whether
+	a StringPairVector representation of the extracted strings will
+	be included in \a results.
 	
 	The total number of resulting strings is capped at \a max_num, 
-	with 0 or negative
-	indicating unlimited. The \a cycles parameter indicates how many 
-	times a cycle
+	with 0 or negative indicating unlimited. 
+	The \a cycles parameter indicates how many times a cycle
 	will be followed, with negative numbers indicating unlimited. 
-	If this function
-	is called on a cyclic transducer with unlimited values for 
-	both \a max_num and
-	\a cycles, an exception will be thrown.
+	If this function is called on a cyclic transducer with unlimited
+	values for both \a max_num and \a cycles, an exception will be thrown.
+
+	This example
+
+\verbatim
+    HfstTransducer tr1("a", "b", SFST_TYPE);
+    tr1.repeat_star();
+    HfstTransducer tr2("c", "d", SFST_TYPE);
+    tr2.repeat_star();
+    tr1.concatenate(tr2).minimize();
+    WeightedPaths<float>::Set results;
+    tr1.extract_strings(results, MAX_NUM, CYCLES);
+    for (WeightedPaths<float>::Set::const_iterator it = results.begin();
+	 it != results.end(); it++)
+      {
+	std::cerr << it->istring << " : "
+		  << it->ostring << "\n";
+      }
+\endverbatim
+
+        prints with values MAX_NUM == -1 and CYCLES == 1 all paths
+	that have no consecutive cycles:
+
+\verbatim
+a : b
+ac : bd
+acc : bdd
+c : d
+cc : dd
+\endverbatim
+
+        and with values MAX_NUM == 7 and CYCLES == 2 a maximum of 7 paths
+	that follow a cycle a maximum of 2 times (there are 11 such paths,
+	but MAX_NUM limits their number to 7):
+
+\verbatim
+a : b
+aa : bb
+aac : bbd
+aacc : bbdd
+c : d
+cc : dd
+ccc : ddd
+\endverbatim
+
 	@throws hfst::exceptions::TransducerIsCyclicException
 	@see #n_best */
     void extract_strings
-      (WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1) const;
+      (WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1, 
+       bool include_spv=false) const;
     
     /* \brief Call \a callback with extracted strings that are not 
-       invalidated by
-       flag diacritic rules.
+       invalidated by flag diacritic rules.
+
+       \a include_spv defines whether a StringPairVector representation
+       of the extracted strings will be included in the WeightedPaths.
+
        @see extract_strings(WeightedPaths<float>::Set&, int, int) */
     void extract_strings_fd
-      (ExtractStringsCb& callback, int cycles=-1, bool filter_fd=true) const;
+      (ExtractStringsCb& callback, int cycles=-1, bool filter_fd=true, 
+       bool include_spv=false) const;
     
     /** \brief Store to \a results string pairs that are recognized 
 	by the transducer
 	and are not invalidated by flag diacritic rules, optionally filtering
 	the flag diacritics themselves out of the result strings.
+	\a include_spv defines whether
+	a StringPairVector representation of the extracted strings will
+	be included in \a results.
 
 	The same conditions that apply for the function
 	#extract_strings(WeightedPaths<float>::Set&, int, int)
@@ -651,7 +705,7 @@ TODO...
   @see extract_strings(WeightedPaths<float>::Set&, int, int) */
     void extract_strings_fd
       (WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1, 
-       bool filter_fd=true) const;
+       bool filter_fd=true, bool include_spv=false) const;
 
     //! @brief Lookup or apply a single string \a s and store a maximum of 
     //! \a limit results to \a results.
