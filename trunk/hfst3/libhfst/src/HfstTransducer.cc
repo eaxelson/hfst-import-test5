@@ -276,19 +276,17 @@ namespace hfst
 
   // *** LOOKUP FUNCTIONS... Implemented only for HFST_OL and HFST_OLW *** //
 
-  // TODO: add HfstOlTransducer implementations when they are ready.
   void HfstTransducer::lookup(HfstLookupPaths& results, const HfstLookupPath& s,
 			      ssize_t limit) const {
-    (void)results;
-    (void)s;
-    (void)limit;
-    throw hfst::exceptions::FunctionNotImplementedException();
+    lookup_fd(results, s, limit);
   }
 
     void HfstTransducer::lookup_fd(HfstLookupPaths& results, 
 				   const HfstLookupPath& s,
 				   ssize_t limit) const {
 	switch(this->type) {
+
+	/* TODO: Convert into HFST_OL(W)_TYPE, if needed. */
 
 	case (HFST_OL_TYPE):
 	case (HFST_OLW_TYPE):
@@ -326,6 +324,7 @@ namespace hfst
   bool HfstTransducer::is_lookup_infinitely_ambiguous(const HfstLookupPath& s)
     const {
       switch(this->type) {
+      /* TODO: Convert into HFST_OL(W)_TYPE, if needed. */
       case (HFST_OL_TYPE):
       case (HFST_OLW_TYPE):
 	  return this->implementation.hfst_ol->is_infinitely_ambiguous();
@@ -698,6 +697,9 @@ namespace hfst
 	  ConversionFunctions::hfst_basic_transducer_to_foma(&net);
 	break;
 #endif
+	// TODO
+	//case HFST_OL_TYPE:
+	//case HFST_OLW_TYPE:
       case ERROR_TYPE:
 	throw hfst::exceptions::SpecifiedTypeRequiredException();
       default:
