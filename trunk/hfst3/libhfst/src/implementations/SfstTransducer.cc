@@ -662,12 +662,13 @@ namespace hfst { namespace implementations {
     return paths;
   }
 
-  static bool extract_strings(Transducer * t, Node *node,
-           Node2Int &all_visitations, Node2Int &path_visitations,
-           vector<char>& lbuffer, int lpos, std::vector<char>& ubuffer, int upos,
-           hfst::ExtractStringsCb& callback, int cycles,
-			      std::vector<hfst::FdState<Character> >* fd_state_stack, bool filter_fd,
-			      bool include_spv, StringPairVector &spv)
+  static bool extract_strings
+  (Transducer * t, Node *node,
+   Node2Int &all_visitations, Node2Int &path_visitations,
+   vector<char>& lbuffer, int lpos, std::vector<char>& ubuffer, int upos,
+   hfst::ExtractStringsCb& callback, int cycles,
+   std::vector<hfst::FdState<Character> >* fd_state_stack, bool filter_fd,
+   bool include_spv, StringPairVector &spv)
   {
     if(cycles >= 0 && path_visitations[node] > cycles)
       return true;
@@ -750,7 +751,8 @@ namespace hfst { namespace implementations {
         up += clen;
       }
       
-      /* Handle spv here. Special symbols (flags, epsilons) are always inserted. */
+      /* Handle spv here. Special symbols (flags, epsilons) are always 
+	 inserted. */
       if (include_spv) {
 	StringPair string_pair(std::string(t->alphabet.write_char(lc)),
 			       std::string(t->alphabet.write_char(uc)));
@@ -774,8 +776,10 @@ namespace hfst { namespace implementations {
   
   static const int BUFFER_START_SIZE = 64;
   
-    void SfstTransducer::extract_strings(Transducer * t, hfst::ExtractStringsCb& callback, int cycles, FdTable<SFST::Character>* fd, bool filter_fd, bool include_spv)
-  {
+    void SfstTransducer::extract_strings
+    (Transducer * t, hfst::ExtractStringsCb& callback, int cycles, 
+     FdTable<SFST::Character>* fd, bool filter_fd, bool include_spv)
+    {
     if(!t->root_node())
       return;
     
@@ -783,17 +787,25 @@ namespace hfst { namespace implementations {
     vector<char> ubuffer(BUFFER_START_SIZE, 0);
     Node2Int all_visitations;
     Node2Int path_visitations;
-    vector<hfst::FdState<Character> >* fd_state_stack = (fd==NULL) ? NULL : new std::vector<hfst::FdState<Character> >(1, hfst::FdState<Character>(*fd));
+    vector<hfst::FdState<Character> >* fd_state_stack = 
+      (fd==NULL) ? NULL : 
+      new std::vector<hfst::FdState<Character> >
+      (1, hfst::FdState<Character>(*fd));
     
     StringPairVector spv;
-    hfst::implementations::extract_strings(t, t->root_node(), all_visitations, path_visitations, lbuffer, 0, ubuffer, 0, callback, cycles, fd_state_stack, filter_fd, include_spv, spv);
+    hfst::implementations::extract_strings
+      (t, t->root_node(), all_visitations, path_visitations, lbuffer, 0, 
+       ubuffer, 0, callback, cycles, fd_state_stack, filter_fd, 
+       include_spv, spv);
   }
 
 
-  Transducer * SfstTransducer::insert_freely(Transducer * t, const StringPair &symbol_pair)
+  Transducer * SfstTransducer::insert_freely
+  (Transducer * t, const StringPair &symbol_pair)
   {
-    return &t->freely_insert( Label( t->alphabet.add_symbol(symbol_pair.first.c_str()),
-				     t->alphabet.add_symbol(symbol_pair.second.c_str()) ));
+    return &t->freely_insert
+      ( Label( t->alphabet.add_symbol(symbol_pair.first.c_str()),
+	       t->alphabet.add_symbol(symbol_pair.second.c_str()) ));
   }
 
   

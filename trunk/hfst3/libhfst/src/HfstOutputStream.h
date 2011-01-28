@@ -52,11 +52,13 @@ The HFST header has the following structure:
 that are each separated by a char "\0"
 
 HFST version 3.0 header must contain at least the attributes 'version', 'type'
-and 'name' and their values. Currently the accepted values are
+and 'name' (in that order) and their values. Currently the accepted values are
 '3.0' for the attribute 'version', 'SFST_TYPE', 'FOMA_TYPE', 
 'TROPICAL_OPENFST_TYPE', 'LOG_OPENFST_TYPE', 'HFST_OL_TYPE' and 'HFST_OLW_TYPE'
 for the attribute 'type' and any string (including the empty string) for 
-the attribute 'name'.
+the attribute 'name'. An HFST header can contain more attributes, but they are
+ignored by HfstInputStream functions unless explicitly handled in the backend
+implementation.
 
 An example:
 

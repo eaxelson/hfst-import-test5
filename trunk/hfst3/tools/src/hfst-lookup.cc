@@ -63,6 +63,8 @@ using std::vector;
 typedef std::vector<std::string> HfstArcPath;
 typedef std::pair<HfstArcPath,float> HfstLookupPath;
 typedef std::set<HfstLookupPath> HfstLookupPaths;
+typedef std::pair<StringPairVector,float> StringPairPath;
+typedef std::set<StringPairPath > StringPairPaths;
 
 // add tools-specific variables here
 static char* lookup_file_name;
@@ -1063,8 +1065,7 @@ lookup_simple(const HfstLookupPath& s, HfstTransducer& t, bool* infinity)
   alignments of the paths that a lookup string has yielded.
 
   @pre The transducer \a t has tropical weights or no weights.
-
-  @todo Support flag diacritics(?) and log weights(?)
+  @todo flag diacritics must be handled outside this function
  */
 void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results, 
 	       const HfstLookupPath& s, unsigned int& index, 
@@ -1072,8 +1073,8 @@ void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results,
 	       std::multiset<HfstState>& visited_states, 
 	       std::vector<HfstState>& epsilon_path,
 	       unsigned int& cycles,
-	       /* Arguments that are used when (include_spv == true) */
-	       std::set<std::pair<StringPairVector,float> > &results_spv,
+	       /* These arguments that are used when include_spv == true */
+	       StringPairPaths &results_spv,
 	       StringPairVector &path_spv,
 	       bool &include_spv)
 { 
@@ -1088,8 +1089,8 @@ void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results,
     path.second = path.second + t.get_final_weight(state); 
     results.insert(path);
 
-    if (include_spv) {
-      std::pair<StringPairVector,float> p(path_spv, path.second);
+    if (include_spv) { // if we want StringPairVector representation
+      StringPairPath p(path_spv, path.second);
       results_spv.insert(p);
     }
 
@@ -1141,7 +1142,7 @@ void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results,
 	// add an output symbol to the traversed path
         path.first.push_back(it->get_output_symbol());
 
-	if (include_spv) {
+	if (include_spv) { // if we want StringPairVector representation
 	  StringPair p(it->get_input_symbol(), it->get_output_symbol());
 	  path_spv.push_back(p);
 	}
@@ -1154,7 +1155,7 @@ void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results,
 	// remove the output symbol from the traversed path
         path.first.pop_back(); 
 
-	if (include_spv) {
+	if (include_spv) { // if we want StringPairVector representation
 	  path_spv.pop_back();
 	}
 
@@ -1188,7 +1189,7 @@ void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results,
 	      // add an output symbol to the traversed path
 	      path.first.push_back(it->get_output_symbol());
 
-	      if (include_spv) {
+	      if (include_spv) { // if we want StringPairVector representation
 		StringPair p(it->get_input_symbol(), it->get_output_symbol());
 		path_spv.push_back(p);
 	      }
@@ -1202,7 +1203,7 @@ void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results,
 	      // remove the output symbol from the traversed path
 	      path.first.pop_back(); 
 
-	      if (include_spv) {
+	      if (include_spv) { // if we want StringPairVector representation
 		path_spv.pop_back();
 	      }
 
@@ -1214,10 +1215,17 @@ void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results,
     }
 }
 
-std::string get_print_format(const std::string &s) {
+static std::string get_print_format(const std::string &s) {
   if (s.compare("@_EPSILON_SYMBOL_@") == 0)
     return std::string(strdup(epsilon_format));
   return std::string(s);
+}
+
+static void print_lookup_string(const HfstArcPath &s) {
+  for (HfstArcPath::const_iterator it = s.begin(); 
+       it != s.end(); it++) {
+    fprintf(stderr, "%s", get_print_format(*it).c_str());
+  }
 }
 
 void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results, 
@@ -1227,17 +1235,15 @@ void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results,
   path.second=0;
   (void)limit;
   unsigned int index=0;
-  std::multiset<HfstState> visited_states;
-  //visited_states.insert(t.get_initial_state());
-  visited_states.insert(0);
-  std::vector<HfstState> epsilon_path;
-  //epsilon_path.push_back(t.get_initial_state());
-  epsilon_path.push_back(0);
-  unsigned int cycles=0;
   HfstState initial_state=0;
+  std::multiset<HfstState> visited_states;
+  visited_states.insert(initial_state);
+  std::vector<HfstState> epsilon_path;
+  epsilon_path.push_back(initial_state);
+  unsigned int cycles=0;
 
   /* If we want a StringPairVector representation */
-  std::set<std::pair<StringPairVector,float> > results_spv;
+  StringPairPaths results_spv;
   StringPairVector path_spv;
 
   lookup_fd(t, results, s, index, 
@@ -1246,27 +1252,33 @@ void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results,
 	    results_spv, path_spv, print_in_pairstring_format);
 
   if (print_in_pairstring_format) {
-    for (std::set<std::pair<StringPairVector,float> >::const_iterator it
-	   = results_spv.begin(); it != results_spv.end(); it++) {
 
-      for (HfstArcPath::const_iterator it_ = s.first.begin(); 
-	   it_ != s.first.end(); it_++) {
-	std::cerr << get_print_format(*it_);
-      }
-      std::cerr << ":\t  ";
-
-      for (StringPairVector::const_iterator IT = it->first.begin();
-	   IT != it->first.end(); IT++) {
-	std::cerr << get_print_format(IT->first) 
-		  << ":" 
-		  << get_print_format(IT->second) 
-		  << " ";
-      }
-      std::cerr << "\t" 
-		<< it->second 
-		<< "\n";
+    /* No results, print just the lookup string. */
+    if (results_spv.size() == 0) {
+      print_lookup_string(s.first);
+      fprintf(outfile, ":\n");
     }
-    std::cerr << "\n";
+    else {
+      /* For all result strings, */
+      for (StringPairPaths::const_iterator it
+	     = results_spv.begin(); it != results_spv.end(); it++) {
+	
+	/* print the lookup string */
+	print_lookup_string(s.first);
+	fprintf(outfile, ":\t");
+	
+	/* and the path that yielded the result string */
+	for (StringPairVector::const_iterator IT = it->first.begin();
+	     IT != it->first.end(); IT++) {
+	  fprintf(outfile, "%s:%s ", 
+		  get_print_format(IT->first).c_str(), 
+		  get_print_format(IT->second).c_str());
+	}
+	/* and the weight of that path. */
+	fprintf(outfile, "\t%f\n", it->second);
+      }
+    }
+    fprintf(outfile, "\n");
   }
 
   HfstLookupPaths filtered;

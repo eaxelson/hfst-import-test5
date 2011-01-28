@@ -697,7 +697,8 @@ ccc : ddd
 	The same conditions that apply for the function
 	#extract_strings(WeightedPaths<float>::Set&, int, int)
 	apply also for this one.
-	Flag diacritics are of the form @[PNDRCU][.][A-Z]+([.][A-Z]+)?@ An example:
+	Flag diacritics are of the form @[PNDRCU][.][A-Z]+([.][A-Z]+)?@ 
+	An example:
 \verbatim
 TODO...
 \endverbatim
