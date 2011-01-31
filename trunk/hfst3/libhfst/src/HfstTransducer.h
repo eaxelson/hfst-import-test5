@@ -499,7 +499,7 @@ in \a ifile.
 
     /** \brief Rename the transducer \a name. 
 	@see get_name */
-    void set_name(std::string &name);
+    void set_name(const std::string &name);
 
     /** \brief Get the name of the transducer. 
 	@see set_name */

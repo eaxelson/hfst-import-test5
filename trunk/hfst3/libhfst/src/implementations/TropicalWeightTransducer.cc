@@ -2232,6 +2232,10 @@ namespace hfst { namespace implementations
   { 
     if (!output_stream)
       fprintf(stderr, "TropicalWeightOutputStream: ERROR: failbit set (1).\n");
+    /* When writing a transducer, both input and output symbol tables are
+       included. */
+    fst::SymbolTable output_st(*(transducer->InputSymbols()));
+    transducer->SetOutputSymbols(&output_st);
     transducer->Write(output_stream,FstWriteOptions()); }
 
   void TropicalWeightOutputStream::close(void) 

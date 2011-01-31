@@ -24,7 +24,8 @@ namespace hfst { namespace implementations
 {
 
 
-  HfstBasicTransducer * ConversionFunctions::hfst_transducer_to_hfst_basic_transducer
+  HfstBasicTransducer * ConversionFunctions::
+  hfst_transducer_to_hfst_basic_transducer
   (const hfst::HfstTransducer &t) {
 
 #if HAVE_SFST
@@ -34,7 +35,8 @@ namespace hfst { namespace implementations
 
 #if HAVE_OPENFST
     if (t.type == TROPICAL_OFST_TYPE)
-      return tropical_ofst_to_hfst_basic_transducer(t.implementation.tropical_ofst); 
+      return tropical_ofst_to_hfst_basic_transducer
+	(t.implementation.tropical_ofst); 
     if (t.type == LOG_OFST_TYPE)
       return log_ofst_to_hfst_basic_transducer(t.implementation.log_ofst); 
 #endif // HAVE_OPENFST
@@ -172,7 +174,8 @@ namespace hfst { namespace implementations
        it != net->end(); it++)
     {
       // Go through the set of transitions in each state
-      for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it = it->second.begin();
+      for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it 
+	     = it->second.begin();
 	   tr_it != it->second.end(); tr_it++)
 	{
 	  // Create new nodes, if needed
@@ -205,7 +208,8 @@ namespace hfst { namespace implementations
     }
 
   // Go through the final states
-  for (HfstBasicTransducer::FinalWeightMap::const_iterator it = net->final_weight_map.begin();
+  for (HfstBasicTransducer::FinalWeightMap::const_iterator it 
+	 = net->final_weight_map.begin();
        it != net->final_weight_map.end(); it++) 
     {
       if (state_map.find(it->first) == state_map.end())
@@ -214,8 +218,10 @@ namespace hfst { namespace implementations
     }
 
   // Make sure that also symbols that occur in the alphabet of the
-  // HfstBasicTransducer but not in its transitions are inserted to the SFST transducer
-  for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it = net->alphabet.begin();
+  // HfstBasicTransducer but not in its transitions are inserted to 
+  // the SFST transducer
+  for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it 
+	 = net->alphabet.begin();
        it != net->alphabet.end(); it++) {
     if (it->compare("@_EPSILON_SYMBOL_@") != 0)
       t->alphabet.add_symbol(it->c_str());
@@ -532,7 +538,8 @@ namespace hfst { namespace implementations
   }
 
   /* Create an OpenFst transducer equivalent to HfstBasicTransducer \a net. */
-  fst::StdVectorFst * ConversionFunctions::hfst_basic_transducer_to_tropical_ofst
+  fst::StdVectorFst * ConversionFunctions::
+  hfst_basic_transducer_to_tropical_ofst
   (const HfstBasicTransducer * net) {
     
     fst::StdVectorFst * t = new fst::StdVectorFst();
@@ -553,7 +560,8 @@ namespace hfst { namespace implementations
 	 it != net->end(); it++)
       {
 	// Go through the set of transitions in each state
-	for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it = it->second.begin();
+	for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it 
+	       = it->second.begin();
 	     tr_it != it->second.end(); tr_it++)
 	  {
 	    // Copy the transition
@@ -577,9 +585,9 @@ namespace hfst { namespace implementations
       }
     
     // Add also symbols that do not occur in transitions
-    for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it = net->alphabet.begin();
-	 it != net->alphabet.end(); it++)
-      {
+    for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it 
+	   = net->alphabet.begin();
+	 it != net->alphabet.end(); it++) {
 	st.AddSymbol(*it);
       }
     
@@ -638,8 +646,10 @@ namespace hfst { namespace implementations
       std::set<std::string> input_symbols;
       std::set<std::string> other_symbols;
     
-      for (HfstBasicTransducer::iterator it = t->begin(); it != t->end(); ++it) {
-	  for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it = it->second.begin();
+      for (HfstBasicTransducer::iterator it = t->begin(); 
+	   it != t->end(); ++it) {
+	  for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it 
+		 = it->second.begin();
 	       tr_it != it->second.end(); ++tr_it) {
 	      std::string istr = tr_it->get_input_symbol();
 	      std::string ostr = tr_it->get_output_symbol();
@@ -693,7 +703,8 @@ namespace hfst { namespace implementations
 		state_placeholders[it->first].final_weight =
 		    t->get_final_weight(it->first);
 	}
-	for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it = it->second.begin();
+	for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it 
+	       = it->second.begin();
 	     tr_it != it->second.end(); ++tr_it) {
 	    
 	    // check for previously unseen inputs
@@ -708,7 +719,8 @@ namespace hfst { namespace implementations
 		string_symbol_map[tr_it->get_output_symbol()],
 		tr_it->get_weight());
 	    state_placeholders[it->first]
-		.inputs[string_symbol_map[tr_it->get_input_symbol()]].push_back(trans);
+		.inputs[string_symbol_map[tr_it->get_input_symbol()]].
+	      push_back(trans);
 	}
     }
 
@@ -811,11 +823,13 @@ namespace hfst { namespace implementations
 	if (used_indices.count(i) == 0) { // blank entries
 	    windex_table.append(hfst_ol::TransitionWIndex());
 	} else { // nonblank entries
-	    windex_table.append(hfst_ol::TransitionWIndex(
-				    used_indices[i].second,
-				    first_transition_vector[used_indices[i].first] +
-				    state_placeholders[used_indices[i].first]
-				    .symbol_offset(used_indices[i].second) + TA_OFFSET));
+	    windex_table.
+	      append(hfst_ol::TransitionWIndex
+		     (
+		      used_indices[i].second,
+		      first_transition_vector[used_indices[i].first] +
+		      state_placeholders[used_indices[i].first]
+		      .symbol_offset(used_indices[i].second) + TA_OFFSET));
 	}
     }
     
@@ -838,16 +852,19 @@ namespace hfst { namespace implementations
 	
 	// Then we iterate through the symbols each state has
 	for (std::map<hfst_ol::SymbolNumber,
-		 std::vector<hfst_ol::TransitionPlaceholder> >::iterator sym_it =
-		 it->second.inputs.begin(); sym_it != it->second.inputs.end(); ++sym_it) {
+	       std::vector<hfst_ol::TransitionPlaceholder> >::iterator sym_it =
+		 it->second.inputs.begin(); 
+	     sym_it != it->second.inputs.end(); ++sym_it) {
 	    // And write each transition
-	    for (std::vector<hfst_ol::TransitionPlaceholder>::iterator tr_it
-		     = sym_it->second.begin(); tr_it != sym_it->second.end(); ++tr_it) {
+	  for (std::vector<hfst_ol::TransitionPlaceholder>::iterator tr_it
+		 = sym_it->second.begin(); 
+	       tr_it != sym_it->second.end(); ++tr_it) {
 		// before writing each transition, find out whether its
 		// target is simple (ie. should point directly to TA entry)
 		unsigned int target;
 		if (state_placeholders[tr_it->target].is_simple()) {
-		    target = first_transition_vector[tr_it->target] + TA_OFFSET - 1;
+		    target = first_transition_vector[tr_it->target] + 
+		      TA_OFFSET - 1;
 		} else {
 		    target = state_placeholders[tr_it->target].start_index;
 		}
@@ -883,7 +900,8 @@ namespace hfst { namespace implementations
   //#if HAVE_MY_TRANSDUCER_LIBRARY
   //
   //HfstBasicTransducer * ConversionFunctions::
-  //my_transducer_library_transducer_to_hfst_basic_transducer(my_namespace::MyFst * t) {
+  //my_transducer_library_transducer_to_hfst_basic_transducer
+  //  (my_namespace::MyFst * t) {
   //(void)t;
   //throw hfst::exceptions::FunctionNotImplementedException();
   //}
