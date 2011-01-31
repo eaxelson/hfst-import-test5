@@ -148,8 +148,8 @@ process_stream(HfstInputStream& instream)
       size_t sparsest_arcs = 1<<31;
       size_t uniq_input_arcs = 0;
       size_t uniq_output_arcs = 0;
-      pair<string,unsigned int> most_ambiguous_input;
-      pair<string,unsigned int> most_ambiguous_output;
+      std::pair<string,unsigned int> most_ambiguous_input;
+      std::pair<string,unsigned int> most_ambiguous_output;
       unsigned int initial_state = 0; // mutt.get_initial_state();
       // iterate states in random orderd
       for (HfstBasicTransducer::const_iterator it = mutt->begin();
