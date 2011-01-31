@@ -1120,7 +1120,7 @@ namespace hfst {
 	   Add a copy of \a graph with epsilon transitions between 
 	   states and with weight as defined in \a sub. */
 	void add_substitution(substitution_data &sub, 
-			      HfstTransitionGraph &graph) {
+			      const HfstTransitionGraph &graph) {
 
 	  // Epsilon transition to initial state of \a graph
 	  max_state++;
@@ -1133,7 +1133,7 @@ namespace hfst {
 	  unsigned int offset = max_state;
 
 	  // Copy \a graph
-	  for (iterator it = graph.begin(); 
+	  for (const_iterator it = graph.begin(); 
 	       it != graph.end(); it++)
 	    {
 	      for (typename HfstTransitionSet::iterator tr_it
@@ -1153,7 +1153,7 @@ namespace hfst {
 	    }
 
 	  // Epsilon transitions from final states of \a graph
-	  for (typename FinalWeightMap::iterator it 
+	  for (typename FinalWeightMap::const_iterator it 
 		 = graph.final_weight_map.begin();
 	       it != graph.final_weight_map.end(); it++)
 	    {
@@ -1186,7 +1186,7 @@ namespace hfst {
 	    in this graph.	    
 	*/
 	HfstTransitionGraph &
-	  substitute(const StringPair &sp, HfstTransitionGraph &graph) {
+	  substitute(const StringPair &sp, const HfstTransitionGraph &graph) {
 	  
 	  // If neither symbol to be substituted is known to the graph,
 	  // do nothing.
@@ -1256,17 +1256,30 @@ namespace hfst {
 	    the graph with weight \a weight. */
 	HfstTransitionGraph &insert_freely
 	  (const StringPair &symbol_pair, W weight) 
-	{	  
-	  alphabet.insert(symbol_pair.first);
-	  alphabet.insert(symbol_pair.second);
-
-	  for (iterator it = begin(); it != end(); it++) {
+	  {	  
+	    alphabet.insert(symbol_pair.first);
+	    alphabet.insert(symbol_pair.second);
+	    
+	    for (iterator it = begin(); it != end(); it++) {
 	      HfstTransition <C> tr( it->first, symbol_pair.first, 
-				      symbol_pair.second, weight );	      
+				     symbol_pair.second, weight );	      
 	      it->second.insert(tr);
 	    }
-	  return *this;
-	}
+	    return *this;
+	  }
+	
+	/** @brief Insert freely any number of \a graph in this
+	    graph. */
+	HfstTransitionGraph &insert_freely
+	  (const HfstTransitionGraph &graph)
+	  {
+	    std::string marker("@_MARKER_SYMBOL_@");
+	    StringPair marker_pair(marker, marker);
+	    insert_freely(marker_pair, 0);
+	    substitute(marker_pair, graph);
+	    alphabet.erase(marker);
+	    return *this;
+	  }
 
 
 	/* -------------------------------
