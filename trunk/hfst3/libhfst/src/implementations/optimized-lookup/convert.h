@@ -330,7 +330,7 @@ public:
                                           TransitionTableIndex place) const;
 };
 
-typedef vector<ConvertFstState*> ConvertFstStateVector;
+ typedef std::vector<ConvertFstState*> ConvertFstStateVector;
 
 class ConvertTransitionTableIndices 
 {

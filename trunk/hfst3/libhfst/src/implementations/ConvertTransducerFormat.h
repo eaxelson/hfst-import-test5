@@ -46,7 +46,7 @@
 //#endif // _MY_TRANSDUCER_LIBRARY_LIB_H_
 //#endif // HAVE_MY_TRANSDUCER_LIBRARY
 
-#include "HfstExceptions.h"
+#include "../HfstExceptions.h"
 #include "optimized-lookup/transducer.h"
 
 struct fsm;
