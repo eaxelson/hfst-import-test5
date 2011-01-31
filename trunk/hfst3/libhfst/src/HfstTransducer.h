@@ -898,6 +898,20 @@ TODO...
     /** \brief Freely insert symbol pair \a symbol_pair into the transducer. */
     HfstTransducer &insert_freely(const StringPair &symbol_pair);
 
+    /** \brief Freely insert a copy of \a tr into the transducer. 
+
+	A copy of \a tr is attached (using epsilon transitions) 
+	to each state of this transducer. For each state S in this
+	transducer, there is an epsilon transition that leads from
+	state S to the initial state of \a tr, and for each final state
+	of \a tr, there is an epsilon transition that leads from that final 
+	state to state S in this transducer.
+
+	Implemented only for HfstBasicTransducer. Conversion is carried
+	out for all HfstTransducers, if this function is called.
+     */
+    HfstTransducer &insert_freely(const HfstTransducer &tr);
+
     /** \brief Substitute all transition \a sp with transitions \a sps 
 	as defined by function \a func. 
 

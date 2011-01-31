@@ -1400,6 +1400,120 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
     return *this;
   }
 
+  HfstTransducer &HfstTransducer::insert_freely
+  (const HfstTransducer &tr)
+  {
+    if (this->type != tr.type)
+      throw hfst::exceptions::TransducerTypeMismatchException ();   
+
+    /* In this function, this transducer must always be harmonized
+       according to tr, not the other way round. */
+    bool harm = harmonize_smaller;
+    harmonize_smaller=false;
+    this->harmonize(const_cast<HfstTransducer&>(tr));
+    harmonize_smaller=harm;
+
+    switch (this->type)    
+      {
+#if HAVE_OPENFST
+      case TROPICAL_OFST_TYPE:
+	{
+	  hfst::implementations::HfstBasicTransducer * net = 
+	    ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
+	    (implementation.tropical_ofst);
+	  delete implementation.tropical_ofst;
+	  
+	  hfst::implementations::HfstBasicTransducer * substituting_net = 
+	    ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
+	    (tr.implementation.tropical_ofst);
+	  
+	  net->insert_freely(*substituting_net);
+	  delete substituting_net;
+	  implementation.tropical_ofst = 
+	    ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(net);
+	  delete net;
+	  return *this;
+	  break;
+	}
+      case LOG_OFST_TYPE:
+	{
+	  hfst::implementations::HfstBasicTransducer * net = 
+	    ConversionFunctions::log_ofst_to_hfst_basic_transducer
+	    (implementation.log_ofst);
+	  delete implementation.log_ofst;
+	  
+	  hfst::implementations::HfstBasicTransducer * substituting_net = 
+	    ConversionFunctions::log_ofst_to_hfst_basic_transducer
+	    (tr.implementation.log_ofst);
+	  
+	  net->insert_freely(*substituting_net);
+	  delete substituting_net;
+	  implementation.log_ofst = 
+	    ConversionFunctions::hfst_basic_transducer_to_log_ofst(net);
+	  delete net;
+	  return *this;
+	  break;
+	}
+#endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+	{
+	  // HfstTransducer::harmonize does nothing to a foma transducer,
+	  // because foma's own functions take care of harmonizing.
+	  // Now we need to harmonize because we are using internal transducers.
+	  this->foma_interface.harmonize
+	    (implementation.foma,tr.implementation.foma);
+
+	  hfst::implementations::HfstBasicTransducer * net = 
+	    ConversionFunctions::foma_to_hfst_basic_transducer
+	    (implementation.foma);
+	  this->foma_interface.delete_foma(implementation.foma);
+	  
+	  hfst::implementations::HfstBasicTransducer * substituting_net = 
+	    ConversionFunctions::foma_to_hfst_basic_transducer
+	    (tr.implementation.foma);
+	  
+	  net->insert_freely(*substituting_net);
+	  delete substituting_net;
+	  implementation.foma = 
+	    ConversionFunctions::hfst_basic_transducer_to_foma(net);
+	  delete net;
+	  return *this;
+	  break;
+	}
+#endif
+#if HAVE_SFST
+      case SFST_TYPE:
+	{
+	  hfst::implementations::HfstBasicTransducer * net = 
+	    ConversionFunctions::sfst_to_hfst_basic_transducer
+	    (implementation.sfst);
+	  delete implementation.sfst;
+	  
+	  hfst::implementations::HfstBasicTransducer * substituting_net = 
+	    ConversionFunctions::sfst_to_hfst_basic_transducer
+	    (tr.implementation.sfst);
+	  
+	  net->insert_freely(*substituting_net);
+	  delete substituting_net;
+	  implementation.sfst = 
+	    ConversionFunctions::hfst_basic_transducer_to_sfst(net);
+	  delete net;
+	  return *this;
+	  break;
+	}
+#endif
+	/* Add here your implementation. */
+      case ERROR_TYPE:
+	throw hfst::exceptions::TransducerHasWrongTypeException();
+      default:
+	throw hfst::exceptions::FunctionNotImplementedException();
+      }
+
+    return *this;
+  }
+
+
   HfstTransducer &HfstTransducer::substitute
   (bool (*func)(const StringPair &sp, StringPairSet &sps))
   {
