@@ -341,7 +341,7 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
 
       // write the rest of the header
       write(header);
-    }
+    } // if (hfst_format)
 
     switch (type)
       {

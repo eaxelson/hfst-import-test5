@@ -829,7 +829,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 
   ImplementationType HfstTransducer::get_type(void) const {
     return this->type; }
-  void HfstTransducer::set_name(std::string &name) {
+  void HfstTransducer::set_name(const std::string &name) {
     this->name = name; }   
   std::string HfstTransducer::get_name() const {
     return this->name; }
