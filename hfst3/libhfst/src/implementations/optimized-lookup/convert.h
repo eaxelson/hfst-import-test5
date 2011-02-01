@@ -21,6 +21,8 @@
 
 namespace hfst_ol {
 
+    typedef std::map<hfst_ol::TransitionTableIndex,unsigned int> HfstOlToBasicStateMap;
+
 struct TransitionPlaceholder {
     unsigned int target;
     SymbolNumber output;

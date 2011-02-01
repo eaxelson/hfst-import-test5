@@ -628,10 +628,12 @@ public:
     Transducer(bool weighted);
     Transducer(Transducer * t);
     Transducer();
-    Transducer(const TransducerHeader& header, const TransducerAlphabet& alphabet,
+    Transducer(const TransducerHeader& header,
+	       const TransducerAlphabet& alphabet,
 	       const TransducerTable<TransitionIndex>& index_table,
 	       const TransducerTable<Transition>& transition_table);
-    Transducer(const TransducerHeader& header, const TransducerAlphabet& alphabet,
+    Transducer(const TransducerHeader& header,
+	       const TransducerAlphabet& alphabet,
 	       const TransducerTable<TransitionWIndex>& index_table,
 	       const TransducerTable<TransitionW>& transition_table);
     virtual ~Transducer();
@@ -648,6 +650,14 @@ public:
 	{ return tables->get_index(i); }
     const Transition& get_transition(TransitionTableIndex i) const
 	{ return tables->get_transition(i); }
+    bool final_index(TransitionTableIndex i) const
+	{
+	    if (indexes_transition_table(i)) {
+		return tables->get_transition_finality(i);
+	    } else {
+		return tables->get_index_finality(i);
+	    }
+	}
     bool is_infinitely_ambiguous(void) const
 	{
 	    return header->probe_flag(Has_input_epsilon_cycles);
