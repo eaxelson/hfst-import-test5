@@ -626,12 +626,95 @@ namespace hfst { namespace implementations
 
       ---------------------------------------------------------- */
 
+/* An auxiliary function. */
+unsigned int hfst_ol_to_hfst_basic_add_state(hfst_ol::Transducer * t, 
+					     HfstBasicTransducer * basic,
+					     hfst_ol::HfstOlToBasicStateMap & state_map,
+					     bool weighted,
+					     hfst_ol::TransitionTableIndex index,
+					     unsigned int state_number)
+{
+  unsigned int new_state = state_number;
+  state_map[index] = new_state;
+  
+  if(hfst_ol::indexes_transition_index_table(index))
+  {
+    const hfst_ol::TransitionIndex& transition_index = t->get_index(index);
+    
+    if(transition_index.final())
+    {
+	basic->add_state(new_state);
+	basic->set_final_weight(new_state,
+				weighted ?
+				dynamic_cast<const hfst_ol::TransitionWIndex&>(transition_index).final_weight() :
+				0.0);
+    }
+  }
+  else // indexes transition table
+  {
+    const hfst_ol::Transition& transition = t->get_transition(index);
+    
+    if(transition.final())
+    {
+	basic->add_state(new_state);
+	basic->set_final_weight(new_state,
+				weighted ?
+				dynamic_cast<const hfst_ol::TransitionW&>(transition).get_weight() :
+				0.0);
+    }
+  }
+  return new_state;
+}
+
+
   /* Create an HfstBasicTransducer equivalent to hfst_ol::Transducer \a t . */
   HfstBasicTransducer * ConversionFunctions::
   hfst_ol_to_hfst_basic_transducer(hfst_ol::Transducer * t)
   {
-    (void)t;
-    throw hfst::exceptions::FunctionNotImplementedException();
+      HfstBasicTransducer * basic = new HfstBasicTransducer();
+      bool weighted = t->get_header().probe_flag(hfst_ol::Weighted);
+      const hfst_ol::SymbolTable& symbols = t->get_alphabet().get_symbol_table();
+      
+      
+      // This contains indices to either (1) the start of a set of entries in the
+      // transition index table, or (2) the boundary before a set of entries in the
+      // transition table; in this case, the following entries will all have the
+      // same input symbol. In either case the index represents a state and may be final
+      // The will already be an entry in state_map for each value in agenda
+      std::vector<hfst_ol::TransitionTableIndex> agenda;
+      hfst_ol::HfstOlToBasicStateMap state_map;
+      unsigned int state_number=0;
+      
+      hfst_ol_to_hfst_basic_add_state(t, basic, state_map, weighted, 0, state_number);
+      agenda.push_back(0);
+      while(!agenda.empty())
+      {
+	  hfst_ol::TransitionTableIndex current_index = agenda.back();
+	  agenda.pop_back();
+	  
+	  unsigned int current_state = state_map[current_index];
+	  
+	  hfst_ol::TransitionTableIndexSet transitions = t->get_transitions_from_state(current_index);
+	  for(hfst_ol::TransitionTableIndexSet::const_iterator it=transitions.begin();it!=transitions.end();it++)
+	  {
+	      const hfst_ol::Transition& transition = t->get_transition(*it);
+	      
+	      if(state_map.find(transition.get_target()) == state_map.end())
+	      {
+		  state_number++;
+		  hfst_ol_to_hfst_basic_add_state(t, basic, state_map, weighted, transition.get_target(), state_number);
+		  agenda.push_back(transition.get_target());
+	      }
+	      basic->add_transition(current_state,
+				    HfstBasicTransition(state_map[transition.get_target()],
+							symbols[transition.get_input_symbol()],
+							symbols[transition.get_output_symbol()],
+							weighted ? dynamic_cast<const hfst_ol::TransitionW&>(transition).get_weight() : 0 ));
+	  }
+      }
+      
+      return basic;
+      
   }
 
   /* Create an hfst_ol::Transducer equivalent to HfstBasicTransducer \a t.
@@ -640,8 +723,17 @@ namespace hfst { namespace implementations
   hfst_basic_transducer_to_hfst_ol
   (HfstBasicTransducer * t, bool weighted)
   {
+      // The transition array is indexed starting from this constant
       const unsigned int TA_OFFSET = 2147483648u;
       const std::string epstr = "@_EPSILON_SYMBOL_@";
+
+      // Symbols must be in the following order in an optimized-lookup
+      // transducer:
+      // 1) epsilon
+      // 2) flag diacritics
+      // 3) other input symbols
+      // 4) symbols that aren't used as input symbols
+      
       std::set<std::string> flag_diacritic_symbols;
       std::set<std::string> input_symbols;
       std::set<std::string> other_symbols;
@@ -661,14 +753,20 @@ namespace hfst { namespace implementations
 	  }
       }
       
-      hfst_ol::SymbolNumber seen_input_symbols = 1; // epsilon always present
+      hfst_ol::SymbolNumber seen_input_symbols = 1; // We always have epsilon
       hfst_ol::SymbolTable symbol_table;
+
+      // 1) epsilon
       symbol_table.push_back(epstr);
+
+      // 2) flag diacritics
       for (std::set<std::string>::iterator it = flag_diacritic_symbols.begin();
 	   it != flag_diacritic_symbols.end(); ++it) {
 	  symbol_table.push_back(*it);
 	  ++seen_input_symbols;
       }
+
+      // 3) input symbols
       for (std::set<std::string>::iterator it = input_symbols.begin();
 	   it != input_symbols.end(); ++it) {
 	  if (it->compare(epstr) and flag_diacritic_symbols.count(*it) == 0) {
@@ -676,6 +774,8 @@ namespace hfst { namespace implementations
 	    ++seen_input_symbols;
 	  }
       }
+
+      // 4) non-input symbols
       for (std::set<std::string>::iterator it = other_symbols.begin();
 	   it != other_symbols.end(); ++it) {
 	  if (it->compare(epstr) and flag_diacritic_symbols.count(*it) == 0 and
@@ -684,12 +784,11 @@ namespace hfst { namespace implementations
 	  }
       }
 
-
-    std::map<std::string, hfst_ol::SymbolNumber> string_symbol_map;
-    for (hfst_ol::SymbolTable::iterator it = symbol_table.begin();
-	 it !=  symbol_table.end(); ++it) {
-	string_symbol_map[*it] = it - symbol_table.begin();
-    }
+      std::map<std::string, hfst_ol::SymbolNumber> string_symbol_map;
+      for (hfst_ol::SymbolTable::iterator it = symbol_table.begin();
+	   it !=  symbol_table.end(); ++it) {
+	  string_symbol_map[*it] = it - symbol_table.begin();
+      }
 
     std::map<unsigned int, hfst_ol::StatePlaceholder> state_placeholders;
 
@@ -756,12 +855,12 @@ namespace hfst { namespace implementations
     // Now we assign starting indices (or alternatively determine a state
     // doesn't need an entry in the TIA). The starting state has index 0.
     // Used indices are stored in a map (at the beginning, every
-    // index below or equal to the alphabet size is available except the first.
+    // index below or equal to the alphabet size is available except index 0).
     // For every state (in the TIA) thereafter, we check each available
     // starting index to see if it fits.
 
-    // The first state is special because it will have a TIA entry even if it's
-    // simple, so we deal with it every time.
+    // The starting state is special because it will have a TIA entry even if
+    // it's simple, so we deal with it every time.
     
     unsigned int first_available_index = 0;
     unsigned int last_used_index = 0;
@@ -842,7 +941,7 @@ namespace hfst { namespace implementations
     for (std::map<unsigned int, hfst_ol::StatePlaceholder>::iterator it =
 	     state_placeholders.begin(); it != state_placeholders.end(); ++it) {
 
-	// Write a finality marker unless this is the first state,
+	// Insert a finality marker unless this is the first state,
 	// the finality of which is determined by the index table
 	if (it->first != 0) {
 	    wtransition_table.append(
