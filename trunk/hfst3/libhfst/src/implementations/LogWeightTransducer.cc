@@ -1547,6 +1547,7 @@ namespace hfst { namespace implementations
       }
     tc->SetInputSymbols(st);
     delete st;
+    return tc;
   }
 
   LogFst * LogWeightTransducer::substitute(LogFst *t,

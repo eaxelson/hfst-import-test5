@@ -562,7 +562,7 @@ namespace hfst {
 	}	
 
 	/* TODO: Change state numbers s1 to s2 and vice versa. */
-	void swap_state_numbers(HfstState s1, HfstState s2) {
+	void swap_state_numbers(HfstState /*s1*/, HfstState /*s2*/) {
 	  throw hfst::exceptions::FunctionNotImplementedException();
 	}
 
