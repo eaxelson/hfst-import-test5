@@ -208,10 +208,10 @@ print_usage()
     fprintf(message_out, "Lookup options:\n"
             "  -I, --input-strings=SFILE        Read lookup strings from SFILE\n"
             "  -O, --output-format=OFORMAT      Use OFORMAT printing results sets\n"
-	    "  -P, --print-in-pairstring-format Print results in pairstring format\n"
-	    "                                   (Not implemented for optimized lookup format)\n"
-	    "  -e, --epsilon-format=EPS         Print epsilons as EPS (defaults to the empty string)\n"
-            "  -F, --input-format=IFORMAT       Use IFORMAT parsing input (TODO)\n"
+            "  -P, --print-in-pairstring-format Print results in pairstring format\n"
+            "                                   (Not implemented for optimized lookup format)\n"
+            "  -e, --epsilon-format=EPS         Print epsilons as EPS (defaults to the empty string)\n"
+            "  -F, --input-format=IFORMAT       Use IFORMAT parsing input \n"
             "  -x, --statistics                 Print statistics\n"
             "  -X, --xfst=VARIABLE              Toggle xfst VARIABLE\n"
             "  -c, --cycles=INT                 How many times to follow input epsilon cycles\n"
@@ -220,6 +220,7 @@ print_usage()
     print_common_unary_program_parameter_instructions(message_out);
     fprintf(message_out, "OFORMAT is one of {xerox,cg,apertium}, "
            "xerox being default\n"
+           "Pairstrings -P overrides output format -O\n"
            "IFORMAT is one of {text,spaced,apertium}, "
            "default being text, unless OFORMAT is apertium\n"
            "VARIABLEs relevant to lookup are {print-pairs,print-space,"
@@ -248,7 +249,7 @@ parse_options(int argc, char** argv)
             {"cycles", required_argument, 0, 'c'},
             {"xfst", required_argument, 0, 'X'},
             {"print-in-pairstring-format", no_argument, 0, 'P'},
-	    {"epsilon-format", required_argument, 0, 'e'},
+            {"epsilon-format", required_argument, 0, 'e'},
             {0,0,0,0}
         };
         int option_index = 0;

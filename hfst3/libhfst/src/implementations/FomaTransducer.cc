@@ -32,7 +32,7 @@ namespace hfst { namespace implementations {
     else {
       input_file = fopen(filename.c_str(),"r");
       if (input_file == NULL)
-	{ throw StreamNotReadableException(); }
+    { throw StreamNotReadableException(); }
     }
   }
 
@@ -43,8 +43,8 @@ namespace hfst { namespace implementations {
       { return; }
     if (filename.c_str()[0] != 0)
       {
-	fclose(input_file);
-	input_file = NULL;
+    fclose(input_file);
+    input_file = NULL;
       }
   }
   
@@ -124,7 +124,7 @@ namespace hfst { namespace implementations {
     void FomaInputStream::ignore(unsigned int n)
     { 
       for (unsigned int i=0; i<n; i++)
-	fgetc(input_file);
+    fgetc(input_file);
     }
 
   fsm * FomaInputStream::read_transducer()
@@ -165,7 +165,7 @@ namespace hfst { namespace implementations {
     if (filename != std::string()) {
       ofile = fopen(filename.c_str(), "wb");
       if (ofile == NULL)
-	throw StreamNotReadableException();
+    throw StreamNotReadableException();
     } 
     else {
       ofile = stdout;
@@ -234,7 +234,7 @@ namespace hfst { namespace implementations {
   {    throw hfst::exceptions::FunctionNotImplementedException();} 
 
   void FomaState::print(KeyTable &key_table, ostream &out,
-			FomaStateIndexer &indexer) const
+            FomaStateIndexer &indexer) const
   {
     throw hfst::exceptions::FunctionNotImplementedException();
   }
@@ -267,7 +267,7 @@ namespace hfst { namespace implementations {
   {    throw hfst::exceptions::FunctionNotImplementedException();}
 
   void FomaTransition::print(KeyTable &key_table, ostream &out,
-			     FomaStateIndexer &indexer) const
+                 FomaStateIndexer &indexer) const
   {
     throw hfst::exceptions::FunctionNotImplementedException();
   }
@@ -319,6 +319,7 @@ namespace hfst { namespace implementations {
   fsm * FomaTransducer::create_empty_transducer(void)
   {    
     struct fsm * retval = fsm_empty_set();
+    return retval;
   }
   
   fsm * FomaTransducer::create_epsilon_transducer(void)
@@ -360,10 +361,10 @@ namespace hfst { namespace implementations {
     
     for (StringPairVector::const_iterator it = spv.begin(); it != spv.end(); it++) 
       {
-	char *in = strdup(it->first.c_str());
-	char *out = strdup(it->second.c_str());
-	fsm_construct_add_arc(h, state_number, state_number+1, in, out);
-	state_number++;
+    char *in = strdup(it->first.c_str());
+    char *out = strdup(it->second.c_str());
+    fsm_construct_add_arc(h, state_number, state_number+1, in, out);
+    state_number++;
       }
     
     fsm_construct_set_initial(h, 0);
@@ -394,9 +395,9 @@ namespace hfst { namespace implementations {
     
     for (StringPairSet::const_iterator it = sps.begin(); it != sps.end(); it++) 
       {
-	char *in = strdup(it->first.c_str());
-	char *out = strdup(it->second.c_str());
-	fsm_construct_add_arc(h, source, target, in, out);
+    char *in = strdup(it->first.c_str());
+    char *out = strdup(it->second.c_str());
+    fsm_construct_add_arc(h, source, target, in, out);
       }
     
     fsm_construct_set_initial(h, source);
@@ -422,12 +423,12 @@ namespace hfst { namespace implementations {
     
     for (std::vector<StringPairSet>::const_iterator it = spsv.begin(); it != spsv.end(); it++) 
       {
-	for (StringPairSet::const_iterator it2 = (*it).begin(); it2 != (*it).end(); it2++ ) {
-	  char *in = strdup(it2->first.c_str());
-	  char *out = strdup(it2->second.c_str());
-	  fsm_construct_add_arc(h, state_number, state_number+1, in, out);
-	}
-	state_number++;
+    for (StringPairSet::const_iterator it2 = (*it).begin(); it2 != (*it).end(); it2++ ) {
+      char *in = strdup(it2->first.c_str());
+      char *out = strdup(it2->second.c_str());
+      fsm_construct_add_arc(h, state_number, state_number+1, in, out);
+    }
+    state_number++;
       }
     
     fsm_construct_set_initial(h, 0);
@@ -444,10 +445,10 @@ namespace hfst { namespace implementations {
   {
     struct fsm * retval = fsm_empty_string();
     for (StringPairVector::const_iterator it = spv.begin();
-	 it != spv.end();
-	 ++it)
+     it != spv.end();
+     ++it)
       {
-	retval = fsm_concat( retval, fsm_cross_product( fsm_symbol(strdup(it->first.c_str())), fsm_symbol(strdup(it->second.c_str())) ) );
+    retval = fsm_concat( retval, fsm_cross_product( fsm_symbol(strdup(it->first.c_str())), fsm_symbol(strdup(it->second.c_str())) ) );
       }
     return retval;  // should we minimize?
   }
@@ -455,13 +456,13 @@ namespace hfst { namespace implementations {
   SLOW!
     struct fsm * retval = NULL;
     for (StringPairSet::const_iterator it = sps.begin();
-	 it != sps.end();
-	 ++it)
+     it != sps.end();
+     ++it)
       {
-	if (retval == NULL)
-	  retval = fsm_cross_product( fsm_symbol(strdup(it->first.c_str())), fsm_symbol(strdup(it->second.c_str())) );
-	else
-	  retval = fsm_union( retval, fsm_cross_product( fsm_symbol(strdup(it->first.c_str())), fsm_symbol(strdup(it->second.c_str())) ) );
+    if (retval == NULL)
+      retval = fsm_cross_product( fsm_symbol(strdup(it->first.c_str())), fsm_symbol(strdup(it->second.c_str())) );
+    else
+      retval = fsm_union( retval, fsm_cross_product( fsm_symbol(strdup(it->first.c_str())), fsm_symbol(strdup(it->second.c_str())) ) );
       }
     if (cyclic)
       retval = fsm_kleene_star(retval);
@@ -543,18 +544,24 @@ namespace hfst { namespace implementations {
   
   fsm * FomaTransducer::insert_freely(fsm * t, const StringPair &symbol_pair)
   {
-    fsm * eps_marked = fsm_substitute_symbol(t, "@_EPSILON_SYMBOL_@", 
-					     "@_EPSILON_SYMBOL_MARKER_@");
+    char* epsilon = strdup("@_EPSILON_SYMBOL_@");
+    char* epsilon_marker = strdup("@_EPSILON_SYMBOL_MARKER_");
+    char* identity = strdup("@_IDENTITY_SYMBOL_@");
+    fsm * eps_marked = fsm_substitute_symbol(t, epsilon, 
+                                             epsilon_marker);
     fsm * ins = fsm_kleene_star( 
-		  fsm_union( fsm_symbol("@_IDENTITY_SYMBOL_@"), 
-			     fsm_cross_product( fsm_symbol("@_EPSILON_SYMBOL_@"),
-						fsm_symbol(strdup(symbol_pair.second.c_str())) ) ) );
+          fsm_union( fsm_symbol(identity), 
+                 fsm_cross_product( fsm_symbol(epsilon),
+                        fsm_symbol(strdup(symbol_pair.second.c_str())) ) ) );
     fsm * comp = fsm_substitute_symbol( fsm_compose(eps_marked, ins),
-					"@_EPSILON_SYMBOL_@",
-					strdup(symbol_pair.first.c_str()) );
+                    epsilon,
+                    strdup(symbol_pair.first.c_str()) );
     return fsm_substitute_symbol( comp,
-				  "@_EPSILON_SYMBOL_MARKER_@",
-				  "@_EPSILON_SYMBOL_@");
+                  epsilon_marker,
+                  epsilon);
+    free(epsilon);
+    free(epsilon_marker);
+    free(identity);
     // marker should be removed from sigma..
   }
   
@@ -605,7 +612,7 @@ namespace hfst { namespace implementations {
     std::map<int,unsigned short> all_visitations, std::map<int, unsigned short> path_visitations,
     std::vector<char>& lbuffer, int lpos, std::vector<char>& ubuffer, int upos,
     ExtractStringsCb& callback, int cycles,
-			      std::vector<hfst::FdState<int> >* fd_state_stack, bool filter_fd, bool include_spv, StringPairVector &spv)
+                  std::vector<hfst::FdState<int> >* fd_state_stack, bool filter_fd, bool include_spv, StringPairVector &spv)
   {
     if(cycles >= 0 && path_visitations[state] > cycles)
       return true;
@@ -631,7 +638,7 @@ namespace hfst { namespace implementations {
       
       hfst::WeightedPath<float> path(&lbuffer[0],&ubuffer[0],0);
       if (include_spv)
-	path.set_string_pair_vector(spv);
+    path.set_string_pair_vector(spv);
       hfst::ExtractStringsCb::RetVal ret = callback(path, final);
       if(!ret.continueSearch || !ret.continuePath)
       {
@@ -719,14 +726,14 @@ namespace hfst { namespace implementations {
       
       /* Handle spv here. Special symbols (flags, epsilons) are always inserted. */
       if (include_spv) {
-	
+    
         //find the key in sigma
         char* c_in=NULL;
         for(struct sigma* sig=t->sigma; sig!=NULL&&sig->symbol!=NULL; sig=sig->next)
-	  { if(sig->number == arc->in) {
-	      c_in = sig->symbol;
-	      break; }
-	  }
+      { if(sig->number == arc->in) {
+          c_in = sig->symbol;
+          break; }
+      }
 
         //find the key in sigma
         char* c_out=NULL;
@@ -736,17 +743,17 @@ namespace hfst { namespace implementations {
             break; }
         }
 
-	StringPair string_pair(std::string(strdup(c_in)),
-			       std::string(strdup(c_out)));
-	spv.push_back(string_pair);
+    StringPair string_pair(std::string(strdup(c_in)),
+                   std::string(strdup(c_out)));
+    spv.push_back(string_pair);
       }
 
       res = extract_strings(t, arc->target, all_visitations, path_visitations,
-			    lbuffer, lp, ubuffer, up, callback, cycles, fd_state_stack, filter_fd,
-			    include_spv, spv);
+                lbuffer, lp, ubuffer, up, callback, cycles, fd_state_stack, filter_fd,
+                include_spv, spv);
     
       if (include_spv)
-	spv.pop_back();
+    spv.pop_back();
 
       if(added_fd_state)
         fd_state_stack->pop_back();
@@ -759,7 +766,7 @@ namespace hfst { namespace implementations {
   static const int BUFFER_START_SIZE = 64;
   
   void FomaTransducer::extract_strings(fsm * t, ExtractStringsCb& callback,
-				       int cycles, FdTable<int>* fd, bool filter_fd, bool include_spv)  {
+                       int cycles, FdTable<int>* fd, bool filter_fd, bool include_spv)  {
     std::vector<char> lbuffer(BUFFER_START_SIZE, 0);
     std::vector<char> ubuffer(BUFFER_START_SIZE, 0);
     std::map<int, unsigned short> all_visitations;
@@ -859,7 +866,7 @@ namespace hfst { namespace implementations {
   }
 
   void FomaTransducer::print(fsm * t, 
-			     KeyTable &key_table, ostream &out)
+                 KeyTable &key_table, ostream &out)
   {
     throw hfst::exceptions::FunctionNotImplementedException();
   }
@@ -884,14 +891,16 @@ namespace hfst { namespace implementations {
     
     char *new_symbol;
     int i, items, new_symbol_number, laststate, lineint[5], *cm;
-    char last_final;
+    char last_final = 0;
 
     if (io_gets(infile, buf) == 0) {
         return NULL;
     }
     
-    net = fsm_create("");
-
+    char* empty = strdup("");
+    net = fsm_create(empty);
+    free(empty);
+    
     if (strcmp(buf, "##foma-net 1.0##") != 0) {
         printf("File format error foma!\n");
         return NULL;
@@ -991,7 +1000,7 @@ namespace hfst { namespace implementations {
         cmatrix_init(net);
         cm = net->medlookup->confusion_matrix;
         for (;;) {
-	  io_gets(infile, buf);
+      io_gets(infile, buf);
             if (buf[0] == '#') break;
             sscanf(buf,"%i", &i);
             *cm = i;
@@ -1010,7 +1019,7 @@ static int io_gets(FILE *infile, char *target) {
     int c = getc(infile);
     for (i = 0; c != '\n' && c != '\0'; i++) {
         *(target+i) = c;
-	c = getc(infile);
+    c = getc(infile);
     }   
     *(target+i) = '\0';
     if (c == '\0')

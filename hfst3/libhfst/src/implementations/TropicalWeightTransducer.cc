@@ -1576,6 +1576,7 @@ namespace hfst { namespace implementations
       }
     tc->SetInputSymbols(st);
     delete st;
+    return tc;
   }
 
   StdVectorFst * TropicalWeightTransducer::substitute(StdVectorFst *t,
