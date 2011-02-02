@@ -42,18 +42,6 @@ namespace hfst { namespace implementations
   void TropicalWeightInputStream::stream_unget(char c) {
     input_stream.putback(c); }
 
-#ifdef FOO
-  void TropicalWeightTransducer::add_symbol_table(StdVectorFst *t, HfstAlphabet &alpha) 
-  {
-    fst::SymbolTable *st = new fst::SymbolTable("anonym_hfst3_symbol_table");
-    HfstAlphabet::CharMap cm = alpha.get_char_map();
-    for (HfstAlphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++)
-      st->AddSymbol(std::string(it->second), (int64)it->first);    
-    t->SetInputSymbols(st);
-    delete st;
-  }
-#endif
-
   void TropicalWeightTransducer::remove_symbol_table(StdVectorFst *t)
   {
     t->SetInputSymbols(NULL);
@@ -882,7 +870,8 @@ namespace hfst { namespace implementations
 
 
 
-  TropicalWeightTransition::TropicalWeightTransition(const StdArc &arc, StdVectorFst *t):
+  TropicalWeightTransition::TropicalWeightTransition
+  (const StdArc &arc, StdVectorFst *t):
     arc(arc), t(t)
   {}
 

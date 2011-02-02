@@ -294,6 +294,17 @@ public HfstArgumentException {};
 class TransducerHeaderException :
 public HfstInputException {};
 
+/** \brief An OpenFst transducer does not have an input symbol table. 
+
+    When converting from OpenFst to tropical HFST, the OpenFst transducer
+    must have at least an input symbol table. If the output symbol table
+    is missing, it is assumed to be equivalent to the input symbol table.
+
+    Thrown by hfst::HfstTransducer(hfst::HfstInputStream&)
+*/
+class MissingOpenFstInputSymbolTableException :
+public HfstInputException {};
+
 /** \brief The calling and/or called transducer do not have the same type. 
 
 An example:

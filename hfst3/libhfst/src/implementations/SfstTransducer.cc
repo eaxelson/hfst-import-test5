@@ -754,9 +754,13 @@ namespace hfst { namespace implementations {
       /* Handle spv here. Special symbols (flags, epsilons) are always 
 	 inserted. */
       if (include_spv) {
-	StringPair string_pair(std::string(t->alphabet.write_char(lc)),
-			       std::string(t->alphabet.write_char(uc)));
-	spv.push_back(string_pair);
+	std::string istring(t->alphabet.write_char(lc));
+	std::string ostring(t->alphabet.write_char(uc));
+	if (istring.compare("<>") == 0)
+	  istring = std::string("@_EPSILON_SYMBOL_@");
+	if (ostring.compare("<>") == 0)
+	  ostring = std::string("@_EPSILON_SYMBOL_@");
+	spv.push_back(StringPair(istring, ostring));
       }
 
       res = extract_strings(t, arc[i]->target_node(), all_visitations, 

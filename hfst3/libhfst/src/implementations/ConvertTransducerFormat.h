@@ -85,7 +85,7 @@ namespace implementations {
 #if HAVE_SFST
   static void sfst_to_hfst_basic_transducer( SFST::Node *node, SFST::NodeNumbering &index, 
 				std::set<SFST::Node*> &visited_nodes, 
-				HfstBasicTransducer *net, SFST::Alphabet &alphabet );
+					     HfstBasicTransducer *net, SFST::Alphabet &alphabet);
 
   static HfstBasicTransducer * sfst_to_hfst_basic_transducer(SFST::Transducer * t);
 
@@ -100,7 +100,7 @@ namespace implementations {
 
 #if HAVE_OPENFST
   static HfstBasicTransducer * tropical_ofst_to_hfst_basic_transducer
-    (fst::StdVectorFst * t);
+    (fst::StdVectorFst * t, bool has_hfst_header=true);
   
   static StateId hfst_state_to_state_id
     (HfstState s, std::map<HfstState, StateId> &state_map, 
@@ -110,17 +110,23 @@ namespace implementations {
     (const HfstBasicTransducer * t);
 
   static HfstBasicTransducer * log_ofst_to_hfst_basic_transducer
-    (LogFst * t);
+    (LogFst * t, bool had_hfst_header=true);
   
+  static StateId hfst_state_to_state_id
+    (HfstState s, std::map<HfstState, StateId> &state_map, 
+     LogFst * t);
+
   static LogFst * hfst_basic_transducer_to_log_ofst
     (const HfstBasicTransducer * t);
+
 #endif // HAVE_OPENFST 
   
 
-  static HfstBasicTransducer * hfst_ol_to_hfst_basic_transducer(hfst_ol::Transducer * t);
+  static HfstBasicTransducer * hfst_ol_to_hfst_basic_transducer
+    (hfst_ol::Transducer * t);
 
   static hfst_ol::Transducer * hfst_basic_transducer_to_hfst_ol
-    (HfstBasicTransducer * t, bool weighted);
+    (const HfstBasicTransducer * t, bool weighted);
 
   /* Define here the functions that convert between HfstBasicTransducer and 
      your transducer class. */

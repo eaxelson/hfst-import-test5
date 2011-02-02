@@ -562,7 +562,7 @@ namespace hfst { namespace implementations {
     free(epsilon);
     free(epsilon_marker);
     free(identity);
-    // marker should be removed from sigma..
+    // marker should be removed from sigma.. (HfstBasicTransducer is now used instead)
   }
   
   fsm * FomaTransducer::compose

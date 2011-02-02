@@ -399,8 +399,8 @@ namespace hfst {
 	/** @brief Create an HfstTransitionGraph equivalent to HfstTransducer 
 	    \a transducer. */
 	HfstTransitionGraph(const hfst::HfstTransducer &transducer) {
-	  HfstTransitionGraph<HfstTropicalTransducerTransitionData, float> *fsm = 
-	    ConversionFunctions::
+	  HfstTransitionGraph<HfstTropicalTransducerTransitionData, float>
+	    *fsm = ConversionFunctions::
 	      hfst_transducer_to_hfst_basic_transducer(transducer);
 	  max_state = fsm->max_state;
 	  state_map = fsm->state_map;
@@ -476,7 +476,7 @@ namespace hfst {
 	    The SymbolTypes do not necessarily occur in any transitions
 	    of the graph. Epsilon, unknown and identity \link 
 	    hfst::String symbols\endlink are always included in the alphabet. */
-	std::set<typename C::SymbolType> get_alphabet() const {
+	const std::set<typename C::SymbolType> &get_alphabet() const {
 	  return alphabet;
 	}
 
