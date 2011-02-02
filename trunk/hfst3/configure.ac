@@ -201,6 +201,12 @@ AC_ARG_ENABLE([minimize],
 			  [enable_minimize=$enableval],
 			  [enable_minimize=yes])
 AM_CONDITIONAL([WANT_MINIMIZE], [test x$enable_minimize != xno])
+AC_ARG_ENABLE([name],
+			  [AS_HELP_STRING([--enable-name],
+							  [build name tool @<:@default=yes@:>@])],
+			  [enable_name=$enableval],
+			  [enable_name=yes])
+AM_CONDITIONAL([WANT_NAME], [test x$enable_name != xno])
 AC_ARG_ENABLE([project],
 			  [AS_HELP_STRING([--enable-project],
 							  [build project tool @<:@default=yes@:>@])],
@@ -426,6 +432,7 @@ cat <<EOF
     *                 lexc2fst: $enable_lexc_compiler
     *                 lookup: $enable_lookup
     *                 minimize: $enable_minimize (minimise)
+    *                 name: $enable_name
     *                 proc: $enable_proc
     *                 project: $enable_project
     *                 push-weights: $enable_push_weights

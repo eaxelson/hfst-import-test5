@@ -40,41 +40,8 @@ namespace hfst
       out.close();
 \endverbatim
 
-An HFST transducer in binary format consist of an HFST header
-and the transducer of the backend implementation. 
-The HFST header has the following structure:
-       
-- the first four chars identify an HFST header: "HFST"
-- the fifth char is a separator: "\0"
-- the sixth and seventh char tell the length of the rest of the header (beginning after the eighth char)
-- the eighth char is a separator and is not counted to the header length: "\0"
-- the rest of the header consists of pairs of attributes and their values
-that are each separated by a char "\0"
-
-HFST version 3.0 header must contain at least the attributes 'version', 'type'
-and 'name' (in that order) and their values. Currently the accepted values are
-'3.0' for the attribute 'version', 'SFST_TYPE', 'FOMA_TYPE', 
-'TROPICAL_OPENFST_TYPE', 'LOG_OPENFST_TYPE', 'HFST_OL_TYPE' and 'HFST_OLW_TYPE'
-for the attribute 'type' and any string (including the empty string) for 
-the attribute 'name'. An HFST header can contain more attributes, but they are
-ignored by HfstInputStream functions unless explicitly handled in the backend
-implementation.
-
-An example:
-
-\verbatim
-"HFST\0"
-"\0\x1c\0"
-"version\0"  "3.0\0"
-"type\0"     "FOMA\0"
-"name\0"     "\0"
-\endverbatim
-
-This is the header of a version 3.0 HFST transducer whose implementation 
-type is foma and whose name is not defined, i.e. is the empty string "". 
-The two bytes "\0\x1c" that form the length field tell that the length of
-the rest of the header (i.e. the sequence of bytes
-"version\03.0\0type\0FOMA\0name\0\0") is 0 * 256 + 28 * 1 = 28 bytes.
+For more information on HFST transducer structure, see 
+<a href="HeaderFormatAndConversions.html">this page</a>.
 
   **/
   class HfstOutputStream
@@ -128,12 +95,14 @@ the rest of the header (i.e. the sequence of bytes
 	\a hfst_format defines whether transducers are written in hfst format or as such in their backend format.
 
 	If the file exists, it is overwritten. */
-    HfstOutputStream(const std::string &filename, ImplementationType type, bool hfst_format=true);
+    HfstOutputStream(const std::string &filename, ImplementationType type, 
+		     bool hfst_format=true);
 
     /** \brief Destructor. */
     ~HfstOutputStream(void);  
 
-    /** \brief Write the transducer \a transducer in binary format to the stream. 
+    /** \brief Write the transducer \a transducer in binary format 
+	to the stream. 
 
 	By default, all transducers must have the same type, else an
 	hfst::exceptions::TransducerHasWrongTypeException is thrown. */

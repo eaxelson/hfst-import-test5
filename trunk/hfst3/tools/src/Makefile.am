@@ -76,6 +76,10 @@ if WANT_MINIMIZE
 MAYBE_MINIMIZE=hfst-minimize
 MAYBE_ALIASES+=hfst-minimise
 endif
+if WANT_NAME
+MAYBE_NAME=hfst-name
+MAYBE_ALIASES+=hfst-name
+endif
 if WANT_PROJECT
 MAYBE_PROJECT=hfst-project
 endif
@@ -149,7 +153,7 @@ bin_PROGRAMS=$(MAYBE_COMPARE) $(MAYBE_COMPOSE) \
 			 $(MAYBE_FST2FST) \
 			 $(MAYBE_FST2STRINGS) $(MAYBE_FST2TXT) \
 			 $(MAYBE_HEAD) $(MAYBE_INVERT) $(MAYBE_LOOKUP) \
-			 $(MAYBE_MINIMIZE) \
+			 $(MAYBE_MINIMIZE) $(MAYBE_NAME) \
 			 $(MAYBE_PROJECT) $(MAYBE_PUSH_WEIGHTS) \
 			 $(MAYBE_REGEXP2FST) $(MAYBE_REMOVE_EPSILONS) \
 			 $(MAYBE_REPEAT) $(MAYBE_REVERSE) $(MAYBE_SPLIT) \
@@ -186,6 +190,7 @@ hfst_lexc2fst_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC) \
 					  parsers/xre_lex.ll parsers/xre_utils.cc
 hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC)
 hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
+hfst_name_SOURCES=hfst-name.cc $(HFST_COMMON_SRC)
 hfst_project_SOURCES=hfst-project.cc $(HFST_COMMON_SRC)
 hfst_push_weights_SOURCES=hfst-push-weights.cc $(HFST_COMMON_SRC)
 hfst_regexp2fst_SOURCES=hfst-regexp2fst.cc $(HFST_COMMON_SRC) \

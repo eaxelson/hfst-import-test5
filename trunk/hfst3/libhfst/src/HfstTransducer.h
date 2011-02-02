@@ -402,9 +402,17 @@ tr1.disjunct(tr2);
 
     /** \brief Read a binary transducer from transducer stream \a in. 
 
+	The stream can contain HFST tranducers or OpenFst, foma or SFST
+	transducers without any HFST header. If the backend implementations
+	are used as such, they are converted into HFST transducers.
+
+	For more information on transducer conversions and the HFST header
+	structure, see <a href="HeaderFormatAndConversions.html">here</a>.
+
 	@pre ( in.is_eof() == in.is_bad() == false && in.is_fst() ).
 	Otherwise, an exception is thrown.
 	@throws hfst::exceptions::NotTransducerStreamException
+	hfst::exceptions::MissingOpenFstInputSymbolTableException
 	@see HfstInputStream **/
     HfstTransducer(HfstInputStream &in);
 
