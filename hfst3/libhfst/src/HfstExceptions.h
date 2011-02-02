@@ -300,7 +300,7 @@ public HfstInputException {};
     must have at least an input symbol table. If the output symbol table
     is missing, it is assumed to be equivalent to the input symbol table.
 
-    Thrown by hfst::HfstTransducer(hfst::HfstInputStream&)
+    Thrown by HfstTransducer(HfstInputStream&)
 */
 class MissingOpenFstInputSymbolTableException :
 public HfstInputException {};
