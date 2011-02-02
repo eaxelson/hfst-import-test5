@@ -286,7 +286,7 @@ namespace hfst
 				   ssize_t limit) const {
 	switch(this->type) {
 
-	/* TODO: Convert into HFST_OL(W)_TYPE, if needed. */
+	/* TODO: Convert into HFST_OL(W)_TYPE, if needed? */
 
 	case (HFST_OL_TYPE):
 	case (HFST_OLW_TYPE):
@@ -697,9 +697,14 @@ namespace hfst
 	  ConversionFunctions::hfst_basic_transducer_to_foma(&net);
 	break;
 #endif
-	// TODO
-	//case HFST_OL_TYPE:
-	//case HFST_OLW_TYPE:
+      case HFST_OL_TYPE:
+	implementation.hfst_ol =
+	  ConversionFunctions::hfst_basic_transducer_to_hfst_ol(&net, false);
+	break;
+      case HFST_OLW_TYPE:
+	implementation.hfst_ol =
+	  ConversionFunctions::hfst_basic_transducer_to_hfst_ol(&net, true);
+	break;
       case ERROR_TYPE:
 	throw hfst::exceptions::SpecifiedTypeRequiredException();
       default:

@@ -88,6 +88,7 @@ For documentation on the HFST binary transducer format, see #hfst::HfstOutputStr
     unsigned int bytes_to_skip;          // how many bytes have been already read by the function
                                          // processing the hfst header
     std::string filename;                // the name of the file, if stdin, name is ""
+    bool has_hfst_header;                // whether the current transducer has an hfst header
 
     /* A special case where an OpenFst transducer has no symbol tables but an
        SFST alphabet is appended at the end. Should not occur very often, but

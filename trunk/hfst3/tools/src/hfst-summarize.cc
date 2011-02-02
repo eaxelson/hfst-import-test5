@@ -233,14 +233,19 @@ process_stream(HfstInputStream& instream)
       // count physical size
       
       // average calculations
-      double average_arcs_per_state = static_cast<double>(arcs)/static_cast<float>(states);
-      double average_input_epsilons = static_cast<double>(input_epsilons)/static_cast<double>(states);
-      double average_input_ambiguity = static_cast<double>(arcs)/static_cast<double>(uniq_input_arcs);
-      double average_output_ambiguity = static_cast<double>(arcs)/static_cast<double>(uniq_output_arcs);
+      double average_arcs_per_state = 
+	static_cast<double>(arcs)/static_cast<float>(states);
+      double average_input_epsilons = 
+	static_cast<double>(input_epsilons)/static_cast<double>(states);
+      double average_input_ambiguity = 
+	static_cast<double>(arcs)/static_cast<double>(uniq_input_arcs);
+      double average_output_ambiguity = 
+	static_cast<double>(arcs)/static_cast<double>(uniq_output_arcs);
       if (transducer_n > 1)
         {
           fprintf(outfile, "-- \nTransducer #%zu:\n", transducer_n);
         }
+      fprintf(outfile, "name: \"%s\"\n", trans->get_name().c_str());
       // next is printed as in OpenFST's fstinfo
       // do not modify for compatibility
       switch (trans->get_type())
@@ -263,7 +268,7 @@ process_stream(HfstInputStream& instream)
           break;
         case hfst::HFST_OL_TYPE:
           fprintf(outfile, "fst type: HFST optimized lookup\n"
-                  "arc type: unweigheted\n");
+                  "arc type: unweighted\n");
           break;
         case hfst::HFST_OLW_TYPE:
           fprintf(outfile, "fst type: HFST optimized lookup\n"

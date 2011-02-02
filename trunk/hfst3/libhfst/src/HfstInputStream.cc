@@ -11,6 +11,10 @@
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
+#include "implementations/ConvertTransducerFormat.h"
+
+using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::ConversionFunctions;
 
 #ifndef DEBUG_MAIN
 namespace hfst
@@ -205,15 +209,54 @@ namespace hfst
       {
 #if HAVE_SFST
       case SFST_TYPE:
+	{
 	t.implementation.sfst =
 	  this->implementation.sfst->read_transducer();
+
+	  /* If we were reading an SFST transducer with no HFST header,
+	     it is possible that epsilon is coded differently than 
+	     "@_EPSILON_SYMBOL_@" and/or that numbers 1 and 2 are reserved
+	     for other use than "@_UNKNOWN_SYMBOL_@" or 
+	     "@_IDENTITY_SYMBOL_@". */
+	  if (not has_hfst_header)
+	    {
+	      HfstBasicTransducer * net = 
+		ConversionFunctions::
+		  sfst_to_hfst_basic_transducer
+		(t.implementation.sfst);
+	      delete t.implementation.sfst;
+	      t.implementation.sfst =
+		ConversionFunctions::
+		  hfst_basic_transducer_to_sfst(net);
+	      delete net;
+	    }
 	break;
+	}
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OFST_TYPE:
 	{
 	  t.implementation.tropical_ofst =
 	    this->implementation.tropical_ofst->read_transducer();
+
+	  /* If we were reading an OpenFst transducer with no HFST header,
+	     it is possible that it has separate input and output symbol tables
+	     and/or that it has no input or output table or neither
+	     and/or that epsilon is coded differently than "@_EPSILON_SYMBOL_@"
+	     and/or that numbers 1 and 2 are reserved for other use than
+	     "@_UNKNOWN_SYMBOL_@" or "@_IDENTITY_SYMBOL_@". */
+	  if (not has_hfst_header)
+	    {
+	      HfstBasicTransducer * net = 
+		ConversionFunctions::
+		  tropical_ofst_to_hfst_basic_transducer
+		(t.implementation.tropical_ofst, false);
+	      delete t.implementation.tropical_ofst;
+	      t.implementation.tropical_ofst =
+		ConversionFunctions::
+		  hfst_basic_transducer_to_tropical_ofst(net);
+	      delete net;
+	    }
 
 	  // A special case: HFST version 2 transducer
 	  if (hfst_version_2_weighted_transducer) // an SFST alphabet follows
@@ -228,10 +271,11 @@ namespace hfst
 	      //fprintf(stderr, "alphabet size is %i\n", (int)n );
 
 	      // special symbol-to-number mappings
-	      std::vector<std::pair<unsigned short, std::string> > special_cases;
-
+	      std::vector<std::pair<unsigned short, std::string> > 
+		special_cases;
 	      // normal symbol-to-number mappings
-	      std::vector<std::pair<unsigned short, std::string> > symbol_mappings;
+	      std::vector<std::pair<unsigned short, std::string> > 
+		symbol_mappings;
 
 	      unsigned short max_number=0;
 
@@ -240,8 +284,10 @@ namespace hfst
 		max_number++;
 
 		unsigned short symbol_number=0;
-		symbol_number = symbol_number + (unsigned short)stream_get() * 1;
-		symbol_number = symbol_number + (unsigned short)stream_get() * 256;
+		symbol_number = symbol_number + 
+		  (unsigned short)stream_get() * 1;
+		symbol_number = symbol_number + 
+		  (unsigned short)stream_get() * 256;
 		
 		std::string symbol_string("");
 		char c = stream_get();
@@ -299,14 +345,36 @@ namespace hfst
 	break;
 	}
       case LOG_OFST_TYPE:
+	{
 	t.implementation.log_ofst =
 	  this->implementation.log_ofst->read_transducer();
+
+	  /* If we were reading an OpenFst transducer with no HFST header,
+	     it is possible that it has separate input and output symbol tables
+	     and/or that it has no input or output table or neither
+	     and/or that epsilon is coded differently than "@_EPSILON_SYMBOL_@"
+	     and/or that numbers 1 and 2 are reserved for other use than
+	     "@_UNKNOWN_SYMBOL_@" or "@_IDENTITY_SYMBOL_@". */
+	  if (not has_hfst_header)
+	    {
+	      HfstBasicTransducer * net = 
+		ConversionFunctions::
+		  log_ofst_to_hfst_basic_transducer
+		(t.implementation.log_ofst, false);
+	      delete t.implementation.log_ofst;
+	      t.implementation.log_ofst =
+		ConversionFunctions::
+		  hfst_basic_transducer_to_log_ofst(net);
+	      delete net;
+	    }
+
 	if (hfst_version_2_weighted_transducer) // this should not happen
 	  { 
 	    fprintf(stderr, "ERROR: not transducer stream\n");
 	    exit(1);
 	  }
 	break;
+	}
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
@@ -323,7 +391,7 @@ namespace hfst
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	t.implementation.hfst_ol =
-	  this->implementation.hfst_ol->read_transducer(false);  // FIX: has_header
+	  this->implementation.hfst_ol->read_transducer(false);
 	if(t.get_type() != type) // weights need to be added or removed
 	{ t.convert(type); }
 	break;
@@ -381,6 +449,7 @@ namespace hfst
 #endif
       case 'P':
 	{
+	  has_hfst_header=true;
 	  // extract HFST version 2 header
 	  (void)stream_get();
 	  int i1 = (int)stream_get();
@@ -408,6 +477,7 @@ namespace hfst
 	}
       case 'A':
 	{
+	  has_hfst_header=true;
 	  (void)stream_get();
 	  bytes_read=1;
 	  char c2 = stream_peek();
@@ -640,6 +710,7 @@ namespace hfst
 
     // whether the stream contains an HFST version 3.0 transducer
     if (read_hfst_header(bytes_read)) {
+      has_hfst_header=true;
       bytes_to_skip=bytes_read;
       return type;
     }
@@ -687,7 +758,7 @@ namespace hfst
      The implementation type of the stream is defined by 
      the type of the first transducer in the stream. */
   HfstInputStream::HfstInputStream(void):
-    bytes_to_skip(0), filename(std::string()), hfst_version_2_weighted_transducer(false)
+    bytes_to_skip(0), filename(std::string()), has_hfst_header(false), hfst_version_2_weighted_transducer(false)
   {
     try { 
       input_stream = &std::cin;
@@ -741,7 +812,7 @@ namespace hfst
 
   // FIX: HfstOutputStream takes a string parameter, HfstInputStream a const char*
   HfstInputStream::HfstInputStream(const std::string &filename):
-    bytes_to_skip(0), filename(std::string(filename)), hfst_version_2_weighted_transducer(false)
+    bytes_to_skip(0), filename(std::string(filename)), has_hfst_header(false), hfst_version_2_weighted_transducer(false)
   {
     try { 
       if (strcmp("",filename.c_str()) != 0) {

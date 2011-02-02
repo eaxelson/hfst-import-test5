@@ -41,6 +41,10 @@ using hfst::HfstInputStream;
 using hfst::exceptions::NotTransducerStreamException;
 using hfst::WeightedPaths;
 using hfst::WeightedPath;
+using hfst::StringPairVector;
+
+using hfst::HFST_OL_TYPE;
+using hfst::HFST_OLW_TYPE;
 
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
@@ -59,6 +63,9 @@ static std::string output_prefix;
 static std::string input_exclude;
 static std::string output_exclude;
 
+static bool print_in_pairstring_format=false;
+static char * epsilon_format="";
+
 void
 print_usage()
 {
@@ -74,6 +81,9 @@ print_usage()
     fprintf(message_out, "  -w, --print-weights        Display the weight for each string\n");
     fprintf(message_out, "  -e, --eval-flags           Only print strings with pass flag diacritic checks\n");
     fprintf(message_out, "  -f, --filter-flags         Don't print flag diacritic symbols (only with -e)\n");
+    fprintf(message_out, "  -E, --epsilon-format=EPS   Print epsilon as EPS (with -S). Default the empty string.\n");
+    fprintf(message_out, "  -S, --print-pairstrings    Print result in pairstring format\n"
+	                 "                             (Not implemented for HFST optimized lookup format)\n");
     fprintf(message_out, "Ignore options:\n");
     fprintf(message_out, "  -l, --max-in-length=INT    Ignore paths with an input string longer than length\n");
     fprintf(message_out, "  -L, --max-out-length=INT   Ignore paths with an output string longer than length\n");
@@ -121,10 +131,12 @@ parse_options(int argc, char** argv)
             {"out-prefix", required_argument, 0, 'P'},
             {"in-exclude", required_argument, 0, 'x'},
             {"out-exclude", required_argument, 0, 'X'},
+	    {"epsilon-format", required_argument, 0, 'E'},
+	    {"print-pairstrings", no_argument, 0, 'S'},
             {0,0,0,0}
         };
         int option_index = 0;
-        char c = getopt_long(argc, argv, "R:dhi:N:n:c:o:qsvVwefl:L:p:P:x:X:",
+        char c = getopt_long(argc, argv, "R:dhi:N:n:c:o:qsvVwefl:L:p:P:x:X:E:S",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -171,6 +183,12 @@ parse_options(int argc, char** argv)
         case 'X':
           output_exclude = optarg;
           break;
+	case 'E':
+	  epsilon_format = hfst_strdup(optarg);
+	  break;
+	case 'S':
+	  print_in_pairstring_format = true;
+	  break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -184,6 +202,13 @@ parse_options(int argc, char** argv)
 #include "inc/check-params-common.h"
 #include "inc/check-params-unary.h"
     return EXIT_CONTINUE;
+}
+
+
+static std::string get_print_format(const std::string &s) {
+  if (s.compare("@_EPSILON_SYMBOL_@") == 0)
+    return std::string(strdup(epsilon_format));
+  return std::string(s);
 }
 
 //Print results as they come
@@ -228,13 +253,32 @@ class Callback : public hfst::ExtractStringsCb
     // the path passed the checks. Print it if it is final
     if(final)
     {
-      *out_ << wp.istring;
-      if(wp.ostring != wp.istring)
-        *out_ << "\t" << wp.ostring;
-      if(display_weights)
-        *out_ << "\t" << wp.weight;
-      *out_ << std::endl;
-      
+
+      if (print_in_pairstring_format) 
+	{
+	  for (StringPairVector::const_iterator it = wp.spv.begin();
+	       it != wp.spv.end(); it++) 
+	    {
+	      *out_ << get_print_format(it->first)
+		    << ":"
+		    << get_print_format(it->second)
+		    << " ";
+	    }
+	  if (display_weights) {
+	    *out_ << "\t" << wp.weight;
+	  }
+	  *out_ << "\n";
+	}
+	
+      else {
+	*out_ << wp.istring;
+	if(wp.ostring != wp.istring)
+	  *out_ << "\t" << wp.ostring;
+	if(display_weights)
+	  *out_ << "\t" << wp.weight;
+	*out_ << std::endl;
+      }
+
       count++;
     }
     // continue until we've printed max_num strings
@@ -255,6 +299,16 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
     first_transducer=false;
     
     HfstTransducer t(instream);
+
+    /* Pairstring format is not supported on optimized lookup format. */
+    if (print_in_pairstring_format && 
+	(instream.get_type() == HFST_OL_TYPE || 
+	 instream.get_type() == HFST_OLW_TYPE) ) {
+      fprintf(stderr, 
+	      "Error: option --print-in-pairstring-format not supported on "
+	      "       optimized lookup transducers, exiting program\n" );
+      exit(1);
+    }
  
     if(input_prefix != "")
       verbose_printf("input_prefix: '%s'\n", input_prefix.c_str());
@@ -284,9 +338,9 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
     
     Callback cb(max_strings, &outstream);
     if(eval_fd)
-      t.extract_strings_fd(cb, cycles, filter_fd);
+      t.extract_strings_fd(cb, cycles, filter_fd, print_in_pairstring_format);
     else
-      t.extract_strings(cb, cycles);
+      t.extract_strings(cb, cycles, print_in_pairstring_format);
     
     verbose_printf("Printed %i string(s)\n", cb.count);
   }

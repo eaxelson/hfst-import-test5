@@ -208,10 +208,10 @@ print_usage()
     fprintf(message_out, "Lookup options:\n"
             "  -I, --input-strings=SFILE        Read lookup strings from SFILE\n"
             "  -O, --output-format=OFORMAT      Use OFORMAT printing results sets\n"
-            "  -P, --print-in-pairstring-format Print results in pairstring format\n"
-            "                                   (Not implemented for optimized lookup format)\n"
-            "  -e, --epsilon-format=EPS         Print epsilons as EPS (defaults to the empty string)\n"
-            "  -F, --input-format=IFORMAT       Use IFORMAT parsing input \n"
+	    "  -P, --print-pairstrings          Print results in pairstring format\n"
+	    "                                   (Not implemented for optimized lookup format)\n"
+	    "  -e, --epsilon-format=EPS         Print epsilons as EPS (defaults to the empty string)\n"
+            "  -F, --input-format=IFORMAT       Use IFORMAT parsing input (TODO)\n"
             "  -x, --statistics                 Print statistics\n"
             "  -X, --xfst=VARIABLE              Toggle xfst VARIABLE\n"
             "  -c, --cycles=INT                 How many times to follow input epsilon cycles\n"
@@ -1477,6 +1477,15 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     // if transducer type is other than optimized_lookup,
     // convert to HfstBasicTransducer
 
+    if (print_in_pairstring_format && 
+	(inputstream.get_type() == HFST_OL_TYPE || 
+	 inputstream.get_type() == HFST_OLW_TYPE) ) {
+      fprintf(outstream, 
+	      "Error: option --print-in-pairstring-format not supported on "
+	      "       optimized lookup transducers, exiting program\n" );
+      exit(1);
+    }
+
     char* line = 0;
     size_t llen = 0;
     while (hfst_getline(&line, &llen, lookup_file) != -1)
@@ -1503,6 +1512,8 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
           {
             kvs = perform_lookups<HfstTransducer>(*kv, cascade, unknown,
                                                   &infinite);
+	    /* This does not throw an exception only if the type of the
+	       transducer is HFST_OL or HFST_OLW. */
           }
         catch (hfst::exceptions::FunctionNotImplementedException)
           {
