@@ -2192,15 +2192,15 @@ namespace hfst { namespace implementations
 
 
 
-  TropicalWeightOutputStream::TropicalWeightOutputStream(void):
-    filename(std::string()), output_stream(std::cout)
+  TropicalWeightOutputStream::TropicalWeightOutputStream(bool hfst_format):
+    filename(std::string()), output_stream(std::cout), hfst_format(hfst_format)
   {
     if (!output_stream)
       fprintf(stderr, "TropicalWeightOutputStream: ERROR: failbit set (3).\n");
   }
 
-  TropicalWeightOutputStream::TropicalWeightOutputStream(const std::string &str):
-    filename(std::string(str)),o_stream(str.c_str(),std::ios::out),output_stream(o_stream)
+  TropicalWeightOutputStream::TropicalWeightOutputStream(const std::string &str, bool hfst_format):
+    filename(std::string(str)),o_stream(str.c_str(),std::ios::out),output_stream(o_stream),hfst_format(hfst_format)
   {}
 
   /*
@@ -2222,11 +2222,18 @@ namespace hfst { namespace implementations
   { 
     if (!output_stream)
       fprintf(stderr, "TropicalWeightOutputStream: ERROR: failbit set (1).\n");
-    /* When writing a transducer, both input and output symbol tables are
-       included. */
-    fst::SymbolTable output_st(*(transducer->InputSymbols()));
-    transducer->SetOutputSymbols(&output_st);
-    transducer->Write(output_stream,FstWriteOptions()); }
+    /* When writing a transducer in the backend format,
+       both input and output symbol tables are included. */
+    fst::SymbolTable *output_st=NULL;
+    if (hfst_format) {
+      output_st = new fst::SymbolTable(*(transducer->InputSymbols()));
+      transducer->SetOutputSymbols(output_st);
+    }
+    transducer->Write(output_stream,FstWriteOptions()); 
+    if (output_st != NULL)
+      delete output_st;
+  }
+
 
   void TropicalWeightOutputStream::close(void) 
   {

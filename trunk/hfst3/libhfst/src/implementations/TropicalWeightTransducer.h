@@ -77,10 +77,11 @@ namespace implementations
     std::string filename;
     ofstream o_stream;
     ostream &output_stream;
+    bool hfst_format;
     //void write_3_0_library_header(std::ostream &out);
   public:
-    TropicalWeightOutputStream(void); 
-    TropicalWeightOutputStream(const std::string &filename);
+    TropicalWeightOutputStream(bool hfst_format=true); 
+    TropicalWeightOutputStream(const std::string &filename, bool hfst_format=false);
     void close(void);
     void write(const char &c);
     void write_transducer(StdVectorFst * transducer);

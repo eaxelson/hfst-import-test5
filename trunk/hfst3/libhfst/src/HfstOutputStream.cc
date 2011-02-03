@@ -83,10 +83,10 @@ namespace hfst
       case TROPICAL_OFST_TYPE:
 	if (filename.compare("") == 0) // FIX: this should be done in TropicalWeight layer
 	  implementation.tropical_ofst = 
-	    new hfst::implementations::TropicalWeightOutputStream();
+	    new hfst::implementations::TropicalWeightOutputStream(hfst_format);
 	else
 	  implementation.tropical_ofst = 
-	    new hfst::implementations::TropicalWeightOutputStream(filename);
+	    new hfst::implementations::TropicalWeightOutputStream(filename, hfst_format);
 	break;
       case LOG_OFST_TYPE:
 	implementation.log_ofst = 
