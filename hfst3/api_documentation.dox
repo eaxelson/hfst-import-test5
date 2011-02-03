@@ -1,79 +1,95 @@
 
-/** \page HeaderFormatAndConversions.html
+/** \page HfstWithSFSTOpenFstAndFoma.html Using HFST with SFST, OpenFst and foma
 
-    <b>This page is still under construction...</b>
-
-    \section HfstTransducerHeaderFormat HFST Transducer Header format
-
-An HFST transducer in binary format consist of an HFST header
-and the transducer of the backend implementation. 
-The HFST header has the following structure:
-       
-- the first four chars identify an HFST header: "HFST"
-- the fifth char is a separator: "\0"
-- the sixth and seventh char tell the length of the rest of the header (beginning after the eighth char)
-- the eighth char is a separator and is not counted to the header length: "\0"
-- the rest of the header consists of pairs of attributes and their values
-that are each separated by a char "\0"
-
-HFST version 3.0 header must contain at least the attributes 'version', 'type'
-and 'name' (in that order) and their values. Currently the accepted values are
-'3.0' for the attribute 'version', 'SFST_TYPE', 'FOMA_TYPE', 
-'TROPICAL_OPENFST_TYPE', 'LOG_OPENFST_TYPE', 'HFST_OL_TYPE' and 'HFST_OLW_TYPE'
-for the attribute 'type' and any string (including the empty string) for 
-the attribute 'name'. An HFST header can contain more attributes, but they are
-ignored by HfstInputStream functions unless explicitly handled in the backend
-implementation.
-
-An example:
+A binary HfstTransducer consists of an HFST header (more on HFST headers in the
+<a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstTransducerHeader">
+wiki pages</a>) and the transducer of the backend implementation. 
+If you want to write backend transducers as such, you can specify it with 
+the hfst_format argument of HfstOutputStream constructor:
 
 \verbatim
-"HFST\0"
-"\0\x1c\0"
-"version\0"  "3.0\0"
-"type\0"     "FOMA\0"
-"name\0"     "\0"
+   HfstOutputStream(ImplementationType type, bool hfst_format=true);
 \endverbatim
 
-This is the header of a version 3.0 HFST transducer whose implementation 
-type is foma and whose name is not defined, i.e. is the empty string "". 
-The two bytes "\0\x1c" that form the length field tell that the length of
-the rest of the header (i.e. the sequence of bytes
-"version\03.0\0type\0FOMA\0name\0\0") is 0 * 256 + 28 * 1 = 28 bytes.
+The following piece of code will write an OpenFst transducer 
+with tropical weights to standard output:
 
-<BR>
+\verbatim
+   HfstTransducer ab("a", "b", TROPICAL_OFST_TYPE);
+   HfstOutputStream out(TROPICAL_OFST_TYPE, false);
+   out << ab;
+\endverbatim
 
-\section ConversionsAmongDifferentFormats Conversions between different transducer formats
+An HfstInputStream can also read backend transducers that do not have an
+HFST header. If the standard input contains an SFST transducer, the following
+piece of code will read it successfully and convert it into an HFST transducer
+of type SFST_TYPE and write it to standard output (with the HFST header 
+included).
 
-Background on differences between HFST foma and foma.
+\verbatim
+   HfstInputStream in();
+   HfstTransducer tr(in);
+   HfstOutputStream out(tr.get_type(), true);
+   out << tr;
+\endverbatim
 
-When converting from foma to HFST. Suppose we have a foma transducer
-transducer.foma. As foma's transducers are written to file gzipped,
-the file must first be gunzipped so that HFST can read it. The name of the
-file must be appended a .gz extension so that the program gunzip knows it is
-a zipped file. The commands
+For more information on HFST transducer formats and conversions, see the
+<a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstTransducerFormats">
+wiki pages</a>.
+
+
+
+<H3>An issue with foma</H3>
+
+Foma writes its binary transducers in gzipped format using the gz tools.
+However, we experienced problems when trying to write to standard output or
+read from standard in with gz tools (foma tools do not write to or read
+from standard streams). So we choose to write, and accordingly read, 
+foma transducers unzipped when writing or reading binary HfstTransducers 
+of FOMA_TYPE. As a result, when we write an HfstTransducer of FOMA_TYPE
+in its plain backend format, the user must gzip it themselves before it 
+can be used by foma tools. Similarily, a foma transducer must be gunzipped 
+before it can be read by HFST tools.
+
+Suppose we have written a FOMA_TYPE HfstTransducer and want to use it with
+foma tools. First we write it, in its plain backend format, to file "ab.foma"
+with the following piece of code:
+
+\verbatim
+   HfstTransducer ab("a", "b", FOMA_TYPE);
+   HfstOutputStream out("ab.foma", FOMA_TYPE, false);
+   out << ab;
+\endverbatim
+
+The command 
+
+\verbatim
+gzip ab.foma
+\endverbatim
+
+will create a file 'ab.foma.gz' that can be used by foma tools.
+
+An example of the opposite case follows. Suppose we have a foma transducer
+'transducer.foma' and want to read it inside an HFST program.
+The name of the file must be appended a .gz extension so that the program 
+'gunzip' knows it is a zipped file. The commands
 
 \verbatim
 mv transducer.foma transducer.foma.gz
 gunzip transducer.foma.gz
 \endverbatim
 
-overwrite the original file transducer.foma with an unzipped version of the
-same file. Now the file can be used by HFST.
-
-When converting from HFST to foma. Suppose we have a HFST foma transducer
-transducer.hfst. As foma's transducers are gzipped, we must gzip the
-file. The command
+overwrite the original file 'transducer.foma' with an unzipped version of the
+same file. Now the file can be used by HFST:
 
 \verbatim
-gzip transducer.hfst
+   HfstInputStream in("transducer.foma");
+   HfstTransducer tr(in);
 \endverbatim
-
-will create a file transducer.hfst.gz that can be used by foma.
 
 */
 
-  /** \page VersionDifferences.html 
+  /** \page VersionDifferences.html Differences between versions 2 and 3
 
       <b>This page is still under construction...</b>
 
@@ -123,11 +139,9 @@ will create a file transducer.hfst.gz that can be used by foma.
    */
 
 
-  /** \page InstallHfst.html
+  /** \page InstallHfst.html Installing the HFST API library
 
       <b>This page is still under construction...</b>
-
-      \section installing_library Installing the HFST API library
       
       You can download the source code packet hfst-3.0.tar.gz
       (will be published during January 2011) from the sourceforge
@@ -187,12 +201,9 @@ HfstTransducer tr("a", "b", SFST_TYPE);
       */
 
 
-  /** \page AddingYourImplementation.html 
+  /** \page AddingYourImplementation.html Adding your own implementation under the HFST API
 
       <b>This page is still under construction...</b>
-
-
-      <H2>Adding your own implementation under the HFST API</H2>
 
       The HFST API is currently implemented with three finite-state libraries,
       SFST, OpenFst and foma. The API is designed so that it is relatively easy to
@@ -634,7 +645,7 @@ AS_IF([test "x$with_my_transducer_library" != "xno"],
 
 namespace hfst {
 
-  /** \page QuickStart.html
+  /** \page QuickStart.html Quick Start to HFST
 
       <b>This page is still under construction...</b>
 
@@ -899,6 +910,7 @@ The examples given in this documentation use
 
    - <a href="VersionDifferences.html">Differences</a> between HFST versions 2 and 3
 
+   - <a href="HfstWithSFSTOpenFstAndFoma.html">Using HFST</a> with SFST, OpenFst and foma
 
 \section download_hfst Download
 
