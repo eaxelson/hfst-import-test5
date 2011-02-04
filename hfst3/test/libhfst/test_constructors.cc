@@ -1,39 +1,15 @@
 /*
-   Test file for HfstTransducer constructors. 
+   Test file for HfstTransducer constructors, destructor, operator=
+   and member functions set_name, get_name and get_type.
 */
 
 #include "HfstTransducer.h"
+#include "auxiliary_functions.cc"
+
 using namespace hfst;
 using hfst::implementations::HfstBasicTransducer;
 using hfst::implementations::HfstBasicTransition;
 
-const bool VERBOSE=true;
-
-void verbose_print(const char *msg, ImplementationType type) {
-  if (VERBOSE) {
-    fprintf(stderr, "Testing:\t%s", msg);
-    fprintf(stderr, " for type ");
-    switch (type) 
-      {
-      case SFST_TYPE:
-	fprintf(stderr, "SFST_TYPE");
-	break;
-      case TROPICAL_OFST_TYPE:
-	fprintf(stderr, "TROPICAL_OFST_TYPE");
-	break;
-      case LOG_OFST_TYPE:
-	fprintf(stderr, "LOG_OFST_TYPE");
-	break;
-      case FOMA_TYPE:
-	fprintf(stderr, "FOMA_TYPE");
-	break;
-      default:
-	fprintf(stderr, "(type not known)");
-	break;
-      }
-    fprintf(stderr, "...\n");
-  }
-}
 
 int main(int argc, char **argv) 
 {
@@ -93,15 +69,30 @@ int main(int argc, char **argv)
       foobar_att.minimize();
       assert(foobar.compare(foobar_att));
 
-      /* From HfstInputStream. */
+      /* From HfstInputStream. 
+	 Tests also functions get_type, set_name and get_name. */
       verbose_print("Construction from HfstInputStream", types[i]);
-      HfstOutputStream out("testfile.hfst", types[i]);
+      HfstOutputStream out("testfile.hfst", foobar.get_type());
+      foobar.set_name("foobar");
       out << foobar;
       out.close();
       HfstInputStream in("testfile.hfst");
       HfstTransducer foobar_stream(in);
       in.close();
       assert(foobar.compare(foobar_stream));
+      assert(foobar_stream.get_name().compare("foobar") == 0);
+      assert(foobar_stream.get_type() == types[i]);
+
+      /* Destructor. */
+      verbose_print("Destructor", types[i]);
+      HfstTransducer * nu = new HfstTransducer("new", types[i]);
+      delete nu;
+
+      /* Operator=. */
+      verbose_print("Operator=", types[i]);
+      HfstTransducer foobar2("baz", types[i]);
+      foobar2 = foobar;
+      assert(foobar.compare(foobar2));
 
     }
 
