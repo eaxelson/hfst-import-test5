@@ -36,11 +36,12 @@ float func(float w) {
   return 2*w + 0.5;
 }
 
-void test_function( HfstTransducer& (HfstTransducer::*pt_function) (ImplementationType), 
-		    HfstTransducer &tr0,
-		    HfstTransducer &tr1,
-		    HfstTransducer &tr2,
-		    HfstTransducer &tr3 ) 
+void test_function
+(HfstTransducer& (HfstTransducer::*pt_function) (ImplementationType), 
+ HfstTransducer &tr0,
+ HfstTransducer &tr1,
+ HfstTransducer &tr2,
+ HfstTransducer &tr3 ) 
 {
   HfstTransducer test0 = (HfstTransducer(tr0).*pt_function)(tr0.get_type()); 
   HfstTransducer test1 = (HfstTransducer(tr1).*pt_function)(tr1.get_type());
@@ -123,11 +124,12 @@ void test_extract_strings( HfstTransducer &t )
 int main(int argc, char **argv) {
 
 #if 0
+
     HfstTransducer anon1(3,4,TROPICAL_OFST_TYPE);
     HfstTransducer anon2(4,1,TROPICAL_OFST_TYPE);
     anon1.disjunct(anon2);
     anon1.minimize();
-    //std::cerr << anon1 << "\n";
+    std::cerr << anon1 << "\n";
   }
 
   {
