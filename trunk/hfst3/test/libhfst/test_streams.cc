@@ -1,6 +1,6 @@
 /*
-   Test file for HfstTransducer constructors, destructor, operator=
-   and member functions set_name, get_name and get_type.
+   Test file for HfstInputStream, HfstOutputStream and functions that
+   write or read AT&T format.
 */
 
 #include "HfstTransducer.h"
@@ -39,8 +39,23 @@ int main(int argc, char **argv)
 	  assert(transducers_read == 4);
 	}
 
+      /* To AT&T format. */
+      verbose_print("Writing in AT&T format", types[i]);
+      
+      FILE * ofile = fopen("transducer2.att", "wb");
+
+      HfstTransducer t1("foo", "bar", types[i]);
+      HfstTransducer t2("baz", "@_EPSILON_SYMBOL_@", types[i]);
+      t2.concatenate(t1);
+      t2.minimize();
+      t2.write_in_att_format(ofile, true);
+      fclose(ofile);
+      assert(system("diff transducer2.att transducer.att") == 0);
+      remove("transducer2.att");
+
+
       /* From HfstInputStream. */      
-      verbose_print("Construction from HfstInputStream", types[i]);
+      verbose_print("Writing to HfstOutputStream", types[i]);
 
       HfstTransducer tr1("foo", types[i]);
       HfstTransducer tr2("bar", "foo", types[i]);
@@ -53,6 +68,8 @@ int main(int argc, char **argv)
       out << tr3;
       out << tr4;
       out.close();
+
+      verbose_print("Construction from HfstInputStream", types[i]);
 
       HfstInputStream in("testfile.hfst");
       std::vector<HfstTransducer> transducers;
