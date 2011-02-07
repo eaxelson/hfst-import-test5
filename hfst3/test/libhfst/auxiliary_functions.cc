@@ -1,6 +1,7 @@
 const bool VERBOSE=true;
 
-void verbose_print(const char *msg, hfst::ImplementationType type) {
+void verbose_print(const char *msg, 
+		   hfst::ImplementationType type=hfst::ERROR_TYPE) {
   if (VERBOSE) {
     fprintf(stderr, "Testing:\t%s", msg);
     fprintf(stderr, " for type ");
@@ -19,7 +20,7 @@ void verbose_print(const char *msg, hfst::ImplementationType type) {
 	fprintf(stderr, "FOMA_TYPE");
 	break;
       default:
-	fprintf(stderr, "(type not known)");
+	fprintf(stderr, "(type undefined)");
 	break;
       }
     fprintf(stderr, "...\n");
