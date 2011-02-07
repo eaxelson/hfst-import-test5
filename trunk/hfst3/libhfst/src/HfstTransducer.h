@@ -741,7 +741,7 @@ TODO...
                    ssize_t limit = -1) const;
 
     //! @brief Lookdown a single string \a s and store a maximum of 
-    //! \a limit results to \a results.
+    //! \a limit results to \a results (not implemented).
     //!
     //! Traverse all paths on logical second level of the transducer to produce
     //! all possible inputs on the first.
@@ -756,7 +756,8 @@ TODO...
     void lookdown(HfstLookupPaths& results, const HfstLookupPath& s,
                   ssize_t limit = -1) const;
 
-    //! @brief Lookdown a single string minding flag diacritics properly.
+    //! @brief Lookdown a single string minding flag diacritics properly
+    //! (not implemented).
     //! 
     //! This is a version of lookdown that handles flag diacritics as epsilons
     //! and validates the sequences prior to outputting.
@@ -768,7 +769,8 @@ TODO...
     //! @brief Whether lookup of path \a s will have infinite results.
     bool is_lookup_infinitely_ambiguous(const HfstLookupPath& s) const;
 
-    //! @brief Whether lookdown of path \a s will have infinite results.
+    //! @brief Whether lookdown of path \a s will have infinite results
+    //! (not implemented).
     bool is_lookdown_infinitely_ambiguous(const HfstLookupPath& s) const;
 
 

@@ -339,7 +339,9 @@ namespace hfst { namespace implementations {
 
     fsm * FomaTransducer::define_transducer(const std::string &symbol)
   {     
-    return fsm_symbol(strdup(symbol.c_str()));
+    fsm * retval = fsm_symbol(strdup(symbol.c_str()));
+    fsm_count(retval);
+    return retval;
   }
 
     fsm * FomaTransducer::define_transducer(const std::string &isymbol, const std::string &osymbol)
@@ -912,7 +914,20 @@ namespace hfst { namespace implementations {
     }
     /* Properties */
     io_gets(infile, buf);
-    sscanf(buf, "%i %i %i %i %i %lld %i %i %i %i %i %i %s", &net->arity, &net->arccount, &net->statecount, &net->linecount, &net->finalcount, &net->pathcount, &net->is_deterministic, &net->is_pruned, &net->is_minimized, &net->is_epsilon_free, &net->is_loop_free, &net->is_completed, buf);
+    sscanf(buf, "%i %i %i %i %i %lld %i %i %i %i %i %i %s", 
+	   &net->arity, 
+	   &net->arccount, 
+	   &net->statecount, 
+	   &net->linecount, 
+	   &net->finalcount, 
+	   &net->pathcount, 
+	   &net->is_deterministic, 
+	   &net->is_pruned, 
+	   &net->is_minimized, 
+	   &net->is_epsilon_free, 
+	   &net->is_loop_free, 
+	   &net->is_completed, 
+	   buf);
     strcpy(net->name, buf);
     //*net_name = strdup(buf);
     io_gets(infile, buf);
@@ -946,7 +961,8 @@ namespace hfst { namespace implementations {
 
         /* scanf is just too slow here */
 
-        //items = sscanf(buf, "%i %i %i %i %i",&lineint[0], &lineint[1], &lineint[2], &lineint[3], &lineint[4]);
+        //items = sscanf(buf, "%i %i %i %i %i",&lineint[0], 
+	//&lineint[1], &lineint[2], &lineint[3], &lineint[4]);
 
         items = explode_line(buf, &lineint[0]);
 
@@ -1059,7 +1075,20 @@ static inline int explode_line (char *buf, int *values) {
 
     /* Properties */
     fprintf(outfile, "%s","##props##\n");
-    fprintf(outfile, "%i %i %i %i %i %lld %i %i %i %i %i %i %s\n",net->arity, net->arccount, net->statecount, net->linecount, net->finalcount, net->pathcount, net->is_deterministic, net->is_pruned, net->is_minimized, net->is_epsilon_free, net->is_loop_free, net->is_completed, net->name);
+    fprintf(outfile, "%i %i %i %i %i %lld %i %i %i %i %i %i %s\n",
+	    net->arity, 
+	    net->arccount, 
+	    net->statecount, 
+	    net->linecount, 
+	    net->finalcount, 
+	    net->pathcount, 
+	    net->is_deterministic, 
+	    net->is_pruned, 
+	    net->is_minimized, 
+	    net->is_epsilon_free, 
+	    net->is_loop_free, 
+	    net->is_completed, 
+	    net->name);
     
     /* Sigma */
     fprintf(outfile, "%s","##sigma##\n");
