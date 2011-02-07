@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 LDADD = ../../libhfst/src/libhfst.la
-AM_CPPFLAGS = -I../../libhfst/src/ -I. -pg
+AM_CPPFLAGS = -I../../libhfst/src/ -I. -g
 AM_CXXFLAGS = -Wno-deprecated
 
 # programs to build before unit etc. testing

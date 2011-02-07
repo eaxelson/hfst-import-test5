@@ -1,7 +1,7 @@
 
 /** \page HfstWithSFSTOpenFstAndFoma.html Using HFST with SFST, OpenFst and foma
 
-A binary HfstTransducer consists of an HFST header (more on HFST headers in the
+A binary HfstTransducer consists of an HFST header (more on HFST headers on the
 <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstTransducerHeader">
 wiki pages</a>) and the transducer of the backend implementation. 
 If you want to write backend transducers as such, you can specify it with 
@@ -47,8 +47,8 @@ read from standard in with gz tools (foma tools do not write to or read
 from standard streams). So we choose to write, and accordingly read, 
 foma transducers unzipped when writing or reading binary HfstTransducers 
 of FOMA_TYPE. As a result, when we write an HfstTransducer of FOMA_TYPE
-in its plain backend format, the user must gzip it themselves before it 
-can be used by foma tools. Similarily, a foma transducer must be gunzipped 
+in its plain backend format, the user must zip it themselves before it 
+can be used by foma tools. Similarily, a foma transducer must be unzipped 
 before it can be read by HFST tools.
 
 Suppose we have written a FOMA_TYPE HfstTransducer and want to use it with
@@ -187,7 +187,7 @@ HfstTransducer tr("a", "b", SFST_TYPE);
 
       an hfst::exceptions::ImplementationTypeNotAvailableException is thrown.
 
-      The command make will compile all the API and commandline tools and install
+      The command make will compile all the API and command line tools and install
       will install them to /usr/local. If you would rather install in eg. your home directory, 
       you can tell ./configure:
 
@@ -196,7 +196,7 @@ HfstTransducer tr("a", "b", SFST_TYPE);
 \endverbatim
 
       <!-- If you want to compile or install just the API library without the
-      commandline tools -->
+      command line tools -->
       
       */
 
@@ -859,7 +859,7 @@ and in AT&T format to file "testfile.att":
 HFST - The Helsinki Finite-State Transducer technology is intended for creating and 
 manipulating weighted or unweighted synchronic transducers implementing regular relations.
 UTF-8 is chosen as the character encoding used in the HFST software.
-Currently HFST has been implemented using the
+Currently, HFST has been implemented using the
 <a href="http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html">SFST</a>, 
 <a href="http:://www.openfst.org">OpenFst</a> and 
 <a href="http://foma.sourceforge.net/">foma</a> software libraries.
@@ -915,7 +915,7 @@ The examples given in this documentation use
 \section download_hfst Download
 
    - <a href="http://sourceforge.net/projects/hfst/files/hfst">Download</a> and 
-   <a href="InstallHfst.html">install</a> the HFST interface and commandline tools
+   <a href="InstallHfst.html">install</a> the HFST interface and command line tools
 
 
 \section links Links
