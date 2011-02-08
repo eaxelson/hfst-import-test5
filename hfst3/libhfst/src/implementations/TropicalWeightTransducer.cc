@@ -2113,18 +2113,22 @@ namespace hfst { namespace implementations
       if ((!filter_fd || fd_state_stack->back().get_table().get_operation(arc.ilabel)==NULL))
       {
         std::string str = t->InputSymbols()->Find(arc.ilabel);
-        if(lpos+str.length() >= lbuffer.size())
-          lbuffer.resize(lbuffer.size()*2, 0);
-        strcpy(&lbuffer[lpos], str.c_str());
-        lp += str.length();
+	if(str.compare("@_EPSILON_SYMBOL_@") != 0) {
+	  if(lpos+str.length() >= lbuffer.size())
+	    lbuffer.resize(lbuffer.size()*2, 0);
+	  strcpy(&lbuffer[lpos], str.c_str());
+	  lp += str.length();
+	}
       }
       if ( (!filter_fd || fd_state_stack->back().get_table().get_operation(arc.olabel)==NULL))
       {
         std::string str = t->InputSymbols()->Find(arc.olabel);
-        if(upos+str.length() > ubuffer.size())
-          ubuffer.resize(ubuffer.size()*2, 0);
-        strcpy(&ubuffer[upos], str.c_str());
-        up += str.length();
+	if(str.compare("@_EPSILON_SYMBOL_@") != 0) {
+	  if(upos+str.length() > ubuffer.size())
+	    ubuffer.resize(ubuffer.size()*2, 0);
+	  strcpy(&ubuffer[upos], str.c_str());
+	  up += str.length();
+	}
       }
       
       /* Handle spv here. Special symbols (flags, epsilons) are always inserted. */
