@@ -305,7 +305,12 @@ namespace hfst { namespace implementations {
     Transducer * t = NULL;
     try 
       {
+	// DEBUGGING
+	assert (stream_get() == 'a');
+	stream_unget('a');
+
 	Transducer * t = new Transducer(input_file,true);
+
 	//tt.alphabet.clear();
 	//t = &tt.copy();
 	if (not is_minimal) {
@@ -317,6 +322,7 @@ namespace hfst { namespace implementations {
     catch (const char * p)
       {
 	delete t;
+	fprintf(stderr, "caught message: \"%s\"\n", p);
 	throw TransducerHasWrongTypeException();
       }
     return NULL;

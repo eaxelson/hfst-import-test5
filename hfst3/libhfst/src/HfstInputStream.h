@@ -83,46 +83,67 @@ For documentation on the HFST binary transducer format, see
       hfst::implementations::HfstOlInputStream * hfst_ol;
     };
 
-    StreamImplementation implementation; // the backend inplementation
-    ImplementationType type;             // implementation type
-    std::string name;                    // name of next transducer, given in the hfst header
-    unsigned int bytes_to_skip;          // how many bytes have been already read by the function
-                                         // processing the hfst header
-    std::string filename;                // the name of the file, if stdin, name is ""
-    bool has_hfst_header;                // whether the current transducer has an hfst header
+    /* The backend implementation */
+    StreamImplementation implementation; 
+    /* Implementation type */
+    ImplementationType type;             
+    /* Name of next transducer, given in the hfst header */
+    std::string name;                    
+    /* How many bytes have been already read by the function 
+       when processing the hfst header */
+    unsigned int bytes_to_skip;          
+    /* The name of the file, if stdin, name is "" */
+    std::string filename;                
+    /* Whether the current transducer has an hfst header */
+    bool has_hfst_header;                
 
     /* A special case where an OpenFst transducer has no symbol tables but an
        SFST alphabet is appended at the end. Should not occur very often, but
-       possible when converting old transducers into version 3.0. transducers.. */
+       possible when converting old transducers into version 3.0. transducers */
     bool hfst_version_2_weighted_transducer;
  
-    /* the stream that the reading operations use
-       this stream is used when reading the first transducer, when the type of the transducer is not known
-       and thus there is no backend implementation whose reading functions could be used
-       if input_stream==NULL, the backend implementation is used */
+    /* The stream that the reading operations use when reading the first
+       transducer. Then the type of the transducer is not known so there 
+       is no backend implementation whose reading functions could be used.
+       If input_stream==NULL, the backend implementation is used */
     std::istream * input_stream;
 
-    /* Basic stream operators, work on input_stream (if not NULL) or on the stream implementation. */
-    char stream_get(); // extract one character from the stream
-    void stream_unget(char c); // return character c to the stream
-    bool stream_eof(); // whether the stream is at end
-    std::string stream_getstring(); // get a string from the stream
-    char stream_peek();     // return the next character in the stream without extracting it
+    /* Basic stream operators, work on input_stream (if not NULL) or on 
+       the stream implementation. */
+
+    /* Extract one character from the stream */
+    char stream_get(); 
+    /* Return character c to the stream */
+    void stream_unget(char c); 
+    /* Whether the stream is at end */
+    bool stream_eof(); 
+    /* Get a string from the stream */
+    std::string stream_getstring(); 
+    /* Return the next character in the stream without extracting it */
+    char stream_peek();  
     /* The stream implementation ignores n bytes. */
     void ignore(unsigned int n);
 
     /* The type of a transducer not supported directly by HFST version 3.0 
        but which can occur in conversion functions. */
     enum TransducerType { 
-      HFST_VERSION_2_WEIGHTED, /* See the above variable. */
-      HFST_VERSION_2_UNWEIGHTED_WITHOUT_ALPHABET, /* An SFST transducer with no alphabet,
-						     not supported. */
-      HFST_VERSION_2_UNWEIGHTED, /* Old header + ordinary SFST transducer. */               
-      OPENFST_, /* An OpenFst transducer, can cause problems if it does not have symbol tables. */
-      SFST_,  /* An SFST transducer. */
-      FOMA_, /* A foma transducer. */
-      MY_TRANSDUCER_LIBRARY_, /* Your transducer type */
-      ERROR_TYPE_ /* Transducer type not recognized. */
+      /* See the above variable. */
+      HFST_VERSION_2_WEIGHTED, 
+      /* An SFST transducer with no alphabet, not supported. */
+      HFST_VERSION_2_UNWEIGHTED_WITHOUT_ALPHABET,
+      /* Old header + ordinary SFST transducer. */                
+      HFST_VERSION_2_UNWEIGHTED,
+      /* An OpenFst transducer, can cause problems if it does not have 
+	 symbol tables. */ 
+      OPENFST_,
+      /* An SFST transducer. */ 
+      SFST_, 
+      /* A foma transducer. */ 
+      FOMA_, 
+      /* Your transducer type */
+      //MY_TRANSDUCER_LIBRARY_,
+      /* Transducer type not recognized. */ 
+      ERROR_TYPE_ 
     };
 
     /* Read a transducer from the stream. */
@@ -136,8 +157,10 @@ For documentation on the HFST binary transducer format, see
     bool read_library_header(int &bytes_read);
     int get_header_size(int &bytes_read);                        
     StringPairVector get_header_data(int header_size);                
-    void process_header_data(StringPairVector &header_data, bool warnings=false); 
-    bool set_implementation_specific_header_data(StringPairVector &data, unsigned int index);
+    void process_header_data
+      (StringPairVector &header_data, bool warnings=false); 
+    bool set_implementation_specific_header_data
+      (StringPairVector &data, unsigned int index);
 
 
     bool read_library_header_old(int &bytes_read);
@@ -145,10 +168,12 @@ For documentation on the HFST binary transducer format, see
 
   public:
 
-    /** \brief Create a stream to standard input for reading binary transducers. */
+    /** \brief Create a stream to standard input for reading binary 
+	transducers. */
     HfstInputStream(void);
 
-    /** \brief Open a stream to file \a filename for reading binary transducers. 
+    /** \brief Open a stream to file \a filename for reading binary 
+	transducers. 
 
 	@pre The file exists. Otherwise, an exception is thrown.
 	@throws hfst::exceptions::StreamNotReadableException */
