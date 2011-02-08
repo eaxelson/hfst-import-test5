@@ -4,16 +4,19 @@ AM_CPPFLAGS = -I../../libhfst/src/ -I. -g
 AM_CXXFLAGS = -Wno-deprecated
 
 # programs to build before unit etc. testing
-check_PROGRAMS=test test_constructors test_streams test_tokenizer
+check_PROGRAMS=test test_constructors test_streams test_tokenizer \
+test_transducer_functions
 
 # sources for programs
 test_SOURCES=test.cc 
 test_constructors_SOURCES=test_constructors.cc
 test_streams_SOURCES=test_streams.cc
 test_tokenizer_SOURCES=test_tokenizer.cc
+test_transducer_functions_SOURCES=test_transducer_functions.cc
 
 # programs to run for unit etc. testing
-TESTS=test test_constructors test_streams test_tokenizer
+TESTS=test test_constructors test_streams test_tokenizer \
+test_transducer_functions
 
 # files needed for test programs
 # EXTRA_DIST=test.att

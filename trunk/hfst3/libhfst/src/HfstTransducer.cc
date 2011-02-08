@@ -616,6 +616,7 @@ namespace hfst
       if (not is_implementation_type_available(type)) {
 	  throw hfst::exceptions::ImplementationTypeNotAvailableException();
       }
+
     in.read_transducer(*this); 
   }
 
