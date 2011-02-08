@@ -605,6 +605,7 @@ namespace hfst { namespace implementations {
 
   bool FomaTransducer::is_cyclic(fsm * t)
   {
+    fsm_topsort(t);
     return !(t->is_loop_free);
     //return (t->pathcount == PATHCOUNT_CYCLIC);
   }

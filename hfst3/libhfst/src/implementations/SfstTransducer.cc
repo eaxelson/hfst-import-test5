@@ -813,21 +813,45 @@ namespace hfst { namespace implementations {
   Transducer * SfstTransducer::insert_freely
   (Transducer * t, const StringPair &symbol_pair)
   {
+    std::string isymbol = symbol_pair.first;
+    std::string osymbol = symbol_pair.second;
+    if (isymbol.compare("@_EPSILON_SYMBOL_@") == 0)
+      isymbol = std::string("<>");
+    if (osymbol.compare("@_EPSILON_SYMBOL_@") == 0)
+      osymbol = std::string("<>");
+
     return &t->freely_insert
-      ( Label( t->alphabet.add_symbol(symbol_pair.first.c_str()),
-	       t->alphabet.add_symbol(symbol_pair.second.c_str()) ));
+      ( Label( t->alphabet.add_symbol(isymbol.c_str()),
+	       t->alphabet.add_symbol(osymbol.c_str()) ));
   }
 
   
   Transducer * SfstTransducer::substitute(Transducer * t,String old_symbol,String new_symbol)
-  { Transducer * retval = &t->replace_char(t->alphabet.add_symbol(old_symbol.c_str()),t->alphabet.add_symbol(new_symbol.c_str()));
+  {
+    std::string old_symbol_ = old_symbol;
+    std::string new_symbol_ = new_symbol;
+    if (old_symbol.compare("@_EPSILON_SYMBOL_@") == 0)
+      old_symbol_ = std::string("<>");
+    if (new_symbol.compare("@_EPSILON_SYMBOL_@") == 0)
+      new_symbol_ = std::string("<>");
+
+    Transducer * retval = &t->replace_char(t->alphabet.add_symbol(old_symbol_.c_str()),t->alphabet.add_symbol(new_symbol_.c_str()));
     retval->alphabet.copy(t->alphabet);
     return retval; }
 
   Transducer * SfstTransducer::substitute(Transducer *t, const StringPair &symbol_pair, Transducer *tr)
-  { Transducer * retval = &t->splice( Label(
-					t->alphabet.add_symbol(symbol_pair.first.c_str()),
-					t->alphabet.add_symbol(symbol_pair.second.c_str()) ), tr );
+  { 
+    std::string isymbol = symbol_pair.first;
+    std::string osymbol = symbol_pair.second;
+    if (isymbol.compare("@_EPSILON_SYMBOL_@") == 0)
+      isymbol = std::string("<>");
+    if (osymbol.compare("@_EPSILON_SYMBOL_@") == 0)
+      osymbol = std::string("<>");
+
+    Transducer * retval 
+      = &t->splice( Label(
+			  t->alphabet.add_symbol(isymbol.c_str()),
+			  t->alphabet.add_symbol(osymbol.c_str()) ), tr );
     retval->alphabet.copy(t->alphabet);
     return retval;
   }
@@ -914,7 +938,10 @@ namespace hfst { namespace implementations {
     SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
     for ( SFST::Alphabet::CharMap::const_iterator it = cm.begin();
 	  it != cm.end(); it++ ) {
-      s.insert( std::string(it->second) );
+      if (strcmp(it->second, "<>") == 0)
+	s.insert( std::string("@_EPSILON_SYMBOL_@"));
+      else
+	s.insert( std::string(it->second) );
     }
     return s;
   }
@@ -939,9 +966,16 @@ namespace hfst { namespace implementations {
 	  exit(1);
 	}
 
-	s.insert(StringPair(std::string(isymbol),
-			    std::string(osymbol)
-			    ));
+	std::string istring(isymbol);
+	std::string ostring(osymbol);
+	if (istring.compare("<>") == 0)
+	  istring = std::string("<>");
+	if (ostring.compare("<>") == 0)
+	  ostring = std::string("<>");
+	
+	  s.insert(StringPair(istring,
+			      ostring
+			      ));
       }
     return s;
   }

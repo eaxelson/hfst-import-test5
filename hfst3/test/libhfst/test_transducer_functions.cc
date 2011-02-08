@@ -34,6 +34,8 @@
       subtract 
    are tested in command line tool tests
 
+   TODO: What about 'get_alphabet etc'?
+
 */
 
 #include "HfstTransducer.h"
@@ -176,22 +178,36 @@ int main(int argc, char **argv)
 	      }
 	  }
 	
+	/* More tests... */
       }
 
 
-#ifdef TESTS_IMPLEMENTED
-      /* Function insert_freely. */
+      /* Functions insert_freely. */
       {
-	verbose_print("function ...", types[i]);
+	verbose_print("functions insert_freely", types[i]);
+
+	HfstTransducer t1("a", "b", types[i]);
+	t1.insert_freely(StringPair("c", "d"));
+
+	HfstTransducer t2("a", "b", types[i]);
+	HfstTransducer tr("c", "d", types[i]);
+	t2.insert_freely(tr);
+
+	assert(t1.compare(t2));
       }
 
 
       /* Function is_cyclic. */
       {
-	verbose_print("function ...", types[i]);
+	verbose_print("function is_cyclic", types[i]);
+
+	HfstTransducer t1("a", "b", types[i]);
+	assert(not t1.is_cyclic());
+	t1.repeat_star();
+	assert(t1.is_cyclic());
       }
 
-
+#ifdef TESTS_IMPLEMENTED
       /* Functions is_lookup_infinitely_ambiguous, lookup and lookup_fd. */
       {
 	verbose_print("function ...", types[i]);
