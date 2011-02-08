@@ -77,6 +77,7 @@ int main(int argc, char **argv)
 
       /* Function convert. */
       {
+	/*
 	verbose_print("function convert", types[i]);
 
 	HfstTransducer t1("foo", "bar", types[i]);
@@ -84,6 +85,7 @@ int main(int argc, char **argv)
 	  {
 	    t1.convert(types[(i+j)%TYPES_SIZE]);
 	  }
+	*/
       }
 
 
