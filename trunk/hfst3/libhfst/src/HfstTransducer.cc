@@ -2569,6 +2569,9 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
   if (&another == this)
     { return *this; }
   
+  if (this->type != another.type)
+    throw hfst::exceptions::TransducerTypeMismatchException();
+
   // set some features
   anonymous = another.anonymous;
   is_trie = another.is_trie;
