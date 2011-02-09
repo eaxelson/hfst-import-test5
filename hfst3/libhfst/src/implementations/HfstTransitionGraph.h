@@ -781,6 +781,7 @@ namespace hfst {
 	  {
 	    SP = sp;
 	    SPS = sps;
+	    substitute_symbol = false;
 	    substitute_symbol_pair = true;
 	  }
 
@@ -790,6 +791,8 @@ namespace hfst {
 				     StringPairSet &sps))
 	  {
 	    func = func_;
+	    substitute_symbol = false;
+	    substitute_symbol_pair = false;
 	    substitute_using_function = true;
 	  }
 
@@ -801,6 +804,9 @@ namespace hfst {
 	      {
 		unknown_set.insert(*it);
 	      }
+	    substitute_symbol = false;
+	    substitute_symbol_pair = false;
+	    substitute_using_function = false;
 	    substitute_expand=true;
 	  }
 
@@ -826,6 +832,9 @@ namespace hfst {
 		}
 		
 		if (substitution_made) {
+		  //fprintf(stderr, "substituting %s:%s with %s:%s\n",
+		  //	  sp.first.c_str(), sp.second.c_str(), 
+		  //	  isymbol.c_str(), osymbol.c_str());
 		  sps.insert(StringPair(isymbol, osymbol));
 		  return true;
 		}

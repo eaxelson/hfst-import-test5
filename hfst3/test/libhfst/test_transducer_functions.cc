@@ -43,6 +43,9 @@
 
 using namespace hfst;
 
+using hfst::implementations::HfstBasicTransition;
+using hfst::implementations::HfstBasicTransducer;
+
 typedef std::vector<std::string> StringVector;
 
 bool compare_string_vectors(const StringVector &v1, const StringVector &v2)
@@ -82,6 +85,20 @@ bool do_hfst_lookup_paths_contain(const HfstLookupPaths &results,
       weight < (path_weight + 0.01))
     return true;
   return false;  
+}
+
+float modify_weights(float f)
+{
+  return f/2;
+}
+
+bool modify_transitions(const StringPair &sp, StringPairSet &sps)
+{
+  if (sp.first.compare(sp.second) == 0) {
+    sps.insert(StringPair("<IDENTITY>", "<IDENTITY>"));
+    return true;
+  }
+  return false;
 }
 
 int main(int argc, char **argv) 
@@ -273,6 +290,8 @@ int main(int argc, char **argv)
 	assert(not animals_ol.is_lookup_infinitely_ambiguous
 	       (lookup_hippopotamus));
 
+	// todo: more is_lookup_infinitely_ambiguous tests...
+
 	/* perform lookups */
 	animals_ol.lookup(results_cat, lookup_cat, limit);
 	animals_ol.lookup(results_dog, lookup_dog, limit);
@@ -386,30 +405,144 @@ int main(int argc, char **argv)
       }
 
 
-#ifdef TESTS_IMPLEMENTED
       /* Function push_weights. */
       {
-	verbose_print("function ...", types[i]);
+	if (types[i] == TROPICAL_OFST_TYPE)
+	  {
+	    verbose_print("function push_weights", types[i]);
+
+	    /* Create an HFST basic transducer [a:b] with transition 
+	       weight 0.3 and final weight 0.5. */
+	    HfstBasicTransducer t;
+	    t.add_state(1);
+	    t.add_transition(0, HfstBasicTransition(1, "a", "b", 0.3));
+	    t.set_final_weight(1, 0.5);
+	    
+	    /* Convert to tropical OpenFst format and push weights 
+	       toward final and initial states. */
+	    HfstTransducer T_final(t, TROPICAL_OFST_TYPE);
+	    T_final.push_weights(TO_FINAL_STATE);
+	    HfstTransducer T_initial(t, TROPICAL_OFST_TYPE);
+	    T_initial.push_weights(TO_INITIAL_STATE);
+	    
+	    /* Convert back to HFST basic transducer. */
+	    HfstBasicTransducer t_final(T_final);
+	    HfstBasicTransducer t_initial(T_initial);
+	    
+	    /* Test the final weight. */
+	    try {
+	      /* Rounding can affect the precision. */  
+	      assert(0.79 < t_final.get_final_weight(1) &&
+		     t_final.get_final_weight(1) < 0.81);
+	    } 
+	    /* If the state does not exist or is not final */
+	    catch (hfst::exceptions::HfstArgumentException e) {
+	      assert(false);
+	    }
+
+	    /* Test the transition weight. */
+	    try {
+	      HfstBasicTransducer::HfstTransitionSet transitions = t_initial[0];
+	      assert(transitions.size() == 1);
+	      float weight = transitions.begin()->get_weight();
+	      /* Rounding can affect the precision. */  
+	      assert(0.79 < weight &&
+		     weight < 0.81);
+	    }
+	    /* If the state does not exist or is not final */
+	    catch (hfst::exceptions::HfstArgumentException e) {
+	      assert(false);
+	    }
+	  }
+	
       }
 
 
-      /* Function set_final_weights. */
+      /* Functions set_final_weights and transform_weights. */
       {
-	verbose_print("function ...", types[i]);
+	if (types[i] == TROPICAL_OFST_TYPE ||
+	    types[i] == LOG_OFST_TYPE)
+	  {
+	    verbose_print("functions set_final_weights and "
+			  "transform_weights", types[i]);
+	    
+	    /* Create an HFST basic transducer [a:b] with transition 
+	       weight 0.3 and final weight 0.5. */
+	    HfstBasicTransducer t;
+	    t.add_state(1);
+	    t.add_transition(0, HfstBasicTransition(1, "a", "b", 0.3));
+	    t.set_final_weight(1, 0.5);
+
+	    /* Modify weights. */
+	    HfstTransducer T(t, types[i]);
+	    T.set_final_weights(0.2);
+	    T.transform_weights(&modify_weights);
+	    T.push_weights(TO_FINAL_STATE);
+
+	    /* Convert back to HFST basic transducer and test the weight. */
+	    HfstBasicTransducer tc(T);	    
+	    try {	    
+	      assert(0.24 < tc.get_final_weight(1) &&
+		     tc.get_final_weight(1) < 0.26);
+	    }
+	    /* If the state does not exist or is not final */
+	    catch (hfst::exceptions::HfstArgumentException e) {
+	      assert(false);
+	    }
+
+	  }
       }
 
 
       /* Functions substitute. */
       {
-	verbose_print("function ...", types[i]);
-      }
+	if (types[i] != TROPICAL_OFST_TYPE &&
+	    types[i] != LOG_OFST_TYPE) {
+	verbose_print("functions substitute", types[i]);
 
+	HfstTokenizer tok;
+	tok.add_multichar_symbol("<eps>");
+	HfstTransducer t("cat", "cats", tok, types[i]);
 
-      /* Function transform_weights. */
-      {
-	verbose_print("function ...", types[i]);
+	/* String with String */
+	HfstTransducer t1(t);
+	t1.substitute("c", "C", true, false);
+	t1.substitute("t", "T", false, true);
+	t1.substitute("@_EPSILON_SYMBOL_@", "<eps>");
+	t1.substitute("a", "A");
+	HfstTransducer t1_("CAt<eps>", "cATs", tok, types[i]);
+	assert(t1.compare(t1_));
+
+	/* StringPair with StringPair */
+	HfstTransducer t2(t);
+	t2.substitute(StringPair("c","c"), StringPair("C","c"));
+	t2.substitute(StringPair("C","c"), StringPair("h","H"));
+	HfstTransducer t2_("hat", "Hats", tok, types[i]);
+
+	/* StringPair with StringPairSet */
+	HfstTransducer t3(t);
+	StringPairSet sps;
+	sps.insert(StringPair("c","c"));
+	sps.insert(StringPair("C","C"));
+	sps.insert(StringPair("h","h"));
+	sps.insert(StringPair("H","H"));
+	t3.substitute(StringPair("c","c"), sps); // TROPICAL_OFST_TYPE: SEGFAULT
+	HfstTransducer t3_("cat", "cats", tok, types[i]);
+	HfstTransducer t3_1("Cat", "Cats", tok, types[i]);
+	HfstTransducer t3_2("hat", "hats", tok, types[i]);
+	HfstTransducer t3_3("Hat", "Hats", tok, types[i]);
+	t3_.disjunct(t3_1);
+	t3_.disjunct(t3_2);
+	t3_.disjunct(t3_3);
+	t3_.minimize();
+
+	assert(t3.compare(t3_));
+
+	/* StringPair with HfstTransducer */
+
+	/* Substitute with function */
+	}
       }
-#endif // TESTS_IMPLEMENTED
 
 
     }
