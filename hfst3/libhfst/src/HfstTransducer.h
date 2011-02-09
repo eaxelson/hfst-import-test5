@@ -728,6 +728,8 @@ TODO...
     //! @param s  string to look up
     //! @param limit  number of strings to extract. -1 tries to extract all and
     //!             may get stuck if infinitely ambiguous
+    //! 
+    //! @see HfstTokenizer::lookup_tokenize
     void lookup(HfstLookupPaths& results, const HfstLookupPath& s,
                 ssize_t limit = -1) const;
 

@@ -79,10 +79,16 @@ namespace hfst
   //! Used by functions in namespace \link hfst::rules rules\endlink
   typedef std::vector <HfstTransducerPair> HfstTransducerPairVector;
 
+  //! @brief A vector of strings
+  //!
+  //! Used by typedef HfstLookupPath.
   typedef std::vector<std::string> HfstArcPath;
   //! @brief A path of one level of arcs with collected weight,
   //!
   //! Used as the source and result data type for lookups and downs.
+  //!
+  //! @see HfstTokenizer::lookup_tokenize
+  //! @see HfstTransducer::lookup
   typedef std::pair<HfstArcPath,float> HfstLookupPath;
   //! @brief A set of simple paths.
   //!

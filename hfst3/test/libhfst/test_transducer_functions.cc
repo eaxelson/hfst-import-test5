@@ -43,6 +43,47 @@
 
 using namespace hfst;
 
+typedef std::vector<std::string> StringVector;
+
+bool compare_string_vectors(const StringVector &v1, const StringVector &v2)
+{
+  if (v1.size() != v2.size())
+    return false;
+  for (unsigned int i=0; i<v1.size(); i++)
+    {
+      if (v1[i].compare(v2[i]) != 0)
+	return false;
+    }
+  return true;
+}
+
+bool do_hfst_lookup_paths_contain(const HfstLookupPaths &results,
+				  const HfstLookupPath &expected_path,
+				  float path_weight=0,
+				  bool test_path_weight=false)
+{
+  bool found=false;
+  float weight=0;
+  for (HfstLookupPaths::const_iterator it = results.begin();
+       it != results.end(); it++)
+    {
+      if (compare_string_vectors(it->first, expected_path.first)) 
+	{
+	  found = true;
+	  weight = it->second;
+	}
+    }
+  if (found == false)
+    return false;
+  if (not test_path_weight)
+    return true;
+  
+  if (weight > (path_weight - 0.01) && 
+      weight < (path_weight + 0.01))
+    return true;
+  return false;  
+}
+
 int main(int argc, char **argv) 
 {
 
@@ -179,6 +220,143 @@ int main(int argc, char **argv)
 	  }
 	
 	/* More tests... */
+
+	
+	/* Functions is_lookup_infinitely_ambiguous, lookup and lookup_fd. */
+	verbose_print("functions is_lookup_infinitely_ambiguous "
+		      "and lookup(_fd)", types[i]);
+	
+	/* add an animal with two possible plural forms */
+	// if type is LOG_OFST_TYPE:
+	// FATAL: EncodeMapper: Weight-encoded arc has non-trivial weight
+	if (types[i] != LOG_OFST_TYPE)
+	  {
+	    HfstTransducer hippopotamus1("hippopotamus", "hippopotami", 
+					 tok, types[i]);
+	    hippopotamus1.set_final_weights(1.2);
+	    HfstTransducer hippopotamus2("hippopotamus", "hippopotamuses", 
+					 tok, types[i]);
+	    hippopotamus2.set_final_weights(1.4);
+	    animals.disjunct(hippopotamus1);
+	    animals.disjunct(hippopotamus2);
+	    animals.minimize();
+	  }
+
+	/* convert to optimized lookup format */
+	HfstTransducer animals_ol(animals);
+	if (types[i] == TROPICAL_OFST_TYPE ||
+	    types[i] == LOG_OFST_TYPE) {
+	  animals_ol.convert(HFST_OLW_TYPE); }
+	else {
+	  animals_ol.convert(HFST_OL_TYPE); }
+
+	/* no limit to the number of lookup results */
+	ssize_t limit=-1;
+
+	/* strings to lookup */
+	HfstLookupPath lookup_cat = tok.lookup_tokenize("cat");
+	HfstLookupPath lookup_dog = tok.lookup_tokenize("dog");
+	HfstLookupPath lookup_mouse = tok.lookup_tokenize("mouse");
+	HfstLookupPath lookup_hippopotamus 
+	  = tok.lookup_tokenize("hippopotamus");
+
+	/* where results of lookup are stored */
+	HfstLookupPaths results_cat;
+	HfstLookupPaths results_dog;
+	HfstLookupPaths results_mouse;
+	HfstLookupPaths results_hippopotamus;
+
+	/* check that lookups are not infinitely ambiguous */
+	assert(not animals_ol.is_lookup_infinitely_ambiguous(lookup_cat));
+	assert(not animals_ol.is_lookup_infinitely_ambiguous(lookup_dog));
+	assert(not animals_ol.is_lookup_infinitely_ambiguous(lookup_mouse));
+	assert(not animals_ol.is_lookup_infinitely_ambiguous
+	       (lookup_hippopotamus));
+
+	/* perform lookups */
+	animals_ol.lookup(results_cat, lookup_cat, limit);
+	animals_ol.lookup(results_dog, lookup_dog, limit);
+	animals_ol.lookup(results_mouse, lookup_mouse, limit);
+	animals_ol.lookup(results_hippopotamus, lookup_hippopotamus, limit);
+
+	/* check that the number of results is correct */
+	assert(results_cat.size() == 1);
+	assert(results_dog.size() == 1);
+	assert(results_mouse.size() == 1);
+	if (types[i] != LOG_OFST_TYPE)
+	  assert(results_hippopotamus.size() == 2);
+
+	bool test_weight=false;
+	if (types[i] == TROPICAL_OFST_TYPE ||
+	    types[i] == LOG_OFST_TYPE) {
+	  test_weight=true; }
+
+	tok.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+
+	/* check that the results are correct */
+	HfstLookupPath expected_path = tok.lookup_tokenize("cats");
+	assert(do_hfst_lookup_paths_contain
+	       (results_cat, expected_path, 3, test_weight));
+
+	expected_path = tok.lookup_tokenize("dogs");
+	assert(do_hfst_lookup_paths_contain
+	       (results_dog, expected_path, 2.5, test_weight));
+
+	expected_path = tok.lookup_tokenize("mice@_EPSILON_SYMBOL_@");
+	assert(do_hfst_lookup_paths_contain
+		(results_mouse, expected_path, 1.7, test_weight));
+
+	expected_path = tok.lookup_tokenize("hippopotami@_EPSILON_SYMBOL_@");
+	if (types[i] != LOG_OFST_TYPE)
+	  assert(do_hfst_lookup_paths_contain
+		 (results_hippopotamus, expected_path, 1.2, test_weight));
+	
+	expected_path = tok.lookup_tokenize("hippopotamuses");
+	if (types[i] != LOG_OFST_TYPE)
+	  assert(do_hfst_lookup_paths_contain
+		 (results_hippopotamus, expected_path, 1.4, test_weight));
+
+
+	// if type is LOG_OFST_TYPE:
+	// FATAL: SingleShortestPath: Weight needs to have the path property
+	// and be right distributive: log
+	if (types[i] != LOG_OFST_TYPE)
+	  {	    
+
+	    /* Function n_best. */
+	    verbose_print("function n_best", types[i]);
+	    
+	    HfstTransducer animals1(animals);
+	    animals1.n_best(1);
+	    WeightedPaths<float>::Set results1;
+	    animals1.extract_strings(results1);
+	    assert(results1.size() == 1);
+	    
+	    HfstTransducer animals2(animals);
+	    animals2.n_best(2);
+	    WeightedPaths<float>::Set results2;
+	    animals2.extract_strings(results2);
+	    assert(results2.size() == 2);
+	    
+	    HfstTransducer animals3(animals);
+	    animals3.n_best(3);
+	    WeightedPaths<float>::Set results3;
+	    animals3.extract_strings(results3);
+	    assert(results3.size() == 3);
+	    
+	    HfstTransducer animals4(animals);
+	    animals4.n_best(4);
+	    WeightedPaths<float>::Set results4;
+	    animals4.extract_strings(results4);
+	    assert(results4.size() == 4);
+	    
+	    HfstTransducer animals5(animals);
+	    animals5.n_best(5);
+	    WeightedPaths<float>::Set results5;
+	    animals5.extract_strings(results5);
+	    assert(results5.size() == 5);
+	  }
+	
       }
 
 
@@ -207,19 +385,8 @@ int main(int argc, char **argv)
 	assert(t1.is_cyclic());
       }
 
+
 #ifdef TESTS_IMPLEMENTED
-      /* Functions is_lookup_infinitely_ambiguous, lookup and lookup_fd. */
-      {
-	verbose_print("function ...", types[i]);
-      }
-
-
-      /* Function n_best. */
-      {
-	verbose_print("function ...", types[i]);
-      }
-
-
       /* Function push_weights. */
       {
 	verbose_print("function ...", types[i]);

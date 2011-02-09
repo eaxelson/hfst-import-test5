@@ -137,6 +137,24 @@ StringPairVector HfstTokenizer::tokenize
   return spv;
 }
 
+HfstLookupPath HfstTokenizer::lookup_tokenize
+(const string& input_string) const
+{
+  HfstArcPath path;
+  const char* s = input_string.c_str();
+  while (*s)
+    {
+      int symbol_size = get_next_symbol_size(s);
+      std::string symbol(s,0,symbol_size);
+      s += symbol_size;
+      if (is_skip_symbol(symbol))
+	{ continue; }
+      path.push_back(string(symbol));
+    }
+  HfstLookupPath retval(path,0);
+  return retval;
+}
+
 StringPairVector HfstTokenizer::tokenize
 (const string& input_string,const string& output_string) const
 {
