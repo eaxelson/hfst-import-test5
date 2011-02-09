@@ -1652,11 +1652,14 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	    implementation.tropical_ofst = tmp;
 	    return *this;
 	  }
-	fst::StdVectorFst * tropical_ofst_temp =
-	  this->tropical_ofst_interface.substitute
-	  (implementation.tropical_ofst, old_symbol, new_symbol);
+	hfst::implementations::HfstBasicTransducer * net = 
+	  ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
+	  (implementation.tropical_ofst);
 	delete implementation.tropical_ofst;
-	implementation.tropical_ofst = tropical_ofst_temp;
+	net->substitute(old_symbol, new_symbol, input_side, output_side);
+	implementation.tropical_ofst = 
+	  ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(net);
+	delete net;
 	return *this;
       }
     if (this->type == LOG_OFST_TYPE)
@@ -1670,11 +1673,14 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	    implementation.log_ofst = tmp;
 	    return *this;
 	  }
-	hfst::implementations::LogFst * log_ofst_temp =
-	  this->log_ofst_interface.substitute
-	  (implementation.log_ofst, old_symbol, new_symbol);
+	hfst::implementations::HfstBasicTransducer * net = 
+	  ConversionFunctions::log_ofst_to_hfst_basic_transducer
+	  (implementation.log_ofst);
 	delete implementation.log_ofst;
-	implementation.log_ofst = log_ofst_temp;
+	net->substitute(old_symbol, new_symbol, input_side, output_side);
+	implementation.log_ofst = 
+	  ConversionFunctions::hfst_basic_transducer_to_log_ofst(net);
+	delete net;
 	return *this;
       }
 #endif
