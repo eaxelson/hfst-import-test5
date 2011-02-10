@@ -293,7 +293,8 @@ public:
     const SymbolTable& get_symbol_table() const
 	{ return symbol_table; }
     const std::string string_from_symbol(const SymbolNumber symbol) const
-	{ return symbol_table[symbol]; }
+    // represent epsilon as blank string
+	{ return (symbol == 0) ? "" : symbol_table[symbol]; }
     const hfst::FdTable<SymbolNumber>& get_fd_table() const
 	{ return fd_table; }
 };
