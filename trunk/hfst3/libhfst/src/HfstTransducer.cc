@@ -2562,6 +2562,14 @@ HfstTransducer::HfstTransducer(FILE * ifile,
 	  ConversionFunctions::hfst_basic_transducer_to_foma(&net);
 	break;
 #endif
+#if HAVE_HFSTOL
+      case HFST_OL_TYPE:
+	  implementation.hfst_ol = ConversionFunctions::hfst_basic_transducer_to_hfst_ol(&net, false);
+	  break;
+      case HFST_OLW_TYPE:
+	  implementation.hfst_ol = ConversionFunctions::hfst_basic_transducer_to_hfst_ol(&net, true);
+	  break;
+#endif
        /* Add here your implementation. */
 	//#if HAVE_MY_TRANSDUCER_LIBRARY
 	//case MY_TRANSDUCER_LIBRARY_TYPE:
