@@ -806,8 +806,7 @@ TODO...
 	In the case of a weighted transducer (#TROPICAL_OFST_TYPE or 
 	#LOG_OFST_TYPE), best paths are defined as paths with the lowest weight.
 	In the case of an unweighted transducer (#SFST_TYPE or #FOMA_TYPE), 
-	best paths are defined as paths with the smallest number of 
-	transitions, i.e. the shortest paths. 
+	the function returns random paths.
 
         This function is not implemented for #FOMA_TYPE or #SFST_TYPE.
 	If this function is called by an HfstTransducer of type #FOMA_TYPE 

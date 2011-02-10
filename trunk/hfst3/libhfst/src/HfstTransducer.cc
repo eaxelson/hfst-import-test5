@@ -1781,6 +1781,23 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 #if HAVE_OPENFST
     if (this->type == TROPICAL_OFST_TYPE)
       {
+	/* The implementation of TropicalWeightTransducer segfaults
+	   for some reason if the symbol pair is substituted with itself. */
+	if (new_symbol_pair_set.find
+	    (StringPair(old_symbol_pair.first, 
+			old_symbol_pair.second))
+	    != new_symbol_pair_set.end())
+	  {
+	    hfst::implementations::HfstBasicTransducer * net = 
+	      ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
+	      (implementation.tropical_ofst);
+	    delete(implementation.tropical_ofst);
+	    net->substitute(old_symbol_pair, new_symbol_pair_set);
+	    implementation.tropical_ofst = 
+	      ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(net);
+	    delete net;
+	    return *this;
+	  }
 	fst::StdVectorFst * tropical_ofst_temp =
 	  this->tropical_ofst_interface.substitute
 	  (implementation.tropical_ofst,old_symbol_pair, new_symbol_pair_set);
@@ -1790,6 +1807,23 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
       }
     if (this->type == LOG_OFST_TYPE)
       {
+	/* The implementation of LogWeightTransducer segfaults
+	   for some reason if the symbol pair is substituted with itself. */
+	if (new_symbol_pair_set.find
+	    (StringPair(old_symbol_pair.first, 
+			old_symbol_pair.second))
+	    != new_symbol_pair_set.end())
+	  {
+	    hfst::implementations::HfstBasicTransducer * net = 
+	      ConversionFunctions::log_ofst_to_hfst_basic_transducer
+	      (implementation.log_ofst);
+	    delete(implementation.log_ofst);
+	    net->substitute(old_symbol_pair, new_symbol_pair_set);
+	    implementation.log_ofst = 
+	      ConversionFunctions::hfst_basic_transducer_to_log_ofst(net);
+	    delete net;
+	    return *this;
+	  }
 	hfst::implementations::LogFst * log_ofst_temp =
 	  this->log_ofst_interface.substitute
 	  (implementation.log_ofst,old_symbol_pair, new_symbol_pair_set);

@@ -33,9 +33,6 @@
       reverse 
       subtract 
    are tested in command line tool tests
-
-   TODO: What about 'get_alphabet etc'?
-
 */
 
 #include "HfstTransducer.h"
@@ -48,6 +45,7 @@ using hfst::implementations::HfstBasicTransducer;
 
 typedef std::vector<std::string> StringVector;
 
+/* Used by function 'do_hfst_lookup_paths_contain'. */
 bool compare_string_vectors(const StringVector &v1, const StringVector &v2)
 {
   if (v1.size() != v2.size())
@@ -60,6 +58,9 @@ bool compare_string_vectors(const StringVector &v1, const StringVector &v2)
   return true;
 }
 
+/* Does \a results contain \a expected_path. \a test_path_weight defines
+   whether the weight of the path found in \a results must be equal to
+   \a path_weight (a deviation of +/- 0.01 is allowed). */
 bool do_hfst_lookup_paths_contain(const HfstLookupPaths &results,
 				  const HfstLookupPath &expected_path,
 				  float path_weight=0,
@@ -87,19 +88,79 @@ bool do_hfst_lookup_paths_contain(const HfstLookupPaths &results,
   return false;  
 }
 
+bool do_weighted_paths_contain(const WeightedPaths<float>::Set &paths,
+			       const std::string &istring,
+			       const std::string &ostring,
+			       float weight=0,
+			       bool test_path_weight=false)
+{
+  for (WeightedPaths<float>::Set::const_iterator it = paths.begin();
+       it != paths.end(); it++)
+    {
+      if (it->istring.compare(istring) == 0 &&
+	  it->ostring.compare(ostring) == 0)
+	{
+	  if (not test_path_weight)
+	    return true;
+	  if (it->weight > (weight - 0.01) && 
+	      it->weight < (weight + 0.01))
+	    return true;
+	}
+    }
+  return false;
+}
+
+void print_weighted_paths(const WeightedPaths<float>::Set &paths)
+{
+  for (WeightedPaths<float>::Set::const_iterator it = paths.begin();
+       it != paths.end(); it++)
+    {
+      fprintf(stderr, "%s:%s\t%f\n", 
+	      it->istring.c_str(), it->ostring.c_str(), it->weight);
+    }
+}
+
+void print_string_vector(const StringVector &sv)
+{
+  for (StringVector::const_iterator it = sv.begin();
+       it != sv.end(); it++)
+    {
+      fprintf(stderr, "%s", it->c_str());
+    }
+}
+
+void print_lookup_path(const HfstLookupPath &path)
+{
+  print_string_vector(path.first);
+  fprintf(stderr, "\t%f", path.second);
+}
+
+void print_lookup_paths(const HfstLookupPaths &paths)
+{
+  for (HfstLookupPaths::const_iterator it = paths.begin();
+       it != paths.end(); it++)
+    {
+      print_lookup_path(*it);
+      fprintf(stderr, "\n");
+    }
+}
+
+/* Used in testing function 'transform_weights'. */
 float modify_weights(float f)
 {
   return f/2;
 }
 
+/* Used in testing function 'substitute'. */
 bool modify_transitions(const StringPair &sp, StringPairSet &sps)
 {
   if (sp.first.compare(sp.second) == 0) {
-    sps.insert(StringPair("<IDENTITY>", "<IDENTITY>"));
+    sps.insert(StringPair("<ID>", "<ID>"));
     return true;
   }
   return false;
 }
+
 
 int main(int argc, char **argv) 
 {
@@ -110,6 +171,7 @@ int main(int argc, char **argv)
 				       LOG_OFST_TYPE, 
 				       FOMA_TYPE};
 
+  /* For all transducer implementation types, perform the following tests: */
   for (unsigned int i=0; i<TYPES_SIZE; i++)
     {
 
@@ -173,6 +235,8 @@ int main(int argc, char **argv)
 
 	HfstTransducer t1("foo", "bar", types[i]);
 	HfstTransducer t2("foo", "bar", types[i]);
+	/* Go through all implementation formats 
+	   and get back to the original one.*/
 	for (unsigned int j=0; j<=TYPES_SIZE; j++)
 	  {
 	    t1.convert(types[(i+j)%TYPES_SIZE]);
@@ -190,6 +254,7 @@ int main(int argc, char **argv)
 	using hfst::HfstTokenizer;
 	using hfst::WeightedPaths;
 
+	/* Create a transducer that contains animals. */
 	HfstTokenizer tok;
 	HfstTransducer cat("cat", "cats", tok, types[i]);
 	cat.set_final_weights(3);
@@ -203,6 +268,7 @@ int main(int argc, char **argv)
 	animals.disjunct(mouse);
 	animals.minimize();
 
+	/* What we expect to get from the animal transducer. */
 	StringPairSet expected_results;
 	expected_results.insert(StringPair("cat","cats"));
 	expected_results.insert(StringPair("dog","dogs"));
@@ -314,6 +380,7 @@ int main(int argc, char **argv)
 
 	/* check that the results are correct */
 	HfstLookupPath expected_path = tok.lookup_tokenize("cats");
+
 	assert(do_hfst_lookup_paths_contain
 	       (results_cat, expected_path, 3, test_weight));
 
@@ -345,35 +412,91 @@ int main(int argc, char **argv)
 	    /* Function n_best. */
 	    verbose_print("function n_best", types[i]);
 	    
+	    bool weighted=false;
+	    if (types[i] == TROPICAL_OFST_TYPE ||
+		types[i] == LOG_OFST_TYPE)
+	      weighted=true;
+
 	    HfstTransducer animals1(animals);
 	    animals1.n_best(1);
 	    WeightedPaths<float>::Set results1;
 	    animals1.extract_strings(results1);
 	    assert(results1.size() == 1);
+	    if (weighted) {
+	      assert(do_weighted_paths_contain
+		     (results1, "hippopotamus", "hippopotami", 1.2, true));
+	    }
 	    
 	    HfstTransducer animals2(animals);
 	    animals2.n_best(2);
 	    WeightedPaths<float>::Set results2;
 	    animals2.extract_strings(results2);
 	    assert(results2.size() == 2);
+	    if (weighted) {
+	      assert(do_weighted_paths_contain
+		     (results2, "hippopotamus", "hippopotami", 1.2, true)
+		     &&
+		     do_weighted_paths_contain
+		     (results2, "hippopotamus", "hippopotamuses", 1.4, true));
+	    }
 	    
 	    HfstTransducer animals3(animals);
 	    animals3.n_best(3);
 	    WeightedPaths<float>::Set results3;
 	    animals3.extract_strings(results3);
 	    assert(results3.size() == 3);
-	    
+	    if (weighted) {
+	      assert(do_weighted_paths_contain
+		     (results3, "hippopotamus", "hippopotami", 1.2, true)
+		     &&
+		     do_weighted_paths_contain
+		     (results3, "hippopotamus", "hippopotamuses", 1.4, true)
+		     &&
+		     do_weighted_paths_contain
+		     (results3, "mouse", "mice", 1.7, true));
+	    }	    
+
 	    HfstTransducer animals4(animals);
 	    animals4.n_best(4);
 	    WeightedPaths<float>::Set results4;
 	    animals4.extract_strings(results4);
 	    assert(results4.size() == 4);
-	    
+	    if (weighted) {
+	      assert(do_weighted_paths_contain
+		     (results4, "hippopotamus", "hippopotami", 1.2, true)
+		     &&
+		     do_weighted_paths_contain
+		     (results4, "hippopotamus", "hippopotamuses", 1.4, true)
+		     &&
+		     do_weighted_paths_contain
+		     (results4, "mouse", "mice", 1.7, true)
+		     &&
+		     do_weighted_paths_contain
+		     (results4, "dog", "dogs", 2.5, true));
+	    }	    	    
+
 	    HfstTransducer animals5(animals);
 	    animals5.n_best(5);
 	    WeightedPaths<float>::Set results5;
 	    animals5.extract_strings(results5);
 	    assert(results5.size() == 5);
+	    if (weighted) {
+	      assert(do_weighted_paths_contain
+		     (results5, "hippopotamus", "hippopotami", 1.2, true)
+		     &&
+		     do_weighted_paths_contain
+		     (results5, "hippopotamus", "hippopotamuses", 1.4, true)
+		     &&
+		     do_weighted_paths_contain
+		     (results5, "mouse", "mice", 1.7, true)
+		     &&
+		     do_weighted_paths_contain
+		     (results5, "dog", "dogs", 2.5, true)
+		     &&
+		     do_weighted_paths_contain
+		     (results5, "cat", "cats", 3.0, true));
+	    }	    	    
+
 	  }
 	
       }
@@ -496,8 +619,6 @@ int main(int argc, char **argv)
 
       /* Functions substitute. */
       {
-	if (types[i] != TROPICAL_OFST_TYPE &&
-	    types[i] != LOG_OFST_TYPE) {
 	verbose_print("functions substitute", types[i]);
 
 	HfstTokenizer tok;
@@ -510,14 +631,19 @@ int main(int argc, char **argv)
 	t1.substitute("t", "T", false, true);
 	t1.substitute("@_EPSILON_SYMBOL_@", "<eps>");
 	t1.substitute("a", "A");
+	t1.substitute("T", "T");      // special 
+	t1.substitute("foo", "bar");  // cases
 	HfstTransducer t1_("CAt<eps>", "cATs", tok, types[i]);
 	assert(t1.compare(t1_));
 
 	/* StringPair with StringPair */
 	HfstTransducer t2(t);
 	t2.substitute(StringPair("c","c"), StringPair("C","c"));
-	t2.substitute(StringPair("C","c"), StringPair("h","H"));
-	HfstTransducer t2_("hat", "Hats", tok, types[i]);
+	t2.substitute(StringPair("C","c"), StringPair("H","h"));
+	t2.substitute(StringPair("a","a"), StringPair("a","a"));      // special
+	t2.substitute(StringPair("foo","bar"), StringPair("f","b"));  // cases
+	HfstTransducer t2_("Hat", "hats", tok, types[i]);
+	assert(t2.compare(t2_));
 
 	/* StringPair with StringPairSet */
 	HfstTransducer t3(t);
@@ -526,7 +652,7 @@ int main(int argc, char **argv)
 	sps.insert(StringPair("C","C"));
 	sps.insert(StringPair("h","h"));
 	sps.insert(StringPair("H","H"));
-	t3.substitute(StringPair("c","c"), sps); // TROPICAL_OFST_TYPE: SEGFAULT
+	t3.substitute(StringPair("c","c"), sps);
 	HfstTransducer t3_("cat", "cats", tok, types[i]);
 	HfstTransducer t3_1("Cat", "Cats", tok, types[i]);
 	HfstTransducer t3_2("hat", "hats", tok, types[i]);
@@ -535,13 +661,21 @@ int main(int argc, char **argv)
 	t3_.disjunct(t3_2);
 	t3_.disjunct(t3_3);
 	t3_.minimize();
-
 	assert(t3.compare(t3_));
 
 	/* StringPair with HfstTransducer */
+	HfstTransducer t4(t);
+	HfstTransducer subs("ch", tok, types[i]);
+	t4.substitute(StringPair("c","c"), subs);
+	HfstTransducer t4_("chat", "chats", tok, types[i]);
+	assert(t4.compare(t4_));
 
 	/* Substitute with function */
-	}
+	HfstTransducer t5(t);
+	t5.substitute(&modify_transitions);
+	tok.add_multichar_symbol("<ID>");
+	HfstTransducer t5_("<ID><ID><ID>", "<ID><ID><ID>s", tok, types[i]);
+	assert(t5.compare(t5_));
       }
 
 
