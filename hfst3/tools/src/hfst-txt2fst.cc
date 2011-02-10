@@ -63,14 +63,14 @@ print_usage()
     fprintf(message_out, "Text format options:\n"
             "  -n, --number        If numbers are used instead of symbol names\n"
             "  -f, --format=FMT    Write result using FMT backend's format\n"
-            "  -e, --epsilon=EPS   Map EPS as zero-lenght string\n");
+            "  -e, --epsilon=EPS   Map EPS as epsilon\n");
     fprintf(message_out, "\n");
     fprintf(message_out, 
         "If OUTFILE or INFILE is missing or -,"
         "standard streams will be used.\n"
         "If FMT is not given, OpenFst's tropical format will be used. "
         "The possible values for FMT are sfst, openfst-tropical, openfst-log,\n"
-        "foma, optimized-lookup, optimized-lookup-weighted...\n"
+        "foma, optimized-lookup-unweighted, optimized-lookup-weighted...\n"
         "If EPS is not given, @0@ will be used\n\n"
         );
     fprintf(message_out, "\n");
