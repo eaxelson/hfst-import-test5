@@ -1520,12 +1520,10 @@ namespace hfst { namespace implementations
     return new StdVectorFst(dec);
   }
 
-  /* It is not certain whether the transition iterator goes through all the transitions that are added
-     during the substitution. In that case, this function should build a new transducer instead of
-     modifying the original one. */
-  StdVectorFst * TropicalWeightTransducer::substitute(StdVectorFst *t,
-						      StringPair old_symbol_pair,
-						      StringPairSet new_symbol_pair_set)
+  StdVectorFst * TropicalWeightTransducer::substitute
+    (StdVectorFst *t,
+     StringPair old_symbol_pair,
+     StringPairSet new_symbol_pair_set)
   {
     fst::StdVectorFst * tc = t->Copy();
     fst::SymbolTable * st = tc->InputSymbols()->Copy();
@@ -1534,7 +1532,8 @@ namespace hfst { namespace implementations
 	 not siter.Done(); siter.Next()) 
       {
 	StateId s = siter.Value();
-	for (fst::MutableArcIterator<StdVectorFst> aiter(tc,s); !aiter.Done(); aiter.Next())
+	for (fst::MutableArcIterator<StdVectorFst> aiter(tc,s); 
+	     !aiter.Done(); aiter.Next())
 	  {
 	    const StdArc &arc = aiter.Value();
 	    if ( strcmp( st->Find(arc.ilabel).c_str(), 
