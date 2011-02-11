@@ -41,6 +41,12 @@ namespace hfst { namespace implementations
   char TropicalWeightInputStream::stream_get() {
     return (char) input_stream.get(); }
 
+  short TropicalWeightInputStream::stream_get_short() {
+    short i;
+    input_stream.read((char*)&i,sizeof(i));
+    return i;
+  }
+
   void TropicalWeightInputStream::stream_unget(char c) {
     input_stream.putback(c); }
 

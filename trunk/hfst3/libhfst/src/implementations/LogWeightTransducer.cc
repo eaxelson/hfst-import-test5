@@ -39,6 +39,12 @@ namespace hfst { namespace implementations
   char LogWeightInputStream::stream_get() {
     return (char) input_stream.get(); }
 
+  short LogWeightInputStream::stream_get_short() {
+    short i;
+    input_stream.read((char*)&i,sizeof(i));
+    return i;
+  }
+
   void LogWeightInputStream::stream_unget(char c) {
     input_stream.putback(c); }
 

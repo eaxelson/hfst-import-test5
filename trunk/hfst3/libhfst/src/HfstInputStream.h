@@ -113,6 +113,13 @@ For documentation on the HFST binary transducer format, see
 
     /* Extract one character from the stream */
     char stream_get(); 
+
+    /* Extract one character from the stream and store it in @a c. */
+    char &stream_get(char &c);
+
+    /* Extract one short from the stream and store it in @a i. */
+    short &stream_get(short &i);
+
     /* Return character c to the stream */
     void stream_unget(char c); 
     /* Whether the stream is at end */

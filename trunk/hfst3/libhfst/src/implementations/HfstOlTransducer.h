@@ -53,6 +53,7 @@ namespace hfst { namespace implementations
     bool is_fst(void) const;
 
     char stream_get();
+    short stream_get_short();
     void stream_unget(char c);
     void ignore(unsigned int n);
     
