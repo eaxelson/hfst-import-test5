@@ -147,6 +147,7 @@ namespace implementations
       static unsigned int number_of_states(Transducer *t);
 
       static StringSet get_alphabet(Transducer *t);
+      static void insert_to_alphabet(Transducer *t, const std::string &symbol);
 
     protected:
       static void initialize_alphabet(Transducer *t);

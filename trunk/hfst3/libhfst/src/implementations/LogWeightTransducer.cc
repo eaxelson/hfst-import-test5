@@ -42,21 +42,19 @@ namespace hfst { namespace implementations
   void LogWeightInputStream::stream_unget(char c) {
     input_stream.putback(c); }
 
-#ifdef FOO
-  void LogWeightTransducer::add_symbol_table(LogFst *t, HfstAlphabet &alpha) 
-  {
-    fst::SymbolTable *st = new fst::SymbolTable("anonym_hfst3_symbol_table");
-    HfstAlphabet::CharMap cm = alpha.get_char_map();
-    for (HfstAlphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++)
-      st->AddSymbol(std::string(it->second), (int64)it->first);    
-    t->SetInputSymbols(st);
-    delete st;
-  }
-#endif
-
   void LogWeightTransducer::remove_symbol_table(LogFst *t)
   {
     t->SetInputSymbols(NULL);
+  }
+
+  void LogWeightTransducer::insert_to_alphabet
+    (LogFst *t, const std::string &symbol)
+  {
+    assert(t->InputSymbols() != NULL);
+    fst::SymbolTable * st = t->InputSymbols()->Copy();
+    st->AddSymbol(symbol);
+    t->SetInputSymbols(st);
+    delete st;
   }
 
   StringSet LogWeightTransducer::get_alphabet(LogFst *t)
@@ -70,29 +68,33 @@ namespace hfst { namespace implementations
     return s;
   }
 
-  /* Find the number-to-number mappings needed to be performed to t1 so that it will follow 
-     the same symbol-to-number encoding as t2.
+  /* Find the number-to-number mappings needed to be performed to t1 
+     so that it will follow the same symbol-to-number encoding as t2.
      @pre t2's symbol table must contain all symbols in t1's symbol table. 
   */
   NumberNumberMap LogWeightTransducer::create_mapping(LogFst *t1, LogFst *t2)
   {
     NumberNumberMap km;
     // find the number-to-number mappings for transducer t1
-    for ( fst::SymbolTableIterator it = fst::SymbolTableIterator(*(t1->InputSymbols()));
+    for ( fst::SymbolTableIterator it 
+	    = fst::SymbolTableIterator(*(t1->InputSymbols()));
 	  not it.Done(); it.Next() ) {    
-      km [ (unsigned int)it.Value() ] = (unsigned int) t2->InputSymbols()->Find( it.Symbol() );
+      km [ (unsigned int)it.Value() ] 
+	= (unsigned int) t2->InputSymbols()->Find( it.Symbol() );
     }
     return km;
   }
 
   /* Recode the symbol numbers in this transducer as indicated in KeyMap km. */
-  void LogWeightTransducer::recode_symbol_numbers(LogFst *t, NumberNumberMap &km) 
+  void LogWeightTransducer::recode_symbol_numbers
+    (LogFst *t, NumberNumberMap &km) 
   {
     for (fst::StateIterator<LogFst> siter(*t); 
 	 not siter.Done(); siter.Next())
       {
 	StateId s = siter.Value();
-	for (fst::MutableArcIterator<LogFst> aiter(t,s); !aiter.Done(); aiter.Next())
+	for (fst::MutableArcIterator<LogFst> aiter(t,s); 
+	     !aiter.Done(); aiter.Next())
 	  {
 	    const LogArc &arc = aiter.Value();
 	    LogArc new_arc;
@@ -130,7 +132,8 @@ namespace hfst { namespace implementations
     return retval;
   }
 
-  LogFst * LogWeightTransducer::transform_weights(LogFst * t,float (*func)(float f))
+  LogFst * LogWeightTransducer::transform_weights
+    (LogFst * t,float (*func)(float f))
   {
     for (fst::StateIterator<LogFst> siter(*t); 
 	 not siter.Done(); siter.Next())
@@ -138,7 +141,8 @@ namespace hfst { namespace implementations
 	StateId s = siter.Value();
 	if ( t->Final(s) != LogWeight::Zero() )
 	  t->SetFinal( s, func(t->Final(s).Value()) );
-	for (fst::MutableArcIterator<LogFst> aiter(t,s); !aiter.Done(); aiter.Next())
+	for (fst::MutableArcIterator<LogFst> aiter(t,s); 
+	     !aiter.Done(); aiter.Next())
 	  {
 	    const LogArc &arc = aiter.Value();
 	    LogArc new_arc;
@@ -191,7 +195,8 @@ namespace hfst { namespace implementations
 	    else
 	      target = (int)arc.nextstate;
 	    fprintf(ofile, "%i\t%i\t%s\t%s\t%f\n", origin, target,
-		    sym->Find(arc.ilabel).c_str(), sym->Find(arc.olabel).c_str(),
+		    sym->Find(arc.ilabel).c_str(), 
+		    sym->Find(arc.olabel).c_str(),
 		    arc.weight.Value());
 	  }
 	if (t->Final(s) != LogWeight::Zero())
@@ -212,7 +217,8 @@ namespace hfst { namespace implementations
 	    origin = 0;
 	  else
 	    origin = (int)s;
-	  for (fst::ArcIterator<LogFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+	  for (fst::ArcIterator<LogFst> aiter(*t,s); 
+	       !aiter.Done(); aiter.Next())
 	    {
 	      const LogArc &arc = aiter.Value();
 	      int target;  // how target state is printed, see the first comment
@@ -223,7 +229,8 @@ namespace hfst { namespace implementations
 	      else
 		target = (int)arc.nextstate;
 	      fprintf(ofile, "%i\t%i\t%s\t%s\t%f\n", origin, target,
-		      sym->Find(arc.ilabel).c_str(), sym->Find(arc.olabel).c_str(),
+		      sym->Find(arc.ilabel).c_str(), 
+		      sym->Find(arc.olabel).c_str(),
 		      arc.weight.Value());
 	    }
 	  if (t->Final(s) != LogWeight::Zero())
@@ -290,7 +297,8 @@ namespace hfst { namespace implementations
 	    origin = 0;
 	  else
 	    origin = (int)s;
-	  for (fst::ArcIterator<LogFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+	  for (fst::ArcIterator<LogFst> aiter(*t,s); 
+	       !aiter.Done(); aiter.Next())
 	    {
 	      const LogArc &arc = aiter.Value();
 	      int target;  // how target state is printed, see the first comment
@@ -374,7 +382,8 @@ namespace hfst { namespace implementations
 	    origin = 0;
 	  else
 	    origin = (int)s;
-	  for (fst::ArcIterator<LogFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+	  for (fst::ArcIterator<LogFst> aiter(*t,s); 
+	       !aiter.Done(); aiter.Next())
 	    {
 	      const LogArc &arc = aiter.Value();
 	      int target;  // how target state is printed, see the first comment
@@ -398,11 +407,9 @@ namespace hfst { namespace implementations
   }
 
 
-  void LogWeightTransducer::write_in_att_format_number(LogFst *t, std::ostream &os)
+  void LogWeightTransducer::write_in_att_format_number
+    (LogFst *t, std::ostream &os)
   {
-
-    //const SymbolTable* sym = t->InputSymbols();
-
     // this takes care that initial state is always printed as number zero
     // and state number zero (if it is not initial) is printed as another number
     // (basically as the number of the initial state in that case, i.e.
@@ -460,7 +467,8 @@ namespace hfst { namespace implementations
 	    origin = 0;
 	  else
 	    origin = (int)s;
-	  for (fst::ArcIterator<LogFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+	  for (fst::ArcIterator<LogFst> aiter(*t,s); 
+	       !aiter.Done(); aiter.Next())
 	    {
 	      const LogArc &arc = aiter.Value();
 	      int target;  // how target state is printed, see the first comment
@@ -486,15 +494,12 @@ namespace hfst { namespace implementations
 
   // AT&T format is handled here ------------------------------
 
-  /* Maps state numbers in AT&T text format to state ids used by OpenFst transducers. */
-  typedef std::map<int, StateId> StateMap;
-
-  // FIX: this would be better in namespace LogWeightTransducer...
   /* A method used by function 'read_in_att_format'.
      Returns the state id of state number state_number and adds a new
      state to t if state_number is encountered for the first time and
      updates state_map accordingly. */
-  StateId add_and_map_state(LogFst *t, int state_number, StateMap &state_map)
+  StateId LogWeightTransducer::add_and_map_state
+  (LogFst *t, int state_number, StateMap &state_map)
   {
     StateMap::iterator it = state_map.find(state_number);
     if (it == state_map.end()) {
@@ -506,10 +511,10 @@ namespace hfst { namespace implementations
       return it->second;
   }
 
-  // FIX: atof and atoi are not necessarily portable...
-  // FIX: sscanf skips spaces
-  /* Reads a description of a transducer in AT&T text format and returns a corresponding
-     binary transducer. 
+  // FIXME: atof and atoi are not necessarily portable...
+  // FIXME: sscanf skips spaces
+  /* Reads a description of a transducer in AT&T text format 
+     and returns a corresponding binary transducer. 
      @note The initial state must be numbered as zero. */
   LogFst * LogWeightTransducer::read_in_att_format(FILE * ifile)
   {
@@ -529,7 +534,8 @@ namespace hfst { namespace implementations
 	if (*line == '-') // transducer separator
 	  return t;
 	//printf("read line: %s", line);
-	char a1 [100]; char a2 [100]; char a3 [100]; char a4 [100]; char a5 [100];
+	char a1 [100]; char a2 [100]; char a3 [100]; 
+	char a4 [100]; char a5 [100];
 	int n = sscanf(line, "%s\t%s\t%s\t%s\t%s", a1, a2, a3, a4, a5);
 	//printf("number of arguments: (%i)\n", n);
 
@@ -545,22 +551,23 @@ namespace hfst { namespace implementations
 	    int final_number = atoi(a1);
 	    StateId final_state = add_and_map_state(t, final_number, state_map);
 	    t->SetFinal(final_state, weight);
-	    //printf("...added final state %i with weight %f\n", final_state, weight);
 	  }
 
 	else if (n == 4 || n == 5)  // transition line
 	  {
 	    int origin_number = atoi(a1);
 	    int target_number = atoi(a2);
-	    StateId origin_state = add_and_map_state(t, origin_number, state_map);
-	    StateId target_state = add_and_map_state(t, target_number, state_map);
+	    StateId origin_state 
+	      = add_and_map_state(t, origin_number, state_map);
+	    StateId target_state 
+	      = add_and_map_state(t, target_number, state_map);
 
 	    int input_number = st.AddSymbol(std::string(a3));
 	    int output_number = st.AddSymbol(std::string(a4));
 
-	    t->AddArc(origin_state, LogArc(input_number, output_number, weight, target_state));
-	    //printf("...added transition from state %i to state %i with input number %i and output number
-	    //%i and weight %f\n", origin_state, target_state, input_number, output_number, weight);
+	    t->AddArc(origin_state, 
+		      LogArc(input_number, output_number, 
+			     weight, target_state));
 	  }
 
 	else  // line could not be parsed
@@ -2029,8 +2036,10 @@ namespace hfst { namespace implementations
       ubuffer[upos]=0;
       bool final = t->Final(s) != LogWeight::Zero();
       hfst::WeightedPath<float> path(&lbuffer[0],&ubuffer[0],weight_sum+(final?t->Final(s).Value():0));
-      if (include_spv)
-	path.set_string_pair_vector(spv);
+      if (include_spv) {
+	path.spv = spv;
+	path.is_spv_in_use = true;
+      }
       hfst::ExtractStringsCb::RetVal ret = callback(path, final);
       if(!ret.continueSearch || !ret.continuePath)
       {

@@ -229,6 +229,8 @@ namespace implementations
 				       const NumberPair old_number_pair,
 				       LogFst *transducer);
 
+      static void insert_to_alphabet
+	(LogFst *t, const std::string &symbol);
       static StringSet get_alphabet(LogFst *t);
       static NumberNumberMap create_mapping(LogFst * t1, LogFst * t2);
       //static std::vector<unsigned int> create_mapping(LogFst * t1, LogFst * t2);
@@ -246,6 +248,13 @@ namespace implementations
       //static void add_symbol_table(LogFst *t, HfstAlphabet &alpha); 
       static void remove_symbol_table(LogFst *t);      
       
+      /* Maps state numbers in AT&T text format to state ids used by 
+	 OpenFst transducers. */
+      typedef std::map<int, StateId> StateMap;
+
+      static StateId add_and_map_state
+	(LogFst *t, int state_number, StateMap &state_map);
+
       static int has_arc(LogFst &t,
 		  LogArc::StateId sourcestate,			  
 		  LogArc::Label ilabel, 

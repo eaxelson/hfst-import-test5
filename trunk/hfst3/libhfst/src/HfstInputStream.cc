@@ -9,6 +9,9 @@
 //
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
+//
+//       FIXME: The structure of this class and its functions is disorganised.
+//
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "implementations/ConvertTransducerFormat.h"
@@ -442,12 +445,11 @@ namespace hfst
 	    stream_unget(chars_read[i]);
 
 	  if (chars_read[18]=='s') // standard
-	    return OPENFST_; //OPENFST_TROPICAL_;
+	    return OPENFST_TROPICAL_;
 	  else if (chars_read[18]=='l') // log
-	    return OPENFST_; //OPENFST_LOG_;
+	    return OPENFST_LOG_;
 	  else
 	    throw hfst::exceptions::NotTransducerStreamException();
-	  //return OPENFST_;
 	  break;
 	}
       case '#':  // foma
@@ -560,7 +562,7 @@ namespace hfst
       name = header_data[2].second;
     }
     // (3) an optional pair "minimal", ("true"|"false") if type == SFST_TYPE
-    // FIX: forward this information to SfstInputStream's transducer
+    // FIXME: forward this information to SfstInputStream's transducer
     else {
       if (not (set_implementation_specific_header_data(header_data, 2)) 
 	  && warnings)
@@ -764,8 +766,11 @@ namespace hfst
       case HFST_VERSION_2_UNWEIGHTED:
 	return SFST_TYPE;
 	break;
-      case OPENFST_:
-	return TROPICAL_OFST_TYPE; // FIX: can be log or something else
+      case OPENFST_TROPICAL_:
+	return TROPICAL_OFST_TYPE;
+	break;
+      case OPENFST_LOG_:
+	return LOG_OFST_TYPE;
 	break;
       case SFST_:
 	return SFST_TYPE;
@@ -842,8 +847,8 @@ namespace hfst
     }
   }
 
-  // FIX: HfstOutputStream takes a string parameter, 
-  // HfstInputStream a const char*
+  // FIXME: HfstOutputStream takes a string parameter, 
+  //        HfstInputStream a const char*
   HfstInputStream::HfstInputStream(const std::string &filename):
     bytes_to_skip(0), filename(std::string(filename)), has_hfst_header(false),
     hfst_version_2_weighted_transducer(false)
@@ -875,7 +880,7 @@ namespace hfst
 #if HAVE_OPENFST
     case TROPICAL_OFST_TYPE:
       if (strcmp(filename.c_str(),"") == 0) {  
-	// FIX: this should be done in TropicalWeight layer
+	// FIXME: this should be done in TropicalWeight layer
 	implementation.tropical_ofst = 
 	  new hfst::implementations::TropicalWeightInputStream();
       }

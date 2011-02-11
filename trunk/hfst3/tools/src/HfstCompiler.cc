@@ -388,7 +388,7 @@ namespace hfst
 
     // Make a tokenizer that recognizes all multicharacter symbols in t.
     // It is needed when weighted paths are transformed into transducers.
-    HfstTokenizer TOK = t->create_tokenizer(); // no effect on performance
+    // HfstTokenizer TOK = t->create_tokenizer(); // no effect on performance
     
     // replace all agreement variables
     for( size_t i=0; i<name.size(); i++ ) {
@@ -408,13 +408,17 @@ namespace hfst
       }
       else {
 	WeightedPaths<float>::Set paths;
-	vt->extract_strings(paths, -1, -1);
+	vt->extract_strings
+	  (paths, -1, -1, 
+	   true /* include a StringPairVector representation */);
 	delete vt;
 
 	// transform weighted paths to a vector of transducers
 	for (WeightedPaths<float>::Set::iterator it = paths.begin(); it != paths.end(); it++) {
-	  WeightedPath<float> wp = *it;
-	  HfstTransducer * path = new HfstTransducer(wp.istring, wp.ostring, TOK, t->get_type());
+	  WeightedPath<float> wp = *it;	  
+	  HfstTransducer * path = new HfstTransducer(wp.spv, t->get_type());
+	  //HfstTransducer * path 
+	  //  = new HfstTransducer(wp.istring, wp.ostring, TOK, t->get_type());
 	  path->set_final_weights(wp.weight);
 	  transducer_paths.push_back(path);
 	}

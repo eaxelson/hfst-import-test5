@@ -46,8 +46,25 @@ using hfst::implementations::HfstBasicTransducer;
 typedef std::vector<std::string> StringVector;
 
 /* Used by function 'do_hfst_lookup_paths_contain'. */
-bool compare_string_vectors(const StringVector &v1, const StringVector &v2)
+bool compare_string_vectors(const StringVector &v1, const StringVector &v2,
+			    bool test_strings=false)
 {
+  /* Test the generated strings. */
+  if (test_strings)
+    {
+      std::string v1_string;
+      std::string v2_string;
+
+      for (unsigned int i=0; i<v1.size(); i++) { 
+	v1_string.append(v1[i]);
+      }
+      for (unsigned int i=0; i<v2.size(); i++) { 
+	v2_string.append(v2[i]);
+      }
+      return (v1_string.compare(v2_string) == 0);
+    }
+
+  /* Test the exact alignments. */
   if (v1.size() != v2.size())
     return false;
   for (unsigned int i=0; i<v1.size(); i++)
@@ -71,7 +88,7 @@ bool do_hfst_lookup_paths_contain(const HfstLookupPaths &results,
   for (HfstLookupPaths::const_iterator it = results.begin();
        it != results.end(); it++)
     {
-      if (compare_string_vectors(it->first, expected_path.first)) 
+      if (compare_string_vectors(it->first, expected_path.first, true)) 
 	{
 	  found = true;
 	  weight = it->second;
@@ -125,7 +142,7 @@ void print_string_vector(const StringVector &sv)
   for (StringVector::const_iterator it = sv.begin();
        it != sv.end(); it++)
     {
-      fprintf(stderr, "%s", it->c_str());
+      fprintf(stderr, "\"%s\" ", it->c_str());
     }
 }
 
@@ -376,8 +393,6 @@ int main(int argc, char **argv)
 	    types[i] == LOG_OFST_TYPE) {
 	  test_weight=true; }
 
-	tok.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-
 	/* check that the results are correct */
 	HfstLookupPath expected_path = tok.lookup_tokenize("cats");
 
@@ -388,11 +403,11 @@ int main(int argc, char **argv)
 	assert(do_hfst_lookup_paths_contain
 	       (results_dog, expected_path, 2.5, test_weight));
 
-	expected_path = tok.lookup_tokenize("mice@_EPSILON_SYMBOL_@");
+	expected_path = tok.lookup_tokenize("mice");
 	assert(do_hfst_lookup_paths_contain
 		(results_mouse, expected_path, 1.7, test_weight));
 
-	expected_path = tok.lookup_tokenize("hippopotami@_EPSILON_SYMBOL_@");
+	expected_path = tok.lookup_tokenize("hippopotami");
 	if (types[i] != LOG_OFST_TYPE)
 	  assert(do_hfst_lookup_paths_contain
 		 (results_hippopotamus, expected_path, 1.2, test_weight));
