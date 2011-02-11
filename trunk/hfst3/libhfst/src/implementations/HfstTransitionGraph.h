@@ -561,6 +561,18 @@ namespace hfst {
 	  return state_map[s];
 	}	
 
+	/** @brief Get the set of transitions of state \a s in this graph. 
+
+	    If the state does not exist, a @a StateIndexOutOfBoundsException
+	    is thrown.
+	*/
+	const std::set<HfstTransition<C> > & operator[](HfstState s) const
+	{
+	  if (s > max_state)
+	    { throw StateIndexOutOfBoundsException(); }
+	  return state_map.find(s)->second;
+	}	
+
 	/* TODO: Change state numbers s1 to s2 and vice versa. */
 	void swap_state_numbers(HfstState /*s1*/, HfstState /*s2*/) {
 	  throw hfst::exceptions::FunctionNotImplementedException();
