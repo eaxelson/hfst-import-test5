@@ -299,6 +299,9 @@ tr1.disjunct(tr2);
     /* Get the alphabet of the transducer. */
     StringSet get_alphabet() const;
 
+    /* Explicitely insert \a symbol to the alphabet of the transducer. */
+    void insert_to_alphabet(const std::string &symbol); 
+
     /* For internal use, implemented only for SFST_TYPE. */	  
     std::vector<HfstTransducer*> extract_paths();
 
@@ -441,11 +444,16 @@ tr1.disjunct(tr2);
 	are represented.
 	
 	Lines are of the form 
-	"source_state TAB destination_state TAB input_symbol TAB 
-	output_symbol (TAB weight)"
-	or "final_state (TAB weight)". If several transducers are listed 
+	"source_state WHITESPACE destination_state WHITESPACE input_symbol 
+	WHITESPACE output_symbol (WHITESPACE weight)"
+	or "final_state (WHITESPACE weight)". If several transducers are listed 
 	in the same file, they are separated by lines of 
-	two consecutive hyphens "--".
+	two consecutive hyphens "--". If (WHITESPACE weight) is missing,
+	the transition or final state is given a zero weight.
+
+	NOTE: Transition symbols cannot contain whitespace characters,
+	because they are used as field separators in AT&T format.
+
 
 An example:
 \verbatim
@@ -544,9 +552,20 @@ in \a ifile.
     /** \brief Write the transducer in AT&T format to FILE \a ofile. 
 	\a write_weights defines whether weights are written.
 
+	The fields in the resulting AT&T format are separated 
+	by tabulator characters.
+
+	NOTE: If the transition symbols contain whitespace characters,
+	calling HfstTransducer(FILE*, ImplementationType, const std::string&)
+	for the output of this function will probably throw an 
+	hfst::exceptions::NotValidAttFormatException
+	because whitespace characters are used as field separators 
+	in AT&T format.
+
 	If several transducers are written in the same file, they must 
-	be separated by a line
-	of two consecutive hyphens "--".
+	be separated by a line of two consecutive hyphens "--", so that
+	they will be read correctly by 
+	HfstTransducer(FILE*, ImplementationType, const std::string&).
 
 An example:
 \verbatim
@@ -580,7 +599,8 @@ This will yield a file "testfile.att" that looks as follows:
 0    0    a    a    0.0
 \endverbatim
 
-	@see hfst::operator<<(std::ostream &out,HfstTransducer &t) HfstTransducer(FILE*, ImplementationType, const std::string&) */
+	@see hfst::operator<<(std::ostream &out,HfstTransducer &t) 
+	HfstTransducer(FILE*, ImplementationType, const std::string&) */
     void write_in_att_format(FILE * ofile, bool write_weights=true) const;
 
 
@@ -597,11 +617,12 @@ This will yield a file "testfile.att" that looks as follows:
 
     /* \brief For internal use: Create a transducer of type \a type as 
        defined in AT&T format in file named \a filename.
-	\a epsilon_symbol defines how epsilons are represented.
+       \a epsilon_symbol defines how epsilons are represented.
 
-	@pre The file exists, otherwise an exception is thrown.
-	@see HfstTransducer(FILE, ImplementationType, const std::string&)
-	@throws hfst::exceptions::StreamNotReadableException hfst::exceptions::NotValidAttFormatException */
+       @pre The file exists, otherwise an exception is thrown.
+       @see HfstTransducer(FILE, ImplementationType, const std::string&)
+       @throws hfst::exceptions::StreamNotReadableException 
+       hfst::exceptions::NotValidAttFormatException */
     static HfstTransducer &read_in_att_format
       (const std::string &filename, ImplementationType type, 
        const std::string &epsilon_symbol);
@@ -723,13 +744,22 @@ TODO...
     //! all possible outputs on the second.
     //! This is in effect a fast composition of single path from left
     //! hand side.
+    //! Epsilons on the second level are represented by empty strings
+    //! in \a results.
+    //! Currently, this function is the same as #lookup_fd.
     //!
-    //! @param results  output parameter to store unique results
-    //! @param s  string to look up
-    //! @param limit  number of strings to extract. -1 tries to extract all and
-    //!             may get stuck if infinitely ambiguous
+    //! @param results  Output parameter to store unique results.
+    //!                 Epsilons are represented by empty strings.
+    //! @param s  String to look up. The weight is ignored.
+    //! @param limit  (Currently ignored.) Number of strings to extract. 
+    //!               -1 tries to extract all and may get stuck 
+    //!               if infinitely ambiguous.
     //! 
     //! @see HfstTokenizer::lookup_tokenize
+    //! @see lookup_fd
+    //!
+    //! @todo Do not ignore argument \a limit.
+    //! @todo Handle flag diacritics as ordinary symbols.
     void lookup(HfstLookupPaths& results, const HfstLookupPath& s,
                 ssize_t limit = -1) const;
 
@@ -755,6 +785,7 @@ TODO...
     //! <!-- @param tok  tokenizer to split string in arcs? -->
     //! @param limit  number of strings to extract. -1 tries to extract all and
     //!             may get stuck if infinitely ambiguous
+    //! @todo todo
     void lookdown(HfstLookupPaths& results, const HfstLookupPath& s,
                   ssize_t limit = -1) const;
 
@@ -765,6 +796,7 @@ TODO...
     //! and validates the sequences prior to outputting.
     //!
     //! @sa lookdown
+    //! @todo todo
     void lookdown_fd(HfstLookupPaths& results, HfstLookupPath& s,
                      ssize_t limit = -1) const;
 
@@ -773,6 +805,7 @@ TODO...
 
     //! @brief Whether lookdown of path \a s will have infinite results
     //! (not implemented).
+    //! @todo todo
     bool is_lookdown_infinitely_ambiguous(const HfstLookupPath& s) const;
 
 

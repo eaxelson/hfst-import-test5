@@ -28,15 +28,12 @@ namespace hfst {
 
   /** \brief A weighted string pair that represents a path in a transducer.
 
-      HfstLookupPath is the same with W == float, 
-      is there a need for two similar datatypes?
-
-      @see WeightedPaths */
+      @see WeightedPaths 
+      @see HfstLookupPath
+      @see HfstTransducer::extract_strings
+  */
   template<class W> class WeightedPath
     {
-    private:
-      /* Whether the StringPairVector representation is in use. */
-      bool is_spv_in_use;
     public:
       /** \brief The input string of the path. */
       std::string istring;
@@ -47,9 +44,14 @@ namespace hfst {
       /** \brief An optional StringPairVector representation of the path. 
 
 	  This can be used when we are interested in the exact alignment of
-	  symbols in a given path. The value of this member can be set with
-	  function #set_string_pair_vector. */
+	  symbols in a given path. If you are going to use this variable,
+	  set the value of \a is_spv_in_use 'true'. */
       StringPairVector spv;
+      /** \brief  Whether the StringPairVector representation is in use. 
+
+	  This variable tells whether we are using the string pair vector
+	  representation. By default, it is 'false'. */
+      bool is_spv_in_use;
 
       WeightedPath(const std::string &is,const std::string &os,W w)
 	{ weight = w; istring = is; ostring = os; is_spv_in_use=false; }
@@ -119,15 +121,10 @@ namespace hfst {
 	  this->istring = another.istring;
 	  this->ostring = another.ostring;
 	  this->weight = another.weight; }
-
-      /** \brief Set the value of the string pair vector representation 
-	  equal to \a spv. */
-      void set_string_pair_vector(const StringPairVector &spv)
-      { this->spv = spv; 
-	is_spv_in_use=true; }
     };
 
-  /** \brief A class for storing weighted string pairs that represent paths in a transducer. 
+  /** \brief A class for storing weighted string pairs that represent 
+      paths in a transducer. 
 
       Iterators to Vectors and Sets return paths in descending weight order
       (the string with the biggest weight is returned first). (check this)
@@ -189,9 +186,9 @@ namespace hfst {
        * ends at a \a final state. The return value determines the future course
        * of the extraction search.
        *
-       * @returns A data structure indicating whether the search should continue,
-       *          be broken off immediately, or whether the specific path should
-       *          no longer be followed.
+       * @returns A data structure indicating whether the search 
+       *          should continue, be broken off immediately, 
+       *          or whether the specific path should no longer be followed.
        */
       virtual RetVal operator()(WeightedPath<float>& path, bool final) = 0;
     };

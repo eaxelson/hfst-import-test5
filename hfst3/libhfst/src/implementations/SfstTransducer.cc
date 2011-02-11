@@ -686,8 +686,10 @@ namespace hfst { namespace implementations {
       ubuffer[upos] = 0;
       bool final = node->is_final();
       hfst::WeightedPath<float> path(&lbuffer[0],&ubuffer[0],0);
-      if (include_spv)
-	path.set_string_pair_vector(spv);
+      if (include_spv) {
+	path.spv = spv;
+	path.is_spv_in_use = true;
+      }
       hfst::ExtractStringsCb::RetVal ret = callback(path, final);
       if(!ret.continueSearch || !ret.continuePath)
       {
@@ -930,6 +932,12 @@ namespace hfst { namespace implementations {
         table->define_diacritic(it->first, it->second);
     }
     return table;
+  }
+
+  void SfstTransducer::insert_to_alphabet
+    (Transducer * t, const std::string &symbol)
+  {
+    t->alphabet.add_symbol(symbol.c_str());
   }
 
   StringSet SfstTransducer::get_alphabet(Transducer * t)

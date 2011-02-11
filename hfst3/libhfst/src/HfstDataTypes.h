@@ -83,9 +83,11 @@ namespace hfst
   //!
   //! Used by typedef HfstLookupPath.
   typedef std::vector<std::string> HfstArcPath;
-  //! @brief A path of one level of arcs with collected weight,
+  //! @brief A path of one level of arcs with collected weight.
   //!
   //! Used as the source and result data type for lookups and downs.
+  //! In the first case, the float is ignored. In the latter case,
+  //! the float represents the weight of the path.
   //!
   //! @see HfstTokenizer::lookup_tokenize
   //! @see HfstTransducer::lookup

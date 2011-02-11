@@ -118,6 +118,36 @@ namespace hfst
       throw hfst::exceptions::FunctionNotImplementedException();
   }
 
+  void HfstTransducer::insert_to_alphabet(const std::string &symbol) 
+  {
+    switch(type)
+      {
+#if HAVE_SFST
+      case SFST_TYPE:
+        sfst_interface.insert_to_alphabet(implementation.sfst, symbol);
+#endif
+#if HAVE_OPENFST
+      case TROPICAL_OFST_TYPE:
+        tropical_ofst_interface.insert_to_alphabet
+	  (implementation.tropical_ofst, symbol);
+      case LOG_OFST_TYPE:
+        log_ofst_interface.insert_to_alphabet
+	  (implementation.log_ofst, symbol);
+#endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+        foma_interface.insert_to_alphabet(implementation.foma, symbol);
+#endif
+      case ERROR_TYPE:
+        throw hfst::exceptions::TransducerHasWrongTypeException();
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+      default:
+        throw hfst::exceptions::FunctionNotImplementedException
+	  ("insert_to_alphabet");
+    }    
+  }
+
   StringSet HfstTransducer::get_alphabet() const
   {
     switch(type)

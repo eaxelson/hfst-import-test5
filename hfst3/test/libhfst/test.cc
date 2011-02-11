@@ -1,5 +1,6 @@
 /*
  * test.cc: A test file for hfst3
+ * FIXME: Remove this file or move relevant parts to other test files.
  */
 
 #include "HfstTransducer.h"

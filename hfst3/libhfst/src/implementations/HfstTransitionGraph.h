@@ -66,7 +66,7 @@ namespace hfst {
       typedef std::map<SymbolType, unsigned int, string_comparison> 
 	Symbol2NumberMap;
 
-    public: /* Fix this */
+    public: /* FIXME: Should be private. */
       /* Maps that contain information of the mappings between strings 
 	 and numbers */
       static Number2SymbolMap number2symbol_map;
@@ -108,19 +108,23 @@ namespace hfst {
 
     public:
 
-      /** @brief Create a HfstTropicalTransducerTransitionData with epsilon input and output
-	  strings and weight zero. */
-    HfstTropicalTransducerTransitionData(): input_number(0), output_number(0), weight(0) {}
+      /** @brief Create a HfstTropicalTransducerTransitionData with 
+	  epsilon input and output strings and weight zero. */
+    HfstTropicalTransducerTransitionData(): 
+      input_number(0), output_number(0), weight(0) {}
 
-      /** @brief Create a deep copy of HfstTropicalTransducerTransitionData \a data. */
-      HfstTropicalTransducerTransitionData(const HfstTropicalTransducerTransitionData &data) {
+      /** @brief Create a deep copy of HfstTropicalTransducerTransitionData 
+	  \a data. */
+      HfstTropicalTransducerTransitionData
+	(const HfstTropicalTransducerTransitionData &data) {
 	input_number = data.input_number;
 	output_number = data.output_number;
 	weight = data.weight;
       }
 
-      /** @brief Create a HfstTropicalTransducerTransitionData with input symbol \a 
-	  isymbol, output symbol \a osymbol and weight \a weight. */
+      /** @brief Create a HfstTropicalTransducerTransitionData with 
+	  input symbol \a isymbol, output symbol \a osymbol 
+	  and weight \a weight. */
       HfstTropicalTransducerTransitionData(SymbolType isymbol,
 		     SymbolType osymbol,
 		     WeightType weight) {
@@ -158,9 +162,10 @@ namespace hfst {
       /** @brief Whether this transition is less than transition 
 	  \a another. 
 
-	  /internal is it too slow if strin comparison is used instead?
+	  /internal is it too slow if string comparison is used instead?
       */
-      bool operator<(const HfstTropicalTransducerTransitionData &another) const {
+      bool operator<(const HfstTropicalTransducerTransitionData &another) 
+	const {
 	if (input_number < another.input_number )
 	  return true;
 	if (input_number > another.input_number)
@@ -176,10 +181,12 @@ namespace hfst {
       friend class Symbol2NumberMapInitializer;
     };
 
-    // Initialization of static members in class HfstTropicalTransducerTransitionData..
+    // Initialization of static members in class 
+    // HfstTropicalTransducerTransitionData..
     class Number2SymbolMapInitializer {
     public:
-      Number2SymbolMapInitializer(HfstTropicalTransducerTransitionData::Number2SymbolMap &map) {
+      Number2SymbolMapInitializer
+	(HfstTropicalTransducerTransitionData::Number2SymbolMap &map) {
 	map[0] = std::string("@_EPSILON_SYMBOL_@");
 	map[1] = std::string("@_UNKNOWN_SYMBOL_@");
 	map[2] = std::string("@_IDENTITY_SYMBOL_@");
@@ -188,7 +195,8 @@ namespace hfst {
 
     class Symbol2NumberMapInitializer {
     public:
-      Symbol2NumberMapInitializer(HfstTropicalTransducerTransitionData::Symbol2NumberMap &map) {
+      Symbol2NumberMapInitializer
+	(HfstTropicalTransducerTransitionData::Symbol2NumberMap &map) {
 	map["@_EPSILON_SYMBOL_@"] = 0;
 	map["@_UNKNOWN_SYMBOL_@"] = 1;
 	map["@_IDENTITY_SYMBOL_@"] = 2;
@@ -220,9 +228,9 @@ namespace hfst {
 	/** @brief Create a transition leading to state \a s with input symbol
 	    \a isymbol, output_symbol \a osymbol and weight \a weight. */
 	HfstTransition(HfstState s, 
-			typename C::SymbolType isymbol, 
-			typename C::SymbolType osymbol, 
-			typename C::WeightType weight):
+		       typename C::SymbolType isymbol, 
+		       typename C::SymbolType osymbol, 
+		       typename C::WeightType weight):
 	target_state(s), transition_data(isymbol, osymbol, weight)
 	  {}
 
@@ -280,7 +288,8 @@ namespace hfst {
 	This implementation is compatible with #HfstBasicTransducer.
 
 	@see HfstTropicalTransducerTransitionData HfstBasicTransducer */
-    typedef HfstTransition<HfstTropicalTransducerTransitionData> HfstBasicTransition;
+    typedef HfstTransition<HfstTropicalTransducerTransitionData> 
+      HfstBasicTransition;
 
     /** @brief A simple transition graph format that consists of
 	states and transitions between those states.
@@ -295,10 +304,10 @@ namespace hfst {
        Probably the easiest way to use this template is to choose
        the implementations #HfstBasicTransducer 
        (HfstTransitionGraph<HfstTropicalTransducerTransitionData, float>)
-       and #HfstBasicTransition (HfstTransition<HfstTropicalTransducerTransitionData>).
-       The class HfstTropicalTransducerTransitionData contains an input string, an output string
-       and a float weight. HfstBasicTransducer is the implementation that is
-       used as an example in this documentation.
+       and #HfstBasicTransition(HfstTransition<HfstTropicalTransducerTransitionData>).
+       The class HfstTropicalTransducerTransitionData contains an input string,
+       an output string and a float weight. HfstBasicTransducer is the 
+       implementation that is used as an example in this documentation.
 
        An example of creating a HfstBasicTransducer [foo:bar baz:baz] 
        with weight 0.4 from scratch:
@@ -520,7 +529,7 @@ namespace hfst {
 	W get_final_weight(HfstState s) const {
 	  if (final_weight_map.find(s) != final_weight_map.end())
 	    return final_weight_map.find(s)->second;
-	  throw hfst::exceptions::HfstInterfaceException();
+	  throw hfst::exceptions::StateIsNotFinalException();
 	}
 
 	/** @brief Set the final weight of state \a s in this graph 
@@ -678,7 +687,8 @@ namespace hfst {
 	    char a1 [100]; char a2 [100]; char a3 [100]; 
 	    char a4 [100]; char a5 [100];
 	    // how many fields could be parsed
-	    int n = sscanf(line, "%s\t%s\t%s\t%s\t%s", a1, a2, a3, a4, a5);
+	    //int n = sscanf(line, "%s\t%s\t%s\t%s\t%s", a1, a2, a3, a4, a5);
+	    int n = sscanf(line, "%s%s%s%s%s", a1, a2, a3, a4, a5);
 	    
 	    // set value of weight
 	    float weight = 0;
@@ -1332,7 +1342,7 @@ namespace hfst {
 	    @note This function is always called for arguments of functions
 	    that take two or more graphs as their arguments, unless otherwise
 	    said.
-	    @todo See that the note is always true..
+	    @todo Check that the note above is always true..
 	*/
 	HfstTransitionGraph &harmonize(HfstTransitionGraph &another) {
 
@@ -1454,7 +1464,7 @@ namespace hfst {
 	  HfstState initial_state = 0;
 	  HfstState final_state = disjunct(spv, it, initial_state);
 
-	  // Set weight of final state
+	  // Set the weight of final state
 	  if (is_final_state(final_state)) 
 	    {
 	      float old_weight = get_final_weight(final_state);
@@ -1468,11 +1478,12 @@ namespace hfst {
 	friend class ConversionFunctions;
       };
 
-    /** @brief An HfstTransitionGraph with transitions of type HfstTropicalTransducerTransitionData and 
-	weight type float.
+    /** @brief An HfstTransitionGraph with transitions of type 
+	HfstTropicalTransducerTransitionData and weight type float.
 	
 	This is probably the most useful kind of HfstTransitionGraph. */
-    typedef HfstTransitionGraph <HfstTropicalTransducerTransitionData, float> HfstBasicTransducer;
+    typedef HfstTransitionGraph <HfstTropicalTransducerTransitionData, float> 
+      HfstBasicTransducer;
 
   }
    

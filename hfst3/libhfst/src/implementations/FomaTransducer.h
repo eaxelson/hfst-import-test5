@@ -128,6 +128,7 @@ namespace hfst {
       
       static FdTable<int>* get_flag_diacritics(fsm * t);
 
+      static void insert_to_alphabet(fsm *t, const std::string &symbol);
       static StringSet get_alphabet(fsm *t);
       
       static void harmonize(fsm *net1, fsm *net2);

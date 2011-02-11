@@ -135,7 +135,8 @@ For documentation on the HFST binary transducer format, see
       HFST_VERSION_2_UNWEIGHTED,
       /* An OpenFst transducer, can cause problems if it does not have 
 	 symbol tables. */ 
-      OPENFST_,
+      OPENFST_TROPICAL_,
+      OPENFST_LOG_,
       /* An SFST transducer. */ 
       SFST_, 
       /* A foma transducer. */ 
