@@ -69,6 +69,90 @@ namespace hfst
       }
   }
 
+  char &HfstInputStream::stream_get(char &c)
+  {
+    if (input_stream != NULL)
+      return c = input_stream->get();
+    switch (type)
+      {
+#if HAVE_SFST
+      case SFST_TYPE:
+	return c = this->implementation.sfst->stream_get();
+	break;
+#endif
+#if HAVE_OPENFST
+      case TROPICAL_OFST_TYPE:
+	return c = this->implementation.tropical_ofst->stream_get();
+	break;
+      case LOG_OFST_TYPE:
+	return c = this->implementation.log_ofst->stream_get();
+	break;
+#endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+	return c = this->implementation.foma->stream_get();
+	break;
+#endif
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      case MY_TRANSDUCER_LIBRARY_TYPE:
+	return c = this->implementation.my_transducer_library->stream_get();
+	break;
+#endif
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	  return c = this->implementation.hfst_ol->stream_get();
+	  break;
+
+      default:
+	assert(false);
+	break;
+      }
+  }
+
+  short &HfstInputStream::stream_get(short &i)
+  {
+    if (input_stream != NULL)
+      { 
+	input_stream->read((char*)&i,sizeof(i));
+	return i;
+      }
+    switch (type)
+      {
+#if HAVE_SFST
+      case SFST_TYPE:
+	return i = this->implementation.sfst->stream_get_short();
+	break;
+#endif
+#if HAVE_OPENFST
+      case TROPICAL_OFST_TYPE:
+	return i = this->implementation.tropical_ofst->stream_get_short();
+	break;
+      case LOG_OFST_TYPE:
+	return i = this->implementation.log_ofst->stream_get_short();
+	break;
+#endif
+#if HAVE_FOMA
+      case FOMA_TYPE:
+	return i = this->implementation.foma->stream_get_short();
+	break;
+#endif
+#if HAVE_MY_TRANSDUCER_LIBRARY
+      case MY_TRANSDUCER_LIBRARY_TYPE:
+	return i = 
+	  this->implementation.my_transducer_library->stream_get_short();
+	break;
+#endif
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	  return i = this->implementation.hfst_ol->stream_get_short();
+	  break;
+
+      default:
+	assert(false);
+	break;
+      }
+  }
+
   char HfstInputStream::stream_get()
   {
     if (input_stream != NULL)
@@ -689,15 +773,13 @@ namespace hfst
 
   int HfstInputStream::get_header_size(int &bytes_read)
   {
-    int header_size=0;
-    int c1 = stream_get();
-    int c2 = stream_get();
-    int c = stream_get();
+    short header_size=0;
+    stream_get(header_size);
+    char c = stream_get();
     if (c != 0) {
       debug_error("#6");
       throw hfst::exceptions::NotTransducerStreamException();
     }
-    header_size = (c1 * 256) + c2;
     bytes_read=3;
 
     return header_size;

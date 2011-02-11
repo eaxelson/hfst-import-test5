@@ -59,6 +59,7 @@ namespace implementations
     void ignore(unsigned int);
 
     char stream_get();
+    short stream_get_short();
     void stream_unget(char c);
 
     bool set_implementation_specific_header_data(StringPairVector &data, unsigned int index);

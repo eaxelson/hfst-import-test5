@@ -61,6 +61,7 @@ namespace hfst {
     fsm * read_transducer();
 
     char stream_get();
+    short stream_get_short();
     void stream_unget(char c);
     
     static bool is_fst(FILE * f);

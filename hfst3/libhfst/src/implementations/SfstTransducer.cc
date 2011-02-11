@@ -60,6 +60,13 @@ namespace hfst { namespace implementations {
   char SfstInputStream::stream_get() {
     return (char) fgetc(input_file); }
 
+  short SfstInputStream::stream_get_short() 
+  {
+    short i;
+    assert(sizeof(i) == fread(&i,sizeof(i),1,input_file));
+    return i;
+  }
+
   void SfstInputStream::stream_unget(char c) {
     ungetc ( (int)c, input_file ); }
 
