@@ -1,3 +1,4 @@
+.. -*- mode: rst -*-
 ==================================================================
  Helsinki Finite-State Technology (library and application suite)
 ==================================================================
@@ -10,6 +11,94 @@ authors specified in AUTHORS file may be contacted about licencing issues.
 
 There's an online wiki-based information source about HFST in
 `Kitwiki HFST pages <https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome>`_.
+
+Dependencies
+------------
+
+Compilation requirements:
+
+- For OpenFST backend:
+
+  - the OpenFST libary can be downloaded from the `OpenFST wiki
+    <http://www.openfst.org>`_
+
+  - the OpenFST library version 1.2 or newer must be installed in running
+    system (on MacOS X: 1.2.2 does not compile, 1.2.4 or later does)
+
+  - compiling against OpenFST library and linking may require recent
+    GCC version and pthread and m libraries, check OpenFST site for details
+
+  - to disable OpenFST support, configure switch ``--without-openfst`` may
+    be used
+
+- For SFST backend:
+
+  - the SFST can be downloaded from `university of Stuttgart SFST pages
+    <http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html>`_
+
+  - the SFST library version 1.4 or newer must be installed in the running
+    system. The library installation of SFST is done by explicit command
+    ``make libinstall``.
+
+  - SFST requires readline and ncurses, check SFST site for details
+
+  - to disable SFST backend, configure switch ``--without-sfst`` may be used
+
+- For foma backend:
+
+  - foma library and tools can be downloaded from `foma website
+    <http://foma.sf.net>`_
+
+  - the foma library version 0.9.14alpha or newer must be installed in the
+    running system. MacOSX note: only the source tarball compiles, the svn
+    version does not compile.
+
+  - foma requires editline, termcap and zlib libraries to compile, check foma
+    site for details
+
+  - to disable foma backend, configure switch ``--without-foma`` may be used
+
+- Versions loaded from version control systems require a relatively new GNU
+  tool-chain to build: 
+
+ - autoconf >=2.62
+
+ - automake >=1.11.1
+
+ - libtool >=2.2
+
+ - >=gettext-0.17
+
+ - GNU tool-chain is also needed with distributed packages if the user wishes to
+   modify Makefile.am or configure.ac files.
+
+ - Mac OS X users are advised to use Darwin Ports; Mac OS X 10.6 with
+   XCode 2.3.2 at least is not sufficient
+
+- Versions loaded from version control system may require parser generator 
+  system:
+
+   - GNU flex 2.5.35 or compatible and
+
+   - GNU bison 1.31 (2.4 suggested) or compatible
+
+   - flex 2.5.4-2.5.33 will choke on perfectly valid rules used in hfst
+
+   - bison older than 1.31 do not support name-prefix needed for having
+     multiple parsers in one library
+
+   - Flex and bison are needed with distribution versions as well if the user
+     wishes to modify .yy or .ll files.
+
+Runtime requirements:
+
+- If the executable is dynamically linked (almost always), the operating system
+  *must* be able to find hfst libraries, and libraries of backends that are
+  dynamically linked
+
+- If you install the libraries in non-standard paths, you need to ensure
+  that operating system is aware of this; In linux this may happen by setting
+  LD_LIBRARY_PATH.
 
 Installation
 ------------
@@ -56,84 +145,12 @@ It is common practice to keep `generated files out of version control
 For further installation instruction refer to file ``INSTALL``, which contains
 the standard installation instructions for GNU autoconf based software.
 
-Dependencies
-------------
-
-Compilation requirements:
-
-- For OpenFST backend:
- 
-  - the OpenFST library version 1.2 or newer must be installed in running
-    system (on MacOS X: 1.2.2 does not compile, 1.2.4 or later does)
-  
-  - compiling against OpenFST library and linking may require recent
-    GCC version and pthread and m libraries, check OpenFST site for details
-
-  - to disable OpenFST support, configure switch ``--without-openfst`` may
-    be used
-
-- For SFST backend:
-
-  - the SFST library version 1.4 or newer must be installed in the running
-    system. The library installation of SFST is done by explicit command
-    ``make libinstall``.
-
-  - SFST requires readline and ncurses, check SFST site for details
-
-  - to disable SFST backend, configure switch ``--without-sfst`` may be used
-
-- For foma backend:
-
-  - the foma library version 0.9.13alpha or newer must be installed in the
-    running system. MacOSX note: only the source tarball compiles, the svn
-    version does not compile.
-
-  - foma requires editline, termcap and zlib libraries to compile, check foma
-    site for details
-
-  - to disable foma backend, configure switch ``--without-foma`` may be used
-
-- Versions loaded from version control systems require a relatively new GNU
-  tool-chain to build: 
-  
- - autoconf >=2.60, 
-
- - automake,
-
- - libtool >=2.2,
-  
- - >=gettext-0.17.
-
- - GNU tool-chain is also needed with distributed packages if the user wishes to
-   modify Makefile.am or configure.ac files.
-
-- Versions loaded from version control system may require parser generator 
-  system:
-  
-   - GNU flex 2.5.35 or compatible and
-     
-   - GNU bison 1.31 (2.4 suggested) or compatible
-     
-   - flex 2.5.4-2.5.33 will choke on perfectly valid rules used in hfst
-   
-   - bison older than 1.31 do not support name-prefix needed for having
-     multiple parsers in one library
-
-   - Flex and bison are needed with distribution versions as well if the user
-     wishes to modify .yy or .ll files.
-
-Runtime requirements:
-
-- If the executable is dynamically linked (almost always), the operating system
-  *must* be able to find hfst libraries, and libraries of backends that are
-  dynamically linked.
-
 Further information
 -------------------
 
 The `Hfst wiki site
-<https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome>`_ also contains more
-details.
+<https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome>`_ contains further
+details of the HFST system.
 
 Reporting bugs
 --------------
