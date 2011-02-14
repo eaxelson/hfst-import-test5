@@ -281,17 +281,39 @@ namespace hfst
 	}
       case (LOG_OPENFST_TYPE):
 	{
-	  // TODO: add harmonize_smaller etc.
 	  std::pair <hfst::implementations::LogFst*, 
 	    hfst::implementations::LogFst*> result;
-	  result =
-	    log_ofst_interface.harmonize(this->implementation.log_ofst,
-					 another.implementation.log_ofst,
-					 unknown_symbols_in_use);
-	  delete this->implementation.log_ofst;
-	  delete another.implementation.log_ofst;
-	  this->implementation.log_ofst = result.first;
-	  another.implementation.log_ofst = result.second;
+
+	  if ( harmonize_smaller && 
+	       log_ofst_interface.number_of_states
+	       (this->implementation.log_ofst) >
+	       log_ofst_interface.number_of_states
+	       (another.implementation.log_ofst) ) {
+	    result =
+	      log_ofst_interface.harmonize
+	        (another.implementation.log_ofst,
+		 this->implementation.log_ofst,
+		 unknown_symbols_in_use);	  
+	    if (unknown_symbols_in_use) {  // new transducers are created
+	      delete another.implementation.log_ofst;
+	      delete this->implementation.log_ofst; 
+	    }
+	    this->implementation.log_ofst = result.second;
+	    another.implementation.log_ofst = result.first;
+	  }
+	  else {
+	    result =
+	      log_ofst_interface.harmonize
+	        (this->implementation.log_ofst,
+		 another.implementation.log_ofst,
+		 unknown_symbols_in_use);	  
+	    if (unknown_symbols_in_use) {  // new transducers are created
+	      delete another.implementation.log_ofst;
+	      delete this->implementation.log_ofst; 
+	    }
+	    this->implementation.log_ofst = result.first;
+	    another.implementation.log_ofst = result.second;
+	  }
 	  break;
 	}
 #endif

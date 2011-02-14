@@ -1342,7 +1342,6 @@ namespace hfst {
 	    @note This function is always called for arguments of functions
 	    that take two or more graphs as their arguments, unless otherwise
 	    said.
-	    @todo Check that the note above is always true..
 	*/
 	HfstTransitionGraph &harmonize(HfstTransitionGraph &another) {
 

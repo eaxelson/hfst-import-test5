@@ -243,6 +243,8 @@ namespace implementations
 
       float get_profile_seconds();
 
+      static unsigned int number_of_states(const LogFst * t);
+
     private:
       static fst::SymbolTable create_symbol_table(std::string name);
       static void initialize_symbol_tables(LogFst *t);
