@@ -158,7 +158,7 @@ public HfstStreamException {};
 
     thrown by HfstTransducer::extract_strings. An example:
 \verbatim
-HfstTransducer transducer("a", "b", TROPICAL_OFST_TYPE);
+HfstTransducer transducer("a", "b", TROPICAL_OPENFST_TYPE);
 transducer.repeat_star();
 try {
   WeightedPaths<float>::Set results;
@@ -212,7 +212,7 @@ FILE * ifile = fopen("testfile.att", "rb");
 try {
   while (not eof(ifile))
     {
-    HfstTransducer t(ifile, TROPICAL_OFST_TYPE, "epsilon");
+    HfstTransducer t(ifile, TROPICAL_OPENFST_TYPE, "epsilon");
     transducers.push_back(t);
     printf("read one transducer\n");
     }

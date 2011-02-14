@@ -21,13 +21,13 @@ namespace hfst
   bool HfstTransducer::is_safe_conversion(ImplementationType original, ImplementationType converted) {
     if (original == converted)
       return true;
-    if (original == TROPICAL_OFST_TYPE && converted == LOG_OFST_TYPE) {
+    if (original == TROPICAL_OPENFST_TYPE && converted == LOG_OPENFST_TYPE) {
       return false;
     }
-    if (original == LOG_OFST_TYPE && converted == TROPICAL_OFST_TYPE) {
+    if (original == LOG_OPENFST_TYPE && converted == TROPICAL_OPENFST_TYPE) {
       return false;
     }
-    if (original == TROPICAL_OFST_TYPE || original == LOG_OFST_TYPE) {
+    if (original == TROPICAL_OPENFST_TYPE || original == LOG_OPENFST_TYPE) {
       if (converted == SFST_TYPE) {
 	return false;
       }
@@ -39,7 +39,7 @@ namespace hfst
     //#ifdef HAVE_MY_TRANSDUCER_LIBRARY
     //if (original == MY_TRANSDUCER_LIBRARY_TYPE) {
     //  // From my transducer to weighted transducer
-    //  if ( converted == TROPICAL_OFST_TYPE || converted == LOG_OFST_TYPE) {
+    //  if ( converted == TROPICAL_OPENFST_TYPE || converted == LOG_OPENFST_TYPE) {
     //	return true;  // if your library supports weights
     //	return false; // if your library does not support weights
     //  }
@@ -84,7 +84,7 @@ namespace hfst
 	}
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	{
 	  fst::StdVectorFst * tropical_ofst_temp =
 	    tropical_ofst_funct(implementation.tropical_ofst);
@@ -92,7 +92,7 @@ namespace hfst
 	  implementation.tropical_ofst = tropical_ofst_temp;
 	  break;
 	}
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	{
 	  hfst::implementations::LogFst * log_ofst_temp =
 	    log_ofst_funct(implementation.log_ofst);
@@ -161,7 +161,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
 	}
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	{
 	  fst::StdVectorFst * tropical_ofst_temp =
 	    tropical_ofst_funct(implementation.tropical_ofst,n);
@@ -169,7 +169,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
 	  implementation.tropical_ofst = tropical_ofst_temp;
 	  break;
 	}
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
         {
 	  hfst::implementations::LogFst * log_ofst_temp =
             log_ofst_funct(implementation.log_ofst,n);
@@ -239,7 +239,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
 	}
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	{
 	  fst::StdVectorFst * tropical_ofst_temp =
 	    tropical_ofst_funct(implementation.tropical_ofst,s1,s2);
@@ -247,7 +247,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
 	  implementation.tropical_ofst = tropical_ofst_temp;
 	  break;
 	}
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
         {
 	  hfst::implementations::LogFst * log_ofst_temp =
             log_ofst_funct(implementation.log_ofst,s1,s2);
@@ -325,7 +325,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
 	}
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	{
 	  fst::StdVectorFst * tropical_ofst_temp =
 	    tropical_ofst_funct(this->implementation.tropical_ofst,
@@ -334,7 +334,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
 	  implementation.tropical_ofst = tropical_ofst_temp;
 	  break;
 	}
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
         {
 	  hfst::implementations::LogFst * log_ofst_temp =
             log_ofst_funct(implementation.log_ofst,

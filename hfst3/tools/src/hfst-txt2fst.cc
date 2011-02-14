@@ -133,7 +133,7 @@ break;
       }
     if (output_format == hfst::UNSPECIFIED_TYPE)
       {
-        output_format = hfst::TROPICAL_OFST_TYPE;
+        output_format = hfst::TROPICAL_OPENFST_TYPE;
         verbose_printf("Using default output format OpenFst "
                 "with tropical weight class\n");
       }
@@ -188,10 +188,10 @@ int main( int argc, char **argv )
       case hfst::SFST_TYPE:
         verbose_printf("Using SFST as output handler\n");
         break;
-      case hfst::TROPICAL_OFST_TYPE:
+      case hfst::TROPICAL_OPENFST_TYPE:
         verbose_printf("Using OpenFst's tropical weights as output\n");
         break;
-      case hfst::LOG_OFST_TYPE:
+      case hfst::LOG_OPENFST_TYPE:
         verbose_printf("Using OpenFst's log weight output\n");
         break;
       case hfst::FOMA_TYPE:

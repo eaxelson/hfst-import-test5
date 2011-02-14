@@ -45,8 +45,8 @@ namespace hfst
   enum ImplementationType 
   {
     SFST_TYPE, /**< An SFST transducer, unweighted. */
-    TROPICAL_OFST_TYPE, /**< An OpenFst transducer with tropical weights. */
-    LOG_OFST_TYPE, /**< An OpenFst transducer with logarithmic weights. */
+    TROPICAL_OPENFST_TYPE, /**< An OpenFst transducer with tropical weights. */
+    LOG_OPENFST_TYPE, /**< An OpenFst transducer with logarithmic weights. */
     FOMA_TYPE, /**< A foma transducer, unweighted. */
     /* Add an enumerator for your transducer type here. */
     //MY_TRANSDUCER_LIBRARY_TYPE, 

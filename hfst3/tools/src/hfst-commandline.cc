@@ -219,17 +219,17 @@ hfst_parse_format_name(const char* s)
     else if ((strcasecmp(s, "openfst-tropical") == 0) ||
              (strcasecmp(s, "ofst-tropical") == 0))
       {
-        rv = hfst::TROPICAL_OFST_TYPE;
+        rv = hfst::TROPICAL_OPENFST_TYPE;
       }
     else if ((strcasecmp(s, "openfst-log") == 0) ||
              (strcasecmp(s, "ofst-log") == 0))
       {
-        rv = hfst::LOG_OFST_TYPE;
+        rv = hfst::LOG_OPENFST_TYPE;
       }
     else if ((strcasecmp(s, "openfst") == 0) ||
              (strcasecmp(s, "ofst") == 0))
       {
-        rv = hfst::TROPICAL_OFST_TYPE;
+        rv = hfst::TROPICAL_OPENFST_TYPE;
         warning(0, 0, "Ambiguous format name %s, guessing openfst-tropical",
                 s);
       }
@@ -272,10 +272,10 @@ hfst_strformat(hfst::ImplementationType format)
     case hfst::SFST_TYPE:
       return strdup("SFST (1.4 compatible)");
       break;
-    case hfst::TROPICAL_OFST_TYPE:
+    case hfst::TROPICAL_OPENFST_TYPE:
       return strdup("OpenFST, std arc, tropical semiring");
       break;
-    case hfst::LOG_OFST_TYPE:
+    case hfst::LOG_OPENFST_TYPE:
       return strdup("OpenFST, std arc, log semiring");
       break;
     case hfst::FOMA_TYPE:

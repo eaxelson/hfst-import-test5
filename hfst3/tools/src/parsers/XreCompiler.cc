@@ -10,7 +10,7 @@
 namespace hfst { namespace xre {
 XreCompiler::XreCompiler() : 
     definitions_(),
-    format_(hfst::TROPICAL_OFST_TYPE)
+    format_(hfst::TROPICAL_OPENFST_TYPE)
 {}
 
 XreCompiler::XreCompiler(hfst::ImplementationType impl) :
@@ -53,7 +53,7 @@ main(int argc, char** argv)
 #endif
 #if HAVE_OPENFST
     std::cout << " (OpenFst...";
-    XreCompiler ofstXre = XreCompiler(TROPICAL_OFST_TYPE);
+    XreCompiler ofstXre = XreCompiler(TROPICAL_OPENFST_TYPE);
 #endif
 #if HAVE_FOMA
     std::cout << " (Foma)...";

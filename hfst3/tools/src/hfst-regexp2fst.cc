@@ -172,7 +172,7 @@ parse_options(int argc, char** argv)
       {
         verbose_printf("Output format not specified, "
              "defaulting to openfst tropical\n");
-        output_format = hfst::TROPICAL_OFST_TYPE;
+        output_format = hfst::TROPICAL_OPENFST_TYPE;
       }
     return EXIT_CONTINUE;
 }
