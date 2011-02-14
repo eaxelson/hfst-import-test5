@@ -248,5 +248,5 @@ hfst_calculate_CXXFLAGS= -Wall -Wno-error
 
 ## YACC and FLEX with autotools argh
 AM_YFLAGS=-d
-AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
+AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c 
 
