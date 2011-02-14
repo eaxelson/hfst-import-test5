@@ -517,8 +517,7 @@ namespace hfst { namespace implementations
       return it->second;
   }
 
-  // FIXME: atof and atoi are not necessarily portable...
-  // FIXME: sscanf skips spaces
+  // FIXME?: atof and atoi
   /* Reads a description of a transducer in AT&T text format 
      and returns a corresponding binary transducer. 
      @note The initial state must be numbered as zero. */
@@ -685,6 +684,15 @@ namespace hfst { namespace implementations
 
     //result->SetInputSymbols(t->InputSymbols());
     return result;
+  }
+
+  unsigned int LogWeightTransducer::number_of_states(const LogFst *t)
+  {
+    unsigned int retval=0;
+    for (fst::StateIterator<LogFst> siter(*t); 
+	 not siter.Done(); siter.Next())
+      retval++;
+    return retval;
   }
 
   std::pair<LogFst*, LogFst*> LogWeightTransducer::harmonize

@@ -310,6 +310,18 @@ tr1.disjunct(tr2);
     static HfstTransducer &convert
       (const HfstTransducer &t, ImplementationType type);
 
+    /* \brief For internal use: Create a transducer of type \a type as 
+       defined in AT&T format in file named \a filename.
+       \a epsilon_symbol defines how epsilons are represented.
+
+       @pre The file exists, otherwise an exception is thrown.
+       @see HfstTransducer(FILE, ImplementationType, const std::string&)
+       @throws hfst::exceptions::StreamNotReadableException 
+       hfst::exceptions::NotValidAttFormatException */
+    static HfstTransducer &read_in_att_format
+      (const std::string &filename, ImplementationType type, 
+       const std::string &epsilon_symbol);
+
 
     /* For debugging */
     void print_alphabet();
@@ -328,11 +340,11 @@ tr1.disjunct(tr2);
     // ----- Constructors, destructor, assignment -----
     // ------------------------------------------------
 
-    /* \brief Create an uninitialized transducer (use with care). 
-
-       @note This constructor leaves the backend implementation variable
-       uninitialized. An uninitialized transducer is likely to cause an
-       hfst::exceptions::TransducerHasWrongTypeException at some point. */
+    /** \brief Create an uninitialized transducer (use with care). 
+	
+	@note This constructor leaves the backend implementation variable
+	uninitialized. An uninitialized transducer is likely to cause an
+	hfst::exceptions::TransducerHasWrongTypeException at some point. */
     HfstTransducer();
 
     /** \brief Create an empty transducer, i.e. a transducer that does not 
@@ -615,18 +627,7 @@ This will yield a file "testfile.att" that looks as follows:
     void write_in_att_format(const std::string &filename, 
 			     bool write_weights=true) const;
 
-    /* \brief For internal use: Create a transducer of type \a type as 
-       defined in AT&T format in file named \a filename.
-       \a epsilon_symbol defines how epsilons are represented.
-
-       @pre The file exists, otherwise an exception is thrown.
-       @see HfstTransducer(FILE, ImplementationType, const std::string&)
-       @throws hfst::exceptions::StreamNotReadableException 
-       hfst::exceptions::NotValidAttFormatException */
-    static HfstTransducer &read_in_att_format
-      (const std::string &filename, ImplementationType type, 
-       const std::string &epsilon_symbol);
-
+  public:
     /* \brief Call \a callback with some or all string pairs recognized 
        by the transducer?
 
@@ -703,7 +704,7 @@ ccc : ddd
     void extract_strings
       (WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1, 
        bool include_spv=false) const;
-    
+
     /* \brief Call \a callback with extracted strings that are not 
        invalidated by flag diacritic rules.
 
@@ -715,6 +716,7 @@ ccc : ddd
       (ExtractStringsCb& callback, int cycles=-1, bool filter_fd=true, 
        bool include_spv=false) const;
     
+  public:
     /** \brief Store to \a results string pairs that are recognized 
 	by the transducer
 	and are not invalidated by flag diacritic rules, optionally filtering

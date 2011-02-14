@@ -538,8 +538,7 @@ namespace hfst { namespace implementations
       return it->second;
   }
 
-  // FIXME: atof and atoi are not necessarily portable...
-  // FIXME: sscanf skips spaces
+  // FIXME?: atof and atoi
   /* Reads a description of a transducer in AT&T text format and returns 
      a corresponding binary transducer. 
      @note The initial state must be numbered as zero. */
