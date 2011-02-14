@@ -36,7 +36,7 @@ void compare_and_delete(HfstTransducer * rule_transducers1[],
   for (int i=0; i<3; i++) {
     delete rule_transducers1[i];
     delete rule_transducers2[i];
-    delete rule_transducers1[i];
+    delete rule_transducers3[i];
   }
 }
 
@@ -90,7 +90,7 @@ int main(int argc, char **argv) {
 		     rule_transducers3);
 
 
-
+#ifdef FOO
   /* HfstTransducer &replace_in_context(
      HfstTransducerPair &context, 
      ReplaceType repl_type, 
@@ -118,6 +118,7 @@ int main(int argc, char **argv) {
     alphabet.insert(StringPair("c","c"));
     HfstTransducer rule = rules::replace_up(context, mapping, false, alphabet);
   }
+#endif
     
 }
 
