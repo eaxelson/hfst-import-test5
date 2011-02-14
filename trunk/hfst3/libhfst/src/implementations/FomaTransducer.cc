@@ -54,7 +54,7 @@ namespace hfst { namespace implementations {
   short FomaInputStream::stream_get_short() 
   {
     short i;
-    assert(sizeof(i) == fread(&i,sizeof(i),1,input_file));
+    assert(1 == fread(&i,sizeof(i),1,input_file));
     return i;
   }
 
