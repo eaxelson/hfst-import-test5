@@ -56,8 +56,8 @@ LexcCompiler* lexc_ = 0;
 
 LexcCompiler::LexcCompiler() :
     quiet_(false),
-    format_(TROPICAL_OFST_TYPE),
-    xre_(TROPICAL_OFST_TYPE),
+    format_(TROPICAL_OPENFST_TYPE),
+    xre_(TROPICAL_OPENFST_TYPE),
     initialLexiconName_("Root"),
     totalEntries_(0),
     currentEntries_(0)
@@ -495,7 +495,7 @@ main(int argc, char** argv)
 #endif
 #if HAVE_OPENFST
     std::cout << " (OpenFST)...";
-    LexcCompiler lexcOfst(TROPICAL_OFST_TYPE);
+    LexcCompiler lexcOfst(TROPICAL_OPENFST_TYPE);
 #endif
 #if HAVE_FOMA
     std::cout << " (foma)...";

@@ -152,7 +152,7 @@ process_stream(HfstInputStream& instream)
         verbose_printf("Writing %zu of %s to %s...\n", transducer_n,
                        inputfilename, outfilename); 
         HfstOutputStream* outstream = new HfstOutputStream(outfilename,
-                                                           instream.get_type()) ;
+                                                           instream.get_type());
         //outstream->open();
         HfstTransducer trans(instream);
         *outstream << trans;

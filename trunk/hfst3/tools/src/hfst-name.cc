@@ -134,12 +134,13 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 
 		if (transducer_n==1)
 		{
-          verbose_printf("Naming %s...\n", inputfilename); 
-        }
+		  verbose_printf("Naming %s...\n", inputfilename); 
+		}
 		else
-		{
-          verbose_printf("Naming %s...%zu\n", inputfilename, transducer_n); 
-        }
+		  {
+		    verbose_printf("Naming %s...%zu\n", 
+				   inputfilename, transducer_n); 
+		  }
 		
 		HfstTransducer trans(instream);
 		if (not print_name) {

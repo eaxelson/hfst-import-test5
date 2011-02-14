@@ -147,7 +147,7 @@ namespace hfst
 \verbatim
     log_transducer.disjunct(sfst_transducer);                        // this will cause an error
     log_transducer.convert(SFST_TYPE).disjunct(sfst_transducer);     // this works, but weights are lost in the conversion
-    log_transducer.disjunct(sfst_transducer.convert(LOG_OFST_TYPE)); // this works, information is not lost
+    log_transducer.disjunct(sfst_transducer.convert(LOG_OPENFST_TYPE)); // this works, information is not lost
 \endverbatim
 
     \section creating_transducers Creating transducers
@@ -356,7 +356,7 @@ tr1.disjunct(tr2);
 \verbatim
        std::string ustring = "foobar";
        HfstTokenizer TOK;
-       HfstTransducer tr(ustring, TOK, LOG_OFST_TYPE);
+       HfstTransducer tr(ustring, TOK, LOG_OPENFST_TYPE);
        // tr now contains one path [f o o b a r]
 \endverbatim
 
@@ -480,7 +480,7 @@ FILE * ifile = fopen("testfile.att", "rb");
 try {
   while (not eof(ifile))
     {
-    HfstTransducer t(ifile, TROPICAL_OFST_TYPE, "<eps>");
+    HfstTransducer t(ifile, TROPICAL_OPENFST_TYPE, "<eps>");
     transducers.push_back(t);
     printf("read one transducer\n");
     }
@@ -836,14 +836,14 @@ TODO...
 
     /** \brief Extract \a n best paths of the transducer. 
 
-	In the case of a weighted transducer (#TROPICAL_OFST_TYPE or 
-	#LOG_OFST_TYPE), best paths are defined as paths with the lowest weight.
+	In the case of a weighted transducer (#TROPICAL_OPENFST_TYPE or 
+	#LOG_OPENFST_TYPE), best paths are defined as paths with the lowest weight.
 	In the case of an unweighted transducer (#SFST_TYPE or #FOMA_TYPE), 
 	the function returns random paths.
 
         This function is not implemented for #FOMA_TYPE or #SFST_TYPE.
 	If this function is called by an HfstTransducer of type #FOMA_TYPE 
-	or #SFST_TYPE, it is converted to #TROPICAL_OFST_TYPE,
+	or #SFST_TYPE, it is converted to #TROPICAL_OPENFST_TYPE,
 	strings are extracted and it is converted back to #FOMA_TYPE or 
 	#SFST_TYPE. If HFST is not linked to OpenFst library, an
 	hfst::exceptions::ImplementationTypeNotAvailable is thrown.
@@ -1011,7 +1011,7 @@ t.substitute(&func);
 
 	The transition weights remain the same.
 
-	Implemented only for #TROPICAL_OFST_TYPE and #LOG_OFST_TYPE.
+	Implemented only for #TROPICAL_OPENFST_TYPE and #LOG_OPENFST_TYPE.
 	If this function is called by an unweighted HfstTransducer, 
 	it is converted to weighted one,
 	substitution is done and it is converted back to the original format.
@@ -1026,9 +1026,9 @@ t.substitute(&func);
 
 	The weight of the original transition is copied to all new transitions.
 
-	Implemented only for #TROPICAL_OFST_TYPE and #LOG_OFST_TYPE.
+	Implemented only for #TROPICAL_OPENFST_TYPE and #LOG_OPENFST_TYPE.
 	If this function is called by an unweighted HfstTransducer 
-	(#SFST_TYPE or #FOMA_TYPE), it is converted to #TROPICAL_OFST_TYPE,
+	(#SFST_TYPE or #FOMA_TYPE), it is converted to #TROPICAL_OPENFST_TYPE,
 	substitution is done and it is converted back to the original format.
 
 	@see String
@@ -1045,9 +1045,9 @@ t.substitute(&func);
 	The weight of the original transition is copied to 
 	the epsilon transition leaving from the source state.
 
-	Implemented only for #TROPICAL_OFST_TYPE and #LOG_OFST_TYPE.
+	Implemented only for #TROPICAL_OPENFST_TYPE and #LOG_OPENFST_TYPE.
 	If this function is called by an unweighted HfstTransducer 
-	(#SFST_TYPE or #FOMA_TYPE), it is converted to #TROPICAL_OFST_TYPE,
+	(#SFST_TYPE or #FOMA_TYPE), it is converted to #TROPICAL_OPENFST_TYPE,
 	substitution is done and it is converted back to the original format.
 
 	@see String

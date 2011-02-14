@@ -254,11 +254,11 @@ process_stream(HfstInputStream& instream)
           fprintf(outfile, "fst type: SFST\n"
                   "arc type: SFST\n");
           break;
-        case hfst::TROPICAL_OFST_TYPE:
+        case hfst::TROPICAL_OPENFST_TYPE:
           fprintf(outfile, "fst type: OpenFST\n"
                   "arc type: tropical\n");
           break;
-        case hfst::LOG_OFST_TYPE:
+        case hfst::LOG_OPENFST_TYPE:
           fprintf(outfile, "fst type: OpenFST\n"
                   "arc type: log\n");
           break;

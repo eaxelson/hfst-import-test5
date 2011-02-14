@@ -48,8 +48,8 @@ namespace xfst {
 
 
     XfstCompiler::XfstCompiler() :
-        xre_(hfst::TROPICAL_OFST_TYPE),
-        format_(hfst::TROPICAL_OFST_TYPE),
+        xre_(hfst::TROPICAL_OPENFST_TYPE),
+        format_(hfst::TROPICAL_OPENFST_TYPE),
         verbose_(false)
       {
         variables_["assert"] = "OFF";
@@ -1850,7 +1850,7 @@ main(int argc, char** argv)
 #endif
 #if HAVE_OPENFST
     std::cout << " (OpenFst)";
-    XfstCompiler ofstXfst(TROPICAL_OFST_TYPE);
+    XfstCompiler ofstXfst(TROPICAL_OPENFST_TYPE);
 #endif
 #if HAVE_SFST
     std::cout << " (foma)";

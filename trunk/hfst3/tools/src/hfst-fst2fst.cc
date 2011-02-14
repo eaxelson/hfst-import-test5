@@ -131,10 +131,10 @@ parse_options(int argc, char** argv)
           output_type = hfst::FOMA_TYPE;
           break;
         case 't':
-          output_type = hfst::TROPICAL_OFST_TYPE;
+          output_type = hfst::TROPICAL_OPENFST_TYPE;
           break;
         case 'l':
-          output_type = hfst::LOG_OFST_TYPE;
+          output_type = hfst::LOG_OPENFST_TYPE;
           break;
         case 'O':
           output_type = hfst::HFST_OL_TYPE;

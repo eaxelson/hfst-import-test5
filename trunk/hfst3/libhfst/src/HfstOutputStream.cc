@@ -30,11 +30,11 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	implementation.tropical_ofst = 
 	  new hfst::implementations::TropicalWeightOutputStream();
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	implementation.log_ofst = 
 	  new hfst::implementations::LogWeightOutputStream();
 	break;
@@ -81,7 +81,7 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	// FIXME: this should be done in TropicalWeight layer
 	if (filename.compare("") == 0) 
 	  implementation.tropical_ofst = 
@@ -90,7 +90,7 @@ namespace hfst
 	  implementation.tropical_ofst = 
 	    new hfst::implementations::TropicalWeightOutputStream(filename, hfst_format);
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	implementation.log_ofst = 
 	  new hfst::implementations::LogWeightOutputStream(filename);
 	break;
@@ -131,10 +131,10 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	delete implementation.tropical_ofst;
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	delete implementation.log_ofst;
 	break;
 #endif
@@ -186,10 +186,10 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	implementation.tropical_ofst->write(c);
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	implementation.log_ofst->write(c);
 	break;
 #endif
@@ -230,10 +230,10 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	type_value=std::string("TROPICAL_OPENFST");
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	type_value=std::string("LOG_OPENFST");
 	break;
 #endif
@@ -337,6 +337,11 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
 	fprintf(stderr, "ERROR: transducer header is too long\n");
 	exit(1);
       }
+      /*
+	short length = (short)header_length;
+	char first_byte = (short)(header_length/255);
+	char second_byte = (short)(header_length%255);
+       */
       char first_byte = *((char*)(&header_length));
       char second_byte = *((char*)(&header_length)+1);
       write(first_byte);
@@ -356,11 +361,11 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
 	return *this;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	implementation.tropical_ofst->write_transducer
 	  (transducer.implementation.tropical_ofst);
 	return *this;    
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	implementation.log_ofst->write_transducer
 	  (transducer.implementation.log_ofst);
 	return *this;
@@ -396,10 +401,10 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	implementation.tropical_ofst->close();
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	implementation.log_ofst->close();
 	break;
 #endif
@@ -440,7 +445,7 @@ main(int argc, char** argv)
 #if HAVE_OPENFST
   std::cout << " (F, OPENFST)...";
   HfstOutputStream ofststream("HfstInputStream_OFST.hfst",
-                             hfst::TROPICAL_OFST_TYPE);
+                             hfst::TROPICAL_OPENFST_TYPE);
 #endif
 #if HAVE_FOMA
   std::cout << " (F, FOMA)...";
@@ -454,7 +459,7 @@ main(int argc, char** argv)
 #endif
 #if HAVE_OPENFST
   std::cout << " <<(HfstTransducer(a, OFST))...";
-  HfstTransducer ofst("a", hfst::TROPICAL_OFST_TYPE);
+  HfstTransducer ofst("a", hfst::TROPICAL_OPENFST_TYPE);
   ofststream << ofst;
 #endif
 #if HAVE_FOMA

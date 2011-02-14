@@ -156,7 +156,7 @@ process_stream(HfstInputStream& instream, FILE* outf)
 	  printw=false;
 	else if ( (type == hfst::SFST_TYPE || type == hfst::FOMA_TYPE) )
 	  printw = false;
-	else if ( (type == hfst::TROPICAL_OFST_TYPE || type == hfst::LOG_OFST_TYPE) )
+	else if ( (type == hfst::TROPICAL_OPENFST_TYPE || type == hfst::LOG_OPENFST_TYPE) )
 	  printw = true;
 	else  // this should not happen
 	  printw = true;

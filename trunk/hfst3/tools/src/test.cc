@@ -34,7 +34,7 @@ void print(HfstInternalTransducer &t)
 
 int main(int argc, char **argv) {
 
-  ImplementationType types[] = {SFST_TYPE, TROPICAL_OFST_TYPE, LOG_OFST_TYPE, FOMA_TYPE};
+  ImplementationType types[] = {SFST_TYPE, TROPICAL_OPENFST_TYPE, LOG_OPENFST_TYPE, FOMA_TYPE};
   for (int i=0; i<4; i++) {
     {
       // Test the empty transducer constructors for all implementation types.
@@ -325,20 +325,20 @@ int main(int argc, char **argv) {
   HfstTokenizer TOK;
   TOK.add_multichar_symbol("foo");
   TOK.add_multichar_symbol("bar");
-  HfstTransducer TOK_TR("fooofoooa", "barrbabarr", TOK, TROPICAL_OFST_TYPE);
+  HfstTransducer TOK_TR("fooofoooa", "barrbabarr", TOK, TROPICAL_OPENFST_TYPE);
   TOK_TR.print();
 
   HfstTokenizer TOK2;
   TOK2.add_multichar_symbol("fii");
   TOK2.add_multichar_symbol("baar");
-  HfstTransducer TOK_TR2("foofii", "barbaarq", TOK2, TROPICAL_OFST_TYPE);
+  HfstTransducer TOK_TR2("foofii", "barbaarq", TOK2, TROPICAL_OPENFST_TYPE);
   TOK_TR2.print();
 
   HfstTransducer TOK_CAT = TOK_TR.concatenate(TOK_TR2);
   TOK_CAT.print();
 
 
-  ImplementationType types[] = {TROPICAL_OFST_TYPE, LOG_OFST_TYPE, SFST_TYPE, FOMA_TYPE};
+  ImplementationType types[] = {TROPICAL_OPENFST_TYPE, LOG_OPENFST_TYPE, SFST_TYPE, FOMA_TYPE};
   for (int i=0; i<4; i++) 
     {      
       fprintf(stderr, "testing transducers of type %i\n", types[i]);
@@ -504,7 +504,7 @@ int main(int argc, char **argv) {
   //fprintf(stderr, "main: (2)\n");
   T = T.convert(SFST_TYPE);
   //fprintf(stderr, "main: (3)\n");
-  T = T.convert(TROPICAL_OFST_TYPE);
+  T = T.convert(TROPICAL_OPENFST_TYPE);
   //fprintf(stderr, "main: (4)\n");
   T = T.convert(FOMA_TYPE);
   //fprintf(stderr, "main: (5)\n");

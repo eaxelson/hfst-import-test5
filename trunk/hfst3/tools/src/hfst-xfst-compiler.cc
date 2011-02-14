@@ -117,7 +117,7 @@ parse_options(int argc, char** argv)
     if (format == hfst::UNSPECIFIED_TYPE)
       {
         verbose_printf("Defaulting to OpenFst tropical type\n");
-        format = hfst::TROPICAL_OFST_TYPE;
+        format = hfst::TROPICAL_OPENFST_TYPE;
       }
     if (argc - optind > 0)
       {

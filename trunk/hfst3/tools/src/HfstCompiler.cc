@@ -595,8 +595,8 @@ namespace hfst
     hfst::implementations::HfstBasicTransducer retval_fsm;
 
     if (type != FOMA_TYPE && 
-	type != TROPICAL_OFST_TYPE &&
-	type != LOG_OFST_TYPE)
+	type != TROPICAL_OPENFST_TYPE &&
+	type != LOG_OPENFST_TYPE)
       retval_hfst = new HfstTransducer(type);
 
     int n=0;
@@ -629,8 +629,8 @@ namespace hfst
       }
 
       if (type != FOMA_TYPE &&
-	  type != TROPICAL_OFST_TYPE &&
-	  type != LOG_OFST_TYPE)
+	  type != TROPICAL_OPENFST_TYPE &&
+	  type != LOG_OPENFST_TYPE)
 	retval_hfst->disjunct(spv);
       else
 	retval_fsm.disjunct(spv,0);
@@ -644,8 +644,8 @@ namespace hfst
       fprintf(stderr,"finished\n");
 
     if (type != FOMA_TYPE &&
-	type != TROPICAL_OFST_TYPE &&
-	type != LOG_OFST_TYPE)
+	type != TROPICAL_OPENFST_TYPE &&
+	type != LOG_OPENFST_TYPE)
       return retval_hfst;
     else {
       return new HfstTransducer(retval_fsm, type);

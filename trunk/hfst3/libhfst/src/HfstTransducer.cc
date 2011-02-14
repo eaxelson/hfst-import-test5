@@ -98,7 +98,7 @@ namespace hfst
       return sfst_interface.get_profile_seconds();
 #endif
 #if HAVE_OPENFST
-    if (type == TROPICAL_OFST_TYPE)
+    if (type == TROPICAL_OPENFST_TYPE)
       return tropical_ofst_interface.get_profile_seconds();
 #endif
     return 0;
@@ -127,10 +127,10 @@ namespace hfst
         sfst_interface.insert_to_alphabet(implementation.sfst, symbol);
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
         tropical_ofst_interface.insert_to_alphabet
 	  (implementation.tropical_ofst, symbol);
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
         log_ofst_interface.insert_to_alphabet
 	  (implementation.log_ofst, symbol);
 #endif
@@ -157,10 +157,10 @@ namespace hfst
         return sfst_interface.get_alphabet(implementation.sfst);
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
         return tropical_ofst_interface.get_alphabet
 	  (implementation.tropical_ofst);
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
         return log_ofst_interface.get_alphabet(implementation.log_ofst);
 #endif
 #if HAVE_FOMA
@@ -243,7 +243,7 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case (TROPICAL_OFST_TYPE):
+      case (TROPICAL_OPENFST_TYPE):
 	{
 	  std::pair <fst::StdVectorFst*, fst::StdVectorFst*> result;
 
@@ -279,7 +279,7 @@ namespace hfst
 	  }
 	  break;
 	}
-      case (LOG_OFST_TYPE):
+      case (LOG_OPENFST_TYPE):
 	{
 	  // TODO: add harmonize_smaller etc.
 	  std::pair <hfst::implementations::LogFst*, 
@@ -394,12 +394,12 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	implementation.tropical_ofst = 
 	  tropical_ofst_interface.create_empty_transducer();
-	this->type = TROPICAL_OFST_TYPE;
+	this->type = TROPICAL_OPENFST_TYPE;
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	implementation.log_ofst = 
 	  log_ofst_interface.create_empty_transducer();
 	break;
@@ -448,12 +448,12 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	implementation.tropical_ofst = 
 	  tropical_ofst_interface.define_transducer(spv);
-	this->type = TROPICAL_OFST_TYPE;
+	this->type = TROPICAL_OPENFST_TYPE;
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	implementation.log_ofst = 
 	  log_ofst_interface.define_transducer(spv);
 	break;
@@ -487,15 +487,15 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	implementation.tropical_ofst = 
 	  tropical_ofst_interface.define_transducer(spv);
-	this->type = TROPICAL_OFST_TYPE;
+	this->type = TROPICAL_OPENFST_TYPE;
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	implementation.log_ofst = 
 	  log_ofst_interface.define_transducer(spv);
-	this->type = LOG_OFST_TYPE;
+	this->type = LOG_OPENFST_TYPE;
 	break;
 #endif
 #if HAVE_FOMA
@@ -529,15 +529,15 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	implementation.tropical_ofst = 
 	  tropical_ofst_interface.define_transducer(sps,cyclic);
-	this->type = TROPICAL_OFST_TYPE;
+	this->type = TROPICAL_OPENFST_TYPE;
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	implementation.log_ofst = 
 	  log_ofst_interface.define_transducer(sps,cyclic);
-	this->type = LOG_OFST_TYPE;
+	this->type = LOG_OPENFST_TYPE;
 	break;
 #endif
 #if HAVE_FOMA
@@ -570,15 +570,15 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	implementation.tropical_ofst = 
 	  tropical_ofst_interface.define_transducer(spsv);
-	this->type = TROPICAL_OFST_TYPE;
+	this->type = TROPICAL_OPENFST_TYPE;
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	implementation.log_ofst = 
 	  log_ofst_interface.define_transducer(spsv);
-	this->type = LOG_OFST_TYPE;
+	this->type = LOG_OPENFST_TYPE;
 	break;
 #endif
 #if HAVE_FOMA
@@ -616,12 +616,12 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	implementation.tropical_ofst = 
 	  tropical_ofst_interface.define_transducer(spv);
-	this->type = TROPICAL_OFST_TYPE;
+	this->type = TROPICAL_OPENFST_TYPE;
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	implementation.log_ofst = 
 	  log_ofst_interface.define_transducer(spv);
 	break;
@@ -665,11 +665,11 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	implementation.tropical_ofst =
 	  tropical_ofst_interface.copy(another.implementation.tropical_ofst);
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	implementation.log_ofst =
 	  log_ofst_interface.copy(another.implementation.log_ofst);
 	break;
@@ -713,11 +713,11 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	implementation.tropical_ofst = 
 	  ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(&net);
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	implementation.log_ofst = 
 	  ConversionFunctions::hfst_basic_transducer_to_log_ofst(&net);	  
 	break;
@@ -756,10 +756,10 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	delete implementation.tropical_ofst;
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	delete implementation.log_ofst;
 	break;
 #endif
@@ -795,12 +795,12 @@ HfstTransducer::HfstTransducer(const std::string &symbol,
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	implementation.tropical_ofst = 
 	  tropical_ofst_interface.define_transducer(symbol);
-	this->type = TROPICAL_OFST_TYPE;
+	this->type = TROPICAL_OPENFST_TYPE;
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	implementation.log_ofst = log_ofst_interface.define_transducer(symbol);
 	break;
 #endif
@@ -834,12 +834,12 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	implementation.tropical_ofst 
 	  = tropical_ofst_interface.define_transducer(isymbol, osymbol);
-	this->type = TROPICAL_OFST_TYPE;
+	this->type = TROPICAL_OPENFST_TYPE;
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	implementation.log_ofst 
 	  = log_ofst_interface.define_transducer(isymbol, osymbol);
 	break;
@@ -893,11 +893,11 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 		 another_copy.implementation.sfst);
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	return one_copy.tropical_ofst_interface.are_equivalent(
                  one_copy.implementation.tropical_ofst, 
 		 another_copy.implementation.tropical_ofst);
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	return one_copy.log_ofst_interface.are_equivalent(
                  one_copy.implementation.log_ofst, 
 		 another_copy.implementation.log_ofst);
@@ -925,9 +925,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
         return sfst_interface.is_cyclic(implementation.sfst);
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
         return tropical_ofst_interface.is_cyclic(implementation.tropical_ofst);
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
         return log_ofst_interface.is_cyclic(implementation.log_ofst);
 #endif
 #if HAVE_FOMA
@@ -1183,11 +1183,11 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
     switch (this->type)
       {
 #if HAVE_OPENFST
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	hfst::implementations::LogWeightTransducer::extract_strings
 	  (implementation.log_ofst,callback,cycles,NULL,false,include_spv);
 	break;
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	hfst::implementations::TropicalWeightTransducer::extract_strings
 	  (implementation.tropical_ofst,callback,cycles,NULL,false,include_spv);
 	break;
@@ -1225,7 +1225,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
     switch (this->type)
       {
 #if HAVE_OPENFST
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
       {
 	FdTable<int64>* t_log_ofst 
 	  = hfst::implementations::LogWeightTransducer::get_flag_diacritics
@@ -1235,7 +1235,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	delete t_log_ofst;
       }
 	break;
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
       {
 	FdTable<int64>* t_tropical_ofst 
 	  = hfst::implementations::TropicalWeightTransducer::
@@ -1388,13 +1388,13 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
     switch (this->type)    
       {
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	{
 	  hfst::implementations::TropicalWeightTransducer::insert_freely
 	    (implementation.tropical_ofst,symbol_pair);
 	  break;
 	}
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	{
 	  hfst::implementations::LogWeightTransducer::insert_freely
 	    (implementation.log_ofst,symbol_pair);
@@ -1452,7 +1452,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
     switch (this->type)    
       {
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	{
 	  hfst::implementations::HfstBasicTransducer * net = 
 	    ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
@@ -1471,7 +1471,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	  return *this;
 	  break;
 	}
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	{
 	  hfst::implementations::HfstBasicTransducer * net = 
 	    ConversionFunctions::log_ofst_to_hfst_basic_transducer
@@ -1582,7 +1582,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
       }
 #endif
 #if HAVE_OPENFST
-    if (this->type == TROPICAL_OFST_TYPE)
+    if (this->type == TROPICAL_OPENFST_TYPE)
       {
 	hfst::implementations::HfstBasicTransducer * net = 
 	  ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
@@ -1594,7 +1594,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	delete net;
 	return *this;
       }
-    if (this->type == LOG_OFST_TYPE)
+    if (this->type == LOG_OPENFST_TYPE)
       {
 	hfst::implementations::HfstBasicTransducer * net = 
 	  ConversionFunctions::log_ofst_to_hfst_basic_transducer
@@ -1671,7 +1671,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
       }
 #endif
 #if HAVE_OPENFST
-    if (this->type == TROPICAL_OFST_TYPE)
+    if (this->type == TROPICAL_OPENFST_TYPE)
       {
 	if (input_side && output_side)
 	  {
@@ -1692,7 +1692,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	delete net;
 	return *this;
       }
-    if (this->type == LOG_OFST_TYPE)
+    if (this->type == LOG_OPENFST_TYPE)
       {
 	if (input_side && output_side)
 	  {
@@ -1752,7 +1752,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
       }
 #endif
 #if HAVE_OPENFST
-    if (this->type == TROPICAL_OFST_TYPE)
+    if (this->type == TROPICAL_OPENFST_TYPE)
       {
 	fst::StdVectorFst * tropical_ofst_temp =
 	  this->tropical_ofst_interface.substitute
@@ -1761,7 +1761,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	implementation.tropical_ofst = tropical_ofst_temp;
 	return *this;
       }
-    if (this->type == LOG_OFST_TYPE)
+    if (this->type == LOG_OPENFST_TYPE)
       {
 	hfst::implementations::LogFst * log_ofst_temp =
 	  this->log_ofst_interface.substitute
@@ -1809,7 +1809,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
       }
 #endif
 #if HAVE_OPENFST
-    if (this->type == TROPICAL_OFST_TYPE)
+    if (this->type == TROPICAL_OPENFST_TYPE)
       {
 	/* The implementation of TropicalWeightTransducer segfaults
 	   for some reason if the symbol pair is substituted with itself. */
@@ -1835,7 +1835,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	implementation.tropical_ofst = tropical_ofst_temp;
 	return *this;
       }
-    if (this->type == LOG_OFST_TYPE)
+    if (this->type == LOG_OPENFST_TYPE)
       {
 	/* The implementation of LogWeightTransducer segfaults
 	   for some reason if the symbol pair is substituted with itself. */
@@ -1917,14 +1917,14 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
       }
 #endif
 #if HAVE_OPENFST
-    if (this->type == TROPICAL_OFST_TYPE)
+    if (this->type == TROPICAL_OPENFST_TYPE)
       {
 	this->tropical_ofst_interface.substitute
 	  (implementation.tropical_ofst,
 	   symbol_pair,transducer.implementation.tropical_ofst);
 	return *this;
       }
-    if (this->type == LOG_OFST_TYPE)
+    if (this->type == LOG_OPENFST_TYPE)
       {
 	this->log_ofst_interface.substitute
 	  (implementation.log_ofst,
@@ -1940,13 +1940,13 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   HfstTransducer &HfstTransducer::set_final_weights(float weight)
   {
 #if HAVE_OPENFST
-    if (this->type == TROPICAL_OFST_TYPE) {
+    if (this->type == TROPICAL_OPENFST_TYPE) {
       implementation.tropical_ofst  =
 	this->tropical_ofst_interface.set_final_weights
 	  (this->implementation.tropical_ofst, weight);
       return *this;
     }
-    if (this->type == LOG_OFST_TYPE) {
+    if (this->type == LOG_OPENFST_TYPE) {
       implementation.log_ofst  =
 	this->log_ofst_interface.set_final_weights
 	(this->implementation.log_ofst, weight);
@@ -1961,7 +1961,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   {
 #if HAVE_OPENFST
     bool to_initial_state = (push_type == TO_INITIAL_STATE);
-    if (this->type == TROPICAL_OFST_TYPE) 
+    if (this->type == TROPICAL_OPENFST_TYPE) 
       {
 	hfst::implementations::StdVectorFst * tmp  =
 	  this->tropical_ofst_interface.push_weights
@@ -1970,7 +1970,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	this->implementation.tropical_ofst = tmp;
 	return *this;
       }
-    if (this->type == LOG_OFST_TYPE)
+    if (this->type == LOG_OPENFST_TYPE)
       {
 	hfst::implementations::LogFst * tmp =
 	  this->log_ofst_interface.push_weights
@@ -1988,13 +1988,13 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   HfstTransducer &HfstTransducer::transform_weights(float (*func)(float))
   {
 #if HAVE_OPENFST
-    if (this->type == TROPICAL_OFST_TYPE) {
+    if (this->type == TROPICAL_OPENFST_TYPE) {
       implementation.tropical_ofst  =
 	this->tropical_ofst_interface.transform_weights
 	(this->implementation.tropical_ofst, func);
       return *this;
     }
-    if (this->type == LOG_OFST_TYPE) {
+    if (this->type == LOG_OPENFST_TYPE) {
       implementation.log_ofst  =
 	this->log_ofst_interface.transform_weights
 	(this->implementation.log_ofst, func);
@@ -2046,7 +2046,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   unsigned int HfstTransducer::number_of_states() const
   {
 #if HAVE_OPENFST
-    if (type == TROPICAL_OFST_TYPE)
+    if (type == TROPICAL_OPENFST_TYPE)
       return this->tropical_ofst_interface.number_of_states
 	(this->implementation.tropical_ofst);
 #endif
@@ -2101,7 +2101,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
         }
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
         {
 	  fst::StdVectorFst * tropical_ofst_temp =
             this->tropical_ofst_interface.compose
@@ -2111,7 +2111,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
           implementation.tropical_ofst = tropical_ofst_temp;
           break;
         }
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
         {
 	  hfst::implementations::LogFst * log_ofst_temp =
             this->log_ofst_interface.compose(implementation.log_ofst,
@@ -2167,7 +2167,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 
     switch (type)
       {
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	{
 	  fst::ArcSort<fst::StdArc,hfst::implementations::StdMyOLabelCompare>
 	    (implementation.tropical_ofst,
@@ -2218,10 +2218,10 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	tropical_ofst_interface.disjunct(implementation.tropical_ofst, spv);
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	throw hfst::exceptions::FunctionNotImplementedException();
 	break;
 #endif
@@ -2248,9 +2248,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
       case SFST_TYPE:
 	throw hfst::exceptions::FunctionNotImplementedException(); break;
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	throw hfst::exceptions::FunctionNotImplementedException(); break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	throw hfst::exceptions::FunctionNotImplementedException(); break;
 #endif
       case FOMA_TYPE:
@@ -2263,7 +2263,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 
   HfstTransducer &HfstTransducer::n_best(unsigned int n) 
   {
-    if (not is_implementation_type_available(TROPICAL_OFST_TYPE)) {
+    if (not is_implementation_type_available(TROPICAL_OPENFST_TYPE)) {
       (void)n;
       throw hfst::exceptions::ImplementationTypeNotAvailableException();
     }
@@ -2271,14 +2271,14 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 #if HAVE_OPENFST
     ImplementationType original_type = this->type;
     if ((original_type == SFST_TYPE) || (original_type == FOMA_TYPE)) {
-      this->convert(TROPICAL_OFST_TYPE);
+      this->convert(TROPICAL_OPENFST_TYPE);
     }
 #endif
 
     switch (this->type)
       {
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	{
 	  fst::StdVectorFst * temp =
 	    hfst::implementations::TropicalWeightTransducer::n_best
@@ -2287,7 +2287,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	  implementation.tropical_ofst = temp;
 	  break;
       }
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	{
 	  hfst::implementations::LogFst * temp =
 	    hfst::implementations::LogWeightTransducer::n_best
@@ -2398,7 +2398,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
       return false;
 #endif
 #if !HAVE_OPENFST
-    if (type == TROPICAL_OFST_TYPE || type == LOG_OFST_TYPE)
+    if (type == TROPICAL_OPENFST_TYPE || type == LOG_OPENFST_TYPE)
       return false;
 #endif
        /* Add here your implementation. */
@@ -2451,13 +2451,13 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	    break;
 #endif
 #if HAVE_OPENFST
-	  case TROPICAL_OFST_TYPE:
+	  case TROPICAL_OPENFST_TYPE:
 	    internal =
 	      ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
 	      (implementation.tropical_ofst);
 	    delete implementation.tropical_ofst;
 	    break;
-	  case LOG_OFST_TYPE:
+	  case LOG_OPENFST_TYPE:
 	  internal =
 	    ConversionFunctions::log_ofst_to_hfst_basic_transducer
 	    (implementation.log_ofst);
@@ -2497,13 +2497,13 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	    //break;
 	    //#endif
 #if HAVE_OPENFST
-	  case TROPICAL_OFST_TYPE:
+	  case TROPICAL_OPENFST_TYPE:
 	    implementation.tropical_ofst =
 	      ConversionFunctions::hfst_basic_transducer_to_tropical_ofst
 	      (internal);
 	    delete internal;
 	    break;
-	  case LOG_OFST_TYPE:
+	  case LOG_OPENFST_TYPE:
 	    implementation.log_ofst =
 	      ConversionFunctions::hfst_basic_transducer_to_log_ofst(internal);
 	    delete internal;
@@ -2576,12 +2576,12 @@ HfstTransducer::HfstTransducer(FILE * ifile,
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	implementation.tropical_ofst 
 	  = ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(&net);
 	  
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	implementation.log_ofst 
 	  = ConversionFunctions::hfst_basic_transducer_to_log_ofst(&net);
 	break;
@@ -2668,10 +2668,10 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
       break;
 #endif
 #if HAVE_OPENFST
-    case TROPICAL_OFST_TYPE:
+    case TROPICAL_OPENFST_TYPE:
       delete implementation.tropical_ofst;
       break;
-    case LOG_OFST_TYPE:
+    case LOG_OPENFST_TYPE:
       delete implementation.log_ofst;
       break;
 #endif
@@ -2707,11 +2707,11 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
       break;
 #endif
 #if HAVE_OPENFST
-    case TROPICAL_OFST_TYPE:
+    case TROPICAL_OPENFST_TYPE:
       implementation.tropical_ofst = 
 	tropical_ofst_interface.copy(another_1.implementation.tropical_ofst);
       break;
-    case LOG_OFST_TYPE:
+    case LOG_OPENFST_TYPE:
       implementation.log_ofst = 
 	log_ofst_interface.copy(another_1.implementation.log_ofst);
       break;
@@ -2798,9 +2798,9 @@ int main(void)
 #endif
 #if HAVE_OPENFST
   std::cout << " (OpenFst tropical)...";
-  HfstTransducer ofsttEmpty(TROPICAL_OFST_TYPE);
+  HfstTransducer ofsttEmpty(TROPICAL_OPENFST_TYPE);
   std::cout << " (OpenFst log)...";
-  HfstTransducer ofstlEmpty(LOG_OFST_TYPE);
+  HfstTransducer ofstlEmpty(LOG_OPENFST_TYPE);
 #endif
 #if HAVE_FOMA
   std::cout << " (foma)...";
@@ -2813,9 +2813,9 @@ int main(void)
 #endif
 #if HAVE_OPENFST
   std::cout << " (äläkkä, t, OpenFst tropical)...";
-  HfstTransducer ofsttUtf8("äläkkä", tokenizer, TROPICAL_OFST_TYPE);
+  HfstTransducer ofsttUtf8("äläkkä", tokenizer, TROPICAL_OPENFST_TYPE);
   std::cout << " (äläkkä, t, OpenFst log)...";
-  HfstTransducer ofstlUtf8("äläkkä", tokenizer, LOG_OFST_TYPE);
+  HfstTransducer ofstlUtf8("äläkkä", tokenizer, LOG_OPENFST_TYPE);
 #endif
 #if HAVE_FOMA
   std::cout << " (äläkkä, t, foma)...";
@@ -2829,10 +2829,10 @@ int main(void)
 #if HAVE_OPENFST
   std::cout << " (apple, banana, t, OpenFst Tropical)...";
   HfstTransducer ofsttAppleBanana("apple", "banana", tokenizer, 
-                                 TROPICAL_OFST_TYPE);
+                                 TROPICAL_OPENFST_TYPE);
   std::cout << " (apple, banana, t, OpenFst log)...";
   HfstTransducer ofstlAppleBanana("apple", "banana", tokenizer, 
-                                 LOG_OFST_TYPE);
+                                 LOG_OPENFST_TYPE);
 #endif
 #if HAVE_FOMA
   std::cout << " (apple, banana, t, foma)...";
@@ -2846,10 +2846,10 @@ int main(void)
 #if HAVE_OPENFST
   std::cout << " (apple, banana, OpenFst Tropical)...";
   HfstTransducer ofsttAppleBanana1("apple", "banana", 
-                                  TROPICAL_OFST_TYPE);
+                                  TROPICAL_OPENFST_TYPE);
   std::cout << " (apple, banana, OpenFst log)...";
   HfstTransducer ofstlAppleBanana1("apple", "banana", 
-                                 LOG_OFST_TYPE);
+                                 LOG_OPENFST_TYPE);
 #endif
 #if HAVE_FOMA
   std::cout << " (apple, banana, foma)...";
@@ -2878,10 +2878,10 @@ int main(void)
 #endif
 #if HAVE_OPENFST
   std::cout << " (OpenFst Tropical)...";
-  delete new HfstTransducer(TROPICAL_OFST_TYPE);
+  delete new HfstTransducer(TROPICAL_OPENFST_TYPE);
   delete new HfstTransducer(ofsttCopy);
   std::cout << " (OpenFst log)...";
-  delete new HfstTransducer(LOG_OFST_TYPE);
+  delete new HfstTransducer(LOG_OPENFST_TYPE);
   delete new HfstTransducer(ofstlCopy);
 #endif
 #if HAVE_FOMA
@@ -3082,8 +3082,8 @@ int main(void)
   sfstAB.subtract(sfstBC);
 #endif
 #if HAVE_OPENFST
-  HfstTransducer ofsttAB("a", "b", TROPICAL_OFST_TYPE);
-  HfstTransducer ofsttBC("b", "c", TROPICAL_OFST_TYPE);
+  HfstTransducer ofsttAB("a", "b", TROPICAL_OPENFST_TYPE);
+  HfstTransducer ofsttBC("b", "c", TROPICAL_OPENFST_TYPE);
   std::cout << " ofst.compose...";
   ofsttAB.compose(ofsttBC);
   std::cout << " concatenate...";
@@ -3115,7 +3115,7 @@ int main(void)
 #if HAVE_OPENFST
   std::cout << " sfst -> TROPICAL_OFST...";
   HfstTransducer sfstToOfst(sfstCopy);
-  sfstToOfst.convert(TROPICAL_OFST_TYPE);
+  sfstToOfst.convert(TROPICAL_OPENFST_TYPE);
 #endif
 #if HAVE_FOMA
   std::cout << " sfst -> FOMA...";
@@ -3144,7 +3144,7 @@ int main(void)
 #if HAVE_OPENFST
   std::cout << " foma -> TROPICAL_OFST...";
   HfstTransducer fomaToOfst(fomaCopy);
-  fomaToOfst.convert(TROPICAL_OFST_TYPE);
+  fomaToOfst.convert(TROPICAL_OPENFST_TYPE);
 #endif
 #endif
   std::cout << std::endl << "Reading and writing AT&T format...";
@@ -3194,7 +3194,7 @@ int main(void)
   fclose(temporary);
   temporary = fopen(temporary_filename, "r");
   std::cout << " (f, TROPICAL_OFST, @0@)...";
-  HfstTransducer ofsttReadAtt(temporary, TROPICAL_OFST_TYPE, "@0@");
+  HfstTransducer ofsttReadAtt(temporary, TROPICAL_OPENFST_TYPE, "@0@");
   fclose(temporary);
 #endif
 #if HAVE_FOMA

@@ -41,10 +41,10 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	this->implementation.tropical_ofst->ignore(n);
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	this->implementation.log_ofst->ignore(n);
 	break;
 #endif
@@ -81,10 +81,10 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	return c = this->implementation.tropical_ofst->stream_get();
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	return c = this->implementation.log_ofst->stream_get();
 	break;
 #endif
@@ -124,10 +124,10 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	return i = this->implementation.tropical_ofst->stream_get_short();
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	return i = this->implementation.log_ofst->stream_get_short();
 	break;
 #endif
@@ -165,10 +165,10 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	return this->implementation.tropical_ofst->stream_get();
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	return this->implementation.log_ofst->stream_get();
 	break;
 #endif
@@ -207,10 +207,10 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	this->implementation.tropical_ofst->stream_unget(c);
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	this->implementation.log_ofst->stream_unget(c);
 	break;
 #endif
@@ -323,7 +323,7 @@ namespace hfst
 	}
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	{
 	  t.implementation.tropical_ofst =
 	    this->implementation.tropical_ofst->read_transducer();
@@ -444,7 +444,7 @@ namespace hfst
 	    }
 	break;
 	}
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	{
 	t.implementation.log_ofst =
 	  this->implementation.log_ofst->read_transducer();
@@ -622,10 +622,12 @@ namespace hfst
       type = SFST_TYPE;
     else if (strcmp("FOMA", header_data[1].second.c_str()) == 0 )
       type = FOMA_TYPE;
-    else if (strcmp("TROPICAL_OPENFST", header_data[1].second.c_str()) == 0 )
-      type = TROPICAL_OFST_TYPE;
-    else if (strcmp("LOG_OPENFST", header_data[1].second.c_str()) == 0 )
-      type = LOG_OFST_TYPE;
+    else if (strcmp("TROPICAL_OPENFST", header_data[1].second.c_str()) == 0 ||
+	     strcmp("TROPICAL_OFST", header_data[1].second.c_str()) == 0)
+      type = TROPICAL_OPENFST_TYPE;
+    else if (strcmp("LOG_OPENFST", header_data[1].second.c_str()) == 0 ||
+	     strcmp("LOG_OFST", header_data[1].second.c_str()) == 0 )
+      type = LOG_OPENFST_TYPE;
 #if HAVE_MY_TRANSDUCER_LIBRARY
     else if (strcmp("MY_TRANSDUCER_LIBRARY", header_data[1].second.c_str()) 
 	     == 0 )
@@ -718,9 +720,9 @@ namespace hfst
     if (fst_type.compare("FOMA_TYPE") == 0)
       { bytes_read=10; return FOMA_TYPE; }
     if (fst_type.compare("TROPICAL_OFST_TYPE") == 0)
-      { bytes_read=19; return TROPICAL_OFST_TYPE; }
+      { bytes_read=19; return TROPICAL_OPENFST_TYPE; }
     if (fst_type.compare("LOG_OFST_TYPE") == 0)
-      { bytes_read=14; return LOG_OFST_TYPE; }
+      { bytes_read=14; return LOG_OPENFST_TYPE; }
     if (fst_type.compare("HFST_OL_TYPE") == 0)
       { bytes_read=13; return HFST_OL_TYPE; }
     if (fst_type.compare("HFST_OLW_TYPE") == 0)
@@ -837,7 +839,7 @@ namespace hfst
       {
       case HFST_VERSION_2_WEIGHTED:
 	hfst_version_2_weighted_transducer=true;
-	return TROPICAL_OFST_TYPE;
+	return TROPICAL_OPENFST_TYPE;
 	break;
       case HFST_VERSION_2_UNWEIGHTED_WITHOUT_ALPHABET:
 	fprintf(stderr, "ERROR: version 2 HFST transducer with no alphabet "
@@ -849,10 +851,10 @@ namespace hfst
 	return SFST_TYPE;
 	break;
       case OPENFST_TROPICAL_:
-	return TROPICAL_OFST_TYPE;
+	return TROPICAL_OPENFST_TYPE;
 	break;
       case OPENFST_LOG_:
-	return LOG_OFST_TYPE;
+	return LOG_OPENFST_TYPE;
 	break;
       case SFST_:
 	return SFST_TYPE;
@@ -895,11 +897,11 @@ namespace hfst
       break;
 #endif
 #if HAVE_OPENFST
-    case TROPICAL_OFST_TYPE:
+    case TROPICAL_OPENFST_TYPE:
       implementation.tropical_ofst = 
 	new hfst::implementations::TropicalWeightInputStream;
       break;
-    case LOG_OFST_TYPE:
+    case LOG_OPENFST_TYPE:
       implementation.log_ofst = 
 	new hfst::implementations::LogWeightInputStream;
       break;
@@ -960,7 +962,7 @@ namespace hfst
       break;
 #endif
 #if HAVE_OPENFST
-    case TROPICAL_OFST_TYPE:
+    case TROPICAL_OPENFST_TYPE:
       if (strcmp(filename.c_str(),"") == 0) {  
 	// FIXME: this should be done in TropicalWeight layer
 	implementation.tropical_ofst = 
@@ -970,7 +972,7 @@ namespace hfst
 	implementation.tropical_ofst = 
 	  new hfst::implementations::TropicalWeightInputStream(filename);
       break;
-    case LOG_OFST_TYPE:
+    case LOG_OPENFST_TYPE:
       implementation.log_ofst = 
 	new hfst::implementations::LogWeightInputStream(filename);
       break;
@@ -1011,10 +1013,10 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	delete implementation.tropical_ofst;
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	delete implementation.log_ofst;
 	break;
 #endif
@@ -1050,10 +1052,10 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	implementation.tropical_ofst->close();
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	implementation.log_ofst->close();
 	break;
 #endif
@@ -1086,10 +1088,10 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	return implementation.tropical_ofst->is_eof();
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	return implementation.log_ofst->is_eof();
 	break;
 #endif
@@ -1122,10 +1124,10 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	return implementation.tropical_ofst->is_bad();
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	return implementation.log_ofst->is_bad();
 	break;
 #endif
@@ -1159,10 +1161,10 @@ namespace hfst
 	break;
 #endif
 #if HAVE_OPENFST
-      case TROPICAL_OFST_TYPE:
+      case TROPICAL_OPENFST_TYPE:
 	return implementation.tropical_ofst->is_good();
 	break;
-      case LOG_OFST_TYPE:
+      case LOG_OPENFST_TYPE:
 	return implementation.log_ofst->is_good();
 	break;
 #endif
@@ -1219,8 +1221,8 @@ int main(void)
   if (NULL == check_existence)
     {
       HfstOutputStream outstream("HfstInputStream_OFST.hfst",
-                                 hfst::TROPICAL_OFST_TYPE);
-      HfstTransducer t("a", hfst::TROPICAL_OFST_TYPE);
+                                 hfst::TROPICAL_OPENFST_TYPE);
+      HfstTransducer t("a", hfst::TROPICAL_OPENFST_TYPE);
       outstream << t;
     }
   else 
