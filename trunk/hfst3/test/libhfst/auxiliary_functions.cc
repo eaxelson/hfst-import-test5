@@ -10,11 +10,11 @@ void verbose_print(const char *msg,
       case hfst::SFST_TYPE:
 	fprintf(stderr, "SFST_TYPE");
 	break;
-      case hfst::TROPICAL_OFST_TYPE:
-	fprintf(stderr, "TROPICAL_OFST_TYPE");
+      case hfst::TROPICAL_OPENFST_TYPE:
+	fprintf(stderr, "TROPICAL_OPENFST_TYPE");
 	break;
-      case hfst::LOG_OFST_TYPE:
-	fprintf(stderr, "LOG_OFST_TYPE");
+      case hfst::LOG_OPENFST_TYPE:
+	fprintf(stderr, "LOG_OPENFST_TYPE");
 	break;
       case hfst::FOMA_TYPE:
 	fprintf(stderr, "FOMA_TYPE");

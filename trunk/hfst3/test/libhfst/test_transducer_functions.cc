@@ -184,8 +184,8 @@ int main(int argc, char **argv)
 
   const unsigned int TYPES_SIZE=4;
   const ImplementationType types [] = {SFST_TYPE, 
-				       TROPICAL_OFST_TYPE, 
-				       LOG_OFST_TYPE, 
+				       TROPICAL_OPENFST_TYPE, 
+				       LOG_OPENFST_TYPE, 
 				       FOMA_TYPE};
 
   /* For all transducer implementation types, perform the following tests: */
@@ -211,8 +211,8 @@ int main(int argc, char **argv)
 	assert(t1.compare(t4));
 
 	/* Weights. */
-	if (types[i] == TROPICAL_OFST_TYPE ||
-	    types[i] == LOG_OFST_TYPE)
+	if (types[i] == TROPICAL_OPENFST_TYPE ||
+	    types[i] == LOG_OPENFST_TYPE)
 	  {
 	    HfstTransducer t6("foo", "bar", types[i]);
 	    t6.set_final_weights(0.3);
@@ -304,8 +304,8 @@ int main(int argc, char **argv)
 	    StringPair sp(it->istring, it->ostring);
 	    assert(expected_results.find(sp) != expected_results.end());
 	    /* Test weights. */
-	    if (types[i] == TROPICAL_OFST_TYPE ||
-		types[i] == LOG_OFST_TYPE)
+	    if (types[i] == TROPICAL_OPENFST_TYPE ||
+		types[i] == LOG_OPENFST_TYPE)
 	      {
 		/* Rounding can affect precision. */
 		if (it->istring.compare("cat") == 0)
@@ -327,9 +327,9 @@ int main(int argc, char **argv)
 		      "and lookup(_fd)", types[i]);
 	
 	/* add an animal with two possible plural forms */
-	// if type is LOG_OFST_TYPE:
+	// if type is LOG_OPENFST_TYPE:
 	// FATAL: EncodeMapper: Weight-encoded arc has non-trivial weight
-	if (types[i] != LOG_OFST_TYPE)
+	if (types[i] != LOG_OPENFST_TYPE)
 	  {
 	    HfstTransducer hippopotamus1("hippopotamus", "hippopotami", 
 					 tok, types[i]);
@@ -344,8 +344,8 @@ int main(int argc, char **argv)
 
 	/* convert to optimized lookup format */
 	HfstTransducer animals_ol(animals);
-	if (types[i] == TROPICAL_OFST_TYPE ||
-	    types[i] == LOG_OFST_TYPE) {
+	if (types[i] == TROPICAL_OPENFST_TYPE ||
+	    types[i] == LOG_OPENFST_TYPE) {
 	  animals_ol.convert(HFST_OLW_TYPE); }
 	else {
 	  animals_ol.convert(HFST_OL_TYPE); }
@@ -385,12 +385,12 @@ int main(int argc, char **argv)
 	assert(results_cat.size() == 1);
 	assert(results_dog.size() == 1);
 	assert(results_mouse.size() == 1);
-	if (types[i] != LOG_OFST_TYPE)
+	if (types[i] != LOG_OPENFST_TYPE)
 	  assert(results_hippopotamus.size() == 2);
 
 	bool test_weight=false;
-	if (types[i] == TROPICAL_OFST_TYPE ||
-	    types[i] == LOG_OFST_TYPE) {
+	if (types[i] == TROPICAL_OPENFST_TYPE ||
+	    types[i] == LOG_OPENFST_TYPE) {
 	  test_weight=true; }
 
 	/* check that the results are correct */
@@ -408,28 +408,28 @@ int main(int argc, char **argv)
 		(results_mouse, expected_path, 1.7, test_weight));
 
 	expected_path = tok.lookup_tokenize("hippopotami");
-	if (types[i] != LOG_OFST_TYPE)
+	if (types[i] != LOG_OPENFST_TYPE)
 	  assert(do_hfst_lookup_paths_contain
 		 (results_hippopotamus, expected_path, 1.2, test_weight));
 	
 	expected_path = tok.lookup_tokenize("hippopotamuses");
-	if (types[i] != LOG_OFST_TYPE)
+	if (types[i] != LOG_OPENFST_TYPE)
 	  assert(do_hfst_lookup_paths_contain
 		 (results_hippopotamus, expected_path, 1.4, test_weight));
 
 
-	// if type is LOG_OFST_TYPE:
+	// if type is LOG_OPENFST_TYPE:
 	// FATAL: SingleShortestPath: Weight needs to have the path property
 	// and be right distributive: log
-	if (types[i] != LOG_OFST_TYPE)
+	if (types[i] != LOG_OPENFST_TYPE)
 	  {	    
 
 	    /* Function n_best. */
 	    verbose_print("function n_best", types[i]);
 	    
 	    bool weighted=false;
-	    if (types[i] == TROPICAL_OFST_TYPE ||
-		types[i] == LOG_OFST_TYPE)
+	    if (types[i] == TROPICAL_OPENFST_TYPE ||
+		types[i] == LOG_OPENFST_TYPE)
 	      weighted=true;
 
 	    HfstTransducer animals1(animals);
@@ -545,7 +545,7 @@ int main(int argc, char **argv)
 
       /* Function push_weights. */
       {
-	if (types[i] == TROPICAL_OFST_TYPE)
+	if (types[i] == TROPICAL_OPENFST_TYPE)
 	  {
 	    verbose_print("function push_weights", types[i]);
 
@@ -558,9 +558,9 @@ int main(int argc, char **argv)
 	    
 	    /* Convert to tropical OpenFst format and push weights 
 	       toward final and initial states. */
-	    HfstTransducer T_final(t, TROPICAL_OFST_TYPE);
+	    HfstTransducer T_final(t, TROPICAL_OPENFST_TYPE);
 	    T_final.push_weights(TO_FINAL_STATE);
-	    HfstTransducer T_initial(t, TROPICAL_OFST_TYPE);
+	    HfstTransducer T_initial(t, TROPICAL_OPENFST_TYPE);
 	    T_initial.push_weights(TO_INITIAL_STATE);
 	    
 	    /* Convert back to HFST basic transducer. */
@@ -598,8 +598,8 @@ int main(int argc, char **argv)
 
       /* Functions set_final_weights and transform_weights. */
       {
-	if (types[i] == TROPICAL_OFST_TYPE ||
-	    types[i] == LOG_OFST_TYPE)
+	if (types[i] == TROPICAL_OPENFST_TYPE ||
+	    types[i] == LOG_OPENFST_TYPE)
 	  {
 	    verbose_print("functions set_final_weights and "
 			  "transform_weights", types[i]);

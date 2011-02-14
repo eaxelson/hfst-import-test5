@@ -13,8 +13,8 @@ int main(int argc, char **argv)
 
   const unsigned int TYPES_SIZE=4;
   const ImplementationType types [] = {SFST_TYPE, 
-				       TROPICAL_OFST_TYPE, 
-				       LOG_OFST_TYPE,
+				       TROPICAL_OPENFST_TYPE, 
+				       LOG_OPENFST_TYPE,
 				       FOMA_TYPE};
 
 
