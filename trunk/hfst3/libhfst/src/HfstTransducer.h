@@ -845,7 +845,7 @@ TODO...
 
         In the case of a weighted transducer (#TROPICAL_OPENFST_TYPE or 
         #LOG_OPENFST_TYPE), best paths are defined as paths with 
-	the lowest weight.
+        the lowest weight.
         In the case of an unweighted transducer (#SFST_TYPE or #FOMA_TYPE), 
         the function returns random paths.
 
@@ -1317,8 +1317,8 @@ SFST manual</a>. */
                               StringPairSet &alphabet);
 
     /** \brief The same as \link {
-	replace_down
-	(HfstTransducerPair&, HfstTransducer&, bool, StringPairSet&)} \endlink
+        replace_down
+        (HfstTransducerPair&, HfstTransducer&, bool, StringPairSet&)} \endlink
         but \a mapping is performed in every context.
 
         @see replace_up */
@@ -1360,8 +1360,8 @@ SFST manual</a>. */
         substrings are mapped to any symbol allowed by \a alphabet.
 
         @see {
-	restriction(HfstTransducerPairVector&, HfstTransducer&, StringPairSet&) 
-	#coercion 
+        restriction(HfstTransducerPairVector&, HfstTransducer&, StringPairSet&) 
+        #coercion 
      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
      SFST manual</a>} */
     HfstTransducer restriction_and_coercion(HfstTransducerPairVector &contexts,

@@ -52,7 +52,8 @@
 struct fsm;
 
 /** @file ConvertTransducerFormat.h
-    \brief Declarations of functions for converting between transducer backend formats. */
+    \brief Declarations of functions for converting between 
+    transducer backend formats. */
 
 namespace hfst { 
 
@@ -62,7 +63,8 @@ namespace implementations {
 
     template <class T, class W> class HfstTransitionGraph;
     class HfstTropicalTransducerTransitionData;
-    typedef HfstTransitionGraph<HfstTropicalTransducerTransitionData, float> HfstBasicTransducer; 
+    typedef HfstTransitionGraph<HfstTropicalTransducerTransitionData, float> 
+      HfstBasicTransducer; 
     typedef unsigned int HfstState;
 
   using namespace hfst::exceptions;
@@ -80,22 +82,27 @@ namespace implementations {
 
   public:
 
-    static HfstBasicTransducer * hfst_transducer_to_hfst_basic_transducer(const hfst::HfstTransducer &t);
+    static HfstBasicTransducer * hfst_transducer_to_hfst_basic_transducer
+      (const hfst::HfstTransducer &t);
 
 #if HAVE_SFST
-  static void sfst_to_hfst_basic_transducer( SFST::Node *node, SFST::NodeNumbering &index, 
-                                std::set<SFST::Node*> &visited_nodes, 
-                                             HfstBasicTransducer *net, SFST::Alphabet &alphabet);
+  static void sfst_to_hfst_basic_transducer
+    ( SFST::Node *node, SFST::NodeNumbering &index, 
+      std::set<SFST::Node*> &visited_nodes, 
+      HfstBasicTransducer *net, SFST::Alphabet &alphabet);
 
-  static HfstBasicTransducer * sfst_to_hfst_basic_transducer(SFST::Transducer * t);
+  static HfstBasicTransducer * sfst_to_hfst_basic_transducer
+    (SFST::Transducer * t);
 
-  static SFST::Transducer * hfst_basic_transducer_to_sfst(const HfstBasicTransducer * t);
+  static SFST::Transducer * hfst_basic_transducer_to_sfst
+    (const HfstBasicTransducer * t);
 #endif // HAVE_SFST
   
 #if HAVE_FOMA
   static HfstBasicTransducer * foma_to_hfst_basic_transducer(struct fsm * t);
 
-  static struct fsm * hfst_basic_transducer_to_foma(const HfstBasicTransducer * t);
+  static struct fsm * hfst_basic_transducer_to_foma
+    (const HfstBasicTransducer * t);
 #endif // HAVE_FOMA
 
 #if HAVE_OPENFST

@@ -143,22 +143,22 @@ namespace implementations
       // string versions
       static LogFst * define_transducer(const std::string &symbol);
       static LogFst * define_transducer
-	(const std::string &isymbol, const std::string &osymbol);
+        (const std::string &isymbol, const std::string &osymbol);
       static LogFst * define_transducer
-	(const hfst::StringPairVector &spv);
+        (const hfst::StringPairVector &spv);
       static LogFst * define_transducer
-	(const hfst::StringPairSet &sps, bool cyclic=false);
+        (const hfst::StringPairSet &sps, bool cyclic=false);
       static LogFst * define_transducer(const std::vector<StringPairSet> &spsv);
 
       // number versions
       static LogFst * define_transducer(unsigned int number);
       static LogFst * define_transducer
-	(unsigned int inumber, unsigned int onumber);
+        (unsigned int inumber, unsigned int onumber);
       static LogFst * define_transducer(const hfst::NumberPairVector &npv);
       static LogFst * define_transducer
-	(const hfst::NumberPairSet &nps, bool cyclic=false);
+        (const hfst::NumberPairSet &nps, bool cyclic=false);
       static LogFst * define_transducer
-	(const std::vector<NumberPairSet> &npsv);
+        (const std::vector<NumberPairSet> &npsv);
 
       static LogFst * copy(LogFst * t);
       static LogFst * determinize(LogFst * t);
@@ -175,9 +175,9 @@ namespace implementations
       static LogFst * extract_input_language(LogFst * t);
       static LogFst * extract_output_language(LogFst * t);
       static void extract_strings
-	(LogFst * t, hfst::ExtractStringsCb& callback,
-	 int cycles=-1, FdTable<int64>* fd=NULL, bool filter_fd=false,
-	 bool include_spv=false);
+        (LogFst * t, hfst::ExtractStringsCb& callback,
+         int cycles=-1, FdTable<int64>* fd=NULL, bool filter_fd=false,
+         bool include_spv=false);
       static LogFst * compose(LogFst * t1,
                                    LogFst * t2);
       static LogFst * concatenate(LogFst * t1,
@@ -198,7 +198,7 @@ namespace implementations
       static LogFst * push_weights(LogFst * t, bool to_initial_state);
 
       static std::pair<LogFst*, LogFst*> harmonize
-	(LogFst *t1, LogFst *t2, bool unknown_symbols_in_use=true);
+        (LogFst *t1, LogFst *t2, bool unknown_symbols_in_use=true);
 
       static void write_in_att_format(LogFst * t, FILE *ofile);
       static void write_in_att_format_number(LogFst * t, FILE *ofile);
@@ -218,16 +218,16 @@ namespace implementations
       // string versions
       static LogFst * insert_freely(LogFst * t, const StringPair &symbol_pair);
       static LogFst * substitute
-	(LogFst * t, std::string old_symbol, std::string new_symbol);
+        (LogFst * t, std::string old_symbol, std::string new_symbol);
       static LogFst * substitute(LogFst * t,
-				 StringPair old_symbol_pair,
-				 StringPair new_symbol_pair);
+                                 StringPair old_symbol_pair,
+                                 StringPair new_symbol_pair);
       static LogFst * substitute(LogFst * t,
-				 StringPair old_symbol_pair,
-				 StringPairSet new_symbol_pair_set);
+                                 StringPair old_symbol_pair,
+                                 StringPairSet new_symbol_pair_set);
       static LogFst * substitute(LogFst * t,
-				 const StringPair old_symbol_pair,
-				 LogFst *transducer);
+                                 const StringPair old_symbol_pair,
+                                 LogFst *transducer);
 
       // number versions
       static LogFst * insert_freely(LogFst * t, const NumberPair &number_pair);
@@ -246,10 +246,10 @@ namespace implementations
       static void recode_symbol_numbers(LogFst * t, hfst::NumberNumberMap &km);
 
       static LogFst * expand_arcs
-	(LogFst * t, hfst::StringSet &unknown, bool unknown_symbols_in_use);
+        (LogFst * t, hfst::StringSet &unknown, bool unknown_symbols_in_use);
 
       static LogFst * remove_from_alphabet
-	(LogFst *t, const std::string &symbol);
+        (LogFst *t, const std::string &symbol);
 
       float get_profile_seconds();
 
@@ -284,8 +284,8 @@ namespace implementations
       static StateId add_state(LogFst *t);
       static void set_final_weight(LogFst *t, StateId s, float w);
       static void add_transition
-	(LogFst *t, StateId source,
-	 std::string &isymbol, std::string &osymbol, float w, StateId target);
+        (LogFst *t, StateId source,
+         std::string &isymbol, std::string &osymbol, float w, StateId target);
       static float get_final_weight(LogFst *t, StateId s);
       static float is_final(LogFst *t, StateId s);
       static StateId get_initial_state(LogFst *t);

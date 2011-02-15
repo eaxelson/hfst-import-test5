@@ -90,7 +90,7 @@ namespace hfst
         else
           implementation.tropical_ofst = 
             new hfst::implementations::TropicalWeightOutputStream
-	    (filename, hfst_format);
+            (filename, hfst_format);
         break;
       case LOG_OPENFST_TYPE:
         implementation.log_ofst = 
@@ -279,7 +279,7 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
 #if HAVE_SFST
       case SFST_TYPE:
         implementation.sfst->append_implementation_specific_header_data
-	  (header, transducer.implementation.sfst);
+          (header, transducer.implementation.sfst);
         break;
 #endif
       default:

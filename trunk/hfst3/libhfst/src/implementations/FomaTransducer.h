@@ -88,10 +88,13 @@ namespace hfst {
       static fsm * create_empty_transducer(void);
       static fsm * create_epsilon_transducer(void);
       static fsm * define_transducer(const hfst::StringPairVector &spv);
-      static fsm * define_transducer(const hfst::StringPairSet &sps, bool cyclic=false);
+      static fsm * define_transducer
+        (const hfst::StringPairSet &sps, bool cyclic=false);
       static fsm * define_transducer(const std::vector<StringPairSet> &spsv);
-      static fsm * define_transducer(const std::string &symbol);                     
-      static fsm * define_transducer(const std::string &isymbol, const std::string &osymbol);       
+      static fsm * define_transducer
+        (const std::string &symbol);                     
+      static fsm * define_transducer
+        (const std::string &isymbol, const std::string &osymbol);       
       static fsm * copy(fsm * t);
       static fsm * determinize(fsm * t);
       static fsm * minimize(fsm * t);
@@ -111,7 +114,8 @@ namespace hfst {
       static bool are_equivalent(fsm *t1, fsm *t2);
       static bool is_cyclic(fsm * t);
 
-      static fsm * substitute(fsm * t,hfst::String old_symbol,hfst::String new_symbol);
+      static fsm * substitute
+        (fsm * t,hfst::String old_symbol,hfst::String new_symbol);
 
       static fsm * compose(fsm * t1,
                            fsm * t2);
@@ -125,7 +129,8 @@ namespace hfst {
                             fsm * t2);
                         
       static void extract_strings(fsm * t, hfst::ExtractStringsCb& callback,
-                                  int cycles=-1, FdTable<int>* fd=NULL, bool filter_fd=false, bool include_spv=false);
+                                  int cycles=-1, FdTable<int>* fd=NULL, 
+                                  bool filter_fd=false, bool include_spv=false);
       
       static FdTable<int>* get_flag_diacritics(fsm * t);
 

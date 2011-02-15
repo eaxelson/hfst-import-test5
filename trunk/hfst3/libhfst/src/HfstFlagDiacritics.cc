@@ -81,7 +81,7 @@ main(int argc, char** argv)
   std::cout << std::endl << "find diacritic... ";
 
     assert(hfst::FdOperation::find_diacritic
-	   ("@P.A.X@", len) != std::string::npos);
+           ("@P.A.X@", len) != std::string::npos);
     assert(hfst::FdOperation::find_diacritic("FOO", len) == std::string::npos);
   std::cout << std::endl << "is diacritic... ";
     assert(hfst::FdOperation::is_diacritic("@P.A.X@"));

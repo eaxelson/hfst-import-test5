@@ -92,14 +92,14 @@ public:
             {
                 assert(op == Cop || op == Dop || op == Rop);
                 feat = str.substr(first_full_stop_pos+1, 
-				  last_char_pos-first_full_stop_pos-1);
+                                  last_char_pos-first_full_stop_pos-1);
             }
             else
             {
                 feat = str.substr(first_full_stop_pos+1, 
-				  second_full_stop_pos-first_full_stop_pos-1);
+                                  second_full_stop_pos-first_full_stop_pos-1);
                 val = str.substr(second_full_stop_pos+1, 
-				 last_char_pos-second_full_stop_pos-1);
+                                 last_char_pos-second_full_stop_pos-1);
             }
       
             if(feature_map.count(feat) == 0)
@@ -114,9 +114,9 @@ public:
             }
       
             operations.insert
-	      (std::pair<T,FdOperation>
-	       (symbol, 
-		FdOperation(op, feature_map[feat], value_map[val], str)));
+              (std::pair<T,FdOperation>
+               (symbol, 
+                FdOperation(op, feature_map[feat], value_map[val], str)));
             symbol_map.insert(std::pair<std::string,T>(str, symbol));
         }
     
@@ -126,18 +126,18 @@ public:
       
     const FdOperation* get_operation(T symbol) const
         {
-	  // for some reason this fails to compile???
-	  //std::map<T,FdOperation>::const_iterator i 
-	  //  = operations.find(symbol);
-	  //return (i==operations.end()) ? NULL : &(i->second);
+          // for some reason this fails to compile???
+          //std::map<T,FdOperation>::const_iterator i 
+          //  = operations.find(symbol);
+          //return (i==operations.end()) ? NULL : &(i->second);
         
-	  return (operations.find(symbol)==operations.end()) ? NULL : 
-	    &(operations.find(symbol)->second);
+          return (operations.find(symbol)==operations.end()) ? NULL : 
+            &(operations.find(symbol)->second);
         }
     const FdOperation* get_operation(const std::string& symbol) const
         {
             return (symbol_map.find(symbol)==symbol_map.end()) ? NULL : 
-	      get_operation(symbol_map.find(symbol)->second);
+              get_operation(symbol_map.find(symbol)->second);
         }
     
     bool is_valid_string(const std::vector<T>& symbols) const
@@ -161,7 +161,7 @@ public:
             while(true)
             {
                 std::string::size_type next_diacritic_pos 
-		  = FdOperation::find_diacritic(remaining, length);
+                  = FdOperation::find_diacritic(remaining, length);
                 if(next_diacritic_pos = std::string::npos)
                     break;
         
@@ -226,16 +226,16 @@ public:
                 return true;
           
             case Uop: // unification
-	      if(values[op.Feature()] == 0 || /* if the feature is unset or */
-		 values[op.Feature()] == op.Value() || /* the feature is at 
-							  this value already 
-							  or */
-		 (values[op.Feature()] < 0 &&
-		  (values[op.Feature()]*-1 != op.Value())) /* the feature is 
-							      negatively set 
-							      to something 
-							      else */
-		 )
+              if(values[op.Feature()] == 0 || /* if the feature is unset or */
+                 values[op.Feature()] == op.Value() || /* the feature is at 
+                                                          this value already 
+                                                          or */
+                 (values[op.Feature()] < 0 &&
+                  (values[op.Feature()]*-1 != op.Value())) /* the feature is 
+                                                              negatively set 
+                                                              to something 
+                                                              else */
+                 )
                 {
                     values[op.Feature()] = op.Value();
                     return true;

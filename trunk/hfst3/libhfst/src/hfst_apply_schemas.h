@@ -30,8 +30,8 @@ HfstTransducer &apply(
  //my_namespace::MyFst * (*my_transducer_library_funct)(my_namespace::MyFst *),
  //#endif
  bool dummy /* makes sure there is always a parameter after the 
-	       function pointer parameters, so commas between parameters 
-	       are easier to handle */
+               function pointer parameters, so commas between parameters 
+               are easier to handle */
 );  
 
 HfstTransducer &apply(

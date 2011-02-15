@@ -94,17 +94,17 @@ namespace implementations
 
       static Transducer * define_transducer(unsigned int number);
       static Transducer * define_transducer
-	(unsigned int inumber, unsigned int onumber);
+        (unsigned int inumber, unsigned int onumber);
 
       static Transducer * define_transducer(const std::string &symbol);
       static Transducer * define_transducer
-	(const std::string &isymbol, const std::string &osymbol);
+        (const std::string &isymbol, const std::string &osymbol);
       static Transducer * define_transducer
-	(const StringPairVector &spv);
+        (const StringPairVector &spv);
       static Transducer * define_transducer
-	(const StringPairSet &sps, bool cyclic=false);
+        (const StringPairSet &sps, bool cyclic=false);
       static Transducer * define_transducer
-	(const std::vector<StringPairSet> &spsv);
+        (const std::vector<StringPairSet> &spsv);
       static Transducer * copy(Transducer * t);
       static Transducer * determinize(Transducer * t);
       static Transducer * minimize(Transducer * t);
@@ -120,16 +120,16 @@ namespace implementations
       static Transducer * extract_output_language(Transducer * t);
       static std::vector<Transducer*> extract_paths(Transducer *t);
       static void extract_strings
-	(Transducer * t, hfst::ExtractStringsCb& callback, int cycles=-1,
-	 FdTable<SFST::Character>* fd=NULL, bool filter_fd=false, 
-	 bool include_spv=false);
+        (Transducer * t, hfst::ExtractStringsCb& callback, int cycles=-1,
+         FdTable<SFST::Character>* fd=NULL, bool filter_fd=false, 
+         bool include_spv=false);
 
       static Transducer * insert_freely
-	(Transducer *t , const StringPair &symbol_pair);
+        (Transducer *t , const StringPair &symbol_pair);
       static Transducer * substitute
-	(Transducer * t, String old_symbol, String new_symbol);
+        (Transducer * t, String old_symbol, String new_symbol);
       static Transducer * substitute
-	(Transducer *t, const StringPair &symbol_pair, Transducer *tr);
+        (Transducer *t, const StringPair &symbol_pair, Transducer *tr);
 
       static Transducer * compose(Transducer * t1,
                            Transducer * t2);
@@ -142,7 +142,7 @@ namespace implementations
       static Transducer * subtract(Transducer * t1,
                             Transducer * t2);
       static std::pair<Transducer*, Transducer*> harmonize
-	(Transducer *t1, Transducer *t2, bool unknown_symbols_in_use=true);
+        (Transducer *t1, Transducer *t2, bool unknown_symbols_in_use=true);
 
       static bool are_equivalent(Transducer * t1, Transducer * t2);
       static bool is_cyclic(Transducer * t);
@@ -153,7 +153,7 @@ namespace implementations
       static void print_alphabet(Transducer *t);
 
       static Transducer * remove_from_alphabet
-	(Transducer *t, const std::string &symbol);
+        (Transducer *t, const std::string &symbol);
 
       static Transducer * disjunct(Transducer * t, const StringPairVector &spv);
 
@@ -172,8 +172,8 @@ namespace implementations
       static void expand_node( Transducer *t, Node *origin, Label &l, 
                                Node *target, hfst::StringSet &s );
       static void expand2
-	( Transducer *t, Node *node,
-	  hfst::StringSet &new_symbols, std::set<Node*> &visited_nodes );
+        ( Transducer *t, Node *node,
+          hfst::StringSet &new_symbols, std::set<Node*> &visited_nodes );
       static void expand(Transducer *t, hfst::StringSet &new_symbols);
 
     };
