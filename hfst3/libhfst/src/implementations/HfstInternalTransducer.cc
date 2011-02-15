@@ -856,10 +856,10 @@ namespace hfst {
 	  break;
 #endif
 #if HAVE_OPENFST
-	case TROPICAL_OFST_TYPE:
+	case TROPICAL_OPENFST_TYPE:
 	  tmp = tropical_ofst_to_internal_hfst_format(transducer.implementation.tropical_ofst);
 	  break;
-	case LOG_OFST_TYPE:
+	case LOG_OPENFST_TYPE:
 	  tmp = log_ofst_to_internal_hfst_format(transducer.implementation.log_ofst);
 	  break;
 #endif
