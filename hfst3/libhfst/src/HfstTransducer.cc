@@ -1254,7 +1254,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
           (implementation.log_ofst);
         hfst::implementations::LogWeightTransducer::extract_strings
           (implementation.log_ofst,callback,cycles,t_log_ofst,filter_fd,
-	   include_spv);
+           include_spv);
         delete t_log_ofst;
       }
         break;
@@ -1278,7 +1278,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
           (implementation.sfst);
         hfst::implementations::SfstTransducer::extract_strings
           (implementation.sfst, callback, cycles, t_sfst, filter_fd,
-	   include_spv);
+           include_spv);
         delete t_sfst;
       }
         break;
@@ -1291,7 +1291,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
             (implementation.foma);
           hfst::implementations::FomaTransducer::extract_strings
             (implementation.foma, callback, cycles, t_foma, filter_fd,
-	     include_spv);
+             include_spv);
           delete t_foma;
       }
         break;
@@ -2620,12 +2620,12 @@ HfstTransducer::HfstTransducer(FILE * ifile,
 #if HAVE_HFSTOL
       case HFST_OL_TYPE:
           implementation.hfst_ol 
-	    = ConversionFunctions::hfst_basic_transducer_to_hfst_ol
-	    (&net, false);
+            = ConversionFunctions::hfst_basic_transducer_to_hfst_ol
+            (&net, false);
           break;
       case HFST_OLW_TYPE:
           implementation.hfst_ol 
-	    = ConversionFunctions::hfst_basic_transducer_to_hfst_ol(&net, true);
+            = ConversionFunctions::hfst_basic_transducer_to_hfst_ol(&net, true);
           break;
 #endif
        /* Add here your implementation. */

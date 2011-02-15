@@ -91,15 +91,15 @@ For more information on HFST transducer structure, see
   public:
 
     /** \brief Create a stream to standard output for writing 
-	binary transducers of type \a type. 
+        binary transducers of type \a type. 
         \a hfst_format defines whether transducers are written 
-	in hfst format or as such in their backend format. */
+        in hfst format or as such in their backend format. */
     HfstOutputStream(ImplementationType type, bool hfst_format=true);
 
     /** \brief Open a stream to file \a filename for writing binary transducers
-	of type \a type. 
-	\a hfst_format defines whether transducers are written in hfst format 
-	or as such in their backend format.
+        of type \a type. 
+        \a hfst_format defines whether transducers are written in hfst format 
+        or as such in their backend format.
 
         If the file exists, it is overwritten. */
     HfstOutputStream(const std::string &filename, ImplementationType type, 

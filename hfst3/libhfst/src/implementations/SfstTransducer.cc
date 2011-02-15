@@ -210,12 +210,14 @@ namespace hfst { namespace implementations {
   Transducer * SfstTransducer::expand_arcs(Transducer * t, StringSet &unknown)
   {
     //std::set<char*> unknown_c_str;
-    //for (StringSet::iterator it = unknown.begin(); it != unknown.end(); it++) {
+    //for (StringSet::iterator it = unknown.begin(); 
+    //it != unknown.end(); it++) {
     //  unknown_c_str.insert(strdup(it->c_str()));
     //}
     Transducer &tc = t->copy();
     SfstTransducer::expand(&tc, unknown);
-    //for (std::set<char*>::iterator it = unknown_c_str.begin(); it != unknown_c_str.end(); it++) {
+    //for (std::set<char*>::iterator it = unknown_c_str.begin(); 
+    //it != unknown_c_str.end(); it++) {
     //7  free(*it);
     //}
     return &tc;
@@ -282,7 +284,8 @@ namespace hfst { namespace implementations {
         fgetc(input_file);
     }
 
-    bool SfstInputStream::set_implementation_specific_header_data(StringPairVector &header_data, unsigned int index)
+    bool SfstInputStream::set_implementation_specific_header_data
+    (StringPairVector &header_data, unsigned int index)
     {
       if (index != (header_data.size()-1) )
         return false;
@@ -359,7 +362,8 @@ namespace hfst { namespace implementations {
       { fclose(ofile); }
   }
 
-    void SfstOutputStream::append_implementation_specific_header_data(std::vector<char> &header, Transducer *t)
+    void SfstOutputStream::append_implementation_specific_header_data
+    (std::vector<char> &header, Transducer *t)
     {
       std::string min("minimal");
       for (unsigned int i=0; i<min.length(); i++)
@@ -409,7 +413,8 @@ namespace hfst { namespace implementations {
   void SfstTransducer::print_alphabet(Transducer *t) {
     printf("alphabet..\n");
     SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
-    for (SFST::Alphabet::CharMap::const_iterator it = cm.begin(); it != cm.end(); it++)
+    for (SFST::Alphabet::CharMap::const_iterator it = cm.begin(); 
+         it != cm.end(); it++)
       printf("%i\t%s\n",it->first,it->second);
     printf("..alphabet\n");
   }
@@ -450,7 +455,8 @@ namespace hfst { namespace implementations {
     n->set_final(1);
     return t; }
   
-    Transducer * SfstTransducer::define_transducer(unsigned int inumber, unsigned int onumber)
+    Transducer * SfstTransducer::define_transducer
+    (unsigned int inumber, unsigned int onumber)
   { Transducer * t = new Transducer;
     initialize_alphabet(t);
     Node * n = t->new_node();
@@ -475,7 +481,8 @@ namespace hfst { namespace implementations {
     n->set_final(1);
     return t; }
   
-    Transducer * SfstTransducer::define_transducer(const std::string &isymbol, const std::string &osymbol)
+    Transducer * SfstTransducer::define_transducer
+    (const std::string &isymbol, const std::string &osymbol)
   { Transducer * t = new Transducer;
     initialize_alphabet(t);
     Node * n = t->new_node();
@@ -522,7 +529,8 @@ namespace hfst { namespace implementations {
     n->set_final(1);
     return t; }
 
-    Transducer * SfstTransducer::define_transducer(const StringPairSet &sps, bool cyclic)
+    Transducer * SfstTransducer::define_transducer
+    (const StringPairSet &sps, bool cyclic)
   { Transducer * t = new Transducer;
     initialize_alphabet(t);
     Node * n = t->root_node();
@@ -550,7 +558,8 @@ namespace hfst { namespace implementations {
     new_node->set_final(1);
     return t; }
 
-  Transducer * SfstTransducer::define_transducer(const std::vector<StringPairSet> &spsv)
+  Transducer * SfstTransducer::define_transducer
+  (const std::vector<StringPairSet> &spsv)
   { Transducer * t = new Transducer;
     initialize_alphabet(t);
     Node * n = t->root_node();
@@ -560,7 +569,8 @@ namespace hfst { namespace implementations {
       {
         Node * temp = t->new_node();
 
-        for (StringPairSet::const_iterator it2 = (*it).begin(); it2 != (*it).end(); it2++ ) 
+        for (StringPairSet::const_iterator it2 = (*it).begin(); 
+             it2 != (*it).end(); it2++ ) 
           {
             unsigned int inumber,onumber;
             if (strcmp(it2->first.c_str(),"@_EPSILON_SYMBOL_@") == 0 || 
@@ -835,7 +845,8 @@ namespace hfst { namespace implementations {
   }
 
   
-  Transducer * SfstTransducer::substitute(Transducer * t,String old_symbol,String new_symbol)
+  Transducer * SfstTransducer::substitute
+  (Transducer * t,String old_symbol,String new_symbol)
   {
     std::string old_symbol_ = old_symbol;
     std::string new_symbol_ = new_symbol;
@@ -844,11 +855,14 @@ namespace hfst { namespace implementations {
     if (new_symbol.compare("@_EPSILON_SYMBOL_@") == 0)
       new_symbol_ = std::string("<>");
 
-    Transducer * retval = &t->replace_char(t->alphabet.add_symbol(old_symbol_.c_str()),t->alphabet.add_symbol(new_symbol_.c_str()));
+    Transducer * retval = 
+      &t->replace_char(t->alphabet.add_symbol(old_symbol_.c_str()),
+                       t->alphabet.add_symbol(new_symbol_.c_str()));
     retval->alphabet.copy(t->alphabet);
     return retval; }
 
-  Transducer * SfstTransducer::substitute(Transducer *t, const StringPair &symbol_pair, Transducer *tr)
+  Transducer * SfstTransducer::substitute
+  (Transducer *t, const StringPair &symbol_pair, Transducer *tr)
   { 
     std::string isymbol = symbol_pair.first;
     std::string osymbol = symbol_pair.second;
@@ -883,7 +897,8 @@ namespace hfst { namespace implementations {
   (Transducer * t, const StringPairVector &spv)
   {
     Node *node= t->root_node();
-    for (StringPairVector::const_iterator it = spv.begin(); it != spv.end(); it++) 
+    for (StringPairVector::const_iterator it = spv.begin(); 
+         it != spv.end(); it++) 
       {
         unsigned int inumber,onumber;
         if (strcmp(it->first.c_str(),"@_EPSILON_SYMBOL_@") == 0 || 
@@ -973,11 +988,13 @@ namespace hfst { namespace implementations {
         const char * osymbol = t->alphabet.code2symbol(it->upper_char());
 
         if (isymbol == NULL) {
-          fprintf(stderr, "ERROR: input number %i not found\n", it->lower_char());
+          fprintf(stderr, "ERROR: input number %i not found\n", 
+                  it->lower_char());
           exit(1);
         }
         if (osymbol == NULL) {
-          fprintf(stderr, "ERROR: input number %i not found\n", it->upper_char());
+          fprintf(stderr, "ERROR: input number %i not found\n", 
+                  it->upper_char());
           exit(1);
         }
 
@@ -996,18 +1013,21 @@ namespace hfst { namespace implementations {
   }
 
   /* Expand a transition according to the previously unknown symbols in s. */
-  void SfstTransducer::expand_node( Transducer *t, Node *origin, Label &l, Node *target, hfst::StringSet &s )
+  void SfstTransducer::expand_node
+  ( Transducer *t, Node *origin, Label &l, Node *target, hfst::StringSet &s )
   {
     if ( l.lower_char() == 1 && l.upper_char() == 1 )     // cross product "?:?"
       {
         for (hfst::StringSet::iterator it1 = s.begin(); it1 != s.end(); it1++) 
           {
             int inumber = t->alphabet.symbol2code(it1->c_str());
-            for (hfst::StringSet::iterator it2 = s.begin(); it2 != s.end(); it2++) 
+            for (hfst::StringSet::iterator it2 = s.begin(); 
+                 it2 != s.end(); it2++) 
               {
                 int onumber = t->alphabet.symbol2code(it2->c_str());
                 if (inumber != onumber) {  
-                  // add transitions of type x:y (non-identity cross-product of symbols in s)
+                  // add transitions of type x:y 
+                  // (non-identity cross-product of symbols in s)
                   origin->add_arc( Label(inumber, onumber), target, t );
                 }
               }
@@ -1016,7 +1036,7 @@ namespace hfst { namespace implementations {
             origin->add_arc( Label(1, inumber), target, t );
           }
       }
-    else if (l.lower_char() == 2 && l.upper_char() == 2 )  // identity "?:?"             
+    else if (l.lower_char() == 2 && l.upper_char() == 2 )  // identity "?:?"
       {
         for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
           {
@@ -1052,9 +1072,9 @@ namespace hfst { namespace implementations {
   /*                                                                 */
   /*******************************************************************/
 
-  void SfstTransducer::expand2( 
-                               Transducer *t, Node *node,
-                               hfst::StringSet &new_symbols, std::set<Node*> &visited_nodes )
+  void SfstTransducer::expand2
+  ( Transducer *t, Node *node,
+    hfst::StringSet &new_symbols, std::set<Node*> &visited_nodes )
   {
     if (visited_nodes.find(node) == visited_nodes.end()) {
       visited_nodes.insert(node);

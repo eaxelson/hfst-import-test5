@@ -232,7 +232,7 @@ namespace implementations
       /** @brief Create a transducer equivalent to transducer t but where all 
           symbols old_symbol are substituted with new_symbol. */
       static MyFst * substitute
-	(MyFst * t, String old_symbol, String new_symbol);
+        (MyFst * t, String old_symbol, String new_symbol);
       /** @brief Create a transducer equivalent to transducer t but where all 
           symbol pairs symbol_pair are substituted with a copy of transducer 
           tr. */

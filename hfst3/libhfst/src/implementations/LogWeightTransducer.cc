@@ -69,7 +69,7 @@ namespace hfst { namespace implementations
     assert(t->InputSymbols() != NULL);
     StringSet s;
     for ( fst::SymbolTableIterator it 
-	    = fst::SymbolTableIterator(*(t->InputSymbols()));
+            = fst::SymbolTableIterator(*(t->InputSymbols()));
           not it.Done(); it.Next() ) {
       s.insert( std::string(it.Symbol()) );
     }
@@ -597,7 +597,7 @@ namespace hfst { namespace implementations
      unknown to this transducer.
   */
   LogFst * LogWeightTransducer::expand_arcs(LogFst * t, StringSet &unknown,
-					    bool unknown_symbols_in_use)
+                                            bool unknown_symbols_in_use)
   {
 
     LogFst * result = new LogFst();
@@ -629,7 +629,7 @@ namespace hfst { namespace implementations
             const LogArc &arc = aiter.Value();
 
             // find the corresponding target state in result or, 
-	    // if not found, create a new state
+            // if not found, create a new state
             StateId result_nextstate=arc.nextstate;
 
             // expand the transitions, if needed
@@ -642,66 +642,66 @@ namespace hfst { namespace implementations
                  arc.olabel == 1 )
               {
                 for (StringSet::iterator it1 = unknown.begin(); 
-		     it1 != unknown.end(); it1++) 
+                     it1 != unknown.end(); it1++) 
                   {
                     int64 inumber = is->Find(*it1);
                     for (StringSet::iterator it2 = unknown.begin(); 
-			 it2 != unknown.end(); it2++) 
+                         it2 != unknown.end(); it2++) 
                       {
                         int64 onumber = is->Find(*it2);
                         if (inumber != onumber)
                           result->AddArc(result_s, 
-					 LogArc(inumber, onumber, 
-						arc.weight, result_nextstate));
+                                         LogArc(inumber, onumber, 
+                                                arc.weight, result_nextstate));
                       }
                     result->AddArc(result_s, 
-				   LogArc(inumber, 1, arc.weight, 
-					  result_nextstate));
+                                   LogArc(inumber, 1, arc.weight, 
+                                          result_nextstate));
                     result->AddArc(result_s, 
-				   LogArc(1, inumber, arc.weight, 
-					  result_nextstate));
+                                   LogArc(1, inumber, arc.weight, 
+                                          result_nextstate));
                   }
               }
             else if (arc.ilabel == 2 &&   // identity "?:?"
                      arc.olabel == 2 )       
               {
                 for (StringSet::iterator it = unknown.begin(); 
-		     it != unknown.end(); it++) 
+                     it != unknown.end(); it++) 
                   {
                     int64 number = is->Find(*it);
                     result->AddArc(result_s, 
-				   LogArc(number, number, arc.weight, 
-					  result_nextstate));
+                                   LogArc(number, number, arc.weight, 
+                                          result_nextstate));
                   }
               }
             else if (arc.ilabel == 1)  // "?:x"
               {
                 for (StringSet::iterator it = unknown.begin(); 
-		     it != unknown.end(); it++) 
+                     it != unknown.end(); it++) 
                   {
                     int64 number = is->Find(*it);
                     result->AddArc(result_s, 
-				   LogArc(number, arc.olabel, arc.weight,
-					  result_nextstate));
+                                   LogArc(number, arc.olabel, arc.weight,
+                                          result_nextstate));
                   }
               }
             else if (arc.olabel == 1)  // "x:?"
               {
                 for (StringSet::iterator it = unknown.begin(); 
-		     it != unknown.end(); it++) 
+                     it != unknown.end(); it++) 
                   {
                     int64 number = is->Find(*it);
                     result->AddArc(result_s, 
-				   LogArc(arc.ilabel, number, 
-					  arc.weight, result_nextstate));
+                                   LogArc(arc.ilabel, number, 
+                                          arc.weight, result_nextstate));
                   }
               }
             }
 
             // the original transition is copied in all cases
             result->AddArc(result_s, 
-			   LogArc(arc.ilabel, arc.olabel, 
-				  arc.weight, result_nextstate));
+                           LogArc(arc.ilabel, arc.olabel, 
+                                  arc.weight, result_nextstate));
             
           }
       }
@@ -1097,7 +1097,7 @@ namespace hfst { namespace implementations
       {
         StateId s2 = t->AddState();
         t->AddArc(s1,LogArc(st.AddSymbol(it->first),
-			    st.AddSymbol(it->second),0,s2));
+                            st.AddSymbol(it->second),0,s2));
         s1 = s2;
       }
     t->SetFinal(s1,0);
@@ -1123,7 +1123,7 @@ namespace hfst { namespace implementations
            ++it)
         {
           t->AddArc(s1,LogArc(st.AddSymbol(it->first),
-			      st.AddSymbol(it->second),0,s2));
+                              st.AddSymbol(it->second),0,s2));
         }
     }
     t->SetFinal(s2,0);
@@ -1145,9 +1145,9 @@ namespace hfst { namespace implementations
       {
         StateId s2 = t->AddState();
         for (StringPairSet::const_iterator it2 = (*it).begin(); 
-	     it2 != (*it).end(); it2++ ) {
+             it2 != (*it).end(); it2++ ) {
           t->AddArc(s1,LogArc(st.AddSymbol(it2->first),
-			      st.AddSymbol(it2->second),0,s2));
+                              st.AddSymbol(it2->second),0,s2));
         }
         s1 = s2;
       }
@@ -1212,7 +1212,7 @@ namespace hfst { namespace implementations
       {
         StateId s2 = t->AddState();
         for (NumberPairSet::const_iterator it2 = (*it).begin(); 
-	     it2 != (*it).end(); it2++ ) {
+             it2 != (*it).end(); it2++ ) {
           t->AddArc(s1,LogArc(it2->first,it2->second,0,s2));
         }
         s1 = s2;
@@ -1266,8 +1266,8 @@ namespace hfst { namespace implementations
           {
             const LogArc &arc = aiter.Value();
             fprintf(ofile, "%i\t%i\t%i\t%i\t%f\n", 
-		    s, arc.nextstate, arc.ilabel, arc.olabel, 
-		    arc.weight.Value());
+                    s, arc.nextstate, arc.ilabel, arc.olabel, 
+                    arc.weight.Value());
           }
       }
   }
@@ -1476,8 +1476,8 @@ namespace hfst { namespace implementations
     for (fst::StateIterator<LogFst> siter(*t); !siter.Done(); siter.Next()) {
       StateId state_id = siter.Value();
       t->AddArc(state_id, fst::LogArc(st->AddSymbol(symbol_pair.first), 
-				      st->AddSymbol(symbol_pair.second), 
-				      0, state_id));
+                                      st->AddSymbol(symbol_pair.second), 
+                                      0, state_id));
     }
     t->SetInputSymbols(st);
     delete st;
@@ -1489,7 +1489,7 @@ namespace hfst { namespace implementations
     for (fst::StateIterator<LogFst> siter(*t); !siter.Done(); siter.Next()) {
       StateId state_id = siter.Value();
       t->AddArc(state_id, fst::LogArc(number_pair.first, number_pair.second, 
-				      0, state_id));
+                                      0, state_id));
     }
     return t;
   }
@@ -1507,7 +1507,7 @@ namespace hfst { namespace implementations
       {
         StateId s = siter.Value();
         for (fst::MutableArcIterator<LogFst> aiter(tc,s); 
-	!aiter.Done(); aiter.Next())
+        !aiter.Done(); aiter.Next())
           {
             const LogArc &arc = aiter.Value(); // current values
             LogArc new_arc;                    // new values
@@ -1583,7 +1583,7 @@ namespace hfst { namespace implementations
       {
         StateId s = siter.Value();
         for (fst::MutableArcIterator<LogFst> aiter(tc,s); 
-	     !aiter.Done(); aiter.Next())
+             !aiter.Done(); aiter.Next())
           {
             const LogArc &arc = aiter.Value();
             if ( strcmp( st->Find(arc.ilabel).c_str(), 
@@ -1624,15 +1624,15 @@ namespace hfst { namespace implementations
     assert(t->InputSymbols() != NULL);
     SymbolTable * st = t->InputSymbols()->Copy();
     LogFst * retval = substitute(t, st->AddSymbol(old_symbol), 
-				 st->AddSymbol(new_symbol));
+                                 st->AddSymbol(new_symbol));
     retval->SetInputSymbols(st);
     delete st;
     return retval;
   }
 
   LogFst * LogWeightTransducer::substitute(LogFst *t,
-					   StringPair old_symbol_pair,
-					   StringPair new_symbol_pair)
+                                           StringPair old_symbol_pair,
+                                           StringPair new_symbol_pair)
   {
     assert(t->InputSymbols() != NULL);
     SymbolTable * st = t->InputSymbols()->Copy();
@@ -1649,8 +1649,8 @@ namespace hfst { namespace implementations
   }
 
   LogFst * LogWeightTransducer::substitute(LogFst *t,
-					   const StringPair old_symbol_pair,
-					   LogFst *transducer)
+                                           const StringPair old_symbol_pair,
+                                           LogFst *transducer)
   {
 
     assert(t->InputSymbols() != NULL);
@@ -1674,7 +1674,7 @@ namespace hfst { namespace implementations
           StateId start_state = t->AddState();
 
           // change the label of the arc to epsilon and point the arc 
-	  // to a new state
+          // to a new state
           arc.ilabel = 0;
           arc.olabel = 0;
           arc.nextstate = start_state;  
@@ -1690,7 +1690,7 @@ namespace hfst { namespace implementations
 
           // go through all states and arcs in replace transducer tr
           for (fst::StateIterator<LogFst> siter(*transducer); 
-	       !siter.Done(); siter.Next()) {
+               !siter.Done(); siter.Next()) {
 
             StateId tr_state_id = siter.Value();
 
@@ -1701,26 +1701,26 @@ namespace hfst { namespace implementations
               t->AddArc( tr_state_id + start_state,
                          fst::LogArc( 0,
                                       0,
-				      /* final weight is copied 
-					 to the epsilon transition */
+                                      /* final weight is copied 
+                                         to the epsilon transition */
                                       transducer->Final(tr_state_id),  
                                       destination_state
                                       )
                          );  
 
             for (fst::ArcIterator<LogFst> aiter(*transducer, tr_state_id); 
-		 !aiter.Done(); aiter.Next()) {
+                 !aiter.Done(); aiter.Next()) {
 
               const fst::LogArc &tr_arc = aiter.Value();
 
               // adding arc from state 'tr_state_id+start_state' 
-	      // to state 'tr_arc.nextstate'
+              // to state 'tr_arc.nextstate'
               // copy arcs from tr to t
               t->AddArc( tr_state_id + start_state, 
                          fst::LogArc( tr_arc.ilabel, 
                                       tr_arc.olabel, 
                                       tr_arc.weight,  /* weight remains 
-							 the same */ 
+                                                         the same */ 
                                       tr_arc.nextstate + start_state 
                                       ) 
                          );
@@ -1737,8 +1737,8 @@ namespace hfst { namespace implementations
   }
 
   LogFst * LogWeightTransducer::substitute(LogFst *t,
-					   const NumberPair old_number_pair,
-					   LogFst *transducer)
+                                           const NumberPair old_number_pair,
+                                           LogFst *transducer)
   {
     int states = t->NumStates();
     for( int i = 0; i < states; ++i ) {
@@ -1758,7 +1758,7 @@ namespace hfst { namespace implementations
           StateId start_state = t->AddState();
 
           // change the label of the arc to epsilon and point 
-	  // the arc to a new state
+          // the arc to a new state
           arc.ilabel = 0;
           arc.olabel = 0;
           arc.nextstate = start_state;  
@@ -1774,7 +1774,7 @@ namespace hfst { namespace implementations
 
           // go through all states and arcs in replace transducer tr
           for (fst::StateIterator<LogFst> siter(*transducer); 
-	       !siter.Done(); siter.Next()) {
+               !siter.Done(); siter.Next()) {
 
             StateId tr_state_id = siter.Value();
 
@@ -1785,25 +1785,25 @@ namespace hfst { namespace implementations
               t->AddArc( tr_state_id + start_state,
                          fst::LogArc( 0,
                                       0,
-				      // final weight is copied 
-				      // to the epsilon transition
+                                      // final weight is copied 
+                                      // to the epsilon transition
                                       transducer->Final(tr_state_id),  
                                       destination_state
                                       )
                          );  
 
             for (fst::ArcIterator<LogFst> aiter(*transducer, tr_state_id); 
-		 !aiter.Done(); aiter.Next()) {
+                 !aiter.Done(); aiter.Next()) {
 
               const fst::LogArc &tr_arc = aiter.Value();
 
               // adding arc from state 'tr_state_id+start_state' 
-	      // to state 'tr_arc.nextstate'
+              // to state 'tr_arc.nextstate'
               // copy arcs from tr to t
               t->AddArc( tr_state_id + start_state, 
                          fst::LogArc( tr_arc.ilabel, 
                                       tr_arc.olabel, 
-				      // weight remains the same 
+                                      // weight remains the same 
                                       tr_arc.weight,  
                                       tr_arc.nextstate + start_state 
                                       ) 
@@ -1867,7 +1867,7 @@ namespace hfst { namespace implementations
     StateId s = t->Start();
 
     for (StringPairVector::const_iterator it = spv.begin(); 
-	 it != spv.end(); it++) 
+         it != spv.end(); it++) 
       {
         unsigned int inumber = st->AddSymbol(it->first.c_str());
         unsigned int onumber = st->AddSymbol(it->second.c_str());
@@ -1902,7 +1902,7 @@ namespace hfst { namespace implementations
     StateId s = t->Start();
 
     for (NumberPairVector::const_iterator it = npv.begin(); 
-	 it != npv.end(); it++) 
+         it != npv.end(); it++) 
       {
         unsigned int inumber = it->first;
         unsigned int onumber = it->second;
@@ -2120,7 +2120,7 @@ namespace hfst { namespace implementations
       ubuffer[upos]=0;
       bool final = t->Final(s) != LogWeight::Zero();
       hfst::WeightedPath<float> path
-	(&lbuffer[0],&ubuffer[0],weight_sum+(final?t->Final(s).Value():0));
+        (&lbuffer[0],&ubuffer[0],weight_sum+(final?t->Final(s).Value():0));
       if (include_spv) {
         path.spv = spv;
         path.is_spv_in_use = true;
@@ -2156,7 +2156,7 @@ namespace hfst { namespace implementations
     
       if (fd_state_stack) {
         if(fd_state_stack->back().get_table().get_operation(arc.ilabel) 
-	   != NULL) {
+           != NULL) {
           fd_state_stack->push_back(fd_state_stack->back());
           if(fd_state_stack->back().apply_operation(arc.ilabel))
             added_fd_state = true;
@@ -2171,8 +2171,8 @@ namespace hfst { namespace implementations
       int up=upos;
       
       if (arc.ilabel != 0 && 
-	  (!filter_fd || fd_state_stack->back().get_table().
-	   get_operation(arc.ilabel)==NULL))
+          (!filter_fd || fd_state_stack->back().get_table().
+           get_operation(arc.ilabel)==NULL))
       {
         std::string str = t->InputSymbols()->Find(arc.ilabel);
         if(lpos+str.length() >= lbuffer.size())
@@ -2181,8 +2181,8 @@ namespace hfst { namespace implementations
         lp += str.length();
       }
       if (arc.olabel != 0 && 
-	  (!filter_fd || fd_state_stack->back().get_table().
-	   get_operation(arc.olabel)==NULL))
+          (!filter_fd || fd_state_stack->back().get_table().
+           get_operation(arc.olabel)==NULL))
       {
         std::string str = t->InputSymbols()->Find(arc.olabel);
         if(upos+str.length() > ubuffer.size())
@@ -2192,7 +2192,7 @@ namespace hfst { namespace implementations
       }
       
       /* Handle spv here. Special symbols (flags, epsilons) are 
-	 always inserted. */
+         always inserted. */
       if (include_spv) { 
         StringPair string_pair(t->InputSymbols()->Find(arc.ilabel),
                                t->InputSymbols()->Find(arc.olabel));
@@ -2200,10 +2200,10 @@ namespace hfst { namespace implementations
       }
 
       res = extract_strings
-	(t, arc.nextstate, all_visitations, path_visitations,
-	 lbuffer,lp, ubuffer,up, weight_sum+arc.weight.Value(), callback,
-	 cycles, fd_state_stack, filter_fd,
-	 include_spv, spv);
+        (t, arc.nextstate, all_visitations, path_visitations,
+         lbuffer,lp, ubuffer,up, weight_sum+arc.weight.Value(), callback,
+         cycles, fd_state_stack, filter_fd,
+         include_spv, spv);
      
       if (include_spv)
         spv.pop_back();
@@ -2244,7 +2244,7 @@ namespace hfst { namespace implementations
     FdTable<int64>* table = new FdTable<int64>();
     const fst::SymbolTable* symbols = t->InputSymbols();
     for(fst::SymbolTableIterator it=fst::SymbolTableIterator(*symbols); 
-	!it.Done(); it.Next())
+        !it.Done(); it.Next())
     {
       if(FdOperation::is_diacritic(it.Symbol()))
         table->define_diacritic(it.Value(), it.Symbol());

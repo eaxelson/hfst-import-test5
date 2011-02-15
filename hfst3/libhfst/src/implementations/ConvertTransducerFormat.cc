@@ -938,7 +938,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
         basic->set_final_weight(new_state,
                                 weighted ?
                                 dynamic_cast<const hfst_ol::TransitionWIndex&>
-				(transition_index).final_weight() :
+                                (transition_index).final_weight() :
                                 0.0);
     }
   }
@@ -952,7 +952,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
         basic->set_final_weight(new_state,
                                 weighted ?
                                 dynamic_cast<const hfst_ol::TransitionW&>
-				(transition).get_weight() :
+                                (transition).get_weight() :
                                 0.0);
     }
   }
@@ -967,21 +967,21 @@ unsigned int hfst_ol_to_hfst_basic_add_state
       HfstBasicTransducer * basic = new HfstBasicTransducer();
       bool weighted = t->get_header().probe_flag(hfst_ol::Weighted);
       const hfst_ol::SymbolTable& symbols 
-	= t->get_alphabet().get_symbol_table();
+        = t->get_alphabet().get_symbol_table();
       
       
       /* This contains indices to either (1) the start of a set of entries 
-	 in the transition index table, or (2) the boundary before a set 
-	 of entries in the transition table; in this case, the following 
-	 entries will all have the same input symbol. In either case 
-	 the index represents a state and may be final The will already be 
-	 an entry in state_map for each value in agenda */
+         in the transition index table, or (2) the boundary before a set 
+         of entries in the transition table; in this case, the following 
+         entries will all have the same input symbol. In either case 
+         the index represents a state and may be final The will already be 
+         an entry in state_map for each value in agenda */
       std::vector<hfst_ol::TransitionTableIndex> agenda;
       hfst_ol::HfstOlToBasicStateMap state_map;
       unsigned int state_number=0;
       
       hfst_ol_to_hfst_basic_add_state
-	(t, basic, state_map, weighted, 0, state_number);
+        (t, basic, state_map, weighted, 0, state_number);
       agenda.push_back(0);
       while(!agenda.empty())
       {
@@ -991,9 +991,9 @@ unsigned int hfst_ol_to_hfst_basic_add_state
           unsigned int current_state = state_map[current_index];
           
           hfst_ol::TransitionTableIndexSet transitions 
-	    = t->get_transitions_from_state(current_index);
+            = t->get_transitions_from_state(current_index);
           for(hfst_ol::TransitionTableIndexSet::const_iterator it
-		=transitions.begin();it!=transitions.end();it++)
+                =transitions.begin();it!=transitions.end();it++)
           {
               const hfst_ol::Transition& transition = t->get_transition(*it);
               
@@ -1001,18 +1001,18 @@ unsigned int hfst_ol_to_hfst_basic_add_state
               {
                   state_number++;
                   hfst_ol_to_hfst_basic_add_state
-		    (t, basic, state_map, weighted, 
-		     transition.get_target(), state_number);
+                    (t, basic, state_map, weighted, 
+                     transition.get_target(), state_number);
                   agenda.push_back(transition.get_target());
               }
               basic->add_transition
-		(current_state,
-		 HfstBasicTransition
-		 (state_map[transition.get_target()],
-		  symbols[transition.get_input_symbol()],
-		  symbols[transition.get_output_symbol()],
-		  weighted ? dynamic_cast<const hfst_ol::TransitionW&>
-		  (transition).get_weight() : 0 ));
+                (current_state,
+                 HfstBasicTransition
+                 (state_map[transition.get_target()],
+                  symbols[transition.get_input_symbol()],
+                  symbols[transition.get_output_symbol()],
+                  weighted ? dynamic_cast<const hfst_ol::TransitionW&>
+                  (transition).get_weight() : 0 ));
           }
       }
       
