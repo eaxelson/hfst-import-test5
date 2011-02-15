@@ -356,7 +356,7 @@ parse_options(int argc, char** argv)
       {
         verbose_printf("Output format not specified, "
              "defaulting to openfst tropical\n");
-        output_format = hfst::TROPICAL_OFST_TYPE;
+        output_format = hfst::TROPICAL_OPENFST_TYPE;
       }
     FileName = strdup(inputfilename);        
 
@@ -404,11 +404,11 @@ void get_flags( int *argc, char **argv )
       argv[i] = NULL;
     }
     else if (strcmp(argv[i],"-tropical") == 0) {
-      output_format = TROPICAL_OFST_TYPE;
+      output_format = TROPICAL_OPENFST_TYPE;
       argv[i] = NULL;
     }
     else if (strcmp(argv[i],"-log") == 0) {
-      output_format = LOG_OFST_TYPE;
+      output_format = LOG_OPENFST_TYPE;
       argv[i] = NULL;
     }
     else if (strcmp(argv[i],"-foma") == 0) {
