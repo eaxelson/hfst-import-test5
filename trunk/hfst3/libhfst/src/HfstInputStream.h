@@ -141,7 +141,7 @@ For documentation on the HFST binary transducer format, see
       /* Old header + ordinary SFST transducer. */                
       HFST_VERSION_2_UNWEIGHTED,
       /* An OpenFst transducer, can cause problems if it does not have 
-	 symbol tables. */ 
+         symbol tables. */ 
       OPENFST_TROPICAL_,
       OPENFST_LOG_,
       /* An SFST transducer. */ 
@@ -177,14 +177,14 @@ For documentation on the HFST binary transducer format, see
   public:
 
     /** \brief Create a stream to standard input for reading binary 
-	transducers. */
+        transducers. */
     HfstInputStream(void);
 
     /** \brief Open a stream to file \a filename for reading binary 
-	transducers. 
+        transducers. 
 
-	@pre The file exists. Otherwise, an exception is thrown.
-	@throws hfst::exceptions::StreamNotReadableException */
+        @pre The file exists. Otherwise, an exception is thrown.
+        @throws hfst::exceptions::StreamNotReadableException */
     HfstInputStream(const std::string &filename);
 
     /** \brief Destructor. */
@@ -192,7 +192,7 @@ For documentation on the HFST binary transducer format, see
 
     /** \brief Close the stream.
 
-	If the stream points to standard input, nothing is done. */
+        If the stream points to standard input, nothing is done. */
     void close(void);
 
     /** \brief Whether the stream is at the end. */
@@ -204,8 +204,8 @@ For documentation on the HFST binary transducer format, see
     
     /** \brief The type of the first transducer in the stream. 
 
-	By default, all transducers in a stream have the same type, else
-	an hfst::exceptions::TransducerTypeMismatchException is thrown. */
+        By default, all transducers in a stream have the same type, else
+        an hfst::exceptions::TransducerTypeMismatchException is thrown. */
     ImplementationType get_type(void) const;
 
     friend class HfstTransducer;

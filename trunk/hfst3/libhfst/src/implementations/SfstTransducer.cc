@@ -41,7 +41,7 @@ namespace hfst { namespace implementations {
     else {
       input_file = fopen(filename.c_str(),"r");
       if (input_file == NULL)
-	{ throw StreamNotReadableException(); }
+        { throw StreamNotReadableException(); }
     }
   }
 
@@ -52,8 +52,8 @@ namespace hfst { namespace implementations {
       { return; }
     if (filename.c_str()[0] != 0)
       {
-	fclose(input_file);
-	input_file = NULL;
+        fclose(input_file);
+        input_file = NULL;
       }
   }
 
@@ -81,18 +81,18 @@ namespace hfst { namespace implementations {
     unsigned int i=0;
     while(true)
       {
-	if (i == ((unsigned int)n-1) ) {
-	  s[i] = '\0';
-	  break;
-	}
-	int c = getc(input_file);
-	if (feof(input_file) || (c == delim)) {
-	  s[i] = '\0';
-	  break;
-	}
-	else
-	  s[i] = delim;
-	i++;
+        if (i == ((unsigned int)n-1) ) {
+          s[i] = '\0';
+          break;
+        }
+        int c = getc(input_file);
+        if (feof(input_file) || (c == delim)) {
+          s[i] = '\0';
+          break;
+        }
+        else
+          s[i] = delim;
+        i++;
       }
       }*/
 
@@ -135,8 +135,8 @@ namespace hfst { namespace implementations {
   }
 
   void SfstInputStream::add_symbol(StringNumberMap &string_number_map,
-				   Character c,
-				   Alphabet &alphabet)
+                                   Character c,
+                                   Alphabet &alphabet)
   {
     const char * string_symbol = 
       alphabet.code2symbol(c);
@@ -154,18 +154,18 @@ namespace hfst { namespace implementations {
     ungetc(c,input_file);
     //fprintf(stderr, "skip_minimality_identifier: c == %c\n", c);
     if ( c != 'M') 
-	return false;
+        return false;
     else 
       {
-	char minimality_identifier[8];
-	int count = fread(minimality_identifier,8,1,input_file);
-	if (count != 1) {
-	  throw NotTransducerStreamException();
-	}
-	if (0 != strcmp(minimality_identifier,"MINIMAL")) {
-	  throw NotTransducerStreamException();
-	}
-	return true;
+        char minimality_identifier[8];
+        int count = fread(minimality_identifier,8,1,input_file);
+        if (count != 1) {
+          throw NotTransducerStreamException();
+        }
+        if (0 != strcmp(minimality_identifier,"MINIMAL")) {
+          throw NotTransducerStreamException();
+        }
+        return true;
       }
   }
 
@@ -176,10 +176,10 @@ namespace hfst { namespace implementations {
     int sfst_id_count = fread(sfst_identifier,10,1,input_file);
     if (sfst_id_count != 1)
       { //fprintf(stderr, "#2\n");
-	throw NotTransducerStreamException(); }
+        throw NotTransducerStreamException(); }
     if (0 != strcmp(sfst_identifier,"SFST_TYPE"))
       { //fprintf(stderr, "#3: %s\n", sfst_identifier);
-	throw NotTransducerStreamException(); }
+        throw NotTransducerStreamException(); }
     return skip_minimality_identifier();
   }
   
@@ -189,7 +189,7 @@ namespace hfst { namespace implementations {
     int header_count = fread(hfst_header,6,1,input_file);
     if (header_count != 1)
       { //fprintf(stderr, "#1\n");
-	throw NotTransducerStreamException(); }
+        throw NotTransducerStreamException(); }
     try { return skip_identifier_version_3_0(); }
     catch (NotTransducerStreamException e) { throw e; }
   }
@@ -239,7 +239,7 @@ namespace hfst { namespace implementations {
       StringSet t1_symbols = get_alphabet(t1);
       StringSet t2_symbols = get_alphabet(t2);
       collect_unknown_sets(t1_symbols, unknown_t1,
-			   t2_symbols, unknown_t2);
+                           t2_symbols, unknown_t2);
     }
 
     Transducer * new_t1 = &t1->copy(false, &t2->alphabet);
@@ -279,23 +279,23 @@ namespace hfst { namespace implementations {
     void SfstInputStream::ignore(unsigned int n)
     { 
       for (unsigned int i=0; i<n; i++)
-	fgetc(input_file);
+        fgetc(input_file);
     }
 
     bool SfstInputStream::set_implementation_specific_header_data(StringPairVector &header_data, unsigned int index)
     {
       if (index != (header_data.size()-1) )
-	return false;
+        return false;
 
       if ( not ( strcmp("minimal", header_data[index].first.c_str()) == 0) )
-	return false;
+        return false;
 
       if ( strcmp("true", header_data[index].second.c_str()) == 0 )
-	is_minimal=true;  // SEGFAULT?
+        is_minimal=true;  // SEGFAULT?
       else if ( strcmp("false", header_data[index].second.c_str()) == 0 )
-	is_minimal=false;
+        is_minimal=false;
       else
-	return false;
+        return false;
 
       return true;
     }
@@ -312,25 +312,25 @@ namespace hfst { namespace implementations {
     Transducer * t = NULL;
     try 
       {
-	// DEBUGGING
-	assert (stream_get() == 'a');
-	stream_unget('a');
+        // DEBUGGING
+        assert (stream_get() == 'a');
+        stream_unget('a');
 
-	Transducer * t = new Transducer(input_file,true);
+        Transducer * t = new Transducer(input_file,true);
 
-	//tt.alphabet.clear();
-	//t = &tt.copy();
-	if (not is_minimal) {
-	  t->minimised = false;
-	  t->deterministic = false;
-	}
-	return t;
+        //tt.alphabet.clear();
+        //t = &tt.copy();
+        if (not is_minimal) {
+          t->minimised = false;
+          t->deterministic = false;
+        }
+        return t;
       }
     catch (const char * p)
       {
-	delete t;
-	fprintf(stderr, "caught message: \"%s\"\n", p);
-	throw TransducerHasWrongTypeException();
+        delete t;
+        fprintf(stderr, "caught message: \"%s\"\n", p);
+        throw TransducerHasWrongTypeException();
       }
     return NULL;
   };
@@ -347,7 +347,7 @@ namespace hfst { namespace implementations {
     if (filename != std::string()) {
       ofile = fopen(filename.c_str(), "wb");
       if (ofile == NULL)
-	throw StreamNotReadableException();
+        throw StreamNotReadableException();
     } 
     else
       ofile = stdout;
@@ -363,17 +363,17 @@ namespace hfst { namespace implementations {
     {
       std::string min("minimal");
       for (unsigned int i=0; i<min.length(); i++)
-	header.push_back(min[i]);
+        header.push_back(min[i]);
       header.push_back('\0');
 
       std::string min_value;
       if (t->minimised && t->deterministic)
-	min_value = std::string("true");
+        min_value = std::string("true");
       else
-	min_value = std::string("false");
+        min_value = std::string("false");
 
       for (unsigned int i=0; i<min_value.length(); i++)
-	header.push_back(min_value[i]);
+        header.push_back(min_value[i]);
       header.push_back('\0');
     }
 
@@ -455,7 +455,7 @@ namespace hfst { namespace implementations {
     initialize_alphabet(t);
     Node * n = t->new_node();
     t->root_node()->add_arc(Label(inumber, 
-				  onumber),n,t);
+                                  onumber),n,t);
     n->set_final(1);
     return t; }
 
@@ -499,25 +499,25 @@ namespace hfst { namespace implementations {
     initialize_alphabet(t);
     Node * n = t->root_node();
     for (StringPairVector::const_iterator it = spv.begin();
-	 it != spv.end();
-	 ++it)
+         it != spv.end();
+         ++it)
       {
-	Node * temp = t->new_node();
+        Node * temp = t->new_node();
 
-	unsigned int inumber,onumber;
-	if (strcmp(it->first.c_str(),"@_EPSILON_SYMBOL_@") == 0 || 
-	    strcmp(it->first.c_str(),"<>") == 0 )
-	  inumber=0;
-	else
-	  inumber=t->alphabet.add_symbol(it->first.c_str());
-	if (strcmp(it->second.c_str(),"@_EPSILON_SYMBOL_@") == 0 ||
-	    strcmp(it->second.c_str(),"<>") == 0 )
-	  onumber=0;
-	else
-	  onumber=t->alphabet.add_symbol(it->second.c_str());
+        unsigned int inumber,onumber;
+        if (strcmp(it->first.c_str(),"@_EPSILON_SYMBOL_@") == 0 || 
+            strcmp(it->first.c_str(),"<>") == 0 )
+          inumber=0;
+        else
+          inumber=t->alphabet.add_symbol(it->first.c_str());
+        if (strcmp(it->second.c_str(),"@_EPSILON_SYMBOL_@") == 0 ||
+            strcmp(it->second.c_str(),"<>") == 0 )
+          onumber=0;
+        else
+          onumber=t->alphabet.add_symbol(it->second.c_str());
 
-	n->add_arc(Label(inumber,onumber),temp,t);
-	n = temp;
+        n->add_arc(Label(inumber,onumber),temp,t);
+        n = temp;
       }
     n->set_final(1);
     return t; }
@@ -529,23 +529,23 @@ namespace hfst { namespace implementations {
     Node * new_node = n;
     if (not sps.empty()) {
       if (not cyclic)
-	new_node = t->new_node();
+        new_node = t->new_node();
       for (StringPairSet::const_iterator it = sps.begin();
-	   it != sps.end();
-	   ++it)
-	{
-	  unsigned int inumber,onumber;
-	  if (strcmp(it->first.c_str(),"@_EPSILON_SYMBOL_@") == 0)
-	    inumber=0;
-	  else
-	    inumber=t->alphabet.add_symbol(it->first.c_str());
-	  if (strcmp(it->second.c_str(),"@_EPSILON_SYMBOL_@") == 0)
-	    onumber=0;
-	  else
-	    onumber=t->alphabet.add_symbol(it->second.c_str());
+           it != sps.end();
+           ++it)
+        {
+          unsigned int inumber,onumber;
+          if (strcmp(it->first.c_str(),"@_EPSILON_SYMBOL_@") == 0)
+            inumber=0;
+          else
+            inumber=t->alphabet.add_symbol(it->first.c_str());
+          if (strcmp(it->second.c_str(),"@_EPSILON_SYMBOL_@") == 0)
+            onumber=0;
+          else
+            onumber=t->alphabet.add_symbol(it->second.c_str());
 
-	  n->add_arc(Label(inumber,onumber),new_node,t);
-	}
+          n->add_arc(Label(inumber,onumber),new_node,t);
+        }
     }
     new_node->set_final(1);
     return t; }
@@ -555,29 +555,29 @@ namespace hfst { namespace implementations {
     initialize_alphabet(t);
     Node * n = t->root_node();
     for (std::vector<StringPairSet>::const_iterator it = spsv.begin();
-	 it != spsv.end();
-	 ++it)
+         it != spsv.end();
+         ++it)
       {
-	Node * temp = t->new_node();
+        Node * temp = t->new_node();
 
-	for (StringPairSet::const_iterator it2 = (*it).begin(); it2 != (*it).end(); it2++ ) 
-	  {
-	    unsigned int inumber,onumber;
-	    if (strcmp(it2->first.c_str(),"@_EPSILON_SYMBOL_@") == 0 || 
-		strcmp(it2->first.c_str(),"<>") == 0 )
-	      inumber=0;
-	    else
-	      inumber=t->alphabet.add_symbol(it2->first.c_str());
-	    if (strcmp(it2->second.c_str(),"@_EPSILON_SYMBOL_@") == 0 ||
-		strcmp(it2->second.c_str(),"<>") == 0 )
-	      onumber=0;
-	    else
-	      onumber=t->alphabet.add_symbol(it2->second.c_str());
-	    
-	    n->add_arc(Label(inumber,onumber),temp,t);
-	  }
+        for (StringPairSet::const_iterator it2 = (*it).begin(); it2 != (*it).end(); it2++ ) 
+          {
+            unsigned int inumber,onumber;
+            if (strcmp(it2->first.c_str(),"@_EPSILON_SYMBOL_@") == 0 || 
+                strcmp(it2->first.c_str(),"<>") == 0 )
+              inumber=0;
+            else
+              inumber=t->alphabet.add_symbol(it2->first.c_str());
+            if (strcmp(it2->second.c_str(),"@_EPSILON_SYMBOL_@") == 0 ||
+                strcmp(it2->second.c_str(),"<>") == 0 )
+              onumber=0;
+            else
+              onumber=t->alphabet.add_symbol(it2->second.c_str());
+            
+            n->add_arc(Label(inumber,onumber),temp,t);
+          }
 
-	n = temp;
+        n = temp;
       }
     n->set_final(1);
     return t; }
@@ -610,9 +610,9 @@ namespace hfst { namespace implementations {
     Transducer * power = create_epsilon_transducer();
     for (int i = 0; i < n; ++i)
       {
-	Transducer * temp = &(*power + *t);
-	delete power;
-	power = temp;
+        Transducer * temp = &(*power + *t);
+        delete power;
+        power = temp;
       }
     return power; }
   
@@ -621,11 +621,11 @@ namespace hfst { namespace implementations {
     Transducer * result = create_empty_transducer();
     for (int i = 0; i < n+1; ++i)
       {
-	Transducer * power = repeat_n(t,i);
-	Transducer * temp = &(*power | *result);
-	delete power;
-	delete result;
-	result = temp;
+        Transducer * power = repeat_n(t,i);
+        Transducer * temp = &(*power | *result);
+        delete power;
+        delete result;
+        result = temp;
       }
     return result; }
   
@@ -694,8 +694,8 @@ namespace hfst { namespace implementations {
       bool final = node->is_final();
       hfst::WeightedPath<float> path(&lbuffer[0],&ubuffer[0],0);
       if (include_spv) {
-	path.spv = spv;
-	path.is_spv_in_use = true;
+        path.spv = spv;
+        path.is_spv_in_use = true;
       }
       hfst::ExtractStringsCb::RetVal ret = callback(path, final);
       if(!ret.continueSearch || !ret.continuePath)
@@ -727,7 +727,7 @@ namespace hfst { namespace implementations {
       
       if (fd_state_stack) {
         if(fd_state_stack->back().get_table().get_operation(l.lower_char()) 
-	   != NULL) {
+           != NULL) {
           fd_state_stack->push_back(fd_state_stack->back());
           if(fd_state_stack->back().apply_operation(l.lower_char()))
             added_fd_state = true;
@@ -744,8 +744,8 @@ namespace hfst { namespace implementations {
       Character lc=l.lower_char();
       Character uc=l.upper_char();
       if (lc != Label::epsilon && 
-	  (!filter_fd || fd_state_stack->back().get_table().get_operation(lc)
-	   ==NULL))
+          (!filter_fd || fd_state_stack->back().get_table().get_operation(lc)
+           ==NULL))
       {
         const char* c = t->alphabet.write_char(lc);
         size_t clen = strlen(c);
@@ -755,8 +755,8 @@ namespace hfst { namespace implementations {
         lp += clen;
       }
       if (uc != Label::epsilon && 
-	  (!filter_fd || fd_state_stack->back().get_table().get_operation(uc)
-	   ==NULL))
+          (!filter_fd || fd_state_stack->back().get_table().get_operation(uc)
+           ==NULL))
       {
         const char* c = t->alphabet.write_char(uc);
         size_t clen = strlen(c);
@@ -767,23 +767,23 @@ namespace hfst { namespace implementations {
       }
       
       /* Handle spv here. Special symbols (flags, epsilons) are always 
-	 inserted. */
+         inserted. */
       if (include_spv) {
-	std::string istring(t->alphabet.write_char(lc));
-	std::string ostring(t->alphabet.write_char(uc));
-	if (istring.compare("<>") == 0)
-	  istring = std::string("@_EPSILON_SYMBOL_@");
-	if (ostring.compare("<>") == 0)
-	  ostring = std::string("@_EPSILON_SYMBOL_@");
-	spv.push_back(StringPair(istring, ostring));
+        std::string istring(t->alphabet.write_char(lc));
+        std::string ostring(t->alphabet.write_char(uc));
+        if (istring.compare("<>") == 0)
+          istring = std::string("@_EPSILON_SYMBOL_@");
+        if (ostring.compare("<>") == 0)
+          ostring = std::string("@_EPSILON_SYMBOL_@");
+        spv.push_back(StringPair(istring, ostring));
       }
 
       res = extract_strings(t, arc[i]->target_node(), all_visitations, 
-			    path_visitations,
-			    lbuffer, lp, ubuffer, up, callback, cycles, 
-			    fd_state_stack, filter_fd, include_spv, spv);
+                            path_visitations,
+                            lbuffer, lp, ubuffer, up, callback, cycles, 
+                            fd_state_stack, filter_fd, include_spv, spv);
       if (include_spv)
-	spv.pop_back();
+        spv.pop_back();
       
       if(added_fd_state)
         fd_state_stack->pop_back();
@@ -831,7 +831,7 @@ namespace hfst { namespace implementations {
 
     return &t->freely_insert
       ( Label( t->alphabet.add_symbol(isymbol.c_str()),
-	       t->alphabet.add_symbol(osymbol.c_str()) ));
+               t->alphabet.add_symbol(osymbol.c_str()) ));
   }
 
   
@@ -859,8 +859,8 @@ namespace hfst { namespace implementations {
 
     Transducer * retval 
       = &t->splice( Label(
-			  t->alphabet.add_symbol(isymbol.c_str()),
-			  t->alphabet.add_symbol(osymbol.c_str()) ), tr );
+                          t->alphabet.add_symbol(isymbol.c_str()),
+                          t->alphabet.add_symbol(osymbol.c_str()) ), tr );
     retval->alphabet.copy(t->alphabet);
     return retval;
   }
@@ -885,26 +885,26 @@ namespace hfst { namespace implementations {
     Node *node= t->root_node();
     for (StringPairVector::const_iterator it = spv.begin(); it != spv.end(); it++) 
       {
-	unsigned int inumber,onumber;
-	if (strcmp(it->first.c_str(),"@_EPSILON_SYMBOL_@") == 0 || 
-	    strcmp(it->first.c_str(),"<>") == 0 )
-	  inumber=0;
-	else
-	  inumber=t->alphabet.add_symbol(it->first.c_str());
-	if (strcmp(it->second.c_str(),"@_EPSILON_SYMBOL_@") == 0 ||
-	    strcmp(it->second.c_str(),"<>") == 0 )
-	  onumber=0;
-	else
-	  onumber=t->alphabet.add_symbol(it->second.c_str());
+        unsigned int inumber,onumber;
+        if (strcmp(it->first.c_str(),"@_EPSILON_SYMBOL_@") == 0 || 
+            strcmp(it->first.c_str(),"<>") == 0 )
+          inumber=0;
+        else
+          inumber=t->alphabet.add_symbol(it->first.c_str());
+        if (strcmp(it->second.c_str(),"@_EPSILON_SYMBOL_@") == 0 ||
+            strcmp(it->second.c_str(),"<>") == 0 )
+          onumber=0;
+        else
+          onumber=t->alphabet.add_symbol(it->second.c_str());
 
-	Label l(inumber, onumber);
-	t->alphabet.insert(l);
-	Arcs *arcs=node->arcs();
-	node = arcs->target_node( l );
-	if (node == NULL) {
-	  node = t->new_node();
-	  arcs->add_arc( l, node, t );
-	}
+        Label l(inumber, onumber);
+        t->alphabet.insert(l);
+        Arcs *arcs=node->arcs();
+        node = arcs->target_node( l );
+        if (node == NULL) {
+          node = t->new_node();
+          arcs->add_arc( l, node, t );
+        }
     }
     node->set_final(1);
     return t;
@@ -934,7 +934,7 @@ namespace hfst { namespace implementations {
     FdTable<SFST::Character>* table = new FdTable<SFST::Character>();
     SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
     for (SFST::Alphabet::CharMap::const_iterator it 
-	   = cm.begin(); it != cm.end(); it++) {
+           = cm.begin(); it != cm.end(); it++) {
       if(FdOperation::is_diacritic(it->second))
         table->define_diacritic(it->first, it->second);
     }
@@ -952,11 +952,11 @@ namespace hfst { namespace implementations {
     StringSet s;
     SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
     for ( SFST::Alphabet::CharMap::const_iterator it = cm.begin();
-	  it != cm.end(); it++ ) {
+          it != cm.end(); it++ ) {
       if (strcmp(it->second, "<>") == 0)
-	s.insert( std::string("@_EPSILON_SYMBOL_@"));
+        s.insert( std::string("@_EPSILON_SYMBOL_@"));
       else
-	s.insert( std::string(it->second) );
+        s.insert( std::string(it->second) );
     }
     return s;
   }
@@ -967,30 +967,30 @@ namespace hfst { namespace implementations {
     t->alphabet.clear_char_pairs();
     t->complete_alphabet();
     for (SFST::Alphabet::const_iterator it = t->alphabet.begin();
-	 it != t->alphabet.end(); it++)
+         it != t->alphabet.end(); it++)
       {
-	const char * isymbol = t->alphabet.code2symbol(it->lower_char());
-	const char * osymbol = t->alphabet.code2symbol(it->upper_char());
+        const char * isymbol = t->alphabet.code2symbol(it->lower_char());
+        const char * osymbol = t->alphabet.code2symbol(it->upper_char());
 
-	if (isymbol == NULL) {
-	  fprintf(stderr, "ERROR: input number %i not found\n", it->lower_char());
-	  exit(1);
-	}
-	if (osymbol == NULL) {
-	  fprintf(stderr, "ERROR: input number %i not found\n", it->upper_char());
-	  exit(1);
-	}
+        if (isymbol == NULL) {
+          fprintf(stderr, "ERROR: input number %i not found\n", it->lower_char());
+          exit(1);
+        }
+        if (osymbol == NULL) {
+          fprintf(stderr, "ERROR: input number %i not found\n", it->upper_char());
+          exit(1);
+        }
 
-	std::string istring(isymbol);
-	std::string ostring(osymbol);
-	if (istring.compare("<>") == 0)
-	  istring = std::string("<>");
-	if (ostring.compare("<>") == 0)
-	  ostring = std::string("<>");
-	
-	  s.insert(StringPair(istring,
-			      ostring
-			      ));
+        std::string istring(isymbol);
+        std::string ostring(osymbol);
+        if (istring.compare("<>") == 0)
+          istring = std::string("<>");
+        if (ostring.compare("<>") == 0)
+          ostring = std::string("<>");
+        
+          s.insert(StringPair(istring,
+                              ostring
+                              ));
       }
     return s;
   }
@@ -1000,46 +1000,46 @@ namespace hfst { namespace implementations {
   {
     if ( l.lower_char() == 1 && l.upper_char() == 1 )     // cross product "?:?"
       {
-	for (hfst::StringSet::iterator it1 = s.begin(); it1 != s.end(); it1++) 
-	  {
-	    int inumber = t->alphabet.symbol2code(it1->c_str());
-	    for (hfst::StringSet::iterator it2 = s.begin(); it2 != s.end(); it2++) 
-	      {
-		int onumber = t->alphabet.symbol2code(it2->c_str());
-		if (inumber != onumber) {  
-		  // add transitions of type x:y (non-identity cross-product of symbols in s)
-		  origin->add_arc( Label(inumber, onumber), target, t );
-		}
-	      }
-	    // add transitions of type x:? and ?:x here
-	    origin->add_arc( Label(inumber, 1), target, t );
-	    origin->add_arc( Label(1, inumber), target, t );
-	  }
+        for (hfst::StringSet::iterator it1 = s.begin(); it1 != s.end(); it1++) 
+          {
+            int inumber = t->alphabet.symbol2code(it1->c_str());
+            for (hfst::StringSet::iterator it2 = s.begin(); it2 != s.end(); it2++) 
+              {
+                int onumber = t->alphabet.symbol2code(it2->c_str());
+                if (inumber != onumber) {  
+                  // add transitions of type x:y (non-identity cross-product of symbols in s)
+                  origin->add_arc( Label(inumber, onumber), target, t );
+                }
+              }
+            // add transitions of type x:? and ?:x here
+            origin->add_arc( Label(inumber, 1), target, t );
+            origin->add_arc( Label(1, inumber), target, t );
+          }
       }
-    else if (l.lower_char() == 2 && l.upper_char() == 2 )  // identity "?:?"	     
+    else if (l.lower_char() == 2 && l.upper_char() == 2 )  // identity "?:?"             
       {
-	for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
-	  {
-	    int number = t->alphabet.symbol2code(it->c_str());
-	    // add transitions of type x:x
-	    origin->add_arc( Label(number, number), target, t );
-	  }
+        for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
+          {
+            int number = t->alphabet.symbol2code(it->c_str());
+            // add transitions of type x:x
+            origin->add_arc( Label(number, number), target, t );
+          }
       }
     else if (l.lower_char() == 1)  // "?:x"
       {
-	for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
-	  {
-	    int number = t->alphabet.symbol2code(it->c_str());
-	    origin->add_arc( Label(number, l.upper_char()), target, t );
-	  }
+        for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
+          {
+            int number = t->alphabet.symbol2code(it->c_str());
+            origin->add_arc( Label(number, l.upper_char()), target, t );
+          }
       }
     else if (l.upper_char() == 1)  // "x:?"
       {
-	for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
-	  {
-	    int number = t->alphabet.symbol2code(it->c_str());
-	    origin->add_arc( Label(l.lower_char(), number), target, t );
-	  }
+        for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
+          {
+            int number = t->alphabet.symbol2code(it->c_str());
+            origin->add_arc( Label(l.lower_char(), number), target, t );
+          }
       }  
     // keep the original transition in all cases
     return;
@@ -1053,17 +1053,17 @@ namespace hfst { namespace implementations {
   /*******************************************************************/
 
   void SfstTransducer::expand2( 
-			       Transducer *t, Node *node,
-			       hfst::StringSet &new_symbols, std::set<Node*> &visited_nodes )
+                               Transducer *t, Node *node,
+                               hfst::StringSet &new_symbols, std::set<Node*> &visited_nodes )
   {
     if (visited_nodes.find(node) == visited_nodes.end()) {
       visited_nodes.insert(node);
       // iterate over all outgoing arcs of node
       for( ArcsIter p(node->arcs()); p; p++ ) {
-	Arc *arc=p;
-	expand2(t, arc->target_node(), new_symbols, visited_nodes);
-	Label l = arc->label();
-	expand_node( t, node, l, arc->target_node(), new_symbols);
+        Arc *arc=p;
+        expand2(t, arc->target_node(), new_symbols, visited_nodes);
+        Label l = arc->label();
+        expand_node( t, node, l, arc->target_node(), new_symbols);
       }
     }
     return;

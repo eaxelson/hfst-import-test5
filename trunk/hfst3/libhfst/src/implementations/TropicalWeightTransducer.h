@@ -82,7 +82,8 @@ namespace implementations
     //void write_3_0_library_header(std::ostream &out);
   public:
     TropicalWeightOutputStream(bool hfst_format=true); 
-    TropicalWeightOutputStream(const std::string &filename, bool hfst_format=false);
+    TropicalWeightOutputStream
+      (const std::string &filename, bool hfst_format=false);
     void close(void);
     void write(const char &c);
     void write_transducer(StdVectorFst * transducer);
@@ -142,17 +143,25 @@ namespace implementations
 
       // string versions
       static StdVectorFst * define_transducer(const std::string &symbol);
-      static StdVectorFst * define_transducer(const std::string &isymbol, const std::string &osymbol);
-      static StdVectorFst * define_transducer(const hfst::StringPairVector &spv);
-      static StdVectorFst * define_transducer(const hfst::StringPairSet &sps, bool cyclic=false);
-      static StdVectorFst * define_transducer(const std::vector<StringPairSet> &spsv);
+      static StdVectorFst * define_transducer
+	(const std::string &isymbol, const std::string &osymbol);
+      static StdVectorFst * define_transducer
+	(const hfst::StringPairVector &spv);
+      static StdVectorFst * define_transducer
+	(const hfst::StringPairSet &sps, bool cyclic=false);
+      static StdVectorFst * define_transducer
+	(const std::vector<StringPairSet> &spsv);
 
       // number versions
       static StdVectorFst * define_transducer(unsigned int number);
-      static StdVectorFst * define_transducer(unsigned int inumber, unsigned int onumber);
-      static StdVectorFst * define_transducer(const hfst::NumberPairVector &npv);
-      static StdVectorFst * define_transducer(const hfst::NumberPairSet &nps, bool cyclic=false);
-      static StdVectorFst * define_transducer(const std::vector<NumberPairSet> &npsv);
+      static StdVectorFst * define_transducer
+	(unsigned int inumber, unsigned int onumber);
+      static StdVectorFst * define_transducer
+	(const hfst::NumberPairVector &npv);
+      static StdVectorFst * define_transducer
+	(const hfst::NumberPairSet &nps, bool cyclic=false);
+      static StdVectorFst * define_transducer
+	(const std::vector<NumberPairSet> &npsv);
 
       static StdVectorFst * copy(StdVectorFst * t);
       static StdVectorFst * determinize(StdVectorFst * t);
@@ -168,28 +177,35 @@ namespace implementations
       static StdVectorFst * reverse(StdVectorFst * transducer);
       static StdVectorFst * extract_input_language(StdVectorFst * t);
       static StdVectorFst * extract_output_language(StdVectorFst * t);
-      static void extract_strings(StdVectorFst * t, hfst::ExtractStringsCb& callback,
-          int cycles=-1, FdTable<int64>* fd=NULL, bool filter_fd=false, bool include_spv=false);
+      static void extract_strings
+	(StdVectorFst * t, hfst::ExtractStringsCb& callback,
+	 int cycles=-1, FdTable<int64>* fd=NULL, bool filter_fd=false, 
+	 bool include_spv=false);
       static StdVectorFst * compose(StdVectorFst * t1,
-				   StdVectorFst * t2);
+                                   StdVectorFst * t2);
       static StdVectorFst * concatenate(StdVectorFst * t1,
-					StdVectorFst * t2);
+                                        StdVectorFst * t2);
       static StdVectorFst * disjunct(StdVectorFst * t1,
-			      StdVectorFst * t2);
+                              StdVectorFst * t2);
 
-      static StdVectorFst * disjunct(StdVectorFst * t, const StringPairVector &spv);
-      static StdVectorFst * disjunct(StdVectorFst * t, const NumberPairVector &npv);
+      static StdVectorFst * disjunct
+	(StdVectorFst * t, const StringPairVector &spv);
+      static StdVectorFst * disjunct
+	(StdVectorFst * t, const NumberPairVector &npv);
 
       static StdVectorFst * intersect(StdVectorFst * t1,
-			     StdVectorFst * t2);
+                             StdVectorFst * t2);
       static StdVectorFst * subtract(StdVectorFst * t1,
-			    StdVectorFst * t2);
+                            StdVectorFst * t2);
       static StdVectorFst * set_weight(StdVectorFst * t,float f);
       static StdVectorFst * set_final_weights(StdVectorFst * t, float weight);
-      static StdVectorFst * transform_weights(StdVectorFst * t,float (*func)(float f));
-      static StdVectorFst * push_weights(StdVectorFst * t, bool to_initial_state);
+      static StdVectorFst * transform_weights
+	(StdVectorFst * t,float (*func)(float f));
+      static StdVectorFst * push_weights
+	(StdVectorFst * t, bool to_initial_state);
 
-      static std::pair<StdVectorFst*, StdVectorFst*> harmonize(StdVectorFst *t1, StdVectorFst *t2, bool unknown_symbols_in_use=true);
+      static std::pair<StdVectorFst*, StdVectorFst*> harmonize
+	(StdVectorFst *t1, StdVectorFst *t2, bool unknown_symbols_in_use=true);
 
       static void write_in_att_format(StdVectorFst * t, FILE *ofile);
       static void write_in_att_format_number(StdVectorFst * t, FILE *ofile);
@@ -197,7 +213,8 @@ namespace implementations
       static void test_minimize(void);
 
       static void write_in_att_format(StdVectorFst * t, std::ostream &os);
-      static void write_in_att_format_number(StdVectorFst * t, std::ostream &os);
+      static void write_in_att_format_number
+	(StdVectorFst * t, std::ostream &os);
 
       static StdVectorFst * read_in_att_format(FILE *ifile);
       
@@ -207,86 +224,95 @@ namespace implementations
       static FdTable<int64>* get_flag_diacritics(StdVectorFst * t);
 
       // string versions
-      static StdVectorFst * insert_freely(StdVectorFst * t, const StringPair &symbol_pair);
-      static StdVectorFst * substitute(StdVectorFst * t, std::string old_symbol, std::string new_symbol);
+      static StdVectorFst * insert_freely
+	(StdVectorFst * t, const StringPair &symbol_pair);
+      static StdVectorFst * substitute
+	(StdVectorFst * t, std::string old_symbol, std::string new_symbol);
       static StdVectorFst * substitute(StdVectorFst * t,
-				       StringPair old_symbol_pair,
-				       StringPair new_symbol_pair);
+                                       StringPair old_symbol_pair,
+                                       StringPair new_symbol_pair);
       static StdVectorFst * substitute(StdVectorFst * t,
-				       StringPair old_symbol_pair,
-				       StringPairSet new_symbol_pair_set);
+                                       StringPair old_symbol_pair,
+                                       StringPairSet new_symbol_pair_set);
       static StdVectorFst * substitute(StdVectorFst * t,
-				       const StringPair old_symbol_pair,
-				       StdVectorFst *transducer);
-      // static StdVectorFst * substitute(StdVectorFst *t, bool (*func)(const StringPair &sp, StringPairSet &sps) );
+                                       const StringPair old_symbol_pair,
+                                       StdVectorFst *transducer);
 
       // number versions
-      static StdVectorFst * insert_freely(StdVectorFst * t, const NumberPair &number_pair);
-      static StdVectorFst * substitute(StdVectorFst * t, unsigned int, unsigned int);
+      static StdVectorFst * insert_freely
+	(StdVectorFst * t, const NumberPair &number_pair);
+      static StdVectorFst * substitute
+	(StdVectorFst * t, unsigned int, unsigned int);
       static StdVectorFst * substitute(StdVectorFst * t,
-				       NumberPair old_number_pair,
-				       NumberPair new_number_pair);
+                                       NumberPair old_number_pair,
+                                       NumberPair new_number_pair);
       static StdVectorFst * substitute(StdVectorFst * t,
-				       const NumberPair old_number_pair,
-				       StdVectorFst *transducer);
+                                       const NumberPair old_number_pair,
+                                       StdVectorFst *transducer);
 
       static void insert_to_alphabet
-	(StdVectorFst *t, const std::string &symbol);
+        (StdVectorFst *t, const std::string &symbol);
       static StringSet get_alphabet(StdVectorFst *t);
-      static NumberNumberMap create_mapping(StdVectorFst * t1, StdVectorFst * t2);
-      //static std::vector<unsigned int> create_mapping(StdVectorFst * t1, StdVectorFst * t2);
-      static void recode_symbol_numbers(StdVectorFst * t, hfst::NumberNumberMap &km);      
-      //static void recode_symbol_numbers(StdVectorFst * t, std::vector<unsigned int> &km);      
-      static StdVectorFst * expand_arcs(StdVectorFst * t, hfst::StringSet &unknown, bool unknown_symbols_in_use);
+      static NumberNumberMap create_mapping
+	(StdVectorFst * t1, StdVectorFst * t2);
+      static void recode_symbol_numbers
+	(StdVectorFst * t, hfst::NumberNumberMap &km);      
+      static StdVectorFst * expand_arcs
+	(StdVectorFst * t, hfst::StringSet &unknown, 
+	 bool unknown_symbols_in_use);
 
 #ifdef FOO
       static StdVectorFst * compose_intersect(StdVectorFst * t,
-					      Grammar * grammar);
+                                              Grammar * grammar);
 #endif
 
-      static StdVectorFst * remove_from_alphabet(StdVectorFst *t, const std::string &symbol);
+      static StdVectorFst * remove_from_alphabet
+	(StdVectorFst *t, const std::string &symbol);
 
       float get_profile_seconds();
 
       static unsigned int number_of_states(const StdVectorFst * t);
 
       // for HFST version 2 transducer handling
-      static void set_symbol_table(StdVectorFst * t, std::vector<std::pair<unsigned short, std::string> > symbol_mappings);
+      static void set_symbol_table
+	(StdVectorFst * t, 
+	 std::vector<std::pair<unsigned short, std::string> > symbol_mappings);
 
     private:
       static fst::SymbolTable create_symbol_table(std::string name);
       static void initialize_symbol_tables(StdVectorFst *t);
-      //static void add_symbol_table(StdVectorFst *t, HfstAlphabet &alpha); 
       static void remove_symbol_table(StdVectorFst *t);      
 
       /* Maps state numbers in AT&T text format to state ids used by 
-	 OpenFst transducers. */
+         OpenFst transducers. */
       typedef std::map<int, StateId> StateMap;
       static StateId add_and_map_state(StdVectorFst *t, int state_number, 
-				       StateMap &state_map);
+                                       StateMap &state_map);
 
       static int has_arc(StdVectorFst &t,
-		  StdArc::StateId sourcestate,			  
-		  StdArc::Label ilabel, 
-		  StdArc::Label olabel);
+                  StdArc::StateId sourcestate,                          
+                  StdArc::Label ilabel, 
+                  StdArc::Label olabel);
       static void disjunct_as_tries(StdVectorFst &t1,
-			     StateId t1_state,
-			     const StdVectorFst * t2,
-			     StateId t2_state);
+                             StateId t1_state,
+                             const StdVectorFst * t2,
+                             StateId t2_state);
       static void add_sub_trie(StdVectorFst &t1,
-			StateId t1_state,
-			const StdVectorFst * t2,
-			StateId t2_state);
+                        StateId t1_state,
+                        const StdVectorFst * t2,
+                        StateId t2_state);
 
     public:
       static StateId add_state(StdVectorFst *t);
       static void set_final_weight(StdVectorFst *t, StateId s, float w);
-      static void add_transition(StdVectorFst *t, StateId source,
-				 std::string &isymbol, std::string &osymbol, float w, StateId target);
+      static void add_transition
+	(StdVectorFst *t, StateId source,
+	 std::string &isymbol, std::string &osymbol, float w, StateId target);
       static float get_final_weight(StdVectorFst *t, StateId s);
       static float is_final(StdVectorFst *t, StateId s);
       static StateId get_initial_state(StdVectorFst *t);
-      static void represent_empty_transducer_as_having_one_state(StdVectorFst *t);      
+      static void represent_empty_transducer_as_having_one_state
+	(StdVectorFst *t);      
 
     };
 

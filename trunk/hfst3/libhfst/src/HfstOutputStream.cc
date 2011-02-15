@@ -25,48 +25,49 @@ namespace hfst
       {
 #if HAVE_SFST
       case SFST_TYPE:
-	implementation.sfst = 
-	  new hfst::implementations::SfstOutputStream();
-	break;
+        implementation.sfst = 
+          new hfst::implementations::SfstOutputStream();
+        break;
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
-	implementation.tropical_ofst = 
-	  new hfst::implementations::TropicalWeightOutputStream();
-	break;
+        implementation.tropical_ofst = 
+          new hfst::implementations::TropicalWeightOutputStream();
+        break;
       case LOG_OPENFST_TYPE:
-	implementation.log_ofst = 
-	  new hfst::implementations::LogWeightOutputStream();
-	break;
+        implementation.log_ofst = 
+          new hfst::implementations::LogWeightOutputStream();
+        break;
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
-	implementation.foma = 
-	  new hfst::implementations::FomaOutputStream();
-	break;
+        implementation.foma = 
+          new hfst::implementations::FomaOutputStream();
+        break;
 #endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
       case MY_TRANSDUCER_LIBRARY_TYPE:
-	implementation.my_transducer_library = 
-	  new hfst::implementations::MyTransducerLibraryOutputStream();
-	break;
+        implementation.my_transducer_library = 
+          new hfst::implementations::MyTransducerLibraryOutputStream();
+        break;
 #endif
       case HFST_OL_TYPE:
-	implementation.hfst_ol =
-	  new hfst::implementations::HfstOlOutputStream(false);
-	break;
+        implementation.hfst_ol =
+          new hfst::implementations::HfstOlOutputStream(false);
+        break;
       case HFST_OLW_TYPE:
-	implementation.hfst_ol =
-	  new hfst::implementations::HfstOlOutputStream(true);
-	break;
+        implementation.hfst_ol =
+          new hfst::implementations::HfstOlOutputStream(true);
+        break;
       default:
-	throw hfst::exceptions::SpecifiedTypeRequiredException();
-	break;
+        throw hfst::exceptions::SpecifiedTypeRequiredException();
+        break;
       }
   }
   // FIXME: HfstOutputStream takes a string parameter, 
   //        HfstInputStream a const char*
-  HfstOutputStream::HfstOutputStream(const std::string &filename,ImplementationType type, bool hfst_format):
+  HfstOutputStream::HfstOutputStream
+  (const std::string &filename,ImplementationType type, bool hfst_format):
     type(type), hfst_format(hfst_format)
   { 
     if (not HfstTransducer::is_implementation_type_available(type))
@@ -76,48 +77,49 @@ namespace hfst
       {
 #if HAVE_SFST
       case SFST_TYPE:
-	implementation.sfst = 
-	  new hfst::implementations::SfstOutputStream(filename);
-	break;
+        implementation.sfst = 
+          new hfst::implementations::SfstOutputStream(filename);
+        break;
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
-	// FIXME: this should be done in TropicalWeight layer
-	if (filename.compare("") == 0) 
-	  implementation.tropical_ofst = 
-	    new hfst::implementations::TropicalWeightOutputStream(hfst_format);
-	else
-	  implementation.tropical_ofst = 
-	    new hfst::implementations::TropicalWeightOutputStream(filename, hfst_format);
-	break;
+        // FIXME: this should be done in TropicalWeight layer
+        if (filename.compare("") == 0) 
+          implementation.tropical_ofst = 
+            new hfst::implementations::TropicalWeightOutputStream(hfst_format);
+        else
+          implementation.tropical_ofst = 
+            new hfst::implementations::TropicalWeightOutputStream
+	    (filename, hfst_format);
+        break;
       case LOG_OPENFST_TYPE:
-	implementation.log_ofst = 
-	  new hfst::implementations::LogWeightOutputStream(filename);
-	break;
+        implementation.log_ofst = 
+          new hfst::implementations::LogWeightOutputStream(filename);
+        break;
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
-	implementation.foma = 
-	  new hfst::implementations::FomaOutputStream(filename);
-	break;
+        implementation.foma = 
+          new hfst::implementations::FomaOutputStream(filename);
+        break;
 #endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
       case MY_TRANSDUCER_LIBRARY_TYPE:
-	implementation.my_transducer_library =
-	  new hfst::implementations::MyTransducerLibraryOutputStream(filename);
-	break;
+        implementation.my_transducer_library =
+          new hfst::implementations::MyTransducerLibraryOutputStream(filename);
+        break;
 #endif
       case HFST_OL_TYPE:
-	implementation.hfst_ol =
-	  new hfst::implementations::HfstOlOutputStream(filename, false);
-	break;
+        implementation.hfst_ol =
+          new hfst::implementations::HfstOlOutputStream(filename, false);
+        break;
       case HFST_OLW_TYPE:
-	implementation.hfst_ol =
-	  new hfst::implementations::HfstOlOutputStream(filename.c_str(), true);
-	break;
+        implementation.hfst_ol =
+          new hfst::implementations::HfstOlOutputStream(filename.c_str(), true);
+        break;
       default:
-	throw hfst::exceptions::SpecifiedTypeRequiredException();
-	break;
+        throw hfst::exceptions::SpecifiedTypeRequiredException();
+        break;
       }
   }
   
@@ -127,33 +129,33 @@ namespace hfst
       {
 #if HAVE_SFST
       case SFST_TYPE:
-	delete implementation.sfst;
-	break;
+        delete implementation.sfst;
+        break;
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
-	delete implementation.tropical_ofst;
-	break;
+        delete implementation.tropical_ofst;
+        break;
       case LOG_OPENFST_TYPE:
-	delete implementation.log_ofst;
-	break;
+        delete implementation.log_ofst;
+        break;
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
-	delete implementation.foma;
-	break;
+        delete implementation.foma;
+        break;
 #endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
       case MY_TRANSDUCER_LIBRARY_TYPE:
-	delete implementation.my_transducer_library;
-	break;
+        delete implementation.my_transducer_library;
+        break;
 #endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
-	delete implementation.hfst_ol;
-	break;
+        delete implementation.hfst_ol;
+        break;
       default:
-	assert(false);
+        assert(false);
       }
   }
 
@@ -182,35 +184,35 @@ namespace hfst
       {
 #if HAVE_SFST
       case SFST_TYPE:
-	implementation.sfst->write(c);
-	break;
+        implementation.sfst->write(c);
+        break;
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
-	implementation.tropical_ofst->write(c);
-	break;
+        implementation.tropical_ofst->write(c);
+        break;
       case LOG_OPENFST_TYPE:
-	implementation.log_ofst->write(c);
-	break;
+        implementation.log_ofst->write(c);
+        break;
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
-	implementation.foma->write(c);
-	break;
+        implementation.foma->write(c);
+        break;
 #endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
       case MY_TRANSDUCER_LIBRARY_TYPE:
-	implementation.my_transducer_library->write(c);
-	break;
+        implementation.my_transducer_library->write(c);
+        break;
 #endif
-	// we always have HFST_OL, right?
+        // we always have HFST_OL, right?
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
-	implementation.hfst_ol->write(c);
-	break;
-	
+        implementation.hfst_ol->write(c);
+        break;
+        
       default:
-	assert(false);
+        assert(false);
       }
   }
 
@@ -226,35 +228,35 @@ namespace hfst
       {
 #if HAVE_SFST
       case SFST_TYPE:
-	type_value=std::string("SFST");
-	break;
+        type_value=std::string("SFST");
+        break;
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
-	type_value=std::string("TROPICAL_OPENFST");
-	break;
+        type_value=std::string("TROPICAL_OPENFST");
+        break;
       case LOG_OPENFST_TYPE:
-	type_value=std::string("LOG_OPENFST");
-	break;
+        type_value=std::string("LOG_OPENFST");
+        break;
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
-	type_value=std::string("FOMA");
-	break;
+        type_value=std::string("FOMA");
+        break;
 #endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
       case MY_TRANSDUCER_LIBRARY_TYPE:
-	type_value=std::string("MY_TRANSDUCER_LIBRARY");
-	break;
+        type_value=std::string("MY_TRANSDUCER_LIBRARY");
+        break;
 #endif
       case HFST_OL_TYPE:
-	type_value=std::string("HFST_OL");
-	break;
+        type_value=std::string("HFST_OL");
+        break;
       case HFST_OLW_TYPE:
-	type_value=std::string("HFST_OLW");
-	break;
+        type_value=std::string("HFST_OLW");
+        break;
       default:
-	assert(false);
+        assert(false);
       }
 
     append(header, type_value);
@@ -276,18 +278,19 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
       {
 #if HAVE_SFST
       case SFST_TYPE:
-	implementation.sfst->append_implementation_specific_header_data(header, transducer.implementation.sfst);
-	break;
+        implementation.sfst->append_implementation_specific_header_data
+	  (header, transducer.implementation.sfst);
+        break;
 #endif
       default:
-	break;
+        break;
       }
   }
 
   HfstOutputStream &HfstOutputStream::operator<< (HfstTransducer &transducer)
   {
     if (type != transducer.type)
-      { throw hfst::exceptions::TransducerHasWrongTypeException(); }  // message...
+      { throw hfst::exceptions::TransducerHasWrongTypeException(); }  
 
     /* Write the HFST header. The header has the following structure:
        
@@ -295,7 +298,8 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
        - the fifth char is a separator:                 "\0"
        - the sixth and seventh char tell the length of the rest of the header
          (beginning after the eighth char)
-       - the eighth char is a separator and is not counted to the header length: "\0"
+       - the eighth char is a separator and is not counted 
+         to the header length: "\0"
        - the rest of the header consists of pairs of attributes and their values
          that are each separated by a char "\0"
 
@@ -313,9 +317,9 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
        the rest of the header (i.e. the sequence of bytes
        "version\03.0\0type\0FOMA\0name\0\0") is 0 * 256 + 28 * 1 = 28 bytes.
 
-       HFST version 3.0 header must contain at least the attributes 'version', 'type'
-       and 'name' and their values. Implementation-specific attributes can
-       follow after these obligatory attributes.
+       HFST version 3.0 header must contain at least the attributes 'version', 
+       'type' and 'name' and their values. Implementation-specific attributes
+       can follow after these obligatory attributes.
      */
     if (hfst_format) {
       const int MAX_HEADER_LENGTH=65535;
@@ -334,13 +338,13 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
       // write header length using two bytes
       int header_length = (int)header.size();
       if (header_length > MAX_HEADER_LENGTH) {
-	fprintf(stderr, "ERROR: transducer header is too long\n");
-	exit(1);
+        fprintf(stderr, "ERROR: transducer header is too long\n");
+        exit(1);
       }
       /*
-	short length = (short)header_length;
-	char first_byte = (short)(header_length/255);
-	char second_byte = (short)(header_length%255);
+        short length = (short)header_length;
+        char first_byte = (short)(header_length/255);
+        char second_byte = (short)(header_length%255);
        */
       char first_byte = *((char*)(&header_length));
       char second_byte = *((char*)(&header_length)+1);
@@ -356,39 +360,39 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
       {
 #if HAVE_SFST
       case SFST_TYPE:
-	implementation.sfst->write_transducer
-	  (transducer.implementation.sfst);
-	return *this;
+        implementation.sfst->write_transducer
+          (transducer.implementation.sfst);
+        return *this;
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
-	implementation.tropical_ofst->write_transducer
-	  (transducer.implementation.tropical_ofst);
-	return *this;    
+        implementation.tropical_ofst->write_transducer
+          (transducer.implementation.tropical_ofst);
+        return *this;    
       case LOG_OPENFST_TYPE:
-	implementation.log_ofst->write_transducer
-	  (transducer.implementation.log_ofst);
-	return *this;
+        implementation.log_ofst->write_transducer
+          (transducer.implementation.log_ofst);
+        return *this;
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
-	implementation.foma->write_transducer
-	  (transducer.implementation.foma);
-	return *this;
+        implementation.foma->write_transducer
+          (transducer.implementation.foma);
+        return *this;
 #endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
       case MY_TRANSDUCER_LIBRARY_TYPE:
-	implementation.my_transducer_library->write_transducer
-	  (transducer.implementation.my_transducer_library);
+        implementation.my_transducer_library->write_transducer
+          (transducer.implementation.my_transducer_library);
 #endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
-	implementation.hfst_ol->write_transducer
-	  (transducer.implementation.hfst_ol);
-	return *this;
+        implementation.hfst_ol->write_transducer
+          (transducer.implementation.hfst_ol);
+        return *this;
       default:
-	assert(false);
-	return *this;
+        assert(false);
+        return *this;
       }
   }
 
@@ -397,33 +401,33 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
       {
 #if HAVE_SFST
       case SFST_TYPE:
-	implementation.sfst->close();
-	break;
+        implementation.sfst->close();
+        break;
 #endif
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
-	implementation.tropical_ofst->close();
-	break;
+        implementation.tropical_ofst->close();
+        break;
       case LOG_OPENFST_TYPE:
-	implementation.log_ofst->close();
-	break;
+        implementation.log_ofst->close();
+        break;
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
-	implementation.foma->close();
-	break;
+        implementation.foma->close();
+        break;
 #endif
 #if HAVE_MY_TRANSDUCER_LIBRARY
       case MY_TRANSDUCER_LIBRARY_TYPE:
-	implementation.my_transducer_library->close();
-	break;
+        implementation.my_transducer_library->close();
+        break;
 #endif
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
-	implementation.hfst_ol->close();
-	break;
+        implementation.hfst_ol->close();
+        break;
       default:
-	assert(false);
+        assert(false);
       }
   }
 

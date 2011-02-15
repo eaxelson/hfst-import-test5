@@ -68,7 +68,8 @@ For more information on HFST transducer structure, see
       hfst::implementations::HfstOlOutputStream * hfst_ol;
     };
     ImplementationType type; // type of the stream implementation
-    bool hfst_format;  // whether an hfst header is written before every transducer
+    // whether an hfst header is written before every transducer
+    bool hfst_format;  
     StreamImplementation implementation; // backend implementation
 
     // write data to stream
@@ -81,36 +82,42 @@ For more information on HFST transducer structure, see
 
     // append obligatory HFST header data to \a header
     void append_hfst_header_data(std::vector<char> &header);
-    // append implementation-specific header data collected from \a transducer to \a header
-    void append_implementation_specific_header_data(std::vector<char> &header, HfstTransducer &transducer);
+    /* append implementation-specific header data collected from 
+       \a transducer to \a header */
+    void append_implementation_specific_header_data
+      (std::vector<char> &header, HfstTransducer &transducer);
 
 
   public:
 
-    /** \brief Create a stream to standard output for writing binary transducers of type \a type. 
-	\a hfst_format defines whether transducers are written in hfst format or as such in their backend format. */
+    /** \brief Create a stream to standard output for writing 
+	binary transducers of type \a type. 
+        \a hfst_format defines whether transducers are written 
+	in hfst format or as such in their backend format. */
     HfstOutputStream(ImplementationType type, bool hfst_format=true);
 
-    /** \brief Open a stream to file \a filename for writing binary transducers of type \a type. 
-	\a hfst_format defines whether transducers are written in hfst format or as such in their backend format.
+    /** \brief Open a stream to file \a filename for writing binary transducers
+	of type \a type. 
+	\a hfst_format defines whether transducers are written in hfst format 
+	or as such in their backend format.
 
-	If the file exists, it is overwritten. */
+        If the file exists, it is overwritten. */
     HfstOutputStream(const std::string &filename, ImplementationType type, 
-		     bool hfst_format=true);
+                     bool hfst_format=true);
 
     /** \brief Destructor. */
     ~HfstOutputStream(void);  
 
     /** \brief Write the transducer \a transducer in binary format 
-	to the stream. 
+        to the stream. 
 
-	By default, all transducers must have the same type, else an
-	hfst::exceptions::TransducerHasWrongTypeException is thrown. */
+        By default, all transducers must have the same type, else an
+        hfst::exceptions::TransducerHasWrongTypeException is thrown. */
     HfstOutputStream &operator<< (HfstTransducer &transducer);
 
     /** \brief Close the stream. 
 
-	If the stream points to standard output, nothing is done. */
+        If the stream points to standard output, nothing is done. */
     void close(void);
   };
 

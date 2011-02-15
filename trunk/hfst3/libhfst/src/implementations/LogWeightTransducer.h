@@ -142,17 +142,23 @@ namespace implementations
 
       // string versions
       static LogFst * define_transducer(const std::string &symbol);
-      static LogFst * define_transducer(const std::string &isymbol, const std::string &osymbol);
-      static LogFst * define_transducer(const hfst::StringPairVector &spv);
-      static LogFst * define_transducer(const hfst::StringPairSet &sps, bool cyclic=false);
+      static LogFst * define_transducer
+	(const std::string &isymbol, const std::string &osymbol);
+      static LogFst * define_transducer
+	(const hfst::StringPairVector &spv);
+      static LogFst * define_transducer
+	(const hfst::StringPairSet &sps, bool cyclic=false);
       static LogFst * define_transducer(const std::vector<StringPairSet> &spsv);
 
       // number versions
       static LogFst * define_transducer(unsigned int number);
-      static LogFst * define_transducer(unsigned int inumber, unsigned int onumber);
+      static LogFst * define_transducer
+	(unsigned int inumber, unsigned int onumber);
       static LogFst * define_transducer(const hfst::NumberPairVector &npv);
-      static LogFst * define_transducer(const hfst::NumberPairSet &nps, bool cyclic=false);
-      static LogFst * define_transducer(const std::vector<NumberPairSet> &npsv);
+      static LogFst * define_transducer
+	(const hfst::NumberPairSet &nps, bool cyclic=false);
+      static LogFst * define_transducer
+	(const std::vector<NumberPairSet> &npsv);
 
       static LogFst * copy(LogFst * t);
       static LogFst * determinize(LogFst * t);
@@ -168,28 +174,31 @@ namespace implementations
       static LogFst * reverse(LogFst * transducer);
       static LogFst * extract_input_language(LogFst * t);
       static LogFst * extract_output_language(LogFst * t);
-      static void extract_strings(LogFst * t, hfst::ExtractStringsCb& callback,
-          int cycles=-1, FdTable<int64>* fd=NULL, bool filter_fd=false, bool include_spv=false);
+      static void extract_strings
+	(LogFst * t, hfst::ExtractStringsCb& callback,
+	 int cycles=-1, FdTable<int64>* fd=NULL, bool filter_fd=false,
+	 bool include_spv=false);
       static LogFst * compose(LogFst * t1,
-				   LogFst * t2);
+                                   LogFst * t2);
       static LogFst * concatenate(LogFst * t1,
-					LogFst * t2);
+                                        LogFst * t2);
       static LogFst * disjunct(LogFst * t1,
-			      LogFst * t2);
+                              LogFst * t2);
 
       static LogFst * disjunct(LogFst * t, const StringPairVector &spv);
       static LogFst * disjunct(LogFst * t, const NumberPairVector &npv);
 
       static LogFst * intersect(LogFst * t1,
-			     LogFst * t2);
+                             LogFst * t2);
       static LogFst * subtract(LogFst * t1,
-			    LogFst * t2);
+                            LogFst * t2);
       static LogFst * set_weight(LogFst * t,float f);
       static LogFst * set_final_weights(LogFst * t, float weight);
       static LogFst * transform_weights(LogFst * t,float (*func)(float f));
       static LogFst * push_weights(LogFst * t, bool to_initial_state);
 
-      static std::pair<LogFst*, LogFst*> harmonize(LogFst *t1, LogFst *t2, bool unknown_symbols_in_use=true);
+      static std::pair<LogFst*, LogFst*> harmonize
+	(LogFst *t1, LogFst *t2, bool unknown_symbols_in_use=true);
 
       static void write_in_att_format(LogFst * t, FILE *ofile);
       static void write_in_att_format_number(LogFst * t, FILE *ofile);
@@ -208,38 +217,39 @@ namespace implementations
 
       // string versions
       static LogFst * insert_freely(LogFst * t, const StringPair &symbol_pair);
-      static LogFst * substitute(LogFst * t, std::string old_symbol, std::string new_symbol);
+      static LogFst * substitute
+	(LogFst * t, std::string old_symbol, std::string new_symbol);
       static LogFst * substitute(LogFst * t,
-				       StringPair old_symbol_pair,
-				       StringPair new_symbol_pair);
+				 StringPair old_symbol_pair,
+				 StringPair new_symbol_pair);
       static LogFst * substitute(LogFst * t,
-				       StringPair old_symbol_pair,
-				       StringPairSet new_symbol_pair_set);
+				 StringPair old_symbol_pair,
+				 StringPairSet new_symbol_pair_set);
       static LogFst * substitute(LogFst * t,
-				       const StringPair old_symbol_pair,
-				       LogFst *transducer);
-      // static LogFst * substitute(LogFst *t, void (*func)(std::string &isymbol, std::string &osymbol) );
+				 const StringPair old_symbol_pair,
+				 LogFst *transducer);
 
       // number versions
       static LogFst * insert_freely(LogFst * t, const NumberPair &number_pair);
       static LogFst * substitute(LogFst * t, unsigned int, unsigned int);
       static LogFst * substitute(LogFst * t,
-				       NumberPair old_number_pair,
-				       NumberPair new_number_pair);
+                                       NumberPair old_number_pair,
+                                       NumberPair new_number_pair);
       static LogFst * substitute(LogFst * t,
-				       const NumberPair old_number_pair,
-				       LogFst *transducer);
+                                       const NumberPair old_number_pair,
+                                       LogFst *transducer);
 
       static void insert_to_alphabet
-	(LogFst *t, const std::string &symbol);
+        (LogFst *t, const std::string &symbol);
       static StringSet get_alphabet(LogFst *t);
       static NumberNumberMap create_mapping(LogFst * t1, LogFst * t2);
-      //static std::vector<unsigned int> create_mapping(LogFst * t1, LogFst * t2);
-      static void recode_symbol_numbers(LogFst * t, hfst::NumberNumberMap &km);      
-      //static void recode_symbol_numbers(LogFst * t, std::vector<unsigned int> &km);      
-      static LogFst * expand_arcs(LogFst * t, hfst::StringSet &unknown, bool unknown_symbols_in_use);
+      static void recode_symbol_numbers(LogFst * t, hfst::NumberNumberMap &km);
 
-      static LogFst * remove_from_alphabet(LogFst *t, const std::string &symbol);
+      static LogFst * expand_arcs
+	(LogFst * t, hfst::StringSet &unknown, bool unknown_symbols_in_use);
+
+      static LogFst * remove_from_alphabet
+	(LogFst *t, const std::string &symbol);
 
       float get_profile_seconds();
 
@@ -248,38 +258,38 @@ namespace implementations
     private:
       static fst::SymbolTable create_symbol_table(std::string name);
       static void initialize_symbol_tables(LogFst *t);
-      //static void add_symbol_table(LogFst *t, HfstAlphabet &alpha); 
       static void remove_symbol_table(LogFst *t);      
       
       /* Maps state numbers in AT&T text format to state ids used by 
-	 OpenFst transducers. */
+         OpenFst transducers. */
       typedef std::map<int, StateId> StateMap;
 
       static StateId add_and_map_state
-	(LogFst *t, int state_number, StateMap &state_map);
+        (LogFst *t, int state_number, StateMap &state_map);
 
       static int has_arc(LogFst &t,
-		  LogArc::StateId sourcestate,			  
-		  LogArc::Label ilabel, 
-		  LogArc::Label olabel);
+                  LogArc::StateId sourcestate,                          
+                  LogArc::Label ilabel, 
+                  LogArc::Label olabel);
       static void disjunct_as_tries(LogFst &t1,
-			     StateId t1_state,
-			     const LogFst * t2,
-			     StateId t2_state);
+                             StateId t1_state,
+                             const LogFst * t2,
+                             StateId t2_state);
       static void add_sub_trie(LogFst &t1,
-			StateId t1_state,
-			const LogFst * t2,
-			StateId t2_state);
+                        StateId t1_state,
+                        const LogFst * t2,
+                        StateId t2_state);
 
     public:
       static StateId add_state(LogFst *t);
       static void set_final_weight(LogFst *t, StateId s, float w);
-      static void add_transition(LogFst *t, StateId source,
-				 std::string &isymbol, std::string &osymbol, float w, StateId target);
+      static void add_transition
+	(LogFst *t, StateId source,
+	 std::string &isymbol, std::string &osymbol, float w, StateId target);
       static float get_final_weight(LogFst *t, StateId s);
       static float is_final(LogFst *t, StateId s);
       static StateId get_initial_state(LogFst *t);
-      static void represent_empty_transducer_as_having_one_state(LogFst *t);      
+      static void represent_empty_transducer_as_having_one_state(LogFst *t);
 
     };
 

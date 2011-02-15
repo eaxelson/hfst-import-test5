@@ -35,15 +35,16 @@ bool FdOperation::is_diacritic(const std::string& diacritic_string)
   if (diacritic_string.find_last_of('.') == 2)
     {
       if ((diacritic_string.at(1) != 'R') and
-	  (diacritic_string.at(1) != 'D') and
-	  (diacritic_string.at(1) != 'C'))
+          (diacritic_string.at(1) != 'D') and
+          (diacritic_string.at(1) != 'C'))
       { return false; }
     }
   return true;
 }
 
-std::string::size_type FdOperation::find_diacritic(const std::string& diacritic_str, 
-                                                 std::string::size_type& length)
+std::string::size_type FdOperation::find_diacritic
+(const std::string& diacritic_str, 
+ std::string::size_type& length)
 {
   std::string::size_type start = diacritic_str.find('@');
   if(start != std::string::npos)
@@ -79,7 +80,8 @@ main(int argc, char** argv)
   return 77;
   std::cout << std::endl << "find diacritic... ";
 
-    assert(hfst::FdOperation::find_diacritic("@P.A.X@", len) != std::string::npos);
+    assert(hfst::FdOperation::find_diacritic
+	   ("@P.A.X@", len) != std::string::npos);
     assert(hfst::FdOperation::find_diacritic("FOO", len) == std::string::npos);
   std::cout << std::endl << "is diacritic... ";
     assert(hfst::FdOperation::is_diacritic("@P.A.X@"));

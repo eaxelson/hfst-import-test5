@@ -242,7 +242,7 @@ namespace implementations
 
   /* TODO: document */
   void MyTransducerLibraryTransducer::extract_strings
-  (MyFst * t, hfst::ExtractStringsCb& callback, 			      
+  (MyFst * t, hfst::ExtractStringsCb& callback,                               
    int cycles, FdTable<unsigned int>* fd, bool filter_fd) {
     (void)t;
     (void)callback;

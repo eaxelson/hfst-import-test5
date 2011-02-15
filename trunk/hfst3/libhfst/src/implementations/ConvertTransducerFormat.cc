@@ -36,7 +36,7 @@ namespace hfst { namespace implementations
 #if HAVE_OPENFST
     if (t.type == TROPICAL_OPENFST_TYPE)
       return tropical_ofst_to_hfst_basic_transducer
-	(t.implementation.tropical_ofst); 
+        (t.implementation.tropical_ofst); 
     if (t.type == LOG_OPENFST_TYPE)
       return log_ofst_to_hfst_basic_transducer(t.implementation.log_ofst); 
 #endif // HAVE_OPENFST
@@ -80,8 +80,8 @@ namespace hfst { namespace implementations
   */
   void ConversionFunctions::
   sfst_to_hfst_basic_transducer( SFST::Node *node, SFST::NodeNumbering &index, 
-		    std::set<SFST::Node*> &visited_nodes, 
-		    HfstBasicTransducer *net, SFST::Alphabet &alphabet ) {
+                    std::set<SFST::Node*> &visited_nodes, 
+                    HfstBasicTransducer *net, SFST::Alphabet &alphabet ) {
   
     // If node has not been visited before
     if (visited_nodes.find(node) == visited_nodes.end() ) { 
@@ -90,38 +90,38 @@ namespace hfst { namespace implementations
 
       // Go through all transitions and copy them to \a net
       for( SFST::ArcsIter p(arcs); p; p++ ) {
-	SFST::Arc *arc=p;
+        SFST::Arc *arc=p;
 
-	std::string istring
-	  (alphabet.code2symbol(arc->label().lower_char()));
-	std::string ostring
-	  (alphabet.code2symbol(arc->label().upper_char()));
+        std::string istring
+          (alphabet.code2symbol(arc->label().lower_char()));
+        std::string ostring
+          (alphabet.code2symbol(arc->label().upper_char()));
 
-	if (istring.compare("<>") == 0) {
-	  istring = std::string("@_EPSILON_SYMBOL_@");
-	}
-	if (ostring.compare("<>") == 0) {
-	  ostring = std::string("@_EPSILON_SYMBOL_@");
-	}
+        if (istring.compare("<>") == 0) {
+          istring = std::string("@_EPSILON_SYMBOL_@");
+        }
+        if (ostring.compare("<>") == 0) {
+          ostring = std::string("@_EPSILON_SYMBOL_@");
+        }
 
-	net->add_transition(index[node], 
-			    HfstBasicTransition
-			    (index[arc->target_node()],
-			     istring,
-			     ostring,
-			     0));
+        net->add_transition(index[node], 
+                            HfstBasicTransition
+                            (index[arc->target_node()],
+                             istring,
+                             ostring,
+                             0));
       }
 
       if (node->is_final())
-	net->set_final_weight(index[node],0);
+        net->set_final_weight(index[node],0);
 
       // Call this function recursively for all target nodes
       // of the transitions
       for( SFST::ArcsIter p(arcs); p; p++ ) {
-	SFST::Arc *arc=p;
-	sfst_to_hfst_basic_transducer(arc->target_node(), index, 
-			 visited_nodes, 
-			 net, alphabet);
+        SFST::Arc *arc=p;
+        sfst_to_hfst_basic_transducer(arc->target_node(), index, 
+                         visited_nodes, 
+                         net, alphabet);
       }
     }
   }
@@ -138,19 +138,19 @@ namespace hfst { namespace implementations
     std::set<SFST::Node*> visited_nodes;
    
     sfst_to_hfst_basic_transducer(t->root_node(), index, 
-		     visited_nodes, 
-				  net, t->alphabet);
+                     visited_nodes, 
+                                  net, t->alphabet);
     
     // Make sure that also symbols that occur in the alphabet of the
     // transducer t but not in its transitions are inserted to net
     SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
     for (SFST::Alphabet::CharMap::const_iterator it 
-	   = cm.begin(); it != cm.end(); it++) 
+           = cm.begin(); it != cm.end(); it++) 
       {
-	if (it->first != 0) // The epsilon symbol "<>" is not inserted
-	  {
-	    net->alphabet.insert(std::string(it->second));
-	  }
+        if (it->first != 0) // The epsilon symbol "<>" is not inserted
+          {
+            net->alphabet.insert(std::string(it->second));
+          }
       }
     
     return net;
@@ -175,45 +175,45 @@ namespace hfst { namespace implementations
     {
       // Go through the set of transitions in each state
       for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it 
-	     = it->second.begin();
-	   tr_it != it->second.end(); tr_it++)
-	{
-	  // Create new nodes, if needed
-	  if (state_map.find(it->first) == state_map.end())
-	    state_map[it->first] = t->new_node();
+             = it->second.begin();
+           tr_it != it->second.end(); tr_it++)
+        {
+          // Create new nodes, if needed
+          if (state_map.find(it->first) == state_map.end())
+            state_map[it->first] = t->new_node();
 
-	  if (state_map.find(tr_it->get_target_state()) == state_map.end())
-	    state_map[tr_it->get_target_state()] = t->new_node();
+          if (state_map.find(tr_it->get_target_state()) == state_map.end())
+            state_map[tr_it->get_target_state()] = t->new_node();
 
-	  std::string istring(tr_it->get_input_symbol());
-	  std::string ostring(tr_it->get_output_symbol());
+          std::string istring(tr_it->get_input_symbol());
+          std::string ostring(tr_it->get_output_symbol());
 
-	  if (istring.compare("@_EPSILON_SYMBOL_@") == 0) {
-	    istring = std::string("<>");
-	  }
+          if (istring.compare("@_EPSILON_SYMBOL_@") == 0) {
+            istring = std::string("<>");
+          }
 
-	  if (ostring.compare("@_EPSILON_SYMBOL_@") == 0) {
-	    ostring = std::string("<>");
-	  }
+          if (ostring.compare("@_EPSILON_SYMBOL_@") == 0) {
+            ostring = std::string("<>");
+          }
 
-	  SFST::Label l
-	    (t->alphabet.add_symbol(istring.c_str()),
-	     t->alphabet.add_symbol(ostring.c_str()));
-	  
-	  // Copy transition to node
-	  state_map[it->first]->add_arc(l,
-					state_map[tr_it->get_target_state()],
-					t);
-	}
+          SFST::Label l
+            (t->alphabet.add_symbol(istring.c_str()),
+             t->alphabet.add_symbol(ostring.c_str()));
+          
+          // Copy transition to node
+          state_map[it->first]->add_arc(l,
+                                        state_map[tr_it->get_target_state()],
+                                        t);
+        }
     }
 
   // Go through the final states
   for (HfstBasicTransducer::FinalWeightMap::const_iterator it 
-	 = net->final_weight_map.begin();
+         = net->final_weight_map.begin();
        it != net->final_weight_map.end(); it++) 
     {
       if (state_map.find(it->first) == state_map.end())
-	state_map[it->first] = t->new_node();
+        state_map[it->first] = t->new_node();
       state_map[it->first]->set_final(1);
     }
 
@@ -221,7 +221,7 @@ namespace hfst { namespace implementations
   // HfstBasicTransducer but not in its transitions are inserted to 
   // the SFST transducer
   for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it 
-	 = net->alphabet.begin();
+         = net->alphabet.begin();
        it != net->alphabet.end(); it++) {
     if (it->compare("@_EPSILON_SYMBOL_@") != 0)
       t->alphabet.add_symbol(it->c_str());
@@ -260,43 +260,43 @@ namespace hfst { namespace implementations
     // 1. If the source state is an initial state in foma:
     if ((fsm+i)->start_state == 1) 
       {
-	// If the start state has not yet been encountered.
-	if (not start_state_found) {
-	  start_state_id = (fsm+i)->state_no;
-	  //if (start_state_id != 0) {
-	  //  throw ErrorException();
-	  //}
-	  start_state_found=true;
-	}
-	// If the start state is encountered again, 
-	else if ((fsm+i)->state_no == start_state_id) {
-	  // do nothing.
-	}
-	// If there are several initial states in foma transducer,
-	else {
-	  // throw an exception.
-	  throw TransducerHasMoreThanOneStartStateException();
-	}
+        // If the start state has not yet been encountered.
+        if (not start_state_found) {
+          start_state_id = (fsm+i)->state_no;
+          //if (start_state_id != 0) {
+          //  throw ErrorException();
+          //}
+          start_state_found=true;
+        }
+        // If the start state is encountered again, 
+        else if ((fsm+i)->state_no == start_state_id) {
+          // do nothing.
+        }
+        // If there are several initial states in foma transducer,
+        else {
+          // throw an exception.
+          throw TransducerHasMoreThanOneStartStateException();
+        }
       }
 
     // 2. If there are transitions leaving from the state,
     if ((fsm+i)->target != -1) 
       {
-	// copy the transition.
-	net->add_transition
-	  ((fsm+i)->state_no,
-	   HfstBasicTransition
-	   ((fsm+i)->target,
-	    std::string (sigma_string((fsm+i)->in, t->sigma)), 
-	    std::string (sigma_string((fsm+i)->out, t->sigma)),
-	    0));      
+        // copy the transition.
+        net->add_transition
+          ((fsm+i)->state_no,
+           HfstBasicTransition
+           ((fsm+i)->target,
+            std::string (sigma_string((fsm+i)->in, t->sigma)), 
+            std::string (sigma_string((fsm+i)->out, t->sigma)),
+            0));      
       }
     
     // 3. If the source state is final in foma,
     if ((fsm+i)->final_state == 1) 
       {
-	// set the state as final.
-	net->set_final_weight((fsm+i)->state_no, 0);
+        // set the state as final.
+        net->set_final_weight((fsm+i)->state_no, 0);
       }
     
   }
@@ -336,41 +336,41 @@ namespace hfst { namespace implementations
     
     // Go through all states
     for (HfstBasicTransducer::const_iterator it = hfst_fsm->begin();
-	 it != hfst_fsm->end(); it++)
+         it != hfst_fsm->end(); it++)
       {
-	// Go through the set of transitions in each state
-	for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it 
-	       = it->second.begin();
-	     tr_it != it->second.end(); tr_it++)
-	  {
-	    // Copy the transition
-	    fsm_construct_add_arc(h, 
-				  (int)it->first, 
-				  (int)tr_it->get_target_state(),
-				  strdup(tr_it->get_input_symbol().c_str()),
-				  strdup(tr_it->get_output_symbol().c_str()) );
-	  }
+        // Go through the set of transitions in each state
+        for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it 
+               = it->second.begin();
+             tr_it != it->second.end(); tr_it++)
+          {
+            // Copy the transition
+            fsm_construct_add_arc(h, 
+                                  (int)it->first, 
+                                  (int)tr_it->get_target_state(),
+                                  strdup(tr_it->get_input_symbol().c_str()),
+                                  strdup(tr_it->get_output_symbol().c_str()) );
+          }
       }
     
     // Go through the final states
     for (HfstBasicTransducer::FinalWeightMap::const_iterator it 
-	   = hfst_fsm->final_weight_map.begin();
-	 it != hfst_fsm->final_weight_map.end(); it++) 
+           = hfst_fsm->final_weight_map.begin();
+         it != hfst_fsm->final_weight_map.end(); it++) 
       {
-	// Set the state as final
-	fsm_construct_set_final(h, (int)it->first);
+        // Set the state as final
+        fsm_construct_set_final(h, (int)it->first);
       }
     
     /* Make sure that also the symbols that occur only in the alphabet
        but not in transitions are copied. */
     for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it 
-	   = hfst_fsm->alphabet.begin();
-	 it != hfst_fsm->alphabet.end(); it++)
+           = hfst_fsm->alphabet.begin();
+         it != hfst_fsm->alphabet.end(); it++)
       {
-	char *symbol = strdup(it->c_str());
-	if ( fsm_construct_check_symbol(h,symbol) == -1 ) {
-	  fsm_construct_add_symbol(h,symbol);
-	}
+        char *symbol = strdup(it->c_str());
+        if ( fsm_construct_check_symbol(h,symbol) == -1 ) {
+          fsm_construct_add_symbol(h,symbol);
+        }
       }
     
     fsm_construct_set_initial(h, 0);
@@ -418,26 +418,26 @@ namespace hfst { namespace implementations
   if (t->Start() == fst::kNoStateId)
     {      
       /* An empty OpenFst transducer does not necessarily have to have
-	 an input or output symbol table. */
+         an input or output symbol table. */
       if (inputsym != NULL) {
-	for ( fst::SymbolTableIterator it = 
-		fst::SymbolTableIterator(*(inputsym));
-	      not it.Done(); it.Next() ) {
-	  if (it.Value() != 0) // epsilon is not inserted
-	    net->alphabet.insert( it.Symbol() );
-	}    
+        for ( fst::SymbolTableIterator it = 
+                fst::SymbolTableIterator(*(inputsym));
+              not it.Done(); it.Next() ) {
+          if (it.Value() != 0) // epsilon is not inserted
+            net->alphabet.insert( it.Symbol() );
+        }    
       }
       /* If the transducer is an OpenFst transducer, it might have an output
-	 symbol table. If the transducer is an HFST tropical transducer, it
-	 can have an output symbol table, but it is equivalent to the 
-	 input symbol table. */
+         symbol table. If the transducer is an HFST tropical transducer, it
+         can have an output symbol table, but it is equivalent to the 
+         input symbol table. */
       if (not has_hfst_header && outputsym != NULL) {
-	for ( fst::SymbolTableIterator it = 
-		fst::SymbolTableIterator(*(outputsym));
-	      not it.Done(); it.Next() ) {
-	  if (it.Value() != 0) // epsilon is not inserted
-	    net->alphabet.insert( it.Symbol() );
-	}    
+        for ( fst::SymbolTableIterator it = 
+                fst::SymbolTableIterator(*(outputsym));
+              not it.Done(); it.Next() ) {
+          if (it.Value() != 0) // epsilon is not inserted
+            net->alphabet.insert( it.Symbol() );
+        }    
       }
       return net;
     }      
@@ -466,106 +466,106 @@ namespace hfst { namespace implementations
     {
       StateId s = siter.Value();
       if (s == initial_state) {
-	int origin;  // how origin state is printed, see the first comment
-	if (s == 0)
-	  origin = zero_print;
-	else if (s == initial_state)
-	  origin = 0;
-	else
-	  origin = (int)s;
+        int origin;  // how origin state is printed, see the first comment
+        if (s == 0)
+          origin = zero_print;
+        else if (s == initial_state)
+          origin = 0;
+        else
+          origin = (int)s;
 
-	/* Go through all transitions in a state */
-	for (fst::ArcIterator<fst::StdVectorFst> aiter(*t,s); 
-	     !aiter.Done(); aiter.Next())
-	  {
-	    const fst::StdArc &arc = aiter.Value();
-	    int target;  // how target state is printed, see the first comment
-	    if (arc.nextstate == 0)
-	      target = zero_print;
-	    else if (arc.nextstate == initial_state)
-	      target = 0;
-	    else
-	      target = (int)arc.nextstate;
+        /* Go through all transitions in a state */
+        for (fst::ArcIterator<fst::StdVectorFst> aiter(*t,s); 
+             !aiter.Done(); aiter.Next())
+          {
+            const fst::StdArc &arc = aiter.Value();
+            int target;  // how target state is printed, see the first comment
+            if (arc.nextstate == 0)
+              target = zero_print;
+            else if (arc.nextstate == initial_state)
+              target = 0;
+            else
+              target = (int)arc.nextstate;
 
-	    // Copy the transition
-	    std::string istring = inputsym->Find(arc.ilabel);
-	    std::string ostring = outputsym->Find(arc.olabel);
-	    if (arc.ilabel == 0)
-	      istring = std::string("@_EPSILON_SYMBOL_@");
-	    if (arc.olabel == 0)
-	      ostring = std::string("@_EPSILON_SYMBOL_@");
-	    net->add_transition(origin, 
-				HfstBasicTransition
-				(target,
-				 istring,
-				 ostring,
-				 arc.weight.Value()
-				 ));
-	  }
-	if (t->Final(s) != fst::TropicalWeight::Zero()) {
-	  // Set the state as final
-	  net->set_final_weight(origin, t->Final(s).Value());
-	}
-	break;
+            // Copy the transition
+            std::string istring = inputsym->Find(arc.ilabel);
+            std::string ostring = outputsym->Find(arc.olabel);
+            if (arc.ilabel == 0)
+              istring = std::string("@_EPSILON_SYMBOL_@");
+            if (arc.olabel == 0)
+              ostring = std::string("@_EPSILON_SYMBOL_@");
+            net->add_transition(origin, 
+                                HfstBasicTransition
+                                (target,
+                                 istring,
+                                 ostring,
+                                 arc.weight.Value()
+                                 ));
+          }
+        if (t->Final(s) != fst::TropicalWeight::Zero()) {
+          // Set the state as final
+          net->set_final_weight(origin, t->Final(s).Value());
+        }
+        break;
       }
     }
 
     for (fst::StateIterator<fst::StdVectorFst> siter(*t); 
-	 not siter.Done(); siter.Next())
+         not siter.Done(); siter.Next())
       {
-	StateId s = siter.Value();
-	if (s != initial_state) {
-	  int origin;  // how origin state is printed, see the first comment
-	  if (s == 0)
-	    origin = zero_print;
-	  else if (s == initial_state)
-	    origin = 0;
-	  else
-	    origin = (int)s;
-	  for (fst::ArcIterator<fst::StdVectorFst> aiter(*t,s); 
-	       !aiter.Done(); aiter.Next())
-	    {
-	      const fst::StdArc &arc = aiter.Value();
-	      int target;  // how target state is printed, see the first comment
-	      if (arc.nextstate == 0)
-		target = zero_print;
-	      else if (arc.nextstate == initial_state)
-		target = 0;
-	      else
-		target = (int)arc.nextstate;
+        StateId s = siter.Value();
+        if (s != initial_state) {
+          int origin;  // how origin state is printed, see the first comment
+          if (s == 0)
+            origin = zero_print;
+          else if (s == initial_state)
+            origin = 0;
+          else
+            origin = (int)s;
+          for (fst::ArcIterator<fst::StdVectorFst> aiter(*t,s); 
+               !aiter.Done(); aiter.Next())
+            {
+              const fst::StdArc &arc = aiter.Value();
+              int target;  // how target state is printed, see the first comment
+              if (arc.nextstate == 0)
+                target = zero_print;
+              else if (arc.nextstate == initial_state)
+                target = 0;
+              else
+                target = (int)arc.nextstate;
 
-	      std::string istring = inputsym->Find(arc.ilabel);
-	      std::string ostring = outputsym->Find(arc.olabel);
-	      if (arc.ilabel == 0)
-		istring = std::string("@_EPSILON_SYMBOL_@");
-	      if (arc.olabel == 0)
-		ostring = std::string("@_EPSILON_SYMBOL_@");
-	      net->add_transition(origin, 
-				  HfstBasicTransition
-				  (target,
-				   istring,
-				   ostring,
-				   arc.weight.Value()
-				   ));
-	    }
-	  if (t->Final(s) != fst::TropicalWeight::Zero())
-	    net->set_final_weight(origin, t->Final(s).Value());
-	}
+              std::string istring = inputsym->Find(arc.ilabel);
+              std::string ostring = outputsym->Find(arc.olabel);
+              if (arc.ilabel == 0)
+                istring = std::string("@_EPSILON_SYMBOL_@");
+              if (arc.olabel == 0)
+                ostring = std::string("@_EPSILON_SYMBOL_@");
+              net->add_transition(origin, 
+                                  HfstBasicTransition
+                                  (target,
+                                   istring,
+                                   ostring,
+                                   arc.weight.Value()
+                                   ));
+            }
+          if (t->Final(s) != fst::TropicalWeight::Zero())
+            net->set_final_weight(origin, t->Final(s).Value());
+        }
       }
 
     /* Make sure that also the symbols that occur only in the alphabet
        but not in transitions are copied. */
     for ( fst::SymbolTableIterator it = 
-	    fst::SymbolTableIterator(*(inputsym));
-	  not it.Done(); it.Next() ) {
+            fst::SymbolTableIterator(*(inputsym));
+          not it.Done(); it.Next() ) {
       if (it.Value() != 0) // epsilon is not inserted
-	net->alphabet.insert( it.Symbol() );
+        net->alphabet.insert( it.Symbol() );
     }    
     for ( fst::SymbolTableIterator it = 
-	    fst::SymbolTableIterator(*(outputsym));
-	  not it.Done(); it.Next() ) {
+            fst::SymbolTableIterator(*(outputsym));
+          not it.Done(); it.Next() ) {
       if (it.Value() != 0) // epsilon is not inserted
-	net->alphabet.insert( it.Symbol() );
+        net->alphabet.insert( it.Symbol() );
     }    
 
     return net;
@@ -583,10 +583,10 @@ namespace hfst { namespace implementations
     std::map<HfstState, StateId>::iterator it = state_map.find(s);
     if (it == state_map.end())
       {
-	// If not found, add a state
-	StateId retval = t->AddState();
-	state_map[s] = retval;
-	return retval;
+        // If not found, add a state
+        StateId retval = t->AddState();
+        state_map[s] = retval;
+        return retval;
       }
     return it->second;
   }
@@ -611,38 +611,38 @@ namespace hfst { namespace implementations
     
     // Go through all states
     for (HfstBasicTransducer::const_iterator it = net->begin();
-	 it != net->end(); it++)
+         it != net->end(); it++)
       {
-	// Go through the set of transitions in each state
-	for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it 
-	       = it->second.begin();
-	     tr_it != it->second.end(); tr_it++)
-	  {
-	    // Copy the transition
-	    t->AddArc( hfst_state_to_state_id(it->first, state_map, t), 
-		       fst::StdArc
-		       ( st.AddSymbol(tr_it->get_input_symbol()),
-			 st.AddSymbol(tr_it->get_output_symbol()),
-			 tr_it->get_weight(),
-			 hfst_state_to_state_id
- 			 (tr_it->get_target_state(), state_map, t)) );
-	  }
+        // Go through the set of transitions in each state
+        for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it 
+               = it->second.begin();
+             tr_it != it->second.end(); tr_it++)
+          {
+            // Copy the transition
+            t->AddArc( hfst_state_to_state_id(it->first, state_map, t), 
+                       fst::StdArc
+                       ( st.AddSymbol(tr_it->get_input_symbol()),
+                         st.AddSymbol(tr_it->get_output_symbol()),
+                         tr_it->get_weight(),
+                         hfst_state_to_state_id
+                          (tr_it->get_target_state(), state_map, t)) );
+          }
       }
     
     // Go through the final states
     for (HfstBasicTransducer::FinalWeightMap::const_iterator it 
-	   = net->final_weight_map.begin();
-	 it != net->final_weight_map.end(); it++) 
+           = net->final_weight_map.begin();
+         it != net->final_weight_map.end(); it++) 
       {
-	t->SetFinal(hfst_state_to_state_id(it->first, state_map, t), 
-		    it->second);
+        t->SetFinal(hfst_state_to_state_id(it->first, state_map, t), 
+                    it->second);
       }
     
     // Add also symbols that do not occur in transitions
     for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it 
-	   = net->alphabet.begin();
-	 it != net->alphabet.end(); it++) {
-	st.AddSymbol(*it);
+           = net->alphabet.begin();
+         it != net->alphabet.end(); it++) {
+        st.AddSymbol(*it);
       }
     
     t->SetInputSymbols(&st);
@@ -672,26 +672,26 @@ namespace hfst { namespace implementations
   if (t->Start() == fst::kNoStateId)
     {      
       /* An empty OpenFst transducer does not necessarily have to have
-	 an input or output symbol table. */
+         an input or output symbol table. */
       if (inputsym != NULL) {
-	for ( fst::SymbolTableIterator it = 
-		fst::SymbolTableIterator(*(inputsym));
-	      not it.Done(); it.Next() ) {
-	  if (it.Value() != 0) // epsilon is not inserted
-	    net->alphabet.insert( it.Symbol() );
-	}    
+        for ( fst::SymbolTableIterator it = 
+                fst::SymbolTableIterator(*(inputsym));
+              not it.Done(); it.Next() ) {
+          if (it.Value() != 0) // epsilon is not inserted
+            net->alphabet.insert( it.Symbol() );
+        }    
       }
       /* If the transducer is an OpenFst transducer, it might have an output
-	 symbol table. If the transducer is an HFST log transducer, it
-	 can have an output symbol table, but it is equivalent to the 
-	 input symbol table. */
+         symbol table. If the transducer is an HFST log transducer, it
+         can have an output symbol table, but it is equivalent to the 
+         input symbol table. */
       if (not has_hfst_header && outputsym != NULL) {
-	for ( fst::SymbolTableIterator it = 
-		fst::SymbolTableIterator(*(outputsym));
-	      not it.Done(); it.Next() ) {
-	  if (it.Value() != 0) // epsilon is not inserted
-	    net->alphabet.insert( it.Symbol() );
-	}    
+        for ( fst::SymbolTableIterator it = 
+                fst::SymbolTableIterator(*(outputsym));
+              not it.Done(); it.Next() ) {
+          if (it.Value() != 0) // epsilon is not inserted
+            net->alphabet.insert( it.Symbol() );
+        }    
       }
       return net;
     }      
@@ -720,106 +720,106 @@ namespace hfst { namespace implementations
     {
       StateId s = siter.Value();
       if (s == initial_state) {
-	int origin;  // how origin state is printed, see the first comment
-	if (s == 0)
-	  origin = zero_print;
-	else if (s == initial_state)
-	  origin = 0;
-	else
-	  origin = (int)s;
+        int origin;  // how origin state is printed, see the first comment
+        if (s == 0)
+          origin = zero_print;
+        else if (s == initial_state)
+          origin = 0;
+        else
+          origin = (int)s;
 
-	/* Go through all transitions in a state */
-	for (fst::ArcIterator<LogFst> aiter(*t,s); 
-	     !aiter.Done(); aiter.Next())
-	  {
-	    const fst::LogArc &arc = aiter.Value();
-	    int target;  // how target state is printed, see the first comment
-	    if (arc.nextstate == 0)
-	      target = zero_print;
-	    else if (arc.nextstate == initial_state)
-	      target = 0;
-	    else
-	      target = (int)arc.nextstate;
+        /* Go through all transitions in a state */
+        for (fst::ArcIterator<LogFst> aiter(*t,s); 
+             !aiter.Done(); aiter.Next())
+          {
+            const fst::LogArc &arc = aiter.Value();
+            int target;  // how target state is printed, see the first comment
+            if (arc.nextstate == 0)
+              target = zero_print;
+            else if (arc.nextstate == initial_state)
+              target = 0;
+            else
+              target = (int)arc.nextstate;
 
-	    // Copy the transition
-	    std::string istring = inputsym->Find(arc.ilabel);
-	    std::string ostring = outputsym->Find(arc.olabel);
-	    if (arc.ilabel == 0)
-	      istring = std::string("@_EPSILON_SYMBOL_@");
-	    if (arc.olabel == 0)
-	      ostring = std::string("@_EPSILON_SYMBOL_@");
-	    net->add_transition(origin, 
-				HfstBasicTransition
-				(target,
-				 istring,
-				 ostring,
-				 arc.weight.Value()
-				 ));
-	  }
-	if (t->Final(s) != fst::LogWeight::Zero()) {
-	  // Set the state as final
-	  net->set_final_weight(origin, t->Final(s).Value());
-	}
-	break;
+            // Copy the transition
+            std::string istring = inputsym->Find(arc.ilabel);
+            std::string ostring = outputsym->Find(arc.olabel);
+            if (arc.ilabel == 0)
+              istring = std::string("@_EPSILON_SYMBOL_@");
+            if (arc.olabel == 0)
+              ostring = std::string("@_EPSILON_SYMBOL_@");
+            net->add_transition(origin, 
+                                HfstBasicTransition
+                                (target,
+                                 istring,
+                                 ostring,
+                                 arc.weight.Value()
+                                 ));
+          }
+        if (t->Final(s) != fst::LogWeight::Zero()) {
+          // Set the state as final
+          net->set_final_weight(origin, t->Final(s).Value());
+        }
+        break;
       }
     }
 
     for (fst::StateIterator<LogFst> siter(*t); 
-	 not siter.Done(); siter.Next())
+         not siter.Done(); siter.Next())
       {
-	StateId s = siter.Value();
-	if (s != initial_state) {
-	  int origin;  // how origin state is printed, see the first comment
-	  if (s == 0)
-	    origin = zero_print;
-	  else if (s == initial_state)
-	    origin = 0;
-	  else
-	    origin = (int)s;
-	  for (fst::ArcIterator<LogFst> aiter(*t,s); 
-	       !aiter.Done(); aiter.Next())
-	    {
-	      const fst::LogArc &arc = aiter.Value();
-	      int target;  // how target state is printed, see the first comment
-	      if (arc.nextstate == 0)
-		target = zero_print;
-	      else if (arc.nextstate == initial_state)
-		target = 0;
-	      else
-		target = (int)arc.nextstate;
+        StateId s = siter.Value();
+        if (s != initial_state) {
+          int origin;  // how origin state is printed, see the first comment
+          if (s == 0)
+            origin = zero_print;
+          else if (s == initial_state)
+            origin = 0;
+          else
+            origin = (int)s;
+          for (fst::ArcIterator<LogFst> aiter(*t,s); 
+               !aiter.Done(); aiter.Next())
+            {
+              const fst::LogArc &arc = aiter.Value();
+              int target;  // how target state is printed, see the first comment
+              if (arc.nextstate == 0)
+                target = zero_print;
+              else if (arc.nextstate == initial_state)
+                target = 0;
+              else
+                target = (int)arc.nextstate;
 
-	      std::string istring = inputsym->Find(arc.ilabel);
-	      std::string ostring = outputsym->Find(arc.olabel);
-	      if (arc.ilabel == 0)
-		istring = std::string("@_EPSILON_SYMBOL_@");
-	      if (arc.olabel == 0)
-		ostring = std::string("@_EPSILON_SYMBOL_@");
-	      net->add_transition(origin, 
-				  HfstBasicTransition
-				  (target,
-				   istring,
-				   ostring,
-				   arc.weight.Value()
-				   ));
-	    }
-	  if (t->Final(s) != fst::LogWeight::Zero())
-	    net->set_final_weight(origin, t->Final(s).Value());
-	}
+              std::string istring = inputsym->Find(arc.ilabel);
+              std::string ostring = outputsym->Find(arc.olabel);
+              if (arc.ilabel == 0)
+                istring = std::string("@_EPSILON_SYMBOL_@");
+              if (arc.olabel == 0)
+                ostring = std::string("@_EPSILON_SYMBOL_@");
+              net->add_transition(origin, 
+                                  HfstBasicTransition
+                                  (target,
+                                   istring,
+                                   ostring,
+                                   arc.weight.Value()
+                                   ));
+            }
+          if (t->Final(s) != fst::LogWeight::Zero())
+            net->set_final_weight(origin, t->Final(s).Value());
+        }
       }
 
     /* Make sure that also the symbols that occur only in the alphabet
        but not in transitions are copied. */
     for ( fst::SymbolTableIterator it = 
-	    fst::SymbolTableIterator(*(inputsym));
-	  not it.Done(); it.Next() ) {
+            fst::SymbolTableIterator(*(inputsym));
+          not it.Done(); it.Next() ) {
       if (it.Value() != 0) // epsilon is not inserted
-	net->alphabet.insert( it.Symbol() );
+        net->alphabet.insert( it.Symbol() );
     }    
     for ( fst::SymbolTableIterator it = 
-	    fst::SymbolTableIterator(*(outputsym));
-	  not it.Done(); it.Next() ) {
+            fst::SymbolTableIterator(*(outputsym));
+          not it.Done(); it.Next() ) {
       if (it.Value() != 0) // epsilon is not inserted
-	net->alphabet.insert( it.Symbol() );
+        net->alphabet.insert( it.Symbol() );
     }    
 
     return net;
@@ -837,10 +837,10 @@ namespace hfst { namespace implementations
     std::map<HfstState, StateId>::iterator it = state_map.find(s);
     if (it == state_map.end())
       {
-	// If not found, add a state
-	StateId retval = t->AddState();
-	state_map[s] = retval;
-	return retval;
+        // If not found, add a state
+        StateId retval = t->AddState();
+        state_map[s] = retval;
+        return retval;
       }
     return it->second;
   }
@@ -865,38 +865,38 @@ namespace hfst { namespace implementations
     
     // Go through all states
     for (HfstBasicTransducer::const_iterator it = net->begin();
-	 it != net->end(); it++)
+         it != net->end(); it++)
       {
-	// Go through the set of transitions in each state
-	for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it 
-	       = it->second.begin();
-	     tr_it != it->second.end(); tr_it++)
-	  {
-	    // Copy the transition
-	    t->AddArc( hfst_state_to_state_id(it->first, state_map, t), 
-		       fst::LogArc
-		       ( st.AddSymbol(tr_it->get_input_symbol()),
-			 st.AddSymbol(tr_it->get_output_symbol()),
-			 tr_it->get_weight(),
-			 hfst_state_to_state_id
- 			 (tr_it->get_target_state(), state_map, t)) );
-	  }
+        // Go through the set of transitions in each state
+        for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it 
+               = it->second.begin();
+             tr_it != it->second.end(); tr_it++)
+          {
+            // Copy the transition
+            t->AddArc( hfst_state_to_state_id(it->first, state_map, t), 
+                       fst::LogArc
+                       ( st.AddSymbol(tr_it->get_input_symbol()),
+                         st.AddSymbol(tr_it->get_output_symbol()),
+                         tr_it->get_weight(),
+                         hfst_state_to_state_id
+                          (tr_it->get_target_state(), state_map, t)) );
+          }
       }
     
     // Go through the final states
     for (HfstBasicTransducer::FinalWeightMap::const_iterator it 
-	   = net->final_weight_map.begin();
-	 it != net->final_weight_map.end(); it++) 
+           = net->final_weight_map.begin();
+         it != net->final_weight_map.end(); it++) 
       {
-	t->SetFinal(hfst_state_to_state_id(it->first, state_map, t), 
-		    it->second);
+        t->SetFinal(hfst_state_to_state_id(it->first, state_map, t), 
+                    it->second);
       }
     
     // Add also symbols that do not occur in transitions
     for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it 
-	   = net->alphabet.begin();
-	 it != net->alphabet.end(); it++) {
-	st.AddSymbol(*it);
+           = net->alphabet.begin();
+         it != net->alphabet.end(); it++) {
+        st.AddSymbol(*it);
       }
     
     t->SetInputSymbols(&st);
@@ -917,12 +917,13 @@ namespace hfst { namespace implementations
       ---------------------------------------------------------- */
 
 /* An auxiliary function. */
-unsigned int hfst_ol_to_hfst_basic_add_state(hfst_ol::Transducer * t, 
-					     HfstBasicTransducer * basic,
-					     hfst_ol::HfstOlToBasicStateMap & state_map,
-					     bool weighted,
-					     hfst_ol::TransitionTableIndex index,
-					     unsigned int state_number)
+unsigned int hfst_ol_to_hfst_basic_add_state
+(hfst_ol::Transducer * t, 
+ HfstBasicTransducer * basic,
+ hfst_ol::HfstOlToBasicStateMap & state_map,
+ bool weighted,
+ hfst_ol::TransitionTableIndex index,
+                                             unsigned int state_number)
 {
   unsigned int new_state = state_number;
   state_map[index] = new_state;
@@ -933,11 +934,12 @@ unsigned int hfst_ol_to_hfst_basic_add_state(hfst_ol::Transducer * t,
     
     if(transition_index.final())
     {
-	basic->add_state(new_state);
-	basic->set_final_weight(new_state,
-				weighted ?
-				dynamic_cast<const hfst_ol::TransitionWIndex&>(transition_index).final_weight() :
-				0.0);
+        basic->add_state(new_state);
+        basic->set_final_weight(new_state,
+                                weighted ?
+                                dynamic_cast<const hfst_ol::TransitionWIndex&>
+				(transition_index).final_weight() :
+                                0.0);
     }
   }
   else // indexes transition table
@@ -946,11 +948,12 @@ unsigned int hfst_ol_to_hfst_basic_add_state(hfst_ol::Transducer * t,
     
     if(transition.final())
     {
-	basic->add_state(new_state);
-	basic->set_final_weight(new_state,
-				weighted ?
-				dynamic_cast<const hfst_ol::TransitionW&>(transition).get_weight() :
-				0.0);
+        basic->add_state(new_state);
+        basic->set_final_weight(new_state,
+                                weighted ?
+                                dynamic_cast<const hfst_ol::TransitionW&>
+				(transition).get_weight() :
+                                0.0);
     }
   }
   return new_state;
@@ -963,44 +966,54 @@ unsigned int hfst_ol_to_hfst_basic_add_state(hfst_ol::Transducer * t,
   {
       HfstBasicTransducer * basic = new HfstBasicTransducer();
       bool weighted = t->get_header().probe_flag(hfst_ol::Weighted);
-      const hfst_ol::SymbolTable& symbols = t->get_alphabet().get_symbol_table();
+      const hfst_ol::SymbolTable& symbols 
+	= t->get_alphabet().get_symbol_table();
       
       
-      // This contains indices to either (1) the start of a set of entries in the
-      // transition index table, or (2) the boundary before a set of entries in the
-      // transition table; in this case, the following entries will all have the
-      // same input symbol. In either case the index represents a state and may be final
-      // The will already be an entry in state_map for each value in agenda
+      /* This contains indices to either (1) the start of a set of entries 
+	 in the transition index table, or (2) the boundary before a set 
+	 of entries in the transition table; in this case, the following 
+	 entries will all have the same input symbol. In either case 
+	 the index represents a state and may be final The will already be 
+	 an entry in state_map for each value in agenda */
       std::vector<hfst_ol::TransitionTableIndex> agenda;
       hfst_ol::HfstOlToBasicStateMap state_map;
       unsigned int state_number=0;
       
-      hfst_ol_to_hfst_basic_add_state(t, basic, state_map, weighted, 0, state_number);
+      hfst_ol_to_hfst_basic_add_state
+	(t, basic, state_map, weighted, 0, state_number);
       agenda.push_back(0);
       while(!agenda.empty())
       {
-	  hfst_ol::TransitionTableIndex current_index = agenda.back();
-	  agenda.pop_back();
-	  
-	  unsigned int current_state = state_map[current_index];
-	  
-	  hfst_ol::TransitionTableIndexSet transitions = t->get_transitions_from_state(current_index);
-	  for(hfst_ol::TransitionTableIndexSet::const_iterator it=transitions.begin();it!=transitions.end();it++)
-	  {
-	      const hfst_ol::Transition& transition = t->get_transition(*it);
-	      
-	      if(state_map.find(transition.get_target()) == state_map.end())
-	      {
-		  state_number++;
-		  hfst_ol_to_hfst_basic_add_state(t, basic, state_map, weighted, transition.get_target(), state_number);
-		  agenda.push_back(transition.get_target());
-	      }
-	      basic->add_transition(current_state,
-				    HfstBasicTransition(state_map[transition.get_target()],
-							symbols[transition.get_input_symbol()],
-							symbols[transition.get_output_symbol()],
-							weighted ? dynamic_cast<const hfst_ol::TransitionW&>(transition).get_weight() : 0 ));
-	  }
+          hfst_ol::TransitionTableIndex current_index = agenda.back();
+          agenda.pop_back();
+          
+          unsigned int current_state = state_map[current_index];
+          
+          hfst_ol::TransitionTableIndexSet transitions 
+	    = t->get_transitions_from_state(current_index);
+          for(hfst_ol::TransitionTableIndexSet::const_iterator it
+		=transitions.begin();it!=transitions.end();it++)
+          {
+              const hfst_ol::Transition& transition = t->get_transition(*it);
+              
+              if(state_map.find(transition.get_target()) == state_map.end())
+              {
+                  state_number++;
+                  hfst_ol_to_hfst_basic_add_state
+		    (t, basic, state_map, weighted, 
+		     transition.get_target(), state_number);
+                  agenda.push_back(transition.get_target());
+              }
+              basic->add_transition
+		(current_state,
+		 HfstBasicTransition
+		 (state_map[transition.get_target()],
+		  symbols[transition.get_input_symbol()],
+		  symbols[transition.get_output_symbol()],
+		  weighted ? dynamic_cast<const hfst_ol::TransitionW&>
+		  (transition).get_weight() : 0 ));
+          }
       }
       
       return basic;
@@ -1029,18 +1042,18 @@ unsigned int hfst_ol_to_hfst_basic_add_state(hfst_ol::Transducer * t,
       std::set<std::string> other_symbols;
     
       for (HfstBasicTransducer::const_iterator it = t->begin(); 
-	   it != t->end(); ++it) {
-	  for (HfstBasicTransducer::HfstTransitionSet::const_iterator tr_it 
-		 = it->second.begin();
-	       tr_it != it->second.end(); ++tr_it) {
-	      std::string istr = tr_it->get_input_symbol();
-	      std::string ostr = tr_it->get_output_symbol();
-	      if (hfst::FdOperation::is_diacritic(istr)) {
-		  flag_diacritic_symbols.insert(istr);
-	      }
-	      other_symbols.insert(ostr);
-	      input_symbols.insert(istr);
-	  }
+           it != t->end(); ++it) {
+          for (HfstBasicTransducer::HfstTransitionSet::const_iterator tr_it 
+                 = it->second.begin();
+               tr_it != it->second.end(); ++tr_it) {
+              std::string istr = tr_it->get_input_symbol();
+              std::string ostr = tr_it->get_output_symbol();
+              if (hfst::FdOperation::is_diacritic(istr)) {
+                  flag_diacritic_symbols.insert(istr);
+              }
+              other_symbols.insert(ostr);
+              input_symbols.insert(istr);
+          }
       }
       
       hfst_ol::SymbolNumber seen_input_symbols = 1; // We always have epsilon
@@ -1051,33 +1064,33 @@ unsigned int hfst_ol_to_hfst_basic_add_state(hfst_ol::Transducer * t,
 
       // 2) flag diacritics
       for (std::set<std::string>::iterator it = flag_diacritic_symbols.begin();
-	   it != flag_diacritic_symbols.end(); ++it) {
-	  symbol_table.push_back(*it);
-	  ++seen_input_symbols;
+           it != flag_diacritic_symbols.end(); ++it) {
+          symbol_table.push_back(*it);
+          ++seen_input_symbols;
       }
 
       // 3) input symbols
       for (std::set<std::string>::iterator it = input_symbols.begin();
-	   it != input_symbols.end(); ++it) {
-	  if (it->compare(epstr) and flag_diacritic_symbols.count(*it) == 0) {
-	    symbol_table.push_back(*it);
-	    ++seen_input_symbols;
-	  }
+           it != input_symbols.end(); ++it) {
+          if (it->compare(epstr) and flag_diacritic_symbols.count(*it) == 0) {
+            symbol_table.push_back(*it);
+            ++seen_input_symbols;
+          }
       }
 
       // 4) non-input symbols
       for (std::set<std::string>::iterator it = other_symbols.begin();
-	   it != other_symbols.end(); ++it) {
-	  if (it->compare(epstr) and flag_diacritic_symbols.count(*it) == 0 and
-	      input_symbols.count(*it) == 0) {
-	    symbol_table.push_back(*it);
-	  }
+           it != other_symbols.end(); ++it) {
+          if (it->compare(epstr) and flag_diacritic_symbols.count(*it) == 0 and
+              input_symbols.count(*it) == 0) {
+            symbol_table.push_back(*it);
+          }
       }
 
       std::map<std::string, hfst_ol::SymbolNumber> string_symbol_map;
       for (hfst_ol::SymbolTable::iterator it = symbol_table.begin();
-	   it !=  symbol_table.end(); ++it) {
-	  string_symbol_map[*it] = it - symbol_table.begin();
+           it !=  symbol_table.end(); ++it) {
+          string_symbol_map[*it] = it - symbol_table.begin();
       }
 
     std::map<unsigned int, hfst_ol::StatePlaceholder> state_placeholders;
@@ -1086,59 +1099,59 @@ unsigned int hfst_ol_to_hfst_basic_add_state(hfst_ol::Transducer * t,
     // about the states except starting indices
 
     for (HfstBasicTransducer::const_iterator it = t->begin(); 
-	 it != t->end(); ++it) {
-	state_placeholders[it->first] = hfst_ol::StatePlaceholder(
-	    it->first, t->is_final_state(it->first));
-	if (t->is_final_state(it->first)) {
-		state_placeholders[it->first].final_weight =
-		    t->get_final_weight(it->first);
-	}
-	for (HfstBasicTransducer::HfstTransitionSet::const_iterator tr_it 
-	       = it->second.begin();
-	     tr_it != it->second.end(); ++tr_it) {
-	    
-	    // check for previously unseen inputs
-	    if (state_placeholders[it->first].inputs.count(
-		    string_symbol_map[tr_it->get_input_symbol()]) == 0) {
-		state_placeholders[it->first].inputs[
-		    string_symbol_map[tr_it->get_input_symbol()]] =
-		    std::vector<hfst_ol::TransitionPlaceholder>();
-	    }
-	    hfst_ol::TransitionPlaceholder trans(
-		tr_it->get_target_state(),
-		string_symbol_map[tr_it->get_output_symbol()],
-		tr_it->get_weight());
-	    state_placeholders[it->first]
-		.inputs[string_symbol_map[tr_it->get_input_symbol()]].
-	      push_back(trans);
-	}
+         it != t->end(); ++it) {
+        state_placeholders[it->first] = hfst_ol::StatePlaceholder(
+            it->first, t->is_final_state(it->first));
+        if (t->is_final_state(it->first)) {
+                state_placeholders[it->first].final_weight =
+                    t->get_final_weight(it->first);
+        }
+        for (HfstBasicTransducer::HfstTransitionSet::const_iterator tr_it 
+               = it->second.begin();
+             tr_it != it->second.end(); ++tr_it) {
+            
+            // check for previously unseen inputs
+            if (state_placeholders[it->first].inputs.count(
+                    string_symbol_map[tr_it->get_input_symbol()]) == 0) {
+                state_placeholders[it->first].inputs[
+                    string_symbol_map[tr_it->get_input_symbol()]] =
+                    std::vector<hfst_ol::TransitionPlaceholder>();
+            }
+            hfst_ol::TransitionPlaceholder trans(
+                tr_it->get_target_state(),
+                string_symbol_map[tr_it->get_output_symbol()],
+                tr_it->get_weight());
+            state_placeholders[it->first]
+                .inputs[string_symbol_map[tr_it->get_input_symbol()]].
+              push_back(trans);
+        }
     }
 
     class Indices: public std::map<unsigned int,
-	std::pair<unsigned int, hfst_ol::SymbolNumber> >
+        std::pair<unsigned int, hfst_ol::SymbolNumber> >
     {
     public:
-	bool fits(hfst_ol::StatePlaceholder & state,
-		  unsigned int position)
-	    {
-		for (std::map<hfst_ol::SymbolNumber,
-			 std::vector<hfst_ol::TransitionPlaceholder> >
-			 ::iterator it = state.inputs.begin();
-		     it != state.inputs.end(); ++it) {
-		    if (count(it->first + position) == 0) {
-			continue;
-		    } else if (this->operator[](it->first + position).second ==
-			       it->first) {
-			return false;
-		    }
-		}
-		return true;
-	    }
-	bool available_for_first(unsigned int index)
-	    {
-		return (count(index) == 0) or
-		    (this->operator[](index).second != 0);
-	    }
+        bool fits(hfst_ol::StatePlaceholder & state,
+                  unsigned int position)
+            {
+                for (std::map<hfst_ol::SymbolNumber,
+                         std::vector<hfst_ol::TransitionPlaceholder> >
+                         ::iterator it = state.inputs.begin();
+                     it != state.inputs.end(); ++it) {
+                    if (count(it->first + position) == 0) {
+                        continue;
+                    } else if (this->operator[](it->first + position).second ==
+                               it->first) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+        bool available_for_first(unsigned int index)
+            {
+                return (count(index) == 0) or
+                    (this->operator[](index).second != 0);
+            }
     };
 
     Indices used_indices;
@@ -1156,31 +1169,31 @@ unsigned int hfst_ol_to_hfst_basic_add_state(hfst_ol::Transducer * t,
     unsigned int first_available_index = 0;
     unsigned int last_used_index = 0;
     for (std::map<unsigned int, hfst_ol::StatePlaceholder>::iterator it =
-	     state_placeholders.begin();
-	 it != state_placeholders.end(); ++it) {
-	if (it->second.is_simple() and it != state_placeholders.begin()) {
-	    continue;
-	}
-	unsigned int i = first_available_index;
+             state_placeholders.begin();
+         it != state_placeholders.end(); ++it) {
+        if (it->second.is_simple() and it != state_placeholders.begin()) {
+            continue;
+        }
+        unsigned int i = first_available_index;
 
-	// While this index is not suitable for a starting index, keep looking
-	while (!used_indices.fits(it->second, i)) {
-	    ++i;
-	}
-	it->second.start_index = i;
-	last_used_index = std::max(i, last_used_index);
-	// Once we've found a starting index, mark all the used input symbols
-	for (std::map<hfst_ol::SymbolNumber,
-		 std::vector<hfst_ol::TransitionPlaceholder> >
-		 ::iterator sym_it = it->second.inputs.begin();
-	     sym_it != it->second.inputs.end(); ++sym_it) {
-	    used_indices[i + sym_it->first] =
-		std::pair<unsigned int, hfst_ol::SymbolNumber>
-		(it->second.state_number, sym_it->first);
-	}
-	while (!used_indices.available_for_first(first_available_index)) {
-	    ++first_available_index;
-	}
+        // While this index is not suitable for a starting index, keep looking
+        while (!used_indices.fits(it->second, i)) {
+            ++i;
+        }
+        it->second.start_index = i;
+        last_used_index = std::max(i, last_used_index);
+        // Once we've found a starting index, mark all the used input symbols
+        for (std::map<hfst_ol::SymbolNumber,
+                 std::vector<hfst_ol::TransitionPlaceholder> >
+                 ::iterator sym_it = it->second.inputs.begin();
+             sym_it != it->second.inputs.end(); ++sym_it) {
+            used_indices[i + sym_it->first] =
+                std::pair<unsigned int, hfst_ol::SymbolNumber>
+                (it->second.state_number, sym_it->first);
+        }
+        while (!used_indices.available_for_first(first_available_index)) {
+            ++first_available_index;
+        }
     }
 
     // Now we figure out where each state in the transition array begins.
@@ -1188,11 +1201,11 @@ unsigned int hfst_ol_to_hfst_basic_add_state(hfst_ol::Transducer * t,
     std::vector<unsigned int> first_transition_vector;
     first_transition_vector.push_back(0);
     for (std::map<unsigned int, hfst_ol::StatePlaceholder>::iterator it =
-	     state_placeholders.begin();
-	 it != state_placeholders.end(); ++it) {
-	first_transition_vector.push_back(
-	    first_transition_vector[it->first] +
-	    it->second.number_of_transitions() + 1);
+             state_placeholders.begin();
+         it != state_placeholders.end(); ++it) {
+        first_transition_vector.push_back(
+            first_transition_vector[it->first] +
+            it->second.number_of_transitions() + 1);
     }
 
     // Now for each index entry we write its input symbol and target
@@ -1201,87 +1214,87 @@ unsigned int hfst_ol_to_hfst_basic_add_state(hfst_ol::Transducer * t,
     hfst_ol::TransducerTable<hfst_ol::TransitionWIndex> windex_table;
     // First we note the finality of the starting state
     if (state_placeholders[0].final) {
-	windex_table.append(hfst_ol::TransitionWIndex::create_final());
+        windex_table.append(hfst_ol::TransitionWIndex::create_final());
     } else {
-	windex_table.append(hfst_ol::TransitionWIndex());
+        windex_table.append(hfst_ol::TransitionWIndex());
     }
     hfst_ol::TransducerTable<hfst_ol::TransitionW> wtransition_table;
 
     Indices::iterator tmp_it = used_indices.end();
     --tmp_it;
     for(unsigned int i = 0; i <= tmp_it->first; ++i) {
-	if (used_indices.count(i) == 0) { // blank entries
-	    windex_table.append(hfst_ol::TransitionWIndex());
-	} else { // nonblank entries
-	    windex_table.
-	      append(hfst_ol::TransitionWIndex
-		     (
-		      used_indices[i].second,
-		      first_transition_vector[used_indices[i].first] +
-		      state_placeholders[used_indices[i].first]
-		      .symbol_offset(used_indices[i].second) + TA_OFFSET));
-	}
+        if (used_indices.count(i) == 0) { // blank entries
+            windex_table.append(hfst_ol::TransitionWIndex());
+        } else { // nonblank entries
+            windex_table.
+              append(hfst_ol::TransitionWIndex
+                     (
+                      used_indices[i].second,
+                      first_transition_vector[used_indices[i].first] +
+                      state_placeholders[used_indices[i].first]
+                      .symbol_offset(used_indices[i].second) + TA_OFFSET));
+        }
     }
     
     for (unsigned int i = 0; i <= symbol_table.size(); ++i) {
-	windex_table.append(hfst_ol::TransitionWIndex()); // padding
+        windex_table.append(hfst_ol::TransitionWIndex()); // padding
     }
 
     //  For each state, write its entries in the transition array.
 
     for (std::map<unsigned int, hfst_ol::StatePlaceholder>::iterator it =
-	     state_placeholders.begin(); it != state_placeholders.end(); ++it) {
+             state_placeholders.begin(); it != state_placeholders.end(); ++it) {
 
-	// Insert a finality marker unless this is the first state,
-	// the finality of which is determined by the index table
-	if (it->first != 0) {
-	    wtransition_table.append(
-		hfst_ol::TransitionW(
-		    it->second.final, it->second.final_weight));
-	}
-	
-	// Then we iterate through the symbols each state has
-	for (std::map<hfst_ol::SymbolNumber,
-	       std::vector<hfst_ol::TransitionPlaceholder> >::iterator sym_it =
-		 it->second.inputs.begin(); 
-	     sym_it != it->second.inputs.end(); ++sym_it) {
-	    // And write each transition
-	  for (std::vector<hfst_ol::TransitionPlaceholder>::iterator tr_it
-		 = sym_it->second.begin(); 
-	       tr_it != sym_it->second.end(); ++tr_it) {
-		// before writing each transition, find out whether its
-		// target is simple (ie. should point directly to TA entry)
-		unsigned int target;
-		if (state_placeholders[tr_it->target].is_simple()) {
-		    target = first_transition_vector[tr_it->target] + 
-		      TA_OFFSET - 1;
-		} else {
-		    target = state_placeholders[tr_it->target].start_index;
-		}
-		wtransition_table.append(
-		    hfst_ol::TransitionW(
-			sym_it->first,
-			tr_it->output,
-			target,
-			tr_it->weight));
-	    }
-	}
+        // Insert a finality marker unless this is the first state,
+        // the finality of which is determined by the index table
+        if (it->first != 0) {
+            wtransition_table.append(
+                hfst_ol::TransitionW(
+                    it->second.final, it->second.final_weight));
+        }
+        
+        // Then we iterate through the symbols each state has
+        for (std::map<hfst_ol::SymbolNumber,
+               std::vector<hfst_ol::TransitionPlaceholder> >::iterator sym_it =
+                 it->second.inputs.begin(); 
+             sym_it != it->second.inputs.end(); ++sym_it) {
+            // And write each transition
+          for (std::vector<hfst_ol::TransitionPlaceholder>::iterator tr_it
+                 = sym_it->second.begin(); 
+               tr_it != sym_it->second.end(); ++tr_it) {
+                // before writing each transition, find out whether its
+                // target is simple (ie. should point directly to TA entry)
+                unsigned int target;
+                if (state_placeholders[tr_it->target].is_simple()) {
+                    target = first_transition_vector[tr_it->target] + 
+                      TA_OFFSET - 1;
+                } else {
+                    target = state_placeholders[tr_it->target].start_index;
+                }
+                wtransition_table.append(
+                    hfst_ol::TransitionW(
+                        sym_it->first,
+                        tr_it->output,
+                        target,
+                        tr_it->weight));
+            }
+        }
     }
     // one final padding transition
     wtransition_table.append(hfst_ol::TransitionW(
-				 false, hfst_ol::INFINITE_WEIGHT));
+                                 false, hfst_ol::INFINITE_WEIGHT));
 
     hfst_ol::TransducerAlphabet alphabet(symbol_table);
     hfst_ol::TransducerHeader header(seen_input_symbols,
-				     symbol_table.size(),
-				     windex_table.size(),
-				     wtransition_table.size(),
-				     weighted);
+                                     symbol_table.size(),
+                                     windex_table.size(),
+                                     wtransition_table.size(),
+                                     weighted);
 
     return new hfst_ol::Transducer(header,
-				   alphabet,
-				   windex_table,
-				   wtransition_table);
+                                   alphabet,
+                                   windex_table,
+                                   wtransition_table);
 
   }
 

@@ -114,18 +114,18 @@ namespace hfst {
       static fsm * substitute(fsm * t,hfst::String old_symbol,hfst::String new_symbol);
 
       static fsm * compose(fsm * t1,
-			   fsm * t2);
+                           fsm * t2);
       static fsm * concatenate(fsm * t1,
-			       fsm * t2);
+                               fsm * t2);
       static fsm * disjunct(fsm * t1,
-			    fsm * t2);
+                            fsm * t2);
       static fsm * intersect(fsm * t1,
-			     fsm * t2);
+                             fsm * t2);
       static fsm * subtract(fsm * t1,
-			    fsm * t2);
-			
+                            fsm * t2);
+                        
       static void extract_strings(fsm * t, hfst::ExtractStringsCb& callback,
-				  int cycles=-1, FdTable<int>* fd=NULL, bool filter_fd=false, bool include_spv=false);
+                                  int cycles=-1, FdTable<int>* fd=NULL, bool filter_fd=false, bool include_spv=false);
       
       static FdTable<int>* get_flag_diacritics(fsm * t);
 
@@ -136,7 +136,7 @@ namespace hfst {
 
       static fsm * read_net(FILE * file);
       static int write_net(fsm * net, FILE * file);
-			
+                        
       static void delete_foma(fsm * net);
       static void print_test(fsm * t);
 
