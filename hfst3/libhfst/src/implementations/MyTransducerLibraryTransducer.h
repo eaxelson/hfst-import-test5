@@ -75,7 +75,7 @@ namespace implementations
     /** @brief Create and open a stream to file filename. */
     MyTransducerLibraryInputStream(const std::string &filename);
     /** @brief Close the stream. If it points to standard in, nothing 
-	is done. */
+        is done. */
     void close(void);
     /** @brief Whether the stream is at end. */
     bool is_eof(void);
@@ -94,7 +94,7 @@ namespace implementations
     void ignore(unsigned int n);
 
     /** @brief Optional: if you want to extract implementation specific 
-	data from the header. */
+        data from the header. */
     bool set_implementation_specific_header_data
       (StringPairVector &data, unsigned int index);
 
@@ -131,13 +131,13 @@ namespace implementations
     /** @brief Create and open a stream to file filename. */
     MyTransducerLibraryOutputStream(const std::string &filename);
     /** @brief Close the stream. If it points to standard out, nothing
-	is done. */
+        is done. */
     void close(void);
     /** @brief Write a char to the stream. */
     void write(const char &c);
 
     /** @brief Optional: if you want to store implementation specific data 
-	to the binary transducer header. */
+        to the binary transducer header. */
     void append_implementation_specific_header_data
       (std::vector<char> &header, MyFst *t);
 
@@ -158,22 +158,22 @@ namespace implementations
       /** @brief Create a transducer that recognises the empty string. */
       static MyFst * create_epsilon_transducer(void);
       /** @brief Create a transducer that recognises the symbol pair 
-	  symbol:symbol */
+          symbol:symbol */
       static MyFst * define_transducer(const std::string &symbol);
       /** @brief Create a transducer that recognises the symbol pair 
-	  isymbol:osymbol */
+          isymbol:osymbol */
       static MyFst * define_transducer
-	(const std::string &isymbol, const std::string &osymbol);
+        (const std::string &isymbol, const std::string &osymbol);
       /** @brief Create a transducer that recognises the concatenation of 
-	  symbol pairs in spv */
+          symbol pairs in spv */
       static MyFst * define_transducer(const StringPairVector &spv);
       /** @brief Create a transducer that recognises the union of symbol pairs 
-	  in sps. If cyclic is true, any number of consecutive symbol pairs is
-	  recognised. */
+          in sps. If cyclic is true, any number of consecutive symbol pairs is
+          recognised. */
       static MyFst * define_transducer
-	(const StringPairSet &sps, bool cyclic=false);
+        (const StringPairSet &sps, bool cyclic=false);
       /** @brief Crate a transducer that recognises the concatenation of 
-	  symbol pair unions in spsv. */
+          symbol pair unions in spsv. */
       static MyFst * define_transducer(const std::vector<StringPairSet> &spsv);
 
       /** @brief Create a deep copy of transducer t. */
@@ -188,91 +188,92 @@ namespace implementations
       static MyFst * remove_epsilons(MyFst * t);
 
       /** @brief Create a transducer that accepts any number of consecutive 
-	  string pairs accepted by transducer t. */
+          string pairs accepted by transducer t. */
       static MyFst * repeat_star(MyFst * t);
       /** @brief Create a transducer that accepts one or more consecutive 
-	  string pairs accepted by transducer t. */
+          string pairs accepted by transducer t. */
       static MyFst * repeat_plus(MyFst * t);
       /** @brief Create a transducer that accepts n consecutive string pairs 
-	  accepted by transducer t. */
+          accepted by transducer t. */
       static MyFst * repeat_n(MyFst * t, unsigned int n);
       /** @brief Create a transducer that accepts from zero to n consecutive 
-	  string pairs accepted by transducer t. */
+          string pairs accepted by transducer t. */
       static MyFst * repeat_le_n(MyFst * t, unsigned int n);
 
       /** @brief Create a transducer that accepts string pairs accepted by 
-	  transducer t or an empty string. */
+          transducer t or an empty string. */
       static MyFst * optionalize(MyFst * t);
       /** @brief Create a transducer that accepts string pair string2:string1 
-	  iff transducer t accepts string pair string1:string2. */
+          iff transducer t accepts string pair string1:string2. */
       static MyFst * invert(MyFst * t);
       /** @brief Create a transducer that accepts string pair 1gnirts:2gnirts 
-	  iff transducer t accepts string pair string1:string2. */
+          iff transducer t accepts string pair string1:string2. */
       static MyFst * reverse(MyFst * t);
 
       /** @brief Create a transducer that accepts string pair string1:string1 
-	  iff transducer t accepts string pair string1:string2. */
+          iff transducer t accepts string pair string1:string2. */
       static MyFst * extract_input_language(MyFst * t);
       /** @brief Create a transducer that accepts string pair string2:string2 
-	  iff transducer t accepts string pair string1:string2. */
+          iff transducer t accepts string pair string1:string2. */
       static MyFst * extract_output_language(MyFst * t);
       /** @brief A vector of transducers that each accept one string pair 
-	  accepted by transducer t. t cannot be cyclic. */
+          accepted by transducer t. t cannot be cyclic. */
       static std::vector<MyFst*> extract_paths(MyFst *t);
       /** @brief TODO: document */
       static void extract_strings
-	(MyFst * t, hfst::ExtractStringsCb& callback,
-	 int cycles=-1, FdTable<unsigned int>* fd=NULL, bool filter_fd=false);
+        (MyFst * t, hfst::ExtractStringsCb& callback,
+         int cycles=-1, FdTable<unsigned int>* fd=NULL, bool filter_fd=false);
 
       /** @brief Create a transducer that accepts string pair of 
-	  [ A:B* s A:B* t A:B* r A:B* i A:B* n A:B* g A:B* 1:2 A:B* ] 
-	 (where A and B are input and output symbol of symbol_pair) iff 
-	 transducer t accepts string pair string1:string2. */
+          [ A:B* s A:B* t A:B* r A:B* i A:B* n A:B* g A:B* 1:2 A:B* ] 
+         (where A and B are input and output symbol of symbol_pair) iff 
+         transducer t accepts string pair string1:string2. */
       static MyFst * insert_freely(MyFst *t , const StringPair &symbol_pair);
       /** @brief Create a transducer equivalent to transducer t but where all 
-	  symbols old_symbol are substituted with new_symbol. */
-      static MyFst * substitute(MyFst * t, String old_symbol, String new_symbol);
-      /** @brief Create a transducer equivalent to transducer t but where all 
-	  symbol pairs symbol_pair are substituted with a copy of transducer 
-	  tr. */
+          symbols old_symbol are substituted with new_symbol. */
       static MyFst * substitute
-	(MyFst *t, const StringPair &symbol_pair, MyFst *tr);
+	(MyFst * t, String old_symbol, String new_symbol);
+      /** @brief Create a transducer equivalent to transducer t but where all 
+          symbol pairs symbol_pair are substituted with a copy of transducer 
+          tr. */
+      static MyFst * substitute
+        (MyFst *t, const StringPair &symbol_pair, MyFst *tr);
 
       /** @brief Create a transducer that accepts string pair string1:string3 
-	  iff t1 accepts string pair string1:string2 and t2 accepts string pair
-	  string2:string3, where string2 is any string. */
+          iff t1 accepts string pair string1:string2 and t2 accepts string pair
+          string2:string3, where string2 is any string. */
       static MyFst * compose(MyFst * t1, MyFst * t2);
       /** @brief Create a transducer that accepts a concatenation of any string
-	  pair accepted by t1 and any string pair accepted by t2. */
+          pair accepted by t1 and any string pair accepted by t2. */
       static MyFst * concatenate(MyFst * t1, MyFst * t2);
       /** @brief Create a transducer that accepts any string pair accepted by 
-	  t1 or t2. */
+          t1 or t2. */
       static MyFst * disjunct(MyFst * t1, MyFst * t2);
       /** @brief Create a transducer that accepts any string pair accepted by 
-	  both t1 and t2. */
+          both t1 and t2. */
       static MyFst * intersect(MyFst * t1, MyFst * t2);
       /** @brief Create a transducer that accepts any string pair accepted by 
-	  t1 but not t2. */
+          t1 but not t2. */
       static MyFst * subtract(MyFst * t1, MyFst * t2);
 
       /** @brief Return a harmonized copy of transducers t1 and t2. 
 
-	 First, all string symbols that are found in t2's alphabet but not in
-	 t1's alphabet are added to the alphabet of t1 to the next free 
-	 positions (numbers). Then a copy of t2 is created where the 
-	 string-to-number mappings are the same as in t1.
+         First, all string symbols that are found in t2's alphabet but not in
+         t1's alphabet are added to the alphabet of t1 to the next free 
+         positions (numbers). Then a copy of t2 is created where the 
+         string-to-number mappings are the same as in t1.
 
-	 Next all unknown and identity symbols of t1 and t2 are expanded 
-	 according to the alphabets of the transducers, i.e. an unknown or 
-	 identity symbol in t2 is expanded to a set of all symbols known to t1 
-	 but unknown to t2 and vice versa.
-	 
-	 Unknown and identity symbols are explained in more detail in (Ref.). 
+         Next all unknown and identity symbols of t1 and t2 are expanded 
+         according to the alphabets of the transducers, i.e. an unknown or 
+         identity symbol in t2 is expanded to a set of all symbols known to t1 
+         but unknown to t2 and vice versa.
+         
+         Unknown and identity symbols are explained in more detail in (Ref.). 
 
-	 A false value of unknown_symbols_in_use may be used for optimization 
-	 as no unknown or identity expanding is needed in that case. */
+         A false value of unknown_symbols_in_use may be used for optimization 
+         as no unknown or identity expanding is needed in that case. */
       static std::pair<MyFst*, MyFst*> harmonize
-	(MyFst *t1, MyFst *t2, bool unknown_symbols_in_use=true);
+        (MyFst *t1, MyFst *t2, bool unknown_symbols_in_use=true);
 
       /** @brief Whether transducers t1 an t2 are equivalent. */
       static bool are_equivalent(MyFst * t1, MyFst * t2);
@@ -280,7 +281,7 @@ namespace implementations
       static bool is_cyclic(MyFst * t);
       
       /** @brief A table of numbers that represent flag 
-	  diacritics in transducer t. */
+          diacritics in transducer t. */
       static FdTable<unsigned int>* get_flag_diacritics(MyFst * t);
 
       /** @brief Remove symbol symbol from the alphabet of transducer t. */
@@ -290,7 +291,7 @@ namespace implementations
       static MyFst * disjunct(MyFst * t, const StringPairVector &spv);
 
       /** @brief Get all symbol pairs that occur in transitions of transducer 
-	  t. */
+          t. */
       static StringPairSet get_symbol_pairs(MyFst *t);
 
       /** @brief The number of states in transducer t. */
@@ -299,10 +300,10 @@ namespace implementations
       // you probably need also these functions
     protected:
       /** @brief Add the following number-to-symbol correspondencies to the 
-	  alphabet of transducer t: 
-	 0 : "@_EPSILON_SYMBOL_@"
-	 1 : "@_UNKNOWN_SYMBOL_@"
-	 2 : "@_IDENTITY_SYMBOL_@"  */
+          alphabet of transducer t: 
+         0 : "@_EPSILON_SYMBOL_@"
+         1 : "@_UNKNOWN_SYMBOL_@"
+         2 : "@_IDENTITY_SYMBOL_@"  */
       static void initialize_alphabet(MyFst *t);
       /** @brief Get all symbols that occur in transitions of transducer t. */
       static StringSet get_alphabet(MyFst *t);

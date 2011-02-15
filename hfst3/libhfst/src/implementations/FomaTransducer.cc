@@ -212,7 +212,7 @@ namespace hfst { namespace implementations {
     (const std::string &isymbol, const std::string &osymbol)
   { 
     return fsm_cross_product( fsm_symbol(strdup(isymbol.c_str())), 
-			      fsm_symbol(strdup(osymbol.c_str())) );
+                              fsm_symbol(strdup(osymbol.c_str())) );
     // should either argument be deleted?
   }
   
@@ -228,12 +228,12 @@ namespace hfst { namespace implementations {
     h = fsm_construct_init(strdup(std::string("").c_str()));
     
     for (StringPairVector::const_iterator it = spv.begin(); 
-	 it != spv.end(); it++) 
+         it != spv.end(); it++) 
       {
-	char *in = strdup(it->first.c_str());
-	char *out = strdup(it->second.c_str());
-	fsm_construct_add_arc(h, state_number, state_number+1, in, out);
-	state_number++;
+        char *in = strdup(it->first.c_str());
+        char *out = strdup(it->second.c_str());
+        fsm_construct_add_arc(h, state_number, state_number+1, in, out);
+        state_number++;
       }
     
     fsm_construct_set_initial(h, 0);
@@ -290,15 +290,15 @@ namespace hfst { namespace implementations {
     h = fsm_construct_init(strdup(std::string("").c_str()));
     
     for (std::vector<StringPairSet>::const_iterator it = spsv.begin(); 
-	 it != spsv.end(); it++) 
+         it != spsv.end(); it++) 
       {
-	for (StringPairSet::const_iterator it2 = (*it).begin(); 
-	     it2 != (*it).end(); it2++ ) {
-	  char *in = strdup(it2->first.c_str());
-	  char *out = strdup(it2->second.c_str());
-	  fsm_construct_add_arc(h, state_number, state_number+1, in, out);
-	}
-	state_number++;
+        for (StringPairSet::const_iterator it2 = (*it).begin(); 
+             it2 != (*it).end(); it2++ ) {
+          char *in = strdup(it2->first.c_str());
+          char *out = strdup(it2->second.c_str());
+          fsm_construct_add_arc(h, state_number, state_number+1, in, out);
+        }
+        state_number++;
       }
     
     fsm_construct_set_initial(h, 0);
@@ -381,8 +381,8 @@ namespace hfst { namespace implementations {
   fsm * FomaTransducer::substitute(fsm * t,String old_symbol,String new_symbol)
   {
     return fsm_substitute_symbol(t, 
-				 strdup(old_symbol.c_str()), 
-				 strdup(new_symbol.c_str()));
+                                 strdup(old_symbol.c_str()), 
+                                 strdup(new_symbol.c_str()));
   }
   
     /* Conversion to HfstBasicTransducer is now used instead. */
@@ -444,7 +444,7 @@ namespace hfst { namespace implementations {
   (fsm * t1, fsm * t2)
   {
     return fsm_isempty(fsm_union(fsm_minus(fsm_copy(t1),fsm_copy(t2)),
-				 fsm_minus(fsm_copy(t1),fsm_copy(t2))));    
+                                 fsm_minus(fsm_copy(t1),fsm_copy(t2))));    
   }
 
   bool FomaTransducer::is_cyclic(fsm * t)
@@ -489,8 +489,8 @@ namespace hfst { namespace implementations {
       
       hfst::WeightedPath<float> path(&lbuffer[0],&ubuffer[0],0);
       if (include_spv) {
-	path.spv = spv;
-	path.is_spv_in_use = true;
+        path.spv = spv;
+        path.is_spv_in_use = true;
       }
       hfst::ExtractStringsCb::RetVal ret = callback(path, final);
       if(!ret.continueSearch || !ret.continuePath)
@@ -510,7 +510,7 @@ namespace hfst { namespace implementations {
         size_t j;
         for(j=0; j<sorted_arcs.size(); j++)
           if (all_visitations[s->target] 
-	      < all_visitations[sorted_arcs[j]->target])
+              < all_visitations[sorted_arcs[j]->target])
             break;
         sorted_arcs.push_back(NULL);
         for( size_t k=sorted_arcs.size()-1; k>j; k-- )
@@ -542,13 +542,13 @@ namespace hfst { namespace implementations {
       int up=upos;
       
       if(arc->in != 0 && 
-	 (!filter_fd || 
-	  fd_state_stack->back().get_table().get_operation(arc->in)==NULL))
+         (!filter_fd || 
+          fd_state_stack->back().get_table().get_operation(arc->in)==NULL))
       {
         //find the key in sigma
         char* c=NULL;
         for(struct sigma* sig=t->sigma; sig!=NULL&&sig->symbol!=NULL; 
-	    sig=sig->next)
+            sig=sig->next)
         {
           if(sig->number == arc->in)
           {
@@ -563,13 +563,13 @@ namespace hfst { namespace implementations {
         lp += clen;
       }
       if(arc->out != 0 && 
-	 (!filter_fd || 
-	  fd_state_stack->back().get_table().get_operation(arc->out)==NULL))
+         (!filter_fd || 
+          fd_state_stack->back().get_table().get_operation(arc->out)==NULL))
       {
         //find the key in sigma
         char* c=NULL;
         for(struct sigma* sig=t->sigma; sig!=NULL&&sig->symbol!=NULL; 
-	    sig=sig->next)
+            sig=sig->next)
         {
           if(sig->number == arc->out)
           {
@@ -585,13 +585,13 @@ namespace hfst { namespace implementations {
       }
       
       /* Handle spv here. Special symbols (flags, epsilons) 
-	 are always inserted. */
+         are always inserted. */
       if (include_spv) {
     
         //find the key in sigma
         char* c_in=NULL;
         for(struct sigma* sig=t->sigma; sig!=NULL&&sig->symbol!=NULL; 
-	    sig=sig->next)
+            sig=sig->next)
       { if(sig->number == arc->in) {
           c_in = sig->symbol;
           break; }
@@ -600,21 +600,21 @@ namespace hfst { namespace implementations {
         //find the key in sigma
         char* c_out=NULL;
         for(struct sigma* sig=t->sigma; sig!=NULL&&sig->symbol!=NULL; 
-	    sig=sig->next) {
+            sig=sig->next) {
           if(sig->number == arc->out) {
             c_out = sig->symbol;
             break; }
         }
 
     StringPair string_pair(std::string(strdup(c_in)),
-			   std::string(strdup(c_out)));
+                           std::string(strdup(c_out)));
     spv.push_back(string_pair);
       }
 
       res = extract_strings(t, arc->target, all_visitations, path_visitations,
-			    lbuffer, lp, ubuffer, up, callback, cycles,
-			    fd_state_stack, filter_fd,
-			    include_spv, spv);
+                            lbuffer, lp, ubuffer, up, callback, cycles,
+                            fd_state_stack, filter_fd,
+                            include_spv, spv);
     
       if (include_spv)
     spv.pop_back();
@@ -647,9 +647,9 @@ namespace hfst { namespace implementations {
     for (int i=0; ((t->states)+i)->state_no != -1 && res == true; i++) {
       if (((t->states)+i)->start_state == 1)
         res = hfst::implementations::extract_strings
-	  (t, ((t->states)+i)->state_no, all_visitations, path_visitations,
-	   lbuffer, 0, ubuffer, 0, callback, cycles, fd_state_stack, 
-	   filter_fd, include_spv, spv);
+          (t, ((t->states)+i)->state_no, all_visitations, path_visitations,
+           lbuffer, 0, ubuffer, 0, callback, cycles, fd_state_stack, 
+           filter_fd, include_spv, spv);
     }
   }
   
@@ -725,19 +725,19 @@ namespace hfst { namespace implementations {
     /* Properties */
     io_gets(infile, buf);
     sscanf(buf, "%i %i %i %i %i %lld %i %i %i %i %i %i %s", 
-	   &net->arity, 
-	   &net->arccount, 
-	   &net->statecount, 
-	   &net->linecount, 
-	   &net->finalcount, 
-	   &net->pathcount, 
-	   &net->is_deterministic, 
-	   &net->is_pruned, 
-	   &net->is_minimized, 
-	   &net->is_epsilon_free, 
-	   &net->is_loop_free, 
-	   &net->is_completed, 
-	   buf);
+           &net->arity, 
+           &net->arccount, 
+           &net->statecount, 
+           &net->linecount, 
+           &net->finalcount, 
+           &net->pathcount, 
+           &net->is_deterministic, 
+           &net->is_pruned, 
+           &net->is_minimized, 
+           &net->is_epsilon_free, 
+           &net->is_loop_free, 
+           &net->is_completed, 
+           buf);
     strcpy(net->name, buf);
     //*net_name = strdup(buf);
     io_gets(infile, buf);
@@ -772,7 +772,7 @@ namespace hfst { namespace implementations {
         /* scanf is just too slow here */
 
         //items = sscanf(buf, "%i %i %i %i %i",&lineint[0], 
-	//&lineint[1], &lineint[2], &lineint[3], &lineint[4]);
+        //&lineint[1], &lineint[2], &lineint[3], &lineint[4]);
 
         items = explode_line(buf, &lineint[0]);
 
@@ -886,24 +886,24 @@ static inline int explode_line (char *buf, int *values) {
     /* Properties */
     fprintf(outfile, "%s","##props##\n");
     fprintf(outfile, "%i %i %i %i %i %lld %i %i %i %i %i %i %s\n",
-	    net->arity, 
-	    net->arccount, 
-	    net->statecount, 
-	    net->linecount, 
-	    net->finalcount, 
-	    net->pathcount, 
-	    net->is_deterministic, 
-	    net->is_pruned, 
-	    net->is_minimized, 
-	    net->is_epsilon_free, 
-	    net->is_loop_free, 
-	    net->is_completed, 
-	    net->name);
+            net->arity, 
+            net->arccount, 
+            net->statecount, 
+            net->linecount, 
+            net->finalcount, 
+            net->pathcount, 
+            net->is_deterministic, 
+            net->is_pruned, 
+            net->is_minimized, 
+            net->is_epsilon_free, 
+            net->is_loop_free, 
+            net->is_completed, 
+            net->name);
     
     /* Sigma */
     fprintf(outfile, "%s","##sigma##\n");
     for (sigma = net->sigma; sigma != NULL && sigma->number != -1; 
-	 sigma = sigma->next) {
+         sigma = sigma->next) {
         fprintf(outfile, "%i %s\n",sigma->number, sigma->symbol);
     }
 
@@ -915,11 +915,11 @@ static inline int explode_line (char *buf, int *values) {
         if (fsm->state_no != laststate) {
             if (fsm->in != fsm->out) {
                 fprintf(outfile, "%i %i %i %i %i\n",
-			fsm->state_no, fsm->in, fsm->out, fsm->target, 
-			fsm->final_state);
+                        fsm->state_no, fsm->in, fsm->out, fsm->target, 
+                        fsm->final_state);
             } else {
                 fprintf(outfile, "%i %i %i %i\n",fsm->state_no, fsm->in, 
-			fsm->target, fsm->final_state);
+                        fsm->target, fsm->final_state);
             }
         } else {
             if (fsm->in != fsm->out) {

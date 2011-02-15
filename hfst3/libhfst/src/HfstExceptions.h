@@ -165,7 +165,8 @@ try {
   transducer.extract_strings(results);
   fprintf(stderr, "The transducer has %i paths\n", results.size());
 } catch (TransducerIsCyclicException e) {
-    fprintf(stderr, "The transducer is cyclic and has an infinite number of paths.\n");
+    fprintf(stderr, "The transducer is cyclic "
+            " and has an infinite number of paths.\n");
 }
 \endverbatim
 */
@@ -223,7 +224,9 @@ fprintf(stderr, "Read %i transducers in total.\n", (int)transducers.size());
 \endverbatim
 
 
-    thrown by #hfst::HfstTransducer::HfstTransducer(FILE *, ImplementationType, const std::string&);
+    thrown by 
+    \link {hfst::HfstTransducer::HfstTransducer
+    (FILE*,ImplementationType,const std::string&)} \endlink
 */
 class NotValidAttFormatException :
 public HfstInputException {};
@@ -250,7 +253,8 @@ public HfstArgumentException {};
 /** \brief Context transducers are not automata.
 
     This exception is thrown by
-    hfst::rules::replace_up(HfstTransducerPair&, HfstTransducer&, bool, StringPairSet&) 
+    \link {hfst::rules::replace_up
+    (HfstTransducerPair&, HfstTransducer&, bool, StringPairSet&) \endlink 
     when either context transducer does not have equivalent input and
     output symbols in all its transitions.
 

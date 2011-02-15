@@ -55,7 +55,8 @@ namespace hfst
     HFST2_TYPE, /**< HFST2 header present, conversion required */
     UNSPECIFIED_TYPE, /**< Format left open by e.g. default constructor */
     ERROR_TYPE /**< Type not recognised. 
-		  This type might be returned by a function if an error occurs. */ 
+                  This type might be returned by a function 
+		  if an error occurs. */ 
   };
 
   /** \brief The type of a push operation.

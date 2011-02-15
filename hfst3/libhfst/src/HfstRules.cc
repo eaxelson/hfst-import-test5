@@ -17,9 +17,9 @@ namespace hfst
   {
 
     HfstTransducer replace( HfstTransducer &t, 
-			    ReplaceType repl_type, 
-			    bool optional, 
-			    StringPairSet &alphabet ) 
+                            ReplaceType repl_type, 
+                            bool optional, 
+                            StringPairSet &alphabet ) 
     {
 
       bool DEBUG=false;
@@ -30,12 +30,12 @@ namespace hfst
 
       HfstTransducer t_proj(t);
       if (repl_type == REPL_UP)
-	t_proj.input_project();
+        t_proj.input_project();
       else if (repl_type == REPL_DOWN)
-	t_proj.output_project();
+        t_proj.output_project();
       else {
-	fprintf(stderr, "ERROR: replace: Impossible replace type\n");
-	exit(1);
+        fprintf(stderr, "ERROR: replace: Impossible replace type\n");
+        exit(1);
       }
 
       HfstTransducer pi_star(alphabet, type, true);
@@ -44,7 +44,7 @@ namespace hfst
       HfstTransducer tc(pi_star);
       tc.concatenate(t_proj);
       tc.concatenate(pi_star);
-		     
+                     
       // tc_neg = ! ( .* t_proj .* )
       HfstTransducer tc_neg(pi_star);
       tc_neg.subtract(tc);
@@ -56,7 +56,7 @@ namespace hfst
       retval.concatenate(tc_neg);
 
       if (optional)
-	retval.disjunct(pi_star);
+        retval.disjunct(pi_star);
 
       if (DEBUG) printf("..replcae\n");
 
@@ -64,9 +64,9 @@ namespace hfst
     }
 
     HfstTransducer replace_transducer(HfstTransducer &t, 
-				      std::string lm, std::string rm, 
-				      ReplaceType repl_type, 
-				      StringPairSet &alphabet)
+                                      std::string lm, std::string rm, 
+                                      ReplaceType repl_type, 
+                                      StringPairSet &alphabet)
     {
       bool DEBUG=false;
 
@@ -99,8 +99,8 @@ namespace hfst
 
 
     HfstTransducer replace_context(HfstTransducer &t, 
-				   std::string m1, std::string m2, 
-				   StringPairSet &alphabet)
+                                   std::string m1, std::string m2, 
+                                   StringPairSet &alphabet)
     {
       // ct = .* ( m1 >> ( m2 >> t ))  ||  !(.* m1)
 
@@ -194,11 +194,11 @@ namespace hfst
 
     /* identical to  ![ .* l [a:. & !a:b] r .* ]  */
     HfstTransducer two_level_if(HfstTransducerPair &context, 
-				StringPairSet &mappings, 
-				StringPairSet &alphabet) 
+                                StringPairSet &mappings, 
+                                StringPairSet &alphabet) 
     {
       if (context.first.get_type() != context.second.get_type())
-	throw hfst::exceptions::TransducerTypeMismatchException();
+        throw hfst::exceptions::TransducerTypeMismatchException();
       ImplementationType type = context.first.get_type();
 
       //assert(context.first.get_type() != UNSPECIFIED_TYPE);
@@ -209,18 +209,18 @@ namespace hfst
       // calculate [ a:. ]
       StringPairSet input_to_any;
       for (StringPairSet::iterator it = mappings.begin(); 
-	   it != mappings.end(); it++)
-	{
-	  for (StringPairSet::iterator alpha_it = alphabet.begin();
-	       alpha_it != alphabet.end(); alpha_it++)
-	    {
-	      if (alpha_it->first == it->first)
-		{
-		  input_to_any.insert(StringPair
-				      (alpha_it->first, alpha_it->second));
-		}
-	    }
-	}
+           it != mappings.end(); it++)
+        {
+          for (StringPairSet::iterator alpha_it = alphabet.begin();
+               alpha_it != alphabet.end(); alpha_it++)
+            {
+              if (alpha_it->first == it->first)
+                {
+                  input_to_any.insert(StringPair
+                                      (alpha_it->first, alpha_it->second));
+                }
+            }
+        }
 
       // center == [ a:. ]
       HfstTransducer center(input_to_any, type);
@@ -245,7 +245,7 @@ namespace hfst
       right_context.concatenate(universal);
 
       HfstTransducer inside(left_context.concatenate(center).
-			    concatenate(right_context));
+                            concatenate(right_context));
 
       HfstTransducer retval(universal.subtract(inside));
       return retval;
@@ -254,11 +254,11 @@ namespace hfst
 
     // equivalent to !(!(.* l) a:b .* | .* a:b !(r .*))
     HfstTransducer two_level_only_if(HfstTransducerPair &context, 
-				     StringPairSet &mappings, 
-				     StringPairSet &alphabet) 
+                                     StringPairSet &mappings, 
+                                     StringPairSet &alphabet) 
     { 
       if (context.first.get_type() != context.second.get_type())
-	throw hfst::exceptions::TransducerTypeMismatchException();
+        throw hfst::exceptions::TransducerTypeMismatchException();
       ImplementationType type = context.first.get_type();
 
       //assert(context.first.get_type() != UNSPECIFIED_TYPE);
@@ -298,20 +298,20 @@ namespace hfst
     }
 
     HfstTransducer two_level_if_and_only_if(HfstTransducerPair &context,
-					    StringPairSet &mappings,
-					    StringPairSet &alphabet) 
+                                            StringPairSet &mappings,
+                                            StringPairSet &alphabet) 
     {
       HfstTransducer if_rule = two_level_if(context, mappings, alphabet);
       HfstTransducer only_if_rule = two_level_only_if
-	(context, mappings, alphabet);
+        (context, mappings, alphabet);
       return if_rule.intersect(only_if_rule);
     }
 
     HfstTransducer replace_in_context(HfstTransducerPair &context, 
-				      ReplaceType repl_type, 
-				      HfstTransducer &t, 
-				      bool optional, 
-				      StringPairSet &alphabet)
+                                      ReplaceType repl_type, 
+                                      HfstTransducer &t, 
+                                      bool optional, 
+                                      StringPairSet &alphabet)
     {
 
       bool DEBUG=false;
@@ -320,8 +320,8 @@ namespace hfst
 
       // test that all transducers have the same type
       if (context.first.get_type() != context.second.get_type() || 
-	  context.first.get_type() != t.get_type() )
-	throw hfst::exceptions::TransducerTypeMismatchException();
+          context.first.get_type() != t.get_type() )
+        throw hfst::exceptions::TransducerTypeMismatchException();
       ImplementationType type = t.get_type();      
 
       if (DEBUG) printf("  ..transducers have the same type\n");
@@ -337,10 +337,10 @@ namespace hfst
       if (DEBUG) printf("  testing if context transducers are automata..\n");
 
       if ( not HfstTransducer::are_equivalent(t1_proj, context.first) ||
-	   not HfstTransducer::are_equivalent(t2_proj, context.second) )
-	throw hfst::exceptions::ContextTransducersAreNotAutomataException();
+           not HfstTransducer::are_equivalent(t2_proj, context.second) )
+        throw hfst::exceptions::ContextTransducersAreNotAutomataException();
 
-	if (DEBUG) printf("  ..context transducers are automata\n");*/
+        if (DEBUG) printf("  ..context transducers are automata\n");*/
       
       std::string leftm("@_LEFT_MARKER_@");
       std::string rightm("@_RIGHT_MARKER_@");
@@ -385,7 +385,7 @@ namespace hfst
 
       // left context transducer .* (<R> >> (<L> >> LEFT_CONTEXT)) || !(.*<L>) 
       HfstTransducer lct = replace_context
-	(context.first, leftm, rightm, alphabet); 
+        (context.first, leftm, rightm, alphabet); 
 
       lct.minimize();
       if (DEBUG) lct.write_in_att_format("compiler_lct.att",false);
@@ -418,10 +418,10 @@ namespace hfst
       // unconditional replace transducer      
       HfstTransducer rt(type);
       if (repl_type == REPL_UP || repl_type == REPL_RIGHT || 
-	  repl_type == REPL_LEFT)
-	rt = replace_transducer( t, leftm, rightm, REPL_UP, alphabet );
+          repl_type == REPL_LEFT)
+        rt = replace_transducer( t, leftm, rightm, REPL_UP, alphabet );
       else
-	rt = replace_transducer( t, leftm, rightm, REPL_DOWN, alphabet );
+        rt = replace_transducer( t, leftm, rightm, REPL_DOWN, alphabet );
       if (DEBUG) printf("  minimizing rt\n");
       rt.minimize();
       if (DEBUG) printf("  ..rt createD\n");
@@ -438,10 +438,10 @@ namespace hfst
       if (DEBUG) printf("#1\n");
 
       if (repl_type == REPL_UP || repl_type == REPL_RIGHT)
-	result.compose(rct);
+        result.compose(rct);
 
       if (repl_type == REPL_UP || repl_type == REPL_LEFT)
-	result.compose(lct);
+        result.compose(lct);
       
       if (DEBUG) printf("#2\n");
 
@@ -454,10 +454,10 @@ namespace hfst
       if (DEBUG) printf("#3\n");
 
       if (repl_type == REPL_DOWN || repl_type == REPL_RIGHT)
-	result.compose(lct);
+        result.compose(lct);
 
       if (repl_type == REPL_DOWN || repl_type == REPL_LEFT)
-	result.compose(rct);
+        result.compose(rct);
       
       if (DEBUG) printf("#4\n");
 
@@ -474,8 +474,8 @@ namespace hfst
       alphabet.erase(StringPair(rightm,rightm));
       
       if (optional) {
-	HfstTransducer pi_star_(alphabet, type, true);
-	result.disjunct(pi_star_);
+        HfstTransducer pi_star_(alphabet, type, true);
+        result.disjunct(pi_star_);
       }
 
       result.minimize();
@@ -488,81 +488,81 @@ namespace hfst
 
 
     HfstTransducer replace_up(HfstTransducerPair &context, 
-			      HfstTransducer &mapping, 
-			      bool optional, 
-			      StringPairSet &alphabet) 
+                              HfstTransducer &mapping, 
+                              bool optional, 
+                              StringPairSet &alphabet) 
     { 
       return replace_in_context(context, REPL_UP, mapping, optional, alphabet);
     }
 
     HfstTransducer replace_down(HfstTransducerPair &context, 
-				HfstTransducer &mapping, 
-				bool optional, 
-				StringPairSet &alphabet) 
+                                HfstTransducer &mapping, 
+                                bool optional, 
+                                StringPairSet &alphabet) 
     { 
       return replace_in_context
-	(context, REPL_DOWN, mapping, optional, alphabet);
+        (context, REPL_DOWN, mapping, optional, alphabet);
     }
 
     HfstTransducer replace_right(HfstTransducerPair &context, 
-				 HfstTransducer &mapping, 
-				 bool optional, 
-				 StringPairSet &alphabet) 
+                                 HfstTransducer &mapping, 
+                                 bool optional, 
+                                 StringPairSet &alphabet) 
     { 
       return replace_in_context
-	(context, REPL_RIGHT, mapping, optional, alphabet);
+        (context, REPL_RIGHT, mapping, optional, alphabet);
     }
 
     HfstTransducer replace_left(HfstTransducerPair &context, 
-				HfstTransducer &mapping, 
-				bool optional, 
-				StringPairSet &alphabet)
+                                HfstTransducer &mapping, 
+                                bool optional, 
+                                StringPairSet &alphabet)
     { 
       return replace_in_context
-	(context, REPL_LEFT, mapping, optional, alphabet);
+        (context, REPL_LEFT, mapping, optional, alphabet);
     }
 
     HfstTransducer replace_up(HfstTransducer &mapping, 
-			      bool optional, 
-			      StringPairSet &alphabet)
+                              bool optional, 
+                              StringPairSet &alphabet)
     {
       return replace(mapping, REPL_UP, optional, alphabet);
     }
 
     HfstTransducer replace_down(HfstTransducer &mapping, 
-				bool optional, 
-				StringPairSet &alphabet)
+                                bool optional, 
+                                StringPairSet &alphabet)
     {
       return replace(mapping, REPL_DOWN, optional, alphabet);
     }
 
 
     HfstTransducer restriction(HfstTransducerPairVector &contexts, 
-			       HfstTransducer &mapping, 
-			       StringPairSet &alphabet,
-			       TwolType twol_type, 
-			       int direction ) 
+                               HfstTransducer &mapping, 
+                               StringPairSet &alphabet,
+                               TwolType twol_type, 
+                               int direction ) 
     { 
       // Make sure that contexts contains at least one transducer pair and that
       // all transducers in the set have the same type.
       ImplementationType type=ERROR_TYPE;
       bool type_defined=false;
       for (HfstTransducerPairVector::const_iterator it = contexts.begin();
-	   it != contexts.end(); it++)
-	{
-	  if (not type_defined) {
-	    type = it->first.get_type();
-	    type_defined=true;
-	  } 
-	  else { 
-	    if (type != it->first.get_type())
-	      throw hfst::exceptions::TransducerTypeMismatchException();
-	  }
-	  if (type != it->second.get_type())
-	    throw hfst::exceptions::TransducerTypeMismatchException();
- 	}
+           it != contexts.end(); it++)
+        {
+          if (not type_defined) {
+            type = it->first.get_type();
+            type_defined=true;
+          } 
+          else { 
+            if (type != it->first.get_type())
+              throw hfst::exceptions::TransducerTypeMismatchException();
+          }
+          if (type != it->second.get_type())
+            throw hfst::exceptions::TransducerTypeMismatchException();
+         }
       if (not type_defined)
-	throw hfst::exceptions::EmptySetOfContextsException();
+        throw hfst::exceptions::EmptySetOfContextsException();
 
       std::string marker("@_MARKER_@");
       HfstTransducer mt(marker, type);
@@ -578,102 +578,102 @@ namespace hfst
 
       HfstTransducer tmp(type);
       if (direction == 0)
-	tmp = pi_star;
+        tmp = pi_star;
       else if (direction == 1)
-	tmp = mapping.input_project().compose(pi_star);
+        tmp = mapping.input_project().compose(pi_star);
       else {
-	tmp = pi_star;
-	tmp.compose(mapping.output_project());
+        tmp = pi_star;
+        tmp.compose(mapping.output_project());
       }
 
       // context transducer 
       // pi_star + left[i] + mt + tmp + mt + + right[i] + pi_star
       HfstTransducer l2(type);
       for (HfstTransducerPairVector::const_iterator it = contexts.begin();
-	   it != contexts.end(); it++)
-	{
-	  HfstTransducer ct("@_EPSILON_SYMBOL_@", type);
-	  ct.concatenate(pi_star);
-	  ct.concatenate(it->first);
-	  ct.concatenate(mt);	  
-	  ct.concatenate(tmp);
-	  ct.concatenate(mt);
-	  ct.concatenate(it->second);
-	  ct.concatenate(pi_star);
-	  l2.disjunct(ct);
-	}
+           it != contexts.end(); it++)
+        {
+          HfstTransducer ct("@_EPSILON_SYMBOL_@", type);
+          ct.concatenate(pi_star);
+          ct.concatenate(it->first);
+          ct.concatenate(mt);          
+          ct.concatenate(tmp);
+          ct.concatenate(mt);
+          ct.concatenate(it->second);
+          ct.concatenate(pi_star);
+          l2.disjunct(ct);
+        }
 
       HfstTransducer result(type);
       
       if (twol_type == twol_right) {
-	// TheAlphabet - ( l1 - l2 ).substitute(marker,epsilon)
-	HfstTransducer retval(alphabet, type, true);
-	HfstTransducer tmp1(l1);
-	tmp1.subtract(l2);
-	tmp1.substitute(marker,"@_EPSILON_SYMBOL_@");
-	retval.subtract(tmp1);
-	return retval;
+        // TheAlphabet - ( l1 - l2 ).substitute(marker,epsilon)
+        HfstTransducer retval(alphabet, type, true);
+        HfstTransducer tmp1(l1);
+        tmp1.subtract(l2);
+        tmp1.substitute(marker,"@_EPSILON_SYMBOL_@");
+        retval.subtract(tmp1);
+        return retval;
       }
       else if (twol_type == twol_left) {
-	// TheAlphabet - ( l2 - l1 ).substitute(marker,epsilon)
-	HfstTransducer retval(alphabet, type, true);
-	HfstTransducer tmp1(l2);
-	tmp1.subtract(l1);
-	tmp1.substitute(marker,"@_EPSILON_SYMBOL_@");
-	retval.subtract(tmp1);
-	return retval;
+        // TheAlphabet - ( l2 - l1 ).substitute(marker,epsilon)
+        HfstTransducer retval(alphabet, type, true);
+        HfstTransducer tmp1(l2);
+        tmp1.subtract(l1);
+        tmp1.substitute(marker,"@_EPSILON_SYMBOL_@");
+        retval.subtract(tmp1);
+        return retval;
       }
       else if (twol_type == twol_both) {
-	// TheAlphabet - ( l1 - l2 ).substitute(marker,epsilon)
-	// TheAlphabet - ( l2 - l1 ).substitute(marker,epsilon)
-	// intersect
-	HfstTransducer retval1(alphabet, type, true);
-	HfstTransducer tmp1(l1);
-	tmp1.subtract(l2);
-	tmp1.substitute(marker,"@_EPSILON_SYMBOL_@");
-	retval1.subtract(tmp1);
+        // TheAlphabet - ( l1 - l2 ).substitute(marker,epsilon)
+        // TheAlphabet - ( l2 - l1 ).substitute(marker,epsilon)
+        // intersect
+        HfstTransducer retval1(alphabet, type, true);
+        HfstTransducer tmp1(l1);
+        tmp1.subtract(l2);
+        tmp1.substitute(marker,"@_EPSILON_SYMBOL_@");
+        retval1.subtract(tmp1);
 
-	HfstTransducer retval2(alphabet, type, true);
-	HfstTransducer tmp2(l2);
-	tmp2.subtract(l1);
-	tmp2.substitute(marker,"@_EPSILON_SYMBOL_@");
-	retval2.subtract(tmp2);
+        HfstTransducer retval2(alphabet, type, true);
+        HfstTransducer tmp2(l2);
+        tmp2.subtract(l1);
+        tmp2.substitute(marker,"@_EPSILON_SYMBOL_@");
+        retval2.subtract(tmp2);
 
-	return retval1.intersect(retval2);
+        return retval1.intersect(retval2);
       }
       else
-	assert(false);
+        assert(false);
 
     }
 
     HfstTransducer restriction(HfstTransducerPairVector &contexts, 
-			       HfstTransducer &mapping, 
-			       StringPairSet &alphabet) {
+                               HfstTransducer &mapping, 
+                               StringPairSet &alphabet) {
       return restriction(contexts, mapping, alphabet, twol_right, 0); 
     }
 
     HfstTransducer coercion(HfstTransducerPairVector &contexts, 
-			    HfstTransducer &mapping, 
-			    StringPairSet &alphabet) { 
+                            HfstTransducer &mapping, 
+                            StringPairSet &alphabet) { 
       return restriction(contexts, mapping, alphabet, twol_left, 0); 
     }
 
     HfstTransducer restriction_and_coercion(HfstTransducerPairVector &contexts,
-					    HfstTransducer &mapping, 
-					    StringPairSet &alphabet) {
+                                            HfstTransducer &mapping, 
+                                            StringPairSet &alphabet) {
       return restriction(contexts, mapping, alphabet, twol_both, 0); 
     }
 
 
     HfstTransducer surface_restriction(HfstTransducerPairVector &contexts,
-				       HfstTransducer &mapping, 
-				       StringPairSet &alphabet) { 
+                                       HfstTransducer &mapping, 
+                                       StringPairSet &alphabet) { 
       return restriction(contexts, mapping, alphabet, twol_right, 1); 
     }
 
     HfstTransducer surface_coercion(HfstTransducerPairVector &contexts, 
-				    HfstTransducer &mapping, 
-				    StringPairSet &alphabet) { 
+                                    HfstTransducer &mapping, 
+                                    StringPairSet &alphabet) { 
       return restriction(contexts, mapping, alphabet, twol_left, 1); 
     }
 
@@ -686,14 +686,14 @@ namespace hfst
 
 
     HfstTransducer deep_restriction(HfstTransducerPairVector &contexts,
-				    HfstTransducer &mapping, 
-				    StringPairSet &alphabet) {  
+                                    HfstTransducer &mapping, 
+                                    StringPairSet &alphabet) {  
       return restriction(contexts, mapping, alphabet, twol_right, -1); 
     }
 
     HfstTransducer deep_coercion(HfstTransducerPairVector &contexts, 
-				 HfstTransducer &mapping, 
-				 StringPairSet &alphabet) {  
+                                 HfstTransducer &mapping, 
+                                 StringPairSet &alphabet) {  
       return restriction(contexts, mapping, alphabet, twol_left, -1); 
     }
 

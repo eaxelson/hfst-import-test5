@@ -58,9 +58,11 @@ namespace hfst
   /** \brief A tokenizer for creating transducers from UTF-8 strings.
 
       Strings are tokenized from left to right using longest match tokenization.
-      For example, if the tokenizer contains a multicharacter symbol "foo" and a skip symbol "fo",
+      For example, if the tokenizer contains a multicharacter symbol 
+      "foo" and a skip symbol "fo",
       the string "foo" is tokenized as "foo:foo".
-      If the tokenizer contains a multicharacter symbol "fo" and a skip symbol "foo",
+      If the tokenizer contains a multicharacter symbol "fo" and a skip 
+      symbol "foo",
       the string "foo" is tokenized as an empty string.
 
       An example:
@@ -75,9 +77,11 @@ namespace hfst
 \endverbatim
 
       @note The tokenizer only tokenizes utf-8 strings. 
-      Special symbols (see #String) are not included in the tokenizer unless added to it.
+      Special symbols (see #String) are not included in the tokenizer 
+      unless added to it.
 
-      @see #hfst::HfstTransducer::HfstTransducer(const std::string&, const HfstTokenizer&, ImplementationType type) */
+      @see {hfst::HfstTransducer::HfstTransducer
+      (const std::string&, const HfstTokenizer&, ImplementationType type)} */
   class HfstTokenizer
   {  
   private:
@@ -93,18 +97,18 @@ namespace hfst
 
     /** \brief Add a symbol to be skipped to this tokenizer. 
 
-	After skipping a symbol, tokenization is always started again.
-	For example if we have a multicharacter symbol "foo" and a 
-	skip symbol "bar", the string "fobaro" will be tokenized 
-	"f" "o" "o", not "foo". */
+        After skipping a symbol, tokenization is always started again.
+        For example if we have a multicharacter symbol "foo" and a 
+        skip symbol "bar", the string "fobaro" will be tokenized 
+        "f" "o" "o", not "foo". */
     void add_skip_symbol(const std::string &symbol);
 
     /** \brief Add a multicharacter symbol \a symbol to this tokenizer. 
 
-	If a multicharacter symbol has a skip symbol inside it, it is
-	not considered a multicharacter symbol. For example if we have 
-	a multicharacter symbol "foo" and a skip symbol "bar", the string
-	"fobaro" will be tokenized "f" "o" "o", not "foo". */
+        If a multicharacter symbol has a skip symbol inside it, it is
+        not considered a multicharacter symbol. For example if we have 
+        a multicharacter symbol "foo" and a skip symbol "bar", the string
+        "fobaro" will be tokenized "f" "o" "o", not "foo". */
     void add_multichar_symbol(const std::string& symbol);
 
     /** \brief Tokenize the string \a input_string. */
@@ -112,19 +116,19 @@ namespace hfst
 
     /** \brief Tokenize the string pair \a input_string : \a output_string. 
 
-	If one string has more tokens than the other, epsilons will be
-	inserted to the end of the tokenized string with less tokens
-	so that both tokenized strings have the same number of tokens.
+        If one string has more tokens than the other, epsilons will be
+        inserted to the end of the tokenized string with less tokens
+        so that both tokenized strings have the same number of tokens.
      */
     StringPairVector tokenize(const std::string &input_string,
-			      const std::string &output_string) const;
+                              const std::string &output_string) const;
 
     /** \brief Tokenize the string \a input string.
 
-	This function is useful for HfstTransducer::lookup.
+        This function is useful for HfstTransducer::lookup.
 
-	@return An HfstLookupPath with weight 0.
-	@see HfstTransducer::lookup
+        @return An HfstLookupPath with weight 0.
+        @see HfstTransducer::lookup
      */
     HfstLookupPath lookup_tokenize(const std::string &input_string) const;
   };

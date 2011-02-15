@@ -19,7 +19,8 @@ HfstTransducer &apply(
 #endif
 #if HAVE_OPENFST
  fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *),
- hfst::implementations::LogFst * (*log_ofst_funct)(hfst::implementations::LogFst *),
+ hfst::implementations::LogFst * (*log_ofst_funct)
+ (hfst::implementations::LogFst *),
 #endif
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *),
@@ -28,8 +29,9 @@ HfstTransducer &apply(
  //#if HAVE_MY_TRANSDUCER_LIBRARY
  //my_namespace::MyFst * (*my_transducer_library_funct)(my_namespace::MyFst *),
  //#endif
- bool dummy /* makes sure there is always a parameter after the function pointer parameters,
-	     * so commas between parameters are easier to handle */
+ bool dummy /* makes sure there is always a parameter after the 
+	       function pointer parameters, so commas between parameters 
+	       are easier to handle */
 );  
 
 HfstTransducer &apply(
@@ -57,36 +59,40 @@ HfstTransducer &apply(
 #endif
 #if HAVE_OPENFST
  fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,String, 
-					    String),
- hfst::implementations::LogFst * (*log_ofst_funct)(hfst::implementations::LogFst *,
-						  String,String),
+                                            String),
+ hfst::implementations::LogFst * (*log_ofst_funct)
+ (hfst::implementations::LogFst *,
+  String,String),
 #endif
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *, String, String),
 #endif
  /* Add your library here */
  //#if HAVE_MY_TRANSDUCER_LIBRARY
- //my_namespace::MyFst * (*my_transducer_library_funct)(my_namespace::MyFst *, String, String),
+ //my_namespace::MyFst * (*my_transducer_library_funct)
+ // (my_namespace::MyFst *, String, String),
  //#endif
  String k1, String k2);
 
 HfstTransducer &apply(
 #if HAVE_SFST
  SFST::Transducer * (*sfst_funct)(SFST::Transducer *,
-				  SFST::Transducer *),
+                                  SFST::Transducer *),
 #endif
 #if HAVE_OPENFST
  fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,
-					    fst::StdVectorFst *),
- hfst::implementations::LogFst * (*log_ofst_funct)(hfst::implementations::LogFst *,
-						  hfst::implementations::LogFst *),
+                                            fst::StdVectorFst *),
+ hfst::implementations::LogFst * (*log_ofst_funct)
+ (hfst::implementations::LogFst *,
+  hfst::implementations::LogFst *),
 #endif
 #if HAVE_FOMA
  fsm * (*foma_funct)(fsm *,
-		     fsm *),
+                     fsm *),
 #endif
  /* Add your library here */
  //#if HAVE_MY_TRANSDUCER_LIBRARY
- //my_namespace::MyFst * (*my_transducer_library_funct)(my_namespace::MyFst *, my_namespace::MyFst *),
+ //my_namespace::MyFst * (*my_transducer_library_funct)
+ //  (my_namespace::MyFst *, my_namespace::MyFst *),
  //#endif
  HfstTransducer &another );

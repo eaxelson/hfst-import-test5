@@ -43,84 +43,84 @@ namespace hfst {
       W weight;
       /** \brief An optional StringPairVector representation of the path. 
 
-	  This can be used when we are interested in the exact alignment of
-	  symbols in a given path. If you are going to use this variable,
-	  set the value of \a is_spv_in_use 'true'. */
+          This can be used when we are interested in the exact alignment of
+          symbols in a given path. If you are going to use this variable,
+          set the value of \a is_spv_in_use 'true'. */
       StringPairVector spv;
       /** \brief  Whether the StringPairVector representation is in use. 
 
-	  This variable tells whether we are using the string pair vector
-	  representation. By default, it is 'false'. */
+          This variable tells whether we are using the string pair vector
+          representation. By default, it is 'false'. */
       bool is_spv_in_use;
 
       WeightedPath(const std::string &is,const std::string &os,W w)
-	{ weight = w; istring = is; ostring = os; is_spv_in_use=false; }
+        { weight = w; istring = is; ostring = os; is_spv_in_use=false; }
 
       bool operator< (const WeightedPath &another) const
-	{ if (weight == another.weight)
-	    { if (istring == another.istring)
-		{ if (ostring == another.ostring) 
-		  { /* Handle here spv. */
-		    if (not is_spv_in_use)
-		      return false; /* paths are equivalent */
-		    unsigned int common_length 
-		      = (spv.size()<another.spv.size())? 
-		      spv.size() : another.spv.size();
-		    /* Go through string pairs. */
-		    for (unsigned int i=0; i<common_length; i++) {
-		      if (spv[i].first == another.spv[i].first)
-			{ if (spv[i].second == another.spv[i].second)
-			    { continue; }
-			  return (spv[i].second < another.spv[i].second); }
-		      return (spv[i].first < another.spv[i].first);
-		    }
-		    /* Shorter path is smaller. */
-		    return (spv.size() < another.spv.size());
-		  }
-		  return ostring < another.ostring; }
-	      return istring < another.istring; }
-	  return weight < another.weight; }
+        { if (weight == another.weight)
+            { if (istring == another.istring)
+                { if (ostring == another.ostring) 
+                  { /* Handle here spv. */
+                    if (not is_spv_in_use)
+                      return false; /* paths are equivalent */
+                    unsigned int common_length 
+                      = (spv.size()<another.spv.size())? 
+                      spv.size() : another.spv.size();
+                    /* Go through string pairs. */
+                    for (unsigned int i=0; i<common_length; i++) {
+                      if (spv[i].first == another.spv[i].first)
+                        { if (spv[i].second == another.spv[i].second)
+                            { continue; }
+                          return (spv[i].second < another.spv[i].second); }
+                      return (spv[i].first < another.spv[i].first);
+                    }
+                    /* Shorter path is smaller. */
+                    return (spv.size() < another.spv.size());
+                  }
+                  return ostring < another.ostring; }
+              return istring < another.istring; }
+          return weight < another.weight; }
       
       std::string to_string(void) const
-	{ stringstream s_stream(ios::out);
-	  s_stream << istring << ":" << ostring << "\t" << weight; 
-	  s_stream.flush();
-	  return s_stream.str();
-	}
+        { stringstream s_stream(ios::out);
+          s_stream << istring << ":" << ostring << "\t" << weight; 
+          s_stream.flush();
+          return s_stream.str();
+        }
       
       WeightedPath<W> &reverse(void)
       { for(size_t i = 0; i < (istring.size() / 2); ++i)
-	  { char c = istring[i];
-	    istring[i] = istring[istring.size() - i - 1];
-	    istring[istring.size() - i - 1] = c; }
+          { char c = istring[i];
+            istring[i] = istring[istring.size() - i - 1];
+            istring[istring.size() - i - 1] = c; }
 
-	for(size_t i = 0; i < (ostring.size() / 2); ++i)
-	  { char c = ostring[i];
-	    ostring[i] = ostring[ostring.size() - i - 1];
-	    ostring[ostring.size() - i - 1] = c; }
-	return *this; }
+        for(size_t i = 0; i < (ostring.size() / 2); ++i)
+          { char c = ostring[i];
+            ostring[i] = ostring[ostring.size() - i - 1];
+            ostring[ostring.size() - i - 1] = c; }
+        return *this; }
 
       WeightedPath &add(const WeightedPath &another,bool in_front=true)
-	{ if (in_front)
-	    {
-	      istring = another.istring + istring;
-	      ostring = another.ostring + ostring;
-	      weight = weight + another.weight;
-	      return *this;
-	    }
-	  else 
-	    {
-	      istring = istring + another.istring;
-	      ostring = ostring + another.ostring;
-	      weight = weight + another.weight;
-	      return *this;
-	    } 
-	}
+        { if (in_front)
+            {
+              istring = another.istring + istring;
+              ostring = another.ostring + ostring;
+              weight = weight + another.weight;
+              return *this;
+            }
+          else 
+            {
+              istring = istring + another.istring;
+              ostring = ostring + another.ostring;
+              weight = weight + another.weight;
+              return *this;
+            } 
+        }
       void operator=(const WeightedPath &another)
-	{ if (this == &another) { return; }
-	  this->istring = another.istring;
-	  this->ostring = another.ostring;
-	  this->weight = another.weight; }
+        { if (this == &another) { return; }
+          this->istring = another.istring;
+          this->ostring = another.ostring;
+          this->weight = another.weight; }
     };
 
   /** \brief A class for storing weighted string pairs that represent 
@@ -142,25 +142,25 @@ namespace hfst {
 
       static void add(Vector &v,WeightedPath<W> &s)
       {
-	for (typename Vector::iterator it = v.begin(); it != v.end(); ++it)
-	  { it->add(s,false); }
+        for (typename Vector::iterator it = v.begin(); it != v.end(); ++it)
+          { it->add(s,false); }
       }
 
       static void add(WeightedPath<W> &s,Vector &v)
       {
-	for (typename Vector::iterator it = v.begin(); it != v.end(); ++it)
-	  { it->add(s); }
+        for (typename Vector::iterator it = v.begin(); it != v.end(); ++it)
+          { it->add(s); }
       }
 
       static void cat(Vector &v, const Vector &another_v)
       {
-	v.insert(v.end(),another_v.begin(),another_v.end());
+        v.insert(v.end(),another_v.begin(),another_v.end());
       }
       
       static void reverse_strings(Vector &v)
       {
-	for (typename Vector::iterator it = v.begin(); it != v.end(); ++it)
-	  { it->reverse(); }
+        for (typename Vector::iterator it = v.begin(); it != v.end(); ++it)
+          { it->reverse(); }
       }
     };
     

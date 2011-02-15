@@ -33,7 +33,8 @@ namespace hfst { namespace implementations
     i_stream(),input_stream(cin)
   {}
   LogWeightInputStream::LogWeightInputStream(const std::string &filename_):
-    filename(std::string(filename_)),i_stream(filename.c_str()),input_stream(i_stream)
+    filename(std::string(filename_)),i_stream(filename.c_str()),
+    input_stream(i_stream)
   {}
 
   char LogWeightInputStream::stream_get() {
@@ -67,8 +68,9 @@ namespace hfst { namespace implementations
   {
     assert(t->InputSymbols() != NULL);
     StringSet s;
-    for ( fst::SymbolTableIterator it = fst::SymbolTableIterator(*(t->InputSymbols()));
-	  not it.Done(); it.Next() ) {
+    for ( fst::SymbolTableIterator it 
+	    = fst::SymbolTableIterator(*(t->InputSymbols()));
+          not it.Done(); it.Next() ) {
       s.insert( std::string(it.Symbol()) );
     }
     return s;
@@ -83,10 +85,10 @@ namespace hfst { namespace implementations
     NumberNumberMap km;
     // find the number-to-number mappings for transducer t1
     for ( fst::SymbolTableIterator it 
-	    = fst::SymbolTableIterator(*(t1->InputSymbols()));
-	  not it.Done(); it.Next() ) {    
+            = fst::SymbolTableIterator(*(t1->InputSymbols()));
+          not it.Done(); it.Next() ) {    
       km [ (unsigned int)it.Value() ] 
-	= (unsigned int) t2->InputSymbols()->Find( it.Symbol() );
+        = (unsigned int) t2->InputSymbols()->Find( it.Symbol() );
     }
     return km;
   }
@@ -96,20 +98,20 @@ namespace hfst { namespace implementations
     (LogFst *t, NumberNumberMap &km) 
   {
     for (fst::StateIterator<LogFst> siter(*t); 
-	 not siter.Done(); siter.Next())
+         not siter.Done(); siter.Next())
       {
-	StateId s = siter.Value();
-	for (fst::MutableArcIterator<LogFst> aiter(t,s); 
-	     !aiter.Done(); aiter.Next())
-	  {
-	    const LogArc &arc = aiter.Value();
-	    LogArc new_arc;
-	    new_arc.ilabel = km[arc.ilabel];
-	    new_arc.olabel = km[arc.olabel];
-	    new_arc.weight = arc.weight;
-	    new_arc.nextstate = arc.nextstate;
-	    aiter.SetValue(new_arc);
-	  }
+        StateId s = siter.Value();
+        for (fst::MutableArcIterator<LogFst> aiter(t,s); 
+             !aiter.Done(); aiter.Next())
+          {
+            const LogArc &arc = aiter.Value();
+            LogArc new_arc;
+            new_arc.ilabel = km[arc.ilabel];
+            new_arc.olabel = km[arc.olabel];
+            new_arc.weight = arc.weight;
+            new_arc.nextstate = arc.nextstate;
+            aiter.SetValue(new_arc);
+          }
       }
     return;
   }
@@ -117,11 +119,11 @@ namespace hfst { namespace implementations
   LogFst * LogWeightTransducer::set_final_weights(LogFst * t, float weight)
   {
     for (fst::StateIterator<LogFst> siter(*t); 
-	 not siter.Done(); siter.Next())
+         not siter.Done(); siter.Next())
       {
-	StateId s = siter.Value();
-	if ( t->Final(s) != LogWeight::Zero() )
-	  t->SetFinal(s, weight);
+        StateId s = siter.Value();
+        if ( t->Final(s) != LogWeight::Zero() )
+          t->SetFinal(s, weight);
       }
     return t;
   }
@@ -142,22 +144,22 @@ namespace hfst { namespace implementations
     (LogFst * t,float (*func)(float f))
   {
     for (fst::StateIterator<LogFst> siter(*t); 
-	 not siter.Done(); siter.Next())
+         not siter.Done(); siter.Next())
       {
-	StateId s = siter.Value();
-	if ( t->Final(s) != LogWeight::Zero() )
-	  t->SetFinal( s, func(t->Final(s).Value()) );
-	for (fst::MutableArcIterator<LogFst> aiter(t,s); 
-	     !aiter.Done(); aiter.Next())
-	  {
-	    const LogArc &arc = aiter.Value();
-	    LogArc new_arc;
-	    new_arc.ilabel = arc.ilabel;
-	    new_arc.olabel = arc.olabel;
-	    new_arc.weight = func(arc.weight.Value());
-	    new_arc.nextstate = arc.nextstate;
-	    aiter.SetValue(new_arc);
-	  }
+        StateId s = siter.Value();
+        if ( t->Final(s) != LogWeight::Zero() )
+          t->SetFinal( s, func(t->Final(s).Value()) );
+        for (fst::MutableArcIterator<LogFst> aiter(t,s); 
+             !aiter.Done(); aiter.Next())
+          {
+            const LogArc &arc = aiter.Value();
+            LogArc new_arc;
+            new_arc.ilabel = arc.ilabel;
+            new_arc.olabel = arc.olabel;
+            new_arc.weight = func(arc.weight.Value());
+            new_arc.nextstate = arc.nextstate;
+            aiter.SetValue(new_arc);
+          }
       }
     return t;
   }
@@ -179,69 +181,69 @@ namespace hfst { namespace implementations
     }
       
     for (fst::StateIterator<LogFst> siter(*t); 
-	 not siter.Done(); siter.Next()) 
+         not siter.Done(); siter.Next()) 
       {
-	StateId s = siter.Value();
-	if (s == initial_state) {
-	int origin;  // how origin state is printed, see the first comment
-	if (s == 0)
-	  origin = zero_print;
-	else if (s == initial_state)
-	  origin = 0;
-	else
-	  origin = (int)s;
-	for (fst::ArcIterator<LogFst> aiter(*t,s); !aiter.Done(); aiter.Next())
-	  {
-	    const LogArc &arc = aiter.Value();
-	    int target;  // how target state is printed, see the first comment
-	    if (arc.nextstate == 0)
-	      target = zero_print;
-	    else if (arc.nextstate == initial_state)
-	      target = 0;
-	    else
-	      target = (int)arc.nextstate;
-	    fprintf(ofile, "%i\t%i\t%s\t%s\t%f\n", origin, target,
-		    sym->Find(arc.ilabel).c_str(), 
-		    sym->Find(arc.olabel).c_str(),
-		    arc.weight.Value());
-	  }
-	if (t->Final(s) != LogWeight::Zero())
-	  fprintf(ofile, "%i\t%f\n", origin, t->Final(s).Value());
-	break;
-	}
+        StateId s = siter.Value();
+        if (s == initial_state) {
+        int origin;  // how origin state is printed, see the first comment
+        if (s == 0)
+          origin = zero_print;
+        else if (s == initial_state)
+          origin = 0;
+        else
+          origin = (int)s;
+        for (fst::ArcIterator<LogFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+          {
+            const LogArc &arc = aiter.Value();
+            int target;  // how target state is printed, see the first comment
+            if (arc.nextstate == 0)
+              target = zero_print;
+            else if (arc.nextstate == initial_state)
+              target = 0;
+            else
+              target = (int)arc.nextstate;
+            fprintf(ofile, "%i\t%i\t%s\t%s\t%f\n", origin, target,
+                    sym->Find(arc.ilabel).c_str(), 
+                    sym->Find(arc.olabel).c_str(),
+                    arc.weight.Value());
+          }
+        if (t->Final(s) != LogWeight::Zero())
+          fprintf(ofile, "%i\t%f\n", origin, t->Final(s).Value());
+        break;
+        }
       }
 
     for (fst::StateIterator<LogFst> siter(*t); 
-	 not siter.Done(); siter.Next())
+         not siter.Done(); siter.Next())
       {
-	StateId s = siter.Value();
-	if (s != initial_state) {
-	  int origin;  // how origin state is printed, see the first comment
-	  if (s == 0)
-	    origin = zero_print;
-	  else if (s == initial_state)
-	    origin = 0;
-	  else
-	    origin = (int)s;
-	  for (fst::ArcIterator<LogFst> aiter(*t,s); 
-	       !aiter.Done(); aiter.Next())
-	    {
-	      const LogArc &arc = aiter.Value();
-	      int target;  // how target state is printed, see the first comment
-	      if (arc.nextstate == 0)
-		target = zero_print;
-	      else if (arc.nextstate == initial_state)
-		target = 0;
-	      else
-		target = (int)arc.nextstate;
-	      fprintf(ofile, "%i\t%i\t%s\t%s\t%f\n", origin, target,
-		      sym->Find(arc.ilabel).c_str(), 
-		      sym->Find(arc.olabel).c_str(),
-		      arc.weight.Value());
-	    }
-	  if (t->Final(s) != LogWeight::Zero())
-	    fprintf(ofile, "%i\t%f\n", origin, t->Final(s).Value());
-	}
+        StateId s = siter.Value();
+        if (s != initial_state) {
+          int origin;  // how origin state is printed, see the first comment
+          if (s == 0)
+            origin = zero_print;
+          else if (s == initial_state)
+            origin = 0;
+          else
+            origin = (int)s;
+          for (fst::ArcIterator<LogFst> aiter(*t,s); 
+               !aiter.Done(); aiter.Next())
+            {
+              const LogArc &arc = aiter.Value();
+              int target;  // how target state is printed, see the first comment
+              if (arc.nextstate == 0)
+                target = zero_print;
+              else if (arc.nextstate == initial_state)
+                target = 0;
+              else
+                target = (int)arc.nextstate;
+              fprintf(ofile, "%i\t%i\t%s\t%s\t%f\n", origin, target,
+                      sym->Find(arc.ilabel).c_str(), 
+                      sym->Find(arc.olabel).c_str(),
+                      arc.weight.Value());
+            }
+          if (t->Final(s) != LogWeight::Zero())
+            fprintf(ofile, "%i\t%f\n", origin, t->Final(s).Value());
+        }
       }
   }
 
@@ -260,67 +262,67 @@ namespace hfst { namespace implementations
     }
       
     for (fst::StateIterator<LogFst> siter(*t); 
-	 not siter.Done(); siter.Next()) 
+         not siter.Done(); siter.Next()) 
       {
-	StateId s = siter.Value();
-	if (s == initial_state) {
-	int origin;  // how origin state is printed, see the first comment
-	if (s == 0)
-	  origin = zero_print;
-	else if (s == initial_state)
-	  origin = 0;
-	else
-	  origin = (int)s;
-	for (fst::ArcIterator<LogFst> aiter(*t,s); !aiter.Done(); aiter.Next())
-	  {
-	    const LogArc &arc = aiter.Value();
-	    int target;  // how target state is printed, see the first comment
-	    if (arc.nextstate == 0)
-	      target = zero_print;
-	    else if (arc.nextstate == initial_state)
-	      target = 0;
-	    else
-	      target = (int)arc.nextstate;
-	    fprintf(ofile, "%i\t%i\t\\%i\t\\%i\t%f\n", origin, target,
-		    arc.ilabel, arc.olabel,
-		    arc.weight.Value());
-	  }
-	if (t->Final(s) != LogWeight::Zero())
-	  fprintf(ofile, "%i\t%f\n", origin, t->Final(s).Value());
-	break;
-	}
+        StateId s = siter.Value();
+        if (s == initial_state) {
+        int origin;  // how origin state is printed, see the first comment
+        if (s == 0)
+          origin = zero_print;
+        else if (s == initial_state)
+          origin = 0;
+        else
+          origin = (int)s;
+        for (fst::ArcIterator<LogFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+          {
+            const LogArc &arc = aiter.Value();
+            int target;  // how target state is printed, see the first comment
+            if (arc.nextstate == 0)
+              target = zero_print;
+            else if (arc.nextstate == initial_state)
+              target = 0;
+            else
+              target = (int)arc.nextstate;
+            fprintf(ofile, "%i\t%i\t\\%i\t\\%i\t%f\n", origin, target,
+                    arc.ilabel, arc.olabel,
+                    arc.weight.Value());
+          }
+        if (t->Final(s) != LogWeight::Zero())
+          fprintf(ofile, "%i\t%f\n", origin, t->Final(s).Value());
+        break;
+        }
       }
 
     for (fst::StateIterator<LogFst> siter(*t); 
-	 not siter.Done(); siter.Next())
+         not siter.Done(); siter.Next())
       {
-	StateId s = siter.Value();
-	if (s != initial_state) {
-	  int origin;  // how origin state is printed, see the first comment
-	  if (s == 0)
-	    origin = zero_print;
-	  else if (s == initial_state)
-	    origin = 0;
-	  else
-	    origin = (int)s;
-	  for (fst::ArcIterator<LogFst> aiter(*t,s); 
-	       !aiter.Done(); aiter.Next())
-	    {
-	      const LogArc &arc = aiter.Value();
-	      int target;  // how target state is printed, see the first comment
-	      if (arc.nextstate == 0)
-		target = zero_print;
-	      else if (arc.nextstate == initial_state)
-		target = 0;
-	      else
-		target = (int)arc.nextstate;
-	      fprintf(ofile, "%i\t%i\t\\%i\t\\%i\t%f\n", origin, target,
-		      arc.ilabel, arc.olabel,
-		      arc.weight.Value());
-	    }
-	  if (t->Final(s) != LogWeight::Zero())
-	    fprintf(ofile, "%i\t%f\n", origin, t->Final(s).Value());
-	}
+        StateId s = siter.Value();
+        if (s != initial_state) {
+          int origin;  // how origin state is printed, see the first comment
+          if (s == 0)
+            origin = zero_print;
+          else if (s == initial_state)
+            origin = 0;
+          else
+            origin = (int)s;
+          for (fst::ArcIterator<LogFst> aiter(*t,s); 
+               !aiter.Done(); aiter.Next())
+            {
+              const LogArc &arc = aiter.Value();
+              int target;  // how target state is printed, see the first comment
+              if (arc.nextstate == 0)
+                target = zero_print;
+              else if (arc.nextstate == initial_state)
+                target = 0;
+              else
+                target = (int)arc.nextstate;
+              fprintf(ofile, "%i\t%i\t\\%i\t\\%i\t%f\n", origin, target,
+                      arc.ilabel, arc.olabel,
+                      arc.weight.Value());
+            }
+          if (t->Final(s) != LogWeight::Zero())
+            fprintf(ofile, "%i\t%f\n", origin, t->Final(s).Value());
+        }
       }
   }
 
@@ -342,73 +344,73 @@ namespace hfst { namespace implementations
     }
       
     for (fst::StateIterator<LogFst> siter(*t); 
-	 not siter.Done(); siter.Next()) 
+         not siter.Done(); siter.Next()) 
       {
-	StateId s = siter.Value();
-	if (s == initial_state) {
-	int origin;  // how origin state is printed, see the first comment
-	if (s == 0)
-	  origin = zero_print;
-	else if (s == initial_state)
-	  origin = 0;
-	else
-	  origin = (int)s;
-	for (fst::ArcIterator<LogFst> aiter(*t,s); !aiter.Done(); aiter.Next())
-	  {
-	    const LogArc &arc = aiter.Value();
-	    int target;  // how target state is printed, see the first comment
-	    if (arc.nextstate == 0)
-	      target = zero_print;
-	    else if (arc.nextstate == initial_state)
-	      target = 0;
-	    else
-	      target = (int)arc.nextstate;
-	    os << origin << "\t" 
-	       << target << "\t" 
-	       << sym->Find(arc.ilabel).c_str() << "\t"
-	       << sym->Find(arc.olabel).c_str() << "\t" 
-	       << arc.weight.Value() << "\n";
-	  }
-	if (t->Final(s) != LogWeight::Zero())
-	  os << origin << "\t"
-	     << t->Final(s).Value() << "\n";
-	break;
-	}
+        StateId s = siter.Value();
+        if (s == initial_state) {
+        int origin;  // how origin state is printed, see the first comment
+        if (s == 0)
+          origin = zero_print;
+        else if (s == initial_state)
+          origin = 0;
+        else
+          origin = (int)s;
+        for (fst::ArcIterator<LogFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+          {
+            const LogArc &arc = aiter.Value();
+            int target;  // how target state is printed, see the first comment
+            if (arc.nextstate == 0)
+              target = zero_print;
+            else if (arc.nextstate == initial_state)
+              target = 0;
+            else
+              target = (int)arc.nextstate;
+            os << origin << "\t" 
+               << target << "\t" 
+               << sym->Find(arc.ilabel).c_str() << "\t"
+               << sym->Find(arc.olabel).c_str() << "\t" 
+               << arc.weight.Value() << "\n";
+          }
+        if (t->Final(s) != LogWeight::Zero())
+          os << origin << "\t"
+             << t->Final(s).Value() << "\n";
+        break;
+        }
       }
 
     for (fst::StateIterator<LogFst> siter(*t); 
-	 not siter.Done(); siter.Next())
+         not siter.Done(); siter.Next())
       {
-	StateId s = siter.Value();
-	if (s != initial_state) {
-	  int origin;  // how origin state is printed, see the first comment
-	  if (s == 0)
-	    origin = zero_print;
-	  else if (s == initial_state)
-	    origin = 0;
-	  else
-	    origin = (int)s;
-	  for (fst::ArcIterator<LogFst> aiter(*t,s); 
-	       !aiter.Done(); aiter.Next())
-	    {
-	      const LogArc &arc = aiter.Value();
-	      int target;  // how target state is printed, see the first comment
-	      if (arc.nextstate == 0)
-		target = zero_print;
-	      else if (arc.nextstate == initial_state)
-		target = 0;
-	      else
-		target = (int)arc.nextstate;
-	      os << origin << "\t" 
-		 << target << "\t"
-		 << sym->Find(arc.ilabel).c_str() << "\t"
-		 << sym->Find(arc.olabel).c_str() << "\t"
-		 << arc.weight.Value() << "\n";
-	    }
-	  if (t->Final(s) != LogWeight::Zero())
-	    os << origin << "\t"
-	       << t->Final(s).Value() << "\n";
-	}
+        StateId s = siter.Value();
+        if (s != initial_state) {
+          int origin;  // how origin state is printed, see the first comment
+          if (s == 0)
+            origin = zero_print;
+          else if (s == initial_state)
+            origin = 0;
+          else
+            origin = (int)s;
+          for (fst::ArcIterator<LogFst> aiter(*t,s); 
+               !aiter.Done(); aiter.Next())
+            {
+              const LogArc &arc = aiter.Value();
+              int target;  // how target state is printed, see the first comment
+              if (arc.nextstate == 0)
+                target = zero_print;
+              else if (arc.nextstate == initial_state)
+                target = 0;
+              else
+                target = (int)arc.nextstate;
+              os << origin << "\t" 
+                 << target << "\t"
+                 << sym->Find(arc.ilabel).c_str() << "\t"
+                 << sym->Find(arc.olabel).c_str() << "\t"
+                 << arc.weight.Value() << "\n";
+            }
+          if (t->Final(s) != LogWeight::Zero())
+            os << origin << "\t"
+               << t->Final(s).Value() << "\n";
+        }
       }
   }
 
@@ -427,73 +429,73 @@ namespace hfst { namespace implementations
     }
       
     for (fst::StateIterator<LogFst> siter(*t); 
-	 not siter.Done(); siter.Next()) 
+         not siter.Done(); siter.Next()) 
       {
-	StateId s = siter.Value();
-	if (s == initial_state) {
-	int origin;  // how origin state is printed, see the first comment
-	if (s == 0)
-	  origin = zero_print;
-	else if (s == initial_state)
-	  origin = 0;
-	else
-	  origin = (int)s;
-	for (fst::ArcIterator<LogFst> aiter(*t,s); !aiter.Done(); aiter.Next())
-	  {
-	    const LogArc &arc = aiter.Value();
-	    int target;  // how target state is printed, see the first comment
-	    if (arc.nextstate == 0)
-	      target = zero_print;
-	    else if (arc.nextstate == initial_state)
-	      target = 0;
-	    else
-	      target = (int)arc.nextstate;
-	    os << origin << "\t" 
-	       << target << "\t" 
-	       << "\\" << arc.ilabel << "\t"
-	       << "\\" << arc.olabel << "\t" 
-	       << arc.weight.Value() << "\n";
-	  }
-	if (t->Final(s) != LogWeight::Zero())
-	  os << origin << "\t"
-	     << t->Final(s).Value() << "\n";
-	break;
-	}
+        StateId s = siter.Value();
+        if (s == initial_state) {
+        int origin;  // how origin state is printed, see the first comment
+        if (s == 0)
+          origin = zero_print;
+        else if (s == initial_state)
+          origin = 0;
+        else
+          origin = (int)s;
+        for (fst::ArcIterator<LogFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+          {
+            const LogArc &arc = aiter.Value();
+            int target;  // how target state is printed, see the first comment
+            if (arc.nextstate == 0)
+              target = zero_print;
+            else if (arc.nextstate == initial_state)
+              target = 0;
+            else
+              target = (int)arc.nextstate;
+            os << origin << "\t" 
+               << target << "\t" 
+               << "\\" << arc.ilabel << "\t"
+               << "\\" << arc.olabel << "\t" 
+               << arc.weight.Value() << "\n";
+          }
+        if (t->Final(s) != LogWeight::Zero())
+          os << origin << "\t"
+             << t->Final(s).Value() << "\n";
+        break;
+        }
       }
 
     for (fst::StateIterator<LogFst> siter(*t); 
-	 not siter.Done(); siter.Next())
+         not siter.Done(); siter.Next())
       {
-	StateId s = siter.Value();
-	if (s != initial_state) {
-	  int origin;  // how origin state is printed, see the first comment
-	  if (s == 0)
-	    origin = zero_print;
-	  else if (s == initial_state)
-	    origin = 0;
-	  else
-	    origin = (int)s;
-	  for (fst::ArcIterator<LogFst> aiter(*t,s); 
-	       !aiter.Done(); aiter.Next())
-	    {
-	      const LogArc &arc = aiter.Value();
-	      int target;  // how target state is printed, see the first comment
-	      if (arc.nextstate == 0)
-		target = zero_print;
-	      else if (arc.nextstate == initial_state)
-		target = 0;
-	      else
-		target = (int)arc.nextstate;
-	      os << origin << "\t" 
-		 << target << "\t"
-		 << "\\" << arc.ilabel << "\t"
-		 << "\\" << arc.olabel << "\t"
-		 << arc.weight.Value() << "\n";
-	    }
-	  if (t->Final(s) != LogWeight::Zero())
-	    os << origin << "\t"
-	       << t->Final(s).Value() << "\n";
-	}
+        StateId s = siter.Value();
+        if (s != initial_state) {
+          int origin;  // how origin state is printed, see the first comment
+          if (s == 0)
+            origin = zero_print;
+          else if (s == initial_state)
+            origin = 0;
+          else
+            origin = (int)s;
+          for (fst::ArcIterator<LogFst> aiter(*t,s); 
+               !aiter.Done(); aiter.Next())
+            {
+              const LogArc &arc = aiter.Value();
+              int target;  // how target state is printed, see the first comment
+              if (arc.nextstate == 0)
+                target = zero_print;
+              else if (arc.nextstate == initial_state)
+                target = 0;
+              else
+                target = (int)arc.nextstate;
+              os << origin << "\t" 
+                 << target << "\t"
+                 << "\\" << arc.ilabel << "\t"
+                 << "\\" << arc.olabel << "\t"
+                 << arc.weight.Value() << "\n";
+            }
+          if (t->Final(s) != LogWeight::Zero())
+            os << origin << "\t"
+               << t->Final(s).Value() << "\n";
+        }
       }
   }
   
@@ -536,50 +538,50 @@ namespace hfst { namespace implementations
 
     while ( fgets(line, 255, ifile) != NULL ) 
       {
-	if (*line == '-') // transducer separator
-	  return t;
-	//printf("read line: %s", line);
-	char a1 [100]; char a2 [100]; char a3 [100]; 
-	char a4 [100]; char a5 [100];
-	int n = sscanf(line, "%s\t%s\t%s\t%s\t%s", a1, a2, a3, a4, a5);
-	//printf("number of arguments: (%i)\n", n);
+        if (*line == '-') // transducer separator
+          return t;
+        //printf("read line: %s", line);
+        char a1 [100]; char a2 [100]; char a3 [100]; 
+        char a4 [100]; char a5 [100];
+        int n = sscanf(line, "%s\t%s\t%s\t%s\t%s", a1, a2, a3, a4, a5);
+        //printf("number of arguments: (%i)\n", n);
 
-	// set value of weight
-	float weight = 0;
-	if (n == 2)
-	  weight = atof(a2);
-	if (n == 5)
-	  weight = atof(a5);
+        // set value of weight
+        float weight = 0;
+        if (n == 2)
+          weight = atof(a2);
+        if (n == 5)
+          weight = atof(a5);
 
-	if (n == 1 || n == 2)  // final state line
-	  {
-	    int final_number = atoi(a1);
-	    StateId final_state = add_and_map_state(t, final_number, state_map);
-	    t->SetFinal(final_state, weight);
-	  }
+        if (n == 1 || n == 2)  // final state line
+          {
+            int final_number = atoi(a1);
+            StateId final_state = add_and_map_state(t, final_number, state_map);
+            t->SetFinal(final_state, weight);
+          }
 
-	else if (n == 4 || n == 5)  // transition line
-	  {
-	    int origin_number = atoi(a1);
-	    int target_number = atoi(a2);
-	    StateId origin_state 
-	      = add_and_map_state(t, origin_number, state_map);
-	    StateId target_state 
-	      = add_and_map_state(t, target_number, state_map);
+        else if (n == 4 || n == 5)  // transition line
+          {
+            int origin_number = atoi(a1);
+            int target_number = atoi(a2);
+            StateId origin_state 
+              = add_and_map_state(t, origin_number, state_map);
+            StateId target_state 
+              = add_and_map_state(t, target_number, state_map);
 
-	    int input_number = st.AddSymbol(std::string(a3));
-	    int output_number = st.AddSymbol(std::string(a4));
+            int input_number = st.AddSymbol(std::string(a3));
+            int output_number = st.AddSymbol(std::string(a4));
 
-	    t->AddArc(origin_state, 
-		      LogArc(input_number, output_number, 
-			     weight, target_state));
-	  }
+            t->AddArc(origin_state, 
+                      LogArc(input_number, output_number, 
+                             weight, target_state));
+          }
 
-	else  // line could not be parsed
-	  {
-	    printf("ERROR: in AT&T file: line: \"%s\"\n", line);
-	    throw NotValidAttFormatException();
-	  }
+        else  // line could not be parsed
+          {
+            printf("ERROR: in AT&T file: line: \"%s\"\n", line);
+            throw NotValidAttFormatException();
+          }
 
       }
 
@@ -588,98 +590,120 @@ namespace hfst { namespace implementations
   }
 
   /* 
-     Create a copy of this transducer where all transitions of type "?:?", "?:x" and "x:?"
-     are expanded according to the StringSymbolSet 'unknown' that lists all symbols previously
+     Create a copy of this transducer where all transitions of type 
+     "?:?", "?:x" and "x:?"
+     are expanded according to the StringSymbolSet 'unknown' that lists 
+     all symbols previously
      unknown to this transducer.
   */
   LogFst * LogWeightTransducer::expand_arcs(LogFst * t, StringSet &unknown,
-						       bool unknown_symbols_in_use)
+					    bool unknown_symbols_in_use)
   {
 
     LogFst * result = new LogFst();
 
     for (fst::StateIterator<LogFst> siter(*t); 
-	 not siter.Done(); siter.Next())
+         not siter.Done(); siter.Next())
       result->AddState();
 
     // go through all states in this
     for (fst::StateIterator<LogFst> siter(*t); 
-	 not siter.Done(); siter.Next())
+         not siter.Done(); siter.Next())
       {
-	// create new state in result, if needed
-	StateId s = siter.Value();
-	StateId result_s=s;
+        // create new state in result, if needed
+        StateId s = siter.Value();
+        StateId result_s=s;
 
-	// make the new state initial, if needed
-	if (t->Start() == s)
-	  result->SetStart(result_s);
+        // make the new state initial, if needed
+        if (t->Start() == s)
+          result->SetStart(result_s);
 
-	// make the new state final, if needed
-	if (t->Final(s) != LogWeight::Zero())
-	  result->SetFinal(result_s, t->Final(s).Value());
+        // make the new state final, if needed
+        if (t->Final(s) != LogWeight::Zero())
+          result->SetFinal(result_s, t->Final(s).Value());
 
 
-	// go through all the arcs in this
-	for (fst::ArcIterator<LogFst> aiter(*t,s); !aiter.Done(); aiter.Next())
-	  {
-	    const LogArc &arc = aiter.Value();
+        // go through all the arcs in this
+        for (fst::ArcIterator<LogFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+          {
+            const LogArc &arc = aiter.Value();
 
-	    // find the corresponding target state in result or, if not found, create a new state
-	    StateId result_nextstate=arc.nextstate;
+            // find the corresponding target state in result or, 
+	    // if not found, create a new state
+            StateId result_nextstate=arc.nextstate;
 
-	    // expand the transitions, if needed
+            // expand the transitions, if needed
 
-	    if (unknown_symbols_in_use) {
+            if (unknown_symbols_in_use) {
 
-	    const fst::SymbolTable *is = t->InputSymbols(); 
+            const fst::SymbolTable *is = t->InputSymbols(); 
 
-	    if ( arc.ilabel == 1 &&       // cross-product "?:?"
-		 arc.olabel == 1 )
-	      {
-		for (StringSet::iterator it1 = unknown.begin(); it1 != unknown.end(); it1++) 
-		  {
-		    int64 inumber = is->Find(*it1);
-		    for (StringSet::iterator it2 = unknown.begin(); it2 != unknown.end(); it2++) 
-		      {
-			int64 onumber = is->Find(*it2);
-			if (inumber != onumber)
-			  result->AddArc(result_s, LogArc(inumber, onumber, arc.weight, result_nextstate));
-		      }
-		    result->AddArc(result_s, LogArc(inumber, 1, arc.weight, result_nextstate));
-		    result->AddArc(result_s, LogArc(1, inumber, arc.weight, result_nextstate));
-		  }
-	      }
-	    else if (arc.ilabel == 2 &&   // identity "?:?"
-		     arc.olabel == 2 )       
-	      {
-		for (StringSet::iterator it = unknown.begin(); it != unknown.end(); it++) 
-		  {
-		    int64 number = is->Find(*it);
-		    result->AddArc(result_s, LogArc(number, number, arc.weight, result_nextstate));
-		  }
-	      }
-	    else if (arc.ilabel == 1)  // "?:x"
-	      {
-		for (StringSet::iterator it = unknown.begin(); it != unknown.end(); it++) 
-		  {
-		    int64 number = is->Find(*it);
-		    result->AddArc(result_s, LogArc(number, arc.olabel, arc.weight, result_nextstate));
-		  }
-	      }
-	    else if (arc.olabel == 1)  // "x:?"
-	      {
-		for (StringSet::iterator it = unknown.begin(); it != unknown.end(); it++) 
-		  {
-		    int64 number = is->Find(*it);
-		    result->AddArc(result_s, LogArc(arc.ilabel, number, arc.weight, result_nextstate));
-		  }
-	      }
-	    }
+            if ( arc.ilabel == 1 &&       // cross-product "?:?"
+                 arc.olabel == 1 )
+              {
+                for (StringSet::iterator it1 = unknown.begin(); 
+		     it1 != unknown.end(); it1++) 
+                  {
+                    int64 inumber = is->Find(*it1);
+                    for (StringSet::iterator it2 = unknown.begin(); 
+			 it2 != unknown.end(); it2++) 
+                      {
+                        int64 onumber = is->Find(*it2);
+                        if (inumber != onumber)
+                          result->AddArc(result_s, 
+					 LogArc(inumber, onumber, 
+						arc.weight, result_nextstate));
+                      }
+                    result->AddArc(result_s, 
+				   LogArc(inumber, 1, arc.weight, 
+					  result_nextstate));
+                    result->AddArc(result_s, 
+				   LogArc(1, inumber, arc.weight, 
+					  result_nextstate));
+                  }
+              }
+            else if (arc.ilabel == 2 &&   // identity "?:?"
+                     arc.olabel == 2 )       
+              {
+                for (StringSet::iterator it = unknown.begin(); 
+		     it != unknown.end(); it++) 
+                  {
+                    int64 number = is->Find(*it);
+                    result->AddArc(result_s, 
+				   LogArc(number, number, arc.weight, 
+					  result_nextstate));
+                  }
+              }
+            else if (arc.ilabel == 1)  // "?:x"
+              {
+                for (StringSet::iterator it = unknown.begin(); 
+		     it != unknown.end(); it++) 
+                  {
+                    int64 number = is->Find(*it);
+                    result->AddArc(result_s, 
+				   LogArc(number, arc.olabel, arc.weight,
+					  result_nextstate));
+                  }
+              }
+            else if (arc.olabel == 1)  // "x:?"
+              {
+                for (StringSet::iterator it = unknown.begin(); 
+		     it != unknown.end(); it++) 
+                  {
+                    int64 number = is->Find(*it);
+                    result->AddArc(result_s, 
+				   LogArc(arc.ilabel, number, 
+					  arc.weight, result_nextstate));
+                  }
+              }
+            }
 
-	    // the original transition is copied in all cases
-	    result->AddArc(result_s, LogArc(arc.ilabel, arc.olabel, arc.weight, result_nextstate));		
-	    
-	  }
+            // the original transition is copied in all cases
+            result->AddArc(result_s, 
+			   LogArc(arc.ilabel, arc.olabel, 
+				  arc.weight, result_nextstate));
+            
+          }
       }
 
     //result->SetInputSymbols(t->InputSymbols());
@@ -690,7 +714,7 @@ namespace hfst { namespace implementations
   {
     unsigned int retval=0;
     for (fst::StateIterator<LogFst> siter(*t); 
-	 not siter.Done(); siter.Next())
+         not siter.Done(); siter.Next())
       retval++;
     return retval;
   }
@@ -708,14 +732,15 @@ namespace hfst { namespace implementations
     StringSet t1_symbols = get_alphabet(t1);
     StringSet t2_symbols = get_alphabet(t2);
     collect_unknown_sets(t1_symbols, unknown_t1,
-			 t2_symbols, unknown_t2);
+                         t2_symbols, unknown_t2);
     
-    // 2. Add new symbols from transducer t1 to the symbol table of transducer t2...
+    // 2. Add new symbols from transducer t1 to the symbol table 
+    //    of transducer t2...
 
     SymbolTable * st2 = t2->InputSymbols()->Copy();
     for ( StringSet::const_iterator it = unknown_t2.begin();
-	  it != unknown_t2.end(); it++ ) {
-	st2->AddSymbol(*it);
+          it != unknown_t2.end(); it++ ) {
+        st2->AddSymbol(*it);
     }
     t2->SetInputSymbols(st2);
 
@@ -839,31 +864,31 @@ namespace hfst { namespace implementations
     FstHeader header;
     try 
       {
-	if (filename == string())
-	  {
-	    header.Read(input_stream,"STDIN");			    
-	    t = static_cast<LogFst*>
-	      (LogFst::Read(input_stream,
-				  FstReadOptions("STDIN",
-						 &header)));
-	  }
-	else
-	  {
-	    header.Read(input_stream,filename);			    
-	    t = static_cast<LogFst*>
-	      (LogFst::Read(input_stream,
-				  FstReadOptions(filename,
-						 &header)));
-	  }
-	if (t == NULL)
-	  { throw TransducerHasWrongTypeException(); }
+        if (filename == string())
+          {
+            header.Read(input_stream,"STDIN");                            
+            t = static_cast<LogFst*>
+              (LogFst::Read(input_stream,
+                                  FstReadOptions("STDIN",
+                                                 &header)));
+          }
+        else
+          {
+            header.Read(input_stream,filename);                            
+            t = static_cast<LogFst*>
+              (LogFst::Read(input_stream,
+                                  FstReadOptions(filename,
+                                                 &header)));
+          }
+        if (t == NULL)
+          { throw TransducerHasWrongTypeException(); }
       }
     catch (TransducerHasWrongTypeException e)
       { throw e; }
 
     try
       {
-	return t;
+        return t;
       }
     catch (HfstInterfaceException e)
       { throw e; }
@@ -923,7 +948,8 @@ namespace hfst { namespace implementations
 
 
 
-  LogWeightTransitionIterator::LogWeightTransitionIterator(LogFst *t, StateId state):
+  LogWeightTransitionIterator::LogWeightTransitionIterator
+  (LogFst *t, StateId state):
     arc_iterator(new ArcIterator<LogFst>(*t, state)),
     t(t)
   {}
@@ -1014,7 +1040,7 @@ namespace hfst { namespace implementations
     t->SetStart(s1);
     t->SetFinal(s2,0);
     t->AddArc(s1,LogArc(st.AddSymbol(symbol),
-			st.AddSymbol(symbol),0,s2));
+                        st.AddSymbol(symbol),0,s2));
     t->SetInputSymbols(&st);
     return t;
   }
@@ -1030,7 +1056,7 @@ namespace hfst { namespace implementations
     t->SetStart(s1);
     t->SetFinal(s2,0);
     t->AddArc(s1,LogArc(st.AddSymbol(isymbol),
-			st.AddSymbol(osymbol),0,s2));
+                        st.AddSymbol(osymbol),0,s2));
     t->SetInputSymbols(&st);
     return t;
   }
@@ -1066,12 +1092,13 @@ namespace hfst { namespace implementations
     StateId s1 = t->AddState();
     t->SetStart(s1);
     for (StringPairVector::const_iterator it = spv.begin();
-	 it != spv.end();
-	 ++it)
+         it != spv.end();
+         ++it)
       {
-	StateId s2 = t->AddState();
-	t->AddArc(s1,LogArc(st.AddSymbol(it->first),st.AddSymbol(it->second),0,s2));
-	s1 = s2;
+        StateId s2 = t->AddState();
+        t->AddArc(s1,LogArc(st.AddSymbol(it->first),
+			    st.AddSymbol(it->second),0,s2));
+        s1 = s2;
       }
     t->SetFinal(s1,0);
     t->SetInputSymbols(&st);
@@ -1090,13 +1117,14 @@ namespace hfst { namespace implementations
 
     if (not sps.empty()) {
       if (not cyclic)
-	s2 = t->AddState();
+        s2 = t->AddState();
       for (StringPairSet::const_iterator it = sps.begin();
-	   it != sps.end();
-	   ++it)
-	{
-	  t->AddArc(s1,LogArc(st.AddSymbol(it->first),st.AddSymbol(it->second),0,s2));
-	}
+           it != sps.end();
+           ++it)
+        {
+          t->AddArc(s1,LogArc(st.AddSymbol(it->first),
+			      st.AddSymbol(it->second),0,s2));
+        }
     }
     t->SetFinal(s2,0);
     t->SetInputSymbols(&st);
@@ -1112,14 +1140,16 @@ namespace hfst { namespace implementations
     StateId s1 = t->AddState();
     t->SetStart(s1);
     for (std::vector<StringPairSet>::const_iterator it = spsv.begin();
-	 it != spsv.end();
-	 ++it)
+         it != spsv.end();
+         ++it)
       {
-	StateId s2 = t->AddState();
-	for (StringPairSet::const_iterator it2 = (*it).begin(); it2 != (*it).end(); it2++ ) {
-	  t->AddArc(s1,LogArc(st.AddSymbol(it2->first),st.AddSymbol(it2->second),0,s2));
-	}
-	s1 = s2;
+        StateId s2 = t->AddState();
+        for (StringPairSet::const_iterator it2 = (*it).begin(); 
+	     it2 != (*it).end(); it2++ ) {
+          t->AddArc(s1,LogArc(st.AddSymbol(it2->first),
+			      st.AddSymbol(it2->second),0,s2));
+        }
+        s1 = s2;
       }
     t->SetFinal(s1,0);
     t->SetInputSymbols(&st);
@@ -1135,12 +1165,12 @@ namespace hfst { namespace implementations
     StateId s1 = t->AddState();
     t->SetStart(s1);
     for (NumberPairVector::const_iterator it = npv.begin();
-	 it != npv.end();
-	 ++it)
+         it != npv.end();
+         ++it)
       {
-	StateId s2 = t->AddState();
-	t->AddArc(s1,LogArc(it->first,it->second,0,s2));
-	s1 = s2;
+        StateId s2 = t->AddState();
+        t->AddArc(s1,LogArc(it->first,it->second,0,s2));
+        s1 = s2;
       }
     t->SetFinal(s1,0);
     return t;
@@ -1157,13 +1187,13 @@ namespace hfst { namespace implementations
 
     if (not nps.empty()) {
       if (not cyclic)
-	s2 = t->AddState();
+        s2 = t->AddState();
       for (NumberPairSet::const_iterator it = nps.begin();
-	   it != nps.end();
-	   ++it)
-	{
-	  t->AddArc(s1,LogArc(it->first,it->second,0,s2));
-	}
+           it != nps.end();
+           ++it)
+        {
+          t->AddArc(s1,LogArc(it->first,it->second,0,s2));
+        }
     }
     t->SetFinal(s2,0);
     return t;
@@ -1177,14 +1207,15 @@ namespace hfst { namespace implementations
     StateId s1 = t->AddState();
     t->SetStart(s1);
     for (std::vector<NumberPairSet>::const_iterator it = npsv.begin();
-	 it != npsv.end();
-	 ++it)
+         it != npsv.end();
+         ++it)
       {
-	StateId s2 = t->AddState();
-	for (NumberPairSet::const_iterator it2 = (*it).begin(); it2 != (*it).end(); it2++ ) {
-	  t->AddArc(s1,LogArc(it2->first,it2->second,0,s2));
-	}
-	s1 = s2;
+        StateId s2 = t->AddState();
+        for (NumberPairSet::const_iterator it2 = (*it).begin(); 
+	     it2 != (*it).end(); it2++ ) {
+          t->AddArc(s1,LogArc(it2->first,it2->second,0,s2));
+        }
+        s1 = s2;
       }
     t->SetFinal(s1,0);
     return t;
@@ -1226,16 +1257,18 @@ namespace hfst { namespace implementations
   void print_att_number(LogFst *t, FILE * ofile) {
     fprintf(ofile, "initial state: %i\n", t->Start());
     for (fst::StateIterator<LogFst> siter(*t); 
-	 not siter.Done(); siter.Next()) 
+         not siter.Done(); siter.Next()) 
       {
-	StateId s = siter.Value();
-	if ( t->Final(s) != LogWeight::Zero() )
-	  fprintf(ofile, "%i\t%f\n", s, t->Final(s).Value());
-	for (fst::ArcIterator<LogFst> aiter(*t,s); !aiter.Done(); aiter.Next())
-	  {
-	    const LogArc &arc = aiter.Value();
-	    fprintf(ofile, "%i\t%i\t%i\t%i\t%f\n", s, arc.nextstate, arc.ilabel, arc.olabel, arc.weight.Value());
-	  }
+        StateId s = siter.Value();
+        if ( t->Final(s) != LogWeight::Zero() )
+          fprintf(ofile, "%i\t%f\n", s, t->Final(s).Value());
+        for (fst::ArcIterator<LogFst> aiter(*t,s); !aiter.Done(); aiter.Next())
+          {
+            const LogArc &arc = aiter.Value();
+            fprintf(ofile, "%i\t%i\t%i\t%i\t%f\n", 
+		    s, arc.nextstate, arc.ilabel, arc.olabel, 
+		    arc.weight.Value());
+          }
       }
   }
 
@@ -1258,14 +1291,14 @@ namespace hfst { namespace implementations
     // encode mapping
     EncodeMapper<LogArc> encode_mapper(0x0001,ENCODE);
     EncodeFst<LogArc> t_rm_eps_enc(t_rm_eps,
-				   &encode_mapper);
+                                   &encode_mapper);
 
     // determinization
     DeterminizeFst<LogArc> t_DET(t_rm_eps_enc);
 
     // minimization
     DecodeFst<LogArc> dec(t_DET,
-			  encode_mapper);
+                          encode_mapper);
     LogFst t_det_std(t_DET);
 
     Minimize<LogArc>(&t_det_std);
@@ -1296,11 +1329,14 @@ namespace hfst { namespace implementations
   }
 
   void 
-  LogWeightTransducer::add_transition(LogFst *t, StateId source, std::string &isymbol, std::string &osymbol, float w, StateId target)
+  LogWeightTransducer::add_transition
+  (LogFst *t, StateId source, std::string &isymbol, std::string &osymbol,
+   float w, StateId target)
   {
     SymbolTable *st = t->InputSymbols()->Copy();
     /*if (t->InputSymbols() != t->OutputSymbols()) {
-      fprintf(stderr, "ERROR:  LogWeightTransducer::add_transition:  input and output symbols are not the same\n"); 
+      fprintf(stderr, "ERROR:  LogWeightTransducer::add_transition:"
+      "  input and output symbols are not the same\n"); 
       throw hfst::exceptions::ErrorException(); 
       }*/
     unsigned int ilabel = st->AddSymbol(isymbol);
@@ -1371,9 +1407,9 @@ namespace hfst { namespace implementations
     LogFst * repetition = create_epsilon_transducer();
     for (int i = 0; i < n; ++i)
       {
-	LogFst * optional_t = optionalize(t);
-	Concat(repetition,*optional_t);
-	delete optional_t;
+        LogFst * optional_t = optionalize(t);
+        Concat(repetition,*optional_t);
+        delete optional_t;
       }
     repetition->SetInputSymbols(t->InputSymbols());
     return repetition;
@@ -1426,11 +1462,11 @@ namespace hfst { namespace implementations
 
 
   static LogFst * substitute(LogFst * t,
-				   StringPair old_symbol_pair,
-				   StringPair new_symbol_pair);
+                                   StringPair old_symbol_pair,
+                                   StringPair new_symbol_pair);
   static LogFst * substitute(LogFst * t,
-				   const StringPair old_symbol_pair,
-				   LogFst *transducer);
+                                   const StringPair old_symbol_pair,
+                                   LogFst *transducer);
 
   LogFst * LogWeightTransducer::insert_freely
   (LogFst * t, const StringPair &symbol_pair)
@@ -1439,7 +1475,9 @@ namespace hfst { namespace implementations
     assert(st != NULL);
     for (fst::StateIterator<LogFst> siter(*t); !siter.Done(); siter.Next()) {
       StateId state_id = siter.Value();
-      t->AddArc(state_id, fst::LogArc(st->AddSymbol(symbol_pair.first), st->AddSymbol(symbol_pair.second), 0, state_id));
+      t->AddArc(state_id, fst::LogArc(st->AddSymbol(symbol_pair.first), 
+				      st->AddSymbol(symbol_pair.second), 
+				      0, state_id));
     }
     t->SetInputSymbols(st);
     delete st;
@@ -1450,7 +1488,8 @@ namespace hfst { namespace implementations
   {
     for (fst::StateIterator<LogFst> siter(*t); !siter.Done(); siter.Next()) {
       StateId state_id = siter.Value();
-      t->AddArc(state_id, fst::LogArc(number_pair.first, number_pair.second, 0, state_id));
+      t->AddArc(state_id, fst::LogArc(number_pair.first, number_pair.second, 
+				      0, state_id));
     }
     return t;
   }
@@ -1464,24 +1503,25 @@ namespace hfst { namespace implementations
     assert(st != NULL);
 
     for (fst::StateIterator<LogFst> siter(*tc); 
-	 not siter.Done(); siter.Next())
+         not siter.Done(); siter.Next())
       {
-	StateId s = siter.Value();
-	for (fst::MutableArcIterator<LogFst> aiter(tc,s); !aiter.Done(); aiter.Next())
-	  {
-	    const LogArc &arc = aiter.Value(); // current values
-	    LogArc new_arc;                    // new values
-	    
-	    std::string istring = st->Find(arc.ilabel);
-	    std::string ostring = st->Find(arc.olabel);
-	    func(istring,ostring);
-	    new_arc.ilabel = st->AddSymbol(istring);
-	    new_arc.olabel = st->AddSymbol(ostring);
-	    // copy weight and next state as such
-	    new_arc.weight = arc.weight.Value();
-	    new_arc.nextstate = arc.nextstate;
-	    aiter.SetValue(new_arc);
-	  }
+        StateId s = siter.Value();
+        for (fst::MutableArcIterator<LogFst> aiter(tc,s); 
+	!aiter.Done(); aiter.Next())
+          {
+            const LogArc &arc = aiter.Value(); // current values
+            LogArc new_arc;                    // new values
+            
+            std::string istring = st->Find(arc.ilabel);
+            std::string ostring = st->Find(arc.olabel);
+            func(istring,ostring);
+            new_arc.ilabel = st->AddSymbol(istring);
+            new_arc.olabel = st->AddSymbol(ostring);
+            // copy weight and next state as such
+            new_arc.weight = arc.weight.Value();
+            new_arc.nextstate = arc.nextstate;
+            aiter.SetValue(new_arc);
+          }
       }
     tc->SetInputSymbols(st);
     delete st;
@@ -1498,9 +1538,10 @@ namespace hfst { namespace implementations
     return new LogFst(t_subst);
   }
   
-  LogFst * LogWeightTransducer::substitute(LogFst * t,
-						      pair<unsigned int, unsigned int> old_key_pair,
-						      pair<unsigned int, unsigned int> new_key_pair)
+  LogFst * LogWeightTransducer::substitute
+  (LogFst * t,
+   pair<unsigned int, unsigned int> old_key_pair,
+   pair<unsigned int, unsigned int> new_key_pair)
   {
     EncodeMapper<LogArc> encode_mapper(0x0001,ENCODE);
     EncodeFst<LogArc> enc(*t,&encode_mapper);
@@ -1511,60 +1552,65 @@ namespace hfst { namespace implementations
       encode_mapper(LogArc(new_key_pair.first,new_key_pair.second,0,0));
 
     // First cast up, then cast down... For some reason dynamic_cast<LogFst*>
-    // doesn't work although both EncodeFst<LogArc> and LogFst extend Fst<LogArc>. 
+    // doesn't work although both EncodeFst<LogArc> and LogFst extend 
+    // Fst<LogArc>. 
     // reinterpret_cast worked, but that is apparently unsafe...
     LogFst * subst = 
       substitute(static_cast<LogFst*>(static_cast<Fst<LogArc>*>(&enc)),
-		 static_cast<unsigned int>(old_pair_code.ilabel),
-		 static_cast<unsigned int>(new_pair_code.ilabel));
+                 static_cast<unsigned int>(old_pair_code.ilabel),
+                 static_cast<unsigned int>(new_pair_code.ilabel));
 
     DecodeFst<LogArc> dec(*subst,encode_mapper);
     delete subst;
     return new LogFst(dec);
   }
 
-  /* It is not certain whether the transition iterator goes through all the transitions that are added
-     during the substitution. In that case, this function should build a new transducer instead of
+  /* It is not certain whether the transition iterator goes through all 
+     the transitions that are added
+     during the substitution. In that case, this function should build 
+     a new transducer instead of
      modifying the original one. */
-  LogFst * LogWeightTransducer::substitute(LogFst *t,
-						      StringPair old_symbol_pair,
-						      StringPairSet new_symbol_pair_set)
+  LogFst * LogWeightTransducer::substitute
+  (LogFst *t,
+   StringPair old_symbol_pair,
+   StringPairSet new_symbol_pair_set)
   {
     LogFst * tc = t->Copy();
     fst::SymbolTable * st = tc->InputSymbols()->Copy();
     assert(st != NULL);
     for (fst::StateIterator<LogFst> siter(*tc); 
-	 not siter.Done(); siter.Next()) 
+         not siter.Done(); siter.Next()) 
       {
-	StateId s = siter.Value();
-	for (fst::MutableArcIterator<LogFst> aiter(tc,s); !aiter.Done(); aiter.Next())
-	  {
-	    const LogArc &arc = aiter.Value();
-	    if ( strcmp( st->Find(arc.ilabel).c_str(), 
-			 old_symbol_pair.first.c_str() ) == 0 &&
-		 strcmp( st->Find(arc.olabel).c_str(), 
-			 old_symbol_pair.second.c_str() ) == 0 )
-	      {
-		bool first_substitution=true;
-		for (StringPairSet::iterator it = new_symbol_pair_set.begin(); 
-		     it != new_symbol_pair_set.end(); it++)
-		  {
-		    if (first_substitution) {
-		      LogArc new_arc;
-		      new_arc.ilabel = st->AddSymbol(it->first);
-		      new_arc.olabel = st->AddSymbol(it->second);
-		      new_arc.weight = arc.weight.Value();
-		      new_arc.nextstate = arc.nextstate;
-		      aiter.SetValue(new_arc); 
-		      first_substitution=false; }
-		    else
-		      tc->AddArc(s, LogArc(st->AddSymbol(it->first), 
-					   st->AddSymbol(it->second), 
-					   arc.weight.Value(), 
-					   arc.nextstate));
-		  }
-	      }
-	  }
+        StateId s = siter.Value();
+        for (fst::MutableArcIterator<LogFst> aiter(tc,s); 
+	     !aiter.Done(); aiter.Next())
+          {
+            const LogArc &arc = aiter.Value();
+            if ( strcmp( st->Find(arc.ilabel).c_str(), 
+                         old_symbol_pair.first.c_str() ) == 0 &&
+                 strcmp( st->Find(arc.olabel).c_str(), 
+                         old_symbol_pair.second.c_str() ) == 0 )
+              {
+                bool first_substitution=true;
+                for (StringPairSet::iterator it = new_symbol_pair_set.begin(); 
+                     it != new_symbol_pair_set.end(); it++)
+                  {
+                    if (first_substitution) {
+                      LogArc new_arc;
+                      new_arc.ilabel = st->AddSymbol(it->first);
+                      new_arc.olabel = st->AddSymbol(it->second);
+                      new_arc.weight = arc.weight.Value();
+                      new_arc.nextstate = arc.nextstate;
+                      aiter.SetValue(new_arc); 
+                      first_substitution=false; }
+                    else
+                      tc->AddArc(s, LogArc(st->AddSymbol(it->first), 
+                                           st->AddSymbol(it->second), 
+                                           arc.weight.Value(), 
+                                           arc.nextstate));
+                  }
+              }
+          }
       }
     tc->SetInputSymbols(st);
     delete st;
@@ -1572,27 +1618,30 @@ namespace hfst { namespace implementations
   }
 
   LogFst * LogWeightTransducer::substitute(LogFst *t,
-						      std::string old_symbol,
-						      std::string new_symbol)
+                                                      std::string old_symbol,
+                                                      std::string new_symbol)
   {
     assert(t->InputSymbols() != NULL);
     SymbolTable * st = t->InputSymbols()->Copy();
-    LogFst * retval = substitute(t, st->AddSymbol(old_symbol), st->AddSymbol(new_symbol));
+    LogFst * retval = substitute(t, st->AddSymbol(old_symbol), 
+				 st->AddSymbol(new_symbol));
     retval->SetInputSymbols(st);
     delete st;
     return retval;
   }
 
   LogFst * LogWeightTransducer::substitute(LogFst *t,
-						      StringPair old_symbol_pair,
-						      StringPair new_symbol_pair)
+					   StringPair old_symbol_pair,
+					   StringPair new_symbol_pair)
   {
     assert(t->InputSymbols() != NULL);
     SymbolTable * st = t->InputSymbols()->Copy();
-    pair<unsigned int, unsigned int> old_pair(st->AddSymbol(old_symbol_pair.first),
-					      st->AddSymbol(old_symbol_pair.second));
-    pair<unsigned int, unsigned int> new_pair(st->AddSymbol(new_symbol_pair.first),
-					      st->AddSymbol(new_symbol_pair.second));
+    pair<unsigned int, unsigned int> old_pair
+      (st->AddSymbol(old_symbol_pair.first),
+       st->AddSymbol(old_symbol_pair.second));
+    pair<unsigned int, unsigned int> new_pair
+      (st->AddSymbol(new_symbol_pair.first),
+       st->AddSymbol(new_symbol_pair.second));
     LogFst * retval = substitute(t, old_pair, new_pair);
     retval->SetInputSymbols(st);
     delete st;
@@ -1600,8 +1649,8 @@ namespace hfst { namespace implementations
   }
 
   LogFst * LogWeightTransducer::substitute(LogFst *t,
-						      const StringPair old_symbol_pair,
-						      LogFst *transducer)
+					   const StringPair old_symbol_pair,
+					   LogFst *transducer)
   {
 
     assert(t->InputSymbols() != NULL);
@@ -1611,67 +1660,74 @@ namespace hfst { namespace implementations
     for( int i = 0; i < states; ++i ) {
 
       for (fst::MutableArcIterator<LogFst> it(t,i);
-	   not it.Done();
-	   it.Next()) {
+           not it.Done();
+           it.Next()) {
 
-	fst::LogArc arc = it.Value();
+        fst::LogArc arc = it.Value();
 
-	// find arcs that must be replaced
-	if ( arc.ilabel == st->AddSymbol(old_symbol_pair.first) && 
-	     arc.olabel == st->AddSymbol(old_symbol_pair.second) ) 
-	  {
+        // find arcs that must be replaced
+        if ( arc.ilabel == st->AddSymbol(old_symbol_pair.first) && 
+             arc.olabel == st->AddSymbol(old_symbol_pair.second) ) 
+          {
 
-	  StateId destination_state = arc.nextstate;
-	  StateId start_state = t->AddState();
+          StateId destination_state = arc.nextstate;
+          StateId start_state = t->AddState();
 
-	  // change the label of the arc to epsilon and point the arc to a new state
-	  arc.ilabel = 0;
-	  arc.olabel = 0;
-	  arc.nextstate = start_state;  
-	  // weight remains the same
-	  it.SetValue(arc);
-
-
-	  // add rest of the states to transducer t
-	  int states_to_add = transducer->NumStates();
-	  for (int j=1; j<states_to_add; j++)
-	    t->AddState();
+          // change the label of the arc to epsilon and point the arc 
+	  // to a new state
+          arc.ilabel = 0;
+          arc.olabel = 0;
+          arc.nextstate = start_state;  
+          // weight remains the same
+          it.SetValue(arc);
 
 
-	  // go through all states and arcs in replace transducer tr
-	  for (fst::StateIterator<LogFst> siter(*transducer); !siter.Done(); siter.Next()) {
+          // add rest of the states to transducer t
+          int states_to_add = transducer->NumStates();
+          for (int j=1; j<states_to_add; j++)
+            t->AddState();
 
-	    StateId tr_state_id = siter.Value();
 
-	    // final states in tr correspond in t to a non-final state which has
-	    // an epsilon transition to original destination state of arc that
-	    // is being replaced
-	    if ( is_final( transducer, tr_state_id ) )
-	      t->AddArc( tr_state_id + start_state,
-			 fst::LogArc( 0,
-				      0,
-				      transducer->Final(tr_state_id),  // final weight is copied to the epsilon transition
-				      destination_state
-				      )
-			 );  
+          // go through all states and arcs in replace transducer tr
+          for (fst::StateIterator<LogFst> siter(*transducer); 
+	       !siter.Done(); siter.Next()) {
 
-	    for (fst::ArcIterator<LogFst> aiter(*transducer, tr_state_id); !aiter.Done(); aiter.Next()) {
+            StateId tr_state_id = siter.Value();
 
-	      const fst::LogArc &tr_arc = aiter.Value();
+            // final states in tr correspond in t to a non-final state which has
+            // an epsilon transition to original destination state of arc that
+            // is being replaced
+            if ( is_final( transducer, tr_state_id ) )
+              t->AddArc( tr_state_id + start_state,
+                         fst::LogArc( 0,
+                                      0,
+				      /* final weight is copied 
+					 to the epsilon transition */
+                                      transducer->Final(tr_state_id),  
+                                      destination_state
+                                      )
+                         );  
 
-	      // adding arc from state 'tr_state_id+start_state' to state 'tr_arc.nextstate'
-	      // copy arcs from tr to t
-	      t->AddArc( tr_state_id + start_state, 
-			 fst::LogArc( tr_arc.ilabel, 
-				      tr_arc.olabel, 
-				      tr_arc.weight,  // weight remains the same 
-				      tr_arc.nextstate + start_state 
-				      ) 
-			 );
+            for (fst::ArcIterator<LogFst> aiter(*transducer, tr_state_id); 
+		 !aiter.Done(); aiter.Next()) {
 
-	    }
-	  }
-	}
+              const fst::LogArc &tr_arc = aiter.Value();
+
+              // adding arc from state 'tr_state_id+start_state' 
+	      // to state 'tr_arc.nextstate'
+              // copy arcs from tr to t
+              t->AddArc( tr_state_id + start_state, 
+                         fst::LogArc( tr_arc.ilabel, 
+                                      tr_arc.olabel, 
+                                      tr_arc.weight,  /* weight remains 
+							 the same */ 
+                                      tr_arc.nextstate + start_state 
+                                      ) 
+                         );
+
+            }
+          }
+        }
       }
     }
 
@@ -1681,74 +1737,81 @@ namespace hfst { namespace implementations
   }
 
   LogFst * LogWeightTransducer::substitute(LogFst *t,
-						      const NumberPair old_number_pair,
-						      LogFst *transducer)
+					   const NumberPair old_number_pair,
+					   LogFst *transducer)
   {
     int states = t->NumStates();
     for( int i = 0; i < states; ++i ) {
 
       for (fst::MutableArcIterator<LogFst> it(t,i);
-	   not it.Done();
-	   it.Next()) {
+           not it.Done();
+           it.Next()) {
 
-	fst::LogArc arc = it.Value();
+        fst::LogArc arc = it.Value();
 
-	// find arcs that must be replaced
-	if ( arc.ilabel == old_number_pair.first && 
-	     arc.olabel == old_number_pair.second ) 
-	  {
+        // find arcs that must be replaced
+        if ( arc.ilabel == old_number_pair.first && 
+             arc.olabel == old_number_pair.second ) 
+          {
 
-	  StateId destination_state = arc.nextstate;
-	  StateId start_state = t->AddState();
+          StateId destination_state = arc.nextstate;
+          StateId start_state = t->AddState();
 
-	  // change the label of the arc to epsilon and point the arc to a new state
-	  arc.ilabel = 0;
-	  arc.olabel = 0;
-	  arc.nextstate = start_state;  
-	  // weight remains the same
-	  it.SetValue(arc);
-
-
-	  // add rest of the states to transducer t
-	  int states_to_add = transducer->NumStates();
-	  for (int j=1; j<states_to_add; j++)
-	    t->AddState();
+          // change the label of the arc to epsilon and point 
+	  // the arc to a new state
+          arc.ilabel = 0;
+          arc.olabel = 0;
+          arc.nextstate = start_state;  
+          // weight remains the same
+          it.SetValue(arc);
 
 
-	  // go through all states and arcs in replace transducer tr
-	  for (fst::StateIterator<LogFst> siter(*transducer); !siter.Done(); siter.Next()) {
+          // add rest of the states to transducer t
+          int states_to_add = transducer->NumStates();
+          for (int j=1; j<states_to_add; j++)
+            t->AddState();
 
-	    StateId tr_state_id = siter.Value();
 
-	    // final states in tr correspond in t to a non-final state which has
-	    // an epsilon transition to original destination state of arc that
-	    // is being replaced
-	    if ( is_final( transducer, tr_state_id ) )
-	      t->AddArc( tr_state_id + start_state,
-			 fst::LogArc( 0,
-				      0,
-				      transducer->Final(tr_state_id),  // final weight is copied to the epsilon transition
-				      destination_state
-				      )
-			 );  
+          // go through all states and arcs in replace transducer tr
+          for (fst::StateIterator<LogFst> siter(*transducer); 
+	       !siter.Done(); siter.Next()) {
 
-	    for (fst::ArcIterator<LogFst> aiter(*transducer, tr_state_id); !aiter.Done(); aiter.Next()) {
+            StateId tr_state_id = siter.Value();
 
-	      const fst::LogArc &tr_arc = aiter.Value();
+            // final states in tr correspond in t to a non-final state which has
+            // an epsilon transition to original destination state of arc that
+            // is being replaced
+            if ( is_final( transducer, tr_state_id ) )
+              t->AddArc( tr_state_id + start_state,
+                         fst::LogArc( 0,
+                                      0,
+				      // final weight is copied 
+				      // to the epsilon transition
+                                      transducer->Final(tr_state_id),  
+                                      destination_state
+                                      )
+                         );  
 
-	      // adding arc from state 'tr_state_id+start_state' to state 'tr_arc.nextstate'
-	      // copy arcs from tr to t
-	      t->AddArc( tr_state_id + start_state, 
-			 fst::LogArc( tr_arc.ilabel, 
-				      tr_arc.olabel, 
-				      tr_arc.weight,  // weight remains the same 
-				      tr_arc.nextstate + start_state 
-				      ) 
-			 );
+            for (fst::ArcIterator<LogFst> aiter(*transducer, tr_state_id); 
+		 !aiter.Done(); aiter.Next()) {
 
-	    }
-	  }
-	}
+              const fst::LogArc &tr_arc = aiter.Value();
+
+              // adding arc from state 'tr_state_id+start_state' 
+	      // to state 'tr_arc.nextstate'
+              // copy arcs from tr to t
+              t->AddArc( tr_state_id + start_state, 
+                         fst::LogArc( tr_arc.ilabel, 
+                                      tr_arc.olabel, 
+				      // weight remains the same 
+                                      tr_arc.weight,  
+                                      tr_arc.nextstate + start_state 
+                                      ) 
+                         );
+
+            }
+          }
+        }
       }
     }
 
@@ -1756,10 +1819,11 @@ namespace hfst { namespace implementations
   }
 
   LogFst * LogWeightTransducer::compose(LogFst * t1,
-			 LogFst * t2)
+                         LogFst * t2)
   {
     StringSet foo;
-    // a copy of t2 is created so that its symbol table check sum is the same as t1's
+    // a copy of t2 is created so that its symbol table check sum is 
+    // the same as t1's
     // (else OpenFst complains about non-matching check sums... )
     LogFst * t2_ = expand_arcs(t2, foo, false);
     t2_->SetInputSymbols(t1->InputSymbols());
@@ -1777,7 +1841,7 @@ namespace hfst { namespace implementations
   }
 
   LogFst * LogWeightTransducer::concatenate(LogFst * t1,
-						       LogFst * t2)
+                                                       LogFst * t2)
   {
     LogFst * result = new LogFst(*t1);
     Concat(result,*t2);
@@ -1786,7 +1850,7 @@ namespace hfst { namespace implementations
   }
 
   LogFst * LogWeightTransducer::disjunct(LogFst * t1,
-						    LogFst * t2)
+                                                    LogFst * t2)
   {
     LogFst * result = new LogFst(*t1);
     Union(result,*t2);
@@ -1802,27 +1866,28 @@ namespace hfst { namespace implementations
 
     StateId s = t->Start();
 
-    for (StringPairVector::const_iterator it = spv.begin(); it != spv.end(); it++) 
+    for (StringPairVector::const_iterator it = spv.begin(); 
+	 it != spv.end(); it++) 
       {
-	unsigned int inumber = st->AddSymbol(it->first.c_str());
-	unsigned int onumber = st->AddSymbol(it->second.c_str());
+        unsigned int inumber = st->AddSymbol(it->first.c_str());
+        unsigned int onumber = st->AddSymbol(it->second.c_str());
 
-	bool transition_found=false;
-	for(fst::ArcIterator<LogFst> it(*t,s); !it.Done(); it.Next())
-	  {
-	    const LogArc& a = it.Value();
-	    if (a.ilabel == inumber && a.olabel == onumber) {
-	      transition_found=true;
-	      s = a.nextstate;
-	      break;
-	    }
-	  }
+        bool transition_found=false;
+        for(fst::ArcIterator<LogFst> it(*t,s); !it.Done(); it.Next())
+          {
+            const LogArc& a = it.Value();
+            if (a.ilabel == inumber && a.olabel == onumber) {
+              transition_found=true;
+              s = a.nextstate;
+              break;
+            }
+          }
 
-	if (not transition_found) {
-	  StateId new_state = t->AddState();
-	  t->AddArc(s, LogArc(inumber,onumber,0,new_state));
-	  s = new_state;
-	}
+        if (not transition_found) {
+          StateId new_state = t->AddState();
+          t->AddArc(s, LogArc(inumber,onumber,0,new_state));
+          s = new_state;
+        }
       }
 
     t->SetFinal(s,0);
@@ -1836,27 +1901,28 @@ namespace hfst { namespace implementations
   {
     StateId s = t->Start();
 
-    for (NumberPairVector::const_iterator it = npv.begin(); it != npv.end(); it++) 
+    for (NumberPairVector::const_iterator it = npv.begin(); 
+	 it != npv.end(); it++) 
       {
-	unsigned int inumber = it->first;
-	unsigned int onumber = it->second;
+        unsigned int inumber = it->first;
+        unsigned int onumber = it->second;
 
-	bool transition_found=false;
-	for(fst::ArcIterator<LogFst> it(*t,s); !it.Done(); it.Next())
-	  {
-	    const LogArc& a = it.Value();
-	    if (a.ilabel == inumber && a.olabel == onumber) {
-	      transition_found=true;
-	      s = a.nextstate;
-	      break;
-	    }
-	  }
+        bool transition_found=false;
+        for(fst::ArcIterator<LogFst> it(*t,s); !it.Done(); it.Next())
+          {
+            const LogArc& a = it.Value();
+            if (a.ilabel == inumber && a.olabel == onumber) {
+              transition_found=true;
+              s = a.nextstate;
+              break;
+            }
+          }
 
-	if (not transition_found) {
-	  StateId new_state = t->AddState();
-	  t->AddArc(s, LogArc(inumber,onumber,0,new_state));
-	  s = new_state;
-	}
+        if (not transition_found) {
+          StateId new_state = t->AddState();
+          t->AddArc(s, LogArc(inumber,onumber,0,new_state));
+          s = new_state;
+        }
       }
 
     t->SetFinal(s,0);
@@ -1864,7 +1930,7 @@ namespace hfst { namespace implementations
   }
 
   LogFst * LogWeightTransducer::intersect(LogFst * t1,
-			   LogFst * t2)
+                           LogFst * t2)
   {
     if (t1->OutputSymbols() == NULL)
       t1->SetOutputSymbols(t1->InputSymbols());
@@ -1893,7 +1959,7 @@ namespace hfst { namespace implementations
   }
 
   LogFst * LogWeightTransducer::subtract(LogFst * t1,
-			  LogFst * t2)
+                          LogFst * t2)
   {
     bool DEBUG=false;
 
@@ -1942,10 +2008,10 @@ namespace hfst { namespace implementations
   {
     LogFst * t_copy = new LogFst(*t);
     for (fst::StateIterator<LogFst> iter(*t); 
-	 not iter.Done(); iter.Next())
+         not iter.Done(); iter.Next())
       {
-	if (t_copy->Final(iter.Value()) != fst::LogWeight::Zero())
-	  { t_copy->SetFinal(iter.Value(),f); }
+        if (t_copy->Final(iter.Value()) != fst::LogWeight::Zero())
+          { t_copy->SetFinal(iter.Value(),f); }
       }
     return t_copy;
   }
@@ -1954,90 +2020,94 @@ namespace hfst { namespace implementations
   // ----- TRIE FUNCTIONS BEGINS -----
 
   int LogWeightTransducer::has_arc(LogFst &t,
-	      LogArc::StateId sourcestate,			  
-	      LogArc::Label ilabel, 
-	      LogArc::Label olabel)
+              LogArc::StateId sourcestate,                          
+              LogArc::Label ilabel, 
+              LogArc::Label olabel)
   {
     for (ArcIterator<LogFst> aiter(t,sourcestate);
-	 !aiter.Done();
-	 aiter.Next())
+         !aiter.Done();
+         aiter.Next())
       {
-	if ((aiter.Value().ilabel == ilabel) and 
-	    (aiter.Value().olabel == olabel))
-	  { return aiter.Position(); }
+        if ((aiter.Value().ilabel == ilabel) and 
+            (aiter.Value().olabel == olabel))
+          { return aiter.Position(); }
       }
 
     return -1;    
   }
 
   void LogWeightTransducer::disjunct_as_tries(LogFst &t1,
-			 StateId t1_state,
-			 const LogFst * t2,
-			 StateId t2_state)
+                         StateId t1_state,
+                         const LogFst * t2,
+                         StateId t2_state)
   {
     if (t2->Final(t2_state) != LogWeight::Zero())
       {
-	t1.SetFinal(t1_state,
-		    Plus(t1.Final(t1_state),
-			 t2->Final(t2_state)));
+        t1.SetFinal(t1_state,
+                    Plus(t1.Final(t1_state),
+                         t2->Final(t2_state)));
       }
     for (ArcIterator<LogFst> aiter(*t2,t2_state);
-	 !aiter.Done();
-	 aiter.Next())
+         !aiter.Done();
+         aiter.Next())
       {
-	const LogArc &arc = aiter.Value();
-	int arc_index = has_arc(t1,t1_state,arc.ilabel,arc.olabel);
-	if (arc_index == -1)
-	  {
-	    LogArc::StateId new_state = t1.AddState();
-	    t1.AddArc(t1_state,LogArc(arc.ilabel,
-				      arc.olabel,
-				      arc.weight,
-				      new_state));
-	    add_sub_trie(t1,new_state,t2,arc.nextstate);
-	  }
-	else
-	  {
-	    MutableArcIterator<LogFst> ajter(&t1,t1_state);
-	    ajter.Seek(arc_index);
-	    disjunct_as_tries(t1,ajter.Value().nextstate,t2,arc.nextstate);
-	  }
+        const LogArc &arc = aiter.Value();
+        int arc_index = has_arc(t1,t1_state,arc.ilabel,arc.olabel);
+        if (arc_index == -1)
+          {
+            LogArc::StateId new_state = t1.AddState();
+            t1.AddArc(t1_state,LogArc(arc.ilabel,
+                                      arc.olabel,
+                                      arc.weight,
+                                      new_state));
+            add_sub_trie(t1,new_state,t2,arc.nextstate);
+          }
+        else
+          {
+            MutableArcIterator<LogFst> ajter(&t1,t1_state);
+            ajter.Seek(arc_index);
+            disjunct_as_tries(t1,ajter.Value().nextstate,t2,arc.nextstate);
+          }
       }
   }
   
   void LogWeightTransducer::add_sub_trie(LogFst &t1,
-		  StateId t1_state,
-		    const LogFst * t2,
-		    StateId t2_state)
+                  StateId t1_state,
+                    const LogFst * t2,
+                    StateId t2_state)
   {
     if (t2->Final(t2_state) != LogWeight::Zero())
       {
-	t1.SetFinal(t1_state,
-		    Plus(t1.Final(t1_state),
-			 t2->Final(t2_state)));
+        t1.SetFinal(t1_state,
+                    Plus(t1.Final(t1_state),
+                         t2->Final(t2_state)));
       }
     for (ArcIterator<LogFst> aiter(*t2,t2_state);
-	 !aiter.Done();
-	 aiter.Next())
+         !aiter.Done();
+         aiter.Next())
       {
-	const LogArc &arc = aiter.Value();
-	LogArc::StateId new_state = t1.AddState();
-	t1.AddArc(t1_state,LogArc(arc.ilabel,
-				  arc.olabel,
-				  arc.weight,
-				  new_state));
-	add_sub_trie(t1,new_state,t2,arc.nextstate);
+        const LogArc &arc = aiter.Value();
+        LogArc::StateId new_state = t1.AddState();
+        t1.AddArc(t1_state,LogArc(arc.ilabel,
+                                  arc.olabel,
+                                  arc.weight,
+                                  new_state));
+        add_sub_trie(t1,new_state,t2,arc.nextstate);
       }
   }
 
   // ----- TRIE FUNCTIONS END -----
   
 
-  static bool extract_strings(LogFst * t, LogArc::StateId s,
-    std::map<StateId,unsigned short> all_visitations, std::map<StateId, unsigned short> path_visitations,
-    std::vector<char>& lbuffer, int lpos, std::vector<char>& ubuffer, int upos, float weight_sum,
-    hfst::ExtractStringsCb& callback, int cycles,
-			      std::vector<hfst::FdState<int64> >* fd_state_stack, bool filter_fd, bool include_spv, StringPairVector &spv)
+  static bool extract_strings
+  (LogFst * t, LogArc::StateId s,
+   std::map<StateId,unsigned short> all_visitations, 
+   std::map<StateId, unsigned short> path_visitations,
+   std::vector<char>& lbuffer, int lpos, std::vector<char>& ubuffer, 
+   int upos, float weight_sum,
+   hfst::ExtractStringsCb& callback, int cycles,
+   std::vector<hfst::FdState<int64> >* fd_state_stack,
+   bool filter_fd, bool include_spv, StringPairVector &spv)
   { 
     if(cycles >= 0 && path_visitations[s] > cycles)
       return true;
@@ -2049,10 +2119,11 @@ namespace hfst { namespace implementations
       lbuffer[lpos]=0;
       ubuffer[upos]=0;
       bool final = t->Final(s) != LogWeight::Zero();
-      hfst::WeightedPath<float> path(&lbuffer[0],&ubuffer[0],weight_sum+(final?t->Final(s).Value():0));
+      hfst::WeightedPath<float> path
+	(&lbuffer[0],&ubuffer[0],weight_sum+(final?t->Final(s).Value():0));
       if (include_spv) {
-	path.spv = spv;
-	path.is_spv_in_use = true;
+        path.spv = spv;
+        path.is_spv_in_use = true;
       }
       hfst::ExtractStringsCb::RetVal ret = callback(path, final);
       if(!ret.continueSearch || !ret.continuePath)
@@ -2084,7 +2155,8 @@ namespace hfst { namespace implementations
       bool added_fd_state = false;
     
       if (fd_state_stack) {
-        if(fd_state_stack->back().get_table().get_operation(arc.ilabel) != NULL) {
+        if(fd_state_stack->back().get_table().get_operation(arc.ilabel) 
+	   != NULL) {
           fd_state_stack->push_back(fd_state_stack->back());
           if(fd_state_stack->back().apply_operation(arc.ilabel))
             added_fd_state = true;
@@ -2098,7 +2170,9 @@ namespace hfst { namespace implementations
       int lp=lpos;
       int up=upos;
       
-      if (arc.ilabel != 0 && (!filter_fd || fd_state_stack->back().get_table().get_operation(arc.ilabel)==NULL))
+      if (arc.ilabel != 0 && 
+	  (!filter_fd || fd_state_stack->back().get_table().
+	   get_operation(arc.ilabel)==NULL))
       {
         std::string str = t->InputSymbols()->Find(arc.ilabel);
         if(lpos+str.length() >= lbuffer.size())
@@ -2106,7 +2180,9 @@ namespace hfst { namespace implementations
         strcpy(&lbuffer[lpos], str.c_str());
         lp += str.length();
       }
-      if (arc.olabel != 0 && (!filter_fd || fd_state_stack->back().get_table().get_operation(arc.olabel)==NULL))
+      if (arc.olabel != 0 && 
+	  (!filter_fd || fd_state_stack->back().get_table().
+	   get_operation(arc.olabel)==NULL))
       {
         std::string str = t->InputSymbols()->Find(arc.olabel);
         if(upos+str.length() > ubuffer.size())
@@ -2115,19 +2191,22 @@ namespace hfst { namespace implementations
         up += str.length();
       }
       
-      /* Handle spv here. Special symbols (flags, epsilons) are always inserted. */
+      /* Handle spv here. Special symbols (flags, epsilons) are 
+	 always inserted. */
       if (include_spv) { 
-	StringPair string_pair(t->InputSymbols()->Find(arc.ilabel),
-			       t->InputSymbols()->Find(arc.olabel));
-	spv.push_back(string_pair);
+        StringPair string_pair(t->InputSymbols()->Find(arc.ilabel),
+                               t->InputSymbols()->Find(arc.olabel));
+        spv.push_back(string_pair);
       }
 
-      res = extract_strings(t, arc.nextstate, all_visitations, path_visitations,
-			    lbuffer,lp, ubuffer,up, weight_sum+arc.weight.Value(), callback, cycles, fd_state_stack, filter_fd,
-			    include_spv, spv);
+      res = extract_strings
+	(t, arc.nextstate, all_visitations, path_visitations,
+	 lbuffer,lp, ubuffer,up, weight_sum+arc.weight.Value(), callback,
+	 cycles, fd_state_stack, filter_fd,
+	 include_spv, spv);
      
       if (include_spv)
-	spv.pop_back();
+        spv.pop_back();
  
       if(added_fd_state)
         fd_state_stack->pop_back();
@@ -2139,8 +2218,9 @@ namespace hfst { namespace implementations
   
   static const int BUFFER_START_SIZE = 64;
   
-  void LogWeightTransducer::extract_strings(LogFst * t, hfst::ExtractStringsCb& callback,
-      int cycles, FdTable<int64>* fd, bool filter_fd, bool include_spv)
+  void LogWeightTransducer::extract_strings
+  (LogFst * t, hfst::ExtractStringsCb& callback,
+   int cycles, FdTable<int64>* fd, bool filter_fd, bool include_spv)
   {
     if (t->Start() == -1)
       return;
@@ -2149,19 +2229,22 @@ namespace hfst { namespace implementations
     vector<char> ubuffer(BUFFER_START_SIZE, 0);
     map<StateId, unsigned short> all_visitations;
     map<StateId, unsigned short> path_visitations;
-    std::vector<hfst::FdState<int64> >* fd_state_stack = (fd==NULL) ? NULL : new std::vector<hfst::FdState<int64> >(1, hfst::FdState<int64>(*fd));
+    std::vector<hfst::FdState<int64> >* fd_state_stack = (fd==NULL) ? NULL :
+      new std::vector<hfst::FdState<int64> >(1, hfst::FdState<int64>(*fd));
     
     StringPairVector spv;
-    hfst::implementations::extract_strings(t,t->Start(),all_visitations,path_visitations,
-					   lbuffer,0,ubuffer,0,0.0f,callback,cycles,fd_state_stack,filter_fd,
-					   include_spv, spv);
+    hfst::implementations::extract_strings
+      (t,t->Start(),all_visitations,path_visitations,
+       lbuffer,0,ubuffer,0,0.0f,callback,cycles,fd_state_stack,filter_fd,
+       include_spv, spv);
   }
   
   FdTable<int64>* LogWeightTransducer::get_flag_diacritics(LogFst * t)
   {
     FdTable<int64>* table = new FdTable<int64>();
     const fst::SymbolTable* symbols = t->InputSymbols();
-    for(fst::SymbolTableIterator it=fst::SymbolTableIterator(*symbols); !it.Done(); it.Next())
+    for(fst::SymbolTableIterator it=fst::SymbolTableIterator(*symbols); 
+	!it.Done(); it.Next())
     {
       if(FdOperation::is_diacritic(it.Symbol()))
         table->define_diacritic(it.Value(), it.Symbol());
@@ -2169,7 +2252,8 @@ namespace hfst { namespace implementations
     return table;
   }
 
-  void LogWeightTransducer::represent_empty_transducer_as_having_one_state(LogFst *t)
+  void LogWeightTransducer::represent_empty_transducer_as_having_one_state
+  (LogFst *t)
   {
     if (t->Start() == fst::kNoStateId || t->NumStates() == 0) {
       delete t;
@@ -2188,7 +2272,8 @@ namespace hfst { namespace implementations
   }
 
   LogWeightOutputStream::LogWeightOutputStream(const std::string &str):
-    filename(std::string(str)),o_stream(str.c_str(),std::ios::out),output_stream(o_stream)
+    filename(std::string(str)),o_stream(str.c_str(),std::ios::out),
+    output_stream(o_stream)
   {}
 
   void LogWeightOutputStream::write(const char &c)
