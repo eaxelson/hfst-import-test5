@@ -719,9 +719,9 @@ namespace hfst
       { bytes_read=10; return SFST_TYPE; }
     if (fst_type.compare("FOMA_TYPE") == 0)
       { bytes_read=10; return FOMA_TYPE; }
-    if (fst_type.compare("TROPICAL_OFST_TYPE") == 0)
+    if (fst_type.compare("TROPICAL_OPENFST_TYPE") == 0)
       { bytes_read=19; return TROPICAL_OPENFST_TYPE; }
-    if (fst_type.compare("LOG_OFST_TYPE") == 0)
+    if (fst_type.compare("LOG_OPENFST_TYPE") == 0)
       { bytes_read=14; return LOG_OPENFST_TYPE; }
     if (fst_type.compare("HFST_OL_TYPE") == 0)
       { bytes_read=13; return HFST_OL_TYPE; }
