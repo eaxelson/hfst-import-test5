@@ -616,6 +616,9 @@ namespace hfst { namespace implementations {
 
       /* Handle spv here. Special symbols (flags, epsilons) 
          are always inserted. */
+
+      std::string istring("");
+      std::string ostring("");
     
       //find the key in sigma
       char* c_in=NULL;
@@ -635,10 +638,13 @@ namespace hfst { namespace implementations {
 	  break; }
       }
 
-      StringPair string_pair(std::string(strdup(c_in)),
-			     std::string(strdup(c_out)));
-      spv.push_back(string_pair);
+      if (!filter_fd || fd_state_stack->back().get_table().get_operation(arc->in)==NULL)
+	istring = strdup(c_in);
 
+      if (!filter_fd || fd_state_stack->back().get_table().get_operation(arc->out)==NULL)
+	ostring = strdup(c_out);
+
+      spv.push_back(StringPair(istring, ostring));
 
       res = extract_strings(t, arc->target, all_visitations, path_visitations,
                             /*lbuffer, lp, ubuffer, up,*/ callback, cycles,

@@ -19,6 +19,12 @@ void verbose_print(const char *msg,
       case hfst::FOMA_TYPE:
 	fprintf(stderr, "FOMA_TYPE");
 	break;
+      case hfst::HFST_OL_TYPE:
+	fprintf(stderr, "HFST_OL_TYPE");
+	break;
+      case hfst::HFST_OLW_TYPE:
+	fprintf(stderr, "HFST_OLW_TYPE");
+	break;
       default:
 	fprintf(stderr, "(type undefined)");
 	break;
