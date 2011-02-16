@@ -1022,18 +1022,18 @@ HfstLookupPaths*
 lookup_simple(const HfstLookupPath& s, HfstTransducer& t, bool* infinity)
 {
   HfstLookupPaths* results = new HfstLookupPaths;
-  if (t.is_lookup_infinitely_ambiguous(s))
+  if (t.is_lookup_infinitely_ambiguous(s.first))
     {
       if (!silent && infinite_cutoff > 0) {
     warning(0, 0, "Got infinite results, number of cycles limited to %zu",
         infinite_cutoff);
       }
-      t.lookup_fd(*results, s, infinite_cutoff);
+      t.lookup_fd(*results, s.first, infinite_cutoff);
       *infinity = true;
     }
   else
     {
-      t.lookup_fd(*results, s);
+      t.lookup_fd(*results, s.first);
     }
 
   if (results->size() == 0)

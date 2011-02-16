@@ -176,8 +176,8 @@ namespace implementations
       static LogFst * extract_output_language(LogFst * t);
       static void extract_strings
         (LogFst * t, hfst::ExtractStringsCb& callback,
-         int cycles=-1, FdTable<int64>* fd=NULL, bool filter_fd=false,
-         bool include_spv=false);
+         int cycles=-1, FdTable<int64>* fd=NULL, bool filter_fd=false
+         /*bool include_spv=false*/);
       static LogFst * compose(LogFst * t1,
                                    LogFst * t2);
       static LogFst * concatenate(LogFst * t1,

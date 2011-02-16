@@ -137,10 +137,10 @@ StringPairVector HfstTokenizer::tokenize
   return spv;
 }
 
-HfstLookupPath HfstTokenizer::lookup_tokenize
+StringVector HfstTokenizer::tokenize_one_level
 (const string& input_string) const
 {
-  HfstArcPath path;
+  StringVector sv;
   const char* s = input_string.c_str();
   while (*s)
     {
@@ -149,11 +149,11 @@ HfstLookupPath HfstTokenizer::lookup_tokenize
       s += symbol_size;
       if (is_skip_symbol(symbol))
         { continue; }
-      path.push_back(string(symbol));
+      sv.push_back(symbol);
     }
-  HfstLookupPath retval(path,0);
-  return retval;
+  return sv;
 }
+
 
 StringPairVector HfstTokenizer::tokenize
 (const string& input_string,const string& output_string) const

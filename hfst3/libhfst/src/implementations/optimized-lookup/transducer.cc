@@ -161,7 +161,7 @@ bool Transducer::initialize_input(char * input_str)
     return true;
 }
 
-HfstLookupPaths Transducer::lookup_fd(const HfstLookupPath & s)
+HfstLookupPaths Transducer::lookup_fd(const StringVector & s)
 {
     lookup_paths.clear();
     std::string input_str;
@@ -169,16 +169,16 @@ HfstLookupPaths Transducer::lookup_fd(const HfstLookupPath & s)
 //    for (it = s.first.begin(); it < s.first.end(); ++it) {
 //	input_str.append(*it);
 //    }
-    for (int i = 0; i < s.first.size(); ++i) {
-	input_str.append((s.first)[i]);
+    for (int i = 0; i < s.size(); ++i) {
+	input_str.append(s[i]);
     }
     if (!initialize_input(const_cast<char *>(input_str.c_str()))) {
 	HfstLookupPaths no_result;
 	return no_result;
     }
-    current_weight += s.second;
+    //current_weight += s.second;
     get_analyses(input_tape, output_tape, output_tape, 0);
-    current_weight -= s.second;
+    //current_weight -= s.second;
     return lookup_paths;
 }
 

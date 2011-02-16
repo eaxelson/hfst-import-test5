@@ -130,7 +130,8 @@ namespace hfst {
                         
       static void extract_strings(fsm * t, hfst::ExtractStringsCb& callback,
                                   int cycles=-1, FdTable<int>* fd=NULL, 
-                                  bool filter_fd=false, bool include_spv=false);
+                                  bool filter_fd=false 
+				  /*bool include_spv=false*/);
       
       static FdTable<int>* get_flag_diacritics(fsm * t);
 

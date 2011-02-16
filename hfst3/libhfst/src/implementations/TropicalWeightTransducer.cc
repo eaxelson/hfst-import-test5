@@ -2129,18 +2129,19 @@ namespace hfst { namespace implementations
   (StdVectorFst * t, StdArc::StateId s,
    std::map<StateId,unsigned short> all_visitations, 
    std::map<StateId, unsigned short> path_visitations,
-   std::vector<char>& lbuffer, int lpos, 
-   std::vector<char>& ubuffer, int upos, float weight_sum,
+   /*std::vector<char>& lbuffer, int lpos, 
+     std::vector<char>& ubuffer, int upos,*/ float weight_sum,
    hfst::ExtractStringsCb& callback, int cycles,
    std::vector<hfst::FdState<int64> >* fd_state_stack, 
    bool filter_fd, 
-   bool include_spv, StringPairVector &spv)
+   /*bool include_spv,*/ StringPairVector &spv)
   { 
     if(cycles >= 0 && path_visitations[s] > cycles)
       return true;
     all_visitations[s]++;
     path_visitations[s]++;
-    
+
+    /*
     if(lpos > 0 && upos > 0)
     {
       lbuffer[lpos]=0;
@@ -2159,6 +2160,20 @@ namespace hfst { namespace implementations
         return ret.continueSearch;
       }
     }
+    */
+
+    if (spv.size() != 0)
+      {
+	bool final = t->Final(s) != TropicalWeight::Zero();
+	hfst::HfstTwoLevelPath path
+	  (spv, weight_sum+(final?t->Final(s).Value():0));
+	hfst::ExtractStringsCb::RetVal ret = callback(path, final);
+	if(!ret.continueSearch || !ret.continuePath)
+	  {
+	    path_visitations[s]--;
+	    return ret.continueSearch;
+	  }
+      }
     
     // sort arcs by number of visitations
     vector<const StdArc*> arcs;
@@ -2193,7 +2208,8 @@ namespace hfst { namespace implementations
           }
         }
       }
-      
+
+      /*
       int lp=lpos;
       int up=upos;
       
@@ -2219,23 +2235,21 @@ namespace hfst { namespace implementations
           up += str.length();
         }
       }
+      */
       
       /* Handle spv here. Special symbols (flags, epsilons) 
          are always inserted. */
-      if (include_spv) {
-        StringPair string_pair(t->InputSymbols()->Find(arc.ilabel),
-                               t->InputSymbols()->Find(arc.olabel));
-        spv.push_back(string_pair);
-      }
+      StringPair string_pair(t->InputSymbols()->Find(arc.ilabel),
+			     t->InputSymbols()->Find(arc.olabel));
+      spv.push_back(string_pair);
 
       res = extract_strings
         (t, arc.nextstate, all_visitations, path_visitations,
-         lbuffer,lp, ubuffer,up, weight_sum+arc.weight.Value(), 
+         /*lbuffer,lp, ubuffer,up,*/ weight_sum+arc.weight.Value(), 
          callback, cycles, fd_state_stack, filter_fd,
-         include_spv, spv);
+         /*include_spv,*/ spv);
       
-      if (include_spv)
-        spv.pop_back();
+      spv.pop_back();
 
       if(added_fd_state)
         fd_state_stack->pop_back();
@@ -2249,13 +2263,13 @@ namespace hfst { namespace implementations
   
   void TropicalWeightTransducer::extract_strings
   (StdVectorFst * t, hfst::ExtractStringsCb& callback,
-   int cycles, FdTable<int64>* fd, bool filter_fd, bool include_spv)
+   int cycles, FdTable<int64>* fd, bool filter_fd /*, bool include_spv*/)
   {
     if (t->Start() == -1)
       return;
     
-    vector<char> lbuffer(BUFFER_START_SIZE, 0);
-    vector<char> ubuffer(BUFFER_START_SIZE, 0);
+    //vector<char> lbuffer(BUFFER_START_SIZE, 0);
+    //vector<char> ubuffer(BUFFER_START_SIZE, 0);
     map<StateId, unsigned short> all_visitations;
     map<StateId, unsigned short> path_visitations;
     std::vector<hfst::FdState<int64> >* fd_state_stack 
@@ -2265,8 +2279,8 @@ namespace hfst { namespace implementations
     StringPairVector spv;
     hfst::implementations::extract_strings
       (t,t->Start(),all_visitations,path_visitations,
-       lbuffer,0,ubuffer,0,0.0f,callback,cycles,fd_state_stack,filter_fd, 
-       include_spv, spv);
+       /*lbuffer,0,ubuffer,0,*/0.0f,callback,cycles,fd_state_stack,filter_fd, 
+       /*include_spv,*/ spv);
   }
   
   FdTable<int64>* TropicalWeightTransducer::get_flag_diacritics

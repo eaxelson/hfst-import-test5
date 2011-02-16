@@ -207,17 +207,19 @@ void HfstOlInputStream::ignore(unsigned int n)
   (hfst_ol::Transducer* t, hfst_ol::TransitionTableIndex s,
    std::map<hfst_ol::TransitionTableIndex,unsigned short> all_visitations, 
    std::map<hfst_ol::TransitionTableIndex, unsigned short> path_visitations,
-   std::vector<char>& lbuffer, int lpos, std::vector<char>& ubuffer, int upos,
+   /*std::vector<char>& lbuffer, int lpos, 
+     std::vector<char>& ubuffer, int upos,*/
    float weight_sum,
    ExtractStringsCb& callback, int cycles,
    std::vector<hfst::FdState<hfst_ol::SymbolNumber> >* fd_state_stack, 
-   bool filter_fd)
+   bool filter_fd, StringPairVector &spv)
   {
     if(cycles >= 0 && path_visitations[s] > cycles)
       return true;
     all_visitations[s]++;
     path_visitations[s]++;
-    
+
+    /*    
     if(lpos > 0 && upos > 0)
     {
       lbuffer[lpos]=0;
@@ -257,7 +259,45 @@ void HfstOlInputStream::ignore(unsigned int n)
         return ret.continueSearch;
       }
     }
+    */
     
+    if (spv.size() != 0)
+      {
+      // check for finality
+      bool final=false;
+      float final_weight=0.0f;
+      if(hfst_ol::indexes_transition_index_table(s))
+      {
+        if(t->get_index(s).final())
+        {
+          final = true;
+          final_weight = t->get_header().probe_flag(hfst_ol::Weighted) ?
+              dynamic_cast<const hfst_ol::TransitionWIndex&>
+            (t->get_index(s)).final_weight() : 0.0f;
+        }
+      }
+      else
+      {
+        if(t->get_transition(s).final())
+        {
+          final = true;
+          final_weight = t->get_header().probe_flag(hfst_ol::Weighted) ?
+              dynamic_cast<const hfst_ol::TransitionW&>
+            (t->get_transition(s)).get_weight() : 0.0f;
+        }
+      }
+
+      hfst::HfstTwoLevelPath path
+	(spv, weight_sum+final_weight);
+      hfst::ExtractStringsCb::RetVal ret = callback(path, final);
+      if(!ret.continueSearch || !ret.continuePath)
+	{
+	  path_visitations[s]--;
+	  return ret.continueSearch;
+	}
+      }
+    
+
     // sort arcs by number of visitations
     hfst_ol::TransitionTableIndexSet transitions 
       = t->get_transitions_from_state(s);
@@ -299,7 +339,8 @@ void HfstOlInputStream::ignore(unsigned int n)
           }
         }
       }
-      
+
+      /*
       int lp=lpos;
       int up=upos;
       
@@ -323,14 +364,23 @@ void HfstOlInputStream::ignore(unsigned int n)
         strcpy(&ubuffer[upos], str.c_str());
         up += str.length();
       }
+      */
+
+      /* Handle spv here. Special symbols (flags, epsilons) 
+         are always inserted. */
+      StringPair string_pair(t->get_alphabet().get_symbol_table()[input],
+			     t->get_alphabet().get_symbol_table()[output]);
+      spv.push_back(string_pair);
       
       res = extract_strings
         (t, transition.get_target(), all_visitations, path_visitations,
-         lbuffer,lp, ubuffer,up, 
+         /*lbuffer,lp, ubuffer,up,*/ 
          weight_sum + (t->get_header().probe_flag(hfst_ol::Weighted) ? 
                        dynamic_cast<const hfst_ol::TransitionW&>(transition)
                        .get_weight() : 0.0f),
-         callback, cycles, fd_state_stack, filter_fd);
+         callback, cycles, fd_state_stack, filter_fd, spv);
+
+      spv.pop_back();
       
       if(added_fd_state)
         fd_state_stack->pop_back();
@@ -346,18 +396,20 @@ void HfstOlInputStream::ignore(unsigned int n)
   (hfst_ol::Transducer * t, hfst::ExtractStringsCb& callback,
    int cycles, const FdTable<hfst_ol::SymbolNumber>* fd, bool filter_fd)
   {
-    std::vector<char> lbuffer(BUFFER_START_SIZE, 0);
-    std::vector<char> ubuffer(BUFFER_START_SIZE, 0);
+    //std::vector<char> lbuffer(BUFFER_START_SIZE, 0);
+    //std::vector<char> ubuffer(BUFFER_START_SIZE, 0);
     std::map<hfst_ol::TransitionTableIndex, unsigned short> all_visitations;
     std::map<hfst_ol::TransitionTableIndex, unsigned short> path_visitations;
     std::vector<hfst::FdState<hfst_ol::SymbolNumber> >* fd_state_stack 
       = (fd==NULL) ? NULL : 
       new std::vector<hfst::FdState<hfst_ol::SymbolNumber> >
       (1, hfst::FdState<hfst_ol::SymbolNumber>(*fd));
+
+    StringPairVector spv;
     
     hfst::implementations::extract_strings
-      (t,0,all_visitations,path_visitations,lbuffer,0,ubuffer,0,0.0f,
-       callback,cycles,fd_state_stack,filter_fd);
+      (t,0,all_visitations,path_visitations,/*lbuffer,0,ubuffer,0,*/0.0f,
+       callback,cycles,fd_state_stack,filter_fd, spv);
   }
   
   const FdTable<hfst_ol::SymbolNumber>* HfstOlTransducer::

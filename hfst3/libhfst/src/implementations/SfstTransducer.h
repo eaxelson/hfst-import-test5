@@ -121,8 +121,7 @@ namespace implementations
       static std::vector<Transducer*> extract_paths(Transducer *t);
       static void extract_strings
         (Transducer * t, hfst::ExtractStringsCb& callback, int cycles=-1,
-         FdTable<SFST::Character>* fd=NULL, bool filter_fd=false, 
-         bool include_spv=false);
+         FdTable<SFST::Character>* fd=NULL, bool filter_fd=false);
 
       static Transducer * insert_freely
         (Transducer *t , const StringPair &symbol_pair);

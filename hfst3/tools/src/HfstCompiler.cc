@@ -407,19 +407,17 @@ namespace hfst
 	delete vt;
       }
       else {
-	WeightedPaths<float>::Set paths;
+	HfstTwoLevelPaths paths;
 	vt->extract_strings
-	  (paths, -1, -1, 
-	   true /* include a StringPairVector representation */);
+	  (paths, -1, -1);
 	delete vt;
 
-	// transform weighted paths to a vector of transducers
-	for (WeightedPaths<float>::Set::iterator it = paths.begin(); it != paths.end(); it++) {
-	  WeightedPath<float> wp = *it;	  
-	  HfstTransducer * path = new HfstTransducer(wp.spv, t->get_type());
+	// transform paths to a vector of transducers
+	for (HfstTwoLevelPaths::const_iterator it = paths.begin(); it != paths.end(); it++) {	  
+	  HfstTransducer * path = new HfstTransducer(it->first, t->get_type());
 	  //HfstTransducer * path 
 	  //  = new HfstTransducer(wp.istring, wp.ostring, TOK, t->get_type());
-	  path->set_final_weights(wp.weight);
+	  path->set_final_weights(it->second);
 	  transducer_paths.push_back(path);
 	}
       }

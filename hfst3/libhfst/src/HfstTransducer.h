@@ -644,8 +644,7 @@ This will yield a file "testfile.att" that looks as follows:
         the search will not end until the callback returns false.
         \a include_spv defines whether a StringPairVector representation
         of the extracted strings will be included in the WeightedPaths. */
-    void extract_strings(ExtractStringsCb& callback, int cycles=-1, 
-                         bool include_spv=false) const;
+    void extract_strings(ExtractStringsCb& callback, int cycles=-1) const;
 
     /** \brief Extract a maximum of \a max_num string pairs that are 
         recognized by the transducer
@@ -707,8 +706,7 @@ ccc : ddd
         @throws hfst::exceptions::TransducerIsCyclicException
         @see #n_best */
     void extract_strings
-      (WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1, 
-       bool include_spv=false) const;
+      (HfstTwoLevelPaths &results, int max_num=-1, int cycles=-1) const;
 
     /* \brief Call \a callback with extracted strings that are not 
        invalidated by flag diacritic rules.
@@ -718,8 +716,7 @@ ccc : ddd
 
        @see extract_strings(WeightedPaths<float>::Set&, int, int) */
     void extract_strings_fd
-      (ExtractStringsCb& callback, int cycles=-1, bool filter_fd=true, 
-       bool include_spv=false) const;
+      (ExtractStringsCb& callback, int cycles=-1, bool filter_fd=true) const;
     
   public:
     /** \brief Store to \a results string pairs that are recognized 
@@ -741,8 +738,8 @@ TODO...
   @throws hfst::exceptions::TransducerIsCyclicException
   @see extract_strings(WeightedPaths<float>::Set&, int, int) */
     void extract_strings_fd
-      (WeightedPaths<float>::Set &results, int max_num=-1, int cycles=-1, 
-       bool filter_fd=true, bool include_spv=false) const;
+      (HfstTwoLevelPaths &results, int max_num=-1, int cycles=-1, 
+       bool filter_fd=true) const;
 
     //! @brief Lookup or apply a single string \a s and store a maximum of 
     //! \a limit results to \a results.
@@ -767,7 +764,7 @@ TODO...
     //!
     //! @todo Do not ignore argument \a limit.
     //! @todo Handle flag diacritics as ordinary symbols.
-    void lookup(HfstLookupPaths& results, const HfstLookupPath& s,
+    void lookup(HfstLookupPaths& results, const StringVector& s,
                 ssize_t limit = -1) const;
 
     //! @brief Lookup or apply a single string minding flag diacritics properly.
@@ -776,7 +773,7 @@ TODO...
     //! and validates the sequences prior to outputting.
     //!
     //! @sa lookup
-    void lookup_fd(HfstLookupPaths& results, const HfstLookupPath& s,
+    void lookup_fd(HfstLookupPaths& results, const StringVector& s,
                    ssize_t limit = -1) const;
 
     //! @brief Lookdown a single string \a s and store a maximum of 
@@ -793,7 +790,7 @@ TODO...
     //! @param limit  number of strings to extract. -1 tries to extract all and
     //!             may get stuck if infinitely ambiguous
     //! @todo todo
-    void lookdown(HfstLookupPaths& results, const HfstLookupPath& s,
+    void lookdown(HfstLookupPaths& results, const StringVector& s,
                   ssize_t limit = -1) const;
 
     //! @brief Lookdown a single string minding flag diacritics properly
@@ -804,16 +801,16 @@ TODO...
     //!
     //! @sa lookdown
     //! @todo todo
-    void lookdown_fd(HfstLookupPaths& results, HfstLookupPath& s,
+    void lookdown_fd(HfstLookupPaths& results, StringVector& s,
                      ssize_t limit = -1) const;
 
     //! @brief Whether lookup of path \a s will have infinite results.
-    bool is_lookup_infinitely_ambiguous(const HfstLookupPath& s) const;
+    bool is_lookup_infinitely_ambiguous(const StringVector& s) const;
 
     //! @brief Whether lookdown of path \a s will have infinite results
     //! (not implemented).
     //! @todo todo
-    bool is_lookdown_infinitely_ambiguous(const HfstLookupPath& s) const;
+    bool is_lookdown_infinitely_ambiguous(const StringVector& s) const;
 
 
 
