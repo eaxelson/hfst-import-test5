@@ -161,7 +161,7 @@ bool Transducer::initialize_input(char * input_str)
     return true;
 }
 
-HfstLookupPaths Transducer::lookup_fd(const StringVector & s)
+HfstOneLevelPaths Transducer::lookup_fd(const StringVector & s)
 {
     lookup_paths.clear();
     std::string input_str;
@@ -173,7 +173,7 @@ HfstLookupPaths Transducer::lookup_fd(const StringVector & s)
 	input_str.append(s[i]);
     }
     if (!initialize_input(const_cast<char *>(input_str.c_str()))) {
-	HfstLookupPaths no_result;
+	HfstOneLevelPaths no_result;
 	return no_result;
     }
     //current_weight += s.second;
@@ -358,7 +358,7 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
 
 void Transducer::note_analysis(SymbolNumber * whole_output_tape)
 {
-    HfstLookupPath result;
+    HfstOneLevelPath result;
     for (SymbolNumber * num = whole_output_tape; *num != NO_SYMBOL_NUMBER; ++num)
     {
 	result.first.push_back(alphabet->string_from_symbol(*num));

@@ -30,7 +30,7 @@ namespace hfst
   // Copied from HfstDataTypes.h because including the file
   // causes problems with header file #ifndef _HEADER_FILE_H_ guards
   typedef std::vector<std::string> StringVector;
-  typedef std::pair<StringVector,float> HfstLookupPath;
+  typedef std::pair<StringVector,float> HfstOneLevelPath;
 
   class MultiCharSymbolTrie;
   typedef std::vector<MultiCharSymbolTrie*> MultiCharSymbolTrieVector;

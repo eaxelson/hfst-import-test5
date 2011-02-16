@@ -328,12 +328,12 @@ namespace hfst
 
   // *** LOOKUP FUNCTIONS... Implemented only for HFST_OL and HFST_OLW *** //
 
-  void HfstTransducer::lookup(HfstLookupPaths& results, const StringVector& s,
+  void HfstTransducer::lookup(HfstOneLevelPaths& results, const StringVector& s,
                               ssize_t limit) const {
     lookup_fd(results, s, limit);
   }
 
-    void HfstTransducer::lookup_fd(HfstLookupPaths& results, 
+    void HfstTransducer::lookup_fd(HfstOneLevelPaths& results, 
                                    const StringVector& s,
                                    ssize_t limit) const {
         switch(this->type) {
@@ -355,7 +355,7 @@ namespace hfst
         }
   }
 
-    void HfstTransducer::lookdown(HfstLookupPaths& results, 
+    void HfstTransducer::lookdown(HfstOneLevelPaths& results, 
                                   const StringVector& s,
                                   ssize_t limit) const {
     (void)results;
@@ -364,7 +364,7 @@ namespace hfst
     throw hfst::exceptions::FunctionNotImplementedException();
   }
 
-    void HfstTransducer::lookdown_fd(HfstLookupPaths& results, 
+    void HfstTransducer::lookdown_fd(HfstOneLevelPaths& results, 
                                      StringVector& s,
                                      ssize_t limit) const {
     (void)results;

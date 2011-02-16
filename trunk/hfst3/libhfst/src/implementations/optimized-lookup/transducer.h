@@ -48,8 +48,8 @@ typedef std::set<TransitionTableIndex> TransitionTableIndexSet;
 typedef std::vector<std::string> SymbolTable;
 
 // for lookup
-typedef std::pair<std::vector<std::string>, Weight> HfstLookupPath;
-typedef std::set<HfstLookupPath> HfstLookupPaths;
+typedef std::pair<std::vector<std::string>, Weight> HfstOneLevelPath;
+typedef std::set<HfstOneLevelPath> HfstOneLevelPaths;
 typedef std::vector<std::string> StringVector;
 
 const SymbolNumber NO_SYMBOL_NUMBER = std::numeric_limits<SymbolNumber>::max();
@@ -590,7 +590,7 @@ protected:
 
     // for lookup
     Weight current_weight;
-    HfstLookupPaths lookup_paths;
+    HfstOneLevelPaths lookup_paths;
     Encoder * encoder;
     SymbolNumber * input_tape;
     SymbolNumber * output_tape;
@@ -679,7 +679,7 @@ public:
 
 
     bool initialize_input(char * input_str);
-    HfstLookupPaths lookup_fd(const StringVector & s);
+    HfstOneLevelPaths lookup_fd(const StringVector & s);
     void note_analysis(SymbolNumber * whole_output_tape);
 
     friend class ConvertTransducer;

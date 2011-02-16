@@ -50,21 +50,26 @@ using hfst::implementations::HfstBasicTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 using hfst::HfstTokenizer;
-using hfst::HfstLookupPath;
-using hfst::HfstLookupPaths;
+using hfst::HfstOneLevelPath;
+using hfst::HfstOneLevelPaths;
+using hfst::HfstTwoLevelPath;
+using hfst::HfstTwoLevelPaths;
 using hfst::exceptions::NotTransducerStreamException;
 
 using hfst::StringPair;
 using hfst::StringPairVector;
+using hfst::StringVector;
 
 using std::string;
 using std::vector;
 
+/*
 typedef std::vector<std::string> HfstArcPath;
 typedef std::pair<HfstArcPath,float> HfstLookupPath;
 typedef std::set<HfstLookupPath> HfstLookupPaths;
 typedef std::pair<StringPairVector,float> StringPairPath;
 typedef std::set<StringPairPath > StringPairPaths;
+*/
 
 // add tools-specific variables here
 static char* lookup_file_name;
@@ -461,7 +466,7 @@ is_flag_diacritic(const std::string& label)
   } 
 
 bool
-is_valid_flag_diacritic_path(HfstArcPath arcs)
+is_valid_flag_diacritic_path(StringVector arcs)
   {
     if (not print_in_pairstring_format)
       fprintf(stderr, "Allowing all flag paths!\n");
@@ -471,8 +476,8 @@ is_valid_flag_diacritic_path(HfstArcPath arcs)
 
 
 int
-lookup_printf(const char* format, const HfstLookupPath* input,
-              const HfstLookupPath* result, const char* markup,
+lookup_printf(const char* format, const HfstOneLevelPath* input,
+              const HfstOneLevelPath* result, const char* markup,
               FILE * ofile)
 {
     size_t space = 0;
@@ -841,11 +846,11 @@ string_to_utf8(char* p)
     return path;
 }
 
-HfstLookupPath*
+HfstOneLevelPath*
 line_to_lookup_path(char** s, const hfst::HfstTokenizer& /* tok */,
                     char** markup, bool* outside_sigma)
 {
-    HfstLookupPath* rv = new HfstLookupPath;
+    HfstOneLevelPath* rv = new HfstOneLevelPath;
     rv->second = 0;
     *outside_sigma = false;
     inputs++;
@@ -938,10 +943,10 @@ line_to_lookup_path(char** s, const hfst::HfstTokenizer& /* tok */,
     return rv;
 }
 
-template<class T> HfstLookupPaths*
-lookup_simple(const HfstLookupPath& s, T& t, bool* infinity)
+template<class T> HfstOneLevelPaths*
+lookup_simple(const HfstOneLevelPath& s, T& t, bool* infinity)
 {
-  HfstLookupPaths* results = new HfstLookupPaths;
+  HfstOneLevelPaths* results = new HfstOneLevelPaths;
 
   (void)s;
   (void)t;
@@ -955,7 +960,7 @@ lookup_simple(const HfstLookupPath& s, T& t, bool* infinity)
 }
 
 bool is_lookup_infinitely_ambiguous
-(HfstBasicTransducer &t, const HfstLookupPath& s, 
+(HfstBasicTransducer &t, const HfstOneLevelPath& s, 
  unsigned int& index, HfstState state, 
  std::set<HfstState> &epsilon_path_states) 
 {
@@ -1006,7 +1011,7 @@ bool is_lookup_infinitely_ambiguous
 }
 
 bool is_lookup_infinitely_ambiguous(HfstBasicTransducer &t, 
-				    const HfstLookupPath& s)
+				    const HfstOneLevelPath& s)
 {
   std::set<HfstState> epsilon_path_states;
   //epsilon_path_states.insert(t.get_initial_state());
@@ -1018,10 +1023,10 @@ bool is_lookup_infinitely_ambiguous(HfstBasicTransducer &t,
                     epsilon_path_states);
 }
 
-HfstLookupPaths*
-lookup_simple(const HfstLookupPath& s, HfstTransducer& t, bool* infinity)
+HfstOneLevelPaths*
+lookup_simple(const HfstOneLevelPath& s, HfstTransducer& t, bool* infinity)
 {
-  HfstLookupPaths* results = new HfstLookupPaths;
+  HfstOneLevelPaths* results = new HfstOneLevelPaths;
   if (t.is_lookup_infinitely_ambiguous(s.first))
     {
       if (!silent && infinite_cutoff > 0) {
@@ -1068,14 +1073,14 @@ lookup_simple(const HfstLookupPath& s, HfstTransducer& t, bool* infinity)
   @pre The transducer \a t has tropical weights or no weights.
   @todo flag diacritics must be handled outside this function
  */
-void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results, 
-	       const HfstLookupPath& s, unsigned int& index, 
-	       HfstLookupPath& path, HfstState state, 
+void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results, 
+	       const HfstOneLevelPath& s, unsigned int& index, 
+	       HfstOneLevelPath& path, HfstState state, 
 	       std::multiset<HfstState>& visited_states, 
 	       std::vector<HfstState>& epsilon_path,
 	       unsigned int& cycles,
 	       /* These arguments that are used when include_spv == true */
-	       StringPairPaths &results_spv,
+	       HfstTwoLevelPaths &results_spv,
 	       StringPairVector &path_spv,
 	       bool &include_spv)
 { 
@@ -1091,7 +1096,7 @@ void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results,
     results.insert(path);
 
     if (include_spv) { // if we want StringPairVector representation
-      StringPairPath p(path_spv, path.second);
+      HfstTwoLevelPath p(path_spv, path.second);
       results_spv.insert(p);
     }
 
@@ -1222,17 +1227,17 @@ static std::string get_print_format(const std::string &s) {
   return std::string(s);
 }
 
-static void print_lookup_string(const HfstArcPath &s) {
-  for (HfstArcPath::const_iterator it = s.begin(); 
+static void print_lookup_string(const StringVector &s) {
+  for (StringVector::const_iterator it = s.begin(); 
        it != s.end(); it++) {
     fprintf(stderr, "%s", get_print_format(*it).c_str());
   }
 }
 
-void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results, 
-	       const HfstLookupPath& s, ssize_t limit = -1)
+void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results, 
+	       const HfstOneLevelPath& s, ssize_t limit = -1)
 {
-  HfstLookupPath path;
+  HfstOneLevelPath path;
   path.second=0;
   (void)limit;
   unsigned int index=0;
@@ -1244,7 +1249,7 @@ void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results,
   unsigned int cycles=0;
 
   /* If we want a StringPairVector representation */
-  StringPairPaths results_spv;
+  HfstTwoLevelPaths results_spv;
   StringPairVector path_spv;
 
   lookup_fd(t, results, s, index, 
@@ -1261,7 +1266,7 @@ void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results,
     }
     else {
       /* For all result strings, */
-      for (StringPairPaths::const_iterator it
+      for (HfstTwoLevelPaths::const_iterator it
 	     = results_spv.begin(); it != results_spv.end(); it++) {
 	
 	/* print the lookup string */
@@ -1282,15 +1287,15 @@ void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results,
     fprintf(outfile, "\n");
   }
 
-  HfstLookupPaths filtered;
-  for (HfstLookupPaths::iterator res = results.begin();
+  HfstOneLevelPaths filtered;
+  for (HfstOneLevelPaths::iterator res = results.begin();
        res != results.end();
        ++res)
     {
       if (is_valid_flag_diacritic_path(res->first) || !obey_flags)
         {
-          HfstArcPath unflagged;
-          for (HfstArcPath::const_iterator arc = res->first.begin();
+          StringVector unflagged;
+          for (StringVector::const_iterator arc = res->first.begin();
                arc != res->first.end();
                arc++)
             {
@@ -1299,16 +1304,16 @@ void lookup_fd(HfstBasicTransducer &t, HfstLookupPaths& results,
                   unflagged.push_back(*arc);
                 }
             }
-          filtered.insert(HfstLookupPath(unflagged, res->second));
+          filtered.insert(HfstOneLevelPath(unflagged, res->second));
         }
     }
   results = filtered;
 }
 
-HfstLookupPaths*
-lookup_simple(const HfstLookupPath& s, HfstBasicTransducer& t, bool* infinity)
+HfstOneLevelPaths*
+lookup_simple(const HfstOneLevelPath& s, HfstBasicTransducer& t, bool* infinity)
 {
-  HfstLookupPaths* results = new HfstLookupPaths;
+  HfstOneLevelPaths* results = new HfstOneLevelPaths;
 
   if (is_lookup_infinitely_ambiguous(t,s))
     {
@@ -1335,21 +1340,21 @@ lookup_simple(const HfstLookupPath& s, HfstBasicTransducer& t, bool* infinity)
 
 
 
-template<class T> HfstLookupPaths*
-lookup_cascading(const HfstLookupPath& s, vector<T> cascade,
+template<class T> HfstOneLevelPaths*
+lookup_cascading(const HfstOneLevelPath& s, vector<T> cascade,
                  bool* infinity)
 {
-  HfstLookupPaths* kvs = new HfstLookupPaths;
+  HfstOneLevelPaths* kvs = new HfstOneLevelPaths;
   kvs->insert(s);
   for (unsigned int i = 0; i < cascade.size(); i++)
     {
       // cascade here
-      HfstLookupPaths* newkvs = new HfstLookupPaths;
-      for (HfstLookupPaths::const_iterator ckv = kvs->begin();
+      HfstOneLevelPaths* newkvs = new HfstOneLevelPaths;
+      for (HfstOneLevelPaths::const_iterator ckv = kvs->begin();
            ckv != kvs->end();
            ++ckv)
         {
-          HfstLookupPaths* xyzkvs = lookup_simple<T>(*ckv, cascade[i],
+          HfstOneLevelPaths* xyzkvs = lookup_simple<T>(*ckv, cascade[i],
                              infinity);
           if (infinity)
             {
@@ -1360,7 +1365,7 @@ lookup_cascading(const HfstLookupPath& s, vector<T> cascade,
             {
               verbose_printf("%zu results @ level %u\n", xyzkvs->size(), i);
             }
-          for (HfstLookupPaths::const_iterator xyzkv = xyzkvs->begin();
+          for (HfstOneLevelPaths::const_iterator xyzkv = xyzkvs->begin();
                xyzkv != xyzkvs->end();
                ++xyzkv)
             {
@@ -1375,8 +1380,8 @@ lookup_cascading(const HfstLookupPath& s, vector<T> cascade,
 }
 
 void
-print_lookups(const HfstLookupPaths& kvs,
-              const HfstLookupPath& kv, char* markup,
+print_lookups(const HfstOneLevelPaths& kvs,
+              const HfstOneLevelPath& kv, char* markup,
               bool outside_sigma, bool inf, FILE * ofile)
 {
     if (outside_sigma)
@@ -1397,11 +1402,11 @@ print_lookups(const HfstLookupPaths& kvs,
       {
         analysed++;
         lookup_printf(infinite_begin_setf, &kv, NULL, markup, ofile);
-        for (HfstLookupPaths::const_iterator lkv = kvs.begin();
+        for (HfstOneLevelPaths::const_iterator lkv = kvs.begin();
                 lkv != kvs.end();
                 ++lkv)
           {
-            HfstLookupPath lup = *lkv;
+            HfstOneLevelPath lup = *lkv;
             lookup_printf(infinite_lookupf, &kv, &lup, markup, ofile);
             analyses++;
           }
@@ -1412,11 +1417,11 @@ print_lookups(const HfstLookupPaths& kvs,
         analysed++;
 
         lookup_printf(begin_setf, &kv, NULL, markup, ofile);
-        for (HfstLookupPaths::const_iterator lkv = kvs.begin();
+        for (HfstOneLevelPaths::const_iterator lkv = kvs.begin();
                 lkv != kvs.end();
                 ++lkv)
           {
-            HfstLookupPath lup = *lkv;
+            HfstOneLevelPath lup = *lkv;
             lookup_printf(lookupf, &kv, &lup, markup, ofile);
             analyses++;
         }
@@ -1424,11 +1429,11 @@ print_lookups(const HfstLookupPaths& kvs,
       }
 }
 
-template<class T> HfstLookupPaths*
-perform_lookups(HfstLookupPath& origin, std::vector<T>& cascade, 
+template<class T> HfstOneLevelPaths*
+perform_lookups(HfstOneLevelPath& origin, std::vector<T>& cascade, 
 		bool unknown, bool* infinite)
 {
-  HfstLookupPaths* kvs;
+  HfstOneLevelPaths* kvs;
     if (!unknown)
       {
         if (cascade.size() == 1)
@@ -1442,7 +1447,7 @@ perform_lookups(HfstLookupPath& origin, std::vector<T>& cascade,
       }
     else
       {
-        kvs = new HfstLookupPaths;
+        kvs = new HfstOneLevelPaths;
       }
     return kvs;
 }
@@ -1505,9 +1510,9 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
         char* markup = 0;
         bool unknown = false;
         bool infinite = false;
-        HfstLookupPath* kv = line_to_lookup_path(&line, tok, &markup,
+        HfstOneLevelPath* kv = line_to_lookup_path(&line, tok, &markup,
                                                  &unknown);
-        HfstLookupPaths* kvs;
+        HfstOneLevelPaths* kvs;
         try 
           {
             kvs = perform_lookups<HfstTransducer>(*kv, cascade, unknown,

@@ -31,10 +31,11 @@ namespace hfst {
   using std::stringstream;
   using std::ios;
 
-  /** \brief A weighted string pair that represents a path in a transducer.
+  /** \brief (Being replaced by HfstOneLevelPath and HfstTwoLevelPath)
+      A weighted string pair that represents a path in a transducer.
 
       @see WeightedPaths 
-      @see HfstLookupPath
+      @see HfstOneLevelPath
       @see HfstTransducer::extract_strings
   */
   template<class W> class WeightedPath
