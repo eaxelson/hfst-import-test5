@@ -2239,9 +2239,18 @@ namespace hfst { namespace implementations
       
       /* Handle spv here. Special symbols (flags, epsilons) 
          are always inserted. */
-      StringPair string_pair(t->InputSymbols()->Find(arc.ilabel),
-			     t->InputSymbols()->Find(arc.olabel));
-      spv.push_back(string_pair);
+
+      std::string istring("");
+      std::string ostring("");
+
+      if (!filter_fd || fd_state_stack->back().get_table().get_operation(arc.ilabel)==NULL)
+	istring = t->InputSymbols()->Find(arc.ilabel);
+
+      if (!filter_fd || fd_state_stack->back().get_table().get_operation(arc.olabel)==NULL)
+	ostring = t->InputSymbols()->Find(arc.olabel);
+
+      spv.push_back(StringPair(istring, ostring));
+
 
       res = extract_strings
         (t, arc.nextstate, all_visitations, path_visitations,

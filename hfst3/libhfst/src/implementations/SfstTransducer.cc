@@ -796,12 +796,20 @@ namespace hfst { namespace implementations {
          inserted. */
       Character lc=l.lower_char();
       Character uc=l.upper_char();
-      std::string istring(t->alphabet.write_char(lc));
-      std::string ostring(t->alphabet.write_char(uc));
+      std::string istring("");
+      std::string ostring("");
+
+      if (!filter_fd || fd_state_stack->back().get_table().get_operation(lc) == NULL)
+	istring = std::string(t->alphabet.write_char(lc));
+
+      if (!filter_fd || fd_state_stack->back().get_table().get_operation(uc) == NULL)
+	ostring = std::string(t->alphabet.write_char(uc));
+
       if (istring.compare("<>") == 0)
 	istring = std::string("@_EPSILON_SYMBOL_@");
       if (ostring.compare("<>") == 0)
 	ostring = std::string("@_EPSILON_SYMBOL_@");
+
       spv.push_back(StringPair(istring, ostring));
     
       res = extract_strings(t, arc[i]->target_node(), all_visitations, 

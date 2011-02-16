@@ -289,6 +289,7 @@ void HfstOlInputStream::ignore(unsigned int n)
 
       hfst::HfstTwoLevelPath path
 	(spv, weight_sum+final_weight);
+
       hfst::ExtractStringsCb::RetVal ret = callback(path, final);
       if(!ret.continueSearch || !ret.continuePath)
 	{
@@ -368,9 +369,20 @@ void HfstOlInputStream::ignore(unsigned int n)
 
       /* Handle spv here. Special symbols (flags, epsilons) 
          are always inserted. */
-      StringPair string_pair(t->get_alphabet().get_symbol_table()[input],
-			     t->get_alphabet().get_symbol_table()[output]);
-      spv.push_back(string_pair);
+      std::string istring("");
+      std::string ostring("");
+
+      if (!filter_fd || 
+	  fd_state_stack->back().get_table().
+	  get_operation(input)==NULL)
+	istring = t->get_alphabet().get_symbol_table()[input];
+
+      if (!filter_fd || 
+	  fd_state_stack->back().get_table().
+	  get_operation(output)==NULL)
+	ostring = t->get_alphabet().get_symbol_table()[output];
+
+      spv.push_back(StringPair(istring, ostring));
       
       res = extract_strings
         (t, transition.get_target(), all_visitations, path_visitations,
