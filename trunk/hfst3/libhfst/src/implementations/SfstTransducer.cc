@@ -688,16 +688,17 @@ namespace hfst { namespace implementations {
   static bool extract_strings
   (Transducer * t, Node *node,
    Node2Int &all_visitations, Node2Int &path_visitations,
-   vector<char>& lbuffer, int lpos, std::vector<char>& ubuffer, int upos,
+   /*vector<char>& lbuffer, int lpos, std::vector<char>& ubuffer, int upos,*/
    hfst::ExtractStringsCb& callback, int cycles,
    std::vector<hfst::FdState<Character> >* fd_state_stack, bool filter_fd,
-   bool include_spv, StringPairVector &spv)
+   /*bool include_spv*/ StringPairVector &spv)
   {
     if(cycles >= 0 && path_visitations[node] > cycles)
       return true;
     all_visitations[node]++;
     path_visitations[node]++;
-    
+
+    /*    
     if(lpos > 0 && upos > 0) {
       lbuffer[lpos] = 0;
       ubuffer[upos] = 0;
@@ -714,6 +715,19 @@ namespace hfst { namespace implementations {
         return ret.continueSearch;
       }
     }
+    */
+
+    if (spv.size() != 0)
+      {
+	bool final = node->is_final();
+	hfst::HfstTwoLevelPath path(spv,0);
+	hfst::ExtractStringsCb::RetVal ret = callback(path, final);
+	if(!ret.continueSearch || !ret.continuePath)
+	  {
+	    path_visitations[node]--;
+	    return ret.continueSearch;
+	  }
+      }
     
     // sort arcs by number of visitations
     vector<Arc*> arc;
@@ -748,6 +762,7 @@ namespace hfst { namespace implementations {
         }
       }
       
+      /*
       int lp=lpos;
       int up=upos;
       
@@ -775,30 +790,30 @@ namespace hfst { namespace implementations {
         strcpy(&ubuffer[upos], c);
         up += clen;
       }
+      */
       
       /* Handle spv here. Special symbols (flags, epsilons) are always 
          inserted. */
-      if (include_spv) {
-        std::string istring(t->alphabet.write_char(lc));
-        std::string ostring(t->alphabet.write_char(uc));
-        if (istring.compare("<>") == 0)
-          istring = std::string("@_EPSILON_SYMBOL_@");
-        if (ostring.compare("<>") == 0)
-          ostring = std::string("@_EPSILON_SYMBOL_@");
-        spv.push_back(StringPair(istring, ostring));
-      }
-
+      Character lc=l.lower_char();
+      Character uc=l.upper_char();
+      std::string istring(t->alphabet.write_char(lc));
+      std::string ostring(t->alphabet.write_char(uc));
+      if (istring.compare("<>") == 0)
+	istring = std::string("@_EPSILON_SYMBOL_@");
+      if (ostring.compare("<>") == 0)
+	ostring = std::string("@_EPSILON_SYMBOL_@");
+      spv.push_back(StringPair(istring, ostring));
+    
       res = extract_strings(t, arc[i]->target_node(), all_visitations, 
-                            path_visitations,
-                            lbuffer, lp, ubuffer, up, callback, cycles, 
-                            fd_state_stack, filter_fd, include_spv, spv);
-      if (include_spv)
-        spv.pop_back();
+			    path_visitations,
+			    /*lbuffer, lp, ubuffer, up,*/ callback, cycles, 
+			    fd_state_stack, filter_fd, /*include_spv*/ spv);
+      spv.pop_back();
       
       if(added_fd_state)
-        fd_state_stack->pop_back();
+	fd_state_stack->pop_back();
     }
-    
+
     path_visitations[node]--;
     return res;
   }
@@ -807,13 +822,13 @@ namespace hfst { namespace implementations {
   
     void SfstTransducer::extract_strings
     (Transducer * t, hfst::ExtractStringsCb& callback, int cycles, 
-     FdTable<SFST::Character>* fd, bool filter_fd, bool include_spv)
+     FdTable<SFST::Character>* fd, bool filter_fd /*bool include_spv*/)
     {
     if(!t->root_node())
       return;
     
-    vector<char> lbuffer(BUFFER_START_SIZE, 0);
-    vector<char> ubuffer(BUFFER_START_SIZE, 0);
+    //vector<char> lbuffer(BUFFER_START_SIZE, 0);
+    //vector<char> ubuffer(BUFFER_START_SIZE, 0);
     Node2Int all_visitations;
     Node2Int path_visitations;
     vector<hfst::FdState<Character> >* fd_state_stack = 
@@ -823,9 +838,10 @@ namespace hfst { namespace implementations {
     
     StringPairVector spv;
     hfst::implementations::extract_strings
-      (t, t->root_node(), all_visitations, path_visitations, lbuffer, 0, 
-       ubuffer, 0, callback, cycles, fd_state_stack, filter_fd, 
-       include_spv, spv);
+      (t, t->root_node(), all_visitations, path_visitations, /*lbuffer, 0, 
+							       ubuffer, 0,*/
+       callback, cycles, fd_state_stack, filter_fd, 
+       /*include_spv,*/ spv);
   }
 
 

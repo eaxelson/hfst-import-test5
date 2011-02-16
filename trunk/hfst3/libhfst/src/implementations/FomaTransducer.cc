@@ -458,18 +458,19 @@ namespace hfst { namespace implementations {
   (fsm * t, int state,
    std::map<int,unsigned short> all_visitations, 
    std::map<int, unsigned short> path_visitations,
-   std::vector<char>& lbuffer, int lpos, 
-   std::vector<char>& ubuffer, int upos,
+   /*std::vector<char>& lbuffer, int lpos, 
+     std::vector<char>& ubuffer, int upos,*/
    ExtractStringsCb& callback, int cycles,
    std::vector<hfst::FdState<int> >* fd_state_stack, 
    bool filter_fd, 
-   bool include_spv, StringPairVector &spv)
+   /*bool include_spv,*/ StringPairVector &spv)
   {
     if(cycles >= 0 && path_visitations[state] > cycles)
       return true;
     all_visitations[state]++;
     path_visitations[state]++;
     
+    /*
     if(lpos > 0 && upos > 0)
     {
       lbuffer[lpos] = 0;
@@ -499,7 +500,32 @@ namespace hfst { namespace implementations {
         return ret.continueSearch;
       }
     }
+    */
+
+    if (spv.size() != 0)
+      {
+	//check finality
+	bool final = false;
+	for(int i=0; ((t->states)+i)->state_no != -1; i++)
+	  {
+	    fsm_state* s = (t->states)+i;
+	    if(s->state_no == state && s->final_state == 1)
+	      {
+		final = true;
+		break;
+	      }
+	  }
+	
+	hfst::HfstTwoLevelPath path(spv,0);
+	hfst::ExtractStringsCb::RetVal ret = callback(path, final);
+	if(!ret.continueSearch || !ret.continuePath)
+	  {
+	    path_visitations[state]--;
+	    return ret.continueSearch;
+	  }
+      }
     
+
     // find and sort transitions
     std::vector<fsm_state*> sorted_arcs;
     for(int i=0; ((t->states)+i)->state_no != -1; i++)
@@ -519,6 +545,7 @@ namespace hfst { namespace implementations {
       }
     }
     
+
     bool res = true;
     for(size_t i=0; i<sorted_arcs.size() && res == true; i++)
     {
@@ -538,6 +565,7 @@ namespace hfst { namespace implementations {
         }
       }
       
+      /*
       int lp=lpos;
       int up=upos;
       
@@ -583,41 +611,41 @@ namespace hfst { namespace implementations {
         strcpy(&ubuffer[upos], c);
         up += clen;
       }
-      
+      */      
+
+
       /* Handle spv here. Special symbols (flags, epsilons) 
          are always inserted. */
-      if (include_spv) {
     
-        //find the key in sigma
-        char* c_in=NULL;
-        for(struct sigma* sig=t->sigma; sig!=NULL&&sig->symbol!=NULL; 
-            sig=sig->next)
-      { if(sig->number == arc->in) {
-          c_in = sig->symbol;
-          break; }
+      //find the key in sigma
+      char* c_in=NULL;
+      for(struct sigma* sig=t->sigma; sig!=NULL&&sig->symbol!=NULL; 
+	  sig=sig->next)
+	{ if(sig->number == arc->in) {
+	    c_in = sig->symbol;
+	    break; }
+	}
+
+      //find the key in sigma
+      char* c_out=NULL;
+      for(struct sigma* sig=t->sigma; sig!=NULL&&sig->symbol!=NULL; 
+	  sig=sig->next) {
+	if(sig->number == arc->out) {
+	  c_out = sig->symbol;
+	  break; }
       }
 
-        //find the key in sigma
-        char* c_out=NULL;
-        for(struct sigma* sig=t->sigma; sig!=NULL&&sig->symbol!=NULL; 
-            sig=sig->next) {
-          if(sig->number == arc->out) {
-            c_out = sig->symbol;
-            break; }
-        }
+      StringPair string_pair(std::string(strdup(c_in)),
+			     std::string(strdup(c_out)));
+      spv.push_back(string_pair);
 
-    StringPair string_pair(std::string(strdup(c_in)),
-                           std::string(strdup(c_out)));
-    spv.push_back(string_pair);
-      }
 
       res = extract_strings(t, arc->target, all_visitations, path_visitations,
-                            lbuffer, lp, ubuffer, up, callback, cycles,
+                            /*lbuffer, lp, ubuffer, up,*/ callback, cycles,
                             fd_state_stack, filter_fd,
-                            include_spv, spv);
-    
-      if (include_spv)
-    spv.pop_back();
+                            /*include_spv,*/ spv);
+
+      spv.pop_back();
 
       if(added_fd_state)
         fd_state_stack->pop_back();
@@ -631,11 +659,11 @@ namespace hfst { namespace implementations {
   
   void FomaTransducer::extract_strings
   (fsm * t, ExtractStringsCb& callback,
-   int cycles, FdTable<int>* fd, bool filter_fd, 
-   bool include_spv)  
+   int cycles, FdTable<int>* fd, bool filter_fd 
+   /*bool include_spv*/)  
   {
-    std::vector<char> lbuffer(BUFFER_START_SIZE, 0);
-    std::vector<char> ubuffer(BUFFER_START_SIZE, 0);
+    //std::vector<char> lbuffer(BUFFER_START_SIZE, 0);
+    //std::vector<char> ubuffer(BUFFER_START_SIZE, 0);
     std::map<int, unsigned short> all_visitations;
     std::map<int, unsigned short> path_visitations;
     std::vector<hfst::FdState<int> >* fd_state_stack 
@@ -648,8 +676,8 @@ namespace hfst { namespace implementations {
       if (((t->states)+i)->start_state == 1)
         res = hfst::implementations::extract_strings
           (t, ((t->states)+i)->state_no, all_visitations, path_visitations,
-           lbuffer, 0, ubuffer, 0, callback, cycles, fd_state_stack, 
-           filter_fd, include_spv, spv);
+           /*lbuffer, 0, ubuffer, 0,*/ callback, cycles, fd_state_stack, 
+           filter_fd, /*include_spv,*/ spv);
     }
   }
   

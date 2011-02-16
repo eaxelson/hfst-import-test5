@@ -43,8 +43,6 @@ using namespace hfst;
 using hfst::implementations::HfstBasicTransition;
 using hfst::implementations::HfstBasicTransducer;
 
-typedef std::vector<std::string> StringVector;
-
 /* Used by function 'do_hfst_lookup_paths_contain'. */
 bool compare_string_vectors(const StringVector &v1, const StringVector &v2,
 			    bool test_strings=false)
@@ -79,7 +77,7 @@ bool compare_string_vectors(const StringVector &v1, const StringVector &v2,
    whether the weight of the path found in \a results must be equal to
    \a path_weight (a deviation of +/- 0.01 is allowed). */
 bool do_hfst_lookup_paths_contain(const HfstLookupPaths &results,
-				  const HfstLookupPath &expected_path,
+				  const StringVector &expected_path,
 				  float path_weight=0,
 				  bool test_path_weight=false)
 {
@@ -88,7 +86,7 @@ bool do_hfst_lookup_paths_contain(const HfstLookupPaths &results,
   for (HfstLookupPaths::const_iterator it = results.begin();
        it != results.end(); it++)
     {
-      if (compare_string_vectors(it->first, expected_path.first, true)) 
+      if (compare_string_vectors(it->first, expected_path, true)) 
 	{
 	  found = true;
 	  weight = it->second;
@@ -105,22 +103,33 @@ bool do_hfst_lookup_paths_contain(const HfstLookupPaths &results,
   return false;  
 }
 
-bool do_weighted_paths_contain(const WeightedPaths<float>::Set &paths,
-			       const std::string &istring,
-			       const std::string &ostring,
-			       float weight=0,
-			       bool test_path_weight=false)
+bool do_results_contain(const HfstTwoLevelPaths &paths,
+			const std::string &istring,
+			const std::string &ostring,
+			float weight=0,
+			bool test_path_weight=false)
 {
-  for (WeightedPaths<float>::Set::const_iterator it = paths.begin();
+  for (HfstTwoLevelPaths::const_iterator it = paths.begin();
        it != paths.end(); it++)
     {
-      if (it->istring.compare(istring) == 0 &&
-	  it->ostring.compare(ostring) == 0)
+      std::string path_istring;
+      std::string path_ostring;
+      for (StringPairVector::const_iterator IT = it->first.begin();
+	   IT != it->first.end(); IT++)
+	{
+	  if (IT->first.compare("@_EPSILON_SYMBOL_@") != 0)
+	    path_istring.append(IT->first);
+	  if (IT->second.compare("@_EPSILON_SYMBOL_@") != 0)
+	    path_ostring.append(IT->second);
+	}
+
+      if (path_istring.compare(istring) == 0 &&
+	  path_ostring.compare(ostring) == 0)
 	{
 	  if (not test_path_weight)
 	    return true;
-	  if (it->weight > (weight - 0.01) && 
-	      it->weight < (weight + 0.01))
+	  if (it->second > (weight - 0.01) && 
+	      it->second < (weight + 0.01))
 	    return true;
 	}
     }
@@ -291,29 +300,40 @@ int main(int argc, char **argv)
 	expected_results.insert(StringPair("dog","dogs"));
 	expected_results.insert(StringPair("mouse","mice"));
 
-	WeightedPaths<float>::Set results;
+	HfstTwoLevelPaths results;
 	animals.extract_strings(results, 
 				3, /* max_num */ 
 				0  /* cycles */ );
 
 	/* Test that results are as expected. */
 	assert(results.size() == 3);
-	for (WeightedPaths<float>::Set::const_iterator it = results.begin();
+	for (HfstTwoLevelPaths::const_iterator it = results.begin();
 	     it != results.end(); it++)
 	  {
-	    StringPair sp(it->istring, it->ostring);
+	    std::string istring;
+	    std::string ostring;
+	    for(StringPairVector::const_iterator IT = it->first.begin();
+		IT != it->first.end(); IT++)
+	      {
+		if (IT->first.compare("@_EPSILON_SYMBOL_@") != 0)
+		  istring.append(IT->first);
+		if (IT->second.compare("@_EPSILON_SYMBOL_@") != 0)
+		  ostring.append(IT->second);
+	      }
+	    StringPair sp(istring, ostring);
+
 	    assert(expected_results.find(sp) != expected_results.end());
 	    /* Test weights. */
 	    if (types[i] == TROPICAL_OPENFST_TYPE ||
 		types[i] == LOG_OPENFST_TYPE)
 	      {
 		/* Rounding can affect precision. */
-		if (it->istring.compare("cat") == 0)
-		  assert(it->weight > 2.99 && it->weight < 3.01);
-		else if (it->istring.compare("dog") == 0)
-		  assert(it->weight > 2.49 && it->weight < 2.51);
-		else if (it->istring.compare("mouse") == 0)
-		  assert(it->weight > 1.69 && it->weight < 1.71);
+		if (istring.compare("cat") == 0)
+		  assert(it->second > 2.99 && it->second < 3.01);
+		else if (istring.compare("dog") == 0)
+		  assert(it->second > 2.49 && it->second < 2.51);
+		else if (istring.compare("mouse") == 0)
+		  assert(it->second > 1.69 && it->second < 1.71);
 		else
 		  assert(false);
 	      }
@@ -354,11 +374,11 @@ int main(int argc, char **argv)
 	ssize_t limit=-1;
 
 	/* strings to lookup */
-	HfstLookupPath lookup_cat = tok.lookup_tokenize("cat");
-	HfstLookupPath lookup_dog = tok.lookup_tokenize("dog");
-	HfstLookupPath lookup_mouse = tok.lookup_tokenize("mouse");
-	HfstLookupPath lookup_hippopotamus 
-	  = tok.lookup_tokenize("hippopotamus");
+	StringVector lookup_cat = tok.tokenize_one_level("cat");
+	StringVector lookup_dog = tok.tokenize_one_level("dog");
+	StringVector lookup_mouse = tok.tokenize_one_level("mouse");
+	StringVector lookup_hippopotamus 
+	  = tok.tokenize_one_level("hippopotamus");
 
 	/* where results of lookup are stored */
 	HfstLookupPaths results_cat;
@@ -394,25 +414,25 @@ int main(int argc, char **argv)
 	  test_weight=true; }
 
 	/* check that the results are correct */
-	HfstLookupPath expected_path = tok.lookup_tokenize("cats");
+	StringVector expected_path = tok.tokenize_one_level("cats");
 
 	assert(do_hfst_lookup_paths_contain
 	       (results_cat, expected_path, 3, test_weight));
 
-	expected_path = tok.lookup_tokenize("dogs");
+	expected_path = tok.tokenize_one_level("dogs");
 	assert(do_hfst_lookup_paths_contain
 	       (results_dog, expected_path, 2.5, test_weight));
 
-	expected_path = tok.lookup_tokenize("mice");
+	expected_path = tok.tokenize_one_level("mice");
 	assert(do_hfst_lookup_paths_contain
 		(results_mouse, expected_path, 1.7, test_weight));
 
-	expected_path = tok.lookup_tokenize("hippopotami");
+	expected_path = tok.tokenize_one_level("hippopotami");
 	if (types[i] != LOG_OPENFST_TYPE)
 	  assert(do_hfst_lookup_paths_contain
 		 (results_hippopotamus, expected_path, 1.2, test_weight));
 	
-	expected_path = tok.lookup_tokenize("hippopotamuses");
+	expected_path = tok.tokenize_one_level("hippopotamuses");
 	if (types[i] != LOG_OPENFST_TYPE)
 	  assert(do_hfst_lookup_paths_contain
 		 (results_hippopotamus, expected_path, 1.4, test_weight));
@@ -434,81 +454,81 @@ int main(int argc, char **argv)
 
 	    HfstTransducer animals1(animals);
 	    animals1.n_best(1);
-	    WeightedPaths<float>::Set results1;
+	    HfstTwoLevelPaths results1;
 	    animals1.extract_strings(results1);
 	    assert(results1.size() == 1);
 	    if (weighted) {
-	      assert(do_weighted_paths_contain
+	      assert(do_results_contain
 		     (results1, "hippopotamus", "hippopotami", 1.2, true));
 	    }
 	    
 	    HfstTransducer animals2(animals);
 	    animals2.n_best(2);
-	    WeightedPaths<float>::Set results2;
+	    HfstTwoLevelPaths results2;
 	    animals2.extract_strings(results2);
 	    assert(results2.size() == 2);
 	    if (weighted) {
-	      assert(do_weighted_paths_contain
+	      assert(do_results_contain
 		     (results2, "hippopotamus", "hippopotami", 1.2, true)
 		     &&
-		     do_weighted_paths_contain
+		     do_results_contain
 		     (results2, "hippopotamus", "hippopotamuses", 1.4, true));
 	    }
 	    
 	    HfstTransducer animals3(animals);
 	    animals3.n_best(3);
-	    WeightedPaths<float>::Set results3;
+	    HfstTwoLevelPaths results3;
 	    animals3.extract_strings(results3);
 	    assert(results3.size() == 3);
 	    if (weighted) {
-	      assert(do_weighted_paths_contain
+	      assert(do_results_contain
 		     (results3, "hippopotamus", "hippopotami", 1.2, true)
 		     &&
-		     do_weighted_paths_contain
+		     do_results_contain
 		     (results3, "hippopotamus", "hippopotamuses", 1.4, true)
 		     &&
-		     do_weighted_paths_contain
+		     do_results_contain
 		     (results3, "mouse", "mice", 1.7, true));
 	    }	    
 
 	    HfstTransducer animals4(animals);
 	    animals4.n_best(4);
-	    WeightedPaths<float>::Set results4;
+	    HfstTwoLevelPaths results4;
 	    animals4.extract_strings(results4);
 	    assert(results4.size() == 4);
 	    if (weighted) {
-	      assert(do_weighted_paths_contain
+	      assert(do_results_contain
 		     (results4, "hippopotamus", "hippopotami", 1.2, true)
 		     &&
-		     do_weighted_paths_contain
+		     do_results_contain
 		     (results4, "hippopotamus", "hippopotamuses", 1.4, true)
 		     &&
-		     do_weighted_paths_contain
+		     do_results_contain
 		     (results4, "mouse", "mice", 1.7, true)
 		     &&
-		     do_weighted_paths_contain
+		     do_results_contain
 		     (results4, "dog", "dogs", 2.5, true));
 	    }	    	    
 
 	    HfstTransducer animals5(animals);
 	    animals5.n_best(5);
-	    WeightedPaths<float>::Set results5;
+	    HfstTwoLevelPaths results5;
 	    animals5.extract_strings(results5);
 	    assert(results5.size() == 5);
 	    if (weighted) {
-	      assert(do_weighted_paths_contain
+	      assert(do_results_contain
 		     (results5, "hippopotamus", "hippopotami", 1.2, true)
 		     &&
-		     do_weighted_paths_contain
+		     do_results_contain
 		     (results5, "hippopotamus", "hippopotamuses", 1.4, true)
 		     &&
-		     do_weighted_paths_contain
+		     do_results_contain
 		     (results5, "mouse", "mice", 1.7, true)
 		     &&
-		     do_weighted_paths_contain
+		     do_results_contain
 		     (results5, "dog", "dogs", 2.5, true)
 		     &&
-		     do_weighted_paths_contain
+		     do_results_contain
 		     (results5, "cat", "cats", 3.0, true));
 	    }	    	    
 

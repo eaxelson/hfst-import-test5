@@ -42,6 +42,7 @@ using hfst::exceptions::NotTransducerStreamException;
 using hfst::WeightedPaths;
 using hfst::WeightedPath;
 using hfst::StringPairVector;
+using hfst::HfstTwoLevelPath;
 
 using hfst::HFST_OL_TYPE;
 using hfst::HFST_OLW_TYPE;
@@ -219,35 +220,44 @@ class Callback : public hfst::ExtractStringsCb
   int max_num;
   std::ostream* out_;
   Callback(int max, std::ostream* out): count(0), max_num(max), out_(out) {}
-  RetVal operator()(WeightedPath<float>& wp, bool final)
+  RetVal operator()(HfstTwoLevelPath &path, bool final)
   {
+    std::string istring;
+    std::string ostring;
+    for(StringPairVector::const_iterator it = path.first.begin();
+	it != path.first.end(); it++) {
+      istring.append(it->first);
+      ostring.append(it->second);
+    }
+
+
     if( (max_input_length > 0) &&
-       (wp.istring.length() > max_input_length))
+       (istring.length() > max_input_length))
       return RetVal(true, false); // continue searching, break off this path
     if((max_output_length > 0) &&
-       (wp.ostring.length() > max_output_length))
+       (ostring.length() > max_output_length))
       return RetVal(true, false); // continue searching, break off this path
     
     if(input_prefix.length() > 0)
     {
-      if(wp.istring.length() < input_prefix.length())
+      if(istring.length() < input_prefix.length())
         return RetVal(true, true);
-      if(wp.istring.compare(0, input_prefix.length(), input_prefix) != 0)
+      if(istring.compare(0, input_prefix.length(), input_prefix) != 0)
         return RetVal(true, false); // continue searching, break off this path
     }
     if(output_prefix.length() > 0)
     {
-      if(wp.ostring.length() < output_prefix.length())
+      if(ostring.length() < output_prefix.length())
         return RetVal(true, true);
-      if(wp.ostring.compare(0, output_prefix.length(), output_prefix) != 0)
+      if(ostring.compare(0, output_prefix.length(), output_prefix) != 0)
         return RetVal(true, false); // continue searching, break off this path
     }
     
     if(input_exclude.length() > 0 && 
-       wp.istring.find(input_exclude) != std::string::npos)
+       istring.find(input_exclude) != std::string::npos)
       return RetVal(true, false); // continue searching, break off this path
     if(output_exclude.length() > 0 && 
-       wp.ostring.find(output_exclude) != std::string::npos)
+       ostring.find(output_exclude) != std::string::npos)
       return RetVal(true, false); // continue searching, break off this path
     
     // the path passed the checks. Print it if it is final
@@ -256,8 +266,8 @@ class Callback : public hfst::ExtractStringsCb
 
       if (print_in_pairstring_format) 
 	{
-	  for (StringPairVector::const_iterator it = wp.spv.begin();
-	       it != wp.spv.end(); it++) 
+	  for (StringPairVector::const_iterator it = path.first.begin();
+	       it != path.first.end(); it++) 
 	    {
 	      *out_ << get_print_format(it->first)
 		    << ":"
@@ -265,17 +275,17 @@ class Callback : public hfst::ExtractStringsCb
 		    << " ";
 	    }
 	  if (display_weights) {
-	    *out_ << "\t" << wp.weight;
+	    *out_ << "\t" << path.second;
 	  }
 	  *out_ << "\n";
 	}
 	
       else {
-	*out_ << wp.istring;
-	if(wp.ostring != wp.istring)
-	  *out_ << "\t" << wp.ostring;
+	*out_ << istring;
+	if(ostring != istring)
+	  *out_ << "\t" << ostring;
 	if(display_weights)
-	  *out_ << "\t" << wp.weight;
+	  *out_ << "\t" << path.second;
 	*out_ << std::endl;
       }
 
@@ -338,9 +348,9 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
     
     Callback cb(max_strings, &outstream);
     if(eval_fd)
-      t.extract_strings_fd(cb, cycles, filter_fd, print_in_pairstring_format);
+      t.extract_strings_fd(cb, cycles, filter_fd);
     else
-      t.extract_strings(cb, cycles, print_in_pairstring_format);
+      t.extract_strings(cb, cycles);
     
     verbose_printf("Printed %i string(s)\n", cb.count);
   }

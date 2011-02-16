@@ -23,6 +23,11 @@
     \brief Classes WeightedPath and WeightsPaths */
 
 namespace hfst {
+
+  typedef std::vector<std::pair<std::string,std::string> > StringPairVector;
+  typedef std::pair<StringPairVector,float> HfstTwoLevelPath;
+  typedef std::set<HfstTwoLevelPath> HfstTwoLevelPaths;
+
   using std::stringstream;
   using std::ios;
 
@@ -190,7 +195,8 @@ namespace hfst {
        *          should continue, be broken off immediately, 
        *          or whether the specific path should no longer be followed.
        */
-      virtual RetVal operator()(WeightedPath<float>& path, bool final) = 0;
+      //virtual RetVal operator()(WeightedPath<float>& path, bool final) = 0;
+      virtual RetVal operator()(HfstTwoLevelPath& path, bool final) = 0;
     };
   }
 #endif

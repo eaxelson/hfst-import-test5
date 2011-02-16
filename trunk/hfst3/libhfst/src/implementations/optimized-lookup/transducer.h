@@ -50,6 +50,7 @@ typedef std::vector<std::string> SymbolTable;
 // for lookup
 typedef std::pair<std::vector<std::string>, Weight> HfstLookupPath;
 typedef std::set<HfstLookupPath> HfstLookupPaths;
+typedef std::vector<std::string> StringVector;
 
 const SymbolNumber NO_SYMBOL_NUMBER = std::numeric_limits<SymbolNumber>::max();
 const TransitionTableIndex NO_TABLE_INDEX = std::numeric_limits<TransitionTableIndex>::max();
@@ -678,7 +679,7 @@ public:
 
 
     bool initialize_input(char * input_str);
-    HfstLookupPaths lookup_fd(const HfstLookupPath & s);
+    HfstLookupPaths lookup_fd(const StringVector & s);
     void note_analysis(SymbolNumber * whole_output_tape);
 
     friend class ConvertTransducer;

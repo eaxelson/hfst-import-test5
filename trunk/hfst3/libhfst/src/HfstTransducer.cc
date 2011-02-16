@@ -328,13 +328,13 @@ namespace hfst
 
   // *** LOOKUP FUNCTIONS... Implemented only for HFST_OL and HFST_OLW *** //
 
-  void HfstTransducer::lookup(HfstLookupPaths& results, const HfstLookupPath& s,
+  void HfstTransducer::lookup(HfstLookupPaths& results, const StringVector& s,
                               ssize_t limit) const {
     lookup_fd(results, s, limit);
   }
 
     void HfstTransducer::lookup_fd(HfstLookupPaths& results, 
-                                   const HfstLookupPath& s,
+                                   const StringVector& s,
                                    ssize_t limit) const {
         switch(this->type) {
 
@@ -356,7 +356,7 @@ namespace hfst
   }
 
     void HfstTransducer::lookdown(HfstLookupPaths& results, 
-                                  const HfstLookupPath& s,
+                                  const StringVector& s,
                                   ssize_t limit) const {
     (void)results;
     (void)s;
@@ -365,7 +365,7 @@ namespace hfst
   }
 
     void HfstTransducer::lookdown_fd(HfstLookupPaths& results, 
-                                     HfstLookupPath& s,
+                                     StringVector& s,
                                      ssize_t limit) const {
     (void)results;
     (void)s;
@@ -373,7 +373,7 @@ namespace hfst
     throw hfst::exceptions::FunctionNotImplementedException();
   }
 
-  bool HfstTransducer::is_lookup_infinitely_ambiguous(const HfstLookupPath& s)
+  bool HfstTransducer::is_lookup_infinitely_ambiguous(const StringVector& s)
     const {
       switch(this->type) {
       /* TODO: Convert into HFST_OL(W)_TYPE, if needed. */
@@ -387,7 +387,7 @@ namespace hfst
   }
 
   bool HfstTransducer::is_lookdown_infinitely_ambiguous
-  (const HfstLookupPath& s) const {
+  (const StringVector& s) const {
     (void)s;
     throw hfst::exceptions::FunctionNotImplementedException();
   }
@@ -1198,8 +1198,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
     return hfst_paths;
   }
 
-  void HfstTransducer::extract_strings(ExtractStringsCb& callback, int cycles,
-                                       bool include_spv)
+  void HfstTransducer::extract_strings(ExtractStringsCb& callback, int cycles)
     const
   { 
     switch (this->type)
@@ -1207,23 +1206,23 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 #if HAVE_OPENFST
       case LOG_OPENFST_TYPE:
         hfst::implementations::LogWeightTransducer::extract_strings
-          (implementation.log_ofst,callback,cycles,NULL,false,include_spv);
+          (implementation.log_ofst,callback,cycles,NULL,false);
         break;
       case TROPICAL_OPENFST_TYPE:
         hfst::implementations::TropicalWeightTransducer::extract_strings
-          (implementation.tropical_ofst,callback,cycles,NULL,false,include_spv);
+          (implementation.tropical_ofst,callback,cycles,NULL,false);
         break;
 #endif
 #if HAVE_SFST
       case SFST_TYPE:
         hfst::implementations::SfstTransducer::extract_strings
-          (implementation.sfst, callback, cycles,NULL,false,include_spv);
+          (implementation.sfst, callback, cycles,NULL,false);
         break;
 #endif
 #if HAVE_FOMA
       case FOMA_TYPE:
         hfst::implementations::FomaTransducer::extract_strings
-          (implementation.foma, callback, cycles,NULL,false,include_spv);
+          (implementation.foma, callback, cycles,NULL,false);
         break;
 #endif
        /* Add here your implementation. */
@@ -1240,8 +1239,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   }
   
   void HfstTransducer::extract_strings_fd(ExtractStringsCb& callback, 
-                                          int cycles, bool filter_fd,
-                                          bool include_spv)
+                                          int cycles, bool filter_fd)
     const
   { 
     switch (this->type)
@@ -1253,8 +1251,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
           = hfst::implementations::LogWeightTransducer::get_flag_diacritics
           (implementation.log_ofst);
         hfst::implementations::LogWeightTransducer::extract_strings
-          (implementation.log_ofst,callback,cycles,t_log_ofst,filter_fd,
-           include_spv);
+          (implementation.log_ofst,callback,cycles,t_log_ofst,filter_fd);
         delete t_log_ofst;
       }
         break;
@@ -1265,7 +1262,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
             get_flag_diacritics(implementation.tropical_ofst);
         hfst::implementations::TropicalWeightTransducer::extract_strings
           (implementation.tropical_ofst,callback,cycles,
-           t_tropical_ofst,filter_fd,include_spv);
+           t_tropical_ofst,filter_fd);
         delete t_tropical_ofst;
       }
         break;
@@ -1277,8 +1274,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
           = hfst::implementations::SfstTransducer::get_flag_diacritics
           (implementation.sfst);
         hfst::implementations::SfstTransducer::extract_strings
-          (implementation.sfst, callback, cycles, t_sfst, filter_fd,
-           include_spv);
+          (implementation.sfst, callback, cycles, t_sfst, filter_fd);
         delete t_sfst;
       }
         break;
@@ -1290,8 +1286,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
             = hfst::implementations::FomaTransducer::get_flag_diacritics
             (implementation.foma);
           hfst::implementations::FomaTransducer::extract_strings
-            (implementation.foma, callback, cycles, t_foma, filter_fd,
-             include_spv);
+            (implementation.foma, callback, cycles, t_foma, filter_fd);
           delete t_foma;
       }
         break;
@@ -1318,12 +1313,13 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   class ExtractStringsCb_ : public ExtractStringsCb
   {
     public:
-      WeightedPaths<float>::Set& paths;
-      int max_num;
+    //WeightedPaths<float>::Set& paths;
+    HfstTwoLevelPaths& paths;
+    int max_num;
       
-      ExtractStringsCb_(WeightedPaths<float>::Set& p, int max): 
+      ExtractStringsCb_(HfstTwoLevelPaths& p, int max): 
         paths(p), max_num(max) {}
-      RetVal operator()(WeightedPath<float>& path, bool final)
+      RetVal operator()(HfstTwoLevelPath& path, bool final)
       {
         if(final)
           paths.insert(path);
@@ -1332,27 +1328,25 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
       }
   };
   
-  void HfstTransducer::extract_strings(WeightedPaths<float>::Set &results,
-                                       int max_num, int cycles,
-                                       bool include_spv) const
+  void HfstTransducer::extract_strings(HfstTwoLevelPaths &results,
+                                       int max_num, int cycles) const
   {
     if(is_cyclic() && max_num < 1 && cycles < 0)
       throw hfst::exceptions::TransducerIsCyclicException();
     
     ExtractStringsCb_ cb(results, max_num);
-    extract_strings(cb, cycles,include_spv);
+    extract_strings(cb, cycles);
   }
   
-  void HfstTransducer::extract_strings_fd(WeightedPaths<float>::Set &results,
+  void HfstTransducer::extract_strings_fd(HfstTwoLevelPaths &results,
                                           int max_num, int cycles,
-                                          bool filter_fd,
-                                          bool include_spv) const
+                                          bool filter_fd) const
   {
     if(is_cyclic() && max_num < 1 && cycles < 0)
       throw hfst::exceptions::TransducerIsCyclicException();
     
     ExtractStringsCb_ cb(results, max_num);
-    extract_strings_fd(cb, cycles, filter_fd,include_spv);
+    extract_strings_fd(cb, cycles, filter_fd);
   }
 
   bool HfstTransducer::check_for_missing_flags_in

@@ -29,8 +29,8 @@ namespace hfst
 
   // Copied from HfstDataTypes.h because including the file
   // causes problems with header file #ifndef _HEADER_FILE_H_ guards
-  typedef std::vector<std::string> HfstArcPath;
-  typedef std::pair<HfstArcPath,float> HfstLookupPath;
+  typedef std::vector<std::string> StringVector;
+  typedef std::pair<StringVector,float> HfstLookupPath;
 
   class MultiCharSymbolTrie;
   typedef std::vector<MultiCharSymbolTrie*> MultiCharSymbolTrieVector;
@@ -114,6 +114,9 @@ namespace hfst
     /** \brief Tokenize the string \a input_string. */
     StringPairVector tokenize(const std::string &input_string) const;
 
+    /** \brief Tokenize the string \a input_string. */
+    StringVector tokenize_one_level(const std::string &input_string) const;
+
     /** \brief Tokenize the string pair \a input_string : \a output_string. 
 
         If one string has more tokens than the other, epsilons will be
@@ -122,15 +125,6 @@ namespace hfst
      */
     StringPairVector tokenize(const std::string &input_string,
                               const std::string &output_string) const;
-
-    /** \brief Tokenize the string \a input string.
-
-        This function is useful for HfstTransducer::lookup.
-
-        @return An HfstLookupPath with weight 0.
-        @see HfstTransducer::lookup
-     */
-    HfstLookupPath lookup_tokenize(const std::string &input_string) const;
   };
 }
 #endif
