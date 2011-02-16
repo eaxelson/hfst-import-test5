@@ -82,7 +82,7 @@ namespace hfst
 
   //! @brief A vector of strings
   //!
-  //! Used by typedef HfstLookupPath.
+  //! Used by typedef HfstOneLevelPath.
   typedef std::vector<std::string> StringVector;
   //! @brief A path of one level of arcs with collected weight.
   //!
@@ -92,11 +92,11 @@ namespace hfst
   //!
   //! @see HfstTokenizer::lookup_tokenize
   //! @see HfstTransducer::lookup
-  typedef std::pair<StringVector,float> HfstLookupPath;
+  typedef std::pair<StringVector,float> HfstOneLevelPath;
   //! @brief A set of simple paths.
   //!
   //! Used as return type of lookup with multiple, unique results.
-  typedef std::set<HfstLookupPath> HfstLookupPaths;
+  typedef std::set<HfstOneLevelPath> HfstOneLevelPaths;
 
   //! @brief A vector of string pairs
   //!

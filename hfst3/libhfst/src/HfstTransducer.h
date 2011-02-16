@@ -764,7 +764,7 @@ TODO...
     //!
     //! @todo Do not ignore argument \a limit.
     //! @todo Handle flag diacritics as ordinary symbols.
-    void lookup(HfstLookupPaths& results, const StringVector& s,
+    void lookup(HfstOneLevelPaths& results, const StringVector& s,
                 ssize_t limit = -1) const;
 
     //! @brief Lookup or apply a single string minding flag diacritics properly.
@@ -773,7 +773,7 @@ TODO...
     //! and validates the sequences prior to outputting.
     //!
     //! @sa lookup
-    void lookup_fd(HfstLookupPaths& results, const StringVector& s,
+    void lookup_fd(HfstOneLevelPaths& results, const StringVector& s,
                    ssize_t limit = -1) const;
 
     //! @brief Lookdown a single string \a s and store a maximum of 
@@ -790,7 +790,7 @@ TODO...
     //! @param limit  number of strings to extract. -1 tries to extract all and
     //!             may get stuck if infinitely ambiguous
     //! @todo todo
-    void lookdown(HfstLookupPaths& results, const StringVector& s,
+    void lookdown(HfstOneLevelPaths& results, const StringVector& s,
                   ssize_t limit = -1) const;
 
     //! @brief Lookdown a single string minding flag diacritics properly
@@ -801,7 +801,7 @@ TODO...
     //!
     //! @sa lookdown
     //! @todo todo
-    void lookdown_fd(HfstLookupPaths& results, StringVector& s,
+    void lookdown_fd(HfstOneLevelPaths& results, StringVector& s,
                      ssize_t limit = -1) const;
 
     //! @brief Whether lookup of path \a s will have infinite results.
