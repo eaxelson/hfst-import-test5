@@ -92,7 +92,7 @@ namespace hfst
   //!
   //! @see HfstTokenizer::lookup_tokenize
   //! @see HfstTransducer::lookup
-  typedef std::pair<StringVector,float> HfstOneLevelPath;
+  typedef std::pair<float, StringVector> HfstOneLevelPath;
   //! @brief A set of simple paths.
   //!
   //! Used as return type of lookup with multiple, unique results.
@@ -103,7 +103,7 @@ namespace hfst
   //! Used by typedef HfstTwoLevelPath.
   typedef std::vector<std::pair<std::string,std::string> > StringPairVector;
   //! @brief A path of two level of arcs with collected weight.
-  typedef std::pair<StringPairVector,float> HfstTwoLevelPath;
+  typedef std::pair<float, StringPairVector> HfstTwoLevelPath;
   //! @brief A set of two-level weighted paths.
   typedef std::set<HfstTwoLevelPath> HfstTwoLevelPaths;
 

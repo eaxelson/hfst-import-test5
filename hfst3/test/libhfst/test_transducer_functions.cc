@@ -76,20 +76,20 @@ bool compare_string_vectors(const StringVector &v1, const StringVector &v2,
 /* Does \a results contain \a expected_path. \a test_path_weight defines
    whether the weight of the path found in \a results must be equal to
    \a path_weight (a deviation of +/- 0.01 is allowed). */
-bool do_hfst_lookup_paths_contain(const HfstLookupPaths &results,
+bool do_hfst_lookup_paths_contain(const HfstOneLevelPaths &results,
 				  const StringVector &expected_path,
 				  float path_weight=0,
 				  bool test_path_weight=false)
 {
   bool found=false;
   float weight=0;
-  for (HfstLookupPaths::const_iterator it = results.begin();
+  for (HfstOneLevelPaths::const_iterator it = results.begin();
        it != results.end(); it++)
     {
-      if (compare_string_vectors(it->first, expected_path, true)) 
+      if (compare_string_vectors(it->second, expected_path, true)) 
 	{
 	  found = true;
-	  weight = it->second;
+	  weight = it->first;
 	}
     }
   if (found == false)
@@ -114,8 +114,8 @@ bool do_results_contain(const HfstTwoLevelPaths &paths,
     {
       std::string path_istring;
       std::string path_ostring;
-      for (StringPairVector::const_iterator IT = it->first.begin();
-	   IT != it->first.end(); IT++)
+      for (StringPairVector::const_iterator IT = it->second.begin();
+	   IT != it->second.end(); IT++)
 	{
 	  if (IT->first.compare("@_EPSILON_SYMBOL_@") != 0)
 	    path_istring.append(IT->first);
@@ -128,8 +128,8 @@ bool do_results_contain(const HfstTwoLevelPaths &paths,
 	{
 	  if (not test_path_weight)
 	    return true;
-	  if (it->second > (weight - 0.01) && 
-	      it->second < (weight + 0.01))
+	  if (it->first > (weight - 0.01) && 
+	      it->first < (weight + 0.01))
 	    return true;
 	}
     }
@@ -155,15 +155,15 @@ void print_string_vector(const StringVector &sv)
     }
 }
 
-void print_lookup_path(const HfstLookupPath &path)
+void print_lookup_path(const HfstOneLevelPath &path)
 {
-  print_string_vector(path.first);
-  fprintf(stderr, "\t%f", path.second);
+  print_string_vector(path.second);
+  fprintf(stderr, "\t%f", path.first);
 }
 
-void print_lookup_paths(const HfstLookupPaths &paths)
+void print_lookup_paths(const HfstOneLevelPaths &paths)
 {
-  for (HfstLookupPaths::const_iterator it = paths.begin();
+  for (HfstOneLevelPaths::const_iterator it = paths.begin();
        it != paths.end(); it++)
     {
       print_lookup_path(*it);
@@ -312,8 +312,8 @@ int main(int argc, char **argv)
 	  {
 	    std::string istring;
 	    std::string ostring;
-	    for(StringPairVector::const_iterator IT = it->first.begin();
-		IT != it->first.end(); IT++)
+	    for(StringPairVector::const_iterator IT = it->second.begin();
+		IT != it->second.end(); IT++)
 	      {
 		if (IT->first.compare("@_EPSILON_SYMBOL_@") != 0)
 		  istring.append(IT->first);
@@ -329,11 +329,11 @@ int main(int argc, char **argv)
 	      {
 		/* Rounding can affect precision. */
 		if (istring.compare("cat") == 0)
-		  assert(it->second > 2.99 && it->second < 3.01);
+		  assert(it->first > 2.99 && it->first < 3.01);
 		else if (istring.compare("dog") == 0)
-		  assert(it->second > 2.49 && it->second < 2.51);
+		  assert(it->first > 2.49 && it->first < 2.51);
 		else if (istring.compare("mouse") == 0)
-		  assert(it->second > 1.69 && it->second < 1.71);
+		  assert(it->first > 1.69 && it->first < 1.71);
 		else
 		  assert(false);
 	      }
@@ -381,10 +381,10 @@ int main(int argc, char **argv)
 	  = tok.tokenize_one_level("hippopotamus");
 
 	/* where results of lookup are stored */
-	HfstLookupPaths results_cat;
-	HfstLookupPaths results_dog;
-	HfstLookupPaths results_mouse;
-	HfstLookupPaths results_hippopotamus;
+	HfstOneLevelPaths results_cat;
+	HfstOneLevelPaths results_dog;
+	HfstOneLevelPaths results_mouse;
+	HfstOneLevelPaths results_hippopotamus;
 
 	/* check that lookups are not infinitely ambiguous */
 	assert(not animals_ol.is_lookup_infinitely_ambiguous(lookup_cat));

@@ -361,9 +361,9 @@ void Transducer::note_analysis(SymbolNumber * whole_output_tape)
     HfstOneLevelPath result;
     for (SymbolNumber * num = whole_output_tape; *num != NO_SYMBOL_NUMBER; ++num)
     {
-	result.first.push_back(alphabet->string_from_symbol(*num));
+	result.second.push_back(alphabet->string_from_symbol(*num));
     }
-    result.second = current_weight;
+    result.first = current_weight;
     lookup_paths.insert(result);
 }
 

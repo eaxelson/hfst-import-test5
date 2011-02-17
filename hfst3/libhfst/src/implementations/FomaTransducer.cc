@@ -516,7 +516,7 @@ namespace hfst { namespace implementations {
 	      }
 	  }
 	
-	hfst::HfstTwoLevelPath path(spv,0);
+	hfst::HfstTwoLevelPath path(0, spv);
 	hfst::ExtractStringsCb::RetVal ret = callback(path, final);
 	if(!ret.continueSearch || !ret.continuePath)
 	  {
