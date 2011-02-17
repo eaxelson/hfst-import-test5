@@ -25,7 +25,7 @@
 namespace hfst {
 
   typedef std::vector<std::pair<std::string,std::string> > StringPairVector;
-  typedef std::pair<StringPairVector,float> HfstTwoLevelPath;
+  typedef std::pair<float, StringPairVector> HfstTwoLevelPath;
   typedef std::set<HfstTwoLevelPath> HfstTwoLevelPaths;
 
   using std::stringstream;

@@ -224,8 +224,8 @@ class Callback : public hfst::ExtractStringsCb
   {
     std::string istring;
     std::string ostring;
-    for(StringPairVector::const_iterator it = path.first.begin();
-	it != path.first.end(); it++) {
+    for(StringPairVector::const_iterator it = path.second.begin();
+	it != path.second.end(); it++) {
       istring.append(it->first);
       ostring.append(it->second);
     }
@@ -266,8 +266,8 @@ class Callback : public hfst::ExtractStringsCb
 
       if (print_in_pairstring_format) 
 	{
-	  for (StringPairVector::const_iterator it = path.first.begin();
-	       it != path.first.end(); it++) 
+	  for (StringPairVector::const_iterator it = path.second.begin();
+	       it != path.second.end(); it++) 
 	    {
 	      *out_ << get_print_format(it->first)
 		    << ":"
@@ -275,7 +275,7 @@ class Callback : public hfst::ExtractStringsCb
 		    << " ";
 	    }
 	  if (display_weights) {
-	    *out_ << "\t" << path.second;
+	    *out_ << "\t" << path.first;
 	  }
 	  *out_ << "\n";
 	}
@@ -285,7 +285,7 @@ class Callback : public hfst::ExtractStringsCb
 	if(ostring != istring)
 	  *out_ << "\t" << ostring;
 	if(display_weights)
-	  *out_ << "\t" << path.second;
+	  *out_ << "\t" << path.first;
 	*out_ << std::endl;
       }
 

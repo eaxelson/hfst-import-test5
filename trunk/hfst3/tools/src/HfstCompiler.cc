@@ -414,10 +414,10 @@ namespace hfst
 
 	// transform paths to a vector of transducers
 	for (HfstTwoLevelPaths::const_iterator it = paths.begin(); it != paths.end(); it++) {	  
-	  HfstTransducer * path = new HfstTransducer(it->first, t->get_type());
+	  HfstTransducer * path = new HfstTransducer(it->second, t->get_type());
 	  //HfstTransducer * path 
 	  //  = new HfstTransducer(wp.istring, wp.ostring, TOK, t->get_type());
-	  path->set_final_weights(it->second);
+	  path->set_final_weights(it->first);
 	  transducer_paths.push_back(path);
 	}
       }

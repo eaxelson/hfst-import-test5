@@ -48,7 +48,7 @@ typedef std::set<TransitionTableIndex> TransitionTableIndexSet;
 typedef std::vector<std::string> SymbolTable;
 
 // for lookup
-typedef std::pair<std::vector<std::string>, Weight> HfstOneLevelPath;
+typedef std::pair<Weight, std::vector<std::string> > HfstOneLevelPath;
 typedef std::set<HfstOneLevelPath> HfstOneLevelPaths;
 typedef std::vector<std::string> StringVector;
 

@@ -2139,7 +2139,7 @@ namespace hfst { namespace implementations
       {
 	bool final = t->Final(s) != LogWeight::Zero();
 	hfst::HfstTwoLevelPath path
-	  (spv, weight_sum+(final?t->Final(s).Value():0));
+	  (weight_sum+(final?t->Final(s).Value():0), spv);
 	hfst::ExtractStringsCb::RetVal ret = callback(path, final);
 	if(!ret.continueSearch || !ret.continuePath)
 	  {

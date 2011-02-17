@@ -288,7 +288,7 @@ void HfstOlInputStream::ignore(unsigned int n)
       }
 
       hfst::HfstTwoLevelPath path
-	(spv, weight_sum+final_weight);
+	(weight_sum+final_weight, spv);
 
       hfst::ExtractStringsCb::RetVal ret = callback(path, final);
       if(!ret.continueSearch || !ret.continuePath)

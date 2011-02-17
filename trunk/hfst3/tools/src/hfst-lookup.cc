@@ -486,8 +486,8 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
     if (result != NULL)
       {
         bool first = true;
-        for (vector<string>::const_iterator s = result->first.begin();
-             s != result->first.end();
+        for (vector<string>::const_iterator s = result->second.begin();
+             s != result->second.end();
              ++s)
           {
             if (!first && print_space)
@@ -514,8 +514,8 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
     if (input != NULL)
       {
         bool first = true;
-        for (vector<string>::const_iterator s = input->first.begin();
-             s != input->first.end();
+        for (vector<string>::const_iterator s = input->second.begin();
+             s != input->second.end();
              ++s)
           {
             if (!first && print_space)
@@ -574,8 +574,8 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
         lookupform = static_cast<char*>(malloc(sizeof(char)*lookup_len+1));
         char* p = lookupform;
         bool first = true;
-        for (vector<string>::const_iterator s = result->first.begin();
-             s != result->first.end();
+        for (vector<string>::const_iterator s = result->second.begin();
+             s != result->second.end();
              ++s)
           {
             if (!first && print_space)
@@ -615,8 +615,8 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
         inputform = static_cast<char*>(malloc(sizeof(char)*input_len+1));
         char* p = inputform;
         bool first = true;
-        for (vector<string>::const_iterator s = input->first.begin();
-             s != input->first.end();
+        for (vector<string>::const_iterator s = input->second.begin();
+             s != input->second.end();
              ++s)
           {
             if (!first && print_space)
@@ -666,7 +666,7 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
     float w = 0.0f;
     if (result != NULL)
       {
-        w = result->second; // %w
+        w = result->first; // %w
       }
     else
       {
@@ -851,7 +851,7 @@ line_to_lookup_path(char** s, const hfst::HfstTokenizer& /* tok */,
                     char** markup, bool* outside_sigma)
 {
     HfstOneLevelPath* rv = new HfstOneLevelPath;
-    rv->second = 0;
+    rv->first = 0;
     *outside_sigma = false;
     inputs++;
     switch (input_format)
@@ -864,13 +864,13 @@ line_to_lookup_path(char** s, const hfst::HfstTokenizer& /* tok */,
             {
               path.push_back(token);
             }
-          rv->first = path;
+          rv->second = path;
           break;
         }
       case UTF8_TOKEN_INPUT:
         {
           vector<string>* path = string_to_utf8(*s);
-          rv->first = *path;
+          rv->second = *path;
           delete path;
           break;
         }
@@ -933,7 +933,7 @@ line_to_lookup_path(char** s, const hfst::HfstTokenizer& /* tok */,
             vector<string>* path = string_to_utf8(sp);
             free(*s);
             *s = sp;
-            rv->first = *path;
+            rv->second = *path;
             break;
           }
       default:
@@ -966,7 +966,7 @@ bool is_lookup_infinitely_ambiguous
 {
   // Whether the end of the lookup path s has been reached
   bool only_epsilons=false;
-  if ((unsigned int)s.first.size() == index)
+  if ((unsigned int)s.second.size() == index)
     only_epsilons=true;
 
   // Go through all transitions in this state
@@ -996,7 +996,7 @@ bool is_lookup_infinitely_ambiguous
 	 would probably benefit from reorganizing the if/else blocks...) */
       else if (not only_epsilons)
     {
-      if (it->get_input_symbol().compare(s.first[index]) == 0) // ###
+      if (it->get_input_symbol().compare(s.second[index]) == 0) // ###
         {
           index++; // consume an input symbol in the lookup path s // ###
           std::set<HfstState> empty_set;
@@ -1022,23 +1022,23 @@ bool is_lookup_infinitely_ambiguous(HfstBasicTransducer &t,
   return is_lookup_infinitely_ambiguous(t, s, index, initial_state, 
                     epsilon_path_states);
 }
-
+// HERE
 HfstOneLevelPaths*
 lookup_simple(const HfstOneLevelPath& s, HfstTransducer& t, bool* infinity)
 {
   HfstOneLevelPaths* results = new HfstOneLevelPaths;
-  if (t.is_lookup_infinitely_ambiguous(s.first))
+  if (t.is_lookup_infinitely_ambiguous(s.second))
     {
       if (!silent && infinite_cutoff > 0) {
     warning(0, 0, "Got infinite results, number of cycles limited to %zu",
         infinite_cutoff);
       }
-      t.lookup_fd(*results, s.first, infinite_cutoff);
+      t.lookup_fd(*results, s.second, infinite_cutoff);
       *infinity = true;
     }
   else
     {
-      t.lookup_fd(*results, s.first);
+      t.lookup_fd(*results, s.second);
     }
 
   if (results->size() == 0)
@@ -1086,22 +1086,22 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
 { 
   // Whether the end of the lookup path s has been reached
   bool only_epsilons=false;
-  if ((unsigned int)s.first.size() == index)
+  if ((unsigned int)s.second.size() == index)
     only_epsilons=true;
   // If the end of the lookup path s has been reached
   // and we are in a final state, add the traversed path to results
   if (only_epsilons && t.is_final_state(state)) {
     // add the final weight
-    path.second = path.second + t.get_final_weight(state); 
+    path.first = path.first + t.get_final_weight(state); 
     results.insert(path);
 
     if (include_spv) { // if we want StringPairVector representation
-      HfstTwoLevelPath p(path_spv, path.second);
+      HfstTwoLevelPath p(path.first, path_spv);
       results_spv.insert(p);
     }
 
     // subtract the final weight
-    path.second = path.second - t.get_final_weight(state); 
+    path.first = path.first - t.get_final_weight(state); 
   }
 
   // Go through all transitions in this state
@@ -1146,7 +1146,7 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
           }     
         }
 	// add an output symbol to the traversed path
-        path.first.push_back(it->get_output_symbol());
+        path.second.push_back(it->get_output_symbol());
 
 	if (include_spv) { // if we want StringPairVector representation
 	  StringPair p(it->get_input_symbol(), it->get_output_symbol());
@@ -1154,19 +1154,19 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
 	}
 
 	// add the transition weight 
-        path.second = path.second + it->get_weight(); 
+        path.first = path.first + it->get_weight(); 
         lookup_fd(t, results, s, index, path, it->get_target_state(), 
 		  visited_states, epsilon_path, cycles,
 		  results_spv, path_spv, include_spv);
 	// remove the output symbol from the traversed path
-        path.first.pop_back(); 
+        path.second.pop_back(); 
 
 	if (include_spv) { // if we want StringPairVector representation
 	  path_spv.pop_back();
 	}
 
 	// subtract the transition weight
-        path.second = path.second - it->get_weight(); 
+        path.first = path.first - it->get_weight(); 
         
         epsilon_path.pop_back();
         visited_states.erase(visited_states.find(state));
@@ -1189,11 +1189,11 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
 	 if/else blocks...) */
       else if (not only_epsilons)
 	{
-	  if (it->get_input_symbol().compare(s.first[index]) == 0) //###
+	  if (it->get_input_symbol().compare(s.second[index]) == 0) //###
 	    {
 	      index++; // consume an input symbol in the lookup path s //###
 	      // add an output symbol to the traversed path
-	      path.first.push_back(it->get_output_symbol());
+	      path.second.push_back(it->get_output_symbol());
 
 	      if (include_spv) { // if we want StringPairVector representation
 		StringPair p(it->get_input_symbol(), it->get_output_symbol());
@@ -1201,20 +1201,20 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
 	      }
 
 	      // add the transition weight 
-	      path.second = path.second + it->get_weight(); 
+	      path.first = path.first + it->get_weight(); 
 	      std::vector<HfstState> empty_path;
 	      lookup_fd(t, results, s, index, path, it->get_target_state(),
 			visited_states, empty_path, cycles,
 			results_spv, path_spv, include_spv);
 	      // remove the output symbol from the traversed path
-	      path.first.pop_back(); 
+	      path.second.pop_back(); 
 
 	      if (include_spv) { // if we want StringPairVector representation
 		path_spv.pop_back();
 	      }
 
 	      // subtract the transition weight
-	      path.second = path.second - it->get_weight(); 
+	      path.first = path.first - it->get_weight(); 
 	      index--; // add the input symbol back to the lookup path s. //###
 	    }
 	}
@@ -1238,7 +1238,7 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
 	       const HfstOneLevelPath& s, ssize_t limit = -1)
 {
   HfstOneLevelPath path;
-  path.second=0;
+  path.first=0;
   (void)limit;
   unsigned int index=0;
   HfstState initial_state=0;
@@ -1261,7 +1261,7 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
 
     /* No results, print just the lookup string. */
     if (results_spv.size() == 0) {
-      print_lookup_string(s.first);
+      print_lookup_string(s.second);
       fprintf(outfile, ":\n");
     }
     else {
@@ -1270,18 +1270,18 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
 	     = results_spv.begin(); it != results_spv.end(); it++) {
 	
 	/* print the lookup string */
-	print_lookup_string(s.first);
+	print_lookup_string(s.second);
 	fprintf(outfile, ":\t");
 	
 	/* and the path that yielded the result string */
-	for (StringPairVector::const_iterator IT = it->first.begin();
-	     IT != it->first.end(); IT++) {
+	for (StringPairVector::const_iterator IT = it->second.begin();
+	     IT != it->second.end(); IT++) {
 	  fprintf(outfile, "%s:%s ", 
 		  get_print_format(IT->first).c_str(), 
 		  get_print_format(IT->second).c_str());
 	}
 	/* and the weight of that path. */
-	fprintf(outfile, "\t%f\n", it->second);
+	fprintf(outfile, "\t%f\n", it->first);
       }
     }
     fprintf(outfile, "\n");
@@ -1292,11 +1292,11 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
        res != results.end();
        ++res)
     {
-      if (is_valid_flag_diacritic_path(res->first) || !obey_flags)
+      if (is_valid_flag_diacritic_path(res->second) || !obey_flags)
         {
           StringVector unflagged;
-          for (StringVector::const_iterator arc = res->first.begin();
-               arc != res->first.end();
+          for (StringVector::const_iterator arc = res->second.begin();
+               arc != res->second.end();
                arc++)
             {
               if (show_flags || !is_flag_diacritic(*arc))
@@ -1304,7 +1304,7 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
                   unflagged.push_back(*arc);
                 }
             }
-          filtered.insert(HfstOneLevelPath(unflagged, res->second));
+          filtered.insert(HfstOneLevelPath(res->first, unflagged));
         }
     }
   results = filtered;
