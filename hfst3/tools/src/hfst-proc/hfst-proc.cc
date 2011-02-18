@@ -46,7 +46,8 @@ static bool handle_hfst3_header(std::istream& is)
     
     if(h_str == header2[0] || h_str == header2[1])
       return true;
-    throw TransducerHasWrongTypeException();
+    //throw TransducerHasWrongTypeException();
+    HFST_THROW(HfstException);
     return false;
   }
   else // nope. put back what we've taken

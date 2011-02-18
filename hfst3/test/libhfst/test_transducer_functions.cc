@@ -3,7 +3,7 @@
    - compare
    - compose
    - convert
-   - extract_strings and extract_strings_fd
+   - extract_paths and extract_paths_fd
    - insert_freely
    - is_cyclic
    - is_lookup_infinitely_ambiguous, lookup and lookup_fd
@@ -271,9 +271,9 @@ int main(int argc, char **argv)
       }
 
 
-      /* Functions extract_strings and extract_strings_fd. */
+      /* Functions extract_paths and extract_paths_fd. */
       {
-	verbose_print("function extract_strings(_fd)", types[i]);
+	verbose_print("function extract_paths(_fd)", types[i]);
 
 	using hfst::StringPair;
 	using hfst::StringPairSet;
@@ -301,7 +301,7 @@ int main(int argc, char **argv)
 	expected_results.insert(StringPair("mouse","mice"));
 
 	HfstTwoLevelPaths results;
-	animals.extract_strings(results, 
+	animals.extract_paths(results, 
 				3, /* max_num */ 
 				0  /* cycles */ );
 
@@ -455,7 +455,7 @@ int main(int argc, char **argv)
 	    HfstTransducer animals1(animals);
 	    animals1.n_best(1);
 	    HfstTwoLevelPaths results1;
-	    animals1.extract_strings(results1);
+	    animals1.extract_paths(results1);
 	    assert(results1.size() == 1);
 	    if (weighted) {
 	      assert(do_results_contain
@@ -465,7 +465,7 @@ int main(int argc, char **argv)
 	    HfstTransducer animals2(animals);
 	    animals2.n_best(2);
 	    HfstTwoLevelPaths results2;
-	    animals2.extract_strings(results2);
+	    animals2.extract_paths(results2);
 	    assert(results2.size() == 2);
 	    if (weighted) {
 	      assert(do_results_contain
@@ -478,7 +478,7 @@ int main(int argc, char **argv)
 	    HfstTransducer animals3(animals);
 	    animals3.n_best(3);
 	    HfstTwoLevelPaths results3;
-	    animals3.extract_strings(results3);
+	    animals3.extract_paths(results3);
 	    assert(results3.size() == 3);
 	    if (weighted) {
 	      assert(do_results_contain
@@ -494,7 +494,7 @@ int main(int argc, char **argv)
 	    HfstTransducer animals4(animals);
 	    animals4.n_best(4);
 	    HfstTwoLevelPaths results4;
-	    animals4.extract_strings(results4);
+	    animals4.extract_paths(results4);
 	    assert(results4.size() == 4);
 	    if (weighted) {
 	      assert(do_results_contain
@@ -513,7 +513,7 @@ int main(int argc, char **argv)
 	    HfstTransducer animals5(animals);
 	    animals5.n_best(5);
 	    HfstTwoLevelPaths results5;
-	    animals5.extract_strings(results5);
+	    animals5.extract_paths(results5);
 	    assert(results5.size() == 5);
 	    if (weighted) {
 	      assert(do_results_contain
@@ -594,7 +594,8 @@ int main(int argc, char **argv)
 		     t_final.get_final_weight(1) < 0.81);
 	    } 
 	    /* If the state does not exist or is not final */
-	    catch (hfst::exceptions::HfstArgumentException e) {
+	    //catch (hfst::exceptions::HfstArgumentException e) {
+	    catch (const HfstException e) {
 	      assert(false);
 	    }
 
@@ -608,7 +609,8 @@ int main(int argc, char **argv)
 		     weight < 0.81);
 	    }
 	    /* If the state does not exist or is not final */
-	    catch (hfst::exceptions::HfstArgumentException e) {
+	    //catch (hfst::exceptions::HfstArgumentException e) {
+	    catch (const HfstException e) {
 	      assert(false);
 	    }
 	  }
@@ -644,7 +646,8 @@ int main(int argc, char **argv)
 		     tc.get_final_weight(1) < 0.26);
 	    }
 	    /* If the state does not exist or is not final */
-	    catch (hfst::exceptions::HfstArgumentException e) {
+	    //catch (hfst::exceptions::HfstArgumentException e) {
+	    catch (const HfstException e) {
 	      assert(false);
 	    }
 

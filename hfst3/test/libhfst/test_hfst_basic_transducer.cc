@@ -9,7 +9,7 @@
 #include "auxiliary_functions.cc"
 
 using namespace hfst;
-using namespace hfst::exceptions;
+;
 
 using implementations::HfstState;
 using implementations::HfstBasicTransition;
@@ -49,7 +49,8 @@ int main(int argc, char **argv)
 	float w = t.get_final_weight(0);
 	assert(false);
       }
-      catch (StateIsNotFinalException e) {};
+      //catch (StateIsNotFinalException e) {};
+      catch (const HfstException e) {};
     }
   }
   /* Reading a file in non-valid AT&T format. */
@@ -64,7 +65,8 @@ int main(int argc, char **argv)
     remove("test.att");
     assert(false);
   }
-  catch (NotValidAttFormatException e) {
+  //catch (NotValidAttFormatException e) {
+  catch (const HfstException e) {
     fclose(ifile);
     remove("test.att");
   }

@@ -10,7 +10,7 @@
 #include <fstream>
 
 using namespace hfst;
-using namespace hfst::exceptions;
+;
 
 
 void compare_and_delete(HfstTransducer * rule_transducers1[],

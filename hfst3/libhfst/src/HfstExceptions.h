@@ -156,13 +156,13 @@ public HfstStreamException {};
 
 /** \brief Transducer is cyclic. 
 
-    thrown by HfstTransducer::extract_strings. An example:
+    thrown by hfst::HfstTransducer::extract_paths. An example:
 \verbatim
 HfstTransducer transducer("a", "b", TROPICAL_OPENFST_TYPE);
 transducer.repeat_star();
 try {
   WeightedPaths<float>::Set results;
-  transducer.extract_strings(results);
+  transducer.extract_paths(results);
   fprintf(stderr, "The transducer has %i paths\n", results.size());
 } catch (TransducerIsCyclicException e) {
     fprintf(stderr, "The transducer is cyclic "
@@ -225,8 +225,7 @@ fprintf(stderr, "Read %i transducers in total.\n", (int)transducers.size());
 
 
     thrown by 
-    \link {hfst::HfstTransducer::HfstTransducer
-    (FILE*,ImplementationType,const std::string&)} \endlink
+    hfst::HfstTransducer::HfstTransducer(FILE*,ImplementationType,const std::string&)}
 */
 class NotValidAttFormatException :
 public HfstInputException {};
@@ -245,7 +244,7 @@ float w = tr.get_final_weight(1);
 You should use function is_final_state if you are not sure whether a
 state is final.
 
-    Thrown by HfstInternalTransducer::get_final_weight. */
+    Thrown by hfst::implementations::HfstTransitionGraph::get_final_weight. */
 class StateIsNotFinalException :
 public HfstArgumentException {};
 
@@ -253,8 +252,7 @@ public HfstArgumentException {};
 /** \brief Context transducers are not automata.
 
     This exception is thrown by
-    \link {hfst::rules::replace_up
-    (HfstTransducerPair&, HfstTransducer&, bool, StringPairSet&) \endlink 
+    hfst::rules::replace_up(HfstTransducerPair&, HfstTransducer&, bool, StringPairSet&)
     when either context transducer does not have equivalent input and
     output symbols in all its transitions.
 
@@ -294,7 +292,7 @@ public HfstArgumentException {};
 
 /** \brief Transducer has a malformed HFST header. 
 
-    Thrown by HfstTransducer(HfstInputStream&). */
+    Thrown by hfst::HfstTransducer(HfstInputStream&). */
 class TransducerHeaderException :
 public HfstInputException {};
 
@@ -304,7 +302,7 @@ public HfstInputException {};
     must have at least an input symbol table. If the output symbol table
     is missing, it is assumed to be equivalent to the input symbol table.
 
-    Thrown by HfstTransducer(HfstInputStream&)
+    Thrown by hfst::HfstTransducer(HfstInputStream&)
 */
 class MissingOpenFstInputSymbolTableException :
 public HfstInputException {};
@@ -341,7 +339,7 @@ public HfstArgumentException {};
    This exception is thrown when an ImplementationType argument
    is ERROR_TYPE.
 
-   @see ImplementationType
+   @see hfst::ImplementationType
  */
 class SpecifiedTypeRequiredException :
 public HfstInterfaceException {};

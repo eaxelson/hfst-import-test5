@@ -877,8 +877,13 @@ to compile the same piece of code using different backend libraries.
 It is also possible to <a href="AddingYourImplementation.html">add</a> 
 your own implementation under the HFST interface.
 
+For a quick start to the HFST interface with examples, see 
+<a href="QuickStart.html">here</a>.
+
 The examples given in this documentation use 
 <a href="http://www.xrce.xerox.com/print/Research-Development/Publications/1997-0052">Xerox transducer notation</a>.
+
+
 
 <br>
 

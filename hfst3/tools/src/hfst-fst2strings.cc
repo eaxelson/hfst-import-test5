@@ -38,7 +38,7 @@
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
-using hfst::exceptions::NotTransducerStreamException;
+
 using hfst::WeightedPaths;
 using hfst::WeightedPath;
 using hfst::StringPairVector;
@@ -348,9 +348,9 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
     
     Callback cb(max_strings, &outstream);
     if(eval_fd)
-      t.extract_strings_fd(cb, cycles, filter_fd);
+      t.extract_paths_fd(cb, cycles, filter_fd);
     else
-      t.extract_strings(cb, cycles);
+      t.extract_paths(cb, cycles);
     
     verbose_printf("Printed %i string(s)\n", cb.count);
   }
@@ -383,7 +383,7 @@ int main( int argc, char **argv ) {
     try {
       instream = (inputfile != stdin) ?
         new HfstInputStream(inputfilename) : new HfstInputStream();
-    } catch(NotTransducerStreamException)   {
+    } catch(const HfstException e)   {
         fprintf(stderr, "%s is not a valid transducer file\n", inputfilename);
         return EXIT_FAILURE;
     }

@@ -22,7 +22,7 @@
     MyTransducerLibraryTransducer.cc 
 */
 
-#include "HfstExceptions.h"
+#include "HfstExceptionDefs.h"
 #include "HfstFlagDiacritics.h"
 #include "HfstSymbolDefs.h"
 #include "HfstExtractStrings.h"
@@ -220,7 +220,7 @@ namespace implementations
           accepted by transducer t. t cannot be cyclic. */
       static std::vector<MyFst*> extract_paths(MyFst *t);
       /** @brief TODO: document */
-      static void extract_strings
+      static void extract_paths
         (MyFst * t, hfst::ExtractStringsCb& callback,
          int cycles=-1, FdTable<unsigned int>* fd=NULL, bool filter_fd=false);
 

@@ -125,7 +125,8 @@ parse_options(int argc, char** argv)
 	}
       hfst::HfstInputStream is(inputfilename);
       return is.get_type();
-    } catch (hfst::exceptions::NotTransducerStreamException e) {
+    } //catch (hfst::exceptions::NotTransducerStreamException e) {
+    catch (const HfstException e) {
       fprintf(stderr, "ERROR: The file/stream does not contain transducers.\n");
       exit(1);
     }

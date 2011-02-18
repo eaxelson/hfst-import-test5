@@ -150,7 +150,8 @@ void HfstOlInputStream::ignore(unsigned int n)
   hfst_ol::Transducer * HfstOlInputStream::read_transducer(bool has_header)
   {
     if (is_eof())
-      { throw StreamIsClosedException(); }
+      { //throw StreamIsClosedException(); 
+	HFST_THROW(HfstException); }
     try 
     {
       if (has_header)
@@ -160,7 +161,8 @@ void HfstOlInputStream::ignore(unsigned int n)
       //t->display();
       return t;
     }
-    catch (TransducerHasWrongTypeException e)
+    //catch (TransducerHasWrongTypeException e)
+    catch (const HfstException e)
     { throw e; }
   }
   
@@ -203,7 +205,7 @@ void HfstOlInputStream::ignore(unsigned int n)
   bool HfstOlTransducer::is_cyclic(hfst_ol::Transducer* t)
   { return t->get_header().probe_flag(hfst_ol::Cyclic); }
   
-  static bool extract_strings
+  static bool extract_paths
   (hfst_ol::Transducer* t, hfst_ol::TransitionTableIndex s,
    std::map<hfst_ol::TransitionTableIndex,unsigned short> all_visitations, 
    std::map<hfst_ol::TransitionTableIndex, unsigned short> path_visitations,
@@ -288,14 +290,14 @@ void HfstOlInputStream::ignore(unsigned int n)
       }
 
       hfst::HfstTwoLevelPath path
-	(weight_sum+final_weight, spv);
+        (weight_sum+final_weight, spv);
 
       hfst::ExtractStringsCb::RetVal ret = callback(path, final);
       if(!ret.continueSearch || !ret.continuePath)
-	{
-	  path_visitations[s]--;
-	  return ret.continueSearch;
-	}
+        {
+          path_visitations[s]--;
+          return ret.continueSearch;
+        }
       }
     
 
@@ -373,18 +375,18 @@ void HfstOlInputStream::ignore(unsigned int n)
       std::string ostring("");
 
       if (!filter_fd || 
-	  fd_state_stack->back().get_table().
-	  get_operation(input)==NULL)
-	istring = t->get_alphabet().get_symbol_table()[input];
+          fd_state_stack->back().get_table().
+          get_operation(input)==NULL)
+        istring = t->get_alphabet().get_symbol_table()[input];
 
       if (!filter_fd || 
-	  fd_state_stack->back().get_table().
-	  get_operation(output)==NULL)
-	ostring = t->get_alphabet().get_symbol_table()[output];
+          fd_state_stack->back().get_table().
+          get_operation(output)==NULL)
+        ostring = t->get_alphabet().get_symbol_table()[output];
 
       spv.push_back(StringPair(istring, ostring));
       
-      res = extract_strings
+      res = extract_paths
         (t, transition.get_target(), all_visitations, path_visitations,
          /*lbuffer,lp, ubuffer,up,*/ 
          weight_sum + (t->get_header().probe_flag(hfst_ol::Weighted) ? 
@@ -404,7 +406,7 @@ void HfstOlInputStream::ignore(unsigned int n)
   
   static const int BUFFER_START_SIZE = 64;
   
-  void HfstOlTransducer::extract_strings
+  void HfstOlTransducer::extract_paths
   (hfst_ol::Transducer * t, hfst::ExtractStringsCb& callback,
    int cycles, const FdTable<hfst_ol::SymbolNumber>* fd, bool filter_fd)
   {
@@ -419,7 +421,7 @@ void HfstOlInputStream::ignore(unsigned int n)
 
     StringPairVector spv;
     
-    hfst::implementations::extract_strings
+    hfst::implementations::extract_paths
       (t,0,all_visitations,path_visitations,/*lbuffer,0,ubuffer,0,*/0.0f,
        callback,cycles,fd_state_stack,filter_fd, spv);
   }

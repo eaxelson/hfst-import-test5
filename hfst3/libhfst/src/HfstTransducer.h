@@ -42,7 +42,7 @@
 #include "implementations/HfstOlTransducer.h"
 #include "HfstTokenizer.h"
 #include "implementations/ConvertTransducerFormat.h"
-#include "HfstExceptions.h"
+#include "HfstExceptionDefs.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
 
@@ -308,7 +308,7 @@ tr1.disjunct(tr2);
     void insert_to_alphabet(const std::string &symbol); 
 
     /* For internal use, implemented only for SFST_TYPE. */          
-    std::vector<HfstTransducer*> extract_paths();
+    std::vector<HfstTransducer*> extract_path_transducers();
 
     /* For internal use:
        Create a new transducer equivalent to \a t in format \a type. */
@@ -427,7 +427,8 @@ tr1.disjunct(tr2);
         are used as such, they are converted into HFST transducers.
 
         For more information on transducer conversions and the HFST header
-        structure, see <a href="HeaderFormatAndConversions.html">here</a>.
+        structure, see 
+        <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstTransducerHeader">here</a>.
 
         @pre ( in.is_eof() == in.is_bad() == false && in.is_fst() ).
         Otherwise, an exception is thrown.
@@ -558,7 +559,16 @@ in \a ifile.
         If a weighted transducer is converted into an unweighted one, 
         all weights are lost. 
         In the reverse case, all weights are initialized to the 
-        semiring's one. */
+        semiring's one. 
+
+        A transducer of type SFST_TYPE, TROPICAL_OPENFST_TYPE,
+        LOG_OPENFST_TYPE or FOMA_TYPE can be converted into an 
+        HFST_OL_TYPE or HFST_OLW_TYPE transducer, but an HFST_OL_TYPE
+        or HFST_OLW_TYPE transducer cannot be converted to any other type.
+
+        @note For conversion between HfstTransitionGraph and HfstTransducer,
+        see HfstTransducer(const hfst::implementations::HfstBasicTransducer&, ImplementationType) and hfst::implementations::HfstTransitionGraph(const hfst::HfstTransducer&).
+    */
     HfstTransducer &convert(ImplementationType type);
 
 
@@ -641,17 +651,13 @@ This will yield a file "testfile.att" that looks as follows:
         indicates how many times a cycle will be followed, with negative numbers
         indicating unlimited. Note that if the transducer is cyclic and 
         cycles aren't capped,
-        the search will not end until the callback returns false.
-        \a include_spv defines whether a StringPairVector representation
-        of the extracted strings will be included in the WeightedPaths. */
-    void extract_strings(ExtractStringsCb& callback, int cycles=-1) const;
+        the search will not end until the callback returns false. */
+    void extract_paths(ExtractStringsCb& callback, int cycles=-1) const;
 
     /** \brief Extract a maximum of \a max_num string pairs that are 
         recognized by the transducer
         following a maximum of \a cycles cycles and store the 
-        string pairs into \a results. \a include_spv defines whether
-        a StringPairVector representation of the extracted strings will
-        be included in \a results.
+        string pairs into \a results.
         
         The total number of resulting strings is capped at \a max_num, 
         with 0 or negative indicating unlimited. 
@@ -668,13 +674,27 @@ This will yield a file "testfile.att" that looks as follows:
     HfstTransducer tr2("c", "d", SFST_TYPE);
     tr2.repeat_star();
     tr1.concatenate(tr2).minimize();
-    WeightedPaths<float>::Set results;
-    tr1.extract_strings(results, MAX_NUM, CYCLES);
-    for (WeightedPaths<float>::Set::const_iterator it = results.begin();
+    HfstTwoLevelPaths results;
+    tr1.extract_paths(results, MAX_NUM, CYCLES);
+
+    // Go through all paths.
+    for (HfstTwoLevelPaths::const_iterator it = results.begin();
          it != results.end(); it++)
       {
-        std::cerr << it->istring << " : "
-                  << it->ostring << "\n";
+        std::string istring;
+	std::string ostring;
+
+        for (StringPairVector::const_iterator IT = it->second.begin();
+	     IT != it->second.end(); IT++)
+	  {
+	    istring.append(IT->first);
+	    ostring.append(IT->second);
+	  }
+	// Print input and output strings of each path
+	std::cerr << istring << ":" << ostring; 
+	// and optionally the weight of the path.
+	// std::cerr << "\t" << it->first;
+	std::cerr << std::endl; 
       }
 \endverbatim
 
@@ -703,19 +723,17 @@ cc : dd
 ccc : ddd
 \endverbatim
 
+        @bug Does not work for HFST_OL_TYPE or HFST_OLW_TYPE
         @throws hfst::exceptions::TransducerIsCyclicException
         @see #n_best */
-    void extract_strings
+    void extract_paths
       (HfstTwoLevelPaths &results, int max_num=-1, int cycles=-1) const;
 
     /* \brief Call \a callback with extracted strings that are not 
        invalidated by flag diacritic rules.
 
-       \a include_spv defines whether a StringPairVector representation
-       of the extracted strings will be included in the WeightedPaths.
-
-       @see extract_strings(WeightedPaths<float>::Set&, int, int) */
-    void extract_strings_fd
+       @see extract_paths(WeightedPaths<float>::Set&, int, int) */
+    void extract_paths_fd
       (ExtractStringsCb& callback, int cycles=-1, bool filter_fd=true) const;
     
   public:
@@ -723,21 +741,28 @@ ccc : ddd
         by the transducer
         and are not invalidated by flag diacritic rules, optionally filtering
         the flag diacritics themselves out of the result strings.
-        \a include_spv defines whether
-        a StringPairVector representation of the extracted strings will
-        be included in \a results.
 
         The same conditions that apply for the function
-        #extract_strings(WeightedPaths<float>::Set&, int, int)
+        extract_paths(WeightedPaths<float>::Set&, int, int)
         apply also for this one.
-        Flag diacritics are of the form @[PNDRCU][.][A-Z]+([.][A-Z]+)?@ 
-        An example:
+
+        Flag diacritics are of the form @[PNDRCU][.][A-Z]+([.][A-Z]+)?@. 
+        
+	For example the transducer 
+
 \verbatim
-TODO...
+[[@U.FEATURE.FOO@ foo] | [@U.FEATURE.BAR@ bar]]  |  [[foo @U.FEATURE.FOO@] | [bar @U.FEATURE.BAR@]]
 \endverbatim
+
+	will yield the paths <CODE>[foo foo]</CODE> and <CODE>[bar bar]</CODE>.
+	<CODE>[foo bar]</CODE> and <CODE>[bar foo]</CODE> are invalidated
+	by the flag diacritics so thay will not be included in \a results.
+
+
+  @bug Doe not work for HFST_OL_TYPE or HFST_OLW_TYPE
   @throws hfst::exceptions::TransducerIsCyclicException
-  @see extract_strings(WeightedPaths<float>::Set&, int, int) */
-    void extract_strings_fd
+  @see extract_paths(WeightedPaths<float>::Set&, int, int) */
+    void extract_paths_fd
       (HfstTwoLevelPaths &results, int max_num=-1, int cycles=-1, 
        bool filter_fd=true) const;
 
@@ -759,7 +784,7 @@ TODO...
     //!               -1 tries to extract all and may get stuck 
     //!               if infinitely ambiguous.
     //! 
-    //! @see HfstTokenizer::lookup_tokenize
+    //! @see HfstTokenizer::tokenize_one_level
     //! @see lookup_fd
     //!
     //! @todo Do not ignore argument \a limit.
@@ -1181,9 +1206,9 @@ alphabet = set(a, a:b, b, c, d, e, ...)
         This expression is identical to ![.* [c|d] [a:. & !a:b] [e] .*]
         Note that the alphabet must contain the pair a:b here.
         
-        @see {
+        @see
     <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
-    SFST manual</a>}
+    SFST manual</a>
     */
     HfstTransducer two_level_if(HfstTransducerPair &context, 
                                 StringPairSet &mappings, 
@@ -1261,9 +1286,9 @@ alphabet = set(a, b, c)
         have to be combined by composition
         rather than intersection.
 
-        @see {
+        @see
      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
-     SFST manual</a>}
+     SFST manual</a>
     */
     HfstTransducer replace_up(HfstTransducerPair &context, 
                               HfstTransducer &mapping, 
@@ -1313,9 +1338,7 @@ SFST manual</a>. */
                               bool optional, 
                               StringPairSet &alphabet);
 
-    /** \brief The same as \link {
-        replace_down
-        (HfstTransducerPair&, HfstTransducer&, bool, StringPairSet&)} \endlink
+    /** \brief The same as replace_down(HfstTransducerPair&, HfstTransducer&, bool, StringPairSet&)
         but \a mapping is performed in every context.
 
         @see replace_up */
@@ -1329,9 +1352,9 @@ SFST manual</a>. */
         Symbols outside of the matching
         substrings are mapped to any symbol allowed by \a alphabet. 
 
-        @see {
+        @see
      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
-     SFST manual</a>}. */
+     SFST manual</a>. */
     HfstTransducer restriction(HfstTransducerPairVector &contexts, 
                                HfstTransducer &mapping, 
                                StringPairSet &alphabet);
@@ -1342,9 +1365,9 @@ SFST manual</a>. */
         the matching
         substrings are mapped to any symbol allowed by \a alphabet.
 
-        @see {
+        @see
      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
-     SFST manual</a>}. */
+     SFST manual</a>. */
     HfstTransducer coercion(HfstTransducerPairVector &contexts, 
                             HfstTransducer &mapping, 
                             StringPairSet &alphabet);
@@ -1356,11 +1379,11 @@ SFST manual</a>. */
         given contexts in \a contexts. Symbols outside of the matching
         substrings are mapped to any symbol allowed by \a alphabet.
 
-        @see {
+        @see
         restriction(HfstTransducerPairVector&, HfstTransducer&, StringPairSet&) 
         #coercion 
      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
-     SFST manual</a>} */
+     SFST manual</a> */
     HfstTransducer restriction_and_coercion(HfstTransducerPairVector &contexts,
                                             HfstTransducer &mapping, 
                                             StringPairSet &alphabet);
@@ -1374,9 +1397,9 @@ SFST manual</a>. */
         Symbols outside of the matching substrings are mapped
         to any symbol allowed by \a alphabet.
 
-        @see {
+        @see
      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
-     SFST manual</a>}. */
+     SFST manual</a>. */
     HfstTransducer surface_restriction(HfstTransducerPairVector &contexts, 
                                        HfstTransducer &mapping, 
                                        StringPairSet &alphabet);
@@ -1390,9 +1413,9 @@ SFST manual</a>. */
         Symbols outside of the matching substrings are mapped to 
         any symbol allowed by \a alphabet.
 
-        @see {
+        @see
      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
-     SFST manual</a>}. */
+     SFST manual</a>. */
     HfstTransducer surface_coercion(HfstTransducerPairVector &contexts, 
                                     HfstTransducer &mapping, 
                                     StringPairSet &alphabet);
@@ -1416,9 +1439,9 @@ SFST manual</a>. */
         Symbols outside of the matching substrings are mapped 
         to any symbol allowed by \a alphabet.
 
-        @see {
+        @see
   <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
-  SFST manual</a>}. */
+  SFST manual</a>. */
     HfstTransducer deep_restriction(HfstTransducerPairVector &contexts, 
                                     HfstTransducer &mapping, 
                                     StringPairSet &alphabet);
@@ -1431,9 +1454,9 @@ SFST manual</a>. */
         Symbols outside of the matching substrings are mapped 
         to any symbol allowed by \a alphabet.
 
-        @see {
+        @see
    <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
-   SFST manual</a>}. */
+   SFST manual</a>. */
     HfstTransducer deep_coercion(HfstTransducerPairVector &contexts, 
                                  HfstTransducer &mapping, 
                                  StringPairSet &alphabet);

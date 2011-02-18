@@ -142,7 +142,7 @@ RE:         RE ARROW CONTEXTS2      { $$ = compiler->restriction($1,$2,$3,0); }
           | RE '|' RE        { $1->disjunct(*$3); delete $3; $$ = $1; }
           | '(' RE ')'       { $$ = $2; }
           | STRING           { $$ = compiler->read_words($1, output_format); }
-          | STRING2          { try { $$ = compiler->read_transducer($1, output_format); } catch (hfst::exceptions::HfstInterfaceException e) { printf("\nAn error happened when reading file \"%s\"\n", $1); exit(1); } }
+          | STRING2          { try { $$ = compiler->read_transducer($1, output_format); } catch (HfstException e) { printf("\nAn error happened when reading file \"%s\"\n", $1); exit(1); } }
           ;
 
 RANGES:     RANGE RANGES     { $$ = compiler->add_range($1,$2); }
@@ -458,7 +458,7 @@ int main( int argc, char *argv[] )
           compiler->write_to_file(Result, "");
 	else
           compiler->write_to_file(Result, strdup(outfilename));
-      } catch (hfst::exceptions::HfstInterfaceException e) {
+      } catch (HfstException e) {
           printf("\nAn error happened when writing to file \"%s\"\n", outfilename); }
     //printf("type is: %i\n", Result->get_type());
     delete Result;

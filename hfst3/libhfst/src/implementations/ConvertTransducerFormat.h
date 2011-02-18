@@ -46,7 +46,7 @@
 //#endif // _MY_TRANSDUCER_LIBRARY_LIB_H_
 //#endif // HAVE_MY_TRANSDUCER_LIBRARY
 
-#include "../HfstExceptions.h"
+#include "../HfstExceptionDefs.h"
 #include "optimized-lookup/transducer.h"
 
 struct fsm;
@@ -67,7 +67,7 @@ namespace implementations {
       HfstBasicTransducer; 
     typedef unsigned int HfstState;
 
-  using namespace hfst::exceptions;
+  ;
 
 #if HAVE_OPENFST
   typedef fst::StdArc::StateId StateId;

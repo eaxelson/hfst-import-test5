@@ -24,8 +24,10 @@ TransducerAlphabet::TransducerAlphabet(std::istream& is, SymbolNumber symbol_cou
 	if(hfst::FdOperation::is_diacritic(str))
 	    fd_table.define_diacritic(i, str);
     }
-    if(!is)
-	throw hfst::exceptions::TransducerHasWrongTypeException();
+    if(!is) {
+      //throw hfst::exceptions::TransducerHasWrongTypeException();
+      HFST_THROW(HfstException);
+    }
 }
 
 TransducerAlphabet::TransducerAlphabet(const SymbolTable& st):
@@ -440,7 +442,8 @@ Transducer::~Transducer()
 TransducerTable<TransitionWIndex> & Transducer::copy_windex_table()
 {
     if (!header->probe_flag(Weighted)) {
-	throw hfst::exceptions::TransducerHasWrongTypeException();
+      //throw hfst::exceptions::TransducerHasWrongTypeException();
+      HFST_THROW(HfstException);
     }
     TransducerTable<TransitionWIndex> * another = new TransducerTable<TransitionWIndex>;
     for (unsigned int i = 0; i < header->index_table_size(); ++i) {
@@ -452,7 +455,8 @@ TransducerTable<TransitionWIndex> & Transducer::copy_windex_table()
 TransducerTable<TransitionW> & Transducer::copy_transitionw_table()
 {
     if (!header->probe_flag(Weighted)) {
-	throw hfst::exceptions::TransducerHasWrongTypeException();
+      //throw hfst::exceptions::TransducerHasWrongTypeException();
+      HFST_THROW(HfstException);
     }
     TransducerTable<TransitionW> * another = new TransducerTable<TransitionW>;
     for (unsigned int i = 0; i < header->target_table_size(); ++i) {
@@ -466,7 +470,8 @@ TransducerTable<TransitionW> & Transducer::copy_transitionw_table()
 TransducerTable<TransitionIndex> & Transducer::copy_index_table()
 {
     if (header->probe_flag(Weighted)) {
-	throw hfst::exceptions::TransducerHasWrongTypeException();
+      //throw hfst::exceptions::TransducerHasWrongTypeException();
+      HFST_THROW(HfstException);
     }
     TransducerTable<TransitionIndex> * another = new TransducerTable<TransitionIndex>;
     for (unsigned int i = 0; i < header->index_table_size(); ++i) {
@@ -477,7 +482,8 @@ TransducerTable<TransitionIndex> & Transducer::copy_index_table()
 TransducerTable<Transition> & Transducer::copy_transition_table()
 {
     if (header->probe_flag(Weighted)) {
-	throw hfst::exceptions::TransducerHasWrongTypeException();
+      //throw hfst::exceptions::TransducerHasWrongTypeException();
+      HFST_THROW(HfstException);
     }
     TransducerTable<Transition> * another = new TransducerTable<Transition>();
     for (unsigned int i = 0; i < header->target_table_size(); ++i) {
@@ -495,8 +501,10 @@ void Transducer::load_tables(std::istream& is)
     else
 	tables = new TransducerTables<TransitionIndex,Transition>(
 	    is, header->index_table_size(),header->target_table_size());
-    if(!is)
-	throw hfst::exceptions::TransducerHasWrongTypeException();
+    if(!is) {
+      //throw hfst::exceptions::TransducerHasWrongTypeException();
+      HFST_THROW(HfstException);
+    }
 }
 
 void Transducer::write(std::ostream& os) const

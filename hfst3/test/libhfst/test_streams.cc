@@ -34,7 +34,8 @@ int main(int argc, char **argv)
 	      transducers_read++;
 	    }
 	}
-      catch (hfst::exceptions::NotValidAttFormatException e)
+      //catch (hfst::exceptions::NotValidAttFormatException e)
+      catch (const HfstException e) 
 	{
 	  assert(transducers_read == 4);
 	}

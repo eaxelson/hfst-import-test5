@@ -13,7 +13,7 @@
 #define _TROPICAL_WEIGHT_TRANSDUCER_H_
 
 #include "HfstSymbolDefs.h"
-#include "HfstExceptions.h"
+#include "HfstExceptionDefs.h"
 #include "HfstFlagDiacritics.h"
 #include <fst/fstlib.h>
 #include "HfstExtractStrings.h"
@@ -31,7 +31,7 @@ namespace hfst {
 namespace implementations
 {
   using namespace fst;
-  using namespace hfst::exceptions;
+  ;
   typedef StdArc::StateId StateId;
 
   typedef std::vector<StdArc> StdArcVector;
@@ -177,7 +177,7 @@ namespace implementations
       static StdVectorFst * reverse(StdVectorFst * transducer);
       static StdVectorFst * extract_input_language(StdVectorFst * t);
       static StdVectorFst * extract_output_language(StdVectorFst * t);
-      static void extract_strings
+      static void extract_paths
         (StdVectorFst * t, hfst::ExtractStringsCb& callback,
          int cycles=-1, FdTable<int64>* fd=NULL, bool filter_fd=false 
          /*bool include_spv=false*/);

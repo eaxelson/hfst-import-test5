@@ -41,7 +41,8 @@ namespace hfst { namespace implementations {
     else {
       input_file = fopen(filename.c_str(),"r");
       if (input_file == NULL)
-        { throw StreamNotReadableException(); }
+        { //throw StreamNotReadableException(); }
+	  HFST_THROW(HfstException); }
     }
   }
 
@@ -143,7 +144,8 @@ namespace hfst { namespace implementations {
     if (string_number_map.find(string_symbol) == string_number_map.end())
       { string_number_map[string_symbol] = c; }
     else if (string_number_map[string_symbol] != c)
-      { throw SymbolRedefinedException(); }
+      { //throw SymbolRedefinedException(); }
+	HFST_THROW(HfstException); }
   }
 
 #ifdef FOO
@@ -160,10 +162,11 @@ namespace hfst { namespace implementations {
         char minimality_identifier[8];
         int count = fread(minimality_identifier,8,1,input_file);
         if (count != 1) {
-          throw NotTransducerStreamException();
-        }
+          //throw NotTransducerStreamException();
+	  HFST_THROW(HfstException); }
         if (0 != strcmp(minimality_identifier,"MINIMAL")) {
-          throw NotTransducerStreamException();
+          //throw NotTransducerStreamException();
+	  HFST_THROW(HfstException);
         }
         return true;
       }
@@ -176,10 +179,12 @@ namespace hfst { namespace implementations {
     int sfst_id_count = fread(sfst_identifier,10,1,input_file);
     if (sfst_id_count != 1)
       { //fprintf(stderr, "#2\n");
-        throw NotTransducerStreamException(); }
+        //throw NotTransducerStreamException(); }
+	HFST_THROW(HfstException); }
     if (0 != strcmp(sfst_identifier,"SFST_TYPE"))
       { //fprintf(stderr, "#3: %s\n", sfst_identifier);
-        throw NotTransducerStreamException(); }
+        //throw NotTransducerStreamException(); }
+	HFST_THROW(HfstException); }
     return skip_minimality_identifier();
   }
   
@@ -189,9 +194,11 @@ namespace hfst { namespace implementations {
     int header_count = fread(hfst_header,6,1,input_file);
     if (header_count != 1)
       { //fprintf(stderr, "#1\n");
-        throw NotTransducerStreamException(); }
+        //throw NotTransducerStreamException(); }
+	HFST_THROW(HfstException); }
     try { return skip_identifier_version_3_0(); }
-    catch (NotTransducerStreamException e) { throw e; }
+    //catch (NotTransducerStreamException e) { throw e; }
+    catch (const HfstException e) { throw e; }
   }
 #endif // FOO  
 
@@ -311,7 +318,8 @@ namespace hfst { namespace implementations {
     Transducer * SfstInputStream::read_transducer()
   {
     if (is_eof())
-      { throw StreamIsClosedException(); }
+      { //throw StreamIsClosedException(); }
+	HFST_THROW(HfstException); }
     Transducer * t = NULL;
     try 
       {
@@ -333,10 +341,11 @@ namespace hfst { namespace implementations {
       {
         delete t;
         fprintf(stderr, "caught message: \"%s\"\n", p);
-        throw TransducerHasWrongTypeException();
+        //throw TransducerHasWrongTypeException();
+	HFST_THROW(HfstException);
       }
     return NULL;
-  };
+  }
 
 
   // ---------- SfstOutputStream functions ----------
@@ -350,7 +359,8 @@ namespace hfst { namespace implementations {
     if (filename != std::string()) {
       ofile = fopen(filename.c_str(), "wb");
       if (ofile == NULL)
-        throw StreamNotReadableException();
+        //throw StreamNotReadableException();
+	HFST_THROW(HfstException);
     } 
     else
       ofile = stdout;
@@ -662,7 +672,8 @@ namespace hfst { namespace implementations {
   std::pair<Transducer*, Transducer*> SfstTransducer::harmonize 
   (Transducer *t1, Transducer *t2, bool unknown_symbols_in_use) ;
 
-  std::vector<Transducer*> SfstTransducer::extract_paths(Transducer *t)
+  std::vector<Transducer*> SfstTransducer::extract_path_transducers
+  (Transducer *t)
   { vector<Transducer*> paths;
     //fprintf(stderr, "enumerating paths from transducer:\n");
     //std::cerr << *t;
@@ -685,7 +696,7 @@ namespace hfst { namespace implementations {
     return paths;
   }
 
-  static bool extract_strings
+  static bool extract_paths
   (Transducer * t, Node *node,
    Node2Int &all_visitations, Node2Int &path_visitations,
    /*vector<char>& lbuffer, int lpos, std::vector<char>& ubuffer, int upos,*/
@@ -719,14 +730,14 @@ namespace hfst { namespace implementations {
 
     if (spv.size() != 0)
       {
-	bool final = node->is_final();
-	hfst::HfstTwoLevelPath path(0, spv);
-	hfst::ExtractStringsCb::RetVal ret = callback(path, final);
-	if(!ret.continueSearch || !ret.continuePath)
-	  {
-	    path_visitations[node]--;
-	    return ret.continueSearch;
-	  }
+        bool final = node->is_final();
+        hfst::HfstTwoLevelPath path(0, spv);
+        hfst::ExtractStringsCb::RetVal ret = callback(path, final);
+        if(!ret.continueSearch || !ret.continuePath)
+          {
+            path_visitations[node]--;
+            return ret.continueSearch;
+          }
       }
     
     // sort arcs by number of visitations
@@ -799,27 +810,29 @@ namespace hfst { namespace implementations {
       std::string istring("");
       std::string ostring("");
 
-      if (!filter_fd || fd_state_stack->back().get_table().get_operation(lc) == NULL)
-	istring = std::string(t->alphabet.write_char(lc));
+      if (!filter_fd || 
+          fd_state_stack->back().get_table().get_operation(lc) == NULL)
+        istring = std::string(t->alphabet.write_char(lc));
 
-      if (!filter_fd || fd_state_stack->back().get_table().get_operation(uc) == NULL)
-	ostring = std::string(t->alphabet.write_char(uc));
+      if (!filter_fd || 
+          fd_state_stack->back().get_table().get_operation(uc) == NULL)
+        ostring = std::string(t->alphabet.write_char(uc));
 
       if (istring.compare("<>") == 0)
-	istring = std::string("@_EPSILON_SYMBOL_@");
+        istring = std::string("@_EPSILON_SYMBOL_@");
       if (ostring.compare("<>") == 0)
-	ostring = std::string("@_EPSILON_SYMBOL_@");
+        ostring = std::string("@_EPSILON_SYMBOL_@");
 
       spv.push_back(StringPair(istring, ostring));
     
-      res = extract_strings(t, arc[i]->target_node(), all_visitations, 
-			    path_visitations,
-			    /*lbuffer, lp, ubuffer, up,*/ callback, cycles, 
-			    fd_state_stack, filter_fd, /*include_spv*/ spv);
+      res = extract_paths(t, arc[i]->target_node(), all_visitations, 
+                            path_visitations,
+                            /*lbuffer, lp, ubuffer, up,*/ callback, cycles, 
+                            fd_state_stack, filter_fd, /*include_spv*/ spv);
       spv.pop_back();
       
       if(added_fd_state)
-	fd_state_stack->pop_back();
+        fd_state_stack->pop_back();
     }
 
     path_visitations[node]--;
@@ -828,7 +841,7 @@ namespace hfst { namespace implementations {
   
   static const int BUFFER_START_SIZE = 64;
   
-    void SfstTransducer::extract_strings
+    void SfstTransducer::extract_paths
     (Transducer * t, hfst::ExtractStringsCb& callback, int cycles, 
      FdTable<SFST::Character>* fd, bool filter_fd /*bool include_spv*/)
     {
@@ -845,9 +858,9 @@ namespace hfst { namespace implementations {
       (1, hfst::FdState<Character>(*fd));
     
     StringPairVector spv;
-    hfst::implementations::extract_strings
+    hfst::implementations::extract_paths
       (t, t->root_node(), all_visitations, path_visitations, /*lbuffer, 0, 
-							       ubuffer, 0,*/
+                                                               ubuffer, 0,*/
        callback, cycles, fd_state_stack, filter_fd, 
        /*include_spv,*/ spv);
   }

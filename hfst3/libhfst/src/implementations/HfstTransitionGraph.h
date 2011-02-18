@@ -5,7 +5,7 @@
 #include <string>
 #include <set>
 #include "../HfstSymbolDefs.h"
-#include "../HfstExceptions.h"
+#include "../HfstExceptionDefs.h"
 #include "../HfstTransducer.h"
 #include "ConvertTransducerFormat.h"
 #include <cassert>
@@ -83,7 +83,8 @@ namespace hfst {
                   "HfstTropicalTransducerTransitionData::get_symbol"
                   "(unsigned int number) "
                   "number is not mapped to any symbol\n");
-          throw hfst::exceptions::HfstInterfaceException();
+          //throw hfst::exceptions::HfstInterfaceException();
+	  HFST_THROW(HfstException);
         }
         return it->second;
       }
@@ -530,7 +531,8 @@ namespace hfst {
         W get_final_weight(HfstState s) const {
           if (final_weight_map.find(s) != final_weight_map.end())
             return final_weight_map.find(s)->second;
-          throw hfst::exceptions::StateIsNotFinalException();
+          //throw hfst::exceptions::StateIsNotFinalException();
+	  HFST_THROW(HfstException);
         }
 
         /** @brief Set the final weight of state \a s in this graph 
@@ -579,13 +581,15 @@ namespace hfst {
         const std::set<HfstTransition<C> > & operator[](HfstState s) const
         {
           if (s > max_state)
-            { throw StateIndexOutOfBoundsException(); }
+            { //throw StateIndexOutOfBoundsException(); }
+	      HFST_THROW(HfstException); }
           return state_map.find(s)->second;
         }        
 
         /* TODO: Change state numbers s1 to s2 and vice versa. */
         void swap_state_numbers(HfstState /*s1*/, HfstState /*s2*/) {
-          throw hfst::exceptions::FunctionNotImplementedException();
+          //throw hfst::exceptions::FunctionNotImplementedException();
+	  HFST_THROW(HfstException);
         }
 
         /** @brief Write the graph in AT&T format to ostream \a os.
@@ -714,8 +718,10 @@ namespace hfst {
               retval.add_transition( atoi(a1), tr );
             }
             
-            else  // line could not be parsed
-              throw hfst::exceptions::NotValidAttFormatException();       
+            else  {  // line could not be parsed
+              //throw hfst::exceptions::NotValidAttFormatException();   
+	      HFST_THROW(HfstException);
+	    }    
           }
           return retval;
         }

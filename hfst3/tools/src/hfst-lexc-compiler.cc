@@ -38,7 +38,7 @@ using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 using hfst::ImplementationType;
-using hfst::exceptions::NotTransducerStreamException;
+
 using hfst::lexc::LexcCompiler;
 
 #include "hfst-commandline.h"

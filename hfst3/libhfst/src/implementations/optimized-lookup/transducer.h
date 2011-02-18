@@ -24,14 +24,14 @@
 #include <climits>
 #include <utility>
 
-#include "../../HfstExceptions.h"
+#include "../../HfstExceptionDefs.h"
 #include "../../HfstFlagDiacritics.h"
 
 namespace hfst_ol {
 using hfst::FdOperation;
 using hfst::FdState;
 using hfst::FdTable;
-using namespace hfst::exceptions;
+;
 
 //    using namespace hfst;
 
@@ -98,7 +98,8 @@ private:
 
     static void header_error()
 	{
-	    throw hfst::exceptions::TransducerHasWrongTypeException();
+	  //throw hfst::exceptions::TransducerHasWrongTypeException();
+	  HFST_THROW(HfstException);
 	}
 
     template<class T>
@@ -189,8 +190,10 @@ public:
 	has_input_epsilon_cycles(read_bool_property(is)),
 	has_unweighted_input_epsilon_cycles(read_bool_property(is))
 	{
-	    if(!is)
-		throw hfst::exceptions::TransducerHasWrongTypeException();
+	  if(!is) {
+	      //throw hfst::exceptions::TransducerHasWrongTypeException();
+	    HFST_THROW(HfstException);
+	  }
 	}
     
     SymbolNumber symbol_count(void) const { return number_of_symbols; }

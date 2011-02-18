@@ -18,8 +18,10 @@ namespace hfst
   HfstOutputStream::HfstOutputStream(ImplementationType type, bool hfst_format):
     type(type), hfst_format(hfst_format)
   { 
-    if (not HfstTransducer::is_implementation_type_available(type))
-      throw hfst::exceptions::ImplementationTypeNotAvailableException();
+    if (not HfstTransducer::is_implementation_type_available(type)) {
+      //throw hfst::exceptions::ImplementationTypeNotAvailableException();
+      HFST_THROW(HfstException);
+    }
 
     switch(type)
       {
@@ -60,7 +62,8 @@ namespace hfst
           new hfst::implementations::HfstOlOutputStream(true);
         break;
       default:
-        throw hfst::exceptions::SpecifiedTypeRequiredException();
+        //throw hfst::exceptions::SpecifiedTypeRequiredException();
+	HFST_THROW(HfstException);
         break;
       }
   }
@@ -70,8 +73,10 @@ namespace hfst
   (const std::string &filename,ImplementationType type, bool hfst_format):
     type(type), hfst_format(hfst_format)
   { 
-    if (not HfstTransducer::is_implementation_type_available(type))
-      throw hfst::exceptions::ImplementationTypeNotAvailableException();
+    if (not HfstTransducer::is_implementation_type_available(type)) {
+      //throw hfst::exceptions::ImplementationTypeNotAvailableException();
+      HFST_THROW(HfstException);
+    }
 
     switch(type)
       {
@@ -118,7 +123,8 @@ namespace hfst
           new hfst::implementations::HfstOlOutputStream(filename.c_str(), true);
         break;
       default:
-        throw hfst::exceptions::SpecifiedTypeRequiredException();
+        //throw hfst::exceptions::SpecifiedTypeRequiredException();
+	HFST_THROW(HfstException);
         break;
       }
   }
@@ -290,7 +296,8 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
   HfstOutputStream &HfstOutputStream::operator<< (HfstTransducer &transducer)
   {
     if (type != transducer.type)
-      { throw hfst::exceptions::TransducerHasWrongTypeException(); }  
+      { //throw hfst::exceptions::TransducerHasWrongTypeException(); 
+	HFST_THROW(HfstException); }  
 
     /* Write the HFST header. The header has the following structure:
        
