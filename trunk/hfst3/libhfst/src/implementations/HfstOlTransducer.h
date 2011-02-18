@@ -15,7 +15,7 @@
 
 #include <iostream>
 #include <fstream>
-#include "../HfstExceptions.h"
+#include "../HfstExceptionDefs.h"
 #include "../HfstFlagDiacritics.h"
 #include "../HfstExtractStrings.h"
 #include "optimized-lookup/transducer.h"
@@ -31,7 +31,7 @@ namespace hfst { namespace implementations
   using std::istream;
   using std::ifstream;
   using std::string;
-  using namespace hfst::exceptions;
+  ;
   
   class HfstOlInputStream
   {
@@ -89,7 +89,7 @@ namespace hfst { namespace implementations
     
     static bool is_cyclic(hfst_ol::Transducer* t);
     
-    static void extract_strings
+    static void extract_paths
       (hfst_ol::Transducer * t, hfst::ExtractStringsCb& callback,
        int cycles=-1, const FdTable<hfst_ol::SymbolNumber>* fd=NULL, 
        bool filter_fd=false);

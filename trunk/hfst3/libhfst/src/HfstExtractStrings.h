@@ -19,7 +19,7 @@
 #include <sstream>
 #include <set>
 
-/** @file HfstExtractStrings.h
+/* @file HfstExtractStrings.h
     \brief Classes WeightedPath and WeightsPaths */
 
 namespace hfst {
@@ -31,29 +31,29 @@ namespace hfst {
   using std::stringstream;
   using std::ios;
 
-  /** \brief (Being replaced by HfstOneLevelPath and HfstTwoLevelPath)
+  /* \brief (Being replaced by HfstOneLevelPath and HfstTwoLevelPath)
       A weighted string pair that represents a path in a transducer.
 
       @see WeightedPaths 
       @see HfstOneLevelPath
-      @see HfstTransducer::extract_strings
+      @see HfstTransducer::extract_paths
   */
   template<class W> class WeightedPath
     {
     public:
-      /** \brief The input string of the path. */
+      /* \brief The input string of the path. */
       std::string istring;
-      /** \brief The output string of the path. */
+      /* \brief The output string of the path. */
       std::string ostring;
-      /** \brief The weight of the path. */
+      /* \brief The weight of the path. */
       W weight;
-      /** \brief An optional StringPairVector representation of the path. 
+      /* \brief An optional StringPairVector representation of the path. 
 
           This can be used when we are interested in the exact alignment of
           symbols in a given path. If you are going to use this variable,
           set the value of \a is_spv_in_use 'true'. */
       StringPairVector spv;
-      /** \brief  Whether the StringPairVector representation is in use. 
+      /* \brief  Whether the StringPairVector representation is in use. 
 
           This variable tells whether we are using the string pair vector
           representation. By default, it is 'false'. */
@@ -129,21 +129,21 @@ namespace hfst {
           this->weight = another.weight; }
     };
 
-  /** \brief A class for storing weighted string pairs that represent 
+  /* \brief A class for storing weighted string pairs that represent 
       paths in a transducer. 
 
       Iterators to Vectors and Sets return paths in descending weight order
       (the string with the biggest weight is returned first). (check this)
 
-      For an example, see HfstTransducer::extract_strings.
+      For an example, see HfstTransducer::extract_paths.
 
-      @see HfstTransducer::extract_strings */
+      @see HfstTransducer::extract_paths */
   template<class W> class WeightedPaths
     { public:
 
-      /** \brief A vector of weighted string pairs. */
+      /* \brief A vector of weighted string pairs. */
       typedef std::vector< WeightedPath<W> > Vector; 
-      /** \brief A set of weighted string pairs. */
+      /* \brief A set of weighted string pairs. */
       typedef std::set< WeightedPath<W> > Set; 
 
       static void add(Vector &v,WeightedPath<W> &s)
@@ -187,7 +187,7 @@ namespace hfst {
       };
       
       /**
-       * This function is called by extract_strings after every transition with
+       * This function is called by extract_paths after every transition with
        * the path \a path up to that point, and whether or not the path
        * ends at a \a final state. The return value determines the future course
        * of the extraction search.

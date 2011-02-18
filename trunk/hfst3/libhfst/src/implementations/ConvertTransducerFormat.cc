@@ -56,7 +56,8 @@ namespace hfst { namespace implementations
     if (t.type == HFST_OL_TYPE || t.type == HFST_OLW_TYPE)
       return hfst_ol_to_hfst_basic_transducer(t.implementation.hfst_ol);
 
-    throw hfst::exceptions::FunctionNotImplementedException();
+    //throw hfst::exceptions::FunctionNotImplementedException();
+    HFST_THROW(HfstException);
   }
 
 
@@ -275,7 +276,8 @@ namespace hfst { namespace implementations
         // If there are several initial states in foma transducer,
         else {
           // throw an exception.
-          throw TransducerHasMoreThanOneStartStateException();
+          //throw TransducerHasMoreThanOneStartStateException();
+	  HFST_THROW(HfstException);
         }
       }
 
@@ -304,7 +306,8 @@ namespace hfst { namespace implementations
   // If there was not an initial state in foma transducer,
   if (not start_state_found) {
     // throw an exception.
-    throw TransducerHasNoStartStateException();
+    //throw TransducerHasNoStartStateException();
+    HFST_THROW(HfstException);
   }
   
   /* If start state number (N) is not zero, swap state numbers N and zero 
@@ -409,8 +412,10 @@ namespace hfst { namespace implementations
     const fst::SymbolTable *outputsym = t->OutputSymbols();
 
     /* An HFST tropical transducer always has an input symbol table. */
-    if (has_hfst_header && inputsym == NULL)
-      throw hfst::exceptions::MissingOpenFstInputSymbolTableException();
+    if (has_hfst_header && inputsym == NULL) {
+      //throw hfst::exceptions::MissingOpenFstInputSymbolTableException();
+      HFST_THROW(HfstException);
+    }
 
   HfstBasicTransducer * net = new HfstBasicTransducer();
 
@@ -445,8 +450,10 @@ namespace hfst { namespace implementations
   /* A non-empty OpenFst transducer must have at least an input symbol table.
      If the output symbol table is missing, we assume that it would be 
      equivalent to the input symbol table. */
-  if (inputsym == NULL)
-    throw hfst::exceptions::MissingOpenFstInputSymbolTableException();
+  if (inputsym == NULL) {
+    //throw hfst::exceptions::MissingOpenFstInputSymbolTableException();
+    HFST_THROW(HfstException);
+  }
   if (outputsym == NULL)
     outputsym = inputsym;
 
@@ -663,8 +670,10 @@ namespace hfst { namespace implementations
     const fst::SymbolTable *outputsym = t->OutputSymbols();
 
     /* An HFST log transducer always has an input symbol table. */
-    if (has_hfst_header && inputsym == NULL)
-      throw hfst::exceptions::MissingOpenFstInputSymbolTableException();
+    if (has_hfst_header && inputsym == NULL) {
+      //throw hfst::exceptions::MissingOpenFstInputSymbolTableException();
+      HFST_THROW(HfstException);
+    }
 
   HfstBasicTransducer * net = new HfstBasicTransducer();
 
@@ -699,8 +708,10 @@ namespace hfst { namespace implementations
   /* A non-empty OpenFst transducer must have at least an input symbol table.
      If the output symbol table is missing, we assume that it would be 
      equivalent to the input symbol table. */
-  if (inputsym == NULL)
-    throw hfst::exceptions::MissingOpenFstInputSymbolTableException();
+  if (inputsym == NULL) {
+    //throw hfst::exceptions::MissingOpenFstInputSymbolTableException();
+    HFST_THROW(HfstException);
+  }
   if (outputsym == NULL)
     outputsym = inputsym;
 

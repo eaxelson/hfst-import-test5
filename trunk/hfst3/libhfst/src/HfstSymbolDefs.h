@@ -37,16 +37,10 @@ namespace hfst
       on the input and output side of a transition.
 
     Strings of form <CODE> @[PNDRCU][.][A-Z]+([.][A-Z]+)?@ </CODE> 
-    are reserved for flag diacritics.
-    For an example of flag diacritics, see 
-    \link {hfst::HfstTransducer::extract_strings_fd
-    (WeightedPaths<float>::Set&, int, int, bool)} \endlink
-
-    An example of unknown and identity symbols:
-
-\verbatim
-
-\endverbatim
+    are reserved for flag diacritics. For an example of flag diacritics, see 
+    #HfstTransducer::extract_paths_fd.
+    For more information on flag diacritics, see Finite State Morphology
+    (Beesley & Karttunen, 2003).
    */
   typedef std::string String;
 

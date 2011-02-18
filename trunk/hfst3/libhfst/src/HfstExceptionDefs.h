@@ -1,8 +1,11 @@
+#ifndef _HFST_EXCEPTION_DEFS_H_
+#define _HFST_EXCEPTION_DEFS_H_
+
 #include <string>
 #include <sstream>
 
-//! @brief Base class for HfstExceptions. Holds its own name and the file and line
-//! number where it was thrown.
+//! @brief Base class for HfstExceptions. Holds its own name and the file 
+//! and line number where it was thrown.
 struct HfstException
 {
   std::string name;
@@ -31,3 +34,5 @@ struct HfstException
 
 // Example declaring an exception class SomeHfstException:
 //HFST_EXCEPTION_CHILD_DECLARATION(SomeHfstException);
+
+#endif // #ifndef _HFST_EXCEPTION_DEFS_H_

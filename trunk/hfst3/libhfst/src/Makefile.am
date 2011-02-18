@@ -28,7 +28,7 @@ AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
 HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc HfstOutputStream.cc\
 		  HfstRules.cc \
 		  HfstSymbolDefs.cc HfstTokenizer.cc \
-		  HfstFlagDiacritics.cc HfstExceptions.cc
+		  HfstFlagDiacritics.cc HfstExceptionDefs.cc
 
 # libtool takes over
 libhfst_la_SOURCES =  $(HFST_SRCS)
@@ -51,7 +51,7 @@ HFST_HDRS = \
 	HfstTokenizer.h \
 	implementations/ConvertTransducerFormat.h \
 	implementations/HfstTransitionGraph.h \
-	HfstExceptions.h \
+	HfstExceptionDefs.h \
 	HfstExtractStrings.h \
 	HfstFlagDiacritics.h \
 	HfstInputStream.h \

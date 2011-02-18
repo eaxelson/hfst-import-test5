@@ -20,51 +20,51 @@
 namespace hfst { 
 namespace implementations
 {
-  using namespace hfst::exceptions;
+  ;
 
   /* Create and open a stream to standard in. */
   MyTransducerLibraryInputStream::MyTransducerLibraryInputStream(void) {
-    throw FunctionNotImplementedException(); }    
+    HFST_THROW(HfstException); }    
   
   /* Create and open a stream to file filename. */
   MyTransducerLibraryInputStream::MyTransducerLibraryInputStream
   (const std::string &filename) {
     (void)filename;
-    throw FunctionNotImplementedException(); }      
+    HFST_THROW(HfstException); }      
   
   /* Close the stream. If it points to standard in, nothing is done. */
   void MyTransducerLibraryInputStream::close(void) {
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
   
   /* */
   bool MyTransducerLibraryInputStream::is_eof(void) {
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
   
   /* */
   bool MyTransducerLibraryInputStream::is_bad(void) {
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
   
   /* */
   bool MyTransducerLibraryInputStream::is_good(void) {
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
   
   /* */
   bool MyTransducerLibraryInputStream::is_fst(void) {
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
     
   /* Extract a char from the stream. */
   char MyTransducerLibraryInputStream::stream_get() {
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
   
   /* Put back a char to the stream. */
   void MyTransducerLibraryInputStream::stream_unget(char c) {
     (void)c;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Extract n chars and ignore them. */
   void MyTransducerLibraryInputStream::ignore(unsigned int n) {
     (void)n;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
   
   /* Optional: if you want to extract implementation specific data from the 
      header. */
@@ -72,32 +72,32 @@ namespace implementations
   (StringPairVector &data, unsigned int index) {
     (void)data;
     (void)index;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
   
   /* Read a transducer from the stream. */
   MyFst * MyTransducerLibraryInputStream::read_transducer() {
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
   
 
 
   /* Create and open a stream to standard out. */
   MyTransducerLibraryOutputStream::MyTransducerLibraryOutputStream(void) {
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create and open a stream to file filename. */
   MyTransducerLibraryOutputStream::MyTransducerLibraryOutputStream
   (const std::string &filename) {
     (void)filename;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
   
   /* Close the stream. If it points to standard out, nothing is done. */
   void MyTransducerLibraryOutputStream::close(void) {
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
   
   /* Write a char to the stream. */
   void MyTransducerLibraryOutputStream::write(const char &c) {
     (void)c;
-    throw FunctionNotImplementedException(); }  
+    HFST_THROW(HfstException); }  
   
   /* Optional: if you want to store implementation specific data to the header.
    */
@@ -106,42 +106,42 @@ namespace implementations
   (std::vector<char> &header, MyFst *t) {
     (void)header;
     (void)t;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
   
   /* Write a transducer to the stream. */
   void MyTransducerLibraryOutputStream::write_transducer(MyFst * transducer) {
     (void)transducer;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
   
 
   
   /* Create a transducer that does not recognise any string. */
   MyFst * MyTransducerLibraryTransducer::create_empty_transducer(void) {
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a transducer that recognises the empty string. */
   MyFst * MyTransducerLibraryTransducer::create_epsilon_transducer(void) {
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
     
   /* Create a transducer that recognises the symbol pair symbol:symbol */
   MyFst * MyTransducerLibraryTransducer::define_transducer
   (const std::string &symbol) {
     (void)symbol;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a transducer that recognises the symbol pair isymbol:osymbol */
   MyFst * MyTransducerLibraryTransducer::define_transducer
   (const std::string &isymbol, const std::string &osymbol) {
     (void)isymbol;
     (void)osymbol;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a transducer that recognises the concatenation of symbol pairs in
      spv */
   MyFst * MyTransducerLibraryTransducer::define_transducer
   (const StringPairVector &spv) {
     (void)spv;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a transducer that recognises the union of symbol pairs in sps 
      If cyclic is true, any number of consecutive symbol pairs is recognised. */
@@ -149,99 +149,99 @@ namespace implementations
   (const StringPairSet &sps, bool cyclic) {
     (void)sps;
     (void)cyclic;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a transducer that recognises the concatenation of symbol pair unions
      in spsv. */
   MyFst * MyTransducerLibraryTransducer::define_transducer
   (const std::vector<StringPairSet> &spsv) {
     (void)spsv;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a deep copy of transducer t. */
   MyFst * MyTransducerLibraryTransducer::copy(MyFst * t) {
     (void)t;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a deterministic transducer equivalent to transducer t. */
   MyFst * MyTransducerLibraryTransducer::determinize(MyFst * t) {
     (void)t;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a minimal transducer equivalent to transducer t. */
   MyFst * MyTransducerLibraryTransducer::minimize(MyFst * t) {
     (void)t;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create an epsilon-free transducer equivalent to transducer t. */
   MyFst * MyTransducerLibraryTransducer::remove_epsilons(MyFst * t) {
     (void)t;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a transducer that accepts any number of consecutive string pairs 
      accepted by transducer t. */
   MyFst * MyTransducerLibraryTransducer::repeat_star(MyFst * t) {
     (void)t;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a transducer that accepts one or more consecutive string pairs 
      accepted by transducer t. */
   MyFst * MyTransducerLibraryTransducer::repeat_plus(MyFst * t) {
     (void)t;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a transducer that accepts n consecutive string pairs accepted by 
      transducer t. */
   MyFst * MyTransducerLibraryTransducer::repeat_n(MyFst * t,int n) {
     (void)t;
     (void)n;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a transducer that accepts from zero to n consecutive string pairs 
      accepted by transducer t. */
   MyFst * MyTransducerLibraryTransducer::repeat_le_n(MyFst * t,int n) {
     (void)t;
     (void)n;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a transducer that accepts string pairs accepted by transducer t or
      an empty string. */
   MyFst * MyTransducerLibraryTransducer::optionalize(MyFst * t) {
     (void)t;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a transducer that accepts string pair string2:string1 iff 
      transducer t accepts string pair string1:string2. */
   MyFst * MyTransducerLibraryTransducer::invert(MyFst * t) {
     (void)t;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a transducer that accepts string pair 1gnirts:2gnirts iff 
      transducer t accepts string pair string1:string2. */
   MyFst * MyTransducerLibraryTransducer::reverse(MyFst * t) {
     (void)t;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a transducer that accepts string pair string1:string1 iff 
      transducer t accepts string pair string1:string2. */
   MyFst * MyTransducerLibraryTransducer::extract_input_language(MyFst * t) {
     (void)t;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a transducer that accepts string pair string2:string2 iff 
      transducer t accepts string pair string1:string2. */
   MyFst * MyTransducerLibraryTransducer::extract_output_language(MyFst * t) {
     (void)t;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* A vector of transducers that each accept one string pair accepted by 
      transducer t. t cannot be cyclic. */
   std::vector<MyFst*> MyTransducerLibraryTransducer::extract_paths(MyFst *t) {
     (void)t;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* TODO: document */
-  void MyTransducerLibraryTransducer::extract_strings
+  void MyTransducerLibraryTransducer::extract_paths
   (MyFst * t, hfst::ExtractStringsCb& callback,                               
    int cycles, FdTable<unsigned int>* fd, bool filter_fd) {
     (void)t;
@@ -249,7 +249,7 @@ namespace implementations
     (void)cycles;
     (void)fd;
     (void)filter_fd;
-    throw FunctionNotImplementedException(); }  
+    HFST_THROW(HfstException); }  
 
   /* Create a transducer that accepts string pair of 
      [ A:B* s A:B* t A:B* r A:B* i A:B* n A:B* g A:B* 1:2 A:B* ] 
@@ -259,7 +259,7 @@ namespace implementations
   (MyFst *t , const StringPair &symbol_pair) {
     (void)t;
     (void)symbol_pair;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a transducer equivalent to transducer t but where all symbols 
      old_symbol are substituted with new_symbol. */
@@ -268,7 +268,7 @@ namespace implementations
     (void)t;
     (void)old_symbol;
     (void)new_symbol;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a transducer equivalent to transducer t but where all symbol pairs 
      symbol_pair are substituted with a copy of transducer tr. */
@@ -277,7 +277,7 @@ namespace implementations
     (void)t;
     (void)symbol_pair;
     (void)tr;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
   
   /* Create a transducer that accepts string pair string1:string3 iff t1 
      accepts string pair string1:string2 and t2 accepts string pair 
@@ -285,34 +285,34 @@ namespace implementations
   MyFst * MyTransducerLibraryTransducer::compose(MyFst * t1, MyFst * t2) {
     (void)t1;
     (void)t2;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a transducer that accepts a concatenation of any string pair 
      accepted by t1 and any string pair accepted by t2. */
   MyFst * MyTransducerLibraryTransducer::concatenate(MyFst * t1, MyFst * t2) {
     (void)t1;
     (void)t2;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a transducer that accepts any string pair accepted by t1 or t2. */
   MyFst * MyTransducerLibraryTransducer::disjunct(MyFst * t1, MyFst * t2) {
     (void)t1;
     (void)t2;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a transducer that accepts any string pair accepted by both t1 and 
      t2. */
   MyFst * MyTransducerLibraryTransducer::intersect(MyFst * t1, MyFst * t2) {
     (void)t1;
     (void)t2;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Create a transducer that accepts any string pair accepted by t1 but not 
      t2. */
   MyFst * MyTransducerLibraryTransducer::subtract(MyFst * t1, MyFst * t2) {
     (void)t1;
     (void)t2;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
   
   /* See file MyTransducerLibraryTransducer.h */
   std::pair<MyFst*, MyFst*> MyTransducerLibraryTransducer::harmonize
@@ -320,49 +320,49 @@ namespace implementations
     (void)t1;
     (void)t2;
     (void)unknown_symbols_in_use;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Whether transducers t1 an t2 are equivalent. */
   bool MyTransducerLibraryTransducer::are_equivalent(MyFst * t1, MyFst * t2) {
     (void)t1;
     (void)t2;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Whether transducer t is cyclic. */
   bool MyTransducerLibraryTransducer::is_cyclic(MyFst * t) {
     (void)t;
-    throw FunctionNotImplementedException(); }  
+    HFST_THROW(HfstException); }  
 
   /* A table of transducer numbers that represent flag 
      diacritics in transducer t. */
   FdTable<unsigned int>* MyTransducerLibraryTransducer::get_flag_diacritics
   (MyFst * t) {
     (void)t;
-    throw FunctionNotImplementedException(); }  
+    HFST_THROW(HfstException); }  
 
   /* Remove symbol symbol from the alphabet of transducer t. */
   MyFst * MyTransducerLibraryTransducer::remove_from_alphabet
   (MyFst *t, const std::string &symbol) {
     (void)t;
     (void)symbol;
-    throw FunctionNotImplementedException(); }  
+    HFST_THROW(HfstException); }  
 
   /* Disjunct t with a path transducer spv. */
   MyFst * MyTransducerLibraryTransducer::disjunct
   (MyFst * t, const StringPairVector &spv) {
     (void)t;
     (void)spv;
-    throw FunctionNotImplementedException(); }  
+    HFST_THROW(HfstException); }  
 
   /* Get all symbol pairs that occur in transitions of transducer t. */
   StringPairSet MyTransducerLibraryTransducer::get_symbol_pairs(MyFst *t) {
     (void)t;
-    throw FunctionNotImplementedException(); }  
+    HFST_THROW(HfstException); }  
 
   /* The number of states in transducer t. */
   unsigned int MyTransducerLibraryTransducer::number_of_states(MyFst *t) {
     (void)t;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
   
   /* Add the following number-to-symbol correspondencies to the alphabet of 
      transducer t: 
@@ -371,12 +371,12 @@ namespace implementations
      2 : "@_IDENTITY_SYMBOL_@"  */
   void MyTransducerLibraryTransducer::initialize_alphabet(MyFst *t) {
     (void)t;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
   /* Get all symbols that occur in transitions of transducer t. */
   StringSet MyTransducerLibraryTransducer::get_alphabet(MyFst *t) {
     (void)t;
-    throw FunctionNotImplementedException(); }
+    HFST_THROW(HfstException); }
 
 }
 }

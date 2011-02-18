@@ -40,7 +40,7 @@ using hfst::HfstInputStream;
 using hfst::implementations::HfstTransitionGraph;
 using hfst::implementations::HfstBasicTransducer;
 using hfst::implementations::HfstState;
-using hfst::implementations::HfstInterfaceException;
+//using hfst::implementations::HfstInterfaceException;
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
@@ -123,7 +123,7 @@ process_stream(HfstInputStream& instream)
       HfstTransducer *trans;
       try {	
 	trans = new HfstTransducer(instream);
-      } catch (HfstInterfaceException e) {
+      } catch (const HfstException e) {
 	fprintf(stderr,"An error happened when reading transducer from stream.\n");
 	exit(1);
       }
@@ -131,7 +131,7 @@ process_stream(HfstInputStream& instream)
       HfstBasicTransducer *mutt;
       try {
 	mutt = new HfstBasicTransducer(*trans);
-      } catch (HfstInterfaceException e) {
+      } catch (const HfstException e) {
 	fprintf(stderr,"An error happened when converting transducer to internal format.\n");
 	exit(1);
       }
@@ -353,7 +353,8 @@ int main( int argc, char **argv ) {
     try {
         instream = (inputfile != stdin) ?
         new HfstInputStream(inputfilename) : new HfstInputStream();
-    } catch (hfst::exceptions::NotTransducerStreamException)  {
+    } //catch (hfst::exceptions::NotTransducerStreamException)  {
+    catch (const HfstException e) {
         error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
         return EXIT_FAILURE;

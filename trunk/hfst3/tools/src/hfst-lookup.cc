@@ -54,7 +54,7 @@ using hfst::HfstOneLevelPath;
 using hfst::HfstOneLevelPaths;
 using hfst::HfstTwoLevelPath;
 using hfst::HfstTwoLevelPaths;
-using hfst::exceptions::NotTransducerStreamException;
+
 
 using hfst::StringPair;
 using hfst::StringPairVector;
@@ -1520,7 +1520,8 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
 	    /* This does not throw an exception only if the type of the
 	       transducer is HFST_OL or HFST_OLW. */
           }
-        catch (hfst::exceptions::FunctionNotImplementedException)
+        //catch (hfst::exceptions::FunctionNotImplementedException)
+	catch (const HfstException e)
           {
             if (!internal_transducers)
               {
@@ -1593,7 +1594,7 @@ int main( int argc, char **argv ) {
           new HfstInputStream(inputfilename) :
           new HfstInputStream();
       } 
-    catch (NotTransducerStreamException)
+    catch(const HfstException e)
       {
         error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);

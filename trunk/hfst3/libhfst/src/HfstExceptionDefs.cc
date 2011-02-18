@@ -1,4 +1,4 @@
-#include "ExceptionTest.h"
+#include "HfstExceptionDefs.h"
 
 HfstException::HfstException(void) {}
 

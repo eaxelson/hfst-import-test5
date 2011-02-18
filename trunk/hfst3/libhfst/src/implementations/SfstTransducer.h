@@ -13,7 +13,7 @@
 #ifndef _SFST_TRANSDUCER_H_
 #define _SFST_TRANSDUCER_H_
 
-#include "HfstExceptions.h"
+#include "HfstExceptionDefs.h"
 #include "HfstFlagDiacritics.h"
 #include "HfstSymbolDefs.h"
 #include "HfstExtractStrings.h"
@@ -31,7 +31,7 @@ namespace hfst {
 namespace implementations
 {
   using namespace SFST;
-  using namespace hfst::exceptions;
+  ;
   using std::ostream;
   using std::ostringstream;
 
@@ -118,8 +118,9 @@ namespace implementations
       static Transducer * reverse(Transducer * transducer);
       static Transducer * extract_input_language(Transducer * t);
       static Transducer * extract_output_language(Transducer * t);
-      static std::vector<Transducer*> extract_paths(Transducer *t);
-      static void extract_strings
+      static std::vector<Transducer*> extract_path_transducers
+	(Transducer *t);
+      static void extract_paths
         (Transducer * t, hfst::ExtractStringsCb& callback, int cycles=-1,
          FdTable<SFST::Character>* fd=NULL, bool filter_fd=false);
 

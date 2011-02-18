@@ -36,7 +36,7 @@ using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 using hfst::ImplementationType;
-using hfst::exceptions::NotTransducerStreamException;
+
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
@@ -177,14 +177,14 @@ int main( int argc, char **argv ) {
     try {
         firststream = (firstfile != stdin) ?
             new HfstInputStream(firstfilename) : new HfstInputStream();
-    } catch(NotTransducerStreamException)   {
+    } catch(const HfstException e)   {
         error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               firstfilename);
     }
     try {
         secondstream = (secondfile != stdin) ?
             new HfstInputStream(secondfilename) : new HfstInputStream();
-    } catch(NotTransducerStreamException)   {
+    } catch(const HfstException e)   {
         error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               secondfilename);
     }

@@ -402,13 +402,13 @@ namespace hfst
       if (t->type == SFST_TYPE) {
 	//fprintf(stderr, "extracting paths in transducer: ...\n");
 	//cerr << *vt;
-	transducer_paths = vt->extract_paths();
+	transducer_paths = vt->extract_path_transducers();
 	//fprintf(stderr, "...extracted\n");
 	delete vt;
       }
       else {
 	HfstTwoLevelPaths paths;
-	vt->extract_strings
+	vt->extract_paths
 	  (paths, -1, -1);
 	delete vt;
 

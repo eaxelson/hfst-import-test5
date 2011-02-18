@@ -457,7 +457,7 @@ int main(int argc, char **argv) {
     HfstTransducer &invert(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &input_project(ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &output_project(ImplementationType type=UNSPECIFIED_TYPE);
-    void extract_strings(WeightedStrings<float>::Set &results);
+    void extract_paths(WeightedStrings<float>::Set &results);
     HfstTransducer &substitute(Key old_key, Key new_key);
     HfstTransducer &substitute(const std::string &old_symbol,
 			       const std::string &new_symbol);

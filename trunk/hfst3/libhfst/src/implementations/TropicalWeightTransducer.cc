@@ -599,7 +599,8 @@ namespace hfst { namespace implementations
         else  // line could not be parsed
           {
             printf("ERROR: in AT&T file: line: \"%s\"\n", line);
-            throw NotValidAttFormatException();
+            //throw NotValidAttFormatException();
+	    HFST_THROW(HfstException);
           }
 
       }
@@ -877,7 +878,8 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightInputStream::read_transducer()
   {
     if (is_eof())
-      { throw StreamIsClosedException(); }
+      { //throw StreamIsClosedException(); }
+	HFST_THROW(HfstException); }
     StdVectorFst * t;
     FstHeader header;
     try 
@@ -899,16 +901,19 @@ namespace hfst { namespace implementations
                                                  &header)));
           }
         if (t == NULL)
-          { throw TransducerHasWrongTypeException(); }
+          { //throw TransducerHasWrongTypeException(); }
+	    HFST_THROW(HfstException); }
       }
-    catch (TransducerHasWrongTypeException e)
+    //catch (TransducerHasWrongTypeException e)
+    catch (const HfstException e )
       { throw e; }
 
     try
       {
         return t;
       }
-    catch (HfstInterfaceException e)
+    //catch (HfstInterfaceException e)
+    catch (const HfstException e )
       { throw e; }
   }
 
@@ -2125,7 +2130,7 @@ namespace hfst { namespace implementations
   // ----- TRIE FUNCTIONS END -----
 
 
-  static bool extract_strings
+  static bool extract_paths
   (StdVectorFst * t, StdArc::StateId s,
    std::map<StateId,unsigned short> all_visitations, 
    std::map<StateId, unsigned short> path_visitations,
@@ -2164,15 +2169,15 @@ namespace hfst { namespace implementations
 
     if (spv.size() != 0)
       {
-	bool final = t->Final(s) != TropicalWeight::Zero();
-	hfst::HfstTwoLevelPath path
-	  (weight_sum+(final?t->Final(s).Value():0), spv);
-	hfst::ExtractStringsCb::RetVal ret = callback(path, final);
-	if(!ret.continueSearch || !ret.continuePath)
-	  {
-	    path_visitations[s]--;
-	    return ret.continueSearch;
-	  }
+        bool final = t->Final(s) != TropicalWeight::Zero();
+        hfst::HfstTwoLevelPath path
+          (weight_sum+(final?t->Final(s).Value():0), spv);
+        hfst::ExtractStringsCb::RetVal ret = callback(path, final);
+        if(!ret.continueSearch || !ret.continuePath)
+          {
+            path_visitations[s]--;
+            return ret.continueSearch;
+          }
       }
     
     // sort arcs by number of visitations
@@ -2243,16 +2248,18 @@ namespace hfst { namespace implementations
       std::string istring("");
       std::string ostring("");
 
-      if (!filter_fd || fd_state_stack->back().get_table().get_operation(arc.ilabel)==NULL)
-	istring = t->InputSymbols()->Find(arc.ilabel);
+      if (!filter_fd || 
+          fd_state_stack->back().get_table().get_operation(arc.ilabel)==NULL)
+        istring = t->InputSymbols()->Find(arc.ilabel);
 
-      if (!filter_fd || fd_state_stack->back().get_table().get_operation(arc.olabel)==NULL)
-	ostring = t->InputSymbols()->Find(arc.olabel);
+      if (!filter_fd || 
+          fd_state_stack->back().get_table().get_operation(arc.olabel)==NULL)
+        ostring = t->InputSymbols()->Find(arc.olabel);
 
       spv.push_back(StringPair(istring, ostring));
 
 
-      res = extract_strings
+      res = extract_paths
         (t, arc.nextstate, all_visitations, path_visitations,
          /*lbuffer,lp, ubuffer,up,*/ weight_sum+arc.weight.Value(), 
          callback, cycles, fd_state_stack, filter_fd,
@@ -2270,7 +2277,7 @@ namespace hfst { namespace implementations
   
   static const int BUFFER_START_SIZE = 64;
   
-  void TropicalWeightTransducer::extract_strings
+  void TropicalWeightTransducer::extract_paths
   (StdVectorFst * t, hfst::ExtractStringsCb& callback,
    int cycles, FdTable<int64>* fd, bool filter_fd /*, bool include_spv*/)
   {
@@ -2286,7 +2293,7 @@ namespace hfst { namespace implementations
       (1, hfst::FdState<int64>(*fd));
     
     StringPairVector spv;
-    hfst::implementations::extract_strings
+    hfst::implementations::extract_paths
       (t,t->Start(),all_visitations,path_visitations,
        /*lbuffer,0,ubuffer,0,*/0.0f,callback,cycles,fd_state_stack,filter_fd, 
        /*include_spv,*/ spv);

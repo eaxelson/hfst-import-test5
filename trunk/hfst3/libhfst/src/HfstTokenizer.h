@@ -80,8 +80,7 @@ namespace hfst
       Special symbols (see #String) are not included in the tokenizer 
       unless added to it.
 
-      @see {hfst::HfstTransducer::HfstTransducer
-      (const std::string&, const HfstTokenizer&, ImplementationType type)} */
+      @see hfst::HfstTransducer::HfstTransducer(const std::string&, const HfstTokenizer&, ImplementationType type) */
   class HfstTokenizer
   {  
   private:

@@ -32,7 +32,8 @@ namespace hfst { namespace implementations {
     else {
       input_file = fopen(filename.c_str(),"r");
       if (input_file == NULL)
-    { throw StreamNotReadableException(); }
+	{ //throw StreamNotReadableException(); 
+	  HFST_THROW(HfstException); }
     }
   }
 
@@ -105,9 +106,11 @@ namespace hfst { namespace implementations {
     char foma_identifier[10];
     int foma_id_count = fread(foma_identifier,10,1,input_file);
     if (foma_id_count != 1)
-      { throw NotTransducerStreamException(); }
+      { //throw NotTransducerStreamException(); 
+	HFST_THROW(HfstException); }
     if (0 != strcmp(foma_identifier,"FOMA_TYPE"))
-      { throw NotTransducerStreamException(); }
+      { //throw NotTransducerStreamException();
+	HFST_THROW(HfstException); }
   }
   
   void FomaInputStream::skip_hfst_header(void)
@@ -115,13 +118,16 @@ namespace hfst { namespace implementations {
     char hfst_header[6];
     int header_count = fread(hfst_header,6,1,input_file);
     if (header_count != 1)
-      { throw NotTransducerStreamException(); }
+      { //throw NotTransducerStreamException(); 
+	HFST_THROW(HfstException); }
     //int c = fgetc(input_file);
     //switch (c)
     //{
     // case 0:
     try { skip_identifier_version_3_0(); }
-    catch (NotTransducerStreamException e) { throw e; }
+    //catch (NotTransducerStreamException e) { throw e; }
+    catch (const HfstException e)
+      { throw e; }
     //break;
     //default:
     //assert(false);
@@ -139,8 +145,10 @@ namespace hfst { namespace implementations {
     if (is_eof())
       return NULL;
     struct fsm * t = FomaTransducer::read_net(input_file);
-    if (t == NULL)
-      throw NotTransducerStreamException();
+    if (t == NULL) {
+      //throw NotTransducerStreamException();
+      HFST_THROW(HfstException);
+    }
     return t;
   };
 
@@ -154,8 +162,10 @@ namespace hfst { namespace implementations {
   {
     if (filename != std::string()) {
       ofile = fopen(filename.c_str(), "wb");
-      if (ofile == NULL)
-    throw StreamNotReadableException();
+      if (ofile == NULL) {
+	//throw StreamNotReadableException();
+	HFST_THROW(HfstException);
+      }
     } 
     else {
       ofile = stdout;
@@ -175,8 +185,10 @@ namespace hfst { namespace implementations {
     
     void FomaOutputStream::write_transducer(struct fsm * transducer) 
   { 
-    if (1 != FomaTransducer::write_net(transducer, ofile))
-      throw hfst::exceptions::HfstInterfaceException();
+    if (1 != FomaTransducer::write_net(transducer, ofile)) {
+      //throw hfst::exceptions::HfstInterfaceException();
+      HFST_THROW(HfstException);
+    }
   }
 
   
@@ -454,7 +466,7 @@ namespace hfst { namespace implementations {
   }
   
   
-  static bool extract_strings
+  static bool extract_paths
   (fsm * t, int state,
    std::map<int,unsigned short> all_visitations, 
    std::map<int, unsigned short> path_visitations,
@@ -504,25 +516,25 @@ namespace hfst { namespace implementations {
 
     if (spv.size() != 0)
       {
-	//check finality
-	bool final = false;
-	for(int i=0; ((t->states)+i)->state_no != -1; i++)
-	  {
-	    fsm_state* s = (t->states)+i;
-	    if(s->state_no == state && s->final_state == 1)
-	      {
-		final = true;
-		break;
-	      }
-	  }
-	
-	hfst::HfstTwoLevelPath path(0, spv);
-	hfst::ExtractStringsCb::RetVal ret = callback(path, final);
-	if(!ret.continueSearch || !ret.continuePath)
-	  {
-	    path_visitations[state]--;
-	    return ret.continueSearch;
-	  }
+        //check finality
+        bool final = false;
+        for(int i=0; ((t->states)+i)->state_no != -1; i++)
+          {
+            fsm_state* s = (t->states)+i;
+            if(s->state_no == state && s->final_state == 1)
+              {
+                final = true;
+                break;
+              }
+          }
+        
+        hfst::HfstTwoLevelPath path(0, spv);
+        hfst::ExtractStringsCb::RetVal ret = callback(path, final);
+        if(!ret.continueSearch || !ret.continuePath)
+          {
+            path_visitations[state]--;
+            return ret.continueSearch;
+          }
       }
     
 
@@ -623,30 +635,32 @@ namespace hfst { namespace implementations {
       //find the key in sigma
       char* c_in=NULL;
       for(struct sigma* sig=t->sigma; sig!=NULL&&sig->symbol!=NULL; 
-	  sig=sig->next)
-	{ if(sig->number == arc->in) {
-	    c_in = sig->symbol;
-	    break; }
-	}
+          sig=sig->next)
+        { if(sig->number == arc->in) {
+            c_in = sig->symbol;
+            break; }
+        }
 
       //find the key in sigma
       char* c_out=NULL;
       for(struct sigma* sig=t->sigma; sig!=NULL&&sig->symbol!=NULL; 
-	  sig=sig->next) {
-	if(sig->number == arc->out) {
-	  c_out = sig->symbol;
-	  break; }
+          sig=sig->next) {
+        if(sig->number == arc->out) {
+          c_out = sig->symbol;
+          break; }
       }
 
-      if (!filter_fd || fd_state_stack->back().get_table().get_operation(arc->in)==NULL)
-	istring = strdup(c_in);
+      if (!filter_fd || 
+          fd_state_stack->back().get_table().get_operation(arc->in)==NULL)
+        istring = strdup(c_in);
 
-      if (!filter_fd || fd_state_stack->back().get_table().get_operation(arc->out)==NULL)
-	ostring = strdup(c_out);
+      if (!filter_fd || 
+          fd_state_stack->back().get_table().get_operation(arc->out)==NULL)
+        ostring = strdup(c_out);
 
       spv.push_back(StringPair(istring, ostring));
 
-      res = extract_strings(t, arc->target, all_visitations, path_visitations,
+      res = extract_paths(t, arc->target, all_visitations, path_visitations,
                             /*lbuffer, lp, ubuffer, up,*/ callback, cycles,
                             fd_state_stack, filter_fd,
                             /*include_spv,*/ spv);
@@ -663,7 +677,7 @@ namespace hfst { namespace implementations {
   
   static const int BUFFER_START_SIZE = 64;
   
-  void FomaTransducer::extract_strings
+  void FomaTransducer::extract_paths
   (fsm * t, ExtractStringsCb& callback,
    int cycles, FdTable<int>* fd, bool filter_fd 
    /*bool include_spv*/)  
@@ -680,7 +694,7 @@ namespace hfst { namespace implementations {
     bool res = true;
     for (int i=0; ((t->states)+i)->state_no != -1 && res == true; i++) {
       if (((t->states)+i)->start_state == 1)
-        res = hfst::implementations::extract_strings
+        res = hfst::implementations::extract_paths
           (t, ((t->states)+i)->state_no, all_visitations, path_visitations,
            /*lbuffer, 0, ubuffer, 0,*/ callback, cycles, fd_state_stack, 
            filter_fd, /*include_spv,*/ spv);

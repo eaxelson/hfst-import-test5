@@ -14,7 +14,7 @@
 #define _FOMA_TRANSDUCER_H_
 
 #include "HfstSymbolDefs.h"
-#include "HfstExceptions.h"
+#include "HfstExceptionDefs.h"
 #include "HfstExtractStrings.h"
 #include "HfstFlagDiacritics.h"
 #include <stdbool.h>  // foma uses _Bool
@@ -38,7 +38,7 @@
 namespace hfst {
   namespace implementations
 {
-  using namespace hfst::exceptions;
+  ;
   using std::ostream;
   using std::ostringstream;
 
@@ -128,10 +128,10 @@ namespace hfst {
       static fsm * subtract(fsm * t1,
                             fsm * t2);
                         
-      static void extract_strings(fsm * t, hfst::ExtractStringsCb& callback,
+      static void extract_paths(fsm * t, hfst::ExtractStringsCb& callback,
                                   int cycles=-1, FdTable<int>* fd=NULL, 
                                   bool filter_fd=false 
-				  /*bool include_spv=false*/);
+                                  /*bool include_spv=false*/);
       
       static FdTable<int>* get_flag_diacritics(fsm * t);
 

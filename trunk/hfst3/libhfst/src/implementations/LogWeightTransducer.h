@@ -13,7 +13,7 @@
 #define _LOG_WEIGHT_TRANSDUCER_H_
 
 #include "HfstSymbolDefs.h"
-#include "HfstExceptions.h"
+#include "HfstExceptionDefs.h"
 #include "HfstFlagDiacritics.h"
 #include <fst/fstlib.h>
 #include "HfstExtractStrings.h"
@@ -31,7 +31,7 @@ namespace hfst {
 namespace implementations
 {
   using namespace fst;
-  using namespace hfst::exceptions;
+  ;
   typedef LogArc::StateId StateId;
   typedef VectorFst<LogArc> LogFst;
 
@@ -174,7 +174,7 @@ namespace implementations
       static LogFst * reverse(LogFst * transducer);
       static LogFst * extract_input_language(LogFst * t);
       static LogFst * extract_output_language(LogFst * t);
-      static void extract_strings
+      static void extract_paths
         (LogFst * t, hfst::ExtractStringsCb& callback,
          int cycles=-1, FdTable<int64>* fd=NULL, bool filter_fd=false
          /*bool include_spv=false*/);

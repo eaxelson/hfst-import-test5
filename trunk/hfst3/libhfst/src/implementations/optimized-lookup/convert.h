@@ -73,7 +73,8 @@ struct StatePlaceholder {
 	    }
 	    offset += it->second.size();
 	}
-	throw HfstFatalException();
+	//throw HfstFatalException();
+	HFST_THROW(HfstException);
     }
 };
 
