@@ -15,12 +15,19 @@ struct HfstException
 
 //! @brief Macro to throw an exception of type @a E.
 //! Use @a THROW instead of regular @a throw with subclasses of HfstException.
-#define THROW(E) throw E(#E,__FILE__,__LINE__)
+#define HFST_THROW(E) throw E(#E,__FILE__,__LINE__)
 
 //! @brief Declare a subclass of @a HfstException of type @a CHILD.
 #define HFST_EXCEPTION_CHILD_DECLARATION(CHILD) \
     struct CHILD : public HfstException \
     { CHILD(const std::string &name,const std::string &file,size_t line); } 
+
+//! Define a subclass of @a HfstException of type @a CHILD.
+#define HFST_EXCEPTION_CHILD_DEFINITION(CHILD) \
+    CHILD::CHILD \
+      (const std::string &name,const std::string &file,size_t line):	\
+      HfstException(name,file,line)					\
+      {}
 
 // Example declaring an exception class SomeHfstException:
 //HFST_EXCEPTION_CHILD_DECLARATION(SomeHfstException);
