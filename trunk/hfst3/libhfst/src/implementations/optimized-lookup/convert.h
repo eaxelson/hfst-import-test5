@@ -27,6 +27,7 @@ struct TransitionPlaceholder {
     unsigned int target;
     SymbolNumber output;
     float weight;
+
 TransitionPlaceholder(unsigned int t, SymbolNumber o, float w):
     target(t),
 	output(o),
