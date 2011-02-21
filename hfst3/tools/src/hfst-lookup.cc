@@ -231,6 +231,16 @@ print_usage()
            "VARIABLEs relevant to lookup are {print-pairs,print-space,"
            "quote-special,show-flags,obey-flags}");
     fprintf(message_out, "\n");
+    fprintf(message_out, "\n");
+
+    fprintf(message_out, 
+	    "Todo:\n"
+	    "  For optimized lookup format, only strings that pass "
+	    "flag diacritic checks\n"
+	    "  are printed and flag diacritic symbols are not printed.\n"
+	    "  For other formats, all flag paths are allowed.\n");
+
+    fprintf(message_out, "\n");
     print_report_bugs();
     fprintf(message_out, "\n");
     print_more_info();
@@ -300,15 +310,15 @@ parse_options(int argc, char** argv)
               }
             break;
         case 'F':
-            if (strcmp(optarg, "text"))
+            if (strcmp(optarg, "text") == 0)
               {
                 input_format = UTF8_TOKEN_INPUT;
               }
-            else if (strcmp(optarg, "spaced"))
+            else if (strcmp(optarg, "spaced") == 0)
               {
                 input_format = SPACE_SEPARATED_TOKEN_INPUT;
               }
-            else if (strcmp(optarg, "apertium"))
+            else if (strcmp(optarg, "apertium") == 0)
               {
                 input_format = APERTIUM_INPUT;
               }
@@ -863,6 +873,7 @@ line_to_lookup_path(char** s, const hfst::HfstTokenizer& /* tok */,
           while (token)
             {
               path.push_back(token);
+	      token = strtok(NULL, " ");
             }
           rv->second = path;
           break;
