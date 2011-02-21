@@ -14,7 +14,8 @@
 
 namespace hfst_ol {
 
-TransducerAlphabet::TransducerAlphabet(std::istream& is, SymbolNumber symbol_count)
+TransducerAlphabet::TransducerAlphabet(std::istream& is,
+				       SymbolNumber symbol_count)
 {
     for(SymbolNumber i=0; i<symbol_count; i++)
     {
@@ -48,16 +49,22 @@ void TransducerAlphabet::display() const
 
 void TransitionIndex::display() const
 {
-    std::cout << "input_symbol: " << input_symbol << ", target: " << first_transition_index << (final()?" (final)":"") << std::endl;
+    std::cout << "input_symbol: " << input_symbol
+	      << ", target: " << first_transition_index
+	      << (final()?" (final)":"") << std::endl;
 }
 void Transition::display() const
 {
-    std::cout << "input_symbol: " << input_symbol << ", output_symbol: " << output_symbol << ", target: " << target_index << (final()?" (final)":"") << std::endl;
+    std::cout << "input_symbol: " << input_symbol << ", output_symbol: "
+	      << output_symbol << ", target: " << target_index
+	      << (final()?" (final)":"") << std::endl;
 }
 void TransitionW::display() const
 {
-    std::cout << "input_symbol: " << input_symbol << ", output_symbol: " << output_symbol
-	      << ", target: " << target_index << ", weight: " << transition_weight << (final()?" (final)":"") << std::endl;
+    std::cout << "input_symbol: " << input_symbol << ", output_symbol: "
+	      << output_symbol << ", target: " << target_index
+	      << ", weight: " << transition_weight << (final()?" (final)":"")
+	      << std::endl;
 }
 
 bool TransitionIndex::matches(SymbolNumber s) const
@@ -71,11 +78,13 @@ bool Transition::matches(SymbolNumber s) const
 
 bool TransitionIndex::final() const
 {
-    return input_symbol == NO_SYMBOL_NUMBER && first_transition_index != NO_TABLE_INDEX;
+    return input_symbol == NO_SYMBOL_NUMBER
+	&& first_transition_index != NO_TABLE_INDEX;
 }
 bool Transition::final() const
 {
-    return input_symbol == NO_SYMBOL_NUMBER && output_symbol == NO_SYMBOL_NUMBER && target_index == 1;
+    return input_symbol == NO_SYMBOL_NUMBER
+	&& output_symbol == NO_SYMBOL_NUMBER && target_index == 1;
 }
 
 Weight TransitionWIndex::final_weight(void) const
@@ -203,7 +212,8 @@ void Transducer::try_epsilon_transitions(SymbolNumber * input_symbol,
 			 tables->get_transition_target(i));
 	    current_weight -= tables->get_weight(i);
 	    ++i;
-	} else if (alphabet->is_flag_diacritic(tables->get_transition_input(i))) {
+	} else if (alphabet->is_flag_diacritic(
+		       tables->get_transition_input(i))) {
 	    hfst::FdState<SymbolNumber> old_state(flag_state);
 	    if (flag_state.apply_operation(tables->get_transition_input(i))) {
 		// flag diacritic allowed
@@ -380,7 +390,8 @@ Transducer::Transducer(std::istream& is):
     tables(NULL), lookup_paths(),
     input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    encoder(new Encoder(alphabet->get_symbol_table(), header->input_symbol_count())),
+    encoder(new Encoder(alphabet->get_symbol_table(),
+			header->input_symbol_count())),
     flag_state(alphabet->get_fd_table())
 {
     load_tables(is);
@@ -393,7 +404,8 @@ Transducer::Transducer(bool weighted):
     lookup_paths(),
     input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    encoder(new Encoder(alphabet->get_symbol_table(), header->input_symbol_count())),
+    encoder(new Encoder(alphabet->get_symbol_table(),
+			header->input_symbol_count())),
     flag_state(alphabet->get_fd_table())
 {
     if(weighted)
@@ -402,29 +414,35 @@ Transducer::Transducer(bool weighted):
 	tables = new TransducerTables<TransitionIndex,Transition>();
 }
 
-Transducer::Transducer(const TransducerHeader& header, const TransducerAlphabet& alphabet,
+Transducer::Transducer(const TransducerHeader& header,
+		       const TransducerAlphabet& alphabet,
 		       const TransducerTable<TransitionIndex>& index_table,
 		       const TransducerTable<Transition>& transition_table):
     header(new TransducerHeader(header)),
     alphabet(new TransducerAlphabet(alphabet)),
-    tables(new TransducerTables<TransitionIndex,Transition>(index_table, transition_table)),
+    tables(new TransducerTables<TransitionIndex,Transition>(
+	       index_table, transition_table)),
     lookup_paths(),
     input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    encoder(new Encoder(alphabet.get_symbol_table(), header.input_symbol_count())),
+    encoder(new Encoder(alphabet.get_symbol_table(),
+			header.input_symbol_count())),
     flag_state(alphabet.get_fd_table())
 {}
 
-Transducer::Transducer(const TransducerHeader& header, const TransducerAlphabet& alphabet,
+Transducer::Transducer(const TransducerHeader& header,
+		       const TransducerAlphabet& alphabet,
 		       const TransducerTable<TransitionWIndex>& index_table,
 		       const TransducerTable<TransitionW>& transition_table):
     header(new TransducerHeader(header)),
     alphabet(new TransducerAlphabet(alphabet)),
-    tables(new TransducerTables<TransitionWIndex,TransitionW>(index_table, transition_table)),
+    tables(new TransducerTables<TransitionWIndex,TransitionW>(
+	       index_table, transition_table)),
     lookup_paths(),
     input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    encoder(new Encoder(alphabet.get_symbol_table(), header.input_symbol_count())),
+    encoder(new Encoder(alphabet.get_symbol_table(),
+			header.input_symbol_count())),
     flag_state(alphabet.get_fd_table())
 {}
 
@@ -443,7 +461,8 @@ TransducerTable<TransitionWIndex> & Transducer::copy_windex_table()
     if (!header->probe_flag(Weighted)) {
       HFST_THROW(TransducerHasWrongTypeException);
     }
-    TransducerTable<TransitionWIndex> * another = new TransducerTable<TransitionWIndex>;
+    TransducerTable<TransitionWIndex> * another =
+	new TransducerTable<TransitionWIndex>;
     for (unsigned int i = 0; i < header->index_table_size(); ++i) {
 	another->append(TransitionWIndex(tables->get_index_input(i),
 					tables->get_index_target(i)));
@@ -469,7 +488,8 @@ TransducerTable<TransitionIndex> & Transducer::copy_index_table()
     if (header->probe_flag(Weighted)) {
       HFST_THROW(TransducerHasWrongTypeException);
     }
-    TransducerTable<TransitionIndex> * another = new TransducerTable<TransitionIndex>;
+    TransducerTable<TransitionIndex> * another =
+	new TransducerTable<TransitionIndex>;
     for (unsigned int i = 0; i < header->index_table_size(); ++i) {
 	another->append(tables->get_index(i));
     }
@@ -515,25 +535,30 @@ Transducer * Transducer::copy(Transducer * t, bool weighted)
 {
     Transducer * another;
     if (weighted) {
-	another = new Transducer(t->get_header(), t->get_alphabet(),
-				 t->copy_windex_table(), t->copy_transitionw_table());
+	another = new Transducer(
+	    t->get_header(), t->get_alphabet(),
+	    t->copy_windex_table(), t->copy_transitionw_table());
     } else {
-	another = new Transducer(t->get_header(), t->get_alphabet(),
-				 t->copy_index_table(), t->copy_transition_table());
+	another = new Transducer(
+	    t->get_header(), t->get_alphabet(),
+	    t->copy_index_table(), t->copy_transition_table());
     }
     return another;
 }
 
 void Transducer::display() const
 {
-    std::cout << "-----Displaying optimized-lookup transducer------" << std::endl;
+    std::cout << "-----Displaying optimized-lookup transducer------"
+	      << std::endl;
     header->display();
     alphabet->display();
     tables->display();
-    std::cout << "-------------------------------------------------" << std::endl;
+    std::cout << "-------------------------------------------------"
+	      << std::endl;
 }
 
-TransitionTableIndexSet Transducer::get_transitions_from_state(TransitionTableIndex state_index) const
+TransitionTableIndexSet Transducer::get_transitions_from_state(
+    TransitionTableIndex state_index) const
 {
     TransitionTableIndexSet transitions;
   
@@ -542,15 +567,18 @@ TransitionTableIndexSet Transducer::get_transitions_from_state(TransitionTableIn
 	// for each input symbol that has a transition from this state
 	for(SymbolNumber symbol=0; symbol < header->symbol_count(); symbol++)
 	{
-	    const TransitionIndex& test_transition_index = get_index(state_index+1+symbol);
+	    const TransitionIndex& test_transition_index =
+		get_index(state_index+1+symbol);
 	    if(test_transition_index.matches(symbol))
 	    {
-		// there are one or more transitions with this input symbol, starting at
-		// test_transition_index.get_target()
-		TransitionTableIndex transition_i = test_transition_index.get_target();
+		// there are one or more transitions with this input symbol,
+		// starting at test_transition_index.get_target()
+		TransitionTableIndex transition_i =
+		    test_transition_index.get_target();
 		while(true)
 		{
-		    if(get_transition(transition_i).matches(test_transition_index.get_input_symbol()))
+		    if(get_transition(transition_i).matches(
+			   test_transition_index.get_input_symbol()))
 			transitions.insert(transition_i);
 		    else
 			break;
@@ -572,7 +600,8 @@ TransitionTableIndexSet Transducer::get_transitions_from_state(TransitionTableIn
 	TransitionTableIndex transition_i = state_index+1;
 	while(true)
 	{
-	    if(get_transition(transition_i).get_input_symbol() != NO_SYMBOL_NUMBER)
+	    if(get_transition(transition_i)
+	       .get_input_symbol() != NO_SYMBOL_NUMBER)
 		transitions.insert(transition_i);
 	    else
 		break;
