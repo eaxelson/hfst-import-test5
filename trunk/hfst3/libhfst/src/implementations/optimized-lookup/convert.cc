@@ -58,7 +58,9 @@ StateId ConvertIdNumberMap::get_id_node(StateIdNumber n) const
   return i->second;
 }
 
-void ConvertTransducerAlphabet::inspect_node(StateId n, StateIdSet& visited_nodes,
+void ConvertTransducerAlphabet::inspect_node(
+    StateId n,
+    StateIdSet& visited_nodes,
     OfstSymbolCountMap& symbol_count_map, SymbolSet& all_symbol_set)
 {
   if(visited_nodes.find(n) != visited_nodes.end())
@@ -69,7 +71,8 @@ void ConvertTransducerAlphabet::inspect_node(StateId n, StateIdSet& visited_node
   for(ArcIterator aiter(*transducer,n); !aiter.Done(); aiter.Next())
   {
     StdArc arc = aiter.Value();
-    std::string input_symbol_string = transducer->InputSymbols()->Find(arc.ilabel);
+    std::string input_symbol_string =
+	transducer->InputSymbols()->Find(arc.ilabel);
     
     if(!FdOperation::is_diacritic(input_symbol_string))
       input_symbols.insert(input_symbol_string);
@@ -79,24 +82,30 @@ void ConvertTransducerAlphabet::inspect_node(StateId n, StateIdSet& visited_node
     else
       all_symbol_set.insert(transducer->InputSymbols()->Find(arc.olabel));
     
-    inspect_node(arc.nextstate, visited_nodes, symbol_count_map, all_symbol_set);
+    inspect_node(
+	arc.nextstate, visited_nodes, symbol_count_map, all_symbol_set);
   }
   
-  for(std::set<std::string>::const_iterator it=input_symbols.begin(); it!=input_symbols.end(); it++)
+  for(std::set<std::string>::const_iterator it=input_symbols.begin();
+      it!=input_symbols.end(); it++)
     symbol_count_map[ofst_symbol_table->Find(*it)]++;
 }
-void ConvertTransducerAlphabet::get_symbol_info(OfstSymbolCountMap &symbol_count_map, SymbolSet& all_symbol_set)
+void ConvertTransducerAlphabet::get_symbol_info(
+    OfstSymbolCountMap &symbol_count_map, SymbolSet& all_symbol_set)
 {
   symbol_count_map[0] = 1;
   StateIdSet visited_nodes;
-  inspect_node(transducer->Start(),visited_nodes,symbol_count_map,all_symbol_set);
+  inspect_node(
+      transducer->Start(), visited_nodes, symbol_count_map, all_symbol_set);
 }
 
-void ConvertTransducerAlphabet::populate_symbol_table(OfstSymbolCountMap &input_symbol_counts, SymbolSet& all_symbol_set)
+void ConvertTransducerAlphabet::populate_symbol_table(
+    OfstSymbolCountMap &input_symbol_counts, SymbolSet& all_symbol_set)
 {
   // a reverse mapping of input_symbol_counts, to sort symbols by frequency
   std::multimap<unsigned int,int64> count_keys;
-  for (OfstSymbolCountMap::iterator it=input_symbol_counts.begin(); it!=input_symbol_counts.end(); ++it)
+  for (OfstSymbolCountMap::iterator it=input_symbol_counts.begin();
+       it!=input_symbol_counts.end(); ++it)
   {
     if(!FdOperation::is_diacritic(ofst_symbol_table->Find(it->first)))
       count_keys.insert(std::pair<unsigned int,int64>(it->second,it->first));
@@ -105,7 +114,9 @@ void ConvertTransducerAlphabet::populate_symbol_table(OfstSymbolCountMap &input_
   }
   
   symbol_table.push_back(ofst_symbol_table->Find((int64)0));
-  for (std::multimap<unsigned int,int64>::reverse_iterator it=count_keys.rbegin(); it!=count_keys.rend();++it)
+  for (std::multimap<unsigned int,int64>::reverse_iterator it =
+	   count_keys.rbegin();
+       it!=count_keys.rend();++it)
   {
     if (it->second != 0)
       symbol_table.push_back(ofst_symbol_table->Find(it->second));
@@ -122,7 +133,8 @@ void ConvertTransducerAlphabet::populate_symbol_table(OfstSymbolCountMap &input_
 
 void ConvertTransducerAlphabet::set_maps()
 {
-  for(fst::SymbolTableIterator it(*(transducer->InputSymbols())); !it.Done(); it.Next())
+  for(fst::SymbolTableIterator it(*(transducer->InputSymbols())); !it.Done()
+	  ; it.Next())
   {
     for(size_t i=0; i<symbol_table.size(); i++)
     {
@@ -136,7 +148,8 @@ void ConvertTransducerAlphabet::set_maps()
   
   if(transducer->OutputSymbols() != NULL)
   {
-    for(fst::SymbolTableIterator it(*(transducer->OutputSymbols())); !it.Done(); it.Next())
+    for(fst::SymbolTableIterator it(*(transducer->OutputSymbols())); !it.Done()
+	    ; it.Next())
     {
       for(size_t i=0; i<symbol_table.size(); i++)
       {
@@ -177,13 +190,17 @@ void ConvertTransducerAlphabet::display() const
     std::cout << i << ": " << symbol_table[i] << std::endl;
   
   std::cout << "Initial input symbols (old/new: string):" << std::endl;
-  for(fst::SymbolTableIterator i(*(transducer->InputSymbols())); !i.Done(); i.Next())
-    std::cout << i.Value() << "/" << lookup_ofst_input_symbol(i.Value()) << ": " << i.Symbol() << std::endl;
+  for(fst::SymbolTableIterator i(*(transducer->InputSymbols()));
+      !i.Done(); i.Next())
+    std::cout << i.Value() << "/" << lookup_ofst_input_symbol(i.Value())
+	      << ": " << i.Symbol() << std::endl;
   std::cout << "Initial output symbols: (old/new: string)" << std::endl;
   if(transducer->OutputSymbols() != NULL)
   {
-    for(fst::SymbolTableIterator i(*(transducer->InputSymbols())); !i.Done(); i.Next())
-      std::cout << i.Value() << "/" << lookup_ofst_output_symbol(i.Value()) << ": " << i.Symbol() << std::endl;
+    for(fst::SymbolTableIterator i(*(transducer->InputSymbols()));
+	!i.Done(); i.Next())
+      std::cout << i.Value() << "/" << lookup_ofst_output_symbol(i.Value())
+		<< ": " << i.Symbol() << std::endl;
   }
   else
     std::cout << "[NULL]" << std::endl;
@@ -194,7 +211,8 @@ SymbolNumber ConvertTransducerAlphabet::lookup_ofst_input_symbol(int64 s) const
   std::map<int64, SymbolNumber>::const_iterator i = input_symbols_map.find(s);
   return (i==input_symbols_map.end()) ? NO_SYMBOL_NUMBER : i->second;
 }
-SymbolNumber ConvertTransducerAlphabet::lookup_ofst_output_symbol(int64 s) const
+SymbolNumber ConvertTransducerAlphabet::lookup_ofst_output_symbol(
+    int64 s) const
 {
   std::map<int64, SymbolNumber>::const_iterator i = output_symbols_map.find(s);
   return (i==output_symbols_map.end()) ? NO_SYMBOL_NUMBER : i->second;
@@ -212,23 +230,30 @@ TransducerAlphabet ConvertTransducerAlphabet::to_alphabet() const
 
 
 ConvertTransition::ConvertTransition(const StdArc &a):
-    input_symbol(ConvertTransducer::constructing_transducer->get_alphabet().lookup_ofst_input_symbol(a.ilabel)),
-    output_symbol(ConvertTransducer::constructing_transducer->get_alphabet().lookup_ofst_output_symbol(a.olabel)),
-    target_state_id(ConvertTransducer::constructing_transducer->get_id_number_map().get_node_id(a.nextstate)),
+    input_symbol(ConvertTransducer::constructing_transducer->
+		 get_alphabet().lookup_ofst_input_symbol(a.ilabel)),
+    output_symbol(ConvertTransducer::constructing_transducer->
+		  get_alphabet().lookup_ofst_output_symbol(a.olabel)),
+    target_state_id(ConvertTransducer::constructing_transducer->
+		    get_id_number_map().get_node_id(a.nextstate)),
     weight(a.weight.Value()), table_index(NO_TABLE_INDEX) {}
 
 void ConvertTransition::display() const
 {
-  std::cout << "  " << input_symbol << ":" << output_symbol << " at " << table_index << " ->" << target_state_index << " (" << weight << ")" << std::endl;
+  std::cout << "  " << input_symbol << ":" << output_symbol << " at "
+	    << table_index << " ->" << target_state_index << " (" << weight
+	    << ")" << std::endl;
 }
 
 void ConvertTransition::set_target_state_index()
 {
-  ConvertFstState& state = ConvertTransducer::constructing_transducer->get_state(target_state_id);
+  ConvertFstState& state = ConvertTransducer::constructing_transducer->
+      get_state(target_state_id);
   target_state_index = state.get_table_index();
 }
 
-bool ConvertTransition::numerical_cmp(const ConvertTransition &another_transition) const
+bool ConvertTransition::numerical_cmp(
+    const ConvertTransition &another_transition) const
 {
   if (input_symbol == another_transition.input_symbol)
   {
@@ -240,18 +265,24 @@ bool ConvertTransition::numerical_cmp(const ConvertTransition &another_transitio
   return input_symbol < another_transition.input_symbol;
 }
 
-bool ConvertTransition::operator<(const ConvertTransition &another_transition) const
+bool ConvertTransition::operator<(
+    const ConvertTransition &another_transition) const
 {
-  if((input_symbol == 0) || ConvertTransducer::constructing_transducer->get_alphabet().is_flag_diacritic(input_symbol))
+  if((input_symbol == 0) || ConvertTransducer::constructing_transducer->
+     get_alphabet().is_flag_diacritic(input_symbol))
   {
-    if((another_transition.input_symbol == 0) || ConvertTransducer::constructing_transducer->get_alphabet().is_flag_diacritic(another_transition.input_symbol))
+    if((another_transition.input_symbol == 0) ||
+       ConvertTransducer::constructing_transducer->get_alphabet()
+       .is_flag_diacritic(another_transition.input_symbol))
       return numerical_cmp(another_transition);
     else
       return true;
   }
   else
   {
-    if((another_transition.input_symbol != 0) && !ConvertTransducer::constructing_transducer->get_alphabet().is_flag_diacritic(another_transition.input_symbol))
+    if((another_transition.input_symbol != 0) &&
+       !ConvertTransducer::constructing_transducer->
+       get_alphabet().is_flag_diacritic(another_transition.input_symbol))
       return numerical_cmp(another_transition);
     else
       return false;
@@ -267,10 +298,13 @@ T ConvertTransition::to_transition() const
 
 void ConvertTransitionIndex::display() const
 {
-  std::cout << "  input_symbol: " << input_symbol << " to transitions starting at " << first_transition_index << std::endl;
+  std::cout << "  input_symbol: " << input_symbol
+	    << " to transitions starting at " << first_transition_index
+	    << std::endl;
 }
 
-bool ConvertTransitionIndex::operator<(const ConvertTransitionIndex &another_index) const
+bool ConvertTransitionIndex::operator<(
+    const ConvertTransitionIndex &another_index) const
 {
   return input_symbol < another_index.input_symbol;
 }
@@ -283,8 +317,10 @@ T ConvertTransitionIndex::to_transition_index() const
 
 
 ConvertFstState::ConvertFstState(StateId n, TransduceR * tr):
-    table_index(NO_TABLE_INDEX), final(check_finality(tr,n)), weight(INFINITE_WEIGHT),
-    id(ConvertTransducer::constructing_transducer->get_id_number_map().get_node_id(n))
+    table_index(NO_TABLE_INDEX), final(check_finality(tr,n)),
+    weight(INFINITE_WEIGHT),
+    id(ConvertTransducer::constructing_transducer->
+       get_id_number_map().get_node_id(n))
 {
   set_transitions(n,tr);
   set_transition_indices();
@@ -301,9 +337,11 @@ ConvertFstState::ConvertFstState(StateId n, TransduceR * tr):
 };
 ConvertFstState::~ConvertFstState()
 {
-  for(ConvertTransitionSet::const_iterator it=transitions.begin(); it!=transitions.end(); it++)
+  for(ConvertTransitionSet::const_iterator it=transitions.begin();
+      it!=transitions.end(); it++)
     delete *it;
-  for(ConvertTransitionIndexSet::const_iterator it=transition_indices.begin(); it!=transition_indices.end(); it++)
+  for(ConvertTransitionIndexSet::const_iterator it=transition_indices.begin();
+      it!=transition_indices.end(); it++)
     delete *it;
 }
 
@@ -314,10 +352,12 @@ void ConvertFstState::display() const
     std::cout << " (final, " << weight << ")";
   std::cout << ":" << std::endl;
   std::cout << " Transition indices:" << std::endl;
-  for(ConvertTransitionIndexSet::const_iterator i=transition_indices.begin(); i!=transition_indices.end(); i++)
+  for(ConvertTransitionIndexSet::const_iterator i=transition_indices.begin();
+      i!=transition_indices.end(); i++)
     (*i)->display();
   std::cout << " Transitions:" << std::endl;
-  for(ConvertTransitionSet::const_iterator i=transitions.begin(); i!=transitions.end(); i++)
+  for(ConvertTransitionSet::const_iterator i=transitions.begin();
+      i!=transitions.end(); i++)
     (*i)->display();
 }
 
@@ -337,13 +377,15 @@ void ConvertFstState::set_transition_indices(void)
   SymbolNumber position = 0;
   
   bool zero_transitions = false;
-  for (ConvertTransitionSet::iterator it=transitions.begin(); it!=transitions.end(); ++it)
+  for (ConvertTransitionSet::iterator it=transitions.begin();
+       it!=transitions.end(); ++it)
   {
     ConvertTransition * t = *it;
     SymbolNumber input_symbol = t->get_input_symbol();
     if(previous_symbol != input_symbol)
     {
-      if(ConvertTransducer::constructing_transducer->get_alphabet().is_flag_diacritic(input_symbol))
+      if(ConvertTransducer::constructing_transducer->
+	 get_alphabet().is_flag_diacritic(input_symbol))
       {
         if(!zero_transitions)
         {
@@ -369,7 +411,8 @@ SymbolNumberSet * ConvertFstState::get_input_symbols(void) const
 {
   SymbolNumberSet * input_symbols = new SymbolNumberSet;
   
-  for(ConvertTransitionIndexSet::const_iterator it=transition_indices.begin(); it!=transition_indices.end(); ++it)
+  for(ConvertTransitionIndexSet::const_iterator it=transition_indices.begin();
+      it!=transition_indices.end(); ++it)
   {
     ConvertTransitionIndex * i = *it;
     input_symbols->insert(i->get_input_symbol());
@@ -378,12 +421,14 @@ SymbolNumberSet * ConvertFstState::get_input_symbols(void) const
   return input_symbols;
 }
 
-TransitionTableIndex ConvertFstState::set_transition_table_indices(TransitionTableIndex place)
+TransitionTableIndex ConvertFstState::set_transition_table_indices(
+    TransitionTableIndex place)
 {
   first_transition_index = place;
   
   // lay out the transitions sequentially with a space between each state
-  for(ConvertTransitionSet::iterator it=transitions.begin(); it!=transitions.end(); ++it)
+  for(ConvertTransitionSet::iterator it=transitions.begin();
+      it!=transitions.end(); ++it)
   {
     ConvertTransition * t = *it;
     t->set_table_index(place);
@@ -391,11 +436,14 @@ TransitionTableIndex ConvertFstState::set_transition_table_indices(TransitionTab
   }
   ++place;
   
-  // update the TransitionIndex's to store the table location of the associated transition
-  for(ConvertTransitionIndexSet::iterator it=transition_indices.begin(); it!=transition_indices.end(); ++it)
+  // update the TransitionIndex's to store the table location of the
+  associated transition
+  for(ConvertTransitionIndexSet::iterator it=transition_indices.begin();
+      it!=transition_indices.end(); ++it)
   {
     ConvertTransitionIndex* i = *it;
-    i->set_first_transition_index(i->get_first_transition()->get_table_index());
+    i->set_first_transition_index(
+	i->get_first_transition()->get_table_index());
   }
   
   return place;
@@ -403,25 +451,31 @@ TransitionTableIndex ConvertFstState::set_transition_table_indices(TransitionTab
 
 void ConvertFstState::set_transition_target_indices()
 {
-  for(ConvertTransitionSet::iterator i=transitions.begin(); i!=transitions.end(); i++)
+  for(ConvertTransitionSet::iterator i=transitions.begin();
+      i!=transitions.end(); i++)
     (*i)->set_target_state_index();
 }
 
 template<class T>
-void ConvertFstState::insert_transition_indices(TransducerTable<T>& index_table) const
+void ConvertFstState::insert_transition_indices(
+    TransducerTable<T>& index_table) const
 {
-  // only the start state and big states have entries in the transition index table
+  // only the start state and big states have
+  // entries in the transition index table
   if(!is_big_state() && !is_start_state())
     return;
   
   TransitionTableIndex i = table_index;
   
   if(final)
-    index_table.set(i, T(index_table[i].get_input_symbol(), *reinterpret_cast<const TransitionTableIndex*>(&weight)));
+    index_table.set(
+	i, T(index_table[i].get_input_symbol(),
+	     *reinterpret_cast<const TransitionTableIndex*>(&weight)));
   
   ++i;
   
-  for(ConvertTransitionIndexSet::const_iterator it=transition_indices.begin(); it!=transition_indices.end(); ++it)
+  for(ConvertTransitionIndexSet::const_iterator it=transition_indices.begin();
+      it!=transition_indices.end(); ++it)
   {
     ConvertTransitionIndex * ind = *it;
     index_table.set(i+ind->get_input_symbol(), ind->to_transition_index<T>());
@@ -429,8 +483,9 @@ void ConvertFstState::insert_transition_indices(TransducerTable<T>& index_table)
 }
 
 template<class T>
-TransitionTableIndex ConvertFstState::append_transitions(TransducerTable<T>& transition_table, 
-                                                         TransitionTableIndex place) const
+TransitionTableIndex ConvertFstState::append_transitions(
+    TransducerTable<T>& transition_table, 
+    TransitionTableIndex place) const
 {
   while(place < get_first_transition_index())
   {
@@ -438,7 +493,8 @@ TransitionTableIndex ConvertFstState::append_transitions(TransducerTable<T>& tra
     ++place;
   }
   
-  for(ConvertTransitionSet::iterator it=transitions.begin(); it!=transitions.end(); ++it)
+  for(ConvertTransitionSet::iterator it=transitions.begin();
+      it!=transitions.end(); ++it)
   {
     transition_table.append((*it)->to_transition<T>());
     ++place;
@@ -448,7 +504,8 @@ TransitionTableIndex ConvertFstState::append_transitions(TransducerTable<T>& tra
 
 
 struct fst_state_compare {
-  bool operator() (const ConvertFstState * s1, const ConvertFstState * s2) const
+  bool operator() (
+      const ConvertFstState * s1, const ConvertFstState * s2) const
   {
     if (s1->transition_indices.size() < s2->transition_indices.size())
       return true;
@@ -484,7 +541,8 @@ bool ConvertTransitionTableIndices::state_fits(SymbolNumberSet * input_symbols,
   
   // The node fits, if every one of its input symbols goes on 
   // an EMPTY or EMPTY_START index.
-  for(SymbolNumberSet::iterator it=input_symbols->begin(); it!=input_symbols->end(); ++it)
+  for(SymbolNumberSet::iterator it=input_symbols->begin();
+      it!=input_symbols->end(); ++it)
   {
     SymbolNumber input_symbol = *it;
     
@@ -496,9 +554,10 @@ bool ConvertTransitionTableIndices::state_fits(SymbolNumberSet * input_symbols,
   return true;
 }
 
-void ConvertTransitionTableIndices::insert_state(SymbolNumberSet * input_symbols,
-					  bool final_state,
-					  PlaceHolderVector::size_type index)
+void ConvertTransitionTableIndices::insert_state(
+    SymbolNumberSet * input_symbols,
+    bool final_state,
+    PlaceHolderVector::size_type index)
 {
   if (final_state || (indices.at(index) == OCCUPIED))
     indices.at(index) = OCCUPIED_START;
@@ -508,7 +567,8 @@ void ConvertTransitionTableIndices::insert_state(SymbolNumberSet * input_symbols
   // The input symbols start after the finality indicator.
   PlaceHolderVector::size_type input_symbol_start = index+1;
   
-  for(SymbolNumberSet::iterator it=input_symbols->begin(); it!=input_symbols->end(); ++it)
+  for(SymbolNumberSet::iterator it=input_symbols->begin();
+      it!=input_symbols->end(); ++it)
   {
     SymbolNumber input_symbol = *it;
     if(indices.at(input_symbol_start + input_symbol) == EMPTY)
@@ -518,7 +578,8 @@ void ConvertTransitionTableIndices::insert_state(SymbolNumberSet * input_symbols
   }
 }
 
-PlaceHolderVector::size_type ConvertTransitionTableIndices::last_full_index(void) const
+PlaceHolderVector::size_type ConvertTransitionTableIndices::last_full_index(
+    void) const
 {
   for(PlaceHolderVector::size_type i = indices.size()-1; i != 0; --i)
   {
@@ -527,7 +588,8 @@ PlaceHolderVector::size_type ConvertTransitionTableIndices::last_full_index(void
   }
   return 0;
 }
-PlaceHolderVector::size_type ConvertTransitionTableIndices::add_state(ConvertFstState * state)
+PlaceHolderVector::size_type ConvertTransitionTableIndices::add_state(
+    ConvertFstState * state)
 {
   if(lower_bound_test_count >= 1)
   {
@@ -544,7 +606,9 @@ PlaceHolderVector::size_type ConvertTransitionTableIndices::add_state(ConvertFst
   //    ++lower_bound;
   //  }
 #ifdef DEBUG
-  std::cerr << lower_bound << " " << lower_bound_test_count << " " << indices.size() << " " << state->number_of_input_symbols() << "\r";
+  std::cerr << lower_bound << " " << lower_bound_test_count << " "
+	    << indices.size() << " " << state->number_of_input_symbols()
+	    << "\r";
 #endif
   bool final_state = state->is_final();
   
@@ -553,7 +617,8 @@ PlaceHolderVector::size_type ConvertTransitionTableIndices::add_state(ConvertFst
   
   ++lower_bound_test_count;
   
-  for(PlaceHolderVector::size_type index=lower_bound; index<indices.size(); ++index)
+  for(PlaceHolderVector::size_type index=lower_bound; index<indices.size();
+      ++index)
   {
     // Only try the first 100 indices.
     //    if (index > lower_bound+100000)
@@ -573,8 +638,10 @@ PlaceHolderVector::size_type ConvertTransitionTableIndices::add_state(ConvertFst
   return UINT_MAX;
 }
 
-void ConvertTransducerHeader::full_traversal(TransducerHeader& h, TransduceR* tr,
-        StateId n, StateIdSet& visited_nodes, StateIdSet& nodes_in_path, OfstSymbolSet& all_input_symbols)
+void ConvertTransducerHeader::full_traversal(
+    TransducerHeader& h, TransduceR* tr,
+    StateId n, StateIdSet& visited_nodes, StateIdSet& nodes_in_path,
+    OfstSymbolSet& all_input_symbols)
 {
   if(visited_nodes.find(n) != visited_nodes.end())
     return;
@@ -627,17 +694,21 @@ void ConvertTransducerHeader::full_traversal(TransducerHeader& h, TransduceR* tr
     if(nodes_in_path.find(target) != nodes_in_path.end())
       h.cyclic = true;
     
-    full_traversal(h, tr, target, visited_nodes, nodes_in_path, all_input_symbols);
+    full_traversal(h, tr, target, visited_nodes, nodes_in_path,
+		   all_input_symbols);
   }
   nodes_in_path.erase(n);
 }
 
-void ConvertTransducerHeader::find_input_epsilon_cycles(StateId n,StateId start,StateIdSet &epsilon_targets,bool unweighted_only,TransduceR * tr,TransducerHeader& h)
+void ConvertTransducerHeader::find_input_epsilon_cycles(
+    StateId n, StateId start, StateIdSet &epsilon_targets,
+    bool unweighted_only, TransduceR * tr, TransducerHeader& h)
 {
   for (ArcIterator aiter(*tr,n); !aiter.Done(); aiter.Next())
   {
     StdArc a = aiter.Value();
-    if(a.ilabel != 0 || FdOperation::is_diacritic(tr->InputSymbols()->Find(a.ilabel)))
+    if(a.ilabel != 0 ||
+       FdOperation::is_diacritic(tr->InputSymbols()->Find(a.ilabel)))
       continue;
     else
     {
@@ -657,7 +728,8 @@ void ConvertTransducerHeader::find_input_epsilon_cycles(StateId n,StateId start,
     if(epsilon_targets.find(target) != epsilon_targets.end())
     {
       epsilon_targets.insert(target);
-      find_input_epsilon_cycles(target,start,epsilon_targets,unweighted_only,tr, h);
+      find_input_epsilon_cycles(
+	  target, start, epsilon_targets, unweighted_only, tr, h);
     }
 
     if(h.has_input_epsilon_cycles || h.has_unweighted_input_epsilon_cycles)
@@ -696,7 +768,8 @@ void ConvertTransducerHeader::compute_header(TransducerHeader& header,
   header.number_of_input_symbols = input_symbols.size();
   header.number_of_states = nodes.size();
   if(!header.weighted)
-    header.has_unweighted_input_epsilon_cycles = header.has_input_epsilon_cycles;
+    header.has_unweighted_input_epsilon_cycles =
+	header.has_input_epsilon_cycles;
 }	
 
 
@@ -715,7 +788,8 @@ void ConvertTransducer::read_nodes(void)
 void ConvertTransducer::set_transition_table_indices(void)
 {
   TransitionTableIndex place = TRANSITION_TARGET_TABLE_START;
-  for (ConvertFstStateVector::iterator it=states.begin(); it!=states.end(); ++it)
+  for (ConvertFstStateVector::iterator it=states.begin();
+       it!=states.end(); ++it)
   {
     ConvertFstState * state = *it;
     place = state->set_transition_table_indices(place);
@@ -726,7 +800,8 @@ void ConvertTransducer::set_index_table_indices(void)
 {
   StateSet state_set;
   
-  for(ConvertFstStateVector::iterator it=states.begin()+1; it != states.end(); ++it)
+  for(ConvertFstStateVector::iterator it=states.begin()+1;
+      it != states.end(); ++it)
       state_set.insert(*it);
   
   ConvertFstState * start_state = *states.begin();
@@ -734,7 +809,8 @@ void ConvertTransducer::set_index_table_indices(void)
   
   start_state->set_table_index(start_state_index);
   
-  for(StateSet::reverse_iterator it=state_set.rbegin(); it!=state_set.rend(); ++it)
+  for(StateSet::reverse_iterator it=state_set.rbegin();
+      it!=state_set.rend(); ++it)
   {
     ConvertFstState * state = *it;
     TransitionTableIndex state_index;
@@ -755,11 +831,14 @@ void ConvertTransducer::set_index_table_indices(void)
   
   // now that the state object's all know their table location, update the
   // transition objects with that information
-  for(ConvertFstStateVector::const_iterator it=states.begin(); it!=states.end(); it++)
+  for(ConvertFstStateVector::const_iterator it=states.begin();
+      it!=states.end(); it++)
     (*it)->set_transition_target_indices();
 }
 
-void ConvertTransducer::add_input_symbols(StateId n, SymbolNumberSet &input_symbols, StateIdSet &visited_nodes)
+void ConvertTransducer::add_input_symbols(StateId n,
+					  SymbolNumberSet &input_symbols,
+					  StateIdSet &visited_nodes)
 {
   for(ArcIterator aiter(*fst,n); !aiter.Done(); aiter.Next())
   {
@@ -785,7 +864,8 @@ SymbolNumber ConvertTransducer::number_of_input_symbols(void)
 TransitionTableIndex ConvertTransducer::count_transitions(void) const
 {
   TransitionTableIndex transition_count = 0;
-  for(ConvertFstStateVector::const_iterator it=states.begin(); it!=states.end(); ++it)
+  for(ConvertFstStateVector::const_iterator it=states.begin();
+      it!=states.end(); ++it)
   {
     // Separator between states;
     ++transition_count;
@@ -798,7 +878,8 @@ TransitionTableIndex ConvertTransducer::count_transitions(void) const
 void ConvertTransducer::display_states() const
 {
   std::cout << "Transducer states:" << std::endl;
-  for(ConvertFstStateVector::const_iterator it=states.begin(); it!=states.end(); it++)
+  for(ConvertFstStateVector::const_iterator it=states.begin();
+      it!=states.end(); it++)
     (*it)->display();
 }
 void ConvertTransducer::display_tables() const
@@ -823,11 +904,13 @@ void ConvertTransducer::display_tables() const
 }
 
 template<class T>
-TransducerTable<T> ConvertTransducer::make_index_table(TransitionTableIndex index_table_size) const
+TransducerTable<T> ConvertTransducer::make_index_table(
+    TransitionTableIndex index_table_size) const
 {
   TransducerTable<T> index_table(index_table_size, T());
   
-  for(ConvertFstStateVector::const_iterator it=states.begin(); it!=states.end(); ++it)
+  for(ConvertFstStateVector::const_iterator it=states.begin();
+      it!=states.end(); ++it)
   {
     ConvertFstState * state = *it;
     state->insert_transition_indices(index_table);
@@ -841,7 +924,8 @@ TransducerTable<T> ConvertTransducer::make_transition_table() const
 {
   TransducerTable<T> transition_table;
   TransitionTableIndex place = TRANSITION_TARGET_TABLE_START;
-  for(ConvertFstStateVector::const_iterator it=states.begin(); it!=states.end(); it++)
+  for(ConvertFstStateVector::const_iterator it=states.begin();
+      it!=states.end(); it++)
   {
     place = (*it)->append_transitions(transition_table, place);
   }
@@ -870,8 +954,9 @@ ConvertTransducer::ConvertTransducer(TransduceR * tr, bool weighted):
   delete fst_indices;
   
   //std::cout << "Computing header properties" << std::endl;
-  ConvertTransducerHeader::compute_header(header, tr, alphabet.get_symbol_table().size(),
-                                          index_table_size,count_transitions(), weighted);
+  ConvertTransducerHeader::compute_header(
+      header, tr, alphabet.get_symbol_table().size(),
+      index_table_size,count_transitions(), weighted);
   
   //header.display();
   //alphabet.display();
@@ -885,7 +970,8 @@ ConvertTransducer::ConvertTransducer(TransduceR * tr, bool weighted):
 
 ConvertTransducer::~ConvertTransducer()
 {
-  for(ConvertFstStateVector::const_iterator it=states.begin(); it!=states.end(); it++)
+  for(ConvertFstStateVector::const_iterator it=states.begin();
+      it!=states.end(); it++)
     delete *it;
 }
 
@@ -893,9 +979,14 @@ Transducer* ConvertTransducer::to_transducer() const
 {
   //std::cout << "Building new transducer" << std::endl;
   if(is_weighted())
-    return new Transducer(header, alphabet.to_alphabet(), make_index_table<TransitionWIndex>(index_table_size), make_transition_table<TransitionW>());
+    return new Transducer(
+	header, alphabet.to_alphabet(),
+	make_index_table<TransitionWIndex>(index_table_size),
+	make_transition_table<TransitionW>());
   else
-    return new Transducer(header, alphabet.to_alphabet(), make_index_table<TransitionIndex>(index_table_size), make_transition_table<Transition>());
+    return new Transducer(header, alphabet.to_alphabet(),
+			  make_index_table<TransitionIndex>(index_table_size),
+			  make_transition_table<Transition>());
 }
 #endif // HAVE_OPENFST
 

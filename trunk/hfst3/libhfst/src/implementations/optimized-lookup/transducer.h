@@ -53,7 +53,8 @@ typedef std::set<HfstOneLevelPath> HfstOneLevelPaths;
 typedef std::vector<std::string> StringVector;
 
 const SymbolNumber NO_SYMBOL_NUMBER = std::numeric_limits<SymbolNumber>::max();
-const TransitionTableIndex NO_TABLE_INDEX = std::numeric_limits<TransitionTableIndex>::max();
+const TransitionTableIndex NO_TABLE_INDEX =
+    std::numeric_limits<TransitionTableIndex>::max();
 const Weight INFINITE_WEIGHT = static_cast<float>(NO_TABLE_INDEX);
 
 enum HeaderFlag {Weighted, Deterministic, Input_deterministic, Minimized,
@@ -175,8 +176,10 @@ public:
     TransducerHeader(std::istream& is):
 	number_of_input_symbols(read_property<SymbolNumber>(is)),
 	number_of_symbols(read_property<SymbolNumber>(is)),
-	size_of_transition_index_table(read_property<TransitionTableIndex>(is)),
-	size_of_transition_target_table(read_property<TransitionTableIndex>(is)),
+	size_of_transition_index_table(
+	    read_property<TransitionTableIndex>(is)),
+	size_of_transition_target_table(
+	    read_property<TransitionTableIndex>(is)),
 	number_of_states(read_property<StateIdNumber>(is)),
 	number_of_transitions(read_property<TransitionNumber>(is)),
 	weighted(read_bool_property(is)),
@@ -195,7 +198,9 @@ public:
 	}
     
     SymbolNumber symbol_count(void) const { return number_of_symbols; }
-    SymbolNumber input_symbol_count(void) const {return number_of_input_symbols;}
+    SymbolNumber input_symbol_count(void) const {
+	return number_of_input_symbols;
+    }
   
     TransitionTableIndex index_table_size(void) const
 	{ return size_of_transition_index_table; }
@@ -205,15 +210,24 @@ public:
     bool probe_flag(HeaderFlag flag) const
 	{
 	    switch (flag) {
-	    case Weighted: return weighted;
-	    case Deterministic: return deterministic;
-	    case Input_deterministic: return input_deterministic;
-	    case Minimized: return minimized;
-	    case Cyclic: return cyclic;
-	    case Has_epsilon_epsilon_transitions: return has_epsilon_epsilon_transitions;
-	    case Has_input_epsilon_transitions: return has_input_epsilon_transitions;
-	    case Has_input_epsilon_cycles: return has_input_epsilon_cycles;
-	    case Has_unweighted_input_epsilon_cycles: return has_unweighted_input_epsilon_cycles;
+	    case Weighted:
+		return weighted;
+	    case Deterministic:
+		return deterministic;
+	    case Input_deterministic:
+		return input_deterministic;
+	    case Minimized:
+		return minimized;
+	    case Cyclic:
+		return cyclic;
+	    case Has_epsilon_epsilon_transitions:
+		return has_epsilon_epsilon_transitions;
+	    case Has_input_epsilon_transitions:
+		return has_input_epsilon_transitions;
+	    case Has_input_epsilon_cycles:
+		return has_input_epsilon_cycles;
+	    case Has_unweighted_input_epsilon_cycles:
+		return has_unweighted_input_epsilon_cycles;
 	    }
 	    return false;
 	}
@@ -221,23 +235,36 @@ public:
     void display() const
 	{
 	    std::cout << "Transducer properties:" << std::endl
-		      << " number_of_symbols: " << number_of_symbols << std::endl
-		      << " number_of_input_symbols: " << number_of_input_symbols << std::endl
-		      << " size_of_transition_index_table: " << size_of_transition_index_table << std::endl
-		      << " size_of_transition_target_table: " << size_of_transition_target_table << std::endl
-
-		      << " number_of_states: " << number_of_states << std::endl
-		      << " number_of_transitions: " << number_of_transitions << std::endl
-
-		      << " weighted: " << weighted << std::endl
-		      << " deterministic: " << deterministic << std::endl
-		      << " input_deterministic: " << input_deterministic << std::endl
-		      << " minimized: " << minimized << std::endl
-		      << " cyclic: " << cyclic << std::endl
-		      << " has_epsilon_epsilon_transitions: " << has_epsilon_epsilon_transitions << std::endl
-		      << " has_input_epsilon_transitions: " << has_input_epsilon_transitions << std::endl
-		      << " has_input_epsilon_cycles: " << has_input_epsilon_cycles << std::endl
-		      << " has_unweighted_input_epsilon_cycles: " << has_unweighted_input_epsilon_cycles << std::endl;
+		      << " number_of_symbols: "
+		      << number_of_symbols << std::endl
+		      << " number_of_input_symbols: "
+		      << number_of_input_symbols << std::endl
+		      << " size_of_transition_index_table: "
+		      << size_of_transition_index_table << std::endl
+		      << " size_of_transition_target_table: "
+		      << size_of_transition_target_table << std::endl
+		      << " number_of_states: "
+		      << number_of_states << std::endl
+		      << " number_of_transitions: "
+		      << number_of_transitions << std::endl
+		      << " weighted: "
+		      << weighted << std::endl
+		      << " deterministic: "
+		      << deterministic << std::endl
+		      << " input_deterministic: "
+		      << input_deterministic << std::endl
+		      << " minimized: "
+		      << minimized << std::endl
+		      << " cyclic: "
+		      << cyclic << std::endl
+		      << " has_epsilon_epsilon_transitions: "
+		      << has_epsilon_epsilon_transitions << std::endl
+		      << " has_input_epsilon_transitions: "
+		      << has_input_epsilon_transitions << std::endl
+		      << " has_input_epsilon_cycles: "
+		      << has_input_epsilon_cycles << std::endl
+		      << " has_unweighted_input_epsilon_cycles: "
+		      << has_unweighted_input_epsilon_cycles << std::endl;
 	}
   
     void write(std::ostream& os) const
@@ -280,7 +307,8 @@ public:
   
     void write(std::ostream& os) const
 	{
-	    for(SymbolTable::const_iterator i = symbol_table.begin(); i != symbol_table.end(); i++)
+	    for(SymbolTable::const_iterator i = symbol_table.begin();
+		i != symbol_table.end(); i++)
 	    {
 		os << *i;
 		os.put('\0');
@@ -307,7 +335,8 @@ protected:
     SymbolNumber input_symbol;
     TransitionTableIndex first_transition_index;
 public:
-    TransitionIndex(): input_symbol(NO_SYMBOL_NUMBER), first_transition_index(NO_TABLE_INDEX) {}
+    TransitionIndex(): input_symbol(NO_SYMBOL_NUMBER),
+		       first_transition_index(NO_TABLE_INDEX) {}
     TransitionIndex(SymbolNumber input,
 		    TransitionTableIndex first_transition):
 	input_symbol(input), first_transition_index(first_transition) {}
@@ -315,27 +344,35 @@ public:
     TransitionIndex(std::istream& is):
 	input_symbol(NO_SYMBOL_NUMBER), first_transition_index(0)
 	{
-	    is.read(reinterpret_cast<char*>(&input_symbol), sizeof(SymbolNumber));
-	    is.read(reinterpret_cast<char*>(&first_transition_index), sizeof(TransitionTableIndex));
+	    is.read(reinterpret_cast<char*>(&input_symbol),
+		    sizeof(SymbolNumber));
+	    is.read(reinterpret_cast<char*>(&first_transition_index),
+		    sizeof(TransitionTableIndex));
 	}
     virtual ~TransitionIndex() {}
   
     void write(std::ostream& os, bool weighted) const
 	{
-	    os.write(reinterpret_cast<const char*>(&input_symbol), sizeof(input_symbol));
+	    os.write(reinterpret_cast<const char*>(&input_symbol),
+		     sizeof(input_symbol));
 	    if(!weighted and input_symbol == NO_SYMBOL_NUMBER and
 	       first_transition_index != NO_TABLE_INDEX) {
 		// Make sure that we write the correct type of final index
-		os.write(reinterpret_cast<const char*>(1ul), sizeof(first_transition_index));
+		os.write(reinterpret_cast<const char*>(1ul),
+			 sizeof(first_transition_index));
 	    } else {
-		os.write(reinterpret_cast<const char*>(&first_transition_index), sizeof(first_transition_index));
+		os.write(reinterpret_cast<const char*>(
+			     &first_transition_index),
+			 sizeof(first_transition_index));
 	    }
 	}
   
     void display() const;
   
-    TransitionTableIndex get_target(void) const {return first_transition_index;}
-    SymbolNumber get_input_symbol(void) const {return input_symbol;}
+    TransitionTableIndex get_target(void) const
+	{ return first_transition_index; }
+    SymbolNumber get_input_symbol(void) const
+	{ return input_symbol; }
   
     bool matches(const SymbolNumber s) const;
     virtual bool final(void) const;
@@ -370,24 +407,33 @@ protected:
 public:
     Transition(SymbolNumber input, SymbolNumber output,
 	       TransitionTableIndex target, Weight bogus=0.0f):
-	input_symbol(input), output_symbol(output), target_index(target) {bogus=0.0f;}
+	input_symbol(input), output_symbol(output), target_index(target)
+	{bogus=0.0f;}
     Transition(bool final, Weight bogus=0.0f):
-	input_symbol(NO_SYMBOL_NUMBER), output_symbol(NO_SYMBOL_NUMBER), target_index(final?1:NO_TABLE_INDEX) {bogus=0.0f;}
+	input_symbol(NO_SYMBOL_NUMBER), output_symbol(NO_SYMBOL_NUMBER),
+	target_index(final?1:NO_TABLE_INDEX) {bogus=0.0f;}
     Transition(std::istream& is):
-	input_symbol(NO_SYMBOL_NUMBER), output_symbol(NO_SYMBOL_NUMBER), target_index(0)
+	input_symbol(NO_SYMBOL_NUMBER), output_symbol(NO_SYMBOL_NUMBER),
+	target_index(0)
 	{
-	    is.read(reinterpret_cast<char*>(&input_symbol), sizeof(SymbolNumber));
-	    is.read(reinterpret_cast<char*>(&output_symbol), sizeof(SymbolNumber));
-	    is.read(reinterpret_cast<char*>(&target_index), sizeof(target_index));
+	    is.read(reinterpret_cast<char*>(&input_symbol),
+		    sizeof(SymbolNumber));
+	    is.read(reinterpret_cast<char*>(&output_symbol),
+		    sizeof(SymbolNumber));
+	    is.read(reinterpret_cast<char*>(&target_index),
+		    sizeof(target_index));
 	}
   
     virtual ~Transition() {}
   
     virtual void write(std::ostream& os, bool weighted) const
 	{
-	    os.write(reinterpret_cast<const char*>(&input_symbol), sizeof(input_symbol));
-	    os.write(reinterpret_cast<const char*>(&output_symbol), sizeof(output_symbol));
-	    os.write(reinterpret_cast<const char*>(&target_index), sizeof(target_index));
+	    os.write(reinterpret_cast<const char*>(&input_symbol),
+		     sizeof(input_symbol));
+	    os.write(reinterpret_cast<const char*>(&output_symbol),
+		     sizeof(output_symbol));
+	    os.write(reinterpret_cast<const char*>(&target_index),
+		     sizeof(target_index));
 	    if (weighted) {
 		os << 0.0f;
 	    }
@@ -421,7 +467,8 @@ public:
 	{
 	    Transition::write(os, false);
 	    if (weighted) {
-		os.write(reinterpret_cast<const char*>(&transition_weight), sizeof(transition_weight));
+		os.write(reinterpret_cast<const char*>(&transition_weight),
+			 sizeof(transition_weight));
 	    }
 	}
   
@@ -439,7 +486,8 @@ protected:
 public:
     TransducerTable(): table() {}
     TransducerTable(size_t size, const T& entry): table(size, entry) {}
-    TransducerTable(std::istream& is, TransitionTableIndex index_count): table()
+    TransducerTable(
+	std::istream& is, TransitionTableIndex index_count): table()
 	{
 	    for(size_t i=0; i<index_count; i++)
 		table.push_back(T(is));
@@ -475,17 +523,28 @@ class TransducerTablesInterface
 public:
     virtual ~TransducerTablesInterface() {}
   
-    virtual const TransitionIndex& get_index(TransitionTableIndex i) const = 0;
-    virtual const Transition& get_transition(TransitionTableIndex i) const = 0;
-    virtual Weight get_weight(TransitionTableIndex i) const = 0;
-    virtual SymbolNumber get_transition_input(TransitionTableIndex i) const = 0;
-    virtual SymbolNumber get_transition_output(TransitionTableIndex i) const = 0;
-    virtual TransitionTableIndex get_transition_target(TransitionTableIndex i) const = 0;
-    virtual bool get_transition_finality(TransitionTableIndex i) const = 0;
-    virtual SymbolNumber get_index_input(TransitionTableIndex i) const = 0;
-    virtual TransitionTableIndex get_index_target(TransitionTableIndex i) const = 0;
-    virtual bool get_index_finality(TransitionTableIndex i) const = 0;
-    virtual Weight get_final_weight(TransitionTableIndex i) const = 0;
+    virtual const TransitionIndex& get_index(
+	TransitionTableIndex i) const = 0;
+    virtual const Transition& get_transition(
+	TransitionTableIndex i) const = 0;
+    virtual Weight get_weight(
+	TransitionTableIndex i) const = 0;
+    virtual SymbolNumber get_transition_input(
+	TransitionTableIndex i) const = 0;
+    virtual SymbolNumber get_transition_output(
+	TransitionTableIndex i) const = 0;
+    virtual TransitionTableIndex get_transition_target(
+	TransitionTableIndex i) const = 0;
+    virtual bool get_transition_finality(
+	TransitionTableIndex i) const = 0;
+    virtual SymbolNumber get_index_input(
+	TransitionTableIndex i) const = 0;
+    virtual TransitionTableIndex get_index_target(
+	TransitionTableIndex i) const = 0;
+    virtual bool get_index_finality(
+	TransitionTableIndex i) const = 0;
+    virtual Weight get_final_weight(
+	TransitionTableIndex i) const = 0;
   
     virtual void display() const {}
 };
@@ -499,9 +558,12 @@ protected:
 public:
     TransducerTables(std::istream& is, TransitionTableIndex index_table_size,
 		     TransitionTableIndex transition_table_size):
-	index_table(is, index_table_size), transition_table(is, transition_table_size) { }
+	index_table(
+	    is, index_table_size),
+	transition_table(is, transition_table_size) { }
 	
-    TransducerTables(): index_table(1, T1::create_final()), transition_table() {}
+    TransducerTables(): index_table(1, T1::create_final()),
+			transition_table() {}
     TransducerTables(const TransducerTable<T1>& index_table,
 		     const TransducerTable<T2>& transition_table):
 	index_table(index_table), transition_table(transition_table) {}
@@ -682,7 +744,8 @@ public:
     //     which case the following entries will all have the same input symbol
     // This function will return a vector of indices to the transition table,
     // i.e. the arcs from the given state
-    TransitionTableIndexSet get_transitions_from_state(TransitionTableIndex state_index) const;
+    TransitionTableIndexSet get_transitions_from_state(
+	TransitionTableIndex state_index) const;
 
 
     bool initialize_input(char * input_str);
