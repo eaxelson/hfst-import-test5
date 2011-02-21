@@ -4,6 +4,9 @@
 #include <string>
 #include <sstream>
 
+//! @file HfstExceptionDefs.h
+//! @brief A file for exceptions
+
 //! @brief Base class for HfstExceptions. Holds its own name and the file 
 //! and line number where it was thrown.
 struct HfstException
@@ -13,12 +16,17 @@ struct HfstException
   size_t line;
   HfstException(void);
   HfstException(const std::string &name,const std::string &file,size_t line);
+  //! @brief Get the error message.
   std::string operator() (void) const;
 };
 
 //! @brief Macro to throw an exception of type @a E.
 //! Use @a THROW instead of regular @a throw with subclasses of HfstException.
 #define HFST_THROW(E) throw E(#E,__FILE__,__LINE__)
+
+//! @brief Macro to throw an exception of type @a E with message @a M.
+//! Use @a THROW instead of regular @a throw with subclasses of HfstException.
+#define HFST_THROW_MESSAGE(E,M) throw E(#E #M,__FILE__,__LINE__)
 
 //! @brief Declare a subclass of @a HfstException of type @a CHILD.
 #define HFST_EXCEPTION_CHILD_DECLARATION(CHILD) \
@@ -34,5 +42,283 @@ struct HfstException
 
 // Example declaring an exception class SomeHfstException:
 //HFST_EXCEPTION_CHILD_DECLARATION(SomeHfstException);
+
+
+//! @brief Two or more HfstTransducers are not of the same type
+HFST_EXCEPTION_CHILD_DECLARATION(HfstTransducerTypeMismatchException);
+
+/** \brief The library required by the implementation type requested 
+    is not linked to HFST. 
+
+An example:
+\verbatim
+try {
+  HfstTransducer("foo", "bar", type);
+} catch (ImplementationTypeNotAvailableException e) {
+  fprintf(stderr, "ERROR: Type requested is not available.\n");
+} 
+\endverbatim
+*/
+HFST_EXCEPTION_CHILD_DECLARATION(ImplementationTypeNotAvailableException);
+
+/** \brief Function has not been implemented (yet). */
+HFST_EXCEPTION_CHILD_DECLARATION(FunctionNotImplementedException);
+
+/** \brief Stream cannot be read. 
+
+An example:
+\verbatim
+try {
+  HfstInputStream in("foofile");
+} catch (StreamNotReadableException e) {
+  fprintf(stderr, "ERROR: file cannot be read.\n");
+}  
+\endverbatim
+*/
+HFST_EXCEPTION_CHILD_DECLARATION(StreamNotReadableException);
+
+/** \brief Stream cannot be written. 
+
+An example:
+\verbatim
+try {
+  HfstTransducer tr("foo", FOMA_TYPE);
+  HfstOutputStream out("testfile");
+  out << tr;
+} catch (StreamCannotBeWrittenException e) {
+  fprintf(stderr, "ERROR: file cannot be written.\n");
+}  
+\endverbatim
+*/
+HFST_EXCEPTION_CHILD_DECLARATION(StreamCannotBeWrittenException);
+
+/** \brief Stream is closed. 
+
+    An example:
+
+\verbatim
+try {
+  HfstTransducer tr("foo", LOG_OPENFST_TYPE);
+  HfstOutputStream out("testfile");
+  out.close();
+  out << tr;
+} catch (StreamIsClosedException e) {
+  fprintf(stderr, "ERROR: stream to file is closed.\n");
+}  
+\endverbatim
+*/
+HFST_EXCEPTION_CHILD_DECLARATION(StreamIsClosedException);
+
+/** \brief Transducer is cyclic. 
+
+    thrown by hfst::HfstTransducer::extract_paths. An example:
+\verbatim
+HfstTransducer transducer("a", "b", TROPICAL_OPENFST_TYPE);
+transducer.repeat_star();
+try {
+  WeightedPaths<float>::Set results;
+  transducer.extract_paths(results);
+  fprintf(stderr, "The transducer has %i paths\n", results.size());
+} catch (TransducerIsCyclicException e) {
+    fprintf(stderr, "The transducer is cyclic "
+            " and has an infinite number of paths.\n");
+}
+\endverbatim
+*/
+HFST_EXCEPTION_CHILD_DECLARATION(TransducerIsCyclicException);
+
+
+/** \brief The stream does not contain transducers. 
+
+    An example. The file "foofile" contains
+\verbatim
+This is a text file.
+Here is another line.
+The file ends here.
+\endverbatim
+
+When we try to read it, an exception will be thrown:
+
+\verbatim
+try {
+  HfstInputStream in("foofile");
+} catch (NotTransducerStreamException e) {
+  fprintf(stderr, "ERROR: file does not contain transducers.\n");
+}  
+\endverbatim
+*/
+HFST_EXCEPTION_CHILD_DECLARATION(NotTransducerStreamException);
+
+/** \brief The stream is not in valid AT&T format. 
+
+    An example. The file "testfile.att" contains
+
+\verbatim
+0       1       a      b
+1
+c
+\verbatim
+
+When we try to read it, an exception is thrown:
+
+\verbatim
+std::vector<HfstTransducer> transducers;
+FILE * ifile = fopen("testfile.att", "rb");
+try {
+  while (not eof(ifile))
+    {
+    HfstTransducer t(ifile, TROPICAL_OPENFST_TYPE, "epsilon");
+    transducers.push_back(t);
+    printf("read one transducer\n");
+    }
+} catch (NotValidAttFormatException e) {
+    printf("Error reading transducer: not valid AT&T format.\n"); }
+fclose(ifile);
+fprintf(stderr, "Read %i transducers in total.\n", (int)transducers.size());
+\endverbatim
+
+
+    thrown by 
+    hfst::HfstTransducer::HfstTransducer(FILE*,ImplementationType,const std::string&)}
+*/
+HFST_EXCEPTION_CHILD_DECLARATION(NotValidAttFormatException);
+
+
+/** \brief State is not final (and cannot have a final weight). 
+
+    An example:
+
+\verbatim
+HfstBasicTransducer tr;
+tr.add_state(1);
+// An exception is thrown as state number 1 is not final
+float w = tr.get_final_weight(1);
+\endverbatim
+
+You should use function is_final_state if you are not sure whether a
+state is final.
+
+    Thrown by hfst::implementations::HfstTransitionGraph::get_final_weight. */
+HFST_EXCEPTION_CHILD_DECLARATION(StateIsNotFinalException);
+
+
+
+/** \brief Context transducers are not automata.
+
+    This exception is thrown by
+    hfst::rules::replace_up(HfstTransducerPair&, HfstTransducer&, bool, StringPairSet&)
+    when either context transducer does not have equivalent input and
+    output symbols in all its transitions.
+
+    An example:
+
+\verbatim
+ImplementationType type = SFST_TYPE;
+// The second context transducer is 
+HfstTransducerPair contexts(HfstTransducer("c", type),
+                            HfstTransducer("c", "d", type));
+HfstTransducer mapping("a", "b", type);
+StringPairSet alphabet;
+alphabet.insert(StringPair("a", "a"));
+alphabet.insert(StringPair("b", "b"));
+alphabet.insert(StringPair("c", "c"));
+alphabet.insert(StringPair("d", "d"));
+hfst::rules::replace_up(contexts, mapping, true, alphabet);
+\endverbatim
+
+*/
+HFST_EXCEPTION_CHILD_DECLARATION(ContextTransducersAreNotAutomataException);
+
+
+/** \brief The StateId argument is not valid.
+
+    An example:
+
+\verbatim
+HfstBasicTransducer tr;
+tr.add_state(1);
+// An exception is thrown as there is no state number 2
+float w = tr.get_final_weight(2);
+\endverbatim
+*/
+HFST_EXCEPTION_CHILD_DECLARATION(StateIndexOutOfBoundsException);
+
+
+/** \brief Transducer has a malformed HFST header. 
+
+    Thrown by hfst::HfstTransducer(HfstInputStream&). */
+HFST_EXCEPTION_CHILD_DECLARATION(TransducerHeaderException);
+
+
+/** \brief An OpenFst transducer does not have an input symbol table. 
+
+    When converting from OpenFst to tropical HFST, the OpenFst transducer
+    must have at least an input symbol table. If the output symbol table
+    is missing, it is assumed to be equivalent to the input symbol table.
+
+    Thrown by hfst::HfstTransducer(HfstInputStream&)
+*/
+HFST_EXCEPTION_CHILD_DECLARATION(MissingOpenFstInputSymbolTableException);
+
+
+/** \brief The calling and/or called transducer do not have the same type. 
+
+An example:
+\verbatim
+HfstTransducer foo("foo", SFST_TYPE);
+HfstTransducer bar("bar", FOMA_TYPE);
+foo.disjunct(bar);   // an exception is thrown 
+\endverbatim
+*/
+HFST_EXCEPTION_CHILD_DECLARATION(TransducerTypeMismatchException);
+
+
+
+/** \brief The set of transducer pairs is empty. 
+
+    Thrown by rule functions in namespace #hfst::rules. An example:
+
+\verbatim
+    HfstTransducerPairVector contexts; // contexts is empty
+    HfstTransducer rest = hfst::rules::restriction
+      (contexts, mapping, alphabet, twol_type, direction); 
+\endverbatim
+*/
+HFST_EXCEPTION_CHILD_DECLARATION(EmptySetOfContextsException);
+
+
+
+/* \brief The type of a transducer is not specified.
+
+   This exception is thrown when an ImplementationType argument
+   is ERROR_TYPE.
+
+   @see hfst::ImplementationType
+ */
+HFST_EXCEPTION_CHILD_DECLARATION(SpecifiedTypeRequiredException);
+
+
+
+
+/** \brief An error happened probably due to a bug in the HFST code. */
+HFST_EXCEPTION_CHILD_DECLARATION(HfstFatalException);
+
+
+/** \brief Transducer has wrong type. 
+
+    This exception suggests that an HfstTransducer has not been properly
+    initialized, probably due to a bug in the HFST library. Alternatively
+    the default constructor of HfstTransducer has been called at some point. 
+
+    @see hfst::HfstTransducer() */
+HFST_EXCEPTION_CHILD_DECLARATION(TransducerHasWrongTypeException);
+
+
+//HFST_EXCEPTION_CHILD_DECLARATION(SymbolRedefinedException); 
+//HFST_EXCEPTION_CHILD_DECLARATION(TransducerHasNoStartStateException);
+//HFST_EXCEPTION_CHILD_DECLARATION(TransducerHasMoreThanOneStartStateException);
+
+
+
 
 #endif // #ifndef _HFST_EXCEPTION_DEFS_H_

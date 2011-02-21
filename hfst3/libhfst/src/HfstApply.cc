@@ -128,8 +128,7 @@ namespace hfst
         //#endif
         case ERROR_TYPE:
         default:
-          //throw hfst::exceptions::TransducerHasWrongTypeException();
-	  HFST_THROW(HfstException);
+	  HFST_THROW(TransducerHasWrongTypeException);
       }
     return *this;
   }
@@ -208,8 +207,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
         //#endif
         case ERROR_TYPE:
         default:
-          //throw hfst::exceptions::TransducerHasWrongTypeException();
-	  HFST_THROW(HfstException);
+	  HFST_THROW(TransducerHasWrongTypeException);
       }
     return *this;
   }
@@ -289,8 +287,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
         //#endif
         case ERROR_TYPE:
         default:
-          //throw hfst::exceptions::TransducerHasWrongTypeException();
-	  HFST_THROW(HfstException);
+	  HFST_THROW(TransducerHasWrongTypeException);
       }
     return *this;
   }
@@ -319,8 +316,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
    HfstTransducer &another)
   {
     if (this->type != another.type)
-      //throw hfst::exceptions::TransducerTypeMismatchException();
-      HFST_THROW(HfstException);
+      HFST_THROW(TransducerTypeMismatchException);
 
     this->harmonize(another);
 
@@ -382,7 +378,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
         case ERROR_TYPE:
         default:
           //throw hfst::exceptions::TransducerHasWrongTypeException();
-	  HFST_THROW(HfstException);
+	  HFST_THROW(TransducerHasWrongTypeException);
       }
 
     return *this;

@@ -143,6 +143,7 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
         HfstTransducer first(firststream);
         HfstTransducer second(secondstream);
 
+	try {
 	if (first.check_for_missing_flags_in(second)) 
 	  {
 	    if (not insert_missing_flags)
@@ -176,6 +177,14 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
 	}
 
         outstream << first.compose(second);
+	}
+	catch (HfstTransducerTypeMismatchException)
+	  {
+	    error(EXIT_FAILURE, 0, "%s and %s contain transducers whose "
+		  "types are not the same",
+		  firstfilename, secondfilename);	    
+	  }
+
         bothInputs = firststream.is_good() && secondstream.is_good();
     }
     

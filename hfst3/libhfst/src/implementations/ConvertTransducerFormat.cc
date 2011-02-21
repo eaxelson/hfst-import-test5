@@ -57,7 +57,7 @@ namespace hfst { namespace implementations
       return hfst_ol_to_hfst_basic_transducer(t.implementation.hfst_ol);
 
     //throw hfst::exceptions::FunctionNotImplementedException();
-    HFST_THROW(HfstException);
+    HFST_THROW(FunctionNotImplementedException);
   }
 
 
@@ -276,8 +276,9 @@ namespace hfst { namespace implementations
         // If there are several initial states in foma transducer,
         else {
           // throw an exception.
-          //throw TransducerHasMoreThanOneStartStateException();
-	  HFST_THROW(HfstException);
+	  HFST_THROW_MESSAGE
+	    (HfstFatalException,
+	     "Foma transducer has more than one start state");
         }
       }
 
@@ -306,8 +307,9 @@ namespace hfst { namespace implementations
   // If there was not an initial state in foma transducer,
   if (not start_state_found) {
     // throw an exception.
-    //throw TransducerHasNoStartStateException();
-    HFST_THROW(HfstException);
+    HFST_THROW_MESSAGE
+      (HfstFatalException,
+       "Foma transducer has no start state");
   }
   
   /* If start state number (N) is not zero, swap state numbers N and zero 
@@ -413,8 +415,7 @@ namespace hfst { namespace implementations
 
     /* An HFST tropical transducer always has an input symbol table. */
     if (has_hfst_header && inputsym == NULL) {
-      //throw hfst::exceptions::MissingOpenFstInputSymbolTableException();
-      HFST_THROW(HfstException);
+      HFST_THROW(MissingOpenFstInputSymbolTableException);
     }
 
   HfstBasicTransducer * net = new HfstBasicTransducer();
@@ -451,8 +452,7 @@ namespace hfst { namespace implementations
      If the output symbol table is missing, we assume that it would be 
      equivalent to the input symbol table. */
   if (inputsym == NULL) {
-    //throw hfst::exceptions::MissingOpenFstInputSymbolTableException();
-    HFST_THROW(HfstException);
+    HFST_THROW(MissingOpenFstInputSymbolTableException);
   }
   if (outputsym == NULL)
     outputsym = inputsym;
@@ -671,8 +671,7 @@ namespace hfst { namespace implementations
 
     /* An HFST log transducer always has an input symbol table. */
     if (has_hfst_header && inputsym == NULL) {
-      //throw hfst::exceptions::MissingOpenFstInputSymbolTableException();
-      HFST_THROW(HfstException);
+      HFST_THROW(MissingOpenFstInputSymbolTableException);
     }
 
   HfstBasicTransducer * net = new HfstBasicTransducer();
@@ -709,8 +708,7 @@ namespace hfst { namespace implementations
      If the output symbol table is missing, we assume that it would be 
      equivalent to the input symbol table. */
   if (inputsym == NULL) {
-    //throw hfst::exceptions::MissingOpenFstInputSymbolTableException();
-    HFST_THROW(HfstException);
+    HFST_THROW(MissingOpenFstInputSymbolTableException);
   }
   if (outputsym == NULL)
     outputsym = inputsym;

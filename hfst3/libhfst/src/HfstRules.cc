@@ -198,8 +198,7 @@ namespace hfst
                                 StringPairSet &alphabet) 
     {
       if (context.first.get_type() != context.second.get_type()) {
-        //throw hfst::exceptions::TransducerTypeMismatchException();
-	HFST_THROW(HfstException);
+	HFST_THROW(TransducerTypeMismatchException);
       }
       ImplementationType type = context.first.get_type();
 
@@ -260,8 +259,7 @@ namespace hfst
                                      StringPairSet &alphabet) 
     { 
       if (context.first.get_type() != context.second.get_type()) {
-        //throw hfst::exceptions::TransducerTypeMismatchException();
-	HFST_THROW(HfstException);
+	HFST_THROW(TransducerTypeMismatchException);
       }
       ImplementationType type = context.first.get_type();
 
@@ -325,8 +323,7 @@ namespace hfst
       // test that all transducers have the same type
       if (context.first.get_type() != context.second.get_type() || 
           context.first.get_type() != t.get_type() ) {
-        //throw hfst::exceptions::TransducerTypeMismatchException();
-	HFST_THROW(HfstException);
+	HFST_THROW(TransducerTypeMismatchException);
       }
       ImplementationType type = t.get_type();      
 
@@ -562,18 +559,15 @@ namespace hfst
           } 
           else { 
             if (type != it->first.get_type()) {
-              //throw hfst::exceptions::TransducerTypeMismatchException();
-	      HFST_THROW(HfstException);
+	      HFST_THROW(TransducerTypeMismatchException);
 	    }
           }
           if (type != it->second.get_type()) {
-            //throw hfst::exceptions::TransducerTypeMismatchException();
-	    HFST_THROW(HfstException);
+	    HFST_THROW(TransducerTypeMismatchException);
 	  }
          }
       if (not type_defined) {
-        //throw hfst::exceptions::EmptySetOfContextsException();
-	HFST_THROW(HfstException);
+	HFST_THROW(EmptySetOfContextsException);
       }
 
       std::string marker("@_MARKER_@");

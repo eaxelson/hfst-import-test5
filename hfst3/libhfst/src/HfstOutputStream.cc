@@ -19,8 +19,7 @@ namespace hfst
     type(type), hfst_format(hfst_format)
   { 
     if (not HfstTransducer::is_implementation_type_available(type)) {
-      //throw hfst::exceptions::ImplementationTypeNotAvailableException();
-      HFST_THROW(HfstException);
+      HFST_THROW(ImplementationTypeNotAvailableException);
     }
 
     switch(type)
@@ -62,8 +61,7 @@ namespace hfst
           new hfst::implementations::HfstOlOutputStream(true);
         break;
       default:
-        //throw hfst::exceptions::SpecifiedTypeRequiredException();
-	HFST_THROW(HfstException);
+	HFST_THROW(SpecifiedTypeRequiredException);
         break;
       }
   }
@@ -74,8 +72,7 @@ namespace hfst
     type(type), hfst_format(hfst_format)
   { 
     if (not HfstTransducer::is_implementation_type_available(type)) {
-      //throw hfst::exceptions::ImplementationTypeNotAvailableException();
-      HFST_THROW(HfstException);
+      HFST_THROW(ImplementationTypeNotAvailableException);
     }
 
     switch(type)
@@ -123,8 +120,7 @@ namespace hfst
           new hfst::implementations::HfstOlOutputStream(filename.c_str(), true);
         break;
       default:
-        //throw hfst::exceptions::SpecifiedTypeRequiredException();
-	HFST_THROW(HfstException);
+	HFST_THROW(SpecifiedTypeRequiredException);
         break;
       }
   }
@@ -296,8 +292,12 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
   HfstOutputStream &HfstOutputStream::operator<< (HfstTransducer &transducer)
   {
     if (type != transducer.type)
-      { //throw hfst::exceptions::TransducerHasWrongTypeException(); 
-	HFST_THROW(HfstException); }  
+      {
+	HFST_THROW_MESSAGE
+	  (TransducerTypeMismatchException, 
+	   "operator<<: "
+	   "HfstOutputStream and HfstTransducer do not have the same type");
+      }
 
     /* Write the HFST header. The header has the following structure:
        

@@ -79,12 +79,20 @@ namespace hfst {
       static std::string get_symbol(unsigned int number) {
         Number2SymbolMap::const_iterator it = number2symbol_map.find(number);
         if (it == number2symbol_map.end()) {
-          fprintf(stderr, "ERROR: "
+          /*fprintf(stderr, "ERROR: "
                   "HfstTropicalTransducerTransitionData::get_symbol"
                   "(unsigned int number) "
-                  "number is not mapped to any symbol\n");
-          //throw hfst::exceptions::HfstInterfaceException();
-	  HFST_THROW(HfstException);
+                  "number is not mapped to any symbol\n");*/
+	  std::string message("HfstTropicalTransducerTransitionData: "
+			      "number ");
+	  std::ostringstream oss;
+	  oss << number;
+	  message.append(oss.str());
+	  message.append(" is not mapped to any symbol");
+	  HFST_THROW_MESSAGE
+	    (HfstFatalException,
+	     message);
+
         }
         return it->second;
       }
@@ -531,8 +539,7 @@ namespace hfst {
         W get_final_weight(HfstState s) const {
           if (final_weight_map.find(s) != final_weight_map.end())
             return final_weight_map.find(s)->second;
-          //throw hfst::exceptions::StateIsNotFinalException();
-	  HFST_THROW(HfstException);
+	  HFST_THROW(StateIsNotFinalException);
         }
 
         /** @brief Set the final weight of state \a s in this graph 
@@ -581,15 +588,14 @@ namespace hfst {
         const std::set<HfstTransition<C> > & operator[](HfstState s) const
         {
           if (s > max_state)
-            { //throw StateIndexOutOfBoundsException(); }
-	      HFST_THROW(HfstException); }
+            { 
+	      HFST_THROW(StateIndexOutOfBoundsException); }
           return state_map.find(s)->second;
         }        
 
         /* TODO: Change state numbers s1 to s2 and vice versa. */
         void swap_state_numbers(HfstState /*s1*/, HfstState /*s2*/) {
-          //throw hfst::exceptions::FunctionNotImplementedException();
-	  HFST_THROW(HfstException);
+	  HFST_THROW(FunctionNotImplementedException);
         }
 
         /** @brief Write the graph in AT&T format to ostream \a os.
@@ -719,8 +725,10 @@ namespace hfst {
             }
             
             else  {  // line could not be parsed
-              //throw hfst::exceptions::NotValidAttFormatException();   
-	      HFST_THROW(HfstException);
+	      std::string message(line);
+	      HFST_THROW_MESSAGE
+		(NotValidAttFormatException,
+		 message);
 	    }    
           }
           return retval;
