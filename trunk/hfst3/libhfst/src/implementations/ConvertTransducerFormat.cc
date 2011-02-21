@@ -1064,6 +1064,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
       
       hfst_ol::SymbolNumber seen_input_symbols = 1; // We always have epsilon
       hfst_ol::SymbolTable symbol_table;
+      std::set<hfst_ol::SymbolNumber> flag_symbols;
 
       std::map<std::string, hfst_ol::SymbolNumber> * string_symbol_map =
 	  new std::map<std::string, hfst_ol::SymbolNumber>();
@@ -1077,6 +1078,9 @@ unsigned int hfst_ol_to_hfst_basic_add_state
            it != input_symbols->end(); ++it) {
           if (it->compare(epstr)) {
 	      string_symbol_map->operator[](*it) = symbol_table.size();
+	      if (FdOperation::is_diacritic(*it)) {
+		  flag_symbols.insert(symbol_table.size());
+	      }
 	      symbol_table.push_back(*it);
 	      ++seen_input_symbols;
           }
@@ -1136,16 +1140,21 @@ unsigned int hfst_ol_to_hfst_basic_add_state
     {
     public:
         bool fits(hfst_ol::StatePlaceholder & state,
+		  std::set<hfst_ol::SymbolNumber> & flag_symbols,
                   unsigned int position)
             {
                 for (std::map<hfst_ol::SymbolNumber,
                          std::vector<hfst_ol::TransitionPlaceholder> >
                          ::iterator it = state.inputs.begin();
                      it != state.inputs.end(); ++it) {
-                    if (count(it->first + position) == 0) {
+		    hfst_ol::SymbolNumber index_offset = it->first;
+		    if (flag_symbols.count(index_offset) != 0) {
+			index_offset = 0;
+		    }
+                    if (count(index_offset + position) == 0) {
                         continue;
-                    } else if (this->operator[](it->first + position).second ==
-                               it->first) {
+                    } else if (this->operator[](index_offset + position)
+			       .second == index_offset) {
                         return false;
                     }
                 }
@@ -1181,7 +1190,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
         unsigned int i = first_available_index;
 
         // While this index is not suitable for a starting index, keep looking
-        while (!used_indices->fits(it->second, i)) {
+        while (!used_indices->fits(it->second, flag_symbols, i)) {
             ++i;
         }
         it->second.start_index = i;
@@ -1191,9 +1200,13 @@ unsigned int hfst_ol_to_hfst_basic_add_state
                  std::vector<hfst_ol::TransitionPlaceholder> >
                  ::iterator sym_it = it->second.inputs.begin();
              sym_it != it->second.inputs.end(); ++sym_it) {
-            used_indices->operator[](i + sym_it->first) =
+	    hfst_ol::SymbolNumber index_offset = sym_it->first;
+	    if (flag_symbols.count(index_offset) != 0) {
+		index_offset = 0;
+	    }
+            used_indices->operator[](i + index_offset) =
                 std::pair<unsigned int, hfst_ol::SymbolNumber>
-                (it->second.state_number, sym_it->first);
+                (it->second.state_number, index_offset);
         }
         while (!used_indices->available_for_first(first_available_index)) {
             ++first_available_index;
@@ -1247,7 +1260,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
     //  For each state, write its entries in the transition array.
 
     for (std::map<unsigned int, hfst_ol::StatePlaceholder>::iterator it =
-             state_placeholders.begin(); it != state_placeholders.end();++it) {
+             state_placeholders.begin(); it!=state_placeholders.end(); ++it) {
 
         // Insert a finality marker unless this is the first state,
         // the finality of which is determined by the index table
