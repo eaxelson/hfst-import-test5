@@ -1247,7 +1247,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
     //  For each state, write its entries in the transition array.
 
     for (std::map<unsigned int, hfst_ol::StatePlaceholder>::iterator it =
-             state_placeholders.begin(); it != state_placeholders.end(); ++it) {
+             state_placeholders.begin(); it != state_placeholders.end();++it) {
 
         // Insert a finality marker unless this is the first state,
         // the finality of which is determined by the index table

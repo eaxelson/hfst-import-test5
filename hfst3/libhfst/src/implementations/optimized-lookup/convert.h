@@ -21,7 +21,8 @@
 
 namespace hfst_ol {
 
-    typedef std::map<hfst_ol::TransitionTableIndex,unsigned int> HfstOlToBasicStateMap;
+    typedef std::map<hfst_ol::TransitionTableIndex,unsigned int>
+	HfstOlToBasicStateMap;
 
 struct TransitionPlaceholder {
     unsigned int target;
@@ -160,15 +161,18 @@ class ConvertTransducerAlphabet
   SymbolTable symbol_table;
   
   TransduceR* transducer;
-  fst::SymbolTable * ofst_symbol_table; // input and output symbol tables together
+  fst::SymbolTable * ofst_symbol_table;
+  // input and output symbol tables together
   
   std::map<int64, SymbolNumber> input_symbols_map;
   std::map<int64, SymbolNumber> output_symbols_map;
   
   void inspect_node(StateId n, StateIdSet& visited_nodes,
     OfstSymbolCountMap& symbol_count_map, SymbolSet& all_symbol_set);
-  void get_symbol_info(OfstSymbolCountMap &symbol_count_map, SymbolSet& all_symbol_set);
-  void populate_symbol_table(OfstSymbolCountMap &input_symbol_counts, SymbolSet& all_symbol_set);
+  void get_symbol_info(
+      OfstSymbolCountMap &symbol_count_map, SymbolSet& all_symbol_set);
+  void populate_symbol_table(
+      OfstSymbolCountMap &input_symbol_counts, SymbolSet& all_symbol_set);
   void set_maps();
  public:
   ConvertTransducerAlphabet(TransduceR* t);
@@ -273,8 +277,10 @@ struct ConvertTransitionIndexCompare
   }
 };
 
-typedef std::set<ConvertTransition*,ConvertTransitionCompare> ConvertTransitionSet;
-typedef std::set<ConvertTransitionIndex*,ConvertTransitionIndexCompare> ConvertTransitionIndexSet;
+typedef std::set<ConvertTransition*,ConvertTransitionCompare>
+    ConvertTransitionSet;
+typedef std::set<ConvertTransitionIndex*,ConvertTransitionIndexCompare>
+    ConvertTransitionIndexSet;
 
 class ConvertFstState
 {
@@ -285,10 +291,11 @@ private:
   // the location in the transition table of the state's first transition. For
   // states without transitions, this is where the first transition *would* be
   TransitionTableIndex first_transition_index;
-  // the location in the table tables where the state's transition indices begin
-  // the state's location in the index tables. This can be either in the
-  // transition index table, or, if the state only has transitions with one input
-  // symbol, in the transition table, immediately preceding the first transition
+  // the location in the table tables where the state's transition indices
+  // begin the state's location in the index tables. This can be either in the
+  // transition index table, or, if the state only has transitions with
+  // one input symbol, in the transition table, immediately preceding
+  // the first transition
   TransitionTableIndex table_index;
   
   bool final;
@@ -306,7 +313,8 @@ public:
   
   void display() const;
   
-  TransitionTableIndex set_transition_table_indices(TransitionTableIndex place);
+  TransitionTableIndex set_transition_table_indices(
+      TransitionTableIndex place);
   
   TransitionTableIndex get_first_transition_index() const
   { return first_transition_index; }
@@ -318,10 +326,15 @@ public:
     
   SymbolNumberSet * get_input_symbols(void) const;
   
-  SymbolNumber number_of_input_symbols(void) const {return transition_indices.size();}
-  SymbolNumber number_of_transitions(void) const {return transitions.size();}
+  SymbolNumber number_of_input_symbols(void) const
+  { return transition_indices.size(); }
+  SymbolNumber number_of_transitions(void) const
+  { return transitions.size(); }
   bool is_final(void) const {return final;}
-  bool is_big_state(void) const {return (transition_indices.size() > BIG_STATE_LIMIT);}
+  bool is_big_state(void) const
+  {
+      return (transition_indices.size() > BIG_STATE_LIMIT);
+  }
   bool is_start_state(void) const {return id == 0;}
   StateIdNumber get_id(void) const {return id;}
   
@@ -357,7 +370,8 @@ private:
   void get_more_space(void);
 public:
   ConvertTransitionTableIndices(SymbolNumber input_symbol_count):
-    lower_bound(0), lower_bound_test_count(0), number_of_input_symbols(input_symbol_count)
+    lower_bound(0), lower_bound_test_count(0),
+	number_of_input_symbols(input_symbol_count)
   {
     get_more_space();
   };
@@ -373,8 +387,12 @@ class ConvertTransducerHeader
 {
  private:
   static void full_traversal(TransducerHeader& h, TransduceR* tr, StateId n,
-         StateIdSet& visited_nodes, StateIdSet& nodes_in_path, OfstSymbolSet& all_input_symbols);
-  static void find_input_epsilon_cycles(StateId n,StateId t,StateIdSet &epsilon_targets,bool unweighted_only,TransduceR * tr,TransducerHeader& h);
+         StateIdSet& visited_nodes, StateIdSet& nodes_in_path,
+			     OfstSymbolSet& all_input_symbols);
+  static void find_input_epsilon_cycles(StateId n, StateId t,
+					StateIdSet &epsilon_targets,
+					bool unweighted_only, TransduceR * tr,
+					TransducerHeader& h);
  public:
   static void compute_header(TransducerHeader& header,
       TransduceR * t, SymbolNumber symbol_count,
@@ -409,7 +427,8 @@ private:
   void display_states() const;
   void display_tables() const;
   
-  template<class T> TransducerTable<T> make_index_table(TransitionTableIndex index_table_size) const;
+  template<class T> TransducerTable<T> make_index_table(
+      TransitionTableIndex index_table_size) const;
   template<class T> TransducerTable<T> make_transition_table() const;
 public:
   ConvertTransducer(TransduceR * tr, bool weighted);
