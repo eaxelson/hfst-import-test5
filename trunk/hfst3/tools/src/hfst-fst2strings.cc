@@ -99,10 +99,18 @@ print_usage()
 
     print_common_unary_program_parameter_instructions(message_out);
     fprintf(message_out,
-        "\n"
+	    "\n"
         "Examples:\n"
         "  %s  lexical.hfst  generates all forms of lexical.hfst\n"
         "\n", program_name);
+
+    fprintf(message_out, 
+	    "Known bugs:\n"
+	    "  Does not work correctly for hfst optimized lookup format.\n"
+	    "  Prints duplicate strings for foma format.\n"
+	    "\n"
+	    );
+
     print_report_bugs();
     fprintf(message_out, "\n");
     print_more_info();
