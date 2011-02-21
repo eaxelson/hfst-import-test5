@@ -247,8 +247,7 @@ namespace hfst
     while (true) {
       char c = stream_get();
       if (stream_eof()) {
-        //throw hfst::exceptions::NotTransducerStreamException();
-	HFST_THROW(HfstException);
+	HFST_THROW(NotTransducerStreamException);
       }
       if (c == '\0')
         break;
@@ -292,8 +291,10 @@ namespace hfst
     else {
       ImplementationType stype = stream_fst_type();
       if (stype != type) {
-        //throw hfst::exceptions::TransducerTypeMismatchException();
-	HFST_THROW(HfstException);
+	HFST_THROW_MESSAGE
+	  (TransducerTypeMismatchException,
+	   "HfstInputStream contains HfstTransducers "
+	   "whose type is not the same");
       }
     }
 
@@ -502,8 +503,7 @@ namespace hfst
         //case UNSPECIFIED_TYPE:
       default:
         debug_error("#1");
-        //throw hfst::exceptions::NotTransducerStreamException();
-	HFST_THROW(HfstException);
+	HFST_THROW(NotTransducerStreamException);
         break;
   }
   
@@ -527,8 +527,7 @@ namespace hfst
           for (unsigned int i=0; i<26; i++) {
             chars_read[i]=(char)stream_get();
             if ( stream_eof() ) {
-              //throw hfst::exceptions::NotTransducerStreamException();
-	      HFST_THROW(HfstException);
+	      HFST_THROW(NotTransducerStreamException);
 	    }
           }
           for (int i=25; i>=0; i--)
@@ -539,8 +538,7 @@ namespace hfst
           else if (chars_read[18]=='l') // log
             return OPENFST_LOG_;
           else {
-            //throw hfst::exceptions::NotTransducerStreamException();
-	    HFST_THROW(HfstException);
+	    HFST_THROW(NotTransducerStreamException);
 	  }
           break;
         }
@@ -587,8 +585,7 @@ namespace hfst
           }
           else {
                     debug_error("#3");
-            //throw hfst::exceptions::NotTransducerStreamException();
-		    HFST_THROW(HfstException);
+		    HFST_THROW(NotTransducerStreamException);
           }
           break;
         }
@@ -617,20 +614,24 @@ namespace hfst
   {
     if (header_data.size() < 2) {
       //throw hfst::exceptions::TransducerHeaderException();
-      HFST_THROW(HfstException);
+      HFST_THROW_MESSAGE
+	(TransducerHeaderException,
+	 "Hfst header has too few attributes");
     }
 
     // (1) first pair "version", "3.0"
     if ( not ( ( strcmp("version", header_data[0].first.c_str()) == 0 ) &&
                ( strcmp("3.0", header_data[0].second.c_str()) == 0 ) ) ) {
-      //throw hfst::exceptions::TransducerHeaderException();
-      HFST_THROW(HfstException);
+      HFST_THROW_MESSAGE
+	(TransducerHeaderException,
+	 "Hfst header: transducer version not recognised");
     }
 
     // (2) second pair "type", (valid type field)
     if ( not ( strcmp("type", header_data[1].first.c_str()) == 0 ) ) {
-      //throw hfst::exceptions::TransducerHeaderException();
-      HFST_THROW(HfstException);
+      HFST_THROW_MESSAGE
+	(TransducerHeaderException,
+	 "Hfst header: transducer type not given");
     }
 
     if (strcmp("SFST", header_data[1].second.c_str()) == 0 )
@@ -653,8 +654,9 @@ namespace hfst
     else if (strcmp("HFST_OLW", header_data[1].second.c_str()) == 0 )
       type = HFST_OLW_TYPE;
     else {
-      //throw hfst::exceptions::TransducerHeaderException();
-      HFST_THROW(HfstException);
+      HFST_THROW_MESSAGE
+	(TransducerHeaderException,
+	 "Hfst header: transducer type not recognised");
     }
 
     if (header_data.size() == 2)
@@ -716,8 +718,7 @@ namespace hfst
       int type_bytes=0;
       type = get_fst_type_old(type_bytes); // throws error
       if (type == ERROR_TYPE) {
-        //throw hfst::exceptions::NotTransducerStreamException();
-	HFST_THROW(HfstException);
+	HFST_THROW(NotTransducerStreamException);
       }
       bytes_read = header_bytes + type_bytes;
 
@@ -730,9 +731,8 @@ namespace hfst
   {
     std::string fst_type = stream_getstring();
     if (stream_eof()) {
-              debug_error("#5");
-      //throw hfst::exceptions::NotTransducerStreamException();
-	      HFST_THROW(HfstException);
+      debug_error("#5");
+      HFST_THROW(NotTransducerStreamException);
     }
     if (fst_type.compare("SFST_TYPE") == 0)
       { bytes_read=10; return SFST_TYPE; }
@@ -799,8 +799,9 @@ namespace hfst
     char c = stream_get();
     if (c != 0) {
       debug_error("#6");
-      //throw hfst::exceptions::NotTransducerStreamException();
-      HFST_THROW(HfstException);
+      HFST_THROW_MESSAGE
+	(NotTransducerStreamException,
+	 "HFST header: header size could not be read");
     }
     bytes_read=3;
 
@@ -821,14 +822,18 @@ namespace hfst
 
         if (bytes_read > header_size) {
           debug_error("#7");
-          fprintf(stderr, "%i > %i\n", bytes_read, header_size);
-          //throw hfst::exceptions::NotTransducerStreamException();
-	  HFST_THROW(HfstException);
+          //fprintf(stderr, "%i > %i\n", bytes_read, header_size);
+	  HFST_THROW_MESSAGE
+	    (NotTransducerStreamException,
+	     "HFST header: FATAL: more bytes read than the header contains");
         }
         if (stream_eof()) {
           debug_error("#8");
           //throw hfst::exceptions::NotTransducerStreamException();
-	  HFST_THROW(HfstException);
+	  HFST_THROW_MESSAGE
+	    (NotTransducerStreamException,
+	     "HFST header: FATAL: stream ended"
+	     " before the header could be read");
         }
 
         retval.push_back(std::pair<std::string, std::string>
@@ -911,8 +916,7 @@ namespace hfst
     { throw e; }
 
     if ( not HfstTransducer::is_implementation_type_available(type)) {
-      //throw hfst::exceptions::ImplementationTypeNotAvailableException();
-      HFST_THROW(HfstException);
+      HFST_THROW(ImplementationTypeNotAvailableException);
     }
 
     switch (type)
@@ -953,8 +957,9 @@ namespace hfst
       break;
     default:
       debug_error("#9");
-      //throw hfst::exceptions::NotTransducerStreamException();
-      HFST_THROW(HfstException);
+      HFST_THROW_MESSAGE
+	(NotTransducerStreamException,
+	 "transducer type not recognised");
     }
   }
 
@@ -980,7 +985,7 @@ namespace hfst
       { throw e; }
     if ( not HfstTransducer::is_implementation_type_available(type)) {
       //throw hfst::exceptions::ImplementationTypeNotAvailableException();
-      HFST_THROW(HfstException);
+      HFST_THROW(ImplementationTypeNotAvailableException);
     }
 
     switch (type)
@@ -1030,7 +1035,9 @@ namespace hfst
     default:
       debug_error("#10");
       //throw hfst::implementations::NotTransducerStreamException();
-      HFST_THROW(HfstException);
+      HFST_THROW_MESSAGE
+	(NotTransducerStreamException,
+	 "transducer type not recognised");
     }
   }
 
@@ -1069,8 +1076,7 @@ namespace hfst
         //case UNSPECIFIED_TYPE:
       default:
         debug_error("#11");
-        //throw hfst::exceptions::NotTransducerStreamException();
-	HFST_THROW(HfstException);
+	HFST_THROW(NotTransducerStreamException);
       }
   }
 

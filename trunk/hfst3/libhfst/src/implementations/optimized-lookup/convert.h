@@ -73,8 +73,11 @@ struct StatePlaceholder {
 	    }
 	    offset += it->second.size();
 	}
-	//throw HfstFatalException();
-	HFST_THROW(HfstException);
+	std::string message("error in conversion between optimized lookup "
+			    "format and HfstTransducer");
+	HFST_THROW_MESSAGE
+	  (HfstFatalException,
+	   message);
     }
 };
 

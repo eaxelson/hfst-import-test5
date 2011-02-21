@@ -41,8 +41,8 @@ namespace hfst { namespace implementations {
     else {
       input_file = fopen(filename.c_str(),"r");
       if (input_file == NULL)
-        { //throw StreamNotReadableException(); }
-	  HFST_THROW(HfstException); }
+        { 
+	  HFST_THROW(StreamNotReadableException); }
     }
   }
 
@@ -144,8 +144,10 @@ namespace hfst { namespace implementations {
     if (string_number_map.find(string_symbol) == string_number_map.end())
       { string_number_map[string_symbol] = c; }
     else if (string_number_map[string_symbol] != c)
-      { //throw SymbolRedefinedException(); }
-	HFST_THROW(HfstException); }
+      { 
+	HFST_THROW_MESSAGE
+	  (HfstFatalException,
+	   "SfstInputStream: symbol redefined"); }
   }
 
 #ifdef FOO
@@ -162,11 +164,9 @@ namespace hfst { namespace implementations {
         char minimality_identifier[8];
         int count = fread(minimality_identifier,8,1,input_file);
         if (count != 1) {
-          //throw NotTransducerStreamException();
-	  HFST_THROW(HfstException); }
+	  HFST_THROW(NotTransducerStreamException); }
         if (0 != strcmp(minimality_identifier,"MINIMAL")) {
-          //throw NotTransducerStreamException();
-	  HFST_THROW(HfstException);
+	  HFST_THROW(NotTransducerStreamException);
         }
         return true;
       }
@@ -178,13 +178,11 @@ namespace hfst { namespace implementations {
     char sfst_identifier[10];
     int sfst_id_count = fread(sfst_identifier,10,1,input_file);
     if (sfst_id_count != 1)
-      { //fprintf(stderr, "#2\n");
-        //throw NotTransducerStreamException(); }
-	HFST_THROW(HfstException); }
+      { 
+	HFST_THROW(NotTransducerStreamException); }
     if (0 != strcmp(sfst_identifier,"SFST_TYPE"))
-      { //fprintf(stderr, "#3: %s\n", sfst_identifier);
-        //throw NotTransducerStreamException(); }
-	HFST_THROW(HfstException); }
+      { 
+	HFST_THROW(NotTransducerStreamException); }
     return skip_minimality_identifier();
   }
   
@@ -193,9 +191,8 @@ namespace hfst { namespace implementations {
     char hfst_header[6];
     int header_count = fread(hfst_header,6,1,input_file);
     if (header_count != 1)
-      { //fprintf(stderr, "#1\n");
-        //throw NotTransducerStreamException(); }
-	HFST_THROW(HfstException); }
+      { 
+	HFST_THROW(NotTransducerStreamException); }
     try { return skip_identifier_version_3_0(); }
     //catch (NotTransducerStreamException e) { throw e; }
     catch (const HfstException e) { throw e; }
@@ -318,8 +315,8 @@ namespace hfst { namespace implementations {
     Transducer * SfstInputStream::read_transducer()
   {
     if (is_eof())
-      { //throw StreamIsClosedException(); }
-	HFST_THROW(HfstException); }
+      { 
+	HFST_THROW(StreamIsClosedException); }
     Transducer * t = NULL;
     try 
       {
@@ -341,8 +338,7 @@ namespace hfst { namespace implementations {
       {
         delete t;
         fprintf(stderr, "caught message: \"%s\"\n", p);
-        //throw TransducerHasWrongTypeException();
-	HFST_THROW(HfstException);
+	HFST_THROW(TransducerHasWrongTypeException);
       }
     return NULL;
   }
@@ -359,8 +355,7 @@ namespace hfst { namespace implementations {
     if (filename != std::string()) {
       ofile = fopen(filename.c_str(), "wb");
       if (ofile == NULL)
-        //throw StreamNotReadableException();
-	HFST_THROW(HfstException);
+	HFST_THROW(StreamNotReadableException);
     } 
     else
       ofile = stdout;

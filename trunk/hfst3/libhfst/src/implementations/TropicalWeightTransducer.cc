@@ -598,9 +598,10 @@ namespace hfst { namespace implementations
 
         else  // line could not be parsed
           {
-            printf("ERROR: in AT&T file: line: \"%s\"\n", line);
-            //throw NotValidAttFormatException();
-	    HFST_THROW(HfstException);
+	    std::string message(line);
+	    HFST_THROW_MESSAGE
+	      (NotValidAttFormatException,
+	       message);
           }
 
       }
@@ -878,8 +879,8 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightInputStream::read_transducer()
   {
     if (is_eof())
-      { //throw StreamIsClosedException(); }
-	HFST_THROW(HfstException); }
+      {
+	HFST_THROW(StreamIsClosedException); }
     StdVectorFst * t;
     FstHeader header;
     try 
@@ -901,8 +902,8 @@ namespace hfst { namespace implementations
                                                  &header)));
           }
         if (t == NULL)
-          { //throw TransducerHasWrongTypeException(); }
-	    HFST_THROW(HfstException); }
+          { 
+	    HFST_THROW(TransducerHasWrongTypeException); }
       }
     //catch (TransducerHasWrongTypeException e)
     catch (const HfstException e )

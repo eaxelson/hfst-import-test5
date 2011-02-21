@@ -32,8 +32,8 @@ namespace hfst { namespace implementations {
     else {
       input_file = fopen(filename.c_str(),"r");
       if (input_file == NULL)
-	{ //throw StreamNotReadableException(); 
-	  HFST_THROW(HfstException); }
+	{ 
+	  HFST_THROW(StreamNotReadableException); }
     }
   }
 
@@ -106,11 +106,11 @@ namespace hfst { namespace implementations {
     char foma_identifier[10];
     int foma_id_count = fread(foma_identifier,10,1,input_file);
     if (foma_id_count != 1)
-      { //throw NotTransducerStreamException(); 
-	HFST_THROW(HfstException); }
+      { 
+	HFST_THROW(NotTransducerStreamException); }
     if (0 != strcmp(foma_identifier,"FOMA_TYPE"))
-      { //throw NotTransducerStreamException();
-	HFST_THROW(HfstException); }
+      {
+	HFST_THROW(NotTransducerStreamException); }
   }
   
   void FomaInputStream::skip_hfst_header(void)
@@ -118,8 +118,8 @@ namespace hfst { namespace implementations {
     char hfst_header[6];
     int header_count = fread(hfst_header,6,1,input_file);
     if (header_count != 1)
-      { //throw NotTransducerStreamException(); 
-	HFST_THROW(HfstException); }
+      {  
+	HFST_THROW(NotTransducerStreamException); }
     //int c = fgetc(input_file);
     //switch (c)
     //{
@@ -146,8 +146,7 @@ namespace hfst { namespace implementations {
       return NULL;
     struct fsm * t = FomaTransducer::read_net(input_file);
     if (t == NULL) {
-      //throw NotTransducerStreamException();
-      HFST_THROW(HfstException);
+      HFST_THROW(NotTransducerStreamException);
     }
     return t;
   };
@@ -163,8 +162,7 @@ namespace hfst { namespace implementations {
     if (filename != std::string()) {
       ofile = fopen(filename.c_str(), "wb");
       if (ofile == NULL) {
-	//throw StreamNotReadableException();
-	HFST_THROW(HfstException);
+	HFST_THROW(StreamNotReadableException);
       }
     } 
     else {
@@ -186,8 +184,9 @@ namespace hfst { namespace implementations {
     void FomaOutputStream::write_transducer(struct fsm * transducer) 
   { 
     if (1 != FomaTransducer::write_net(transducer, ofile)) {
-      //throw hfst::exceptions::HfstInterfaceException();
-      HFST_THROW(HfstException);
+      HFST_THROW_MESSAGE
+	(HfstFatalException,
+	 "an error happened when writing a foma transducer");
     }
   }
 

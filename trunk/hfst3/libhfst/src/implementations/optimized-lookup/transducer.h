@@ -98,8 +98,7 @@ private:
 
     static void header_error()
 	{
-	  //throw hfst::exceptions::TransducerHasWrongTypeException();
-	  HFST_THROW(HfstException);
+	  HFST_THROW(TransducerHasWrongTypeException);
 	}
 
     template<class T>
@@ -191,8 +190,7 @@ public:
 	has_unweighted_input_epsilon_cycles(read_bool_property(is))
 	{
 	  if(!is) {
-	      //throw hfst::exceptions::TransducerHasWrongTypeException();
-	    HFST_THROW(HfstException);
+	    HFST_THROW(TransducerHasWrongTypeException);
 	  }
 	}
     
