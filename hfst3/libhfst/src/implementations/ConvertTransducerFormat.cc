@@ -1161,8 +1161,8 @@ unsigned int hfst_ol_to_hfst_basic_add_state
     Indices * used_indices = new Indices();
 
     // Now we assign starting indices (or alternatively determine a state
-    // doesn't need an entry in the TIA). The starting state has index 0.
-    // Used indices are stored in a map (at the beginning, every
+    // doesn't need an entry in the TIA ("is simple"). The starting state has
+    // index 0. Used indices are stored in a map (at the beginning, every
     // index below or equal to the alphabet size is available except index 0).
     // For every state (in the TIA) thereafter, we check each available
     // starting index to see if it fits.
@@ -1201,7 +1201,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
     }
 
     // Now we figure out where each state in the transition array begins.
-    
+
     std::vector<unsigned int> first_transition_vector;
     first_transition_vector.push_back(0);
     for (std::map<unsigned int, hfst_ol::StatePlaceholder>::iterator it =
@@ -1224,9 +1224,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
     }
     hfst_ol::TransducerTable<hfst_ol::TransitionW> wtransition_table;
 
-    Indices::iterator tmp_it = used_indices->end();
-    --tmp_it;
-    for(unsigned int i = 0; i <= tmp_it->first; ++i) {
+    for(unsigned int i = 0; i <= (used_indices->end()->first); ++i) {
         if (used_indices->count(i) == 0) { // blank entries
             windex_table.append(hfst_ol::TransitionWIndex());
         } else { // nonblank entries
@@ -1242,7 +1240,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 
     delete used_indices;
     
-    for (unsigned int i = 0; i <= symbol_table.size(); ++i) {
+    for (unsigned int i = 0; i < symbol_table.size(); ++i) {
         windex_table.append(hfst_ol::TransitionWIndex()); // padding
     }
 
@@ -1277,12 +1275,11 @@ unsigned int hfst_ol_to_hfst_basic_add_state
                 } else {
                     target = state_placeholders[tr_it->target].start_index;
                 }
-                wtransition_table.append(
-                    hfst_ol::TransitionW(
-                        sym_it->first,
-                        tr_it->output,
-                        target,
-                        tr_it->weight));
+                wtransition_table.append(hfst_ol::TransitionW(
+					     sym_it->first,
+					     tr_it->output,
+					     target,
+					     tr_it->weight));
             }
         }
     }

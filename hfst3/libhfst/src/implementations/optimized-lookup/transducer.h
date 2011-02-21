@@ -320,10 +320,16 @@ public:
 	}
     virtual ~TransitionIndex() {}
   
-    void write(std::ostream& os) const
+    void write(std::ostream& os, bool weighted) const
 	{
 	    os.write(reinterpret_cast<const char*>(&input_symbol), sizeof(input_symbol));
-	    os.write(reinterpret_cast<const char*>(&first_transition_index), sizeof(first_transition_index));
+	    if(!weighted and input_symbol == NO_SYMBOL_NUMBER and
+	       first_transition_index != NO_TABLE_INDEX) {
+		// Make sure that we write the correct type of final index
+		os.write(reinterpret_cast<const char*>(1ul), sizeof(first_transition_index));
+	    } else {
+		os.write(reinterpret_cast<const char*>(&first_transition_index), sizeof(first_transition_index));
+	    }
 	}
   
     void display() const;
