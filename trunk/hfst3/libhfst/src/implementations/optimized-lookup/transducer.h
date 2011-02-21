@@ -358,7 +358,8 @@ public:
 	    if(!weighted and input_symbol == NO_SYMBOL_NUMBER and
 	       first_transition_index != NO_TABLE_INDEX) {
 		// Make sure that we write the correct type of final index
-		os.write(reinterpret_cast<const char*>(1ul),
+		unsigned int unweighted_final_index = 1;
+		os.write(reinterpret_cast<const char*>(&unweighted_final_index),
 			 sizeof(first_transition_index));
 	    } else {
 		os.write(reinterpret_cast<const char*>(
