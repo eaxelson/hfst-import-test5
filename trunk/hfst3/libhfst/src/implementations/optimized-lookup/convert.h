@@ -83,6 +83,61 @@ struct StatePlaceholder {
     }
 };
 
+class IndexPlaceholders: public std::map<unsigned int,
+        std::pair<unsigned int, hfst_ol::SymbolNumber> >
+{
+public:
+    bool fits(StatePlaceholder & state,
+	      std::set<SymbolNumber> & flag_symbols,
+	      unsigned int position)
+    {
+	for (std::map<SymbolNumber,
+		 std::vector<TransitionPlaceholder> >
+		 ::iterator it = state.inputs.begin();
+	     it != state.inputs.end(); ++it) {
+	    hfst_ol::SymbolNumber index_offset = it->first;
+	    if (flag_symbols.count(index_offset) != 0) {
+		index_offset = 0;
+	    }
+	    if (count(index_offset + position) != 0) {
+		return false;
+	    }
+	}
+	return true;
+    }
+    bool available_for_first(unsigned int index,
+			     std::set<unsigned int> * used_states)
+    {
+	return used_states->count(index) == 0;
+    }
+    
+    bool available_for_something(unsigned int index,
+				 unsigned short symbols,
+				 float packing_aggression)
+    {
+	// "Perfect packing" (under this strategy)
+/*		for (unsigned int i = 0; i < symbols; ++i) {
+		
+		if (count(index + i) == 0) {
+		return true;
+		}
+		return false;
+		}
+		}
+		
+*/
+	unsigned int filled = 0;
+	for (unsigned int i = 0; i < symbols; ++i) {
+	    filled += count(index + i);
+	}
+	if (filled <= (packing_aggression*symbols)) {
+	    return true;
+	}
+	return false;
+    }
+};
+
+
 void write_transitions_from_state_placeholders(
     TransducerTable<TransitionW> & transition_table,
     std::map<unsigned int, hfst_ol::StatePlaceholder>
