@@ -1050,7 +1050,13 @@ unsigned int hfst_ol_to_hfst_basic_add_state
       // (epsilon) and otherwise have a proper unique number,
       // but they can appear anywhere in the alphabet.
       
+      // In this case we implement an optimisation where flag diacritics
+      // appear at the end of the alphabet. This allows us to ignore
+      // them for indexing purposes, which potentially makes the index
+      // table smaller and faster to pack.
+      
       StringSet * input_symbols = new StringSet();
+      StringSet * flag_diacritics = new StringSet();
       StringSet * other_symbols = new StringSet();
     
       for (HfstBasicTransducer::const_iterator it = t->begin(); 
@@ -1058,7 +1064,11 @@ unsigned int hfst_ol_to_hfst_basic_add_state
           for (HfstBasicTransducer::HfstTransitionSet::const_iterator tr_it 
                  = it->second.begin();
                tr_it != it->second.end(); ++tr_it) {
+	      if (FdOperation::is_diacritic(tr_it->get_input_symbol())) {
+		  flag_diacritics->insert(tr_it->get_input_symbol());
+	      } else {
               input_symbols->insert(tr_it->get_input_symbol());
+	      }
               other_symbols->insert(tr_it->get_output_symbol());
           }
       }
@@ -1079,15 +1089,23 @@ unsigned int hfst_ol_to_hfst_basic_add_state
            it != input_symbols->end(); ++it) {
           if (it->compare(epstr)) {
 	      string_symbol_map->operator[](*it) = symbol_table.size();
-	      if (FdOperation::is_diacritic(*it)) {
-		  flag_symbols.insert(symbol_table.size());
-	      }
 	      symbol_table.push_back(*it);
 	      ++seen_input_symbols;
           }
       }
 
-      // 3) non-input symbols
+      // 3) Flag diacritics
+      for (std::set<std::string>::iterator it = flag_diacritics->begin();
+	   it != flag_diacritics->end(); ++it) {
+	  if (it->compare(epstr)) {
+	      string_symbol_map->operator[](*it) = symbol_table.size();
+	      symbol_table.push_back(*it);
+	      // don't increment seen_input_symbols - we use it for
+	      // indexing
+	  }
+      }
+
+      // 4) non-input symbols
       for (std::set<std::string>::iterator it = other_symbols->begin();
            it != other_symbols->end(); ++it) {
           if (it->compare(epstr) and input_symbols->count(*it) == 0) {
@@ -1097,6 +1115,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
       }
 
       delete input_symbols;
+      delete flag_diacritics;
       delete other_symbols;
 
     std::map<unsigned int, hfst_ol::StatePlaceholder> state_placeholders;
@@ -1288,46 +1307,11 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 
     //  For each state, write its entries in the transition array.
 
-    for (std::map<unsigned int, hfst_ol::StatePlaceholder>::iterator it =
-             state_placeholders.begin(); it!=state_placeholders.end(); ++it) {
-
-        // Insert a finality marker unless this is the first state,
-        // the finality of which is determined by the index table
-        if (it->first != 0) {
-            wtransition_table.append(
-                hfst_ol::TransitionW(
-                    it->second.final, it->second.final_weight));
-        }
-        
-        // Then we iterate through the symbols each state has
-        for (std::map<hfst_ol::SymbolNumber,
-               std::vector<hfst_ol::TransitionPlaceholder> >::iterator sym_it =
-                 it->second.inputs.begin(); 
-             sym_it != it->second.inputs.end(); ++sym_it) {
-            // And write each transition
-          for (std::vector<hfst_ol::TransitionPlaceholder>::iterator tr_it
-                 = sym_it->second.begin(); 
-               tr_it != sym_it->second.end(); ++tr_it) {
-                // before writing each transition, find out whether its
-                // target is simple (ie. should point directly to TA entry)
-                unsigned int target;
-                if (state_placeholders[tr_it->target].is_simple()) {
-                    target = first_transition_vector[tr_it->target] + 
-                      TA_OFFSET - 1;
-                } else {
-                    target = state_placeholders[tr_it->target].start_index;
-                }
-                wtransition_table.append(hfst_ol::TransitionW(
-					     sym_it->first,
-					     tr_it->output,
-					     target,
-					     tr_it->weight));
-            }
-        }
-    }
-    // one final padding transition
-    wtransition_table.append(hfst_ol::TransitionW(
-                                 false, hfst_ol::INFINITE_WEIGHT));
+    hfst_ol::write_transitions_from_state_placeholders(
+	wtransition_table,
+	state_placeholders,
+	first_transition_vector,
+	flag_symbols);
 
     hfst_ol::TransducerAlphabet alphabet(symbol_table);
     hfst_ol::TransducerHeader header(seen_input_symbols,
