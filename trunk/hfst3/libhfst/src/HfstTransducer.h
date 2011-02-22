@@ -72,8 +72,8 @@ namespace hfst
   class HfstTransducer;
 
   using hfst::implementations::HfstOlTransducer;
-  using hfst::WeightedPaths;
-  using hfst::WeightedPath;
+  //using hfst::WeightedPaths;
+  //using hfst::WeightedPath;
 
 #if HAVE_SFST
   using hfst::implementations::SfstTransducer;
@@ -654,15 +654,16 @@ This will yield a file "testfile.att" that looks as follows:
         the search will not end until the callback returns false. */
     void extract_paths(ExtractStringsCb& callback, int cycles=-1) const;
 
-    /** \brief Extract a maximum of \a max_num string pairs that are 
-        recognized by the transducer
-        following a maximum of \a cycles cycles and store the 
-        string pairs into \a results.
-        
-        The total number of resulting strings is capped at \a max_num, 
-        with 0 or negative indicating unlimited. 
-        The \a cycles parameter indicates how many times a cycle
-        will be followed, with negative numbers indicating unlimited. 
+    /** \brief Extract a maximum of \a max_num paths that are 
+        recognized by the transducer following a maximum of \a cycles cycles
+	and store the paths into \a results.
+
+	@param results The extracted paths are inserted here. 
+        @param max_num The total number of resulting strings is capped at 
+	               \a max_num, with 0 or negative indicating unlimited. 
+        @param cycles Indicates how many times a cycle will be followed, with
+	              negative numbers indicating unlimited.
+ 
         If this function is called on a cyclic transducer with unlimited
         values for both \a max_num and \a cycles, an exception will be thrown.
 
@@ -732,19 +733,26 @@ ccc : ddd
     /* \brief Call \a callback with extracted strings that are not 
        invalidated by flag diacritic rules.
 
-       @see extract_paths(WeightedPaths<float>::Set&, int, int) */
+       @see extract_paths(HfstTwoLevelPaths&, int, int) */
     void extract_paths_fd
       (ExtractStringsCb& callback, int cycles=-1, bool filter_fd=true) const;
     
   public:
-    /** \brief Store to \a results string pairs that are recognized 
-        by the transducer
-        and are not invalidated by flag diacritic rules, optionally filtering
-        the flag diacritics themselves out of the result strings.
+    /** \brief Extract a maximum of \a max_num paths that are 
+        recognized by the transducer and are not invalidated by flag 
+	diacritic rules following a maximum of \a cycles cycles
+	and store the paths into \a results. \a filter_fd defines whether
+	the flag diacritics themselves are filtered out of the result strings.
 
-        The same conditions that apply for the function
-        extract_paths(WeightedPaths<float>::Set&, int, int)
-        apply also for this one.
+	@param results  The extracted paths are inserted here. 
+        @param max_num  The total number of resulting strings is capped at 
+	                \a max_num, with 0 or negative indicating unlimited. 
+        @param cycles  Indicates how many times a cycle will be followed, with
+	               negative numbers indicating unlimited.
+	@param filter_fd  Whether the  
+
+        If this function is called on a cyclic transducer with unlimited
+        values for both \a max_num and \a cycles, an exception will be thrown.
 
         Flag diacritics are of the form @[PNDRCU][.][A-Z]+([.][A-Z]+)?@. 
         
@@ -759,9 +767,9 @@ ccc : ddd
 	by the flag diacritics so thay will not be included in \a results.
 
 
-  @bug Doe not work for HFST_OL_TYPE or HFST_OLW_TYPE
-  @throws hfst::exceptions::TransducerIsCyclicException
-  @see extract_paths(WeightedPaths<float>::Set&, int, int) */
+	@bug Does not work for HFST_OL_TYPE or HFST_OLW_TYPE
+	@throws hfst::exceptions::TransducerIsCyclicException
+	@see extract_paths(HfstTwoLevelPaths&, int, int) const */
     void extract_paths_fd
       (HfstTwoLevelPaths &results, int max_num=-1, int cycles=-1, 
        bool filter_fd=true) const;
@@ -777,6 +785,9 @@ ccc : ddd
     //! in \a results.
     //! Currently, this function is the same as #lookup_fd.
     //!
+    //! @pre The transducer must be of type HFST_OL or HFST_OLW
+    //!      This function is not implemented for other transducer types.
+    //!
     //! @param results  Output parameter to store unique results.
     //!                 Epsilons are represented by empty strings.
     //! @param s  String to look up. The weight is ignored.
@@ -788,7 +799,8 @@ ccc : ddd
     //! @see lookup_fd
     //!
     //! @todo Do not ignore argument \a limit.
-    //! @todo Handle flag diacritics as ordinary symbols.
+    //! @todo Handle flag diacritics as ordinary symbols instead of calling
+    //!       lookup_fd.
     void lookup(HfstOneLevelPaths& results, const StringVector& s,
                 ssize_t limit = -1) const;
 
@@ -800,6 +812,21 @@ ccc : ddd
     //! @sa lookup
     void lookup_fd(HfstOneLevelPaths& results, const StringVector& s,
                    ssize_t limit = -1) const;
+
+    //! @brief Lookup or apply a single string \a s and store a maximum of 
+    //! \a limit results to \a results. \a tok defined how \a s is tokenized.
+    //!
+    //! This function is the same as 
+    //! lookup(HfstOneLevelPaths&, const StringVector&, ssize_t) const
+    //! but lookup is not done using a StringVector but a string and
+    //! a tokenizer.
+    void lookup(HfstOneLevelPaths& results, const HfstTokenizer& tok,
+		const std::string &s, ssize_t limit = -1) const;
+
+    //! @brief The same as 
+    //! lookup(HfstOneLevelPaths&, const HfstTokenizer&, const std::string&, ssize_t) const
+    void lookup_fd(HfstOneLevelPaths& results, const HfstTokenizer& tok,
+		   const std::string &s, ssize_t limit = -1) const;
 
     //! @brief Lookdown a single string \a s and store a maximum of 
     //! \a limit results to \a results (not implemented).
@@ -830,6 +857,12 @@ ccc : ddd
                      ssize_t limit = -1) const;
 
     //! @brief Whether lookup of path \a s will have infinite results.
+    //!
+    //! Currently, this function will return whether the transducer
+    //! is infinitely ambiguous on any lookup path found in the transducer,
+    //! i.e. the argument \a s is ignored.
+    //!
+    //! @todo todo
     bool is_lookup_infinitely_ambiguous(const StringVector& s) const;
 
     //! @brief Whether lookdown of path \a s will have infinite results

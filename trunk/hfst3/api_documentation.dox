@@ -185,7 +185,7 @@ autoreconf -i && ./configure && make && make install
 HfstTransducer tr("a", "b", SFST_TYPE);
 \endverbatim
 
-      an hfst::exceptions::ImplementationTypeNotAvailableException is thrown.
+      an ImplementationTypeNotAvailableException is thrown.
 
       The command make will compile all the API and command line tools and install
       will install them to /usr/local. If you would rather install in eg. your home directory, 
@@ -703,8 +703,6 @@ The HFST API is written in the namespace #hfst that includes the following class
 and the following namespaces:
 
    - \link hfst::rules rules\endlink: A namespace that contains functions to create two-level, replace, restriction and coercion rules.
-
-   - \link hfst::exceptions exceptions\endlink: A namespace for exceptions.
 
    - \link hfst::implementations implementations\endlink: A namespace that contains HFST's own transducer format.
 
