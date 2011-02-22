@@ -1266,7 +1266,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
     }
     hfst_ol::TransducerTable<hfst_ol::TransitionW> wtransition_table;
 
-    for(unsigned int i = 0; i <= (used_indices->end()->first); ++i) {
+    for(unsigned int i = 0; i <= (--(used_indices->end()))->first; ++i) {
         if (used_indices->count(i) == 0) { // blank entries
             windex_table.append(hfst_ol::TransitionWIndex());
         } else { // nonblank entries
