@@ -1155,60 +1155,8 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 
     delete string_symbol_map;
 
-    class Indices: public std::map<unsigned int,
-        std::pair<unsigned int, hfst_ol::SymbolNumber> >
-    {
-    public:
-        bool fits(hfst_ol::StatePlaceholder & state,
-		  std::set<hfst_ol::SymbolNumber> & flag_symbols,
-                  unsigned int position)
-            {
-                for (std::map<hfst_ol::SymbolNumber,
-                         std::vector<hfst_ol::TransitionPlaceholder> >
-                         ::iterator it = state.inputs.begin();
-                     it != state.inputs.end(); ++it) {
-		    hfst_ol::SymbolNumber index_offset = it->first;
-		    if (flag_symbols.count(index_offset) != 0) {
-			index_offset = 0;
-		    }
-                    if (count(index_offset + position) != 0) {
-                        return false;
-                    }
-                }
-                return true;
-            }
-        bool available_for_first(unsigned int index,
-				 std::set<unsigned int> * used_states)
-            {
-                return used_states->count(index) == 0;
-            }
-
-	bool available_for_something(unsigned int index,
-				     unsigned short symbols,
-				     float packing_aggression)
-	    {
-		// "Perfect packing" (under this strategy)
-/*		for (unsigned int i = 0; i < symbols; ++i) {
-		
-		    if (count(index + i) == 0) {
-			return true;
-		    }
-		    return false;
-		}
-	    }
-
-*/		unsigned int filled = 0;
-		for (unsigned int i = 0; i < symbols; ++i) {
-		    filled += count(index + i);
-		}
-		if (filled <= (packing_aggression*symbols)) {
-		    return true;
-		}
-		return false;
-	    }
-    };
-
-    Indices * used_indices = new Indices();
+    hfst_ol::IndexPlaceholders * used_indices =
+	new hfst_ol::IndexPlaceholders();
 
     // Now we assign starting indices (or alternatively determine a state
     // doesn't need an entry in the TIA ("is simple"). The starting state has
