@@ -405,6 +405,7 @@ int main(int argc, char **argv)
 	assert(results_cat.size() == 1);
 	assert(results_dog.size() == 1);
 	assert(results_mouse.size() == 1);
+
 	if (types[i] != LOG_OPENFST_TYPE)
 	  assert(results_hippopotamus.size() == 2);
 
