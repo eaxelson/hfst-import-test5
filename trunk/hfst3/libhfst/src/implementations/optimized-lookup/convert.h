@@ -83,6 +83,20 @@ struct StatePlaceholder {
     }
 };
 
+void write_transitions_from_state_placeholders(
+    TransducerTable<TransitionW> & transition_table,
+    std::map<unsigned int, hfst_ol::StatePlaceholder>
+    & state_placeholders,
+    std::vector<unsigned int> & first_transition_vector,
+    std::set<SymbolNumber> & flag_symbols);
+
+void add_transitions_with(SymbolNumber symbol,
+			  std::vector<TransitionPlaceholder> & transitions,
+			  TransducerTable<TransitionW> & transition_table,
+			  std::map<unsigned int, hfst_ol::StatePlaceholder>
+			  & state_placeholders,
+			  std::vector<unsigned int> & first_transition_vector);
+
 #if HAVE_OPENFST // Covers remainder of file
 typedef fst::StdArc::StateId StateId;
 typedef fst::StdArc StdArc;
