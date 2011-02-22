@@ -356,6 +356,14 @@ namespace hfst
         }
   }
 
+  void HfstTransducer::lookup(HfstOneLevelPaths& results, 
+			      const HfstTokenizer& tok,
+			      const std::string &s, 
+			      ssize_t limit) const {
+    StringVector sv = tok.tokenize_one_level(s);
+    lookup(results, sv, limit);
+  }
+
     void HfstTransducer::lookdown(HfstOneLevelPaths& results, 
                                   const StringVector& s,
                                   ssize_t limit) const {

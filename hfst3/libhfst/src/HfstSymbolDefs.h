@@ -38,7 +38,7 @@ namespace hfst
 
     Strings of form <CODE> @[PNDRCU][.][A-Z]+([.][A-Z]+)?@ </CODE> 
     are reserved for flag diacritics. For an example of flag diacritics, see 
-    #HfstTransducer::extract_paths_fd.
+    #hfst::HfstTransducer::extract_paths_fd(hfst::HfstTwoLevelPaths&, int, int, bool) const.
     For more information on flag diacritics, see Finite State Morphology
     (Beesley & Karttunen, 2003).
    */
