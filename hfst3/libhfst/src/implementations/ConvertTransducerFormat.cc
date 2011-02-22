@@ -1038,6 +1038,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
       typedef std::set<std::string> StringSet;
       // The transition array is indexed starting from this constant
       const unsigned int TA_OFFSET = 2147483648u;
+      const float packing_aggression = 0.85;
       const std::string epstr = "@_EPSILON_SYMBOL_@";
 
       // Symbols must be in the following order in an optimized-lookup
@@ -1151,20 +1152,41 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 		    if (flag_symbols.count(index_offset) != 0) {
 			index_offset = 0;
 		    }
-                    if (count(index_offset + position) == 0) {
-                        continue;
-                    } else if (this->operator[](index_offset + position)
-			       .second == index_offset) {
+                    if (count(index_offset + position) != 0) {
                         return false;
                     }
                 }
                 return true;
             }
-        bool available_for_first(unsigned int index)
+        bool available_for_first(unsigned int index,
+				 std::set<unsigned int> * used_states)
             {
-                return (count(index) == 0) or
-                    (this->operator[](index).second != 0);
+                return used_states->count(index) == 0;
             }
+
+	bool available_for_something(unsigned int index,
+				     unsigned short symbols,
+				     float packing_aggression)
+	    {
+		// "Perfect packing" (under this strategy)
+/*		for (unsigned int i = 0; i < symbols; ++i) {
+		
+		    if (count(index + i) == 0) {
+			return true;
+		    }
+		    return false;
+		}
+	    }
+
+*/		unsigned int filled = 0;
+		for (unsigned int i = 0; i < symbols; ++i) {
+		    filled += count(index + i);
+		}
+		if (filled <= (packing_aggression*symbols)) {
+		    return true;
+		}
+		return false;
+	    }
     };
 
     Indices * used_indices = new Indices();
@@ -1178,13 +1200,13 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 
     // The starting state is special because it will have a TIA entry even if
     // it's simple, so we deal with it every time.
-    
+
     unsigned int first_available_index = 0;
-    unsigned int last_used_index = 0;
+    std::set<unsigned int> * used_state_index = new std::set<unsigned int>();
     for (std::map<unsigned int, hfst_ol::StatePlaceholder>::iterator it =
              state_placeholders.begin();
          it != state_placeholders.end(); ++it) {
-        if (it->second.is_simple() and it != state_placeholders.begin()) {
+        if (it->second.is_simple() and it->first != 0) {
             continue;
         }
         unsigned int i = first_available_index;
@@ -1194,8 +1216,8 @@ unsigned int hfst_ol_to_hfst_basic_add_state
             ++i;
         }
         it->second.start_index = i;
-        last_used_index = std::max(i, last_used_index);
         // Once we've found a starting index, mark all the used input symbols
+	used_state_index->insert(i);
         for (std::map<hfst_ol::SymbolNumber,
                  std::vector<hfst_ol::TransitionPlaceholder> >
                  ::iterator sym_it = it->second.inputs.begin();
@@ -1208,10 +1230,17 @@ unsigned int hfst_ol_to_hfst_basic_add_state
                 std::pair<unsigned int, hfst_ol::SymbolNumber>
                 (it->second.state_number, index_offset);
         }
-        while (!used_indices->available_for_first(first_available_index)) {
+        while (!used_indices->available_for_first(
+		   first_available_index, used_state_index) or
+	       !used_indices->available_for_something(
+		   first_available_index,
+		   seen_input_symbols,
+		   packing_aggression)) {
             ++first_available_index;
         }
     }
+
+    delete used_state_index;
 
     // Now we figure out where each state in the transition array begins.
 
