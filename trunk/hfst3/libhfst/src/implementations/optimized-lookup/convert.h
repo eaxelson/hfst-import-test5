@@ -54,9 +54,28 @@ struct StatePlaceholder {
 	final(false),
 	final_weight(0.0)
 	{ }
-    bool is_simple()
+    bool is_simple(std::set<SymbolNumber> & flag_symbols)
 	{
-	    return inputs.size() < 2;
+	    if (flag_symbols.size() == 0) {
+		return inputs.size() < 2;
+	    }
+	    bool have_zero = false;
+	    SymbolNumber input_symbols = 0;
+	    for(std::map<SymbolNumber, std::vector<TransitionPlaceholder> >
+		    ::iterator it = inputs.begin(); it != inputs.end(); ++it) {
+		if ((it->first == 0) or (flag_symbols.count(it->first) != 0)) {
+		    if (!have_zero) {
+			have_zero = true;
+			++input_symbols;
+		    }
+		} else {
+		    ++input_symbols;
+		}
+		if (input_symbols > 1) {
+		    return false;
+		}
+	    }
+	    return true;
 	}
     unsigned int number_of_transitions(void) {
 	unsigned int count = 0;
@@ -157,7 +176,8 @@ void add_transitions_with(SymbolNumber symbol,
 			  TransducerTable<TransitionW> & transition_table,
 			  std::map<unsigned int, hfst_ol::StatePlaceholder>
 			  & state_placeholders,
-			  std::vector<unsigned int> & first_transition_vector);
+			  std::vector<unsigned int> & first_transition_vector,
+			  std::set<SymbolNumber> & flag_symbols);
 
 #if HAVE_OPENFST // Covers remainder of file
 typedef fst::StdArc::StateId StateId;

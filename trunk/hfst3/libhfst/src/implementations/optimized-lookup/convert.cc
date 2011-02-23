@@ -39,7 +39,8 @@ void write_transitions_from_state_placeholders(
 	    add_transitions_with(0, it->second.inputs[0],
 				 transition_table,
 				 state_placeholders,
-				 first_transition_vector);
+				 first_transition_vector,
+				 flag_symbols);
 	}
 	for (std::set<hfst_ol::SymbolNumber>::iterator flag_it =
 		 flag_symbols.begin(); flag_it != flag_symbols.end();
@@ -49,7 +50,8 @@ void write_transitions_from_state_placeholders(
 					      it->second.inputs[*flag_it],
 					      transition_table,
 					      state_placeholders,
-					      first_transition_vector);
+					      first_transition_vector,
+					      flag_symbols);
 		
 	    }
 	}
@@ -64,7 +66,8 @@ void write_transitions_from_state_placeholders(
 					  it->second.inputs[sym_it->first],
 					  transition_table,
 					  state_placeholders,
-					  first_transition_vector);
+					  first_transition_vector,
+					  flag_symbols);
 	}
     }
 
@@ -80,14 +83,15 @@ void add_transitions_with(SymbolNumber symbol,
 			  TransducerTable<TransitionW> & transition_table,
 			  std::map<unsigned int, hfst_ol::StatePlaceholder>
 			  & state_placeholders,
-			  std::vector<unsigned int> & first_transition_vector)
+			  std::vector<unsigned int> & first_transition_vector,
+			  std::set<SymbolNumber> & flag_symbols)
 {
     for (std::vector<TransitionPlaceholder>::iterator it = transitions.begin();
 	 it != transitions.end(); ++it) {
 	// before writing each transition, find out whether its
 	// target is simple (ie. should point directly to TA entry)
 	unsigned int target;
-	if (state_placeholders[it->target].is_simple()) {
+	if (state_placeholders[it->target].is_simple(flag_symbols)) {
 	    target = first_transition_vector[it->target] + 
 		TRANSITION_TARGET_TABLE_START - 1;
 	} else {
