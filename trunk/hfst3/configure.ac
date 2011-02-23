@@ -399,8 +399,10 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
                  libhfst/Makefile libhfst/src/Makefile
                  libhfst/src/implementations/Makefile 
                  libhfst/hfst.pc
-                 tools/Makefile tools/src/Makefile tools/src/hfst-proc/Makefile
-                 man/Makefile
+		 tools/Makefile tools/src/Makefile tools/src/hfst-proc/Makefile
+		 tools/src/hfst-twolc/Makefile
+		 tools/src/hfst-twolc/src/Makefile
+		 man/Makefile 
                  scripts/Makefile scripts/hfst-foma-wrapper.sh])
 
 # output
