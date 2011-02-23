@@ -7,6 +7,7 @@
 % llncs.doc is actually a tex file, it's the source for the Authors'
 % Instructions. There are good examples of eg. tables and graphs there.
 \documentclass{llncs}
+\usepackage{llncsdoc}
 %
 \begin{document}
 %
@@ -67,11 +68,11 @@
 % KL
 
 
-\section*{Structural Layout}
+\section{Structural Layout}
 % MS
 
 
-\section*{Structural Layout cont.}
+\section{Structural Layout cont.}
 % SH
 % Comment to remove before submission:
 % the relatively insignificant material here should really be incorporated into
@@ -83,7 +84,7 @@ transducers and, more importantly, the operations and formalisms (eg.
 for them. HFST is now independent of any particular library and requires no
 custom extensions to the libraries it uses.
 
-\subsection*{Dynamic linking to underlying libaries}
+\subsection{Dynamic Linking to Underlying Libraries}
 Previously HFST relied on custom extensions to the libraries it supported,
 namely OpenFst and SFST, and it was necessary to statically link them into
 \verb+libhfst+. This was obviously also rather restrictive in terms of
@@ -94,43 +95,43 @@ HFST3 supports conditional compilation of all its elements that provide
 interfaces to underlying libraries, and dynamic linking is done to whichever
 libraries the user configures HFST3 to use.
 
-\subsection*{Stand-alone use and flexibility}
+\subsection{Stand-alone Use and Flexibility}
 Due to these improvements, HFST3 can also be built without any external
 libraries (in which case only the operations for a simple internal
-representation and optimized-lookup \ref{optimized-lookup}, building
+representation and optimized-lookup (\ref{optimized-lookup}), building
 from text representation and fast lookup will be supported) or only the user's
 self-made library, which will then support compilation to optimized-lookup
 format.
 
-\section*{Coding Priciples}
+\section{Coding Priciples}
 % EA
 
 
-\section*{Data Format}
+\section{Data Format}
 % EA
 
-\section*{Alphabet}
+\section{Alphabet}
 % EA
 
-\section*{Algorithmic Improvements}
+\section{Algorithmic Improvements}
 % MS
 
-\section*{Xerox Compatibility}
+\section{Xerox Compatibility}
 % TP
 
-\section*{Compilation Performance}
+\section{Compilation Performance}
 % EA
 
-\section*{Application Areas}
+\section{Application Areas}
 % TP
 
-\section*{Optimized Lookup}\label{optimized-lookup}
+\section{Optimized Lookup}\label{optimized-lookup}
 % SH
 
-\section*{Discussion}
+\section{Discussion}
 %KL
 
-\section*{Conclusion}
+\section{Conclusion}
 % KL
 
 %
