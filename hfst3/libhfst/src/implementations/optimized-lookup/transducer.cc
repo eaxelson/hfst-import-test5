@@ -223,7 +223,7 @@ void Transducer::try_epsilon_transitions(SymbolNumber * input_symbol,
 			     output_symbol+1,
 			     original_output_tape,
 			     tables->get_transition_target(i));
-		current_weight += tables->get_weight(i);
+		current_weight -= tables->get_weight(i);
 		}
 		flag_state = old_state;
 		++i;

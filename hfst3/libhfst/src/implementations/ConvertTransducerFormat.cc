@@ -1175,7 +1175,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
     for (std::map<unsigned int, hfst_ol::StatePlaceholder>::iterator it =
              state_placeholders.begin();
          it != state_placeholders.end(); ++it) {
-        if (it->second.is_simple() and it->first != 0) {
+        if (it->second.is_simple(flag_symbols) and it->first != 0) {
             continue;
         }
         unsigned int i = first_available_index;
