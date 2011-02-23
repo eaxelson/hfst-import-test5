@@ -1,5 +1,11 @@
 % This is the Authors' notes demonstration file with content stripped out
 % and sections from Krister's email substituted.
+% 
+% It might be a good idea to verify that Authors' Instructions.pdf
+% (in this directory) is adhered to before submitting.
+%
+% llncs.doc is actually a tex file, it's the source for the Authors'
+% Instructions. There are good examples of eg. tables and graphs there.
 \documentclass{llncs}
 %
 \begin{document}
@@ -67,11 +73,34 @@
 
 \section*{Structural Layout cont.}
 % SH
-The goal of the HSFT distribution is to act as a transparent compatibility
-layer between different representations of finite-state transducers and,
-more importantly, the operations and formalisms (eg.
+% Comment to remove before submission:
+% the relatively insignificant material here should really be incorporated into
+% another section..
+There has been considerable progress in achieving HSFT's goal of acting as a
+compatibility layer between different representations of finite-state
+transducers and, more importantly, the operations and formalisms (eg.
 \verb+lexc/twolc+ , \verb+xfst+ , \verb+sfst+) that have been implemented
-for them.
+for them. HFST is now independent of any particular library and requires no
+custom extensions to the libraries it uses.
+
+\subsection*{Dynamic linking to underlying libaries}
+Previously HFST relied on custom extensions to the libraries it supported,
+namely OpenFst and SFST, and it was necessary to statically link them into
+\verb+libhfst+. This was obviously also rather restrictive in terms of
+new versions and different use cases (eg. experimentation with local changes to
+the underlying libraries.
+
+HFST3 supports conditional compilation of all its elements that provide
+interfaces to underlying libraries, and dynamic linking is done to whichever
+libraries the user configures HFST3 to use.
+
+\subsection*{Stand-alone use and flexibility}
+Due to these improvements, HFST3 can also be built without any external
+libraries (in which case only the operations for a simple internal
+representation and optimized-lookup \ref{optimized-lookup}, building
+from text representation and fast lookup will be supported) or only the user's
+self-made library, which will then support compilation to optimized-lookup
+format.
 
 \section*{Coding Priciples}
 % EA
@@ -95,7 +124,7 @@ for them.
 \section*{Application Areas}
 % TP
 
-\section*{Optimized Lookup}
+\section*{Optimized Lookup}\label{optimized-lookup}
 % SH
 
 \section*{Discussion}
