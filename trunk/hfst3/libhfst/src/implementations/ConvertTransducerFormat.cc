@@ -1099,6 +1099,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 	   it != flag_diacritics->end(); ++it) {
 	  if (it->compare(epstr)) {
 	      string_symbol_map->operator[](*it) = symbol_table.size();
+	      flag_symbols.insert(symbol_table.size());
 	      symbol_table.push_back(*it);
 	      // don't increment seen_input_symbols - we use it for
 	      // indexing

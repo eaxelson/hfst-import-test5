@@ -67,6 +67,12 @@ struct StatePlaceholder {
 	return count;
     }
     unsigned int symbol_offset(SymbolNumber symbol) {
+	// The following test is necessary because of states with flags
+	// (which have index 0, and are therefore called here with symbol == 0)
+	// but without epsilons.
+	if (symbol == 0) {
+	    return 0;
+	}
 	unsigned int offset = 0;
 	for(std::map<SymbolNumber, std::vector<TransitionPlaceholder> >
 		::iterator it = inputs.begin(); it!= inputs.end(); ++it) {
@@ -76,7 +82,8 @@ struct StatePlaceholder {
 	    offset += it->second.size();
 	}
 	std::string message("error in conversion between optimized lookup "
-			    "format and HfstTransducer");
+			    "format and HfstTransducer;\ntried to calculate "
+			    "symbol_offset for symbol not present in state");
 	HFST_THROW_MESSAGE
 	  (HfstFatalException,
 	   message);
