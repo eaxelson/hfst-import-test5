@@ -1108,7 +1108,8 @@ unsigned int hfst_ol_to_hfst_basic_add_state
       // 4) non-input symbols
       for (std::set<std::string>::iterator it = other_symbols->begin();
            it != other_symbols->end(); ++it) {
-          if (it->compare(epstr) and input_symbols->count(*it) == 0) {
+          if (it->compare(epstr) and input_symbols->count(*it) == 0 and
+	      flag_diacritics->count(*it) == 0) {
 	      string_symbol_map->operator[](*it) = symbol_table.size();
 	      symbol_table.push_back(*it);
           }
