@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS=hfst-proc
+SUBDIRS=hfst-proc hfst-twolc
 AUTOMAKE_OPTIONS=std-options subdir-objects
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/tools/src/parsers
