@@ -67,6 +67,11 @@ namespace hfst
     TO_FINAL_STATE /**< Push weights towards final state(s). */ 
   };
 
+  //! @breif A vector of transducers
+  //!
+  //! Used by compose_intersect.
+  typedef std::vector<HfstTransducer> HfstTransducerVector;
+ 
   //! @brief A pair of transducers
   //!
   //! Used by functions in namespace \link hfst::rules rules\endlink

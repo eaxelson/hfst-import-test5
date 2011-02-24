@@ -19,8 +19,13 @@ AUTOMAKE_OPTIONS=subdir-objects
 noinst_LTLIBRARIES=libhfstimplementations.la
 
 # HFST bridge specific stuff
-IMPLEMENTATION_SRCS=HfstTransitionGraph.cc ConvertTransducerFormat.cc
-AM_CXXFLAGS=-Wno-deprecated
+IMPLEMENTATION_SRCS=HfstTransitionGraph.cc ConvertTransducerFormat.cc \
+                    compose_intersect/ComposeIntersectRulePair.cc \
+                    compose_intersect/ComposeIntersectLexicon.cc \
+                    compose_intersect/ComposeIntersectRule.cc \
+                    compose_intersect/ComposeIntersectFst.cc
+
+AM_CXXFLAGS=-Wno-deprecated -g
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
 # the bridges
 if WANT_SFST
@@ -60,7 +65,12 @@ implinclude_HEADERS = \
 		FomaTransducer.h \
 		LogWeightTransducer.h \
 		SfstTransducer.h TropicalWeightTransducer.h \
-		HfstOlTransducer.h HfstTransitionGraph.h
+		HfstOlTransducer.h HfstTransitionGraph.h \
+		compose_intersect/ComposeIntersectRulePair.h \
+		compose_intersect/ComposeIntersectLexicon.h \
+		compose_intersect/ComposeIntersectRule.h \
+		compose_intersect/ComposeIntersectFst.h
+
 ### Add here your library ###
 #		MyTransducerLibraryTransducer.h
 

@@ -188,6 +188,12 @@ namespace hfst {
 
       friend class Number2SymbolMapInitializer;
       friend class Symbol2NumberMapInitializer;
+
+      friend class ComposeIntersectFst;
+      friend class ComposeIntersectLexicon;
+      friend class ComposeIntersectRule;
+      friend class ComposeIntersectRulePair;
+
     };
 
     // Initialization of static members in class 
@@ -289,6 +295,10 @@ namespace hfst {
           return transition_data.get_weight();
         }
 
+	friend class ComposeIntersectFst;
+	friend class ComposeIntersectLexicon;
+	friend class ComposeIntersectRule;
+	friend class ComposeIntersectRulePair;
       };
 
     /** @brief An HfstTransition with transition data of type
@@ -1502,6 +1512,7 @@ namespace hfst {
   }
    
 }
+
 #endif // #ifndef _HFST_TRANSITION_GRAPH_H_
 
 

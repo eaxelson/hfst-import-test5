@@ -970,17 +970,16 @@ ccc : ddd
     /** \brief Compose this transducer with \a another. */
     HfstTransducer &compose(const HfstTransducer &another);
 
-#ifdef COMPOSE_INTERSECT_IMPLEMENTED
     /** \brief Compose this transducer with the intersection of 
-        rule transducers in \a grammar. 
+	transducers in \a v. 
 
         The algorithm used by this function is faster than intersecting 
         all transducers one by one and then composing this transducer 
         with the intersection. 
 
-        @see HfstGrammar */
-    HfstTransducer &compose_intersect(HfstGrammar &grammar);
-#endif // COMPOSE_INTERSECT_IMPLEMENTED
+	@pre The rules in v are deterministic and epsilon free.
+    */
+    HfstTransducer &compose_intersect(const HfstTransducerVector &v);
 
     /** \brief Concatenate this transducer with \a another. */
     HfstTransducer &concatenate(const HfstTransducer &another);
