@@ -29,7 +29,7 @@
   extern char * yytext;
   extern int yylineno;
   extern char * yytext;
-  extern bool rules_start;
+  extern bool regexp_start;
   void yyerror(const char * text );
   void warn(const char * warning );
   int yylex();
@@ -108,9 +108,11 @@
 %left  <symbol_number> CONTAINMENT CONTAINMENT_ONCE TERM_COMPLEMENT COMPLEMENT 
 %right <symbol_number> POWER
 
- /* "[", "]", "(" and ")". */
+ /* "[", "]", "(", ")", "{", "}". */
 %right <symbol_number> RIGHT_SQUARE_BRACKET RIGHT_PARENTHESIS 
 %left  <symbol_number> LEFT_SQUARE_BRACKET LEFT_PARENTHESIS
+%right <symbol_number> RIGHT_CURLY_BRACKET
+%left  <symbol_number> LEFT_CURLY_BRACKET
 
  /* Twolc rule operators */
 %token <symbol_number> LEFT_RESTRICTION_ARROW LEFT_ARROW RIGHT_ARROW 
@@ -186,6 +188,7 @@ RULE_NAME_DECL: RULE_NAME
 RULE_CENTER: ALPHABET_PAIR
 | RULE_CENTER UNION ALPHABET_PAIR
 | LEFT_SQUARE_BRACKET CENTER_LIST RIGHT_SQUARE_BRACKET
+| LEFT_CURLY_BRACKET CENTER_LIST RIGHT_CURLY_BRACKET
 
 CENTER_LIST: ALPHABET_PAIR
 | CENTER_LIST UNION ALPHABET_PAIR
@@ -277,6 +280,7 @@ RE: PAIR
 | COMPLEMENT RE
 | TERM_COMPLEMENT RE
 | LEFT_SQUARE_BRACKET REGULAR_EXPRESSION RIGHT_SQUARE_BRACKET
+| LEFT_CURLY_BRACKET REGULAR_EXPRESSION RIGHT_CURLY_BRACKET
 | LEFT_PARENTHESIS REGULAR_EXPRESSION RIGHT_PARENTHESIS
 
 SET_LIST: /* empty */ 
@@ -513,7 +517,7 @@ void reduce_queue(bool variable_symbol)
   //    rule-variable names and values.
   if (not variable_symbol)
     {
-      if (not rules_start)
+      if (not regexp_start)
 	{ 
 	  std::cout << get_symbol_queue_front() << " "; 
 	  pop_symbol_queue();
