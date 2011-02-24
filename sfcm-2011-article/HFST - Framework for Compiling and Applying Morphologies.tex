@@ -112,8 +112,164 @@ optimized-lookup format.
 \section{Data Format}
 % EA
 
+\subsection{Transducer binary format}
+
+An HFST transducer in binary format consists of an HFST header followed by the
+backend implementation in binary format. In version 3.0, the header
+format is less error-prone than in the previous version and gives more 
+information both for users of HFST (even when seen on a screen or in a
+text editor in binary format) and for the HFST library itself.
+ 
+The current header format is somewhat similar to foma where pieces of 
+information are separated by newline characters to make them more
+readable. In HFST version 2, we represented the properties of a
+transducer in a cryptic two-byte bit vector akin to OpenFst's header
+format. The type of the transducer and the existence of an optional
+alphabet were also encoded with two characters in the beginning of the
+binary transducer and they were impossible to interpret without
+looking at the HFST code itself.
+
+The beginning of an HFST version 3.0 header contains an identifier
+'HFST', a separating zero byte, two bytes signifying the length of
+the rest of the header in bytes and a separating zero byte. The rest
+of the header contains pairs of attributes and their values. The pairs
+are separated by newlines and attributes and values by zero bytes. 
+HFST version 3.0 header must contain at least the attributes
+'version', 'type' and 'name' (in that order) and their values. 
+Additional attributes can follow after these obligatory ones. 
+For instance, we could include information on the minimality or
+cyclicity of a transducer even if the backend implementation did not
+store these properties in its binary format (e.g. SFST). 
+For more information on the header format, see (ref. to HfstTransducerHeader).
+
+The new header format makes it easier to react to unexpected
+situations and inform the user of them. When we start to read an HFST
+binary transducer, we first see whether the identifier 'HFST' is
+found. If it is not found, we know that the user has given a wrong
+type of file and can throw a appropriate exception. 
+Next we see what kind of transducer is coming from the stream. 
+If the backend transducer library is not linked to HFST, we can handle
+the situation by throwing an exception again. 
+Next we see the HFST version used and know how to process the header
+and the backend implementation correctly. 
+If the user has requested a verbose mode for a tool that reads the
+transducer, it is possible to print the name of each transducer 
+before or after reading it.
+
+\subsection{Conversion between different backend formats}
+
+In HFST version 3.0, the conversion between different backend formats 
+(SFST, foma, OpenFst with tropical and logarithmic semiring) is
+carried out through HFST's own transducer format, HfstTransitionGraph, 
+a simple transition graph datatype that consists of states (unsigned
+integers) and transitions between those states.
+ 
+We have chosen to implement HfstTransitionGraph for two
+reasons. Firstly, it serves as an intermediate transducer format in
+conversions, thus reducing the number of conversion functions from 2 x
+N to N x (N - 1), where N is the number of different transducer
+backend formats. Secondly, it is easy to implement functions for 
+HfstTransitionGraph that allow the user to construct transducers from 
+scratch and iterate through their states and transitions. Implementing
+such features for some transducer libraries (e.g. SFST and foma) can
+be difficult because they are designed to be used on a higher level of 
+abstraction. Accordingly, the functions that operate on states and 
+transitions are often declared protected and not necessarily well
+documented.
+
+HfstTransitionGraph is a class template with template parameters T and
+W. T defines the type of transition data that a transition uses and W
+the weight type that is used in transitions and final states. 
+HfstTransitionGraph contains two maps. One maps each state to a set of
+that state's transitions (that are of type class HfstTransition\textless class
+T\textgreater). The other maps each final state to its final weight 
+(that is of type class W). Class T must use the weight type W. 
+A state's transition (class HfstTransition\textless class T\textgreater) 
+contains a target state and a transition data field (that is of type class T).
+
+Actually, HfstTransitionGraph is not a transducer but a more
+generalized transition graph that can contain many kinds of data in
+its transitions. Currently, the HFST library offers the specializations 
+HfstBasicTransducer and HfstBasicTransition for HfstTransitionGraph
+and HfstTransition. These specializations are designed for weighted 
+transducers. The weight class W is a float and the transition data
+class T contains an input string, an output string and a weight of
+type float. The specializations HfstBasicTransducer and
+HfstBasicTransition are used when converting between different
+transducer backend formats.
+
+The class template HfstTransitionGraph is designed so that it can
+easily be extended for different kinds of transition datatypes. For
+example, if HFST tools are used in text-to-speech or speech-to-text
+conversion, the symbol type of transitions will probably be something
+else than strings.
+
+
+
 \section{Alphabet}
 % EA
+
+The alphabet of a transducer means all symbols (strings) that are
+known to that transducer. The alphabet includes all symbols that occur 
+or have occurred in a transition of the transducer unless explicitly
+removed from the alphabet. 
+If we apply a binary operation (e.g. disjunction or composition) on 
+transducers A and B, the resulting transducer's alphabet will include
+all symbols that were in the alphabets of A and B. 
+
+In HFST version 2.0, we were not especially interested in alphabets 
+since the interface did not offer any way for the user to access a 
+transducer's alphabet. It was up to the backend implementation to take
+care of alphabets. In SFST the transducers always have an alphabet,
+but in OpenFst their use is optional so we did not use them in our
+OpenFst implementation.
+
+In HFST version 3.0, we need to be aware of alphabets because two new
+special symbols are included, UNKNOWN and IDENTITY. These special
+symbols are a part of the Xerox Finite-State Tool (XFST) formalism 
+(Beesley et Karttunen, 2003, page x) and they are also implemented in
+foma (Huldén, 2009, page 278). UNKNOWN and IDENTITY symbols are useful
+when we want to refer to all symbols that are not currently known to a
+transducer but which the transducer can later become aware of. 
+
+Supporting UNKNOWN and IDENTITY symbols in all HFST backend
+implementations has enabled us to make an XFST compiler that can be used
+with all backend implementations. 
+In this way we can offer the users of HFST new regular expression
+formalism in addition to the SFST programming language. Next we
+describe what these new special symbols require for HFST's
+part. Because they are already implemented in foma, we have to care
+only for the SFST and OpenFst implementations.
+
+Besides keeping track of all symbols known to a transducer, we also
+have to expand each transition involving UNKNOWN and IDENTITY symbols
+into a set of transitions every time we apply a binary operation on
+two transducers. 
+This is because the transducer becomes aware of new symbols that are
+no longer unknown and thus no more included in UNKNOWN or IDENTITY
+symbols.
+Fortunately, this expansion can be done before the operation itself 
+(and for composition before and after the operation itself), so we do
+not have to make changes in the operations of the backend transducer
+libraries. 
+The operations can freely (and will) handle these special symbols just
+like any ordinary symbols. 
+
+First we iterate through the alphabets of both transducers and find
+out what symbols in the alphabet of one transducer are not found in
+the alphabet of the other transducer and vice versa. 
+Then we add beside each transition involving UNKNOWN or IDENTITY
+symbols a set of transitions where UNKNOWN and IDENTITY symbols are
+replaced with all symbols that the transducer just got aware of. 
+For more information on expanding special symbols, see 
+(Huldén, 2009, page 278) and (Beesley et Karttunen, 2003, page x).
+
+It is also possible to switch off special symbol handling if we know
+for sure that they are not used in transducers. 
+In this way we can optimize performance for instance for the tool 
+hfst-calculate that processes SFST programming language which does not
+support unknown or identity symbols.
+
 
 \section{Algorithmic Improvements}
 % MS
@@ -149,7 +305,6 @@ Note that the foma implementation was not available in version 2.0.
     HFST. The times are expressed in minutes and seconds.}
   \label{tab:compilation_times}
 \end{table}
-
 
 We can clearly see that the compilation time has improved dramatically
 for the SFST implementation.
