@@ -190,7 +190,10 @@ int CommandLine::parse_options(int argc, char** argv)
   if (not inputNamed)
     {
       if ((argc - optind) == 1)
-	{ infilename = hfst_strdup(argv[optind]); }
+	{ 
+	  inputNamed = true;
+	  infilename = hfst_strdup(argv[optind]); 
+	}
       else if ((argc - optind) > 1)
 	{ 
 	  std::cerr << "no more than one input rule file may be given" 
