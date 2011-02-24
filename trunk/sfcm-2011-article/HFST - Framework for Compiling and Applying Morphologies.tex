@@ -8,6 +8,7 @@
 % Instructions. There are good examples of eg. tables and graphs there.
 \documentclass{llncs}
 \usepackage{llncsdoc}
+\usepackage{multirow}
 %
 \begin{document}
 %
@@ -121,6 +122,20 @@ optimized-lookup format.
 
 \section{Compilation Performance}
 % EA
+
+\begin{center}
+  \begin{tabular}{ | c | c | c | c | }
+  \hline
+  \multicolumn{4}{|c|}{Compilation times} \\ \hline
+  Backend & version & Finnish & German \\ \hline
+  \multirow{2}{*}{SFST} & 2.0 & 25:16 & 107:47 \\
+  & 3.0 & 5:02 & 6:39 \\ \hline
+  \multirow{2}{*}{OpenFst} & 2.0 & 7:54 & 6:23 \\
+  & 3.0 & 6:51 & 6:28 \\ \hline
+  \multirow{2}{*}{foma} & 2.0 & - & - \\
+  & 3.0 & 1:49 & 1:29 \\ \hline
+  \end{tabular}
+\end{center}
 
 \section{Application Areas}
 % TP
