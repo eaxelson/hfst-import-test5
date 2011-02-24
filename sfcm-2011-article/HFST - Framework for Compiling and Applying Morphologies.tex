@@ -9,6 +9,7 @@
 \documentclass{llncs}
 \usepackage{llncsdoc}
 \usepackage{multirow}
+\usepackage{caption}
 %
 \begin{document}
 %
@@ -123,19 +124,62 @@ optimized-lookup format.
 \section{Compilation Performance}
 % EA
 
-\begin{center}
-  \begin{tabular}{ | c | c | c | c | }
-  \hline
-  \multicolumn{4}{|c|}{Compilation times} \\ \hline
+The performance of HFST has improved from version 2.0 to 3.0. 
+We compiled two finite-state morphologies in SFST programming language format
+with HFST versions 2.0 and 3.0. 
+The morphologies were OMorFi (ref.) for Finnish and Morphisto (ref.) for German.
+In table~\ref{tab:compilation_times} are the compilation times 
+for both morphologies with 
+different backend implementations with both versions of HFST. 
+Note that the foma implementation was not available in version 2.0.
+
+\begin{table}
+\centering
+  \begin{tabular}{ c | c | c | c }
+  \multicolumn{4}{c}{Compilation times} \\ \hline
   Backend & version & Finnish & German \\ \hline
   \multirow{2}{*}{SFST} & 2.0 & 25:16 & 107:47 \\
   & 3.0 & 5:02 & 6:39 \\ \hline
   \multirow{2}{*}{OpenFst} & 2.0 & 7:54 & 6:23 \\
   & 3.0 & 6:51 & 6:28 \\ \hline
   \multirow{2}{*}{foma} & 2.0 & - & - \\
-  & 3.0 & 1:49 & 1:29 \\ \hline
+  & 3.0 & 1:49 & 1:29 \\
   \end{tabular}
-\end{center}
+  \caption{Compilation times for Finnish and German morphologies with
+    HFST. The times are expressed in minutes and seconds.}
+  \label{tab:compilation_times}
+\end{table}
+
+
+We can clearly see that the compilation time has improved dramatically
+for the SFST implementation.
+This is mainly because the new version of SFST, 1.4.2, uses Hopcroft's 
+minimization algorithm instead of Brzozowski's. 
+We noticed how the minimization algorithm affects performance
+already when we were testing HFST version 2.0; 
+OpenFst was clearly faster because it uses Hopcroft's algorithm. 
+Based on this observation, Helmut Schmid could improve his SFST by 
+writing a minimization function that uses Hopcroft's algorithm.
+
+When comparing the compilation times for OpenFst, we see that the
+Finnish morphology compiles faster but the German one slightly slower
+on HFST version 3.0 than on version 2.0. This is because there are two
+factors that contribute to the difference in performance. Firstly, we
+are currently using OpenFst version 1.2.7 that is faster than the
+previous versions. Secondly, in HFST version 3.0 we no longer use the
+same number-to-symbol encodings for all transducers during the same
+session. Every time we perform a binary operation on two transducers,
+we must harmonize the encodings of the transducers. Nevertheless, 
+it seems that the newer, more efficient version of
+OpenFst compensates well for this slowness caused by harmonization. 
+
+We did not have the foma implementation available in HFST version 2.0,
+but it is evident that it is much faster than the other
+implementations in either version of HFST. Foma does not either use
+the same symbol-to-number encodings in its transducers, but it still
+performs well. It is presumable that symbol harmonization is not a big
+factor in the compilation times of morphologies. 
+
 
 \section{Application Areas}
 % TP
