@@ -359,8 +359,20 @@ PAIR: GRAMMAR_SYMBOL COLON_SPACE
   // Reduce the first three symbols "X", "__HFST_TWOLC_:" and "X" from
   // symbol_queue.
   std::string symbol = get_symbol_queue_front();
-  symbol_queue.push_front("__HFST_TWOLC_:");
-  symbol_queue.push_front(symbol);
+
+  // The word voundaruy is an exception. It always corresponds to 0 on 
+  // the output side.
+  if (symbol != "__HFST_TWOLC_.#.")
+    { 
+      symbol_queue.push_front("__HFST_TWOLC_:");
+      symbol_queue.push_front(symbol); 
+    }
+  else
+    { 
+      symbol_queue.front() = "__HFST_TWOLC_0";
+      symbol_queue.push_front("__HFST_TWOLC_:");
+      symbol_queue.push_front("__HFST_TWOLC_.#."); 
+    }
   reduce_symbol_pair();
 }
 
