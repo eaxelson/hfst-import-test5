@@ -20,46 +20,10 @@
 \institute{University of Helsinki}
 
 \maketitle
-%
-% Modify the bibliography environment to call for the author-year
-% system. This is done normally with the citeauthoryear option
-% for a particular contribution.
 
-% SH: Not sure we need this ... the example file had two articles, the latter with this format.
-% It should be possible to comment out until the abstract and get the 'regular' citation.
-\makeatletter
-\renewenvironment{thebibliography}[1]
-     {\section*{\refname}
-      \small
-      \list{}%
-           {\settowidth\labelwidth{}%
-            \leftmargin\parindent
-            \itemindent=-\parindent
-            \labelsep=\z@
-            \if@openbib
-              \advance\leftmargin\bibindent
-              \itemindent -\bibindent
-              \listparindent \itemindent
-              \parsep \z@
-            \fi
-            \usecounter{enumiv}%
-            \let\p@enumiv\@empty
-            \renewcommand\theenumiv{}}%
-      \if@openbib
-        \renewcommand\newblock{\par}%
-      \else
-        \renewcommand\newblock{\hskip .11em \@plus.33em \@minus.07em}%
-      \fi
-      \sloppy\clubpenalty4000\widowpenalty4000%
-      \sfcode`\.=\@m}
-     {\def\@noitemerr
-       {\@latex@warning{Empty `thebibliography' environment}}%
-      \endlist}
-      \def\@cite#1{#1}%
-      \def\@lbibitem[#1]#2{\item[]\if@filesw
-        {\def\protect##1{\string ##1\space}\immediate
-      \write\@auxout{\string\bibcite{#2}{#1}}}\fi\ignorespaces}
-\makeatother
+% Removed the manual bibstyle in favor of splncs03.bst,
+% if it's required fetch it from svn history
+
 %
 \begin{abstract}
 % KL
@@ -105,7 +69,7 @@ building from text representation and fast lookup will be supported) or only
 the user's self-made library, which will then support compilation to
 optimized-lookup format.
 
-\section{Coding Priciples}
+\section{Coding Principles}
 % EA
 
 Exceptional situations occur sometimes in computer programs when the
@@ -154,7 +118,7 @@ Exceptions are also used internally in HFST code for reporting to the
 calling function that something unexpected happened. The calling
 function can handle the situation or inform the user of it. 
 So the execution of the program does not need to stop or lead to an
-erraneous result or even cause later a segmentation fault.
+erroneous result or even cause later a segmentation fault.
 
 An HfstFatalException is thrown when it is supposed that the user
 cannot handle that exception. The user should instead report the error
@@ -281,9 +245,9 @@ OpenFst implementation.
 
 In HFST version 3.0, we need to be aware of alphabets because two new
 special symbols are included, UNKNOWN and IDENTITY. These special
-symbols are a part of the Xerox Finite-State Tool (XFST) formalism 
-(Beesley et Karttunen, 2003, page x) and they are also implemented in
-foma (Huldén, 2009, page 278). UNKNOWN and IDENTITY symbols are useful
+symbols are a part of the Xerox Finite-State Tool (XFST) 
+formalism~\cite[page x]{beesley/2003} and they are also implemented in
+foma~\cite{hulden/2009}. UNKNOWN and IDENTITY symbols are useful
 when we want to refer to all symbols that are not currently known to a
 transducer but which the transducer can later become aware of. 
 
@@ -316,8 +280,8 @@ the alphabet of the other transducer and vice versa.
 Then we add beside each transition involving UNKNOWN or IDENTITY
 symbols a set of transitions where UNKNOWN and IDENTITY symbols are
 replaced with all symbols that the transducer just got aware of. 
-For more information on expanding special symbols, see 
-(Huldén, 2009, page 278) and (Beesley et Karttunen, 2003, page x).
+For more information on expanding special symbols, 
+see~\cite{hulden/2009}~and~\cite{beesley/2003}.
 
 It is also possible to switch off special symbol handling if we know
 for sure that they are not used in transducers. 
@@ -331,6 +295,28 @@ support unknown or identity symbols.
 
 \section{Xerox Compatibility}
 % TP
+
+Among the one goals of HFST framework has always been to retain legacy support
+for Xerox line of tools for building finite-state
+morphologies~\cite{beesley/2003}. The support should also be trivial for
+end-users converting from the Xerox tools. For this purpose we have aimed to
+create clones of the most important Xerox tools as accurate as possible.
+Previous open source implementations of Xerox tool clones have included the
+lexc and twolc~\cite{linden/2009/sfcm} and lexc and xfst~\cite{hulden/2009}, in
+HFST 3 we have combined these contributions to one uniform package capable of
+handling full line of Xerox tools for morphology, which for most intents and
+purposes means that end users will require no other work than changing program
+names to start using HFST tools for their Xerox-style language description.
+
+For specific functionality, the Xerox tools have lots of specific special
+processing of finite-state automata, that is not part of standard finite-state
+algorithms. Primary example of this is handling of special symbols such as
+flag diacritics~\cite{beesley/1998}, which would require support from underlying
+libraries for many finite-state operations to work as they do in Xerox tools
+when using \texttt{flag-is-epsilon} and \texttt{obey-flags} settings. In
+HFST tools we have provided support for same options and provided fall-back
+processing where it is possible to have backend libraries support required
+operations. 
 
 \section{Compilation Performance}
 % EA
@@ -394,6 +380,49 @@ factor in the compilation times of morphologies.
 \section{Application Areas}
 % TP
 
+After initial release of HFST platform it has been used in several end-product
+application software. The two most prominent uses are as a part of rule-based
+machine translation platform in apertium\footnote{\url{http://apertium.sf.net}}
+and spell-checking library voikko\footnote{\url{http://voikko.sf.net}}.
+
+\subsection{Apertium interoperability---corpus processing tools and I/O formats}
+
+In apertium the finite-state automata are used to provide language models for
+both parsing the running text and generating the translations after performing
+a mid-shallow rule-based transfer. The HFST is only one possible language
+model, so the crucial part for inclusion was to get HFST language models
+work as others. This includes two functions: reliable tokenization based on
+the dictionary data and support for apertium I/O formats. The total
+contribution of this corpus processing functionality is contained in tool
+called \texttt{hfst-proc} included in HFST toolkit. The name originates from
+the interoperability with other toolkits' corpora processing tools, specifically
+\texttt{cg-proc} from vislcg3\footnote{\url{http://visl.sdk.edu.dk}} and
+\texttt{lt-proc} from apertium itself.
+
+For tokenization the FST-based dictionaries are useful, since the process of
+analysis and lookup can be both performed by basic FST traversal. The specific
+implementation of analysis and tokenisation with single FST traversal was
+implemented as Google summer of code project, based on previous studies on
+topic~\cite{garrido-alenda/2002}. The basic program logic of automata traversal
+for longest matches is trivially extended here by processing of flag diacritics
+and weights.
+
+The I/O format handling is \ldots
+
+\subsection{Voikko and HFST based spell-checker formulation}
+
+The application of finite-state language models for spell-checking applications
+is also based on new development of finite-state algorithms. The application
+framework including HFST spell-checkers is voikko library, which provides
+spell-checkers for OpenOffice.org/LibreOffice, the GNOME desktop (via
+enchant), Mac OS X (via SpellService) and Mozilla application suite.
+
+The finite-state formulation of spell-checking system was developed based on
+previous research~\cite{oflazer/1996,agata/2002,pirinen/2010/lrec}. Furthermore
+we have optimised the application of error models to language models using
+specialised form of parallel composition to apply the filter with standard
+composition operation on the fly. 
+
 \section{Optimized Lookup}\label{optimized-lookup}
 % SH
 
@@ -406,15 +435,9 @@ factor in the compilation times of morphologies.
 %
 %
 %
-% ---- Bibliography ----
-%
-\begin{thebibliography}{}
-% An example from the demo:
-%\bibitem[1980]{2clar:eke}
-%Clarke, F., Ekeland, I.:
-%Nonlinear oscillations and
-%boundary-value problems for Hamiltonian systems.
-%Arch. Rat. Mech. Anal. 78, 315--333 (1982)
 
-\end{thebibliography}
+\bibliographystyle{splncs03}
+\bibliography{sfcm-2011}
+
 \end{document}
+% vim: set spell
