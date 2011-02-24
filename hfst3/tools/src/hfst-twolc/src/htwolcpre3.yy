@@ -460,7 +460,7 @@ int main(int argc, char * argv[])
     { exit(exit_code); }
 
   message("Compiling and storing rules.");
-  if (command_line.has_output_file)
+  if (not command_line.has_output_file)
     {
       HfstOutputStream stdout(command_line.format);
       grammar->compile_and_store(stdout);

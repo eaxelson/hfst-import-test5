@@ -252,6 +252,7 @@ void warn(const char * warning)
 // Print error messge and exit 1.
 void yyerror(const char * text) 
 { 
+  std::cerr << text << std::endl;
   (void)text;
   exit(1); 
 }
