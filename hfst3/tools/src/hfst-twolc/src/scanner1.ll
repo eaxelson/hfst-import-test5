@@ -45,50 +45,57 @@
 
 %}
 
+RESERVED_SYMBOL0	   [*+/\\=\"$?|&^\-\{\[\(:;_!%\r\t\n~ ]
+RESERVED_EXC_COL0   [*+/\\=\"$?|&^\-\{\[\(:;_!%\r\t\n~ ]{-}[:]
+RESERVED_EXC_PERC_AND_Q_MARK0  [*+/\\=\"$?|&^\-\{\[\(:;_!%\r\t\n~ ]{-}[%?]
+FREE_SYMBOL0	   [^*+/\\=\"$?|&^\-\{\[\(:;_!%\r\t\n~ ]
+
 RESERVED_SYMBOL	   [*+/\\=\"$?|&^\-\{\}\[\]\(\):;_!%\r\t\n~ ]
 RESERVED_EXC_COL   [*+/\\=\"$?|&^\-\{\}\[\]\(\):;_!%\r\t\n~ ]{-}[:]
 RESERVED_EXC_PERC_AND_Q_MARK  [*+/\\=\"$?|&^\-\{\}\[\]\(\):;_!%\r\t\n~ ]{-}[%?]
 FREE_SYMBOL	   [^*+/\\=\"$?|&^\-\{\}\[\]\(\):;_!%\r\t\n~ ]
 
+%s IN_BRACKET
+
 %%
 
-Alphabet/{RESERVED_SYMBOL} { 
+Alphabet/{RESERVED_SYMBOL0} { 
   // Alphabet declaration.
   symbol_queue.push_back("__HFST_TWOLC_Alphabet");
   reduce_queue();
   return ALPHABET_DECLARATION; 
 }
-Diacritics/{RESERVED_SYMBOL} {
+Diacritics/{RESERVED_SYMBOL0} {
   // Diacritics declaration.
   symbol_queue.push_back("__HFST_TWOLC_Diacritics"); 
   reduce_queue();
   return DIACRITICS_DECLARATION; 
 } 
-Rule-variables/{RESERVED_SYMBOL} { 
+Rule-variables/{RESERVED_SYMBOL0} { 
   // Rule-variables declaration, is not necessary,
   // but is supported for backwards compatibility.
   return VARIABLE_DECLARATION; 
 }
-Definitions/{RESERVED_SYMBOL} {
+Definitions/{RESERVED_SYMBOL0} {
   // Definitions declaration.
   symbol_queue.push_back("__HFST_TWOLC_Definitions"); 
   reduce_queue();
   return DEFINITION_DECLARATION; 
 }
-Sets/{RESERVED_SYMBOL} { 
+Sets/{RESERVED_SYMBOL0} { 
   // Sets declaration.
   symbol_queue.push_back("__HFST_TWOLC_Sets");
   reduce_queue();
   return SETS_DECLARATION; 
 }
-Rules/{RESERVED_SYMBOL} {
+Rules/{RESERVED_SYMBOL0} {
   // Rules declaration.
   symbol_queue.push_back("__HFST_TWOLC_Rules"); 
   reduce_queue();
   rules_start = true;
   return RULES_DECLARATION; 
 }
-where/{RESERVED_SYMBOL} {
+where/{RESERVED_SYMBOL0} {
   // The symbols until AND occur in rules with variables.
   // When the symbols are encountered, nothing is printed,
   // since the purpose is to reduce rules with variables
@@ -96,11 +103,11 @@ where/{RESERVED_SYMBOL} {
   where_seen = true;                     
   return WHERE; 
 }
-matched/{RESERVED_SYMBOL} { return MATCHED_MATCHER; }
-mixed/{RESERVED_SYMBOL} { return MIXED_MATCHER; }
-freely/{RESERVED_SYMBOL} { return FREELY_MATCHER; }
-in/{RESERVED_SYMBOL} { return IN; }
-[a]nd/{RESERVED_SYMBOL} { return AND; }
+matched/{RESERVED_SYMBOL0} { return MATCHED_MATCHER; }
+mixed/{RESERVED_SYMBOL0} { return MIXED_MATCHER; }
+freely/{RESERVED_SYMBOL0} { return FREELY_MATCHER; }
+in/{RESERVED_SYMBOL0} { return IN; }
+[a]nd/{RESERVED_SYMBOL0} { return AND; }
 
 [!].* { /* comments: ignore */ }
 [ \t\r] { /* spaces and tabs: ignore */ }
@@ -171,18 +178,31 @@ in/{RESERVED_SYMBOL} { return IN; }
   symbol_queue.push_back("__HFST_TWOLC_?");
   return SYMBOL; 
 }
-[?]/{RESERVED_EXC_COL} {
+<INITIAL>[?]/{RESERVED_EXC_COL0} {
   if (not rules_start)
     { return QUESTION_MARK; }
   // Any symbol. 
   symbol_queue.push_back("__HFST_TWOLC_?");
   return SYMBOL_SPACE; 
 }
+<IN_BRACKET>[?]/{RESERVED_EXC_COL} {
+  if (not rules_start)
+    { return QUESTION_MARK; }
+  // Any symbol. 
+  symbol_queue.push_back("__HFST_TWOLC_?");
+  return SYMBOL_SPACE; 
+}
+
 [0]/[:] { 
   symbol_queue.push_back("__HFST_TWOLC_0");
   return SYMBOL; 
 }
-[0]/{RESERVED_EXC_COL} { 
+<INITIAL>[0]/{RESERVED_EXC_COL0} { 
+  // Zero symbol.
+  symbol_queue.push_back("__HFST_TWOLC_0");
+  return SYMBOL_SPACE; 
+}
+<IN_BRACKET>[0]/{RESERVED_EXC_COL} { 
   // Zero symbol.
   symbol_queue.push_back("__HFST_TWOLC_0");
   return SYMBOL_SPACE; 
@@ -211,21 +231,37 @@ in/{RESERVED_SYMBOL} { return IN; }
   reduce_queue();
   return DIFFERENCE; 
 }
-[0-9],[0-9]+/{RESERVED_EXC_COL} {
+<INITIAL>[0-9],[0-9]+/{RESERVED_EXC_COL0} {
   // Number. 
-  symbol_queue.push_back(std::string("__HFST_TWOLC_NUMBER=")
-		    +yytext);
-  reduce_queue();
+  symbol_queue.push_back(+yytext);
+  return NUMBER_SPACE; 
+}
+<IN_BRACKET>[0-9],[0-9]+/{RESERVED_EXC_COL} {
+  // Number. 
+  symbol_queue.push_back(+yytext);
+  return NUMBER_SPACE; 
+}
+<INITIAL>[0-9]+/{RESERVED_EXC_COL0} {
+  // Number. 
+  symbol_queue.push_back(yytext);
+  return NUMBER_SPACE; 
+}
+<IN_BRACKET>[0-9]+/{RESERVED_EXC_COL} {
+  // Number. 
+  symbol_queue.push_back(yytext);
+  return NUMBER_SPACE; 
+}
+[0-9]+/[:] {
+  // Number. 
+  symbol_queue.push_back(yytext);
   return NUMBER; 
 }
-[0-9]+/{RESERVED_EXC_COL} {
-  // Number. 
-  symbol_queue.push_back(std::string("__HFST_TWOLC_NUMBER=")
-		    +yytext);
-  reduce_queue();
-  return NUMBER; 
+<INITIAL>[.][#][.]/{RESERVED_SYMBOL0} {
+  // Word boundary.
+  symbol_queue.push_back("__HFST_TWOLC_.#."); 
+  return SYMBOL_SPACE; 
 }
-[.][#][.]/{RESERVED_SYMBOL} {
+<IN_BRACKET>[.][#][.]/{RESERVED_SYMBOL} {
   // Word boundary.
   symbol_queue.push_back("__HFST_TWOLC_.#."); 
   return SYMBOL_SPACE; 
@@ -234,24 +270,28 @@ in/{RESERVED_SYMBOL} { return IN; }
   // Beginning of a bracketed regex.
   symbol_queue.push_back("__HFST_TWOLC_["); 
   reduce_queue();
+  BEGIN IN_BRACKET;
   return LEFT_SQUARE_BRACKET; 
 }
-\] {
+<IN_BRACKET>\] {
   // End of a bracketed regex.
   symbol_queue.push_back("__HFST_TWOLC_]"); 
   reduce_queue();
+  BEGIN 0;
   return RIGHT_SQUARE_BRACKET; 
 }
 \{ {
   // Beginning of a bracketed regex.
   symbol_queue.push_back("__HFST_TWOLC_["); 
   reduce_queue();
+  BEGIN IN_BRACKET;
   return LEFT_SQUARE_BRACKET; 
 }
-\} {
+<IN_BRACKET>\} {
   // End of a bracketed regex.
   symbol_queue.push_back("__HFST_TWOLC_]"); 
   reduce_queue();
+  BEGIN 0;
   return RIGHT_SQUARE_BRACKET; 
 }
 \( {
@@ -261,15 +301,17 @@ in/{RESERVED_SYMBOL} { return IN; }
       symbol_queue.push_back("__HFST_TWOLC_("); 
       reduce_queue();
     }
+  BEGIN IN_BRACKET;
   return LEFT_PARENTHESIS; 
 }
-\) {
+<IN_BRACKET>\) {
   // End of an optional bracketed regex.
   if (not where_seen) 
     {
       symbol_queue.push_back("__HFST_TWOLC_)"); 
       reduce_queue();
     }
+  BEGIN 0;
   return RIGHT_PARENTHESIS; 
 }
 [/][<][=] {
@@ -296,7 +338,13 @@ in/{RESERVED_SYMBOL} { return IN; }
   reduce_queue();
   return LEFT_RIGHT_ARROW; 
 }
-[:]/{RESERVED_EXC_PERC_AND_Q_MARK} {
+<INITIAL>[:]/{RESERVED_EXC_PERC_AND_Q_MARK0} {
+  // Pair separator in expressions like "[a:]".
+  symbol_queue.push_back("__HFST_TWOLC_: "); 
+  symbol_queue.push_back("__HFST_TWOLC_?"); 
+  return COLON_SPACE; 
+}
+<IN_BRACKET>[:]/{RESERVED_EXC_PERC_AND_Q_MARK} {
   // Pair separator in expressions like "[a:]".
   symbol_queue.push_back("__HFST_TWOLC_: "); 
   symbol_queue.push_back("__HFST_TWOLC_?"); 
@@ -330,14 +378,29 @@ in/{RESERVED_SYMBOL} { return IN; }
   reduce_queue();
   return CENTER_MARKER; 
 }
-(([%]({RESERVED_SYMBOL}|{FREE_SYMBOL}))|{FREE_SYMBOL})+/[:] { 
+<INITIAL>(([%]({RESERVED_SYMBOL0}|{FREE_SYMBOL0}))|{FREE_SYMBOL0})+/[:] { 
   // A symbol which is the left side of a pair e.g. "a" in "a:b".
   symbol_queue.push_back
     (yytext);
   return SYMBOL; 
 }
 
-(([%]({RESERVED_SYMBOL}|{FREE_SYMBOL}))|{FREE_SYMBOL})+/{RESERVED_EXC_COL} { 
+<IN_BRACKET>(([%]({RESERVED_SYMBOL}|{FREE_SYMBOL}))|{FREE_SYMBOL})+/[:] { 
+  // A symbol which is the left side of a pair e.g. "a" in "a:b".
+  symbol_queue.push_back
+    (yytext);
+  return SYMBOL; 
+}
+
+<INITIAL>(([%]({RESERVED_SYMBOL0}|{FREE_SYMBOL0}))|{FREE_SYMBOL0})+/{RESERVED_EXC_COL0} { 
+  // A symbol which is not the left side of a pair e.g. "b" in "a:b" or "[b]".
+  std::string symbol = 
+    remove_white_space(replace_substr(yytext,"\n","__HFST_TWOLC_\\n"));
+  symbol_queue.push_back(symbol);
+  return SYMBOL_SPACE; 
+ }
+
+<IN_BRACKET>(([%]({RESERVED_SYMBOL}|{FREE_SYMBOL}))|{FREE_SYMBOL})+/{RESERVED_EXC_COL} { 
   // A symbol which is not the left side of a pair e.g. "b" in "a:b" or "[b]".
   std::string symbol = 
     remove_white_space(replace_substr(yytext,"\n","__HFST_TWOLC_\\n"));

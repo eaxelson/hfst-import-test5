@@ -124,7 +124,7 @@
 %token <symbol_number>  MIXED_MATCHER FREELY_MATCHER IN AND
 %token <symbol_number>  COLON_SPACE SYMBOL_SPACE
 %token <symbol_number>  SEMI_COLON EQUALS CENTER_MARKER
-%token <symbol_number>  RULE_NAME SYMBOL NUMBER
+%token <symbol_number>  RULE_NAME SYMBOL NUMBER NUMBER_SPACE
 %token <symbol_number>  QUESTION_MARK
 %%
 
@@ -264,7 +264,12 @@ RE_LIST: /* empty */
 | RE_LIST RE
 
 RE: PAIR
-| RE POWER NUMBER
+| RE POWER NUMBER_SPACE
+{ 
+  symbol_queue.front() = 
+    std::string("__HFST_TWOLC_NUMBER=") + symbol_queue.front(); 
+  reduce_queue();
+}
 | RE STAR
 | RE PLUS
 | CONTAINMENT RE
@@ -397,8 +402,12 @@ ALPHABET_PAIR: GRAMMAR_SYMBOL COLON GRAMMAR_SYMBOL_SPACE
 }
 
 GRAMMAR_SYMBOL: SYMBOL
+| NUMBER
+
 
 GRAMMAR_SYMBOL_SPACE: SYMBOL_SPACE
+| NUMBER_SPACE
+
 
 VARIABLE_LIST: /* empty */
 | VARIABLE_LIST GRAMMAR_SYMBOL_SPACE
@@ -415,7 +424,11 @@ void warn(const char * warning)
 
 // Print error messge and exit 1.
 void yyerror(const char * text) 
-{ input_reader.error(text); }
+{ 
+  input_reader.error(text); 
+  std::cout << "__HFST_TWOLC_DIE";
+  exit(1);
+}
 
 // Set the variable of this variable initialization and set its values.
 // If its value list contains set names, replace them by the set elements.

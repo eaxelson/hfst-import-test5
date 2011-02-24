@@ -187,6 +187,28 @@ int CommandLine::parse_options(int argc, char** argv)
       
     }
 
+  if (not inputNamed)
+    {
+      if ((argc - optind) == 1)
+	{ infilename = hfst_strdup(argv[optind]); }
+      else if ((argc - optind) > 1)
+	{ 
+	  std::cerr << "no more than one input rule file may be given" 
+		    << std::endl; 
+	  exit(1);
+	}
+    }
+  else 
+    {
+      if ((argc - optind) > 0)
+	{ 
+	  std::cerr << "no more than one input rule file may be given" 
+		    << std::endl; 
+	  exit(1);
+	}
+
+    }
+  
   this->be_verbose = verbose;
   this->be_quiet = silent;
   this->has_input_file = inputNamed;

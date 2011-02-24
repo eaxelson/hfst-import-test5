@@ -44,7 +44,6 @@ void InputReader::error(const std::string &err)
   std::cerr << "on line " << counter << ":" << std::endl;
   std::cerr << buffer << std::endl;
   std::cerr << "Aborted." << std::endl << std::endl;
-  exit(1);
 }
 
 char InputReader::input(void)
