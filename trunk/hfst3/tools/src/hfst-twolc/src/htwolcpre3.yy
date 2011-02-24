@@ -389,8 +389,8 @@ void warn(const char * warning)
 // Print error messge and exit 1.
 void yyerror(const char * text) 
 { 
-  //(void)text;
-  input_reader.error(text);
+  (void)text;
+  //input_reader.error(text);
   exit(1); 
 }
 
