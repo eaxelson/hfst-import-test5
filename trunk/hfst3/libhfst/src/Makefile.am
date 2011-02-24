@@ -21,7 +21,7 @@ lib_LTLIBRARIES = libhfst.la
 
 EXTRA_DIST=coding-style.sh
 
-AM_CXXFLAGS=-Wno-deprecated -Wall -Wextra
+AM_CXXFLAGS=-Wno-deprecated -Wall -Wextra -g
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
 
 # HFST bridge specific stuff
@@ -51,6 +51,10 @@ HFST_HDRS = \
 	HfstTokenizer.h \
 	implementations/ConvertTransducerFormat.h \
 	implementations/HfstTransitionGraph.h \
+	implementations/compose_intersect/ComposeIntersectRulePair.h \
+	implementations/compose_intersect/ComposeIntersectLexicon.h \
+	implementations/compose_intersect/ComposeIntersectRule.h \
+	implementations/compose_intersect/ComposeIntersectFst.h \
 	HfstExceptionDefs.h \
 	HfstExtractStrings.h \
 	HfstFlagDiacritics.h \

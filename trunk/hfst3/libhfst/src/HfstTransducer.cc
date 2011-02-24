@@ -17,6 +17,7 @@
     files in the directory implementations. */
 
 #include "HfstTransducer.h"
+#include "implementations/compose_intersect/ComposeIntersectLexicon.h"
 
 using hfst::implementations::ConversionFunctions;
 
@@ -2195,37 +2196,62 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
     return *this;
   }
 
-#ifdef FOO
   HfstTransducer &HfstTransducer::compose_intersect
-  (HfstGrammar &grammar)
+  (const HfstTransducerVector &v)
   {
-    //HfstTransducer rule_copy(grammar.get_first_rule());
-    //harmonize(rule_copy);
+    if (v.empty())
+      { *this = HfstTransducer(type); }
+    
+    const HfstTransducer &first = *v.begin();
 
-    HfstTransducer rule = grammar.get_first_rule();
-    harmonize(rule);
-
-    switch (type)
-      {
-      case TROPICAL_OPENFST_TYPE:
-        {
-          fst::ArcSort<fst::StdArc,hfst::implementations::StdMyOLabelCompare>
-            (implementation.tropical_ofst,
-             hfst::implementations::StdMyOLabelCompare());
-          fst::StdVectorFst * temp = implementation.tropical_ofst;
-          implementation.tropical_ofst =
-            hfst::implementations::TropicalWeightTransducer::compose_intersect
-            (implementation.tropical_ofst,grammar.grammar);        
-          delete temp;
-          break;
-        }
-      default:
-	HFST_THROW(FunctionNotImplementedException); 
+    // If rule transducers contain word boundaries, add word boundaries to 
+    // the lexicon.
+    std::set<std::string> alphabet = first.get_alphabet();
+    if (alphabet.find("__HFST_TWOLC_.#.") != alphabet.end())
+      { 
+	HfstTokenizer tokenizer;
+	tokenizer.add_multichar_symbol("@#@");
+	tokenizer.add_multichar_symbol("__HFST_TWOLC_.#.");
+	HfstTransducer wb("@#@","__HFST_TWOLC_.#.",tokenizer,type);
+	HfstTransducer wb_copy(wb);
+	wb.concatenate(*this).concatenate(wb_copy).minimize();
+	*this = wb;
       }
 
+    if (v.size() == 1) 
+      {
+	// In case there is only onw rule, compose with that.
+	implementations::ComposeIntersectRule rule(v.at(0));
+	// Create a ComposeIntersectLexicon from *this. 
+	implementations::ComposeIntersectLexicon lexicon(*this);
+	*this = HfstTransducer(lexicon.compose_with_rules(&rule),type);
+      }
+    else
+      {
+	// In case there are many rules, build a ComposeIntersectRulePair 
+	// recursively and compose with that.
+	std::vector<implementations::ComposeIntersectRule*> rule_vector;
+	implementations::ComposeIntersectRule * first_rule = 
+	  new implementations::ComposeIntersectRule(*v.begin());
+	implementations::ComposeIntersectRule * second_rule = 
+	  new implementations::ComposeIntersectRule(*v.begin());
+
+	implementations::ComposeIntersectRulePair * rules = 
+	  new implementations::ComposeIntersectRulePair
+	  (first_rule,second_rule);
+
+	for (HfstTransducerVector::const_iterator it = v.begin() + 2;
+	     it != v.end();
+	     ++it)
+	  { rules = new implementations::ComposeIntersectRulePair
+	      (new implementations::ComposeIntersectRule(*it),rules); }	
+	// Create a ComposeIntersectLexicon from *this. 
+	implementations::ComposeIntersectLexicon lexicon(*this);
+	*this = HfstTransducer(lexicon.compose_with_rules(rules),type);
+	delete rules;
+      }
     return *this;
   }
-#endif
 
   HfstTransducer &HfstTransducer::concatenate
   (const HfstTransducer &another)
