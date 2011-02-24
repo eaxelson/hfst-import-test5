@@ -108,6 +108,61 @@ optimized-lookup format.
 \section{Coding Priciples}
 % EA
 
+Exceptional situations occur sometimes in computer programs when the
+user does something wrong or there is a bug in the code.
+Possible user-originating situations in a finite-state library could
+be for example:
+
+\begin{enumerate} 
+\item The user tries to read a binary transducer from a
+file that contains a text document or does not exist.
+\item A transducer in AT \& T text format has a typo on one line and the 
+line cannot be parsed. 
+\item The user calls a function without checking the preconditions,
+e.g. tries to extract all paths from a cyclic transducer.
+\end{enumerate}
+
+Throwing an exception on such occasions gives the user a possibility
+to catch the exception and recover from the situation. In HFST version
+2.0, exceptional situations were handled by printing to standard error
+a short message and exiting with an error code. In HFST version 3, 
+exceptions are classes that have a figurative name and can contain an 
+error message.
+
+For the above scenarios, HFST will throw the following exceptions:
+
+\begin{enumerate} 
+\item NotTransducerStreamException or StreamCannotBeReadException and
+the name of the file or stream in the error message.
+\item NotValidAttFormatException and the line that could not be parsed
+in the error message.
+\item TransducerIsCyclicException.
+\end{enumerate} 
+
+The user could react to the exceptions in the following ways, for
+example:
+
+\begin{enumerate} 
+\item Check that the file exists and contains transducers and try again
+with the correct file.
+\item Fix the typo in the text format.
+\item Call another function that limits the number of paths extracted
+from the transducer.
+\end{enumerate} 
+
+Exceptions are also used internally in HFST code for reporting to the 
+calling function that something unexpected happened. The calling
+function can handle the situation or inform the user of it. 
+So the execution of the program does not need to stop or lead to an
+erraneous result or even cause later a segmentation fault.
+
+An HfstFatalException is thrown when it is supposed that the user
+cannot handle that exception. The user should instead report the error
+to the developers of HFST and in which circumstances it happened, because that
+is essentially a bug that must be fixed. Sometimes asserts are also
+used for internal checks. When an assertion fails the user should similarly
+report the assert message and from which file and which line it happened.
+
 
 \section{Data Format}
 % EA
