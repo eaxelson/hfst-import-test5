@@ -98,7 +98,7 @@
 %left  <symbol_number> CONTAINMENT CONTAINMENT_ONCE TERM_COMPLEMENT COMPLEMENT 
 %right <symbol_number> POWER
 
- /* "[", "]", "(" and ")". */
+ /* "[", "]", "(", ")". */
 %right <symbol_number> RIGHT_SQUARE_BRACKET RIGHT_PARENTHESIS 
 %left  <symbol_number> LEFT_SQUARE_BRACKET LEFT_PARENTHESIS
 

@@ -32,8 +32,8 @@
   #include "HfstTwolcDefs.h"
   extern HandyDeque<std::string> symbol_queue;
 
-  // This tells Bison that the Rules section commenced.
-  bool rules_start = false;
+  // This tells Bison that regular expression sections commenced.
+  bool regexp_start = false;
 
   // Tells whether we are in the where-part of a rule or not.
   bool where_seen = false;
@@ -45,57 +45,50 @@
 
 %}
 
-RESERVED_SYMBOL0	   [*+/\\=\"$?|&^\-\{\[\(:;_!%\r\t\n~ ]
-RESERVED_EXC_COL0   [*+/\\=\"$?|&^\-\{\[\(:;_!%\r\t\n~ ]{-}[:]
-RESERVED_EXC_PERC_AND_Q_MARK0  [*+/\\=\"$?|&^\-\{\[\(:;_!%\r\t\n~ ]{-}[%?]
-FREE_SYMBOL0	   [^*+/\\=\"$?|&^\-\{\[\(:;_!%\r\t\n~ ]
-
 RESERVED_SYMBOL	   [*+/\\=\"$?|&^\-\{\}\[\]\(\):;_!%\r\t\n~ ]
 RESERVED_EXC_COL   [*+/\\=\"$?|&^\-\{\}\[\]\(\):;_!%\r\t\n~ ]{-}[:]
 RESERVED_EXC_PERC_AND_Q_MARK  [*+/\\=\"$?|&^\-\{\}\[\]\(\):;_!%\r\t\n~ ]{-}[%?]
 FREE_SYMBOL	   [^*+/\\=\"$?|&^\-\{\}\[\]\(\):;_!%\r\t\n~ ]
 
-%s IN_BRACKET
-
 %%
 
-Alphabet/{RESERVED_SYMBOL0} { 
+Alphabet/{RESERVED_SYMBOL} { 
   // Alphabet declaration.
   symbol_queue.push_back("__HFST_TWOLC_Alphabet");
   reduce_queue();
   return ALPHABET_DECLARATION; 
 }
-Diacritics/{RESERVED_SYMBOL0} {
+Diacritics/{RESERVED_SYMBOL} {
   // Diacritics declaration.
   symbol_queue.push_back("__HFST_TWOLC_Diacritics"); 
   reduce_queue();
   return DIACRITICS_DECLARATION; 
 } 
-Rule-variables/{RESERVED_SYMBOL0} { 
+Rule-variables/{RESERVED_SYMBOL} { 
   // Rule-variables declaration, is not necessary,
   // but is supported for backwards compatibility.
   return VARIABLE_DECLARATION; 
 }
-Definitions/{RESERVED_SYMBOL0} {
+Definitions/{RESERVED_SYMBOL} {
   // Definitions declaration.
   symbol_queue.push_back("__HFST_TWOLC_Definitions"); 
   reduce_queue();
+  regexp_start = true;
   return DEFINITION_DECLARATION; 
 }
-Sets/{RESERVED_SYMBOL0} { 
+Sets/{RESERVED_SYMBOL} { 
   // Sets declaration.
   symbol_queue.push_back("__HFST_TWOLC_Sets");
   reduce_queue();
   return SETS_DECLARATION; 
 }
-Rules/{RESERVED_SYMBOL0} {
+Rules/{RESERVED_SYMBOL} {
   // Rules declaration.
   symbol_queue.push_back("__HFST_TWOLC_Rules"); 
   reduce_queue();
-  rules_start = true;
   return RULES_DECLARATION; 
 }
-where/{RESERVED_SYMBOL0} {
+where/{RESERVED_SYMBOL} {
   // The symbols until AND occur in rules with variables.
   // When the symbols are encountered, nothing is printed,
   // since the purpose is to reduce rules with variables
@@ -103,11 +96,11 @@ where/{RESERVED_SYMBOL0} {
   where_seen = true;                     
   return WHERE; 
 }
-matched/{RESERVED_SYMBOL0} { return MATCHED_MATCHER; }
-mixed/{RESERVED_SYMBOL0} { return MIXED_MATCHER; }
-freely/{RESERVED_SYMBOL0} { return FREELY_MATCHER; }
-in/{RESERVED_SYMBOL0} { return IN; }
-[a]nd/{RESERVED_SYMBOL0} { return AND; }
+matched/{RESERVED_SYMBOL} { return MATCHED_MATCHER; }
+mixed/{RESERVED_SYMBOL} { return MIXED_MATCHER; }
+freely/{RESERVED_SYMBOL} { return FREELY_MATCHER; }
+in/{RESERVED_SYMBOL} { return IN; }
+[a]nd/{RESERVED_SYMBOL} { return AND; }
 
 [!].* { /* comments: ignore */ }
 [ \t\r] { /* spaces and tabs: ignore */ }
@@ -172,21 +165,14 @@ in/{RESERVED_SYMBOL0} { return IN; }
   return SYMBOL; 
 }
 [?]/[:] {
-  if (not rules_start)
+  if (not regexp_start)
     { return QUESTION_MARK; }
   // Any symbol. 
   symbol_queue.push_back("__HFST_TWOLC_?");
   return SYMBOL; 
 }
-<INITIAL>[?]/{RESERVED_EXC_COL0} {
-  if (not rules_start)
-    { return QUESTION_MARK; }
-  // Any symbol. 
-  symbol_queue.push_back("__HFST_TWOLC_?");
-  return SYMBOL_SPACE; 
-}
-<IN_BRACKET>[?]/{RESERVED_EXC_COL} {
-  if (not rules_start)
+[?]/{RESERVED_EXC_COL} {
+  if (not regexp_start)
     { return QUESTION_MARK; }
   // Any symbol. 
   symbol_queue.push_back("__HFST_TWOLC_?");
@@ -197,12 +183,7 @@ in/{RESERVED_SYMBOL0} { return IN; }
   symbol_queue.push_back("__HFST_TWOLC_0");
   return SYMBOL; 
 }
-<INITIAL>[0]/{RESERVED_EXC_COL0} { 
-  // Zero symbol.
-  symbol_queue.push_back("__HFST_TWOLC_0");
-  return SYMBOL_SPACE; 
-}
-<IN_BRACKET>[0]/{RESERVED_EXC_COL} { 
+[0]/{RESERVED_EXC_COL} { 
   // Zero symbol.
   symbol_queue.push_back("__HFST_TWOLC_0");
   return SYMBOL_SPACE; 
@@ -231,22 +212,12 @@ in/{RESERVED_SYMBOL0} { return IN; }
   reduce_queue();
   return DIFFERENCE; 
 }
-<INITIAL>[0-9],[0-9]+/{RESERVED_EXC_COL0} {
+[0-9],[0-9]+/{RESERVED_EXC_COL} {
   // Number. 
   symbol_queue.push_back(+yytext);
   return NUMBER_SPACE; 
 }
-<IN_BRACKET>[0-9],[0-9]+/{RESERVED_EXC_COL} {
-  // Number. 
-  symbol_queue.push_back(+yytext);
-  return NUMBER_SPACE; 
-}
-<INITIAL>[0-9]+/{RESERVED_EXC_COL0} {
-  // Number. 
-  symbol_queue.push_back(yytext);
-  return NUMBER_SPACE; 
-}
-<IN_BRACKET>[0-9]+/{RESERVED_EXC_COL} {
+[0-9]+/{RESERVED_EXC_COL} {
   // Number. 
   symbol_queue.push_back(yytext);
   return NUMBER_SPACE; 
@@ -256,12 +227,7 @@ in/{RESERVED_SYMBOL0} { return IN; }
   symbol_queue.push_back(yytext);
   return NUMBER; 
 }
-<INITIAL>[.][#][.]/{RESERVED_SYMBOL0} {
-  // Word boundary.
-  symbol_queue.push_back("__HFST_TWOLC_.#."); 
-  return SYMBOL_SPACE; 
-}
-<IN_BRACKET>[.][#][.]/{RESERVED_SYMBOL} {
+[.][#][.]/{RESERVED_SYMBOL} {
   // Word boundary.
   symbol_queue.push_back("__HFST_TWOLC_.#."); 
   return SYMBOL_SPACE; 
@@ -270,29 +236,25 @@ in/{RESERVED_SYMBOL0} { return IN; }
   // Beginning of a bracketed regex.
   symbol_queue.push_back("__HFST_TWOLC_["); 
   reduce_queue();
-  BEGIN IN_BRACKET;
   return LEFT_SQUARE_BRACKET; 
 }
-<IN_BRACKET>\] {
+\] {
   // End of a bracketed regex.
   symbol_queue.push_back("__HFST_TWOLC_]"); 
   reduce_queue();
-  BEGIN 0;
   return RIGHT_SQUARE_BRACKET; 
 }
 \{ {
   // Beginning of a bracketed regex.
   symbol_queue.push_back("__HFST_TWOLC_["); 
   reduce_queue();
-  BEGIN IN_BRACKET;
-  return LEFT_SQUARE_BRACKET; 
+  return LEFT_CURLY_BRACKET; 
 }
-<IN_BRACKET>\} {
+\} {
   // End of a bracketed regex.
   symbol_queue.push_back("__HFST_TWOLC_]"); 
   reduce_queue();
-  BEGIN 0;
-  return RIGHT_SQUARE_BRACKET; 
+  return RIGHT_CURLY_BRACKET; 
 }
 \( {
   // Beginning of an optional bracketed regex.
@@ -301,10 +263,9 @@ in/{RESERVED_SYMBOL0} { return IN; }
       symbol_queue.push_back("__HFST_TWOLC_("); 
       reduce_queue();
     }
-  BEGIN IN_BRACKET;
   return LEFT_PARENTHESIS; 
 }
-<IN_BRACKET>\) {
+\) {
   // End of an optional bracketed regex.
   if (not where_seen) 
     {
@@ -338,13 +299,7 @@ in/{RESERVED_SYMBOL0} { return IN; }
   reduce_queue();
   return LEFT_RIGHT_ARROW; 
 }
-<INITIAL>[:]/{RESERVED_EXC_PERC_AND_Q_MARK0} {
-  // Pair separator in expressions like "[a:]".
-  symbol_queue.push_back("__HFST_TWOLC_: "); 
-  symbol_queue.push_back("__HFST_TWOLC_?"); 
-  return COLON_SPACE; 
-}
-<IN_BRACKET>[:]/{RESERVED_EXC_PERC_AND_Q_MARK} {
+[:]/{RESERVED_EXC_PERC_AND_Q_MARK} {
   // Pair separator in expressions like "[a:]".
   symbol_queue.push_back("__HFST_TWOLC_: "); 
   symbol_queue.push_back("__HFST_TWOLC_?"); 
@@ -378,29 +333,14 @@ in/{RESERVED_SYMBOL0} { return IN; }
   reduce_queue();
   return CENTER_MARKER; 
 }
-<INITIAL>(([%]({RESERVED_SYMBOL0}|{FREE_SYMBOL0}))|{FREE_SYMBOL0})+/[:] { 
+(([%]({RESERVED_SYMBOL}|{FREE_SYMBOL}))|{FREE_SYMBOL})+/[:] { 
   // A symbol which is the left side of a pair e.g. "a" in "a:b".
   symbol_queue.push_back
     (yytext);
   return SYMBOL; 
 }
 
-<IN_BRACKET>(([%]({RESERVED_SYMBOL}|{FREE_SYMBOL}))|{FREE_SYMBOL})+/[:] { 
-  // A symbol which is the left side of a pair e.g. "a" in "a:b".
-  symbol_queue.push_back
-    (yytext);
-  return SYMBOL; 
-}
-
-<INITIAL>(([%]({RESERVED_SYMBOL0}|{FREE_SYMBOL0}))|{FREE_SYMBOL0})+/{RESERVED_EXC_COL0} { 
-  // A symbol which is not the left side of a pair e.g. "b" in "a:b" or "[b]".
-  std::string symbol = 
-    remove_white_space(replace_substr(yytext,"\n","__HFST_TWOLC_\\n"));
-  symbol_queue.push_back(symbol);
-  return SYMBOL_SPACE; 
- }
-
-<IN_BRACKET>(([%]({RESERVED_SYMBOL}|{FREE_SYMBOL}))|{FREE_SYMBOL})+/{RESERVED_EXC_COL} { 
+(([%]({RESERVED_SYMBOL}|{FREE_SYMBOL}))|{FREE_SYMBOL})+/{RESERVED_EXC_COL} { 
   // A symbol which is not the left side of a pair e.g. "b" in "a:b" or "[b]".
   std::string symbol = 
     remove_white_space(replace_substr(yytext,"\n","__HFST_TWOLC_\\n"));
