@@ -193,9 +193,9 @@ states\footnote{\url{http://hfst.sourceforge.net/hfst3/index.html}}.
  
 We have chosen to implement \texttt{HfstTransitionGraph} for two
 reasons. Firstly, it serves as an intermediate transducer format in
-conversions, thus reducing the number of conversion functions from 2 x
-N to N x (N - 1), where N is the number of different transducer
-backend formats. Secondly, it is easy to implement functions for 
+conversions, thus reducing the number of conversion functions from
+$2 \times N$ to $N \times (N - 1)$, where N is the number of different
+transducer backend formats. Secondly, it is easy to implement functions for 
 \texttt{HfstTransitionGraph} that allow the user to construct transducers from 
 scratch and iterate through their states and transitions. Implementing
 such features for some transducer libraries (e.g. SFST and foma) can
@@ -329,7 +329,7 @@ pairwise intersection of the rule transducers. The lexicon can be
 composed with this intersection using a standard composition
 algorithm.
 
-\subsubsection{Previous implementation}
+\subsubsection{Previous implementation.}
 
 The implementation of intersecting composition in hfst2 can be
 characterized as the composition of the lexicon transducer $L$ with a
@@ -368,7 +368,7 @@ would still be suboptimal, since a new state configuration always
 requires re-examining the transitions in all rules. This is true even
 though only one rule state would differ from a previous configuration.
 
-\subsubsection{Current implementation}
+\subsubsection{Current implementation.}
 
 Phonological two-level rules usually track sound changes in fairly
 specific contexts. This means that when composing two-level rule
@@ -628,7 +628,10 @@ License~\cite{lgpl-license}.
 
 Provision was later made for both unweighted and weighted (with log weights)
 transducers, and flag diacritics~\cite{beesley/2003} (also see section
-\ref{flag-diacritics}). Demonstrations of the lookup facility were also
+\ref{flag-diacritics}).
+
+\subsubsection{Other implementations and applications.}
+Demonstrations of the lookup facility were also
 produced in Java and Python, two popular and accessible programming languages,
 in the hope of facilitating and spreading use of the format. This effort
 bore fruit in the incorporation of the Java code in a project for anonymizing
@@ -643,6 +646,7 @@ was put to use in various text stream processing scripts (eg.
 \verb+-analyze+ for analysis, \verb+-generate+ for generation and
 \verb+-hyphenate+ for hyphenation).
 
+\subsubsection{HFST3.}
 Originally compilation to the format was only possible from SFST and OpenFst
 formats, and as uses and applications proliferated, it became desirable to
 provide some API access to optimized-lookup in the HFST library. In HFST3
