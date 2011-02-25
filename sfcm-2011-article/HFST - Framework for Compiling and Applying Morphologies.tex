@@ -499,7 +499,7 @@ intermediate results out of the system.
 
 \section{Optimized Lookup}\label{optimized-lookup}
 % SH
-``Optimized-lookup`` is a HFST-specific binary format for finite-state
+\emph{Optimized-lookup} is a HFST-specific binary format for finite-state
 transducers providing fast lookup. First documented in \cite{silfverberg/2009},
 its implementation has evolved somewhat to meet the requirements of specific
 applications. The format has also found new application in on-the-fly
@@ -507,6 +507,17 @@ operations in transducers, eg. composing lookup for spell-checking and
 correction (see section \ref{spellcheck}).
 
 \subsection{Implementation and Integration in HFST3}
+Optimized-lookup was supported in HFST2 by the standalone utilities
+\verb+hfst-lookup-optimize+ (compilation to the format) and
+\verb+hfst-optimized-lookup+ (non-tokenizing lookup). This was partly
+in service of the goal to give optimized-lookup the widest possible range
+of uses; \verb+hfst-optimized-lookup+ was released under the
+Apache License~\cite{apache-license}, whereas HFST2 proper was released
+under the potentially more restrictive GNU Lesser Public
+License~\cite{lgpl-license}.
+
+Provision was later made for both unweighted and weighted (with log weights)
+transducers, and 
 
 \subsection{Index Table Packing}
 
