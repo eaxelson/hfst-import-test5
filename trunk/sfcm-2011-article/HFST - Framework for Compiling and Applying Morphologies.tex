@@ -430,32 +430,32 @@ order to start using HFST tools for their Xerox-style language description
 needs.
 
 The actual implementation of the xfst scripting language makes heavy
-use of the new foma backend that already included good coverage of the
-xfst support. The only additions made in HFST are once required to support
-interoperability between other back ends and HFST internals, specifically
+use of the new foma backend, which already included good coverage xfst
+features. The only additions in HFST are ones required for
+interoperability between other backends and HFST internals. Particular
 care was taken not to duplicate the work already present in foma and its
-tools. In similar effect the HFST's own lexc parsing engine was mainly
+tools. Similarly HFST's lexc parsing engine was
 replaced by the faster parser in foma, again with HFST interoperability
 tweaks bridged in.
 
 For examples of specific previously implemented Xerox style finite-state
 language descriptions we provide a wiki-based web page\footnote{\url{https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstExamples}}. Another repository of
-such language descriptions is located at university of Tromsø's subversion
+such language descriptions is located at the University of Tromsø's subversion
 repository\footnote{\url{http://divvun.no/doc/infra/anonymous-svn.html}}.
-Of these at least variants of Sámi and Greenlandic are regularly
+Of these, variants of Sámi and Greenlandic are regularly
 used to regress and stress test HFST tools.
 
-For specific functionality, the Xerox tools have lots of specific special
-processing of finite-state automata, that is not part of standard finite-state
-algorithms. Primary example of this is handling of special symbols such as
-flag diacritics~\cite{beesley/1998}, which would require support from underlying
-libraries for many finite-state operations to work as they do in Xerox tools
-when using \texttt{flag-is-epsilon} and \texttt{obey-flags} settings. In
-HFST tools we have provided support for same options and provided fall-back
-processing where it is possible to have backend libraries support required
-operations. The fallback commonly means converting the end library
-automata to HFST's internal format, calculating the operation out internally
-and convert back to end libraries format. 
+For specific functionality, the Xerox tools perform various kinds of special
+processing of finite-state automata beyond the range of standard finite-state
+algorithms. A prominent example of this is the handling of special symbols such
+as flag diacritics~\cite{beesley/1998}, which would require support from
+underlying libraries for many finite-state operations to work as they do in
+Xerox tools when using \texttt{flag-is-epsilon} and \texttt{obey-flags}
+settings. HFST tools provide support for the same options, and
+fall-back processing where backend libraries lack support for the
+required operations. Fallback support commonly involves converting the end
+library automata to HFST's internal format, calculating the operation
+internally and converting back to the end libraries' format. 
 
 \section{Compilation Performance}
 % EA
