@@ -647,7 +647,7 @@ HFST3-supported tools.
 
 \subsection{Index Table Compaction}
 The critical idea behind optimized-lookup is Liang compaction, as described in
-\ref{silfverberg/2009}. It allows for the representation of a transducer as
+\cite{silfverberg/2009}. It allows for the representation of a transducer as
 a lookup table, with entries for each symbol in the alphabet for each state
 in the transducer, without growing to the prohibitive sizes such a design
 would imply (a multiple of the number of states and the number of symbols for
@@ -667,12 +667,61 @@ R_i = \displaystyle\sum\limits_{p, q} s_p(q) [I_p + q = i]
 entries $0$ or $1$. An optimally compacted index table corresponds to the
 shortest result array $R$.
 
+A simple strategy is to iterate through the arrays in some order, assigning
+the lowest possible starting index to each one. For transducers of an
+appreciable size this process can become slow, as the result array
+will typically have some zeros in practically all its regions, so a large
+number of possibilities have to be checked. This problem can be mitigated by
+applying a head filter, disregarding the largest region of the result array
+$R(1 \ldots r)$ with that region having a density of $1$ entries greater than
+some predifined limit. A limit of $1.0$ corresponds to having no filter at all;
+in practice limits in the region $0.8 \ldots 0.9$ have proved reasonable.
+
+For the order in which the arrays are traversed, ordering the states from
+greatest density of $1$ entries to lowest and simply ordering them in
+numerical order have been tried. These approaches don't appear to produce
+dramatically different results\footnote{Of course, in practice these orderings
+will often be similar.}; also in theory, either approach could
+produce better results than the other.
+
+\begin{table}[htb!]
+\begin{center}
+\begin{tabular}{c|r}
+Head filter limit  & Number of index entries \\
+\hline
+(No compaction) & 4,541,879 \\
+\hline
+0.0 & 1,107,321 \\
+\hline
+0.1 & 408,843 \\
+\hline
+0.3 & 206,152 \\
+\hline
+0.5 & 170,789 \\
+\hline
+0.7 & 155,703 \\
+\hline
+0.8 & 148,740 \\
+\hline
+0.9 & 140,795 \\
+\hline
+1.0 & 135,285 \\
+\end{tabular}
+\vskip.2cm
+\caption{Index table sizes for various values of the head filter limit as applied to the Morphalou project's French morphology and released on HFST's site on 2010-04-14.}
+\end{center}
+\end{table}
+
+Work is ongoing in finding the best practical filter strategies, filter
+limits and traversal orders, and potentially different compaction strategies.
+
 A representation of the index table with no compaction would require
-$N \times L$ entries. In the case of an analyzing transducer from OmorFi
-\footnote{We used the binary released on HFST's site on 2010-10-14}, a
-Finnish finite-state morphology, this is $203851 \times 155 = 31596905$.
-
-
+$N \times L$ entries. For the sake of comparison, in the case of an analyzing
+transducer from OmorFi \footnote{We used the binary released on HFST's site on
+2010-10-14.}, a Finnish finite-state morphology, this is
+$203851 \times 155 = 31,596,905$ and would produce a binary of almost 200
+megabytes, whereas the compacted index table has 364,980 entries, or about
+one percent of the uncompacted form, for a binary of 7 megabytes.
 
 \subsection{Flag Diacritics and Related Optimization Tricks}\label{flag-diacritics}
 
