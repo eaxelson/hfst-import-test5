@@ -13,11 +13,14 @@
 %
 \begin{document}
 %
-\title{HFST - Framework for Compiling and Applying Morphologies}
+\title{HFST---Framework for Compiling and Applying Morphologies}
 %
-\author{Author Names\inst{}}
+\author{Krister Lind\'{e}n \and Erik Axelson \and Sam Hardwick \and Tommi A Pirinen \and Miikka Silfverberg}
 
-\institute{University of Helsinki}
+\institute{University of Helsinki\\
+Department of Modern Languages\\
+Unioninkatu 40 A\\
+FI-00014 Helsingin yliopisto}
 
 \maketitle
 
@@ -308,6 +311,23 @@ handling full line of Xerox tools for morphology, which for most intents and
 purposes means that end users will require no other work than changing program
 names to start using HFST tools for their Xerox-style language description.
 
+
+The actual implementation of xfst scripting language support makes heavy
+use of the new foma backend that already included good coverage of the
+xfst support. The only additions made in HFST are once required to support
+interoperability between other back ends and HFST internals, specifically
+care was taken not to duplicate the work already present in foma and its
+tools. In similar effect the HFST's own lexc parsing engine was mainly
+replaced by the faster parser in foma, again with HFST interoperability
+tweaks bridged in.
+
+For examples of specific previously implemented Xerox style finite-state
+language descriptions we provide a wiki-based web page\footnote{\url{https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstExamples}}. Another repository of
+such language descriptions is located at university of Tromsø's subversion
+repository\footnote{\url{http://divvun.no/doc/infra/anonymous-svn.html}}.
+Of these at least variants of Sámi and Greenlandic are regularly
+used to regress and stress test HFST tools.
+
 For specific functionality, the Xerox tools have lots of specific special
 processing of finite-state automata, that is not part of standard finite-state
 algorithms. Primary example of this is handling of special symbols such as
@@ -316,7 +336,9 @@ libraries for many finite-state operations to work as they do in Xerox tools
 when using \texttt{flag-is-epsilon} and \texttt{obey-flags} settings. In
 HFST tools we have provided support for same options and provided fall-back
 processing where it is possible to have backend libraries support required
-operations. 
+operations. The fallback commonly means converting the end library
+automata to HFST's internal format, calculating the operation out internally
+and convert back to end libraries format. 
 
 \section{Compilation Performance}
 % EA
@@ -324,7 +346,7 @@ operations.
 The performance of HFST has improved from version 2.0 to 3.0. 
 We compiled two finite-state morphologies in SFST programming language format
 with HFST versions 2.0 and 3.0. 
-The morphologies were OMorFi (ref.) for Finnish and Morphisto (ref.) for German.
+The morphologies were OMorFi~\cite{pirinen/2008} for Finnish and Morphisto (ref.) for German.
 In table~\ref{tab:compilation_times} are the compilation times 
 for both morphologies with 
 different backend implementations with both versions of HFST. 
@@ -349,8 +371,9 @@ Note that the foma implementation was not available in version 2.0.
 
 We can clearly see that the compilation time has improved dramatically
 for the SFST implementation.
-This is mainly because the new version of SFST, 1.4.2, uses Hopcroft's 
-minimization algorithm instead of Brzozowski's. 
+This is mainly because the new version of SFST, 1.4.2, uses Hopcroft's
+minimization algorithm~\cite{hopcroft/1971} instead of 
+Brzozowski's~\cite{brzozowski/1964}. 
 We noticed how the minimization algorithm affects performance
 already when we were testing HFST version 2.0; 
 OpenFst was clearly faster because it uses Hopcroft's algorithm. 
@@ -383,7 +406,31 @@ factor in the compilation times of morphologies.
 After initial release of HFST platform it has been used in several end-product
 application software. The two most prominent uses are as a part of rule-based
 machine translation platform in apertium\footnote{\url{http://apertium.sf.net}}
-and spell-checking library voikko\footnote{\url{http://voikko.sf.net}}.
+and spell-checking library voikko\footnote{\url{http://voikko.sf.net}}. Both of
+these linguistic applications take a huge benefit from the fact that there
+were available previous language descriptions written in Xerox finite-state
+morphology formalism and integrating HFST to these applications gave
+developers of those language descriptions direct conversion path to two
+application types that had not been available in the Xerox framework. Since
+both applications as well as HFST framework are free and libre open source
+software, the integration of the existing language descriptions to the
+projects was easily possible.
+
+One of the most pressing reason for extending finite-state support to these
+applications is the lack of language support and lack of even theoeretical
+possibility of language support for morphologically more complex languages
+in those application fields. For example in field of spell-checkers the
+theoretical bounds of hunspell---de facto standard in open source market---
+is mere 4 affixes. For polyXXXXXX languages like Greenlandic, it simply is
+not possible to precompute enough combinations out, like has been done with
+e.g. Hungarian. The Xerox style finite-state morphology demonstrably supports
+at least Hungarian and a wide variety of other morphologically varying
+languages~\cite{beesley/2003}.
+
+Another rationale for extending finite-state methods to these application areas
+is that the efficiency and expressiveness of finite-state automata has been
+well-known and researched e.g. in \cite{aho/2007}, which makes it a good choice
+for various text-processing tasks.
 
 \subsection{Apertium interoperability---corpus processing tools and I/O formats}
 
@@ -396,7 +443,7 @@ the dictionary data and support for apertium I/O formats. The total
 contribution of this corpus processing functionality is contained in tool
 called \texttt{hfst-proc} included in HFST toolkit. The name originates from
 the interoperability with other toolkits' corpora processing tools, specifically
-\texttt{cg-proc} from vislcg3\footnote{\url{http://visl.sdk.edu.dk}} and
+\texttt{cg-proc} from vislcg3\footnote{\url{http://beta.visl.sdu.dk/cg3.html}} and
 \texttt{lt-proc} from apertium itself.
 
 For tokenization the FST-based dictionaries are useful, since the process of
@@ -407,7 +454,12 @@ topic~\cite{garrido-alenda/2002}. The basic program logic of automata traversal
 for longest matches is trivially extended here by processing of flag diacritics
 and weights.
 
-The I/O format handling is \ldots
+The I/O format requirements for apertium platform are based on the needs to
+translate existing documents containing all kinds of markup and rich text
+formats, such as html for web pages or mediawiki codes from wikipedia. To
+achieve this apertium uses text encoding and decoding mechanisms and
+interchange format called apertium stream format, whose input and output
+was implemented in hfst's corpus processing tools.
 
 \subsection{Voikko and HFST based spell-checker formulation}
 
@@ -418,10 +470,24 @@ spell-checkers for OpenOffice.org/LibreOffice, the GNOME desktop (via
 enchant), Mac OS X (via SpellService) and Mozilla application suite.
 
 The finite-state formulation of spell-checking system was developed based on
-previous research~\cite{oflazer/1996,agata/2002,pirinen/2010/lrec}. Furthermore
-we have optimised the application of error models to language models using
-specialised form of parallel composition to apply the filter with standard
-composition operation on the fly. 
+previous research. In this research it has been shown that a finite-state based
+natural language description is usable as spell-checker with specialized fuzzy
+traversal algorithms~\cite{oflazer/1996,hulden/2009} or by using a special
+(weighted) two-tape automaton as error model and regular finite-state
+composition to map misspelled words to their possible
+corrections\cite{agata/2002,pirinen/2010/lrec}.
+ 
+The basic finding here is that typical finite-state language descriptions are
+usable as spell-checking dictionaries with minor to no modifications.
+Furthermore it has been shown that pre-existing non-finite-state spell-checking
+dictionaries from hunspell and myspell can be converted to finite-state
+form~\cite{pirinen/2010/cla} providing full backwards compatibility for
+traditional spell-checking systems.
+
+Furthermore we have optimised the application of error models by composition
+using parallel composition with both the dictionary and the misspelled word in
+one operation. This reduces the weight and time requirements by leaving the
+intermediate results out of the system.
 
 \section{Optimized Lookup}\label{optimized-lookup}
 % SH
