@@ -78,15 +78,14 @@ optimized-lookup format.
 \section{Coding Principles}
 % EA
 
-Exceptional situations occur sometimes in computer programs when the
-user does something wrong or there is a bug in the code.
-Possible user-originating situations in a finite-state library could
-be for example:
+Exceptional situations occur in computer programs when the
+user does something unexpected or there is a bug in the code.
+Examples of user-originating situations in a finite-state library include:
 
 \begin{enumerate} 
 \item The user tries to read a binary transducer from a
 file that contains a text document or does not exist.
-\item A transducer in AT \& T text format has a typo on one line and the 
+\item A transducer in AT\&T text format has a typo on one line and the 
 line cannot be parsed. 
 \item The user calls a function without checking the preconditions,
 e.g. tries to extract all paths from a cyclic transducer.
@@ -94,23 +93,23 @@ e.g. tries to extract all paths from a cyclic transducer.
 
 Throwing an exception on such occasions gives the user a possibility
 to catch the exception and recover from the situation. In HFST version
-2.0, exceptional situations were handled by printing to standard error
-a short message and exiting with an error code. In HFST version 3, 
-exceptions are classes that have a figurative name and can contain an 
-error message.
+2, exceptional situations were handled by printing a short message
+to standard error stream and exiting with an error code. In HFST version 3, 
+exceptions are classes that have a figurative name and contain an 
+optional error message.
 
 For the above scenarios, HFST will throw the following exceptions:
 
 \begin{enumerate} 
-\item NotTransducerStreamException or StreamCannotBeReadException and
-the name of the file or stream in the error message.
-\item NotValidAttFormatException and the line that could not be parsed
-in the error message.
-\item TransducerIsCyclicException.
+\item \texttt{NotTransducerStreamException} or 
+\texttt{StreamCannotBeReadException} and, in the error message,
+the name of the file or stream.
+\item \texttt{NotValidAttFormatException} and, in the error message, 
+the line that could not be parsed.
+\item \texttt{TransducerIsCyclicException}.
 \end{enumerate} 
 
-The user could react to the exceptions in the following ways, for
-example:
+The user could react to the exceptions in the following ways:
 
 \begin{enumerate} 
 \item Check that the file exists and contains transducers and try again
@@ -120,18 +119,19 @@ with the correct file.
 from the transducer.
 \end{enumerate} 
 
-Exceptions are also used internally in HFST code for reporting to the 
+Exceptions are also used internally in the HFST library for reporting to a 
 calling function that something unexpected happened. The calling
-function can handle the situation or inform the user of it. 
+function can handle the situation itself or inform the user and suggest
+what he/she should do. 
 So the execution of the program does not need to stop or lead to an
-erroneous result or even cause later a segmentation fault.
+incorrect result or even cause a segmentation fault at a later stage.
 
-An HfstFatalException is thrown when it is supposed that the user
-cannot handle that exception. The user should instead report the error
-to the developers of HFST and in which circumstances it happened, because that
-is essentially a bug that must be fixed. Sometimes asserts are also
+An \texttt{HfstFatalException} is thrown when it is supposed that the user
+cannot handle an exception. The user should instead report the exception
+and in which circumstances it happened to HFST developers, because the exception
+is essentially a bug that must be fixed. Sometimes assertions are also
 used for internal checks. When an assertion fails the user should similarly
-report the assert message and from which file and which line it happened.
+report the failure as a bug.
 
 
 \section{Data Format}
@@ -167,7 +167,6 @@ Additional attributes can follow after these obligatory ones.
 For instance, we could include information on the minimality or
 cyclicity of a transducer even if the backend implementation did not
 store these properties in its binary format (e.g. SFST). 
-For more information on the header format, see (ref. to HfstTransducerHeader).
 
 The new header format makes it easier to react to unexpected
 situations and inform the user of them. When we start to read an HFST
@@ -187,46 +186,52 @@ before or after reading it.
 
 In HFST version 3.0, the conversion between different backend formats 
 (SFST, foma, OpenFst with tropical and logarithmic semiring) is
-carried out through HFST's own transducer format, HfstTransitionGraph, 
+carried out through HFST's own transducer format, \texttt{HfstTransitionGraph}, 
 a simple transition graph datatype that consists of states (unsigned
 integers) and transitions between those 
 states\footnote{\url{http://hfst.sourceforge.net/hfst3/index.html}}.
  
-We have chosen to implement HfstTransitionGraph for two
+We have chosen to implement \texttt{HfstTransitionGraph} for two
 reasons. Firstly, it serves as an intermediate transducer format in
 conversions, thus reducing the number of conversion functions from 2 x
 N to N x (N - 1), where N is the number of different transducer
 backend formats. Secondly, it is easy to implement functions for 
-HfstTransitionGraph that allow the user to construct transducers from 
+\texttt{HfstTransitionGraph} that allow the user to construct transducers from 
 scratch and iterate through their states and transitions. Implementing
 such features for some transducer libraries (e.g. SFST and foma) can
-be difficult because they are designed to be used on a higher level of 
+be difficult because the libraries are designed to be used on a higher level of 
 abstraction. Accordingly, the functions that operate on states and 
 transitions are often declared protected and not necessarily well
 documented.
 
-HfstTransitionGraph is a class template with template parameters T and
-W. T defines the type of transition data that a transition uses and W
+\texttt{HfstTransitionGraph} is a class template with template parameters 
+\texttt{T} and \texttt{W}. \texttt{T} defines the type of transition data
+that a transition uses and \texttt{W}
 the weight type that is used in transitions and final states. 
-HfstTransitionGraph contains two maps. One maps each state to a set of
-that state's transitions (that are of type class HfstTransition\textless class
-T\textgreater). The other maps each final state to its final weight 
-(that is of type class W). Class T must use the weight type W. 
-A state's transition (class HfstTransition\textless class T\textgreater) 
-contains a target state and a transition data field (that is of type class T).
+\texttt{HfstTransitionGraph} contains two maps. One maps each state to a set of
+that state's transitions (that are of type 
+\texttt{class HfstTransition\textless class T\textgreater}). 
+The other maps each final state to its final weight 
+(that is of type class \texttt{W}). Class \texttt{T} must use
+the weight type \texttt{W}. 
+A state's transition 
+(\texttt{class HfstTransition\textless class T\textgreater}) 
+contains a target state and a transition data field (that is of type class 
+\texttt{T}).
 
-Actually, HfstTransitionGraph is not a transducer but a more
+Actually, \texttt{HfstTransitionGraph} is not a transducer but a more
 generalized transition graph that can contain many kinds of data in
 its transitions. Currently, the HFST library offers the specializations 
-HfstBasicTransducer and HfstBasicTransition for HfstTransitionGraph
-and HfstTransition. These specializations are designed for weighted 
-transducers. The weight class W is a float and the transition data
-class T contains an input string, an output string and a weight of
-type float. The specializations HfstBasicTransducer and
-HfstBasicTransition are used when converting between different
+\texttt{HfstBasicTransducer} and \texttt{HfstBasicTransition} 
+for \texttt{HfstTransitionGraph} and \texttt{HfstTransition}.
+These specializations are designed for weighted 
+transducers. The weight class \texttt{W} is a float and the transition data
+class \texttt{T} contains an input string, an output string and a weight of
+type float. The specializations \texttt{HfstBasicTransducer} and
+\texttt{HfstBasicTransition} are used when converting between different
 transducer backend formats.
 
-The class template HfstTransitionGraph is designed so that it can
+The class template \texttt{HfstTransitionGraph} is designed so that it can
 easily be extended for different kinds of transition datatypes. For
 example, if HFST tools are used in text-to-speech or speech-to-text
 conversion, the symbol type of transitions will probably be something
@@ -239,13 +244,13 @@ else than strings.
 
 The alphabet of a transducer means all symbols (strings) that are
 known to that transducer. The alphabet includes all symbols that occur 
-or have occurred in a transition of the transducer unless explicitly
+or have occurred in the transitions of the transducer unless explicitly
 removed from the alphabet. 
 If we apply a binary operation (e.g. disjunction or composition) on 
 transducers A and B, the resulting transducer's alphabet will include
 all symbols that were in the alphabets of A and B. 
 
-In HFST version 2.0, we were not especially interested in alphabets 
+In HFST version 2, we were not especially interested in alphabets 
 since the interface did not offer any way for the user to access a 
 transducer's alphabet. It was up to the backend implementation to take
 care of alphabets. In SFST the transducers always have an alphabet,
@@ -280,7 +285,7 @@ Fortunately, this expansion can be done before the operation itself
 (and for composition before and after the operation itself), so we do
 not have to make changes in the operations of the backend transducer
 libraries. 
-The operations can freely (and will) handle these special symbols just
+The operations can (and will) handle these special symbols just
 like any ordinary symbols. 
 
 First we iterate through the alphabets of both transducers and find
@@ -455,7 +460,7 @@ and convert back to end libraries format.
 \section{Compilation Performance}
 % EA
 
-The performance of HFST has improved from version 2.0 to 3.0. 
+The performance of HFST has improved from version 2 to 3. 
 We compiled two finite-state morphologies in SFST programming language format
 with HFST versions 2.0 and 3.0. 
 The morphologies were OMorFi~\cite{pirinen/2008} for Finnish and 
@@ -463,7 +468,7 @@ Morphisto~\cite{zielinski/2009} for German.
 In table~\ref{tab:compilation_times} are the compilation times 
 for both morphologies with 
 different backend implementations with both versions of HFST. 
-Note that the foma implementation was not available in version 2.0.
+Note that the foma implementation was not available in version 2.
 
 \begin{table}
 \centering
