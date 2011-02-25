@@ -302,6 +302,106 @@ support unknown or identity symbols.
 
 \section{Algorithmic Improvements}
 % MS
+\subsection{Intersecting Composition}
+
+Intersecting composition is used to apply a grammar of two-level
+phonological rules on a two-level lexicon. The result of the operation
+is a morphological analyzer, which maps word forms to
+analyzes. Compiling the analyzer using conventional methods requires
+computing the intersection of the rule transducers. This can lead to a
+prohibitively large intermediate result. Intersecting composition
+avoids computing the entire intersection of the rules thus reducing
+both memory and time requirement. The operation was introduced by
+Karttunen \cite{Karttunen/1994} and later extended to weighted
+transducer in hfst2 by Silfverberg and Lind\'{e}n
+\cite{silfverberg/2009/2}.
+
+The intersecting composition operation was implemented in hfst2, but
+we used techniques adopted from OpenFst \cite{openfst/2007} to improve
+the implementation and the current implementation is significantly
+faster than the old one. The current implementation computes a lazy
+pairwise intersection of the rule transducers. The lexicon can be
+composed with this intersection using a standard composition
+algorithm.
+
+\subsubsection{Previous implementation}
+
+The implementation of intersecting composition in hfst2 can be
+characterized as the composition of the lexicon transducer $L$ with a
+parallel structure $P$ containing all rule transducer. For simplicity,
+we assume that the lexicon and rule transducers are deterministic as
+automata.
+
+Outwards the structure $P$ resembles an ordinary transducer with
+states and transitions. The states of $P$ correspond internally to
+vectors of rule transducer states, which we call state
+configurations. The vectors have equally many indices as there are rules
+and each rule corresponds to a unique index, where its state is
+stored. E.g. the start state of $P$ corresponds to the vector
+containing the start states of the rules.
+
+Initially only the start state of $P$ is computed. More states in $P$
+are computed according to the transitions in $L$. E.g. the lexicon $L$
+might have a transition with output-symbol {\tt a} in its initial
+state. In order to compute the intersecting composition, it would be
+necessary to create transitions and corresponding target states in $P$
+for all symbol pairs {\tt a:b}, where each of the rules has
+transitions from its initial state with symbol pair {\tt
+  a:b}. Outwards $P$ would have one target state $t$ for the
+transition with pair {\tt a:b} from its initial state. Internally $t$
+would correspond to a configuration of the target states of the
+transitions with symbol pair {\tt a:b} in each of the indiviual rules.
+
+There is no caching of transitions in the states of $P$. Thus the
+transitions in states have to be recomputed every time the algorithm
+visits a given configuration of rule states. This requires more work
+than if the transitions were cached, since there usually exist state
+configuration which are very frequently visited.
+
+Even if the transitions in states were cached, this implementation
+would still be suboptimal, since a new state configuration always
+requires re-examining the transitions in all rules. This is true even
+though only one rule state would differ from a previous configuration.
+
+\subsubsection{Current implementation}
+
+Phonological two-level rules usually track sound changes in fairly
+specific contexts. This means that when composing two-level rule
+transducers with a lexicon, the rules will occupy a limited state set
+during the majority of the time of the composition. The current
+implementation of intersecting composition capitalizes on this
+property.
+
+Instead of a parallel lazy intersection like we used in hfst2, we
+recursively build up an intersection of the rules by intersecting them
+lazily pairwise. The first and second rule are intersected, the result
+is intersected with the third rule and so on. The current
+implementation caches the transitions in a give state pair, so there
+is no need to recompute it when the state is revisited.
+
+This leads to significant improvement in performance. The improvement
+results from caching transitions, but it is improved by the fact that
+computing the transitions in a previously unseen state configuration
+does not require recomputing the transitions in all of the
+rules. E.g. if rule number $n$ moves to a new state with symbol pair
+{\tt a:b}, but the rest of the rules remain in a familiar state
+configuration, we only need to recompute the transitions of the rules
+having greater index than $n$. This results from the fact that we have
+already cached the target state of the subset of rules $1$ to $n-1$ in
+their lazy intersection structure.
+
+Like the old implementation, the current implementation of
+intersecting compose is equivalent with flag Xerox style diacritics
+and IDENTITY symbols.
+
+\begin{table}[htb!]
+\begin{tabular}{l|c|c}
+language  & hfst3 & hfst2 \\
+\hline
+s\'{a}mi  &       & 364 s \\
+\hline
+finnish   &       &
+\end{table}
 
 \section{Xerox Compatibility}
 % TP
