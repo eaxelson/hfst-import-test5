@@ -686,13 +686,6 @@ $R(1 \ldots r)$ with that region having a density of $1$ entries greater than
 some predifined limit. A limit of $1.0$ corresponds to having no filter at all;
 in practice limits in the region $0.8 \ldots 0.9$ have proved reasonable.
 
-For the order in which the arrays are traversed, ordering the states from
-greatest density of $1$ entries to lowest and simply ordering them in
-numerical order have been tried. These approaches don't appear to produce
-dramatically different results\footnote{Of course, in practice these orderings
-will often be similar.}; also in theory, either approach could
-produce better results than the other.
-
 \begin{table}[htb!]
 \begin{center}
 \begin{tabular}{c|r}
@@ -720,6 +713,13 @@ Head filter limit  & Number of index entries \\
 \caption{Index table sizes for various values of the head filter limit as applied to the Morphalou project's French morphology and released on HFST's site on 2010-04-14.}
 \end{center}
 \end{table}
+
+For the order in which the arrays are traversed, ordering the states from
+greatest density of $1$ entries to lowest and simply ordering them in
+numerical order have been tried. These approaches don't appear to produce
+dramatically different results\footnote{Of course, in practice these orderings
+will often be similar.}; also in theory, either approach could
+produce better results than the other.
 
 Work is ongoing in finding the best practical filter strategies, filter
 limits and traversal orders, and potentially different compaction strategies.
