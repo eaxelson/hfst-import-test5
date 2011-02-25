@@ -506,7 +506,7 @@ applications. The format has also found new application in on-the-fly
 operations in transducers, eg. composing lookup for spell-checking and
 correction (see section \ref{spellcheck}).
 
-\subsection{Implementation and Integration in HFST3}
+\subsection{Implementation and Integration in HFST2 and HFST3}
 Optimized-lookup was supported in HFST2 by the standalone utilities
 \verb+hfst-lookup-optimize+ (compilation to the format) and
 \verb+hfst-optimized-lookup+ (non-tokenizing lookup). This was partly
@@ -517,11 +517,32 @@ under the potentially more restrictive GNU Lesser Public
 License~\cite{lgpl-license}.
 
 Provision was later made for both unweighted and weighted (with log weights)
-transducers, and 
+transducers, and flag diacritics~\cite{beesley/2003} (also see section
+\ref{flag-diacritics}). Demonstrations of the lookup facility were also
+produced in Java and Python, two popular and accessible programming languages,
+in the hope of facilitating and spreading use of the format. This effort
+bore fruit in the incorporation of the Java code in a project for anonymizing
+identities in legal decisions at the Aalto University.
+
+Over the course of furthering research goals and maintaining HFST2,
+the format saw additional uses and implementations. Hyphenators and spell
+checking transducers were primarily used in this format for its speed, and
+in 2010 a Google Summer of Code project by Brian Croom produced
+\verb+hfst-proc+, a tokenizing lookup application for optimized-lookup which
+was put to use in various text stream processing scripts (eg.
+\verb+-analyze+ for analysis, \verb+-generate+ for generation and
+\verb+-hyphenate+ for hyphenation).
+
+Originally compilation to the format was only possible from SFST and OpenFst
+formats, and as uses and applications proliferated, it became desirable to
+provide some API access to optimized-lookup in the HFST library. In HFST3
+this has been accomplished by implementing compilation from HFST's internal
+transducer format, allowing for a great degree of integration with
+HFST3-supported tools.
 
 \subsection{Index Table Packing}
 
-\subsection{Flag Diacritics and Related Optimization Tricks}
+\subsection{Flag Diacritics and Related Optimization Tricks}\label{flag-diacritics}
 
 \section{Discussion}
 %KL
