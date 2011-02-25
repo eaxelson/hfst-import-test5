@@ -724,6 +724,32 @@ megabytes, whereas the compacted index table has 364,980 entries, or about
 one percent of the uncompacted form, for a binary of 7 megabytes.
 
 \subsection{Flag Diacritics and Related Optimization Tricks}\label{flag-diacritics}
+Support for flag diacritics was added to the \verb+optimized-lookup+ utility
+with an eye to efficiency, prompting some refinements to HFST's implementation
+of the format itself. Flag diacritics are parsed prior to lookup and during
+it they restrict the lookup search tree. This is critical for speed, as the
+alternative of calculating all the outputs first and then removing outputs
+with conflicting flag diacritics can, in the case of transducers with liberal
+use of flags, involve several times the work.
+
+For the purposes of traversing transitions, flag diacritics are essentially
+a special case of the epsilon symbol. If the configuration of flags
+that have been traversed up to a certain point allow it, each transition
+with a flag diacritic is traversed without reading an input symbol. With
+this in mind, it was desirable to avoid checking for transitions with each
+flag symbol in each state. The optimized-lookup format was therefore amended
+to treat flag diacritics as epsilon for purposes of constructing the index
+table and to list their transitions out of the normal order, after the epsilon
+transitions. Thus it is possible to check only those flag transitions that
+are present in a given state.
+
+This allows further reductions in the size of the index table; as
+the indexes for flag diacritics are no longer in use, it is possible to reduce
+the effective size of the input alphabet by the number of different flag
+diacritic operations. These improvements may appear minor, but are not
+insignificant in transducers that make substantial use of flag diacritics. In
+the previously discussed version of OmorFi, we achieved a reduction of $12.4%$
+in index table size.
 
 \section{Discussion}
 %KL
