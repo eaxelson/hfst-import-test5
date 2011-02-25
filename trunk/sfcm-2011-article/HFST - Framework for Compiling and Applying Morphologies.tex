@@ -464,7 +464,7 @@ achieve this apertium uses text encoding and decoding mechanisms and
 interchange format called apertium stream format, whose input and output
 was implemented in hfst's corpus processing tools.
 
-\subsection{Voikko and HFST based spell-checker formulation}
+\subsection{Voikko and HFST based spell-checker formulation}\label{spellcheck}
 
 The application of finite-state language models for spell-checking applications
 is also based on new development of finite-state algorithms. The application
@@ -494,6 +494,18 @@ intermediate results out of the system.
 
 \section{Optimized Lookup}\label{optimized-lookup}
 % SH
+``Optimized-lookup`` is a HFST-specific binary format for finite-state
+transducers providing fast lookup. First documented in \cite{silfverberg/2009},
+its implementation has evolved somewhat to meet the requirements of specific
+applications. The format has also found new application in on-the-fly
+operations in transducers, eg. composing lookup for spell-checking and
+correction (see section \ref{spellcheck}).
+
+\subsection{Implementation and Integration in HFST3}
+
+\subsection{Index Table Packing}
+
+\subsection{Flag Diacritics and Related Optimization Tricks}
 
 \section{Discussion}
 %KL
