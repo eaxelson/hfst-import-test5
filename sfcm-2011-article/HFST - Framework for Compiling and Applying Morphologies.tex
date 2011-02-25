@@ -312,7 +312,7 @@ support unknown or identity symbols.
 Intersecting composition is used to apply a grammar of two-level
 phonological rules on a two-level lexicon. The result of the operation
 is a morphological analyzer, which maps word forms to
-analyzes. Compiling the analyzer using conventional methods requires
+analyses. Compiling the analyzer using conventional methods requires
 computing the intersection of the rule transducers. This can lead to a
 prohibitively large intermediate result. Intersecting composition
 avoids computing the entire intersection of the rules thus reducing
@@ -416,20 +416,20 @@ Finnish   &       &
 \section{Xerox Compatibility}
 % TP
 
-Among the one goals of HFST framework has always been to retain legacy support
-for Xerox line of tools for building finite-state
-morphologies~\cite{beesley/2003}. The support should also be trivial for
-end-users converting from the Xerox tools. For this purpose we have aimed to
-create clones of the most important Xerox tools as accurate as possible.
-Previous open source implementations of Xerox tool clones have included the
-lexc and twolc~\cite{linden/2009/sfcm} and lexc and xfst~\cite{hulden/2009}, in
-HFST 3 we have combined these contributions to one uniform package capable of
-handling full line of Xerox tools for morphology, which for most intents and
-purposes means that end users will require no other work than changing program
-names to start using HFST tools for their Xerox-style language description.
+Among the goals of the HFST framework has always been to retain legacy support
+for the Xerox line of tools for building finite-state
+morphologies~\cite{beesley/2003}. Optimally, the tools should be familiar
+to end-users converting from the Xerox tools. For this purpose we have aimed to
+create clones of the most important Xerox tools as accurately as possible.
+Previous open source implementations of Xerox tool clones have included
+lexc and twolc~\cite{linden/2009/sfcm} and lexc and xfst~\cite{hulden/2009}; in
+HFST3 we have combined these contributions into one uniform package capable of
+handling the full line of Xerox tools for morphology. For the most part,
+end users will require no other familiarisation than changing program names in
+order to start using HFST tools for their Xerox-style language description
+needs.
 
-
-The actual implementation of xfst scripting language support makes heavy
+The actual implementation of the xfst scripting language makes heavy
 use of the new foma backend that already included good coverage of the
 xfst support. The only additions made in HFST are once required to support
 interoperability between other back ends and HFST internals, specifically
