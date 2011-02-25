@@ -140,7 +140,9 @@ report the assert message and from which file and which line it happened.
 \subsection{Transducer binary format}
 
 An HFST transducer in binary format consists of an HFST header followed by the
-backend implementation in binary format. In version 3.0, the header
+backend implementation in binary 
+format\footnote{\url{https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstTransducerHeader}}. 
+In version 3.0, the header
 format is less error-prone than in the previous version and gives more 
 information both for users of HFST (even when seen on a screen or in a
 text editor in binary format) and for the HFST library itself.
@@ -187,7 +189,8 @@ In HFST version 3.0, the conversion between different backend formats
 (SFST, foma, OpenFst with tropical and logarithmic semiring) is
 carried out through HFST's own transducer format, HfstTransitionGraph, 
 a simple transition graph datatype that consists of states (unsigned
-integers) and transitions between those states.
+integers) and transitions between those 
+states\footnote{\url{http://hfst.sourceforge.net/hfst3/index.html}}.
  
 We have chosen to implement HfstTransitionGraph for two
 reasons. Firstly, it serves as an intermediate transducer format in
@@ -250,14 +253,14 @@ but in OpenFst their use is optional so we did not use them in our
 OpenFst implementation.
 
 In HFST version 3.0, we need to be aware of alphabets because two new
-special symbols are included, UNKNOWN and IDENTITY. These special
-symbols are a part of the Xerox Finite-State Tool (XFST) 
+special symbols are included, \texttt{unknown} and \texttt{identity}. 
+These special symbols are a part of the Xerox Finite-State Tool (XFST) 
 formalism~\cite[page x]{beesley/2003} and they are also implemented in
-foma~\cite{hulden/2009}. UNKNOWN and IDENTITY symbols are useful
-when we want to refer to all symbols that are not currently known to a
-transducer but which the transducer can later become aware of. 
+foma~\cite{hulden/2009}. \texttt{unknown} and \texttt{identity} symbols 
+are useful when we want to refer to all symbols that are not currently 
+known to a transducer but which the transducer can later become aware of. 
 
-Supporting UNKNOWN and IDENTITY symbols in all HFST backend
+Supporting \texttt{unknown} and \texttt{identity} symbols in all HFST backend
 implementations has enabled us to make an XFST compiler that can be used
 with all backend implementations. 
 In this way we can offer the users of HFST new regular expression
@@ -267,12 +270,12 @@ part. Because they are already implemented in foma, we have to care
 only for the SFST and OpenFst implementations.
 
 Besides keeping track of all symbols known to a transducer, we also
-have to expand each transition involving UNKNOWN and IDENTITY symbols
-into a set of transitions every time we apply a binary operation on
-two transducers. 
+have to expand each transition involving \texttt{unknown} and 
+\texttt{identity} symbols into a set of transitions every time we apply 
+a binary operation on two transducers. 
 This is because the transducer becomes aware of new symbols that are
-no longer unknown and thus no more included in UNKNOWN or IDENTITY
-symbols.
+no longer unknown and thus no more included in \texttt{unknown} or 
+\texttt{identity} symbols.
 Fortunately, this expansion can be done before the operation itself 
 (and for composition before and after the operation itself), so we do
 not have to make changes in the operations of the backend transducer
@@ -283,8 +286,9 @@ like any ordinary symbols.
 First we iterate through the alphabets of both transducers and find
 out what symbols in the alphabet of one transducer are not found in
 the alphabet of the other transducer and vice versa. 
-Then we add beside each transition involving UNKNOWN or IDENTITY
-symbols a set of transitions where UNKNOWN and IDENTITY symbols are
+Then we add beside each transition involving \texttt{unknown} or 
+\texttt{identity} symbols a set of transitions where \texttt{unknown} 
+and \texttt{identity} symbols are
 replaced with all symbols that the transducer just got aware of. 
 For more information on expanding special symbols, 
 see~\cite{hulden/2009}~and~\cite{beesley/2003}.
@@ -349,7 +353,8 @@ and convert back to end libraries format.
 The performance of HFST has improved from version 2.0 to 3.0. 
 We compiled two finite-state morphologies in SFST programming language format
 with HFST versions 2.0 and 3.0. 
-The morphologies were OMorFi~\cite{pirinen/2008} for Finnish and Morphisto (ref.) for German.
+The morphologies were OMorFi~\cite{pirinen/2008} for Finnish and 
+Morphisto~\cite{zielinski/2009} for German.
 In table~\ref{tab:compilation_times} are the compilation times 
 for both morphologies with 
 different backend implementations with both versions of HFST. 
