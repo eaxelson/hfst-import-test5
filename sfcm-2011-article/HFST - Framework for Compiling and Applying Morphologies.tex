@@ -16,8 +16,10 @@
 % Instructions. There are good examples of eg. tables and graphs there.
 \documentclass{llncs}
 \usepackage{llncsdoc}
+\usepackage[utf8x]{inputenc}
 \usepackage{multirow}
 \usepackage{caption}
+\usepackage{url}
 %
 \begin{document}
 %
@@ -68,7 +70,7 @@ custom extensions to the libraries it uses.
 Previously HFST relied on custom extensions to the libraries it supported,
 namely OpenFst and SFST, and it was necessary to statically link them into
 \verb+libhfst+. This was obviously also rather restrictive in terms of
-new versions and different use cases (eg. experimentation with local changes to
+new versions and different use cases (e.g. experimentation with local changes to
 the underlying libraries.
 
 HFST3 supports conditional compilation of all its elements that provide
@@ -130,7 +132,7 @@ from the transducer.
 Exceptions are also used internally in the HFST library for reporting to a 
 calling function that something unexpected happened. The calling
 function can handle the situation itself or inform the user and suggest
-what he/she should do. 
+what they should do. 
 So the execution of the program does not need to stop or lead to an
 incorrect result or even cause a segmentation fault at a later stage.
 
@@ -190,7 +192,7 @@ If the user has requested a verbose mode for a tool that reads the
 transducer, it is possible to print the name of each transducer 
 before or after reading it.
 
-\subsection{Conversion between different backend formats}
+\subsection{Conversion Between Different Backend Formats}
 
 In HFST version 3.0, the conversion between different backend formats 
 (SFST, foma, OpenFst with tropical and logarithmic semiring) is
@@ -276,22 +278,21 @@ known to a transducer but which the transducer can later become aware of.
 Supporting \texttt{unknown} and \texttt{identity} symbols in all HFST backend
 implementations has enabled us to make an XFST compiler that can be used
 with all backend implementations. 
-In this way we can offer the users of HFST new regular expression
-formalism in addition to the SFST programming language. Next we
-describe what these new special symbols require for HFST's
-part. Because they are already implemented in foma, we have to care
-only for the SFST and OpenFst implementations.
+In this way we can offer users of HFST a new 
+formalism for regular expressions in addition to the one available in SFST. 
+As the extensions are already implemented in foma, we only need to 
+consider SFST and OpenFst in HFST3.
 
-Besides keeping track of all symbols known to a transducer, we also
+Aside from keeping track of all symbols known to a transducer, we also
 have to expand each transition involving \texttt{unknown} and 
 \texttt{identity} symbols into a set of transitions every time we apply 
 a binary operation on two transducers. 
 This is because the transducer becomes aware of new symbols that are
-no longer unknown and thus no more included in \texttt{unknown} or 
+no longer unknown and thus no longer included in the \texttt{unknown} or 
 \texttt{identity} symbols.
 Fortunately, this expansion can be done before the operation itself 
-(and for composition before and after the operation itself), so we do
-not have to make changes in the operations of the backend transducer
+(and for composition before and after the operation itself), so it is  
+not necessary to make changes in the operations of the backend transducer
 libraries. 
 The operations can (and will) handle these special symbols just
 like any ordinary symbols. 
@@ -309,16 +310,15 @@ see~\cite{hulden/2009}~and~\cite{beesley/2003}.
 It is also possible to switch off special symbol handling if we know
 for sure that they are not used in transducers. 
 In this way we can optimize performance for instance for the tool 
-hfst-calculate that processes SFST programming language which does not
+{\verb hfst-calculate} that processes the SFST formalism which does not
 support unknown or identity symbols.
-
 
 \section{Algorithmic Improvements}
 % MS
 \subsection{Intersecting Composition}
 
 Intersecting composition is used to apply a grammar of two-level
-phonological rules on a two-level lexicon. The result of the operation
+phonological rules to a two-level lexicon. The result of the operation
 is a morphological analyzer, which maps word forms to
 analyses. Compiling the analyzer using conventional methods requires
 computing the intersection of the rule transducers. This can lead to a
@@ -326,7 +326,7 @@ prohibitively large intermediate result. Intersecting composition
 avoids computing the entire intersection of the rules thus reducing
 both memory and time requirement. The operation was introduced by
 Karttunen \cite{Karttunen/1994} and later extended to weighted
-transducer in hfst2 by Silfverberg and Lind\'{e}n
+transducer in HFST2 by Silfverberg and Lind\'{e}n
 \cite{silfverberg/2009/2}.
 
 The intersecting composition operation was implemented in hfst2, but
@@ -337,13 +337,12 @@ pairwise intersection of the rule transducers. The lexicon can be
 composed with this intersection using a standard composition
 algorithm.
 
-\subsubsection{Previous implementation.}
+\subsubsection{Previous Implementation.}
 
-The implementation of intersecting composition in hfst2 can be
+The implementation of intersecting composition in HFST2 can be
 characterized as the composition of the lexicon transducer $L$ with a
-parallel structure $P$ containing all rule transducer. For simplicity,
-we assume that the lexicon and rule transducers are deterministic as
-automata.
+parallel structure $P$ containing all rule transducers. For simplicity,
+we assume that the lexicon and rule transducers are deterministic.
 
 Outwards the structure $P$ resembles an ordinary transducer with
 states and transitions. The states of $P$ correspond internally to
@@ -376,7 +375,7 @@ would still be suboptimal, since a new state configuration always
 requires re-examining the transitions in all rules. This is true even
 though only one rule state would differ from a previous configuration.
 
-\subsubsection{Current implementation.}
+\subsubsection{Current Implementation.}
 
 Phonological two-level rules usually track sound changes in fairly
 specific contexts. This means that when composing two-level rule
@@ -385,7 +384,7 @@ during the majority of the time of the composition. The current
 implementation of intersecting composition capitalizes on this
 property.
 
-Instead of a parallel lazy intersection like we used in hfst2, we
+Instead of a parallel lazy intersection like we used in HFST2, we
 recursively build up an intersection of the rules by intersecting them
 lazily pairwise. The first and second rule are intersected, the result
 is intersected with the third rule and so on. The current
@@ -405,19 +404,19 @@ their lazy intersection structure.
 
 Like the old implementation, the current implementation of
 intersecting compose is equivalent with flag Xerox style diacritics
-and IDENTITY symbols.
+and {\verb identity} symbols.
 
 \begin{table}[htb!]
 \begin{center}
 \begin{tabular}{l|c|c}
-Language  & hfst3 & hfst2 \\
+Language  & HFST 2.0 & HFST 3.0\\
 \hline
-Northern S\'{a}mi  & 63s   & 364 s \\
+North S\'{a}mi  & 364s & 63s \\
 \hline
 Finnish   &       &
 \end{tabular}
 \vskip.2cm
-\caption{Runtimes for intersecting composition of the Finnish and Northern S\'{a}mi morphological analyzers in hfst2 and hfst3.}
+\caption{Runtimes for intersecting composition of the Finnish and North S\'{a}mi morphological analyzers in HFST2 and HFST3.}
 \end{center}
 \end{table}
 
@@ -429,7 +428,7 @@ for the Xerox line of tools for building finite-state
 morphologies~\cite{beesley/2003}. Optimally, the tools should be familiar
 to end-users converting from the Xerox tools. For this purpose we have aimed to
 create clones of the most important Xerox tools as accurately as possible.
-Previous open source implementations of Xerox tool clones have included
+Previous open-source implementations of Xerox tool clones have included
 lexc and twolc~\cite{linden/2009/sfcm} and lexc and xfst~\cite{hulden/2009}; in
 HFST3 we have combined these contributions into one uniform package capable of
 handling the full line of Xerox tools for morphology. For the most part,
@@ -437,8 +436,8 @@ end users will require no other familiarisation than changing program names in
 order to start using HFST tools for their Xerox-style language description
 needs.
 
-The actual implementation of the xfst scripting language makes heavy
-use of the new foma backend, which already included good coverage xfst
+The implementation of the xfst scripting language makes heavy
+use of the new foma backend, which already had a good coverage xfst
 features. The only additions in HFST are ones required for
 interoperability between other backends and HFST internals. Particular
 care was taken not to duplicate the work already present in foma and its
@@ -450,8 +449,8 @@ For examples of specific previously implemented Xerox style finite-state
 language descriptions we provide a wiki-based web page\footnote{\url{https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstExamples}}. Another repository of
 such language descriptions is located at the University of Tromsø's subversion
 repository\footnote{\url{http://divvun.no/doc/infra/anonymous-svn.html}}.
-Of these, variants of Sámi and Greenlandic are regularly
-used to regress and stress test HFST tools.
+Of these, the Sámi morphologies and Greenlandic are regularly
+used in regression and stress testing of HFST tools.
 
 For specific functionality, the Xerox tools perform various kinds of special
 processing of finite-state automata beyond the range of standard finite-state
