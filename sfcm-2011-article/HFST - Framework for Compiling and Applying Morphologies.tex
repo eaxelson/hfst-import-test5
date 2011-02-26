@@ -7,10 +7,8 @@
 % Note to Krister: consider a table in Introduction or Discussion with available
 % functional morphologies, keeping in mind
 % eg. trmorph and http://dev.sslmit.unibo.it/linguistics/morph-it.php
-% Also: unify eg. HSFT 2 / HFST3 / HFST 3 / HFST 3.0 to some consistent
-% representation - SH prefers HFST2 and HFST3.
-% If it seems reasonable, consider giving thanks to Francis Tyers who
-% helped out with some proofreading.
+%
+% For some additional comments search for 'FMT:'
 %
 % llncs.doc is actually a tex file, it's the source for the Authors'
 % Instructions. There are good examples of eg. tables and graphs there.
@@ -449,8 +447,8 @@ For examples of specific previously implemented Xerox style finite-state
 language descriptions we provide a wiki-based web page\footnote{\url{https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstExamples}}. Another repository of
 such language descriptions is located at the University of Tromsø's subversion
 repository\footnote{\url{http://divvun.no/doc/infra/anonymous-svn.html}}.
-Of these, the Sámi morphologies and Greenlandic are regularly
-used in regression and stress testing of HFST tools.
+Of these, the morphologies for the Sámi languages and Greenlandic are 
+regularly used in regression and stress testing of HFST tools.
 
 For specific functionality, the Xerox tools perform various kinds of special
 processing of finite-state automata beyond the range of standard finite-state
@@ -481,18 +479,20 @@ Note that the foma implementation was not available in version 2.
 \centering
   \begin{tabular}{ c | c | c | c }
   \multicolumn{4}{c}{Compilation times} \\ \hline
-  Backend & version & Finnish & German \\ \hline
-  \multirow{2}{*}{SFST} & 2.0 & 25:16 & 107:47 \\
-  & 3.0 & 5:02 & 6:39 \\ \hline
-  \multirow{2}{*}{OpenFst} & 2.0 & 7:54 & 6:23 \\
-  & 3.0 & 6:51 & 6:28 \\ \hline
-  \multirow{2}{*}{foma} & 2.0 & - & - \\
-  & 3.0 & 1:49 & 1:29 \\
+  Backend                  & version & Finnish & German \\ \hline
+  \multirow{2}{*}{SFST}    & 2.0     & 25:16   & 107:47 \\
+                           & 3.0     & 5:02    & 6:39 \\ \hline
+  \multirow{2}{*}{OpenFst} & 2.0     & 7:54    & 6:23 \\
+                           & 3.0     & 6:51    & 6:28 \\ \hline
+  \multirow{2}{*}{foma}    & 2.0     & -       & - \\
+                           & 3.0     & 1:49    & 1:29 \\
   \end{tabular}
   \caption{Compilation times for Finnish and German morphologies with
     HFST. The times are expressed in minutes and seconds.}
   \label{tab:compilation_times}
 \end{table}
+%% FMT:  Perhaps mention how the numbers were calculated, are they averages ?
+%%       is the 5 second difference significant ?
 
 We can clearly see that the compilation time has improved dramatically
 for the SFST implementation.
@@ -502,7 +502,7 @@ Brzozowski's~\cite{brzozowski/1964}.
 We noticed how the minimization algorithm affects performance
 already when we were testing HFST version 2.0; 
 OpenFst was clearly faster because it uses Hopcroft's algorithm. 
-Based on this observation, Helmut Schmid could improve his SFST by 
+Based on this observation, Helmut Schmid was able to improve SFST by 
 writing a minimization function that uses Hopcroft's algorithm.
 
 When comparing the compilation times for OpenFst, we see that the
@@ -529,15 +529,15 @@ factor in the compilation times of morphologies.
 % TP
 
 After initial release of HFST platform it has been used in several end-product
-application software. The two most prominent uses are as a part of rule-based
-machine translation platform in apertium\footnote{\url{http://apertium.sf.net}}
-and spell-checking library voikko\footnote{\url{http://voikko.sf.net}}. Both of
-these linguistic applications take a huge benefit from the fact that there
-were available previous language descriptions written in Xerox finite-state
+applications. The two most prominent uses are as a part of the rule-based
+machine translation platform Apertium\footnote{\url{http://apertium.sf.net}}
+and spell-checking library Voikko\footnote{\url{http://voikko.sf.net}}. Both of
+these linguistic applications benefit hugely from the fact that there
+were available previous language descriptions written in the Xerox finite-state
 morphology formalism and integrating HFST to these applications gave
 developers of those language descriptions direct conversion path to two
 application types that had not been available in the Xerox framework. Since
-both applications as well as HFST framework are free and libre open source
+both applications, as well as HFST framework, are free/libre open-source
 software, the integration of the existing language descriptions to the
 projects was easily possible.
 
@@ -546,10 +546,10 @@ applications is the lack of language support and lack of even theoeretical
 possibility of language support for morphologically more complex languages
 in those application fields. For example in field of spell-checkers the
 theoretical bounds of hunspell---de facto standard in open source market---
-is mere 4 affixes. For polyXXXXXX languages like Greenlandic, it simply is
-not possible to precompute enough combinations out, like has been done with
+is mere 4 affixes. For polysynthetic languages like Greenlandic, it simply is
+not possible to precompute enough combinations, like has been done with
 e.g. Hungarian. The Xerox style finite-state morphology demonstrably supports
-at least Hungarian and a wide variety of other morphologically varying
+at least Hungarian and a wide variety of other morphologically varied
 languages~\cite{beesley/2003}.
 
 Another rationale for extending finite-state methods to these application areas
@@ -557,10 +557,11 @@ is that the efficiency and expressiveness of finite-state automata has been
 well-known and researched e.g. in \cite{aho/2007}, which makes it a good choice
 for various text-processing tasks.
 
-\subsection{Apertium interoperability---corpus processing tools and I/O formats}
+\subsection{Apertium Interoperability---Corpus Processing Tools and I/O Formats}
+%% FMT: Intead of 'language model' perhaps "perform morphological analysis and generation" ?
 
-In apertium the finite-state automata are used to provide language models for
-both parsing the running text and generating the translations after performing
+In Apertium the finite-state automata are used to provide language models for
+both parsing running text and generating the translations after performing
 a mid-shallow rule-based transfer. The HFST is only one possible language
 model, so the crucial part for inclusion was to get HFST language models
 work as others. This includes two functions: reliable tokenization based on
@@ -568,8 +569,8 @@ the dictionary data and support for apertium I/O formats. The total
 contribution of this corpus processing functionality is contained in tool
 called \texttt{hfst-proc} included in HFST toolkit. The name originates from
 the interoperability with other toolkits' corpora processing tools, specifically
-\texttt{cg-proc} from vislcg3\footnote{\url{http://beta.visl.sdu.dk/cg3.html}} and
-\texttt{lt-proc} from apertium itself.
+\texttt{cg-proc} from VISLCG3\footnote{\url{http://beta.visl.sdu.dk/cg3.html}} and
+\texttt{lt-proc} from Apertium itself.
 
 For tokenization the FST-based dictionaries are useful, since the process of
 analysis and lookup can be both performed by basic FST traversal. The specific
@@ -581,12 +582,12 @@ and weights.
 
 The I/O format requirements for apertium platform are based on the needs to
 translate existing documents containing all kinds of markup and rich text
-formats, such as html for web pages or mediawiki codes from wikipedia. To
-achieve this apertium uses text encoding and decoding mechanisms and
-interchange format called apertium stream format, whose input and output
-was implemented in hfst's corpus processing tools.
+formats, such as html for web pages or MediaWiki codes from Wikipedia. To
+achieve this Apertium uses text encoding and decoding mechanisms and
+interchange format called Apertium stream format, whose input and output
+was implemented in HFST's corpus processing tools.
 
-\subsection{Voikko and HFST based spell-checker formulation}\label{spellcheck}
+\subsection{Voikko and HFST Based Spell-Checker Formulation}\label{spellcheck}
 
 The application of finite-state language models for spell-checking applications
 is also based on new development of finite-state algorithms. The application
@@ -620,7 +621,7 @@ intermediate results out of the system.
 transducers providing fast lookup. First documented in \cite{silfverberg/2009},
 its implementation has evolved somewhat to meet the requirements of specific
 applications. The format has also found new application in on-the-fly
-operations in transducers, eg. composing lookup for spell-checking and
+operations in transducers, e.g. composing lookup for spell-checking and
 correction (see section \ref{spellcheck}).
 
 \subsection{Implementation and Integration in HFST2 and HFST3}
@@ -637,7 +638,7 @@ Provision was later made for both unweighted and weighted (with log weights)
 transducers, and flag diacritics~\cite{beesley/2003} (also see section
 \ref{flag-diacritics}).
 
-\subsubsection{Other implementations and applications.}
+\subsubsection{Other Implementations and Applications.}
 Demonstrations of the lookup facility were also
 produced in Java and Python, two popular and accessible programming languages,
 in the hope of facilitating and spreading use of the format. This effort
@@ -647,7 +648,7 @@ identities in legal decisions at Aalto University.
 Over the course of furthering research goals and maintaining HFST2,
 the format saw additional uses and implementations. Hyphenators and spell
 checking transducers were primarily used in this format for its speed, and
-in 2010 a Google Summer of Code project by Brian Croom produced
+in 2010 a Google Summer of Code\footnote{\url{http://code.google.com/soc/}} project by Brian Croom produced
 \verb+hfst-proc+, a tokenizing lookup application for optimized-lookup which
 was put to use in various text stream processing scripts (eg.
 \verb+-analyze+ for analysis, \verb+-generate+ for generation and
