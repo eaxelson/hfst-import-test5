@@ -724,6 +724,17 @@ using parallel composition with both the dictionary and the misspelled word in
 one operation. This reduces the weight and time requirements by leaving the
 intermediate results out of the system.
 
+\subsection{Statistical Part-of-speech Tagging using Weighted Finite-State Transducers}
+
+HFST3 has been applied to part-of-speech tagging the Finnish, Swedish
+and English Europarl corpora \cite{silfverberg/2010}. Silfverberg and
+Lind\'{e}n implemented first order Hidden Markov Models (HMM) as sets
+of parallel weightd finite-state transducers using HFST3 tools. Like
+standard HMMs, their tagger used tag sequences. In addition they
+included lemmas in their models. Part-of-speech tagging was
+accomplished by intersecting composition of a sentence automaton with
+the set of tagger transducers.
+
 \section{Optimized Lookup}\label{optimized-lookup}
 % SH
 \emph{Optimized-lookup} is a HFST-specific binary format for finite-state
