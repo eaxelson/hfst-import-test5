@@ -53,7 +53,6 @@ void OtherSymbolTransducer::define_diacritics
        it != OtherSymbolTransducer::diacritics.end();
        ++it)
     { 
-      std::cerr << "Erasing: " << *it << ":" << *it << std::endl;
       symbol_pairs.erase(SymbolPair(*it,*it)); 
       input_symbols.erase(*it);
       output_symbols.erase(*it);
