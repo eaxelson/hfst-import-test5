@@ -224,6 +224,7 @@ void insert_alphabet_pairs(const HandyDeque<std::string> &symbol_queue,
 	  symbol_pair_set.insert(SymbolPair(input_symbol,output_symbol));
 	}
     }
+  symbol_pair_set.insert(SymbolPair("__HFST_TWOLC_.#.","__HFST_TWOLC_.#."));
 }
 
 // Add all pairs in the grammar, which are missing from the Alphabet section,

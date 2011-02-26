@@ -28,6 +28,7 @@ Rule::Rule(const std::string &name,
        it != contexts_copy.end();
        ++it)
     { context.apply(&HfstTransducer::disjunct,*it); }
+  this->center.harmonize_diacritics(context);
 }
 
 Rule::Rule(const std::string &name,
@@ -78,6 +79,8 @@ void Rule::store(HfstOutputStream &out)
   add_name();
   rule_transducer.remove_diacritics_from_output();
   rule_transducer.apply(&HfstTransducer::substitute,TWOLC_EPSILON,HFST_EPSILON,
+			true,true);
+  rule_transducer.apply(&HfstTransducer::substitute,"__HFST_TWOLC_.#.","@#@",
 			true,true);
   rule_transducer.apply(&HfstTransducer::substitute,TWOLC_IDENTITY,
 			HFST_IDENTITY,

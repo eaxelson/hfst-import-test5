@@ -224,6 +224,7 @@ ALPHABET_HEADER:ALPHABET_DECLARATION
 DIACRITICS: DIACRITICS_HEADER SYMBOL_LIST SEMI_COLON_LIST
 { 
   grammar->define_diacritics(*$2);
+  alphabet.define_diacritics(*$2);
   delete $2;
 }
 
@@ -442,35 +443,51 @@ int main(int argc, char * argv[])
   yydebug = 1;
 #endif
 
-  CommandLine command_line(argc,argv);
-  if (command_line.help or command_line.usage or command_line.version)
-    { exit(0); }
-  input_reader.set_input(std::cin);
-
-  OtherSymbolTransducer::set_transducer_type(command_line.format);
-  silent = command_line.be_quiet;
-  verbose = command_line.be_verbose;
-
-  TwolCGrammar twolc_grammar(command_line.be_quiet,
-			     command_line.be_verbose,
-			     command_line.resolve_conflicts);
-  grammar = &twolc_grammar;
-  int exit_code = yyparse();
-  if (exit_code != 0)
-    { exit(exit_code); }
-
-  message("Compiling and storing rules.");
-  if (not command_line.has_output_file)
+  try 
     {
-      HfstOutputStream stdout(command_line.format);
-      grammar->compile_and_store(stdout);
+      CommandLine command_line(argc,argv);
+      if (command_line.help or command_line.usage or command_line.version)
+	{ exit(0); }
+      input_reader.set_input(std::cin);
+      
+      OtherSymbolTransducer::set_transducer_type(command_line.format);
+      silent = command_line.be_quiet;
+      verbose = command_line.be_verbose;
+      
+      TwolCGrammar twolc_grammar(command_line.be_quiet,
+				 command_line.be_verbose,
+				 command_line.resolve_conflicts);
+      grammar = &twolc_grammar;
+      int exit_code = yyparse();
+      if (exit_code != 0)
+	{ exit(exit_code); }
+      
+      message("Compiling and storing rules.");
+      if (not command_line.has_output_file)
+	{
+	  HfstOutputStream stdout(command_line.format);
+	  grammar->compile_and_store(stdout);
+	}
+      else
+	{
+	  HfstOutputStream out
+	    (command_line.output_file_name,command_line.format);
+	  grammar->compile_and_store(out);
+	}
+      exit(0);
     }
-  else
+  catch (const HfstException e)
     {
-      HfstOutputStream out(command_line.output_file_name,command_line.format);
-      grammar->compile_and_store(out);
+      std::cerr << "This is an hfst interface bug:" << std::endl
+		<< e() << std::endl;
+      exit(1);
     }
-  exit(0);
+  catch (const char * s)
+    {
+      std::cerr << "This is an a bug probably from sfst:" << std::endl
+		<< s << std::endl;
+      exit(1);
+    }
 }
 
 

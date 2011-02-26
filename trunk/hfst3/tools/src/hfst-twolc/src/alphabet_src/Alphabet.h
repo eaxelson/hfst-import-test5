@@ -34,6 +34,7 @@ class Alphabet
   HandySet<SymbolPair> alphabet_set;
   HandySet<std::string> input_symbols;
   HandySet<std::string> output_symbols;
+  HandySet<std::string> diacritics;
   HandyMap<SymbolPair,OtherSymbolTransducer> alphabet;
   HandyMap<std::string,SymbolRange> sets;
 
@@ -44,6 +45,7 @@ class Alphabet
   void define_set(const std::string &name,const SymbolRange &elements);
   void define_alphabet_pair(const SymbolPair &pair);
   void alphabet_done(void);
+  void define_diacritics(const SymbolRange &);
   const OtherSymbolTransducer &get_transducer(const SymbolPair &pair);
 };
 
