@@ -49,8 +49,117 @@ tommi.pirinen, miikka silfverberg\}@helsinki.fi}}
 
 
 \section{Structural Layout}
-% MS
+%- uudet kirjastot helppo liittää
+%- rajapinta ja rakenne selkeämpi
+%- operaatioiden yhteiskäyttö
+%- varauduttu laajennuksiin, esim. painot 
 
+Finite-state transducer libraries such as sfst~\cite{schmid/2005},
+foma~\cite{hulden/2009} and OpenFst~\cite{hulden/2009} all provide
+different ways for creating transducers. E.g. foma emulates the xfst
+formalism and sfst contains a compiler for its own regular expression
+formalism. The lack of common formalisms makes it difficult to compare
+the performance of the different libraries reliably, since they cannot
+be used to compute the same tasks. 
+ 
+One of the original goals in the hfst-project was to provide a
+framework where it is possible to compare the performance of different
+finite-state transducer libraries on the same tasks. Hfst2 provided
+limited support for this by joining sfst and OpenFst under one
+interface. Regrettably, adding more libraries would have caused
+prohibitive code complexity. Hfst3 makes it practical to add new
+complete or partial implementations of transducer libraries and use
+these to compile lexc lexicons and twolc and sfst gramars.
+
+Related to the goal of comparing performance, is the goal of combining
+algorithms from different transducer libraries in one task. This is
+now possible in Hfst3, where transducers can be converted between
+different underlying libraries. Thus it is possible to utilize well
+implemented algorithms from a variety of libraries in order to achieve
+faster compilation times. It is also possible to test the effect on a
+single transducer operation on the total compilation time of a task by
+switching between operations from different libraries.
+
+\subsection{General Layout of HFST}
+
+Transducers in HFST are objects of the class {\tt HfstTransducer}. The
+{\tt HfstTransducer} class supports all the ordinary transducer
+operations like, disjunction, composition and determinization as
+automaton. HfstTransducer encapsulates the different transducer
+libraries under the HFST interface, so the same code will work for all
+transducer libraries which are part of HFST. E.g. the function {\tt containment} in figure~\ref{containment-figure} works equally well for transducers whose are underlying implementation is an sfst transducer and transducers which are internally foma-transducers.
+
+\begin{figure}
+\begin{center}
+\caption{Function {\tt containment} computes the language {\tt context center context}, assigns it to center and return a reference to center.}\label{containment-figure}
+\begin{verbatim}
+HfstTransducer &containment
+(HfstTransducer &center,const HfstTransducer &context)
+{
+  HfstTransducer context_copy(context);
+  return center = 
+    context_copy.concatenate(center).concatenate(context).minimize();
+}
+\end{verbatim}
+\end{center}
+\end{figure}
+
+Internally {\tt HfstTransducer} objects contain pointers to specific
+transducer library implementations. These are wrappers on the actual
+transducer libraries. Currently there are four wrappers for three
+libraries sfst, openfst and foma. The tropical weight semiring and log
+weight semiring in OpenFst require separate wrappers. An {\tt
+  HfstTransducer} can be initialized using any of the three transducer
+libraries, which are available, and it is possible to convert between
+the libraries in runtime.
+
+A wrapper for a library consists of input and output stream classes
+for reading and storing binary transducers and a transducer class. The
+wrappers encapsulate implementation specific details in the different
+transducer libraries thus providing the HFST interface a unified way
+to manipulate objects from the different transducer
+libraries. E.g. the wrappers for SFST are the classes {\tt
+  SfstInputStream}, {\tt SfstOutputStream} and {\tt SfstTransducer}.
+
+Internally each {\tt HfstTransducer} object {\tt t} points to one of
+the implementations e.g. {\tt SfstTransducer}. When {\tt t.minimize()}
+is called, the {\tt minimize} in {\tt fstTransducer} gets called. 
+
+In binary operations like {\tt concatenate}, there is risk for a
+transducer type mismatch, since the {\tt HfstTransducer} objects
+involved may have different types. In case they do, an exception is
+thrown. This can be caught and the transducers can be converted to a
+common type. The concatenation can then safely take place.
+
+In HFST3 we have made a conscious choice to not convert transducer
+automatically in binary operations because this might loose
+information, e.g. when converting from unweighted to weighted formats.
+
+\subsection{Adding New Libraries to HFST}
+
+The task of adding a new transducer library {\tt MyTransducerLibrary} to HFST can be broken into three subtasks.
+
+\begin{enumerate}
+\item Building the wrappers {\tt MyTransducerLibraryInputStream}, {\tt
+  MyTransducerLibraryOutputStream} and {\tt
+  MyTransducerLibraryTransducer}.
+\item Adding conversion functions to/from {\tt
+  MyTransducerLibraryTransducer} objects from/to the HFST internal
+  format {\tt HfstBasicTransducer}.
+\item Adding necessary declarations into the master interface files
+  {\tt HfstTransducer.h} and {\tt HfstTransducer.cc} in order to use
+  the interface functions properly.
+\end{enumerate} 
+
+Unless {\tt MyTransducerLibrary} has an alphabet implementation which
+associates string symbos with symbol numbers, such an alphabet has to
+be created additionally.
+
+There is support in the current HFST interface also for transducers
+with weight semi-rings which are not representable as floating point
+numbers, though this may require implementing some new functions.
+
+\subsection{Programming in HFST}
 
 \section{Structural Layout cont.}
 % SH
