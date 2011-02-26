@@ -86,6 +86,7 @@ Rules/{RESERVED_SYMBOL} {
   // Rules declaration.
   symbol_queue.push_back("__HFST_TWOLC_Rules"); 
   reduce_queue();
+  regexp_start = true;
   return RULES_DECLARATION; 
 }
 where/{RESERVED_SYMBOL} {

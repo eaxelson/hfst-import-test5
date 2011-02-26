@@ -293,8 +293,25 @@ SET_SYMBOL: GRAMMAR_SYMBOL_SPACE
 { 
   // Push the set_symbol into latest_set, which contains symbols in the next
   // set which will be defined.
-  latest_set.push_back(get_symbol_queue_front());
-  reduce_queue();  
+  if (sets.find(get_symbol_queue_front()) != sets.end())
+    {
+      for (std::vector<std::string>::iterator it = 
+	     set_symbols
+	     ["__HFST_TWOLC_SET_NAME=" + get_symbol_queue_front()].begin();
+	   it != set_symbols
+	     ["__HFST_TWOLC_SET_NAME=" + get_symbol_queue_front()].end();
+	   ++it)
+	{ 
+	  std::cout << *it << " ";
+	  latest_set.push_back(*it);
+	}
+      pop_symbol_queue();
+    }
+  else
+    { 
+      latest_set.push_back(get_symbol_queue_front()); 
+      reduce_queue();  
+    }
 }
 
 SET_DEFINITION: SET_NAME EQUALS SYMBOL_LIST SEMI_COLON_LIST
