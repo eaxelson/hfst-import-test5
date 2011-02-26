@@ -140,16 +140,9 @@ void Alphabet::define_diacritics(const SymbolRange &diacs)
        it != diacritics.end();
        ++it)
     { 
-      std::cerr << "Erasing: " << *it << ":" << *it << std::endl;
       alphabet_set.erase(SymbolPair(*it,*it)); 
       input_symbols.erase(*it);
       output_symbols.erase(*it);
-    }
-  for (HandySet<SymbolPair>::iterator it = alphabet_set.begin();
-       it != alphabet_set.end();
-       ++it)
-    { 
-      std::cerr << it->first << ":" << it->second << std::endl;
     }
 }
 
