@@ -151,7 +151,7 @@ An HFST transducer in binary format consists of an HFST header followed by the
 backend implementation in binary 
 format\footnote{\url{https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstTransducerHeader}}. 
 In version 3.0, the header
-format is less error-prone than in the previous version and gives more 
+format is less error-prone than in the previous versions and gives more 
 information both for users of HFST (even when seen on a screen or in a
 text editor in binary format) and for the HFST library itself.
  
@@ -168,26 +168,26 @@ The beginning of an HFST version 3.0 header contains an identifier
 'HFST', a separating zero byte, two bytes signifying the length of
 the rest of the header in bytes and a separating zero byte. The rest
 of the header contains pairs of attributes and their values. The pairs
-are separated by newlines and attributes and values by zero bytes. 
+are separated by newlines, and attributes and values by zero bytes. 
 HFST version 3.0 header must contain at least the attributes
 'version', 'type' and 'name' (in that order) and their values. 
 Additional attributes can follow after these obligatory ones. 
-For instance, we could include information on the minimality or
-cyclicity of a transducer even if the backend implementation did not
+For instance, we can include information on the minimality or
+cyclicity of a transducer even if the backend implementation does not
 store these properties in its binary format (e.g. SFST). 
 
 The new header format makes it easier to react to unexpected
-situations and inform the user of them. When we start to read an HFST
+situations and inform the user, if necessary. When we read an HFST
 binary transducer, we first see whether the identifier 'HFST' is
-found. If it is not found, we know that the user has given a wrong
+found. If it is not, we know that the user has given a wrong
 type of file and can throw a appropriate exception. 
-Next we see what kind of transducer is coming from the stream. 
+Next we see what is the implementation type of the transducer. 
 If the backend transducer library is not linked to HFST, we can handle
 the situation by throwing an exception again. 
-Next we see the HFST version used and know how to process the header
-and the backend implementation correctly. 
-If the user has requested a verbose mode for a tool that reads the
-transducer, it is possible to print the name of each transducer 
+Then we see what is the version of the header in order to process 
+the rest of the header and the backend implementation correctly. 
+If the user has requested a verbose mode for a tool that is reading the
+transducer, it is also possible to print the name of each transducer 
 before or after reading it.
 
 \subsection{Conversion Between Different Backend Formats}
@@ -264,7 +264,7 @@ transducer's alphabet. It was up to the backend implementation to take
 care of alphabets. In SFST the transducers always have an alphabet,
 but in OpenFst their use is optional so we did not use them in our
 OpenFst implementation.
-
+ 
 In HFST version 3.0, we need to be aware of alphabets because two new
 special symbols are included, \texttt{unknown} and \texttt{identity}. 
 These special symbols are a part of the Xerox Finite-State Tool (XFST) 
