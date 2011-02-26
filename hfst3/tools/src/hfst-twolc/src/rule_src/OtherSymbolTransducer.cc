@@ -48,6 +48,16 @@ void OtherSymbolTransducer::define_diacritics
   OtherSymbolTransducer::diacritics.clear();
   OtherSymbolTransducer::diacritics.insert
     (diacritics.begin(),diacritics.end());
+  for (HandySet<std::string>::iterator it = 
+	 OtherSymbolTransducer::diacritics.begin();
+       it != OtherSymbolTransducer::diacritics.end();
+       ++it)
+    { 
+      std::cerr << "Erasing: " << *it << ":" << *it << std::endl;
+      symbol_pairs.erase(SymbolPair(*it,*it)); 
+      input_symbols.erase(*it);
+      output_symbols.erase(*it);
+    }
 }
 
 OtherSymbolTransducer OtherSymbolTransducer::get_universal(void)
@@ -94,7 +104,6 @@ OtherSymbolTransducer::OtherSymbolTransducer
   check_pair(input_symbol,output_symbol); 
   if (is_broken)
     { return; }
-  
   if (input_symbol == HFST_UNKNOWN && output_symbol == HFST_UNKNOWN)
     { transducer = get_universal().transducer; }
   else
@@ -164,6 +173,58 @@ OtherSymbolTransducer::OtherSymbolTransducer
   is_broken(another.is_broken),
   transducer(another.transducer)
 { /*add_diamond_transition();*/ }
+
+OtherSymbolTransducer &OtherSymbolTransducer::harmonize_diacritics
+(OtherSymbolTransducer &t)
+{
+  HfstBasicTransducer basic(transducer);
+  std::set<std::string> alphabet = 
+    basic.get_alphabet();
+
+  HfstBasicTransducer basic_t(t.transducer);
+  std::set<std::string> t_alphabet = 
+    basic_t.get_alphabet();
+
+  HandySet<std::string> missing_diacritics;
+
+  for (HandySet<std::string>::const_iterator it = diacritics.begin();
+       it != diacritics.end();
+       ++it)
+    {
+      if (t_alphabet.find(*it) != t_alphabet.end() and
+	  alphabet.find(*it) == alphabet.end())
+	{ missing_diacritics.insert(*it); }
+    }
+  if (missing_diacritics.empty())
+    { return *this; }
+
+  for (HfstBasicTransducer::iterator it = basic.begin();
+       it != basic.end();
+       ++it)
+    {
+      for (HfstBasicTransitionSet::iterator jt = it->second.begin();
+	   jt != it->second.end();
+	   ++jt)
+	{
+	  if (jt->get_input_symbol() == TWOLC_IDENTITY)
+	    {
+	      HfstState target = jt->get_target_state();
+
+	      for (HandySet<std::string>::iterator kt = 
+		     missing_diacritics.begin();
+		   kt != missing_diacritics.end();
+		   ++kt)
+		{
+		  it->second.insert
+		    (HfstBasicTransition(target,*kt,*kt,0.0));
+		}
+	      break;
+	    }
+	}
+    }
+  transducer = HfstTransducer(basic,transducer_type);
+  return *this;
+}
 
 OtherSymbolTransducer OtherSymbolTransducer::get_context
 (OtherSymbolTransducer &left,OtherSymbolTransducer &right)
@@ -281,6 +342,11 @@ OtherSymbolTransducer &OtherSymbolTransducer::apply
   if (another.is_broken)
     { throw UndefinedSymbolPairsFound(); }
   OtherSymbolTransducer another_copy(another);
+  if (not diacritics.empty())
+    {
+      harmonize_diacritics(another_copy);
+      another_copy.harmonize_diacritics(*this);
+    }
   transducer = CALL_MEMBER_FN(transducer,p)(another_copy.transducer); 
   transducer = CALL_MEMBER_FN(transducer,&HfstTransducer::minimize)(); 
   return *this;

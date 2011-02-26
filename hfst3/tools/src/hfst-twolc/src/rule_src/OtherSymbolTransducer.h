@@ -215,6 +215,8 @@ class OtherSymbolTransducer
   //! Return true, iff @a sym exists in the alphabet of @a t.
   static bool has_symbol(const HfstBasicTransducer &t,const std::string &sym);
 
+  OtherSymbolTransducer &harmonize_diacritics(OtherSymbolTransducer &t);
+    
   //! @brief Set the state @a state final.
   static void set_final(HfstBasicTransducer &center_t,size_t state);
 

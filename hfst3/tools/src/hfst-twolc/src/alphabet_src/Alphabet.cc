@@ -32,6 +32,8 @@ bool Alphabet::is_pair(const std::string &input,const std::string &output)
     { return output_symbols.has_element(output); }
   if (output == "__HFST_TWOLC_?")
     { return input_symbols.has_element(input); }
+  if (diacritics.has_element(input) and input == output)
+    { return true; }
   return alphabet_set.has_element(SymbolPair(input,output));
 }
 
@@ -129,6 +131,26 @@ void Alphabet::define_alphabet_pair(const SymbolPair &pair)
   alphabet_set.insert(pair); 
   input_symbols.insert(pair.first);
   output_symbols.insert(pair.second);
+}
+
+void Alphabet::define_diacritics(const SymbolRange &diacs)
+{ 
+  diacritics.insert(diacs.begin(),diacs.end()); 
+  for (HandySet<std::string>::iterator it = diacritics.begin();
+       it != diacritics.end();
+       ++it)
+    { 
+      std::cerr << "Erasing: " << *it << ":" << *it << std::endl;
+      alphabet_set.erase(SymbolPair(*it,*it)); 
+      input_symbols.erase(*it);
+      output_symbols.erase(*it);
+    }
+  for (HandySet<SymbolPair>::iterator it = alphabet_set.begin();
+       it != alphabet_set.end();
+       ++it)
+    { 
+      std::cerr << it->first << ":" << it->second << std::endl;
+    }
 }
 
 void Alphabet::alphabet_done(void)
