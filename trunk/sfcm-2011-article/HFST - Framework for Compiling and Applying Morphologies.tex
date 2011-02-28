@@ -25,7 +25,7 @@ tommi.pirinen, miikka silfverberg\}@helsinki.fi}}
 % if it's required fetch it from svn history
 
 \begin{abstract}
-HFST--Helsinki Finite-State Technology web site\footnote{hfst.sf.net}
+HFST--Helsinki Finite-State Technology\footnote{hfst.sf.net}
 is a framework for compiling and applying linguistic descriptions with
 finite-state methods. 
 HFST currently collects some of the most important finite-state tools for creating
@@ -82,7 +82,7 @@ for processing finite-state transducers in specialized ways. As far as possible,
 we have tried to avoid implementing yet another finite-state calculus. We have 
 rather utilized existing free open source implementations, e.g. SFST by Helmut 
 Schmid~\cite{schmid/2005} and foma by Måns Huldén~\cite{hulden/2009} 
-for transducers without weights, as well as OpenFST  by M. Riley, J. Schalkwyk, W. Skut, 
+for transducers without weights, as well as OpenFst  by M. Riley, J. Schalkwyk, W. Skut, 
 C. Allauzen and M. Mohri~\cite{openfst/2007} for weighted transducers. A structural 
 layout of how this compatibility is accomplished in HFST is available in Section~\ref{hfst:structural-layout}.
 
@@ -101,7 +101,7 @@ available in HFST, see Section~\ref{hfst:data-formats}
 % 3. SFST Programming Language Compatibility \ref{hfst:sfst-compatibility}
 An early adopter of the open-source paradigm was the SFST--Stuttgart Finite-State 
 programming language which also has attracted developers of full-scale lexicons for 
-various languages, e.g. German, Finnish, Turkish, Italian, etc. The benefits of HFST is 
+various languages, e.g. German, Finnish, Turkish, Italian, etc. The benefits of HFST are 
 demonstrated by using the foma library to implement the SFST programming language,
 which reduces the compile time to a fraction of the original. For further details on this, 
 see Section~\ref{hfst:sfst-compatibility}.
@@ -121,22 +121,22 @@ the size of a corresponding uncompacted file, in Section~\ref{hfst:optimized-loo
 % 6. Application Areas \ref{hfst:application-areas}
 Some of the open-source application areas, where HFST is already in use, e.g. 
 spell-checking through Voikko for OpenOffice, machine translation preprocessing via Apertium 
-and part-of-speech tagging using parallell weighted transducers, are outlined in Section~\ref{hfst:application-areas}.
+and part-of-speech tagging using parallel weighted transducers, are outlined in Section~\ref{hfst:application-areas}.
 
 % 7. Discussion
 HFST supports both commercial and open source applications. The tools and libraries of HFST are
 compatible with the GNU GPL license, which means that any FST produced with HFST tools will 
 remain under the licensing conditions of the input lexicons and rule sets. The HFST runtime
-format and runtime library are also released under the Apache license. This means that the
+format and runtime library are additionally released under the Apache license. This means that the
 HFST tools and the HFST runtime library can be used both for open source and proprietary projects.
-A further discussion of the impact HFST is already having on the field and some of the 
-open-source morphologies currently available is provided in Section~\ref{hfst:discussion}.
+A further discussion of the impact of the HFST environment and some of the open-source 
+morphologies currently available is provided in Section~\ref{hfst:discussion}.
 
 
 \section{Structural Layout}\label{hfst:structural-layout}
 
 Finite-state transducer libraries such as SFST~\cite{schmid/2005},
-foma~\cite{hulden/2009} and OpenFST~\cite{openfst/2007} all provide
+foma~\cite{hulden/2009} and OpenFst~\cite{openfst/2007} all provide
 different ways for creating transducers, e.g. foma emulates the Xfst
 formalism and SFST contains a compiler for its own regular expression
 formalism. The lack of common formalisms makes it difficult to compare
@@ -146,7 +146,7 @@ be used for computing the same tasks.
 One of the original goals in the HFST project was to provide a
 framework where it is possible to compare the performance of different
 finite-state transducer libraries on the same tasks. HFST~2.0 provided
-limited support for this by joining SFST and OpenFST under one
+limited support for this by joining SFST and OpenFst under one
 interface. Regrettably, adding new libraries was cumbersome in HFST~2.0. 
 To remedy this, HFST~3.0 was designed to make it practical to add both
 complete and partial implementations of transducer libraries and to use
@@ -175,9 +175,11 @@ how new libraries can be linked and tested.
 Transducers in HFST are objects of the class {\tt HfstTransducer}. The
 {\tt HfstTrans\-ducer} class supports all the ordinary transducer
 operations like disjunction, composition and automaton determinization. 
-HfstTransducer encapsulates the different transducer
-libraries under the HFST interface, so the same code will work for all
-transducer libraries which are part of HFST. E.g. the function {\tt containment} in figure~\ref{containment-figure} works equally well for transducers whose are underlying implementation is an SFST transducer and transducers which are internally foma transducers.
+{\tt HfstTransducer} encapsulates the different transducer
+libraries under the HFST interface, i.e. the same code will work for all
+transducer libraries which are part of HFST. E.g. the function {\tt containment} 
+in Figure~\ref{containment-figure} works equally well for transducers whose 
+underlying implementation is an SFST or a foma transducer.
 
 \begin{figure}
 \begin{center}
@@ -198,8 +200,8 @@ transducer libraries which are part of HFST. E.g. the function {\tt containment}
 Internally {\tt HfstTransducer} objects contain pointers to specific
 transducer library implementations. These are wrappers on the actual
 transducer libraries. Currently there are four wrappers for three
-libraries SFST, OpenFST and foma. The tropical weight semi-ring and log
-weight semi-ring in OpenFST have separate wrappers. An {\tt
+libraries SFST, OpenFst and foma. The tropical weight semi-ring and log
+weight semi-ring in OpenFst have separate wrappers. An {\tt
   HfstTransducer} can be initialized using any of the three transducer
 libraries, which are available, and it is possible to convert between
 the libraries at runtime.
@@ -268,7 +270,7 @@ e.g. tries to extract all paths from a cyclic transducer.
 Throwing an exception on such occasions gives the user a possibility
 to catch the exception and recover from the situation. In HFST version
 2.0, exceptional situations were handled by printing a short message
-in the standard error stream and exiting with an error code. In HFST version 3.0, 
+on the standard error stream and exiting with an error code. In HFST version 3.0, 
 exceptions are classes that have a figurative name and contain an 
 optional error message.
 
@@ -315,7 +317,7 @@ for them. HFST is now independent of any particular library and requires no
 custom extensions to the libraries it uses.
 
 Previously, HFST relied on custom extensions to the libraries it supported,
-namely OpenFST and SFST, which made it necessary to statically link them into
+namely OpenFst and SFST, which made it necessary to statically link them into
 \verb+libhfst+. This was obviously also rather restrictive in terms of
 new versions and different use cases, e.g. experimenting with local changes to
 the underlying libraries.
@@ -359,7 +361,7 @@ text editor in binary format, and for the HFST library itself.
 The current header format is somewhat similar to foma where pieces of 
 information are separated by newline characters to make them more
 readable. In HFST version 2.0, we represented the properties of a
-transducer in a two-byte bit vector akin to the OpenFST header
+transducer in a two-byte bit vector akin to the OpenFst header
 format. The type of the transducer and the existence of an optional
 alphabet in the transducer were also encoded with two characters in the beginning of the
 binary transducer which required familiarity with the specifications to interpret.
@@ -369,7 +371,7 @@ The beginning of an HFST version 3.0 header contains an identifier
 the rest of the header in bytes and a separating zero byte. The rest
 of the header contains pairs of attributes and their values. The pairs
 are separated by newlines, and attributes and values by zero bytes. 
-A HFST version 3.0 header must contain at least the attributes
+An HFST version 3.0 header must contain at least the attributes
 'version', 'type' and 'name' (in that order) and their values. 
 Additional attributes can follow after these obligatory ones. 
 For instance, we can include information on the minimality or
@@ -380,7 +382,7 @@ The new header format makes it easier to react to unexpected
 situations and inform the user, if necessary. When we read an HFST
 binary transducer, we first see whether the identifier 'HFST' is
 found. If not, we know that the user has given an incorrect
-file type and can throw a appropriate exception. 
+file type and can throw an appropriate exception. 
 Next we recognize the implementation type of the transducer. 
 If the back-end transducer library is not linked to HFST, we can handle
 the situation by throwing another exception. 
@@ -392,7 +394,7 @@ before or after reading it.
 
 \subsection{Conversion Between Different Back-End Formats}
 In HFST version 3.0, the conversion between different back-end formats, i.e. 
-SFST, foma or OpenFST with tropical and logarithmic semi-ring,  is
+SFST, foma or OpenFst with tropical and logarithmic semi-ring,  is
 carried out through the prorpietary HFST transducer format, \texttt{HfstTransitionGraph}. 
 The HFST internal format is a simple transition graph data type that consists 
 of states (unsigned integers) and transitions between those 
@@ -446,14 +448,14 @@ known to that transducer. The alphabet includes all symbols that occur
 or have occurred in the transitions of the transducer unless explicitly
 removed from the alphabet. 
 If we apply a binary operation (e.g. disjunction or composition) on 
-transducers A and B, the resulting transducer's alphabet will include
-all symbols that were in the alphabets of A and B. 
+transducers $A$ and $B$, the resulting transducer's alphabet will include
+all symbols that were in the alphabets of $A$ and $B$. 
 
 In HFST version 2, alphabets were designed to be external to the transducer,
 and the interface did not offer any way convenient way for the user to access a 
 transducer's internal representation of the alphabet. It was up to the back-end 
 implementation to take care of the alphabet of an individual transducer. In SFST 
-the transducers always have an explicit alphabet, but in OpenFST their use is optional.
+the transducers always have an explicit alphabet, but in OpenFst their use is optional.
  
 In HFST version 3.0, we need to be aware of transducer-specific alphabets 
 because two new special symbols are included, \texttt{unknown} and \texttt{identity}. 
@@ -469,7 +471,7 @@ with all back-end implementations.
 In this way, we can offer users of HFST a new 
 formalism for regular expressions in addition to the one available in SFST. 
 As the extension is already implemented in foma, we only needed to 
-consider SFST and OpenFST in HFST~3.0.
+consider SFST and OpenFst in HFST~3.0.
 
 Aside from keeping track of all symbols known to an individual transducer, we also
 have to expand each transition involving \texttt{unknown} and 
@@ -498,7 +500,7 @@ see~\cite{hulden/2009} and~\cite{beesley/2003}.
 It is also possible to switch off the handling of special symbols if we know
 for sure that they are not used in the transducers. 
 In this way, we can optimize performance for instance for the tool 
-{\verb hfst-calculate} that processes the SFST programming language 
+{\tt hfst-calculate} that processes the SFST programming language 
 formalism which does not support the unknown or identity symbols.
 
 
@@ -508,7 +510,7 @@ We compiled two finite-state morphologies in the SFST programming language forma
 with HFST versions 2.0 and 3.0. 
 The morphologies were OMorFi~\cite{pirinen/2008} for Finnish and 
 Morphisto~\cite{zielinski/2009} for German.
-In table~\ref{tab:compilation_times} are the compilation times 
+In Table~\ref{tab:compilation_times} are the compilation times 
 for both morphologies with 
 different back-end implementations with both versions of HFST. 
 Note that the foma implementation was not available in version 2.0.
@@ -520,7 +522,7 @@ Note that the foma implementation was not available in version 2.0.
   Back-End                  & version & Finnish & German \\ \hline
   \multirow{2}{*}{SFST}    & 2.0     & 25:16   & 107:47 \\
                            & 3.0     & 5:02    & 6:39 \\ \hline
-  \multirow{2}{*}{OpenFST} & 2.0     & 7:54    & 6:23 \\
+  \multirow{2}{*}{OpenFst} & 2.0     & 7:54    & 6:23 \\
                            & 3.0     & 6:51    & 6:28 \\ \hline
   \multirow{2}{*}{foma}    & 2.0     & -       & - \\
                            & 3.0     & 1:49    & 1:29 \\ 
@@ -540,21 +542,21 @@ minimization algorithm~\cite{hopcroft/1971} instead of
 Brzozowski's~\cite{brzozowski/1964}. 
 We noticed that the Brozowski minimization algorithm hampered the performance
 already when we were testing HFST version 2.0; 
-OpenFST was clearly faster because it used the Hopcroft algorithm. 
+OpenFst was clearly faster because it used the Hopcroft algorithm. 
 Based on this observation, Helmut Schmid improved SFST by 
 writing a minimization function using the Hopcroft algorithm.
 
-When comparing the compilation times for OpenFST, we see that the
+When comparing the compilation times for OpenFst, we see that the
 Finnish morphology compiles faster but the German one slightly slower
 on HFST version 3.0 than on version 2.0. This is because there are two
 main factors that contribute to the difference in performance. Firstly, we
-are currently using OpenFST version 1.2.7 that is faster than the
+are currently using OpenFst version 1.2.7 that is faster than the
 previous versions. Secondly, in HFST version 3.0 we no longer use a
 global number-to-symbol encoding for all transducers during one
 session. Every time we perform a binary operation on two transducers,
 we harmonize the encodings of the transducers. Nevertheless, 
 it seems that the newer, more efficient version of 
-OpenFST mostly compensates for this additional effort caused by harmonization. 
+OpenFst mostly compensates for this additional effort caused by harmonization. 
 
 We did not have the foma implementation of the SFST programming language 
 available in HFST version 2.0, but it is evident that it is much faster than the other
@@ -619,7 +621,7 @@ Karttunen~\cite{Karttunen/1994} and later extended to weighted
 transducer in HFST~2.0 by Silfverberg and Lind\'{e}n~\cite{silfverberg/2009/2}.
 
 The intersecting composition operation was implemented in HFST~2.0, but
-we used techniques adopted from OpenFST~\cite{openfst/2007} to improve
+we used techniques adopted from OpenFst~\cite{openfst/2007} to improve
 the implementation, and the current implementation is significantly
 faster than the old one. The current implementation computes a lazy
 pairwise intersection of the rule transducers. The lexicon can be
@@ -691,7 +693,7 @@ their lazy intersection structure.
 
 Like the old implementation, the current implementation of
 intersecting composition is equivalent with Xerox style flag diacritics
-and {\verb identity} symbols.
+and {\tt identity} symbols.
 
 \begin{table}[htb!]
 \begin{center}
@@ -746,7 +748,7 @@ was put to use in various text stream processing scripts (e.g.
 \verb+-hyphenate+ for hyphenation).
 
 \subsubsection{HFST~3.0.}
-Originally compilation to the format was only possible from the SFST and OpenFST
+Originally compilation to the format was only possible from the SFST and OpenFst
 formats, and as uses and applications proliferated, it became desirable to
 provide some API access to optimized-lookup in the HFST library. In HFST~3.0
 this has been accomplished by implementing compilation from the HFST internal
@@ -974,13 +976,16 @@ spellers~\cite{pirinen/2010/cla} with an improved error correction mechanism
 already exist. The effort to collect existing morphological descriptions
 for various languages is on-going.
 
+A concrete outcome of the current HFST environment is that it is now possible to take 
+a lexicon developed with e.g. Xfst or Hunspell and weight it with material from a specialized corpus 
+in order to create a tailored speller for a given domain. This can all be accomplished in the course 
+of an afternoon after which we can start using it in e.g. OpenOffice.
+
 As future work, we are investigating how to extend the morphological analyzers 
 into finite-state implementations of constraint 
 grammars\footnote{\url{http://beta.visl.sdu.dk/cg3.html}} and other 
 dependency-related tagger and grammar formalisms using both statistical
-and rule-based approaches with weighted finite-state transducers. For this, we
-will extend the HFST library with specialized libraries for processing
-words and n-grams in context.
+and rule-based approaches with weighted finite-state transducers. 
 
 %
 % trmorph
@@ -1000,8 +1005,8 @@ libraries for finite-state algorithms and applications. Especially facilitating 
 finite-state implementations is important for processing and enhancing language descriptions created with different
 tools and formalisms. In this article, we especially focused on two finite-state programming language environments, 
 i.e. the SFST Programming Language and the Xerox tools for creating morphological descriptions and showed
-that the HFST toolkit can cover a wider range of languages and applications compared with the original finite-state programming language. We have also demonstrated that the cross-usage of finite-state programming language 
-front-ends and finite-state library back-ends can provide significant reductions in compile time.
+that the HFST toolkit can cover a wider range of languages and applications compared with the original finite-state environments. We have also demonstrated that the cross-usage of finite-state programming language 
+front-ends and finite-state library back-ends can provide significant reductions in processing time.
 
 \section*{Acknowledgments}
 
