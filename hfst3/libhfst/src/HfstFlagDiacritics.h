@@ -195,7 +195,7 @@ public:
     FdState():
         table(NULL), values(), error_flag(false)
         {}
-    
+
     const FdTable<T>& get_table() const {return *table;}
     
     bool apply_operation(const FdOperation& op)
@@ -268,5 +268,6 @@ public:
             values.insert(values.begin(), table->num_features(), 0);
         }
 };
+
 }
 #endif
