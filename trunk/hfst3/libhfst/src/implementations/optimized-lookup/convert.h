@@ -148,10 +148,9 @@ public:
 		return true;
 		}
 		return false;
-		}
-		}
+		}*/
 		
-*/
+
 	unsigned int filled = 0;
 	for (unsigned int i = 0; i < symbols; ++i) {
 	    filled += count(index + i);
@@ -160,6 +159,7 @@ public:
 	    return true;
 	}
 	return false;
+
     }
 };
 
