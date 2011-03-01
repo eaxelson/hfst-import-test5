@@ -1038,7 +1038,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
       typedef std::set<std::string> StringSet;
       // The transition array is indexed starting from this constant
       const unsigned int TA_OFFSET = 2147483648u;
-      const float packing_aggression = 0.85;
+      const float packing_aggression = 0.7;
       const std::string epstr = "@_EPSILON_SYMBOL_@";
 
       // Symbols must be in the following order in an optimized-lookup
@@ -1058,7 +1058,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
       StringSet * input_symbols = new StringSet();
       StringSet * flag_diacritics = new StringSet();
       StringSet * other_symbols = new StringSet();
-    
+
       for (HfstBasicTransducer::const_iterator it = t->begin(); 
            it != t->end(); ++it) {
           for (HfstBasicTransducer::HfstTransitionSet::const_iterator tr_it 
@@ -1235,7 +1235,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
     }
     hfst_ol::TransducerTable<hfst_ol::TransitionW> wtransition_table;
 
-    for(unsigned int i = 0; i <= (--(used_indices->end()))->first; ++i) {
+    for(unsigned int i = 0; i <= (used_indices->rbegin())->first; ++i) {
         if (used_indices->count(i) == 0) { // blank entries
             windex_table.append(hfst_ol::TransitionWIndex());
         } else { // nonblank entries
