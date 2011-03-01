@@ -327,6 +327,10 @@ public:
 	{ return (symbol == 0) ? "" : symbol_table[symbol]; }
     const hfst::FdTable<SymbolNumber>& get_fd_table() const
 	{ return fd_table; }
+    const hfst::FdOperation * get_operation(SymbolNumber symbol) const
+	{
+	    return fd_table.get_operation(symbol);
+	}
 };
 
 class TransitionIndex

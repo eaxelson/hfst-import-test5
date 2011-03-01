@@ -1251,7 +1251,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 
     delete used_indices;
     
-    for (unsigned int i = 0; i < symbol_table.size(); ++i) {
+    for (unsigned int i = 0; i < seen_input_symbols; ++i) {
         windex_table.append(hfst_ol::TransitionWIndex()); // padding
     }
 

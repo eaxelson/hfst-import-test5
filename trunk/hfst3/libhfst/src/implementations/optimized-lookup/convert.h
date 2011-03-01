@@ -56,6 +56,9 @@ struct StatePlaceholder {
 	{ }
     bool is_simple(std::set<SymbolNumber> & flag_symbols)
 	{
+	    if (state_number == 0) {
+		return false;
+	    }
 	    if (flag_symbols.size() == 0) {
 		return inputs.size() < 2;
 	    }
