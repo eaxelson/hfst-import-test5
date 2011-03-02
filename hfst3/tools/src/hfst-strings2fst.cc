@@ -130,7 +130,9 @@ print_usage()
             "openfst-tropical, sfst or foma\n"
             "If EPS is not defined, the default representation of @0@ is used.\n"
         "Option --log precedes option --norm.\n"
-        "The FILE of option -m lists all multichar-symbols, each symbol on its own line."   
+        "The FILE of option -m lists all multichar-symbols, each symbol on its own line.\n"   
+      "The backslash '\\' is reserved for escaping a colon ':' or a space ' '\n"
+	"and it cannot be used as such\n"
         "\n"
             );
 
@@ -238,6 +240,8 @@ process_stream(HfstOutputStream& outstream)
     {
       tok.add_multichar_symbol(*it);
     }
+  // add skip symbol '\\' to tokenizer
+  tok.add_skip_symbol("\\");
 
   while (hfst_getline(&line, &len, inputfile) != -1)
     {

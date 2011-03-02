@@ -1531,14 +1531,15 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
 	    /* This does not throw an exception only if the type of the
 	       transducer is HFST_OL or HFST_OLW. */
           }
-        //catch (hfst::exceptions::FunctionNotImplementedException)
+        // FunctionNotImplementedException
 	catch (const HfstException e)
           {
             if (!internal_transducers)
               {
-                warning(0, 0, "Lookup not supported on this automaton "
-                      "format: converting to HFST basic transducer "
-              "and trying\n");
+                warning(0, 0, 
+			"Lookup not supported on this automaton "
+			"format: converting to HFST basic transducer "
+			"and trying\n");
                 for (unsigned int i=0; i<cascade.size(); i++) 
                   {
                     HfstBasicTransducer mut(cascade[i]);

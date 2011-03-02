@@ -562,25 +562,12 @@ namespace hfst
           (void)stream_get();
           (void)stream_get();
           (void)stream_get();
-          //int i1 = (int)stream_get();
-          //int i2 = (int)stream_get();
-          //unsigned int prop_length= i2*256 + i1;
           bytes_read=4;
-          //if (prop_length != 2) {
-          //  debug_error("#2");
-          //  throw hfst::exceptions::NotTransducerStreamException();
-          //}
           char c5=stream_get();
-          //bytes_read++;
           if (c5 == 'A')
             return HFST_VERSION_2_UNWEIGHTED_WITHOUT_ALPHABET;
           if (c5 == 'a') {
             stream_unget(c5);
-            //stream_unget(c4);
-            //stream_unget(c3);
-            //stream_unget(c2);
-            //stream_unget(c1);
-            //bytes_read--;
             return HFST_VERSION_2_UNWEIGHTED;
           }
           else {
@@ -613,7 +600,6 @@ namespace hfst
   (StringPairVector &header_data, bool warnings)
   {
     if (header_data.size() < 2) {
-      //throw hfst::exceptions::TransducerHeaderException();
       HFST_THROW_MESSAGE
 	(TransducerHeaderException,
 	 "Hfst header has too few attributes");
@@ -829,7 +815,6 @@ namespace hfst
         }
         if (stream_eof()) {
           debug_error("#8");
-          //throw hfst::exceptions::NotTransducerStreamException();
 	  HFST_THROW_MESSAGE
 	    (NotTransducerStreamException,
 	     "HFST header: FATAL: stream ended"
@@ -984,7 +969,6 @@ namespace hfst
     catch( const HfstException e)
       { throw e; }
     if ( not HfstTransducer::is_implementation_type_available(type)) {
-      //throw hfst::exceptions::ImplementationTypeNotAvailableException();
       HFST_THROW(ImplementationTypeNotAvailableException);
     }
 

@@ -179,7 +179,7 @@ fprintf(stderr, "Read %i transducers in total.\n", (int)transducers.size());
 
 
     thrown by 
-    hfst::HfstTransducer::HfstTransducer(FILE*,ImplementationType,const std::string&)}
+    hfst::HfstTransducer::HfstTransducer(FILE*,ImplementationType,const std::string&)
 */
 HFST_EXCEPTION_CHILD_DECLARATION(NotValidAttFormatException);
 

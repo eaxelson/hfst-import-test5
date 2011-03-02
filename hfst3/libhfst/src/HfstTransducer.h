@@ -321,8 +321,7 @@ tr1.disjunct(tr2);
 
        @pre The file exists, otherwise an exception is thrown.
        @see HfstTransducer(FILE, ImplementationType, const std::string&)
-       @throws hfst::exceptions::StreamNotReadableException 
-       hfst::exceptions::NotValidAttFormatException */
+       @throws StreamNotReadableException NotValidAttFormatException */
     static HfstTransducer &read_in_att_format
       (const std::string &filename, ImplementationType type, 
        const std::string &epsilon_symbol);
@@ -349,11 +348,11 @@ tr1.disjunct(tr2);
         
         @note This constructor leaves the backend implementation variable
         uninitialized. An uninitialized transducer is likely to cause an
-        hfst::exceptions::TransducerHasWrongTypeException at some point. */
+        TransducerHasWrongTypeException at some point. */
     HfstTransducer();
 
     /** \brief Create an empty transducer, i.e. a transducer that does not 
-        recognize any string. The type of the transducer is befined by \a type.
+        recognize any string. The type of the transducer is defined by \a type.
 
         @note Use HfstTransducer("@_EPSILON_SYMBOL_@") 
         to create an epsilon transducer.
@@ -432,8 +431,8 @@ tr1.disjunct(tr2);
 
         @pre ( in.is_eof() == in.is_bad() == false && in.is_fst() ).
         Otherwise, an exception is thrown.
-        @throws hfst::exceptions::NotTransducerStreamException
-        hfst::exceptions::MissingOpenFstInputSymbolTableException
+        @throws NotTransducerStreamException
+        MissingOpenFstInputSymbolTableException
         @see HfstInputStream **/
     HfstTransducer(HfstInputStream &in);
 
@@ -512,7 +511,7 @@ Epsilon will be represented as "@_EPSILON_SYMBOL_@" in the resulting transducer.
 The argument \a epsilon_symbol only denotes how epsilons are represented 
 in \a ifile.
 
-@throws hfst::exceptions::NotValidAttFormatException
+@throws NotValidAttFormatException
 @see #write_in_att_format(FILE*,bool)const String
 **/
     HfstTransducer(FILE * ifile, ImplementationType type, 
@@ -585,7 +584,7 @@ in \a ifile.
         NOTE: If the transition symbols contain whitespace characters,
         calling HfstTransducer(FILE*, ImplementationType, const std::string&)
         for the output of this function will probably throw an 
-        hfst::exceptions::NotValidAttFormatException
+        NotValidAttFormatException
         because whitespace characters are used as field separators 
         in AT&T format.
 
@@ -725,7 +724,7 @@ ccc : ddd
 \endverbatim
 
         @bug Does not work for HFST_OL_TYPE or HFST_OLW_TYPE
-        @throws hfst::exceptions::TransducerIsCyclicException
+        @throws TransducerIsCyclicException
         @see #n_best */
     void extract_paths
       (HfstTwoLevelPaths &results, int max_num=-1, int cycles=-1) const;
@@ -768,7 +767,7 @@ ccc : ddd
 
 
 	@bug Does not work for HFST_OL_TYPE or HFST_OLW_TYPE
-	@throws hfst::exceptions::TransducerIsCyclicException
+	@throws TransducerIsCyclicException
 	@see extract_paths(HfstTwoLevelPaths&, int, int) const */
     void extract_paths_fd
       (HfstTwoLevelPaths &results, int max_num=-1, int cycles=-1, 
@@ -909,7 +908,7 @@ ccc : ddd
         or #SFST_TYPE, it is converted to #TROPICAL_OPENFST_TYPE,
         strings are extracted and it is converted back to #FOMA_TYPE or 
         #SFST_TYPE. If HFST is not linked to OpenFst library, an
-        hfst::exceptions::ImplementationTypeNotAvailable is thrown.
+        ImplementationTypeNotAvailableException is thrown.
     */
     HfstTransducer &n_best(unsigned int n);
 

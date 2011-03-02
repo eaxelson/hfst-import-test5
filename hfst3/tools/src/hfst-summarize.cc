@@ -353,7 +353,7 @@ int main( int argc, char **argv ) {
     try {
         instream = (inputfile != stdin) ?
         new HfstInputStream(inputfilename) : new HfstInputStream();
-    } //catch (hfst::exceptions::NotTransducerStreamException)  {
+    } // NotTransducerStreamException
     catch (const HfstException e) {
         error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);

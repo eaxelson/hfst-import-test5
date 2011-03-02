@@ -112,7 +112,7 @@ For more information on HFST transducer structure, see
         to the stream. 
 
         By default, all transducers must have the same type, else an
-        hfst::exceptions::TransducerHasWrongTypeException is thrown. */
+        TransducerHasWrongTypeException is thrown. */
     HfstOutputStream &operator<< (HfstTransducer &transducer);
 
     /** \brief Close the stream. 

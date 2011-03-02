@@ -56,7 +56,6 @@ namespace hfst { namespace implementations
     if (t.type == HFST_OL_TYPE || t.type == HFST_OLW_TYPE)
       return hfst_ol_to_hfst_basic_transducer(t.implementation.hfst_ol);
 
-    //throw hfst::exceptions::FunctionNotImplementedException();
     HFST_THROW(FunctionNotImplementedException);
   }
 
@@ -1285,14 +1284,14 @@ unsigned int hfst_ol_to_hfst_basic_add_state
   //my_transducer_library_transducer_to_hfst_basic_transducer
   //  (my_namespace::MyFst * t) {
   //(void)t;
-  //throw hfst::exceptions::FunctionNotImplementedException();
+  //HFST_THROW(FunctionNotImplementedException);
   //}
 
   //my_namespace::MyFst * ConversionFunctions::
   //hfst_basic_transducer_to_my_transducer_library_transducer
   //  (const HfstBasicTransducer * t) {
   //(void)t;
-  //throw hfst::exceptions::FunctionNotImplementedException();
+  //HFST_THROW(FunctionNotImplementedException);
   //}
   //#endif // HAVE_MY_TRANSDUCER_LIBRARY
 
