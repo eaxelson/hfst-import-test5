@@ -22,7 +22,7 @@
 #include <iostream>
 #include <getopt.h>
 
-#include <hfst/HfstTransducer.h>
+#include "HfstTransducer.h"
 using hfst::ImplementationType;
 
 /** successful return value for argument parsing routine */
