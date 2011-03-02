@@ -377,7 +377,6 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
         //#endif
         case ERROR_TYPE:
         default:
-          //throw hfst::exceptions::TransducerHasWrongTypeException();
 	  HFST_THROW(TransducerHasWrongTypeException);
       }
 

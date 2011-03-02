@@ -1345,7 +1345,7 @@ namespace hfst { namespace implementations
     /*if (t->InputSymbols() != t->OutputSymbols()) {
       fprintf(stderr, "ERROR:  LogWeightTransducer::add_transition:"
       "  input and output symbols are not the same\n"); 
-      throw hfst::exceptions::ErrorException(); 
+      throw ErrorException(); 
       }*/
     unsigned int ilabel = st->AddSymbol(isymbol);
     unsigned int olabel = st->AddSymbol(osymbol);

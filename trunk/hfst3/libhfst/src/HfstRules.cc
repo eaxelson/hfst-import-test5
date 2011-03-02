@@ -198,7 +198,8 @@ namespace hfst
                                 StringPairSet &alphabet) 
     {
       if (context.first.get_type() != context.second.get_type()) {
-	HFST_THROW(TransducerTypeMismatchException);
+	HFST_THROW_MESSAGE
+	  (TransducerTypeMismatchException, "rules::two_level_if");
       }
       ImplementationType type = context.first.get_type();
 
@@ -259,7 +260,8 @@ namespace hfst
                                      StringPairSet &alphabet) 
     { 
       if (context.first.get_type() != context.second.get_type()) {
-	HFST_THROW(TransducerTypeMismatchException);
+	HFST_THROW_MESSAGE(TransducerTypeMismatchException, 
+			   "rules::two_level_only_if");
       }
       ImplementationType type = context.first.get_type();
 
@@ -323,13 +325,15 @@ namespace hfst
       // test that all transducers have the same type
       if (context.first.get_type() != context.second.get_type() || 
           context.first.get_type() != t.get_type() ) {
-	HFST_THROW(TransducerTypeMismatchException);
+	HFST_THROW_MESSAGE(TransducerTypeMismatchException,
+			   "rules::replace_in_context");
       }
       ImplementationType type = t.get_type();      
 
       if (DEBUG) printf("  ..transducers have the same type\n");
 
 
+      // TODO:
       // test that both context transducers are automata
       // this could be done more efficiently...
       /*HfstTransducer t1_proj(context.first);
@@ -341,7 +345,7 @@ namespace hfst
 
       if ( not HfstTransducer::are_equivalent(t1_proj, context.first) ||
            not HfstTransducer::are_equivalent(t2_proj, context.second) )
-        throw hfst::exceptions::ContextTransducersAreNotAutomataException();
+        throw ContextTransducersAreNotAutomataException();
 
         if (DEBUG) printf("  ..context transducers are automata\n");*/
       
@@ -559,15 +563,18 @@ namespace hfst
           } 
           else { 
             if (type != it->first.get_type()) {
-	      HFST_THROW(TransducerTypeMismatchException);
+	      HFST_THROW_MESSAGE
+		(TransducerTypeMismatchException, "rules::restriction");
 	    }
           }
           if (type != it->second.get_type()) {
-	    HFST_THROW(TransducerTypeMismatchException);
+	    HFST_THROW_MESSAGE
+	      (TransducerTypeMismatchException, "rules::restriction");
 	  }
          }
       if (not type_defined) {
-	HFST_THROW(EmptySetOfContextsException);
+	HFST_THROW_MESSAGE
+	  (EmptySetOfContextsException, "rules::restriction");
       }
 
       std::string marker("@_MARKER_@");

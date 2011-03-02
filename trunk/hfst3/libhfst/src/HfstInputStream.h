@@ -184,7 +184,7 @@ For documentation on the HFST binary transducer format, see
         transducers. 
 
         @pre The file exists. Otherwise, an exception is thrown.
-        @throws hfst::exceptions::StreamNotReadableException */
+        @throws StreamNotReadableException */
     HfstInputStream(const std::string &filename);
 
     /** \brief Destructor. */
@@ -205,7 +205,7 @@ For documentation on the HFST binary transducer format, see
     /** \brief The type of the first transducer in the stream. 
 
         By default, all transducers in a stream have the same type, else
-        an hfst::exceptions::TransducerTypeMismatchException is thrown. */
+        an TransducerTypeMismatchException is thrown. */
     ImplementationType get_type(void) const;
 
     friend class HfstTransducer;
