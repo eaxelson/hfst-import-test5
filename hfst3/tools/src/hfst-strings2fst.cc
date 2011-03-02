@@ -327,7 +327,7 @@ process_stream(HfstOutputStream& outstream)
                                 "line may not start with unescaped colon");
                   colon = strstr(colon + 1, ":");
                 }
-              else if (*(colon-1) == '\\')
+              else if (*(colon-1) == '\\' && *(colon-2) != '\\')
                 {
                   colon = strstr(colon + 1, ":");
                 }
