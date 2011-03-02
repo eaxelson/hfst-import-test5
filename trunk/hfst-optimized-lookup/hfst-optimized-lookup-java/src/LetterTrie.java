@@ -15,7 +15,9 @@ public class LetterTrie
 			{
 			    children.put(str.charAt(0), new LetterTrieNode());
 			}
-		    children.get(str.charAt(0)).addString(str.substring(1,str.length()), symbolNumber);
+		    children.get(str.charAt(0))
+			.addString(str.substring(1,str.length()),
+				   symbolNumber);
 		} else if (str.length() == 1)
 		{
 		    symbols.put(str.charAt(0), symbolNumber);
@@ -28,23 +30,28 @@ public class LetterTrie
 		{
 		    return HfstOptimizedLookup.NO_SYMBOL_NUMBER;
 		}
+	    Character at_s = string.str.charAt(string.index);
 	    ++string.index;
-	    if (children.containsKey(string.str.charAt(string.index - 1)) == false)
+	    if (children.containsKey(at_s) == false)
 		{
-		    if (symbols.get(string.str.charAt(string.index - 1)) == null)
+		    if (symbols.get(at_s) == null)
 			{
+			    --string.index;
 			    return HfstOptimizedLookup.NO_SYMBOL_NUMBER;
 			}
-		    return symbols.get(string.str.charAt(string.index - 1));
+		    return symbols.get(at_s);
 		}
-	    int oldindex = string.index;
-	    int temp = children.get(string.str.charAt(string.index - 1)).findKey(string);
-	    if (temp == HfstOptimizedLookup.NO_SYMBOL_NUMBER)
+	    int s = children.get(at_s).findKey(string);
+	    if (s == HfstOptimizedLookup.NO_SYMBOL_NUMBER)
 		{
-		    string.index = oldindex;
-		    return symbols.get(string.str.charAt(string.index - 1));
+		    if (symbols.get(at_s) == null)
+			{
+			    --string.index;
+			    return HfstOptimizedLookup.NO_SYMBOL_NUMBER;
+			}
+		    return symbols.get(at_s);
 		}
-	    return temp;
+	    return s;
 	}
 	
 	public LetterTrieNode()
