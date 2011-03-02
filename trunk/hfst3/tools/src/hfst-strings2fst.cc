@@ -131,8 +131,8 @@ print_usage()
             "If EPS is not defined, the default representation of @0@ is used.\n"
         "Option --log precedes option --norm.\n"
         "The FILE of option -m lists all multichar-symbols, each symbol on its own line.\n"   
-      "The backslash '\\' is reserved for escaping a colon ':' or a space ' '\n"
-	"and it cannot be used as such\n"
+      "The backslash '\\' is reserved for escaping a colon (\"\\:\"), \n"
+		"a space (\"\\ \") or a backslash (\"\\\\\") \n"	
         "\n"
             );
 
@@ -242,6 +242,7 @@ process_stream(HfstOutputStream& outstream)
     }
   // add skip symbol '\\' to tokenizer
   tok.add_skip_symbol("\\");
+  tok.add_multichar_symbol("\\\\");
 
   while (hfst_getline(&line, &len, inputfile) != -1)
     {
@@ -350,6 +351,15 @@ process_stream(HfstOutputStream& outstream)
 
           verbose_printf("Found %s:%s...\n", first, second);
       StringPairVector spv_tok = tok.tokenize(std::string(first), std::string(second));
+      for (StringPairVector::iterator it = spv_tok.begin(); 
+	   it != spv_tok.end(); it++)
+	{
+	  if (it->first.compare("\\\\") == 0)
+	    it->first = std::string("\\");
+	  if (it->second.compare("\\\\") == 0)
+	    it->second = std::string("\\");
+	}
+
       spv = spv_tok;
         }
 
