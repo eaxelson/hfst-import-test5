@@ -21,7 +21,9 @@ function print_version() {
     echo "There is NO WARRANTY, to the extent permitted by law."
 }
 
-extraopts="-p"
+if ! test -t 1 ; then
+    extraopts="-p"
+fi
 while getopts "e:f:hl:s:qvF:u:" flag ; do
     case $flag in
     h) print_help; exit 0;;
@@ -34,7 +36,7 @@ while getopts "e:f:hl:s:qvF:u:" flag ; do
     F) wrapopts="$wrapopts -f $OPTARG";;
     u) utf8=utf8;;
     s) echo "Cannot use XFST automata binaries"; exit 1;;
-    ?) echo "Unknown command line switch -$flag$OPTARG, passing on"; extraopts=$extraopts -$flag$OPTARG;;
+    ?) echo "Unknown command line switch -$flag$OPTARG, passing on"; extraopts="$extraopts -$flag$OPTARG";;
     esac
 done
 
@@ -59,8 +61,18 @@ if test "x$ffile" = "x-f lush" ; then
     ffile=
     extraopts="$extraopts -flush"
 fi
-
-if ! hfst-foma-wrapper.sh $wrapopts -X"$ffile $efile $lfile $extraopts"; then
-    echo "Foma wrapper failed"
-    exit 1
+if test -t 1 ; then
+    if test -z "$ffile" ; then
+        echo Running foma without automatic exit at end
+        echo Files from interactive session cannot be converted
+    fi
+    if ! hfst-foma-wrapper.sh $wrapopts -X"$ffile $efile $lfile $extraopts"; then
+        echo "Foma wrapper failed"
+        exit 1
+    fi
+else
+    if ! hfst-foma-wrapper.sh $wrapopts -X"$ffile $efile $lfile $extraopts" > /dev/null; then
+        echo "Foma wrapper failed"
+        exit 1
+    fi
 fi

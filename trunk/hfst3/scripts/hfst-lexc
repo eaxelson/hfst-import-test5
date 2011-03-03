@@ -11,11 +11,15 @@ function print_help() {
     print_usage
     echo "Imitates lexc using foma and a wrapper script"
     echo
-    echo "  -h          print this help"
+    echo "Xerox lexc options supported:"
+    echo "  -h            print this help"
+    echo "  -l(atin1)     convert input to UTF-8 for processing"
+    echo "  -u(tf8)       use UTF-8 input (default)"
+    echo
+    echo "Hfst options:"
     echo "  -V          print version info"
-    echo "  -f format   parameter is HFST3 format name"
+    echo "  -f format   save result in format"
     echo "  -o          output file name"
-    echo "  -latin1     convert input to UTF-8 for processing"
     echo
     echo "If ROOT file is not given, the root lexicon is read from stdin"
     echo "before starting"
@@ -23,7 +27,7 @@ function print_help() {
 }
 
 function print_version() {
-    echo "hfst-lexc 0.50.0 (foma 0.9.13)"
+    echo "hfst-lexc 0.50.0 (foma 0.9.14)"
     echo "Copyright (c) 2010 University of Helsinki"
     echo "Licence GPLv3: GNU GPL version 3 <http://gnu.org/licenses/gpl.html>"
     echo "This is free software: you are free to change and redistribute it."
@@ -40,15 +44,11 @@ while getopts "hvVqF:l:o:u:" flag ; do
     f) wrapopts="$wrapopts -f $OPTARG";;
     u) utf8=utf8;;
     o) outfile="$OPTARG";;
-    ?) echo "Unknown command line switch -$flag$OPTARG, passing on"; extraopts=$extraopts -$flag$OPTARG;;
+    \?) echo "Unknown command line switch -$flag$OPTARG, passing on"; extraopts=$"extraopts -$flag$OPTARG";;
     esac
 done
 
 shift $(($OPTIND-1))
-if test -z "$outfile" ; then
-    echo "-o required"
-    exit 1
-fi
 if test x$utf8 =  xutf8 ; then
     echo "UTF-8 is already default in $0"
 fi
@@ -63,12 +63,33 @@ if test "x$latin1" = "xlatin1" ; then
     done
 fi
 
-cat $@ > $outfile.tmp.lexc
-printf "read lexc $outfile.tmp.lexc\nsave stack $outfile" > $outfile.tmp.lexcscript
-
-if ! hfst-foma-wrapper.sh $wrapopts -X"-f $outfile.tmp.lexcscript $extraopts"; then
-    rm -f $outfile.tmp.lexcscript $outfile $outfile.tmp.lexc
-    echo "Foma wrapper failed"
-    exit 1
+if test -z "$@" ; then
+    if test -t 1 ; then
+        echo "Reading all lexc files from stdin first"
+    fi
 fi
-rm -f $outfile.tmp.lexcscript $outfile.tmp.lexc
+cat $@ > $outfile.tmp.lexc
+if test -z "$outfile" ; then
+    printf "read lexc $outfile.tmp.lexc\nsave stack $$outfile" > $outfile.tmp.lexcscript
+else
+    printf "read lexc $outfile.tmp.lexc\nsave stack $outfile" > $outfile.tmp.lexcscript
+fi
+if test -t 1 ; then
+    if ! hfst-foma-wrapper.sh $wrapopts -X"-f $outfile.tmp.lexcscript $extraopts"; then
+        rm -f "$outfile.tmp.lexcscript" "$outfile" "$outfile.tmp.lexc"
+        echo "Foma wrapper failed"
+        exit 1
+    fi
+else
+    if ! hfst-foma-wrapper.sh $wrapopts -X"-f $outfile.tmp.lexcscript -p $extraopts" > /dev/null ; then
+        rm -f "$outfile.tmp.lexcscript" "$outfile" "$outfile.tmp.lexc"
+        echo "Foma wrapper failed"
+        exit 1
+    fi
+fi
+if test -z "$outfile" ; then
+    cat $$outfile
+    rm -f $$outfile
+fi
+rm -f "$outfile.tmp.lexcscript" "$outfile.tmp.lexc"
+
