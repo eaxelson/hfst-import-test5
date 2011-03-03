@@ -170,7 +170,7 @@ public class Transducer implements HfstOptimizedLookup.transducer
 	operations = alphabet.operations;
 	letterTrie = new LetterTrie();
 	int i = 0;
-	while (i < header.getSymbolCount())
+	while (i < header.getInputSymbolCount())
 	    {
 		letterTrie.addString(alphabet.keyTable.get(i), i);
 		i++;
@@ -319,6 +319,9 @@ public class Transducer implements HfstOptimizedLookup.transducer
 	while (inputLine.index < input.length())
 	    {
 		inputString.add(letterTrie.findKey(inputLine));
+		if (inputString.lastElement() == HfstOptimizedLookup.NO_SYMBOL_NUMBER) {
+		    break;
+		}
 	    }
 	if ( (inputString.size() == 0) || (inputString.lastElement() == HfstOptimizedLookup.NO_SYMBOL_NUMBER) )
 	    {
