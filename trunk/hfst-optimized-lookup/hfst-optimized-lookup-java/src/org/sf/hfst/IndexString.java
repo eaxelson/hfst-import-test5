@@ -1,3 +1,5 @@
+package net.sf.hfst;
+
 // There has to be a better way...
 public class IndexString
 {

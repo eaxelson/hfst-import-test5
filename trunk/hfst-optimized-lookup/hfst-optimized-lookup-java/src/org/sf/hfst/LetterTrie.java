@@ -1,3 +1,5 @@
+package net.sf.hfst;
+
 import java.util.Hashtable;
 
 public class LetterTrie

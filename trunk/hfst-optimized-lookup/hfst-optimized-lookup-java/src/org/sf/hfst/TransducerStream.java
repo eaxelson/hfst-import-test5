@@ -1,3 +1,5 @@
+package net.sf.hfst;
+
 import java.io.DataInputStream;
 
 /**

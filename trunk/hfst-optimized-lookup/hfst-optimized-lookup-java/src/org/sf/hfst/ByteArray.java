@@ -1,3 +1,5 @@
+package net.sf.hfst;
+
 /**
  * A way of handling unsigned little-endian data
  */
