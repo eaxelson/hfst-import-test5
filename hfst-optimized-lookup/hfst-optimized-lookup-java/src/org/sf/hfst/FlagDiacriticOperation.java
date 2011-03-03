@@ -1,3 +1,5 @@
+package net.sf.hfst;
+
 /**
  * A representation of one flag diacritic statement
  */

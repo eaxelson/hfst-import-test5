@@ -1,6 +1,10 @@
+package net.sf.hfst;
+
 import java.io.FileInputStream;
 import java.io.DataInputStream;
 import java.io.Console;
+
+import net.sf.hfst;
 
 /**
  * HfstRuntimeReader takes a transducer (the name of which should
@@ -23,12 +27,6 @@ public class HfstOptimizedLookup {
 
     public static enum FlagDiacriticOperator {P, N, R, D, C, U};
 
-    public interface transducer
-    {
-	Boolean analyze(String str);
-	void printAnalyses();
-    }
-
     public static void runTransducer(transducer t)
     {
 	System.out.println("Ready for input.");
@@ -36,14 +34,9 @@ public class HfstOptimizedLookup {
 	String str = console.readLine();
 	while (str != null)
 	    {
-		if (t.analyze(str))
+		for ( String analysis : t.analyze(str) )
 		    {
-			t.printAnalyses();
-			System.out.println();
-		    } else
-		    {
-			//System.out.println("tokenization failed");
-			// tokenization failed
+			System.out.println( analysis );
 		    }
 		str = console.readLine();
 	    }
