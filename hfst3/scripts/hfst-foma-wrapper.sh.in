@@ -39,12 +39,12 @@ while getopts "vqshVf:F:X:" flag ; do
     case $flag in
     h) print_help; exit 0;;
     V) print_version; exit 0;;
-    v) verbose=-v;;
-    s|q) quiet=-q;;
+    v) verbose="-v";;
+    s|q) quiet="-q";;
     f) format="-f $OPTARG";;
-    F) files=$OPTARG;;
-    X) fomaopts=$OPTARG;;
-    ?) echo "Unknown command line switch $OPTARG, try -h for help"; print_usage; exit 1;;
+    F) files="$OPTARG";;
+    X) fomaopts="$OPTARG";;
+    \?) echo "Unknown command line switch $OPTARG, try -h for help"; print_usage; exit 1;;
     esac
 done
 hfstopts="$quiet $verbose $format"
@@ -90,7 +90,9 @@ if [ -z $files ] ; then
     fi
 fi
 if [ -z "$files" ] ; then
-    echo "Unable to find saved stack files to convert; use -F!"
+    echo "Unable to find saved stack files to convert..."
+    echo "HFST-xfst can only use -f scripts with save stack command or"
+    echo "-l scripts with save stack before interactive part"
     exit 1
 fi
 for f in $files ; do
