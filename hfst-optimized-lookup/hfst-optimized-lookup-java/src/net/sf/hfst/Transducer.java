@@ -59,7 +59,7 @@ public class Transducer implements HfstOptimizedLookup.transducer
 			  Integer indicesCount) throws java.io.IOException
 	{
 	    ByteArray b = new ByteArray((int) indicesCount*6);
-	    filestream.read(b.bytes);
+	    filestream.read(b.getBytes());
 	    // each index entry is a unsigned short followed by an unsigned int
 	    indices = new TransitionIndex[indicesCount];
 
@@ -126,7 +126,7 @@ public class Transducer implements HfstOptimizedLookup.transducer
 	{
 	    ByteArray b = new ByteArray((int) transitionCount*8);
 	    // each transition entry is two unsigned shorts and an unsigned int
-	    filestream.read(b.bytes);
+	    filestream.read(b.getBytes());
 	    transitions = new Transition[transitionCount];
 	    Integer i = 0;
 	    while (i < transitionCount)

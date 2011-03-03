@@ -1,17 +1,54 @@
 package net.sf.hfst;
 
+import java.lang.Math; // heh
+
 /**
  * A way of handling unsigned little-endian data
  */
 public class ByteArray
 {
-    public byte[] bytes;
-    public int index;
+    private byte[] bytes;
+    private int index;
+    private int size;
 
-    public ByteArray(int size)
+    public ByteArray(int s)
     {
+	size = s;
 	bytes = new byte[size];
 	index = 0;
+    }
+    
+    public ByteArray(ByteArray another, int s)
+    {
+	size = Math.max(s, another.getSize());
+	bytes = new byte[size];
+	for (int i = 0; i < another.getSize(); ++i) {
+	    bytes[i] = another.get(i);
+	}
+	index = 0;
+    }
+
+    public int getSize()
+    {
+	return size;
+    }
+
+    public byte get(int i)
+    {
+	return bytes[i];
+    }
+
+    public byte[] getBytes()
+    {
+	return bytes;
+    }
+
+    public short getUByte()
+    {
+	short result = 0;
+	result |= bytes[index];
+	index += 1;
+	return result;
     }
 
     public int getUShort() throws java.io.IOException
