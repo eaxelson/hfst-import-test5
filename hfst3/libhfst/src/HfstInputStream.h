@@ -177,14 +177,25 @@ For documentation on the HFST binary transducer format, see
   public:
 
     /** \brief Create a stream to standard input for reading binary 
-        transducers. */
+        transducers. 
+
+        @throws StreamNotReadableException 
+	@throws NotTransducerStreamException
+	@throws EndOfStreamException
+	@throws TransducerHeaderException
+    */
     HfstInputStream(void);
 
     /** \brief Open a stream to file \a filename for reading binary 
         transducers. 
 
         @pre The file exists. Otherwise, an exception is thrown.
-        @throws StreamNotReadableException */
+
+        @throws StreamNotReadableException 
+	@throws NotTransducerStreamException
+	@throws EndOfStreamException
+	@throws TransducerHeaderException
+    */
     HfstInputStream(const std::string &filename);
 
     /** \brief Destructor. */

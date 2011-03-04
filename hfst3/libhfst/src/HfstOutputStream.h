@@ -93,7 +93,8 @@ For more information on HFST transducer structure, see
     /** \brief Create a stream to standard output for writing 
         binary transducers of type \a type. 
         \a hfst_format defines whether transducers are written 
-        in hfst format or as such in their backend format. */
+        in hfst format or as such in their backend format. 
+    */
     HfstOutputStream(ImplementationType type, bool hfst_format=true);
 
     /** \brief Open a stream to file \a filename for writing binary transducers
@@ -101,7 +102,8 @@ For more information on HFST transducer structure, see
         \a hfst_format defines whether transducers are written in hfst format 
         or as such in their backend format.
 
-        If the file exists, it is overwritten. */
+        If the file exists, it is overwritten. 
+    */
     HfstOutputStream(const std::string &filename, ImplementationType type, 
                      bool hfst_format=true);
 
@@ -111,8 +113,11 @@ For more information on HFST transducer structure, see
     /** \brief Write the transducer \a transducer in binary format 
         to the stream. 
 
-        By default, all transducers must have the same type, else an
-        TransducerHasWrongTypeException is thrown. */
+        All transducers must have the same type as the stream, else an
+        TransducerTypeMismatchException is thrown. 
+
+	@throws TransducerTypeMismatchException
+    */
     HfstOutputStream &operator<< (HfstTransducer &transducer);
 
     /** \brief Close the stream. 

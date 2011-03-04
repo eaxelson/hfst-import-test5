@@ -247,7 +247,8 @@ namespace hfst
     while (true) {
       char c = stream_get();
       if (stream_eof()) {
-	HFST_THROW(NotTransducerStreamException);
+	//HFST_THROW(NotTransducerStreamException);
+	HFST_THROW(EndOfStreamException);
       }
       if (c == '\0')
         break;
@@ -284,11 +285,15 @@ namespace hfst
   {
     if (input_stream != NULL) { // first transducer in the stream
       input_stream = NULL;
+      if (stream_eof())
+	HFST_THROW(EndOfStreamException);
       // if header bytes have been read from a file, skip these bytes
       if (strcmp(filename.c_str(), "") != 0)
         ignore(bytes_to_skip);
     }
     else {
+      if (stream_eof())
+	HFST_THROW(EndOfStreamException);
       ImplementationType stype = stream_fst_type();
       if (stype != type) {
 	HFST_THROW_MESSAGE
@@ -527,7 +532,8 @@ namespace hfst
           for (unsigned int i=0; i<26; i++) {
             chars_read[i]=(char)stream_get();
             if ( stream_eof() ) {
-	      HFST_THROW(NotTransducerStreamException);
+	      //HFST_THROW(NotTransducerStreamException);
+	      HFST_THROW(EndOfStreamException);
 	    }
           }
           for (int i=25; i>=0; i--)
@@ -718,7 +724,8 @@ namespace hfst
     std::string fst_type = stream_getstring();
     if (stream_eof()) {
       debug_error("#5");
-      HFST_THROW(NotTransducerStreamException);
+      //HFST_THROW(NotTransducerStreamException);
+      HFST_THROW(EndOfStreamException);
     }
     if (fst_type.compare("SFST_TYPE") == 0)
       { bytes_read=10; return SFST_TYPE; }
@@ -894,6 +901,8 @@ namespace hfst
   {
     try { 
       input_stream = &std::cin;
+      if (stream_eof())
+	HFST_THROW(EndOfStreamException);
       type = stream_fst_type();
     }
     //catch (hfst::implementations::StreamNotReadableException e)
@@ -958,10 +967,14 @@ namespace hfst
       if (strcmp("",filename.c_str()) != 0) {
         std::ifstream ifs(filename.c_str());
         input_stream = &ifs;
+	if (stream_eof())
+	  HFST_THROW(EndOfStreamException);
         type = stream_fst_type();
       }
       else {
         input_stream = &std::cin;
+	if (stream_eof())
+	  HFST_THROW(EndOfStreamException);
         type = stream_fst_type();
       }
     }
