@@ -321,7 +321,9 @@ tr1.disjunct(tr2);
 
        @pre The file exists, otherwise an exception is thrown.
        @see HfstTransducer(FILE, ImplementationType, const std::string&)
-       @throws StreamNotReadableException NotValidAttFormatException */
+       @throws StreamNotReadableException 
+       @throws NotValidAttFormatException 
+    */
     static HfstTransducer &read_in_att_format
       (const std::string &filename, ImplementationType type, 
        const std::string &epsilon_symbol);
@@ -431,8 +433,13 @@ tr1.disjunct(tr2);
 
         @pre ( in.is_eof() == in.is_bad() == false && in.is_fst() ).
         Otherwise, an exception is thrown.
-        @throws NotTransducerStreamException
-        MissingOpenFstInputSymbolTableException
+
+        @throws NotTransducerStreamException 
+        @throws StreamNotReadableException
+        @throws StreamIsClosedException 
+        @throws TransducerTypeMismatchException
+        @throws MissingOpenFstInputSymbolTableException
+  
         @see HfstInputStream **/
     HfstTransducer(HfstInputStream &in);
 
@@ -511,7 +518,9 @@ Epsilon will be represented as "@_EPSILON_SYMBOL_@" in the resulting transducer.
 The argument \a epsilon_symbol only denotes how epsilons are represented 
 in \a ifile.
 
-@throws NotValidAttFormatException
+@throws NotValidAttFormatException 
+@throws StreamNotReadableException
+@throws StreamIsClosedException
 @see #write_in_att_format(FILE*,bool)const String
 **/
     HfstTransducer(FILE * ifile, ImplementationType type, 
@@ -624,6 +633,9 @@ This will yield a file "testfile.att" that looks as follows:
 0    0.0
 0    0    a    a    0.0
 \endverbatim
+
+        @throws StreamCannotBeWrittenException 
+        @throws StreamIsClosedException
 
         @see hfst::operator<<(std::ostream &out,HfstTransducer &t) 
         HfstTransducer(FILE*, ImplementationType, const std::string&) */
@@ -1060,6 +1072,13 @@ t.substitute(&func);
         \a input_side and \a output_side define whether 
         the substitution is made on input and output sides.
 
+	@param old_symbol Symbol to be substituted.
+	@param new_symbol The substituting symbol.
+	@param input_side Whether the substitution is made on the input side
+	                  of a transition.
+	@param output_side Whether the substitution is made on the output side
+	                   of a transition.
+
         The transition weights remain the same. 
 
         @see String */
@@ -1075,8 +1094,9 @@ t.substitute(&func);
 
         Implemented only for #TROPICAL_OPENFST_TYPE and #LOG_OPENFST_TYPE.
         If this function is called by an unweighted HfstTransducer, 
-        it is converted to weighted one,
-        substitution is done and it is converted back to the original format.
+        it is converted to a weighted one,
+        substitution is made and the transducer is converted back 
+	to the original format.
 
         @see String
      */
@@ -1131,6 +1151,10 @@ t.substitute(&func);
 
     /** \brief Transform all transition and state weights as defined 
         in \a func. 
+
+	@param func A pointer to a function that takes a weight as its
+	            argument and returns a weight that will be the new
+		    value of the weight given as the argument.
 
      An example:
 \verbatim
@@ -1225,6 +1249,14 @@ HfstTransducer t_transformed;
         defined by \a mappings in the context \a context
         when the alphabet is \a alphabet. 
 
+	@param context A pair of transducers where the first transducer
+	               defines the left context and the second transducer
+		       the right context.
+	@param mappings A set of mappings that the resulting transducer
+	                will perform in the context given in \a context.
+        @param alphabet The set of symbol pairs that defines the alphabet
+	                (see the example).
+
         For example, a transducer yielded by the following arguments
 \verbatim
 context = pair( [c|d], [e] )
@@ -1287,6 +1319,16 @@ alphabet = set(a, a:b, b, c, d, e, ...)
         in the context \a context when the alphabet is \a alphabet.
         \a optional defines whether the mapping is optional. 
 
+	@param context A pair of transducers where the first transducer
+	               defines the left context and the second transducer
+		       the right context. Both transducers must be automata,
+		       i.e. map strings onto themselves.
+	@param mapping The mapping that the resulting transducer
+	               will perform in the context given in \a context.
+	@param optional Whether the mapping is optional.
+	@param alphabet The set of symbol pairs that defines the alphabet
+	                (see the explanation below).
+
         Each substring s of the input string which is in the input language
         of the transducer \a mapping and whose left context is matched 
         by the expression
@@ -1316,6 +1358,8 @@ alphabet = set(a, b, c)
         Note that replace operations (unlike the two-level rules) 
         have to be combined by composition
         rather than intersection.
+
+	@throws ContextTransducersAreNotAutomataException
 
         @see
      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
@@ -1382,6 +1426,8 @@ SFST manual</a>. */
         only if it occurs in any of the contexts in \a contexts. 
         Symbols outside of the matching
         substrings are mapped to any symbol allowed by \a alphabet. 
+
+	@throws EmptySetOfContextsException
 
         @see
      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">

@@ -332,22 +332,18 @@ namespace hfst
 
       if (DEBUG) printf("  ..transducers have the same type\n");
 
-
-      // TODO:
       // test that both context transducers are automata
       // this could be done more efficiently...
-      /*HfstTransducer t1_proj(context.first);
+      HfstTransducer t1_proj(context.first);
       t1_proj.input_project();
       HfstTransducer t2_proj(context.second);
       t2_proj.input_project();
 
       if (DEBUG) printf("  testing if context transducers are automata..\n");
 
-      if ( not HfstTransducer::are_equivalent(t1_proj, context.first) ||
-           not HfstTransducer::are_equivalent(t2_proj, context.second) )
-        throw ContextTransducersAreNotAutomataException();
-
-        if (DEBUG) printf("  ..context transducers are automata\n");*/
+      if ( not t1_proj.compare(context.first) ||
+           not t2_proj.compare(context.second) )
+        HFST_THROW(ContextTransducersAreNotAutomataException);
       
       std::string leftm("@_LEFT_MARKER_@");
       std::string rightm("@_RIGHT_MARKER_@");

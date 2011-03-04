@@ -66,6 +66,10 @@ HFST_EXCEPTION_CHILD_DECLARATION(FunctionNotImplementedException);
 
 /** \brief Stream cannot be read. 
 
+Thrown by
+hfst::HfstTransducer(const hfst::HfstInputStream&) and
+hfst::HfstTransducer(FILE*, ImplementationType, const std::string&)
+
 An example:
 \verbatim
 try {
@@ -78,6 +82,9 @@ try {
 HFST_EXCEPTION_CHILD_DECLARATION(StreamNotReadableException);
 
 /** \brief Stream cannot be written. 
+
+Thrown by hfst::HfstOutputStream::operator<< and 
+hfst::HfstTransducer::write_in_att_format
 
 An example:
 \verbatim
@@ -94,6 +101,11 @@ HFST_EXCEPTION_CHILD_DECLARATION(StreamCannotBeWrittenException);
 
 /** \brief Stream is closed. 
 
+    Thrown by hfst::HfstTransducer::write_in_att_format
+    hfst::HfstTransducer(FILE*, ImplementationType, const std::string&)
+    hfst::HfstTransducer(const hfst::HfstInputStream&)
+    hfst::HfstOutputStream::operator<<
+
     An example:
 
 \verbatim
@@ -109,14 +121,24 @@ try {
 */
 HFST_EXCEPTION_CHILD_DECLARATION(StreamIsClosedException);
 
+/** \brief The stream is at end.
+
+    Thrown by
+    hfst::HfstTransducer(const hfst::HfstInputStream&)
+    hfst::HfstInputStream() 
+    hfst::HfstInputStream(const std::string&)
+*/
+HFST_EXCEPTION_CHILD_DECLARATION(EndOfStreamException);
+
 /** \brief Transducer is cyclic. 
 
-    thrown by hfst::HfstTransducer::extract_paths. An example:
+    thrown by hfst::HfstTransducer::extract_paths and
+    hfst::HfstTransducer::extract_paths_fd. An example:
 \verbatim
 HfstTransducer transducer("a", "b", TROPICAL_OPENFST_TYPE);
 transducer.repeat_star();
 try {
-  WeightedPaths<float>::Set results;
+  HfstTwoLevelPaths results;
   transducer.extract_paths(results);
   fprintf(stderr, "The transducer has %i paths\n", results.size());
 } catch (TransducerIsCyclicException e) {
@@ -129,6 +151,11 @@ HFST_EXCEPTION_CHILD_DECLARATION(TransducerIsCyclicException);
 
 
 /** \brief The stream does not contain transducers. 
+
+    Thrown by 
+    hfst::HfstTransducer(const hfst::HfstInputStream&)
+    hfst::HfstInputStream() 
+    hfst::HfstInputStream(const std::string&)
 
     An example. The file "foofile" contains
 \verbatim
@@ -246,13 +273,16 @@ HFST_EXCEPTION_CHILD_DECLARATION(StateIndexOutOfBoundsException);
 
 /** \brief Transducer has a malformed HFST header. 
 
-    Thrown by hfst::HfstTransducer(HfstInputStream&). */
+    Thrown by hfst::HfstTransducer(HfstInputStream&)
+    hfst::HfstInputStream()
+    hfst::HfstInputStream(const std::string&)
+*/
 HFST_EXCEPTION_CHILD_DECLARATION(TransducerHeaderException);
 
 
 /** \brief An OpenFst transducer does not have an input symbol table. 
 
-    When converting from OpenFst to tropical HFST, the OpenFst transducer
+    When converting from OpenFst to tropical or log HFST, the OpenFst transducer
     must have at least an input symbol table. If the output symbol table
     is missing, it is assumed to be equivalent to the input symbol table.
 
@@ -261,7 +291,18 @@ HFST_EXCEPTION_CHILD_DECLARATION(TransducerHeaderException);
 HFST_EXCEPTION_CHILD_DECLARATION(MissingOpenFstInputSymbolTableException);
 
 
-/** \brief The calling and/or called transducer do not have the same type. 
+/** \brief Two or more transducers do not have the same type.
+
+    This can happen if (1) the calling and called transducer in a binary
+    operation, (2) two transducers in an HfstTransducerPair,
+    (3) two consecutive transducers coming from an HfstInputStream or
+    (4) two transducers in a function taking two or more transducers as
+    arguments do not have the same type.
+
+    Thrown e.g. by
+    HfstTransducer::disjunct(const HfstTransducer&)
+    rules::two_level_if
+    HfstTransducer(HfstInputStream&)
 
 An example:
 \verbatim
