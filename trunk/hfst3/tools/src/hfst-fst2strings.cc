@@ -75,41 +75,44 @@ print_usage()
         "Display the strings recognized by a transducer\n"
         "\n", program_name);
     print_common_program_options(message_out);
-    fprintf(message_out, "Fst2strings options:\n");
-    fprintf(message_out, "  -n, --max-strings=INT      The maximum number of strings printed\n");
-    fprintf(message_out, "  -N, --nbest=INT            Prune the transducer to a max number of best strings\n");
-    fprintf(message_out, "  -c, --cycles=INT           How many times to follow cycles. Negative=infinite (default)\n");
-    fprintf(message_out, "  -w, --print-weights        Display the weight for each string\n");
-    fprintf(message_out, "  -e, --eval-flags           Only print strings with pass flag diacritic checks\n");
-    fprintf(message_out, "  -f, --filter-flags         Don't print flag diacritic symbols (only with -e)\n");
-    fprintf(message_out, "  -E, --epsilon-format=EPS   Print epsilon as EPS (with -S). Default the empty string.\n");
-    fprintf(message_out, "  -S, --print-pairstrings    Print result in pairstring format\n"
-	                 "                             (Not implemented for HFST optimized lookup format)\n");
-    fprintf(message_out, "Ignore options:\n");
-    fprintf(message_out, "  -l, --max-in-length=INT    Ignore paths with an input string longer than length\n");
-    fprintf(message_out, "  -L, --max-out-length=INT   Ignore paths with an output string longer than length\n");
-    fprintf(message_out, "  -p, --in-prefix=PREFIX     Ignore paths with an input string not beginning with PREFIX\n");
-    fprintf(message_out, "  -P, --out-prefix=PREFIX    Ignore paths with an output string not beginning with PREFIX\n");
-    fprintf(message_out, "  -x, --in-exclude=STR       Ignore paths with an input string containing STR\n");
-    fprintf(message_out, "  -X, --out-exclude=STR      Ignore paths with an output string containing STR\n");
-    
-    fprintf(message_out, "\n");
-    fprintf(message_out, "Option -N overrides options -n and -c.\n");
+    fprintf(message_out, "Fst2strings options:\n"
+"  -n, --max-strings=NSTR     print at most NSTR strings\n"
+"  -N, --nbest=NBEST          print at most NBEST best strings\n"
+"  -c, --cycles=NCYC          follow cycles at most NCYC times\n"
+"  -w, --print-weights        display the weight for each string\n"
+"  -E, --epsilon-format=EPS   print epsilon as EPS (with -S)\n"
+"  -S, --print-pairstrings    print result in pairstring format\n"
+"  -X, --xfst=VARIABLE        toggle xfst compatibility option VARIABLE\n");
+    fprintf(message_out, "Ignore paths if:\n"
+"  -l, --max-in-length=MIL    input string longer than MIL\n"
+"  -L, --max-out-length=MOL   output string longer than MOL\n"
+"  -p, --in-prefix=OPREFIX    input string not beginning with IPREFIX\n"
+"  -P, --out-prefix=OPREFIX   output string not beginning with OPREFIX\n"
+"  -x, --in-exclude=IXSTR     input string containing IXSTR\n"
+"  -X, --out-exclude=OXST     output string containing OXSTR\n");
+
     fprintf(message_out, "\n");
 
     print_common_unary_program_parameter_instructions(message_out);
+    fprintf(message_out, "If all NSTR, NBEST and NCYC are omitted, "
+            "all possible paths are printed.\n"
+            "NSTR, NBEST and NCYC default to infinity.\n"
+            "NBEST overrides NSTR and NCYC; giving NBEST changes algorithm "
+            "used for traversal\n"
+            "If EPS is not given, default is empty string.\n"
+            "numeric options are parsed with strtod(3)\n");
     fprintf(message_out,
-	    "\n"
+        "\n"
         "Examples:\n"
         "  %s  lexical.hfst  generates all forms of lexical.hfst\n"
         "\n", program_name);
 
     fprintf(message_out, 
-	    "Known bugs:\n"
-	    "  Does not work correctly for hfst optimized lookup format.\n"
-	    "  Prints duplicate strings for foma format.\n"
-	    "\n"
-	    );
+        "Known bugs:\n"
+        "  Does not work correctly for hfst optimized lookup format.\n"
+        "  Prints duplicate strings for foma format.\n"
+        "\n"
+        );
 
     print_report_bugs();
     fprintf(message_out, "\n");
@@ -123,29 +126,28 @@ parse_options(int argc, char** argv)
     while (true)
     {
         static const struct option long_options[] =
-        {
-        HFST_GETOPT_COMMON_LONG
-          ,
-        HFST_GETOPT_UNARY_LONG
-          ,
-          {"nbest", required_argument, 0, 'N'},
-            {"max-strings", required_argument, 0, 'n'},
+          {
+            HFST_GETOPT_COMMON_LONG,
+            HFST_GETOPT_UNARY_LONG,
             {"cycles", required_argument, 0, 'c'},
-            {"print-weights", no_argument, 0, 'w'},
-            {"eval-flags", no_argument, 0, 'e'},
-            {"filter-flags", no_argument, 0, 'f'},
+            {"epsilon-format", required_argument, 0, 'E'},
+            {"in-exclude", required_argument, 0, 'u'},
+            {"in-prefix", required_argument, 0, 'p'},
             {"max-in-length", required_argument, 0, 'l'},
             {"max-out-length", required_argument, 0, 'L'},
-            {"in-prefix", required_argument, 0, 'p'},
+            {"max-strings", required_argument, 0, 'n'},
+            {"nbest", required_argument, 0, 'N'},
+            {"out-exclude", required_argument, 0, 'U'},
             {"out-prefix", required_argument, 0, 'P'},
-            {"in-exclude", required_argument, 0, 'x'},
-            {"out-exclude", required_argument, 0, 'X'},
-	    {"epsilon-format", required_argument, 0, 'E'},
-	    {"print-pairstrings", no_argument, 0, 'S'},
+            {"print-pairstrings", no_argument, 0, 'S'},
+            {"print-weights", no_argument, 0, 'w'},
+            {"xfst", required_argument, 0, 'X'},
             {0,0,0,0}
-        };
+          };
         int option_index = 0;
-        char c = getopt_long(argc, argv, "R:dhi:N:n:c:o:qsvVwefl:L:p:P:x:X:E:S",
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
+                             HFST_GETOPT_UNARY_SHORT
+                             "SWc:e:u:p:l:L:n:N:U:P:X:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -157,57 +159,60 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-unary.h"
         case 'n':
-            max_strings = atoi(hfst_strdup(optarg));
+            max_strings = hfst_strtoul(optarg, 10);
             break;
         case 'N':
-            nbest_strings = atoi(hfst_strdup(optarg));
+            nbest_strings = hfst_strtoul(optarg, 10);
             break;
         case 'c':
-          cycles = atoi(hfst_strdup(optarg));
-          break;
+            cycles = hfst_strtoul(optarg, 10);
+            break;
         case 'w':
             display_weights = true;
             break;
-        case 'e':
-          eval_fd = true;
-          break;
-        case 'f':
-          filter_fd = true;
+        case 'X':
+            if (strcmp(optarg, "obey-flags") == 0)
+              {
+                eval_fd = true;
+              }
+            else if (strcmp(optarg, "print-flags") == 0)
+              {
+                filter_fd = false;
+              }
+            else
+              {
+                error(0, EXIT_FAILURE, "Unrecognised xfst option. "
+                     "available options are obey-flags, print-flags\n");
+              }
           break;
         case 'l':
-          max_input_length = atoi(hfst_strdup(optarg));
-          break;
+            max_input_length = hfst_strtoul(optarg, 10);
+            break;
         case 'L':
-          max_output_length = atoi(hfst_strdup(optarg));
-          break;
+            max_output_length = hfst_strtoul(optarg, 10);
+            break;
         case 'p':
-          input_prefix = optarg;
-          break;
+            input_prefix = optarg;
+            break;
         case 'P':
-          output_prefix = optarg;
-          break;
-        case 'x':
-          input_exclude = optarg;
-          break;
-        case 'X':
+            output_prefix = optarg;
+            break;
+        case 'u':
+            input_exclude = optarg;
+            break;
+        case 'U':
           output_exclude = optarg;
           break;
-	case 'E':
-	  epsilon_format = hfst_strdup(optarg);
-	  break;
-	case 'S':
-	  print_in_pairstring_format = true;
-	  break;
+        case 'E':
+          epsilon_format = hfst_strdup(optarg);
+          break;
+        case 'S':
+          print_in_pairstring_format = true;
+          break;
 #include "inc/getopt-cases-error.h"
         }
     }
 
-      if (!eval_fd && filter_fd)
-      {
-        error(0, 0, "Option -f must be used in conjunction with -e\n");
-        print_short_help();
-        return EXIT_FAILURE;
-      }
 #include "inc/check-params-common.h"
 #include "inc/check-params-unary.h"
     return EXIT_CONTINUE;
@@ -233,7 +238,7 @@ class Callback : public hfst::ExtractStringsCb
     std::string istring;
     std::string ostring;
     for(StringPairVector::const_iterator it = path.second.begin();
-	it != path.second.end(); it++) {
+    it != path.second.end(); it++) {
       istring.append(it->first);
       ostring.append(it->second);
     }
@@ -273,28 +278,28 @@ class Callback : public hfst::ExtractStringsCb
     {
 
       if (print_in_pairstring_format) 
-	{
-	  for (StringPairVector::const_iterator it = path.second.begin();
-	       it != path.second.end(); it++) 
-	    {
-	      *out_ << get_print_format(it->first)
-		    << ":"
-		    << get_print_format(it->second)
-		    << " ";
-	    }
-	  if (display_weights) {
-	    *out_ << "\t" << path.first;
-	  }
-	  *out_ << "\n";
-	}
-	
+    {
+      for (StringPairVector::const_iterator it = path.second.begin();
+           it != path.second.end(); it++) 
+        {
+          *out_ << get_print_format(it->first)
+            << ":"
+            << get_print_format(it->second)
+            << " ";
+        }
+      if (display_weights) {
+        *out_ << "\t" << path.first;
+      }
+      *out_ << "\n";
+    }
+    
       else {
-	*out_ << istring;
-	if(ostring != istring)
-	  *out_ << "\t" << ostring;
-	if(display_weights)
-	  *out_ << "\t" << path.first;
-	*out_ << std::endl;
+    *out_ << istring;
+    if(ostring != istring)
+      *out_ << "\t" << ostring;
+    if(display_weights)
+      *out_ << "\t" << path.first;
+    *out_ << std::endl;
       }
 
       count++;
@@ -320,11 +325,11 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
 
     /* Pairstring format is not supported on optimized lookup format. */
     if (print_in_pairstring_format && 
-	(instream.get_type() == HFST_OL_TYPE || 
-	 instream.get_type() == HFST_OLW_TYPE) ) {
+    (instream.get_type() == HFST_OL_TYPE || 
+     instream.get_type() == HFST_OLW_TYPE) ) {
       fprintf(stderr, 
-	      "Error: option --print-in-pairstring-format not supported on "
-	      "       optimized lookup transducers, exiting program\n" );
+          "Error: option --print-in-pairstring-format not supported on "
+          "       optimized lookup transducers, exiting program\n" );
       exit(1);
     }
  
@@ -334,13 +339,13 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
     if(nbest_strings > 0)
     {
       verbose_printf("Pruning transducer to %i best path(s)...\n", 
-		     nbest_strings);
+             nbest_strings);
       t.n_best(nbest_strings);
     }
     else
     {
       if(max_strings <= 0 && max_input_length <= 0 && max_output_length <= 0 &&
-	 cycles < 0 && t.is_cyclic())
+     cycles < 0 && t.is_cyclic())
       {
         error(EXIT_FAILURE, 0,
               "Transducer is cyclic. Use one or more of these options: "
