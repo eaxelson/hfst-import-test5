@@ -95,10 +95,9 @@ print_usage()
 
     print_common_unary_program_parameter_instructions(message_out);
     fprintf(message_out, "If all NSTR, NBEST and NCYC are omitted, "
-            "all possible paths are printed.\n"
+            "all possible paths are printed:\n"
             "NSTR, NBEST and NCYC default to infinity.\n"
-            "NBEST overrides NSTR and NCYC; giving NBEST changes algorithm "
-            "used for traversal\n"
+            "NBEST overrides NSTR and NCYC.\n"
             "If EPS is not given, default is empty string.\n"
             "numeric options are parsed with strtod(3)\n");
     fprintf(message_out,
@@ -228,7 +227,7 @@ static std::string get_print_format(const std::string &s) {
 //Print results as they come
 class Callback : public hfst::ExtractStringsCb
 {
- public:
+public:
   int count;
   int max_num;
   std::ostream* out_;
@@ -237,73 +236,101 @@ class Callback : public hfst::ExtractStringsCb
   {
     std::string istring;
     std::string ostring;
-    for(StringPairVector::const_iterator it = path.second.begin();
-    it != path.second.end(); it++) {
+    for (StringPairVector::const_iterator it = path.second.begin();
+         it != path.second.end(); it++) {
       istring.append(it->first);
       ostring.append(it->second);
     }
 
 
-    if( (max_input_length > 0) &&
-       (istring.length() > max_input_length))
-      return RetVal(true, false); // continue searching, break off this path
-    if((max_output_length > 0) &&
-       (ostring.length() > max_output_length))
-      return RetVal(true, false); // continue searching, break off this path
-    
-    if(input_prefix.length() > 0)
-    {
-      if(istring.length() < input_prefix.length())
-        return RetVal(true, true);
-      if(istring.compare(0, input_prefix.length(), input_prefix) != 0)
-        return RetVal(true, false); // continue searching, break off this path
-    }
-    if(output_prefix.length() > 0)
-    {
-      if(ostring.length() < output_prefix.length())
-        return RetVal(true, true);
-      if(ostring.compare(0, output_prefix.length(), output_prefix) != 0)
-        return RetVal(true, false); // continue searching, break off this path
-    }
-    
-    if(input_exclude.length() > 0 && 
-       istring.find(input_exclude) != std::string::npos)
-      return RetVal(true, false); // continue searching, break off this path
-    if(output_exclude.length() > 0 && 
-       ostring.find(output_exclude) != std::string::npos)
-      return RetVal(true, false); // continue searching, break off this path
-    
-    // the path passed the checks. Print it if it is final
-    if(final)
-    {
-
-      if (print_in_pairstring_format) 
-    {
-      for (StringPairVector::const_iterator it = path.second.begin();
-           it != path.second.end(); it++) 
+    if ((max_input_length > 0) &&
+        (istring.length() > max_input_length))
+      {
+        // continue searching, break off this path
+        return RetVal(true, false);
+      }
+    if ((max_output_length > 0) &&
+        (ostring.length() > max_output_length))
+      {
+      return RetVal(true, false);
+      // continue searching, break off this path
+      }
+    if (input_prefix.length() > 0)
+      {
+        if (istring.length() < input_prefix.length())
+          {
+            return RetVal(true, true);
+          }
+      if (istring.compare(0, input_prefix.length(), input_prefix) != 0)
         {
-          *out_ << get_print_format(it->first)
-            << ":"
-            << get_print_format(it->second)
-            << " ";
+          return RetVal(true, false);
+          // continue searching, break off this path
         }
-      if (display_weights) {
-        *out_ << "\t" << path.first;
       }
-      *out_ << "\n";
-    }
-    
-      else {
-    *out_ << istring;
-    if(ostring != istring)
-      *out_ << "\t" << ostring;
-    if(display_weights)
-      *out_ << "\t" << path.first;
-    *out_ << std::endl;
+    if(output_prefix.length() > 0)
+      {
+        if (ostring.length() < output_prefix.length())
+          {
+            return RetVal(true, true);
+          }
+        if (ostring.compare(0, output_prefix.length(), output_prefix) != 0)
+          {
+            return RetVal(true, false);
+            // continue searching, break off this path
+          }
       }
-
-      count++;
-    }
+    if (input_exclude.length() > 0 && 
+        (istring.find(input_exclude) != std::string::npos))
+      {
+        return RetVal(true, false);
+        // continue searching, break off this path
+      }
+    if (output_exclude.length() > 0 && 
+        (ostring.find(output_exclude) != std::string::npos))
+      {
+        return RetVal(true, false);
+        // continue searching, break off this path
+      }
+    // the path passed the checks. Print it if it is final
+    if (final)
+      {
+        if (print_in_pairstring_format) 
+          {
+            for (StringPairVector::const_iterator it = path.second.begin();
+                 it != path.second.end(); it++) 
+              {
+                *out_ << get_print_format(it->first)
+                      << ":"
+                      << get_print_format(it->second)
+                      << " ";
+              }
+            if (display_weights) 
+              {
+                *out_ << "\t" << path.first;
+              }
+            *out_ << "\n";
+          }
+        else 
+          {
+            for (StringPairVector::const_iterator it = path.second.begin();
+                 it != path.second.end(); ++it)
+              {
+                *out_ << get_print_format(it->first);
+              }
+            *out_ << "\t";
+            for (StringPairVector::const_iterator it = path.second.begin();
+                 it != path.second.end(); ++it)
+              {
+                *out_ << get_print_format(it->second);
+              }
+            if (display_weights)
+              {
+                *out_ << "\t" << path.first;
+              }
+            *out_ << std::endl;
+           }
+        count++;
+      }
     // continue until we've printed max_num strings
     return RetVal((max_num < 1) || (count < max_num), true); 
   }
