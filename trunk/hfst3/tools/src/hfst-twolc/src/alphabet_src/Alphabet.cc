@@ -52,7 +52,17 @@ const OtherSymbolTransducer &Alphabet::compute(const SymbolPair &pair)
 
   OtherSymbolTransducer pair_transducer;
 
-  if (input == TWOLC_UNKNOWN and output == TWOLC_UNKNOWN)
+  if (diacritics.has_element(input))
+    { 
+      pair_transducer.apply(&HfstTransducer::disjunct,
+			    OtherSymbolTransducer(input,input)); 
+      if (input != output and output != TWOLC_EPSILON and 
+	  output != TWOLC_UNKNOWN)
+	{ std::cerr << "Warning: Diacritic " << input << " in pair "
+		    << input << ":" << output << " will correspond 0."
+		    << std::endl; }
+    }
+  else if (input == TWOLC_UNKNOWN and output == TWOLC_UNKNOWN)
     { 
       for (HandySet<SymbolPair>::const_iterator it = alphabet_set.begin();
 	   it != alphabet_set.end();
