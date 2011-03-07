@@ -131,26 +131,30 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
           {
             if (transducer_n == 1)
               {
-                fprintf(outfile, "%s == %s\n", firstfilename, secondfilename);
+		if (not silent)
+		  fprintf(outfile, "%s == %s\n", firstfilename, secondfilename);
               }
             else
               {
-                fprintf(outfile, "%s[%zu] == %s[%zu]\n",
-                        firstfilename, transducer_n,
-                        secondfilename, transducer_n);
+		if (not silent)
+		  fprintf(outfile, "%s[%zu] == %s[%zu]\n",
+			  firstfilename, transducer_n,
+			  secondfilename, transducer_n);
               }
           }
         else
           {
             if (transducer_n == 1)
               {
-                fprintf(outfile, "%s != %s\n", firstfilename, secondfilename);
+		if (not silent)
+		  fprintf(outfile, "%s != %s\n", firstfilename, secondfilename);
               }
             else
               {
-                fprintf(outfile, "%s[%zu] != %s[%zu]\n",
-                        firstfilename, transducer_n, 
-                        secondfilename, transducer_n);
+		if (not silent)
+		  fprintf(outfile, "%s[%zu] != %s[%zu]\n",
+			  firstfilename, transducer_n, 
+			  secondfilename, transducer_n);
               }
             mismatches++;
           }
@@ -165,7 +169,8 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
           HfstTransducer dummy(firststream);
           verbose_printf("Cannot compare %s %zu to non-existent transducer",
                          firstfilename, transducer_n);
-          fprintf(outfile, "%s[%zu] != ?\n", firstfilename, transducer_n);
+	  if (not silent)
+	    fprintf(outfile, "%s[%zu] != ?\n", firstfilename, transducer_n);
           mismatches++;
         }
     }
@@ -177,7 +182,8 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
           HfstTransducer dummy(secondstream);
           verbose_printf("Cannot compare %s %zu to non-existent transducer",
                          secondfilename, transducer_n);
-          fprintf(outfile, "? != %s[%zu]\n", secondfilename, transducer_n);
+	  if (not silent)
+	    fprintf(outfile, "? != %s[%zu]\n", secondfilename, transducer_n);
           mismatches++;
         }
     }

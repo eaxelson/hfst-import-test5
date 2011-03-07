@@ -172,19 +172,37 @@ namespace hfst
 
 An example:
 \verbatim
-ImplementationType type = SFST_TYPE;
-HfstTransducer tr1("@_UNKNOWN_SYMBOL_@", "foo", type);
-// tr1 is [ @_UNKNOWN_SYMBOL_@:foo ]
 
-HfstTransducer tr2("@_IDENTITY_SYMBOL_@", type);
-HfstTransducer tmp("bar", type);
-tr2.concatenate(tmp); 
-// tr is [ [ @_IDENTITY_SYMBOL_@:@_IDENTITY_SYMBOL_@ ] [ bar:bar ] ]
+  // In the xerox formalism used here, "?" means the unknown symbol
+  // and "?:?" the identity pair 
 
-tr1.disjunct(tr2);
-// tr1 is expanded to [ @_UNKNOWN_SYMBOL_@:foo | bar:foo ]
-// tr2 is expanded to 
-// [ [ @_IDENTITY_SYMBOL_@:@_IDENTITY_SYMBOL_@ | foo:foo ] [ bar:bar ] ]
+  HfstBasicTransducer tr1;
+  tr1.add_state(1);
+  tr1.set_final_weight(1, 0);
+  tr1.add_transition
+    (0, HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "foo", 0) );
+
+  // tr1 is now [ ?:foo ]
+  
+  HfstBasicTransducer tr2;
+  tr2.add_state(1);
+  tr2.add_state(2);
+  tr2.set_final_weight(2, 0);
+  tr2.add_transition
+    (0, HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@", 
+			    "@_IDENTITY_SYMBOL_@", 0) );
+  tr2.add_transition
+    (1, HfstBasicTransition(2, "bar", "bar", 0) );
+
+  // tr2 is now [ [ ?:? ] [ bar:bar ] ]
+
+  ImplementationType type = SFST_TYPE;
+  HfstTransducer Tr1(tr1, type);
+  HfstTransducer Tr2(tr2, type);
+  Tr1.disjunct(Tr2);
+
+  // Tr1 is now [ [ ?:foo | bar:foo ]  |  [[ ?:? | foo:foo ] [ bar:bar ]] ]
+
 \endverbatim
 
   */
@@ -408,23 +426,32 @@ tr1.disjunct(tr2);
 
         @see HfstTokenizer **/
     HfstTransducer(const std::string& input_utf8_str,
-                       const std::string& output_utf8_str,
-                       const HfstTokenizer &multichar_symbol_tokenizer,
+		   const std::string& output_utf8_str,
+		   const HfstTokenizer &multichar_symbol_tokenizer,
                    ImplementationType type);
 
-    /* Constructors used by HfstCompiler.cc 
-       These contructors could be documented, since they are in the 
-       public interface.. */
+    /* @brief Create a transducer that recognizes the union of string pairs in 
+       \a sps. The type of the transducer is defined by \a type. \a cyclic
+       defines whether the transducer recognizes any number (from zero to
+       infinity, inclusive) of consecutive string pairs in \s sps. */
     HfstTransducer(const StringPairSet & sps, ImplementationType type, 
                    bool cyclic=false);
+
+    /* \brief Create a transducer that recognizes the concatenation of
+       string pairs in \a spv. The type of the transducer is defined
+       by \a type. */
     HfstTransducer(const StringPairVector & spv, ImplementationType type);
+
+    /* \brief Create a transducer that recognizes the concatenation of the 
+       unions of string pairs in string pair sets in \a spsv. The type of
+       the transducer is defined by \a type. */
     HfstTransducer(const std::vector<StringPairSet> & spsv, 
                    ImplementationType type);
 
     /** \brief Read a binary transducer from transducer stream \a in. 
 
         The stream can contain HFST tranducers or OpenFst, foma or SFST
-        transducers without any HFST header. If the backend implementations
+        transducers without an HFST header. If the backend implementations
         are used as such, they are converted into HFST transducers.
 
         For more information on transducer conversions and the HFST header
@@ -681,9 +708,10 @@ This will yield a file "testfile.att" that looks as follows:
         This example
 
 \verbatim
-    HfstTransducer tr1("a", "b", SFST_TYPE);
+    ImplementationType type = SFST_TYPE;
+    HfstTransducer tr1("a", "b", type);
     tr1.repeat_star();
-    HfstTransducer tr2("c", "d", SFST_TYPE);
+    HfstTransducer tr2("c", "d", type);
     tr2.repeat_star();
     tr1.concatenate(tr2).minimize();
     HfstTwoLevelPaths results;
@@ -705,7 +733,7 @@ This will yield a file "testfile.att" that looks as follows:
 	// Print input and output strings of each path
 	std::cerr << istring << ":" << ostring; 
 	// and optionally the weight of the path.
-	// std::cerr << "\t" << it->first;
+	//std::cerr << "\t" << it->first;
 	std::cerr << std::endl; 
       }
 \endverbatim

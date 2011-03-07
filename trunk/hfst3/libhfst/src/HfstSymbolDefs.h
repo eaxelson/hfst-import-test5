@@ -29,12 +29,19 @@ namespace hfst
     Strings <i>"@_EPSILON_SYMBOL_@"</i>, <i>"@_UNKNOWN_SYMBOL_@"</i> 
     and <i>"@_IDENTITY_SYMBOL_@"</i> are reserved.
 
-    - <i>"@_EPSILON_SYMBOL_@"</i> denotes the epsilon. 
+    - <i>"@_EPSILON_SYMBOL_@"</i> denotes the epsilon (in AT&T formalism 
+      <tt>[0]</tt>). 
     - <i>"@_UNKNOWN_SYMBOL_@"</i> denotes an unknown symbol, 
       i.e. any symbol that 
-      does not occur or has not occurred in the transducer. 
+      does not occur or has not occurred in the transducer 
+      (in AT&T formalism <tt>[?], [?:x], [x:?]</tt>). 
     - <i>"@_IDENTITY_SYMBOL_@"</i> denotes any unknown symbol that is the same
-      on the input and output side of a transition.
+      on the input and output side of a transition (in AT&T formalism 
+      <tt>[?:?]</tt>).
+
+      For an example of special symbols, see HFST transducer
+      <a href="classhfst_1_1HfstTransducer.html#symbols">
+      documentation</a>.
 
     Strings of form <CODE> @[PNDRCU][.][A-Z]+([.][A-Z]+)?@ </CODE> 
     are reserved for flag diacritics. For an example of flag diacritics, see 
