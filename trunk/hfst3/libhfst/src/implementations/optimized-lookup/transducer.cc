@@ -214,10 +214,11 @@ void Transducer::try_epsilon_transitions(SymbolNumber * input_symbol,
 	    ++i;
 	} else if (alphabet->is_flag_diacritic(
 		       tables->get_transition_input(i))) {
-	    hfst::FdState<SymbolNumber> old_state = flag_state;
+	    std::vector<short> old_values =
+		flag_state.get_values();
 	    if (flag_state.apply_operation(
 		    *(alphabet->get_operation(
-			tables->get_transition_input(i))))) {
+			  tables->get_transition_input(i))))) {
 		// flag diacritic allowed
 		*output_symbol = tables->get_transition_output(i);
 		current_weight += tables->get_weight(i);
@@ -226,9 +227,9 @@ void Transducer::try_epsilon_transitions(SymbolNumber * input_symbol,
 			     original_output_tape,
 			     tables->get_transition_target(i));
 		current_weight -= tables->get_weight(i);
-		}
-		flag_state = old_state;
-		++i;
+	    }
+	    flag_state.assign_values(old_values);
+	    ++i;
 	} else { // it's not epsilon and it's not a flag, so nothing to do
 	    return;
 	}
@@ -307,7 +308,7 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
     if (indexes_transition_table(i))
     {
 	i -= TRANSITION_TARGET_TABLE_START;
-	
+
 	try_epsilon_transitions(input_symbol,
 				output_symbol,
 				original_output_tape,
@@ -329,7 +330,7 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
       
 	SymbolNumber input = *input_symbol;
 	++input_symbol;
-      
+
 	find_transitions(input,
 			 input_symbol,
 			 output_symbol,
@@ -338,7 +339,6 @@ void Transducer::get_analyses(SymbolNumber * input_symbol,
     }
     else
     {
-      
 	try_epsilon_indices(input_symbol,
 			    output_symbol,
 			    original_output_tape,
