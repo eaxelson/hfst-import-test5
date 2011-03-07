@@ -30,6 +30,7 @@
   extern int yylineno;
   extern char * yytext;
   extern bool regexp_start;
+  extern bool rules_start;
   void yyerror(const char * text );
   void warn(const char * warning );
   int yylex();
@@ -534,7 +535,7 @@ void reduce_queue(bool variable_symbol)
   //    rule-variable names and values.
   if (not variable_symbol)
     {
-      if (not regexp_start)
+      if (not rules_start)
 	{ 
 	  std::cout << get_symbol_queue_front() << " "; 
 	  pop_symbol_queue();

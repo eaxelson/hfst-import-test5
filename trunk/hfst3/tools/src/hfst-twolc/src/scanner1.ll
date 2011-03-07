@@ -35,6 +35,9 @@
   // This tells Bison that regular expression sections commenced.
   bool regexp_start = false;
 
+  // This tells Bison that the rule section commenced.
+  bool rules_start = false;
+
   // Tells whether we are in the where-part of a rule or not.
   bool where_seen = false;
 
@@ -86,6 +89,7 @@ Rules/{RESERVED_SYMBOL} {
   // Rules declaration.
   symbol_queue.push_back("__HFST_TWOLC_Rules"); 
   reduce_queue();
+  rules_start = true;
   regexp_start = true;
   return RULES_DECLARATION; 
 }
