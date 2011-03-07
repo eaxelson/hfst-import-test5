@@ -54,7 +54,6 @@ const OtherSymbolTransducer &Alphabet::compute(const SymbolPair &pair)
 
   if (diacritics.has_element(input))
     { 
-      std::cerr << __FILE__ << " " << __LINE__ << std::endl;
       pair_transducer.apply(&HfstTransducer::disjunct,
 			    OtherSymbolTransducer(input,input)); 
       if (input != output and output != TWOLC_EPSILON and 

@@ -521,7 +521,7 @@ void reduce_queue(bool variable_symbol)
   // definition if it is. 
   if (definitions.has_element(get_symbol_queue_front()))
     { get_symbol_queue_front() = 
-      std::string("__HFST_TWOLC_DEFINITON_NAME=") + get_symbol_queue_front(); }
+      std::string("__HFST_TWOLC_DEFINITION_NAME=") + get_symbol_queue_front();}
 
   // Unescape the escaped characters in the symbol.
   get_symbol_queue_front() = unescape(get_symbol_queue_front());

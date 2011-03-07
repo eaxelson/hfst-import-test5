@@ -91,6 +91,7 @@ __HFST_TWOLC_[:] { return COLON; }
 __HFST_TWOLC_[;] { return SEMI_COLON; }
 __HFST_TWOLC_[=] { return EQUALS; }
 __HFST_TWOLC__ { return CENTER_MARKER; }
+
 __HFST_TWOLC_SET_NAME=[^ ]+ {
   yylval.value = string_copy(yytext);
   return SYMBOL;
