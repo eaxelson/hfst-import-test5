@@ -197,6 +197,18 @@ public:
         {}
 
     const FdTable<T>& get_table() const {return *table;}
+
+    const std::vector<FdValue> & get_values(void) const
+    { return values; }
+
+    void assign_values(std::vector<FdValue> const & vals)
+    {
+	values = vals;
+	if (values.size() != table->num_features()) {
+	    error_flag = true;
+	}
+    }
+	
     
     bool apply_operation(const FdOperation& op)
         {
