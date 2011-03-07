@@ -1,4 +1,4 @@
 Alphabet a b ;
 Rules
 "rule name"
-a:b => x ~ b x _ ;
+a:b => x ~b  _ ;

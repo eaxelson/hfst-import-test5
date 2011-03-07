@@ -20,10 +20,10 @@
           }
         else if ((argc - optind) == 1)
           {
-            firstfilename = hfst_strdup(argv[optind]);
-            firstfile = hfst_fopen(firstfilename, "r");
-            secondfilename = hfst_strdup("<stdin>");
-            secondfile = stdin;
+            secondfilename = hfst_strdup(argv[optind]);
+            secondfile = hfst_fopen(secondfilename, "r");
+            firstfilename = hfst_strdup("<stdin>");
+            firstfile = stdin;
             is_input_stdin = true;
           }
         else if ((argc - optind) > 2)

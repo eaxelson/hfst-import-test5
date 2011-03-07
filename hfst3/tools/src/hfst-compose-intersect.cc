@@ -141,7 +141,7 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
 
 
 int main( int argc, char **argv ) {
-    hfst_set_program_name(argv[0], "0.1", "HfstCompose");
+    hfst_set_program_name(argv[0], "0.1", "HfstComposeIntersect");
     int retval = parse_options(argc, argv);
     if (retval != EXIT_CONTINUE)
     {
