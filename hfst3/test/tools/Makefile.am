@@ -37,8 +37,8 @@ TESTS=hfst-check-version.sh hfst-check-help.sh empty-input.sh\
 	  split-functionality.sh head-functionality.sh tail-functionality.sh \
 	  calculate-functionality.sh format-functionality.sh \
 	  lookup-functionality.sh \
-	  lexc-compiler-functionality.sh \
-	  lexc-functionality.sh # xfst-functionality.sh
+	  lexc-functionality.sh \
+	  utf-8-strings.sh latin-1-strings.sh
 DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   cat2cat_or_CAT_uppercased.hfst cat2CAT_uppercased.hfst cat2dog.hfst \
 		   cat+dog.hfst catdog.hfst cat_or_dog.hfst cat.hfst \
@@ -97,7 +97,8 @@ FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
 		 summarize_test2.txt tac.txt proc-caps.txt
 FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-out1.strings \
 		 proc-caps-out2.strings proc-caps-out3.strings proc-caps-out4.strings \
-		 proc-cat-out.strings proc-cat-weighted-out.strings
+		 proc-cat-out.strings proc-cat-weighted-out.strings \
+		 utf-8.strings latin-1.strings
 SUBSTITUTE_TXTS=cat2dog.substitute
 XRE_TXTS=cats_and_dogs.xre
 #XFST_TXTS=cat-regex.xfst
