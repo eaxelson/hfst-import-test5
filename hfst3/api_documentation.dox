@@ -652,7 +652,7 @@ namespace hfst {
 
       \section using_hfst Using HFST in your own code
 
-      After <a href="InstallHfst.html">installing</a> HFST to your computer,
+      After <a href="InstallHfst.html">installing</a> HFST on your computer,
       include file HfstTransducer.h to the beginning of your program file and link to the
       HFST library.
 
