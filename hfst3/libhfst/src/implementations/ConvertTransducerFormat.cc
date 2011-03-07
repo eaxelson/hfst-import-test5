@@ -1087,7 +1087,6 @@ unsigned int hfst_ol_to_hfst_basic_add_state
       for (std::set<std::string>::iterator it = input_symbols->begin();
            it != input_symbols->end(); ++it) {
           if (it->compare(epstr)) {
-	      std::cerr << *it << std::endl;
 	      string_symbol_map->operator[](*it) = symbol_table.size();
 	      symbol_table.push_back(*it);
 	      ++seen_input_symbols;
