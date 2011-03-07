@@ -54,6 +54,7 @@ void OtherSymbolTransducer::define_diacritics
        ++it)
     { 
       symbol_pairs.erase(SymbolPair(*it,*it)); 
+      symbol_pairs.erase(SymbolPair(*it,TWOLC_EPSILON)); 
       input_symbols.erase(*it);
       output_symbols.erase(*it);
     }
