@@ -208,7 +208,6 @@ public:
 	    error_flag = true;
 	}
     }
-	
     
     bool apply_operation(const FdOperation& op)
         {
@@ -243,7 +242,7 @@ public:
                                                           this value already 
                                                           or */
                  (values[op.Feature()] < 0 &&
-                  (values[op.Feature()]*-1 != op.Value())) /* the feature is 
+                  (values[op.Feature()]*(-1) != op.Value())) /* the feature is 
                                                               negatively set 
                                                               to something 
                                                               else */
