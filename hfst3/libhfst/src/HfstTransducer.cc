@@ -2208,25 +2208,33 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 
     // If rule transducers contain word boundaries, add word boundaries to 
     // the lexicon.
-    std::set<std::string> alphabet = first.get_alphabet();
-    if (alphabet.find("__HFST_TWOLC_.#.") != alphabet.end())
+    std::set<std::string> rule_alphabet = first.get_alphabet();
+    if (rule_alphabet.find("@#@") != rule_alphabet.end())
       { 
-	HfstTokenizer tokenizer;
-	tokenizer.add_multichar_symbol("@#@");
-	tokenizer.add_multichar_symbol("__HFST_TWOLC_.#.");
-	HfstTransducer wb("@#@","__HFST_TWOLC_.#.",tokenizer,type);
-	HfstTransducer wb_copy(wb);
-	wb.concatenate(*this).concatenate(wb_copy).minimize();
-	*this = wb;
+	std::set<std::string> lexicon_alphabet = get_alphabet();
+	if (lexicon_alphabet.find("@#@") == lexicon_alphabet.end())
+	  {
+	    HfstTokenizer tokenizer;
+	    tokenizer.add_multichar_symbol("@#@");
+	    HfstTransducer wb("@#@","@#@",tokenizer,type);
+	    HfstTransducer wb_copy(wb);
+	    wb.concatenate(*this).concatenate(wb_copy).minimize();
+	    *this = wb;
+	  }
       }
 
     if (v.size() == 1) 
       {
+	//std::cerr << *this << std::endl;
+	//std::cerr << v.at(0) << std::endl;
 	// In case there is only onw rule, compose with that.
 	implementations::ComposeIntersectRule rule(v.at(0));
 	// Create a ComposeIntersectLexicon from *this. 
 	implementations::ComposeIntersectLexicon lexicon(*this);
-	*this = HfstTransducer(lexicon.compose_with_rules(&rule),type);
+	hfst::implementations::HfstBasicTransducer res = 
+	  lexicon.compose_with_rules(&rule);
+	res.prune_alphabet();
+	*this = HfstTransducer(res,type);
       }
     else
       {
@@ -2249,7 +2257,10 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	      (new implementations::ComposeIntersectRule(*it),rules); }	
 	// Create a ComposeIntersectLexicon from *this. 
 	implementations::ComposeIntersectLexicon lexicon(*this);
-	*this = HfstTransducer(lexicon.compose_with_rules(rules),type);
+	hfst::implementations::HfstBasicTransducer res = 
+	  lexicon.compose_with_rules(rules);
+	res.prune_alphabet();
+	*this = HfstTransducer(res,type);
 	delete rules;
       }
     return *this;
