@@ -198,8 +198,6 @@ void Transducer::try_epsilon_transitions(SymbolNumber * input_symbol,
 					 TransitionTableIndex i)
 {
 //        std::cerr << "try_epsilon_transitions, index " << i << std::endl;
-
-  
     while (true)
     {
 	if (tables->get_transition_input(i) == 0) // epsilon

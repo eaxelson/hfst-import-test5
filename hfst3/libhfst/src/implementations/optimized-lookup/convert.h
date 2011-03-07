@@ -88,20 +88,39 @@ struct StatePlaceholder {
 	}
 	return count;
     }
-    unsigned int symbol_offset(SymbolNumber symbol) {
-	// The following test is necessary because of states with flags
-	// (which have index 0, and are therefore called here with symbol == 0)
-	// but without epsilons.
-	if (symbol == 0) {
-	    return 0;
-	}
+    unsigned int symbol_offset(SymbolNumber symbol,
+			       std::set<SymbolNumber> & flag_symbols) {
 	unsigned int offset = 0;
-	for(std::map<SymbolNumber, std::vector<TransitionPlaceholder> >
-		::iterator it = inputs.begin(); it!= inputs.end(); ++it) {
-	    if (symbol == it->first) {
+	if (flag_symbols.size() == 0) {
+	    for(std::map<SymbolNumber, std::vector<TransitionPlaceholder> >
+		    ::iterator it = inputs.begin(); it!= inputs.end(); ++it) {
+		if (symbol == it->first) {
+		    return offset;
+		}
+		offset += it->second.size();
+	    }
+
+	} else {
+	    if (symbol == 0) {
 		return offset;
 	    }
-	    offset += it->second.size();
+	    offset = inputs[0].size();
+	    for(std::set<SymbolNumber>::iterator flag_it = flag_symbols.begin();
+		flag_it != flag_symbols.end(); ++flag_it) {
+		if (inputs.count(*flag_it) != 0) {
+		    offset += inputs[*flag_it].size();
+		}
+	    }
+	    for(std::map<SymbolNumber, std::vector<TransitionPlaceholder> >
+		    ::iterator it = inputs.begin(); it!= inputs.end(); ++it) {
+		if (it->first == 0 || flag_symbols.count(it->first) != 0) {
+		    continue;
+		}
+		if (symbol == it->first) {
+		    return offset;
+		}
+		offset += it->second.size();
+	    }
 	}
 	std::string message("error in conversion between optimized lookup "
 			    "format and HfstTransducer;\ntried to calculate "

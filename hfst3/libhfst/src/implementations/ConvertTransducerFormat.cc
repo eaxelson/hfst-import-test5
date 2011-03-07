@@ -1243,7 +1243,8 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 		hfst_ol::TransitionWIndex(
 		    sym,
 		    first_transition_vector[idx] +
-		    state_placeholders[idx].symbol_offset(sym) + TA_OFFSET));
+		    state_placeholders[idx].symbol_offset(
+			sym, flag_symbols) + TA_OFFSET));
         }
     }
 
