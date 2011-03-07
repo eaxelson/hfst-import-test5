@@ -1233,7 +1233,12 @@ unsigned int hfst_ol_to_hfst_basic_add_state
     }
     hfst_ol::TransducerTable<hfst_ol::TransitionW> wtransition_table;
 
-    for(unsigned int i = 0; i <= (used_indices->rbegin())->first; ++i) {
+    unsigned int greatest_index = 0;
+    if (used_indices->size() != 0) {
+	greatest_index = used_indices->rbegin()->first;
+    }
+
+    for(unsigned int i = 0; i <= greatest_index; ++i) {
         if (used_indices->count(i) == 0) { // blank entries
             windex_table.append(hfst_ol::TransitionWIndex());
         } else { // nonblank entries
@@ -1273,7 +1278,6 @@ unsigned int hfst_ol_to_hfst_basic_add_state
                                    alphabet,
                                    windex_table,
                                    wtransition_table);
-
   }
 
 
