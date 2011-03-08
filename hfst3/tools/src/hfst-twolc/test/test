@@ -1,0 +1,32 @@
+#! /bin/bash
+
+NUMBER_OF_TESTS=44
+
+for i in `seq 1 $NUMBER_OF_TESTS` 
+do
+	cat test"$i" | ../src/hfst-twolc-loc -R -s | hfst-fst2txt | hfst-txt2fst -e"@_EPSILON_SYMBOL_@" > temp.twolc.hfst
+	cat test"$i".txt_fst | hfst-txt2fst -e"@_EPSILON_SYMBOL_@" > temp.hfst
+	if ! hfst-compare -q -1 temp.hfst -2 temp.twolc.hfst &> /dev/null
+	then
+		echo "hfst-twolc subtest $i failed."
+		echo
+		echo "Grammar:"
+		echo
+		cat test"$i"
+		echo
+		echo "Should be:"
+		echo
+		hfst-fst2txt temp.hfst
+		echo
+		echo "Is:"
+		echo
+		hfst-fst2txt temp.twolc.hfst
+		echo
+		rm temp.hfst temp.twolc.hfst
+		exit 1
+	else
+	    echo "hfst-twolc subtest $i passed."
+	fi
+done
+
+rm temp.hfst temp.twolc.hfst
