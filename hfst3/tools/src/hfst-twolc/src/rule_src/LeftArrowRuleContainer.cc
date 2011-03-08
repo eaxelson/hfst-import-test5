@@ -76,7 +76,10 @@ void LeftArrowRuleContainer::add_rule_and_display_and_resolve_conflicts
 			}
 		    }
 		}
-	      out << std::endl;
+	      if (report_left_arrow_conflicts)
+		{ 
+		  out << std::endl;
+		}
 	    }
 	}
     }
