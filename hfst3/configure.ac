@@ -402,6 +402,7 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 tools/Makefile tools/src/Makefile tools/src/hfst-proc/Makefile
 		 tools/src/hfst-twolc/Makefile
 		 tools/src/hfst-twolc/src/Makefile
+		 tools/src/hfst-twolc/test/Makefile
 		 man/Makefile 
                  scripts/Makefile scripts/hfst-foma-wrapper.sh])
 
