@@ -1,7 +1,7 @@
 AM_YFLAGS= -d -o y.tab.c
 AM_CXXFLAGS= -O3 -g -Wall -Wextra -Wcast-qual -Wno-deprecated -Wfatal-errors
 bin_PROGRAMS=htwolcpre1 htwolcpre2 htwolcpre3
-bin_SCRIPTS=hfst-twolc
+bin_SCRIPTS=hfst-twolc hfst-twolc-loc
 EXTRA_DIST=hfst-twolc.sh
 IO_SRC=$(srcdir)/io_src
 STRING_SRC=$(srcdir)/string_src
@@ -74,3 +74,7 @@ htwolcpre3_SOURCES=htwolcpre3.yy scanner3.ll HfstTwolcDefs.h \
 hfst-twolc$(EXEEXT): hfst-twolc.sh
 	cat $< | sed -e 's|BINDIR|$(bindir)|' > $@
 	chmod ogu+rx hfst-twolc
+
+hfst-twolc-loc$(EXEEXT): hfst-twolc.sh
+	cat $< | sed -e 's|BINDIR|$(PWD)|' > $@
+	chmod ogu+rx hfst-twolc-loc
