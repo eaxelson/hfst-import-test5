@@ -229,7 +229,6 @@ EXP: EXP CROSS_PRODUCT EXP {
     | READ_BIN
     {
         hfst::HfstInputStream instream($1);
-        //instream.open();
         $$ = new HfstTransducer(instream);
         free($1);
     }
@@ -251,11 +250,11 @@ EXP: EXP CROSS_PRODUCT EXP {
         free($3);
       }
     | CHAR PAIR_SEPARATOR_WO_RIGHT     {
-        $$ = new HfstTransducer($1, "@?@", hfst::xre::format);
+        $$ = new HfstTransducer($1, "@_UNKNOWN_SYMBOL_@", hfst::xre::format);
         free($1);
       }
     | PAIR_SEPARATOR_WO_LEFT CHAR   {
-        $$ = new HfstTransducer("@?@", $2, hfst::xre::format);
+        $$ = new HfstTransducer("@_UNKNOWN_SYMBOL_@", $2, hfst::xre::format);
         free($2);
       }
     | CHAR {
@@ -264,6 +263,10 @@ EXP: EXP CROSS_PRODUCT EXP {
             // label alone may be sneaky definition macro
             HfstTransducer* def = hfst::xre::definitions[$1];
             $$ = new HfstTransducer(*def);
+          }
+        else if (strcmp("@_UNKNOWN_SYMBOL_@", $1) == 0)
+          {
+            $$ = new HfstTransducer("@_IDENTITY_SYMBOL_@", hfst::xre::format);
           }
         else
           {
@@ -278,17 +281,17 @@ EXP: EXP CROSS_PRODUCT EXP {
         free($1);
       }
     | PAIR_SEPARATOR_SOLE {
-        $$ = new HfstTransducer("@?@", hfst::xre::format);
+        $$ = new HfstTransducer("@_IDENTITY_SYMBOL_@", hfst::xre::format);
       }
     ;
 
 CHAR: SYMBOL { $$ = $1; }
     | QUOTED_LITERAL { $$ = $1; }
     | ANY_TOKEN {
-        $$ = strdup("@?@");
+        $$ = strdup("@_UNKNOWN_SYMBOL_@");
         }
     | EPSILON_TOKEN {
-        $$ = strdup("@0@");
+        $$ = strdup("@_EPSILON_SYMBOL_@");
         }
     ;
 
