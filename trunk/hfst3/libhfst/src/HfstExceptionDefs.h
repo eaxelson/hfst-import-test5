@@ -26,7 +26,8 @@ struct HfstException
 
 //! @brief Macro to throw an exception of type @a E with message @a M.
 //! Use @a THROW instead of regular @a throw with subclasses of HfstException.
-#define HFST_THROW_MESSAGE(E,M) throw E(#E #M,__FILE__,__LINE__)
+#define HFST_THROW_MESSAGE(E,M) throw E(std::string(#E)+": "+std::string(M)\
+					,__FILE__,__LINE__)
 
 //! @brief Declare a subclass of @a HfstException of type @a CHILD.
 #define HFST_EXCEPTION_CHILD_DECLARATION(CHILD) \

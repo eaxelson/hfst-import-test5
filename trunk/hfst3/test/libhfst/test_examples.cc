@@ -98,5 +98,113 @@ int main(int argc, char **argv)
 
     }
 
+  {
+    ImplementationType type=FOMA_TYPE;
+    
+    /* Create a simple lexicon transducer 
+       [[foo bar foo] | [foo bar baz]]. */
+    
+    HfstTokenizer tok;
+    tok.add_multichar_symbol("foo");
+    tok.add_multichar_symbol("bar");
+    tok.add_multichar_symbol("baz");
+    
+    HfstTransducer words("foobarfoo", tok, type);
+    HfstTransducer t("foobarbaz", tok, type);
+    words.disjunct(t);
+    
+    
+    /* Create a rule transducer that optionally replaces 
+       "bar" with "baz" between "foo" and "foo". */
+    
+    HfstTransducerPair context
+      (HfstTransducer("foo", type),
+       HfstTransducer("foo", type) );
+    HfstTransducer mapping
+      ("bar", "baz", type);
+    bool optional=true;
+    
+    StringPairSet alphabet;
+    alphabet.insert(StringPair("foo", "foo"));
+    alphabet.insert(StringPair("bar", "bar"));
+    alphabet.insert(StringPair("baz", "baz"));
+    
+    HfstTransducer rule = rules::replace_up
+      (context, mapping, optional, alphabet);
+    
+    
+    /* Apply the rule transducer to the lexicon. */  
+    words.compose(rule).minimize();
+    
+    
+    /* Extract all string pairs from the result and print
+       them to stdout. */
+    
+    HfstTwoLevelPaths results;
+    
+    try {
+      words.extract_paths(results);
+    } 
+    catch (TransducerIsCyclicException e)
+      {
+	/* This should not happen because transducer is not cyclic. */
+	fprintf(stderr, "TEST FAILED\n");
+	exit(1);
+      }
+    
+    /* Go through all paths. */  
+    for (HfstTwoLevelPaths::const_iterator it = results.begin();
+         it != results.end(); it++)
+      {
+	/* Go through each path. */
+	StringPairVector spv = it->second;
+	std::string istring("");
+	std::string ostring("");
+	
+	for (StringPairVector::const_iterator IT = spv.begin();
+	     IT != spv.end(); IT++)
+	  {
+	    istring.append(IT->first);
+	    ostring.append(IT->second);
+	  }
+	/*fprintf(stdout, "%s : %s\n", 
+		istring.c_str(), 
+		ostring.c_str());*/
+      }
+  }
+
+
+  {
+    ImplementationType type = SFST_TYPE;
+
+    StringPairSet ruleset1;
+    ruleset1.insert(StringPair("a","b"));
+    ruleset1.insert(StringPair("c","d"));
+    ruleset1.insert(StringPair("e","f"));
+    HfstTransducer rule1(ruleset1, type);
+
+    StringPairSet ruleset2;
+    ruleset2.insert(StringPair("a","b"));
+    ruleset2.insert(StringPair("g","g"));
+    ruleset2.insert(StringPair("i","j"));
+    HfstTransducer rule2(ruleset2, type);
+
+    StringPairSet ruleset3;
+    ruleset3.insert(StringPair("a","b"));
+    ruleset3.insert(StringPair("k","l"));
+    ruleset3.insert(StringPair("m","n"));
+    HfstTransducer rule3(ruleset3, type);
+
+    std::vector<HfstTransducer> rules;
+    rules.push_back(rule1);
+    rules.push_back(rule2);
+    rules.push_back(rule3);
+
+    HfstTransducer test("A", "a", type);
+    test.compose_intersect(rules);
+    //std::cerr << test;
+  }
+
+
 }
 
