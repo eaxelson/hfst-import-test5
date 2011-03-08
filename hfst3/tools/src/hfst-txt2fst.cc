@@ -157,10 +157,17 @@ process_stream(HfstOutputStream& outstream)
         {
           verbose_printf("Reading transducer table %zu...\n", transducer_n);
         }
-      HfstTransducer t(inputfile,
-		       output_format,
-		       std::string(epsilonname));
-      outstream << t;
+      try {
+	HfstTransducer t(inputfile,
+			 output_format,
+			 std::string(epsilonname));
+	outstream << t;
+      }
+      catch (HfstException e)
+	{
+	  std::cerr << e() << std::endl;
+	  return EXIT_FAILURE;
+	}
     }
   outstream.close();
   return EXIT_SUCCESS;

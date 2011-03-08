@@ -5,7 +5,7 @@ A binary HfstTransducer consists of an HFST header (more on HFST headers on the
 <a href="https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstTransducerHeader">
 wiki pages</a>) and the transducer of the backend implementation. 
 If you want to write backend transducers as such, you can specify it with 
-the hfst_format argument of HfstOutputStream constructor:
+the <i>hfst_format</i> argument of HfstOutputStream constructor:
 
 \verbatim
    HfstOutputStream(ImplementationType type, bool hfst_format=true);
@@ -254,7 +254,7 @@ HfstTransducer tr("a", "b", SFST_TYPE);
      so that thay can be accessed via a standardized interface that works similarily 
      for all implementations.
 
-     All functions in the skeleton files return an hfst::exceptions::FunctionNotImplementedException
+     All functions in the skeleton files return a FunctionNotImplementedException
      as they have no implementation. When starting to write your own implementation,
      you can also return the same exception for all functions that you have not 
      yet implemented.
@@ -404,7 +404,7 @@ to TransducerImplementation, the union of possible transducer backend implementa
   functions. However, usually more complex functions are implemented
   with HFST API basic functions, so they do not have to be implemented
   separately for each library. By default all functionalities throw
-  an hfst::exceptions::FunctionNotImplementedException if the implementation
+  a FunctionNotImplementedException if the implementation
   type requested is not handled as a separate case in the function.
   This should make it easy for you to start adding your implementations
   gradually.
@@ -423,7 +423,7 @@ to TransducerImplementation, the union of possible transducer backend implementa
     type(type),anonymous(false),is_trie(true), name("")
   {
     if (not is_implementation_type_available(type))
-      throw hfst::exceptions::ImplementationTypeNotAvailableException();
+      HFST_THROW(ImplementationTypeNotAvailableException);
 
     switch (type)
       {
@@ -461,9 +461,9 @@ to TransducerImplementation, the union of possible transducer backend implementa
 	  (type==HFST_OLW_TYPE?true:false);
 	break;
       case ERROR_TYPE:
-	throw hfst::exceptions::TransducerHasWrongTypeException();
+	HFST_THROW(TransducerHasWrongTypeException);
       default:
-	throw hfst::exceptions::FunctionNotImplementedException();
+	HFST_THROW(FunctionNotImplementedException);
       }
   }
 \endverbatim
@@ -592,7 +592,7 @@ HfstTransducer &apply(
 	//#endif
 	case ERROR_TYPE:
 	default:
-	  throw hfst::exceptions::TransducerHasWrongTypeException();
+	  HFST_THROW(TransducerHasWrongTypeException);
       }
     return *this;
   }
@@ -744,7 +744,7 @@ try {
   exit(1);
 } 
 /* If the state does not exist or is not final */
-catch (exceptions::HfstInterfaceException e) {
+catch (HfstException e) {
   fprintf(stderr, "TEST FAILED: An exception thrown.\n");
   exit(1);
 }
@@ -752,7 +752,7 @@ catch (exceptions::HfstInterfaceException e) {
 
 
 An example of creating transducers from strings, applying rules to them
-an printing the resulting transducer.
+and printing the string pairs recognized by the resulting transducer.
 
 \verbatim
   using namespace hfst;
@@ -792,30 +792,42 @@ an printing the resulting transducer.
 
 
   /* Apply the rule transducer to the lexicon. */  
-  words.compose(rule);
+  words.compose(rule).minimize();
   
   
   /* Extract all string pairs from the result and print
      them to stdout. */
 
-  WeightedPaths<float>::Set results;
+  HfstTwoLevelPaths results;
   
   try {
-    words.extract_strings(results);
+    words.extract_paths(results);
   } 
-  catch (hfst::exceptions::TransducerIsCyclicException e)
+  catch (TransducerIsCyclicException e)
     {
       /* This should not happen because transducer is not cyclic. */
       fprintf(stderr, "TEST FAILED\n");
       exit(1);
     }
 
-  for (WeightedPaths<float>::Set::const_iterator it = results.begin();
+  /* Go through all paths. */  
+  for (HfstTwoLevelPaths::const_iterator it = results.begin();
          it != results.end(); it++)
     {
+    /* Go through each path. */
+    StringPairVector spv = it->second;
+    std::string istring("");
+    std::string ostring("");
+
+    for (StringPairVector::const_iterator IT = spv.begin();
+           IT != spv.end(); IT++)
+      {
+	istring.append(IT->first);
+	ostring.append(IT->second);
+      }
     fprintf(stdout, "%s : %s\n", 
-            it->istring.c_str(), 
-            it->ostring.c_str());
+            istring, 
+            ostring);
     }
 \endverbatim
 

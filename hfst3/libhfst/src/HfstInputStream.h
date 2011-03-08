@@ -216,7 +216,7 @@ For documentation on the HFST binary transducer format, see
     /** \brief The type of the first transducer in the stream. 
 
         By default, all transducers in a stream have the same type, else
-        an TransducerTypeMismatchException is thrown. */
+        a TransducerTypeMismatchException is thrown. */
     ImplementationType get_type(void) const;
 
     friend class HfstTransducer;
