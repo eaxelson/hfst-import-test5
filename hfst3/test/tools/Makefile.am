@@ -46,7 +46,8 @@ DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   cat_weight_initial.hfst cat_weight_middle.hfst dog2cat.hfst \
 		   dog.hfst infinitely_ambiguous.hfst non_minimal.hfst rule1.hfst \
 		   rule2.hfst summarize_test1.hfst summarize_test2.hfst tac.hfst \
-		   epsilon.hfst epsilon2cat.hfst cat2epsilon.hfst
+		   epsilon.hfst epsilon2cat.hfst cat2epsilon.hfst \
+		   unknown-star.hfst identity-star.hfst
 if WANT_SFST
 SFST_CHECKS=0to3cats.hfst.sfst 2to4cats.hfst.sfst 4cats.hfst.sfst\
 			4toINFcats.hfst.sfst cat2cat_or_CAT_uppercased.hfst.sfst \
@@ -94,7 +95,8 @@ FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
 		 cat_weight_middle.txt dog2cat.txt dog.txt\
 		 epsilon.txt epsilon2cat.txt infinitely_ambiguous.txt \
 		 non_minimal.txt rule1.txt rule2.txt summarize_test1.txt \
-		 summarize_test2.txt tac.txt proc-caps.txt
+		 summarize_test2.txt tac.txt proc-caps.txt \
+		 unknown-star.txt identity-star.txt
 FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-out1.strings \
 		 proc-caps-out2.strings proc-caps-out3.strings proc-caps-out4.strings \
 		 proc-cat-out.strings proc-cat-weighted-out.strings \
