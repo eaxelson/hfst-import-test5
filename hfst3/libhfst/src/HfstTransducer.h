@@ -337,6 +337,11 @@ An example:
        defined in AT&T format in file named \a filename.
        \a epsilon_symbol defines how epsilons are represented.
 
+        NOTE: If the transition symbols contain space characters
+	they must be represented as <i>@_SPACE_@</i> because
+        whitespace characters are used as field separators 
+        in AT&T format.
+
        @pre The file exists, otherwise an exception is thrown.
        @see HfstTransducer(FILE, ImplementationType, const std::string&)
        @throws StreamNotReadableException 
@@ -630,11 +635,9 @@ in \a ifile.
         The fields in the resulting AT&T format are separated 
         by tabulator characters.
 
-        NOTE: If the transition symbols contain whitespace characters,
-        calling HfstTransducer(FILE*, ImplementationType, const std::string&)
-        for the output of this function will probably throw an 
-        NotValidAttFormatException
-        because whitespace characters are used as field separators 
+        NOTE: If the transition symbols contain space characters,
+	the spaces are printed as <i>@_SPACE_@</i> because
+        whitespace characters are used as field separators 
         in AT&T format.
 
         If several transducers are written in the same file, they must 

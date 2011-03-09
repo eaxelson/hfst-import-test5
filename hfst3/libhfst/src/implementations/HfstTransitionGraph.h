@@ -608,6 +608,23 @@ namespace hfst {
 	  HFST_THROW(FunctionNotImplementedException);
         }
 
+	/* Replace all strings \a str1 in \a symbol with \a str2. */
+	static std::string replace_all(std::string symbol, 
+				       const std::string &str1,
+				       const std::string &str2)
+	{
+	  size_t pos = symbol.find(str1);
+	  while (pos != string::npos) // while there are str1:s to replace
+	    {
+	      symbol.erase(pos, str1.size()); // erase str1
+	      symbol.insert(pos, str2);       // insert str2 instead
+	      pos = symbol.find               // find next str1
+		(str1, pos+str2.size());      
+	    }
+	  return symbol;
+	}
+
+
         /** @brief Write the graph in AT&T format to ostream \a os.
             \a write_weights defines whether weights are printed. */
         void write_in_att_format(std::ostream &os, bool write_weights=true) 
@@ -622,8 +639,11 @@ namespace hfst {
                   
                   os <<  it->first << "\t" 
                      <<  tr_it->get_target_state() << "\t"
-                     <<         data.get_input_symbol().c_str() << "\t"
-                     <<         data.get_output_symbol().c_str();
+                     <<  replace_all(data.get_input_symbol(), 
+				     " ", "@_SPACE_@") 
+		     << "\t"
+                     <<  replace_all(data.get_output_symbol(), 
+				     " ", "@_SPACE_@");
                   if (write_weights)
                     os <<  "\t" << data.get_weight(); 
                   os << "\n";
@@ -653,9 +673,10 @@ namespace hfst {
                   fprintf(file, "%i\t%i\t%s\t%s",
                           it->first,
                           tr_it->get_target_state(),
-                          data.get_input_symbol().c_str(),
-                          data.get_output_symbol().c_str()          
-                          );
+                          replace_all(data.get_input_symbol(), 
+				      " ", "@_SPACE_@").c_str(),
+                          replace_all(data.get_output_symbol(),
+				      " ", "@_SPACE_@").c_str());
 
                   if (write_weights)
                     fprintf(file, "\t%f",
@@ -724,6 +745,11 @@ namespace hfst {
             else if (n == 4 || n == 5) { // a transition line
               std::string input_symbol=std::string(a3);
               std::string output_symbol=std::string(a4);
+
+	      // replace "@_SPACE_@"s with " "
+	      input_symbol = replace_all(input_symbol, "@_SPACE_@", " ");
+	      output_symbol = replace_all(output_symbol, "@_SPACE_@", " ");
+
               if (epsilon_symbol.compare(input_symbol) == 0)
                 input_symbol="@_EPSILON_SYMBOL_@";
               if (epsilon_symbol.compare(output_symbol) == 0)
