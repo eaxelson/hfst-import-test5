@@ -2225,20 +2225,19 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
     const HfstTransducer &first = *v.begin();
 
     // If rule transducers contain word boundaries, add word boundaries to 
-    // the lexicon.
+    // the lexicon unless the lexicon already contains them. 
     std::set<std::string> rule_alphabet = first.get_alphabet();
+    bool remove_word_boundary = false;
     if (rule_alphabet.find("@#@") != rule_alphabet.end())
       { 
 	std::set<std::string> lexicon_alphabet = get_alphabet();
-	if (lexicon_alphabet.find("@#@") == lexicon_alphabet.end())
-	  {
-	    HfstTokenizer tokenizer;
-	    tokenizer.add_multichar_symbol("@#@");
-	    HfstTransducer wb("@#@","@#@",tokenizer,type);
-	    HfstTransducer wb_copy(wb);
-	    wb.concatenate(*this).concatenate(wb_copy).minimize();
-	    *this = wb;
-	  }
+	remove_word_boundary = (lexicon_alphabet.find("@#@") == lexicon_alphabet.end());
+	HfstTokenizer tokenizer;
+	tokenizer.add_multichar_symbol("@#@");
+	HfstTransducer wb("@#@","@#@",tokenizer,type);
+	HfstTransducer wb_copy(wb);
+	wb.concatenate(*this).concatenate(wb_copy).minimize();
+	*this = wb;	
       }
 
     if (v.size() == 1) 
@@ -2281,6 +2280,13 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	*this = HfstTransducer(res,type);
 	delete rules;
       }
+    if (remove_word_boundary)
+      { 
+	std::cerr << "Removed word boundary symbols." << std::endl;
+	substitute("@#@","@_EPSILON_SYMBOL_@"); 
+      }
+    else
+      { std::cerr << "Leaving word boundary symbols in place." << std::endl; }
     return *this;
   }
 
