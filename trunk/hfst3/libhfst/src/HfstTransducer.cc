@@ -2250,8 +2250,6 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	implementations::ComposeIntersectLexicon lexicon(*this);
 	hfst::implementations::HfstBasicTransducer res = 
 	  lexicon.compose_with_rules(&rule);
-	res.prune_alphabet();
-	*this = HfstTransducer(res,type);
       }
     else
       {
@@ -2276,17 +2274,14 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	implementations::ComposeIntersectLexicon lexicon(*this);
 	hfst::implementations::HfstBasicTransducer res = 
 	  lexicon.compose_with_rules(rules);
-	res.prune_alphabet();
 	*this = HfstTransducer(res,type);
 	delete rules;
       }
     if (remove_word_boundary)
-      { 
-	std::cerr << "Removed word boundary symbols." << std::endl;
-	substitute("@#@","@_EPSILON_SYMBOL_@"); 
-      }
-    else
-      { std::cerr << "Leaving word boundary symbols in place." << std::endl; }
+      { substitute("@#@","@_EPSILON_SYMBOL_@",true,true); }
+    implementations::HfstBasicTransducer basic(*this);
+    basic.prune_alphabet();
+    *this = HfstTransducer(basic,type);
     return *this;
   }
 
