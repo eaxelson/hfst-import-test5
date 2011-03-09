@@ -27,8 +27,8 @@ ConflictResolvingLeftArrowRule::ConflictResolvingLeftArrowRule
 {}
 
 bool ConflictResolvingLeftArrowRule::conflicts_this
-(const ConflictResolvingLeftArrowRule &another)
-{ return not context.is_empty_intersection(another.context); }
+(const ConflictResolvingLeftArrowRule &another,StringVector &v)
+{ return not context.is_empty_intersection(another.context,v); }
 
 bool ConflictResolvingLeftArrowRule::resolvable_conflict
 (const ConflictResolvingLeftArrowRule &another)

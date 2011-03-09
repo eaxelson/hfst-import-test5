@@ -27,6 +27,7 @@
 #include "../../../../../libhfst/src/HfstTransducer.h"
 #include "HfstTwolcDefs.h"
 #include "grammar_defs.h"
+#include "../string_src/string_manipulation.h"
 #include <vector>
 #include <map>
 #include <algorithm>
@@ -122,13 +123,12 @@ class OtherSymbolTransducer
   static bool empty(const HfstBasicTransducer &fsm);
 
  public:
-  typedef std::vector<std::string> StringVector;
 
   //! @brief Define the set of possible symbol-pairs.
   static void set_symbol_pairs(const HandySet<SymbolPair> &symbol_pairs);
 
   //! @brief Define the set of possible symbol-pairs.
-  static void define_diacritics(const StringVector &diacritics);
+  static void define_diacritics(const std::vector<std::string> &diacritics);
 
   //! @brief Set the type of transducer to be used
   static void set_transducer_type(ImplementationType transducer_type);
@@ -221,8 +221,9 @@ class OtherSymbolTransducer
   static void set_final(HfstBasicTransducer &center_t,size_t state);
 
   //! @brief Return true, iff the intersection of @a this and @a another is 
-  //! empty.
-  bool is_empty_intersection(const OtherSymbolTransducer &another);
+  //! empty. If it is non-empty, store the first common string found in v.
+  bool is_empty_intersection(const OtherSymbolTransducer &another,
+			     StringVector &);
 
   //! @brief Return true, iff @a another is a subset of the @a this.
   bool is_subset(const OtherSymbolTransducer &another);
