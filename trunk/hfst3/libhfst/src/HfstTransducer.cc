@@ -2047,21 +2047,21 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
     return *this;
   }
 
-  bool substitute_single_identity_with_unknown
+  bool substitute_single_identity_with_the_other_symbol
   (const StringPair &sp, StringPairSet &sps)
   {
     std::string isymbol = sp.first;
     std::string osymbol = sp.second;
     
-    if (isymbol.compare("@_IDENTITY_SYMBOL_@") && 
-        (osymbol.compare("@_IDENTITY_SYMBOL_@") == false)) {
-      isymbol = std::string("@_UNKNOWN_SYMBOL_@");
+    if (isymbol.compare("@_IDENTITY_SYMBOL_@") == 0 && 
+        (osymbol.compare("@_IDENTITY_SYMBOL_@") != 0)) {
+      isymbol = osymbol; //std::string("@_UNKNOWN_SYMBOL_@");
       sps.insert(StringPair(isymbol, osymbol));
       return true;
     }
-    else if (osymbol.compare("@_IDENTITY_SYMBOL_@") && 
-             (isymbol.compare("@_IDENTITY_SYMBOL_@") == false)) {
-      osymbol = std::string("@_UNKNOWN_SYMBOL_@");
+    else if (osymbol.compare("@_IDENTITY_SYMBOL_@") == 0 && 
+             (isymbol.compare("@_IDENTITY_SYMBOL_@") != 0)) {
+      osymbol = isymbol; //std::string("@_UNKNOWN_SYMBOL_@");
       sps.insert(StringPair(isymbol, osymbol));
       return true;
     }
@@ -2075,8 +2075,8 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
     std::string isymbol = sp.first;
     std::string osymbol = sp.second;
 
-    if (isymbol.compare("@_UNKNOWN_SYMBOL_@") && 
-        isymbol.compare("@_IDENTITY_SYMBOL_@")) {
+    if (isymbol.compare("@_UNKNOWN_SYMBOL_@") == 0 && 
+        osymbol.compare("@_IDENTITY_SYMBOL_@") == 0) {
       isymbol = std::string("@_IDENTITY_SYMBOL_@");
       osymbol = std::string("@_IDENTITY_SYMBOL_@");
       sps.insert(StringPair(isymbol, osymbol));
@@ -2125,8 +2125,20 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
         if (DEBUG) fprintf(stderr,"..done\n");
       }
 
+    /*fprintf(stderr, "before harmonization:\n");
+    this->write_in_att_format(stderr);
+    fprintf(stderr, "--\n");
+    another.write_in_att_format(stderr);
+    fprintf(stderr, "\n");*/
+
     if (DEBUG) fprintf(stderr, "harmonizing for composition..\n");
     this->harmonize(const_cast<HfstTransducer&>(another));
+
+    /*fprintf(stderr, "before composition:\n");
+    this->write_in_att_format(stderr);
+    fprintf(stderr, "--\n");
+    another.write_in_att_format(stderr);
+    fprintf(stderr, "\n");*/
 
     if (DEBUG) fprintf(stderr,"..done\n");
     
@@ -2181,19 +2193,25 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	HFST_THROW(FunctionNotImplementedException);
       }
 
-#if HAVE_FOMA
+    /*fprintf(stderr, "after composition:\n");
+    this->write_in_att_format(stderr);
+    fprintf(stderr, "--\n");
+    another.write_in_att_format(stderr);
+    fprintf(stderr, "\n");*/
+
+    //#if HAVE_FOMA
     if ( (this->type != FOMA_TYPE) && unknown_symbols_in_use) 
       {
         if (DEBUG) fprintf(stderr,"substituting after composition..\n");
 
         // comment...
-        this->substitute(&substitute_single_identity_with_unknown);
+        this->substitute(&substitute_single_identity_with_the_other_symbol);
         (const_cast<HfstTransducer&>(another)).
           substitute(&substitute_unknown_identity_pairs);
 
         if (DEBUG) fprintf(stderr,"..done\n");
       }
-#endif
+    //#endif
 
     return *this;
   }
