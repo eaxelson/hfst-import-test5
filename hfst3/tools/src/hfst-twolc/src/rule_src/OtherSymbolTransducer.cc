@@ -43,7 +43,7 @@ void OtherSymbolTransducer::set_symbol_pairs
 }
 
 void OtherSymbolTransducer::define_diacritics
-(const StringVector &diacritics)
+(const std::vector<std::string> &diacritics)
 {
   OtherSymbolTransducer::diacritics.clear();
   OtherSymbolTransducer::diacritics.insert
@@ -590,7 +590,8 @@ HfstTransducer OtherSymbolTransducer::get_transducer(void)
 bool have_common_string(HfstState state1,HfstState state2,
 			const HfstBasicTransducer &fst1,
 			const HfstBasicTransducer &fst2,
-			HandySet<StatePair> &visited_pairs)
+			HandySet<StatePair> &visited_pairs,
+			StringVector &v)
 {
   if (fst1.is_final_state(state1) and fst2.is_final_state(state2))
     { return true; }
@@ -620,10 +621,13 @@ bool have_common_string(HfstState state1,HfstState state2,
 			       it->get_target_state());
 	  if (not visited_pairs.has_element(state_pair))
 	    {
+	      v.push_back(symbol_pair.first + ":" + symbol_pair.second);
 	      visited_pairs.insert(state_pair);
 	      if (have_common_string(state_pair.first,state_pair.second,
-				     fst1,fst2,visited_pairs))
+				     fst1,fst2,visited_pairs,v))
 		{ return true; }
+	      else
+		{ v.pop_back(); }
 	    }
 	}
     }
@@ -631,13 +635,13 @@ bool have_common_string(HfstState state1,HfstState state2,
 }
 
 bool OtherSymbolTransducer::is_empty_intersection
-(const OtherSymbolTransducer &another)
+(const OtherSymbolTransducer &another,StringVector &v)
 {
   HfstBasicTransducer this_fst(transducer);
   HfstBasicTransducer another_fst(another.transducer);
   HandySet<StatePair> visited_pairs;
   visited_pairs.insert(StatePair(0,0));
-  return not have_common_string(0,0,this_fst,another_fst,visited_pairs);
+  return not have_common_string(0,0,this_fst,another_fst,visited_pairs,v);
 }
 
 bool OtherSymbolTransducer::is_subset(const OtherSymbolTransducer &another)

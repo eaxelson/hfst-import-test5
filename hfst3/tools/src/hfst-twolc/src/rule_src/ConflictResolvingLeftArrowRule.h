@@ -24,6 +24,7 @@
 #endif
 
 #include "LeftArrowRule.h"
+#include "../string_src/string_manipulation.h"
 
 class LeftArrowRuleContainer;
 
@@ -40,9 +41,12 @@ class ConflictResolvingLeftArrowRule : public LeftArrowRule
   //! @brief Return true if @a another conflicts @a this.
   //!
   //! Return true if the input symbols of the centers of @a another and
-  //! @this are equal, the output symbols differ, and the contexts of @a another
-  //! and @a this have a non-empty intersection.
-  bool conflicts_this(const ConflictResolvingLeftArrowRule &another);
+  //! @this are equal, the output symbols differ, and the contexts of @a 
+  //! another and @a this have a non-empty intersection.
+  //!
+  //! If a conflict exists, store the conflicting string in v.
+  bool conflicts_this(const ConflictResolvingLeftArrowRule &another,
+		      StringVector &v);
 
   //! Return @a true, if the context of @a another is a sub language of 
   //! the context of @a this.
