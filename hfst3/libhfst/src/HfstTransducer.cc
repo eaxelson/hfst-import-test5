@@ -2231,10 +2231,12 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
     if (rule_alphabet.find("@#@") != rule_alphabet.end())
       { 
 	std::set<std::string> lexicon_alphabet = get_alphabet();
-	remove_word_boundary = (lexicon_alphabet.find("@#@") == lexicon_alphabet.end());
+	remove_word_boundary = 
+	  (lexicon_alphabet.find("@#@") == lexicon_alphabet.end());
 	HfstTokenizer tokenizer;
 	tokenizer.add_multichar_symbol("@#@");
-	HfstTransducer wb("@#@","@#@",tokenizer,type);
+	tokenizer.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+	HfstTransducer wb("@_EPSILON_SYMBOL_@","@#@",tokenizer,type);
 	HfstTransducer wb_copy(wb);
 	wb.concatenate(*this).concatenate(wb_copy).minimize();
 	*this = wb;	
@@ -2242,14 +2244,14 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 
     if (v.size() == 1) 
       {
-	//std::cerr << *this << std::endl;
-	//std::cerr << v.at(0) << std::endl;
 	// In case there is only onw rule, compose with that.
 	implementations::ComposeIntersectRule rule(v.at(0));
 	// Create a ComposeIntersectLexicon from *this. 
 	implementations::ComposeIntersectLexicon lexicon(*this);
 	hfst::implementations::HfstBasicTransducer res = 
 	  lexicon.compose_with_rules(&rule);
+	res.prune_alphabet();
+	*this = HfstTransducer(res,type);
       }
     else
       {
@@ -2274,14 +2276,10 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 	implementations::ComposeIntersectLexicon lexicon(*this);
 	hfst::implementations::HfstBasicTransducer res = 
 	  lexicon.compose_with_rules(rules);
+	res.prune_alphabet();
 	*this = HfstTransducer(res,type);
 	delete rules;
       }
-    if (remove_word_boundary)
-      { substitute("@#@","@_EPSILON_SYMBOL_@",true,true); }
-    implementations::HfstBasicTransducer basic(*this);
-    basic.prune_alphabet();
-    *this = HfstTransducer(basic,type);
     return *this;
   }
 
