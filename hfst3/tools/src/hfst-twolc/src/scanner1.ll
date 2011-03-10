@@ -237,6 +237,11 @@ in/{RESERVED_SYMBOL} { return IN; }
   symbol_queue.push_back("__HFST_TWOLC_.#."); 
   return SYMBOL_SPACE; 
 }
+[#]/{RESERVED_EXC_COL} {
+  // Word boundary.
+  symbol_queue.push_back("__HFST_TWOLC_.#."); 
+  return SYMBOL_SPACE; 
+}
 \[ {
   // Beginning of a bracketed regex.
   symbol_queue.push_back("__HFST_TWOLC_["); 

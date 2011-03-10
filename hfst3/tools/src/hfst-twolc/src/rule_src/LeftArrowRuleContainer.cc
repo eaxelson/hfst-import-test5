@@ -52,15 +52,21 @@ void LeftArrowRuleContainer::add_rule_and_display_and_resolve_conflicts
 		       ++it)
 		    { 
 		      std::string symbol_pair = *it;
-		      if (symbol_pair == "__HFST_TWOLC_DIAMOND:__HFST_TWOLC_DIAMOND")
+		      symbol_pair = replace_substr
+			(symbol_pair,TWOLC_EPSILON,"");
+		      if (symbol_pair == 
+			  "__HFST_TWOLC_DIAMOND:__HFST_TWOLC_DIAMOND")
 			{ 
 			  if (diamond_seen)
 			    { continue; }
 			  symbol_pair = "_";
 			  diamond_seen = true;
 			}
-		      else if (symbol_pair == "@_TWOLC_IDENTITY_SYMBOL_@:@_TWOLC_IDENTITY_SYMBOL_@")
+		      else if 
+			(symbol_pair == 
+			 "@_TWOLC_IDENTITY_SYMBOL_@:@_TWOLC_IDENTITY_SYMBOL_@")
 			{ symbol_pair = "?"; }
+		      
 		      out << symbol_pair << " "; 
 		    }
 		  out << std::endl;
