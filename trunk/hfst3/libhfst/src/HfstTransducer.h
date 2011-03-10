@@ -338,7 +338,7 @@ An example:
        \a epsilon_symbol defines how epsilons are represented.
 
         NOTE: If the transition symbols contain space characters
-	they must be represented as <i>@_SPACE_@</i> because
+	they must be represented as "@_SPACE_@" because
         whitespace characters are used as field separators 
         in AT&T format.
 
@@ -519,8 +519,10 @@ An example:
 	(<tt>([\\w]+(-)[0-9]+(\.[0-9]+))</tt>) 
 	is missing, the transition or final state is given a zero weight.
 
-        NOTE: Transition symbols cannot contain whitespace characters,
-        because they are used as field separators in AT&T format.
+        NOTE: If transition symbols contains spaces, they must be escaped
+	as "@_SPACE_@" because spaces are used as field separators.
+	Both "@0@" and "@_EPSILON_SYMBOL_@" are always interpreted as
+	epsilons.
 
 
 An example:
@@ -636,9 +638,10 @@ in \a ifile.
         by tabulator characters.
 
         NOTE: If the transition symbols contain space characters,
-	the spaces are printed as <i>@_SPACE_@</i> because
+	the spaces are printed as "@_SPACE_@" because
         whitespace characters are used as field separators 
-        in AT&T format.
+        in AT&T format. Epsilon symbols are printed as "@0@".
+
 
         If several transducers are written in the same file, they must 
         be separated by a line of two consecutive hyphens "--", so that
