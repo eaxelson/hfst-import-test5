@@ -242,8 +242,8 @@ process_stream(HfstOutputStream& outstream)
       tok.add_multichar_symbol(*it);
     }
   // add skip symbol '\\' to tokenizer
-  tok.add_skip_symbol("\\");
-  tok.add_multichar_symbol("\\\\");
+  //tok.add_skip_symbol("\\");
+  //tok.add_multichar_symbol("\\\\");
 
   while (hfst_getline(&line, &len, inputfile) != -1)
     {
@@ -296,14 +296,16 @@ process_stream(HfstOutputStream& outstream)
               if (colon != NULL)
                 {
                   char* upper = hfst_strndup(pair, colon - pair);
-                  char* lower = hfst_strndup(colon, pair_end - colon);
-          spv.push_back(StringPair(std::string(upper), std::string(lower)));
+                  char* lower = hfst_strndup(colon+1, pair_end - colon);
+		  spv.push_back
+		    (StringPair(std::string(upper), std::string(lower)));
                 }
               else
                 {
-          spv.push_back(StringPair(std::string(pair), std::string(pair)));
+		  spv.push_back
+		    (StringPair(std::string(pair), std::string(pair)));
                 }
-              strtok(NULL, " ");
+              pair = strtok(NULL, " ");
             }
         }
 
@@ -372,9 +374,88 @@ process_stream(HfstOutputStream& outstream)
       // (3) of form "c:da:ot:g"
       else if (!has_spaces && pairstrings)
         {
-          fprintf(stderr, "FIXME: unimplemented !has_spaces && pairstrings\n");
-          return EXIT_FAILURE;
-        }
+
+	  // tokenize the line using ':' as a separator
+	  StringVector sv;
+	  char* str = strtok(line, ":");
+	  while (str != NULL)
+	    {
+	      sv.push_back(std::string(str));
+	      str = strtok(NULL, ":");
+	    }
+
+	  // an empty string
+	  if (sv.size() == 0)
+	    ;
+	  // a one-symbol string with equivalent input and output
+	  else if (sv.size() == 1)
+	    spv.push_back(StringPair(sv[0], sv[0]));
+	  // a more complex case
+	  else
+	    {
+	      // the input symbol that still needs an output symbol 
+	      std::string last_str;  
+
+	      // go through all strings separated by ':'
+	      for (unsigned int i=0; i<sv.size(); i++)
+		{
+		  StringVector tokenization = tok.tokenize_one_level(sv[i]);
+
+		  if ((i == 0 || (i == sv.size()-1)) && 
+		      tokenization.size() < 1)
+		    {
+		      error_at_line
+			(0, 0, inputfilename, line_n, 
+			 "an unescaped colon found");
+		      return EXIT_FAILURE;
+		    }
+
+		  // the first tokenization ("c")
+		  if (i == 0)
+		    {
+		      for (unsigned int n=0; n<tokenization.size()-1; n++)
+			{
+			  spv.push_back(StringPair(tokenization[n],
+						   tokenization[n]));
+			}
+		      last_str = tokenization[tokenization.size()-1];
+		    }
+
+		  // the last tokenization ("g")
+		  else if (i == sv.size()-1)
+		    {
+		      spv.push_back(StringPair(last_str,
+					       tokenization[0]));
+		      for (unsigned int n=1; n < tokenization.size(); n++)
+			{
+			  spv.push_back(StringPair(tokenization[n],
+						   tokenization[n]));
+			}
+		    }
+
+		  // any other tokenization in order ("da" or "ot")
+		  else
+		    {
+		      if (tokenization.size() < 2)
+			{
+			  error_at_line
+			    (0, 0, inputfilename, line_n, 
+			     "an unescaped colon found");
+			  return EXIT_FAILURE;
+			}
+		      spv.push_back(StringPair(last_str,
+					       tokenization[0]));
+		      for (unsigned int n=1; n < tokenization.size()-1; n++)
+			{
+			  spv.push_back(StringPair(tokenization[n],
+						   tokenization[n]));
+			}
+		      last_str = tokenization[tokenization.size()-1];
+		    }
+
+		}   // end of for loop
+	    }   // end of the more complex case
+        }   // end of case (3)
 
       // (4) of form "cat:dog"
       else if (!has_spaces && !pairstrings)
@@ -529,22 +610,27 @@ int main( int argc, char **argv )
 
   if (multichar_symbol_filename != NULL)
     {
-      verbose_printf("Reading multichar stuff from %s\n", multichar_symbol_filename);
-      FILE *file = hfst_fopen(multichar_symbol_filename, "r");
-      char* line = 0;
-      size_t len = 0;
+      verbose_printf("Reading multichar stuff from %s\n", 
+		     multichar_symbol_filename);
 
-      while (hfst_getline(&line, &len, file) != -1)
-        {
-            for (char* p = line; line != '\0'; p++)
-              {
-                if (*p == '\n') 
-                  {
-                    *p='\0';
-                  }
-              }
-            multichar_symbols.insert(std::string(line));
-          }
+      FILE * file = fopen(multichar_symbol_filename, "r");
+      while (not feof(file))
+	{
+	  char * c = new char [256];
+	  char * line = fgets(c, 256, file);
+	  if (line == NULL)
+	    break;
+
+	  for (unsigned int i=0; i < 255; i++) {
+	    if (line[i] == '\n') {
+	      line[i] = '\0';
+	      break;
+	    }
+	  }
+	  
+	  multichar_symbols.insert(std::string(line));
+	}
+      fclose(file);
     }
 
   // close output buffers, we use output streams
