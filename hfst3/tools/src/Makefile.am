@@ -143,7 +143,8 @@ noinst_HEADERS= \
 	inc/check-params-unary.h  inc/getopt-cases-binary.h \
 	inc/getopt-cases-common.h inc/getopt-cases-error.h  \
 	inc/getopt-cases-unary.h  inc/globals-binary.h      \
-	inc/globals-common.h      inc/globals-unary.h
+	inc/globals-common.h      inc/globals-unary.h \
+	HfstStrings2FstTokenizer.h
 
 # sort alphabetically
 bin_PROGRAMS= \
@@ -198,7 +199,8 @@ hfst_remove_epsilons_SOURCES=hfst-remove-epsilons.cc $(HFST_COMMON_SRC)
 hfst_repeat_SOURCES=hfst-repeat.cc $(HFST_COMMON_SRC)
 hfst_reverse_SOURCES=hfst-reverse.cc $(HFST_COMMON_SRC)
 hfst_split_SOURCES=hfst-split.cc $(HFST_COMMON_SRC)
-hfst_strings2fst_SOURCES=hfst-strings2fst.cc $(HFST_COMMON_SRC)
+hfst_strings2fst_SOURCES=hfst-strings2fst.cc $(HFST_COMMON_SRC) \
+HfstStrings2FstTokenizer.cc
 hfst_strip_header_SOURCES=hfst-strip-header.cc $(HFST_COMMON_SRC)
 hfst_substitute_SOURCES=hfst-substitute.cc $(HFST_COMMON_SRC)
 hfst_subtract_SOURCES=hfst-subtract.cc $(HFST_COMMON_SRC)
