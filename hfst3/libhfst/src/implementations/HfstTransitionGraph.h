@@ -639,11 +639,14 @@ namespace hfst {
                   
                   os <<  it->first << "\t" 
                      <<  tr_it->get_target_state() << "\t"
-                     <<  replace_all(data.get_input_symbol(), 
-				     " ", "@_SPACE_@") 
+		    // replace all spaces and epsilons
+                     <<  replace_all(replace_all(data.get_input_symbol(), 
+						 " ", "@_SPACE_@"),
+				     "@_EPSILON_SYMBOL_@", "@0@")
 		     << "\t"
-                     <<  replace_all(data.get_output_symbol(), 
-				     " ", "@_SPACE_@");
+		     <<  replace_all(replace_all(data.get_output_symbol(), 
+						 " ", "@_SPACE_@"),
+				     "@_EPSILON_SYMBOL_@", "@0@");
                   if (write_weights)
                     os <<  "\t" << data.get_weight(); 
                   os << "\n";
@@ -673,10 +676,13 @@ namespace hfst {
                   fprintf(file, "%i\t%i\t%s\t%s",
                           it->first,
                           tr_it->get_target_state(),
-                          replace_all(data.get_input_symbol(), 
-				      " ", "@_SPACE_@").c_str(),
-                          replace_all(data.get_output_symbol(),
-				      " ", "@_SPACE_@").c_str());
+			  // replace all spaces and epsilons
+                          replace_all(replace_all(data.get_input_symbol(), 
+						  " ", "@_SPACE_@"),
+				      "@_EPSILON_SYMBOL_@", "@0@").c_str(),
+                          replace_all(replace_all(data.get_output_symbol(),
+						  " ", "@_SPACE_@"),
+				      "@_EPSILON_SYMBOL_@", "@0@").c_str());
 
                   if (write_weights)
                     fprintf(file, "\t%f",
@@ -746,9 +752,14 @@ namespace hfst {
               std::string input_symbol=std::string(a3);
               std::string output_symbol=std::string(a4);
 
-	      // replace "@_SPACE_@"s with " "
-	      input_symbol = replace_all(input_symbol, "@_SPACE_@", " ");
-	      output_symbol = replace_all(output_symbol, "@_SPACE_@", " ");
+	      // replace "@_SPACE_@"s with " " and "@0@"s with 
+	      // "@_EPSILON_SYMBOL_@"
+	      input_symbol = replace_all
+		(replace_all(input_symbol, "@_SPACE_@", " "),
+		 "@0@", "@_EPSILON_SYMBOL_@");
+	      output_symbol = replace_all
+		(replace_all(output_symbol, "@_SPACE_@", " "),
+		 "@0@", "@_EPSILON_SYMBOL_@");
 
               if (epsilon_symbol.compare(input_symbol) == 0)
                 input_symbol="@_EPSILON_SYMBOL_@";

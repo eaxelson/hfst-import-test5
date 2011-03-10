@@ -80,7 +80,7 @@ print_usage()
 "  -N, --nbest=NBEST          print at most NBEST best strings\n"
 "  -c, --cycles=NCYC          follow cycles at most NCYC times\n"
 "  -w, --print-weights        display the weight for each string\n"
-"  -E, --epsilon-format=EPS   print epsilon as EPS (with -S)\n"
+"  -E, --epsilon-format=EPS   print epsilon as EPS (default: empty string)\n"
 "  -S, --print-pairstrings    print result in pairstring format\n"
 "  -X, --xfst=VARIABLE        toggle xfst compatibility option VARIABLE\n");
     fprintf(message_out, "Ignore paths if:\n"
@@ -146,7 +146,7 @@ parse_options(int argc, char** argv)
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
                              HFST_GETOPT_UNARY_SHORT
-                             "SWc:e:u:p:l:L:n:N:U:P:X:",
+                             "SWc:E:u:p:l:L:n:N:U:P:X:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -217,11 +217,33 @@ parse_options(int argc, char** argv)
     return EXIT_CONTINUE;
 }
 
+/* Replace all strings \a str1 in \a symbol with \a str2. */
+static std::string replace_all(std::string symbol, 
+			       const std::string &str1,
+			       const std::string &str2)
+{
+  size_t pos = symbol.find(str1);
+  while (pos != string::npos) // while there are str1:s to replace
+    {
+      symbol.erase(pos, str1.size()); // erase str1
+      symbol.insert(pos, str2);       // insert str2 instead
+      pos = symbol.find               // find next str1
+	(str1, pos+str2.size());      
+    }
+  return symbol;
+}
 
-static std::string get_print_format(const std::string &s) {
+
+static std::string get_print_format(const std::string &s) 
+{
+  // print epsilon as defined by the user or use the default
   if (s.compare("@_EPSILON_SYMBOL_@") == 0)
-    return std::string(strdup(epsilon_format));
-  return std::string(s);
+      return std::string(strdup(epsilon_format));
+
+  // escape spaces and colons as they have a special meaning
+  return replace_all
+    ( replace_all(std::string(s), " ", "@_SPACE_@"),
+      ":", "@_COLON_@");
 }
 
 //Print results as they come

@@ -57,6 +57,7 @@ using hfst::implementations::HfstBasicTransducer;
 using hfst::StringPairVector;
 using hfst::StringPair;
 using hfst::StringSet;
+using hfst::StringVector;
 
 static char *epsilonname=NULL; // FIX: use this
 static bool has_spaces=false;
@@ -277,7 +278,10 @@ process_stream(HfstOutputStream& outstream)
         }
       *string_end = '\0';
 
+      // Parse the string
       StringPairVector spv;
+
+      // (1) of form "c:d a:o t:g"
       if (has_spaces && pairstrings)
         {
           char* pair = strtok(line, " ");
@@ -302,22 +306,124 @@ process_stream(HfstOutputStream& outstream)
               strtok(NULL, " ");
             }
         }
+
+      // (2) of form "c a t:d o g"
       else if (has_spaces && !pairstrings)
         {
-          char* pair = strtok(line, " ");
-          while (pair != NULL)
+	  StringVector input_sv;
+	  StringVector output_sv;
+
+	  // Find out whether the line has two levels
+	  char * second_string = NULL;
+	  for (unsigned int i=0; line[i] != '\0'; i++)
+	    {
+	      if (line[i] == ':') {
+		line[i] = '\0';
+		second_string = &line[i+1];
+		break;
+	      }
+	    }
+
+	  // tokenize the input string
+          char* input_string = strtok(line, " ");
+          while (input_string != NULL)
             {
-          spv.push_back(StringPair(std::string(pair), std::string(pair)));
-              pair = strtok(NULL, " ");
+	      input_sv.push_back(std::string(input_string));
+              input_string = strtok(NULL, " ");
             }
+
+	  // tokenize the output string
+	  if (second_string != NULL)
+	    {
+	      char* output_string = strtok(second_string, " ");
+	      while (output_string != NULL)
+		{
+		  output_sv.push_back(std::string(output_string));
+		  output_string = strtok(NULL, " ");
+		}
+	    }
+	  else 
+	    {
+	      output_sv = input_sv;
+	    }
+
+	  // convert into a string pair
+	  for (unsigned int i=0; 
+	       i < input_sv.size() || i < output_sv.size();
+	       i++)
+	    {	      
+	      std::string istring;
+	      std::string ostring;
+
+	      if (i < input_sv.size())
+		istring = input_sv[i];
+	      else
+		istring = std::string("@_EPSILON_SYMBOL_@");
+
+	      if (i < output_sv.size())
+		ostring = output_sv[i];
+	      else
+		ostring = std::string("@_EPSILON_SYMBOL_@");
+
+	      spv.push_back(StringPair(istring, ostring));
+	    }
         }
+
+      // (3) of form "c:da:ot:g"
       else if (!has_spaces && pairstrings)
         {
           fprintf(stderr, "FIXME: unimplemented !has_spaces && pairstrings\n");
           return EXIT_FAILURE;
         }
+
+      // (4) of form "cat:dog"
       else if (!has_spaces && !pairstrings)
         {
+	  StringVector input_sv;
+	  StringVector output_sv;
+
+	  // Find out whether the line has two levels
+	  char * second_string = NULL;
+	  for (unsigned int i=0; line[i] != '\0'; i++)
+	    {
+	      if (line[i] == ':') {
+		line[i] = '\0';
+		second_string = &line[i+1];
+		break;
+	      }
+	    }
+
+	  // tokenize the input string
+	  input_sv = tok.tokenize_one_level(std::string(line));
+
+	  // tokenize the output string
+	  if (second_string != NULL)
+	    output_sv = tok.tokenize_one_level(std::string(second_string));
+	  else
+	    output_sv = input_sv;
+
+	  // convert into a string pair
+	  for (unsigned int i=0; 
+	       i < input_sv.size() || i < output_sv.size();
+	       i++)
+	    {	      
+	      std::string istring;
+	      std::string ostring;
+
+	      if (i < input_sv.size())
+		istring = input_sv[i];
+	      else
+		istring = std::string("@_EPSILON_SYMBOL_@");
+
+	      if (i < output_sv.size())
+		ostring = output_sv[i];
+	      else
+		ostring = std::string("@_EPSILON_SYMBOL_@");
+
+	      spv.push_back(StringPair(istring, ostring));
+	    }
+
+#ifdef FOO
           const char* colon = strstr(line, ":");
           while (colon != NULL)
             {
@@ -350,19 +456,21 @@ process_stream(HfstOutputStream& outstream)
             }
 
           verbose_printf("Found %s:%s...\n", first, second);
-      StringPairVector spv_tok = tok.tokenize(std::string(first), std::string(second));
-      for (StringPairVector::iterator it = spv_tok.begin(); 
-	   it != spv_tok.end(); it++)
-	{
-	  if (it->first.compare("\\\\") == 0)
-	    it->first = std::string("\\");
-	  if (it->second.compare("\\\\") == 0)
-	    it->second = std::string("\\");
-	}
-
-      spv = spv_tok;
+	  StringPairVector spv_tok = tok.tokenize(std::string(first), std::string(second));
+	  for (StringPairVector::iterator it = spv_tok.begin(); 
+	       it != spv_tok.end(); it++)
+	    {
+	      if (it->first.compare("\\\\") == 0)
+		it->first = std::string("\\");
+	      if (it->second.compare("\\\\") == 0)
+		it->second = std::string("\\");
+	    }
+	  
+	  spv = spv_tok;
+#endif // FOO
         }
 
+      // Handle the weight
       float path_weight=0;
 
       if (weighted)
@@ -379,14 +487,14 @@ process_stream(HfstOutputStream& outstream)
           verbose_printf("Using final weight %f...\n", weight);
         }
 
-      if (!disjunct_strings)
+      if (!disjunct_strings) // each string into a transducer
         {
           HfstBasicTransducer tr;
           tr.disjunct(spv, path_weight);
           HfstTransducer res(tr, output_format);
           outstream << res;
         }
-      else
+      else // disjunct all strings into a single transducer
         {
           disjunction.disjunct(spv, path_weight);
         }
