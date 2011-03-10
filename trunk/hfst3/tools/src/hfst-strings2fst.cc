@@ -44,6 +44,7 @@ using std::pair;
 #include "implementations/HfstTransitionGraph.h"
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
+#include "HfstStrings2FstTokenizer.h"
 
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
@@ -64,7 +65,7 @@ static bool has_spaces=false;
 static bool disjunct_strings=false;
 static bool pairstrings=false;
 static char *multichar_symbol_filename=NULL;
-static StringSet multichar_symbols;
+static StringVector multichar_symbols;
 
 static float sum_of_weights=0;
 static bool normalize_weights=false;
@@ -235,15 +236,8 @@ process_stream(HfstOutputStream& outstream)
   HfstBasicTransducer disjunction;
   size_t line_n = 0;
 
-  // add multicharater symbols to tokenizer
-  for(StringSet::const_iterator it=multichar_symbols.begin();
-      it != multichar_symbols.end(); it++ ) 
-    {
-      tok.add_multichar_symbol(*it);
-    }
-  // add skip symbol '\\' to tokenizer
-  //tok.add_skip_symbol("\\");
-  //tok.add_multichar_symbol("\\\\");
+  HfstStrings2FstTokenizer
+    multichar_symbol_tokenizer(multichar_symbols,std::string(epsilonname));
 
   while (hfst_getline(&line, &len, inputfile) != -1)
     {
@@ -280,276 +274,12 @@ process_stream(HfstOutputStream& outstream)
 
       // Parse the string
       StringPairVector spv;
-
-      // (1) of form "c:d a:o t:g"
-      if (has_spaces && pairstrings)
-        {
-          char* pair = strtok(line, " ");
-          while (pair != NULL)
-            {
-              char* colon = strchr(pair, ':');
-              char* pair_end = pair;
-              while (*pair_end != '\0')
-                {
-                  pair_end++;
-                }
-              if (colon != NULL)
-                {
-                  char* upper = hfst_strndup(pair, colon - pair);
-                  char* lower = hfst_strndup(colon+1, pair_end - colon);
-		  spv.push_back
-		    (StringPair(std::string(upper), std::string(lower)));
-                }
-              else
-                {
-		  spv.push_back
-		    (StringPair(std::string(pair), std::string(pair)));
-                }
-              pair = strtok(NULL, " ");
-            }
-        }
-
-      // (2) of form "c a t:d o g"
-      else if (has_spaces && !pairstrings)
-        {
-	  StringVector input_sv;
-	  StringVector output_sv;
-
-	  // Find out whether the line has two levels
-	  char * second_string = NULL;
-	  for (unsigned int i=0; line[i] != '\0'; i++)
-	    {
-	      if (line[i] == ':') {
-		line[i] = '\0';
-		second_string = &line[i+1];
-		break;
-	      }
-	    }
-
-	  // tokenize the input string
-          char* input_string = strtok(line, " ");
-          while (input_string != NULL)
-            {
-	      input_sv.push_back(std::string(input_string));
-              input_string = strtok(NULL, " ");
-            }
-
-	  // tokenize the output string
-	  if (second_string != NULL)
-	    {
-	      char* output_string = strtok(second_string, " ");
-	      while (output_string != NULL)
-		{
-		  output_sv.push_back(std::string(output_string));
-		  output_string = strtok(NULL, " ");
-		}
-	    }
-	  else 
-	    {
-	      output_sv = input_sv;
-	    }
-
-	  // convert into a string pair
-	  for (unsigned int i=0; 
-	       i < input_sv.size() || i < output_sv.size();
-	       i++)
-	    {	      
-	      std::string istring;
-	      std::string ostring;
-
-	      if (i < input_sv.size())
-		istring = input_sv[i];
-	      else
-		istring = std::string("@_EPSILON_SYMBOL_@");
-
-	      if (i < output_sv.size())
-		ostring = output_sv[i];
-	      else
-		ostring = std::string("@_EPSILON_SYMBOL_@");
-
-	      spv.push_back(StringPair(istring, ostring));
-	    }
-        }
-
-      // (3) of form "c:da:ot:g"
-      else if (!has_spaces && pairstrings)
-        {
-
-	  // tokenize the line using ':' as a separator
-	  StringVector sv;
-	  char* str = strtok(line, ":");
-	  while (str != NULL)
-	    {
-	      sv.push_back(std::string(str));
-	      str = strtok(NULL, ":");
-	    }
-
-	  // an empty string
-	  if (sv.size() == 0)
-	    ;
-	  // a one-symbol string with equivalent input and output
-	  else if (sv.size() == 1)
-	    spv.push_back(StringPair(sv[0], sv[0]));
-	  // a more complex case
-	  else
-	    {
-	      // the input symbol that still needs an output symbol 
-	      std::string last_str;  
-
-	      // go through all strings separated by ':'
-	      for (unsigned int i=0; i<sv.size(); i++)
-		{
-		  StringVector tokenization = tok.tokenize_one_level(sv[i]);
-
-		  if ((i == 0 || (i == sv.size()-1)) && 
-		      tokenization.size() < 1)
-		    {
-		      error_at_line
-			(0, 0, inputfilename, line_n, 
-			 "an unescaped colon found");
-		      return EXIT_FAILURE;
-		    }
-
-		  // the first tokenization ("c")
-		  if (i == 0)
-		    {
-		      for (unsigned int n=0; n<tokenization.size()-1; n++)
-			{
-			  spv.push_back(StringPair(tokenization[n],
-						   tokenization[n]));
-			}
-		      last_str = tokenization[tokenization.size()-1];
-		    }
-
-		  // the last tokenization ("g")
-		  else if (i == sv.size()-1)
-		    {
-		      spv.push_back(StringPair(last_str,
-					       tokenization[0]));
-		      for (unsigned int n=1; n < tokenization.size(); n++)
-			{
-			  spv.push_back(StringPair(tokenization[n],
-						   tokenization[n]));
-			}
-		    }
-
-		  // any other tokenization in order ("da" or "ot")
-		  else
-		    {
-		      if (tokenization.size() < 2)
-			{
-			  error_at_line
-			    (0, 0, inputfilename, line_n, 
-			     "an unescaped colon found");
-			  return EXIT_FAILURE;
-			}
-		      spv.push_back(StringPair(last_str,
-					       tokenization[0]));
-		      for (unsigned int n=1; n < tokenization.size()-1; n++)
-			{
-			  spv.push_back(StringPair(tokenization[n],
-						   tokenization[n]));
-			}
-		      last_str = tokenization[tokenization.size()-1];
-		    }
-
-		}   // end of for loop
-	    }   // end of the more complex case
-        }   // end of case (3)
-
-      // (4) of form "cat:dog"
-      else if (!has_spaces && !pairstrings)
-        {
-	  StringVector input_sv;
-	  StringVector output_sv;
-
-	  // Find out whether the line has two levels
-	  char * second_string = NULL;
-	  for (unsigned int i=0; line[i] != '\0'; i++)
-	    {
-	      if (line[i] == ':') {
-		line[i] = '\0';
-		second_string = &line[i+1];
-		break;
-	      }
-	    }
-
-	  // tokenize the input string
-	  input_sv = tok.tokenize_one_level(std::string(line));
-
-	  // tokenize the output string
-	  if (second_string != NULL)
-	    output_sv = tok.tokenize_one_level(std::string(second_string));
-	  else
-	    output_sv = input_sv;
-
-	  // convert into a string pair
-	  for (unsigned int i=0; 
-	       i < input_sv.size() || i < output_sv.size();
-	       i++)
-	    {	      
-	      std::string istring;
-	      std::string ostring;
-
-	      if (i < input_sv.size())
-		istring = input_sv[i];
-	      else
-		istring = std::string("@_EPSILON_SYMBOL_@");
-
-	      if (i < output_sv.size())
-		ostring = output_sv[i];
-	      else
-		ostring = std::string("@_EPSILON_SYMBOL_@");
-
-	      spv.push_back(StringPair(istring, ostring));
-	    }
-
-#ifdef FOO
-          const char* colon = strstr(line, ":");
-          while (colon != NULL)
-            {
-              if (colon == line)
-                {
-                  error_at_line(0, 0, inputfilename, line_n, 
-                                "line may not start with unescaped colon");
-                  colon = strstr(colon + 1, ":");
-                }
-              else if (*(colon-1) == '\\' && *(colon-2) != '\\')
-                {
-                  colon = strstr(colon + 1, ":");
-                }
-              else
-                {
-                  break;
-                }
-            }
-          char* first;
-          char* second;
-          if (colon != NULL)
-            {
-              first = hfst_strndup(line, colon-line);
-              second = hfst_strndup(colon+1, string_end - colon);
-            }
-          else
-            {
-              first = hfst_strndup(line, string_end-line);
-              second = first;
-            }
-
-          verbose_printf("Found %s:%s...\n", first, second);
-	  StringPairVector spv_tok = tok.tokenize(std::string(first), std::string(second));
-	  for (StringPairVector::iterator it = spv_tok.begin(); 
-	       it != spv_tok.end(); it++)
-	    {
-	      if (it->first.compare("\\\\") == 0)
-		it->first = std::string("\\");
-	      if (it->second.compare("\\\\") == 0)
-		it->second = std::string("\\");
-	    }
-	  
-	  spv = spv_tok;
-#endif // FOO
-        }
+      if (pairstrings)
+	{ spv = multichar_symbol_tokenizer.tokenize_pair_string
+	    (line,has_spaces); }
+      else
+	{ spv = multichar_symbol_tokenizer.tokenize_string_pair
+	    (line,has_spaces); }
 
       // Handle the weight
       float path_weight=0;
@@ -610,27 +340,22 @@ int main( int argc, char **argv )
 
   if (multichar_symbol_filename != NULL)
     {
-      verbose_printf("Reading multichar stuff from %s\n", 
+      verbose_printf("Reading multichar symbols from %s\n", 
 		     multichar_symbol_filename);
-
-      FILE * file = fopen(multichar_symbol_filename, "r");
-      while (not feof(file))
-	{
-	  char * c = new char [256];
-	  char * line = fgets(c, 256, file);
-	  if (line == NULL)
-	    break;
-
-	  for (unsigned int i=0; i < 255; i++) {
-	    if (line[i] == '\n') {
-	      line[i] = '\0';
-	      break;
+      std::ifstream multichar_in(multichar_symbol_filename);
+      (void)multichar_in.peek();
+      if (not multichar_in.good())
+	{ error(EXIT_FAILURE, errno,"Multichar symbol file can't be read."); }
+      char multichar_line[1000];
+      while (multichar_in.good())
+	{ 
+	  multichar_in.getline(multichar_line,1000);
+	  if (strlen(multichar_line) > 0)
+	    { 
+	      verbose_printf("Defining multichar symbol %s\n",multichar_line);
+	      multichar_symbols.push_back(multichar_line); 
 	    }
-	  }
-	  
-	  multichar_symbols.insert(std::string(line));
 	}
-      fclose(file);
     }
 
   // close output buffers, we use output streams
