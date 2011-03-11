@@ -128,7 +128,7 @@ namespace hfst
         //#endif
         case ERROR_TYPE:
         default:
-	  HFST_THROW(TransducerHasWrongTypeException);
+          HFST_THROW(TransducerHasWrongTypeException);
       }
     return *this;
   }
@@ -207,7 +207,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
         //#endif
         case ERROR_TYPE:
         default:
-	  HFST_THROW(TransducerHasWrongTypeException);
+          HFST_THROW(TransducerHasWrongTypeException);
       }
     return *this;
   }
@@ -287,7 +287,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
         //#endif
         case ERROR_TYPE:
         default:
-	  HFST_THROW(TransducerHasWrongTypeException);
+          HFST_THROW(TransducerHasWrongTypeException);
       }
     return *this;
   }
@@ -377,7 +377,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
         //#endif
         case ERROR_TYPE:
         default:
-	  HFST_THROW(TransducerHasWrongTypeException);
+          HFST_THROW(TransducerHasWrongTypeException);
       }
 
     return *this;

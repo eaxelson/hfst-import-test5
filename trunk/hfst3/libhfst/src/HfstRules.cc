@@ -198,8 +198,8 @@ namespace hfst
                                 StringPairSet &alphabet) 
     {
       if (context.first.get_type() != context.second.get_type()) {
-	HFST_THROW_MESSAGE
-	  (TransducerTypeMismatchException, "rules::two_level_if");
+        HFST_THROW_MESSAGE(TransducerTypeMismatchException,
+                           "rules::two_level_if");
       }
       ImplementationType type = context.first.get_type();
 
@@ -260,8 +260,8 @@ namespace hfst
                                      StringPairSet &alphabet) 
     { 
       if (context.first.get_type() != context.second.get_type()) {
-	HFST_THROW_MESSAGE(TransducerTypeMismatchException, 
-			   "rules::two_level_only_if");
+        HFST_THROW_MESSAGE(TransducerTypeMismatchException, 
+                           "rules::two_level_only_if");
       }
       ImplementationType type = context.first.get_type();
 
@@ -325,8 +325,8 @@ namespace hfst
       // test that all transducers have the same type
       if (context.first.get_type() != context.second.get_type() || 
           context.first.get_type() != t.get_type() ) {
-	HFST_THROW_MESSAGE(TransducerTypeMismatchException,
-			   "rules::replace_in_context");
+          HFST_THROW_MESSAGE(TransducerTypeMismatchException,
+                             "rules::replace_in_context");
       }
       ImplementationType type = t.get_type();      
 
@@ -559,18 +559,17 @@ namespace hfst
           } 
           else { 
             if (type != it->first.get_type()) {
-	      HFST_THROW_MESSAGE
-		(TransducerTypeMismatchException, "rules::restriction");
-	    }
+              HFST_THROW_MESSAGE(TransducerTypeMismatchException,
+                                 "rules::restriction");
+            }
           }
           if (type != it->second.get_type()) {
-	    HFST_THROW_MESSAGE
-	      (TransducerTypeMismatchException, "rules::restriction");
-	  }
+            HFST_THROW_MESSAGE(TransducerTypeMismatchException,
+                               "rules::restriction");
+      }
          }
       if (not type_defined) {
-	HFST_THROW_MESSAGE
-	  (EmptySetOfContextsException, "rules::restriction");
+    HFST_THROW_MESSAGE(EmptySetOfContextsException, "rules::restriction");
       }
 
       std::string marker("@_MARKER_@");

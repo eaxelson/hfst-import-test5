@@ -80,7 +80,7 @@ print_usage()
 "  -N, --nbest=NBEST          print at most NBEST best strings\n"
 "  -c, --cycles=NCYC          follow cycles at most NCYC times\n"
 "  -w, --print-weights        display the weight for each string\n"
-"  -E, --epsilon-format=EPS   print epsilon as EPS (default: empty string)\n"
+"  -E, --epsilon-format=EPS   print epsilon as EPS\n"
 "  -S, --print-pairstrings    print result in pairstring format\n"
 "  -X, --xfst=VARIABLE        toggle xfst compatibility option VARIABLE\n");
     fprintf(message_out, "Ignore paths if:\n"

@@ -203,10 +203,10 @@ public:
 
     void assign_values(std::vector<FdValue> const & vals)
     {
-	values = vals;
-	if (values.size() != table->num_features()) {
-	    error_flag = true;
-	}
+        values = vals;
+        if (values.size() != table->num_features()) {
+            error_flag = true;
+        }
     }
     
     bool apply_operation(const FdOperation& op)

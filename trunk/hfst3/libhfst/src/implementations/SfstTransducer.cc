@@ -42,7 +42,7 @@ namespace hfst { namespace implementations {
       input_file = fopen(filename.c_str(),"r");
       if (input_file == NULL)
         { 
-	  HFST_THROW(StreamNotReadableException); }
+          HFST_THROW(StreamNotReadableException); }
     }
   }
 
@@ -145,9 +145,9 @@ namespace hfst { namespace implementations {
       { string_number_map[string_symbol] = c; }
     else if (string_number_map[string_symbol] != c)
       { 
-	HFST_THROW_MESSAGE
-	  (HfstFatalException,
-	   "SfstInputStream: symbol redefined"); }
+        HFST_THROW_MESSAGE
+          (HfstFatalException,
+           "SfstInputStream: symbol redefined"); }
   }
 
 #ifdef FOO
@@ -164,9 +164,9 @@ namespace hfst { namespace implementations {
         char minimality_identifier[8];
         int count = fread(minimality_identifier,8,1,input_file);
         if (count != 1) {
-	  HFST_THROW(NotTransducerStreamException); }
+          HFST_THROW(NotTransducerStreamException); }
         if (0 != strcmp(minimality_identifier,"MINIMAL")) {
-	  HFST_THROW(NotTransducerStreamException);
+          HFST_THROW(NotTransducerStreamException);
         }
         return true;
       }
@@ -179,10 +179,10 @@ namespace hfst { namespace implementations {
     int sfst_id_count = fread(sfst_identifier,10,1,input_file);
     if (sfst_id_count != 1)
       { 
-	HFST_THROW(NotTransducerStreamException); }
+        HFST_THROW(NotTransducerStreamException); }
     if (0 != strcmp(sfst_identifier,"SFST_TYPE"))
       { 
-	HFST_THROW(NotTransducerStreamException); }
+        HFST_THROW(NotTransducerStreamException); }
     return skip_minimality_identifier();
   }
   
@@ -192,7 +192,7 @@ namespace hfst { namespace implementations {
     int header_count = fread(hfst_header,6,1,input_file);
     if (header_count != 1)
       { 
-	HFST_THROW(NotTransducerStreamException); }
+        HFST_THROW(NotTransducerStreamException); }
     try { return skip_identifier_version_3_0(); }
     //catch (NotTransducerStreamException e) { throw e; }
     catch (const HfstException e) { throw e; }
@@ -316,7 +316,7 @@ namespace hfst { namespace implementations {
   {
     if (is_eof())
       { 
-	HFST_THROW(StreamIsClosedException); }
+        HFST_THROW(StreamIsClosedException); }
     Transducer * t = NULL;
     try 
       {
@@ -338,7 +338,7 @@ namespace hfst { namespace implementations {
       {
         delete t;
         fprintf(stderr, "caught message: \"%s\"\n", p);
-	HFST_THROW(TransducerHasWrongTypeException);
+        HFST_THROW(TransducerHasWrongTypeException);
       }
     return NULL;
   }
@@ -355,7 +355,7 @@ namespace hfst { namespace implementations {
     if (filename != std::string()) {
       ofile = fopen(filename.c_str(), "wb");
       if (ofile == NULL)
-	HFST_THROW(StreamNotReadableException);
+        HFST_THROW(StreamNotReadableException);
     } 
     else
       ofile = stdout;

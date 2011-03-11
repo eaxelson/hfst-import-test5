@@ -151,7 +151,7 @@ void HfstOlInputStream::ignore(unsigned int n)
   {
     if (is_eof())
       { 
-	HFST_THROW(StreamIsClosedException); }
+        HFST_THROW(StreamIsClosedException); }
     try 
     {
       if (has_header)

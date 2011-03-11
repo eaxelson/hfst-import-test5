@@ -32,8 +32,8 @@ namespace hfst { namespace implementations {
     else {
       input_file = fopen(filename.c_str(),"r");
       if (input_file == NULL)
-	{ 
-	  HFST_THROW(StreamNotReadableException); }
+        { 
+          HFST_THROW(StreamNotReadableException); }
     }
   }
 
@@ -107,10 +107,10 @@ namespace hfst { namespace implementations {
     int foma_id_count = fread(foma_identifier,10,1,input_file);
     if (foma_id_count != 1)
       { 
-	HFST_THROW(NotTransducerStreamException); }
+        HFST_THROW(NotTransducerStreamException); }
     if (0 != strcmp(foma_identifier,"FOMA_TYPE"))
       {
-	HFST_THROW(NotTransducerStreamException); }
+        HFST_THROW(NotTransducerStreamException); }
   }
   
   void FomaInputStream::skip_hfst_header(void)
@@ -119,7 +119,7 @@ namespace hfst { namespace implementations {
     int header_count = fread(hfst_header,6,1,input_file);
     if (header_count != 1)
       {  
-	HFST_THROW(NotTransducerStreamException); }
+        HFST_THROW(NotTransducerStreamException); }
     //int c = fgetc(input_file);
     //switch (c)
     //{
@@ -162,7 +162,7 @@ namespace hfst { namespace implementations {
     if (filename != std::string()) {
       ofile = fopen(filename.c_str(), "wb");
       if (ofile == NULL) {
-	HFST_THROW(StreamNotReadableException);
+        HFST_THROW(StreamNotReadableException);
       }
     } 
     else {
@@ -185,8 +185,8 @@ namespace hfst { namespace implementations {
   { 
     if (1 != FomaTransducer::write_net(transducer, ofile)) {
       HFST_THROW_MESSAGE
-	(HfstFatalException,
-	 "an error happened when writing a foma transducer");
+        (HfstFatalException,
+         "an error happened when writing a foma transducer");
     }
   }
 

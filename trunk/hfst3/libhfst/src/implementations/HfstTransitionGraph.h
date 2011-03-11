@@ -83,15 +83,15 @@ namespace hfst {
                   "HfstTropicalTransducerTransitionData::get_symbol"
                   "(unsigned int number) "
                   "number is not mapped to any symbol\n");*/
-	  std::string message("HfstTropicalTransducerTransitionData: "
-			      "number ");
-	  std::ostringstream oss;
-	  oss << number;
-	  message.append(oss.str());
-	  message.append(" is not mapped to any symbol");
-	  HFST_THROW_MESSAGE
-	    (HfstFatalException,
-	     message);
+          std::string message("HfstTropicalTransducerTransitionData: "
+                      "number ");
+          std::ostringstream oss;
+          oss << number;
+          message.append(oss.str());
+          message.append(" is not mapped to any symbol");
+          HFST_THROW_MESSAGE
+            (HfstFatalException,
+             message);
 
         }
         return it->second;
@@ -295,10 +295,10 @@ namespace hfst {
           return transition_data.get_weight();
         }
 
-	friend class ComposeIntersectFst;
-	friend class ComposeIntersectLexicon;
-	friend class ComposeIntersectRule;
-	friend class ComposeIntersectRulePair;
+        friend class ComposeIntersectFst;
+        friend class ComposeIntersectLexicon;
+        friend class ComposeIntersectRule;
+        friend class ComposeIntersectRulePair;
       };
 
     /** @brief An HfstTransition with transition data of type
@@ -549,7 +549,7 @@ namespace hfst {
         W get_final_weight(HfstState s) const {
           if (final_weight_map.find(s) != final_weight_map.end())
             return final_weight_map.find(s)->second;
-	  HFST_THROW(StateIsNotFinalException);
+          HFST_THROW(StateIsNotFinalException);
         }
 
         /** @brief Set the final weight of state \a s in this graph 
@@ -599,30 +599,30 @@ namespace hfst {
         {
           if (s > max_state)
             { 
-	      HFST_THROW(StateIndexOutOfBoundsException); }
+              HFST_THROW(StateIndexOutOfBoundsException); }
           return state_map.find(s)->second;
         }        
 
         /* TODO: Change state numbers s1 to s2 and vice versa. */
         void swap_state_numbers(HfstState /*s1*/, HfstState /*s2*/) {
-	  HFST_THROW(FunctionNotImplementedException);
+          HFST_THROW(FunctionNotImplementedException);
         }
 
-	/* Replace all strings \a str1 in \a symbol with \a str2. */
-	static std::string replace_all(std::string symbol, 
-				       const std::string &str1,
-				       const std::string &str2)
-	{
-	  size_t pos = symbol.find(str1);
-	  while (pos != string::npos) // while there are str1:s to replace
-	    {
-	      symbol.erase(pos, str1.size()); // erase str1
-	      symbol.insert(pos, str2);       // insert str2 instead
-	      pos = symbol.find               // find next str1
-		(str1, pos+str2.size());      
-	    }
-	  return symbol;
-	}
+        /* Replace all strings \a str1 in \a symbol with \a str2. */
+        static std::string replace_all(std::string symbol, 
+                           const std::string &str1,
+                           const std::string &str2)
+        {
+          size_t pos = symbol.find(str1);
+          while (pos != string::npos) // while there are str1:s to replace
+            {
+              symbol.erase(pos, str1.size()); // erase str1
+              symbol.insert(pos, str2);       // insert str2 instead
+              pos = symbol.find               // find next str1
+                (str1, pos+str2.size());      
+            }
+          return symbol;
+        }
 
 
         /** @brief Write the graph in AT&T format to ostream \a os.
@@ -639,14 +639,14 @@ namespace hfst {
                   
                   os <<  it->first << "\t" 
                      <<  tr_it->get_target_state() << "\t"
-		    // replace all spaces and epsilons
+                // replace all spaces and epsilons
                      <<  replace_all(replace_all(data.get_input_symbol(), 
-						 " ", "@_SPACE_@"),
-				     "@_EPSILON_SYMBOL_@", "@0@")
-		     << "\t"
-		     <<  replace_all(replace_all(data.get_output_symbol(), 
-						 " ", "@_SPACE_@"),
-				     "@_EPSILON_SYMBOL_@", "@0@");
+                                 " ", "@_SPACE_@"),
+                                 "@_EPSILON_SYMBOL_@", "@0@")
+                     << "\t"
+                     <<  replace_all(replace_all(data.get_output_symbol(), 
+                                     " ", "@_SPACE_@"),
+                                     "@_EPSILON_SYMBOL_@", "@0@");
                   if (write_weights)
                     os <<  "\t" << data.get_weight(); 
                   os << "\n";
@@ -676,13 +676,13 @@ namespace hfst {
                   fprintf(file, "%i\t%i\t%s\t%s",
                           it->first,
                           tr_it->get_target_state(),
-			  // replace all spaces and epsilons
+                  // replace all spaces and epsilons
                           replace_all(replace_all(data.get_input_symbol(), 
-						  " ", "@_SPACE_@"),
-				      "@_EPSILON_SYMBOL_@", "@0@").c_str(),
+                                              " ", "@_SPACE_@"),
+                                      "@_EPSILON_SYMBOL_@", "@0@").c_str(),
                           replace_all(replace_all(data.get_output_symbol(),
-						  " ", "@_SPACE_@"),
-				      "@_EPSILON_SYMBOL_@", "@0@").c_str());
+                                      " ", "@_SPACE_@"),
+                                      "@_EPSILON_SYMBOL_@", "@0@").c_str());
 
                   if (write_weights)
                     fprintf(file, "\t%f",
@@ -752,14 +752,14 @@ namespace hfst {
               std::string input_symbol=std::string(a3);
               std::string output_symbol=std::string(a4);
 
-	      // replace "@_SPACE_@"s with " " and "@0@"s with 
-	      // "@_EPSILON_SYMBOL_@"
-	      input_symbol = replace_all
-		(replace_all(input_symbol, "@_SPACE_@", " "),
-		 "@0@", "@_EPSILON_SYMBOL_@");
-	      output_symbol = replace_all
-		(replace_all(output_symbol, "@_SPACE_@", " "),
-		 "@0@", "@_EPSILON_SYMBOL_@");
+              // replace "@_SPACE_@"s with " " and "@0@"s with 
+              // "@_EPSILON_SYMBOL_@"
+              input_symbol = replace_all
+                (replace_all(input_symbol, "@_SPACE_@", " "),
+                 "@0@", "@_EPSILON_SYMBOL_@");
+                  output_symbol = replace_all
+                (replace_all(output_symbol, "@_SPACE_@", " "),
+                 "@0@", "@_EPSILON_SYMBOL_@");
 
               if (epsilon_symbol.compare(input_symbol) == 0)
                 input_symbol="@_EPSILON_SYMBOL_@";
@@ -772,11 +772,11 @@ namespace hfst {
             }
             
             else  {  // line could not be parsed
-	      std::string message(line);
-	      HFST_THROW_MESSAGE
-		(NotValidAttFormatException,
-		 message);
-	    }    
+              std::string message(line);
+              HFST_THROW_MESSAGE
+                (NotValidAttFormatException,
+                 message);
+            }    
           }
           return retval;
         }

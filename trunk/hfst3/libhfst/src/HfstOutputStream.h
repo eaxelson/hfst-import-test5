@@ -116,7 +116,7 @@ For more information on HFST transducer structure, see
         All transducers must have the same type as the stream, else an
         TransducerTypeMismatchException is thrown. 
 
-	@throws TransducerTypeMismatchException
+        @throws TransducerTypeMismatchException
     */
     HfstOutputStream &operator<< (HfstTransducer &transducer);
 

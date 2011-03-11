@@ -140,12 +140,12 @@ namespace hfst
         foma_interface.insert_to_alphabet(implementation.foma, symbol);
 #endif
       case ERROR_TYPE:
-	HFST_THROW(TransducerHasWrongTypeException);
+        HFST_THROW(TransducerHasWrongTypeException);
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
       default:
-	HFST_THROW_MESSAGE
-	  (FunctionNotImplementedException, "insert_to_alphabet");
+        HFST_THROW_MESSAGE(FunctionNotImplementedException,
+                           "insert_to_alphabet");
     }    
   }
 
@@ -169,11 +169,11 @@ namespace hfst
         return foma_interface.get_alphabet(implementation.foma);
 #endif
       case ERROR_TYPE:
-	HFST_THROW(TransducerHasWrongTypeException);
+        HFST_THROW(TransducerHasWrongTypeException);
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
       default:
-	HFST_THROW_MESSAGE(FunctionNotImplementedException, "get_alphabet");
+        HFST_THROW_MESSAGE(FunctionNotImplementedException, "get_alphabet");
     }    
   }
 
@@ -206,7 +206,7 @@ namespace hfst
   void HfstTransducer::harmonize(HfstTransducer &another)
   {
     if (this->type != another.type) {
-	HFST_THROW(TransducerTypeMismatchException); }
+        HFST_THROW(TransducerTypeMismatchException); }
 
     if (this->anonymous && another.anonymous) {
       return; }
@@ -320,7 +320,7 @@ namespace hfst
 #endif
       case (ERROR_TYPE):
       default:
-	HFST_THROW(TransducerHasWrongTypeException);
+        HFST_THROW(TransducerHasWrongTypeException);
       }
   }
 
@@ -347,19 +347,19 @@ namespace hfst
             return;
 
         case (ERROR_TYPE):
-	  HFST_THROW(TransducerHasWrongTypeException);
+          HFST_THROW(TransducerHasWrongTypeException);
         default:
             (void)results;
             (void)s;
             (void)limit;
-	    HFST_THROW(FunctionNotImplementedException);
+            HFST_THROW(FunctionNotImplementedException);
         }
   }
 
   void HfstTransducer::lookup(HfstOneLevelPaths& results, 
-			      const HfstTokenizer& tok,
-			      const std::string &s, 
-			      ssize_t limit) const {
+                              const HfstTokenizer& tok,
+                              const std::string &s, 
+                              ssize_t limit) const {
     StringVector sv = tok.tokenize_one_level(s);
     lookup(results, sv, limit);
   }
@@ -391,7 +391,7 @@ namespace hfst
           return this->implementation.hfst_ol->is_infinitely_ambiguous();
       default:
           (void)s;
-	  HFST_THROW(FunctionNotImplementedException);      
+          HFST_THROW(FunctionNotImplementedException);      
       }
   }
 
@@ -453,9 +453,9 @@ namespace hfst
           (type==HFST_OLW_TYPE?true:false);
         break;
       case ERROR_TYPE:
-	HFST_THROW(SpecifiedTypeRequiredException);
+        HFST_THROW(SpecifiedTypeRequiredException);
       default:
-	HFST_THROW(FunctionNotImplementedException);
+        HFST_THROW(FunctionNotImplementedException);
       }
   }
 
@@ -496,9 +496,9 @@ namespace hfst
         break;
 #endif
       case ERROR_TYPE:
-	HFST_THROW(SpecifiedTypeRequiredException);
+        HFST_THROW(SpecifiedTypeRequiredException);
       default:
-	HFST_THROW(FunctionNotImplementedException);
+        HFST_THROW(FunctionNotImplementedException);
       }
   }
 
@@ -507,7 +507,7 @@ namespace hfst
     type(type), anonymous(false), is_trie(false), name("")
   {
     if (not is_implementation_type_available(type))
-	HFST_THROW(ImplementationTypeNotAvailableException);
+        HFST_THROW(ImplementationTypeNotAvailableException);
 
     switch (type)
       {
@@ -537,9 +537,9 @@ namespace hfst
         break;
 #endif
       case ERROR_TYPE:
-	HFST_THROW(SpecifiedTypeRequiredException);
+        HFST_THROW(SpecifiedTypeRequiredException);
       default:
-	HFST_THROW(FunctionNotImplementedException);
+        HFST_THROW(FunctionNotImplementedException);
       }
   }
 
@@ -549,7 +549,7 @@ namespace hfst
     type(type),anonymous(false),is_trie(false), name("")
   {
     if (not is_implementation_type_available(type))
-	HFST_THROW(ImplementationTypeNotAvailableException);
+        HFST_THROW(ImplementationTypeNotAvailableException);
 
     switch (type)
       {
@@ -579,9 +579,9 @@ namespace hfst
         break;
 #endif
       case ERROR_TYPE:
-	HFST_THROW(SpecifiedTypeRequiredException);
+        HFST_THROW(SpecifiedTypeRequiredException);
       default:
-	HFST_THROW(FunctionNotImplementedException);
+        HFST_THROW(FunctionNotImplementedException);
       }
   }
 
@@ -590,7 +590,7 @@ namespace hfst
     type(type),anonymous(false),is_trie(false), name("")
   {
     if (not is_implementation_type_available(type))
-	HFST_THROW(ImplementationTypeNotAvailableException);
+        HFST_THROW(ImplementationTypeNotAvailableException);
 
     switch (type)
       {
@@ -620,9 +620,9 @@ namespace hfst
         break;
 #endif
       case ERROR_TYPE:
-	HFST_THROW(SpecifiedTypeRequiredException);
+        HFST_THROW(SpecifiedTypeRequiredException);
       default:
-	HFST_THROW(FunctionNotImplementedException);
+        HFST_THROW(FunctionNotImplementedException);
       }
   }
 
@@ -664,9 +664,9 @@ namespace hfst
         break;
 #endif
       case ERROR_TYPE:
-	HFST_THROW(SpecifiedTypeRequiredException);
+        HFST_THROW(SpecifiedTypeRequiredException);
       default:
-	HFST_THROW(ImplementationTypeNotAvailableException);
+        HFST_THROW(ImplementationTypeNotAvailableException);
       }
   }
 
@@ -675,7 +675,7 @@ namespace hfst
     type(in.type), anonymous(false),is_trie(false), name("")
   {
       if (not is_implementation_type_available(type)) {
-	HFST_THROW(ImplementationTypeNotAvailableException);
+        HFST_THROW(ImplementationTypeNotAvailableException);
       }
 
     in.read_transducer(*this); 
@@ -721,9 +721,9 @@ namespace hfst
             (another.implementation.hfst_ol, true);
           break;
       case ERROR_TYPE:
-	HFST_THROW(TransducerHasWrongTypeException);
+        HFST_THROW(TransducerHasWrongTypeException);
       default:
-	HFST_THROW(FunctionNotImplementedException);
+        HFST_THROW(FunctionNotImplementedException);
       }
   }
 
@@ -733,7 +733,7 @@ namespace hfst
     type(type),anonymous(false),is_trie(false), name("")
   {
     if (not is_implementation_type_available(type))
-	HFST_THROW(ImplementationTypeNotAvailableException);
+        HFST_THROW(ImplementationTypeNotAvailableException);
 
     switch (type)
       {
@@ -768,16 +768,16 @@ namespace hfst
           ConversionFunctions::hfst_basic_transducer_to_hfst_ol(&net, true);
         break;
       case ERROR_TYPE:
-	HFST_THROW(TransducerHasWrongTypeException);
+        HFST_THROW(TransducerHasWrongTypeException);
       default:
-	HFST_THROW(FunctionNotImplementedException);
+        HFST_THROW(FunctionNotImplementedException);
       }
   }
 
   HfstTransducer::~HfstTransducer(void)
   {
     if (not is_implementation_type_available(type))
-	HFST_THROW(ImplementationTypeNotAvailableException);
+        HFST_THROW(ImplementationTypeNotAvailableException);
 
     switch (type)
       {
@@ -804,9 +804,9 @@ namespace hfst
         delete implementation.hfst_ol;
         break;
       case ERROR_TYPE:
-	HFST_THROW(TransducerHasWrongTypeException);
+        HFST_THROW(TransducerHasWrongTypeException);
       default:
-	HFST_THROW(FunctionNotImplementedException);
+        HFST_THROW(FunctionNotImplementedException);
       }
   }
 
@@ -816,7 +816,7 @@ HfstTransducer::HfstTransducer(const std::string &symbol,
   type(type),anonymous(false),is_trie(false), name("")
   {
     if (not is_implementation_type_available(type))
-	HFST_THROW(ImplementationTypeNotAvailableException);
+        HFST_THROW(ImplementationTypeNotAvailableException);
 
     switch (this->type)
       {
@@ -842,9 +842,9 @@ HfstTransducer::HfstTransducer(const std::string &symbol,
         break;
 #endif
       case ERROR_TYPE:
-	HFST_THROW(TransducerHasWrongTypeException);
+        HFST_THROW(TransducerHasWrongTypeException);
       default:
-	HFST_THROW(FunctionNotImplementedException);
+        HFST_THROW(FunctionNotImplementedException);
       }
   }
 
@@ -854,7 +854,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   type(type),anonymous(false),is_trie(false), name("")
   {
     if (not is_implementation_type_available(type))
-	HFST_THROW(ImplementationTypeNotAvailableException);
+        HFST_THROW(ImplementationTypeNotAvailableException);
 
     switch (this->type)
       {
@@ -883,9 +883,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
         break;
 #endif
       case ERROR_TYPE:
-	HFST_THROW(TransducerHasWrongTypeException);
+        HFST_THROW(TransducerHasWrongTypeException);
       default:
-	HFST_THROW(FunctionNotImplementedException);
+        HFST_THROW(FunctionNotImplementedException);
       }
   }
 
@@ -908,7 +908,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   {
     if (this->type != another.type)
       HFST_THROW_MESSAGE(TransducerTypeMismatchException, 
-			 "HfstTransducer::compare");
+                         "HfstTransducer::compare");
 
     HfstTransducer one_copy(*this);
     HfstTransducer another_copy(another);
@@ -941,9 +941,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
                  another_copy.implementation.foma);
 #endif
       case ERROR_TYPE:
-	HFST_THROW(TransducerHasWrongTypeException);
+        HFST_THROW(TransducerHasWrongTypeException);
       default:
-	HFST_THROW(FunctionNotImplementedException);
+        HFST_THROW(FunctionNotImplementedException);
       }
 
   }
@@ -970,9 +970,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
       case HFST_OLW_TYPE:
         return hfst_ol_interface.is_cyclic(implementation.hfst_ol);
       case ERROR_TYPE:
-	HFST_THROW(TransducerHasWrongTypeException);
+        HFST_THROW(TransducerHasWrongTypeException);
       default:
-	HFST_THROW(FunctionNotImplementedException);
+        HFST_THROW(FunctionNotImplementedException);
     }
   }
 
@@ -1190,7 +1190,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   std::vector<HfstTransducer*> HfstTransducer::extract_path_transducers()
   {
     if (this->type != SFST_TYPE)
-	HFST_THROW(FunctionNotImplementedException);
+        HFST_THROW(FunctionNotImplementedException);
 
     std::vector<HfstTransducer*> hfst_paths;
 #if HAVE_SFST
@@ -1242,9 +1242,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
           (implementation.hfst_ol, callback, cycles);
         break;
       case ERROR_TYPE:
-	HFST_THROW(TransducerHasWrongTypeException);
+        HFST_THROW(TransducerHasWrongTypeException);
       default:
-	HFST_THROW(FunctionNotImplementedException);
+        HFST_THROW(FunctionNotImplementedException);
       }
   }
   
@@ -1314,9 +1314,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
       }
         break;
       case ERROR_TYPE:
-	HFST_THROW(TransducerHasWrongTypeException);
+        HFST_THROW(TransducerHasWrongTypeException);
       default:
-	HFST_THROW(FunctionNotImplementedException);
+        HFST_THROW(FunctionNotImplementedException);
       }
   }
   
@@ -1343,7 +1343,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   {
     if(is_cyclic() && max_num < 1 && cycles < 0)
       HFST_THROW_MESSAGE(TransducerIsCyclicException,
-			 "HfstTransducer::extract_paths");
+                         "HfstTransducer::extract_paths");
     
     ExtractStringsCb_ cb(results, max_num);
     extract_paths(cb, cycles);
@@ -1355,7 +1355,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   {
     if(is_cyclic() && max_num < 1 && cycles < 0)
       HFST_THROW_MESSAGE(TransducerIsCyclicException,
-			 "HfstTransducer::extract_paths_fd");
+                         "HfstTransducer::extract_paths_fd");
     
     ExtractStringsCb_ cb(results, max_num);
     extract_paths_fd(cb, cycles, filter_fd);
@@ -1459,9 +1459,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 #endif
        /* Add here your implementation. */
       case ERROR_TYPE:
-	HFST_THROW(TransducerHasWrongTypeException);
+        HFST_THROW(TransducerHasWrongTypeException);
       default:
-	HFST_THROW(FunctionNotImplementedException);
+        HFST_THROW(FunctionNotImplementedException);
       }
 
     return *this;
@@ -1472,7 +1472,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   {
     if (this->type != tr.type)
       HFST_THROW_MESSAGE(TransducerTypeMismatchException,
-			 "HfstTransducer::insert_freely");  
+                         "HfstTransducer::insert_freely");  
 
     /* In this function, this transducer must always be harmonized
        according to tr, not the other way round. */
@@ -1573,9 +1573,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 #endif
         /* Add here your implementation. */
       case ERROR_TYPE:
-	HFST_THROW(TransducerHasWrongTypeException);
+        HFST_THROW(TransducerHasWrongTypeException);
       default:
-	HFST_THROW(FunctionNotImplementedException);
+        HFST_THROW(FunctionNotImplementedException);
       }
 
     return *this;
@@ -1912,7 +1912,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   { 
     if (this->type != transducer.type) {
       HFST_THROW_MESSAGE(TransducerTypeMismatchException,
-			 "HfstTransducer::substitute"); }
+                         "HfstTransducer::substitute"); }
 
     bool harm = harmonize_smaller;
     harmonize_smaller=false;
@@ -2106,7 +2106,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 
     if (this->type != another.type)
       HFST_THROW_MESSAGE(HfstTransducerTypeMismatchException,
-			 "HfstTransducer::compose");
+                         "HfstTransducer::compose");
 
     bool DEBUG=false;
 
@@ -2188,9 +2188,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
         }
 #endif
       case ERROR_TYPE:
-	HFST_THROW(TransducerHasWrongTypeException);
+        HFST_THROW(TransducerHasWrongTypeException);
       default:
-	HFST_THROW(FunctionNotImplementedException);
+        HFST_THROW(FunctionNotImplementedException);
       }
 
     /*fprintf(stderr, "after composition:\n");
@@ -2230,55 +2230,55 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
     bool remove_word_boundary = false;
     if (rule_alphabet.find("@#@") != rule_alphabet.end())
       { 
-	std::set<std::string> lexicon_alphabet = get_alphabet();
-	remove_word_boundary = 
-	  (lexicon_alphabet.find("@#@") == lexicon_alphabet.end());
-	HfstTokenizer tokenizer;
-	tokenizer.add_multichar_symbol("@#@");
-	tokenizer.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-	HfstTransducer wb("@_EPSILON_SYMBOL_@","@#@",tokenizer,type);
-	HfstTransducer wb_copy(wb);
-	wb.concatenate(*this).concatenate(wb_copy).minimize();
-	*this = wb;	
+            std::set<std::string> lexicon_alphabet = get_alphabet();
+            remove_word_boundary = 
+              (lexicon_alphabet.find("@#@") == lexicon_alphabet.end());
+            HfstTokenizer tokenizer;
+            tokenizer.add_multichar_symbol("@#@");
+            tokenizer.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+            HfstTransducer wb("@_EPSILON_SYMBOL_@","@#@",tokenizer,type);
+            HfstTransducer wb_copy(wb);
+            wb.concatenate(*this).concatenate(wb_copy).minimize();
+            *this = wb;
       }
 
     if (v.size() == 1) 
       {
-	// In case there is only onw rule, compose with that.
-	implementations::ComposeIntersectRule rule(v.at(0));
-	// Create a ComposeIntersectLexicon from *this. 
-	implementations::ComposeIntersectLexicon lexicon(*this);
-	hfst::implementations::HfstBasicTransducer res = 
-	  lexicon.compose_with_rules(&rule);
-	res.prune_alphabet();
-	*this = HfstTransducer(res,type);
+            // In case there is only onw rule, compose with that.
+            implementations::ComposeIntersectRule rule(v.at(0));
+            // Create a ComposeIntersectLexicon from *this. 
+            implementations::ComposeIntersectLexicon lexicon(*this);
+            hfst::implementations::HfstBasicTransducer res = 
+              lexicon.compose_with_rules(&rule);
+            res.prune_alphabet();
+            *this = HfstTransducer(res,type);
       }
     else
       {
-	// In case there are many rules, build a ComposeIntersectRulePair 
-	// recursively and compose with that.
-	std::vector<implementations::ComposeIntersectRule*> rule_vector;
-	implementations::ComposeIntersectRule * first_rule = 
-	  new implementations::ComposeIntersectRule(*v.begin());
-	implementations::ComposeIntersectRule * second_rule = 
-	  new implementations::ComposeIntersectRule(*v.begin());
+        // In case there are many rules, build a ComposeIntersectRulePair 
+        // recursively and compose with that.
+        std::vector<implementations::ComposeIntersectRule*> rule_vector;
+        implementations::ComposeIntersectRule * first_rule = 
+          new implementations::ComposeIntersectRule(*v.begin());
+        implementations::ComposeIntersectRule * second_rule = 
+          new implementations::ComposeIntersectRule(*v.begin());
 
-	implementations::ComposeIntersectRulePair * rules = 
-	  new implementations::ComposeIntersectRulePair
-	  (first_rule,second_rule);
+        implementations::ComposeIntersectRulePair * rules = 
+          new implementations::ComposeIntersectRulePair
+          (first_rule,second_rule);
 
-	for (HfstTransducerVector::const_iterator it = v.begin() + 2;
-	     it != v.end();
-	     ++it)
-	  { rules = new implementations::ComposeIntersectRulePair
-	      (new implementations::ComposeIntersectRule(*it),rules); }	
-	// Create a ComposeIntersectLexicon from *this. 
-	implementations::ComposeIntersectLexicon lexicon(*this);
-	hfst::implementations::HfstBasicTransducer res = 
-	  lexicon.compose_with_rules(rules);
-	res.prune_alphabet();
-	*this = HfstTransducer(res,type);
-	delete rules;
+            for (HfstTransducerVector::const_iterator it = v.begin() + 2;
+                 it != v.end();
+                 ++it)
+              { rules = new implementations::ComposeIntersectRulePair
+                  (new implementations::ComposeIntersectRule(*it),rules); }
+            // Create a ComposeIntersectLexicon from *this. 
+            implementations::ComposeIntersectLexicon lexicon(*this);
+            hfst::implementations::HfstBasicTransducer res = 
+              lexicon.compose_with_rules(rules);
+            res.prune_alphabet();
+            *this = HfstTransducer(res,type);
+            delete rules;
       }
     return *this;
   }
@@ -2318,11 +2318,11 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
         tropical_ofst_interface.disjunct(implementation.tropical_ofst, spv);
         break;
       case LOG_OPENFST_TYPE:
-	HFST_THROW(FunctionNotImplementedException);
+        HFST_THROW(FunctionNotImplementedException);
         break;
 #endif
       case FOMA_TYPE:
-	HFST_THROW(FunctionNotImplementedException);
+        HFST_THROW(FunctionNotImplementedException);
         break;
        /* Add here your implementation. */
       default:
@@ -2342,19 +2342,19 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
     switch (this->type)
       {
       case SFST_TYPE:
-	HFST_THROW(FunctionNotImplementedException);
-	break;
+        HFST_THROW(FunctionNotImplementedException);
+        break;
 #if HAVE_OPENFST
       case TROPICAL_OPENFST_TYPE:
-	HFST_THROW(FunctionNotImplementedException);
-	break;
+        HFST_THROW(FunctionNotImplementedException);
+        break;
       case LOG_OPENFST_TYPE:
-	HFST_THROW(FunctionNotImplementedException);
-	break;
+        HFST_THROW(FunctionNotImplementedException);
+        break;
 #endif
       case FOMA_TYPE:
-	HFST_THROW(FunctionNotImplementedException);
-	break;
+        HFST_THROW(FunctionNotImplementedException);
+        break;
       default:
         assert(false);
       }
@@ -2366,8 +2366,8 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
     if (not is_implementation_type_available(TROPICAL_OPENFST_TYPE)) {
       (void)n;
       HFST_THROW_MESSAGE(ImplementationTypeNotAvailableException,
-			 "HfstTransducer::n_best implemented only for "
-			 "TROPICAL_OPENFST_TYPE");
+                         "HfstTransducer::n_best implemented only for "
+                         "TROPICAL_OPENFST_TYPE");
     }
 
 #if HAVE_OPENFST
@@ -2400,11 +2400,11 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
         }
 #endif
       case ERROR_TYPE:
-	HFST_THROW(TransducerHasWrongTypeException);
+        HFST_THROW(TransducerHasWrongTypeException);
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
       default:
-	HFST_THROW(FunctionNotImplementedException);
+        HFST_THROW(FunctionNotImplementedException);
         break;       
       }
 #if HAVE_OPENFST
@@ -2474,14 +2474,14 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
     if (type == ERROR_TYPE)
       { 
       HFST_THROW_MESSAGE
-	(SpecifiedTypeRequiredException, "HfstTransducer::convert");
+        (SpecifiedTypeRequiredException, "HfstTransducer::convert");
       }
     if (type == t.type)
       { return *(new HfstTransducer(t)); }
     if (not is_implementation_type_available(type)) {
       HFST_THROW_MESSAGE
-	(ImplementationTypeNotAvailableException, 
-	 "HfstTransducer::convert");
+        (ImplementationTypeNotAvailableException, 
+         "HfstTransducer::convert");
     }
     hfst::implementations::HfstBasicTransducer net(t);    
 
@@ -2520,13 +2520,13 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   {
     if (type == ERROR_TYPE)
       { 
-	HFST_THROW_MESSAGE(SpecifiedTypeRequiredException,
-			   "HfstTransducer::convert"); }
+        HFST_THROW_MESSAGE(SpecifiedTypeRequiredException,
+                           "HfstTransducer::convert"); }
     if (type == this->type)
       { return *this; }
     if (not is_implementation_type_available(type)) {
       HFST_THROW_MESSAGE(ImplementationTypeNotAvailableException,
-			 "HfstTransducer::convert");
+                         "HfstTransducer::convert");
     }
 
     try 
@@ -2583,8 +2583,8 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 #endif
         case ERROR_TYPE:
         default:
-	  HFST_THROW(TransducerHasWrongTypeException);
-	  break;
+          HFST_THROW(TransducerHasWrongTypeException);
+          break;
           }
 
         this->type = type;
@@ -2637,12 +2637,12 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 #endif
         case ERROR_TYPE:
         default:
-	  HFST_THROW(TransducerHasWrongTypeException);
-	  }
+          HFST_THROW(TransducerHasWrongTypeException);
+          }
       }
     catch (const HfstException e)
       { //throw e; 
-	throw e; }
+        throw e; }
     return *this;
   }
 
@@ -2674,8 +2674,8 @@ HfstTransducer::HfstTransducer(FILE * ifile,
 {
   if (not is_implementation_type_available(type))
     HFST_THROW_MESSAGE(ImplementationTypeNotAvailableException,
-		       "HfstTransducer::HfstTransducer"
-		       "(FILE*, ImplementationType, const std::string&)");
+                       "HfstTransducer::HfstTransducer"
+                       "(FILE*, ImplementationType, const std::string&)");
   // Implemented only for internal transducer format.
   hfst::implementations::HfstBasicTransducer net =
     hfst::implementations::HfstTransitionGraph<hfst::implementations::
@@ -2728,9 +2728,9 @@ HfstTransducer::HfstTransducer(FILE * ifile,
         //break;
         //#endif
       case ERROR_TYPE:
-	HFST_THROW(SpecifiedTypeRequiredException);
+        HFST_THROW(SpecifiedTypeRequiredException);
       default:
-	HFST_THROW(TransducerHasWrongTypeException);
+        HFST_THROW(TransducerHasWrongTypeException);
       }
 }
 
@@ -2753,7 +2753,7 @@ HfstTransducer &HfstTransducer::read_in_att_format
 {
   if (not is_implementation_type_available(type))
     HFST_THROW_MESSAGE(ImplementationTypeNotAvailableException,
-		       "HfstTransducer::read_in_att_format");
+                       "HfstTransducer::read_in_att_format");
   hfst::implementations::HfstBasicTransducer net =
     hfst::implementations::HfstTransitionGraph<hfst::implementations::
       HfstTropicalTransducerTransitionData,float>

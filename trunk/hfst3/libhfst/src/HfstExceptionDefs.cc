@@ -19,8 +19,8 @@ std::string HfstException::operator() (void) const
 //! Define a subclass of @a HfstException of type @a CHILD.
 #define HFST_EXCEPTION_CHILD_DEFINITION(CHILD) \
     CHILD::CHILD \
-      (const std::string &name,const std::string &file,size_t line):	\
-      HfstException(name,file,line)					\
+      (const std::string &name,const std::string &file,size_t line):\
+      HfstException(name,file,line)\
       {}
 
 // Example defining an exception class SomeHfstException:

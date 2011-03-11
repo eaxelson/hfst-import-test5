@@ -598,10 +598,10 @@ namespace hfst { namespace implementations
 
         else  // line could not be parsed
           {
-	    std::string message(line);
-	    HFST_THROW_MESSAGE
-	      (NotValidAttFormatException,
-	       message);
+            std::string message(line);
+            HFST_THROW_MESSAGE
+              (NotValidAttFormatException,
+               message);
           }
 
       }
@@ -880,7 +880,7 @@ namespace hfst { namespace implementations
   {
     if (is_eof())
       {
-	HFST_THROW(StreamIsClosedException); }
+        HFST_THROW(StreamIsClosedException); }
     StdVectorFst * t;
     FstHeader header;
     try 
@@ -903,7 +903,7 @@ namespace hfst { namespace implementations
           }
         if (t == NULL)
           { 
-	    HFST_THROW(TransducerHasWrongTypeException); }
+            HFST_THROW(TransducerHasWrongTypeException); }
       }
     //catch (TransducerHasWrongTypeException e)
     catch (const HfstException e )
