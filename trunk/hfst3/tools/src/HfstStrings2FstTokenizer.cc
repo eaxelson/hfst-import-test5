@@ -6,13 +6,21 @@ HfstStrings2FstTokenizer::HfstStrings2FstTokenizer
   eps(eps)
 {
   // \: \\ \<space> and eps are special cases.
+  add_multichar_symbol( eps );
+
+
   tokenizer.add_multichar_symbol( BACKSLASH COL );
   tokenizer.add_multichar_symbol( BACKSLASH SPACE );
   tokenizer.add_multichar_symbol( BACKSLASH BACKSLASH );
+  add_multichar_symbol( COL_ESCAPE );
+  add_multichar_symbol( TAB_ESCAPE );
+  add_multichar_symbol( SPACE_ESCAPE );
+
   if (eps.size() > 0) {
     tokenizer.add_multichar_symbol(eps);
     add_multichar_symbol_head(eps);
   }
+  add_multichar_symbol_head( SPACE_ESCAPE );
 
   for (StringVector::const_iterator it = multichar_symbols.begin();
        it != multichar_symbols.end();
@@ -53,7 +61,7 @@ StringPairVector HfstStrings2FstTokenizer::tokenize_pair_string
 	std::remove(tokenized_str.begin(),tokenized_str.end(),BACKSLASH);
       tokenized_str.erase(new_end,tokenized_str.end());
     }
-  return make_pair_vector(tokenized_str,spaces);
+  return make_pair_vector(tokenized_str);
 }
 
 StringPairVector HfstStrings2FstTokenizer::tokenize_string_pair
@@ -75,65 +83,28 @@ StringPairVector HfstStrings2FstTokenizer::tokenize_string_pair
 }
 
 StringPairVector HfstStrings2FstTokenizer::make_pair_vector
-(const StringVector &v,bool spaces)
+(const StringVector &v)
 {
   StringPairVector spv;
-  if (spaces)
+  for (StringVector::const_iterator it = v.begin();
+       it != v.end();
+       ++it)
     {
-      for (StringVector::const_iterator it = v.begin();
-	    it != v.end();
-	    ++it)
-	 {
-	   int pos;
-	   if ((pos = get_col_pos(*it)) >= 0)
-	     { 
-	       std::string input = it->substr(0,pos);
-	       input = (input.empty() or input == eps ? 
-			EPSILON_SYMBOL : unescape(input));
-	       std::string output = it->substr(pos+1);
- 	       output = (output.empty() or output == eps ? 
-			 EPSILON_SYMBOL : unescape(output));
-	       spv.push_back(StringPair(input,output));
-	     }
-	   else
-	     { 
-	       std::string symbol = 
-		 (it->empty() or *it == eps ? EPSILON_SYMBOL : 
-		  unescape(*it));
-	       spv.push_back(StringPair(symbol,symbol)); 
-	     }
-	 }
-    }
-  else
-    {
-       for (StringVector::const_iterator it = v.begin();
-	    it != v.end();
-	    ++it)
-	 {
-	   if (not is_pair_input_symbol(it,v.end()))
-	     { 
-	       std::string symbol = unescape(*it);
-	       symbol = (symbol.empty() or symbol == eps ? 
-			 EPSILON_SYMBOL : symbol);
-	       spv.push_back(StringPair(symbol,symbol)); }
-	   else
-	     {
-	       std::string input = (it->empty() or *it == eps ? 
-				    EPSILON_SYMBOL : unescape(*it));
-	       ++(++it);
-	       std::string output = (it->empty() or *it == eps ? 
-				     EPSILON_SYMBOL : unescape(*it));
-	       spv.push_back(StringPair(input,output));
-	     }
+      if (not is_pair_input_symbol(it,v.end()))
+	{ 
+	  std::string symbol = unescape(*it);
+	  symbol = (symbol.empty() or symbol == eps ? 
+		    EPSILON_SYMBOL : symbol);
+	  spv.push_back(StringPair(symbol,symbol)); }
+      else
+	{
+	  std::string input = (it->empty() or *it == eps ? 
+			       EPSILON_SYMBOL : unescape(*it));
+	  ++(++it);
+	  std::string output = (it->empty() or *it == eps ? 
+				EPSILON_SYMBOL : unescape(*it));
+	  spv.push_back(StringPair(input,output));
 	}
-       if (not spv.empty())
-	 {
-	   if (spv.begin()->first == COL and spv.begin()->second == COL)
-	     { spv[0] = StringPair(EPSILON_SYMBOL,EPSILON_SYMBOL);}
-	   if (spv.back().first == COL and spv.back().second == COL)
-	     { spv.back() = 
-		 StringPair(EPSILON_SYMBOL,EPSILON_SYMBOL);}
-	 }
     }
   return spv;
 }
@@ -175,6 +146,8 @@ StringPairVector HfstStrings2FstTokenizer::make_pair_vector
 
 std::string HfstStrings2FstTokenizer::unescape(std::string symbol)
 {
+  check_cols(symbol);
+
   if (symbol == (BACKSLASH BACKSLASH))
     { return BACKSLASH; }
 
@@ -190,6 +163,18 @@ std::string HfstStrings2FstTokenizer::unescape(std::string symbol)
   while ((pos = symbol.find(BACKSLASH_ESC)) != std::string::npos)
     { symbol.replace(pos,strlen(BACKSLASH_ESC),EMPTY); }
   
+  pos = 0;
+  while ((pos = symbol.find(SPACE_ESCAPE)) != std::string::npos)
+    { symbol.replace(pos,strlen(SPACE_ESCAPE)," "); }
+
+  pos = 0;
+  while ((pos = symbol.find(TAB_ESCAPE)) != std::string::npos)
+    { symbol.replace(pos,strlen(TAB_ESCAPE),"	"); }
+  
+  pos = 0;
+  while ((pos = symbol.find(COL_ESCAPE)) != std::string::npos)
+    { symbol.replace(pos,strlen(COL_ESCAPE),":"); }
+
   return symbol;
 }
 
@@ -207,6 +192,23 @@ bool HfstStrings2FstTokenizer::is_pair_input_symbol
   if (it == end)
     { return false; }
   return true;
+}
+
+void HfstStrings2FstTokenizer::check_cols(const std::string &symbol)
+{
+  if (not symbol.empty())
+    {
+      if (symbol[0] == COL_CHAR)
+	{ throw UnescapedColsFound(); }
+      size_t pos = 0;
+      while ((pos = symbol.find(COL_CHAR,pos+1)) != std::string::npos)
+	{ 
+	  if (symbol[pos-1] != BACKSLASH_CHAR)
+	    { throw UnescapedColsFound(); }
+	  if (pos > 1 and symbol[pos-2] == BACKSLASH_CHAR)
+	    { throw UnescapedColsFound(); }
+	}
+    }
 }
 
 int HfstStrings2FstTokenizer::get_col_pos(const std::string &str)
@@ -239,6 +241,19 @@ StringVector HfstStrings2FstTokenizer::split_at_spaces(const std::string &str)
 	    if (it == sv.end())
 	      { break; }
 	  }
+      else if (* it == SPACE)
+	{ 
+	  while (it + 1 != sv.end() and *(it + 1) == SPACE)
+	    { ++it; }
+	}
+      else if (*it == COL and not symbol.empty())
+	{ 
+	  res.push_back(symbol);
+	  res.push_back(COL);
+	  symbol = EMPTY;
+	}
+      else if (*it == COL)
+	{ res.push_back(COL); }
       else
 	{ symbol += *it; }
     }

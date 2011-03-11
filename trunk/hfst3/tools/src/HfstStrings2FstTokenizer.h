@@ -39,8 +39,15 @@ using hfst::HfstTokenizer;
 
 #define COL_CHAR ':'
 #define BACKSLASH_CHAR '\\'
- 
+
+#define COL_ESCAPE "@_COLON_@"
+#define TAB_ESCAPE "@_TAB_@"
+#define SPACE_ESCAPE "@_SPACE_@"
+
 class EmptyMulticharSymbol
+{};
+
+class UnescapedColsFound
 {};
 
 class HfstStrings2FstTokenizer
@@ -72,7 +79,7 @@ class HfstStrings2FstTokenizer
   // Transform v into a StringPairVector by treating symbols separated by a
   // ":" symbol as the input and output symbols of a pair and treating other
   // symbols as identity pairs. Treat initial and final colons as eps
-  StringPairVector make_pair_vector(const StringVector &v,bool spaces);
+  StringPairVector make_pair_vector(const StringVector &v);
 
   // Make a pair string out of input and output by pairing symbols at the
   // same indices. Pad with zeroes at the end when ncecessary.
@@ -91,6 +98,9 @@ class HfstStrings2FstTokenizer
 
   //! Split str at spaces, except quoted spaces "\ ".
   StringVector split_at_spaces(const std::string &str);
+
+  //! Throw UnescapedColsFound, if symbols contains unescaped ':'-symbols.
+  void check_cols(const std::string &symbol); 
 };
 
 #endif // HEADER_STRINGS_2_FST_TOKENIZER_H
