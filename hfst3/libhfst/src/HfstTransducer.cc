@@ -2255,18 +2255,18 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
       }
     else
       {
-        // In case there are many rules, build a ComposeIntersectRulePair 
-        // recursively and compose with that.
-        std::vector<implementations::ComposeIntersectRule*> rule_vector;
-        implementations::ComposeIntersectRule * first_rule = 
-          new implementations::ComposeIntersectRule(*v.begin());
-        implementations::ComposeIntersectRule * second_rule = 
-          new implementations::ComposeIntersectRule(*v.begin());
+	// In case there are many rules, build a ComposeIntersectRulePair 
+	// recursively and compose with that.
+	std::vector<implementations::ComposeIntersectRule*> rule_vector;
+	implementations::ComposeIntersectRule * first_rule = 
+	  new implementations::ComposeIntersectRule(*v.begin());
+	implementations::ComposeIntersectRule * second_rule = 
+	  new implementations::ComposeIntersectRule(*(v.begin() + 1));
 
         implementations::ComposeIntersectRulePair * rules = 
           new implementations::ComposeIntersectRulePair
           (first_rule,second_rule);
-
+	
             for (HfstTransducerVector::const_iterator it = v.begin() + 2;
                  it != v.end();
                  ++it)
