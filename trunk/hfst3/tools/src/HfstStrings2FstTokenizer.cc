@@ -9,8 +9,10 @@ HfstStrings2FstTokenizer::HfstStrings2FstTokenizer
   tokenizer.add_multichar_symbol( BACKSLASH COL );
   tokenizer.add_multichar_symbol( BACKSLASH SPACE );
   tokenizer.add_multichar_symbol( BACKSLASH BACKSLASH );
-  tokenizer.add_multichar_symbol(eps);
-  add_multichar_symbol_head(eps);
+  if (eps.size() > 0) {
+    tokenizer.add_multichar_symbol(eps);
+    add_multichar_symbol_head(eps);
+  }
 
   for (StringVector::const_iterator it = multichar_symbols.begin();
        it != multichar_symbols.end();
