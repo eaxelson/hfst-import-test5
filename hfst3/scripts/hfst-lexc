@@ -63,7 +63,7 @@ if test "x$latin1" = "xlatin1" ; then
     done
 fi
 
-if test -z "$@" ; then
+if test -z "$*" ; then
     if test -t 1 ; then
         echo "Reading all lexc files from stdin first"
     fi
