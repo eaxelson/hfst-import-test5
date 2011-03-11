@@ -78,8 +78,8 @@ label_to_stringpair(const char* label)
           }
         else
           {
-            rv = new StringPair(strndup(label, colon-label),
-                                strndup(colon+1, endstr-colon-1));
+            rv = new StringPair(hfst_strndup(label, colon-label),
+                                hfst_strndup(colon+1, endstr-colon-1));
             break;
           }
       }
