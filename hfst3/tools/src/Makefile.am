@@ -187,7 +187,8 @@ hfst_lexc2fst_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC) \
 					  parsers/lexc-lexer.ll parsers/lexc-utils.cc \
 					  parsers/XreCompiler.cc parsers/xre_parse.yy \
 					  parsers/xre_lex.ll parsers/xre_utils.cc
-hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC)
+hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC) \
+HfstStrings2FstTokenizer.cc
 hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
 hfst_name_SOURCES=hfst-name.cc $(HFST_COMMON_SRC)
 hfst_project_SOURCES=hfst-project.cc $(HFST_COMMON_SRC)

@@ -339,12 +339,12 @@ public:
               {
                 *out_ << get_print_format(it->first);
               }
-            *out_ << "\t";
-            for (StringPairVector::const_iterator it = path.second.begin();
-                 it != path.second.end(); ++it)
-              {
-                *out_ << get_print_format(it->second);
-              }
+	    *out_ << ":";
+	    for (StringPairVector::const_iterator it = path.second.begin();
+		 it != path.second.end(); ++it)
+	      {
+		*out_ << get_print_format(it->second);
+	      }
             if (display_weights)
               {
                 *out_ << "\t" << path.first;

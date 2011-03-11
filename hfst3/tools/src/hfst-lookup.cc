@@ -41,6 +41,7 @@
 
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
+#include "HfstStrings2FstTokenizer.h"
 
 using hfst::HfstTransducer;
 using hfst::HFST_OL_TYPE;
@@ -54,7 +55,6 @@ using hfst::HfstOneLevelPath;
 using hfst::HfstOneLevelPaths;
 using hfst::HfstTwoLevelPath;
 using hfst::HfstTwoLevelPaths;
-
 
 using hfst::StringPair;
 using hfst::StringPairVector;
@@ -431,6 +431,8 @@ parse_options(int argc, char** argv)
     return EXIT_CONTINUE;
 }
 
+
+static std::string get_print_format(const std::string &s) ;
 
 // local flag handling
 bool
@@ -814,7 +816,11 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
     free(b);
     free(i);
     free(m);
-    int rv = fprintf(ofile, "%s", res);
+    int rv;
+    if (not quote_special)
+      rv = fprintf(ofile, "%s", res);
+    else
+      rv = fprintf(ofile, "%s", get_print_format(res).c_str());
     free(res);
     return rv;
 }
@@ -856,9 +862,22 @@ string_to_utf8(char* p)
     return path;
 }
 
+/* Add a '\' in front of ':', ' ' and '\'. */
+static std::string escape_special_characters(char *s)
+{
+  std::string retval;
+  for (unsigned int i=0; s[i] != '\0'; i++)
+    {
+      if (s[i] == ':' || s[i] == '\\' || s[i] == ' ')
+	retval.append(1, '\\');
+      retval.append(1, s[i]);
+    }
+  return retval;
+}
+
 HfstOneLevelPath*
-line_to_lookup_path(char** s, const hfst::HfstTokenizer& /* tok */,
-                    char** markup, bool* outside_sigma)
+line_to_lookup_path(char** s, HfstStrings2FstTokenizer& tok,
+                    char** markup, bool* outside_sigma, bool optimized_lookup)
 {
     HfstOneLevelPath* rv = new HfstOneLevelPath;
     rv->first = 0;
@@ -868,6 +887,7 @@ line_to_lookup_path(char** s, const hfst::HfstTokenizer& /* tok */,
       {
       case SPACE_SEPARATED_TOKEN_INPUT:
         {
+	  /*
           vector<string> path;
           char* token = strtok(*s, " ");
           while (token)
@@ -877,17 +897,48 @@ line_to_lookup_path(char** s, const hfst::HfstTokenizer& /* tok */,
             }
           rv->second = path;
           break;
+	  */
+	  
+	  std::string S = escape_special_characters(*s);
+
+	  StringPairVector spv 
+	    = tok.tokenize_string_pair(S, true);
+	  
+	  for (StringPairVector::const_iterator it = spv.begin();
+	       it != spv.end(); it++)
+	    {
+	      rv->second.push_back(it->first);
+	    }
+	  break;
         }
       case UTF8_TOKEN_INPUT:
         {
-          vector<string>* path = string_to_utf8(*s);
-          rv->second = *path;
-          delete path;
-          break;
+	  if (optimized_lookup)
+	    {
+	      vector<string>* path = string_to_utf8(*s);
+	      rv->second = *path;
+	      delete path;
+	    }
+	  else
+	    {
+	      std::string S = escape_special_characters(*s);
+
+	      StringPairVector spv 
+		= tok.tokenize_string_pair(S, false);
+	      
+	      for (StringPairVector::const_iterator it = spv.begin();
+		   it != spv.end(); it++)
+		{
+		  rv->second.push_back(it->first);
+		}
+	    }
+	  break;
         }
       case APERTIUM_INPUT:
           {
-            char* real_s = static_cast<char*>(calloc(sizeof(char),strlen(*s)+1));
+            char* real_s 
+	      = static_cast<char*>(calloc(sizeof(char),strlen(*s)+1));
+
             *markup = static_cast<char*>(calloc(sizeof(char), strlen(*s)+1));
             char* m = *markup;
             char* sp = real_s;
@@ -1232,9 +1283,39 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
     }
 }
 
-static std::string get_print_format(const std::string &s) {
+/* Replace all strings \a str1 in \a symbol with \a str2. */
+static std::string replace_all(std::string symbol, 
+			       const std::string &str1,
+			       const std::string &str2)
+{
+  size_t pos = symbol.find(str1);
+  while (pos != string::npos) // while there are str1:s to replace
+    {
+      symbol.erase(pos, str1.size()); // erase str1
+      symbol.insert(pos, str2);       // insert str2 instead
+      pos = symbol.find               // find next str1
+	(str1, pos+str2.size());      
+    }
+  return symbol;
+}
+
+
+static std::string get_print_format(const std::string &s) 
+{
   if (s.compare("@_EPSILON_SYMBOL_@") == 0)
     return std::string(strdup(epsilon_format));
+
+  if (quote_special) 
+    {
+      return 
+	replace_all
+	( replace_all
+	  ( replace_all
+	    (s, "\\", "\\\\"),
+	    ":", "\\:"),
+	  " ", "\\ ");
+    }
+
   return std::string(s);
 }
 
@@ -1269,11 +1350,11 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
 	    results_spv, path_spv, print_in_pairstring_format);
 
   if (print_in_pairstring_format) {
-
+    
     /* No results, print just the lookup string. */
     if (results_spv.size() == 0) {
       print_lookup_string(s.second);
-      fprintf(outfile, ":\n");
+      fprintf(outfile, "\n");
     }
     else {
       /* For all result strings, */
@@ -1282,7 +1363,7 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
 	
 	/* print the lookup string */
 	print_lookup_string(s.second);
-	fprintf(outfile, ":\t");
+	fprintf(outfile, "\t");
 	
 	/* and the path that yielded the result string */
 	for (StringPairVector::const_iterator IT = it->second.begin();
@@ -1297,7 +1378,7 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
     }
     fprintf(outfile, "\n");
   }
-
+ 
   HfstOneLevelPaths filtered;
   for (HfstOneLevelPaths::iterator res = results.begin();
        res != results.end();
@@ -1471,7 +1552,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     bool internal_transducers=false;
 
     size_t transducer_n=0;
-    HfstTokenizer tok;
+    StringVector mc_symbols;
     while (inputstream.is_good())
       {
         transducer_n++;
@@ -1485,6 +1566,31 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                            transducer_n); 
           }
         HfstTransducer trans(inputstream);
+
+	// add multicharacter symbols to mc_symbols
+	hfst::ImplementationType type = trans.get_type();
+	if (type == hfst::SFST_TYPE || 
+	    type == hfst::TROPICAL_OPENFST_TYPE ||
+	    type == hfst::LOG_OPENFST_TYPE ||
+	    type == hfst::FOMA_TYPE)
+	  {
+	    HfstBasicTransducer basic(trans);
+	    for (HfstBasicTransducer::const_iterator it = basic.begin();
+		 it != basic.end(); it++)
+	      {
+		for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it = 
+		       it->second.begin();
+		     tr_it != it->second.end(); tr_it++)
+		  {
+		    std::string mcs = tr_it->get_input_symbol();
+		    if (mcs.size() > 1) {
+		      mc_symbols.push_back(mcs);
+		      fprintf(stderr, "adding mc symbol: %s\n", mcs.c_str());
+		    }
+		  }
+	      }
+	  }
+
         cascade.push_back(trans);
       }
 
@@ -1521,8 +1627,17 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
         char* markup = 0;
         bool unknown = false;
         bool infinite = false;
-        HfstOneLevelPath* kv = line_to_lookup_path(&line, tok, &markup,
-                                                 &unknown);
+
+	bool optimized_lookup=
+	  (cascade[0].get_type() == HFST_OL_TYPE ||
+	   cascade[0].get_type() == HFST_OLW_TYPE);
+
+	HfstStrings2FstTokenizer input_tokenizer(mc_symbols, 
+						 std::string(epsilon_format));
+
+        HfstOneLevelPath* kv = line_to_lookup_path(&line, input_tokenizer,
+						   &markup,
+						   &unknown, optimized_lookup);
         HfstOneLevelPaths* kvs;
         try 
           {
