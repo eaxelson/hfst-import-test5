@@ -83,11 +83,11 @@ if [ -z $files ] ; then
     for f in $@ $scripts; do
         if test -f ./"$f" ; then
             if egrep -q '^(save stack|ss)' ./"$f" ; then
-                files="$(egrep '^(save stack|ss)' < "$f" | sed -e 's/^save stack //' -e 's/^ss //') #__# $files"
+                files="$(egrep '^(save stack|ss)' < "$f" | sed -e 's/^save stack //' -e 's/^ss //') $files"
             fi
       fi
     done
-    files=$(echo $files | sed -e 's/ \?#__# \?/\n/g' | sort | uniq)
+    files=$(echo $files | tr -s ' ' '\n' | sort | uniq)
     if [ "x$verbose" == "x-v" ] ; then
         echo "discovered stack files: $files"
     fi
@@ -102,17 +102,19 @@ for f in $files ; do
     if [ "x$verbose" == "x-v" ] ; then
         echo "converting $f"
     fi
-    printf "load stack $f\nwatt $f.att\nquit" > $f.tmpscript
-    if ! $foma_exec -q -f $f.tmpscript ; then
-        echo "converting $f from foma to text failed"
-        exit 1
+    if test -f "$f" ; then
+        printf "load stack $f\nwatt $f.att\nquit" > $f.tmpscript
+        if ! $foma_exec -q -f $f.tmpscript ; then
+            echo "converting $f from foma to text failed"
+            exit 1
+        fi
+        sed -e 's/		/	@_TAB_@/g' -e 's/	 /	@_SPACE_@/g' < "$f".att > "$f".att2
+        mv "$f".att2 "$f".att
+        if ! hfst-txt2fst -e '@0@' $hfstopts $format -i "$f.att" -o "$f" ; then
+            echo "converting $f from text to HFST3 failed"
+            exit 1
+        fi
+        rm $f.tmpscript $f.att
     fi
-    sed -e 's/		/	@_TAB_@/g' -e 's/	 /	@_SPACE_@/g' < "$f".att > "$f".att2
-    mv "$f".att2 "$f".att
-    if ! hfst-txt2fst -e '@0@' $hfstopts $format -i "$f.att" -o "$f" ; then
-        echo "converting $f from text to HFST3 failed"
-        exit 1
-    fi
-    rm $f.tmpscript $f.att
 done
 # vim: set ft=bash
