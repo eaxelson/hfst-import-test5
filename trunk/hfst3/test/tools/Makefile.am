@@ -100,11 +100,16 @@ FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
 FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-out1.strings \
 		 proc-caps-out2.strings proc-caps-out3.strings proc-caps-out4.strings \
 		 proc-cat-out.strings proc-cat-weighted-out.strings \
-		 utf-8.strings latin-1.strings
+		 utf-8.strings latin-1.strings \
+		 cat2dog.strings
+FST_PAIRS=cat2dog.pairs
+FST_PAIRSTRINGS=cat2dog.pairstring
+FST_SPACESTRINGS=cat2dog.spaces
 SUBSTITUTE_TXTS=cat2dog.substitute
 XRE_TXTS=cats_and_dogs.xre
 #XFST_TXTS=cat-regex.xfst
 
+# this compilation is uesd by check target before running the tests
 %.hfst: %.txt
 	${top_builddir}/tools/src/hfst-txt2fst -e '@0@' < $< > $@
 %.hfst.sfst: %.txt
@@ -117,8 +122,11 @@ XRE_TXTS=cats_and_dogs.xre
 	${top_builddir}/tools/src/hfst-txt2fst -e '@0@' -i $< | ${top_builddir}/tools/src/hfst-fst2fst -w -o $@
 %.gen.hfst.ol: %.txt
 	${top_builddir}/tools/src/hfst-txt2fst -e '@0@' -i $< | ${top_builddir}/tools/src/hfst-invert | ${top_builddir}/tools/src/hfst-fst2fst -w -o $@
+
 # files needed for test programs
-EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(SUBSTITUTE_TXTS) $(XRE_TXTS) $(XFST_TXTS)
+EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) \
+		   $(FST_PAIRSTRINGS) $(FST_SPACESTRINGS) \
+		   $(SUBSTITUTE_TXTS) $(XRE_TXTS) $(XFST_TXTS)
 
 clean-local:
 	-rm -f $(check_DATA)
