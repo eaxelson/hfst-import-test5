@@ -119,7 +119,7 @@ namespace implementations
       static Transducer * extract_input_language(Transducer * t);
       static Transducer * extract_output_language(Transducer * t);
       static std::vector<Transducer*> extract_path_transducers
-	(Transducer *t);
+        (Transducer *t);
       static void extract_paths
         (Transducer * t, hfst::ExtractStringsCb& callback, int cycles=-1,
          FdTable<SFST::Character>* fd=NULL, bool filter_fd=false);

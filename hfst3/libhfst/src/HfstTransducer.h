@@ -190,7 +190,7 @@ An example:
   tr2.set_final_weight(2, 0);
   tr2.add_transition
     (0, HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@", 
-			    "@_IDENTITY_SYMBOL_@", 0) );
+                    "@_IDENTITY_SYMBOL_@", 0) );
   tr2.add_transition
     (1, HfstBasicTransition(2, "bar", "bar", 0) );
 
@@ -338,7 +338,7 @@ An example:
        \a epsilon_symbol defines how epsilons are represented.
 
         NOTE: If the transition symbols contain space characters
-	they must be represented as "@_SPACE_@" because
+        they must be represented as "@_SPACE_@" because
         whitespace characters are used as field separators 
         in AT&T format.
 
@@ -431,8 +431,8 @@ An example:
 
         @see HfstTokenizer **/
     HfstTransducer(const std::string& input_utf8_str,
-		   const std::string& output_utf8_str,
-		   const HfstTokenizer &multichar_symbol_tokenizer,
+                   const std::string& output_utf8_str,
+                   const HfstTokenizer &multichar_symbol_tokenizer,
                    ImplementationType type);
 
     /* @brief Create a transducer that recognizes the union of string pairs in 
@@ -480,19 +480,19 @@ An example:
 
     /** \brief Create an HFST transducer equivalent to 
         HFST basic transducer \a t. The type of the created transducer
-	is defined by \a type.  **/
+        is defined by \a type.  **/
     HfstTransducer(const hfst::implementations::HfstBasicTransducer &t, 
                    ImplementationType type);
 
     /** \brief Create a transducer that recognizes the string pair
-	&lt;"symbol","symbol"&gt;, i.e. [symbol:symbol]. 
-	The type of the transducer is defined by \a type. 
+        &lt;"symbol","symbol"&gt;, i.e. [symbol:symbol]. 
+        The type of the transducer is defined by \a type. 
         @see String **/
     HfstTransducer(const std::string &symbol, ImplementationType type);
 
     /** \brief Create a transducer that recognizes the string pair 
-	&lt;"isymbol","osymbol"&gt;, i.e [isymbol:osymbol]. 
-	The type of the transducer is defined by \a type. 
+        &lt;"isymbol","osymbol"&gt;, i.e [isymbol:osymbol]. 
+        The type of the transducer is defined by \a type. 
         @see String **/
     HfstTransducer(const std::string &isymbol, const std::string &osymbol, 
                    ImplementationType type);
@@ -513,16 +513,16 @@ An example:
         [0-9]+[\w]+([\w]+(-)[0-9]+(\.[0-9]+))
 \endverbatim
 
-	If several transducers are listed in the same file, 
-	they are separated by lines of 
+        If several transducers are listed in the same file, 
+        they are separated by lines of 
         two consecutive hyphens "--". If the weight 
-	(<tt>([\\w]+(-)[0-9]+(\.[0-9]+))</tt>) 
-	is missing, the transition or final state is given a zero weight.
+        (<tt>([\\w]+(-)[0-9]+(\.[0-9]+))</tt>) 
+        is missing, the transition or final state is given a zero weight.
 
         NOTE: If transition symbols contains spaces, they must be escaped
-	as "@_SPACE_@" because spaces are used as field separators.
-	Both "@0@" and "@_EPSILON_SYMBOL_@" are always interpreted as
-	epsilons.
+        as "@_SPACE_@" because spaces are used as field separators.
+        Both "@0@" and "@_EPSILON_SYMBOL_@" are always interpreted as
+        epsilons.
 
 
 An example:
@@ -638,7 +638,7 @@ in \a ifile.
         by tabulator characters.
 
         NOTE: If the transition symbols contain space characters,
-	the spaces are printed as "@_SPACE_@" because
+        the spaces are printed as "@_SPACE_@" because
         whitespace characters are used as field separators 
         in AT&T format. Epsilon symbols are printed as "@0@".
 
@@ -683,7 +683,7 @@ This will yield a file "testfile.att" that looks as follows:
         @throws StreamCannotBeWrittenException 
         @throws StreamIsClosedException
 
-	@see operator<<(std::ostream &out, const HfstTransducer &t)
+        @see operator<<(std::ostream &out, const HfstTransducer &t)
         @see HfstTransducer(FILE*, ImplementationType, const std::string&) */
     void write_in_att_format(FILE * ofile, bool write_weights=true) const;
 
@@ -713,18 +713,18 @@ This will yield a file "testfile.att" that looks as follows:
 
     /** \brief Extract a maximum of \a max_num paths that are 
         recognized by the transducer following a maximum of \a cycles cycles
-	and store the paths into \a results.
+        and store the paths into \a results.
 
-	@param results The extracted paths are inserted here. 
+        @param results The extracted paths are inserted here. 
         @param max_num The total number of resulting strings is capped at 
-	               \a max_num, with 0 or negative indicating unlimited. 
+                       \a max_num, with 0 or negative indicating unlimited. 
         @param cycles Indicates how many times a cycle will be followed, with
-	              negative numbers indicating unlimited.
+                      negative numbers indicating unlimited.
 
-	This is a version of extract_paths that handles flag diacritics 
-	as ordinary symbols and does not validate the sequences prior to
-	outputting as opposed to 
-	#extract_paths_fd(HfstTwoLevelPaths &, int, int, bool) const.
+        This is a version of extract_paths that handles flag diacritics 
+        as ordinary symbols and does not validate the sequences prior to
+        outputting as opposed to 
+        #extract_paths_fd(HfstTwoLevelPaths &, int, int, bool) const.
  
         If this function is called on a cyclic transducer with unlimited
         values for both \a max_num and \a cycles, an exception will be thrown.
@@ -746,19 +746,19 @@ This will yield a file "testfile.att" that looks as follows:
          it != results.end(); it++)
       {
         std::string istring;
-	std::string ostring;
+        std::string ostring;
 
         for (StringPairVector::const_iterator IT = it->second.begin();
-	     IT != it->second.end(); IT++)
-	  {
-	    istring.append(IT->first);
-	    ostring.append(IT->second);
-	  }
-	// Print input and output strings of each path
-	std::cerr << istring << ":" << ostring; 
-	// and optionally the weight of the path.
-	//std::cerr << "\t" << it->first;
-	std::cerr << std::endl; 
+             IT != it->second.end(); IT++)
+          {
+            istring.append(IT->first);
+            ostring.append(IT->second);
+          }
+        // Print input and output strings of each path
+        std::cerr << istring << ":" << ostring; 
+        // and optionally the weight of the path.
+        //std::cerr << "\t" << it->first;
+        std::cerr << std::endl; 
       }
 \endverbatim
 
@@ -790,7 +790,7 @@ ccc : ddd
         @bug Does not work for HFST_OL_TYPE or HFST_OLW_TYPE
         @throws TransducerIsCyclicException
         @see #n_best 
-	@see hfst::HfstTransducer::extract_paths_fd(hfst::HfstTwoLevelPaths&, int, int, bool) const
+        @see hfst::HfstTransducer::extract_paths_fd(hfst::HfstTwoLevelPaths&, int, int, bool) const
     */
     void extract_paths
       (HfstTwoLevelPaths &results, int max_num=-1, int cycles=-1) const;
@@ -805,37 +805,37 @@ ccc : ddd
   public:
     /** \brief Extract a maximum of \a max_num paths that are 
         recognized by the transducer and are not invalidated by flag 
-	diacritic rules following a maximum of \a cycles cycles
-	and store the paths into \a results. \a filter_fd defines whether
-	the flag diacritics themselves are filtered out of the result strings.
+        diacritic rules following a maximum of \a cycles cycles
+        and store the paths into \a results. \a filter_fd defines whether
+        the flag diacritics themselves are filtered out of the result strings.
 
-	@param results  The extracted paths are inserted here. 
+        @param results  The extracted paths are inserted here. 
         @param max_num  The total number of resulting strings is capped at 
-	                \a max_num, with 0 or negative indicating unlimited. 
+                        \a max_num, with 0 or negative indicating unlimited. 
         @param cycles  Indicates how many times a cycle will be followed, with
-	               negative numbers indicating unlimited.
-	@param filter_fd  Whether the flag diacritics are filtered out of the
-	                  result strings.
+                       negative numbers indicating unlimited.
+        @param filter_fd  Whether the flag diacritics are filtered out of the
+                          result strings.
 
         If this function is called on a cyclic transducer with unlimited
         values for both \a max_num and \a cycles, an exception will be thrown.
 
         Flag diacritics are of the form @[PNDRCU][.][A-Z]+([.][A-Z]+)?@. 
         
-	For example the transducer 
+        For example the transducer 
 
 \verbatim
 [[@U.FEATURE.FOO@ foo] | [@U.FEATURE.BAR@ bar]]  |  [[foo @U.FEATURE.FOO@] | [bar @U.FEATURE.BAR@]]
 \endverbatim
 
-	will yield the paths <CODE>[foo foo]</CODE> and <CODE>[bar bar]</CODE>.
-	<CODE>[foo bar]</CODE> and <CODE>[bar foo]</CODE> are invalidated
-	by the flag diacritics so thay will not be included in \a results.
+        will yield the paths <CODE>[foo foo]</CODE> and <CODE>[bar bar]</CODE>.
+        <CODE>[foo bar]</CODE> and <CODE>[bar foo]</CODE> are invalidated
+        by the flag diacritics so thay will not be included in \a results.
 
 
-	@bug Does not work for HFST_OL_TYPE or HFST_OLW_TYPE
-	@throws TransducerIsCyclicException
-	@see extract_paths(HfstTwoLevelPaths&, int, int) const */
+        @bug Does not work for HFST_OL_TYPE or HFST_OLW_TYPE
+        @throws TransducerIsCyclicException
+        @see extract_paths(HfstTwoLevelPaths&, int, int) const */
     void extract_paths_fd
       (HfstTwoLevelPaths &results, int max_num=-1, int cycles=-1, 
        bool filter_fd=true) const;
@@ -895,7 +895,7 @@ ccc : ddd
     //! but lookup is not done using a string and a tokenizer instead of
     //! a StringVector.
     void lookup(HfstOneLevelPaths& results, const HfstTokenizer& tok,
-		const std::string &s, ssize_t limit = -1) const;
+            const std::string &s, ssize_t limit = -1) const;
 
     //! @brief Lookup or apply a single string \a s minding flag diacritics 
     //! properly and store a maximum of \a limit results to \a results. 
@@ -906,7 +906,7 @@ ccc : ddd
     //! but uses a tokenizer and a string instead of a StringVector.
     //!
     void lookup_fd(HfstOneLevelPaths& results, const HfstTokenizer& tok,
-		   const std::string &s, ssize_t limit = -1) const;
+                   const std::string &s, ssize_t limit = -1) const;
 
     //! @brief (Not implemented) Lookdown a single string \a s and store 
     //! a maximum of \a limit results to \a results.
@@ -1052,13 +1052,13 @@ ccc : ddd
     HfstTransducer &compose(const HfstTransducer &another);
 
     /** \brief Compose this transducer with the intersection of 
-	transducers in \a v. 
+        transducers in \a v. 
 
         The algorithm used by this function is faster than intersecting 
         all transducers one by one and then composing this transducer 
         with the intersection. 
 
-	@pre The transducers in \a v are deterministic and epsilon-free.
+        @pre The transducers in \a v are deterministic and epsilon-free.
     */
     HfstTransducer &compose_intersect(const HfstTransducerVector &v);
 
@@ -1084,9 +1084,9 @@ ccc : ddd
 
     /** \brief Freely insert symbol pair \a symbol_pair into the transducer. 
 
-	To each state in this transducer is added a transition that 
-	leads from that state to itself with input and output symbols 
-	defined by \a symbol_pair.
+        To each state in this transducer is added a transition that 
+        leads from that state to itself with input and output symbols 
+        defined by \a symbol_pair.
      */
     HfstTransducer &insert_freely(const StringPair &symbol_pair);
 
@@ -1094,27 +1094,27 @@ ccc : ddd
 
         A copy of \a tr is attached with epsilon transitions 
         to each state of this transducer. After the operation, for each 
-	state S in this transducer, there is an epsilon transition 
-	that leads from state S to the initial state of \a tr, 
-	and for each final state of \a tr, there is an epsilon transition
-	that leads from that final state to state S in this transducer.
-	The weights of the final states in \a tr are copied to the 
-	epsilon transitions leading to state S.
-	
+        state S in this transducer, there is an epsilon transition 
+        that leads from state S to the initial state of \a tr, 
+        and for each final state of \a tr, there is an epsilon transition
+        that leads from that final state to state S in this transducer.
+        The weights of the final states in \a tr are copied to the 
+        epsilon transitions leading to state S.
+        
         Implemented only for implementations::HfstBasicTransducer. 
-	Conversion is carried out for an HfstTransducer, if this function
-	is called.
+        Conversion is carried out for an HfstTransducer, if this function
+        is called.
      */
     HfstTransducer &insert_freely(const HfstTransducer &tr);
 
     /** \brief Substitute all transition \a sp with transitions \a sps 
         as defined by function \a func. 
 
-	@param func A pointer to a function that takes as its argument
-	a StringPair sp and inserts to StringPairSet sps all StringPairs
-	with which sp is to be substituted. Returns whether any substituting
-	string pairs were inserted in sps, i.e. whether there is a need to
-	perform substitution on transition sp.
+        @param func A pointer to a function that takes as its argument
+        a StringPair sp and inserts to StringPairSet sps all StringPairs
+        with which sp is to be substituted. Returns whether any substituting
+        string pairs were inserted in sps, i.e. whether there is a need to
+        perform substitution on transition sp.
 
         An example:
 \verbatim
@@ -1156,12 +1156,12 @@ t.substitute(&func);
         \a input_side and \a output_side define whether 
         the substitution is made on input and output sides.
 
-	@param old_symbol Symbol to be substituted.
-	@param new_symbol The substituting symbol.
-	@param input_side Whether the substitution is made on the input side
-	                  of a transition.
-	@param output_side Whether the substitution is made on the output side
-	                   of a transition.
+        @param old_symbol Symbol to be substituted.
+        @param new_symbol The substituting symbol.
+        @param input_side Whether the substitution is made on the input side
+                          of a transition.
+        @param output_side Whether the substitution is made on the output side
+                           of a transition.
 
         The transition weights remain the same. 
 
@@ -1180,7 +1180,7 @@ t.substitute(&func);
         If this function is called by an unweighted HfstTransducer, 
         it is converted to a weighted one,
         substitution is made and the transducer is converted back 
-	to the original format.
+        to the original format.
 
         @see String
      */
@@ -1236,9 +1236,9 @@ t.substitute(&func);
     /** \brief Transform all transition and state weights as defined 
         in \a func. 
 
-	@param func A pointer to a function that takes a weight as its
-	            argument and returns a weight that will be the new
-		    value of the weight given as the argument.
+        @param func A pointer to a function that takes a weight as its
+                    argument and returns a weight that will be the new
+                    value of the weight given as the argument.
 
      An example:
 \verbatim
@@ -1336,13 +1336,13 @@ HfstTransducer t_transformed;
         defined by \a mappings in the context \a context
         when the alphabet is \a alphabet. 
 
-	@param context A pair of transducers where the first transducer
-	               defines the left context and the second transducer
-		       the right context.
-	@param mappings A set of mappings that the resulting transducer
-	                will perform in the context given in \a context.
+        @param context A pair of transducers where the first transducer
+                       defines the left context and the second transducer
+                       the right context.
+        @param mappings A set of mappings that the resulting transducer
+                        will perform in the context given in \a context.
         @param alphabet The set of symbol pairs that defines the alphabet
-	                (see the example).
+                        (see the example).
 
         For example, a transducer yielded by the following arguments
 \verbatim
@@ -1406,15 +1406,15 @@ alphabet = set(a, a:b, b, c, d, e, ...)
         in the context \a context when the alphabet is \a alphabet.
         \a optional defines whether the mapping is optional. 
 
-	@param context A pair of transducers where the first transducer
-	               defines the left context and the second transducer
-		       the right context. Both transducers must be automata,
-		       i.e. map strings onto themselves.
-	@param mapping The mapping that the resulting transducer
-	               will perform in the context given in \a context.
-	@param optional Whether the mapping is optional.
-	@param alphabet The set of symbol pairs that defines the alphabet
-	                (see the explanation below).
+        @param context A pair of transducers where the first transducer
+                       defines the left context and the second transducer
+                   the right context. Both transducers must be automata,
+                   i.e. map strings onto themselves.
+        @param mapping The mapping that the resulting transducer
+                       will perform in the context given in \a context.
+        @param optional Whether the mapping is optional.
+        @param alphabet The set of symbol pairs that defines the alphabet
+                        (see the explanation below).
 
         Each substring s of the input string which is in the input language
         of the transducer \a mapping and whose left context is matched 
@@ -1446,7 +1446,7 @@ alphabet = set(a, b, c)
         have to be combined by composition
         rather than intersection.
 
-	@throws ContextTransducersAreNotAutomataException
+        @throws ContextTransducersAreNotAutomataException
 
         @see
      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">
@@ -1514,7 +1514,7 @@ SFST manual</a>. */
         Symbols outside of the matching
         substrings are mapped to any symbol allowed by \a alphabet. 
 
-	@throws EmptySetOfContextsException
+        @throws EmptySetOfContextsException
 
         @see
      <a href="ftp://ftp.ims.uni-stuttgart.de/pub/corpora/SFST/SFST-Manual.pdf">

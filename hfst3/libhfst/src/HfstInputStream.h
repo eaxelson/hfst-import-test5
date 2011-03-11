@@ -180,9 +180,9 @@ For documentation on the HFST binary transducer format, see
         transducers. 
 
         @throws StreamNotReadableException 
-	@throws NotTransducerStreamException
-	@throws EndOfStreamException
-	@throws TransducerHeaderException
+        @throws NotTransducerStreamException
+        @throws EndOfStreamException
+        @throws TransducerHeaderException
     */
     HfstInputStream(void);
 
@@ -192,9 +192,9 @@ For documentation on the HFST binary transducer format, see
         @pre The file exists. Otherwise, an exception is thrown.
 
         @throws StreamNotReadableException 
-	@throws NotTransducerStreamException
-	@throws EndOfStreamException
-	@throws TransducerHeaderException
+        @throws NotTransducerStreamException
+        @throws EndOfStreamException
+        @throws TransducerHeaderException
     */
     HfstInputStream(const std::string &filename);
 
