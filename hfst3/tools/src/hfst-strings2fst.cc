@@ -274,13 +274,35 @@ process_stream(HfstOutputStream& outstream)
 
       // Parse the string
       StringPairVector spv;
-      if (pairstrings)
-	{ spv = multichar_symbol_tokenizer.tokenize_pair_string
-	    (line,has_spaces); }
-      else
-	{ spv = multichar_symbol_tokenizer.tokenize_string_pair
-	    (line,has_spaces); }
-
+      try
+	{
+	  if (pairstrings)
+	    { spv = multichar_symbol_tokenizer.tokenize_pair_string
+		(line,has_spaces); }
+	  else
+	    { spv = multichar_symbol_tokenizer.tokenize_string_pair
+		(line,has_spaces); }
+	}
+      catch (const UnescapedColsFound &e)
+	{ 
+	  if (pairstrings)
+	    {
+	      error
+		(EXIT_FAILURE, errno, 
+		 "String \"%s\" contains unescaped ':'-symbols,\n"
+	         "which are not pair separators. Use '\\:' for literal ':'.",
+		 line);
+	    }
+	  else
+	    {
+	      error
+		(EXIT_FAILURE, errno, 
+		 "String \"%s\" contains unescaped ':'-symbols,\n"
+	         "which are not pair separators. Use '\\:\' for literal ':'.\n"
+		 "If you are compiling pair strings, use option -p.",
+		 line);	      
+	    }
+	}
       // Handle the weight
       float path_weight=0;
 
