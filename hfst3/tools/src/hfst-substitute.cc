@@ -37,7 +37,7 @@
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
-
+using hfst::StringPair;
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
@@ -46,10 +46,45 @@ using hfst::HfstOutputStream;
 #include "inc/globals-unary.h"
 
 static char* from_label = 0;
+static StringPair* from_pair = 0;
 static char* from_file_name = 0;
 static FILE* from_file = 0;
 static char* to_label = 0;
+static StringPair* to_pair = 0;
 static char* to_transducer_filename = 0;
+static HfstTransducer* to_transducer = 0;
+
+/**
+ * @brief parse string pair from arc label.
+ *
+ * @return new stringpair, or null if not a pair.
+ */
+static
+StringPair*
+label_to_stringpair(const char* label)
+  {
+    const char* colon = strchr(label, ':');
+    const char* endstr = strchr(label, '\0');
+    StringPair* rv = 0;
+    while (colon != 0)
+      {
+        if (*(colon-1) == '\\')
+          {
+            colon = strchr(label, ':');
+          }
+        else if (*(colon+1) == '\0')
+          {
+            colon = 0;
+          }
+        else
+          {
+            rv = new StringPair(strndup(label, colon-label),
+                                strndup(colon+1, endstr-colon-1));
+            break;
+          }
+      }
+    return rv;
+  }
 
 void
 print_usage()
@@ -117,6 +152,7 @@ parse_options(int argc, char** argv)
           // add tool-specific cases here
         case 'f':
             from_label = hfst_strdup(optarg);
+            from_pair = label_to_stringpair(from_label);
             break;
         case 'F':
             from_file_name = hfst_strdup(optarg);
@@ -128,6 +164,7 @@ parse_options(int argc, char** argv)
             break;
         case 't':
             to_label = hfst_strdup(optarg);
+            to_pair = label_to_stringpair(to_label);
             break;
         case 'T':
             to_transducer_filename = hfst_strdup(optarg);
@@ -160,6 +197,82 @@ parse_options(int argc, char** argv)
     return EXIT_CONTINUE;
 }
 
+static
+HfstTransducer&
+do_substitute(HfstTransducer& trans, size_t transducer_n)
+{
+  if (from_pair && to_pair)
+    {
+      if (transducer_n < 2)
+        {
+          verbose_printf("Substituting pair %s:%s with pair %s:%s...\n",
+                         from_pair->first.c_str(),
+                         from_pair->second.c_str(),
+                         to_pair->first.c_str(),
+                         to_pair->second.c_str());
+        }
+      else
+        {
+          verbose_printf("Substituting pair %s:%s with pair %s:%s...\n",
+                         from_pair->first.c_str(),
+                         from_pair->second.c_str(),
+                         to_pair->first.c_str(),
+                         to_pair->second.c_str());
+        }
+      trans.substitute(*from_pair, *to_pair);
+    }
+  else if (from_label && to_label)
+    {
+      if (transducer_n < 2)
+        {
+          verbose_printf("Substituting label %s with label %s...\n", from_label,
+                         to_label);
+        }
+      else
+        {
+          verbose_printf("Substituting label %s with label %s... %zu\n",
+                         from_label, to_label, transducer_n);
+        }
+      trans.substitute(from_label, to_label);
+    }
+  else if (from_pair && to_transducer)
+    {
+      if (transducer_n < 2)
+        {
+          verbose_printf("Substituting pair %s:%s with transducer %s...\n", 
+                         from_pair->first.c_str(),
+                         from_pair->second.c_str(),
+                         to_transducer_filename);
+        }
+      else
+        {
+          verbose_printf("Substituting pair %s:%s with transducer %s... %zu\n", 
+                         from_pair->first.c_str(), 
+                         from_pair->second.c_str(), to_transducer_filename,
+                         transducer_n);
+        }
+      trans.substitute(*from_pair, *to_transducer);
+    }
+
+  else if (from_label && to_transducer)
+    {
+      if (transducer_n < 2)
+        {
+          verbose_printf("Substituting id. label %s with transducer %s...\n", 
+                         from_label, to_transducer_filename);
+        }
+      else
+        {
+          verbose_printf("Substituting id. label %s with transducer %s... %zu\n", 
+                         from_label, to_transducer_filename,
+                         transducer_n);
+        }
+      hfst::StringPair from_arc(from_label, from_label);
+      trans.substitute(from_arc, *to_transducer);
+    }
+  return trans;
+}
+
 int
 process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 {
@@ -184,37 +297,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
     {
       transducer_n++;
       HfstTransducer trans(instream);
-      if (from_label && to_label)
-        {
-          if (transducer_n < 2)
-            {
-              verbose_printf("Substituting %s with %s...\n", from_label,
-                             to_label);
-            }
-          else
-            {
-              verbose_printf("Substituting %s with %s... %zu\n", from_label,
-                            to_label, transducer_n);
-            }
-          outstream << trans.substitute(from_label, to_label);
-        }
-      else if (from_label && to_transducer)
-        {
-          if (transducer_n < 2)
-            {
-              verbose_printf("Substituting %s:%s with transducer %s...\n", 
-                             from_label, from_label, to_transducer_filename);
-            }
-          else
-            {
-              verbose_printf("Substituting %s:%s with transducer %s... %zu\n", 
-                             from_label, from_label, to_transducer_filename,
-                             transducer_n);
-            }
-          hfst::StringPair from_arc(from_label, from_label);
-          outstream << trans.substitute(from_arc, *to_transducer);
-        }
-      else if (from_file)
+      if (from_file)
         {
           char* line = NULL;
           size_t len = 0;
@@ -246,20 +329,15 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                 }
               from_label = hfst_strndup(line, tab-line);
               to_label = hfst_strndup(tab+1, endstr-tab-1);
-              if (transducer_n < 2)
-                {
-                  verbose_printf("Substituting %s with %s...\n", from_label,
-                                 to_label);
-                }
-              else
-                {
-                  verbose_printf("Substituting %s with %s... %zu\n", from_label,
-                                 to_label, transducer_n);
-                }
-              trans.substitute(from_label, to_label);
-              free(from_label);
-              free(to_label);
+              from_pair = label_to_stringpair(from_label);
+              to_pair = label_to_stringpair(to_label);
+              do_substitute(trans, transducer_n);
             }
+          outstream << trans;
+        }
+      else
+        {
+          do_substitute(trans, transducer_n);
           outstream << trans;
         }
     }
