@@ -387,19 +387,9 @@ PAIR: GRAMMAR_SYMBOL COLON_SPACE
   // symbol_queue.
   std::string symbol = get_symbol_queue_front();
 
-  // The word voundaruy is an exception. It always corresponds to 0 on 
-  // the output side.
-  if (symbol != "__HFST_TWOLC_.#.")
-    { 
-      symbol_queue.push_front("__HFST_TWOLC_:");
-      symbol_queue.push_front(symbol); 
-    }
-  else
-    { 
-      symbol_queue.front() = "__HFST_TWOLC_0";
-      symbol_queue.push_front("__HFST_TWOLC_:");
-      symbol_queue.push_front("__HFST_TWOLC_.#."); 
-    }
+  // Add the colon and output symbol.
+  symbol_queue.push_front("__HFST_TWOLC_:");
+  symbol_queue.push_front(symbol); 
   reduce_symbol_pair();
 }
 
