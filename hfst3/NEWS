@@ -5,24 +5,55 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
-Noteworthy changes in 3.0
--------------------------
+Noteworthy changes in 3.0_rc1
+-----------------------------
 
-* All new API in object oriented form
+* all new API in object oriented form
 
 * brand new foma backend for unweighted transducer handling
 
-* preliminary hfst-xfst-compiler
+* the FST libraries used for automata handling are now dynamically linked to
+  HFST
 
-* hfst-lexc was dropped in favor of hfst-lexc-compiler command line tool
+    * this requires end users to install needed backends themselves
+
+* hfst-lexc and hfst-xfst based on foma's compiler
+
+  * xfst is now also fully supported
+
+  * the obsolete command line clients for HFST-based compilation of lexc and
+    xfst scripts are hidden in hfst-lexc2fst and hfst-xfst2fst
 
 * preliminary support for unknown character classes
 
 * optimized-lookup backend supported in library
 
+  * dropped special tools for optimised handling since optimised lookup is
+    included in library: hfst-optimised-lookup -> hfst-lookup; 
+    hfst-lookup-optimize -> hfst-fst2fst
+
 * hfst-proc tool to emulate lt-proc, cg-proc
 
-* 
+* Slightly improved string and text formats to support weights uniformly and
+  parsing tabs and spaces as automata arcs: see `wiki page for text and string
+  formats
+  <https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstStringAndTextFormats>`
+
+* better error handling using exceptions
+
+* The argument handling order of binary tools changed: stdin is first if not
+  specified
+
+* The automata are now packed in HFST automaton container format (akin to AVI
+  for videos); this supports arbitrary metadata and underlying FST formats
+
+* the symbol handling is more implicit; no more symbol table arguments for tools
+  or hfst-symbols command
+
+* converted to new autotools: silent rules and color tests
+
+* Hfst's internal automata format for fallback on some unsupported operations
+  and for conversions
 
 Noteworthy changes in 2.4.1
 ---------------------------

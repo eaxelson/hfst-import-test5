@@ -17,7 +17,7 @@ and so on. But more important than following certain guidelines is being
 and file type indentation rules at all times. The users of emacs should also
 turn on automatic indentation. The code formatting-for C and C++ emacs defaults
 to GNU coding styles anyways. At very least stick to maximum line length of 79,
-and use some indentation.
+and use some indentation. The tab characters should be expanded to spaces.
 
 Version control usage
 ---------------------
@@ -75,8 +75,6 @@ The typical command line tool works like this:
 To write output to users:
 
 * On errors, error(int,int,char*,...) should be used.
-
-* Warnings may use warning_printf(char*, ...).
 
 * When verbose is on, each step should include informative
   verbose_printf(char*, ...).
