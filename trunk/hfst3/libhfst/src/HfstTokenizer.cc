@@ -13,7 +13,6 @@
 #include "HfstTokenizer.h"
 #include <string>
 
-#ifndef DEBUG_MAIN
 using std::string;
 namespace hfst 
 {
@@ -191,93 +190,3 @@ StringPairVector HfstTokenizer::tokenize
 }
 
 }
-
-#else
-#include <iostream>
-#include <cstring>
-#include <cstdlib>
-
-int main(void)
-{
-  std::cout << "Unit tests for " __FILE__ ":";
-  std::cout << std::endl << "constructors:";
-  hfst::HfstTokenizer tokenizer;
-  std::cout << std::endl << "add_multicharacter_symbols:";
-  tokenizer.add_multichar_symbol("sha");
-  tokenizer.add_multichar_symbol("kes");
-  tokenizer.add_multichar_symbol("pea");
-  tokenizer.add_multichar_symbol("ren");
-  tokenizer.add_multichar_symbol("näy");
-  tokenizer.add_multichar_symbol("tel");
-  tokenizer.add_multichar_symbol("mi");
-  tokenizer.add_multichar_symbol("en");
-  tokenizer.add_multichar_symbol("mi");
-  tokenizer.add_multichar_symbol("tal");
-  tokenizer.add_multichar_symbol("li");
-  tokenizer.add_multichar_symbol("set");
-  tokenizer.add_multichar_symbol("o");
-  tokenizer.add_multichar_symbol("sat");
-  tokenizer.add_multichar_symbol("vat");
-  tokenizer.add_multichar_symbol("ku");
-  tokenizer.add_multichar_symbol("ten");
-  tokenizer.add_multichar_symbol("jo");
-  tokenizer.add_multichar_symbol("ai");
-  tokenizer.add_multichar_symbol("em");
-  tokenizer.add_multichar_symbol("min");
-  tokenizer.add_multichar_symbol("to");
-  tokenizer.add_multichar_symbol("det");
-  tokenizer.add_multichar_symbol("tiin");
-  tokenizer.add_multichar_symbol("si");
-  tokenizer.add_multichar_symbol("lo");
-  tokenizer.add_multichar_symbol("sä");
-  tokenizer.add_multichar_symbol("et");
-  tokenizer.add_multichar_symbol("tä");
-  tokenizer.add_multichar_symbol("e");
-  tokenizer.add_multichar_symbol("li");
-  tokenizer.add_multichar_symbol("vii");
-  tokenizer.add_multichar_symbol("si");
-  tokenizer.add_multichar_symbol("pol");
-  tokenizer.add_multichar_symbol("vis");
-  tokenizer.add_multichar_symbol("ta");
-  tokenizer.add_multichar_symbol("jam");
-  tokenizer.add_multichar_symbol("bi");
-  tokenizer.add_multichar_symbol("a");
-  tokenizer.add_multichar_symbol("tar");
-  tokenizer.add_multichar_symbol("kas");
-  tokenizer.add_multichar_symbol("tel");
-  tokenizer.add_multichar_symbol("laan");
-  tokenizer.add_multichar_symbol("a");
-  tokenizer.add_multichar_symbol("luk");
-  tokenizer.add_multichar_symbol("si");
-  tokenizer.add_multichar_symbol("mil");
-  tokenizer.add_multichar_symbol("lai");
-  tokenizer.add_multichar_symbol("nen");
-  tokenizer.add_multichar_symbol("tä");
-  tokenizer.add_multichar_symbol("mä");
-  tokenizer.add_multichar_symbol("on");
-  tokenizer.add_multichar_symbol("ja");
-  tokenizer.add_multichar_symbol("mi");
-  tokenizer.add_multichar_symbol("ten");
-  tokenizer.add_multichar_symbol("si");
-  tokenizer.add_multichar_symbol("tä");
-  tokenizer.add_multichar_symbol("on");
-  tokenizer.add_multichar_symbol("suo");
-  tokenizer.add_multichar_symbol("ma");
-  tokenizer.add_multichar_symbol("lai");
-  tokenizer.add_multichar_symbol("ses");
-  tokenizer.add_multichar_symbol("sa");
-  tokenizer.add_multichar_symbol("ru");
-  tokenizer.add_multichar_symbol("nou");
-  tokenizer.add_multichar_symbol("des");
-  tokenizer.add_multichar_symbol("sa");
-  tokenizer.add_multichar_symbol("so");
-  tokenizer.add_multichar_symbol("vel");
-  tokenizer.add_multichar_symbol("let");
-  tokenizer.add_multichar_symbol("tu");
-  std::cout << std::endl << "add_skip_symbol:";
-  tokenizer.add_skip_symbol("<br/>");
-  std::cout << "ok" << std::endl;
-  return EXIT_SUCCESS;
-}
-
-#endif

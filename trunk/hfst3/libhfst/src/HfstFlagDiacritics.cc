@@ -1,6 +1,5 @@
 #include "HfstFlagDiacritics.h"
 
-#ifndef DEBUG_MAIN
 namespace hfst {
 
 bool FdOperation::is_diacritic(const std::string& diacritic_string)
@@ -64,29 +63,3 @@ std::string::size_type FdOperation::find_diacritic
 }
 
 }
-#else
-
-#include "HfstFlagDiacritics.h"
-#include <iostream>
-#include <cassert>
-#include <cstdlib>
-
-int
-main(int argc, char** argv)
-{
-  std::string::size_type len = 0;
-  std::cout << "Unit Tests for " __FILE__ ":";
-  std::cout << "skipped, cos I don't understand this stuff" << std::endl;
-  return 77;
-  std::cout << std::endl << "find diacritic... ";
-
-    assert(hfst::FdOperation::find_diacritic
-           ("@P.A.X@", len) != std::string::npos);
-    assert(hfst::FdOperation::find_diacritic("FOO", len) == std::string::npos);
-  std::cout << std::endl << "is diacritic... ";
-    assert(hfst::FdOperation::is_diacritic("@P.A.X@"));
-    assert(!hfst::FdOperation::is_diacritic("FOO"));
-    std::cout << "ok" << std::endl;
-    return EXIT_SUCCESS;
-}
-#endif
