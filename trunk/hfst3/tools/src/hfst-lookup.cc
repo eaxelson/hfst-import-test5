@@ -1585,6 +1585,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
 		    std::string mcs = tr_it->get_input_symbol();
 		    if (mcs.size() > 1) {
 		      mc_symbols.push_back(mcs);
+              if (verbose)
 		      fprintf(stderr, "adding mc symbol: %s\n", mcs.c_str());
 		    }
 		  }
