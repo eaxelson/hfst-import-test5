@@ -89,8 +89,6 @@ namespace hfst
     StringSet skip_symbol_set;
     int get_next_symbol_size(const char * symbol) const;
     bool is_skip_symbol(String &s) const;
-
-    void check_utf8_correctness(const std::string &input_string) const;
   
   public:
 
@@ -128,6 +126,24 @@ namespace hfst
     StringPairVector tokenize(const std::string &input_string,
                               const std::string &output_string) const;
 
+    //! \brief If @a input_String is not valid utf-8, throw an
+    //! @a IncorrectUtf8CodingException.
+    //!
+    //! A string is non-valid if: 
+    //!   - It contains one of the unsigned bytes 192, 193, 245, 246 and 247.
+    //!   - If it is not made up of sequences of one initial byte (0xxxxxxx, 
+    //!     110xxxxx, 1110xxxx or 11110xxx) followed by an appropriate number 
+    //!     of continuation bytes (10xxxxxx).
+    //!     -# Initial bytes 0xxxxxxx represent ASCII chars and may not be
+    //!        followed by a continuation byte.
+    //!     -# Initial bytes 110xxxxx are followed by exactly one 
+    //!        continuation byte.
+    //!     -# Initial bytes 1110xxxx are followed by exactly two continuation
+    //!        bytes.
+    //!     -# Initial bytes 11110xxx are followed by exactly three 
+    //!        continuation bytes.
+    //! (For reference: http://en.wikipedia.org/wiki/UTF-8)
+    static void check_utf8_correctness(const std::string &input_string);
   };
 }
 #endif
