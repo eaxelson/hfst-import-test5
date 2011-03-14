@@ -74,12 +74,7 @@ done
 
 
 if [ -z $files ] ; then
-    if echo $fomaopts | grep -q '[-]f' ; then
-        scripts="$(echo $fomaopts | sed 's/.*-f \?\([^ ]*\).*/\1/') $scripts"
-    fi
-    if echo $fomaopts | grep -q '[-]l' ; then
-        scripts="$(echo $fomaopts | sed 's/.*-l \?\([^ ]*\).*/\1/') $scripts"
-    fi
+    scripts="$(echo $fomaopts | sed 's/ -f //') $scripts"
     for f in $@ $scripts; do
         if test -f ./"$f" ; then
             if egrep -q '^(save stack|ss)' ./"$f" ; then
@@ -99,10 +94,10 @@ if [ -z "$files" ] ; then
     exit 1
 fi
 for f in $files ; do
-    if [ "x$verbose" == "x-v" ] ; then
-        echo "converting $f"
-    fi
     if test -f "$f" ; then
+        if [ "x$verbose" == "x-v" ] ; then
+            echo "converting $f"
+        fi
         printf "load stack $f\nwatt $f.att\nquit" > $f.tmpscript
         if ! $foma_exec -q -f $f.tmpscript ; then
             echo "converting $f from foma to text failed"
@@ -110,7 +105,7 @@ for f in $files ; do
         fi
         sed -e 's/		/	@_TAB_@/g' -e 's/	 /	@_SPACE_@/g' < "$f".att > "$f".att2
         mv "$f".att2 "$f".att
-        if ! hfst-txt2fst -e '@0@' $hfstopts $format -i "$f.att" -o "$f" ; then
+        if ! hfst-txt2fst -e '@0@' $verbose $hfstopts $format -i "$f.att" -o "$f" ; then
             echo "converting $f from text to HFST3 failed"
             exit 1
         fi
