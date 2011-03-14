@@ -381,13 +381,13 @@ void Transducer::note_analysis(SymbolNumber * whole_output_tape)
 
 
 Transducer::Transducer(): header(NULL), alphabet(NULL), tables(NULL),
-			  lookup_paths(), input_tape(NULL), output_tape(NULL),
-			  encoder(NULL), flag_state() {}
+			  current_weight(0.0), lookup_paths(), input_tape(NULL),
+			  output_tape(NULL), encoder(NULL), flag_state() {}
 
 Transducer::Transducer(std::istream& is):
     header(new TransducerHeader(is)),
     alphabet(new TransducerAlphabet(is, header->symbol_count())),
-    tables(NULL), lookup_paths(),
+    tables(NULL), current_weight(0.0), lookup_paths(),
     input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     encoder(new Encoder(alphabet->get_symbol_table(),
@@ -401,6 +401,7 @@ Transducer::Transducer(std::istream& is):
 Transducer::Transducer(bool weighted):
     header(new TransducerHeader(weighted)),
     alphabet(new TransducerAlphabet()),
+    current_weight(0.0),
     lookup_paths(),
     input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
@@ -422,6 +423,7 @@ Transducer::Transducer(const TransducerHeader& header,
     alphabet(new TransducerAlphabet(alphabet)),
     tables(new TransducerTables<TransitionIndex,Transition>(
 	       index_table, transition_table)),
+    current_weight(0.0),
     lookup_paths(),
     input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
@@ -438,6 +440,7 @@ Transducer::Transducer(const TransducerHeader& header,
     alphabet(new TransducerAlphabet(alphabet)),
     tables(new TransducerTables<TransitionWIndex,TransitionW>(
 	       index_table, transition_table)),
+    current_weight(0.0),
     lookup_paths(),
     input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
