@@ -133,6 +133,11 @@ class TransducerHeader
  public:
   TransducerHeader(FILE * f)
     {
+	if (!handle_hfst3_header(f)) {
+	    std::cerr << "Couldn't parse hfst3 header or a backward compatible "
+		      << "binary." << std::endl;
+	    exit(1);
+	}
       // The silly compiler complains about not catching the return value
       // of fread(). Hence this dummy variable is needed.
       size_t val;
@@ -157,6 +162,8 @@ class TransducerHeader
       read_property(has_input_epsilon_cycles,f);
       read_property(has_unweighted_input_epsilon_cycles,f);
     }
+
+  bool handle_hfst3_header(FILE * f);
 
   SymbolNumber symbol_count(void)
   { return number_of_symbols; }

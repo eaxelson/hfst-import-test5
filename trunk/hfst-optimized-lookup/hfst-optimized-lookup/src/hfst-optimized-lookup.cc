@@ -200,6 +200,36 @@ int main(int argc, char **argv)
     }
 }
 
+bool TransducerHeader::handle_hfst3_header(FILE * f)
+{
+    const char * header1 = "HFST";
+    int header_loc = 0;
+    int c;
+    for(header_loc = 0; header_loc < strlen(header1) + 1; header_loc++)
+    {
+	c = fgetc(f);
+	if(c != header1[header_loc])
+	    break;
+    }
+    if(header_loc == strlen(header1) + 1) { // we found it
+	unsigned short remaining_header_len;
+	fread(&remaining_header_len, sizeof(remaining_header_len), 1, f);
+	while (remaining_header_len--) {
+	    c = fgetc(f);
+	}
+	if (c != '\0') {
+	    return false;
+	}
+	return true;
+    } else { // nope. put back what we've taken
+	ungetc(c, f); // first the non-matching character
+	for(int i=header_loc-1; i>=0; i--) {
+	    ungetc(header1[i], f);
+	}
+	return true;
+    }
+}
+
 void TransducerAlphabet::get_next_symbol(FILE * f, SymbolNumber k)
 {
   int byte;
