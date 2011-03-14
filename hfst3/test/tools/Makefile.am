@@ -48,6 +48,8 @@ DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   rule2.hfst summarize_test1.hfst summarize_test2.hfst tac.hfst \
 		   epsilon.hfst epsilon2cat.hfst cat2epsilon.hfst \
 		   unknown-star.hfst identity-star.hfst
+OL_CHECKS=cat2dog.hfst.ol cat2dog.gen.hfst.ol cat_weight_final.hfst.ol \
+			proc-caps.hfst.ol proc-caps.gen.hfst.ol
 if WANT_SFST
 SFST_CHECKS=0to3cats.hfst.sfst 2to4cats.hfst.sfst 4cats.hfst.sfst\
 			4toINFcats.hfst.sfst cat2cat_or_CAT_uppercased.hfst.sfst \
@@ -85,7 +87,7 @@ FOMA_CHECKS=0to3cats.hfst.foma 2to4cats.hfst.foma 4cats.hfst.foma \
 			summarize_test1.hfst.foma summarize_test2.hfst.foma tac.hfst.foma
 endif
 
-check_DATA=$(DEFAULT_CHECKS) $(SFST_CHECKS) $(OFST_CHECKS) $(FOMA_CHECKS)
+check_DATA=$(DEFAULT_CHECKS) $(SFST_CHECKS) $(OFST_CHECKS) $(FOMA_CHECKS) $(OL_CHECKS)
 
 FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
 		 cat2cat_or_CAT_uppercased.txt cat2CAT_uppercased.txt 
