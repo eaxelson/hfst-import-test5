@@ -14,7 +14,7 @@ LDADD = $(top_builddir)/libhfst/src/libhfst.la
 
 htwolcpre1_SOURCES=htwolcpre1.yy scanner1.ll HfstTwolcDefs.h \
 		   $(CL_SRC)/CommandLine.h $(CL_SRC)/CommandLine.cc \
-	           $(IO_SRC)/input_defs.h $(IO_SRC)/grammar_defs.h \
+	           $(IO_SRC)/input_defs.h grammar_defs.h \
                    $(IO_SRC)/InputReader.h $(IO_SRC)/InputReader.cc \
 	           $(STRING_SRC)/string_manipulation.cc \
 		   $(STRING_SRC)/string_manipulation.h \
@@ -38,16 +38,16 @@ htwolcpre1_SOURCES=htwolcpre1.yy scanner1.ll HfstTwolcDefs.h \
 
 htwolcpre2_SOURCES=htwolcpre2.yy scanner2.ll HfstTwolcDefs.h \
 		   $(CL_SRC)/CommandLine.h $(CL_SRC)/CommandLine.cc \
-	           $(IO_SRC)/input_defs.h $(IO_SRC)/grammar_defs.h \
+	           $(IO_SRC)/input_defs.h grammar_defs.h \
                    $(IO_SRC)/InputReader.h $(IO_SRC)/InputReader.cc
 
 htwolcpre3_SOURCES=htwolcpre3.yy scanner3.ll HfstTwolcDefs.h \
 		   $(CL_SRC)/CommandLine.h $(CL_SRC)/CommandLine.cc \
-	           $(IO_SRC)/input_defs.h $(IO_SRC)/grammar_defs.h \
+	           $(IO_SRC)/input_defs.h grammar_defs.h \
                    $(IO_SRC)/InputReader.cc $(IO_SRC)/InputReader.h \
 	           $(STRING_SRC)/string_manipulation.cc \
 		   $(STRING_SRC)/string_manipulation.h \
-		   $(ALPHABET_SRC)/Alphabet.cc $(ALPHABET_SRC)/alphabet.h \
+		   $(ALPHABET_SRC)/Alphabet.cc $(ALPHABET_SRC)/Alphabet.h \
 		   $(RULE_SRC)/ConflictResolvingLeftArrowRule.cc \
 		   $(RULE_SRC)/ConflictResolvingLeftArrowRule.h \
 		   $(RULE_SRC)/ConflictResolvingRightArrowRule.cc \
