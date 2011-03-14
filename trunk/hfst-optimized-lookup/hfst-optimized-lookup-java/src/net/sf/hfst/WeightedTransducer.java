@@ -5,16 +5,21 @@ import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.Enumeration;
-import java.util.Vector;
 import java.util.Iterator;
 import java.util.Hashtable;
 import java.util.Stack;
+import java.util.Vector;
+import java.util.Collection;
+import java.util.Collections;
+
+import net.sf.hfst.Transducer;
+import net.sf.hfst.NoTokenizationException;
 
 /**
  * Reads the header, alphabet, index table and transition table and provides
  * interfaces to them.
  */
-public class TransducerWeighted implements HfstOptimizedLookup.transducer
+public class WeightedTransducer implements Transducer
 {
 
     public class TransitionIndex
@@ -188,7 +193,7 @@ public class TransducerWeighted implements HfstOptimizedLookup.transducer
     protected int inputPointer;
     protected float current_weight;
     
-    public TransducerWeighted(FileInputStream file, TransducerHeader h, TransducerAlphabet a) throws java.io.IOException
+    public WeightedTransducer(FileInputStream file, TransducerHeader h, TransducerAlphabet a) throws java.io.IOException
     {
 	header = h;
 	alphabet = a;
@@ -356,7 +361,8 @@ public class TransducerWeighted implements HfstOptimizedLookup.transducer
 	displayVector.set(displayVector.size() - 1, displayVector.lastElement() + "\t" + current_weight);
     }
 
-    public Boolean analyze(String input)
+    public Collection<String> analyze(String input)
+	throws NoTokenizationException
     {
 	inputString.clear();
 	displayVector.clear();
@@ -374,18 +380,11 @@ public class TransducerWeighted implements HfstOptimizedLookup.transducer
 	    }
 	if ( (inputString.size() == 0) || (inputString.lastElement() == HfstOptimizedLookup.NO_SYMBOL_NUMBER) )
 	    {
-		return false;
+		throw new NoTokenizationException(input);
 	    }
 	inputString.add(HfstOptimizedLookup.NO_SYMBOL_NUMBER);
 	getAnalyses(0);
-	return true;
-    }
-
-    public void printAnalyses()
-    {
-	Iterator it = displayVector.iterator();
-	while (it.hasNext())
-	    { System.out.println(it.next()); }
+	return Collections.unmodifiableCollection(displayVector);
     }
 
         private Boolean pushState(FlagDiacriticOperation flag)

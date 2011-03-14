@@ -3,9 +3,12 @@ package net.sf.hfst;
 import java.io.FileInputStream;
 import java.io.DataInputStream;
 import java.io.Console;
+import java.util.Collection;
 
 import net.sf.hfst.Transducer;
-import net.sf.hfst.TransducerWeighted;
+import net.sf.hfst.UnweightedTransducer;
+import net.sf.hfst.WeightedTransducer;
+import net.sf.hfst.NoTokenizationException;
 
 /**
  * HfstRuntimeReader takes a transducer (the name of which should
@@ -28,31 +31,25 @@ public class HfstOptimizedLookup {
 
     public static enum FlagDiacriticOperator {P, N, R, D, C, U};
 
-    public interface transducer
-    {
-	Boolean analyze(String str);
-	void printAnalyses();
-    }
-    
-    public static void runTransducer(transducer t)
+    public static void runTransducer(Transducer t)
     {
 	System.out.println("Ready for input.");
 	Console console = System.console();
 	String str = console.readLine();
 	while (str != null)
 	    {
-		if (t.analyze(str))
-		    {
-			t.printAnalyses();
-			System.out.println();
-		    } else
-		    {
-			//System.out.println("tokenization failed");
-			// tokenization failed
-		    }
-		str = console.readLine();
+		try{
+		    for ( String analysis : t.analyze(str) )
+			{
+			    System.out.println( analysis );
+			}
+		} catch (NoTokenizationException e) {
+		    System.out.println(e.message());
+		}
+    		str = console.readLine();
 	    }
     }
+    
     
     public static void main(String[] argv) throws java.io.IOException
     {
@@ -77,11 +74,11 @@ public class HfstOptimizedLookup {
 	System.out.println("Reading transition and index tables...");
 	if (h.isWeighted())
 	    {
-		TransducerWeighted transducer = new TransducerWeighted(transducerfile, h, a);
+		Transducer transducer = new WeightedTransducer(transducerfile, h, a);
 		runTransducer(transducer);
 	    } else
 	    {
-		Transducer transducer = new Transducer(transducerfile, h, a);
+		Transducer transducer = new UnweightedTransducer(transducerfile, h, a);
 		runTransducer(transducer);
 	    }
     }
