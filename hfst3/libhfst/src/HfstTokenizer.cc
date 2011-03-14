@@ -122,6 +122,7 @@ HfstTokenizer::add_skip_symbol(const std::string &symbol)
 StringPairVector HfstTokenizer::tokenize
 (const string& input_string) const
 {
+  check_utf8_correctness(input_string);
   StringPairVector spv;
   const char* s = input_string.c_str();
   while (*s)
@@ -139,6 +140,8 @@ StringPairVector HfstTokenizer::tokenize
 StringVector HfstTokenizer::tokenize_one_level
 (const string& input_string) const
 {
+  check_utf8_correctness(input_string);
+
   StringVector sv;
   const char* s = input_string.c_str();
   while (*s)
@@ -157,6 +160,9 @@ StringVector HfstTokenizer::tokenize_one_level
 StringPairVector HfstTokenizer::tokenize
 (const string& input_string,const string& output_string) const
 {
+  check_utf8_correctness(input_string);
+  check_utf8_correctness(output_string);
+
   StringPairVector spv;
   
   StringPairVector input_spv = tokenize(input_string.c_str());
@@ -188,5 +194,52 @@ StringPairVector HfstTokenizer::tokenize
     }
   return spv;
 }
+  
+  void 
+  HfstTokenizer::check_utf8_correctness(const std::string &input_string) const
+{
+  for (std::string::const_iterator it = input_string.begin(); 
+       it != input_string.end();
+       ++it)
+    {
+      unsigned char initial_char = *it;
+      size_t additional_chars = 0;
+  
+      // The bytes 192, 193, 245, 246 and 247 are invalid in utf8.
+      if (initial_char == 192 or initial_char == 193 or 
+	  initial_char == 245 or initial_char == 246 or initial_char == 247)
+	{ HFST_THROW(IncorrectUtf8CodingException); }
+      // Case 0xxxxxxx, i.e. ASCII byte.
+      else if ((128 & initial_char) == 0)
+	{ additional_chars = 0; }
+      // Case 10xxxxxx cannot be an initial byte. 
+      else if ((64 & initial_char) == 0)
+	{ HFST_THROW(IncorrectUtf8CodingException); }
+      // Case 110xxxxx, i.e. read one more byte.
+      else if ((32 & initial_char) == 0)
+	{ additional_chars = 1; }
+      // Case 1110xxxx, i.e. read two more bytes.
+      else if ((16 & initial_char) == 0)
+	{ additional_chars = 2; }
+      // Case 11110xxx, i.e. read three more bytes.
+      else if ((8 & initial_char) == 0) 
+	{ additional_chars = 3; }
+      // Case 11111xxx is not allowed in utf8.
+      else
+	{ HFST_THROW(IncorrectUtf8CodingException); }
 
+      for (size_t i = 0; i < additional_chars; ++i)
+	{
+	  ++it;
+	  // String ends too early.
+	  if (it == input_string.end())
+	    { HFST_THROW(IncorrectUtf8CodingException); }
+	  char byte = *it;
+	  // All continuation bytes looka like 10xxxxxx.
+	  if (not (128 & byte and 64 ^ byte))
+	    { HFST_THROW(IncorrectUtf8CodingException); }
+	}
+    }
+}
+  
 }

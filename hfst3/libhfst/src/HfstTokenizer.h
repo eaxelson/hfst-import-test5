@@ -13,6 +13,7 @@
 #ifndef _HFST_TOKENIZER_H_
 #define _HFST_TOKENIZER_H_
 #include "HfstSymbolDefs.h"
+#include "HfstExceptionDefs.h"
 #include <iostream>
 #include <climits>
 #include <string>
@@ -89,6 +90,8 @@ namespace hfst
     int get_next_symbol_size(const char * symbol) const;
     bool is_skip_symbol(String &s) const;
 
+    void check_utf8_correctness(const std::string &input_string) const;
+  
   public:
 
     /** \brief Create a tokenizer that recognizes utf-8 symbols. */
@@ -124,6 +127,7 @@ namespace hfst
      */
     StringPairVector tokenize(const std::string &input_string,
                               const std::string &output_string) const;
+
   };
 }
 #endif

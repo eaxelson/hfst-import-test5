@@ -355,6 +355,13 @@ HFST_EXCEPTION_CHILD_DECLARATION(HfstFatalException);
     @see hfst::HfstTransducer() */
 HFST_EXCEPTION_CHILD_DECLARATION(TransducerHasWrongTypeException);
 
+/** \brief String is not valid utf-8. 
+
+    This exception suggests that an input string is not valid utf8.
+
+*/
+HFST_EXCEPTION_CHILD_DECLARATION(IncorrectUtf8CodingException);
+
 
 //HFST_EXCEPTION_CHILD_DECLARATION(SymbolRedefinedException); 
 //HFST_EXCEPTION_CHILD_DECLARATION(TransducerHasNoStartStateException);
