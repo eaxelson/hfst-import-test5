@@ -58,6 +58,7 @@ static bool display_weights=false;
 static bool eval_fd=false;
 static bool filter_fd=false;
 static bool quote_special=true;
+static bool print_spaces=false;
 static unsigned int max_input_length = 0;
 static unsigned int max_output_length = 0;
 static std::string input_prefix;
@@ -82,9 +83,10 @@ print_usage()
 "  -c, --cycles=NCYC          follow cycles at most NCYC times\n"
 "  -w, --print-weights        display the weight for each string\n"
 "  -e, --epsilon-format=EPS   print epsilon as EPS\n"
-"  -S, --print-pairstrings    print result in pairstring format\n"
+/*"  -a, --print-pairstrings    print result in pairstring format\n"*/
+/*"  -S, --print-spaces         print spaces between symbols/symbol pairs\n"*/
 "  -X, --xfst=VARIABLE        toggle xfst compatibility option VARIABLE\n"
-"  -D, --do-not-quote-special do not quote special characters\n");
+"  -D, --do-not-quote-special do not quote special characters (default yes)\n");
     fprintf(message_out, "Ignore paths if:\n"
 "  -l, --max-in-length=MIL    input string longer than MIL\n"
 "  -L, --max-out-length=MOL   output string longer than MOL\n"
@@ -101,7 +103,9 @@ print_usage()
             "NSTR, NBEST and NCYC default to infinity.\n"
             "NBEST overrides NSTR and NCYC.\n"
             "If EPS is not given, default is empty string.\n"
-            "numeric options are parsed with strtod(3)\n");
+            "Numeric options are parsed with strtod(3).\n"
+	    "Xfst variables supported are { obey-flags, print-flags,\n"
+	    "print-pairs, print-space }.\n");
     fprintf(message_out,
         "\n"
         "Examples:\n"
@@ -140,7 +144,8 @@ parse_options(int argc, char** argv)
             {"nbest", required_argument, 0, 'N'},
             {"out-exclude", required_argument, 0, 'U'},
             {"out-prefix", required_argument, 0, 'P'},
-            {"print-pairstrings", no_argument, 0, 'S'},
+            {"print-pairstrings", no_argument, 0, 'a'},
+	    {"print-spaces", no_argument, 0, 'S'},
             {"print-weights", no_argument, 0, 'w'},
             {"xfst", required_argument, 0, 'X'},
 	    {"do-not-quote-special", no_argument, 0, 'D'},
@@ -149,7 +154,7 @@ parse_options(int argc, char** argv)
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
                              HFST_GETOPT_UNARY_SHORT
-                             "Swc:e:u:p:l:L:n:N:U:P:X:D",
+                             "Sawc:e:u:p:l:L:n:N:U:P:X:D",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -183,7 +188,16 @@ parse_options(int argc, char** argv)
               }
             else if (strcmp(optarg, "quote-special") == 0)
               {
+		/* default is true, so this has no effect */
                 quote_special = true;
+              }
+            else if (strcmp(optarg, "print-pairs") == 0)
+              {
+                print_in_pairstring_format = true;
+              }
+            else if (strcmp(optarg, "print-space") == 0)
+              {
+                print_spaces = true;
               }
             else
               {
@@ -215,9 +229,12 @@ parse_options(int argc, char** argv)
         case 'e':
           epsilon_format = hfst_strdup(optarg);
           break;
-        case 'S':
+        case 'a':
           print_in_pairstring_format = true;
           break;
+	case 'S':
+	  print_spaces = true;
+	  break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -334,13 +351,19 @@ public:
       {
         if (print_in_pairstring_format) 
           {
+	    bool first_pair=true;
             for (StringPairVector::const_iterator it = path.second.begin();
                  it != path.second.end(); it++) 
               {
+		if (print_spaces && not first_pair) 
+		  {
+		    *out_ << " ";
+		  }
+		first_pair=false;
+
                 *out_ << get_print_format(it->first)
                       << ":"
-                      << get_print_format(it->second)
-                      << " ";
+                      << get_print_format(it->second);
               }
             if (display_weights) 
               {
@@ -350,15 +373,29 @@ public:
           }
         else 
           {
+	    bool first_symbol=true;
             for (StringPairVector::const_iterator it = path.second.begin();
                  it != path.second.end(); ++it)
               {
-                *out_ << get_print_format(it->first);
+		if (print_spaces && not first_symbol)
+		  {
+		    *out_ << " ";
+		  }
+		first_symbol=false;
+		*out_ << get_print_format(it->first);
               }
+	    if (print_spaces)
+	      {
+		*out_ << " ";
+	      }
 	    *out_ << ":";
 	    for (StringPairVector::const_iterator it = path.second.begin();
 		 it != path.second.end(); ++it)
 	      {
+		if (print_spaces)
+		  {
+		    *out_ << " ";
+		  }
 		*out_ << get_print_format(it->second);
 	      }
             if (display_weights)

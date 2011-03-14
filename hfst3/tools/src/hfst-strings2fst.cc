@@ -109,34 +109,32 @@ print_usage()
         print_common_program_options(message_out);
         print_common_unary_program_options(message_out); 
         fprintf(message_out, "String and format options:\n"
-                "  -f, --format=FMT          Write result in FMT format\n"
-                "  -j, --disjunct-strings    Disjunct all strings instead of "
-                    "transforming each string into a separate transducer\n"
-                /*"      --sum                 Sum weights of duplicate strings "
-          "instead of taking minimum\n"*/
-                "      --norm                Divide each weight by sum "
-                    "of all weights (with option -j)\n"
-                "      --log                 Take negative logarithm "
-                    "of each weight\n"
-                "  -p, --pairstring          Input is in pairstring format\n"
-                "  -S, --spaces              Input has spaces between "
-                    "transitions\n"
-                "  -e, --epsilon=EPS         How epsilon is represented.\n"
+        "  -f, --format=FMT          Write result in FMT format\n"
+        "  -j, --disjunct-strings    Disjunct all strings instead of transforming\n"
+        "                            each string into a separate transducer\n"
+      /*"      --sum                 Sum weights of duplicate strings\n"
+	"                            instead of taking minimum\n"*/
+        "      --norm                Divide each weight by sum of all weights\n"
+        "                            (with option -j)\n"
+        "      --log                 Take negative logarithm of each weight\n"
+        "  -p, --pairstrings         Input is in pairstring format\n"
+        "  -S, --has-spaces          Input has spaces between symbols/symbol pairs\n"
+        "  -e, --epsilon=EPS         Interpret string EPS as epsilon.\n"
         "  -m, --multichar-symbols=FILE   Strings that must be tokenized as one symbol.\n"
         );
         fprintf(message_out, "\n");
 
         fprintf(message_out, 
-            "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
-            "FMT must be name of a format usable by libhfst, such as "
-            "openfst-tropical, sfst or foma\n"
-            "If EPS is not defined, the default representation of @0@ is used.\n"
+        "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
+        "FMT can be { sfst, openfst-tropical, openfst-log, foma }.\n"
+        "If EPS is not defined, the default representation of @0@ is used.\n"
         "Option --log precedes option --norm.\n"
-        "The FILE of option -m lists all multichar-symbols, each symbol on its own line.\n"   
-      "The backslash '\\' is reserved for escaping a colon (\"\\:\"), \n"
-		"a space (\"\\ \") or a backslash (\"\\\\\") \n"
-		"The weight of a string can be given after the string\n"
-		"separated by a tabulator\n"
+        "The FILE of option -m lists all multichar-symbols, each symbol\n"
+	"on its own line.\n"   
+        "The backslash '\\' is reserved for escaping a colon (\"\\:\"), \n"
+	"a space (\"\\ \") or a backslash (\"\\\\\").\n"
+	"The weight of a string can be given after the string separated\n"
+	"by a tabulator.\n"
         "\n"
             );
 
@@ -160,17 +158,17 @@ parse_options(int argc, char** argv)
     {
         static const struct option long_options[] =
         {
-        HFST_GETOPT_COMMON_LONG,
-        HFST_GETOPT_UNARY_LONG,
-          {"disjunct-strings", no_argument, 0, 'j'},
-          {"epsilon", required_argument, 0, 'e'},
-          {"norm", no_argument, 0, '2'},
-          {"log", no_argument, 0, '3'},
-          {"pairstrings", no_argument, 0, 'p'},
-          {"spaces", no_argument, 0, 'S'},
-      {"multichar-symbols", required_argument, 0, 'm'},
-          {"format", required_argument, 0, 'f'},
-          {0,0,0,0}
+	  HFST_GETOPT_COMMON_LONG,
+	  HFST_GETOPT_UNARY_LONG,
+	  {"disjunct-strings", no_argument, 0, 'j'},
+	  {"epsilon", required_argument, 0, 'e'},
+	  {"norm", no_argument, 0, '2'},
+	  {"log", no_argument, 0, '3'},
+	  {"pairstrings", no_argument, 0, 'p'},
+	  {"has-spaces", no_argument, 0, 'S'},
+	  {"multichar-symbols", required_argument, 0, 'm'},
+	  {"format", required_argument, 0, 'f'},
+	  {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT

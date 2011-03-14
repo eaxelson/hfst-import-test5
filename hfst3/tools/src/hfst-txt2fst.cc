@@ -44,7 +44,7 @@ using hfst::HfstOutputStream;
 // add tools-specific variables here
 static hfst::ImplementationType output_format = hfst::UNSPECIFIED_TYPE;
 // whether numbers are used instead of symbol names
-static bool use_numbers=false;
+static bool use_numbers=false; // not used
 // printname for epsilon
 static char *epsilonname=NULL;
 static const unsigned int EPSILON_KEY=0;
@@ -61,9 +61,9 @@ print_usage()
     print_common_unary_program_options(message_out);
     // fprintf(message_out, (tool-specific options and short descriptions)
     fprintf(message_out, "Text format options:\n"
-            "  -n, --number        If numbers are used instead of symbol names\n"
-            "  -f, --format=FMT    Write result using FMT backend's format\n"
-            "  -e, --epsilon=EPS   Map EPS as epsilon\n");
+            /*"  -n, --number        If numbers are used instead of symbol names\n"*/
+            "  -f, --format=FMT    Write result using FMT as backend format\n"
+            "  -e, --epsilon=EPS   Interpret string EPS as epsilon\n");
     fprintf(message_out, "\n");
     fprintf(message_out, 
         "If OUTFILE or INFILE is missing or -,"

@@ -769,17 +769,21 @@ namespace hfst {
               // replace "@_SPACE_@"s with " " and "@0@"s with 
               // "@_EPSILON_SYMBOL_@"
               input_symbol 
-		= replace_all
+		= replace_all 
 		(replace_all
-		 (replace_all(input_symbol, "@_SPACE_@", " "),
-		  "@0@", "@_EPSILON_SYMBOL_@"),
-		 "@_TAB_@", "\t");
+		 (replace_all
+		  (replace_all(input_symbol, "@_SPACE_@", " "),
+		   "@0@", "@_EPSILON_SYMBOL_@"),
+		  "@_TAB_@", "\t"),
+		 "@_COLON_@", ":");
 	      output_symbol 
 		= replace_all
 		(replace_all
-		 (replace_all(output_symbol, "@_SPACE_@", " "),
-		  "@0@", "@_EPSILON_SYMBOL_@"),
-		 "@_TAB_@", "\t");
+		 (replace_all
+		  (replace_all(output_symbol, "@_SPACE_@", " "),
+		   "@0@", "@_EPSILON_SYMBOL_@"),
+		  "@_TAB_@", "\t"),
+		 "@_COLON_@", ":");
 
               if (epsilon_symbol.compare(input_symbol) == 0)
                 input_symbol="@_EPSILON_SYMBOL_@";
