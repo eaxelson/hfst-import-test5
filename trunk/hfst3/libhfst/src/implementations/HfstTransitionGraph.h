@@ -614,7 +614,7 @@ namespace hfst {
                            const std::string &str2)
         {
           size_t pos = symbol.find(str1);
-          while (pos != string::npos) // while there are str1:s to replace
+          while (pos != std::string::npos) // while there are str1:s to replace
             {
               symbol.erase(pos, str1.size()); // erase str1
               symbol.insert(pos, str2);       // insert str2 instead
