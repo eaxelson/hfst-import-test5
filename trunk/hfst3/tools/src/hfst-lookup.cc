@@ -30,7 +30,7 @@
 #include <cstdarg>
 #include <getopt.h>
 #include <limits>
-
+#include <math.h>
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
@@ -63,12 +63,6 @@ using hfst::StringVector;
 using std::string;
 using std::vector;
 
-#ifdef INFINITY
-#undef INFINITY
-#endif
-
-float INFINITY;
- 
 /*
 typedef std::vector<std::string> HfstArcPath;
 typedef std::pair<HfstArcPath,float> HfstLookupPath;
@@ -1696,7 +1690,6 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
 
 
 int main( int argc, char **argv ) {
-    INFINITY = std::numeric_limits<float>::infinity();
     hfst_set_program_name(argv[0], "0.6", "HfstLookup");
     int retval = parse_options(argc, argv);
     if (retval != EXIT_CONTINUE)
