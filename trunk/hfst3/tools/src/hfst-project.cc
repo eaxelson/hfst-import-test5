@@ -45,7 +45,7 @@ using hfst::HfstOutputStream;
 
 
 // add tools-specific variables here
-bool project_upwards = false;
+bool project_input = false;
 
 void
 print_usage()
@@ -105,14 +105,14 @@ parse_options(int argc, char** argv)
                  (strncasecmp(optarg, "first", 1) == 0) ||
                  (strncasecmp(optarg, "analysis", 1) == 0) )
             {
-                project_upwards = true;
+                project_input = true;
             }
             else if ( (strncasecmp(optarg, "lower", 1) == 0) ||
                       (strncasecmp(optarg, "output", 1) == 0) ||
                       (strncasecmp(optarg, "second", 1) == 0) ||
                       (strncasecmp(optarg, "generation", 1) == 0) )
             {
-                project_upwards = false;
+                project_input = false;
             }
             else
             {
@@ -145,37 +145,37 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         transducer_n++;
         if (transducer_n==1)
         {
-          if (project_upwards)
+          if (project_input)
             {
-              verbose_printf("Projecting second %s...\n", inputfilename); 
+              verbose_printf("Projecting first %s...\n", inputfilename); 
             }
           else
             {
-              verbose_printf("Projecting first %s...\n", inputfilename);
+              verbose_printf("Projecting second %s...\n", inputfilename);
             }
         }
         else
         {
-          if (project_upwards)
+          if (project_input)
             {
-              verbose_printf("Projecting second %s... %zu\n", inputfilename,
+              verbose_printf("Projecting first %s... %zu\n", inputfilename,
                              transducer_n);
             }
           else
             {
-              verbose_printf("Projecting first %s... %zu\n", inputfilename,
+              verbose_printf("Projecting second %s... %zu\n", inputfilename,
                              transducer_n);
             }
         }
         
         HfstTransducer trans(instream);
-        if (project_upwards)
+        if (project_input)
           {
-            outstream << trans.output_project();
+            outstream << trans.input_project();
           }
         else
           {
-            outstream << trans.input_project();
+            outstream << trans.output_project();
           }
     }
     instream.close();
