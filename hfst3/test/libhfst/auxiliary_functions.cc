@@ -32,3 +32,12 @@ void verbose_print(const char *msg,
     fprintf(stderr, "...\n");
   }
 }
+
+unsigned char get_bin(size_t fact_128, size_t fact_64, size_t fact_32,
+		      size_t fact_16 , size_t fact_8 , size_t fact_4 ,
+		      size_t fact_2  , size_t fact_1)
+{
+  return 
+    fact_128*128 + fact_64*64 + fact_32*32 + fact_16*16 + fact_8*8 +
+    fact_4*4 + fact_2*2+ fact_1*1;
+}
