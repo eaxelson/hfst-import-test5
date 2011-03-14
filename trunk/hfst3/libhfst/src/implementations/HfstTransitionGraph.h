@@ -639,14 +639,22 @@ namespace hfst {
                   
                   os <<  it->first << "\t" 
                      <<  tr_it->get_target_state() << "\t"
-                // replace all spaces and epsilons
-                     <<  replace_all(replace_all(data.get_input_symbol(), 
-                                 " ", "@_SPACE_@"),
-                                 "@_EPSILON_SYMBOL_@", "@0@")
+                // replace all spaces, epsilons and tabs
+                     <<  
+		    replace_all
+		    (replace_all
+		     (replace_all(data.get_input_symbol(), 
+				  " ", "@_SPACE_@"),
+		      "@_EPSILON_SYMBOL_@", "@0@"),
+		     "\t", "@_TAB_@")
                      << "\t"
-                     <<  replace_all(replace_all(data.get_output_symbol(), 
-                                     " ", "@_SPACE_@"),
-                                     "@_EPSILON_SYMBOL_@", "@0@");
+                     <<  
+		    replace_all
+		    (replace_all
+		     (replace_all(data.get_output_symbol(), 
+				  " ", "@_SPACE_@"),
+		      "@_EPSILON_SYMBOL_@", "@0@"),
+		     "\t", "@_TAB_@");
                   if (write_weights)
                     os <<  "\t" << data.get_weight(); 
                   os << "\n";
@@ -677,12 +685,18 @@ namespace hfst {
                           it->first,
                           tr_it->get_target_state(),
                   // replace all spaces and epsilons
-                          replace_all(replace_all(data.get_input_symbol(), 
-                                              " ", "@_SPACE_@"),
-                                      "@_EPSILON_SYMBOL_@", "@0@").c_str(),
-                          replace_all(replace_all(data.get_output_symbol(),
-                                      " ", "@_SPACE_@"),
-                                      "@_EPSILON_SYMBOL_@", "@0@").c_str());
+			  replace_all
+			  (replace_all
+			   (replace_all(data.get_input_symbol(), 
+					" ", "@_SPACE_@"),
+			    "@_EPSILON_SYMBOL_@", "@0@"),
+			   "\t", "@_TAB_@").c_str(),
+			  replace_all
+			  (replace_all
+			   (replace_all(data.get_output_symbol(),
+					" ", "@_SPACE_@"),
+			    "@_EPSILON_SYMBOL_@", "@0@"),
+			   "\t", "@_TAB_@").c_str());
 
                   if (write_weights)
                     fprintf(file, "\t%f",
@@ -754,12 +768,18 @@ namespace hfst {
 
               // replace "@_SPACE_@"s with " " and "@0@"s with 
               // "@_EPSILON_SYMBOL_@"
-              input_symbol = replace_all
-                (replace_all(input_symbol, "@_SPACE_@", " "),
-                 "@0@", "@_EPSILON_SYMBOL_@");
-                  output_symbol = replace_all
-                (replace_all(output_symbol, "@_SPACE_@", " "),
-                 "@0@", "@_EPSILON_SYMBOL_@");
+              input_symbol 
+		= replace_all
+		(replace_all
+		 (replace_all(input_symbol, "@_SPACE_@", " "),
+		  "@0@", "@_EPSILON_SYMBOL_@"),
+		 "@_TAB_@", "\t");
+	      output_symbol 
+		= replace_all
+		(replace_all
+		 (replace_all(output_symbol, "@_SPACE_@", " "),
+		  "@0@", "@_EPSILON_SYMBOL_@"),
+		 "@_TAB_@", "\t");
 
               if (epsilon_symbol.compare(input_symbol) == 0)
                 input_symbol="@_EPSILON_SYMBOL_@";

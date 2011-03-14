@@ -120,6 +120,8 @@ namespace hfst
 
   void HfstTransducer::insert_to_alphabet(const std::string &symbol) 
   {
+    HfstTokenizer::check_utf8_correctness(symbol);
+
     switch(type)
       {
 #if HAVE_SFST
@@ -817,6 +819,8 @@ HfstTransducer::HfstTransducer(const std::string &symbol,
     if (not is_implementation_type_available(type))
         HFST_THROW(ImplementationTypeNotAvailableException);
 
+    HfstTokenizer::check_utf8_correctness(symbol);
+
     switch (this->type)
       {
 #if HAVE_SFST
@@ -854,6 +858,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   {
     if (not is_implementation_type_available(type))
         HFST_THROW(ImplementationTypeNotAvailableException);
+
+    HfstTokenizer::check_utf8_correctness(isymbol);
+    HfstTokenizer::check_utf8_correctness(osymbol);
 
     switch (this->type)
       {
@@ -896,6 +903,7 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   ImplementationType HfstTransducer::get_type(void) const {
     return this->type; }
   void HfstTransducer::set_name(const std::string &name) {
+    HfstTokenizer::check_utf8_correctness(name);
     this->name = name; }   
   std::string HfstTransducer::get_name() const {
     return this->name; }
@@ -1410,6 +1418,9 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
   HfstTransducer &HfstTransducer::insert_freely
   (const StringPair &symbol_pair)
   {
+    HfstTokenizer::check_utf8_correctness(symbol_pair.first);
+    HfstTokenizer::check_utf8_correctness(symbol_pair.second);
+
     /* Add symbols in symbol_pair to the alphabet of this transducer
        and expand unknown and epsilon symbols accordingly. */
     HfstTransducer tmp(symbol_pair.first, symbol_pair.second, this->type);
@@ -2671,10 +2682,15 @@ HfstTransducer::HfstTransducer(FILE * ifile,
                                const std::string &epsilon_symbol):
   type(type),anonymous(false),is_trie(false), name("")
 {
+
+
   if (not is_implementation_type_available(type))
     HFST_THROW_MESSAGE(ImplementationTypeNotAvailableException,
                        "HfstTransducer::HfstTransducer"
                        "(FILE*, ImplementationType, const std::string&)");
+
+    HfstTokenizer::check_utf8_correctness(epsilon_symbol);
+
   // Implemented only for internal transducer format.
   hfst::implementations::HfstBasicTransducer net =
     hfst::implementations::HfstTransitionGraph<hfst::implementations::
@@ -2742,6 +2758,8 @@ HfstTransducer &HfstTransducer::read_in_att_format
     std::string message(filename);
     HFST_THROW_MESSAGE(StreamNotReadableException, message);
   }
+  HfstTokenizer::check_utf8_correctness(epsilon_symbol);
+
   HfstTransducer &retval = read_in_att_format(ifile, type, epsilon_symbol);
   fclose(ifile);
   return retval;
@@ -2753,6 +2771,9 @@ HfstTransducer &HfstTransducer::read_in_att_format
   if (not is_implementation_type_available(type))
     HFST_THROW_MESSAGE(ImplementationTypeNotAvailableException,
                        "HfstTransducer::read_in_att_format");
+
+  HfstTokenizer::check_utf8_correctness(epsilon_symbol);
+
   hfst::implementations::HfstBasicTransducer net =
     hfst::implementations::HfstTransitionGraph<hfst::implementations::
       HfstTropicalTransducerTransitionData,float>

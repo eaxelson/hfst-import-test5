@@ -134,15 +134,18 @@ print_usage()
         "Option --log precedes option --norm.\n"
         "The FILE of option -m lists all multichar-symbols, each symbol on its own line.\n"   
       "The backslash '\\' is reserved for escaping a colon (\"\\:\"), \n"
-		"a space (\"\\ \") or a backslash (\"\\\\\") \n"	
+		"a space (\"\\ \") or a backslash (\"\\\\\") \n"
+		"The weight of a string can be given after the string\n"
+		"separated by a tabulator\n"
         "\n"
             );
 
         fprintf(message_out, "Examples:\n"
-            "  echo \"cat:dog\" | %s        create cat:dog fst\n"
-            "  echo \"c:da:ot:g\" | %s -p   same as pairstring\n"
-            "  echo \"c:d a:o t:g | %s -S   same with spaces\n"
-            "\n", program_name, program_name, program_name);
+            "  echo \"cat:dog\" | %s            create cat:dog fst\n"
+            "  echo \"c:da:ot:g\" | %s -p       same as pairstring\n"
+            "  echo \"c:d a:o t:g\" | %s -p -S  same as pairstring with spaces\n"
+            "  echo \"c a t:d o g\" | %s -S     same with spaces\n"
+		"\n", program_name, program_name, program_name, program_name);
         print_report_bugs();
         fprintf(message_out, "\n");
         print_more_info();
@@ -235,6 +238,8 @@ process_stream(HfstOutputStream& outstream)
   HfstTokenizer tok;
   HfstBasicTransducer disjunction;
   size_t line_n = 0;
+
+  try {
 
   HfstStrings2FstTokenizer
     multichar_symbol_tokenizer(multichar_symbols,std::string(epsilonname));
@@ -348,6 +353,11 @@ process_stream(HfstOutputStream& outstream)
     }
   free(line);
   return EXIT_SUCCESS;
+  }
+  catch(IncorrectUtf8CodingException e)
+    {
+      error(EXIT_FAILURE, errno, "Incorrect utf-8 coding.");
+    }
 }
 
 
