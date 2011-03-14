@@ -66,6 +66,8 @@ HFST_EXCEPTION_CHILD_DEFINITION(HfstFatalException);
 
 HFST_EXCEPTION_CHILD_DEFINITION(TransducerHasWrongTypeException);
 
+HFST_EXCEPTION_CHILD_DEFINITION(IncorrectUtf8CodingException);
+
 //HFST_EXCEPTION_CHILD_DEFINITION(SymbolRedefinedException); 
 //HFST_EXCEPTION_CHILD_DEFINITION(TransducerHasNoStartStateException);
 //HFST_EXCEPTION_CHILD_DEFINITION(TransducerHasMoreThanOneStartStateException);
