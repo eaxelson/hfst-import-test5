@@ -57,6 +57,7 @@ static int nbest_strings=-1;
 static bool display_weights=false;
 static bool eval_fd=false;
 static bool filter_fd=false;
+static bool quote_special=true;
 static unsigned int max_input_length = 0;
 static unsigned int max_output_length = 0;
 static std::string input_prefix;
@@ -80,9 +81,10 @@ print_usage()
 "  -N, --nbest=NBEST          print at most NBEST best strings\n"
 "  -c, --cycles=NCYC          follow cycles at most NCYC times\n"
 "  -w, --print-weights        display the weight for each string\n"
-"  -E, --epsilon-format=EPS   print epsilon as EPS\n"
+"  -e, --epsilon-format=EPS   print epsilon as EPS\n"
 "  -S, --print-pairstrings    print result in pairstring format\n"
-"  -X, --xfst=VARIABLE        toggle xfst compatibility option VARIABLE\n");
+"  -X, --xfst=VARIABLE        toggle xfst compatibility option VARIABLE\n"
+"  -D, --do-not-quote-special do not quote special characters\n");
     fprintf(message_out, "Ignore paths if:\n"
 "  -l, --max-in-length=MIL    input string longer than MIL\n"
 "  -L, --max-out-length=MOL   output string longer than MOL\n"
@@ -129,7 +131,7 @@ parse_options(int argc, char** argv)
             HFST_GETOPT_COMMON_LONG,
             HFST_GETOPT_UNARY_LONG,
             {"cycles", required_argument, 0, 'c'},
-            {"epsilon-format", required_argument, 0, 'E'},
+            {"epsilon-format", required_argument, 0, 'e'},
             {"in-exclude", required_argument, 0, 'u'},
             {"in-prefix", required_argument, 0, 'p'},
             {"max-in-length", required_argument, 0, 'l'},
@@ -141,12 +143,13 @@ parse_options(int argc, char** argv)
             {"print-pairstrings", no_argument, 0, 'S'},
             {"print-weights", no_argument, 0, 'w'},
             {"xfst", required_argument, 0, 'X'},
+	    {"do-not-quote-special", no_argument, 0, 'D'},
             {0,0,0,0}
           };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
                              HFST_GETOPT_UNARY_SHORT
-                             "SWc:E:u:p:l:L:n:N:U:P:X:",
+                             "Swc:e:u:p:l:L:n:N:U:P:X:D",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -178,12 +181,19 @@ parse_options(int argc, char** argv)
               {
                 filter_fd = false;
               }
+            else if (strcmp(optarg, "quote-special") == 0)
+              {
+                quote_special = true;
+              }
             else
               {
                 error(0, EXIT_FAILURE, "Unrecognised xfst option. "
                      "available options are obey-flags, print-flags\n");
               }
           break;
+	case 'D':
+	  quote_special = false;
+	  break;
         case 'l':
             max_input_length = hfst_strtoul(optarg, 10);
             break;
@@ -202,7 +212,7 @@ parse_options(int argc, char** argv)
         case 'U':
           output_exclude = optarg;
           break;
-        case 'E':
+        case 'e':
           epsilon_format = hfst_strdup(optarg);
           break;
         case 'S':
@@ -240,10 +250,16 @@ static std::string get_print_format(const std::string &s)
   if (s.compare("@_EPSILON_SYMBOL_@") == 0)
       return std::string(strdup(epsilon_format));
 
+  if (not quote_special)
+    return std::string(s);
+
   // escape spaces and colons as they have a special meaning
-  return replace_all
-    ( replace_all(std::string(s), " ", "@_SPACE_@"),
-      ":", "@_COLON_@");
+  return 
+    replace_all 
+    (replace_all
+     ( replace_all(std::string(s), " ", "@_SPACE_@"),
+       ":", "@_COLON_@"),
+     "\t", "@_TAB_@");
 }
 
 //Print results as they come
