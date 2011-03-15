@@ -2,7 +2,9 @@ package net.sf.hfst;
 
 import java.io.FileInputStream;
 import java.io.DataInputStream;
-import java.io.Console;
+import java.io.InputStreamReader;
+import java.io.BufferedReader;
+import java.io.IOException;
 import java.util.Collection;
 
 import net.sf.hfst.Transducer;
@@ -34,10 +36,16 @@ public class HfstOptimizedLookup {
     public static void runTransducer(Transducer t)
     {
 	System.out.println("Ready for input.");
-	Console console = System.console();
-	String str = console.readLine();
-	while (str != null)
+	BufferedReader stdin =
+	    new BufferedReader(new InputStreamReader(System.in));
+	String str;
+	while (true)
 	    {
+		try {
+		    str = stdin.readLine();
+		} catch (IOException e) {
+		    break;
+		}
 		try{
 		    for ( String analysis : t.analyze(str) )
 			{
@@ -46,12 +54,11 @@ public class HfstOptimizedLookup {
 		} catch (NoTokenizationException e) {
 		    System.out.println(e.message());
 		}
-    		str = console.readLine();
 	    }
     }
     
     
-    public static void main(String[] argv) throws java.io.IOException
+    public static void main(String[] argv) throws IOException
     {
 	if (argv.length != 1)
 	    {
