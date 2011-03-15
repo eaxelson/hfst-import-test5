@@ -184,7 +184,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                          inputfilename, transducer_n);
         }
         HfstTransducer orig(instream);
-        outstream << orig.convert(output_type, options);
+        outstream << orig.convert(output_type /*, options*/);
     }
     instream.close();
     outstream.close();
