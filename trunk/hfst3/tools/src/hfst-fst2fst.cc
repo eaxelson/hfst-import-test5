@@ -49,6 +49,7 @@ using hfst::ImplementationType;
 
 ImplementationType output_type = hfst::UNSPECIFIED_TYPE;
 bool hfst_format = true;
+std::string options = "";
 
 void
 print_usage()
@@ -68,7 +69,8 @@ print_usage()
     "  -t, --tropical-weight             Write output in (HFST's) tropical weight (OpenFST) implementation\n"
     "  -l, --log-weight                  Write output in (HFST's) log weight (OpenFST) implementation\n"
     "  -O, --optimized-lookup            Write output in the HFST optimized-lookup implementation\n"
-    "  -w, --optimized-lookup-weighted   Write output in optimized-lookup (weighted) implementation\n");
+    "  -w, --optimized-lookup-weighted   Write output in optimized-lookup (weighted) implementation\n"
+    "  -Q  --quick                       When converting to optimized-lookup, don't try hard to compress\n");
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
         fprintf(message_out, 
@@ -100,12 +102,13 @@ parse_options(int argc, char** argv)
           {"log-weight",         no_argument, 0, 'l'},
           {"optimized-lookup",   no_argument, 0, 'O'},
           {"optimized-lookup-weighted",no_argument, 0, 'w'},
+	  {"quick",              no_argument, 0, 'Q'},
           {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "SFtlOwf:b",
+                             HFST_GETOPT_UNARY_SHORT "SFtlOwQf:b",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -142,6 +145,9 @@ parse_options(int argc, char** argv)
         case 'w':
           output_type = hfst::HFST_OLW_TYPE;
           break;
+	case 'Q':
+	    options = "quick";
+	    break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -178,7 +184,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                          inputfilename, transducer_n);
         }
         HfstTransducer orig(instream);
-        outstream << orig.convert(output_type);
+        outstream << orig.convert(output_type, options);
     }
     instream.close();
     outstream.close();

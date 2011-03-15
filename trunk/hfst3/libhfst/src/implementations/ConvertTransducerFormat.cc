@@ -1032,12 +1032,13 @@ unsigned int hfst_ol_to_hfst_basic_add_state
      \a weighted defined whether the created transducer is weighted. */
   hfst_ol::Transducer * ConversionFunctions::
   hfst_basic_transducer_to_hfst_ol
-  (const HfstBasicTransducer * t, bool weighted)
+  (const HfstBasicTransducer * t, bool weighted, std::string options)
   {
+      const float packing_aggression = 0.75;
+      bool quick = options == "quick";
       typedef std::set<std::string> StringSet;
       // The transition array is indexed starting from this constant
       const unsigned int TA_OFFSET = 2147483648u;
-      const float packing_aggression = 0.7;
       const std::string epstr = "@_EPSILON_SYMBOL_@";
 
       // Symbols must be in the following order in an optimized-lookup
@@ -1180,9 +1181,11 @@ unsigned int hfst_ol_to_hfst_basic_add_state
         unsigned int i = first_available_index;
 
         // While this index is not suitable for a starting index, keep looking
-        while (!used_indices->fits(it->second, flag_symbols, i)) {
-            ++i;
-        }
+	if (!quick) {
+	    while (!used_indices->fits(it->second, flag_symbols, i)) {
+		++i;
+	    }
+	}
         it->second.start_index = i;
         // Once we've found a starting index, mark all the used input symbols
         used_state_index->insert(i);
@@ -1198,13 +1201,17 @@ unsigned int hfst_ol_to_hfst_basic_add_state
                 std::pair<unsigned int, hfst_ol::SymbolNumber>
                 (it->second.state_number, index_offset);
         }
-        while (!used_indices->available_for_first(
-               first_available_index, used_state_index) or
-               !used_indices->available_for_something(
-               first_available_index,
-               seen_input_symbols,
-               packing_aggression)) {
-            ++first_available_index;
+	if (quick) {
+	    first_available_index = used_indices->rbegin()->first + 1;
+	} else {
+	    while (!used_indices->available_for_first(
+		       first_available_index, used_state_index) or
+		   !used_indices->available_for_something(
+		       first_available_index,
+		       seen_input_symbols,
+		       packing_aggression)) {
+		++first_available_index;
+	    }
         }
     }
 

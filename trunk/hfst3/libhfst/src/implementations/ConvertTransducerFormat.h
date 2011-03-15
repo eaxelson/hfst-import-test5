@@ -133,7 +133,8 @@ namespace implementations {
     (hfst_ol::Transducer * t);
 
   static hfst_ol::Transducer * hfst_basic_transducer_to_hfst_ol
-    (const HfstBasicTransducer * t, bool weighted);
+      (const HfstBasicTransducer * t, bool weighted,
+       std::string options="");
 
   /* Define here the functions that convert between HfstBasicTransducer and 
      your transducer class. */
