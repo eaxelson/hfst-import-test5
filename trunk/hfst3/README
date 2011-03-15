@@ -58,6 +58,8 @@ Compilation requirements:
 
   - to disable foma backend, configure switch ``--without-foma`` may be used
 
+  - the *hfst-xfst* and *hfst-lexc* frontends **require** foma binary
+
 - Versions loaded from version control systems require a relatively new GNU
   tool-chain to build: 
 
@@ -99,6 +101,8 @@ Runtime requirements:
 - If you install the libraries in non-standard paths, you need to ensure
   that operating system is aware of this; In linux this may happen by setting
   LD_LIBRARY_PATH.
+
+- the *hfst-xfst* and *hfst-lexc* frontends **require** foma binary
 
 Installation
 ------------

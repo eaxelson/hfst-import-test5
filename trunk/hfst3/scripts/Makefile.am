@@ -15,5 +15,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+if CAN_FOMAWRAP
 bin_SCRIPTS = hfst-foma-wrapper.sh hfst-xfst hfst-lexc
 EXTRA_DIST=hfst-lexc hfst-xfst
+endif
