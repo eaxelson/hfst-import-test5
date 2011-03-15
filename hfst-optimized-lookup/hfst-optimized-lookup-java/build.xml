@@ -1,4 +1,4 @@
-<project name="MyProject" default="jar" basedir=".">
+<project name="HfstOptimizedLookup" default="jar" basedir=".">
     <description>
         simple example build file
     </description>
