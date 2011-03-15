@@ -48,6 +48,7 @@ using hfst::HFST_OL_TYPE;
 using hfst::HFST_OLW_TYPE;
 using hfst::implementations::HfstState;
 using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstBasicTransition;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 using hfst::HfstTokenizer;
@@ -1054,7 +1055,7 @@ bool is_lookup_infinitely_ambiguous
 	 would probably benefit from reorganizing the if/else blocks...) */
       else if (not only_epsilons)
     {
-      if (it->get_input_symbol().compare(s.second[index]) == 0) // ###
+      if (it->get_input_symbol().compare(s.second.at(index)) == 0) // ###
         {
           index++; // consume an input symbol in the lookup path s // ###
           std::set<HfstState> empty_set;
@@ -1106,6 +1107,7 @@ lookup_simple(const HfstOneLevelPath& s, HfstTransducer& t, bool* infinity)
     }
   return results;
 }
+
 
 /*
   @param t        The transducer where lookup is performed.
@@ -1179,10 +1181,10 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
       // that the maximum number of cycles is not going to be exceeded.
       if ( (visited_states.find(it->get_target_state()) 
 	    != visited_states.end() ||
-        state == it->get_target_state()) &&
+	    state == it->get_target_state()) &&
            cycles >= (unsigned int)infinite_cutoff ) {}
 
-      else {
+      else { // (*)
         epsilon_path.push_back(state);
         visited_states.insert(state);
         bool cycles_increased=false;
@@ -1193,15 +1195,16 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
 	    != visited_states.end()) {
           cycles_increased=true;
           cycles++;   
-          for (unsigned int i=epsilon_path.size()-1; 
-	       epsilon_path[i] != it->get_target_state(); i--) {
+	  for (int i=epsilon_path.size()-1; 
+	       i >= 0 && epsilon_path.at(i) != it->get_target_state(); i--) {
 	    //fprintf(stderr, "removing state %i\n", epsilon_path[i]);
 	    // ...remove the states that lead to the cycle so
 	    // they will not increase the number of cycles many times
-	    removed_states.push_back(epsilon_path[i]);
-	    visited_states.erase(visited_states.find(epsilon_path[i]));
+	    removed_states.push_back(epsilon_path.at(i));
+	    visited_states.erase(visited_states.find(epsilon_path.at(i)));
+	    assert(not epsilon_path.empty());
 	    epsilon_path.pop_back();
-          }     
+	  }     
         }
 	// add an output symbol to the traversed path
         path.second.push_back(it->get_output_symbol());
@@ -1217,26 +1220,30 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
 		  visited_states, epsilon_path, cycles,
 		  results_spv, path_spv, include_spv);
 	// remove the output symbol from the traversed path
+	assert(not path.second.empty());
         path.second.pop_back(); 
 
 	if (include_spv) { // if we want StringPairVector representation
+	  assert(not path_spv.empty());
 	  path_spv.pop_back();
 	}
 
 	// subtract the transition weight
         path.first = path.first - it->get_weight(); 
         
-        epsilon_path.pop_back();
+	assert(not epsilon_path.empty()); // FIXME: assert fails
+	epsilon_path.pop_back();
         visited_states.erase(visited_states.find(state));
         if (cycles_increased) {
           cycles--;
           for(int i=removed_states.size()-1; i>=0; i--) {
         //fprintf(stderr, "readding state %i\n", removed_states[i]);
-        epsilon_path.push_back(removed_states[i]);
-        visited_states.insert(removed_states[i]);
+	    epsilon_path.push_back(removed_states.at(i));
+	    visited_states.insert(removed_states.at(i));
           }
         }
-      }
+      } // else (*)
+
     }
 
       /* CASE 2: Other input symbols consume a symbol in the lookup path s,
@@ -1247,7 +1254,7 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
 	 if/else blocks...) */
       else if (not only_epsilons)
 	{
-	  if (it->get_input_symbol().compare(s.second[index]) == 0) //###
+	  if (it->get_input_symbol().compare(s.second.at(index)) == 0) //###
 	    {
 	      index++; // consume an input symbol in the lookup path s //###
 	      // add an output symbol to the traversed path
@@ -1265,9 +1272,11 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
 			visited_states, empty_path, cycles,
 			results_spv, path_spv, include_spv);
 	      // remove the output symbol from the traversed path
+	      assert(not path.second.empty());
 	      path.second.pop_back(); 
 
 	      if (include_spv) { // if we want StringPairVector representation
+		assert(not path_spv.empty());
 		path_spv.pop_back();
 	      }
 
@@ -1278,6 +1287,130 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
 	}
     }
 }
+
+// *** The functions that will replace the old lookup_fd begin... *** //
+
+static void push_back_to_two_level_path
+(HfstTwoLevelPath &path,
+ const StringPair &sp,
+ const float &weight)
+{
+  path.second.push_back(sp);
+  path.first = path.first + weight;
+}
+
+static void pop_back_from_two_level_path
+(HfstTwoLevelPath &path,
+ const float &weight)
+{
+  path.second.pop_back();
+  path.first = path.first - weight;
+}
+
+static void add_to_results
+(HfstTwoLevelPaths &results,
+ HfstTwoLevelPath &path_so_far,
+ const float &final_weight)
+{
+  path_so_far.first = path_so_far.first + final_weight;
+  results.insert(path_so_far);
+  path_so_far.first = path_so_far.first - final_weight;
+}
+
+static bool is_possible_transition
+(const HfstBasicTransition &transition,
+ const StringVector &lookup_path,
+ const unsigned int &lookup_index)
+{
+  std::string isymbol = transition.get_input_symbol();
+
+  // If we are not at the end of lookup_path,
+  if (not lookup_index == lookup_path.size())
+    {
+      // we can go further if the current symbol in lookup_path
+      // matches to the input symbol of the transition.
+      if ( isymbol.compare(lookup_path.at(lookup_index)) == 0 )
+	{
+	  return true;
+	}
+    }
+  // Whether there are more symbols in lookup_path or not,
+  // we can always go further if the input symbol of the transition
+  // is an epsilon or a flag diacritic.
+  if ( isymbol.compare("@_EPSILON_SYMBOL_@") == 0 || 
+       is_flag_diacritic(isymbol) )
+    {
+      return true;
+    }
+
+  // No matches.
+  return false;
+}
+
+static void lookup_fd
+(HfstBasicTransducer &t,
+ StringVector &lookup_path,
+ HfstTwoLevelPaths &results,
+ HfstState state,
+ unsigned int lookup_index, // an iterator instead?
+ HfstTwoLevelPath &path_so_far)
+{
+  // If we are at the end of lookup_path,
+  if (lookup_index == lookup_path.size())
+    {
+      // and if the current state is final, 
+      if (t.is_final_state(state)) 
+	{
+	  // path_so_far is a valid result.
+	  add_to_results
+	    (results, path_so_far, t.get_final_weight(state) );
+	}
+    }
+
+  // Whether there are more symbols in lookup_path or not,
+  // go through all transitions in the current state.
+  HfstBasicTransducer::HfstTransitionSet transitions = t[state];
+  for (HfstBasicTransducer::HfstTransitionSet::iterator it 
+	 = transitions.begin();
+       it != transitions.end(); it++)
+    {
+      if ( is_possible_transition
+	   (*it, lookup_path, lookup_index) )
+	{
+	  // update path_so_far and lookup_index
+	  push_back_to_two_level_path
+	    (path_so_far, 
+	     StringPair(it->get_input_symbol(), it->get_output_symbol()),
+	     it->get_weight());
+	  lookup_index++;
+
+	  // call lookup for the target state of the transition
+	  lookup_fd(t, lookup_path, results, it->get_target_state(),
+		    lookup_index, path_so_far);
+
+	  // return to the original values of path_so_far and lookup_index
+	  lookup_index--;
+	  pop_back_from_two_level_path(path_so_far, it->get_weight());
+	}
+    }
+  
+}
+
+static void lookup_fd
+(HfstBasicTransducer &t,
+ StringVector &lookup_path,
+ HfstTwoLevelPaths &results)
+{
+  HfstState state = 0;
+  unsigned int lookup_index = 0;
+  HfstTwoLevelPath path_so_far;
+  lookup_fd(t, lookup_path, results, state, lookup_index, path_so_far);
+}
+
+// *** ... the functions that will replace the old lookup_fd end. *** //
+
+
+
 
 /* Replace all strings \a str1 in \a symbol with \a str2. */
 static std::string replace_all(std::string symbol, 
