@@ -1,6 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 LDADD = ../../libhfst/src/libhfst.la
-AM_CPPFLAGS = -I../../libhfst/src/ -I. -g
+AM_CPPFLAGS = -I$(top_srcdir)/libhfst/src/ -I. -g
 AM_CXXFLAGS = -Wno-deprecated
 
 # programs to build before unit etc. testing
@@ -17,6 +17,7 @@ test_transducer_functions_SOURCES=test_transducer_functions.cc
 test_hfst_basic_transducer_SOURCES=test_hfst_basic_transducer.cc
 test_flag_diacritics_SOURCES=test_flag_diacritics.cc
 test_examples_SOURCES=test_examples.cc
+noinst_HEADERS=auxiliary_functions.cc
 
 # programs to run for unit etc. testing
 TESTS=test_rules test_constructors test_streams test_tokenizer \
