@@ -624,7 +624,7 @@ in \a ifile.
         @note For conversion between implementations::HfstTransitionGraph and HfstTransducer,
         see HfstTransducer(const hfst::implementations::HfstBasicTransducer&, ImplementationType) and #hfst::implementations::HfstTransitionGraph::HfstTransitionGraph(const hfst::HfstTransducer&).
     */
-    HfstTransducer &convert(ImplementationType type);
+    HfstTransducer &convert(ImplementationType type, std::string options="");
 
 
     // --------------------------------------------------------
