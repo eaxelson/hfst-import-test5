@@ -321,7 +321,7 @@ hfst_fopen(const char* filename, const char* mode)
     }
     else
     {
-        error(EXIT_FAILURE, errno, "Could not open %s", filename);
+        error(EXIT_FAILURE, errno, "Could not open '%s'. ", filename);
         return NULL;
     }
 }
