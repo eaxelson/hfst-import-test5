@@ -318,7 +318,9 @@ AC_PROG_AWK
 AC_PROG_CPP
 AC_PROG_YACC
 AC_PROG_LEX
-AC_PATH_PROG([FOMACLI], [foma])
+AC_PATH_PROG([FOMACLI], [foma], [false])
+AM_CONDITIONAL([CAN_FOMAWRAP], [test x$FOMACLI != xfalse])
+AS_IF([test x$FOMACLI = xfalse], [AC_MSG_WARN([You cannot use hfst-lexc or hfst-xfst without available foma binaries])])
 # if flex 3.X ever comes out, this breaks :)
 LEX_VERSION=`$LEX --version`
 AS_IF([test -z "`echo "$LEX_VERSION" | grep 'flex 2\.[[5-9]]\.[[3-9][4-9]]'`"],
