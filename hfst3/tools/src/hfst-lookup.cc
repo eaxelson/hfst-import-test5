@@ -102,8 +102,6 @@ static bool print_pairs = false;
 static bool print_space = false;
 static bool quote_special = false;
 
-static bool print_in_pairstring_format = false;
-
 static char* epsilon_format = "";
 static char* space_format = "";
 
@@ -236,7 +234,11 @@ print_usage()
 	    "flag diacritic checks\n"
 	    "  are printed and flag diacritic symbols are not printed.\n"
 	    "  For other formats, all flag paths are allowed.\n"
-	    "  Support VARIABLE \"print-space\" for optimized lookup format\n");
+	    "  Support VARIABLE 'print-space' for optimized lookup format\n");
+    fprintf(message_out,
+	    "\n"
+	    "Known bugs:\n"
+	    "  'quote-special' quotes spaces that come from 'print-space'\n");
 
     fprintf(message_out, "\n");
     print_report_bugs();
@@ -327,9 +329,6 @@ parse_options(int argc, char** argv)
                 return EXIT_FAILURE;
               }
             break;
-	case 'P':
-	  print_in_pairstring_format = true;
-	  break;
 	case 'e':
 	  epsilon_format = hfst_strdup(optarg);
 	  break;
@@ -340,7 +339,7 @@ parse_options(int argc, char** argv)
             if (strcmp(optarg, "print-pairs") == 0)
               {
                 print_pairs = true;
-                error(EXIT_FAILURE, 0, "Unimplemented pair printing");
+                /* error(EXIT_FAILURE, 0, "Unimplemented pair printing"); */
               }
             else if (strcmp(optarg, "print-space") == 0)
               {
@@ -477,7 +476,7 @@ is_flag_diacritic(const std::string& label)
 bool
 is_valid_flag_diacritic_path(StringVector arcs)
   {
-    if (not print_in_pairstring_format)
+    if (not print_pairs)
       fprintf(stderr, "Allowing all flag paths!\n");
     return true;
   }
@@ -1344,9 +1343,9 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
   lookup_fd(t, results, s, index, 
 	    path, initial_state,
 	    visited_states, epsilon_path, cycles,
-	    results_spv, path_spv, print_in_pairstring_format);
+	    results_spv, path_spv, print_pairs);
 
-  if (print_in_pairstring_format) {
+  if (print_pairs) {
     
     /* No results, print just the lookup string. */
     if (results_spv.size() == 0) {
@@ -1363,9 +1362,14 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
 	fprintf(outfile, "\t");
 	
 	/* and the path that yielded the result string */
+	bool first_pair=true;
 	for (StringPairVector::const_iterator IT = it->second.begin();
 	     IT != it->second.end(); IT++) {
-	  fprintf(outfile, "%s:%s ", 
+	  if (print_space && not first_pair) {
+	    fprintf(outfile, " ");
+	  }
+	  first_pair=false;
+	  fprintf(outfile, "%s:%s", 
 		  get_print_format(IT->first).c_str(), 
 		  get_print_format(IT->second).c_str());
 	}
@@ -1597,11 +1601,11 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     // if transducer type is other than optimized_lookup,
     // convert to HfstBasicTransducer
 
-    if (print_in_pairstring_format && 
+    if (print_pairs && 
 	(inputstream.get_type() == HFST_OL_TYPE || 
 	 inputstream.get_type() == HFST_OLW_TYPE) ) {
       fprintf(outstream, 
-	      "Error: option --print-in-pairstring-format not supported on "
+	      "Error: pair printing not supported on "
 	      "       optimized lookup transducers, exiting program\n" );
       exit(1);
     }
@@ -1664,7 +1668,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                                                          unknown,
                                                          &infinite);
           }
-	if (not print_in_pairstring_format) { 
+	if (not print_pairs) { 
 	  // printing was already done in function lookup_fd
 	  print_lookups(*kvs, *kv, markup, unknown, infinite, outstream);
 	}
