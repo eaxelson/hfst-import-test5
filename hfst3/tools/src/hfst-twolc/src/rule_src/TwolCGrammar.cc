@@ -96,7 +96,7 @@ void TwolCGrammar::add_rule(const std::string &name,
       rule = new RightArrowRule(name,center_fst,contexts);
       other_rule_container.add_rule
 	(static_cast<RightArrowRule*>(rule));
-
+      name_to_rule_subcases[get_original_name(name)].insert(rule);
       rule = new LeftArrowRule(name,center_fst,contexts);
       other_rule_container.add_rule
 	(static_cast<LeftArrowRule*>(rule));
