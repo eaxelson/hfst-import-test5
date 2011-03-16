@@ -5,8 +5,8 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
-Noteworthy changes in 3.0_rc1
------------------------------
+Noteworthy changes in 3.0
+-------------------------
 
 * all new API in object oriented form
 
