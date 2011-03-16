@@ -64,9 +64,9 @@ Compilation requirements:
 
   - If you only have a local version of a library, you can use it with
     appropriate LDFLAGS and CXXFLAGS, eg.
-    ``LDFLAGS=-L/path/to/local/lib ./configure 
+    ``./configure LDFLAGS=-L/path/to/local/lib
     --prefix=/path/to/local/installation`` and
-    ``make LDFLAGS=-L/path/to/local/lib CXXFLAGS=-I/path/to/local/headers``
+    ``make CXXFLAGS=-I/path/to/local/headers``
 
 - Versions loaded from version control systems require a relatively new GNU
   tool-chain to build: 
