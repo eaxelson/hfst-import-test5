@@ -323,12 +323,13 @@ parse_options(int argc, char** argv)
         HFST_GETOPT_COMMON_LONG,
         HFST_GETOPT_UNARY_LONG,
           {"format", required_argument, 0, 'f'},
-	  {"harmonize-smaller", no_argument, 0, 'H'},	  
+	  {"harmonize-smaller", no_argument, 0, 'H'},
+	  {"weighted", no_argument, 0, 'w'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "f:H",
+                             HFST_GETOPT_UNARY_SHORT "f:Hw",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -345,6 +346,12 @@ parse_options(int argc, char** argv)
 	case 'H':
 	    hfst::set_harmonize_smaller(true);
 	    break;
+	case'w':
+            verbose_printf(
+	    "Interpreting deprecated -w switch as openfst tropical format\n");
+	    output_format = hfst::TROPICAL_OPENFST_TYPE;
+	    break;
+	    	 
 #include "inc/getopt-cases-error.h"
         }
     }
