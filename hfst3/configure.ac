@@ -19,7 +19,7 @@
 AC_PREREQ([2.62])
 
 # init
-AC_INIT([hfst], [3.0_rc1], [hfst-bugs@helsinki.fi], [hfst], [http://hfst.sf.net])
+AC_INIT([hfst], [3.0], [hfst-bugs@helsinki.fi], [hfst], [http://hfst.sf.net])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall -Werror std-options foreign check-news color-tests silent-rules 1.11])
 AM_SILENT_RULES([yes])
@@ -32,7 +32,7 @@ AC_CONFIG_HEADERS([config.h])
 HFST_NAME=hfst
 HFST_MAJOR=3
 HFST_MINOR=0
-HFST_EXTENSION=_rc1
+#HFST_EXTENSION=
 HFST_VERSION=$HFST_MAJOR.$HFST_MINOR$HFST_EXTENSION
 # for package-config pc file
 LIBHFST_NAME=hfst
