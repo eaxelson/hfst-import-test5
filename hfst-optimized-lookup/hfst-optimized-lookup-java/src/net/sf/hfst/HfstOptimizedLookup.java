@@ -33,29 +33,32 @@ public class HfstOptimizedLookup {
 
     public static enum FlagDiacriticOperator {P, N, R, D, C, U};
 
-    public static void runTransducer(Transducer t)
-    {
-	System.out.println("Ready for input.");
-	BufferedReader stdin =
-	    new BufferedReader(new InputStreamReader(System.in));
-	String str;
-	while (true)
-	    {
-		try {
-		    str = stdin.readLine();
-		} catch (IOException e) {
-		    break;
-		}
-		try{
-		    for ( String analysis : t.analyze(str) )
-			{
-			    System.out.println( analysis );
+    public static void runTransducer(Transducer t) {
+		System.out.println("Ready for input.");
+		BufferedReader stdin = new BufferedReader(new InputStreamReader(
+				System.in));
+		String str;
+		while (true) {
+			try {
+				str = stdin.readLine();
+			} catch (IOException e) {
+				break;
 			}
-		} catch (NoTokenizationException e) {
-		    System.out.println(e.message());
+			try {
+				Collection<String> analyses = t.analyze(str);
+				for (String analysis : analyses) {
+					System.out.println(str + "\t" + analysis);
+				}
+				if (analyses.isEmpty()) {
+					System.out.println(str + "\t+?");
+				}
+			} catch (NoTokenizationException e) {
+				// System.out.println(e.message());
+				System.out.println(str + "\t+?");
+			}
+			System.out.println();
 		}
-	    }
-    }
+	}
     
     
     public static void main(String[] argv) throws IOException
