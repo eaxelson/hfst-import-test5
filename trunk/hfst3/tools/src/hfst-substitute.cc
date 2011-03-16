@@ -97,15 +97,20 @@ print_usage()
     print_common_program_options(message_out);
     print_common_unary_program_options(message_out);
     fprintf(message_out, "Relabeling options:\n"
-            "  -f, --from-label=LABEL     replace LABEL\n"
-            "  -t, --to-label=LABEL       replace with LABEL\n"
-            "  -T, --to-transducer=FILE   replace with transducer "
-            "read from FILE\n"
+            "  -f, --from-label=FLABEL      replace FLABEL\n"
+            "  -t, --to-label=TLABEL        replace with TLABEL\n"
+            "  -T, --to-transducer=TFILE    replace with transducer "
+            "read from TFILE\n"
+            "  -F, --from-file=LABELFILE    read replacements from LABELFILE\n"
            );
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
-    fprintf(message_out, "LABEL must be a symbol name of single arc in "
-            "transducer\n");
+    fprintf(message_out, "LABEL must be a symbol name in single arc in "
+            "transducer,"
+            " or colon separated pair defining an arc\n"
+            "if TFILE is specified, FLABEL must be a pair\n"
+            "LABELFILE is a 2 column tsv file where col 1 is FLABEL and"
+            "col 2 TLABEL specifications");
     fprintf(message_out,
            "\n"
            "Examples:\n"
