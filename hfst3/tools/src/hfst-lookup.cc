@@ -1109,187 +1109,6 @@ lookup_simple(const HfstOneLevelPath& s, HfstTransducer& t, bool* infinity)
 }
 
 
-/*
-  @param t        The transducer where lookup is performed.
-  @param results  The resulting set of output strings.
-  @param s        The input string that is looked up.
-  @param index    An index that points to the intput symbol in \a s
-                  that is being matched next.
-  @param path     The output string that \a s has yielded so far.
-  @param state    The state in \a t where we are.
-  @param visited_states  A multiset of states that have been already visited
-                         Used for cycle detection.
-  @param epsilon_path    The path of consecutive input epsilon transitions.
-  @param cycles   The number of cycles followed.
-
-  @param results_spv  A StringPairVector representation of the paths traversed.
-  @param path_spv     The path so far traversed.
-  @param include_spv  Whether to include a StringPairVector representation
-                      of the paths traversed.
-
-  The last three arguments can be used when we are interested in the exact
-  alignments of the paths that a lookup string has yielded.
-
-  @pre The transducer \a t has tropical weights or no weights.
-  @todo flag diacritics must be handled outside this function
- */
-void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results, 
-	       const HfstOneLevelPath& s, unsigned int& index, 
-	       HfstOneLevelPath& path, HfstState state, 
-	       std::multiset<HfstState>& visited_states, 
-	       std::vector<HfstState>& epsilon_path,
-	       unsigned int& cycles,
-	       /* These arguments that are used when include_spv == true */
-	       HfstTwoLevelPaths &results_spv,
-	       StringPairVector &path_spv,
-	       bool &include_spv)
-{ 
-  // Whether the end of the lookup path s has been reached
-  bool only_epsilons=false;
-  if ((unsigned int)s.second.size() == index)
-    only_epsilons=true;
-  // If the end of the lookup path s has been reached
-  // and we are in a final state, add the traversed path to results
-  if (only_epsilons && t.is_final_state(state)) {
-    // add the final weight
-    path.first = path.first + t.get_final_weight(state); 
-    results.insert(path);
-
-    if (include_spv) { // if we want StringPairVector representation
-      HfstTwoLevelPath p(path.first, path_spv);
-      results_spv.insert(p);
-    }
-
-    // subtract the final weight
-    path.first = path.first - t.get_final_weight(state); 
-  }
-
-  // Go through all transitions in this state
-  HfstBasicTransducer::HfstTransitionSet transitions = t[state];
-  for (HfstBasicTransducer::HfstTransitionSet::iterator it 
-	 = transitions.begin();
-       it != transitions.end(); it++)
-    {
-      // CASE 1: Input epsilons do not consume a symbol in the lookup path s,
-      //         so they can be added freely.
-      if ((it->get_input_symbol().compare("@_EPSILON_SYMBOL_@") == 0) ||
-          (is_flag_diacritic(it->get_input_symbol())) )
-    {
-
-      // If the target state is a visited state or the target state is
-      // the current state, there is a cycle and we must check
-      // that the maximum number of cycles is not going to be exceeded.
-      if ( (visited_states.find(it->get_target_state()) 
-	    != visited_states.end() ||
-	    state == it->get_target_state()) &&
-           cycles >= (unsigned int)infinite_cutoff ) {}
-
-      else { // (*)
-        epsilon_path.push_back(state);
-        visited_states.insert(state);
-        bool cycles_increased=false;
-        std::vector<HfstState> removed_states;
-        
-        // If there is a cycle... 
-        if (visited_states.find(it->get_target_state()) 
-	    != visited_states.end()) {
-          cycles_increased=true;
-          cycles++;   
-	  for (int i=epsilon_path.size()-1; 
-	       i >= 0 && epsilon_path.at(i) != it->get_target_state(); i--) {
-	    //fprintf(stderr, "removing state %i\n", epsilon_path[i]);
-	    // ...remove the states that lead to the cycle so
-	    // they will not increase the number of cycles many times
-	    removed_states.push_back(epsilon_path.at(i));
-	    visited_states.erase(visited_states.find(epsilon_path.at(i)));
-	    assert(not epsilon_path.empty());
-	    epsilon_path.pop_back();
-	  }     
-        }
-	// add an output symbol to the traversed path
-        path.second.push_back(it->get_output_symbol());
-
-	if (include_spv) { // if we want StringPairVector representation
-	  StringPair p(it->get_input_symbol(), it->get_output_symbol());
-	  path_spv.push_back(p);
-	}
-
-	// add the transition weight 
-        path.first = path.first + it->get_weight(); 
-        lookup_fd(t, results, s, index, path, it->get_target_state(), 
-		  visited_states, epsilon_path, cycles,
-		  results_spv, path_spv, include_spv);
-	// remove the output symbol from the traversed path
-	assert(not path.second.empty());
-        path.second.pop_back(); 
-
-	if (include_spv) { // if we want StringPairVector representation
-	  assert(not path_spv.empty());
-	  path_spv.pop_back();
-	}
-
-	// subtract the transition weight
-        path.first = path.first - it->get_weight(); 
-        
-	assert(not epsilon_path.empty()); // FIXME: assert fails
-	epsilon_path.pop_back();
-        visited_states.erase(visited_states.find(state));
-        if (cycles_increased) {
-          cycles--;
-          for(int i=removed_states.size()-1; i>=0; i--) {
-        //fprintf(stderr, "readding state %i\n", removed_states[i]);
-	    epsilon_path.push_back(removed_states.at(i));
-	    visited_states.insert(removed_states.at(i));
-          }
-        }
-      } // else (*)
-
-    }
-
-      /* CASE 2: Other input symbols consume a symbol in the lookup path s,
-	 so they can be added only if the end of the lookup path s
-	 has not been reached. (This code is almost the same as in case 1,
-	 but has three extra lines marked with the comment ###. 
-	 The whole function would probably benefit from reorganizing the 
-	 if/else blocks...) */
-      else if (not only_epsilons)
-	{
-	  if (it->get_input_symbol().compare(s.second.at(index)) == 0) //###
-	    {
-	      index++; // consume an input symbol in the lookup path s //###
-	      // add an output symbol to the traversed path
-	      path.second.push_back(it->get_output_symbol());
-
-	      if (include_spv) { // if we want StringPairVector representation
-		StringPair p(it->get_input_symbol(), it->get_output_symbol());
-		path_spv.push_back(p);
-	      }
-
-	      // add the transition weight 
-	      path.first = path.first + it->get_weight(); 
-	      std::vector<HfstState> empty_path;
-	      lookup_fd(t, results, s, index, path, it->get_target_state(),
-			visited_states, empty_path, cycles,
-			results_spv, path_spv, include_spv);
-	      // remove the output symbol from the traversed path
-	      assert(not path.second.empty());
-	      path.second.pop_back(); 
-
-	      if (include_spv) { // if we want StringPairVector representation
-		assert(not path_spv.empty());
-		path_spv.pop_back();
-	      }
-
-	      // subtract the transition weight
-	      path.first = path.first - it->get_weight(); 
-	      index--; // add the input symbol back to the lookup path s. //###
-	    }
-	}
-    }
-}
-
-// *** The functions that will replace the old lookup_fd begin... *** //
-
 /* A class for handling input epsilon cycles in function lookup_fd. */
 class EpsilonHandler
 {
@@ -1391,24 +1210,15 @@ static bool is_possible_transition
  const unsigned int &lookup_index,
  bool &input_symbol_consumed)
 {
-  //fprintf(stderr, "lookup_index: %i\n", (int)lookup_index);
-  //fprintf(stderr, "lookup_path size: %i\n", (int)lookup_path.size());
-
   std::string isymbol = transition.get_input_symbol();
-
-  //fprintf(stderr, "transition input symbol: %s\n", isymbol.c_str());
-  //fprintf(stderr, "lookup_path symbol: %s\n\n", 
-  //lookup_path.at(lookup_index).c_str();
 
   // If we are not at the end of lookup_path,
   if (not (lookup_index == (unsigned int)lookup_path.size()))
     {
-      //fprintf(stderr, "HERE..\n");
       // we can go further if the current symbol in lookup_path
       // matches to the input symbol of the transition.
       if ( isymbol.compare(lookup_path.at(lookup_index)) == 0 )
 	{
-	  //fprintf(stderr, "..HERE\n");
 	  input_symbol_consumed=true;
 	  return true;
 	}
@@ -1441,8 +1251,6 @@ static void lookup_fd
     return;
   }
 
-  //fprintf(stderr, "lookup_fd in state %i..\n", state);
-
   // If we are at the end of lookup_path,
   if (lookup_index == lookup_path.size())
     {
@@ -1452,7 +1260,6 @@ static void lookup_fd
 	  // path_so_far is a valid result.
 	  add_to_results
 	    (results, path_so_far, t.get_final_weight(state) );
-	  //fprintf(stderr, "  added a path\n");
 	}
     }
 
@@ -1514,9 +1321,6 @@ static void lookup_fd
   lookup_fd(t, lookup_path, results, state, lookup_index, path_so_far, Eh);
 }
 
-// *** ... the functions that will replace the old lookup_fd end. *** //
-
-
 
 
 /* Replace all strings \a str1 in \a symbol with \a str2. */
@@ -1565,29 +1369,13 @@ static void print_lookup_string(const StringVector &s) {
 void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results, 
 	       const HfstOneLevelPath& s, ssize_t limit = -1)
 {
-  HfstOneLevelPath path;
-  path.first=0;
   (void)limit;
-  unsigned int index=0;
-  HfstState initial_state=0;
-  std::multiset<HfstState> visited_states;
-  visited_states.insert(initial_state);
-  std::vector<HfstState> epsilon_path;
-  epsilon_path.push_back(initial_state);
-  unsigned int cycles=0;
 
   /* If we want a StringPairVector representation */
   HfstTwoLevelPaths results_spv;
   StringPairVector path_spv;
 
   lookup_fd(t, s.second, results_spv);
-
-  /*
-  lookup_fd(t, results, s, index, 
-	    path, initial_state,
-	    visited_states, epsilon_path, cycles,
-	    results_spv, path_spv, print_pairs);
-  */
 
   if (print_pairs) {
     
@@ -1623,6 +1411,20 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
     }
     fprintf(outfile, "\n");
   }
+
+  // Convert HfstTwoLevelPaths into HfstOneLevelPaths
+  for (HfstTwoLevelPaths::const_iterator it = results_spv.begin();
+       it != results_spv.end(); it++)
+    {
+      StringVector sv;
+      for (StringPairVector::const_iterator spv_it = it->second.begin();
+	   spv_it != it->second.end(); spv_it++)
+	{
+	  sv.push_back(spv_it->second);
+	}
+      HfstOneLevelPath path(it->first, sv);
+      results.insert(path);
+    }
  
   HfstOneLevelPaths filtered;
   for (HfstOneLevelPaths::iterator res = results.begin();
