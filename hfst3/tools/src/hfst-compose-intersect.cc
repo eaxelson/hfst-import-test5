@@ -62,7 +62,7 @@ print_usage()
             "\n"
             "Examples:\n"
             "  %s -o analyzer.hfst hfst-lexc-lexicon.hfst" 
-		"hfst-twolc-rules.hfst\n"
+            " hfst-twolc-rules.hfst  compose rules with lexicon\n"
             "\n",
             program_name );
         print_report_bugs();
