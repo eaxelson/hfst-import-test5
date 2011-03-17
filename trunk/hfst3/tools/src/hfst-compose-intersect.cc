@@ -61,7 +61,7 @@ print_usage()
         fprintf(message_out,
             "\n"
             "Examples:\n"
-            "  %s -o analyzer.hfst hfst-lexc-lexicon.hfst" 
+            "  %s -o analyzer.hfst hfst-lexc-lexicon.hfst " 
             " hfst-twolc-rules.hfst  compose rules with lexicon\n"
             "\n",
             program_name );
