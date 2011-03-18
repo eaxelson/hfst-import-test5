@@ -58,7 +58,7 @@ static int nbest_strings=-1;
 static bool display_weights=false;
 static bool eval_fd=false;
 static bool filter_fd=true;
-static bool quote_special=true;
+static bool quote_special=false;
 static bool print_spaces=false;
 static unsigned int max_input_length = 0;
 static unsigned int max_output_length = 0;
@@ -92,8 +92,8 @@ print_usage()
 "  -L, --max-out-length=MOL   output string longer than MOL\n"
 "  -p, --in-prefix=OPREFIX    input string not beginning with IPREFIX\n"
 "  -P, --out-prefix=OPREFIX   output string not beginning with OPREFIX\n"
-"  -x, --in-exclude=IXSTR     input string containing IXSTR\n"
-"  -X, --out-exclude=OXST     output string containing OXSTR\n");
+"  -u, --in-exclude=IXSTR     input string containing IXSTR\n"
+"  -U, --out-exclude=OXST     output string containing OXSTR\n");
 
     fprintf(message_out, "\n");
 
@@ -260,7 +260,7 @@ static std::string get_print_format(const std::string &s)
 {
   // print epsilon as defined by the user or use the default
   if (s.compare("@_EPSILON_SYMBOL_@") == 0)
-      return std::string(strdup(epsilon_format));
+    return std::string(strdup(epsilon_format));
 
   if (not quote_special)
     return std::string(s);
@@ -269,7 +269,8 @@ static std::string get_print_format(const std::string &s)
   return 
     replace_all 
     (replace_all
-     ( replace_all(std::string(s), " ", "@_SPACE_@"),
+     ( replace_all
+       (std::string(s), " ", "@_SPACE_@"),
        ":", "@_COLON_@"),
      "\t", "@_TAB_@");
 }
