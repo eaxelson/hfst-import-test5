@@ -5,7 +5,7 @@ for i in "" .sfst .ofst .foma; do
             echo turning cat.hfst$i to strings failed
             exit 1
         fi
-        if ! diff test.strings cat.two-level.strings > /dev/null 2>&1 ; then
+        if ! diff test.strings cat.strings > /dev/null 2>&1 ; then
             echo cat.hfst$i strings differ from expected
             exit 1
         fi
