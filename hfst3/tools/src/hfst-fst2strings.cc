@@ -56,7 +56,7 @@ static int cycles = -1;
 static int nbest_strings=-1;
 static bool display_weights=false;
 static bool eval_fd=false;
-static bool filter_fd=false;
+static bool filter_fd=true;
 static bool quote_special=true;
 static bool print_spaces=false;
 static unsigned int max_input_length = 0;
@@ -109,7 +109,7 @@ print_usage()
     fprintf(message_out,
         "\n"
         "Examples:\n"
-        "  %s  lexical.hfst  generates all forms of lexical.hfst\n"
+        "  %s lexical.hfst  generates all forms of lexical.hfst\n"
         "\n", program_name);
 
     fprintf(message_out, 
