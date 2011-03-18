@@ -310,7 +310,7 @@ SET_SYMBOL: GRAMMAR_SYMBOL_SPACE
     }
   else
     { 
-      latest_set.push_back(get_symbol_queue_front()); 
+      latest_set.push_back(unescape(get_symbol_queue_front())); 
       reduce_queue();  
     }
 }
