@@ -38,6 +38,7 @@
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
+using hfst::FdOperation;
 
 using hfst::WeightedPaths;
 using hfst::WeightedPath;
@@ -85,8 +86,7 @@ print_usage()
 "  -e, --epsilon-format=EPS   print epsilon as EPS\n"
 /*"  -a, --print-pairstrings    print result in pairstring format\n"*/
 /*"  -S, --print-spaces         print spaces between symbols/symbol pairs\n"*/
-"  -X, --xfst=VARIABLE        toggle xfst compatibility option VARIABLE\n"
-"  -D, --do-not-quote-special do not quote special characters (default yes)\n");
+"  -X, --xfst=VARIABLE        toggle xfst compatibility option VARIABLE\n");
     fprintf(message_out, "Ignore paths if:\n"
 "  -l, --max-in-length=MIL    input string longer than MIL\n"
 "  -L, --max-out-length=MOL   output string longer than MOL\n"
@@ -105,7 +105,7 @@ print_usage()
             "If EPS is not given, default is empty string.\n"
             "Numeric options are parsed with strtod(3).\n"
 	    "Xfst variables supported are { obey-flags, print-flags,\n"
-	    "print-pairs, print-space }.\n");
+	    "print-pairs, print-space, quote-special }.\n");
     fprintf(message_out,
         "\n"
         "Examples:\n"
@@ -148,13 +148,12 @@ parse_options(int argc, char** argv)
 	    {"print-spaces", no_argument, 0, 'S'},
             {"print-weights", no_argument, 0, 'w'},
             {"xfst", required_argument, 0, 'X'},
-	    {"do-not-quote-special", no_argument, 0, 'D'},
             {0,0,0,0}
           };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
                              HFST_GETOPT_UNARY_SHORT
-                             "Sawc:e:u:p:l:L:n:N:U:P:X:D",
+                             "Sawc:e:u:p:l:L:n:N:U:P:X:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -188,7 +187,6 @@ parse_options(int argc, char** argv)
               }
             else if (strcmp(optarg, "quote-special") == 0)
               {
-		/* default is true, so this has no effect */
                 quote_special = true;
               }
             else if (strcmp(optarg, "print-pairs") == 0)
@@ -205,9 +203,6 @@ parse_options(int argc, char** argv)
                      "available options are obey-flags, print-flags\n");
               }
           break;
-	case 'D':
-	  quote_special = false;
-	  break;
         case 'l':
             max_input_length = hfst_strtoul(optarg, 10);
             break;
@@ -355,15 +350,24 @@ public:
             for (StringPairVector::const_iterator it = path.second.begin();
                  it != path.second.end(); it++) 
               {
-		if (print_spaces && not first_pair) 
-		  {
-		    *out_ << " ";
-		  }
-		first_pair=false;
+		if ((not filter_fd) || 
+		    (not FdOperation::is_diacritic(it->first))) {
+		  if (print_spaces && not first_pair) 
+		    {
+		      *out_ << " ";
+		    }
+		
+		  *out_ << get_print_format(it->first);
+		  first_pair=false;
+		}
 
-                *out_ << get_print_format(it->first)
-                      << ":"
-                      << get_print_format(it->second);
+		if (it->first.compare(it->second) != 0)
+		  {
+		    if ((not filter_fd) || 
+			(not FdOperation::is_diacritic(it->second)))
+		      *out_ << ":"
+			    << get_print_format(it->second);
+		  }
               }
             if (display_weights) 
               {
@@ -373,31 +377,48 @@ public:
           }
         else 
           {
+	    bool is_automaton=true;
+
 	    bool first_symbol=true;
             for (StringPairVector::const_iterator it = path.second.begin();
                  it != path.second.end(); ++it)
               {
-		if (print_spaces && not first_symbol)
+		if ((not filter_fd) || 
+		    (not FdOperation::is_diacritic(it->first)))
 		  {
-		    *out_ << " ";
+		    if (print_spaces && not first_symbol)
+		      {
+			*out_ << " ";
+		      }
+		    if (it->first.compare(it->second) != 0)
+		      is_automaton=false;
+		    
+		    *out_ << get_print_format(it->first);
 		  }
 		first_symbol=false;
-		*out_ << get_print_format(it->first);
-              }
+	      }
 	    if (print_spaces)
 	      {
 		*out_ << " ";
 	      }
-	    *out_ << ":";
-	    for (StringPairVector::const_iterator it = path.second.begin();
-		 it != path.second.end(); ++it)
-	      {
-		if (print_spaces)
-		  {
-		    *out_ << " ";
-		  }
-		*out_ << get_print_format(it->second);
-	      }
+
+	    if (not is_automaton) {
+	      *out_ << ":";
+	      for (StringPairVector::const_iterator it = path.second.begin();
+		   it != path.second.end(); ++it)
+		{
+		  if ((not filter_fd) || 
+		      (not FdOperation::is_diacritic(it->second)))
+		    {
+		      if (print_spaces)
+			{
+			  *out_ << " ";
+			}
+		      *out_ << get_print_format(it->second);
+		    }
+		}
+	    }
+
             if (display_weights)
               {
                 *out_ << "\t" << path.first;

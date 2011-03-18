@@ -91,8 +91,6 @@ same file. Now the file can be used by HFST:
 
   /** \page VersionDifferences.html Differences between versions 2 and 3
 
-      <b>This page is still under construction...</b>
-
       If you need documentation on HFST version 2, you find it 
       <a href="http://hfst.sourceforge.net/hfst2/index.html">here</a>.
       The page is no longer updated and it is recommended to update
@@ -141,10 +139,8 @@ same file. Now the file can be used by HFST:
 
   /** \page InstallHfst.html Installing the HFST API library
 
-      <b>This page is still under construction...</b>
-      
       You can download the source code packet hfst-3.0.tar.gz
-      (will be published during January 2011) from the sourceforge
+      from sourceforge
       <a href="http://sourceforge.net/projects/hfst/files/hfst/">download page</a>.
       Extract all files with the command
 
@@ -202,8 +198,6 @@ HfstTransducer tr("a", "b", SFST_TYPE);
 
 
   /** \page AddingYourImplementation.html Adding your own implementation under the HFST API
-
-      <b>This page is still under construction...</b>
 
       The HFST API is currently implemented with three finite-state libraries,
       SFST, OpenFst and foma. The API is designed so that it is relatively easy to
@@ -647,8 +641,6 @@ namespace hfst {
 
   /** \page QuickStart.html Quick Start to HFST
 
-      <b>This page is still under construction...</b>
-
 
       \section using_hfst Using HFST in your own code
 
@@ -864,7 +856,6 @@ and in AT&T format to file "testfile.att":
 
 /** \mainpage 
 
-<b>This page is still under construction...</b>
 
 HFST - The Helsinki Finite-State Transducer technology is intended for creating and 
 manipulating weighted or unweighted synchronic transducers implementing regular relations.
@@ -961,6 +952,13 @@ The examples given in this documentation use
     for example the files SfstTransducer.h and SfstTransducer.cc 
     define the SFST implementation. 
 
-    What about HFST optimized lookup format?
+    The implementation of HFST's own transducer format, HfstTransitionGraph
+    is also placed here.
+*/
+
+/**
+    @dir libhfst/src/implementations/optimized-lookup
+    @brief A directory for optimized lookup transducer
+    implementations.
 */
  
