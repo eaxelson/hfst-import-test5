@@ -78,7 +78,6 @@ MAYBE_ALIASES+=hfst-minimise
 endif
 if WANT_NAME
 MAYBE_NAME=hfst-name
-MAYBE_ALIASES+=hfst-name
 endif
 if WANT_PROJECT
 MAYBE_PROJECT=hfst-project
@@ -147,6 +146,7 @@ noinst_HEADERS= \
 	HfstStrings2FstTokenizer.h
 
 # sort alphabetically
+# or don't, as no one cares about anything anyways
 bin_PROGRAMS= \
              $(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_CONCATENATE)     \
 	     $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) $(MAYBE_DISJUNCT)	\
@@ -161,7 +161,7 @@ bin_PROGRAMS= \
 	     $(MAYBE_TXT2FST) $(MAYBE_CALCULATE) $(MAYBE_SUBSTITUTE)	\
 	     $(MAYBE_FLAG_DIACRITICS) $(MAYBE_LEXC_COMPILER)		\
 	     $(MAYBE_XFST_COMPILER) $(MAYBE_FORMAT)			\
-	     $(MAYBE_COMPOSE_INTERSECT)
+	     $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME)
 
 bin_SCRIPTS=$(MAYBE_ALIASES)
 
