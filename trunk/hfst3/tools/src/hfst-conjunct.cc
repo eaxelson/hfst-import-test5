@@ -56,11 +56,11 @@ print_usage()
         "\n", program_name );
         print_common_program_options(message_out);
         print_common_binary_program_options(message_out);
-	fprintf(message_out,
-		"Flag diacritics:\n"
-		"  -F, --insert-missing-flags  Insert missing flag "
-		"diacritics from\n                              "
-		"one transducer to another\n"); 
+        fprintf(message_out,
+                "Flag diacritics:\n"
+                "  -F, --insert-missing-flags  Insert missing flag "
+                "diacritics from\n                              "
+                "one transducer to another\n"); 
         fprintf(message_out, "\n");
         print_common_binary_program_parameter_instructions(message_out);
         fprintf(message_out, "\n");
@@ -85,7 +85,7 @@ parse_options(int argc, char** argv)
         {
           HFST_GETOPT_COMMON_LONG,
           HFST_GETOPT_BINARY_LONG,
-	  {"insert-missing-flags", no_argument, 0, 'F'},
+          {"insert-missing-flags", no_argument, 0, 'F'},
           {0,0,0,0}
         };
         int option_index = 0;
@@ -100,9 +100,9 @@ parse_options(int argc, char** argv)
         {
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-binary.h"
-	case 'F':
-	  insert_missing_flags=true;
-	  break;
+        case 'F':
+          insert_missing_flags=true;
+          break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -128,51 +128,61 @@ conjunct_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
       }
     size_t transducer_n = 0;
     while (bothInputs) {
+        HfstTransducer first(firststream);
+        HfstTransducer second(secondstream);
         transducer_n++;
+        char* firstname = strdup(first.get_name().c_str());
+        char* secondname = strdup(second.get_name().c_str());
+        if (strlen(firstname) <= 0)
+          {
+            firstname = strdup(firstfilename);
+          }
+        if (strlen(secondname) <= 0)
+          {
+            secondname = strdup(secondfilename);
+          }
         if (transducer_n == 1)
         {
-            verbose_printf("Intersecting %s and %s...\n", firstfilename, 
-                        secondfilename);
+            verbose_printf("Intersecting %s and %s...\n", firstname, 
+                        secondname);
         }
         else
         {
             verbose_printf("Intersecting %s and %s... %zu\n",
-                           firstfilename, secondfilename, transducer_n);
+                           firstname, secondname, transducer_n);
         }
-        HfstTransducer first(firststream);
-        HfstTransducer second(secondstream);
 
-	if (first.check_for_missing_flags_in(second)) 
-	  {
-	    if (not insert_missing_flags)
-	      {
-		if (not silent) 
-		  {
-		    warning(0, 0, "Warning: %s contains flag diacritics not "
-			    "found in %s\n", secondfilename, firstfilename);
-		}
-	      }
-	    else
-	      {
-		first.insert_freely_missing_flags_from(second);
-	      }
-	}
+        if (first.check_for_missing_flags_in(second)) 
+          {
+            if (not insert_missing_flags)
+              {
+                if (not silent) 
+                  {
+                    warning(0, 0, "Warning: %s contains flag diacritics not "
+                            "found in %s\n", secondname, firstname);
+                }
+              }
+            else
+              {
+                first.insert_freely_missing_flags_from(second);
+              }
+        }
 
-	if (second.check_for_missing_flags_in(first)) 
-	  {
-	    if (not insert_missing_flags)
-	      {
-		if (not silent)
-		  {
-		    warning(0, 0, "Warning: %s contains flag diacritics not "
-			    "found in %s\n", firstfilename, secondfilename);
-		  }
-	      }
-	    else
-	      {
-		second.insert_freely_missing_flags_from(first);
-	      }
-	}
+        if (second.check_for_missing_flags_in(first)) 
+          {
+            if (not insert_missing_flags)
+              {
+                if (not silent)
+                  {
+                    warning(0, 0, "Warning: %s contains flag diacritics not "
+                            "found in %s\n", firstname, secondname);
+                  }
+              }
+            else
+              {
+                second.insert_freely_missing_flags_from(first);
+              }
+        }
 
         outstream << first.intersect(second);
         bothInputs = firststream.is_good() && secondstream.is_good();

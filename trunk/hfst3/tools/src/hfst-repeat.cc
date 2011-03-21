@@ -80,30 +80,30 @@ print_usage()
 int
 parse_options(int argc, char** argv)
 {
-	// use of this function requires options are settable on global scope
-	while (true)
-	{
-		static const struct option long_options[] =
-		{
-		  HFST_GETOPT_COMMON_LONG,
-		  HFST_GETOPT_UNARY_LONG,
+    // use of this function requires options are settable on global scope
+    while (true)
+    {
+        static const struct option long_options[] =
+        {
+          HFST_GETOPT_COMMON_LONG,
+          HFST_GETOPT_UNARY_LONG,
           {"from", required_argument, 0, 'f'},
           {"to", required_argument, 0, 't'},
-		  // add tool-specific options here 
-			{0,0,0,0}
-		};
-		int option_index = 0;
-		// add tool-specific options here 
-		char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
+          // add tool-specific options here 
+            {0,0,0,0}
+        };
+        int option_index = 0;
+        // add tool-specific options here 
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
                              HFST_GETOPT_UNARY_SHORT "f:t:",
-							 long_options, &option_index);
-		if (-1 == c)
-		{
-			break;
-		}
+                             long_options, &option_index);
+        if (-1 == c)
+        {
+            break;
+        }
 
-		switch (c)
-		{
+        switch (c)
+        {
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-unary.h"
         case 'f':
@@ -113,8 +113,8 @@ parse_options(int argc, char** argv)
           at_most = hfst_strtonumber(optarg, &to_infinity);
           break;
 #include "inc/getopt-cases-error.h"
-		}
-	}
+        }
+    }
 
 #include "inc/check-params-common.h"
 #include "inc/check-params-unary.h"
@@ -128,7 +128,7 @@ parse_options(int argc, char** argv)
         error(EXIT_FAILURE, 0, "Cannot repeat from infinity to %lu times\n",
               at_most);
       }
-	return EXIT_CONTINUE;
+    return EXIT_CONTINUE;
 }
 
 int
@@ -136,56 +136,61 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 {
   //instream.open();
   //outstream.open();
-	
-	size_t transducer_n=0;
-	while(instream.is_good())
-	{
-		transducer_n++;
-		if (transducer_n==1)
-		{
-          if (!from_infinity && !to_infinity)
-            {
-              verbose_printf("Repeating [%lu..%lu] %s...\n", at_least,
-                             at_most, inputfilename);
-            }
+    
+    size_t transducer_n=0;
+    while(instream.is_good())
+      {
+        transducer_n++;
+        HfstTransducer trans(instream);
+        char* inputname = strdup(trans.get_name().c_str());
+        if (strlen(inputname) <= 0) 
+          {
+            inputname = strdup(inputfilename);
+          }
+        if (transducer_n==1)
+          {
+            if (!from_infinity && !to_infinity)
+              {
+                verbose_printf("Repeating [%lu..%lu] %s...\n", at_least,
+                               at_most, inputname);
+              }
           else if (from_infinity && to_infinity)
             {
-              verbose_printf("Repeating star %s...\n", inputfilename);
+              verbose_printf("Repeating star %s...\n", inputname);
             }
           else if (!from_infinity && to_infinity)
             {
               verbose_printf("Repeating [%lu..*] %s...\n", at_least,
-                             inputfilename);
+                             inputname);
             }
           else if (from_infinity && to_infinity)
             {
               error(EXIT_FAILURE, 0, "Repeating *..%lu?", at_most);
             }
         }
-		else
-		{
+        else
+        {
           if (!from_infinity && !to_infinity)
             {
               verbose_printf("Repeating [%lu..%lu] %s... %zu\n", 
-                             at_least, at_most, inputfilename, transducer_n);
+                             at_least, at_most, inputname, transducer_n);
             }
           else if (from_infinity && to_infinity)
             {
-              verbose_printf("Repeating star %s... %zu\n", inputfilename,
+              verbose_printf("Repeating star %s... %zu\n", inputname,
                              transducer_n);
             }
           else if (!from_infinity && to_infinity)
             {
               verbose_printf("Repeating [%lu..*] %s... %zu\n", at_least,
-                             inputfilename, transducer_n);
+                             inputname, transducer_n);
             }
           else if (from_infinity && to_infinity)
             {
               error(EXIT_FAILURE, 0, "Repeating *..%lu?", at_most);
             }
         }
-		
-		HfstTransducer trans(instream);
+        
         if (!from_infinity && !to_infinity)
           {
             outstream << trans.repeat_n_to_k(at_least, at_most);
@@ -202,31 +207,31 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           {
           error(EXIT_FAILURE, 0, "Repeating *..%lu?", at_most);
           }
-	}
-	instream.close();
-	outstream.close();
-	return EXIT_SUCCESS;
+    }
+    instream.close();
+    outstream.close();
+    return EXIT_SUCCESS;
 }
 
 
 int main( int argc, char **argv ) {
-	hfst_set_program_name(argv[0], "0.1", "HfstRepeat");
-	int retval = parse_options(argc, argv);
-	if (retval != EXIT_CONTINUE)
-	{
-		return retval;
-	}
-	// close buffers, we use streams
-	if (inputfile != stdin)
-	{
-		fclose(inputfile);
-	}
-	if (outfile != stdout)
-	{
-		fclose(outfile);
-	}
-	verbose_printf("Reading from %s, writing to %s\n", 
-		inputfilename, outfilename);
+    hfst_set_program_name(argv[0], "0.1", "HfstRepeat");
+    int retval = parse_options(argc, argv);
+    if (retval != EXIT_CONTINUE)
+    {
+        return retval;
+    }
+    // close buffers, we use streams
+    if (inputfile != stdin)
+    {
+        fclose(inputfile);
+    }
+    if (outfile != stdout)
+    {
+        fclose(outfile);
+    }
+    verbose_printf("Reading from %s, writing to %s\n", 
+        inputfilename, outfilename);
           if (!from_infinity && !to_infinity)
             {
               verbose_printf("Repeating from %lu to %lu times\n",
@@ -247,25 +252,25 @@ int main( int argc, char **argv ) {
                     "no more than %lu times?", at_most);
             }
 
-	// here starts the buffer handling part
-	HfstInputStream* instream = NULL;
-	try {
-	  instream = (inputfile != stdin) ?
-	    new HfstInputStream(inputfilename) : new HfstInputStream();
-	} catch(const HfstException e)	{
-		error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+    // here starts the buffer handling part
+    HfstInputStream* instream = NULL;
+    try {
+      instream = (inputfile != stdin) ?
+        new HfstInputStream(inputfilename) : new HfstInputStream();
+    } catch(const HfstException e)  {
+        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
-		return EXIT_FAILURE;
-	}
-	HfstOutputStream* outstream = (outfile != stdout) ?
-		new HfstOutputStream(outfilename, instream->get_type()) :
-		new HfstOutputStream(instream->get_type());
-	
-	retval = process_stream(*instream, *outstream);
-	delete instream;
-	delete outstream;
-	free(inputfilename);
-	free(outfilename);
-	return retval;
+        return EXIT_FAILURE;
+    }
+    HfstOutputStream* outstream = (outfile != stdout) ?
+        new HfstOutputStream(outfilename, instream->get_type()) :
+        new HfstOutputStream(instream->get_type());
+    
+    retval = process_stream(*instream, *outstream);
+    delete instream;
+    delete outstream;
+    free(inputfilename);
+    free(outfilename);
+    return retval;
 }
 

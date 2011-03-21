@@ -121,19 +121,19 @@ process_stream(HfstInputStream& instream)
           verbose_printf("Summarizing... %zu\n", transducer_n);
         }
       HfstTransducer *trans;
-      try {	
-	trans = new HfstTransducer(instream);
+      try { 
+    trans = new HfstTransducer(instream);
       } catch (const HfstException e) {
-	fprintf(stderr,"An error happened when reading transducer from stream.\n");
-	exit(1);
+    fprintf(stderr,"An error happened when reading transducer from stream.\n");
+    exit(1);
       }
       //std::cerr << trans;
       HfstBasicTransducer *mutt;
       try {
-	mutt = new HfstBasicTransducer(*trans);
+    mutt = new HfstBasicTransducer(*trans);
       } catch (const HfstException e) {
-	fprintf(stderr,"An error happened when converting transducer to internal format.\n");
-	exit(1);
+    fprintf(stderr,"An error happened when converting transducer to internal format.\n");
+    exit(1);
       }
       size_t states = 0;
       size_t final_states = 0;
@@ -153,8 +153,8 @@ process_stream(HfstInputStream& instream)
       unsigned int initial_state = 0; // mutt.get_initial_state();
       // iterate states in random orderd
       for (HfstBasicTransducer::const_iterator it = mutt->begin();
-	   it != mutt->end(); it++)
-	{
+       it != mutt->end(); it++)
+    {
           HfstState s = it->first;
           ++states;
           if (mutt->is_final_state(s))
@@ -165,13 +165,13 @@ process_stream(HfstInputStream& instream)
           map<string,unsigned int> input_ambiguity;
           map<string,unsigned int> output_ambiguity;
 
-	  for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it = it->second.begin();
-	       tr_it != it->second.end(); tr_it++)
-	    {
+      for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it = it->second.begin();
+           tr_it != it->second.end(); tr_it++)
+        {
               arcs++;
               arcs_here++;
               if ( (tr_it->get_input_symbol() == "@_EPSILON_SYMBOL_@") && 
-		   (tr_it->get_output_symbol() == "@_EPSILON_SYMBOL_@") )
+           (tr_it->get_output_symbol() == "@_EPSILON_SYMBOL_@") )
                 {
                   io_epsilons++;
                   input_epsilons++;
@@ -234,13 +234,13 @@ process_stream(HfstInputStream& instream)
       
       // average calculations
       double average_arcs_per_state = 
-	static_cast<double>(arcs)/static_cast<float>(states);
+    static_cast<double>(arcs)/static_cast<float>(states);
       double average_input_epsilons = 
-	static_cast<double>(input_epsilons)/static_cast<double>(states);
+    static_cast<double>(input_epsilons)/static_cast<double>(states);
       double average_input_ambiguity = 
-	static_cast<double>(arcs)/static_cast<double>(uniq_input_arcs);
+    static_cast<double>(arcs)/static_cast<double>(uniq_input_arcs);
       double average_output_ambiguity = 
-	static_cast<double>(arcs)/static_cast<double>(uniq_output_arcs);
+    static_cast<double>(arcs)/static_cast<double>(uniq_output_arcs);
       if (transducer_n > 1)
         {
           fprintf(outfile, "-- \nTransducer #%zu:\n", transducer_n);

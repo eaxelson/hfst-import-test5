@@ -53,9 +53,9 @@ void print_common_unary_program_options(FILE *file) {
 void print_common_unary_program_parameter_instructions(FILE *file) {
 
   fprintf(file, 
-	  "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
-	  "Format of result depends on format of INFILE\n"
-	  );
+      "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
+      "Format of result depends on format of INFILE\n"
+      );
 
 }
 
@@ -75,12 +75,12 @@ void print_common_binary_program_options(FILE *file) {
 void print_common_binary_program_parameter_instructions(FILE *file) {
 
   fprintf(file, 
-	  "If OUTFILE, or either INFILE1 or INFILE2 is missing or -,\n"
-	  "standard streams will be used.\n"
-	  "INFILE1, INFILE2, or both, must be specified.\n"
-	  "Format of result depends on format of INFILE1\n"
-	  "and INFILE2; both should have the same format.\n"
-	  );
+      "If OUTFILE, or either INFILE1 or INFILE2 is missing or -,\n"
+      "standard streams will be used.\n"
+      "INFILE1, INFILE2, or both, must be specified.\n"
+      "Format of result depends on format of INFILE1\n"
+      "and INFILE2; both should have the same format.\n"
+      );
 
 }
 
