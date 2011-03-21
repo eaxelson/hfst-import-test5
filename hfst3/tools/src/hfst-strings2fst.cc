@@ -113,7 +113,7 @@ print_usage()
         "  -j, --disjunct-strings    Disjunct all strings instead of transforming\n"
         "                            each string into a separate transducer\n"
       /*"      --sum                 Sum weights of duplicate strings\n"
-	"                            instead of taking minimum\n"*/
+        "                            instead of taking minimum\n"*/
         "      --norm                Divide each weight by sum of all weights\n"
         "                            (with option -j)\n"
         "      --log                 Take negative logarithm of each weight\n"
@@ -130,11 +130,11 @@ print_usage()
         "If EPS is not defined, the default representation of @0@ is used.\n"
         "Option --log precedes option --norm.\n"
         "The FILE of option -m lists all multichar-symbols, each symbol\n"
-	"on its own line.\n"   
+        "on its own line.\n"   
         "The backslash '\\' is reserved for escaping a colon (\"\\:\"), \n"
-	"a space (\"\\ \") or a backslash (\"\\\\\").\n"
-	"The weight of a string can be given after the string separated\n"
-	"by a tabulator.\n"
+        "a space (\"\\ \") or a backslash (\"\\\\\").\n"
+        "The weight of a string can be given after the string separated\n"
+        "by a tabulator.\n"
         "\n"
             );
 
@@ -143,7 +143,7 @@ print_usage()
             "  echo \"c:da:ot:g\" | %s -p       same as pairstring\n"
             "  echo \"c:d a:o t:g\" | %s -p -S  same as pairstring with spaces\n"
             "  echo \"c a t:d o g\" | %s -S     same with spaces\n"
-		"\n", program_name, program_name, program_name, program_name);
+                "\n", program_name, program_name, program_name, program_name);
         print_report_bugs();
         fprintf(message_out, "\n");
         print_more_info();
@@ -158,17 +158,17 @@ parse_options(int argc, char** argv)
     {
         static const struct option long_options[] =
         {
-	  HFST_GETOPT_COMMON_LONG,
-	  HFST_GETOPT_UNARY_LONG,
-	  {"disjunct-strings", no_argument, 0, 'j'},
-	  {"epsilon", required_argument, 0, 'e'},
-	  {"norm", no_argument, 0, '2'},
-	  {"log", no_argument, 0, '3'},
-	  {"pairstrings", no_argument, 0, 'p'},
-	  {"has-spaces", no_argument, 0, 'S'},
-	  {"multichar-symbols", required_argument, 0, 'm'},
-	  {"format", required_argument, 0, 'f'},
-	  {0,0,0,0}
+          HFST_GETOPT_COMMON_LONG,
+          HFST_GETOPT_UNARY_LONG,
+          {"disjunct-strings", no_argument, 0, 'j'},
+          {"epsilon", required_argument, 0, 'e'},
+          {"norm", no_argument, 0, '2'},
+          {"log", no_argument, 0, '3'},
+          {"pairstrings", no_argument, 0, 'p'},
+          {"has-spaces", no_argument, 0, 'S'},
+          {"multichar-symbols", required_argument, 0, 'm'},
+          {"format", required_argument, 0, 'f'},
+          {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
@@ -278,34 +278,34 @@ process_stream(HfstOutputStream& outstream)
       // Parse the string
       StringPairVector spv;
       try
-	{
-	  if (pairstrings)
-	    { spv = multichar_symbol_tokenizer.tokenize_pair_string
-		(line,has_spaces); }
-	  else
-	    { spv = multichar_symbol_tokenizer.tokenize_string_pair
-		(line,has_spaces); }
-	}
+        {
+          if (pairstrings)
+            { spv = multichar_symbol_tokenizer.tokenize_pair_string
+                (line,has_spaces); }
+          else
+            { spv = multichar_symbol_tokenizer.tokenize_string_pair
+                (line,has_spaces); }
+        }
       catch (const UnescapedColsFound &e)
-	{ 
-	  if (pairstrings)
-	    {
-	      error
-		(EXIT_FAILURE, errno, 
-		 "String \"%s\" contains unescaped ':'-symbols,\n"
-	         "which are not pair separators. Use '\\:' for literal ':'.",
-		 line);
-	    }
-	  else
-	    {
-	      error
-		(EXIT_FAILURE, errno, 
-		 "String \"%s\" contains unescaped ':'-symbols,\n"
-	         "which are not pair separators. Use '\\:\' for literal ':'.\n"
-		 "If you are compiling pair strings, use option -p.",
-		 line);	      
-	    }
-	}
+        { 
+          if (pairstrings)
+            {
+              error
+                (EXIT_FAILURE, errno, 
+                 "String \"%s\" contains unescaped ':'-symbols,\n"
+                 "which are not pair separators. Use '\\:' for literal ':'.",
+                 line);
+            }
+          else
+            {
+              error
+                (EXIT_FAILURE, errno, 
+                 "String \"%s\" contains unescaped ':'-symbols,\n"
+                 "which are not pair separators. Use '\\:\' for literal ':'.\n"
+                 "If you are compiling pair strings, use option -p.",
+                 line);              
+            }
+        }
       // Handle the weight
       float path_weight=0;
 
@@ -328,6 +328,16 @@ process_stream(HfstOutputStream& outstream)
           HfstBasicTransducer tr;
           tr.disjunct(spv, path_weight);
           HfstTransducer res(tr, output_format);
+          char* name = static_cast<char*>(malloc(sizeof(char)*(strlen("hfst-strings2fst ") + strlen(line) + 1)));
+          if (sprintf(name, "hfst-strings2fst %s", line) > 0)
+            {
+              res.set_name(name);
+            }
+          else
+            {
+              res.set_name("hfst-strings2fst <error in sprintf>");
+            }
+
           outstream << res;
         }
       else // disjunct all strings into a single transducer
@@ -347,7 +357,16 @@ process_stream(HfstOutputStream& outstream)
           else
             res.transform_weights(&divide_by_sum_of_weights_log);
         }
-          outstream << res;
+      char* name = static_cast<char*>(malloc(sizeof(char)*(strlen("hfst-strings2fst ") + strlen(inputfilename) + 1)));
+      if (sprintf(name, "hfst-strings2fst %s", inputfilename) > 0)
+        {
+          res.set_name(name);
+        }
+      else
+        {
+          res.set_name("hfst-strings2fst <error in sprintf>");
+        }
+      outstream << res;
     }
   free(line);
   return EXIT_SUCCESS;
@@ -355,6 +374,7 @@ process_stream(HfstOutputStream& outstream)
   catch(IncorrectUtf8CodingException e)
     {
       error(EXIT_FAILURE, errno, "Incorrect utf-8 coding.");
+      return EXIT_FAILURE;
     }
 }
 
@@ -371,21 +391,21 @@ int main( int argc, char **argv )
   if (multichar_symbol_filename != NULL)
     {
       verbose_printf("Reading multichar symbols from %s\n", 
-		     multichar_symbol_filename);
+                     multichar_symbol_filename);
       std::ifstream multichar_in(multichar_symbol_filename);
       (void)multichar_in.peek();
       if (not multichar_in.good())
-	{ error(EXIT_FAILURE, errno,"Multichar symbol file can't be read."); }
+        { error(EXIT_FAILURE, errno,"Multichar symbol file can't be read."); }
       char multichar_line[1000];
       while (multichar_in.good())
-	{ 
-	  multichar_in.getline(multichar_line,1000);
-	  if (strlen(multichar_line) > 0)
-	    { 
-	      verbose_printf("Defining multichar symbol %s\n",multichar_line);
-	      multichar_symbols.push_back(multichar_line); 
-	    }
-	}
+        { 
+          multichar_in.getline(multichar_line,1000);
+          if (strlen(multichar_line) > 0)
+            { 
+              verbose_printf("Defining multichar symbol %s\n",multichar_line);
+              multichar_symbols.push_back(multichar_line); 
+            }
+        }
     }
 
   // close output buffers, we use output streams

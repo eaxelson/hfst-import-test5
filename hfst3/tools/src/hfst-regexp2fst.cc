@@ -207,12 +207,30 @@ process_stream(HfstOutputStream& outstream)
         }
       else
         {
+          char* name = static_cast<char*>(malloc(sizeof(char)*(strlen("hfst-regexp2fst ") + strlen(line) + 1)));
+          if (sprintf(name, "hfst-regexp2fst %s", line) > 0)
+            {
+              compiled->set_name(name);
+            }
+          else
+            {
+              compiled->set_name("hfst-regexp2fst <error in sprintf>");
+            }
           outstream << *compiled;
         }
       delete compiled;
     }
   if (disjunct_expressions)
     {
+      char* name = static_cast<char*>(malloc(sizeof(char)*(strlen("hfst-regexp2fst ") + strlen(inputfilename) + 1)));
+      if (sprintf(name, "hfst-regexp2fst %s", inputfilename) > 0)
+        {
+          disjunction.set_name(name);
+        }
+      else
+        {
+          disjunction.set_name("hfst-regexp2fst <error in sprintf>");
+        }
       outstream << disjunction;
     }
   free(line);
