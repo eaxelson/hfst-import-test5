@@ -157,28 +157,22 @@ hfst::ImplementationType hfst_parse_format_name(const char* s);
 /** @brief allocate new string describing type of transducer format */
 char* hfst_strformat(hfst::ImplementationType format);
 
-#if HAVE_XSTRDUP
-#  define hfst_strdup xstrdup
-#else
-#  define hfst_strdup strdup
+#ifndef HAVE_STRNDUP
+char* strndup(const char* s, size_t n);
 #endif
-#if HAVE_XSTRNDUP
-#  define hfst_strndup xstrndup
-#elif HAVE_STRNDUP
-#  define hfst_strndup strndup
-#else
+
+/** @brief duplicate substring and exit cleanly on error */
 char* hfst_strndup(const char* s, size_t n);
-#endif
-#if HAVE_XMALLOC
-#  define hfst_malloc xmalloc
-#else
-#  define hfst_malloc malloc
-#endif
-#if HAVE_XCALLOC
-#  define hfst_calloc xcalloc
-#else
-#  define hfst_calloc calloc
-#endif
+
+/** @brief duplicate string and exit cleanly on error */
+char* hfst_strdup(const char* s);
+
+/** @brief allocate memory and exit cleanly on error */
+void* hfst_malloc(size_t size);
+
+/** @brief allocate memory to zero and exit cleanly on error */
+void* hfst_calloc(size_t nmemb, size_t size);
+
 
 /**
  * @brief open file, or print informative error message and exit on failure.
