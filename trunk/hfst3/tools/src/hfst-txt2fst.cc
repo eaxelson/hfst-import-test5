@@ -70,8 +70,8 @@ print_usage()
         "standard streams will be used.\n"
         "If FMT is not given, OpenFst's tropical format will be used.\n"
         "The possible values for FMT are { sfst, openfst-tropical, "
-	    "openfst-log,\n"
-	"foma, optimized-lookup-unweighted, optimized-lookup-weighted }.\n"
+        "openfst-log,\n"
+    "foma, optimized-lookup-unweighted, optimized-lookup-weighted }.\n"
         "If EPS is not given, @0@ will be used\n\n"
         );
     fprintf(message_out, "\n");
@@ -159,16 +159,25 @@ process_stream(HfstOutputStream& outstream)
           verbose_printf("Reading transducer table %zu...\n", transducer_n);
         }
       try {
-	HfstTransducer t(inputfile,
-			 output_format,
-			 std::string(epsilonname));
-	outstream << t;
-      }
+        HfstTransducer t(inputfile,
+             output_format,
+             std::string(epsilonname));
+        char* name = static_cast<char*>(malloc(sizeof(char)*(strlen("hfst-regexp2fst ") + strlen(inputfilename) + 1)));
+        if (sprintf(name, "hfst-txt2fst %s", inputfilename) > 0)
+          {
+            t.set_name(name);
+          }
+        else
+          {
+            t.set_name("hfst-txt2fst <error in sprintf>");
+          }
+          outstream << t;
+        }
       catch (HfstException e)
-	{
-	  std::cerr << e() << std::endl;
-	  return EXIT_FAILURE;
-	}
+        {
+          std::cerr << e() << std::endl;
+          return EXIT_FAILURE;
+        }
     }
   outstream.close();
   return EXIT_SUCCESS;
