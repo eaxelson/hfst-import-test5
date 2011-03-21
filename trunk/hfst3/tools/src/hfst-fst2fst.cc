@@ -174,8 +174,8 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
     while(instream.is_good())
     {
         transducer_n++;
-        HfstTransducer input(instream);
-        char* inputname = strdup(input.get_name().c_str());
+        HfstTransducer orig(instream);
+        char* inputname = strdup(orig.get_name().c_str());
         if (strlen(inputname) <= 0 )
           {
             inputname = strdup(inputfilename);
@@ -189,7 +189,6 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           verbose_printf("Converting %s...%zu\n",
                          inputname, transducer_n);
         }
-        HfstTransducer orig(instream);
         outstream << orig.convert(output_type /*, options*/);
     }
     instream.close();
