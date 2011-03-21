@@ -103,10 +103,19 @@ int get_compatible_fst_format(std::istream& , std::istream& ) {
 
 // specific printf's wrapped in conditions
 void
-debug_save_transducer(hfst::HfstTransducer t, const char* name)
+debug_save_transducer(hfst::HfstTransducer& t, const char* name)
 {
     if (debug)
       {
+        char* debug_name = static_cast<char*>(malloc(sizeof(char)*(strlen("DEBUG: " + strlen(name) + 1 ))));
+        if ((sprintf(debug_name, "DEBUG %s", name)) > 0 ) 
+          {
+            t.set_name(debug_name);
+          }
+        else
+          {
+            t.set_name("DEBUG <error in sprintf>");
+          }
         hfst::HfstOutputStream debugOut(name, t.get_type());
         //debugOut.open();
         debug_printf("*** DEBUG (%s): saving current transducer to %s\n",
@@ -355,18 +364,59 @@ hfst_ftell(FILE* stream)
 
 #ifndef HAVE_STRNDUP
 char*
+strndup(const char* s, size_t n)
+  {
+    char* rv = static_cast<char*>(malloc(sizeof(char)*n+1));
+    if (rv == NULL)
+      {
+        return rv;
+      }
+    rv = static_cast<char*>(memcpy(rv, s, n));
+    if (rv == NULL)
+      {
+        return rv;
+      }
+    rv[n] = '\0';
+    return rv;
+  }
+#endif
+
+char*
 hfst_strndup(const char* s, size_t n)
-{
-  char* rv = static_cast<char*>(malloc(sizeof(char)*n+1));
-  if (rv == NULL)
-    {
-      fprintf(stderr, "strndup failed to malloc\n");
-      exit(EXIT_FAILURE);
-    }
-  rv = static_cast<char*>(memcpy(rv, s, n));
-  rv[n] = '\0';
-  return rv;
+  {
+    char* rv = strndup(s, n);
+    if (rv == NULL)
+      {
+        error(EXIT_FAILURE, errno, "strndup failed");
+      }
+    return rv;
 }
+
+#ifndef HAVE_GETLINE
+ssize_t
+getline(char** lineptr, size_t* n, FILE* stream)
+  {
+#define MAX_LEN 4196
+    size_t nn = *n;
+    if (nn == 0)
+      {
+        nn = MAX_LEN;
+      }
+    if (*lineptr == NULL)
+      {
+        *lineptr = static_cast<char*>(malloc(nn));
+        if (*lineptr == NULL)
+          {
+             return -1;
+          }
+      }
+    *lineptr = fgets(*lineptr, nn, stream);
+    if (*lineptr == NULL)
+      {
+        return -1;
+      }
+    return strlen(*lineptr);
+  }
 #endif
 
 ssize_t
@@ -374,67 +424,41 @@ hfst_getline(char** lineptr, size_t* n, FILE* stream)
 {
   errno = 0;
   ssize_t rv = -1;
-#if HAVE_GETLINE
   rv = getline(lineptr, n, stream);
   if ((rv < 0) && errno)
     {
       error(EXIT_FAILURE, errno, "getline failed");
     }
-#else
-#define MAX_LEN 4196
-  size_t nn = *n;
-  if (nn == 0)
-    {
-      nn = MAX_LEN;
-    }
-  if (*lineptr == NULL)
-    {
-      *lineptr = static_cast<char*>(malloc(nn));
-      if (*lineptr == NULL)
-        {
-           error(EXIT_FAILURE, errno, "getline failed to malloc");
-        }
-    }
-  *lineptr = fgets(*lineptr, nn, stream);
-  if (*lineptr == NULL)
-    {
-      if (feof(stream))
-        {
-          return -1;
-        }
-      else
-        {
-          error(EXIT_FAILURE, errno, "getline fread failed");
-        }
-    }
-  rv = strlen(*lineptr);
-#endif
   return rv;
 }
+
+#ifndef HAVE_SET_PROGRAM_NAME
+void
+set_program_name(const char* argv0)
+  {
+    // this's gnulib
+    const char *slash;
+    const char *base;
+    slash = strrchr (argv0, '/');
+    base = (slash != NULL ? slash + 1 : argv0);
+    if (base - argv0 >= 7 && strncmp (base - 7, "/.libs/", 7) == 0)
+      {
+        argv0 = base;
+        if (strncmp (base, "lt-", 3) == 0)
+          {
+            argv0 = base + 3;
+          }
+      }
+    program_name = hfst_strdup(argv0);
+  }
+#endif
 
 // customized default printouts for HFST tools
 void
 hfst_set_program_name(const char* argv0, const char* version_vector,
                       const char* wikiname)
 {
-#if HAVE_SET_PROGRAM_NAME
   set_program_name(argv0);
-#else
-// this's gnulib
-  const char *slash;
-  const char *base;
-  slash = strrchr (argv0, '/');
-  base = (slash != NULL ? slash + 1 : argv0);
-  if (base - argv0 >= 7 && strncmp (base - 7, "/.libs/", 7) == 0)
-    {
-      argv0 = base;
-      if (strncmp (base, "lt-", 3) == 0)
-        {
-          argv0 = base + 3;
-        }
-    }
-  program_name = hfst_strdup(argv0);
-#endif
   hfst_tool_version = hfst_strdup(version_vector);
   hfst_tool_wikiname = hfst_strdup(wikiname);
 }

@@ -242,18 +242,23 @@ do_substitute(HfstTransducer& trans, size_t transducer_n)
     }
   else if (from_pair && to_transducer)
     {
+      char* to_name = strdup(to_transducer->get_name().c_str());
+      if (strlen(to_name) <= 0)
+        {
+          to_name = strdup(to_transducer_filename);
+        }
       if (transducer_n < 2)
         {
           verbose_printf("Substituting pair %s:%s with transducer %s...\n", 
                          from_pair->first.c_str(),
                          from_pair->second.c_str(),
-                         to_transducer_filename);
+                         to_name);
         }
       else
         {
           verbose_printf("Substituting pair %s:%s with transducer %s... %zu\n", 
                          from_pair->first.c_str(), 
-                         from_pair->second.c_str(), to_transducer_filename,
+                         from_pair->second.c_str(), to_name,
                          transducer_n);
         }
       trans.substitute(*from_pair, *to_transducer);
@@ -261,15 +266,20 @@ do_substitute(HfstTransducer& trans, size_t transducer_n)
 
   else if (from_label && to_transducer)
     {
+      char* to_name = strdup(to_transducer->get_name().c_str());
+      if (strlen(to_name) <= 0)
+        {
+          to_name = strdup(to_transducer_filename);
+        }
       if (transducer_n < 2)
         {
           verbose_printf("Substituting id. label %s with transducer %s...\n", 
-                         from_label, to_transducer_filename);
+                         from_label, to_name);
         }
       else
         {
           verbose_printf("Substituting id. label %s with transducer %s... %zu\n", 
-                         from_label, to_transducer_filename,
+                         from_label, to_name,
                          transducer_n);
         }
       hfst::StringPair from_arc(from_label, from_label);
@@ -302,6 +312,20 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
     {
       transducer_n++;
       HfstTransducer trans(instream);
+      char* inputname = strdup(trans.get_name().c_str());
+      if (strlen(inputname) <= 0)
+        {
+          inputname = strdup(inputfilename);
+        }
+      if (transducer_n == 1)
+        {
+          verbose_printf("performing substitutions in %s...\n", inputname);
+        }
+      else
+        {
+          verbose_printf("performing substitutions in %s... %zu\n", inputname,
+                         transducer_n);
+        }
       if (from_file)
         {
           char* line = NULL;

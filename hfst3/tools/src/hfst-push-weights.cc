@@ -1,6 +1,6 @@
-//! @file hfst-project.cc
+//! @file hfst-push-weights.cc
 //!
-//! @brief Transducer projection tool
+//! @brief Transducer whoever ever reads these lol tool
 //!
 //! @author HFST Team
 
@@ -74,29 +74,29 @@ print_usage()
 int
 parse_options(int argc, char** argv)
 {
-	// use of this function requires options are settable on global scope
-	while (true)
-	{
-		static const struct option long_options[] =
-		{
-		  HFST_GETOPT_COMMON_LONG,
-		  HFST_GETOPT_UNARY_LONG,
-		  // add tool-specific options here 
-		  {"push", required_argument, 0, 'p'},
-		  {0,0,0,0}
-		};
-		int option_index = 0;
-		// add tool-specific options here 
-		char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
+    // use of this function requires options are settable on global scope
+    while (true)
+    {
+        static const struct option long_options[] =
+        {
+          HFST_GETOPT_COMMON_LONG,
+          HFST_GETOPT_UNARY_LONG,
+          // add tool-specific options here 
+          {"push", required_argument, 0, 'p'},
+          {0,0,0,0}
+        };
+        int option_index = 0;
+        // add tool-specific options here 
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
                              HFST_GETOPT_UNARY_SHORT "p:",
-							 long_options, &option_index);
-		if (-1 == c)
-		{
-			break;
-		}
+                             long_options, &option_index);
+        if (-1 == c)
+        {
+            break;
+        }
 
-		switch (c)
-		{
+        switch (c)
+        {
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-unary.h"
         case 'p':
@@ -118,15 +118,15 @@ parse_options(int argc, char** argv)
                       "should be one of start, initial, begin, end or final.\n",
                       optarg);
                 return EXIT_FAILURE;
-	    }
-	    break;
+        }
+        break;
 #include "inc/getopt-cases-error.h"
-		}
-	}
+        }
+    }
 
 #include "inc/check-params-common.h"
 #include "inc/check-params-unary.h"
-	return EXIT_CONTINUE;
+    return EXIT_CONTINUE;
 }
 
 int
@@ -134,37 +134,42 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 {
   //instream.open();
   //outstream.open();
-	
-	size_t transducer_n=0;
-	while(instream.is_good())
-	{
-		transducer_n++;
-		if (transducer_n==1)
-		{
+    
+    size_t transducer_n=0;
+    while(instream.is_good())
+    {
+        transducer_n++;
+        HfstTransducer trans(instream);
+        char* inputname = strdup(trans.get_name().c_str());
+        if (strlen(inputname) <= 0)
+          {
+            inputname = strdup(inputfilename);
+          }
+        if (transducer_n==1)
+        {
           if (push_initial)
             {
-              verbose_printf("Pushing towards start %s...\n", inputfilename); 
+              verbose_printf("Pushing towards start %s...\n", inputname); 
             }
           else
             {
-              verbose_printf("Pushing towards end %s...\n", inputfilename);
+              verbose_printf("Pushing towards end %s...\n", inputname);
             }
         }
-		else
-		{
+        else
+        {
           if (push_initial)
             {
-              verbose_printf("Pushing towards start %s... %zu\n", inputfilename,
+              verbose_printf("Pushing towards start %s... %zu\n", inputname,
                              transducer_n);
             }
           else
             {
-              verbose_printf("Pushing towards end %s... %zu\n", inputfilename,
+              verbose_printf("Pushing towards end %s... %zu\n", inputname,
                              transducer_n);
             }
         }
-		
-		HfstTransducer trans(instream);
+        
         if (push_initial)
           {
             outstream << trans.push_weights(hfst::TO_INITIAL_STATE);
@@ -173,50 +178,50 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           {
             outstream << trans.push_weights(hfst::TO_FINAL_STATE);
           }
-	}
-	instream.close();
-	outstream.close();
-	return EXIT_SUCCESS;
+    }
+    instream.close();
+    outstream.close();
+    return EXIT_SUCCESS;
 }
 
 
 int main( int argc, char **argv ) {
-	hfst_set_program_name(argv[0], "0.1", "HfstPush");
-	int retval = parse_options(argc, argv);
-	if (retval != EXIT_CONTINUE)
-	{
-		return retval;
-	}
-	// close buffers, we use streams
-	if (inputfile != stdin)
-	{
-		fclose(inputfile);
-	}
-	if (outfile != stdout)
-	{
-		fclose(outfile);
-	}
-	verbose_printf("Reading from %s, writing to %s\n", 
-		inputfilename, outfilename);
-	// here starts the buffer handling part
-	HfstInputStream* instream = NULL;
-	try {
-	  instream = (inputfile != stdin) ?
-	    new HfstInputStream(inputfilename) : new HfstInputStream();
-	} catch(const HfstException e)	{
-		error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
+    hfst_set_program_name(argv[0], "0.1", "HfstPush");
+    int retval = parse_options(argc, argv);
+    if (retval != EXIT_CONTINUE)
+    {
+        return retval;
+    }
+    // close buffers, we use streams
+    if (inputfile != stdin)
+    {
+        fclose(inputfile);
+    }
+    if (outfile != stdout)
+    {
+        fclose(outfile);
+    }
+    verbose_printf("Reading from %s, writing to %s\n", 
+        inputfilename, outfilename);
+    // here starts the buffer handling part
+    HfstInputStream* instream = NULL;
+    try {
+      instream = (inputfile != stdin) ?
+        new HfstInputStream(inputfilename) : new HfstInputStream();
+    } catch(const HfstException e)  {
+        error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
               inputfilename);
-		return EXIT_FAILURE;
-	}
-	HfstOutputStream* outstream = (outfile != stdout) ?
-		new HfstOutputStream(outfilename, instream->get_type()) :
-		new HfstOutputStream(instream->get_type());
-	
-	retval = process_stream(*instream, *outstream);
-	delete instream;
-	delete outstream;
-	free(inputfilename);
-	free(outfilename);
-	return retval;
+        return EXIT_FAILURE;
+    }
+    HfstOutputStream* outstream = (outfile != stdout) ?
+        new HfstOutputStream(outfilename, instream->get_type()) :
+        new HfstOutputStream(instream->get_type());
+    
+    retval = process_stream(*instream, *outstream);
+    delete instream;
+    delete outstream;
+    free(inputfilename);
+    free(outfilename);
+    return retval;
 }
 

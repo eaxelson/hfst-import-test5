@@ -120,9 +120,18 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
     HfstTransducerVector rules;
     size_t transducer_n = 1;
     while (secondstream.is_good()) {
-      
-      verbose_printf("Reading and minimizing rule %u...\n",transducer_n);
       HfstTransducer rule(secondstream);
+      const char* rulename = rule.get_name().c_str();
+      if (strlen(rulename) > 0)
+        {
+          verbose_printf("Reading and minimizing rule %s...\n",
+                         rulename);
+        }
+      else
+        {
+          verbose_printf("Reading and minimizing rule %zu...\n",
+                         transducer_n);
+        }
       rule.minimize();
       rules.push_back(rule);      
     }

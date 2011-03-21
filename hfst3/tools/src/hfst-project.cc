@@ -143,32 +143,37 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
     while(instream.is_good())
     {
         transducer_n++;
+        HfstTransducer trans(instream);
+        char* inputname = strdup(trans.get_name().c_str());
+        if (strlen(inputname) <= 0)
+          {
+            inputname = strdup(inputfilename);
+          }
         if (transducer_n==1)
         {
           if (project_input)
             {
-              verbose_printf("Projecting first %s...\n", inputfilename); 
+              verbose_printf("Projecting first %s...\n", inputname); 
             }
           else
             {
-              verbose_printf("Projecting second %s...\n", inputfilename);
+              verbose_printf("Projecting second %s...\n", inputname);
             }
         }
         else
         {
           if (project_input)
             {
-              verbose_printf("Projecting first %s... %zu\n", inputfilename,
+              verbose_printf("Projecting first %s... %zu\n", inputname,
                              transducer_n);
             }
           else
             {
-              verbose_printf("Projecting second %s... %zu\n", inputfilename,
+              verbose_printf("Projecting second %s... %zu\n", inputname,
                              transducer_n);
             }
         }
         
-        HfstTransducer trans(instream);
         if (project_input)
           {
             outstream << trans.input_project();

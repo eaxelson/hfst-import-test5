@@ -212,7 +212,7 @@ print_usage()
     fprintf(message_out, "Lookup options:\n"
             "  -I, --input-strings=SFILE        Read lookup strings from SFILE\n"
             "  -O, --output-format=OFORMAT      Use OFORMAT printing results sets\n"
-	    "  -e, --epsilon-format=EPS         Print epsilon as EPS\n"
+            "  -e, --epsilon-format=EPS         Print epsilon as EPS\n"
             "  -F, --input-format=IFORMAT       Use IFORMAT parsing input\n"
             "  -x, --statistics                 Print statistics\n"
             "  -X, --xfst=VARIABLE              Toggle xfst VARIABLE\n"
@@ -220,26 +220,26 @@ print_usage()
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
     fprintf(message_out, 
-	    "OFORMAT is one of {xerox,cg,apertium}, xerox being default\n"
-	    "IFORMAT is one of {text,spaced,apertium}, default being text,\n"
-	    "unless OFORMAT is apertium\n"
-	    "VARIABLEs relevant to lookup are {print-pairs,print-space,\n"
-	    "quote-special,show-flags,obey-flags}\n",
-	    "Input epsilon cycles are followed by default INT=5 times.\n"
-	    "Epsilon is printed by default as empty string.\n");
+            "OFORMAT is one of {xerox,cg,apertium}, xerox being default\n"
+            "IFORMAT is one of {text,spaced,apertium}, default being text,\n"
+            "unless OFORMAT is apertium\n"
+            "VARIABLEs relevant to lookup are {print-pairs,print-space,\n"
+            "quote-special,show-flags,obey-flags}\n"
+            "Input epsilon cycles are followed by default INT=5 times.\n"
+            "Epsilon is printed by default as empty string.\n");
     fprintf(message_out, "\n");
 
     fprintf(message_out, 
-	    "Todo:\n"
-	    "  For optimized lookup format, only strings that pass "
-	    "flag diacritic checks\n"
-	    "  are printed and flag diacritic symbols are not printed.\n"
-	    "  For other formats, all flag paths are allowed.\n"
-	    "  Support VARIABLE 'print-space' for optimized lookup format\n");
+            "Todo:\n"
+            "  For optimized lookup format, only strings that pass "
+            "flag diacritic checks\n"
+            "  are printed and flag diacritic symbols are not printed.\n"
+            "  For other formats, all flag paths are allowed.\n"
+            "  Support VARIABLE 'print-space' for optimized lookup format\n");
     fprintf(message_out,
-	    "\n"
-	    "Known bugs:\n"
-	    "  'quote-special' quotes spaces that come from 'print-space'\n");
+            "\n"
+            "Known bugs:\n"
+            "  'quote-special' quotes spaces that come from 'print-space'\n");
 
     fprintf(message_out, "\n");
     print_report_bugs();
@@ -265,12 +265,13 @@ parse_options(int argc, char** argv)
             {"cycles", required_argument, 0, 'c'},
             {"xfst", required_argument, 0, 'X'},
             {"epsilon-format", required_argument, 0, 'e'},
+            {"epsilon-format2", required_argument, 0, 'E'},
             {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "I:O:F:xc:X:e:",
+                             HFST_GETOPT_UNARY_SHORT "I:O:F:xc:X:e:E:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -330,9 +331,10 @@ parse_options(int argc, char** argv)
                 return EXIT_FAILURE;
               }
             break;
-	case 'e':
-	  epsilon_format = hfst_strdup(optarg);
-	  break;
+        case 'e':
+        case 'E':
+            epsilon_format = hfst_strdup(optarg);
+            break;
         case 'x':
             print_statistics = true;
             break;
@@ -866,7 +868,7 @@ static std::string escape_special_characters(char *s)
   for (unsigned int i=0; s[i] != '\0'; i++)
     {
       if (s[i] == ':' || s[i] == '\\' || s[i] == ' ')
-	retval.append(1, '\\');
+        retval.append(1, '\\');
       retval.append(1, s[i]);
     }
   return retval;
@@ -884,57 +886,57 @@ line_to_lookup_path(char** s, HfstStrings2FstTokenizer& tok,
       {
       case SPACE_SEPARATED_TOKEN_INPUT:
         {
-	  /*
+          /*
           vector<string> path;
           char* token = strtok(*s, " ");
           while (token)
             {
               path.push_back(token);
-	      token = strtok(NULL, " ");
+              token = strtok(NULL, " ");
             }
           rv->second = path;
           break;
-	  */
-	  
-	  std::string S = escape_special_characters(*s);
+          */
+          
+          std::string S = escape_special_characters(*s);
 
-	  StringPairVector spv 
-	    = tok.tokenize_string_pair(S, true);
-	  
-	  for (StringPairVector::const_iterator it = spv.begin();
-	       it != spv.end(); it++)
-	    {
-	      rv->second.push_back(it->first);
-	    }
-	  break;
+          StringPairVector spv 
+            = tok.tokenize_string_pair(S, true);
+          
+          for (StringPairVector::const_iterator it = spv.begin();
+               it != spv.end(); it++)
+            {
+              rv->second.push_back(it->first);
+            }
+          break;
         }
       case UTF8_TOKEN_INPUT:
         {
-	  if (optimized_lookup)
-	    {
-	      vector<string>* path = string_to_utf8(*s);
-	      rv->second = *path;
-	      delete path;
-	    }
-	  else
-	    {
-	      std::string S = escape_special_characters(*s);
+          if (optimized_lookup)
+            {
+              vector<string>* path = string_to_utf8(*s);
+              rv->second = *path;
+              delete path;
+            }
+          else
+            {
+              std::string S = escape_special_characters(*s);
 
-	      StringPairVector spv 
-		= tok.tokenize_string_pair(S, false);
-	      
-	      for (StringPairVector::const_iterator it = spv.begin();
-		   it != spv.end(); it++)
-		{
-		  rv->second.push_back(it->first);
-		}
-	    }
-	  break;
+              StringPairVector spv 
+                = tok.tokenize_string_pair(S, false);
+              
+              for (StringPairVector::const_iterator it = spv.begin();
+                   it != spv.end(); it++)
+                {
+                  rv->second.push_back(it->first);
+                }
+            }
+          break;
         }
       case APERTIUM_INPUT:
           {
             char* real_s 
-	      = static_cast<char*>(calloc(sizeof(char),strlen(*s)+1));
+              = static_cast<char*>(calloc(sizeof(char),strlen(*s)+1));
 
             *markup = static_cast<char*>(calloc(sizeof(char), strlen(*s)+1));
             char* m = *markup;
@@ -1031,7 +1033,7 @@ bool is_lookup_infinitely_ambiguous
   // Go through all transitions in this state
   HfstBasicTransducer::HfstTransitionSet transitions = t[state];
   for (HfstBasicTransducer::HfstTransitionSet::iterator it 
-	 = transitions.begin();
+         = transitions.begin();
        it != transitions.end(); it++)
     {
       // CASE 1: Input epsilons do not consume a symbol in the lookup path s,
@@ -1040,19 +1042,19 @@ bool is_lookup_infinitely_ambiguous
     {
       epsilon_path_states.insert(state);
       if (epsilon_path_states.find(it->get_target_state()) 
-	  != epsilon_path_states.end())
+          != epsilon_path_states.end())
         return true;
       if (is_lookup_infinitely_ambiguous
-	  (t, s, index, it->get_target_state(), epsilon_path_states))
+          (t, s, index, it->get_target_state(), epsilon_path_states))
         return true;
       epsilon_path_states.erase(state);
     }
 
       /* CASE 2: Other input symbols consume a symbol in the lookup path s,
-	 so they can be added only if the end of the lookup path s has not 
-	 been reached. (This code is almost the same as in case 1, but has
-	 three extra lines marked with the comment ###. The whole function
-	 would probably benefit from reorganizing the if/else blocks...) */
+         so they can be added only if the end of the lookup path s has not 
+         been reached. (This code is almost the same as in case 1, but has
+         three extra lines marked with the comment ###. The whole function
+         would probably benefit from reorganizing the if/else blocks...) */
       else if (not only_epsilons)
     {
       if (it->get_input_symbol().compare(s.second.at(index)) == 0) // ###
@@ -1060,8 +1062,8 @@ bool is_lookup_infinitely_ambiguous
           index++; // consume an input symbol in the lookup path s // ###
           std::set<HfstState> empty_set;
           if (is_lookup_infinitely_ambiguous
-	      (t, s, index, it->get_target_state(), empty_set)) {
-	    return true; }
+              (t, s, index, it->get_target_state(), empty_set)) {
+            return true; }
           index--; // add the input symbol back to the lookup path s. // ###
         }
     }
@@ -1070,7 +1072,7 @@ bool is_lookup_infinitely_ambiguous
 }
 
 bool is_lookup_infinitely_ambiguous(HfstBasicTransducer &t, 
-				    const HfstOneLevelPath& s)
+                                    const HfstOneLevelPath& s)
 {
   std::set<HfstState> epsilon_path_states;
   //epsilon_path_states.insert(t.get_initial_state());
@@ -1162,17 +1164,17 @@ bool EpsilonHandler::can_continue(HfstState s)
       it != epsilon_path.end(); it++)
     {
       if (*it == s) // a cycle detected
-	{
-	  it++;
-	  // erase the cycle from the epsilon path 
-	  // and check whether the number of cycles is exceeded
-	  epsilon_path.erase(it, epsilon_path.end());
-	  cycles++;
-	  if (cycles > max_cycles) {
-	    return false;
-	  }
-	  return true;
-	}
+        {
+          it++;
+          // erase the cycle from the epsilon path 
+          // and check whether the number of cycles is exceeded
+          epsilon_path.erase(it, epsilon_path.end());
+          cycles++;
+          if (cycles > max_cycles) {
+            return false;
+          }
+          return true;
+        }
     }
   return true;  // no cycle detected
 };
@@ -1218,10 +1220,10 @@ static bool is_possible_transition
       // we can go further if the current symbol in lookup_path
       // matches to the input symbol of the transition.
       if ( isymbol.compare(lookup_path.at(lookup_index)) == 0 )
-	{
-	  input_symbol_consumed=true;
-	  return true;
-	}
+        {
+          input_symbol_consumed=true;
+          return true;
+        }
     }
   // Whether there are more symbols in lookup_path or not,
   // we can always go further if the input symbol of the transition
@@ -1256,55 +1258,55 @@ static void lookup_fd
     {
       // and if the current state is final, 
       if (t.is_final_state(state)) 
-	{
-	  // path_so_far is a valid result.
-	  add_to_results
-	    (results, path_so_far, t.get_final_weight(state) );
-	}
+        {
+          // path_so_far is a valid result.
+          add_to_results
+            (results, path_so_far, t.get_final_weight(state) );
+        }
     }
 
   // Whether there are more symbols in lookup_path or not,
   // go through all transitions in the current state.
   HfstBasicTransducer::HfstTransitionSet transitions = t[state];
   for (HfstBasicTransducer::HfstTransitionSet::iterator it 
-	 = transitions.begin();
+         = transitions.begin();
        it != transitions.end(); it++)
     {
       bool input_symbol_consumed=false;
       if ( is_possible_transition
-	   (*it, lookup_path, lookup_index, input_symbol_consumed) )
-	{
-	  // update path_so_far and lookup_index
-	  push_back_to_two_level_path
-	    (path_so_far, 
-	     StringPair(it->get_input_symbol(), it->get_output_symbol()),
-	     it->get_weight());
-	  EpsilonHandler * Ehp = NULL;
-	  if (input_symbol_consumed) {
-	    lookup_index++;
-	    Ehp = new EpsilonHandler(infinite_cutoff);
-	  }
-	  else {
-	    Eh.push_back(state);
-	    Ehp = &Eh;
-	  }
+           (*it, lookup_path, lookup_index, input_symbol_consumed) )
+        {
+          // update path_so_far and lookup_index
+          push_back_to_two_level_path
+            (path_so_far, 
+             StringPair(it->get_input_symbol(), it->get_output_symbol()),
+             it->get_weight());
+          EpsilonHandler * Ehp = NULL;
+          if (input_symbol_consumed) {
+            lookup_index++;
+            Ehp = new EpsilonHandler(infinite_cutoff);
+          }
+          else {
+            Eh.push_back(state);
+            Ehp = &Eh;
+          }
 
-	  // call lookup for the target state of the transition
-	  lookup_fd(t, lookup_path, results, it->get_target_state(),
-		    lookup_index, path_so_far, *Ehp);
+          // call lookup for the target state of the transition
+          lookup_fd(t, lookup_path, results, it->get_target_state(),
+                    lookup_index, path_so_far, *Ehp);
 
-	  // return to the original values of path_so_far and lookup_index
-	  if (input_symbol_consumed) {
-	    lookup_index--;
-	    delete Ehp;
-	  }
-	  else {
-	    // Eh.pop_back();  not needed because the destructor of Eh is 
-	    //                 automatically called next
-	  }
+          // return to the original values of path_so_far and lookup_index
+          if (input_symbol_consumed) {
+            lookup_index--;
+            delete Ehp;
+          }
+          else {
+            // Eh.pop_back();  not needed because the destructor of Eh is 
+            //                 automatically called next
+          }
 
-	  pop_back_from_two_level_path(path_so_far, it->get_weight());
-	}
+          pop_back_from_two_level_path(path_so_far, it->get_weight());
+        }
     }
   
 }
@@ -1325,8 +1327,8 @@ static void lookup_fd
 
 /* Replace all strings \a str1 in \a symbol with \a str2. */
 static std::string replace_all(std::string symbol, 
-			       const std::string &str1,
-			       const std::string &str2)
+                               const std::string &str1,
+                               const std::string &str2)
 {
   size_t pos = symbol.find(str1);
   while (pos != string::npos) // while there are str1:s to replace
@@ -1334,7 +1336,7 @@ static std::string replace_all(std::string symbol,
       symbol.erase(pos, str1.size()); // erase str1
       symbol.insert(pos, str2);       // insert str2 instead
       pos = symbol.find               // find next str1
-	(str1, pos+str2.size());      
+        (str1, pos+str2.size());      
     }
   return symbol;
 }
@@ -1348,12 +1350,12 @@ static std::string get_print_format(const std::string &s)
   if (quote_special) 
     {
       return 
-	replace_all
-	( replace_all
-	  ( replace_all
-	    (s, "\\", "\\\\"),
-	    ":", "\\:"),
-	  " ", "\\ ");
+        replace_all
+        ( replace_all
+          ( replace_all
+            (s, "\\", "\\\\"),
+            ":", "\\:"),
+          " ", "\\ ");
     }
 
   return std::string(s);
@@ -1367,7 +1369,7 @@ static void print_lookup_string(const StringVector &s) {
 }
 
 void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results, 
-	       const HfstOneLevelPath& s, ssize_t limit = -1)
+               const HfstOneLevelPath& s, ssize_t limit = -1)
 {
   (void)limit;
 
@@ -1387,26 +1389,26 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
     else {
       /* For all result strings, */
       for (HfstTwoLevelPaths::const_iterator it
-	     = results_spv.begin(); it != results_spv.end(); it++) {
-	
-	/* print the lookup string */
-	print_lookup_string(s.second);
-	fprintf(outfile, "\t");
-	
-	/* and the path that yielded the result string */
-	bool first_pair=true;
-	for (StringPairVector::const_iterator IT = it->second.begin();
-	     IT != it->second.end(); IT++) {
-	  if (print_space && not first_pair) {
-	    fprintf(outfile, " ");
-	  }
-	  first_pair=false;
-	  fprintf(outfile, "%s:%s", 
-		  get_print_format(IT->first).c_str(), 
-		  get_print_format(IT->second).c_str());
-	}
-	/* and the weight of that path. */
-	fprintf(outfile, "\t%f\n", it->first);
+             = results_spv.begin(); it != results_spv.end(); it++) {
+        
+        /* print the lookup string */
+        print_lookup_string(s.second);
+        fprintf(outfile, "\t");
+        
+        /* and the path that yielded the result string */
+        bool first_pair=true;
+        for (StringPairVector::const_iterator IT = it->second.begin();
+             IT != it->second.end(); IT++) {
+          if (print_space && not first_pair) {
+            fprintf(outfile, " ");
+          }
+          first_pair=false;
+          fprintf(outfile, "%s:%s", 
+                  get_print_format(IT->first).c_str(), 
+                  get_print_format(IT->second).c_str());
+        }
+        /* and the weight of that path. */
+        fprintf(outfile, "\t%f\n", it->first);
       }
     }
     fprintf(outfile, "\n");
@@ -1418,10 +1420,10 @@ void lookup_fd(HfstBasicTransducer &t, HfstOneLevelPaths& results,
     {
       StringVector sv;
       for (StringPairVector::const_iterator spv_it = it->second.begin();
-	   spv_it != it->second.end(); spv_it++)
-	{
-	  sv.push_back(spv_it->second);
-	}
+           spv_it != it->second.end(); spv_it++)
+        {
+          sv.push_back(spv_it->second);
+        }
       HfstOneLevelPath path(it->first, sv);
       results.insert(path);
     }
@@ -1570,7 +1572,7 @@ print_lookups(const HfstOneLevelPaths& kvs,
 
 template<class T> HfstOneLevelPaths*
 perform_lookups(HfstOneLevelPath& origin, std::vector<T>& cascade, 
-		bool unknown, bool* infinite)
+                bool unknown, bool* infinite)
 {
   HfstOneLevelPaths* kvs;
     if (!unknown)
@@ -1603,41 +1605,46 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     while (inputstream.is_good())
       {
         transducer_n++;
+        HfstTransducer trans(inputstream);
+        char* inputname = strdup(trans.get_name().c_str());
+        if (strlen(inputname) <= 0)
+          {
+            inputname = strdup(inputfilename);
+          }
         if (transducer_n==1)
           {
-            verbose_printf("Reading %s...\n", inputfilename); 
+            verbose_printf("Reading %s...\n", inputname); 
           }
         else
           {
-            verbose_printf("Reading %s...%zu\n", inputfilename,
+            verbose_printf("Reading %s...%zu\n", inputname,
                            transducer_n); 
           }
-        HfstTransducer trans(inputstream);
 
-	// add multicharacter symbols to mc_symbols
-	hfst::ImplementationType type = trans.get_type();
-	if (type == hfst::SFST_TYPE || 
-	    type == hfst::TROPICAL_OPENFST_TYPE ||
-	    type == hfst::LOG_OPENFST_TYPE ||
-	    type == hfst::FOMA_TYPE)
-	  {
-	    HfstBasicTransducer basic(trans);
-	    for (HfstBasicTransducer::const_iterator it = basic.begin();
-		 it != basic.end(); it++)
-	      {
-		for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it = 
-		       it->second.begin();
-		     tr_it != it->second.end(); tr_it++)
-		  {
-		    std::string mcs = tr_it->get_input_symbol();
-		    if (mcs.size() > 1) {
-		      mc_symbols.push_back(mcs);
+        // add multicharacter symbols to mc_symbols
+        hfst::ImplementationType type = trans.get_type();
+        if (type == hfst::SFST_TYPE || 
+            type == hfst::TROPICAL_OPENFST_TYPE ||
+            type == hfst::LOG_OPENFST_TYPE ||
+            type == hfst::FOMA_TYPE)
+          {
+            HfstBasicTransducer basic(trans);
+            for (HfstBasicTransducer::const_iterator it = basic.begin();
+                 it != basic.end(); it++)
+              {
+                for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it = 
+                       it->second.begin();
+                     tr_it != it->second.end(); tr_it++)
+                  {
+                    std::string mcs = tr_it->get_input_symbol();
+                    if (mcs.size() > 1) {
+                      mc_symbols.push_back(mcs);
               if (verbose)
-		      fprintf(stderr, "adding mc symbol: %s\n", mcs.c_str());
-		    }
-		  }
-	      }
-	  }
+                      fprintf(stderr, "adding mc symbol: %s\n", mcs.c_str());
+                    }
+                  }
+              }
+          }
 
         cascade.push_back(trans);
       }
@@ -1648,11 +1655,11 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     // convert to HfstBasicTransducer
 
     if (print_pairs && 
-	(inputstream.get_type() == HFST_OL_TYPE || 
-	 inputstream.get_type() == HFST_OLW_TYPE) ) {
+        (inputstream.get_type() == HFST_OL_TYPE || 
+         inputstream.get_type() == HFST_OLW_TYPE) ) {
       fprintf(outstream, 
-	      "Error: pair printing not supported on "
-	      "       optimized lookup transducers, exiting program\n" );
+              "Error: pair printing not supported on "
+              "       optimized lookup transducers, exiting program\n" );
       exit(1);
     }
 
@@ -1676,33 +1683,33 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
         bool unknown = false;
         bool infinite = false;
 
-	bool optimized_lookup=
-	  (cascade[0].get_type() == HFST_OL_TYPE ||
-	   cascade[0].get_type() == HFST_OLW_TYPE);
+        bool optimized_lookup=
+          (cascade[0].get_type() == HFST_OL_TYPE ||
+           cascade[0].get_type() == HFST_OLW_TYPE);
 
-	HfstStrings2FstTokenizer input_tokenizer(mc_symbols, 
-						 std::string(epsilon_format));
+        HfstStrings2FstTokenizer input_tokenizer(mc_symbols, 
+                                                 std::string(epsilon_format));
 
         HfstOneLevelPath* kv = line_to_lookup_path(&line, input_tokenizer,
-						   &markup,
-						   &unknown, optimized_lookup);
+                                                   &markup,
+                                                   &unknown, optimized_lookup);
         HfstOneLevelPaths* kvs;
         try 
           {
             kvs = perform_lookups<HfstTransducer>(*kv, cascade, unknown,
                                                   &infinite);
-	    /* This does not throw an exception only if the type of the
-	       transducer is HFST_OL or HFST_OLW. */
+            /* This does not throw an exception only if the type of the
+               transducer is HFST_OL or HFST_OLW. */
           }
         // FunctionNotImplementedException
-	catch (const HfstException e)
+        catch (const HfstException e)
           {
             if (!internal_transducers)
               {
                 warning(0, 0, 
-			"Lookup not supported on this automaton "
-			"format: converting to HFST basic transducer "
-			"and trying\n");
+                        "Lookup not supported on this automaton "
+                        "format: converting to HFST basic transducer "
+                        "and trying\n");
                 for (unsigned int i=0; i<cascade.size(); i++) 
                   {
                     HfstBasicTransducer mut(cascade[i]);
@@ -1714,10 +1721,10 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                                                          unknown,
                                                          &infinite);
           }
-	if (not print_pairs) { 
-	  // printing was already done in function lookup_fd
-	  print_lookups(*kvs, *kv, markup, unknown, infinite, outstream);
-	}
+        if (not print_pairs) { 
+          // printing was already done in function lookup_fd
+          print_lookups(*kvs, *kv, markup, unknown, infinite, outstream);
+        }
         delete kv;
         delete kvs;
       } // while lines in input

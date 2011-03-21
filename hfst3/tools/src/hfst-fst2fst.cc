@@ -174,14 +174,20 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
     while(instream.is_good())
     {
         transducer_n++;
-        if(transducer_n == 1)
+        HfstTransducer input(instream);
+        char* inputname = strdup(input.get_name().c_str());
+        if (strlen(inputname) <= 0 )
+          {
+            inputname = strdup(inputfilename);
+          }
+        if (transducer_n == 1)
         {
-          verbose_printf("Converting %s...\n", inputfilename); 
+          verbose_printf("Converting %s...\n", inputname); 
         }
         else
         {
           verbose_printf("Converting %s...%zu\n",
-                         inputfilename, transducer_n);
+                         inputname, transducer_n);
         }
         HfstTransducer orig(instream);
         outstream << orig.convert(output_type /*, options*/);

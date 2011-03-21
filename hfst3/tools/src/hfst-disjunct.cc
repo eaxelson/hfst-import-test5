@@ -119,18 +119,28 @@ disjunct_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
     size_t transducer_n = 0;
     while (bothInputs) {
         transducer_n++;
+        HfstTransducer first(firststream);
+        HfstTransducer second(secondstream);
+        char* firstname = strdup(first.get_name().c_str());
+        if (strlen(firstname) <= 0 )
+          {
+            firstname = strdup(firstfilename);
+          }
+        char* secondname = strdup(second.get_name().c_str());
+        if (strlen(secondname) <= 0 )
+          {
+            secondname = strdup(secondfilename);
+          }
         if (transducer_n == 1)
         {
-            verbose_printf("Disjuncting %s and %s...\n", firstfilename, 
-                        secondfilename);
+            verbose_printf("Disjuncting %s and %s...\n", firstname, 
+                        secondname);
         }
         else
         {
             verbose_printf("Disjuncting %s and %s... %zu\n",
-                           firstfilename, secondfilename, transducer_n);
+                           firstname, secondname, transducer_n);
         }
-        HfstTransducer first(firststream);
-        HfstTransducer second(secondstream);
         outstream << first.disjunct(second);
         bothInputs = firststream.is_good() && secondstream.is_good();
     }
