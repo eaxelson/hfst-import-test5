@@ -362,6 +362,7 @@ hfst_ftell(FILE* stream)
     }
 }
 
+// str functions
 #ifndef HAVE_STRNDUP
 char*
 strndup(const char* s, size_t n)
@@ -380,6 +381,17 @@ strndup(const char* s, size_t n)
     return rv;
   }
 #endif
+
+char*
+hfst_strdup(const char* s)
+  {
+    char* rv = strdup(s);
+    if (rv == NULL)
+      {
+        error(EXIT_FAILURE, errno, "strdup failed");
+      }
+    return rv;
+  }
 
 char*
 hfst_strndup(const char* s, size_t n)
@@ -452,6 +464,19 @@ set_program_name(const char* argv0)
     program_name = hfst_strdup(argv0);
   }
 #endif
+
+// mem functions
+
+void*
+hfst_malloc(size_t s)
+  {
+    void* rv = malloc(s);
+    if ((rv==NULL) && (s > 0))
+      {
+        error(EXIT_FAILURE, errno, "malloc failed");
+      }
+    return rv;
+  }
 
 // customized default printouts for HFST tools
 void
