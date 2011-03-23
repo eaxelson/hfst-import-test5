@@ -163,7 +163,6 @@ parse_options(int argc, char** argv)
 #include "inc/check-params-unary.h"
     return EXIT_CONTINUE;
 }
-
 int
 process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 {
@@ -189,7 +188,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           verbose_printf("Converting %s...%zu\n",
                          inputname, transducer_n);
         }
-        outstream << orig.convert(output_type /*, options*/);
+        outstream << orig.convert(output_type, options);
     }
     instream.close();
     outstream.close();
@@ -240,7 +239,7 @@ int main( int argc, char **argv ) {
     HfstOutputStream* outstream = (outfile != stdout) ?
       new HfstOutputStream(outfilename, output_type, hfst_format) :
       new HfstOutputStream(output_type, hfst_format);
-    
+
     retval = process_stream(*instream, *outstream);
     delete instream;
     delete outstream;
