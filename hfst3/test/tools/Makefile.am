@@ -18,7 +18,7 @@
 # programs to run for unit etc. testing
 # prefer alphabetical order, except for core tests others depend upon
 # If compare doesn't function 99 % of other tests will fail anyways
-TESTS=hfst-check-version.sh hfst-check-help.sh empty-input.sh\
+TESTS=hfst-check-version.sh hfst-check-help.sh empty-input.sh \
 	  permutate-file-params.sh \
 	  compare-functionality.sh \
 	  concatenate-functionality.sh \
@@ -90,7 +90,7 @@ endif
 check_DATA=$(DEFAULT_CHECKS) $(SFST_CHECKS) $(OFST_CHECKS) $(FOMA_CHECKS) $(OL_CHECKS)
 
 FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
-		 cat2cat_or_CAT_uppercased.txt cat2CAT_uppercased.txt 
+		 cat2cat_or_CAT_uppercased.txt cat2CAT_uppercased.txt \
 		 cat2epsilon.txt cat2dog.txt \
 		 cat+dog.txt catdog.txt cat_or_dog.txt cat.txt CAT_uppercased2cat.txt \
 		 CAT_uppercased.txt cat_weight_final.txt cat_weight_initial.txt \
@@ -128,7 +128,7 @@ XRE_TXTS=cats_and_dogs.xre
 # files needed for test programs
 EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) \
 		   $(FST_PAIRSTRINGS) $(FST_SPACESTRINGS) \
-		   $(SUBSTITUTE_TXTS) $(XRE_TXTS) $(XFST_TXTS)
+		   $(SUBSTITUTE_TXTS) $(XRE_TXTS) $(XFST_TXTS) $(TESTS) cat2dog.substitute cat.strings cat.txt cats_and_dogs.xre utf-8.strings latin-1.strings
 
 clean-local:
 	-rm -f $(check_DATA)

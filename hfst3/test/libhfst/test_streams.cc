@@ -18,6 +18,20 @@ int main(int argc, char **argv)
 				       FOMA_TYPE};
 
 
+  FILE * f = fopen("test_transducers.att", "wb");
+  fprintf(f, 
+	  "0\t1\tfoo\tbar\t0.3\n"
+	  "1\t0.5\n"
+	  "--\n"
+	  "0\t0.0\n"
+	  "--\n"
+	  "--\n"
+	  "0\t0.0\n"
+	  "0\t0\ta\t<eps>\t0.2\n"
+	  "--\n"
+	  "0\t1\ta\n"
+	  "2\tb\n");
+
   for (unsigned int i=0; i<TYPES_SIZE; i++)
     {
 
@@ -43,6 +57,13 @@ int main(int argc, char **argv)
       /* To AT&T format. */
       verbose_print("Writing in AT&T format", types[i]);
       
+      FILE * f2 = fopen("transducer.att", "wb");
+      fprintf(f2,
+	      "0\t1\tbaz\t@0@\t0.000000\n"
+	      "1\t2\tfoo\tbar\t0.000000\n"
+	      "2\t0.000000\n");
+      fclose(f2);
+
       FILE * ofile = fopen("transducer2.att", "wb");
 
       HfstTransducer t1("foo", "bar", types[i]);

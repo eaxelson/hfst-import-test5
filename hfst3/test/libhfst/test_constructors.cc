@@ -63,6 +63,13 @@ int main(int argc, char **argv)
 
       /* From AT&T format. */
       verbose_print("Construction from AT&T format", types[i]);
+      FILE * f = fopen("foobar.att", "wb");
+      fprintf(f, 
+	      "0 1 @0@ @0@ 0.0\n"
+	      "1 2 foo bar 0\n"
+	      "2 3 @0@ @0@\n"
+	      "3\n");
+      fclose(f);
       FILE * file = fopen("foobar.att", "rb");
       HfstTransducer foobar_att(file, types[i], "@0@");
       fclose(file);

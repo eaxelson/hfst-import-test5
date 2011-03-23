@@ -2135,20 +2135,8 @@ HfstTransducer &HfstTransducer::compose
         if (DEBUG) fprintf(stderr,"..done\n");
     }
 
-    /*fprintf(stderr, "before harmonization:\n");
-      this->write_in_att_format(stderr);
-      fprintf(stderr, "--\n");
-      another.write_in_att_format(stderr);
-      fprintf(stderr, "\n");*/
-
     if (DEBUG) fprintf(stderr, "harmonizing for composition..\n");
     this->harmonize(const_cast<HfstTransducer&>(another));
-
-    /*fprintf(stderr, "before composition:\n");
-      this->write_in_att_format(stderr);
-      fprintf(stderr, "--\n");
-      another.write_in_att_format(stderr);
-      fprintf(stderr, "\n");*/
 
     if (DEBUG) fprintf(stderr,"..done\n");
     

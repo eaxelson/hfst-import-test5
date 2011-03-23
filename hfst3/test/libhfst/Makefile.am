@@ -25,4 +25,4 @@ test_transducer_functions test_hfst_basic_transducer test_flag_diacritics \
 test_examples
 
 # files needed for test programs
-# EXTRA_DIST=test.att
+EXTRA_DIST=foobar.att test_transducers.att
