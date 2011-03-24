@@ -331,6 +331,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           char* line = NULL;
           size_t len = 0;
           size_t line_n = 0;
+          verbose_printf("reading substitutions from %s...\n", from_file_name);
           while (hfst_getline(&line, &len, from_file) != -1)
             {
               line_n++;

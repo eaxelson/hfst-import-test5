@@ -665,7 +665,7 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
       {
         space += 2 * strlen(markup);
       }
-    char* res = static_cast<char*>(calloc(sizeof(char), space + 1));
+    char* res = static_cast<char*>(calloc(sizeof(char), space*32 + 1));
     size_t space_left = space;
     const char* src = format;
     char* dst = res;

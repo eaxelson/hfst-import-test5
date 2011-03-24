@@ -406,7 +406,8 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 tools/src/hfst-twolc/src/Makefile
 		 tools/src/hfst-twolc/test/Makefile
 		 man/Makefile 
-                 scripts/Makefile scripts/hfst-foma-wrapper.sh])
+                 scripts/Makefile scripts/hfst-foma-wrapper.sh],
+                 [chmod +x scripts/hfst-foma-wrapper.sh])
 
 # output
 AC_OUTPUT

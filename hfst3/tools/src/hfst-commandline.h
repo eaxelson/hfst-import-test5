@@ -190,6 +190,10 @@ void hfst_fseek(FILE* stream, long offset, int whence);
  */
 unsigned long hfst_ftell(FILE* stream);
 
+#ifndef HAVE_GETLINE
+ssize_t getline(char** lineptr, size_t* n, FILE* stream);
+#endif
+
 /**
  * @brief safely read one full line from file or print informative error
  * messae and exit on failure.
