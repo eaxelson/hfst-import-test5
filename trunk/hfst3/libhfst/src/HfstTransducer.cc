@@ -1368,6 +1368,18 @@ void HfstTransducer::extract_paths_fd(HfstTwoLevelPaths &results,
     extract_paths_fd(cb, cycles, filter_fd);
 }
 
+void HfstTransducer::extract_random_paths
+(HfstTwoLevelPaths &results, int max_num) const
+{
+  HFST_THROW(FunctionNotImplementedException);
+}
+
+void HfstTransducer::extract_random_paths_fd
+(HfstTwoLevelPaths &results, int max_num) const
+{
+  HFST_THROW(FunctionNotImplementedException);
+}
+
 bool HfstTransducer::check_for_missing_flags_in
 (const HfstTransducer &another,
  StringSet &missing_flags,
