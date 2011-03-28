@@ -44,6 +44,7 @@ using hfst::WeightedPaths;
 using hfst::WeightedPath;
 using hfst::StringPairVector;
 using hfst::HfstTwoLevelPath;
+using hfst::HfstTwoLevelPaths;
 
 using hfst::HFST_OL_TYPE;
 using hfst::HFST_OLW_TYPE;
@@ -55,6 +56,7 @@ using hfst::HFST_OLW_TYPE;
 static int max_strings = 0;
 static int cycles = -1;
 static int nbest_strings=-1;
+static int max_random_strings=-1;
 static bool display_weights=false;
 static bool eval_fd=false;
 static bool filter_fd=true;
@@ -81,6 +83,7 @@ print_usage()
     fprintf(message_out, "Fst2strings options:\n"
 "  -n, --max-strings=NSTR     print at most NSTR strings\n"
 "  -N, --nbest=NBEST          print at most NBEST best strings\n"
+"  -r, --random=NRAND         print at most NRAND random strings\n"
 "  -c, --cycles=NCYC          follow cycles at most NCYC times\n"
 "  -w, --print-weights        display the weight for each string\n"
 "  -e, --epsilon-format=EPS   print epsilon as EPS\n"
@@ -101,7 +104,7 @@ print_usage()
     fprintf(message_out, "If all NSTR, NBEST and NCYC are omitted, "
             "all possible paths are printed:\n"
             "NSTR, NBEST and NCYC default to infinity.\n"
-            "NBEST overrides NSTR and NCYC.\n"
+            "NBEST overrides NSTR and NCYC\n"
             "If EPS is not given, default is empty string.\n"
             "Numeric options are parsed with strtod(3).\n"
 	    "Xfst variables supported are { obey-flags, print-flags,\n"
@@ -142,6 +145,7 @@ parse_options(int argc, char** argv)
             {"max-out-length", required_argument, 0, 'L'},
             {"max-strings", required_argument, 0, 'n'},
             {"nbest", required_argument, 0, 'N'},
+	    {"random", required_argument, 0, 'r'},
             {"out-exclude", required_argument, 0, 'U'},
             {"out-prefix", required_argument, 0, 'P'},
             {"print-pairstrings", no_argument, 0, 'a'},
@@ -153,7 +157,7 @@ parse_options(int argc, char** argv)
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
                              HFST_GETOPT_UNARY_SHORT
-                             "Sawc:e:u:p:l:L:n:N:U:P:X:",
+                             "Sawc:e:u:p:l:L:n:r:N:U:P:X:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -169,6 +173,9 @@ parse_options(int argc, char** argv)
             break;
         case 'N':
             nbest_strings = hfst_strtoul(optarg, 10);
+            break;
+        case 'r':
+            max_random_strings = hfst_strtoul(optarg, 10);
             break;
         case 'c':
             cycles = hfst_strtoul(optarg, 10);
@@ -468,28 +475,60 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
     }
     else
     {
-      if(max_strings <= 0 && max_input_length <= 0 && max_output_length <= 0 &&
-     cycles < 0 && t.is_cyclic())
+      if(max_random_strings <= 0 && max_strings <= 0 && max_input_length <= 0 
+	 && max_output_length <= 0 &&
+	 cycles < 0 && t.is_cyclic())
       {
         error(EXIT_FAILURE, 0,
               "Transducer is cyclic. Use one or more of these options: "
-              "-n, -N, -l, -L, -c");
+              "-n, -N, -r, -l, -L, -c");
         return EXIT_FAILURE;
       }
     }
     
     if(max_strings > 0)
       verbose_printf("Finding at most %i path(s)...\n", max_strings);
+    else if(max_random_strings > 0)
+      verbose_printf("Finding at most %i random path(s)...\n", 
+		     max_random_strings);
     else
       verbose_printf("Finding strings...\n");
     
-    Callback cb(max_strings, &outstream);
-    if(eval_fd)
-      t.extract_paths_fd(cb, cycles, filter_fd);
+    /* not random strings */
+    if (max_random_strings <= 0)
+      {
+	Callback cb(max_strings, &outstream);
+	if(eval_fd)
+	  t.extract_paths_fd(cb, cycles, filter_fd);
+	else
+	  t.extract_paths(cb, cycles);    
+	verbose_printf("Printed %i string(s)\n", cb.count);
+      }
+    /* random strings */
     else
-      t.extract_paths(cb, cycles);
+      {
+	try {
+	  HfstTwoLevelPaths results;
+	  if (filter_fd)
+	    t.extract_random_paths(results, max_random_strings);
+	  else
+	    t.extract_random_paths(results, max_random_strings);
+	  
+	  Callback cb(max_random_strings, &outstream);
+	  for (HfstTwoLevelPaths::const_iterator it = results.begin();
+	       it != results.end(); it++)
+	    {
+	      HfstTwoLevelPath path = *it;
+	      cb(path, true /*final*/);
+	    }
+	  verbose_printf("Printed %i random string(s)\n", cb.count);
+	}
+	catch (const HfstException e) {
+	  fprintf(stderr, "option --random not implemented\n");
+	  return EXIT_FAILURE;
+	}
+      }
     
-    verbose_printf("Printed %i string(s)\n", cb.count);
   }
     
   instream.close();
@@ -500,6 +539,14 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
 int main( int argc, char **argv ) {
   hfst_set_program_name(argv[0], "0.1", "HfstFst2Strings");
     int retval = parse_options(argc, argv);
+
+    if (max_strings > 0 && max_random_strings > 0 && !silent)
+      {
+	fprintf(stderr, 
+		"warning: option --max_strings ignored, --random used\n");
+	max_strings = -1;
+      }
+
     if (retval != EXIT_CONTINUE)
     {
         return retval;
