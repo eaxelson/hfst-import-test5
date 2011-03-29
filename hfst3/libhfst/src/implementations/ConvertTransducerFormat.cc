@@ -1225,7 +1225,6 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 	    it->inputs.size() >= packing_aggression*seen_input_symbols) {
 	    first_available_index = used_indices->rbegin()->first + 1;
 	} else {
-	    ++toplevel_complex_windowings;
 	    while (!used_indices->available_for_first(
 		       first_available_index, used_state_index) or
 		   !used_indices->available_for_something(
