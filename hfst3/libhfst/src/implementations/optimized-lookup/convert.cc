@@ -16,57 +16,53 @@ namespace hfst_ol {
 
 void write_transitions_from_state_placeholders(
     TransducerTable<TransitionW> & transition_table,
-    std::map<unsigned int, hfst_ol::StatePlaceholder>
+    std::vector<hfst_ol::StatePlaceholder>
     & state_placeholders,
-    std::vector<unsigned int> & first_transition_vector,
     std::set<SymbolNumber> & flag_symbols)
 {
-    for (std::map<unsigned int, StatePlaceholder>::iterator it =
+    for (std::vector<StatePlaceholder>::iterator it =
              state_placeholders.begin(); it!=state_placeholders.end(); ++it) {
 
         // Insert a finality marker unless this is the first state,
         // the finality of which is determined by the index table
-        if (it->first != 0) {
+        if (it->state_number != 0) {
             transition_table.append(
                 TransitionW(
-                    it->second.final, it->second.final_weight));
+                    it->final, it->final_weight));
         }
         
         // Then we iterate through the symbols each state has.
 	// First we do a pass for epsilon and flags (they have to come
 	// first), then everything else.
-	if (it->second.inputs.count(0) != 0) {
-	    add_transitions_with(0, it->second.inputs[0],
+	if (it->inputs.count(0) != 0) {
+	    add_transitions_with(0, it->inputs[0],
 				 transition_table,
 				 state_placeholders,
-				 first_transition_vector,
 				 flag_symbols);
 	}
 	for (std::set<hfst_ol::SymbolNumber>::iterator flag_it =
 		 flag_symbols.begin(); flag_it != flag_symbols.end();
 	     ++flag_it) {
-	    if (it->second.inputs.count(*flag_it) != 0) {
+	    if (it->inputs.count(*flag_it) != 0) {
 		hfst_ol::add_transitions_with(*flag_it,
-					      it->second.inputs[*flag_it],
+					      it->inputs[*flag_it],
 					      transition_table,
 					      state_placeholders,
-					      first_transition_vector,
 					      flag_symbols);
 		
 	    }
 	}
         for (std::map<SymbolNumber,
 		 std::vector<TransitionPlaceholder> >::iterator sym_it =
-                 it->second.inputs.begin(); 
-             sym_it != it->second.inputs.end(); ++sym_it) {
+                 it->inputs.begin(); 
+             sym_it != it->inputs.end(); ++sym_it) {
             if (sym_it->first == 0 or flag_symbols.count(sym_it->first) != 0) {
 		continue;
 	    }
 	    hfst_ol::add_transitions_with(sym_it->first,
-					  it->second.inputs[sym_it->first],
+					  it->inputs[sym_it->first],
 					  transition_table,
 					  state_placeholders,
-					  first_transition_vector,
 					  flag_symbols);
 	}
     }
@@ -81,9 +77,8 @@ void write_transitions_from_state_placeholders(
 void add_transitions_with(SymbolNumber symbol,
 			  std::vector<TransitionPlaceholder> & transitions,
 			  TransducerTable<TransitionW> & transition_table,
-			  std::map<unsigned int, hfst_ol::StatePlaceholder>
+			  std::vector<hfst_ol::StatePlaceholder>
 			  & state_placeholders,
-			  std::vector<unsigned int> & first_transition_vector,
 			  std::set<SymbolNumber> & flag_symbols)
 {
     for (std::vector<TransitionPlaceholder>::iterator it = transitions.begin();
@@ -92,7 +87,7 @@ void add_transitions_with(SymbolNumber symbol,
 	// target is simple (ie. should point directly to TA entry)
 	unsigned int target;
 	if (state_placeholders[it->target].is_simple(flag_symbols)) {
-	    target = first_transition_vector[it->target] + 
+	    target = state_placeholders[it->target].first_transition + 
 		TRANSITION_TARGET_TABLE_START - 1;
 	} else {
 	    target = state_placeholders[it->target].start_index;
@@ -104,6 +99,21 @@ void add_transitions_with(SymbolNumber symbol,
 				    it->weight));
     }
 }
+
+bool compare_states_by_input_size(
+    const StatePlaceholder & lhs, const StatePlaceholder & rhs)
+{
+    // descending by input size
+    return lhs.inputs.size() > rhs.inputs.size();
+}
+
+bool compare_states_by_state_number(
+    const StatePlaceholder & lhs, const StatePlaceholder & rhs)
+{
+    // ascending by number
+    return lhs.state_number < rhs.state_number;
+}
+
 
 
 #if HAVE_OPENFST
