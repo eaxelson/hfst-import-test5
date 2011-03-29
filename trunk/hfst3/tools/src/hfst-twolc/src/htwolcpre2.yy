@@ -214,12 +214,13 @@ void insert_alphabet_pairs(const HandyDeque<std::string> &symbol_queue,
 	   *it == "__HFST_TWOLC_#" or
            it->find("__HFST_TWOLC_") == std::string::npos)  
 	  and
-	  *(it+1) == "__HFST_TWOLC_:" and
+	  *(it+1) == "__HFST_TWOLC_:" 
+	  and
 	  (*(it+2) == "__HFST_TWOLC_0" or
 	   *(it+2) == "__HFST_TWOLC_.#." or
-	   *it == "__HFST_TWOLC_#" or
+	   *(it+2) == "__HFST_TWOLC_#" or
            (it+2)->find("__HFST_TWOLC_") == std::string::npos))
-	{
+	{	  
 	  std::string input_symbol = *it == "__HFST_TWOLC_#" ? "#" : *it;
 	  ++(++it);
 	  std::string output_symbol = *it == "__HFST_TWOLC_#" ? "#" : *it;
