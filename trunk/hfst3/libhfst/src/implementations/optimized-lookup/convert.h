@@ -39,21 +39,25 @@ TransitionPlaceholder(unsigned int t, SymbolNumber o, float w):
 struct StatePlaceholder {
     unsigned int state_number;
     unsigned int start_index;
+    unsigned int first_transition;
     std::map<SymbolNumber, std::vector<TransitionPlaceholder> > inputs;
     bool final;
     float final_weight;
-    StatePlaceholder (unsigned int state, bool finality):
+    StatePlaceholder (unsigned int state, bool finality, unsigned int first):
     state_number(state),
 	start_index(UINT_MAX),
+	first_transition(first),
 	final(finality),
 	final_weight(0.0)
 	{}
     StatePlaceholder ():
     state_number(UINT_MAX),
-    start_index(UINT_MAX),
+	start_index(UINT_MAX),
+	first_transition(UINT_MAX),
 	final(false),
 	final_weight(0.0)
 	{ }
+    
     bool is_simple(std::set<SymbolNumber> & flag_symbols)
 	{
 	    if (state_number == 0) {
@@ -80,6 +84,7 @@ struct StatePlaceholder {
 	    }
 	    return true;
 	}
+    
     unsigned int number_of_transitions(void) {
 	unsigned int count = 0;
 	for(std::map<SymbolNumber, std::vector<TransitionPlaceholder> >
@@ -88,6 +93,7 @@ struct StatePlaceholder {
 	}
 	return count;
     }
+    
     unsigned int symbol_offset(SymbolNumber symbol,
 			       std::set<SymbolNumber> & flag_symbols) {
 	unsigned int offset = 0;
@@ -131,6 +137,11 @@ struct StatePlaceholder {
     }
 };
 
+bool compare_states_by_input_size(
+    const StatePlaceholder & lhs, const StatePlaceholder & rhs);
+bool compare_states_by_state_number(
+    const StatePlaceholder & lhs, const StatePlaceholder & rhs);
+
 class IndexPlaceholders: public std::map<unsigned int,
         std::pair<unsigned int, hfst_ol::SymbolNumber> >
 {
@@ -171,34 +182,30 @@ public:
 		}
 		return false;
 		}*/
-		
 
 	unsigned int filled = 0;
 	for (unsigned int i = 0; i < symbols; ++i) {
 	    filled += count(index + i);
+	    if (filled >= (packing_aggression*symbols)) {
+		return false;
+	    }
 	}
-	if (filled <= (packing_aggression*symbols)) {
-	    return true;
-	}
-	return false;
-
+	return true;
     }
 };
 
 
 void write_transitions_from_state_placeholders(
     TransducerTable<TransitionW> & transition_table,
-    std::map<unsigned int, hfst_ol::StatePlaceholder>
+    std::vector<hfst_ol::StatePlaceholder>
     & state_placeholders,
-    std::vector<unsigned int> & first_transition_vector,
     std::set<SymbolNumber> & flag_symbols);
 
 void add_transitions_with(SymbolNumber symbol,
 			  std::vector<TransitionPlaceholder> & transitions,
 			  TransducerTable<TransitionW> & transition_table,
-			  std::map<unsigned int, hfst_ol::StatePlaceholder>
+			  std::vector<hfst_ol::StatePlaceholder>
 			  & state_placeholders,
-			  std::vector<unsigned int> & first_transition_vector,
 			  std::set<SymbolNumber> & flag_symbols);
 
 #if HAVE_OPENFST // Covers remainder of file
