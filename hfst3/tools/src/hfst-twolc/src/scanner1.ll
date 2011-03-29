@@ -237,11 +237,6 @@ in/{RESERVED_SYMBOL} { return IN; }
   symbol_queue.push_back("__HFST_TWOLC_.#."); 
   return SYMBOL_SPACE; 
 }
-[#]/{RESERVED_SYMBOL} {
-  // Word boundary.
-  symbol_queue.push_back("__HFST_TWOLC_#"); 
-  return SYMBOL_SPACE; 
-}
 \[ {
   // Beginning of a bracketed regex.
   symbol_queue.push_back("__HFST_TWOLC_["); 
@@ -345,8 +340,10 @@ in/{RESERVED_SYMBOL} { return IN; }
 }
 (([%]({RESERVED_SYMBOL}|{FREE_SYMBOL}))|{FREE_SYMBOL})+/[:] { 
   // A symbol which is the left side of a pair e.g. "a" in "a:b".
-  symbol_queue.push_back
-    (yytext);
+  if (std::string(yytext) == "#")
+    { symbol_queue.push_back("__HFST_TWOLC_#"); }
+  else
+    { symbol_queue.push_back(yytext); }
   return SYMBOL; 
 }
 
@@ -354,6 +351,8 @@ in/{RESERVED_SYMBOL} { return IN; }
   // A symbol which is not the left side of a pair e.g. "b" in "a:b" or "[b]".
   std::string symbol = 
     remove_white_space(replace_substr(yytext,"\n","__HFST_TWOLC_\\n"));
+  if (symbol == "#")
+    { symbol = "__HFST_TWOLC_#"; }
   symbol_queue.push_back(symbol);
   return SYMBOL_SPACE; 
  }
