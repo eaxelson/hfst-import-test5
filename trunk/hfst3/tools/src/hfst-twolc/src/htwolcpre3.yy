@@ -347,9 +347,29 @@ PAIR: PAIR_SYMBOL COLON PAIR_SYMBOL
   if (std::string("__HFST_TWOLC_0") == $1 and 
       std::string("__HFST_TWOLC_0") == $3)
     { $$ = new OtherSymbolTransducer(HFST_EPSILON); }
+  else if (std::string("__HFST_TWOLC_#") == $1)
+    { 
+      // __HFST_TWOLC_# corresponds to the #-symbol in grammars. It should
+      // be split into an absolute word boundary "__HFST_TWOLC_.#." and a
+      // relative word boundary "#". On the surface the relative word-boundary
+      // may correspond to whatever it did correspond to in the rule file.
+      // The absolute word boundary surface realization is treated the same as
+      // the surface realizations of other absolute word boundaries.
+      OtherSymbolTransducer wb = 
+	alphabet.get_transducer(SymbolPair
+				("__HFST_TWOLC_.#.","__HFST_TWOLC_.#."));
+      OtherSymbolTransducer alt_wb = 
+	alphabet.get_transducer
+	(SymbolPair
+	 ("#",$3 == std::string("__HFST_TWOLC_#") ? "#" : $3));      
+      wb.apply(&HfstTransducer::disjunct,alt_wb);
+
+      $$ = new OtherSymbolTransducer(wb);
+    }  
   else
     { $$ = new OtherSymbolTransducer
 	(alphabet.get_transducer(SymbolPair($1,$3))); }
+
   free($1);
   free($3);
 }
