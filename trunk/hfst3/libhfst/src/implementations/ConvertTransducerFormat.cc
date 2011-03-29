@@ -1203,7 +1203,6 @@ unsigned int hfst_ol_to_hfst_basic_add_state
         // While this index is not suitable for a starting index, keep looking
 	if (!quick) {
 	    while (!used_indices->fits(*it, flag_symbols, i)) {
-		++index_increments;
 		++i;
 	    }
 	}
@@ -1224,7 +1223,6 @@ unsigned int hfst_ol_to_hfst_basic_add_state
         }
 	if (quick or
 	    it->inputs.size() >= packing_aggression*seen_input_symbols) {
-	    ++simple_windowings;
 	    first_available_index = used_indices->rbegin()->first + 1;
 	} else {
 	    ++toplevel_complex_windowings;
@@ -1234,7 +1232,6 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 		       first_available_index,
 		       seen_input_symbols,
 		       packing_aggression)) {
-		++complex_windowing_iterations;
 		++first_available_index;
 	    }
         }
