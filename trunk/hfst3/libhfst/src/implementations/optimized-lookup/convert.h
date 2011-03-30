@@ -143,13 +143,16 @@ bool compare_states_by_state_number(
     const StatePlaceholder & lhs, const StatePlaceholder & rhs);
 
 class IndexPlaceholders: public std::map<unsigned int,
-        std::pair<unsigned int, hfst_ol::SymbolNumber> >
+        std::pair<unsigned int, SymbolNumber> >
 {
 public:
     bool fits(StatePlaceholder & state,
 	      std::set<SymbolNumber> & flag_symbols,
 	      unsigned int position)
     {
+	if (count(position) != 0) {
+	    return false;
+	}
 	for (std::map<SymbolNumber,
 		 std::vector<TransitionPlaceholder> >
 		 ::iterator it = state.inputs.begin();
@@ -158,21 +161,33 @@ public:
 	    if (flag_symbols.count(index_offset) != 0) {
 		index_offset = 0;
 	    }
-	    if (count(index_offset + position) != 0) {
+	    if (count(index_offset + position + 1) != 0) {
 		return false;
 	    }
 	}
 	return true;
     }
-    bool available_for_first(unsigned int index,
-			     std::set<unsigned int> * used_states)
+
+    inline bool unsuitable(unsigned int from,
+			   std::set<unsigned int> * used_start_states,
+			   SymbolNumber seen_input_symbols,
+			   float packing_aggression)
+    {
+	return
+	    !available_for_first(from, used_start_states) or
+	    !available_for_something(
+		from, seen_input_symbols, packing_aggression);
+    }
+    
+    inline bool available_for_first(unsigned int index,
+				    std::set<unsigned int> * used_states)
     {
 	return used_states->count(index) == 0;
     }
     
-    bool available_for_something(unsigned int index,
-				 unsigned short symbols,
-				 float packing_aggression)
+    inline bool available_for_something(unsigned int index,
+					unsigned short symbols,
+					float packing_aggression)
     {
 	// "Perfect packing" (under this strategy)
 /*		for (unsigned int i = 0; i < symbols; ++i) {
@@ -185,7 +200,7 @@ public:
 
 	unsigned int filled = 0;
 	for (unsigned int i = 0; i < symbols; ++i) {
-	    filled += count(index + i);
+	    filled += count(index + i + 1);
 	    if (filled >= (packing_aggression*symbols)) {
 		return false;
 	    }

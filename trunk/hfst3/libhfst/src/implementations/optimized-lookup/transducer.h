@@ -401,6 +401,17 @@ public:
   
     static TransitionWIndex create_final()
 	{ return TransitionWIndex(NO_SYMBOL_NUMBER, 0); }
+    
+    static TransitionWIndex create_final(Weight w)
+	{
+	    union to_weight
+	    {
+		TransitionTableIndex i;
+		Weight w;
+	    } weight;
+	    weight.w = w;
+	    return TransitionWIndex(NO_SYMBOL_NUMBER, weight.i);
+	}
 };
     
 class Transition

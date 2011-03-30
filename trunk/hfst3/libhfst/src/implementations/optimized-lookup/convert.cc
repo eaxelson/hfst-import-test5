@@ -114,8 +114,6 @@ bool compare_states_by_state_number(
     return lhs.state_number < rhs.state_number;
 }
 
-
-
 #if HAVE_OPENFST
 
 bool check_finality(TransduceR * tr, StateId s)
