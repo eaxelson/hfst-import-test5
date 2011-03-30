@@ -152,10 +152,68 @@ and install the necessary autotools files from the host system:
   autoreconf -i
 
 It is common practice to keep `generated files out of version control
-<http://www.gnu.org/software/automake/manual/automake.html#CVS>`_.
+I<http://www.gnu.org/software/automake/manual/automake.html#CVS>`_.
 
 For further installation instruction refer to file ``INSTALL``, which contains
 the standard installation instructions for GNU autoconf based software.
+
+Troubleshooting
+---------------
+
+Compilation errors of form::
+
+  /usr/include/c++/4.3/cstdlib:124: error: '::malloc' has not been declared
+
+or::
+
+  your configure failed to find malloc, check README for further instructions
+
+are mosts often caused by broken library installation. This can be verified
+from the ``config.log`` file, which should contain something like::
+
+  configure:16727: g++ -o conftest -g -O2   conftest.cpp -lfoma -lz -lsfst -lm -lfst -ldl -lpthread  >&5
+  configure:16727: $? = 0
+  configure:16727: ./conftest
+  ./conftest: error while loading shared libraries: libfst.so.0: cannot open shared object file: No such file or directory
+
+Now this means you have installed OpenFst, but the linker doesn't know where
+to find it anymore. The simplest solution in Linux-based platforms is ldconfig::
+
+  ldconfig -v
+
+This is actually told and performed by the autotools libtool library
+installation, but it's easy to miss. It looks like this::
+
+  Libraries have been installed in:
+     /usr/local/lib
+
+  If you ever happen to want to link against installed libraries
+  in a given directory, LIBDIR, you must either use libtool, and
+  specify the full pathname of the library, or use the '-LLIBDIR'
+  flag during linking and do at least one of the following:
+     - add LIBDIR to the 'LD_LIBRARY_PATH' environment variable
+       during execution
+     - add LIBDIR to the 'LD_RUN_PATH' environment variable
+       during linking
+     - use the '-Wl,-rpath -Wl,LIBDIR' linker flag
+     - have your system administrator add LIBDIR to '/etc/ld.so.conf'
+
+  See any operating system documentation about shared libraries for
+  more information, such as the ld(1) and ld.so(8) manual pages.
+
+If you installed openfst on non-standard path, or installed it to the
+default ``/usr/local/lib``, but your variant of Linux doesn't support libraries
+there, you may need to set it up and/or ldconfig the directory explicitly::
+
+  export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
+  ldconfig -v -n /usr/local/lib
+
+If all else fails, try installing openfst to wherever your blend of Linux
+installs all its libraries, such as /usr/lib.
+
+See also: 
+<http://nerdland.net/unstumping-the-internet/malloc-has-not-been-declared/> for
+the gory details.
 
 Further information
 -------------------
