@@ -152,15 +152,15 @@ class IndexPlaceholders: public std::map<unsigned int,
 {
 public:
     bool const fits(StatePlaceholder const & state,
-	      std::set<SymbolNumber> const & flag_symbols,
-	      unsigned int const position) const
+		    std::set<SymbolNumber> const & flag_symbols,
+		    unsigned int const position) const
     {
 	if (count(position) != 0) {
 	    return false;
 	}
-	for (SymbolTransitionsMap ::const_iterator it = state.inputs.begin();
+	for (SymbolTransitionsMap::const_iterator it = state.inputs.begin();
 	     it != state.inputs.end(); ++it) {
-	    hfst_ol::SymbolNumber index_offset = it->first;
+	    SymbolNumber index_offset = it->first;
 	    if (flag_symbols.count(index_offset) != 0) {
 		index_offset = 0;
 	    }
