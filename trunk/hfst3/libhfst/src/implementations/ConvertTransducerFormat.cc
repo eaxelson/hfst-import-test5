@@ -1034,7 +1034,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
   hfst_basic_transducer_to_hfst_ol
   (const HfstBasicTransducer * t, bool weighted, std::string options)
   {
-      const float packing_aggression = 0.7;
+      const float packing_aggression = 0.8;
       bool quick = options == "quick";
       typedef std::set<std::string> StringSet;
       using hfst_ol::SymbolNumber;
@@ -1190,6 +1190,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 //     unsigned int index_increments = 0;
     unsigned int first_available_index = 0;
     unsigned int previous_first_index = 0;
+    unsigned int previous_successful_index = 0;
     for (std::vector<hfst_ol::StatePlaceholder>::iterator it =
              state_placeholders.begin();
          it != state_placeholders.end(); ++it) {
@@ -1205,6 +1206,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 	    }
 	}
         it->start_index = i;
+	previous_successful_index = i;
         // Once we've found a starting index, mark all the used input symbols
 	used_indices->operator[](i) =
 	    std::pair<unsigned int, SymbolNumber>(
@@ -1228,10 +1230,15 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 	while (used_indices->unsuitable(
 		   first_available_index, seen_input_symbols,
 		   packing_aggression)) {
-		   ++first_available_index;
+	    ++first_available_index;
 	       }
 	if (first_available_index == previous_first_index) {
-	    ++first_available_index;
+	    SymbolNumber index_offset = it->inputs.rbegin()->first;
+	    if (flag_symbols.count(index_offset) != 0) {
+		index_offset = 0;
+	    }
+	    first_available_index =
+		previous_successful_index + 1 + index_offset;
 	    while (used_indices->unsuitable(
 		       first_available_index,
 		       seen_input_symbols, packing_aggression)) {
