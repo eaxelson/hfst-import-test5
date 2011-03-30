@@ -357,6 +357,10 @@ parse_options(int argc, char** argv)
               {
                 quote_special = true;
               }
+	    else if (strcmp(optarg, "obey-flags") == 0)
+	      {
+		obey_flags = true;
+	      }
             else 
               {
                 error(EXIT_FAILURE, 0, "Xfst variable %s unrecognised",
@@ -482,6 +486,8 @@ is_valid_flag_diacritic_path(StringVector arcs)
     if (not print_pairs)
       fprintf(stderr, "Allowing all flag paths!\n");
     return true;
+    //hfst::FdTable<std::string> FdT;
+    //return FdT.is_valid_string(arcs);
   }
 
 

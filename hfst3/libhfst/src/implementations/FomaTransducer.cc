@@ -699,6 +699,15 @@ namespace hfst { namespace implementations {
            filter_fd, /*include_spv,*/ spv);
     }
   }
+
+    void FomaTransducer::extract_random_paths
+    (const fsm *t , HfstTwoLevelPaths &results, int max_num)
+    {
+      (void)t;
+      (void)results;
+      (void)max_num;
+      HFST_THROW(FunctionNotImplementedException);
+    }
   
   void FomaTransducer::insert_to_alphabet(fsm * t, const std::string &symbol)
   {

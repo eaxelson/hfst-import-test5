@@ -124,6 +124,9 @@ namespace implementations
         (Transducer * t, hfst::ExtractStringsCb& callback, int cycles=-1,
          FdTable<SFST::Character>* fd=NULL, bool filter_fd=false);
 
+      static void extract_random_paths
+	(Transducer *t, HfstTwoLevelPaths &results, int max_num);
+
       static Transducer * insert_freely
         (Transducer *t , const StringPair &symbol_pair);
       static Transducer * substitute

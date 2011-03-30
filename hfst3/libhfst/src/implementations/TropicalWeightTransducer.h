@@ -181,6 +181,10 @@ namespace implementations
         (StdVectorFst * t, hfst::ExtractStringsCb& callback,
          int cycles=-1, FdTable<int64>* fd=NULL, bool filter_fd=false 
          /*bool include_spv=false*/);
+
+      static void extract_random_paths
+	(StdVectorFst *t, HfstTwoLevelPaths &results, int max_num);
+
       static StdVectorFst * compose(StdVectorFst * t1,
                                    StdVectorFst * t2);
       static StdVectorFst * concatenate(StdVectorFst * t1,

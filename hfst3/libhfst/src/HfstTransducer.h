@@ -799,7 +799,7 @@ ccc : ddd
       (HfstTwoLevelPaths &results, int max_num) const;
 
     void extract_random_paths_fd
-      (HfstTwoLevelPaths &results, int max_num) const;
+      (HfstTwoLevelPaths &results, int max_num, bool filter_fd) const;
 
     /* \brief Call \a callback with extracted strings that are not 
        invalidated by flag diacritic rules.

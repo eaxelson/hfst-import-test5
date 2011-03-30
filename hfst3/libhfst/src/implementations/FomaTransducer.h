@@ -132,7 +132,9 @@ namespace hfst {
                                   int cycles=-1, FdTable<int>* fd=NULL, 
                                   bool filter_fd=false 
                                   /*bool include_spv=false*/);
-      
+      static void extract_random_paths
+	(const fsm *t, HfstTwoLevelPaths &results, int max_num);
+
       static FdTable<int>* get_flag_diacritics(fsm * t);
 
       static void insert_to_alphabet(fsm *t, const std::string &symbol);

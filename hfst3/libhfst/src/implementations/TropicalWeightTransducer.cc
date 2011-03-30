@@ -2299,7 +2299,113 @@ namespace hfst { namespace implementations
        /*lbuffer,0,ubuffer,0,*/0.0f,callback,cycles,fd_state_stack,filter_fd, 
        /*include_spv,*/ spv);
   }
-  
+
+  /* Get a random path from transducer \a t. */
+  static HfstTwoLevelPath random_path(StdVectorFst *t) {
+    
+    HfstTwoLevelPath path;    
+    StateId current_state = t->Start();
+
+    /* If we cannot proceed, all elements in \a path whose index is smaller
+       that \a last_index constitute the longest path that is recognized by
+       transducer \a t so far. */
+    int last_index=0;
+
+    /* Whether a state has been visited. */
+    int visited[ t->NumStates() ];
+    /* Whether the state is marked as broken, i.e. we cannot proceed from
+       that state. These arrays are used for giving more probability for 
+       shorter paths if \a t is cyclic. */
+    int broken[ t->NumStates() ];
+    
+    for ( unsigned int i = 0; i < t->NumStates(); ++i ) {
+      visited[i] = 0;
+      broken[i] = 0;
+    }
+
+    while (1) {
+
+      visited[ current_state ] = 1;
+      
+      vector<fst::StdArc> t_transitions;
+
+      for (fst::ArcIterator<StdVectorFst> aiter(*t,current_state); 
+	   !aiter.Done(); aiter.Next())
+	{
+	  t_transitions.push_back(aiter.Value());
+	}
+      
+      /* If we cannot proceed, return the longest path so far. */
+      if (t_transitions.empty() || broken[current_state]) {
+	for (int i=(int)path.second.size()-1; i>=last_index; i--) {
+	  path.second.pop_back(); 
+	}
+	return path;
+      }
+
+      /* Go through all transitions in a random order.
+	 (If \a t is pruned, only one transition is proceeded.) */
+      while ( not t_transitions.empty() ) {
+	unsigned int index = rand() % t_transitions.size();
+	fst::StdArc arc = t_transitions.at(index);
+	t_transitions.erase(t_transitions.begin()+index);
+	
+	StateId t_target = arc.nextstate;
+
+	path.second.push_back
+	  (StringPair
+	   (t->InputSymbols()->Find(arc.ilabel),
+	    t->InputSymbols()->Find(arc.olabel)));
+	
+	/* If the target state is final, */
+	if ( t->Final(t_target) != TropicalWeight::Zero() ) {
+	  if ( (rand() % 4) == 0 ) {  // randomly return the path so far,
+	    return path;
+	  } // or continue.
+	  last_index = (int)path.second.size();  
+	} 
+
+	/* Give more probability for shorter paths. */
+	if ( broken[ t_target ] == 0 ) {
+	  if ( visited[ t_target ] == 1 ) 
+	    if ( (rand() % 4) == 0 )
+	      broken[ t_target ] = 1;
+	}
+	
+	if ( visited[ t_target ] == 1 ) { 
+	  if ( (rand() % 4) == 0 )
+	    broken[ t_target ] = 1;
+	}
+
+	/* Proceed to the target state. */
+	current_state = t_target;
+	break;
+      }     
+    }
+    return path;
+  };
+      
+  void TropicalWeightTransducer::extract_random_paths
+  (StdVectorFst *t, HfstTwoLevelPaths &results, int max_num)
+  {
+    srand((unsigned int)(time(0)));
+
+    while (max_num > 0) {
+      HfstTwoLevelPath path = random_path(t);
+
+      /* If we extract the same path again, try at most 5 times
+	 to extract another one. */
+      unsigned int i = 0;
+      while ( (results.find(path) != results.end()) and (i < 5) ) {
+	path = random_path(t);
+	++i;
+      }
+      results.insert(path);
+
+      --max_num;    
+    }
+  }
+
   FdTable<int64>* TropicalWeightTransducer::get_flag_diacritics
   (StdVectorFst * t)
   {

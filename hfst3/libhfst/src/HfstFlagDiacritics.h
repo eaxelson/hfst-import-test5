@@ -208,7 +208,14 @@ public:
             error_flag = true;
         }
     }
-    
+
+    bool apply_operation(T symbol)
+        {
+            const FdOperation* op = table->get_operation(symbol);
+            if(op)
+                return apply_operation(*op);
+            return true; // if the symbol isn't a diacritic
+        }    
     bool apply_operation(const FdOperation& op)
         {
             switch(op.Operator()) {
@@ -254,14 +261,6 @@ public:
                 return false;
             }
             throw; // for the compiler's peace of mind
-        }
-    
-    bool apply_operation(T symbol)
-        {
-            const FdOperation* op = table->get_operation(symbol);
-            if(op)
-                return apply_operation(*op);
-            return true; // if the symbol isn't a diacritic
         }
     bool apply_operation(const std::string& symbol)
         {

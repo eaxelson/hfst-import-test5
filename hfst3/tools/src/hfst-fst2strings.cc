@@ -507,26 +507,28 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
     /* random strings */
     else
       {
+	HfstTwoLevelPaths results;
 	try {
-	  HfstTwoLevelPaths results;
-	  if (filter_fd)
+	  if (eval_fd) {
+	    t.extract_random_paths_fd(results, max_random_strings, filter_fd);
+	  }
+	  else {
 	    t.extract_random_paths(results, max_random_strings);
-	  else
-	    t.extract_random_paths(results, max_random_strings);
-	  
-	  Callback cb(max_random_strings, &outstream);
-	  for (HfstTwoLevelPaths::const_iterator it = results.begin();
-	       it != results.end(); it++)
-	    {
-	      HfstTwoLevelPath path = *it;
-	      cb(path, true /*final*/);
-	    }
-	  verbose_printf("Printed %i random string(s)\n", cb.count);
+	  }
 	}
 	catch (const HfstException e) {
 	  fprintf(stderr, "option --random not implemented\n");
 	  return EXIT_FAILURE;
 	}
+	  
+	Callback cb(max_random_strings, &outstream);
+	for (HfstTwoLevelPaths::const_iterator it = results.begin();
+	     it != results.end(); it++)
+	  {
+	    HfstTwoLevelPath path = *it;
+	    cb(path, true /*final*/);
+	  }
+	verbose_printf("Printed %i random string(s)\n", cb.count);
       }
     
   }
