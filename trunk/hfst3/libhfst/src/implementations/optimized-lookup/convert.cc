@@ -100,14 +100,14 @@ void add_transitions_with(SymbolNumber symbol,
     }
 }
 
-bool compare_states_by_input_size(
+const bool compare_states_by_input_size(
     const StatePlaceholder & lhs, const StatePlaceholder & rhs)
 {
     // descending by input size
     return lhs.inputs.size() > rhs.inputs.size();
 }
 
-bool compare_states_by_state_number(
+const bool compare_states_by_state_number(
     const StatePlaceholder & lhs, const StatePlaceholder & rhs)
 {
     // ascending by number
