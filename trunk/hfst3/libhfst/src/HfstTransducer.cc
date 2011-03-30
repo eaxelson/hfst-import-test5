@@ -1371,12 +1371,54 @@ void HfstTransducer::extract_paths_fd(HfstTwoLevelPaths &results,
 void HfstTransducer::extract_random_paths
 (HfstTwoLevelPaths &results, int max_num) const
 {
-  HFST_THROW(FunctionNotImplementedException);
+  switch (this->type)
+    {
+#if HAVE_OPENFST
+    case TROPICAL_OPENFST_TYPE:
+    {
+      this->tropical_ofst_interface.extract_random_paths
+	(this->implementation.tropical_ofst, results, max_num);
+    }
+    break;
+    case LOG_OPENFST_TYPE:
+    {
+      this->log_ofst_interface.extract_random_paths
+	(this->implementation.log_ofst, results, max_num);
+    }
+    break;
+#endif
+#if HAVE_SFST
+    case SFST_TYPE:
+    {
+      this->sfst_interface.extract_random_paths
+	(this->implementation.sfst, results, max_num);
+    }
+    break;
+#endif
+#if HAVE_FOMA
+    case FOMA_TYPE:
+    {
+      this->foma_interface.extract_random_paths
+	(this->implementation.foma, results, max_num);
+    }
+    break;
+#endif
+    /* Add here your implementation. */
+    case ERROR_TYPE:
+        HFST_THROW(TransducerHasWrongTypeException);
+    case HFST_OL_TYPE:
+    case HFST_OLW_TYPE:
+    default:
+      HFST_THROW(FunctionNotImplementedException);
+    }
 }
 
 void HfstTransducer::extract_random_paths_fd
-(HfstTwoLevelPaths &results, int max_num) const
+(HfstTwoLevelPaths &results, int max_num, bool filter_fd) const
 {
+  (void)results;
+  (void)max_num;
+  (void)filter_fd;
   HFST_THROW(FunctionNotImplementedException);
 }
 

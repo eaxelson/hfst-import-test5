@@ -860,6 +860,110 @@ namespace hfst { namespace implementations {
        /*include_spv,*/ spv);
   }
 
+  /* Get a random path from transducer \a t. */
+  static HfstTwoLevelPath random_path(Transducer *t) {
+    
+    HfstTwoLevelPath path;    
+    Node * current_t_node = t->root_node();
+
+    /* If we cannot proceed, all elements in \a path whose index is smaller
+       that \a last_index constitute the longest path that is recognized by
+       transducer \a t so far. */
+    int last_index=0;
+
+    NodeNumbering num(*t);
+
+    /* Whether a state has been visited. */
+    int visited[ num.number_of_nodes() ];
+    /* Whether the state is marked as broken, i.e. we cannot proceed from
+       that state. These arrays are used for giving more probability for 
+       shorter paths if \a t is cyclic. */
+    int broken[ num.number_of_nodes() ];
+    
+    for ( unsigned int i = 0; i < num.number_of_nodes(); ++i ) {
+      visited[i] = 0;
+      broken[i] = 0;
+    }
+
+    while (1) {
+
+      visited[ num[current_t_node] ] = 1;
+      
+      vector<Arc> t_transitions;
+      for ( ArcsIter it( current_t_node->arcs() ); it; it++) {
+	t_transitions.push_back(*it);
+      }
+      
+      /* If we cannot proceed, return the longest path so far. */
+      if (t_transitions.empty() || broken[num[current_t_node]]) {
+	for (int i=(int)path.second.size()-1; i>=last_index; i--) {
+	  path.second.pop_back(); 
+	}
+	return path;
+      }
+
+      /* Go through all transitions in a random order.
+	 (If \a t is pruned, only one transition is proceeded.) */
+      while ( not t_transitions.empty() ) {
+	unsigned int index = rand() % t_transitions.size();
+	Arc arc = t_transitions.at(index);
+	t_transitions.erase(t_transitions.begin()+index);
+	
+	Node * t_target = arc.target_node();
+
+	path.second.push_back
+	  (StringPair
+	   (t->alphabet.code2symbol(arc.label().lower_char()),
+	    t->alphabet.code2symbol(arc.label().upper_char())));
+	
+	/* If the target state is final, */
+	if ( t_target->is_final() ) {
+	  if ( (rand() % 4) == 0 ) {  // randomly return the path so far,
+	    return path;
+	  } // or continue.
+	  last_index = (int)path.second.size();  
+	} 
+
+	/* Give more probability for shorter paths. */
+	if ( broken[ num[ t_target ] ] == 0 ) {
+	  if ( visited[ num[ t_target ] ] == 1 ) 
+	    if ( (rand() % 4) == 0 )
+	      broken[ num[ t_target ] ] = 1;
+	}
+	
+	if ( visited[ num[ t_target ] ] == 1 ) { 
+	  if ( (rand() % 4) == 0 )
+	    broken[ num[ t_target ] ] = 1;
+	}
+
+	/* Proceed to the target state. */
+	current_t_node = t_target;
+	break;
+      }     
+    }
+    return path;
+  };
+    
+  void SfstTransducer::extract_random_paths
+  (Transducer *t, HfstTwoLevelPaths &results, int max_num)
+  {
+    srand((unsigned int)(time(0)));
+
+    while (max_num > 0) {
+      HfstTwoLevelPath path = random_path(t);
+
+      /* If we extract the same path again, try at most 5 times
+	 to extract another one. */
+      unsigned int i = 0;
+      while ( (results.find(path) != results.end()) and (i < 5) ) {
+	path = random_path(t);
+	++i;
+      }
+      results.insert(path);
+
+      --max_num;    
+    }
+  }
 
   Transducer * SfstTransducer::insert_freely
   (Transducer * t, const StringPair &symbol_pair)

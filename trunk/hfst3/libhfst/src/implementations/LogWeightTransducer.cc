@@ -2271,6 +2271,15 @@ namespace hfst { namespace implementations
        /*lbuffer,0,ubuffer,0,*/0.0f,callback,cycles,fd_state_stack,filter_fd,
        /*include_spv,*/ spv);
   }
+
+  void LogWeightTransducer::extract_random_paths
+  (const LogFst *t, HfstTwoLevelPaths &results, int max_num)
+  {
+    (void)t;
+    (void)results;
+    (void)max_num;
+    HFST_THROW(FunctionNotImplementedException);
+  }
   
   FdTable<int64>* LogWeightTransducer::get_flag_diacritics(LogFst * t)
   {

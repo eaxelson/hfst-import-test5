@@ -178,6 +178,8 @@ namespace implementations
         (LogFst * t, hfst::ExtractStringsCb& callback,
          int cycles=-1, FdTable<int64>* fd=NULL, bool filter_fd=false
          /*bool include_spv=false*/);
+      static void extract_random_paths
+	(const LogFst *t, HfstTwoLevelPaths &results, int max_num);
       static LogFst * compose(LogFst * t1,
                                    LogFst * t2);
       static LogFst * concatenate(LogFst * t1,
