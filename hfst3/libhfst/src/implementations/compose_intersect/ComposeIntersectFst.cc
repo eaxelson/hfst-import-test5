@@ -73,7 +73,7 @@ namespace hfst
 	  SymbolTransitionMap &symbol_transition_map = 
 	    transition_map_vector.back();
 	  bool identity_found = false;
-	  for (std::set<HfstBasicTransition>::const_iterator jt = 
+	  for (std::vector<HfstBasicTransition>::const_iterator jt = 
 		 it->second.begin();
 	       jt != it->second.end();
 	       ++jt)
