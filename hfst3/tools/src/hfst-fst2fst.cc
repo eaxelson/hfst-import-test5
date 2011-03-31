@@ -190,7 +190,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         }
 	try {
 	    outstream << orig.convert(output_type, options);
-	} HFST_CATCH(HfstFatalException)
+	} HFST_CATCH(HfstException)
     }
     instream.close();
     outstream.close();
