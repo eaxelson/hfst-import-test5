@@ -41,6 +41,14 @@ struct HfstException
       HfstException(name,file,line)\
       {}
 
+//! @brief Macro to catch exceptions thrown with HFST_THROW
+#define HFST_CATCH(E)							\
+    catch (const E &e)							\
+    {									\
+	std::cerr << e.file << ", line " << e.line << ": " <<		\
+	    e() << std::endl;						\
+    }
+
 // Example declaring an exception class SomeHfstException:
 //HFST_EXCEPTION_CHILD_DECLARATION(SomeHfstException);
 
