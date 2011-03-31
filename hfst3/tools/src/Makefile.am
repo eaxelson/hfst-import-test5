@@ -143,7 +143,7 @@ noinst_HEADERS= \
 	inc/getopt-cases-common.h inc/getopt-cases-error.h  \
 	inc/getopt-cases-unary.h  inc/globals-binary.h      \
 	inc/globals-common.h      inc/globals-unary.h \
-	HfstStrings2FstTokenizer.h
+	HfstStrings2FstTokenizer.h HfstLookupFlagDiacritics.h
 
 # sort alphabetically
 # or don't, as no one cares about anything anyways
@@ -188,7 +188,7 @@ hfst_lexc2fst_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC) \
 					  parsers/XreCompiler.cc parsers/xre_parse.yy \
 					  parsers/xre_lex.ll parsers/xre_utils.cc
 hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC) \
-HfstStrings2FstTokenizer.cc
+HfstStrings2FstTokenizer.cc HfstLookupFlagDiacritics.cc
 hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
 hfst_name_SOURCES=hfst-name.cc $(HFST_COMMON_SRC)
 hfst_project_SOURCES=hfst-project.cc $(HFST_COMMON_SRC)

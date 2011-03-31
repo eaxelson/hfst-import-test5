@@ -383,9 +383,13 @@ namespace hfst {
        @see #HfstBasicTransducer HfstBasicTransition */
     template <class C, class W> class HfstTransitionGraph 
       {
+      public:
+        /** @brief A set of transitions of a state in an HfstTransitionGraph. */
+        typedef std::set<HfstTransition<C> > HfstTransitionSet;
+
       protected:
         typedef std::map<HfstState, 
-          std::set<HfstTransition<C> > >
+          HfstTransitionSet >
           HfstStateMap;
         HfstStateMap state_map;
         typedef std::map<HfstState,W> FinalWeightMap;
@@ -395,8 +399,6 @@ namespace hfst {
         unsigned int max_state; /* The biggest state number in use. */
 
       public:
-        /** @brief A set of transitions of a state in an HfstTransitionGraph. */
-        typedef std::set<HfstTransition<C> > HfstTransitionSet;
         /** @brief An iterator type that points to the map of states 
             in the graph. 
 
@@ -414,7 +416,7 @@ namespace hfst {
             number zero and is not a final state, i.e. an empty graph. */
         HfstTransitionGraph(void): max_state(0) {
           initialize_alphabet(alphabet);
-          state_map[0]=std::set<HfstTransition <C> >();
+          state_map[0]=HfstTransitionSet();
         }
 
         /** @brief Create a deep copy of HfstTransitionGraph \a graph. */
@@ -521,7 +523,7 @@ namespace hfst {
             @return \a s*/
         HfstState add_state(HfstState s) {
           if (state_map.find(s) == state_map.end())
-            state_map[s]=std::set<HfstTransition <C> >();
+            state_map[s]=HfstTransitionSet();
           if (max_state < s)
             max_state=s;
           return s;
@@ -584,7 +586,7 @@ namespace hfst {
 
             If the state does not exist, it is created. The created
             state has an empty set of transitions. */
-        std::set<HfstTransition<C> > & operator[](HfstState s) {
+        HfstTransitionSet & operator[](HfstState s) {
           if (s > max_state)
             max_state=s;
           return state_map[s];
@@ -595,7 +597,7 @@ namespace hfst {
             If the state does not exist, a @a StateIndexOutOfBoundsException
             is thrown.
         */
-        const std::set<HfstTransition<C> > & operator[](HfstState s) const
+        const HfstTransitionSet & operator[](HfstState s) const
         {
           if (s > max_state)
             { 

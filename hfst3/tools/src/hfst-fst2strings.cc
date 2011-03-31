@@ -105,6 +105,7 @@ print_usage()
             "all possible paths are printed:\n"
             "NSTR, NBEST and NCYC default to infinity.\n"
             "NBEST overrides NSTR and NCYC\n"
+	    "NRAND overrides NBEST, NSTR and NCYC\n"
             "If EPS is not given, default is empty string.\n"
             "Numeric options are parsed with strtod(3).\n"
 	    "Xfst variables supported are { obey-flags, print-flags,\n"

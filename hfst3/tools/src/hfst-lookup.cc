@@ -34,6 +34,7 @@
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
+#include "HfstLookupFlagDiacritics.h"
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
@@ -359,7 +360,7 @@ parse_options(int argc, char** argv)
               }
 	    else if (strcmp(optarg, "obey-flags") == 0)
 	      {
-		obey_flags = true;
+		obey_flags = false;
 	      }
             else 
               {
@@ -483,11 +484,22 @@ is_flag_diacritic(const std::string& label)
 bool
 is_valid_flag_diacritic_path(StringVector arcs)
   {
-    if (not print_pairs)
-      fprintf(stderr, "Allowing all flag paths!\n");
-    return true;
-    //hfst::FdTable<std::string> FdT;
-    //return FdT.is_valid_string(arcs);
+    //if (not print_pairs)
+    //  fprintf(stderr, "Allowing all flag paths!\n");
+    //return true;
+    FlagDiacriticTable FdT;
+    /*fprintf(stderr, "testing flag validity for \n");
+    for (StringVector::const_iterator it = arcs.begin();
+	 it != arcs.end(); it++)
+      {
+	fprintf(stderr, "%s ", it->c_str());
+	}*/
+    bool res = FdT.is_valid_string(arcs);
+    /*if (res)
+      fprintf(stderr, "TRUE\n");
+    else
+    fprintf(stderr, "FALSE\n");*/
+    return res;
   }
 
 
