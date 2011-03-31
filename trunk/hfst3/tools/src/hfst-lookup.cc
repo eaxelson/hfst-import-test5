@@ -1049,8 +1049,8 @@ bool is_lookup_infinitely_ambiguous
     only_epsilons=true;
 
   // Go through all transitions in this state
-  HfstBasicTransducer::HfstTransitionSet transitions = t[state];
-  for (HfstBasicTransducer::HfstTransitionSet::iterator it 
+  HfstBasicTransducer::HfstTransitions transitions = t[state];
+  for (HfstBasicTransducer::HfstTransitions::const_iterator it 
          = transitions.begin();
        it != transitions.end(); it++)
     {
@@ -1285,8 +1285,8 @@ static void lookup_fd
 
   // Whether there are more symbols in lookup_path or not,
   // go through all transitions in the current state.
-  HfstBasicTransducer::HfstTransitionSet transitions = t[state];
-  for (HfstBasicTransducer::HfstTransitionSet::iterator it 
+  HfstBasicTransducer::HfstTransitions transitions = t[state];
+  for (HfstBasicTransducer::HfstTransitions::const_iterator it 
          = transitions.begin();
        it != transitions.end(); it++)
     {
@@ -1650,8 +1650,8 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
             for (HfstBasicTransducer::const_iterator it = basic.begin();
                  it != basic.end(); it++)
               {
-                for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it = 
-                       it->second.begin();
+                for (HfstBasicTransducer::HfstTransitions::const_iterator 
+		       tr_it = it->second.begin();
                      tr_it != it->second.end(); tr_it++)
                   {
                     std::string mcs = tr_it->get_input_symbol();

@@ -202,7 +202,8 @@ OtherSymbolTransducer &OtherSymbolTransducer::harmonize_diacritics
        it != basic.end();
        ++it)
     {
-      for (HfstBasicTransitionSet::iterator jt = it->second.begin();
+      for (HfstBasicTransducer::HfstTransitions::const_iterator jt 
+	     = it->second.begin();
 	   jt != it->second.end();
 	   ++jt)
 	{
@@ -215,7 +216,7 @@ OtherSymbolTransducer &OtherSymbolTransducer::harmonize_diacritics
 		   kt != missing_diacritics.end();
 		   ++kt)
 		{
-		  it->second.insert
+		  it->second.push_back
 		    (HfstBasicTransition(target,*kt,*kt,0.0));
 		}
 	      break;
@@ -488,7 +489,8 @@ OtherSymbolTransducer OtherSymbolTransducer::get_inverse_of_upper_projection
       new_fst.add_state(state);
       if (fst.is_final_state(state))
 	{ new_fst.set_final_weight(state,fst.get_final_weight(state)); }
-      for (HfstBasicTransitionSet::iterator jt = it->second.begin();
+      for (HfstBasicTransducer::HfstTransitions::iterator jt 
+	     = it->second.begin();
 	   jt != it->second.end();
 	   ++jt)
 	{
@@ -596,11 +598,11 @@ bool have_common_string(HfstState state1,HfstState state2,
   if (fst1.is_final_state(state1) and fst2.is_final_state(state2))
     { return true; }
 
-  const std::set<HfstBasicTransition> &fst1_transitions = fst1[state1];
-  const std::set<HfstBasicTransition> &fst2_transitions = fst2[state2];
+  const HfstBasicTransducer::HfstTransitions &fst1_transitions = fst1[state1];
+  const HfstBasicTransducer::HfstTransitions &fst2_transitions = fst2[state2];
 
   HandyMap<SymbolPair,HfstState> fst1_transition_map;
-  for (std::set<HfstBasicTransition>::const_iterator it = 
+  for (HfstBasicTransducer::HfstTransitions::const_iterator it = 
 	 fst1_transitions.begin();
        it != fst1_transitions.end();
        ++it)
@@ -608,7 +610,7 @@ bool have_common_string(HfstState state1,HfstState state2,
 				     it->get_output_symbol())] =
 	it->get_target_state(); }
 
-  for (std::set<HfstBasicTransition>::const_iterator it = 
+  for (HfstBasicTransducer::HfstTransitions::const_iterator it = 
 	 fst2_transitions.begin();
        it != fst2_transitions.end();
        ++it)

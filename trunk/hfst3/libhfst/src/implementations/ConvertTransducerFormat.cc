@@ -174,7 +174,7 @@ namespace hfst { namespace implementations
        it != net->end(); it++)
     {
       // Go through the set of transitions in each state
-      for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it 
+      for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
              = it->second.begin();
            tr_it != it->second.end(); tr_it++)
         {
@@ -343,7 +343,7 @@ namespace hfst { namespace implementations
          it != hfst_fsm->end(); it++)
       {
         // Go through the set of transitions in each state
-        for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it 
+        for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
                = it->second.begin();
              tr_it != it->second.end(); tr_it++)
           {
@@ -620,7 +620,7 @@ namespace hfst { namespace implementations
          it != net->end(); it++)
       {
         // Go through the set of transitions in each state
-        for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it 
+        for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
                = it->second.begin();
              tr_it != it->second.end(); tr_it++)
           {
@@ -876,7 +876,7 @@ namespace hfst { namespace implementations
          it != net->end(); it++)
       {
         // Go through the set of transitions in each state
-        for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it 
+        for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
                = it->second.begin();
              tr_it != it->second.end(); tr_it++)
           {
@@ -1063,7 +1063,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 
       for (HfstBasicTransducer::const_iterator it = t->begin(); 
            it != t->end(); ++it) {
-          for (HfstBasicTransducer::HfstTransitionSet::const_iterator tr_it 
+          for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
                  = it->second.begin();
                tr_it != it->second.end(); ++tr_it) {
               if (FdOperation::is_diacritic(tr_it->get_input_symbol())) {
@@ -1139,7 +1139,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 	    state_placeholders.back().final_weight =
 		t->get_final_weight(it->first);
         }
-        for (HfstBasicTransducer::HfstTransitionSet::const_iterator tr_it 
+        for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
                = it->second.begin();
              tr_it != it->second.end(); ++tr_it) {
 	    ++first_transition;

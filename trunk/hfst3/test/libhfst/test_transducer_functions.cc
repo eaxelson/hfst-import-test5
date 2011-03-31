@@ -602,7 +602,7 @@ int main(int argc, char **argv)
 
 	    /* Test the transition weight. */
 	    try {
-	      HfstBasicTransducer::HfstTransitionSet transitions = t_initial[0];
+	      HfstBasicTransducer::HfstTransitions transitions = t_initial[0];
 	      assert(transitions.size() == 1);
 	      float weight = transitions.begin()->get_weight();
 	      /* Rounding can affect the precision. */  
