@@ -71,7 +71,16 @@ namespace hfst
      @see HfstTransducer::substitute(const StringPair&, const StringPairSet &)
      #hfst::rules */
   typedef std::set<StringPair> StringPairSet;
-
+  
+/* The internal representations */
+  const std::string internal_epsilon = "@_EPSILON_SYMBOL_@";
+  const std::string internal_unknown = "@_UNKNOWN_SYMBOL_@";
+  const std::string internal_identity = "@_IDENTITY_SYMBOL_@";
+  
+  /* Check whether a string is equal to reserved internal representation. */
+  bool is_epsilon(std::string const str);
+  bool is_unknown(std::string const str);
+  bool is_identity(std::string const str);
 
   /* For internal use */
   typedef std::pair<unsigned int, unsigned int> NumberPair;
