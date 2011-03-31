@@ -911,10 +911,17 @@ namespace hfst { namespace implementations {
 	
 	Node * t_target = arc.target_node();
 
+	std::string istring 
+	  = t->alphabet.code2symbol(arc.label().lower_char());
+	std::string ostring 
+	  = t->alphabet.code2symbol(arc.label().upper_char());
+	if (istring.compare("<>") == 0)
+	  istring = std::string("@_EPSILON_SYMBOL_@");
+	if (ostring.compare("<>") == 0)
+	  ostring = std::string("@_EPSILON_SYMBOL_@");
+
 	path.second.push_back
-	  (StringPair
-	   (t->alphabet.code2symbol(arc.label().lower_char()),
-	    t->alphabet.code2symbol(arc.label().upper_char())));
+	  (StringPair(istring, ostring));
 	
 	/* If the target state is final, */
 	if ( t_target->is_final() ) {
