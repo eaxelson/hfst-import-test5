@@ -188,7 +188,9 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           verbose_printf("Converting %s...%zu\n",
                          inputname, transducer_n);
         }
-        outstream << orig.convert(output_type, options);
+	try {
+	    outstream << orig.convert(output_type, options);
+	} HFST_CATCH(HfstFatalException)
     }
     instream.close();
     outstream.close();
