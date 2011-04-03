@@ -79,6 +79,10 @@ endif
 if WANT_NAME
 MAYBE_NAME=hfst-name
 endif
+if WANT_PREPROCESS_FOR_OPTIMIZED_LOOKUP
+MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP=hfst-preprocess-for-optimized-lookup-format
+MAYBE_ALIASES+=hfst-preprocess-for-optimised-lookup-format
+endif
 if WANT_PROJECT
 MAYBE_PROJECT=hfst-project
 endif
@@ -146,22 +150,21 @@ noinst_HEADERS= \
 	HfstStrings2FstTokenizer.h HfstLookupFlagDiacritics.h
 
 # sort alphabetically
-# or don't, as no one cares about anything anyways
 bin_PROGRAMS= \
-             $(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_CONCATENATE)     \
-	     $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) $(MAYBE_DISJUNCT)	\
-	     $(MAYBE_FORMAT) $(MAYBE_FST2FST) $(MAYBE_FST2STRINGS)	\
-	     $(MAYBE_FST2TXT) $(MAYBE_HEAD) $(MAYBE_INVERT)		\
-	     $(MAYBE_LOOKUP) $(MAYBE_MINIMIZE) $(MAYBE_NAME)		\
-	     $(MAYBE_PROJECT) $(MAYBE_PUSH_WEIGHTS)			\
-	     $(MAYBE_REGEXP2FST) $(MAYBE_REMOVE_EPSILONS)		\
-	     $(MAYBE_REPEAT) $(MAYBE_REVERSE) $(MAYBE_SPLIT)		\
-	     $(MAYBE_STRINGS2FST) $(MAYBE_STRIP_HEADER)			\
-	     $(MAYBE_SUBTRACT) $(MAYBE_SUMMARIZE) $(MAYBE_TAIL)		\
-	     $(MAYBE_TXT2FST) $(MAYBE_CALCULATE) $(MAYBE_SUBSTITUTE)	\
-	     $(MAYBE_FLAG_DIACRITICS) $(MAYBE_LEXC_COMPILER)		\
-	     $(MAYBE_XFST_COMPILER) $(MAYBE_FORMAT)			\
-	     $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME)
+			 $(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_CONCATENATE)     \
+			 $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) $(MAYBE_DISJUNCT)   \
+			 $(MAYBE_FORMAT) $(MAYBE_FST2FST) $(MAYBE_FST2STRINGS)      \
+			 $(MAYBE_FST2TXT) $(MAYBE_HEAD) $(MAYBE_INVERT)             \
+			 $(MAYBE_LOOKUP) $(MAYBE_MINIMIZE) $(MAYBE_NAME)            \
+			 $(MAYBE_PROJECT) $(MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP)  \
+			 $(MAYBE_PUSH_WEIGHTS) $(MAYBE_REGEXP2FST)                  \
+			 $(MAYBE_REMOVE_EPSILONS) $(MAYBE_REPEAT) $(MAYBE_REVERSE)  \
+			 $(MAYBE_SPLIT) $(MAYBE_STRINGS2FST) $(MAYBE_STRIP_HEADER)  \
+			 $(MAYBE_SUBTRACT) $(MAYBE_SUMMARIZE) $(MAYBE_TAIL)         \
+			 $(MAYBE_TXT2FST) $(MAYBE_CALCULATE) $(MAYBE_SUBSTITUTE)    \
+			 $(MAYBE_FLAG_DIACRITICS) $(MAYBE_LEXC_COMPILER)            \
+			 $(MAYBE_XFST_COMPILER) $(MAYBE_FORMAT)                     \
+			 $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME)
 
 bin_SCRIPTS=$(MAYBE_ALIASES)
 
@@ -191,6 +194,8 @@ hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC) \
 HfstStrings2FstTokenizer.cc HfstLookupFlagDiacritics.cc
 hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
 hfst_name_SOURCES=hfst-name.cc $(HFST_COMMON_SRC)
+hfst_preprocess_for_optimized_lookup_format_SOURCES=hfst-preprocess-for-optimized-lookup-format.cc\
+													 $(HFST_COMMON_SRC)
 hfst_project_SOURCES=hfst-project.cc $(HFST_COMMON_SRC)
 hfst_push_weights_SOURCES=hfst-push-weights.cc $(HFST_COMMON_SRC)
 hfst_regexp2fst_SOURCES=hfst-regexp2fst.cc $(HFST_COMMON_SRC) \
@@ -230,6 +235,9 @@ hfst-minimise$(EXEEXT): hfst-minimize$(EXEEXT)
 	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
 
 hfst-minus$(EXEEXT): hfst-subtract$(EXEEXT)
+	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
+
+hfst-preprocess-for-optimised-lookup-format$(EXEEXT): hfst-preprocess-for-optimized-lookup-format$(EXEEXT)
 	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
 
 hfst-sfstpl2fst$(EXEEXT): hfst-calculate$(EXEEXT)
