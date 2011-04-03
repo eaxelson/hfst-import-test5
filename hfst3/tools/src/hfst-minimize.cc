@@ -126,8 +126,19 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         {
           verbose_printf("Minimizing %s...%zu\n", inputname, transducer_n); 
         }
+        trans.minimize();
+        char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                             (strlen(inputname) +
+                                              strlen("hfst-minimize=(%s)")) 
+                                             + 1));
+        if (sprintf(composed_name, "hfst-minimize=(%s)", 
+                    inputname) > 0)
+          {
+            trans.set_name(composed_name);
+          }
+
         
-        outstream << trans.minimize();
+        outstream << trans;
     }
     instream.close();
     outstream.close();

@@ -128,8 +128,18 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           verbose_printf("Determinizing %s...%zu\n", inputname,
                          transducer_n); 
         }
-        
-        outstream << trans.determinize();
+        trans.determinize();
+        char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                             (strlen(inputname) +
+                                              strlen("hfst-determinize=(%s)")) 
+                                             + 1));
+        if (sprintf(composed_name, "hfst-determinize=(%s)", 
+                    inputname) > 0)
+          {
+            trans.set_name(composed_name);
+          }
+
+        outstream << trans;
     }
     instream.close();
     outstream.close();

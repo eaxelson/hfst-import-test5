@@ -193,20 +193,49 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         
         if (!from_infinity && !to_infinity)
           {
-            outstream << trans.repeat_n_to_k(at_least, at_most);
+            trans.repeat_n_to_k(at_least, at_most);
+            char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                             (strlen(inputname) +
+                                              strlen("hfst-repeat=(%s^{%lu,%lu})")) 
+                                             + 1 + 32 + 32));
+            if (sprintf(composed_name, "hfst-repeat=(%s^{%lu,%lu})",
+                        inputname, at_least, at_most) > 0)
+              {
+                trans.set_name(composed_name);
+              }
+
           }
         else if (from_infinity && to_infinity)
           {
-            outstream << trans.repeat_star();
+            trans.repeat_star();
+            char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                             (strlen(inputname) +
+                                              strlen("hfst-repeat=(%s^{0,})")) 
+                                             + 1 + 32 + 32));
+            if (sprintf(composed_name, "hfst-repeat=(%s^{0,})",
+                        inputname) > 0)
+              {
+                trans.set_name(composed_name);
+              }
           }
         else if (!from_infinity && to_infinity)
           {
-            outstream << trans.repeat_n_plus(at_least);
+            trans.repeat_n_plus(at_least);
+            char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                             (strlen(inputname) +
+                                              strlen("hfst-repeat=(%s^{%lu,})")) 
+                                             + 1 + 32 + 32));
+            if (sprintf(composed_name, "hfst-repeat=(%s^{%lu,})",
+                        inputname, at_least) > 0)
+              {
+                trans.set_name(composed_name);
+              }
           }
         else if (from_infinity && !to_infinity)
           {
-          error(EXIT_FAILURE, 0, "Repeating *..%lu?", at_most);
+             error(EXIT_FAILURE, 0, "Repeating *..%lu?", at_most);
           }
+        outstream << trans;
     }
     instream.close();
     outstream.close();

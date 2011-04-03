@@ -172,12 +172,33 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         
         if (push_initial)
           {
-            outstream << trans.push_weights(hfst::TO_INITIAL_STATE);
+            trans.push_weights(hfst::TO_INITIAL_STATE);
+            char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                             (strlen(inputname) +
+                                              strlen("hfst-push=(%s.<)")) 
+                                             + 1));
+            if (sprintf(composed_name, "hfst-push=(%s.<)", 
+                    inputname) > 0)
+              {
+                trans.set_name(composed_name);
+              }
+
           }
         else
           {
-            outstream << trans.push_weights(hfst::TO_FINAL_STATE);
+            trans.push_weights(hfst::TO_FINAL_STATE);
+            char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                             (strlen(inputname) +
+                                              strlen("hfst-push=(%s.>)")) 
+                                             + 1));
+            if (sprintf(composed_name, "hfst-push=(%s.>)", 
+                        inputname) > 0)
+              {
+                trans.set_name(composed_name);
+              }
+
           }
+        outstream << trans;
     }
     instream.close();
     outstream.close();

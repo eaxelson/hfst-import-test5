@@ -120,14 +120,24 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           }
         if (transducer_n==1)
         {
-          verbose_printf("Inverting %s...\n", inputfilename); 
+          verbose_printf("Inverting %s...\n", inputname); 
         }
         else
         {
-          verbose_printf("Inverting %s...%zu\n", inputfilename, transducer_n); 
+          verbose_printf("Inverting %s...%zu\n", inputname, transducer_n); 
         }
-        
-        outstream << trans.invert();
+        trans.invert();
+        char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                             (strlen(inputname) +
+                                              strlen("hfst-invert=(%s)")) 
+                                             + 1));
+        if (sprintf(composed_name, "hfst-invert=(%s)", 
+                    inputname) > 0)
+          {
+            trans.set_name(composed_name);
+          }
+
+        outstream << trans;
     }
     instream.close();
     outstream.close();

@@ -188,9 +188,21 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           verbose_printf("Converting %s...%zu\n",
                          inputname, transducer_n);
         }
-	try {
-	    outstream << orig.convert(output_type, options);
-	} HFST_CATCH(HfstException)
+        try {
+            orig.convert(output_type, options);
+        } HFST_CATCH(HfstException)
+        char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                             (strlen(inputname) +
+                                              strlen("hfst-fst2fst=(%s)")) 
+                                             + 1));
+        if (sprintf(composed_name, "hfst-fst2fst=(%s)", 
+                    inputname) > 0)
+          {
+            orig.set_name(composed_name);
+          }
+
+
+        outstream << orig;
     }
     instream.close();
     outstream.close();
