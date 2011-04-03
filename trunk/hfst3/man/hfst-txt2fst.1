@@ -26,25 +26,46 @@ Alias of \fB\-\-quiet\fR
 .SS "Input/Output options:"
 .TP
 \fB\-i\fR, \fB\-\-input\fR=\fIINFILE\fR
-Read input transducer from INFILE
+Read input transducer from \fIINFILE\fR
 .TP
 \fB\-o\fR, \fB\-\-output\fR=\fIOUTFILE\fR
-Write output transducer to OUTFILE
+Write output transducer to \fIOUTFILE\fR
 .SS "Text format options:"
 .TP
 \fB\-n\fR, \fB\-\-number\fR
 If numbers are used instead of symbol names
 .TP
 \fB\-f\fR, \fB\-\-format\fR=\fIFMT\fR
-Write result using FMT backend's format
+Write result using \fIFMT\fR backend's format
 .TP
 \fB\-e\fR, \fB\-\-epsilon\fR=\fIEPS\fR
-Map EPS as epsilon
+Map \fIEPS\fR as epsilon
 .PP
-If OUTFILE or INFILE is missing or \-,standard streams will be used.
-If FMT is not given, OpenFst's tropical format will be used. The possible values for FMT are sfst, openfst\-tropical, openfst\-log,
-foma, optimized\-lookup\-unweighted, optimized\-lookup\-weighted...
-If EPS is not given, @0@ will be used
+If \fIOUTFILE\fR or \fIINFILE\fR is missing or \-,standard streams will be used.
+If \fIFMT\fR is not given, OpenFst's tropical format will be used. The possible
+values for \fIFMT\fR are \fBsfst\fR, \fBopenfst\-tropical\fR, 
+\fBopenfst\-log\ \fBfoma\fR, \fBolw\fR,... If \fIEPS\fR is not given, \fB@0@\fR
+will be used.
+.SH EXAMPLES
+.TP
+.B hfst\-txt2fst cat.txt
+compile cat.txt to hfst automaton
+.SS "Input formats:"
+The input format for this tool is same as in OpenFst tools; tab separated
+values where lines of 2 fields are used to represent \fIfinal state number\fR
+and its \fIweight\fR, and lines of 5 fields are used to represent transitions
+\fIfrom state number\fR \fIto state number\fR with given
+\fIinput symbol\fR, \fIoutput symbol\fR and \fIweight\fR. The state number is
+integer as parsed by
+.BR strtoul (3)
+The symbols are strings. The weight is a float as parsed by
+.BR strtod (3)
+and can be omitted.
+.SS "Special symbols"
+The strings \fB@0@\fR and \fB@_EPSILON_SYMBOL_@\fR can be used to denote epsilon
+symbol. The string \fB@_IDENTITY_SYMBOL_@\fR can be used to denote symmetric
+unknown symbol. The string \fB@_UNKNOWN_SYMBOL_@\fR can be used to denote
+unknown symbol.
 .SH "REPORTING BUGS"
 Report bugs to <hfst\-bugs@helsinki.fi> or directly to our bug tracker at:
 <https://sourceforge.net/tracker/?atid=1061990&group_id=224521&func=browse>
@@ -60,3 +81,5 @@ License GPLv3: GNU GPL version 3 <http://gnu.org/licenses/gpl.html>
 .br
 This is free software: you are free to change and redistribute it.
 There is NO WARRANTY, to the extent permitted by law.
+.SH AUTHOR
+Written by HFST team <hfst-bugs@helsinki.fi>.

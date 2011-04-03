@@ -26,33 +26,46 @@ Alias of \fB\-\-quiet\fR
 .SS "Input/Output options:"
 .TP
 \fB\-i\fR, \fB\-\-input\fR=\fIINFILE\fR
-Read input transducer from INFILE
+Read input transducer from \fIINFILE\fR
 .TP
 \fB\-o\fR, \fB\-\-output\fR=\fIOUTFILE\fR
-Write output transducer to OUTFILE
+Write output transducer to \fIOUTFILE\fR
 .SS "Relabeling options:"
 .TP
-\fB\-f\fR, \fB\-\-from\-label\fR=\fILABEL\fR
-replace LABEL
+\fB\-f\fR, \fB\-\-from\-label\fR=\fIFLABEL\fR
+replace \fIFLABEL\fR
 .TP
-\fB\-t\fR, \fB\-\-to\-label\fR=\fILABEL\fR
-replace with LABEL
+\fB\-t\fR, \fB\-\-to\-label\fR=\fITLABEL\fR
+replace with \fITLABEL\fR
 .TP
-\fB\-T\fR, \fB\-\-to\-transducer\fR=\fIFILE\fR
-replace with transducer read from FILE
+\fB\-T\fR, \fB\-\-to\-transducer\fR=\fITFILE\fR
+replace with transducer read from \fITFILE\fR
 .TP
 \fB\-F\fR, \fB\-\-from\-file\fR=\fLABELFILE\fR
-replace pairs read from LABELFILE
+replace pairs read from \fILABELFILE\fR
 .PP
-If OUTFILE or INFILE is missing or \-, standard streams will be used.
-Format of result depends on format of INFILE
-LABEL must be a symbol name of single arc in transducer or a colon separated
-pair.
-LABELFILE is a two column tsv file consisting of -f and -t values.
+If \fIOUTFILE\fR or \fIINFILE\fR is missing or \-, standard streams will be
+used. Format of result depends on format of \fIINFILE\fR
+\fILABEL\fR must be a symbol name of single arc in transducer or a colon
+separated pair.
+\fILABELFILE\fR is a two column tsv file consisting of \fILABEL\fR values.
 .SH EXAMPLES
+.TP
+.B hfst\-substitute -f c -t f -i cat.hfst -o fat.hfst
+rewrite c's in cat.hfst with f's
+.SS "Input formats:"
+Substitute supports rewriting list of symbols or arcs with the \fB\-F\fR option.
+The format of substitution file is tab separated lines containing two fields,
+the \fIFLABEL\fR field and the \fITLABEL\fR field. The function of \fB\-F\fR
+option is same as performing \fBhfst\-substitute\fR multiple times in a row
+each time giving first field as \fB\-f\fR parameter and second field as 
+\fB\-t\fR parameter.
 .TP
 hfst\-substitute \fB\-o\fR cg.hfst \fB\-F\fR omor2cg.relabel omor.hfst
 transform omor tags cg
+.SS "Special symbols"
+The strings \fB@0@\fR and \fB@_EPSILON_SYMBOL_@\fR can be used to denote epsilon
+symbol.
 .SH "REPORTING BUGS"
 Report bugs to <hfst\-bugs@helsinki.fi> or directly to our bug tracker at:
 <https://sourceforge.net/tracker/?atid=1061990&group_id=224521&func=browse>
