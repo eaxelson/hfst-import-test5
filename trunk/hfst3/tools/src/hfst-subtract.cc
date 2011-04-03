@@ -185,8 +185,19 @@ subtract_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                 second.insert_freely_missing_flags_from(first);
               }
         }
+        first.subtract(second);
+        char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                             (strlen(firstname) +
+                                              strlen(secondname) +
+                                              strlen("hfst-subtract=(%s - %s)")) 
+                                             + 1));
+        if (sprintf(composed_name, "hfst-subtract=(%s - %s)", 
+                    firstname, secondname) > 0)
+          {
+            first.set_name(composed_name);
+          }
+        outstream << first;
 
-        outstream << first.subtract(second);
         bothInputs = firststream.is_good() && secondstream.is_good();
     }
     

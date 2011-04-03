@@ -183,8 +183,18 @@ conjunct_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                 second.insert_freely_missing_flags_from(first);
               }
         }
-
-        outstream << first.intersect(second);
+        first.intersect(second);
+        char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                             (strlen(firstname) +
+                                              strlen(secondname) +
+                                              strlen("hfst-intersect=(%s & %s)")) 
+                                             + 1));
+        if (sprintf(composed_name, "hfst-intersect=(%s & %s)", 
+                    firstname, secondname) > 0)
+          {
+            first.set_name(composed_name);
+          }
+        outstream << first;
         bothInputs = firststream.is_good() && secondstream.is_good();
     }
     

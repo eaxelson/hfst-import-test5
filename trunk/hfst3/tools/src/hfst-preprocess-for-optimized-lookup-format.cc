@@ -183,6 +183,16 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
               }
           }
         trans = HfstTransducer(replication, trans.get_type());
+        char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                             (strlen(inputname) +
+                                              strlen("hfst-fu=(%s)")) 
+                                             + 1));
+        if (sprintf(composed_name, "hfst-fu=(%s)", 
+                    inputname) > 0)
+          {
+            trans.set_name(composed_name);
+          }
+
         outstream << trans.remove_epsilons();
     }
     instream.close();

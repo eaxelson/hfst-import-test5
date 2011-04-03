@@ -142,7 +142,19 @@ concatenate_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
             verbose_printf("Concatenating %s and %s... %zu\n", firstname,
                            secondname, transducer_n);
         }
-        outstream << first.concatenate(second);
+        first.concatenate(second);
+        char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                             (strlen(firstname) +
+                                              strlen(secondname) +
+                                              strlen("hfst-concatenate=(%s + %s)")) 
+                                             + 1));
+        if (sprintf(composed_name, "hfst-concatenate=(%s + %s)", 
+                    firstname, secondname) > 0)
+          {
+            first.set_name(composed_name);
+          }
+
+        outstream << first;
         bothInputs = firststream.is_good() && secondstream.is_good();
     }
     

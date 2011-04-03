@@ -115,8 +115,14 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
               firstfilename, secondfilename);
       }
 
-    verbose_printf("Reading lexicon...\n");
+    verbose_printf("Reading lexicon...");
     HfstTransducer lexicon(firststream);
+    const char* lexiconname = lexicon.get_name().c_str();
+    if (strlen(lexiconname) < 1) 
+      {
+        lexiconname = hfst_strdup(firstfilename);
+      }
+    verbose_printf(" %s read\n", lexiconname);
     HfstTransducerVector rules;
     size_t transducer_n = 1;
     while (secondstream.is_good()) {
@@ -136,10 +142,21 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
       rules.push_back(rule);      
     }
     
-    verbose_printf("Computing intersecting composition.\n");
+    verbose_printf("Computing intersecting composition...\n");
     lexicon.compose_intersect(rules);
+    char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                             (strlen(lexiconname) +
+                                              strlen(secondfilename) +
+                                              strlen("hfst-compose-intersect=(%s o &(%s))")) 
+                                             + 1));
+    if (sprintf(composed_name, "hfst-compose-intersect=(%s o &(%s))", 
+                lexiconname, secondfilename) > 0)
+      {
+        lexicon.set_name(composed_name);
+      }
 
-    verbose_printf("Storing result.\n");
+
+    verbose_printf("Storing result in %s...\n", outfilename);
     outstream << lexicon;
 
     firststream.close();

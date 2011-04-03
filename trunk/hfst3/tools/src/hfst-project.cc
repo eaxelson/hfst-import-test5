@@ -176,12 +176,33 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         
         if (project_input)
           {
-            outstream << trans.input_project();
+            trans.input_project();
+            char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                             (strlen(inputname) +
+                                              strlen("hfst-project=(%s.1)")) 
+                                             + 1));
+            if (sprintf(composed_name, "hfst-project=(%s.1)", 
+                        inputname) > 0)
+              {
+                trans.set_name(composed_name);
+              }
+
           }
         else
           {
-            outstream << trans.output_project();
+            trans.output_project();
+            char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                             (strlen(inputname) +
+                                              strlen("hfst-project=(%s.2)")) 
+                                             + 1));
+            if (sprintf(composed_name, "hfst-project=(%s.2)", 
+                        inputname) > 0)
+              {
+                trans.set_name(composed_name);
+              }
+
           }
+        outstream << trans;
     }
     instream.close();
     outstream.close();

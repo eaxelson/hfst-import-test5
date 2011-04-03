@@ -33,10 +33,14 @@
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
+#include "implementations/HfstTransitionGraph.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
+using hfst::implementations::HfstState;
+using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstBasicTransition;
 using hfst::StringPair;
 
 #include "hfst-commandline.h"
@@ -203,6 +207,92 @@ parse_options(int argc, char** argv)
 }
 
 static
+HfstBasicTransducer&
+do_substitute(HfstBasicTransducer& trans, size_t transducer_n)
+{
+  if (from_pair && to_pair)
+    {
+      if (transducer_n < 2)
+        {
+          verbose_printf("Substituting pair %s:%s with pair %s:%s...\n",
+                         from_pair->first.c_str(),
+                         from_pair->second.c_str(),
+                         to_pair->first.c_str(),
+                         to_pair->second.c_str());
+        }
+      else
+        {
+          verbose_printf("Substituting pair %s:%s with pair %s:%s...\n",
+                         from_pair->first.c_str(),
+                         from_pair->second.c_str(),
+                         to_pair->first.c_str(),
+                         to_pair->second.c_str());
+        }
+      trans.substitute(*from_pair, *to_pair);
+    }
+  else if (from_label && to_label)
+    {
+      if (transducer_n < 2)
+        {
+          verbose_printf("Substituting label %s with label %s...\n", from_label,
+                         to_label);
+        }
+      else
+        {
+          verbose_printf("Substituting label %s with label %s... %zu\n",
+                         from_label, to_label, transducer_n);
+        }
+      trans.substitute(from_label, to_label);
+    }
+  else if (from_pair && to_transducer)
+    {
+      char* to_name = strdup(to_transducer->get_name().c_str());
+      if (strlen(to_name) <= 0)
+        {
+          to_name = strdup(to_transducer_filename);
+        }
+      if (transducer_n < 2)
+        {
+          verbose_printf("Substituting pair %s:%s with transducer %s...\n", 
+                         from_pair->first.c_str(),
+                         from_pair->second.c_str(),
+                         to_name);
+        }
+      else
+        {
+          verbose_printf("Substituting pair %s:%s with transducer %s... %zu\n", 
+                         from_pair->first.c_str(), 
+                         from_pair->second.c_str(), to_name,
+                         transducer_n);
+        }
+      trans.substitute(*from_pair, *to_transducer);
+    }
+
+  else if (from_label && to_transducer)
+    {
+      char* to_name = strdup(to_transducer->get_name().c_str());
+      if (strlen(to_name) <= 0)
+        {
+          to_name = strdup(to_transducer_filename);
+        }
+      if (transducer_n < 2)
+        {
+          verbose_printf("Substituting id. label %s with transducer %s...\n", 
+                         from_label, to_name);
+        }
+      else
+        {
+          verbose_printf("Substituting id. label %s with transducer %s... %zu\n", 
+                         from_label, to_name,
+                         transducer_n);
+        }
+      hfst::StringPair from_arc(from_label, from_label);
+      trans.substitute(from_arc, *to_transducer);
+    }
+  return trans;
+}
+
+static
 HfstTransducer&
 do_substitute(HfstTransducer& trans, size_t transducer_n)
 {
@@ -308,11 +398,20 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           return EXIT_FAILURE;
         }
     }
+  HfstBasicTransducer* fallback = 0;
+  bool warnedAlready = false;
+  bool fellback = false;
   while (instream.is_good())
     {
       transducer_n++;
       HfstTransducer trans(instream);
       char* inputname = strdup(trans.get_name().c_str());
+      if (!warnedAlready)
+        {
+          warning(0, 0, "substitution is not supported for this transducer type"
+                  " falling back to internal formats and trying...");
+        }
+      fallback = new HfstBasicTransducer(trans);
       if (strlen(inputname) <= 0)
         {
           inputname = strdup(inputfilename);
@@ -361,15 +460,87 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
               to_label = hfst_strndup(tab+1, endstr-tab-1);
               from_pair = label_to_stringpair(from_label);
               to_pair = label_to_stringpair(to_label);
-              do_substitute(trans, transducer_n);
+#if 0
+              try 
+                {
+                  do_substitute(trans, transducer_n);
+                }
+              catch (FunctionNotSupportedException fnse)
+                {
+#endif
+                  do_substitute(*fallback, transducer_n);
+                  fellback = true;
+#if 0
+                }
+#endif
             }
-          outstream << trans;
         }
       else
         {
-          do_substitute(trans, transducer_n);
-          outstream << trans;
+#if 0
+          try
+            {
+              do_substitute(trans, transducer_n);
+            }
+          catch (FunctionNotSupported fnse)
+            {
+#endif
+              do_substitute(*fallback, transducer_n);
+              fellback = true;
+#if 0
+            }
+#endif
         }
+      if (fellback)
+        {
+          trans = HfstTransducer(*fallback, trans.get_type());
+        }
+      if (from_file)
+        {
+            char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                         (strlen(inputname) +
+                                          strlen(from_file_name) +
+                                          strlen("hfst-substitute=(%s, @%s)")) 
+                                         + 1));
+            if (sprintf(composed_name, "hfst-substitute=(%s, @%s))",
+                        inputname, from_file_name) > 0)
+              {
+                trans.set_name(composed_name);
+              }
+        }
+      else if (from_label && to_label)
+        {
+            char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                         (strlen(inputname) +
+                                          strlen(from_label) +
+                                          strlen(to_label) +
+                                          strlen("hfst-substitute=(%s, %s->%s)")) 
+                                         + 1));
+            if (sprintf(composed_name, "hfst-substitute=(%s, %s->%s))",
+                        inputname, from_label, to_label) > 0)
+              {
+                trans.set_name(composed_name);
+              }
+
+        }
+      else if (to_transducer_filename)
+        {
+            char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                         (strlen(inputname) +
+                                          strlen(from_label) +
+                                          strlen(to_transducer_filename) +
+                                          strlen("hfst-substitute=(%s, %s->(%s))")) 
+                                         + 1));
+            if (sprintf(composed_name, "hfst-substitute=(%s, %s->(%s))",
+                        inputname, from_label, to_transducer_filename) > 0)
+              {
+                trans.set_name(composed_name);
+              }
+
+
+        }
+
+      outstream << trans;
     }
   delete to_transducer;
   return EXIT_SUCCESS;
