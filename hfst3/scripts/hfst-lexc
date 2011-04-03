@@ -88,10 +88,10 @@ else
     fi
 fi
 if test -z "$outfile" ; then
-    cat $$outfile | hfst-name -n "hfst-lexc $*"
+    cat $$outfile | hfst-name -t 40 -n "hfst-lexc='$*'"
     rm -f $$outfile
 else
-    cat $outfile | hfst-name -n "hfst-lexc $*" > $outfile.named
+    cat $outfile | hfst-name -t 40 -n "hfst-lexc='$*'" > $outfile.named
     mv $outfile.named $outfile
 fi
 rm -f "$outfile.tmp.lexcscript" "$outfile.tmp.lexc"
