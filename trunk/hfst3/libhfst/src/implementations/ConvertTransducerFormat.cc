@@ -1056,16 +1056,26 @@ unsigned int hfst_ol_to_hfst_basic_add_state
       // appear at the end of the alphabet. This allows us to ignore
       // them for indexing purposes, which potentially makes the index
       // table smaller and faster to pack.
-      
+
+      // We also gather information about possible gaps in the state numbering,
+      // because we want it to be contiguous from now on.
+
       StringSet * input_symbols = new StringSet();
       StringSet * flag_diacritics = new StringSet();
       StringSet * other_symbols = new StringSet();
+      
+      std::vector<hfst_ol::StatePlaceholder> state_placeholders;
+
+      std::map<unsigned int, unsigned int> * relabeled_states =
+	  new std::map<unsigned int, unsigned int>();
+      unsigned int first_transition = 0;
 
       for (HfstBasicTransducer::const_iterator it = t->begin(); 
            it != t->end(); ++it) {
           for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
                  = it->second.begin();
                tr_it != it->second.end(); ++tr_it) {
+	      ++first_transition;
               if (FdOperation::is_diacritic(tr_it->get_input_symbol())) {
                   flag_diacritics->insert(tr_it->get_input_symbol());
               } else {
@@ -1122,46 +1132,40 @@ unsigned int hfst_ol_to_hfst_basic_add_state
       delete flag_diacritics;
       delete other_symbols;
 
-    std::vector<hfst_ol::StatePlaceholder> state_placeholders;
-
-    // first do one pass over the transitions, figuring out everything
+    // Do a second pass over the transitions, figuring out everything
     // about the states except starting indices
-
-    unsigned int first_transition = 0;
 
     for (HfstBasicTransducer::const_iterator it = t->begin(); 
          it != t->end(); ++it) {
-	state_placeholders.push_back(
-	    hfst_ol::StatePlaceholder(
-		it->first, t->is_final_state(it->first), first_transition));
-	++first_transition; // There's a padding transition between each state
-        if (t->is_final_state(it->first)) {
-	    state_placeholders.back().final_weight =
-		t->get_final_weight(it->first);
-        }
         for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
                = it->second.begin();
              tr_it != it->second.end(); ++tr_it) {
-	    ++first_transition;
-            
+	    unsigned int state_number = it->first;
+	    if (relabeled_states->count(state_number) != 0) {
+		state_number = relabeled_states->operator[](state_number);
+	    }
             // check for previously unseen inputs
-            if (state_placeholders.back().inputs.count(
+            if (state_placeholders[state_number].inputs.count(
                     string_symbol_map->operator[](
                                     tr_it->get_input_symbol())) == 0) {
-                state_placeholders.back().inputs[
+                state_placeholders[state_number].inputs[
                     string_symbol_map->operator[](tr_it->get_input_symbol())] =
                     std::vector<hfst_ol::TransitionPlaceholder>();
             }
+	    unsigned int target = tr_it->get_target_state();
+	    if (relabeled_states->count(target) != 0) {
+		target = relabeled_states->operator[](target);
+	    }
             hfst_ol::TransitionPlaceholder trans(
-                tr_it->get_target_state(),
+                target,
                 string_symbol_map->operator[](tr_it->get_output_symbol()),
                 tr_it->get_weight());
-            state_placeholders.back()
+            state_placeholders[state_number]
                 .inputs[string_symbol_map->operator[](
                             tr_it->get_input_symbol())].push_back(trans);
         }
     }
-
+    delete relabeled_states;
     delete string_symbol_map;
 
     // For determining the index table we first sort the states (excepting

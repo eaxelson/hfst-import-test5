@@ -112,13 +112,20 @@ struct StatePlaceholder {
 	    }
 
 	} else {
-	    if (symbol == 0) {
-		return offset;
+	    if (inputs.count(0) != 0) {
+		if (symbol == 0) {
+		    return offset;
+		}
+		offset = inputs.find(0)->second.size();
 	    }
-	    offset = inputs.begin()->second.size();
 	    for(std::set<SymbolNumber>::iterator flag_it = flag_symbols.begin();
 		flag_it != flag_symbols.end(); ++flag_it) {
 		if (inputs.count(*flag_it) != 0) {
+		    if (symbol == 0) {
+			// Even if we don't have epsilons, return 0 if we do
+			// have flags
+			return 0;
+		    }
 		    offset += inputs.find(*flag_it)->second.size();
 		}
 	    }
