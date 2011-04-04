@@ -1072,8 +1072,17 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 
       for (HfstBasicTransducer::const_iterator it = t->begin(); 
            it != t->end(); ++it) {
+	  unsigned int state_number = state_placeholders.size();
+	  if (state_number != it->first) {
+	      relabeled_states->operator[](it->first) = state_number;
+	  }
+	  state_placeholders.push_back(hfst_ol::StatePlaceholder(
+					   state_number,
+					   t->is_final_state(it->first),
+					   first_transition));
+	  ++first_transition; // there's a padding entry between states
           for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
-                 = it->second.begin();
+		   = it->second.begin();
                tr_it != it->second.end(); ++tr_it) {
 	      ++first_transition;
               if (FdOperation::is_diacritic(tr_it->get_input_symbol())) {
@@ -1162,7 +1171,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
                 tr_it->get_weight());
             state_placeholders[state_number]
                 .inputs[string_symbol_map->operator[](
-                            tr_it->get_input_symbol())].push_back(trans);
+		    tr_it->get_input_symbol())].push_back(trans);
         }
     }
     delete relabeled_states;
