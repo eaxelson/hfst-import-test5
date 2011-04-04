@@ -1034,7 +1034,8 @@ unsigned int hfst_ol_to_hfst_basic_add_state
   hfst_basic_transducer_to_hfst_ol
   (const HfstBasicTransducer * t, bool weighted, std::string options)
   {
-      const float packing_aggression = 0.8;
+      const float packing_aggression = 0.85;
+      const int floor_jump_threshold = 4; // a packing aggression parameter
       bool quick = options == "quick";
       typedef std::set<std::string> StringSet;
       using hfst_ol::SymbolNumber;
@@ -1197,13 +1198,10 @@ unsigned int hfst_ol_to_hfst_basic_add_state
     // The starting state is special because it will have a TIA entry even if
     // it's simple, so we deal with it every time.
 
-//     unsigned int simple_windowings = 0;
-//     unsigned int toplevel_complex_windowings = 0;
-//    unsigned int complex_windowing_iterations = 0;
-//     unsigned int index_increments = 0;
     unsigned int first_available_index = 0;
     unsigned int previous_first_index = 0;
     unsigned int previous_successful_index = 0;
+    int floor_stuck_counter = 0;
     for (std::vector<hfst_ol::StatePlaceholder>::iterator it =
              state_placeholders.begin();
          it != state_placeholders.end(); ++it) {
@@ -1220,7 +1218,8 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 	}
         it->start_index = i;
 	previous_successful_index = i;
-        // Once we've found a starting index, mark all the used input symbols
+        // Once we've found a starting index, insert a finality marker and
+	// mark all the used indices
 	used_indices->operator[](i) =
 	    std::pair<unsigned int, SymbolNumber>(
 		it->state_number, NO_SYMBOL_NUMBER);
@@ -1244,26 +1243,30 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 		   first_available_index, seen_input_symbols,
 		   packing_aggression)) {
 	    ++first_available_index;
-	       }
-	if (first_available_index == previous_first_index) {
-	    SymbolNumber index_offset = it->inputs.rbegin()->first;
-	    if (flag_symbols.count(index_offset) != 0) {
-		index_offset = 0;
-	    }
-	    first_available_index =
-		previous_successful_index + 1 + index_offset;
-	    while (used_indices->unsuitable(
-		       first_available_index,
-		       seen_input_symbols, packing_aggression)) {
-		++first_available_index;
-	    }
 	}
-	previous_first_index = first_available_index;
+	if (first_available_index == previous_first_index) {
+	    if (floor_stuck_counter > floor_jump_threshold) {
+		SymbolNumber index_offset = it->inputs.rbegin()->first;
+		if (flag_symbols.count(index_offset) != 0) {
+		    index_offset = 0;
+		}
+		first_available_index =
+		    previous_successful_index + 1 + index_offset;
+		while (used_indices->unsuitable(
+			   first_available_index,
+			   seen_input_symbols, packing_aggression)) {
+		    ++first_available_index;
+		}
+		floor_stuck_counter = 0;
+		previous_first_index = first_available_index;
+	    } else {
+		++floor_stuck_counter;
+	    }
+	} else {
+	    previous_first_index = first_available_index;
+	    floor_stuck_counter = 0;
+	}
     }
-//     std::cerr << simple_windowings << " simple windowings\n";
-//     std::cerr << index_increments << " index increments\n";
-//     std::cerr << toplevel_complex_windowings << " toplevel complex windowings\n";
-//     std::cerr << complex_windowing_iterations << " complex_windowing_iterations\n";
 
     // Now resort by state number for the rest
     // (this could definitely be neater...)
