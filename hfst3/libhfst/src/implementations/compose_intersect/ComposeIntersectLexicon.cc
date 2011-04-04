@@ -96,24 +96,32 @@ namespace hfst
     {
       StatePair p = get_pair(state);
 
-      for (SymbolTransitionMap::const_iterator it = 
+    bool lexicon_eps_transition_found = false;
+      
+    for (SymbolTransitionMap::const_iterator it = 
 	     transition_map_vector[p.first].begin();
 	   it != transition_map_vector[p.first].end();
 	   ++it)
 	{ 
 	  if (it->first == HfstTropicalTransducerTransitionData::get_number
 	      ("@_EPSILON_SYMBOL_@"))
-	    { lexicon_skip_symbol_compose(it->second,p.second,state); }
+	    { 
+          lexicon_skip_symbol_compose(it->second,p.second,state);
+          lexicon_eps_transition_found = true;
+        }
 	  else if (is_flag_diacritic(it->first))
 	    { lexicon_skip_symbol_compose(it->second,p.second,state); }
 	  else
 	    { compose(it->second,rules->get_transitions
 		      (p.second,it->first),state); }
 	}
-      rule_skip_symbol_compose
-	(rules->get_transitions
-	 (p.second,HfstTropicalTransducerTransitionData::get_number
-	  ("@_EPSILON_SYMBOL_@")),p.first,state);
+    if (!lexicon_eps_transition_found)
+      {
+        rule_skip_symbol_compose
+            (rules->get_transitions
+                 (p.second,HfstTropicalTransducerTransitionData::get_number
+                      ("@_EPSILON_SYMBOL_@")),p.first,state);
+      }
     }
     
     void ComposeIntersectLexicon::lexicon_skip_symbol_compose
