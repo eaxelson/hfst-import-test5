@@ -14,6 +14,11 @@
 
 namespace hfst_ol {
 
+bool should_ascii_tokenize(unsigned char c)
+{
+    return ((c >= 'a' and c <= 'z') or (c >= 'A' and c <= 'Z'));
+}
+
 TransducerAlphabet::TransducerAlphabet(std::istream& is,
 				       SymbolNumber symbol_count)
 {
@@ -134,7 +139,7 @@ void Encoder::read_input_symbols(const SymbolTable & kt)
     for (SymbolNumber k = 0; k < number_of_input_symbols; ++k)
     {
 	const char * p = kt[k].c_str();
-	if ((strlen(p) == 1) && (unsigned char)(*p) <= 127)
+	if ((strlen(p) == 1) && should_ascii_tokenize((unsigned char)(*p)))
 	{
 	    ascii_symbols[(unsigned char)(*p)] = k;
 	}
