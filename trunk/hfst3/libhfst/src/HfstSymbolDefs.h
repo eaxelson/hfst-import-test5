@@ -78,9 +78,9 @@ namespace hfst
   const std::string internal_identity = "@_IDENTITY_SYMBOL_@";
   
   /* Check whether a string is equal to reserved internal representation. */
-  bool is_epsilon(std::string const str);
-  bool is_unknown(std::string const str);
-  bool is_identity(std::string const str);
+  bool is_epsilon(std::string const & str);
+  bool is_unknown(std::string const & str);
+  bool is_identity(std::string const & str);
 
   /* For internal use */
   typedef std::pair<unsigned int, unsigned int> NumberPair;

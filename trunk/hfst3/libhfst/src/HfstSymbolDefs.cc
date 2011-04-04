@@ -14,17 +14,17 @@
 
 namespace hfst {
 
-bool is_epsilon(std::string const str)
+bool is_epsilon(std::string const & str)
 {
     return str == internal_epsilon;
 }
 
-bool is_unknown(std::string const str)
+bool is_unknown(std::string const & str)
 {
     return str == internal_unknown;
 }
 
-bool is_identity(std::string const str)
+bool is_identity(std::string const & str)
 {
     return str == internal_identity;
 }
