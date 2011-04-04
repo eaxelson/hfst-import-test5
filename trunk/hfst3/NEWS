@@ -5,6 +5,16 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.0.1
+---------------------------
+
+* this is a bugfix release
+
+* conversion to hfst-optimized-lookup format was fundamentally broken in the
+  original release; this should provide a fix and considerable speedup
+
+* compose-intersect memory use is much improved
+
 Noteworthy changes in 3.0
 -------------------------
 
