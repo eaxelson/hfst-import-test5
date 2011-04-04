@@ -71,6 +71,7 @@ MAYBE_LEXC_COMPILER=hfst-lexc2fst
 endif
 if WANT_LOOKUP
 MAYBE_LOOKUP=hfst-lookup
+MAYBE_ALIASES+=hfst-optimized-lookup hfst-optimised-lookup
 endif
 if WANT_MINIMIZE
 MAYBE_MINIMIZE=hfst-minimize
@@ -235,6 +236,12 @@ hfst-minimise$(EXEEXT): hfst-minimize$(EXEEXT)
 	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
 
 hfst-minus$(EXEEXT): hfst-subtract$(EXEEXT)
+	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
+
+hfst-optimized-lookup$(EXEEXT): hfst-lookup$(EXEEXT)
+	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
+
+hfst-optimised-lookup$(EXEEXT): hfst-lookup$(EXEEXT)
 	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
 
 hfst-preprocess-for-optimised-lookup-format$(EXEEXT): hfst-preprocess-for-optimized-lookup-format$(EXEEXT)
