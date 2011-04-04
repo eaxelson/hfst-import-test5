@@ -1042,7 +1042,6 @@ unsigned int hfst_ol_to_hfst_basic_add_state
       using hfst_ol::NO_SYMBOL_NUMBER;
       // The transition array is indexed starting from this constant
       const unsigned int TA_OFFSET = 2147483648u;
-      const std::string epstr = "@_EPSILON_SYMBOL_@";
 
       // Symbols must be in the following order in an optimized-lookup
       // transducer:
@@ -1103,13 +1102,13 @@ unsigned int hfst_ol_to_hfst_basic_add_state
       new std::map<std::string, SymbolNumber>();
 
       // 1) epsilon
-      string_symbol_map->operator[](epstr) = symbol_table.size();
-      symbol_table.push_back(epstr);
+      string_symbol_map->operator[](internal_epsilon) = symbol_table.size();
+      symbol_table.push_back(internal_epsilon);
 
       // 2) input symbols
       for (std::set<std::string>::iterator it = input_symbols->begin();
            it != input_symbols->end(); ++it) {
-          if (it->compare(epstr)) {
+          if (!is_epsilon(*it)) {
               string_symbol_map->operator[](*it) = symbol_table.size();
               symbol_table.push_back(*it);
               ++seen_input_symbols;
@@ -1119,7 +1118,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
       // 3) Flag diacritics
       for (std::set<std::string>::iterator it = flag_diacritics->begin();
            it != flag_diacritics->end(); ++it) {
-          if (it->compare(epstr)) {
+          if (!is_epsilon(*it)) {
               string_symbol_map->operator[](*it) = symbol_table.size();
               flag_symbols.insert(symbol_table.size());
               symbol_table.push_back(*it);
@@ -1131,7 +1130,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
       // 4) non-input symbols
       for (std::set<std::string>::iterator it = other_symbols->begin();
            it != other_symbols->end(); ++it) {
-          if (it->compare(epstr) and input_symbols->count(*it) == 0 and
+          if (!is_epsilon(*it) and input_symbols->count(*it) == 0 and
               flag_diacritics->count(*it) == 0) {
               string_symbol_map->operator[](*it) = symbol_table.size();
               symbol_table.push_back(*it);
