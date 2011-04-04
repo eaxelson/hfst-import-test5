@@ -67,6 +67,11 @@ enum HeaderFlag {Weighted, Deterministic, Input_deterministic, Minimized,
 const TransitionTableIndex TRANSITION_TARGET_TABLE_START = 2147483648u;
 const unsigned int MAX_IO_LEN = 10000;
 
+// This function is queried to check whether we should do the
+// single-character ascii lookup tokenization or the regular
+// trie-tokenization
+bool should_ascii_tokenize(unsigned char c);
+
 inline bool indexes_transition_table(const TransitionTableIndex i)
 {
     return i >= TRANSITION_TARGET_TABLE_START;
