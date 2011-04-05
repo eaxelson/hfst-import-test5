@@ -86,6 +86,20 @@ int main(int argc, char **argv)
   assert(alphabet.find("foo") == alphabet.end());
 
   
+  verbose_print("HfstBasicTransducer: substitute");
+
+  HfstBasicTransducer tr;
+  tr.add_state();
+  tr.add_transition(0, HfstBasicTransition(s1, "a", "b", 0));
+  tr.add_transition(0, HfstBasicTransition(s1, "a", "b", 0));
+  tr.set_final_weight(1, 0);
+
+  StringPairSet sps;
+  sps.insert(StringPair("A","B"));
+  sps.insert(StringPair("C","D"));
+  tr.substitute(StringPair("a","b"), sps);
+
+  //tr.write_in_att_format(stderr);
 
 }
 

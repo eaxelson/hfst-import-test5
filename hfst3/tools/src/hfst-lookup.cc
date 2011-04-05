@@ -65,14 +65,6 @@ using hfst::StringVector;
 using std::string;
 using std::vector;
 
-/*
-typedef std::vector<std::string> HfstArcPath;
-typedef std::pair<HfstArcPath,float> HfstLookupPath;
-typedef std::set<HfstLookupPath> HfstLookupPaths;
-typedef std::pair<StringPairVector,float> StringPairPath;
-typedef std::set<StringPairPath > StringPairPaths;
-*/
-
 // add tools-specific variables here
 static char* lookup_file_name;
 static FILE* lookup_file;
@@ -486,19 +478,8 @@ is_valid_flag_diacritic_path(StringVector arcs)
   {
     //if (not print_pairs)
     //  fprintf(stderr, "Allowing all flag paths!\n");
-    //return true;
     FlagDiacriticTable FdT;
-    /*fprintf(stderr, "testing flag validity for \n");
-    for (StringVector::const_iterator it = arcs.begin();
-	 it != arcs.end(); it++)
-      {
-	fprintf(stderr, "%s ", it->c_str());
-	}*/
     bool res = FdT.is_valid_string(arcs);
-    /*if (res)
-      fprintf(stderr, "TRUE\n");
-    else
-    fprintf(stderr, "FALSE\n");*/
     return res;
   }
 
@@ -1070,19 +1051,17 @@ bool is_lookup_infinitely_ambiguous
 
       /* CASE 2: Other input symbols consume a symbol in the lookup path s,
          so they can be added only if the end of the lookup path s has not 
-         been reached. (This code is almost the same as in case 1, but has
-         three extra lines marked with the comment ###. The whole function
-         would probably benefit from reorganizing the if/else blocks...) */
+         been reached. */
       else if (not only_epsilons)
     {
-      if (it->get_input_symbol().compare(s.second.at(index)) == 0) // ###
+      if (it->get_input_symbol().compare(s.second.at(index)) == 0)
         {
-          index++; // consume an input symbol in the lookup path s // ###
+          index++; // consume an input symbol in the lookup path s
           std::set<HfstState> empty_set;
           if (is_lookup_infinitely_ambiguous
               (t, s, index, it->get_target_state(), empty_set)) {
             return true; }
-          index--; // add the input symbol back to the lookup path s. // ###
+          index--; // add the input symbol back to the lookup path s.
         }
     }
     }  
@@ -1307,7 +1286,7 @@ static void lookup_fd
           else {
             Eh.push_back(state);
             Ehp = &Eh;
-          }
+	  }
 
           // call lookup for the target state of the transition
           lookup_fd(t, lookup_path, results, it->get_target_state(),
@@ -1683,6 +1662,10 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
 
     char* line = 0;
     size_t llen = 0;
+
+    HfstStrings2FstTokenizer input_tokenizer(mc_symbols, 
+					     std::string(epsilon_format));
+
     while (hfst_getline(&line, &llen, lookup_file) != -1)
       {
         linen++;
@@ -1704,9 +1687,6 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
         bool optimized_lookup=
           (cascade[0].get_type() == HFST_OL_TYPE ||
            cascade[0].get_type() == HFST_OLW_TYPE);
-
-        HfstStrings2FstTokenizer input_tokenizer(mc_symbols, 
-                                                 std::string(epsilon_format));
 
         HfstOneLevelPath* kv = line_to_lookup_path(&line, input_tokenizer,
                                                    &markup,

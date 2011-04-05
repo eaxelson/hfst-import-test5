@@ -138,7 +138,7 @@ namespace hfst { namespace implementations
     std::set<SFST::Node*> visited_nodes;
    
     sfst_to_hfst_basic_transducer(t->root_node(), index, 
-                     visited_nodes, 
+				  visited_nodes, 
                                   net, t->alphabet);
     
     // Make sure that also symbols that occur in the alphabet of the
@@ -166,8 +166,15 @@ namespace hfst { namespace implementations
   t->alphabet.add_symbol("@_IDENTITY_SYMBOL_@", 2);
 
   // Map that maps states of \a net to SFST nodes
-  std::map<HfstState, SFST::Node*> state_map;
-  state_map[0] = t->root_node();
+
+  //std::map<HfstState, SFST::Node*> state_map;
+  //state_map[0] = t->root_node();
+
+  std::vector<SFST::Node*> state_vector;
+  state_vector.push_back(t->root_node());
+  for (unsigned int i=0; i <= (net->max_state); i++) {
+    state_vector.push_back(t->new_node());
+  }
 
   // Go through all states
   for (HfstBasicTransducer::const_iterator it = net->begin();
@@ -179,11 +186,11 @@ namespace hfst { namespace implementations
            tr_it != it->second.end(); tr_it++)
         {
           // Create new nodes, if needed
-          if (state_map.find(it->first) == state_map.end())
+          /*if (state_map.find(it->first) == state_map.end())
             state_map[it->first] = t->new_node();
 
           if (state_map.find(tr_it->get_target_state()) == state_map.end())
-            state_map[tr_it->get_target_state()] = t->new_node();
+	  state_map[tr_it->get_target_state()] = t->new_node();*/
 
           std::string istring(tr_it->get_input_symbol());
           std::string ostring(tr_it->get_output_symbol());
@@ -201,9 +208,12 @@ namespace hfst { namespace implementations
              t->alphabet.add_symbol(ostring.c_str()));
           
           // Copy transition to node
-          state_map[it->first]->add_arc(l,
+          /*state_map[it->first]->add_arc(l,
                                         state_map[tr_it->get_target_state()],
-                                        t);
+                                        t);*/
+	  state_vector[it->first]->add_arc
+	    (l, state_vector[tr_it->get_target_state()], t);
+					   
         }
     }
 
@@ -212,9 +222,13 @@ namespace hfst { namespace implementations
          = net->final_weight_map.begin();
        it != net->final_weight_map.end(); it++) 
     {
-      if (state_map.find(it->first) == state_map.end())
+      /*if (state_map.find(it->first) == state_map.end())
         state_map[it->first] = t->new_node();
-      state_map[it->first]->set_final(1);
+	state_map[it->first]->set_final(1);*/
+      if (it->first >= state_vector.size()) { // should not happen..
+	state_vector.push_back(t->new_node());
+      }
+      state_vector[it->first]->set_final(1);
     }
 
   // Make sure that also symbols that occur in the alphabet of the
@@ -460,104 +474,55 @@ namespace hfst { namespace implementations
      and state number zero (if it is not initial) is some other number
      (basically as the number of the initial state in that case, i.e.
      the numbers of initial state and state number zero are swapped) */
-  StateId zero_print=0;
   StateId initial_state = t->Start();
-  if (initial_state != 0) {
-    zero_print = initial_state;
-  }
 
   /* Go through all states */
   for (fst::StateIterator<fst::StdVectorFst> siter(*t); 
        not siter.Done(); siter.Next()) 
     {
       StateId s = siter.Value();
-      if (s == initial_state) {
-        int origin;  // how origin state is printed, see the first comment
-        if (s == 0)
-          origin = zero_print;
-        else if (s == initial_state)
-          origin = 0;
-        else
-          origin = (int)s;
 
-        /* Go through all transitions in a state */
-        for (fst::ArcIterator<fst::StdVectorFst> aiter(*t,s); 
-             !aiter.Done(); aiter.Next())
-          {
-            const fst::StdArc &arc = aiter.Value();
-            int target;  // how target state is printed, see the first comment
-            if (arc.nextstate == 0)
-              target = zero_print;
-            else if (arc.nextstate == initial_state)
-              target = 0;
-            else
-              target = (int)arc.nextstate;
+      HfstState origin = s;
+      if (origin == initial_state)
+	origin = 0;
+      else if (origin == 0)
+	origin = initial_state;
 
-            // Copy the transition
-            std::string istring = inputsym->Find(arc.ilabel);
-            std::string ostring = outputsym->Find(arc.olabel);
-            if (arc.ilabel == 0)
-              istring = std::string("@_EPSILON_SYMBOL_@");
-            if (arc.olabel == 0)
-              ostring = std::string("@_EPSILON_SYMBOL_@");
-            net->add_transition(origin, 
-                                HfstBasicTransition
-                                (target,
-                                 istring,
-                                 ostring,
-                                 arc.weight.Value()
-                                 ));
-          }
-        if (t->Final(s) != fst::TropicalWeight::Zero()) {
-          // Set the state as final
-          net->set_final_weight(origin, t->Final(s).Value());
-        }
-        break;
+      /* Go through all transitions in a state */
+      for (fst::ArcIterator<fst::StdVectorFst> aiter(*t,s); 
+	   !aiter.Done(); aiter.Next())
+	{
+	  const fst::StdArc &arc = aiter.Value();
+
+	  HfstState target = arc.nextstate;
+	  if (target == initial_state)
+	    target = 0;
+	  else if (target == 0)
+	    target = initial_state;
+
+	  // Copy the transition
+	  std::string istring = inputsym->Find(arc.ilabel);
+	  std::string ostring = outputsym->Find(arc.olabel);
+	  if (arc.ilabel == 0)
+	    istring = std::string("@_EPSILON_SYMBOL_@");
+	  if (arc.olabel == 0)
+	    ostring = std::string("@_EPSILON_SYMBOL_@");
+
+	  net->add_transition(origin, 
+			      HfstBasicTransition
+			      (target,
+			       istring,
+			       ostring,
+			       arc.weight.Value()
+			       ));
+	} 
+
+      if (t->Final(s) != fst::TropicalWeight::Zero()) {
+	// Set the state as final
+	net->set_final_weight(origin, t->Final(s).Value());
       }
+
     }
-
-    for (fst::StateIterator<fst::StdVectorFst> siter(*t); 
-         not siter.Done(); siter.Next())
-      {
-        StateId s = siter.Value();
-        if (s != initial_state) {
-          int origin;  // how origin state is printed, see the first comment
-          if (s == 0)
-            origin = zero_print;
-          else if (s == initial_state)
-            origin = 0;
-          else
-            origin = (int)s;
-          for (fst::ArcIterator<fst::StdVectorFst> aiter(*t,s); 
-               !aiter.Done(); aiter.Next())
-            {
-              const fst::StdArc &arc = aiter.Value();
-              int target;  // how target state is printed, see the first comment
-              if (arc.nextstate == 0)
-                target = zero_print;
-              else if (arc.nextstate == initial_state)
-                target = 0;
-              else
-                target = (int)arc.nextstate;
-
-              std::string istring = inputsym->Find(arc.ilabel);
-              std::string ostring = outputsym->Find(arc.olabel);
-              if (arc.ilabel == 0)
-                istring = std::string("@_EPSILON_SYMBOL_@");
-              if (arc.olabel == 0)
-                ostring = std::string("@_EPSILON_SYMBOL_@");
-              net->add_transition(origin, 
-                                  HfstBasicTransition
-                                  (target,
-                                   istring,
-                                   ostring,
-                                   arc.weight.Value()
-                                   ));
-            }
-          if (t->Final(s) != fst::TropicalWeight::Zero())
-            net->set_final_weight(origin, t->Final(s).Value());
-        }
-      }
 
     /* Make sure that also the symbols that occur only in the alphabet
        but not in transitions are copied. */
@@ -579,6 +544,8 @@ namespace hfst { namespace implementations
 
 
 
+  // REPLACED BY StateId hfst_state_to_state_id(HfstState &s, 
+  // std::vector<StateId> &state_vector, fst::StdVectorFst *t)
   /* Get a state id for a state in transducer \a t that corresponds
      to HfstState s as defined in \a state_map.     
      Used by function hfst_basic_transducer_to_tropical_ofst. */
@@ -594,7 +561,7 @@ namespace hfst { namespace implementations
         state_map[s] = retval;
         return retval;
       }
-    return it->second;
+      return it->second;
   }
 
   /* Create an OpenFst transducer equivalent to HfstBasicTransducer \a net. */
@@ -603,13 +570,20 @@ namespace hfst { namespace implementations
   (const HfstBasicTransducer * net) {
     
     fst::StdVectorFst * t = new fst::StdVectorFst();
-    StateId start_state = t->AddState();
+    StateId start_state = t->AddState(); // always zero
     t->SetStart(start_state);
     
     // The mapping between states in HfstBasicTransducer and StdVectorFst
-    std::map<HfstState, StateId> state_map;
-    state_map[0] = start_state;
-    
+
+    //std::map<HfstState, StateId> state_map;
+    //state_map[0] = start_state;
+
+    std::vector<StateId> state_vector;
+    state_vector.push_back(start_state);
+    for (unsigned int i = 1; i <= (net->max_state); i++) {
+      state_vector.push_back(t->AddState());
+    }
+
     fst::SymbolTable st("");
     st.AddSymbol("@_EPSILON_SYMBOL_@", 0);
     st.AddSymbol("@_UNKNOWN_SYMBOL_@", 1);
@@ -625,13 +599,15 @@ namespace hfst { namespace implementations
              tr_it != it->second.end(); tr_it++)
           {
             // Copy the transition
-            t->AddArc( hfst_state_to_state_id(it->first, state_map, t), 
+            t->AddArc( /*hfst_state_to_state_id(it->first, state_map, t),*/
+		      state_vector[it->first],
                        fst::StdArc
                        ( st.AddSymbol(tr_it->get_input_symbol()),
                          st.AddSymbol(tr_it->get_output_symbol()),
                          tr_it->get_weight(),
-                         hfst_state_to_state_id
-                          (tr_it->get_target_state(), state_map, t)) );
+                         /*hfst_state_to_state_id
+			   (tr_it->get_target_state(), state_map, t)));*/
+			 state_vector[tr_it->get_target_state()]));
           }
       }
     
@@ -640,7 +616,8 @@ namespace hfst { namespace implementations
            = net->final_weight_map.begin();
          it != net->final_weight_map.end(); it++) 
       {
-        t->SetFinal(hfst_state_to_state_id(it->first, state_map, t), 
+        t->SetFinal(/*hfst_state_to_state_id(it->first, state_map, t),*/
+		    state_vector[it->first],
                     it->second);
       }
     
