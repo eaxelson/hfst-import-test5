@@ -522,8 +522,10 @@ namespace hfst {
             If the state already exists, it is not added again. 
             @return \a s*/
         HfstState add_state(HfstState s) {
-          if (state_map.find(s) == state_map.end())
-            state_map[s]=HfstTransitions();
+          /*if (state_map.find(s) == state_map.end()) {
+            state_map[s] = HfstTransitions();
+	    }*/
+	  (void)state_map[s];
           if (max_state < s)
             max_state=s;
           return s;
@@ -535,7 +537,7 @@ namespace hfst {
         void add_transition(HfstState s, HfstTransition<C> transition) {
 
           C data = transition.get_transition_data();
-          add_state(s);
+          //add_state(s); // the last line adds the state
           add_state(transition.get_target_state());
           alphabet.insert(data.get_input_symbol());
           alphabet.insert(data.get_output_symbol());
