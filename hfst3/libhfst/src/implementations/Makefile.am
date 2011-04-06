@@ -20,10 +20,14 @@ noinst_LTLIBRARIES=libhfstimplementations.la
 
 # HFST bridge specific stuff
 IMPLEMENTATION_SRCS=HfstTransitionGraph.cc ConvertTransducerFormat.cc \
+		    ConvertSfstTransducer.cc ConvertTropicalWeightTransducer.cc \
+		    ConvertLogWeightTransducer.cc ConvertFomaTransducer.cc \
+	  	    ConvertOlTransducer.cc \
                     compose_intersect/ComposeIntersectRulePair.cc \
                     compose_intersect/ComposeIntersectLexicon.cc \
                     compose_intersect/ComposeIntersectRule.cc \
-                    compose_intersect/ComposeIntersectFst.cc
+                    compose_intersect/ComposeIntersectFst.cc \
+                    HfstConstantTransducer.cc
 
 AM_CXXFLAGS=-Wno-deprecated -g
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
@@ -62,6 +66,7 @@ implincludedir = $(hfstincludedir)/implementations
 
 implinclude_HEADERS = \
 		ConvertTransducerFormat.h \
+		HfstConstantTransducer.h \
 		FomaTransducer.h \
 		LogWeightTransducer.h \
 		SfstTransducer.h TropicalWeightTransducer.h \

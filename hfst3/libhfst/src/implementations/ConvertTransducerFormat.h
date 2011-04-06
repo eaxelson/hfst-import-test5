@@ -48,6 +48,7 @@
 
 #include "../HfstExceptionDefs.h"
 #include "optimized-lookup/transducer.h"
+#include "HfstConstantTransducer.h"
 
 struct fsm;
 
@@ -96,6 +97,17 @@ namespace implementations {
 
   static SFST::Transducer * hfst_basic_transducer_to_sfst
     (const HfstBasicTransducer * t);
+
+  static void sfst_to_hfst_constant_transducer
+    ( SFST::Node *node, SFST::NodeNumbering &index, 
+      std::set<SFST::Node*> &visited_nodes, 
+      HfstConstantTransducer *net);
+
+  static HfstConstantTransducer * sfst_to_hfst_constant_transducer
+    (SFST::Transducer * t);
+
+  static SFST::Transducer * hfst_constant_transducer_to_sfst
+    (const HfstConstantTransducer * t);
 #endif // HAVE_SFST
   
 #if HAVE_FOMA
@@ -103,6 +115,12 @@ namespace implementations {
 
   static struct fsm * hfst_basic_transducer_to_foma
     (const HfstBasicTransducer * t);
+
+  static HfstConstantTransducer * foma_to_hfst_constant_transducer
+    (struct fsm * t);
+
+  static struct fsm * hfst_constant_transducer_to_foma
+    (const HfstConstantTransducer * t);
 #endif // HAVE_FOMA
 
 #if HAVE_OPENFST
@@ -116,6 +134,14 @@ namespace implementations {
   static fst::StdVectorFst * hfst_basic_transducer_to_tropical_ofst
     (const HfstBasicTransducer * t);
 
+
+  static HfstConstantTransducer * tropical_ofst_to_hfst_constant_transducer
+    (fst::StdVectorFst * t, bool has_hfst_header=true);
+
+  static fst::StdVectorFst * hfst_constant_transducer_to_tropical_ofst
+    (const HfstConstantTransducer * t);
+
+
   static HfstBasicTransducer * log_ofst_to_hfst_basic_transducer
     (LogFst * t, bool had_hfst_header=true);
   
@@ -125,6 +151,15 @@ namespace implementations {
 
   static LogFst * hfst_basic_transducer_to_log_ofst
     (const HfstBasicTransducer * t);
+
+
+  static HfstConstantTransducer * log_ofst_to_hfst_constant_transducer
+    (LogFst * t, bool had_hfst_header=true);
+
+  static LogFst * hfst_constant_transducer_to_log_ofst
+    (const HfstConstantTransducer * t);
+
+
 
 #endif // HAVE_OPENFST 
   
