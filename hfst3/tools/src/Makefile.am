@@ -73,6 +73,9 @@ if WANT_LOOKUP
 MAYBE_LOOKUP=hfst-lookup
 MAYBE_ALIASES+=hfst-optimized-lookup hfst-optimised-lookup
 endif
+if WANT_PAIR_TEST
+MAYBE_PAIR_TEST=hfst-pair-test
+endif
 if WANT_MINIMIZE
 MAYBE_MINIMIZE=hfst-minimize
 MAYBE_ALIASES+=hfst-minimise
@@ -165,7 +168,7 @@ bin_PROGRAMS= \
 			 $(MAYBE_TXT2FST) $(MAYBE_CALCULATE) $(MAYBE_SUBSTITUTE)    \
 			 $(MAYBE_FLAG_DIACRITICS) $(MAYBE_LEXC_COMPILER)            \
 			 $(MAYBE_XFST_COMPILER) $(MAYBE_FORMAT)                     \
-			 $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME)
+			 $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME) $(MAYBE_PAIR_TEST)
 
 bin_SCRIPTS=$(MAYBE_ALIASES)
 
@@ -193,6 +196,8 @@ hfst_lexc2fst_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC) \
 					  parsers/xre_lex.ll parsers/xre_utils.cc
 hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC) \
 HfstStrings2FstTokenizer.cc HfstLookupFlagDiacritics.cc
+hfst_pair_test_SOURCES=hfst-pair-test.cc $(HFST_COMMON_SRC) \
+HfstStrings2FstTokenizer.cc 
 hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
 hfst_name_SOURCES=hfst-name.cc $(HFST_COMMON_SRC)
 hfst_preprocess_for_optimized_lookup_format_SOURCES=hfst-preprocess-for-optimized-lookup-format.cc\

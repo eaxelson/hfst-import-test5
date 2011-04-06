@@ -197,6 +197,12 @@ AC_ARG_ENABLE([lookup],
 			  [enable_lookup=$enableval],
 			  [enable_lookup=yes])
 AM_CONDITIONAL([WANT_LOOKUP], [test x$enable_lookup != xno])
+AC_ARG_ENABLE([pair-test],
+			  [AS_HELP_STRING([--enable-pair-test],
+							  [build pair-test tool @<:@default=yes@:>@])],
+			  [enable_pair_test=$enableval],
+			  [enable_pair_test=yes])
+AM_CONDITIONAL([WANT_PAIR_TEST], [test x$enable_pair_test != xno])
 AC_ARG_ENABLE([minimize],
 			  [AS_HELP_STRING([--enable-minimize],
 							  [build minimize tool @<:@default=yes@:>@])],
