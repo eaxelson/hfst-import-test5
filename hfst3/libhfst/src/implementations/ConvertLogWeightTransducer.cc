@@ -283,20 +283,6 @@ namespace hfst { namespace implementations
   // *** THE NEW FUNCTIONS ***
 
   HfstConstantTransducer * ConversionFunctions::
-  tropical_ofst_to_hfst_constant_transducer
-  (fst::StdVectorFst * t, bool has_hfst_header)
-  {
-    HFST_THROW(FunctionNotImplementedException);
-  }
-  
-  fst::StdVectorFst * ConversionFunctions::
-  hfst_constant_transducer_to_tropical_ofst
-  (const HfstConstantTransducer * t)
-  {
-    HFST_THROW(FunctionNotImplementedException);
-  }
-
-  HfstConstantTransducer * ConversionFunctions::
   log_ofst_to_hfst_constant_transducer
   (LogFst * t, bool had_hfst_header)
   {

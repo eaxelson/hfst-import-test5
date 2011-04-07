@@ -22,6 +22,7 @@
 #include "HfstDataTypes.h"
 #include "HfstSymbolDefs.h"
 #include "implementations/HfstTransitionGraph.h"
+#include "implementations/HfstConstantTransducer.h"
 
 #if HAVE_SFST
 #include "implementations/SfstTransducer.h"

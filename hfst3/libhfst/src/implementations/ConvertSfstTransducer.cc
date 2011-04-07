@@ -15,7 +15,6 @@
 #endif
 
 #include "ConvertTransducerFormat.h"
-//#include "optimized-lookup/convert.h"
 #include "HfstTransitionGraph.h"
 #include "HfstTransducer.h"
 
@@ -43,9 +42,10 @@ namespace hfst { namespace implementations
      @param alphabet  The alphabet of the SFST transducer
   */
   void ConversionFunctions::
-  sfst_to_hfst_basic_transducer( SFST::Node *node, SFST::NodeNumbering &index, 
-                    std::set<SFST::Node*> &visited_nodes, 
-                    HfstBasicTransducer *net, SFST::Alphabet &alphabet ) {
+  sfst_to_hfst_basic_transducer
+  ( SFST::Node *node, SFST::NodeNumbering &index, 
+    std::set<SFST::Node*> &visited_nodes, 
+    HfstBasicTransducer *net, SFST::Alphabet &alphabet ) {
   
     // If node has not been visited before
     if (visited_nodes.find(node) == visited_nodes.end() ) { 
@@ -129,11 +129,6 @@ namespace hfst { namespace implementations
   t->alphabet.add_symbol("@_UNKNOWN_SYMBOL_@", 1);
   t->alphabet.add_symbol("@_IDENTITY_SYMBOL_@", 2);
 
-  // Map that maps states of \a net to SFST nodes
-
-  //std::map<HfstState, SFST::Node*> state_map;
-  //state_map[0] = t->root_node();
-
   std::vector<SFST::Node*> state_vector;
   state_vector.push_back(t->root_node());
   for (unsigned int i=1; i <= (net->max_state); i++) {
@@ -149,13 +144,6 @@ namespace hfst { namespace implementations
              = it->second.begin();
            tr_it != it->second.end(); tr_it++)
         {
-          // Create new nodes, if needed
-          /*if (state_map.find(it->first) == state_map.end())
-            state_map[it->first] = t->new_node();
-
-          if (state_map.find(tr_it->get_target_state()) == state_map.end())
-	  state_map[tr_it->get_target_state()] = t->new_node();*/
-
           std::string istring(tr_it->get_input_symbol());
           std::string ostring(tr_it->get_output_symbol());
 
@@ -172,9 +160,6 @@ namespace hfst { namespace implementations
              t->alphabet.add_symbol(ostring.c_str()));
           
           // Copy transition to node
-          /*state_map[it->first]->add_arc(l,
-                                        state_map[tr_it->get_target_state()],
-                                        t);*/
 	  state_vector[it->first]->add_arc
 	    (l, state_vector[tr_it->get_target_state()], t);
 					   
@@ -186,9 +171,6 @@ namespace hfst { namespace implementations
          = net->final_weight_map.begin();
        it != net->final_weight_map.end(); it++) 
     {
-      /*if (state_map.find(it->first) == state_map.end())
-        state_map[it->first] = t->new_node();
-	state_map[it->first]->set_final(1);*/
       if (it->first >= state_vector.size()) { // should not happen..
 	state_vector.push_back(t->new_node());
       }
@@ -231,8 +213,9 @@ namespace hfst { namespace implementations
 			    0);
       }
       
-      if (node->is_final())
+      if (node->is_final()) {
         net->set_final_weight(index[node],0);
+      }
 
       // Call this function recursively for all target nodes
       // of the transitions
@@ -252,10 +235,10 @@ namespace hfst { namespace implementations
     SFST::NodeNumbering index(*t);
 
     HfstConstantTransducer * net 
-      = new HfstConstantTransducer((unsigned int)index.number_of_nodes()-1);
+      = new HfstConstantTransducer((unsigned int)index.number_of_nodes());
 
     // Copy the alphabet
-    net->initialize_symbol_map();
+    net->symbol_map[0] = std::string("@_EPSILON_SYMBOL_@");
 
     SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
     for (SFST::Alphabet::CharMap::const_iterator it 
@@ -285,8 +268,9 @@ namespace hfst { namespace implementations
     for (HfstConstantTransducer::SymbolMap::const_iterator it 
 	   = net->symbol_map.begin();
 	 it != net->symbol_map.end(); it++) {
-      if (it->second.compare("@_EPSILON_SYMBOL_@") != 0)
+      if (it->second.compare("@_EPSILON_SYMBOL_@") != 0) {
 	t->alphabet.add_symbol(it->second.c_str(), it->first);
+      }
     }    
 
 
@@ -294,7 +278,7 @@ namespace hfst { namespace implementations
     // that corresponds to the node of \a t   
     std::vector<SFST::Node*> state_vector;
     state_vector.push_back(t->root_node());
-    for (unsigned int i=1; i <= ((unsigned int)net->states.size()-1); i++) {
+    for (unsigned int i=1; i < ((unsigned int)net->states.size()); i++) {
       state_vector.push_back(t->new_node());
     }
     
@@ -308,7 +292,7 @@ namespace hfst { namespace implementations
 	  {	    
 	    SFST::Label l(tr_it->input, tr_it->output);	    
 	    state_vector[i]->add_arc
-	      (l, state_vector[tr_it->target], t);	    
+	      (l, state_vector[tr_it->target], t);
 	  }
       }
     

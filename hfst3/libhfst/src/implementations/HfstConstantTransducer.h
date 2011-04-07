@@ -7,6 +7,7 @@
 #include <map>
 
 namespace hfst {
+  namespace implementations {
 
   struct HfstConstantTransition
   {
@@ -37,7 +38,7 @@ namespace hfst {
     typedef StateVector::const_iterator const_iterator;
 
     HfstConstantTransducer();
-    HfstConstantTransducer(unsigned int max_state_number);
+    HfstConstantTransducer(unsigned int number_of_states);
     void initialize_symbol_map();
 
     void add_transition(unsigned int source,
@@ -52,6 +53,7 @@ namespace hfst {
     const_iterator const_end();
   };
 
+  }
 }
 
 

@@ -15,7 +15,6 @@
 #endif
 
 #include "ConvertTransducerFormat.h"
-//#include "optimized-lookup/convert.h"
 #include "HfstTransitionGraph.h"
 #include "HfstTransducer.h"
 
@@ -23,17 +22,15 @@
 namespace hfst { namespace implementations
 {
 
-  /* --------------------------------------------------------------
-
-      Conversion functions between HfstBasicTransducer and OpenFst transducers 
-
-      ------------------------------------------------------------- */
-
-
 #if HAVE_OPENFST
 
 
-  /* --- Conversion between tropical OpenFst and HfstBasicTransducer --- */
+  /* -------------------------------------------------------
+     
+       Conversions between HfstBasicTransducer and OpenFst's 
+       tropical transducer
+
+     ------------------------------------------------------- */
 
 
   /* Create an HfstBasicTransducer equivalent to an OpenFst tropical weight
@@ -163,8 +160,7 @@ namespace hfst { namespace implementations
 
 
 
-  // REPLACED BY StateId hfst_state_to_state_id(HfstState &s, 
-  // std::vector<StateId> &state_vector, fst::StdVectorFst *t)
+  //  NOT NEEDED
   /* Get a state id for a state in transducer \a t that corresponds
      to HfstState s as defined in \a state_map.     
      Used by function hfst_basic_transducer_to_tropical_ofst. */
@@ -192,11 +188,6 @@ namespace hfst { namespace implementations
     StateId start_state = t->AddState(); // always zero
     t->SetStart(start_state);
     
-    // The mapping between states in HfstBasicTransducer and StdVectorFst
-
-    //std::map<HfstState, StateId> state_map;
-    //state_map[0] = start_state;
-
     std::vector<StateId> state_vector;
     state_vector.push_back(start_state);
     for (unsigned int i = 1; i <= (net->max_state); i++) {
@@ -218,14 +209,12 @@ namespace hfst { namespace implementations
              tr_it != it->second.end(); tr_it++)
           {
             // Copy the transition
-            t->AddArc( /*hfst_state_to_state_id(it->first, state_map, t),*/
+            t->AddArc(
 		      state_vector[it->first],
                        fst::StdArc
                        ( st.AddSymbol(tr_it->get_input_symbol()),
                          st.AddSymbol(tr_it->get_output_symbol()),
                          tr_it->get_weight(),
-                         /*hfst_state_to_state_id
-			   (tr_it->get_target_state(), state_map, t)));*/
 			 state_vector[tr_it->get_target_state()]));
           }
       }
@@ -235,7 +224,7 @@ namespace hfst { namespace implementations
            = net->final_weight_map.begin();
          it != net->final_weight_map.end(); it++) 
       {
-        t->SetFinal(/*hfst_state_to_state_id(it->first, state_map, t),*/
+        t->SetFinal(
 		    state_vector[it->first],
                     it->second);
       }
@@ -248,6 +237,173 @@ namespace hfst { namespace implementations
       }
     
     t->SetInputSymbols(&st);
+    return t;  
+  }
+
+
+
+  /* ------------------------------------------------------------
+     
+       Conversions between HfstConstantTransducer and OpenFst's 
+       tropical transducer
+
+     ------------------------------------------------------------ */
+
+
+  /* Create an HfstConstantTransducer equivalent to an OpenFst tropical weight
+     transducer \a t. 
+
+     @pre has_hfst_header = true */  
+  HfstConstantTransducer * ConversionFunctions::
+  tropical_ofst_to_hfst_constant_transducer
+  (fst::StdVectorFst * t, bool has_hfst_header) {
+
+    const fst::SymbolTable *inputsym = t->InputSymbols();
+    const fst::SymbolTable *outputsym = t->OutputSymbols();
+
+    /* An HFST tropical transducer always has an input symbol table. */
+    if (has_hfst_header && inputsym == NULL) {
+      HFST_THROW(MissingOpenFstInputSymbolTableException);
+    }
+
+    HfstConstantTransducer * net 
+      = new HfstConstantTransducer(t->NumStates());
+
+    // An empty transducer
+    if (t->Start() == fst::kNoStateId) {      
+      return net;
+    }      
+
+    /* A non-empty OpenFst transducer must have at least an input symbol table.
+       If the output symbol table is missing, we assume that it would be 
+       equivalent to the input symbol table. */
+    if (inputsym == NULL) {
+      HFST_THROW(MissingOpenFstInputSymbolTableException);
+    }
+    if (outputsym == NULL)
+      outputsym = inputsym;
+    
+    /* Copy the alphabet */
+    for ( fst::SymbolTableIterator it = 
+	    fst::SymbolTableIterator(*(inputsym));
+	  not it.Done(); it.Next() ) {
+      //if (it.Value() != 0) // epsilon is not inserted
+	net->symbol_map[it.Value()] = it.Symbol();
+    }    
+    for ( fst::SymbolTableIterator it = 
+	    fst::SymbolTableIterator(*(outputsym));
+	  not it.Done(); it.Next() ) {
+      //if (it.Value() != 0) // epsilon is not inserted
+	net->symbol_map[it.Value()] = it.Symbol();
+    }    
+    
+    
+    /* This takes care that initial state is always number zero
+       and state number zero (if it is not initial) is some other number
+       (basically as the number of the initial state in that case, i.e.
+       the numbers of initial state and state number zero are swapped) */
+    StateId initial_state = t->Start();
+    
+    /* Go through all states */
+    for (fst::StateIterator<fst::StdVectorFst> siter(*t); 
+	 not siter.Done(); siter.Next()) 
+      {
+	StateId s = siter.Value();
+	
+	HfstState origin = s;
+	if (origin == initial_state)
+	  origin = 0;
+	else if (origin == 0)
+	  origin = initial_state;
+	
+	/* Go through all transitions in a state */
+	for (fst::ArcIterator<fst::StdVectorFst> aiter(*t,s); 
+	     !aiter.Done(); aiter.Next())
+	  {
+	    const fst::StdArc &arc = aiter.Value();
+	    
+	    HfstState target = arc.nextstate;
+	    if (target == initial_state)
+	      target = 0;
+	    else if (target == 0)
+	      target = initial_state;
+	    
+	    // Copy the transition
+	    net->add_transition(origin,
+				target,
+				arc.ilabel,
+				arc.olabel,
+				arc.weight.Value()
+				);
+	  } 
+	
+	if (t->Final(s) != fst::TropicalWeight::Zero()) {
+	  // Set the state as final
+	  net->set_final_weight(origin, t->Final(s).Value());
+	}
+	
+      }
+    
+    return net;
+  }
+
+
+  /* Create an OpenFst transducer equivalent to 
+     HfstConstantTransducer \a net. */
+  fst::StdVectorFst * ConversionFunctions::
+  hfst_constant_transducer_to_tropical_ofst
+  (const HfstConstantTransducer * net) {
+    
+    fst::StdVectorFst * t = new fst::StdVectorFst();
+
+    // (0) Copy the alphabet
+    fst::SymbolTable st("");
+    st.AddSymbol("@_EPSILON_SYMBOL_@", 0);  // these should
+    st.AddSymbol("@_UNKNOWN_SYMBOL_@", 1);  // already be in
+    st.AddSymbol("@_IDENTITY_SYMBOL_@", 2); // the alphabet..
+
+    for (HfstConstantTransducer::SymbolMap::const_iterator it 
+           = net->symbol_map.begin();
+         it != net->symbol_map.end(); it++) {
+      st.AddSymbol(it->second, it->first);
+    }
+    t->SetInputSymbols(&st);
+
+    // (1) Go through all states
+    for (unsigned int i=0; i < net->states.size(); i++)
+      {
+	// Create the state
+	t->AddState();
+
+        // Go through the set of transitions in each state
+        for (HfstConstantTransducer::TransitionVector::const_iterator tr_it 
+               = net->states[i].begin();
+             tr_it != net->states[i].end(); tr_it++)
+          {
+            // Copy the transition
+            t->AddArc( i,
+                       fst::StdArc
+		       (
+			tr_it->input,
+			tr_it->output,
+			tr_it->weight,
+			tr_it->target
+			 ));
+          }
+      }
+    
+    // (2) Go through the final states
+    for (HfstConstantTransducer::FinalStateMap::const_iterator it 
+           = net->final_states.begin();
+         it != net->final_states.end(); it++) 
+      {
+        t->SetFinal(it->first,
+                    it->second);
+      }
+    
+    // Set state number 0 as start state
+    t->SetStart(0);
+
     return t;  
   }
 

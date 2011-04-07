@@ -178,13 +178,145 @@ namespace hfst { namespace implementations
   HfstConstantTransducer * ConversionFunctions::foma_to_hfst_constant_transducer
   (struct fsm * t)
   {
-    HFST_THROW(FunctionNotImplementedException);
+    fsm_count(t);
+    HfstConstantTransducer * net 
+      = new HfstConstantTransducer(t->statecount);
+    struct fsm_state *fsm;
+    fsm = t->states;
+    int start_state_id = -1;
+    bool start_state_found=false;
+
+    // Copy the alphabet
+    struct sigma * p = t->sigma;
+    while (p != NULL) {
+      if (p->symbol == NULL)
+	break;
+      net->symbol_map[p->number] = std::string(p->symbol);
+      p = p->next;
+    }
+
+    
+    // For every line in foma transducer:
+    for (int i=0; (fsm+i)->state_no != -1; i++) {    
+      
+      // 1. If the source state is an initial state in foma:
+      if ((fsm+i)->start_state == 1) 
+	{
+	  // If the start state has not yet been encountered.
+	  if (not start_state_found) {
+	    start_state_id = (fsm+i)->state_no;
+	    //if (start_state_id != 0) {
+	    //  throw ErrorException();
+	    //}
+	    start_state_found=true;
+	  }
+	  // If the start state is encountered again, 
+	  else if ((fsm+i)->state_no == start_state_id) {
+	    // do nothing.
+	  }
+	  // If there are several initial states in foma transducer,
+	  else {
+	    // throw an exception.
+	    HFST_THROW_MESSAGE
+	      (HfstFatalException,
+	       "Foma transducer has more than one start state");
+	  }
+	}
+      
+      // 2. If there are transitions leaving from the state,
+      if ((fsm+i)->target != -1) 
+	{
+	  // copy the transition.
+	  net->add_transition
+	    ((fsm+i)->state_no,
+	     (fsm+i)->target,
+	     (fsm+i)->in, 
+	     (fsm+i)->out,
+	     0);
+	}
+      
+      // 3. If the source state is final in foma,
+      if ((fsm+i)->final_state == 1) 
+	{
+	  // set the state as final.
+	  net->set_final_weight((fsm+i)->state_no, 0);
+	}
+      
+    }
+    
+    // If there was not an initial state in foma transducer,
+    if (not start_state_found) {
+      // throw an exception.
+      HFST_THROW_MESSAGE
+	(HfstFatalException,
+	 "Foma transducer has no start state");
+    }
+    
+    /* If start state number (N) is not zero, swap state numbers N and zero 
+       in internal transducer. TODO */
+    if (start_state_id != 0) {
+      //net->swap_state_numbers(start_state_id,0);
+      HFST_THROW_MESSAGE
+	(HfstFatalException,
+	 "Start state of a foma transducer is not numbered as zero");
+    }
+        
+    return net;
   }
 
   struct fsm * ConversionFunctions::hfst_constant_transducer_to_foma
   (const HfstConstantTransducer * t)
   {
-    HFST_THROW(FunctionNotImplementedException);
+    struct fsm_construct_handle *h;
+    struct fsm *net;
+    h = fsm_construct_init(strdup(std::string("").c_str()));
+    
+    std::vector<std::string> symbols;
+
+    // Copy the alphabet
+    for (HfstConstantTransducer::SymbolMap::const_iterator it 
+           = t->symbol_map.begin();
+         it != t->symbol_map.end(); it++)
+      {
+	symbols.push_back(it->second);
+        char *symbol = strdup(it->second.c_str());
+        if ( fsm_construct_check_symbol(h,symbol) == -1 ) {
+          fsm_construct_add_symbol(h,symbol);
+        }
+      }
+
+    // Go through all states
+    for (unsigned int i=0; i < (unsigned int)t->states.size(); i++)
+      {
+        // Go through the set of transitions in each state
+        for (HfstConstantTransducer::TransitionVector::const_iterator tr_it 
+               = t->states[i].begin();
+             tr_it != t->states[i].end(); tr_it++)
+          {
+            // Copy the transition
+            fsm_construct_add_arc(h, 
+                                  (int)i, 
+                                  (int)tr_it->target,
+                                  strdup(symbols[tr_it->input].c_str()),
+                                  strdup(symbols[tr_it->output].c_str()) );
+          }
+      }
+    
+    // Go through the final states
+    for (HfstConstantTransducer::FinalStateMap::const_iterator it 
+           = t->final_states.begin();
+         it != t->final_states.end(); it++) 
+      {
+        // Set the state as final
+        fsm_construct_set_final(h, (int)it->first);
+      }
+    
+    fsm_construct_set_initial(h, 0);
+    net = fsm_construct_done(h);
+    fsm_count(net);
+    net = fsm_topsort(net);
+    
+    return net;      
   }
 
 #endif // HAVE_FOMA
