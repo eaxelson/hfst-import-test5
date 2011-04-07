@@ -2585,15 +2585,21 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
     try 
     {
         hfst::implementations::HfstBasicTransducer * internal;
+	hfst::implementations::HfstConstantTransducer * const_internal;
         switch (this->type)
 	{
 #if HAVE_FOMA
 	case FOMA_TYPE:
-            internal =
-		ConversionFunctions::foma_to_hfst_basic_transducer
-		(implementation.foma);
-            foma_interface.delete_foma(implementation.foma);
-            break;
+	  if (type == SFST_TYPE || type == TROPICAL_OPENFST_TYPE)
+            const_internal =
+	      ConversionFunctions::foma_to_hfst_constant_transducer
+	      (implementation.foma);
+	  else
+	    internal =
+	      ConversionFunctions::foma_to_hfst_basic_transducer
+	      (implementation.foma);
+	  foma_interface.delete_foma(implementation.foma);
+	  break;
 #endif
 	    /* Add here your implementation. */
             //#if HAVE_MY_TRANSDUCER_LIBRARY
@@ -2607,7 +2613,12 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
             //#endif
 #if HAVE_SFST
 	case SFST_TYPE:
-            internal = 
+	  if (type == TROPICAL_OPENFST_TYPE || type == FOMA_TYPE)
+	      const_internal = 
+		ConversionFunctions::sfst_to_hfst_constant_transducer
+		(implementation.sfst);
+	    else 
+	      internal = 
 		ConversionFunctions::sfst_to_hfst_basic_transducer
 		(implementation.sfst);
             delete implementation.sfst;
@@ -2615,6 +2626,11 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
 #endif
 #if HAVE_OPENFST
 	case TROPICAL_OPENFST_TYPE:
+	  if (type == SFST_TYPE || type == FOMA_TYPE)
+	    const_internal = 
+	      ConversionFunctions::tropical_ofst_to_hfst_constant_transducer
+	      (implementation.tropical_ofst);
+	  else 
             internal =
 		ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
 		(implementation.tropical_ofst);
@@ -2640,15 +2656,25 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
 	    break;
 	}
 
+	ImplementationType original_type = this->type;
         this->type = type;
         switch (this->type)
 	{
 #if HAVE_SFST
 	case SFST_TYPE:
+	  if (original_type == TROPICAL_OPENFST_TYPE || 
+	      original_type == FOMA_TYPE) {
+	    implementation.sfst = 
+	      ConversionFunctions::hfst_constant_transducer_to_sfst
+	      (const_internal);
+	    delete const_internal;
+	  }
+	  else {
             implementation.sfst = 
-		ConversionFunctions::hfst_basic_transducer_to_sfst(internal);
+	      ConversionFunctions::hfst_basic_transducer_to_sfst(internal);
             delete internal;
-            break;
+	  }
+	  break;
 #endif
 	    /* Add here your implementation. */
             //#if HAVE_MY_TRANSDUCER_LIBRARY
@@ -2662,10 +2688,18 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
             //#endif
 #if HAVE_OPENFST
 	case TROPICAL_OPENFST_TYPE:
+	  if (original_type == SFST_TYPE || original_type == FOMA_TYPE) {
+	    implementation.tropical_ofst = 
+	      ConversionFunctions::hfst_constant_transducer_to_tropical_ofst
+	      (const_internal);
+	    delete const_internal; 
+	  }
+	  else {
             implementation.tropical_ofst =
-		ConversionFunctions::hfst_basic_transducer_to_tropical_ofst
-		(internal);
+	      ConversionFunctions::hfst_basic_transducer_to_tropical_ofst
+	      (internal);
             delete internal;
+	  }
             break;
 	case LOG_OPENFST_TYPE:
             implementation.log_ofst =
@@ -2680,9 +2714,17 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
 #endif
 #if HAVE_FOMA
 	case FOMA_TYPE:
+	  if (original_type == SFST_TYPE || 
+	      original_type == TROPICAL_OPENFST_TYPE) {
+	    implementation.foma =
+	      ConversionFunctions::hfst_constant_transducer_to_foma(const_internal);
+            delete const_internal;
+	  }
+	  else {
             implementation.foma =
-		ConversionFunctions::hfst_basic_transducer_to_foma(internal);
+	      ConversionFunctions::hfst_basic_transducer_to_foma(internal);
             delete internal;
+	  }
             break;
 #endif
         case ERROR_TYPE:

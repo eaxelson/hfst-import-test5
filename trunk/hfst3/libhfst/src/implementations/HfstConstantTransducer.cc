@@ -1,6 +1,7 @@
 #include "HfstConstantTransducer.h"
 
 namespace hfst {
+  namespace implementations {
 
   HfstConstantTransition::HfstConstantTransition() :
     target(0), input(0), output(0), weight(0) {}
@@ -15,9 +16,9 @@ namespace hfst {
   HfstConstantTransducer::HfstConstantTransducer() {}
 
   HfstConstantTransducer::HfstConstantTransducer
-  (unsigned int max_state_number)
+  (unsigned int number_of_states)
   {
-    for (unsigned int i=0; i < max_state_number; i++) {
+    for (unsigned int i=0; i < number_of_states; i++) {
       TransitionVector v;
       states.push_back(v);
     }
@@ -73,4 +74,5 @@ namespace hfst {
     return states.end();
   }
 
+  }
 }
