@@ -89,7 +89,7 @@ namespace implementations {
 #if HAVE_SFST
   static void sfst_to_hfst_basic_transducer
     ( SFST::Node *node, SFST::NodeNumbering &index, 
-      std::set<SFST::Node*> &visited_nodes, 
+      /*std::set<SFST::Node*> &visited_nodes,*/ 
       HfstBasicTransducer *net, SFST::Alphabet &alphabet);
 
   static HfstBasicTransducer * sfst_to_hfst_basic_transducer
@@ -100,7 +100,7 @@ namespace implementations {
 
   static void sfst_to_hfst_constant_transducer
     ( SFST::Node *node, SFST::NodeNumbering &index, 
-      std::set<SFST::Node*> &visited_nodes, 
+      /*std::set<SFST::Node*> &visited_nodes,*/ 
       HfstConstantTransducer *net);
 
   static HfstConstantTransducer * sfst_to_hfst_constant_transducer
