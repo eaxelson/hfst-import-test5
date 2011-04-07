@@ -406,12 +406,6 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
       transducer_n++;
       HfstTransducer trans(instream);
       char* inputname = strdup(trans.get_name().c_str());
-      if (!warnedAlready)
-        {
-          warning(0, 0, "substitution is not supported for this transducer type"
-                  " falling back to internal formats and trying...");
-        }
-      fallback = new HfstBasicTransducer(trans);
       if (strlen(inputname) <= 0)
         {
           inputname = strdup(inputfilename);
@@ -460,36 +454,40 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
               to_label = hfst_strndup(tab+1, endstr-tab-1);
               from_pair = label_to_stringpair(from_label);
               to_pair = label_to_stringpair(to_label);
-#if 0
               try 
                 {
                   do_substitute(trans, transducer_n);
                 }
-              catch (FunctionNotSupportedException fnse)
+              catch (FunctionNotImplementedException fnse)
                 {
-#endif
+                  if (!warnedAlready)
+                    {
+                      warning(0, 0, "substitution is not supported for this transducer type"
+                              " falling back to internal formats and trying...");
+                      fallback = new HfstBasicTransducer(trans);
+                    }
                   do_substitute(*fallback, transducer_n);
                   fellback = true;
-#if 0
                 }
-#endif
             }
         }
       else
         {
-#if 0
           try
             {
               do_substitute(trans, transducer_n);
             }
-          catch (FunctionNotSupported fnse)
+          catch (FunctionNotImplementedException fnse)
             {
-#endif
+              if (!warnedAlready)
+                {
+                  warning(0, 0, "substitution is not supported for this transducer type"
+                          " falling back to internal formats and trying...");
+                  fallback = new HfstBasicTransducer(trans);
+                }
               do_substitute(*fallback, transducer_n);
               fellback = true;
-#if 0
             }
-#endif
         }
       if (fellback)
         {
