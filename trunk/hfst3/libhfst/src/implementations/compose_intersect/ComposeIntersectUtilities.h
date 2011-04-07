@@ -1,0 +1,193 @@
+#ifndef HEADER_COMPOSE_INTERSECT_UTILITIES_H
+#define HEADER_COMPOSE_INTERSECT_UTILITIES_H
+
+#include <vector>
+#include <algorithm>
+#include <utility>
+
+#ifdef COMPOSE_INTERSECT_UTILITIES_TEST
+#include <iostream>
+#endif // COMPOSE_INTERSECT_UTILITIES_TEST
+
+namespace hfst
+{
+  namespace implementations
+  {
+    namespace compose_intersect_utilities
+    {
+      template <class X,class Y> class SpaceSavingMap
+	{	  
+	protected:
+	  typedef std::pair<X,Y> XYPair;
+	  typedef std::vector<XYPair> XYPairVector;
+
+	public:
+	  typedef typename XYPairVector::const_iterator const_iterator;
+	  typedef typename XYPairVector::iterator iterator;
+
+	  iterator begin(void)
+	  { return container_.begin(); }
+
+	  const_iterator begin(void) const
+	  { return container_.begin(); }
+	  
+	  iterator end(void)
+	  { return container_.end(); }
+	  
+	  const_iterator end(void) const
+	  { return container_.end(); }
+	  
+	  SpaceSavingMap &operator=(const SpaceSavingMap &another)
+	  {
+	    container_ = another.container_;
+	    return *this;
+	  }
+	  Y &operator[](const X &x)
+	  {
+	    iterator least_upper_bound = get_least_upper_bound(x);
+	    if (least_upper_bound == end() or least_upper_bound->first != x)
+	      { return add_key(x,least_upper_bound); }
+	    else 
+	      { return least_upper_bound->second; }
+	  }
+
+	  const_iterator find(const X &x) const
+	  {
+	    const_iterator least_upper_bound = get_least_upper_bound(x);
+	    if (least_upper_bound == end() or least_upper_bound->first != x)
+	      { return end(); }
+	    return least_upper_bound;
+	  }
+
+	  void clear(void)
+	  { container_.clear(); }
+
+	  bool has_key(const X &x) const
+	  { return find(x) != end(); }
+
+	  size_t size(void)
+	  { return container_.size(); }
+
+	protected:
+
+	  struct ReverseCompare
+	  {
+	    bool operator() (const XYPair &p1,const XYPair &p2) const
+	    { return p1.first < p2.first; }
+	  } reverse_comp;
+
+	  XYPairVector container_;
+
+	  const_iterator get_least_upper_bound(const X &x) const
+	  { 
+	    XYPair x_pair(x,Y());
+	    return std::lower_bound<const_iterator,XYPair,ReverseCompare>
+	      (begin(),end(),x_pair,reverse_comp); }
+
+	  iterator get_least_upper_bound(const X &x)
+	  { 
+	    XYPair x_pair(x,Y());
+	    return std::lower_bound<iterator,XYPair,ReverseCompare>
+	      (begin(),end(),x_pair,reverse_comp); }
+
+	  Y &add_key(const X &x,iterator least_upper_bound)
+	  {
+	    XYPair xy_pair(x,Y()); 
+	    return container_.insert(least_upper_bound,xy_pair)->second;
+	  }
+	};
+
+      template <class X,class C> class SpaceSavingSet
+      {
+	protected:
+	  typedef std::vector<X> XVector;
+
+	public:
+	  typedef typename XVector::const_iterator const_iterator;
+	  typedef typename XVector::iterator iterator;
+
+	  const_iterator begin(void) const
+	  { return container_.begin(); }
+	  
+	  const_iterator end(void) const
+	  { return container_.end(); }
+	  
+	  iterator begin(void)
+	  { return container_.begin(); }
+	  
+	  iterator end(void)
+	  { return container_.end(); }
+	  
+	  SpaceSavingSet &operator=(const SpaceSavingSet &another)
+	  {
+	    container_ = another.container_;
+	    return *this;
+	  }
+	  
+	  void insert(const X &x)
+	  {
+	    iterator least_upper_bound = get_least_upper_bound(x);
+	    const X &new_x = *least_upper_bound;
+	    if (least_upper_bound == end() or not (x == new_x))
+	      { add_value(x,least_upper_bound); }
+	  }
+
+	  const_iterator find(const X &x) const
+	  {
+	    const_iterator least_upper_bound = get_least_upper_bound(x);
+	    if (least_upper_bound == end())
+	      { return end(); }
+	    return least_upper_bound;
+	  }
+
+	  void clear(void)
+	  { container_.clear(); }
+
+	  bool has_element(const X &x) const
+	  { return find(x) != end(); }
+
+	  size_t size(void)
+	  { return container_.size(); }
+
+	protected:
+	  static C comparator;
+
+	  static struct ReverseCompare
+	  {
+	    bool operator() (const X &x1,const X &x2) const
+	    { return comparator()(x1,x2); }
+	  } reverse_comp;
+
+	  XVector container_;
+
+	  const_iterator get_least_upper_bound(const X &x) const
+	  { 
+	    const_iterator it = container_.begin();
+	    for ( ; it != container_.end(); ++it)
+	      { 
+		if (not comparator(*it,x))
+		  { break; }
+	      }
+	    return it;
+	  }
+
+	  iterator get_least_upper_bound(const X &x)
+	  { 
+	    iterator it = container_.begin();
+	    for ( ; it != container_.end(); ++it)
+	      { 
+		if (not comparator(*it,x))
+		  { break; }
+	      }
+	    return it;
+	  }
+
+	  void add_value(const X &x,iterator least_upper_bound)
+	  { container_.insert(least_upper_bound,x); }
+      };
+
+    }
+  }
+}
+
+#endif // HEADER_COMPOSE_INTERSECT_UTILITIES_H

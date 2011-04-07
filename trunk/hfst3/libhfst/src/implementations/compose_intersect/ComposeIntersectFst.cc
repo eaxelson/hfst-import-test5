@@ -9,6 +9,10 @@ namespace hfst
 
     const HfstState ComposeIntersectFst::START;
 
+    template<> ComposeIntersectFst::CompareTransitions 
+    ComposeIntersectFst::TransitionSet::comparator = 
+     ComposeIntersectFst::CompareTransitions();
+    
     ComposeIntersectFst::Transition::Transition(const HfstBasicTransition &t):
       ilabel(t.transition_data.input_number),
       olabel(t.transition_data.output_number),
@@ -24,6 +28,15 @@ namespace hfst
     target(target)
     {}
 
+    bool ComposeIntersectFst::Transition::operator==
+    (const ComposeIntersectFst::Transition &another) const
+    {
+      return 
+	ilabel == another.ilabel and
+	olabel == another.olabel and
+	weight == another.weight and
+	target == another.target;
+    }
     bool ComposeIntersectFst::CompareTransitions::operator()
     (const Transition &tr1,
      const Transition &tr2) const
