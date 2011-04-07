@@ -92,7 +92,7 @@ namespace hfst
 	fst2->get_transitions(state_pair.second,symbol);
       ComposeIntersectRule::TransitionSet::const_iterator jt = 
 	fst2_transitions.begin();
-
+ 
       (void)state_transition_vector[state][symbol];
       TransitionSet transitions;
       while (it != fst1_transitions.end() and jt != fst2_transitions.end())
@@ -116,7 +116,6 @@ namespace hfst
 }
 
 #ifdef TEST_COMPOSE_INTERSECT_RULE_PAIR
-#include <cassert>
 using namespace hfst;
 using hfst::implementations::ComposeIntersectRule;
 using hfst::implementations::ComposeIntersectRulePair;
@@ -130,21 +129,20 @@ std::ostream &ComposeIntersectRulePair::print(std::ostream &out)
 	     ComposeIntersectRule::symbol_set.begin();
 	   it != ComposeIntersectRule::symbol_set.end();
 	   ++it)
-	{ 
+	{ 	  
 	  const TransitionSet &transitions = get_transitions(s,*it);
-
 	  for (TransitionSet::const_iterator jt = transitions.begin();
 	       jt != transitions.end();
 	       ++jt)
 	    {
 	      out << s << "\t"
-		  << jt->get_target_state() << "\t"
-		  << jt->get_input_symbol() << "\t"
-		  << jt->get_output_symbol() << "\t"
-		  << jt->get_weight() << std::endl;
+		  << jt->target << "\t"
+		  << HfstTropicalTransducerTransitionData::get_symbol(jt->ilabel) << "\t"
+		  << HfstTropicalTransducerTransitionData::get_symbol(jt->olabel) << "\t"
+		  << jt->weight << std::endl;
 	    }	  
 	}
-      std::cerr << s << "\t" << get_final_weight(s) << std::endl;
+      out << s << "\t" << get_final_weight(s) << std::endl;
       ++s;
       if (not has_state(s))
 	{ break; }
@@ -155,6 +153,8 @@ std::ostream &ComposeIntersectRulePair::print(std::ostream &out)
 std::ostream &operator<<
 (std::ostream &out,ComposeIntersectRulePair &p)
 { return p.print(out); }
+
+#include <cassert>
 
 int main(void)
 {

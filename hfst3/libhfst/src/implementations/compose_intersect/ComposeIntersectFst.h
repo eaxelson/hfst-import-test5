@@ -6,6 +6,7 @@
 
 #include "../../HfstExceptionDefs.h"
 #include "../HfstTransitionGraph.h"
+#include "ComposeIntersectUtilities.h"
 
 #ifdef TEST_COMPOSE_INTERSECT_FST
 #include <iostream>
@@ -28,6 +29,7 @@ namespace hfst
 	HfstState target;
 	Transition(const HfstBasicTransition &);
 	Transition(HfstState,size_t,size_t,float);
+	bool operator==(const Transition&) const;
       };
 
       struct CompareTransitions
@@ -36,7 +38,8 @@ namespace hfst
 			 const Transition &transition2) const; 
       };
 
-      typedef std::set<Transition,CompareTransitions> 
+      typedef compose_intersect_utilities::SpaceSavingSet
+	<Transition,CompareTransitions> 
 	TransitionSet; 
       typedef std::set<size_t> SymbolSet;
       static const HfstState START = 0;
@@ -64,7 +67,6 @@ namespace hfst
       FloatVector finality_vector;
       TransitionVector identity_transition_vector;
     };
-
   }
 }
 

@@ -130,9 +130,11 @@ namespace hfst
       for (TransitionSet::const_iterator it = transitions.begin();
 	   it != transitions.end();
 	   ++it)
-	{ add_transition
+	{ 
+	  add_transition
 	    (origin,it->ilabel,it->olabel,it->weight,
-	     get_state(StatePair(it->target,rule_state))); }
+	     get_state(StatePair(it->target,rule_state))); 
+	}
     }
 
     void ComposeIntersectLexicon::rule_skip_symbol_compose
@@ -141,9 +143,12 @@ namespace hfst
       for (TransitionSet::const_iterator it = transitions.begin();
 	   it != transitions.end();
 	   ++it)
-	{ add_transition
+	{ 
+	  add_transition
 	    (origin,it->ilabel,it->olabel,it->weight,
-	     get_state(StatePair(lex_state,it->target))); }
+	     get_state(StatePair(lex_state,it->target))); 
+	}
+
     }
 
     void ComposeIntersectLexicon::compose
@@ -158,8 +163,7 @@ namespace hfst
 	  for (TransitionSet::const_iterator jt = rule_transitions.begin();
 	       jt != rule_transitions.end();
 	       ++jt)
-	    { 
-	      add_transition
+	    { add_transition
 		(origin,it->ilabel,jt->olabel,it->weight + jt->weight,
 		 get_state(StatePair(it->target,jt->target))); } 
 	}
