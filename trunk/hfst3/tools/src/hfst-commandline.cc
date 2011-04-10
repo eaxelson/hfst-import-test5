@@ -404,15 +404,67 @@ hfst_strndup(const char* s, size_t n)
     return rv;
 }
 
+#ifndef HAVE_GETDELIM
+ssize_t
+getdelim(char** lineptr, size_t* n, int delim, FILE* stream)
+  {
+#define MAX_GETDELIM 8192
+    size_t nn = *n;
+    if (nn == 0)
+      {
+        nn = MAX_GETDELIM;
+      }
+    if (*lineptr == NULL)
+      {
+        *lineptr = static_cast<char*>(malloc(nn));
+        if (*lineptr == NULL)
+          {
+            return -1;
+          }
+      }
+    char* currptr = *lineptr;
+    *currptr = '\0';
+    size_t readin = 0;
+    int readbyte = 0;
+    while ((readbyte = fgetc(stream)) != EOF)
+      {
+        *currptr = static_cast<char>(readbyte);
+        currptr++;
+        readin++;
+        if (readin >= nn)
+          {
+            currptr--;
+            *currptr = '\0';
+            return -1;
+          }
+        else if (readbyte == delim)
+          {
+            *currptr = '\0';
+            return strlen(*lineptr);
+          }
+      }
+    if (readbyte == EOF)
+      {
+        *currptr = '\0';
+        return -1;
+      }
+    if (*lineptr == NULL)
+      {
+        return -1;
+      }
+    return strlen(*lineptr);
+  }
+#endif
+
 #ifndef HAVE_GETLINE
 ssize_t
 getline(char** lineptr, size_t* n, FILE* stream)
   {
-#define MAX_LEN 4196
+#define MAX_GETLINE 4096
     size_t nn = *n;
     if (nn == 0)
       {
-        nn = MAX_LEN;
+        nn = MAX_GETLINE;
       }
     if (*lineptr == NULL)
       {
@@ -430,6 +482,19 @@ getline(char** lineptr, size_t* n, FILE* stream)
     return strlen(*lineptr);
   }
 #endif
+
+ssize_t
+hfst_getdelim(char** lineptr, size_t* n, int delim, FILE* stream)
+  {
+    errno = 0;
+    ssize_t rv = -1;
+    rv = getdelim(lineptr, n, delim, stream);
+    if ((rv < 0) && errno)
+      {
+        error(EXIT_FAILURE, errno, "getdelim failed");
+      }
+    return rv;
+  }
 
 ssize_t
 hfst_getline(char** lineptr, size_t* n, FILE* stream)
