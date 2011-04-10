@@ -190,9 +190,18 @@ void hfst_fseek(FILE* stream, long offset, int whence);
  */
 unsigned long hfst_ftell(FILE* stream);
 
+#ifdef HAVE_GETDELIM
+ssize_t getdelim(char** lineptr, size_t* n, int delim, FILE* stream);
+#endif
 #ifndef HAVE_GETLINE
 ssize_t getline(char** lineptr, size_t* n, FILE* stream);
 #endif
+
+/**
+ * @brief safely read one @a delim delimited char array or print informative
+ * error message and exit on failure.
+ */
+ssize_t hfst_getdelim(char** lineptr, size_t* n, int delim, FILE* stream);
 
 /**
  * @brief safely read one full line from file or print informative error

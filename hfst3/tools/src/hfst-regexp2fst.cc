@@ -187,20 +187,22 @@ process_stream(HfstOutputStream& outstream)
   XreCompiler comp(output_format);
   HfstTransducer disjunction(output_format);
   //outstream.open();
-  while (hfst_getline(&line, &len, inputfile) != -1)
+  int delim = '\n';
+  if (line_separated)
+    {
+      delim = '\n';
+    }
+  else
+    {
+      delim = ';';
+    }
+  while (hfst_getdelim(&line, &len, delim, inputfile) != -1)
     {
       transducer_n++;
       line_count++;
       HfstTransducer* compiled;
-      if (line_separated)
-        {
-          verbose_printf("Compiling line %u\n", line_count);
-          compiled = comp.compile(line);
-        }
-      else
-        {
-          return EXIT_FAILURE;
-        }
+      verbose_printf("Compiling expression %u\n", line_count);
+      compiled = comp.compile(line);
       if (disjunct_expressions)
         {
           disjunction.disjunct(*compiled);
