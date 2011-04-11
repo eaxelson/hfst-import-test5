@@ -29,9 +29,10 @@ namespace hfst { namespace implementations
 
      ----------------------------------------------------------- */
 
+#if HAVE_SFST
+
   SFST::VType VMARK = 10000;
 
-#if HAVE_SFST
 
   /* Recursively copy all transitions of \a node to \a net.
      Used by function sfst_to_hfst_basic_transducer(SFST::Transducer * t).
