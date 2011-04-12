@@ -1,0 +1,243 @@
+.. -*- mode: rst -*-
+==================================================================
+ Helsinki Finite-State Technology (library and application suite)
+==================================================================
+
+This package contains a bridging library for multiple FST libraries and toolkits
+and set of tools for processing of finite-state automate especially for
+linguistic systems. HFST library and tools are licenced under GNU GPL licence
+version 3, you may read the full licence in the file named COPYING. The
+authors specified in AUTHORS file may be contacted about licencing issues.
+
+There's an online wiki-based information source about HFST in
+`Kitwiki HFST pages <https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome>`_.
+
+Dependencies
+------------
+
+Compilation requirements:
+
+- For OpenFST backend:
+
+  - the OpenFST libary can be downloaded from the `OpenFST wiki
+    <http://www.openfst.org>`_
+
+  - the OpenFST library version 1.2 or newer must be installed in running
+    system (on MacOS X: 1.2.2 does not compile, 1.2.4 or later does)
+
+  - compiling against OpenFST library and linking may require recent
+    GCC version and pthread and m libraries, check OpenFST site for details
+
+  - to disable OpenFST support, configure switch ``--without-openfst`` may
+    be used
+
+- For SFST backend:
+
+  - the SFST can be downloaded from `university of Stuttgart SFST pages
+    <http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html>`_
+
+  - the SFST library version 1.4 or newer must be installed in the running
+    system. The library installation of SFST is done by explicit command
+    ``make libinstall``.
+
+  - SFST requires readline and ncurses, check SFST site for details
+
+  - to disable SFST backend, configure switch ``--without-sfst`` may be used
+
+- For foma backend:
+
+  - foma library and tools can be downloaded from `foma website
+    <http://foma.sf.net>`_
+
+  - the foma library version 0.9.14alpha or newer must be installed in the
+    running system. MacOSX note: only the source tarball compiles, the svn
+    version does not compile.
+
+  - foma requires editline, termcap and zlib libraries to compile, check foma
+    site for details
+
+  - to disable foma backend, configure switch ``--without-foma`` may be used
+
+  - the *hfst-xfst* and *hfst-lexc* frontends **require** foma binary
+
+- Local libraries:
+
+  - If you only have a local version of a library, you can use it with
+    appropriate LDFLAGS and CXXFLAGS, eg.
+    ``./configure LDFLAGS=-L/path/to/local/lib
+    --prefix=/path/to/local/installation`` and
+    ``make CXXFLAGS=-I/path/to/local/headers``
+
+- Versions loaded from version control systems require a relatively new GNU
+  tool-chain to build: 
+
+ - autoconf >=2.62
+
+ - automake >=1.11.1
+
+ - libtool >=2.2
+
+ - >=gettext-0.17
+
+ - GNU tool-chain is also needed with distributed packages if the user wishes to
+   modify Makefile.am or configure.ac files.
+
+ - Mac OS X users are advised to use Darwin Ports; Mac OS X 10.6 with
+   XCode 2.3.2 at least is not sufficient
+
+- Versions loaded from version control system may require parser generator 
+  system:
+
+   - GNU flex 2.5.35 or compatible and
+
+   - GNU bison 1.31 (2.4 suggested) or compatible
+
+   - flex 2.5.4-2.5.33 will choke on perfectly valid rules used in hfst
+
+   - bison older than 1.31 do not support name-prefix needed for having
+     multiple parsers in one library
+
+   - Flex and bison are needed with distribution versions as well if the user
+     wishes to modify .yy or .ll files.
+
+Runtime requirements:
+
+- If the executable is dynamically linked (almost always), the operating system
+  *must* be able to find hfst libraries, and libraries of backends that are
+  dynamically linked
+
+- If you install the libraries in non-standard paths, you need to ensure
+  that operating system is aware of this; In linux this may happen by setting
+  LD_LIBRARY_PATH.
+
+- the *hfst-xfst* and *hfst-lexc* frontends **require** foma binary
+
+Installation
+------------
+
+INSTALL describes the GNU build system in detail, but for most users the usual::
+
+	./configure
+	make
+	(as root) make install
+
+should result in a local installation and::
+
+	(as root) make uninstall
+
+in its uninstallation. If you aren't going to be linking to the library after
+building it and don't need to be able to send debugging information, you can
+save a considerable amount of space and memory by doing::
+
+	make install-strip
+
+instead of make install. This strips all the symbols from the binaries,
+reducing sizes by a factor of 5-10.
+
+If you would rather install in e.g. your home directory
+(or aren't the system administrator), you can tell ./configure::
+
+        ./configure --prefix=$HOME
+
+The HFST library may link to numerous FST handling backends with varying
+licences. If you are going to redistribute the HFST library you compiled, make
+sure there are no clashes in the licences of the linked libraries; all
+of them are free and open source, but under strict interpretation you may not
+be able to redistribute combination of strict GNU GPLv2 and Apache APLv2 in the
+same binary (e.g. foma and OpenFST).
+
+If you are checking out the development versions from SVN you must first create
+and install the necessary autotools files from the host system:
+
+  autoreconf -i
+
+It is common practice to keep `generated files out of version control
+I<http://www.gnu.org/software/automake/manual/automake.html#CVS>`_.
+
+For further installation instruction refer to file ``INSTALL``, which contains
+the standard installation instructions for GNU autoconf based software.
+
+Troubleshooting
+---------------
+
+Compilation errors of form::
+
+  /usr/include/c++/4.3/cstdlib:124: error: '::malloc' has not been declared
+
+or::
+
+  your configure failed to find malloc, check README for further instructions
+
+are mosts often caused by broken library installation. This can be verified
+from the ``config.log`` file, which should contain something like::
+
+  configure:16727: g++ -o conftest -g -O2   conftest.cpp -lfoma -lz -lsfst -lm -lfst -ldl -lpthread  >&5
+  configure:16727: $? = 0
+  configure:16727: ./conftest
+  ./conftest: error while loading shared libraries: libfst.so.0: cannot open shared object file: No such file or directory
+
+Now this means you have installed OpenFst, but the linker doesn't know where
+to find it anymore. The simplest solution in Linux-based platforms is ldconfig::
+
+  ldconfig -v
+
+This is actually told and performed by the autotools libtool library
+installation, but it's easy to miss. It looks like this::
+
+  Libraries have been installed in:
+     /usr/local/lib
+
+  If you ever happen to want to link against installed libraries
+  in a given directory, LIBDIR, you must either use libtool, and
+  specify the full pathname of the library, or use the '-LLIBDIR'
+  flag during linking and do at least one of the following:
+     - add LIBDIR to the 'LD_LIBRARY_PATH' environment variable
+       during execution
+     - add LIBDIR to the 'LD_RUN_PATH' environment variable
+       during linking
+     - use the '-Wl,-rpath -Wl,LIBDIR' linker flag
+     - have your system administrator add LIBDIR to '/etc/ld.so.conf'
+
+  See any operating system documentation about shared libraries for
+  more information, such as the ld(1) and ld.so(8) manual pages.
+
+If you installed openfst on non-standard path, or installed it to the
+default ``/usr/local/lib``, but your variant of Linux doesn't support libraries
+there, you may need to set it up and/or ldconfig the directory explicitly::
+
+  export LD_LIBRARY_PATH=${LD_LIBRARY_PATH}:/usr/local/lib
+  ldconfig -v -n /usr/local/lib
+
+If all else fails, try installing openfst to wherever your blend of Linux
+installs all its libraries, such as /usr/lib.
+
+See also: 
+<http://nerdland.net/unstumping-the-internet/malloc-has-not-been-declared/> for
+the gory details.
+
+Further information
+-------------------
+
+The `Hfst wiki site
+<https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstHome>`_ contains further
+details of the HFST system.
+
+Reporting bugs
+--------------
+
+Bugs can be reported via email to `HFST team bug mail address
+<hfst-bugs@helsinki.fi>`_, or preferably to `HFST's bug tracking system
+at sourceforge
+<https://sourceforge.net/tracker/?atid=1061990&group_id=224521&func=browse>`_
+When reporting, please include at least following:
+
+* version of software used, if command-line tool (hfst-toolname --version)
+
+* version of hfst-library, if possible
+
+* steps to reproduce, attach or all related files if possible
+
+* information about platform used (e.g. uname -a)
+
+
+.. vim: set ft=rst:
