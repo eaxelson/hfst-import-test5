@@ -63,4 +63,4 @@ HFST_HDRS = \
 
 hfstinclude_HEADERS = $(HFST_HDRS)
 
-libhfst_la_LDFLAGS = -no-undefined -version-info 2:0:1
+libhfst_la_LDFLAGS = -no-undefined -version-info 3:0:2
