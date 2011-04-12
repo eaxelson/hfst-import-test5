@@ -157,8 +157,8 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
               {
                 if (not silent) 
                   {
-                    warning(0, 0, "Warning: %s contains flag diacritics not "
-                            "found in %s\n", secondname, firstname);
+                    warning(0, 0, "%s contains flag diacritics not "
+                            "found in %s", secondname, firstname);
                 }
               }
             else
@@ -173,8 +173,8 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
               {
                 if (not silent)
                   {
-                    warning(0, 0, "Warning: %s contains flag diacritics not "
-                            "found in %s\n", firstname, secondname);
+                    warning(0, 0, "%s contains flag diacritics not "
+                            "found in %s", firstname, secondname);
                   }
               }
             else
@@ -208,13 +208,13 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
     
     if (firststream.is_good())
     {
-      warning(0, 0, "Warning: %s contains more transducers than %s; "
-                     "residue skipped\n", firstfilename, secondfilename);
+      warning(0, 0, "%s contains more transducers than %s; "
+                     "residue skipped", firstfilename, secondfilename);
     }
     else if (secondstream.is_good())
     {
-      warning(0, 0, "Warning: %s contains fewer transducers than %s; "
-                     "residue skipped\n", firstfilename, secondfilename);
+      warning(0, 0, "%s contains fewer transducers than %s; "
+                     "residue skipped", firstfilename, secondfilename);
     }
     firststream.close();
     secondstream.close();
