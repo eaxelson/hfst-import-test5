@@ -10,6 +10,12 @@ Noteworthy changes in 3.0.2
 
 * some fixes to OSX compatibility
 
+* no more license conflict problems wrt foma
+
+* better memory use in compose-intersect
+
+* new implementation of internal transducer
+
 Noteworthy changes in 3.0.1
 ---------------------------
 
