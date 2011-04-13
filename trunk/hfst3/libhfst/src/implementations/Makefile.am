@@ -27,6 +27,7 @@ IMPLEMENTATION_SRCS=HfstTransitionGraph.cc ConvertTransducerFormat.cc \
                     compose_intersect/ComposeIntersectLexicon.cc \
                     compose_intersect/ComposeIntersectRule.cc \
                     compose_intersect/ComposeIntersectFst.cc \
+                    compose_intersect/ComposeIntersectUtilities.cc \
                     HfstConstantTransducer.cc
 
 AM_CXXFLAGS=-Wno-deprecated -g
