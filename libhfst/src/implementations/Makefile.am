@@ -27,6 +27,7 @@ IMPLEMENTATION_SRCS=HfstTransitionGraph.cc ConvertTransducerFormat.cc \
                     compose_intersect/ComposeIntersectLexicon.cc \
                     compose_intersect/ComposeIntersectRule.cc \
                     compose_intersect/ComposeIntersectFst.cc \
+                    compose_intersect/ComposeIntersectUtilities.cc \
                     HfstConstantTransducer.cc
 
 AM_CXXFLAGS=-Wno-deprecated -g
@@ -74,7 +75,8 @@ implinclude_HEADERS = \
 		compose_intersect/ComposeIntersectRulePair.h \
 		compose_intersect/ComposeIntersectLexicon.h \
 		compose_intersect/ComposeIntersectRule.h \
-		compose_intersect/ComposeIntersectFst.h
+		compose_intersect/ComposeIntersectFst.h \
+		compose_intersect/ComposeIntersectUtilities.h
 
 ### Add here your library ###
 #		MyTransducerLibraryTransducer.h
