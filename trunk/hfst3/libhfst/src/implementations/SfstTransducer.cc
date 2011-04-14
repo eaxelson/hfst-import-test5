@@ -1179,7 +1179,7 @@ namespace hfst { namespace implementations {
             origin->add_arc( Label(1, inumber), target, t );
           }
       }
-    else if (l.lower_char() == 2 && l.upper_char() == 2 )  // identity "?:?"
+    else if (l.lower_char() == 2 || l.upper_char() == 2 )  // identity "?:?"
       {
         for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
           {

@@ -47,7 +47,7 @@ DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   dog.hfst infinitely_ambiguous.hfst non_minimal.hfst rule1.hfst \
 		   rule2.hfst summarize_test1.hfst summarize_test2.hfst tac.hfst \
 		   epsilon.hfst epsilon2cat.hfst cat2epsilon.hfst \
-		   unknown-star.hfst identity-star.hfst
+		   unknown-star.hfst identity-star.hfst unknown2a.hfst identity.hfst
 OL_CHECKS=cat2dog.hfst.ol cat2dog.gen.hfst.ol cat_weight_final.hfst.ol \
 			proc-caps.hfst.ol proc-caps.gen.hfst.ol
 if WANT_SFST
@@ -60,7 +60,7 @@ SFST_CHECKS=0to3cats.hfst.sfst 2to4cats.hfst.sfst 4cats.hfst.sfst\
 			cat_weight_middle.hfst.sfst dog2cat.hfst.sfst dog.hfst.sfst \
 			infinitely_ambiguous.hfst.sfst non_minimal.hfst.sfst \
 			rule1.hfst.sfst rule2.hfst.sfst summarize_test1.hfst.sfst \
-			summarize_test2.hfst.sfst tac.hfst.sfst 
+			summarize_test2.hfst.sfst tac.hfst.sfst unknown2a.hfst.sfst identity.hfst.sfst 
 endif
 if WANT_OPENFST
 OFST_CHECKS=0to3cats.hfst.ofst \
@@ -72,7 +72,7 @@ OFST_CHECKS=0to3cats.hfst.ofst \
 			cat_weight_initial.hfst.ofst cat_weight_middle.hfst.ofst \
 			dog2cat.hfst.ofst dog.hfst.ofst infinitely_ambiguous.hfst.ofst \
 			non_minimal.hfst.ofst rule1.hfst.ofst rule2.hfst.ofst \
-			summarize_test1.hfst.ofst summarize_test2.hfst.ofst tac.hfst.ofst
+			summarize_test1.hfst.ofst summarize_test2.hfst.ofst tac.hfst.ofst unknown2a.hfst.ofst identity.hfst.ofst
 endif
 if WANT_FOMA
 FOMA_CHECKS=0to3cats.hfst.foma 2to4cats.hfst.foma 4cats.hfst.foma \
@@ -84,7 +84,7 @@ FOMA_CHECKS=0to3cats.hfst.foma 2to4cats.hfst.foma 4cats.hfst.foma \
 			cat_weight_initial.hfst.foma cat_weight_middle.hfst.foma \
 			dog2cat.hfst.foma dog.hfst.foma infinitely_ambiguous.hfst.foma \
 			non_minimal.hfst.foma rule1.hfst.foma rule2.hfst.foma \
-			summarize_test1.hfst.foma summarize_test2.hfst.foma tac.hfst.foma
+			summarize_test1.hfst.foma summarize_test2.hfst.foma tac.hfst.foma unknown2a.hfst.foma identity.hfst.foma
 endif
 
 check_DATA=$(DEFAULT_CHECKS) $(SFST_CHECKS) $(OFST_CHECKS) $(FOMA_CHECKS) $(OL_CHECKS)

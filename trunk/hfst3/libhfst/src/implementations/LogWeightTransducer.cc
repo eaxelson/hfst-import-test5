@@ -666,7 +666,7 @@ namespace hfst { namespace implementations
                                           result_nextstate));
                   }
               }
-            else if (arc.ilabel == 2 &&   // identity "?:?"
+            else if (arc.ilabel == 2 ||   // identity "?:?"
                      arc.olabel == 2 )       
               {
                 for (StringSet::iterator it = unknown.begin(); 
