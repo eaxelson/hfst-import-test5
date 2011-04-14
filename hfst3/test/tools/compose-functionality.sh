@@ -21,5 +21,13 @@ for i in "" .sfst .ofst .foma; do
                 exit 1
             fi
         fi
+	if test -f unknown2a.hfst$i && test -f identity.hfst$i ; then
+	    if ! ../../tools/src/hfst-compose unknown2a.hfst$i identity.hfst$i > test.hfst ; then
+		exit 1
+            fi
+	    if ../../tools/src/hfst-compare test.hfst unknown2a.hfst$i > /dev/null ; then
+		exit
+	    fi
+	fi 
     fi
 done

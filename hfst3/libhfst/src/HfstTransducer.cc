@@ -17,6 +17,7 @@
     files in the directory implementations. */
 
 #include "HfstTransducer.h"
+#include "HfstFlagDiacritics.h"
 #include "implementations/compose_intersect/ComposeIntersectLexicon.h"
 
 using hfst::implementations::ConversionFunctions;
@@ -188,12 +189,12 @@ void collect_unknown_sets(StringSet &s1, StringSet &unknown1,
 {
     for (StringSet::const_iterator it1 = s1.begin(); it1 != s1.end(); it1++) {
 	String sym1 = *it1;
-	if ( s2.find(sym1) == s2.end() )
+	if ( s2.find(sym1) == s2.end() && not FdOperation::is_diacritic(sym1))
 	    unknown2.insert(sym1);
     }
     for (StringSet::const_iterator it2 = s2.begin(); it2 != s2.end(); it2++) {
 	String sym2 = *it2;
-	if ( s1.find(sym2) == s1.end() )
+	if ( s1.find(sym2) == s1.end() && not FdOperation::is_diacritic(sym2))
 	    unknown1.insert(sym2);
     }
 }
@@ -2119,13 +2120,13 @@ bool substitute_single_identity_with_the_other_symbol
     
     if (isymbol.compare("@_IDENTITY_SYMBOL_@") == 0 && 
         (osymbol.compare("@_IDENTITY_SYMBOL_@") != 0)) {
-	isymbol = osymbol; //std::string("@_UNKNOWN_SYMBOL_@");
+	isymbol = std::string("@_UNKNOWN_SYMBOL_@");
 	sps.insert(StringPair(isymbol, osymbol));
 	return true;
     }
     else if (osymbol.compare("@_IDENTITY_SYMBOL_@") == 0 && 
              (isymbol.compare("@_IDENTITY_SYMBOL_@") != 0)) {
-	osymbol = isymbol; //std::string("@_UNKNOWN_SYMBOL_@");
+	osymbol = std::string("@_UNKNOWN_SYMBOL_@");
 	sps.insert(StringPair(isymbol, osymbol));
 	return true;
     }
@@ -2176,7 +2177,8 @@ HfstTransducer &HfstTransducer::compose
 
     /* Substitution requires conversion to HfstBasicTransducer
        which can change the symbol-to-number mappings. 
-       That is why it must be done before harmonizing. */
+       That is why substitution must be done before harmonizing. 
+       Note that foma takes care of identities and unknowns. */
     if ( (this->type != FOMA_TYPE) && unknown_symbols_in_use) 
     {
         if (DEBUG) fprintf(stderr,"substituting for composition..\n");
@@ -2251,7 +2253,6 @@ HfstTransducer &HfstTransducer::compose
       another.write_in_att_format(stderr);
       fprintf(stderr, "\n");*/
 
-    //#if HAVE_FOMA
     if ( (this->type != FOMA_TYPE) && unknown_symbols_in_use) 
     {
         if (DEBUG) fprintf(stderr,"substituting after composition..\n");
@@ -2263,7 +2264,6 @@ HfstTransducer &HfstTransducer::compose
 
         if (DEBUG) fprintf(stderr,"..done\n");
     }
-    //#endif
 
     return *this;
 }

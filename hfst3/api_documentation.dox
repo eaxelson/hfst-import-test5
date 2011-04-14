@@ -899,6 +899,8 @@ The examples given in this documentation use
 
 \section features Features
 
+   - Create transducers and apply \link hfst::HfstTransducer operations\endlink on them
+
    - Create transducers \link hfst::implementations::HfstTransitionGraph from scratch\endlink
 
    - \link hfst::implementations::HfstTransitionGraph::iterator Iterate\endlink through a transducer's states and transitions
