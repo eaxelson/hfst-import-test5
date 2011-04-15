@@ -26,7 +26,8 @@ AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
 HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc HfstOutputStream.cc\
 		  HfstRules.cc \
 		  HfstSymbolDefs.cc HfstTokenizer.cc \
-		  HfstFlagDiacritics.cc HfstExceptionDefs.cc
+		  HfstFlagDiacritics.cc HfstExceptionDefs.cc \
+		  HarmonizeUnknownAndIdentitySymbols.cc
 
 # libtool takes over
 libhfst_la_SOURCES =  $(HFST_SRCS)
@@ -53,6 +54,7 @@ HFST_HDRS = \
 	implementations/compose_intersect/ComposeIntersectLexicon.h \
 	implementations/compose_intersect/ComposeIntersectRule.h \
 	implementations/compose_intersect/ComposeIntersectFst.h \
+	HarmonizeUnknownAndIdentitySymbols.h \
 	HfstExceptionDefs.h \
 	HfstExtractStrings.h \
 	HfstFlagDiacritics.h \
