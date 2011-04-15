@@ -11,14 +11,36 @@ const char * HarmonizeUnknownAndIdentitySymbols::unknown =
 size_t max(size_t t1,size_t t2)
 { return t1 < t2 ? t2 : t1; }
 
+bool is_subset(const StringSet &subset,const StringSet &superset)
+{
+  for (StringSet::const_iterator it = subset.begin();
+       it != subset.end();
+       ++it)
+    {
+      if (superset.find(*it) == superset.end())
+	{ return false; }
+    }
+  return true;
+}
+
 HarmonizeUnknownAndIdentitySymbols::HarmonizeUnknownAndIdentitySymbols
 (HfstBasicTransducer &t1,HfstBasicTransducer &t2) :
   t1(t1),
   t2(t2)
 {
-  populate_symbol_set(t1,t1_symbol_set);
-  populate_symbol_set(t2,t2_symbol_set);
-  
+  t1_symbol_set = t1.get_alphabet();
+  t2_symbol_set = t2.get_alphabet();
+ 
+  if (debug_harmonize)
+    {
+      StringSet t1_symbols_in_transitions;
+      StringSet t2_symbols_in_transitions;
+      populate_symbol_set(t1,t1_symbols_in_transitions);
+      populate_symbol_set(t2,t2_symbols_in_transitions);
+      assert(is_subset(t1_symbols_in_transitions,t1_symbol_set));
+      assert(is_subset(t2_symbols_in_transitions,t2_symbol_set));
+    }
+
   std::vector<std::string> diff_vector
     (max(t1_symbol_set.size(),t2_symbol_set.size()),"");
   
