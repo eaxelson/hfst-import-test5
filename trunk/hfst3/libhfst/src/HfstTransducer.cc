@@ -324,6 +324,12 @@ void HfstTransducer::harmonize(HfstTransducer &another)
     default:
         HFST_THROW(TransducerHasWrongTypeException);
     }
+
+    if (false)
+      {
+	this->write_in_att_format(stderr);
+	another.write_in_att_format(stderr);
+      }
 }
 
 // *** ...HARMONIZATION FUNCTIONS ENDS ***
@@ -1763,7 +1769,7 @@ HfstTransducer &HfstTransducer::substitute
         this->foma_interface.delete_foma(implementation.foma);
         net->substitute(old_symbol, new_symbol, input_side, output_side);
         implementation.foma = 
-	    ConversionFunctions::hfst_basic_transducer_to_foma(net);
+	  ConversionFunctions::hfst_basic_transducer_to_foma(net);
         delete net;
         return *this;
     }
@@ -2175,6 +2181,17 @@ HfstTransducer &HfstTransducer::compose
 
     bool DEBUG=false;
 
+    if (DEBUG)
+      {
+	this->write_in_att_format(stderr);
+	fprintf(stderr, "--\n");
+	another.write_in_att_format(stderr);
+	fprintf(stderr, "This alphabet: ");
+	this->print_alphabet();
+	fprintf(stderr, "Another alphabet: ");
+	const_cast<HfstTransducer&>(another).print_alphabet();
+      }
+
     /* Substitution requires conversion to HfstBasicTransducer
        which can change the symbol-to-number mappings. 
        That is why substitution must be done before harmonizing. 
@@ -2190,6 +2207,17 @@ HfstTransducer &HfstTransducer::compose
 
         if (DEBUG) fprintf(stderr,"..done\n");
     }
+
+    if (DEBUG)
+      {
+	this->write_in_att_format(stderr);
+	fprintf(stderr, "--\n");
+	another.write_in_att_format(stderr);
+	fprintf(stderr, "This alphabet: ");
+	this->print_alphabet();
+	fprintf(stderr, "Another alphabet: ");
+	const_cast<HfstTransducer&>(another).print_alphabet();
+      }
 
     if (DEBUG) fprintf(stderr, "harmonizing for composition..\n");
     this->harmonize(const_cast<HfstTransducer&>(another));
@@ -2257,12 +2285,24 @@ HfstTransducer &HfstTransducer::compose
     {
         if (DEBUG) fprintf(stderr,"substituting after composition..\n");
 
+	/*	if (DEBUG) {
+	  this->write_in_att_format(stderr);
+	  fprintf(stderr, "--\n");
+	  another.write_in_att_format(stderr);
+	  }*/
+
         // comment...
         this->substitute(&substitute_single_identity_with_the_other_symbol);
         (const_cast<HfstTransducer&>(another)).
 	    substitute(&substitute_unknown_identity_pairs);
 
         if (DEBUG) fprintf(stderr,"..done\n");
+	
+	/*if (DEBUG) {
+	  this->write_in_att_format(stderr);
+	  fprintf(stderr, "--\n");
+	  another.write_in_att_format(stderr);
+	  }*/
     }
 
     return *this;
@@ -3000,7 +3040,12 @@ void HfstTransducer::print_alphabet()
 {
 #if HAVE_SFST
     if (this->type == SFST_TYPE)
-	this->sfst_interface.print_alphabet(this->implementation.sfst);
+      this->sfst_interface.print_alphabet(this->implementation.sfst);
+#endif
+#if HAVE_OPENFST
+    if (this->type == TROPICAL_OPENFST_TYPE)
+      this->tropical_ofst_interface.print_alphabet
+	(this->implementation.tropical_ofst);
 #endif
     return;
 }

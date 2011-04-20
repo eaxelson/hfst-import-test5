@@ -741,6 +741,8 @@ namespace hfst { namespace implementations
   std::pair<StdVectorFst*, StdVectorFst*> TropicalWeightTransducer::harmonize
   (StdVectorFst *t1, StdVectorFst *t2, bool unknown_symbols_in_use)
   {
+    bool DEBUG=false;
+
     clock_t startclock = clock();
 
     // 1. Calculate the set of unknown symbols for transducers t1 and t2.
@@ -753,6 +755,21 @@ namespace hfst { namespace implementations
     collect_unknown_sets(t1_symbols, unknown_t1,
                          t2_symbols, unknown_t2);
     
+    if (DEBUG)
+      {
+	fprintf(stderr, "New symbols for t1: ");
+	for (StringSet::const_iterator it = unknown_t1.begin(); 
+	     it != unknown_t1.end(); it++)
+	  fprintf(stderr, "'%s', ", it->c_str());
+	fprintf(stderr, "\n");
+	fprintf(stderr, "New symbols for t2: ");
+	for (StringSet::const_iterator it = unknown_t2.begin(); 
+	     it != unknown_t2.end(); it++)
+	  fprintf(stderr, "'%s', ", it->c_str());
+	fprintf(stderr, "\n");
+      }
+
+
     // 2. Add new symbols from transducer t1 to the symbol table of 
     //    transducer t2...
 
@@ -1282,6 +1299,17 @@ namespace hfst { namespace implementations
     return det;
   }
 
+
+  void TropicalWeightTransducer::print_alphabet(const StdVectorFst *t)
+  {
+    for(fst::SymbolTableIterator it=fst::SymbolTableIterator
+	  (*t->InputSymbols()); 
+        !it.Done(); it.Next())
+      {
+	fprintf(stderr, "'%s', ", it.Symbol().c_str());
+      }
+    fprintf(stderr, "\n");
+  }
 
   void print_att_number(StdVectorFst *t, FILE * ofile) {
     fprintf(ofile, "initial state: %i\n", t->Start());

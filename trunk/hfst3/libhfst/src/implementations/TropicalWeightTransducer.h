@@ -227,6 +227,8 @@ namespace implementations
       
       static FdTable<int64>* get_flag_diacritics(StdVectorFst * t);
 
+      static void print_alphabet(const StdVectorFst *t);
+
       // string versions
       static StdVectorFst * insert_freely
         (StdVectorFst * t, const StringPair &symbol_pair);
