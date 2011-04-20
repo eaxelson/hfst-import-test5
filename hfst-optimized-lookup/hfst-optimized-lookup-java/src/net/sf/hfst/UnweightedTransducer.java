@@ -372,7 +372,7 @@ public class UnweightedTransducer implements Transducer
 	} else if (flag.op == HfstOptimizedLookup.FlagDiacriticOperator.D) { // disallow
 	    if (flag.value == 0) // empty disallow
 		{
-		    if (stateStack.peek()[flag.feature] == 0)
+		    if (stateStack.peek()[flag.feature] != 0)
 			{
 			    return false;
 			}
