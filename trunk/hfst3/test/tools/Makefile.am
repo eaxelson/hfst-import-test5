@@ -60,7 +60,8 @@ SFST_CHECKS=0to3cats.hfst.sfst 2to4cats.hfst.sfst 4cats.hfst.sfst\
 			cat_weight_middle.hfst.sfst dog2cat.hfst.sfst dog.hfst.sfst \
 			infinitely_ambiguous.hfst.sfst non_minimal.hfst.sfst \
 			rule1.hfst.sfst rule2.hfst.sfst summarize_test1.hfst.sfst \
-			summarize_test2.hfst.sfst tac.hfst.sfst unknown2a.hfst.sfst identity.hfst.sfst 
+			summarize_test2.hfst.sfst tac.hfst.sfst unknown2a.hfst.sfst\
+			identity.hfst.sfst 
 endif
 if WANT_OPENFST
 OFST_CHECKS=0to3cats.hfst.ofst \
@@ -72,7 +73,8 @@ OFST_CHECKS=0to3cats.hfst.ofst \
 			cat_weight_initial.hfst.ofst cat_weight_middle.hfst.ofst \
 			dog2cat.hfst.ofst dog.hfst.ofst infinitely_ambiguous.hfst.ofst \
 			non_minimal.hfst.ofst rule1.hfst.ofst rule2.hfst.ofst \
-			summarize_test1.hfst.ofst summarize_test2.hfst.ofst tac.hfst.ofst unknown2a.hfst.ofst identity.hfst.ofst
+			summarize_test1.hfst.ofst summarize_test2.hfst.ofst tac.hfst.ofst\
+			unknown2a.hfst.ofst identity.hfst.ofst
 endif
 if WANT_FOMA
 FOMA_CHECKS=0to3cats.hfst.foma 2to4cats.hfst.foma 4cats.hfst.foma \
@@ -84,7 +86,8 @@ FOMA_CHECKS=0to3cats.hfst.foma 2to4cats.hfst.foma 4cats.hfst.foma \
 			cat_weight_initial.hfst.foma cat_weight_middle.hfst.foma \
 			dog2cat.hfst.foma dog.hfst.foma infinitely_ambiguous.hfst.foma \
 			non_minimal.hfst.foma rule1.hfst.foma rule2.hfst.foma \
-			summarize_test1.hfst.foma summarize_test2.hfst.foma tac.hfst.foma unknown2a.hfst.foma identity.hfst.foma
+			summarize_test1.hfst.foma summarize_test2.hfst.foma tac.hfst.foma\
+			unknown2a.hfst.foma identity.hfst.foma
 endif
 
 check_DATA=$(DEFAULT_CHECKS) $(SFST_CHECKS) $(OFST_CHECKS) $(FOMA_CHECKS) $(OL_CHECKS)
@@ -98,7 +101,7 @@ FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
 		 epsilon.txt epsilon2cat.txt infinitely_ambiguous.txt \
 		 non_minimal.txt rule1.txt rule2.txt summarize_test1.txt \
 		 summarize_test2.txt tac.txt proc-caps.txt \
-		 unknown-star.txt identity-star.txt
+		 unknown-star.txt identity-star.txt unknown2a.txt identity.txt
 FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-out1.strings \
 		 proc-caps-out2.strings proc-caps-out3.strings proc-caps-out4.strings \
 		 proc-cat-out.strings proc-cat-weighted-out.strings \
@@ -108,7 +111,9 @@ FST_PAIRS=cat2dog.pairs
 FST_PAIRSTRINGS=cat2dog.pairstring
 FST_SPACESTRINGS=cat2dog.spaces
 SUBSTITUTE_TXTS=cat2dog.substitute
-XRE_TXTS=cats_and_dogs.xre
+XRE_TXTS=cats_and_dogs.xre cats_and_dogs_semicolon.xre
+ALL_SRCS=$(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) \
+		 $(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TEXTS)
 #XFST_TXTS=cat-regex.xfst
 
 # this compilation is uesd by check target before running the tests

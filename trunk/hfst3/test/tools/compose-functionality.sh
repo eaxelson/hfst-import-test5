@@ -2,14 +2,17 @@
 for i in "" .sfst .ofst .foma; do 
     if test -f cat.hfst$i -a -f cat2dog.hfst$i ; then
         if ! ../../tools/src/hfst-compose cat.hfst$i cat2dog.hfst$i > test.hfst ; then
+            echo cat.hfst$1 o cat2dog.hfst$i fail
             exit 1
         fi
         if ! ../../tools/src/hfst-compare test.hfst cat2dog.hfst$i > /dev/null 2>&1 ; then
+            echo cat2doghfst$i differs
             exit 1
         fi
         rm test.hfst;
         if test -f identity-star.hfst$i ; then
             if ! ../../tools/src/hfst-compose cat.hfst$i identity-star.hfst$i > test.hfst ; then
+                echo cat.hfst$1 o identitytstar.hfst$i fail
                 exit 1
             fi
             if ! ../../tools/src/hfst-compare cat.hfst$i test.hfst > /dev/null ; then
