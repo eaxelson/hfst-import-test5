@@ -445,10 +445,9 @@ public class WeightedTransducer implements Transducer
 	    return true;
 	} else if (flag.op == HfstOptimizedLookup.FlagDiacriticOperator.U) { // unification
 	    if ((stateStack.peek()[flag.feature] == 0) ||
-		(stateStack.peek()[flag.feature] == flag.value &&
-		 stateStack.peek()[flag.feature] > 0 ||
-		 (stateStack.peek()[flag.feature] == flag.value &&
-		  stateStack.peek()[flag.feature] < 0))) {
+		(stateStack.peek()[flag.feature] == flag.value) ||
+		(stateStack.peek()[flag.feature] != flag.value &&
+		 stateStack.peek()[flag.feature] < 0)) {
 		
 		    stateStack.push(top);
 		    stateStack.peek()[flag.feature] = flag.value;
