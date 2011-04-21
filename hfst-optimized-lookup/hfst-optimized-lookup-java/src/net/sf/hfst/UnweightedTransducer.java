@@ -42,7 +42,10 @@ public class UnweightedTransducer implements Transducer
 	}
 	
 	public Boolean isFinal()
-	{ return (firstTransitionIndex == 1); }
+	{
+	    return (inputSymbol == HfstOptimizedLookup.NO_SYMBOL_NUMBER &&
+		    firstTransitionIndex != HfstOptimizedLookup.NO_TABLE_INDEX);
+	}
 	
 	    public long target()
 	{ return firstTransitionIndex; }
@@ -115,7 +118,11 @@ public class UnweightedTransducer implements Transducer
 	{ return inputSymbol; }
 	
 	public Boolean isFinal()
-	{ return (targetIndex == 1); }
+	{
+	    return (inputSymbol == HfstOptimizedLookup.NO_SYMBOL_NUMBER &&
+		    outputSymbol == HfstOptimizedLookup.NO_SYMBOL_NUMBER &&
+		    targetIndex == 1);
+	}
     }
     
     /**

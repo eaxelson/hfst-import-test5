@@ -44,10 +44,8 @@ public class WeightedTransducer implements Transducer
 	
 	public Boolean isFinal()
 	{
-	    if (inputSymbol != HfstOptimizedLookup.NO_SYMBOL_NUMBER)
-		{ return false; }
-	    float w = (float) firstTransitionIndex;
-	    return (w != HfstOptimizedLookup.INFINITE_WEIGHT);
+	    return (inputSymbol == HfstOptimizedLookup.NO_SYMBOL_NUMBER &&
+		    firstTransitionIndex != HfstOptimizedLookup.NO_TABLE_INDEX);
 	}
 
 	public float getFinalWeight()
@@ -136,11 +134,9 @@ public class WeightedTransducer implements Transducer
 	
 	public Boolean isFinal()
 	{
-	    if (inputSymbol != HfstOptimizedLookup.NO_SYMBOL_NUMBER)
-		return false;
-	    if (outputSymbol != HfstOptimizedLookup.NO_SYMBOL_NUMBER)
-		return false;
-	    return (weight != HfstOptimizedLookup.INFINITE_WEIGHT);
+	    return (inputSymbol == HfstOptimizedLookup.NO_SYMBOL_NUMBER &&
+		    outputSymbol == HfstOptimizedLookup.NO_SYMBOL_NUMBER &&
+		    targetIndex == 1);
 	}
 
 	public float getWeight()
