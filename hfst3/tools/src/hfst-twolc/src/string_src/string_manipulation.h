@@ -145,4 +145,7 @@ class StringVector : public std::vector<std::string>
   StringVector &add_values(const StringVector &another);
 };
 
+//! @brief Remove hfst-twolc escape sequences from @a name.
+std::string unescape_name(const std::string &name);
+
 #endif
