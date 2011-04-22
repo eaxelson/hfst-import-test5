@@ -20,7 +20,7 @@ Rule::Rule(const std::string &name,
 	   const OtherSymbolTransducer &center,
 	   const OtherSymbolTransducerVector &contexts):
   is_empty(false),
-  name(name),
+  name(unescape_name(name)),
   center(center)
 {
   OtherSymbolTransducerVector contexts_copy = contexts; 
@@ -34,7 +34,7 @@ Rule::Rule(const std::string &name,
 Rule::Rule(const std::string &name,
 	   const RuleVector &v):
   is_empty(true),
-  name(name),
+  name(unescape_name(name)),
   rule_transducer(TWOLC_UNKNOWN)
 {
   rule_transducer.apply(&HfstTransducer::repeat_star);

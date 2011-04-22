@@ -27,6 +27,7 @@
 #include "HfstTransducer.h"
 #include "OtherSymbolTransducer.h"
 #include "grammar_defs.h"
+#include "../string_src/string_manipulation.h"
 
 using hfst::HfstOutputStream;
 

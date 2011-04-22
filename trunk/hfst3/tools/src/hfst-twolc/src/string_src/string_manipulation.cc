@@ -127,6 +127,14 @@ StringVector &StringVector::add_values(const StringVector &another)
   return *this;
 }
 
+std::string unescape_name(const std::string &name)
+{
+  std::string new_name = 
+    replace_substr(replace_substr(name,"__HFST_TWOLC_RULE_NAME=",""),
+		   "__HFST_TWOLC_SPACE"," ");
+  return new_name;
+}
+
 #ifdef STRING_MANIPULATION_TEST
 #include <iostream>
 int main(void)
