@@ -123,7 +123,6 @@ add_percents(const char *s)
   {
     char* ns = static_cast<char*>(malloc(sizeof(char)*strlen(s)*2+1));
     char* p = ns;
-    fprintf(stderr, "\nDBG: adding percents to %s\n", s);
     while (*s != '\0')
       {
         if ((*s == '@') || (*s == '-') || (*s == ' ') || (*s == '|') ||
@@ -141,7 +140,6 @@ add_percents(const char *s)
         s++;
       }
     *p = '\0';
-    fprintf(stderr, "\nDBG: got %s\n", ns);
     return ns;
   }
 
