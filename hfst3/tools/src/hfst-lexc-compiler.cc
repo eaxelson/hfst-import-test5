@@ -117,7 +117,7 @@ parse_options(int argc, char** argv)
 #include "inc/check-params-common.h"
     if (format == hfst::UNSPECIFIED_TYPE)
       {
-        verbose_printf("Defaulting to OpenFst tropical type\n");
+        warning(0, 0, "Defaulting to OpenFst tropical type");
         format = hfst::TROPICAL_OPENFST_TYPE;
       }
     if (argc - optind > 0)
@@ -162,6 +162,17 @@ lexc_streams(LexcCompiler& lexc, HfstOutputStream& outstream)
       }
     verbose_printf("Compiling... ");
     HfstTransducer* res = lexc.compileLexical();
+    char* name = static_cast<char*>(malloc(sizeof(char) * 
+                                    (strlen(lexcfilenames[0]) +
+                                     strlen("lexc(...)") + 1)));
+    if ((sprintf(name, "lexc(%s...)", lexcfilenames[0])))
+      {
+        res->set_name(name);
+      }
+    else
+      {
+        res->set_name("lexc(sprintf failed?)");
+      }
     verbose_printf("\nWriting... ");
     outstream << *res;
     verbose_printf("done\n");

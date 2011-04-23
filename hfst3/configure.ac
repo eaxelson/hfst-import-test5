@@ -185,12 +185,12 @@ AC_ARG_ENABLE([invert],
 			  [enable_invert=$enableval],
 			  [enable_invert=yes])
 AM_CONDITIONAL([WANT_INVERT], [test x$enable_invert != xno])
-AC_ARG_ENABLE([lexc-compiler],
-              [AS_HELP_STRING([--enable-lexc-compiler],
-                              [build lexc2fst cli @<:@default=no@:>@])],
-              [enable_lexc_compiler=$enableval],
-              [enable_lexc_compiler=no])
-AM_CONDITIONAL([WANT_LEXC_COMPILER], [test "x$enable_lexc_compiler" != xno])
+AC_ARG_ENABLE([lexc2fst],
+              [AS_HELP_STRING([--enable-lexc2fst],
+                              [build lexc2fst cli @<:@default=yes@:>@])],
+              [enable_lexc2=$enableval],
+              [enable_lexc2fst=yes])
+AM_CONDITIONAL([WANT_LEXC2FST], [test "x$enable_lexc2fst" != xno])
 AC_ARG_ENABLE([lookup],
 			  [AS_HELP_STRING([--enable-lookup],
 							  [build lookup tool @<:@default=yes@:>@])],
