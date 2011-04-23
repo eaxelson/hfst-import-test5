@@ -82,6 +82,11 @@ char* strdup_nonconst_part(const char* token,
                            const char* suffix,
                            bool strip);
 
+// help flex/yacc with meaningful error messages
+//! @brief print error_at_line style error message for current token
+void error_at_current_token(int status, int errnum, const char* format);
+
+
 } }
 // vim: set ft=cpp.doxygen:
 #endif // GUARD_lexc_utils_h

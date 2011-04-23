@@ -48,7 +48,7 @@ replace_all(string& haystack, const string& needle, const string& replacement)
 {
         size_t last_needle = haystack.find(needle);
         size_t needle_len = needle.length();
-        while(last_needle != string::npos)
+        while (last_needle != string::npos)
         {
                 haystack.replace(last_needle, needle_len, replacement);
                 last_needle = haystack.find(needle);
@@ -130,11 +130,8 @@ count_newlines(const char *linestring)
 void
 set_infile_name(const char* s)
 {
-	if (hlexcfilename != 0)
-	{
-		free(hlexcfilename);
-	}
-	hlexcfilename = strdup(s);
+    free(hlexcfilename);
+    hlexcfilename = strdup(s);
 }
 
 void
@@ -155,8 +152,8 @@ token_update_positions(const char *token)
 {
 	size_t token_length = strlen(token);
 	int newlines = count_newlines(token);
-	hlexclloc.first_line = hlexclineno;
-	hlexclloc.last_line = (hlexclineno + newlines);
+	hlexclloc.first_line = hlexclloc.last_line;
+	hlexclloc.last_line = (hlexclloc.first_line + newlines);
 	// FIXME: columns equal bytes not characters
 	hlexclloc.first_column = hlexclloc.last_column + 1;
 	if (0 == newlines)
@@ -352,6 +349,14 @@ strdup_nonconst_part(const char* token, const char* prefix,
 	return token_part;
 }
 
+void
+error_at_current_token(int status, int errnum, const char* format)
+{
+    char* leader = strdup_token_positions();
+    char* token = strdup_token_part();
+    fprintf(stderr, "%s: %s %s\n", leader, format, token);
+    free(leader);
+}
 
 } } 
 

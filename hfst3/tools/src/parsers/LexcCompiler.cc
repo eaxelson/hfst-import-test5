@@ -83,6 +83,14 @@ LexcCompiler::LexcCompiler(ImplementationType impl) :
 LexcCompiler& LexcCompiler::parse(FILE* infile)
 {
     lexc_ = this;
+    if (infile == stdin)
+      {
+        hfst::lexc::set_infile_name("<stdin>");
+      }
+    else
+      {
+        hfst::lexc::set_infile_name("<unnamed>");
+      }
     hlexcin = infile;
     hlexcparse();
     return *this;
@@ -91,6 +99,7 @@ LexcCompiler& LexcCompiler::parse(FILE* infile)
 LexcCompiler& LexcCompiler::parse(const char* filename)
 {
     lexc_ = this;
+    hfst::lexc::set_infile_name(filename);
     hlexcin = fopen(filename, "r");
     if (hlexcin == NULL)
       {
@@ -312,7 +321,7 @@ LexcCompiler::compileLexical()
         lexicon = leftJoiner.concatenate(lexicon).minimize();
         if (verbose_)
           {
-            fprintf(stderr, " minimising... ", s->c_str());
+            fprintf(stderr, " minimising... ");
           }
         lexicons.disjunct(lexicon).minimize();
       }

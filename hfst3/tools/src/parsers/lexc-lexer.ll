@@ -58,7 +58,7 @@ A7UNRESTRICTED [\x21-\x7e]{-}[ <>%!;:""]
 /* special meaning in xre */
 XRERESTRICTED [- <>%!:;@0~\\&?$+*/_{}\]\[-]
 /* non-restricted ASCII in XRE */
-XREUNRESTRICTED [\x21-\x7e]{-}[- <>%!:;@0~\\&?$+*/_{}\]\[-]
+XREUNRESTRICTED [\x21-\x7e\n]{-}[- <>%!:;@0~\\&?$+*/_{}\]\[-]
 
 
 /* RegExp. stuff */
