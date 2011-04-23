@@ -28,6 +28,7 @@
 using std::string;
 
 #include "LexcCompiler.h"
+#include "lexc-utils.h"
 
 // obligatory yacc stuff
 extern int hlexclineno;
@@ -311,8 +312,8 @@ int hlexcparse(void);
 // gah, bison/flex error mechanism here
 void
 hlexcerror(const char* text)
-{ 
-    fprintf(stderr,  "%s\n", text);
+{
+    hfst::lexc::error_at_current_token(0, 0, text);
 }
 
 
