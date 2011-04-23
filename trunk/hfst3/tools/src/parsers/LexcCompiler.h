@@ -111,6 +111,7 @@ class LexcCompiler
 
   private:
   bool quiet_;
+  bool verbose_;
   hfst::ImplementationType format_;
   hfst::HfstTokenizer tokenizer_;
   hfst::xre::XreCompiler xre_;

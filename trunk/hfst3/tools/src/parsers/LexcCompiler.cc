@@ -30,8 +30,7 @@ using std::map;
 using std::set;
 
 #include "LexcCompiler.h"
-#include "../../../libhfst/src/HfstTransducer.h"
-#include "../../../libhfst/src/implementations/HfstTransitionGraph.h"
+#include "HfstTransducer.h"
 #include "XreCompiler.h"
 #include "lexc-utils.h"
 #include "lexc-parser.h"
@@ -56,6 +55,7 @@ LexcCompiler* lexc_ = 0;
 
 LexcCompiler::LexcCompiler() :
     quiet_(false),
+    verbose_(false),
     format_(TROPICAL_OPENFST_TYPE),
     xre_(TROPICAL_OPENFST_TYPE),
     initialLexiconName_("Root"),
@@ -65,6 +65,7 @@ LexcCompiler::LexcCompiler() :
 
 LexcCompiler::LexcCompiler(ImplementationType impl) :
     quiet_(false),
+    verbose_(false),
     format_(impl),
     xre_(impl),
     initialLexiconName_("Root"),
@@ -104,6 +105,7 @@ LexcCompiler&
 LexcCompiler::setVerbosity(bool verbose)
 {
     quiet_ = !verbose;
+    verbose_ = verbose;
     return *this;
 }
 
@@ -216,7 +218,7 @@ LexcCompiler::addXreEntry(const string& regexp, const string& continuation,
 LexcCompiler&
 LexcCompiler::addXreDefinition(const string& definition_name, const string& xre)
 {
-    // collect implicit characters
+    // FIXME: collect implicit characters
     xre_.define(definition_name, xre);
     if (!quiet_)
       {
@@ -277,9 +279,12 @@ HfstTransducer*
 LexcCompiler::compileLexical()
 {
     printConnectedness();
-    HfstBasicTransducer rebuilt;
-    map<string,HfstTransducer> lexicons;
+    HfstTransducer lexicons(format_);
     // combine tries with reg.exps and minimize
+    if (verbose_)
+      {
+        fprintf(stderr, "Disjuncting lexicons... ");
+      }
     for (set<string>::const_iterator s = lexiconNames_.begin();
          s != lexiconNames_.end();
          ++s)
@@ -288,6 +293,13 @@ LexcCompiler::compileLexical()
           {
             continue;
           }
+        if (verbose_)
+          {
+            fprintf(stderr, "%s", s->c_str());
+          }
+        string joinerEnc = *s;
+        joinerEncode(joinerEnc);
+        HfstTransducer leftJoiner(joinerEnc, joinerEnc, format_);
         HfstTransducer lexicon(format_);
         if (stringTries_.find(*s) != stringTries_.end())
           {
@@ -297,137 +309,56 @@ LexcCompiler::compileLexical()
           {
             lexicon.disjunct(regexps_[*s]);
           }
-        lexicon.determinize();
-        lexicons.insert(pair<string,HfstTransducer>(*s, lexicon));
-      }
-    // build initial states
-    map<string,HfstState> starts;
-    HfstState first_free = 0;
-    string startEnc(initialLexiconName_);
-    joinerEncode(startEnc);
-    starts[startEnc] = first_free;
-    first_free++;
-    for (map<string,HfstTransducer>::const_iterator lex = lexicons.begin();
-         lex != lexicons.end();
-         ++lex)
-      {
-        string nameEnc(lex->first);
-        joinerEncode(nameEnc);
-        if (nameEnc != startEnc)
+        lexicon = leftJoiner.concatenate(lexicon).minimize();
+        if (verbose_)
           {
-            starts[nameEnc] = first_free;
-            first_free++;
+            fprintf(stderr, " minimising... ", s->c_str());
           }
+        lexicons.disjunct(lexicon).minimize();
       }
-    string ender("#");
-    joinerEncode(ender);
-    HfstState new_end = first_free;
-    first_free++;
-    rebuilt.set_final_weight(new_end, 0);
-    starts[ender] = new_end;
-    HfstState sink = first_free;
-    first_free++;
-    // connect lexicons
-    for (map<string,HfstTransducer>::const_iterator lex = lexicons.begin();
-         lex != lexicons.end();
-         ++lex)
+    // repeat star to overgenerate
+    lexicons.repeat_star().minimize();
+    if (verbose_)
       {
-        // help structures
-        HfstBasicTransducer mut(lex->second);
-        map<HfstState,HfstState> rebuildMap;
-        // connect start states
-        string nameEnc(lex->first);
-        joinerEncode(nameEnc);
-        HfstState start_nu = starts[nameEnc];
-        HfstState start_old = 0;
-        rebuildMap[start_old] = start_nu;
-        // clone all states
-        for (HfstBasicTransducer::iterator state = mut.begin();
-             state != mut.end();
-             state++)
-          {
-            HfstState old_state = state->first;
-            HfstState nu_state;
-            if (rebuildMap.find(old_state) != rebuildMap.end())
-              {
-                // already built
-                nu_state = rebuildMap[old_state];
-              }
-            else
-              {
-                // create new
-                nu_state = first_free;
-                first_free++;
-                rebuildMap[old_state] = nu_state;
-              }
-            // clone all transitions
-	    HfstBasicTransducer::HfstTransitionSet transitions = mut[old_state];
-	    for ( HfstBasicTransducer::HfstTransitionSet::iterator transition 
-		    = transitions.begin(); 
-		  transition != transitions.end();
-		  transition++ )
-              {
-                //HfstTransitionData old_transition = transition->get_transition_data();
-                string old_osymbol = transition->get_input_symbol();
-                string old_isymbol = transition->get_output_symbol();
-                string nu_osymbol;
-                string nu_isymbol;
-                float nu_weight = transition->get_weight();
-                HfstState old_target = transition->get_target_state();
-                HfstState nu_target;
-                if (old_osymbol.substr(0, 5) == "@LEXC")
-                  {
-                    // quasitransition to new lexicon 
-                    if (mut.is_final_state(old_target))
-                      {
-                        nu_weight += mut.get_final_weight(old_target);
-                      }
-                    if (starts.find(old_osymbol) != starts.end())
-                      {
-                        nu_target = starts[old_osymbol];
-                      }
-                    else
-                      {
-                        // non-existent continuation, kill path
-                        nu_target = sink;
-                      }
-                    nu_osymbol = "@_EPSILON_SYMBOL_@";
-                    nu_isymbol = "@_EPSILON_SYMBOL_@";
-                  }
-                else
-                  {
-                    // regular transition
-                    nu_isymbol = old_isymbol;
-                    nu_osymbol = old_osymbol;
-                    if (rebuildMap.find(old_target) != rebuildMap.end())
-                      {
-                        // target already built
-                        nu_target = rebuildMap[old_target];
-                      }
-                    else
-                      {
-                        // new target, rebuild asap
-                        nu_target = first_free;
-                        first_free++;
-                        rebuildMap[old_target] = nu_target;
-                      }
-                  }
-                //HfstState nu_icode = rebuilt.alphabet->add_symbol(nu_isymbol.c_str());
-                //HfstState nu_ocode = rebuilt.alphabet->add_symbol(nu_osymbol.c_str());
-
-		/*                rebuilt.add_line(nu_state, nu_target,
-                                 nu_icode, nu_ocode,
-                                 nu_weight); */
-		rebuilt.add_transition(nu_state, HfstBasicTransition
-				       (nu_target,
-					nu_isymbol,
-					nu_osymbol,
-					nu_weight));
-              }
-          }
+        fprintf(stderr, "\n" "calculating correct lexicon combinations...");
       }
-    HfstTransducer* rv = new HfstTransducer(rebuilt, format_);
-
+    for (set<string>::const_iterator s = lexiconNames_.begin();
+         s != lexiconNames_.end();
+         ++s)
+      {
+        if (*s == "#")
+          {
+            continue;
+          }
+        if (verbose_)
+          {
+            fprintf(stderr, "%s -> %s -> #", initialLexiconName_.c_str(),
+                    s->c_str());
+          }
+        string startEnc = initialLexiconName_;
+        joinerEncode(startEnc);
+        HfstTransducer start(startEnc, startEnc, format_);
+        string joinerEnc = *s;
+        joinerEncode(joinerEnc);
+        HfstTransducer joiner(joinerEnc, joinerEnc, format_);
+        string endEnc = "#";
+        joinerEncode(endEnc);
+        HfstTransducer end(endEnc, endEnc, format_);
+        HfstTransducer sigmaStar("@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@",
+                                 format_);
+        sigmaStar = sigmaStar.subtract(start).subtract(end).subtract(joiner);
+        sigmaStar.repeat_star();
+        HfstTransducer joinerPair = joiner.repeat_n(2);
+        HfstTransducer morphotax = sigmaStar.disjunct(joinerPair);
+        morphotax.repeat_star();
+        morphotax = start.concatenate(morphotax).concatenate(end).minimize();
+        lexicons = lexicons.compose(morphotax);
+        lexicons.substitute(joinerEnc, "@_EPSILON_SYMBOL_@").minimize();
+      }
+    string endEnc = "#";
+    joinerEncode(endEnc);
+    lexicons.substitute(endEnc, "@_EPSILON_SYMBOL_@");
+    HfstTransducer* rv = new HfstTransducer(lexicons);
     rv->minimize();
     return rv;
 }
