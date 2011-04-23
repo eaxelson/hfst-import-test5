@@ -292,14 +292,14 @@ ProcTransducerAlphabet::calculate_caps()
   size_t size = symbol_table.size(); // size before any new symbols added
   for(size_t i=0;i<size;i++)
   {
-    int case_res = 0;
+    int case_res = 0; // -1 = lower, 1 = upper
     std::string switched;
     if(is_alphabetic(i))
       switched = caps_helper(symbol_table[i].c_str(), case_res);
     else
       case_res = 0;
     
-    if(case_res < 0)
+    if(case_res < 0) 
     {
       symbol_properties_table[i].lower = i;
       symbol_properties_table[i].upper = (switched=="")?NO_SYMBOL_NUMBER:symbolizer.find_symbol(switched.c_str());
@@ -355,6 +355,18 @@ ProcTransducerAlphabet::calculate_caps()
 std::string
 ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
 {
+  static const char* override_upper[5][2] = {{"Ə", "ə"},
+                                             {"Р", "р"},
+                                             {"А", "а"},
+                                             {"Ч", "ч"},
+                                             {"Э", "э"}};
+
+  static const char* override_lower[5][2] = {{"ə", "Ə"},
+                                             {"р", "Р"},
+                                             {"а", "А"},
+                                             {"ч", "Ч"},
+                                             {"э", "Э"}};
+
   static const char* parallel_ranges[5][2][2] = {{{"A","Z"},{"a","z"}}, // Basic Latin
                                                  {{"À","Þ"},{"à","þ"}}, // Latin-1 Supplement
                                                  {{"Α","Ϋ"},{"α","ϋ"}}, // Greek and Coptic
@@ -372,6 +384,25 @@ ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
                                              {"Ӑ","ӿ"}, // Cyrillic
                                              {"Ԁ","ԥ"}, // Cyrillic Supplement
                                              {"Ḁ","ỿ"}};//Latin Extended Additional
+
+  for(int i = 0; i < 5; i++) 
+  {
+    if(strcmp(c,override_upper[i][0]) == 0) 
+    {
+      case_res = 1;
+      return override_upper[i][1];
+    }
+  }
+
+  for(int i = 0; i < 5; i++) 
+  {
+    if(strcmp(c,override_lower[i][0]) == 0) 
+    {
+      case_res = -1;
+      return override_lower[i][1];
+    }
+  }
+
   for(int i=0;i<5;i++) // check parallel ranges
   {
     if(strcmp(c,parallel_ranges[i][0][0]) >= 0 &&
