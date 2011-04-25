@@ -3,8 +3,12 @@ if ! type hfst-foma-wrapper.sh > /dev/null ; then
     echo "Cannot find hfst-foma-wrapper installed"
     exit 1
 fi
+getopt="getopts"
+if type -p getopt > /dev/null ; then
+    getopt=$(type -p getopt)
+fi
 function print_usage() {
-    echo "$0 [-h | -V | -f format | -latin1] [ROOT [LEXICON...]]"
+    echo "$0 [-h | -V | -f format | -latin1] [-o OUTFILE] [ROOT [LEXICON...]]"
 }
 
 function print_help() {
@@ -34,21 +38,44 @@ function print_version() {
     echo "There is NO WARRANTY, to the extent permitted by law."
 }
 
-while getopts "hvVqF:l:o:u:" flag ; do
-    case $flag in
-    h) print_help; exit 0;;
-    V) print_version; exit 0;;
-    v) wrapopts="$wrapopts -v";;
-    q) wrapopts="$wrapopts -q";;
-    l) latin1=latin1;;
-    f) wrapopts="$wrapopts -f $OPTARG";;
-    u) utf8=utf8;;
-    o) outfile="$OPTARG";;
-    \?) echo "Unknown command line switch -$flag$OPTARG, passing on"; extraopts=$"extraopts -$flag$OPTARG";;
-    esac
-done
-
-shift $(($OPTIND-1))
+if test "x$getopt" = xgetopts ; then
+    while getopts "hvVqf:l:o:u:" flag ; do
+        case $flag in
+        h) print_help; exit 0;;
+        V) print_version; exit 0;;
+        v) wrapopts="$wrapopts -v";;
+        q) wrapopts="$wrapopts -q";;
+        l) latin1=latin1;;
+        f) wrapopts="$wrapopts -f $OPTARG";;
+        u) utf8=utf8;;
+        o) outfile="$OPTARG";;
+        \?) echo "Unknown command line switch -$flag$OPTARG, passing on"; extraopts=$"extraopts -$flag$OPTARG";;
+        esac
+    done
+    shift $(($OPTIND-1))
+else
+    args=$($getopt -o "hvVqf:o:l:u:" -l "help,verbose,version,quiet,format:,output:,latin1::,utf8::" -n hfst-lexc -- "$@")
+    if test $? -ne 0 ; then
+        print_usage
+        exit 1
+    fi
+    eval set -- "$args"
+    while true ; do
+        case $1 in
+        -h|--help) print_help; exit 0;;
+        -V|--version) print_version; exit 0;;
+        -v|--verbose) wrapopts="$wrapopts -v"; shift;;
+        -q|--quiet) wrapopts="$wrapopts -q"; shift;;
+        -l|--latin1) latin1="latin1"; shift;;
+        -f|--format) wrapopts="$wrapopts -F $2"; shift 2;;
+        -u|--utf8) utf8="utf8";;
+        -o|--output) outfile="$2"; shift 2;;
+        --) shift; break;;
+        *) echo "Unknown command line switch -$flag$OPTARG, passing on"; extraopts=$"extraopts -$flag$OPTARG";;
+        esac
+    done
+    infiles="$@"
+fi
 if test x$utf8 =  xutf8 ; then
     echo "UTF-8 is already default in $0"
 fi
