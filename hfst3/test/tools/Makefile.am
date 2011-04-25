@@ -38,6 +38,7 @@ TESTS=hfst-check-version.sh hfst-check-help.sh empty-input.sh \
 	  calculate-functionality.sh format-functionality.sh \
 	  lookup-functionality.sh \
 	  lexc-functionality.sh \
+	  lexc-compiler-functionality.sh \
 	  utf-8-strings.sh latin-1-strings.sh
 DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   cat2cat_or_CAT_uppercased.hfst cat2CAT_uppercased.hfst cat2dog.hfst \
@@ -47,7 +48,8 @@ DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   dog.hfst infinitely_ambiguous.hfst non_minimal.hfst rule1.hfst \
 		   rule2.hfst summarize_test1.hfst summarize_test2.hfst tac.hfst \
 		   epsilon.hfst epsilon2cat.hfst cat2epsilon.hfst \
-		   unknown-star.hfst identity-star.hfst unknown2a.hfst identity.hfst
+		   unknown-star.hfst identity-star.hfst unknown2a.hfst identity.hfst \
+		   heavycat.hfst
 OL_CHECKS=cat2dog.hfst.ol cat2dog.gen.hfst.ol cat_weight_final.hfst.ol \
 			proc-caps.hfst.ol proc-caps.gen.hfst.ol
 if WANT_SFST
@@ -74,7 +76,8 @@ OFST_CHECKS=0to3cats.hfst.ofst \
 			dog2cat.hfst.ofst dog.hfst.ofst infinitely_ambiguous.hfst.ofst \
 			non_minimal.hfst.ofst rule1.hfst.ofst rule2.hfst.ofst \
 			summarize_test1.hfst.ofst summarize_test2.hfst.ofst tac.hfst.ofst\
-			unknown2a.hfst.ofst identity.hfst.ofst
+			unknown2a.hfst.ofst identity.hfst.ofst \
+			heavycat.hfst
 endif
 if WANT_FOMA
 FOMA_CHECKS=0to3cats.hfst.foma 2to4cats.hfst.foma 4cats.hfst.foma \
@@ -101,7 +104,8 @@ FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
 		 epsilon.txt epsilon2cat.txt infinitely_ambiguous.txt \
 		 non_minimal.txt rule1.txt rule2.txt summarize_test1.txt \
 		 summarize_test2.txt tac.txt proc-caps.txt \
-		 unknown-star.txt identity-star.txt unknown2a.txt identity.txt
+		 unknown-star.txt identity-star.txt unknown2a.txt identity.txt\
+		 heavycat.txt
 FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-out1.strings \
 		 proc-caps-out2.strings proc-caps-out3.strings proc-caps-out4.strings \
 		 proc-cat-out.strings proc-cat-weighted-out.strings \
@@ -114,19 +118,24 @@ SUBSTITUTE_TXTS=cat2dog.substitute
 XRE_TXTS=cats_and_dogs.xre cats_and_dogs_semicolon.xre
 ALL_SRCS=$(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) \
 		 $(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TEXTS)
-#XFST_TXTS=cat-regex.xfst
+XFST_TXTS=cat-regex.xfst
 
 # this compilation is uesd by check target before running the tests
 %.hfst: %.txt
-	${top_builddir}/tools/src/hfst-txt2fst -e '@0@' < $< > $@
+	${top_builddir}/tools/src/hfst-txt2fst -e '@0@' $< > $@
+
 %.hfst.sfst: %.txt
-	${top_builddir}/tools/src/hfst-txt2fst -f sfst -e '@0@' < $< > $@
+	${top_builddir}/tools/src/hfst-txt2fst -f sfst -e '@0@' $< > $@
+
 %.hfst.ofst: %.txt
-	${top_builddir}/tools/src/hfst-txt2fst -f openfst-tropical -e '@0@' < $< > $@
+	${top_builddir}/tools/src/hfst-txt2fst -f openfst-tropical -e '@0@' $< > $@
+
 %.hfst.foma: %.txt
-	${top_builddir}/tools/src/hfst-txt2fst -f foma -e '@0@' < $< > $@
+	${top_builddir}/tools/src/hfst-txt2fst -f foma -e '@0@' $< > $@
+
 %.hfst.ol: %.txt
 	${top_builddir}/tools/src/hfst-txt2fst -e '@0@' -i $< | ${top_builddir}/tools/src/hfst-fst2fst -w -o $@
+
 %.gen.hfst.ol: %.txt
 	${top_builddir}/tools/src/hfst-txt2fst -e '@0@' -i $< | ${top_builddir}/tools/src/hfst-invert | ${top_builddir}/tools/src/hfst-fst2fst -w -o $@
 

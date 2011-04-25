@@ -2,6 +2,7 @@
 
 # basic lookup
 if ! echo "cat" | ../../tools/src/hfst-proc/hfst-proc cat2dog.hfst.ol > test.strings ; then
+    echo fail 
     exit 1
 fi
 if ! diff test.strings proc-cat-out.strings > /dev/null 2>&1 ; then
@@ -20,7 +21,7 @@ fi
 if ! echo "cat" | ../../tools/src/hfst-proc/hfst-proc -W cat_weight_final.hfst.ol > test.strings ; then
     exit 1
 fi
-if ! diff test.strings proc-cat-weighted-out.strings > /dev/null 2>&1 ; then
+if ! diff test.strings proc-cat-weighted-out.strings ; then
     exit 1
 fi
 
