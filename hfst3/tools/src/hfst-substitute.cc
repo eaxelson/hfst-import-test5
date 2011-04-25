@@ -69,24 +69,60 @@ label_to_stringpair(const char* label)
   {
     const char* colon = strchr(label, ':');
     const char* endstr = strchr(label, '\0');
-    StringPair* rv = 0;
-    while (colon != 0)
+    while (colon != NULL)
       {
-        if (*(colon-1) == '\\')
+        if (colon == label)
           {
-            colon = strchr(label, ':');
+            colon = strchr(colon + 1, ':');
           }
-        else if (*(colon+1) == '\0')
+        else if (colon == (endstr - 1))
           {
             colon = 0;
           }
+        else if (*(colon - 1) == '\\')
+          {
+            if (colon > (label + 1))
+              {
+                if (*(colon - 2) == '\\')
+                  {
+                    break;
+                  }
+                else
+                  {
+                    colon = strchr(colon + 1, ':');
+                  }
+              }
+          }
         else
           {
-            rv = new StringPair(hfst_strndup(label, colon-label),
-                                hfst_strndup(colon+1, endstr-colon-1));
             break;
           }
       }
+    char* first = 0;
+    char* second = 0;
+    if ((label < colon) && (colon < endstr))
+      {
+        first = hfst_strndup(label, colon-label);
+        second = hfst_strndup(colon + 1, endstr - colon - 1);
+      }
+    else
+      {
+        return NULL;
+      }
+    if (strcmp(first, "@0@") == 0)
+      {
+        free(first);
+        first = hfst_strdup(hfst::internal_epsilon.c_str());
+      }
+    if (strcmp(second, "@0@") == 0)
+      {
+        free(second);
+        second = hfst_strdup(hfst::internal_epsilon.c_str());
+      }
+
+    StringPair* rv = new StringPair(first, second);
+    free(first);
+    free(second);
     return rv;
   }
 
@@ -537,7 +573,9 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 
 
         }
-
+      fallback = new HfstBasicTransducer(trans);
+      fallback->prune_alphabet();
+      trans = HfstTransducer(*fallback, trans.get_type());
       outstream << trans;
     }
   delete to_transducer;
