@@ -82,8 +82,27 @@ create cat2dog fst using SFST style pair string
 .TP
 .B echo "c:d a:o t:g | hfst\-strings2fst \-S \-p
 create cat2dog fst using space separated pairs
-.SS "Special symbols"
-The string specified by parameter \fB-e\fR can be used to denote epsilon symbol.
+.SS Weights:
+Strings2fst supports currently weights that are separated from the input strings
+by horizontal tabulation character \fBTAB\fR (byte value 0x09). This works in
+any of the given string types.
+.TP
+.B echo "cat:dog	3.141"
+create pi weighted cat2dog
+.PP
+The format of weight depends on backend implementation. For tropical,
+logarithmic and probability weights we use strtod(3) to parse the weight.
+.PP
+Most typical weighted automaton you will create is likely a log frequency
+weighted data from corpus. Given the corpus size in tokens XXX, it can be
+created by e.g.
+.TP
+.B tr \-s ' ' 'n' | sort | uniq -c | awk '{print $2, \-log($1/XXX)} | hfst\-strings2fst
+create probability weighted corpus
+.SS "Special symbols:"
+The string specified by parameter \fB-e\fR can be used to denote epsilon
+symbol; default is \fB@0@\fR.  Internally, the string \fB@_EPSILON_SYMBOL_@\fR
+will always be recognised as epsilon regardless of settings.
 .SH "REPORTING BUGS"
 Report bugs to <hfst\-bugs@helsinki.fi> or directly to our bug tracker at:
 <https://sourceforge.net/tracker/?atid=1061990&group_id=224521&func=browse>
@@ -96,7 +115,7 @@ General help using HFST software:
 .SH CAVEATS
 By default the tool creates one automaton per line of text and stores them in
 hfst archive format. To union the lines and generate single automaton accepting
-all strings given, use ̭̭̭\fB-j\fR option.
+all strings given, use the ̭̭̭\fB-j\fR option.
 .SH COPYRIGHT
 Copyright \(co 2010 University of Helsinki,
 License GPLv3: GNU GPL version 3 <http://gnu.org/licenses/gpl.html>
