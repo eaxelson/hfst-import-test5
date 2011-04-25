@@ -194,6 +194,7 @@ hfst_lexc2fst_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC) \
 					  parsers/lexc-lexer.ll parsers/lexc-utils.cc \
 					  parsers/XreCompiler.cc parsers/xre_parse.yy \
 					  parsers/xre_lex.ll parsers/xre_utils.cc
+hfst_lexc2fst_BUILT=parsers/lexc-parser.h parsers/xre_parse.h
 hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC) \
 HfstStrings2FstTokenizer.cc HfstLookupFlagDiacritics.cc
 hfst_pair_test_SOURCES=hfst-pair-test.cc $(HFST_COMMON_SRC) \
@@ -261,7 +262,8 @@ hfst-summarise$(EXEEXT): hfst-summarize$(EXEEXT)
 hfst-union$(EXEEXT): hfst-disjunct$(EXEEXT)
 	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
 
-BUILT_SOURCES=hfst-scanner.h hfst-compiler.h
+BUILT_SOURCES=hfst-scanner.h hfst-compiler.h $(hfst_lexc2fst_BUILT)
+
 # make make realise headers automatically follow from flexing
 hfst-scanner.h: hfst-scanner.cc
 
