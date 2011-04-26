@@ -227,7 +227,6 @@ print_usage()
             "  For optimized lookup format, only strings that pass "
             "flag diacritic checks\n"
             "  are printed and flag diacritic symbols are not printed.\n"
-            "  For other formats, all flag paths are allowed.\n"
             "  Support VARIABLE 'print-space' for optimized lookup format\n");
     fprintf(message_out,
             "\n"
@@ -480,6 +479,16 @@ is_valid_flag_diacritic_path(StringVector arcs)
     //  fprintf(stderr, "Allowing all flag paths!\n");
     FlagDiacriticTable FdT;
     bool res = FdT.is_valid_string(arcs);
+    if (!res)
+      {
+        verbose_printf("blocked by flags: ");
+        for (StringVector::const_iterator s = arcs.begin();
+             s != arcs.end();
+             ++s)
+          {
+            verbose_printf("%s ", s->c_str());
+          }
+      }
     return res;
   }
 
@@ -1636,8 +1645,8 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                     std::string mcs = tr_it->get_input_symbol();
                     if (mcs.size() > 1) {
                       mc_symbols.push_back(mcs);
-              if (verbose)
-                      fprintf(stderr, "adding mc symbol: %s\n", mcs.c_str());
+                      verbose_printf("multicharacter symbol: %s\n",
+                                     mcs.c_str());
                     }
                   }
               }
@@ -1654,10 +1663,8 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     if (print_pairs && 
         (inputstream.get_type() == HFST_OL_TYPE || 
          inputstream.get_type() == HFST_OLW_TYPE) ) {
-      fprintf(outstream, 
-              "Error: pair printing not supported on "
-              "       optimized lookup transducers, exiting program\n" );
-      exit(1);
+      error(EXIT_FAILURE, 0, "pair printing not supported on "
+              "optimized lookup transducers");
     }
 
     char* line = 0;
@@ -1692,6 +1699,17 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                                                    &markup,
                                                    &unknown, optimized_lookup);
         HfstOneLevelPaths* kvs;
+        if (verbose)
+          {
+            verbose_printf("Tokenized to: ");
+            for (StringVector::const_iterator s = kv->second.begin();
+                 s != kv->second.end();
+                 ++s)
+              {
+                verbose_printf("%s ", s->c_str());
+              }
+            verbose_printf("\n");
+          }
         try 
           {
             kvs = perform_lookups<HfstTransducer>(*kv, cascade, unknown,
