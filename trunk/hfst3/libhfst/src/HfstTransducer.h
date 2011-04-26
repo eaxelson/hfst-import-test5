@@ -850,7 +850,7 @@ ccc : ddd
       (HfstTwoLevelPaths &results, int max_num=-1, int cycles=-1, 
        bool filter_fd=true) const;
 
-    //! @brief Lookup or apply a single string \a s and
+    //! @brief Lookup or apply a single tokenized string \a s and
     //! store a maximum of \a limit results to \a results.
     //! 
     //! This is a version of lookup that handles flag diacritics as ordinary
@@ -861,6 +861,14 @@ ccc : ddd
     //!       lookup_fd.
     //! @sa lookup_fd
     void lookup(HfstOneLevelPaths& results, const StringVector& s,
+                ssize_t limit = -1) const;
+
+    //! @brief Lookup or apply a single string \a s and
+    //! store a maximum of \a limit results to \a results.
+    //! 
+    //! This is an overloaded lookup function that leaves tokenizing to the
+    //! transducer.
+    void lookup(HfstOneLevelPaths& results, const std::string & s,
                 ssize_t limit = -1) const;
 
     //! @brief Lookup or apply a single string \a s minding flag diacritics
@@ -894,6 +902,24 @@ ccc : ddd
     //! @todo Do not ignore argument \a limit.
     //!
     void lookup_fd(HfstOneLevelPaths& results, const StringVector& s,
+                   ssize_t limit = -1) const;
+
+    //! @brief Lookup or apply a single string \a s minding flag diacritics
+    //! properly and store a maximum of \a limit results to \a results.
+    //!
+    //! This is an overloaded lookup_fd that leaves tokenizing to the
+    //! transducer.
+    //!
+    //! @param results  Output parameter to store unique results.
+    //!                 Epsilons are represented by empty strings.
+    //! @param s  String to look up. The weight is ignored.
+    //! @param limit  (Currently ignored.) Number of strings to look up. 
+    //!               -1 tries to look up all and may get stuck 
+    //!               if infinitely ambiguous.
+    //!
+    //!
+    //!@sa lookup_fd
+    void lookup_fd(HfstOneLevelPaths& results, const std::string& s,
                    ssize_t limit = -1) const;
 
     //! @brief Lookup or apply a single string \a s and store a maximum of 

@@ -176,9 +176,10 @@ bool Transducer::initialize_input(char * input_str)
     return true;
 }
 
-HfstOneLevelPaths Transducer::lookup_fd(const StringVector & s)
+HfstOneLevelPaths Transducer::lookup_fd(const StringVector & s,
+					HfstOneLevelPaths & results)
 {
-    lookup_paths.clear();
+    lookup_paths = &results;
     std::string input_str;
 //    std::vector<std::string>::iterator it;
 //    for (it = s.first.begin(); it < s.first.end(); ++it) {
@@ -188,13 +189,26 @@ HfstOneLevelPaths Transducer::lookup_fd(const StringVector & s)
 	input_str.append(s[i]);
     }
     if (!initialize_input(const_cast<char *>(input_str.c_str()))) {
-	HfstOneLevelPaths no_result;
-	return no_result;
+	return results;
     }
     //current_weight += s.second;
     get_analyses(input_tape, output_tape, output_tape, 0);
     //current_weight -= s.second;
-    return lookup_paths;
+    return results;
+}
+
+HfstOneLevelPaths Transducer::lookup_fd(const std::string & s,
+					HfstOneLevelPaths & results)
+{
+    lookup_paths = &results;
+    std::string input_str;
+    if (!initialize_input(const_cast<char *>(s.c_str()))) {
+	return results;
+    }
+    //current_weight += s.second;
+    get_analyses(input_tape, output_tape, output_tape, 0);
+    //current_weight -= s.second;
+    return results;
 }
 
 void Transducer::try_epsilon_transitions(SymbolNumber * input_symbol,
@@ -380,19 +394,19 @@ void Transducer::note_analysis(SymbolNumber * whole_output_tape)
 	result.second.push_back(alphabet->string_from_symbol(*num));
     }
     result.first = current_weight;
-    lookup_paths.insert(result);
+    lookup_paths->insert(result);
 }
 
 
 
 Transducer::Transducer(): header(NULL), alphabet(NULL), tables(NULL),
-			  current_weight(0.0), lookup_paths(), input_tape(NULL),
+			  current_weight(0.0), lookup_paths(NULL), input_tape(NULL),
 			  output_tape(NULL), encoder(NULL), flag_state() {}
 
 Transducer::Transducer(std::istream& is):
     header(new TransducerHeader(is)),
     alphabet(new TransducerAlphabet(is, header->symbol_count())),
-    tables(NULL), current_weight(0.0), lookup_paths(),
+    tables(NULL), current_weight(0.0), lookup_paths(NULL),
     input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     encoder(new Encoder(alphabet->get_symbol_table(),
@@ -407,7 +421,7 @@ Transducer::Transducer(bool weighted):
     header(new TransducerHeader(weighted)),
     alphabet(new TransducerAlphabet()),
     current_weight(0.0),
-    lookup_paths(),
+    lookup_paths(NULL),
     input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     encoder(new Encoder(alphabet->get_symbol_table(),
@@ -429,7 +443,7 @@ Transducer::Transducer(const TransducerHeader& header,
     tables(new TransducerTables<TransitionIndex,Transition>(
 	       index_table, transition_table)),
     current_weight(0.0),
-    lookup_paths(),
+    lookup_paths(NULL),
     input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     encoder(new Encoder(alphabet.get_symbol_table(),
@@ -446,7 +460,7 @@ Transducer::Transducer(const TransducerHeader& header,
     tables(new TransducerTables<TransitionWIndex,TransitionW>(
 	       index_table, transition_table)),
     current_weight(0.0),
-    lookup_paths(),
+    lookup_paths(NULL),
     input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     encoder(new Encoder(alphabet.get_symbol_table(),
