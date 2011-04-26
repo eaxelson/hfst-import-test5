@@ -182,10 +182,15 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 	  if (state_number != it->first) {
 	      relabeled_states->operator[](it->first) = state_number;
 	  }
+	  hfst_ol::Weight final_w = 0.0;
+	  if (t->is_final_state(it->first)) {
+	      final_w = t->get_final_weight(it->first);    
+	  }
 	  state_placeholders.push_back(hfst_ol::StatePlaceholder(
 					   state_number,
 					   t->is_final_state(it->first),
-					   first_transition));
+					   first_transition,
+					   final_w));
 	  ++first_transition; // there's a padding entry between states
           for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
 		   = it->second.begin();
