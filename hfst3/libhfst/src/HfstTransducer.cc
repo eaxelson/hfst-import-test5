@@ -342,6 +342,11 @@ void HfstTransducer::lookup(HfstOneLevelPaths& results, const StringVector& s,
     lookup_fd(results, s, limit);
 }
 
+void HfstTransducer::lookup(HfstOneLevelPaths& results, const std::string & s,
+			    ssize_t limit) const {
+    lookup_fd(results, s, limit);
+}
+
 void HfstTransducer::lookup_fd(HfstOneLevelPaths& results, 
 			       const StringVector& s,
 			       ssize_t limit) const {
@@ -351,7 +356,29 @@ void HfstTransducer::lookup_fd(HfstOneLevelPaths& results,
 
     case (HFST_OL_TYPE):
     case (HFST_OLW_TYPE):
-	results = this->implementation.hfst_ol->lookup_fd(s);
+	this->implementation.hfst_ol->lookup_fd(s, results);
+	return;
+
+    case (ERROR_TYPE):
+	HFST_THROW(TransducerHasWrongTypeException);
+    default:
+	(void)results;
+	(void)s;
+	(void)limit;
+	HFST_THROW(FunctionNotImplementedException);
+    }
+}
+
+void HfstTransducer::lookup_fd(HfstOneLevelPaths& results, 
+			       const std::string & s,
+			       ssize_t limit) const {
+    switch(this->type) {
+
+        /* TODO: Convert into HFST_OL(W)_TYPE, if needed? */
+
+    case (HFST_OL_TYPE):
+    case (HFST_OLW_TYPE):
+	this->implementation.hfst_ol->lookup_fd(s, results);
 	return;
 
     case (ERROR_TYPE):

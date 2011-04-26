@@ -31,7 +31,6 @@ namespace hfst_ol {
 using hfst::FdOperation;
 using hfst::FdState;
 using hfst::FdTable;
-;
 
 //    using namespace hfst;
 
@@ -680,7 +679,7 @@ protected:
 
     // for lookup
     Weight current_weight;
-    HfstOneLevelPaths lookup_paths;
+    HfstOneLevelPaths * lookup_paths;
     Encoder * encoder;
     SymbolNumber * input_tape;
     SymbolNumber * output_tape;
@@ -770,7 +769,10 @@ public:
 
 
     bool initialize_input(char * input_str);
-    HfstOneLevelPaths lookup_fd(const StringVector & s);
+    HfstOneLevelPaths lookup_fd(const StringVector & s,
+				HfstOneLevelPaths & results);
+    HfstOneLevelPaths lookup_fd(const std::string & s,
+				HfstOneLevelPaths & results);
     void note_analysis(SymbolNumber * whole_output_tape);
 
     friend class ConvertTransducer;
