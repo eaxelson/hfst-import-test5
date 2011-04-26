@@ -47,12 +47,13 @@ struct StatePlaceholder {
     SymbolTransitionsMap inputs;
     bool final;
     float final_weight;
-    StatePlaceholder (unsigned int state, bool finality, unsigned int first):
+    StatePlaceholder (unsigned int state, bool finality, unsigned int first,
+		      Weight final_weight):
     state_number(state),
 	start_index(UINT_MAX),
 	first_transition(first),
 	final(finality),
-	final_weight(0.0)
+	final_weight(final_weight)
 	{}
     StatePlaceholder ():
     state_number(UINT_MAX),
