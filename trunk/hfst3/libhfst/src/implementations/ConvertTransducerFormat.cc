@@ -40,12 +40,12 @@ namespace hfst { namespace implementations
     if (t.type == LOG_OPENFST_TYPE)
       return log_ofst_to_hfst_basic_transducer(t.implementation.log_ofst); 
 #endif // HAVE_OPENFST
-
+    
 #if HAVE_FOMA
     if (t.type == FOMA_TYPE)
       return foma_to_hfst_basic_transducer(t.implementation.foma); 
 #endif // HAVE_FOMA
-
+    
     /* Add here your implementation. */
     //#if HAVE_MY_TRANSDUCER_LIBRARY
     //    if (t.type == MY_TRANSDUCER_LIBRARY_TYPE)

@@ -11,6 +11,7 @@
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "LogWeightTransducer.h"
+#include "HfstSymbolDefs.h"
 
 #ifndef DEBUG_MAIN
 namespace hfst { namespace implementations
@@ -735,8 +736,8 @@ namespace hfst { namespace implementations
 
     StringSet t1_symbols = get_alphabet(t1);
     StringSet t2_symbols = get_alphabet(t2);
-    collect_unknown_sets(t1_symbols, unknown_t1,
-                         t2_symbols, unknown_t2);
+    hfst::symbols::collect_unknown_sets(t1_symbols, unknown_t1,
+					t2_symbols, unknown_t2);
     
     // 2. Add new symbols from transducer t1 to the symbol table 
     //    of transducer t2...

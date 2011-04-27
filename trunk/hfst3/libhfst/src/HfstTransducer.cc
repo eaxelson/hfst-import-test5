@@ -51,7 +51,7 @@ hfst::implementations::FomaTransducer HfstTransducer::foma_interface;
 /* The default minimization algorithm if Hopcroft. */
 MinimizationAlgorithm minimization_algorithm=HOPCROFT;
 /* By default, harmonization is not optimized. */
-bool harmonize_smaller=false;
+bool harmonize_smaller=true;
 /* By default, unknown symbols are used. */
 bool unknown_symbols_in_use=true;
 
@@ -181,23 +181,6 @@ StringSet HfstTransducer::get_alphabet() const
 
 
 // *** HARMONIZATION FUNCTIONS... ***
-
-/* Insert to unknown1 strings that are found in s2 but not in s1 
-   and vice versa. */
-void collect_unknown_sets(StringSet &s1, StringSet &unknown1,
-			  StringSet &s2, StringSet &unknown2)
-{
-    for (StringSet::const_iterator it1 = s1.begin(); it1 != s1.end(); it1++) {
-	String sym1 = *it1;
-	if ( s2.find(sym1) == s2.end() && not FdOperation::is_diacritic(sym1))
-	    unknown2.insert(sym1);
-    }
-    for (StringSet::const_iterator it2 = s2.begin(); it2 != s2.end(); it2++) {
-	String sym2 = *it2;
-	if ( s1.find(sym2) == s1.end() && not FdOperation::is_diacritic(sym2))
-	    unknown1.insert(sym2);
-    }
-}
 
 /*  Harmonize symbol-to-number encodings and expand unknown and 
     identity symbols. 
@@ -781,7 +764,7 @@ HfstTransducer::HfstTransducer
 #if HAVE_OPENFST
     case TROPICAL_OPENFST_TYPE:
         implementation.tropical_ofst = 
-	    ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(&net);
+	  ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(&net); // FAIL
         break;
     case LOG_OPENFST_TYPE:
         implementation.log_ofst = 
@@ -2357,6 +2340,7 @@ HfstTransducer &HfstTransducer::compose_intersect
 	tokenizer.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 	HfstTransducer wb("@_EPSILON_SYMBOL_@","@#@",tokenizer,type);
 	HfstTransducer wb_copy(wb);
+
 	wb.concatenate(*this).concatenate(wb_copy).minimize();
 	*this = wb;
     }
@@ -2374,6 +2358,7 @@ HfstTransducer &HfstTransducer::compose_intersect
     }
     else
     {
+
 	// In case there are many rules, build a ComposeIntersectRulePair 
 	// recursively and compose with that.
 	std::vector<implementations::ComposeIntersectRule*> rule_vector;
@@ -2385,18 +2370,31 @@ HfstTransducer &HfstTransducer::compose_intersect
         implementations::ComposeIntersectRulePair * rules = 
 	    new implementations::ComposeIntersectRulePair
 	    (first_rule,second_rule);
-	
+
 	for (HfstTransducerVector::const_iterator it = v.begin() + 2;
 	     it != v.end();
 	     ++it)
-	{ rules = new implementations::ComposeIntersectRulePair
+	{ 
+rules = new implementations::ComposeIntersectRulePair
 		(new implementations::ComposeIntersectRule(*it),rules); }
 	// Create a ComposeIntersectLexicon from *this. 
 	implementations::ComposeIntersectLexicon lexicon(*this);
 	hfst::implementations::HfstBasicTransducer res = 
 	    lexicon.compose_with_rules(rules);
+	for (implementations::HfstBasicTransducer::const_iterator it = res.begin();
+	     it != res.end();
+	     ++it)
+	  {
+	    for (implementations::HfstBasicTransducer::HfstTransitions::const_iterator jt = it->second.begin();
+		 jt != it->second.end();
+		 ++jt)
+	      { 
+		assert(jt->get_input_symbol() != "");
+		assert(jt->get_output_symbol() != "");
+	      }
+	  }
 	res.prune_alphabet();
-	*this = HfstTransducer(res,type);
+	*this = HfstTransducer(res,type); // FAIL
 	delete rules;
     }
     return *this;
@@ -2651,8 +2649,8 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
 
     try 
     {
-        hfst::implementations::HfstBasicTransducer * internal;
-	hfst::implementations::HfstConstantTransducer * const_internal;
+        hfst::implementations::HfstBasicTransducer * internal=NULL;
+	hfst::implementations::HfstConstantTransducer * const_internal=NULL;
         switch (this->type)
 	{
 #if HAVE_FOMA

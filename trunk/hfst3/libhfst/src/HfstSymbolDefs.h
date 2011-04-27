@@ -88,7 +88,10 @@ namespace hfst
   typedef std::set<NumberPair> NumberPairSet;
   typedef std::map<String,unsigned int> StringNumberMap;
   typedef std::map<unsigned int,unsigned int> NumberNumberMap;
-  void collect_unknown_sets(StringSet &s1, StringSet &unknown1,
-                            StringSet &s2, StringSet &unknown2);
+
+  namespace symbols {
+    void collect_unknown_sets(StringSet &s1, StringSet &unknown1,
+			      StringSet &s2, StringSet &unknown2);
+  }
 }
 #endif
