@@ -25,6 +25,9 @@ Compilation requirements:
   - the OpenFST library version 1.2 or newer must be installed in running
     system (on MacOS X: 1.2.2 does not compile, 1.2.4 or later does)
 
+    - the version 1.1 or older uses const char* type where 1.2 has string, so
+      you cannot use this API incompatible version with HFST
+
   - compiling against OpenFST library and linking may require recent
     GCC version and pthread and m libraries, check OpenFST site for details
 
@@ -160,6 +163,11 @@ the standard installation instructions for GNU autoconf based software.
 Troubleshooting
 ---------------
 
+Commonly faced errors.
+
+\::malloc has not been declared
+'''''''''''''''''''''''''''''''
+
 Compilation errors of form::
 
   /usr/include/c++/4.3/cstdlib:124: error: '::malloc' has not been declared
@@ -214,6 +222,19 @@ installs all its libraries, such as /usr/lib.
 See also: 
 <http://nerdland.net/unstumping-the-internet/malloc-has-not-been-declared/> for
 the gory details.
+
+Request for member c_str in ... which is of non-class type const char*
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+The errors of form::
+
+  TropicalWeightTransducer.cc:1349: error: request for 
+  member ‘c_str’ in ‘it.fst::SymbolTableIterator::Symbol()’, which is
+  of non-class type ‘const char*’
+
+are typically caused by openfst which is incompatible and using const char*
+type instead of strings, as in openfst 1.2. Update or downgrade your openfst
+installation to 1.2 and ensure that older (or newer?) headers are not around.
 
 Further information
 -------------------
