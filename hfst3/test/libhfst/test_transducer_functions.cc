@@ -100,6 +100,8 @@ bool do_hfst_lookup_paths_contain(const HfstOneLevelPaths &results,
   if (weight > (path_weight - 0.01) && 
       weight < (path_weight + 0.01))
     return true;
+  fprintf(stderr, "FAIL: The path weight is %f, %f expected.\n",
+	  weight, path_weight);
   return false;  
 }
 
@@ -364,6 +366,7 @@ int main(int argc, char **argv)
 
 	/* convert to optimized lookup format */
 	HfstTransducer animals_ol(animals);
+
 	if (types[i] == TROPICAL_OPENFST_TYPE ||
 	    types[i] == LOG_OPENFST_TYPE) {
 	  animals_ol.convert(HFST_OLW_TYPE); }
@@ -418,7 +421,7 @@ int main(int argc, char **argv)
 	StringVector expected_path = tok.tokenize_one_level("cats");
 
 	assert(do_hfst_lookup_paths_contain
-	       (results_cat, expected_path, 3, test_weight));
+	     (results_cat, expected_path, 3, test_weight));
 
 	expected_path = tok.tokenize_one_level("dogs");
 	assert(do_hfst_lookup_paths_contain

@@ -48,7 +48,31 @@ int main(int argc, char **argv)
   for (unsigned int i=0; i<TYPES_SIZE-2; i++) 
     // FIXME: infinite loop in HFST_OL_TYPE
     {
-      
+
+      if (types[i] != LOG_OPENFST_TYPE) {
+
+      verbose_print("Identitites with flags", types[i]);
+
+      HfstTransducer id("@_IDENTITY_SYMBOL_@", types[i]);
+      id.repeat_star();
+      HfstTransducer ab_flag("a", "b", types[i]);
+      HfstTransducer flag("@U.F.A@", types[i]);
+      ab_flag.disjunct(flag);
+
+      ab_flag.concatenate(id);
+      id.minimize();
+
+      HfstTransducer a_tr("a", types[i]);
+      HfstTransducer b_tr("b", types[i]);
+      HfstTransducer abid("@_IDENTITY_SYMBOL_@", types[i]);
+      abid.disjunct(a_tr);
+      abid.disjunct(b_tr);
+      abid.repeat_star();
+      abid.minimize();
+
+      assert(abid.compare(id));
+      }
+
       verbose_print("Unification flags", types[i]);
       
       HfstTransducer tr(t, types[i]);

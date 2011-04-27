@@ -14,11 +14,16 @@ namespace hfst
      ComposeIntersectFst::CompareTransitions();
     
     ComposeIntersectFst::Transition::Transition(const HfstBasicTransition &t):
-      ilabel(t.transition_data.input_number),
-      olabel(t.transition_data.output_number),
+      ilabel(HfstTropicalTransducerTransitionData::get_number
+	     (t.transition_data.get_input_symbol())),
+      olabel(HfstTropicalTransducerTransitionData::get_number
+	     (t.transition_data.get_output_symbol())),
       weight(t.get_weight()),
       target(t.get_target_state())
-    {}
+    {
+      assert(t.get_input_symbol() != "");
+      assert(t.get_output_symbol() != "");
+    }
 
     ComposeIntersectFst::Transition::Transition
     (HfstState target,size_t ilabel,size_t olabel, float weight): 
@@ -112,7 +117,8 @@ namespace hfst
 		  HfstTropicalTransducerTransitionData::get_number
 		  ("@_EPSILON_SYMBOL_@"),
 		  HfstTropicalTransducerTransitionData::get_number
-		  ("@_EPSILON_SYMBOL_@"),0)); }
+		  ("@_EPSILON_SYMBOL_@"),
+		  0)); }
 	}
     }
 

@@ -58,6 +58,7 @@ namespace hfst { namespace implementations
         for ( fst::SymbolTableIterator it = 
                 fst::SymbolTableIterator(*(inputsym));
               not it.Done(); it.Next() ) {
+	  assert(it.Symbol() != "");
           if (it.Value() != 0) // epsilon is not inserted
             net->alphabet.insert( it.Symbol() );
         }    
@@ -70,6 +71,7 @@ namespace hfst { namespace implementations
         for ( fst::SymbolTableIterator it = 
                 fst::SymbolTableIterator(*(outputsym));
               not it.Done(); it.Next() ) {
+	  assert(it.Symbol() != "");
           if (it.Value() != 0) // epsilon is not inserted
             net->alphabet.insert( it.Symbol() );
         }    
@@ -119,10 +121,22 @@ namespace hfst { namespace implementations
 	  // Copy the transition
 	  std::string istring = inputsym->Find(arc.ilabel);
 	  std::string ostring = outputsym->Find(arc.olabel);
-	  if (arc.ilabel == 0)
+
+	  if(istring == "") {
+	    std::cerr << "ERROR: arc.ilabel " << arc.ilabel << " not found" << std::endl;
+	    assert(false);
+	  }
+	  if(ostring == "") {
+	    std::cerr << "ERROR: arc.olabel " << arc.olabel << " not found" << std::endl;
+	    assert(false);
+	  }
+
+	  if (arc.ilabel == 0) {
 	    istring = std::string("@_EPSILON_SYMBOL_@");
-	  if (arc.olabel == 0)
+	  }
+	  if (arc.olabel == 0) {
 	    ostring = std::string("@_EPSILON_SYMBOL_@");
+	  }
 
 	  net->add_transition(origin, 
 			      HfstBasicTransition
@@ -130,7 +144,7 @@ namespace hfst { namespace implementations
 			       istring,
 			       ostring,
 			       arc.weight.Value()
-			       ));
+			       ));  // FAIL
 	} 
 
       if (t->Final(s) != fst::TropicalWeight::Zero()) {
@@ -145,12 +159,14 @@ namespace hfst { namespace implementations
     for ( fst::SymbolTableIterator it = 
             fst::SymbolTableIterator(*(inputsym));
           not it.Done(); it.Next() ) {
+      assert(it.Symbol() != "");
       if (it.Value() != 0) // epsilon is not inserted
         net->alphabet.insert( it.Symbol() );
     }    
     for ( fst::SymbolTableIterator it = 
             fst::SymbolTableIterator(*(outputsym));
           not it.Done(); it.Next() ) {
+      assert(it.Symbol() != "");
       if (it.Value() != 0) // epsilon is not inserted
         net->alphabet.insert( it.Symbol() );
     }    
@@ -209,13 +225,20 @@ namespace hfst { namespace implementations
              tr_it != it->second.end(); tr_it++)
           {
             // Copy the transition
+
+	    if(tr_it->get_input_symbol().empty()) { // FAIL
+	      std::cerr << "ERROR: the empty symbol is number " 
+			<< tr_it->get_input_number() << std::endl;
+	    }
+	    assert(not tr_it->get_output_symbol().empty());
+
             t->AddArc(
 		      state_vector[it->first],
                        fst::StdArc
-                       ( st.AddSymbol(tr_it->get_input_symbol()),
-                         st.AddSymbol(tr_it->get_output_symbol()),
-                         tr_it->get_weight(),
-			 state_vector[tr_it->get_target_state()]));
+		      ( st.AddSymbol(tr_it->get_input_symbol()),
+			st.AddSymbol(tr_it->get_output_symbol()),
+			tr_it->get_weight(),
+			state_vector[tr_it->get_target_state()]));
           }
       }
     
@@ -233,8 +256,9 @@ namespace hfst { namespace implementations
     for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it 
            = net->alphabet.begin();
          it != net->alphabet.end(); it++) {
-        st.AddSymbol(*it);
-      }
+      assert(not it->empty());
+      st.AddSymbol(*it);
+    }
     
     t->SetInputSymbols(&st);
     return t;  

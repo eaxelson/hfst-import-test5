@@ -1225,7 +1225,8 @@ static bool is_possible_transition
     {
       // we can go further if the current symbol in lookup_path
       // matches to the input symbol of the transition.
-      if ( isymbol.compare(lookup_path.at(lookup_index)) == 0 )
+      if ( isymbol.compare(lookup_path.at(lookup_index)) == 0 || 
+	   isymbol.compare("@_IDENTITY_SYMBOL_@") == 0)
         {
           input_symbol_consumed=true;
           return true;
@@ -1283,10 +1284,21 @@ static void lookup_fd
            (*it, lookup_path, lookup_index, input_symbol_consumed) )
         {
           // update path_so_far and lookup_index
-          push_back_to_two_level_path
-            (path_so_far, 
-             StringPair(it->get_input_symbol(), it->get_output_symbol()),
-             it->get_weight());
+
+	  if (not (it->get_input_symbol() == "@_IDENTITY_SYMBOL_@")) {
+	    push_back_to_two_level_path
+	      (path_so_far, 
+	       StringPair(it->get_input_symbol(), it->get_output_symbol()),
+	       it->get_weight());
+	  }
+	  else {
+	    push_back_to_two_level_path
+	      (path_so_far, 
+	       StringPair(lookup_path.at(lookup_index), 
+			  lookup_path.at(lookup_index)),
+	       it->get_weight());
+	  }
+
           EpsilonHandler * Ehp = NULL;
           if (input_symbol_consumed) {
             lookup_index++;

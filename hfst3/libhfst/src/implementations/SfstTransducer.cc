@@ -11,6 +11,7 @@
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "SfstTransducer.h"
+#include "HfstSymbolDefs.h"
 #include <time.h>
 
 #ifndef DEBUG_MAIN
@@ -244,8 +245,8 @@ namespace hfst { namespace implementations {
     if (unknown_symbols_in_use) {
       StringSet t1_symbols = get_alphabet(t1);
       StringSet t2_symbols = get_alphabet(t2);
-      collect_unknown_sets(t1_symbols, unknown_t1,
-                           t2_symbols, unknown_t2);
+      hfst::symbols::collect_unknown_sets(t1_symbols, unknown_t1,
+					  t2_symbols, unknown_t2);
     }
 
     Transducer * new_t1 = &t1->copy(false, &t2->alphabet);
@@ -1163,46 +1164,57 @@ namespace hfst { namespace implementations {
       {
         for (hfst::StringSet::iterator it1 = s.begin(); it1 != s.end(); it1++) 
           {
-            int inumber = t->alphabet.symbol2code(it1->c_str());
-            for (hfst::StringSet::iterator it2 = s.begin(); 
-                 it2 != s.end(); it2++) 
-              {
-                int onumber = t->alphabet.symbol2code(it2->c_str());
-                if (inumber != onumber) {  
-                  // add transitions of type x:y 
-                  // (non-identity cross-product of symbols in s)
-                  origin->add_arc( Label(inumber, onumber), target, t );
-                }
-              }
-            // add transitions of type x:? and ?:x here
-            origin->add_arc( Label(inumber, 1), target, t );
-            origin->add_arc( Label(1, inumber), target, t );
-          }
+	    if (not FdOperation::is_diacritic(*it1)) {
+
+	      int inumber = t->alphabet.symbol2code(it1->c_str());
+	      for (hfst::StringSet::iterator it2 = s.begin(); 
+		   it2 != s.end(); it2++) 
+		{
+		  if (not FdOperation::is_diacritic(*it2)) {
+		    int onumber = t->alphabet.symbol2code(it2->c_str());
+		    if (inumber != onumber) {  
+		      // add transitions of type x:y 
+		      // (non-identity cross-product of symbols in s)
+		      origin->add_arc( Label(inumber, onumber), target, t );
+		    }
+		  }
+		}
+	      // add transitions of type x:? and ?:x here
+	      origin->add_arc( Label(inumber, 1), target, t );
+	      origin->add_arc( Label(1, inumber), target, t );
+	    }
+	  }
       }
     else if (l.lower_char() == 2 || l.upper_char() == 2 )  // identity "?:?"
       {
         for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
           {
-            int number = t->alphabet.symbol2code(it->c_str());
-            // add transitions of type x:x
-            origin->add_arc( Label(number, number), target, t );
-          }
+	    if (not FdOperation::is_diacritic(*it)) {
+	      int number = t->alphabet.symbol2code(it->c_str());
+	      // add transitions of type x:x
+	      origin->add_arc( Label(number, number), target, t );
+	    }
+	  }
       }
     else if (l.lower_char() == 1)  // "?:x"
       {
         for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
           {
-            int number = t->alphabet.symbol2code(it->c_str());
-            origin->add_arc( Label(number, l.upper_char()), target, t );
+	    if (not FdOperation::is_diacritic(*it)) {
+	      int number = t->alphabet.symbol2code(it->c_str());
+	      origin->add_arc( Label(number, l.upper_char()), target, t );
+	    }
           }
       }
     else if (l.upper_char() == 1)  // "x:?"
       {
         for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
           {
-            int number = t->alphabet.symbol2code(it->c_str());
-            origin->add_arc( Label(l.lower_char(), number), target, t );
-          }
+	    if (not FdOperation::is_diacritic(*it)) {
+	      int number = t->alphabet.symbol2code(it->c_str());
+	      origin->add_arc( Label(l.lower_char(), number), target, t );
+	    }
+	  }
       }  
     // keep the original transition in all cases
     return;

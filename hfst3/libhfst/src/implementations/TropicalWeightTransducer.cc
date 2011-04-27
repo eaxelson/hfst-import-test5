@@ -11,6 +11,7 @@
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "TropicalWeightTransducer.h"
+#include "HfstSymbolDefs.h"
 
 #ifndef DEBUG_MAIN
 namespace hfst { namespace implementations
@@ -91,7 +92,11 @@ namespace hfst { namespace implementations
           not it.Done(); it.Next() ) {    
       km [ (unsigned int)it.Value() ] 
         = (unsigned int) t2->InputSymbols()->Find( it.Symbol() );
+      
+      assert(it.Value() >= 0);
+      assert(not (t2->InputSymbols()->Find( it.Symbol() ) < 0));
     }
+    
     return km;
   }
 
@@ -110,6 +115,10 @@ namespace hfst { namespace implementations
             StdArc new_arc;
             new_arc.ilabel = km[arc.ilabel];
             new_arc.olabel = km[arc.olabel];
+
+	    assert(new_arc.ilabel >= 0);
+	    assert(new_arc.olabel >= 0);
+
             new_arc.weight = arc.weight;
             new_arc.nextstate = arc.nextstate;
             aiter.SetValue(new_arc);
@@ -665,23 +674,29 @@ namespace hfst { namespace implementations
                 for (StringSet::iterator it1 = unknown.begin(); 
                      it1 != unknown.end(); it1++) 
                   {
-                    int64 inumber = is->Find(*it1);
-                    for (StringSet::iterator it2 = unknown.begin(); 
-                         it2 != unknown.end(); it2++) 
-                      {
-                        int64 onumber = is->Find(*it2);
-                        if (inumber != onumber)
-                          result->AddArc(result_s, 
-                                         StdArc(inumber, onumber, 
-                                                arc.weight, result_nextstate));
-                      }
-                    result->AddArc(result_s, 
-                                   StdArc(inumber, 1, arc.weight, 
-                                          result_nextstate));
-                    result->AddArc(result_s, 
-                                   StdArc(1, inumber, arc.weight, 
-                                          result_nextstate));
-                  }
+		    if (not FdOperation::is_diacritic(*it1)) {
+		      
+		      int64 inumber = is->Find(*it1);
+		      for (StringSet::iterator it2 = unknown.begin(); 
+			   it2 != unknown.end(); it2++) 
+			{
+			  if (not FdOperation::is_diacritic(*it2)) {
+			    int64 onumber = is->Find(*it2);
+			    if (inumber != onumber)
+			      result->AddArc(result_s, 
+					     StdArc(inumber, onumber, 
+						    arc.weight, 
+						    result_nextstate));
+			  }
+			}
+		      result->AddArc(result_s, 
+				     StdArc(inumber, 1, arc.weight, 
+					    result_nextstate));
+		      result->AddArc(result_s, 
+				     StdArc(1, inumber, arc.weight, 
+					    result_nextstate));
+		    }
+		  }
               }
             else if (arc.ilabel == 2 ||   // identity "?:?"
                      arc.olabel == 2 )       
@@ -689,10 +704,12 @@ namespace hfst { namespace implementations
                 for (StringSet::iterator it = unknown.begin(); 
                      it != unknown.end(); it++) 
                   {
-                    int64 number = is->Find(*it);
-                    result->AddArc(result_s, 
-                                   StdArc(number, number, 
-                                          arc.weight, result_nextstate));
+		    if (not FdOperation::is_diacritic(*it)) {
+		      int64 number = is->Find(*it);
+		      result->AddArc(result_s, 
+				     StdArc(number, number, 
+					    arc.weight, result_nextstate));
+		    }
                   }
               }
             else if (arc.ilabel == 1)  // "?:x"
@@ -700,10 +717,12 @@ namespace hfst { namespace implementations
                 for (StringSet::iterator it = unknown.begin(); 
                      it != unknown.end(); it++) 
                   {
-                    int64 number = is->Find(*it);
-                    result->AddArc(result_s, 
-                                   StdArc(number, arc.olabel, 
-                                          arc.weight, result_nextstate));
+		    if (not FdOperation::is_diacritic(*it)) {
+		      int64 number = is->Find(*it);
+		      result->AddArc(result_s, 
+				     StdArc(number, arc.olabel, 
+					    arc.weight, result_nextstate));
+		    }
                   }
               }
             else if (arc.olabel == 1)  // "x:?"
@@ -711,11 +730,13 @@ namespace hfst { namespace implementations
                 for (StringSet::iterator it = unknown.begin(); 
                      it != unknown.end(); it++) 
                   {
-                    int64 number = is->Find(*it);
-                    result->AddArc(result_s, 
-                                   StdArc(arc.ilabel, number, 
-                                          arc.weight, result_nextstate));
-                  }
+		    if (not FdOperation::is_diacritic(*it)) {
+		      int64 number = is->Find(*it);
+		      result->AddArc(result_s, 
+				     StdArc(arc.ilabel, number, 
+					    arc.weight, result_nextstate));
+		    }
+		  }
               }
             }
 
@@ -752,8 +773,8 @@ namespace hfst { namespace implementations
 
     StringSet t1_symbols = get_alphabet(t1);
     StringSet t2_symbols = get_alphabet(t2);
-    collect_unknown_sets(t1_symbols, unknown_t1,
-                         t2_symbols, unknown_t2);
+    hfst::symbols::collect_unknown_sets(t1_symbols, unknown_t1,
+					t2_symbols, unknown_t2);
     
     if (DEBUG)
       {
@@ -776,7 +797,10 @@ namespace hfst { namespace implementations
     SymbolTable * st2 = t2->InputSymbols()->Copy();
     for ( StringSet::const_iterator it = unknown_t2.begin();
           it != unknown_t2.end(); it++ ) {
-        st2->AddSymbol(*it);
+      if(st2->AddSymbol(*it) < 3) {
+	std::cerr << "ERROR: string " << *it << " got strange number" << std::endl;
+	assert(false);
+      }
     }
     t2->SetInputSymbols(st2);
 
@@ -988,8 +1012,6 @@ namespace hfst { namespace implementations
     return arc.weight;
   }
 
-
-
   TropicalWeightTransitionIterator::TropicalWeightTransitionIterator
   (StdVectorFst *t, StateId state):
     arc_iterator(new ArcIterator<StdVectorFst>(*t, state)),
@@ -1077,6 +1099,9 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::define_transducer
   (const std::string &symbol)
   {
+
+    assert(not (symbol == ""));
+
     StdVectorFst * t = new StdVectorFst;
     SymbolTable st = create_symbol_table("");
 
@@ -1093,6 +1118,10 @@ namespace hfst { namespace implementations
   StdVectorFst * TropicalWeightTransducer::define_transducer
     (const std::string &isymbol, const std::string &osymbol)
   {
+
+    assert(not (isymbol == ""));
+    assert(not (osymbol == ""));
+
     StdVectorFst * t = new StdVectorFst;
     SymbolTable st = create_symbol_table("");
 
@@ -1142,6 +1171,10 @@ namespace hfst { namespace implementations
          ++it)
       {
         StateId s2 = t->AddState();
+
+	assert(not (it->first == ""));
+	assert(not (it->second == ""));
+
         t->AddArc(s1,StdArc(st.AddSymbol(it->first),
                             st.AddSymbol(it->second),0,s2));
         s1 = s2;
@@ -1168,6 +1201,9 @@ namespace hfst { namespace implementations
            it != sps.end();
            ++it)
         {
+	  assert(not (it->first == ""));
+	  assert(not (it->second == ""));
+
           t->AddArc(s1,StdArc(st.AddSymbol(it->first),
                               st.AddSymbol(it->second),0,s2));
         }
@@ -1192,6 +1228,10 @@ namespace hfst { namespace implementations
         StateId s2 = t->AddState();
         for (StringPairSet::const_iterator it2 = (*it).begin(); 
              it2 != (*it).end(); it2++ ) {
+
+	  assert(not (it2->first == ""));
+	  assert(not (it2->second == ""));
+
           t->AddArc(s1,StdArc(st.AddSymbol(it2->first),
                               st.AddSymbol(it2->second),0,s2));
         }

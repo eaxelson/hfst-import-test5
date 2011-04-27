@@ -6,7 +6,7 @@
 #include <set>
 #include "../HfstSymbolDefs.h"
 #include "../HfstExceptionDefs.h"
-#include "../HfstTransducer.h"
+#include "../HfstTransducer.h" // should not include this header
 #include "ConvertTransducerFormat.h"
 #include <cassert>
 #include <iostream>
@@ -77,7 +77,14 @@ namespace hfst {
     protected:
       /* Get the symbol that is mapped as number */
       static std::string get_symbol(unsigned int number) {
+
+	assert(symbol2number_map.find("") == symbol2number_map.end());
+	
+
         Number2SymbolMap::const_iterator it = number2symbol_map.find(number);
+
+	assert(not(it->second == ""));
+
         if (it == number2symbol_map.end()) {
           /*fprintf(stderr, "ERROR: "
                   "HfstTropicalTransducerTransitionData::get_symbol"
@@ -94,11 +101,26 @@ namespace hfst {
              message);
 
         }
+
         return it->second;
       }
 
       /* Get the number that is used to represent the symbol */
       static unsigned int get_number(const std::string &symbol) {
+
+	if(symbol == "") { // FAIL
+	  Symbol2NumberMap::iterator it = symbol2number_map.find(symbol);
+	  if (it == symbol2number_map.end()) {
+	    std::cerr << "ERROR: No number for the empty symbol\n" 
+		      << std::endl;
+	  }
+	  else {
+	    std::cerr << "ERROR: The empty symbol corresdponds to number " 
+		      << it->second << std::endl;
+	  }
+	  assert(false);
+	}
+
         Symbol2NumberMap::iterator it = symbol2number_map.find(symbol);
         if (it == symbol2number_map.end()) {
           max_number++;
@@ -109,7 +131,8 @@ namespace hfst {
         return it->second;
       }
 
-    private:
+      //private: TEST
+    public:
       /* The actual transition data */
       unsigned int input_number;
       unsigned int output_number;
@@ -298,6 +321,10 @@ namespace hfst {
         typename C::SymbolType get_input_symbol() const {
           return transition_data.get_input_symbol();
         }
+
+	unsigned int get_input_number() const {
+	  return transition_data.input_number;
+	}
 	
         /** @brief Get the output symbol of the transition. */
         typename C::SymbolType get_output_symbol() const {
@@ -433,12 +460,25 @@ namespace hfst {
           state_map[0]=HfstTransitions();
         }
 
+	HfstTransitionGraph &operator=(const HfstTransitionGraph &graph)
+	  {
+	    if (this == &graph)
+	      return *this;
+	    max_state = graph.max_state;
+	    state_map = graph.state_map;
+	    final_weight_map = graph.final_weight_map;
+	    alphabet = graph.alphabet;
+	    assert(alphabet.count(typename C::SymbolType()) == 0);
+	    return *this;
+	  }
+
         /** @brief Create a deep copy of HfstTransitionGraph \a graph. */
         HfstTransitionGraph(const HfstTransitionGraph &graph): 
         max_state(graph.max_state) {
           state_map = graph.state_map;
           final_weight_map = graph.final_weight_map;
-          alphabet = alphabet;
+          alphabet = graph.alphabet;
+	  assert(alphabet.count(typename C::SymbolType()) == 0);
         }
 
         /** @brief Create an HfstTransitionGraph equivalent to HfstTransducer 
@@ -551,6 +591,10 @@ namespace hfst {
         void add_transition(HfstState s, HfstTransition<C> transition) {
 
           C data = transition.get_transition_data();
+
+	  assert(not data.get_input_symbol().empty()); //!= typename C::SymbolType());
+	  assert(not data.get_output_symbol().empty()); //!= typename C::SymbolType());
+
           //add_state(s); // the last line adds the state
           add_state(transition.get_target_state());
           alphabet.insert(data.get_input_symbol());
