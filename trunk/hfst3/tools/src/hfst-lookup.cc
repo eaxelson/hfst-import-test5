@@ -61,6 +61,7 @@ using hfst::HfstTwoLevelPaths;
 using hfst::StringPair;
 using hfst::StringPairVector;
 using hfst::StringVector;
+using hfst::StringSet;
 
 using std::string;
 using std::vector;
@@ -96,8 +97,8 @@ static bool print_pairs = false;
 static bool print_space = false;
 static bool quote_special = false;
 
-static char* epsilon_format = "";
-static char* space_format = "";
+static char* epsilon_format = strdup("");
+static char* space_format = strdup("");
 
 // the formats for lookup cases go like so:
 //  BEGIN LOOKUP LOOKUP LOOKUP... END
@@ -1216,6 +1217,7 @@ static bool is_possible_transition
 (const HfstBasicTransition &transition,
  const StringVector &lookup_path,
  const unsigned int &lookup_index,
+ const StringSet &alphabet,
  bool &input_symbol_consumed)
 {
   std::string isymbol = transition.get_input_symbol();
@@ -1224,9 +1226,14 @@ static bool is_possible_transition
   if (not (lookup_index == (unsigned int)lookup_path.size()))
     {
       // we can go further if the current symbol in lookup_path
-      // matches to the input symbol of the transition.
-      if ( isymbol.compare(lookup_path.at(lookup_index)) == 0 || 
-	   isymbol.compare("@_IDENTITY_SYMBOL_@") == 0)
+      // matches to the input symbol of the transition, i.e
+      // either the input symbol is the same as the current symbol
+      if ( isymbol.compare(lookup_path.at(lookup_index)) == 0 ||
+	   // or the input symbol is the identity symbol and the current
+	   // symbol is not found in the alphabet of the transducer.
+	   ( (isymbol == "@_IDENTITY_SYMBOL_@") &&
+	     (alphabet.find(lookup_path.at(lookup_index)) == alphabet.end()) ) 
+	   )
         {
           input_symbol_consumed=true;
           return true;
@@ -1235,7 +1242,7 @@ static bool is_possible_transition
   // Whether there are more symbols in lookup_path or not,
   // we can always go further if the input symbol of the transition
   // is an epsilon or a flag diacritic.
-  if ( isymbol.compare("@_EPSILON_SYMBOL_@") == 0 || 
+  if ( (isymbol == "@_EPSILON_SYMBOL_@") || 
        is_flag_diacritic(isymbol) )
     {
       input_symbol_consumed=false;
@@ -1253,6 +1260,7 @@ static void lookup_fd
  HfstState state,
  unsigned int lookup_index, // an iterator instead?
  HfstTwoLevelPath &path_so_far,
+ StringSet &alphabet,
  EpsilonHandler Eh)
 {
   // Check whether the number of input epsilon cycles is exceeded
@@ -1281,7 +1289,7 @@ static void lookup_fd
     {
       bool input_symbol_consumed=false;
       if ( is_possible_transition
-           (*it, lookup_path, lookup_index, input_symbol_consumed) )
+           (*it, lookup_path, lookup_index, alphabet, input_symbol_consumed) )
         {
           // update path_so_far and lookup_index
 
@@ -1291,7 +1299,7 @@ static void lookup_fd
 	       StringPair(it->get_input_symbol(), it->get_output_symbol()),
 	       it->get_weight());
 	  }
-	  else {
+	  else { // identity symbol is replaced with the lookup symbol
 	    push_back_to_two_level_path
 	      (path_so_far, 
 	       StringPair(lookup_path.at(lookup_index), 
@@ -1311,7 +1319,7 @@ static void lookup_fd
 
           // call lookup for the target state of the transition
           lookup_fd(t, lookup_path, results, it->get_target_state(),
-                    lookup_index, path_so_far, *Ehp);
+                    lookup_index, path_so_far, alphabet, *Ehp);
 
           // return to the original values of path_so_far and lookup_index
           if (input_symbol_consumed) {
@@ -1337,8 +1345,10 @@ static void lookup_fd
   HfstState state = 0;
   unsigned int lookup_index = 0;
   HfstTwoLevelPath path_so_far;
+  StringSet alphabet = t.get_alphabet();
   EpsilonHandler Eh(infinite_cutoff);
-  lookup_fd(t, lookup_path, results, state, lookup_index, path_so_far, Eh);
+  lookup_fd(t, lookup_path, results, state, lookup_index, path_so_far, 
+	    alphabet, Eh);
 }
 
 
