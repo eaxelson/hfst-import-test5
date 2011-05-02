@@ -55,14 +55,35 @@ namespace hfst { namespace implementations
       //visited_nodes.insert(node);
       SFST::Arcs *arcs=node->arcs();
 
+      // Count the number of nodes and initialize the transition
+      // vector of net.
+      unsigned int number_of_nodes=0;
+      for( SFST::ArcsIter p(arcs); p; p++ ) {
+	number_of_nodes++;
+      }
+      net->initialize_transition_vector(index[node], number_of_nodes);
+
       // Go through all transitions and copy them to \a net
       for( SFST::ArcsIter p(arcs); p; p++ ) {
         SFST::Arc *arc=p;
 
+	const char *isymbol = alphabet.code2symbol(arc->label().lower_char());
+	if (isymbol == NULL) {
+	  std::cerr << "ERROR: no string found for number " 
+		    << arc->label().lower_char() << std::endl;
+	  assert(false);
+	}
         std::string istring
-          (alphabet.code2symbol(arc->label().lower_char()));
+          (isymbol);
+
+	const char *osymbol = alphabet.code2symbol(arc->label().upper_char());
+	if (osymbol == NULL) {
+	  std::cerr << "ERROR: no string found for number " 
+		    << arc->label().upper_char() << std::endl;
+	  assert(false);
+	}
         std::string ostring
-          (alphabet.code2symbol(arc->label().upper_char()));
+          (osymbol);
 
         if (istring.compare("<>") == 0) {
           istring = std::string("@_EPSILON_SYMBOL_@");
@@ -208,6 +229,14 @@ namespace hfst { namespace implementations
       //visited_nodes.insert(node);
       SFST::Arcs *arcs=node->arcs();
 
+      // Count the number of nodes and initialize the transition
+      // vector of net.
+      unsigned int number_of_nodes=0;
+      for( SFST::ArcsIter p(arcs); p; p++ ) {
+	number_of_nodes++;
+      }
+      net->initialize_transition_vector(index[node], number_of_nodes);
+      
       // Go through all transitions and copy them to \a net
       for( SFST::ArcsIter p(arcs); p; p++ ) {
         SFST::Arc *arc=p;

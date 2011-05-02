@@ -44,6 +44,22 @@ namespace hfst { namespace implementations
   // For every line in foma transducer:
   for (int i=0; (fsm+i)->state_no != -1; i++) {    
 
+    // Count the number of transitions in the current state
+    // and initialize the transition vector of net.
+    if ((fsm+i)->target != -1 )
+      {
+	unsigned int number_of_transitions=0;
+	for (unsigned int j=0; 
+	     (fsm+i+j)->target != -1 &&
+	       (fsm+i+j)->state_no == (fsm+i)->state_no;
+	     j++)
+	  {
+	    number_of_transitions++;
+	  }
+	net->initialize_transition_vector((fsm+i)->state_no, 
+					  number_of_transitions);
+      }
+
     // 1. If the source state is an initial state in foma:
     if ((fsm+i)->start_state == 1) 
       {
@@ -197,6 +213,22 @@ namespace hfst { namespace implementations
     
     // For every line in foma transducer:
     for (int i=0; (fsm+i)->state_no != -1; i++) {    
+
+    // Count the number of transitions in the current state
+    // and initialize the transition vector of net.
+    if ((fsm+i)->target != -1 )
+      {
+	unsigned int number_of_transitions=0;
+	for (unsigned int j=0; 
+	     (fsm+i+j)->target != -1 &&
+	       (fsm+i+j)->state_no == (fsm+i)->state_no;
+	     j++)
+	  {
+	    number_of_transitions++;
+	  }
+	net->initialize_transition_vector((fsm+i)->state_no, 
+					  number_of_transitions);
+      }
       
       // 1. If the source state is an initial state in foma:
       if ((fsm+i)->start_state == 1) 

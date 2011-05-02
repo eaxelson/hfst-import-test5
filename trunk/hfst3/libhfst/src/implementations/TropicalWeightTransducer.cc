@@ -1545,17 +1545,25 @@ namespace hfst { namespace implementations
 
   StdVectorFst * TropicalWeightTransducer::extract_input_language
   (StdVectorFst * t)
-  { StdVectorFst * retval =  new StdVectorFst(ProjectFst<StdArc>
-                                              (*t,PROJECT_INPUT)); 
+  { StdVectorFst * proj = new StdVectorFst(ProjectFst<StdArc>
+                                             (*t,PROJECT_INPUT));
+    // substitute unknown with identity 
+    StdVectorFst * retval = substitute(proj, 1, 2);
+    delete proj;
     retval->SetInputSymbols(t->InputSymbols());
-    return retval; }
+    return retval;
+  }
 
   StdVectorFst * TropicalWeightTransducer::extract_output_language
   (StdVectorFst * t)
-  { StdVectorFst * retval = new StdVectorFst(ProjectFst<StdArc>
-                                             (*t,PROJECT_OUTPUT)); 
+  { StdVectorFst * proj = new StdVectorFst(ProjectFst<StdArc>
+                                             (*t,PROJECT_OUTPUT));
+    // substitute unknown with identity 
+    StdVectorFst * retval = substitute(proj, 1, 2);
+    delete proj;
     retval->SetInputSymbols(t->InputSymbols());
-    return retval; }
+    return retval;
+  }
   
   typedef std::pair<int,int> LabelPair;
   typedef std::vector<LabelPair> LabelPairVector;
@@ -2073,19 +2081,38 @@ namespace hfst { namespace implementations
     ArcSort(t1, OLabelCompare<StdArc>());
     ArcSort(t2, ILabelCompare<StdArc>());
 
-    //RmEpsilonFst<StdArc> rm1(*t1);
-    //RmEpsilonFst<StdArc> rm2(*t2);
-
     RmEpsilon(t1);
     RmEpsilon(t2);
 
     if (DEBUG) printf("  ..epsilons removed\n");
 
-    EncodeMapper<StdArc> encoder(0x0003,ENCODE); // t2 must be unweighted
-    //EncodeFst<StdArc> enc1(rm1, &encoder);
-    //EncodeFst<StdArc> enc2(rm2, &encoder);
+    // Remove weights from t2, is this really needed?
+    StdVectorFst *t2_ = copy(t2);
+#ifdef FOO
+    for (fst::StateIterator<StdVectorFst> siter(*t2_); 
+         not siter.Done(); siter.Next())
+      {
+        StateId s = siter.Value();
+        for (fst::MutableArcIterator<StdVectorFst> aiter(t2_,s); 
+             !aiter.Done(); aiter.Next())
+          {
+            const StdArc &arc = aiter.Value();
+            StdArc new_arc;
+            new_arc.ilabel = arc.ilabel;
+            new_arc.olabel = arc.olabel;
+            new_arc.weight = 0;
+            new_arc.nextstate = arc.nextstate;
+            aiter.SetValue(new_arc);    
+	  }
+	if (t2_->Final(s) != fst::TropicalWeight::Zero())
+          { t2_->SetFinal(s,0); }
+      }
+#endif
+
+    EncodeMapper<StdArc> encoder(0x0001,ENCODE);
     EncodeFst<StdArc> enc1(*t1, &encoder);
-    EncodeFst<StdArc> enc2(*t2, &encoder);
+    EncodeFst<StdArc> enc2(*t2_, &encoder);
+    delete t2_;
     DeterminizeFst<StdArc> det1(enc1);
     DeterminizeFst<StdArc> det2(enc2);
 
@@ -2098,7 +2125,6 @@ namespace hfst { namespace implementations
 
     if (DEBUG) printf("  ..subtracted\n");
 
-    //DifferenceFst<StdArc> subtract(enc1,enc2);
     StdVectorFst *result = new StdVectorFst(subtract); 
     result->SetInputSymbols(t1->InputSymbols());
     return result;

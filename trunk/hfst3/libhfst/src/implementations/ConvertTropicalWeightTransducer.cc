@@ -59,6 +59,7 @@ namespace hfst { namespace implementations
                 fst::SymbolTableIterator(*(inputsym));
               not it.Done(); it.Next() ) {
 	  assert(it.Symbol() != "");
+
           if (it.Value() != 0) // epsilon is not inserted
             net->alphabet.insert( it.Symbol() );
         }    
@@ -77,7 +78,7 @@ namespace hfst { namespace implementations
         }    
       }
       return net;
-    }      
+    }
 
   /* A non-empty OpenFst transducer must have at least an input symbol table.
      If the output symbol table is missing, we assume that it would be 
@@ -106,6 +107,9 @@ namespace hfst { namespace implementations
       else if (origin == 0)
 	origin = initial_state;
 
+      unsigned int number_of_arcs = fst::NumArcs(*t, s);
+      net->initialize_transition_vector(s, number_of_arcs);
+
       /* Go through all transitions in a state */
       for (fst::ArcIterator<fst::StdVectorFst> aiter(*t,s); 
 	   !aiter.Done(); aiter.Next())
@@ -122,7 +126,7 @@ namespace hfst { namespace implementations
 	  std::string istring = inputsym->Find(arc.ilabel);
 	  std::string ostring = outputsym->Find(arc.olabel);
 
-	  if(istring == "") {
+	  if(istring == "") { // omorfi fails
 	    std::cerr << "ERROR: arc.ilabel " << arc.ilabel << " not found" << std::endl;
 	    assert(false);
 	  }
@@ -340,6 +344,9 @@ namespace hfst { namespace implementations
 	else if (origin == 0)
 	  origin = initial_state;
 	
+	unsigned int number_of_arcs = fst::NumArcs(*t, s);
+	net->initialize_transition_vector(s, number_of_arcs);
+
 	/* Go through all transitions in a state */
 	for (fst::ArcIterator<fst::StdVectorFst> aiter(*t,s); 
 	     !aiter.Done(); aiter.Next())

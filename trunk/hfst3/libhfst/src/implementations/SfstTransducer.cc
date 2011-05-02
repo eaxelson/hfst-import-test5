@@ -249,12 +249,41 @@ namespace hfst { namespace implementations {
 					  t2_symbols, unknown_t2);
     }
 
+    //std::cerr << "Transducer t1:" << std::endl;
+    //std::cerr << *t1 << std::endl;
+    //print_alphabet(t1);
+
+    /*
+    std::cerr << "Transducer t1:" << std::endl;
+    std::cerr << *t1 << std::endl;
+    print_alphabet(t1);
+
+    std::cerr << "Transducer t2:" << std::endl;
+    std::cerr << *t2 << std::endl;
+    print_alphabet(t2);
+    */
+
+    // FAIL: the alphabet is pruned here
     Transducer * new_t1 = &t1->copy(false, &t2->alphabet);
+    new_t1->alphabet.insert_symbols(t2->alphabet);
+    SFST::Alphabet::CharMap cm = t1->alphabet.get_char_map();
+    for (SFST::Alphabet::CharMap::const_iterator it = cm.begin(); 
+         it != cm.end(); it++) {
+      new_t1->alphabet.add_symbol(it->second);
+    }
+
     t2->alphabet.insert_symbols(new_t1->alphabet);
     delete t1;
     t1 = new_t1;
+    /*
+    std::cerr << "Transducer t1:" << std::endl;
+    std::cerr << *t1 << std::endl;
+    print_alphabet(t1);
 
-    //std::cerr << *t1 << "--\n" << *t2;
+    std::cerr << "Transducer t2:" << std::endl;
+    std::cerr << *t2 << std::endl;
+    print_alphabet(t2);
+    */
 
     // 3. Calculate the set of symbol pairs to which a non-identity "?:?"
     //    transition is expanded for both transducers.
@@ -417,12 +446,12 @@ namespace hfst { namespace implementations {
   }
 
   void SfstTransducer::print_alphabet(Transducer *t) {
-    printf("alphabet..\n");
+    fprintf(stderr, "alphabet..\n");
     SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
     for (SFST::Alphabet::CharMap::const_iterator it = cm.begin(); 
          it != cm.end(); it++)
-      printf("%i\t%s\n",it->first,it->second);
-    printf("..alphabet\n");
+      fprintf(stderr, "%i\t%s\n",it->first,it->second);
+    fprintf(stderr, "..alphabet\n");
   }
 
   void SfstTransducer::initialize_alphabet(Transducer *t) {
@@ -659,11 +688,94 @@ namespace hfst { namespace implementations {
   
   Transducer * SfstTransducer::extract_input_language(Transducer * t)
   { t->complete_alphabet();
-    return &t->lower_level(); }
+
+    /*
+    fprintf(stderr, "The alphabet contains now:\n");
+    SFST::Alphabet::CharMap cm_ = t->alphabet.get_char_map();
+    for (SFST::Alphabet::CharMap::const_iterator it 
+           = cm_.begin(); it != cm_.end(); it++) {
+      fprintf(stderr, "number %i string %s\n",
+	      it->first, it->second);
+    }
+    fprintf(stderr, " and the pairs:\n");
+
+    for (SFST::Alphabet::const_iterator it = t->alphabet.begin();
+	 it != t->alphabet.end(); it++)
+      {
+	fprintf(stderr, "%i:%i\n", it->lower_char(),
+		it->upper_char());
+      }
+    fprintf(stderr, "\n");
+    */
+
+    //Label l1(1,1);
+    //Label l2(2,2);
+    //t->alphabet.insert(l1);
+    //t->alphabet.insert(l2);
+    Transducer * retval = &t->lower_level();
+
+    // projection includes in the alphabet only symbols that
+    // occur in the input side, which we do not want
+
+    SFST::Alphabet::CharMap _cm = t->alphabet.get_char_map();
+    for (SFST::Alphabet::CharMap::const_iterator it 
+           = _cm.begin(); it != _cm.end(); it++) {
+      //fprintf(stderr, "adding symbol %s at number %i\n",
+      //	      it->second, it->first);
+      retval->alphabet.add_symbol(it->second, it->first);
+      }
+
+    // unknowns must be replaced with identities
+    Transducer * tmp = retval;
+    retval = substitute(retval, "@_UNKNOWN_SYMBOL_@", "@_IDENTITY_SYMBOL_@");
+    delete tmp;
+
+    //retval->alphabet.add_symbol("@_UNKNOWN_SYMBOL_@", 1);
+    //retval->alphabet.add_symbol("@_IDENTITY_SYMBOL_@", 2);
+
+    /*
+    fprintf(stderr, "The alphabet contains now:\n");
+    SFST::Alphabet::CharMap cm__ = retval->alphabet.get_char_map();
+    for (SFST::Alphabet::CharMap::const_iterator it 
+           = cm__.begin(); it != cm__.end(); it++) {
+      fprintf(stderr, "number %i string %s\n",
+	      it->first, it->second);
+    }
+    fprintf(stderr, " and the pairs:\n");
+
+    for (SFST::Alphabet::const_iterator it = retval->alphabet.begin();
+	 it != retval->alphabet.end(); it++)
+      {
+	fprintf(stderr, "%i:%i\n", it->lower_char(),
+		it->upper_char());
+      }
+    fprintf(stderr, "\n");
+    */
+
+    //retval->alphabet.clear_char_pairs(); // we want to get rid of (1,1) and (2,2)
+    return retval; }
   
   Transducer * SfstTransducer::extract_output_language(Transducer * t)
   { t->complete_alphabet();
-    return &t->upper_level(); }
+    //Label l1(1,1);
+    //Label l2(2,2);
+    //t->alphabet.insert(l1);
+    //t->alphabet.insert(l2);
+    Transducer * retval = &t->upper_level(); 
+    // unknowns must be replaced with identities
+    //Transducer * tmp = retval;
+    //retval = substitute(retval, "@_UNKNOWN_SYMBOL_@", "@_IDENTITY_SYMBOL_@");
+    //delete tmp;
+    // projection includes in the alphabet only symbols that
+    // occur in the output side, which we do not want
+    SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
+    for (SFST::Alphabet::CharMap::const_iterator it 
+           = cm.begin(); it != cm.end(); it++) {
+      if (it->first != 0 && it->first != 1 && it->first != 2)
+	retval->alphabet.add_symbol(it->second);
+    }
+    //retval->alphabet.clear_char_pairs(); 
+    return retval; }
 
   std::pair<Transducer*, Transducer*> SfstTransducer::harmonize 
   (Transducer *t1, Transducer *t2, bool unknown_symbols_in_use) ;
@@ -1167,11 +1279,21 @@ namespace hfst { namespace implementations {
 	    if (not FdOperation::is_diacritic(*it1)) {
 
 	      int inumber = t->alphabet.symbol2code(it1->c_str());
+	      if (inumber == -1) {
+		std::cerr << "ERROR: no number for symbol " << *it1
+			  << std::endl;
+		assert(false);
+	      }
 	      for (hfst::StringSet::iterator it2 = s.begin(); 
 		   it2 != s.end(); it2++) 
 		{
 		  if (not FdOperation::is_diacritic(*it2)) {
 		    int onumber = t->alphabet.symbol2code(it2->c_str());
+		    if (onumber == -1) {
+		      std::cerr << "ERROR: no number for symbol " << *it2
+				<< std::endl;
+		      assert(false);
+		    }
 		    if (inumber != onumber) {  
 		      // add transitions of type x:y 
 		      // (non-identity cross-product of symbols in s)
@@ -1191,6 +1313,11 @@ namespace hfst { namespace implementations {
           {
 	    if (not FdOperation::is_diacritic(*it)) {
 	      int number = t->alphabet.symbol2code(it->c_str());
+	      if (number == -1) {
+		std::cerr << "ERROR: no number for symbol " << *it
+			  << std::endl;
+		assert(false);
+	      }
 	      // add transitions of type x:x
 	      origin->add_arc( Label(number, number), target, t );
 	    }
@@ -1202,6 +1329,11 @@ namespace hfst { namespace implementations {
           {
 	    if (not FdOperation::is_diacritic(*it)) {
 	      int number = t->alphabet.symbol2code(it->c_str());
+	      if (number == -1) {
+		std::cerr << "ERROR: no number for symbol " << *it
+			  << std::endl;
+		assert(false);
+	      }
 	      origin->add_arc( Label(number, l.upper_char()), target, t );
 	    }
           }
@@ -1212,6 +1344,11 @@ namespace hfst { namespace implementations {
           {
 	    if (not FdOperation::is_diacritic(*it)) {
 	      int number = t->alphabet.symbol2code(it->c_str());
+	      if (number == -1) {
+		std::cerr << "ERROR: no number for symbol " << *it
+			  << std::endl;
+		assert(false);
+	      }
 	      origin->add_arc( Label(l.lower_char(), number), target, t );
 	    }
 	  }

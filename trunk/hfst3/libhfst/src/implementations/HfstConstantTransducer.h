@@ -40,6 +40,8 @@ namespace hfst {
     HfstConstantTransducer();
     HfstConstantTransducer(unsigned int number_of_states);
     void initialize_symbol_map();
+    void initialize_transition_vector
+    (unsigned int state_number, unsigned int number_of_transitions);
 
     void add_transition(unsigned int source,
 			unsigned int target,
