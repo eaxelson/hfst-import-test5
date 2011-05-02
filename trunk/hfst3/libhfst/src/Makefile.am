@@ -66,3 +66,40 @@ HFST_HDRS = \
 hfstinclude_HEADERS = $(HFST_HDRS)
 
 libhfst_la_LDFLAGS = -no-undefined -version-info 3:0:2
+
+LIBHFST_TSTS=HfstApply HfstInputStream HfstTransducer \
+		HfstOutputStream HfstRules HfstSymbolDefs \
+		HfstTokenizer HfstFlagDiacritics \
+		HarmonizeUnknownAndIdentitySymbols
+
+check_PROGRAMS=$(LIBHFST_TSTS)
+
+HfstApply_SOURCES=HfstApply.cc
+HfstApply_CXXFLAGS=-DMAIN_TEST
+HfstApply_LDADD=libhfst.la
+HfstInputStream_SOURCES=HfstInputStream.cc
+HfstInputStream_CXXFLAGS=-DMAIN_TEST
+HfstInputStream_LDADD=libhfst.la
+HfstTransducer_SOURCES=HfstTransducer.cc
+HfstTransducer_CXXFLAGS=-DMAIN_TEST
+HfstTransducer_LDADD=libhfst.la
+HfstOutputStream_SOURCES=HfstOutputStream.cc
+HfstOutputStream_CXXFLAGS=-DMAIN_TEST
+HfstOutputStream_LDADD=libhfst.la
+HfstRules_SOURCES=HfstRules.cc
+HfstRules_CXXFLAGS=-DMAIN_TEST
+HfstRules_LDADD=libhfst.la
+HfstSymbolDefs_SOURCES=HfstSymbolDefs.cc
+HfstSymbolDefs_CXXFLAGS=-DMAIN_TEST
+HfstSymbolDefs_LDADD=libhfst.la
+HfstTokenizer_SOURCES=HfstTokenizer.cc
+HfstTokenizer_CXXFLAGS=-DMAIN_TEST
+HfstTokenizer_LDADD=libhfst.la
+HfstFlagDiacritics_SOURCES=HfstFlagDiacritics.cc
+HfstFlagDiacritics_CXXFLAGS=-DMAIN_TEST
+HfstFlagDiacritics_LDADD=libhfst.la
+HarmonizeUnknownAndIdentitySymbols_SOURCES=HarmonizeUnknownAndIdentitySymbols.cc
+HarmonizeUnknownAndIdentitySymbols_CXXFLAGS=-DMAIN_TEST
+HarmonizeUnknownAndIdentitySymbols_LDADD=libhfst.la
+
+TESTS=$(LIBHFST_TSTS)

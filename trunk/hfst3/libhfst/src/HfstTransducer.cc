@@ -22,6 +22,8 @@
 
 using hfst::implementations::ConversionFunctions;
 
+#ifndef MAIN_TEST
+
 namespace hfst
 {
 
@@ -3077,3 +3079,17 @@ void HfstTransducer::print_alphabet()
 
 
 }
+
+#else // MAIN_TEST was defined
+
+#include <iostream>
+
+int main(int argc, char * argv[])
+{
+    std::cout << "Unit tests for " __FILE__ ":" << std::endl;
+    
+    std::cout << "ok" << std::endl;
+    return 0;
+}
+
+#endif // MAIN_TEST

@@ -1,5 +1,7 @@
 #include "HarmonizeUnknownAndIdentitySymbols.h"
 
+#ifndef MAIN_TEST
+
 namespace hfst
 {
 
@@ -249,13 +251,20 @@ void debug_harmonize_print(const std::string &s)
 
 }
 
-#ifdef TEST_HARMONIZE_UNKNOWN_AND_IDENTITY_SYMBOLS
+
+#else // MAIN_TEST
 using hfst::HfstInputStream;
 using hfst::HfstTransducer;
 using hfst::HfstOutputStream;
+using hfst::HfstBasicTransducer;
 
-int main(void)
+int main(int argc, char * argv[])
 {
+    std::cout << "Unit tests for " __FILE__ ":" << std::endl;
+
+    // the following tests require stdio, not appropriate for unit testing..
+    // TODO: implement whatever we want to do in functionality tests?
+    /*
   HfstInputStream in;
   
   std::cerr << "Reading first transducer" << std::endl;
@@ -271,14 +280,19 @@ int main(void)
   HfstBasicTransducer b2(t2);
   
   std::cerr << "Harmonizing" << std::endl;
-  HarmonizeUnknownAndIdentitySymbols(b1,b2);
+  hfst::HarmonizeUnknownAndIdentitySymbols(b1,b2);
 
-  t1 = HfstTransducer(b1,TROPICAL_OPENFST_TYPE);
-  t2 = HfstTransducer(b2,TROPICAL_OPENFST_TYPE);
+  t1 = HfstTransducer(b1,hfst::TROPICAL_OPENFST_TYPE);
+  t2 = HfstTransducer(b2,hfst::TROPICAL_OPENFST_TYPE);
 
-  HfstOutputStream out(TROPICAL_OPENFST_TYPE);
+  HfstOutputStream out(hfst::TROPICAL_OPENFST_TYPE);
 
   std::cerr << "composing" << std::endl;
   out << t1.compose(t2);
+    */
+  std::cout << "ok" << std::endl;
+  return 0;
 }
-#endif // TEST_HARMONIZE_UNKNOWN_AND_IDENTITY_SYMBOLS
+
+
+#endif // MAIN_TEST

@@ -12,6 +12,8 @@
 #include "HfstTransducer.h"
 #include "HfstOutputStream.h"
 
+#ifndef MAIN_TEST
+
 namespace hfst
 {
   HfstOutputStream::HfstOutputStream(ImplementationType type, bool hfst_format):
@@ -438,3 +440,17 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
   }
 
 }
+
+#else // MAIN_TEST was defined
+
+#include <iostream>
+
+int main(int argc, char * argv[])
+{
+    std::cout << "Unit tests for " __FILE__ ":" << std::endl;
+    
+    std::cout << "ok" << std::endl;
+    return 0;
+}
+
+#endif // MAIN_TEST

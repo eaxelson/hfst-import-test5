@@ -13,6 +13,8 @@
 #include "HfstTokenizer.h"
 #include <string>
 
+#ifndef MAIN_TEST
+
 using std::string;
 namespace hfst 
 {
@@ -246,3 +248,17 @@ StringPairVector HfstTokenizer::tokenize
 }
   
 }
+
+#else // MAIN_TEST was defined
+
+#include <iostream>
+
+int main(int argc, char * argv[])
+{
+    std::cout << "Unit tests for " __FILE__ ":" << std::endl;
+    
+    std::cout << "ok" << std::endl;
+    return 0;
+}
+
+#endif // MAIN_TEST

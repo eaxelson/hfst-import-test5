@@ -12,6 +12,8 @@
 
 #include "HfstSymbolDefs.h"
 
+#ifndef MAIN_TEST
+
 namespace hfst {
 
 bool is_epsilon(std::string const & str)
@@ -48,3 +50,17 @@ bool is_identity(std::string const & str)
 
 
 }
+
+#else // MAIN_TEST was defined
+
+#include <iostream>
+
+int main(int argc, char * argv[])
+{
+    std::cout << "Unit tests for " __FILE__ ":" << std::endl;
+    
+    std::cout << "ok" << std::endl;
+    return 0;
+}
+
+#endif // MAIN_TEST

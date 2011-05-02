@@ -16,6 +16,9 @@
  */
 
 #include "HfstTransducer.h"
+
+#ifndef MAIN_TEST
+
 namespace hfst
 {
   // Whether weights or other information are lost in the conversion.
@@ -383,3 +386,17 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
     return *this;
   }
 }
+
+#else // MAIN_TEST was defined
+
+#include <iostream>
+
+int main(int argc, char * argv[])
+{
+    std::cout << "Unit tests for " __FILE__ ":" << std::endl;
+    
+    std::cout << "ok" << std::endl;
+    return 0;
+}
+
+#endif // MAIN_TEST
