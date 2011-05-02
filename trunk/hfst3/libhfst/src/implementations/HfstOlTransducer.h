@@ -95,6 +95,8 @@ namespace hfst { namespace implementations
        bool filter_fd=false);
     static const FdTable<hfst_ol::SymbolNumber>* 
       get_flag_diacritics(hfst_ol::Transducer* t);
+
+    
   };
   
 } }

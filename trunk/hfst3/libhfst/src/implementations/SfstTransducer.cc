@@ -14,7 +14,7 @@
 #include "HfstSymbolDefs.h"
 #include <time.h>
 
-#ifndef DEBUG_MAIN
+#ifndef MAIN_TEST
 namespace hfst { namespace implementations {
 
     float sfst_seconds_in_harmonize=0;
@@ -1255,7 +1255,7 @@ namespace hfst { namespace implementations {
 
 } }
 
-#else
+#else // MAIN_TEST was defined
 using namespace hfst::implementations;
 #include <iostream>
 
@@ -1265,6 +1265,5 @@ int main(int argc, char * argv[])
     std::cout << std::endl << "ok" << std::endl;
     return EXIT_SUCCESS;
 }
-#endif
-
+#endif // MAIN_TEST
 

@@ -19,7 +19,7 @@
 #include "HfstTransitionGraph.h"
 #include "HfstTransducer.h"
 
-#ifndef DEBUG_MAIN
+#ifndef MAIN_TEST
 namespace hfst { namespace implementations
 {
 
@@ -81,7 +81,7 @@ namespace hfst { namespace implementations
 
 } }
 
-#else  // #ifndef DEBUG_MAIN
+#else // MAIN_TEST was defined
 #include <cstdlib>
 #include <cassert>
 
@@ -101,5 +101,4 @@ int main(void)
       "since they've disappeared into thin air" << std::endl;
     return 77;
   }
-#endif // #ifndef DEBUG_MAIN
-
+#endif // MAIN_TEST

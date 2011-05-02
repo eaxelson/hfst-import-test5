@@ -12,6 +12,8 @@
 
 #include "./transducer.h"
 
+#ifndef MAIN_TEST
+
 namespace hfst_ol {
 
 bool should_ascii_tokenize(unsigned char c)
@@ -635,3 +637,16 @@ TransitionTableIndexSet Transducer::get_transitions_from_state(
 
 }
 
+#else // MAIN_TEST was defined
+
+#include <iostream>
+
+int main(int argc, char * argv[])
+{
+    std::cout << "Unit tests for " __FILE__ ":" << std::endl;
+    
+    std::cout << "ok" << std::endl;
+    return 0;
+}
+
+#endif // MAIN_TEST

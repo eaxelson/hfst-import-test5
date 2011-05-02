@@ -12,6 +12,8 @@
 
 #include "convert.h"
 
+#ifndef MAIN_TEST
+
 namespace hfst_ol {
 
 void write_transitions_from_state_placeholders(
@@ -1092,4 +1094,16 @@ Transducer* ConvertTransducer::to_transducer() const
 
 }
 
+#else // MAIN_TEST was defined
 
+#include <iostream>
+
+int main(int argc, char * argv[])
+{
+    std::cout << "Unit tests for " __FILE__ ":" << std::endl;
+    
+    std::cout << "ok" << std::endl;
+    return 0;
+}
+
+#endif // MAIN_TEST

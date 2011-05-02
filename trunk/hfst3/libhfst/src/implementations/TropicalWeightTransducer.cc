@@ -13,7 +13,7 @@
 #include "TropicalWeightTransducer.h"
 #include "HfstSymbolDefs.h"
 
-#ifndef DEBUG_MAIN
+#ifndef MAIN_TEST
 namespace hfst { namespace implementations
 {
   float tropical_seconds_in_harmonize=0;
@@ -2543,19 +2543,14 @@ namespace hfst { namespace implementations
   }
 }
 
-  
-
-
-
-
-#else
+#else // MAIN_TEST was defined
 #include <cassert>
 #include <cstdlib>
 #include <iostream>
 
 using namespace hfst::implementations;
 
-int main(void) 
+int main(int argc, char * argv[]) 
 {
     std::cout << "Unit tests for " __FILE__ ":";
   TropicalWeightTransducer ofst;
@@ -2563,7 +2558,7 @@ int main(void)
   delete t;
   t = ofst.create_epsilon_transducer();
   delete t;
-    std::cout << std::endl << "ok" << std::endl;
-    return EXIT_SUCCESS;
+  std::cout << std::endl << "ok" << std::endl;
+  return EXIT_SUCCESS;
 }
-#endif
+#endif // MAIN_TEST

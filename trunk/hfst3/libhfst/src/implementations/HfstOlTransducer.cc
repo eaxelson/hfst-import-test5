@@ -13,7 +13,7 @@
 #include <cstring>
 #include "HfstOlTransducer.h"
 
-#ifndef DEBUG_MAIN
+#ifndef MAIN_TEST
 namespace hfst { namespace implementations
 {
   HfstOlInputStream::HfstOlInputStream(bool weighted):
@@ -434,7 +434,7 @@ void HfstOlInputStream::ignore(unsigned int n)
 
 } }
 
-#else
+#else // MAIN_TEST was defined
 #include <cstdlib>
 #include <cassert>
 #include <iostream>
@@ -446,5 +446,4 @@ int main(int argc, char * argv[])
     std::cout << std::endl << "ok" << std::endl;
     return EXIT_SUCCESS;
 }
-#endif
-
+#endif // MAIN_TEST

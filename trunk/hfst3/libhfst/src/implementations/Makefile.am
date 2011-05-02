@@ -93,7 +93,7 @@ if WANT_FOMA
 FOMA_TSTS=FomaTransducer
 endif
 if WANT_HFSTOL
-HFSTOL_TSTS=HfstOlTransducer
+HFSTOL_TSTS=HfstOlTransducer optimized-lookup/transducer optimized-lookup/convert
 endif
 if WANT_OPENFST
 OFST_TSTS=LogWeightTransducer TropicalWeightTransducer
@@ -102,3 +102,78 @@ if WANT_SFST
 SFST_TSTS=SfstTransducer
 endif
 
+LIBHFST_TSTS=HfstTransitionGraph ConvertTransducerFormat \
+		ConvertSfstTransducer ConvertTropicalWeightTransducer \
+		ConvertLogWeightTransducer ConvertFomaTransducer \
+		ConvertOlTransducer \
+		compose_intersect/ComposeIntersectRulePair \
+		compose_intersect/ComposeIntersectLexicon \
+		compose_intersect/ComposeIntersectRule \
+		compose_intersect/ComposeIntersectFst \
+		compose_intersect/ComposeIntersectUtilities \
+		HfstConstantTransducer
+
+check_PROGRAMS=$(FOMA_TSTS) $(HFSTOL_TSTS) $(OFST_TSTS) $(SFST_TSTS) $(LIBHFST_TSTS)
+
+FomaTransducer_SOURCES=FomaTransducer.cc
+FomaTransducer_CXXFLAGS=-DMAIN_TEST
+FomaTransducer_LDADD=../libhfst.la
+HfstOlTransducer_SOURCES=HfstOlTransducer.cc
+HfstOlTransducer_CXXFLAGS=-DMAIN_TEST
+HfstOlTransducer_LDADD=../libhfst.la
+LogWeightTransducer_SOURCES=LogWeightTransducer.cc
+LogWeightTransducer_CXXFLAGS=-DMAIN_TEST
+LogWeightTransducer_LDADD=../libhfst.la
+TropicalWeightTransducer_SOURCES=TropicalWeightTransducer.cc
+TropicalWeightTransducer_CXXFLAGS=-DMAIN_TEST
+TropicalWeightTransducer_LDADD=../libhfst.la
+SfstTransducer_SOURCES=SfstTransducer.cc
+SfstTransducer_CXXFLAGS=-DMAIN_TEST
+SfstTransducer_LDADD=../libhfst.la
+HfstTransitionGraph_SOURCES=HfstTransitionGraph.cc
+HfstTransitionGraph_CXXFLAGS=-DMAIN_TEST
+HfstTransitionGraph_LDADD=../libhfst.la
+ConvertTransducerFormat_SOURCES=ConvertTransducerFormat.cc
+ConvertTransducerFormat_CXXFLAGS=-DMAIN_TEST
+ConvertTransducerFormat_LDADD=../libhfst.la
+ConvertSfstTransducer_SOURCES=ConvertSfstTransducer.cc
+ConvertSfstTransducer_CXXFLAGS=-DMAIN_TEST
+ConvertSfstTransducer_LDADD=../libhfst.la
+ConvertTropicalWeightTransducer_SOURCES=ConvertTropicalWeightTransducer.cc
+ConvertTropicalWeightTransducer_CXXFLAGS=-DMAIN_TEST
+ConvertTropicalWeightTransducer_LDADD=../libhfst.la
+ConvertLogWeightTransducer_SOURCES=ConvertLogWeightTransducer.cc
+ConvertLogWeightTransducer_CXXFLAGS=-DMAIN_TEST
+ConvertLogWeightTransducer_LDADD=../libhfst.la
+ConvertFomaTransducer_SOURCES=ConvertFomaTransducer.cc
+ConvertFomaTransducer_CXXFLAGS=-DMAIN_TEST
+ConvertFomaTransducer_LDADD=../libhfst.la
+ConvertOlTransducer_SOURCES=ConvertOlTransducer.cc
+ConvertOlTransducer_CXXFLAGS=-DMAIN_TEST
+ConvertOlTransducer_LDADD=../libhfst.la
+optimized_lookup_transducer_SOURCES=optimized-lookup/transducer.cc
+optimized_lookup_transducer_CXXFLAGS=-DMAIN_TEST
+optimized_lookup_transducer_LDADD=../libhfst.la
+optimized_lookup_convert_SOURCES=optimized-lookup/convert.cc
+optimized_lookup_convert_CXXFLAGS=-DMAIN_TEST
+optimized_lookup_convert_LDADD=../libhfst.la
+compose_intersect_ComposeIntersectRulePair_SOURCES=compose_intersect/ComposeIntersectRulePair.cc
+compose_intersect_ComposeIntersectRulePair_CXXFLAGS=-DMAIN_TEST
+compose_intersect_ComposeIntersectRulePair_LDADD=../libhfst.la
+compose_intersect_ComposeIntersectLexicon_SOURCES=compose_intersect/ComposeIntersectLexicon.cc
+compose_intersect_ComposeIntersectLexicon_CXXFLAGS=-DMAIN_TEST
+compose_intersect_ComposeIntersectLexicon_LDADD=../libhfst.la
+compose_intersect_ComposeIntersectRule_SOURCES=compose_intersect/ComposeIntersectRule.cc
+compose_intersect_ComposeIntersectRule_CXXFLAGS=-DMAIN_TEST
+compose_intersect_ComposeIntersectRule_LDADD=../libhfst.la
+compose_intersect_ComposeIntersectFst_SOURCES=compose_intersect/ComposeIntersectFst.cc
+compose_intersect_ComposeIntersectFst_CXXFLAGS=-DMAIN_TEST
+compose_intersect_ComposeIntersectFst_LDADD=../libhfst.la
+compose_intersect_ComposeIntersectUtilities_SOURCES=compose_intersect/ComposeIntersectUtilities.cc
+compose_intersect_ComposeIntersectUtilities_CXXFLAGS=-DMAIN_TEST
+compose_intersect_ComposeIntersectUtilities_LDADD=../libhfst.la
+HfstConstantTransducer_SOURCES=HfstConstantTransducer.cc
+HfstConstantTransducer_CXXFLAGS=-DMAIN_TEST
+HfstConstantTransducer_LDADD=../libhfst.la
+
+TESTS=$(FOMA_TSTS) $(HFSTOL_TSTS) $(OFST_TSTS) $(SFST_TSTS)

@@ -1,74 +1,28 @@
 #include "ComposeIntersectUtilities.h"
 
-#ifdef COMPOSE_INTERSECT_UTILITIES_TEST
-#include <iostream>
-#include <cassert>
 #include <set>
-typedef 
-hfst::implementations::compose_intersect_utilities::SpaceSavingMap<int,int> 
-IntSpaceSavingMap;
 
 struct CmpInt
 { bool operator() (int i, int j) const { return i < j; } };
+
 typedef 
 hfst::implementations::compose_intersect_utilities::SpaceSavingSet<int,CmpInt> 
 IntSpaceSavingSet;
 
 template<> CmpInt IntSpaceSavingSet::comparator = CmpInt();
 
-int main(void)
+#ifndef MAIN_TEST
+
+
+#else // MAIN_TEST was defined
+
+#include <iostream>
+#include <cassert>
+
+int main(int argc, char * argv[])
 {
-  IntSpaceSavingMap mmap;
-  assert(mmap.size() == 0);
-  assert(mmap.has_key(0) == false);
-
-  mmap[0] = 1;
-  assert(mmap.size() == 1);
-  assert(mmap.has_key(0) == true);
-  assert(mmap[0] == 1);
-
-  mmap[0] = 1;
-  assert(mmap.size() == 1);
-  assert(mmap.has_key(0) == true);
-  assert(mmap[0] == 1);
-
-  mmap[0] = 2;
-  assert(mmap.size() == 1);
-  assert(mmap.has_key(0) == true);
-  assert(mmap[0] == 2);
-  
-  mmap[1] = 3;
-  assert(mmap.size() == 2);
-  assert(mmap.has_key(0) == true);
-  assert(mmap.has_key(1) == true);
-  assert(mmap[0] == 2);
-  assert(mmap[1] == 3);
-
-  mmap.clear();
-  assert(mmap.size() == 0);
-  assert(mmap.has_key(0) == false);
-  assert(mmap.has_key(1) == false);
-
-  IntSpaceSavingMap::const_iterator it = mmap.begin();
-  assert(it == mmap.end());
-
-  mmap[0] = 1;
-  it = mmap.begin();
-  assert(it != mmap.end());
-  assert((*it).first == 0 and (*it).second == 1);
-  ++it;
-  assert(it == mmap.end());
-
-  mmap[2] = 3;
-  it = mmap.begin();
-  assert(it != mmap.end());
-  assert((*it).first == 0 and (*it).second == 1);
-  ++it;
-  assert(it != mmap.end());
-  assert((*it).first == 2 and (*it).second == 3);
-  ++it;
-  assert(it == mmap.end());
-
+    std::cout << "Unit tests for " __FILE__ ":" << std::endl;
+    
   IntSpaceSavingSet sset;
   assert(sset.size() == 0);
   assert(not sset.has_element(0));
@@ -134,5 +88,8 @@ int main(void)
 
   for (size_t i = 0; i != 100000; ++i)
     { IntSpaceSavingSet * p = new IntSpaceSavingSet(); p->insert(0); p->insert(1);}
+
+  std::cout << "ok" << std::endl;
+  return 0;
 }
-#endif // COMPOSE_INTERSECT_UTILITIES_TEST
+#endif // MAIN_TEST
