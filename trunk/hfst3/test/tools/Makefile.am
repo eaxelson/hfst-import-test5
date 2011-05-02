@@ -116,9 +116,9 @@ FST_PAIRSTRINGS=cat2dog.pairstring
 FST_SPACESTRINGS=cat2dog.spaces
 SUBSTITUTE_TXTS=cat2dog.substitute
 XRE_TXTS=cats_and_dogs.xre cats_and_dogs_semicolon.xre
+#XFST_TXTS=cat-regex.xfst
 ALL_SRCS=$(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) \
-		 $(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TEXTS)
-XFST_TXTS=cat-regex.xfst
+		$(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TEXTS)
 
 # this compilation is uesd by check target before running the tests
 %.hfst: %.txt
