@@ -28,7 +28,7 @@ namespace hfst
 
       float get_final_weight(HfstState) const;
 
-#ifdef TEST_COMPOSE_INTERSECT_RULE_PAIR
+#ifdef MAIN_TEST
       std::ostream &print(std::ostream &);
 #endif
       

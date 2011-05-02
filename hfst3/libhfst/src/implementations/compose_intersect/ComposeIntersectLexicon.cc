@@ -1,5 +1,7 @@
 #include "ComposeIntersectLexicon.h"
 
+#ifndef MAIN_TEST
+
 namespace hfst
 {
   namespace implementations
@@ -183,12 +185,14 @@ namespace hfst
   }
 }
 
-#ifdef TEST_COMPOSE_INTERSECT_LEXICON
+#else // MAIN_TEST was defined
 using namespace hfst;
 using namespace implementations;
 #include <cassert>
-int main(void)
+int main(int argc, char * argv[])
 {
+    std::cout << "Unit tests for " __FILE__ ":" << std::endl;
+    
   HfstTokenizer tokenizer;
   tokenizer.add_multichar_symbol("@D.SomeVar.1@");
   tokenizer.add_multichar_symbol("@R.SomeVar.1@");
@@ -258,5 +262,7 @@ int main(void)
   lex_fst.minimize();
   std::cerr << lex_fst << std::endl;
 
+  std::cout << "ok" << std::endl;
+  return 0;
 }
-#endif
+#endif // MAIN_TEST

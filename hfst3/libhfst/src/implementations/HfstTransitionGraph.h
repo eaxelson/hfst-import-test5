@@ -1700,7 +1700,26 @@ namespace hfst {
             }
           set_final_weight(final_state, weight);
           return *this;
-        }        
+        }
+
+/* 	/\** @brief Determine whether this graph has input-epsilon cycles. */
+/* 	 *\/ */
+/* 	bool has_input_epsilon_cycles(void) */
+/* 	{ */
+/* 	            typedef std::map<HfstState,  */
+/*           std::set<HfstTransition<C> > > */
+/*           HfstStateMap; */
+/*         HfstStateMap state_map; */
+
+/* 	    std::set<HfstState> total_seen; */
+/* 	    for (state_map::iterator it = state_map.begin(); */
+/* 		 it != state_map.end(); ++it) { */
+/* 		if (total_seen.count(*it) != 0) { */
+/* 		    continue; */
+/* 		} */
+		
+/* 	    } */
+/* 	} */
         
         friend class ConversionFunctions;
       };
@@ -1717,5 +1736,3 @@ namespace hfst {
 }
 
 #endif // #ifndef _HFST_TRANSITION_GRAPH_H_
-
-

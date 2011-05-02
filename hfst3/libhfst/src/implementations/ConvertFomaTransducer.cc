@@ -15,11 +15,10 @@
 #endif
 
 #include "ConvertTransducerFormat.h"
-//#include "optimized-lookup/convert.h"
 #include "HfstTransitionGraph.h"
 #include "HfstTransducer.h"
 
-#ifndef DEBUG_MAIN
+#ifndef MAIN_TEST
 namespace hfst { namespace implementations
 {
 
@@ -324,4 +323,17 @@ namespace hfst { namespace implementations
 
 
   }}
-#endif // DEBUG_MAIN
+#else // MAIN_TEST was defined
+
+#include <iostream>
+
+int main(int argc, char * argv[])
+{
+    std::cout << "Unit tests for " __FILE__ ":" << std::endl;
+    
+    std::cout << "ok" << std::endl;
+    return 0;
+}
+
+#endif // MAIN_TEST
+

@@ -8,10 +8,6 @@
 #include "../HfstTransitionGraph.h"
 #include "ComposeIntersectUtilities.h"
 
-#ifdef TEST_COMPOSE_INTERSECT_FST
-#include <iostream>
-#endif
-
 HFST_EXCEPTION_CHILD_DECLARATION(StateNotDefined);
 
 namespace hfst
@@ -50,7 +46,7 @@ namespace hfst
 	get_transitions(HfstState,size_t);
       virtual float get_final_weight(HfstState) const;
       const SymbolSet &get_symbols(void) const;
-#ifdef TEST_COMPOSE_INTERSECT_FST
+#ifdef MAIN_TEST
       std::ostream &print(std::ostream &) const;
 #endif
     protected:

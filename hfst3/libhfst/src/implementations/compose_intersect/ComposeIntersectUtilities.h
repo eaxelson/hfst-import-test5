@@ -5,10 +5,6 @@
 #include <algorithm>
 #include <utility>
 
-#ifdef COMPOSE_INTERSECT_UTILITIES_TEST
-#include <iostream>
-#endif // COMPOSE_INTERSECT_UTILITIES_TEST
-
 namespace hfst
 {
   namespace implementations

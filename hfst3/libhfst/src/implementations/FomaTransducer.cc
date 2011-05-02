@@ -12,7 +12,7 @@
 
 #include "FomaTransducer.h"
 
-#ifndef DEBUG_MAIN
+#ifndef MAIN_TEST
 namespace hfst { namespace implementations {
 
 
@@ -1009,7 +1009,7 @@ static inline int explode_line (char *buf, int *values) {
 
   } }
 
-#else
+#else // MAIN_TEST was defined
 #include <cstdlib>
 #include <cassert>
 #include <iostream>
@@ -1021,4 +1021,4 @@ int main(int argc, char * argv[])
     std::cout << std::endl << "ok" << std::endl;
     return EXIT_SUCCESS;
 }
-#endif
+#endif // MAIN_TEST
