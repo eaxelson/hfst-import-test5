@@ -49,7 +49,7 @@ DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   rule2.hfst summarize_test1.hfst summarize_test2.hfst tac.hfst \
 		   epsilon.hfst epsilon2cat.hfst cat2epsilon.hfst \
 		   unknown-star.hfst identity-star.hfst unknown2a.hfst identity.hfst \
-		   heavycat.hfst abid.hfst
+		   heavycat.hfst abid.hfst unk2unk.hfst
 OL_CHECKS=cat2dog.hfst.ol cat2dog.gen.hfst.ol cat_weight_final.hfst.ol \
 			proc-caps.hfst.ol proc-caps.gen.hfst.ol
 if WANT_SFST
@@ -63,7 +63,7 @@ SFST_CHECKS=0to3cats.hfst.sfst 2to4cats.hfst.sfst 4cats.hfst.sfst\
 			infinitely_ambiguous.hfst.sfst non_minimal.hfst.sfst \
 			rule1.hfst.sfst rule2.hfst.sfst summarize_test1.hfst.sfst \
 			summarize_test2.hfst.sfst tac.hfst.sfst unknown2a.hfst.sfst\
-			identity.hfst.sfst abid.hfst.sfst 
+			identity.hfst.sfst abid.hfst.sfst unk2unk.hfst.sfst 
 endif
 if WANT_OPENFST
 OFST_CHECKS=0to3cats.hfst.ofst \
@@ -77,7 +77,8 @@ OFST_CHECKS=0to3cats.hfst.ofst \
 			non_minimal.hfst.ofst rule1.hfst.ofst rule2.hfst.ofst \
 			summarize_test1.hfst.ofst summarize_test2.hfst.ofst tac.hfst.ofst\
 			unknown2a.hfst.ofst identity.hfst.ofst \
-			heavycat.hfst abid.hfst.ofst
+			heavycat.hfst abid.hfst.ofst unk2unk.hfst.ofst \
+			cat2dog_0.3.hfst.ofst cat2dog_0.5.hfst.ofst empty.hfst.ofst
 endif
 if WANT_FOMA
 FOMA_CHECKS=0to3cats.hfst.foma 2to4cats.hfst.foma 4cats.hfst.foma \
@@ -90,7 +91,7 @@ FOMA_CHECKS=0to3cats.hfst.foma 2to4cats.hfst.foma 4cats.hfst.foma \
 			dog2cat.hfst.foma dog.hfst.foma infinitely_ambiguous.hfst.foma \
 			non_minimal.hfst.foma rule1.hfst.foma rule2.hfst.foma \
 			summarize_test1.hfst.foma summarize_test2.hfst.foma tac.hfst.foma\
-			unknown2a.hfst.foma identity.hfst.foma abid.hfst.foma
+			unknown2a.hfst.foma identity.hfst.foma abid.hfst.foma unk2unk.hfst.foma
 endif
 
 check_DATA=$(DEFAULT_CHECKS) $(SFST_CHECKS) $(OFST_CHECKS) $(FOMA_CHECKS) $(OL_CHECKS)
@@ -105,7 +106,7 @@ FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
 		 non_minimal.txt rule1.txt rule2.txt summarize_test1.txt \
 		 summarize_test2.txt tac.txt proc-caps.txt \
 		 unknown-star.txt identity-star.txt unknown2a.txt identity.txt\
-		 heavycat.txt abid.txt
+		 heavycat.txt abid.txt unk2unk.txt cat2dog_0.3.txt cat2dog_0.5.txt empty.txt
 FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-out1.strings \
 		 proc-caps-out2.strings proc-caps-out3.strings proc-caps-out4.strings \
 		 proc-cat-out.strings proc-cat-weighted-out.strings \

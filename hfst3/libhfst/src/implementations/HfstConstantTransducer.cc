@@ -20,10 +20,17 @@ namespace hfst {
   HfstConstantTransducer::HfstConstantTransducer
   (unsigned int number_of_states)
   {
+    states.reserve(number_of_states);
     for (unsigned int i=0; i < number_of_states; i++) {
       TransitionVector v;
       states.push_back(v);
     }
+  }
+
+  void HfstConstantTransducer::initialize_transition_vector
+  (unsigned int state_number, unsigned int number_of_transitions)
+  {
+    states[state_number].reserve(number_of_transitions);
   }
   
   void HfstConstantTransducer::initialize_symbol_map()

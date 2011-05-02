@@ -585,6 +585,12 @@ namespace hfst {
           return s;
         }
 
+	void initialize_transition_vector
+	  (unsigned int state_number, unsigned int number_of_transitions)
+	{
+	  state_map[state_number].reserve(number_of_transitions);
+	}
+
         /** @brief Add a transition \a transition to state \a s. 
 
             If state \a s does not exist, it is created. */
@@ -1151,8 +1157,39 @@ namespace hfst {
 		    it->second[i] = tr;
 		  }
 		  
-		}
-	    }
+		} // all transitions gone through
+	    } // all states gone through
+	  return;
+	}
+
+	/* A function that performs in-place-substitution in the graph. */
+
+	void substitute_(const StringPair &old_sp, 
+			 const StringPair &new_sp)
+	{
+          // Go through all states
+          for (iterator it = begin(); it != end(); it++)
+            {
+	      // Go through all transitions
+              for (unsigned int i=0; i < it->second.size(); i++)
+                {
+		  HfstTransition<C> &tr_it = it->second[i];
+
+		  if (tr_it.get_input_symbol() == old_sp.first &&
+		      tr_it.get_output_symbol() == old_sp.second)
+		    {
+		      
+		      HfstTransition<C> tr
+			(tr_it.get_target_state(),
+			 new_sp.first,
+			 new_sp.second,
+			 tr_it.get_weight());
+		      
+		      it->second[i] = tr;
+		    }		  
+		} // all transitions gone through
+	    } // all states gone through
+	  return;
 	}
 
 
@@ -1161,6 +1198,10 @@ namespace hfst {
            Substitute all transitions according to substituter \a subs. 
            ------------------------------------------------------------ */
         void substitute(substituter &subs) { 
+
+	  /*std::string message
+	    ("HfstTransitionGraph::substitute(substituter &subs) called");
+	    HFST_THROW_MESSAGE(HfstFatalException, message);*/
 
           // Go through all states
           for (iterator it = begin(); it != end(); it++)
@@ -1314,6 +1355,9 @@ namespace hfst {
         HfstTransitionGraph &substitute
           (const StringPair &sp, const StringPairSet &sps) 
         {
+	  /*std::string msg("HfstTransitionGraph &substitute"
+			  "(const StringPair &sp, const StringPairSet &sps) ");
+			  HFST_THROW_MESSAGE(FunctionNotImplementedException, msg);*/
           substituter subs(sp, sps);
           substitute(subs);
           return *this;
@@ -1325,9 +1369,7 @@ namespace hfst {
           (const StringPair &old_pair, 
            const StringPair &new_pair) 
         {
-          StringPairSet new_pair_set;
-          new_pair_set.insert(new_pair);
-          substitute(old_pair, new_pair_set);
+          substitute_(old_pair, new_pair);
           return *this;
         } 
 
@@ -1343,6 +1385,11 @@ namespace hfst {
           substitute(bool (*func)
                      (const StringPair &sp, StringPairSet &sps) ) 
         { 
+	  /*std::string msg("HfstTransitionGraph &substitute"
+			            "substitute(bool (*func)"
+                     "(const StringPair &sp, StringPairSet &sps) )" );
+		     HFST_THROW_MESSAGE(FunctionNotImplementedException, msg);*/
+
           substituter subs(func);
           substitute(subs);
           return *this;

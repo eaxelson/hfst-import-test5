@@ -1182,7 +1182,7 @@ HfstTransducer &HfstTransducer::reverse()
 
 HfstTransducer &HfstTransducer::input_project()
 { is_trie = false; // This could be done so that is_trie is preserved
-    return apply (
+  return apply (
 #if HAVE_SFST
 	&hfst::implementations::SfstTransducer::extract_input_language,
 #endif
@@ -1194,11 +1194,11 @@ HfstTransducer &HfstTransducer::input_project()
 	&hfst::implementations::FomaTransducer::extract_input_language,
 #endif
 	/* Add here your implementation. */
-	false ); }    
+	false ); }
 
 HfstTransducer &HfstTransducer::output_project()
 { is_trie = false; // This could be done so that is_trie is preserved
-    return apply (
+  return apply (
 #if HAVE_SFST
 	&hfst::implementations::SfstTransducer::extract_output_language,
 #endif
@@ -1211,7 +1211,7 @@ HfstTransducer &HfstTransducer::output_project()
 	&hfst::implementations::FomaTransducer::extract_output_language,
 #endif
 	/* Add here your implementation. */
-	false ); }    
+	false ); }
 
 std::vector<HfstTransducer*> HfstTransducer::extract_path_transducers()
 {
@@ -2383,22 +2383,12 @@ rules = new implementations::ComposeIntersectRulePair
 	implementations::ComposeIntersectLexicon lexicon(*this);
 	hfst::implementations::HfstBasicTransducer res = 
 	    lexicon.compose_with_rules(rules);
-	for (implementations::HfstBasicTransducer::const_iterator it = res.begin();
-	     it != res.end();
-	     ++it)
-	  {
-	    for (implementations::HfstBasicTransducer::HfstTransitions::const_iterator jt = it->second.begin();
-		 jt != it->second.end();
-		 ++jt)
-	      { 
-		assert(jt->get_input_symbol() != "");
-		assert(jt->get_output_symbol() != "");
-	      }
-	  }
+
 	res.prune_alphabet();
-	*this = HfstTransducer(res,type); // FAIL
+	*this = HfstTransducer(res,type);
 	delete rules;
     }
+
     return *this;
 }
 
