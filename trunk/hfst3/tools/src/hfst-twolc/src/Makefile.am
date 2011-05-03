@@ -83,3 +83,7 @@ hfst-twolc$(EXEEXT): hfst-twolc.sh
 hfst-twolc-loc$(EXEEXT): hfst-twolc.sh
 	cat $< | sed -e 's|BINDIR|$(PWD)|' > $@
 	chmod ogu+rx hfst-twolc-loc
+
+clean-local:
+	-rm -f hfst-twolc$(EXEEXT) hfst-twolc-loc$(EXEEXT)
+
