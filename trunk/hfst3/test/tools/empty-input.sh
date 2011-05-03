@@ -1,7 +1,7 @@
 #!/bin/bash
 for f in ../../tools/src/hfst-* ; do
     if [ -x "$f" -a ! -d "$f" ] ; then
-        $f < empty-file > /dev/null 2>&1
+        $f < $srcdir/empty-file > /dev/null 2>&1
         rv=$?
         if [ $rv -eq 139 ] ; then
             echo $f received SEGV on empty input file

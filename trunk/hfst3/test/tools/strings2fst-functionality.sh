@@ -12,14 +12,14 @@ for i in "" .sfst .ofst .foma; do
             FFLAG=;;
     esac
     if test -f cat.hfst$i ; then
-        if ! ../../tools/src/hfst-strings2fst $FFLAG cat.strings > test.hfst ; then
+        if ! ../../tools/src/hfst-strings2fst $FFLAG $srcdir/cat.strings > test.hfst ; then
             exit 1
         fi
         if ! ../../tools/src/hfst-compare test.hfst cat.hfst$i ; then
             exit 1
         fi
         rm test.hfst
-        if ! ../../tools/src/hfst-strings2fst $FFLAG -S c_a_t.strings > test.hfst ; then
+        if ! ../../tools/src/hfst-strings2fst $FFLAG -S $srcdir/c_a_t.strings > test.hfst ; then
             exit 1
         fi
         if ! ../../tools/src/hfst-compare test.hfst cat.hfst$i ; then
@@ -28,7 +28,7 @@ for i in "" .sfst .ofst .foma; do
         rm test.hfst
     fi
     if test -f heavycat.hfst$i ; then
-        if ! ../../tools/src/hfst-strings2fst $FFLAG heavycat.strings > test.hfst ; then
+        if ! ../../tools/src/hfst-strings2fst $FFLAG $srcdir/heavycat.strings > test.hfst ; then
             exit 1
         fi
         if ! ../../tools/src/hfst-compare test.hfst heavycat.hfst$i ; then
@@ -37,25 +37,25 @@ for i in "" .sfst .ofst .foma; do
         rm test.hfst
     fi
     if test -f cat2dog.hfst$i ; then
-        if ! ../../tools/src/hfst-strings2fst $FFLAG < cat2dog.strings > test.hfst ; then
+        if ! ../../tools/src/hfst-strings2fst $FFLAG $srcdir/cat2dog.strings > test.hfst ; then
             exit 1
         fi
         if ! ../../tools/src/hfst-compare test.hfst cat2dog.hfst$i > /dev/null 1>&1 ; then
             exit 1
         fi
-        if ! ../../tools/src/hfst-strings2fst $FFLAG -S < cat2dog.spaces > test.hfst ; then
+        if ! ../../tools/src/hfst-strings2fst $FFLAG -S $srcdir/cat2dog.spaces > test.hfst ; then
             exit 1
         fi
         if ! ../../tools/src/hfst-compare test.hfst cat2dog.hfst$i > /dev/null 1>&1 ; then
             exit 1
         fi
-        if ! ../../tools/src/hfst-strings2fst $FFLAG -p -S < cat2dog.pairs > test.hfst ; then
+        if ! ../../tools/src/hfst-strings2fst $FFLAG -p -S $srcdir/cat2dog.pairs > test.hfst ; then
             exit 1
         fi
         if ! ../../tools/src/hfst-compare test.hfst cat2dog.hfst$i > /dev/null 1>&1 ; then
             exit 1
         fi
-        if ! ../../tools/src/hfst-strings2fst $FFLAG -p < cat2dog.pairstring > test.hfst ; then
+        if ! ../../tools/src/hfst-strings2fst $FFLAG -p $srcdir/cat2dog.pairstring > test.hfst ; then
             exit 1
         fi
         if ! ../../tools/src/hfst-compare test.hfst cat2dog.hfst$i > /dev/null 1>&1 ; then
