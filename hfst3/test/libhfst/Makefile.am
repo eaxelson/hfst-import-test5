@@ -26,3 +26,6 @@ test_examples
 
 # files needed for test programs
 EXTRA_DIST= foobar.att test_transducers.att
+
+clean-local:
+	-rm -f *.att *.hfst
