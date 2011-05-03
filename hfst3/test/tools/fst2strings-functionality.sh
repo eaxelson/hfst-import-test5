@@ -1,11 +1,11 @@
 #!/bin/sh
 for i in "" .sfst .ofst .foma; do
     if test -f cat.hfst$i ; then
-        if ! ../../tools/src/hfst-fst2strings < cat.hfst$i > test.strings ; then
+        if ! ../../tools/src/hfst-fst2strings cat.hfst$i > test.strings ; then
             echo turning cat.hfst$i to strings failed
             exit 1
         fi
-        if ! diff test.strings cat.strings > /dev/null 2>&1 ; then
+        if ! diff test.strings $srcdir/cat.strings > /dev/null 2>&1 ; then
             echo cat.hfst$i strings differ from expected
             exit 1
         fi

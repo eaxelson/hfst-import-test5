@@ -1,5 +1,5 @@
 #!/bin/sh
-../../tools/src/hfst-strings2fst < latin-1.strings > test.hfst
+../../tools/src/hfst-strings2fst $srcdir/latin-1.strings > test.hfst
 RV=$?
 if test $RV -eq 0 ; then
     echo Latin-1 input incorrectly allowed

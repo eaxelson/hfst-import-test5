@@ -111,12 +111,28 @@ FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-out1.strings \
 		 proc-caps-out2.strings proc-caps-out3.strings proc-caps-out4.strings \
 		 proc-cat-out.strings proc-cat-weighted-out.strings \
 		 utf-8.strings latin-1.strings \
-		 cat2dog.strings
+		 cat2dog.strings heavycat.strings
 FST_PAIRS=cat2dog.pairs
 FST_PAIRSTRINGS=cat2dog.pairstring
 FST_SPACESTRINGS=cat2dog.spaces
 SUBSTITUTE_TXTS=cat2dog.substitute
 XRE_TXTS=cats_and_dogs.xre cats_and_dogs_semicolon.xre
+LEXC_TXTS=basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc \
+		  basic.empty-sides.lexc basic.end.lexc basic.escapes.lexc \
+		  basic.infostrings.lexc basic.initial-lexicon-empty.lexc \
+		  basic.multichar-symbols.lexc basic.multichar-symbol-with-0.lexc \
+		  basic.multi-entry-lines.lexc basic.multi-file-1.lexc \
+		  basic.multi-file-2.lexc basic.multi-file-3.lexc \
+		  basic.no-newline-at-end.lexc basic.no-Root.lexc \
+		  basic.punctuation.lexc basic.root-loop.lexc \
+		  basic.spurious-lexicon.lexc basic.string-pairs.lexc \
+		  basic.two-lexicons.lexc basic.UTF-8.lexc basic.zeros-epsilons.lexc \
+		  cat.lexc hfst.weights.lexc stress.random-lexicons-100.lexc \
+		  xfail.bogus.lexc xfail.ISO-8859-1.lexc xfail.lexicon-semicolon.lexc \
+		  xre.any-variations.lexc xre.at-file.lexc \
+		  xre.automatic-multichar-symbols.lexc xre.basic.lexc \
+		  xre.definitions.lexc xre.months.lexc xre.nested-definitions.lexc \
+		  xre.numeric-star.lexc xre.sharp.lexc xre.star-plus-optional.lexc
 #XFST_TXTS=cat-regex.xfst
 ALL_SRCS=$(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) \
 		$(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TEXTS)
@@ -143,7 +159,7 @@ ALL_SRCS=$(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) \
 EXTRA_FILES=cat2dog.substitute cat.strings cat.txt cats_and_dogs.xre utf-8.strings latin-1.strings c_a_t.strings cat.lexc
 
 # files needed for test programs
-EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) $(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TXTS) $(XFST_TXTS) $(TESTS) $(EXTRA_FILES)
+EXTRA_DIST=empty-file $(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) $(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TXTS) $(XFST_TXTS) $(TESTS) $(EXTRA_FILES) $(LEXC_TXTS)
 
 clean-local:
 	-rm -f $(check_DATA)
