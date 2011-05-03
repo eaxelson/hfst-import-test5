@@ -689,29 +689,6 @@ namespace hfst { namespace implementations {
   Transducer * SfstTransducer::extract_input_language(Transducer * t)
   { t->complete_alphabet();
 
-    /*
-    fprintf(stderr, "The alphabet contains now:\n");
-    SFST::Alphabet::CharMap cm_ = t->alphabet.get_char_map();
-    for (SFST::Alphabet::CharMap::const_iterator it 
-           = cm_.begin(); it != cm_.end(); it++) {
-      fprintf(stderr, "number %i string %s\n",
-	      it->first, it->second);
-    }
-    fprintf(stderr, " and the pairs:\n");
-
-    for (SFST::Alphabet::const_iterator it = t->alphabet.begin();
-	 it != t->alphabet.end(); it++)
-      {
-	fprintf(stderr, "%i:%i\n", it->lower_char(),
-		it->upper_char());
-      }
-    fprintf(stderr, "\n");
-    */
-
-    //Label l1(1,1);
-    //Label l2(2,2);
-    //t->alphabet.insert(l1);
-    //t->alphabet.insert(l2);
     Transducer * retval = &t->lower_level();
 
     // projection includes in the alphabet only symbols that
@@ -720,61 +697,35 @@ namespace hfst { namespace implementations {
     SFST::Alphabet::CharMap _cm = t->alphabet.get_char_map();
     for (SFST::Alphabet::CharMap::const_iterator it 
            = _cm.begin(); it != _cm.end(); it++) {
-      //fprintf(stderr, "adding symbol %s at number %i\n",
-      //	      it->second, it->first);
       retval->alphabet.add_symbol(it->second, it->first);
-      }
+    }
 
     // unknowns must be replaced with identities
     Transducer * tmp = retval;
     retval = substitute(retval, "@_UNKNOWN_SYMBOL_@", "@_IDENTITY_SYMBOL_@");
     delete tmp;
 
-    //retval->alphabet.add_symbol("@_UNKNOWN_SYMBOL_@", 1);
-    //retval->alphabet.add_symbol("@_IDENTITY_SYMBOL_@", 2);
-
-    /*
-    fprintf(stderr, "The alphabet contains now:\n");
-    SFST::Alphabet::CharMap cm__ = retval->alphabet.get_char_map();
-    for (SFST::Alphabet::CharMap::const_iterator it 
-           = cm__.begin(); it != cm__.end(); it++) {
-      fprintf(stderr, "number %i string %s\n",
-	      it->first, it->second);
-    }
-    fprintf(stderr, " and the pairs:\n");
-
-    for (SFST::Alphabet::const_iterator it = retval->alphabet.begin();
-	 it != retval->alphabet.end(); it++)
-      {
-	fprintf(stderr, "%i:%i\n", it->lower_char(),
-		it->upper_char());
-      }
-    fprintf(stderr, "\n");
-    */
-
-    //retval->alphabet.clear_char_pairs(); // we want to get rid of (1,1) and (2,2)
     return retval; }
   
   Transducer * SfstTransducer::extract_output_language(Transducer * t)
   { t->complete_alphabet();
-    //Label l1(1,1);
-    //Label l2(2,2);
-    //t->alphabet.insert(l1);
-    //t->alphabet.insert(l2);
-    Transducer * retval = &t->upper_level(); 
-    // unknowns must be replaced with identities
-    //Transducer * tmp = retval;
-    //retval = substitute(retval, "@_UNKNOWN_SYMBOL_@", "@_IDENTITY_SYMBOL_@");
-    //delete tmp;
+
+    Transducer * retval = &t->upper_level();
+
     // projection includes in the alphabet only symbols that
     // occur in the output side, which we do not want
-    SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
+
+    SFST::Alphabet::CharMap _cm = t->alphabet.get_char_map();
     for (SFST::Alphabet::CharMap::const_iterator it 
-           = cm.begin(); it != cm.end(); it++) {
-      if (it->first != 0 && it->first != 1 && it->first != 2)
-	retval->alphabet.add_symbol(it->second);
+           = _cm.begin(); it != _cm.end(); it++) {
+      retval->alphabet.add_symbol(it->second, it->first);
     }
-    //retval->alphabet.clear_char_pairs(); 
+
+    // unknowns must be replaced with identities
+    Transducer * tmp = retval;
+    retval = substitute(retval, "@_UNKNOWN_SYMBOL_@", "@_IDENTITY_SYMBOL_@");
+    delete tmp;
+
     return retval; }
 
   std::pair<Transducer*, Transducer*> SfstTransducer::harmonize 
@@ -783,22 +734,15 @@ namespace hfst { namespace implementations {
   std::vector<Transducer*> SfstTransducer::extract_path_transducers
   (Transducer *t)
   { vector<Transducer*> paths;
-    //fprintf(stderr, "enumerating paths from transducer:\n");
-    //std::cerr << *t;
+
     t->enumerate_paths(paths);
-    //fprintf(stderr, "paths enumerated\n");
+
     // paths contains vectors whose alphabet does not have special symbols
     Transducer *foo = define_transducer("@_EPSILON_SYMBOL_@");
     for (unsigned int i=0; i<(unsigned int)paths.size(); i++) {
       (paths[i])->alphabet.copy(t->alphabet);
-      //fprintf(stderr, "harmonizing transducer\n");
-      //std::cerr << *paths[i];  // prints symbol "\3"
-      //fprintf(stderr, "according to transducer\n");
-      //std::cerr << *foo;
       std::pair<Transducer*,Transducer*> harm = harmonize(paths[i],foo,false);
-      //delete paths[i];
       paths[i] = harm.first;
-      //delete harm.second;
     }
     delete foo;
     return paths;
@@ -807,34 +751,14 @@ namespace hfst { namespace implementations {
   static bool extract_paths
   (Transducer * t, Node *node,
    Node2Int &all_visitations, Node2Int &path_visitations,
-   /*vector<char>& lbuffer, int lpos, std::vector<char>& ubuffer, int upos,*/
    hfst::ExtractStringsCb& callback, int cycles,
    std::vector<hfst::FdState<Character> >* fd_state_stack, bool filter_fd,
-   /*bool include_spv*/ StringPairVector &spv)
+   StringPairVector &spv)
   {
     if(cycles >= 0 && path_visitations[node] > cycles)
       return true;
     all_visitations[node]++;
     path_visitations[node]++;
-
-    /*    
-    if(lpos > 0 && upos > 0) {
-      lbuffer[lpos] = 0;
-      ubuffer[upos] = 0;
-      bool final = node->is_final();
-      hfst::WeightedPath<float> path(&lbuffer[0],&ubuffer[0],0);
-      if (include_spv) {
-        path.spv = spv;
-        path.is_spv_in_use = true;
-      }
-      hfst::ExtractStringsCb::RetVal ret = callback(path, final);
-      if(!ret.continueSearch || !ret.continuePath)
-      {
-        path_visitations[node]--;
-        return ret.continueSearch;
-      }
-    }
-    */
 
     if (spv.size() != 0)
       {
@@ -880,37 +804,7 @@ namespace hfst { namespace implementations {
           }
         }
       }
-      
-      /*
-      int lp=lpos;
-      int up=upos;
-      
-      Character lc=l.lower_char();
-      Character uc=l.upper_char();
-      if (lc != Label::epsilon && 
-          (!filter_fd || fd_state_stack->back().get_table().get_operation(lc)
-           ==NULL))
-      {
-        const char* c = t->alphabet.write_char(lc);
-        size_t clen = strlen(c);
-        if(lpos+clen >= lbuffer.size())
-          lbuffer.resize(lbuffer.size()*2, 0);
-        strcpy(&lbuffer[lpos], c);
-        lp += clen;
-      }
-      if (uc != Label::epsilon && 
-          (!filter_fd || fd_state_stack->back().get_table().get_operation(uc)
-           ==NULL))
-      {
-        const char* c = t->alphabet.write_char(uc);
-        size_t clen = strlen(c);
-        if(upos+clen > ubuffer.size())
-          ubuffer.resize(ubuffer.size()*2, 0);
-        strcpy(&ubuffer[upos], c);
-        up += clen;
-      }
-      */
-      
+            
       /* Handle spv here. Special symbols (flags, epsilons) are always 
          inserted. */
       Character lc=l.lower_char();
@@ -935,8 +829,8 @@ namespace hfst { namespace implementations {
     
       res = extract_paths(t, arc[i]->target_node(), all_visitations, 
                             path_visitations,
-                            /*lbuffer, lp, ubuffer, up,*/ callback, cycles, 
-                            fd_state_stack, filter_fd, /*include_spv*/ spv);
+                            callback, cycles, 
+                            fd_state_stack, filter_fd, spv);
       spv.pop_back();
       
       if(added_fd_state)
@@ -951,13 +845,11 @@ namespace hfst { namespace implementations {
   
     void SfstTransducer::extract_paths
     (Transducer * t, hfst::ExtractStringsCb& callback, int cycles, 
-     FdTable<SFST::Character>* fd, bool filter_fd /*bool include_spv*/)
+     FdTable<SFST::Character>* fd, bool filter_fd)
     {
     if(!t->root_node())
       return;
     
-    //vector<char> lbuffer(BUFFER_START_SIZE, 0);
-    //vector<char> ubuffer(BUFFER_START_SIZE, 0);
     Node2Int all_visitations;
     Node2Int path_visitations;
     vector<hfst::FdState<Character> >* fd_state_stack = 
@@ -967,10 +859,9 @@ namespace hfst { namespace implementations {
     
     StringPairVector spv;
     hfst::implementations::extract_paths
-      (t, t->root_node(), all_visitations, path_visitations, /*lbuffer, 0, 
-                                                               ubuffer, 0,*/
+      (t, t->root_node(), all_visitations, path_visitations,
        callback, cycles, fd_state_stack, filter_fd, 
-       /*include_spv,*/ spv);
+       spv);
   }
 
   /* Get a random path from transducer \a t. */
