@@ -2088,7 +2088,7 @@ namespace hfst { namespace implementations
 
     // Remove weights from t2, is this really needed?
     StdVectorFst *t2_ = copy(t2);
-#ifdef FOO
+#ifndef FOO
     for (fst::StateIterator<StdVectorFst> siter(*t2_); 
          not siter.Done(); siter.Next())
       {
