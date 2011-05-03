@@ -7,3 +7,4 @@ if test $RV -eq 0 ; then
 elif test $RV -gt 8 ; then
     exit 1
 fi
+rm test.hfst
