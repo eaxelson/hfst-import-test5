@@ -18,4 +18,5 @@
 if CAN_FOMAWRAP
 bin_SCRIPTS = hfst-foma-wrapper.sh hfst-xfst hfst-lexc
 EXTRA_DIST=hfst-lexc hfst-xfst
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=hfst-foma-wrapper.sh hfst-xfst hfst-lexc
 endif
