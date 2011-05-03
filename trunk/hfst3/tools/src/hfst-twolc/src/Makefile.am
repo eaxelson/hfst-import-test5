@@ -12,6 +12,11 @@ CL_SRC=$(srcdir)/commandline_src
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
 
+# the preprocessor scripts do not support options per se, so we whitelist
+# them here
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=htwolcpre1 htwolcpre2 htwolcpre3 \
+								   hfst-twolc hfst-twolc-loc
+
 htwolcpre1_SOURCES=htwolcpre1.yy scanner1.ll HfstTwolcDefs.h \
 		   $(CL_SRC)/CommandLine.h $(CL_SRC)/CommandLine.cc \
 	           $(IO_SRC)/input_defs.h grammar_defs.h \
