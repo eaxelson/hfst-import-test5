@@ -30,8 +30,9 @@ for i in "" .sfst .ofst .foma; do
 	exit 1;
     fi
     # test that there are no unknowns in projection
-    if ../../tools/src/hfst-fst2txt concatenation.input.hfst$i | grep -q "@_UNKNOWN_SYMBOL_@" ; then
+    if ../../tools/src/hfst-fst2txt concatenation.input.hfst | grep -q "@_UNKNOWN_SYMBOL_@" ; then
 	echo "FAIL: Unknowns in input projection (should be identities)" $i;
 	exit 1
     fi
+    rm concatenation.hfst concatenation.input.hfst
 done
