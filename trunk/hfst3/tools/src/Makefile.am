@@ -170,7 +170,8 @@ bin_PROGRAMS= \
 			 $(MAYBE_XFST_COMPILER) $(MAYBE_FORMAT)                     \
 			 $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME) $(MAYBE_PAIR_TEST)
 
-bin_SCRIPTS=$(MAYBE_ALIASES)
+# FIXME: ln'd aliases drag .libs in install but not uninstall
+#bin_SCRIPTS=$(MAYBE_ALIASES)
 
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc
 # sort alphabetically
@@ -193,7 +194,8 @@ hfst_lexc2fst_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC) \
 					  parsers/LexcCompiler.cc parsers/lexc-parser.yy \
 					  parsers/lexc-lexer.ll parsers/lexc-utils.cc \
 					  parsers/XreCompiler.cc parsers/xre_parse.yy \
-					  parsers/xre_lex.ll parsers/xre_utils.cc
+					  parsers/xre_lex.ll parsers/xre_utils.cc \
+					  parsers/LexcCompiler.h parsers/lexc-utils.h
 hfst_lexc2fst_BUILT=parsers/lexc-parser.h parsers/xre_parse.h
 hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC) \
 HfstStrings2FstTokenizer.cc HfstLookupFlagDiacritics.cc
@@ -272,4 +274,3 @@ hfst_calculate_CXXFLAGS= -Wall -Wno-error
 ## YACC and FLEX with autotools argh
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c 
-
