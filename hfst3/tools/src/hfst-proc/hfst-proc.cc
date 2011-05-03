@@ -87,9 +87,11 @@ void stream_error(std::string e) {stream_error(e.c_str());}
 
 bool print_usage(void)
 {
-  std::cerr <<
+  std::cout <<
     "\n" <<
-    "Usage: " << PACKAGE_NAME << " [-a [-p|-C|-x] [-k]|-g|-n|-d|-t] [-W] [-n N] [-c|-w] [-z] [-v|-q|] transducer_file [input_file [output_file]]\n" <<
+    "Usage: hfst-proc " <<
+    "[-a [-p|-C|-x] [-k]|-g|-n|-d|-t] [-W] [-n N] [-c|-w] [-z] [-v|-q|]\n" <<
+    "    transducer_file [input_file [output_file]]\n" <<
     "Perform a transducer lookup on a text stream, tokenizing on the fly\n" <<
     "\n" <<
     "  -a, --analysis          Morphological analysis (default)\n" <<
@@ -123,9 +125,10 @@ bool print_usage(void)
 
 bool print_version(void)
 {
-  std::cerr <<
+  std::cout <<
     "\n" <<
-    PACKAGE_STRING << std::endl <<
+    "hfst-proc 0.0 (" << 
+    PACKAGE_STRING << ")" << std::endl <<
     __DATE__ << " " __TIME__ << std::endl <<
     "copyright (C) 2009 University of Helsinki\n";
   return true;
