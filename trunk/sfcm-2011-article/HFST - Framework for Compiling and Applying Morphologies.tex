@@ -768,14 +768,20 @@ compaction is in any case computationally infeasible, and consequently some appr
 producing a ``good enough'' compaction have been attempted.
 
 For the purposes of this article, the task of compacting the index table may
-be summarized as the following. Given $N$ arrays $s$ of length $L$, the
-entries of which are $0$ or $1$, calculate a list of starting indexes
-$I_1, I_2 \ldots I_N$ such that a result array with cells
+be summarized as the following. Given $N$ arrays (one for each state) $s$ of
+length $L$ (the size of the alphabet), the
+entries of which are $0$ (representing an unused entry) or $1$ (representing a
+used entry), calculate a list of starting indexes $I_1, I_2 \ldots I_N$ such
+that a result array with entries
 \begin{equation}
 R_i = \displaystyle\sum\limits_{p, q} s_p(q) [I_p + q = i]
 \end{equation} will also have
-entries $0$ or $1$. An optimally compacted index table corresponds to the
-shortest result array $R$.
+entries $0$ or $1$. $[$ and $]$ are Iverson brackets; the value of the bracketed
+expression is $1$ if the condition is true and $0$ if it is false. This
+array will contain all $N$ arrays superimposed on each other in such a way
+that each entry in the result array is used by no more than one of the original
+arrays. An optimally compacted index table corresponds to the shortest result
+array $R$.
 
 A simple strategy is to iterate through the arrays in some order, assigning
 the lowest possible starting index to each one. For transducers of an
