@@ -89,6 +89,10 @@ int main(int argc, char * argv[])
   for (size_t i = 0; i != 100000; ++i)
     { IntSpaceSavingSet * p = new IntSpaceSavingSet(); p->insert(0); p->insert(1);}
 
+  sset.clear();
+  sset.insert(2);
+  assert(not sset.has_element(1));
+
   std::cout << "ok" << std::endl;
   return 0;
 }
