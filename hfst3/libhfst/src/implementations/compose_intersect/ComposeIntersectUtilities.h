@@ -51,6 +51,11 @@ namespace hfst
 	    const_iterator least_upper_bound = get_least_upper_bound(x);
 	    if (least_upper_bound == end())
 	      { return end(); }
+
+	    const X &new_x = *least_upper_bound;
+	    if (new_x != x)
+	      { return end(); }
+
 	    return least_upper_bound;
 	  }
 
