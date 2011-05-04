@@ -291,8 +291,8 @@ unsigned int hfst_ol_to_hfst_basic_add_state
     // For determining the index table we first sort the states (excepting
     // the starting state) by number of different input symbols.
     if (state_placeholders.begin() != state_placeholders.end()) {
-	sort(state_placeholders.begin() + 1, state_placeholders.end(),
-	     hfst_ol::compare_states_by_input_size);
+	std::sort(state_placeholders.begin() + 1, state_placeholders.end(),
+		  hfst_ol::compare_states_by_input_size);
     }
 
     hfst_ol::IndexPlaceholders * used_indices =
@@ -381,8 +381,8 @@ unsigned int hfst_ol_to_hfst_basic_add_state
     // Now resort by state number for the rest
     // (this could definitely be neater...)
     if (state_placeholders.begin() != state_placeholders.end()) {
-	sort(state_placeholders.begin() + 1, state_placeholders.end(),
-	     hfst_ol::compare_states_by_state_number);
+	std::sort(state_placeholders.begin() + 1, state_placeholders.end(),
+		  hfst_ol::compare_states_by_state_number);
     }
 
     // Now for each index entry we write its input symbol and target
