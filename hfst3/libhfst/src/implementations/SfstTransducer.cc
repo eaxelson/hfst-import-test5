@@ -1287,9 +1287,36 @@ namespace hfst { namespace implementations {
 using namespace hfst::implementations;
 #include <iostream>
 
+bool does_sfst_alphabet_contain(SFST::Transducer *t, const char *str)
+{
+  SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
+  for (SFST::Alphabet::CharMap::const_iterator it = cm.begin(); 
+       it != cm.end(); it++) {
+    if (strcmp(str, it->second) == 0) {
+      return true; }
+  } 
+  return false;
+}
+
 int main(int argc, char * argv[]) 
 {
     std::cout << "Unit tests for " __FILE__ ":";
+
+    // Test alphabet pruning
+    Transducer * t = SfstTransducer::define_transducer("a", "b");
+
+    Transducer * t_input = SfstTransducer::extract_input_language(t);
+    assert( does_sfst_alphabet_contain(t_input, "a") && 
+	    does_sfst_alphabet_contain(t_input, "b")  );
+
+    Transducer * t_output = SfstTransducer::extract_output_language(t);
+    assert( does_sfst_alphabet_contain(t_output, "a") && 
+	    does_sfst_alphabet_contain(t_output, "b")  );
+
+    Transducer * t_min = SfstTransducer::minimize(t_input);
+    assert( does_sfst_alphabet_contain(t_min, "a") && 
+	    does_sfst_alphabet_contain(t_min, "b")  );
+
     std::cout << std::endl << "ok" << std::endl;
     return EXIT_SUCCESS;
 }
