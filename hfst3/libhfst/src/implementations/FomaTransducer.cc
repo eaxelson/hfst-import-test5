@@ -723,6 +723,11 @@ namespace hfst { namespace implementations {
         break;
       alpha.insert(std::string(p->symbol));
     }
+    // it seems that the specail symbols are not always included, but foma
+    // is still aware of them..
+    alpha.insert(internal_epsilon);
+    alpha.insert(internal_unknown);
+    alpha.insert(internal_identity);
     return alpha;
   }
 

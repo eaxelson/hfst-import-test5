@@ -3074,10 +3074,39 @@ void HfstTransducer::print_alphabet()
 
 #include <iostream>
 
+
+
 int main(int argc, char * argv[])
 {
+  using namespace hfst;
+
     std::cout << "Unit tests for " __FILE__ ":" << std::endl;
     
+    ImplementationType types[] = {SFST_TYPE, TROPICAL_OPENFST_TYPE,
+				  FOMA_TYPE};
+    unsigned int NUMBER_OF_TYPES=3;
+
+    for (unsigned int i=0; i < NUMBER_OF_TYPES; i++) 
+      {
+	
+	// Test alphabet after substitute 
+	
+	HfstTransducer t("a", "b", types[i]); 
+	t.substitute("a", "c");
+	StringSet alpha = t.get_alphabet();
+	assert(alpha.find("b") != alpha.end());
+	assert(alpha.find("c") != alpha.end());
+	//assert(alpha.find("a") != alpha.end()); // FIXME: which is correct?
+	
+	HfstTransducer t1("a", "b", types[i]);
+	HfstTransducer t2("a", "c", types[i]);
+	t1.substitute(StringPair("a", "b"), t2);
+	alpha = t1.get_alphabet();
+	assert(alpha.find("a") != alpha.end());
+	assert(alpha.find("c") != alpha.end());
+	assert(alpha.find("b") != alpha.end());
+      }
+
     std::cout << "ok" << std::endl;
     return 0;
 }
