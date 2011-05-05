@@ -1317,6 +1317,17 @@ int main(int argc, char * argv[])
     assert( does_sfst_alphabet_contain(t_min, "a") && 
 	    does_sfst_alphabet_contain(t_min, "b")  );
 
+    Transducer * t_eps_free = SfstTransducer::remove_epsilons(t_output);
+    assert( does_sfst_alphabet_contain(t_eps_free, "a") && 
+	    does_sfst_alphabet_contain(t_eps_free, "b")  );
+
+    Transducer * t_subst = SfstTransducer::substitute(t, "a", "c");
+    assert( does_sfst_alphabet_contain(t_subst, "a") && 
+	    does_sfst_alphabet_contain(t_subst, "b")  && 
+	    does_sfst_alphabet_contain(t_subst, "c") );
+
+    
+
     std::cout << std::endl << "ok" << std::endl;
     return EXIT_SUCCESS;
 }

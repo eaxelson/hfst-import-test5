@@ -43,6 +43,31 @@ using namespace hfst;
 using hfst::implementations::HfstBasicTransition;
 using hfst::implementations::HfstBasicTransducer;
 
+/* Used by the tests. */
+bool compare_alphabets(const HfstTransducer &t1, const HfstTransducer &t2)
+{
+  StringSet alpha1 = t1.get_alphabet();
+  StringSet alpha2 = t2.get_alphabet();
+  bool retval = (alpha1 == alpha2);
+
+  // DEBUG
+  if (not retval)
+    {
+      for (StringSet::const_iterator it = alpha1.begin(); 
+	   it != alpha1.end(); it++) {
+	std::cerr << *it << std::endl;
+      }
+      std::cerr << "--" << std::endl;
+      for (StringSet::const_iterator it = alpha2.begin(); 
+	   it != alpha1.end(); it++) {
+	std::cerr << *it << std::endl;
+      }
+      std::cerr << "----" << std::endl;
+    }
+  
+  return retval;
+}
+
 /* Used by function 'do_hfst_lookup_paths_contain'. */
 bool compare_string_vectors(const StringVector &v1, const StringVector &v2,
 			    bool test_strings=false)
@@ -268,8 +293,10 @@ int main(int argc, char **argv)
 	for (unsigned int j=0; j<=TYPES_SIZE; j++)
 	  {
 	    t1.convert(types[(i+j)%TYPES_SIZE]);
+	    assert(compare_alphabets(t1, t2));
 	  }
 	assert(t1.compare(t2));
+	assert(compare_alphabets(t1, t2));
       }
 
 

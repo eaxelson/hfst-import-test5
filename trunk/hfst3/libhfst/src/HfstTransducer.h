@@ -323,9 +323,11 @@ An example:
        Get all symbol pairs that occur in the transitions of the transducer. */
     StringPairSet get_symbol_pairs();
 
-    /* Get the alphabet of the transducer. */
+  public:
+    /** \brief Get the alphabet of the transducer. */
     StringSet get_alphabet() const;
 
+  protected:
     /* Explicitely insert \a symbol to the alphabet of the transducer. */
     void insert_to_alphabet(const std::string &symbol); 
 
