@@ -318,9 +318,9 @@ namespace hfst
       type = r->get_type();
 
     if (l == NULL)
-      l = new HfstTransducer("@_EPSILON_SYMBOL_@",type);
+      l = new HfstTransducer(internal_epsilon,type);
     if (r == NULL)
-      r = new HfstTransducer("@_EPSILON_SYMBOL_@",type);
+      r = new HfstTransducer(internal_epsilon,type);
     
     Contexts *c=new Contexts();
     c->left = l;
@@ -511,9 +511,9 @@ namespace hfst
     }
 
     if (lc == NULL)
-      lc = new HfstTransducer("@_EPSILON_SYMBOL_@", implementation_type);
+      lc = new HfstTransducer(internal_epsilon, implementation_type);
     if (rc == NULL)
-      rc = new HfstTransducer("@_EPSILON_SYMBOL_@", implementation_type);
+      rc = new HfstTransducer(internal_epsilon, implementation_type);
 
     HfstTransducerPair tr_pair(*(lc), *(rc));
 
@@ -794,8 +794,8 @@ namespace hfst
     tr->minimize();
 
     TheAlphabet.clear_pairs();
-    TheAlphabet.add("@_UNKNOWN_SYMBOL_@", 1);
-    TheAlphabet.add("@_IDENTITY_SYMBOL_@", 2);
+    TheAlphabet.add(internal_unknown.c_str(), 1);
+    TheAlphabet.add(internal_identity.c_str(), 2);
 
     // no effect on performance in OMorFi, but in Morphisto?
     if (false || tr->type == SFST_TYPE)

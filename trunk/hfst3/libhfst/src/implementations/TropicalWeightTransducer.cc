@@ -1040,9 +1040,9 @@ namespace hfst { namespace implementations
   fst::SymbolTable TropicalWeightTransducer::create_symbol_table
   (std::string name) {
     fst::SymbolTable st(name);
-    st.AddSymbol("@_EPSILON_SYMBOL_@", 0);
-    st.AddSymbol("@_UNKNOWN_SYMBOL_@", 1);
-    st.AddSymbol("@_IDENTITY_SYMBOL_@", 2);
+    st.AddSymbol(internal_epsilon, 0);
+    st.AddSymbol(internal_unknown, 1);
+    st.AddSymbol(internal_identity, 2);
     return st;
   }
   
@@ -2308,34 +2308,6 @@ namespace hfst { namespace implementations
           }
         }
       }
-
-      /*
-      int lp=lpos;
-      int up=upos;
-      
-      if ((!filter_fd || 
-           fd_state_stack->back().get_table().get_operation(arc.ilabel)==NULL))
-      {
-        std::string str = t->InputSymbols()->Find(arc.ilabel);
-        if(str.compare("@_EPSILON_SYMBOL_@") != 0) {
-          if(lpos+str.length() >= lbuffer.size())
-            lbuffer.resize(lbuffer.size()*2, 0);
-          strcpy(&lbuffer[lpos], str.c_str());
-          lp += str.length();
-        }
-      }
-      if ( (!filter_fd || 
-            fd_state_stack->back().get_table().get_operation(arc.olabel)==NULL))
-      {
-        std::string str = t->InputSymbols()->Find(arc.olabel);
-        if(str.compare("@_EPSILON_SYMBOL_@") != 0) {
-          if(upos+str.length() > ubuffer.size())
-            ubuffer.resize(ubuffer.size()*2, 0);
-          strcpy(&ubuffer[upos], str.c_str());
-          up += str.length();
-        }
-      }
-      */
       
       /* Handle spv here. Special symbols (flags, epsilons) 
          are always inserted. */
@@ -2356,9 +2328,9 @@ namespace hfst { namespace implementations
 
       res = extract_paths
         (t, arc.nextstate, all_visitations, path_visitations,
-         /*lbuffer,lp, ubuffer,up,*/ weight_sum+arc.weight.Value(), 
+         weight_sum+arc.weight.Value(), 
          callback, cycles, fd_state_stack, filter_fd,
-         /*include_spv,*/ spv);
+         spv);
       
       spv.pop_back();
 
@@ -2374,7 +2346,7 @@ namespace hfst { namespace implementations
   
   void TropicalWeightTransducer::extract_paths
   (StdVectorFst * t, hfst::ExtractStringsCb& callback,
-   int cycles, FdTable<int64>* fd, bool filter_fd /*, bool include_spv*/)
+   int cycles, FdTable<int64>* fd, bool filter_fd)
   {
     if (t->Start() == -1)
       return;

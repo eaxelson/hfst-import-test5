@@ -214,18 +214,9 @@ namespace hfst { namespace implementations {
 
   Transducer * SfstTransducer::expand_arcs(Transducer * t, StringSet &unknown)
   {
-    //std::set<char*> unknown_c_str;
-    //for (StringSet::iterator it = unknown.begin(); 
-    //it != unknown.end(); it++) {
-    //  unknown_c_str.insert(strdup(it->c_str()));
-    //}
     Transducer &tc = t->copy();
     SfstTransducer::expand(&tc, unknown);
-    //for (std::set<char*>::iterator it = unknown_c_str.begin(); 
-    //it != unknown_c_str.end(); it++) {
-    //7  free(*it);
-    //}
-    return &tc;
+     return &tc;
   }
 
 
@@ -263,7 +254,6 @@ namespace hfst { namespace implementations {
     print_alphabet(t2);
     */
 
-    // FAIL: the alphabet is pruned here
     Transducer * new_t1 = &t1->copy(false, &t2->alphabet);
     new_t1->alphabet.insert_symbols(t2->alphabet);
     SFST::Alphabet::CharMap cm = t1->alphabet.get_char_map();
@@ -328,7 +318,7 @@ namespace hfst { namespace implementations {
         return false;
 
       if ( strcmp("true", header_data[index].second.c_str()) == 0 )
-        is_minimal=true;  // SEGFAULT?
+        is_minimal=true;
       else if ( strcmp("false", header_data[index].second.c_str()) == 0 )
         is_minimal=false;
       else
@@ -455,19 +445,11 @@ namespace hfst { namespace implementations {
   }
 
   void SfstTransducer::initialize_alphabet(Transducer *t) {
-
-    const char * EPSILON_STRING = "<>";
-    const char * UNKNOWN_STRING = "@_UNKNOWN_SYMBOL_@";
-    const char * IDENTITY_STRING = "@_IDENTITY_SYMBOL_@";
-    const unsigned int EPSILON_NUMBER = 0;
-    const unsigned int UNKNOWN_NUMBER = 1;
-    const unsigned int IDENTITY_NUMBER = 2;
-
     t->alphabet.clear();
     t->alphabet.utf8 = true;
-    t->alphabet.add_symbol(EPSILON_STRING, EPSILON_NUMBER);
-    t->alphabet.add_symbol(UNKNOWN_STRING, UNKNOWN_NUMBER);
-    t->alphabet.add_symbol(IDENTITY_STRING, IDENTITY_NUMBER);
+    t->alphabet.add_symbol("<>", 0);
+    t->alphabet.add_symbol(internal_unknown.c_str(), 1);
+    t->alphabet.add_symbol(internal_identity.c_str(), 2);
   }
 
   Transducer * SfstTransducer::create_empty_transducer(void)
@@ -507,7 +489,7 @@ namespace hfst { namespace implementations {
     Node * n = t->new_node();
 
     unsigned int number;
-    if (strcmp(symbol.c_str(),"@_EPSILON_SYMBOL_@") == 0)
+    if (is_epsilon(symbol))
       number=0;
     else
       number=t->alphabet.add_symbol(symbol.c_str());
@@ -523,11 +505,11 @@ namespace hfst { namespace implementations {
     Node * n = t->new_node();
 
     unsigned int inumber,onumber;
-    if (strcmp(isymbol.c_str(),"@_EPSILON_SYMBOL_@") == 0)
+    if (is_epsilon(isymbol))
       inumber=0;
     else
       inumber=t->alphabet.add_symbol(isymbol.c_str());
-    if (strcmp(osymbol.c_str(),"@_EPSILON_SYMBOL_@") == 0)
+    if (is_epsilon(osymbol))
       onumber=0;
     else
       onumber=t->alphabet.add_symbol(osymbol.c_str());
@@ -547,12 +529,12 @@ namespace hfst { namespace implementations {
         Node * temp = t->new_node();
 
         unsigned int inumber,onumber;
-        if (strcmp(it->first.c_str(),"@_EPSILON_SYMBOL_@") == 0 || 
+        if (is_epsilon(it->first) || 
             strcmp(it->first.c_str(),"<>") == 0 )
           inumber=0;
         else
           inumber=t->alphabet.add_symbol(it->first.c_str());
-        if (strcmp(it->second.c_str(),"@_EPSILON_SYMBOL_@") == 0 ||
+        if (is_epsilon(it->second) ||
             strcmp(it->second.c_str(),"<>") == 0 )
           onumber=0;
         else
@@ -578,11 +560,11 @@ namespace hfst { namespace implementations {
            ++it)
         {
           unsigned int inumber,onumber;
-          if (strcmp(it->first.c_str(),"@_EPSILON_SYMBOL_@") == 0)
+          if (is_epsilon(it->first))
             inumber=0;
           else
             inumber=t->alphabet.add_symbol(it->first.c_str());
-          if (strcmp(it->second.c_str(),"@_EPSILON_SYMBOL_@") == 0)
+          if (is_epsilon(it->second))
             onumber=0;
           else
             onumber=t->alphabet.add_symbol(it->second.c_str());
@@ -608,12 +590,12 @@ namespace hfst { namespace implementations {
              it2 != (*it).end(); it2++ ) 
           {
             unsigned int inumber,onumber;
-            if (strcmp(it2->first.c_str(),"@_EPSILON_SYMBOL_@") == 0 || 
+            if (is_epsilon(it2->first) || 
                 strcmp(it2->first.c_str(),"<>") == 0 )
               inumber=0;
             else
               inumber=t->alphabet.add_symbol(it2->first.c_str());
-            if (strcmp(it2->second.c_str(),"@_EPSILON_SYMBOL_@") == 0 ||
+            if (is_epsilon(it2->second) ||
                 strcmp(it2->second.c_str(),"<>") == 0 )
               onumber=0;
             else
@@ -687,8 +669,8 @@ namespace hfst { namespace implementations {
   { return &t->reverse(); }
   
   Transducer * SfstTransducer::extract_input_language(Transducer * t)
-  { t->complete_alphabet();
-
+  { 
+    t->complete_alphabet();
     Transducer * retval = &t->lower_level();
 
     // projection includes in the alphabet only symbols that
@@ -702,10 +684,11 @@ namespace hfst { namespace implementations {
 
     // unknowns must be replaced with identities
     Transducer * tmp = retval;
-    retval = substitute(retval, "@_UNKNOWN_SYMBOL_@", "@_IDENTITY_SYMBOL_@");
+    retval = substitute(retval, internal_unknown, internal_identity);
     delete tmp;
 
-    return retval; }
+    return retval; 
+  }
   
   Transducer * SfstTransducer::extract_output_language(Transducer * t)
   { t->complete_alphabet();
@@ -723,7 +706,7 @@ namespace hfst { namespace implementations {
 
     // unknowns must be replaced with identities
     Transducer * tmp = retval;
-    retval = substitute(retval, "@_UNKNOWN_SYMBOL_@", "@_IDENTITY_SYMBOL_@");
+    retval = substitute(retval, internal_unknown, internal_identity);
     delete tmp;
 
     return retval; }
@@ -738,7 +721,7 @@ namespace hfst { namespace implementations {
     t->enumerate_paths(paths);
 
     // paths contains vectors whose alphabet does not have special symbols
-    Transducer *foo = define_transducer("@_EPSILON_SYMBOL_@");
+    Transducer *foo = define_transducer(internal_epsilon);
     for (unsigned int i=0; i<(unsigned int)paths.size(); i++) {
       (paths[i])->alphabet.copy(t->alphabet);
       std::pair<Transducer*,Transducer*> harm = harmonize(paths[i],foo,false);
@@ -821,9 +804,9 @@ namespace hfst { namespace implementations {
         ostring = std::string(t->alphabet.write_char(uc));
 
       if (istring.compare("<>") == 0)
-        istring = std::string("@_EPSILON_SYMBOL_@");
+        istring = std::string(internal_epsilon);
       if (ostring.compare("<>") == 0)
-        ostring = std::string("@_EPSILON_SYMBOL_@");
+        ostring = std::string(internal_epsilon);
 
       spv.push_back(StringPair(istring, ostring));
     
@@ -920,9 +903,9 @@ namespace hfst { namespace implementations {
 	std::string ostring 
 	  = t->alphabet.code2symbol(arc.label().upper_char());
 	if (istring.compare("<>") == 0)
-	  istring = std::string("@_EPSILON_SYMBOL_@");
+	  istring = std::string(internal_epsilon);
 	if (ostring.compare("<>") == 0)
-	  ostring = std::string("@_EPSILON_SYMBOL_@");
+	  ostring = std::string(internal_epsilon);
 
 	path.second.push_back
 	  (StringPair(istring, ostring));
@@ -981,9 +964,9 @@ namespace hfst { namespace implementations {
   {
     std::string isymbol = symbol_pair.first;
     std::string osymbol = symbol_pair.second;
-    if (isymbol.compare("@_EPSILON_SYMBOL_@") == 0)
+    if (is_epsilon(isymbol))
       isymbol = std::string("<>");
-    if (osymbol.compare("@_EPSILON_SYMBOL_@") == 0)
+    if (is_epsilon(osymbol))
       osymbol = std::string("<>");
 
     return &t->freely_insert
@@ -997,9 +980,9 @@ namespace hfst { namespace implementations {
   {
     std::string old_symbol_ = old_symbol;
     std::string new_symbol_ = new_symbol;
-    if (old_symbol.compare("@_EPSILON_SYMBOL_@") == 0)
+    if (is_epsilon(old_symbol))
       old_symbol_ = std::string("<>");
-    if (new_symbol.compare("@_EPSILON_SYMBOL_@") == 0)
+    if (is_epsilon(new_symbol))
       new_symbol_ = std::string("<>");
 
     Transducer * retval = 
@@ -1013,9 +996,9 @@ namespace hfst { namespace implementations {
   { 
     std::string isymbol = symbol_pair.first;
     std::string osymbol = symbol_pair.second;
-    if (isymbol.compare("@_EPSILON_SYMBOL_@") == 0)
+    if (is_epsilon(isymbol))
       isymbol = std::string("<>");
-    if (osymbol.compare("@_EPSILON_SYMBOL_@") == 0)
+    if (is_epsilon(osymbol))
       osymbol = std::string("<>");
 
     Transducer * retval 
@@ -1048,12 +1031,12 @@ namespace hfst { namespace implementations {
          it != spv.end(); it++) 
       {
         unsigned int inumber,onumber;
-        if (strcmp(it->first.c_str(),"@_EPSILON_SYMBOL_@") == 0 || 
+        if (is_epsilon(it->first) || 
             strcmp(it->first.c_str(),"<>") == 0 )
           inumber=0;
         else
           inumber=t->alphabet.add_symbol(it->first.c_str());
-        if (strcmp(it->second.c_str(),"@_EPSILON_SYMBOL_@") == 0 ||
+        if (is_epsilon(it->second) ||
             strcmp(it->second.c_str(),"<>") == 0 )
           onumber=0;
         else
@@ -1116,7 +1099,7 @@ namespace hfst { namespace implementations {
     for ( SFST::Alphabet::CharMap::const_iterator it = cm.begin();
           it != cm.end(); it++ ) {
       if (strcmp(it->second, "<>") == 0)
-        s.insert( std::string("@_EPSILON_SYMBOL_@"));
+        s.insert(internal_epsilon);
       else
         s.insert( std::string(it->second) );
     }
@@ -1324,9 +1307,7 @@ int main(int argc, char * argv[])
     Transducer * t_subst = SfstTransducer::substitute(t, "a", "c");
     assert( does_sfst_alphabet_contain(t_subst, "a") && 
 	    does_sfst_alphabet_contain(t_subst, "b")  && 
-	    does_sfst_alphabet_contain(t_subst, "c") );
-
-    
+	    does_sfst_alphabet_contain(t_subst, "c") );    
 
     std::cout << std::endl << "ok" << std::endl;
     return EXIT_SUCCESS;

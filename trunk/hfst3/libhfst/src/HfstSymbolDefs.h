@@ -81,6 +81,9 @@ namespace hfst
   bool is_epsilon(std::string const & str);
   bool is_unknown(std::string const & str);
   bool is_identity(std::string const & str);
+  bool is_epsilon(const char * str);
+  bool is_unknown(const char * str);
+  bool is_identity(const char * str);
 
   /* For internal use */
   typedef std::pair<unsigned int, unsigned int> NumberPair;

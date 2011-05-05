@@ -366,9 +366,9 @@ namespace implementations
   
   /* Add the following number-to-symbol correspondencies to the alphabet of 
      transducer t: 
-     0 : "@_EPSILON_SYMBOL_@"
-     1 : "@_UNKNOWN_SYMBOL_@"
-     2 : "@_IDENTITY_SYMBOL_@"  */
+     0 : "@_EPSILON_SYMBOL_@", i.e. internal_epsilon
+     1 : "@_UNKNOWN_SYMBOL_@", i.e. internal_unknown
+     2 : "@_IDENTITY_SYMBOL_@", i.e. internal_identity  */
   void MyTransducerLibraryTransducer::initialize_alphabet(MyFst *t) {
     (void)t;
     HFST_THROW(FunctionNotImplementedException); }

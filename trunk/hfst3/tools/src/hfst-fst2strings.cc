@@ -35,6 +35,7 @@
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
+#include "HfstSymbolDefs.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
@@ -267,7 +268,7 @@ static std::string replace_all(std::string symbol,
 static std::string get_print_format(const std::string &s) 
 {
   // print epsilon as defined by the user or use the default
-  if (s.compare("@_EPSILON_SYMBOL_@") == 0)
+  if (hfst::is_epsilon(s))
     return std::string(strdup(epsilon_format));
 
   if (not quote_special)

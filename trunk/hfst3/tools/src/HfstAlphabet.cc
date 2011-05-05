@@ -1,6 +1,7 @@
 #include "HfstAlphabet.h"
 #include "HfstBasic.h"
 #include "HfstUtf8.h"
+#include "HfstSymbolDefs.h"
 
 #ifndef DEBUG_MAIN
 
@@ -8,9 +9,9 @@ namespace hfst {
   namespace implementations {
     
     HfstAlphabet::HfstAlphabet() {
-      add("@_EPSILON_SYMBOL_@",0);
-      add("@_UNKNOWN_SYMBOL_@",1);
-      add("@_IDENTITY_SYMBOL_@",2);
+      add(hfst::internal_epsilon.c_str(),0);
+      add(hfst::internal_unknown.c_str(),1);
+      add(hfst::internal_identity.c_str(),2);
     }
     
     HfstAlphabet::HfstAlphabet(const HfstAlphabet &alpha) 

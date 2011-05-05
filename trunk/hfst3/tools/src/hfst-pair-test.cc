@@ -40,6 +40,7 @@
 #include "inc/globals-unary.h"
 
 #include "HfstStrings2FstTokenizer.h"
+#include "HfstSymbolDefs.h"
 
 static char*  pair_test_file_name;
 static FILE*  pair_test_file;
@@ -264,7 +265,7 @@ HfstTransducer get_transducer(const StringPairVector &tokenized_pair_string)
 
 std::string unescape(std::string symbol)
 {
-  if (symbol == "@_EPSILON_SYMBOL_@")
+  if (hfst::is_epsilon(symbol))
     { return "0"; }
   if (symbol == "@#@")
     { return "#"; }
@@ -490,10 +491,10 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
 	    
 	    tokenized_pair_string.insert
 	      (tokenized_pair_string.begin(),
-	       StringPair("@#@","@_EPSILON_SYMBOL_@"));
+	       StringPair("@#@",hfst::internal_epsilon));
 	    tokenized_pair_string.insert
 	      (tokenized_pair_string.end(),
-	       StringPair("@#@","@_EPSILON_SYMBOL_@"));
+	       StringPair("@#@",hfst::internal_epsilon));
 
 	    int new_exit_code = 
 	      test(tokenized_pair_string,line,grammar,rule_names,

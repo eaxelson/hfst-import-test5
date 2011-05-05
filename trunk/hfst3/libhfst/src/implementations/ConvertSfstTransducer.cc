@@ -86,10 +86,10 @@ namespace hfst { namespace implementations
           (osymbol);
 
         if (istring.compare("<>") == 0) {
-          istring = std::string("@_EPSILON_SYMBOL_@");
+          istring = std::string(internal_epsilon);
         }
         if (ostring.compare("<>") == 0) {
-          ostring = std::string("@_EPSILON_SYMBOL_@");
+          ostring = std::string(internal_epsilon);
         }
 
         net->add_transition(index[node], 
@@ -152,8 +152,8 @@ namespace hfst { namespace implementations
   hfst_basic_transducer_to_sfst(const HfstBasicTransducer * net) {
 
   SFST::Transducer * t = new SFST::Transducer();
-  t->alphabet.add_symbol("@_UNKNOWN_SYMBOL_@", 1);
-  t->alphabet.add_symbol("@_IDENTITY_SYMBOL_@", 2);
+  t->alphabet.add_symbol(internal_unknown.c_str(), 1);
+  t->alphabet.add_symbol(internal_identity.c_str(), 2);
 
   std::vector<SFST::Node*> state_vector;
   state_vector.push_back(t->root_node());
@@ -173,11 +173,11 @@ namespace hfst { namespace implementations
           std::string istring(tr_it->get_input_symbol());
           std::string ostring(tr_it->get_output_symbol());
 
-          if (istring.compare("@_EPSILON_SYMBOL_@") == 0) {
+          if (is_epsilon(istring)) {
             istring = std::string("<>");
           }
 
-          if (ostring.compare("@_EPSILON_SYMBOL_@") == 0) {
+          if (is_epsilon(ostring)) {
             ostring = std::string("<>");
           }
 
@@ -209,7 +209,7 @@ namespace hfst { namespace implementations
   for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it 
          = net->alphabet.begin();
        it != net->alphabet.end(); it++) {
-    if (it->compare("@_EPSILON_SYMBOL_@") != 0)
+    if (not is_epsilon(*it))
       t->alphabet.add_symbol(it->c_str());
   }
   
@@ -273,7 +273,7 @@ namespace hfst { namespace implementations
       = new HfstConstantTransducer((unsigned int)index.number_of_nodes());
 
     // Copy the alphabet
-    net->symbol_map[0] = std::string("@_EPSILON_SYMBOL_@");
+    net->symbol_map[0] = std::string(internal_epsilon);
 
     SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
     for (SFST::Alphabet::CharMap::const_iterator it 
@@ -298,14 +298,14 @@ namespace hfst { namespace implementations
   (const HfstConstantTransducer * net)
   {
     SFST::Transducer * t = new SFST::Transducer();
-    t->alphabet.add_symbol("@_UNKNOWN_SYMBOL_@", 1);
-    t->alphabet.add_symbol("@_IDENTITY_SYMBOL_@", 2);
+    t->alphabet.add_symbol(internal_unknown.c_str(), 1);
+    t->alphabet.add_symbol(internal_identity.c_str(), 2);
 
     // Copy the alphabet
     for (HfstConstantTransducer::SymbolMap::const_iterator it 
 	   = net->symbol_map.begin();
 	 it != net->symbol_map.end(); it++) {
-      if (it->second.compare("@_EPSILON_SYMBOL_@") != 0) {
+      if (not is_epsilon(it->second)) {
 	t->alphabet.add_symbol(it->second.c_str(), it->first);
       }
     }    

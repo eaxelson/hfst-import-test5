@@ -1,4 +1,5 @@
 #include "HfstConstantTransducer.h"
+#include "HfstSymbolDefs.h"
 
 #ifndef MAIN_TEST
 
@@ -35,9 +36,9 @@ namespace hfst {
   
   void HfstConstantTransducer::initialize_symbol_map()
   {
-    symbol_map[0] = std::string("@_EPSILON_SYMBOL_@");
-    symbol_map[1] = std::string("@_UNKNOWN_SYMBOL_@");
-    symbol_map[2] = std::string("@_IDENTITY_SYMBOL_@");
+    symbol_map[0] = std::string(internal_epsilon);
+    symbol_map[1] = std::string(internal_unknown);
+    symbol_map[2] = std::string(internal_identity);
   }
 
   void HfstConstantTransducer::add_transition
