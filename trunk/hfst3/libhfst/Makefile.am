@@ -23,3 +23,6 @@ if CAN_DOXYGEN
 apidoc: Doxyfile
 	$(DOXYGEN) $<
 endif
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = hfst.pc
