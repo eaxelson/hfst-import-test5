@@ -120,9 +120,9 @@ namespace hfst { namespace implementations
             std::string istring = inputsym->Find(arc.ilabel);
             std::string ostring = outputsym->Find(arc.olabel);
             if (arc.ilabel == 0)
-              istring = std::string("@_EPSILON_SYMBOL_@");
+              istring = std::string(internal_epsilon);
             if (arc.olabel == 0)
-              ostring = std::string("@_EPSILON_SYMBOL_@");
+              ostring = std::string(internal_epsilon);
             net->add_transition(origin, 
                                 HfstBasicTransition
                                 (target,
@@ -166,9 +166,9 @@ namespace hfst { namespace implementations
               std::string istring = inputsym->Find(arc.ilabel);
               std::string ostring = outputsym->Find(arc.olabel);
               if (arc.ilabel == 0)
-                istring = std::string("@_EPSILON_SYMBOL_@");
+                istring = std::string(internal_epsilon);
               if (arc.olabel == 0)
-                ostring = std::string("@_EPSILON_SYMBOL_@");
+                ostring = std::string(internal_epsilon);
               net->add_transition(origin, 
                                   HfstBasicTransition
                                   (target,
@@ -234,9 +234,9 @@ namespace hfst { namespace implementations
     state_map[0] = start_state;
     
     fst::SymbolTable st("");
-    st.AddSymbol("@_EPSILON_SYMBOL_@", 0);
-    st.AddSymbol("@_UNKNOWN_SYMBOL_@", 1);
-    st.AddSymbol("@_IDENTITY_SYMBOL_@", 2);
+    st.AddSymbol(internal_epsilon, 0);
+    st.AddSymbol(internal_unknown, 1);
+    st.AddSymbol(internal_identity, 2);
     
     // Go through all states
     for (HfstBasicTransducer::const_iterator it = net->begin();

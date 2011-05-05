@@ -136,10 +136,10 @@ namespace hfst { namespace implementations
 	  }
 
 	  if (arc.ilabel == 0) {
-	    istring = std::string("@_EPSILON_SYMBOL_@");
+	    istring = std::string(internal_epsilon);
 	  }
 	  if (arc.olabel == 0) {
-	    ostring = std::string("@_EPSILON_SYMBOL_@");
+	    ostring = std::string(internal_epsilon);
 	  }
 
 	  net->add_transition(origin, 
@@ -215,9 +215,9 @@ namespace hfst { namespace implementations
     }
 
     fst::SymbolTable st("");
-    st.AddSymbol("@_EPSILON_SYMBOL_@", 0);
-    st.AddSymbol("@_UNKNOWN_SYMBOL_@", 1);
-    st.AddSymbol("@_IDENTITY_SYMBOL_@", 2);
+    st.AddSymbol(internal_epsilon, 0);
+    st.AddSymbol(internal_unknown, 1);
+    st.AddSymbol(internal_identity, 2);
     
     // Go through all states
     for (HfstBasicTransducer::const_iterator it = net->begin();
@@ -389,9 +389,9 @@ namespace hfst { namespace implementations
 
     // (0) Copy the alphabet
     fst::SymbolTable st("");
-    st.AddSymbol("@_EPSILON_SYMBOL_@", 0);  // these should
-    st.AddSymbol("@_UNKNOWN_SYMBOL_@", 1);  // already be in
-    st.AddSymbol("@_IDENTITY_SYMBOL_@", 2); // the alphabet..
+    st.AddSymbol(internal_epsilon, 0);  // these should
+    st.AddSymbol(internal_unknown, 1);  // already be in
+    st.AddSymbol(internal_identity, 2); // the alphabet..
 
     for (HfstConstantTransducer::SymbolMap::const_iterator it 
            = net->symbol_map.begin();

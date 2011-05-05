@@ -399,9 +399,9 @@ namespace hfst { namespace implementations {
     /* Conversion to HfstBasicTransducer is now used instead. */
   fsm * FomaTransducer::insert_freely(fsm * t, const StringPair &symbol_pair)
   {
-    char* epsilon = strdup("@_EPSILON_SYMBOL_@");
-    char* epsilon_marker = strdup("@_EPSILON_SYMBOL_MARKER_");
-    char* identity = strdup("@_IDENTITY_SYMBOL_@");
+    char* epsilon = strdup(internal_epsilon.c_str());
+    char* epsilon_marker = strdup("@_EPSILON_SYMBOL_MARKER_@");
+    char* identity = strdup(internal_identity.c_str());
     fsm * eps_marked = fsm_substitute_symbol(t, epsilon, 
                                              epsilon_marker);
     fsm * ins = fsm_kleene_star( 

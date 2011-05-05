@@ -349,22 +349,22 @@ namespace hfst
       
       std::string leftm("@_LEFT_MARKER_@");
       std::string rightm("@_RIGHT_MARKER_@");
-      std::string epsilon("@_EPSILON_SYMBOL_@");
+      std::string epsilon(internal_epsilon);
 
       // HfstTransducer pi(alphabet, type);
 
       // Create the insert boundary transducer (.|<>:<L>|<>:<R>)*    
       StringPairSet pi1 = alphabet;
-      pi1.insert(StringPair("@_EPSILON_SYMBOL_@", leftm));
-      pi1.insert(StringPair("@_EPSILON_SYMBOL_@", rightm));
+      pi1.insert(StringPair(internal_epsilon, leftm));
+      pi1.insert(StringPair(internal_epsilon, rightm));
       HfstTransducer ibt(pi1, type, true);
 
       if (DEBUG) printf("  ..ibt created\n");
 
       // Create the remove boundary transducer (.|<L>:<>|<R>:<>)*    
       StringPairSet pi2 = alphabet;
-      pi2.insert(StringPair(leftm, "@_EPSILON_SYMBOL_@"));
-      pi2.insert(StringPair(rightm, "@_EPSILON_SYMBOL_@"));
+      pi2.insert(StringPair(leftm, internal_epsilon));
+      pi2.insert(StringPair(rightm, internal_epsilon));
       HfstTransducer rbt(pi2, type, true);
 
       if (DEBUG) printf("  ..rbt created\n");
@@ -579,7 +579,7 @@ namespace hfst
       HfstTransducer pi_star(alphabet, type, true);
       
       // center transducer
-      HfstTransducer l1("@_EPSILON_SYMBOL_@", type);
+      HfstTransducer l1(internal_epsilon, type);
       l1.concatenate(pi_star);
       l1.concatenate(mt);
       l1.concatenate(mapping);
@@ -602,7 +602,7 @@ namespace hfst
       for (HfstTransducerPairVector::const_iterator it = contexts.begin();
            it != contexts.end(); it++)
         {
-          HfstTransducer ct("@_EPSILON_SYMBOL_@", type);
+          HfstTransducer ct(internal_epsilon, type);
           ct.concatenate(pi_star);
           ct.concatenate(it->first);
           ct.concatenate(mt);          
@@ -620,7 +620,7 @@ namespace hfst
         HfstTransducer retval(alphabet, type, true);
         HfstTransducer tmp1(l1);
         tmp1.subtract(l2);
-        tmp1.substitute(marker,"@_EPSILON_SYMBOL_@");
+        tmp1.substitute(marker,internal_epsilon);
         retval.subtract(tmp1);
         return retval;
       }
@@ -629,7 +629,7 @@ namespace hfst
         HfstTransducer retval(alphabet, type, true);
         HfstTransducer tmp1(l2);
         tmp1.subtract(l1);
-        tmp1.substitute(marker,"@_EPSILON_SYMBOL_@");
+        tmp1.substitute(marker, internal_epsilon);
         retval.subtract(tmp1);
         return retval;
       }
@@ -640,13 +640,13 @@ namespace hfst
         HfstTransducer retval1(alphabet, type, true);
         HfstTransducer tmp1(l1);
         tmp1.subtract(l2);
-        tmp1.substitute(marker,"@_EPSILON_SYMBOL_@");
+        tmp1.substitute(marker, internal_epsilon);
         retval1.subtract(tmp1);
 
         HfstTransducer retval2(alphabet, type, true);
         HfstTransducer tmp2(l2);
         tmp2.subtract(l1);
-        tmp2.substitute(marker,"@_EPSILON_SYMBOL_@");
+        tmp2.substitute(marker, internal_epsilon);
         retval2.subtract(tmp2);
 
         return retval1.intersect(retval2);

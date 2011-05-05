@@ -2339,8 +2339,8 @@ HfstTransducer &HfstTransducer::compose_intersect
 	    (lexicon_alphabet.find("@#@") == lexicon_alphabet.end());
 	HfstTokenizer tokenizer;
 	tokenizer.add_multichar_symbol("@#@");
-	tokenizer.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-	HfstTransducer wb("@_EPSILON_SYMBOL_@","@#@",tokenizer,type);
+	tokenizer.add_multichar_symbol(internal_epsilon);
+	HfstTransducer wb(internal_epsilon,"@#@",tokenizer,type);
 	HfstTransducer wb_copy(wb);
 
 	wb.concatenate(*this).concatenate(wb_copy).minimize();
@@ -3105,8 +3105,41 @@ int main(int argc, char * argv[])
 	assert(alpha.find("a") != alpha.end());
 	assert(alpha.find("c") != alpha.end());
 	assert(alpha.find("b") != alpha.end());
-      }
 
+	// Test the const arguments are really const
+	HfstTransducer ab("a", "b", types[i]);
+	HfstTransducer ac("b", "c", types[i]);
+	HfstTransducer ab_(ab);
+	HfstTransducer ac_(ac);
+
+	ab_.compare(ac_);
+	assert(ab_.get_alphabet() == ab.get_alphabet());
+	assert(ac_.get_alphabet() == ac.get_alphabet());
+
+	HfstTransducer &compose(const HfstTransducer &another);
+	
+	HfstTransducer &compose_intersect(const HfstTransducerVector &v);
+	
+	HfstTransducer &concatenate(const HfstTransducer &another);
+	
+	HfstTransducer &disjunct(const HfstTransducer &another);
+	
+	HfstTransducer &disjunct(const StringPairVector &spv);
+	
+	HfstTransducer &intersect(const HfstTransducer &another);
+	
+	HfstTransducer &subtract(const HfstTransducer &another);
+	
+	HfstTransducer &insert_freely(const HfstTransducer &tr);
+	
+	HfstTransducer &substitute(const StringPair &symbol_pair,
+				   HfstTransducer &transducer);
+	
+	void insert_freely_missing_flags_from
+	  (const HfstTransducer &another);
+	
+      }
+    
     std::cout << "ok" << std::endl;
     return 0;
 }

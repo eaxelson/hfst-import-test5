@@ -171,18 +171,18 @@ process_stream(HfstInputStream& instream)
         {
               arcs++;
               arcs_here++;
-              if ( (tr_it->get_input_symbol() == "@_EPSILON_SYMBOL_@") && 
-           (tr_it->get_output_symbol() == "@_EPSILON_SYMBOL_@") )
+              if ( hfst::is_epsilon(tr_it->get_input_symbol()) && 
+		   hfst::is_epsilon(tr_it->get_output_symbol()) )
                 {
                   io_epsilons++;
                   input_epsilons++;
                   output_epsilons++;
                 }
-              else if (tr_it->get_input_symbol() == "@_EPSILON_SYMBOL_@")
+              else if (hfst::is_epsilon(tr_it->get_input_symbol()))
                 {
                   input_epsilons++;
                 }
-              else if (tr_it->get_output_symbol() == "@_EPSILON_SYMBOL_@")
+              else if (hfst::is_epsilon(tr_it->get_output_symbol()))
                 {
                   output_epsilons++;
                 }

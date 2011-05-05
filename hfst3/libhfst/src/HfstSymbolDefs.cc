@@ -31,6 +31,21 @@ bool is_identity(std::string const & str)
     return str == internal_identity;
 }
 
+bool is_epsilon(const char * str)
+{
+  return std::string(str) == internal_epsilon;
+}
+
+bool is_unknown(const char * str)
+{
+  return std::string(str) == internal_unknown;
+}
+
+bool is_identity(const char * str)
+{
+  return std::string(str) == internal_identity;
+}
+
   namespace symbols {
     void collect_unknown_sets(StringSet &s1, StringSet &unknown1,
 			      StringSet &s2, StringSet &unknown2)

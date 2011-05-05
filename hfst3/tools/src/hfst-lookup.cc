@@ -43,6 +43,12 @@
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
 #include "HfstStrings2FstTokenizer.h"
+#include "HfstSymbolDefs.h"
+
+using hfst::internal_epsilon;
+using hfst::internal_identity;
+using hfst::is_epsilon;
+using hfst::is_identity;
 
 using hfst::HfstTransducer;
 using hfst::HFST_OL_TYPE;
@@ -514,7 +520,7 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
               {
                 lookup_len += strlen(space_format);
               }
-            if (s->compare("@_EPSILON_SYMBOL_@") == 0)
+            if (is_epsilon(*s))
               {
                 lookup_len += strlen(epsilon_format);
               }
@@ -542,7 +548,7 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
               {
                 input_len += strlen(space_format);
               }
-            if (s->compare("@_EPSILON_SYMBOL_@") == 0)
+            if (is_epsilon(*s))
               {
                 input_len += strlen(epsilon_format);
               }
@@ -603,7 +609,7 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
                 p = strcpy(p, space_format);
                 p += strlen(space_format);
               }
-            if (s->compare("@_EPSILON_SYMBOL_@") == 0)
+            if (is_epsilon(*s))
               {
                 p = strcpy(p, epsilon_format);
                 p += strlen(epsilon_format);
@@ -644,7 +650,7 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
                 p = strcpy(p, space_format);
                 p += strlen(space_format);
               }
-            if (s->compare("@_EPSILON_SYMBOL_@") == 0)
+            if (is_epsilon(*s))
               {
                 p = strcpy(p, epsilon_format);
                 p += strlen(epsilon_format);
@@ -1047,7 +1053,7 @@ bool is_lookup_infinitely_ambiguous
     {
       // CASE 1: Input epsilons do not consume a symbol in the lookup path s,
       //         so they can be added freely.
-      if (it->get_input_symbol().compare("@_EPSILON_SYMBOL_@") == 0)
+      if (is_epsilon(it->get_input_symbol()))
     {
       epsilon_path_states.insert(state);
       if (epsilon_path_states.find(it->get_target_state()) 
@@ -1231,7 +1237,7 @@ static bool is_possible_transition
       if ( isymbol.compare(lookup_path.at(lookup_index)) == 0 ||
 	   // or the input symbol is the identity symbol and the current
 	   // symbol is not found in the alphabet of the transducer.
-	   ( (isymbol == "@_IDENTITY_SYMBOL_@") &&
+	   ( is_identity(isymbol) &&
 	     (alphabet.find(lookup_path.at(lookup_index)) == alphabet.end()) ) 
 	   )
         {
@@ -1242,7 +1248,7 @@ static bool is_possible_transition
   // Whether there are more symbols in lookup_path or not,
   // we can always go further if the input symbol of the transition
   // is an epsilon or a flag diacritic.
-  if ( (isymbol == "@_EPSILON_SYMBOL_@") || 
+  if ( is_epsilon(isymbol) || 
        is_flag_diacritic(isymbol) )
     {
       input_symbol_consumed=false;
@@ -1293,7 +1299,7 @@ static void lookup_fd
         {
           // update path_so_far and lookup_index
 
-	  if (not (it->get_input_symbol() == "@_IDENTITY_SYMBOL_@")) {
+	  if (not (is_identity(it->get_input_symbol()))) {
 	    push_back_to_two_level_path
 	      (path_so_far, 
 	       StringPair(it->get_input_symbol(), it->get_output_symbol()),
@@ -1372,7 +1378,7 @@ static std::string replace_all(std::string symbol,
 
 static std::string get_print_format(const std::string &s) 
 {
-  if (s.compare("@_EPSILON_SYMBOL_@") == 0)
+  if (is_epsilon(s))
     return std::string(strdup(epsilon_format));
 
   if (quote_special) 
