@@ -50,7 +50,7 @@ DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   epsilon.hfst epsilon2cat.hfst cat2epsilon.hfst \
 		   unknown-star.hfst identity-star.hfst unknown2a.hfst identity.hfst \
 		   heavycat.hfst abid.hfst unk2unk.hfst unk_or_id_star.hfst a2b.hfst \
-		   a2b_complement.hfst a2b_input_projection_complement.hfst
+		   a2b_complement.hfst a2b_input_projection_complement.hfst empty.hfst
 OL_CHECKS=cat2dog.hfst.ol cat2dog.gen.hfst.ol cat_weight_final.hfst.ol \
 			proc-caps.hfst.ol proc-caps.gen.hfst.ol
 if WANT_SFST
@@ -65,7 +65,8 @@ SFST_CHECKS=0to3cats.hfst.sfst 2to4cats.hfst.sfst 4cats.hfst.sfst\
 			rule1.hfst.sfst rule2.hfst.sfst summarize_test1.hfst.sfst \
 			summarize_test2.hfst.sfst tac.hfst.sfst unknown2a.hfst.sfst\
 			identity.hfst.sfst abid.hfst.sfst unk2unk.hfst.sfst unk_or_id_star.hfst.sfst \
-			a2b.hfst.sfst a2b_complement.hfst.sfst a2b_input_projection_complement.hfst.sfst
+			a2b.hfst.sfst a2b_complement.hfst.sfst a2b_input_projection_complement.hfst.sfst \
+			empty.hfst.sfst
 endif
 if WANT_OPENFST
 OFST_CHECKS=0to3cats.hfst.ofst \
@@ -95,7 +96,8 @@ FOMA_CHECKS=0to3cats.hfst.foma 2to4cats.hfst.foma 4cats.hfst.foma \
 			non_minimal.hfst.foma rule1.hfst.foma rule2.hfst.foma \
 			summarize_test1.hfst.foma summarize_test2.hfst.foma tac.hfst.foma\
 			unknown2a.hfst.foma identity.hfst.foma abid.hfst.foma unk2unk.hfst.foma unk_or_id_star.hfst.foma \
-			a2b.hfst.foma a2b_complement.hfst.foma a2b_input_projection_complement.hfst.foma
+			a2b.hfst.foma a2b_complement.hfst.foma a2b_input_projection_complement.hfst.foma \
+			empty.hfst.foma
 endif
 
 check_DATA=$(DEFAULT_CHECKS) $(SFST_CHECKS) $(OFST_CHECKS) $(FOMA_CHECKS) $(OL_CHECKS)

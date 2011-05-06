@@ -203,6 +203,7 @@ void HfstTransducer::harmonize(HfstTransducer &another)
 #if HAVE_SFST
     case (SFST_TYPE):
     {
+      try {
 	std::pair <SFST::Transducer*, SFST::Transducer*> result;
 	if ( harmonize_smaller && 
 	     sfst_interface.number_of_states(this->implementation.sfst) >
@@ -222,7 +223,10 @@ void HfstTransducer::harmonize(HfstTransducer &another)
             this->implementation.sfst = result.first;
             another.implementation.sfst = result.second;
 	}
-	break;
+      } catch (char *msg) {
+	HFST_THROW_MESSAGE(HfstFatalException, std::string(msg));
+      }
+      break;
     }
 #endif
 #if HAVE_FOMA
