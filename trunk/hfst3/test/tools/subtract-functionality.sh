@@ -11,6 +11,18 @@ for i in "" .sfst .ofst .foma; do
     else
 	exit 1 ;
     fi
+# test the empty transducer
+    if test -f empty.hfst$i ; then
+	if ! ../../tools/src/hfst-subtract empty.hfst$i empty.hfst$i > test.hfst ; then
+	    exit 1
+	fi
+	if ! ../../tools/src/hfst-compare test.hfst empty.hfst$i ; then
+	    exit 1
+	fi
+    else
+        echo "FAIL: Missing files in empty transducer tests"
+	exit 1 ;
+    fi
 # test that the complement [ [ID:ID | UNK:UNK]* - transducer ] works
     if test -f unk_or_id_star.hfst$i -a a2b.hfst$i -a a2b_complement.hfst$i -a a2b_input_projection_complement.hfst$i ; then
 	if ! ../../tools/src/hfst-subtract -1 unk_or_id_star.hfst$i -2 a2b.hfst$i > test.hfst ; then

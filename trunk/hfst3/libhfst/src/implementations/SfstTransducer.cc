@@ -224,6 +224,8 @@ namespace hfst { namespace implementations {
   (Transducer *t1, Transducer *t2, bool unknown_symbols_in_use) 
   {
 
+    try {
+
     //clock_t startclock = clock();
 
     //std::cerr << *t1 << "--\n" << *t2;
@@ -233,12 +235,12 @@ namespace hfst { namespace implementations {
     StringSet unknown_t1;    // symbols known to another but not this
     StringSet unknown_t2;    // and vice versa
 
-    if (unknown_symbols_in_use) {
-      StringSet t1_symbols = get_alphabet(t1);
-      StringSet t2_symbols = get_alphabet(t2);
-      hfst::symbols::collect_unknown_sets(t1_symbols, unknown_t1,
-					  t2_symbols, unknown_t2);
-    }
+      if (unknown_symbols_in_use) {
+	StringSet t1_symbols = get_alphabet(t1);
+	StringSet t2_symbols = get_alphabet(t2);
+	hfst::symbols::collect_unknown_sets(t1_symbols, unknown_t1,
+					    t2_symbols, unknown_t2);
+      }
 
     //std::cerr << "Transducer t1:" << std::endl;
     //std::cerr << *t1 << std::endl;
@@ -254,17 +256,18 @@ namespace hfst { namespace implementations {
     print_alphabet(t2);
     */
 
-    Transducer * new_t1 = &t1->copy(false, &t2->alphabet);
-    new_t1->alphabet.insert_symbols(t2->alphabet);
-    SFST::Alphabet::CharMap cm = t1->alphabet.get_char_map();
-    for (SFST::Alphabet::CharMap::const_iterator it = cm.begin(); 
-         it != cm.end(); it++) {
-      new_t1->alphabet.add_symbol(it->second);
-    }
+      Transducer * new_t1 = &t1->copy(false, &t2->alphabet);
+      new_t1->alphabet.insert_symbols(t2->alphabet);
+      SFST::Alphabet::CharMap cm = t1->alphabet.get_char_map();
+      for (SFST::Alphabet::CharMap::const_iterator it = cm.begin(); 
+	   it != cm.end(); it++) {
+	new_t1->alphabet.add_symbol(it->second);
+      }
+      
+      t2->alphabet.insert_symbols(new_t1->alphabet);
+      delete t1;
+      t1 = new_t1;
 
-    t2->alphabet.insert_symbols(new_t1->alphabet);
-    delete t1;
-    t1 = new_t1;
     /*
     std::cerr << "Transducer t1:" << std::endl;
     std::cerr << *t1 << std::endl;
@@ -299,6 +302,11 @@ namespace hfst { namespace implementations {
        ( (float)(endclock - startclock) / CLOCKS_PER_SEC); */
 
     return std::pair<Transducer*, Transducer*>(harmonized_t1, harmonized_t2);
+
+    }
+    catch (const char *msg) {
+      HFST_THROW_MESSAGE(HfstFatalException, std::string(msg));
+    }
 
   }
 
@@ -1061,7 +1069,26 @@ namespace hfst { namespace implementations {
 
   Transducer * SfstTransducer::subtract
   (Transducer * t1, Transducer * t2)
-  { return &t1->operator/(*t2); }
+  { 
+    try { 
+      unsigned int t1_alphabet_size = t1->alphabet.size();
+      // This will cause an exception when SFST calculates the negation
+      // that is needed in subtraction.
+      if (t1_alphabet_size == 0)  {
+	t1->alphabet.insert(Label(1,1)); // insert a dummy symbol pair
+      } 
+      Transducer * retval = &t1->operator/(*t2); 
+      if (t1_alphabet_size == 0) {
+	t1->alphabet.clear_char_pairs(); // remove the dummy symbol pair
+	t1->complete_alphabet();
+      }
+      return retval;
+    } 
+    catch (const char *msg) {
+      fprintf(stderr, "ERROR: %s\n", msg);
+      HFST_THROW_MESSAGE(HfstFatalException, std::string(msg));
+    }
+  }
 
   bool SfstTransducer::are_equivalent(Transducer * t1, Transducer * t2)
   {
