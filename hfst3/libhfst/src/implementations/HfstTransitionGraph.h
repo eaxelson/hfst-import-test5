@@ -810,6 +810,19 @@ namespace hfst {
                 break;
             }
 
+	    // an empty line signifying an empty transducer,
+	    // a special case that is accepted if it is the only
+	    // transducer in the stream
+	    if (line[0] == '\0' ||
+		(line[0] == '\n' && line[1] == '\0')) {
+	      // make sure that the end-of-file is reached
+	      if (file == NULL)
+		is.get();
+	      else
+		fgetc(file);
+	      break;
+	    }
+
             if (*line == '-') // transducer separator line is "--"
               return retval;
 
@@ -819,7 +832,7 @@ namespace hfst {
             // how many fields could be parsed
             //int n = sscanf(line, "%s\t%s\t%s\t%s\t%s", a1, a2, a3, a4, a5);
             int n = sscanf(line, "%s%s%s%s%s", a1, a2, a3, a4, a5);
-            
+
             // set value of weight
             float weight = 0;
             if (n == 2) // a final state line with weight
