@@ -16,6 +16,8 @@
 #ifndef MAIN_TEST
 namespace hfst { namespace implementations
 {
+  void print_att_number(StdVectorFst *t, FILE * ofile);
+
   float tropical_seconds_in_harmonize=0;
 
     float TropicalWeightTransducer::get_profile_seconds() {
@@ -1138,17 +1140,15 @@ namespace hfst { namespace implementations
   bool TropicalWeightTransducer::are_equivalent
   (StdVectorFst *a, StdVectorFst *b) 
   {
-    StdVectorFst * mina = minimize(a);
-    StdVectorFst * minb = minimize(b);
-    //write_in_att_format_number(a, stdout);
-    //std::cerr << "--\n";
-    //write_in_att_format_number(b, stdout);
-    //std::cerr << "\n\n";
+    StdVectorFst * mina = determinize(a);
+    StdVectorFst * minb = determinize(b);
+
     EncodeMapper<StdArc> encode_mapper(0x0001,ENCODE);
     EncodeFst<StdArc> enca(*mina, &encode_mapper);
     EncodeFst<StdArc> encb(*minb, &encode_mapper);
     StdVectorFst A(enca);
     StdVectorFst B(encb);
+
     return Equivalent(A, B);
   }
   
@@ -1317,7 +1317,7 @@ namespace hfst { namespace implementations
   TropicalWeightTransducer::determinize(StdVectorFst * t)
   {
     RmEpsilon<StdArc>(t);
-    EncodeMapper<StdArc> encode_mapper(kEncodeLabels|kEncodeWeights,ENCODE);
+    EncodeMapper<StdArc> encode_mapper(kEncodeLabels/*|kEncodeWeights*/,ENCODE);
     Encode(t, &encode_mapper);
     StdVectorFst * det = new StdVectorFst();
     Determinize<StdArc>(*t, det);
@@ -1330,7 +1330,7 @@ namespace hfst { namespace implementations
   (StdVectorFst * t)
   {
     RmEpsilon<StdArc>(t);
-    EncodeMapper<StdArc> encode_mapper(kEncodeLabels|kEncodeWeights,ENCODE);
+    EncodeMapper<StdArc> encode_mapper(kEncodeLabels/*|kEncodeWeights*/,ENCODE);
     Encode(t, &encode_mapper);
     StdVectorFst * det = new StdVectorFst();
     Determinize<StdArc>(*t, det);
