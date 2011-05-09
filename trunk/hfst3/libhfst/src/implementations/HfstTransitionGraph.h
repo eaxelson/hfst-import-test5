@@ -53,8 +53,10 @@ namespace hfst {
         The class has two static maps and functions that take care of conversion
         between strings and internal numbers.
 
+	FIXME: move to a separate class, this is a specialization.
+
         @see HfstTransition HfstBasicTransition */
-    class HfstTropicalTransducerTransitionData {
+    class HfstTropicalTransducerTransitionData { // to some other file
     public:
       /** @brief The input and output symbol type. */
       typedef std::string SymbolType;
@@ -425,7 +427,7 @@ namespace hfst {
     template <class C, class W> class HfstTransitionGraph 
       {
       public:
-        /** @brief A set of transitions of a state in an HfstTransitionGraph. */
+        /** @brief A vector of transitions of a state in an HfstTransitionGraph. */
         typedef std::vector<HfstTransition<C> > HfstTransitions;
 
       protected:
@@ -460,6 +462,7 @@ namespace hfst {
           state_map[0]=HfstTransitions();
         }
 
+	// FIXME: the default should be enough
 	HfstTransitionGraph &operator=(const HfstTransitionGraph &graph)
 	  {
 	    if (this == &graph)
@@ -468,7 +471,7 @@ namespace hfst {
 	    state_map = graph.state_map;
 	    final_weight_map = graph.final_weight_map;
 	    alphabet = graph.alphabet;
-	    assert(alphabet.count(typename C::SymbolType()) == 0);
+	    assert(alphabet.count(typename C::SymbolType()) == 0); // TEST
 	    return *this;
 	  }
 
@@ -482,7 +485,7 @@ namespace hfst {
         }
 
         /** @brief Create an HfstTransitionGraph equivalent to HfstTransducer 
-            \a transducer. */
+            \a transducer. FIXME: move to a separate file */
         HfstTransitionGraph(const hfst::HfstTransducer &transducer) {
           HfstTransitionGraph<HfstTropicalTransducerTransitionData, float>
             *fsm = ConversionFunctions::
@@ -494,6 +497,7 @@ namespace hfst {
           delete fsm;
         }
 
+	// FIXME: documented/protected
         void initialize_alphabet(HfstTransitionGraphAlphabet &alpha) {
           alpha.insert("@_EPSILON_SYMBOL_@");
           alpha.insert("@_UNKNOWN_SYMBOL_@");
@@ -585,6 +589,7 @@ namespace hfst {
           return s;
         }
 
+	// FIXME: documented/protected
 	void initialize_transition_vector
 	  (unsigned int state_number, unsigned int number_of_transitions)
 	{
@@ -598,6 +603,7 @@ namespace hfst {
 
           C data = transition.get_transition_data();
 
+	  // FIXME: throw an exception in constructor of HfstTransition?
 	  assert(not data.get_input_symbol().empty()); //!= typename C::SymbolType());
 	  assert(not data.get_output_symbol().empty()); //!= typename C::SymbolType());
 
@@ -608,7 +614,8 @@ namespace hfst {
           state_map[s].push_back(transition);
         }
 
-        /** @brief Whether state \a s is final. */
+        /** @brief Whether state \a s is final. 
+	    FIXME: return positive infinity instead if not final. */
         bool is_final_state(HfstState s) const {
           return (final_weight_map.find(s) != final_weight_map.end());
         }
@@ -652,7 +659,7 @@ namespace hfst {
 
             If the state does not exist, it is created. The created
             state has an empty set of transitions. */
-        HfstTransitions & operator[](HfstState s) {
+        HfstTransitions & operator[](HfstState s) { // FIXME: protected
           if (s > max_state)
             max_state=s;
           return state_map[s];
