@@ -6,8 +6,8 @@
 #include <set>
 #include "../HfstSymbolDefs.h"
 #include "../HfstExceptionDefs.h"
-//#include "../HfstTransducer.h" // should not include this header
 #include "ConvertTransducerFormat.h"
+#include "HfstDataTypes.h"
 #include <cassert>
 #include <iostream>
 
@@ -18,7 +18,7 @@
 
 namespace hfst {
 
-  class HfstTransducer;
+  //class HfstTransducer;
 
   /** @brief A namespace for all code that forms a bridge between
       backend libraries and HFST.

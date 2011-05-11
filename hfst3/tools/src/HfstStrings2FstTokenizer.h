@@ -22,7 +22,8 @@
 #  include <config.h>
 #endif
 
-#include "HfstTransducer.h"
+#include "HfstDataTypes.h"
+#include "HfstTokenizer.h"
 
 typedef std::vector<std::string> StringVector;
 typedef std::pair<std::string,std::string> StringPair;

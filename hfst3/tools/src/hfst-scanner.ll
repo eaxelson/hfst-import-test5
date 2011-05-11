@@ -18,6 +18,7 @@
 #include "hfst-compiler.h"
 #include "HfstBasic.h"
 #include "HfstUtf8.h"
+#include "HfstTransducer.h"
 
 using namespace hfst;
 using namespace basic;

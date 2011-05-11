@@ -35,7 +35,7 @@
 #  include <error.h>
 #endif
 
-#include "HfstTransducer.h"
+#include "HfstDataTypes.h"
 
 
 /* These variables should be used in all command line programs.

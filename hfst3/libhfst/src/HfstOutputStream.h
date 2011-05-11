@@ -16,14 +16,30 @@
 #  include <config.h>
 #endif
 
-//#include "HfstTransducer.h"
-namespace hfst { class HfstTransducer; }
+#include "HfstDataTypes.h"
 
 /** @file HfstOutputStream.h
  \brief Declaration of class HfstOutputStream. */
 
 namespace hfst
 {
+
+  namespace implementations {
+#if HAVE_OPENFST
+    class LogWeightOutputStream;
+    class TropicalWeightOutputStream;
+#endif
+#if HAVE_SFST
+    class SfstOutputStream;
+#endif
+#if HAVE_FOMA
+    class FomaOutputStream;
+#endif    
+#if HAVE_MY_TRANSDUCER_LIBRARY
+    class MyTransducerLibraryOutputStream;
+#endif
+    class HfstOlOutputStream;
+  }
 
 
   /** \brief A stream for writing binary transducers. 

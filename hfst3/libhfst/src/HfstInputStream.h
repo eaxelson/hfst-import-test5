@@ -16,8 +16,7 @@
 #  include <config.h>
 #endif
 
-//#include "HfstTransducer.h"
-namespace hfst { class HfstTransducer; }
+#include "HfstDataTypes.h"
 
 /** @file HfstInputStream.h 
     \brief Declaration of class HfstInputStream.
@@ -25,6 +24,25 @@ namespace hfst { class HfstTransducer; }
 
 namespace hfst
 {
+
+  namespace implementations {
+#if HAVE_OPENFST
+    class LogWeightInputStream;
+    class TropicalWeightInputStream;
+#endif
+#if HAVE_SFST
+    class SfstInputStream;
+#endif
+#if HAVE_FOMA
+    class FomaInputStream;
+#endif    
+#if HAVE_MY_TRANSDUCER_LIBRARY
+    class MyTransducerLibraryInputStream;
+#endif
+    class HfstOlInputStream;
+  }
+
+
   /** \brief A stream for reading binary transducers. 
 
       An example:

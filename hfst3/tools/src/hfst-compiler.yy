@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include "HfstCompiler.h"
+#include "HfstTransducer.h"
 
 #include <cstdio>
 #include <cstdlib>

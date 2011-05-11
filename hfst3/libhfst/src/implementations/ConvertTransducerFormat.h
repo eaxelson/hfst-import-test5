@@ -52,23 +52,15 @@
 
 struct fsm;
 
+#include "../HfstDataTypes.h"
+
 /** @file ConvertTransducerFormat.h
     \brief Declarations of functions for converting between 
     transducer backend formats. */
 
 namespace hfst { 
 
-  class HfstTransducer;
-
 namespace implementations {
-
-    template <class T, class W> class HfstTransitionGraph;
-    class HfstTropicalTransducerTransitionData;
-    typedef HfstTransitionGraph<HfstTropicalTransducerTransitionData, float> 
-      HfstBasicTransducer; 
-    typedef unsigned int HfstState;
-
-  ;
 
 #if HAVE_OPENFST
   typedef fst::StdArc::StateId StateId;

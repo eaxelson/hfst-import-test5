@@ -16,8 +16,6 @@
 #  include <config.h>
 #endif
 
-//#include "HfstTransducer.h"
-
 #include <string>
 #include <iostream>
 #include <vector>
@@ -111,6 +109,19 @@ namespace hfst
   typedef std::pair<float, StringPairVector> HfstTwoLevelPath;
   //! @brief A set of two-level weighted paths.
   typedef std::set<HfstTwoLevelPath> HfstTwoLevelPaths;
+
+  namespace implementations {
+    template <class T, class W> class HfstTransitionGraph;
+    class HfstTropicalTransducerTransitionData;
+    typedef HfstTransitionGraph<HfstTropicalTransducerTransitionData, float> 
+      HfstBasicTransducer; 
+    typedef unsigned int HfstState;
+
+    template <class C> class HfstTransition;
+    typedef HfstTransition<HfstTropicalTransducerTransitionData> 
+      HfstBasicTransition;
+
+  }
 
   // ...ENUMS AND TYPEDEFS
 

@@ -13,7 +13,7 @@
 #ifndef _HFST_COMPILER_H_
 #define _HFST_COMPILER_H_
 
-#include "HfstTransducer.h"
+#include "HfstDataTypes.h"
 #include "HfstAlphabet.h"
 #include <iostream>
 #include <fstream>
