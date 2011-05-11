@@ -32,6 +32,7 @@
 
 #include "hfst-commandline.h"
 #include "HfstOutputStream.h"
+#include "HfstTransducer.h"
 
 #ifndef HAVE_ERROR_AT_LINE
 void error_at_line(int status, int errnum, const char* filename, 

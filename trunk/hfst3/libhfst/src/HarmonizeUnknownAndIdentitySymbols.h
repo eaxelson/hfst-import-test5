@@ -11,7 +11,7 @@
 
 typedef std::set<std::string> StringSet;
 
-#include "implementations/HfstTransitionGraph.h"
+#include "HfstDataTypes.h"
 
 namespace hfst
 {

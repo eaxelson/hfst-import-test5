@@ -1,5 +1,6 @@
 #include "HfstStrings2FstTokenizer.h"
 #include <algorithm>
+#include <cstring>
 
 HfstStrings2FstTokenizer::HfstStrings2FstTokenizer
 (StringVector &multichar_symbols,const std::string &eps):

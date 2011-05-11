@@ -59,7 +59,8 @@ HFST_HDRS = \
 	HfstExtractStrings.h \
 	HfstFlagDiacritics.h \
 	HfstInputStream.h \
-	HfstOutputStream.h
+	HfstOutputStream.h \
+	extensions/LexcCompiler.h
 ### Add your library here ###
 #	implementations/MyTransducerLibraryTransducer.h
 
