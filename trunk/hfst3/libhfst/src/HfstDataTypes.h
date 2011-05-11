@@ -16,7 +16,7 @@
 #  include <config.h>
 #endif
 
-#include "HfstTransducer.h"
+//#include "HfstTransducer.h"
 
 #include <string>
 #include <iostream>

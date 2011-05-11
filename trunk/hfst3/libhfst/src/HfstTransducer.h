@@ -49,6 +49,7 @@
 #include "HfstExceptionDefs.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
+#include "../../tools/src/parsers/LexcCompiler.h"
 
 #include <string>
 #include <cassert>

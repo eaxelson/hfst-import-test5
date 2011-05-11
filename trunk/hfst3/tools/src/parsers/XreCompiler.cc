@@ -4,6 +4,7 @@
 
 #include "XreCompiler.h"
 #include "xre_utils.h"
+#include "HfstTransducer.h"
 
 #ifndef DEBUG_MAIN
 

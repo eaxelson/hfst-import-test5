@@ -16,7 +16,8 @@
 #  include <config.h>
 #endif
 
-#include "HfstTransducer.h"
+//#include "HfstTransducer.h"
+namespace hfst { class HfstTransducer; }
 
 /** @file HfstInputStream.h 
     \brief Declaration of class HfstInputStream.
