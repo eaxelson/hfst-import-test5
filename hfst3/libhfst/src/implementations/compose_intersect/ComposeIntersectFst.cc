@@ -188,6 +188,7 @@ namespace hfst
 
 #else // MAIN_TEST was defined
 
+#include "HfstTransducer.h"
 #include <iostream>
 using namespace hfst::implementations;
 using namespace hfst;

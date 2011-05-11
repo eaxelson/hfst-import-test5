@@ -1,4 +1,5 @@
 #include "HarmonizeUnknownAndIdentitySymbols.h"
+#include "HfstTransducer.h"
 
 #ifndef MAIN_TEST
 

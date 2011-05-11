@@ -186,6 +186,10 @@ namespace hfst
 }
 
 #else // MAIN_TEST was defined
+
+#include "HfstTokenizer.h"
+#include "HfstTransducer.h"
+
 using namespace hfst;
 using namespace implementations;
 #include <cassert>

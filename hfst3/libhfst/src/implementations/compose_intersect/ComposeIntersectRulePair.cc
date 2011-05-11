@@ -119,6 +119,9 @@ namespace hfst
 
 #else // MAIN_TEST was defined
 
+#include "HfstTokenizer.h"
+#include "HfstTransducer.h"
+
 using namespace hfst;
 using hfst::implementations::ComposeIntersectRule;
 using hfst::implementations::ComposeIntersectRulePair;

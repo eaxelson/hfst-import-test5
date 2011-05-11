@@ -6,7 +6,7 @@
 #include <set>
 #include "../HfstSymbolDefs.h"
 #include "../HfstExceptionDefs.h"
-#include "../HfstTransducer.h" // should not include this header
+//#include "../HfstTransducer.h" // should not include this header
 #include "ConvertTransducerFormat.h"
 #include <cassert>
 #include <iostream>

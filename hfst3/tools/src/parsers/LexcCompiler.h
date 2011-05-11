@@ -30,8 +30,10 @@
 
 #include <string>
 
-#include "HfstTransducer.h"
+//#include "HfstTransducer.h"
+namespace hfst { class HfstTransducer; }
 #include "XreCompiler.h"
+#include "HfstTokenizer.h"
 
 namespace hfst {
 //! @brief Namespace for Xerox LexC related specific functions and classes.
