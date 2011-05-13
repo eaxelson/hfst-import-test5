@@ -50,6 +50,7 @@ HFST_HDRS = \
 	HfstTokenizer.h \
 	implementations/ConvertTransducerFormat.h \
 	implementations/HfstTransitionGraph.h \
+	implementations/HfstTropicalTransducerTransitionData.h \
 	implementations/compose_intersect/ComposeIntersectRulePair.h \
 	implementations/compose_intersect/ComposeIntersectLexicon.h \
 	implementations/compose_intersect/ComposeIntersectRule.h \
