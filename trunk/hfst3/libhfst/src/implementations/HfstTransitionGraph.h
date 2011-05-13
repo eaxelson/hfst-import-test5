@@ -12,15 +12,13 @@
 #include <iostream>
 
 #include "HfstTropicalTransducerTransitionData.h"
-
+#include "HfstFastTransitionData.h"
 
 /** @file HfstTransitionGraph.h
     @brief Declaration of classes needed by HFST's 
     own simple transducer format. */
 
 namespace hfst {
-
-  //class HfstTransducer;
 
   /** @brief A namespace for all code that forms a bridge between
       backend libraries and HFST.
@@ -130,6 +128,8 @@ namespace hfst {
         @see HfstTropicalTransducerTransitionData HfstBasicTransducer */
     typedef HfstTransition<HfstTropicalTransducerTransitionData> 
       HfstBasicTransition;
+
+    typedef HfstTransition<HfstFastTransitionData> HfstFastTransition;
 
     /** @brief A simple transition graph format that consists of
         states and transitions between those states.
@@ -275,18 +275,17 @@ namespace hfst {
           delete fsm;
         }
 
-	// FIXME: documented/protected
-        void initialize_alphabet(HfstTransitionGraphAlphabet &alpha) {
-          alpha.insert("@_EPSILON_SYMBOL_@");
-          alpha.insert("@_UNKNOWN_SYMBOL_@");
-          alpha.insert("@_IDENTITY_SYMBOL_@");
-        }
+	void initialize_alphabet(HfstTransitionGraphAlphabet &alpha) {
+	  alpha.insert(C::get_epsilon());
+	  alpha.insert(C::get_unknown());
+	  alpha.insert(C::get_identity());
+	}
 
         /** @brief Explicitly add a symbol to the alphabet of the graph.
 
             Usually the user does not have to take care of the alphabet
             of a graph. This function can be useful in some special cases. */
-        void add_symbol_to_alphabet(const std::string &symbol) {
+        void add_symbol_to_alphabet(const typename C::SymbolType &symbol) {
           alphabet.insert(symbol);
         }
 
@@ -1576,6 +1575,8 @@ namespace hfst {
     typedef HfstTransitionGraph <HfstTropicalTransducerTransitionData, float> 
       HfstBasicTransducer;
 
+    typedef HfstTransitionGraph <HfstFastTransitionData, float> 
+      HfstFastTransducer;
   }
    
 }
