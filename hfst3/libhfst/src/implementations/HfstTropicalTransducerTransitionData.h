@@ -1,3 +1,9 @@
+#include <string>
+#include <map>
+#include <cassert>
+#include <cstdio>
+#include <iostream>
+#include "../HfstExceptionDefs.h"
 
 namespace hfst {
 
@@ -23,7 +29,7 @@ namespace hfst {
         between strings and internal numbers.
 
         @see HfstTransition HfstBasicTransition */
-    class HfstTropicalTransducerTransitionData { // to some other file
+    class HfstTropicalTransducerTransitionData {
     public:
       /** @brief The input and output symbol type. */
       typedef std::string SymbolType;
@@ -34,6 +40,21 @@ namespace hfst {
         Number2SymbolMap;
       typedef std::map<SymbolType, unsigned int, string_comparison> 
         Symbol2NumberMap;
+
+      static SymbolType get_epsilon()
+      {
+	return SymbolType("@_EPSILON_SYMBOL_@");
+      }
+
+      static SymbolType get_unknown()
+      {
+	return SymbolType("@_UNKNOWN_SYMBOL_@");
+      }
+
+      static SymbolType get_identity()
+      {
+	return SymbolType("@_IDENTITY_SYMBOL_@");
+      }
 
     public: /* FIXME: Should be private. */
       /* Maps that contain information of the mappings between strings 
