@@ -7,7 +7,7 @@
 #include "../HfstSymbolDefs.h"
 #include "../HfstExceptionDefs.h"
 #include "ConvertTransducerFormat.h"
-#include "HfstDataTypes.h"
+#include "../HfstDataTypes.h"
 #include <cassert>
 #include <iostream>
 
