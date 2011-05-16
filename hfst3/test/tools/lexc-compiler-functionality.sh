@@ -8,7 +8,6 @@ LEXCTESTS="basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc
           basic.spurious-lexicon.lexc basic.string-pairs.lexc 
           basic.two-lexicons.lexc basic.UTF-8.lexc basic.zeros-epsilons.lexc 
           hfst.weights.lexc 
-          stress.random-lexicons-100.lexc 
           xre.any-variations.lexc
           xre.automatic-multichar-symbols.lexc xre.basic.lexc 
           xre.definitions.lexc xre.months.lexc xre.nested-definitions.lexc 
