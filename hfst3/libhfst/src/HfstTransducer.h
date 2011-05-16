@@ -1106,6 +1106,31 @@ ccc : ddd
     /** \brief Disjunct this transducer with \a another. */
     HfstTransducer &disjunct(const HfstTransducer &another);
 
+    /** \brief Make priority union of this transducer with \a another.
+     *
+     * For the operation t1.priority_union(t2), the result is a union of t1 and t2,
+     * except that whenever t1 and t2 have the same string on left side,
+     * the path in t2 overrides the path in t1.
+     *
+     * Example
+     *
+     * Transducer 1 (t1):
+     * a : a
+     * b : b
+     *
+     * Transducer 2 (t2):
+     * b : B
+     * c : C
+     *
+     * Result ( t1.priority_union(t2) ):
+     * a : a
+     * b : B
+     * c : C
+     *
+     * For more information, read: www.fsmbook.com
+     *  */
+    HfstTransducer &priority_union(const HfstTransducer &another);
+
     /* For HfstCompiler: Optimized disjunction function. */
     HfstTransducer &disjunct(const StringPairVector &spv);
 
