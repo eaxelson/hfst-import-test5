@@ -2324,6 +2324,64 @@ HfstTransducer &HfstTransducer::compose
     return *this;
 }
 
+HfstTransducer &HfstTransducer::priority_union (const HfstTransducer &another)
+{
+	bool DEBUG = false;
+
+	if ( this->type != another.type )
+	{
+		HFST_THROW_MESSAGE(HfstTransducerTypeMismatchException, "HfstTransducer::priority_union");
+	}
+	HfstTransducer tmp(*this);
+	HfstTransducer filter(another);
+	HfstTransducer final(*this);
+
+	if ( DEBUG )
+	{
+		printf("--t1--\n");
+		tmp.write_in_att_format(stdout, 1);
+		printf("--t2--\n");
+		filter.write_in_att_format(stdout, 1);
+	}
+
+	/*
+	 * Invert t1, compose it with t2, invert back.
+	 * Compose t2 with those to get the pairs which need to be filtered from t1.
+	 * Subtract those pairs from t1 and union filtered t1 with t2.
+	*/
+
+	tmp.invert();
+	tmp.compose(another);
+	tmp.minimize();
+	tmp.invert();
+	filter.compose(tmp); 	// t2 compose changed t1
+	filter.minimize();
+	if ( DEBUG )
+	{
+		printf("Filter:\n");
+		filter.write_in_att_format(stdout, 1);
+	}
+	final.subtract(filter); // subtract filter from t1
+	final.minimize();
+	if ( DEBUG )
+	{
+		printf("Subtract filter from t1:\n");
+		final.write_in_att_format(stdout, 1);
+	}
+	final.disjunct(another);    // union filtered t1 with t2
+	final.minimize();
+	if ( DEBUG )
+	{
+		printf("Final result:\n");
+		final.write_in_att_format(stdout, 1);
+	}
+	*this = final;
+
+	return *this;
+
+}
+
+
 HfstTransducer &HfstTransducer::compose_intersect
 (const HfstTransducerVector &v)
 {
@@ -2415,7 +2473,10 @@ HfstTransducer &HfstTransducer::concatenate
 	    //#if HAVE_MY_TRANSDUCER_LIBRARY
 	    //&hfst::implementations::MyTransducerLibraryTransducer::concatenate,
 	    //#endif
-	    const_cast<HfstTransducer&>(another)); }
+	    const_cast<HfstTransducer&>(another));
+}
+
+
 
 HfstTransducer &HfstTransducer::disjunct(const StringPairVector &spv)
 {
@@ -3072,17 +3133,226 @@ void HfstTransducer::print_alphabet()
 }
 
 
+
 }
 
 #else // MAIN_TEST was defined
 
 #include <iostream>
+using namespace hfst;
+using namespace implementations;
 
+// test function
+void priority_union_test ( ImplementationType TYPE )
+{
+    HfstBasicTransducer		btEmpty,
+    						btEmptyString,
+    						epsilon,
+    						bt1,
+    						bt2,
+    						bt3,
+    						bt2withoutPriority,
+    						btIdentity,
+    						btUnknown,
+    						btEpsilon,
+    						btResult1,
+    						btResult2,
+    						btResult3,
+    						btResult4,
+    						btResult5,
+    						btResult6,
+    						btResult7;
+
+    // Empty string
+    btEmptyString.set_final_weight(0, 3);
+
+    // First test transducer
+    bt1.add_transition(0, HfstBasicTransition(1, "a", "a", 1) );
+    bt1.add_transition(0, HfstBasicTransition(1, "b", "b", 2) );
+    bt1.add_transition(1, HfstBasicTransition(2, "@_EPSILON_SYMBOL_@", "1", 3) );
+    bt1.set_final_weight(2, 5);
+
+    // Second test transducer
+    bt2.add_transition(0, HfstBasicTransition(1, "c", "C", 10) );
+    bt2.add_transition(0, HfstBasicTransition(1, "b", "B", 20) );
+    bt2.add_transition(1, HfstBasicTransition(2, "@_EPSILON_SYMBOL_@", "1", 30) );
+    bt2.set_final_weight(2, 50);
+
+    // Second test transducer without priority string
+	bt2withoutPriority.add_transition(0, HfstBasicTransition(1, "c", "C", 10) );
+	bt2withoutPriority.add_transition(1, HfstBasicTransition(2, "@_EPSILON_SYMBOL_@", "1", 30) );
+	bt2withoutPriority.set_final_weight(2, 50);
+
+    // Third test transducer
+	bt3.add_transition(0, HfstBasicTransition(1, "a", "b", 55) );
+    bt3.add_transition(0, HfstBasicTransition(1, "b", "b", 65) );
+    bt3.set_final_weight(1, 75);
+
+    // Identity to Identity
+    btIdentity.add_transition(0, HfstBasicTransition(0, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 100) );
+    btIdentity.set_final_weight(0, 100);
+
+    // Unknown to unknown
+    btUnknown.add_transition(0, HfstBasicTransition(0, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 200) );
+    btUnknown.set_final_weight(0, 200);
+
+    // Epsilon
+    btEpsilon.add_transition(0, HfstBasicTransition(0, "@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@", 300) );
+    btEpsilon.set_final_weight(0, 300);
+
+    // Result 1 ... tr1 .p. emptyString
+    //			...	emptyString .p. tr1
+    btResult1.add_transition(0, HfstBasicTransition(1, "a", "a", 1) );
+    btResult1.add_transition(0, HfstBasicTransition(1, "b", "b", 2) );
+    btResult1.add_transition(1, HfstBasicTransition(2, "@_EPSILON_SYMBOL_@", "1", 3) );
+    btResult1.set_final_weight(2, 5);
+    btResult1.set_final_weight(0, 3);
+
+    // Result 2 ... tr1 .p. tr2
+      btResult2.add_transition(0, HfstBasicTransition(1, "c", "C", 10) );
+    btResult2.add_transition(0, HfstBasicTransition(1, "b", "B", 20) );
+    btResult2.add_transition(0, HfstBasicTransition(2, "a", "a", 1) );
+    btResult2.add_transition(1, HfstBasicTransition(3, "@_EPSILON_SYMBOL_@", "1", 30) );
+    btResult2.add_transition(2, HfstBasicTransition(4, "@_EPSILON_SYMBOL_@", "1", 3) );
+    btResult2.set_final_weight(3, 50);
+    btResult2.set_final_weight(4, 5);
+
+    // Result 3 ... tr1 .p. tr2 without priority
+    btResult3.add_transition(0, HfstBasicTransition(1, "c", "C", 10) );
+    btResult3.add_transition(0, HfstBasicTransition(2, "b", "b", 2) );
+    btResult3.add_transition(0, HfstBasicTransition(2, "a", "a", 1) );
+    btResult3.add_transition(1, HfstBasicTransition(3, "@_EPSILON_SYMBOL_@", "1", 30) );
+    btResult3.add_transition(2, HfstBasicTransition(4, "@_EPSILON_SYMBOL_@", "1", 3) );
+    btResult3.set_final_weight(3, 50);
+    btResult3.set_final_weight(4, 5);
+
+    // Result 4 ... tr1 .p. trIdentity
+    btResult4.add_transition(0, HfstBasicTransition(0, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 100) );
+    btResult4.add_transition(0, HfstBasicTransition(0, "b", "b", 100) );
+    btResult4.add_transition(0, HfstBasicTransition(0, "a", "a", 100) );
+    btResult4.add_transition(0, HfstBasicTransition(0, "1", "1", 100) );
+    btResult4.set_final_weight(0, 100);
+
+    // Result 5 ... trIdentity .p. tr3
+    btResult5.add_transition(0, HfstBasicTransition(1, "a", "b", 130) );
+    btResult5.add_transition(0, HfstBasicTransition(2, "b", "b", 140) );
+    btResult5.add_transition(0, HfstBasicTransition(3, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 200) );
+    btResult5.add_transition(0, HfstBasicTransition(4, "a", "a", 300) );
+    btResult5.add_transition(2, HfstBasicTransition(3, "b", "b", 160) );
+    btResult5.add_transition(2, HfstBasicTransition(3, "a", "a", 160) );
+    btResult5.add_transition(2, HfstBasicTransition(3, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 160) );
+    btResult5.add_transition(3, HfstBasicTransition(3, "b", "b", 100) );
+    btResult5.add_transition(3, HfstBasicTransition(3, "a", "a", 100) );
+    btResult5.add_transition(3, HfstBasicTransition(3, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 100) );
+    btResult5.add_transition(4, HfstBasicTransition(3, "b", "b", 0) );
+    btResult5.add_transition(4, HfstBasicTransition(3, "a", "a", 0) );
+    btResult5.add_transition(4, HfstBasicTransition(3, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
+    btResult5.set_final_weight(0, 100);
+    btResult5.set_final_weight(1, 0);
+    btResult5.set_final_weight(2, 0);
+    btResult5.set_final_weight(3, 0);
+
+    // Result 6 ... tr3 .p. trUnknown
+    btResult6.add_transition(0, HfstBasicTransition(0, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 200) );
+    btResult6.add_transition(0, HfstBasicTransition(0, "@_UNKNOWN_SYMBOL_@", "b", 200) );
+    btResult6.add_transition(0, HfstBasicTransition(0, "b", "@_UNKNOWN_SYMBOL_@", 200) );
+    btResult6.add_transition(0, HfstBasicTransition(0, "b", "a", 200) );
+    btResult6.add_transition(0, HfstBasicTransition(0, "@_UNKNOWN_SYMBOL_@", "a", 200) );
+    btResult6.add_transition(0, HfstBasicTransition(0, "a", "@_UNKNOWN_SYMBOL_@", 200) );
+    btResult6.add_transition(0, HfstBasicTransition(0, "a", "b", 200) );
+    btResult6.set_final_weight(0, 200);
+
+    // Result 7 ... trUnknown .p. tr3
+    btResult7.add_transition(0, HfstBasicTransition(1, "a", "b", 130) );
+    btResult7.add_transition(0, HfstBasicTransition(2, "b", "b", 140) );
+    btResult7.add_transition(0, HfstBasicTransition(3, "b", "a", 600) );
+    btResult7.add_transition(0, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "a", 400) );
+    btResult7.add_transition(0, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "b", 400) );
+	btResult7.add_transition(0, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 400) );
+	btResult7.add_transition(0, HfstBasicTransition(3, "b", "@_UNKNOWN_SYMBOL_@", 600) );
+	btResult7.add_transition(0, HfstBasicTransition(3, "a", "@_UNKNOWN_SYMBOL_@", 600) );
+	btResult7.add_transition(1, HfstBasicTransition(4, "a", "b", 470) );
+	btResult7.add_transition(1, HfstBasicTransition(4, "b", "a", 470) );
+	btResult7.add_transition(1, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "a", 470) );
+	btResult7.add_transition(1, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "b", 470) );
+	btResult7.add_transition(1, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 470) );
+	btResult7.add_transition(1, HfstBasicTransition(4, "b", "@_UNKNOWN_SYMBOL_@", 470) );
+	btResult7.add_transition(1, HfstBasicTransition(4, "a", "@_UNKNOWN_SYMBOL_@", 470) );
+	btResult7.add_transition(3, HfstBasicTransition(4, "a", "b", 0) );
+	btResult7.add_transition(3, HfstBasicTransition(4, "b", "a", 0) );
+	btResult7.add_transition(3, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "a", 0) );
+	btResult7.add_transition(3, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "b", 0) );
+	btResult7.add_transition(3, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0) );
+	btResult7.add_transition(3, HfstBasicTransition(4, "b", "@_UNKNOWN_SYMBOL_@", 0) );
+	btResult7.add_transition(3, HfstBasicTransition(4, "a", "@_UNKNOWN_SYMBOL_@", 0) );
+	btResult7.add_transition(4, HfstBasicTransition(4, "a", "b", 200) );
+	btResult7.add_transition(4, HfstBasicTransition(4, "b", "a", 200) );
+	btResult7.add_transition(4, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "a", 200) );
+	btResult7.add_transition(4, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "b", 200) );
+	btResult7.add_transition(4, HfstBasicTransition(4, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 200) );
+	btResult7.add_transition(4, HfstBasicTransition(4, "b", "@_UNKNOWN_SYMBOL_@", 200) );
+	btResult7.add_transition(4, HfstBasicTransition(4, "a", "@_UNKNOWN_SYMBOL_@", 200) );
+	btResult7.set_final_weight(0, 200);
+	btResult7.set_final_weight(1, 0);
+	btResult7.set_final_weight(2, 0);
+	btResult7.set_final_weight(4, 0);
+
+
+    // Transforming basic transducers to a TYPE transducer
+    HfstTransducer trEmpty(btEmpty, TYPE);
+    HfstTransducer trEmptyString(btEmptyString, TYPE);
+    HfstTransducer tr1(bt1, TYPE);
+    HfstTransducer tr2(bt2, TYPE);
+    HfstTransducer tr3(bt3, TYPE);
+    HfstTransducer tr2withoutPriority(bt2withoutPriority, TYPE);
+    HfstTransducer trIdentity(btIdentity, TYPE);
+    HfstTransducer trUnknown(btUnknown, TYPE);
+    HfstTransducer trEpsilon(btEpsilon, TYPE);
+    HfstTransducer result1(btResult1, TYPE);
+    HfstTransducer result2(btResult2, TYPE);
+    HfstTransducer result3(btResult3, TYPE);
+    HfstTransducer result4(btResult4, TYPE);
+    HfstTransducer result5(btResult5, TYPE);
+    HfstTransducer result6(btResult6, TYPE);
+    HfstTransducer result7(btResult7, TYPE);
+
+
+
+    // emptyLang .p. emptyLang
+    HfstTransducer testTr = trEmpty;
+    assert ( testTr.priority_union( trEmpty ).compare( trEmpty ) );
+    // emptyString .p. emptyString
+    testTr = trEmptyString;
+    assert ( testTr.priority_union( trEmptyString ).compare( trEmptyString ) );
+    // transducer .p. emptyString
+    testTr = tr1;
+    assert ( testTr.priority_union( trEmptyString ).compare( result1 ) );
+    // emptyString .p. transducer
+    testTr = trEmptyString;
+    assert ( testTr.priority_union( tr1 ).compare( result1 ) );
+    // normal transducer .p. normal transducer
+    testTr = tr1;
+    assert ( testTr.priority_union( tr2 ).compare( result2 ) );
+    // normal transducer .p. normal transducer without priority string
+    testTr = tr1;
+    assert (  testTr.priority_union( tr2withoutPriority ).compare( result3 ) );
+	// normal transducer .p. universal language
+    testTr = tr1;
+	assert ( testTr.priority_union( trIdentity ).compare( result4 ) );
+	// identity .p. normal transducer
+	testTr = trIdentity;
+	assert (  testTr.priority_union( tr3 ).compare( result5 ) );
+	// normal .p. unknown
+	testTr = tr3;
+	assert (  testTr.priority_union( trUnknown ).compare( result6 ) );
+	// unknown .p. normal
+	testTr = trUnknown;
+	assert ( testTr.priority_union( tr3 ).compare( result7 ) );
+}
 
 
 int main(int argc, char * argv[])
 {
-  using namespace hfst;
 
     std::cout << "Unit tests for " __FILE__ ":" << std::endl;
     
@@ -3091,58 +3361,62 @@ int main(int argc, char * argv[])
     unsigned int NUMBER_OF_TYPES=3;
 
     for (unsigned int i=0; i < NUMBER_OF_TYPES; i++) 
-      {
+    {
 	
-	// Test alphabet after substitute 
-	
-	HfstTransducer t("a", "b", types[i]); 
-	t.substitute("a", "c");
-	StringSet alpha = t.get_alphabet();
-	assert(alpha.find("b") != alpha.end());
-	assert(alpha.find("c") != alpha.end());
-	//assert(alpha.find("a") != alpha.end()); // FIXME: which is correct?
-	
-	HfstTransducer t1("a", "b", types[i]);
-	HfstTransducer t2("a", "c", types[i]);
-	t1.substitute(StringPair("a", "b"), t2);
-	alpha = t1.get_alphabet();
-	assert(alpha.find("a") != alpha.end());
-	assert(alpha.find("c") != alpha.end());
-	assert(alpha.find("b") != alpha.end());
+    	// Test alphabet after substitute
 
-	// Test the const arguments are really const
-	HfstTransducer ab("a", "b", types[i]);
-	HfstTransducer ac("b", "c", types[i]);
-	HfstTransducer ab_(ab);
-	HfstTransducer ac_(ac);
+		HfstTransducer t("a", "b", types[i]);
+		t.substitute("a", "c");
+		StringSet alpha = t.get_alphabet();
+		assert(alpha.find("b") != alpha.end());
+		assert(alpha.find("c") != alpha.end());
+		//assert(alpha.find("a") != alpha.end()); // FIXME: which is correct?
 
-	ab_.compare(ac_);
-	assert(ab_.get_alphabet() == ab.get_alphabet());
-	assert(ac_.get_alphabet() == ac.get_alphabet());
+		HfstTransducer t1("a", "b", types[i]);
+		HfstTransducer t2("a", "c", types[i]);
+		t1.substitute(StringPair("a", "b"), t2);
+		alpha = t1.get_alphabet();
+		assert(alpha.find("a") != alpha.end());
+		assert(alpha.find("c") != alpha.end());
+		assert(alpha.find("b") != alpha.end());
+	
+		// Test the const arguments are really const
+		HfstTransducer ab("a", "b", types[i]);
+		HfstTransducer ac("b", "c", types[i]);
+		HfstTransducer ab_(ab);
+		HfstTransducer ac_(ac);
+	
+		ab_.compare(ac_);
+		assert(ab_.get_alphabet() == ab.get_alphabet());
+		assert(ac_.get_alphabet() == ac.get_alphabet());
+	
+		HfstTransducer &compose(const HfstTransducer &another);
 
-	HfstTransducer &compose(const HfstTransducer &another);
+		HfstTransducer &compose_intersect(const HfstTransducerVector &v);
+
+		HfstTransducer &concatenate(const HfstTransducer &another);
+
+		HfstTransducer &disjunct(const HfstTransducer &another);
+
+		HfstTransducer &disjunct(const StringPairVector &spv);
+
+		HfstTransducer &intersect(const HfstTransducer &another);
+
+		HfstTransducer &subtract(const HfstTransducer &another);
+
+		HfstTransducer &insert_freely(const HfstTransducer &tr);
+
+		HfstTransducer &substitute(const StringPair &symbol_pair,
+					   HfstTransducer &transducer);
 	
-	HfstTransducer &compose_intersect(const HfstTransducerVector &v);
+		// priority union test
+		priority_union_test( types[i] );
 	
-	HfstTransducer &concatenate(const HfstTransducer &another);
+
+		void insert_freely_missing_flags_from
+		  (const HfstTransducer &another);
 	
-	HfstTransducer &disjunct(const HfstTransducer &another);
-	
-	HfstTransducer &disjunct(const StringPairVector &spv);
-	
-	HfstTransducer &intersect(const HfstTransducer &another);
-	
-	HfstTransducer &subtract(const HfstTransducer &another);
-	
-	HfstTransducer &insert_freely(const HfstTransducer &tr);
-	
-	HfstTransducer &substitute(const StringPair &symbol_pair,
-				   HfstTransducer &transducer);
-	
-	void insert_freely_missing_flags_from
-	  (const HfstTransducer &another);
-	
-      }
+    }
     
     std::cout << "ok" << std::endl;
     return 0;
