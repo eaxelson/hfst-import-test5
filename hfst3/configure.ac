@@ -324,6 +324,14 @@ AC_ARG_ENABLE([xfst-compiler],
 			  [enable_xfst_compiler=no])
 AM_CONDITIONAL([WANT_XFST_COMPILER], [test x$enable_xfst_compiler != xno])
 
+# Disable stress tests by default
+AC_ARG_ENABLE([stress-tests],
+              [AS_HELP_STRING([--enable-stress-tests],
+                              [include stress tests in check @<:@default=no@:>@])],
+                              [enable_stress_tests=$enableval],
+                              [enable_stress_tests=no])
+AM_CONDITIONAL([WANT_STRESSTESTS], [test x$enable_stress_tests != xno])
+
 # Checks for programs
 AC_PROG_CC
 AC_PROG_CXX
