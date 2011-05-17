@@ -22,7 +22,7 @@ libhfst_module = Extension('_libhfst',
                            sources=libsrc_and_wrap(('HfstTransducer.cc',
                                                     'HfstInputStream.cc',
                                                     'HfstOutputStream.cc')),
-                           include_dirs = ['/usr/local/include/hfst'],
+                           include_dirs = [os.path.abspath(libhfst_src_path)],
                            libraries = ['libhfst'],
                            library_dirs = ['/usr/local/lib'])
 
