@@ -15,7 +15,7 @@ libhfst_src_path = '../libhfst/src/'
 def libsrc_and_wrap(filenames):
     return list(flatten([[os.path.abspath(libhfst_src_path + filename),
                           os.path.abspath(filename.split('.')[0] + \
-                                              '_wrap.cc')]
+                                              '_wrap.cxx')]
                          for filename in filenames]))
 
 libhfst_module = Extension('_libhfst',
