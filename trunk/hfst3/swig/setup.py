@@ -24,14 +24,16 @@ def libsrc_and_wrap(filenames):
 #                                                     'HfstOutputStream.cc')),
 
 libhfst_module = Extension('_libhfst',
-                           sources=map(lambda s: libhfst_src_path + s,
-                                       ['HfstTransducer.cc',
-                                        'HfstInputStream.cc',
-                                        'HfstOutputStream.cc']) +\
+                           sources=map(
+        lambda s: os.path.abspath(libhfst_src_path + s),
+        ['HfstTransducer.cc',
+         'HfstInputStream.cc',
+         'HfstOutputStream.cc']) +\
                                ['libhfst_wrap.cxx'], # global wrapper
                            include_dirs = [os.path.abspath(libhfst_src_path)],
-                           libraries = ['libhfst'],
-                           library_dirs = ['/usr/local/lib'])
+                           libraries = [os.path.abspath(libhfst_src_path) + \
+                                            '/libhfst.la']
+                           )
 
 setup(name = 'libhfst_swig',
       version = '3.0.3_beta',
