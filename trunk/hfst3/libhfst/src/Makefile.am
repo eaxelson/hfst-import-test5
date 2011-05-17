@@ -69,7 +69,7 @@ HFST_HDRS = \
 
 hfstinclude_HEADERS = $(HFST_HDRS)
 
-libhfst_la_LDFLAGS = -no-undefined -version-info 3:0:2
+libhfst_la_LDFLAGS = -no-undefined -version-info 4:0:0
 
 LIBHFST_TSTS=HfstApply HfstInputStream HfstTransducer \
 		HfstOutputStream HfstRules HfstSymbolDefs \
