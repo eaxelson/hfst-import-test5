@@ -21,7 +21,10 @@ def libsrc_and_wrap(filenames):
 libhfst_module = Extension('_libhfst',
                            sources=libsrc_and_wrap(('HfstTransducer.cc',
                                                     'HfstInputStream.cc',
-                                                    'HfstOutputStream.cc')))
+                                                    'HfstOutputStream.cc')),
+                           include_dirs = ['/usr/local/include/hfst'],
+                           libraries = ['libhfst'],
+                           library_dirs = ['/usr/local/lib'])
 
 setup(name = 'libhfst_swig',
       version = '3.0.3_beta',
