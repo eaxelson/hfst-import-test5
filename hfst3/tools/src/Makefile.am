@@ -18,7 +18,7 @@
 SUBDIRS=hfst-proc hfst-twolc
 AUTOMAKE_OPTIONS=std-options subdir-objects
 LDADD = $(top_builddir)/libhfst/src/libhfst.la
-AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/tools/src/parsers
+AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/tools/src/parsers 
 AM_CXXFLAGS = -Wno-deprecated
 
 MAYBE_ALIASES=
@@ -144,14 +144,14 @@ endif
 
 noinst_HEADERS= \
 	calculate_functions.h hfst-commandline.h hfst-program-options.h \
-	hfst-compiler.h HfstCompiler.h HfstBasic.h HfstAlphabet.h HfstUtf8.h parsers/XreCompiler.h \
-	parsers/xre_utils.h \
+	hfst-compiler.h HfstCompiler.h HfstBasic.h HfstAlphabet.h HfstUtf8.h \
 	inc/check-params-binary.h inc/check-params-common.h \
 	inc/check-params-unary.h  inc/getopt-cases-binary.h \
 	inc/getopt-cases-common.h inc/getopt-cases-error.h  \
 	inc/getopt-cases-unary.h  inc/globals-binary.h      \
 	inc/globals-common.h      inc/globals-unary.h \
 	HfstStrings2FstTokenizer.h HfstLookupFlagDiacritics.h
+# parsers/XreCompiler.h parsers/xre_utils.h
 
 # sort alphabetically
 bin_PROGRAMS= \
@@ -190,13 +190,13 @@ hfst_fst2strings_SOURCES=hfst-fst2strings.cc $(HFST_COMMON_SRC)
 hfst_fst2txt_SOURCES=hfst-fst2txt.cc $(HFST_COMMON_SRC)
 hfst_head_SOURCES=hfst-head.cc $(HFST_COMMON_SRC)
 hfst_invert_SOURCES=hfst-invert.cc $(HFST_COMMON_SRC)
-hfst_lexc2fst_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC) \
-					  parsers/LexcCompiler.cc parsers/lexc-parser.yy \
-					  parsers/lexc-lexer.ll parsers/lexc-utils.cc \
-					  parsers/XreCompiler.cc parsers/xre_parse.yy \
-					  parsers/xre_lex.ll parsers/xre_utils.cc \
-					  parsers/LexcCompiler.h parsers/lexc-utils.h
-hfst_lexc2fst_BUILT=parsers/lexc-parser.h parsers/xre_parse.h
+hfst_lexc2fst_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC)
+#					  parsers/LexcCompiler.cc parsers/lexc-parser.yy \
+#					  parsers/lexc-lexer.ll parsers/lexc-utils.cc \
+#					  parsers/XreCompiler.cc parsers/xre_parse.yy \
+#					  parsers/xre_lex.ll parsers/xre_utils.cc \
+#					  parsers/LexcCompiler.h parsers/lexc-utils.h
+#hfst_lexc2fst_BUILT=parsers/lexc-parser.h parsers/xre_parse.h
 hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC) \
 HfstStrings2FstTokenizer.cc HfstLookupFlagDiacritics.cc
 hfst_pair_test_SOURCES=hfst-pair-test.cc $(HFST_COMMON_SRC) \
@@ -207,9 +207,9 @@ hfst_preprocess_for_optimized_lookup_format_SOURCES=hfst-preprocess-for-optimize
 													 $(HFST_COMMON_SRC)
 hfst_project_SOURCES=hfst-project.cc $(HFST_COMMON_SRC)
 hfst_push_weights_SOURCES=hfst-push-weights.cc $(HFST_COMMON_SRC)
-hfst_regexp2fst_SOURCES=hfst-regexp2fst.cc $(HFST_COMMON_SRC) \
-						parsers/XreCompiler.cc parsers/xre_parse.yy \
-						parsers/xre_lex.ll parsers/xre_utils.cc
+hfst_regexp2fst_SOURCES=hfst-regexp2fst.cc $(HFST_COMMON_SRC)
+#						parsers/XreCompiler.cc parsers/xre_parse.yy \
+#						parsers/xre_lex.ll parsers/xre_utils.cc
 hfst_remove_epsilons_SOURCES=hfst-remove-epsilons.cc $(HFST_COMMON_SRC)
 hfst_repeat_SOURCES=hfst-repeat.cc $(HFST_COMMON_SRC)
 hfst_reverse_SOURCES=hfst-reverse.cc $(HFST_COMMON_SRC)
@@ -224,11 +224,11 @@ hfst_tail_SOURCES=hfst-tail.cc $(HFST_COMMON_SRC)
 hfst_txt2fst_SOURCES=hfst-txt2fst.cc $(HFST_COMMON_SRC)
 hfst_xfst2fst_SOURCES=hfst-xfst-compiler.cc $(HFST_COMMON_SRC) \
 					  parsers/XfstCompiler.cc parsers/xfst-parser.yy \
-					  parsers/xfst-lexer.ll parsers/xfst-utils.cc \
-					  parsers/LexcCompiler.cc parsers/lexc-parser.yy \
-					  parsers/lexc-lexer.ll parsers/lexc-utils.cc \
-					  parsers/XreCompiler.cc parsers/xre_parse.yy \
-					  parsers/xre_lex.ll parsers/xre_utils.cc
+					  parsers/xfst-lexer.ll parsers/xfst-utils.cc
+#					  parsers/LexcCompiler.cc parsers/lexc-parser.yy \
+#					  parsers/lexc-lexer.ll parsers/lexc-utils.cc \
+#					  parsers/XreCompiler.cc parsers/xre_parse.yy \
+#					  parsers/xre_lex.ll parsers/xre_utils.cc
 
 # aliases:
 hfst-determinise$(EXEEXT): hfst-determinize$(EXEEXT)

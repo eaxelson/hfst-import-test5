@@ -23,6 +23,7 @@
 #include "HfstSymbolDefs.h"
 #include "implementations/HfstTransitionGraph.h"
 #include "implementations/HfstConstantTransducer.h"
+#include "parsers/LexcCompiler.h"
 
 #if HAVE_SFST
 #include "implementations/SfstTransducer.h"
