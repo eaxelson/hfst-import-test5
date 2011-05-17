@@ -358,19 +358,24 @@ AM_CONDITIONAL([CAN_DOXYGEN], [test x$DOXYGEN != xno])
 AC_CHECK_LIB([pthread], [main])
 AC_CHECK_LIB([dl], [main])
 
+AC_LANG_PUSH([C++])
 AS_IF([test "x$with_openfst" != "xno"], 
       [AC_CHECK_LIB([fst], [main], [],
                  [AC_MSG_FAILURE([openfst test failed (--without-openfst to disable)])])]
       [AC_CHECK_LIB([m], [main])])
 
 AS_IF([test "x$with_sfst" != "xno"],
-      [AC_CHECK_LIB([sfst], [main], [],
-                 [AC_MSG_FAILURE([sfst test failed (--without-sfst to disable)])])])
-
+      [AC_CHECK_LIB([sfst], [main])]
+      [AC_CHECK_LIB([sfst1], [main])])
+AS_IF([test "x$ac_cv_lib_sfst_main" == xno -a "x$ac_cv_lib_sfst1_main" == xno],
+      [AC_MSG_FAILURE([sfst tests failed (--without-sfst to disable)])])
+AC_LANG_POP
+AC_LANG_PUSH([C])
 AS_IF([test "x$with_foma" == "xcheck"],
       [AC_CHECK_LIB([z], [main])]
       [AC_CHECK_LIB([foma], [main], [],
                  [AC_MSG_FAILURE([foma test failed (--without-foma to disable)])])])
+AC_LANG_POP
 
 ### Add here your library ###
 #AS_IF([test "x$with_my_transducer_library" != "xno"],
@@ -380,18 +385,20 @@ AS_IF([test "x$with_foma" == "xcheck"],
 # Checks for header files
 AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h])
 
-AC_LANG([C++])
+AC_LANG_PUSH([C++])
 
 AS_IF([test "x$with_sfst" != "xno"],
-      [AC_CHECK_HEADERS([sfst/fst.h])]
+      [AC_CHECK_HEADERS([sfst/fst.h sfst1/fst.h])]
       [AC_CHECK_HEADERS([backward/hash_set ext/hash_set hash_set])]
       [AC_CHECK_HEADERS([backward/hash_map ext/hash_map hash_map])])
 AS_IF([test "x$with_openfst" != "xno"],
       [AC_CHECK_HEADERS([fst/fstlib.h])])
+AC_LANG_POP
+AC_LANG_PUSH([C])
 AS_IF([test "x$with_foma" != "xno"],
-      [AC_LANG_PUSH([C])]
-      [AC_CHECK_HEADERS([fomalib.h])]
-      [AC_LANG_POP])
+      [AC_CHECK_HEADERS([fomalib.h])])
+AC_LANG_POP
+
 ### Add here your library ###
 #AS_IF([test "x$with_my_transducer_library" != "xno"],
 #      [AC_CHECK_HEADERS([my_transducer_library/MyTransducerLibrary.h])])
