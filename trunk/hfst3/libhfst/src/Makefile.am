@@ -15,7 +15,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS=implementations
+SUBDIRS=implementations parsers
 AUTOMAKE_OPTIONS=subdir-objects
 lib_LTLIBRARIES = libhfst.la
 
@@ -31,7 +31,8 @@ HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc HfstOutputStream.cc\
 
 # libtool takes over
 libhfst_la_SOURCES =  $(HFST_SRCS)
-libhfst_la_LIBADD = implementations/libhfstimplementations.la
+libhfst_la_LIBADD = implementations/libhfstimplementations.la \
+			parsers/libhfstparsers.la
 
 # we only have one library target but would like a particular includedir
 # structure for various headers, so we do this
@@ -61,7 +62,8 @@ HFST_HDRS = \
 	HfstExtractStrings.h \
 	HfstFlagDiacritics.h \
 	HfstInputStream.h \
-	HfstOutputStream.h
+	HfstOutputStream.h \
+	parsers/LexcCompiler.h parsers/XreCompiler.h
 ### Add your library here ###
 #	implementations/MyTransducerLibraryTransducer.h
 
