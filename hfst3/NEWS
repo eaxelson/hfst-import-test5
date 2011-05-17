@@ -5,6 +5,14 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.0.3
+---------------------------
+
+* numerous internal improvements, eg. distcheck is now functional
+
+* many bugfixes, especially wrt. INDENTITY_PAIR & OTHER SYMBOL, composition,
+  final weights in ol-converted transducers
+
 Noteworthy changes in 3.0.2
 ---------------------------
 
