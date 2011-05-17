@@ -23,10 +23,6 @@ libhfst_module = Extension('_libhfst',
                                                     'HfstInputStream.cc',
                                                     'HfstOutputStream.cc')))
 
-print libsrc_and_wrap(('HfstTransducer.cc',
-                       'HfstInputStream.cc',
-                       'HfstOutputStream.cc'))
-
 setup(name = 'libhfst_swig',
       version = '3.0.3_beta',
       author = 'HFST team',
