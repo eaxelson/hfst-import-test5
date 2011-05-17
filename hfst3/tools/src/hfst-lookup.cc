@@ -594,7 +594,7 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
           }
         space++;
       }
-    char* lookupform = strdup("");
+    char* lookupform = 0;
     if (result != NULL)
       {
         lookupform = static_cast<char*>(malloc(sizeof(char)*lookup_len+1));
@@ -633,9 +633,10 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
       }
     else
       {
+        free(lookupform);
         lookupform = strdup("");
       }
-    char* inputform = strdup("");
+    char* inputform = 0;
     if (input != NULL)
       {
         inputform = static_cast<char*>(malloc(sizeof(char)*input_len+1));
@@ -674,6 +675,7 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
       }
     else
       {
+        free(inputform);
         inputform = strdup("");
       }
     if (markup != NULL)
@@ -830,6 +832,8 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
     free(b);
     free(i);
     free(m);
+    free(inputform);
+    free(lookupform);
     int rv;
     if (not quote_special)
       rv = fprintf(ofile, "%s", res);
@@ -1100,7 +1104,7 @@ bool is_lookup_infinitely_ambiguous(HfstBasicTransducer &t,
 HfstOneLevelPaths*
 lookup_simple(const HfstOneLevelPath& s, HfstTransducer& t, bool* infinity)
 {
-  HfstOneLevelPaths* results = new HfstOneLevelPaths;
+  HfstOneLevelPaths* results = 0;
   if (t.is_lookup_infinitely_ambiguous(s.second))
     {
       if (!silent && infinite_cutoff > 0) {
