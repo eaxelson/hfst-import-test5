@@ -26,7 +26,7 @@ test_transducer_functions test_hfst_basic_transducer test_flag_diacritics \
 test_examples test_lexc
 
 # files needed for test programs
-EXTRA_DIST= foobar.att test_transducers.att test_lexc.lexc
+EXTRA_DIST=foobar.att test_transducers.att test_lexc.lexc
 
 clean-local:
 	-rm -f *.att *.hfst

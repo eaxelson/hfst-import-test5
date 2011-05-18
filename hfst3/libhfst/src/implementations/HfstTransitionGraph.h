@@ -208,6 +208,9 @@ namespace hfst {
         /** @brief A vector of transitions of a state in an HfstTransitionGraph. */
         typedef std::vector<HfstTransition<C> > HfstTransitions;
 
+	typedef std::pair<typename C::SymbolType, 
+	  typename C::SymbolType> HfstSymbolPair; 
+
       protected:
         typedef std::map<HfstState, 
           HfstTransitions >
@@ -1289,7 +1292,8 @@ namespace hfst {
             in this graph.            
         */
         HfstTransitionGraph &
-          substitute(const StringPair &sp, const HfstTransitionGraph &graph) {
+          substitute(const HfstSymbolPair &sp, 
+		     const HfstTransitionGraph &graph) {
           
           // If neither symbol to be substituted is known to the graph,
           // do nothing.
@@ -1318,8 +1322,8 @@ namespace hfst {
 
                   // Whether there is anything to substitute 
                   // in this transition
-                  if (data.get_input_symbol().compare(sp.first) == 0 &&
-                      data.get_output_symbol().compare(sp.second) == 0) 
+                  if (data.get_input_symbol() == sp.first &&
+                      data.get_output_symbol() == sp.second) 
                     {
                       // schedule a substitution
                       substitutions.push_back(substitution_data
@@ -1358,7 +1362,7 @@ namespace hfst {
         /** @brief Insert freely any number of \a symbol_pair in 
             the graph with weight \a weight. */
         HfstTransitionGraph &insert_freely
-          (const StringPair &symbol_pair, W weight) 
+          (const HfstSymbolPair &symbol_pair, W weight) 
           {          
             alphabet.insert(symbol_pair.first);
             alphabet.insert(symbol_pair.second);
@@ -1377,7 +1381,7 @@ namespace hfst {
           (const HfstTransitionGraph &graph)
           {
             std::string marker("@_MARKER_SYMBOL_@");
-            StringPair marker_pair(marker, marker);
+            HfstSymbolPair marker_pair(marker, marker);
             insert_freely(marker_pair, 0);
             substitute(marker_pair, graph);
             alphabet.erase(marker);

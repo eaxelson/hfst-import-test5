@@ -103,7 +103,8 @@ LexcCompiler& LexcCompiler::parse(const char* filename)
     hlexcin = fopen(filename, "r");
     if (hlexcin == NULL)
       {
-        fprintf(stderr, "could not open %s for reading\n", filename);
+        fprintf(stderr, "could not open %s/%s for reading\n", 
+		getenv("PWD"), filename);
         return *this;
       }
     hlexcparse();
