@@ -4,7 +4,19 @@ int main(int argc, char **argv)
 {
   using namespace hfst;
   using namespace hfst::lexc;
-  
+
+  FILE * testfile = fopen("test_lexc.lexc", "wb");
+  fprintf(testfile, "LEXICON Root\n\n"
+	  "A;\n"
+	  "B;\n\n"
+	  "LEXICON A\n\n"
+	  "cat #;\n"
+	  "dog #;\n\n"
+	  "LEXICON B\n\n"
+	  "mouse #;\n"
+	  );
+  fclose(testfile);
+
   const unsigned int TYPES_SIZE=3;//4;
   const ImplementationType types [] = {SFST_TYPE, 
 				       TROPICAL_OPENFST_TYPE, 
@@ -31,5 +43,7 @@ int main(int argc, char **argv)
       assert(animals.compare(*parsed));
       delete parsed;
     }
+
+  remove("test_lexc.lexc");
 
 }
