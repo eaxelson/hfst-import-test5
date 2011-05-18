@@ -5,6 +5,7 @@ int main(int argc, char **argv)
   using namespace hfst;
   using namespace hfst::lexc;
 
+  /*
   FILE * testfile = fopen("test_lexc.lexc", "wb");
   fprintf(testfile, "LEXICON Root\n\n"
 	  "A;\n"
@@ -16,6 +17,7 @@ int main(int argc, char **argv)
 	  "mouse #;\n"
 	  );
   fclose(testfile);
+  */
 
   const unsigned int TYPES_SIZE=3;//4;
   const ImplementationType types [] = {SFST_TYPE, 
@@ -27,7 +29,8 @@ int main(int argc, char **argv)
   for (unsigned int i=0; i<TYPES_SIZE; i++)
     {
       LexcCompiler compiler(types[i]);
-      compiler.parse("test_lexc.lexc");
+      compiler.parse((std::string(getenv("srcdir")) + 
+		      std::string("/test_lexc.lexc")).c_str());
       HfstTransducer * parsed = compiler.compileLexical();
 
       HfstTokenizer tok;
@@ -44,6 +47,6 @@ int main(int argc, char **argv)
       delete parsed;
     }
 
-  remove("test_lexc.lexc");
+  //remove("test_lexc.lexc");
 
 }
