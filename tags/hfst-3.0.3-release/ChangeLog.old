@@ -1,0 +1,877 @@
+2010-03-22 17:15  mie
+
+	* : Also, start from empty in rebuilding phase
+
+2010-03-22 17:09  mie
+
+	* : Start building from *empty(), not *epsilon()
+
+2010-03-22 14:27  moshagen
+
+	* : A few more files to ignore.
+
+2010-03-22 08:54  hardwick
+
+	* : Increased buffer sizes in optimized-lookup
+
+2010-03-17 05:25  mie
+
+	* : optimizations by cppcheck, thanks to Harri Pitkänen for heads
+	  up on the tool
+
+2010-03-16 12:43  mpsilfve
+
+	* : Changed InputReader so that it has a larger buffer
+
+2010-03-15 02:35  mie
+
+	* : still broken eliminate-flags with buggy regexes
+
+2010-03-15 02:33  mie
+
+	* : Remove hfst2 from include path. patch by Harri Pitkänen§
+
+2010-03-03 00:14  mie
+
+	* : Update docs for pending release
+
+2010-03-02 03:05  mie
+
+	* : Move FlagDiacritic code to the library
+
+2010-02-24 23:55  mie
+
+	* : Combine substring points
+
+2010-02-23 22:37  mie
+
+	* : Swap ? and ?:?
+
+2010-02-22 18:19  mie
+
+	* : Allow final weight for XRE parser
+
+2010-02-09 15:45  mie
+
+	* : missing format symbol for apertium output, patch by Kevin
+	  Brubeck Unhammer
+
+2010-02-08 12:42  mpsilfve
+
+	* : Fixed problem in intersecting composition with argument
+	  transducers which were empty.
+
+2010-02-07 21:19  mie
+
+	* : Fix xerox formats again
+
+2010-02-02 14:40  mpsilfve
+
+	* : The new version of weighted optimized lookup transducers where
+	  flagdiacritics are treated as epsilons in the transition index
+	  array
+
+2010-02-02 14:39  mpsilfve
+
+	* : The new version of unweighted optimized lookup transducers
+	  where flagdiacritics are treated as epsilons in the transition
+	  index array
+
+2010-02-02 14:39  hardwick
+
+	* : New flag transition-ordering for lookup and
+	  a new output-dumping commandline option for maximum speed
+
+2010-01-29 09:05  moshagen
+
+	* : Ignore the binary file 'hfst-flag-diacritics'.
+
+2010-01-28 17:00  mie
+
+	* : remove AC_SYSTEM_EXTENSIONS for Mac OS X compatibility
+
+2010-01-28 12:38  mie
+
+	* : All sorts of different formatting
+
+2010-01-26 13:58  mie
+
+	* : Flag diacritical tool§
+
+2010-01-26 08:58  mie
+
+	* : specific tool to evaluate morphologies as spellers
+
+2010-01-26 08:57  mie
+
+	* : Update lookup to support some apertium input format and true
+	  getline
+
+2010-01-17 03:17  mie
+
+	* : On second thought, use std::less by derefence as compare
+
+2010-01-17 02:30  mie
+
+	* : Remove broken KeyVector comparison functor
+
+2010-01-13 00:37  mie
+
+	* : Change warning 7 to more readable by bug report from Sjur
+	  Moshagen
+
+2010-01-08 19:38  hardwick
+
+	* : Fixed include bug with hfst2/hfst/string.h
+
+2010-01-05 12:33  mpsilfve
+
+	* : hfst-lookup now uniqizes (wonder whether that's a word...)
+	  results
+
+2010-01-04 04:24  mie
+
+	* : Pass STL containers by reference
+
+2009-12-21 13:06  mpsilfve
+
+	* : Fixed new state finality bug in compose-intersect
+
+2009-12-18 15:38  mpsilfve
+
+	* : Added hfst3_proposition
+
+2009-12-17 16:38  mie
+
+	* : another way to break a ChangeLog with svn2cl
+
+2009-12-17 16:22  mie
+
+	* : Documentation and version marker changes for release
+
+2009-12-16 13:58  hardwick
+
+	* : Documented input-multichar handling in optimized-lookup
+
+2009-12-15 15:48  moshagen
+
+	* : Ignore the generated binary hfst-substitute.
+
+2009-12-15 13:06  mie
+
+	* : Make default format strings print neatly
+
+2009-12-15 13:05  mie
+
+	* : Correct synopsis line
+
+2009-12-15 10:12  mie
+
+	* : Man page for new substitution tool
+
+2009-12-14 11:42  mie
+
+	* : Pretty statistics
+
+2009-12-13 18:39  mie
+
+	* : Update bug listing and document bug reporting procedures.
+
+2009-12-13 18:18  mie
+
+	* : A new tool: hfst-substitute
+
+2009-12-11 17:40  hardwick
+
+	* : Misc. corner case fixes to optimized-lookup
+
+2009-12-11 13:57  hardwick
+
+	* : get_symbol and empty require in weighted fixes to
+	  optimized-lookup
+
+2009-12-11 03:15  mie
+
+	* : Note infinite results non-verbose mode
+
+2009-12-10 19:32  mpsilfve
+
+	* : Fixed key not found problem in lift_input_keys
+
+2009-12-10 19:03  mie
+
+	* : Print before and after flags on verbose
+
+2009-12-10 18:44  hardwick
+
+	* : Obsessive flag-checking in optimized-lookup
+
+2009-12-08 16:42  hardwick
+
+	* : Temporary (suboptimal) flag handling in optimized-lookup
+
+2009-12-08 09:41  hardwick
+
+	* : Don't assume flag transition ordering in optimized-lookup
+
+2009-12-07 02:23  mie
+
+	* : Apparently flag diacritics filtering deletes its parameters
+	  inconditionally; working around
+
+2009-12-06 18:17  mie
+
+	* : Preliminary flag diacritic support in hfst-diff-test.
+	  
+	  May break occasionally.
+
+2009-12-05 14:44  mie
+
+	* : Have all built sources in BUILT_SOURCES
+
+2009-12-04 12:01  mpsilfve
+
+	* : Adding zero to the optimized lookup transducer regardless of
+	  whether it is in the alphabet or not
+
+2009-12-04 12:00  mpsilfve
+
+	* : Adding zero to the optimized lookup transducer regardless of
+	  whether it is in the alphabet or not
+
+2009-12-04 11:59  mpsilfve
+
+	* : Adding zero to the optimized lookup transducer regardless of
+	  whether it is in the alphabet or not
+
+2009-12-04 11:57  mpsilfve
+
+	* : Since hfst-optimized-lookup can nowadays skip flag diacritics
+	  on the input side, thaes aren't written as epsilons in
+	  lookup-optimize anymore
+
+2009-12-03 17:41  hardwick
+
+	* : Better understanding of non-flag @*@ symbols in
+	  optimized-lookup
+
+2009-12-03 16:50  hardwick
+
+	* : optimized-lookup munging
+
+2009-12-03 16:38  mpsilfve
+
+	* : Forgot to filter flag diacritics
+
+2009-12-03 15:33  mpsilfve
+
+	* : fixed hfst-lookup slowness problem
+
+2009-12-03 15:32  mpsilfve
+
+	* : Fixed hfst-diff-test slowness problem
+
+2009-12-02 18:33  hardwick
+
+	* : Groping for flag diacritic sanity in optimized-lookup
+
+2009-12-02 10:50  hardwick
+
+	* : Empty disallow flag diacritic in optimized-lookup
+
+2009-11-28 17:14  mie
+
+	* : Some statistics for lookup for automated coverage tests
+
+2009-11-26 19:15  mie
+
+	* : Removed flag diacritics printing from SFST's fst-lex.
+
+2009-11-25 19:04  mie
+
+	* : Fix @ reporting
+
+2009-11-25 17:58  mie
+
+	* : Verbosely print the lexicon building process
+
+2009-11-25 15:52  mpsilfve
+
+	* : Fixed HWFST::minimize again and fixed HWFST::find_all_paths
+
+2009-11-25 13:37  mpsilfve
+
+	* : Fixed HWFST::minimize again
+
+2009-11-25 13:21  mpsilfve
+
+	* : Fixed HWFST::minimize
+
+2009-11-25 08:42  mie
+
+	* : Print “Minimizing...” when minimising
+
+2009-11-25 08:15  mpsilfve
+
+	* : Fxed symbol table issue in hfst-compose-intersect
+
+2009-11-25 02:51  mie
+
+	* : Add warning for broken flag diacritics
+
+2009-11-24 16:23  mpsilfve
+
+	* : Fixed word boundary and harmonization problem in compose
+	  intersect
+
+2009-11-24 14:02  mpsilfve
+
+	* : Fixed word boundaries in hfst-twolc
+
+2009-11-24 10:00  mpsilfve
+
+	* : Fixed hfst-compose so it will warn in verbose mode if -F option
+	  isn't used and there are flag diacritics in transducers
+
+2009-11-24 09:48  mpsilfve
+
+	* : Added random paths finding to weighted side
+
+2009-11-23 23:21  mie
+
+	* : Xerox related bugs added
+
+2009-11-23 16:20  mpsilfve
+
+	* : Changed error msg in LeftArrowRule.h
+
+2009-11-23 16:18  mpsilfve
+
+	* : added random option on weighted side in fst2strings
+
+2009-11-23 11:59  mpsilfve
+
+	* : Added minimize_key_table
+
+2009-11-23 11:52  mpsilfve
+
+	* : Added minimize_key_table
+
+2009-11-20 13:59  mpsilfve
+
+	* : Added @R.X@ and @D.X@ type flag diacritics and fixed @R.X.Y@
+	  type flag diacritics.
+
+2009-11-19 20:49  moshagen
+
+	* : Ignore all the compiled HFST tools.
+
+2009-11-18 14:41  hardwick
+
+	* : Prevented distribution of generated hfst-twolc
+
+2009-11-18 13:14  moshagen
+
+	* : Ignore generated hfst-twolc.
+
+2009-11-18 12:59  mpsilfve
+
+	* : Fixed unknown symbols in compose-intersect
+
+2009-11-18 00:32  mie
+
+	* : Include BUGS in distribution, record hfst-bugs@h.f INBOX
+
+2009-11-17 23:32  mpsilfve
+
+	* : Removed generated file hfst-twolc
+
+2009-11-17 23:07  hardwick
+
+	* : Realigned handling of empty inputs in ol with lookup
+
+2009-11-17 22:44  hardwick
+
+	* : Added unrecognized tag to optimized-lookup output
+
+2009-11-17 22:33  hardwick
+
+	* : Yet another output unification wrt (optimized-)lookup
+
+2009-11-17 22:11  hardwick
+
+	* : Made optimized-lookup output less nicely spaced
+	  out to make it comply with lookup
+
+2009-11-17 21:18  moshagen
+
+	* : More generated files to ignore.
+
+2009-11-17 21:17  moshagen
+
+	* : More generated files to ignore, now created by the make dist
+	  target.
+
+2009-11-17 20:58  mie
+
+	* : Kill all gettext invocations
+
+2009-11-17 17:34  hardwick
+
+	* : Fixed some 32-bit behaviour in optimized-lookup
+
+2009-11-17 16:24  hardwick
+
+	* : Aligned hfst-optimized-lookup to out current beliefs
+	  regarding flag diacritics
+
+2009-11-17 07:05  hardwick
+
+	* : Added flex version checks
+
+2009-11-16 18:22  mpsilfve
+
+	* : Added flag diacritics functionality to hfst-compose
+
+2009-11-16 08:05  moshagen
+
+	* : The last batch of generated files to ignore.
+
+2009-11-16 07:58  moshagen
+
+	* : Still more generated files to ignore.
+
+2009-11-16 07:11  moshagen
+
+	* : Ignore even more generated files.
+
+2009-11-16 07:09  moshagen
+
+	* : Ignore still more generated files.
+
+2009-11-16 07:07  moshagen
+
+	* : Ignore more generated files.
+
+2009-11-16 07:06  moshagen
+
+	* : Ignore more generated files.
+
+2009-11-16 07:05  moshagen
+
+	* : Ignore more generated files.
+
+2009-11-16 07:02  moshagen
+
+	* : Ignore more generated files.
+
+2009-11-16 06:59  moshagen
+
+	* : Ignore generated files and directories.
+
+2009-11-16 06:46  moshagen
+
+	* : Ignore generated distributions.
+
+2009-11-15 15:57  mie
+
+	* : Disable nls and gettext
+
+2009-11-13 21:37  moshagen
+
+	* : Ignore generated files.
+
+2009-11-13 16:22  eaxelson
+
+	* : print_transducer now always prints initial state first
+
+2009-11-13 15:01  mpsilfve
+
+	* : Fixed lookup so it can handle flag diacritics in non-identity
+	  pairs.
+
+2009-11-13 13:29  mpsilfve
+
+	* : Fixed weighted compose-intersect so it doesn't assume the start
+	  state of a transducer is 0
+
+2009-11-13 10:34  mie
+
+	* : Force ignorance of generated m4 in svn
+
+2009-11-13 10:29  mie
+
+	* : Remove generated m4 macros from svn
+
+2009-11-13 10:12  mie
+
+	* : Try LT_INIT before AC_PROG_LIBTOOL (from libvoikko's
+	  configure.ac, may fix
+	  problems on some platforms with >=libtool-2)
+
+2009-11-12 20:14  mpsilfve
+
+	* : Diacritics can now be variable values
+
+2009-11-12 18:53  mpsilfve
+
+	* : Fixed escaping of diacritics
+
+2009-11-12 15:00  mpsilfve
+
+	* : Fixed bug with unknown symbols in compose-intersect
+
+2009-11-11 23:10  mpsilfve
+
+	* : Added support for unknown lexicon chars in twolc and
+	  compose-intersect
+
+2009-11-11 20:51  mpsilfve
+
+	* : Fixed some tests and compose intersect
+
+2009-11-11 20:24  mpsilfve
+
+	* : Fixed twolc word-boundary bug
+
+2009-11-11 12:24  mie
+
+	* : Make all #s special
+
+2009-11-11 02:08  mie
+
+	* : Keep generated file out of svn
+
+2009-11-11 01:54  mie
+
+	* : Remove extra newline from xerox's initial format string
+
+2009-11-10 11:40  hardwick
+
+	* : Made xerox output default in optimized-lookup
+
+2009-11-10 10:10  mpsilfve
+
+	* : Removed print_transducer form hfst-lookup-optimize (it was
+	  there by mistake)
+
+2009-11-08 22:44  mie
+
+	* : rename trunk
+
+2009-11-08 19:50  mie
+
+	* : Tell big news
+
+2009-11-08 17:22  mie
+
+	* : Version number bump
+
+2009-11-06 13:13  mpsilfve
+
+	* : Fixed a potential endless loop in
+	  fst_intersecting_composition.C
+
+2009-11-05 18:51  mpsilfve
+
+	* :
+
+2009-11-05 17:18  mpsilfve
+
+	* : Fixed weighted is_subset and weighted intersecting composition
+	  (again)
+
+2009-11-05 12:00  eaxelson
+
+	* : a bug in unweighted negation fixed
+
+2009-11-04 15:15  mie
+
+	* : Remove generated sources from svn
+
+2009-11-04 15:14  mie
+
+	* : Remove useless hlexc additions, such as alphabet and metadata
+
+2009-11-04 13:31  mpsilfve
+
+	* : Removed superfluous flex rules in hfst-twolc/src/scanner.ll
+
+2009-11-04 12:09  mpsilfve
+
+	* : Fixed lookup so that it handles flag diacritics
+
+2009-11-04 12:08  mpsilfve
+
+	* : Fixed lookup so that it handles flag diacritics
+
+2009-11-04 12:04  mpsilfve
+
+	* : Fixed bug in using escaped symbols in set constructions
+
+2009-11-04 09:58  mpsilfve
+
+	* : Fixed lookup so that it handles diacritics
+
+2009-11-03 22:20  mie
+
+	* : svn:ignore stuff
+
+2009-11-03 22:16  mie
+
+	* : Remove generated message files
+
+2009-11-03 19:45  hardwick
+
+	* : fixed misunderstanding in README
+
+2009-11-03 19:13  hardwick
+
+	* : added xerox output to optimized-lookup
+
+2009-11-03 16:44  hardwick
+
+	* : typo fix
+
+2009-11-03 16:29  hardwick
+
+	* : Fixed unification in optimized-lookup again (I'm sure I did
+	  this already...)
+	  There appear to be some generated files under version control
+	  with @s in
+	  their names and I can't figure out how to svn rm them D:
+
+2009-11-03 16:08  hardwick
+
+	* : Fixed bug with initial flag-transition
+
+2009-11-03 13:40  mie
+
+	* : Dummy pair test for fao
+
+2009-11-03 13:36  mie
+
+	* : Include fao test
+
+2009-11-03 13:33  mie
+
+	* : kill further references to readline
+
+2009-11-03 13:29  mie
+
+	* : Kill readline? Again?
+
+2009-11-03 13:09  mie
+
+	* : Kill readline
+
+2009-11-03 13:04  mie
+
+	* : Kill documentation
+
+2009-11-02 16:41  mie
+
+	* : Reserve double format string space (should be vsprintf)
+
+2009-10-30 07:47  hardwick
+
+	* : optimized-lookup was missing a short flag
+
+2009-10-30 07:24  hardwick
+
+	* : synchronised optimized-lookup versions
+
+2009-10-28 14:01  mpsilfve
+
+	* : Added HFST/HWFST::compose without bool parameter destructive
+
+2009-10-27 15:11  mie
+
+	* : make no lookup format effective on unweighted side as well
+
+2009-10-27 14:53  mie
+
+	* : format no results
+
+2009-10-27 14:32  mie
+
+	* : Optionalise readline support more
+
+2009-10-22 17:16  mpsilfve
+
+	* : Added containment and insertion operations to xre_parse.yy
+
+2009-10-22 14:03  mpsilfve
+
+	* : gcc 4.3 fixes and hfst-regexp2fst input reading changed so
+	  there is no maximum length for lines.
+
+2009-10-21 23:05  mie
+
+	* : One more generated file here
+
+2009-10-21 18:46  mpsilfve
+
+	* : Fixed compose-intersect again... Also fixed
+	  hfst-lookup-functionality-test
+
+2009-10-21 16:50  hardwick
+
+	* : Fixed non-nested build #define in hfst-lookup
+
+2009-10-21 16:14  mie
+
+	* : Typoed ^ in apertium results, thanks to Francis Tyers & Sjur
+	  Moshagen for noticing.
+
+2009-10-21 16:12  mie
+
+	* : Mark new version as some changes in functionality have been
+	  implemented.
+
+2009-10-21 14:19  mie
+
+	* : Update --help instructions to inform about readline feature.
+
+2009-10-21 14:00  mie
+
+	* : Somehow attribute the fact that Xerox treats # specially
+
+2009-10-21 13:59  mie
+
+	* : Bit more jiggling with weight positioning here
+
+2009-10-21 13:58  mie
+
+	* : More removals of generated files from version control
+
+2009-10-21 13:53  mie
+
+	* : Lookup with readline and format strings
+
+2009-10-20 11:52  mie
+
+	* : Move weights from final states towards arcs
+
+2009-10-20 00:04  mie
+
+	* : Support # as implicitly synonymous to special word boundary
+	  marker
+
+2009-10-19 19:46  mie
+
+	* : Still more tweaks to joiner elimination (HWFST::State changes
+	  depending on weight assigned to incoming arc?)
+
+2009-10-19 18:22  mie
+
+	* : Slightly optimize ? handling (still wasteful)
+
+2009-10-19 16:42  mie
+
+	* : include Faeroese test suite in top level configure
+
+2009-10-19 16:26  mie
+
+	* : Add Faeroese test case
+
+2009-10-19 09:38  mie
+
+	* : Omit epsilons as early as possible
+
+2009-10-19 08:59  mie
+
+	* : tell (what is being done)
+
+2009-10-18 23:54  mie
+
+	* : Print all the interesting stuff even without -v
+
+2009-10-15 16:05  mie
+
+	* : Remove extraneous building in lexc joining
+
+2009-10-15 14:31  mpsilfve
+
+	* : Fixed hfst-compose-intersect segfault for the second time.
+
+2009-10-15 14:21  hardwick
+
+	* : README copyedit
+
+2009-10-15 14:16  hardwick
+
+	* : Added note about make install-strip in README
+
+2009-10-15 14:11  mie
+
+	* : slightly jiggle lexc joiner elimination scheme for fun
+
+2009-10-15 13:38  hardwick
+
+	* : Makefile fix
+
+2009-10-15 13:36  hardwick
+
+	* : made everything compile with -O3
+
+2009-10-15 12:33  mpsilfve
+
+	* : Change hfst-twolc epsilon symbol to @0@ and any-symbol to @?@
+
+2009-10-15 09:02  hardwick
+
+	* : README copyedit
+
+2009-10-15 08:16  mie
+
+	* : Detail VC building and few more things in README
+
+2009-10-15 07:14  hardwick
+
+	* : updated BUGS
+
+2009-10-14 20:40  mie
+
+	* : Make more special characters explicit in alphabet
+
+2009-10-14 17:41  mie
+
+	* : Include ChangeLog for detailed view on Changes between release
+	  versions
+
+2009-10-14 17:40  mie
+
+	* : Include NEWS to overview releases
+
+2009-10-14 17:24  mie
+
+	* : Some version markers to 2.X
+
+2009-10-14 17:20  mie
+
+	* : Remove generated files from version control
+
+2009-10-14 13:40  mpsilfve
+
+	* : Fixed hfst-lookup
+
+2009-10-14 11:14  mpsilfve
+
+	* : Added word-boundaries @#@ to hfst-compose-intersect and
+	  hfst-twolc
+
+2009-10-14 11:11  hardwick
+
+	* : Updated hfst-tools/README
+
+2009-10-14 11:11  hardwick
+
+	* : Removed weighted2unweighted and unweighted2weighted
+
+2009-10-14 07:59  hardwick
+
+	* : Moved everything into hfst-2.0
+	  This may break your commits, sorry about that -
+	  revert if necessary.
+
