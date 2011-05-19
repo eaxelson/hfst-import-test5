@@ -99,7 +99,14 @@ int main(int argc, char **argv)
   sps.insert(StringPair("C","D"));
   tr.substitute(StringPair("a","b"), sps);
 
-  //tr.write_in_att_format(stderr);
-
+  verbose_print("HfstBasicTransducer: EmptyStringException");
+  
+  try {
+    HfstBasicTransducer empty_symbol;
+    empty_symbol.add_transition(0, HfstBasicTransition(0, "", "", 0));
+  }
+  catch (EmptyStringException e) {
+    ;
+  }
 }
 
