@@ -70,6 +70,8 @@ HFST_EXCEPTION_CHILD_DEFINITION(IncorrectUtf8CodingException);
 
 HFST_EXCEPTION_CHILD_DEFINITION(EmptyStringException);
 
+HFST_EXCEPTION_CHILD_DEFINITION(SymbolNotFoundException);
+
 //HFST_EXCEPTION_CHILD_DEFINITION(SymbolRedefinedException); 
 //HFST_EXCEPTION_CHILD_DEFINITION(TransducerHasNoStartStateException);
 //HFST_EXCEPTION_CHILD_DEFINITION(TransducerHasMoreThanOneStartStateException);

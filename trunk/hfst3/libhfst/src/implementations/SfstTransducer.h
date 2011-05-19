@@ -167,6 +167,8 @@ namespace implementations
 
       static StringSet get_alphabet(Transducer *t);
       static void insert_to_alphabet(Transducer *t, const std::string &symbol);
+      static unsigned int get_symbol_number(Transducer *t, 
+					    const std::string &symbol);
 
     protected:
       static void initialize_alphabet(Transducer *t);

@@ -332,6 +332,9 @@ An example:
     /* Explicitely insert \a symbol to the alphabet of the transducer. */
     void insert_to_alphabet(const std::string &symbol); 
 
+    /* Get the number used to represent the symbol \a symbol. */
+    unsigned int get_symbol_number(const std::string &symbol);
+
     /* For internal use, implemented only for SFST_TYPE. */          
     std::vector<HfstTransducer*> extract_path_transducers();
 

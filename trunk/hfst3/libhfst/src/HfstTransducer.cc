@@ -185,6 +185,36 @@ StringSet HfstTransducer::get_alphabet() const
     }    
 }
 
+unsigned int HfstTransducer::get_symbol_number(const std::string &symbol) 
+{
+  switch(type)
+    {
+#if HAVE_SFST
+    case SFST_TYPE:
+      return sfst_interface.get_symbol_number(implementation.sfst, symbol);
+#endif
+#if HAVE_OPENFST
+    case TROPICAL_OPENFST_TYPE:
+      return tropical_ofst_interface.get_symbol_number
+	(implementation.tropical_ofst, symbol);
+    case LOG_OPENFST_TYPE:
+      return log_ofst_interface.get_symbol_number(implementation.log_ofst,
+						  symbol);
+#endif
+#if HAVE_FOMA
+    case FOMA_TYPE:
+      return foma_interface.get_symbol_number(implementation.foma,
+					      symbol);
+#endif
+    case ERROR_TYPE:
+      HFST_THROW(TransducerHasWrongTypeException);
+    case HFST_OL_TYPE:
+    case HFST_OLW_TYPE:
+    default:
+      HFST_THROW_MESSAGE(FunctionNotImplementedException, 
+			   "get_symbol_number");
+    }    
+}
 
 // *** HARMONIZATION FUNCTIONS... ***
 

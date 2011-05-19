@@ -78,6 +78,17 @@ namespace hfst { namespace implementations
     return s;
   }
 
+  unsigned int TropicalWeightTransducer::get_symbol_number
+  (StdVectorFst *t, 
+   const std::string &symbol)
+  {
+    assert(t->InputSymbols() != NULL);
+    int64 i = t->InputSymbols()->Find(symbol);
+    if (i < 0)
+      HFST_THROW(SymbolNotFoundException);
+    return (unsigned int)i;
+  }
+
   /* Find the number-to-number mappings needed to be performed to t1 
      so that it will follow the same symbol-to-number encoding as t2.
      @pre t2's symbol table must contain all symbols in t1's symbol table. 

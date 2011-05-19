@@ -259,6 +259,9 @@ namespace implementations
       static void insert_to_alphabet
         (StdVectorFst *t, const std::string &symbol);
       static StringSet get_alphabet(StdVectorFst *t);
+      static unsigned int get_symbol_number(StdVectorFst *t, 
+					    const std::string &symbol);
+
       static NumberNumberMap create_mapping
         (StdVectorFst * t1, StdVectorFst * t2);
       static void recode_symbol_numbers

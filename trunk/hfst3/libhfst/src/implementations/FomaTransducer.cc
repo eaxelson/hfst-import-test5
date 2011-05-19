@@ -730,6 +730,21 @@ namespace hfst { namespace implementations {
     alpha.insert(internal_identity);
     return alpha;
   }
+    
+  unsigned int FomaTransducer::get_symbol_number
+  (fsm *t, 
+   const std::string &symbol)
+  {
+    const char * c = symbol.c_str();
+    for(struct sigma* p = t->sigma; p!=NULL; p=p->next)
+      {
+	if (p->symbol == NULL)
+	  break;
+	if (strcmp(p->symbol, c) == 0)
+	  return (unsigned int)p->number;
+      }
+    HFST_THROW(SymbolNotFoundException);
+  }
 
   FdTable<int>* FomaTransducer::get_flag_diacritics(fsm * t)
   {

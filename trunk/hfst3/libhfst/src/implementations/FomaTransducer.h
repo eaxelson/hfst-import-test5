@@ -138,7 +138,9 @@ namespace hfst {
 
       static void insert_to_alphabet(fsm *t, const std::string &symbol);
       static StringSet get_alphabet(fsm *t);
-      
+      static unsigned int get_symbol_number(fsm *t, 
+					    const std::string &symbol);      
+
       static void harmonize(fsm *net1, fsm *net2);
 
       static fsm * read_net(FILE * file);
