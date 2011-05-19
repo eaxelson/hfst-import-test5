@@ -104,6 +104,7 @@ int main(int argc, char **argv)
   try {
     HfstBasicTransducer empty_symbol;
     empty_symbol.add_transition(0, HfstBasicTransition(0, "", "", 0));
+    assert(false);
   }
   catch (EmptyStringException e) {
     ;
