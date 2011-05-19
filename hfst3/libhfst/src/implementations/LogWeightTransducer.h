@@ -244,6 +244,9 @@ namespace implementations
       static void insert_to_alphabet
         (LogFst *t, const std::string &symbol);
       static StringSet get_alphabet(LogFst *t);
+      static unsigned int get_symbol_number(LogFst *t, 
+					    const std::string &symbol);
+
       static NumberNumberMap create_mapping(LogFst * t1, LogFst * t2);
       static void recode_symbol_numbers(LogFst * t, hfst::NumberNumberMap &km);
 

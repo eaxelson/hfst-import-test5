@@ -1133,6 +1133,15 @@ namespace hfst { namespace implementations {
     return s;
   }
 
+  unsigned int SfstTransducer::get_symbol_number(Transducer *t, 
+						 const std::string &symbol)
+  {
+    int i = t->alphabet.symbol2code(symbol.c_str());
+    if (i == EOF)
+      HFST_THROW(SymbolNotFoundException);
+    return (unsigned int)i;
+  }
+
   StringPairSet SfstTransducer::get_symbol_pairs(Transducer *t)
   {
     StringPairSet s;
