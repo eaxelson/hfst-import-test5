@@ -126,6 +126,9 @@ void HfstTransducer::insert_to_alphabet(const std::string &symbol)
 {
     HfstTokenizer::check_utf8_correctness(symbol);
 
+    if (symbol == "")
+      HFST_THROW_MESSAGE(EmptyStringException, "insert_to_alphabet");
+
     switch(type)
     {
 #if HAVE_SFST
@@ -494,6 +497,12 @@ HfstTransducer::HfstTransducer(const std::string& utf8_str,
     if (not is_implementation_type_available(type))
 	HFST_THROW(ImplementationTypeNotAvailableException);
 
+    if (utf8_str == "")
+      HFST_THROW_MESSAGE
+	(EmptyStringException, 
+	 "HfstTransducer(const std::string&, const HfstTokenizer&,"
+	 " ImplementationType)");
+
     StringPairVector spv = 
 	multichar_symbol_tokenizer.tokenize(utf8_str);
     switch (type)
@@ -532,7 +541,16 @@ HfstTransducer::HfstTransducer(const StringPairVector & spv,
     type(type), anonymous(false), is_trie(false), name("")
 {
     if (not is_implementation_type_available(type))
-        HFST_THROW(ImplementationTypeNotAvailableException);
+      HFST_THROW(ImplementationTypeNotAvailableException);
+    
+    for (StringPairVector::const_iterator it = spv.begin();
+	 it != spv.end(); it++)
+      {
+	if (it->first == "" || it->second == "")
+	  HFST_THROW_MESSAGE
+	    (EmptyStringException, 
+	     "HfstTransducer(const StringPairVector&, ImplementationType)");
+      }
 
     switch (type)
     {
@@ -576,6 +594,15 @@ HfstTransducer::HfstTransducer(const StringPairSet & sps,
     if (not is_implementation_type_available(type))
         HFST_THROW(ImplementationTypeNotAvailableException);
 
+    for (StringPairSet::const_iterator it = sps.begin();
+	 it != sps.end(); it++)
+      {
+	if (it->first == "" || it->second == "")
+	  HFST_THROW_MESSAGE
+	    (EmptyStringException, 
+	     "HfstTransducer(const StringPairSet&, ImplementationType, bool)");
+      }
+
     switch (type)
     {
 #if HAVE_SFST
@@ -616,6 +643,20 @@ HfstTransducer::HfstTransducer(const std::vector<StringPairSet> & spsv,
 {
     if (not is_implementation_type_available(type))
         HFST_THROW(ImplementationTypeNotAvailableException);
+
+    for (std::vector<StringPairSet>::const_iterator it = spsv.begin();
+	 it != spsv.end(); it++)
+      {
+	for (StringPairSet::const_iterator IT = it->begin();
+	     IT != it->end(); IT++)
+	  {
+	    if (IT->first == "" || IT->second == "")
+	      HFST_THROW_MESSAGE
+		(EmptyStringException, 
+		 "HfstTransducer(const std::vector<StringPairSet>&, "
+		 " ImplementationType)");
+	  }
+      }
 
     switch (type)
     {
@@ -660,6 +701,13 @@ HfstTransducer::HfstTransducer(const std::string& upper_utf8_str,
 {
     if (not is_implementation_type_available(type))
 	HFST_THROW(ImplementationTypeNotAvailableException);
+
+    if (upper_utf8_str == "" || 
+	lower_utf8_str == "")
+      HFST_THROW_MESSAGE
+	(EmptyStringException,
+	 "HfstTransducer(const std::string&, const std::string&, "
+	 "const HfstTokenizer&, ImplementationType");  
 
     StringPairVector spv = 
 	multichar_symbol_tokenizer.tokenize
@@ -845,6 +893,11 @@ HfstTransducer::HfstTransducer(const std::string &symbol,
 
     HfstTokenizer::check_utf8_correctness(symbol);
 
+    if (symbol == "")
+      HFST_THROW_MESSAGE
+	(EmptyStringException, 
+	 "HfstTransducer(const std::string&, ImplementationType)");
+
     switch (this->type)
     {
 #if HAVE_SFST
@@ -885,6 +938,12 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 
     HfstTokenizer::check_utf8_correctness(isymbol);
     HfstTokenizer::check_utf8_correctness(osymbol);
+
+    if (isymbol == "" || osymbol == "")
+      HFST_THROW_MESSAGE
+	(EmptyStringException, 
+	 "HfstTransducer(const std::string&, const std::string&, "
+	 " ImplementationType)");
 
     switch (this->type)
     {
@@ -1499,6 +1558,11 @@ HfstTransducer &HfstTransducer::insert_freely
     HfstTokenizer::check_utf8_correctness(symbol_pair.first);
     HfstTokenizer::check_utf8_correctness(symbol_pair.second);
 
+    if (symbol_pair.first == "" || symbol_pair.second == "")
+      HFST_THROW_MESSAGE
+	(EmptyStringException, 
+	 "insert_freely(const StringPair&)");
+
     /* Add symbols in symbol_pair to the alphabet of this transducer
        and expand unknown and epsilon symbols accordingly. */
     HfstTransducer tmp(symbol_pair.first, symbol_pair.second, this->type);
@@ -1754,6 +1818,11 @@ HfstTransducer &HfstTransducer::substitute
 (const std::string &old_symbol, const std::string &new_symbol,
  bool input_side, bool output_side)
 {
+  if (old_symbol == "" || new_symbol == "")
+    HFST_THROW_MESSAGE
+      (EmptyStringException, 
+       "substitute(const std::string&, const std::string&, bool, bool)");
+
 #if HAVE_SFST
     if (this->type == SFST_TYPE)
     {
@@ -1846,6 +1915,13 @@ HfstTransducer &HfstTransducer::substitute
 (const StringPair &old_symbol_pair, 
  const StringPair &new_symbol_pair)
 { 
+
+  if (old_symbol_pair.first == "" || old_symbol_pair.second == "" ||
+      new_symbol_pair.first == "" || new_symbol_pair.second == "")
+    HFST_THROW_MESSAGE
+      (EmptyStringException, 
+       "substitute(const StringPair&, const StringPair&)");
+
 #if HAVE_SFST
     if (this->type == SFST_TYPE)
     {
@@ -1905,6 +1981,11 @@ HfstTransducer &HfstTransducer::substitute
 (const StringPair &old_symbol_pair, 
  const StringPairSet &new_symbol_pair_set)
 { 
+  if(old_symbol_pair.first == "" || old_symbol_pair.second == "")
+    HFST_THROW_MESSAGE
+      (EmptyStringException, 
+       "substitute(const StringPair&, const StringPairSet&");
+
 #if HAVE_SFST
     if (this->type == SFST_TYPE)
     {
@@ -2001,6 +2082,11 @@ HfstTransducer &HfstTransducer::substitute
     if (this->type != transducer.type) {
 	HFST_THROW_MESSAGE(TransducerTypeMismatchException,
 			   "HfstTransducer::substitute"); }
+
+    if (symbol_pair.first == "" || symbol_pair.second == "")
+      HFST_THROW_MESSAGE
+	(EmptyStringException, 
+	 "substitute(const StringPair&, HfstTransducer&)");
 
     bool harm = harmonize_smaller;
     harmonize_smaller=false;
@@ -3126,6 +3212,49 @@ HfstTokenizer HfstTransducer::create_tokenizer()
     return tok;
 }
 
+HfstTransducer * HfstTransducer::read_lexc(const std::string &filename,
+					    ImplementationType type)
+{
+  (void)filename;
+  if (not is_implementation_type_available(type))
+    HFST_THROW(ImplementationTypeNotAvailableException);
+  
+  HfstTransducer * retval = new HfstTransducer();
+  
+  switch (type)
+    {
+#if HAVE_FOMA
+    case FOMA_TYPE:
+      //retval->implementation.foma = foma_interface.read_lexc(filename);
+      //retval->type=FOMA_TYPE;
+      HFST_THROW_MESSAGE(FunctionNotImplementedException, "read_lexc");
+	break;
+#endif
+#if HAVE_SFST
+    case SFST_TYPE:
+      HFST_THROW_MESSAGE(FunctionNotImplementedException, "read_lexc");
+	break;
+#endif
+#if HAVE_OPENFST
+    case TROPICAL_OPENFST_TYPE:
+      HFST_THROW_MESSAGE(FunctionNotImplementedException, "read_lexc");
+	break;
+    case LOG_OPENFST_TYPE:
+      HFST_THROW_MESSAGE(FunctionNotImplementedException, "read_lexc");
+	break;
+#endif
+	/* Add here your implementation. */
+	//#if HAVE_MY_TRANSDUCER_LIBRARY
+	//case MY_TRANSDUCER_LIBRARY_TYPE:
+	// ...
+	//break;
+	//#endif
+    case ERROR_TYPE:
+    default:
+      HFST_THROW(TransducerHasWrongTypeException);
+    }
+  return retval;
+}
 
 std::ostream &operator<<(std::ostream &out,const HfstTransducer &t)
 {

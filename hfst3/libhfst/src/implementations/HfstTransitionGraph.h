@@ -1117,6 +1117,11 @@ namespace hfst {
                      bool input_side=true, 
                      bool output_side=true) {
 
+	  if (old_symbol == "" || new_symbol == "")
+	    HFST_THROW_MESSAGE
+	      (EmptyStringException,
+	       "HfstTransitionGraph::substitute");
+
           // If a symbol is substituted with itself, do nothing.
           if (old_symbol.compare(new_symbol) == 0)
             return *this;
@@ -1154,7 +1159,20 @@ namespace hfst {
             \a sps. */
         HfstTransitionGraph &substitute
           (const StringPair &sp, const StringPairSet &sps) 
-        {
+	  {
+	    if (sp.first == "" || sp.second == "")
+	      HFST_THROW_MESSAGE
+		(EmptyStringException,
+		 "HfstTransitionGraph::substitute");
+	    for (StringPairSet::const_iterator it = sps.begin();
+		 it != sps.end(); it++)
+	      {
+		if (it->first == "" || it->second == "")
+		  HFST_THROW_MESSAGE
+		    (EmptyStringException,
+		     "HfstTransitionGraph::substitute");
+	      }
+
 	  /*std::string msg("HfstTransitionGraph &substitute"
 			  "(const StringPair &sp, const StringPairSet &sps) ");
 			  HFST_THROW_MESSAGE(FunctionNotImplementedException, msg);*/
@@ -1169,6 +1187,12 @@ namespace hfst {
           (const StringPair &old_pair, 
            const StringPair &new_pair) 
         {
+	  if (old_pair.first == "" || new_pair.first == "" ||
+	      old_pair.second == "" || new_pair.second == "")
+	    HFST_THROW_MESSAGE
+	      (EmptyStringException,
+	       "HfstTransitionGraph::substitute");
+
           substitute_(old_pair, new_pair);
           return *this;
         } 
@@ -1294,6 +1318,11 @@ namespace hfst {
         HfstTransitionGraph &
           substitute(const HfstSymbolPair &sp, 
 		     const HfstTransitionGraph &graph) {
+
+	  if (sp.first == "" || sp.second == "")
+	    HFST_THROW_MESSAGE
+	      (EmptyStringException,
+	       "HfstTransitionGraph::substitute");
           
           // If neither symbol to be substituted is known to the graph,
           // do nothing.
@@ -1364,6 +1393,11 @@ namespace hfst {
         HfstTransitionGraph &insert_freely
           (const HfstSymbolPair &symbol_pair, W weight) 
           {          
+	    if (symbol_pair.first == "" || symbol_pair.second == "")
+	      HFST_THROW_MESSAGE
+		(EmptyStringException,
+		 "HfstTransitionGraph::insert_freely");
+
             alphabet.insert(symbol_pair.first);
             alphabet.insert(symbol_pair.second);
             

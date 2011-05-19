@@ -1344,6 +1344,11 @@ HfstTransducer t_transformed;
     HfstTransducer &push_weights(PushType type);
 
 
+    /** \brief Compile a lexc file in file \a filename into an HfstTransducer
+	of type \a type and return the transducer. */
+    static HfstTransducer * read_lexc(const std::string &filename,
+				      ImplementationType type);
+
     // *** For commandline programs. ***
 
     /* For each flag diacritic fd that is included in the alphabet of

@@ -370,6 +370,7 @@ HFST_EXCEPTION_CHILD_DECLARATION(TransducerHasWrongTypeException);
 */
 HFST_EXCEPTION_CHILD_DECLARATION(IncorrectUtf8CodingException);
 
+HFST_EXCEPTION_CHILD_DECLARATION(EmptyStringException);
 
 //HFST_EXCEPTION_CHILD_DECLARATION(SymbolRedefinedException); 
 //HFST_EXCEPTION_CHILD_DECLARATION(TransducerHasNoStartStateException);

@@ -148,6 +148,9 @@ namespace hfst {
       static void print_test(fsm * t);
 
       static fsm * remove_from_alphabet(fsm * t, const std::string &symbol);
+
+      static fsm * read_lexc(const std::string &filename);
+
     };
 
 } }

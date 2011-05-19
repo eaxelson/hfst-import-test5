@@ -155,8 +155,14 @@ namespace hfst {
           input symbol \a isymbol, output symbol \a osymbol 
           and weight \a weight. */
       HfstTropicalTransducerTransitionData(SymbolType isymbol,
-                     SymbolType osymbol,
-                     WeightType weight) {
+					   SymbolType osymbol,
+					   WeightType weight) {
+	if (isymbol == "" || osymbol == "")
+	  HFST_THROW_MESSAGE
+	    (EmptyStringException,
+	     "HfstTropicalTransducerTransitionData"
+	     "(SymbolType, SymbolType, WeightType)");
+	
         input_number = get_number(isymbol);
         output_number = get_number(osymbol);
         this->weight = weight;

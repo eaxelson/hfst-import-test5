@@ -744,6 +744,17 @@ namespace hfst { namespace implementations {
     return table;
   }
 
+  fsm * FomaTransducer::read_lexc(const std::string &filename) {
+    char * filename_ = strdup(filename.c_str());
+
+    // DEBUG
+    fprintf(stderr, "reading lexc file from %s...\n", filename_); 
+
+    fsm * retval = fsm_lexc_parse_string(filename_);
+    delete filename_;
+    return retval;
+  }
+
   void FomaTransducer::print_test(fsm * t)
   {
     net_print_att(t, stdout);

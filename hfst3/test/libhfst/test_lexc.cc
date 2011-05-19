@@ -45,6 +45,18 @@ int main(int argc, char **argv)
 
       assert(animals.compare(*parsed));
       delete parsed;
+
+      try {
+	HfstTransducer * rlexc 
+	  = HfstTransducer::read_lexc
+	  ("./test_lexc.lexc", types[i]);
+	assert(animals.compare(*rlexc));
+	delete rlexc;
+      }
+      catch (FunctionNotImplementedException e) {
+	;
+      }
+
     }
 
   //remove("test_lexc.lexc");
