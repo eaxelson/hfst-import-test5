@@ -22,6 +22,7 @@
 
 using hfst::implementations::ConversionFunctions;
 
+
 #ifndef MAIN_TEST
 
 namespace hfst
@@ -2381,6 +2382,28 @@ HfstTransducer &HfstTransducer::priority_union (const HfstTransducer &another)
 
 }
 
+HfstTransducer HfstTransducer::universal_pair ( ImplementationType type )
+{
+	using namespace implementations;
+	HfstBasicTransducer bt;
+	bt.add_transition(0, HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
+	bt.add_transition(0, HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0) );
+	bt.set_final_weight(1, 0);
+
+	HfstTransducer final(bt, type);
+
+	bool DEBUG = true;
+	if ( DEBUG )
+		{
+			printf("--un--\n");
+			final.write_in_att_format(stdout, 1);
+		}
+
+	return final;
+}
+
+
+
 
 HfstTransducer &HfstTransducer::compose_intersect
 (const HfstTransducerVector &v)
@@ -3142,8 +3165,8 @@ void HfstTransducer::print_alphabet()
 using namespace hfst;
 using namespace implementations;
 
-// test function
-void priority_union_test ( ImplementationType TYPE )
+// Priority union test function
+void priority_union_test ( ImplementationType type )
 {
     HfstBasicTransducer		btEmpty,
     						btEmptyString,
@@ -3299,22 +3322,22 @@ void priority_union_test ( ImplementationType TYPE )
 
 
     // Transforming basic transducers to a TYPE transducer
-    HfstTransducer trEmpty(btEmpty, TYPE);
-    HfstTransducer trEmptyString(btEmptyString, TYPE);
-    HfstTransducer tr1(bt1, TYPE);
-    HfstTransducer tr2(bt2, TYPE);
-    HfstTransducer tr3(bt3, TYPE);
-    HfstTransducer tr2withoutPriority(bt2withoutPriority, TYPE);
-    HfstTransducer trIdentity(btIdentity, TYPE);
-    HfstTransducer trUnknown(btUnknown, TYPE);
-    HfstTransducer trEpsilon(btEpsilon, TYPE);
-    HfstTransducer result1(btResult1, TYPE);
-    HfstTransducer result2(btResult2, TYPE);
-    HfstTransducer result3(btResult3, TYPE);
-    HfstTransducer result4(btResult4, TYPE);
-    HfstTransducer result5(btResult5, TYPE);
-    HfstTransducer result6(btResult6, TYPE);
-    HfstTransducer result7(btResult7, TYPE);
+    HfstTransducer trEmpty(btEmpty, type);
+    HfstTransducer trEmptyString(btEmptyString, type);
+    HfstTransducer tr1(bt1, type);
+    HfstTransducer tr2(bt2, type);
+    HfstTransducer tr3(bt3, type);
+    HfstTransducer tr2withoutPriority(bt2withoutPriority, type);
+    HfstTransducer trIdentity(btIdentity, type);
+    HfstTransducer trUnknown(btUnknown, type);
+    HfstTransducer trEpsilon(btEpsilon, type);
+    HfstTransducer result1(btResult1, type);
+    HfstTransducer result2(btResult2, type);
+    HfstTransducer result3(btResult3, type);
+    HfstTransducer result4(btResult4, type);
+    HfstTransducer result5(btResult5, type);
+    HfstTransducer result6(btResult6, type);
+    HfstTransducer result7(btResult7, type);
 
 
 
@@ -3350,10 +3373,83 @@ void priority_union_test ( ImplementationType TYPE )
 	assert ( testTr.priority_union( tr3 ).compare( result7 ) );
 }
 
+// Universal pair test function
+void universal_pair_test ( ImplementationType type )
+{
+	HfstBasicTransducer 	bt,
+							bt2,
+							bt3,
+							btResult1,
+							btResult2,
+							btResult3,
+							btResult4,
+							btEmpty;
+
+	// Test transducer a:a
+	bt.add_transition(0, HfstBasicTransition(1, "a", "a", 0) );
+	bt.set_final_weight(1, 0);
+	// Test transducer b:b
+	bt2.add_transition(0, HfstBasicTransition(1, "a", "b", 0) );
+	bt2.set_final_weight(1, 0);
+	// Test transducer aa:bb
+	bt3.add_transition(0, HfstBasicTransition(1, "a", "b", 0) );
+	bt3.add_transition(1, HfstBasicTransition(2, "a", "b", 0) );
+	bt3.set_final_weight(2, 0);
+
+	// Result 1 ( a:a .o. universal pair )
+	btResult1.add_transition(0, HfstBasicTransition(1, "a", "a", 0) );
+	btResult1.add_transition(0, HfstBasicTransition(1, "a", "@_UNKNOWN_SYMBOL_@", 0) );
+	btResult1.set_final_weight(1, 0);
+	// Result 2 ( universal pair .o. a:a )
+	btResult2.add_transition(0, HfstBasicTransition(1, "a", "a", 0) );
+	btResult2.add_transition(0, HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "a", 0) );
+	btResult2.set_final_weight(1, 0);
+	// Result 3 ( a:b .o. universal pair )
+	btResult3.add_transition(0, HfstBasicTransition(1, "a", "b", 0) );
+	btResult3.add_transition(0, HfstBasicTransition(1, "a", "a", 0) );
+	btResult3.add_transition(0, HfstBasicTransition(1, "a", "@_UNKNOWN_SYMBOL_@", 0) );
+	btResult3.set_final_weight(1, 0);
+	// Result 4 ( universal pair .o. a:b )
+	btResult4.add_transition(0, HfstBasicTransition(1, "a", "b", 0) );
+	btResult4.add_transition(0, HfstBasicTransition(1, "b", "b", 0) );
+	btResult4.add_transition(0, HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "b", 0) );
+	btResult4.set_final_weight(1, 0);
+
+	HfstTransducer tr1(bt, type);
+	HfstTransducer tr2(bt2, type);
+	HfstTransducer tr3(bt3, type);
+	HfstTransducer result1(btResult1, type);
+	HfstTransducer result2(btResult2, type);
+	HfstTransducer result3(btResult3, type);
+	HfstTransducer result4(btResult4, type);
+	HfstTransducer empty(btEmpty, type);
+
+	HfstTransducer un = HfstTransducer::universal_pair(type);
+
+	// Universal pair is tested by composing it with test transducers
+	// a:a .o. universal pair
+	HfstTransducer tmp = tr1;
+	assert ( tmp.compose(un).compare( result1 ) );
+	// universal pair .o. a:a
+	tmp = un;
+	assert ( tmp.compose(tr1).compare( result2 ) );
+	// a:b .o. universal pair
+	tmp = tr2;
+	assert ( tmp.compose(un).compare( result3 ) );
+	// universal pair .o. a:b
+	tmp = un;
+	assert ( tmp.compose(tr2).compare( result4 ) );
+	// aa:bb .o. universal pair
+	tmp = tr3;
+	assert ( tmp.compose(un).compare( empty ) );
+	// universal pair .o. aa:bb
+	tmp = un;
+	assert ( tmp.compose(tr3).compare( empty ) );
+
+}
 
 int main(int argc, char * argv[])
 {
-
     std::cout << "Unit tests for " __FILE__ ":" << std::endl;
     
     ImplementationType types[] = {SFST_TYPE, TROPICAL_OPENFST_TYPE,
@@ -3411,6 +3507,11 @@ int main(int argc, char * argv[])
 	
 		// priority union test
 		priority_union_test( types[i] );
+
+		// universal test
+		//HfstTransducer un = HfstTransducer::universal_pair( types[i] );
+		universal_pair_test( types[i] );
+
 	
 
 		void insert_freely_missing_flags_from

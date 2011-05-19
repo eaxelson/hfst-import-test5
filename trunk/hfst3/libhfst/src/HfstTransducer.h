@@ -305,7 +305,7 @@ An example:
 
     /* Whether the conversion requested can be done without losing 
        any information */
-    bool static is_safe_conversion(ImplementationType original, 
+    bool static is_safe_conversion(ImplementationType original,
                                    ImplementationType conversion);
 
     /* For internal use */
@@ -1131,6 +1131,19 @@ ccc : ddd
      * For more information, read: www.fsmbook.com
      *  */
     HfstTransducer &priority_union(const HfstTransducer &another);
+
+
+    /** \brief Create universal pair transducer of \a type.
+     *
+     *	The transducer has only one state, and it accepts:
+     *	Identity:Identity and Unknown:Unknown
+     *
+     *	Transducer weight is 0.
+     */
+    static HfstTransducer universal_pair ( ImplementationType type );
+
+
+
 
     /* For HfstCompiler: Optimized disjunction function. */
     HfstTransducer &disjunct(const StringPairVector &spv);
