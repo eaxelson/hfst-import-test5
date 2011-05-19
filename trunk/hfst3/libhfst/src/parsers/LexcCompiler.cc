@@ -24,10 +24,15 @@
 #include <string>
 #include <map>
 #include <set>
+#include <vector>
+#include <algorithm>
 
 using std::string;
 using std::map;
 using std::set;
+using std::pair;
+using std::vector;
+using std::set_difference;
 
 #include "LexcCompiler.h"
 #include "HfstTransducer.h"

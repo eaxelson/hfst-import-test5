@@ -14,6 +14,8 @@
 #  include <config.h>
 #endif
 
+#include <algorithm>
+
 #include "ConvertTransducerFormat.h"
 #include "optimized-lookup/convert.h"
 #include "HfstTransitionGraph.h"
