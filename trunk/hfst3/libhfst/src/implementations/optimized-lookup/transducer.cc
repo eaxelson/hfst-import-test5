@@ -178,38 +178,39 @@ bool Transducer::initialize_input(char * input_str)
     return true;
 }
 
-HfstOneLevelPaths Transducer::lookup_fd(const StringVector & s,
-					HfstOneLevelPaths & results)
+HfstOneLevelPaths * Transducer::lookup_fd(const StringVector & s)
+
 {
-    lookup_paths = &results;
+    HfstOneLevelPaths * results = new HfstOneLevelPaths;
+    lookup_paths = results;
     std::string input_str;
-//    std::vector<std::string>::iterator it;
-//    for (it = s.first.begin(); it < s.first.end(); ++it) {
-//	input_str.append(*it);
-//    }
-    for (int i = 0; i < s.size(); ++i) {
-	input_str.append(s[i]);
+    for (StringVector::const_iterator it = s.begin(); it != s.end(); ++it) {
+	input_str.append(*it);
     }
     if (!initialize_input(const_cast<char *>(input_str.c_str()))) {
+	lookup_paths = NULL;
 	return results;
     }
     //current_weight += s.second;
     get_analyses(input_tape, output_tape, output_tape, 0);
     //current_weight -= s.second;
+    lookup_paths = NULL;
     return results;
 }
 
-HfstOneLevelPaths Transducer::lookup_fd(const std::string & s,
-					HfstOneLevelPaths & results)
+HfstOneLevelPaths * Transducer::lookup_fd(const std::string & s)
 {
-    lookup_paths = &results;
+    HfstOneLevelPaths * results = new HfstOneLevelPaths;
+    lookup_paths = results;
     std::string input_str;
     if (!initialize_input(const_cast<char *>(s.c_str()))) {
+	lookup_paths = NULL;
 	return results;
     }
     //current_weight += s.second;
     get_analyses(input_tape, output_tape, output_tape, 0);
     //current_weight -= s.second;
+    lookup_paths = NULL;
     return results;
 }
 
