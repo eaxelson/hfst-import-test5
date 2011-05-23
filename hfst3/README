@@ -155,7 +155,7 @@ and install the necessary autotools files from the host system:
   autoreconf -i
 
 It is common practice to keep `generated files out of version control
-I<http://www.gnu.org/software/automake/manual/automake.html#CVS>`_.
+<http://www.gnu.org/software/automake/manual/automake.html#CVS>`_.
 
 For further installation instruction refer to file ``INSTALL``, which contains
 the standard installation instructions for GNU autoconf based software.
@@ -163,12 +163,14 @@ the standard installation instructions for GNU autoconf based software.
 Troubleshooting
 ---------------
 
-Commonly faced errors.
+In this section we list the errors that pop up commonly on our support channel,
+<irc://FreeNode/#hfst>, in the bug tracker <> or on the mailing lists
+<hfst-development@lists.sf.net>.
 
 \::malloc has not been declared
 '''''''''''''''''''''''''''''''
 
-Compilation errors of form::
+**During the compilation** errors of form::
 
   /usr/include/c++/4.3/cstdlib:124: error: '::malloc' has not been declared
 
@@ -223,10 +225,32 @@ See also:
 <http://nerdland.net/unstumping-the-internet/malloc-has-not-been-declared/> for
 the gory details.
 
+Error while loading shared libraries: libhfst.so.0: cannot open shared object file: No such file or directory
+'''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+**After installing HFST and running programs**, the installed programs should
+on most systems be able to find and use the shared libraries that just got
+installed alongside the programs that were installed on the same go, but this
+is not always the case. Typically on first installation of the HFST library
+or after a major version update of HFST library, the system may not know about
+it. To fix this, you must run ``ldconfig`` on GNU systems. To ensure proper
+linking, use ``ldconfig -v`` to get a print out of known libraries, the
+listing should include libhfst.so indicating the current version.
+
+If this is the first time you install a library on your system by hand, it may
+happen on some systems that the library configuration does not include that
+directory at all. Notably on ubuntu it seems that /usr/local/lib is not one of
+library directories, and that is the default target for manually installed
+libraries. Either fix this by doing ``./configure --prefix=/usr`` or check
+your distributions manuals on how to set up new library directories. Same
+applies for libraries installed to e.g. home directory.
+
+See also the previous error description.
+
 Request for member c_str in ... which is of non-class type const char*
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-The errors of form::
+**During the compilation**, the errors of form::
 
   TropicalWeightTransducer.cc:1349: error: request for 
   member ‘c_str’ in ‘it.fst::SymbolTableIterator::Symbol()’, which is
@@ -235,6 +259,24 @@ The errors of form::
 are typically caused by openfst which is incompatible and using const char*
 type instead of strings, as in openfst 1.2. Update or downgrade your openfst
 installation to 1.2 and ensure that older (or newer?) headers are not around.
+
+chmod: cannot access 'scripts/hfst-foma-wrapper.sh': No such file or directory
+''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+**During the configuration phase.** This is a case of autoconf being silly; the commands for creating a script and
+making it executable from autoconf are ran in parallel but must be ran once
+per file and autoconf just doesn't keep track of the files it creates. The
+script for doing this is copied to configure.ac from autoconf manual so it
+supposably will always work correctly...
+
+....libs/lt-hfst-strings2fst: Incorrect utf-8 coding
+''''''''''''''''''''''''''''''''''''''''''''''''''''
+
+**During the make check phase**. This indicates that a test that tests for
+expected failure fails expectedly, which is also indicated by a green word
+*PASS* on the next line. This is expected behaviour and not an indication of a
+bug. If there is a bug effecting that or other tests in the test suite, it will
+be indicated by a line starting with word *FAIL* in red colour.
 
 Further information
 -------------------
