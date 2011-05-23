@@ -131,6 +131,12 @@ AC_ARG_ENABLE([conjunct],
 			  [enable_conjunct=$enableval],
 			  [enable_conjunct=yes])
 AM_CONDITIONAL([WANT_CONJUNCT], [test x$enable_conjunct != xno])
+AC_ARG_ENABLE([duplicate],
+			  [AS_HELP_STRING([--enable-duplicate],
+							  [build duplicate tool @<:@default=yes@:>@])],
+			  [enable_duplicate=$enableval],
+			  [enable_duplicate=yes])
+AM_CONDITIONAL([WANT_DUPLICATE], [test x$enable_duplicate != xno])
 AC_ARG_ENABLE([determinize],
 			  [AS_HELP_STRING([--enable-determinize],
 							  [build determinize tool @<:@default=yes@:>@])],
