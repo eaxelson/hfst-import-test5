@@ -47,6 +47,9 @@ if WANT_DISJUNCT
 MAYBE_DISJUNCT=hfst-disjunct
 MAYBE_ALIASES+=hfst-union
 endif
+if WANT_DUPLICATE
+MAYBE_DUPLICATE=hfst-duplicate
+endif
 if WANT_FORMAT
 MAYBE_FORMAT=hfst-format
 endif
@@ -157,6 +160,7 @@ noinst_HEADERS= \
 bin_PROGRAMS= \
 			 $(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_CONCATENATE)     \
 			 $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) $(MAYBE_DISJUNCT)   \
+			 $(MAYBE_DUPLICATE)											\
 			 $(MAYBE_FORMAT) $(MAYBE_FST2FST) $(MAYBE_FST2STRINGS)      \
 			 $(MAYBE_FST2TXT) $(MAYBE_HEAD) $(MAYBE_INVERT)             \
 			 $(MAYBE_LOOKUP) $(MAYBE_MINIMIZE) $(MAYBE_NAME)            \
@@ -183,6 +187,7 @@ hfst_concatenate_SOURCES=hfst-concatenate.cc $(HFST_COMMON_SRC)
 hfst_conjunct_SOURCES=hfst-conjunct.cc $(HFST_COMMON_SRC)
 hfst_determinize_SOURCES=hfst-determinize.cc $(HFST_COMMON_SRC)
 hfst_disjunct_SOURCES=hfst-disjunct.cc $(HFST_COMMON_SRC)
+hfst_duplicate_SOURCES=hfst-duplicate.cc $(HFST_COMMON_SRC)
 hfst_flag_diacritics_SOURCES=hfst-flag-diacritics.cc $(HFST_COMMON_SRC)
 hfst_format_SOURCES=hfst-format.cc $(HFST_COMMON_SRC)
 hfst_fst2fst_SOURCES=hfst-fst2fst.cc $(HFST_COMMON_SRC)
