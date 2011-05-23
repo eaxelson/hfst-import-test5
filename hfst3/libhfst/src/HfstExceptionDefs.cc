@@ -46,6 +46,8 @@ HFST_EXCEPTION_CHILD_DEFINITION(NotTransducerStreamException);
 
 HFST_EXCEPTION_CHILD_DEFINITION(NotValidAttFormatException);
 
+HFST_EXCEPTION_CHILD_DEFINITION(NotValidLexcFormatException);
+
 HFST_EXCEPTION_CHILD_DEFINITION(StateIsNotFinalException);
 
 HFST_EXCEPTION_CHILD_DEFINITION(ContextTransducersAreNotAutomataException);

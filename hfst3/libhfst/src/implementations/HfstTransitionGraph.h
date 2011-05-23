@@ -1615,6 +1615,10 @@ namespace hfst {
 
     typedef HfstTransitionGraph <HfstFastTransitionData, float> 
       HfstFastTransducer;
+
+    template <class C, class W> class HfstSubstituteTransducer: 
+    public HfstTransitionGraph<C, W> { };
+    
   }
    
 }

@@ -220,6 +220,8 @@ fprintf(stderr, "Read %i transducers in total.\n", (int)transducers.size());
 HFST_EXCEPTION_CHILD_DECLARATION(NotValidAttFormatException);
 
 
+HFST_EXCEPTION_CHILD_DECLARATION(NotValidLexcFormatException);
+
 /** \brief State is not final (and cannot have a final weight). 
 
     An example:
