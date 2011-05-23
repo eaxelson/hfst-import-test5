@@ -185,16 +185,18 @@ private:
     
     // This is indexed with values of type FdFeature
     typename std::vector<FdValue> values;
+    T num_features;
     
     bool error_flag;
 public:
     FdState(const FdTable<T>& t):
-        table(&t), values(table->num_features()), error_flag(false)
+    table(&t), values(table->num_features()),
+	num_features(table->num_features()), error_flag(false)
         {}
 
     FdState():
-        table(NULL), values(), error_flag(false)
-        {}
+    table(NULL), values(), num_features(0), error_flag(false)
+    {}
 
     const FdTable<T>& get_table() const {return *table;}
 
@@ -204,7 +206,7 @@ public:
     void assign_values(std::vector<FdValue> const & vals)
     {
         values = vals;
-        if (values.size() != table->num_features()) {
+        if (values.size() != num_features) {
             error_flag = true;
         }
     }

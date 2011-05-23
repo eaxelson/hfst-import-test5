@@ -234,8 +234,7 @@ void Transducer::try_epsilon_transitions(SymbolNumber * input_symbol,
 	    ++i;
 	} else if (alphabet->is_flag_diacritic(
 		       tables->get_transition_input(i))) {
-	    std::vector<short> old_values =
-		flag_state.get_values();
+	    std::vector<short> old_values(flag_state.get_values());
 	    if (flag_state.apply_operation(
 		    *(alphabet->get_operation(
 			  tables->get_transition_input(i))))) {
