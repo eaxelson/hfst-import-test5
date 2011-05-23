@@ -759,14 +759,25 @@ namespace hfst { namespace implementations {
     return table;
   }
 
-  fsm * FomaTransducer::read_lexc(const std::string &filename) {
+  fsm * FomaTransducer::read_lexc(const std::string &filename) 
+  {
     char * filename_ = strdup(filename.c_str());
-
-    // DEBUG
-    fprintf(stderr, "reading lexc file from %s...\n", filename_); 
-
-    fsm * retval = fsm_lexc_parse_string(filename_);
+    char * lexcfile = file_to_mem(filename_);
+    if (lexcfile == NULL) 
+      {
+	std::string msg("Could not read file ");
+	msg + filename;
+	HFST_THROW_MESSAGE(StreamNotReadableException, msg);
+      }
     delete filename_;
+    fsm * retval = fsm_lexc_parse_string(lexcfile);
+    if (retval == NULL)
+      {
+	std::string msg("Not valid Lexc format in file ");
+	msg + filename;
+	HFST_THROW_MESSAGE(NotValidLexcFormatException, msg);
+      }
+    free(lexcfile);
     return retval;
   }
 

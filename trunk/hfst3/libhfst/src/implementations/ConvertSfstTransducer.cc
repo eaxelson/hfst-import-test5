@@ -46,13 +46,10 @@ namespace hfst { namespace implementations
   void ConversionFunctions::
   sfst_to_hfst_basic_transducer
   ( SFST::Node *node, SFST::NodeNumbering &index, 
-    /*std::set<SFST::Node*> &visited_nodes,*/ 
     HfstBasicTransducer *net, SFST::Alphabet &alphabet ) {
   
     // If node has not been visited before
-    //if (visited_nodes.find(node) == visited_nodes.end() ) {
     if (not node->was_visited(VMARK)) {
-      //visited_nodes.insert(node);
       SFST::Arcs *arcs=node->arcs();
 
       // Count the number of nodes and initialize the transition
@@ -107,8 +104,7 @@ namespace hfst { namespace implementations
       // of the transitions
       for( SFST::ArcsIter p(arcs); p; p++ ) {
         SFST::Arc *arc=p;
-        sfst_to_hfst_basic_transducer(arc->target_node(), index, 
-				      /*visited_nodes,*/ 
+        sfst_to_hfst_basic_transducer(arc->target_node(), index,  
 				      net, alphabet);
       }
     }
@@ -122,8 +118,6 @@ namespace hfst { namespace implementations
     HfstBasicTransducer * net = new HfstBasicTransducer();
     // A map that maps nodes to integers
     SFST::NodeNumbering index(*t);
-    // The set of nodes that have been visited
-    //std::set<SFST::Node*> visited_nodes;
     if (t->root_node()->check_visited(VMARK))
       VMARK++;
    
@@ -256,9 +250,7 @@ namespace hfst { namespace implementations
       // of the transitions
       for( SFST::ArcsIter p(arcs); p; p++ ) {
         SFST::Arc *arc=p;
-        sfst_to_hfst_constant_transducer(arc->target_node(), index, 
-					 /*visited_nodes,*/ 
-					 net);
+        sfst_to_hfst_constant_transducer(arc->target_node(), index, net);
       }
     }    
   }
@@ -283,14 +275,11 @@ namespace hfst { namespace implementations
       }
     }
     
-    // The set of nodes that have been visited
-    //std::set<SFST::Node*> visited_nodes
     if (t->root_node()->check_visited(VMARK))
       VMARK++;
 
-    sfst_to_hfst_constant_transducer(t->root_node(), index, 
-				     /*visited_nodes,*/ 
-				     net);
+    sfst_to_hfst_constant_transducer(t->root_node(), index, net);
+
     return net;
   }
 

@@ -5,20 +5,6 @@ int main(int argc, char **argv)
   using namespace hfst;
   using namespace hfst::lexc;
 
-  /*
-  FILE * testfile = fopen("test_lexc.lexc", "wb");
-  fprintf(testfile, "LEXICON Root\n\n"
-	  "A;\n"
-	  "B;\n\n"
-	  "LEXICON A\n\n"
-	  "cat #;\n"
-	  "dog #;\n\n"
-	  "LEXICON B\n\n"
-	  "mouse #;\n"
-	  );
-  fclose(testfile);
-  */
-
   const unsigned int TYPES_SIZE=3;//4;
   const ImplementationType types [] = {SFST_TYPE, 
 				       TROPICAL_OPENFST_TYPE, 
@@ -28,6 +14,10 @@ int main(int argc, char **argv)
   /* For all transducer implementation types, perform the following tests: */
   for (unsigned int i=0; i<TYPES_SIZE; i++)
     {
+
+      // Test the lexc parser:
+
+      // (1) A file in valid lexc format
       LexcCompiler compiler(types[i]);
       compiler.parse((std::string(getenv("srcdir")) + 
 		      std::string("/test_lexc.lexc")).c_str());
@@ -45,11 +35,21 @@ int main(int argc, char **argv)
 
       assert(animals.compare(*parsed));
       delete parsed;
+  
+      // (2) A file that does not follow lexc format
+      // No exception thrown..
 
+      // (3) A file that does not exist
+      // No exception thrown..
+      
+
+      // Test the fast foma implementation:
+
+      // (1) A file in valid lexc format
       try {
 	HfstTransducer * rlexc 
 	  = HfstTransducer::read_lexc
-	  ("./test_lexc.lexc", types[i]);
+	  (std::string(getenv("srcdir")) + "/test_lexc.lexc", types[i]);
 	assert(animals.compare(*rlexc));
 	delete rlexc;
       }
@@ -57,8 +57,35 @@ int main(int argc, char **argv)
 	;
       }
 
-    }
+      // (2) A file that does not follow lexc format
+      try {
+	HfstTransducer * rlexc
+	  = HfstTransducer::read_lexc
+	  (std::string(getenv("srcdir")) + "/test_lexc_fail.lexc", types[i]);
+	assert(false);
+      }
+      catch (FunctionNotImplementedException e) {
+	;
+      }
+      catch (NotValidLexcFormatException e) {
+	;
+      }
 
-  //remove("test_lexc.lexc");
+      // (3) A file that does not exist
+      try {
+	HfstTransducer * rlexc
+	  = HfstTransducer::read_lexc
+	  (std::string(getenv("srcdir")) + 
+	   "/a_test_file_that_does_not_exist.o2f393480f31fsfgqe", types[i]);
+	assert(false);
+      }
+      catch (FunctionNotImplementedException e) {
+	;
+      }
+      catch (StreamNotReadableException e) {
+	;
+      }
+
+    }
 
 }

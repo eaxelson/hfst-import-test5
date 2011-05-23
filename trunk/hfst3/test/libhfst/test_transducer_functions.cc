@@ -411,10 +411,10 @@ int main(int argc, char **argv)
 	  = tok.tokenize_one_level("hippopotamus");
 
 	/* where results of lookup are stored */
-	HfstOneLevelPaths results_cat;
-	HfstOneLevelPaths results_dog;
-	HfstOneLevelPaths results_mouse;
-	HfstOneLevelPaths results_hippopotamus;
+	HfstOneLevelPaths * results_cat;
+	HfstOneLevelPaths * results_dog;
+	HfstOneLevelPaths * results_mouse;
+	HfstOneLevelPaths * results_hippopotamus;
 
 	/* check that lookups are not infinitely ambiguous */
 	assert(not animals_ol.is_lookup_infinitely_ambiguous(lookup_cat));
@@ -426,18 +426,18 @@ int main(int argc, char **argv)
 	// todo: more is_lookup_infinitely_ambiguous tests...
 
 	/* perform lookups */
-	animals_ol.lookup(results_cat, lookup_cat, limit);
-	animals_ol.lookup(results_dog, lookup_dog, limit);
-	animals_ol.lookup(results_mouse, lookup_mouse, limit);
-	animals_ol.lookup(results_hippopotamus, lookup_hippopotamus, limit);
+	results_cat = animals_ol.lookup(lookup_cat, limit);
+	results_dog = animals_ol.lookup(lookup_dog, limit);
+	results_mouse = animals_ol.lookup(lookup_mouse, limit);
+	results_hippopotamus = animals_ol.lookup(lookup_hippopotamus, limit);
 
 	/* check that the number of results is correct */
-	assert(results_cat.size() == 1);
-	assert(results_dog.size() == 1);
-	assert(results_mouse.size() == 1);
+	assert(results_cat->size() == 1);
+	assert(results_dog->size() == 1);
+	assert(results_mouse->size() == 1);
 
 	if (types[i] != LOG_OPENFST_TYPE)
-	  assert(results_hippopotamus.size() == 2);
+	  assert(results_hippopotamus->size() == 2);
 
 	bool test_weight=false;
 	if (types[i] == TROPICAL_OPENFST_TYPE ||
@@ -448,25 +448,25 @@ int main(int argc, char **argv)
 	StringVector expected_path = tok.tokenize_one_level("cats");
 
 	assert(do_hfst_lookup_paths_contain
-	     (results_cat, expected_path, 3, test_weight));
+	     (*results_cat, expected_path, 3, test_weight));
 
 	expected_path = tok.tokenize_one_level("dogs");
 	assert(do_hfst_lookup_paths_contain
-	       (results_dog, expected_path, 2.5, test_weight));
+	       (*results_dog, expected_path, 2.5, test_weight));
 
 	expected_path = tok.tokenize_one_level("mice");
 	assert(do_hfst_lookup_paths_contain
-		(results_mouse, expected_path, 1.7, test_weight));
+		(*results_mouse, expected_path, 1.7, test_weight));
 
 	expected_path = tok.tokenize_one_level("hippopotami");
 	if (types[i] != LOG_OPENFST_TYPE)
 	  assert(do_hfst_lookup_paths_contain
-		 (results_hippopotamus, expected_path, 1.2, test_weight));
+		 (*results_hippopotamus, expected_path, 1.2, test_weight));
 	
 	expected_path = tok.tokenize_one_level("hippopotamuses");
 	if (types[i] != LOG_OPENFST_TYPE)
 	  assert(do_hfst_lookup_paths_contain
-		 (results_hippopotamus, expected_path, 1.4, test_weight));
+		 (*results_hippopotamus, expected_path, 1.4, test_weight));
 
 
 	// if type is LOG_OPENFST_TYPE:
@@ -565,6 +565,11 @@ int main(int argc, char **argv)
 
 	  }
 	
+	delete results_cat;
+	delete results_dog;
+	delete results_mouse;
+	delete results_hippopotamus;
+
       }
 
 

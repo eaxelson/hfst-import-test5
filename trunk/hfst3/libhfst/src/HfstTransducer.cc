@@ -3241,7 +3241,7 @@ HfstTokenizer HfstTransducer::create_tokenizer()
 }
 
 HfstTransducer * HfstTransducer::read_lexc(const std::string &filename,
-					    ImplementationType type)
+					   ImplementationType type)
 {
   (void)filename;
   if (not is_implementation_type_available(type))
@@ -3253,8 +3253,8 @@ HfstTransducer * HfstTransducer::read_lexc(const std::string &filename,
     {
 #if HAVE_FOMA
     case FOMA_TYPE:
-      //retval->implementation.foma = foma_interface.read_lexc(filename);
-      //retval->type=FOMA_TYPE;
+      retval->implementation.foma = foma_interface.read_lexc(filename);
+      retval->type=FOMA_TYPE;
       HFST_THROW_MESSAGE(FunctionNotImplementedException, "read_lexc");
 	break;
 #endif
