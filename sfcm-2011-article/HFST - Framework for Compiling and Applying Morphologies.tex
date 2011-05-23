@@ -366,21 +366,21 @@ format. The type of the transducer and the existence of an optional
 alphabet in the transducer were also encoded with two characters in the beginning of the
 binary transducer which required familiarity with the specifications to interpret.
 
-The beginning of an HFST version 3.0 header contains an identifier
-'HFST', a separating zero byte, two bytes signifying the length of
-the rest of the header in bytes and a separating zero byte. The rest
-of the header contains pairs of attributes and their values. The pairs
-are separated by newlines, and attributes and values by zero bytes. 
-An HFST version 3.0 header must contain at least the attributes
-'version', 'type' and 'name' (in that order) and their values. 
-Additional attributes can follow after these obligatory ones. 
-For instance, we can include information on the minimality or
-cyclicity of a transducer even if the back-end implementation does not
-store these properties in its binary format, e.g. SFST. 
+% The beginning of an HFST version 3.0 header contains an identifier
+% 'HFST', a separating zero byte, two bytes signifying the length of
+% the rest of the header in bytes and a separating zero byte. The rest
+% of the header contains pairs of attributes and their values. The pairs
+% are separated by newlines, and attributes and values by zero bytes. 
+% An HFST version 3.0 header must contain at least the attributes
+% 'version', 'type' and 'name' (in that order) and their values. 
+% Additional attributes can follow after these obligatory ones. 
+% For instance, we can include information on the minimality or
+% cyclicity of a transducer even if the back-end implementation does not
+% store these properties in its binary format, e.g. SFST. 
 
 The new header format makes it easier to react to unexpected
 situations and inform the user, if necessary. When we read an HFST
-binary transducer, we first see whether the identifier 'HFST' is
+binary transducer, we first see whether an identifier 'HFST' is
 found. If not, we know that the user has given an incorrect
 file type and can throw an appropriate exception. 
 Next we recognize the implementation type of the transducer. 
@@ -443,7 +443,7 @@ conversion, the weights may be more complex and the symbol type of the transitio
 will probably be something else than strings.
 
 \subsection{Alphabet}
-The alphabet of a transducer means all symbols (strings) that are
+The alphabet of a transducer consists of all symbols (strings) that are
 known to that transducer. The alphabet includes all symbols that occur 
 or have occurred in the transitions of the transducer unless explicitly
 removed from the alphabet. 
@@ -452,7 +452,7 @@ transducers $A$ and $B$, the resulting transducer's alphabet will include
 all symbols that were in the alphabets of $A$ and $B$. 
 
 In HFST version 2, alphabets were designed to be external to the transducer,
-and the interface did not offer any way convenient way for the user to access a 
+and the interface did not offer any convenient way for the user to access a 
 transducer's internal representation of the alphabet. It was up to the back-end 
 implementation to take care of the alphabet of an individual transducer. In SFST 
 the transducers always have an explicit alphabet, but in OpenFst their use is optional.
@@ -500,7 +500,7 @@ see~\cite{hulden/2009} and~\cite{beesley/2003}.
 It is also possible to switch off the handling of special symbols if we know
 for sure that they are not used in the transducers. 
 In this way, we can optimize performance for instance for the tool 
-{\tt hfst-calculate} that processes the SFST programming language 
+{\tt hfst-sfstpl2fst} that processes the SFST programming language 
 formalism which does not support the unknown or identity symbols.
 
 
