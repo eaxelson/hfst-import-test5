@@ -769,10 +769,8 @@ public:
 
 
     bool initialize_input(char * input_str);
-    HfstOneLevelPaths lookup_fd(const StringVector & s,
-				HfstOneLevelPaths & results);
-    HfstOneLevelPaths lookup_fd(const std::string & s,
-				HfstOneLevelPaths & results);
+    HfstOneLevelPaths * lookup_fd(const StringVector & s);
+    HfstOneLevelPaths * lookup_fd(const std::string & s);
     void note_analysis(SymbolNumber * whole_output_tape);
 
     friend class ConvertTransducer;

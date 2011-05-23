@@ -1111,12 +1111,12 @@ lookup_simple(const HfstOneLevelPath& s, HfstTransducer& t, bool* infinity)
     warning(0, 0, "Got infinite results, number of cycles limited to %zu",
         infinite_cutoff);
       }
-      t.lookup_fd(*results, s.second, infinite_cutoff);
+      results = t.lookup_fd(s.second, infinite_cutoff);
       *infinity = true;
     }
   else
     {
-      t.lookup_fd(*results, s.second);
+      results = t.lookup_fd(s.second);
     }
 
   if (results->size() == 0)

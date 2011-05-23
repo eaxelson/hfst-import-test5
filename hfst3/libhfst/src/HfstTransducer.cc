@@ -360,66 +360,64 @@ void HfstTransducer::harmonize(HfstTransducer &another)
 
 // *** LOOKUP FUNCTIONS... Implemented only for HFST_OL and HFST_OLW *** //
 
-void HfstTransducer::lookup(HfstOneLevelPaths& results, const StringVector& s,
-			    ssize_t limit) const {
-    lookup_fd(results, s, limit);
+HfstOneLevelPaths * HfstTransducer::lookup(const StringVector& s,
+			    ssize_t limit) const
+{
+    return lookup_fd(s, limit);
 }
 
-void HfstTransducer::lookup(HfstOneLevelPaths& results, const std::string & s,
-			    ssize_t limit) const {
-    lookup_fd(results, s, limit);
+HfstOneLevelPaths * HfstTransducer::lookup(const std::string & s,
+					   ssize_t limit) const
+{
+    return lookup_fd(s, limit);
 }
 
-void HfstTransducer::lookup_fd(HfstOneLevelPaths& results, 
-			       const StringVector& s,
-			       ssize_t limit) const {
+HfstOneLevelPaths * HfstTransducer::lookup_fd(const StringVector& s,
+					      ssize_t limit) const
+{
     switch(this->type) {
 
         /* TODO: Convert into HFST_OL(W)_TYPE, if needed? */
 
     case (HFST_OL_TYPE):
     case (HFST_OLW_TYPE):
-	this->implementation.hfst_ol->lookup_fd(s, results);
-	return;
+	return this->implementation.hfst_ol->lookup_fd(s);
 
     case (ERROR_TYPE):
 	HFST_THROW(TransducerHasWrongTypeException);
     default:
-	(void)results;
 	(void)s;
 	(void)limit;
 	HFST_THROW(FunctionNotImplementedException);
     }
 }
 
-void HfstTransducer::lookup_fd(HfstOneLevelPaths& results, 
-			       const std::string & s,
-			       ssize_t limit) const {
+HfstOneLevelPaths * HfstTransducer::lookup_fd(const std::string & s,
+					     ssize_t limit) const
+{
     switch(this->type) {
 
         /* TODO: Convert into HFST_OL(W)_TYPE, if needed? */
 
     case (HFST_OL_TYPE):
     case (HFST_OLW_TYPE):
-	this->implementation.hfst_ol->lookup_fd(s, results);
-	return;
+	return this->implementation.hfst_ol->lookup_fd(s);
 
     case (ERROR_TYPE):
 	HFST_THROW(TransducerHasWrongTypeException);
     default:
-	(void)results;
 	(void)s;
 	(void)limit;
 	HFST_THROW(FunctionNotImplementedException);
     }
 }
 
-void HfstTransducer::lookup(HfstOneLevelPaths& results, 
-			    const HfstTokenizer& tok,
-			    const std::string &s, 
-			    ssize_t limit) const {
+HfstOneLevelPaths * HfstTransducer::lookup(const HfstTokenizer& tok,
+					   const std::string &s, 
+					   ssize_t limit) const
+{
     StringVector sv = tok.tokenize_one_level(s);
-    lookup(results, sv, limit);
+    return lookup(sv, limit);
 }
 
 void HfstTransducer::lookdown(HfstOneLevelPaths& results, 
