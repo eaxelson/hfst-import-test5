@@ -158,9 +158,10 @@ class Transducer:
         self.displayVector = []
 
         inputline = Indexlist(unicode(string, "utf-8")) # wrap the input in an indexing container
-        while inputline.pos < len(inputline.s):
+        while inputline.pos < len(inputline.s) and \
+                self.inputString.last != NO_SYMBOL_NUMBER:
             self.inputString.s.append(self.letterTrie.findKey(inputline))
-        if len(self.inputString.s) == 0 or self.inputString.s[-1] == NO_SYMBOL_NUMBER:
+        if self.inputString.s[-1] == NO_SYMBOL_NUMBER:
             return False
         self.inputString.s.append(NO_SYMBOL_NUMBER)
         self.getAnalyses(0) # start at index zero
