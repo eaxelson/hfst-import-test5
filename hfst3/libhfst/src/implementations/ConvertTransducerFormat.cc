@@ -23,6 +23,44 @@
 namespace hfst { namespace implementations
 {
 
+  ConversionFunctions::String2NumberMap 
+    ConversionFunctions::string_to_number_map;
+  StringVector ConversionFunctions::number_to_string_vector;
+
+  std::string ConversionFunctions::get_string(unsigned int number) 
+  {
+    if (number >= number_to_string_vector.size()) {
+      return std::string(""); } // number not found
+    return number_to_string_vector[number];
+  }
+  
+  unsigned int ConversionFunctions::get_number(const std::string &str)
+  {
+    String2NumberMap::iterator it =
+      string_to_number_map.find(str);
+    if (it == string_to_number_map.end()) { // string not found
+      number_to_string_vector.push_back(str);
+      unsigned int new_index = number_to_string_vector.size()-1; 
+      string_to_number_map[str] = new_index;
+      return new_index;
+    }
+    return it->second;
+  }
+  
+  ConversionFunctions::NumberVector 
+    ConversionFunctions::get_harmonization_vector
+      (const StringVector &coding_vector)
+  {
+    NumberVector retval;
+    retval.reserve(coding_vector.size());
+    for (StringVector::const_iterator it = coding_vector.begin();
+	 it != coding_vector.end(); it++) {
+      assert (*it != "");
+      retval.push_back(get_number(*it));
+    }
+    return retval;
+  }
+
 
   HfstBasicTransducer * ConversionFunctions::
   hfst_transducer_to_hfst_basic_transducer
