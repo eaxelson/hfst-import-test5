@@ -895,12 +895,11 @@ ccc : ddd
     //! @pre The transducer must be of type #HFST_OL_TYPE or #HFST_OLW_TYPE.
     //!      This function is not implemented for other transducer types.
     //!
-    //! @param results  Output parameter to store unique results.
-    //!                 Epsilons are represented by empty strings.
     //! @param s  String to look up. The weight is ignored.
     //! @param limit  (Currently ignored.) Number of strings to look up. 
     //!               -1 tries to look up all and may get stuck 
     //!               if infinitely ambiguous.
+    //! \return{A pointer to a HfstOneLevelPaths container allocated by callee}
     //! 
     //! @see HfstTokenizer::tokenize_one_level
     //! @see is_lookup_infinitely_ambiguous(const StringVector&) const
@@ -916,12 +915,11 @@ ccc : ddd
     //! This is an overloaded lookup_fd that leaves tokenizing to the
     //! transducer.
     //!
-    //! @param results  Output parameter to store unique results.
-    //!                 Epsilons are represented by empty strings.
     //! @param s  String to look up. The weight is ignored.
     //! @param limit  (Currently ignored.) Number of strings to look up. 
     //!               -1 tries to look up all and may get stuck 
     //!               if infinitely ambiguous.
+    //! \return{A pointer to a HfstOneLevelPaths container allocated by callee}
     //!
     //!
     //!@sa lookup_fd
