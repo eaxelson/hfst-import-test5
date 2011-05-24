@@ -75,6 +75,29 @@ namespace implementations {
 
   public:
 
+    typedef std::map<std::string, unsigned int> String2NumberMap;
+    typedef std::vector<unsigned int> NumberVector;
+
+    /* A number-to-string vector common to all transducers during a session. */
+    static StringVector number_to_string_vector;
+
+    /* A string-to-number map common to all transducers during a session. */
+    static String2NumberMap string_to_number_map;
+
+    /* Get the string that is represented by \a number in the number-to-string
+       vector. If \a number is not found, return the empty string. */
+    static std::string get_string(unsigned int number);
+
+    /* Get the number that represents \a str in the string-to-number map.
+       If \a str is not found, add it to the next free index. */
+    static unsigned int get_number(const std::string &str);
+
+    /* Get a vector that tells how a transducer that follows 
+       the number-to-symbol encoding of \a coding should be harmonized so that 
+       it will follow the one of number_to_string_vector. */
+    static NumberVector get_harmonization_vector
+      (const StringVector &coding_vector);
+
     static HfstBasicTransducer * hfst_transducer_to_hfst_basic_transducer
       (const hfst::HfstTransducer &t);
 
