@@ -5,7 +5,14 @@ class Header:
     """Read and provide interface to header"""
     
     def __init__(self, file):
-        bytes = file.read(56) # 2 unsigned shorts, 4 unsigned ints and 9 uint-bools
+        bytes = file.read(5) # "HFST\0"
+        if str(struct.unpack_from("<5s", bytes, 0)) == "('HFST\\x00',)":
+            # just ignore any hfst3 header
+            remaining = struct.unpack_from("<H", file.read(3), 0)[0]
+            self.handle_hfst3_header(file, remaining)
+            bytes = file.read(56) # 2 unsigned shorts, 4 unsigned ints and 9 uint-bools
+        else:
+            bytes = bytes + file.read(56 - 5)
         self.number_of_input_symbols             = struct.unpack_from("<H", bytes, 0)[0]
         self.number_of_symbols                   = struct.unpack_from("<H", bytes, 2)[0]
         self.size_of_transition_index_table      = struct.unpack_from("<I", bytes, 4)[0]
@@ -21,6 +28,11 @@ class Header:
         self.has_input_epsilon_transitions       = struct.unpack_from("<I", bytes, 44)[0] != 0
         self.has_input_epsilon_cycles            = struct.unpack_from("<I", bytes, 48)[0] != 0
         self.has_unweighted_input_epsilon_cycles = struct.unpack_from("<I", bytes, 52)[0] != 0
+
+    def handle_hfst3_header(self, file, remaining):
+        chars = struct.unpack_from("<" + str(remaining) + "c",
+                                   file.read(remaining), 0)
+        # assume the h3-header doesn't say anything surprising for now
 
 class Alphabet:
     """Read and provide interface to alphabet"""
@@ -67,7 +79,7 @@ class LetterTrie:
             Add string to trie, having it resolve to symbolNumber
             """
             if len(string) > 1:
-                if not string[0] in self.children:
+                if not (string[0] in self.children):
                     self.children[string[0]] = self.__class__() # instantiate a new node
                 self.children[string[0]].add(string[1:], symbolNumber)
             elif len(string) == 1:
@@ -82,16 +94,19 @@ class LetterTrie:
             """
             if indexstring.pos >= len(indexstring.s):
                 return NO_SYMBOL_NUMBER
+            current = indexstring.get()
             indexstring.pos += 1
-            if not indexstring.get(-1) in self.children:
-                if not indexstring.get(-1) in self.symbols:
+            if not (current in self.children):
+                if not (current in self.symbols):
+                    indexstring.pos -= 1
                     return NO_SYMBOL_NUMBER
-                return self.symbols[indexstring.get(-1)]
-            indexstring.save()
-            temp = self.children[indexstring.get(-1)].find(indexstring)
+                return self.symbols[current]
+            temp = self.children[current].find(indexstring)
             if temp == NO_SYMBOL_NUMBER:
-                indexstring.restore()
-                return self.symbols[indexstring.get(-1)]
+                if not (current in symbols):
+                    indexstring.pos -= 1
+                    return NO_SYMBOL_NUMBER
+                return self.symbols[current]
             return temp
     
     def __init__(self):
@@ -124,6 +139,11 @@ class Indexlist:
 
     def restore(self):
         self.pos = self.temp
+
+    def last(self):
+        if len(self.s) > 0:
+            return self.s[-1]
+        return None
 
 class FlagDiacriticOperation:
     """Represents one flag diacritic operation"""
