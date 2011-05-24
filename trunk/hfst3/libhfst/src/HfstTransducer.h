@@ -957,14 +957,14 @@ ccc : ddd
     //! This is in effect a fast composition of single
     //! path from left hand side.
     //!
-    //! @param results  output parameter to store unique results
     //! @param s  string to look down
     //! <!-- @param tok  tokenizer to split string in arcs? -->
     //! @param limit  number of strings to extract. -1 tries to extract all and
     //!             may get stuck if infinitely ambiguous
+    //! @param results  output parameter to store unique results
     //! @todo todo
-    void lookdown(HfstOneLevelPaths& results, const StringVector& s,
-                  ssize_t limit = -1) const;
+    HfstOneLevelPaths * lookdown(const StringVector& s,
+				 ssize_t limit = -1) const;
 
     //! @brief (Not implemented) Lookdown a single string minding 
     //! flag diacritics properly.
@@ -974,8 +974,8 @@ ccc : ddd
     //!
     //! @sa lookdown
     //! @todo todo
-    void lookdown_fd(HfstOneLevelPaths& results, StringVector& s,
-                     ssize_t limit = -1) const;
+    HfstOneLevelPaths * lookdown_fd(StringVector& s,
+				    ssize_t limit = -1) const;
 
     //! @brief Whether lookup of path \a s will have infinite results.
     //!

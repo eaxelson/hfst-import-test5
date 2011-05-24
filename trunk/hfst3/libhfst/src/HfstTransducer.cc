@@ -420,19 +420,15 @@ HfstOneLevelPaths * HfstTransducer::lookup(const HfstTokenizer& tok,
     return lookup(sv, limit);
 }
 
-void HfstTransducer::lookdown(HfstOneLevelPaths& results, 
-			      const StringVector& s,
-			      ssize_t limit) const {
-    (void)results;
+HfstOneLevelPaths * HfstTransducer::lookdown(const StringVector& s,
+					     ssize_t limit) const {
     (void)s;
     (void)limit;
     HFST_THROW(FunctionNotImplementedException);
 }
 
-void HfstTransducer::lookdown_fd(HfstOneLevelPaths& results, 
-				 StringVector& s,
-				 ssize_t limit) const {
-    (void)results;
+HfstOneLevelPaths * HfstTransducer::lookdown_fd(StringVector& s,
+						ssize_t limit) const {
     (void)s;
     (void)limit;
     HFST_THROW(FunctionNotImplementedException);
