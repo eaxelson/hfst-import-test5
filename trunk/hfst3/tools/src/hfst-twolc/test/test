@@ -4,7 +4,7 @@ NUMBER_OF_TESTS=`ls $srcdir | egrep "test[0-9][0-9]*$" | wc -l`
 
 echo "There are $NUMBER_OF_TESTS substests for hfst-twolc."
 
-for f in $(ls $srcdir | egrep "test[0-9][0-9]*$" | sort -n)
+for f in $(ls -d $srcdir/* | egrep "test[0-9][0-9]*$" | sort -n)
 do
 	cat $f | ../src/hfst-twolc-loc -R -s | ../../hfst-fst2txt | ../../hfst-txt2fst -e"@_EPSILON_SYMBOL_@" > temp.twolc.hfst
 	cat $f.txt_fst | ../../hfst-txt2fst -e"@_EPSILON_SYMBOL_@" > temp.hfst
