@@ -91,7 +91,7 @@ namespace hfst
       tm.minimize();
       HfstTransducer retval = replace(tm, repl_type, false, alphabet);
 
-      if (DEBUG) printf("..replcae_transducer\n");
+      if (DEBUG) printf("..replace_transducer\n");
 
       retval.minimize();
 
