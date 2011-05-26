@@ -178,25 +178,26 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 	  new std::map<unsigned int, unsigned int>();
       unsigned int first_transition = 0;
 
+      unsigned int source_state=0;
       for (HfstBasicTransducer::const_iterator it = t->begin(); 
            it != t->end(); ++it) {
 	  unsigned int state_number = state_placeholders.size();
-	  if (state_number != it->first) {
-	      relabeled_states->operator[](it->first) = state_number;
+	  if (state_number != source_state) {
+	      relabeled_states->operator[](source_state) = state_number;
 	  }
 	  hfst_ol::Weight final_w = 0.0;
-	  if (t->is_final_state(it->first)) {
-	      final_w = t->get_final_weight(it->first);    
+	  if (t->is_final_state(source_state)) {
+	      final_w = t->get_final_weight(source_state);    
 	  }
 	  state_placeholders.push_back(hfst_ol::StatePlaceholder(
 					   state_number,
-					   t->is_final_state(it->first),
+					   t->is_final_state(source_state),
 					   first_transition,
 					   final_w));
 	  ++first_transition; // there's a padding entry between states
           for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
-		   = it->second.begin();
-               tr_it != it->second.end(); ++tr_it) {
+		   = it->begin();
+               tr_it != it->end(); ++tr_it) {
 	      ++first_transition;
               if (FdOperation::is_diacritic(tr_it->get_input_symbol())) {
                   flag_diacritics->insert(tr_it->get_input_symbol());
@@ -205,6 +206,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
               }
               other_symbols->insert(tr_it->get_output_symbol());
           }
+	  source_state++;
       }
       
       SymbolNumber seen_input_symbols = 1; // We always have epsilon
@@ -257,12 +259,13 @@ unsigned int hfst_ol_to_hfst_basic_add_state
     // Do a second pass over the transitions, figuring out everything
     // about the states except starting indices
 
+    source_state=0;
     for (HfstBasicTransducer::const_iterator it = t->begin(); 
          it != t->end(); ++it) {
         for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
-               = it->second.begin();
-             tr_it != it->second.end(); ++tr_it) {
-	    unsigned int state_number = it->first;
+               = it->begin();
+             tr_it != it->end(); ++tr_it) {
+	    unsigned int state_number = source_state;
 	    if (relabeled_states->count(state_number) != 0) {
 		state_number = relabeled_states->operator[](state_number);
 	    }
@@ -286,6 +289,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
                 .inputs[string_symbol_map->operator[](
 		    tr_it->get_input_symbol())].push_back(trans);
         }
+	source_state++;
     }
     delete relabeled_states;
     delete string_symbol_map;

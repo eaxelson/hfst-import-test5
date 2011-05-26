@@ -203,8 +203,8 @@ OtherSymbolTransducer &OtherSymbolTransducer::harmonize_diacritics
        ++it)
     {
       for (HfstBasicTransducer::HfstTransitions::const_iterator jt 
-	     = it->second.begin();
-	   jt != it->second.end();
+	     = it->begin();
+	   jt != it->end();
 	   ++jt)
 	{
 	  if (jt->get_input_symbol() == TWOLC_IDENTITY)
@@ -216,7 +216,7 @@ OtherSymbolTransducer &OtherSymbolTransducer::harmonize_diacritics
 		   kt != missing_diacritics.end();
 		   ++kt)
 		{
-		  it->second.push_back
+		  it->push_back
 		    (HfstBasicTransition(target,*kt,*kt,0.0));
 		}
 	      break;
@@ -483,15 +483,15 @@ OtherSymbolTransducer OtherSymbolTransducer::get_inverse_of_upper_projection
   HfstBasicTransducer fst(this->transducer);
   HfstBasicTransducer new_fst;
 
+  HfstState state=0;
   for (HfstBasicTransducer::iterator it = fst.begin(); it != fst.end(); ++it)
     {
-      HfstState state = it->first;
       new_fst.add_state(state);
       if (fst.is_final_state(state))
 	{ new_fst.set_final_weight(state,fst.get_final_weight(state)); }
       for (HfstBasicTransducer::HfstTransitions::iterator jt 
-	     = it->second.begin();
-	   jt != it->second.end();
+	     = it->begin();
+	   jt != it->end();
 	   ++jt)
 	{
 	  HfstBasicTransition arc = *jt;
@@ -530,6 +530,7 @@ OtherSymbolTransducer OtherSymbolTransducer::get_inverse_of_upper_projection
 		{ add_transition(new_fst,state,target,input,HFST_UNKNOWN); }
 	    }
 	}
+      state++;
     }
   OtherSymbolTransducer copy(*this);
   copy.transducer = HfstTransducer(new_fst,transducer_type);
@@ -657,12 +658,14 @@ bool OtherSymbolTransducer::is_subset(const OtherSymbolTransducer &another)
 
 bool OtherSymbolTransducer::empty(const HfstBasicTransducer &fsm)
 {
+  HfstState state=0;
   for (HfstBasicTransducer::const_iterator it = fsm.begin(); 
        it != fsm.end(); 
        ++it)
     { 
-      if (fsm.is_final_state(it->first))
+      if (fsm.is_final_state(state))
 	{ return false; }
+      state++;
     }
   return true;
 }

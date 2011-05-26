@@ -152,10 +152,11 @@ process_stream(HfstInputStream& instream)
       std::pair<string,unsigned int> most_ambiguous_output;
       unsigned int initial_state = 0; // mutt.get_initial_state();
       // iterate states in random orderd
+      HfstState source_state=0;
       for (HfstBasicTransducer::const_iterator it = mutt->begin();
        it != mutt->end(); it++)
     {
-          HfstState s = it->first;
+          HfstState s = source_state;
           ++states;
           if (mutt->is_final_state(s))
             {
@@ -166,8 +167,8 @@ process_stream(HfstInputStream& instream)
           map<string,unsigned int> output_ambiguity;
 
       for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
-	     = it->second.begin();
-           tr_it != it->second.end(); tr_it++)
+	     = it->begin();
+           tr_it != it->end(); tr_it++)
         {
               arcs++;
               arcs_here++;
@@ -227,7 +228,8 @@ process_stream(HfstInputStream& instream)
                 }
               uniq_output_arcs++;
             }
-        }
+	  source_state++;
+      }
       delete mutt;
       // traverse
       

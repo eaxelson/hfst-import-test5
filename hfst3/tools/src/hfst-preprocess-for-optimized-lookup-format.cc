@@ -144,24 +144,25 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         HfstState state_count = 1;
         std::map<HfstState,HfstState> rebuilt;
         rebuilt[0] = 0;
+	HfstState source_state=0;
         for (HfstBasicTransducer::iterator state = original.begin();
              state != original.end();
              ++state)
           {
-            if (rebuilt.find(state->first) == rebuilt.end())
+            if (rebuilt.find(source_state) == rebuilt.end())
               {
                 replication.add_state(state_count);
-                if (original.is_final_state(state->first))
+                if (original.is_final_state(source_state))
                   {
                     replication.set_final_weight(state_count,
-                                                 original.get_final_weight(state->first));
+                                                 original.get_final_weight(source_state));
                   }
-                rebuilt[state->first] = state_count;
+                rebuilt[source_state] = state_count;
                 state_count++;
               }
             for (HfstBasicTransducer::HfstTransitions::iterator arc =
-                 state->second.begin();
-                 arc != state->second.end();
+                 state->begin();
+                 arc != state->end();
                  ++arc)
               {
                 if (rebuilt.find(arc->get_target_state()) == rebuilt.end())
@@ -179,8 +180,9 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                                        arc->get_input_symbol(),
                                        arc->get_output_symbol(),
                                        arc->get_weight());
-                replication.add_transition(rebuilt[state->first], nu);
+                replication.add_transition(rebuilt[source_state], nu);
               }
+	    source_state++;
           }
         trans = HfstTransducer(replication, trans.get_type());
         char* composed_name = static_cast<char*>(malloc(sizeof(char) * 

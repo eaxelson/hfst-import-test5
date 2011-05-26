@@ -142,21 +142,23 @@ namespace hfst { namespace implementations
     h = fsm_construct_init(strdup(std::string("").c_str()));
     
     // Go through all states
+    unsigned int source_state=0;
     for (HfstBasicTransducer::const_iterator it = hfst_fsm->begin();
          it != hfst_fsm->end(); it++)
       {
         // Go through the set of transitions in each state
         for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
-               = it->second.begin();
-             tr_it != it->second.end(); tr_it++)
+               = it->begin();
+             tr_it != it->end(); tr_it++)
           {
             // Copy the transition
             fsm_construct_add_arc(h, 
-                                  (int)it->first, 
+                                  (int)source_state, 
                                   (int)tr_it->get_target_state(),
                                   strdup(tr_it->get_input_symbol().c_str()),
                                   strdup(tr_it->get_output_symbol().c_str()) );
           }
+	source_state++;
       }
     
     // Go through the final states

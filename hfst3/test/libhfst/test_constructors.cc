@@ -14,10 +14,10 @@ using hfst::implementations::HfstBasicTransition;
 int main(int argc, char **argv) 
 {
 
-  const unsigned int TYPES_SIZE=4;
+  const unsigned int TYPES_SIZE=3;
   const ImplementationType types [] = {SFST_TYPE, 
 				       TROPICAL_OPENFST_TYPE, 
-				       LOG_OPENFST_TYPE, 
+				       /*LOG_OPENFST_TYPE,*/ 
 				       FOMA_TYPE};
 
   for (unsigned int i=0; i<TYPES_SIZE; i++)
@@ -70,8 +70,13 @@ int main(int argc, char **argv)
 	      "2 3 @0@ @0@\n"
 	      "3\n");
 	      fclose(f);*/
-      FILE * file = fopen((std::string(getenv("srcdir")) + 
-			   std::string("/foobar.att")).c_str(), "rb");
+      char * srcdir = getenv("srcdir");
+      std::string srcdir_(".");
+      if (srcdir != NULL)
+	srcdir_ + std::string(srcdir);
+      const char * file_to_open = (srcdir_ + 
+				   std::string("/foobar.att")).c_str();
+      FILE * file = fopen(file_to_open, "rb");
       HfstTransducer foobar_att(file, types[i], "@0@");
       fclose(file);
       foobar_att.minimize();

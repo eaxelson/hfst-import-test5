@@ -406,8 +406,8 @@ void get_symbols(HfstBasicTransducer &t,SymbolSet &known_symbols)
   for (HfstBasicTransducer::const_iterator it = t.begin(); it != t.end(); ++it)
     {
       for (HfstBasicTransducer::HfstTransitions::const_iterator jt = 
-	     it->second.begin();
-	   jt != it->second.end();
+	     it->begin();
+	   jt != it->end();
 	   ++jt)
 	{ 
 	  known_symbols.insert(jt->get_input_symbol());

@@ -205,22 +205,21 @@ namespace hfst {
     template <class C, class W> class HfstTransitionGraph 
       {
       public:
-        /** @brief A vector of transitions of a state in an HfstTransitionGraph. */
+        /** @brief A vector of transitions of a state in an 
+	    HfstTransitionGraph. */
         typedef std::vector<HfstTransition<C> > HfstTransitions;
 
 	typedef std::pair<typename C::SymbolType, 
 	  typename C::SymbolType> HfstSymbolPair; 
 
       protected:
-        typedef std::map<HfstState, 
-          HfstTransitions >
-          HfstStateMap;
-        HfstStateMap state_map;
+        typedef std::vector<HfstTransitions>
+          HfstStates;
+        HfstStates state_vector;
         typedef std::map<HfstState,W> FinalWeightMap;
         FinalWeightMap final_weight_map;
         typedef std::set<typename C::SymbolType> HfstTransitionGraphAlphabet;
         HfstTransitionGraphAlphabet alphabet;
-        unsigned int max_state; /* The biggest state number in use. */
 
       public:
         /** @brief An iterator type that points to the map of states 
@@ -228,19 +227,20 @@ namespace hfst {
 
             The value pointed by the iterator is of type 
             std::pair<HfstState, HfstTransitions >. */
-        typedef typename HfstStateMap::iterator iterator;
+        typedef typename HfstStates::iterator iterator;
         /** @brief A const iterator type that points to the map of states
             in the graph.
 
             The value pointed by the iterator is of type 
             std::pair<HfstState, HfstTransitions >. */
-        typedef typename HfstStateMap::const_iterator const_iterator;
+        typedef typename HfstStates::const_iterator const_iterator;
 
         /** @brief Create a graph with one initial state that has state
             number zero and is not a final state, i.e. an empty graph. */
-        HfstTransitionGraph(void): max_state(0) {
+        HfstTransitionGraph(void) {
           initialize_alphabet(alphabet);
-          state_map[0]=HfstTransitions();
+	  HfstTransitions tr;
+          state_vector.push_back(tr);
         }
 
 	// FIXME: the default should be enough
@@ -248,8 +248,7 @@ namespace hfst {
 	  {
 	    if (this == &graph)
 	      return *this;
-	    max_state = graph.max_state;
-	    state_map = graph.state_map;
+	    state_vector = graph.state_vector;
 	    final_weight_map = graph.final_weight_map;
 	    alphabet = graph.alphabet;
 	    assert(alphabet.count(typename C::SymbolType()) == 0); // TEST
@@ -257,9 +256,8 @@ namespace hfst {
 	  }
 
         /** @brief Create a deep copy of HfstTransitionGraph \a graph. */
-        HfstTransitionGraph(const HfstTransitionGraph &graph): 
-        max_state(graph.max_state) {
-          state_map = graph.state_map;
+        HfstTransitionGraph(const HfstTransitionGraph &graph) {
+          state_vector = graph.state_vector;
           final_weight_map = graph.final_weight_map;
           alphabet = graph.alphabet;
 	  assert(alphabet.count(typename C::SymbolType()) == 0);
@@ -271,8 +269,7 @@ namespace hfst {
           HfstTransitionGraph<HfstTropicalTransducerTransitionData, float>
             *fsm = ConversionFunctions::
               hfst_transducer_to_hfst_basic_transducer(transducer);
-          max_state = fsm->max_state;
-          state_map = fsm->state_map;
+          state_vector = fsm->state_vector;
           final_weight_map = fsm->final_weight_map;
           alphabet = fsm->alphabet;
           delete fsm;
@@ -307,8 +304,8 @@ namespace hfst {
           for (iterator it = begin(); it != end(); it++)
             {
               for (typename HfstTransitions::iterator tr_it
-                     = it->second.begin();
-                   tr_it != it->second.end(); tr_it++)
+                     = it->begin();
+                   tr_it != it->end(); tr_it++)
                 {
                   C data = tr_it->get_transition_data();
                   
@@ -352,46 +349,58 @@ namespace hfst {
         /** @brief Add a new state to this graph and return its number.
 
             @return The next (smallest) free state number. */
-        HfstState add_state(void)
-        { return add_state(max_state+1); }
+        HfstState add_state(void) {
+	  HfstTransitions tr;
+	  state_vector.push_back(tr);
+	  return state_vector.size()-1;
+	}
 
         /** @brief Add a state \a s to this graph.
  
             If the state already exists, it is not added again. 
             @return \a s*/
         HfstState add_state(HfstState s) {
-          /*if (state_map.find(s) == state_map.end()) {
-            state_map[s] = HfstTransitions();
-	    }*/
-	  (void)state_map[s];
-          if (max_state < s)
-            max_state=s;
+	  while(state_vector.size() <= s) {
+	    HfstTransitions tr;
+	    state_vector.push_back(tr);
+	  }
           return s;
         }
 
-	// FIXME: documented/protected
+	/** @brief Get the biggest state number. */
+	HfstState get_max_state() const {
+	  return state_vector.size()-1;
+	}
+
+	void initialize_state_vector
+	  (unsigned int number_of_states)
+	{
+	  state_vector.reserve(number_of_states);
+	}
+
 	void initialize_transition_vector
 	  (unsigned int state_number, unsigned int number_of_transitions)
 	{
-	  state_map[state_number].reserve(number_of_transitions);
+	  add_state(state_number);
+	  state_vector[state_number].reserve(number_of_transitions);
 	}
 
         /** @brief Add a transition \a transition to state \a s. 
 
             If state \a s does not exist, it is created. */
-        void add_transition(HfstState s, HfstTransition<C> transition) {
+        void add_transition(HfstState s, const HfstTransition<C> & transition) {
 
           C data = transition.get_transition_data();
 
 	  // FIXME: throw an exception in constructor of HfstTransition?
-	  assert(not data.get_input_symbol().empty()); //!= typename C::SymbolType());
-	  assert(not data.get_output_symbol().empty()); //!= typename C::SymbolType());
+	  assert(not data.get_input_symbol().empty());
+	  assert(not data.get_output_symbol().empty());
 
-          //add_state(s); // the last line adds the state
+          add_state(s);
           add_state(transition.get_target_state());
           alphabet.insert(data.get_input_symbol());
           alphabet.insert(data.get_output_symbol());
-          state_map[s].push_back(transition);
+          state_vector[s].push_back(transition);
         }
 
         /** @brief Whether state \a s is final. 
@@ -412,8 +421,7 @@ namespace hfst {
 
             If the state does not exist, it is created. */
         void set_final_weight(HfstState s, const W & weight) {
-          if (s > max_state)
-            max_state=s;
+	  add_state(s);
           final_weight_map[s] = weight;
         }
 
@@ -421,29 +429,20 @@ namespace hfst {
             the graph. 
 
             For an example, see #HfstTransitionGraph */
-        iterator begin() { return state_map.begin(); }
+        iterator begin() { return state_vector.begin(); }
 
         /** @brief Get a const iterator to the beginning of the map of 
             states in the graph. */
-        const_iterator begin() const { return state_map.begin(); }
+        const_iterator begin() const { return state_vector.begin(); }
 
         /** @brief Get an iterator to the end of the map of states in
             the graph. */
-        iterator end() { return state_map.end(); }
+        iterator end() { return state_vector.end(); }
 
         /** @brief Get a const iterator to the end of the map of states in
             the graph. */
-        const_iterator end() const { return state_map.end(); }
+        const_iterator end() const { return state_vector.end(); }
 
-        /** @brief Get the set of transitions of state \a s in this graph. 
-
-            If the state does not exist, it is created. The created
-            state has an empty set of transitions. */
-        HfstTransitions & operator[](HfstState s) { // FIXME: protected
-          if (s > max_state)
-            max_state=s;
-          return state_map[s];
-        }        
 
         /** @brief Get the set of transitions of state \a s in this graph. 
 
@@ -452,12 +451,22 @@ namespace hfst {
         */
         const HfstTransitions & operator[](HfstState s) const
         {
-          if (s > max_state)
-            { 
-              HFST_THROW(StateIndexOutOfBoundsException); }
-          return state_map.find(s)->second;
+          if (s >= state_vector.size()) { 
+	    HFST_THROW(StateIndexOutOfBoundsException); }
+          return state_vector[s];
         }        
 
+      public:
+        /** @brief Get the set of transitions of state \a s in this graph. 
+	    
+            If the state does not exist, it is created. The created
+            state has an empty set of transitions. */
+        HfstTransitions & operator[](HfstState s) {
+	  add_state(s);
+          return state_vector[s];
+        }        
+
+      public:
         /* TODO: Change state numbers s1 to s2 and vice versa. */
         void swap_state_numbers(HfstState /*s1*/, HfstState /*s2*/) {
           HFST_THROW(FunctionNotImplementedException);
@@ -484,15 +493,16 @@ namespace hfst {
             \a write_weights defines whether weights are printed. */
         void write_in_att_format(std::ostream &os, bool write_weights=true) 
         {
+	  unsigned int source_state=0;
           for (iterator it = begin(); it != end(); it++)
             {
               for (typename HfstTransitions::iterator tr_it
-                     = it->second.begin();
-                   tr_it != it->second.end(); tr_it++)
+                     = it->begin();
+                   tr_it != it->end(); tr_it++)
                 {
                   C data = tr_it->get_transition_data();
                   
-                  os <<  it->first << "\t" 
+                  os <<  source_state << "\t" 
                      <<  tr_it->get_target_state() << "\t"
                 // replace all spaces, epsilons and tabs
                      <<  
@@ -514,13 +524,14 @@ namespace hfst {
                     os <<  "\t" << data.get_weight(); 
                   os << "\n";
                 }
-              if (is_final_state(it->first))
+              if (is_final_state(source_state))
                 {
-                  os <<  it->first;
+                  os <<  source_state;
                   if (write_weights)
-                    os << "\t" <<  get_final_weight(it->first);
+                    os << "\t" <<  get_final_weight(source_state);
                   os << "\n";
                 }
+	      source_state++;
             }          
         }
 
@@ -528,16 +539,17 @@ namespace hfst {
             \a write_weights defines whether weights are printed. */
         void write_in_att_format(FILE *file, bool write_weights=true) 
         {
+	  unsigned int source_state=0;
           for (iterator it = begin(); it != end(); it++)
             {
               for (typename HfstTransitions::iterator tr_it
-                     = it->second.begin();
-                   tr_it != it->second.end(); tr_it++)
+                     = it->begin();
+                   tr_it != it->end(); tr_it++)
                 {
                   C data = tr_it->get_transition_data();
                   
                   fprintf(file, "%i\t%i\t%s\t%s",
-                          it->first,
+                          source_state,
                           tr_it->get_target_state(),
                   // replace all spaces and epsilons
 			  replace_all
@@ -558,14 +570,15 @@ namespace hfst {
                             data.get_weight()); 
                   fprintf(file, "\n");
                 }
-              if (is_final_state(it->first))
+              if (is_final_state(source_state))
                 {
-                  fprintf(file, "%i", it->first);
+                  fprintf(file, "%i", source_state);
                   if (write_weights)
                     fprintf(file, "\t%f", 
-                            get_final_weight(it->first));
+                            get_final_weight(source_state));
                   fprintf(file, "\n");
                 }
+	      source_state++;
             }          
         }
 
@@ -925,9 +938,9 @@ namespace hfst {
           for (iterator it = begin(); it != end(); it++)
             {
 	      // Go through all transitions
-              for (unsigned int i=0; i < it->second.size(); i++)
+              for (unsigned int i=0; i < it->size(); i++)
                 {
-		  HfstTransition<C> &tr_it = it->second[i];
+		  HfstTransition<C> &tr_it = it->operator[](i);
 
 		  std::string substituting_input_symbol
 		    = tr_it.get_input_symbol();
@@ -954,7 +967,7 @@ namespace hfst {
 		       substituting_output_symbol,
 		       tr_it.get_weight());
 
-		    it->second[i] = tr;
+		    it->operator[](i) = tr;
 		  }
 		  
 		} // all transitions gone through
@@ -971,9 +984,9 @@ namespace hfst {
           for (iterator it = begin(); it != end(); it++)
             {
 	      // Go through all transitions
-              for (unsigned int i=0; i < it->second.size(); i++)
+              for (unsigned int i=0; i < it->size(); i++)
                 {
-		  HfstTransition<C> &tr_it = it->second[i];
+		  HfstTransition<C> &tr_it = it->operator[](i);
 
 		  if (tr_it.get_input_symbol() == old_sp.first &&
 		      tr_it.get_output_symbol() == old_sp.second)
@@ -985,7 +998,7 @@ namespace hfst {
 			 new_sp.second,
 			 tr_it.get_weight());
 		      
-		      it->second[i] = tr;
+		      it->operator[](i) = tr;
 		    }		  
 		} // all transitions gone through
 	    } // all states gone through
@@ -1014,8 +1027,8 @@ namespace hfst {
 
               // Go through all transitions
               for (typename HfstTransitions::iterator tr_it
-                     = it->second.begin();
-                   tr_it != it->second.end(); tr_it++)
+                     = it->begin();
+                   tr_it != it->end(); tr_it++)
                 {
                   C data = tr_it->get_transition_data();
 
@@ -1083,14 +1096,14 @@ namespace hfst {
 			old_transitions.at(i)->get_input_symbol().c_str(),
 			old_transitions.at(i)->get_output_symbol().c_str());*/
 
-                it->second.erase(old_transitions.at(i));
+                it->erase(old_transitions.at(i));
               }
 
               // and add the substituting transitions
               for (typename HfstTransitions::iterator IT 
                      = new_transitions.begin();
                    IT != new_transitions.end(); IT++) {
-                it->second.push_back(*IT);
+                it->push_back(*IT);
               }
 
               // (all transitions in a state substituted)
@@ -1253,22 +1266,23 @@ namespace hfst {
                               const HfstTransitionGraph &graph) {
 
           // Epsilon transition to initial state of \a graph
-          max_state++;
+          HfstState s = add_state();
           HfstTransition <C> epsilon_transition
-            (max_state, "@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@", 
+            (s, "@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@", 
              sub.weight);
           add_transition(sub.origin_state, epsilon_transition);
 
           /* Offset between state numbers */
-          unsigned int offset = max_state;
+          unsigned int offset = s;
 
           // Copy \a graph
+	  HfstState source_state=0;
           for (const_iterator it = graph.begin(); 
                it != graph.end(); it++)
             {
               for (typename HfstTransitions::const_iterator tr_it
-                     = it->second.begin();
-                   tr_it != it->second.end(); tr_it++)
+                     = it->begin();
+                   tr_it != it->end(); tr_it++)
                 {
                   C data = tr_it->get_transition_data();
                   
@@ -1278,8 +1292,9 @@ namespace hfst {
                      data.get_output_symbol(),
                      data.get_weight());
 
-                  add_transition(it->first + offset, transition);
+                  add_transition(source_state + offset, transition);
                 }
+	      source_state++;
             }
 
           // Epsilon transitions from final states of \a graph
@@ -1335,6 +1350,7 @@ namespace hfst {
           std::vector<substitution_data> substitutions;
 
           // Go through all states
+	  HfstState source_state=0;
           for (iterator it = begin(); it != end(); it++)
             {
 
@@ -1344,8 +1360,8 @@ namespace hfst {
 
               // Go through all transitions
               for (typename HfstTransitions::iterator tr_it
-                     = it->second.begin();
-                   tr_it != it->second.end(); tr_it++)
+                     = it->begin();
+                   tr_it != it->end(); tr_it++)
                 {
                   C data = tr_it->get_transition_data();
 
@@ -1356,7 +1372,7 @@ namespace hfst {
                     {
                       // schedule a substitution
                       substitutions.push_back(substitution_data
-                                              (it->first, 
+                                              (source_state, 
                                                tr_it->get_target_state(), 
                                                data.get_weight()));
                       // schedule the old transition to be deleted
@@ -1371,9 +1387,10 @@ namespace hfst {
                      HfstTransitions::iterator>::iterator IT =
                      old_transitions.begin(); 
                    IT != old_transitions.end(); IT++) {
-                it->second.erase(*IT);
+                it->erase(*IT);
               }
-
+	      
+	      source_state++;
             }
           // (all states gone trough)
 
@@ -1401,10 +1418,12 @@ namespace hfst {
             alphabet.insert(symbol_pair.first);
             alphabet.insert(symbol_pair.second);
             
+	    HfstState source_state=0;
             for (iterator it = begin(); it != end(); it++) {
-              HfstTransition <C> tr( it->first, symbol_pair.first, 
+              HfstTransition <C> tr( source_state, symbol_pair.first, 
                                      symbol_pair.second, weight );              
-              it->second.push_back(tr);
+              it->push_back(tr);
+	      source_state++;
             }
             return *this;
           }
@@ -1510,7 +1529,7 @@ namespace hfst {
             return s;
           }
 
-          HfstTransitions tr = state_map[s];
+          HfstTransitions tr = state_vector[s];
           bool transition_found=false;
           /* The target state of the transition followed or added */
           HfstState next_state; 
@@ -1533,10 +1552,9 @@ namespace hfst {
           // If not found, create the transition
           if (not transition_found)
             {
-              max_state++;
-              next_state = max_state;
+              next_state = add_state();
               HfstTransition <C> transition(next_state, it->first,
-                                             it-> second, 0);
+                                             it->second, 0);
               add_transition(s, transition);
             }
 
@@ -1590,12 +1608,12 @@ namespace hfst {
 /* 	{ */
 /* 	            typedef std::map<HfstState,  */
 /*           std::set<HfstTransition<C> > > */
-/*           HfstStateMap; */
-/*         HfstStateMap state_map; */
+/*           HfstStates; */
+/*         HfstStates state_map; */
 
 /* 	    std::set<HfstState> total_seen; */
-/* 	    for (state_map::iterator it = state_map.begin(); */
-/* 		 it != state_map.end(); ++it) { */
+/* 	    for (state_vector::iterator it = state_vector.begin(); */
+/* 		 it != state_vector.end(); ++it) { */
 /* 		if (total_seen.count(*it) != 0) { */
 /* 		    continue; */
 /* 		} */
