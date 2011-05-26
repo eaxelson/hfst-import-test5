@@ -828,8 +828,8 @@ namespace hfst
 	   it != t.end(); it++)
 	{
 	  for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
-		 = it->second.begin();
-	       tr_it != it->second.end(); tr_it++)
+		 = it->begin();
+	       tr_it != it->end(); tr_it++)
 	    {
 	      TheAlphabet.insert(HfstAlphabet::NumberPair
 				  (

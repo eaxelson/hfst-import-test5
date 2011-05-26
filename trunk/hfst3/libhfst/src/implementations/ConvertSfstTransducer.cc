@@ -151,18 +151,19 @@ namespace hfst { namespace implementations
 
   std::vector<SFST::Node*> state_vector;
   state_vector.push_back(t->root_node());
-  for (unsigned int i=1; i <= (net->max_state); i++) {
+  for (unsigned int i=1; i <= (net->get_max_state()); i++) {
     state_vector.push_back(t->new_node());
   }
 
   // Go through all states
+  unsigned int source_state=0;
   for (HfstBasicTransducer::const_iterator it = net->begin();
        it != net->end(); it++)
     {
       // Go through the set of transitions in each state
       for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
-             = it->second.begin();
-           tr_it != it->second.end(); tr_it++)
+             = it->begin();
+           tr_it != it->end(); tr_it++)
         {
           std::string istring(tr_it->get_input_symbol());
           std::string ostring(tr_it->get_output_symbol());
@@ -180,10 +181,11 @@ namespace hfst { namespace implementations
              t->alphabet.add_symbol(ostring.c_str()));
           
           // Copy transition to node
-	  state_vector[it->first]->add_arc
+	  state_vector[source_state]->add_arc
 	    (l, state_vector[tr_it->get_target_state()], t);
 					   
         }
+      source_state++;
     }
 
   // Go through the final states

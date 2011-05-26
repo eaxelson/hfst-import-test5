@@ -210,7 +210,7 @@ namespace hfst { namespace implementations
     
     std::vector<StateId> state_vector;
     state_vector.push_back(start_state);
-    for (unsigned int i = 1; i <= (net->max_state); i++) {
+    for (unsigned int i = 1; i <= (net->get_max_state()); i++) {
       state_vector.push_back(t->AddState());
     }
 
@@ -220,13 +220,14 @@ namespace hfst { namespace implementations
     st.AddSymbol(internal_identity, 2);
     
     // Go through all states
+    unsigned int source_state=0;
     for (HfstBasicTransducer::const_iterator it = net->begin();
          it != net->end(); it++)
       {
         // Go through the set of transitions in each state
         for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
-               = it->second.begin();
-             tr_it != it->second.end(); tr_it++)
+               = it->begin();
+             tr_it != it->end(); tr_it++)
           {
             // Copy the transition
 
@@ -237,13 +238,14 @@ namespace hfst { namespace implementations
 	    assert(not tr_it->get_output_symbol().empty());
 
             t->AddArc(
-		      state_vector[it->first],
+		      state_vector[source_state],
                        fst::StdArc
 		      ( st.AddSymbol(tr_it->get_input_symbol()),
 			st.AddSymbol(tr_it->get_output_symbol()),
 			tr_it->get_weight(),
 			state_vector[tr_it->get_target_state()]));
           }
+	source_state++;
       }
     
     // Go through the final states

@@ -35,10 +35,10 @@ int main(int argc, char **argv)
   t.add_transition(s5, HfstBasicTransition(s6, fd1, fd1, 0));
 
 
-  const unsigned int TYPES_SIZE=6;
+  const unsigned int TYPES_SIZE=5;
   const ImplementationType types [] = {SFST_TYPE, 
 				       TROPICAL_OPENFST_TYPE, 
-				       LOG_OPENFST_TYPE, 
+				       /*LOG_OPENFST_TYPE,*/ 
 				       FOMA_TYPE,
 				       HFST_OL_TYPE,
 				       HFST_OLW_TYPE};

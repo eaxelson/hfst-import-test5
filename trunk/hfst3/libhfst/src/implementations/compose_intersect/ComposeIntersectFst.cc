@@ -80,13 +80,14 @@ namespace hfst
 	{ symbol_set.insert(HfstTropicalTransducerTransitionData::get_number
 			    (*it)); }
 
+      unsigned int source_state=0;
       for (HfstBasicTransducer::const_iterator it = t.begin();
 	   it != t.end();
 	   ++it)
 	{
 	  transition_map_vector.push_back(SymbolTransitionMap());
-	  if (t.is_final_state(it->first))
-	    { finality_vector.push_back(t.get_final_weight(it->first)); }
+	  if (t.is_final_state(source_state))
+	    { finality_vector.push_back(t.get_final_weight(source_state)); }
 	  else
 	    { finality_vector.push_back
 		(std::numeric_limits<float>::infinity()); }
@@ -94,8 +95,8 @@ namespace hfst
 	    transition_map_vector.back();
 	  bool identity_found = false;
 	  for (std::vector<HfstBasicTransition>::const_iterator jt = 
-		 it->second.begin();
-	       jt != it->second.end();
+		 it->begin();
+	       jt != it->end();
 	       ++jt)
 	    { 
 	      if (jt->get_input_symbol() == "@_IDENTITY_SYMBOL_@")

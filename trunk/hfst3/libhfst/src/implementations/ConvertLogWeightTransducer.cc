@@ -239,16 +239,17 @@ namespace hfst { namespace implementations
     st.AddSymbol(internal_identity, 2);
     
     // Go through all states
+    unsigned int source_state=0;
     for (HfstBasicTransducer::const_iterator it = net->begin();
          it != net->end(); it++)
       {
         // Go through the set of transitions in each state
         for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
-               = it->second.begin();
-             tr_it != it->second.end(); tr_it++)
+               = it->begin();
+             tr_it != it->end(); tr_it++)
           {
             // Copy the transition
-            t->AddArc( hfst_state_to_state_id(it->first, state_map, t), 
+            t->AddArc( hfst_state_to_state_id(source_state, state_map, t), 
                        fst::LogArc
                        ( st.AddSymbol(tr_it->get_input_symbol()),
                          st.AddSymbol(tr_it->get_output_symbol()),

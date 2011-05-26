@@ -123,8 +123,8 @@ void HarmonizeUnknownAndIdentitySymbols::populate_symbol_set
   for (HfstBasicTransducer::const_iterator it = t.begin(); it != t.end(); ++it)
     {
       for (HfstBasicTransducer::HfstTransitions::const_iterator jt = 
-	     it->second.begin();
-	   jt != it->second.end();
+	     it->begin();
+	   jt != it->end();
 	   ++jt)
 	{
 	  s.insert(jt->get_input_symbol());
@@ -150,8 +150,8 @@ void HarmonizeUnknownAndIdentitySymbols::harmonize_identity_symbols
       HfstBasicTransducer::HfstTransitions added_transitions;
 
       for (HfstBasicTransducer::HfstTransitions::const_iterator jt = 
-	     it->second.begin();
-	   jt != it->second.end();
+	     it->begin();
+	   jt != it->end();
 	   ++jt)
 	{
 	  if (jt->get_input_symbol() == identity)
@@ -166,8 +166,8 @@ void HarmonizeUnknownAndIdentitySymbols::harmonize_identity_symbols
 					 jt->get_weight())); }
 	    }
 	}
-      it->second.insert(it->second.end(),
-			added_transitions.begin(),added_transitions.end());
+      it->insert(it->end(),
+		 added_transitions.begin(),added_transitions.end());
     }  
 }
 
@@ -182,8 +182,8 @@ void HarmonizeUnknownAndIdentitySymbols::harmonize_unknown_symbols
       HfstBasicTransducer::HfstTransitions added_transitions;
 
       for (HfstBasicTransducer::HfstTransitions::const_iterator jt = 
-	     it->second.begin();
-	   jt != it->second.end();
+	     it->begin();
+	   jt != it->end();
 	   ++jt)
 	{
 	  if (jt->get_input_symbol() == unknown)
@@ -235,8 +235,8 @@ void HarmonizeUnknownAndIdentitySymbols::harmonize_unknown_symbols
 		}
 	    }
 	}
-      it->second.insert(it->second.end(),
-			added_transitions.begin(),added_transitions.end());
+      it->insert(it->end(),
+		 added_transitions.begin(),added_transitions.end());
     }
 }
 
