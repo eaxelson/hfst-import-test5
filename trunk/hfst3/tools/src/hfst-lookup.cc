@@ -1796,6 +1796,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
 
 
 int main( int argc, char **argv ) {
+    hfst_setlocale();
     hfst_set_program_name(argv[0], "0.6", "HfstLookup");
     int retval = parse_options(argc, argv);
     if (retval != EXIT_CONTINUE)

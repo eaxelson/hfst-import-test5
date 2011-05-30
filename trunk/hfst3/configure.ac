@@ -389,7 +389,7 @@ AC_LANG_POP
 #                [AC_MSG_FAILURE([my transducer library test failed (--without-my-transducer-library to disable)])])])
 
 # Checks for header files
-AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h])
+AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h locale.h langinfo.h])
 
 AC_LANG_PUSH([C++])
 
@@ -426,7 +426,7 @@ AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_FUNC_STRTOD
-AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strcspn strtol strtoul error error_at_line strndup getline getdelim getopt_long strtod xstrdup set_program_name setprogname])
+AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strcspn strtol strtoul error error_at_line strndup getline getdelim getopt_long strtod xstrdup set_program_name setprogname setlocale nl_langinfo])
 
 # Checks for system services
 

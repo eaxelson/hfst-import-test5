@@ -29,6 +29,12 @@
 #include <cstdlib>
 #include <cstring>
 #include <errno.h>
+#if HAVE_LOCALE_H
+#  include <locale.h>
+#endif
+#if HAVE_LANGINFO_H
+#  include <langinfo.h>
+#endif
 
 #include "hfst-commandline.h"
 #include "HfstOutputStream.h"
@@ -510,6 +516,29 @@ hfst_getline(char** lineptr, size_t* n, FILE* stream)
   return rv;
 }
 
+char*
+hfst_setlocale()
+{
+#if HAVE_SETLOCALE
+    char* rv = setlocale(LC_ALL, "");
+    if (NULL == rv)
+      {
+        error(EXIT_FAILURE, errno, "Unable to set locale for character "
+              "settings");
+      }
+#if HAVE_NL_LANGINFO
+    char* charset = nl_langinfo(CODESET);
+    if (strcmp(charset, "UTF-8") != 0)
+      {
+        error(EXIT_FAILURE, 0, "Character set %s not supported; exiting to "
+              "avoid data corruption", charset);
+      }
+#endif
+#else
+    char* rv = NULL;
+#endif
+    return rv;
+}
 #ifndef HAVE_SET_PROGRAM_NAME
 void
 set_program_name(const char* argv0)
