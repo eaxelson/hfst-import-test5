@@ -114,12 +114,17 @@ namespace hfst
     template <class T, class W> class HfstTransitionGraph;
     class HfstTropicalTransducerTransitionData;
     typedef HfstTransitionGraph<HfstTropicalTransducerTransitionData, float> 
-      HfstBasicTransducer; 
+      HfstBasicTransducer;
+    class HfstFastTransitionData;
+    typedef HfstTransitionGraph<HfstFastTransitionData, float>
+      HfstFastTransducer;
     typedef unsigned int HfstState;
 
     template <class C> class HfstTransition;
     typedef HfstTransition<HfstTropicalTransducerTransitionData> 
       HfstBasicTransition;
+    typedef HfstTransition<HfstFastTransitionData>
+      HfstFastTransition;
 
   }
 

@@ -393,8 +393,8 @@ namespace hfst {
           C data = transition.get_transition_data();
 
 	  // FIXME: throw an exception in constructor of HfstTransition?
-	  assert(not data.get_input_symbol().empty());
-	  assert(not data.get_output_symbol().empty());
+	  //assert(not data.get_input_symbol().empty());
+	  //assert(not data.get_output_symbol().empty());
 
           add_state(s);
           add_state(transition.get_target_state());
