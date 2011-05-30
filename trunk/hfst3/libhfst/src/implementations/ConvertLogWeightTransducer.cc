@@ -24,6 +24,22 @@ namespace hfst { namespace implementations
 
 #if HAVE_OPENFST
 
+
+  HfstFastTransducer * ConversionFunctions::log_ofst_to_hfst_fast_transducer
+  (LogFst * t, bool has_hfst_header)
+  {
+    HFST_THROW_MESSAGE(FunctionNotImplementedException, 
+		       "log_ofst_to_hfst_fast_transducer");
+  }
+
+  LogFst * ConversionFunctions::hfst_fast_transducer_to_log_ofst
+    (const HfstFastTransducer * t)
+  {
+    HFST_THROW_MESSAGE(FunctionNotImplementedException, 
+		       "hfst_fast_transducer_to_log_ofst");
+  }
+
+
   /* --- Conversion between log OpenFst and HfstBasicTransducer --- */
   
   /* Create an HfstBasicTransducer equivalent to an OpenFst log weight

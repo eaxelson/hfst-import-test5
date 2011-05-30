@@ -212,6 +212,163 @@ namespace hfst { namespace implementations
   return t;
 }
 
+
+
+
+  /* Recursively copy all transitions of \a node to \a net.
+     Used by function sfst_to_hfst_fast_transducer(SFST::Transducer * t).
+
+     @param node  The current node in the SFST transducer
+     @param index  A map that maps nodes to integers
+     @param visited_nodes  Which nodes have already been visited
+     @param net  The HfstFastTransducer that is being created
+  */
+  void ConversionFunctions::
+  sfst_to_hfst_fast_transducer
+  ( SFST::Node *node, SFST::NodeNumbering &index, 
+    HfstFastTransducer *net, NumberVector &harmonization_vector) {
+  
+    // If node has not been visited before
+    if (not node->was_visited(VMARK)) {
+      SFST::Arcs *arcs=node->arcs();
+
+      // Count the number of nodes and initialize the transition
+      // vector of net.
+      unsigned int number_of_nodes=0;
+      for( SFST::ArcsIter p(arcs); p; p++ ) {
+	number_of_nodes++;
+      }
+      net->initialize_transition_vector(index[node], number_of_nodes);
+
+      // Go through all transitions and copy them to \a net
+      for( SFST::ArcsIter p(arcs); p; p++ ) {
+        SFST::Arc *arc=p;
+	
+        net->add_transition(index[node], 
+                            HfstFastTransition
+                            (index[arc->target_node()],
+                             harmonization_vector.at(arc->label().lower_char()),
+                             harmonization_vector.at(arc->label().upper_char()),
+                             0));
+      }
+
+      if (node->is_final())
+        net->set_final_weight(index[node],0);
+
+      // Call this function recursively for all target nodes
+      // of the transitions
+      for( SFST::ArcsIter p(arcs); p; p++ ) {
+        SFST::Arc *arc=p;
+        sfst_to_hfst_fast_transducer(arc->target_node(), index, 
+				      net, harmonization_vector);
+      }
+    }
+  }
+
+
+  /* Create an HfstFastTransducer equivalent to an SFST transducer \a t. */
+  HfstFastTransducer * ConversionFunctions::
+  sfst_to_hfst_fast_transducer(SFST::Transducer * t) {
+
+    HfstFastTransducer * net = new HfstFastTransducer();
+  
+    // Handle the alphabet
+    StringVector coding_vector;
+    SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
+    for (SFST::Alphabet::CharMap::const_iterator it 
+           = cm.begin(); it != cm.end(); it++) 
+      {
+	net->add_symbol_to_alphabet(it->first);
+        if (it->first != 0) { 
+	  coding_vector.push_back(std::string(it->second));
+	} else { // The epsilon symbol "<>"
+	  coding_vector.push_back(internal_epsilon);
+	}	
+      }
+    NumberVector harmonization_vector 
+      = get_harmonization_vector(coding_vector);
+
+    // A map that maps nodes to integers
+    SFST::NodeNumbering index(*t);
+    if (t->root_node()->check_visited(VMARK))
+      VMARK++;
+   
+    sfst_to_hfst_fast_transducer(t->root_node(), index, 
+				 net, harmonization_vector);
+        
+    return net;
+  }
+
+
+  /* Create an SFST::Transducer equivalent to HfstFastTransducer \a net. */
+  SFST::Transducer * ConversionFunctions::
+  hfst_fast_transducer_to_sfst(const HfstFastTransducer * net) {
+
+  SFST::Transducer * t = new SFST::Transducer();
+  t->alphabet.add_symbol(internal_unknown.c_str(), 1);
+  t->alphabet.add_symbol(internal_identity.c_str(), 2);
+
+  // Handle the alphabet
+  for (HfstFastTransducer::HfstTransitionGraphAlphabet::iterator it 
+         = net->alphabet.begin();
+       it != net->alphabet.end(); it++) {
+    if (*it != 0) { // The epsilon is "<>" in SFST
+      t->alphabet.add_symbol(get_string(*it).c_str(), *it);
+    }
+  }
+
+
+  std::vector<SFST::Node*> state_vector;
+  state_vector.push_back(t->root_node());
+  for (unsigned int i=1; i <= (net->get_max_state()); i++) {
+    state_vector.push_back(t->new_node());
+  }
+
+  // Go through all states
+  unsigned int source_state=0;
+  for (HfstFastTransducer::const_iterator it = net->begin();
+       it != net->end(); it++)
+    {
+      // Go through the set of transitions in each state
+      for (HfstFastTransducer::HfstTransitions::const_iterator tr_it 
+             = it->begin();
+           tr_it != it->end(); tr_it++)
+        {
+          SFST::Label l
+            (tr_it->get_input_symbol(),
+	     tr_it->get_output_symbol());             
+          
+          // Copy transition to node
+	  state_vector[source_state]->add_arc
+	    (l, state_vector[tr_it->get_target_state()], t);
+					   
+        }
+      source_state++;
+    }
+
+  // Go through the final states
+  for (HfstFastTransducer::FinalWeightMap::const_iterator it 
+         = net->final_weight_map.begin();
+       it != net->final_weight_map.end(); it++) 
+    {
+      if (it->first >= state_vector.size()) { // should not happen..
+	state_vector.push_back(t->new_node());
+      }
+      state_vector[it->first]->set_final(1);
+    }
+  
+  return t;
+}
+
+
+
+
+
+
+
+
+
+
   // *** THE NEW FUNCTIONS ***
 
   void ConversionFunctions::sfst_to_hfst_constant_transducer

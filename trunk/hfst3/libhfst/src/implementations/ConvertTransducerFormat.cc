@@ -27,6 +27,11 @@ namespace hfst { namespace implementations
     ConversionFunctions::string_to_number_map;
   StringVector ConversionFunctions::number_to_string_vector;
 
+  StringVectorInitializer 
+  dummy3(ConversionFunctions::number_to_string_vector);
+  String2NumberMapInitializer 
+  dummy4(ConversionFunctions::string_to_number_map);
+
   std::string ConversionFunctions::get_string(unsigned int number) 
   {
     if (number >= number_to_string_vector.size()) {

@@ -104,7 +104,6 @@ namespace implementations {
 #if HAVE_SFST
   static void sfst_to_hfst_basic_transducer
     ( SFST::Node *node, SFST::NodeNumbering &index, 
-      /*std::set<SFST::Node*> &visited_nodes,*/ 
       HfstBasicTransducer *net, SFST::Alphabet &alphabet);
 
   static HfstBasicTransducer * sfst_to_hfst_basic_transducer
@@ -113,9 +112,18 @@ namespace implementations {
   static SFST::Transducer * hfst_basic_transducer_to_sfst
     (const HfstBasicTransducer * t);
 
+  static void sfst_to_hfst_fast_transducer
+    ( SFST::Node *node, SFST::NodeNumbering &index, 
+      HfstFastTransducer *net, NumberVector &harmonization_vector);
+
+  static HfstFastTransducer * sfst_to_hfst_fast_transducer
+    (SFST::Transducer * t);
+
+  static SFST::Transducer * hfst_fast_transducer_to_sfst
+    (const HfstFastTransducer * t);
+
   static void sfst_to_hfst_constant_transducer
     ( SFST::Node *node, SFST::NodeNumbering &index, 
-      /*std::set<SFST::Node*> &visited_nodes,*/ 
       HfstConstantTransducer *net);
 
   static HfstConstantTransducer * sfst_to_hfst_constant_transducer
@@ -130,6 +138,13 @@ namespace implementations {
 
   static struct fsm * hfst_basic_transducer_to_foma
     (const HfstBasicTransducer * t);
+
+
+  static HfstFastTransducer * foma_to_hfst_fast_transducer(struct fsm * t);
+
+  static struct fsm * hfst_fast_transducer_to_foma
+    (const HfstFastTransducer * t);
+
 
   static HfstConstantTransducer * foma_to_hfst_constant_transducer
     (struct fsm * t);
@@ -150,6 +165,14 @@ namespace implementations {
     (const HfstBasicTransducer * t);
 
 
+  static HfstFastTransducer * tropical_ofst_to_hfst_fast_transducer
+    (fst::StdVectorFst * t, bool has_hfst_header=true);
+
+  static fst::StdVectorFst * hfst_fast_transducer_to_tropical_ofst
+    (const HfstFastTransducer * t);
+
+
+
   static HfstConstantTransducer * tropical_ofst_to_hfst_constant_transducer
     (fst::StdVectorFst * t, bool has_hfst_header=true);
 
@@ -166,6 +189,13 @@ namespace implementations {
 
   static LogFst * hfst_basic_transducer_to_log_ofst
     (const HfstBasicTransducer * t);
+
+
+  static HfstFastTransducer * log_ofst_to_hfst_fast_transducer
+    (LogFst * t, bool has_hfst_header=true);
+
+  static LogFst * hfst_fast_transducer_to_log_ofst
+    (const HfstFastTransducer * t);
 
 
   static HfstConstantTransducer * log_ofst_to_hfst_constant_transducer
@@ -198,9 +228,33 @@ namespace implementations {
   //    (const HfstBasicTransducer * t);
   //#endif // HAVE_MY_TRANSDUCER_LIBRARY
 
+    friend class StringVectorInitializer;
+    friend class String2NumberMapInitializer;
+  
   };
 
+    // Initialization of static members in class 
+    // ConvertTransducerFormat..
+    class StringVectorInitializer {
+    public:
+      StringVectorInitializer
+        (StringVector &vector) {
+        vector.push_back(std::string("@_EPSILON_SYMBOL_@"));
+	vector.push_back(std::string("@_UNKNOWN_SYMBOL_@"));
+        vector.push_back(std::string("@_IDENTITY_SYMBOL_@"));
+      }
+    };
 
-  } }
+    class String2NumberMapInitializer {
+    public:
+      String2NumberMapInitializer
+        (ConversionFunctions::String2NumberMap &map) {
+        map["@_EPSILON_SYMBOL_@"] = 0;
+        map["@_UNKNOWN_SYMBOL_@"] = 1;
+        map["@_IDENTITY_SYMBOL_@"] = 2;
+      }
+    };
+
+} }
 #endif // _CONVERT_TRANSDUCER_H_
 
