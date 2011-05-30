@@ -585,6 +585,34 @@ int main(int argc, char **argv)
 	t2.insert_freely(tr);
 
 	assert(t1.compare(t2));
+	
+	HfstTransducer cd_star("c", "d", types[i]);
+	cd_star.repeat_star();
+	HfstTransducer ab("a", "b", types[i]);
+	HfstTransducer test(types[i]);
+	test = cd_star;
+	test.concatenate(ab);
+	test.concatenate(cd_star);
+
+	assert(t1.compare(test));
+	assert(t2.compare(test));
+
+	HfstTransducer unk2unk
+	  ("@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", types[i]);
+	unk2unk.insert_freely(StringPair("c", "d"));
+	HfstTransducer dc("d", "c", types[i]);
+
+	HfstTransducer empty(types[i]);
+	assert(not unk2unk.intersect(dc).compare(empty));
+
+	HfstTransducer unk2unk_
+	  ("@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", types[i]);
+	HfstTransducer cd_("c", "d", types[i]);
+	unk2unk_.insert_freely(cd_);
+
+	HfstTransducer dc_("d", "c", types[i]);
+	HfstTransducer empty_(types[i]);
+	assert(not unk2unk_.intersect(dc_).compare(empty));
       }
 
 

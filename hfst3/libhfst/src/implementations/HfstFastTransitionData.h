@@ -16,6 +16,8 @@ namespace hfst {
       typedef unsigned int SymbolType;
       /** @brief The weight type. */
       typedef float WeightType;
+      /** @brief A set of symbols. */
+      typedef std::set<SymbolType> SymbolTypeSet;
 
     private:
       /* The actual transition data */
@@ -89,6 +91,22 @@ namespace hfst {
       }
       static bool is_identity(const SymbolType &s) {
 	return s == 2;
+      }
+      static bool is_valid_symbol(const SymbolType &s) {
+	(void)s;
+	return true;
+      }
+
+      /* Get a marker symbol. Equivalent to (biggest number in sts + 1). */
+      static SymbolType get_marker(const SymbolTypeSet &sts) {
+	SymbolType marker=0;
+	for (SymbolTypeSet::const_iterator it = sts.begin();
+	     it != sts.end(); it++) {
+	  if (marker < *it) {
+	    marker = *it;
+	  }
+	}
+	return marker++;
       }
 
       /** @brief Whether this transition is less than transition 

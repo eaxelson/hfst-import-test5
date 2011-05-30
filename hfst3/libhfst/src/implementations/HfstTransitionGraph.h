@@ -1268,7 +1268,7 @@ namespace hfst {
           // Epsilon transition to initial state of \a graph
           HfstState s = add_state();
           HfstTransition <C> epsilon_transition
-            (s, "@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@", 
+            (s, C::get_epsilon(), C::get_epsilon(), 
              sub.weight);
           add_transition(sub.origin_state, epsilon_transition);
 
@@ -1303,7 +1303,7 @@ namespace hfst {
                it != graph.final_weight_map.end(); it++)
             {
               HfstTransition <C> epsilon_transition
-                (sub.target_state, "@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@",
+                (sub.target_state, C::get_epsilon(), C::get_epsilon(),
                  it->second);
               add_transition(it->first + offset, epsilon_transition);
             }
@@ -1334,10 +1334,14 @@ namespace hfst {
           substitute(const HfstSymbolPair &sp, 
 		     const HfstTransitionGraph &graph) {
 
-	  if (sp.first == "" || sp.second == "")
+	  if ( not ( C::is_valid_symbol(sp.first) &&		      
+		     C::is_valid_symbol(sp.second) ) ) {
 	    HFST_THROW_MESSAGE
-	      (EmptyStringException,
-	       "HfstTransitionGraph::substitute");
+	      (EmptyStringException, 
+	       "HfstTransitionGraph::substitute(const HfstSymbolPair&, "
+	       "const HfstTransitionGraph&)");
+	      }
+
           
           // If neither symbol to be substituted is known to the graph,
           // do nothing.
@@ -1409,11 +1413,14 @@ namespace hfst {
             the graph with weight \a weight. */
         HfstTransitionGraph &insert_freely
           (const HfstSymbolPair &symbol_pair, W weight) 
-          {          
-	    if (symbol_pair.first == "" || symbol_pair.second == "")
+          {    
+	    if ( not ( C::is_valid_symbol(symbol_pair.first) &&		      
+		       C::is_valid_symbol(symbol_pair.second) ) ) {
 	      HFST_THROW_MESSAGE
-		(EmptyStringException,
-		 "HfstTransitionGraph::insert_freely");
+		(EmptyStringException, 
+		 "HfstTransitionGraph::insert_freely"
+		 "(const HfstSymbolPair&, W)");
+	    }
 
             alphabet.insert(symbol_pair.first);
             alphabet.insert(symbol_pair.second);
@@ -1433,7 +1440,7 @@ namespace hfst {
         HfstTransitionGraph &insert_freely
           (const HfstTransitionGraph &graph)
           {
-            std::string marker("@_MARKER_SYMBOL_@");
+	    typename C::SymbolType marker = C::get_marker(alphabet);
             HfstSymbolPair marker_pair(marker, marker);
             insert_freely(marker_pair, 0);
             substitute(marker_pair, graph);
