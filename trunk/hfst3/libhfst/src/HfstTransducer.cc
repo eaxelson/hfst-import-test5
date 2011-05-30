@@ -1611,13 +1611,21 @@ HfstTransducer &HfstTransducer::insert_freely
 #if HAVE_FOMA
     case FOMA_TYPE:
     {
-        hfst::implementations::HfstBasicTransducer * net = 
-	    ConversionFunctions::foma_to_hfst_basic_transducer
+      // HfstTransducer::harmonize does nothing to foma transducers, 
+      // because foma functions take care of harmonization.
+      // However, now we are using HfstFastTransducer.
+      this->foma_interface.harmonize(this->implementation.foma,
+				     tmp.implementation.foma);
+        hfst::implementations::HfstFastTransducer * net = 
+	    ConversionFunctions::foma_to_hfst_fast_transducer
 	    (implementation.foma);
         this->foma_interface.delete_foma(implementation.foma);
-        net->insert_freely(symbol_pair, 0);
+        net->insert_freely
+	  (hfst::implementations::HfstFastTransducer::HfstSymbolPair
+	   (ConversionFunctions::get_number(symbol_pair.first),
+	    ConversionFunctions::get_number(symbol_pair.second)), 0);
         implementation.foma = 
-	    ConversionFunctions::hfst_basic_transducer_to_foma(net);
+	    ConversionFunctions::hfst_fast_transducer_to_foma(net);
         delete net;
         break;
     }

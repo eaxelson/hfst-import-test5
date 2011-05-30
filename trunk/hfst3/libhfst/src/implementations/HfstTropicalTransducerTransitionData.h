@@ -1,5 +1,6 @@
 #include <string>
 #include <map>
+#include <set>
 #include <cassert>
 #include <cstdio>
 #include <iostream>
@@ -35,6 +36,8 @@ namespace hfst {
       typedef std::string SymbolType;
       /** @brief The weight type. */
       typedef float WeightType;
+      /** @brief A set of symbols. */
+      typedef std::set<SymbolType> SymbolTypeSet;
 
       typedef std::map<unsigned int, SymbolType> 
         Number2SymbolMap;
@@ -192,6 +195,16 @@ namespace hfst {
       }
       static bool is_identity(const SymbolType &symbol) {
         return (symbol.compare("@_IDENTITY_SYMBOL_@") == 0);
+      }
+      static bool is_valid_symbol(const SymbolType &symbol) {
+	if (symbol == "")
+	  return false;
+	return true;
+      }
+
+      static SymbolType get_marker(const SymbolTypeSet &sts) {
+	(void)sts;
+	return SymbolType("@_MARKER_SYMBOL_@");
       }
 
       /** @brief Whether this transition is less than transition 
