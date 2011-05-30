@@ -210,6 +210,12 @@ ssize_t hfst_getdelim(char** lineptr, size_t* n, int delim, FILE* stream);
 ssize_t hfst_getline(char** lineptr, size_t* n, FILE* stream);
 
 /**
+ * @brief set locale according to environment if UTF-8-capable or
+ * print informative erro message and exit on failure.
+ */
+char* hfst_setlocale();
+
+/**
  * @brief determine if next transducers of given streams are compatible.
  * 
  * @deprecated all formats are compatible in HFST3
