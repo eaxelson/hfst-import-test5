@@ -1446,7 +1446,6 @@ namespace hfst {
 	    if (marker_graph > marker)
 	      marker = marker_graph;
 
-	    std::cerr << "using marker: " << marker << std::endl; 
             HfstSymbolPair marker_pair(marker, marker);
             insert_freely(marker_pair, 0);
             substitute(marker_pair, graph);
