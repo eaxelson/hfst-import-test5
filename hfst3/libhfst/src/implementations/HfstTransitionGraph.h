@@ -1440,11 +1440,17 @@ namespace hfst {
         HfstTransitionGraph &insert_freely
           (const HfstTransitionGraph &graph)
           {
-	    typename C::SymbolType marker = C::get_marker(alphabet);
+	    typename C::SymbolType marker_this = C::get_marker(alphabet);
+	    typename C::SymbolType marker_graph = C::get_marker(alphabet);
+	    typename C::SymbolType marker = marker_this;
+	    if (marker_graph > marker)
+	      marker = marker_graph;
+
+	    std::cerr << "using marker: " << marker << std::endl; 
             HfstSymbolPair marker_pair(marker, marker);
             insert_freely(marker_pair, 0);
             substitute(marker_pair, graph);
-            alphabet.erase(marker);
+            //alphabet.erase(marker); TODO: fix
             return *this;
           }
 
