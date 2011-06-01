@@ -20,7 +20,7 @@ install:
 	chmod 0755 $(analyzer_script)
 	chmod 0755 $(generator_script)
 
-clean:
+uninstall:
 	rm -f $(transducerpath)/$(analyzer_transducer)
 	rm -f $(transducerpath)/$(generator_transducer)
 	rmdir --ignore-fail-on-non-empty $(transducerpath)
