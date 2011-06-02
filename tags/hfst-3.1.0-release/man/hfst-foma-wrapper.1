@@ -1,0 +1,57 @@
+.TH HFST-FOMA-WRAPPER "1" "December 2010" "HFST" "User Commands"
+.SH NAME
+hfst-foma-wrapper.sh \- manual page for hfst-foma-wrapper.sh 0.1 (hfst 3.0)
+.SH SYNOPSIS
+.B hfst-foma-wrapper.sh
+[\fIOPTIONS\fR...] [\fIINFILE\fR]
+.SH DESCRIPTION
+Parse foma script and convert saved stacks to hfst format
+.TP
+\fB\-h\fR, \fB\-\-help\fR
+Print help message
+.TP
+\fB\-V\fR, \fB\-\-version\fR
+Print version info
+.TP
+\fB\-v\fR, \fB\-\-verbose\fR
+Print verbosely while processing
+.TP
+\fB\-q\fR, \fB\-\-quiet\fR
+Do not print output
+.TP
+\fB\-s\fR, \fB\-\-silent\fR
+Alias of \fB\-\-quiet\fR
+.TP
+\fB\-f\fR, \fB\-\-format\fR=\fIFORMAT\fR
+Convert into HFST transducer format FORMAT
+.TP
+\fB\-F\fR, \fB\-\-output\fR=\fIOUTFILES\fR
+Convert files in OUTFILES after processing
+.PP
+If OUTFILES is missing the script tries hard to guess automata files from
+the script contents. If script is parsed from standard input, the OUTFILES is
+required.
+.SH EXAMPLES
+.TP
+hfst-foma-wrapper.sh -o uppercase.hfst -f openfst-tropical uppercase.xfst
+Compile uppercase script and convert saved stacks to openfst format
+.TP
+hfst-foma-wrapper.sh -f foma -o cat.hfst -F cat.fst cat.xfst
+Compile cat script and only convert cat.fst to HFST foma format
+.SH "REPORTING BUGS"
+Report bugs to <hfst\-bugs@helsinki.fi> or directly to our bug tracker at:
+<https://sourceforge.net/tracker/?atid=1061990&group_id=224521&func=browse>
+.SH "SEE ALSO"
+hfst-xfst(1)
+.br
+hfst\-foma\-wrapper.sh home page:
+<https://kitwiki.csc.fi/twiki/bin/view/KitWiki//HfstFomaWrapper>
+.br
+General help using HFST software:
+<https://kitwiki.csc.fi/twiki/bin/view/KitWiki//HfstHome>
+.SH COPYRIGHT
+Copyright \(co 2010 University of Helsinki,
+License GPLv3: GNU GPL version 3 <http://gnu.org/licenses/gpl.html>
+.br
+This is free software: you are free to change and redistribute it.
+There is NO WARRANTY, to the extent permitted by law.

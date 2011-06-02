@@ -1,0 +1,46 @@
+## Process this file with automake to produce Makefile.in
+
+## Copyright (C) 2011 University of Helsinki
+
+## This program is free software: you can redistribute it and/or modify
+## it under the terms of the GNU General Public License as published by
+## the Free Software Foundation, either version 3 of the License, or
+## (at your option) any later version.
+
+## This program is distributed in the hope that it will be useful,
+## but WITHOUT ANY WARRANTY; without even the implied warranty of
+## MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+## GNU General Public License for more details.
+
+## You should have received a copy of the GNU General Public License
+## along with this program. If not, see <http://www.gnu.org/licenses/>.
+
+AUTOMAKE_OPTIONS=std-options subdir-objects
+
+noinst_LTLIBRARIES=libhfstparsers.la
+
+XRE_SRCS=xre_lex.ll xre_parse.yy xre_utils.cc XreCompiler.cc
+XRE_HDRS=XreCompiler.h xre_utils.h
+XRE_BUILT=xre_parse.h
+
+LEXC_SRCS=lexc-lexer.ll lexc-parser.yy lexc-utils.cc LexcCompiler.cc
+LEXC_HDRS=LexcCompiler.h lexc-utils.h
+LEXC_BUILT=lexc-parser.h
+
+BUILT_SOURCES=$(XRE_BUILT) $(LEXC_BUILT)
+
+AM_YFLAGS=-d
+AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
+
+libhfstparsers_la_SOURCES=$(SFST_SRCS) $(XRE_SRCS) $(LEXC_SRCS)
+
+AM_CPPFLAGS=-I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/libhfst/src
+
+# headers of parsers
+hfstincludedir = $(includedir)/hfst
+extincludedir = $(hfstincludedir)/parsers
+
+extinclude_HEADERS = $(XRE_HDRS) $(LEXC_HDRS)
+
+
+
