@@ -5,6 +5,12 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.1.0
+---------------------------
+
+* api for lookup and lookdown changed, previously memory didn't get initialized
+  anywhere, causing a serious bug
+
 Noteworthy changes in 3.0.3
 ---------------------------
 
