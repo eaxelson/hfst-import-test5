@@ -164,3 +164,8 @@ void Rule::add_missing_symbols_freely(const SymbolRange &diacritics)
     }
   
 }
+
+#ifdef TEST_RULE
+int main(void)
+{ /* TEST */ }
+#endif

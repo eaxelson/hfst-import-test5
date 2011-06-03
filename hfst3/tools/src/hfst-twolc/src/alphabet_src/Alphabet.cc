@@ -183,13 +183,6 @@ int main(void)
   alphabet.define_set(name2,sr2);
   alphabet.define_set(name3,sr3);
 
-  std::cout << 
-    alphabet.get_transducer(SymbolPair(name1,name2)).get_transducer() 
-	    << std::endl;
-
-  std::cout << 
-    alphabet.get_transducer(SymbolPair(name3,TWOLC_UNKNOWN)).get_transducer() 
-	    << std::endl;
 
 }
 #endif

@@ -82,6 +82,6 @@ int main(void)
 
   assert(rule1.conflicts_this(rule2));
   rule1.resolve_conflict(rule2);
-  std::cout << rule1.compile().get_transducer() << std::endl;
+  //std::cout << rule1.compile().get_transducer() << std::endl;
 }
 #endif // TEST_CONFLICT_RESOLVING_RIGHT_ARROW_RULE

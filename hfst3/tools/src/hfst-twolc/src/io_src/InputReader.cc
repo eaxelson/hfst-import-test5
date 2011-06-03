@@ -69,7 +69,7 @@ int main(void)
   std::string str1
     ("Some text spanning one line only.");
   std::istringstream in1(str1);
-  int counter = 1;
+  size_t counter = 1;
   InputReader ir1(counter);
   try
     { 
