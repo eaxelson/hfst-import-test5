@@ -12,10 +12,10 @@ const char * HarmonizeUnknownAndIdentitySymbols::identity =
 const char * HarmonizeUnknownAndIdentitySymbols::unknown = 
 "@_UNKNOWN_SYMBOL_@";
 
-size_t max(size_t t1,size_t t2)
+static size_t max(size_t t1,size_t t2)
 { return t1 < t2 ? t2 : t1; }
 
-bool is_subset(const StringSet &subset,const StringSet &superset)
+static bool is_subset(const StringSet &subset,const StringSet &superset)
 {
   for (StringSet::const_iterator it = subset.begin();
        it != subset.end();
