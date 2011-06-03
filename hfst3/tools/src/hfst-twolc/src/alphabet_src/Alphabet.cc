@@ -21,6 +21,14 @@
 void Alphabet::define_set(const std::string &name,const SymbolRange &elements)
 { sets[name] = elements; }
 
+SymbolPairVector * Alphabet::get_symbol_pair_vector(const SymbolPair &pair)
+{
+  const OtherSymbolTransducer result_fst = get_transducer(pair);
+  SymbolPairVector * result = new SymbolPairVector();
+  result_fst.get_initial_transition_pairs(*result);
+  return result;
+}
+
 const OtherSymbolTransducer &Alphabet::get_transducer(const SymbolPair &pair)
 { return alphabet.has_key(pair) ? alphabet[pair] : compute(pair); } 
 
@@ -116,6 +124,7 @@ const OtherSymbolTransducer &Alphabet::compute(const SymbolPair &pair)
     {
       const SymbolRange &input_set = sets[input];
       const SymbolRange &output_set = sets[output];
+
       for (SymbolRange::const_iterator it = input_set.begin(); 
 	   it != input_set.end(); 
 	   ++it)

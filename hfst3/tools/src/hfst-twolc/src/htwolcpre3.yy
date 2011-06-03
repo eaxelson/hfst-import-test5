@@ -183,7 +183,7 @@ CENTER_LIST: CENTER_PAIR
 
 CENTER_PAIR: CENTER_SYMBOL COLON CENTER_SYMBOL
 { 
-  $$ = new SymbolPairVector(1,SymbolPair($1,$3)); 
+  $$ = alphabet.get_symbol_pair_vector(SymbolPair($1,$3)); 
   free($1); free($3);
 }
 
