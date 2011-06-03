@@ -69,7 +69,6 @@ class HarmonizeUnknownAndIdentitySymbols
 
 void debug_harmonize_print(const StringSet &);
 void debug_harmonize_print(const std::string &);
-size_t max(size_t t1,size_t t2);
 
 }
 
