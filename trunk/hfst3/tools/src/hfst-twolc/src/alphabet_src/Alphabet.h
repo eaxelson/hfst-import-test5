@@ -47,6 +47,7 @@ class Alphabet
   void alphabet_done(void);
   void define_diacritics(const SymbolRange &);
   const OtherSymbolTransducer &get_transducer(const SymbolPair &pair);
+  SymbolPairVector * get_symbol_pair_vector(const SymbolPair &pair);
 };
 
 #endif
