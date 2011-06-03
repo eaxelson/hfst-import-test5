@@ -203,8 +203,8 @@ OtherSymbolTransducer &OtherSymbolTransducer::harmonize_diacritics
        ++it)
     {
       for (HfstBasicTransducer::HfstTransitions::const_iterator jt 
-	     = it->begin();
-	   jt != it->end();
+	     = it->second.begin();
+	   jt != it->second.end();
 	   ++jt)
 	{
 	  if (jt->get_input_symbol() == TWOLC_IDENTITY)
@@ -216,7 +216,7 @@ OtherSymbolTransducer &OtherSymbolTransducer::harmonize_diacritics
 		   kt != missing_diacritics.end();
 		   ++kt)
 		{
-		  it->push_back
+		  it->second.push_back
 		    (HfstBasicTransition(target,*kt,*kt,0.0));
 		}
 	      break;
@@ -490,8 +490,8 @@ OtherSymbolTransducer OtherSymbolTransducer::get_inverse_of_upper_projection
       if (fst.is_final_state(state))
 	{ new_fst.set_final_weight(state,fst.get_final_weight(state)); }
       for (HfstBasicTransducer::HfstTransitions::iterator jt 
-	     = it->begin();
-	   jt != it->end();
+	     = it->second.begin();
+	   jt != it->second.end();
 	   ++jt)
 	{
 	  HfstBasicTransition arc = *jt;
@@ -697,7 +697,7 @@ int main(void)
     (&HfstTransducer::concatenate,ost5).apply
     (&HfstTransducer::concatenate,ost6);
   HfstTransducer ost1_t = ost1.get_transducer();
-  std::cout << ost1_t << std::endl;
+  //std::cout << ost1_t << std::endl;
 
 }
 #endif // TEST_OTHER_SYMBOL_TRANSDUCER

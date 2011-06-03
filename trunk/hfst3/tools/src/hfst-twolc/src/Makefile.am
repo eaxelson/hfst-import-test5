@@ -87,3 +87,102 @@ hfst-twolc-loc$(EXEEXT): hfst-twolc.sh
 clean-local:
 	-rm -f hfst-twolc$(EXEEXT) hfst-twolc-loc$(EXEEXT)
 
+HFST_TWOLC_TESTS=string_manipulation InputReader Alphabet \
+                 OtherSymbolTransducer Rule LeftArrowRule RightArrowRule \
+                 RuleContainer LeftArrowRuleContainer RightArrowRuleContainer \
+                 ConflictResolvingLeftArrowRule \
+                 ConflictResolvingRightArrowRule TwolCGrammar \
+                 LeftRestrictionArrowRule
+
+check_PROGRAMS=$(HFST_TWOLC_TESTS)
+
+string_manipulation_SOURCES=$(STRING_SRC)/string_manipulation.cc
+string_manipulation_CXXFLAGS=-DSTRING_MANIPULATION_TEST
+
+InputReader_SOURCES=$(IO_SRC)/InputReader.cc
+InputReader_CXXFLAGS=-DINPUT_READER_TEST
+
+Alphabet_SOURCES=$(ALPHABET_SRC)/Alphabet.cc \
+                 $(RULE_SRC)/OtherSymbolTransducer.cc
+Alphabet_CXXFLAGS=-DTEST_ALPHABET
+
+OtherSymbolTransducer_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc
+OtherSymbolTransducer_CXXFLAGS=-DTEST_OTHER_SYMBOL_TRANSDUCER
+
+Rule_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc $(RULE_SRC)/Rule.cc \
+             $(STRING_SRC)/string_manipulation.cc
+Rule_CXXFLAGS=-DTEST_RULE
+
+LeftArrowRule_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
+                      $(STRING_SRC)/string_manipulation.cc \
+                      $(RULE_SRC)/Rule.cc $(RULE_SRC)/LeftArrowRule.cc	
+LeftArrowRule_CXXFLAGS=-DTEST_LEFT_ARROW_RULE
+
+LeftRestrictionArrowRule_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
+                      $(STRING_SRC)/string_manipulation.cc \
+                      $(RULE_SRC)/Rule.cc $(RULE_SRC)/LeftArrowRule.cc \
+                      $(RULE_SRC)/LeftRestrictionArrowRule.cc
+LeftRestrictionArrowRule_CXXFLAGS=-DTEST_LEFT_RESTRICTION_ARROW_RULE
+
+RightArrowRule_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
+                       $(STRING_SRC)/string_manipulation.cc \
+                       $(RULE_SRC)/Rule.cc $(RULE_SRC)/RightArrowRule.cc
+RightArrowRule_CXXFLAGS=-DTEST_RIGHT_ARROW_RULE
+
+RuleContainer_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
+                      $(RULE_SRC)/Rule.cc $(RULE_SRC)/RuleContainer.cc \
+                      $(STRING_SRC)/string_manipulation.cc
+RuleContainer_CXXFLAGS=-DTEST_RULE_CONTAINER
+
+LeftArrowRuleContainer_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
+                               $(RULE_SRC)/Rule.cc \
+                               $(RULE_SRC)/RuleContainer.cc \
+                               $(STRING_SRC)/string_manipulation.cc \
+                               $(RULE_SRC)/ConflictResolvingLeftArrowRule.cc \
+                               $(RULE_SRC)/LeftArrowRuleContainer.cc \
+                               $(RULE_SRC)/LeftArrowRule.cc
+
+LeftArrowRuleContainer_CXXFLAGS=-DTEST_LEFT_ARROW_RULE_CONTAINER
+
+RightArrowRuleContainer_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
+                                $(RULE_SRC)/Rule.cc \
+                                $(RULE_SRC)/RuleContainer.cc \
+                                $(STRING_SRC)/string_manipulation.cc \
+                                $(RULE_SRC)/ConflictResolvingRightArrowRule.cc\
+                                $(RULE_SRC)/RightArrowRuleContainer.cc \
+                                $(RULE_SRC)/RightArrowRule.cc
+RightArrowRuleContainer_CXXFLAGS=-DTEST_RIGHT_ARROW_RULE_CONTAINER
+
+ConflictResolvingLeftArrowRule_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
+                                        $(RULE_SRC)/Rule.cc \
+                                        $(RULE_SRC)/RuleContainer.cc \
+                                        $(STRING_SRC)/string_manipulation.cc \
+                                $(RULE_SRC)/ConflictResolvingLeftArrowRule.cc\
+                                        $(RULE_SRC)/LeftArrowRule.cc
+ConflictResolvingLeftArrowRule_CXXFLAGS=\
+-DTEST_CONFLICT_RESOLVING_LEFT_ARROW_RULE
+
+ConflictResolvingRightArrowRule_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
+                                        $(RULE_SRC)/Rule.cc \
+                                        $(RULE_SRC)/RuleContainer.cc \
+                                        $(STRING_SRC)/string_manipulation.cc \
+                                $(RULE_SRC)/ConflictResolvingRightArrowRule.cc\
+                                        $(RULE_SRC)/RightArrowRule.cc
+ConflictResolvingRightArrowRule_CXXFLAGS=\
+-DTEST_CONFLICT_RESOLVING_RIGHT_ARROW_RULE
+
+TwolCGrammar_SOURCES=$(RULE_SRC)/OtherSymbolTransducer.cc \
+                     $(RULE_SRC)/Rule.cc $(RULE_SRC)/RuleContainer.cc \
+                     $(STRING_SRC)/string_manipulation.cc \
+                     $(RULE_SRC)/ConflictResolvingLeftArrowRule.cc \
+                     $(RULE_SRC)/LeftArrowRule.cc \
+                     $(RULE_SRC)/ConflictResolvingRightArrowRule.cc\
+                     $(RULE_SRC)/RightArrowRule.cc \
+                     $(RULE_SRC)/RightArrowRuleContainer.cc \
+                     $(RULE_SRC)/LeftArrowRuleContainer.cc \
+                     $(RULE_SRC)/TwolCGrammar.cc \
+                     $(RULE_SRC)/LeftRestrictionArrowRule.cc \
+                     $(ALPHABET_SRC)/Alphabet.cc
+TwolCGrammar_CXXFLAGS=-DTEST_TWOL_C_GRAMMAR
+
+TESTS=$(HFST_TWOLC_TESTS)

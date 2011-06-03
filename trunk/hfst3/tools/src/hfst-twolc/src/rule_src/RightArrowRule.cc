@@ -69,6 +69,6 @@ int main(void)
   RightArrowRule rule("__HFST_TWOLC_RULE_NAME=\"Test rule\"",
 		     center,contexts);
   OtherSymbolTransducer compiled_rule = rule.compile();
-  std::cout << compiled_rule.get_transducer() << std::endl;
+  //std::cout << compiled_rule.get_transducer() << std::endl;
 }
 #endif // TEST_RIGHT_ARROW_RULE

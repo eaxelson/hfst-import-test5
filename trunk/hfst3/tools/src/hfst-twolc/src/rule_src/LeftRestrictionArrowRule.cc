@@ -81,12 +81,12 @@ int main(void)
   LeftRestrictionArrowRule rule("__HFST_TWOLC_RULE_NAME=\"Test rule\"",
 				center,contexts);
   OtherSymbolTransducer compiled_rule = rule.compile();
-  std::cout << compiled_rule.get_transducer() << std::endl;
+  //std::cout << compiled_rule.get_transducer() << std::endl;
   OtherSymbolTransducer b_c("b","c");
   OtherSymbolTransducer a_d("a","b");
   b_c.
     apply(&HfstTransducer::concatenate,a_d).
     apply(&HfstTransducer::intersect,compiled_rule);
-  std::cout << b_c.get_transducer() << std::endl;
+  //std::cout << b_c.get_transducer() << std::endl;
 }
 #endif // TEST_LEFT_RESTRICTION_ARROW_RULE

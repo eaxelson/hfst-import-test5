@@ -134,16 +134,23 @@ void TwolCGrammar::compile_and_store(HfstOutputStream &out)
 
 #ifdef TEST_TWOL_C_GRAMMAR
 #include <cassert>
+#include "../alphabet_src/Alphabet.h"
 int main(void)
 {
-  TwolCGrammar g(true,true);
+  TwolCGrammar g(true,false,true);
 
-  HandySet<SymbolPair> symbols;
+  /*HandySet<SymbolPair> symbols;
   symbols.insert(SymbolPair("a","b"));
   symbols.insert(SymbolPair("a","d"));
-  symbols.insert(SymbolPair("b","c"));
-  g.set_alphabet(symbols);
- 
+  symbols.insert(SymbolPair("b","c"));*/
+  //g.set_alphabet(symbols);
+
+  Alphabet alphabet;
+  alphabet.define_alphabet_pair(SymbolPair("a","b"));
+  alphabet.define_alphabet_pair(SymbolPair("a","d"));
+  alphabet.define_alphabet_pair(SymbolPair("b","c"));
+  alphabet.alphabet_done();
+
   OtherSymbolTransducer unknown("__HFST_TWOLC_?","__HFST_TWOLC_?");
   OtherSymbolTransducer diamond("__HFST_TWOLC_DIAMOND");
   OtherSymbolTransducer b_c_pair("b","c");

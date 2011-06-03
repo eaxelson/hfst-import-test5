@@ -79,10 +79,11 @@ int main(void)
   ConflictResolvingLeftArrowRule rule2("__TWOLC_RULE_NAME=\"test rule II\"",
 				       SymbolPair("a","b"),v2);
   
-  assert(rule1.conflicts_this(rule2));
+  StringVector v;
+  assert(rule1.conflicts_this(rule2,v));
   assert(rule1.resolvable_conflict(rule2));
   rule1.resolve_conflict(rule2);
-  std::cout << rule1.compile().get_transducer() << std::endl;
+  //std::cout << rule1.compile().get_transducer() << std::endl;
   //std::cout << rule2.compile().get_transducer() << std::endl;
 }
 #endif
