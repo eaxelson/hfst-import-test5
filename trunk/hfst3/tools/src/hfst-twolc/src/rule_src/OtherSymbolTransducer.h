@@ -264,7 +264,10 @@ class OtherSymbolTransducer
   //! @brief Replace diacritics from output-side.
   void remove_diacritics_from_output(void);
 
-  HfstTransducer get_transducer(void);
+  HfstTransducer get_transducer(void) const;
+
+  //! @brief Return the symbol pairs in the transitions from the start state.
+  void get_initial_transition_pairs(SymbolPairVector &pair_container) const;
 
   friend class Rule;
 

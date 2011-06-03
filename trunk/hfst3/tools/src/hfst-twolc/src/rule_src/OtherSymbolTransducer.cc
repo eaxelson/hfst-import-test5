@@ -203,8 +203,8 @@ OtherSymbolTransducer &OtherSymbolTransducer::harmonize_diacritics
        ++it)
     {
       for (HfstBasicTransducer::HfstTransitions::const_iterator jt 
-	     = it->second.begin();
-	   jt != it->second.end();
+	     = it->begin();
+	   jt != it->end();
 	   ++jt)
 	{
 	  if (jt->get_input_symbol() == TWOLC_IDENTITY)
@@ -216,7 +216,7 @@ OtherSymbolTransducer &OtherSymbolTransducer::harmonize_diacritics
 		   kt != missing_diacritics.end();
 		   ++kt)
 		{
-		  it->second.push_back
+		  it->push_back
 		    (HfstBasicTransition(target,*kt,*kt,0.0));
 		}
 	      break;
@@ -490,8 +490,8 @@ OtherSymbolTransducer OtherSymbolTransducer::get_inverse_of_upper_projection
       if (fst.is_final_state(state))
 	{ new_fst.set_final_weight(state,fst.get_final_weight(state)); }
       for (HfstBasicTransducer::HfstTransitions::iterator jt 
-	     = it->second.begin();
-	   jt != it->second.end();
+	     = it->begin();
+	   jt != it->end();
 	   ++jt)
 	{
 	  HfstBasicTransition arc = *jt;
@@ -581,13 +581,32 @@ OtherSymbolTransducer &OtherSymbolTransducer::term_complemented(void)
   return *this = universal;
 }
 
-HfstTransducer OtherSymbolTransducer::get_transducer(void)
+HfstTransducer OtherSymbolTransducer::get_transducer(void) const
 { 
 #ifndef TEST_OTHER_SYMBOL_TRANSDUCER  
   if (is_broken)
     { throw UndefinedSymbolPairsFound(); }
 #endif
   return transducer; 
+}
+
+void OtherSymbolTransducer::get_initial_transition_pairs
+(SymbolPairVector &pair_container) const
+{
+  if (is_broken)
+    { throw UndefinedSymbolPairsFound(); }
+
+  HfstBasicTransducer fst(this->transducer);
+  HfstBasicTransducer::iterator start_state_it = fst.begin();
+  for (HfstBasicTransducer::HfstTransitions::iterator jt 
+	 = start_state_it->begin();
+       jt != start_state_it->end();
+       ++jt)
+    {
+      std::string input = jt->get_transition_data().get_input_symbol();
+      std::string output = jt->get_transition_data().get_output_symbol(); 
+      pair_container.push_back(SymbolPair(input,output));
+    }
 }
 
 bool have_common_string(HfstState state1,HfstState state2,
