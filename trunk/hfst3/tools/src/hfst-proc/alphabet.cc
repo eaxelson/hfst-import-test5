@@ -355,16 +355,24 @@ ProcTransducerAlphabet::calculate_caps()
 std::string
 ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
 {
-  static const char* override_upper[5][2] = {{"Ə", "ə"},
+  static const char* override_upper[9][2] = {{"Ə", "ə"},
                                              {"Р", "р"},
                                              {"А", "а"},
                                              {"Ч", "ч"},
+                                             {"Ы", "ы"},
+                                             {"У", "у"},
+                                             {"Ю", "ю"},
+                                             {"Т", "т"},
                                              {"Э", "э"}};
 
-  static const char* override_lower[5][2] = {{"ə", "Ə"},
+  static const char* override_lower[9][2] = {{"ə", "Ə"},
                                              {"р", "Р"},
                                              {"а", "А"},
                                              {"ч", "Ч"},
+                                             {"ы", "Ы"},
+                                             {"у", "У"},
+                                             {"ю", "Ю"},
+                                             {"т", "Т"},
                                              {"э", "Э"}};
 
   static const char* parallel_ranges[5][2][2] = {{{"A","Z"},{"a","z"}}, // Basic Latin
@@ -385,7 +393,7 @@ ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
                                              {"Ԁ","ԥ"}, // Cyrillic Supplement
                                              {"Ḁ","ỿ"}};//Latin Extended Additional
 
-  for(int i = 0; i < 5; i++) 
+  for(int i = 0; i < 9; i++) 
   {
     if(strcmp(c,override_upper[i][0]) == 0) 
     {
@@ -394,7 +402,7 @@ ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
     }
   }
 
-  for(int i = 0; i < 5; i++) 
+  for(int i = 0; i < 9; i++) 
   {
     if(strcmp(c,override_lower[i][0]) == 0) 
     {
