@@ -1576,6 +1576,7 @@ SFST manual</a>. */
                                 bool optional, 
                                 StringPairSet &alphabet);
 
+
     /** \brief The same as replace_up but \a mapping is performed 
         in every context. 
 
@@ -1591,6 +1592,62 @@ SFST manual</a>. */
     HfstTransducer replace_down(HfstTransducer &mapping, 
                                 bool optional, 
                                 StringPairSet &alphabet);
+
+
+    /** \brief Inversion of the replace_up and the result needs to be composed on the upper side
+     * 	 of the input language.
+     *
+     * 	 B <- A is the inversion of A -> B.
+     *
+     * 	 \a Mapping is performed in every context.
+     *
+     * 	 @see replace_up */
+    HfstTransducer left_replace_up(	HfstTransducer		&mapping,
+									bool				optional,
+									StringPairSet		&alphabet);
+
+    /** \brief Inversion of the replace_up and the result needs to be composed on the upper side
+     * 	 of the input language.
+     *
+     * 	 B <- A is the inversion of A -> B.
+     *
+     * 	 @see replace_up */
+	HfstTransducer left_replace_up(	HfstTransducerPair	&context,
+									HfstTransducer		&mapping,
+									bool				optional,
+									StringPairSet		&alphabet);
+    /** \brief Inversion of the replace_up and the result needs to be composed on the upper side
+     * 	 of the input language. However, matching is done on the output side of \a mapping
+     *
+     * 	 @see replace_up */
+    HfstTransducer left_replace_down(HfstTransducerPair	&context,
+                                  	 HfstTransducer		&mapping,
+                                  	 bool 				optional,
+                                  	 StringPairSet		&alphabet);
+
+    /** \brief Inversion of the replace_up and the result needs to be composed on the upper side
+     * 	 of the input language. However, left context matching is done on the input side of \a mapping
+     *   and right context on the output side of \a mapping.
+     *
+     * 	 @see replace_up */
+    HfstTransducer left_replace_left(HfstTransducerPair	&context,
+                                  	 HfstTransducer		&mapping,
+                                  	 bool				optional,
+                                  	 StringPairSet		&alphabet);
+
+    /** \brief Inversion of the replace_up and the result needs to be composed on the upper side
+     * 	 of the input language. However, left context matching is done on the output side of \a mapping
+     *   and right context on the input side of \a mapping.
+     *
+     * 	 @see replace_up */
+    HfstTransducer left_replace_right(HfstTransducerPair	&context,
+                                 	  HfstTransducer 		&mapping,
+                                 	  bool				optional,
+                                 	  StringPairSet		&alphabet);
+
+
+
+
 
     /** \brief A transducer that allows any (substring) mapping defined 
         by \a mapping
