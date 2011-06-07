@@ -72,7 +72,8 @@ namespace hfst
     (const HfstBasicTransducer &t,bool input_keys):
       t(t)
     {
-      std::set<std::string> alphabet = t.get_alphabet();
+      this->t.sort_arcs();
+      std::set<std::string> alphabet = this->t.get_alphabet();
 
       for (std::set<std::string>::const_iterator it = alphabet.begin();
 	   it != alphabet.end();
@@ -81,13 +82,13 @@ namespace hfst
 			    (*it)); }
 
       unsigned int source_state=0;
-      for (HfstBasicTransducer::const_iterator it = t.begin();
-	   it != t.end();
+      for (HfstBasicTransducer::const_iterator it = this->t.begin();
+	   it != this->t.end();
 	   ++it)
 	{
 	  transition_map_vector.push_back(SymbolTransitionMap());
-	  if (t.is_final_state(source_state))
-	    { finality_vector.push_back(t.get_final_weight(source_state)); }
+	  if (this->t.is_final_state(source_state))
+	    { finality_vector.push_back(this->t.get_final_weight(source_state)); }
 	  else
 	    { finality_vector.push_back
 		(std::numeric_limits<float>::infinity()); }
