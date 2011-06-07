@@ -720,7 +720,22 @@ namespace hfst {
         }
 
 
-
+        /** @brief Sort the arcs of this transducer according to input and
+            output symbols.
+	*/
+        HfstTransitionGraph &sort_arcs(void)
+	  {
+	    for (typename HfstStates::iterator it = state_vector.begin();
+		 it != state_vector.end();
+		 ++it)
+	      {
+		HfstTransitions &transitions = *it;
+		std::sort<typename HfstTransitions::iterator>
+		  (transitions.begin(),transitions.end());
+	      }
+	    return *this;
+	  }
+	
 
         /* ----------------------------
               Substitution functions
