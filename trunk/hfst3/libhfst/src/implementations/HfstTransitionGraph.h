@@ -15,7 +15,7 @@
 #include "ConvertTransducerFormat.h"
 #include "HfstTropicalTransducerTransitionData.h"
 #include "HfstFastTransitionData.h"
-#include "HfstTransitionData.h" // to be used in future..
+//#include "HfstTransitionData.h" // to be used in future..
 
 
 /** @file HfstTransitionGraph.h
@@ -1053,12 +1053,8 @@ namespace hfst {
 
 	/* A function that performs in-place-substitution in the graph. */
 
-	void substitute_(const std::pair
-			 <typename C::SymbolType, typename C::SymbolType> 
-			 &old_sp, 
-			 const std::pair
-			 <typename C::SymbolType, typename C::SymbolType> 
-			 &new_sp)
+	void substitute_(const HfstSymbolPair &old_sp, 
+			 const HfstSymbolPair &new_sp)
 	{
           // Go through all states
           for (iterator it = begin(); it != end(); it++)
@@ -1085,6 +1081,83 @@ namespace hfst {
 		    }		  
 		} // all transitions gone through
 	    } // all states gone through
+	  return;
+	}
+
+	/* A function that performs in-place-substitution in the graph. */
+
+	void substitute_(const HfstSymbolPair &old_sp, 
+			 const std::set<HfstSymbolPair> &new_sp)
+	{
+	  bool substitution_performed=false;
+
+          // Go through all states
+          for (iterator it = begin(); it != end(); it++)
+            {
+	      // The transitions to be added
+	      typename std::vector<HfstTransition<C> > new_transitions;
+
+	      // Go through all transitions
+              for (unsigned int i=0; i < it->size(); i++)
+                {
+		  HfstTransition<C> &tr_it = it->operator[](i);
+
+		  if (tr_it.get_input_symbol() == old_sp.first &&
+		      tr_it.get_output_symbol() == old_sp.second)
+		    {
+		      substitution_performed=true;
+		      
+		      // change the transition to the first element
+		      // in new_sp
+		      typename std::set<HfstSymbolPair>::const_iterator IT 
+			= new_sp.begin();
+		      
+		      HfstTransition<C> tr
+			(tr_it.get_target_state(),
+			 IT->first,
+			 IT->second,
+			 tr_it.get_weight());
+		      
+		      it->operator[](i) = tr;
+
+		      // and schedule the rest of the elements in new_sp
+		      // to be added to this state
+		      while (IT != new_sp.end())
+			{
+			  HfstTransition<C> TR
+			    (tr_it.get_target_state(),
+			     IT->first,
+			     IT->second,
+			     tr_it.get_weight());
+
+			  new_transitions.push_back(TR);
+			  
+			  IT++;
+			}
+		    }		  
+		} // all transitions gone through
+
+	      // add the new transitions
+	      for (typename std::vector<HfstTransition<C> >
+		     ::const_iterator NIT = new_transitions.begin();
+		   NIT != new_transitions.end(); NIT++)
+		{
+		  it->push_back(*NIT);
+		}
+
+	    } // all states gone through
+
+	  if (substitution_performed)
+	    {
+	      for (typename std::set<HfstSymbolPair>::const_iterator It 
+		     = new_sp.begin();
+		   It != new_sp.end(); It++)
+		{
+		  add_symbol_to_alphabet(It->first);
+		  add_symbol_to_alphabet(It->second);
+		}
+	    }
+
 	  return;
 	}
 
@@ -1273,8 +1346,10 @@ namespace hfst {
 	  /*std::string msg("HfstTransitionGraph &substitute"
 			  "(const StringPair &sp, const StringPairSet &sps) ");
 			  HFST_THROW_MESSAGE(FunctionNotImplementedException, msg);*/
-          substituter subs(sp, sps);
-          substitute(subs);
+          //substituter subs(sp, sps);
+          //substitute(subs);
+
+	    substitute_(sp, sps);
 
           return *this;
         }
