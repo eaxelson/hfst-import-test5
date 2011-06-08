@@ -1,6 +1,8 @@
 #ifndef _HFST_TRANSITION_GRAPH_H_
 #define _HFST_TRANSITION_GRAPH_H_
 
+#include "HfstTransitionData.h"
+
 #include <cstdio>
 #include <string>
 #include <set>
@@ -48,6 +50,11 @@ namespace hfst {
       protected:
         HfstState target_state;
         C transition_data;
+	static unsigned int get_symbol_number
+	  (const typename C::SymbolType &symbol) {
+	  return C::get_symbol_number(symbol);
+	}
+
       public:
 
         /** @brief Create a transition leading to state zero with input and
@@ -203,7 +210,7 @@ namespace hfst {
 \endverbatim
 
        @see #HfstBasicTransducer HfstBasicTransition */
-    template <class C, class W> class HfstTransitionGraph 
+    template <class C> class HfstTransitionGraph 
       {
       public:
         /** @brief A vector of transitions of a state in an 
@@ -217,7 +224,7 @@ namespace hfst {
         typedef std::vector<HfstTransitions>
           HfstStates;
         HfstStates state_vector;
-        typedef std::map<HfstState,W> FinalWeightMap;
+        typedef std::map<HfstState,typename C::WeightType> FinalWeightMap;
         FinalWeightMap final_weight_map;
         typedef std::set<typename C::SymbolType> HfstTransitionGraphAlphabet;
         HfstTransitionGraphAlphabet alphabet;
@@ -267,7 +274,7 @@ namespace hfst {
         /** @brief Create an HfstTransitionGraph equivalent to HfstTransducer 
             \a transducer. FIXME: move to a separate file */
         HfstTransitionGraph(const hfst::HfstTransducer &transducer) {
-          HfstTransitionGraph<HfstTropicalTransducerTransitionData, float>
+          HfstTransitionGraph<HfstTropicalTransducerTransitionData>
             *fsm = ConversionFunctions::
               hfst_transducer_to_hfst_basic_transducer(transducer);
           state_vector = fsm->state_vector;
@@ -289,6 +296,33 @@ namespace hfst {
         void add_symbol_to_alphabet(const typename C::SymbolType &symbol) {
           alphabet.insert(symbol);
         }
+
+	/* Check that all symbols that occur in the transitions of the graph
+	   are also in the alphabet. */
+	bool check_alphabet() 
+	{
+          for (iterator it = begin(); it != end(); it++)
+            {
+              for (typename HfstTransitions::iterator tr_it
+                     = it->begin();
+                   tr_it != it->end(); tr_it++)
+                {
+                  C data = tr_it->get_transition_data();
+                  
+                  if(alphabet.find(data.get_input_symbol()) 
+		     == alphabet.end()) 
+		    {
+		      return false;
+		    }
+                  if(alphabet.find(data.get_output_symbol()) 
+		     == alphabet.end()) 
+		    {
+		      return false;
+		    }
+                }
+            }
+	  return true;
+	}
 
         /** @brief Remove all symbols that do not occur in transitions of
             the graph from its alphabet. 
@@ -346,6 +380,24 @@ namespace hfst {
         const std::set<typename C::SymbolType> &get_alphabet() const {
           return alphabet;
         }
+
+	void print_alphabet() const 
+	{
+	  for (typename HfstTransitionGraphAlphabet::const_iterator it 
+		 = alphabet.begin(); it != alphabet.end(); it++)
+	    {
+	      if (it != alphabet.begin())
+		std::cerr << ", ";
+	      std::cerr << *it;
+	    }
+	  std::cerr << std::endl;
+	}
+
+	/* @brief Get the number of the SymbolType \a symbol. */
+	unsigned int get_symbol_number
+	  (const typename C::SymbolType &symbol) const {
+	  return C::get_number(symbol);
+	}
 
         /** @brief Add a new state to this graph and return its number.
 
@@ -411,7 +463,7 @@ namespace hfst {
         }
 
         /** Get the final weight of state \a s in this graph. */
-        W get_final_weight(HfstState s) const {
+        typename C::WeightType get_final_weight(HfstState s) const {
           if (final_weight_map.find(s) != final_weight_map.end())
             return final_weight_map.find(s)->second;
           HFST_THROW(StateIsNotFinalException);
@@ -421,7 +473,8 @@ namespace hfst {
             to \a weight. 
 
             If the state does not exist, it is created. */
-        void set_final_weight(HfstState s, const W & weight) {
+        void set_final_weight(HfstState s, 
+			      const typename C::WeightType & weight) {
 	  add_state(s);
           final_weight_map[s] = weight;
         }
@@ -462,10 +515,10 @@ namespace hfst {
 	    
             If the state does not exist, it is created. The created
             state has an empty set of transitions. */
-        HfstTransitions & operator[](HfstState s) {
-	  add_state(s);
-          return state_vector[s];
-        }        
+        //const HfstTransitions & operator[](HfstState s) {
+	//  add_state(s);
+        //  return state_vector[s];
+        //}        
 
       public:
         /* TODO: Change state numbers s1 to s2 and vice versa. */
@@ -945,8 +998,8 @@ namespace hfst {
 
 	/* A function that performs in-place-substitution in the graph. */
 
-	void substitute_(const std::string &old_symbol, 
-			 const std::string &new_symbol,
+	void substitute_(const typename C::SymbolType &old_symbol, 
+			 const typename C::SymbolType &new_symbol,
 			 bool input_side=true, 
 			 bool output_side=true)
 	{
@@ -958,9 +1011,9 @@ namespace hfst {
                 {
 		  HfstTransition<C> &tr_it = it->operator[](i);
 
-		  std::string substituting_input_symbol
+		  typename C::SymbolType substituting_input_symbol
 		    = tr_it.get_input_symbol();
-		  std::string substituting_output_symbol
+		  typename C::SymbolType substituting_output_symbol
 		    = tr_it.get_output_symbol();
 		  bool substitution_made=false;
 		  
@@ -976,6 +1029,8 @@ namespace hfst {
 		  }
 
 		  if (substitution_made) {
+
+		    add_symbol_to_alphabet(new_symbol);
 
 		    HfstTransition<C> tr
 		      (tr_it.get_target_state(),
@@ -993,8 +1048,12 @@ namespace hfst {
 
 	/* A function that performs in-place-substitution in the graph. */
 
-	void substitute_(const StringPair &old_sp, 
-			 const StringPair &new_sp)
+	void substitute_(const std::pair
+			 <typename C::SymbolType, typename C::SymbolType> 
+			 &old_sp, 
+			 const std::pair
+			 <typename C::SymbolType, typename C::SymbolType> 
+			 &new_sp)
 	{
           // Go through all states
           for (iterator it = begin(); it != end(); it++)
@@ -1007,6 +1066,9 @@ namespace hfst {
 		  if (tr_it.get_input_symbol() == old_sp.first &&
 		      tr_it.get_output_symbol() == old_sp.second)
 		    {
+
+		      add_symbol_to_alphabet(new_sp.first);
+		      add_symbol_to_alphabet(new_sp.second);
 		      
 		      HfstTransition<C> tr
 			(tr_it.get_target_state(),
@@ -1071,6 +1133,9 @@ namespace hfst {
                            sps_it->first,
                            sps_it->second,
                            data.get_weight());
+
+			add_symbol_to_alphabet(sps_it->first);
+			add_symbol_to_alphabet(sps_it->second);
                         
                         new_transitions.push_back(new_transition);
 			
@@ -1141,18 +1206,20 @@ namespace hfst {
 
             @todo Unknown and identity symbols must be handled correctly */
         HfstTransitionGraph &
-          substitute(const std::string &old_symbol, 
-                     const std::string &new_symbol,
+          substitute(const typename C::SymbolType &old_symbol, 
+                     const typename C::SymbolType  &new_symbol,
                      bool input_side=true, 
                      bool output_side=true) {
 
+	  /*
 	  if (old_symbol == "" || new_symbol == "")
 	    HFST_THROW_MESSAGE
 	      (EmptyStringException,
 	       "HfstTransitionGraph::substitute");
+	  */
 
           // If a symbol is substituted with itself, do nothing.
-          if (old_symbol.compare(new_symbol) == 0)
+          if (old_symbol == new_symbol)
             return *this;
           // If the old symbol is not known to the graph, do nothing.
           if (alphabet.find(old_symbol) == alphabet.end())
@@ -1162,10 +1229,10 @@ namespace hfst {
           // if the substitution is made on both sides.
           if (input_side && output_side) {
             /* Special symbols are always included in the alphabet */
-            if (old_symbol.compare("@_EPSILON_SYMBOL_@") != 0 && 
-                old_symbol.compare("@_UNKNOWN_SYMBOL_@") != 0 &&
-                old_symbol.compare("@_IDENTITY_SYMBOL_@") != 0)
-              alphabet.erase(old_symbol);
+            if (not is_epsilon(old_symbol) && 
+                not is_unknown(old_symbol) &&
+                not is_identity(old_symbol)) {
+              alphabet.erase(old_symbol); }
           }
           // Insert the substituting symbol to the alphabet.
           alphabet.insert(new_symbol);
@@ -1207,6 +1274,7 @@ namespace hfst {
 			  HFST_THROW_MESSAGE(FunctionNotImplementedException, msg);*/
           substituter subs(sp, sps);
           substitute(subs);
+
           return *this;
         }
   
@@ -1223,6 +1291,7 @@ namespace hfst {
 	       "HfstTransitionGraph::substitute");
 
           substitute_(old_pair, new_pair);
+	
           return *this;
         } 
 
@@ -1245,6 +1314,7 @@ namespace hfst {
 
           substituter subs(func);
           substitute(subs);
+
           return *this;
         }
 
@@ -1262,11 +1332,11 @@ namespace hfst {
         {
           HfstState origin_state;
           HfstState target_state;
-          W weight;
+          typename C::WeightType weight;
           
           substitution_data(HfstState origin, 
                             HfstState target,
-                            W weight)
+                            typename C::WeightType weight)
           {
             origin_state=origin;
             target_state=target;
@@ -1428,7 +1498,7 @@ namespace hfst {
         /** @brief Insert freely any number of \a symbol_pair in 
             the graph with weight \a weight. */
         HfstTransitionGraph &insert_freely
-          (const HfstSymbolPair &symbol_pair, W weight) 
+          (const HfstSymbolPair &symbol_pair, typename C::WeightType weight) 
           {    
 	    if ( not ( C::is_valid_symbol(symbol_pair.first) &&		      
 		       C::is_valid_symbol(symbol_pair.second) ) ) {
@@ -1448,6 +1518,7 @@ namespace hfst {
               it->push_back(tr);
 	      source_state++;
             }
+
             return *this;
           }
         
@@ -1466,6 +1537,7 @@ namespace hfst {
             insert_freely(marker_pair, 0);
             substitute(marker_pair, graph);
             //alphabet.erase(marker); TODO: fix
+
             return *this;
           }
 
@@ -1613,7 +1685,7 @@ namespace hfst {
 
         */
         HfstTransitionGraph &disjunct
-          (const StringPairVector &spv, W weight) 
+          (const StringPairVector &spv, typename C::WeightType weight) 
         {
           StringPairVector::const_iterator it = spv.begin();
           HfstState initial_state = 0;
@@ -1656,14 +1728,14 @@ namespace hfst {
         HfstTropicalTransducerTransitionData and weight type float.
         
         This is probably the most useful kind of HfstTransitionGraph. */
-    typedef HfstTransitionGraph <HfstTropicalTransducerTransitionData, float> 
+    typedef HfstTransitionGraph <HfstTropicalTransducerTransitionData> 
       HfstBasicTransducer;
 
-    typedef HfstTransitionGraph <HfstFastTransitionData, float> 
+    typedef HfstTransitionGraph <HfstFastTransitionData> 
       HfstFastTransducer;
 
-    template <class C, class W> class HfstSubstituteTransducer: 
-    public HfstTransitionGraph<C, W> { };
+    template <class C> class HfstSubstituteTransducer: 
+    public HfstTransitionGraph<C> { };
     
   }
    

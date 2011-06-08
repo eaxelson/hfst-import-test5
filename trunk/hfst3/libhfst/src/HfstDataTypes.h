@@ -111,12 +111,12 @@ namespace hfst
   typedef std::set<HfstTwoLevelPath> HfstTwoLevelPaths;
 
   namespace implementations {
-    template <class T, class W> class HfstTransitionGraph;
+    template <class C> class HfstTransitionGraph;
     class HfstTropicalTransducerTransitionData;
-    typedef HfstTransitionGraph<HfstTropicalTransducerTransitionData, float> 
+    typedef HfstTransitionGraph<HfstTropicalTransducerTransitionData> 
       HfstBasicTransducer;
     class HfstFastTransitionData;
-    typedef HfstTransitionGraph<HfstFastTransitionData, float>
+    typedef HfstTransitionGraph<HfstFastTransitionData>
       HfstFastTransducer;
     typedef unsigned int HfstState;
 

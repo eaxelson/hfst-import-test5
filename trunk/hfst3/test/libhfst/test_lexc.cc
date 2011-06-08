@@ -54,7 +54,7 @@ int main(int argc, char **argv)
 	delete rlexc;
       }
       catch (FunctionNotImplementedException e) {
-	  assert(false);
+	assert(false);
       }
 
       // (2) A file that does not follow lexc format

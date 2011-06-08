@@ -1,6 +1,7 @@
 #include "HarmonizeUnknownAndIdentitySymbols.h"
 #include "HfstTransducer.h"
-#include "implementations/HfstTransitionGraph.h"
+// --- HfstTransitionGraph.h is enough
+#include "implementations/HfstTransitionGraph.h" 
 
 #ifndef MAIN_TEST
 
@@ -8,11 +9,13 @@ namespace hfst
 {
 
 const char * HarmonizeUnknownAndIdentitySymbols::identity = 
-"@_IDENTITY_SYMBOL_@";
+  "@_IDENTITY_SYMBOL_@"; // --- internal_identity.c_str();
 const char * HarmonizeUnknownAndIdentitySymbols::unknown = 
-"@_UNKNOWN_SYMBOL_@";
+  "@_UNKNOWN_SYMBOL_@";  // --- internal_unknown.c_str();
 
-static size_t max(size_t t1,size_t t2)
+  // --- these functions could be useful elsewhere, too
+  //     maybe they should be in separate h- and cc-files?
+size_t max(size_t t1,size_t t2)
 { return t1 < t2 ? t2 : t1; }
 
 static bool is_subset(const StringSet &subset,const StringSet &superset)
@@ -35,7 +38,7 @@ HarmonizeUnknownAndIdentitySymbols::HarmonizeUnknownAndIdentitySymbols
   t1_symbol_set = t1.get_alphabet();
   t2_symbol_set = t2.get_alphabet();
  
-  if (debug_harmonize)
+  if (debug_harmonize) // --- good
     {
       StringSet t1_symbols_in_transitions;
       StringSet t2_symbols_in_transitions;
@@ -45,16 +48,18 @@ HarmonizeUnknownAndIdentitySymbols::HarmonizeUnknownAndIdentitySymbols
       assert(is_subset(t2_symbols_in_transitions,t2_symbol_set));
     }
 
+  // --- typedef StringVector (not in HfstSymbolDefs.h, maybe it should be?)
   std::vector<std::string> diff_vector
     (max(t1_symbol_set.size(),t2_symbol_set.size()),"");
   
   if (debug_harmonize)
     { debug_harmonize_print("Computing t1 symbols - t2 symbols."); }
 
+  // --- documentation would be useful
   std::vector<std::string>::iterator diff_end =
-  std::set_difference(t1_symbol_set.begin(),t1_symbol_set.end(),
-		      t2_symbol_set.begin(),t2_symbol_set.end(),
-		      diff_vector.begin());
+    std::set_difference(t1_symbol_set.begin(),t1_symbol_set.end(),
+			t2_symbol_set.begin(),t2_symbol_set.end(),
+			diff_vector.begin());
 
   StringSet t1_symbols_minus_t2_symbols(diff_vector.begin(),diff_end);
 
@@ -97,6 +102,11 @@ HarmonizeUnknownAndIdentitySymbols::HarmonizeUnknownAndIdentitySymbols
   harmonize_unknown_symbols(t1,t2_symbols_minus_t1_symbols);
   harmonize_unknown_symbols(t2,t1_symbols_minus_t2_symbols);
 
+  // Add new symbols to the alphabets of the transducers.
+  
+  add_symbols_to_alphabet(t1,t2_symbols_minus_t1_symbols);
+  add_symbols_to_alphabet(t2,t1_symbols_minus_t2_symbols);
+
   if (debug_harmonize)
     {
       if (t2_symbols_minus_t1_symbols.empty())
@@ -138,6 +148,16 @@ void HarmonizeUnknownAndIdentitySymbols::populate_symbol_set
     }
 }
 
+void HarmonizeUnknownAndIdentitySymbols::add_symbols_to_alphabet
+(HfstBasicTransducer &t, const StringSet &s)
+{
+  for (StringSet::const_iterator it = s.begin(); it != s.end(); it++)
+    {
+      t.add_symbol_to_alphabet(*it);
+    }
+}
+
+// --- documentation would make this function easier to follow
 void HarmonizeUnknownAndIdentitySymbols::harmonize_identity_symbols
 (HfstBasicTransducer &t,const StringSet &missing_symbols)
 {
@@ -156,6 +176,8 @@ void HarmonizeUnknownAndIdentitySymbols::harmonize_identity_symbols
 	{
 	  if (jt->get_input_symbol() == identity)
 	    {
+	      // --- an exception instead, this could also be checked
+	      //     at an earlier stage
 	      assert(jt->get_output_symbol() == identity);
 	      for (StringSet::const_iterator kt = missing_symbols.begin();
 		   kt != missing_symbols.end();
@@ -171,6 +193,7 @@ void HarmonizeUnknownAndIdentitySymbols::harmonize_identity_symbols
     }  
 }
 
+// --- documentation would make this function easier to follow
 void HarmonizeUnknownAndIdentitySymbols::harmonize_unknown_symbols
 (HfstBasicTransducer &t,const StringSet &missing_symbols)
 {
@@ -188,8 +211,10 @@ void HarmonizeUnknownAndIdentitySymbols::harmonize_unknown_symbols
 	{
 	  if (jt->get_input_symbol() == unknown)
 	    {
+	      // --- an exception instead, this could also be checked
+	      //     at an earlier stage
 	      assert(jt->get_output_symbol() != identity);
-
+		
 	      for (StringSet::const_iterator kt = missing_symbols.begin();
 		   kt != missing_symbols.end();
 		   ++kt)
@@ -202,6 +227,8 @@ void HarmonizeUnknownAndIdentitySymbols::harmonize_unknown_symbols
 	    }
 	  if (jt->get_output_symbol() == unknown)
 	    {
+	      // --- an exception instead, this could also be checked
+	      //     at an earlier stage
 	      assert(jt->get_input_symbol() != identity);
 
 	      for (StringSet::const_iterator kt = missing_symbols.begin();
@@ -229,7 +256,7 @@ void HarmonizeUnknownAndIdentitySymbols::harmonize_unknown_symbols
 
 		      added_transitions.push_back
 			(HfstBasicTransition(jt->get_target_state(),
-					     jt->get_input_symbol(),*kt,
+					     *lt,*kt,
 					     jt->get_weight())); 
 		    }
 		}
@@ -240,6 +267,7 @@ void HarmonizeUnknownAndIdentitySymbols::harmonize_unknown_symbols
     }
 }
 
+// --- this could be useful elsewhere, too (print_string_set?)
 void debug_harmonize_print(const StringSet &s)
 {
   for (StringSet::const_iterator it = s.begin();
@@ -254,7 +282,7 @@ void debug_harmonize_print(const std::string &s)
 }
 
 
-#else // MAIN_TEST
+#else // MAIN_TEST --- good
 using hfst::HfstInputStream;
 using hfst::HfstTransducer;
 using hfst::HfstOutputStream;

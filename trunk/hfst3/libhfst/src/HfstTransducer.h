@@ -68,9 +68,9 @@ namespace hfst
 {
 
   namespace implementations {    
-    template <class T, class W> class HfstTransitionGraph;
+    template <class T> class HfstTransitionGraph;
     class HfstTropicalTransducerTransitionData;
-    typedef HfstTransitionGraph<HfstTropicalTransducerTransitionData, float> 
+    typedef HfstTransitionGraph<HfstTropicalTransducerTransitionData> 
       HfstBasicTransducer; 
   }
   class HfstCompiler;
@@ -342,6 +342,19 @@ An example:
        Create a new transducer equivalent to \a t in format \a type. */
     static HfstTransducer &convert
       (const HfstTransducer &t, ImplementationType type);
+
+    /* For internal use:
+       Create an HfstBasicTransducer equivalent to \a t end delete
+       the backend implementation of \a t. */
+    implementations::HfstBasicTransducer * convert_to_basic_transducer();
+
+    /* For internal use:
+       Create a backend implementation of the same type that this transducer
+       has and that is equivalent to \a t and delete \a t. Assign the 
+       backend implementation as the value of the implementation of this
+       transducer. */
+    HfstTransducer &convert_to_hfst_transducer
+      (implementations::HfstBasicTransducer *t);
 
     /* \brief For internal use: Create a transducer of type \a type as 
        defined in AT&T format in file named \a filename.
@@ -1368,7 +1381,7 @@ HfstTransducer t_transformed;
     friend std::ostream& operator<<(std::ostream &out, const HfstTransducer &t);
     friend class HfstInputStream;
     friend class HfstOutputStream;
-    friend class hfst::implementations::HfstTransitionGraph<class C, class W>;
+    friend class hfst::implementations::HfstTransitionGraph<class C>;
     friend class HfstCompiler;
     friend class hfst::implementations::ConversionFunctions;
     friend class HfstGrammar;
