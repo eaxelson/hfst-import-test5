@@ -57,7 +57,7 @@ namespace hfst
       Transition get_identity_transition(HfstState);
       bool has_identity_transition(HfstState);
       bool is_known_symbol(size_t) const;
-      const HfstBasicTransducer &t;
+      HfstBasicTransducer t;
       SymbolSet symbol_set;
       TransitionMapVector transition_map_vector;
       FloatVector finality_vector;
