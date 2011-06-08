@@ -19,7 +19,6 @@
 #include "HfstTransducer.h"
 #include "HfstFlagDiacritics.h"
 #include "implementations/compose_intersect/ComposeIntersectLexicon.h"
-#include "HarmonizeUnknownAndIdentitySymbols.h"
 
 using hfst::implementations::ConversionFunctions;
 
@@ -250,7 +249,7 @@ void HfstTransducer::harmonize(HfstTransducer &another)
 	HfstBasicTransducer * another_basic = 
 	  another.convert_to_basic_transducer();
 
-	HarmonizeUnknownAndIdentitySymbols foo(*this_basic, *another_basic);
+	this_basic->harmonize(*another_basic);
 
 	this->convert_to_hfst_transducer(this_basic);
 	another.convert_to_hfst_transducer(another_basic);
@@ -1842,7 +1841,7 @@ HfstTransducer &HfstTransducer::substitute
       }
 #endif
     
-    // use the default HfstFastTransducer function
+    // use the default HfstBasicTransducer function
     hfst::implementations::HfstBasicTransducer * net =
       convert_to_basic_transducer();
     net->substitute(old_symbol, 
