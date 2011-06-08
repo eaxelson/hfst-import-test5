@@ -241,10 +241,7 @@ namespace hfst { namespace implementations
           {
             // Copy the transition
 
-	    if(tr_it->get_input_symbol().empty()) {
-	      std::cerr << "ERROR: the empty symbol is number " 
-			<< tr_it->get_input_number() << std::endl;
-	    }
+	    assert(not tr_it->get_input_symbol().empty());
 	    assert(not tr_it->get_output_symbol().empty());
 
 	    unsigned int in = st.Find(tr_it->get_input_symbol());

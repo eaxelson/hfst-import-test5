@@ -1,21 +1,22 @@
 #ifndef _HFST_TRANSITION_GRAPH_H_
 #define _HFST_TRANSITION_GRAPH_H_
 
-#include "HfstTransitionData.h"
-
 #include <cstdio>
 #include <string>
 #include <set>
-#include "../HfstSymbolDefs.h"
-#include "../HfstExceptionDefs.h"
-#include "ConvertTransducerFormat.h"
-#include "../HfstDataTypes.h"
 #include <cassert>
 #include <iostream>
 #include <algorithm>
 
+#include "../HfstSymbolDefs.h"
+#include "../HfstExceptionDefs.h"
+#include "../HfstDataTypes.h"
+#include "../HarmonizeUnknownAndIdentitySymbols.h"
+#include "ConvertTransducerFormat.h"
 #include "HfstTropicalTransducerTransitionData.h"
 #include "HfstFastTransitionData.h"
+#include "HfstTransitionData.h" // to be used in future..
+
 
 /** @file HfstTransitionGraph.h
     @brief Declaration of classes needed by HFST's 
@@ -39,17 +40,19 @@ namespace hfst {
     /** @brief A transition that consists of a target state and 
         transition data represented by class C. 
 
-       The easiest way to use this template is to choose the 
-       the implementation #HfstBasicTransition which is compatible with
-       #HfstBasicTransducer.
+	The easiest way to use this template is to choose the 
+	the implementation #HfstBasicTransition which is compatible with
+	#HfstBasicTransducer.
 
        @see HfstBasicTransition
     */
     template <class C> class HfstTransition 
       {
       protected:
-        HfstState target_state;
-        C transition_data;
+        HfstState target_state; // the state where the transition leads
+        C transition_data;      // the actual transition data
+
+	/* Get the number that represents the symbol in the transition data. */
 	static unsigned int get_symbol_number
 	  (const typename C::SymbolType &symbol) {
 	  return C::get_symbol_number(symbol);
@@ -107,10 +110,6 @@ namespace hfst {
         typename C::SymbolType get_input_symbol() const {
           return transition_data.get_input_symbol();
         }
-
-	unsigned int get_input_number() const {
-	  return transition_data.input_number;
-	}
 	
         /** @brief Get the output symbol of the transition. */
         typename C::SymbolType get_output_symbol() const {
@@ -137,29 +136,35 @@ namespace hfst {
     typedef HfstTransition<HfstTropicalTransducerTransitionData> 
       HfstBasicTransition;
 
+    /** @brief An HfstTransition with transition data of type
+        HfstFastTransitionData. 
+
+        This implementation is compatible with #HfstFastTransducer.
+
+        @see HfstFastTransitionData HfstFastTransducer */
     typedef HfstTransition<HfstFastTransitionData> HfstFastTransition;
 
     /** @brief A simple transition graph format that consists of
         states and transitions between those states.
 
-       An HfstTransitionGraph contains two maps. One maps each state
-       to a set of that state's transitions (that are of type class 
-       HfstTransition<class C>). The other maps each final state to its 
-       final weight (that is of type class W). Class C must use the weight
-       type W. A state's transition (class HfstTransition<class C>) contains
-       a target state and a transition data field (that is of type class C).
+	An HfstTransitionGraph contains two maps. One maps each state
+	to a set of that state's transitions (that are of type class 
+	HfstTransition<class C>). The other maps each final state to its 
+	final weight (that is of type C::WeightType). 
+	A state's transition (class HfstTransition<class C>) contains
+	a target state and a transition data field (that is of type class C).
+	
+	Probably the easiest way to use this template is to choose
+	the implementations #HfstBasicTransducer
+	(HfstTransitionGraph<HfstTropicalTransducerTransitionData>)
+	and #HfstBasicTransition
+	(HfstTransition<HfstTropicalTransducerTransitionData>).
+	The class HfstTropicalTransducerTransitionData contains an input string,
+	an output string and a float weight. HfstBasicTransducer is the 
+	implementation that is used as an example in this documentation.
 
-       Probably the easiest way to use this template is to choose
-       the implementations #HfstBasicTransducer
-       (HfstTransitionGraph<HfstTropicalTransducerTransitionData, float>)
-       and #HfstBasicTransition
-       (HfstTransition<HfstTropicalTransducerTransitionData>).
-       The class HfstTropicalTransducerTransitionData contains an input string,
-       an output string and a float weight. HfstBasicTransducer is the 
-       implementation that is used as an example in this documentation.
-
-       An example of creating a HfstBasicTransducer [foo:bar baz:baz] 
-       with weight 0.4 from scratch:
+	An example of creating a HfstBasicTransducer [foo:bar baz:baz] 
+	with weight 0.4 from scratch:
 
 \verbatim
   // Create an empty transducer
@@ -213,45 +218,49 @@ namespace hfst {
     template <class C> class HfstTransitionGraph 
       {
       public:
-        /** @brief A vector of transitions of a state in an 
-	    HfstTransitionGraph. */
+        /** @brief Datatype for the states of a transition in a graph. */
         typedef std::vector<HfstTransition<C> > HfstTransitions;
 
 	typedef std::pair<typename C::SymbolType, 
 	  typename C::SymbolType> HfstSymbolPair; 
 
       protected:
-        typedef std::vector<HfstTransitions>
-          HfstStates;
+	/* Datatype for the states of a graph and their transitions.
+	   Each index of the vector is a state and the transitions 
+	   on that index are the transitions of that state. */
+        typedef std::vector<HfstTransitions> HfstStates;
+	/* States of the graph and their transitions. */
         HfstStates state_vector;
+
+	/* Datatype for the final states and their weights in a graph. */
         typedef std::map<HfstState,typename C::WeightType> FinalWeightMap;
+	/* The final states and their weights in the graph. */
         FinalWeightMap final_weight_map;
+
+	/* Datatype for the alphabet of a graph. */
         typedef std::set<typename C::SymbolType> HfstTransitionGraphAlphabet;
+	/* The alphabet of the graph. */
         HfstTransitionGraphAlphabet alphabet;
 
       public:
-        /** @brief An iterator type that points to the map of states 
-            in the graph. 
-
-            The value pointed by the iterator is of type 
-            std::pair<HfstState, HfstTransitions >. */
+        /** @brief An iterator type that points to a state in a graph. 
+	    
+            The value pointed by the iterator is of type HfstTransitions. */
         typedef typename HfstStates::iterator iterator;
-        /** @brief A const iterator type that points to the map of states
-            in the graph.
-
-            The value pointed by the iterator is of type 
-            std::pair<HfstState, HfstTransitions >. */
+        /** @brief A const iterator type that points a state in a graph.
+	    
+            The value pointed by the iterator is of type HfstTransitions. */
         typedef typename HfstStates::const_iterator const_iterator;
 
-        /** @brief Create a graph with one initial state that has state
-            number zero and is not a final state, i.e. an empty graph. */
+        /** @brief Create a graph with one initial state that has state number
+            zero and is not a final state, i.e. create an empty graph. */
         HfstTransitionGraph(void) {
           initialize_alphabet(alphabet);
 	  HfstTransitions tr;
           state_vector.push_back(tr);
         }
 
-	// FIXME: the default should be enough
+	// The default operator= is maybe enough..
 	HfstTransitionGraph &operator=(const HfstTransitionGraph &graph)
 	  {
 	    if (this == &graph)
@@ -259,7 +268,7 @@ namespace hfst {
 	    state_vector = graph.state_vector;
 	    final_weight_map = graph.final_weight_map;
 	    alphabet = graph.alphabet;
-	    assert(alphabet.count(typename C::SymbolType()) == 0); // TEST
+	    assert(alphabet.count(typename C::SymbolType()) == 0);
 	    return *this;
 	  }
 
@@ -283,21 +292,24 @@ namespace hfst {
           delete fsm;
         }
 
+	/* Add epsilon, unknown and identity symbols to the alphabet 
+	   \a alpha. */
 	void initialize_alphabet(HfstTransitionGraphAlphabet &alpha) {
 	  alpha.insert(C::get_epsilon());
 	  alpha.insert(C::get_unknown());
 	  alpha.insert(C::get_identity());
 	}
 
-        /** @brief Explicitly add a symbol to the alphabet of the graph.
+        /** @brief Explicitly add \a symbol to the alphabet of the graph.
 
-            Usually the user does not have to take care of the alphabet
+            @note Usually the user does not have to take care of the alphabet
             of a graph. This function can be useful in some special cases. */
         void add_symbol_to_alphabet(const typename C::SymbolType &symbol) {
           alphabet.insert(symbol);
         }
 
-	/* Check that all symbols that occur in the transitions of the graph
+	/* For bug fixing: 
+	   Check that all symbols that occur in the transitions of the graph
 	   are also in the alphabet. */
 	bool check_alphabet() 
 	{
@@ -377,10 +389,12 @@ namespace hfst {
             The SymbolTypes do not necessarily occur in any transitions
             of the graph. Epsilon, unknown and identity \link 
             hfst::String symbols\endlink are always included in the alphabet. */
-        const std::set<typename C::SymbolType> &get_alphabet() const {
+        const HfstTransitionGraphAlphabet &get_alphabet() const {
           return alphabet;
         }
 
+	/* For bug fixing: print the alphabet of the graph 
+	   to standard error stream. */
 	void print_alphabet() const 
 	{
 	  for (typename HfstTransitionGraphAlphabet::const_iterator it 
@@ -393,14 +407,14 @@ namespace hfst {
 	  std::cerr << std::endl;
 	}
 
-	/* @brief Get the number of the SymbolType \a symbol. */
+	/* For bug fixing: Get the number of the SymbolType \a symbol. */
 	unsigned int get_symbol_number
 	  (const typename C::SymbolType &symbol) const {
 	  return C::get_number(symbol);
 	}
 
         /** @brief Add a new state to this graph and return its number.
-
+	    
             @return The next (smallest) free state number. */
         HfstState add_state(void) {
 	  HfstTransitions tr;
@@ -410,7 +424,9 @@ namespace hfst {
 
         /** @brief Add a state \a s to this graph.
  
-            If the state already exists, it is not added again. 
+            If the state already exists, it is not added again.
+	    All states with state number smaller than \a s are also
+	    added to the graph if they did not exist before.
             @return \a s*/
         HfstState add_state(HfstState s) {
 	  while(state_vector.size() <= s) {
@@ -420,17 +436,22 @@ namespace hfst {
           return s;
         }
 
-	/** @brief Get the biggest state number. */
+	/** @brief Get the biggest state number in use. */
 	HfstState get_max_state() const {
 	  return state_vector.size()-1;
 	}
 
+	/* For internal optimization: Reserve space for 
+	   \a number_of_states states. */
 	void initialize_state_vector
 	  (unsigned int number_of_states)
 	{
 	  state_vector.reserve(number_of_states);
 	}
 
+	/* For internal optimization: Reserve space for
+	   \a number_of_transitions transitions for state number 
+	   \a state_number. */
 	void initialize_transition_vector
 	  (unsigned int state_number, unsigned int number_of_transitions)
 	{
@@ -444,10 +465,6 @@ namespace hfst {
         void add_transition(HfstState s, const HfstTransition<C> & transition) {
 
           C data = transition.get_transition_data();
-
-	  // FIXME: throw an exception in constructor of HfstTransition?
-	  //assert(not data.get_input_symbol().empty());
-	  //assert(not data.get_output_symbol().empty());
 
           add_state(s);
           add_state(transition.get_target_state());
@@ -479,22 +496,22 @@ namespace hfst {
           final_weight_map[s] = weight;
         }
 
-        /** @brief Get an iterator to the beginning of the map of states in 
+        /** @brief Get an iterator to the beginning of the states in 
             the graph. 
 
             For an example, see #HfstTransitionGraph */
         iterator begin() { return state_vector.begin(); }
 
-        /** @brief Get a const iterator to the beginning of the map of 
+        /** @brief Get a const iterator to the beginning of 
             states in the graph. */
         const_iterator begin() const { return state_vector.begin(); }
 
-        /** @brief Get an iterator to the end of the map of states in
-            the graph. */
+        /** @brief Get an iterator to the end of states (last state + 1) 
+	    in the graph. */
         iterator end() { return state_vector.end(); }
 
-        /** @brief Get a const iterator to the end of the map of states in
-            the graph. */
+        /** @brief Get a const iterator to the end of states (last state + 1)
+	    in the graph. */
         const_iterator end() const { return state_vector.end(); }
 
 
@@ -510,17 +527,6 @@ namespace hfst {
           return state_vector[s];
         }        
 
-      public:
-        /** @brief Get the set of transitions of state \a s in this graph. 
-	    
-            If the state does not exist, it is created. The created
-            state has an empty set of transitions. */
-        //const HfstTransitions & operator[](HfstState s) {
-	//  add_state(s);
-        //  return state_vector[s];
-        //}        
-
-      public:
         /* TODO: Change state numbers s1 to s2 and vice versa. */
         void swap_state_numbers(HfstState /*s1*/, HfstState /*s2*/) {
           HFST_THROW(FunctionNotImplementedException);
@@ -775,8 +781,7 @@ namespace hfst {
 
 
         /** @brief Sort the arcs of this transducer according to input and
-            output symbols.
-	*/
+            output symbols. */
         HfstTransitionGraph &sort_arcs(void)
 	  {
 	    for (typename HfstStates::iterator it = state_vector.begin();
@@ -1089,10 +1094,6 @@ namespace hfst {
            Substitute all transitions according to substituter \a subs. 
            ------------------------------------------------------------ */
         void substitute(substituter &subs) { 
-
-	  /*std::string message
-	    ("HfstTransitionGraph::substitute(substituter &subs) called");
-	    HFST_THROW_MESSAGE(HfstFatalException, message);*/
 
           // Go through all states
           for (iterator it = begin(); it != end(); it++)
@@ -1572,42 +1573,11 @@ namespace hfst {
             that take two or more graphs as their arguments, unless otherwise
             said.
         */
-        HfstTransitionGraph &harmonize(HfstTransitionGraph &another) {
-
-          /* Collect symbols previously unknown to graphs this and another. */
-          HfstTransitionGraphAlphabet unknown_this;
-          HfstTransitionGraphAlphabet unknown_another;
-
-          for (typename HfstTransitionGraphAlphabet::const_iterator it
-                 = another.alphabet.begin();
-               it != another.alphabet.end(); it++)
-            {
-              if (alphabet.find(*it) == alphabet.end())
-                unknown_this.insert(*it);
-            }
-          for (typename HfstTransitionGraphAlphabet::const_iterator it
-                 = alphabet.begin();
-               it != alphabet.end(); it++)
-            {
-              if (another.alphabet.find(*it) == another.alphabet.end())
-                unknown_another.insert(*it);
-            }
-          
-          /* No need to harmonize. */
-          if (unknown_this.size() == 0 &&
-              unknown_another.size() == 0) {
-            return *this;
-          }
-
-          /* Expand the unknowns. */
-          substituter subs_this(unknown_this);
-          substitute(subs_this);
-
-          substituter subs_another(unknown_another);
-          another.substitute(subs_another);
-
-          return *this;
-        }
+        HfstTransitionGraph &harmonize(HfstTransitionGraph &another) 
+	  {
+	    HarmonizeUnknownAndIdentitySymbols foo(*this, another);
+	    return *this;
+	  }
         
 
         /* -------------------------------
