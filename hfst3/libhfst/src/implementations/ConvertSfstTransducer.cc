@@ -18,6 +18,8 @@
 #include "HfstTransitionGraph.h"
 #include "HfstTransducer.h"
 
+#include <stdexcept>
+
 #ifndef MAIN_TEST
 namespace hfst { namespace implementations
 {
@@ -149,6 +151,16 @@ namespace hfst { namespace implementations
   t->alphabet.add_symbol(internal_unknown.c_str(), 1);
   t->alphabet.add_symbol(internal_identity.c_str(), 2);
 
+  // Make sure that also symbols that occur in the alphabet of the
+  // HfstBasicTransducer but not in its transitions are inserted to 
+  // the SFST transducer
+  for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it 
+         = net->alphabet.begin();
+       it != net->alphabet.end(); it++) {
+    if (not is_epsilon(*it) && not is_unknown(*it) && not is_identity(*it))
+      t->alphabet.add_symbol(it->c_str(), net->get_symbol_number(*it));
+  }
+
   std::vector<SFST::Node*> state_vector;
   state_vector.push_back(t->root_node());
   for (unsigned int i=1; i <= (net->get_max_state()); i++) {
@@ -177,8 +189,8 @@ namespace hfst { namespace implementations
           }
 
           SFST::Label l
-            (t->alphabet.add_symbol(istring.c_str()),
-             t->alphabet.add_symbol(ostring.c_str()));
+            (t->alphabet.symbol2code(istring.c_str()),
+             t->alphabet.symbol2code(ostring.c_str()));
           
           // Copy transition to node
 	  state_vector[source_state]->add_arc
@@ -198,16 +210,6 @@ namespace hfst { namespace implementations
       }
       state_vector[it->first]->set_final(1);
     }
-
-  // Make sure that also symbols that occur in the alphabet of the
-  // HfstBasicTransducer but not in its transitions are inserted to 
-  // the SFST transducer
-  for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it 
-         = net->alphabet.begin();
-       it != net->alphabet.end(); it++) {
-    if (not is_epsilon(*it))
-      t->alphabet.add_symbol(it->c_str());
-  }
   
   return t;
 }
@@ -244,11 +246,25 @@ namespace hfst { namespace implementations
       for( SFST::ArcsIter p(arcs); p; p++ ) {
         SFST::Arc *arc=p;
 	
+	unsigned int in, out;
+	try {
+	  in = harmonization_vector.at(arc->label().lower_char());
+	  out = harmonization_vector.at(arc->label().upper_char());
+	} catch (std::out_of_range e)
+	  {
+	    fprintf(stderr, "no index for %i or %i\n",
+		    arc->label().lower_char(),
+		    arc->label().upper_char());
+	    fprintf(stderr, "the size of harmonization_vector is %i\n",
+		    (unsigned int)harmonization_vector.size());
+	    assert(false);
+	  }
+
         net->add_transition(index[node], 
                             HfstFastTransition
                             (index[arc->target_node()],
-                             harmonization_vector.at(arc->label().lower_char()),
-                             harmonization_vector.at(arc->label().upper_char()),
+                             in,
+			     out,
                              0));
       }
 
@@ -271,19 +287,23 @@ namespace hfst { namespace implementations
   sfst_to_hfst_fast_transducer(SFST::Transducer * t) {
 
     HfstFastTransducer * net = new HfstFastTransducer();
-  
+
     // Handle the alphabet
     StringVector coding_vector;
+    coding_vector.push_back(internal_epsilon);
+
     SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
     for (SFST::Alphabet::CharMap::const_iterator it 
            = cm.begin(); it != cm.end(); it++) 
       {
-	net->add_symbol_to_alphabet(it->first);
         if (it->first != 0) { 
+	  // it is possible that there are gaps in numbering
+	  while (coding_vector.size() < it->first) {
+	    // empty space if no symbol at this index
+	    coding_vector.push_back(std::string(""));
+	  }
 	  coding_vector.push_back(std::string(it->second));
-	} else { // The epsilon symbol "<>"
-	  coding_vector.push_back(internal_epsilon);
-	}	
+	}
       }
     NumberVector harmonization_vector 
       = get_harmonization_vector(coding_vector);

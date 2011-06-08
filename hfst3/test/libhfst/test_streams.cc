@@ -11,10 +11,10 @@ using namespace hfst;
 int main(int argc, char **argv) 
 {
 
-  const unsigned int TYPES_SIZE=4;
+  const unsigned int TYPES_SIZE=3;
   const ImplementationType types [] = {SFST_TYPE, 
 				       TROPICAL_OPENFST_TYPE, 
-				       LOG_OPENFST_TYPE,
+				       /*LOG_OPENFST_TYPE,*/
 				       FOMA_TYPE};
 
 

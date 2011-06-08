@@ -492,7 +492,7 @@ int main(int argc, char **argv)
 	      assert(do_results_contain
 		     (results1, "hippopotamus", "hippopotami", 1.2, true));
 	    }
-	    
+
 	    HfstTransducer animals2(animals);
 	    animals2.n_best(2);
 	    HfstTwoLevelPaths results2;
@@ -505,7 +505,7 @@ int main(int argc, char **argv)
 		     do_results_contain
 		     (results2, "hippopotamus", "hippopotamuses", 1.4, true));
 	    }
-	    
+
 	    HfstTransducer animals3(animals);
 	    animals3.n_best(3);
 	    HfstTwoLevelPaths results3;
@@ -582,8 +582,7 @@ int main(int argc, char **argv)
 
 	HfstTransducer t2("a", "b", types[i]);
 	HfstTransducer tr("c", "d", types[i]);
-	t2.insert_freely(tr);
-
+	t2.insert_freely(tr); // FAILS HERE
 	assert(t1.compare(t2));
 	
 	HfstTransducer cd_star("c", "d", types[i]);

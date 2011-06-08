@@ -38,7 +38,7 @@ namespace hfst {
       typedef float WeightType;
       /** @brief A set of symbols. */
       typedef std::set<SymbolType> SymbolTypeSet;
-
+      
       typedef std::map<unsigned int, SymbolType> 
         Number2SymbolMap;
       typedef std::map<SymbolType, unsigned int, string_comparison> 
@@ -239,6 +239,7 @@ namespace hfst {
       friend class ComposeIntersectLexicon;
       friend class ComposeIntersectRule;
       friend class ComposeIntersectRulePair;
+      template <class C> friend class HfstTransitionGraph;
 
     };
 

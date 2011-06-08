@@ -126,7 +126,7 @@ namespace hfst { namespace implementations
 	  std::string istring = inputsym->Find(arc.ilabel);
 	  std::string ostring = outputsym->Find(arc.olabel);
 
-	  if(istring == "") { // omorfi fails
+	  if(istring == "") {
 	    std::cerr << "ERROR: arc.ilabel " << arc.ilabel << " not found" << std::endl;
 	    assert(false);
 	  }
@@ -148,7 +148,7 @@ namespace hfst { namespace implementations
 			       istring,
 			       ostring,
 			       arc.weight.Value()
-			       ));  // FAIL
+			       ));
 	} 
 
       if (t->Final(s) != fst::TropicalWeight::Zero()) {
@@ -162,19 +162,21 @@ namespace hfst { namespace implementations
        but not in transitions are copied. */
     for ( fst::SymbolTableIterator it = 
             fst::SymbolTableIterator(*(inputsym));
-          not it.Done(); it.Next() ) {
-      assert(it.Symbol() != "");
-      if (it.Value() != 0) // epsilon is not inserted
-        net->alphabet.insert( it.Symbol() );
-    }    
+          not it.Done(); it.Next() ) 
+      {
+	assert(it.Symbol() != "");
+	if (it.Value() != 0) // epsilon is not inserted
+	  net->alphabet.insert( it.Symbol() );
+      }    
     for ( fst::SymbolTableIterator it = 
             fst::SymbolTableIterator(*(outputsym));
-          not it.Done(); it.Next() ) {
-      assert(it.Symbol() != "");
-      if (it.Value() != 0) // epsilon is not inserted
-        net->alphabet.insert( it.Symbol() );
-    }    
-
+          not it.Done(); it.Next() ) 
+      {
+	assert(it.Symbol() != "");
+	if (it.Value() != 0) // epsilon is not inserted
+	  net->alphabet.insert( it.Symbol() );
+      }    
+    
     return net;
 }
 
@@ -219,6 +221,14 @@ namespace hfst { namespace implementations
     st.AddSymbol(internal_unknown, 1);
     st.AddSymbol(internal_identity, 2);
     
+    // Add also symbols that do not occur in transitions
+    for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it 
+           = net->alphabet.begin();
+         it != net->alphabet.end(); it++) {
+      assert(not it->empty());
+      st.AddSymbol(*it, net->get_symbol_number(*it));
+    }
+
     // Go through all states
     unsigned int source_state=0;
     for (HfstBasicTransducer::const_iterator it = net->begin();
@@ -231,17 +241,43 @@ namespace hfst { namespace implementations
           {
             // Copy the transition
 
-	    if(tr_it->get_input_symbol().empty()) { // FAIL
+	    if(tr_it->get_input_symbol().empty()) {
 	      std::cerr << "ERROR: the empty symbol is number " 
 			<< tr_it->get_input_number() << std::endl;
 	    }
 	    assert(not tr_it->get_output_symbol().empty());
 
+	    unsigned int in = st.Find(tr_it->get_input_symbol());
+	    unsigned int out = st.Find(tr_it->get_output_symbol());
+
+	    if (in == -1)
+	      {
+		// FIXME: a temporary solution
+		st.AddSymbol(tr_it->get_input_symbol(), 
+			     net->get_symbol_number
+			       (tr_it->get_input_symbol()));
+		in = st.Find(tr_it->get_input_symbol());
+		/* std::cerr << "ERROR: no number found for input symbol "
+			  << tr_it->get_input_symbol() << std::endl;
+			  assert(false); */
+	      }
+	    if (out == -1)
+	      {
+		// FIXME: a temporary solution
+		st.AddSymbol(tr_it->get_output_symbol(), 
+			     net->get_symbol_number
+			       (tr_it->get_output_symbol()));
+		out = st.Find(tr_it->get_output_symbol());
+		/* std::cerr << "ERROR: no number found for output symbol "
+			  << tr_it->get_output_symbol() << std::endl;
+			  assert(false); */
+	      }
+
             t->AddArc(
 		      state_vector[source_state],
                        fst::StdArc
-		      ( st.AddSymbol(tr_it->get_input_symbol()),
-			st.AddSymbol(tr_it->get_output_symbol()),
+		      ( in,
+			out,
 			tr_it->get_weight(),
 			state_vector[tr_it->get_target_state()]));
           }
@@ -257,14 +293,6 @@ namespace hfst { namespace implementations
 		    state_vector[it->first],
                     it->second);
       }
-    
-    // Add also symbols that do not occur in transitions
-    for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it 
-           = net->alphabet.begin();
-         it != net->alphabet.end(); it++) {
-      assert(not it->empty());
-      st.AddSymbol(*it);
-    }
     
     t->SetInputSymbols(&st);
     return t;  
@@ -351,6 +379,11 @@ namespace hfst { namespace implementations
 	not it.Done(); it.Next() ) {
     assert(it.Symbol() != "");
     //if (it.Value() != 0) // epsilon is not inserted
+    // it is possible that there are gaps in numbering
+    while (input_coding_vector.size() < it.Value()) {
+      // empty space if no symbol at this index
+      input_coding_vector.push_back(std::string(""));
+    }
     net->alphabet.insert( it.Value() );
     input_coding_vector.push_back( it.Symbol() );
   }    
@@ -359,6 +392,11 @@ namespace hfst { namespace implementations
 	not it.Done(); it.Next() ) {
     assert(it.Symbol() != "");
     //if (it.Value() != 0) // epsilon is not inserted
+    // it is possible that there are gaps in numbering
+    while (output_coding_vector.size() < it.Value()) {
+      // empty space if no symbol at this index
+      output_coding_vector.push_back(std::string(""));
+    }
     net->alphabet.insert( it.Value() );
     output_coding_vector.push_back( it.Symbol() );
   }    
