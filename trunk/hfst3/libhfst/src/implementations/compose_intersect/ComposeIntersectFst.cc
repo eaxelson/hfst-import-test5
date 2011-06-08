@@ -92,6 +92,7 @@ namespace hfst
 	  else
 	    { finality_vector.push_back
 		(std::numeric_limits<float>::infinity()); }
+	  ++source_state;
 	  SymbolTransitionMap &symbol_transition_map = 
 	    transition_map_vector.back();
 	  bool identity_found = false;
