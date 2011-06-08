@@ -19,7 +19,8 @@ AUTOMAKE_OPTIONS=subdir-objects
 noinst_LTLIBRARIES=libhfstimplementations.la
 
 # HFST bridge specific stuff
-IMPLEMENTATION_SRCS=HfstTransitionGraph.cc ConvertTransducerFormat.cc \
+IMPLEMENTATION_SRCS=HfstTransitionGraph.cc \
+		    ConvertTransducerFormat.cc \
 		    HfstTropicalTransducerTransitionData.cc \
 		    ConvertSfstTransducer.cc ConvertTropicalWeightTransducer.cc \
 		    ConvertLogWeightTransducer.cc ConvertFomaTransducer.cc \
@@ -72,7 +73,7 @@ implinclude_HEADERS = \
 		FomaTransducer.h \
 		LogWeightTransducer.h \
 		SfstTransducer.h TropicalWeightTransducer.h \
-		HfstOlTransducer.h HfstTransitionGraph.h \
+		HfstOlTransducer.h HfstTransitionGraph.h HfstTransition.h \
 		HfstTropicalTransducerTransitionData.h \
 		HfstFastTransitionData.h \
 		compose_intersect/ComposeIntersectRulePair.h \
