@@ -10,6 +10,7 @@
 #include "../HfstDataTypes.h"
 #include <cassert>
 #include <iostream>
+#include <algorithm>
 
 #include "HfstTropicalTransducerTransitionData.h"
 #include "HfstFastTransitionData.h"
