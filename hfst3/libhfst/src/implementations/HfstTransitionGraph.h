@@ -15,7 +15,6 @@
 #include "ConvertTransducerFormat.h"
 #include "HfstTropicalTransducerTransitionData.h"
 #include "HfstFastTransitionData.h"
-//#include "HfstTransitionData.h" // to be used in future..
 
 
 /** @file HfstTransitionGraph.h
@@ -221,8 +220,10 @@ namespace hfst {
         /** @brief Datatype for the states of a transition in a graph. */
         typedef std::vector<HfstTransition<C> > HfstTransitions;
 
-	typedef std::pair<typename C::SymbolType, 
-	  typename C::SymbolType> HfstSymbolPair; 
+	typedef std::pair<typename C::SymbolType, typename C::SymbolType> 
+	  HfstSymbolPair; 
+	typedef std::set<HfstSymbolPair> HfstSymbolPairSet;
+	typedef std::vector<HfstSymbolPair> HfstSymbolPairVector;
 
       protected:
 	/* Datatype for the states of a graph and their transitions.
@@ -307,6 +308,18 @@ namespace hfst {
         void add_symbol_to_alphabet(const typename C::SymbolType &symbol) {
           alphabet.insert(symbol);
         }
+
+	/** @brief Same as add_symbol_to_alphabet for each symbol in
+	    \a symbols. */
+	void add_symbols_to_alphabet(const HfstSymbolPairSet &symbols)
+	{
+	  for (typename HfstSymbolPairSet::const_iterator it = symbols.begin();
+	       it != symbols.end(); it++)
+	    {
+	      alphabet.insert(it->first);
+	      alphabet.insert(it->second);
+	    }
+	}
 
 	/* For bug fixing: 
 	   Check that all symbols that occur in the transitions of the graph
@@ -802,205 +815,6 @@ namespace hfst {
 
       protected:
 
-        /* -------------------------------------------------------
-              A class used by function substitute(substituter&) 
-           -------------------------------------------------------  */
-        struct substituter {
-
-          /* Whether one symbol is substituted with another symbol. */
-          bool substitute_symbol;
-          std::string old_symbol;
-          std::string new_symbol;
-          bool input_side;
-          bool output_side;
-
-          /* Whether a symbol pair is substituted with a set of symbol pairs. */
-          bool substitute_symbol_pair;
-          StringPair SP;
-          StringPairSet SPS;
-
-          /* Whether substitution is made according to a function. */
-          bool substitute_using_function;
-          bool (*func) (const StringPair &sp, StringPairSet &sps);
-
-          /* Whether substitution is expanding unknown and identity symbols. */
-          bool substitute_expand;
-          StringSet unknown_set;
-
-          /* Create a substituter that substitutes one symbol with
-             another symbol. */
-          substituter(const std::string &old_symbol_,
-                      const std::string &new_symbol_, 
-                      bool input_side_=true,
-                      bool output_side_=true)
-          {
-            old_symbol = old_symbol_;
-            new_symbol = new_symbol_;
-            input_side = input_side_;
-            output_side = output_side_;
-            substitute_symbol =true;
-          }
-
-          /* Create a substituter that substitutes a symbol pair with
-             a set of symbol pairs. */
-          substituter(const StringPair &sp, const StringPairSet &sps)
-          {
-            SP = sp;
-            SPS = sps;
-            substitute_symbol = false;
-            substitute_symbol_pair = true;
-          }
-
-          /* Create a substituter that substitutes transitions according
-             to a function. */
-          substituter(bool (*func_) (const StringPair &sp, 
-                                     StringPairSet &sps))
-          {
-            func = func_;
-            substitute_symbol = false;
-            substitute_symbol_pair = false;
-            substitute_using_function = true;
-          }
-
-          /* Create a substituter that expands unknown and identity symbols. */
-          substituter(HfstTransitionGraphAlphabet &alpha)
-          {
-            for (typename HfstTransitionGraphAlphabet::const_iterator it
-                   = alpha.begin; it != alpha.end(); it++)
-              {
-                unknown_set.insert(*it);
-              }
-            substitute_symbol = false;
-            substitute_symbol_pair = false;
-            substitute_using_function = false;
-            substitute_expand=true;
-          }
-
-
-          /* Stores to \a sps the transitions with which the transition \a sp
-             must be substituted and returns whether any substitutions must
-             be made, i.e. whether any transitions were inserted in \a sps. */
-          bool substitute(const StringPair &sp, StringPairSet &sps)
-          {
-            if (substitute_symbol)
-              {
-                std::string isymbol = sp.first;
-                std::string osymbol = sp.second;
-                bool substitution_made=false;
-                
-                if (input_side && isymbol.compare(old_symbol) == 0) {
-                  isymbol = new_symbol;
-                  substitution_made=true;
-                }
-                if (output_side && osymbol.compare(old_symbol) == 0) {
-                  osymbol = new_symbol;
-                  substitution_made=true;
-                }
-                
-                if (substitution_made) {
-		  if (false)
-		    fprintf(stderr, "substituting %s:%s with %s:%s\n",
-			    sp.first.c_str(), sp.second.c_str(), 
-			    isymbol.c_str(), osymbol.c_str());
-                  sps.insert(StringPair(isymbol, osymbol));
-                  return true;
-                }
-                return false;
-              }
-
-            if (substitute_symbol_pair)
-              {
-                if ( sp.first.compare(SP.first) == 0 &&
-                     sp.second.compare(SP.second) == 0 )
-                  {
-                    for (StringPairSet::const_iterator it = SPS.begin();
-                         it != SPS.end(); it ++)
-                      {
-                        sps.insert(*it);
-                      }
-                    return true;
-                  }
-                return false;
-              }
-
-            if (substitute_using_function)
-              {
-                return func(sp, sps);
-              }
-            
-            if (substitute_expand)
-              {
-                // Identity
-                if (sp.first.compare("@_IDENTITY_SYMBOL_@") == 0 &&
-                    sp.second.compare("@_IDENTITY_SYMBOL_@") == 0)
-                  {
-                    for (StringSet::const_iterator it = unknown_set.begin();
-                         it != unknown_set.end(); it++)
-                      {
-                        sps.insert(StringPair(*it, *it));
-                      }
-                    sps.insert(StringPair("@_IDENTITY_SYMBOL_@", 
-                                          "@_IDENTITY_SYMBOL_@"));
-                    return true;
-                  }
-
-                // Unknown to unknown
-                if (sp.first.compare("@_UNKNOWN_SYMBOL_@") == 0 &&
-                    sp.second.compare("@_UNKNOWN_SYMBOL_@") == 0)
-                  {
-                    for (StringSet::const_iterator it1 = unknown_set.begin();
-                         it1 != unknown_set.end(); it1++)
-                      {
-                        for (StringSet::const_iterator it2 
-                               = unknown_set.begin();
-                             it2 != unknown_set.end(); it2++)
-                          {
-                            if (it1->compare(*it2) != 0)
-                              {
-                                sps.insert(StringPair(*it1, *it2));
-                              }
-                            // add transitions x:? and ?:x
-                            sps.insert(StringPair(*it1, "@_UNKNOWN_SYMBOL_@"));
-                            sps.insert(StringPair("@_UNKNOWN_SYMBOL_@", *it1));
-                          }
-                      }
-                    sps.insert(StringPair("@_UNKNOWN_SYMBOL_@", 
-                                          "@_UNKNOWN_SYMBOL_@"));
-                    return true;
-                  }
-
-                // Unknown to not unknown
-                if (sp.first.compare("@_UNKNOWN_SYMBOL_@") == 0)
-                  {
-                    for (StringSet::const_iterator it = unknown_set.begin();
-                         it != unknown_set.end(); it++)
-                      {
-                        sps.insert(StringPair(*it, sp.second));
-                      }
-                    sps.insert(StringPair("@_UNKNOWN_SYMBOL_@", sp.second));
-                    return true;
-                  }
-
-                // Not unknown to unknown
-                if (sp.second.compare("@_UNKNOWN_SYMBOL_@") == 0)
-                  {
-                    for (StringSet::const_iterator it = unknown_set.begin();
-                         it != unknown_set.end(); it++)
-                      {
-                        sps.insert(StringPair(sp.first, *it));
-                      }
-                    sps.insert(StringPair(sp.first, "@_UNKNOWN_SYMBOL_@"));
-                    return true;
-                  }
-
-                // Other cases, no need to expand.
-                return false;
-              }
-
-            return false;            
-          }
-        };
-
 	/* A function that performs in-place-substitution in the graph. */
 
 	void substitute_(const typename C::SymbolType &old_symbol, 
@@ -1008,7 +822,7 @@ namespace hfst {
 			 bool input_side=true, 
 			 bool output_side=true)
 	{
-          // Go through all states
+          // ----- Go through all states -----
           for (iterator it = begin(); it != end(); it++)
             {
 	      // Go through all transitions
@@ -1016,10 +830,14 @@ namespace hfst {
                 {
 		  HfstTransition<C> &tr_it = it->operator[](i);
 
+		  // The substituting input and output symbols for the 
+		  // current transition.
 		  typename C::SymbolType substituting_input_symbol
 		    = tr_it.get_input_symbol();
 		  typename C::SymbolType substituting_output_symbol
 		    = tr_it.get_output_symbol();
+
+		  // Whether a substitution will be performed.
 		  bool substitution_made=false;
 		  
 		  if (input_side &&
@@ -1033,10 +851,12 @@ namespace hfst {
 		    substitution_made=true;
 		  }
 
+		  // If a substitution is to be performed,
 		  if (substitution_made) {
 
 		    add_symbol_to_alphabet(new_symbol);
 
+		    // change the current transition accordingly.
 		    HfstTransition<C> tr
 		      (tr_it.get_target_state(),
 		       substituting_input_symbol,
@@ -1047,70 +867,122 @@ namespace hfst {
 		  }
 		  
 		} // all transitions gone through
-	    } // all states gone through
+
+	    } // ----- all states gone through -----
+
 	  return;
 	}
 
-	/* A function that performs in-place-substitution in the graph. */
-
-	void substitute_(const HfstSymbolPair &old_sp, 
-			 const HfstSymbolPair &new_sp)
-	{
-          // Go through all states
-          for (iterator it = begin(); it != end(); it++)
-            {
-	      // Go through all transitions
-              for (unsigned int i=0; i < it->size(); i++)
-                {
-		  HfstTransition<C> &tr_it = it->operator[](i);
-
-		  if (tr_it.get_input_symbol() == old_sp.first &&
-		      tr_it.get_output_symbol() == old_sp.second)
-		    {
-
-		      add_symbol_to_alphabet(new_sp.first);
-		      add_symbol_to_alphabet(new_sp.second);
-		      
-		      HfstTransition<C> tr
-			(tr_it.get_target_state(),
-			 new_sp.first,
-			 new_sp.second,
-			 tr_it.get_weight());
-		      
-		      it->operator[](i) = tr;
-		    }		  
-		} // all transitions gone through
-	    } // all states gone through
-	  return;
-	}
 
 	/* A function that performs in-place-substitution in the graph. */
-
 	void substitute_(const HfstSymbolPair &old_sp, 
-			 const std::set<HfstSymbolPair> &new_sp)
+			 const HfstSymbolPairSet &new_sps)
 	{
+	  // Whether any substitution was performed
 	  bool substitution_performed=false;
 
-          // Go through all states
+          // ----- Go through all states -----
           for (iterator it = begin(); it != end(); it++)
             {
-	      // The transitions to be added
-	      typename std::vector<HfstTransition<C> > new_transitions;
+	      // The transitions to be added to the current state
+	      HfstTransitions new_transitions;
 
-	      // Go through all transitions
+	      // Go through all transitions of the current state
               for (unsigned int i=0; i < it->size(); i++)
                 {
 		  HfstTransition<C> &tr_it = it->operator[](i);
 
+		  // If a match was found, substitute:
 		  if (tr_it.get_input_symbol() == old_sp.first &&
 		      tr_it.get_output_symbol() == old_sp.second)
 		    {
 		      substitution_performed=true;
 		      
+		      // change the current transition so that it is equivalent
+		      // to the first substituting transition in new_sps
+		      typename HfstSymbolPairSet::const_iterator IT 
+			= new_sps.begin();
+		      
+		      HfstTransition<C> tr
+			(tr_it.get_target_state(),
+			 IT->first,
+			 IT->second,
+			 tr_it.get_weight());
+		      
+		      it->operator[](i) = tr;
+		      
+		      // and schedule the rest of the substituting transitions
+		      // in new_sps to be added to the current state.
+		      while (IT != new_sps.end())
+			{
+			  HfstTransition<C> TR
+			    (tr_it.get_target_state(),
+			     IT->first,
+			     IT->second,
+			     tr_it.get_weight());
+
+			  new_transitions.push_back(TR);
+			  IT++;
+			}
+
+		    } // (substitution and scheduling done)		  
+
+		} // (all transitions of a state gone through)
+
+	      // Add the new transitions to the current state
+	      for (typename HfstTransitions
+		     ::const_iterator NIT = new_transitions.begin();
+		   NIT != new_transitions.end(); NIT++)
+		{
+		  it->push_back(*NIT);
+		}
+
+	    } // ( ----- all states in the graph gone through ----- )
+
+	  // If at least one substitution was performed, add all the
+	  // symbols in the substituting transitions to the alphabet of
+	  // the graph.
+	  if (substitution_performed) {
+	    add_symbols_to_alphabet(new_sps);
+	  }
+
+	  return;
+	}
+
+	/* A function that performs in-place-substitution in the graph. */
+	void substitute_(bool (*func)
+			 (const HfstSymbolPair &sp, HfstSymbolPairSet &sps))
+	{
+          // ----- Go through all states. -----
+          for (iterator it = begin(); it != end(); it++)
+            {
+	      // The transitions to be added to the current state.
+	      HfstTransitions new_transitions;
+
+	      // Go through all transitions.
+              for (unsigned int i=0; i < it->size(); i++)
+                {
+		  HfstTransition<C> &tr_it = it->operator[](i);
+
+		  HfstSymbolPair transition_symbol_pair
+		    (tr_it.get_input_symbol(),
+		     tr_it.get_output_symbol());
+		  HfstSymbolPairSet substituting_transitions;
+		  
+		  // If a substitution is to be performed,
+		  if ((*func)(transition_symbol_pair, 
+			      substituting_transitions))
+		    {		   
 		      // change the transition to the first element
-		      // in new_sp
-		      typename std::set<HfstSymbolPair>::const_iterator IT 
-			= new_sp.begin();
+		      // in new_sps
+		      typename HfstSymbolPairSet::const_iterator IT 
+			= substituting_transitions.begin();
+
+		      if (not C::is_valid_symbol(IT->first) ||
+			  not C::is_valid_symbol(IT->second) )
+			HFST_THROW_MESSAGE
+			  (EmptyStringException,
+			   "HfstTransitionGraph::substitute");
 		      
 		      HfstTransition<C> tr
 			(tr_it.get_target_state(),
@@ -1120,153 +992,50 @@ namespace hfst {
 		      
 		      it->operator[](i) = tr;
 
-		      // and schedule the rest of the elements in new_sp
-		      // to be added to this state
-		      while (IT != new_sp.end())
+		      add_symbol_to_alphabet(IT->first);
+		      add_symbol_to_alphabet(IT->second);
+
+		      // and schedule the rest of the elements in new_sps
+		      // to be added to this state.
+		      while (IT != substituting_transitions.end())
 			{
+			  
+			  if (not C::is_valid_symbol(IT->first) ||
+			      not C::is_valid_symbol(IT->second) )
+			    HFST_THROW_MESSAGE
+			      (EmptyStringException,
+			       "HfstTransitionGraph::substitute");
+			  
 			  HfstTransition<C> TR
 			    (tr_it.get_target_state(),
 			     IT->first,
 			     IT->second,
 			     tr_it.get_weight());
-
+			  
 			  new_transitions.push_back(TR);
+			  
+			  add_symbol_to_alphabet(IT->first);
+			  add_symbol_to_alphabet(IT->second);
 			  
 			  IT++;
 			}
-		    }		  
-		} // all transitions gone through
 
-	      // add the new transitions
-	      for (typename std::vector<HfstTransition<C> >
+		    } // Substitution and scheduling performed.	  
+
+		} // All transitions gone through.
+
+	      // Add the new transitions.
+	      for (typename HfstTransitions
 		     ::const_iterator NIT = new_transitions.begin();
 		   NIT != new_transitions.end(); NIT++)
 		{
 		  it->push_back(*NIT);
 		}
 
-	    } // all states gone through
-
-	  if (substitution_performed)
-	    {
-	      for (typename std::set<HfstSymbolPair>::const_iterator It 
-		     = new_sp.begin();
-		   It != new_sp.end(); It++)
-		{
-		  add_symbol_to_alphabet(It->first);
-		  add_symbol_to_alphabet(It->second);
-		}
-	    }
-
+	    } // ----- All states gone through. -----
+	  
 	  return;
 	}
-
-
-        /* ------------------------------------------------------------
-           A function used by the public substitution functions. 
-           Substitute all transitions according to substituter \a subs. 
-           ------------------------------------------------------------ */
-        void substitute(substituter &subs) { 
-
-          // Go through all states
-          for (iterator it = begin(); it != end(); it++)
-            {
-              // The transitions that are substituted, i.e. removed
-              std::vector<typename HfstTransitions::iterator> 
-                old_transitions;
-              // The substituting transitions that are added
-              HfstTransitions new_transitions;
-
-              // Go through all transitions
-              for (typename HfstTransitions::iterator tr_it
-                     = it->begin();
-                   tr_it != it->end(); tr_it++)
-                {
-                  C data = tr_it->get_transition_data();
-
-                  // Whether there is anything to substitute 
-                  // in this transition
-                  StringPair sp(data.get_input_symbol(), 
-                                data.get_output_symbol());
-                  StringPairSet sps;
-
-                  // Find out whether there is a need to substitute
-                  // and which are the substituting transitions
-                  bool substitution_made = 
-                    subs.substitute(sp, sps);
-
-                  // If there is something to substitute,
-                  if (substitution_made) {
-
-                    // schedule the new transitions to be added
-                    for (StringPairSet::const_iterator sps_it = sps.begin();
-                         sps_it != sps.end(); sps_it++)
-                      {
-                        HfstTransition <C> new_transition
-                          (tr_it->get_target_state(),
-                           sps_it->first,
-                           sps_it->second,
-                           data.get_weight());
-
-			add_symbol_to_alphabet(sps_it->first);
-			add_symbol_to_alphabet(sps_it->second);
-                        
-                        new_transitions.push_back(new_transition);
-			
-			/*fprintf(stderr, "adding transition %i %i %s %s\n",
-				it->first,
-				new_transition.get_target_state(),
-				new_transition.get_input_symbol().c_str(),
-				new_transition.get_output_symbol().c_str());*/
-
-                      }
-
-                    // and the old transition to be deleted
-                    old_transitions.push_back(tr_it);
-                  }
-		  else 
-		    { // DEBUG
-		      /*fprintf
-			(stderr, "keeping transition %i %i %s %s\n",
-			 it->first,
-			 tr_it->get_target_state(),
-			 data.get_input_symbol().c_str(),
-			 data.get_output_symbol().c_str());*/ 
-		    }
-
-                  // (one transition gone through)
-                }
-              // (all transitions in a state gone through)
-
-	      //fprintf(stderr, "all transitions in a state gone through:\n");
-	      //this->write_in_att_format(stderr, true);
-
-              // Remove the substituted transitions
-              for (int i = (int)old_transitions.size()-1; 
-		   i >= 0; i--) {
-
-		/*fprintf(stderr, "removing transition %i %i %s %s\n", // DEBUG
-			it->first,
-			old_transitions.at(i)->get_target_state(),
-			old_transitions.at(i)->get_input_symbol().c_str(),
-			old_transitions.at(i)->get_output_symbol().c_str());*/
-
-                it->erase(old_transitions.at(i));
-              }
-
-              // and add the substituting transitions
-              for (typename HfstTransitions::iterator IT 
-                     = new_transitions.begin();
-                   IT != new_transitions.end(); IT++) {
-                it->push_back(*IT);
-              }
-
-              // (all transitions in a state substituted)
-            }
-          // (all states handled)
-
-        }
-
 
       public:
 
@@ -1285,12 +1054,11 @@ namespace hfst {
                      bool input_side=true, 
                      bool output_side=true) {
 
-	  /*
-	  if (old_symbol == "" || new_symbol == "")
+	  if (not C::is_valid_symbol(old_symbol) || 
+	      not C::is_valid_symbol(new_symbol) ) {
 	    HFST_THROW_MESSAGE
 	      (EmptyStringException,
-	       "HfstTransitionGraph::substitute");
-	  */
+	       "HfstTransitionGraph::substitute"); }
 
           // If a symbol is substituted with itself, do nothing.
           if (old_symbol == new_symbol)
@@ -1311,15 +1079,6 @@ namespace hfst {
           // Insert the substituting symbol to the alphabet.
           alphabet.insert(new_symbol);
 
-	  /*
-          // Create a substituter
-          substituter subs
-            (old_symbol, new_symbol,
-             input_side, output_side);
-          // and perform the substitutions
-          substitute(subs);
-	  */
-
 	  substitute_(old_symbol, new_symbol, input_side, output_side);
 
           return *this;
@@ -1328,27 +1087,24 @@ namespace hfst {
         /** @brief Substitute all transitions \a sp with a set of transitions
             \a sps. */
         HfstTransitionGraph &substitute
-          (const StringPair &sp, const StringPairSet &sps) 
+          (const HfstSymbolPair &sp, const HfstSymbolPairSet &sps) 
 	  {
-	    if (sp.first == "" || sp.second == "")
+	    if (not C::is_valid_symbol(sp.first) || 
+		not C::is_valid_symbol(sp.second) ) {
 	      HFST_THROW_MESSAGE
 		(EmptyStringException,
-		 "HfstTransitionGraph::substitute");
-	    for (StringPairSet::const_iterator it = sps.begin();
+		 "HfstTransitionGraph::substitute"); }
+
+	    for (typename HfstSymbolPairSet::const_iterator it = sps.begin();
 		 it != sps.end(); it++)
 	      {
-		if (it->first == "" || it->second == "")
+		if (not C::is_valid_symbol(it->first) || 
+		    not C::is_valid_symbol(it->second) ) {
 		  HFST_THROW_MESSAGE
 		    (EmptyStringException,
-		     "HfstTransitionGraph::substitute");
+		     "HfstTransitionGraph::substitute"); }
 	      }
-
-	  /*std::string msg("HfstTransitionGraph &substitute"
-			  "(const StringPair &sp, const StringPairSet &sps) ");
-			  HFST_THROW_MESSAGE(FunctionNotImplementedException, msg);*/
-          //substituter subs(sp, sps);
-          //substitute(subs);
-
+	    
 	    substitute_(sp, sps);
 
           return *this;
@@ -1357,16 +1113,20 @@ namespace hfst {
         /** @brief Substitute all transitions \a old_pair with 
             \a new_pair. */
         HfstTransitionGraph &substitute
-          (const StringPair &old_pair, 
-           const StringPair &new_pair) 
+          (const HfstSymbolPair &old_pair, 
+           const HfstSymbolPair &new_pair) 
         {
-	  if (old_pair.first == "" || new_pair.first == "" ||
-	      old_pair.second == "" || new_pair.second == "")
+	  if (not C::is_valid_symbol(old_pair.first) || 
+	      not C::is_valid_symbol(new_pair.first) ||
+	      not C::is_valid_symbol(old_pair.second) || 
+	      not C::is_valid_symbol(new_pair.second) ) {
 	    HFST_THROW_MESSAGE
 	      (EmptyStringException,
-	       "HfstTransitionGraph::substitute");
+	       "HfstTransitionGraph::substitute"); }
 
-          substitute_(old_pair, new_pair);
+	  StringPairSet new_pair_set;
+	  new_pair_set.insert(new_pair);
+	  substitute_(old_pair, new_pair_set);
 	
           return *this;
         } 
@@ -1381,16 +1141,9 @@ namespace hfst {
             whether any transition was inserted into \a sps. */
         HfstTransitionGraph &
           substitute(bool (*func)
-                     (const StringPair &sp, StringPairSet &sps) ) 
+                     (const HfstSymbolPair &sp, HfstSymbolPairSet &sps) ) 
         { 
-	  /*std::string msg("HfstTransitionGraph &substitute"
-			            "substitute(bool (*func)"
-                     "(const StringPair &sp, StringPairSet &sps) )" );
-		     HFST_THROW_MESSAGE(FunctionNotImplementedException, msg);*/
-
-          substituter subs(func);
-          substitute(subs);
-
+	  substitute_(func);
           return *this;
         }
 
