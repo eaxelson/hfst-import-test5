@@ -1,3 +1,9 @@
+#ifndef _HFST_TRANSITION_H_
+#define _HFST_TRANSITION_H_
+
+/** @file HfstTransition.h 
+    @brief Class HfstTransition */
+
 #include "../HfstDataTypes.h"
 
 namespace hfst {
@@ -114,3 +120,5 @@ namespace hfst {
   }
 
 }
+
+#endif // _HFST_TRANSITION_H_
