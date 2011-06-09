@@ -256,115 +256,6 @@ void HfstTransducer::harmonize(HfstTransducer &another)
 	break;
       }
 #endif
-
-#ifdef FOO
-
-#if HAVE_SFST
-    case (SFST_TYPE):
-      try {
-	std::pair <SFST::Transducer*, SFST::Transducer*> result;
-	if ( harmonize_smaller && 
-	     sfst_interface.number_of_states(this->implementation.sfst) >
-	     sfst_interface.number_of_states(another.implementation.sfst) ) {
-            result =
-		sfst_interface.harmonize(another.implementation.sfst,
-					 this->implementation.sfst,
-					 unknown_symbols_in_use);
-            this->implementation.sfst = result.second;
-            another.implementation.sfst = result.first;
-	}
-	else {
-            result =
-		sfst_interface.harmonize(this->implementation.sfst,
-					 another.implementation.sfst,
-					 unknown_symbols_in_use);
-            this->implementation.sfst = result.first;
-            another.implementation.sfst = result.second;
-	}
-      } catch (char *msg) {
-	HFST_THROW_MESSAGE(HfstFatalException, std::string(msg));
-      }
-      break;
-
-#endif
-#if HAVE_OPENFST
-    case (TROPICAL_OPENFST_TYPE):
-    {
-	std::pair <fst::StdVectorFst*, fst::StdVectorFst*> result;
-
-	if ( harmonize_smaller && 
-	     tropical_ofst_interface.number_of_states
-	     (this->implementation.tropical_ofst) >
-	     tropical_ofst_interface.number_of_states
-	     (another.implementation.tropical_ofst) ) {
-            result =
-		tropical_ofst_interface.harmonize
-                (another.implementation.tropical_ofst,
-                 this->implementation.tropical_ofst,
-                 unknown_symbols_in_use);          
-            if (unknown_symbols_in_use) {  // new transducers are created
-		delete another.implementation.tropical_ofst;
-		delete this->implementation.tropical_ofst; 
-            }
-            this->implementation.tropical_ofst = result.second;
-            another.implementation.tropical_ofst = result.first;
-	}
-	else {
-            result =
-		tropical_ofst_interface.harmonize
-                (this->implementation.tropical_ofst,
-                 another.implementation.tropical_ofst,
-                 unknown_symbols_in_use);          
-            if (unknown_symbols_in_use) {  // new transducers are created
-		delete another.implementation.tropical_ofst;
-		delete this->implementation.tropical_ofst; 
-            }
-            this->implementation.tropical_ofst = result.first;
-            another.implementation.tropical_ofst = result.second;
-	}
-	break;
-    }
-    case (LOG_OPENFST_TYPE):
-    {
-	std::pair <hfst::implementations::LogFst*, 
-            hfst::implementations::LogFst*> result;
-
-	if ( harmonize_smaller && 
-	     log_ofst_interface.number_of_states
-	     (this->implementation.log_ofst) >
-	     log_ofst_interface.number_of_states
-	     (another.implementation.log_ofst) ) {
-            result =
-		log_ofst_interface.harmonize
-                (another.implementation.log_ofst,
-                 this->implementation.log_ofst,
-                 unknown_symbols_in_use);          
-            if (unknown_symbols_in_use) {  // new transducers are created
-		delete another.implementation.log_ofst;
-		delete this->implementation.log_ofst; 
-            }
-            this->implementation.log_ofst = result.second;
-            another.implementation.log_ofst = result.first;
-	}
-	else {
-            result =
-		log_ofst_interface.harmonize
-                (this->implementation.log_ofst,
-                 another.implementation.log_ofst,
-                 unknown_symbols_in_use);          
-            if (unknown_symbols_in_use) {  // new transducers are created
-		delete another.implementation.log_ofst;
-		delete this->implementation.log_ofst; 
-            }
-            this->implementation.log_ofst = result.first;
-            another.implementation.log_ofst = result.second;
-	}
-	break;
-    }
-#endif
-
-#endif // FOO
-
     case (ERROR_TYPE):
     default:
         HFST_THROW(TransducerHasWrongTypeException);
@@ -865,7 +756,7 @@ HfstTransducer::HfstTransducer
 #if HAVE_OPENFST
     case TROPICAL_OPENFST_TYPE:
         implementation.tropical_ofst = 
-	  ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(&net); // FAIL
+	  ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(&net);
         break;
     case LOG_OPENFST_TYPE:
         implementation.log_ofst = 
@@ -2186,48 +2077,15 @@ HfstTransducer &HfstTransducer::compose
 	HFST_THROW_MESSAGE(HfstTransducerTypeMismatchException,
 			   "HfstTransducer::compose");
 
-    bool DEBUG=false;
-
-    if (DEBUG)
-      {
-	this->write_in_att_format(stderr);
-	fprintf(stderr, "--\n");
-	another.write_in_att_format(stderr);
-	fprintf(stderr, "This alphabet: ");
-	this->print_alphabet();
-	fprintf(stderr, "Another alphabet: ");
-	const_cast<HfstTransducer&>(another).print_alphabet();
-      }
-
-    if (DEBUG)
-      {
-	this->write_in_att_format(stderr);
-	fprintf(stderr, "--\n");
-	another.write_in_att_format(stderr);
-	fprintf(stderr, "This alphabet: ");
-	this->print_alphabet();
-	fprintf(stderr, "Another alphabet: ");
-	const_cast<HfstTransducer&>(another).print_alphabet();
-      }
-
-    if (DEBUG) fprintf(stderr, "harmonizing for composition..\n");
     this->harmonize(const_cast<HfstTransducer&>(another));
-
-    
-    if (DEBUG) fprintf(stderr,"..done\n");
-
 
     // Handle special symbols here.
     if ( (this->type != FOMA_TYPE) && unknown_symbols_in_use) 
     {
-        if (DEBUG) fprintf(stderr,"substituting for composition..\n");
-
         // comment...
         this->substitute("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",false,true);
         (const_cast<HfstTransducer&>(another)).substitute
 	    ("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",true,false);
-
-        if (DEBUG) fprintf(stderr,"..done:\n");
     }
     
     switch (this->type)
@@ -2281,34 +2139,12 @@ HfstTransducer &HfstTransducer::compose
         HFST_THROW(FunctionNotImplementedException);
     }
 
-    /*fprintf(stderr, "after composition:\n");
-      this->write_in_att_format(stderr);
-      fprintf(stderr, "--\n");
-      another.write_in_att_format(stderr);
-      fprintf(stderr, "\n");*/
-
     if ( (this->type != FOMA_TYPE) && unknown_symbols_in_use) 
     {
-        if (DEBUG) fprintf(stderr,"substituting after composition..\n");
-
-	/*	if (DEBUG) {
-	  this->write_in_att_format(stderr);
-	  fprintf(stderr, "--\n");
-	  another.write_in_att_format(stderr);
-	  }*/
-
         // comment...
         this->substitute(&substitute_single_identity_with_the_other_symbol);
         (const_cast<HfstTransducer&>(another)).
 	    substitute(&substitute_unknown_identity_pairs);
-
-        if (DEBUG) fprintf(stderr,"..done\n");
-	
-	/*if (DEBUG) {
-	  this->write_in_att_format(stderr);
-	  fprintf(stderr, "--\n");
-	  another.write_in_att_format(stderr);
-	  }*/
     }
 
     return *this;

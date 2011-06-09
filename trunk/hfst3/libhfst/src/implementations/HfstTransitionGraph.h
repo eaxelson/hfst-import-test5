@@ -1,6 +1,9 @@
 #ifndef _HFST_TRANSITION_GRAPH_H_
 #define _HFST_TRANSITION_GRAPH_H_
 
+/** @file HfstTransitionGraph.h
+    @brief Class HfstTransitionGraph */
+
 #include <cstdio>
 #include <string>
 #include <set>
@@ -17,10 +20,6 @@
 #include "HfstTropicalTransducerTransitionData.h"
 #include "HfstFastTransitionData.h"
 
-
-/** @file HfstTransitionGraph.h
-    @brief Declaration of classes needed by HFST's 
-    own simple transducer format. */
 
 namespace hfst {
 
@@ -103,13 +102,21 @@ namespace hfst {
        @see #HfstBasicTransducer HfstBasicTransition */
     template <class C> class HfstTransitionGraph 
       {
+	
+	// --- Datatypes and variables ---
+
       public:
         /** @brief Datatype for the states of a transition in a graph. */
         typedef std::vector<HfstTransition<C> > HfstTransitions;
 
-	typedef std::pair<typename C::SymbolType, typename C::SymbolType> 
+	/** @brief Datatype for a symbol in a transition. */
+	typedef typename C::SymbolType HfstSymbol;
+	/** @brief Datatype for a symbol pair in a transition. */
+	typedef std::pair<HfstSymbol, HfstSymbol> 
 	  HfstSymbolPair; 
+	/** @brief A set of symbol pairs. */
 	typedef std::set<HfstSymbolPair> HfstSymbolPairSet;
+	/** @brief A vector of symbol pairs. */
 	typedef std::vector<HfstSymbolPair> HfstSymbolPairVector;
 
       protected:
@@ -126,7 +133,7 @@ namespace hfst {
         FinalWeightMap final_weight_map;
 
 	/* Datatype for the alphabet of a graph. */
-        typedef std::set<typename C::SymbolType> HfstTransitionGraphAlphabet;
+        typedef std::set<HfstSymbol> HfstTransitionGraphAlphabet;
 	/* The alphabet of the graph. */
         HfstTransitionGraphAlphabet alphabet;
 
@@ -140,6 +147,23 @@ namespace hfst {
             The value pointed by the iterator is of type HfstTransitions. */
         typedef typename HfstStates::const_iterator const_iterator;
 
+	/** @brief An HfstTransitionGraph with transitions of type 
+	    HfstTropicalTransducerTransitionData and weight type float.
+	    
+	    This is probably the most useful kind of HfstTransitionGraph. */
+	typedef HfstTransitionGraph <HfstTropicalTransducerTransitionData> 
+	  HfstBasicTransducer;
+	
+	/** @brief A specialization for faster conversion. */
+	typedef HfstTransitionGraph <HfstFastTransitionData> 
+	  HfstFastTransducer;
+
+
+
+	// --------------------------------------------------------
+	// --- Construction, assignment, copying and conversion ---
+	// --------------------------------------------------------
+
         /** @brief Create a graph with one initial state that has state number
             zero and is not a final state, i.e. create an empty graph. */
         HfstTransitionGraph(void) {
@@ -148,7 +172,7 @@ namespace hfst {
           state_vector.push_back(tr);
         }
 
-	// The default operator= is maybe enough..
+	/** @brief The assignment operator. */
 	HfstTransitionGraph &operator=(const HfstTransitionGraph &graph)
 	  {
 	    if (this == &graph)
@@ -156,7 +180,7 @@ namespace hfst {
 	    state_vector = graph.state_vector;
 	    final_weight_map = graph.final_weight_map;
 	    alphabet = graph.alphabet;
-	    assert(alphabet.count(typename C::SymbolType()) == 0);
+	    assert(alphabet.count(HfstSymbol()) == 0);
 	    return *this;
 	  }
 
@@ -165,7 +189,7 @@ namespace hfst {
           state_vector = graph.state_vector;
           final_weight_map = graph.final_weight_map;
           alphabet = graph.alphabet;
-	  assert(alphabet.count(typename C::SymbolType()) == 0);
+	  assert(alphabet.count(HfstSymbol()) == 0);
         }
 
         /** @brief Create an HfstTransitionGraph equivalent to HfstTransducer 
@@ -180,6 +204,12 @@ namespace hfst {
           delete fsm;
         }
 
+
+	// --------------------------------------------------
+	// --- Initialization, optimization and debugging ---
+	// --------------------------------------------------
+
+      protected:
 	/* Add epsilon, unknown and identity symbols to the alphabet 
 	   \a alpha. */
 	void initialize_alphabet(HfstTransitionGraphAlphabet &alpha) {
@@ -188,28 +218,7 @@ namespace hfst {
 	  alpha.insert(C::get_identity());
 	}
 
-        /** @brief Explicitly add \a symbol to the alphabet of the graph.
-
-            @note Usually the user does not have to take care of the alphabet
-            of a graph. This function can be useful in some special cases. */
-        void add_symbol_to_alphabet(const typename C::SymbolType &symbol) {
-          alphabet.insert(symbol);
-        }
-
-	/** @brief Same as add_symbol_to_alphabet for each symbol in
-	    \a symbols. */
-	void add_symbols_to_alphabet(const HfstSymbolPairSet &symbols)
-	{
-	  for (typename HfstSymbolPairSet::const_iterator it = symbols.begin();
-	       it != symbols.end(); it++)
-	    {
-	      alphabet.insert(it->first);
-	      alphabet.insert(it->second);
-	    }
-	}
-
-	/* For bug fixing: 
-	   Check that all symbols that occur in the transitions of the graph
+	/* Check that all symbols that occur in the transitions of the graph
 	   are also in the alphabet. */
 	bool check_alphabet() 
 	{
@@ -222,18 +231,79 @@ namespace hfst {
                   C data = tr_it->get_transition_data();
                   
                   if(alphabet.find(data.get_input_symbol()) 
-		     == alphabet.end()) 
-		    {
-		      return false;
-		    }
+		     == alphabet.end()) {
+		    return false;
+		  }
                   if(alphabet.find(data.get_output_symbol()) 
-		     == alphabet.end()) 
-		    {
-		      return false;
-		    }
+		     == alphabet.end()) {
+		    return false;
+		  }
                 }
             }
 	  return true;
+	}
+
+	/* Print the alphabet of the graph to standard error stream. */
+	void print_alphabet() const 
+	{
+	  for (typename HfstTransitionGraphAlphabet::const_iterator it 
+		 = alphabet.begin(); it != alphabet.end(); it++)
+	    {
+	      if (it != alphabet.begin())
+		std::cerr << ", ";
+	      std::cerr << *it;
+	    }
+	  std::cerr << std::endl;
+	}
+
+	/* Get the number of the \a symbol. */
+	unsigned int get_symbol_number
+	  (const HfstSymbol &symbol) const {
+	  return C::get_number(symbol);
+	}
+
+	/* For internal optimization: Reserve space for 
+	   \a number_of_states states. */
+	void initialize_state_vector
+	  (unsigned int number_of_states)
+	{
+	  state_vector.reserve(number_of_states);
+	}
+
+	/* For internal optimization: Reserve space for
+	   \a number_of_transitions transitions for state number 
+	   \a state_number. */
+	void initialize_transition_vector
+	  (unsigned int state_number, unsigned int number_of_transitions)
+	{
+	  add_state(state_number);
+	  state_vector[state_number].reserve(number_of_transitions);
+	}
+
+
+	// -----------------------------------
+	// ---------- The alphabet -----------
+	// -----------------------------------
+
+      public:
+        /** @brief Explicitly add \a symbol to the alphabet of the graph.
+
+            @note Usually the user does not have to take care of the alphabet
+            of a graph. This function can be useful in some special cases. */
+        void add_symbol_to_alphabet(const HfstSymbol &symbol) {
+          alphabet.insert(symbol);
+        }
+
+	/** @brief Same as #add_symbol_to_alphabet for each symbol in
+	    \a symbols. */
+	void add_symbols_to_alphabet(const HfstSymbolPairSet &symbols)
+	{
+	  for (typename HfstSymbolPairSet::const_iterator it = symbols.begin();
+	       it != symbols.end(); it++)
+	    {
+	      alphabet.insert(it->first);
+	      alphabet.insert(it->second);
+	    }
 	}
 
         /** @brief Remove all symbols that do not occur in transitions of
@@ -283,35 +353,21 @@ namespace hfst {
             }
         }
 
-        /** @brief Get the set of SymbolTypes in the alphabet 
+        /** @brief Get the set of HfstSymbols in the alphabet 
             of the graph. 
-
-            The SymbolTypes do not necessarily occur in any transitions
+	    
+            The HfstSymbols do not necessarily occur in any transitions
             of the graph. Epsilon, unknown and identity \link 
             hfst::String symbols\endlink are always included in the alphabet. */
         const HfstTransitionGraphAlphabet &get_alphabet() const {
           return alphabet;
         }
 
-	/* For bug fixing: print the alphabet of the graph 
-	   to standard error stream. */
-	void print_alphabet() const 
-	{
-	  for (typename HfstTransitionGraphAlphabet::const_iterator it 
-		 = alphabet.begin(); it != alphabet.end(); it++)
-	    {
-	      if (it != alphabet.begin())
-		std::cerr << ", ";
-	      std::cerr << *it;
-	    }
-	  std::cerr << std::endl;
-	}
 
-	/* For bug fixing: Get the number of the SymbolType \a symbol. */
-	unsigned int get_symbol_number
-	  (const typename C::SymbolType &symbol) const {
-	  return C::get_number(symbol);
-	}
+
+	// ----------------------------------------------------------------
+	// --- Adding states and transitions and iterating through them ---
+	// ----------------------------------------------------------------
 
         /** @brief Add a new state to this graph and return its number.
 	    
@@ -339,24 +395,6 @@ namespace hfst {
 	/** @brief Get the biggest state number in use. */
 	HfstState get_max_state() const {
 	  return state_vector.size()-1;
-	}
-
-	/* For internal optimization: Reserve space for 
-	   \a number_of_states states. */
-	void initialize_state_vector
-	  (unsigned int number_of_states)
-	{
-	  state_vector.reserve(number_of_states);
-	}
-
-	/* For internal optimization: Reserve space for
-	   \a number_of_transitions transitions for state number 
-	   \a state_number. */
-	void initialize_transition_vector
-	  (unsigned int state_number, unsigned int number_of_transitions)
-	{
-	  add_state(state_number);
-	  state_vector[state_number].reserve(number_of_transitions);
 	}
 
         /** @brief Add a transition \a transition to state \a s. 
@@ -395,6 +433,21 @@ namespace hfst {
 	  add_state(s);
           final_weight_map[s] = weight;
         }
+	
+        /** @brief Sort the arcs of this transducer according to input and
+            output symbols. */
+        HfstTransitionGraph &sort_arcs(void)
+	  {
+	    for (typename HfstStates::iterator it = state_vector.begin();
+		 it != state_vector.end();
+		 ++it)
+	      {
+		HfstTransitions &transitions = *it;
+		std::sort<typename HfstTransitions::iterator>
+		  (transitions.begin(),transitions.end());
+	      }
+	    return *this;
+	  }
 
         /** @brief Get an iterator to the beginning of the states in 
             the graph. 
@@ -427,11 +480,17 @@ namespace hfst {
           return state_vector[s];
         }        
 
+
+	// --------------------------------------------------
+	// -----   Reading and writing in AT&T format   -----
+	// --------------------------------------------------
+
+      protected:
         /* TODO: Change state numbers s1 to s2 and vice versa. */
         void swap_state_numbers(HfstState /*s1*/, HfstState /*s2*/) {
           HFST_THROW(FunctionNotImplementedException);
         }
-
+	
         /* Replace all strings \a str1 in \a symbol with \a str2. */
         static std::string replace_all(std::string symbol, 
                            const std::string &str1,
@@ -448,11 +507,7 @@ namespace hfst {
           return symbol;
         }
 
-
-	// --------------------------------------------------
-	// -----   Reading and writing in AT&T format   -----
-	// --------------------------------------------------
-
+      public:
 
         /** @brief Write the graph in AT&T format to ostream \a os.
             \a write_weights defines whether weights are printed. */
@@ -682,24 +737,8 @@ namespace hfst {
           return read_in_att_format
             (std::cin /* a dummy variable */,
              file, epsilon_symbol);
-        }
+        }	
 
-
-        /** @brief Sort the arcs of this transducer according to input and
-            output symbols. */
-        HfstTransitionGraph &sort_arcs(void)
-	  {
-	    for (typename HfstStates::iterator it = state_vector.begin();
-		 it != state_vector.end();
-		 ++it)
-	      {
-		HfstTransitions &transitions = *it;
-		std::sort<typename HfstTransitions::iterator>
-		  (transitions.begin(),transitions.end());
-	      }
-	    return *this;
-	  }
-	
 
 	// ----------------------------------------------
 	// -----       Substitution functions       -----
@@ -709,8 +748,8 @@ namespace hfst {
 
 	/* A function that performs in-place-substitution in the graph. */
 
-	void substitute_(const typename C::SymbolType &old_symbol, 
-			 const typename C::SymbolType &new_symbol,
+	void substitute_(const HfstSymbol &old_symbol, 
+			 const HfstSymbol &new_symbol,
 			 bool input_side=true, 
 			 bool output_side=true)
 	{
@@ -724,9 +763,9 @@ namespace hfst {
 
 		  // The substituting input and output symbols for the 
 		  // current transition.
-		  typename C::SymbolType substituting_input_symbol
+		  HfstSymbol substituting_input_symbol
 		    = tr_it.get_input_symbol();
-		  typename C::SymbolType substituting_output_symbol
+		  HfstSymbol substituting_output_symbol
 		    = tr_it.get_output_symbol();
 
 		  // Whether a substitution will be performed.
@@ -941,8 +980,8 @@ namespace hfst {
 
             @todo Unknown and identity symbols must be handled correctly */
         HfstTransitionGraph &
-          substitute(const typename C::SymbolType &old_symbol, 
-                     const typename C::SymbolType  &new_symbol,
+          substitute(const HfstSymbol &old_symbol, 
+                     const HfstSymbol  &new_symbol,
                      bool input_side=true, 
                      bool output_side=true) {
 
@@ -1253,9 +1292,9 @@ namespace hfst {
         HfstTransitionGraph &insert_freely
           (const HfstTransitionGraph &graph)
           {
-	    typename C::SymbolType marker_this = C::get_marker(alphabet);
-	    typename C::SymbolType marker_graph = C::get_marker(alphabet);
-	    typename C::SymbolType marker = marker_this;
+	    HfstSymbol marker_this = C::get_marker(alphabet);
+	    HfstSymbol marker_graph = C::get_marker(alphabet);
+	    HfstSymbol marker = marker_this;
 	    if (marker_graph > marker)
 	      marker = marker_graph;
 
@@ -1416,21 +1455,11 @@ namespace hfst {
 /* 	    } */
 /* 	} */
         
+
+	// --- Friends ---
+
         friend class ConversionFunctions;
       };
-
-    /** @brief An HfstTransitionGraph with transitions of type 
-        HfstTropicalTransducerTransitionData and weight type float.
-        
-        This is probably the most useful kind of HfstTransitionGraph. */
-    typedef HfstTransitionGraph <HfstTropicalTransducerTransitionData> 
-      HfstBasicTransducer;
-
-    typedef HfstTransitionGraph <HfstFastTransitionData> 
-      HfstFastTransducer;
-
-    template <class C> class HfstSubstituteTransducer: 
-    public HfstTransitionGraph<C> { };
     
   }
    
