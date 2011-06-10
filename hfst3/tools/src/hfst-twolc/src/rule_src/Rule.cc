@@ -148,6 +148,21 @@ OtherSymbolTransducer Rule::get_center(const SymbolPairVector &v)
   return center;
 }
 
+OtherSymbolTransducer Rule::get_center
+(const OtherSymbolTransducer &restricted_center)
+{
+  OtherSymbolTransducer unknown(TWOLC_UNKNOWN);
+  unknown.apply(&HfstTransducer::repeat_star);
+  OtherSymbolTransducer diamond(TWOLC_DIAMOND);
+  OtherSymbolTransducer center(unknown);
+   center.
+     apply(&HfstTransducer::concatenate,diamond).
+     apply(&HfstTransducer::concatenate,restricted_center).
+     apply(&HfstTransducer::concatenate,diamond).
+     apply(&HfstTransducer::concatenate,unknown);  
+   return center;
+}
+
 void Rule::add_missing_symbols_freely(const SymbolRange &diacritics)
 {
   std::set<std::string> symbol_set = 

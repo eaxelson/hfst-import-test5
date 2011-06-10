@@ -245,9 +245,28 @@ in/{RESERVED_SYMBOL} { return IN; }
 }
 \] {
   // End of a bracketed regex.
+  //
+  // For some bizarre reason flex will print the [[ only if the latter [ is
+  // escaped.
   symbol_queue.push_back("__HFST_TWOLC_]"); 
   reduce_queue();
   return RIGHT_SQUARE_BRACKET; 
+}
+\[\[ {
+  // Beginning of a bracketed regex.
+  //
+  // For some bizarre reason [[ can't occur in the string-literal here...
+  symbol_queue.push_back("__HFST_TWOLC_[" "["); 
+  reduce_queue();
+  return RE_LEFT_SQUARE_BRACKET; 
+}
+\]\] {
+  // End of a bracketed regex.
+  //
+  // For some bizarre reason ]] can't occur in the string-literal here...
+  symbol_queue.push_back("__HFST_TWOLC_]" "]"); 
+  reduce_queue();
+  return RE_RIGHT_SQUARE_BRACKET; 
 }
 \{ {
   // Beginning of a bracketed regex.
@@ -303,6 +322,30 @@ in/{RESERVED_SYMBOL} { return IN; }
   symbol_queue.push_back("__HFST_TWOLC_<=>"); 
   reduce_queue();
   return LEFT_RIGHT_ARROW; 
+}
+[/][<][=][=] {
+  // Restriction regular expression rule operator.
+  symbol_queue.push_back("__HFST_TWOLC_/<=="); 
+  reduce_queue();
+  return RE_LEFT_RESTRICTION_ARROW; 
+}
+[<][=][=] {
+  // Left regular expression rule operator.
+  symbol_queue.push_back("__HFST_TWOLC_<=="); 
+  reduce_queue();
+  return RE_LEFT_ARROW; 
+}
+[=][=][>] {
+  // Right regular expression rule operator.
+  symbol_queue.push_back("__HFST_TWOLC_==>"); 
+  reduce_queue();
+  return RE_RIGHT_ARROW; 
+}
+[<][=][=][>] {
+  // Equivalence regular expression rule operator.
+  symbol_queue.push_back("__HFST_TWOLC_<==>"); 
+  reduce_queue();
+  return RE_LEFT_RIGHT_ARROW; 
 }
 [:]/{RESERVED_EXC_PERC_AND_Q_MARK} {
   // Pair separator in expressions like "[a:]".

@@ -33,7 +33,16 @@
 namespace op
 {
   enum OPERATOR
-  { RIGHT, LEFT, NOT_LEFT, LEFT_RIGHT };
+  { 
+    RIGHT, 
+    LEFT, 
+    NOT_LEFT, 
+    LEFT_RIGHT, 
+    RE_RIGHT, 
+    RE_LEFT, 
+    RE_NOT_LEFT, 
+    RE_LEFT_RIGHT 
+  };
 }
 
 class TwolCGrammar
@@ -60,6 +69,10 @@ class TwolCGrammar
   void define_diacritics(const SymbolRange &diacritics);
   void add_rule(const std::string &name,
 		const SymbolPair &center,
+		op::OPERATOR oper,
+		const OtherSymbolTransducerVector contexts);
+  void add_rule(const std::string &name,
+		const OtherSymbolTransducer &center,
 		op::OPERATOR oper,
 		const OtherSymbolTransducerVector contexts);
   void add_rule(const std::string &name,
