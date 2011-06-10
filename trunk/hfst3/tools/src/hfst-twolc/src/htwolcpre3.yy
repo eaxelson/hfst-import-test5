@@ -106,6 +106,14 @@
 %token <symbol_number> LEFT_RESTRICTION_ARROW LEFT_ARROW RIGHT_ARROW 
 %token <symbol_number> LEFT_RIGHT_ARROW
 
+ /* Twolc regular expression rule operators */
+%token <symbol_number> RE_LEFT_RESTRICTION_ARROW RE_LEFT_ARROW RE_RIGHT_ARROW 
+%token <symbol_number> RE_LEFT_RIGHT_ARROW
+
+ /* Twolc regular expression rule center brackets. */
+%right <symbol_number> RE_RIGHT_SQUARE_BRACKET
+%left  <symbol_number> RE_LEFT_SQUARE_BRACKET
+
  /* Basic tokens. */
 %token <symbol_number>  ALPHABET_DECLARATION DIACRITICS_DECLARATION 
 %token <symbol_number>  SETS_DECLARATION DEFINITION_DECLARATION
@@ -114,10 +122,11 @@
 %token <value>          RULE_NAME SYMBOL DEFINITION_NAME NUMBER NUMBER_RANGE
 
 %type<regular_expression> PAIR REGULAR_EXPRESSION RE_LIST RE RULE_CONTEXT
+%type<regular_expression> RE_RULE_CENTER
 %type<regular_expression> RULE_CONTEXTS;
 %type<symbol_range>       SYMBOL_LIST 
 %type<symbol_pair_range>  CENTER_PAIR CENTER_LIST RULE_CENTER
-%type<rule_operator>      RULE_OPERATOR
+%type<rule_operator>      RULE_OPERATOR RE_RULE_OPERATOR
 %type<value>              CENTER_SYMBOL PAIR_SYMBOL
 
 %%
@@ -160,6 +169,13 @@ RULE: RULE_NAME RULE_CENTER RULE_OPERATOR RULE_CONTEXTS
   delete $2;
   delete $4;
 }
+| RULE_NAME RE_RULE_CENTER RE_RULE_OPERATOR RULE_CONTEXTS
+{
+  grammar->add_rule($1,*$2,$3,OtherSymbolTransducerVector(1,*$4));
+  free($1);
+  delete $2;
+  delete $4;
+}
 
 RULE_CENTER: CENTER_PAIR
 { $$ = $1; }
@@ -170,6 +186,9 @@ RULE_CENTER: CENTER_PAIR
   delete $3;
 }
 | LEFT_SQUARE_BRACKET CENTER_LIST RIGHT_SQUARE_BRACKET
+{ $$ = $2; }
+
+RE_RULE_CENTER: RE_LEFT_SQUARE_BRACKET REGULAR_EXPRESSION RE_RIGHT_SQUARE_BRACKET
 { $$ = $2; }
 
 CENTER_LIST: CENTER_PAIR
@@ -198,6 +217,15 @@ RULE_OPERATOR:LEFT_ARROW
 { $$ = op::NOT_LEFT; }
 | LEFT_RIGHT_ARROW
 { $$ = op::LEFT_RIGHT; }
+
+RE_RULE_OPERATOR: RE_LEFT_ARROW
+{ $$ = op::RE_LEFT; }
+| RE_RIGHT_ARROW
+{ $$ = op::RE_RIGHT; }
+| RE_LEFT_RESTRICTION_ARROW
+{ $$ = op::RE_NOT_LEFT; }
+| RE_LEFT_RIGHT_ARROW
+{ $$ = op::RE_LEFT_RIGHT; }
 
 RULE_CONTEXTS: /* empty */
 { $$ = new OtherSymbolTransducer(); }

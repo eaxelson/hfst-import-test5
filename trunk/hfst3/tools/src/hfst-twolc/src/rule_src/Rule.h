@@ -79,6 +79,9 @@ class Rule
 
   static OtherSymbolTransducer get_center(const SymbolPairVector &v);
 
+  static OtherSymbolTransducer get_center
+    (const OtherSymbolTransducer &restricted_center);
+
   //! Replace "__HFST_TWOLC_SPACE" with " " and replace 
   //! "__HFST_TWOLC_RULE_NAME=" with "".
   static std::string get_print_name(const std::string &s);

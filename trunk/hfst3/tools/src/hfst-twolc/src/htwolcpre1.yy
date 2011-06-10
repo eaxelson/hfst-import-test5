@@ -119,6 +119,14 @@
 %token <symbol_number> LEFT_RESTRICTION_ARROW LEFT_ARROW RIGHT_ARROW 
 %token <symbol_number> LEFT_RIGHT_ARROW
 
+ /* Twolc regular expression rule operators */
+%token <symbol_number> RE_LEFT_RESTRICTION_ARROW RE_LEFT_ARROW RE_RIGHT_ARROW 
+%token <symbol_number> RE_LEFT_RIGHT_ARROW
+
+ /* Twolc regular expression rule center brackets. */
+%right <symbol_number> RE_RIGHT_SQUARE_BRACKET
+%left  <symbol_number> RE_LEFT_SQUARE_BRACKET
+
  /* Basic tokens. */
 %token <symbol_number>  ALPHABET_DECLARATION DIACRITICS_DECLARATION 
 %token <symbol_number>  SETS_DECLARATION DEFINITION_DECLARATION
@@ -179,6 +187,15 @@ RULE: RULE_NAME_DECL RULE_CENTER RULE_OPERATOR RULE_CONTEXTS RULE_VARIABLES
   variable_value_map.clear();
   rule_variables.clear();
 }
+| RULE_NAME_DECL RE_RULE_CENTER RE_RULE_OPERATOR RULE_CONTEXTS 
+{ 
+  std::cout << rule_symbol_vector.replace_variables(); 
+
+  // Clear all containers, so that we'll be ready to handle the next rule.
+  rule_symbol_vector.clear();
+  variable_value_map.clear();
+  rule_variables.clear();
+}
 
 RULE_NAME_DECL: RULE_NAME
 { 
@@ -191,6 +208,8 @@ RULE_CENTER: ALPHABET_PAIR
 | LEFT_SQUARE_BRACKET CENTER_LIST RIGHT_SQUARE_BRACKET
 | LEFT_CURLY_BRACKET CENTER_LIST RIGHT_CURLY_BRACKET
 
+RE_RULE_CENTER: RE_LEFT_SQUARE_BRACKET REGULAR_EXPRESSION RE_RIGHT_SQUARE_BRACKET
+
 CENTER_LIST: ALPHABET_PAIR
 | CENTER_LIST UNION ALPHABET_PAIR
 
@@ -198,6 +217,11 @@ RULE_OPERATOR:LEFT_ARROW
 | RIGHT_ARROW
 | LEFT_RESTRICTION_ARROW
 | LEFT_RIGHT_ARROW
+
+RE_RULE_OPERATOR: RE_LEFT_ARROW
+| RE_RIGHT_ARROW
+| RE_LEFT_RESTRICTION_ARROW
+| RE_LEFT_RIGHT_ARROW
 
 RULE_CONTEXTS: /* empty */
 | RULE_CONTEXTS RULE_CONTEXT

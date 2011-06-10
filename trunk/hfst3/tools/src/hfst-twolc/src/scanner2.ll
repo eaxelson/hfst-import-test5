@@ -172,6 +172,20 @@ __HFST_TWOLC_\] {
   non_alphabet_symbol_queue.push_back("__HFST_TWOLC_]"); 
   return RIGHT_SQUARE_BRACKET; 
 }
+__HFST_TWOLC_\[\[ {
+  // Beginning of a bracketed regex.
+  //
+  // For some bizarre reason [[ can't occur in the string-literal here...
+  non_alphabet_symbol_queue.push_back("__HFST_TWOLC_[" "["); 
+  return RE_LEFT_SQUARE_BRACKET; 
+}
+__HFST_TWOLC_\]\] {
+  // End of a bracketed regex.
+  //
+  // For some bizarre reason ]] can't occur in the string-literal here...
+  non_alphabet_symbol_queue.push_back("__HFST_TWOLC_]" "]"); 
+  return RE_RIGHT_SQUARE_BRACKET; 
+}
 __HFST_TWOLC_\( {
   // Beginning of an optional bracketed regex.
   non_alphabet_symbol_queue.push_back("__HFST_TWOLC_("); 
@@ -201,6 +215,26 @@ __HFST_TWOLC_[<][=][>] {
   // Equivalence rule operator.
   non_alphabet_symbol_queue.push_back("__HFST_TWOLC_<=>"); 
   return LEFT_RIGHT_ARROW; 
+}
+__HFST_TWOLC_[/][<][=][=] {
+  // Restriction rule operator.
+  non_alphabet_symbol_queue.push_back("__HFST_TWOLC_/<=="); 
+  return RE_LEFT_RESTRICTION_ARROW; 
+}
+__HFST_TWOLC_[<][=][=] {
+  // Left rule operator.
+  non_alphabet_symbol_queue.push_back("__HFST_TWOLC_<=="); 
+  return RE_LEFT_ARROW; 
+}
+__HFST_TWOLC_[=][=][>] {
+  // Right rule operator.
+  non_alphabet_symbol_queue.push_back("__HFST_TWOLC_==>"); 
+  return RE_RIGHT_ARROW; 
+}
+__HFST_TWOLC_[<][=][=][>] {
+  // Equivalence rule operator.
+  non_alphabet_symbol_queue.push_back("__HFST_TWOLC_<==>"); 
+  return RE_LEFT_RIGHT_ARROW; 
 }
 __HFST_TWOLC_[:] {
   if (alphabet_ended)

@@ -81,12 +81,18 @@ __HFST_TWOLC_NUMBER=[0-9]+,[0-9]+ {
 }
 __HFST_TWOLC_\[ { return LEFT_SQUARE_BRACKET; }
 __HFST_TWOLC_\] { return RIGHT_SQUARE_BRACKET; }
+__HFST_TWOLC_\[\[ { return RE_LEFT_SQUARE_BRACKET; }
+__HFST_TWOLC_\]\] { return RE_RIGHT_SQUARE_BRACKET; }
 __HFST_TWOLC_\( { return LEFT_PARENTHESIS; }
 __HFST_TWOLC_\) { return RIGHT_PARENTHESIS; }
 __HFST_TWOLC_[/][<][=] { return LEFT_RESTRICTION_ARROW; }
 __HFST_TWOLC_[<][=] { return LEFT_ARROW; }
 __HFST_TWOLC_[=][>] { return RIGHT_ARROW; }
 __HFST_TWOLC_[<][=][>] { return LEFT_RIGHT_ARROW; }
+__HFST_TWOLC_[/][<][=][=] { return RE_LEFT_RESTRICTION_ARROW; }
+__HFST_TWOLC_[<][=][=] { return RE_LEFT_ARROW; }
+__HFST_TWOLC_[=][=][>] { return RE_RIGHT_ARROW; }
+__HFST_TWOLC_[<][=][=][>] { return RE_LEFT_RIGHT_ARROW; }
 __HFST_TWOLC_[:] { return COLON; }
 __HFST_TWOLC_[;] { return SEMI_COLON; }
 __HFST_TWOLC_[=] { return EQUALS; }
