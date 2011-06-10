@@ -6,7 +6,14 @@ echo "There are $NUMBER_OF_TESTS substests for hfst-twolc."
 
 for f in $(ls -d $srcdir/* | egrep "test[0-9][0-9]*$" | sort -n)
 do
-	cat $f | ../src/hfst-twolc-loc -R -s | ../../hfst-fst2txt | ../../hfst-txt2fst -e"@_EPSILON_SYMBOL_@" > temp.twolc.hfst
+	cat $f | ../src/hfst-twolc-loc -R -s > temp.twolc.hfst0
+	if  [ $? -ne 0 ] 
+	then
+	        rm temp.twolc.hfst0
+	        exit 1
+	fi
+	cat temp.twolc.hfst0 | ../../hfst-fst2txt | ../../hfst-txt2fst -e"@_EPSILON_SYMBOL_@" > temp.twolc.hfst
+	cat $f | ../src/hfst-twolc-loc -R -s &> /dev/null
 	cat $f.txt_fst | ../../hfst-txt2fst -e"@_EPSILON_SYMBOL_@" > temp.hfst
 	if ! ../../hfst-compare -q -1 temp.hfst -2 temp.twolc.hfst &> /dev/null
 	then
@@ -24,7 +31,7 @@ do
 		echo
 		../../hfst-fst2txt temp.twolc.hfst
 		echo
-		rm temp.hfst temp.twolc.hfst
+		rm temp.hfst temp.twolc.hfst temp.twolc.hfst0
 		exit 1
 	else
 	    echo "hfst-twolc sub$f passed."
