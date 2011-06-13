@@ -73,7 +73,7 @@ int main(int argc, char **argv)
       char * srcdir = getenv("srcdir");
       std::string srcdir_(".");
       if (srcdir != NULL)
-	srcdir_ + std::string(srcdir);
+	srcdir_ = std::string(srcdir);
       const char * file_to_open = (srcdir_ + 
 				   std::string("/foobar.att")).c_str();
       FILE * file = fopen(file_to_open, "rb");
