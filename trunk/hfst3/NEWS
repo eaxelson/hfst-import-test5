@@ -5,6 +5,13 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+
+Noteworthy changes in 3.1.1
+---------------------------
+
+* Numerous bugfixes, in particular regarding a broken assumption in
+  compose-intersect
+
 Noteworthy changes in 3.1.0
 ---------------------------
 
