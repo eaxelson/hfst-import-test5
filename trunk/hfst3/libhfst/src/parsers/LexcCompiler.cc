@@ -108,8 +108,7 @@ LexcCompiler& LexcCompiler::parse(const char* filename)
     hlexcin = fopen(filename, "r");
     if (hlexcin == NULL)
       {
-        fprintf(stderr, "could not open %s/%s for reading\n", 
-		getenv("PWD"), filename);
+        fprintf(stderr, "could not open %s for reading\n", filename);
         return *this;
       }
     hlexcparse();
@@ -247,7 +246,6 @@ LexcCompiler::addXreDefinition(const string& definition_name, const string& xre)
 LexcCompiler&
 LexcCompiler::setCurrentLexiconName(const string& lexiconName)
 {
-    currentEntries_ = 0;
     static bool firstLexicon = true;
     currentLexiconName_ = lexiconName;
     lexiconNames_.insert(lexiconName);
@@ -277,6 +275,7 @@ LexcCompiler::setCurrentLexiconName(const string& lexiconName)
         fprintf(stderr, "%s...", lexiconName.c_str());
         firstLexicon = false;
       }
+    currentEntries_ = 0;
     return *this;
 }
 
@@ -343,11 +342,18 @@ LexcCompiler::compileLexical()
       {
         if (*s == "#")
           {
+            // # doesn't form pairs, only works at end
+            continue;
+          }
+        if (*s == initialLexiconName_)
+          {
+            // we compose and remove root lexicon last to avoid difficulties
+            // with its dual meaning
             continue;
           }
         if (verbose_)
           {
-            fprintf(stderr, "%s -> %s -> #", initialLexiconName_.c_str(),
+            fprintf(stderr, "%s -> %s -> #, ", initialLexiconName_.c_str(),
                     s->c_str());
           }
         string startEnc = initialLexiconName_;
@@ -369,6 +375,26 @@ LexcCompiler::compileLexical()
         morphotax = start.concatenate(morphotax).concatenate(end).minimize();
         lexicons = lexicons.compose(morphotax);
         lexicons.substitute(joinerEnc, "@_EPSILON_SYMBOL_@").minimize();
+      }
+      {
+        // now same for initial lexicon
+        string startEnc = initialLexiconName_;
+        joinerEncode(startEnc);
+        HfstTransducer start(startEnc, startEnc, format_);
+        HfstTransducer joiner(startEnc, startEnc, format_);
+        string endEnc = "#";
+        joinerEncode(endEnc);
+        HfstTransducer end(endEnc, endEnc, format_);
+        HfstTransducer sigmaStar("@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@",
+                                 format_);
+        sigmaStar = sigmaStar.subtract(start).subtract(end).subtract(joiner);
+        sigmaStar.repeat_star();
+        HfstTransducer joinerPair = joiner.repeat_n(2);
+        HfstTransducer morphotax = sigmaStar.disjunct(joinerPair);
+        morphotax.repeat_star();
+        morphotax = start.concatenate(morphotax).concatenate(end).minimize();
+        lexicons = lexicons.compose(morphotax);
+        lexicons.substitute(startEnc, "@_EPSILON_SYMBOL_@").minimize();
       }
     string endEnc = "#";
     joinerEncode(endEnc);

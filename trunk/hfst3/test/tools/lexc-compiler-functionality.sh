@@ -27,6 +27,7 @@ for i in "" .sfst .ofst .foma ; do
     esac
     if test -f cat.hfst$i ; then
         if ! ../../tools/src/hfst-lexc2fst $FFLAG $srcdir/cat.lexc > test.hfst ; then
+            echo lexc2fst $FFLAG $srcdir/cat.lexc failed with $?
             exit 1
         fi
         if ! ../../tools/src/hfst-compare cat.hfst$i test.hfst ; then
@@ -35,10 +36,19 @@ for i in "" .sfst .ofst .foma ; do
         rm test.hfst
     fi
     for f in $LEXCTESTS ; do
-        echo DBG doing $FFLAG $f
         if ! ../../tools/src/hfst-lexc2fst $FFLAG $srcdir/$f > test.hfst ; then
+            echo lexc2fst $FFLAG $srcdir/$f failed with $?
             exit 1
         fi
         rm test.hfst
     done
+    if ! ../../tools/src/hfst-lexc2fst $FFLAG $srcdir/basic.multi-file-1.lexc \
+        $srcdir/basic.multi-file-2.lexc \
+        $srcdir/basic.multi-file-3.lexc > test.hfst ; then
+        echo lexc2fst $FFLAG $srcdir/basic.multi-file-{1,2,3}.lexc failed with $?
+        exit 1
+    fi
+    if ! ../../tools/src/hfst-compare walk_or_dog.hfst$i test.hfst ; then
+        exit 1
+    fi
 done
