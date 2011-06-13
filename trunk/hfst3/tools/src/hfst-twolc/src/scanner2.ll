@@ -1,4 +1,4 @@
-%option 8Bit batch yylineno noyywrap
+%option 8Bit batch yylineno noyywrap nounput
 
 %{
   //   This program is free software: you can redistribute it and/or modify
