@@ -38,5 +38,5 @@ do
 	fi
 done
 
-rm temp.hfst temp.twolc.hfst
+rm temp.hfst temp.twolc.hfst temp.twolc.hfst0
 
