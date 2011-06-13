@@ -252,7 +252,7 @@ in/{RESERVED_SYMBOL} { return IN; }
   reduce_queue();
   return RIGHT_SQUARE_BRACKET; 
 }
-\[\[ {
+\<\[ {
   // Beginning of a bracketed regex.
   //
   // For some bizarre reason [[ can't occur in the string-literal here...
@@ -260,7 +260,7 @@ in/{RESERVED_SYMBOL} { return IN; }
   reduce_queue();
   return RE_LEFT_SQUARE_BRACKET; 
 }
-\]\] {
+\]\> {
   // End of a bracketed regex.
   //
   // For some bizarre reason ]] can't occur in the string-literal here...
