@@ -341,11 +341,12 @@ namespace hfst
       HfstTransducer t2_proj(context.second);
       t2_proj.input_project();
 
-      if (DEBUG) printf("  testing if context transducers are automata..\n");
+      if (DEBUG) 
+	printf("  testing if context transducers are automata..\n");
 
       if ( not t1_proj.compare(context.first) ||
-           not t2_proj.compare(context.second) )
-        HFST_THROW(ContextTransducersAreNotAutomataException);
+           not t2_proj.compare(context.second) ) {
+        HFST_THROW(ContextTransducersAreNotAutomataException); }
       
       std::string leftm("@_LEFT_MARKER_@");
       std::string rightm("@_RIGHT_MARKER_@");

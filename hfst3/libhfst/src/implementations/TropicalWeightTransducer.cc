@@ -1152,12 +1152,22 @@ namespace hfst { namespace implementations
   bool TropicalWeightTransducer::are_equivalent
   (StdVectorFst *a, StdVectorFst *b) 
   {
-    StdVectorFst * mina = determinize(a);
-    StdVectorFst * minb = determinize(b);
+    StdVectorFst * ac = copy(a);
+    StdVectorFst * ab = copy(b);
+    push_weights(ac, false);
+    push_weights(ab, false);
+    StdVectorFst * mina = determinize(ac);
+    StdVectorFst * minb = determinize(ab);
+    delete ac;
+    delete ab;
 
     EncodeMapper<StdArc> encode_mapper(0x0001,ENCODE);
     EncodeFst<StdArc> enca(*mina, &encode_mapper);
     EncodeFst<StdArc> encb(*minb, &encode_mapper);
+
+    delete mina;
+    delete minb;
+
     StdVectorFst A(enca);
     StdVectorFst B(encb);
 

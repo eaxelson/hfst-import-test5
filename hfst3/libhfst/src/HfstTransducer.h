@@ -22,7 +22,6 @@
 #include "HfstDataTypes.h"
 #include "HfstSymbolDefs.h"
 #include "implementations/HfstTransitionGraph.h"
-//#include "implementations/HfstConstantTransducer.h"
 #include "parsers/LexcCompiler.h"
 
 #if HAVE_SFST
@@ -77,8 +76,6 @@ namespace hfst
   class HfstTransducer;
 
   using hfst::implementations::HfstOlTransducer;
-  //using hfst::WeightedPaths;
-  //using hfst::WeightedPath;
 
 #if HAVE_SFST
   using hfst::implementations::SfstTransducer;

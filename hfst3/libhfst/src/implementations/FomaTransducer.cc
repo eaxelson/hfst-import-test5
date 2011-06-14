@@ -381,11 +381,13 @@ namespace hfst { namespace implementations {
   
   fsm * FomaTransducer::extract_input_language(fsm * t)
   { 
+    // foma does not handle epsilon transducer properly..
     return fsm_upper(fsm_copy(t));
   }
   
   fsm * FomaTransducer::extract_output_language(fsm * t)
   {
+    // foma does not handle epsilon transducer properly..
     return fsm_lower(fsm_copy(t));
   }
   
@@ -1060,6 +1062,16 @@ using namespace hfst::implementations;
 int main(int argc, char * argv[]) 
 {
     std::cout << "Unit tests for " __FILE__ ":";
+
+    // The tests are omitted until a segfault in minimizing
+    // the copy of an input-projected epsilon transducer is fixed..
+    /*
+    fsm * epsilon 
+      = FomaTransducer::define_transducer("@_EPSILON_SYMBOL_@");
+    fsm * epsilon_i = FomaTransducer::extract_input_language(epsilon);
+    fsm * epsilon_i_min = FomaTransducer::minimize(fsm_copy(epsilon_i));
+    */
+    
     std::cout << std::endl << "ok" << std::endl;
     return EXIT_SUCCESS;
 }
