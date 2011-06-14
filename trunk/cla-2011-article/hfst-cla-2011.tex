@@ -1,9 +1,12 @@
-\documentclass[conference]{IEEEtran}
-\ifCLASSINFOpdf
-\else
-\fi
-\hyphenation{op-tical net-works semi-conduc-tor}
-\begin{document}
+\documentclass[a4paper,conference]{IEEEtran}
+
+\IEEEoverridecommandlockouts
+%\usepackage{hyperref}
+\usepackage{url}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[cmex10]{amsmath}
+\usepackage{balance}
 
 \title{Improving Predictive Entry of Text Messages using IRC Logs}
 
@@ -28,13 +31,24 @@
 \ldots}
 }
 
+
+
+\begin{document}
+
+
+
+%\IEEEspecialpapernotice{(Authors' pre-print draft version)}
 \maketitle
+
 
 \begin{abstract}
 
 \end{abstract}
 
 \section{Introduction}
+\label{sec:introduction}
+
+\IEEEPARstart{P}{redictive} text input is pretty cool.
 
 % - Demonstrate the relevance of the research problem.
 %   * Predictive text entry works poorly, because it doesn't adequately take 
@@ -55,34 +69,107 @@
 %   using IRC logs to train predictive text entry systems.
 
 \section{Related Work}
+\label{sec:related-work}
 
 \section{Combining a Lexicon and IRC Logs}
+\label{sec:methods}
+
+The weighted language model in our finite-state language mode is based on
+morphological dictionary of the language created in traditional finite-state
+morphology framework\cite{beesley/2003}. The weights in this system will be
+basic scaled unigram weights transformed in finite-state form by $w = -\log
+\frac{f}{cs}$ where $w$ is the weight, $f$ is the frequency of token and $cs$
+the size of corpus in tokens. For tokens that do not exist maximum weight of
+$w_{max} = -\log \frac{1}{cs+1}$ is used.  The probabilities are gained by
+extracting the word frequencies from a large scale corpus such as
+wikipedia~\cite{pirinen/2010/lrec}. The basic unigram weighting system can be
+fine-tuned, especially on part of unknown words, by composing additional
+weights based on e.g. morphological complexity, as suggested in
+\cite{karlsson/1992}, which can be easily modeled in weighted finite-state
+form as suggested e.g. in\cite{schiller/2005}
+
+The probability weightins systems need to be scaled in combination to match and
+\ldots
+% Tähän kai pitää vielä tarkentaa mitä on tehty omorfin + irkkilokipainojen
+% skaalaukseen ja mitä se tarkotaa
+
 
 \section{Tools and Resources}
 
+To implement the full system we have used only freely available open source
+tools and resources that anyone can download from the Internet to reproduce the
+results. For the finite-state system we have selected the HFST
+tools\footnote{\url{http://hfst.sf.net}}, which is relatively complete
+reproduction of the classical tools of finite-state
+morphology\cite{beesley/2003}. Similarly we have downloaded a freely available
+Finnish finite-state morphological analyser
+omorfi\footnote{\url{http://home.gna.org/omorfi/}} for our language model
+data\cite{pirinen/2011/nodalida}. For further training of the language model we
+have used the Finnish
+Wikipedia\footnote{\url{http://dumps.wikimedia.org/fiwiki/latest/}} as corpus
+to acquire the unigram probabilities\cite{pirinen/2010/lrec}.
+
 \subsection{Tools}
 
+In our setup we use unmodified version of HFST tools for creation, manipulation
+and use of finite state transducers\cite{hfst/2011}. This means that we have
+not needed to prepare any specialised algorithms for application of the t9
+predictive input model. This basically means that it can be used on any of
+current or future finite-state systems as long as they implement needed subset
+of finite-state algebra as defined in \ref{sec:methods}.
+
+For processing of corpora we have used standard GNU tools like coreutils as
+well as bash and python scripting languages. The source code of the full system
+used for building, applying and evaluation of the full system is available
+under free
+licence\footnote{\url{http://hfst.svn.sourceforge.net/viewvc/hfst/trunk/cla-2011-article/}}.
+
 \subsection{Data}
+
+For language model we have selected to use ready-made free open source
+finite-state implementation of Finnish language\cite{pirinen/2011/nodalida}.
+The language model here is meant for parsing running text consisting mainly of
+standard written Finnish language, which is relatively far from the language
+sms text messages.  To train the language model we have used
+the Finnish Wikipedia data to add unigram probabilities to word forms that are
+recognised by the language model we are using. 
+
+The text message data used for evaluation was collected from students of
+university blah \ldots
 
 \section{Evaluation}
 
 \section{Discussion and Future Work}
 
+This work demonstrates that using simple methods we can improve a lot.\ldots
+
+In this paper we used readily available language model geared towards parsing
+running texts of literary written Finnish. It would be interesting to see if
+modifying the language model towards the standard spoken Finnish dialect
+might yield a significant increase in recall.
+
+The demonstrated model only considers unigrams for probability likelihood
+maximisation. It has been demonstrated that it is possible to extend these
+models trivially to arbitrary n-gram and varigram models\cite{silfveberg/2011},
+and this should be explored to see if there's improvement for wider statistical
+models in task of predictive text input for mobile text messages.
+
+Finally we have only performed our experiment for Finnish, but we believe that
+same methods will apply to at least most of the latin abjad based languages
+with no modifications excepting the orthographic conventions---such as accent
+dropping---on some texting cultures.
+
 \section{Conclusion}
 
+\ldots \balance
 \section*{Acknowledgment}
 \ldots
-
-\begin{thebibliography}{1}
-
-\bibitem{Linden:SFCM:2009}
-K. Lind\'{e}n, M. Silfverberg and T. Pirinen, \emph{HFST Tools for 
-Morphology---An Efficient Open-Source Package for Construction of 
-Morphological Analyzers}.\hskip 1em plus
-  0.5em minus 0.4em\relax Systems and Frameworks for Computational Morphology,
- SFCM, Z\"{u}rich, Switzerland, 2007.
-
-\end{thebibliography}
+% We the people thank the HFST research team and the staff of University of
+% Helsinki for fruity discussions as well as the anonymous reviewers for
+% good suggestions.
+\
+\bibliographystyle{IEEEtran}
+\bibliography{cla2011}
 
 
 
