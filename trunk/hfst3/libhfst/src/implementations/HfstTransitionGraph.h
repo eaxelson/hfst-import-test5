@@ -147,18 +147,6 @@ namespace hfst {
             The value pointed by the iterator is of type HfstTransitions. */
         typedef typename HfstStates::const_iterator const_iterator;
 
-	/** @brief An HfstTransitionGraph with transitions of type 
-	    HfstTropicalTransducerTransitionData and weight type float.
-	    
-	    This is probably the most useful kind of HfstTransitionGraph. */
-	typedef HfstTransitionGraph <HfstTropicalTransducerTransitionData> 
-	  HfstBasicTransducer;
-	
-	/** @brief A specialization for faster conversion. */
-	typedef HfstTransitionGraph <HfstFastTransitionData> 
-	  HfstFastTransducer;
-
-
 
 	// --------------------------------------------------------
 	// --- Construction, assignment, copying and conversion ---
@@ -1460,7 +1448,19 @@ namespace hfst {
 
         friend class ConversionFunctions;
       };
+   
+    /** @brief An HfstTransitionGraph with transitions of type 
+	HfstTropicalTransducerTransitionData and weight type float.
+	
+	This is probably the most useful kind of HfstTransitionGraph. */
+    typedef HfstTransitionGraph <HfstTropicalTransducerTransitionData> 
+      HfstBasicTransducer;
     
+    /** @brief A specialization for faster conversion. */
+    typedef HfstTransitionGraph <HfstFastTransitionData> 
+      HfstFastTransducer;
+
+ 
   }
    
 }

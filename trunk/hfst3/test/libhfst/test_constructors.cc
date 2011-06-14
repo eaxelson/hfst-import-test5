@@ -70,12 +70,12 @@ int main(int argc, char **argv)
 	      "2 3 @0@ @0@\n"
 	      "3\n");
 	      fclose(f);*/
-      char * srcdir = getenv("srcdir");
+      /*char * srcdir = getenv("srcdir");
       std::string srcdir_(".");
       if (srcdir != NULL)
-	srcdir_ = std::string(srcdir);
-      const char * file_to_open = (srcdir_ + 
-				   std::string("/foobar.att")).c_str();
+      srcdir_ + std::string(srcdir); */
+      const char * file_to_open = "foobar.att"; // (srcdir_ + 
+	//std::string("/foobar.att")).c_str();
       FILE * file = fopen(file_to_open, "rb");
       HfstTransducer foobar_att(file, types[i], "@0@");
       fclose(file);
