@@ -7,6 +7,8 @@
 \usepackage[T1]{fontenc}
 \usepackage[cmex10]{amsmath}
 \usepackage{balance}
+\usepackage{subfig}
+\usepackage {graphicx}
 
 \title{Improving Predictive Entry of Text Messages using IRC Logs}
 
@@ -139,6 +141,16 @@ university blah \ldots
 
 \section{Evaluation}
 
+\begin{figure*}[!t]
+\centerline{\subfloat[The first guess is correct.]{\includegraphics[width=3.5in]
+  {accuracy_first_guess.pdf}}
+\hfil
+\subfloat[Correct guess found among the three first guesses.]{\includegraphics[width=3.5in]
+  {accuracy_first_to_third_guess.pdf}}}
+\caption{The accuracy of our algorithm using different linear combinations of the weights given by the morphological analyzer and the IRC log transducer. On the x-axis we give the relative weight of the IRC log transducer and on the y-axis we give the accuracy. The dotted line gives the accuracy for the text message test material and the solid line gives the accuracy for the IRC log test material.}
+\label{AccuraciesIRCMaterial}
+\end{figure*}
+
 \section{Discussion and Future Work}
 
 This work demonstrates that using simple methods we can improve a lot.\ldots
@@ -163,7 +175,8 @@ dropping---on some texting cultures.
 
 \ldots \balance
 \section*{Acknowledgment}
-\ldots
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+
 % We the people thank the HFST research team and the staff of University of
 % Helsinki for fruity discussions as well as the anonymous reviewers for
 % good suggestions.
