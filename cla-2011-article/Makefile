@@ -2,6 +2,7 @@ all:hfst-cla-2011.pdf
 
 accuracy_%.pdf:correct_%_irc.tab correct_%_sms.tab
 	R --quiet --no-save --args $^ $@ < draw_graphs.r
+	sed -i 's/IRC_W/IRC W/g' $@
 
 hfst-cla-2011.pdf:hfst-cla-2011.tex accuracy_first_guess.pdf \
                   accuracy_first_to_third_guess.pdf
