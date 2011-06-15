@@ -214,7 +214,7 @@ namespace hfst { namespace implementations {
 
     fsm * FomaTransducer::define_transducer(const std::string &symbol)
   {     
-    fsm * retval = fsm_symbol(strdup(symbol.c_str()));
+    fsm * retval = fsm_symbol(const_cast<char*>(symbol.c_str()));
     fsm_count(retval);
     return retval;
   }
@@ -222,8 +222,8 @@ namespace hfst { namespace implementations {
   fsm * FomaTransducer::define_transducer
     (const std::string &isymbol, const std::string &osymbol)
   { 
-    return fsm_cross_product( fsm_symbol(strdup(isymbol.c_str())), 
-                              fsm_symbol(strdup(osymbol.c_str())) );
+    return fsm_cross_product( fsm_symbol(const_cast<char*>(isymbol.c_str())), 
+                              fsm_symbol(const_cast<char*>(osymbol.c_str())) );
     // should either argument be deleted?
   }
   
@@ -401,26 +401,30 @@ namespace hfst { namespace implementations {
     /* Conversion to HfstBasicTransducer is now used instead. */
   fsm * FomaTransducer::insert_freely(fsm * t, const StringPair &symbol_pair)
   {
-    char* epsilon = strdup(internal_epsilon.c_str());
-    char* epsilon_marker = strdup("@_EPSILON_SYMBOL_MARKER_@");
-    char* identity = strdup(internal_identity.c_str());
-    fsm * eps_marked = fsm_substitute_symbol(t, epsilon, 
-                                             epsilon_marker);
-    fsm * ins = fsm_kleene_star( 
-          fsm_union( fsm_symbol(identity), 
-                 fsm_cross_product( fsm_symbol(epsilon),
-                        fsm_symbol(strdup(symbol_pair.second.c_str())) ) ) );
-    fsm * comp = fsm_substitute_symbol( fsm_compose(eps_marked, ins),
-                    epsilon,
-                    strdup(symbol_pair.first.c_str()) );
-    return fsm_substitute_symbol( comp,
-                  epsilon_marker,
-                  epsilon);
-    free(epsilon);
-    free(epsilon_marker);
-    free(identity);
-    // marker should be removed from sigma.. 
-    // (HfstBasicTransducer is now used instead)
+    const char * epsilon = internal_epsilon.c_str();
+    char * epsilon_marker = strdup("@_EPSILON_SYMBOL_MARKER_@");
+    const char * identity = internal_identity.c_str();
+    fsm * eps_marked = 
+      fsm_substitute_symbol(t, const_cast<char*>(epsilon), 
+			    epsilon_marker);
+    fsm * ins = fsm_kleene_star
+      ( 
+       fsm_union( 
+		 fsm_symbol(const_cast<char*>(identity)), 
+		 fsm_cross_product
+		 ( fsm_symbol(const_cast<char*>(epsilon)),
+		   fsm_symbol(const_cast<char*>(symbol_pair.second.c_str())
+			      ))));
+    fsm * comp = fsm_substitute_symbol
+      ( fsm_compose(eps_marked, ins),
+	const_cast<char*>(epsilon),
+	const_cast<char*>(symbol_pair.first.c_str()));
+  return fsm_substitute_symbol( comp,
+				epsilon_marker,
+				const_cast<char*>(epsilon));
+  free(epsilon_marker);
+  // marker should be removed from sigma.. 
+  // (HfstBasicTransducer is now used instead)
   }
   
   fsm * FomaTransducer::compose
@@ -1063,14 +1067,10 @@ int main(int argc, char * argv[])
 {
     std::cout << "Unit tests for " __FILE__ ":";
 
-    // The tests are omitted until a segfault in minimizing
-    // the copy of an input-projected epsilon transducer is fixed..
-    /*
     fsm * epsilon 
       = FomaTransducer::define_transducer("@_EPSILON_SYMBOL_@");
     fsm * epsilon_i = FomaTransducer::extract_input_language(epsilon);
     fsm * epsilon_i_min = FomaTransducer::minimize(fsm_copy(epsilon_i));
-    */
     
     std::cout << std::endl << "ok" << std::endl;
     return EXIT_SUCCESS;
