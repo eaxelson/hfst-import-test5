@@ -1,10 +1,15 @@
 all:hfst-cla-2011.pdf
 
-%.pdf:%.tex
+accuracy_%.pdf:correct_%_irc.tab correct_%_sms.tab
+	R --quiet --no-save --args $^ $@ < draw_graphs.r
+
+hfst-cla-2011.pdf:hfst-cla-2011.tex accuracy_first_guess.pdf \
+                  accuracy_first_to_third_guess.pdf
 	pdflatex $^
 	bibtex $*
 	pdflatex $^
 	pdflatex $^
 
 clean:
-	-rm -f hfst-cla-2011.pdf hfst-cla-2011.aux hfst-cla-2011.bbl hfst-cla-2011.blg
+	-rm -f hfst-cla-2011.pdf hfst-cla-2011.aux hfst-cla-2011.bbl \
+               hfst-cla-2011.blg
