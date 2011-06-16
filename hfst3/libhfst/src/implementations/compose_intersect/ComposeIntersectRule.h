@@ -12,6 +12,9 @@ namespace hfst
     public:
       ComposeIntersectRule(const HfstBasicTransducer &);
       ComposeIntersectRule(void);
+      bool known_symbol(size_t symbol);
+    protected:
+      StringSet symbols;
     };
   }
 }
