@@ -110,7 +110,7 @@ a morphological analyzer with word frequencies computed from IRC logs
 and how such a system is used to disambiguate between words
 corresponding to an ambiguous input sequence. After this we present
 the morphological analyzer, Omorfi, and the Hfst interface in section
-\ref{tools} and present the IRC log data used for training out model
+\ref{sec:tools} and present the IRC log data used for training out model
 and the text message data used for evaluation in \ref{sec:data}. We
 evaluate our system in section \ref{sec:evaluation} and present some
 general and closing remarks in sections \ref{sec:discussion} and
@@ -136,6 +136,24 @@ general and closing remarks in sections \ref{sec:discussion} and
 
 \section{Related Work}
 \label{sec:related-work}
+
+\begin{itemize}
+\item Using genre or domain-specific text to train a NLP system is not
+  a new idea.The approach has been tested in e.g. automatic
+  translation (...) and tagging (...).
+\item \cite{Harbusch/2003} Investigate the usefulness of a
+  domain-specific lexical model in predictive text entry. They
+  established that it is difficult to assemble a good enough purely
+  domain-specific lexicon. According to them, the best approach is
+  therefore to use a combination of a high coverage general lexicon
+  and a domain-specific model, which is exactly what we have done.
+\item \cite{Harbusch/2003} are concerned with building systems for very
+  specific domains such as school exercises ad scientific texts. They
+  do not really address the question of what would constitute
+  practical training material for a general text message system. We
+  are expressly interested in improving text entry using widely
+  available materials.
+\end{itemize}
 
 \section{Combining a Lexicon and IRC Logs}
 \label{sec:methods}
@@ -220,6 +238,7 @@ university blah \ldots
 \end{figure*}
 
 \section{Discussion and Future Work}
+\label{sec:discussion}
 
 This work demonstrates that using simple methods we can improve a lot.\ldots
 
@@ -228,11 +247,12 @@ running texts of literary written Finnish. It would be interesting to see if
 modifying the language model towards the standard spoken Finnish dialect
 might yield a significant increase in recall.
 
-The demonstrated model only considers unigrams for probability likelihood
-maximisation. It has been demonstrated that it is possible to extend these
-models trivially to arbitrary n-gram and varigram models\cite{silfveberg/2011},
-and this should be explored to see if there's improvement for wider statistical
-models in task of predictive text input for mobile text messages.
+The demonstrated model only considers unigrams for probability
+likelihood maximisation. It has been demonstrated that it is possible
+to extend these models trivially to arbitrary n-gram and varigram
+models \cite{Silfverberg/2011}, and this should be explored to see if
+there's improvement for wider statistical models in task of predictive
+text input for mobile text messages.
 
 Finally we have only performed our experiment for Finnish, but we believe that
 same methods will apply to at least most of the latin abjad based languages
@@ -240,6 +260,7 @@ with no modifications excepting the orthographic conventions---such as accent
 dropping---on some texting cultures.
 
 \section{Conclusion}
+\label{sec:conclusions}
 
 \ldots \balance
 \section*{Acknowledgment}
