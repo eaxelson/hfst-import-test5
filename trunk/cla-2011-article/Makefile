@@ -7,7 +7,7 @@ accuracy_%.pdf:correct_%_irc.tab correct_%_sms.tab
 hfst-cla-2011.pdf:hfst-cla-2011.tex accuracy_first_guess.pdf \
                   accuracy_first_to_third_guess.pdf
 	pdflatex $^
-	bibtex $*
+	bibtex hfst-cla-2011.aux
 	pdflatex $^
 	pdflatex $^
 
