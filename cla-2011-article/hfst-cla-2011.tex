@@ -155,29 +155,77 @@ general and closing remarks in sections \ref{sec:discussion} and
   available materials.
 \end{itemize}
 
-\section{Combining a Lexicon and IRC Logs}
+\section{Combining a Morphological Lexicon and IRC Logs}
 \label{sec:methods}
 
-The weighted language model in our finite-state language mode is based
-on morphological dictionary of the language created in traditional
-finite-state morphology framework\cite{beesley/2003}. The weights in
-this system will be basic scaled unigram weights transformed in
-finite-state form by $w = -\log \frac{f}{cs}$ where $w$ is the weight,
-$f$ is the frequency of token and $cs$ the size of corpus in
-tokens. For tokens that do not exist maximum weight of $w_{max} =
--\log \frac{1}{cs+1}$ is used.  The probabilities are gained by
-extracting the word frequencies from a large scale corpus such as
-wikipedia~\cite{pirinen/2010/lrec}. The basic unigram weighting system
-can be fine-tuned, especially on part of unknown words, by composing
-additional weights based on e.g. morphological complexity, as
-suggested in \cite{karlsson/1992}, which can be easily modeled in
-weighted finite-state form as suggested e.g. in\cite{schiller/2005}
+Our goal is to first combine two probabilistic lexicons, to build a
+probabilistic model which (i) has broad lexical coverage and (ii)
+gives a good approximation of the probabilities of word forms in text
+messages. We then transform the model so that it can be used as a
+machine, that takes number sequences such as "2452" as input. It
+outputs the list of Finnish words that can correspond to the input,
+when typed on a cell phone. The output contains only those words,
+which are known to the lexicons. The words are appended with a
+probability, which is computed from the probabilities given by the
+lexicons used to construct the model.
 
-The probability weightins systems need to be scaled in combination to match and
-\ldots
+One of the lexicons we use is derived from the Finnish open-source
+morphological analyzer Omorfi. The other lexicon we construct from a
+corpus of IRC logs.
+
+We have chosen to implement our system using weighted finite-state
+machines, partly because the morphological analyzer Omorfi is
+implemented as a WFST, but also because they provide a flexible way of
+combining models to build language technology applications.
+
+\subsection{Weighted Finite-State Transducers}
+
+%The weighted language model in our finite-state language model is based
+%on morphological dictionary of the language created in traditional
+%finite-state morphology framework\cite{beesley/2003}. The weights in
+%this system will be basic scaled unigram weights transformed in
+%finite-state form by $w = -\log \frac{f}{cs}$ where $w$ is the weight,
+%$f$ is the frequency of token and $cs$ the size of corpus in
+%tokens. For tokens that do not exist maximum weight of $w_{max} =
+%-\log \frac{1}{cs+1}$ is used.  The probabilities are gained by
+%extracting the word frequencies from a large scale corpus such as
+%wikipedia~\cite{pirinen/2010/lrec}. The basic unigram weighting system
+%can be fine-tuned, especially on part of unknown words, by composing
+%additional weights based on e.g. morphological complexity, as
+%suggested in \cite{karlsson/1992}, which can be easily modeled in
+%weighted finite-state form as suggested e.g. in\cite{schiller/2005}
+
+Finite-state transducers are a class of computational models, which
+rewrite input strings to output strings \cite{beesley/2003}. A
+classical example of a language technological application implemented
+as finite-state transducers, are morphological analyzer, which rewrite
+an input word e.g. "dog" into a set of morphological analyses
+$\{$"dog+NOUN+SG", "dog+VERB+INF"$\}$.
+
+Our system is implemented using weighted finite-state transducers
+(WFSTs). These are an extension of finite-state transducers, where
+every every correspondence between an input string and an output
+string receives a weight (usually a floating point number). The
+weights in our system represent probabilities. Akin to ordinary
+transducers, WFSTs can be combined using different binary algebraic
+operations or modified using unary algebraic operations to yield new
+WFSTs. Our system uses three different algebraic operations:
+\begin{description}
+\item[Projection:] A unary operation, which  
+\item[Disjunction:]
+\item[composition:]
+\end{description}
+
+Our lexicons code simply Finnish words along with probabilities estimated using word frequencies in corpora.
+
+\subsection{Combining the Component Lexicons}
+
+%The probability weightins systems need to be scaled in combination to match and
+%\ldots
 % Tähän kai pitää vielä tarkentaa mitä on tehty omorfin + irkkilokipainojen
 % skaalaukseen ja mitä se tarkotaa
 
+\subsection{Using a Combination of Lexicons for Predictive Text Entry}
 
 \section{Tools and Resources}
 \label{sec:tools}
