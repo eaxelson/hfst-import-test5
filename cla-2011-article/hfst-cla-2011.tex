@@ -52,8 +52,8 @@
 
 \IEEEPARstart{M}{obile} phone text messages are a hugely popular way
 of communication, but mobile phones are not especially well suited for
-inputing text because of their small size and often limited
-keyboard. There are several technological solutions for inputing text
+inputting text because of their small size and often limited
+keyboard. There are several technological solutions for inputting text
 on mobile phones and other limited keyboard devices. This paper is
 concerned with so called predictive text entry, which utilizes
 redundancy in natural language in order to enable efficient text entry
@@ -196,27 +196,97 @@ combining models to build language technology applications.
 %weighted finite-state form as suggested e.g. in\cite{schiller/2005}
 
 Finite-state transducers are a class of computational models, which
-rewrite input strings to output strings \cite{beesley/2003}. A
-classical example of a language technological application implemented
-as finite-state transducers, are morphological analyzer, which rewrite
-an input word e.g. "dog" into a set of morphological analyses
-$\{$"dog+NOUN+SG", "dog+VERB+INF"$\}$.
+rewrite input strings to output strings \cite{beesley/2003}. The input
+string $s_i$ and its output string $s_o$ are called a correspondence
+and written $s_i\mathrm{:}s_o$. If $T$ is a transducer, we write
+$s_i\mathrm{:}s_o \in T$, iff $T$ rewrites $s_i$ as $s_o$, i.e. accepts the correspondence $s_i\mathrm{:}s_o$.
+
+Classical examples of language technological applications
+implemented as finite-state transducers, are morphological analyzers,
+which rewrite an input word e.g. "dog" into a set of morphological
+analyses $\{$"dog+NOUN+SG", "dog+VERB+INF"$\}$. Here "dog" is the
+input string in two correspondences.
 
 Our system is implemented using weighted finite-state transducers
 (WFSTs). These are an extension of finite-state transducers, where
-every every correspondence between an input string and an output
-string receives a weight (usually a floating point number). The
-weights in our system represent probabilities. Akin to ordinary
-transducers, WFSTs can be combined using different binary algebraic
-operations or modified using unary algebraic operations to yield new
-WFSTs. Our system uses three different algebraic operations:
-\begin{description}
-\item[Projection:] A unary operation, which  
-\item[Disjunction:]
-\item[composition:]
-\end{description}
+every correspondence $s_i\mathrm{:}s_o$ between an input string $s_i$
+and an output string $s_o$ receives a weight $w_T(s_i\mathrm{:}s_o)$,
+where $T$is the transducer. The weight is a floating point number. 
 
-Our lexicons code simply Finnish words along with probabilities estimated using word frequencies in corpora.
+The weights in our system represent probabilities, which have been
+transformed into so called penalty weights using the map $p \mapsto
+-\log p$ in order to avoid underflow in computer arithmetics. Since
+probability $0$ corresponds to an infinite penalty weight, we say that
+a transducer $T$ gives infinite weight to correspondences it doesn't
+accept. Weight arithmetics is performed in the tropical semiring, so
+addition of weights $w_1 \oplus w_2$ corresponds to taking their
+minimum $\min(\{w_1,w_2\})$ and multiplication $w_1 \otimes w_2$
+corresponds to ordinary addition of floating point numbers $w_1 + w_2$.
+
+Akin to ordinary transducers, WFSTs can be combined using
+different binary algebraic operations or modified using unary
+algebraic operations to yield new WFSTs. Our system uses three
+different algebraic operations:
+\begin{itemize}
+\item {\bf Projection $\mathrm{p}(T)$:} A unary operation, whose result
+  rewrites a string $s_i$ into itself, iff the argument rewrites $s_i$
+  into any output string $s_o$. The weight given to each correspondence
+  $s_i:s_i$ is
+  $$\bigoplus_{s_i\mathrm{:}s_o \in T} w_T(s_i\mathrm{:}s_o)$$
+\item {\bf Disjunction $S \cup T$:} A binary operation, whose result
+  rewrites an input strings $s_i$ into the output string $s_o$, iff
+  one of the argument transducers writes $s_i$ to $s_o$. The weight
+  given each correspondence $s_i\mathrm{:}s_o$ is
+  $$w_S(s_i\mathrm{:}s_o) \oplus w_T(s_i\mathrm{:}s_o)$$
+\item {\bf composition $S \circ T$:} A binary operation, whose result
+  writes an input string $s_i$ into an output string $s_o$, iff the
+  first argument rewrites $s_i$ as some string $t$ and the second
+  argument rewrites $t$ to $s_o$. The weight given each correspondence
+  $s_i\mathrm{:}s_o$ is
+  $$\bigoplus_{s_i\mathrm{:}t \in S, t\mathrm{:}s_o \in T} w_S(s_i\mathrm{:}t) \otimes w_T(t\mathrm{:}s_o)$$
+\end{itemize}
+For a more thorough discussion on WFSTs, see \cite{openfst/2007}.
+
+\subsection{Component of the predictive text entry system}
+Our system is constructed from three WFSTs, which are combined using disjunction and composition:
+\begin{itemize}
+\item A transducer $[\mathrm{Num}\rightarrow\mathrm{Text}]$, which
+  rewrites number sequences as letter sequences mimicing the way the
+  keypad of a 12-key cell phone
+  works. E.g. $[\mathrm{Num}\rightarrow\mathrm{Text}]$ would rewrite
+  $23$ as the strings "ad", "ae", "af", "bd", "be", "bf", "cd", "ce"
+  and "cf". Each correspondence in $[\mathrm{Num}\rightarrow\mathrm{Text}]$
+  receives equal weight.
+\item A lexicon transducer $L_O$, which rewrites word forms as them
+  selves (i.e. gives an identity correspondence) and associates a
+  penalty weight corresponding to a probability to known word
+  forms. The probability is based on corpus frequencies. An English
+  lexicon might e.g. accept the correspondence "be":"be" with penalty
+  weight $5.41$ corresponding to the probability $0.39\%$.
+\item A domain specific lexicon transducer $L_I$, which also
+  associates penalty weights to word forms, but the probabilities have
+  been computed from some source which resembles the language used in
+  text messages (in our case IRC logs).
+\end{itemize}
+
+Schematically our system works by looking up a number sequence in
+$[\mathrm{Num}\rightarrow\mathrm{Text}]$ to find all possible letter
+strings associated to the sequence and then performing a lexicon
+lookup in both of the lexicons $L_O$ and $L_I$ to see which of the
+letter sequences are actually words. Each of the words receives some
+(possibly infinite) weight from both $L_O$ and $L_I$. For each
+candidate word, a weighted average is computed from these penalties
+and this is the probability of the candidate word. Predictive text
+entry will offer the candidates in order of penalty weight.
+
+In practice this approach is not feasible, because
+$[\mathrm{Num}\rightarrow\mathrm{Text}]$ will over-generate hugely
+(e.g. for a string of ten numbers, $59049$ letter sequences are
+generated and need to be looked up in the lexicons). This is why we
+compile all three transducers into one transducer using composition
+and disjunction. The transducer performs translation into letter
+sequences and lexicon lookup simultaneously thus avoiding
+over-generation.
 
 \subsection{Combining the Component Lexicons}
 
