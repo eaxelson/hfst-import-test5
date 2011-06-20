@@ -77,6 +77,7 @@ int main(int argc, char **argv)
       const char * file_to_open = "foobar.att"; // (srcdir_ + 
 	//std::string("/foobar.att")).c_str();
       FILE * file = fopen(file_to_open, "rb");
+      assert(file != NULL);
       HfstTransducer foobar_att(file, types[i], "@0@");
       fclose(file);
       foobar_att.minimize();
