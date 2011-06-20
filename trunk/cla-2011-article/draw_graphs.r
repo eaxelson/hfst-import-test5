@@ -16,10 +16,10 @@ sms_1st_table = read.table(args[2],header=TRUE)
 g_range <- range(0.0,1.0)
 
 # Plot the IRC material using o-type ticks and filled line
-plot(irc_1st_table,type="o",ylim=g_range)
+plot(irc_1st_table,type="o",ylim=g_range,lty=2)
 
 #Plot the SMS material using 0-typ ticks and dashed line
-lines(sms_1st_table,type="o",lty=2)
+lines(sms_1st_table,type="o")
 
 # Flush the pdf device into accuracy_first_guess.pdf and close the device.
 dev.off()
