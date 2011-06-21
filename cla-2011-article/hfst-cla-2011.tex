@@ -210,7 +210,7 @@ input string in two correspondences.
 Our system is implemented using weighted finite-state transducers
 (WFSTs). These are an extension of finite-state transducers, where
 every correspondence $s_i\mathrm{:}s_o$ between an input string $s_i$
-and an output string $s_o$ receives a weight $w_T(s_i\mathrm{:}s_o)$,
+and an output string $s_o$ receives a weight $\mathrm{w}_T(s_i\mathrm{:}s_o)$,
 where $T$is the transducer. The weight is a floating point number. 
 
 The weights in our system represent probabilities, which have been
@@ -231,21 +231,29 @@ algebraic operations to yield new WFSTs. Our system uses two unary and three bin
   rewrites a string $s_i$ into itself, iff the argument rewrites $s_i$
   into any output string $s_o$. The weight given to each correspondence
   $s_i:s_i$ is
-  $$\bigoplus_{s_i\mathrm{:}s_o \in T} w_T(s_i\mathrm{:}s_o)$$
-\item {\bf scaling $\mathrm{W}(k,T)$:} A unary operation, whose result accepts the same correspondences $s_i\mathrm{:}s_o$ as $T$ with weight $k\cdot w_T(s_i\mathrm{:}s_o)$. Here we use regular multiplication of floating point numbers (not $\otimes$).
+  \begin{equation}
+    \bigoplus_{s_i\mathrm{:}s_o \in T} \mathrm{w}_T(s_i\mathrm{:}s_o)
+  \end{equation}
+\item {\bf scaling $\mathrm{W}(k,T)$:} A unary operation, whose result accepts the same correspondences $s_i\mathrm{:}s_o$ as $T$ with weight $k\cdot \mathrm{w}_T(s_i\mathrm{:}s_o)$. Here we use regular multiplication of floating point numbers (not $\otimes$).
 \item {\bf Disjunction $S \cup T$:} A binary operation, whose result
   rewrites an input strings $s_i$ into the output string $s_o$, iff
   one of the argument transducers writes $s_i$ to $s_o$. The weight
   given each correspondence $s_i\mathrm{:}s_o$ is
-  $$w_S(s_i\mathrm{:}s_o) \oplus w_T(s_i\mathrm{:}s_o)$$
+  \begin{equation}
+    \mathrm{w}_S(s_i\mathrm{:}s_o) \oplus \mathrm{w}_T(s_i\mathrm{:}s_o)
+  \end{equation}
 \item {\bf composition $S \circ T$:} A binary operation, whose result
   writes an input string $s_i$ into an output string $s_o$, iff the
   first argument rewrites $s_i$ as some string $t$ and the second
   argument rewrites $t$ to $s_o$. The weight given each correspondence
   $s_i\mathrm{:}s_o$ is
-  $$\bigoplus_{s_i\mathrm{:}t \in S, t\mathrm{:}s_o \in T} w_S(s_i\mathrm{:}t) \otimes w_T(t\mathrm{:}s_o)$$
+  \begin{equation}
+    \bigoplus_{s_i\mathrm{:}t \in S, t\mathrm{:}s_o \in T} \mathrm{w}_S(s_i\mathrm{:}t) \otimes \mathrm{w}_T(t\mathrm{:}s_o)
+    \end{equation}
 \item {\bf Subtraction $S - T$:} A binary operation whose result accepts those correspondences in $S$, which are not accepted by $T$. The weight remains the same, so
-$$w_{S-T}(s_i\mathrm{:}s_o) < \infty \Rightarrow w_{S-T}(s_i\mathrm{:}s_o) = w_{S}(s_i\mathrm{:}s_o)$$
+  \begin{equation}
+    \mathrm{w}_{S-T}(s_i\mathrm{:}s_o) < \infty \Rightarrow \mathrm{w}_{S-T}(s_i\mathrm{:}s_o) = \mathrm{w}_{S}(s_i\mathrm{:}s_o)
+  \end{equation}
 \end{itemize}
 For a more thorough discussion on WFSTs, see \cite{openfst/2007}.
 
@@ -279,7 +287,7 @@ The lexicon transducer $L_O$ is derived from an existing morphology $M$
 Finnish Omorfi). The morphological analyzer is converted to a lexicon
 using projection, which throws away the morphological analyses and
 leaves a transducer which accepts wordforms. Hence 
-$$ L_O = \mathrm{P}(M)\text{.}$$
+\begin{equation}L_O = \mathrm{P}(M)\text{.}\end{equation}
 
 Schematically our system works by looking up a number sequence in
 $[\mathrm{Num}\rightarrow\mathrm{Text}]$ to find all possible letter
@@ -317,26 +325,30 @@ which is greater than the weight that given by the lexicons for any
 accepted word form. Therefore we disjunct the lexicons with the
 language $U_{max}$, which accepts all words and gives them weight
 $w_{max}$. The result $L_O \cup U_{max}$ will accept any word form $s$
-and give it weight $w_{L_O}(s\mathrm{:}s)$, if it is accepted by $L_O$
-and $w_{max}$ otherwise. The same applies for $L_I \cup U_{max}$.
+and give it weight $\mathrm{w}_{L_O}(s\mathrm{:}s)$, if it is accepted by $L_O$
+and $\mathrm{w}_{max}$ otherwise. The same applies for $L_I \cup U_{max}$.
 
-We want to construct such a transducer $L$, that $w_L(s\mathrm{:}s)$
-is a weighted average of the weights $w_{L_I \cup U_{max}}(s\mathrm{:}s)$ and
-$w_{L_O \cup U_{max}}(s\mathrm{:}s)$, i.e.
-$$w_L(s\mathrm{:}s) = k\cdot w_{L_I}(s\mathrm{:}s) + (1 - k)\cdot w_{L_O}(s\mathrm{:}s)\text{, where }0\leq k \leq 1\text{.}$$
+We want to construct such a transducer $L$, that $\mathrm{w}_L(s\mathrm{:}s)$
+is a weighted average of the weights $\mathrm{w}_{L_I \cup U_{max}}(s\mathrm{:}s)$ and
+$\mathrm{w}_{L_O \cup U_{max}}(s\mathrm{:}s)$, i.e.
+\begin{equation}
+  \mathrm{w}_L(s\mathrm{:}s) = k\cdot \mathrm{w}_{L_I}(s\mathrm{:}s) + (1 - k)\cdot \mathrm{w}_{L_O}(s\mathrm{:}s)\text{, where }0\leq k \leq 1\text{.}
+\end{equation}
 Notice that we use regular addition and multiplication of floating
 point numbers. We can easily represent the transducer using scaling, disjunction and composition
-$$ L = \mathrm{W}\big(k,(L_I \cup U_{max})\big) \circ \mathrm{W}\big(1-k,(L_O \cup U_{max})\big)$$
+\begin{equation}
+  L = \mathrm{W}(k,(L_I \cup U_{max})) \circ \mathrm{W}((1-k),(L_O \cup U_{max}))
+\end{equation}
 
 There is a problem with the language $L$, because it will accept every
 string of letters, which is a performance concern, as we explained
 above. Therefore we need to subtract the language of all strings that
 are not in $L_I$ or $L_O$. Hence the final lexicon is
-$$L_{tot} = L - (U - (L_I \cup L_O))\text{,}$$
+\begin{equation}L_{I\vee O} = L - (U - (L_I \cup L_O))\text{,}\end{equation}
 where $U$ is the language of all letter strings.
 
 Finally we can compose $[\mathrm{Num}\rightarrow\mathrm{Text}]$ with
-$L_{tot}$ in order to get a transducer, which transforms number
+$L_{I\vee O}$ in order to get a transducer, which transforms number
 sequences to word forms.
 
 In the construction of the composite lexicon $L$, we used the floating
@@ -344,7 +356,28 @@ point constant $k$. This constant needs to be estimated
 experimentally. In the section \ref{sec:evaluation}, we show that the
 constant can be estimated without resorting to a corpus of text messages.
 
+The method which we described is fairly contrived, so we wanted to try
+out a simpler way to combine the lexicons
+\begin{equation}
+  L_{I\vee O}' = \mathrm{W}(k,L_I) \cup \mathrm{W}((1 - k),L_O)\text{, where }0 \leq k \leq 1\text{.}
+\end{equation} 
+The weight given to a word form $s$ by $L_{I\vee O}'$ is not a linear
+combination of the scaled weights given by $L_I$ and $L_O$. Instead
+it's the minimum of the scaled weights
+$\mathrm{w}_{L_I}(s\mathrm{:}s)$ and $\mathrm{w}_{L_O}(s\mathrm{:}s)$.
+Tests showed negligible difference in accuracy between the methods,
+which lead us to use the simpler method.
+
 \subsection{Using a Combination of Lexicons for Predictive Text Entry}
+
+The lexicon $L_{I\vee O}'$ is used by performing lookup for number
+sequences. The result is a finite set of word forms with weights. The
+system gives suggestion in order of weight.
+
+Using the Hfst interface, we can convert the transducer into a fast
+lookup format \cite{conf/fsmnlp/Silfverberg2009}, whose throughput is
+about $100000$ number sequences per second, which is more than
+sufficient for predictive text entry.
 
 \section{Tools and Resources}
 \label{sec:tools}
