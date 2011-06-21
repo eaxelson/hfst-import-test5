@@ -63,24 +63,13 @@ int main(int argc, char **argv)
 
       /* From AT&T format. */
       verbose_print("Construction from AT&T format", types[i]);
-      /*FILE * f = fopen("foobar.att", "wb");
-      fprintf(f, 
-	      "0 1 @0@ @0@ 0.0\n"
-	      "1 2 foo bar 0\n"
-	      "2 3 @0@ @0@\n"
-	      "3\n");
-	      fclose(f);*/
-      /*char * srcdir = getenv("srcdir");
-      std::string srcdir_(".");
-      if (srcdir != NULL)
-      srcdir_ + std::string(srcdir); */
-      const char * file_to_open = "foobar.att"; // (srcdir_ + 
-	//std::string("/foobar.att")).c_str();
-      FILE * file = fopen(file_to_open, "rb");
+      FILE * file = fopen((std::string(getenv("srcdir")) + 
+			   std::string("/foobar.att")).c_str(), "rb");
       assert(file != NULL);
       HfstTransducer foobar_att(file, types[i], "@0@");
       fclose(file);
       foobar_att.minimize();
+
       assert(foobar.compare(foobar_att));
 
       /* From HfstInputStream. 
