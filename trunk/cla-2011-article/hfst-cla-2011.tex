@@ -225,14 +225,14 @@ corresponds to ordinary addition of floating point numbers $w_1 + w_2$.
 
 Akin to ordinary transducers, WFSTs can be combined using
 different binary algebraic operations or modified using unary
-algebraic operations to yield new WFSTs. Our system uses three
-different algebraic operations:
+algebraic operations to yield new WFSTs. Our system uses two unary and three binary operations:
 \begin{itemize}
-\item {\bf Projection $\mathrm{p}(T)$:} A unary operation, whose result
+\item {\bf Projection $\mathrm{P}(T)$:} A unary operation, whose result
   rewrites a string $s_i$ into itself, iff the argument rewrites $s_i$
   into any output string $s_o$. The weight given to each correspondence
   $s_i:s_i$ is
   $$\bigoplus_{s_i\mathrm{:}s_o \in T} w_T(s_i\mathrm{:}s_o)$$
+\item {\bf scaling $\mathrm{W}(k,T)$:} A unary operation, whose result accepts the same correspondences $s_i\mathrm{:}s_o$ as $T$ with weight $k\cdot w_T(s_i\mathrm{:}s_o)$. Here we use regular multiplication of floating point numbers (not $\otimes$).
 \item {\bf Disjunction $S \cup T$:} A binary operation, whose result
   rewrites an input strings $s_i$ into the output string $s_o$, iff
   one of the argument transducers writes $s_i$ to $s_o$. The weight
@@ -244,11 +244,16 @@ different algebraic operations:
   argument rewrites $t$ to $s_o$. The weight given each correspondence
   $s_i\mathrm{:}s_o$ is
   $$\bigoplus_{s_i\mathrm{:}t \in S, t\mathrm{:}s_o \in T} w_S(s_i\mathrm{:}t) \otimes w_T(t\mathrm{:}s_o)$$
+\item {\bf Subtraction $S - T$:} A binary operation whose result accepts those correspondences in $S$, which are not accepted by $T$. The weight remains the same, so
+$$w_{S-T}(s_i\mathrm{:}s_o) < \infty \Rightarrow w_{S-T}(s_i\mathrm{:}s_o) = w_{S}(s_i\mathrm{:}s_o)$$
 \end{itemize}
 For a more thorough discussion on WFSTs, see \cite{openfst/2007}.
 
 \subsection{Component of the predictive text entry system}
-Our system is constructed from three WFSTs, which are combined using disjunction and composition:
+
+Our system is constructed from three WFSTs, which are combined using
+disjunction and composition:
+
 \begin{itemize}
 \item A transducer $[\mathrm{Num}\rightarrow\mathrm{Text}]$, which
   rewrites number sequences as letter sequences mimicing the way the
@@ -269,31 +274,75 @@ Our system is constructed from three WFSTs, which are combined using disjunction
   text messages (in our case IRC logs).
 \end{itemize}
 
+The lexicon transducer $L_O$ is derived from an existing morphology $M$
+(in this paper we use the open-source finite-state morphology for
+Finnish Omorfi). The morphological analyzer is converted to a lexicon
+using projection, which throws away the morphological analyses and
+leaves a transducer which accepts wordforms. Hence 
+$$ L_O = \mathrm{P}(M)\text{.}$$
+
 Schematically our system works by looking up a number sequence in
 $[\mathrm{Num}\rightarrow\mathrm{Text}]$ to find all possible letter
 strings associated to the sequence and then performing a lexicon
 lookup in both of the lexicons $L_O$ and $L_I$ to see which of the
 letter sequences are actually words. Each of the words receives some
-(possibly infinite) weight from both $L_O$ and $L_I$. For each
-candidate word, a weighted average is computed from these penalties
-and this is the probability of the candidate word. Predictive text
-entry will offer the candidates in order of penalty weight.
+(possibly infinite) weight from both $L_O$ and $L_I$. In case, either
+one of the lexicons gives an infinite weight, it will be replaced by
+some large penalty $w_{max}$. or each candidate word, a weighted
+average is computed from these penalties and this is the probability
+of the candidate word. Predictive text entry will offer the candidates
+in order of penalty weight.
 
 In practice this approach is not feasible, because
 $[\mathrm{Num}\rightarrow\mathrm{Text}]$ will over-generate hugely
-(e.g. for a string of ten numbers, $59049$ letter sequences are
-generated and need to be looked up in the lexicons). This is why we
-compile all three transducers into one transducer using composition
-and disjunction. The transducer performs translation into letter
-sequences and lexicon lookup simultaneously thus avoiding
-over-generation.
+(e.g. for a string of ten numbers at least $3^{10} = 59049$ letter
+sequences are generated and need to be looked up in the
+lexicons). This is why we compile all three transducers into one
+transducer using composition and disjunction. The transducer performs
+translation into letter sequences and lexicon lookup simultaneously
+thus avoiding over-generation.
 
 \subsection{Combining the Component Lexicons}
 
-%The probability weightins systems need to be scaled in combination to match and
-%\ldots
-% Tähän kai pitää vielä tarkentaa mitä on tehty omorfin + irkkilokipainojen
-% skaalaukseen ja mitä se tarkotaa
+In this subsection we explain, how the lexicons $L_O$ and $L_I$ are
+combined with the transducer $[\mathrm{Num}\rightarrow\mathrm{Text}]$
+to form the transducer which performs predictive text entry. We first
+derive a formally correct way to combine the transducers and then show
+how it can be done simpler, without sacrificing accuracy.
+
+As we explained above, it may happen that some word forms are found in
+one lexicon but not the other. In that case we want to replace the
+infinite weight they receive by a large penalty weight $w_{max}$,
+which is greater than the weight that given by the lexicons for any
+accepted word form. Therefore we disjunct the lexicons with the
+language $U_{max}$, which accepts all words and gives them weight
+$w_{max}$. The result $L_O \cup U_{max}$ will accept any word form $s$
+and give it weight $w_{L_O}(s\mathrm{:}s)$, if it is accepted by $L_O$
+and $w_{max}$ otherwise. The same applies for $L_I \cup U_{max}$.
+
+We want to construct such a transducer $L$, that $w_L(s\mathrm{:}s)$
+is a weighted average of the weights $w_{L_I \cup U_{max}}(s\mathrm{:}s)$ and
+$w_{L_O \cup U_{max}}(s\mathrm{:}s)$, i.e.
+$$w_L(s\mathrm{:}s) = k\cdot w_{L_I}(s\mathrm{:}s) + (1 - k)\cdot w_{L_O}(s\mathrm{:}s)\text{, where }0\leq k \leq 1\text{.}$$
+Notice that we use regular addition and multiplication of floating
+point numbers. We can easily represent the transducer using scaling, disjunction and composition
+$$ L = \mathrm{W}\big(k,(L_I \cup U_{max})\big) \circ \mathrm{W}\big(1-k,(L_O \cup U_{max})\big)$$
+
+There is a problem with the language $L$, because it will accept every
+string of letters, which is a performance concern, as we explained
+above. Therefore we need to subtract the language of all strings that
+are not in $L_I$ or $L_O$. Hence the final lexicon is
+$$L_{tot} = L - (U - (L_I \cup L_O))\text{,}$$
+where $U$ is the language of all letter strings.
+
+Finally we can compose $[\mathrm{Num}\rightarrow\mathrm{Text}]$ with
+$L_{tot}$ in order to get a transducer, which transforms number
+sequences to word forms.
+
+In the construction of the composite lexicon $L$, we used the floating
+point constant $k$. This constant needs to be estimated
+experimentally. In the section \ref{sec:evaluation}, we show that the
+constant can be estimated without resorting to a corpus of text messages.
 
 \subsection{Using a Combination of Lexicons for Predictive Text Entry}
 
