@@ -109,5 +109,41 @@ int main(int argc, char **argv)
   catch (EmptyStringException e) {
     ;
   }
+
+  
+  verbose_print("HfstBasicTransducer: unknown and indentity symbols");
+
+  {
+    // In the xerox formalism used here, "?" means the unknown symbol
+    // and "?:?" the identity pair 
+    
+    HfstBasicTransducer tr1;
+    tr1.add_state(1);
+    tr1.set_final_weight(1, 0);
+    tr1.add_transition
+      (0, HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "foo", 0) );
+    
+    // tr1 is now [ ?:foo ]
+    
+    HfstBasicTransducer tr2;
+    tr2.add_state(1);
+    tr2.add_state(2);
+    tr2.set_final_weight(2, 0);
+    tr2.add_transition
+      (0, HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@", 
+			      "@_IDENTITY_SYMBOL_@", 0) );
+    tr2.add_transition
+      (1, HfstBasicTransition(2, "bar", "bar", 0) );
+    
+    // tr2 is now [ [ ?:? ] [ bar:bar ] ]
+    
+    ImplementationType type = SFST_TYPE;
+    HfstTransducer Tr1(tr1, type);
+    HfstTransducer Tr2(tr2, type);
+    Tr1.disjunct(Tr2);
+    
+    // Tr1 is now [ [ ?:foo | bar:foo ]  |  [[ ?:? | foo:foo ] [ bar:bar ]] ]
+  }
+  
 }
 

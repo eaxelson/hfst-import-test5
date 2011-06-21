@@ -10,6 +10,27 @@ using namespace hfst;
 using hfst::implementations::HfstBasicTransition;
 using hfst::implementations::HfstBasicTransducer;
 
+bool function(const StringPair &sp, StringPairSet &sps) 
+{
+  if (sp.second.compare(sp.first) != 0)
+    return false;
+
+  std::string isymbol = sp.first;
+  std::string osymbol;
+
+  if (sp.second.compare("a") == 0 ||
+      sp.second.compare("o") == 0 ||
+      sp.second.compare("u") == 0)
+    osymbol = std::string("<back_wovel>");
+  if (sp.second.compare("e") == 0 ||
+      sp.second.compare("i") == 0)
+    osymbol = std::string("<front_wovel>");
+
+  sps.insert(StringPair(isymbol, osymbol));
+  return true;
+}
+
+
 int main(int argc, char **argv) 
 {
 
@@ -205,6 +226,13 @@ int main(int argc, char **argv)
     //std::cerr << test;
   }
 
+
+  {
+    HfstTransducer t("a", "a", SFST_TYPE);
+    t.substitute(&function);
+    HfstTransducer T("a", "<back_wovel>", SFST_TYPE);
+    assert(t.compare(T));
+  }
 
 }
 

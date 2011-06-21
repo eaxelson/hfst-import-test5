@@ -29,4 +29,4 @@ test_examples test_lexc
 EXTRA_DIST=foobar.att test_transducers.att test_lexc.lexc test_lexc_fail.lexc
 
 clean-local:
-	-rm -f *.att *.hfst
+	-rm -f *.hfst
