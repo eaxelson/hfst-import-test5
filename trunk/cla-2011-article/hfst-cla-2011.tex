@@ -9,6 +9,7 @@
 \usepackage{balance}
 \usepackage{subfig}
 \usepackage {graphicx}
+\usepackage{amssymb}
 
 \title{Improving Predictive Entry of Text Messages using IRC Logs}
 
@@ -234,7 +235,7 @@ algebraic operations to yield new WFSTs. Our system uses two unary and three bin
   \begin{equation}
     \bigoplus_{s_i\mathrm{:}s_o \in T} \mathrm{w}_T(s_i\mathrm{:}s_o)
   \end{equation}
-\item {\bf scaling $\mathrm{W}_k(T)$:} A unary operation, whose result accepts the same correspondences $s_i\mathrm{:}s_o$ as $T$ with weight $k\cdot \mathrm{w}_T(s_i\mathrm{:}s_o)$. Here we use regular multiplication of floating point numbers (not $\otimes$).
+\item {\bf scaling $\mathrm{W}_k(T)$,where $k \in \mathbb{R}$:} A unary operation, whose result accepts the same correspondences $s_i\mathrm{:}s_o$ as $T$ with weight $k\cdot \mathrm{w}_T(s_i\mathrm{:}s_o)$. Here we use regular multiplication of floating point numbers (not $\otimes$).
 \item {\bf Disjunction $S \cup T$:} (sometimes called union) A binary
   operation, whose result rewrites an input strings $s_i$ into the
   output string $s_o$, iff one of the argument transducers writes
