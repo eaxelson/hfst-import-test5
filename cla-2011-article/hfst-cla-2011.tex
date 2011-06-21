@@ -297,19 +297,19 @@ lookup in both of the lexicons $L_O$ and $L_I$ to see which of the
 letter sequences are actually words. Each of the words receives some
 (possibly infinite) weight from both $L_O$ and $L_I$. In case, either
 one of the lexicons gives an infinite weight, it will be replaced by
-some large penalty $w_{max}$. or each candidate word, a weighted
-average is computed from these penalties and this is the probability
-of the candidate word. Predictive text entry will offer the candidates
-in order of penalty weight.
+some large penalty $w_{max}$. For each candidate word, a weighted
+average is computed from these penalties and this is the total penalty
+weight of the candidate word. Predictive text entry will offer the
+candidates in order of increasing penalty weight.
 
 In practice this approach is not feasible, because
 $[\mathrm{Num}\rightarrow\mathrm{Text}]$ will over-generate hugely
 (e.g. for a string of ten numbers at least $3^{10} = 59049$ letter
 sequences are generated and need to be looked up in the
 lexicons). This is why we compile all three transducers into one
-transducer using composition and disjunction. The transducer performs
-translation into letter sequences and lexicon lookup simultaneously
-thus avoiding over-generation.
+transducer using composition, disjunction and subtraction. The
+transducer performs translation into letter sequences and lexicon
+lookup simultaneously thus avoiding over-generation.
 
 \subsection{Combining the Component Lexicons}
 
@@ -321,13 +321,14 @@ how it can be done simpler, without sacrificing accuracy.
 
 As we explained above, it may happen that some word forms are found in
 one lexicon but not the other. In that case we want to replace the
-infinite weight they receive by a large penalty weight $w_{max}$,
-which is greater than the weight that given by the lexicons for any
-accepted word form. Therefore we disjunct the lexicons with the
+infinite weight given by one of the lexicons by a large penalty weight
+$w_{max}$, which is greater than the weight given by the lexicons for
+any accepted word form. Therefore we disjunct the lexicons with the
 language $U_{max}$, which accepts all words and gives them weight
-$w_{max}$. The result $L_O \cup U_{max}$ will accept any word form $s$
-and give it weight $\mathrm{w}_{L_O}(s\mathrm{:}s)$, if it is accepted by $L_O$
-and $\mathrm{w}_{max}$ otherwise. The same applies for $L_I \cup U_{max}$.
+$w_{max}$. For the lexicon $L_O$, the result $L_O \cup U_{max}$ will
+accept any word form $s$ and give it weight
+$\mathrm{w}_{L_O}(s\mathrm{:}s)$, if it is accepted by $L_O$ and
+$\mathrm{w}_{max}$ otherwise. The same applies for $L_I \cup U_{max}$.
 
 We want to construct such a transducer $L$, that $\mathrm{w}_L(s\mathrm{:}s)$
 is a weighted average of the weights $\mathrm{w}_{L_I \cup U_{max}}(s\mathrm{:}s)$ and
@@ -341,7 +342,7 @@ point numbers. We can easily represent the transducer using scaling, disjunction
   L = \mathrm{W}(k,(L_I \cup U_{max})) \circ \mathrm{W}((1-k),(L_O \cup U_{max}))
 \end{equation}
 
-There is a problem with the language $L$, because it will accept every
+There is a problem with the language $L$. It will accept every
 string of letters, which is a performance concern, as we explained
 above. Therefore we need to subtract the language of all strings that
 are not in $L_I$ or $L_O$. Hence the final lexicon is
@@ -354,11 +355,11 @@ sequences to word forms.
 
 In the construction of the composite lexicon $L$, we used the floating
 point constant $k$. This constant needs to be estimated
-experimentally. In the section \ref{sec:evaluation}, we show that the
+experimentally. In section \ref{sec:evaluation}, we show that the
 constant can be estimated without resorting to a corpus of text messages.
 
 The method which we described is fairly contrived, so we wanted to try
-out a simpler way to combine the lexicons
+out a simplifyed way to combine the lexicons
 \begin{equation}
   L_{I\vee O}' = \mathrm{W}(k,L_I) \cup \mathrm{W}((1 - k),L_O)\text{, where }0 \leq k \leq 1\text{.}
 \end{equation} 
@@ -367,7 +368,7 @@ combination of the scaled weights given by $L_I$ and $L_O$. Instead
 it's the minimum of the scaled weights
 $\mathrm{w}_{L_I}(s\mathrm{:}s)$ and $\mathrm{w}_{L_O}(s\mathrm{:}s)$.
 Tests showed negligible difference in accuracy between the methods,
-which lead us to use the simpler method.
+which lead us to use the simplifyed method in practice.
 
 \subsection{Using a Combination of Lexicons for Predictive Text Entry}
 
