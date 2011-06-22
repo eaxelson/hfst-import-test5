@@ -404,7 +404,7 @@ bool HfstTransducer::is_lookdown_infinitely_ambiguous
 // -----------------------------------------------------------------------
 
 HfstTransducer::HfstTransducer():
-    type(ERROR_TYPE),anonymous(false),is_trie(true), name("")
+    type(UNSPECIFIED_TYPE),anonymous(false),is_trie(true), name("")
 {}
 
 
@@ -2974,9 +2974,11 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
     if (&another == this)
     { return *this; }
   
-    if (this->type != another.type)
-	HFST_THROW_MESSAGE
-	    (TransducerTypeMismatchException, "HfstTransducer::operator=");
+    if (this->type != UNSPECIFIED_TYPE && 
+	this->type != another.type) {
+      HFST_THROW_MESSAGE
+	(TransducerTypeMismatchException, "HfstTransducer::operator=");
+    }
 
     // set some features
     anonymous = another.anonymous;
@@ -3009,6 +3011,8 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
 	//delete implementation.my_transducer_library;
 	//break;
 	//#endif
+    case UNSPECIFIED_TYPE:
+      break;
     case ERROR_TYPE:
     default:
 	HFST_THROW(TransducerHasWrongTypeException);

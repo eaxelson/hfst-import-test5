@@ -270,6 +270,13 @@ namespace hfst { namespace implementations
 			  assert(false); */
 	      }
 
+	    // DEBUG
+	    /*std::cerr << "adding arc "
+		      << state_vector[source_state] << "\t"
+		      << state_vector[tr_it->get_target_state()] << "\t"
+		      << in << "\t"
+		      << out << std::endl;*/
+
             t->AddArc(
 		      state_vector[source_state],
                        fst::StdArc

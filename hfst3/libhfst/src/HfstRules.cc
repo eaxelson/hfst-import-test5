@@ -914,12 +914,14 @@ void right_arrow_test1( ImplementationType type )
 	// -> \/ Replace down
 	tmp = input1;
 	tmp.compose(replaceDown).minimize();
-	// TODO: assert Replace_down:
+	// TODO: assert Replace_down correctly, SFST's replace_down
+	// and Karttunen's are not defined in the same way:
 	//assert ( tmp.compare( result_right4 ) );
 	// (->) \/ Replace down optional
 	tmp = input1;
 	tmp.compose(replaceDownOptional).minimize();
-	// TODO: assert Replace_down:
+	// TODO: assert Replace_down correctly, SFST's replace_down
+	// and Karttunen's are not defined in the same way:
 	//assert ( tmp.compare( result_right4_optional ) );
 }
 /*

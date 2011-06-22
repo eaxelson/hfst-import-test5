@@ -19,7 +19,7 @@
 #include "HfstDataTypes.h"
 
 /** @file HfstOutputStream.h
- \brief Declaration of class HfstOutputStream. */
+    \brief Declaration of class HfstOutputStream. */
 
 namespace hfst
 {
@@ -50,6 +50,7 @@ namespace hfst
 
       ...
 
+      // Write three HFST transducers in binary format to file named "testfile"
       HfstOutputStream out("testfile", FOMA_TYPE);
       out << foma_transducer1 
           << foma_transducer2 
@@ -130,7 +131,7 @@ For more information on HFST transducer structure, see
     /** \brief Write the transducer \a transducer in binary format 
         to the stream. 
 
-        All transducers must have the same type as the stream, else an
+        All transducers must have the same type as the stream, else a
         TransducerTypeMismatchException is thrown. 
 
         @throws TransducerTypeMismatchException
