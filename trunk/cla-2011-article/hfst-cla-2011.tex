@@ -456,8 +456,6 @@ We tested the combination model with the one tenth of the IRC log set aside for 
 To ensure the test results were not merely a result of coincidentally having chosen an exceptionally easy tenth of the IRC logs, we ran the same tests for each of the other tenths as well, creating the combination models using the rest of the logs, using the optimal weighting (see \ref{sec:weighting}). The amount of the words recognised was between 93.95 and 94.99 \% in each case, with an average of 94.51 \%. This means that the original tenth of the logs used for testing is quite similar to the other tenths in terms of difficulty for the model, and we have no reason to assume the choice of the test material would significantly bias the results.
 
 \subsection{Testing with text messages}
-
-(Kaivataanko jostain tuloksista taulukoita? )
  
 We then used the text message data for testing. 91.07 \% of the words were analysed correctly. The text message data also received the best results with the weighting 0.2 for the spoken language model and 0.8 for the baseline model, with which 75.16 \% of the words were recognised on the first attempt.
 
@@ -465,11 +463,19 @@ We also ran tests with the text message data on the alternative combination mode
 
 The results for correct first guesses have an average of 75.22 \%, with a standard deviation of 0.10 percentage points. If the results follow the normal distribution, 99.7 \% of them should be within 3 standard deviations from the average, i.e. between 74.92 \% and 75.52 \%. We do not know whether the results are normally distributed, but this gives us a rough idea of what the results are expected to look like.
 
-% baseline -vertailu
-
 To confirm our assumption that adding the understanding of spoken language indeed improves the quality of the results, we ran the text message test data through the baseline model to see how much the spoken language model affects the results. The difference between the results achieved with the baseline and the combined model is noticeable. The baseline gave a correct analysis for 81.37 \% of the words. Only 55.10 \% of the words were given the correct analysis at the first attempt.
 
-Taulukko baselinen ja kombon tuloksista?
+% omorfi, tekstarit
+\begin{tabular} {l c r}
+ & baseline & combination \\
+ \hline
+Recognised on first try & 55.10 \% & 75.16 \% \\
+Recognised in 3 tries & 72.18 \% & 85.77 \% \\
+Recognised & 81.37 \% & 91.07 \% \\
+\hline
+ & & \\
+\end{tabular}
+
 
 To determine the significance of the differences between the results from the baseline model and the combination model, we ran a Wilcoxon paired rank test which is suitable for data that cannot be guaranteed to follow the normal distribution. We compared the percentages of correct first attempts with the baseline model and the ten different combination models. Since the test requires equally big sets of test data, we used the baseline model result as a counterpart for each of the different combination model results. The test gave a p-value of 6.34e-05, which means that we can quite confidently say the results differ quite clearly.
 
