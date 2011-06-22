@@ -43,7 +43,7 @@ namespace hfst
   }
 
 
-  /** \brief A stream for reading binary transducers. 
+  /** \brief A stream for reading HFST binary transducers. 
 
       An example:
 \verbatim
@@ -51,24 +51,36 @@ namespace hfst
 
 ...
 
-HfstInputStream *in;
-try {
+HfstInputStream *in = NULL;
+
+try 
+{
   in = new HfstInputStream("testfile");
-} catch (StreamNotReadableException e) {
-    printf("ERROR: File does not exist.\n");
+} 
+catch (StreamNotReadableException e) 
+{
+    std::cerr << "ERROR: File does not exist." << std::endl;
     exit(1);
 }
-int n=0;
-while (not in->is_eof()) {
-  if (in->is_bad()) {
-    printf("ERROR: Stream cannot be read.\n");
-    exit(1); 
+
+int transducers_read = 0;
+
+while (not in->is_eof()) 
+{
+  if (in->is_bad()) 
+  {
+  std::cerr << "ERROR: Stream cannot be read." << std::endl;
+  exit(1); 
   }
   HfstTransducer t(*in);
-  printf("One transducer succesfully read.\n");
-  n++;
+  std::cerr << "One transducer succesfully read." << std::endl;
+  transducers_read++;
 }
-printf("\nRead %i transducers in total.\n", n);
+
+std::cerr << "Read " 
+          << transducers_read 
+          << " transducers in total."
+	  << std::endl;
 in->close();
 delete in;
 \endverbatim
@@ -208,7 +220,8 @@ For documentation on the HFST binary transducer format, see
     /** \brief Open a stream to file \a filename for reading binary 
         transducers. 
 
-        @pre The file exists. Otherwise, an exception is thrown.
+        @pre The file exists. Otherwise, a StreamNotReadableException
+	is thrown.
 
         @throws StreamNotReadableException 
         @throws NotTransducerStreamException
@@ -225,7 +238,7 @@ For documentation on the HFST binary transducer format, see
         If the stream points to standard input, nothing is done. */
     void close(void);
 
-    /** \brief Whether the stream is at the end. */
+    /** \brief Whether the stream is at end. */
     bool is_eof(void);
     /** \brief Whether badbit is set. */
     bool is_bad(void);
@@ -235,7 +248,8 @@ For documentation on the HFST binary transducer format, see
     /** \brief The type of the first transducer in the stream. 
 
         By default, all transducers in a stream have the same type, else
-        a TransducerTypeMismatchException is thrown. */
+        a TransducerTypeMismatchException is thrown when reading the first
+	transducer that has a different type than the previous ones. */
     ImplementationType get_type(void) const;
 
     friend class HfstTransducer;

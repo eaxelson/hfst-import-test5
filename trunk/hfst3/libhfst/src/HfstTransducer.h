@@ -127,15 +127,17 @@ namespace hfst
     \section argument_handling Argument handling
 
     Transducer functions modify their calling object and return 
-    a reference to it, unless otherwise said.
+    a reference to the calling object after modification, 
+    unless otherwise mentioned.
     Transducer arguments are usually not modified.
 \verbatim
     // transducer is reversed
     transducer.reverse();
-    // tr2 is not modified, but a copy of it is disjuncted with t1
-    tr1.disjunct(tr2);                                       
+    // transducer2 is not modified, but a copy of it is disjuncted with
+    // transducer1 
+    transducer1.disjunct(transducer2);                                       
     // a chain of functions is possible
-    tr.reverse().determinize().reverse().determinize();      
+    transducer.reverse().determinize().reverse().determinize();      
 \endverbatim
 
     \section implementation_types Implementation types
@@ -321,17 +323,13 @@ An example:
        Get all symbol pairs that occur in the transitions of the transducer. */
     StringPairSet get_symbol_pairs();
 
-  public:
-    /** \brief Get the alphabet of the transducer. */
-    StringSet get_alphabet() const;
-
   protected:
     /* Explicitely insert \a symbol to the alphabet of the transducer. */
     void insert_to_alphabet(const std::string &symbol); 
-
+    
     /* Get the number used to represent the symbol \a symbol. */
     unsigned int get_symbol_number(const std::string &symbol);
-
+    
     /* For internal use, implemented only for SFST_TYPE. */          
     std::vector<HfstTransducer*> extract_path_transducers();
 
@@ -393,7 +391,8 @@ An example:
         
         @note This constructor leaves the backend implementation variable
         uninitialized. An uninitialized transducer is likely to cause a
-        TransducerHasWrongTypeException at some point. */
+        TransducerHasWrongTypeException at some point unless it is given
+	a value at some point. */
     HfstTransducer();
 
     /** \brief Create an empty transducer, i.e. a transducer that does not 
@@ -423,7 +422,7 @@ An example:
 
         @see HfstTokenizer **/
     HfstTransducer(const std::string& utf8_str, 
-                       const HfstTokenizer &multichar_symbol_tokenizer,
+		   const HfstTokenizer &multichar_symbol_tokenizer,
                    ImplementationType type);
 
     /** \brief Create a transducer by tokenizing 
@@ -613,6 +612,12 @@ in \a ifile.
     /** \brief Get the name of the transducer. 
         @see set_name */
     std::string get_name() const;
+
+    /** \brief Get the alphabet of the transducer. 
+	
+	The alphabet is defined as the set of symbols known 
+	to the transducer. */
+    StringSet get_alphabet() const;
 
     /** \brief Whether the transducer is cyclic. */
     bool is_cyclic(void) const;
@@ -867,7 +872,7 @@ ccc : ddd
        bool filter_fd=true) const;
 
     //! @brief Lookup or apply a single tokenized string \a s and
-    //! store a maximum of \a limit results to \a results.
+    //! return a maximum of \a limit results.
     //! 
     //! This is a version of lookup that handles flag diacritics as ordinary
     //! symbols and does not validate the sequences prior to outputting.
@@ -880,7 +885,7 @@ ccc : ddd
 			       ssize_t limit = -1) const;
 
     //! @brief Lookup or apply a single string \a s and
-    //! store a maximum of \a limit results to \a results.
+    //! return a maximum of \a limit results.
     //! 
     //! This is an overloaded lookup function that leaves tokenizing to the
     //! transducer.
@@ -941,7 +946,7 @@ ccc : ddd
     //!
     //!
     //! This function is the same as 
-    //! #lookup(HfstOneLevelPaths&, const StringVector&, ssize_t) const
+    //! #lookup(const StringVector&, ssize_t) const
     //! but lookup is not done using a string and a tokenizer instead of
     //! a StringVector.
     HfstOneLevelPaths * lookup(const HfstTokenizer& tok,
@@ -952,15 +957,15 @@ ccc : ddd
     //! \a tok defines how s is tokenized.
     //!
     //! The same as 
-    //! #lookup_fd(HfstOneLevelPaths&, const StringVector&, ssize_t) const 
+    //! #lookup_fd(const StringVector&, ssize_t) const 
     //! but uses a tokenizer and a string instead of a StringVector.
     //!
     HfstOneLevelPaths * lookup_fd(
 	const HfstTokenizer& tok,
 	const std::string &s, ssize_t limit = -1) const;
 
-    //! @brief (Not implemented) Lookdown a single string \a s and store 
-    //! a maximum of \a limit results to \a results.
+    //! @brief (Not implemented) Lookdown a single string \a s and return 
+    //! a maximum of \a limit results.
     //!
     //! Traverse all paths on logical second level of the transducer to produce
     //! all possible inputs on the first.
@@ -971,7 +976,7 @@ ccc : ddd
     //! <!-- @param tok  tokenizer to split string in arcs? -->
     //! @param limit  number of strings to extract. -1 tries to extract all and
     //!             may get stuck if infinitely ambiguous
-    //! @param results  output parameter to store unique results
+    //! @return  output parameter to store unique results
     //! @todo todo
     HfstOneLevelPaths * lookdown(const StringVector& s,
 				 ssize_t limit = -1) const;
@@ -1232,7 +1237,7 @@ bool function(const StringPair &sp, StringPairSet &sps)
 // For all transitions in transducer t whose input and output wovels 
 // are equivalent, substitute the output wovel with a symbol that defines
 // whether the wovel in question is a front or back wovel.
-t.substitute(&func);
+t.substitute(&function);
 \endverbatim               
 
 @see String
@@ -1338,7 +1343,7 @@ float func(float f) {
 ...
 
 // All transition and final weights are multiplied by two and summed with 0.5.
-HfstTransducer t_transformed;
+transducer.transform_weights(&func);
 \endverbatim 
 
     If the HfstTransducer is of unweighted type 
