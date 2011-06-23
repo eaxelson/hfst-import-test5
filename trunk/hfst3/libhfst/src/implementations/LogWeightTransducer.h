@@ -243,6 +243,8 @@ namespace implementations
 
       static void insert_to_alphabet
         (LogFst *t, const std::string &symbol);
+      static void remove_from_alphabet
+        (LogFst *t, const std::string &symbol);
       static StringSet get_alphabet(LogFst *t);
       static unsigned int get_symbol_number(LogFst *t, 
 					    const std::string &symbol);
@@ -252,9 +254,6 @@ namespace implementations
 
       static LogFst * expand_arcs
         (LogFst * t, hfst::StringSet &unknown, bool unknown_symbols_in_use);
-
-      static LogFst * remove_from_alphabet
-        (LogFst *t, const std::string &symbol);
 
       float get_profile_seconds();
 

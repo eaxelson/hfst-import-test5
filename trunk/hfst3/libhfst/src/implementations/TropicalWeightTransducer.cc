@@ -66,6 +66,21 @@ namespace hfst { namespace implementations
     delete st;
   }
 
+  void TropicalWeightTransducer::remove_from_alphabet
+  (StdVectorFst *t, const std::string &symbol)
+  {
+    assert(t->InputSymbols() != NULL);
+    fst::SymbolTable st(t->InputSymbols()->Name());    
+    for ( fst::SymbolTableIterator it 
+            = fst::SymbolTableIterator(*(t->InputSymbols()));
+          not it.Done(); it.Next() ) {
+      if (it.Symbol() != symbol) {
+	st.AddSymbol(it.Symbol(), it.Value());
+      }
+    }
+    t->SetInputSymbols(&st);
+  }
+
   StringSet TropicalWeightTransducer::get_alphabet(StdVectorFst *t)
   {
     assert(t->InputSymbols() != NULL);
