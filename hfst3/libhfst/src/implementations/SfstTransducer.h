@@ -155,9 +155,6 @@ namespace implementations
       static void print_test(Transducer *t);
       static void print_alphabet(Transducer *t);
 
-      static Transducer * remove_from_alphabet
-        (Transducer *t, const std::string &symbol);
-
       static Transducer * disjunct(Transducer * t, const StringPairVector &spv);
 
       static StringPairSet get_symbol_pairs(Transducer *t);
@@ -167,6 +164,8 @@ namespace implementations
 
       static StringSet get_alphabet(Transducer *t);
       static void insert_to_alphabet(Transducer *t, const std::string &symbol);
+      static void remove_from_alphabet
+	(Transducer *t, const std::string &symbol);
       static unsigned int get_symbol_number(Transducer *t, 
 					    const std::string &symbol);
 

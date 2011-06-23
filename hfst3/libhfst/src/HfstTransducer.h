@@ -324,9 +324,7 @@ An example:
     StringPairSet get_symbol_pairs();
 
   protected:
-    /* Explicitely insert \a symbol to the alphabet of the transducer. */
-    void insert_to_alphabet(const std::string &symbol); 
-    
+
     /* Get the number used to represent the symbol \a symbol. */
     unsigned int get_symbol_number(const std::string &symbol);
     
@@ -371,7 +369,9 @@ An example:
 
 
     /* For debugging */
+  public:
     void print_alphabet();
+  protected:
     static float get_profile_seconds(ImplementationType type);
 
 #include "hfst_apply_schemas.h"
@@ -618,6 +618,22 @@ in \a ifile.
 	The alphabet is defined as the set of symbols known 
 	to the transducer. */
     StringSet get_alphabet() const;
+
+    /** \brief Explicitely insert \a symbol to the alphabet 
+	of the transducer. 
+
+	@note Usually this function is not needed since new symbols are
+	added to the alphabet by default. */
+    void insert_to_alphabet(const std::string &symbol); 
+
+    /** \brief Remove \a symbol from the alphabet of the transducer.
+	CURRENTLY NOT IMPLEMENTED.
+
+	@pre \a symbol does not occur in any transition of the transducer.
+	@note Use with care, removing a symbol that occurs in a transition
+	of the transducer can have unexpected results.
+	@todo See that the tests work. */
+    void remove_from_alphabet(const std::string &symbol);
 
     /** \brief Whether the transducer is cyclic. */
     bool is_cyclic(void) const;

@@ -258,6 +258,8 @@ namespace implementations
 
       static void insert_to_alphabet
         (StdVectorFst *t, const std::string &symbol);
+      static void remove_from_alphabet
+        (StdVectorFst *t, const std::string &symbol);
       static StringSet get_alphabet(StdVectorFst *t);
       static unsigned int get_symbol_number(StdVectorFst *t, 
 					    const std::string &symbol);
@@ -274,9 +276,6 @@ namespace implementations
       static StdVectorFst * compose_intersect(StdVectorFst * t,
                                               Grammar * grammar);
 #endif
-
-      static StdVectorFst * remove_from_alphabet
-        (StdVectorFst *t, const std::string &symbol);
 
       float get_profile_seconds();
 

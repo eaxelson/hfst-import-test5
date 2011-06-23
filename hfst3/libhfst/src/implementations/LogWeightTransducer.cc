@@ -65,6 +65,21 @@ namespace hfst { namespace implementations
     delete st;
   }
 
+  void LogWeightTransducer::remove_from_alphabet
+  (LogFst *t, const std::string &symbol)
+  {
+    assert(t->InputSymbols() != NULL);
+    fst::SymbolTable st(t->InputSymbols()->Name());    
+    for ( fst::SymbolTableIterator it 
+            = fst::SymbolTableIterator(*(t->InputSymbols()));
+          not it.Done(); it.Next() ) {
+      if (it.Symbol() != symbol) {
+	st.AddSymbol(it.Symbol(), it.Value());
+      }
+    }
+    t->SetInputSymbols(&st);
+  }
+
   StringSet LogWeightTransducer::get_alphabet(LogFst *t)
   {
     assert(t->InputSymbols() != NULL);

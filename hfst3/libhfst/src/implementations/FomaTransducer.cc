@@ -720,6 +720,12 @@ namespace hfst { namespace implementations {
     sigma_add(strdup(symbol.c_str()), t->sigma);
   }    
 
+  void FomaTransducer::remove_from_alphabet
+  (fsm * t, const std::string &symbol)
+  {
+    sigma_remove(strdup(symbol.c_str()), t->sigma);
+  }
+
   StringSet FomaTransducer::get_alphabet(fsm *t)
   {
     StringSet alpha;

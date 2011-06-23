@@ -1116,7 +1116,48 @@ namespace hfst { namespace implementations {
   void SfstTransducer::insert_to_alphabet
     (Transducer * t, const std::string &symbol)
   {
+    std::cerr << "adding symbol " << symbol << std::endl;
     t->alphabet.add_symbol(symbol.c_str());
+  }
+
+  void SfstTransducer::remove_from_alphabet
+  (Transducer * t, const std::string &symbol)
+  {
+    SFST::Alphabet & alpha = t->alphabet;
+    const char * symbol_to_remove = symbol.c_str();
+
+    std::vector<char*> sym;
+    std::vector<SFST::Character> code;
+    std::vector<SFST::Label> label;
+
+    SFST::Alphabet::CharMap cm = alpha.get_char_map();
+    for( SFST::Alphabet::CharMap::const_iterator it=cm.begin(); 
+	 it!=cm.end(); it++ ) {
+      SFST::Character c=it->first;
+      char *s=it->second;
+      if (strcmp(s, symbol_to_remove) != 0) {
+	sym.push_back(fst_strdup(s));
+	code.push_back(c);
+      }
+    }
+    
+    for( std::set<SFST::Label>::const_iterator it=alpha.begin(); 
+	 it!=alpha.end(); it++ ) {
+      SFST::Label l=*it;
+      if (strcmp(alpha.code2symbol(l.upper_char()), symbol_to_remove) != 0 &&
+	  strcmp(alpha.code2symbol(l.lower_char()), symbol_to_remove) != 0  ) {
+	label.push_back(l);
+      }
+    }
+    
+    alpha.clear();
+
+    for( size_t i=0; i<sym.size(); i++ ) {
+      alpha.add_symbol(sym[i], code[i]);
+      free(sym[i]);
+    }
+    for( size_t i=0; i<label.size(); i++ )
+      alpha.insert( label[i] );
   }
 
   StringSet SfstTransducer::get_alphabet(Transducer * t)

@@ -137,6 +137,7 @@ namespace hfst {
       static FdTable<int>* get_flag_diacritics(fsm * t);
 
       static void insert_to_alphabet(fsm *t, const std::string &symbol);
+      static void remove_from_alphabet(fsm *t, const std::string &symbol);
       static StringSet get_alphabet(fsm *t);
       static unsigned int get_symbol_number(fsm *t, 
 					    const std::string &symbol);      
@@ -148,8 +149,6 @@ namespace hfst {
                         
       static void delete_foma(fsm * net);
       static void print_test(fsm * t);
-
-      static fsm * remove_from_alphabet(fsm * t, const std::string &symbol);
 
       static fsm * read_lexc(const std::string &filename);
 

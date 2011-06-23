@@ -780,6 +780,80 @@ int main(int argc, char **argv)
       }
 
 
+#ifdef FOO // FIXME
+      {
+	verbose_print("alphabets", types[i]);
+
+	HfstTransducer a2unk("a", /*"@_UNKNOWN_SYMBOL_@",*/ types[i]);
+	assert(a2unk.get_alphabet().size() > 3);
+	std::cerr << "HERE1" << std::endl;
+	a2unk.insert_to_alphabet("FOO");
+	std::cerr << "HERE2" << std::endl;
+	a2unk.remove_from_alphabet("FOO");
+	StringSet alpha = a2unk.get_alphabet();
+	assert(alpha.find("FOO") == alpha.end());
+      }
+
+      /* Test that binary operations do not change the transducer argument. */
+      {
+	verbose_print("binary operations", types[i]);
+
+	HfstTransducer id2id(internal_identity, internal_identity, types[i]);
+	HfstTransducer a2b("a", "b", types[i]);
+	
+	{
+	  HfstTransducer a2b_copy(a2b);
+	  HfstTransducer id2id_copy(id2id);
+	  HfstTransducer id2id_copy2(id2id);
+	  
+	  a2b_copy.concatenate(id2id_copy);	  
+	  assert(id2id_copy.compare(id2id_copy2));
+	  assert(id2id_copy.get_alphabet() == id2id_copy2.get_alphabet());
+	}
+
+	{
+	  HfstTransducer a2b_copy(a2b);
+	  HfstTransducer id2id_copy(id2id);
+	  HfstTransducer id2id_copy2(id2id);
+	  
+	  a2b_copy.disjunct(id2id_copy);	  
+	  assert(id2id_copy.compare(id2id_copy2));
+	  assert(id2id_copy.get_alphabet() == id2id_copy2.get_alphabet());
+	}
+
+	{
+	  HfstTransducer a2b_copy(a2b);
+	  HfstTransducer id2id_copy(id2id);
+	  HfstTransducer id2id_copy2(id2id);
+	  
+	  a2b_copy.intersect(id2id_copy);	  
+	  assert(id2id_copy.compare(id2id_copy2));
+	  assert(id2id_copy.get_alphabet() == id2id_copy2.get_alphabet());
+	}
+
+	{
+	  HfstTransducer a2b_copy(a2b);
+	  HfstTransducer id2id_copy(id2id);
+	  HfstTransducer id2id_copy2(id2id);
+	  
+	  a2b_copy.subtract(id2id_copy);	  
+	  assert(id2id_copy.compare(id2id_copy2));
+	  assert(id2id_copy.get_alphabet() == id2id_copy2.get_alphabet());
+	}
+
+	{
+	  HfstTransducer a2b_copy(a2b);
+	  HfstTransducer id2id_copy(id2id);
+	  HfstTransducer id2id_copy2(id2id);
+	  
+	  a2b_copy.compose(id2id_copy);	  
+	  assert(id2id_copy.compare(id2id_copy2));
+	  assert(id2id_copy.get_alphabet() == id2id_copy2.get_alphabet());
+	}
+	
+      }
+#endif // FOO
+
     }
 }
 
