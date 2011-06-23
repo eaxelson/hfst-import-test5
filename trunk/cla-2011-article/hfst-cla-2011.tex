@@ -11,7 +11,7 @@
 \usepackage {graphicx}
 \usepackage{amssymb}
 
-\title{Improving Predictive Entry of Text Messages using IRC Logs}
+\title{Improving Predictive Entry of Finnish Text Messages using IRC Logs}
 
 
 % author names and affiliations
@@ -56,15 +56,15 @@ of communication, but mobile phones are not especially well suited for
 inputting text because of their small size and often limited
 keyboard. There are several technological solutions for inputting text
 on mobile phones and other limited keyboard devices. This paper is
-concerned with so called predictive text entry, which utilizes
+concerned with a technology called predictive text entry, which utilizes
 redundancy in natural language in order to enable efficient text entry
 using limited keyboards (typically including 12 keys).
 
 There has been a lot of research into improving predictive text entry
-e.g. (...), but the research has mainly been concerned with improving
-the statistical model, or other technical aspects of the text entry
-algorithm. In this paper, we investigate the role of choice of training
-data for the accuracy of the text entry system. 
+e.g. (...), but research has mainly been concerned with improving the
+statistical model, or other technical aspects of the text entry
+algorithm. In this paper, we investigate the role of choice of
+training data for the accuracy of the text entry system.
 
 There has been work on improving text entry systems by training them
 on actual text messages, e.g. (...). Since text messages are difficult
@@ -487,8 +487,16 @@ To determine the significance of the differences between the results from the ba
 \hfil
 \subfloat[Correct guess found among the three first guesses.]{\includegraphics[width=3.5in]
   {accuracy_first_to_third_guess.pdf}}}
-\caption{The accuracy of our algorithm using different linear combinations of the weights given by the morphological analyzer and the IRC log transducer. On the x-axis we give the relative weight of the IRC log transducer and on the y-axis we give the accuracy. The dotted line gives the accuracy for the IRC log test material and the solid line gives the accuracy for the text message test material.}
+\caption{The recall of our algorithm using different linear combinations of the weights given by the morphological analyzer and the IRC log transducer. On the x-axis we give the relative weight of the IRC log transducer and on the y-axis we give the recall. The dotted line gives the recall for the IRC log test material and the solid line gives the recall for the text message test material. Peak recall for the text message test material is 75.8\% for the first guess and 86.5\% for the three first guesses.}
 \label{AccuraciesIRCMaterial}
+\end{figure*}
+
+\begin{figure*}[!t]
+\begin{center}
+\includegraphics[width=3.5in]{accuracy_as_function_of_data_size.pdf}
+\end{center}
+\caption{Recall for the first guess as a function of the number of words in the training data. The increase in recall clearly levels out as we use more training data. The increase in recall when going from $200000$ words of training data to $350000$ words of training data is only about 1.3 percentage points.}
+\label{SaturationGraph}
 \end{figure*}
 
 \section{Discussion and Future Work}
