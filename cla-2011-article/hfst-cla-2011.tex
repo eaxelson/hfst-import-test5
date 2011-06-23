@@ -507,7 +507,8 @@ We also ran tests with the text message data on the alternative combination mode
 The results for correct first guesses have an average of 75.22 \%, with a standard deviation of 0.10 percentage points. If the results follow the normal distribution, 99.7 \% of them should be within 3 standard deviations from the average, i.e. between 74.92 \% and 75.52 \%. We do not know whether the results are normally distributed, but this gives us a rough idea of what the results are expected to look like.
 
 % omorfi, tekstarit
-\begin{table}
+\begin{table}[!t]
+\caption{Recall for baseline and combination system}
 \begin{center}
 \begin{tabular} {l c r}
  & Baseline & Combination \\
@@ -519,15 +520,15 @@ Recognised & 81.37 \% & 91.07 \% \\
  & & \\
 \end{tabular}
 \end{center}
-\caption{Recall for the baseline system (using only the morphological analyzer Omorfi) and our system using the weight coefficient 0.2 for the IRC log model and 0.8 for the morphological analyzer.}
 \label{tab:recall}
 \end{table}
 
 
 To confirm our assumption that adding the understanding of spoken language indeed improves the quality of the results, we ran the text message test data through the baseline model to see how much the spoken language model affects the results. The difference between the results achieved with the baseline and the combined model is noticeable. The baseline gave a correct analysis for 81.37 \% of the words. Only 55.10 \% of the words were given the correct analysis at the first attempt.
 
-\begin{table}
+\begin{table}[!t]
 \begin{center}
+\caption{Recall for three mobile phones and our system}
 \begin{tabular} {l c c}
 System & Recall 1st guess & Recall 1st to 3rd guess\\
 \hline
@@ -538,7 +539,7 @@ Our system & 64.52\% & 80.65\%  \\
 \hline
 \end{tabular}
 \end{center}
-\caption{Recall fot the predictive text entry of three different mobile phones and our system using 31 words chosen at random from the text message test material.}
+\label{tab:phones}
 \end{table}
 
 To determine the significance of the differences between the results from the baseline model and the combination model, we ran a Wilcoxon paired rank test which is suitable for data that cannot be guaranteed to follow the normal distribution. We compared the percentages of correct first attempts with the baseline model and the ten different combination models. Since the test requires equally big sets of test data, we used the baseline model result as a counterpart for each of the different combination model results. The test gave a p-value of 6.34e-05, which means that we can quite confidently say the results differ quite clearly.
