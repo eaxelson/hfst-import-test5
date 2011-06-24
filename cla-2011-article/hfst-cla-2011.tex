@@ -54,7 +54,7 @@ gives substantial improvement in recall from a baseline system using
 word frequencies computed from the Finnish Wikipedia. We evaluate our
 system against the predictive text entry systems in three widely
 available mobile phone models and establish that we achieve comparable
-accuracy.
+recall.
 \end{abstract}
 
 \section{Introduction}
@@ -72,9 +72,9 @@ using limited keyboards (typically having 12 keys).
 There has been a lot of research into improving predictive text entry,
 but it has mainly been concerned with improving the statistical model,
 or other technical aspects of text entry such as the keyboard
-layout. In this paper, we investigate the role of the training data,
-used in constructing the predictive text entry system, on the accuracy
-of a predictive text entry system.
+layout. In this paper, we investigate the what role the training data,
+used in constructing the predictive text entry system, plays on the
+recall.
 
 Ideally the training data for any data driven system, such as
 predictive text entry, should resemble the input data of the system as
@@ -100,20 +100,20 @@ messages of a couple of hundred of characters.
 
 We evaluate our system against the predictive text entry in a number
 of widely available mobile phones (Nokia 9200, Nokia C7 and Samsung
-SGH-M310) and show that we achieve comparable accuracy. This
+SGH-M310) and show that we achieve comparable recall. This
 demonstrates that it is possible to construct an accurate predictive
 text entry system without resorting to actual text message data. Even
 estimating the parameters of the system can be accomplished without
 using actual text message data.
 
 Because Finnish is a morphologically complex language, our system uses
-a morphological analyzer for Finnish Omorfi 
-\cite{pirinen/2011/nodalida}. The word forms found in Omorfi are given
-probabilities according to their frequency in the Finnish
-Wikipedia. These probabilities are combined using similar
-probabilities computed from IRC logs and the final probability given
-for a word form is a combination of the probabilities given by Omorfi
-and the IRC log model.
+a morphological analyzer for Finnish Omorfi
+\cite{pirinen/2011/nodalida} rather than simply using a word list. The
+word forms found in Omorfi are given probabilities according to their
+frequency in the Finnish Wikipedia. These probabilities are combined
+using similar probabilities computed from IRC logs and the final
+probability given for a word form is a combination of the
+probabilities given by Omorfi and the IRC log model.
 
 Since Omorfi is implemented as a weighted finite-state transducer
 (WFST), we implemented our predictive text entry system in the
@@ -122,7 +122,7 @@ weighted finite-state framework. We used HFST
 interface, for constructing and utilizing WFSTs.
 
 This paper is organized as follows: In section \ref{sec:related-work},
-we present earlier work in improving the accuracy of predictive text
+we present earlier work in improving the recall of predictive text
 entry systems. In section \ref{sec:text-entry}, we present the predictive
 text entry task. In section \ref{sec:methods}, we explain how to
 augment a morphological analyzer with word frequencies computed from
@@ -191,7 +191,7 @@ are concerned with building systems for very specific domains such as
 school exercises and scientific texts. They do not really address the
 question of what would constitute practical training material for a
 general text message system. We are expressly interested in improving
-text entry using widely available materials (namely IRC logs).
+entry of text messages using widely available materials (namely IRC logs).
 
 There has also been work on using finite-state transducers for
 predictive text entry. Forcada \cite{Forcada01corpus-basedstochastic} uses
@@ -217,7 +217,7 @@ from 2 to 9, in such a way that each key can be used to type three or
 four letters. The key 0 is used to type <SPACE>.
 
 For most languages whose alphabet differs from the English alphabet,
-number keys are also used to input the remaining symbols, which are
+number keys are also used to input those symbols, which are
 not found in the English alphabet. E.g. the three Finnish letters not
 found in the English alphabet "å'', "\"{a}" and "\"{o}" are typed
 using key 2 in case of "å" and "\"{a}" and key 6 in case of "\"{o}".
@@ -262,7 +262,7 @@ them to achieve a model of Finnish which (i) has broad lexical
 coverage and (ii) gives a good approximation of the probabilities of
 word forms in text messages. We then transform the model so that it
 can be used as a machine, which takes number sequences such as "2452"
-as input. 
+as input.
 
 Our model outputs a list of suggestions that correspond to the number
 sequence given as input. The list contains only suggestions, which
@@ -271,7 +271,8 @@ is not found in the lexical models, our method cannot suggest it. The
 suggestions are appended with a probability, which is computed by
 combining the probabilities given by the lexical models used to
 construct the model. The suggestions are given to the user in order of
-decreasing probability.
+decreasing probability. The list of suggestions corresponding to
+"2452" could contain e.g. "aika" and "äijä".
 
 We have chosen to implement our system using {\it weighted finite-state
 transducers} (WFST), partly because the morphological analyzer Omorfi is
@@ -309,7 +310,7 @@ technological applications implemented as finite-state
 transducers. They rewrite input words e.g. "dog" to sets of
 morphological analyses $\{$"dog+NOUN+SG", "dog+VERB+INF"$\}$. Here
 "dog" is the input string in two correspondences "dog":"dog+NOUN+SG"
-and "dog:dog+VERB+INF".
+and "dog":"dog+VERB+INF".
 
 Our system is implemented using weighted finite-state transducers
 (WFSTs). These are an extension of finite-state transducers, where
@@ -491,7 +492,7 @@ The weight given to a word form $s$ by $L_{I\vee O}'$ is not a linear
 combination of the scaled weights given by $L_I$ and $L_O$. Instead
 it's the minimum of the scaled weights
 $\mathrm{w}_{L_I}(s\mathrm{:}s)$ and $\mathrm{w}_{L_O}(s\mathrm{:}s)$.
-Tests showed good accuracy for this method, which lead us to use it in
+Tests showed good recall for this method, which lead us to use it in
 practice.
 
 \subsection{Using a Combination of Lexical Models for Predictive Text Entry}
@@ -592,9 +593,9 @@ $k$, which determines the relative weights of the IRC logs and Omorfi.
 \begin{equation}L_{I\vee O}' = \mathrm{W}_k(L_I) \cup \mathrm{W}_{1-k}(L_O)\text{.}\end{equation}
 
 To find the constant $k$, we took the remaining 10\% of the training
-data and coded it into number sequences. We then tested the accuracy
+data and coded it into number sequences. We then tested the recall
 obtained on that data using different values of $k$ between $0$ and
-$1$. The accuracy peaked at $k = 0.2$. Thus the best combination of Omorfi and the IRC log transducer was
+$1$. The recall peaked at $k = 0.2$. Thus the best combination of Omorfi and the IRC log transducer was
 \begin{equation}L_{I\vee O}' = \mathrm{W}_{0.2}(L_I) \cup \mathrm{W}_{0.8}(L_O)\text{.}\end{equation}
 
 It is important to notice that, we give suggestions in order of
@@ -748,12 +749,12 @@ The results of the evaluation are interesting and encouraging. They
 show that we are able to achieve an improvement of about $20$
 percentage points from the baseline recall of $55.10\%$ to the recall
 $75.12\%$ for giving a correct suggestion in first place. Figure
-\ref{fig:SaturationGraph} shows that little additional accuracy could be
+\ref{fig:SaturationGraph} shows that little additional recall could be
 gained by increasing the amount of training data.
 
 From Figure~\ref{fig:AccuraciesIRCMaterial} we can see that, while the
-accuracy of the system peaks at weight 0.2 for the IRC test data and
-0.1 for the text message test data, the difference in accuracy for the
+recall of the system peaks at weight 0.2 for the IRC test data and
+0.1 for the text message test data, the difference in recall for the
 text message test data is rather insignificant (in fact it is
 0.7\%). Thus we feel that we can conclude that a near optimal
 weighting for the IRC logs and Omorfi can be found without resorting
@@ -776,6 +777,13 @@ there's improvement for wider statistical models in task of predictive
 text input for mobile text messages. We could consider incorporating
 some kind of POS tagger in the system, as Gong \& al. \cite{gong/2008}
 did.
+
+We have only evaluated the recall of the simplified system, which we
+described at the end of section~\ref{sec:methods}. We also tried to
+evaluate the recall for the original idea, which we described before
+the simplification, but it was simply too resource intensive to
+compute the model. Therefore we were not able to get any results from
+those attempts.
 
 Finally we have only performed our experiment for Finnish, but we
 believe that same methods will apply to at least most of the Latin
