@@ -411,7 +411,7 @@ lookup in both of the lexical models $L_O$ and $L_I$ to see which of the
 letter sequences are actually words. The words are the suggestions
 given by the system. Each of the suggestions receives some (possibly
 infinite) weight from both $L_O$ and $L_I$. In case one of the
-lexical models gives an infinite weight but the other one doesn't, the
+lexical models gives an infinite weight, but the other one doesn't, the
 infinite weight will be replaced by some large penalty $w_{max}$. This
 makes it possible to suggest words which are only encoded in one of
 the models.
@@ -689,7 +689,7 @@ first attempts with the baseline model and the ten different
 combination models. Since the test requires equally big sets of test
 data, we used the baseline model result as a counterpart for each of
 the different combination model results. The test gave a p-value of
-6.34e-05, which means that we can quite confidently say the results
+6.34e-05, which means that we can confidently say the results
 differ quite clearly.
 
 \subsection{Comparing the language model with existing predictive text entry}
@@ -751,7 +751,7 @@ $75.12\%$ for giving a correct suggestion in first place. Figure
 \ref{fig:SaturationGraph} shows that little additional accuracy could be
 gained by increasing the amount of training data.
 
-From figure~\ref{fig:AccuraciesIRCMaterial} we can see that, while the
+From Figure~\ref{fig:AccuraciesIRCMaterial} we can see that, while the
 accuracy of the system peaks at weight 0.2 for the IRC test data and
 0.1 for the text message test data, the difference in accuracy for the
 text message test data is rather insignificant (in fact it is
@@ -764,7 +764,7 @@ commercial products by using only open source tools and readily
 available corpus data. It backs our assumption that the IRC logs
 indeed are a valuable source for teaching language models aimed at
 understanding casual, informal Finnish commonly used in text
-messages. An analysis of our the errors our model produced, revealed
+messages. An analysis of the errors our model produced, revealed
 that most of them could have been avoided by including a model which
 recognizes proper names and a model for abbreviations.
 
