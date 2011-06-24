@@ -58,64 +58,72 @@ keyboard. There are several technological solutions for inputting text
 on mobile phones and other limited keyboard devices. This paper is
 concerned with a technology called predictive text entry, which utilizes
 redundancy in natural language in order to enable efficient text entry
-using limited keyboards (typically including 12 keys).
+using limited keyboards (typically having 12 keys).
 
 There has been a lot of research into improving predictive text entry,
-but research has mainly been concerned with improving the statistical
-model, or other technical aspects of the text entry algorithm. In this
-paper, we investigate the role of choice of training data for the
-accuracy of the text entry system.
+but it has mainly been concerned with improving the statistical model,
+or other technical aspects of text entry such as the keyboard
+layout. In this paper, we investigate the role of the training data,
+used in constructing the predictive text entry system, on the accuracy
+of a predictive text entry system.
 
-There has been work on improving text entry systems by training them
-on actual text messages, e.g. (...). Since text messages are difficult
-to come by and there are legal restrictions for using them,
-open-source text entry systems require alternative sources of training
-data, which yield good accuracy. In this paper, we use Internet Relay
-Chat (IRC) logs, to train a predictive text input system for Finnish,
-and show that this gives significant improvement compared to a
-baseline system, which is trained using data from the Finnish
-Wikipedia. 
+Ideally the training data for any data driven system, such as
+predictive text entry, should resemble the input data of the
+system. In the case of a predictive text entry system, the ideal
+training data would thus consist of text messages. Since text messages
+are difficult to come by and there are legal restrictions for using
+them, other sources for training data should be considered. 
+
+In this paper, we use Internet Relay Chat (IRC) logs, to train a
+predictive text input system for Finnish. In IRC multiple users chat
+in public chat rooms and often these conversations are logged and the
+logs are posted on the Internet. We show that using IRC logs as
+training data gives significant improvement compared to a baseline
+system, which is trained using data from the Finnish Wikipedia.
 
 To the best of our knowledge, there have not been earlier inquiries
 into using IRC logs for training predictive text entry systems. IRC
 log material is nevertheless very well suited for the task, since
 there is a lot of material available in different languages. Like text
-messages, it resembles spoken language and consists of short messages.
+messages, it resembles spoken language and typically consists of short
+messages of a couple of hundred of characters.
 
 We evaluate our system against the predictive text entry in a number
-of widely available mobile phones (...) and show that we get
-comparable (better?, only slightly worse?) results. This demonstrates
-that it is possible to construct an accurate predictive text entry
-system without resorting to actual text message data. Even
-optimization of the accuracy of the system can be accomplished without
+of widely available mobile phones (Nokia 9200, Nokia C7 and Samsung
+SGH-M310) and show that we achieve comparable accuracy. This
+demonstrates that it is possible to construct an accurate predictive
+text entry system without resorting to actual text message data. Even
+estimating the parameters of the system can be accomplished without
 using actual text message data.
 
 Because Finnish is a morphologically complex language, our system uses
-a morphological analyzer for Finnish Omorfi (...). The word forms
-found in Omorfi are given probabilities according to their frequency
-in the Finnish Wikipedia. These probabilities are combined using
-similar probabilitites computed from IRC logs and the final
-probability given for a word form is a combination of the probabilities
-given by Omorfi and the IRC log model.
+a morphological analyzer for Finnish Omorfi 
+\cite{pirinen/2011/nodalida}. The word forms found in Omorfi are given
+probabilities according to their frequency in the Finnish
+Wikipedia. These probabilities are combined using similar
+probabilities computed from IRC logs and the final probability given
+for a word form is a combination of the probabilities given by Omorfi
+and the IRC log model.
 
-Since Omorfi is implemented as a weighted finite-state transducer, we
-implemented our predictive text entry system in the weighted
-finite-state framework. We used a freely available open-source C++
-interface for constructing and utilizing weighted finite-state transducers,
-Hfst (...).
+Since Omorfi is implemented as a weighted finite-state transducer
+(WFST), we implemented our predictive text entry system in the
+weighted finite-state framework. We used HFST
+\cite{conf/sfcm/Linden2009}, a freely available open-source C++
+interface, for constructing and utilizing WFSTs.
 
 This paper is organized as follows: In section \ref{sec:related-work},
 we present earlier work in improving the accuracy of predictive text
-entry systems. In section \ref{sec:methods}, we explain how to augment
-a morphological analyzer with word frequencies computed from IRC logs
-and how such a system is used to disambiguate between words
+entry systems. In section \ref{sec:text-entry}, we present predictive
+text entry task. In section \ref{sec:methods}, we explain how to
+augment a morphological analyzer with word frequencies computed from
+IRC logs and how such a system is used to disambiguate between words
 corresponding to an ambiguous input sequence. After this we present
-the morphological analyzer, Omorfi, and the Hfst interface in section
-\ref{sec:tools} and present the IRC log data used for training out model
-and the text message data used for evaluation in \ref{sec:data}. We
-evaluate our system in section \ref{sec:evaluation} and present some
-general and closing remarks in sections \ref{sec:discussion} and
-\ref{sec:conclusions}.
+the morphological analyzer, Omorfi, and the HFST interface in section
+\ref{sec:tools} and present the IRC log data used for training out
+model and the text message data used for evaluation in
+\ref{sec:data}. We evaluate our system in section \ref{sec:evaluation}
+and present some general and closing remarks in sections
+\ref{sec:discussion} and \ref{sec:conclusions}.
 
 % - Demonstrate the relevance of the research problem.
 %   * Predictive text entry works poorly, because it doesn't adequately take 
@@ -138,42 +146,65 @@ general and closing remarks in sections \ref{sec:discussion} and
 \section{Related Work}
 \label{sec:related-work}
 
-\begin{itemize}
-\item Improving predictive text entry is a widely researched problem.
-\item E.g. \cite{how05optimizing} and
-  \cite{Department98aprobabilistic} have researched ways to reorder
-  letters on the mobile phone keypad in order to make typing more
-  efficient.
-\item \cite{ganslandt/2009} has investigated context dependent models for predictive text entry.
-\item Using genre or domain-specific text to train a NLP system is not
-  a new idea.The approach has been tested in e.g. automatic
-  translation (...) and tagging (...).
-\item \cite{Harbusch/2003} Investigate the usefulness of a
-  domain-specific lexical model in predictive text entry. They
-  established that it is difficult to assemble a good enough purely
-  domain-specific lexicon. According to them, the best approach is
-  therefore to use a combination of a high coverage general lexicon
-  and a domain-specific model, which is exactly what we have done.
-\item \cite{Harbusch/2003} are concerned with building systems for very
-  specific domains such as school exercises ad scientific texts. They
-  do not really address the question of what would constitute
-  practical training material for a general text message system. We
-  are expressly interested in improving text entry using widely
-  available materials.
-\end{itemize}
+Improving predictive text entry is a widely researched problem. The
+improvements can mainly be divided into two broad cathegories (i)
+improving the statistical model used in predictive text entry by
+e.g. using context dependent models or improving the training material
+and (ii) improving the design of the keypad of the mobile phone in
+order to support faster typing.
 
+Ganslandt \& al. \cite{ganslandt/2009} and Gong \&
+al. \cite{gong/2008} have extended the statistical model by
+incorporating context into the model. They use both traditional word
+bigrams and more complex syntactic and semantic contextual
+restrictions. Gong \& al. additionally use a POS tagger as part of the
+model.
+
+E.g. How and Kan \cite{how05optimizing} and Bellman and Mackenzie
+\cite{Department98aprobabilistic} have researched ways to reorder
+letters on the mobile phone keypad in order to make typing more
+efficient. The model of Bellman and Mackenzie is adaptive.
+
+We are concerned with improving the statistical model by using
+training data that resembles text messages. Using genre or
+domain-specific text to train a NLP system is not a new idea and it
+has also been applied to predictive text entry. Harbusch \&
+al. \cite{Harbusch/2003} investigate the usefulness of a
+domain-specific lexical model in predictive text entry. They establish
+that it is difficult to assemble a good enough purely domain-specific
+lexicon. According to them, the best approach is therefore to use a
+combination of a high coverage general lexicon and a domain-specific
+model, which is exactly what we have done.
+
+The work by Harbusch \& al. is closely related to our own work, but they
+are concerned with building systems for very specific domains such as
+school exercises and scientific texts. They do not really address the
+question of what would constitute practical training material for a
+general text message system. We are expressly interested in improving
+text entry using widely available materials (namely IRC logs).
+
+There has also been work on using finite-state transducers for
+predictive text entry. Forcada \cite{Forcada01corpus-basedstochastic} uses
+stochastic (i.e. weighted) finite-state transducers to construct a
+predictive text entry system for Catalan and our model is similar to
+theirs, but their system works with a word-list, whereas our system
+uses a morphological analyzer.  In addition our system allows for
+merging lexical models from several sources.
+ 
 \section{Predictive Text Entry}
+\label{sec:text-entry}
 
 The keypad of a typical mobile phone has twelve keys for typing
 numbers and symbols. Additionally there are function keys, which are
 used for various other purposes. The typical layout uses ten keys for
-typing numbers and letters and the remaining two keys for typing
-special symbols, e.g. "*", "\#", "+" and <SPACE>. Figure
-\ref{fig:keypad} shows a typical layout for a mobile phone keyboard.
+typing numbers. Nine of those are also used for typing letters (including
+<SPACE>). The remaining two keys are used for typing special symbols,
+e.g. "*", "\#" and "+". Figure \ref{fig:keypad} shows a typical layout
+for a mobile phone keyboard.
 
 The letters of the English alphabet are distributed between the keys
 from 2 to 9, in such a way that each key can be used to type three or
-four letters.
+four letters. The key 0 is used to type <SPACE>.
 
 For most languages whose alphabet differs from the English alphabet,
 number keys are also used to input the remaining symbols, which are
@@ -183,7 +214,7 @@ using key 2 in case of "å" and "\"{a}" and key 6 in case of "\"{o}".
 
 Since each key from 2 to 9 corresponds to at least three different
 letters, every sequence of numbers encodes many different letter
-sequences. The letter sequences are called suggestions. Predictive
+sequences. We call the letter sequences {\it suggestions}. Predictive
 text entry is the task of finding the correct suggestion corresponding
 to the number sequence received as input from a user of the mobile
 phone. The correct suggestion is the letter sequence the user
@@ -208,23 +239,28 @@ correct suggestion based on partial input.
 \section{Combining a Morphological Lexicon and IRC Logs}
 \label{sec:methods}
 
-Our goal is to first combine two probabilistic lexicons, to build a
-probabilistic model which (i) has broad lexical coverage and (ii)
-gives a good approximation of the probabilities of word forms in text
-messages. We then transform the model so that it can be used as a
-machine, that takes number sequences such as "2452" as input. It
-outputs the list of Finnish words that can correspond to the input,
-when typed on a cell phone. The output contains only those words,
-which are known to the lexicons. The words are appended with a
-probability, which is computed from the probabilities given by the
-lexicons used to construct the model.
+Our predictive text entry system is based on probabilistic lexical
+models of the Finnish language. By a lexical model, we mean a model,
+which assigns some probability between 0 and 1 to the words in a
+language.
 
-One of the lexicons we use is derived from the Finnish open-source
-morphological analyzer Omorfi. The other lexicon we construct from a
-corpus of IRC logs.
+We first construct two probabilistic lexical models of Finnish,
+using an existing Finnish morphological analyzer Omorfi and IRC logs, and combine
+them to achieve a model of Finnish which (i) has broad lexical
+coverage and (ii) gives a good approximation of the probabilities of
+word forms in text messages. We then transform the model so that it
+can be used as a machine, which takes number sequences such as "2452"
+as input. 
 
-We have chosen to implement our system using weighted finite-state
-machines, partly because the morphological analyzer Omorfi is
+Our model outputs a list of suggestions that correspond to the number
+sequence given as input. Only words, which are known to the lexicons,
+can be suggested. The suggestions are appended with a probability, which is
+computed from the probabilities given by the lexical models used to
+construct the model. The suggestions are given to the user in order of
+decreasing probability.
+
+We have chosen to implement our system using {\it weighted finite-state
+transducers} (WFST), partly because the morphological analyzer Omorfi is
 implemented as a WFST, but also because they provide a flexible way of
 combining models to build language technology applications.
 
@@ -249,44 +285,52 @@ Finite-state transducers are a class of computational models, which
 rewrite input strings to output strings \cite{beesley/2003}. The input
 string $s_i$ and its output string $s_o$ are called a correspondence
 and written $s_i\mathrm{:}s_o$. If $T$ is a transducer, we write
-$s_i\mathrm{:}s_o \in T$, iff $T$ rewrites $s_i$ as $s_o$, i.e. accepts the correspondence $s_i\mathrm{:}s_o$.
+$s_i\mathrm{:}s_o \in T$, iff $T$ rewrites $s_i$ to $s_o$, i.e. {\it
+  accepts} the correspondence $s_i\mathrm{:}s_o$. If $T$ accepts an
+identity correspondence $s\mathrm{:}s$, we say that $T$ accepts the
+string $s$.
 
-Classical examples of language technological applications
-implemented as finite-state transducers, are morphological analyzers,
-which rewrite an input word e.g. "dog" into a set of morphological
-analyses $\{$"dog+NOUN+SG", "dog+VERB+INF"$\}$. Here "dog" is the
-input string in two correspondences.
+Mophological analyzers are classical examples of language
+technological applications implemented as finite-state
+transducers. They rewrite input words e.g. "dog" to sets of
+morphological analyses $\{$"dog+NOUN+SG", "dog+VERB+INF"$\}$. Here
+"dog" is the input string in two correspondences "dog":"dog+NOUN+SG"
+and "dog:dog+VERB+INF".
 
 Our system is implemented using weighted finite-state transducers
 (WFSTs). These are an extension of finite-state transducers, where
 every correspondence $s_i\mathrm{:}s_o$ between an input string $s_i$
-and an output string $s_o$ receives a weight $\mathrm{w}_T(s_i\mathrm{:}s_o)$,
-where $T$is the transducer. The weight is a floating point number. 
+and an output string $s_o$ receives a {\it weight} $\mathrm{w}_T(s_i\mathrm{:}s_o)$. Here $T$ is the transducer. The weight is a floating point number. 
 
 The weights in our system represent probabilities, which have been
-transformed into so called penalty weights using the map $p \mapsto
--\log p$ in order to avoid underflow in computer arithmetics. Since
-probability $0$ corresponds to an infinite penalty weight, we say that
-a transducer $T$ gives infinite weight to correspondences it doesn't
-accept. Weight arithmetics is performed in the tropical semiring, so
-addition of weights $w_1 \oplus w_2$ corresponds to taking their
-minimum $\min(\{w_1,w_2\})$ and multiplication $w_1 \otimes w_2$
-corresponds to ordinary addition of floating point numbers $w_1 + w_2$.
+transformed into so called {\it penalty weights} using the map $p
+\mapsto -\log p$. Probabilities are transformed into penalty weights
+in order to avoid underflow in computer arithmetics. 
+
+Since the probability $0$ corresponds to an infinite penalty weight,
+we say that a transducer $T$ gives infinite weight to correspondences
+it doesn't accept. Weight arithmetics is approximate probability
+arithmetics, taking into account the transformation $p \mapsto -\log
+p$. Addition of weights $w_1 \oplus w_2$ corresponds to taking
+their minimum $\min(\{w_1,w_2\})$ and multiplication $w_1 \otimes w_2$
+corresponds to ordinary addition of floating point numbers $w_1 +
+w_2$. The addition operation $\oplus$ underestimates the actual sum of
+penaltyweights $-\log (e^{-w_1} + e^{-w_2})$, but the approximation is usualy good enough.
 
 Akin to ordinary transducers, WFSTs can be combined using
 different binary algebraic operations or modified using unary
 algebraic operations to yield new WFSTs. Our system uses two unary and three binary operations:
 \begin{itemize}
 \item {\bf Projection $\mathrm{P}(T)$:} A unary operation, whose result
-  rewrites a string $s_i$ into itself, iff the argument rewrites $s_i$
-  into any output string $s_o$. The weight given to each correspondence
+  rewrites a string $s_i$ to itself, iff the argument rewrites $s_i$
+  to some output string $s_o$. The weight given to each correspondence
   $s_i:s_i$ is
   \begin{equation}
     \bigoplus_{s_i\mathrm{:}s_o \in T} \mathrm{w}_T(s_i\mathrm{:}s_o)
   \end{equation}
-\item {\bf scaling $\mathrm{W}_k(T)$,where $k \in \mathbb{R}$:} A unary operation, whose result accepts the same correspondences $s_i\mathrm{:}s_o$ as $T$ with weight $k\cdot \mathrm{w}_T(s_i\mathrm{:}s_o)$. Here we use regular multiplication of floating point numbers (not $\otimes$).
+\item {\bf scaling $\mathrm{W}_k(T)$, where $k \in \mathbb{R}$:} A unary operation, whose result accepts the same correspondences $s_i\mathrm{:}s_o$ as $T$ with weight $k\cdot \mathrm{w}_T(s_i\mathrm{:}s_o)$. Here we use regular multiplication of floating point numbers (not $\otimes$).\footnote{Actually scaling is of course a set of unary operations. One for each floating point number $k$.}
 \item {\bf Disjunction $S \cup T$:} (sometimes called union) A binary
-  operation, whose result rewrites an input strings $s_i$ into the
+  operation, whose result rewrites an input strings $s_i$ to the
   output string $s_o$, iff one of the argument transducers writes
   $s_i$ to $s_o$. The weight given each correspondence
   $s_i\mathrm{:}s_o$ is
@@ -295,7 +339,7 @@ algebraic operations to yield new WFSTs. Our system uses two unary and three bin
   \end{equation}
 \item {\bf composition $S \circ T$:} A binary operation, whose result
   writes an input string $s_i$ into an output string $s_o$, iff the
-  first argument rewrites $s_i$ as some string $t$ and the second
+  first argument rewrites $s_i$ to some string $t$ and the second
   argument rewrites $t$ to $s_o$. The weight given each correspondence
   $s_i\mathrm{:}s_o$ is
   \begin{equation}
@@ -306,22 +350,21 @@ algebraic operations to yield new WFSTs. Our system uses two unary and three bin
     \mathrm{w}_{S-T}(s_i\mathrm{:}s_o) < \infty \Rightarrow \mathrm{w}_{S-T}(s_i\mathrm{:}s_o) = \mathrm{w}_{S}(s_i\mathrm{:}s_o)
   \end{equation}
 \end{itemize}
-For a more thorough discussion on WFSTs, see \cite{openfst/2007}.
+For a more thorough discussion on WFSTs, see Allauzen \& al. \cite{openfst/2007}.
 
 \subsection{Component of the predictive text entry system}
 
 Our system is constructed from three WFSTs, which are combined using
-disjunction and composition:
+disjunction, subtraction and composition:
 
 \begin{itemize}
 \item A transducer $[\mathrm{Num}\rightarrow\mathrm{Text}]$, which
-  rewrites number sequences as letter sequences mimicing the way the
-  keypad of a 12-key cell phone
+  rewrites number sequences to letter sequences like a 12-key mobile phone
   works. E.g. $[\mathrm{Num}\rightarrow\mathrm{Text}]$ would rewrite
-  $23$ as the strings "ad", "ae", "af", "bd", "be", "bf", "cd", "ce"
+  $23$ to the strings "ad", "ae", "af", "bd", "be", "bf", "cd", "ce"
   and "cf". Each correspondence in $[\mathrm{Num}\rightarrow\mathrm{Text}]$
   receives equal weight.
-\item A lexicon transducer $L_O$, which rewrites word forms as them
+\item A lexicon transducer $L_O$, which rewrites word forms to them
   selves (i.e. gives an identity correspondence) and associates a
   penalty weight corresponding to a probability to known word
   forms. The probability is based on corpus frequencies. An English
@@ -333,26 +376,32 @@ disjunction and composition:
   text messages (in our case IRC logs).
 \end{itemize}
 
-The lexicon transducer $L_O$ is derived from an existing morphology $M$
-(in this paper we use the open-source finite-state morphology for
-Finnish Omorfi). The morphological analyzer is converted to a lexicon
-using projection, which throws away the morphological analyses and
-leaves a transducer which accepts wordforms. Hence 
+The lexicon transducer $L_O$ is derived from an existing morphological
+analyzer $M$ (in this paper we use the open-source finite-state
+morphology for Finnish Omorfi). The morphological analyzer is
+converted to a lexicon using projection, which throws away the
+morphological analyses and leaves a transducer which accepts
+wordforms. Hence
 \begin{equation}L_O = \mathrm{P}(M)\text{.}\end{equation}
 
-The domain specific lexicon transducer $L_I$ is built by taking a corpus, counting the frequencies for all the words and converting the corpus to a language model where the frequencies are used to compute penalty weights for the words. 
+The domain specific lexicon transducer $L_I$ is built by taking a
+corpus, counting the frequencies for all the words and compiling the
+words and their frequencies into a WFST.
 
 Schematically our system works by looking up a number sequence in
 $[\mathrm{Num}\rightarrow\mathrm{Text}]$ to find all possible letter
 strings associated to the sequence and then performing a lexicon
 lookup in both of the lexicons $L_O$ and $L_I$ to see which of the
-letter sequences are actually words. Each of the words receives some
-(possibly infinite) weight from both $L_O$ and $L_I$. In case, either
-one of the lexicons gives an infinite weight, it will be replaced by
-some large penalty $w_{max}$. For each candidate word, a weighted
-average is computed from these penalties and this is the total penalty
-weight of the candidate word. Predictive text entry will offer the
-candidates in order of increasing penalty weight.
+letter sequences are actually words. The words are the suggestions
+given by the system. Each of the suggestions receives some (possibly
+infinite) weight from both $L_O$ and $L_I$. In case either one of the
+lexicons gives an infinite weight, it will be replaced by some large
+penalty $w_{max}$. 
+
+For each suggestion, a weighted average is computed from these
+penalties and this is the total penalty weight of the candidate
+word. Predictive text entry will offer the suggestions in order of
+increasing penalty weight.
 
 In practice this approach is not feasible, because
 $[\mathrm{Num}\rightarrow\mathrm{Text}]$ will over-generate hugely
@@ -369,7 +418,8 @@ In this subsection we explain, how the lexicons $L_O$ and $L_I$ are
 combined with the transducer $[\mathrm{Num}\rightarrow\mathrm{Text}]$
 to form the transducer which performs predictive text entry. We first
 derive a formally correct way to combine the transducers and then show
-how it can be done simpler, without sacrificing accuracy.
+how it can be done easier and in a way which is less computationally
+demanding.
 
 As we explained above, it may happen that some word forms are found in
 one lexicon but not the other. In that case we want to replace the
@@ -410,8 +460,12 @@ point constant $k$. This constant needs to be estimated
 experimentally. In section \ref{sec:evaluation}, we show that the
 constant can be estimated without resorting to a corpus of text messages.
 
-The method which we described is fairly contrived, so we wanted to try
-out a simplifyed way to combine the lexicons
+The method which we described is fairly contrived and extremely
+resource intensive because determinizing and minizing the languages
+$L_O \cup U_{max}$ and $L_O \cup U_{max}$ is a demanding task. It
+cannot be avoided, because subtraction requires deterministic and
+minimal arguments. Therefore we wanted to try out a simplifyed way to
+combine the lexicons
 \begin{equation}
   L_{I\vee O}' = \mathrm{W}_k(L_I) \cup \mathrm{W}_{1-k}(L_O)\text{, where }0 \leq k \leq 1\text{.}
 \end{equation} 
@@ -419,8 +473,8 @@ The weight given to a word form $s$ by $L_{I\vee O}'$ is not a linear
 combination of the scaled weights given by $L_I$ and $L_O$. Instead
 it's the minimum of the scaled weights
 $\mathrm{w}_{L_I}(s\mathrm{:}s)$ and $\mathrm{w}_{L_O}(s\mathrm{:}s)$.
-Tests showed negligible difference in accuracy between the methods,
-which lead us to use the simplifyed method in practice.
+Tests showed good accuracy for this method, which lead us to use it in
+practice.
 
 \subsection{Using a Combination of Lexicons for Predictive Text Entry}
 
@@ -428,7 +482,7 @@ The lexicon $L_{I\vee O}'$ is used by performing lookup for number
 sequences. The result is a finite set of word forms with weights. The
 system gives suggestion in order of weight.
 
-Using the Hfst interface, we can convert the transducer into a fast
+Using the HFST interface, we can convert the transducer into a fast
 lookup format \cite{conf/fsmnlp/Silfverberg2009}, whose throughput is
 about $100000$ number sequences per second, which is more than
 sufficient for predictive text entry.
@@ -611,11 +665,11 @@ We presented a way of constructing a language model where a baseline model - a m
 
 \ldots \balance
 \section*{Acknowledgment}
-Kiitti, Sam, logeista!
-Ja kiitti kaikille niille, jotka lahjotti tekstareita testiaineistoks.
 
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
 
+% Kiitti, Sam, logeista!
+% Ja kiitti kaikille niille, jotka lahjotti tekstareita testiaineistoks.
 % We the people thank the HFST research team and the staff of University of
 % Helsinki for fruity discussions as well as the anonymous reviewers for
 % good suggestions.
