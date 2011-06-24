@@ -182,8 +182,8 @@ has also been applied to predictive text entry. Harbusch \&
 al. \cite{Harbusch/2003} investigate the usefulness of a
 domain-specific lexical model in predictive text entry. They establish
 that it is difficult to assemble a good enough purely domain-specific
-lexicon. According to them, the best approach is therefore to use a
-combination of a high coverage general lexicon and a domain-specific
+lexical model. According to them, the best approach is therefore to use a
+combination of a high coverage general lexical model and a domain-specific
 model, which is exactly what we have done.
 
 The work by Harbusch \& al. is closely related to our own work, but they
@@ -379,27 +379,27 @@ disjunction, subtraction and composition:
   $23$ to the strings "ad", "ae", "af", "bd", "be", "bf", "cd", "ce"
   and "cf". Each correspondence in $[\mathrm{Num}\rightarrow\mathrm{Text}]$
   receives equal weight.
-\item A lexicon transducer $L_O$, which rewrites word forms to
+\item A lexical model transducer $L_O$, which rewrites word forms to
   themselves (i.e. gives an identity correspondence) and associates a
   penalty weight corresponding to a probability to known word
   forms. The probability is based on corpus frequencies. An English
-  lexicon might e.g. accept the correspondence "be":"be" with penalty
+  lexical model might e.g. accept the correspondence "be":"be" with penalty
   weight $5.41$ corresponding to the probability $0.39\%$.
-\item A domain specific lexicon transducer $L_I$, which also
+\item A domain specific lexical model transducer $L_I$, which also
   associates penalty weights to word forms, but the probabilities have
   been computed from some source which resembles the language used in
   text messages (in our case IRC logs).
 \end{itemize}
 
-The lexicon transducer $L_O$ is derived from an existing morphological
+The lexical model transducer $L_O$ is derived from an existing morphological
 analyzer $M$ (in this paper we use the open-source finite-state
 morphology for Finnish Omorfi). The morphological analyzer is
-converted to a lexicon using projection, which throws away the
+converted to a lexical model using projection, which throws away the
 morphological analyses and leaves a transducer which accepts
 word forms. Hence
 \begin{equation}L_O = \mathrm{P}(M)\text{.}\end{equation}
 
-The domain specific lexicon transducer $L_I$ is built by taking a
+The domain specific lexical model transducer $L_I$ is built by taking a
 corpus, counting the frequencies for all the words and compiling the
 words and the penalty weights corresponding to their frequencies into
 a WFST.
@@ -407,11 +407,11 @@ a WFST.
 Schematically our system works by looking up a number sequence in
 $[\mathrm{Num}\rightarrow\mathrm{Text}]$ to find all possible letter
 strings associated to the sequence and then performing a lexicon
-lookup in both of the lexicons $L_O$ and $L_I$ to see which of the
+lookup in both of the lexical models $L_O$ and $L_I$ to see which of the
 letter sequences are actually words. The words are the suggestions
 given by the system. Each of the suggestions receives some (possibly
 infinite) weight from both $L_O$ and $L_I$. In case one of the
-lexicons gives an infinite weight but the other one doesn't, the
+lexical models gives an infinite weight but the other one doesn't, the
 infinite weight will be replaced by some large penalty $w_{max}$. This
 makes it possible to suggest words which are only encoded in one of
 the models.
@@ -425,14 +425,14 @@ In practice this approach is not feasible, because
 $[\mathrm{Num}\rightarrow\mathrm{Text}]$ will over-generate hugely
 (e.g. for a string of ten numbers at least $3^{10} = 59049$ letter
 sequences are generated and need to be looked up in the
-lexicons). This is why we compile all three transducers into one
+lexical models). This is why we compile all three transducers into one
 transducer using composition, disjunction and subtraction. The
-transducer performs translation into letter sequences and lexicon
+transducer performs translation into letter sequences and lexical models
 lookup simultaneously thus avoiding over-generation.
 
-\subsection{Combining the Component Lexicons}
+\subsection{Combining the the General and Domain Specific Lexical Models}
 
-In this subsection we explain, how the lexicons $L_O$ and $L_I$ are
+In this subsection we explain, how the lexical models $L_O$ and $L_I$ are
 combined with the transducer $[\mathrm{Num}\rightarrow\mathrm{Text}]$
 to form the transducer which performs predictive text entry. We first
 derive a formally correct way to combine the transducers and then show
@@ -440,12 +440,12 @@ how it can be done easier and in a way which is less computationally
 demanding.
 
 As we explained above, it may happen that some word forms are found in
-one lexicon but not the other. In that case we want to replace the
-infinite weight given by one of the lexicons by a large penalty weight
-$w_{max}$, which is greater than the weight given by the lexicons for
-any accepted word form. Therefore we disjunct the lexicons with the
+one lexical model but not the other. In that case we want to replace the
+infinite weight given by one of the lexical models by a large penalty weight
+$w_{max}$, which is greater than the weight given by the lexical model for
+any accepted word form. Therefore we disjunct the lexical model with the
 language $U_{max}$, which accepts all words and gives them weight
-$w_{max}$. For the lexicon $L_O$, the result $L_O \cup U_{max}$ will
+$w_{max}$. For the lexical model $L_O$, the result $L_O \cup U_{max}$ will
 accept any word form $s$ and give it weight
 $\mathrm{w}_{L_O}(s\mathrm{:}s)$, if it is accepted by $L_O$ and
 $\mathrm{w}_{max}$ otherwise. The same applies for $L_I \cup U_{max}$.
@@ -465,7 +465,7 @@ point numbers. We can easily represent the transducer using scaling, disjunction
 There is a problem with the language $L$. It will accept every
 string of letters, which is a performance concern, as we explained
 above. Therefore we need to subtract the language of all strings that
-are not in $L_I$ or $L_O$. Hence the final lexicon is
+are not in $L_I$ or $L_O$. Hence the final lexical model is
 \begin{equation}L_{I\vee O} = L - (U - (L_I \cup L_O))\text{,}\end{equation}
 where $U$ is the language of all letter strings.
 
@@ -473,7 +473,7 @@ Finally we can compose $[\mathrm{Num}\rightarrow\mathrm{Text}]$ with
 $L_{I\vee O}$ in order to get a transducer, which transforms number
 sequences to suggestions.
 
-In the construction of the composite lexicon $L$, we used the floating
+In the construction of the composite lexical model $L$, we used the floating
 point constant $k$. This constant needs to be estimated
 experimentally. In section \ref{sec:evaluation}, we show that the
 constant can be estimated without resorting to a corpus of text messages.
@@ -483,7 +483,7 @@ resource intensive because determinizing and minimizing the languages
 $L_I \cup U_{max}$ and $L_O \cup U_{max}$ is a demanding task. It
 cannot be avoided, because subtraction requires deterministic and
 minimal arguments. Therefore we wanted to try out a simplified way to
-combine the lexicons
+combine the lexical models
 \begin{equation}
   L_{I\vee O}' = \mathrm{W}_k(L_I) \cup \mathrm{W}_{1-k}(L_O)\text{, where }0 \leq k \leq 1\text{.}
 \end{equation} 
@@ -494,9 +494,9 @@ $\mathrm{w}_{L_I}(s\mathrm{:}s)$ and $\mathrm{w}_{L_O}(s\mathrm{:}s)$.
 Tests showed good accuracy for this method, which lead us to use it in
 practice.
 
-\subsection{Using a Combination of Lexicons for Predictive Text Entry}
+\subsection{Using a Combination of Lexical Models for Predictive Text Entry}
 
-The lexicon $L_{I\vee O}'$ is used by performing lookup for number
+The lexical model $L_{I\vee O}'$ is used by performing lookup for number
 sequences. The result is a finite set of word forms with weights. The
 system gives suggestion in order of weight.
 
@@ -608,7 +608,7 @@ the weights in the Omorfi transducer (which are multiplied by $0.8$).
 \label{sec:evaluation}
 
 Our goal was to test whether adding some understanding of spoken
-language to the lexicon of a predictive text model improves its
+language to the lexical model of a predictive text model improves its
 quality. We also aimed to find out how suitable IRC logs are for this
 purpose. Additionally we wanted to ensure that the relative weighting
 of Omorfi and the IRC log transducer could be established without
