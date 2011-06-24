@@ -290,7 +290,7 @@ $s_i\mathrm{:}s_o \in T$, iff $T$ rewrites $s_i$ to $s_o$, i.e. {\it
 identity correspondence $s\mathrm{:}s$, we say that $T$ accepts the
 string $s$.
 
-Mophological analyzers are classical examples of language
+Morphological analyzers are classical examples of language
 technological applications implemented as finite-state
 transducers. They rewrite input words e.g. "dog" to sets of
 morphological analyses $\{$"dog+NOUN+SG", "dog+VERB+INF"$\}$. Here
@@ -311,11 +311,12 @@ Since the probability $0$ corresponds to an infinite penalty weight,
 we say that a transducer $T$ gives infinite weight to correspondences
 it doesn't accept. Weight arithmetics is approximate probability
 arithmetics, taking into account the transformation $p \mapsto -\log
-p$. Addition of weights $w_1 \oplus w_2$ corresponds to taking
-their minimum $\min(\{w_1,w_2\})$ and multiplication $w_1 \otimes w_2$
+p$. Addition of weights $w_1 \oplus w_2$ corresponds to taking their
+minimum $\min(\{w_1,w_2\})$ and multiplication $w_1 \otimes w_2$
 corresponds to ordinary addition of floating point numbers $w_1 +
 w_2$. The addition operation $\oplus$ underestimates the actual sum of
-penaltyweights $-\log (e^{-w_1} + e^{-w_2})$, but the approximation is usualy good enough.
+penalty weights $-\log (e^{-w_1} + e^{-w_2})$, but the approximation
+is usually good enough.
 
 Akin to ordinary transducers, WFSTs can be combined using
 different binary algebraic operations or modified using unary
@@ -381,7 +382,7 @@ analyzer $M$ (in this paper we use the open-source finite-state
 morphology for Finnish Omorfi). The morphological analyzer is
 converted to a lexicon using projection, which throws away the
 morphological analyses and leaves a transducer which accepts
-wordforms. Hence
+word forms. Hence
 \begin{equation}L_O = \mathrm{P}(M)\text{.}\end{equation}
 
 The domain specific lexicon transducer $L_I$ is built by taking a
@@ -464,7 +465,7 @@ The method which we described is fairly contrived and extremely
 resource intensive because determinizing and minizing the languages
 $L_O \cup U_{max}$ and $L_O \cup U_{max}$ is a demanding task. It
 cannot be avoided, because subtraction requires deterministic and
-minimal arguments. Therefore we wanted to try out a simplifyed way to
+minimal arguments. Therefore we wanted to try out a simplified way to
 combine the lexicons
 \begin{equation}
   L_{I\vee O}' = \mathrm{W}_k(L_I) \cup \mathrm{W}_{1-k}(L_O)\text{, where }0 \leq k \leq 1\text{.}
@@ -508,9 +509,9 @@ corpus to acquire unigram probabilities~\cite{pirinen/2010/lrec}.
 In our setup we use an unmodified version of HFST tools for creating,
 manipulating and utilizing finite state
 transducers~\cite{hfst/2011}. This means that we did not have to
-implement any specialised algorithms for application of the predictive
+implement any specialized algorithms for application of the predictive
 text entry model. Hence our system can be implemented in any current
-or future weightd finite-state software as long as it supports the
+or future weighted finite-state software as long as it supports the
 necessary subset of the finite-state algebra described in
 \ref{sec:methods}.
 
