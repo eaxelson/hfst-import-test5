@@ -340,6 +340,8 @@ using projection, which throws away the morphological analyses and
 leaves a transducer which accepts wordforms. Hence 
 \begin{equation}L_O = \mathrm{P}(M)\text{.}\end{equation}
 
+The domain specific lexicon transducer $L_I$ is built by taking a corpus, counting the frequencies for all the words and converting the corpus to a language model where the frequencies are used to compute penalty weights for the words. 
+
 Schematically our system works by looking up a number sequence in
 $[\mathrm{Num}\rightarrow\mathrm{Text}]$ to find all possible letter
 strings associated to the sequence and then performing a lexicon
@@ -474,41 +476,40 @@ the Finnish Wikipedia data to add unigram probabilities to word forms that are
 recognised by the language model we are using. 
 
 \subsubsection{IRC Logs}
-IRC (Internet Relay Chat) VIITE? is a real-time messaging network. It is mainly used for group communication, but also enables private one-on-one discussions. The group communication happens on channels, similar to chat rooms, of which some are private and require a password to enter. The IRC logs we use are from a public channel directed mainly to the members of a local student organization. The topic of the discussion varies a lot making the log quite versatile as test and teaching material.
+IRC (Internet Relay Chat) is a real-time messaging network. It is mainly used for group communication, but also enables private one-on-one discussions. The group communication happens on channels, similar to chat rooms, of which some are private and require a password to enter. The IRC logs we use are from a public channel directed mainly to the members of a local student organization. The topic of the discussion varies a lot making the log quite versatile as test and teaching material.
 
 IRC discussions tend to be rather informal, and thus the language used is casual, resembling the spoken language, as is also the case with text messages. In Finnish this  means e.g. shortening words from the end and using different word forms than formal written language does.
 
-The IRC logs used in this research contain 385303 words after omitting everything that does not consist of letters, an apostrophe (') and a hyphen (-); the three elements that are used to form Finnish words.
+The IRC logs used in this research contain 385303 words after omitting everything that does not consist of letters, an apostrophe (') and a hyphen (-); the three elements that are used to form Finnish words. One tenth of the corpus is set aside for testing purposes. The size of the corpus used for constructing the language model is thus 345423 words.
+
 
 \subsubsection{Text Messages}
 
-Authentic text messages were collected for testing purposes via requests in the social media from 12 volunteers, aged between 20 and 35. The messages contain 10851 words after the same trimming that was performed to the IRC logs.
+Authentic text messages were collected for testing purposes via requests in the social media from 12 volunteers, aged between 20 and 35. The messages contain 10851 words after the same trimming that was performed on the IRC logs.
 
 \section{Evaluation}
 \label{sec:evaluation}
 
 Our goal was to test whether adding some understanding of spoken language to the lexicon of a predictive text model improves its quality. We also aimed to find out how suitable IRC logs are for this purpose. We used a morphological analyser for Finnish as a baseline model. Our hypothesis is that the language in IRC logs, being often of casual nature, resembles the language used in text messages and can therefore be used as a source for creating models that understand spoken language.
 
+% 0.2 & 0.8 anto parhaan tuloksen niin logeilla ku tekstareillakin
 
-\subsection{Creating the models and determining penalty weights}
-\label{sec:weighting}
-To create a model with and understanding of spoken language, we started out by separating one tenth of the IRC logs and setting it aside for testing purposes, and used the rest of the logs to build the model. We counted the frequencies of the words and built a transducer of them, containing weights based on the frequencies. PAINOJEN LASKUKAAVA? The weights were processed (…) to the form of penalty weights, where small values mean high desirability.
 
-After creating the model for spoken language, we combined it with the baseline model, i.e. the morphological analyser. We scaled the weights of the baseline model and the spoken language model to fit the same scale by MIIKKA KERTOO JOTAIN? and tried out different ways of prioritising the spoken language compared to the literal language contained by the baseline model. We created 11 combination models, giving the spoken language a propositional weight scaling from 0.0 (no penalty weight) to 1.0 (maximum penalty weight) with an interval of 0.1. 
+\subsection{Testing the language model using IRC logs}
 
-Both the baseline model and the combination model understanding spoken language take number sequences as an input and return an analysis of which words would match that sequence, sorted according to the penalty weights of the words. In cases where a word is recognised by both models, the one with a smaller penalty weight (i.e. better rating) will be chosen.
+We tested the language model $L_{I\vee O}'$ containing the baseline model and the spoken language model with the one tenth of the IRC log set aside for testing. 94.37 \% of the words were successfully analysed. Of all the weighted combination models, the one with the weight 0.2 for the spoken language model and the 0.8 weight for the baseline model recognised the most words on the first try.
 
-We tested the combination model with the one tenth of the IRC log set aside for testing. 94.37 \% of the words were successfully analysed. Of all the weighted combination models, the one with the weight 0.2 for the spoken language model and the 0.8 weight for the baseline model recognised the most words on the first try (see MIIKAN KUVA).
+To ensure the test results were not merely a result of coincidentally having chosen an exceptionally easy tenth of the IRC logs, we ran the same tests for each of the other tenths as well, creating the combination models using the rest of the logs, using the optimal weighting 0.2 for spoken language and 0.8 for the baseline model. The amount of the words recognised was between 93.95 and 94.99 \% in each case, with an average of 94.51 \%. This means that the original tenth of the logs used for testing is quite similar to the other tenths in terms of difficulty for the model, and we have no reason to assume the choice of the test material would significantly bias the results.
 
-\subsection{Assessing the difficulty of the test material}
-\label{sec:difficulty}
-To ensure the test results were not merely a result of coincidentally having chosen an exceptionally easy tenth of the IRC logs, we ran the same tests for each of the other tenths as well, creating the combination models using the rest of the logs, using the optimal weighting (see \ref{sec:weighting}). The amount of the words recognised was between 93.95 and 94.99 \% in each case, with an average of 94.51 \%. This means that the original tenth of the logs used for testing is quite similar to the other tenths in terms of difficulty for the model, and we have no reason to assume the choice of the test material would significantly bias the results.
+% Pitäiskö tälle laskea keskihajonta? Onks hassuu, että tekstareille on laskettu mut irc-logeille ei?
 
 \subsection{Testing with text messages}
  
-We then used the text message data for testing. 91.07 \% of the words were analysed correctly. The text message data also received the best results with the weighting 0.2 for the spoken language model and 0.8 for the baseline model, with which 75.16 \% of the words were recognised on the first attempt.
+We then used the text message data for testing to see if the results correlate with the testing done with the IRC logs. 91.07 \% of the words were analysed correctly. The text message data also received the best results with the weighting 0.2 for the spoken language model and 0.8 for the baseline model, with which 75.16 \% of the words were recognised on the first attempt. (See MIIKAN FIG)
 
-We also ran tests with the text message data on the alternative combination models created for testing the difficulty of the original combination model (see \ref{sec:difficulty}). The amount of successfully analysed words range between 91.06 \% and 91.18\%, and from 75.02 \% to 75.42 \% of the words were recognised at the first attempt. 
+We also ran tests with the text message data on the alternative combination models created for testing the difficulty of the original combination model. The amount of successfully analysed words range between 91.06 \% and 91.18\%, and from 75.02 \% to 75.42 \% of the words were recognised at the first attempt. 
+
+% Pitäskö näistä heittää jotain taulukoita?
 
 The results for correct first guesses have an average of 75.22 \%, with a standard deviation of 0.10 percentage points. If the results follow the normal distribution, 99.7 \% of them should be within 3 standard deviations from the average, i.e. between 74.92 \% and 75.52 \%. We do not know whether the results are normally distributed, but this gives us a rough idea of what the results are expected to look like.
 
@@ -532,6 +533,14 @@ Recognised & 81.37 \% & 91.07 \% \\
 
 To confirm our assumption that adding the understanding of spoken language indeed improves the quality of the results, we ran the text message test data through the baseline model to see how much the spoken language model affects the results. The difference between the results achieved with the baseline and the combined model is noticeable. The baseline gave a correct analysis for 81.37 \% of the words. Only 55.10 \% of the words were given the correct analysis at the first attempt.
 
+
+
+To determine the significance of the differences between the results from the baseline model and the combination model, we ran a Wilcoxon paired rank test which is suitable for data that cannot be guaranteed to follow the normal distribution. We compared the percentages of correct first attempts with the baseline model and the ten different combination models. Since the test requires equally big sets of test data, we used the baseline model result as a counterpart for each of the different combination model results. The test gave a p-value of 6.34e-05, which means that we can quite confidently say the results differ quite clearly.
+
+\subsection{Comparing the language model with existing predictive text entry}
+
+In order to get a better understanding of the quality of our language model we compared it to the existing predictive text entry systems found in mobile phones. As this must be done word by word manually, it is rather laborous which is why we did not use the whole text message test data but chose 31 words by starting with the first one and taking every 361th word.
+
 \begin{table}[!t]
 \begin{center}
 \caption{Recall for three mobile phones and our system}
@@ -548,8 +557,7 @@ Our system & 64.52\% & 80.65\%  \\
 \label{tab:phones}
 \end{table}
 
-To determine the significance of the differences between the results from the baseline model and the combination model, we ran a Wilcoxon paired rank test which is suitable for data that cannot be guaranteed to follow the normal distribution. We compared the percentages of correct first attempts with the baseline model and the ten different combination models. Since the test requires equally big sets of test data, we used the baseline model result as a counterpart for each of the different combination model results. The test gave a p-value of 6.34e-05, which means that we can quite confidently say the results differ quite clearly.
-
+This shows we come quite close to the leading commercial product by using only open source tools and readily available corpus data, and backs our assumption that the IRC logs indeed are a valuable source for teaching language models aimed at understanding casual, informal Finnish commonly used in text messages.
 
 
 \begin{figure*}[!t]
@@ -575,7 +583,7 @@ To determine the significance of the differences between the results from the ba
 
 This work demonstrates that using simple methods we can improve a lot.\ldots
 
-In this paper we used readily available language model geared towards parsing
+In this paper we used a readily available language model geared towards parsing
 running texts of literary written Finnish. It would be interesting to see if
 modifying the language model towards the standard spoken Finnish dialect
 might yield a significant increase in recall.
@@ -595,8 +603,17 @@ dropping---on some texting cultures.
 \section{Conclusion}
 \label{sec:conclusions}
 
+Adding some understanding of spoken-language-like casual Finnish to a language model used for predictive text entry seems to significantly improve the performance of the model. Not only does the amount of correctly analysed words grow, but more words get analysed correctly on the first try as well.
+
+As text messages are often of private nature, they are hard to come by in large amounts, and using them as a corpus to build a language model is impractical. The language used in IRC conversations and the one used in text messages resemble each other, IRC logs may be used as a base for a language model instead. 
+
+We presented a way of constructing a language model where a baseline model - a morphological analyser - was combined with a spoken language model constructed from IRC logs. We showed that using a spoken language model with a baseline model yields significantly better results than the baseline model by itself.
+
 \ldots \balance
 \section*{Acknowledgment}
+Kiitti, Sam, logeista!
+Ja kiitti kaikille niille, jotka lahjotti tekstareita testiaineistoks.
+
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
 
 % We the people thank the HFST research team and the staff of University of
