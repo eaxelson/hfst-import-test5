@@ -580,6 +580,13 @@ obtained on that data using different values of $k$ between $0$ and
 $1$. The accuracy peaked at $k = 0.2$. Thus the best combination of Omorfi and the IRC log transducer was
 \begin{equation}L_{I\vee O}' = \mathrm{W}_{0.2}(L_I) \cup \mathrm{W}_{0.8}(L_O)\text{.}\end{equation}
 
+It is important to notice that, we give suggestions in order of
+increasing weight. Hence the value $0.2$ of the coefficient $k$
+actually means that suggestions in the IRC log transducer are
+preferred over suggestions in the Omorfi transducer, because their
+weight is multiplied by a smaller constant $0.2$ than the weights in
+the Omorfi transducer (which are multiplied by $0.8$).
+
 \section{Evaluation}
 \label{sec:evaluation}
 
@@ -720,42 +727,66 @@ data. Figure~{fig:SaturationGraph} shows the results.
 \section{Discussion and Future Work}
 \label{sec:discussion}
 
-This work demonstrates that using simple methods we can improve a lot.\ldots
+The results of the evaluation are interesting and encouraging. They
+show that we are able to achieve an improvement of about $20$
+percentage points from the baseline recall of $55.10\%$ to the recall
+$75.12\%$ for giving a correct suggestion in first place. Figure
+\ref{fig:SaturationGraph} shows that little additional accuracy could be
+gained by increasing the amount of training data.
 
-In this paper we used a readily available language model geared towards parsing
-running texts of literary written Finnish. It would be interesting to see if
-modifying the language model towards the standard spoken Finnish dialect
-might yield a significant increase in recall.
+From figure~\ref{fig:AccuraciesIRCMaterial} we can see that, while the
+accuracy of the system peaks at weight 0.2 for the IRC test data and
+0.1 for the text message test data, the difference in accuracy for the
+text message test data is rather insignificant (in fact it is
+0.7\%). Thus we feel that we can conclude that a near optimal
+weighting for the IRC logs and Omorfi can be found without resorting
+to text message training data.
 
-This shows we come quite close to the leading commercial product by
-using only open source tools and readily available corpus data, and
-backs our assumption that the IRC logs indeed are a valuable source
-for teaching language models aimed at understanding casual, informal
-Finnish commonly used in text messages.
+Table~\ref{tab:phones} shows that we come quite close to typical
+commercial products by using only open source tools and readily
+available corpus data. It backs our assumption that the IRC logs
+indeed are a valuable source for teaching language models aimed at
+understanding casual, informal Finnish commonly used in text
+messages. An analysis of our model, revealed that most
+of them could have been avoided by including a model which recognizes
+proper names and a model for abbreviations.
 
-
-The demonstrated model only considers unigrams for probability
+The demonstrated model considers only unigrams for probability
 likelihood maximisation. It has been demonstrated that it is possible
-to extend these models trivially to arbitrary n-gram and varigram
+to extend these models to arbitrary n-gram and varigram
 models~\cite{Silfverberg/2011}, and this should be explored to see if
 there's improvement for wider statistical models in task of predictive
-text input for mobile text messages.
+text input for mobile text messages. We could consider incorporating
+some kind of POS tagger in the system, as Gong \& al. \cite{gong/2008}
+did.
 
-Finally we have only performed our experiment for Finnish, but we believe that
-same methods will apply to at least most of the latin abjad based languages
-with no modifications excepting the orthographic conventions---such as accent
-dropping---on some texting cultures.
+Finally we have only performed our experiment for Finnish, but we
+believe that same methods will apply to at least most of the Latin
+alphabet based languages with no modifications excepting the
+orthographic conventions---such as accent dropping---in some text messaging
+cultures.
 
 \section{Conclusion}
 \label{sec:conclusions}
+Adding some understanding of spoken-language-like casual Finnish to a
+language model used for predictive text entry seems to significantly
+improve the performance of the model. Not only does the amount of
+correctly analysed words grow, but more words get analysed correctly
+on the first try as well.
 
-Adding some understanding of spoken-language-like casual Finnish to a language model used for predictive text entry seems to significantly improve the performance of the model. Not only does the amount of correctly analysed words grow, but more words get analysed correctly on the first try as well.
+As text messages are often of private nature, they are hard to come by
+in large amounts, and using them as a corpus to build a language model
+is impractical. The language used in IRC conversations and the one
+used in text messages resemble each other, IRC logs may be used as a
+base for a language model instead.
 
-As text messages are often of private nature, they are hard to come by in large amounts, and using them as a corpus to build a language model is impractical. The language used in IRC conversations and the one used in text messages resemble each other, IRC logs may be used as a base for a language model instead. 
+We presented a way of constructing a language model where a baseline
+model - a morphological analyser - was combined with a spoken language
+model constructed from IRC logs. We showed that using a spoken
+language model with a baseline model yields significantly better
+results than the baseline model by itself. We also showed that the
+system can be constructed without resorting to text message data.
 
-We presented a way of constructing a language model where a baseline model - a morphological analyser - was combined with a spoken language model constructed from IRC logs. We showed that using a spoken language model with a baseline model yields significantly better results than the baseline model by itself.
-
-\ldots \balance
 \section*{Acknowledgment}
 
 Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
