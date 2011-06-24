@@ -45,7 +45,15 @@
 
 
 \begin{abstract}
-
+We describe a predictive text entry system for Finnish combining an
+open source morphological analyzer and a lexical model compiled from
+Internet Relay Chat (IRC) logs. The system is implemented as a
+weighted finite-state transducer (WFST). We show that using IRC logs
+to train the system gives substantial improvement in recall from a
+baseline system using word frequencies computed from the Finnish
+Wikipedia. We evaluate our system against the predictive text entry
+systems in three widely available mobile phone models and establish that we
+achieve comparable accuracy.
 \end{abstract}
 
 \section{Introduction}
@@ -68,11 +76,12 @@ used in constructing the predictive text entry system, on the accuracy
 of a predictive text entry system.
 
 Ideally the training data for any data driven system, such as
-predictive text entry, should resemble the input data of the
-system. In the case of a predictive text entry system, the ideal
-training data would thus consist of text messages. Since text messages
-are difficult to come by and there are legal restrictions for using
-them, other sources for training data should be considered. 
+predictive text entry, should resemble the input data of the system as
+closely as possible. In the case of a predictive text entry system,
+the ideal training data would thus consist of text messages. Since
+text messages are difficult to come by and there are legal
+restrictions for using them, other sources for training data should be
+considered.
 
 In this paper, we use Internet Relay Chat (IRC) logs, to train a
 predictive text input system for Finnish. In IRC multiple users chat
@@ -113,14 +122,14 @@ interface, for constructing and utilizing WFSTs.
 
 This paper is organized as follows: In section \ref{sec:related-work},
 we present earlier work in improving the accuracy of predictive text
-entry systems. In section \ref{sec:text-entry}, we present predictive
+entry systems. In section \ref{sec:text-entry}, we present the predictive
 text entry task. In section \ref{sec:methods}, we explain how to
 augment a morphological analyzer with word frequencies computed from
-IRC logs and how such a system is used to disambiguate between words
-corresponding to an ambiguous input sequence. After this we present
-the morphological analyzer, Omorfi, and the HFST interface in section
-\ref{sec:tools} and present the IRC log data used for training out
-model and the text message data used for evaluation in
+IRC logs and how such a system is used to disambiguate between
+suggestions corresponding to an ambiguous input sequence. After this
+we present the morphological analyzer, Omorfi, and the HFST interface
+in section \ref{sec:tools} and present the IRC log data used for
+training out model and the text message data used for evaluation in
 \ref{sec:data}. We evaluate our system in section \ref{sec:evaluation}
 and present some general and closing remarks in sections
 \ref{sec:discussion} and \ref{sec:conclusions}.
@@ -147,11 +156,11 @@ and present some general and closing remarks in sections
 \label{sec:related-work}
 
 Improving predictive text entry is a widely researched problem. The
-improvements can mainly be divided into two broad cathegories (i)
-improving the statistical model used in predictive text entry by
-e.g. using context dependent models or improving the training material
-and (ii) improving the design of the keypad of the mobile phone in
-order to support faster typing.
+improvements can be divided into two broad categories (i) improving
+the statistical model used in predictive text entry by e.g. using
+context dependent models or improving the training material and (ii)
+improving the design of the keypad of the mobile phone in order to
+support faster typing.
 
 Ganslandt \& al. \cite{ganslandt/2009} and Gong \&
 al. \cite{gong/2008} have extended the statistical model by
@@ -236,7 +245,7 @@ correct suggestion based on partial input.
 \label{fig:keypad}
 \end{figure}
 
-\section{Combining a Morphological Lexicon and IRC Logs}
+\section{Methods}
 \label{sec:methods}
 
 Our predictive text entry system is based on probabilistic lexical
@@ -314,9 +323,9 @@ arithmetics, taking into account the transformation $p \mapsto -\log
 p$. Addition of weights $w_1 \oplus w_2$ corresponds to taking their
 minimum $\min(\{w_1,w_2\})$ and multiplication $w_1 \otimes w_2$
 corresponds to ordinary addition of floating point numbers $w_1 +
-w_2$. The addition operation $\oplus$ underestimates the actual sum of
-penalty weights $-\log (e^{-w_1} + e^{-w_2})$, but the approximation
-is usually good enough.
+w_2$. The addition operation $\oplus$ underestimates the penalty
+weight of the sum of the underlying probabilities $-\log (e^{-w_1} +
+e^{-w_2})$, but the approximation is usually good enough.
 
 Akin to ordinary transducers, WFSTs can be combined using
 different binary algebraic operations or modified using unary
@@ -353,7 +362,7 @@ algebraic operations to yield new WFSTs. Our system uses two unary and three bin
 \end{itemize}
 For a more thorough discussion on WFSTs, see Allauzen \& al. \cite{openfst/2007}.
 
-\subsection{Component of the predictive text entry system}
+\subsection{Components of the predictive text entry system}
 
 Our system is constructed from three WFSTs, which are combined using
 disjunction, subtraction and composition:
@@ -387,7 +396,8 @@ word forms. Hence
 
 The domain specific lexicon transducer $L_I$ is built by taking a
 corpus, counting the frequencies for all the words and compiling the
-words and their frequencies into a WFST.
+words and the penalty weights corresponding to their frequencies into
+a WFST.
 
 Schematically our system works by looking up a number sequence in
 $[\mathrm{Num}\rightarrow\mathrm{Text}]$ to find all possible letter
@@ -400,9 +410,9 @@ lexicons gives an infinite weight, it will be replaced by some large
 penalty $w_{max}$. 
 
 For each suggestion, a weighted average is computed from these
-penalties and this is the total penalty weight of the candidate
-word. Predictive text entry will offer the suggestions in order of
-increasing penalty weight.
+penalties and this is the total penalty weight of the
+suggestion. Predictive text entry will offer the suggestions in order
+of increasing penalty weight (i.e. decreasing probability).
 
 In practice this approach is not feasible, because
 $[\mathrm{Num}\rightarrow\mathrm{Text}]$ will over-generate hugely
@@ -454,7 +464,7 @@ where $U$ is the language of all letter strings.
 
 Finally we can compose $[\mathrm{Num}\rightarrow\mathrm{Text}]$ with
 $L_{I\vee O}$ in order to get a transducer, which transforms number
-sequences to word forms.
+sequences to suggestions.
 
 In the construction of the composite lexicon $L$, we used the floating
 point constant $k$. This constant needs to be estimated
@@ -512,7 +522,7 @@ transducers~\cite{hfst/2011}. This means that we did not have to
 implement any specialized algorithms for application of the predictive
 text entry model. Hence our system can be implemented in any current
 or future weighted finite-state software as long as it supports the
-necessary subset of the finite-state algebra described in
+necessary subset of finite-state algebra described in
 \ref{sec:methods}.
 
 For processing of corpora we have used standard GNU tools like
@@ -555,10 +565,9 @@ language used in text messages.
 
 The IRC logs used in this research contain 385303 words after omitting
 all words, which contain symbols that are not letters, apostrophes (')
-or hyphens (-), which are the three elements that make up Finnish
-words. One tenth of the corpus is set aside for testing purposes. The
-size of the corpus used for constructing the language model is thus
-345423 words.
+or hyphens (-). One tenth of the corpus is set aside for testing
+purposes. The size of the corpus used for constructing the language
+model is thus 345423 words.
 
 
 \subsubsection{Text Messages}
@@ -582,11 +591,11 @@ $1$. The accuracy peaked at $k = 0.2$. Thus the best combination of Omorfi and t
 \begin{equation}L_{I\vee O}' = \mathrm{W}_{0.2}(L_I) \cup \mathrm{W}_{0.8}(L_O)\text{.}\end{equation}
 
 It is important to notice that, we give suggestions in order of
-increasing weight. Hence the value $0.2$ of the coefficient $k$
-actually means that suggestions in the IRC log transducer are
-preferred over suggestions in the Omorfi transducer, because their
-weight is multiplied by a smaller constant $0.2$ than the weights in
-the Omorfi transducer (which are multiplied by $0.8$).
+increasing weight (i.e. decreasing probability). Hence the value $0.2$
+of the coefficient $k$ actually means that suggestions in the IRC log
+transducer are preferred over suggestions in the Omorfi transducer,
+because their weight is multiplied by a smaller constant $0.2$ than
+the weights in the Omorfi transducer (which are multiplied by $0.8$).
 
 \section{Evaluation}
 \label{sec:evaluation}
@@ -612,17 +621,17 @@ log data, i.e. without resorting to text messages.
 
 Table~\ref{tab:recall} shows the recall of our system when testing on
 text message data and the relative weighting of 0.2 for the IRC logs
-and 0.8 for Omorfi. The rows shows the amount of words where the
+and 0.8 for Omorfi. The rows show the amount of words where the
 correct suggestion was (i) the first suggestion, (ii) among the three
 first suggestion or (iii) was any of the suggestions.
 
 Figure~\ref{fig:AccuraciesIRCMaterial} shows the recall for the first
 guess and for the three first guesses as a function of the relative
-weight of the IRC logs. The accuracy was measured both for held-out
-IRC log data and text messages. For IRC log data, accuracy peaked
+weight of the IRC logs. The recall was measured both for held-out
+IRC log data and text messages. For IRC log data, recall peaked
 at relative weight 0.2 and for the text message data it peaked at 0.1.
 
-In order to get some idea of variation of accuracy depending on the
+In order to get some idea of variation of recall depending on the
 training data, we divided the IRC logs into ten parts and trained ten
 different models using 90\% of the data for training and varying the
 held-out 10\% of the data. The amount of successfully analysed words
@@ -705,7 +714,7 @@ every 361th word. See the results in table~\ref{tab:phones}.
 
 We evaluated the effect of the amount of training data on the recall
 of the system on text message training
-data. Figure~{fig:SaturationGraph} shows the results. 
+data. Figure~\ref{fig:SaturationGraph} shows the results. 
 
 \begin{figure*}[!t]
 \centerline{\subfloat[The first guess is correct.]{\includegraphics[width=3.5in]
@@ -748,9 +757,9 @@ commercial products by using only open source tools and readily
 available corpus data. It backs our assumption that the IRC logs
 indeed are a valuable source for teaching language models aimed at
 understanding casual, informal Finnish commonly used in text
-messages. An analysis of our model, revealed that most
-of them could have been avoided by including a model which recognizes
-proper names and a model for abbreviations.
+messages. An analysis of our the errors our model produced, revealed
+that most of them could have been avoided by including a model which
+recognizes proper names and a model for abbreviations.
 
 The demonstrated model considers only unigrams for probability
 likelihood maximisation. It has been demonstrated that it is possible
