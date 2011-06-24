@@ -490,82 +490,143 @@ sufficient for predictive text entry.
 \section{Tools and Resources}
 \label{sec:tools}
 
-To implement the full system we have used only freely available open source
-tools and resources that anyone can download from the Internet to reproduce the
-results. For the finite-state system we have selected the HFST
-tools\footnote{\url{http://hfst.sf.net}}, which is relatively complete
-reproduction of the classical tools of finite-state
-morphology\cite{beesley/2003}. Similarly we have downloaded a freely available
-Finnish finite-state morphological analyser
-omorfi\footnote{\url{http://home.gna.org/omorfi/}} for our language model
-data\cite{pirinen/2011/nodalida}. For further training of the language model we
-have used the Finnish
-Wikipedia\footnote{\url{http://dumps.wikimedia.org/fiwiki/latest/}} as corpus
-to acquire the unigram probabilities\cite{pirinen/2010/lrec}.
+To implement the full system we have used only freely available open
+source tools and resources that anyone can download from the Internet
+to reproduce the results. For the finite-state system we have selected
+the HFST tools\footnote{\url{http://hfst.sf.net}}, which is relatively
+complete reproduction of the classical tools of finite-state
+morphology~\cite{beesley/2003}. Similarly we have downloaded a freely
+available Finnish finite-state morphological analyser
+Omorfi\footnote{\url{http://home.gna.org/omorfi/}} for our language
+model data~\cite{pirinen/2011/nodalida}. For further training of the
+language model we have used the Finnish
+Wikipedia\footnote{\url{http://dumps.wikimedia.org/fiwiki/latest/}} as
+corpus to acquire unigram probabilities~\cite{pirinen/2010/lrec}.
 
 \subsection{Tools}
 
-In our setup we use unmodified version of HFST tools for creation, manipulation
-and use of finite state transducers\cite{hfst/2011}. This means that we have
-not needed to prepare any specialised algorithms for application of the t9
-predictive input model. This basically means that it can be used on any of
-current or future finite-state systems as long as they implement needed subset
-of finite-state algebra as defined in \ref{sec:methods}.
+In our setup we use an unmodified version of HFST tools for creating,
+manipulating and utilizing finite state
+transducers~\cite{hfst/2011}. This means that we did not have to
+implement any specialised algorithms for application of the predictive
+text entry model. Hence our system can be implemented in any current
+or future weightd finite-state software as long as it supports the
+necessary subset of the finite-state algebra described in
+\ref{sec:methods}.
 
-For processing of corpora we have used standard GNU tools like coreutils as
-well as bash and python scripting languages. The source code of the full system
-used for building, applying and evaluation of the full system is available
-under free
+For processing of corpora we have used standard GNU tools like
+coreutils as well as the bash and python scripting languages. The
+source code for building, applying and evaluating the full system is
+available under free
 licence\footnote{\url{http://hfst.svn.sourceforge.net/viewvc/hfst/trunk/cla-2011-article/}}.
 
 \subsection{Data}
 \label{sec:data}
 
-For language model we have selected to use ready-made free open source
-finite-state implementation of Finnish language\cite{pirinen/2011/nodalida}.
-The language model here is meant for parsing running text consisting mainly of
-standard written Finnish language, which is relatively far from the language
-sms text messages.  To train the language model we have used
-the Finnish Wikipedia data to add unigram probabilities to word forms that are
-recognised by the language model we are using. 
+\subsubsection{The morphological analyzer Omorfi} 
+We chose the ready-made free open source finite-state implementation
+of the Finnish language Omorfi~\cite{pirinen/2011/nodalida} for the
+morphological analyzer used in our system.  Its language model is
+meant for parsing running text consisting mainly of standard written
+Finnish language, which is relatively far from the language of text
+messages. To add lexical probabilities to Omorfi, we have used the
+Finnish Wikipedia.
 
 \subsubsection{IRC Logs}
-IRC (Internet Relay Chat) is a real-time messaging network. It is mainly used for group communication, but also enables private one-on-one discussions. The group communication happens on channels, similar to chat rooms, of which some are private and require a password to enter. The IRC logs we use are from a public channel directed mainly to the members of a local student organization. The topic of the discussion varies a lot making the log quite versatile as test and teaching material.
+IRC (Internet Relay Chat) is a real-time messaging network. It is
+mainly used for group communication, but it also enables private
+one-on-one discussions. The group communication happens on channels,
+similar to chat rooms, of which some are private and require a
+password to enter, but most are public. Chat participants often log
+discussions and publish the logs on the Internet, so a lot of logs are
+freely available. The IRC logs we use are from a public channel
+directed mainly to the members of a local student organization. The
+topic of the discussion varies a lot making the log quite versatile as
+test and teaching material.
 
-IRC discussions tend to be rather informal, and thus the language used is casual, resembling the spoken language, as is also the case with text messages. In Finnish this  means e.g. shortening words from the end and using different word forms than formal written language does.
+IRC discussions tend to be rather informal, and thus the language used
+is casual, resembling the spoken language, as is also the case with
+text messages. In Finnish this means e.g. shortening words from the
+end and using different word forms than formal written language
+does. Additionally the messages in IRC discussions are usually fairly
+short (a couple of hundred of characters), which also resembles the
+language used in text messages.
 
-The IRC logs used in this research contain 385303 words after omitting everything that does not consist of letters, an apostrophe (') and a hyphen (-); the three elements that are used to form Finnish words. One tenth of the corpus is set aside for testing purposes. The size of the corpus used for constructing the language model is thus 345423 words.
+The IRC logs used in this research contain 385303 words after omitting
+all words, which contain symbols that are not letters, apostrophes (')
+or hyphens (-), which are the three elements that make up Finnish
+words. One tenth of the corpus is set aside for testing purposes. The
+size of the corpus used for constructing the language model is thus
+345423 words.
 
 
 \subsubsection{Text Messages}
 
 Authentic text messages were collected for testing purposes via requests in the social media from 12 volunteers, aged between 20 and 35. The messages contain 10851 words after the same trimming that was performed on the IRC logs.
 
+\section{Training a predictive text entry system for Finnish}
+
+Constructing the text entry model for Finnish consists of two
+tasks. The first task is to construct the lexical models $L_O$ and
+$L_I$ from the morphological analyzer Omorfi and IRC logs as explained
+in section \ref{sec:methods}. We use 90\% of IRC log data to train the
+lexical model. The second task is to find the value of the coefficient
+$k$, which determines the relative weights of the IRC logs and Omorfi.
+\begin{equation}L_{I\vee O}' = \mathrm{W}_k(L_I) \cup \mathrm{W}_{1-k}(L_O)\text{.}\end{equation}
+
+To find the constant $k$, we took the remaining 10\% of the training
+data and coded it into number sequences. We then tested the accuracy
+obtained on that data using different values of $k$ between $0$ and
+$1$. The accuracy peaked at $k = 0.2$. Thus the best combination of Omorfi and the IRC log transducer was
+\begin{equation}L_{I\vee O}' = \mathrm{W}_{0.2}(L_I) \cup \mathrm{W}_{0.8}(L_O)\text{.}\end{equation}
+
 \section{Evaluation}
 \label{sec:evaluation}
 
-Our goal was to test whether adding some understanding of spoken language to the lexicon of a predictive text model improves its quality. We also aimed to find out how suitable IRC logs are for this purpose. We used a morphological analyser for Finnish as a baseline model. Our hypothesis is that the language in IRC logs, being often of casual nature, resembles the language used in text messages and can therefore be used as a source for creating models that understand spoken language.
+Our goal was to test whether adding some understanding of spoken
+language to the lexicon of a predictive text model improves its
+quality. We also aimed to find out how suitable IRC logs are for this
+purpose. Additionally we wanted to ensure that the relative weighting
+of Omorfi and the IRC log transducer could be established without
+resorting to text message data. 
+
+As baseline model in all tests, we used the morphological analyser
+Omorfi, weighted using the Finnish Wikipedia.
 
 % 0.2 & 0.8 anto parhaan tuloksen niin logeilla ku tekstareillakin
 
-
-\subsection{Testing the language model using IRC logs}
-
-We tested the language model $L_{I\vee O}'$ containing the baseline model and the spoken language model with the one tenth of the IRC log set aside for testing. 94.37 \% of the words were successfully analysed. Of all the weighted combination models, the one with the weight 0.2 for the spoken language model and the 0.8 weight for the baseline model recognised the most words on the first try.
-
-To ensure the test results were not merely a result of coincidentally having chosen an exceptionally easy tenth of the IRC logs, we ran the same tests for each of the other tenths as well, creating the combination models using the rest of the logs, using the optimal weighting 0.2 for spoken language and 0.8 for the baseline model. The amount of the words recognised was between 93.95 and 94.99 \% in each case, with an average of 94.51 \%. This means that the original tenth of the logs used for testing is quite similar to the other tenths in terms of difficulty for the model, and we have no reason to assume the choice of the test material would significantly bias the results.
-
-% Pitäiskö tälle laskea keskihajonta? Onks hassuu, että tekstareille on laskettu mut irc-logeille ei?
-
-\subsection{Testing with text messages}
+\subsection{Testing using text messages}
  
-We then used the text message data for testing to see if the results correlate with the testing done with the IRC logs. 91.07 \% of the words were analysed correctly. The text message data also received the best results with the weighting 0.2 for the spoken language model and 0.8 for the baseline model, with which 75.16 \% of the words were recognised on the first attempt. (See MIIKAN FIG)
+We used text message data to evaluate the overall performance of our
+system and also establish that the optimal relative weighting between
+Omorfi and the IRC log transducer could be established by using IRC
+log data, i.e. without resorting to text messages.
 
-We also ran tests with the text message data on the alternative combination models created for testing the difficulty of the original combination model. The amount of successfully analysed words range between 91.06 \% and 91.18\%, and from 75.02 \% to 75.42 \% of the words were recognised at the first attempt. 
+Table~\ref{tab:recall} shows the recall of our system when testing on
+text message data and the relative weighting of 0.2 for the IRC logs
+and 0.8 for Omorfi. The rows shows the amount of words where the
+correct suggestion was (i) the first suggestion, (ii) among the three
+first suggestion or (iii) was any of the suggestions.
 
-% Pitäskö näistä heittää jotain taulukoita?
+Figure~\ref{fig:AccuraciesIRCMaterial} shows the recall for the first
+guess and for the three first guesses as a function of the relative
+weight of the IRC logs. The accuracy was measured both for held-out
+IRC log data and text messages. For IRC log data, accuracy peaked
+at relative weight 0.2 and for the text message data it peaked at 0.1.
 
-The results for correct first guesses have an average of 75.22 \%, with a standard deviation of 0.10 percentage points. If the results follow the normal distribution, 99.7 \% of them should be within 3 standard deviations from the average, i.e. between 74.92 \% and 75.52 \%. We do not know whether the results are normally distributed, but this gives us a rough idea of what the results are expected to look like.
+In order to get some idea of variation of accuracy depending on the
+training data, we divided the IRC logs into ten parts and trained ten
+different models using 90\% of the data for training and varying the
+held-out 10\% of the data. The amount of successfully analysed words
+from the text message material ranged between 91.06 \% and 91.18\%,
+and between 75.02 \% and 75.42 \% of the words were recognised at the
+first attempt. The results for correct first guesses have an average
+of 75.22 \%, with a standard deviation of 0.10 percentage points. If
+the results follow the normal distribution, the 99.7\% confidence
+interval is the interval of 3 standard deviations from the average,
+i.e. between 74.92 \% and 75.52 \%. We do not know whether the results
+are normally distributed, but this gives us a rough idea of what the
+results are expected to look like.
 
 % omorfi, tekstarit
 \begin{table}[!t]
@@ -585,19 +646,34 @@ Recognised & 81.37 \% & 91.07 \% \\
 \end{table}
 
 
-To confirm our assumption that adding the understanding of spoken language indeed improves the quality of the results, we ran the text message test data through the baseline model to see how much the spoken language model affects the results. The difference between the results achieved with the baseline and the combined model is noticeable. The baseline gave a correct analysis for 81.37 \% of the words. Only 55.10 \% of the words were given the correct analysis at the first attempt.
+To confirm our assumption that adding the understanding of spoken
+language indeed improves the quality of the results, we ran the text
+message test data through the baseline model to see how much the
+spoken language model affects the results. The difference between the
+results achieved with the baseline and the combined model is
+noticeable. The baseline gave a correct analysis for 81.37 \% of the
+words. Only 55.10 \% of the words were given the correct analysis at
+the first attempt.
 
 
-
-To determine the significance of the differences between the results from the baseline model and the combination model, we ran a Wilcoxon paired rank test which is suitable for data that cannot be guaranteed to follow the normal distribution. We compared the percentages of correct first attempts with the baseline model and the ten different combination models. Since the test requires equally big sets of test data, we used the baseline model result as a counterpart for each of the different combination model results. The test gave a p-value of 6.34e-05, which means that we can quite confidently say the results differ quite clearly.
+To determine the significance of the differences between the results
+from the baseline model and the combination model, we ran a Wilcoxon
+paired rank test on the results obtained by varying the held-out
+data. The test is suitable for data that cannot be guaranteed to
+follow the normal distribution. We compared the percentages of correct
+first attempts with the baseline model and the ten different
+combination models. Since the test requires equally big sets of test
+data, we used the baseline model result as a counterpart for each of
+the different combination model results. The test gave a p-value of
+6.34e-05, which means that we can quite confidently say the results
+differ quite clearly.
 
 \subsection{Comparing the language model with existing predictive text entry}
-
-In order to get a better understanding of the quality of our language model we compared it to the existing predictive text entry systems found in mobile phones. As this must be done word by word manually, it is rather laborous which is why we did not use the whole text message test data but chose 31 words by starting with the first one and taking every 361th word.
 
 \begin{table}[!t]
 \begin{center}
 \caption{Recall for three mobile phones and our system}
+\label{tab:phones}
 \begin{tabular} {l c c}
 System & Recall 1st guess & Recall 1st to 3rd guess\\
 \hline
@@ -608,11 +684,20 @@ Our system & 64.52\% & 80.65\%  \\
 \hline
 \end{tabular}
 \end{center}
-\label{tab:phones}
 \end{table}
 
-This shows we come quite close to the leading commercial product by using only open source tools and readily available corpus data, and backs our assumption that the IRC logs indeed are a valuable source for teaching language models aimed at understanding casual, informal Finnish commonly used in text messages.
+In order to get a better understanding of the quality of our language
+model we compared it to the existing predictive text entry systems
+found in mobile phones. As this must be done word by word manually, it
+is rather laborous which is why we did not use the whole text message
+test data but chose 31 words by starting with the first one and taking
+every 361th word. See the results in table~\ref{tab:phones}.
 
+\subsection{Effect of the Amount of Training Data}
+
+We evaluated the effect of the amount of training data on the recall
+of the system on text message training
+data. Figure~{fig:SaturationGraph} shows the results. 
 
 \begin{figure*}[!t]
 \centerline{\subfloat[The first guess is correct.]{\includegraphics[width=3.5in]
@@ -620,7 +705,7 @@ This shows we come quite close to the leading commercial product by using only o
 \hfil
 \subfloat[Correct guess found among the three first guesses.]{\includegraphics[width=3.5in]
   {accuracy_first_to_third_guess.pdf}}}
-\caption{The recall of our algorithm using different linear combinations of the weights given by the morphological analyzer and the IRC log transducer. On the x-axis we give the relative weight of the IRC log transducer and on the y-axis we give the recall. The dotted line gives the recall for the IRC log test material and the solid line gives the recall for the text message test material. Peak recall for the text message test material is 75.8\% for the first guess and 86.5\% for the three first guesses.}
+\caption{The recall of our algorithm using different linear combinations of the weights given by the morphological analyzer and the IRC log transducer. On the x-axis we give the relative weight of the IRC log transducer and on the y-axis we give the recall. The dotted line gives the recall for the IRC log test material and the solid line gives the recall for the text message test material. Peak recall for the text message test material is at IRC weight $0.1$, 75.8\% for the first guess and 86.5\% for the three first guesses.}
 \label{fig:AccuraciesIRCMaterial}
 \end{figure*}
 
@@ -642,10 +727,17 @@ running texts of literary written Finnish. It would be interesting to see if
 modifying the language model towards the standard spoken Finnish dialect
 might yield a significant increase in recall.
 
+This shows we come quite close to the leading commercial product by
+using only open source tools and readily available corpus data, and
+backs our assumption that the IRC logs indeed are a valuable source
+for teaching language models aimed at understanding casual, informal
+Finnish commonly used in text messages.
+
+
 The demonstrated model only considers unigrams for probability
 likelihood maximisation. It has been demonstrated that it is possible
 to extend these models trivially to arbitrary n-gram and varigram
-models \cite{Silfverberg/2011}, and this should be explored to see if
+models~\cite{Silfverberg/2011}, and this should be explored to see if
 there's improvement for wider statistical models in task of predictive
 text input for mobile text messages.
 
