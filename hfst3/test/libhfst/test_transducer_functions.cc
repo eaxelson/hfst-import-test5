@@ -780,20 +780,21 @@ int main(int argc, char **argv)
       }
 
 
-#ifdef FOO // FIXME
+      //#ifdef FOO // FIXME
       {
 	verbose_print("alphabets", types[i]);
 
-	HfstTransducer a2unk("a", /*"@_UNKNOWN_SYMBOL_@",*/ types[i]);
-	assert(a2unk.get_alphabet().size() > 3);
-	std::cerr << "HERE1" << std::endl;
+	HfstTransducer a2unk("a", "@_UNKNOWN_SYMBOL_@", types[i]);
+	assert(a2unk.get_alphabet().size() == 4);
 	a2unk.insert_to_alphabet("FOO");
-	std::cerr << "HERE2" << std::endl;
+	assert(a2unk.get_alphabet().size() == 5);
 	a2unk.remove_from_alphabet("FOO");
+	assert(a2unk.get_alphabet().size() == 4);
 	StringSet alpha = a2unk.get_alphabet();
 	assert(alpha.find("FOO") == alpha.end());
       }
 
+#ifdef FOO // FIXME
       /* Test that binary operations do not change the transducer argument. */
       {
 	verbose_print("binary operations", types[i]);

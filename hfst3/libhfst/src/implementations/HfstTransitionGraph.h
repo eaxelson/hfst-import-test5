@@ -282,6 +282,14 @@ namespace hfst {
           alphabet.insert(symbol);
         }
 
+	/** @brief Remove symbol \a symbol from the alphabet of the graph. 
+
+	    @note Use with care, removing symbols that occur in the transitions
+	    of the graph can have unexpected results. */
+	void remove_symbol_from_alphabet(const HfstSymbol &symbol) {
+	  alphabet.erase(symbol);
+	}
+
 	/** @brief Same as #add_symbol_to_alphabet for each symbol in
 	    \a symbols. */
 	void add_symbols_to_alphabet(const HfstSymbolPairSet &symbols)
