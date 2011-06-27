@@ -152,7 +152,65 @@ int main(int argc, char **argv) {
     HfstTransducer rule = rules::replace_up(context, mapping, false, alphabet);
   }
 #endif
-    
+ 
+
+  // replace_up for foma in a special case that seems to fail sometimes
+
+  {
+    ImplementationType type = FOMA_TYPE;
+
+    HfstBasicTransducer mapping;
+
+    mapping.add_transition
+      (0, HfstBasicTransition(1, "@_EPSILON_SYMBOL_@", "X", 0));
+    mapping.set_final_weight(1, 0);    
+
+    mapping.add_transition
+      (0, HfstBasicTransition(2, "@_UNKNOWN_SYMBOL_@", "X", 0));
+    mapping.add_transition
+      (0, HfstBasicTransition(2, "X", "X", 0));
+    mapping.add_transition
+      (2, HfstBasicTransition(2, "X", "@_EPSILON_SYMBOL_@", 0));
+    mapping.add_transition
+      (2, HfstBasicTransition
+       (2, "@_UNKNOWN_SYMBOL_@", "@_EPSILON_SYMBOL_@", 0));
+    mapping.set_final_weight(2, 0);
+
+    HfstTransducer mapping_(mapping, type);
+
+    //std::cerr << mapping_ << std::endl;
+
+    StringPairSet alphabet;
+    alphabet.insert(StringPair("a", "a"));
+    alphabet.insert(StringPair("b", "b"));
+    alphabet.insert(StringPair("X", "X"));
+    alphabet.insert(StringPair("K", "K"));
+
+    bool optional = false;
+
+    HfstTransducerPair context(HfstTransducer("K", "K", type),
+			       HfstTransducer("K", "K", type));
+
+    HfstTransducer rule 
+      = rules::replace_up(context, mapping_, optional, alphabet);
+
+    //std::cerr << rule << std::endl;
+
+    HfstTokenizer TOK;
+
+    HfstTransducer abKabKab("abKabKab", TOK, type);
+    //std::cerr << abKabKab << std::endl;
+
+    abKabKab.compose(rule).minimize();
+
+    HfstTransducer abKabKab_("abKabKab", TOK, type);
+
+    // FIXME
+    //assert(not abKabKab.compare(abKabKab_));
+
+    //std::cerr << abKabKab << std::endl;
+  }
+   
 }
 
 
