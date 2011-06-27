@@ -142,6 +142,13 @@ void HfstTransducer::insert_to_alphabet(const std::string &symbol)
     if (symbol == "")
       HFST_THROW_MESSAGE(EmptyStringException, "insert_to_alphabet");
 
+    hfst::implementations::HfstBasicTransducer * net 
+      = convert_to_basic_transducer();
+    net->add_symbol_to_alphabet(symbol);
+    convert_to_hfst_transducer(net);
+    //return *this;
+
+#ifdef FOO
     switch(type)
     {
 #if HAVE_SFST
@@ -168,18 +175,26 @@ void HfstTransducer::insert_to_alphabet(const std::string &symbol)
         HFST_THROW_MESSAGE(FunctionNotImplementedException,
                            "insert_to_alphabet");
     }    
+#endif // FOO
 }
 
 
 void HfstTransducer::remove_from_alphabet(const std::string &symbol) 
 {
-  HFST_THROW_MESSAGE(FunctionNotImplementedException, "remove_from_alphabet");
+  //HFST_THROW_MESSAGE(FunctionNotImplementedException, "remove_from_alphabet");
 
   HfstTokenizer::check_utf8_correctness(symbol);
 
   if (symbol == "")
     HFST_THROW_MESSAGE(EmptyStringException, "remove_from_alphabet");
 
+    hfst::implementations::HfstBasicTransducer * net 
+      = convert_to_basic_transducer();
+    net->remove_symbol_from_alphabet(symbol);
+    convert_to_hfst_transducer(net);
+    //return *this;
+
+#ifdef FOO
   switch(type)
     {
 #if HAVE_SFST
@@ -206,6 +221,7 @@ void HfstTransducer::remove_from_alphabet(const std::string &symbol)
       HFST_THROW_MESSAGE(FunctionNotImplementedException,
 			 "remove_from_alphabet");
     }    
+#endif // FOO
 }
 
 
