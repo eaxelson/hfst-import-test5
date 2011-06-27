@@ -231,6 +231,7 @@ namespace hfst {
 	  return true;
 	}
 
+      public:
 	/* Print the alphabet of the graph to standard error stream. */
 	void print_alphabet() const 
 	{
@@ -244,6 +245,7 @@ namespace hfst {
 	  std::cerr << std::endl;
 	}
 
+      protected:
 	/* Get the number of the \a symbol. */
 	unsigned int get_symbol_number
 	  (const HfstSymbol &symbol) const {

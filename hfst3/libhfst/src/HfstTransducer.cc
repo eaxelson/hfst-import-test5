@@ -390,6 +390,14 @@ void HfstTransducer::print_alphabet()
       this->tropical_ofst_interface.print_alphabet
 	(this->implementation.tropical_ofst);
 #endif
+#if HAVE_FOMA
+    if (this->type == FOMA_TYPE)
+      {
+	HfstBasicTransducer net(*this);
+	net.print_alphabet();
+      }
+#endif
+
     return;
 }
 
