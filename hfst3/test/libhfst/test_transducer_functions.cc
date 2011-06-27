@@ -794,8 +794,8 @@ int main(int argc, char **argv)
 	assert(alpha.find("FOO") == alpha.end());
       }
 
-#ifdef FOO // FIXME
       /* Test that binary operations do not change the transducer argument. */
+
       {
 	verbose_print("binary operations", types[i]);
 
@@ -851,10 +851,9 @@ int main(int argc, char **argv)
 	  assert(id2id_copy.compare(id2id_copy2));
 	  assert(id2id_copy.get_alphabet() == id2id_copy2.get_alphabet());
 	}
-	
-      }
-#endif // FOO
 
+      }
     }
+
 }
 

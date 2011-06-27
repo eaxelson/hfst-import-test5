@@ -286,6 +286,10 @@ An example:
        in both transducers. */
     void harmonize(HfstTransducer &another);
 
+    /* The same as harmonize but does not change the second argument but
+       returns a harmonized version of that. */
+    HfstTransducer * harmonize_(const HfstTransducer &another);
+
     /* Check if transducer \a another has in its alphabet flag diacritics
        that are not found in the alphabet of this transducer and insert
        all missing flag diacritics to \a missing_flags. 
@@ -340,6 +344,10 @@ An example:
        Create an HfstBasicTransducer equivalent to \a t end delete
        the backend implementation of \a t. */
     implementations::HfstBasicTransducer * convert_to_basic_transducer();
+
+    /* For internal use:
+       Create an HfstBasicTransducer equivalent to \a t. */
+    implementations::HfstBasicTransducer * get_basic_transducer() const;
 
     /* For internal use:
        Create a backend implementation of the same type that this transducer
