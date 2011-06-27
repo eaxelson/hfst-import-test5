@@ -284,6 +284,49 @@ unsigned int HfstTransducer::get_symbol_number(const std::string &symbol)
     }    
 }
 
+HfstTransducer * HfstTransducer::harmonize_(const HfstTransducer &another)
+{
+  using namespace implementations;
+    if (this->type != another.type) {
+        HFST_THROW(TransducerTypeMismatchException); }
+
+    if (this->anonymous && another.anonymous) {
+      HFST_THROW_MESSAGE
+	(HfstFatalException, "harmonize_ with anonymous transducers"); }
+
+    switch(this->type)
+    {
+#if HAVE_FOMA
+    case (FOMA_TYPE):
+      // no need to harmonize as foma's functions take care of harmonizing
+      return NULL;
+      break;
+#endif // HAVE_FOMA
+#if HAVE_SFST || HAVE_OPENFST
+    case (SFST_TYPE):
+    case (TROPICAL_OPENFST_TYPE):
+    case (LOG_OPENFST_TYPE):
+      {
+	HfstBasicTransducer * this_basic = this->convert_to_basic_transducer();
+	HfstBasicTransducer * another_basic = another.get_basic_transducer();
+
+	this_basic->harmonize(*another_basic);
+
+	this->convert_to_hfst_transducer(this_basic);
+	HfstTransducer * another_harmonized 
+	  = new HfstTransducer(*another_basic, this->type);
+	delete another_basic;
+
+	return another_harmonized;
+	break;
+      }
+#endif
+    case (ERROR_TYPE):
+    default:
+        HFST_THROW(TransducerHasWrongTypeException);
+    }
+
+}
 
 /*  Harmonize symbol-to-number encodings and expand unknown and 
     identity symbols. 
@@ -2199,15 +2242,19 @@ HfstTransducer &HfstTransducer::compose
 	HFST_THROW_MESSAGE(HfstTransducerTypeMismatchException,
 			   "HfstTransducer::compose");
 
-    this->harmonize(const_cast<HfstTransducer&>(another));
+    HfstTransducer * another_harmonized =
+      this->harmonize_(const_cast<HfstTransducer&>(another));
+    if (another_harmonized == NULL) { // foma
+      another_harmonized = new HfstTransducer(another);
+    }
 
     // Handle special symbols here.
     if ( (this->type != FOMA_TYPE) && unknown_symbols_in_use) 
     {
-        // comment...
-        this->substitute("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",false,true);
-        (const_cast<HfstTransducer&>(another)).substitute
-	    ("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",true,false);
+      // comment...
+      this->substitute("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",false,true);
+      const_cast<HfstTransducer*>(another_harmonized)->substitute
+	("@_IDENTITY_SYMBOL_@","@_UNKNOWN_SYMBOL_@",true,false);
     }
     
     switch (this->type)
@@ -2216,8 +2263,8 @@ HfstTransducer &HfstTransducer::compose
     case SFST_TYPE:
     {
 	SFST::Transducer * sfst_temp =
-            this->sfst_interface.compose
-	    (implementation.sfst,another.implementation.sfst);
+	  this->sfst_interface.compose
+	  (implementation.sfst,another_harmonized->implementation.sfst);
 	delete implementation.sfst;
 	implementation.sfst = sfst_temp;
 	break;
@@ -2229,7 +2276,7 @@ HfstTransducer &HfstTransducer::compose
 	fst::StdVectorFst * tropical_ofst_temp =
             this->tropical_ofst_interface.compose
 	    (this->implementation.tropical_ofst,
-	     another.implementation.tropical_ofst);
+	     another_harmonized->implementation.tropical_ofst);
 	delete implementation.tropical_ofst;
 	implementation.tropical_ofst = tropical_ofst_temp;
 	break;
@@ -2237,8 +2284,9 @@ HfstTransducer &HfstTransducer::compose
     case LOG_OPENFST_TYPE:
     {
 	hfst::implementations::LogFst * log_ofst_temp =
-            this->log_ofst_interface.compose(implementation.log_ofst,
-					     another.implementation.log_ofst);
+            this->log_ofst_interface.compose
+	  (implementation.log_ofst,
+	   another_harmonized->implementation.log_ofst);
 	delete implementation.log_ofst;
 	implementation.log_ofst = log_ofst_temp;
 	break;
@@ -2249,7 +2297,7 @@ HfstTransducer &HfstTransducer::compose
     {
 	fsm * foma_temp =
             this->foma_interface.compose
-            (implementation.foma,another.implementation.foma);
+            (implementation.foma,another_harmonized->implementation.foma);
 	this->foma_interface.delete_foma(implementation.foma);
 	implementation.foma = foma_temp;
 	break;
@@ -2265,9 +2313,10 @@ HfstTransducer &HfstTransducer::compose
     {
         // comment...
         this->substitute(&substitute_single_identity_with_the_other_symbol);
-        (const_cast<HfstTransducer&>(another)).
-	    substitute(&substitute_unknown_identity_pairs);
+        (const_cast<HfstTransducer*>(another_harmonized))->
+	   substitute(&substitute_unknown_identity_pairs);
     }
+    delete another_harmonized;
 
     return *this;
 }
@@ -2278,7 +2327,8 @@ HfstTransducer &HfstTransducer::priority_union (const HfstTransducer &another)
 
 	if ( this->type != another.type )
 	{
-		HFST_THROW_MESSAGE(HfstTransducerTypeMismatchException, "HfstTransducer::priority_union");
+		HFST_THROW_MESSAGE(HfstTransducerTypeMismatchException, 
+				   "HfstTransducer::priority_union");
 	}
 	HfstTransducer tmp(*this);
 	HfstTransducer filter(another);
@@ -2294,7 +2344,8 @@ HfstTransducer &HfstTransducer::priority_union (const HfstTransducer &another)
 
 	/*
 	 * Invert t1, compose it with t2, invert back.
-	 * Compose t2 with those to get the pairs which need to be filtered from t1.
+	 * Compose t2 with those to get the pairs which need to be 
+	 * filtered from t1.
 	 * Subtract those pairs from t1 and union filtered t1 with t2.
 	*/
 
@@ -2319,6 +2370,7 @@ HfstTransducer &HfstTransducer::priority_union (const HfstTransducer &another)
 	  }
 
 	tmp.invert();
+
 	filter.compose(tmp); 	// t2 compose changed t1
 	filter.minimize();
 	if ( DEBUG )
@@ -2350,8 +2402,12 @@ HfstTransducer HfstTransducer::universal_pair ( ImplementationType type )
 {
 	using namespace implementations;
 	HfstBasicTransducer bt;
-	bt.add_transition(0, HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
-	bt.add_transition(0, HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0) );
+	bt.add_transition
+	  (0, HfstBasicTransition
+	   (1, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
+	bt.add_transition
+	  (0, HfstBasicTransition
+	   (1, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0) );
 	bt.set_final_weight(1, 0);
 
 	HfstTransducer final(bt, type);
@@ -2580,6 +2636,50 @@ HfstTransducer &HfstTransducer::subtract
 //                       Conversion functions
 //
 // -----------------------------------------------------------------------
+
+implementations::HfstBasicTransducer * HfstTransducer::
+get_basic_transducer() const
+{
+#if HAVE_SFST
+    if (this->type == SFST_TYPE)
+      {
+        hfst::implementations::HfstBasicTransducer * net = 
+	  ConversionFunctions::sfst_to_hfst_basic_transducer
+	  (implementation.sfst);
+	return net;
+      }
+#endif
+#if HAVE_OPENFST
+    if (this->type == TROPICAL_OPENFST_TYPE)
+      {
+        hfst::implementations::HfstBasicTransducer * net = 
+	  ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
+	  (implementation.tropical_ofst);
+	return net;
+      }
+    if (this->type == LOG_OPENFST_TYPE)
+      {
+        hfst::implementations::HfstBasicTransducer * net = 
+	  ConversionFunctions::log_ofst_to_hfst_basic_transducer
+	  (implementation.log_ofst);
+	return net;
+      }
+#endif
+#if HAVE_FOMA
+    if (this->type == FOMA_TYPE)
+      {
+        hfst::implementations::HfstBasicTransducer * net = 
+	  ConversionFunctions::foma_to_hfst_basic_transducer
+	  (implementation.foma);
+	return net;
+      }
+#endif
+    if (this->type == ERROR_TYPE) {
+	HFST_THROW(TransducerHasWrongTypeException);
+    }
+    HFST_THROW(FunctionNotImplementedException);
+}
+
 
 implementations::HfstBasicTransducer * HfstTransducer::
 convert_to_basic_transducer()
@@ -3400,6 +3500,14 @@ void priority_union_test ( ImplementationType type )
     assert ( testTr.priority_union( tr1 ).compare( result1 ) );
     // normal transducer .p. normal transducer
     testTr = tr1;
+
+    /*
+    std::cerr << testTr.priority_union( tr2 )
+	      << "--\n"
+	      << result2
+	      << std::endl;
+    */
+
     assert ( testTr.priority_union( tr2 ).compare( result2 ) );
 
     // normal transducer .p. normal transducer without priority string

@@ -321,7 +321,10 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
     if (this->type != another.type)
       HFST_THROW(TransducerTypeMismatchException);
 
-    this->harmonize(another);
+    HfstTransducer * another_ = this->harmonize_(another);
+    if (another_ == NULL) { // foma
+      another_ = new HfstTransducer(another);
+    }
 
     switch (this->type)
       {
@@ -329,7 +332,8 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
       case SFST_TYPE:
         {
           SFST::Transducer * sfst_temp = 
-            sfst_funct(implementation.sfst,another.implementation.sfst);
+            sfst_funct(implementation.sfst,
+		       another_->implementation.sfst);
           delete implementation.sfst;
           implementation.sfst = sfst_temp;
           break;
@@ -340,7 +344,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
         {
           fst::StdVectorFst * tropical_ofst_temp =
             tropical_ofst_funct(this->implementation.tropical_ofst,
-                                another.implementation.tropical_ofst);
+                                another_->implementation.tropical_ofst);
           delete implementation.tropical_ofst;
           implementation.tropical_ofst = tropical_ofst_temp;
           break;
@@ -349,7 +353,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
         {
           hfst::implementations::LogFst * log_ofst_temp =
             log_ofst_funct(implementation.log_ofst,
-                           another.implementation.log_ofst);
+                           another_->implementation.log_ofst);
           delete implementation.log_ofst;
           implementation.log_ofst = log_ofst_temp;
           break;
@@ -359,7 +363,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
       case FOMA_TYPE:
         {
           fsm * foma_temp = 
-            foma_funct(implementation.foma,another.implementation.foma);
+            foma_funct(implementation.foma,another_->implementation.foma);
           delete implementation.foma;
           implementation.foma = foma_temp;
           break;
@@ -382,6 +386,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
         default:
           HFST_THROW(TransducerHasWrongTypeException);
       }
+    delete another_;
 
     return *this;
   }
