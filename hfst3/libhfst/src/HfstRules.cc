@@ -28,6 +28,10 @@ namespace hfst
 
       if (DEBUG) printf("replace..\n");
 
+      if (DEBUG) t.write_in_att_format("replace_t.att", true);
+
+      if (DEBUG) t.print_alphabet();
+
       ImplementationType type = t.get_type();
 
       HfstTransducer t_proj(t);
@@ -40,22 +44,34 @@ namespace hfst
         exit(1);
       }
 
+      if (DEBUG) t_proj.write_in_att_format("replace_t_proj.att", true);
+      if (DEBUG) t_proj.print_alphabet();
+
       HfstTransducer pi_star(alphabet, type, true);
+
+      if (DEBUG) pi_star.write_in_att_format("replace_pi_star.att", true);
+      if (DEBUG) pi_star.print_alphabet();
 
       // tc = ( .* t_proj .* )
       HfstTransducer tc(pi_star);
       tc.concatenate(t_proj);
       tc.concatenate(pi_star);
                      
+      if (DEBUG) tc.write_in_att_format("replace_tc.att", true);
+
       // tc_neg = ! ( .* t_proj .* )
       HfstTransducer tc_neg(pi_star);
       tc_neg.subtract(tc);
+
+      if (DEBUG) tc_neg.write_in_att_format("replace_tc_neg.att", true);
 
       // retval = ( tc_neg t )* tc_neg
       HfstTransducer retval(tc_neg);
       retval.concatenate(t);
       retval.repeat_star();
       retval.concatenate(tc_neg);
+
+      if (DEBUG) retval.write_in_att_format("replace_retval.att", true);
 
       if (optional)
         retval.disjunct(pi_star);
@@ -75,7 +91,7 @@ namespace hfst
       t.minimize();
       if (DEBUG) t.write_in_att_format("compiler_t.att",true);
 
-      if (DEBUG) printf("replcae_transducer..\n");
+      if (DEBUG) printf("replace_transducer..\n");
 
       ImplementationType type = t.get_type();
 
@@ -89,6 +105,9 @@ namespace hfst
       tm.concatenate(rmtr);
 
       tm.minimize();
+      
+      if (DEBUG) tm.write_in_att_format("replace_up_tm.att", true);
+
       HfstTransducer retval = replace(tm, repl_type, false, alphabet);
 
       if (DEBUG) printf("..replace_transducer\n");
@@ -360,7 +379,10 @@ namespace hfst
       pi1.insert(StringPair(internal_epsilon, rightm));
       HfstTransducer ibt(pi1, type, true);
 
-      if (DEBUG) printf("  ..ibt created\n");
+      if (DEBUG) { 
+	printf("  ..ibt created:\n");
+	//std::cerr << ibt << std::endl;
+      }
 
       // Create the remove boundary transducer (.|<L>:<>|<R>:<>)*    
       StringPairSet pi2 = alphabet;
@@ -368,13 +390,18 @@ namespace hfst
       pi2.insert(StringPair(rightm, internal_epsilon));
       HfstTransducer rbt(pi2, type, true);
 
-      if (DEBUG) printf("  ..rbt created\n");
+      if (DEBUG) { 
+	printf("  ..rbt created\n");
+	//std::cerr << rbt << std::endl;
+      }
 
       // Add the markers to the alphabet
       alphabet.insert(StringPair(leftm,leftm));
       alphabet.insert(StringPair(rightm,rightm));
 
       HfstTransducer pi_star(alphabet,type,true);
+
+      if (DEBUG) pi_star.write_in_att_format("FOO",false); // TEST IF FAILS
 
       // Create the constrain boundary transducer !(.*<L><R>.*)
       HfstTransducer leftm_to_leftm(leftm, leftm, type);
@@ -386,7 +413,7 @@ namespace hfst
       HfstTransducer cbt(pi_star);
       cbt.subtract(tmp);
       cbt.minimize();
-      if (DEBUG) cbt.write_in_att_format("compiler_cbt.att",false);
+      if (DEBUG) cbt.write_in_att_format("replace_up_cbt.att",false);
       if (DEBUG) printf("  ..cbt created\n");
 
       // left context transducer .* (<R> >> (<L> >> LEFT_CONTEXT)) || !(.*<L>) 
@@ -394,15 +421,20 @@ namespace hfst
         (context.first, leftm, rightm, alphabet); 
 
       lct.minimize();
-      if (DEBUG) lct.write_in_att_format("compiler_lct.att",false);
+      if (DEBUG) lct.write_in_att_format("replace_up_lct.att",false);
       if (DEBUG) printf("  ..lct created\n");
 
       // right context transducer:  
       // reversion( (<R> >> (<L> >> reversion(RIGHT_CONTEXT))) .* || !(<R>.*) )
       HfstTransducer right_rev(context.second);
 
+      if (DEBUG) right_rev.write_in_att_format("FOO",true);  // FAILS
+
       if (DEBUG) printf("(1)\n");
       right_rev.reverse();
+      if (DEBUG) printf("(#1)\n");
+
+      if (DEBUG) right_rev.write_in_att_format("FOO",true);
 
       // Bug?: in foma, if context.second is an epsilon-transducer
       // reverting it yields an empty transducer.
@@ -410,7 +442,7 @@ namespace hfst
       if (DEBUG) printf("(2)\n");
       right_rev.minimize();
 
-      if (DEBUG) right_rev.write_in_att_format("right_rev.att",true);
+      if (DEBUG) right_rev.write_in_att_format("replace_up_right_rev.att",true);
 
       HfstTransducer rct = replace_context(right_rev, rightm, leftm, alphabet);
       if (DEBUG) printf("(3)\n");
@@ -418,7 +450,7 @@ namespace hfst
       if (DEBUG) printf("(4)\n");
       rct.minimize();
       if (DEBUG) printf("(5)\n");
-      if (DEBUG) rct.write_in_att_format("compiler_rct.att",false);
+      if (DEBUG) rct.write_in_att_format("replace_up_rct.att",false);
       if (DEBUG) printf("  ..rct created\n");
 
       // unconditional replace transducer      
@@ -431,6 +463,7 @@ namespace hfst
       if (DEBUG) printf("  minimizing rt\n");
       rt.minimize();
       if (DEBUG) printf("  ..rt createD\n");
+      if (DEBUG) rt.write_in_att_format("replace_up_rt.att", true);
 
 
       // build the conditional replacement transducer
@@ -439,7 +472,7 @@ namespace hfst
       result.compose(cbt);
       result.minimize(); // added
       
-      if (DEBUG) result.write_in_att_format("result0.att", true);
+      if (DEBUG) result.write_in_att_format("replace_up1.att", true);
 
       if (DEBUG) printf("#1\n");
 
@@ -453,7 +486,7 @@ namespace hfst
 
       result.minimize();  // ADDED
 
-      if (DEBUG) result.write_in_att_format("result2.att", true);
+      if (DEBUG) result.write_in_att_format("replace_up2.att", true);
 
       result.compose(rt);
       
@@ -469,7 +502,7 @@ namespace hfst
 
       result.minimize();  // ADDED
 
-      if (DEBUG) result.write_in_att_format("result4.att", true);
+      if (DEBUG) result.write_in_att_format("replace_up4.att", true);
 
       result.compose(rbt);
 
@@ -485,7 +518,7 @@ namespace hfst
       }
 
       result.minimize();
-      if (DEBUG) result.write_in_att_format("result.att",true);
+      if (DEBUG) result.write_in_att_format("replace_up_result.att",true);
 
       if (DEBUG) printf("...replace_in_context\n");
 

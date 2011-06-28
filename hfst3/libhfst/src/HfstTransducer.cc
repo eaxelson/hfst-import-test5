@@ -1782,19 +1782,17 @@ HfstTransducer &HfstTransducer::insert_freely
     {
       // HfstTransducer::harmonize does nothing to foma transducers, 
       // because foma functions take care of harmonization.
-      // However, now we are using HfstFastTransducer.
+      // However, now we are using HfstBasicTransducer.
       this->foma_interface.harmonize(this->implementation.foma,
 				     tmp.implementation.foma);
-        hfst::implementations::HfstFastTransducer * net = 
-	    ConversionFunctions::foma_to_hfst_fast_transducer
+        hfst::implementations::HfstBasicTransducer * net = 
+	    ConversionFunctions::foma_to_hfst_basic_transducer
 	    (implementation.foma);
         this->foma_interface.delete_foma(implementation.foma);
         net->insert_freely
-	  (hfst::implementations::HfstFastTransducer::HfstSymbolPair
-	   (ConversionFunctions::get_number(symbol_pair.first),
-	    ConversionFunctions::get_number(symbol_pair.second)), 0);
+	  (StringPair(symbol_pair.first, symbol_pair.second), 0);
         implementation.foma = 
-	    ConversionFunctions::hfst_fast_transducer_to_foma(net);
+	    ConversionFunctions::hfst_basic_transducer_to_foma(net);
         delete net;
         break;
     }
@@ -2850,7 +2848,7 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
 	{
 #if HAVE_FOMA
 	case FOMA_TYPE:
-	  if (type == SFST_TYPE || type == TROPICAL_OPENFST_TYPE)
+	  if (false || type == SFST_TYPE || type == TROPICAL_OPENFST_TYPE)
             fast_internal =
 	      ConversionFunctions::foma_to_hfst_fast_transducer
 	      (implementation.foma);
@@ -2873,7 +2871,7 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
             //#endif
 #if HAVE_SFST
 	case SFST_TYPE:
-	  if (type == TROPICAL_OPENFST_TYPE || type == FOMA_TYPE)
+	  if (false || type == TROPICAL_OPENFST_TYPE || type == FOMA_TYPE)
 	      fast_internal = 
 		ConversionFunctions::sfst_to_hfst_fast_transducer
 		(implementation.sfst);
@@ -2886,7 +2884,7 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
 #endif
 #if HAVE_OPENFST
 	case TROPICAL_OPENFST_TYPE:
-	  if (type == SFST_TYPE || type == FOMA_TYPE)
+	  if (false || type == SFST_TYPE || type == FOMA_TYPE)
 	    fast_internal = 
 	      ConversionFunctions::tropical_ofst_to_hfst_fast_transducer
 	      (implementation.tropical_ofst);
@@ -2922,7 +2920,7 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
 	{
 #if HAVE_SFST
 	case SFST_TYPE:
-	  if (original_type == TROPICAL_OPENFST_TYPE || 
+	  if (false || original_type == TROPICAL_OPENFST_TYPE || 
 	      original_type == FOMA_TYPE) {
 	    implementation.sfst = 
 	      ConversionFunctions::hfst_fast_transducer_to_sfst
@@ -2948,7 +2946,8 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
             //#endif
 #if HAVE_OPENFST
 	case TROPICAL_OPENFST_TYPE:
-	  if (original_type == SFST_TYPE || original_type == FOMA_TYPE) {
+	  if (false || original_type == SFST_TYPE || 
+	      original_type == FOMA_TYPE) {
 	    implementation.tropical_ofst = 
 	      ConversionFunctions::hfst_fast_transducer_to_tropical_ofst
 	      (fast_internal);
@@ -2974,7 +2973,7 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
 #endif
 #if HAVE_FOMA
 	case FOMA_TYPE:
-	  if (original_type == SFST_TYPE || 
+	  if (false || original_type == SFST_TYPE || 
 	      original_type == TROPICAL_OPENFST_TYPE) {
 	    implementation.foma =
 	      ConversionFunctions::hfst_fast_transducer_to_foma(fast_internal);

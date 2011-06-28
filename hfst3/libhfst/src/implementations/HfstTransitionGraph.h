@@ -485,8 +485,43 @@ namespace hfst {
 
       protected:
         /* TODO: Change state numbers s1 to s2 and vice versa. */
-        void swap_state_numbers(HfstState /*s1*/, HfstState /*s2*/) {
-          HFST_THROW(FunctionNotImplementedException);
+        void swap_state_numbers(HfstState s1, HfstState s2) {
+
+	  HfstTransitions s1_copy = state_vector[s1];
+	  state_vector[s1] = state_vector[s2];
+	  state_vector[s2] = s1_copy;
+
+          // ----- Go through all states -----
+          for (iterator it = begin(); it != end(); it++)
+            {
+	      // Go through all transitions
+              for (unsigned int i=0; i < it->size(); i++)
+                {
+		  HfstTransition<C> &tr_it = it->operator[](i);
+
+		  HfstState new_target;
+		  if (tr_it.get_target_state() == s1)
+		    new_target = s2;
+		  if (tr_it.get_target_state() == s2)
+		    new_target = s1;
+
+		  if (new_target != tr_it.get_target_state())
+		    {
+		      HfstTransition<C> tr
+			(new_target,
+			 tr_it.get_input_symbol(),
+			 tr_it.get_output_symbol(),
+			 tr_it.get_weight());
+		      
+		      it->operator[](i) = tr;
+		    }
+		  
+		} // all transitions gone through
+
+	    } // ----- all states gone through -----
+
+	  return;
+
         }
 	
         /* Replace all strings \a str1 in \a symbol with \a str2. */

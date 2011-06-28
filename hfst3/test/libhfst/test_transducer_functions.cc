@@ -855,5 +855,16 @@ int main(int argc, char **argv)
       }
     }
 
+  // A special case..
+
+  {
+    HfstTransducer t_sfst("c", "c", SFST_TYPE);
+    t_sfst.convert(TROPICAL_OPENFST_TYPE);
+    HfstTransducer t_foma("a", "b", FOMA_TYPE);
+    t_foma.substitute(StringPair("a", "b"), StringPair("b", "a"));
+    StringSet alphabet = t_foma.get_alphabet();
+    assert(alphabet.find("c") == alphabet.end());
+  }
+  
 }
 
