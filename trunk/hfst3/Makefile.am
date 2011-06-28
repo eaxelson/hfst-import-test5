@@ -18,6 +18,10 @@
 ACLOCAL_AMFLAGS = -I m4
 SUBDIRS = libhfst tools test doc man scripts
 
+# for external projects to use HFST from auto*
+m4dir=$(datadir)/aclocal
+m4_DATA=hfst.m4
+
 if CAN_DOXYGEN
 doxygen:
 	doxygen Doxyfile
