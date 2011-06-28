@@ -1857,19 +1857,19 @@ HfstTransducer &HfstTransducer::insert_freely
     }
     case LOG_OPENFST_TYPE:
     {
-	hfst::implementations::HfstFastTransducer * net = 
-            ConversionFunctions::log_ofst_to_hfst_fast_transducer
+	hfst::implementations::HfstBasicTransducer * net = 
+            ConversionFunctions::log_ofst_to_hfst_basic_transducer
             (implementation.log_ofst);
 	delete implementation.log_ofst;
           
-	hfst::implementations::HfstFastTransducer * substituting_net = 
-            ConversionFunctions::log_ofst_to_hfst_fast_transducer
+	hfst::implementations::HfstBasicTransducer * substituting_net = 
+            ConversionFunctions::log_ofst_to_hfst_basic_transducer
             (tr.implementation.log_ofst);
           
 	net->insert_freely(*substituting_net);
 	delete substituting_net;
 	implementation.log_ofst = 
-            ConversionFunctions::hfst_fast_transducer_to_log_ofst(net);
+            ConversionFunctions::hfst_basic_transducer_to_log_ofst(net);
 	delete net;
 	return *this;
 	break;
@@ -1884,19 +1884,19 @@ HfstTransducer &HfstTransducer::insert_freely
 	this->foma_interface.harmonize
             (implementation.foma,tr.implementation.foma);
 
-	hfst::implementations::HfstFastTransducer * net = 
-            ConversionFunctions::foma_to_hfst_fast_transducer
+	hfst::implementations::HfstBasicTransducer * net = 
+            ConversionFunctions::foma_to_hfst_basic_transducer
             (implementation.foma);
 	this->foma_interface.delete_foma(implementation.foma);
           
-	hfst::implementations::HfstFastTransducer * substituting_net = 
-            ConversionFunctions::foma_to_hfst_fast_transducer
+	hfst::implementations::HfstBasicTransducer * substituting_net = 
+            ConversionFunctions::foma_to_hfst_basic_transducer
             (tr.implementation.foma);
           
 	net->insert_freely(*substituting_net);
 	delete substituting_net;
 	implementation.foma = 
-            ConversionFunctions::hfst_fast_transducer_to_foma(net);
+            ConversionFunctions::hfst_basic_transducer_to_foma(net);
 	delete net;
 	return *this;
 	break;
@@ -1905,19 +1905,19 @@ HfstTransducer &HfstTransducer::insert_freely
 #if HAVE_SFST
     case SFST_TYPE:
     {
-	hfst::implementations::HfstFastTransducer * net = 
-            ConversionFunctions::sfst_to_hfst_fast_transducer
+	hfst::implementations::HfstBasicTransducer * net = 
+            ConversionFunctions::sfst_to_hfst_basic_transducer
             (implementation.sfst);
 	delete implementation.sfst;
           
-	hfst::implementations::HfstFastTransducer * substituting_net = 
-            ConversionFunctions::sfst_to_hfst_fast_transducer
+	hfst::implementations::HfstBasicTransducer * substituting_net = 
+            ConversionFunctions::sfst_to_hfst_basic_transducer
             (tr.implementation.sfst);
 
 	net->insert_freely(*substituting_net);
 	delete substituting_net;
 	implementation.sfst = 
-            ConversionFunctions::hfst_fast_transducer_to_sfst(net);
+            ConversionFunctions::hfst_basic_transducer_to_sfst(net);
 	delete net;
 	return *this;
 	break;
