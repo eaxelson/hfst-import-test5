@@ -90,6 +90,13 @@ typedef std::vector<Transition*> TransitionVector;
 // For some profound reason it can't be replaced with (UINT_MAX+1)/2.
 const TransitionTableIndex TRANSITION_TARGET_TABLE_START = 2147483648u;
 
+class HeaderParsingException: public std::exception
+{
+public:
+    virtual const char* what() const throw()
+	{ return("Parsing error while reading header"); }
+};
+
 class TransducerHeader
 {
  private:
@@ -133,11 +140,8 @@ class TransducerHeader
  public:
   TransducerHeader(FILE * f)
     {
-	if (!handle_hfst3_header(f)) {
-	    std::cerr << "Couldn't parse hfst3 header or a backward compatible "
-		      << "binary." << std::endl;
-	    exit(1);
-	}
+	skip_hfst3_header(f);
+	
       // The silly compiler complains about not catching the return value
       // of fread(). Hence this dummy variable is needed.
       size_t val;
@@ -163,7 +167,7 @@ class TransducerHeader
       read_property(has_unweighted_input_epsilon_cycles,f);
     }
 
-  bool handle_hfst3_header(FILE * f);
+  void skip_hfst3_header(FILE * f);
 
   SymbolNumber symbol_count(void)
   { return number_of_symbols; }
