@@ -17,6 +17,7 @@ void compare_and_delete(HfstTransducer * rule_transducers1[],
 			HfstTransducer * rule_transducers2[],
 			HfstTransducer * rule_transducers3[])
 {
+
   rule_transducers1[0]->convert(TROPICAL_OPENFST_TYPE);
   rule_transducers1[2]->convert(TROPICAL_OPENFST_TYPE);
 
@@ -38,11 +39,11 @@ void compare_and_delete(HfstTransducer * rule_transducers1[],
     delete rule_transducers2[i];
     delete rule_transducers3[i];
   }
+
 }
 
 int main(int argc, char **argv) {
 
- 
   ImplementationType types [] = {SFST_TYPE, TROPICAL_OPENFST_TYPE, FOMA_TYPE};
   HfstTransducer * rule_transducers1 [3]; 
   HfstTransducer * rule_transducers2 [3]; 
@@ -75,6 +76,7 @@ int main(int argc, char **argv) {
       alphabet.insert(StringPair("b", "b"));
       alphabet.insert(StringPair("c", "c"));
       
+
       HfstTransducer rule_transducer1 
 	= rules::two_level_if(context, mappings, alphabet);
       HfstTransducer rule_transducer2 
@@ -90,6 +92,7 @@ int main(int argc, char **argv) {
   compare_and_delete(rule_transducers1,
 		     rule_transducers2,
 		     rule_transducers3);
+
 
   // replace_down
   // FIXME: temporarily omitted since the replace_down function copied
@@ -157,7 +160,7 @@ int main(int argc, char **argv) {
   // replace_up for foma in a special case that seems to fail sometimes
 
   {
-    ImplementationType type = FOMA_TYPE;
+    ImplementationType type = SFST_TYPE;
 
     HfstBasicTransducer mapping;
 
@@ -206,7 +209,7 @@ int main(int argc, char **argv) {
     HfstTransducer abKabKab_("abKabKab", TOK, type);
 
     // FIXME
-    //assert(not abKabKab.compare(abKabKab_));
+    assert(not abKabKab.compare(abKabKab_));
 
     //std::cerr << abKabKab << std::endl;
   }

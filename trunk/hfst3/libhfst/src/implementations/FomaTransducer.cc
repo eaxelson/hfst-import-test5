@@ -284,6 +284,10 @@ namespace hfst { namespace implementations {
 
     net = fsm_construct_done(h);
     fsm_count(net);
+
+    //sigma_add_special (0, net->sigma);
+    //sigma_add_special (1, net->sigma);
+    //sigma_add_special (2, net->sigma);
     
     return net;      
   }

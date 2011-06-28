@@ -35,6 +35,19 @@ namespace hfst { namespace implementations
   HfstBasicTransducer * ConversionFunctions::
   foma_to_hfst_basic_transducer(struct fsm * t) {
 
+    // DEBUG
+    StringSet alphabet_before;
+    struct sigma * P = t->sigma;
+    while (P != NULL) {
+      if (P->symbol == NULL)
+	break;
+      alphabet_before.insert(std::string(P->symbol));
+      P = P->next;
+    }
+    alphabet_before.insert(internal_epsilon);
+    alphabet_before.insert(internal_unknown);
+    alphabet_before.insert(internal_identity);
+
   HfstBasicTransducer * net = new HfstBasicTransducer();
   struct fsm_state *fsm;
   fsm = t->states;
@@ -116,8 +129,9 @@ namespace hfst { namespace implementations
   
   /* If start state number (N) is not zero, swap state numbers N and zero 
      in internal transducer. TODO */
-  if (start_state_id != 0)
+  if (start_state_id != 0) {
     net->swap_state_numbers(start_state_id,0);
+  }
 
   /* Make sure that also the symbols that occur only in the alphabet
      but not in transitions are copied. */
@@ -129,6 +143,34 @@ namespace hfst { namespace implementations
     p = p->next;
   }
 
+  // DEBUG
+  StringSet alphabet_after = net->get_alphabet();
+  if (alphabet_after != alphabet_before) {
+    for (StringSet::const_iterator after_it = alphabet_after.begin();
+	 after_it != alphabet_after.end(); after_it++)
+      {
+	if (alphabet_before.find(*after_it) == alphabet_before.end())
+	  {
+	    std::cerr << "ERROR: " 
+		      << *after_it 
+		      << " was inserted to the alphabet!"
+		      << std::endl;
+	  }
+      }
+    for (StringSet::const_iterator before_it = alphabet_before.begin();
+	 before_it != alphabet_before.end(); before_it++)
+      {
+	if (alphabet_after.find(*before_it) == alphabet_after.end())
+	  {
+	    std::cerr << "ERROR: " 
+		      << *before_it 
+		      << " was removed from the alphabet!"
+		      << std::endl;
+	  }
+      }
+    assert(false);
+  }
+
   return net;
 }
 
@@ -136,6 +178,12 @@ namespace hfst { namespace implementations
   /* Create a foma transducer equivalent to HfstBasicTransducer \a hfst_fsm. */
   struct fsm * ConversionFunctions::
     hfst_basic_transducer_to_foma(const HfstBasicTransducer * hfst_fsm) {
+
+    // DEBUG
+    StringSet alphabet_before = hfst_fsm->get_alphabet();
+    alphabet_before.erase(internal_epsilon);
+    alphabet_before.erase(internal_unknown);
+    alphabet_before.erase(internal_identity);
     
     struct fsm_construct_handle *h;
     struct fsm *net;
@@ -186,7 +234,19 @@ namespace hfst { namespace implementations
     net = fsm_construct_done(h);
     fsm_count(net);
     net = fsm_topsort(net);
-    
+
+    // DEBUG
+    StringSet alphabet_after;
+    struct sigma * p = net->sigma;
+    while (p != NULL) {
+      if (p->symbol == NULL)
+	break;
+      if (p->number != 0 && p->number != 1 && p->number != 2)
+	alphabet_after.insert(std::string(p->symbol));
+      p = p->next;
+    }
+    assert(alphabet_after == alphabet_before);
+
     return net;      
   }
 

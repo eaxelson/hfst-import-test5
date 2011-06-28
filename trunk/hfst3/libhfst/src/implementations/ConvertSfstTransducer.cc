@@ -116,7 +116,18 @@ namespace hfst { namespace implementations
   /* Create an HfstBasicTransducer equivalent to an SFST transducer \a t. */
   HfstBasicTransducer * ConversionFunctions::
   sfst_to_hfst_basic_transducer(SFST::Transducer * t) {
-  
+
+    StringSet alphabet_before; // DEBUG
+    SFST::Alphabet::CharMap CM = t->alphabet.get_char_map();
+    for (SFST::Alphabet::CharMap::const_iterator it 
+           = CM.begin(); it != CM.end(); it++) 
+      {
+	if (it->first != 0)
+	  alphabet_before.insert(std::string(it->second));
+	else
+	  alphabet_before.insert(internal_epsilon);
+      }  
+    
     HfstBasicTransducer * net = new HfstBasicTransducer();
     // A map that maps nodes to integers
     SFST::NodeNumbering index(*t);
@@ -139,6 +150,10 @@ namespace hfst { namespace implementations
           }
       }
     
+    // DEBUG
+    StringSet alphabet_after = net->get_alphabet();
+    assert(alphabet_after == alphabet_before);
+
     return net;
   }
 
