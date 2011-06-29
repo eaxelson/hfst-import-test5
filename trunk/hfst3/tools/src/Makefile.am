@@ -21,7 +21,6 @@ LDADD = $(top_builddir)/libhfst/src/libhfst.la
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/tools/src/parsers 
 AM_CXXFLAGS = -Wno-deprecated
 
-MAYBE_ALIASES=
 # sort alphabetically:
 if WANT_COMPARE
 MAYBE_COMPARE=hfst-compare
@@ -37,15 +36,12 @@ MAYBE_CONCATENATE=hfst-concatenate
 endif
 if WANT_CONJUNCT
 MAYBE_CONJUNCT=hfst-conjunct
-MAYBE_ALIASES+=hfst-intersect
 endif
 if WANT_DETERMINIZE
 MAYBE_DETERMINIZE=hfst-determinize
-MAYBE_ALIASES+=hfst-determinise
 endif
 if WANT_DISJUNCT
 MAYBE_DISJUNCT=hfst-disjunct
-MAYBE_ALIASES+=hfst-union
 endif
 if WANT_DUPLICATE
 MAYBE_DUPLICATE=hfst-duplicate
@@ -58,10 +54,12 @@ MAYBE_FST2FST=hfst-fst2fst
 endif
 if WANT_FST2STRINGS
 MAYBE_FST2STRINGS=hfst-fst2strings
-MAYBE_ALIASES+=hfst-expand
 endif
 if WANT_FST2TXT
 MAYBE_FST2TXT=hfst-fst2txt
+endif
+if WANT_GREP
+MAYBE_GREP=hfst-grep
 endif
 if WANT_HEAD
 MAYBE_HEAD=hfst-head
@@ -74,21 +72,18 @@ MAYBE_LEXC2FST=hfst-lexc2fst
 endif
 if WANT_LOOKUP
 MAYBE_LOOKUP=hfst-lookup
-MAYBE_ALIASES+=hfst-optimized-lookup hfst-optimised-lookup
 endif
 if WANT_PAIR_TEST
 MAYBE_PAIR_TEST=hfst-pair-test
 endif
 if WANT_MINIMIZE
 MAYBE_MINIMIZE=hfst-minimize
-MAYBE_ALIASES+=hfst-minimise
 endif
 if WANT_NAME
 MAYBE_NAME=hfst-name
 endif
 if WANT_PREPROCESS_FOR_OPTIMIZED_LOOKUP
 MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP=hfst-preprocess-for-optimized-lookup-format
-MAYBE_ALIASES+=hfst-preprocess-for-optimised-lookup-format
 endif
 if WANT_PROJECT
 MAYBE_PROJECT=hfst-project
@@ -119,11 +114,9 @@ MAYBE_STRIP_HEADER=hfst-strip-header
 endif
 if WANT_SUBTRACT
 MAYBE_SUBTRACT=hfst-subtract
-MAYBE_ALIASES+=hfst-minus
 endif
 if WANT_SUMMARIZE
 MAYBE_SUMMARIZE=hfst-summarize
-MAYBE_ALIASES+=hfst-summarise
 endif
 if WANT_TAIL
 MAYBE_TAIL=hfst-tail
@@ -133,7 +126,6 @@ MAYBE_TXT2FST=hfst-txt2fst
 endif
 if WANT_CALCULATE
 MAYBE_CALCULATE=hfst-calculate
-MAYBE_ALIASES+=hfst-sfstpl2fst
 endif
 if WANT_SUBSTITUTE
 MAYBE_SUBSTITUTE=hfst-substitute
@@ -162,7 +154,8 @@ bin_PROGRAMS= \
 			 $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) $(MAYBE_DISJUNCT)   \
 			 $(MAYBE_DUPLICATE)											\
 			 $(MAYBE_FORMAT) $(MAYBE_FST2FST) $(MAYBE_FST2STRINGS)      \
-			 $(MAYBE_FST2TXT) $(MAYBE_HEAD) $(MAYBE_INVERT)             \
+			 $(MAYBE_FST2TXT) $(MAYBE_GREP) $(MAYBE_HEAD) \
+			 $(MAYBE_INVERT)             \
 			 $(MAYBE_LOOKUP) $(MAYBE_MINIMIZE) $(MAYBE_NAME)            \
 			 $(MAYBE_PROJECT) $(MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP)  \
 			 $(MAYBE_PUSH_WEIGHTS) $(MAYBE_REGEXP2FST)                  \
@@ -173,9 +166,6 @@ bin_PROGRAMS= \
 			 $(MAYBE_FLAG_DIACRITICS) $(MAYBE_LEXC2FST)                 \
 			 $(MAYBE_XFST_COMPILER) $(MAYBE_FORMAT)                     \
 			 $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME) $(MAYBE_PAIR_TEST)
-
-# FIXME: ln'd aliases drag .libs in install but not uninstall
-#bin_SCRIPTS=$(MAYBE_ALIASES)
 
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc
 # sort alphabetically
@@ -193,6 +183,7 @@ hfst_format_SOURCES=hfst-format.cc $(HFST_COMMON_SRC)
 hfst_fst2fst_SOURCES=hfst-fst2fst.cc $(HFST_COMMON_SRC)
 hfst_fst2strings_SOURCES=hfst-fst2strings.cc $(HFST_COMMON_SRC)
 hfst_fst2txt_SOURCES=hfst-fst2txt.cc $(HFST_COMMON_SRC)
+hfst_grep_SOURCES=hfst-grep.cc $(HFST_COMMON_SRC)
 hfst_head_SOURCES=hfst-head.cc $(HFST_COMMON_SRC)
 hfst_invert_SOURCES=hfst-invert.cc $(HFST_COMMON_SRC)
 hfst_lexc2fst_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC)
@@ -237,37 +228,19 @@ hfst_xfst2fst_SOURCES=hfst-xfst-compiler.cc $(HFST_COMMON_SRC) \
 
 # aliases:
 hfst-determinise$(EXEEXT): hfst-determinize$(EXEEXT)
-	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
-
-hfst-expand$(EXEEXT): hfst-fst2strings$(EXEEXT)
-	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
-
-hfst-intersect$(EXEEXT): hfst-conjunct$(EXEEXT)
-	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
-
-hfst-minimise$(EXEEXT): hfst-minimize$(EXEEXT)
-	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
-
-hfst-minus$(EXEEXT): hfst-subtract$(EXEEXT)
-	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
-
-hfst-optimized-lookup$(EXEEXT): hfst-lookup$(EXEEXT)
-	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
-
-hfst-optimised-lookup$(EXEEXT): hfst-lookup$(EXEEXT)
-	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
-
-hfst-preprocess-for-optimised-lookup-format$(EXEEXT): hfst-preprocess-for-optimized-lookup-format$(EXEEXT)
-	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
-
-hfst-sfstpl2fst$(EXEEXT): hfst-calculate$(EXEEXT)
-	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
-
-hfst-summarise$(EXEEXT): hfst-summarize$(EXEEXT)
-	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
-
-hfst-union$(EXEEXT): hfst-disjunct$(EXEEXT)
-	$(AM_V_GEN)$(LN_S) $(notdir $<) $@
+install-exec-hook:
+	cd $(DESTDIR)$(bindir) && \
+		$(LN_S) -f hfst-determinize$(EXEEXT) hfst-determinise$(EXEEXT) && \
+		$(LN_S) -f hfst-fst2strings$(EXEEXT) hfst-expand$(EXEEXT) && \
+		$(LN_S) -f hfst-conjunct$(EXEEXT) hfst-intersect$(EXEEXT) && \
+		$(LN_S) -f hfst-minimize$(EXEEXT) hfst-minimise$(EXEEXT) && \
+		$(LN_S) -f hfst-subtract$(EXEEXT) hfst-minus$(EXEEXT) && \
+		$(LN_S) -f hfst-lookup$(EXEEXT) hfst-optimized-lookup$(EXEEXT) && \
+		$(LN_S) -f hfst-lookup$(EXEEXT) hfst-optimised-lookup$(EXEEXT) && \
+		$(LN_S) -f hfst-preprocess-for-optimized-lookup-format$(EXEEXT) hfst-preprocess-for-optimised-lookup-format$(EXEEXT) && \
+		$(LN_S) -f hfst-calculate$(EXEEXT) hfst-sfstpl2fst$(EXEEXT) && \
+		$(LN_S) -f hfst-summarize$(EXEEXT) hfst-summarise$(EXEEXT) && \
+		$(LN_S) -f hfst-disjunct$(EXEEXT) hfst-union$(EXEEXT)
 
 BUILT_SOURCES=hfst-scanner.h hfst-compiler.h $(hfst_lexc2fst_BUILT)
 
