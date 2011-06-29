@@ -283,11 +283,13 @@ An example:
        the symbol-to-number correspondencies of this transducer are recoded
        so that they are equivalent to the ones used in transducer another.
        Then the unknown and identity symbols are expanded
-       in both transducers. */
+       in both transducers. If this and \a another have type FOMA_TYPE, 
+       nothing is done, since foma takes care of harmonization. */
     void harmonize(HfstTransducer &another);
 
-    /* The same as harmonize but does not change the second argument but
-       returns a harmonized version of that. */
+    /* The same as harmonize but does not change \a another but
+       returns a harmonized version of that. If this and \a another 
+       have type FOMA_TYPE, NULL is returned. */
     HfstTransducer * harmonize_(const HfstTransducer &another);
 
     /* Check if transducer \a another has in its alphabet flag diacritics
