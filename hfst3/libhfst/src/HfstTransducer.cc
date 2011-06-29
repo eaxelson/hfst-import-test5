@@ -1829,15 +1829,18 @@ HfstTransducer &HfstTransducer::insert_freely
        according to tr, not the other way round. */
     bool harm = harmonize_smaller;
     harmonize_smaller=false;
-    this->harmonize(const_cast<HfstTransducer&>(tr));
+    HfstTransducer * tr_harmonized = this->harmonize_(tr);
     harmonize_smaller=harm;
+
+    if (tr_harmonized == NULL) { // foma
+      tr_harmonized = new HfstTransducer(tr);
+    }
 
     switch (this->type)    
     {
 #if HAVE_OPENFST
     case TROPICAL_OPENFST_TYPE:
     {
-      // FIX: Use HfstFastTransducer instead
 	hfst::implementations::HfstBasicTransducer * net = 
             ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
             (implementation.tropical_ofst);
@@ -1845,7 +1848,8 @@ HfstTransducer &HfstTransducer::insert_freely
           
 	hfst::implementations::HfstBasicTransducer * substituting_net = 
             ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
-            (tr.implementation.tropical_ofst);
+            (tr_harmonized->implementation.tropical_ofst);
+	delete tr_harmonized;
           
 	net->insert_freely(*substituting_net);
 	delete substituting_net;
@@ -1864,8 +1868,9 @@ HfstTransducer &HfstTransducer::insert_freely
           
 	hfst::implementations::HfstBasicTransducer * substituting_net = 
             ConversionFunctions::log_ofst_to_hfst_basic_transducer
-            (tr.implementation.log_ofst);
-          
+            (tr_harmonized->implementation.log_ofst);
+	delete tr_harmonized;
+
 	net->insert_freely(*substituting_net);
 	delete substituting_net;
 	implementation.log_ofst = 
@@ -1882,7 +1887,7 @@ HfstTransducer &HfstTransducer::insert_freely
 	// because foma's own functions take care of harmonizing.
 	// Now we need to harmonize because we are using internal transducers.
 	this->foma_interface.harmonize
-            (implementation.foma,tr.implementation.foma);
+            (implementation.foma,tr_harmonized->implementation.foma);
 
 	hfst::implementations::HfstBasicTransducer * net = 
             ConversionFunctions::foma_to_hfst_basic_transducer
@@ -1891,8 +1896,9 @@ HfstTransducer &HfstTransducer::insert_freely
           
 	hfst::implementations::HfstBasicTransducer * substituting_net = 
             ConversionFunctions::foma_to_hfst_basic_transducer
-            (tr.implementation.foma);
-          
+            (tr_harmonized->implementation.foma);
+	delete tr_harmonized;
+
 	net->insert_freely(*substituting_net);
 	delete substituting_net;
 	implementation.foma = 
@@ -1912,7 +1918,8 @@ HfstTransducer &HfstTransducer::insert_freely
           
 	hfst::implementations::HfstBasicTransducer * substituting_net = 
             ConversionFunctions::sfst_to_hfst_basic_transducer
-            (tr.implementation.sfst);
+            (tr_harmonized->implementation.sfst);
+	delete tr_harmonized;
 
 	net->insert_freely(*substituting_net);
 	delete substituting_net;

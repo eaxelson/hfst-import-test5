@@ -35,7 +35,7 @@ namespace hfst { namespace implementations
   HfstBasicTransducer * ConversionFunctions::
   foma_to_hfst_basic_transducer(struct fsm * t) {
 
-    // DEBUG
+#ifdef DEBUG_CONVERSION
     StringSet alphabet_before;
     struct sigma * P = t->sigma;
     while (P != NULL) {
@@ -47,6 +47,7 @@ namespace hfst { namespace implementations
     alphabet_before.insert(internal_epsilon);
     alphabet_before.insert(internal_unknown);
     alphabet_before.insert(internal_identity);
+#endif // DEBUG_CONVERSION
 
   HfstBasicTransducer * net = new HfstBasicTransducer();
   struct fsm_state *fsm;
@@ -143,7 +144,7 @@ namespace hfst { namespace implementations
     p = p->next;
   }
 
-  // DEBUG
+#ifdef DEBUG_CONVERSION
   StringSet alphabet_after = net->get_alphabet();
   if (alphabet_after != alphabet_before) {
     for (StringSet::const_iterator after_it = alphabet_after.begin();
@@ -170,6 +171,7 @@ namespace hfst { namespace implementations
       }
     assert(false);
   }
+#endif // DEBUG_CONVERSION
 
   return net;
 }
@@ -179,12 +181,13 @@ namespace hfst { namespace implementations
   struct fsm * ConversionFunctions::
     hfst_basic_transducer_to_foma(const HfstBasicTransducer * hfst_fsm) {
 
-    // DEBUG
+#ifdef DEBUG_CONVERSION
     StringSet alphabet_before = hfst_fsm->get_alphabet();
     alphabet_before.erase(internal_epsilon);
     alphabet_before.erase(internal_unknown);
     alphabet_before.erase(internal_identity);
-    
+#endif // DEBUG_CONVERSION    
+
     struct fsm_construct_handle *h;
     struct fsm *net;
     h = fsm_construct_init(strdup(std::string("").c_str()));
@@ -235,7 +238,7 @@ namespace hfst { namespace implementations
     fsm_count(net);
     net = fsm_topsort(net);
 
-    // DEBUG
+#ifdef DEBUG_CONVERSION
     StringSet alphabet_after;
     struct sigma * p = net->sigma;
     while (p != NULL) {
@@ -246,6 +249,7 @@ namespace hfst { namespace implementations
       p = p->next;
     }
     assert(alphabet_after == alphabet_before);
+#endif // DEBUG_CONVERSION
 
     return net;      
   }

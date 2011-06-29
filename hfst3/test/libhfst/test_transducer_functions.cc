@@ -780,7 +780,6 @@ int main(int argc, char **argv)
       }
 
 
-      //#ifdef FOO // FIXME
       {
 	verbose_print("alphabets", types[i]);
 
@@ -848,6 +847,16 @@ int main(int argc, char **argv)
 	  HfstTransducer id2id_copy2(id2id);
 	  
 	  a2b_copy.compose(id2id_copy);	  
+	  assert(id2id_copy.compare(id2id_copy2));
+	  assert(id2id_copy.get_alphabet() == id2id_copy2.get_alphabet());
+	}
+
+	{
+	  HfstTransducer a2b_copy(a2b);
+	  HfstTransducer id2id_copy(id2id);
+	  HfstTransducer id2id_copy2(id2id);
+	  
+	  a2b_copy.insert_freely(id2id_copy);	  
 	  assert(id2id_copy.compare(id2id_copy2));
 	  assert(id2id_copy.get_alphabet() == id2id_copy2.get_alphabet());
 	}
