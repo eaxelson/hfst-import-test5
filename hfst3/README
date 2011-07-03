@@ -278,6 +278,52 @@ expected failure fails expectedly, which is also indicated by a green word
 bug. If there is a bug effecting that or other tests in the test suite, it will
 be indicated by a line starting with word *FAIL* in red colour.
 
+openfst tests failed (--without-openfst to disable)
+'''''''''''''''''''''''''''''''''''''''''''''''''''
+
+**During the configuration phase**. This indicates that you did not succeed in
+installing compatible version of OpenFst to your computer. To install openfst
+libraries you should use the standard ``./configure && make install`` in
+openfst source directory.  Depending on your operation system you may also need
+to execute something like ``ldconfig``, consult your operation system's manual
+for further information.
+
+If you do not wish to use the non-obligatory openfst library backend with HFST you
+can disable it by using the command line switch --without-sfst to 
+configure. This will, however, result in loss of all weighted finite-state
+technology at the moment, as OpenFst is the only weighted FST library we use.
+
+sfst tests failed (--without-sfst to disable)
+'''''''''''''''''''''''''''''''''''''''''''''
+
+**During the configuration phase**. This indicates that you did not succeed in
+installing compatible version of SFST to your computer. To install sfst library
+you *must* use the command ``make libinstall`` in SFST directory. Depending
+on your operation system you may also need to execute something like 
+``ldconfig``, consult your operation system's manual for further information.
+
+If you do not wish to use the non-obligatory sfst library backend with HFST you
+can freely disable it by using the command line switch --without-sfst to 
+configure without any loss of functionality beyond the ability to handle
+SFST format automata.
+
+foma tests failed (--without-foma to disable)
+'''''''''''''''''''''''''''''''''''''''''''''
+
+**During the configuration phase**. This indicates that you did not succeed in
+installing compatible version of foma to your computer. The foma library
+can be installed by standard ``make install`` in foma directory. Depending
+on your operation system you may also need to execute something like 
+``ldconfig``, consult your operation system's manual for further information.
+
+If you do not wish to use the non-obligatory foma library backend with HFST you
+can freely disable it by using the command line switch --without-foma to
+configure without any loss of functionality beyond the ability to handle foma
+format automata.  The support for foma-based scripts is not dependent on
+--without-foma option, it uses the ``foma`` binary directly if available.
+
+
+
 Further information
 -------------------
 
