@@ -96,7 +96,7 @@ def why_loop(twolcFile, form, correct, potential):
 	excluded = False
 	correctPre = re.sub(' ','',form)+":"+correct
 	for i in range(1,numRules):
-		potentialForms = blocks[i]
+		potentialForms = set(blocks[i])
 		excludedForms = allForms - set(blocks[i])
 		if excludedForms != set() or potentialForms != set():
 			if correctPre in excludedForms:
