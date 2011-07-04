@@ -75,11 +75,14 @@ def main_loop(twolcFile, form, correct, potential):
 			print(rules[i])
 			print("\tcreates", ) if potential else print("\texcludes", )
 			for form in eliminatedForms:
-				#print(form.split(':')[1], correct)
-				if form.split(':')[1] == correct:
-					print('\t\t\033[1;31m'+form+'\033[1;m', )
+				if form != "":
+					#print(form.split(':')[1], correct)
+					if form.split(':')[1] == correct:
+						print('\t\t\033[1;31m'+form+'\033[1;m', )
+					else:
+						print('\t\t'+form, )
 				else:
-					print('\t\t'+form, )
+					print("\t\t\033[1;31mNOTHING\033[1;m")
 
 def why_loop(twolcFile, form, correct, potential):
 	rules = {}
@@ -98,13 +101,15 @@ def why_loop(twolcFile, form, correct, potential):
 	for i in range(1,numRules):
 		potentialForms = set(blocks[i])
 		excludedForms = allForms - set(blocks[i])
-		if excludedForms != set() or potentialForms != set():
+		if potentialForms != set() and potentialForms != {''} :
 			if correctPre in excludedForms:
 				print(rules[i]+" excludes "+correctPre)
 				excluded = True
 			if correctPre in potentialForms:
 				#print(rules[i]+" creates form "+form)
 				found += 1
+			#else:
+			#	print(rules[i]+" does not create "+correctPre)
 				
 		else:
 			print("No forms output by rule "+rules[i]+"!")
