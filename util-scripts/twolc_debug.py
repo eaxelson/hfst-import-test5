@@ -100,7 +100,7 @@ def why_loop(twolcFile, form, correct, potential):
 		excludedForms = allForms - set(blocks[i])
 		if excludedForms != set() or potentialForms != set():
 			if correctPre in excludedForms:
-				print(rules[i]+" excludes form "+form)
+				print(rules[i]+" excludes "+correctPre)
 				excluded = True
 			if correctPre in potentialForms:
 				#print(rules[i]+" creates form "+form)
