@@ -51,10 +51,10 @@ def get_forms(form, numRules, twolcFile):
 		#count += 1
 		#yield (count, block.strip('\n').split('\n'))
 		#yield block.strip('\n').split('\n')
-		thisBlock = []
+		thisBlock = set()
 		for form in block.strip('\n').split('\n'):
 			if	re.search(':', form):
-				thisBlock += [form.split(':')[1]]
+				thisBlock.add(form.split(':')[1])
 		yield thisBlock
 
 def get_all_forms(blocks):
@@ -67,7 +67,7 @@ def get_all_forms(blocks):
 def get_rules_excluding_correct(ruleSet, correct):
 	outRules = set()
 	for (rule, forms) in ruleSet:
-		if correct not in forms:
+		if correct in forms:
 			outRules.add(rule)
 	return outRules
 
@@ -107,13 +107,18 @@ def main_loop(twolcFile, inputForm, correct, showforms, why):
 	allForms = get_all_forms(blocks)
 
 	rulesExcludingCorrect = get_rules_excluding_correct(ruleSet, correct)
-	rulesWithNoOutput = get_rules_with_nothing(ruleSet, correct)
-
-	print(rulesExcludingCorrect)
-	print(rulesWithNoOutput)
+	rulesWithNoExcludes = get_rules_with_nothing(ruleSet, correct)
 
 	if showforms:
-		print(showforms)
+		for (rule, excludedForms) in ruleSet:
+			allowedForms = allForms - excludedForms
+			print(rule+" EXCLUDES:")
+			for form in excludedForms:
+				print("\t"+form)
+			print(rule+" ALLOWS:")
+			for form in allowedForms:
+				print("\t"+form)
+		#print(showforms)
 		#TODO:
 		# this will output
 		# a table of forms created and excluded by each rule
@@ -158,6 +163,17 @@ def main_loop(twolcFile, inputForm, correct, showforms, why):
 	#				print("\t\t\033[1;31mNOTHING\033[1;m")
 	#		else:
 	#			print("\t\t\033[1;31mNOTHING\033[1;m")
+
+	#Instead of why_loop:
+	print()
+	print("These rules don't exclude any possible forms: \n\t"+str(rulesWithNoExcludes))
+	print()
+	print("Furthermore, these rules exclude the correct form: \n\t"+str(rulesExcludingCorrect))
+	print()
+	if len(rulesWithNoExcludes)==0 and len(rulesExcludingCorrect)==0:
+		print("There doesn't seem to be anything wrong, ‹"+correct+"› should be output\n")
+
+
 
 #def why_loop(twolcFile, form, correct, potential):
 #	rules = {}
