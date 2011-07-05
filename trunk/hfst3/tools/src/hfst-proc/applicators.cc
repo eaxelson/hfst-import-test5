@@ -105,9 +105,16 @@ AnalysisApplicator::apply()
   	if(surface_form.size() > 0 && state.is_final())
   	{
   	  LookupPathSet finals = state.get_finals_set();
-  	  analyzed_forms = formatter.process_finals(finals, 
-  	                                            caps_mode==DictionaryCase ? Unknown:
+      if (caps_mode == DictionaryCase || caps_mode == CaseSensitiveDictionaryCase)
+        {
+  	      analyzed_forms = formatter.process_finals(finals, 
+  	                                                Unknown);
+        }
+      else
+        {
+          analyzed_forms = formatter.process_finals(finals,
   	                                                                        token_stream.get_capitalization_state(surface_form));
+        }
   	  last_stream_location = token_stream.get_pos()-1;
   	  
   	  if(printDebuggingInformationFlag)

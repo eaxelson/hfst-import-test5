@@ -25,7 +25,6 @@ bool displayUniqueFlag = false;
 int maxAnalyses = std::numeric_limits<int>::max();
 bool preserveDiacriticRepresentationsFlag = false;
 bool printDebuggingInformationFlag = false;
-
 static bool handle_hfst3_header(std::istream& is)
 {
   const char* header1 = "HFST";
@@ -101,7 +100,6 @@ bool print_usage(void)
     "  -t  --tokenize          Tokenize the input stream into symbols (for debugging)\n" <<
     "  -p  --apertium          Apertium output format for analysis (default)\n" <<
     "  -C  --cg                Constraint Grammar output format for analysis\n" <<
-    "                          (implies -w)\n" <<
     "  -x, --xerox             Xerox output format for analysis\n" <<
     "  -k, --keep-compounds    Retain compound analyses even when analyses with fewer\n" <<
     "                          compound-boundaries are available\n" <<
@@ -117,6 +115,8 @@ bool print_usage(void)
     "  -q, --quiet             Don't be verbose (default)\n" <<
     "  -V, --version           Print version information\n" <<
     "  -h, --help              Print this help message\n" <<
+    "  -X, --raw               Do not perform any mangling to:\n"
+    "                          case, ``superblanks'' or anything else!!!\n"
     "\n" <<
     "Report bugs to " << PACKAGE_BUGREPORT << "\n" <<
     "\n";
@@ -173,11 +173,12 @@ int main(int argc, char **argv)
       {"case-sensitive", no_argument,       0, 'c'},
       {"dictionary-case",no_argument,       0, 'w'},
       {"null-flush",     no_argument,       0, 'z'},
+      {"raw",            no_argument,       0, 'X'},
       {0,                0,                 0,  0 }
     };
     
     int option_index = 0;
-    int c = getopt_long(argc, argv, "hVvqsagndtpxCkWN:cwz", long_options, &option_index);
+    int c = getopt_long(argc, argv, "hVvqsagndtpxCkWN:cwzX", long_options, &option_index);
 
     if (c == -1) // no more options to look at
       break;
@@ -260,6 +261,7 @@ int main(int argc, char **argv)
     
     case 'c':
     case 'w':
+    case 'X':
       if(capitalization==0)
         capitalization=c;
       else
@@ -331,6 +333,9 @@ int main(int argc, char **argv)
       break;
     case 'w':
       capitalization_mode = DictionaryCase;
+      break;
+    case 'X':
+      capitalization_mode = CaseSensitiveDictionaryCase;
       break;
     default:
       if(capitalization == 0 && output_type == 'C')

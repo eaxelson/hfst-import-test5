@@ -63,4 +63,12 @@ fi
 if ! diff test.strings $srcdir/proc-caps-out4.strings ; then
     exit 1
 fi
+if ! ../../tools/src/hfst-proc/hfst-proc --cg --raw proc-caps.hfst.ol < $srcdir/proc-caps-in.strings > test.strings ; then
+    echo raw cg fail:
+    cat test.strings
+    exit 1
+fi
+if ! diff test.strings $srcdir/proc-caps-out5.strings ; then
+    exit 1
+fi
 rm test.strings
