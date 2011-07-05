@@ -27,7 +27,7 @@
 
 #include "implementations/optimized-lookup/transducer.h"
 
-#define OL_FULL_DEBUG 0
+#define OL_FULL_DEBUG 1
 
 using namespace hfst_ol;
 
@@ -70,7 +70,13 @@ enum GenerationMode
  *                  lookup. Output the result with the capitalization found in
  *                  the transducer
  */
-enum CapitalizationMode {IgnoreCase, CaseSensitive, DictionaryCase};
+enum CapitalizationMode
+  {
+    IgnoreCase,
+    CaseSensitive,
+    DictionaryCase,
+    CaseSensitiveDictionaryCase
+  };
 
 /**
  * Describes the case properties of a surface form (detection examines only

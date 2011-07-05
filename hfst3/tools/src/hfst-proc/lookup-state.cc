@@ -52,7 +52,7 @@ void
 LookupState::step(const SymbolNumber input, CapitalizationMode mode)
 {
   if(input==NO_SYMBOL_NUMBER || !transducer.get_alphabet().has_case(input) ||
-     transducer.get_alphabet().is_lower(input) || mode==CaseSensitive)
+     transducer.get_alphabet().is_lower(input) || mode==CaseSensitive || mode==CaseSensitiveDictionaryCase)
     step(input);
   else
     step(input, transducer.get_alphabet().to_lower(input));
