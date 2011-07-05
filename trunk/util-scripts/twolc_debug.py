@@ -7,7 +7,8 @@ parser = argparse.ArgumentParser(prog='twolc_debug', description='Tells which tw
 parser.add_argument('-t', '--twol', nargs=1, dest='twolcFile', help='The compiled twol.hfst file')
 parser.add_argument('form', nargs='+', help='A form or forms to parse')
 parser.add_argument('-c', '--correct', dest='correct', help='Correct output of twolc')
-parser.add_argument('-p', '--potential', dest='potential', action='store_true', help='Show all potential outputs produced by rule, as opposed to all outputs excluded by rule')
+#parser.add_argument('-p', '--potential', dest='potential', action='store_true', help='Show all potential outputs produced by rule, as opposed to all outputs excluded by rule')
+parser.add_argument('-s', '--showforms', dest='showforms', action='store_true', help='Show all forms created and excluded by rule')
 parser.add_argument('-w', '--why', dest='why', action='store_true', help='Instead of output forms, tell why the correct form is not being produced')
 
 #twolcFile = "/home/jonathan/quick/apertium/svn/incubator/apertium-tr-ky/.deps/ky.twol.hfst"
@@ -24,12 +25,14 @@ def get_rule_names(twolcFile):
 	p1.stdout.close()
 	output = p2.communicate()[0].decode('utf-8')
 	#output = output.decode('utf-8')
-	count = 0
+	#count = 0
 	for line in output.split('\n'):
 		if line != "":
-			count+=1
-			yield (count, reRuletext.match(line).groups()[0])
+			#count+=1
+			#yield (count, reRuletext.match(line).groups()[0])
+			yield reRuletext.match(line).groups()[0]
 
+# get list of all forms allowed by the grammar
 def get_forms(form, numRules, twolcFile):
 	#echo "с ү й > {I} п" | hfst-strings2fst -S | hfst-duplicate -n 28 | hfst-compose .deps/ky.twol.hfst | hfst-fst2strings
 	p1 = Popen(["echo", form], stdout=PIPE)
@@ -43,81 +46,153 @@ def get_forms(form, numRules, twolcFile):
 	p3.stdout.close()
 	p4.stdout.close()
 	output = p5.communicate()[0].decode('utf-8')
-	count = 0
+	#count = 0
 	for block in output.split('--'):
-		count += 1
-		yield (count, block.strip('\n').split('\n'))
+		#count += 1
+		#yield (count, block.strip('\n').split('\n'))
+		#yield block.strip('\n').split('\n')
+		thisBlock = []
+		for form in block.strip('\n').split('\n'):
+			if	re.search(':', form):
+				thisBlock += [form.split(':')[1]]
+		yield thisBlock
 
 def get_all_forms(blocks):
 	allForms = set()
 	for block in blocks:
-		for line in blocks[block]:
+		for line in block:
 			allForms.add(line)
 	return allForms
 
-def main_loop(twolcFile, form, correct, potential):
-	rules = {}
-	for (num, rule) in get_rule_names(twolcFile):
-		rules[num] = rule
+def get_rules_excluding_correct(ruleSet, correct):
+	outRules = set()
+	for (rule, forms) in ruleSet:
+		if correct not in forms:
+			outRules.add(rule)
+	return outRules
+
+def get_rules_with_nothing(ruleSet, correct):
+	outRules = set()
+	for (rule, forms) in ruleSet:
+		if len(forms)==0: # or forms == ['']:
+			outRules.add(rule)
+	return outRules
+
+def main_loop(twolcFile, inputForm, correct, showforms, why):
+	#rules = {}
+	#for (num, rule) in get_rule_names(twolcFile):
+	#	rules[num] = rule
+	#blocks = {}
+	#for (count, block) in get_forms(inputForm, numRules, twolcFile):
+	#	blocks[count] = block
+
+	rules = []
+	blocks = []
+
+	for rule in get_rule_names(twolcFile):
+		rules += [rule]
+
 	numRules = len(rules)
-	blocks = {}
-	for (count, block) in get_forms(form, numRules, twolcFile):
-		blocks[count] = block
+	for block in get_forms(inputForm, numRules, twolcFile):
+		blocks += [block]
+
+
+	#ruleSet = {}
+	#for i in range(1,numRules):
+	#	ruleSet[i] = (rules[i], blocks[i])
+	ruleSet = []
+	for (rule, block) in zip(rules, blocks):
+		ruleSet += [(rule, block)]
 
 	allForms = get_all_forms(blocks)
 
-	for i in range(1,numRules):
-		if potential:
-			eliminatedForms = blocks[i]  # actually, should be "potential forms"
-		else:
-			eliminatedForms = allForms - set(blocks[i])
-		if eliminatedForms != set():
-			print(rules[i])
-			print("\tcreates", ) if potential else print("\texcludes", )
-			for form in eliminatedForms:
-				if form != "":
-					#print(form.split(':')[1], correct)
-					if form.split(':')[1] == correct:
-						print('\t\t\033[1;31m'+form+'\033[1;m', )
-					else:
-						print('\t\t'+form, )
-				else:
-					print("\t\t\033[1;31mNOTHING\033[1;m")
+	rulesExcludingCorrect = get_rules_excluding_correct(ruleSet, correct)
+	rulesWithNoOutput = get_rules_with_nothing(ruleSet, correct)
 
-def why_loop(twolcFile, form, correct, potential):
-	rules = {}
-	for (num, rule) in get_rule_names(twolcFile):
-		rules[num] = rule
-	numRules = len(rules)
-	blocks = {}
-	for (count, block) in get_forms(form, numRules, twolcFile):
-		blocks[count] = block
+	print(rulesExcludingCorrect)
+	print(rulesWithNoOutput)
 
-	allForms = get_all_forms(blocks)
+	if showforms:
+		print(showforms)
+		#TODO:
+		# this will output
+		# a table of forms created and excluded by each rule
+		# in place of the crap below
 
-	found = 0
-	excluded = False
-	correctPre = re.sub(' ','',form)+":"+correct
-	for i in range(1,numRules):
-		potentialForms = set(blocks[i])
-		excludedForms = allForms - set(blocks[i])
-		if potentialForms != set() and potentialForms != {''} :
-			if correctPre in excludedForms:
-				print(rules[i]+" excludes "+correctPre)
-				excluded = True
-			if correctPre in potentialForms:
-				#print(rules[i]+" creates form "+form)
-				found += 1
-			#else:
-			#	print(rules[i]+" does not create "+correctPre)
-				
-		else:
-			print("No forms output by rule "+rules[i]+"!")
+	##TODO: make less ugly
+	#if potential:
+	#	for i in range(1,numRules):
+	#		potentialForms = set(blocks[i])
+	#		print(rules[i])
+	#		if potentialForms != set() and potentialForms != {''}:
+	#			print("\tcreates", )
+	#			nothing = True
+	#			for form in potentialForms:
+	#				if form != "":
+	#					#print(form.split(':')[1], correct)
+	#					if form.split(':')[1] == correct:
+	#						print('\t\t\033[1;31m'+form+'\033[1;m', )
+	#					else:
+	#						print('\t\t'+form, )
+	#					nothing = False
+	#			if nothing:
+	#				print("\t\t\033[1;31mNOTHING\033[1;m")
+	#		else:
+	#			print("\t\t\033[1;31mNOTHING\033[1;m")
+	#else:
+	#	for i in range(1,numRules):
+	#		excludedForms = allForms - set(blocks[i])
+	#		print(rules[i])
+	#		if excludedForms != set() and excludedForms != {''}:
+	#			print("\texcludes", )
+	#			nothing = True
+	#			for form in excludedForms:
+	#				if form != "":
+	#					#print(form.split(':')[1], correct)
+	#					if form.split(':')[1] == correct:
+	#						print('\t\t\033[1;31m'+form+'\033[1;m', )
+	#					else:
+	#						print('\t\t'+form, )
+	#					nothing = False
+	#			if nothing:
+	#				print("\t\t\033[1;31mNOTHING\033[1;m")
+	#		else:
+	#			print("\t\t\033[1;31mNOTHING\033[1;m")
 
-	if found==0:
-		print("Correct form ‹ "+correct+" › never created!")
-	elif not excluded:
-		print("This form should be working!")
+#def why_loop(twolcFile, form, correct, potential):
+#	rules = {}
+#	for (num, rule) in get_rule_names(twolcFile):
+#		rules[num] = rule
+#	numRules = len(rules)
+#	blocks = {}
+#	for (count, block) in get_forms(form, numRules, twolcFile):
+#		blocks[count] = block
+#
+#	allForms = get_all_forms(blocks)
+#
+#	found = 0
+#	excluded = False
+#	correctPre = re.sub(' ','',form)+":"+correct
+#	for i in range(1,numRules):
+#		potentialForms = set(blocks[i])
+#		excludedForms = allForms - set(blocks[i])
+#		if potentialForms != set() and potentialForms != {''} :
+#			if correctPre in excludedForms:
+#				print(rules[i]+" excludes "+correctPre)
+#				excluded = True
+#			if correctPre in potentialForms:
+#				#print(rules[i]+" creates form "+form)
+#				found += 1
+#			#else:
+#			#	print(rules[i]+" does not create "+correctPre)
+#				
+#		else:
+#			print("No forms output by rule "+rules[i]+"!")
+#
+#	if found==0:
+#		print("Correct form ‹ "+correct+" › never created!")
+#	elif not excluded:
+#		print("This form should be working!")
 
 
 args = parser.parse_args()
@@ -125,10 +200,11 @@ args = parser.parse_args()
 if args.form != None and args.twolcFile != None:
 	for form in args.form:
 		print('\n'+form+'\n')
-		if not args.why:
-			main_loop(args.twolcFile[0], form, args.correct, args.potential)
-		else:
-			why_loop(args.twolcFile[0], form, args.correct, args.potential)
+		main_loop(args.twolcFile[0], form, args.correct, args.showforms, args.why)
+		#if not args.why:
+		#	main_loop(args.twolcFile[0], form, args.correct, args.potential)
+		#else:
+		#	why_loop(args.twolcFile[0], form, args.correct, args.potential)
 #elif args.twolcFile != None:
 else:
 	parser.print_help()	
