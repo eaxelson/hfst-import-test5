@@ -107,7 +107,9 @@ def main_loop(twolcFile, inputForm, correct, showforms, why):
 	allForms = get_all_forms(blocks)
 
 	rulesExcludingCorrect = get_rules_excluding_correct(ruleSet, correct)
+	#rulesAllowingCorrect = get_rules_allowing_correct(ruleSet, correct)
 	rulesWithNoExcludes = get_rules_with_nothing(ruleSet, correct)
+	correctAllowed = correct in allForms
 
 	if showforms:
 		for (rule, excludedForms) in ruleSet:
@@ -169,8 +171,11 @@ def main_loop(twolcFile, inputForm, correct, showforms, why):
 	print("These rules don't exclude any possible forms: \n\t"+str(rulesWithNoExcludes))
 	print()
 	print("Furthermore, these rules exclude the correct form: \n\t"+str(rulesExcludingCorrect))
-	print()
-	if len(rulesWithNoExcludes)==0 and len(rulesExcludingCorrect)==0:
+	if not correctAllowed:
+		print()
+		print("However, it looks like the correct form was never generated!")
+	if len(rulesWithNoExcludes)==0 and len(rulesExcludingCorrect)==0 and correctAllowed:
+		print()
 		print("There doesn't seem to be anything wrong, ‹"+correct+"› should be output\n")
 
 
