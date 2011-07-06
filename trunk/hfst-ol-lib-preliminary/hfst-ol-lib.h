@@ -56,6 +56,13 @@ namespace hfst_ol
   // For some profound reason it can't be replaced with (UINT_MAX+1)/2.
   const TransitionTableIndex TRANSITION_TARGET_TABLE_START = 2147483648u;
 
+  class HeaderParsingException: public std::exception
+  {
+  public:
+      virtual const char* what() const throw()
+      { return("Parsing error while reading header"); }
+  };
+
   class TransducerHeader
   {
   private:
