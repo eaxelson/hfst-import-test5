@@ -64,6 +64,9 @@ endif
 if WANT_INVERT
 MAYBE_INVERT=hfst-invert
 endif
+if WANT_LEXC
+MAYBE_LEXC=hfst-lexc
+endif
 if WANT_LEXC2FST
 MAYBE_LEXC2FST=hfst-lexc2fst
 endif
@@ -160,7 +163,7 @@ bin_PROGRAMS= \
 			 $(MAYBE_SPLIT) $(MAYBE_STRINGS2FST) $(MAYBE_STRIP_HEADER)  \
 			 $(MAYBE_SUBTRACT) $(MAYBE_SUMMARIZE) $(MAYBE_TAIL)         \
 			 $(MAYBE_TXT2FST) $(MAYBE_CALCULATE) $(MAYBE_SUBSTITUTE)    \
-			 $(MAYBE_FLAG_DIACRITICS) $(MAYBE_LEXC2FST)                 \
+			 $(MAYBE_FLAG_DIACRITICS) $(MAYBE_LEXC2FST) $(MAYBE_LEXC)   \
 			 $(MAYBE_XFST_COMPILER) $(MAYBE_FORMAT)                     \
 			 $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME) $(MAYBE_PAIR_TEST)
 
@@ -182,6 +185,7 @@ hfst_fst2strings_SOURCES=hfst-fst2strings.cc $(HFST_COMMON_SRC)
 hfst_fst2txt_SOURCES=hfst-fst2txt.cc $(HFST_COMMON_SRC)
 hfst_head_SOURCES=hfst-head.cc $(HFST_COMMON_SRC)
 hfst_invert_SOURCES=hfst-invert.cc $(HFST_COMMON_SRC)
+hfst_lexc_SOURCES=hfst-lexc.cc $(HFST_COMMON_SRC)
 hfst_lexc2fst_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC)
 #					  parsers/LexcCompiler.cc parsers/lexc-parser.yy \
 #					  parsers/lexc-lexer.ll parsers/lexc-utils.cc \

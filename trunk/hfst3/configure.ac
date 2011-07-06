@@ -179,6 +179,12 @@ AC_ARG_ENABLE([fst2txt],
 			  [enable_fst2txt=$enableval],
 			  [enable_fst2txt=yes])
 AM_CONDITIONAL([WANT_FST2TXT], [test x$enable_fst2txt != xno])
+AC_ARG_ENABLE([grep],
+			  [AS_HELP_STRING([--enable-grep],
+							  [build grep tool @<:@default=no@:>@])],
+			  [enable_grep=$enableval],
+			  [enable_grep=no])
+AM_CONDITIONAL([WANT_GREP], [test x$enable_grep != xno])
 AC_ARG_ENABLE([head],
 			  [AS_HELP_STRING([--enable-head],
 							  [build head tool @<:@default=yes@:>@])],
@@ -191,10 +197,16 @@ AC_ARG_ENABLE([invert],
 			  [enable_invert=$enableval],
 			  [enable_invert=yes])
 AM_CONDITIONAL([WANT_INVERT], [test x$enable_invert != xno])
+AC_ARG_ENABLE([lexc],
+              [AS_HELP_STRING([--enable-lexc],
+                              [build lexc cli and readline @<:@default=no@:>@])],
+              [enable_lexc=$enableval],
+              [enable_lexc=no])
+AM_CONDITIONAL([WANT_LEXC], [test "x$enable_lexc" != xno])
 AC_ARG_ENABLE([lexc2fst],
               [AS_HELP_STRING([--enable-lexc2fst],
                               [build lexc2fst cli @<:@default=yes@:>@])],
-              [enable_lexc2=$enableval],
+              [enable_lexc2fst=$enableval],
               [enable_lexc2fst=yes])
 AM_CONDITIONAL([WANT_LEXC2FST], [test "x$enable_lexc2fst" != xno])
 AC_ARG_ENABLE([lookup],
@@ -348,7 +360,7 @@ AC_PROG_YACC
 AC_PROG_LEX
 AC_PATH_PROG([FOMACLI], [foma], [false])
 AM_CONDITIONAL([CAN_FOMAWRAP], [test x$FOMACLI != xfalse])
-AS_IF([test x$FOMACLI = xfalse], [AC_MSG_WARN([You cannot use hfst-lexc or hfst-xfst without available foma binaries])])
+AS_IF([test x$FOMACLI = xfalse], [AC_MSG_WARN([You cannot use hfst-xfst without available foma binaries])])
 # if flex 3.X ever comes out, this breaks :)
 LEX_VERSION=`$LEX --version`
 AS_IF([test -z "`echo "$LEX_VERSION" | grep 'flex 2\.[[5-9]]\.[[3-9][4-9]]'`"],
@@ -382,6 +394,8 @@ AS_IF([test "x$with_foma" == "xcheck"],
       [AC_CHECK_LIB([foma], [main], [],
                  [AC_MSG_FAILURE([foma test failed (--without-foma to disable)])])])
 AC_LANG_POP
+
+
 
 ### Add here your library ###
 #AS_IF([test "x$with_my_transducer_library" != "xno"],
@@ -469,8 +483,10 @@ cat <<EOF
     *                 fst2fst: $enable_fst2fst
     *                 fst2strings: $enable_fst2strings (expand)
     *                 fst2txt: $enable_fst2txt
+    *                 grep: $enable_grep
     *                 head: $enable_head
     *                 invert: $enable_invert
+    *                 lexc: $enable_lexc
     *                 lexc2fst: $enable_lexc_compiler
     *                 lookup: $enable_lookup
     *                 minimize: $enable_minimize (minimise)
@@ -492,7 +508,7 @@ cat <<EOF
     *                 test: $enable_test
     *                 txt2fst: $enable_txt2fst
     *                 xfst2fst: $enable_xfst_compiler
-    *                 foma=xfst/lexc: -> $FOMACLI
+    *                 foma=xfst: -> $FOMACLI
 EOF
 dnl important licensing information
 dnl according to GNU GPLv2 strict (not plus) is incompatible with Apache
@@ -502,4 +518,4 @@ dnl hope end users never disable ofst
 AS_IF([test "x$with_openfst" == "xno"],
       [AC_MSG_WARN([Disabling openfst backend will severely cripple libhfst])])
 AS_IF([test "x$FOMACLI" = "xfalse"],
-      [AC_MSG_WARN([using hfst-lexc and hfst-xfst is disabled because foma binary was not found])])
+      [AC_MSG_WARN([using hfst-xfst is disabled because foma binary was not found])])
