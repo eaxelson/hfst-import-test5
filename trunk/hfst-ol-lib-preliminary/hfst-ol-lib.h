@@ -97,6 +97,8 @@ namespace hfst_ol
   public:
     TransducerHeader(FILE * f)
       {
+	  skip_hfst3_header(f);
+
 	// The silly compiler complains about not catching the return value
 	// of fread(). Hence this dummy variable is needed.
 	size_t val;
@@ -121,6 +123,8 @@ namespace hfst_ol
 	read_property(has_input_epsilon_cycles,f);
 	read_property(has_unweighted_input_epsilon_cycles,f);
       }
+
+    void skip_hfst3_header(FILE * f);
 
     SymbolNumber symbol_count(void)
     { return number_of_symbols; }
