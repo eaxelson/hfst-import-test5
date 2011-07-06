@@ -351,7 +351,7 @@ void TransducerHeader::skip_hfst3_header(FILE * f)
 
   OutputVector Transducer::returnAnalyses(void)
   {
-    output_vector.clear()
+      output_vector.clear();
     analyze();
     return output_vector;
   }
@@ -376,7 +376,7 @@ void TransducerHeader::skip_hfst3_header(FILE * f)
 
   OutputVector TransducerW::returnAnalyses(void)
   {
-    output_vector.clear()
+      output_vector.clear();
     analyze();
     return output_vector;
   }
