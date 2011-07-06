@@ -2,6 +2,53 @@
 
 namespace hfst_ol {
 
+void TransducerHeader::skip_hfst3_header(FILE * f)
+{
+    const char* header1 = "HFST";
+    unsigned int header_loc = 0; // how much of the header has been found
+    int c;
+    for(header_loc = 0; header_loc < strlen(header1) + 1; header_loc++)
+    {
+	c = getc(f);
+	if(c != header1[header_loc]) {
+	    break;
+	}
+    }
+    if(header_loc == strlen(header1) + 1) // we found it
+    {
+	unsigned short remaining_header_len;
+	if (fread(&remaining_header_len,
+		  sizeof(remaining_header_len), 1, f) != 1 ||
+	    getc(f) != '\0') {
+	    throw HeaderParsingException();
+	}
+	char * headervalue = new char[remaining_header_len];
+	if (fread(headervalue, remaining_header_len, 1, f) != 1)
+	{
+	    throw HeaderParsingException();
+	}
+	if (headervalue[remaining_header_len - 1] != '\0') {
+	    throw HeaderParsingException();
+	}
+	std::string header_tail(headervalue, remaining_header_len);
+	size_t type_field = header_tail.find("type");
+	if (type_field != std::string::npos) {
+	    if (header_tail.find("HFST_OL") != type_field + 5 &&
+		header_tail.find("HFST_OLW") != type_field + 5) {
+		delete headervalue;
+		throw HeaderParsingException();
+	    }
+	}
+    } else // nope. put back what we've taken
+    {
+	ungetc(c, f); // first the non-matching character
+	    for(int i = header_loc - 1; i>=0; i--) {
+// then the characters that did match (if any)
+		ungetc(header1[i], f);
+	    }
+    }
+}
+
   void TransducerAlphabet::get_next_symbol(FILE * f, SymbolNumber k)
   {
     int byte;
