@@ -2,13 +2,14 @@
 
 import os, re, argparse
 from subprocess import Popen, PIPE
+from colorama import Fore, Back
 
 parser = argparse.ArgumentParser(prog='twolc_debug', description='Tells which twol rules exclude which potential outputs of a given form')
 parser.add_argument('-t', '--twol', nargs=1, dest='twolcFile', help='The compiled twol.hfst file')
 parser.add_argument('form', nargs='+', help='A form or forms to parse')
 parser.add_argument('-c', '--correct', dest='correct', help='Correct output of twolc')
 parser.add_argument('-s', '--showforms', dest='showforms', action='store_true', help='Show all forms created and excluded by rule')
-parser.add_argument('-w', '--why', dest='why', action='store_true', help='Instead of output forms, tell why the correct form is not being produced')
+#parser.add_argument('-w', '--why', dest='why', action='store_true', help='Instead of output forms, tell why the correct form is not being produced')
 
 #twolcFile = "/home/jonathan/quick/apertium/svn/incubator/apertium-tr-ky/.deps/ky.twol.hfst"
 #form = "с ү й > {I} п"
@@ -38,7 +39,7 @@ def get_forms(form, numRules, twolcFile):
 	p2 = Popen(["hfst-strings2fst", "-S"], stdin=p1.stdout, stdout=PIPE)
 	p3 = Popen(["hfst-duplicate", "-n", str(numRules)], stdin=p2.stdout, stdout=PIPE)
 	p4 = Popen(["hfst-compose", twolcFile], stdin=p3.stdout, stdout=PIPE)
-	p5 = Popen(["hfst-fst2strings", "-c 1"], stdin=p4.stdout, stdout=PIPE)
+	p5 = Popen(["hfst-fst2strings", "-c 5"], stdin=p4.stdout, stdout=PIPE)
 	p1.stdout.close()
 	p2.stdout.close()
 	p3.stdout.close()
@@ -65,6 +66,14 @@ def get_rules_excluding_correct(ruleSet, correct):
 			outRules.add(rule)
 	return outRules
 
+def get_rules_allowing_correct(allForms, ruleSet, correct):
+	outRules = set()
+	for (rule, forms) in ruleSet:
+		allowedForms = allForms - forms
+		if correct in allowedForms:
+			outRules.add(rule)
+	return outRules
+
 def get_rules_with_nothing(ruleSet, correct):
 	outRules = set()
 	for (rule, forms) in ruleSet:
@@ -72,7 +81,7 @@ def get_rules_with_nothing(ruleSet, correct):
 			outRules.add(rule)
 	return outRules
 
-def main_loop(twolcFile, inputForm, correct, showforms, why):
+def main_loop(twolcFile, inputForm, correct, showforms):
 	rules = []
 	blocks = []
 	ruleSet = []
@@ -90,7 +99,7 @@ def main_loop(twolcFile, inputForm, correct, showforms, why):
 	allForms = get_all_forms(blocks)
 
 	rulesExcludingCorrect = get_rules_excluding_correct(ruleSet, correct)
-	#rulesAllowingCorrect = get_rules_allowing_correct(ruleSet, correct)
+	rulesAllowingCorrect = get_rules_allowing_correct(allForms, ruleSet, correct)
 	rulesWithNoExcludes = get_rules_with_nothing(ruleSet, correct)
 	correctAllowed = correct in allForms
 
@@ -100,13 +109,21 @@ def main_loop(twolcFile, inputForm, correct, showforms, why):
 			allowedForms = allForms - excludedForms
 			print(rule+" EXCLUDES:")
 			for form in excludedForms:
-				print("\t"+form)
+				if form==correct:
+					print("\t"+Back.RED+form+Back.RESET)
+				else:
+					print("\t"+form)
 			print(rule+" ALLOWS:")
 			for form in allowedForms:
-				print("\t"+form)
+				if form==correct:
+					print("\t"+Back.GREEN.form+Back.RESET)
+				else:
+					print("\t"+form)
 
 	#TODO: make less ugly
 	#Instead of why_loop:
+	print()
+	print("These rules allow the correct form: \n\t"+str(rulesAllowingCorrect))
 	print()
 	print("These rules don't exclude any possible forms: \n\t"+str(rulesWithNoExcludes))
 	print()
@@ -117,6 +134,9 @@ def main_loop(twolcFile, inputForm, correct, showforms, why):
 	if len(rulesWithNoExcludes)==0 and len(rulesExcludingCorrect)==0 and correctAllowed:
 		print()
 		print("There doesn't seem to be anything wrong, ‹"+correct+"› should be output\n")
+	else:
+		print()
+		print("It looks like the correct form is generated somewhere (either as possible or exclude).")
 
 
 args = parser.parse_args()
@@ -124,7 +144,7 @@ args = parser.parse_args()
 if args.form != None and args.twolcFile != None:
 	for form in args.form:
 		print('\n'+form+'\n')
-		main_loop(args.twolcFile[0], form, args.correct, args.showforms, args.why)
+		main_loop(args.twolcFile[0], form, args.correct, args.showforms)
 
 #elif args.twolcFile != None:
 else:
