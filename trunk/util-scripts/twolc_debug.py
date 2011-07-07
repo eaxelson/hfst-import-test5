@@ -39,7 +39,7 @@ def get_forms(form, numRules, twolcFile):
 	p2 = Popen(["hfst-strings2fst", "-S"], stdin=p1.stdout, stdout=PIPE)
 	p3 = Popen(["hfst-duplicate", "-n", str(numRules)], stdin=p2.stdout, stdout=PIPE)
 	p4 = Popen(["hfst-compose", twolcFile], stdin=p3.stdout, stdout=PIPE)
-	p5 = Popen(["hfst-fst2strings", "-c 5"], stdin=p4.stdout, stdout=PIPE)
+	p5 = Popen(["hfst-fst2strings", "-c 10"], stdin=p4.stdout, stdout=PIPE)
 	p1.stdout.close()
 	p2.stdout.close()
 	p3.stdout.close()
@@ -116,7 +116,7 @@ def main_loop(twolcFile, inputForm, correct, showforms):
 			print(rule+" ALLOWS:")
 			for form in allowedForms:
 				if form==correct:
-					print("\t"+Back.GREEN.form+Back.RESET)
+					print("\t"+Back.GREEN+form+Back.RESET)
 				else:
 					print("\t"+form)
 
