@@ -6,7 +6,7 @@ if ! echo "cat" | ../../tools/src/hfst-proc/hfst-proc cat2dog.hfst.ol > test.str
     cat test.strings
     exit 1
 fi
-if ! diff test.strings $srcdir/proc-cat-out.strings > /dev/null 2>&1 ; then
+if ! diff test.strings $srcdir/proc-cat-out.strings ; then
     exit 1
 fi
 
@@ -39,7 +39,7 @@ fi
 if ! diff test.strings $srcdir/proc-caps-out1.strings ; then
     exit 1
 fi
-if ! ../../tools/src/hfst-proc/hfst-proc proc-caps.hfst.ol < $srcdir/proc-caps-in.strings | cut -f2- -d'/'  | sed "s/\\$//g" | sed "s/\\//\\n/g" | sed "s/^/^/g" | sed "s/$/$/g" | ../../tools/src/hfst-proc/hfst-proc -g proc-caps.gen.hfst.ol > test.strings ; then
+if ! hfst-proc -g proc-caps.gen.hfst.ol < $srcdir/proc-caps-gen.strings > test.strings ; then
     echo uppercase roundtrip fail:
     cat test.strings
     exit 1
