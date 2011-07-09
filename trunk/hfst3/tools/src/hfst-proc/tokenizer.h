@@ -97,6 +97,7 @@ class TokenIOStream
   std::ostream& os;
   const ProcTransducerAlphabet& alphabet;
   bool null_flush;
+  bool is_raw;
   
   const Symbolizer& symbolizer;
   
@@ -140,7 +141,7 @@ class TokenIOStream
   Token read_token();
  public:
   TokenIOStream(std::istream& i, std::ostream& o, const ProcTransducerAlphabet& a,
-                bool flush);
+                bool flush, bool raw);
   
   size_t get_pos() const {return token_buffer.getPos();}
   size_t diff_prev(size_t pos) const {return token_buffer.diffPrevPos(pos);}

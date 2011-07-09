@@ -19,13 +19,14 @@
 std::set<char> TokenIOStream::escaped_chars;
 
 TokenIOStream::TokenIOStream(std::istream& i, std::ostream& o, 
-                             const ProcTransducerAlphabet& a, bool flush):
-  is(i), os(o), alphabet(a), null_flush(flush), 
+                             const ProcTransducerAlphabet& a, bool flush,
+                             bool raw):
+  is(i), os(o), alphabet(a), null_flush(flush), is_raw(raw),
   symbolizer(a.get_symbolizer()), superblank_bucket(), token_buffer(1024)
 {
   if(printDebuggingInformationFlag)
     std::cout << "Creating TokenIOStream" << std::endl;
-  if(escaped_chars.size() == 0)
+  if(escaped_chars.size() == 0 && !is_raw)
     initialize_escaped_chars();
 }
 
@@ -154,7 +155,7 @@ TokenIOStream::read_escaped()
   int c = is.get();
   
   if(c == EOF || escaped_chars.find(c) == escaped_chars.end())
-    stream_error("Found invalid character after backslash");
+    stream_error("Found non-reserved character after backslash");
   
   return c;
 }
