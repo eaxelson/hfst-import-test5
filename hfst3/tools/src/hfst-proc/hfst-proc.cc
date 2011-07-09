@@ -25,6 +25,8 @@ bool displayUniqueFlag = false;
 int maxAnalyses = std::numeric_limits<int>::max();
 bool preserveDiacriticRepresentationsFlag = false;
 bool printDebuggingInformationFlag = false;
+bool rawMode = false;
+
 static bool handle_hfst3_header(std::istream& is)
 {
   const char* header1 = "HFST";
@@ -336,6 +338,7 @@ int main(int argc, char **argv)
       break;
     case 'X':
       capitalization_mode = CaseSensitiveDictionaryCase;
+      rawMode = true;
       break;
     default:
       if(capitalization == 0 && output_type == 'C')
@@ -350,8 +353,8 @@ int main(int argc, char **argv)
     if(verboseFlag)
       std::cout << "Transducer successfully loaded" << std::endl;
     in.close();
-    
-    TokenIOStream token_stream(*input, *output, t.get_alphabet(), null_flush);
+    TokenIOStream token_stream(*input, *output, t.get_alphabet(), null_flush,
+                               rawMode);
     Applicator* applicator = NULL;
     OutputFormatter* output_formatter = NULL;
     switch(cmd)
