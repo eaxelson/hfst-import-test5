@@ -40,7 +40,7 @@ using hfst::HfstInputStream;
 using hfst::implementations::HfstTransitionGraph;
 using hfst::implementations::HfstBasicTransducer;
 using hfst::implementations::HfstState;
-//using hfst::implementations::HfstInterfaceException;
+using hfst::StringSet;
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
@@ -127,7 +127,6 @@ process_stream(HfstInputStream& instream)
     fprintf(stderr,"An error happened when reading transducer from stream.\n");
     exit(1);
       }
-      //std::cerr << trans;
       HfstBasicTransducer *mutt;
       try {
     mutt = new HfstBasicTransducer(*trans);
@@ -151,7 +150,10 @@ process_stream(HfstInputStream& instream)
       std::pair<string,unsigned int> most_ambiguous_input;
       std::pair<string,unsigned int> most_ambiguous_output;
       unsigned int initial_state = 0; // mutt.get_initial_state();
-      // iterate states in random orderd
+      StringSet transducerAlphabet = trans->get_alphabet();
+      StringSet foundAlphabet;
+      bool acceptor = true;
+      // iterate states in random order
       HfstState source_state=0;
       for (HfstBasicTransducer::const_iterator it = mutt->begin();
        it != mutt->end(); it++)
@@ -167,13 +169,19 @@ process_stream(HfstInputStream& instream)
           map<string,unsigned int> output_ambiguity;
 
       for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
-	     = it->begin();
+           = it->begin();
            tr_it != it->end(); tr_it++)
         {
               arcs++;
               arcs_here++;
+              foundAlphabet.insert(tr_it->get_input_symbol());
+              foundAlphabet.insert(tr_it->get_output_symbol());
+              if (tr_it->get_input_symbol() != tr_it->get_output_symbol())
+                {
+                  acceptor = false;
+                }
               if ( hfst::is_epsilon(tr_it->get_input_symbol()) && 
-		   hfst::is_epsilon(tr_it->get_output_symbol()) )
+                   hfst::is_epsilon(tr_it->get_output_symbol()) )
                 {
                   io_epsilons++;
                   input_epsilons++;
@@ -228,7 +236,7 @@ process_stream(HfstInputStream& instream)
                 }
               uniq_output_arcs++;
             }
-	  source_state++;
+      source_state++;
       }
       delete mutt;
       // traverse
@@ -283,8 +291,8 @@ process_stream(HfstInputStream& instream)
           break;
         }
       delete trans;
-      fprintf(outfile, "input symbol table: ???\n"
-              "output symbol table: ???\n"
+      fprintf(outfile, "input symbol table: yes\n"
+              "output symbol table: yes\n"
               "# of states: %zu\n"
               "# of arcs: %zu\n"
               "initial state: %ld\n"
@@ -303,7 +311,7 @@ process_stream(HfstInputStream& instream)
       // other names from properties...
       fprintf(outfile, "expanded: ???\n"
               "mutable: ???\n"
-              "acceptor: ???\n"
+              "acceptor: %s\n"
               "input deterministic: ???\n"
               "output deterministic: ???\n"
               "input label sorted: ???\n"
@@ -313,9 +321,10 @@ process_stream(HfstInputStream& instream)
               "cyclic at initial state: ???\n"
               "topologically sorted: ???\n"
               "accessible: ???\n"
-              "coaccessible: ????\n"
+              "coaccessible: ???\n"
               "string: ???\n"
-              "minimised: ???\n");
+              "minimised: ???\n",
+              acceptor? "yes": "no");
       // our extensions for nice statistics maybe
       fprintf(outfile,
               "number of arcs in sparsest state: %zu\n"
@@ -332,6 +341,36 @@ process_stream(HfstInputStream& instream)
               most_ambiguous_input.first.c_str(), most_ambiguous_input.second,
               most_ambiguous_output.first.c_str(), most_ambiguous_output.second,
               average_input_ambiguity, average_output_ambiguity);
+      // alphabets
+      fprintf(outfile,
+              "sigma set:\n");
+      bool first = true;
+      for (StringSet::const_iterator s = transducerAlphabet.begin();
+           s != transducerAlphabet.end();
+           ++s)
+        {
+          if (!first) 
+            {
+              fprintf(outfile, ", ");
+            }
+          fprintf(outfile, "%s", s->c_str());
+          first = false;
+        }
+      fprintf(outfile, "\n");
+      fprintf(outfile, "arc symbols actually seen in transducer:\n");
+      first = true;
+      for (StringSet::const_iterator s = foundAlphabet.begin();
+           s != foundAlphabet.end();
+           ++s)
+        {
+          if (!first) 
+            {
+              fprintf(outfile, ", ");
+            }
+          fprintf(outfile, "%s", s->c_str());
+          first = false;
+        }
+      fprintf(outfile, "\n");
     }
   return EXIT_SUCCESS;
 }
