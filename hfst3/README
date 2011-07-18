@@ -61,7 +61,7 @@ Compilation requirements:
 
   - to disable foma backend, configure switch ``--without-foma`` may be used
 
-  - the *hfst-xfst* and *hfst-lexc* frontends **require** foma binary
+  - the *hfst-xfst* frontend **requires** foma binary
 
 - Local libraries:
 
@@ -113,7 +113,10 @@ Runtime requirements:
   that operating system is aware of this; In linux this may happen by setting
   LD_LIBRARY_PATH.
 
-- the *hfst-xfst* and *hfst-lexc* frontends **require** foma binary
+- the *hfst-xfst* frontend **requires** foma binary
+
+- the *hfst-xfst* frontend needs GNU compatible getopt, or basic getopts
+  *without* GNU-incompatible getopt installed
 
 Installation
 ------------
@@ -322,7 +325,27 @@ configure without any loss of functionality beyond the ability to handle foma
 format automata.  The support for foma-based scripts is not dependent on
 --without-foma option, it uses the ``foma`` binary directly if available.
 
+cat: hvVqf:o:l:u:: No such file or directory
+''''''''''''''''''''''''''''''''''''''''''''
+**During use of bash-based scripts**, an error message including things like::
 
+
+  cat: -l: No such file or directory
+  cat: version,quiet,format:,output:,latin1::,utf8::: No such file or directory
+  cat: -n: No such file or directory
+  cat: hfst-lexc: No such file or directory
+  cat: --: No such file or directory
+
+indicate that script is trying to use Mac OS X's getopt as if it was GNU getopt.
+However default getopt in Mac OS X does not work at all. like GNU getopt.
+Easiest solution is to install working getopt e.g. by using MacPorts::
+
+  sudo port install getopt
+
+The newer versions of bash scripts detect Mac OS X's getopt and fallback to
+using getopts. Note that getopts does not support long options or and filenames
+must be last parameters on commandline with it, so its use is strongly
+discouraged.
 
 Further information
 -------------------
