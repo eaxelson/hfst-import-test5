@@ -359,8 +359,16 @@ AC_PROG_CPP
 AC_PROG_YACC
 AC_PROG_LEX
 AC_PATH_PROG([FOMACLI], [foma], [false])
+AC_PATH_PROG([GETOPT], [getopt getopts], [false])
+AC_CACHE_CHECK([for gnu compatible getopt with long options],
+               [ac_cv_path_GNU_GETOPT],
+               [AC_PATH_PROGS_FEATURE_CHECK([GNU_GETOPT], 
+                                            [getopt ggetopt], 
+                            [[m4out=`$ac_path_GNU_GETOPT -V | fgrep getopt`
+                             test -z "$m4out" || ac_cv_path_GNU_GETOPT=$ac_path_GNU_GETOPT ac_path_GNU_GETOPT_found=:]],
+                            [ac_cv_path_GNU_GETOPT=no])])
+AC_SUBST([GNU_GETOPT], [$ac_cv_path_GNU_GETOPT])
 AM_CONDITIONAL([CAN_FOMAWRAP], [test x$FOMACLI != xfalse])
-AS_IF([test x$FOMACLI = xfalse], [AC_MSG_WARN([You cannot use hfst-xfst without available foma binaries])])
 # if flex 3.X ever comes out, this breaks :)
 LEX_VERSION=`$LEX --version`
 AS_IF([test -z "`echo "$LEX_VERSION" | grep 'flex 2\.[[5-9]]\.[[3-9][4-9]]'`"],
@@ -510,6 +518,7 @@ cat <<EOF
     *                 xfst2fst: $enable_xfst_compiler
     *                 foma=xfst: -> $FOMACLI
 EOF
+dnl stick important warnings to bottom
 dnl important licensing information
 dnl according to GNU GPLv2 strict (not plus) is incompatible with Apache
 AS_IF([test "x$with_foma" != "xno" -a "x$with_openfst" != "xno"],
@@ -517,5 +526,10 @@ AS_IF([test "x$with_foma" != "xno" -a "x$with_openfst" != "xno"],
 dnl hope end users never disable ofst 
 AS_IF([test "x$with_openfst" == "xno"],
       [AC_MSG_WARN([Disabling openfst backend will severely cripple libhfst])])
+dnl without gnu getopt, shell scripts cannot support long options or option 
+dnl permutation
+AS_IF([test "x$GNU_GETOPT" = xno], 
+      [AC_MSG_WARN([hfst-xfst will onlys support part of short options or option permuttation, since GNU getopt is missing])])
+dnl without foma, foma-based scripts cannot work
 AS_IF([test "x$FOMACLI" = "xfalse"],
       [AC_MSG_WARN([using hfst-xfst is disabled because foma binary was not found])])

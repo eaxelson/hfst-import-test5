@@ -6,6 +6,11 @@ fi
 getopt="getopts"
 if type -p getopt > /dev/null ; then
     getopt=$(type -p getopt)
+    if ! $getopt -V > /dev/null ; then
+        getopt="getopts"
+    elif test -z "$($getopt -V | fgrep getopt)" ; then
+        getopt="getopts"
+    fi
 fi
 function print_usage() {
     echo "$0 [-h | -V | -f format | -latin1] [-o OUTFILE] [ROOT [LEXICON...]]"
