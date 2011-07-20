@@ -705,18 +705,21 @@ class TransitionWIndex
   
   bool final(void)
   {
-    if (input_symbol != NO_SYMBOL_NUMBER)
-      {
-	return false;
-      }
-    return first_transition_index != NO_TABLE_INDEX;
+      return input_symbol == NO_SYMBOL_NUMBER &&
+	  first_transition_index != NO_TABLE_INDEX;
   }
   
   Weight final_weight(void)
   {
-    return static_cast<Weight>(first_transition_index);
+      union to_weight
+      {
+	  TransitionTableIndex i;
+	  Weight w;
+      } weight;
+      weight.i = first_transition_index;
+      return weight.w;
   }
-
+  
   SymbolNumber get_input(void)
   {
     return input_symbol;
@@ -779,11 +782,9 @@ class TransitionW
 
   bool final(void)
   {
-    if (input_symbol != NO_SYMBOL_NUMBER)
-      return false;
-    if (output_symbol != NO_SYMBOL_NUMBER)
-      return false;
-    return transition_weight != INFINITE_WEIGHT;
+      return input_symbol == NO_SYMBOL_NUMBER &&
+	  output_symbol == NO_SYMBOL_NUMBER &&
+	  target_index == 1;
   }
 };
 
