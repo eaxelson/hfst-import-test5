@@ -198,9 +198,11 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
         }
         catch (HfstTransducerTypeMismatchException)
           {
-            error(EXIT_FAILURE, 0, "%s and %s contain transducers whose "
-                  "types are not the same",
-                  firstfilename, secondfilename);            
+            error(EXIT_FAILURE, 0, "Could not compose %s and %s [%zu]\n"
+                  "types %s and %s are not compatible for composition",
+                  firstname, secondname, transducer_n,
+                  hfst_strformat(firststream.get_type()),
+                  hfst_strformat(secondstream.get_type()));
           }
 
         bothInputs = firststream.is_good() && secondstream.is_good();
