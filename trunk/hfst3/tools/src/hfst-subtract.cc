@@ -124,7 +124,7 @@ subtract_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
     if (firststream.get_type() != secondstream.get_type())
       {
         warning(0, 0, "Tranducer type mismatch in %s and %s; "
-              "using former type as output\n",
+              "using former type as output",
               firstfilename, secondfilename);
       }
     size_t transducer_n = 0;
@@ -161,7 +161,7 @@ subtract_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                 if (not silent) 
                   {
                     warning(0, 0, "Warning: %s contains flag diacritics not "
-                            "found in %s\n", secondfilename, firstfilename);
+                            "found in %s", secondfilename, firstfilename);
                 }
               }
             else
@@ -177,7 +177,7 @@ subtract_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                 if (not silent)
                   {
                     warning(0, 0, "Warning: %s contains flag diacritics not "
-                            "found in %s\n", firstname, secondname);
+                            "found in %s", firstname, secondname);
                   }
               }
             else
@@ -185,7 +185,18 @@ subtract_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                 second.insert_freely_missing_flags_from(first);
               }
         }
-        first.subtract(second);
+        try
+          {
+            first.subtract(second);
+          }
+        catch (TransducerTypeMismatchException ttme)
+          {
+            error(EXIT_FAILURE, 0, "Could not subtract %s from %s [%zu]\n"
+                  "formats %s and %s are not compatible for subtraction",
+                  secondname, firstname, transducer_n,
+                  hfst_strformat(secondstream.get_type()),
+                  hfst_strformat(firststream.get_type()));
+          }
         char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
                                              (strlen(firstname) +
                                               strlen(secondname) +

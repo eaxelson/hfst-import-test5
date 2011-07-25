@@ -142,7 +142,18 @@ concatenate_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
             verbose_printf("Concatenating %s and %s... %zu\n", firstname,
                            secondname, transducer_n);
         }
-        first.concatenate(second);
+        try
+          {
+            first.concatenate(second);
+          }
+        catch (TransducerTypeMismatchException ttme)
+          {
+            error(EXIT_FAILURE, 0, "Could not concatenate %s and %s [%zu]\n"
+                  "types %s and %s are not compatible for concatenation",
+                  firstname, secondname, transducer_n,
+                  hfst_strformat(firststream.get_type()),
+                  hfst_strformat(secondstream.get_type()));
+          }
         char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
                                              (strlen(firstname) +
                                               strlen(secondname) +
