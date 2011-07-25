@@ -277,9 +277,23 @@ supposably will always work correctly...
 
 **During the make check phase**. This indicates that a test that tests for
 expected failure fails expectedly, which is also indicated by a green word
-*PASS* on the next line. This is expected behaviour and not an indication of a
-bug. If there is a bug effecting that or other tests in the test suite, it will
-be indicated by a line starting with word *FAIL* in red colour.
+*PASS*  or *XFAIL* on the next line. This is expected behaviour and not an
+indication of a bug. If there is a bug effecting that or other tests in the
+test suite, it will be indicated by a line starting with word *FAIL* or *XPASS*
+in red colour.
+
+Same applies for other messages printed during make check phase. The cases where
+something actually fails will be clearly stated in the end of the test suite by
+a message such as::
+
+  ======================================
+  2 of 36 tests failed
+  Please report to hfst-bugs@helsinki.fi
+  ======================================
+
+These errors can be reported either to the stated mail address or the `HFST
+bug tracker in sf.net infrastructure
+<https://sourceforge.net/tracker/?atid=1061990&group_id=224521&func=browse>`_.
 
 openfst tests failed (--without-openfst to disable)
 '''''''''''''''''''''''''''''''''''''''''''''''''''
