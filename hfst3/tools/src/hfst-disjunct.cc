@@ -113,7 +113,7 @@ disjunct_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
     if (firststream.get_type() != secondstream.get_type())
       {
         warning(0, 0, "Tranducer type mismatch in %s and %s; "
-              "using former type as output\n",
+              "using former type as output",
               firstfilename, secondfilename);
       }
     size_t transducer_n = 0;
@@ -141,7 +141,18 @@ disjunct_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
             verbose_printf("Disjuncting %s and %s... %zu\n",
                            firstname, secondname, transducer_n);
         }
-        first.disjunct(second);
+        try
+          {
+            first.disjunct(second);
+          }
+        catch (TransducerTypeMismatchException ttme)
+          {
+            error(EXIT_FAILURE, 0, "Could not disjunct %s and %s [%zu]\n"
+                  "formats %s and %s are not compatible for conjunction",
+                  firstname, secondname, transducer_n,
+                  hfst_strformat(firststream.get_type()),
+                  hfst_strformat(secondstream.get_type()));
+          }
         char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
                                              (strlen(firstname) +
                                               strlen(secondname) +

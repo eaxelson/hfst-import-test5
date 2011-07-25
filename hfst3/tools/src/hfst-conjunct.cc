@@ -123,7 +123,7 @@ conjunct_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
     if (firststream.get_type() != secondstream.get_type())
       {
         warning(0, 0, "Tranducer type mismatch in %s and %s; "
-              "using former type as output\n",
+              "using former type as output",
               firstfilename, secondfilename);
       }
     size_t transducer_n = 0;
@@ -159,7 +159,7 @@ conjunct_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                 if (not silent) 
                   {
                     warning(0, 0, "Warning: %s contains flag diacritics not "
-                            "found in %s\n", secondname, firstname);
+                            "found in %s", secondname, firstname);
                 }
               }
             else
@@ -175,7 +175,7 @@ conjunct_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                 if (not silent)
                   {
                     warning(0, 0, "Warning: %s contains flag diacritics not "
-                            "found in %s\n", firstname, secondname);
+                            "found in %s", firstname, secondname);
                   }
               }
             else
@@ -183,7 +183,18 @@ conjunct_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                 second.insert_freely_missing_flags_from(first);
               }
         }
-        first.intersect(second);
+        try 
+          {
+            first.intersect(second);
+          }
+        catch (TransducerTypeMismatchException ttme)
+          {
+            error(EXIT_FAILURE, 0, "Could not conjunct %s and %s [%zu]\n"
+                  "formats %s and %s are not compatible for intersection",
+                  firstname, secondname, transducer_n,
+                  hfst_strformat(firststream.get_type()),
+                  hfst_strformat(secondstream.get_type()));
+          }
         char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
                                              (strlen(firstname) +
                                               strlen(secondname) +
