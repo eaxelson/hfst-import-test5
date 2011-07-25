@@ -137,37 +137,51 @@ compare_streams(HfstInputStream& firststream, HfstInputStream& secondstream)
             verbose_printf("Comparing %s and %s... %zu\n",
                            firstname, secondname, transducer_n);
         }
-        if (first.compare(second))
+        try
           {
-            if (transducer_n == 1)
+            if (first.compare(second))
               {
-                if (not silent)
-                  fprintf(outfile, "%s == %s\n", firstname, secondname);
+                if (transducer_n == 1)
+                  {
+                    if (not silent)
+                      fprintf(outfile, "%s == %s\n", firstname, secondname);
+                  }
+                else
+                  {
+                    if (not silent)
+                      fprintf(outfile, "%s[%zu] == %s[%zu]\n",
+                              firstname, transducer_n,
+                              secondname, transducer_n);
+                  }
               }
             else
               {
-                if (not silent)
-                  fprintf(outfile, "%s[%zu] == %s[%zu]\n",
-                          firstname, transducer_n,
-                          secondname, transducer_n);
+                if (transducer_n == 1)
+                  {
+                    if (not silent)
+                      fprintf(outfile, "%s != %s\n", firstname, secondname);
+                  }
+                else
+                  {
+                    if (not silent)
+                      fprintf(outfile, "%s[%zu] != %s[%zu]\n",
+                              firstname, transducer_n, 
+                              secondname, transducer_n);
+                  }
+                mismatches++;
               }
           }
-        else
+        catch (TransducerTypeMismatchException ttme)
           {
-            if (transducer_n == 1)
-              {
-                if (not silent)
-                  fprintf(outfile, "%s != %s\n", firstname, secondname);
-              }
-            else
-              {
-                if (not silent)
-                  fprintf(outfile, "%s[%zu] != %s[%zu]\n",
-                          firstname, transducer_n, 
-                          secondname, transducer_n);
-              }
-            mismatches++;
+            // cannot recover yet, but beautify error messages
+            error(2, 0, "Cannot compare `%s' and `%s' [%zu]\n"
+                  "the formats %s and %s are not compatible for comparison\n",
+                  firstname, secondname, transducer_n,
+                  hfst_strformat(firststream.get_type()),
+                  hfst_strformat(secondstream.get_type()));
           }
+
+
         bothInputs = firststream.is_good() && secondstream.is_good();
     }
     
