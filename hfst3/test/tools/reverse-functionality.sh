@@ -1,6 +1,6 @@
 #!/bin/sh
 for i in "" .sfst .ofst .foma; do
-    if test -f cat2dog.hfst$i -a dog2cat.hfst$i ; then
+    if test -f cat2dog.hfst$i -a -f dog2cat.hfst$i ; then
         if ! ../../tools/src/hfst-invert cat2dog.hfst$i > test.hfst ; then
             exit 1
         fi
