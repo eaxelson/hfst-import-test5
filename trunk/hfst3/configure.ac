@@ -49,25 +49,25 @@ AC_SUBST(LIBHFST_NAME)
 # allow backends to be removed
 AC_ARG_WITH([sfst],
             [AS_HELP_STRING([--with-sfst],
-                            [process unweighted fsts with SFST @<:@default=check@:>@])],
+                            [process unweighted fsts with SFST @<:@default=yes@:>@])],
             [],
-            [with_sfst=check])
+            [with_sfst=yes])
 AS_IF([test "x$with_sfst" != xno], [AC_DEFINE([HAVE_SFST], [1],
                                               [Define to compile SFST support in HFST])])
 AM_CONDITIONAL([WANT_SFST], [test x$with_sfst != xno])
 AC_ARG_WITH([openfst],
             [AS_HELP_STRING([--with-openfst],
-                            [process weighted fsts with OpenFst @<:@default=check@:>@])],
+                            [process weighted fsts with OpenFst @<:@default=yes@:>@])],
             [],
-            [with_openfst=check])
+            [with_openfst=yes])
 AS_IF([test "x$with_openfst" != xno], [AC_DEFINE([HAVE_OPENFST], [1],
                                               [Define to compile OpenFst support in HFST])])
 AM_CONDITIONAL([WANT_OPENFST], [test x$with_openfst != xno])
 AC_ARG_WITH([foma],
             [AS_HELP_STRING([--with-foma],
-                            [process unweighted fsts with foma @<:@default=check@:>@])],
+                            [process unweighted fsts with foma @<:@default=yes@:>@])],
             [],
-            [with_foma=check])
+            [with_foma=yes])
 AS_IF([test "x$with_foma" != xno], [AC_DEFINE([HAVE_FOMA], [1],
                                               [Define to compile foma support in HFST])])
 AM_CONDITIONAL([WANT_FOMA], [test x$with_foma != xno])
@@ -93,6 +93,12 @@ AM_CONDITIONAL([WANT_HFSTOL], [test x$with_hfstol != xno])
 
 AS_IF([test "x$with_sfst" == "xno" -a "x$with_openfst" == "xno" -a "x$with_foma" == "xno" -a "x$with_hfstol" == "xno"], [AC_MSG_ERROR([must build with at least one fst backend])])
 
+# relay unicode support to which backend library
+AC_ARG_WITH([unicode_handler],
+            [AS_HELP_STRING([--with-unicode-handler=backend],
+                            [select library to use for unicode handling @<:@default=hfst@:>@])],
+            [with_unicode_handler=$withval],
+            [with_unicode_handler=hfst])
 
 # allow programs to be built separately (sort alphabetically)
 AC_ARG_ENABLE([calculate],
@@ -389,7 +395,6 @@ AS_IF([test "x$with_openfst" != "xno"],
       [AC_CHECK_LIB([fst], [main], [],
                  [AC_MSG_FAILURE([openfst test failed (--without-openfst to disable)])])]
       [AC_CHECK_LIB([m], [main])])
-
 AS_IF([test "x$with_sfst" != "xno"],
       [AC_CHECK_LIB([sfst], [main])]
       [AC_CHECK_LIB([sfst1], [main])])
@@ -397,13 +402,18 @@ AS_IF([test "x$ac_cv_lib_sfst_main" == xno -a "x$ac_cv_lib_sfst1_main" == xno],
       [AC_MSG_FAILURE([sfst tests failed (--without-sfst to disable)])])
 AC_LANG_POP
 AC_LANG_PUSH([C])
-AS_IF([test "x$with_foma" == "xcheck"],
+AS_IF([test "x$with_foma" != "xno"],
       [AC_CHECK_LIB([z], [main])]
       [AC_CHECK_LIB([foma], [main], [],
-                 [AC_MSG_FAILURE([foma test failed (--without-foma to disable)])])])
+                    [AC_MSG_FAILURE([foma test failed (--without-foma to disable)])])])
 AC_LANG_POP
 
-
+AS_IF([test "x$with_unicode_handler" = "xglib"],
+      [PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.12])
+       AC_DEFINE([USE_GLIB_UNICODE], 1, [if using glib for unicode string handling])])
+AS_IF([test "x$with_unicode_handler" = "xicu"],
+      [PKG_CHECK_MODULES([ICU], [icu-uc >= 4.6])
+       AC_DEFINE([USE_ICU_UNICODE], 1, [if using ICU for unicode string handling])])
 
 ### Add here your library ###
 #AS_IF([test "x$with_my_transducer_library" != "xno"],
@@ -426,6 +436,7 @@ AC_LANG_PUSH([C])
 AS_IF([test "x$with_foma" != "xno"],
       [AC_CHECK_HEADERS([fomalib.h])])
 AC_LANG_POP
+
 
 ### Add here your library ###
 #AS_IF([test "x$with_my_transducer_library" != "xno"],
@@ -516,7 +527,8 @@ cat <<EOF
     *                 test: $enable_test
     *                 txt2fst: $enable_txt2fst
     *                 xfst2fst: $enable_xfst_compiler
-    *                 foma=xfst: -> $FOMACLI
+    * foma used for xfst: -> $FOMACLI
+    * unicode parsed in corpus tools with: $with_unicode_handler
 EOF
 dnl stick important warnings to bottom
 dnl important licensing information
@@ -529,7 +541,12 @@ AS_IF([test "x$with_openfst" == "xno"],
 dnl without gnu getopt, shell scripts cannot support long options or option 
 dnl permutation
 AS_IF([test "x$GNU_GETOPT" = xno], 
-      [AC_MSG_WARN([hfst-xfst will onlys support part of short options or option permuttation, since GNU getopt is missing])])
+      [AC_MSG_WARN([hfst-xfst will only support part of short options or option permutation, since GNU getopt is missing])])
 dnl without foma, foma-based scripts cannot work
 AS_IF([test "x$FOMACLI" = "xfalse"],
       [AC_MSG_WARN([using hfst-xfst is disabled because foma binary was not found])])
+dnl HFST's case mapping in corpus tools is mainly MES-2 set with other characters
+dnl added as we go
+AS_IF([test "x$with_unicode_handler" = "xhfst"],
+      [AC_MSG_WARN([HFST only supports basic unicode handling with limited case mapping tables etc.; for better support consider using glib or ICU --with-unicode-handler])])
+

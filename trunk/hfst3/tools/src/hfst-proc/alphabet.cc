@@ -10,6 +10,14 @@
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
+#if USE_GLIB_UNICODE
+#  include <glib.h>
+#endif
+
 #include <cstring>
 #include <cstdio>
 #include <sstream>
@@ -355,6 +363,33 @@ ProcTransducerAlphabet::calculate_caps()
 std::string
 ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
 {
+#if USE_ICU_UNICODE
+#error ICU unicode unimplemented
+#elif USE_GLIB_UNICODE
+  glong readed = 0;
+  glong written = 0;
+  GError** gerrno;
+  gunichar* s = g_utf8_to_ucs4(c, -1, &readed, &written, gerrno);
+  gchar* cased = 0;
+  if (g_unichar_isupper(*s))
+    {
+      case_res = 1;
+      cased = g_utf8_strdown(c, -1);
+    }
+  else if (g_unichar_islower(*s))
+    {
+      case_res = -1;
+      cased = g_utf8_strup(c, -1);
+    }
+  else
+    {
+      case_res = 0;
+      cased = g_strdup("");
+    }
+  g_free(s);
+  string rv(cased);
+  return cased;
+#else
   static const char* override_upper[14][2] = {{"Ə", "ə"},
                                              {"Р", "р"},
                                              {"А", "а"},
@@ -460,6 +495,7 @@ ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
   }
   case_res = 0;
   return "";
+#endif // HFST_UNICODE
 }
 
 std::string
