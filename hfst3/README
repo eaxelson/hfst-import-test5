@@ -63,6 +63,15 @@ Compilation requirements:
 
   - the *hfst-xfst* frontend **requires** foma binary
 
+- For proper Unicode support in corpus tools:
+
+  - Glib version 2.16 or newer; configure ``--with-unicode-handler=glib``
+
+  - Pkg-config 0.14 or newer
+
+  - Without unicode libraries the corpus tools may be unable to handle
+    operations such as *case-folding* properly
+
 - Local libraries:
 
   - If you only have a local version of a library, you can use it with
