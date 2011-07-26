@@ -520,6 +520,7 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
               {
                 lookup_len += strlen(space_format);
               }
+            first = false;
             if (is_epsilon(*s))
               {
                 lookup_len += strlen(epsilon_format);
@@ -548,6 +549,7 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
               {
                 input_len += strlen(space_format);
               }
+            first = false;
             if (is_epsilon(*s))
               {
                 input_len += strlen(epsilon_format);
@@ -597,7 +599,8 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
     char* lookupform = 0;
     if (result != NULL)
       {
-        lookupform = static_cast<char*>(malloc(sizeof(char)*lookup_len+1));
+        lookupform = static_cast<char*>(malloc(sizeof(char) * lookup_len +
+                                              sizeof(char) * strlen(space_format) * (lookup_len - 1) +1));
         char* p = lookupform;
         bool first = true;
         for (vector<string>::const_iterator s = result->second.begin();
@@ -639,7 +642,8 @@ lookup_printf(const char* format, const HfstOneLevelPath* input,
     char* inputform = 0;
     if (input != NULL)
       {
-        inputform = static_cast<char*>(malloc(sizeof(char)*input_len+1));
+        inputform = static_cast<char*>(malloc(sizeof(char) * input_len +
+                                              sizeof(char) * strlen(space_format) * (input_len - 1) +1));
         char* p = inputform;
         bool first = true;
         for (vector<string>::const_iterator s = input->second.begin();
