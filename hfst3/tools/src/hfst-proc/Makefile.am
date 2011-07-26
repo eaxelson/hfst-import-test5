@@ -15,9 +15,9 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-LDADD = $(top_builddir)/libhfst/src/libhfst.la
-AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib
-AM_CXXFLAGS = $(WERR_CFLAGS)
+LDADD = $(top_builddir)/libhfst/src/libhfst.la $(GLIB_LIBS)
+AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib 
+AM_CXXFLAGS = $(WERR_CFLAGS) $(GLIB_CFLAGS)
 
 if WANT_PROC
 MAYBE_PROC=hfst-proc
