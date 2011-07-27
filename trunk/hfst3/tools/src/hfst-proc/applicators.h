@@ -67,7 +67,7 @@ class GenerationApplicator: public Applicator
    */
   std::vector<TokenVector> split(const TokenVector& tokens) const;
   
-  void lookup(const TokenVector& tokens);
+  bool lookup(const TokenVector& tokens, bool generate_on_fail);
 
  public:
   GenerationApplicator(const ProcTransducer& t, TokenIOStream& ts,
