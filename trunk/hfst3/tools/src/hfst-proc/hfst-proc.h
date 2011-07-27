@@ -49,6 +49,7 @@ extern bool verboseFlag;
 extern bool displayWeightsFlag;
 extern int maxAnalyses;
 extern bool preserveDiacriticRepresentationsFlag;
+extern bool processCompounds;
 
 // the following flags are only meaningful with certain debugging #defines
 extern bool printDebuggingInformationFlag;

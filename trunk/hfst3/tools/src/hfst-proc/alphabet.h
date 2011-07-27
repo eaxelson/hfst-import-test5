@@ -22,6 +22,8 @@ class LetterTrie;
 typedef std::vector<LetterTrie*> LetterTrieVector;
 class Symbolizer;
 
+extern bool processCompounds ; 
+
 class LetterTrie
 {
  private:

@@ -25,6 +25,7 @@ bool displayUniqueFlag = false;
 int maxAnalyses = std::numeric_limits<int>::max();
 bool preserveDiacriticRepresentationsFlag = false;
 bool printDebuggingInformationFlag = false;
+bool processCompounds = false;
 bool rawMode = false;
 
 static bool handle_hfst3_header(std::istream& is)
@@ -103,6 +104,7 @@ bool print_usage(void)
     "  -p  --apertium          Apertium output format for analysis (default)\n" <<
     "  -C  --cg                Constraint Grammar output format for analysis\n" <<
     "  -x, --xerox             Xerox output format for analysis\n" <<
+    "  -e, --do-compounds      Treat '+' and '#' as compound boundaries\n" <<
     "  -k, --keep-compounds    Retain compound analyses even when analyses with fewer\n" <<
     "                          compound-boundaries are available\n" <<
     "  -W, --show-weights      Print final analysis weights (if any)\n" <<
@@ -132,7 +134,7 @@ bool print_version(void)
     "hfst-proc 0.0 (" << 
     PACKAGE_STRING << ")" << std::endl <<
     __DATE__ << " " __TIME__ << std::endl <<
-    "copyright (C) 2009 University of Helsinki\n";
+    "copyright (C) 2009-2011 University of Helsinki\n";
   return true;
 }
 
@@ -170,6 +172,7 @@ int main(int argc, char **argv)
       {"xerox",          no_argument,       0, 'x'},
       {"cg",             no_argument,       0, 'C'},
       {"keep-compounds", no_argument,       0, 'k'},
+      {"do-compounds",   no_argument,       0, 'e'},
       {"show-weights",   no_argument,       0, 'W'},
       {"analyses",       required_argument, 0, 'N'},
       {"case-sensitive", no_argument,       0, 'c'},
@@ -180,7 +183,7 @@ int main(int argc, char **argv)
     };
     
     int option_index = 0;
-    int c = getopt_long(argc, argv, "hVvqsagndtpxCkWN:cwzX", long_options, &option_index);
+    int c = getopt_long(argc, argv, "hVvqsagndtpxCkeWN:cwzX", long_options, &option_index);
 
     if (c == -1) // no more options to look at
       break;
@@ -262,13 +265,15 @@ int main(int argc, char **argv)
       break;
     
     case 'c':
+    case 'e': 
+      processCompounds = true;
     case 'w':
     case 'X':
       if(capitalization==0)
         capitalization=c;
       else
       {
-        std::cerr << "Multiple capitalization modes given" << std::endl;
+        std::cerr << "Multiple capitalisation modes given" << std::endl;
         print_short_help();
         return EXIT_FAILURE;
       }
@@ -413,4 +418,3 @@ int main(int argc, char **argv)
   
   return EXIT_SUCCESS;
 }
-
