@@ -24,6 +24,8 @@
 #include "alphabet.h"
 #include "tokenizer.h"
 
+
+
 //////////Function definitions for LetterTrie
 
 bool
@@ -242,8 +244,8 @@ ProcTransducerAlphabet::check_for_overlapping() const
   {
     std::cerr << "!! Warning: Transducer contains one or more multi-character symbols made up of\n"
               << "ASCII characters which are also available as single-character symbols. The\n"
-              << "input stream will always be tokenized using the longest symbols available.\n"
-              << "Use the -t option to view the tokenization. The problematic symbol(s):\n";
+              << "input stream will always be tokenised using the longest symbols available.\n"
+              << "Use the -t option to view the tokenisation. The problematic symbol(s):\n";
     for(size_t i=0;i<overlapping.size();i++)
       std::cerr << (i==0?"":" ") << overlapping[i];
     std::cerr << std::endl;
@@ -390,7 +392,7 @@ ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
   string rv(cased);
   return cased;
 #else
-  static const char* override_upper[14][2] = {{"Ə", "ə"},
+  static const char* override_upper[16][2] = {{"Ə", "ə"},
                                              {"Р", "р"},
                                              {"А", "а"},
                                              {"Ч", "ч"},
@@ -403,9 +405,11 @@ ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
                                              {"Ш", "ш"},
                                              {"Ө", "ө"},
                                              {"Ф", "ф"},
+                                             {"Я", "я"},
+                                             {"Ц", "ц"},
                                              {"Э", "э"}};
 
-  static const char* override_lower[14][2] = {{"ə", "Ə"},
+  static const char* override_lower[16][2] = {{"ə", "Ə"},
                                              {"р", "Р"},
                                              {"а", "А"},
                                              {"ч", "Ч"},
@@ -418,6 +422,8 @@ ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
                                              {"ш", "Ш"},
                                              {"ө", "Ө"},
                                              {"ф", "Ф"},
+                                             {"я", "Я"},
+                                             {"ц", "Ц"},
                                              {"э", "Э"}};
 
   static const char* parallel_ranges[5][2][2] = {{{"A","Z"},{"a","z"}}, // Basic Latin
@@ -438,7 +444,7 @@ ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
                                              {"Ԁ","ԥ"}, // Cyrillic Supplement
                                              {"Ḁ","ỿ"}};//Latin Extended Additional
 
-  for(int i = 0; i < 14; i++) 
+  for(int i = 0; i < 16; i++) 
   {
     if(strcmp(c,override_upper[i][0]) == 0) 
     {
@@ -447,7 +453,7 @@ ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
     }
   }
 
-  for(int i = 0; i < 14; i++) 
+  for(int i = 0; i < 16; i++) 
   {
     if(strcmp(c,override_lower[i][0]) == 0) 
     {
@@ -621,10 +627,14 @@ ProcTransducerAlphabet::is_tag(SymbolNumber symbol) const
   return false;
 }
 
-bool
+bool /* @@@ */
 ProcTransducerAlphabet::is_compound_boundary(SymbolNumber symbol) const
 {
+extern bool processCompounds ;
   std::string s = symbol_to_string(symbol);
+  if(!processCompounds) 
+    return false;
+
   if(s == "+" || s[s.length()-1] == '+' ||
      s == "#" || s[s.length()-1] == '#')
     return true;
