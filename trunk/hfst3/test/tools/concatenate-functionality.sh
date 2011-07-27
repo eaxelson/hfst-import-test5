@@ -4,7 +4,7 @@ for i in "" .sfst .ofst .foma; do
         if ! ../../tools/src/hfst-concatenate cat.hfst$i dog.hfst$i > test.hfst ; then
             exit 1
         fi
-        if ! ../../tools/src/hfst-compare test.hfst catdog.hfst$i > /dev/null 2>&1 ; then
+        if ! ../../tools/src/hfst-compare test.hfst catdog.hfst$i  ; then
             exit 1
         fi
         rm test.hfst;
