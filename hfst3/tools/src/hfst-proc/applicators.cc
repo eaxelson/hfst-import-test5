@@ -261,9 +261,17 @@ GenerationApplicator::apply()
         }
         else
         {
-          std::vector<TokenVector> parts = split(form);
-          for(std::vector<TokenVector>::const_iterator it=parts.begin(); it!=parts.end(); it++)
-            lookup(*it);
+          // first try unsplit
+          
+          if(!lookup(form, false))
+            {
+              std::vector<TokenVector> parts = split(form);
+              for (std::vector<TokenVector>::const_iterator it=parts.begin();
+                   it!=parts.end(); it++)
+                {
+                  lookup(*it, true);
+                }
+            }
           
           if(prefix_char == '#') // if there is an invariant part remaining
           {
@@ -303,8 +311,8 @@ GenerationApplicator::split(const TokenVector& tokens) const
   return res;
 }
 
-void
-GenerationApplicator::lookup(const TokenVector& tokens)
+bool
+GenerationApplicator::lookup(const TokenVector& tokens, bool generate_on_fail)
 {
   LookupState state(transducer);
   state.lookup(token_stream.to_symbols(tokens), caps_mode);
@@ -330,8 +338,9 @@ GenerationApplicator::lookup(const TokenVector& tokens)
         token_stream.put_symbols((*it)->get_output_symbols(),capitalization_state);
       }
     }
+    return true;
   }
-  else // no generations found
+  else if (generate_on_fail) // no generations found
   {
     if(mode != gm_clean)
       token_stream.put_token(Token::as_reservedcharacter('#'));
@@ -349,6 +358,12 @@ GenerationApplicator::lookup(const TokenVector& tokens)
       }
     }
     token_stream.write_escaped(word);
+    return true;
   }
+  else
+    {
+      return false;
+    }
+  return false;
 }
 
