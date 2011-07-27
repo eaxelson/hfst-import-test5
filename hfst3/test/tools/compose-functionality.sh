@@ -5,7 +5,7 @@ for i in "" .sfst .ofst .foma; do
             echo cat.hfst$1 o cat2dog.hfst$i fail
             exit 1
         fi
-        if ! ../../tools/src/hfst-compare test.hfst cat2dog.hfst$i > /dev/null 2>&1 ; then
+        if ! ../../tools/src/hfst-compare test.hfst cat2dog.hfst$i  ; then
             echo cat2doghfst$i differs
             exit 1
         fi

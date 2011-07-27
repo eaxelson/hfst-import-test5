@@ -15,7 +15,7 @@ for i in "" .sfst .ofst .foma; do
         if ! echo "catcatcat(cat)+" | ../../tools/src/hfst-calculate $FFLAG > test.hfst ; then
             exit 1
         fi
-        if ! ../../tools/src/hfst-compare 4toINFcats.hfst$i test.hfst > /dev/null 2>&1 ; then
+        if ! ../../tools/src/hfst-compare 4toINFcats.hfst$i test.hfst  ; then
             exit 1
         fi
         rm test.hfst
@@ -24,7 +24,7 @@ for i in "" .sfst .ofst .foma; do
         if ! echo "{cat}:{dog}" | ../../tools/src/hfst-calculate $FFLAG > test.hfst ; then
             exit 1
         fi
-        if ! ../../tools/src/hfst-compare cat2dog.hfst$i test.hfst > /dev/null 2>&1 ; then
+        if ! ../../tools/src/hfst-compare cat2dog.hfst$i test.hfst  ; then
             exit 1
         fi
         rm test.hfst
