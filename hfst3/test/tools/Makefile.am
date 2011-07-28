@@ -125,11 +125,13 @@ FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
 		 heavycat.txt abid.txt unk2unk.txt cat2dog_0.3.txt cat2dog_0.5.txt empty.txt unk_or_id_star.txt \
 		 a2b.txt a2b_complement.txt a2b_input_projection_complement.txt \
 		 walk_or_dog.txt
-FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-out1.strings \
-		 proc-caps-out2.strings proc-caps-out3.strings proc-caps-out4.strings \
-		 proc-cat-out.strings proc-cat-weighted-out.strings \
-		 utf-8.strings latin-1.strings \
-		 cat2dog.strings heavycat.strings
+FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-gen.strings \
+			proc-caps-out1.strings proc-caps-out2.strings \
+			proc-caps-out3.strings proc-caps-out4.strings \
+			proc-caps-out5.strings \
+			proc-cat-out.strings proc-cat-weighted-out.strings \
+			utf-8.strings latin-1.strings \
+			cat2dog.strings heavycat.strings
 FST_PAIRS=cat2dog.pairs
 FST_PAIRSTRINGS=cat2dog.pairstring
 FST_SPACESTRINGS=cat2dog.spaces
