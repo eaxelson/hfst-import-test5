@@ -61,7 +61,7 @@ int main(int argc, char **argv)
       fclose(ofile);
       assert(system("diff transducer2.att transducer.att") == 0);
       remove("transducer2.att");
-
+      remove("transducer.att");
 
       /* From HfstInputStream. */      
       verbose_print("Writing to HfstOutputStream", types[i]);

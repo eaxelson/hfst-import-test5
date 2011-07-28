@@ -114,10 +114,10 @@ int main(int argc, char **argv)
 	  assert(true);
 	}
       fclose(ifile);
-
       
 
     }
+      remove("testfile.att");
 
   {
     ImplementationType type=FOMA_TYPE;
