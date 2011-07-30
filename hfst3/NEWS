@@ -6,6 +6,19 @@ This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
 
+Noteworthy changes in 3.2.0
+---------------------------
+
+* Numerous improvements to hfst-proc, including better uppercasing via glib,
+  better compound handling, new analysis mode for raw analysis without case
+  changes or special symbols etc.
+
+* old slow lexc (not built by default)
+
+* numerous scripting fixes for mac os x compatibility with foma
+
+* constness changes in API
+
 Noteworthy changes in 3.1.1
 ---------------------------
 
