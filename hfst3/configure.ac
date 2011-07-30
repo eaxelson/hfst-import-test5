@@ -96,9 +96,9 @@ AS_IF([test "x$with_sfst" == "xno" -a "x$with_openfst" == "xno" -a "x$with_foma"
 # relay unicode support to which backend library
 AC_ARG_WITH([unicode_handler],
             [AS_HELP_STRING([--with-unicode-handler=backend],
-                            [select library to use for unicode handling @<:@default=hfst@:>@])],
+                            [select library to use for unicode handling @<:@default=glib@:>@])],
             [with_unicode_handler=$withval],
-            [with_unicode_handler=hfst])
+            [with_unicode_handler=glib])
 
 # allow programs to be built separately (sort alphabetically)
 AC_ARG_ENABLE([calculate],
