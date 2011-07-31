@@ -71,7 +71,7 @@ static std::string input_exclude;
 static std::string output_exclude;
 
 static bool print_in_pairstring_format=false;
-static char * epsilon_format="";
+static char * epsilon_format=0;
 
 void
 print_usage()
@@ -132,6 +132,7 @@ print_usage()
 int
 parse_options(int argc, char** argv)
 {
+    extend_options_getenv(&argc, &argv);
     // use of this function requires options are settable on global scope
     while (true)
     {
@@ -542,6 +543,7 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
 
 int main( int argc, char **argv ) {
   hfst_set_program_name(argv[0], "0.1", "HfstFst2Strings");
+  epsilon_format = hfst_strdup("");
     int retval = parse_options(argc, argv);
 
     if (max_strings > 0 && max_random_strings > 0 && !silent)
@@ -587,6 +589,7 @@ int main( int argc, char **argv ) {
     delete instream;
     free(inputfilename);
     free(outfilename);
+    free(epsilon_format);
     return retval;
 }
 

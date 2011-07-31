@@ -21,7 +21,8 @@
 if WANT_STRESSTESTS
 STRESSES=lexc2fst-stress.sh lookup-stress.sh proc-stress.sh valgrind.sh
 endif
-TESTS=hfst-check-version.sh hfst-check-help.sh empty-input.sh \
+TESTS=hfst-check-version.sh hfst-check-help.sh hfst-check-environment.sh \
+	  empty-input.sh \
 	  permutate-file-params.sh \
 	  compare-functionality.sh \
 	  concatenate-functionality.sh \

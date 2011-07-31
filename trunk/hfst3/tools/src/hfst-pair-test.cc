@@ -130,6 +130,7 @@ print_usage()
 int
 parse_options(int argc, char** argv)
 {
+    extend_options_getenv(&argc, &argv);
     // use of this function requires options are settable on global scope
     while (true)
     {

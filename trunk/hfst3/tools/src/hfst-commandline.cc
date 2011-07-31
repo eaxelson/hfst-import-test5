@@ -573,6 +573,17 @@ hfst_malloc(size_t s)
     return rv;
   }
 
+void*
+hfst_realloc(void* ptr, size_t s)
+{
+  void* rv = realloc(ptr, s);
+  if ((rv==NULL) && (s > 0))
+    {
+      error(EXIT_FAILURE, errno, "realloc failed");
+    }
+  return rv;
+}
+
 // customized default printouts for HFST tools
 void
 hfst_set_program_name(const char* argv0, const char* version_vector,
@@ -624,4 +635,38 @@ print_report_bugs()
           "<https://sourceforge.net/tracker/?atid=1061990&group_id=224521&func=browse>\n");
 }
 
+
+void
+extend_options_getenv(int* argc, char*** argv)
+{
+  char* hfstopts = getenv("HFST_OPTIONS");
+  if (NULL == hfstopts)
+    {
+      return;
+    }
+  char* p = hfstopts;
+  unsigned int spaces = 0;
+  while (*p != '\0')
+    {
+      if (' ' == *p)
+        {
+          spaces++;
+        }
+      p++;
+    }
+  // we cannot realloc argv since it's magic
+  char** new_argv = static_cast<char**>(hfst_malloc(sizeof(char*) * 
+                                                    (*argc + spaces + 1)));
+  new_argv = static_cast<char**>(memcpy(new_argv, *argv, sizeof(char*)**argc));
+  // there's this magic stuff with *argv that we shouldn't free it still
+  *argv = new_argv;
+  char* new_arg = strtok(hfstopts, " ");
+  while (new_arg != NULL)
+    {
+      char** new_arg_spot = ((*argv) + *argc);
+      *new_arg_spot = hfst_strdup(new_arg);
+      (*argc)++;
+      new_arg = strtok(NULL, " ");
+    }
+}
 
