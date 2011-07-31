@@ -44,8 +44,9 @@ using hfst::HfstOutputStream;
 using hfst::HfstTokenizer;
 using hfst::HfstOneLevelPath;
 using hfst::HfstOneLevelPaths;
+using hfst::HfstTwoLevelPaths;
 using hfst::xre::XreCompiler;
-
+using hfst::is_epsilon;
 
 // add tools-specific variables here
 char** infilenames = 0;
@@ -66,7 +67,7 @@ bool match_full_line = false;
 char linesep = '\n';
 bool very_quiet = false;
 bool invert_matches = false;
-unsigned long max_count = 0;
+unsigned long max_count = -1;
 bool max_infinite = true;
 bool print_offset = false;
 bool print_linenumbers = false;
@@ -75,6 +76,7 @@ bool print_filenames = false;
 bool print_only_matches = false;
 bool print_only_matching_filenames = false;
 bool print_only_unmatching_filenames = false;
+bool print_only_count = false;
 bool count_matches = false;
 bool print_filename_null = false;
 bool color_matches = false;
@@ -94,7 +96,7 @@ print_usage()
     fprintf(message_out, "Usage: %s [OPTIONS...] PATTERN [FILE...]\n"
            "Search for PATTERN in each FILE or standard input.\n"
            "Pattern is, by default, a Xerox regular expression (XRE).\n"
-           "Example: hfst-grep 'hello world' menu.h menu.c\n"   
+           "Example: hfst-grep 'h e l l o %%  w o r l d' menu.h menu.c\n"   
         "\n", program_name);
 
     // options, grouped
@@ -313,6 +315,7 @@ parse_options(int argc, char** argv)
           break;
         case 'm':
           max_count = hfst_strtoul(optarg, 10);
+          count_matches = true;
           break;
         case 'b':
           print_offset = true;
@@ -355,6 +358,7 @@ parse_options(int argc, char** argv)
           break;
         case 'c':
           count_matches = true;
+          print_only_count = true;
           break;
         case 'Z':
           print_filename_null = true;
@@ -381,7 +385,12 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-error.h"
         }
     }
-
+    if (!dialect_fixed_strings && !dialect_xerox && !dialect_posix_bre &&
+        !dialect_posix_ere && !dialect_perl)
+      {
+        warning(0, 0, "Dialect not defined, defaulting to Xerox for now!");
+        dialect_xerox = true;
+      }
     if (format == hfst::UNSPECIFIED_TYPE)
       {
         format = hfst::TROPICAL_OPENFST_TYPE;
@@ -616,6 +625,45 @@ print_match_line(const HfstOneLevelPath& path)
   fprintf(outfile, "\n");
 }
 
+void
+print_match_transducer(const HfstTransducer& path)
+{
+  HfstTwoLevelPaths p;
+  path.extract_paths(p, 1);
+  if (print_only_matching_filenames || print_only_unmatching_filenames)
+    {
+      return;
+    }
+  if (print_filenames)
+    {
+      fprintf(outfile, "%s", inputfilename);
+      if (print_filename_null)
+        {
+          uint8_t zero = 0;
+          fwrite(&zero, 1, 1, outfile);
+        }
+      else
+        {
+          fprintf(outfile, ": ");
+        }
+    }
+  if (print_linenumbers)
+    {
+      fprintf(outfile, "%lu: ", linen);
+    }
+  for (vector<pair<string,string> >::const_iterator s = p.begin()->second.begin();
+       s != p.begin()->second.end();
+       ++s)
+    {
+      if (!is_epsilon(s->first))
+        {
+          fprintf(outfile, "%s", s->first.c_str());
+        }
+    }
+  fprintf(outfile, "\n");
+
+}
+
 /**
  * @return true if matches in @a infile
  */
@@ -625,6 +673,11 @@ match_lines(FILE* infile, char* infilename)
     char* line = 0;
     size_t len = 0;
     verbose_printf("matching against %s...\n", infilename);
+    bool matched = false;
+    size_t matches_n = 0;
+#ifndef HFST_OPTIMISED_LOOKUP_CAN_IDENTITY
+    HfstTokenizer tokeniser;
+#endif
     while (hfst_getline(&line, &len, infile) != -1)
       {
         linen++;
@@ -639,6 +692,7 @@ match_lines(FILE* infile, char* infilename)
             p++;
           }
         verbose_printf("matching %s...\n", line);
+#if HFST_OPTIMISED_LOOKUP_CAN_IDENTITY
         HfstOneLevelPath path;
         vector<string>* letters = string_to_utf8(line);
         path.second = *letters;
@@ -661,12 +715,47 @@ match_lines(FILE* infile, char* infilename)
                 HfstOneLevelPath match = *(results->begin());
                 print_match_line(match);
               }
+            matched = true;
+            matches_n++;
           }
+#else
+        if (*line == '\0')
+          {
+            continue;
+          }
+        HfstTransducer lineTrans(line, line, tokeniser, format);
+        verbose_printf("composing...\n");
+        HfstTransducer results = lineTrans.compose(*matcher).output_project();
+        HfstTransducer empty(format);
+        if (results.compare(empty))
+          {
+            verbose_printf("no matches\n");
+            if (invert_matches)
+              {
+                print_match_transducer(lineTrans);
+              }
+          }
+        else
+          {
+            verbose_printf("matches\n");
+            if (!invert_matches)
+              {
+                print_match_transducer(results);
+              }
+            matched = true;
+            matches_n++;
+          }
+#endif
         if (flush_newlines)
           {
             fflush(outfile);
           }
+        if ((max_count > 0) && (matches_n >= max_count))
+          {
+            break;
+          }
       }
+    return invert_matches? !matched: matched;
   }
 
 void
@@ -687,8 +776,9 @@ int main( int argc, char **argv ) {
     verbose_printf("Writing to %s\n", outfilename);
     read_matcher(regexp);
     extend_matcher_with_options();
+#if HFST_OPTIMISED_LOOKUP_CAN_IDENTITY_SYMBOL
     optimise_matcher();
-
+#endif
     for (int i = 0; i < infile_n; i++)
       {
         inputfilename = infilenames[i];
