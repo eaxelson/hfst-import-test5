@@ -225,6 +225,44 @@ void hfst_fseek(FILE* stream, long offset, int whence);
  */
 unsigned long hfst_ftell(FILE* stream);
 
+/**
+ * @brief read at most @a nmemb elements of @a size or print informative
+ *        error message and exit.
+ */
+size_t hfst_fread(void* ptr, size_t size, size_t nmemb, FILE* stream);
+/**
+ * @brief write at most @a nmemb elements of @a size or print informative
+ *        error message end exit.
+ */
+size_t hfst_fwrite(void* ptr, size_t size, size_t nmemb, FILE* stream);
+/** 
+ * @brief create temporary file or print informative error message and exit
+ *        on failure.
+ */
+FILE* hfst_tmpfile();
+// same stuff for fd's
+/** @brief close a file descriptor or print informative error message and exit
+ *         on failure.
+ */
+int hfst_close(int fd);
+/** @brief open a file descriptor or print informative error message and exit
+ *         on failure.
+ */
+int hfst_open(const char* pathname, int flags);
+/** @brief read at most @a count bytes from the file descriptor or print
+ *         error message and exit on failure.
+ */
+ssize_t hfst_read(int fd, void* bug, size_t count);
+/** @brief write at most @a count bytes to file descriptor or print error
+ *         message and exit on failure
+ */
+ssize_t hfst_write(int fd, const void* buf, size_t count);
+/**
+ * @brief create temporary file from template name or print informative error
+ *        message and exit on failrue.
+ */
+int hfst_mkstemp(char* templ);
+
 #ifdef HAVE_GETDELIM
 ssize_t getdelim(char** lineptr, size_t* n, int delim, FILE* stream);
 #endif

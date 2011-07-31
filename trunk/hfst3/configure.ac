@@ -205,9 +205,9 @@ AC_ARG_ENABLE([invert],
 AM_CONDITIONAL([WANT_INVERT], [test x$enable_invert != xno])
 AC_ARG_ENABLE([lexc],
               [AS_HELP_STRING([--enable-lexc],
-                              [build lexc cli and readline @<:@default=no@:>@])],
+                              [build lexc cli and readline @<:@default=yes@:>@])],
               [enable_lexc=$enableval],
-              [enable_lexc=no])
+              [enable_lexc=yes])
 AM_CONDITIONAL([WANT_LEXC], [test "x$enable_lexc" != xno])
 AC_ARG_ENABLE([lexc2fst],
               [AS_HELP_STRING([--enable-lexc2fst],

@@ -56,12 +56,14 @@ print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE1...]]\n"
-             "Compile lexc files into transducer\n"
+             "Compile lexc files into transducer or imitate Xerox lexc\n"
         "\n", program_name );
         print_common_program_options(message_out);
         fprintf(message_out, "Input/Output options:\n"
-               "  -f, --format=FORMAT     compile into FORMAT transducer\n"
-               "  -o, --output=OUTFILE    write result into OUTFILE\n");
+               "  -f, --format=FORMAT       compile into FORMAT transducer\n"
+               "  -o, --output=OUTFILE      write result into OUTFILE\n"
+               "  -X, --xerox, --readline   imitate Xerox lexc user interface\n"
+        );
         fprintf(message_out, "\n");
         fprintf(message_out,
                 "If INFILE or OUTFILE are omitted or -, standard streams will "
@@ -97,6 +99,7 @@ parse_options(int argc, char** argv)
           {"latin1",   optional_argument, 0, 'l'},
           {"utf8",     optional_argument, 0, 'u'},
           {"readline", no_argument,       0, 'X'},
+          {"xerox",    no_argument,       0, 'X'},
           {0,0,0,0}
         };
         int option_index = 0;
@@ -167,8 +170,31 @@ parse_options(int argc, char** argv)
 
     if (lexccount > 1)
       {
-        warning(0, 0, "Current implementation does not support multiple lexicon"
-                " files. Use cat to combine multiple files together");
+        warning(0, 0, "multiple file handling is not supported by all "
+                "backends;\n"
+                "concatenating to temporary file");
+        char* tempfilename = hfst_strdup("hfst-lexcXXXXXX");
+        int temporary_fd = hfst_mkstemp(tempfilename);
+        for (unsigned int i = 0; i < lexccount; i++)
+          {
+            verbose_printf("Copying data from %s to temporary file\n",
+                           lexcfilenames[i]);
+            hfst_fseek(lexcfiles[i], -1, SEEK_END);
+            long file_length = hfst_ftell(lexcfiles[i]);
+            rewind(lexcfiles[i]);
+            char* fdata = static_cast<char*>(malloc(sizeof(char) * 
+                                                    (file_length +1)));
+            hfst_fread(fdata, sizeof(char), file_length,
+                                   lexcfiles[i]);
+            fdata[file_length] = '\0';
+            fclose(lexcfiles[i]);
+            free(lexcfilenames[i]);
+            hfst_write(temporary_fd, fdata, file_length);
+          }
+        hfst_close(temporary_fd);
+        lexccount = 1;
+        lexcfiles[0] = hfst_fopen(tempfilename, "r");
+        lexcfilenames[0] = hfst_strdup(tempfilename);
       }
     return EXIT_CONTINUE;
 }
@@ -228,7 +254,7 @@ int main( int argc, char **argv ) {
     {
         fclose(outfile);
     }
-    if (start_readline) 
+    if (start_readline || (lexcfiles[0] == stdin)) 
       {
         error(EXIT_FAILURE, 0, "Readline interface missing...");
         return EXIT_FAILURE;
