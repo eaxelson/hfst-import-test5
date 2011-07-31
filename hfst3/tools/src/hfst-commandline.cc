@@ -29,6 +29,10 @@
 #include <cstdlib>
 #include <cstring>
 #include <errno.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <fcntl.h>
+
 #if HAVE_LOCALE_H
 #  include <locale.h>
 #endif
@@ -367,6 +371,106 @@ hfst_ftell(FILE* stream)
         error(EXIT_FAILURE, errno, "ftell failed");
         return -1;
     }
+}
+
+size_t
+hfst_fread(void* ptr, size_t size, size_t nmemb, FILE* stream)
+{
+  errno = 0;
+  size_t rv = fread(ptr, size, nmemb, stream);
+  if ((rv < nmemb) && (ferror(stream)))
+    {
+      error(EXIT_FAILURE, errno, "fread failed");
+    }
+  return rv;
+}
+
+size_t
+hfst_fwrite(void* ptr, size_t size, size_t nmemb, FILE* stream)
+{
+  errno = 0;
+  size_t rv = fwrite(ptr, size, nmemb, stream);
+  if ((rv < nmemb) || (ferror(stream)))
+    {
+      error(EXIT_FAILURE, errno, "fwrite failed");
+    }
+  return rv;
+}
+
+FILE*
+hfst_tmpfile()
+{
+  errno = 0;
+  FILE* rv = tmpfile();
+  if (NULL == rv)
+    {
+      error(EXIT_FAILURE, errno, "tmpfile failed");
+    }
+  return rv;
+}
+
+int
+hfst_close(int fd)
+{
+  errno = 0;
+  int rv = close(fd);
+  if (rv == -1)
+    {
+      error(EXIT_FAILURE, errno, "close failed");
+    }
+  return rv;
+}
+
+int
+hfst_open(const char* pathname, int flags)
+{
+  errno = 0;
+  int rv = open(pathname, flags);
+  if (rv == -1)
+    {
+      error(EXIT_FAILURE, errno, "open failed");
+    }
+  return rv;
+}
+
+ssize_t
+hfst_read(int fd, void* buf, size_t count)
+{
+  if (count > SSIZE_MAX)
+    {
+      error(EXIT_FAILURE, 0, "cannot read %zu bytes in one read(2)", count);
+    }
+  errno = 0;
+  ssize_t rv = read(fd, buf, count);
+  if (rv == -1)
+    {
+      error(EXIT_FAILURE, errno, "read failed");
+    }
+  return rv;
+}
+
+ssize_t
+hfst_write(int fd, const void* buf, size_t count)
+{
+  errno = 0;
+  ssize_t rv = write(fd, buf, count);
+  if (rv == -1)
+    {
+      error(EXIT_FAILURE, errno, "write failed");
+    }
+  return rv;
+}
+
+int
+hfst_mkstemp(char* templ)
+{
+  errno = 0;
+  int rv = mkstemp(templ);
+  if (rv == -1)
+    {
+      error(EXIT_FAILURE, errno, "mkstemp failed");
+    }
+  return rv;
 }
 
 // str functions

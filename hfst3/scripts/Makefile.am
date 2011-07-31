@@ -16,7 +16,7 @@
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 if CAN_FOMAWRAP
-bin_SCRIPTS = hfst-foma-wrapper.sh hfst-xfst hfst-lexc
-EXTRA_DIST=hfst-lexc hfst-xfst
-AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=hfst-foma-wrapper.sh hfst-xfst hfst-lexc
+bin_SCRIPTS = hfst-foma-wrapper.sh hfst-xfst
+EXTRA_DIST=hfst-xfst
+AM_INSTALLCHECK_STD_OPTIONS_EXEMPT=hfst-foma-wrapper.sh hfst-xfst
 endif
