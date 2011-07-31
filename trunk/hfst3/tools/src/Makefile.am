@@ -58,6 +58,9 @@ endif
 if WANT_FST2TXT
 MAYBE_FST2TXT=hfst-fst2txt
 endif
+if WANT_GREP
+MAYBE_GREP=hfst-grep
+endif
 if WANT_HEAD
 MAYBE_HEAD=hfst-head
 endif
@@ -154,7 +157,7 @@ bin_PROGRAMS= \
 			 $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) $(MAYBE_DISJUNCT)   \
 			 $(MAYBE_DUPLICATE)											\
 			 $(MAYBE_FORMAT) $(MAYBE_FST2FST) $(MAYBE_FST2STRINGS)      \
-			 $(MAYBE_FST2TXT) $(MAYBE_HEAD) \
+			 $(MAYBE_FST2TXT) $(MAYBE_GREP) $(MAYBE_HEAD) \
 			 $(MAYBE_INVERT)             \
 			 $(MAYBE_LOOKUP) $(MAYBE_MINIMIZE) $(MAYBE_NAME)            \
 			 $(MAYBE_PROJECT) $(MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP)  \
@@ -183,6 +186,7 @@ hfst_format_SOURCES=hfst-format.cc $(HFST_COMMON_SRC)
 hfst_fst2fst_SOURCES=hfst-fst2fst.cc $(HFST_COMMON_SRC)
 hfst_fst2strings_SOURCES=hfst-fst2strings.cc $(HFST_COMMON_SRC)
 hfst_fst2txt_SOURCES=hfst-fst2txt.cc $(HFST_COMMON_SRC)
+hfst_grep_SOURCES=hfst-grep.cc $(HFST_COMMON_SRC)
 hfst_head_SOURCES=hfst-head.cc $(HFST_COMMON_SRC)
 hfst_invert_SOURCES=hfst-invert.cc $(HFST_COMMON_SRC)
 hfst_lexc_SOURCES=hfst-lexc.cc $(HFST_COMMON_SRC)

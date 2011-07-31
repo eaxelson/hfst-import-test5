@@ -187,9 +187,9 @@ AC_ARG_ENABLE([fst2txt],
 AM_CONDITIONAL([WANT_FST2TXT], [test x$enable_fst2txt != xno])
 AC_ARG_ENABLE([grep],
 			  [AS_HELP_STRING([--enable-grep],
-							  [build grep tool @<:@default=no@:>@])],
+							  [build grep tool @<:@default=yes@:>@])],
 			  [enable_grep=$enableval],
-			  [enable_grep=no])
+			  [enable_grep=yes])
 AM_CONDITIONAL([WANT_GREP], [test x$enable_grep != xno])
 AC_ARG_ENABLE([head],
 			  [AS_HELP_STRING([--enable-head],
