@@ -41,11 +41,32 @@
 /* These variables should be used in all command line programs.
  * In some cases they may be nonsensical; just define something then.
  */
+/** 
+ * @brief set @c verbose when program should print before and after every
+ *        non-trivial step it takes.
+ */
 extern bool verbose;
+/** @brief set @c silent when program should not print anything at all. */
 extern bool silent;
+/** @brief set @c debug when program should dump all the intermediate results
+ *         to terminal and/or save them to files in @c CWD.
+ */
 extern bool debug;
+/** @brief set @c message_out to stream that is usable for non-error message
+ *         print-outs.
+ *         This @e should be stdout in all cases, except when transducer 
+ *         binaries are being transmitted through @c stdout. Some programs 
+ *         @e may have option to log these messages to a file instead.
+ */
 extern FILE* message_out;
+/** 
+ *  @brief set @c hfst_tool_version to version specific to the tool.
+ *  @sa hfst_set_program_name
+ */
 extern const char* hfst_tool_version;
+/** 
+ * @brief set @c hfst_tool_wikiname to name of the kitwiki page for this tool.
+ */
 extern const char* hfst_tool_wikiname;
 
 /* hfst tools generic helper print functions */
@@ -59,30 +80,36 @@ void debug_printf(const char* format, ...);
 /** print message @c s with parameters @c __VA_ARGS__ if debug is @a true. */
 void verbose_printf(const char* format, ...);
 
-/** @brief set program's name and other infos for reusable messages defined
+/** 
+ * @brief set program's name and other infos for reusable messages defined
  * below. This function must be called in beginning of main as the values are
  * used in all error messages as well.
  */
 void hfst_set_program_name(const char* argv0, const char* version,
                            const char* wikipage);
 
-/** @brief program's name is made available through a global. 
- * This name can be used when printing program error messages.
+
+/** 
+ * @brief set @c program_name to program's executable name for error messages.
  */
 extern const char* program_name;
 
-/** @brief print standard formatted error message and exit if needed
- */
 #ifndef HAVE_ERROR
+/** @brief print standard formatted error message and exit if needed */
 void error(int status, int error, const char* format, ...);
 #endif
-/** @brief print standard formatted warning message and exit if needed
- */
 #ifndef HAVE_WARNING
+/** @brief print standard formatted warning message and exit if needed */
 void warning(int status, int error, const char* format , ...);
 #endif
 
 #ifndef HAVE_ERROR_AT_LINE
+/** 
+ * @brief print standard formatted error message when parsing a file and exit
+ *        if needed. 
+ *        The use of this function is especially important since error
+ *        highlighting of vim and emacs depends on this error format.
+ */
 void error_at_line(int status, int errnum, const char* filename, unsigned int linenum, const char* fmt, ...);
 #endif
 
@@ -137,6 +164,12 @@ void print_report_bugs();
 int parse_options(int argc, char** argv);
 
 /**
+ * @brief extend the options in argv by parsing standard hfst environment
+ *        variables.
+ */
+void extend_options_getenv(int* argc, char*** argv);
+
+/**
  * @brief parse weight from string, or print error message and return zero
  * weight on failure.
  */
@@ -173,6 +206,8 @@ void* hfst_malloc(size_t size);
 /** @brief allocate memory to zero and exit cleanly on error */
 void* hfst_calloc(size_t nmemb, size_t size);
 
+/** @brief reallocate memory and exit cleanly on error */
+void* hfst_realloc(void* ptr, size_t size);
 
 /**
  * @brief open file, or print informative error message and exit on failure.
