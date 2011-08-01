@@ -169,7 +169,7 @@ print_usage()
             "  -T, --initial-tab         make tabs line up (if needed)\n"
             "  -Z, --null                print 0 byte after FILE name\n"
             "\n");
-    fprintf(stderr, "Context control:\n"
+    fprintf(message_out, "Context control:\n"
             "  -B, --before-context=NUM  print NUM lines of leading context\n"
             "  -A, --after-context=NUM   print NUM lines of trailing context\n"
             "  -C, --context=NUM         print NUM lines of output context\n"
