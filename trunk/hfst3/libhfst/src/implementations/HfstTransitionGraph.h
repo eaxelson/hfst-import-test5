@@ -78,7 +78,7 @@ namespace hfst {
        it != fsm.end(); it++)
     {
       // Go through the set of transitions in each state
-      for (HfstBasicTransducer::HfstTransitionSet::iterator tr_it = 
+      for (HfstBasicTransducer::HfstTransitions::iterator tr_it = 
              it->second.begin();
            tr_it != it->second.end(); tr_it++)
         {
@@ -484,7 +484,7 @@ namespace hfst {
 	// --------------------------------------------------
 
       protected:
-        /* TODO: Change state numbers s1 to s2 and vice versa. */
+        /* Change state numbers s1 to s2 and vice versa. */
         void swap_state_numbers(HfstState s1, HfstState s2) {
 
 	  HfstTransitions s1_copy = state_vector[s1];
@@ -1334,7 +1334,7 @@ namespace hfst {
             HfstSymbolPair marker_pair(marker, marker);
             insert_freely(marker_pair, 0);
             substitute(marker_pair, graph);
-            //alphabet.erase(marker); TODO: fix
+            alphabet.erase(marker); // TODO: fix
 
             return *this;
           }

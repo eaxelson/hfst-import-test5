@@ -12,3 +12,12 @@ for i in "" .sfst .ofst .foma; do
         rm test.strings;
     fi
 done
+
+for i in "" .sfst .ofst; do
+    if test -f empty.hfst$i ; then
+	if ! ../../tools/src/hfst-fst2strings -r 20 empty.hfst$i > /dev/null ; then
+	    echo "searching for random paths in an empty transducer failed"
+	    exit 1
+	fi
+    fi
+ done

@@ -51,7 +51,7 @@ namespace hfst {
       const_iterator end() const;
       size_t size() const;
       
-      //bool contains_special_symbols(StringPair sp);  TODO!
+      //bool contains_special_symbols(StringPair sp);
 
       void print();
       void print_pairs(FILE *file);

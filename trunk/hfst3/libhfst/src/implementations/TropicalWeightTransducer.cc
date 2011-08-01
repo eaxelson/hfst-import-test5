@@ -2409,6 +2409,11 @@ namespace hfst { namespace implementations
     HfstTwoLevelPath path;    
     StateId current_state = t->Start();
 
+    /* If the transducer is empty, return. */
+    if (current_state < 0) {
+      return path;
+    }
+
     /* If we cannot proceed, all elements in \a path whose index is smaller
        that \a last_index constitute the longest path that is recognized by
        transducer \a t so far. */
