@@ -164,9 +164,9 @@ AnalysisApplicator::apply()
         }
         else
         {
-          size_t word_length = token_stream.first_nonalphabetic(surface_form);
-          if(word_length == string::npos)
-            word_length = surface_form.size();
+          //size_t word_length = token_stream.first_nonalphabetic(surface_form);
+          //if(word_length == string::npos)
+          size_t word_length = surface_form.size();
           
           int revert_count = surface_form.size()-word_length+
                          next_token_is_part_of_word ? 0 : 1;
