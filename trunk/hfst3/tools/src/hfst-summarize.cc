@@ -326,52 +326,77 @@ process_stream(HfstInputStream& instream)
               "string: ???\n"
               "minimised: ???\n",
               acceptor? "yes": "no");
-      // our extensions for nice statistics maybe
-      fprintf(outfile,
-              "number of arcs in sparsest state: %zu\n"
-              "number of arcs in densest state: %zu\n"
-              "average arcs per state: %f\n"
-              "average input epsilons per state: %f\n"
-              "most ambiguous input: %s %u\n"
-              "most ambiguous output: %s %u\n"
-              "average input ambiguity: %f\n"
-              "average output ambiguity: %f\n",
-              sparsest_arcs, densest_arcs,
-              average_arcs_per_state,
-              average_input_epsilons,
-              most_ambiguous_input.first.c_str(), most_ambiguous_input.second,
-              most_ambiguous_output.first.c_str(), most_ambiguous_output.second,
-              average_input_ambiguity, average_output_ambiguity);
-      // alphabets
-      fprintf(outfile,
-              "sigma set:\n");
-      bool first = true;
-      for (StringSet::const_iterator s = transducerAlphabet.begin();
-           s != transducerAlphabet.end();
-           ++s)
+      if (verbose)
         {
-          if (!first) 
+          // our extensions for nice statistics maybe
+          fprintf(outfile,
+                  "number of arcs in sparsest state: %zu\n"
+                  "number of arcs in densest state: %zu\n"
+                  "average arcs per state: %f\n"
+                  "average input epsilons per state: %f\n"
+                  "most ambiguous input: %s %u\n"
+                  "most ambiguous output: %s %u\n"
+                  "average input ambiguity: %f\n"
+                  "average output ambiguity: %f\n",
+                  sparsest_arcs, densest_arcs,
+                  average_arcs_per_state,
+                  average_input_epsilons,
+                  most_ambiguous_input.first.c_str(), most_ambiguous_input.second,
+                  most_ambiguous_output.first.c_str(), most_ambiguous_output.second,
+                  average_input_ambiguity, average_output_ambiguity);
+          // alphabets
+          fprintf(outfile,
+                  "sigma set:\n");
+          bool first = true;
+          for (StringSet::const_iterator s = transducerAlphabet.begin();
+               s != transducerAlphabet.end();
+               ++s)
             {
-              fprintf(outfile, ", ");
+              if (!first) 
+                {
+                  fprintf(outfile, ", ");
+                }
+              fprintf(outfile, "%s", s->c_str());
+              first = false;
             }
-          fprintf(outfile, "%s", s->c_str());
-          first = false;
-        }
-      fprintf(outfile, "\n");
-      fprintf(outfile, "arc symbols actually seen in transducer:\n");
-      first = true;
-      for (StringSet::const_iterator s = foundAlphabet.begin();
-           s != foundAlphabet.end();
-           ++s)
-        {
-          if (!first) 
+          fprintf(outfile, "\n");
+          fprintf(outfile, "arc symbols actually seen in transducer:\n");
+          first = true;
+          for (StringSet::const_iterator s = foundAlphabet.begin();
+               s != foundAlphabet.end();
+               ++s)
             {
-              fprintf(outfile, ", ");
+              if (!first) 
+                {
+                  fprintf(outfile, ", ");
+                }
+              fprintf(outfile, "%s", s->c_str());
+              first = false;
             }
-          fprintf(outfile, "%s", s->c_str());
-          first = false;
+          fprintf(outfile, "\n");
+          StringSet transducerMinusSet;
+          std::set_difference(transducerAlphabet.begin(), 
+                              transducerAlphabet.end(),
+                              foundAlphabet.begin(), 
+                              foundAlphabet.end(),
+                              std::inserter(transducerMinusSet, 
+                                            transducerMinusSet.end()));
+          fprintf(outfile, "sigma symbols missing from transducer:\n");
+          first = true;
+          for (StringSet::const_iterator s = transducerMinusSet.begin();
+               s != transducerMinusSet.end();
+               ++s)
+            {
+              if (!first) 
+                {
+                  fprintf(outfile, ", ");
+                }
+              fprintf(outfile, "%s", s->c_str());
+              first = false;
+            }
+          fprintf(outfile, "\n");
+
         }
-      fprintf(outfile, "\n");
     }
   return EXIT_SUCCESS;
 }
