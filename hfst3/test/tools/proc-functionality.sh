@@ -71,4 +71,13 @@ fi
 if ! diff test.strings $srcdir/proc-caps-out5.strings ; then
     exit 1
 fi
+
+if ! ../../tools/src/hfst-proc/hfst-proc compounds.hfst.ol < $srcdir/proc-compounds.strings > test.strings ; then
+    echo compound fail:
+    cat test.strings
+    exit 1
+fi
+if ! diff test.strings $srcdir/proc-compounds-out.strings ; then
+    exit 1
+fi
 rm test.strings
