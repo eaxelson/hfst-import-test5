@@ -73,30 +73,33 @@ namespace hfst {
        and transitions when printing it in AT&T format to stderr:
 
 \verbatim
+  // The first state is always number zero.
+  unsigned int source_state=0;
+
   // Go through all states
-  for (HfstBasicTransducer::iterator it = fsm.begin();
-       it != fsm.end(); it++)
-    {
-      // Go through the set of transitions in each state
-      for (HfstBasicTransducer::HfstTransitions::iterator tr_it = 
-             it->second.begin();
-           tr_it != it->second.end(); tr_it++)
-        {
-          fprintf(stderr, "%i\t%i\t%s\t%s\t%f\n",
-                  it->first,
-                  tr_it->get_target_state(),
-                  tr_it->get_input_symbol().c_str(),
-                  tr_it->get_output_symbol().c_str(),
-                  tr_it->get_weight()
-                  );
-        }
-      if (fsm.is_final_state(it->first))
-        {
-          fprintf(stderr, "%i\t%f\n",
-                  it->first,
-                  fsm.get_final_weight(it->first));
-        }
-    }
+    for (HfstBasicTransducer::const_iterator it = t.begin();
+	 it != t.end(); it++ )
+      {
+        // Go through all transitions
+	for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
+	       = it->begin(); tr_it != it->end(); tr_it++)
+	  {
+	    std::cerr << source_state << "\t"
+		      << tr_it->get_target_state() << "\t"
+		      << tr_it->get_input_symbol() << "\t"
+		      << tr_it->get_output_symbol() << "\t"
+		      << tr_it->get_weight() << std::endl;
+	  }
+
+	if (t.is_final_state(source_state)) 
+	  {
+	    std::cerr << source_state << "\t"
+		      << t.get_final_weight(source_state) << std::endl;
+	  }
+	
+	// the next state is numbered source_state + 1  
+	source_state++;
+      }
 \endverbatim
 
        @see #HfstBasicTransducer HfstBasicTransition */

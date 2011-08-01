@@ -144,6 +144,36 @@ int main(int argc, char **argv)
     
     // Tr1 is now [ [ ?:foo | bar:foo ]  |  [[ ?:? | foo:foo ] [ bar:bar ]] ]
   }
+
+
+  verbose_print("HfstBasicTransducer: iterating through");
+
+  { 
+    unsigned int source_state=0;
+
+    for (HfstBasicTransducer::const_iterator it = t.begin();
+	 it != t.end(); it++ )
+      {
+	for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
+	       = it->begin(); tr_it != it->end(); tr_it++)
+	  {
+	    std::cerr << source_state << "\t"
+		      << tr_it->get_target_state() << "\t"
+		      << tr_it->get_input_symbol() << "\t"
+		      << tr_it->get_output_symbol() << "\t"
+		      << tr_it->get_weight() << std::endl;
+	  }
+
+	if (t.is_final_state(source_state)) 
+	  {
+	    std::cerr << source_state << "\t"
+		      << t.get_final_weight(source_state) << std::endl;
+	  }
+	
+	source_state++;
+      }
+  }
+
   
 }
 
