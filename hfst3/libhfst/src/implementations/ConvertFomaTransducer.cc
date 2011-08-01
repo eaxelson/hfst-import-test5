@@ -203,11 +203,15 @@ namespace hfst { namespace implementations
              tr_it != it->end(); tr_it++)
           {
             // Copy the transition
+            char* input = strdup(tr_it->get_input_symbol().c_str());
+            char* output = strdup(tr_it->get_output_symbol().c_str());
             fsm_construct_add_arc(h, 
                                   (int)source_state, 
                                   (int)tr_it->get_target_state(),
-                                  strdup(tr_it->get_input_symbol().c_str()),
-                                  strdup(tr_it->get_output_symbol().c_str()) );
+                                  input,
+                                  output );
+            free(input);
+            free(output);
           }
 	source_state++;
       }
@@ -231,6 +235,7 @@ namespace hfst { namespace implementations
         if ( fsm_construct_check_symbol(h,symbol) == -1 ) {
           fsm_construct_add_symbol(h,symbol);
         }
+        free(symbol);
       }
     
     fsm_construct_set_initial(h, 0);
