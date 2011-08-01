@@ -59,7 +59,6 @@ print_usage()
 	print_common_program_options(message_out);
 	print_common_unary_program_options(message_out);
 	fprintf(message_out, "Text format options:\n"
-		/* "  -n, --number                 If numbers are used instead of symbol names (TODO)\n" */
 		"  -w, --print-weights          If weights are printed in all cases\n"
 		"  -D, --do-not-print-weights   If weights are not printed in any case\n");
 	fprintf(message_out, "\n");

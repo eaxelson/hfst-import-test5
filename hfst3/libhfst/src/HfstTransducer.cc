@@ -3649,7 +3649,8 @@ int main(int argc, char * argv[])
 		StringSet alpha = t.get_alphabet();
 		assert(alpha.find("b") != alpha.end());
 		assert(alpha.find("c") != alpha.end());
-		//assert(alpha.find("a") != alpha.end()); // FIXME: which is correct?
+		// TODO: which is correct?
+		//assert(alpha.find("a") != alpha.end()); 
 
 		HfstTransducer t1("a", "b", types[i]);
 		HfstTransducer t2("a", "c", types[i]);

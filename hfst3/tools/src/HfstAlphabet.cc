@@ -46,7 +46,7 @@ namespace hfst {
     HfstAlphabet::const_iterator HfstAlphabet::end() const { return pairs.end(); };
     size_t HfstAlphabet::size() const { return pairs.size(); };
     
-    //bool HfstAlphabet::contains_special_symbols(StringPair sp);  TODO!
+    //bool HfstAlphabet::contains_special_symbols(StringPair sp);
 
     void HfstAlphabet::print_pairs(FILE *file) {
       for (NumberPairSet::const_iterator it = pairs.begin(); it != pairs.end(); it++)
@@ -60,7 +60,8 @@ namespace hfst {
       printf("..alphabet\n");
     }
     
-    void HfstAlphabet::insert(NumberPair sp) { /* check special symbols */ pairs.insert(sp); };  // TODO!
+    void HfstAlphabet::insert(NumberPair sp) { 
+      /* check special symbols */ pairs.insert(sp); };
     void HfstAlphabet::clear_pairs() { pairs.clear(); };
     HfstAlphabet::CharMap HfstAlphabet::get_char_map() { return cm; };
 
@@ -275,7 +276,6 @@ main(int argc, char** argv)
   std::cout << std::endl << "destructor: ";
     delete new HfstAlphabet();
     delete new HfstAlphabet(defaultAlpha);
-    // FIXME: alpha 
     std::cout << std::endl << "rest skipped...";
     std::cout << "ok" << std::endl;
     return EXIT_SUCCESS;
