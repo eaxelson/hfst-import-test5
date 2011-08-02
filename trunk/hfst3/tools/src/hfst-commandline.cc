@@ -39,6 +39,12 @@
 #if HAVE_LANGINFO_H
 #  include <langinfo.h>
 #endif
+#if HAVE_READLINE_READLINE_H
+#  include <readline/readline.h>
+#endif
+#if HAVE_READLINE_HISTORY_H
+#  include <readline/history.h>
+#endif
 
 #include "hfst-commandline.h"
 #include "HfstOutputStream.h"
@@ -618,6 +624,27 @@ hfst_getline(char** lineptr, size_t* n, FILE* stream)
       error(EXIT_FAILURE, errno, "getline failed");
     }
   return rv;
+}
+
+#ifndef HAVE_READLINE
+char*
+readline(const char* prompt)
+{
+  fprintf(message_out, "%s", prompt);
+  char* line = 0;
+  size_t len = 0;
+  if (hfst_getline(&line, &len, stdin) == -1)
+    {
+      return 0;
+    }
+  return line;
+}
+#endif
+
+char*
+hfst_readline(const char* prompt)
+{
+  return readline(prompt);
 }
 
 char*

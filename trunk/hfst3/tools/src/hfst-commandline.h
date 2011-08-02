@@ -263,7 +263,7 @@ ssize_t hfst_write(int fd, const void* buf, size_t count);
  */
 int hfst_mkstemp(char* templ);
 
-#ifdef HAVE_GETDELIM
+#ifndef HAVE_GETDELIM
 ssize_t getdelim(char** lineptr, size_t* n, int delim, FILE* stream);
 #endif
 #ifndef HAVE_GETLINE
@@ -281,6 +281,16 @@ ssize_t hfst_getdelim(char** lineptr, size_t* n, int delim, FILE* stream);
  * messae and exit on failure.
  */
 ssize_t hfst_getline(char** lineptr, size_t* n, FILE* stream);
+
+#ifndef HAVE_READLINE
+char* readline(const char* prompt);
+#endif
+
+/**
+ * @brief read one line of interactive input or print informative error
+ *        message adn exit on failure.
+ */
+char* hfst_readline(const char* prompt);
 
 /**
  * @brief set locale according to environment if UTF-8-capable or

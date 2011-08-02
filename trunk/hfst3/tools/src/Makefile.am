@@ -124,6 +124,9 @@ endif
 if WANT_TAIL
 MAYBE_TAIL=hfst-tail
 endif
+if WANT_TRAVERSE
+MAYBE_TRAVERSE=hfst-traverse
+endif
 if WANT_TXT2FST
 MAYBE_TXT2FST=hfst-txt2fst
 endif
@@ -152,6 +155,12 @@ noinst_HEADERS= \
 # parsers/XreCompiler.h parsers/xre_utils.h
 
 # sort alphabetically
+# sort alphabetically
+# sort alphabetically
+# sort alphabetically
+# sort in abc order
+# finish with xyz
+# see <http://en.wikipedia.org/wiki/Alphabets#Alphabetic_order> for details
 bin_PROGRAMS= \
 			 $(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_CONCATENATE)     \
 			 $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) $(MAYBE_DISJUNCT)   \
@@ -168,7 +177,8 @@ bin_PROGRAMS= \
 			 $(MAYBE_TXT2FST) $(MAYBE_CALCULATE) $(MAYBE_SUBSTITUTE)    \
 			 $(MAYBE_FLAG_DIACRITICS) $(MAYBE_LEXC2FST) $(MAYBE_LEXC)   \
 			 $(MAYBE_XFST_COMPILER) $(MAYBE_FORMAT)                     \
-			 $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME) $(MAYBE_PAIR_TEST)
+			 $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME) $(MAYBE_PAIR_TEST)\
+			 $(MAYBE_TRAVERSE)
 
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc
 # sort alphabetically
@@ -221,6 +231,7 @@ hfst_substitute_SOURCES=hfst-substitute.cc $(HFST_COMMON_SRC)
 hfst_subtract_SOURCES=hfst-subtract.cc $(HFST_COMMON_SRC)
 hfst_summarize_SOURCES=hfst-summarize.cc $(HFST_COMMON_SRC)
 hfst_tail_SOURCES=hfst-tail.cc $(HFST_COMMON_SRC)
+hfst_traverse_SOURCES=hfst-traverse.cc $(HFST_COMMON_SRC)
 hfst_txt2fst_SOURCES=hfst-txt2fst.cc $(HFST_COMMON_SRC)
 hfst_xfst2fst_SOURCES=hfst-xfst-compiler.cc $(HFST_COMMON_SRC) \
 					  parsers/XfstCompiler.cc parsers/xfst-parser.yy \
