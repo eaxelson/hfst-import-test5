@@ -688,11 +688,8 @@ namespace hfst { namespace implementations {
   
   void FomaTransducer::extract_paths
   (fsm * t, ExtractStringsCb& callback,
-   int cycles, FdTable<int>* fd, bool filter_fd 
-   /*bool include_spv*/)  
+   int cycles, FdTable<int>* fd, bool filter_fd)  
   {
-    //std::vector<char> lbuffer(BUFFER_START_SIZE, 0);
-    //std::vector<char> ubuffer(BUFFER_START_SIZE, 0);
     std::map<int, unsigned short> all_visitations;
     std::map<int, unsigned short> path_visitations;
     std::vector<hfst::FdState<int> >* fd_state_stack 
@@ -705,8 +702,8 @@ namespace hfst { namespace implementations {
       if (((t->states)+i)->start_state == 1)
         res = hfst::implementations::extract_paths
           (t, ((t->states)+i)->state_no, all_visitations, path_visitations,
-           /*lbuffer, 0, ubuffer, 0,*/ callback, cycles, fd_state_stack, 
-           filter_fd, /*include_spv,*/ spv);
+           callback, cycles, fd_state_stack, 
+           filter_fd, spv);
     }
   }
 

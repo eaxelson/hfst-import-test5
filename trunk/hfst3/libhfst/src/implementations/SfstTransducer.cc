@@ -869,15 +869,18 @@ namespace hfst { namespace implementations {
     NodeNumbering num(*t);
 
     /* Whether a state has been visited. */
-    int visited[ num.number_of_nodes() ];
+    std::vector<int> visited;
+    visited.reserve(num.number_of_nodes());
+
     /* Whether the state is marked as broken, i.e. we cannot proceed from
        that state. These arrays are used for giving more probability for 
        shorter paths if \a t is cyclic. */
-    int broken[ num.number_of_nodes() ];
-    
+    std::vector<int> broken;
+    broken.reserve(num.number_of_nodes());
+
     for ( unsigned int i = 0; i < num.number_of_nodes(); ++i ) {
-      visited[i] = 0;
-      broken[i] = 0;
+      visited.push_back(0);
+      visited.push_back(0);
     }
 
     while (1) {
