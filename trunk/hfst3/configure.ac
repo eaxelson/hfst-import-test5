@@ -21,7 +21,7 @@ AC_PREREQ([2.62])
 # init
 AC_INIT([hfst], [3.2.0], [hfst-bugs@helsinki.fi], [hfst], [http://hfst.sf.net])
 AC_CONFIG_AUX_DIR([build-aux])
-AM_INIT_AUTOMAKE([-Wall -Werror std-options foreign check-news color-tests silent-rules 1.11])
+AM_INIT_AUTOMAKE([1.11 -Wall -Werror std-options foreign check-news color-tests silent-rules])
 AM_SILENT_RULES([yes])
 AC_REVISION([$Revision: 1.9 $])
 AC_CONFIG_MACRO_DIR([m4])
