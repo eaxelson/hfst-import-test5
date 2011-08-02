@@ -502,11 +502,15 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                       warning(0, 0, "substitution is not supported for this transducer type"
                               " falling back to internal formats and trying...");
                       fallback = new HfstBasicTransducer(trans);
+                      warnedAlready = true;
                     }
                   do_substitute(*fallback, transducer_n);
                   fellback = true;
                 }
+              free(from_label);
+              free(to_label);
             }
+          free(line);
         }
       else
         {
@@ -541,6 +545,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                         inputname, from_file_name) > 0)
               {
                 trans.set_name(composed_name);
+                free(composed_name);
               }
         }
       else if (from_label && to_label)
@@ -555,6 +560,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                         inputname, from_label, to_label) > 0)
               {
                 trans.set_name(composed_name);
+                free(composed_name);
               }
 
         }
@@ -570,6 +576,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                         inputname, from_label, to_transducer_filename) > 0)
               {
                 trans.set_name(composed_name);
+                free(composed_name);
               }
 
 
@@ -578,6 +585,8 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
       fallback->prune_alphabet();
       trans = HfstTransducer(*fallback, trans.get_type());
       outstream << trans;
+      delete fallback;
+      free(inputname);
     }
   delete to_transducer;
   return EXIT_SUCCESS;

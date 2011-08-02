@@ -99,6 +99,12 @@ AC_ARG_WITH([unicode_handler],
                             [select library to use for unicode handling @<:@default=glib@:>@])],
             [with_unicode_handler=$withval],
             [with_unicode_handler=glib])
+# make readline optional since mac os x has sucky implementation of readline
+AC_ARG_WITH([readline],
+            [AS_HELP_STRING([--with-readline],
+                            [use readline for interactive programs @<:@default=yes@:>@])],
+            [with_readline=$withval],
+            [with_readline=yes])
 
 # allow programs to be built separately (sort alphabetically)
 AC_ARG_ENABLE([calculate],
@@ -329,6 +335,12 @@ AC_ARG_ENABLE([tail],
 			  [enable_tail=$enableval],
 			  [enable_tail=yes])
 AM_CONDITIONAL([WANT_TAIL], [test x$enable_tail != xno])
+AC_ARG_ENABLE([traverse],
+			  [AS_HELP_STRING([--enable-traverse],
+							  [build traversal tool @<:@default=yes@:>@])],
+			  [enable_traverse=$enableval],
+			  [enable_traverse=yes])
+AM_CONDITIONAL([WANT_TRAVERSE], [test x$enable_test != xno])
 AC_ARG_ENABLE([test],
 			  [AS_HELP_STRING([--enable-test],
 							  [build test tool @<:@default=yes@:>@])],
@@ -414,6 +426,11 @@ AS_IF([test "x$with_unicode_handler" = "xglib"],
 AS_IF([test "x$with_unicode_handler" = "xicu"],
       [PKG_CHECK_MODULES([ICU], [icu-uc >= 4.6])
        AC_DEFINE([USE_ICU_UNICODE], 1, [if using ICU for unicode string handling])])
+AS_IF([test "x$with_readline" = "xyes"],
+      [AC_SEARCH_LIBS([readline], [readline editline], 
+                      [AC_DEFINE([HAVE_READLINE], 1, [if readline can be used])], 
+                      [AC_MSG_FAILURE([readline test failed (--without-readline to disable)])])])
+
 
 ### Add here your library ###
 #AS_IF([test "x$with_my_transducer_library" != "xno"],
@@ -436,7 +453,9 @@ AC_LANG_PUSH([C])
 AS_IF([test "x$with_foma" != "xno"],
       [AC_CHECK_HEADERS([fomalib.h])])
 AC_LANG_POP
-
+AC_LANG_PUSH([C])
+AS_IF([test "x$with_readline" = "xyes"],
+      [AC_CHECK_HEADERS([readline/readline.h readline/history.h])])
 
 ### Add here your library ###
 #AS_IF([test "x$with_my_transducer_library" != "xno"],
