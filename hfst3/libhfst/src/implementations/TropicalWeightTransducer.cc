@@ -2388,8 +2388,6 @@ namespace hfst { namespace implementations
     if (t->Start() == -1)
       return;
     
-    //vector<char> lbuffer(BUFFER_START_SIZE, 0);
-    //vector<char> ubuffer(BUFFER_START_SIZE, 0);
     map<StateId, unsigned short> all_visitations;
     map<StateId, unsigned short> path_visitations;
     std::vector<hfst::FdState<int64> >* fd_state_stack 
@@ -2399,8 +2397,8 @@ namespace hfst { namespace implementations
     StringPairVector spv;
     hfst::implementations::extract_paths
       (t,t->Start(),all_visitations,path_visitations,
-       /*lbuffer,0,ubuffer,0,*/0.0f,callback,cycles,fd_state_stack,filter_fd, 
-       /*include_spv,*/ spv);
+       0.0f,callback,cycles,fd_state_stack,filter_fd, 
+       spv);
   }
 
   /* Get a random path from transducer \a t. */
@@ -2419,16 +2417,21 @@ namespace hfst { namespace implementations
        transducer \a t so far. */
     int last_index=0;
 
+    unsigned int num_states = t->NumStates();
+
     /* Whether a state has been visited. */
-    int visited[ t->NumStates() ];
+    std::vector<int> visited;
+    visited.reserve(num_states);
+
     /* Whether the state is marked as broken, i.e. we cannot proceed from
        that state. These arrays are used for giving more probability for 
        shorter paths if \a t is cyclic. */
-    int broken[ t->NumStates() ];
-    
-    for ( unsigned int i = 0; i < t->NumStates(); ++i ) {
-      visited[i] = 0;
-      broken[i] = 0;
+    std::vector<int> broken;
+    broken.reserve(num_states);
+
+    for (unsigned int i=0; i < num_states; i++ ) {
+      visited.push_back(0);
+      broken.push_back(0);
     }
 
     while (1) {
@@ -2490,6 +2493,10 @@ namespace hfst { namespace implementations
 	break;
       }     
     }
+
+    //free(visited);
+    //free(broken);
+
     return path;
   };
       

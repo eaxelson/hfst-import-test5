@@ -77,8 +77,8 @@ namespace hfst {
   unsigned int source_state=0;
 
   // Go through all states
-    for (HfstBasicTransducer::const_iterator it = t.begin();
-	 it != t.end(); it++ )
+    for (HfstBasicTransducer::const_iterator it = fsm.begin();
+	 it != fsm.end(); it++ )
       {
         // Go through all transitions
 	for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
@@ -91,10 +91,10 @@ namespace hfst {
 		      << tr_it->get_weight() << std::endl;
 	  }
 
-	if (t.is_final_state(source_state)) 
+	if (fsm.is_final_state(source_state)) 
 	  {
 	    std::cerr << source_state << "\t"
-		      << t.get_final_weight(source_state) << std::endl;
+		      << fsm.get_final_weight(source_state) << std::endl;
 	  }
 	
 	// the next state is numbered source_state + 1  
@@ -121,6 +121,8 @@ namespace hfst {
 	typedef std::set<HfstSymbolPair> HfstSymbolPairSet;
 	/** @brief A vector of symbol pairs. */
 	typedef std::vector<HfstSymbolPair> HfstSymbolPairVector;
+	/** @brief Datatype for the alphabet of a graph. */
+        typedef std::set<HfstSymbol> HfstTransitionGraphAlphabet;
 
       protected:
 	/* Datatype for the states of a graph and their transitions.
@@ -135,8 +137,6 @@ namespace hfst {
 	/* The final states and their weights in the graph. */
         FinalWeightMap final_weight_map;
 
-	/* Datatype for the alphabet of a graph. */
-        typedef std::set<HfstSymbol> HfstTransitionGraphAlphabet;
 	/* The alphabet of the graph. */
         HfstTransitionGraphAlphabet alphabet;
 
