@@ -15,19 +15,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-# autoconf requirements
-AC_PREREQ([2.62])
-
-# init
-AC_INIT([hfst], [3.2.0], [hfst-bugs@helsinki.fi], [hfst], [http://hfst.sf.net])
-AC_CONFIG_AUX_DIR([build-aux])
-AM_INIT_AUTOMAKE([1.11 -Wall -Werror std-options foreign check-news color-tests silent-rules])
-AM_SILENT_RULES([yes])
-AC_REVISION([$Revision: 1.9 $])
-AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_SRCDIR([libhfst/src/HfstTransducer.h])
-AC_CONFIG_HEADERS([config.h])
-
 # Information on package
 HFST_NAME=hfst
 HFST_MAJOR=3
@@ -40,6 +27,26 @@ LIBHFST_MAJOR=3
 LIBHFST_MINOR=2
 LIBHFST_EXTENSION=0
 LIBHFST_VERSION=$LIBHFST_MAJOR.$LIBHFST_MINOR.$LIBHFST_EXTENSION
+
+# autoconf >= 2.62 required for ASSERT, REALLOC
+AC_PREREQ([2.62])
+
+# init must be at the start
+AC_INIT([hfst], [3.2.0], [hfst-bugs@helsinki.fi], [hfst], [http://hfst.sf.net])
+AC_CONFIG_AUX_DIR([build-aux])
+
+# automake >= 1.11 required for color-tests, silent-rules
+AM_INIT_AUTOMAKE([1.11 -Wall -Werror std-options foreign check-news color-tests silent-rules])
+AM_SILENT_RULES([yes])
+
+# libtool 2 required since some distros totally hose their libtoolses
+LT_PREREQ([2.2.6])
+
+AC_REVISION([$Revision: 1.9 $])
+AC_CONFIG_MACRO_DIR([m4])
+AC_CONFIG_SRCDIR([libhfst/src/HfstTransducer.h])
+AC_CONFIG_HEADERS([config.h])
+
 AC_SUBST(LIBHFST_MAJOR)
 AC_SUBST(LIBHFST_MINOR)
 AC_SUBST(LIBHFST_EXTENSION)
@@ -371,7 +378,7 @@ AM_CONDITIONAL([WANT_STRESSTESTS], [test x$enable_stress_tests != xno])
 # Checks for programs
 AC_PROG_CC
 AC_PROG_CXX
-m4_ifdef([LT_INIT], [LT_INIT], [AC_PROG_LIBTOOL])
+LT_INIT
 AC_PROG_AWK
 AC_PROG_CPP
 AC_PROG_YACC
