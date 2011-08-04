@@ -28,3 +28,6 @@ if CAN_DOXYGEN
 doxygen:
 	doxygen Doxyfile
 endif
+valgrind:
+	$(MAKE) -C libhfst/src/ valgrind
+	$(MAKE) -C test/tools/ valgrind

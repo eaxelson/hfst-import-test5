@@ -5,7 +5,11 @@ if ! test -d valgrind-logs ; then
     mkdir valgrind-logs/
 fi
 if test -z "$srcdir" ; then
-    srcdir=./
+    if test $# -eq 1 ; then
+        srcdir="$1"
+    else
+        srcdir="./"
+    fi
 fi
 p=calculate
 for i in "" .sfst .ofst .foma; do
