@@ -108,3 +108,6 @@ HarmonizeUnknownAndIdentitySymbols_CXXFLAGS=-DMAIN_TEST
 HarmonizeUnknownAndIdentitySymbols_LDADD=libhfst.la
 
 TESTS=$(LIBHFST_TSTS)
+
+valgrind: valgrind-unit-tests.sh $(LIBHFST_TSTS)
+	$(SH) $(srcdir)/valgrind-unit-tests.sh $^
