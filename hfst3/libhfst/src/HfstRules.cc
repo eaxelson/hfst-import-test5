@@ -453,9 +453,6 @@ namespace hfst
 
       if (DEBUG) right_rev.write_in_att_format("FOO",true);
 
-      // Bug?: in foma, if context.second is an epsilon-transducer
-      // reverting it yields an empty transducer.
-
       if (DEBUG) printf("(2)\n");
       right_rev.minimize();
 
@@ -1564,8 +1561,8 @@ int main(int argc, char * argv[])
     std::cout << "Unit tests for " __FILE__ ":" << std::endl;
     
 
-    ImplementationType types[] = {SFST_TYPE, TROPICAL_OPENFST_TYPE};
-    unsigned int NUMBER_OF_TYPES=2;
+    ImplementationType types[] = {SFST_TYPE, TROPICAL_OPENFST_TYPE, FOMA_TYPE};
+    unsigned int NUMBER_OF_TYPES=3;
     //TODO: add FOMA_TYPE
 
 
