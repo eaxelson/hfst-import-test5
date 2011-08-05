@@ -93,15 +93,11 @@ int main(int argc, char **argv) {
 		     rule_transducers2,
 		     rule_transducers3);
 
-
-  // replace_down
-  // FIXME: temporarily omitted since the replace_down function copied
-  // from SFST has a bug..
-
-  /*
+  // replace_down_karttunen
   {
     for (int i=0; i<3; i++) {
       HfstTokenizer TOK;
+      TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
       HfstTransducer mapping("ab", "x", TOK, types[i]);
       HfstTransducer left_context("ab", "ab", TOK, types[i]);
       HfstTransducer right_context("a", types[i]);
@@ -113,18 +109,20 @@ int main(int argc, char **argv) {
       bool optional = false;
       
       HfstTransducer replace_down_transducer
-	= rules::replace_down(context, mapping, optional, alphabet);
+	= rules::replace_down_karttunen(context, mapping, optional, alphabet);
       
       HfstTransducer test_abababa("abababa", TOK, types[i]);
       test_abababa.compose(replace_down_transducer);
-      HfstTransducer abxaba("abxaba", TOK, types[i]);
-      HfstTransducer ababxa("ababxa", TOK, types[i]);
+      HfstTransducer abxaba("abababa", 
+			    "abx@_EPSILON_SYMBOL_@aba", TOK, types[i]);
+      HfstTransducer ababxa("abababa",
+			    "ababx@_EPSILON_SYMBOL_@a", TOK, types[i]);
       HfstTransducer expected_result(types[i]);
       expected_result.disjunct(abxaba);
       expected_result.disjunct(ababxa);
       assert(expected_result.compare(test_abababa));
     }
-    } */
+  }
 
 #ifdef FOO
   /* HfstTransducer &replace_in_context(

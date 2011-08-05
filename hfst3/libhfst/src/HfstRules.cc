@@ -18,11 +18,25 @@ namespace hfst
   namespace rules
   {
 
+    /*    static void make_optional(HfstTransducer &t, ReplaceType repl_type)
+    {
+      HfstTransducer tc(t);      
+      if (repl_type == REPL_DOWN) {
+	tc.output_project(); }
+      else { 
+	tc.input_project(); }
+      t.disjunct(tc);
+      return;
+      }*/
+
     HfstTransducer replace( HfstTransducer &t, 
                             ReplaceType repl_type, 
                             bool optional, 
                             StringPairSet &alphabet ) 
     {
+
+      //if (optional)
+      //	make_optional(t, repl_type);
 
       bool DEBUG=false;
 
@@ -339,6 +353,9 @@ namespace hfst
                                       StringPairSet &alphabet)
     {
 
+      //if (optional)
+      //	make_optional(t, repl_type);
+
       bool DEBUG=false;
 
       if (DEBUG) printf("replace_in_context...\n");
@@ -456,7 +473,7 @@ namespace hfst
       // unconditional replace transducer      
       HfstTransducer rt(type);
       if (repl_type == REPL_UP || repl_type == REPL_RIGHT || 
-          repl_type == REPL_LEFT)
+          repl_type == REPL_LEFT || repl_type == REPL_DOWN_KARTTUNEN)
         rt = replace_transducer( t, leftm, rightm, REPL_UP, alphabet );
       else
         rt = replace_transducer( t, leftm, rightm, REPL_DOWN, alphabet );
@@ -492,10 +509,12 @@ namespace hfst
       
       if (DEBUG) printf("#3\n");
 
-      if (repl_type == REPL_DOWN || repl_type == REPL_RIGHT)
+      if (repl_type == REPL_DOWN || repl_type == REPL_RIGHT ||
+	  repl_type == REPL_DOWN_KARTTUNEN)
         result.compose(lct);
 
-      if (repl_type == REPL_DOWN || repl_type == REPL_LEFT)
+      if (repl_type == REPL_DOWN || repl_type == REPL_LEFT ||
+	  repl_type == REPL_DOWN_KARTTUNEN)
         result.compose(rct);
       
       if (DEBUG) printf("#4\n");
@@ -535,12 +554,21 @@ namespace hfst
     }
 
     HfstTransducer replace_down(HfstTransducerPair &context, 
-                                HfstTransducer &mapping, 
-                                bool optional, 
-                                StringPairSet &alphabet) 
+				HfstTransducer &mapping, 
+				bool optional, 
+				StringPairSet &alphabet) 
     { 
       return replace_in_context
         (context, REPL_DOWN, mapping, optional, alphabet);
+    }
+
+    HfstTransducer replace_down_karttunen(HfstTransducerPair &context, 
+					  HfstTransducer &mapping, 
+					  bool optional, 
+					  StringPairSet &alphabet) 
+    { 
+      return replace_in_context
+        (context, REPL_DOWN_KARTTUNEN, mapping, optional, alphabet);
     }
 
     HfstTransducer replace_right(HfstTransducerPair &context, 
@@ -911,6 +939,7 @@ void right_arrow_test1( ImplementationType type )
 	result_right4.disjunct(result_right2).minimize().disjunct(result_right3).minimize();
 	// TODO: ca (->) d \/ ca_c  ( input: cacacac )
 
+
 	// RIGHT ARROW RULE
 	// -> || Replace up
 	HfstTransducer tmp = input1;
@@ -945,16 +974,12 @@ void right_arrow_test1( ImplementationType type )
 	tmp.compose(replaceRightOptional).minimize();
 	assert ( tmp.compare( result_right3_optional ) );
 	// -> \/ Replace down
-	tmp = input1;
-	tmp.compose(replaceDown).minimize();
-	// TODO: assert Replace_down correctly, SFST's replace_down
-	// and Karttunen's are not defined in the same way:
+	//tmp = input1;
+	//tmp.compose(replaceDown).minimize();
 	//assert ( tmp.compare( result_right4 ) );
 	// (->) \/ Replace down optional
-	tmp = input1;
-	tmp.compose(replaceDownOptional).minimize();
-	// TODO: assert Replace_down correctly, SFST's replace_down
-	// and Karttunen's are not defined in the same way:
+	//tmp = input1;
+	//tmp.compose(replaceDownOptional).minimize();
 	//assert ( tmp.compare( result_right4_optional ) );
 }
 /*
@@ -989,12 +1014,12 @@ void right_arrow_test2( ImplementationType type )
 	HfstTransducer input1("caadaaa", TOK, type);
 
 	HfstTransducer replaceUp	= replace_up(contextEpsilon, mapping, 0, alphabet);
-	HfstTransducer replaceDown	= replace_down(contextEpsilon, mapping, 0, alphabet);
+	HfstTransducer replaceDown	= replace_down_karttunen(contextEpsilon, mapping, 0, alphabet);
 	HfstTransducer replaceLeft	= replace_left(contextEpsilon, mapping, 0, alphabet);
 	HfstTransducer replaceRight = replace_right(contextEpsilon, mapping, 0, alphabet);
 
 	HfstTransducer replaceUpOptional	= replace_up(contextEpsilon, mapping, 1, alphabet);
-	HfstTransducer replaceDownOptional	= replace_down(contextEpsilon, mapping, 1, alphabet);
+	HfstTransducer replaceDownOptional	= replace_down_karttunen(contextEpsilon, mapping, 1, alphabet);
 	HfstTransducer replaceLeftOptional	= replace_left(contextEpsilon, mapping, 1, alphabet);
 	HfstTransducer replaceRightOptional = replace_right(contextEpsilon, mapping, 1, alphabet);
 
@@ -1059,12 +1084,12 @@ void right_arrow_test3( ImplementationType type )
 
 	// Create replace transducers
 	HfstTransducer replaceUp	= replace_up(contextEpsilon, mapping, 0, alphabet);
-	HfstTransducer replaceDown	= replace_down(contextEpsilon, mapping, 0, alphabet);
+	HfstTransducer replaceDown	= replace_down_karttunen(contextEpsilon, mapping, 0, alphabet);
 	HfstTransducer replaceLeft	= replace_left(contextEpsilon, mapping, 0, alphabet);
 	HfstTransducer replaceRight = replace_right(contextEpsilon, mapping, 0, alphabet);
 
 	HfstTransducer replaceUpOptional	= replace_up(contextEpsilon, mapping, 1, alphabet);
-	HfstTransducer replaceDownOptional	= replace_down(contextEpsilon, mapping, 1, alphabet);
+	HfstTransducer replaceDownOptional	= replace_down_karttunen(contextEpsilon, mapping, 1, alphabet);
 	HfstTransducer replaceLeftOptional	= replace_left(contextEpsilon, mapping, 1, alphabet);
 	HfstTransducer replaceRightOptional = replace_right(contextEpsilon, mapping, 1, alphabet);
 
@@ -1134,12 +1159,12 @@ void right_arrow_test4( ImplementationType type )
 
 	// Replace transducers
 	HfstTransducer replaceUp	= replace_up(contextEpsilon, mapping, 0, alphabet);
-	HfstTransducer replaceDown	= replace_down(contextEpsilon, mapping, 0, alphabet);
+	HfstTransducer replaceDown	= replace_down_karttunen(contextEpsilon, mapping, 0, alphabet);
 	HfstTransducer replaceLeft	= replace_left(contextEpsilon, mapping, 0, alphabet);
 	HfstTransducer replaceRight = replace_right(contextEpsilon, mapping, 0, alphabet);
 
 	HfstTransducer replaceUpOptional	= replace_up(contextEpsilon, mapping, 1, alphabet);
-	HfstTransducer replaceDownOptional	= replace_down(contextEpsilon, mapping, 1, alphabet);
+	HfstTransducer replaceDownOptional	= replace_down_karttunen(contextEpsilon, mapping, 1, alphabet);
 	HfstTransducer replaceLeftOptional	= replace_left(contextEpsilon, mapping, 1, alphabet);
 	HfstTransducer replaceRightOptional = replace_right(contextEpsilon, mapping, 1, alphabet);
 
