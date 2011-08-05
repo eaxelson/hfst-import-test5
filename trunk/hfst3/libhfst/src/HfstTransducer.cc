@@ -3316,8 +3316,6 @@ std::ostream &operator<<(std::ostream &out,const HfstTransducer &t)
     return out;
 }
 
-
-
 }
 
 #else // MAIN_TEST was defined

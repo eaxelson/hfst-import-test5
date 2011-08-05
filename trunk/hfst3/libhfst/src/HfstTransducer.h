@@ -1426,7 +1426,8 @@ transducer.transform_weights(&func);
       restriction and coercion rule transducers. */
   namespace rules
   {
-    enum ReplaceType {REPL_UP, REPL_DOWN, REPL_RIGHT, REPL_LEFT};
+    enum ReplaceType {REPL_UP, REPL_DOWN, REPL_RIGHT, REPL_LEFT,
+		      REPL_DOWN_KARTTUNEN};
     enum TwolType {twol_right, twol_left, twol_both};
 
     /* helping methods */
@@ -1593,6 +1594,11 @@ SFST manual</a>. */
                                 bool optional, 
                                 StringPairSet &alphabet);
 
+    HfstTransducer replace_down_karttunen(HfstTransducerPair &context, 
+					  HfstTransducer &mapping, 
+					  bool optional, 
+					  StringPairSet &alphabet);
+
     /** \brief The same as replace_up, but left context matching is 
         done on the output side of \a mapping
         and right context on the input side of \a mapping 
@@ -1633,7 +1639,6 @@ SFST manual</a>. */
     HfstTransducer replace_down(HfstTransducer &mapping, 
                                 bool optional, 
                                 StringPairSet &alphabet);
-
 
     /** \brief Inversion of the replace_up and the result needs to be composed on the upper side
      * 	 of the input language.
