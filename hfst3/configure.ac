@@ -476,6 +476,7 @@ AC_TYPE_SIZE_T
 
 # Checks for structures
 AC_CHECK_DECLS([program_name, program_invocation_name, program_invocation_short_name])
+AC_CHECK_DECLS([rl_completion_suppress_append])
 
 # Checks for compiler characteristics
 AC_C_INLINE
