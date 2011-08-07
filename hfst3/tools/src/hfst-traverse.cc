@@ -239,7 +239,9 @@ main_loop(HfstBasicTransducer trans)
           {
             paths = new_paths;
           }
+#if HAVE_READLINE_HISTORY_H
         add_history(label);
+#endif
       } // while paths not empty
     return EXIT_SUCCESS;
 }
