@@ -168,7 +168,9 @@ main_loop(HfstBasicTransducer trans)
     rl_attempted_completion_function = arclabel_completion;
     rl_bind_key('\t', rl_complete);
     rl_completion_append_character = '\0';
+#if HAVE_DECL_RL_COMPLETION_SUPPRESS_APPEND
     rl_completion_suppress_append = 1;
+#endif
 #endif
 #if HAVE_READLINE_HISTORY_H
     using_history();
