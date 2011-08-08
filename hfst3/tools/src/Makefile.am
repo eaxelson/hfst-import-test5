@@ -199,7 +199,7 @@ hfst_fst2txt_SOURCES=hfst-fst2txt.cc $(HFST_COMMON_SRC)
 hfst_grep_SOURCES=hfst-grep.cc $(HFST_COMMON_SRC)
 hfst_head_SOURCES=hfst-head.cc $(HFST_COMMON_SRC)
 hfst_invert_SOURCES=hfst-invert.cc $(HFST_COMMON_SRC)
-hfst_lexc_SOURCES=hfst-lexc.cc $(HFST_COMMON_SRC)
+hfst_lexc_SOURCES=hfst-lexc.cc lexc-readline-ui.cc $(HFST_COMMON_SRC)
 hfst_lexc2fst_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC)
 #					  parsers/LexcCompiler.cc parsers/lexc-parser.yy \
 #					  parsers/lexc-lexer.ll parsers/lexc-utils.cc \
