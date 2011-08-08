@@ -17,4 +17,6 @@ For further information, consult
 
 and the distutils documentation.
 
-There is a demonstration utility, omor_query, with some basic usage.
+Demonstration utilities:
+	      omor_query.py, lookup and basic usage
+	      hfstBot.py, a irc bot for lookup
