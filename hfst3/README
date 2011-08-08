@@ -45,6 +45,10 @@ Compilation requirements:
 
   - SFST requires readline and ncurses, check SFST site for details
 
+  - The SFST *frontend* a.k.a. the SFST-PL parser a.k.a. ``hfst-sfstpl2fst``
+    do **not** require the SFST library to be installed; the library is only
+    used for library-stuff like reading SFST format automata.
+
   - to disable SFST backend, configure switch ``--without-sfst`` may be used
 
 - For foma backend:
@@ -126,6 +130,10 @@ Runtime requirements:
 
 - the *hfst-xfst* frontend needs GNU compatible getopt, or basic getopts
   *without* GNU-incompatible getopt installed
+
+- the *hfst-sfstpl2fst* frontend does **not** require SFST libraries or
+  binaries, you do **not** need to install SFST libraries or binaries in
+  order to compile SFST-PL scripts to HFST automata.
 
 Installation
 ------------
@@ -331,7 +339,10 @@ on your operation system you may also need to execute something like
 If you do not wish to use the non-obligatory sfst library backend with HFST you
 can freely disable it by using the command line switch --without-sfst to 
 configure without any loss of functionality beyond the ability to handle
-SFST format automata.
+SFST format automata. In particular, the ``hfst-sfstpl2fst`` compiler that
+parses SFST-PL scripts into automata does **not** require SFST to be installed.
+SFST is only used to handle SFST format automata and to use SFST automata
+algorithms on lower level.
 
 foma tests failed (--without-foma to disable)
 '''''''''''''''''''''''''''''''''''''''''''''
