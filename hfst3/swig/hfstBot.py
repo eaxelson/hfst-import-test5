@@ -97,8 +97,11 @@ class HfstBot(irc.IRCClient):
             msg = msg[colon_index + 1:].strip().split(' ')[0].strip()
             replyprefix = "%s: " % user
             analysis_results = self.analyzer.analyze(msg)
-            for result in analysis_results:
-                self.msg(channel, replyprefix + result)
+            if len(analysis_results) == 0:
+                self.notice(user, "I don't know that word!")
+            else:
+                for result in analysis_results:
+                    self.msg(channel, replyprefix + result)
 
     def action(self, user, channel, msg):
         """This will get called when the bot sees someone do an action."""
