@@ -43,7 +43,7 @@ class MorphologicalAnalyzer:
             weight = entry[0]
             string = ''.join(
                 ffilter(libhfst.FdOperation.is_diacritic, entry[1]))
-            results.append((string, weight))
+            results.append(string)
         return results
 
     def analyze(self, message):
@@ -98,7 +98,7 @@ class HfstBot(irc.IRCClient):
             replyprefix = "%s: " % user
             analysis_results = self.analyzer.analyze(msg)
             for result in analysis_results:
-                self.msg(channel, replyprefix + str(result))
+                self.msg(channel, replyprefix + result)
 
     def action(self, user, channel, msg):
         """This will get called when the bot sees someone do an action."""
