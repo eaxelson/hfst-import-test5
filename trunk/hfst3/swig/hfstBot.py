@@ -81,16 +81,16 @@ class HfstBot(irc.IRCClient):
 
     def privmsg(self, user, channel, msg):
         """This will get called when the bot receives a message."""
-        user = user.split('!', 1)[0]
-        colonpos = msg.index(':')
-        
         # Check to see if they're sending me a private message
         if channel == self.nickname:
             print msg
             return
-#            self.msg(user, self.analyzer.analyze()
-#            return
+        #            self.msg(user, self.analyzer.analyze()
+        #            return
 
+        user = user.split('!', 1)[0]
+        colonpos = msg.index(':')
+        
         # Otherwise check to see if it is a message directed at me
         if msg.startswith(self.nickname + ":"):
             colon_index = msg.index(':')
