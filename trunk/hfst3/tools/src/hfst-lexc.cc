@@ -51,6 +51,9 @@ static unsigned int lexccount = 0;
 static bool is_input_stdin = true;
 static ImplementationType format = hfst::UNSPECIFIED_TYPE;
 static bool start_readline = false;
+
+int lexc_readline_loop(ImplementationType format);
+
 void
 print_usage()
 {
@@ -139,13 +142,46 @@ parse_options(int argc, char** argv)
                 "(since it has native lexc support)");
         format = hfst::FOMA_TYPE;
       }
+    if (outfile == stdout)
+      {
+        error(EXIT_FAILURE, 0, "Cannot write result to <stdout> since backend "
+              "libraries will pollute it;\n"
+              "Use --output meanwhile");
+      }
     if (start_readline && (argc - optind > 0))
       {
         error(EXIT_FAILURE, 0, "Trailing arguments not allowed for interactive "
               "mode");
         return EXIT_FAILURE;
       }
-    if (argc - optind > 0)
+    else if (!start_readline && (argc == optind))
+      {
+#if AT_END_OF_DEPRECATION_PERIOD
+        warning(0, 0, "Reading lexc script (not a lexicon) "
+                "from stdin with readline");
+        start_readline = true;
+#else
+        warning(0, 0, "Reading lexicons from stdin is deprecated and will "
+                "be removed in next versions;\n"
+                "this is not even supported by the original lexc");
+        char* tempfilename = hfst_strdup("/tmp/hfst-lexcXXXXXX");
+        int temporary_fd = hfst_mkstemp(tempfilename);
+        verbose_printf("Copying data from <stdin> to temporary file\n");
+        char* fdata = 0;
+        size_t len = 0;
+        while (hfst_getline(&fdata, &len, stdin) != -1)
+          {
+            hfst_write(temporary_fd, fdata, strlen(fdata));
+          }
+        hfst_close(temporary_fd);
+        lexccount = 1;
+        lexcfiles = static_cast<FILE**>(malloc(sizeof(FILE*) * lexccount));
+        lexcfilenames = static_cast<char**>(malloc(sizeof(char*) * lexccount));
+        lexcfiles[0] = hfst_fopen(tempfilename, "r");
+        lexcfilenames[0] = hfst_strdup(tempfilename);
+#endif
+      }
+    else if (argc - optind > 0)
       {
         lexcfilenames = static_cast<char**>(malloc(sizeof(char*)*(argc-optind)));
         lexcfiles = static_cast<FILE**>(malloc(sizeof(char*)*(argc-optind)));
@@ -173,7 +209,7 @@ parse_options(int argc, char** argv)
         warning(0, 0, "multiple file handling is not supported by all "
                 "backends;\n"
                 "concatenating to temporary file");
-        char* tempfilename = hfst_strdup("hfst-lexcXXXXXX");
+        char* tempfilename = hfst_strdup("/tmp/hfst-lexcXXXXXX");
         int temporary_fd = hfst_mkstemp(tempfilename);
         for (unsigned int i = 0; i < lexccount; i++)
           {
@@ -254,9 +290,9 @@ int main( int argc, char **argv ) {
     {
         fclose(outfile);
     }
-    if (start_readline || (lexcfiles[0] == stdin)) 
+    if (start_readline) 
       {
-        error(EXIT_FAILURE, 0, "Readline interface missing...");
+        lexc_readline_loop(format);
         return EXIT_FAILURE;
       }
     verbose_printf("Reading from ");
