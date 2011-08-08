@@ -16,3 +16,5 @@ For further information, consult
     python setup.py --help-commands
 
 and the distutils documentation.
+
+There is a demonstration utility, omor_query, with some basic usage.

@@ -49,6 +49,7 @@ class StringPairSet;
 class StringVector;
 
 std::vector<std::pair <float, std::vector<std::string> > > vectorize(HfstOneLevelPaths * olps);
+std::vector<std::pair <float, std::vector<std::string> > > purge_flags(std::vector<std::pair<float, std::vector<std::string> > > olpv);
 std::vector<std::pair <std::string, float> > detokenize_vector(OneLevelPathVector olpv);
 std::vector<std::pair <std::string, float > > detokenize_paths(HfstOneLevelPaths * olps);
 
