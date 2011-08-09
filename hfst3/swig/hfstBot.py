@@ -103,16 +103,18 @@ class HfstBot(irc.IRCClient):
 
         try:
             user = user.split('!', 1)[0]
-            colonpos = msg.index(':')
+            if ':' in msg:
+                divpos = msg.index(':')
+            elif ',' in msg:
+                divpos = msg.index(',')
         except:
             print "Failed to parse message"
             print "user: %s\nchannel: %s \nmsg:%s" %(user, channel, msg)
             return
         
         # Otherwise check to see if it is a message directed at me
-        if msg.startswith(self.nickname + ":"):
-            colon_index = msg.index(':')
-            msg = msg[colon_index + 1:].strip().split(' ')[0].strip()
+        if msg.startswith(self.nickname):
+            msg = msg[divpos + 1:].strip().split(' ')[0].strip()
             replyprefix = "%s: " % user
             analysis_results = self.analyzer.analyze(msg)
             if len(analysis_results) == 0:
