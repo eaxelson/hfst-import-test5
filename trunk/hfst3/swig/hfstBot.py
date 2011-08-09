@@ -6,7 +6,8 @@ e.g.
 
   <foo> hfstbot: koira
 
-the bot will analyze its (Finnish) morphology:
+the bot will perform a lookup on the first word in the string and return the
+results:
 
   <hfstbot> foo: koira<N><Sg><Nom><cap>
 
@@ -14,6 +15,9 @@ Run this script with three arguments: the irc server the bot should
 connect to, the channel it should join and the file to use for analysis, e.g.:
 
   $ python hfstbot.py chat.freenode.net hfst /home/sam/ircbot/omorfi.hfstol
+
+If the file $IRCSERVER-$CHANNELNAME-$TRANSDUCERFILE-misses.txt is writeable,
+hfstbot will append to it words that it wasn't able to return any analyses for.
 """
 
 # twisted imports
@@ -26,6 +30,9 @@ import sys
 
 import libhfst
 from itertools import ifilterfalse as ffilter
+
+logfilename = sys.argv[1] + "-" + sys.argv[2].replace('#','') + "-" + \
+    sys.argv[3].split('/')[-1] + "-misses.txt"
 
 class MorphologicalAnalyzer:
     """
@@ -67,6 +74,8 @@ class HfstBot(irc.IRCClient):
 
     def connectionLost(self, reason):
         irc.IRCClient.connectionLost(self, reason)
+        if self.logfilehandle != None:
+            self.logfilehandle.close()
         self.analyzer.close()
 
     # callbacks for events
@@ -77,19 +86,28 @@ class HfstBot(irc.IRCClient):
 
     def joined(self, channel):
         """This will get called when the bot joins the channel."""
-        pass
+        print logfilename
+        try:
+            self.logfilehandle = open(logfilename, 'a')
+        except IOError:
+            self.logfilehandle = None
 
     def privmsg(self, user, channel, msg):
         """This will get called when the bot receives a message."""
         # Check to see if they're sending me a private message
         if channel == self.nickname:
-            print msg
+            print "Got private message:"
+            print "user: %s\nchannel: %s \nmsg:%s" %(user, channel, msg)
+            #            self.msg(user, self.analyzer.analyze()
             return
-        #            self.msg(user, self.analyzer.analyze()
-        #            return
 
-        user = user.split('!', 1)[0]
-        colonpos = msg.index(':')
+        try:
+            user = user.split('!', 1)[0]
+            colonpos = msg.index(':')
+        except:
+            print "Failed to parse message"
+            print "user: %s\nchannel: %s \nmsg:%s" %(user, channel, msg)
+            return
         
         # Otherwise check to see if it is a message directed at me
         if msg.startswith(self.nickname + ":"):
@@ -99,6 +117,8 @@ class HfstBot(irc.IRCClient):
             analysis_results = self.analyzer.analyze(msg)
             if len(analysis_results) == 0:
                 self.notice(user, "I don't know that word!")
+                if self.logfilehandle != None:
+                    self.logfilehandle.write(msg + '\n')
             else:
                 for result in analysis_results:
                     self.msg(channel, replyprefix + result)
