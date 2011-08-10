@@ -7,6 +7,15 @@ Copyright (C) 1994, 1995, 1996, 1999, 2000, 2001, 2002, 2004, 2005,
 This file is free documentation; the Free Software Foundation gives
 unlimited permission to copy, distribute and modify it.
 
+This is standard installation guide from the GNU project.
+
+********************************************************************
+* PLEASE CONSIDER READING README FIRST IF YOU ARE NEW TO THE       *
+* HFST SOFTWARE AND WANT A STARTING POINT FOR INSTALLATION.        *
+* THIS INSTRUCTION ONLY GUIDES YOU TO USAGE OF AUTOTOOLS.          *
+* PLEASE READ README FIRST.                                        *
+********************************************************************
+
 Basic Installation
 ==================
 
