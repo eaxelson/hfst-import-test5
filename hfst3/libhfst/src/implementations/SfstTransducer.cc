@@ -866,26 +866,27 @@ namespace hfst { namespace implementations {
        transducer \a t so far. */
     int last_index=0;
 
-    NodeNumbering num(*t);
+    NodeNumbering num(*t); // NODE_NUMBERING
+    unsigned int number_of_nodes = num.number_of_nodes(); // NODE_NUMBERING
 
     /* Whether a state has been visited. */
     std::vector<int> visited;
-    visited.reserve(num.number_of_nodes());
+    visited.reserve(number_of_nodes);
 
     /* Whether the state is marked as broken, i.e. we cannot proceed from
        that state. These arrays are used for giving more probability for 
        shorter paths if \a t is cyclic. */
     std::vector<int> broken;
-    broken.reserve(num.number_of_nodes());
+    broken.reserve(number_of_nodes);
 
-    for ( unsigned int i = 0; i < num.number_of_nodes(); ++i ) {
+    for ( unsigned int i = 0; i < number_of_nodes; ++i ) {
       visited.push_back(0);
       visited.push_back(0);
     }
 
     while (1) {
 
-      visited[ num[current_t_node] ] = 1;
+      visited[ num[current_t_node] ] = 1; // NODE_NUMBERING
       
       vector<Arc> t_transitions;
       for ( ArcsIter it( current_t_node->arcs() ); it; it++) {
@@ -893,6 +894,7 @@ namespace hfst { namespace implementations {
       }
       
       /* If we cannot proceed, return the longest path so far. */
+      // NODE_NUMBERING
       if (t_transitions.empty() || broken[num[current_t_node]]) {
 	for (int i=(int)path.second.size()-1; i>=last_index; i--) {
 	  path.second.pop_back(); 
@@ -930,6 +932,7 @@ namespace hfst { namespace implementations {
 	} 
 
 	/* Give more probability for shorter paths. */
+	// NODE_NUMBERING
 	if ( broken[ num[ t_target ] ] == 0 ) {
 	  if ( visited[ num[ t_target ] ] == 1 ) 
 	    if ( (rand() % 4) == 0 )

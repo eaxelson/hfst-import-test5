@@ -96,6 +96,15 @@ int main(int argc, char **argv)
       HfstTransducer foobar2("baz", types[i]);
       foobar2 = foobar;
       assert(foobar.compare(foobar2));
+      HfstTransducer empty_ol(HFST_OL_TYPE);
+      HfstTransducer empty_olw(HFST_OLW_TYPE);
+      try {
+	empty_ol = foobar2.convert(HFST_OL_TYPE);
+	empty_olw = foobar2.convert(HFST_OLW_TYPE);
+      }
+      catch (const FunctionNotImplementedException e)
+	{
+	}
 
     }
 

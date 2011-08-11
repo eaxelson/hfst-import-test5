@@ -47,6 +47,7 @@ hfst::implementations::LogWeightTransducer
 #if HAVE_FOMA
 hfst::implementations::FomaTransducer HfstTransducer::foma_interface;
 #endif
+  hfst::implementations::HfstOlTransducer HfstTransducer::hfst_ol_interface;
 /* Add here the interface between HFST and your transducer library. */
 //#if HAVE_MY_TRANSDUCER_LIBRARY
 //hfst::implementations::MyTransducerLibraryTransducer 
@@ -3174,6 +3175,11 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
 	delete implementation.log_ofst;
 	break;
 #endif
+    case HFST_OL_TYPE:
+    case HFST_OLW_TYPE:
+      HFST_THROW_MESSAGE(FunctionNotImplementedException, 
+			 "HfstTransducer::operator= for type HFST_OL(W)_TYPE");
+      break;
 	/* Add here your implementation. */
 	//#if HAVE_MY_TRANSDUCER_LIBRARY
 	//case MY_TRANSDUCER_LIBRARY_TYPE:
