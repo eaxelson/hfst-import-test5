@@ -245,9 +245,6 @@ in/{RESERVED_SYMBOL} { return IN; }
 }
 \] {
   // End of a bracketed regex.
-  //
-  // For some bizarre reason flex will print the [[ only if the latter [ is
-  // escaped.
   symbol_queue.push_back("__HFST_TWOLC_]"); 
   reduce_queue();
   return RIGHT_SQUARE_BRACKET; 
@@ -267,6 +264,18 @@ in/{RESERVED_SYMBOL} { return IN; }
   symbol_queue.push_back("__HFST_TWOLC_]" "]"); 
   reduce_queue();
   return RE_RIGHT_SQUARE_BRACKET; 
+}
+\~~\[ {
+  // Beginning of negative context.
+  symbol_queue.push_back("__HFST_TWOLC_~~["); 
+  reduce_queue();
+  return LEFT_NEGATIVE_CONTEXT_BRACKET; 
+}
+\]\~~ {
+  // Beginning of negative context.
+  symbol_queue.push_back("__HFST_TWOLC_]~~"); 
+  reduce_queue();
+  return RIGHT_NEGATIVE_CONTEXT_BRACKET; 
 }
 \{ {
   // Beginning of a bracketed regex.

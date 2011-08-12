@@ -114,6 +114,9 @@
 %right <symbol_number> RE_RIGHT_SQUARE_BRACKET
 %left  <symbol_number> RE_LEFT_SQUARE_BRACKET
 
+%left <symbol_number>  LEFT_NEGATIVE_CONTEXT_BRACKET; 
+%right <symbol_number> RIGHT_NEGATIVE_CONTEXT_BRACKET; 
+
  /* Basic tokens. */
 %token <symbol_number>  ALPHABET_DECLARATION DIACRITICS_DECLARATION 
 %token <symbol_number>  SETS_DECLARATION DEFINITION_DECLARATION
@@ -122,8 +125,8 @@
 %token <value>          RULE_NAME SYMBOL DEFINITION_NAME NUMBER NUMBER_RANGE
 
 %type<regular_expression> PAIR REGULAR_EXPRESSION RE_LIST RE RULE_CONTEXT
-%type<regular_expression> RE_RULE_CENTER
-%type<regular_expression> RULE_CONTEXTS;
+%type<regular_expression> RE_RULE_CENTER NEGATIVE_RULE_CONTEXT
+%type<regular_expression> RULE_CONTEXTS NEGATIVE_RULE_CONTEXTS
 %type<symbol_range>       SYMBOL_LIST 
 %type<symbol_pair_range>  CENTER_PAIR CENTER_LIST RULE_CENTER
 %type<rule_operator>      RULE_OPERATOR RE_RULE_OPERATOR
@@ -156,8 +159,11 @@ RULES_HEADER:RULES_DECLARATION
 RULE_LIST: /* empty */
 | RULE_LIST RULE
 
-RULE: RULE_NAME RULE_CENTER RULE_OPERATOR RULE_CONTEXTS
+RULE: RULE_NAME RULE_CENTER RULE_OPERATOR RULE_CONTEXTS NEGATIVE_RULE_CONTEXTS
 { 
+  // Subtract negative contexts from positive contexts.
+  $4->apply(&HfstTransducer::subtract,*$5);
+
   if (verbose)
     { message(std::string("Processing: ")+ get_name($1)); }
 
@@ -168,13 +174,19 @@ RULE: RULE_NAME RULE_CENTER RULE_OPERATOR RULE_CONTEXTS
   free($1);
   delete $2;
   delete $4;
+  delete $5;
 }
-| RULE_NAME RE_RULE_CENTER RE_RULE_OPERATOR RULE_CONTEXTS
+| RULE_NAME RE_RULE_CENTER RE_RULE_OPERATOR RULE_CONTEXTS 
+NEGATIVE_RULE_CONTEXTS
 {
+  // Subtract negative contexts from positive contexts.
+  $4->apply(&HfstTransducer::subtract,*$5);
+
   grammar->add_rule($1,*$2,$3,OtherSymbolTransducerVector(1,*$4));
   free($1);
   delete $2;
   delete $4;
+  delete $5;
 }
 
 RULE_CENTER: CENTER_PAIR
@@ -235,12 +247,29 @@ RULE_CONTEXTS: /* empty */
   delete $2;
 }
 
+NEGATIVE_RULE_CONTEXTS: /* empty */
+{ $$ = new OtherSymbolTransducer(); }
+| NEGATIVE_RULE_CONTEXTS NEGATIVE_RULE_CONTEXT
+{ 
+  $$ = &$1->apply(&HfstTransducer::disjunct,*$2);
+  delete $2;
+}
+
 RULE_CONTEXT: REGULAR_EXPRESSION CENTER_MARKER REGULAR_EXPRESSION
 SEMI_COLON_LIST
 {
   $$ = new OtherSymbolTransducer(OtherSymbolTransducer::get_context(*$1,*$3));
   delete $1;
   delete $3;
+}
+
+NEGATIVE_RULE_CONTEXT: LEFT_NEGATIVE_CONTEXT_BRACKET REGULAR_EXPRESSION 
+CENTER_MARKER REGULAR_EXPRESSION RIGHT_NEGATIVE_CONTEXT_BRACKET
+SEMI_COLON_LIST
+{
+  $$ = new OtherSymbolTransducer(OtherSymbolTransducer::get_context(*$2,*$4));
+  delete $2;
+  delete $4;
 }
 
 ALPHABET: ALPHABET_HEADER ALPHABET_PAIR_LIST SEMI_COLON_LIST
@@ -439,7 +468,7 @@ void warn(const char * warning)
 void yyerror(const char * text) 
 { 
   (void)text;
-  //input_reader.error(text);
+  input_reader.error(text);
   exit(1); 
 }
 

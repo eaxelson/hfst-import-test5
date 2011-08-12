@@ -172,6 +172,16 @@ __HFST_TWOLC_\] {
   non_alphabet_symbol_queue.push_back("__HFST_TWOLC_]"); 
   return RIGHT_SQUARE_BRACKET; 
 }
+__HFST_TWOLC_[~][~]\[ {
+  // Beginning of a negative rule context.
+  non_alphabet_symbol_queue.push_back("__HFST_TWOLC_~~["); 
+  return LEFT_NEGATIVE_CONTEXT_BRACKET; 
+}
+__HFST_TWOLC_\][~][~] {
+  // Beginning of a negative rule context.
+  non_alphabet_symbol_queue.push_back("__HFST_TWOLC_]~~"); 
+  return RIGHT_NEGATIVE_CONTEXT_BRACKET; 
+}
 __HFST_TWOLC_\[\[ {
   // Beginning of a bracketed regex.
   //
