@@ -2,22 +2,46 @@
 
 NUMBER_OF_TESTS=`ls $srcdir | egrep "test[0-9][0-9]*$" | wc -l`
 
+GENERATED_FILES="temp.hfst temp.twolc.hfst temp.twolc.hfst0 temp.twolc.hfst1 temp.twolc.hfst2 temp.twolc.hfst3"
+
 echo "There are $NUMBER_OF_TESTS substests for hfst-twolc."
 
 for f in $(ls -d $srcdir/* | egrep "test[0-9][0-9]*$" | sort -n)
 do
-	cat "$f" | ../src/hfst-twolc-loc -R -s > temp.twolc.hfst0
+	cat "$f" | ../src/hfst-twolc-loc -R -s -f foma             > temp.twolc.hfst0
+#	cat "$f" | ../src/hfst-twolc-loc -R -s -f log-openfst      > temp.twolc.hfst1
+	cat "$f" | ../src/hfst-twolc-loc -R -s -f tropical-openfst > temp.twolc.hfst2
+#	cat "$f" | ../src/hfst-twolc-loc -R -s -f sfst             > temp.twolc.hfst3
 	if  [ $? -ne 0 ] 
 	then
-	        rm temp.twolc.hfst0
+	        rm -f $GENERATED_FILES
 	        exit 1
 	fi
-	cat temp.twolc.hfst0 | ../../hfst-fst2txt | ../../hfst-txt2fst -e"@_EPSILON_SYMBOL_@" > temp.twolc.hfst
-	cat "$f" | ../src/hfst-twolc-loc -R -s &> /dev/null
 	cat "$f.txt_fst" | ../../hfst-txt2fst -e"@_EPSILON_SYMBOL_@" > temp.hfst
-	if ! ../../hfst-compare -q -1 temp.hfst -2 temp.twolc.hfst &> /dev/null
-	then
-        echo "hfst-twolc sub$(basename $f) failed."
+#	for n in 0 1 2 3  
+	for n in 0 2  	
+	do
+	    cat temp.twolc.hfst"$n" | ../../hfst-fst2txt | ../../hfst-txt2fst -e"@_EPSILON_SYMBOL_@" > temp.twolc.hfst
+	    cat "$f" | ../src/hfst-twolc-loc -R -s &> /dev/null
+	    if ! ../../hfst-compare -q -1 temp.hfst -2 temp.twolc.hfst &> /dev/null
+	    then
+		echo "hfst-twolc sub$(basename $f) failed."
+		if [ $n -eq 0 ]
+		then
+		    echo "For foma type."
+		fi
+		if [ $n -eq 1 ]
+		then
+		    echo "For log-openfst type."
+		fi
+		if [ $n -eq 2 ]
+		then
+		    echo "For tropical-openfst type."
+		fi
+		if [ $n -eq 3 ]
+		then
+		    echo "For sfst type."
+		fi
 		echo
 		echo "Grammar:"
 		echo
@@ -31,12 +55,12 @@ do
 		echo
 		../../hfst-fst2txt temp.twolc.hfst
 		echo
-		rm temp.hfst temp.twolc.hfst temp.twolc.hfst0
+		rm -f $GENERATED_FILES
 		exit 1
-	else
-        echo "hfst-twolc sub$(basename $f) passed."
-	fi
+	    fi
+	done
+	echo "hfst-twolc sub$(basename $f) passed."
 done
 
-rm temp.hfst temp.twolc.hfst temp.twolc.hfst0
+rm -f $GENERATED_FILES
 
