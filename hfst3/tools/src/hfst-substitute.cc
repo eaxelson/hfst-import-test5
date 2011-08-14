@@ -57,6 +57,9 @@ static char* to_label = 0;
 static StringPair* to_pair = 0;
 static char* to_transducer_filename = 0;
 static HfstTransducer* to_transducer = 0;
+static bool compose = false;
+static HfstTransducer* substitution_trans = 0;
+static bool delayed = false;
 
 /**
  * @brief parse string pair from arc label.
@@ -142,6 +145,8 @@ print_usage()
             "  -T, --to-transducer=TFILE    replace with transducer "
             "read from TFILE\n"
             "  -F, --from-file=LABELFILE    read replacements from LABELFILE\n"
+            "Transient optimisation schemes:\n"
+            "  -9, --compose                compose substitutions when possible\n"
            );
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
@@ -179,12 +184,13 @@ parse_options(int argc, char** argv)
             {"from-file", required_argument, 0, 'F'},
             {"to-label", required_argument, 0, 't'},
             {"to-transducer", required_argument, 0, 'T'},
+            {"compose", no_argument, 0, '9'},
             {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "f:F:t:T:",
+                             HFST_GETOPT_UNARY_SHORT "f:F:t:T:9",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -199,6 +205,13 @@ parse_options(int argc, char** argv)
         case 'f':
             from_label = hfst_strdup(optarg);
             from_pair = label_to_stringpair(from_label);
+            if (strlen(from_label) == 0)
+              {
+                error(EXIT_FAILURE, 0, "argument of source label option is "
+                      "empty;\n"
+                      "if you REALLY want to replace epsilons with something, "
+                      "use @0@ or %s", hfst::internal_epsilon.c_str());
+              }
             break;
         case 'F':
             from_file_name = hfst_strdup(optarg);
@@ -211,6 +224,13 @@ parse_options(int argc, char** argv)
         case 't':
             to_label = hfst_strdup(optarg);
             to_pair = label_to_stringpair(to_label);
+            if (strlen(to_label) == 0)
+              {
+                error(EXIT_FAILURE, 0, "argument of target label option is "
+                      "empty;\n"
+                      "if you want to substitute something with epsilons, "
+                      "use @0@ or %s", hfst::internal_epsilon.c_str());
+              }
             break;
         case 'T':
             to_transducer_filename = hfst_strdup(optarg);
@@ -220,6 +240,9 @@ parse_options(int argc, char** argv)
                 return EXIT_FAILURE;
             }
             fclose(f);
+            break;
+        case '9':
+            compose = true;
             break;
 #include "inc/getopt-cases-error.h"
         }
@@ -355,17 +378,43 @@ do_substitute(HfstTransducer& trans, size_t transducer_n)
     }
   else if (from_label && to_label)
     {
-      if (transducer_n < 2)
+      if (compose)
         {
-          verbose_printf("Substituting label %s with label %s...\n", from_label,
-                         to_label);
+          if (transducer_n < 2)
+            {
+              verbose_printf("Delaying substitution of label %s with "
+                             "label %s...\n", from_label,
+                             to_label);
+            }
+          else
+            {
+              verbose_printf("Delaying substitution of label %s with "
+                             "label %s... %zu\n",
+                             from_label, to_label, transducer_n);
+            
+            }
+          HfstTransducer substitution(from_label, to_label, trans.get_type());
+          substitution_trans->disjunct(substitution);
+          delayed = true;
         }
       else
         {
-          verbose_printf("Substituting label %s with label %s... %zu\n",
-                         from_label, to_label, transducer_n);
+          if (transducer_n < 2)
+            {
+              verbose_printf("Substituting label %s with "
+                             "label %s...\n", from_label,
+                             to_label);
+            }
+          else
+            {
+              verbose_printf("Substituting label %s with "
+                             "label %s... %zu\n",
+                             from_label, to_label, transducer_n);
+            
+            }
+          trans.substitute(from_label, to_label);
         }
-      trans.substitute(from_label, to_label);
+
     }
   else if (from_pair && to_transducer)
     {
@@ -415,6 +464,30 @@ do_substitute(HfstTransducer& trans, size_t transducer_n)
   return trans;
 }
 
+static
+void
+perform_delayed(HfstTransducer& trans)
+{
+  verbose_printf("Finalising substitution transducer...\n");
+  HfstTransducer sigmaMinusSubs = HfstTransducer(hfst::internal_identity,
+                                            hfst::internal_identity,
+                                            trans.get_type());
+  HfstTransducer subsIn(*substitution_trans);
+  subsIn.input_project();
+  sigmaMinusSubs.subtract(subsIn);
+  substitution_trans->disjunct(sigmaMinusSubs);
+  substitution_trans->repeat_star();
+  verbose_printf("Composing delayed substitutions on right...\n");
+  trans.compose(*substitution_trans);
+  verbose_printf("Minimising...\n");
+  trans.minimize();
+  substitution_trans->invert();
+  verbose_printf("Composing delayed substitutions on left...\n");
+  trans = substitution_trans->compose(trans);
+  verbose_printf("Minimising...\n");
+  trans.minimize();
+}
+
 int
 process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 {
@@ -427,8 +500,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
       try {
         HfstInputStream tostream(to_transducer_filename);
         to_transducer = new HfstTransducer(tostream);
-      } //catch (NotTransducerStreamException ntse)  
-      catch (HfstException ntse)
+      } catch (NotTransducerStreamException ntse)  
         {
           error(EXIT_FAILURE, 0, "%s is not a valid transducer file",
                 to_transducer_filename);
@@ -456,6 +528,8 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           verbose_printf("performing substitutions in %s... %zu\n", inputname,
                          transducer_n);
         }
+      // initialize delayed substitutor automaton
+      substitution_trans = new HfstTransducer(trans.get_type());
       if (from_file)
         {
           char* line = NULL;
@@ -491,6 +565,23 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
               to_label = hfst_strndup(tab+1, endstr-tab-1);
               from_pair = label_to_stringpair(from_label);
               to_pair = label_to_stringpair(to_label);
+              if (strlen(from_label) == 0)
+                {
+                  error_at_line(EXIT_FAILURE, 0, from_file_name, line_n,
+                                "First field is empty;\n"
+                                "if you REALLY want to replace epsilons with"
+                                "something, use @0@ or %s",
+                                hfst::internal_epsilon.c_str());
+                }
+              if (strlen(to_label) == 0)
+                {
+                  error_at_line(EXIT_FAILURE, 0, from_file_name, line_n,
+                                "Second field seems empty;\n"
+                                "if you want to substitute something with "
+                                "epsilons, use @0@ or %s",
+                                hfst::internal_epsilon.c_str());
+                }
+
               try 
                 {
                   do_substitute(trans, transducer_n);
@@ -509,7 +600,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                 }
               free(from_label);
               free(to_label);
-            }
+            } // while getline
           free(line);
         }
       else
@@ -533,6 +624,10 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
       if (fellback)
         {
           trans = HfstTransducer(*fallback, trans.get_type());
+        }
+      else if (delayed)
+        {
+          perform_delayed(trans);
         }
       if (from_file)
         {
