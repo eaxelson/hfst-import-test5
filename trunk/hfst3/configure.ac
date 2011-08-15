@@ -114,6 +114,12 @@ AC_ARG_WITH([readline],
             [with_readline=yes])
 
 # allow programs to be built separately (sort alphabetically)
+dnlAC_ARG_ENABLE([affix_guessify],
+dnl			  [AS_HELP_STRING([--enable-affix_guessify],
+dnl							  [build affix_guessify tool @<:@default=yes@:>@])],
+dnl			  [enable_affix_guessify=$enableval],
+dnl			  [enable_affix_guessify=no])
+dnl AM_CONDITIONAL([WANT_AFFIX_GUESSIFY], [test x$enable_affix_guessify != xno])
 AC_ARG_ENABLE([calculate],
 			  [AS_HELP_STRING([--enable-calculate],
 							  [build calculate tool @<:@default=yes@:>@])],
@@ -476,7 +482,7 @@ AC_TYPE_SIZE_T
 
 # Checks for structures
 AC_CHECK_DECLS([program_name, program_invocation_name, program_invocation_short_name])
-AC_CHECK_DECLS([rl_completion_suppress_append])
+AC_CHECK_DECLS([rl_completion_suppress_append rl_completion_matches])
 
 # Checks for compiler characteristics
 AC_C_INLINE
