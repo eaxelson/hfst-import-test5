@@ -114,18 +114,15 @@
 %right <symbol_number> RE_RIGHT_SQUARE_BRACKET
 %left  <symbol_number> RE_LEFT_SQUARE_BRACKET
 
-%left <symbol_number>  LEFT_NEGATIVE_CONTEXT_BRACKET; 
-%right <symbol_number> RIGHT_NEGATIVE_CONTEXT_BRACKET; 
-
  /* Basic tokens. */
 %token <symbol_number>  ALPHABET_DECLARATION DIACRITICS_DECLARATION 
 %token <symbol_number>  SETS_DECLARATION DEFINITION_DECLARATION
 %token <symbol_number>  RULES_DECLARATION COLON SEMI_COLON
-%token <symbol_number>  EQUALS CENTER_MARKER QUESTION_MARK 
+%token <symbol_number>  EQUALS CENTER_MARKER QUESTION_MARK EXCEPT
 %token <value>          RULE_NAME SYMBOL DEFINITION_NAME NUMBER NUMBER_RANGE
 
 %type<regular_expression> PAIR REGULAR_EXPRESSION RE_LIST RE RULE_CONTEXT
-%type<regular_expression> RE_RULE_CENTER NEGATIVE_RULE_CONTEXT
+%type<regular_expression> RE_RULE_CENTER
 %type<regular_expression> RULE_CONTEXTS NEGATIVE_RULE_CONTEXTS
 %type<symbol_range>       SYMBOL_LIST 
 %type<symbol_pair_range>  CENTER_PAIR CENTER_LIST RULE_CENTER
@@ -249,11 +246,8 @@ RULE_CONTEXTS: /* empty */
 
 NEGATIVE_RULE_CONTEXTS: /* empty */
 { $$ = new OtherSymbolTransducer(); }
-| NEGATIVE_RULE_CONTEXTS NEGATIVE_RULE_CONTEXT
-{ 
-  $$ = &$1->apply(&HfstTransducer::disjunct,*$2);
-  delete $2;
-}
+| EXCEPT RULE_CONTEXTS
+{ $$ = $2; }
 
 RULE_CONTEXT: REGULAR_EXPRESSION CENTER_MARKER REGULAR_EXPRESSION
 SEMI_COLON_LIST
@@ -261,15 +255,6 @@ SEMI_COLON_LIST
   $$ = new OtherSymbolTransducer(OtherSymbolTransducer::get_context(*$1,*$3));
   delete $1;
   delete $3;
-}
-
-NEGATIVE_RULE_CONTEXT: LEFT_NEGATIVE_CONTEXT_BRACKET REGULAR_EXPRESSION 
-CENTER_MARKER REGULAR_EXPRESSION RIGHT_NEGATIVE_CONTEXT_BRACKET
-SEMI_COLON_LIST
-{
-  $$ = new OtherSymbolTransducer(OtherSymbolTransducer::get_context(*$2,*$4));
-  delete $2;
-  delete $4;
 }
 
 ALPHABET: ALPHABET_HEADER ALPHABET_PAIR_LIST SEMI_COLON_LIST

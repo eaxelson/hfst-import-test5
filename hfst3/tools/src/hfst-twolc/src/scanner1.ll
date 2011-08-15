@@ -101,6 +101,12 @@ where/{RESERVED_SYMBOL} {
   where_seen = true;                     
   return WHERE; 
 }
+except/{RESERVED_SYMBOL} {
+  // Separates negative contexts from positive contexts.
+  symbol_queue.push_back("__HFST_TWOLC_except"); 
+  reduce_queue();
+  return EXCEPT;
+}
 matched/{RESERVED_SYMBOL} { return MATCHED_MATCHER; }
 mixed/{RESERVED_SYMBOL} { return MIXED_MATCHER; }
 freely/{RESERVED_SYMBOL} { return FREELY_MATCHER; }
@@ -264,18 +270,6 @@ in/{RESERVED_SYMBOL} { return IN; }
   symbol_queue.push_back("__HFST_TWOLC_]" "]"); 
   reduce_queue();
   return RE_RIGHT_SQUARE_BRACKET; 
-}
-\~~\[ {
-  // Beginning of negative context.
-  symbol_queue.push_back("__HFST_TWOLC_~~["); 
-  reduce_queue();
-  return LEFT_NEGATIVE_CONTEXT_BRACKET; 
-}
-\]\~~ {
-  // Beginning of negative context.
-  symbol_queue.push_back("__HFST_TWOLC_]~~"); 
-  reduce_queue();
-  return RIGHT_NEGATIVE_CONTEXT_BRACKET; 
 }
 \{ {
   // Beginning of a bracketed regex.
