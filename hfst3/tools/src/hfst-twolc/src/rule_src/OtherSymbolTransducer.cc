@@ -488,12 +488,14 @@ OtherSymbolTransducer OtherSymbolTransducer::get_inverse_of_upper_projection
   HfstBasicTransducer new_fst;
 
   HfstState state=0;
-  for (HfstBasicTransducer::iterator it = fst.begin(); it != fst.end(); ++it)
+  for (HfstBasicTransducer::const_iterator it = fst.begin(); 
+       it != fst.end(); 
+       ++it)
     {
       new_fst.add_state(state);
       if (fst.is_final_state(state))
     { new_fst.set_final_weight(state,fst.get_final_weight(state)); }
-      for (HfstBasicTransducer::HfstTransitions::iterator jt 
+      for (HfstBasicTransducer::HfstTransitions::const_iterator jt 
          = it->begin();
        jt != it->end();
        ++jt)
@@ -601,8 +603,8 @@ void OtherSymbolTransducer::get_initial_transition_pairs
     { throw UndefinedSymbolPairsFound(); }
 
   HfstBasicTransducer fst(this->transducer);
-  HfstBasicTransducer::iterator start_state_it = fst.begin();
-  for (HfstBasicTransducer::HfstTransitions::iterator jt 
+  HfstBasicTransducer::const_iterator start_state_it = fst.begin();
+  for (HfstBasicTransducer::HfstTransitions::const_iterator jt 
      = start_state_it->begin();
        jt != start_state_it->end();
        ++jt)
