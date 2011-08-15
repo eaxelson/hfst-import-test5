@@ -114,12 +114,12 @@ AC_ARG_WITH([readline],
             [with_readline=yes])
 
 # allow programs to be built separately (sort alphabetically)
-dnl AC_ARG_ENABLE([affix_guessify],
-dnl			  [AS_HELP_STRING([--enable-affix_guessify],
-dnl							  [build affix_guessify tool @<:@default=yes@:>@])],
-dnl			  [enable_affix_guessify=$enableval],
-dnl			  [enable_affix_guessify=no])
-dnl AM_CONDITIONAL([WANT_AFFIX_GUESSIFY], [test x$enable_affix_guessify != xno])
+AC_ARG_ENABLE([affix_guessify],
+			  [AS_HELP_STRING([--enable-affix_guessify],
+							  [build affix_guessify tool @<:@default=yes@:>@])],
+			  [enable_affix_guessify=$enableval],
+			  [enable_affix_guessify=yes])
+AM_CONDITIONAL([WANT_AFFIX_GUESSIFY], [test x$enable_affix_guessify != xno])
 AC_ARG_ENABLE([calculate],
 			  [AS_HELP_STRING([--enable-calculate],
 							  [build calculate tool @<:@default=yes@:>@])],
