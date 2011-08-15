@@ -171,12 +171,10 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         }
       HfstBasicTransducer* repl = 0;
       HfstTransducer* t = 0;
-      HfstState staten = 0;
       HfstState guess_state = 0;
-      HfstState dst_state = 0;
       HfstBasicTransducer* mutt = 0;
       set<HfstState> replayed;
-      HfstBasicTransducer::iterator i;
+      HfstBasicTransducer::const_iterator i;
       switch (direction)
         {
         case GUESS_SUFFIX:
@@ -205,7 +203,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                                             hfst::internal_identity,
                                             weight);
               repl->add_transition(guess_state, guess_arc);
-              for (HfstBasicTransducer::HfstTransitions::iterator arc =
+              for (HfstBasicTransducer::HfstTransitions::const_iterator arc =
                    i->begin();
                    arc != i->end();
                    ++arc)
