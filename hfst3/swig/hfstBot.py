@@ -96,25 +96,20 @@ class HfstBot(irc.IRCClient):
         """This will get called when the bot receives a message."""
         # Check to see if they're sending me a private message
         if channel == self.nickname:
-            print "Got private message:"
-            print "user: %s\nchannel: %s \nmsg:%s" %(user, channel, msg)
-            #            self.msg(user, self.analyzer.analyze()
+            msg = msg.strip().split(' ')[0].strip()
+            analysis_results = self.analyzer.analyze(msg)
+            if len(analysis_results) == 0:
+                self.msg(user, "I don't know that word!")
+                if self.logfilehandle != None:
+                    self.logfilehandle.write(msg + '\n')
+            else:
+                for result in analysis_results:
+                    self.msg(user, result)
             return
 
-        try:
-            user = user.split('!', 1)[0]
-            if ':' in msg:
-                divpos = msg.index(':')
-            elif ',' in msg:
-                divpos = msg.index(',')
-        except:
-            print "Failed to parse message"
-            print "user: %s\nchannel: %s \nmsg:%s" %(user, channel, msg)
-            return
-        
         # Otherwise check to see if it is a message directed at me
         if msg.startswith(self.nickname):
-            msg = msg[divpos + 1:].strip().split(' ')[0].strip()
+            msg = msg[len(self.nickname) + 1:].strip().split(' ')[0].strip()
             replyprefix = "%s: " % user
             analysis_results = self.analyzer.analyze(msg)
             if len(analysis_results) == 0:
