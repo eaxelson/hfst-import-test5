@@ -114,7 +114,7 @@ AC_ARG_WITH([readline],
             [with_readline=yes])
 
 # allow programs to be built separately (sort alphabetically)
-dnlAC_ARG_ENABLE([affix_guessify],
+dnl AC_ARG_ENABLE([affix_guessify],
 dnl			  [AS_HELP_STRING([--enable-affix_guessify],
 dnl							  [build affix_guessify tool @<:@default=yes@:>@])],
 dnl			  [enable_affix_guessify=$enableval],
