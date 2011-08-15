@@ -55,6 +55,7 @@ __HFST_TWOLC_RULE_NAME=\"[^\"]+\" {
   yylval.value = string_copy(yytext);
   return RULE_NAME; 
 }
+__HFST_TWOLC_except { return EXCEPT; }
 __HFST_TWOLC_[*] { return STAR; }
 __HFST_TWOLC_[+] { return PLUS; }
 __HFST_TWOLC_[/] { return FREELY_INSERT; }
@@ -81,8 +82,6 @@ __HFST_TWOLC_NUMBER=[0-9]+,[0-9]+ {
 }
 __HFST_TWOLC_\[ { return LEFT_SQUARE_BRACKET; }
 __HFST_TWOLC_\] { return RIGHT_SQUARE_BRACKET; }
-__HFST_TWOLC_[~][~]\[ { return LEFT_NEGATIVE_CONTEXT_BRACKET; }
-__HFST_TWOLC_\][~][~] { return RIGHT_NEGATIVE_CONTEXT_BRACKET; }
 __HFST_TWOLC_\[\[ { return RE_LEFT_SQUARE_BRACKET; }
 __HFST_TWOLC_\]\] { return RE_RIGHT_SQUARE_BRACKET; }
 __HFST_TWOLC_\( { return LEFT_PARENTHESIS; }

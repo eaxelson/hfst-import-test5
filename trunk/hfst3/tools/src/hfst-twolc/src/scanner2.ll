@@ -68,6 +68,11 @@ __HFST_TWOLC_Rules {
   non_alphabet_symbol_queue.push_back("__HFST_TWOLC_Rules"); 
   return RULES_DECLARATION; 
 }
+__HFST_TWOLC_except {
+  non_alphabet_symbol_queue.push_back("__HFST_TWOLC_except"); 
+  return EXCEPT;
+}
+
 __HFST_TWOLC_KILL_SYMBOL {
   // Signifies a syntax error in the first compilation phase.
   // Just die quietly, since syntax error msgs have been issued by 
@@ -171,16 +176,6 @@ __HFST_TWOLC_\] {
   // End of a bracketed regex.
   non_alphabet_symbol_queue.push_back("__HFST_TWOLC_]"); 
   return RIGHT_SQUARE_BRACKET; 
-}
-__HFST_TWOLC_[~][~]\[ {
-  // Beginning of a negative rule context.
-  non_alphabet_symbol_queue.push_back("__HFST_TWOLC_~~["); 
-  return LEFT_NEGATIVE_CONTEXT_BRACKET; 
-}
-__HFST_TWOLC_\][~][~] {
-  // Beginning of a negative rule context.
-  non_alphabet_symbol_queue.push_back("__HFST_TWOLC_]~~"); 
-  return RIGHT_NEGATIVE_CONTEXT_BRACKET; 
 }
 __HFST_TWOLC_\[\[ {
   // Beginning of a bracketed regex.

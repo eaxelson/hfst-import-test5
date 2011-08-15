@@ -6,4 +6,5 @@ Rules
 
 "Change x to y after z but not between two z symbols"
 x:y <=>      z _ ;
-         ~~[ z _ z ]~~ ;
+    except
+             z _ z ;
