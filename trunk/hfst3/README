@@ -39,7 +39,7 @@ Compilation requirements:
   - the SFST can be downloaded from `university of Stuttgart SFST pages
     <http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html>`_
 
-  - the SFST library version 1.4 or newer must be installed in the running
+  - the SFST library version 1.4.6a or newer must be installed in the running
     system. The library installation of SFST is done by explicit command
     ``make libinstall``.
 
@@ -179,6 +179,7 @@ It is common practice to keep `generated files out of version control
 
 For further installation instruction refer to file ``INSTALL``, which contains
 the standard installation instructions for GNU autoconf based software.
+
 
 Troubleshooting
 ---------------
@@ -380,6 +381,17 @@ The newer versions of bash scripts detect Mac OS X's getopt and fallback to
 using getopts. Note that getopts does not support long options or and filenames
 must be last parameters on commandline with it, so its use is strongly
 discouraged.
+
+error: ‘class SFST::Node’ has no member named ‘index’
+'''''''''''''''''''''''''''''''''''''''''''''''''''''
+**During compilation phase**, error messages about SFST::Node, nodeindexing or
+similar things may be caused by SFST version being too old. For HFST versions
+newer than 3.2.0, SFST must be at least version 1.4.6a, which is where new
+Nodes and nodeindexing are introduced. Note that if you do not require
+support for SFST binary automata or SFST's specific algorithms, you have the
+option of disabling SFST backend support without any loss of functionality using
+the configure option ``without-sfst``.
+
 
 Further information
 -------------------
