@@ -117,8 +117,13 @@ class HfstBot(irc.IRCClient):
                 if self.logfilehandle != None:
                     self.logfilehandle.write(msg + '\n')
             else:
+                timeout = 0
                 for result in analysis_results:
+                    if timeout == 5:
+                        sleep(1)
+                        timeout = 0
                     self.msg(channel, replyprefix + result)
+                    timeout += 1
 
     def action(self, user, channel, msg):
         """This will get called when the bot sees someone do an action."""
