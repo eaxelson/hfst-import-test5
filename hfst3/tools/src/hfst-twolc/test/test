@@ -11,7 +11,7 @@ do
 	cat "$f" | ../src/hfst-twolc-loc -R -s -f foma             > temp.twolc.hfst0
 #	cat "$f" | ../src/hfst-twolc-loc -R -s -f log-openfst      > temp.twolc.hfst1
 	cat "$f" | ../src/hfst-twolc-loc -R -s -f tropical-openfst > temp.twolc.hfst2
-#	cat "$f" | ../src/hfst-twolc-loc -R -s -f sfst             > temp.twolc.hfst3
+	cat "$f" | ../src/hfst-twolc-loc -R -s -f sfst             > temp.twolc.hfst3
 	if  [ $? -ne 0 ] 
 	then
 	        rm -f $GENERATED_FILES
