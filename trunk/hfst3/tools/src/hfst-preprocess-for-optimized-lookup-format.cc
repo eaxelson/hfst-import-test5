@@ -146,7 +146,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         std::map<HfstState,HfstState> rebuilt;
         rebuilt[0] = 0;
     HfstState source_state=0;
-        for (HfstBasicTransducer::iterator state = original.begin();
+        for (HfstBasicTransducer::const_iterator state = original.begin();
              state != original.end();
              ++state)
           {
@@ -161,7 +161,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                 rebuilt[source_state] = state_count;
                 state_count++;
               }
-            for (HfstBasicTransducer::HfstTransitions::iterator arc =
+            for (HfstBasicTransducer::HfstTransitions::const_iterator arc =
                  state->begin();
                  arc != state->end();
                  ++arc)
