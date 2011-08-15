@@ -58,6 +58,7 @@ using hfst::implementations::HfstState;
 bool cave_mode = false;
 vector<string> _rl_arcs;
 
+#if HAVE_DECL_RL_COMPLETION_MATCHES
 char*
 arclabel_generator(const char* text, int state)
 {
@@ -91,7 +92,7 @@ arclabel_completion(const char* text, int start, int end)
     return (matches);
 
 }
-
+#endif
 
 void
 print_usage()
@@ -165,7 +166,9 @@ main_loop(HfstBasicTransducer trans)
     paths.insert(pair<string, HfstState>("", 0));
     HfstBasicTransducer::const_iterator state = trans.begin();
 #if HAVE_READLINE_READLINE_H
+#if HAVE_RL_COMPLETION_MATCHES
     rl_attempted_completion_function = arclabel_completion;
+#endif
     rl_bind_key('\t', rl_complete);
     rl_completion_append_character = '\0';
 #if HAVE_DECL_RL_COMPLETION_SUPPRESS_APPEND
