@@ -198,30 +198,33 @@ OtherSymbolTransducer &OtherSymbolTransducer::harmonize_diacritics
   if (missing_diacritics.empty())
     { return *this; }
 
-  for (HfstBasicTransducer::iterator it = basic.begin();
+  HfstState s = 0;
+  for (HfstBasicTransducer::const_iterator it = basic.begin();
        it != basic.end();
        ++it)
     {
-      for (HfstBasicTransducer::HfstTransitions::const_iterator jt 
-         = it->begin();
-       jt != it->end();
-       ++jt)
-    {
-      if (jt->get_input_symbol() == TWOLC_IDENTITY)
-        {
-          HfstState target = jt->get_target_state();
-
-          for (HandySet<std::string>::iterator kt = 
-             missing_diacritics.begin();
-           kt != missing_diacritics.end();
-           ++kt)
-        {
-          it->push_back
-            (HfstBasicTransition(target,*kt,*kt,0.0));
-        }
-          break;
-        }
-    }
+     for (HfstBasicTransducer::HfstTransitions::const_iterator jt 
+	    = it->begin();
+	  jt != it->end();
+	  ++jt)
+       {
+	  if (jt->get_input_symbol() == TWOLC_IDENTITY)
+	    {
+	      HfstState target = jt->get_target_state();
+	      
+	      for (HandySet<std::string>::iterator kt = 
+		     missing_diacritics.begin();
+		   kt != missing_diacritics.end();
+		   ++kt)
+		{
+		  basic.add_transition(s,
+				       HfstBasicTransition
+				       (target,*kt,*kt,0.0));
+		}
+	      break;
+	    }
+	}
+     ++s;
     }
   transducer = HfstTransducer(basic,transducer_type);
   return *this;
@@ -235,6 +238,7 @@ OtherSymbolTransducer OtherSymbolTransducer::get_context
   OtherSymbolTransducer result(universal);
   OtherSymbolTransducer diamond(TWOLC_DIAMOND);
   universal.apply(&HfstTransducer::repeat_star);
+
   return result.
     apply(&HfstTransducer::concatenate,left).
     apply(&HfstTransducer::concatenate,diamond).
