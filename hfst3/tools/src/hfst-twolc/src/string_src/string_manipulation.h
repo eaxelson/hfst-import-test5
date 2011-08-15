@@ -46,7 +46,7 @@ struct FaultyStringInput
   //! @param function the name of a string-manipulation function.
   //! @param int the input @a function received.
   FaultyStringInput(const std::string &function,
-		    const std::string &input);
+            const std::string &input);
 };
 
 //! @brief Return a string of size @a lgth, where each byte is 0.
@@ -66,7 +66,7 @@ char * string_copy(const char * str);
 //! for the result. Continue until no substitutions can be made (i.e. until
 //! the result no longer contains @a substr as a substring).
 std::string replace_substr(std::string str,const std::string &substr,
-			   const std::string &replacement);
+               const std::string &replacement);
 
 //! @brief Return @a str with all occurrences of @a sign removed.
 std::string remove_sign(std::string str,char sign);
@@ -90,7 +90,7 @@ std::string unescape(const std::string str);
 //! @return Return true if @a str1, thus compared, is alphabetically less than 
 //! @a str2.
 int strcmp_unescaped(const std::string &str1, 
-		     const std::string &str2);
+             const std::string &str2);
 
 //! @brief Transform a string of form <tt>(-)[0-9]+</tt> into an integer.
 //! @pre @a str begins <tt>(-)?[0-9]+</tt>.
@@ -121,14 +121,14 @@ void print_kill_symbol(void);
 //! @brief Regular string comparison.
 struct str_cmp {
   bool operator() (const std::string &str1,
-		   const std::string &str2) const
+           const std::string &str2) const
   { return str1 < str2; }
 };
 
 //! @brief String comparison of unescaped strings.
 struct relaxed_str_cmp {
   bool operator() (const std::string &str1,
-		   const std::string &str2) const
+           const std::string &str2) const
   { return strcmp_unescaped(str1,str2) < 0; }
 };
 

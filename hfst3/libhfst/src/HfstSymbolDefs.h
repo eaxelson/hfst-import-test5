@@ -94,7 +94,7 @@ namespace hfst
 
   namespace symbols {
     void collect_unknown_sets(StringSet &s1, StringSet &unknown1,
-			      StringSet &s2, StringSet &unknown2);
+                  StringSet &s2, StringSet &unknown2);
   }
 }
 #endif

@@ -43,11 +43,11 @@ template <class T> class ConstContainerIterator
   {
     ConstContainerIterator i;
     for (typename TVector::const_iterator it = v.begin(); 
-	 it != v.end(); ++it)
+     it != v.end(); ++it)
       {
-	i.iterator_vector.push_back(it->begin());
-	i.begin_iterator_vector.push_back(it->begin());
-	i.end_iterator_vector.push_back(it->end());
+    i.iterator_vector.push_back(it->begin());
+    i.begin_iterator_vector.push_back(it->begin());
+    i.end_iterator_vector.push_back(it->end());
       }
     return i;
   };
@@ -55,11 +55,11 @@ template <class T> class ConstContainerIterator
   {
     ConstContainerIterator i;
     for (typename TVector::const_iterator it = v.begin(); 
-	 it != v.end(); ++it)
+     it != v.end(); ++it)
       {
-	i.iterator_vector.push_back(it->end());
-	i.begin_iterator_vector.push_back(it->begin());
-	i.end_iterator_vector.push_back(it->end());
+    i.iterator_vector.push_back(it->end());
+    i.begin_iterator_vector.push_back(it->begin());
+    i.end_iterator_vector.push_back(it->end());
       }
     return i;
   };
@@ -84,9 +84,9 @@ template <class T> class ConstContainerIterator
    { 
      if (this != &another)
        {
-	 iterator_vector = another.iterator_vector;
-	 begin_iterator_vector = another.begin_iterator_vector; 
-	 end_iterator_vector = another.end_iterator_vector; 
+     iterator_vector = another.iterator_vector;
+     begin_iterator_vector = another.begin_iterator_vector; 
+     end_iterator_vector = another.end_iterator_vector; 
        }
      return *this;
    };
@@ -105,14 +105,14 @@ template <class T> class ConstContainerIterator
      bool found_a_non_final_iterator = false;
      for (size_t i = 0 ; i < iterator_vector.size(); ++i)
        {
-	 if (iterator_vector.at(i) + 1 == end_iterator_vector.at(i))
-	   { iterator_vector.at(i) = begin_iterator_vector.at(i); }
-	 else
-	   { 
-	     ++iterator_vector.at(i);
-	     found_a_non_final_iterator = true; 
-	     break;
-	   }
+     if (iterator_vector.at(i) + 1 == end_iterator_vector.at(i))
+       { iterator_vector.at(i) = begin_iterator_vector.at(i); }
+     else
+       { 
+         ++iterator_vector.at(i);
+         found_a_non_final_iterator = true; 
+         break;
+       }
        }
      if (not found_a_non_final_iterator)
        { iterator_vector = end_iterator_vector; }
@@ -131,9 +131,9 @@ template <class T> class ConstContainerIterator
   void set_values(VariableValueMap * vvm) const
   {
     for (typename TIteratorVector::const_iterator it = 
-	   iterator_vector.begin();
-	 it != iterator_vector.end(); 
-	 ++it)
+       iterator_vector.begin();
+     it != iterator_vector.end(); 
+     ++it)
       { it->set_values(vvm); }
   }
   

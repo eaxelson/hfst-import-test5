@@ -80,7 +80,7 @@ while (not in->is_eof())
 std::cerr << "Read " 
           << transducers_read 
           << " transducers in total."
-	  << std::endl;
+      << std::endl;
 in->close();
 delete in;
 \endverbatim
@@ -221,7 +221,7 @@ For documentation on the HFST binary transducer format, see
         transducers. 
 
         @pre The file exists. Otherwise, a StreamNotReadableException
-	is thrown.
+    is thrown.
 
         @throws StreamNotReadableException 
         @throws NotTransducerStreamException
@@ -249,7 +249,7 @@ For documentation on the HFST binary transducer format, see
 
         By default, all transducers in a stream have the same type, else
         a TransducerTypeMismatchException is thrown when reading the first
-	transducer that has a different type than the previous ones. */
+    transducer that has a different type than the previous ones. */
     ImplementationType get_type(void) const;
 
     friend class HfstTransducer;

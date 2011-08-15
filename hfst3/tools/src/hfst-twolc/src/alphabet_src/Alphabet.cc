@@ -63,22 +63,22 @@ const OtherSymbolTransducer &Alphabet::compute(const SymbolPair &pair)
   if (diacritics.has_element(input))
     { 
       pair_transducer.apply(&HfstTransducer::disjunct,
-			    OtherSymbolTransducer(input,input)); 
+                OtherSymbolTransducer(input,input)); 
       if (input != output and output != TWOLC_EPSILON and 
-	  output != TWOLC_UNKNOWN)
-	{ std::cerr << "Warning: Diacritic " << input << " in pair "
-		    << input << ":" << output << " will correspond 0."
-		    << std::endl; }
+      output != TWOLC_UNKNOWN)
+    { std::cerr << "Warning: Diacritic " << input << " in pair "
+            << input << ":" << output << " will correspond 0."
+            << std::endl; }
     }
   else if (input == TWOLC_UNKNOWN and output == TWOLC_UNKNOWN)
     { 
       for (HandySet<SymbolPair>::const_iterator it = alphabet_set.begin();
-	   it != alphabet_set.end();
-	   ++it)
-	{
-	  pair_transducer.apply(&HfstTransducer::disjunct,
-				OtherSymbolTransducer(it->first,it->second));
-	}
+       it != alphabet_set.end();
+       ++it)
+    {
+      pair_transducer.apply(&HfstTransducer::disjunct,
+                OtherSymbolTransducer(it->first,it->second));
+    }
       pair_transducer.apply(&HfstTransducer::disjunct,
       			    OtherSymbolTransducer(TWOLC_UNKNOWN));
     }
@@ -86,39 +86,39 @@ const OtherSymbolTransducer &Alphabet::compute(const SymbolPair &pair)
     {
       const SymbolRange &output_set = sets[output];
       for (SymbolRange::const_iterator it = output_set.begin();
-	   it != output_set.end();
-	   ++it)
-	{
-	  for (HandySet<SymbolPair>::const_iterator jt = alphabet_set.begin();
-	       jt != alphabet_set.end();
-	       ++jt)
-	    {
-	      if (*it == jt->second)
-		{ 
-		  pair_transducer.apply(&HfstTransducer::disjunct,
-					OtherSymbolTransducer
-					(jt->first,jt->second)); }
-	    }
-	}
+       it != output_set.end();
+       ++it)
+    {
+      for (HandySet<SymbolPair>::const_iterator jt = alphabet_set.begin();
+           jt != alphabet_set.end();
+           ++jt)
+        {
+          if (*it == jt->second)
+        { 
+          pair_transducer.apply(&HfstTransducer::disjunct,
+                    OtherSymbolTransducer
+                    (jt->first,jt->second)); }
+        }
+    }
     }
   else if (output == TWOLC_UNKNOWN)
     {
       const SymbolRange &input_set = sets[input];
       for (SymbolRange::const_iterator it = input_set.begin();
-	   it != input_set.end();
-	   ++it)
-	{
-	  for (HandySet<SymbolPair>::const_iterator jt = alphabet_set.begin();
-	       jt != alphabet_set.end();
-	       ++jt)
-	    {
-	      if (*it == jt->first)
-		{ 
-		  pair_transducer.apply(&HfstTransducer::disjunct,
-					OtherSymbolTransducer
-					(jt->first,jt->second)); }
-	    }
-	}
+       it != input_set.end();
+       ++it)
+    {
+      for (HandySet<SymbolPair>::const_iterator jt = alphabet_set.begin();
+           jt != alphabet_set.end();
+           ++jt)
+        {
+          if (*it == jt->first)
+        { 
+          pair_transducer.apply(&HfstTransducer::disjunct,
+                    OtherSymbolTransducer
+                    (jt->first,jt->second)); }
+        }
+    }
     }
   else
     {
@@ -126,20 +126,20 @@ const OtherSymbolTransducer &Alphabet::compute(const SymbolPair &pair)
       const SymbolRange &output_set = sets[output];
 
       for (SymbolRange::const_iterator it = input_set.begin(); 
-	   it != input_set.end(); 
-	   ++it)
-	{
-	  for (SymbolRange::const_iterator jt = output_set.begin(); 
-	       jt != output_set.end();
-	       ++jt)
-	    {
-	      if (is_pair(*it,*jt))
-		{ 
-		  pair_transducer.apply(&HfstTransducer::disjunct,
-					OtherSymbolTransducer(*it,*jt));
-		}
-	    }
-	}
+       it != input_set.end(); 
+       ++it)
+    {
+      for (SymbolRange::const_iterator jt = output_set.begin(); 
+           jt != output_set.end();
+           ++jt)
+        {
+          if (is_pair(*it,*jt))
+        { 
+          pair_transducer.apply(&HfstTransducer::disjunct,
+                    OtherSymbolTransducer(*it,*jt));
+        }
+        }
+    }
     }
   alphabet[pair] = pair_transducer;
   return alphabet[pair];

@@ -22,7 +22,7 @@
 namespace hfst_ol {
     
     typedef std::map<hfst_ol::TransitionTableIndex,unsigned int>
-	HfstOlToBasicStateMap;
+    HfstOlToBasicStateMap;
 
 struct TransitionPlaceholder {
     unsigned int target;
@@ -31,9 +31,9 @@ struct TransitionPlaceholder {
 
 TransitionPlaceholder(unsigned int t, SymbolNumber o, float w):
     target(t),
-	output(o),
-	weight(w)
-	{}
+    output(o),
+    weight(w)
+    {}
 };
 
 typedef std::map<SymbolNumber, std::vector<TransitionPlaceholder> >
@@ -48,105 +48,105 @@ struct StatePlaceholder {
     bool final;
     float final_weight;
     StatePlaceholder (unsigned int state, bool finality, unsigned int first,
-		      Weight final_weight):
+              Weight final_weight):
     state_number(state),
-	start_index(UINT_MAX),
-	first_transition(first),
-	final(finality),
-	final_weight(final_weight)
-	{}
+    start_index(UINT_MAX),
+    first_transition(first),
+    final(finality),
+    final_weight(final_weight)
+    {}
     StatePlaceholder ():
     state_number(UINT_MAX),
-	start_index(UINT_MAX),
-	first_transition(UINT_MAX),
-	final(false),
-	final_weight(0.0)
-	{ }
+    start_index(UINT_MAX),
+    first_transition(UINT_MAX),
+    final(false),
+    final_weight(0.0)
+    { }
     
     bool const is_simple(std::set<SymbolNumber> const & flag_symbols) const
-	{
-	    if (state_number == 0) {
-		return false;
-	    }
-	    if (flag_symbols.size() == 0) {
-		return inputs.size() < 2;
-	    }
-	    bool have_zero = false;
-	    SymbolNumber input_symbols = 0;
-	    for(SymbolTransitionsMap::const_iterator it = inputs.begin();
-		it != inputs.end(); ++it) {
-		if ((it->first == 0) or (flag_symbols.count(it->first) != 0)) {
-		    if (!have_zero) {
-			have_zero = true;
-			++input_symbols;
-		    }
-		} else {
-		    ++input_symbols;
-		}
-		if (input_symbols > 1) {
-		    return false;
-		}
-	    }
-	    return true;
-	}
+    {
+        if (state_number == 0) {
+        return false;
+        }
+        if (flag_symbols.size() == 0) {
+        return inputs.size() < 2;
+        }
+        bool have_zero = false;
+        SymbolNumber input_symbols = 0;
+        for(SymbolTransitionsMap::const_iterator it = inputs.begin();
+        it != inputs.end(); ++it) {
+        if ((it->first == 0) or (flag_symbols.count(it->first) != 0)) {
+            if (!have_zero) {
+            have_zero = true;
+            ++input_symbols;
+            }
+        } else {
+            ++input_symbols;
+        }
+        if (input_symbols > 1) {
+            return false;
+        }
+        }
+        return true;
+    }
     
     unsigned int const number_of_transitions(void) const {
-	unsigned int count = 0;
-	for(SymbolTransitionsMap::const_iterator it = inputs.begin();
-	    it != inputs.end(); ++it) {
-	    count += it->second.size();
-	}
-	return count;
+    unsigned int count = 0;
+    for(SymbolTransitionsMap::const_iterator it = inputs.begin();
+        it != inputs.end(); ++it) {
+        count += it->second.size();
+    }
+    return count;
     }
     
     unsigned int const symbol_offset(
-	SymbolNumber const symbol,
-	std::set<SymbolNumber> const & flag_symbols) const {
-	unsigned int offset = 0;
-	if (flag_symbols.size() == 0) {
-	    for(SymbolTransitionsMap::const_iterator it = inputs.begin();
-		it!= inputs.end(); ++it) {
-		if (symbol == it->first) {
-		    return offset;
-		}
-		offset += it->second.size();
-	    }
+    SymbolNumber const symbol,
+    std::set<SymbolNumber> const & flag_symbols) const {
+    unsigned int offset = 0;
+    if (flag_symbols.size() == 0) {
+        for(SymbolTransitionsMap::const_iterator it = inputs.begin();
+        it!= inputs.end(); ++it) {
+        if (symbol == it->first) {
+            return offset;
+        }
+        offset += it->second.size();
+        }
 
-	} else {
-	    if (inputs.count(0) != 0) {
-		if (symbol == 0) {
-		    return offset;
-		}
-		offset = inputs.find(0)->second.size();
-	    }
-	    for(std::set<SymbolNumber>::iterator flag_it = flag_symbols.begin();
-		flag_it != flag_symbols.end(); ++flag_it) {
-		if (inputs.count(*flag_it) != 0) {
-		    if (symbol == 0) {
-			// Even if we don't have epsilons, return 0 if we do
-			// have flags
-			return 0;
-		    }
-		    offset += inputs.find(*flag_it)->second.size();
-		}
-	    }
-	    for(SymbolTransitionsMap::const_iterator it = inputs.begin();
-		it!= inputs.end(); ++it) {
-		if (it->first == 0 || flag_symbols.count(it->first) != 0) {
-		    continue;
-		}
-		if (symbol == it->first) {
-		    return offset;
-		}
-		offset += it->second.size();
-	    }
-	}
-	std::string message("error in conversion between optimized lookup "
-			    "format and HfstTransducer;\ntried to calculate "
-			    "symbol_offset for symbol not present in state");
-	HFST_THROW_MESSAGE
-	  (HfstFatalException,
-	   message);
+    } else {
+        if (inputs.count(0) != 0) {
+        if (symbol == 0) {
+            return offset;
+        }
+        offset = inputs.find(0)->second.size();
+        }
+        for(std::set<SymbolNumber>::iterator flag_it = flag_symbols.begin();
+        flag_it != flag_symbols.end(); ++flag_it) {
+        if (inputs.count(*flag_it) != 0) {
+            if (symbol == 0) {
+            // Even if we don't have epsilons, return 0 if we do
+            // have flags
+            return 0;
+            }
+            offset += inputs.find(*flag_it)->second.size();
+        }
+        }
+        for(SymbolTransitionsMap::const_iterator it = inputs.begin();
+        it!= inputs.end(); ++it) {
+        if (it->first == 0 || flag_symbols.count(it->first) != 0) {
+            continue;
+        }
+        if (symbol == it->first) {
+            return offset;
+        }
+        offset += it->second.size();
+        }
+    }
+    std::string message("error in conversion between optimized lookup "
+                "format and HfstTransducer;\ntried to calculate "
+                "symbol_offset for symbol not present in state");
+    HFST_THROW_MESSAGE
+      (HfstFatalException,
+       message);
     }
 };
 
@@ -160,50 +160,50 @@ class IndexPlaceholders: public std::map<unsigned int,
 {
 public:
     bool const fits(StatePlaceholder const & state,
-		    std::set<SymbolNumber> const & flag_symbols,
-		    unsigned int const position) const
+            std::set<SymbolNumber> const & flag_symbols,
+            unsigned int const position) const
     {
-	if (count(position) != 0) {
-	    return false;
-	}
-	for (SymbolTransitionsMap::const_iterator it = state.inputs.begin();
-	     it != state.inputs.end(); ++it) {
-	    SymbolNumber index_offset = it->first;
-	    if (flag_symbols.count(index_offset) != 0) {
-		index_offset = 0;
-	    }
-	    if (count(index_offset + position + 1) != 0) {
-		return false;
-	    }
-	}
-	return true;
+    if (count(position) != 0) {
+        return false;
+    }
+    for (SymbolTransitionsMap::const_iterator it = state.inputs.begin();
+         it != state.inputs.end(); ++it) {
+        SymbolNumber index_offset = it->first;
+        if (flag_symbols.count(index_offset) != 0) {
+        index_offset = 0;
+        }
+        if (count(index_offset + position + 1) != 0) {
+        return false;
+        }
+    }
+    return true;
     }
 
     bool const unsuitable(unsigned int const index,
-			  SymbolNumber const symbols,
-			  float const packing_aggression) const
+              SymbolNumber const symbols,
+              float const packing_aggression) const
     {
-	if (count(index) != 0) {
-	    return true;
-	}
-	
-	// "Perfect packing" (under this strategy)
+    if (count(index) != 0) {
+        return true;
+    }
+    
+    // "Perfect packing" (under this strategy)
 /*		for (unsigned int i = 0; i < symbols; ++i) {
-		
-		if (count(index + i) == 0) {
-		return true;
-		}
-		return false;
-		}*/
+        
+        if (count(index + i) == 0) {
+        return true;
+        }
+        return false;
+        }*/
 
-	unsigned int filled = 0;
-	for (unsigned int i = 0; i < symbols; ++i) {
-	    filled += count(index + i + 1);
-	    if (filled >= (packing_aggression*symbols)) {
-		return true; // too full
-	    }
-	}
-	return false;
+    unsigned int filled = 0;
+    for (unsigned int i = 0; i < symbols; ++i) {
+        filled += count(index + i + 1);
+        if (filled >= (packing_aggression*symbols)) {
+        return true; // too full
+        }
+    }
+    return false;
     }
 };
 
@@ -215,11 +215,11 @@ void write_transitions_from_state_placeholders(
     std::set<SymbolNumber> & flag_symbols);
 
 void add_transitions_with(SymbolNumber symbol,
-			  std::vector<TransitionPlaceholder> & transitions,
-			  TransducerTable<TransitionW> & transition_table,
-			  std::vector<hfst_ol::StatePlaceholder>
-			  & state_placeholders,
-			  std::set<SymbolNumber> & flag_symbols);
+              std::vector<TransitionPlaceholder> & transitions,
+              TransducerTable<TransitionW> & transition_table,
+              std::vector<hfst_ol::StatePlaceholder>
+              & state_placeholders,
+              std::set<SymbolNumber> & flag_symbols);
 
 #if HAVE_OPENFST // Covers remainder of file
 typedef fst::StdArc::StateId StateId;
@@ -243,10 +243,10 @@ struct transition_label
 struct compare_transition_labels 
 {
   bool operator() ( const transition_label &l1,
-		    const transition_label &l2) const
+            const transition_label &l2) const
   {
     if (l1.input_symbol == l2.input_symbol)
-	    return l1.output_symbol < l2.output_symbol;
+        return l1.output_symbol < l2.output_symbol;
     return l1.input_symbol < l2.input_symbol;
   }
 };
@@ -400,7 +400,7 @@ public:
 struct ConvertTransitionCompare
 {
   bool operator() (const ConvertTransition * t1,
-		   const ConvertTransition * t2) const 
+           const ConvertTransition * t2) const 
   { 
     return t1->operator<(*t2); 
   }
@@ -409,7 +409,7 @@ struct ConvertTransitionCompare
 struct ConvertTransitionIndexCompare
 {
   bool operator() (const ConvertTransitionIndex * i1,
-		   const ConvertTransitionIndex * i2) const 
+           const ConvertTransitionIndex * i2) const 
   {
     return i1->operator<(*i2); 
   }
@@ -499,17 +499,17 @@ private:
   SymbolNumber number_of_input_symbols;
   
   bool state_fits(SymbolNumberSet * input_symbols,
-		  bool final_state,
-		  PlaceHolderVector::size_type index);
+          bool final_state,
+          PlaceHolderVector::size_type index);
 
   void insert_state(SymbolNumberSet * input_symbols,
-		    bool final_state,
-		    PlaceHolderVector::size_type index);
+            bool final_state,
+            PlaceHolderVector::size_type index);
   void get_more_space(void);
 public:
   ConvertTransitionTableIndices(SymbolNumber input_symbol_count):
     lower_bound(0), lower_bound_test_count(0),
-	number_of_input_symbols(input_symbol_count)
+    number_of_input_symbols(input_symbol_count)
   {
     get_more_space();
   };
@@ -526,17 +526,17 @@ class ConvertTransducerHeader
  private:
   static void full_traversal(TransducerHeader& h, TransduceR* tr, StateId n,
          StateIdSet& visited_nodes, StateIdSet& nodes_in_path,
-			     OfstSymbolSet& all_input_symbols);
+                 OfstSymbolSet& all_input_symbols);
   static void find_input_epsilon_cycles(StateId n, StateId t,
-					StateIdSet &epsilon_targets,
-					bool unweighted_only, TransduceR * tr,
-					TransducerHeader& h);
+                    StateIdSet &epsilon_targets,
+                    bool unweighted_only, TransduceR * tr,
+                    TransducerHeader& h);
  public:
   static void compute_header(TransducerHeader& header,
       TransduceR * t, SymbolNumber symbol_count,
-	    TransitionTableIndex number_of_index_table_entries,
-	    TransitionTableIndex number_of_target_table_entries,
-	    bool weighted);
+        TransitionTableIndex number_of_index_table_entries,
+        TransitionTableIndex number_of_target_table_entries,
+        bool weighted);
 };
 
 class ConvertTransducer
@@ -556,8 +556,8 @@ private:
   void set_index_table_indices(void);
   
   void add_input_symbols(StateId n,
-			 SymbolNumberSet &input_symbols,
-			 StateIdSet &visited_nodes);
+             SymbolNumberSet &input_symbols,
+             StateIdSet &visited_nodes);
   SymbolNumber number_of_input_symbols(void);
   
   TransitionTableIndex count_transitions(void) const;

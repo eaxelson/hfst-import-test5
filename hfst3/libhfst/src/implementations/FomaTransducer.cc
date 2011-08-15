@@ -410,22 +410,22 @@ namespace hfst { namespace implementations {
     const char * identity = internal_identity.c_str();
     fsm * eps_marked = 
       fsm_substitute_symbol(t, const_cast<char*>(epsilon), 
-			    epsilon_marker);
+                epsilon_marker);
     fsm * ins = fsm_kleene_star
       ( 
        fsm_union( 
-		 fsm_symbol(const_cast<char*>(identity)), 
-		 fsm_cross_product
-		 ( fsm_symbol(const_cast<char*>(epsilon)),
-		   fsm_symbol(const_cast<char*>(symbol_pair.second.c_str())
-			      ))));
+         fsm_symbol(const_cast<char*>(identity)), 
+         fsm_cross_product
+         ( fsm_symbol(const_cast<char*>(epsilon)),
+           fsm_symbol(const_cast<char*>(symbol_pair.second.c_str())
+                  ))));
     fsm * comp = fsm_substitute_symbol
       ( fsm_compose(eps_marked, ins),
-	const_cast<char*>(epsilon),
-	const_cast<char*>(symbol_pair.first.c_str()));
+    const_cast<char*>(epsilon),
+    const_cast<char*>(symbol_pair.first.c_str()));
   return fsm_substitute_symbol( comp,
-				epsilon_marker,
-				const_cast<char*>(epsilon));
+                epsilon_marker,
+                const_cast<char*>(epsilon));
   free(epsilon_marker);
   // marker should be removed from sigma.. 
   // (HfstBasicTransducer is now used instead)
@@ -751,10 +751,10 @@ namespace hfst { namespace implementations {
     const char * c = symbol.c_str();
     for(struct sigma* p = t->sigma; p!=NULL; p=p->next)
       {
-	if (p->symbol == NULL)
-	  break;
-	if (strcmp(p->symbol, c) == 0)
-	  return (unsigned int)p->number;
+    if (p->symbol == NULL)
+      break;
+    if (strcmp(p->symbol, c) == 0)
+      return (unsigned int)p->number;
       }
     HFST_THROW(SymbolNotFoundException);
   }
@@ -778,17 +778,17 @@ namespace hfst { namespace implementations {
     char * lexcfile = file_to_mem(filename_);
     if (lexcfile == NULL) 
       {
-	std::string msg("Could not read file ");
-	msg + filename;
-	HFST_THROW_MESSAGE(StreamNotReadableException, msg);
+    std::string msg("Could not read file ");
+    msg + filename;
+    HFST_THROW_MESSAGE(StreamNotReadableException, msg);
       }
     delete filename_;
     fsm * retval = fsm_lexc_parse_string(lexcfile);
     if (retval == NULL)
       {
-	std::string msg("Not valid Lexc format in file ");
-	msg + filename;
-	HFST_THROW_MESSAGE(NotValidLexcFormatException, msg);
+    std::string msg("Not valid Lexc format in file ");
+    msg + filename;
+    HFST_THROW_MESSAGE(NotValidLexcFormatException, msg);
       }
     free(lexcfile);
     return retval;

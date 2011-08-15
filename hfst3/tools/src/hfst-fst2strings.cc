@@ -106,11 +106,11 @@ print_usage()
             "all possible paths are printed:\n"
             "NSTR, NBEST and NCYC default to infinity.\n"
             "NBEST overrides NSTR and NCYC\n"
-	    "NRAND overrides NBEST, NSTR and NCYC\n"
+        "NRAND overrides NBEST, NSTR and NCYC\n"
             "If EPS is not given, default is empty string.\n"
             "Numeric options are parsed with strtod(3).\n"
-	    "Xfst variables supported are { obey-flags, print-flags,\n"
-	    "print-pairs, print-space, quote-special }.\n");
+        "Xfst variables supported are { obey-flags, print-flags,\n"
+        "print-pairs, print-space, quote-special }.\n");
     fprintf(message_out,
         "\n"
         "Examples:\n"
@@ -148,11 +148,11 @@ parse_options(int argc, char** argv)
             {"max-out-length", required_argument, 0, 'L'},
             {"max-strings", required_argument, 0, 'n'},
             {"nbest", required_argument, 0, 'N'},
-	    {"random", required_argument, 0, 'r'},
+        {"random", required_argument, 0, 'r'},
             {"out-exclude", required_argument, 0, 'U'},
             {"out-prefix", required_argument, 0, 'P'},
             {"print-pairstrings", no_argument, 0, 'a'},
-	    {"print-spaces", no_argument, 0, 'S'},
+        {"print-spaces", no_argument, 0, 'S'},
             {"print-weights", no_argument, 0, 'w'},
             {"xfst", required_argument, 0, 'X'},
             {0,0,0,0}
@@ -237,9 +237,9 @@ parse_options(int argc, char** argv)
         case 'a':
           print_in_pairstring_format = true;
           break;
-	case 'S':
-	  print_spaces = true;
-	  break;
+    case 'S':
+      print_spaces = true;
+      break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -251,8 +251,8 @@ parse_options(int argc, char** argv)
 
 /* Replace all strings \a str1 in \a symbol with \a str2. */
 static std::string replace_all(std::string symbol, 
-			       const std::string &str1,
-			       const std::string &str2)
+                   const std::string &str1,
+                   const std::string &str2)
 {
   size_t pos = symbol.find(str1);
   while (pos != std::string::npos) // while there are str1:s to replace
@@ -260,7 +260,7 @@ static std::string replace_all(std::string symbol,
       symbol.erase(pos, str1.size()); // erase str1
       symbol.insert(pos, str2);       // insert str2 instead
       pos = symbol.find               // find next str1
-	(str1, pos+str2.size());      
+    (str1, pos+str2.size());      
     }
   return symbol;
 }
@@ -357,28 +357,28 @@ public:
       {
         if (print_in_pairstring_format) 
           {
-	    bool first_pair=true;
+        bool first_pair=true;
             for (StringPairVector::const_iterator it = path.second.begin();
                  it != path.second.end(); it++) 
               {
-		if ((not filter_fd) || 
-		    (not FdOperation::is_diacritic(it->first))) {
-		  if (print_spaces && not first_pair) 
-		    {
-		      *out_ << " ";
-		    }
-		
-		  *out_ << get_print_format(it->first);
-		  first_pair=false;
-		}
+        if ((not filter_fd) || 
+            (not FdOperation::is_diacritic(it->first))) {
+          if (print_spaces && not first_pair) 
+            {
+              *out_ << " ";
+            }
+        
+          *out_ << get_print_format(it->first);
+          first_pair=false;
+        }
 
-		if (it->first.compare(it->second) != 0)
-		  {
-		    if ((not filter_fd) || 
-			(not FdOperation::is_diacritic(it->second)))
-		      *out_ << ":"
-			    << get_print_format(it->second);
-		  }
+        if (it->first.compare(it->second) != 0)
+          {
+            if ((not filter_fd) || 
+            (not FdOperation::is_diacritic(it->second)))
+              *out_ << ":"
+                << get_print_format(it->second);
+          }
               }
             if (display_weights) 
               {
@@ -388,47 +388,47 @@ public:
           }
         else 
           {
-	    bool is_automaton=true;
+        bool is_automaton=true;
 
-	    bool first_symbol=true;
+        bool first_symbol=true;
             for (StringPairVector::const_iterator it = path.second.begin();
                  it != path.second.end(); ++it)
               {
-		if ((not filter_fd) || 
-		    (not FdOperation::is_diacritic(it->first)))
-		  {
-		    if (print_spaces && not first_symbol)
-		      {
-			*out_ << " ";
-		      }
-		    if (it->first.compare(it->second) != 0)
-		      is_automaton=false;
-		    
-		    *out_ << get_print_format(it->first);
-		  }
-		first_symbol=false;
-	      }
-	    if (print_spaces)
-	      {
-		*out_ << " ";
-	      }
+        if ((not filter_fd) || 
+            (not FdOperation::is_diacritic(it->first)))
+          {
+            if (print_spaces && not first_symbol)
+              {
+            *out_ << " ";
+              }
+            if (it->first.compare(it->second) != 0)
+              is_automaton=false;
+            
+            *out_ << get_print_format(it->first);
+          }
+        first_symbol=false;
+          }
+        if (print_spaces)
+          {
+        *out_ << " ";
+          }
 
-	    if (not is_automaton) {
-	      *out_ << ":";
-	      for (StringPairVector::const_iterator it = path.second.begin();
-		   it != path.second.end(); ++it)
-		{
-		  if ((not filter_fd) || 
-		      (not FdOperation::is_diacritic(it->second)))
-		    {
-		      if (print_spaces)
-			{
-			  *out_ << " ";
-			}
-		      *out_ << get_print_format(it->second);
-		    }
-		}
-	    }
+        if (not is_automaton) {
+          *out_ << ":";
+          for (StringPairVector::const_iterator it = path.second.begin();
+           it != path.second.end(); ++it)
+        {
+          if ((not filter_fd) || 
+              (not FdOperation::is_diacritic(it->second)))
+            {
+              if (print_spaces)
+            {
+              *out_ << " ";
+            }
+              *out_ << get_print_format(it->second);
+            }
+        }
+        }
 
             if (display_weights)
               {
@@ -479,8 +479,8 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
     else
     {
       if(max_random_strings <= 0 && max_strings <= 0 && max_input_length <= 0 
-	 && max_output_length <= 0 &&
-	 cycles < 0 && t.is_cyclic())
+     && max_output_length <= 0 &&
+     cycles < 0 && t.is_cyclic())
       {
         error(EXIT_FAILURE, 0,
               "Transducer is cyclic. Use one or more of these options: "
@@ -493,45 +493,45 @@ process_stream(HfstInputStream& instream, std::ostream& outstream)
       verbose_printf("Finding at most %i path(s)...\n", max_strings);
     else if(max_random_strings > 0)
       verbose_printf("Finding at most %i random path(s)...\n", 
-		     max_random_strings);
+             max_random_strings);
     else
       verbose_printf("Finding strings...\n");
     
     /* not random strings */
     if (max_random_strings <= 0)
       {
-	Callback cb(max_strings, &outstream);
-	if(eval_fd)
-	  t.extract_paths_fd(cb, cycles, filter_fd);
-	else
-	  t.extract_paths(cb, cycles);    
-	verbose_printf("Printed %i string(s)\n", cb.count);
+    Callback cb(max_strings, &outstream);
+    if(eval_fd)
+      t.extract_paths_fd(cb, cycles, filter_fd);
+    else
+      t.extract_paths(cb, cycles);    
+    verbose_printf("Printed %i string(s)\n", cb.count);
       }
     /* random strings */
     else
       {
-	HfstTwoLevelPaths results;
-	try {
-	  if (eval_fd) {
-	    t.extract_random_paths_fd(results, max_random_strings, filter_fd);
-	  }
-	  else {
-	    t.extract_random_paths(results, max_random_strings);
-	  }
-	}
-	catch (const HfstException e) {
-	  fprintf(stderr, "option --random not implemented\n");
-	  return EXIT_FAILURE;
-	}
-	  
-	Callback cb(max_random_strings, &outstream);
-	for (HfstTwoLevelPaths::const_iterator it = results.begin();
-	     it != results.end(); it++)
-	  {
-	    HfstTwoLevelPath path = *it;
-	    cb(path, true /*final*/);
-	  }
-	verbose_printf("Printed %i random string(s)\n", cb.count);
+    HfstTwoLevelPaths results;
+    try {
+      if (eval_fd) {
+        t.extract_random_paths_fd(results, max_random_strings, filter_fd);
+      }
+      else {
+        t.extract_random_paths(results, max_random_strings);
+      }
+    }
+    catch (const HfstException e) {
+      fprintf(stderr, "option --random not implemented\n");
+      return EXIT_FAILURE;
+    }
+      
+    Callback cb(max_random_strings, &outstream);
+    for (HfstTwoLevelPaths::const_iterator it = results.begin();
+         it != results.end(); it++)
+      {
+        HfstTwoLevelPath path = *it;
+        cb(path, true /*final*/);
+      }
+    verbose_printf("Printed %i random string(s)\n", cb.count);
       }
     
   }
@@ -548,9 +548,9 @@ int main( int argc, char **argv ) {
 
     if (max_strings > 0 && max_random_strings > 0 && !silent)
       {
-	fprintf(stderr, 
-		"warning: option --max_strings ignored, --random used\n");
-	max_strings = -1;
+    fprintf(stderr, 
+        "warning: option --max_strings ignored, --random used\n");
+    max_strings = -1;
       }
 
     if (retval != EXIT_CONTINUE)

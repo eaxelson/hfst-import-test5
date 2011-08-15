@@ -40,7 +40,7 @@ namespace hfst { namespace implementations
     struct sigma * P = t->sigma;
     while (P != NULL) {
       if (P->symbol == NULL)
-	break;
+    break;
       alphabet_before.insert(std::string(P->symbol));
       P = P->next;
     }
@@ -62,16 +62,16 @@ namespace hfst { namespace implementations
     // and initialize the transition vector of net.
     if ((fsm+i)->target != -1 )
       {
-	unsigned int number_of_transitions=0;
-	for (unsigned int j=0; 
-	     (fsm+i+j)->target != -1 &&
-	       (fsm+i+j)->state_no == (fsm+i)->state_no;
-	     j++)
-	  {
-	    number_of_transitions++;
-	  }
-	net->initialize_transition_vector((fsm+i)->state_no, 
-					  number_of_transitions);
+    unsigned int number_of_transitions=0;
+    for (unsigned int j=0; 
+         (fsm+i+j)->target != -1 &&
+           (fsm+i+j)->state_no == (fsm+i)->state_no;
+         j++)
+      {
+        number_of_transitions++;
+      }
+    net->initialize_transition_vector((fsm+i)->state_no, 
+                      number_of_transitions);
       }
 
     // 1. If the source state is an initial state in foma:
@@ -148,26 +148,26 @@ namespace hfst { namespace implementations
   StringSet alphabet_after = net->get_alphabet();
   if (alphabet_after != alphabet_before) {
     for (StringSet::const_iterator after_it = alphabet_after.begin();
-	 after_it != alphabet_after.end(); after_it++)
+     after_it != alphabet_after.end(); after_it++)
       {
-	if (alphabet_before.find(*after_it) == alphabet_before.end())
-	  {
-	    std::cerr << "ERROR: " 
-		      << *after_it 
-		      << " was inserted to the alphabet!"
-		      << std::endl;
-	  }
+    if (alphabet_before.find(*after_it) == alphabet_before.end())
+      {
+        std::cerr << "ERROR: " 
+              << *after_it 
+              << " was inserted to the alphabet!"
+              << std::endl;
+      }
       }
     for (StringSet::const_iterator before_it = alphabet_before.begin();
-	 before_it != alphabet_before.end(); before_it++)
+     before_it != alphabet_before.end(); before_it++)
       {
-	if (alphabet_after.find(*before_it) == alphabet_after.end())
-	  {
-	    std::cerr << "ERROR: " 
-		      << *before_it 
-		      << " was removed from the alphabet!"
-		      << std::endl;
-	  }
+    if (alphabet_after.find(*before_it) == alphabet_after.end())
+      {
+        std::cerr << "ERROR: " 
+              << *before_it 
+              << " was removed from the alphabet!"
+              << std::endl;
+      }
       }
     assert(false);
   }
@@ -213,7 +213,7 @@ namespace hfst { namespace implementations
             free(input);
             free(output);
           }
-	source_state++;
+    source_state++;
       }
     
     // Go through the final states
@@ -248,9 +248,9 @@ namespace hfst { namespace implementations
     struct sigma * p = net->sigma;
     while (p != NULL) {
       if (p->symbol == NULL)
-	break;
+    break;
       if (p->number != 0 && p->number != 1 && p->number != 2)
-	alphabet_after.insert(std::string(p->symbol));
+    alphabet_after.insert(std::string(p->symbol));
       p = p->next;
     }
     assert(alphabet_after == alphabet_before);
@@ -306,16 +306,16 @@ namespace hfst { namespace implementations
     // and initialize the transition vector of net.
     if ((fsm+i)->target != -1 )
       {
-	unsigned int number_of_transitions=0;
-	for (unsigned int j=0; 
-	     (fsm+i+j)->target != -1 &&
-	       (fsm+i+j)->state_no == (fsm+i)->state_no;
-	     j++)
-	  {
-	    number_of_transitions++;
-	  }
-	net->initialize_transition_vector((fsm+i)->state_no, 
-					  number_of_transitions);
+    unsigned int number_of_transitions=0;
+    for (unsigned int j=0; 
+         (fsm+i+j)->target != -1 &&
+           (fsm+i+j)->state_no == (fsm+i)->state_no;
+         j++)
+      {
+        number_of_transitions++;
+      }
+    net->initialize_transition_vector((fsm+i)->state_no, 
+                      number_of_transitions);
       }
 
     // 1. If the source state is an initial state in foma:
@@ -412,13 +412,13 @@ namespace hfst { namespace implementations
           {
             // Copy the transition
             fsm_construct_add_arc
-	      (h, 
-	       (int)source_state, 
-	       (int)tr_it->get_target_state(),
-	       strdup(get_string(tr_it->get_input_symbol()).c_str()),
-	       strdup(get_string(tr_it->get_output_symbol()).c_str()) );
+          (h, 
+           (int)source_state, 
+           (int)tr_it->get_target_state(),
+           strdup(get_string(tr_it->get_input_symbol()).c_str()),
+           strdup(get_string(tr_it->get_output_symbol()).c_str()) );
           }
-	source_state++;
+    source_state++;
       }
     
     // Go through the final states
@@ -462,7 +462,7 @@ namespace hfst { namespace implementations
     struct sigma * p = t->sigma;
     while (p != NULL) {
       if (p->symbol == NULL)
-	break;
+    break;
       net->symbol_map[p->number] = std::string(p->symbol);
       p = p->next;
     }
@@ -475,60 +475,60 @@ namespace hfst { namespace implementations
     // and initialize the transition vector of net.
     if ((fsm+i)->target != -1 )
       {
-	unsigned int number_of_transitions=0;
-	for (unsigned int j=0; 
-	     (fsm+i+j)->target != -1 &&
-	       (fsm+i+j)->state_no == (fsm+i)->state_no;
-	     j++)
-	  {
-	    number_of_transitions++;
-	  }
-	net->initialize_transition_vector((fsm+i)->state_no, 
-					  number_of_transitions);
+    unsigned int number_of_transitions=0;
+    for (unsigned int j=0; 
+         (fsm+i+j)->target != -1 &&
+           (fsm+i+j)->state_no == (fsm+i)->state_no;
+         j++)
+      {
+        number_of_transitions++;
+      }
+    net->initialize_transition_vector((fsm+i)->state_no, 
+                      number_of_transitions);
       }
       
       // 1. If the source state is an initial state in foma:
       if ((fsm+i)->start_state == 1) 
-	{
-	  // If the start state has not yet been encountered.
-	  if (not start_state_found) {
-	    start_state_id = (fsm+i)->state_no;
-	    //if (start_state_id != 0) {
-	    //  throw ErrorException();
-	    //}
-	    start_state_found=true;
-	  }
-	  // If the start state is encountered again, 
-	  else if ((fsm+i)->state_no == start_state_id) {
-	    // do nothing.
-	  }
-	  // If there are several initial states in foma transducer,
-	  else {
-	    // throw an exception.
-	    HFST_THROW_MESSAGE
-	      (HfstFatalException,
-	       "Foma transducer has more than one start state");
-	  }
-	}
+    {
+      // If the start state has not yet been encountered.
+      if (not start_state_found) {
+        start_state_id = (fsm+i)->state_no;
+        //if (start_state_id != 0) {
+        //  throw ErrorException();
+        //}
+        start_state_found=true;
+      }
+      // If the start state is encountered again, 
+      else if ((fsm+i)->state_no == start_state_id) {
+        // do nothing.
+      }
+      // If there are several initial states in foma transducer,
+      else {
+        // throw an exception.
+        HFST_THROW_MESSAGE
+          (HfstFatalException,
+           "Foma transducer has more than one start state");
+      }
+    }
       
       // 2. If there are transitions leaving from the state,
       if ((fsm+i)->target != -1) 
-	{
-	  // copy the transition.
-	  net->add_transition
-	    ((fsm+i)->state_no,
-	     (fsm+i)->target,
-	     (fsm+i)->in, 
-	     (fsm+i)->out,
-	     0);
-	}
+    {
+      // copy the transition.
+      net->add_transition
+        ((fsm+i)->state_no,
+         (fsm+i)->target,
+         (fsm+i)->in, 
+         (fsm+i)->out,
+         0);
+    }
       
       // 3. If the source state is final in foma,
       if ((fsm+i)->final_state == 1) 
-	{
-	  // set the state as final.
-	  net->set_final_weight((fsm+i)->state_no, 0);
-	}
+    {
+      // set the state as final.
+      net->set_final_weight((fsm+i)->state_no, 0);
+    }
       
     }
     
@@ -536,8 +536,8 @@ namespace hfst { namespace implementations
     if (not start_state_found) {
       // throw an exception.
       HFST_THROW_MESSAGE
-	(HfstFatalException,
-	 "Foma transducer has no start state");
+    (HfstFatalException,
+     "Foma transducer has no start state");
     }
     
     /* If start state number (N) is not zero, swap state numbers N and zero 
@@ -545,8 +545,8 @@ namespace hfst { namespace implementations
     if (start_state_id != 0) {
       //net->swap_state_numbers(start_state_id,0);
       HFST_THROW_MESSAGE
-	(HfstFatalException,
-	 "Start state of a foma transducer is not numbered as zero");
+    (HfstFatalException,
+     "Start state of a foma transducer is not numbered as zero");
     }
         
     return net;
@@ -566,7 +566,7 @@ namespace hfst { namespace implementations
            = t->symbol_map.begin();
          it != t->symbol_map.end(); it++)
       {
-	symbols.push_back(it->second);
+    symbols.push_back(it->second);
         char *symbol = strdup(it->second.c_str());
         if ( fsm_construct_check_symbol(h,symbol) == -1 ) {
           fsm_construct_add_symbol(h,symbol);

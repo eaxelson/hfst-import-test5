@@ -80,7 +80,7 @@ int main(void)
     apply(&HfstTransducer::concatenate,unknown);
   OtherSymbolTransducerVector contexts(1,context);
   LeftArrowRule rule("__HFST_TWOLC_RULE_NAME=\"Test rule\"",
-		     center,contexts);
+             center,contexts);
   OtherSymbolTransducer compiled_rule = rule.compile();
   //std::cout << compiled_rule.get_transducer() << std::endl;
 }

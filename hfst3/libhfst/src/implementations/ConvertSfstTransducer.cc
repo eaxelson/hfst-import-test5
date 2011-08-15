@@ -59,7 +59,7 @@ namespace hfst { namespace implementations
       // vector of net.
       unsigned int number_of_nodes=0;
       for( SFST::ArcsIter p(arcs); p; p++ ) {
-	number_of_nodes++;
+    number_of_nodes++;
       }
       // NODE_NUMBERING
       net->initialize_transition_vector(index[node], number_of_nodes);
@@ -68,21 +68,21 @@ namespace hfst { namespace implementations
       for( SFST::ArcsIter p(arcs); p; p++ ) {
         SFST::Arc *arc=p;
 
-	const char *isymbol = alphabet.code2symbol(arc->label().lower_char());
-	if (isymbol == NULL) {
-	  std::cerr << "ERROR: no string found for number " 
-		    << arc->label().lower_char() << std::endl;
-	  assert(false);
-	}
+    const char *isymbol = alphabet.code2symbol(arc->label().lower_char());
+    if (isymbol == NULL) {
+      std::cerr << "ERROR: no string found for number " 
+            << arc->label().lower_char() << std::endl;
+      assert(false);
+    }
         std::string istring
           (isymbol);
 
-	const char *osymbol = alphabet.code2symbol(arc->label().upper_char());
-	if (osymbol == NULL) {
-	  std::cerr << "ERROR: no string found for number " 
-		    << arc->label().upper_char() << std::endl;
-	  assert(false);
-	}
+    const char *osymbol = alphabet.code2symbol(arc->label().upper_char());
+    if (osymbol == NULL) {
+      std::cerr << "ERROR: no string found for number " 
+            << arc->label().upper_char() << std::endl;
+      assert(false);
+    }
         std::string ostring
           (osymbol);
 
@@ -93,7 +93,7 @@ namespace hfst { namespace implementations
           ostring = std::string(internal_epsilon);
         }
 
-	// NODE_NUMBERING
+    // NODE_NUMBERING
         net->add_transition(index[node], 
                             HfstBasicTransition
                             (index[arc->target_node()],
@@ -110,7 +110,7 @@ namespace hfst { namespace implementations
       for( SFST::ArcsIter p(arcs); p; p++ ) {
         SFST::Arc *arc=p;
         sfst_to_hfst_basic_transducer(arc->target_node(), index,  
-				      net, alphabet);
+                      net, alphabet);
       }
     }
   }
@@ -125,10 +125,10 @@ namespace hfst { namespace implementations
     for (SFST::Alphabet::CharMap::const_iterator it 
            = CM.begin(); it != CM.end(); it++) 
       {
-	if (it->first != 0)
-	  alphabet_before.insert(std::string(it->second));
-	else
-	  alphabet_before.insert(internal_epsilon);
+    if (it->first != 0)
+      alphabet_before.insert(std::string(it->second));
+    else
+      alphabet_before.insert(internal_epsilon);
       }  
     
     HfstBasicTransducer * net = new HfstBasicTransducer();
@@ -141,7 +141,7 @@ namespace hfst { namespace implementations
       VMARK++;
    
     sfst_to_hfst_basic_transducer(t->root_node(), index, 
-				  /*visited_nodes,*/ 
+                  /*visited_nodes,*/ 
                                   net, t->alphabet);
     
     // Make sure that also symbols that occur in the alphabet of the
@@ -214,9 +214,9 @@ namespace hfst { namespace implementations
              t->alphabet.symbol2code(ostring.c_str()));
           
           // Copy transition to node
-	  state_vector[source_state]->add_arc
-	    (l, state_vector[tr_it->get_target_state()], t);
-					   
+      state_vector[source_state]->add_arc
+        (l, state_vector[tr_it->get_target_state()], t);
+                       
         }
       source_state++;
     }
@@ -227,7 +227,7 @@ namespace hfst { namespace implementations
        it != net->final_weight_map.end(); it++) 
     {
       if (it->first >= state_vector.size()) { // should not happen..
-	state_vector.push_back(t->new_node());
+    state_vector.push_back(t->new_node());
       }
       state_vector[it->first]->set_final(1);
     }
@@ -260,7 +260,7 @@ namespace hfst { namespace implementations
       // vector of net.
       unsigned int number_of_nodes=0;
       for( SFST::ArcsIter p(arcs); p; p++ ) {
-	number_of_nodes++;
+    number_of_nodes++;
       }
       // NODE_NUMBERING
       net->initialize_transition_vector(index[node], number_of_nodes);
@@ -268,27 +268,27 @@ namespace hfst { namespace implementations
       // Go through all transitions and copy them to \a net
       for( SFST::ArcsIter p(arcs); p; p++ ) {
         SFST::Arc *arc=p;
-	
-	unsigned int in, out;
-	try {
-	  in = harmonization_vector.at(arc->label().lower_char());
-	  out = harmonization_vector.at(arc->label().upper_char());
-	} catch (std::out_of_range e)
-	  {
-	    fprintf(stderr, "no index for %i or %i\n",
-		    arc->label().lower_char(),
-		    arc->label().upper_char());
-	    fprintf(stderr, "the size of harmonization_vector is %i\n",
-		    (unsigned int)harmonization_vector.size());
-	    assert(false);
-	  }
+    
+    unsigned int in, out;
+    try {
+      in = harmonization_vector.at(arc->label().lower_char());
+      out = harmonization_vector.at(arc->label().upper_char());
+    } catch (std::out_of_range e)
+      {
+        fprintf(stderr, "no index for %i or %i\n",
+            arc->label().lower_char(),
+            arc->label().upper_char());
+        fprintf(stderr, "the size of harmonization_vector is %i\n",
+            (unsigned int)harmonization_vector.size());
+        assert(false);
+      }
 
-	// NODE_NUMBERING
+    // NODE_NUMBERING
         net->add_transition(index[node], 
                             HfstFastTransition
                             (index[arc->target_node()],
                              in,
-			     out,
+                 out,
                              0));
       }
 
@@ -300,7 +300,7 @@ namespace hfst { namespace implementations
       for( SFST::ArcsIter p(arcs); p; p++ ) {
         SFST::Arc *arc=p;
         sfst_to_hfst_fast_transducer(arc->target_node(), index, 
-				      net, harmonization_vector);
+                      net, harmonization_vector);
       }
     }
   }
@@ -321,13 +321,13 @@ namespace hfst { namespace implementations
            = cm.begin(); it != cm.end(); it++) 
       {
         if (it->first != 0) { 
-	  // it is possible that there are gaps in numbering
-	  while (coding_vector.size() < it->first) {
-	    // empty space if no symbol at this index
-	    coding_vector.push_back(std::string(""));
-	  }
-	  coding_vector.push_back(std::string(it->second));
-	}
+      // it is possible that there are gaps in numbering
+      while (coding_vector.size() < it->first) {
+        // empty space if no symbol at this index
+        coding_vector.push_back(std::string(""));
+      }
+      coding_vector.push_back(std::string(it->second));
+    }
       }
     NumberVector harmonization_vector 
       = get_harmonization_vector(coding_vector);
@@ -338,7 +338,7 @@ namespace hfst { namespace implementations
       VMARK++;
    
     sfst_to_hfst_fast_transducer(t->root_node(), index, 
-				 net, harmonization_vector);
+                 net, harmonization_vector);
         
     return net;
   }
@@ -380,12 +380,12 @@ namespace hfst { namespace implementations
         {
           SFST::Label l
             (tr_it->get_input_symbol(),
-	     tr_it->get_output_symbol());             
+         tr_it->get_output_symbol());             
           
           // Copy transition to node
-	  state_vector[source_state]->add_arc
-	    (l, state_vector[tr_it->get_target_state()], t);
-					   
+      state_vector[source_state]->add_arc
+        (l, state_vector[tr_it->get_target_state()], t);
+                       
         }
       source_state++;
     }
@@ -396,7 +396,7 @@ namespace hfst { namespace implementations
        it != net->final_weight_map.end(); it++) 
     {
       if (it->first >= state_vector.size()) { // should not happen..
-	state_vector.push_back(t->new_node());
+    state_vector.push_back(t->new_node());
       }
       state_vector[it->first]->set_final(1);
     }
@@ -431,7 +431,7 @@ namespace hfst { namespace implementations
       // vector of net.
       unsigned int number_of_nodes=0;
       for( SFST::ArcsIter p(arcs); p; p++ ) {
-	number_of_nodes++;
+    number_of_nodes++;
       }
       // NODE_NUMBERING
       net->initialize_transition_vector(index[node], number_of_nodes);
@@ -440,12 +440,12 @@ namespace hfst { namespace implementations
       for( SFST::ArcsIter p(arcs); p; p++ ) {
         SFST::Arc *arc=p;
 
-	// NODE_NUMBERING
+    // NODE_NUMBERING
         net->add_transition(index[node], 
                             index[arc->target_node()],
-			    arc->label().lower_char(),
-			    arc->label().upper_char(),
-			    0);
+                arc->label().lower_char(),
+                arc->label().upper_char(),
+                0);
       }
       
       if (node->is_final()) {     // NODE_NUMBERING
@@ -477,7 +477,7 @@ namespace hfst { namespace implementations
     for (SFST::Alphabet::CharMap::const_iterator it 
            = cm.begin(); it != cm.end(); it++) {
       if (it->first != 0) { // The epsilon symbol "<>" is not inserted 
-	net->symbol_map[it->first] = std::string(it->second);
+    net->symbol_map[it->first] = std::string(it->second);
       }
     }
     
@@ -498,10 +498,10 @@ namespace hfst { namespace implementations
 
     // Copy the alphabet
     for (HfstConstantTransducer::SymbolMap::const_iterator it 
-	   = net->symbol_map.begin();
-	 it != net->symbol_map.end(); it++) {
+       = net->symbol_map.begin();
+     it != net->symbol_map.end(); it++) {
       if (not is_epsilon(it->second)) {
-	t->alphabet.add_symbol(it->second.c_str(), it->first);
+    t->alphabet.add_symbol(it->second.c_str(), it->first);
       }
     }    
 
@@ -517,23 +517,23 @@ namespace hfst { namespace implementations
     // Go through all states
     for (unsigned int i=0; i < net->states.size(); i++)
       {
-	// Go through the set of transitions in each state
-	for (HfstConstantTransducer::TransitionVector::const_iterator tr_it 
-	       = net->states[i].begin();
-	     tr_it != net->states[i].end(); tr_it++)
-	  {	    
-	    SFST::Label l(tr_it->input, tr_it->output);	    
-	    state_vector[i]->add_arc
-	      (l, state_vector[tr_it->target], t);
-	  }
+    // Go through the set of transitions in each state
+    for (HfstConstantTransducer::TransitionVector::const_iterator tr_it 
+           = net->states[i].begin();
+         tr_it != net->states[i].end(); tr_it++)
+      {     
+        SFST::Label l(tr_it->input, tr_it->output);     
+        state_vector[i]->add_arc
+          (l, state_vector[tr_it->target], t);
+      }
       }
     
     // Go through the final states
     for (HfstConstantTransducer::FinalStateMap::const_iterator it 
-	   = net->final_states.begin();
-	 it != net->final_states.end(); it++)  
+       = net->final_states.begin();
+     it != net->final_states.end(); it++)  
       {
-	state_vector[it->first]->set_final(1);
+    state_vector[it->first]->set_final(1);
       }
     
     return t;

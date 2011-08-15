@@ -16,9 +16,9 @@ int main(int argc, char **argv)
 
   const unsigned int TYPES_SIZE=3;
   const ImplementationType types [] = {SFST_TYPE, 
-				       TROPICAL_OPENFST_TYPE, 
-				       /*LOG_OPENFST_TYPE,*/ 
-				       FOMA_TYPE};
+                       TROPICAL_OPENFST_TYPE, 
+                       /*LOG_OPENFST_TYPE,*/ 
+                       FOMA_TYPE};
 
   for (unsigned int i=0; i<TYPES_SIZE; i++)
     {
@@ -64,7 +64,7 @@ int main(int argc, char **argv)
       /* From AT&T format. */
       verbose_print("Construction from AT&T format", types[i]);
       FILE * file = fopen((std::string(getenv("srcdir")) + 
-			   std::string("/foobar.att")).c_str(), "rb");
+               std::string("/foobar.att")).c_str(), "rb");
       assert(file != NULL);
       HfstTransducer foobar_att(file, types[i], "@0@");
       fclose(file);
@@ -73,7 +73,7 @@ int main(int argc, char **argv)
       assert(foobar.compare(foobar_att));
 
       /* From HfstInputStream. 
-	 Tests also functions get_type, set_name and get_name. */
+     Tests also functions get_type, set_name and get_name. */
       verbose_print("Construction from HfstInputStream", types[i]);
       HfstOutputStream out("testfile.hfst", foobar.get_type());
       foobar.set_name("foobar");
@@ -99,12 +99,12 @@ int main(int argc, char **argv)
       HfstTransducer empty_ol(HFST_OL_TYPE);
       HfstTransducer empty_olw(HFST_OLW_TYPE);
       try {
-	empty_ol = foobar2.convert(HFST_OL_TYPE);
-	empty_olw = foobar2.convert(HFST_OLW_TYPE);
+    empty_ol = foobar2.convert(HFST_OL_TYPE);
+    empty_olw = foobar2.convert(HFST_OLW_TYPE);
       }
       catch (const FunctionNotImplementedException e)
-	{
-	}
+    {
+    }
 
     }
 

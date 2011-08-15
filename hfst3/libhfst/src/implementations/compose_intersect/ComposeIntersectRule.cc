@@ -14,8 +14,8 @@ namespace hfst
     {}   
     bool ComposeIntersectRule::known_symbol(size_t symbol)
     { return 
-	symbols.count(HfstTropicalTransducerTransitionData::get_symbol(symbol))
-	> 0; }
+    symbols.count(HfstTropicalTransducerTransitionData::get_symbol(symbol))
+    > 0; }
   }
 }
 

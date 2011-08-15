@@ -78,8 +78,8 @@ public:
     {
       if(buf_size == 0)
       {
-	cerr << "Error: Cannot create empty buffer." << endl;
-	exit(EXIT_FAILURE);
+    cerr << "Error: Cannot create empty buffer." << endl;
+    exit(EXIT_FAILURE);
       }    
       buf = new T[buf_size];
     }
@@ -107,8 +107,8 @@ public:
     {
       if(&b != this)
       {
-	destroy();
-	copy(b);
+    destroy();
+    copy(b);
       }
       return *this;
     }
@@ -122,7 +122,7 @@ public:
     {
       if(lastpos == size)
       {
-	lastpos = 0;
+    lastpos = 0;
       }
       buf[lastpos++] = value;
       currentpos = lastpos;
@@ -139,7 +139,7 @@ public:
     {
       if(lastpos == size)
       {
-	lastpos = 0;
+    lastpos = 0;
       }
       currentpos = lastpos;
       return buf[lastpos -1];
@@ -154,15 +154,15 @@ public:
     {
       if(currentpos != lastpos)
       {
-	if(currentpos == size)
-	{
-	  currentpos = 0;
-	}
-	return buf[currentpos++];
+    if(currentpos == size)
+    {
+      currentpos = 0;
+    }
+    return buf[currentpos++];
       }
       else
       {
-	return last();
+    return last();
       }
     }
     
@@ -174,11 +174,11 @@ public:
     {
       if(lastpos != 0)
       {
-	return buf[lastpos-1];
+    return buf[lastpos-1];
       }
       else
       {
-	return buf[size-1];
+    return buf[size-1];
       }
     }
   
@@ -220,11 +220,11 @@ public:
     {
       if(prevpos <= currentpos)
       {
-	return currentpos - prevpos;
+    return currentpos - prevpos;
       }
       else
       {
-	return currentpos + size - prevpos;
+    return currentpos + size - prevpos;
       }
     } 
 
@@ -238,11 +238,11 @@ public:
     {
       if(postpos >= currentpos)
       {
-	return postpos - currentpos;
+    return postpos - currentpos;
       }
       else
       {
-	return postpos + size - currentpos;
+    return postpos + size - currentpos;
       }
     }
 

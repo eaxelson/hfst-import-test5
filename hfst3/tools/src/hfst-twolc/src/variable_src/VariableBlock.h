@@ -41,11 +41,11 @@ public VariableContainer<VariableValues,IT>
    VariableContainer<VariableValues,IT>()
    {
      for (VariableValuesVector::const_iterator it = v.begin(); it != v.end();
-	  ++it)
+      ++it)
        {
-	 if (it->empty())
-	   { throw EmptyContainer(); }
-	 VariableContainer<VariableValues,IT>::add_object(*it); 
+     if (it->empty())
+       { throw EmptyContainer(); }
+     VariableContainer<VariableValues,IT>::add_object(*it); 
        }
    }
 };

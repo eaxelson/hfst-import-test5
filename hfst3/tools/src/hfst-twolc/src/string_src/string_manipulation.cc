@@ -4,7 +4,7 @@
 #include "string_manipulation.h"
 
 FaultyStringInput::FaultyStringInput(const std::string &function,
-				     const std::string &input):
+                     const std::string &input):
   function(function),
   input(input)
 {}
@@ -19,7 +19,7 @@ char * string_copy(const char * str)
 }
 
 std::string replace_substr(std::string str,const std::string &substr,
-			   const std::string &replacement)
+               const std::string &replacement)
 {
   size_t index;
   while ((index = str.find(substr)) != std::string::npos)
@@ -44,7 +44,7 @@ std::string unescape(std::string str)
 }
 
 int strcmp_unescaped(const std::string &str1, 
-		    const std::string &str2)
+            const std::string &str2)
 {
   // Remove all escapes from str1 and str2 and 
   // compare them.
@@ -59,16 +59,16 @@ std::string remove_white_space(std::string str)
     { throw FaultyStringInput("remove_white_space",str); }
   str = 
     replace_substr(remove_sign(replace_substr(str,"% ","\n"),' '),
-		   "\n","__HFST_TWOLC_SPACE");
+           "\n","__HFST_TWOLC_SPACE");
   str = 
     replace_substr(remove_sign(replace_substr(str,"%\t","\n"),'\t'),
-		   "\n","__HFST_TWOLC_TAB");
+           "\n","__HFST_TWOLC_TAB");
   str = 
     replace_substr(remove_sign(replace_substr(str,"%\r","\n"),'\r'),
-		   "\n","__HFST_TWOLC_CR");
+           "\n","__HFST_TWOLC_CR");
   str =
     replace_substr(remove_sign(replace_substr(str,"%__HFST_TWOLC_\\n","\n"),
-			       "__HFST_TWOLC_\\n"),"\n","__HFST_TWOLC_\\n");
+                   "__HFST_TWOLC_\\n"),"\n","__HFST_TWOLC_\\n");
   return str;
 }
 
@@ -114,7 +114,7 @@ StringVector::StringVector(const std::string &s)
   while ((space_pos = s.find(' ',start_pos)) != std::string::npos)
     {
       std::vector<std::string>::push_back(s.substr(start_pos,
-						   space_pos - start_pos));
+                           space_pos - start_pos));
       start_pos = space_pos + 1;
     }
   std::vector<std::string>::push_back(s.substr(start_pos));
@@ -123,7 +123,7 @@ StringVector::StringVector(const std::string &s)
 StringVector &StringVector::add_values(const StringVector &another)
 {
   std::vector<std::string>::insert(std::vector<std::string>::end(),
-				   another.begin(),another.end());
+                   another.begin(),another.end());
   return *this;
 }
 
@@ -131,7 +131,7 @@ std::string unescape_name(const std::string &name)
 {
   std::string new_name = 
     replace_substr(replace_substr(name,"__HFST_TWOLC_RULE_NAME=",""),
-		   "__HFST_TWOLC_SPACE"," ");
+           "__HFST_TWOLC_SPACE"," ");
   return new_name;
 }
 

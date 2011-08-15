@@ -75,7 +75,7 @@ namespace hfst { namespace implementations
             = fst::SymbolTableIterator(*(t->InputSymbols()));
           not it.Done(); it.Next() ) {
       if (it.Symbol() != symbol) {
-	st.AddSymbol(it.Symbol(), it.Value());
+    st.AddSymbol(it.Symbol(), it.Value());
       }
     }
     t->SetInputSymbols(&st);
@@ -142,8 +142,8 @@ namespace hfst { namespace implementations
             new_arc.ilabel = km[arc.ilabel];
             new_arc.olabel = km[arc.olabel];
 
-	    assert(new_arc.ilabel >= 0);
-	    assert(new_arc.olabel >= 0);
+        assert(new_arc.ilabel >= 0);
+        assert(new_arc.olabel >= 0);
 
             new_arc.weight = arc.weight;
             new_arc.nextstate = arc.nextstate;
@@ -700,29 +700,29 @@ namespace hfst { namespace implementations
                 for (StringSet::iterator it1 = unknown.begin(); 
                      it1 != unknown.end(); it1++) 
                   {
-		    if (not FdOperation::is_diacritic(*it1)) {
-		      
-		      int64 inumber = is->Find(*it1);
-		      for (StringSet::iterator it2 = unknown.begin(); 
-			   it2 != unknown.end(); it2++) 
-			{
-			  if (not FdOperation::is_diacritic(*it2)) {
-			    int64 onumber = is->Find(*it2);
-			    if (inumber != onumber)
-			      result->AddArc(result_s, 
-					     StdArc(inumber, onumber, 
-						    arc.weight, 
-						    result_nextstate));
-			  }
-			}
-		      result->AddArc(result_s, 
-				     StdArc(inumber, 1, arc.weight, 
-					    result_nextstate));
-		      result->AddArc(result_s, 
-				     StdArc(1, inumber, arc.weight, 
-					    result_nextstate));
-		    }
-		  }
+            if (not FdOperation::is_diacritic(*it1)) {
+              
+              int64 inumber = is->Find(*it1);
+              for (StringSet::iterator it2 = unknown.begin(); 
+               it2 != unknown.end(); it2++) 
+            {
+              if (not FdOperation::is_diacritic(*it2)) {
+                int64 onumber = is->Find(*it2);
+                if (inumber != onumber)
+                  result->AddArc(result_s, 
+                         StdArc(inumber, onumber, 
+                            arc.weight, 
+                            result_nextstate));
+              }
+            }
+              result->AddArc(result_s, 
+                     StdArc(inumber, 1, arc.weight, 
+                        result_nextstate));
+              result->AddArc(result_s, 
+                     StdArc(1, inumber, arc.weight, 
+                        result_nextstate));
+            }
+          }
               }
             else if (arc.ilabel == 2 ||   // identity "?:?"
                      arc.olabel == 2 )       
@@ -730,12 +730,12 @@ namespace hfst { namespace implementations
                 for (StringSet::iterator it = unknown.begin(); 
                      it != unknown.end(); it++) 
                   {
-		    if (not FdOperation::is_diacritic(*it)) {
-		      int64 number = is->Find(*it);
-		      result->AddArc(result_s, 
-				     StdArc(number, number, 
-					    arc.weight, result_nextstate));
-		    }
+            if (not FdOperation::is_diacritic(*it)) {
+              int64 number = is->Find(*it);
+              result->AddArc(result_s, 
+                     StdArc(number, number, 
+                        arc.weight, result_nextstate));
+            }
                   }
               }
             else if (arc.ilabel == 1)  // "?:x"
@@ -743,12 +743,12 @@ namespace hfst { namespace implementations
                 for (StringSet::iterator it = unknown.begin(); 
                      it != unknown.end(); it++) 
                   {
-		    if (not FdOperation::is_diacritic(*it)) {
-		      int64 number = is->Find(*it);
-		      result->AddArc(result_s, 
-				     StdArc(number, arc.olabel, 
-					    arc.weight, result_nextstate));
-		    }
+            if (not FdOperation::is_diacritic(*it)) {
+              int64 number = is->Find(*it);
+              result->AddArc(result_s, 
+                     StdArc(number, arc.olabel, 
+                        arc.weight, result_nextstate));
+            }
                   }
               }
             else if (arc.olabel == 1)  // "x:?"
@@ -756,13 +756,13 @@ namespace hfst { namespace implementations
                 for (StringSet::iterator it = unknown.begin(); 
                      it != unknown.end(); it++) 
                   {
-		    if (not FdOperation::is_diacritic(*it)) {
-		      int64 number = is->Find(*it);
-		      result->AddArc(result_s, 
-				     StdArc(arc.ilabel, number, 
-					    arc.weight, result_nextstate));
-		    }
-		  }
+            if (not FdOperation::is_diacritic(*it)) {
+              int64 number = is->Find(*it);
+              result->AddArc(result_s, 
+                     StdArc(arc.ilabel, number, 
+                        arc.weight, result_nextstate));
+            }
+          }
               }
             }
 
@@ -802,20 +802,20 @@ namespace hfst { namespace implementations
     StringSet t1_symbols = get_alphabet(t1);
     StringSet t2_symbols = get_alphabet(t2);
     hfst::symbols::collect_unknown_sets(t1_symbols, unknown_t1,
-					t2_symbols, unknown_t2);
+                    t2_symbols, unknown_t2);
     
     if (DEBUG)
       {
-	fprintf(stderr, "New symbols for t1: ");
-	for (StringSet::const_iterator it = unknown_t1.begin(); 
-	     it != unknown_t1.end(); it++)
-	  fprintf(stderr, "'%s', ", it->c_str());
-	fprintf(stderr, "\n");
-	fprintf(stderr, "New symbols for t2: ");
-	for (StringSet::const_iterator it = unknown_t2.begin(); 
-	     it != unknown_t2.end(); it++)
-	  fprintf(stderr, "'%s', ", it->c_str());
-	fprintf(stderr, "\n");
+    fprintf(stderr, "New symbols for t1: ");
+    for (StringSet::const_iterator it = unknown_t1.begin(); 
+         it != unknown_t1.end(); it++)
+      fprintf(stderr, "'%s', ", it->c_str());
+    fprintf(stderr, "\n");
+    fprintf(stderr, "New symbols for t2: ");
+    for (StringSet::const_iterator it = unknown_t2.begin(); 
+         it != unknown_t2.end(); it++)
+      fprintf(stderr, "'%s', ", it->c_str());
+    fprintf(stderr, "\n");
       }
 
 
@@ -826,8 +826,8 @@ namespace hfst { namespace implementations
     for ( StringSet::const_iterator it = unknown_t2.begin();
           it != unknown_t2.end(); it++ ) {
       if(st2->AddSymbol(*it) < 3) {
-	std::cerr << "ERROR: string " << *it << " got strange number" << std::endl;
-	assert(false);
+    std::cerr << "ERROR: string " << *it << " got strange number" << std::endl;
+    assert(false);
       }
     }
     t2->SetInputSymbols(st2);
@@ -1209,8 +1209,8 @@ namespace hfst { namespace implementations
       {
         StateId s2 = t->AddState();
 
-	assert(not (it->first == ""));
-	assert(not (it->second == ""));
+    assert(not (it->first == ""));
+    assert(not (it->second == ""));
 
         t->AddArc(s1,StdArc(st.AddSymbol(it->first),
                             st.AddSymbol(it->second),0,s2));
@@ -1238,8 +1238,8 @@ namespace hfst { namespace implementations
            it != sps.end();
            ++it)
         {
-	  assert(not (it->first == ""));
-	  assert(not (it->second == ""));
+      assert(not (it->first == ""));
+      assert(not (it->second == ""));
 
           t->AddArc(s1,StdArc(st.AddSymbol(it->first),
                               st.AddSymbol(it->second),0,s2));
@@ -1266,8 +1266,8 @@ namespace hfst { namespace implementations
         for (StringPairSet::const_iterator it2 = (*it).begin(); 
              it2 != (*it).end(); it2++ ) {
 
-	  assert(not (it2->first == ""));
-	  assert(not (it2->second == ""));
+      assert(not (it2->first == ""));
+      assert(not (it2->second == ""));
 
           t->AddArc(s1,StdArc(st.AddSymbol(it2->first),
                               st.AddSymbol(it2->second),0,s2));
@@ -1380,10 +1380,10 @@ namespace hfst { namespace implementations
   void TropicalWeightTransducer::print_alphabet(const StdVectorFst *t)
   {
     for(fst::SymbolTableIterator it=fst::SymbolTableIterator
-	  (*t->InputSymbols()); 
+      (*t->InputSymbols()); 
         !it.Done(); it.Next())
       {
-	fprintf(stderr, "'%s', ", it.Symbol().c_str());
+    fprintf(stderr, "'%s', ", it.Symbol().c_str());
       }
     fprintf(stderr, "\n");
   }
@@ -2140,8 +2140,8 @@ namespace hfst { namespace implementations
             new_arc.weight = 0;
             new_arc.nextstate = arc.nextstate;
             aiter.SetValue(new_arc);    
-	  }
-	if (t2_->Final(s) != fst::TropicalWeight::Zero())
+      }
+    if (t2_->Final(s) != fst::TropicalWeight::Zero())
           { t2_->SetFinal(s,0); }
       }
 #endif
@@ -2441,56 +2441,56 @@ namespace hfst { namespace implementations
       vector<fst::StdArc> t_transitions;
 
       for (fst::ArcIterator<StdVectorFst> aiter(*t,current_state); 
-	   !aiter.Done(); aiter.Next())
-	{
-	  t_transitions.push_back(aiter.Value());
-	}
+       !aiter.Done(); aiter.Next())
+    {
+      t_transitions.push_back(aiter.Value());
+    }
       
       /* If we cannot proceed, return the longest path so far. */
       if (t_transitions.empty() || broken[current_state]) {
-	for (int i=(int)path.second.size()-1; i>=last_index; i--) {
-	  path.second.pop_back(); 
-	}
-	return path;
+    for (int i=(int)path.second.size()-1; i>=last_index; i--) {
+      path.second.pop_back(); 
+    }
+    return path;
       }
 
       /* Go through all transitions in a random order.
-	 (If \a t is pruned, only one transition is proceeded.) */
+     (If \a t is pruned, only one transition is proceeded.) */
       while ( not t_transitions.empty() ) {
-	unsigned int index = rand() % t_transitions.size();
-	fst::StdArc arc = t_transitions.at(index);
-	t_transitions.erase(t_transitions.begin()+index);
-	
-	StateId t_target = arc.nextstate;
+    unsigned int index = rand() % t_transitions.size();
+    fst::StdArc arc = t_transitions.at(index);
+    t_transitions.erase(t_transitions.begin()+index);
+    
+    StateId t_target = arc.nextstate;
 
-	path.second.push_back
-	  (StringPair
-	   (t->InputSymbols()->Find(arc.ilabel),
-	    t->InputSymbols()->Find(arc.olabel)));
-	
-	/* If the target state is final, */
-	if ( t->Final(t_target) != TropicalWeight::Zero() ) {
-	  if ( (rand() % 4) == 0 ) {  // randomly return the path so far,
-	    return path;
-	  } // or continue.
-	  last_index = (int)path.second.size();  
-	} 
+    path.second.push_back
+      (StringPair
+       (t->InputSymbols()->Find(arc.ilabel),
+        t->InputSymbols()->Find(arc.olabel)));
+    
+    /* If the target state is final, */
+    if ( t->Final(t_target) != TropicalWeight::Zero() ) {
+      if ( (rand() % 4) == 0 ) {  // randomly return the path so far,
+        return path;
+      } // or continue.
+      last_index = (int)path.second.size();  
+    } 
 
-	/* Give more probability for shorter paths. */
-	if ( broken[ t_target ] == 0 ) {
-	  if ( visited[ t_target ] == 1 ) 
-	    if ( (rand() % 4) == 0 )
-	      broken[ t_target ] = 1;
-	}
-	
-	if ( visited[ t_target ] == 1 ) { 
-	  if ( (rand() % 4) == 0 )
-	    broken[ t_target ] = 1;
-	}
+    /* Give more probability for shorter paths. */
+    if ( broken[ t_target ] == 0 ) {
+      if ( visited[ t_target ] == 1 ) 
+        if ( (rand() % 4) == 0 )
+          broken[ t_target ] = 1;
+    }
+    
+    if ( visited[ t_target ] == 1 ) { 
+      if ( (rand() % 4) == 0 )
+        broken[ t_target ] = 1;
+    }
 
-	/* Proceed to the target state. */
-	current_state = t_target;
-	break;
+    /* Proceed to the target state. */
+    current_state = t_target;
+    break;
       }     
     }
 
@@ -2509,11 +2509,11 @@ namespace hfst { namespace implementations
       HfstTwoLevelPath path = random_path(t);
 
       /* If we extract the same path again, try at most 5 times
-	 to extract another one. */
+     to extract another one. */
       unsigned int i = 0;
       while ( (results.find(path) != results.end()) and (i < 5) ) {
-	path = random_path(t);
-	++i;
+    path = random_path(t);
+    ++i;
       }
       results.insert(path);
 

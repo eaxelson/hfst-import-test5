@@ -18,9 +18,9 @@ namespace hfst {
 
     HfstConstantTransition();
     HfstConstantTransition(unsigned int target,
-			   unsigned int input,
-			   unsigned int output,
-			   float weight);
+               unsigned int input,
+               unsigned int output,
+               float weight);
   };
 
   struct HfstConstantTransducer 
@@ -44,10 +44,10 @@ namespace hfst {
     (unsigned int state_number, unsigned int number_of_transitions);
 
     void add_transition(unsigned int source,
-			unsigned int target,
-			unsigned int input,
-			unsigned int output,
-			float weight);
+            unsigned int target,
+            unsigned int input,
+            unsigned int output,
+            float weight);
     void set_final_weight(unsigned int state, float weight);
     iterator begin();
     iterator end();

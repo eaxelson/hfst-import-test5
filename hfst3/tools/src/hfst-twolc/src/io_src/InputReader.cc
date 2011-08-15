@@ -54,7 +54,7 @@ char InputReader::input(void)
     {
       input_stream->getline(buffer,buffer_size);
       if (input_stream->gcount() == 0)
-	{ return 0; }
+    { return 0; }
       buffer_index = 0;
       return '\n';
     }

@@ -6,8 +6,8 @@ namespace hfst {
     /** @brief One implementation of template class C in HfstTransition. 
 
         An HfstFastTransitionData has an input number and an output number
-	of type SymbolType (an unsigned int) and a weight of type WeightType 
-	(a float).
+    of type SymbolType (an unsigned int) and a weight of type WeightType 
+    (a float).
     */
 
     class HfstFastTransitionData {
@@ -28,7 +28,7 @@ namespace hfst {
     public:
       
       /** @brief Create an HfstFastTransitionData with 
-	  input and output numbers and weight zero. */
+      input and output numbers and weight zero. */
     HfstFastTransitionData(): 
       input_number(0), output_number(0), weight(0) {}
       
@@ -45,8 +45,8 @@ namespace hfst {
           input number \a inumber, output number \a onumber 
           and weight \a weight. */
       HfstFastTransitionData(SymbolType inumber,
-			     SymbolType onumber,
-			     WeightType weight) {
+                 SymbolType onumber,
+                 WeightType weight) {
         input_number = inumber;
         output_number = onumber;
         this->weight = weight;
@@ -69,44 +69,44 @@ namespace hfst {
 
       static SymbolType get_epsilon()
       {
-	return 0;
+    return 0;
       }
 
       static SymbolType get_unknown()
       {
-	return 1;
+    return 1;
       }
 
       static SymbolType get_identity()
       {
-	return 2;
+    return 2;
       }
 
       /* Are these needed? */
       static bool is_epsilon(const SymbolType &s) {
-	return s == 0;
+    return s == 0;
       }
       static bool is_unknown(const SymbolType &s) {
-	return s == 1;
+    return s == 1;
       }
       static bool is_identity(const SymbolType &s) {
-	return s == 2;
+    return s == 2;
       }
       static bool is_valid_symbol(const SymbolType &s) {
-	(void)s;
-	return true;
+    (void)s;
+    return true;
       }
 
       /* Get a marker symbol. Equivalent to (biggest number in sts + 1). */
       static SymbolType get_marker(const SymbolTypeSet &sts) {
-	SymbolType marker=0;
-	for (SymbolTypeSet::const_iterator it = sts.begin();
-	     it != sts.end(); it++) {
-	  if (marker < *it) {
-	    marker = *it;
-	  }
-	}
-	return marker++;
+    SymbolType marker=0;
+    for (SymbolTypeSet::const_iterator it = sts.begin();
+         it != sts.end(); it++) {
+      if (marker < *it) {
+        marker = *it;
+      }
+    }
+    return marker++;
       }
 
       /** @brief Whether this transition is less than transition 
@@ -126,11 +126,11 @@ namespace hfst {
       }
 
       void operator=(const HfstFastTransitionData &another)
-	{
-	  input_number = another.input_number;
-	  output_number = another.output_number;
-	  weight = another.weight;
-	}
+    {
+      input_number = another.input_number;
+      output_number = another.output_number;
+      weight = another.weight;
+    }
 
       friend class ComposeIntersectFst;
       friend class ComposeIntersectLexicon;
@@ -141,12 +141,12 @@ namespace hfst {
 
 
     /*    std::ostream& operator<<(std::ostream &out, 
-			     const HfstFastTransitionData &tr)
+                 const HfstFastTransitionData &tr)
       {
-	return out << tr.get_input_symbol() << '\t' 
-		   << tr.get_output_symbol() << '\t' 
-		   << tr.get_weight();
-		   }*/
+    return out << tr.get_input_symbol() << '\t' 
+           << tr.get_output_symbol() << '\t' 
+           << tr.get_weight();
+           }*/
 
   } // namespace implementations
 

@@ -35,11 +35,11 @@ public ConstContainerIterator<T>
   bool didnt_end(void)
   {
     for (size_t i = 0; i < ConstContainerIterator<T>::iterator_vector.size(); 
-	 ++i)
+     ++i)
        { 
-	 if(ConstContainerIterator<T>::iterator_vector.at(i) != 
-	    ConstContainerIterator<T>::end_iterator_vector.at(i))
-	   { return true; }
+     if(ConstContainerIterator<T>::iterator_vector.at(i) != 
+        ConstContainerIterator<T>::end_iterator_vector.at(i))
+       { return true; }
        }
     return false;
   }
@@ -47,14 +47,14 @@ public ConstContainerIterator<T>
   {
     IndexSet index_set;
     for (size_t i = 0; i < ConstContainerIterator<T>::iterator_vector.size(); 
-	 ++i)
+     ++i)
       { 
-	size_t index = 
-	  ConstContainerIterator<T>::iterator_vector.at(i) - 
-	  ConstContainerIterator<T>::begin_iterator_vector.at(i);
-	if (index_set.has_element(index))
-	  { return true; }
-	index_set.insert(index);
+    size_t index = 
+      ConstContainerIterator<T>::iterator_vector.at(i) - 
+      ConstContainerIterator<T>::begin_iterator_vector.at(i);
+    if (index_set.has_element(index))
+      { return true; }
+    index_set.insert(index);
       }
     return false;
   }
@@ -64,7 +64,7 @@ public ConstContainerIterator<T>
    { 
       ConstContainerIterator<T>::operator=(another); 
       while (didnt_end() and equal_indices())
-	{ operator++(); }
+    { operator++(); }
    }
   //! @brief Increment.
   int operator++(void)

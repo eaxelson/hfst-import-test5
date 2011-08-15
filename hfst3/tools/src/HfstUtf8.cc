@@ -120,12 +120,12 @@ namespace hfst_utf8 {
       (*s)++;
       c = (unsigned char)**s;
       if (c < (unsigned char) set2MSbits &&
-	  c >= (unsigned char) set1MSbits)    // 1000xxxx
-	{
-	  result = (result << 6) | (c & get6LSbits);
-	}
+      c >= (unsigned char) set1MSbits)    // 1000xxxx
+    {
+      result = (result << 6) | (c & get6LSbits);
+    }
       else
-	return 0;
+    return 0;
     }
 
     (*s)++;

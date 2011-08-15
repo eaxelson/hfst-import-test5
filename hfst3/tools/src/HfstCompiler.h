@@ -50,13 +50,13 @@ namespace hfst
     class HfstCompiler {
       
       struct ltstr {
-	bool operator()(const char* s1, const char* s2) const
-	{ return strcmp(s1, s2) < 0; }
+    bool operator()(const char* s1, const char* s2) const
+    { return strcmp(s1, s2) < 0; }
       };
       
       struct eqstr {
-	bool operator()(const char* s1, const char* s2) const
-	{ return strcmp(s1, s2) == 0; }
+    bool operator()(const char* s1, const char* s2) const
+    { return strcmp(s1, s2) == 0; }
       };
       
       typedef std::set<char*, ltstr> RVarSet;
@@ -109,9 +109,9 @@ namespace hfst
       
       HfstTransducer * substitute(HfstTransducer *t, Character old_char, Character new_char);
       HfstTransducer * substitute(HfstTransducer *t, Character old_char_in, Character old_char_out,
-				  Character new_char_in, Character new_char_out);      
+                  Character new_char_in, Character new_char_out);      
       HfstTransducer * substitute(HfstTransducer *t, Character old_char_in, Character old_char_out,
-				  HfstTransducer *tr);
+                  HfstTransducer *tr);
 
       HfstTransducer * insert_freely(HfstTransducer *t, Character input, Character output);
       HfstTransducer * negation( HfstTransducer *t );
@@ -124,7 +124,7 @@ namespace hfst
       HfstTransducer * replace(HfstTransducer * mapping, Repl_Type repl_type, bool optional);
       HfstTransducer * restriction( HfstTransducer * t, Twol_Type type, Contexts *c, int direction );
       HfstTransducer * make_rule( HfstTransducer * lc, Range * lower_range, Twol_Type type, 
-				  Range * upper_range, HfstTransducer * rc, ImplementationType implementation_type );
+                  Range * upper_range, HfstTransducer * rc, ImplementationType implementation_type );
       
       void def_alphabet( HfstTransducer *a );
       bool def_var( char *name, HfstTransducer *a );

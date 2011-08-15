@@ -19,8 +19,8 @@ void print(HfstInternalTransducer &t)
       HfstTransition tr = IT.value();
       //fprintf(stderr, "transition\n");
       cout << s << "\t" << tr.get_target_state() << "\t"
-	   << tr.get_input_symbol() << "\t" << tr.get_output_symbol()
-	   << "\t" << tr.get_weight();
+       << tr.get_input_symbol() << "\t" << tr.get_output_symbol()
+       << "\t" << tr.get_weight();
       cout << "\n";
       IT.next();
     }
@@ -41,12 +41,12 @@ int main(int argc, char **argv) {
       HfstTransducer tr(types[i]);
       assert (tr.get_type() == types[i]);
       for (int j=0; j<4; j++) {
-	// Test the conversions.
-	HfstTransducer trconv = tr.convert(types[j]);
-	assert (tr.get_type() == types[j]);
-	assert (HfstTransducer::test_equivalence(tr, trconv));
-	HfstTransducer tranother(types[j]);
-	assert (HfstTransducer::test_equivalence(tr, tranother));
+    // Test the conversions.
+    HfstTransducer trconv = tr.convert(types[j]);
+    assert (tr.get_type() == types[j]);
+    assert (HfstTransducer::test_equivalence(tr, trconv));
+    HfstTransducer tranother(types[j]);
+    assert (HfstTransducer::test_equivalence(tr, tranother));
       }
       HfstInternalTransducer mut(tr);
       HfstTransducer foo(mut);
@@ -58,12 +58,12 @@ int main(int argc, char **argv) {
       HfstTransducer tr("foo", types[i]);
       assert (tr.get_type() == types[i]);
       for (int j=0; j<4; j++) {
-	// Test the conversions.
-	HfstTransducer trconv = tr.convert(types[j]);
-	assert (tr.get_type() == types[j]);
-	assert (HfstTransducer::test_equivalence(tr, trconv));
-	HfstTransducer tranother("foo", types[j]);
-	assert (HfstTransducer::test_equivalence(tr, tranother));
+    // Test the conversions.
+    HfstTransducer trconv = tr.convert(types[j]);
+    assert (tr.get_type() == types[j]);
+    assert (HfstTransducer::test_equivalence(tr, trconv));
+    HfstTransducer tranother("foo", types[j]);
+    assert (HfstTransducer::test_equivalence(tr, tranother));
       }
       HfstInternalTransducer mut(tr);
       HfstTransducer foo(mut);
@@ -75,16 +75,16 @@ int main(int argc, char **argv) {
       HfstTransducer tr("foo", "bar", types[i]);
       assert (tr.get_type() == types[i]);
       for (int j=0; j<4; j++) {
-	// Test the conversions.
-	HfstTransducer trconv = tr.convert(types[j]);
-	assert (tr.get_type() == types[j]);
-	assert (HfstTransducer::test_equivalence(tr, trconv));
-	HfstTransducer tranother("foo", "bar", types[j]);
-	assert (HfstTransducer::test_equivalence(tr, tranother));
-	// test the att format
-	tr.write_in_att_format("testfile");
-	HfstTransducer foo = HfstTransducer::read_in_att_format("testfile");
-	assert (HfstTransducer::test_equivalence(tr, foo));
+    // Test the conversions.
+    HfstTransducer trconv = tr.convert(types[j]);
+    assert (tr.get_type() == types[j]);
+    assert (HfstTransducer::test_equivalence(tr, trconv));
+    HfstTransducer tranother("foo", "bar", types[j]);
+    assert (HfstTransducer::test_equivalence(tr, tranother));
+    // test the att format
+    tr.write_in_att_format("testfile");
+    HfstTransducer foo = HfstTransducer::read_in_att_format("testfile");
+    assert (HfstTransducer::test_equivalence(tr, foo));
       }
       HfstInternalTransducer mut(tr);
       HfstTransducer foo(mut);
@@ -99,12 +99,12 @@ int main(int argc, char **argv) {
       HfstTransducer tr("foobar", tok, types[i]);
       assert (tr.get_type() == types[i]);
       for (int j=0; j<4; j++) {
-	// Test the conversions.
-	HfstTransducer trconv = tr.convert(types[j]);
-	assert (tr.get_type() == types[j]);
-	assert (HfstTransducer::test_equivalence(tr, trconv));
-	HfstTransducer tranother("foobar", tok, types[j]);
-	assert (HfstTransducer::test_equivalence(tr, tranother));
+    // Test the conversions.
+    HfstTransducer trconv = tr.convert(types[j]);
+    assert (tr.get_type() == types[j]);
+    assert (HfstTransducer::test_equivalence(tr, trconv));
+    HfstTransducer tranother("foobar", tok, types[j]);
+    assert (HfstTransducer::test_equivalence(tr, tranother));
       }
       HfstInternalTransducer mut(tr);
       HfstTransducer foo(mut);
@@ -119,12 +119,12 @@ int main(int argc, char **argv) {
       HfstTransducer tr("fofoo", "barbarba", tok, types[i]);
       assert (tr.get_type() == types[i]);
       for (int j=0; j<4; j++) {
-	// Test the conversions.
-	HfstTransducer trconv = tr.convert(types[j]);
-	assert (tr.get_type() == types[j]);
-	assert (HfstTransducer::test_equivalence(tr, trconv));
-	HfstTransducer tranother("fofoo", "barbarba", tok, types[j]);
-	assert (HfstTransducer::test_equivalence(tr, tranother));
+    // Test the conversions.
+    HfstTransducer trconv = tr.convert(types[j]);
+    assert (tr.get_type() == types[j]);
+    assert (HfstTransducer::test_equivalence(tr, trconv));
+    HfstTransducer tranother("fofoo", "barbarba", tok, types[j]);
+    assert (HfstTransducer::test_equivalence(tr, tranother));
       }
       HfstInternalTransducer mut(tr);
       HfstTransducer foo(mut);
@@ -145,156 +145,156 @@ int main(int argc, char **argv) {
       test3.convert(types[3]);
 
       assert ( test0.get_type() !=
-	       test1.get_type() !=
-	       test2.get_type() !=
-	       test3.get_type() );
+           test1.get_type() !=
+           test2.get_type() !=
+           test3.get_type() );
       
 
       // ----- repeat_star -----
       {
-	HfstTransducer test0_plus = HfstTransducer(test0).repeat_plus(); 
-	HfstTransducer test1_plus = HfstTransducer(test1).repeat_plus();
-	HfstTransducer test2_plus = HfstTransducer(test2).repeat_plus();
-	HfstTransducer test3_plus = HfstTransducer(test3).repeat_plus();
-	
-	assert ( test0_plus.get_type() !=
-		 test1_plus.get_type() !=
-		 test2_plus.get_type() !=
-		 test3_plus.get_type() );
+    HfstTransducer test0_plus = HfstTransducer(test0).repeat_plus(); 
+    HfstTransducer test1_plus = HfstTransducer(test1).repeat_plus();
+    HfstTransducer test2_plus = HfstTransducer(test2).repeat_plus();
+    HfstTransducer test3_plus = HfstTransducer(test3).repeat_plus();
+    
+    assert ( test0_plus.get_type() !=
+         test1_plus.get_type() !=
+         test2_plus.get_type() !=
+         test3_plus.get_type() );
 
-	assert (HfstTransducer::test_equivalence( test0_plus, test1_plus ) );
-	assert (HfstTransducer::test_equivalence( test0_plus, test2_plus ) );
-	assert (HfstTransducer::test_equivalence( test0_plus, test3_plus ) );
+    assert (HfstTransducer::test_equivalence( test0_plus, test1_plus ) );
+    assert (HfstTransducer::test_equivalence( test0_plus, test2_plus ) );
+    assert (HfstTransducer::test_equivalence( test0_plus, test3_plus ) );
       }
       printf("repeat_star tested\n");
 
 
       // ----- repeat_plus -----
       {
-	HfstTransducer test0_plus = HfstTransducer(test0).repeat_plus();      
-	HfstTransducer test1_plus = HfstTransducer(test1).repeat_plus();
-	HfstTransducer test2_plus = HfstTransducer(test2).repeat_plus();
-	HfstTransducer test3_plus = HfstTransducer(test3).repeat_plus();
-	
-	assert ( test0_plus.get_type() !=
-		 test1_plus.get_type() !=
-		 test2_plus.get_type() !=
-		 test3_plus.get_type() );
+    HfstTransducer test0_plus = HfstTransducer(test0).repeat_plus();      
+    HfstTransducer test1_plus = HfstTransducer(test1).repeat_plus();
+    HfstTransducer test2_plus = HfstTransducer(test2).repeat_plus();
+    HfstTransducer test3_plus = HfstTransducer(test3).repeat_plus();
+    
+    assert ( test0_plus.get_type() !=
+         test1_plus.get_type() !=
+         test2_plus.get_type() !=
+         test3_plus.get_type() );
 
-	assert (HfstTransducer::test_equivalence( test0_plus, test1_plus ) );
-	assert (HfstTransducer::test_equivalence( test0_plus, test2_plus ) );
-	assert (HfstTransducer::test_equivalence( test0_plus, test3_plus ) );
+    assert (HfstTransducer::test_equivalence( test0_plus, test1_plus ) );
+    assert (HfstTransducer::test_equivalence( test0_plus, test2_plus ) );
+    assert (HfstTransducer::test_equivalence( test0_plus, test3_plus ) );
       }
       printf("repeat_plus tested\n");
 
 
       // ----- repeat_n -----
       {
-	const int MAX_REPEAT_N = 5; 
-	for (int n=0; n <= MAX_REPEAT_N; n++) {
+    const int MAX_REPEAT_N = 5; 
+    for (int n=0; n <= MAX_REPEAT_N; n++) {
 
-	  HfstTransducer test0_n = HfstTransducer(test0).repeat_n(n); 
-	  HfstTransducer test1_n = HfstTransducer(test1).repeat_n(n);
-	  HfstTransducer test2_n = HfstTransducer(test2).repeat_n(n);
-	  HfstTransducer test3_n = HfstTransducer(test3).repeat_n(n);
-	
-	assert ( test0_n.get_type() !=
-		 test1_n.get_type() !=
-		 test2_n.get_type() !=
-		 test3_n.get_type() );
+      HfstTransducer test0_n = HfstTransducer(test0).repeat_n(n); 
+      HfstTransducer test1_n = HfstTransducer(test1).repeat_n(n);
+      HfstTransducer test2_n = HfstTransducer(test2).repeat_n(n);
+      HfstTransducer test3_n = HfstTransducer(test3).repeat_n(n);
+    
+    assert ( test0_n.get_type() !=
+         test1_n.get_type() !=
+         test2_n.get_type() !=
+         test3_n.get_type() );
 
-	  assert (HfstTransducer::test_equivalence( test0_n, test1_n ) );
-	  assert (HfstTransducer::test_equivalence( test0_n, test2_n ) );
-	  assert (HfstTransducer::test_equivalence( test0_n, test3_n ) );
-	}
+      assert (HfstTransducer::test_equivalence( test0_n, test1_n ) );
+      assert (HfstTransducer::test_equivalence( test0_n, test2_n ) );
+      assert (HfstTransducer::test_equivalence( test0_n, test3_n ) );
+    }
       }
       printf("repeat_n tested\n");
 
 
       // ----- repeat_n_minus -----
       {
-	const int MAX_REPEAT_N = 5; 
-	for (int n=0; n <= MAX_REPEAT_N; n++) {
-	  HfstTransducer test0_n = HfstTransducer(test0).repeat_n_minus(n); 
-	  HfstTransducer test1_n = HfstTransducer(test1).repeat_n_minus(n);
-	  HfstTransducer test2_n = HfstTransducer(test2).repeat_n_minus(n);
-	  HfstTransducer test3_n = HfstTransducer(test3).repeat_n_minus(n);
-	
-	  assert ( test0_n.get_type() !=
-		   test1_n.get_type() !=
-		   test2_n.get_type() !=
-		   test3_n.get_type() );
+    const int MAX_REPEAT_N = 5; 
+    for (int n=0; n <= MAX_REPEAT_N; n++) {
+      HfstTransducer test0_n = HfstTransducer(test0).repeat_n_minus(n); 
+      HfstTransducer test1_n = HfstTransducer(test1).repeat_n_minus(n);
+      HfstTransducer test2_n = HfstTransducer(test2).repeat_n_minus(n);
+      HfstTransducer test3_n = HfstTransducer(test3).repeat_n_minus(n);
+    
+      assert ( test0_n.get_type() !=
+           test1_n.get_type() !=
+           test2_n.get_type() !=
+           test3_n.get_type() );
 
-	  assert (HfstTransducer::test_equivalence( test0_n, test1_n ) );
-	  assert (HfstTransducer::test_equivalence( test0_n, test2_n ) );
-	  assert (HfstTransducer::test_equivalence( test0_n, test3_n ) );
-	}
+      assert (HfstTransducer::test_equivalence( test0_n, test1_n ) );
+      assert (HfstTransducer::test_equivalence( test0_n, test2_n ) );
+      assert (HfstTransducer::test_equivalence( test0_n, test3_n ) );
+    }
       }
       printf("repeat_n_minus tested\n");
 
 
       // ----- repeat_n_plus -----
       {
-	const int MAX_REPEAT_N = 1; 
-	for (int n=0; n <= MAX_REPEAT_N; n++) {
-	  HfstTransducer test0_n = HfstTransducer(test0).repeat_n_plus(n); 
-	  HfstTransducer test1_n = HfstTransducer(test1).repeat_n_plus(n);
-	  HfstTransducer test2_n = HfstTransducer(test2).repeat_n_plus(n);
-	  HfstTransducer test3_n = HfstTransducer(test3).repeat_n_plus(n);
-	
-	  assert ( test0_n.get_type() !=
-		   test1_n.get_type() !=
-		   test2_n.get_type() !=
-		   test3_n.get_type() );
+    const int MAX_REPEAT_N = 1; 
+    for (int n=0; n <= MAX_REPEAT_N; n++) {
+      HfstTransducer test0_n = HfstTransducer(test0).repeat_n_plus(n); 
+      HfstTransducer test1_n = HfstTransducer(test1).repeat_n_plus(n);
+      HfstTransducer test2_n = HfstTransducer(test2).repeat_n_plus(n);
+      HfstTransducer test3_n = HfstTransducer(test3).repeat_n_plus(n);
+    
+      assert ( test0_n.get_type() !=
+           test1_n.get_type() !=
+           test2_n.get_type() !=
+           test3_n.get_type() );
 
-	  assert (HfstTransducer::test_equivalence( test0_n, test1_n ) );
-	  assert (HfstTransducer::test_equivalence( test0_n, test2_n ) );
-	  assert (HfstTransducer::test_equivalence( test0_n, test3_n ) );	  
-	}
+      assert (HfstTransducer::test_equivalence( test0_n, test1_n ) );
+      assert (HfstTransducer::test_equivalence( test0_n, test2_n ) );
+      assert (HfstTransducer::test_equivalence( test0_n, test3_n ) );     
+    }
       }
       printf("repeat_n_plus tested\n");
 
 
       // ----- repeat_n_to_k -----
       {
-	const int REPEAT_N_MAX = 2; 
-	const int REPEAT_K_MAX = 3;
-	for (int n=0; n <= REPEAT_N_MAX; n++) {
-	  for (int k=n; k <= REPEAT_K_MAX; k++) {
-	    HfstTransducer test0_n = HfstTransducer(test0).repeat_n_to_k(n,k); 
-	    HfstTransducer test1_n = HfstTransducer(test1).repeat_n_to_k(n,k);
-	    HfstTransducer test2_n = HfstTransducer(test2).repeat_n_to_k(n,k);
-	    HfstTransducer test3_n = HfstTransducer(test3).repeat_n_to_k(n,k);
-	    
-	    assert ( test0_n.get_type() !=
-		     test1_n.get_type() !=
-		     test2_n.get_type() !=
-		     test3_n.get_type() );
+    const int REPEAT_N_MAX = 2; 
+    const int REPEAT_K_MAX = 3;
+    for (int n=0; n <= REPEAT_N_MAX; n++) {
+      for (int k=n; k <= REPEAT_K_MAX; k++) {
+        HfstTransducer test0_n = HfstTransducer(test0).repeat_n_to_k(n,k); 
+        HfstTransducer test1_n = HfstTransducer(test1).repeat_n_to_k(n,k);
+        HfstTransducer test2_n = HfstTransducer(test2).repeat_n_to_k(n,k);
+        HfstTransducer test3_n = HfstTransducer(test3).repeat_n_to_k(n,k);
+        
+        assert ( test0_n.get_type() !=
+             test1_n.get_type() !=
+             test2_n.get_type() !=
+             test3_n.get_type() );
 
-	    assert (HfstTransducer::test_equivalence( test0_n, test1_n ) );
-	    assert (HfstTransducer::test_equivalence( test0_n, test2_n ) );
-	    assert (HfstTransducer::test_equivalence( test0_n, test3_n ) );
-	  }
-	}
+        assert (HfstTransducer::test_equivalence( test0_n, test1_n ) );
+        assert (HfstTransducer::test_equivalence( test0_n, test2_n ) );
+        assert (HfstTransducer::test_equivalence( test0_n, test3_n ) );
+      }
+    }
       }
       printf("repeat_n_to_k tested\n");
 
       
       // ----- optionalize -----
       {
-	HfstTransducer test0_opt = HfstTransducer(test0).optionalize();      
-	HfstTransducer test1_opt = HfstTransducer(test1).optionalize();
-	HfstTransducer test2_opt = HfstTransducer(test2).optionalize();
-	HfstTransducer test3_opt = HfstTransducer(test3).optionalize();
-	
-	assert ( test0_opt.get_type() !=
-		 test1_opt.get_type() !=
-		 test2_opt.get_type() !=
-		 test3_opt.get_type() );
+    HfstTransducer test0_opt = HfstTransducer(test0).optionalize();      
+    HfstTransducer test1_opt = HfstTransducer(test1).optionalize();
+    HfstTransducer test2_opt = HfstTransducer(test2).optionalize();
+    HfstTransducer test3_opt = HfstTransducer(test3).optionalize();
+    
+    assert ( test0_opt.get_type() !=
+         test1_opt.get_type() !=
+         test2_opt.get_type() !=
+         test3_opt.get_type() );
 
-	assert (HfstTransducer::test_equivalence( test0_opt, test1_opt ) );
-	assert (HfstTransducer::test_equivalence( test0_opt, test2_opt ) );
-	assert (HfstTransducer::test_equivalence( test0_opt, test3_opt ) );
+    assert (HfstTransducer::test_equivalence( test0_opt, test1_opt ) );
+    assert (HfstTransducer::test_equivalence( test0_opt, test2_opt ) );
+    assert (HfstTransducer::test_equivalence( test0_opt, test3_opt ) );
       }
       printf("optionalize tested\n");
 
@@ -368,57 +368,57 @@ int main(int argc, char **argv) {
       in2.open();
 
       while (not in1.is_eof() && not in2.is_eof()) {
-	fprintf(stderr, " while loop\n");
-	HfstTransducer tr1(in1);
-	HfstTransducer tr2(in2);
+    fprintf(stderr, " while loop\n");
+    HfstTransducer tr1(in1);
+    HfstTransducer tr2(in2);
 
-	{ HfstTransducer t = tr1.compose(tr2);
-	  fprintf(stderr, "  composed\n"); }
-	{ HfstTransducer t = tr1.intersect(tr2);
-	  fprintf(stderr, "  intersected\n"); }
-	{ HfstTransducer t = tr1.disjunct(tr2);
-	  fprintf(stderr, "  disjuncted\n"); }
-	{ HfstTransducer t = tr1.concatenate(tr2);
-	  fprintf(stderr, "  concatenated\n"); }
-	{ HfstTransducer t = tr1.subtract(tr2);
-	  fprintf(stderr, "  subtracted\n"); }
+    { HfstTransducer t = tr1.compose(tr2);
+      fprintf(stderr, "  composed\n"); }
+    { HfstTransducer t = tr1.intersect(tr2);
+      fprintf(stderr, "  intersected\n"); }
+    { HfstTransducer t = tr1.disjunct(tr2);
+      fprintf(stderr, "  disjuncted\n"); }
+    { HfstTransducer t = tr1.concatenate(tr2);
+      fprintf(stderr, "  concatenated\n"); }
+    { HfstTransducer t = tr1.subtract(tr2);
+      fprintf(stderr, "  subtracted\n"); }
 
-	{ HfstTransducer t = tr1.remove_epsilons();
-	  fprintf(stderr, "  removed epsilons\n"); }
-	{ HfstTransducer t = tr1.determinize();
-	  fprintf(stderr, "  determinized\n"); }
-	{ HfstTransducer t = tr1.minimize();
-	  fprintf(stderr, "  minimized\n"); }
+    { HfstTransducer t = tr1.remove_epsilons();
+      fprintf(stderr, "  removed epsilons\n"); }
+    { HfstTransducer t = tr1.determinize();
+      fprintf(stderr, "  determinized\n"); }
+    { HfstTransducer t = tr1.minimize();
+      fprintf(stderr, "  minimized\n"); }
 
-	{ HfstTransducer t = tr1.repeat_star();
-	  fprintf(stderr, "  repeated star\n"); }
-	{ HfstTransducer t = tr1.repeat_plus();
-	  fprintf(stderr, "  repeated plus\n"); }
-	{ HfstTransducer t = tr1.repeat_n(3);
-	  fprintf(stderr, "  repeated n\n"); }
-	{ HfstTransducer t = tr1.repeat_n_minus(3);
-	  fprintf(stderr, "  repeated n minus\n"); }
-	{ HfstTransducer t = tr1.repeat_n_plus(3);
-	  fprintf(stderr, "  repeated n plus\n"); }
-	{ HfstTransducer t = tr1.repeat_n_to_k(1, 4);
-	  fprintf(stderr, "  repeated n to k\n"); }
-	{ HfstTransducer t = tr1.optionalize();
-	  fprintf(stderr, "  optionalized\n"); }
+    { HfstTransducer t = tr1.repeat_star();
+      fprintf(stderr, "  repeated star\n"); }
+    { HfstTransducer t = tr1.repeat_plus();
+      fprintf(stderr, "  repeated plus\n"); }
+    { HfstTransducer t = tr1.repeat_n(3);
+      fprintf(stderr, "  repeated n\n"); }
+    { HfstTransducer t = tr1.repeat_n_minus(3);
+      fprintf(stderr, "  repeated n minus\n"); }
+    { HfstTransducer t = tr1.repeat_n_plus(3);
+      fprintf(stderr, "  repeated n plus\n"); }
+    { HfstTransducer t = tr1.repeat_n_to_k(1, 4);
+      fprintf(stderr, "  repeated n to k\n"); }
+    { HfstTransducer t = tr1.optionalize();
+      fprintf(stderr, "  optionalized\n"); }
 
-	{ HfstTransducer t = tr1.invert();
-	  fprintf(stderr, "  inverted\n"); }
-	{ HfstTransducer t = tr1.input_project();
-	  fprintf(stderr, "  input projected\n"); }
-	{ HfstTransducer t = tr1.output_project();
-	  fprintf(stderr, "  output projected\n"); }
-	{ HfstTransducer t = tr1.reverse();
-	  fprintf(stderr, "  reversed\n"); }
-	{ HfstTransducer t = tr1.substitute(std::string(),
-					    std::string();
-	  fprintf(stderr, "  substituted string\n"); }
-	{ HfstTransducer t = tr1.substitute(const StringSymbolPair &old_symbol_pair,
-					    const StringSymbolPair &new_symbol_pair);
-	  fprintf(stderr, "  substituted string pair\n"); }
+    { HfstTransducer t = tr1.invert();
+      fprintf(stderr, "  inverted\n"); }
+    { HfstTransducer t = tr1.input_project();
+      fprintf(stderr, "  input projected\n"); }
+    { HfstTransducer t = tr1.output_project();
+      fprintf(stderr, "  output projected\n"); }
+    { HfstTransducer t = tr1.reverse();
+      fprintf(stderr, "  reversed\n"); }
+    { HfstTransducer t = tr1.substitute(std::string(),
+                        std::string();
+      fprintf(stderr, "  substituted string\n"); }
+    { HfstTransducer t = tr1.substitute(const StringSymbolPair &old_symbol_pair,
+                        const StringSymbolPair &new_symbol_pair);
+      fprintf(stderr, "  substituted string pair\n"); }
 
       }
 
@@ -460,21 +460,21 @@ int main(int argc, char **argv) {
     void extract_paths(WeightedStrings<float>::Set &results);
     HfstTransducer &substitute(Key old_key, Key new_key);
     HfstTransducer &substitute(const std::string &old_symbol,
-			       const std::string &new_symbol);
+                   const std::string &new_symbol);
     HfstTransducer &substitute(const KeyPair &old_key_pair, 
-			       const KeyPair &new_key_pair);
+                   const KeyPair &new_key_pair);
     HfstTransducer &substitute(const StringSymbolPair &old_symbol_pair,
-			       const StringSymbolPair &new_symbol_pair);
+                   const StringSymbolPair &new_symbol_pair);
     HfstTransducer &compose(HfstTransducer &another,
-			    ImplementationType type=UNSPECIFIED_TYPE);
+                ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &concatenate(HfstTransducer &another,
-				ImplementationType type=UNSPECIFIED_TYPE);
+                ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &disjunct(HfstTransducer &another,
-			     ImplementationType type=UNSPECIFIED_TYPE);
+                 ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &intersect(HfstTransducer &another,
-			      ImplementationType type=UNSPECIFIED_TYPE);
+                  ImplementationType type=UNSPECIFIED_TYPE);
     HfstTransducer &subtract(HfstTransducer &another,
-			     ImplementationType type=UNSPECIFIED_TYPE);
+                 ImplementationType type=UNSPECIFIED_TYPE);
 
 
 

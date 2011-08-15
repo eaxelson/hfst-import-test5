@@ -13,9 +13,9 @@ int main(int argc, char **argv)
 
   const unsigned int TYPES_SIZE=3;
   const ImplementationType types [] = {SFST_TYPE, 
-				       TROPICAL_OPENFST_TYPE, 
-				       /*LOG_OPENFST_TYPE,*/
-				       FOMA_TYPE};
+                       TROPICAL_OPENFST_TYPE, 
+                       /*LOG_OPENFST_TYPE,*/
+                       FOMA_TYPE};
 
   for (unsigned int i=0; i<TYPES_SIZE; i++)
     {
@@ -25,30 +25,30 @@ int main(int argc, char **argv)
 
       unsigned int transducers_read=0;
       FILE * file = fopen((std::string(getenv("srcdir")) + 
-			   std::string("/test_transducers.att")).c_str(), "rb");
+               std::string("/test_transducers.att")).c_str(), "rb");
       assert(file != NULL);
       try 
-	{
-	  while (not feof(file))
-	    {
-	      HfstTransducer t(file, types[i], "<eps>");
-	      transducers_read++;
-	    }
-	}
+    {
+      while (not feof(file))
+        {
+          HfstTransducer t(file, types[i], "<eps>");
+          transducers_read++;
+        }
+    }
       //catch (hfst::exceptions::NotValidAttFormatException e)
       catch (const HfstException e) 
-	{
-	  assert(transducers_read == 4);
-	}
+    {
+      assert(transducers_read == 4);
+    }
 
       /* To AT&T format. */
       verbose_print("Writing in AT&T format", types[i]);
       
       FILE * f2 = fopen("transducer.att", "wb");
       fprintf(f2,
-	      "0\t1\tbaz\t@0@\t0.000000\n"
-	      "1\t2\tfoo\tbar\t0.000000\n"
-	      "2\t0.000000\n");
+          "0\t1\tbaz\t@0@\t0.000000\n"
+          "1\t2\tfoo\tbar\t0.000000\n"
+          "2\t0.000000\n");
       fclose(f2);
 
       FILE * ofile = fopen("transducer2.att", "wb");
@@ -84,11 +84,11 @@ int main(int argc, char **argv)
       std::vector<HfstTransducer> transducers;
       transducers_read=0;
       while (not in.is_eof())
-	{
-	  HfstTransducer tr(in);   
-	  transducers.push_back(tr);
-	  transducers_read++;
-	}
+    {
+      HfstTransducer tr(in);   
+      transducers.push_back(tr);
+      transducers_read++;
+    }
       in.close();
 
 

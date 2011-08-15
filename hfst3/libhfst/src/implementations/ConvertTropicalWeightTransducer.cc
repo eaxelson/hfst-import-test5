@@ -58,7 +58,7 @@ namespace hfst { namespace implementations
         for ( fst::SymbolTableIterator it = 
                 fst::SymbolTableIterator(*(inputsym));
               not it.Done(); it.Next() ) {
-	  assert(it.Symbol() != "");
+      assert(it.Symbol() != "");
 
           if (it.Value() != 0) // epsilon is not inserted
             net->alphabet.insert( it.Symbol() );
@@ -72,7 +72,7 @@ namespace hfst { namespace implementations
         for ( fst::SymbolTableIterator it = 
                 fst::SymbolTableIterator(*(outputsym));
               not it.Done(); it.Next() ) {
-	  assert(it.Symbol() != "");
+      assert(it.Symbol() != "");
           if (it.Value() != 0) // epsilon is not inserted
             net->alphabet.insert( it.Symbol() );
         }    
@@ -103,57 +103,57 @@ namespace hfst { namespace implementations
 
       HfstState origin = s;
       if (origin == initial_state)
-	origin = 0;
+    origin = 0;
       else if (origin == 0)
-	origin = initial_state;
+    origin = initial_state;
 
       unsigned int number_of_arcs = fst::NumArcs(*t, s);
       net->initialize_transition_vector(s, number_of_arcs);
 
       /* Go through all transitions in a state */
       for (fst::ArcIterator<fst::StdVectorFst> aiter(*t,s); 
-	   !aiter.Done(); aiter.Next())
-	{
-	  const fst::StdArc &arc = aiter.Value();
+       !aiter.Done(); aiter.Next())
+    {
+      const fst::StdArc &arc = aiter.Value();
 
-	  HfstState target = arc.nextstate;
-	  if (target == initial_state)
-	    target = 0;
-	  else if (target == 0)
-	    target = initial_state;
+      HfstState target = arc.nextstate;
+      if (target == initial_state)
+        target = 0;
+      else if (target == 0)
+        target = initial_state;
 
-	  // Copy the transition
-	  std::string istring = inputsym->Find(arc.ilabel);
-	  std::string ostring = outputsym->Find(arc.olabel);
+      // Copy the transition
+      std::string istring = inputsym->Find(arc.ilabel);
+      std::string ostring = outputsym->Find(arc.olabel);
 
-	  if(istring == "") {
-	    std::cerr << "ERROR: arc.ilabel " << arc.ilabel << " not found" << std::endl;
-	    assert(false);
-	  }
-	  if(ostring == "") {
-	    std::cerr << "ERROR: arc.olabel " << arc.olabel << " not found" << std::endl;
-	    assert(false);
-	  }
+      if(istring == "") {
+        std::cerr << "ERROR: arc.ilabel " << arc.ilabel << " not found" << std::endl;
+        assert(false);
+      }
+      if(ostring == "") {
+        std::cerr << "ERROR: arc.olabel " << arc.olabel << " not found" << std::endl;
+        assert(false);
+      }
 
-	  if (arc.ilabel == 0) {
-	    istring = std::string(internal_epsilon);
-	  }
-	  if (arc.olabel == 0) {
-	    ostring = std::string(internal_epsilon);
-	  }
+      if (arc.ilabel == 0) {
+        istring = std::string(internal_epsilon);
+      }
+      if (arc.olabel == 0) {
+        ostring = std::string(internal_epsilon);
+      }
 
-	  net->add_transition(origin, 
-			      HfstBasicTransition
-			      (target,
-			       istring,
-			       ostring,
-			       arc.weight.Value()
-			       ));
-	} 
+      net->add_transition(origin, 
+                  HfstBasicTransition
+                  (target,
+                   istring,
+                   ostring,
+                   arc.weight.Value()
+                   ));
+    } 
 
       if (t->Final(s) != fst::TropicalWeight::Zero()) {
-	// Set the state as final
-	net->set_final_weight(origin, t->Final(s).Value());
+    // Set the state as final
+    net->set_final_weight(origin, t->Final(s).Value());
       }
 
     }
@@ -164,17 +164,17 @@ namespace hfst { namespace implementations
             fst::SymbolTableIterator(*(inputsym));
           not it.Done(); it.Next() ) 
       {
-	assert(it.Symbol() != "");
-	if (it.Value() != 0) // epsilon is not inserted
-	  net->alphabet.insert( it.Symbol() );
+    assert(it.Symbol() != "");
+    if (it.Value() != 0) // epsilon is not inserted
+      net->alphabet.insert( it.Symbol() );
       }    
     for ( fst::SymbolTableIterator it = 
             fst::SymbolTableIterator(*(outputsym));
           not it.Done(); it.Next() ) 
       {
-	assert(it.Symbol() != "");
-	if (it.Value() != 0) // epsilon is not inserted
-	  net->alphabet.insert( it.Symbol() );
+    assert(it.Symbol() != "");
+    if (it.Value() != 0) // epsilon is not inserted
+      net->alphabet.insert( it.Symbol() );
       }    
     
     return net;
@@ -241,51 +241,51 @@ namespace hfst { namespace implementations
           {
             // Copy the transition
 
-	    assert(not tr_it->get_input_symbol().empty());
-	    assert(not tr_it->get_output_symbol().empty());
+        assert(not tr_it->get_input_symbol().empty());
+        assert(not tr_it->get_output_symbol().empty());
 
-	    unsigned int in = st.Find(tr_it->get_input_symbol());
-	    unsigned int out = st.Find(tr_it->get_output_symbol());
+        unsigned int in = st.Find(tr_it->get_input_symbol());
+        unsigned int out = st.Find(tr_it->get_output_symbol());
 
-	    if (in == -1)
-	      {
-		// FIXME: a temporary solution
-		st.AddSymbol(tr_it->get_input_symbol(), 
-			     net->get_symbol_number
-			       (tr_it->get_input_symbol()));
-		in = st.Find(tr_it->get_input_symbol());
-		/* std::cerr << "ERROR: no number found for input symbol "
-			  << tr_it->get_input_symbol() << std::endl;
-			  assert(false); */
-	      }
-	    if (out == -1)
-	      {
-		// FIXME: a temporary solution
-		st.AddSymbol(tr_it->get_output_symbol(), 
-			     net->get_symbol_number
-			       (tr_it->get_output_symbol()));
-		out = st.Find(tr_it->get_output_symbol());
-		/* std::cerr << "ERROR: no number found for output symbol "
-			  << tr_it->get_output_symbol() << std::endl;
-			  assert(false); */
-	      }
+        if (in == -1)
+          {
+        // FIXME: a temporary solution
+        st.AddSymbol(tr_it->get_input_symbol(), 
+                 net->get_symbol_number
+                   (tr_it->get_input_symbol()));
+        in = st.Find(tr_it->get_input_symbol());
+        /* std::cerr << "ERROR: no number found for input symbol "
+              << tr_it->get_input_symbol() << std::endl;
+              assert(false); */
+          }
+        if (out == -1)
+          {
+        // FIXME: a temporary solution
+        st.AddSymbol(tr_it->get_output_symbol(), 
+                 net->get_symbol_number
+                   (tr_it->get_output_symbol()));
+        out = st.Find(tr_it->get_output_symbol());
+        /* std::cerr << "ERROR: no number found for output symbol "
+              << tr_it->get_output_symbol() << std::endl;
+              assert(false); */
+          }
 
-	    // DEBUG
-	    /*std::cerr << "adding arc "
-		      << state_vector[source_state] << "\t"
-		      << state_vector[tr_it->get_target_state()] << "\t"
-		      << in << "\t"
-		      << out << std::endl;*/
+        // DEBUG
+        /*std::cerr << "adding arc "
+              << state_vector[source_state] << "\t"
+              << state_vector[tr_it->get_target_state()] << "\t"
+              << in << "\t"
+              << out << std::endl;*/
 
             t->AddArc(
-		      state_vector[source_state],
+              state_vector[source_state],
                        fst::StdArc
-		      ( in,
-			out,
-			tr_it->get_weight(),
-			state_vector[tr_it->get_target_state()]));
+              ( in,
+            out,
+            tr_it->get_weight(),
+            state_vector[tr_it->get_target_state()]));
           }
-	source_state++;
+    source_state++;
       }
     
     // Go through the final states
@@ -294,7 +294,7 @@ namespace hfst { namespace implementations
          it != net->final_weight_map.end(); it++) 
       {
         t->SetFinal(
-		    state_vector[it->first],
+            state_vector[it->first],
                     it->second);
       }
     
@@ -341,7 +341,7 @@ namespace hfst { namespace implementations
         for ( fst::SymbolTableIterator it = 
                 fst::SymbolTableIterator(*(inputsym));
               not it.Done(); it.Next() ) {
-	  assert(it.Symbol() != "");
+      assert(it.Symbol() != "");
 
           //if (it.Value() != 0) // epsilon is not inserted
             net->alphabet.insert( it.Value() );
@@ -355,7 +355,7 @@ namespace hfst { namespace implementations
         for ( fst::SymbolTableIterator it = 
                 fst::SymbolTableIterator(*(outputsym));
               not it.Done(); it.Next() ) {
-	  assert(it.Symbol() != "");
+      assert(it.Symbol() != "");
           //if (it.Value() != 0) // epsilon is not inserted
             net->alphabet.insert( it.Value() );
         }    
@@ -379,8 +379,8 @@ namespace hfst { namespace implementations
   StringVector output_coding_vector;
 
   for ( fst::SymbolTableIterator it = 
-	  fst::SymbolTableIterator(*(inputsym));
-	not it.Done(); it.Next() ) {
+      fst::SymbolTableIterator(*(inputsym));
+    not it.Done(); it.Next() ) {
     assert(it.Symbol() != "");
     //if (it.Value() != 0) // epsilon is not inserted
     // it is possible that there are gaps in numbering
@@ -392,8 +392,8 @@ namespace hfst { namespace implementations
     input_coding_vector.push_back( it.Symbol() );
   }    
   for ( fst::SymbolTableIterator it = 
-	  fst::SymbolTableIterator(*(outputsym));
-	not it.Done(); it.Next() ) {
+      fst::SymbolTableIterator(*(outputsym));
+    not it.Done(); it.Next() ) {
     assert(it.Symbol() != "");
     //if (it.Value() != 0) // epsilon is not inserted
     // it is possible that there are gaps in numbering
@@ -424,37 +424,37 @@ namespace hfst { namespace implementations
 
       HfstState origin = s;
       if (origin == initial_state)
-	origin = 0;
+    origin = 0;
       else if (origin == 0)
-	origin = initial_state;
+    origin = initial_state;
 
       unsigned int number_of_arcs = fst::NumArcs(*t, s);
       net->initialize_transition_vector(s, number_of_arcs);
 
       /* Go through all transitions in a state */
       for (fst::ArcIterator<fst::StdVectorFst> aiter(*t,s); 
-	   !aiter.Done(); aiter.Next())
-	{
-	  const fst::StdArc &arc = aiter.Value();
+       !aiter.Done(); aiter.Next())
+    {
+      const fst::StdArc &arc = aiter.Value();
 
-	  HfstState target = arc.nextstate;
-	  if (target == initial_state)
-	    target = 0;
-	  else if (target == 0)
-	    target = initial_state;
+      HfstState target = arc.nextstate;
+      if (target == initial_state)
+        target = 0;
+      else if (target == 0)
+        target = initial_state;
 
-	  net->add_transition(origin, 
-			      HfstFastTransition
-			      (target,
-			       input_harmonization_vector.at(arc.ilabel),
-			       output_harmonization_vector.at(arc.olabel),
-			       arc.weight.Value()
-			       ));
-	} 
+      net->add_transition(origin, 
+                  HfstFastTransition
+                  (target,
+                   input_harmonization_vector.at(arc.ilabel),
+                   output_harmonization_vector.at(arc.olabel),
+                   arc.weight.Value()
+                   ));
+    } 
 
       if (t->Final(s) != fst::TropicalWeight::Zero()) {
-	// Set the state as final
-	net->set_final_weight(origin, t->Final(s).Value());
+    // Set the state as final
+    net->set_final_weight(origin, t->Final(s).Value());
       }
 
     }
@@ -505,14 +505,14 @@ namespace hfst { namespace implementations
           {
             // Copy the transition
             t->AddArc(
-		      state_vector[source_state],
+              state_vector[source_state],
                        fst::StdArc
-		      ( tr_it->get_input_symbol(),
-			tr_it->get_output_symbol(),
-			tr_it->get_weight(),
-			state_vector[tr_it->get_target_state()]));
+              ( tr_it->get_input_symbol(),
+            tr_it->get_output_symbol(),
+            tr_it->get_weight(),
+            state_vector[tr_it->get_target_state()]));
           }
-	source_state++;
+    source_state++;
       }
     
     // Go through the final states
@@ -521,7 +521,7 @@ namespace hfst { namespace implementations
          it != net->final_weight_map.end(); it++) 
       {
         t->SetFinal(
-		    state_vector[it->first],
+            state_vector[it->first],
                     it->second);
       }
         
@@ -583,16 +583,16 @@ namespace hfst { namespace implementations
     
     /* Copy the alphabet */
     for ( fst::SymbolTableIterator it = 
-	    fst::SymbolTableIterator(*(inputsym));
-	  not it.Done(); it.Next() ) {
+        fst::SymbolTableIterator(*(inputsym));
+      not it.Done(); it.Next() ) {
       //if (it.Value() != 0) // epsilon is not inserted
-	net->symbol_map[it.Value()] = it.Symbol();
+    net->symbol_map[it.Value()] = it.Symbol();
     }    
     for ( fst::SymbolTableIterator it = 
-	    fst::SymbolTableIterator(*(outputsym));
-	  not it.Done(); it.Next() ) {
+        fst::SymbolTableIterator(*(outputsym));
+      not it.Done(); it.Next() ) {
       //if (it.Value() != 0) // epsilon is not inserted
-	net->symbol_map[it.Value()] = it.Symbol();
+    net->symbol_map[it.Value()] = it.Symbol();
     }    
     
     
@@ -604,45 +604,45 @@ namespace hfst { namespace implementations
     
     /* Go through all states */
     for (fst::StateIterator<fst::StdVectorFst> siter(*t); 
-	 not siter.Done(); siter.Next()) 
+     not siter.Done(); siter.Next()) 
       {
-	StateId s = siter.Value();
-	
-	HfstState origin = s;
-	if (origin == initial_state)
-	  origin = 0;
-	else if (origin == 0)
-	  origin = initial_state;
-	
-	unsigned int number_of_arcs = fst::NumArcs(*t, s);
-	net->initialize_transition_vector(s, number_of_arcs);
+    StateId s = siter.Value();
+    
+    HfstState origin = s;
+    if (origin == initial_state)
+      origin = 0;
+    else if (origin == 0)
+      origin = initial_state;
+    
+    unsigned int number_of_arcs = fst::NumArcs(*t, s);
+    net->initialize_transition_vector(s, number_of_arcs);
 
-	/* Go through all transitions in a state */
-	for (fst::ArcIterator<fst::StdVectorFst> aiter(*t,s); 
-	     !aiter.Done(); aiter.Next())
-	  {
-	    const fst::StdArc &arc = aiter.Value();
-	    
-	    HfstState target = arc.nextstate;
-	    if (target == initial_state)
-	      target = 0;
-	    else if (target == 0)
-	      target = initial_state;
-	    
-	    // Copy the transition
-	    net->add_transition(origin,
-				target,
-				arc.ilabel,
-				arc.olabel,
-				arc.weight.Value()
-				);
-	  } 
-	
-	if (t->Final(s) != fst::TropicalWeight::Zero()) {
-	  // Set the state as final
-	  net->set_final_weight(origin, t->Final(s).Value());
-	}
-	
+    /* Go through all transitions in a state */
+    for (fst::ArcIterator<fst::StdVectorFst> aiter(*t,s); 
+         !aiter.Done(); aiter.Next())
+      {
+        const fst::StdArc &arc = aiter.Value();
+        
+        HfstState target = arc.nextstate;
+        if (target == initial_state)
+          target = 0;
+        else if (target == 0)
+          target = initial_state;
+        
+        // Copy the transition
+        net->add_transition(origin,
+                target,
+                arc.ilabel,
+                arc.olabel,
+                arc.weight.Value()
+                );
+      } 
+    
+    if (t->Final(s) != fst::TropicalWeight::Zero()) {
+      // Set the state as final
+      net->set_final_weight(origin, t->Final(s).Value());
+    }
+    
       }
     
     return net;
@@ -673,8 +673,8 @@ namespace hfst { namespace implementations
     // (1) Go through all states
     for (unsigned int i=0; i < net->states.size(); i++)
       {
-	// Create the state
-	t->AddState();
+    // Create the state
+    t->AddState();
 
         // Go through the set of transitions in each state
         for (HfstConstantTransducer::TransitionVector::const_iterator tr_it 
@@ -684,12 +684,12 @@ namespace hfst { namespace implementations
             // Copy the transition
             t->AddArc( i,
                        fst::StdArc
-		       (
-			tr_it->input,
-			tr_it->output,
-			tr_it->weight,
-			tr_it->target
-			 ));
+               (
+            tr_it->input,
+            tr_it->output,
+            tr_it->weight,
+            tr_it->target
+             ));
           }
       }
     

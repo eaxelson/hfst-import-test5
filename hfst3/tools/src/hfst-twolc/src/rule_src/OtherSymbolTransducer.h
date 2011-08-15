@@ -118,7 +118,7 @@ class OtherSymbolTransducer
   bool is_broken;
   HfstTransducer transducer;
   void check_pair(const std::string &input_symbol,
-		  const std::string &output_symbol);
+          const std::string &output_symbol);
   void add_diamond_transition(void);
   static bool empty(const HfstBasicTransducer &fsm);
 
@@ -138,7 +138,7 @@ class OtherSymbolTransducer
 
   //! @brief Construct transducer <i>input_symbol:output_symbol</i>.
   OtherSymbolTransducer(const std::string &input_symbol,
-			const std::string &output_symbol);
+            const std::string &output_symbol);
 
   //! @brief Construct transducer <i>symbol:symbol</i>.
   OtherSymbolTransducer(const std::string &symbol);
@@ -159,13 +159,13 @@ class OtherSymbolTransducer
   //! @a another.
   OtherSymbolTransducer 
     &apply(const HfstTransducerOneArgMember,
-	   const OtherSymbolTransducer &another);
+       const OtherSymbolTransducer &another);
 
   //! @brief Call @a p of @a this taking @a another as argument.
   //!
   bool
     apply(const HfstTransducerOneArgMemberBool,
-	  const OtherSymbolTransducer &another) const;
+      const OtherSymbolTransducer &another) const;
 
   //! @brief Apply @a p onto @a this taking @a num as argument and
   //! minimize @a this.
@@ -176,7 +176,7 @@ class OtherSymbolTransducer
   //! and minimize @a this.
   OtherSymbolTransducer 
     &apply(const HfstTransducerTwoNumArgMember,unsigned int num1,
-	   unsigned int num2);
+       unsigned int num2);
 
   //! @brief Apply @a p onto @a this taking @a pair as argument and
   //! minimize @a this.
@@ -188,19 +188,19 @@ class OtherSymbolTransducer
   //! as arguments and minimize @a this.
   OtherSymbolTransducer 
     &apply(const HfstTransducerSubstMember p,const std::string &str1, 
-	   const std::string &str2, bool b1, bool b2);
+       const std::string &str2, bool b1, bool b2);
 
   //! @brief Apply @a p onto @a this taking @a p1 and @a p2 as arguments and
   //! minimize @a this.
   OtherSymbolTransducer 
     &apply(const HfstTransducerSubstPairMember p,const SymbolPair &p1,
-	   const SymbolPair &p2);
+       const SymbolPair &p2);
 
   //! @brief Apply @a p onto @a this taking @a p1 and @a p2 as arguments and
   //! minimize @a this.
   OtherSymbolTransducer 
     &apply(const HfstTransducerSubstPairFstMember p,const SymbolPair &p1,
-	   const OtherSymbolTransducer &t);
+       const OtherSymbolTransducer &t);
 
 
   //! @brief Add one transition from the start state of @a this to a new state
@@ -223,7 +223,7 @@ class OtherSymbolTransducer
   //! @brief Return true, iff the intersection of @a this and @a another is 
   //! empty. If it is non-empty, store the first common string found in v.
   bool is_empty_intersection(const OtherSymbolTransducer &another,
-			     StringVector &);
+                 StringVector &);
 
   //! @brief Return true, iff @a another is a subset of the @a this.
   bool is_subset(const OtherSymbolTransducer &another);
@@ -252,7 +252,7 @@ class OtherSymbolTransducer
   //! left context, <tt>Y</tt> is the right context, <tt>D</tt> is the 
   //! diamond symbol <tt>__HFST_TWOLC_DIAMOND</tt>.
   static OtherSymbolTransducer get_context(OtherSymbolTransducer &left,
-					   OtherSymbolTransducer &right);
+                       OtherSymbolTransducer &right);
   
   //! @brief Get a transducer recogninzing any pair.
   static OtherSymbolTransducer get_universal(void);
@@ -272,7 +272,7 @@ class OtherSymbolTransducer
   friend class Rule;
 
   friend std::ostream &operator<<(std::ostream &,
-				  const OtherSymbolTransducer &);
+                  const OtherSymbolTransducer &);
 };
 
 //! @brief Container for OtherSymbolTransducers.

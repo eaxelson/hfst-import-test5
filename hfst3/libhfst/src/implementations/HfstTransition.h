@@ -13,9 +13,9 @@ namespace hfst {
    /** @brief A transition that consists of a target state and 
         transition data represented by class C. 
 
-	The easiest way to use this template is to choose the 
-	the implementation #HfstBasicTransition which is compatible with
-	#HfstBasicTransducer.
+    The easiest way to use this template is to choose the 
+    the implementation #HfstBasicTransition which is compatible with
+    #HfstBasicTransducer.
 
        @see HfstBasicTransition
     */
@@ -25,11 +25,11 @@ namespace hfst {
         HfstState target_state; // the state where the transition leads
         C transition_data;      // the actual transition data
 
-	/* Get the number that represents the symbol in the transition data. */
-	static unsigned int get_symbol_number
-	  (const typename C::SymbolType &symbol) {
-	  return C::get_symbol_number(symbol);
-	}
+    /* Get the number that represents the symbol in the transition data. */
+    static unsigned int get_symbol_number
+      (const typename C::SymbolType &symbol) {
+      return C::get_symbol_number(symbol);
+    }
 
       public:
 
@@ -78,12 +78,12 @@ namespace hfst {
         const C & get_transition_data() const {
           return transition_data;
         }
-	
+    
         /** @brief Get the input symbol of the transition. */
         typename C::SymbolType get_input_symbol() const {
           return transition_data.get_input_symbol();
         }
-	
+    
         /** @brief Get the output symbol of the transition. */
         typename C::SymbolType get_output_symbol() const {
           return transition_data.get_output_symbol();

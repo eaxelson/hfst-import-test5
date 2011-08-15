@@ -33,21 +33,21 @@ void display_pair_vector(KeyPairVector * v) {
     {
       KeyPair * kp = *it;
       Symbol 
-	input(get_key_symbol(kp->lower_char(),rule_keys)),
-	output(get_key_symbol(kp->upper_char(),rule_keys));
+    input(get_key_symbol(kp->lower_char(),rule_keys)),
+    output(get_key_symbol(kp->upper_char(),rule_keys));
       const char *
-	input_name(get_symbol_name(input));
+    input_name(get_symbol_name(input));
       const char *
-	output_name(get_symbol_name(output));
+    output_name(get_symbol_name(output));
 
       if (v->end() == (it+1))
-	{
-	  fprintf(stderr,"%s:%s", input_name, output_name);
-	}
+    {
+      fprintf(stderr,"%s:%s", input_name, output_name);
+    }
       else
-	{
-	  fprintf(stderr,"%s:%s, ", input_name, output_name);
-	}
+    {
+      fprintf(stderr,"%s:%s, ", input_name, output_name);
+    }
     }
   fprintf(stderr,"}\n");
 }
@@ -77,10 +77,10 @@ int get_symbol_number(char * symbol_name) {
   if (not is_symbol(symbol_name)) 
     {
       if (debug)
-	{
-	  fprintf(stderr,"Symbol %s has no corresponding symbol number\n",
-		  symbol_name);
-	}
+    {
+      fprintf(stderr,"Symbol %s has no corresponding symbol number\n",
+          symbol_name);
+    }
       return -1;
     }
   return get_symbol(symbol_name);
@@ -92,9 +92,9 @@ int get_symbol_number_key(Symbol symbol_number, char * symbol_name) {
   if (not is_symbol(symbol_number,rule_keys)) 
     {
       if (debug)
-	{
-	  fprintf(stderr,"Symbol %s has no key\n",symbol_name);
-	}
+    {
+      fprintf(stderr,"Symbol %s has no key\n",symbol_name);
+    }
       return -1;
     }
   return get_key(symbol_number,rule_keys);
@@ -145,17 +145,17 @@ KeyPair * split_symbol_pair(char * symbol_pair_string) {
       Symbol output_symbol;
       int output_symbol_indicator = get_symbol_number(output);
       if (-1 == output_symbol_indicator)
-	{
-	  return NULL;
-	}
+    {
+      return NULL;
+    }
       output_symbol = static_cast<Symbol>(output_symbol_indicator);
 
       // Get the symbol key corresponding to the symbol number output_symbol.
       int output_key_indicator = get_symbol_number_key(output_symbol,output);
       if (-1 == output_key_indicator)
-	{
-	  return NULL;
-	}
+    {
+      return NULL;
+    }
       output_key = static_cast<Key>(output_key_indicator);
     }
   // Return the pair input_key:output_key.
@@ -163,10 +163,10 @@ KeyPair * split_symbol_pair(char * symbol_pair_string) {
 }
 
 bool test_correspondence(KeyPairVector * input_vector,
-			 FstVector * rules,
-			 RuleNameVector * rule_names,
-			 bool negative,
-			 FILE * output_file=stdout)
+             FstVector * rules,
+             RuleNameVector * rule_names,
+             bool negative,
+             FILE * output_file=stdout)
 {
   if ( debug )
     {
@@ -178,7 +178,7 @@ bool test_correspondence(KeyPairVector * input_vector,
   // Rather complicatd way to transform a KeyPairVector into a transducer...
   TransducerHandle input_fst = 
     disjunct_as_trie(HFST::create_empty_transducer(),
-			   input_vector);
+               input_vector);
 
   // Delete input_vector
   for (KeyPairVector::iterator it = input_vector->begin();
@@ -192,39 +192,39 @@ bool test_correspondence(KeyPairVector * input_vector,
     {
       passed_test = true;
       for (size_t i = 0; i < rules->size(); ++i)
-	{
-	  // Is the correspondence accepted by the rule?
-	  bool test_result =
-	    not are_disjoint(input_fst,rules->at(i));
-	  if (not test_result) {
-	    if (debug or verbose)
-	      {
-		if (rule_names == NULL)
-		  {
-		    fprintf(output_file,"Rule %zu rejects\n",i);
-		  }
-		else
-		  {
-		    fprintf(output_file,"Rule %s rejects\n",rule_names->at(i));
-		  }
-	      }
-	  }
-	  passed_test = passed_test and test_result;
-	}
+    {
+      // Is the correspondence accepted by the rule?
+      bool test_result =
+        not are_disjoint(input_fst,rules->at(i));
+      if (not test_result) {
+        if (debug or verbose)
+          {
+        if (rule_names == NULL)
+          {
+            fprintf(output_file,"Rule %zu rejects\n",i);
+          }
+        else
+          {
+            fprintf(output_file,"Rule %s rejects\n",rule_names->at(i));
+          }
+          }
+      }
+      passed_test = passed_test and test_result;
+    }
     }
   else
     {
       passed_test = false;
       for (size_t i = 0; i < rules->size(); ++i)
-	{
-	  bool test_result =
-	    are_disjoint(input_fst,rules->at(i));
-	  if (test_result)
-	    {
-	      passed_test = true;
-	      break;
-	    }
-	}
+    {
+      bool test_result =
+        are_disjoint(input_fst,rules->at(i));
+      if (test_result)
+        {
+          passed_test = true;
+          break;
+        }
+    }
     }
 
   delete input_fst;
@@ -269,7 +269,7 @@ KeyPairVector * split_at_spaces(char * input_string)
     // and store the pairs in symbol_name_pairs.
     if (symbol_pair_string != NULL)
       {
-	symbol_name_pairs.push_back(symbol_pair_string);
+    symbol_name_pairs.push_back(symbol_pair_string);
       }
   } while ((symbol_pair_string = strtok(NULL," ")) != NULL);
   
@@ -279,18 +279,18 @@ KeyPairVector * split_at_spaces(char * input_string)
     {
       symbol_pair_string = *it;
       KeyPair * symbol_pair = 
-	split_symbol_pair(symbol_pair_string);
+    split_symbol_pair(symbol_pair_string);
       if (symbol_pair == NULL)
-	{
-	  fprintf(stderr,
-	     "WARNING!\n"
-	     "The string \"%s\" can't be tokenized. It's likely, that it\n"
-	     "contains symbols not declared in the alphabet of the\n"
-	     "rule-transducers.\n",original_input_string);
-	  free(original_input_string);
-	  delete_key_pair_vector(tokenized_input);
-	  return NULL;
-	}
+    {
+      fprintf(stderr,
+         "WARNING!\n"
+         "The string \"%s\" can't be tokenized. It's likely, that it\n"
+         "contains symbols not declared in the alphabet of the\n"
+         "rule-transducers.\n",original_input_string);
+      free(original_input_string);
+      delete_key_pair_vector(tokenized_input);
+      return NULL;
+    }
       tokenized_input->push_back(symbol_pair);
     }
   free(original_input_string);
@@ -324,59 +324,59 @@ KeyPairVector * construct_pair_vector(vector<KeyVector*> &input_fragments)
       ++it)
     {
       if (pairs == NULL)
-	{
-	  delete *it;
-	  continue;
-	}
+    {
+      delete *it;
+      continue;
+    }
       if ((*it)->empty())
-	{
-	  delete pairs;
-	  pairs = NULL;
-	  delete *it;
-	  continue;
-	}
+    {
+      delete pairs;
+      pairs = NULL;
+      delete *it;
+      continue;
+    }
       if (it == input_fragments.begin())
-	{
-	  for(KeyVector::iterator jt = (*it)->begin();
-	      jt != (*it)->end() - 1;
-	      ++jt) 
-	    {
-	      pairs->push_back(new KeyPair(*jt));
-	    }
-	  Key last_key = *((*it)->end() - 1);
-	  previous_key = last_key;
-	}
+    {
+      for(KeyVector::iterator jt = (*it)->begin();
+          jt != (*it)->end() - 1;
+          ++jt) 
+        {
+          pairs->push_back(new KeyPair(*jt));
+        }
+      Key last_key = *((*it)->end() - 1);
+      previous_key = last_key;
+    }
       else if (it+1 == input_fragments.end())
-	{
-	  Key first_key = *((*it)->begin());
-	  pairs->push_back(new KeyPair(previous_key,first_key));
-	  for(KeyVector::iterator jt = (*it)->begin()+1;
-	      jt != (*it)->end();
-	      ++jt)
-	    {
-	      pairs->push_back(new KeyPair(*jt));
-	    }
-	}
+    {
+      Key first_key = *((*it)->begin());
+      pairs->push_back(new KeyPair(previous_key,first_key));
+      for(KeyVector::iterator jt = (*it)->begin()+1;
+          jt != (*it)->end();
+          ++jt)
+        {
+          pairs->push_back(new KeyPair(*jt));
+        }
+    }
       else if ((*it)->size() < 2)
-	{
-	  delete *it;
-	  delete pairs;
-	  pairs = NULL;
-	  continue;
-	}
+    {
+      delete *it;
+      delete pairs;
+      pairs = NULL;
+      continue;
+    }
       else 
-	{
-	  Key first_key = *((*it)->begin());
-	  pairs->push_back(new KeyPair(previous_key,first_key));
-	  for(KeyVector::iterator jt = (*it)->begin()+1;
-	      jt != (*it)->end() - 1;
-	      ++jt)
-	    {
-	      pairs->push_back(new KeyPair(*jt));
-	    }
-	  Key last_key = *((*it)->end() - 1);
-	  previous_key = last_key;
-	}
+    {
+      Key first_key = *((*it)->begin());
+      pairs->push_back(new KeyPair(previous_key,first_key));
+      for(KeyVector::iterator jt = (*it)->begin()+1;
+          jt != (*it)->end() - 1;
+          ++jt)
+        {
+          pairs->push_back(new KeyPair(*jt));
+        }
+      Key last_key = *((*it)->end() - 1);
+      previous_key = last_key;
+    }
     }
   return pairs;
 }
@@ -398,48 +398,48 @@ KeyPairVector * tokenize(char * input_string)
   // using do-while{} because last uncolonized section must also be parsed.
   do {
   	colon = strchr(last_start, ':');
-	if ((colon != NULL) && (colon == last_start))
-	{
-		// either absolute start is : or there is :: somewhere
-		colon = strchr(last_start + 1, ':');
-	}
-	while ((colon != NULL) && (colon != input_string) &&
-		(*(colon - 1) == '\\'))
-	{
-		colon = strchr(colon + 1 , ':');
-	}
-	char* input_fragment = NULL;
-	if (colon != NULL)
-	{
-		input_fragment = static_cast<char*>(malloc(sizeof(char) *
-					(colon - last_start + 1)));
-		input_fragment = static_cast<char*>(memcpy(input_fragment, last_start, colon - last_start));
-		input_fragment[colon - last_start] = '\0';
-	}
-	else
-	{
-		input_fragment = strdup(last_start);
-	}
-	last_start = colon + 1;
+    if ((colon != NULL) && (colon == last_start))
+    {
+        // either absolute start is : or there is :: somewhere
+        colon = strchr(last_start + 1, ':');
+    }
+    while ((colon != NULL) && (colon != input_string) &&
+        (*(colon - 1) == '\\'))
+    {
+        colon = strchr(colon + 1 , ':');
+    }
+    char* input_fragment = NULL;
+    if (colon != NULL)
+    {
+        input_fragment = static_cast<char*>(malloc(sizeof(char) *
+                    (colon - last_start + 1)));
+        input_fragment = static_cast<char*>(memcpy(input_fragment, last_start, colon - last_start));
+        input_fragment[colon - last_start] = '\0';
+    }
+    else
+    {
+        input_fragment = strdup(last_start);
+    }
+    last_start = colon + 1;
 #if 0
-	fprintf(stderr, "*** DBG: input_fragment %s\n", input_fragment);
+    fprintf(stderr, "*** DBG: input_fragment %s\n", input_fragment);
 #endif
     KeyVector * tokenized_string_fragment =
       longest_match_tokenize(tokenizer,
-				   input_fragment,
-				   rule_keys);
+                   input_fragment,
+                   rule_keys);
     //replace_epsilons(tokenized_string_fragment);
     if (tokenized_string_fragment == NULL) {
       for(vector<KeyVector*>::iterator it = input_fragments.begin();
-	  it != input_fragments.end();
-	  ++it ) {
-	delete *it;
+      it != input_fragments.end();
+      ++it ) {
+    delete *it;
       }
       fprintf(stderr,
-	      "WARNING!\n"
-	      "The string \"%s\" can't be tokenized. It's likely, that it\n"
-	      "contains symbols not declared in the alphabet of the\n"
-	      "rule-transducers.\n",original_input_string);
+          "WARNING!\n"
+          "The string \"%s\" can't be tokenized. It's likely, that it\n"
+          "contains symbols not declared in the alphabet of the\n"
+          "rule-transducers.\n",original_input_string);
       free(original_input_string);
       return NULL;
     }
@@ -452,10 +452,10 @@ KeyPairVector * tokenize(char * input_string)
   if (tokenized_input == NULL)
     {
       fprintf(stderr,
-	      "WARNING!\n"
-	      "The string \"%s\" can't be tokenized. It is syntactically\n"
-	      "incorrect in some way. Use option --help to find out more\n",
-	      original_input_string);
+          "WARNING!\n"
+          "The string \"%s\" can't be tokenized. It is syntactically\n"
+          "incorrect in some way. Use option --help to find out more\n",
+          original_input_string);
     }
   free(original_input_string);
   return tokenized_input;
@@ -484,7 +484,7 @@ void get_alphabet(char * symbol_file_name)
   if ( symbol_file_name == NULL )
     {
       fprintf(stderr,"Error: No alphabet supplied either with the rule\n"
-	      "transducers or in a separate file.\n");
+          "transducers or in a separate file.\n");
       exit(1);
     }
   ifstream sym_in(symbol_file_name);
@@ -492,7 +492,7 @@ void get_alphabet(char * symbol_file_name)
   if ( rule_keys == NULL )
     {
       fprintf(stderr,"Error: The file %s doesn't contain a symbol table.\n",
-	      symbol_file_name);
+          symbol_file_name);
       exit(1);
     }
 }
@@ -513,43 +513,43 @@ FstVector * read_rule_transducers(void)
       // Count the rules, in order to display information.
       size_t counter = 0;
       if (not silent)
-	fprintf(stderr,
-		"Reading rule transducers from STDIN.\n"
-		"(If this seems to take forever, please check\n"
-		"that you're actually giving something as input)\n\n");
+    fprintf(stderr,
+        "Reading rule transducers from STDIN.\n"
+        "(If this seems to take forever, please check\n"
+        "that you're actually giving something as input)\n\n");
       while ((format = read_format()) == UNWEIGHTED)
-	{
-	  if ( rule_keys == NULL and has_symbol_table(cin)) 
-	    {
-	      rule_keys = create_key_table();
-	      rules->push_back(read_transducer(cin,rule_keys));
-	    }
-	  else
-	    {
-	      rules->push_back(read_transducer());
-	    }
-	  if ( debug or verbose )
-	    fprintf(stderr,"Read rule: %zu   \r",++counter);
-	}
+    {
+      if ( rule_keys == NULL and has_symbol_table(cin)) 
+        {
+          rule_keys = create_key_table();
+          rules->push_back(read_transducer(cin,rule_keys));
+        }
+      else
+        {
+          rules->push_back(read_transducer());
+        }
+      if ( debug or verbose )
+        fprintf(stderr,"Read rule: %zu   \r",++counter);
+    }
     }
   else
     {
       size_t counter = 0;
       ifstream fst_in(fst_file_name);
       while ((format = read_format(fst_in)) == UNWEIGHTED)
-	{
-	  if ( rule_keys == NULL and has_symbol_table(fst_in)) 
-	    {
-	      rule_keys = create_key_table();
-	      rules->push_back(read_transducer(fst_in,rule_keys));
-	    }
-	  else
-	    {
-	      rules->push_back(read_transducer(fst_in));
-	    }
-	  if ( debug or verbose )
-	    fprintf(stderr,"Read rule: %zu   \r",++counter);
-	}
+    {
+      if ( rule_keys == NULL and has_symbol_table(fst_in)) 
+        {
+          rule_keys = create_key_table();
+          rules->push_back(read_transducer(fst_in,rule_keys));
+        }
+      else
+        {
+          rules->push_back(read_transducer(fst_in));
+        }
+      if ( debug or verbose )
+        fprintf(stderr,"Read rule: %zu   \r",++counter);
+    }
     }
   if ( debug or verbose )
     fprintf(stderr,"\n\n");
@@ -557,27 +557,27 @@ FstVector * read_rule_transducers(void)
     {
       delete rules;
       fprintf(stderr,
-	      "No input transducers could be read.\n");
+          "No input transducers could be read.\n");
       if (format != EOF)
-	{
-	  if (format == WEIGHTED)
-	    {
-	      fprintf(stderr,
-		      "Error: You gave weighted input transducers.\n");
-	    }
-	  else 
-	    {
-	      fprintf(stderr,
-		      "Error: Unknown input transducer format.\n");
-	    }
-	}
+    {
+      if (format == WEIGHTED)
+        {
+          fprintf(stderr,
+              "Error: You gave weighted input transducers.\n");
+        }
+      else 
+        {
+          fprintf(stderr,
+              "Error: Unknown input transducer format.\n");
+        }
+    }
       else
-	{
-	  fprintf(stderr,
-		  "Error: The input transducer file is empty\n");
+    {
+      fprintf(stderr,
+          "Error: The input transducer file is empty\n");
 
-	}
-	  exit(1);
+    }
+      exit(1);
     }
   return rules;
 }

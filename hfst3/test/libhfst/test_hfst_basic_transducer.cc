@@ -34,7 +34,7 @@ int main(int argc, char **argv)
   assert(not t.is_final_state(s2));
   t.set_final_weight(s2, 1.0);
   assert(t.is_final_state(s2) &&
-	 t.get_final_weight(s2) == 1.0);
+     t.get_final_weight(s2) == 1.0);
 
   /* Take a copy. */
   HfstBasicTransducer tc(t);
@@ -46,8 +46,8 @@ int main(int argc, char **argv)
   for (HfstState s=0; s<5; s++) {
     if (s != s2) {
       try {
-	float w = t.get_final_weight(0);
-	assert(false);
+    float w = t.get_final_weight(0);
+    assert(false);
       }
       //catch (StateIsNotFinalException e) {};
       catch (const HfstException e) {};
@@ -131,7 +131,7 @@ int main(int argc, char **argv)
     tr2.set_final_weight(2, 0);
     tr2.add_transition
       (0, HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@", 
-			      "@_IDENTITY_SYMBOL_@", 0) );
+                  "@_IDENTITY_SYMBOL_@", 0) );
     tr2.add_transition
       (1, HfstBasicTransition(2, "bar", "bar", 0) );
     
@@ -152,25 +152,25 @@ int main(int argc, char **argv)
     unsigned int source_state=0;
 
     for (HfstBasicTransducer::const_iterator it = t.begin();
-	 it != t.end(); it++ )
+     it != t.end(); it++ )
       {
-	for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
-	       = it->begin(); tr_it != it->end(); tr_it++)
-	  {
-	    std::cerr << source_state << "\t"
-		      << tr_it->get_target_state() << "\t"
-		      << tr_it->get_input_symbol() << "\t"
-		      << tr_it->get_output_symbol() << "\t"
-		      << tr_it->get_weight() << std::endl;
-	  }
+    for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
+           = it->begin(); tr_it != it->end(); tr_it++)
+      {
+        std::cerr << source_state << "\t"
+              << tr_it->get_target_state() << "\t"
+              << tr_it->get_input_symbol() << "\t"
+              << tr_it->get_output_symbol() << "\t"
+              << tr_it->get_weight() << std::endl;
+      }
 
-	if (t.is_final_state(source_state)) 
-	  {
-	    std::cerr << source_state << "\t"
-		      << t.get_final_weight(source_state) << std::endl;
-	  }
-	
-	source_state++;
+    if (t.is_final_state(source_state)) 
+      {
+        std::cerr << source_state << "\t"
+              << t.get_final_weight(source_state) << std::endl;
+      }
+    
+    source_state++;
       }
   }
 

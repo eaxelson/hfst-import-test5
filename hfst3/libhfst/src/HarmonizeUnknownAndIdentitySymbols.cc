@@ -25,7 +25,7 @@ static bool is_subset(const StringSet &subset,const StringSet &superset)
        ++it)
     {
       if (superset.find(*it) == superset.end())
-	{ return false; }
+    { return false; }
     }
   return true;
 }
@@ -58,8 +58,8 @@ HarmonizeUnknownAndIdentitySymbols::HarmonizeUnknownAndIdentitySymbols
   // --- documentation would be useful
   std::vector<std::string>::iterator diff_end =
     std::set_difference(t1_symbol_set.begin(),t1_symbol_set.end(),
-			t2_symbol_set.begin(),t2_symbol_set.end(),
-			diff_vector.begin());
+            t2_symbol_set.begin(),t2_symbol_set.end(),
+            diff_vector.begin());
 
   StringSet t1_symbols_minus_t2_symbols(diff_vector.begin(),diff_end);
 
@@ -76,8 +76,8 @@ HarmonizeUnknownAndIdentitySymbols::HarmonizeUnknownAndIdentitySymbols
     { debug_harmonize_print("Computing t2 symbols - t1 symbols."); }
 
   diff_end = std::set_difference(t2_symbol_set.begin(),t2_symbol_set.end(),
-				 t1_symbol_set.begin(),t1_symbol_set.end(),
-				 diff_vector.begin());
+                 t1_symbol_set.begin(),t1_symbol_set.end(),
+                 diff_vector.begin());
 
   StringSet t2_symbols_minus_t1_symbols(diff_vector.begin(),diff_end);
 
@@ -110,20 +110,20 @@ HarmonizeUnknownAndIdentitySymbols::HarmonizeUnknownAndIdentitySymbols
   if (debug_harmonize)
     {
       if (t2_symbols_minus_t1_symbols.empty())
-	{ debug_harmonize_print("t1 includes no symbols not found in t2."); }
+    { debug_harmonize_print("t1 includes no symbols not found in t2."); }
       else
-	{ 
-	  HfstTransducer fst1(t1,TROPICAL_OPENFST_TYPE);
-	  std::cerr << fst1 << std::endl; 
-	}
+    { 
+      HfstTransducer fst1(t1,TROPICAL_OPENFST_TYPE);
+      std::cerr << fst1 << std::endl; 
+    }
 
       if (t1_symbols_minus_t2_symbols.empty())
-	{ debug_harmonize_print("t2 includes no symbols not found in t1."); }
+    { debug_harmonize_print("t2 includes no symbols not found in t1."); }
       else
-	{ 
-	  HfstTransducer fst2(t2,TROPICAL_OPENFST_TYPE);
-	  std::cerr << fst2 << std::endl; 
-	}
+    { 
+      HfstTransducer fst2(t2,TROPICAL_OPENFST_TYPE);
+      std::cerr << fst2 << std::endl; 
+    }
     }
 }
 
@@ -133,13 +133,13 @@ void HarmonizeUnknownAndIdentitySymbols::populate_symbol_set
   for (HfstBasicTransducer::const_iterator it = t.begin(); it != t.end(); ++it)
     {
       for (HfstBasicTransducer::HfstTransitions::const_iterator jt = 
-	     it->begin();
-	   jt != it->end();
-	   ++jt)
-	{
-	  s.insert(jt->get_input_symbol());
-	  s.insert(jt->get_output_symbol());
-	}
+         it->begin();
+       jt != it->end();
+       ++jt)
+    {
+      s.insert(jt->get_input_symbol());
+      s.insert(jt->get_output_symbol());
+    }
     }
   if (debug_harmonize)
     {
@@ -170,26 +170,26 @@ void HarmonizeUnknownAndIdentitySymbols::harmonize_identity_symbols
       HfstBasicTransducer::HfstTransitions added_transitions;
 
       for (HfstBasicTransducer::HfstTransitions::const_iterator jt = 
-	     it->begin();
-	   jt != it->end();
-	   ++jt)
-	{
-	  if (jt->get_input_symbol() == identity)
-	    {
-	      // --- an exception instead, this could also be checked
-	      //     at an earlier stage
-	      assert(jt->get_output_symbol() == identity);
-	      for (StringSet::const_iterator kt = missing_symbols.begin();
-		   kt != missing_symbols.end();
-		   ++kt)
-		{ added_transitions.push_back
-		    (HfstBasicTransition(jt->get_target_state(),
-					 *kt,*kt,
-					 jt->get_weight())); }
-	    }
-	}
+         it->begin();
+       jt != it->end();
+       ++jt)
+    {
+      if (jt->get_input_symbol() == identity)
+        {
+          // --- an exception instead, this could also be checked
+          //     at an earlier stage
+          assert(jt->get_output_symbol() == identity);
+          for (StringSet::const_iterator kt = missing_symbols.begin();
+           kt != missing_symbols.end();
+           ++kt)
+        { added_transitions.push_back
+            (HfstBasicTransition(jt->get_target_state(),
+                     *kt,*kt,
+                     jt->get_weight())); }
+        }
+    }
       it->insert(it->end(),
-		 added_transitions.begin(),added_transitions.end());
+         added_transitions.begin(),added_transitions.end());
     }  
 }
 
@@ -205,65 +205,65 @@ void HarmonizeUnknownAndIdentitySymbols::harmonize_unknown_symbols
       HfstBasicTransducer::HfstTransitions added_transitions;
 
       for (HfstBasicTransducer::HfstTransitions::const_iterator jt = 
-	     it->begin();
-	   jt != it->end();
-	   ++jt)
-	{
-	  if (jt->get_input_symbol() == unknown)
-	    {
-	      // --- an exception instead, this could also be checked
-	      //     at an earlier stage
-	      assert(jt->get_output_symbol() != identity);
-		
-	      for (StringSet::const_iterator kt = missing_symbols.begin();
-		   kt != missing_symbols.end();
-		   ++kt)
-		{ 
-		  added_transitions.push_back
-		    (HfstBasicTransition(jt->get_target_state(),
-					 *kt,jt->get_output_symbol(),
-					 jt->get_weight())); 
-		}
-	    }
-	  if (jt->get_output_symbol() == unknown)
-	    {
-	      // --- an exception instead, this could also be checked
-	      //     at an earlier stage
-	      assert(jt->get_input_symbol() != identity);
+         it->begin();
+       jt != it->end();
+       ++jt)
+    {
+      if (jt->get_input_symbol() == unknown)
+        {
+          // --- an exception instead, this could also be checked
+          //     at an earlier stage
+          assert(jt->get_output_symbol() != identity);
+        
+          for (StringSet::const_iterator kt = missing_symbols.begin();
+           kt != missing_symbols.end();
+           ++kt)
+        { 
+          added_transitions.push_back
+            (HfstBasicTransition(jt->get_target_state(),
+                     *kt,jt->get_output_symbol(),
+                     jt->get_weight())); 
+        }
+        }
+      if (jt->get_output_symbol() == unknown)
+        {
+          // --- an exception instead, this could also be checked
+          //     at an earlier stage
+          assert(jt->get_input_symbol() != identity);
 
-	      for (StringSet::const_iterator kt = missing_symbols.begin();
-		   kt != missing_symbols.end();
-		   ++kt)
-		{ added_transitions.push_back
-		    (HfstBasicTransition(jt->get_target_state(),
-					 jt->get_input_symbol(),*kt,
-					 jt->get_weight())); }
+          for (StringSet::const_iterator kt = missing_symbols.begin();
+           kt != missing_symbols.end();
+           ++kt)
+        { added_transitions.push_back
+            (HfstBasicTransition(jt->get_target_state(),
+                     jt->get_input_symbol(),*kt,
+                     jt->get_weight())); }
 
-	    }
-	  if (jt->get_input_symbol() == unknown and 
-	      jt->get_output_symbol() == unknown)
-	    {
-	      for (StringSet::const_iterator kt = missing_symbols.begin();
-		   kt != missing_symbols.end();
-		   ++kt)
-		{ 
-		  for (StringSet::const_iterator lt = missing_symbols.begin();
-		       lt != missing_symbols.end();
-		       ++lt)
-		    { 
-		      if (kt == lt)
-			{ continue; }
+        }
+      if (jt->get_input_symbol() == unknown and 
+          jt->get_output_symbol() == unknown)
+        {
+          for (StringSet::const_iterator kt = missing_symbols.begin();
+           kt != missing_symbols.end();
+           ++kt)
+        { 
+          for (StringSet::const_iterator lt = missing_symbols.begin();
+               lt != missing_symbols.end();
+               ++lt)
+            { 
+              if (kt == lt)
+            { continue; }
 
-		      added_transitions.push_back
-			(HfstBasicTransition(jt->get_target_state(),
-					     *lt,*kt,
-					     jt->get_weight())); 
-		    }
-		}
-	    }
-	}
+              added_transitions.push_back
+            (HfstBasicTransition(jt->get_target_state(),
+                         *lt,*kt,
+                         jt->get_weight())); 
+            }
+        }
+        }
+    }
       it->insert(it->end(),
-		 added_transitions.begin(),added_transitions.end());
+         added_transitions.begin(),added_transitions.end());
     }
 }
 

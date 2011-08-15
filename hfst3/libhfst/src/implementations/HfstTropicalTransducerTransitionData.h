@@ -46,17 +46,17 @@ namespace hfst {
 
       static SymbolType get_epsilon()
       {
-	return SymbolType("@_EPSILON_SYMBOL_@");
+    return SymbolType("@_EPSILON_SYMBOL_@");
       }
 
       static SymbolType get_unknown()
       {
-	return SymbolType("@_UNKNOWN_SYMBOL_@");
+    return SymbolType("@_UNKNOWN_SYMBOL_@");
       }
 
       static SymbolType get_identity()
       {
-	return SymbolType("@_IDENTITY_SYMBOL_@");
+    return SymbolType("@_IDENTITY_SYMBOL_@");
       }
 
     public: /* FIXME: Should be private. */
@@ -71,12 +71,12 @@ namespace hfst {
       /* Get the symbol that is mapped as number */
       static std::string get_symbol(unsigned int number) {
 
-	assert(symbol2number_map.find("") == symbol2number_map.end());
-	
+    assert(symbol2number_map.find("") == symbol2number_map.end());
+    
 
         Number2SymbolMap::const_iterator it = number2symbol_map.find(number);
 
-	assert(not(it->second == ""));
+    assert(not(it->second == ""));
 
         if (it == number2symbol_map.end()) {
           /*fprintf(stderr, "ERROR: "
@@ -101,18 +101,18 @@ namespace hfst {
       /* Get the number that is used to represent the symbol */
       static unsigned int get_number(const std::string &symbol) {
 
-	if(symbol == "") { // FAIL
-	  Symbol2NumberMap::iterator it = symbol2number_map.find(symbol);
-	  if (it == symbol2number_map.end()) {
-	    std::cerr << "ERROR: No number for the empty symbol\n" 
-		      << std::endl;
-	  }
-	  else {
-	    std::cerr << "ERROR: The empty symbol corresdponds to number " 
-		      << it->second << std::endl;
-	  }
-	  assert(false);
-	}
+    if(symbol == "") { // FAIL
+      Symbol2NumberMap::iterator it = symbol2number_map.find(symbol);
+      if (it == symbol2number_map.end()) {
+        std::cerr << "ERROR: No number for the empty symbol\n" 
+              << std::endl;
+      }
+      else {
+        std::cerr << "ERROR: The empty symbol corresdponds to number " 
+              << it->second << std::endl;
+      }
+      assert(false);
+    }
 
         Symbol2NumberMap::iterator it = symbol2number_map.find(symbol);
         if (it == symbol2number_map.end()) {
@@ -134,8 +134,8 @@ namespace hfst {
     public:
       void print_transition_data() 
       {
-	fprintf(stderr, "%i:%i %f\n", 
-		input_number, output_number, weight);
+    fprintf(stderr, "%i:%i %f\n", 
+        input_number, output_number, weight);
       }
 
     public:
@@ -158,14 +158,14 @@ namespace hfst {
           input symbol \a isymbol, output symbol \a osymbol 
           and weight \a weight. */
       HfstTropicalTransducerTransitionData(SymbolType isymbol,
-					   SymbolType osymbol,
-					   WeightType weight) {
-	if (isymbol == "" || osymbol == "")
-	  HFST_THROW_MESSAGE
-	    (EmptyStringException,
-	     "HfstTropicalTransducerTransitionData"
-	     "(SymbolType, SymbolType, WeightType)");
-	
+                       SymbolType osymbol,
+                       WeightType weight) {
+    if (isymbol == "" || osymbol == "")
+      HFST_THROW_MESSAGE
+        (EmptyStringException,
+         "HfstTropicalTransducerTransitionData"
+         "(SymbolType, SymbolType, WeightType)");
+    
         input_number = get_number(isymbol);
         output_number = get_number(osymbol);
         this->weight = weight;
@@ -197,14 +197,14 @@ namespace hfst {
         return (symbol.compare("@_IDENTITY_SYMBOL_@") == 0);
       }
       static bool is_valid_symbol(const SymbolType &symbol) {
-	if (symbol == "")
-	  return false;
-	return true;
+    if (symbol == "")
+      return false;
+    return true;
       }
 
       static SymbolType get_marker(const SymbolTypeSet &sts) {
-	(void)sts;
-	return SymbolType("@_MARKER_SYMBOL_@");
+    (void)sts;
+    return SymbolType("@_MARKER_SYMBOL_@");
       }
 
       /** @brief Whether this transition is less than transition 
@@ -226,11 +226,11 @@ namespace hfst {
       }
 
       void operator=(const HfstTropicalTransducerTransitionData &another)
-	{
-	  input_number = another.input_number;
-	  output_number = another.output_number;
-	  weight = another.weight;
-	}
+    {
+      input_number = another.input_number;
+      output_number = another.output_number;
+      weight = another.weight;
+    }
 
       friend class Number2SymbolMapInitializer;
       friend class Symbol2NumberMapInitializer;

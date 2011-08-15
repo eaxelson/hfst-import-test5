@@ -32,11 +32,11 @@ template <class IT> class VariableValueIterator
   std::string variable;
   IT it;
   static VariableValueIterator begin(const std::string &variable,
-				     const std::vector<std::string> &v)
+                     const std::vector<std::string> &v)
   { return VariableValueIterator<IT>(variable,v.begin()); }
 
   static VariableValueIterator end(const std::string &variable,
-				    const std::vector<std::string> &v)
+                    const std::vector<std::string> &v)
   { return VariableValueIterator<IT>(variable,v.end()); }
   
   VariableValueIterator(const std::string &variable,const IT &it):
@@ -57,8 +57,8 @@ template <class IT> class VariableValueIterator
   {
     if (not (this == &another))
       {
-	variable = another.variable;
-	it = another.it;
+    variable = another.variable;
+    it = another.it;
       }
     return *this;
   }

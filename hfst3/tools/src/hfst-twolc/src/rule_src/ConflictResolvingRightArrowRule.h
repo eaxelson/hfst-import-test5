@@ -33,8 +33,8 @@ class ConflictResolvingRightArrowRule : public RightArrowRule
   SymbolPair center_pair;
  public:
   ConflictResolvingRightArrowRule(const std::string &name,
-				  const SymbolPair &center,
-				  const OtherSymbolTransducerVector &contexts);
+                  const SymbolPair &center,
+                  const OtherSymbolTransducerVector &contexts);
   bool conflicts_this(ConflictResolvingRightArrowRule &another);
   void resolve_conflict(ConflictResolvingRightArrowRule &another);
 

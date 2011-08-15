@@ -29,13 +29,13 @@ class LeftRestrictionArrowRule : public Rule
 {
  public:
   LeftRestrictionArrowRule(const std::string &name,
-			   const OtherSymbolTransducer &center,
-			   const OtherSymbolTransducerVector &contexts);
+               const OtherSymbolTransducer &center,
+               const OtherSymbolTransducerVector &contexts);
 
   //! @brief Inititalize.
   LeftRestrictionArrowRule(const std::string &name,
-			   const SymbolPair &center,
-			   const OtherSymbolTransducerVector &contexts);
+               const SymbolPair &center,
+               const OtherSymbolTransducerVector &contexts);
 
   //! @brief Compile @a this. Subclasses implement this method.
   OtherSymbolTransducer compile(void);
