@@ -22,6 +22,9 @@ AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/libhfst/src/parsers -I
 AM_CXXFLAGS = -Wno-deprecated
 
 # sort alphabetically:
+if WANT_AFFIX_GUESSIFY
+MAYBE_AFFIX_GUESSIFY=hfst-affix-guessify
+endif
 if WANT_COMPARE
 MAYBE_COMPARE=hfst-compare
 endif
@@ -162,6 +165,7 @@ noinst_HEADERS= \
 # finish with xyz
 # see <http://en.wikipedia.org/wiki/Alphabets#Alphabetic_order> for details
 bin_PROGRAMS= \
+			  $(MAYBE_AFFIX_GUESSIFY) 									\
 			 $(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_CONCATENATE)     \
 			 $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) $(MAYBE_DISJUNCT)   \
 			 $(MAYBE_DUPLICATE)											\
@@ -182,6 +186,7 @@ bin_PROGRAMS= \
 
 HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc
 # sort alphabetically
+hfst_affix_guessify_SOURCES=hfst-affix-guessify.cc $(HFST_COMMON_SRC)
 hfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy HfstCompiler.cc HfstBasic.cc HfstAlphabet.cc HfstUtf8.cc $(HFST_COMMON_SRC)
 hfst_compare_SOURCES=hfst-compare.cc $(HFST_COMMON_SRC)
 hfst_compose_intersect_SOURCES=hfst-compose-intersect.cc $(HFST_COMMON_SRC)
