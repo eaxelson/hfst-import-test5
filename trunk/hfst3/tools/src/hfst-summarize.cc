@@ -121,20 +121,8 @@ process_stream(HfstInputStream& instream)
         {
           verbose_printf("Summarizing... %zu\n", transducer_n);
         }
-      HfstTransducer *trans;
-      try { 
-    trans = new HfstTransducer(instream);
-      } catch (const HfstException e) {
-    fprintf(stderr,"An error happened when reading transducer from stream.\n");
-    exit(1);
-      }
-      HfstBasicTransducer *mutt;
-      try {
-    mutt = new HfstBasicTransducer(*trans);
-      } catch (const HfstException e) {
-    fprintf(stderr,"An error happened when converting transducer to internal format.\n");
-    exit(1);
-      }
+      HfstTransducer *trans = new HfstTransducer(instream);
+      HfstBasicTransducer *mutt = new HfstBasicTransducer(*trans);
       size_t states = 0;
       size_t final_states = 0;
       //size_t paths = 0;
@@ -153,12 +141,58 @@ process_stream(HfstInputStream& instream)
       unsigned int initial_state = 0; // mutt.get_initial_state();
       StringSet transducerAlphabet = trans->get_alphabet();
       StringSet foundAlphabet;
+      bool expanded = true;
+      bool is_mutable = true;
       bool acceptor = true;
+      bool input_deterministic = true;
+      bool output_deterministic = true;
+      bool input_label_sorted = false;
+      bool output_label_sorted = false;
+      bool weighted = true;
+      bool cyclic = false;
+      bool cyclic_at_initial_state = false;
+      bool topologically_sorted = false;
+      bool accessible = true;
+      bool coaccessible = true;
+      bool is_string = true;
+      bool minimised = false;
+      // assign data from knowledge about source type
+      switch (trans->get_type())
+        {
+        case hfst::SFST_TYPE:
+          is_mutable = true;
+          weighted = false;
+          break;
+        case hfst::TROPICAL_OPENFST_TYPE:
+          is_mutable = true;
+          weighted = true;
+          break;
+        case hfst::LOG_OPENFST_TYPE:
+          is_mutable = true;
+          weighted = true;
+          break;
+        case hfst::FOMA_TYPE:
+          is_mutable = true;
+          weighted = false;
+          break;
+        case hfst::HFST_OL_TYPE:
+          is_mutable = false;
+          weighted = false;
+          break;
+        case hfst::HFST_OLW_TYPE:
+          is_mutable = false;
+          weighted = true;
+          break;
+        default:
+          is_mutable = false;
+          break;
+        }
       // iterate states in random order
       HfstState source_state=0;
       for (HfstBasicTransducer::const_iterator it = mutt->begin();
-       it != mutt->end(); it++)
-    {
+           it != mutt->end();
+           it++)
+        {
           HfstState s = source_state;
           ++states;
           if (mutt->is_final_state(s))
@@ -187,14 +221,18 @@ process_stream(HfstInputStream& instream)
                   io_epsilons++;
                   input_epsilons++;
                   output_epsilons++;
+                  input_deterministic = false;
+                  output_deterministic = false;
                 }
               else if (hfst::is_epsilon(tr_it->get_input_symbol()))
                 {
                   input_epsilons++;
+                  input_deterministic = false;
                 }
               else if (hfst::is_epsilon(tr_it->get_output_symbol()))
                 {
                   output_epsilons++;
+                  output_deterministic = false;
                 }
               if (input_ambiguity.find(tr_it->get_input_symbol()) == input_ambiguity.end())
                 {
@@ -205,7 +243,15 @@ process_stream(HfstInputStream& instream)
                   output_ambiguity[tr_it->get_output_symbol()] = 0;
                 }
               input_ambiguity[tr_it->get_input_symbol()]++;
+              if (input_ambiguity[tr_it->get_input_symbol()] > 1)
+                {
+                  input_deterministic = false;
+                }
               output_ambiguity[tr_it->get_output_symbol()]++;
+              if (output_ambiguity[tr_it->get_output_symbol()] > 1)
+                {
+                  output_deterministic = false;
+                }
             }
           if (arcs_here > densest_arcs)
             {
@@ -311,13 +357,13 @@ process_stream(HfstInputStream& instream)
               input_epsilons, output_epsilons);
       // other names from properties...
       fprintf(outfile, "expanded: ???\n"
-              "mutable: ???\n"
+              "mutable: %s\n"
               "acceptor: %s\n"
-              "input deterministic: ???\n"
-              "output deterministic: ???\n"
+              "input deterministic: %s\n"
+              "output deterministic: %s\n"
               "input label sorted: ???\n"
               "output label sorted: ???\n"
-              "weighted: ???\n"
+              "weighted: %s\n"
               "cyclic: ???\n"
               "cyclic at initial state: ???\n"
               "topologically sorted: ???\n"
@@ -325,7 +371,11 @@ process_stream(HfstInputStream& instream)
               "coaccessible: ???\n"
               "string: ???\n"
               "minimised: ???\n",
-              acceptor? "yes": "no");
+              is_mutable? "yes": "no",
+              acceptor? "yes": "no",
+              input_deterministic? "yes": "no",
+              output_deterministic? "yes": "no",
+              weighted? "yes": "no");
       if (verbose)
         {
           // our extensions for nice statistics maybe
