@@ -3309,7 +3309,8 @@ HfstTransducer * HfstTransducer::read_lexc(const std::string &filename,
   return retval;
 }
 
-std::ostream &operator<<(std::ostream &out,const HfstTransducer &t)
+std::ostream & operator<<
+(std::ostream &out, const HfstTransducer & t)
 {
     // Implemented only for internal transducer format.
     hfst::implementations::HfstBasicTransducer net(t);

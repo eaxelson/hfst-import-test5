@@ -140,11 +140,13 @@ namespace hfst {
     /* The alphabet of the graph. */
         HfstTransitionGraphAlphabet alphabet;
 
-      public:
-        /** @brief An iterator type that points to a state in a graph. 
+      protected:
+        /* @brief An iterator type that points to a state in a graph. 
         
-            The value pointed by the iterator is of type HfstTransitions. */
+	   The value pointed by the iterator is of type HfstTransitions. */
         typedef typename HfstStates::iterator iterator;
+
+      public:
         /** @brief A const iterator type that points a state in a graph.
         
             The value pointed by the iterator is of type HfstTransitions. */
@@ -1495,6 +1497,7 @@ namespace hfst {
     // --- Friends ---
 
         friend class ConversionFunctions;
+	friend class hfst::HarmonizeUnknownAndIdentitySymbols;
       };
    
     /** @brief An HfstTransitionGraph with transitions of type 
