@@ -91,12 +91,12 @@ namespace implementations
     
     struct hashf {
       size_t operator()(const Node *node) const {
-	return (size_t)node;
+    return (size_t)node;
       }
     };
     struct equalf {
       int operator()(const Node *n1, const Node *n2) const {
-	return (n1 == n2);
+    return (n1 == n2);
       }
     };
     typedef hash_map<Node*, int, hashf, equalf> NL;
@@ -108,7 +108,7 @@ namespace implementations
     int &operator[]( Node *node ) {
       NL::iterator it=number.find(node);
       if (it == number.end())
-	return number.insert(NL::value_type(node, 0)).first->second;
+    return number.insert(NL::value_type(node, 0)).first->second;
       return it->second;
     };
   };

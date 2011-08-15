@@ -62,7 +62,7 @@ namespace hfst { namespace implementations
       // vector of net.
       unsigned int number_of_arcs=0;
       for( SFST::ArcsIter p(arcs); p; p++ ) {
-	number_of_arcs++;
+    number_of_arcs++;
       }
       // NODE_NUMBERING
       net->initialize_transition_vector(node->index, number_of_arcs);
@@ -114,9 +114,9 @@ namespace hfst { namespace implementations
         SFST::Arc *arc=p;
         sfst_to_hfst_basic_transducer(arc->target_node(), 
 #ifdef FOO
-				      index,  
+                      index,  
 #endif
-				      net, alphabet);
+                      net, alphabet);
       }
     }
   }
@@ -279,7 +279,7 @@ namespace hfst { namespace implementations
       // vector of net.
       unsigned int number_of_arcs=0;
       for( SFST::ArcsIter p(arcs); p; p++ ) {
-	number_of_arcs++;
+    number_of_arcs++;
       }
       // NODE_NUMBERING
       net->initialize_transition_vector(node->index, number_of_arcs);
@@ -320,7 +320,7 @@ namespace hfst { namespace implementations
         SFST::Arc *arc=p;
         sfst_to_hfst_fast_transducer(arc->target_node(), 
 #ifdef FOO
-				     index, 
+                     index, 
 #endif
                       net, harmonization_vector);
       }
@@ -469,7 +469,7 @@ namespace hfst { namespace implementations
       // vector of net.
       unsigned int number_of_arcs=0;
       for( SFST::ArcsIter p(arcs); p; p++ ) {
-	number_of_arcs++;
+    number_of_arcs++;
       }
       // NODE_NUMBERING
       net->initialize_transition_vector(node->index, number_of_arcs);
@@ -495,11 +495,11 @@ namespace hfst { namespace implementations
       for( SFST::ArcsIter p(arcs); p; p++ ) {
         SFST::Arc *arc=p;
         sfst_to_hfst_constant_transducer
-	  (arc->target_node(), 
+      (arc->target_node(), 
 #ifdef FOO
-	   index, 
+       index, 
 #endif
-	   net);
+       net);
       }
     }    
   }
