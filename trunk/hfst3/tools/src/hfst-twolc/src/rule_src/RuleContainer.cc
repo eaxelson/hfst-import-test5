@@ -40,8 +40,8 @@ void RuleContainer::compile(std::ostream &msg_out,bool be_verbose)
        ++it)
     {
       if (be_verbose)
-	{ msg_out << "Compiling " << Rule::get_print_name((*it)->get_name()) 
-		  << std::endl; } 
+    { msg_out << "Compiling " << Rule::get_print_name((*it)->get_name()) 
+          << std::endl; } 
       (*it)->compile(); 
     }
 }
@@ -54,8 +54,8 @@ void RuleContainer::store
        ++it)
     { 
       if (be_verbose)
-	{ msg_out << "Storing " << Rule::get_print_name((*it)->get_name()) 
-		  << std::endl; }
+    { msg_out << "Storing " << Rule::get_print_name((*it)->get_name()) 
+          << std::endl; }
       (*it)->store(out); 
     }
 }

@@ -29,8 +29,8 @@ class RightArrowRule : public Rule
 {
  public:
   RightArrowRule(const std::string &name,
-		 const OtherSymbolTransducer &center,
-		 const OtherSymbolTransducerVector &contexts);
+         const OtherSymbolTransducer &center,
+         const OtherSymbolTransducerVector &contexts);
 
   //! @brief Compile @a this. Subclasses implement this method.
   OtherSymbolTransducer compile(void);

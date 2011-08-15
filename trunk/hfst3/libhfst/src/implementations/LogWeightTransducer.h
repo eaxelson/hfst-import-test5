@@ -179,7 +179,7 @@ namespace implementations
          int cycles=-1, FdTable<int64>* fd=NULL, bool filter_fd=false
          /*bool include_spv=false*/);
       static void extract_random_paths
-	(const LogFst *t, HfstTwoLevelPaths &results, int max_num);
+    (const LogFst *t, HfstTwoLevelPaths &results, int max_num);
       static LogFst * compose(LogFst * t1,
                                    LogFst * t2);
       static LogFst * concatenate(LogFst * t1,
@@ -247,7 +247,7 @@ namespace implementations
         (LogFst *t, const std::string &symbol);
       static StringSet get_alphabet(LogFst *t);
       static unsigned int get_symbol_number(LogFst *t, 
-					    const std::string &symbol);
+                        const std::string &symbol);
 
       static NumberNumberMap create_mapping(LogFst * t1, LogFst * t2);
       static void recode_symbol_numbers(LogFst * t, hfst::NumberNumberMap &km);

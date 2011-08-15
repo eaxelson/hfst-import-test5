@@ -236,10 +236,10 @@ namespace hfst { namespace implementations {
     StringSet unknown_t2;    // and vice versa
 
       if (unknown_symbols_in_use) {
-	StringSet t1_symbols = get_alphabet(t1);
-	StringSet t2_symbols = get_alphabet(t2);
-	hfst::symbols::collect_unknown_sets(t1_symbols, unknown_t1,
-					    t2_symbols, unknown_t2);
+    StringSet t1_symbols = get_alphabet(t1);
+    StringSet t2_symbols = get_alphabet(t2);
+    hfst::symbols::collect_unknown_sets(t1_symbols, unknown_t1,
+                        t2_symbols, unknown_t2);
       }
 
     //std::cerr << "Transducer t1:" << std::endl;
@@ -260,8 +260,8 @@ namespace hfst { namespace implementations {
       new_t1->alphabet.insert_symbols(t2->alphabet);
       SFST::Alphabet::CharMap cm = t1->alphabet.get_char_map();
       for (SFST::Alphabet::CharMap::const_iterator it = cm.begin(); 
-	   it != cm.end(); it++) {
-	new_t1->alphabet.add_symbol(it->second);
+       it != cm.end(); it++) {
+    new_t1->alphabet.add_symbol(it->second);
       }
       
       t2->alphabet.insert_symbols(new_t1->alphabet);
@@ -890,63 +890,63 @@ namespace hfst { namespace implementations {
       
       vector<Arc> t_transitions;
       for ( ArcsIter it( current_t_node->arcs() ); it; it++) {
-	t_transitions.push_back(*it);
+    t_transitions.push_back(*it);
       }
       
       /* If we cannot proceed, return the longest path so far. */
       // NODE_NUMBERING
       if (t_transitions.empty() || broken[num[current_t_node]]) {
-	for (int i=(int)path.second.size()-1; i>=last_index; i--) {
-	  path.second.pop_back(); 
-	}
-	return path;
+    for (int i=(int)path.second.size()-1; i>=last_index; i--) {
+      path.second.pop_back(); 
+    }
+    return path;
       }
 
       /* Go through all transitions in a random order.
-	 (If \a t is pruned, only one transition is proceeded.) */
+     (If \a t is pruned, only one transition is proceeded.) */
       while ( not t_transitions.empty() ) {
-	unsigned int index = rand() % t_transitions.size();
-	Arc arc = t_transitions.at(index);
-	t_transitions.erase(t_transitions.begin()+index);
-	
-	Node * t_target = arc.target_node();
+    unsigned int index = rand() % t_transitions.size();
+    Arc arc = t_transitions.at(index);
+    t_transitions.erase(t_transitions.begin()+index);
+    
+    Node * t_target = arc.target_node();
 
-	std::string istring 
-	  = t->alphabet.code2symbol(arc.label().lower_char());
-	std::string ostring 
-	  = t->alphabet.code2symbol(arc.label().upper_char());
-	if (istring.compare("<>") == 0)
-	  istring = std::string(internal_epsilon);
-	if (ostring.compare("<>") == 0)
-	  ostring = std::string(internal_epsilon);
+    std::string istring 
+      = t->alphabet.code2symbol(arc.label().lower_char());
+    std::string ostring 
+      = t->alphabet.code2symbol(arc.label().upper_char());
+    if (istring.compare("<>") == 0)
+      istring = std::string(internal_epsilon);
+    if (ostring.compare("<>") == 0)
+      ostring = std::string(internal_epsilon);
 
-	path.second.push_back
-	  (StringPair(istring, ostring));
-	
-	/* If the target state is final, */
-	if ( t_target->is_final() ) {
-	  if ( (rand() % 4) == 0 ) {  // randomly return the path so far,
-	    return path;
-	  } // or continue.
-	  last_index = (int)path.second.size();  
-	} 
+    path.second.push_back
+      (StringPair(istring, ostring));
+    
+    /* If the target state is final, */
+    if ( t_target->is_final() ) {
+      if ( (rand() % 4) == 0 ) {  // randomly return the path so far,
+        return path;
+      } // or continue.
+      last_index = (int)path.second.size();  
+    } 
 
-	/* Give more probability for shorter paths. */
-	// NODE_NUMBERING
-	if ( broken[ num[ t_target ] ] == 0 ) {
-	  if ( visited[ num[ t_target ] ] == 1 ) 
-	    if ( (rand() % 4) == 0 )
-	      broken[ num[ t_target ] ] = 1;
-	}
-	
-	if ( visited[ num[ t_target ] ] == 1 ) { 
-	  if ( (rand() % 4) == 0 )
-	    broken[ num[ t_target ] ] = 1;
-	}
+    /* Give more probability for shorter paths. */
+    // NODE_NUMBERING
+    if ( broken[ num[ t_target ] ] == 0 ) {
+      if ( visited[ num[ t_target ] ] == 1 ) 
+        if ( (rand() % 4) == 0 )
+          broken[ num[ t_target ] ] = 1;
+    }
+    
+    if ( visited[ num[ t_target ] ] == 1 ) { 
+      if ( (rand() % 4) == 0 )
+        broken[ num[ t_target ] ] = 1;
+    }
 
-	/* Proceed to the target state. */
-	current_t_node = t_target;
-	break;
+    /* Proceed to the target state. */
+    current_t_node = t_target;
+    break;
       }     
     }
     return path;
@@ -961,11 +961,11 @@ namespace hfst { namespace implementations {
       HfstTwoLevelPath path = random_path(t);
 
       /* If we extract the same path again, try at most 5 times
-	 to extract another one. */
+     to extract another one. */
       unsigned int i = 0;
       while ( (results.find(path) != results.end()) and (i < 5) ) {
-	path = random_path(t);
-	++i;
+    path = random_path(t);
+    ++i;
       }
       results.insert(path);
 
@@ -1081,12 +1081,12 @@ namespace hfst { namespace implementations {
       // This will cause an exception when SFST calculates the negation
       // that is needed in subtraction.
       if (t1_alphabet_size == 0)  {
-	t1->alphabet.insert(Label(1,1)); // insert a dummy symbol pair
+    t1->alphabet.insert(Label(1,1)); // insert a dummy symbol pair
       } 
       Transducer * retval = &t1->operator/(*t2); 
       if (t1_alphabet_size == 0) {
-	t1->alphabet.clear_char_pairs(); // remove the dummy symbol pair
-	t1->complete_alphabet();
+    t1->alphabet.clear_char_pairs(); // remove the dummy symbol pair
+    t1->complete_alphabet();
       }
       return retval;
     } 
@@ -1138,21 +1138,21 @@ namespace hfst { namespace implementations {
 
     SFST::Alphabet::CharMap cm = alpha.get_char_map();
     for( SFST::Alphabet::CharMap::const_iterator it=cm.begin(); 
-	 it!=cm.end(); it++ ) {
+     it!=cm.end(); it++ ) {
       SFST::Character c=it->first;
       char *s=it->second;
       if (strcmp(s, symbol_to_remove) != 0) {
-	sym.push_back(fst_strdup(s));
-	code.push_back(c);
+    sym.push_back(fst_strdup(s));
+    code.push_back(c);
       }
     }
     
     for( std::set<SFST::Label>::const_iterator it=alpha.begin(); 
-	 it!=alpha.end(); it++ ) {
+     it!=alpha.end(); it++ ) {
       SFST::Label l=*it;
       if (strcmp(alpha.code2symbol(l.upper_char()), symbol_to_remove) != 0 &&
-	  strcmp(alpha.code2symbol(l.lower_char()), symbol_to_remove) != 0  ) {
-	label.push_back(l);
+      strcmp(alpha.code2symbol(l.lower_char()), symbol_to_remove) != 0  ) {
+    label.push_back(l);
       }
     }
     
@@ -1181,7 +1181,7 @@ namespace hfst { namespace implementations {
   }
 
   unsigned int SfstTransducer::get_symbol_number(Transducer *t, 
-						 const std::string &symbol)
+                         const std::string &symbol)
   {
     int i = t->alphabet.symbol2code(symbol.c_str());
     if (i == EOF)
@@ -1233,82 +1233,82 @@ namespace hfst { namespace implementations {
       {
         for (hfst::StringSet::iterator it1 = s.begin(); it1 != s.end(); it1++) 
           {
-	    if (not FdOperation::is_diacritic(*it1)) {
+        if (not FdOperation::is_diacritic(*it1)) {
 
-	      int inumber = t->alphabet.symbol2code(it1->c_str());
-	      if (inumber == -1) {
-		std::cerr << "ERROR: no number for symbol " << *it1
-			  << std::endl;
-		assert(false);
-	      }
-	      for (hfst::StringSet::iterator it2 = s.begin(); 
-		   it2 != s.end(); it2++) 
-		{
-		  if (not FdOperation::is_diacritic(*it2)) {
-		    int onumber = t->alphabet.symbol2code(it2->c_str());
-		    if (onumber == -1) {
-		      std::cerr << "ERROR: no number for symbol " << *it2
-				<< std::endl;
-		      assert(false);
-		    }
-		    if (inumber != onumber) {  
-		      // add transitions of type x:y 
-		      // (non-identity cross-product of symbols in s)
-		      origin->add_arc( Label(inumber, onumber), target, t );
-		    }
-		  }
-		}
-	      // add transitions of type x:? and ?:x here
-	      origin->add_arc( Label(inumber, 1), target, t );
-	      origin->add_arc( Label(1, inumber), target, t );
-	    }
-	  }
+          int inumber = t->alphabet.symbol2code(it1->c_str());
+          if (inumber == -1) {
+        std::cerr << "ERROR: no number for symbol " << *it1
+              << std::endl;
+        assert(false);
+          }
+          for (hfst::StringSet::iterator it2 = s.begin(); 
+           it2 != s.end(); it2++) 
+        {
+          if (not FdOperation::is_diacritic(*it2)) {
+            int onumber = t->alphabet.symbol2code(it2->c_str());
+            if (onumber == -1) {
+              std::cerr << "ERROR: no number for symbol " << *it2
+                << std::endl;
+              assert(false);
+            }
+            if (inumber != onumber) {  
+              // add transitions of type x:y 
+              // (non-identity cross-product of symbols in s)
+              origin->add_arc( Label(inumber, onumber), target, t );
+            }
+          }
+        }
+          // add transitions of type x:? and ?:x here
+          origin->add_arc( Label(inumber, 1), target, t );
+          origin->add_arc( Label(1, inumber), target, t );
+        }
+      }
       }
     else if (l.lower_char() == 2 || l.upper_char() == 2 )  // identity "?:?"
       {
         for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
           {
-	    if (not FdOperation::is_diacritic(*it)) {
-	      int number = t->alphabet.symbol2code(it->c_str());
-	      if (number == -1) {
-		std::cerr << "ERROR: no number for symbol " << *it
-			  << std::endl;
-		assert(false);
-	      }
-	      // add transitions of type x:x
-	      origin->add_arc( Label(number, number), target, t );
-	    }
-	  }
+        if (not FdOperation::is_diacritic(*it)) {
+          int number = t->alphabet.symbol2code(it->c_str());
+          if (number == -1) {
+        std::cerr << "ERROR: no number for symbol " << *it
+              << std::endl;
+        assert(false);
+          }
+          // add transitions of type x:x
+          origin->add_arc( Label(number, number), target, t );
+        }
+      }
       }
     else if (l.lower_char() == 1)  // "?:x"
       {
         for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
           {
-	    if (not FdOperation::is_diacritic(*it)) {
-	      int number = t->alphabet.symbol2code(it->c_str());
-	      if (number == -1) {
-		std::cerr << "ERROR: no number for symbol " << *it
-			  << std::endl;
-		assert(false);
-	      }
-	      origin->add_arc( Label(number, l.upper_char()), target, t );
-	    }
+        if (not FdOperation::is_diacritic(*it)) {
+          int number = t->alphabet.symbol2code(it->c_str());
+          if (number == -1) {
+        std::cerr << "ERROR: no number for symbol " << *it
+              << std::endl;
+        assert(false);
+          }
+          origin->add_arc( Label(number, l.upper_char()), target, t );
+        }
           }
       }
     else if (l.upper_char() == 1)  // "x:?"
       {
         for (hfst::StringSet::iterator it = s.begin(); it != s.end(); it++) 
           {
-	    if (not FdOperation::is_diacritic(*it)) {
-	      int number = t->alphabet.symbol2code(it->c_str());
-	      if (number == -1) {
-		std::cerr << "ERROR: no number for symbol " << *it
-			  << std::endl;
-		assert(false);
-	      }
-	      origin->add_arc( Label(l.lower_char(), number), target, t );
-	    }
-	  }
+        if (not FdOperation::is_diacritic(*it)) {
+          int number = t->alphabet.symbol2code(it->c_str());
+          if (number == -1) {
+        std::cerr << "ERROR: no number for symbol " << *it
+              << std::endl;
+        assert(false);
+          }
+          origin->add_arc( Label(l.lower_char(), number), target, t );
+        }
+      }
       }  
     // keep the original transition in all cases
     return;
@@ -1373,24 +1373,24 @@ int main(int argc, char * argv[])
 
     Transducer * t_input = SfstTransducer::extract_input_language(t);
     assert( does_sfst_alphabet_contain(t_input, "a") && 
-	    does_sfst_alphabet_contain(t_input, "b")  );
+        does_sfst_alphabet_contain(t_input, "b")  );
 
     Transducer * t_output = SfstTransducer::extract_output_language(t);
     assert( does_sfst_alphabet_contain(t_output, "a") && 
-	    does_sfst_alphabet_contain(t_output, "b")  );
+        does_sfst_alphabet_contain(t_output, "b")  );
 
     Transducer * t_min = SfstTransducer::minimize(t_input);
     assert( does_sfst_alphabet_contain(t_min, "a") && 
-	    does_sfst_alphabet_contain(t_min, "b")  );
+        does_sfst_alphabet_contain(t_min, "b")  );
 
     Transducer * t_eps_free = SfstTransducer::remove_epsilons(t_output);
     assert( does_sfst_alphabet_contain(t_eps_free, "a") && 
-	    does_sfst_alphabet_contain(t_eps_free, "b")  );
+        does_sfst_alphabet_contain(t_eps_free, "b")  );
 
     Transducer * t_subst = SfstTransducer::substitute(t, "a", "c");
     assert( does_sfst_alphabet_contain(t_subst, "a") && 
-	    does_sfst_alphabet_contain(t_subst, "b")  && 
-	    does_sfst_alphabet_contain(t_subst, "c") );    
+        does_sfst_alphabet_contain(t_subst, "b")  && 
+        does_sfst_alphabet_contain(t_subst, "c") );    
 
     std::cout << std::endl << "ok" << std::endl;
     return EXIT_SUCCESS;

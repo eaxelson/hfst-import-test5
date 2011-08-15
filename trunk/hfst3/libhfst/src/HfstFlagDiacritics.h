@@ -191,7 +191,7 @@ private:
 public:
     FdState(const FdTable<T>& t):
     table(&t), values(table->num_features()),
-	num_features(table->num_features()), error_flag(false)
+    num_features(table->num_features()), error_flag(false)
         {}
 
     FdState():

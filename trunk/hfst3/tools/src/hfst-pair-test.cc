@@ -75,52 +75,52 @@ print_usage()
         "Input/Output options:\n"
         "  -i, --input=INFILE     Read input rule file from INFILE\n"
         "  -o, --output=OUTFILE   Write test output to OUTFILE\n"
-	"  -N  --negative-test    Test fails if any of the pair strings is\n"
-	"                         accepted.\n");
+    "  -N  --negative-test    Test fails if any of the pair strings is\n"
+    "                         accepted.\n");
 
     fprintf(message_out, "Pair test options:\n"
             "  -I, --input-strings=SFILE        Read pair test strings from\n"
-	    "                                   SFILE\n");
+        "                                   SFILE\n");
     fprintf(message_out, "\n");
     fprintf(message_out,
-	    "If SFILE is missing, the test pair strings are read from STDIN.\n"
-	    "If OUTFILE is missing, test output is written to STDOUT.\n");
+        "If SFILE is missing, the test pair strings are read from STDIN.\n"
+        "If OUTFILE is missing, test output is written to STDOUT.\n");
     fprintf(message_out, "\n");
     fprintf(message_out,
-	    "The rule file is tested using correspondences given as\n"
-	    "pair strings, e.g. \"e a r l y:i e r\". Every pair string is\n"
-	    "tested using every rule and the program prints information\n"
-	    "about correspondences that are incorrectly allowed or\n"
-	    "disallowed.\n");
+        "The rule file is tested using correspondences given as\n"
+        "pair strings, e.g. \"e a r l y:i e r\". Every pair string is\n"
+        "tested using every rule and the program prints information\n"
+        "about correspondences that are incorrectly allowed or\n"
+        "disallowed.\n");
     fprintf(message_out, "\n");
     fprintf(message_out,
-	    "The test pair string files contain one pair string/line. Lines\n"
-	    "where the first non-white-space character is \"!\" are\n"
-	    "considered comment lines and skipped.\n");
+        "The test pair string files contain one pair string/line. Lines\n"
+        "where the first non-white-space character is \"!\" are\n"
+        "considered comment lines and skipped.\n");
     fprintf(message_out, "\n");
     fprintf(message_out,
-	    "There are two test modes positive and negative. In positive\n"
-	    "mode, all of the pair strings should be allowed and in negative\n"
-	    "mode they should be disallowed.\n"
-	    );
+        "There are two test modes positive and negative. In positive\n"
+        "mode, all of the pair strings should be allowed and in negative\n"
+        "mode they should be disallowed.\n"
+        );
     fprintf(message_out, "\n");
     fprintf(message_out,
-	   "Ordinarily, positive test mode is in use. Option -N switches to\n" 
-	    "negative test mode. The exit code for a successful test is 0. \n"
-	    "The exit code is 1 otherwise. A successful test will print\n"
-	    "\"Test passed\". A failing test prints \"Test failed\" and\n"
-	    "information about pair strings that are handled incorrectly.\n");
+       "Ordinarily, positive test mode is in use. Option -N switches to\n" 
+        "negative test mode. The exit code for a successful test is 0. \n"
+        "The exit code is 1 otherwise. A successful test will print\n"
+        "\"Test passed\". A failing test prints \"Test failed\" and\n"
+        "information about pair strings that are handled incorrectly.\n");
     fprintf(message_out, "\n");
     fprintf(message_out,
-	    "In positive test mode (i.e. without option -N), if a pair\n"
-	    "string is not accepted, the names of the rules that reject\n"
-	    "it are printed as well as the positions in the string where the\n"
-	    "rules run out of possible transitions. In negative mode, only\n"
-	    "the strings that are allowed are printed.\n");
+        "In positive test mode (i.e. without option -N), if a pair\n"
+        "string is not accepted, the names of the rules that reject\n"
+        "it are printed as well as the positions in the string where the\n"
+        "rules run out of possible transitions. In negative mode, only\n"
+        "the strings that are allowed are printed.\n");
     fprintf(message_out, "\n");
     fprintf(message_out,
-	    "In silent mode (-s), the program won't print anything. Only the\n"
-	    "exit code tells whether the test was successful or not.\n");
+        "In silent mode (-s), the program won't print anything. Only the\n"
+        "exit code tells whether the test was successful or not.\n");
     fprintf(message_out, "\n");
     print_report_bugs();
     fprintf(message_out, "\n");
@@ -164,8 +164,8 @@ parse_options(int argc, char** argv)
             pair_test_given = true;
             break;
         case 'N':
-	    positive_test = false;
-	    break;
+        positive_test = false;
+        break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -181,16 +181,16 @@ parse_options(int argc, char** argv)
     if (inputfilename == std::string("<stdin>"))
       { 
         error(EXIT_FAILURE, 0, 
-	      "The rule transducer file needs to be given using option -i.",
+          "The rule transducer file needs to be given using option -i.",
               inputfilename);
       }
     return EXIT_CONTINUE;
 }
 
 HfstState get_target(const std::string &isymbol,
-		     const std::string &osymbol,
-		     HfstState s,const HfstBasicTransducer &t,
-		     const SymbolSet &known_symbols)
+             const std::string &osymbol,
+             HfstState s,const HfstBasicTransducer &t,
+             const SymbolSet &known_symbols)
 {
   HfstState identity_target = -1;
 
@@ -199,11 +199,11 @@ HfstState get_target(const std::string &isymbol,
        ++it)
     {
       if (it->get_input_symbol() == isymbol and 
-	  it->get_output_symbol() == osymbol)
-	{ return it->get_target_state(); }
+      it->get_output_symbol() == osymbol)
+    { return it->get_target_state(); }
       if (it->get_input_symbol() == "@_IDENTITY_SYMBOL_@" and
-	  it->get_output_symbol() == "@_IDENTITY_SYMBOL_@")
-	{ identity_target = it->get_target_state(); }
+      it->get_output_symbol() == "@_IDENTITY_SYMBOL_@")
+    { identity_target = it->get_target_state(); }
     }
 
   if 
@@ -217,10 +217,10 @@ bool is_final_state(HfstState s,const HfstBasicTransducer &t)
 { return t.is_final_state(s); }
 
 int test(const StringPairVector &tokenized_pair_string,
-	 const HfstBasicTransducer &t,
-	 bool positive,
-	 FILE * outfile,
-	 const SymbolSet &known_symbols)
+     const HfstBasicTransducer &t,
+     bool positive,
+     FILE * outfile,
+     const SymbolSet &known_symbols)
 {
   HfstState s = 0;
   for (StringPairVector::const_iterator it = tokenized_pair_string.begin();
@@ -229,12 +229,12 @@ int test(const StringPairVector &tokenized_pair_string,
     {
       s = get_target(it->first,it->second,s,t,known_symbols);
       if (s == -1)
-	{ 
-	  if (positive)
-	    { return 1; }
-	  else
-	    { return 0; }
-	}
+    { 
+      if (positive)
+        { return 1; }
+      else
+        { return 0; }
+    }
     }
 
   if (is_final_state(s,t) and positive)
@@ -257,7 +257,7 @@ HfstTransducer get_transducer(const StringPairVector &tokenized_pair_string)
     {
       HfstState target = t.add_state();
       t.add_transition
-	(s,HfstBasicTransition(target,it->first,it->second,0.0));
+    (s,HfstBasicTransition(target,it->first,it->second,0.0));
       s = target;
     }
   t.set_final_weight(s,0.0);
@@ -274,10 +274,10 @@ std::string unescape(std::string symbol)
 }
 
 void print_recognized_prefix(const StringPairVector &tokenized_pair_string,
-			     const HfstBasicTransducer &str_transducer,
-			     const std::string &name,
-			     FILE * outfile,
-			     const SymbolSet &known_symbols)
+                 const HfstBasicTransducer &str_transducer,
+                 const std::string &name,
+                 FILE * outfile,
+                 const SymbolSet &known_symbols)
 {
   if (silent)
     { return; }
@@ -289,16 +289,16 @@ void print_recognized_prefix(const StringPairVector &tokenized_pair_string,
   for ( ; it != tokenized_pair_string.end(); ++it)
     {
       s = get_target(it->first,it->second.c_str(),s,str_transducer,
-		     known_symbols);
+             known_symbols);
 
       if (s == -1)
-	{ break; }
+    { break; }
 
       if (it->first == it->second)
-	{ fprintf(outfile,"%s ",unescape(it->first).c_str()); }
+    { fprintf(outfile,"%s ",unescape(it->first).c_str()); }
       else
-	{ fprintf(outfile,"%s:%s ",unescape(it->first).c_str(),
-		  unescape(it->second).c_str()); }
+    { fprintf(outfile,"%s:%s ",unescape(it->first).c_str(),
+          unescape(it->second).c_str()); }
 
     }
   
@@ -307,33 +307,33 @@ void print_recognized_prefix(const StringPairVector &tokenized_pair_string,
   for ( ; it != tokenized_pair_string.end(); ++it)
     {
       if (it->first == it->second)
-	{ fprintf(outfile,"%s ",unescape(it->first).c_str()); }
+    { fprintf(outfile,"%s ",unescape(it->first).c_str()); }
       else
-	{ fprintf(outfile,"%s:%s ",unescape(it->first).c_str(),
-		  unescape(it->second).c_str()); }
+    { fprintf(outfile,"%s:%s ",unescape(it->first).c_str(),
+          unescape(it->second).c_str()); }
     }
   fprintf(outfile,"\n\n");
 }
 
 void print_failure_info(const StringPairVector &tokenized_pair_string,
-			const HfstBasicTransducer &t,const std::string &name,
-			FILE * outfile,
-			const SymbolSet &known_symbols)
+            const HfstBasicTransducer &t,const std::string &name,
+            FILE * outfile,
+            const SymbolSet &known_symbols)
 {
   HfstTransducer str_transducer = get_transducer(tokenized_pair_string);
   HfstTransducer tt(t,TROPICAL_OPENFST_TYPE);
   str_transducer.input_project().compose(tt).minimize();
   print_recognized_prefix(tokenized_pair_string,str_transducer,name,outfile,
-			  known_symbols);
+              known_symbols);
 }
 
 int test(const StringPairVector &tokenized_pair_string,
-	 const std::string pair_string,
-	 const BasicTransducerVector &grammar,
-	 const StringVector &names,
-	 bool positive,
-	 FILE * outfile,
-	 const SymbolSet &known_symbols)
+     const std::string pair_string,
+     const BasicTransducerVector &grammar,
+     const StringVector &names,
+     bool positive,
+     FILE * outfile,
+     const SymbolSet &known_symbols)
 {
   int positive_exit_code = 0;
   int negative_exit_code = 1;
@@ -345,17 +345,17 @@ int test(const StringPairVector &tokenized_pair_string,
        ++it)
     {
       int new_exit_code = test(tokenized_pair_string,*it,positive,outfile,
-			       known_symbols);
+                   known_symbols);
 
       if (positive and new_exit_code == 1)
-	{ print_failure_info
-	    (tokenized_pair_string,*it,names.at(ind),outfile,known_symbols); }
+    { print_failure_info
+        (tokenized_pair_string,*it,names.at(ind),outfile,known_symbols); }
       
       if (positive and positive_exit_code == 0)
-	{ positive_exit_code = new_exit_code; }
+    { positive_exit_code = new_exit_code; }
       
       if (not positive and negative_exit_code == 1)
-	{ negative_exit_code = new_exit_code; }
+    { negative_exit_code = new_exit_code; }
 
       ++ind;
     }
@@ -363,17 +363,17 @@ int test(const StringPairVector &tokenized_pair_string,
   if (positive)
     {
       if (positive_exit_code == 1 and not silent)
-	{ fprintf(outfile,"%s DISALLOWED\n\n",pair_string.c_str()); }
+    { fprintf(outfile,"%s DISALLOWED\n\n",pair_string.c_str()); }
       if (positive_exit_code == 0 and verbose)
-	{ fprintf(outfile,"%s ALLOWED\n\n",pair_string.c_str()); }
+    { fprintf(outfile,"%s ALLOWED\n\n",pair_string.c_str()); }
       return positive_exit_code;
     }
   else
     {
       if (negative_exit_code == 1 and not silent)
-	{ fprintf(outfile,"%s ALLOWED\n\n",pair_string.c_str()); }
+    { fprintf(outfile,"%s ALLOWED\n\n",pair_string.c_str()); }
       if (negative_exit_code == 0 and verbose)
-	{ fprintf(outfile,"%s DISALLOWED\n\n",pair_string.c_str()); }
+    { fprintf(outfile,"%s DISALLOWED\n\n",pair_string.c_str()); }
       return negative_exit_code;
     }
 }
@@ -407,13 +407,13 @@ void get_symbols(HfstBasicTransducer &t,SymbolSet &known_symbols)
   for (HfstBasicTransducer::const_iterator it = t.begin(); it != t.end(); ++it)
     {
       for (HfstBasicTransducer::HfstTransitions::const_iterator jt = 
-	     it->begin();
-	   jt != it->end();
-	   ++jt)
-	{ 
-	  known_symbols.insert(jt->get_input_symbol());
-	  known_symbols.insert(jt->get_output_symbol());
-	}
+         it->begin();
+       jt != it->end();
+       ++jt)
+    { 
+      known_symbols.insert(jt->get_input_symbol());
+      known_symbols.insert(jt->get_output_symbol());
+    }
     }
 }
 
@@ -438,9 +438,9 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                            transducer_n); 
           }
         HfstTransducer trans(inputstream);
-	rule_transducer_type = trans.get_type();
+    rule_transducer_type = trans.get_type();
         grammar.push_back(trans);
-	rule_names.push_back(demangle(trans.get_name()));
+    rule_names.push_back(demangle(trans.get_name()));
       }
 
     inputstream.close();
@@ -448,12 +448,12 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     SymbolSet known_symbols;
     if (not grammar.empty())
       {
-	verbose_printf("Defining known symbols.\n");
-	get_symbols(grammar[0],known_symbols);
-	for (SymbolSet::const_iterator it = known_symbols.begin();
-	     it != known_symbols.end();
-	     ++it)
-	  { verbose_printf("Symbol %s\n",it->c_str()); }
+    verbose_printf("Defining known symbols.\n");
+    get_symbols(grammar[0],known_symbols);
+    for (SymbolSet::const_iterator it = known_symbols.begin();
+         it != known_symbols.end();
+         ++it)
+      { verbose_printf("Symbol %s\n",it->c_str()); }
       }
 
     char* line = 0;
@@ -479,42 +479,42 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
               }
             p++;
           }
-	if (is_empty_or_comment(line))
-	  { continue; }
+    if (is_empty_or_comment(line))
+      { continue; }
         verbose_printf("Pair test on %s...\n", line);
 
-	int new_exit_code = 0;
+    int new_exit_code = 0;
 
-	try
-	  {
-	    StringPairVector tokenized_pair_string =
-	      input_tokenizer.tokenize_pair_string(line,true);
-	    
-	    tokenized_pair_string.insert
-	      (tokenized_pair_string.begin(),
-	       StringPair("@#@",hfst::internal_epsilon));
-	    tokenized_pair_string.insert
-	      (tokenized_pair_string.end(),
-	       StringPair("@#@",hfst::internal_epsilon));
+    try
+      {
+        StringPairVector tokenized_pair_string =
+          input_tokenizer.tokenize_pair_string(line,true);
+        
+        tokenized_pair_string.insert
+          (tokenized_pair_string.begin(),
+           StringPair("@#@",hfst::internal_epsilon));
+        tokenized_pair_string.insert
+          (tokenized_pair_string.end(),
+           StringPair("@#@",hfst::internal_epsilon));
 
-	    int new_exit_code = 
-	      test(tokenized_pair_string,line,grammar,rule_names,
-		   positive_test,outfile,known_symbols);
-	    
-	  }
-	catch (const UnescapedColsFound &e)
-	  {
-	    error(EXIT_FAILURE, 0, 
-		  "The correspondence %s contains unquoted colon-symbols. If "
-		  "you want to input pairs where either symbol is epsilon, "
-		  "use 0 e.g. \"m a s s 0:e s\".\n",
-		  line);
-	    
-	  }
+        int new_exit_code = 
+          test(tokenized_pair_string,line,grammar,rule_names,
+           positive_test,outfile,known_symbols);
+        
+      }
+    catch (const UnescapedColsFound &e)
+      {
+        error(EXIT_FAILURE, 0, 
+          "The correspondence %s contains unquoted colon-symbols. If "
+          "you want to input pairs where either symbol is epsilon, "
+          "use 0 e.g. \"m a s s 0:e s\".\n",
+          line);
+        
+      }
 
-	
-	if (exit_code == 0)
-	  { exit_code = new_exit_code; }
+    
+    if (exit_code == 0)
+      { exit_code = new_exit_code; }
 
       } // while lines in input
     free(line);	
@@ -555,10 +555,10 @@ int main( int argc, char **argv ) {
 
     if (not silent)
       {
-	if (exit_code == 0)
-	  { fprintf(outfile,"Test passed.\n"); }
-	else
-	  { fprintf(outfile,"Test failed.\n"); }
+    if (exit_code == 0)
+      { fprintf(outfile,"Test passed.\n"); }
+    else
+      { fprintf(outfile,"Test failed.\n"); }
       }
 
     if (outfile != stdout)

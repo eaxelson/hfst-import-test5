@@ -50,8 +50,8 @@ namespace hfst {
   {
     if (source >= states.size()) {
       for (unsigned int i = 0; i <= (states.size()-source); i++ ) {
-	TransitionVector v;
-	states.push_back(v);
+    TransitionVector v;
+    states.push_back(v);
       }
     }
     HfstConstantTransition tr(target, input, output, weight);

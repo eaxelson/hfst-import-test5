@@ -29,14 +29,14 @@ namespace hfst { namespace implementations
   (LogFst * t, bool has_hfst_header)
   {
     HFST_THROW_MESSAGE(FunctionNotImplementedException, 
-		       "log_ofst_to_hfst_fast_transducer");
+               "log_ofst_to_hfst_fast_transducer");
   }
 
   LogFst * ConversionFunctions::hfst_fast_transducer_to_log_ofst
     (const HfstFastTransducer * t)
   {
     HFST_THROW_MESSAGE(FunctionNotImplementedException, 
-		       "hfst_fast_transducer_to_log_ofst");
+               "hfst_fast_transducer_to_log_ofst");
   }
 
 

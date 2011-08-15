@@ -19,31 +19,31 @@ namespace hfst
     public:      
       struct Transition
       {
-	size_t ilabel;
-	size_t olabel;
-	float weight;
-	HfstState target;
-	Transition(const HfstBasicTransition &);
-	Transition(HfstState,size_t,size_t,float);
-	bool operator==(const Transition&) const;
+    size_t ilabel;
+    size_t olabel;
+    float weight;
+    HfstState target;
+    Transition(const HfstBasicTransition &);
+    Transition(HfstState,size_t,size_t,float);
+    bool operator==(const Transition&) const;
       };
 
       struct CompareTransitions
       {
-	bool operator() (const Transition &transition1,
-			 const Transition &transition2) const; 
+    bool operator() (const Transition &transition1,
+             const Transition &transition2) const; 
       };
 
       typedef compose_intersect_utilities::SpaceSavingSet
-	<Transition,CompareTransitions> 
-	TransitionSet; 
+    <Transition,CompareTransitions> 
+    TransitionSet; 
       typedef std::set<size_t> SymbolSet;
       static const HfstState START = 0;
       ComposeIntersectFst(const HfstBasicTransducer &, bool input_keys);
       ComposeIntersectFst(void);
       virtual ~ComposeIntersectFst(void);
       virtual const TransitionSet &
-	get_transitions(HfstState,size_t);
+    get_transitions(HfstState,size_t);
       virtual float get_final_weight(HfstState) const;
       const SymbolSet &get_symbols(void) const;
 #ifdef MAIN_TEST

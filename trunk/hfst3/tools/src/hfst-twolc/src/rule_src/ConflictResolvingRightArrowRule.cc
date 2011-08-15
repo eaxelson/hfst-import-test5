@@ -23,8 +23,8 @@ ConflictResolvingRightArrowRule::ConflictResolvingRightArrowRule
  const SymbolPair &center,
  const OtherSymbolTransducerVector &contexts):
   RightArrowRule(name,
-		 get_center(center.first,center.second),
-		 contexts),
+         get_center(center.first,center.second),
+         contexts),
   center_pair(center)
 {}
 
@@ -66,7 +66,7 @@ int main(void)
     apply(&HfstTransducer::concatenate,unknown);
   OtherSymbolTransducerVector v1(1,context1);
   ConflictResolvingRightArrowRule rule1("__TWOLC_RULE_NAME=\"test rule\"",
-				       SymbolPair("a","b"),v1);
+                       SymbolPair("a","b"),v1);
 
   OtherSymbolTransducer context2(unknown);
   OtherSymbolTransducer a_c("a","c");
@@ -78,7 +78,7 @@ int main(void)
     apply(&HfstTransducer::concatenate,unknown);
   OtherSymbolTransducerVector v2(1,context2);
   ConflictResolvingRightArrowRule rule2("__TWOLC_RULE_NAME=\"test rule\"",
-				       SymbolPair("a","b"),v2);
+                       SymbolPair("a","b"),v2);
 
   assert(rule1.conflicts_this(rule2));
   rule1.resolve_conflict(rule2);

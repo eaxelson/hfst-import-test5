@@ -68,17 +68,17 @@ class TwolCGrammar
   TwolCGrammar(bool be_quiet,bool be_verbose,bool resolve_conflicts);
   void define_diacritics(const SymbolRange &diacritics);
   void add_rule(const std::string &name,
-		const SymbolPair &center,
-		op::OPERATOR oper,
-		const OtherSymbolTransducerVector contexts);
+        const SymbolPair &center,
+        op::OPERATOR oper,
+        const OtherSymbolTransducerVector contexts);
   void add_rule(const std::string &name,
-		const OtherSymbolTransducer &center,
-		op::OPERATOR oper,
-		const OtherSymbolTransducerVector contexts);
+        const OtherSymbolTransducer &center,
+        op::OPERATOR oper,
+        const OtherSymbolTransducerVector contexts);
   void add_rule(const std::string &name,
-		const SymbolPairVector &center,
-		op::OPERATOR oper,
-		const OtherSymbolTransducerVector contexts);
+        const SymbolPairVector &center,
+        op::OPERATOR oper,
+        const OtherSymbolTransducerVector contexts);
   void compile_and_store(HfstOutputStream &out);
 };
 

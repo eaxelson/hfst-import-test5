@@ -402,7 +402,7 @@ An example:
         @note This constructor leaves the backend implementation variable
         uninitialized. An uninitialized transducer is likely to cause a
         TransducerHasWrongTypeException at some point unless it is given
-	a value at some point. */
+    a value at some point. */
     HfstTransducer();
 
     /** \brief Create an empty transducer, i.e. a transducer that does not 
@@ -432,7 +432,7 @@ An example:
 
         @see HfstTokenizer **/
     HfstTransducer(const std::string& utf8_str, 
-		   const HfstTokenizer &multichar_symbol_tokenizer,
+           const HfstTokenizer &multichar_symbol_tokenizer,
                    ImplementationType type);
 
     /** \brief Create a transducer by tokenizing 
@@ -624,25 +624,25 @@ in \a ifile.
     std::string get_name() const;
 
     /** \brief Get the alphabet of the transducer. 
-	
-	The alphabet is defined as the set of symbols known 
-	to the transducer. */
+    
+    The alphabet is defined as the set of symbols known 
+    to the transducer. */
     StringSet get_alphabet() const;
 
     /** \brief Explicitely insert \a symbol to the alphabet 
-	of the transducer. 
+    of the transducer. 
 
-	@note Usually this function is not needed since new symbols are
-	added to the alphabet by default. */
+    @note Usually this function is not needed since new symbols are
+    added to the alphabet by default. */
     void insert_to_alphabet(const std::string &symbol); 
 
     /** \brief Remove \a symbol from the alphabet of the transducer.
-	CURRENTLY NOT IMPLEMENTED.
+    CURRENTLY NOT IMPLEMENTED.
 
-	@pre \a symbol does not occur in any transition of the transducer.
-	@note Use with care, removing a symbol that occurs in a transition
-	of the transducer can have unexpected results.
-	@todo See that the tests work. */
+    @pre \a symbol does not occur in any transition of the transducer.
+    @note Use with care, removing a symbol that occurs in a transition
+    of the transducer can have unexpected results.
+    @todo See that the tests work. */
     void remove_from_alphabet(const std::string &symbol);
 
     /** \brief Whether the transducer is cyclic. */
@@ -908,7 +908,7 @@ ccc : ddd
     //!       lookup_fd.
     //! @sa lookup_fd
     HfstOneLevelPaths * lookup(const StringVector& s,
-			       ssize_t limit = -1) const;
+                   ssize_t limit = -1) const;
 
     //! @brief Lookup or apply a single string \a s and
     //! return a maximum of \a limit results.
@@ -916,7 +916,7 @@ ccc : ddd
     //! This is an overloaded lookup function that leaves tokenizing to the
     //! transducer.
     HfstOneLevelPaths * lookup(const std::string & s,
-			       ssize_t limit = -1) const;
+                   ssize_t limit = -1) const;
 
     //! @brief Lookup or apply a single string \a s minding flag diacritics
     //! properly and store a maximum of \a limit results to \a results.
@@ -948,7 +948,7 @@ ccc : ddd
     //! @todo Do not ignore argument \a limit.
     //!
     HfstOneLevelPaths * lookup_fd(const StringVector& s,
-				  ssize_t limit = -1) const;
+                  ssize_t limit = -1) const;
 
     //! @brief Lookup or apply a single string \a s minding flag diacritics
     //! properly and store a maximum of \a limit results to \a results.
@@ -965,7 +965,7 @@ ccc : ddd
     //!
     //!@sa lookup_fd
     HfstOneLevelPaths * lookup_fd(const std::string& s,
-				  ssize_t limit = -1) const;
+                  ssize_t limit = -1) const;
 
     //! @brief Lookup or apply a single string \a s and store a maximum of 
     //! \a limit results to \a results. \a tok defined how \a s is tokenized.
@@ -976,7 +976,7 @@ ccc : ddd
     //! but lookup is not done using a string and a tokenizer instead of
     //! a StringVector.
     HfstOneLevelPaths * lookup(const HfstTokenizer& tok,
-			       const std::string &s, ssize_t limit = -1) const;
+                   const std::string &s, ssize_t limit = -1) const;
 
     //! @brief Lookup or apply a single string \a s minding flag diacritics 
     //! properly and store a maximum of \a limit results to \a results. 
@@ -987,8 +987,8 @@ ccc : ddd
     //! but uses a tokenizer and a string instead of a StringVector.
     //!
     HfstOneLevelPaths * lookup_fd(
-	const HfstTokenizer& tok,
-	const std::string &s, ssize_t limit = -1) const;
+    const HfstTokenizer& tok,
+    const std::string &s, ssize_t limit = -1) const;
 
     //! @brief (Not implemented) Lookdown a single string \a s and return 
     //! a maximum of \a limit results.
@@ -1005,7 +1005,7 @@ ccc : ddd
     //! @return  output parameter to store unique results
     //! @todo todo
     HfstOneLevelPaths * lookdown(const StringVector& s,
-				 ssize_t limit = -1) const;
+                 ssize_t limit = -1) const;
 
     //! @brief (Not implemented) Lookdown a single string minding 
     //! flag diacritics properly.
@@ -1016,7 +1016,7 @@ ccc : ddd
     //! @sa lookdown
     //! @todo todo
     HfstOneLevelPaths * lookdown_fd(StringVector& s,
-				    ssize_t limit = -1) const;
+                    ssize_t limit = -1) const;
 
     //! @brief Whether lookup of path \a s will have infinite results.
     //!
@@ -1388,9 +1388,9 @@ transducer.transform_weights(&func);
 
 
     /** \brief Compile a lexc file in file \a filename into an HfstTransducer
-	of type \a type and return the transducer. */
+    of type \a type and return the transducer. */
     static HfstTransducer * read_lexc(const std::string &filename,
-				      ImplementationType type);
+                      ImplementationType type);
 
     // *** For commandline programs. ***
 
@@ -1427,7 +1427,7 @@ transducer.transform_weights(&func);
   namespace rules
   {
     enum ReplaceType {REPL_UP, REPL_DOWN, REPL_RIGHT, REPL_LEFT,
-		      REPL_DOWN_KARTTUNEN};
+              REPL_DOWN_KARTTUNEN};
     enum TwolType {twol_right, twol_left, twol_both};
 
     /* helping methods */
@@ -1595,9 +1595,9 @@ SFST manual</a>. */
                                 StringPairSet &alphabet);
 
     HfstTransducer replace_down_karttunen(HfstTransducerPair &context, 
-					  HfstTransducer &mapping, 
-					  bool optional, 
-					  StringPairSet &alphabet);
+                      HfstTransducer &mapping, 
+                      bool optional, 
+                      StringPairSet &alphabet);
 
     /** \brief The same as replace_up, but left context matching is 
         done on the output side of \a mapping
@@ -1649,8 +1649,8 @@ SFST manual</a>. */
      *
      * 	 @see replace_up */
     HfstTransducer left_replace_up(	HfstTransducer		&mapping,
-									bool				optional,
-									StringPairSet		&alphabet);
+                                    bool                optional,
+                                    StringPairSet       &alphabet);
 
     /** \brief Inversion of the replace_up and the result needs to be composed on the upper side
      * 	 of the input language.
@@ -1658,10 +1658,10 @@ SFST manual</a>. */
      * 	 B <- A is the inversion of A -> B.
      *
      * 	 @see replace_up */
-	HfstTransducer left_replace_up(	HfstTransducerPair	&context,
-									HfstTransducer		&mapping,
-									bool				optional,
-									StringPairSet		&alphabet);
+    HfstTransducer left_replace_up( HfstTransducerPair  &context,
+                                    HfstTransducer      &mapping,
+                                    bool                optional,
+                                    StringPairSet       &alphabet);
     /** \brief Inversion of the replace_up and the result needs to be composed on the upper side
      * 	 of the input language. However, matching is done on the output side of \a mapping
      *

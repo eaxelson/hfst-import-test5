@@ -6,69 +6,69 @@ void CommandLine::print_version(void)
 {
   // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dversion
   std::cerr << std::endl << PROGRAM_NAME << " " << 0 << "(" 
-	    << PACKAGE_STRING << ")" << std::endl
-	    << "Copyright (C) 2010 University of Helsinki," << std::endl
-	    << "License GPLv3: GNU GPL version 3 " << std::endl
-	    << "<http://gnu.org/licenses/gpl.html>" << std::endl
-	    << "This is free software: you are free to change and " 
-	    << std::endl
-	    << "redistribute it." << std::endl
-	    << "There is NO WARRANTY, to the extent permitted by law." 
-	    << std::endl << std::endl;
+        << PACKAGE_STRING << ")" << std::endl
+        << "Copyright (C) 2010 University of Helsinki," << std::endl
+        << "License GPLv3: GNU GPL version 3 " << std::endl
+        << "<http://gnu.org/licenses/gpl.html>" << std::endl
+        << "This is free software: you are free to change and " 
+        << std::endl
+        << "redistribute it." << std::endl
+        << "There is NO WARRANTY, to the extent permitted by law." 
+        << std::endl << std::endl;
 }
 
 void CommandLine::print_usage(void)
 {
   std::cerr << std::endl
-	    << "Usage: " << PROGRAM_NAME << " [OPTIONS...] INFILE" 
-	    << std::endl 
-	    << "Usage: " << PROGRAM_NAME << " [OPTIONS...] -i INFILE" 
-	    << std::endl 
-	    << "Usage: " << PROGRAM_NAME << " [OPTIONS...] --input=INFILE" 
-	    << std::endl 
-	    << "Usage: cat INFILE | " << PROGRAM_NAME << " [OPTIONS...]" 
-	    << std::endl
-	    << "An input file has to be given either using the option -i or"
-	    << std::endl
-	    << "--input, as the last commandline argument or from STDIN."
-	    << std::endl << std::endl;
+        << "Usage: " << PROGRAM_NAME << " [OPTIONS...] INFILE" 
+        << std::endl 
+        << "Usage: " << PROGRAM_NAME << " [OPTIONS...] -i INFILE" 
+        << std::endl 
+        << "Usage: " << PROGRAM_NAME << " [OPTIONS...] --input=INFILE" 
+        << std::endl 
+        << "Usage: cat INFILE | " << PROGRAM_NAME << " [OPTIONS...]" 
+        << std::endl
+        << "An input file has to be given either using the option -i or"
+        << std::endl
+        << "--input, as the last commandline argument or from STDIN."
+        << std::endl << std::endl;
 }
 
 void CommandLine::print_help(void)
 {
   print_usage();
   std::cerr << std::endl
-	    << "Read a twolc grammar, compile it and store it. If INFILE is "
-	    << std::endl
-	    << "missing, the grammar is read from STDIN. If there is no output"
-	    << std::endl
-	    << "file given using -o or --output, the compiled grammar is"
-	    << std::endl
-	    << "written to STDOUT." << std::endl << std::endl;
+        << "Read a twolc grammar, compile it and store it. If INFILE is "
+        << std::endl
+        << "missing, the grammar is read from STDIN. If there is no output"
+        << std::endl
+        << "file given using -o or --output, the compiled grammar is"
+        << std::endl
+        << "written to STDOUT." << std::endl << std::endl;
 
   std::cerr << "Common options:\n"
-	    << "  -h, --help             Print help message" << std::endl  
-	    << "  -V, --version          Print version info" << std::endl 
-	    << "  -u, --usage            Print usage"  << std::endl
-	    << "  -v, --verbose          Print verbosely while processing"
-	    << std::endl
-	    << "  -q, --quiet            Do not print output" << std::endl
-	    << "  -s, --silent           Alias of --quiet"    << std::endl;
+        << "  -h, --help             Print help message" << std::endl  
+        << "  -V, --version          Print version info" << std::endl 
+        << "  -u, --usage            Print usage"  << std::endl
+        << "  -v, --verbose          Print verbosely while processing"
+        << std::endl
+        << "  -q, --quiet            Do not print output" << std::endl
+        << "  -s, --silent           Alias of --quiet"    << std::endl;
 
   std::cerr << "Input/Output options:" << std::endl
-	    << "  -i, --input=INFILE     Read input transducer from INFILE"
-	    << std::endl
-	    << "  -o, --output=OUTFILE   Write output transducer to OUTFILE"
-	    << std::endl;
+        << "  -i, --input=INFILE     Read input transducer from INFILE"
+        << std::endl
+        << "  -o, --output=OUTFILE   Write output transducer to OUTFILE"
+        << std::endl;
 
   std::cerr << "TwolC grammar options:" << std::endl
-	    << "  -R, --resolve          Resolve left-arrow conflicts." 
-	    << std::endl
-	    << "  -f, --format=FORMAT    Store result in format FORMAT." 
-	    << std::endl << std::endl;
+        << "  -R, --resolve          Resolve left-arrow conflicts." 
+        << std::endl
+        << "  -f, --format=FORMAT    Store result in format FORMAT." 
+        << std::endl << std::endl;
   
   std::cerr << "Format may be one of log-openfst, tropical-openfst, foma or sfst."
-	    << std::endl << std::endl;
+        << std::endl << std::endl;
 }
 
 int CommandLine::parse_options(int argc, char** argv)
@@ -87,102 +87,102 @@ int CommandLine::parse_options(int argc, char** argv)
     {
       static const struct option long_options[] =
         {
-	  {"help", no_argument, 0, 'h'},	
-	  {"version", no_argument, 0, 'V'},	
-	  {"verbose", no_argument, 0, 'v'},	
-	  {"quiet", no_argument, 0, 'q'},	
-	  {"silent", no_argument, 0, 's'},	
-	  {"usage", no_argument, 0, 'u'},
-	  {"input", required_argument, 0, 'i'},	
-	  {"output", required_argument, 0, 'o'},
-	  {"resolve",no_argument, 0, 'R'},
-	  {"format",required_argument, 0, 'f'},
-	  {0,0,0,0}
+      {"help", no_argument, 0, 'h'},    
+      {"version", no_argument, 0, 'V'}, 
+      {"verbose", no_argument, 0, 'v'}, 
+      {"quiet", no_argument, 0, 'q'},   
+      {"silent", no_argument, 0, 's'},  
+      {"usage", no_argument, 0, 'u'},
+      {"input", required_argument, 0, 'i'}, 
+      {"output", required_argument, 0, 'o'},
+      {"resolve",no_argument, 0, 'R'},
+      {"format",required_argument, 0, 'f'},
+      {0,0,0,0}
         };
       int option_index = 0;
       // add tool-specific options here 
       char c = getopt_long(argc, argv, 
-			   ":hVvqsu" "i:o:" "Ri:f:",
-			   long_options, &option_index);
+               ":hVvqsu" "i:o:" "Ri:f:",
+               long_options, &option_index);
       if (-1 == c)
         {
-	  break;
+      break;
         }
       
       switch (c)
         {
-	case 'h':
-	  help = true;
-	  break;
-	case 'V':
-	  version = true;
-	  break;
-	case 'u':
-	  usage = true;
-	  break;
-	case 'v':
-	  verbose = true;
-	  break;
-	case 'q':
-	  silent = true;
-	  break;
-	case 's':
-	  silent = true;
-	  break;
-	case 'R':
-	  resolve = true;
-	  break;
-	case 'i':
-	  inputNamed = true;
-	  infilename = hfst_strdup(optarg);
-	  break;
-	case 'o':
-	  outputNamed = true;
-	  outfilename = hfst_strdup(optarg);
-	  break;
-	case 'f':
-	  if (std::string("tropical-weight") == optarg)
-	    { form = hfst::TROPICAL_OPENFST_TYPE; }
-	  if (std::string("tropical") == optarg)
-	    { form = hfst::TROPICAL_OPENFST_TYPE; }
-	  if (std::string("log") == optarg)
-	    { form = hfst::LOG_OPENFST_TYPE; }
-	  else if (std::string("tropical-openfst") == optarg)
-	    { form = hfst::TROPICAL_OPENFST_TYPE; }
-	  else if (std::string("log-weight") == optarg)
-	    { form = hfst::LOG_OPENFST_TYPE; }
-	  else if (std::string("log-openfst") == optarg)
-	    { form = hfst::LOG_OPENFST_TYPE; }
-	  else if (std::string("openfst") == optarg)
-	    { form = hfst::TROPICAL_OPENFST_TYPE; }
-	  else if (std::string("weighted") == optarg)
-	    { form = hfst::TROPICAL_OPENFST_TYPE; }
-	  else if (std::string("weight") == optarg)
-	    { form = hfst::TROPICAL_OPENFST_TYPE; }
-	  else if (std::string("sfst") == optarg)
-	    { form = hfst::SFST_TYPE; }
-	  else if (std::string("foma") == optarg)
-	    { form = hfst::FOMA_TYPE; }
-	  else if (std::string("unweighted") == optarg)
-	    { form = hfst::FOMA_TYPE; }
-	  else
-	    { 
-	      std::cerr << "Unknown format \"" << optarg << "\"."
-			<< "Try runnning with option -h or --help."
-			<< std::endl;
-	      exit(1);
-	    }
-	  break;
-	case ':':
-	  std::cerr << "Missing argument for -" << (char)optopt 
-		    << ". Try using --help." 
-		    << std::endl;
-	  exit(1);
-	default:
-	  std::cerr << "Unknown commandline option: -" << (char)optopt
-		    << ". Try using --help." 
-		    << std::endl;
-	  exit(1);
+    case 'h':
+      help = true;
+      break;
+    case 'V':
+      version = true;
+      break;
+    case 'u':
+      usage = true;
+      break;
+    case 'v':
+      verbose = true;
+      break;
+    case 'q':
+      silent = true;
+      break;
+    case 's':
+      silent = true;
+      break;
+    case 'R':
+      resolve = true;
+      break;
+    case 'i':
+      inputNamed = true;
+      infilename = hfst_strdup(optarg);
+      break;
+    case 'o':
+      outputNamed = true;
+      outfilename = hfst_strdup(optarg);
+      break;
+    case 'f':
+      if (std::string("tropical-weight") == optarg)
+        { form = hfst::TROPICAL_OPENFST_TYPE; }
+      if (std::string("tropical") == optarg)
+        { form = hfst::TROPICAL_OPENFST_TYPE; }
+      if (std::string("log") == optarg)
+        { form = hfst::LOG_OPENFST_TYPE; }
+      else if (std::string("tropical-openfst") == optarg)
+        { form = hfst::TROPICAL_OPENFST_TYPE; }
+      else if (std::string("log-weight") == optarg)
+        { form = hfst::LOG_OPENFST_TYPE; }
+      else if (std::string("log-openfst") == optarg)
+        { form = hfst::LOG_OPENFST_TYPE; }
+      else if (std::string("openfst") == optarg)
+        { form = hfst::TROPICAL_OPENFST_TYPE; }
+      else if (std::string("weighted") == optarg)
+        { form = hfst::TROPICAL_OPENFST_TYPE; }
+      else if (std::string("weight") == optarg)
+        { form = hfst::TROPICAL_OPENFST_TYPE; }
+      else if (std::string("sfst") == optarg)
+        { form = hfst::SFST_TYPE; }
+      else if (std::string("foma") == optarg)
+        { form = hfst::FOMA_TYPE; }
+      else if (std::string("unweighted") == optarg)
+        { form = hfst::FOMA_TYPE; }
+      else
+        { 
+          std::cerr << "Unknown format \"" << optarg << "\"."
+            << "Try runnning with option -h or --help."
+            << std::endl;
+          exit(1);
+        }
+      break;
+    case ':':
+      std::cerr << "Missing argument for -" << (char)optopt 
+            << ". Try using --help." 
+            << std::endl;
+      exit(1);
+    default:
+      std::cerr << "Unknown commandline option: -" << (char)optopt
+            << ". Try using --help." 
+            << std::endl;
+      exit(1);
         }
       
     }
@@ -190,25 +190,25 @@ int CommandLine::parse_options(int argc, char** argv)
   if (not inputNamed)
     {
       if ((argc - optind) == 1)
-	{ 
-	  inputNamed = true;
-	  infilename = hfst_strdup(argv[optind]); 
-	}
+    { 
+      inputNamed = true;
+      infilename = hfst_strdup(argv[optind]); 
+    }
       else if ((argc - optind) > 1)
-	{ 
-	  std::cerr << "no more than one input rule file may be given" 
-		    << std::endl; 
-	  exit(1);
-	}
+    { 
+      std::cerr << "no more than one input rule file may be given" 
+            << std::endl; 
+      exit(1);
+    }
     }
   else 
     {
       if ((argc - optind) > 0)
-	{ 
-	  std::cerr << "no more than one input rule file may be given" 
-		    << std::endl; 
-	  exit(1);
-	}
+    { 
+      std::cerr << "no more than one input rule file may be given" 
+            << std::endl; 
+      exit(1);
+    }
 
     }
   
@@ -255,12 +255,12 @@ std::istream &CommandLine::set_input_file(void)
     {
       input_file = new std::ifstream(input_file_name.c_str());
       if (not input_file->good())
-	{ 
-	  std::cerr << "File " << input_file_name << " could not be opened!"
-		    << std::endl;
-	  std::cout << "__HFST_TWOLC_DIE";
-	  exit(1);
-	}
+    { 
+      std::cerr << "File " << input_file_name << " could not be opened!"
+            << std::endl;
+      std::cout << "__HFST_TWOLC_DIE";
+      exit(1);
+    }
       return *input_file;
     }
   return std::cin;
@@ -272,12 +272,12 @@ std::ostream &CommandLine::set_output_file(void)
     {
       output_file = new std::ofstream(output_file_name.c_str());
       if (not output_file->good())
-	{ 
-	  std::cerr << "File " << output_file_name << " could not be opened!"
-		    << std::endl;
-	  std::cout << "__HFST_TWOLC_DIE";
-	  exit(1);      
-	}
+    { 
+      std::cerr << "File " << output_file_name << " could not be opened!"
+            << std::endl;
+      std::cout << "__HFST_TWOLC_DIE";
+      exit(1);      
+    }
       return *output_file;
     }
   return std::cout;

@@ -34,24 +34,24 @@ class  FlagDiacriticTable
   static bool is_genuine_diacritic(const std::string &diacritic_string);
   static void split_diacritic(const std::string &diacritic_string);
   void set_positive_value(std::string &feature,
-			  std::string &value);
+              std::string &value);
   void set_negative_value(std::string &feature,
-			  std::string &value);
+              std::string &value);
   void disallow(std::string &feature,
-		std::string &value);
+        std::string &value);
   void disallow(std::string &feature);
   void require(std::string &feature,
-	       std::string &value);
+           std::string &value);
   void require(std::string &feature);
   void unify(std::string &feature,
-	     std::string &value);
+         std::string &value);
   void clear(std::string &feature);
 
  public:
   FlagDiacriticTable(void);
   /*static void define_diacritic(short diacritic_number,
-			       const std::string &diacritic_string);
-			       void insert_number(short key_number);*/
+                   const std::string &diacritic_string);
+                   void insert_number(short key_number);*/
   void insert_symbol(const std::string &symbol);
   void reset(void);
   bool fails(void);

@@ -243,7 +243,7 @@ namespace implementations {
       StringVectorInitializer
         (StringVector &vector) {
         vector.push_back(std::string("@_EPSILON_SYMBOL_@"));
-	vector.push_back(std::string("@_UNKNOWN_SYMBOL_@"));
+    vector.push_back(std::string("@_UNKNOWN_SYMBOL_@"));
         vector.push_back(std::string("@_IDENTITY_SYMBOL_@"));
       }
     };

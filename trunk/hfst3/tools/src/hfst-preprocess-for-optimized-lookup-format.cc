@@ -145,7 +145,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         HfstState state_count = 1;
         std::map<HfstState,HfstState> rebuilt;
         rebuilt[0] = 0;
-	HfstState source_state=0;
+    HfstState source_state=0;
         for (HfstBasicTransducer::iterator state = original.begin();
              state != original.end();
              ++state)
@@ -183,7 +183,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                                        arc->get_weight());
                 replication.add_transition(rebuilt[source_state], nu);
               }
-	    source_state++;
+        source_state++;
           }
         trans = HfstTransducer(replication, trans.get_type());
         char* composed_name = static_cast<char*>(malloc(sizeof(char) * 

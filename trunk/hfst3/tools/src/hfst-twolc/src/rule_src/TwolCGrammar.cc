@@ -37,9 +37,9 @@ void TwolCGrammar::define_diacritics(const SymbolRange &diacritics)
 }
 
 void TwolCGrammar::add_rule(const std::string &name,
-			    const SymbolPair &center,
-			    op::OPERATOR oper,
-			    const OtherSymbolTransducerVector contexts)
+                const SymbolPair &center,
+                op::OPERATOR oper,
+                const OtherSymbolTransducerVector contexts)
 {
   Rule * rule;
   switch (oper)
@@ -47,26 +47,26 @@ void TwolCGrammar::add_rule(const std::string &name,
     case op::RIGHT:
       rule = new ConflictResolvingRightArrowRule(name,center,contexts);
       right_arrow_rule_container.add_rule_and_display_and_resolve_conflicts
-	(static_cast<ConflictResolvingRightArrowRule*>(rule),std::cerr);
+    (static_cast<ConflictResolvingRightArrowRule*>(rule),std::cerr);
       break;
     case op::LEFT:
       rule = new ConflictResolvingLeftArrowRule(name,center,contexts);
       left_arrow_rule_container.add_rule_and_display_and_resolve_conflicts
-	(static_cast<ConflictResolvingLeftArrowRule*>(rule),std::cerr); 
+    (static_cast<ConflictResolvingLeftArrowRule*>(rule),std::cerr); 
       break;
     case op::LEFT_RIGHT:
       rule = new ConflictResolvingRightArrowRule(name,center,contexts);
       right_arrow_rule_container.add_rule_and_display_and_resolve_conflicts
-	(static_cast<ConflictResolvingRightArrowRule*>(rule),std::cerr); 
+    (static_cast<ConflictResolvingRightArrowRule*>(rule),std::cerr); 
       name_to_rule_subcases[get_original_name(name)].insert(rule);
       rule = new ConflictResolvingLeftArrowRule(name,center,contexts);
       left_arrow_rule_container.add_rule_and_display_and_resolve_conflicts
-	(static_cast<ConflictResolvingLeftArrowRule*>(rule),std::cerr); 
+    (static_cast<ConflictResolvingLeftArrowRule*>(rule),std::cerr); 
       break;
     case op::NOT_LEFT:
       rule = new LeftRestrictionArrowRule(name,center,contexts);
       other_rule_container.add_rule
-	(static_cast<LeftRestrictionArrowRule*>(rule)); 
+    (static_cast<LeftRestrictionArrowRule*>(rule)); 
       break;
     default:
       assert(false);
@@ -75,9 +75,9 @@ void TwolCGrammar::add_rule(const std::string &name,
 }
 
 void TwolCGrammar::add_rule(const std::string &name,
-			    const OtherSymbolTransducer &center,
-			    op::OPERATOR oper,
-			    const OtherSymbolTransducerVector contexts)
+                const OtherSymbolTransducer &center,
+                op::OPERATOR oper,
+                const OtherSymbolTransducerVector contexts)
 {
   OtherSymbolTransducer center_fst = Rule::get_center(center);
 
@@ -87,26 +87,26 @@ void TwolCGrammar::add_rule(const std::string &name,
     case op::RE_RIGHT:
       rule = new RightArrowRule(name,center_fst,contexts);
       other_rule_container.add_rule
-	(static_cast<RightArrowRule*>(rule));
+    (static_cast<RightArrowRule*>(rule));
       break;
     case op::RE_LEFT:
       rule = new LeftArrowRule(name,center_fst,contexts);
       other_rule_container.add_rule
-	(static_cast<LeftArrowRule*>(rule));
+    (static_cast<LeftArrowRule*>(rule));
       break;
     case op::RE_LEFT_RIGHT:
       rule = new RightArrowRule(name,center_fst,contexts);
       other_rule_container.add_rule
-	(static_cast<RightArrowRule*>(rule));
+    (static_cast<RightArrowRule*>(rule));
       name_to_rule_subcases[get_original_name(name)].insert(rule);
       rule = new LeftArrowRule(name,center_fst,contexts);
       other_rule_container.add_rule
-	(static_cast<LeftArrowRule*>(rule));
+    (static_cast<LeftArrowRule*>(rule));
       break;
     case op::RE_NOT_LEFT:
       rule = new LeftRestrictionArrowRule(name,center_fst,contexts);
       other_rule_container.add_rule
-	(static_cast<LeftRestrictionArrowRule*>(rule));
+    (static_cast<LeftRestrictionArrowRule*>(rule));
       break;
     default:
       assert(false);
@@ -115,9 +115,9 @@ void TwolCGrammar::add_rule(const std::string &name,
 }
 
 void TwolCGrammar::add_rule(const std::string &name,
-			    const SymbolPairVector &center,
-			    op::OPERATOR oper,
-			    const OtherSymbolTransducerVector contexts)
+                const SymbolPairVector &center,
+                op::OPERATOR oper,
+                const OtherSymbolTransducerVector contexts)
 {
   OtherSymbolTransducer center_fst = Rule::get_center(center);
 
@@ -127,26 +127,26 @@ void TwolCGrammar::add_rule(const std::string &name,
     case op::RIGHT:
       rule = new RightArrowRule(name,center_fst,contexts);
       other_rule_container.add_rule
-	(static_cast<RightArrowRule*>(rule));
+    (static_cast<RightArrowRule*>(rule));
       break;
     case op::LEFT:
       rule = new LeftArrowRule(name,center_fst,contexts);
       other_rule_container.add_rule
-	(static_cast<LeftArrowRule*>(rule));
+    (static_cast<LeftArrowRule*>(rule));
       break;
     case op::LEFT_RIGHT:
       rule = new RightArrowRule(name,center_fst,contexts);
       other_rule_container.add_rule
-	(static_cast<RightArrowRule*>(rule));
+    (static_cast<RightArrowRule*>(rule));
       name_to_rule_subcases[get_original_name(name)].insert(rule);
       rule = new LeftArrowRule(name,center_fst,contexts);
       other_rule_container.add_rule
-	(static_cast<LeftArrowRule*>(rule));
+    (static_cast<LeftArrowRule*>(rule));
       break;
     case op::NOT_LEFT:
       rule = new LeftRestrictionArrowRule(name,center_fst,contexts);
       other_rule_container.add_rule
-	(static_cast<LeftRestrictionArrowRule*>(rule));
+    (static_cast<LeftRestrictionArrowRule*>(rule));
       break;
     default:
       assert(false);
@@ -167,8 +167,8 @@ void TwolCGrammar::compile_and_store(HfstOutputStream &out)
        it != name_to_rule_subcases.end();
        ++it)
     { compiled_rule_container.add_rule
-	(new Rule(it->first,Rule::RuleVector(it->second.begin(),
-					     it->second.end()))); }
+    (new Rule(it->first,Rule::RuleVector(it->second.begin(),
+                         it->second.end()))); }
   compiled_rule_container.add_missing_symbols_freely(diacritics);
 
   if (not be_quiet)
@@ -208,9 +208,9 @@ int main(void)
     apply(&HfstTransducer::concatenate,unknown);
   OtherSymbolTransducerVector contexts(1,context);
   g.add_rule("\"test1\"",SymbolPair("a","b"),
-	     op::LEFT_RIGHT,contexts);
+         op::LEFT_RIGHT,contexts);
   g.add_rule("\"test2\"",SymbolPair("a","b"),
-	     op::LEFT_RIGHT,contexts);
+         op::LEFT_RIGHT,contexts);
 
   OtherSymbolTransducer a_d_pair("a","d");
   OtherSymbolTransducer context1 = unknown;
@@ -223,6 +223,6 @@ int main(void)
     apply(&HfstTransducer::concatenate,unknown);
   OtherSymbolTransducerVector contexts1(1,context1);
   g.add_rule("\"test3\"",SymbolPair("a","b"),
-	     op::LEFT_RIGHT,contexts1);
+         op::LEFT_RIGHT,contexts1);
 }
 #endif // TEST_TWOL_C_GRAMMAR

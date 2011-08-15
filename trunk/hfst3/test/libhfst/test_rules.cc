@@ -14,8 +14,8 @@ using namespace hfst;
 
 
 void compare_and_delete(HfstTransducer * rule_transducers1[],
-			HfstTransducer * rule_transducers2[],
-			HfstTransducer * rule_transducers3[])
+            HfstTransducer * rule_transducers2[],
+            HfstTransducer * rule_transducers3[])
 {
 
   rule_transducers1[0]->convert(TROPICAL_OPENFST_TYPE);
@@ -57,10 +57,10 @@ int main(int argc, char **argv) {
      ImplementationType type); */
 
   verbose_print("HfstTransducer two_level_if("
-		"HfstTransducerPair &context," 
-		"StringPairSet &mappings," 
-		"StringPairSet &alphabet," 
-		"ImplementationType type");
+        "HfstTransducerPair &context," 
+        "StringPairSet &mappings," 
+        "StringPairSet &alphabet," 
+        "ImplementationType type");
 
   {
     for (int i=0; i<3; i++) {
@@ -78,11 +78,11 @@ int main(int argc, char **argv) {
       
 
       HfstTransducer rule_transducer1 
-	= rules::two_level_if(context, mappings, alphabet);
+    = rules::two_level_if(context, mappings, alphabet);
       HfstTransducer rule_transducer2 
-	= rules::two_level_only_if(context, mappings, alphabet);
+    = rules::two_level_only_if(context, mappings, alphabet);
       HfstTransducer rule_transducer3 
-	= rules::two_level_if_and_only_if(context, mappings, alphabet);
+    = rules::two_level_if_and_only_if(context, mappings, alphabet);
       rule_transducers1[i] = new HfstTransducer(rule_transducer1);
       rule_transducers2[i] = new HfstTransducer(rule_transducer2);
       rule_transducers3[i] = new HfstTransducer(rule_transducer3);
@@ -90,8 +90,8 @@ int main(int argc, char **argv) {
   }
 
   compare_and_delete(rule_transducers1,
-		     rule_transducers2,
-		     rule_transducers3);
+             rule_transducers2,
+             rule_transducers3);
 
   // replace_down_karttunen
   {
@@ -109,14 +109,14 @@ int main(int argc, char **argv) {
       bool optional = false;
       
       HfstTransducer replace_down_transducer
-	= rules::replace_down_karttunen(context, mapping, optional, alphabet);
+    = rules::replace_down_karttunen(context, mapping, optional, alphabet);
       
       HfstTransducer test_abababa("abababa", TOK, types[i]);
       test_abababa.compose(replace_down_transducer);
       HfstTransducer abxaba("abababa", 
-			    "abx@_EPSILON_SYMBOL_@aba", TOK, types[i]);
+                "abx@_EPSILON_SYMBOL_@aba", TOK, types[i]);
       HfstTransducer ababxa("abababa",
-			    "ababx@_EPSILON_SYMBOL_@a", TOK, types[i]);
+                "ababx@_EPSILON_SYMBOL_@a", TOK, types[i]);
       HfstTransducer expected_result(types[i]);
       expected_result.disjunct(abxaba);
       expected_result.disjunct(ababxa);
@@ -133,11 +133,11 @@ int main(int argc, char **argv) {
      StringPairSet &alphabet) */
   
   verbose_print("HfstTransducer &replace_in_context("
-		"HfstTransducerPair &context," 
-		"ReplaceType repl_type," 
-		"HfstTransducer &t," 
-		"bool optional," 
-		"StringPairSet &alphabet");
+        "HfstTransducerPair &context," 
+        "ReplaceType repl_type," 
+        "HfstTransducer &t," 
+        "bool optional," 
+        "StringPairSet &alphabet");
 
   for (int i=0; i<3; i++) {
     HfstTransducer left("c",types[i]);
@@ -190,7 +190,7 @@ int main(int argc, char **argv) {
     bool optional = false;
 
     HfstTransducerPair context(HfstTransducer("K", "K", type),
-			       HfstTransducer("K", "K", type));
+                   HfstTransducer("K", "K", type));
 
     HfstTransducer rule 
       = rules::replace_up(context, mapping_, optional, alphabet);

@@ -37,12 +37,12 @@ void FunctionalTransducer::collect_symbols_from_fst
        ++it)
     {
       for (TransitionSet::const_iterator jt = it->second.begin();
-	   jt != it->second.end();
-	   ++jt)
-	{
-	  input_symbols.insert(jt->get_input_symbol());
-	  output_symbols.insert(jt->get_output_symbol());
-	}
+       jt != it->second.end();
+       ++jt)
+    {
+      input_symbols.insert(jt->get_input_symbol());
+      output_symbols.insert(jt->get_output_symbol());
+    }
     }
 }
 
@@ -99,19 +99,19 @@ StringVector FunctionalTransducer::tokenize
        ++it)
     {
       if (not it->empty())
-	{ 
-	  if (*it == ZERO)
-	    { *it = EPSILON_SYMBOL; }
-	  if (*it->begin() == '\\')
-	    { *it = it->substr(1,std::string::npos); }
-	}
+    { 
+      if (*it == ZERO)
+        { *it = EPSILON_SYMBOL; }
+      if (*it->begin() == '\\')
+        { *it = it->substr(1,std::string::npos); }
+    }
     }
   return tokenized_str;
 }
 
 std::string FunctionalTransducer::join(const StringVector & v,
-				       const std::string &joiner,
-				       bool replace_epsilons)
+                       const std::string &joiner,
+                       bool replace_epsilons)
 {
   std::string joined;
   for (StringVector::const_iterator it = v.begin();
@@ -120,10 +120,10 @@ std::string FunctionalTransducer::join(const StringVector & v,
     {
       std::string symbol = *it;
       if (replace_epsilons and symbol == EPSILON_SYMBOL)
-	{ continue; }
-	joined += *it;
+    { continue; }
+    joined += *it;
       if (it != v.end())
-	{ joined += joiner; }
+    { joined += joiner; }
     }
   return joined;
 }

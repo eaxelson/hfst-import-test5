@@ -85,11 +85,11 @@ class HfstStrings2FstTokenizer
   // Make a pair string out of input and output by pairing symbols at the
   // same indices. Pad with zeroes at the end when ncecessary.
   StringPairVector make_pair_vector(const StringVector &input,
-				    const StringVector &output);
+                    const StringVector &output);
 
   // Return true it *it is followed by ':' and another symbol.
   bool is_pair_input_symbol(StringVector::const_iterator it,
-			    StringVector::const_iterator end);
+                StringVector::const_iterator end);
   
   // Remove backslashes, except quoted backslashes '\\'.
   std::string unescape(std::string symbol);

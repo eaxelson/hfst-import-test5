@@ -79,20 +79,20 @@ void RuleVariablesConstIterator::operator++(void)
   if (f_it + 1 == f_end)
     {
       if (ma_it + 1 == ma_end)
-	{
-	  if (mi_it + 1 == mi_end)
-	    { 
-	      f_it = f_end;
-	      ma_it = ma_end;
-	      mi_it = mi_end;
-	      return; 
-	    }
-	  else
-	    { ++mi_it; }
-	  ma_it = ma_begin;
-	}
+    {
+      if (mi_it + 1 == mi_end)
+        { 
+          f_it = f_end;
+          ma_it = ma_end;
+          mi_it = mi_end;
+          return; 
+        }
       else
-	{ ++ma_it; }
+        { ++mi_it; }
+      ma_it = ma_begin;
+    }
+      else
+    { ++ma_it; }
       f_it = f_begin;
     }
   else

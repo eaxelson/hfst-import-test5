@@ -7,9 +7,9 @@ int main(int argc, char **argv)
 
   const unsigned int TYPES_SIZE=3;//4;
   const ImplementationType types [] = {SFST_TYPE, 
-				       TROPICAL_OPENFST_TYPE, 
-				       /*LOG_OPENFST_TYPE,*/ 
-				       FOMA_TYPE};
+                       TROPICAL_OPENFST_TYPE, 
+                       /*LOG_OPENFST_TYPE,*/ 
+                       FOMA_TYPE};
 
   /* For all transducer implementation types, perform the following tests: */
   for (unsigned int i=0; i<TYPES_SIZE; i++)
@@ -20,7 +20,7 @@ int main(int argc, char **argv)
       // (1) A file in valid lexc format
       LexcCompiler compiler(types[i]);
       compiler.parse((std::string(getenv("srcdir")) + 
-		      std::string("/test_lexc.lexc")).c_str());
+              std::string("/test_lexc.lexc")).c_str());
       HfstTransducer * parsed = compiler.compileLexical();
 
       HfstTokenizer tok;
@@ -47,44 +47,44 @@ int main(int argc, char **argv)
 
       // (1) A file in valid lexc format
       try {
-	HfstTransducer * rlexc 
-	  = HfstTransducer::read_lexc
-	  (std::string(getenv("srcdir")) + "/test_lexc.lexc", types[i]);
-	assert(animals.compare(*rlexc));
-	delete rlexc;
+    HfstTransducer * rlexc 
+      = HfstTransducer::read_lexc
+      (std::string(getenv("srcdir")) + "/test_lexc.lexc", types[i]);
+    assert(animals.compare(*rlexc));
+    delete rlexc;
       }
       catch (FunctionNotImplementedException e) {
-	assert(false);
+    assert(false);
       }
 
       // (2) A file that does not follow lexc format
       /*try {
-	HfstTransducer * rlexc
-	  = HfstTransducer::read_lexc
-	  (std::string(getenv("srcdir")) + "/test_lexc_fail.lexc", types[i]);
-	assert(false);
+    HfstTransducer * rlexc
+      = HfstTransducer::read_lexc
+      (std::string(getenv("srcdir")) + "/test_lexc_fail.lexc", types[i]);
+    assert(false);
       }
       catch (FunctionNotImplementedException e) {
-	assert(false);
+    assert(false);
       }
       catch (NotValidLexcFormatException e) {
-	;
-	}*/
+    ;
+    }*/
 
       // (3) A file that does not exist
       /*try {
-	HfstTransducer * rlexc
-	  = HfstTransducer::read_lexc
-	  (std::string(getenv("srcdir")) + 
-	   "/a_test_file_that_does_not_exist.o2f393480f31fsfgqe", types[i]);
-	assert(false);
+    HfstTransducer * rlexc
+      = HfstTransducer::read_lexc
+      (std::string(getenv("srcdir")) + 
+       "/a_test_file_that_does_not_exist.o2f393480f31fsfgqe", types[i]);
+    assert(false);
       }
       catch (FunctionNotImplementedException e) {
-	assert(false);
+    assert(false);
       }
       catch (StreamNotReadableException e) {
-	;
-	}*/
+    ;
+    }*/
 
     }
 

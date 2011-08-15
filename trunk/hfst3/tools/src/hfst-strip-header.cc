@@ -52,37 +52,37 @@ print_usage()
 int
 parse_options(int argc, char** argv)
 {
-	// use of this function requires options are settable on global scope
-	while (true)
-	{
-		static const struct option long_options[] =
-		{
-		HFST_GETOPT_COMMON_LONG,
+    // use of this function requires options are settable on global scope
+    while (true)
+    {
+        static const struct option long_options[] =
+        {
+        HFST_GETOPT_COMMON_LONG,
         HFST_GETOPT_UNARY_LONG,
         {0,0,0,0}
-		};
-		int option_index = 0;
-		// add tool-specific options here 
-		char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
+        };
+        int option_index = 0;
+        // add tool-specific options here 
+        char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
                              HFST_GETOPT_UNARY_SHORT,
-							 long_options, &option_index);
-		if (-1 == c)
-		{
-			break;
-		}
+                             long_options, &option_index);
+        if (-1 == c)
+        {
+            break;
+        }
 
 
-		switch (c)
-		{
+        switch (c)
+        {
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-unary.h"
 #include "inc/getopt-cases-error.h"
-		}
-	}
-	
+        }
+    }
+    
 #include "inc/check-params-common.h"
 #include "inc/check-params-unary.h"
-	return EXIT_CONTINUE;
+    return EXIT_CONTINUE;
 }
 
 int
@@ -139,7 +139,7 @@ int main(int argc, char* argv[])
     inputfilename, outfilename);
   
   retval = process_stream(inputfile, outfile);
-	
+    
   free(inputfilename);
   free(outfilename);
   return retval;

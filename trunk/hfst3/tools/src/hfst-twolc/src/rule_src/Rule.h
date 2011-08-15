@@ -75,7 +75,7 @@ class Rule
   static OtherSymbolTransducer get_universal_language_with_diamonds(void);
 
   static OtherSymbolTransducer get_center(const std::string &input,
-					  const std::string &output);
+                      const std::string &output);
 
   static OtherSymbolTransducer get_center(const SymbolPairVector &v);
 

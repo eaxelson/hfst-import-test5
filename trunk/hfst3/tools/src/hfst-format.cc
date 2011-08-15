@@ -111,18 +111,18 @@ parse_options(int argc, char** argv)
     try {
 
       if (inputfilename == NULL)
-	{
-	  if ((argc - optind) == 0)
-	    {
-	      inputfilename = strdup("<stdin>");
-	      hfst::HfstInputStream is("");
-	      return is.get_type();
-	    }
-	  else if ((argc - optind) == 1)
-	    {
-	      inputfilename = argv[optind];
-	    }     
-	}
+    {
+      if ((argc - optind) == 0)
+        {
+          inputfilename = strdup("<stdin>");
+          hfst::HfstInputStream is("");
+          return is.get_type();
+        }
+      else if ((argc - optind) == 1)
+        {
+          inputfilename = argv[optind];
+        }     
+    }
       hfst::HfstInputStream is(inputfilename);
       return is.get_type();
     } // NotTransducerStreamException

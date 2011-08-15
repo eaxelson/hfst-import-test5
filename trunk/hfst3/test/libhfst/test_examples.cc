@@ -36,9 +36,9 @@ int main(int argc, char **argv)
 
   const unsigned int TYPES_SIZE=3;
   const ImplementationType types [] = {SFST_TYPE, 
-				       TROPICAL_OPENFST_TYPE, 
-				       /*LOG_OPENFST_TYPE,*/ 
-				       FOMA_TYPE};
+                       TROPICAL_OPENFST_TYPE, 
+                       /*LOG_OPENFST_TYPE,*/ 
+                       FOMA_TYPE};
 
   HfstBasicTransducer tr1;
   tr1.add_state(1);
@@ -53,7 +53,7 @@ int main(int argc, char **argv)
   tr2.set_final_weight(2, 0);
   tr2.add_transition
     (0, HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@", 
-			    "@_IDENTITY_SYMBOL_@", 0) );
+                "@_IDENTITY_SYMBOL_@", 0) );
   tr2.add_transition
     (1, HfstBasicTransition(2, "bar", "bar", 0) );
   // tr2 is [ [ @_IDENTITY_SYMBOL_@:@_IDENTITY_SYMBOL_@ ] [ bar:bar ] ]
@@ -66,7 +66,7 @@ int main(int argc, char **argv)
 
   disj.add_transition
     (0, HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@", 
-			    "@_IDENTITY_SYMBOL_@", 0) );
+                "@_IDENTITY_SYMBOL_@", 0) );
   disj.add_transition
     (0, HfstBasicTransition(1, "foo", "foo", 0) );
 
@@ -106,13 +106,13 @@ int main(int argc, char **argv)
 
       FILE * ifile = fopen("testfile.att", "rb");
       try {
-	HfstTransducer t(ifile, types[i], "@_EPSILON_SYMBOL_@");
-	assert(false);
+    HfstTransducer t(ifile, types[i], "@_EPSILON_SYMBOL_@");
+    assert(false);
       }
       catch (NotValidAttFormatException e)
-	{
-	  assert(true);
-	}
+    {
+      assert(true);
+    }
       fclose(ifile);
       
 
@@ -168,29 +168,29 @@ int main(int argc, char **argv)
     } 
     catch (TransducerIsCyclicException e)
       {
-	/* This should not happen because transducer is not cyclic. */
-	fprintf(stderr, "TEST FAILED\n");
-	exit(1);
+    /* This should not happen because transducer is not cyclic. */
+    fprintf(stderr, "TEST FAILED\n");
+    exit(1);
       }
     
     /* Go through all paths. */  
     for (HfstTwoLevelPaths::const_iterator it = results.begin();
          it != results.end(); it++)
       {
-	/* Go through each path. */
-	StringPairVector spv = it->second;
-	std::string istring("");
-	std::string ostring("");
-	
-	for (StringPairVector::const_iterator IT = spv.begin();
-	     IT != spv.end(); IT++)
-	  {
-	    istring.append(IT->first);
-	    ostring.append(IT->second);
-	  }
-	/*fprintf(stdout, "%s : %s\n", 
-		istring.c_str(), 
-		ostring.c_str());*/
+    /* Go through each path. */
+    StringPairVector spv = it->second;
+    std::string istring("");
+    std::string ostring("");
+    
+    for (StringPairVector::const_iterator IT = spv.begin();
+         IT != spv.end(); IT++)
+      {
+        istring.append(IT->first);
+        ostring.append(IT->second);
+      }
+    /*fprintf(stdout, "%s : %s\n", 
+        istring.c_str(), 
+        ostring.c_str());*/
       }
   }
 

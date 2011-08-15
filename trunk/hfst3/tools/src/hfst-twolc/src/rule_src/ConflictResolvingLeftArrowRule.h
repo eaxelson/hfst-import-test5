@@ -35,8 +35,8 @@ class ConflictResolvingLeftArrowRule : public LeftArrowRule
  public:
   //! @brief Inititalize.
   ConflictResolvingLeftArrowRule(const std::string &name,
-				 const SymbolPair &center,
-				 const OtherSymbolTransducerVector &contexts);
+                 const SymbolPair &center,
+                 const OtherSymbolTransducerVector &contexts);
 
   //! @brief Return true if @a another conflicts @a this.
   //!
@@ -46,7 +46,7 @@ class ConflictResolvingLeftArrowRule : public LeftArrowRule
   //!
   //! If a conflict exists, store the conflicting string in v.
   bool conflicts_this(const ConflictResolvingLeftArrowRule &another,
-		      StringVector &v);
+              StringVector &v);
 
   //! Return @a true, if the context of @a another is a sub language of 
   //! the context of @a this.

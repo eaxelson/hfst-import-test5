@@ -24,9 +24,9 @@ namespace hfst {
     private:
       // string comparison operators needed to stored strings in a hash table
       struct eqstr {
-	bool operator()(const char* s1, const char* s2) const {
-	  return strcmp(s1, s2) == 0;
-	}
+    bool operator()(const char* s1, const char* s2) const {
+      return strcmp(s1, s2) == 0;
+    }
       };
       
       // hash table used to map the symbols to their codes

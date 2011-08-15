@@ -45,8 +45,8 @@ struct HfstException
 #define HFST_CATCH(E)							\
     catch (const E &e)							\
     {									\
-	std::cerr << e.file << ", line " << e.line << ": " <<		\
-	    e() << std::endl;						\
+    std::cerr << e.file << ", line " << e.line << ": " <<       \
+        e() << std::endl;                       \
     }
 
 // Example declaring an exception class SomeHfstException:

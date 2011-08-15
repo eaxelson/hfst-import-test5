@@ -74,7 +74,7 @@ namespace hfst { namespace implementations
             = fst::SymbolTableIterator(*(t->InputSymbols()));
           not it.Done(); it.Next() ) {
       if (it.Symbol() != symbol) {
-	st.AddSymbol(it.Symbol(), it.Value());
+    st.AddSymbol(it.Symbol(), it.Value());
       }
     }
     t->SetInputSymbols(&st);
@@ -763,7 +763,7 @@ namespace hfst { namespace implementations
     StringSet t1_symbols = get_alphabet(t1);
     StringSet t2_symbols = get_alphabet(t2);
     hfst::symbols::collect_unknown_sets(t1_symbols, unknown_t1,
-					t2_symbols, unknown_t2);
+                    t2_symbols, unknown_t2);
     
     // 2. Add new symbols from transducer t1 to the symbol table 
     //    of transducer t2...

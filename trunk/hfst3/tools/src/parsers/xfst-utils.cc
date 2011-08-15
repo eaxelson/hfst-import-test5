@@ -72,147 +72,147 @@ xfst_fopen(const char* path, const char* mode)
 char*
 strdup_token_part()
 {
-	char *error_token = (char*)malloc(sizeof(char)*strlen(hxfsttext)+100);
-	char* maybelbr = strchr(hxfsttext, '\n');
-	if (maybelbr != NULL)
-	{
-		char* beforelbr = (char*)malloc(sizeof(char)*strlen(hxfsttext)+1);
-		(void)memcpy(beforelbr, hxfsttext, maybelbr-hxfsttext);
-		beforelbr[maybelbr-hxfsttext] = '\0';
-		(void)sprintf(error_token, "[near: `%s\\n']", beforelbr);
-		free(beforelbr);
-	}
-	else if (strlen(hxfsttext) < 80)
-	{
-		(void)sprintf(error_token, "[near: `%s']", hxfsttext);
-	}
-	else
-	{
-		(void)sprintf(error_token, "[near: `%30s...' (truncated)]",
-					  hxfsttext);
-	}
-	return error_token;
+    char *error_token = (char*)malloc(sizeof(char)*strlen(hxfsttext)+100);
+    char* maybelbr = strchr(hxfsttext, '\n');
+    if (maybelbr != NULL)
+    {
+        char* beforelbr = (char*)malloc(sizeof(char)*strlen(hxfsttext)+1);
+        (void)memcpy(beforelbr, hxfsttext, maybelbr-hxfsttext);
+        beforelbr[maybelbr-hxfsttext] = '\0';
+        (void)sprintf(error_token, "[near: `%s\\n']", beforelbr);
+        free(beforelbr);
+    }
+    else if (strlen(hxfsttext) < 80)
+    {
+        (void)sprintf(error_token, "[near: `%s']", hxfsttext);
+    }
+    else
+    {
+        (void)sprintf(error_token, "[near: `%30s...' (truncated)]",
+                      hxfsttext);
+    }
+    return error_token;
 }
 
 char*
 strip_percents(const char* s, bool do_zeros)
 {
-	char* rv = (char*)malloc(sizeof(char)*strlen(s)*6+1);
-	char* p = rv;
-	const char* c = s;
-	bool escaping = false;
-	while (*c != '\0')
-	{
-		if (escaping)
-		{
-			if (*c != '0')
-			{
-				*p = *c;
-			}
-			else
-			{
-				*p = '@';
-				p++;
-				*p = 'Z';
-				p++;
-				*p = 'E';
-				p++;
-				*p = 'R';
-				p++;
-				*p = 'O';
-				p++;
-				*p = '@';
-			}
-			escaping = false;
-			++p;
-			++c;
-		}
-		else if (*c == '%')
-		{
-			escaping = true;
-			++c;
-		}
-		else if (do_zeros && (*c == '0'))
-		{
-			*p = '@';
-			p++;
-			*p = '0';
-			p++;
-			*p = '@';
-			p++;
-			c++;
-		}
-		else
-		{
-			*p = *c;
-			++p;
-			++c;
-		}
-	}
-	*p = '\0';
-	if (escaping)
-	{
-		fprintf(stderr, "Stray escape char %% in %s\n", s);
-		return NULL;
-	}
-	return rv;
+    char* rv = (char*)malloc(sizeof(char)*strlen(s)*6+1);
+    char* p = rv;
+    const char* c = s;
+    bool escaping = false;
+    while (*c != '\0')
+    {
+        if (escaping)
+        {
+            if (*c != '0')
+            {
+                *p = *c;
+            }
+            else
+            {
+                *p = '@';
+                p++;
+                *p = 'Z';
+                p++;
+                *p = 'E';
+                p++;
+                *p = 'R';
+                p++;
+                *p = 'O';
+                p++;
+                *p = '@';
+            }
+            escaping = false;
+            ++p;
+            ++c;
+        }
+        else if (*c == '%')
+        {
+            escaping = true;
+            ++c;
+        }
+        else if (do_zeros && (*c == '0'))
+        {
+            *p = '@';
+            p++;
+            *p = '0';
+            p++;
+            *p = '@';
+            p++;
+            c++;
+        }
+        else
+        {
+            *p = *c;
+            ++p;
+            ++c;
+        }
+    }
+    *p = '\0';
+    if (escaping)
+    {
+        fprintf(stderr, "Stray escape char %% in %s\n", s);
+        return NULL;
+    }
+    return rv;
 }
 
 char*
 strstrip(const char* s)
 {
-	char* rv = (char*)malloc(sizeof(char)*strlen(s)+1);
-	char* p = rv;
-	while (isspace(*s))
-	{
-		++s;
-	}
-	while (*s != '\0')
-	{
-		*p = *s;
-		++p;
-		++s;
-	}
-	*p = '\0';
-	--p;
-	while (isspace(*p))
-	{
-		*p = '\0';
-		--p;
-	}
-	return rv;
+    char* rv = (char*)malloc(sizeof(char)*strlen(s)+1);
+    char* p = rv;
+    while (isspace(*s))
+    {
+        ++s;
+    }
+    while (*s != '\0')
+    {
+        *p = *s;
+        ++p;
+        ++s;
+    }
+    *p = '\0';
+    --p;
+    while (isspace(*p))
+    {
+        *p = '\0';
+        --p;
+    }
+    return rv;
 }
 
 char*
 strdup_nonconst_part(const char* token, const char* prefix,
-						  const char* suffix, bool strip)
+                          const char* suffix, bool strip)
 {
-	size_t prefix_len = 0;
-	size_t suffix_len = 0;
-	size_t varpart_len = 0;
-	size_t token_len = strlen(token);
-	char* token_part = (char*)malloc(sizeof(char) * token_len + 1);
-	if (prefix)
-	{
-		prefix_len = strlen(prefix);
-	}
-	if (suffix)
-	{
-		suffix_len = strlen(suffix);
-	}
-	varpart_len = strlen(token) - prefix_len - suffix_len;
-	assert(varpart_len <= token_len);
-	assert(strncmp(token, prefix, prefix_len) == 0);
-	assert(strncmp(token + prefix_len + varpart_len, suffix, suffix_len) == 0);
-	(void)memcpy(token_part, token + prefix_len, varpart_len);
-	token_part[varpart_len] = '\0';
-	if (strip)
-	{
-		char* tmp = strstrip(token_part);
-		free(token_part);
-		token_part = tmp;
-	}
-	return token_part;
+    size_t prefix_len = 0;
+    size_t suffix_len = 0;
+    size_t varpart_len = 0;
+    size_t token_len = strlen(token);
+    char* token_part = (char*)malloc(sizeof(char) * token_len + 1);
+    if (prefix)
+    {
+        prefix_len = strlen(prefix);
+    }
+    if (suffix)
+    {
+        suffix_len = strlen(suffix);
+    }
+    varpart_len = strlen(token) - prefix_len - suffix_len;
+    assert(varpart_len <= token_len);
+    assert(strncmp(token, prefix, prefix_len) == 0);
+    assert(strncmp(token + prefix_len + varpart_len, suffix, suffix_len) == 0);
+    (void)memcpy(token_part, token + prefix_len, varpart_len);
+    token_part[varpart_len] = '\0';
+    if (strip)
+    {
+        char* tmp = strstrip(token_part);
+        free(token_part);
+        token_part = tmp;
+    }
+    return token_part;
 }
 
 

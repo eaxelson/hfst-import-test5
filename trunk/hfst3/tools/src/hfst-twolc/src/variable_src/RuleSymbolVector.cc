@@ -24,28 +24,28 @@ std::string RuleSymbolVector::replace_variables(void)
 {
   std::string result;
   for (std::vector<std::string>::const_iterator it = 
-	 std::vector<std::string>::begin();
+     std::vector<std::string>::begin();
        it != std::vector<std::string>::end();
        ++it)
     {
       std::string symbol = *it;
       if (symbol.find("__HFST_TWOLC_RULE_NAME") != std::string::npos)
-	{
-	  if (not vvm.empty())
-	    {
-	      symbol.insert
-		(symbol.size()-1,
-		 "__HFST_TWOLC_SPACE" "SUBCASE:");
-	    }
-	  for (VariableValueMap::const_iterator it = vvm.begin();
-	       it != vvm.end();
-	       ++it)
-	    { symbol.insert
-		(symbol.size()-1,
-		 "__HFST_TWOLC_SPACE"+ it->first + "=" + it->second); }
-	}
+    {
+      if (not vvm.empty())
+        {
+          symbol.insert
+        (symbol.size()-1,
+         "__HFST_TWOLC_SPACE" "SUBCASE:");
+        }
+      for (VariableValueMap::const_iterator it = vvm.begin();
+           it != vvm.end();
+           ++it)
+        { symbol.insert
+        (symbol.size()-1,
+         "__HFST_TWOLC_SPACE"+ it->first + "=" + it->second); }
+    }
       result += 
-	(vvm.has_key(symbol) ? vvm.get_value(symbol) : symbol) + " ";
+    (vvm.has_key(symbol) ? vvm.get_value(symbol) : symbol) + " ";
     }
   return result;
 }
@@ -60,6 +60,6 @@ RuleSymbolVector &RuleSymbolVector::push_back
 (const std::vector<std::string> &v)
 {
   std::vector<std::string>::insert(std::vector<std::string>::end(),
-				   v.begin(),v.end());
+                   v.begin(),v.end());
   return *this;
 }

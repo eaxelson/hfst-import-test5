@@ -126,7 +126,7 @@ namespace implementations
          FdTable<SFST::Character>* fd=NULL, bool filter_fd=false);
 
       static void extract_random_paths
-	(Transducer *t, HfstTwoLevelPaths &results, int max_num);
+    (Transducer *t, HfstTwoLevelPaths &results, int max_num);
 
       static Transducer * insert_freely
         (Transducer *t , const StringPair &symbol_pair);
@@ -166,9 +166,9 @@ namespace implementations
       static StringSet get_alphabet(Transducer *t);
       static void insert_to_alphabet(Transducer *t, const std::string &symbol);
       static void remove_from_alphabet
-	(Transducer *t, const std::string &symbol);
+    (Transducer *t, const std::string &symbol);
       static unsigned int get_symbol_number(Transducer *t, 
-					    const std::string &symbol);
+                        const std::string &symbol);
 
     protected:
       static void initialize_alphabet(Transducer *t);

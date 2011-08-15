@@ -27,15 +27,15 @@ void RightArrowRuleContainer::add_rule_and_display_and_resolve_conflicts
   if (center_to_rule_map.has_key(rule->center_pair))
     { 
       if (report_right_arrow_conflicts)
-	{ 
-	  out << "There is a =>-rule conflict between "
-	      << Rule::get_print_name
-	    (center_to_rule_map[rule->center_pair]->name) 
-	      << " and " << Rule::get_print_name(rule->name) << "." 
-	      << std::endl
-	      << "Resolving the conflict by joining contexts." 
-	      << std::endl << std::endl;
-	}
+    { 
+      out << "There is a =>-rule conflict between "
+          << Rule::get_print_name
+        (center_to_rule_map[rule->center_pair]->name) 
+          << " and " << Rule::get_print_name(rule->name) << "." 
+          << std::endl
+          << "Resolving the conflict by joining contexts." 
+          << std::endl << std::endl;
+    }
       center_to_rule_map[rule->center_pair]->resolve_conflict(*rule); 
       rule->is_empty = true;
     }

@@ -43,32 +43,32 @@ static bool handle_hfst3_header(std::istream& is)
   {
       unsigned short remaining_header_len;
       is.read(reinterpret_cast<char*>(&remaining_header_len),
-	      sizeof(remaining_header_len));
+          sizeof(remaining_header_len));
       if(is.get() != '\0') {
-	  HFST_THROW(HfstException);
-	  return false;
+      HFST_THROW(HfstException);
+      return false;
       }
       char * headervalue = new char[remaining_header_len];
       while(remaining_header_len > 0) {
-	  is.getline(headervalue, remaining_header_len + 1, '\0');
-	  remaining_header_len -= strlen(headervalue) + 1;
-	  if (!strcmp(headervalue, "type")) {
-	      is.getline(headervalue, remaining_header_len + 1, '\0');
-	      remaining_header_len -= strlen(headervalue) + 1;
-	      if (strcmp(headervalue, "HFST_OL") and
-		  strcmp(headervalue, "HFST_OLW")) {
-		  delete headervalue;
-		  HFST_THROW(TransducerHasWrongTypeException);
-		  return false;
-	      }
+      is.getline(headervalue, remaining_header_len + 1, '\0');
+      remaining_header_len -= strlen(headervalue) + 1;
+      if (!strcmp(headervalue, "type")) {
+          is.getline(headervalue, remaining_header_len + 1, '\0');
+          remaining_header_len -= strlen(headervalue) + 1;
+          if (strcmp(headervalue, "HFST_OL") and
+          strcmp(headervalue, "HFST_OLW")) {
+          delete headervalue;
+          HFST_THROW(TransducerHasWrongTypeException);
+          return false;
+          }
       }
       }
       delete headervalue;
       if (remaining_header_len == 0) {
-	  return true;
+      return true;
       } else {
-	  HFST_THROW(HfstException);
-	  return false;
+      HFST_THROW(HfstException);
+      return false;
       }
   } else // nope. put back what we've taken
   {

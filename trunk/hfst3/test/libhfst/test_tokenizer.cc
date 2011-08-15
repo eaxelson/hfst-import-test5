@@ -12,7 +12,7 @@ int main(int argc, char **argv)
 
   /* From one string. */
   verbose_print("Tokenization from one string with multichar symbol "
-		"\"foo\" and skip symbol \"bar\"");
+        "\"foo\" and skip symbol \"bar\"");
   
   HfstTokenizer tok1;
   tok1.add_multichar_symbol("foo");
@@ -24,7 +24,7 @@ int main(int argc, char **argv)
   assert(tokenization1[2] == StringPair("o","o"));
   
   verbose_print("Tokenization from one string with multichar symbol "
-		"\"foo\" and skip symbol \"fo\"");
+        "\"foo\" and skip symbol \"fo\"");
 
   HfstTokenizer tok2;
   tok2.add_multichar_symbol("foo");
@@ -34,7 +34,7 @@ int main(int argc, char **argv)
   assert(tokenization2[0] == StringPair("foo","foo"));
   
   verbose_print("Tokenization from one string with multichar symbol "
-		"\"fo\" and skip symbol \"foo\"");
+        "\"fo\" and skip symbol \"foo\"");
 
   HfstTokenizer tok3;
   tok3.add_multichar_symbol("fo");
@@ -44,7 +44,7 @@ int main(int argc, char **argv)
   
   /* From two strings. */
   verbose_print("Tokenization from two strings with multichar symbol "
-		"\"foo\" and skip symbol \"bar\"");
+        "\"foo\" and skip symbol \"bar\"");
 
   HfstTokenizer tok4;
   tok4.add_multichar_symbol("foo");

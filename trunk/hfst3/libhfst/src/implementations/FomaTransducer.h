@@ -132,7 +132,7 @@ namespace hfst {
                                   int cycles=-1, FdTable<int>* fd=NULL, 
                                   bool filter_fd=false);
       static void extract_random_paths
-	(const fsm *t, HfstTwoLevelPaths &results, int max_num);
+    (const fsm *t, HfstTwoLevelPaths &results, int max_num);
 
       static FdTable<int>* get_flag_diacritics(fsm * t);
 
@@ -140,7 +140,7 @@ namespace hfst {
       static void remove_from_alphabet(fsm *t, const std::string &symbol);
       static StringSet get_alphabet(fsm *t);
       static unsigned int get_symbol_number(fsm *t, 
-					    const std::string &symbol);      
+                        const std::string &symbol);      
 
       static void harmonize(fsm *net1, fsm *net2);
 

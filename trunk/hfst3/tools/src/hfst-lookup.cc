@@ -357,10 +357,10 @@ parse_options(int argc, char** argv)
               {
                 quote_special = true;
               }
-	    else if (strcmp(optarg, "obey-flags") == 0)
-	      {
-		obey_flags = false;
-	      }
+        else if (strcmp(optarg, "obey-flags") == 0)
+          {
+        obey_flags = false;
+          }
             else 
               {
                 error(EXIT_FAILURE, 0, "Xfst variable %s unrecognised",
@@ -1244,11 +1244,11 @@ static bool is_possible_transition
       // matches to the input symbol of the transition, i.e
       // either the input symbol is the same as the current symbol
       if ( isymbol.compare(lookup_path.at(lookup_index)) == 0 ||
-	   // or the input symbol is the identity symbol and the current
-	   // symbol is not found in the alphabet of the transducer.
-	   ( is_identity(isymbol) &&
-	     (alphabet.find(lookup_path.at(lookup_index)) == alphabet.end()) ) 
-	   )
+       // or the input symbol is the identity symbol and the current
+       // symbol is not found in the alphabet of the transducer.
+       ( is_identity(isymbol) &&
+         (alphabet.find(lookup_path.at(lookup_index)) == alphabet.end()) ) 
+       )
         {
           input_symbol_consumed=true;
           return true;
@@ -1308,19 +1308,19 @@ static void lookup_fd
         {
           // update path_so_far and lookup_index
 
-	  if (not (is_identity(it->get_input_symbol()))) {
-	    push_back_to_two_level_path
-	      (path_so_far, 
-	       StringPair(it->get_input_symbol(), it->get_output_symbol()),
-	       it->get_weight());
-	  }
-	  else { // identity symbol is replaced with the lookup symbol
-	    push_back_to_two_level_path
-	      (path_so_far, 
-	       StringPair(lookup_path.at(lookup_index), 
-			  lookup_path.at(lookup_index)),
-	       it->get_weight());
-	  }
+      if (not (is_identity(it->get_input_symbol()))) {
+        push_back_to_two_level_path
+          (path_so_far, 
+           StringPair(it->get_input_symbol(), it->get_output_symbol()),
+           it->get_weight());
+      }
+      else { // identity symbol is replaced with the lookup symbol
+        push_back_to_two_level_path
+          (path_so_far, 
+           StringPair(lookup_path.at(lookup_index), 
+              lookup_path.at(lookup_index)),
+           it->get_weight());
+      }
 
           EpsilonHandler * Ehp = NULL;
           if (input_symbol_consumed) {
@@ -1330,7 +1330,7 @@ static void lookup_fd
           else {
             Eh.push_back(state);
             Ehp = &Eh;
-	  }
+      }
 
           // call lookup for the target state of the transition
           lookup_fd(t, lookup_path, results, it->get_target_state(),
@@ -1363,7 +1363,7 @@ static void lookup_fd
   StringSet alphabet = t.get_alphabet();
   EpsilonHandler Eh(infinite_cutoff);
   lookup_fd(t, lookup_path, results, state, lookup_index, path_so_far, 
-	    alphabet, Eh);
+        alphabet, Eh);
 }
 
 
@@ -1676,7 +1676,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
                  it != basic.end(); it++)
               {
                 for (HfstBasicTransducer::HfstTransitions::const_iterator 
-		       tr_it = it->begin();
+               tr_it = it->begin();
                      tr_it != it->end(); tr_it++)
                   {
                     std::string mcs = tr_it->get_input_symbol();
@@ -1708,7 +1708,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     size_t llen = 0;
 
     HfstStrings2FstTokenizer input_tokenizer(mc_symbols, 
-					     std::string(epsilon_format));
+                         std::string(epsilon_format));
 
     while (hfst_getline(&line, &llen, lookup_file) != -1)
       {

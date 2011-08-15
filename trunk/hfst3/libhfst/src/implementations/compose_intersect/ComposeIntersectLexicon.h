@@ -34,17 +34,17 @@ namespace hfst
       void clear_all_info(void);
       HfstState map_state_and_add_to_agenda(const StatePair &);
       HfstBasicTransducer &compute_composition_result
-	(ComposeIntersectRule *);
+    (ComposeIntersectRule *);
       void compute_state(HfstState state,ComposeIntersectRule *);
       void set_final_state_weights(ComposeIntersectRule *);
       void lexicon_skip_symbol_compose
-	(const TransitionSet &,HfstState,HfstState);
+    (const TransitionSet &,HfstState,HfstState);
       void rule_skip_symbol_compose(const TransitionSet &,HfstState,HfstState);
       void compose(const TransitionSet &,const TransitionSet &,HfstState);
       void add_transition
-	(HfstState, size_t,size_t,float,HfstState);
+    (HfstState, size_t,size_t,float,HfstState);
       void identity_compose
-	(const TransitionSet &,const HfstBasicTransition &,HfstState);
+    (const TransitionSet &,const HfstBasicTransition &,HfstState);
     };
   }
 }

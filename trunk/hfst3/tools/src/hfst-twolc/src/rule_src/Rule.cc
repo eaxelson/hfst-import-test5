@@ -17,8 +17,8 @@
 #include "Rule.h"
 
 Rule::Rule(const std::string &name,
-	   const OtherSymbolTransducer &center,
-	   const OtherSymbolTransducerVector &contexts):
+       const OtherSymbolTransducer &center,
+       const OtherSymbolTransducerVector &contexts):
   is_empty(false),
   name(unescape_name(name)),
   center(center)
@@ -32,7 +32,7 @@ Rule::Rule(const std::string &name,
 }
 
 Rule::Rule(const std::string &name,
-	   const RuleVector &v):
+       const RuleVector &v):
   is_empty(true),
   name(unescape_name(name)),
   rule_transducer(TWOLC_UNKNOWN)
@@ -43,11 +43,11 @@ Rule::Rule(const std::string &name,
        ++it)
     {
       if (not (*it)->empty())	
-	{ 
-	  rule_transducer.apply
-	    (&HfstTransducer::intersect,(*it)->rule_transducer); 
-	  is_empty = false;
-	}
+    { 
+      rule_transducer.apply
+        (&HfstTransducer::intersect,(*it)->rule_transducer); 
+      is_empty = false;
+    }
     }
 }
 
@@ -59,10 +59,10 @@ std::string Rule::get_print_name(const std::string &s)
   std::string ss(s);
   while (ss.find("__HFST_TWOLC_SPACE") != std::string::npos)
     { ss.replace(ss.find("__HFST_TWOLC_SPACE"),
-		 std::string("__HFST_TWOLC_SPACE").size()," "); }
+         std::string("__HFST_TWOLC_SPACE").size()," "); }
   while (ss.find("__HFST_TWOLC_RULE_NAME=") != std::string::npos)
     { ss.replace(ss.find("__HFST_TWOLC_RULE_NAME="),
-		 std::string("__HFST_TWOLC_RULE_NAME=").size()," "); }
+         std::string("__HFST_TWOLC_RULE_NAME=").size()," "); }
   return ss;
 }
 
@@ -79,14 +79,14 @@ void Rule::store(HfstOutputStream &out)
   add_name();
   rule_transducer.remove_diacritics_from_output();
   rule_transducer.apply(&HfstTransducer::substitute,TWOLC_EPSILON,HFST_EPSILON,
-			true,true);
+            true,true);
   rule_transducer.apply(&HfstTransducer::substitute,"__HFST_TWOLC_.#.","@#@",
-			true,true);
+            true,true);
   rule_transducer.apply(&HfstTransducer::substitute,SymbolPair("@#@","@#@"),
-			SymbolPair("@#@",HFST_EPSILON));
+            SymbolPair("@#@",HFST_EPSILON));
   rule_transducer.apply(&HfstTransducer::substitute,TWOLC_IDENTITY,
-			HFST_IDENTITY,
-			true,true);
+            HFST_IDENTITY,
+            true,true);
   HfstTransducer &t = rule_transducer.transducer;
   out << t;
 }
@@ -112,7 +112,7 @@ OtherSymbolTransducer Rule::get_universal_language_with_diamonds(void)
 }
 
 OtherSymbolTransducer Rule::get_center(const std::string &input,
-				       const std::string &output)
+                       const std::string &output)
 {
   OtherSymbolTransducer unknown(TWOLC_UNKNOWN);
   unknown.apply(&HfstTransducer::repeat_star);
@@ -137,7 +137,7 @@ OtherSymbolTransducer Rule::get_center(const SymbolPairVector &v)
     {
       OtherSymbolTransducer pair(it->first,it->second);
       center_pair_transducer.
-	apply(&HfstTransducer::disjunct,pair);
+    apply(&HfstTransducer::disjunct,pair);
     }
   OtherSymbolTransducer center(unknown);
    center.
@@ -172,10 +172,10 @@ void Rule::add_missing_symbols_freely(const SymbolRange &diacritics)
        ++it)
     { 
       if (symbol_set.find(*it) == symbol_set.end())
-	{ 
-	  rule_transducer.add_symbol_to_alphabet(*it); 
-	  rule_transducer.apply(&HfstTransducer::insert_freely,
-				SymbolPair(*it,*it)); }
+    { 
+      rule_transducer.add_symbol_to_alphabet(*it); 
+      rule_transducer.apply(&HfstTransducer::insert_freely,
+                SymbolPair(*it,*it)); }
     }
   
 }

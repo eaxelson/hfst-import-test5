@@ -37,11 +37,11 @@ int main(int argc, char **argv)
 
   const unsigned int TYPES_SIZE=5;
   const ImplementationType types [] = {SFST_TYPE, 
-				       TROPICAL_OPENFST_TYPE, 
-				       /*LOG_OPENFST_TYPE,*/ 
-				       FOMA_TYPE,
-				       HFST_OL_TYPE,
-				       HFST_OLW_TYPE};
+                       TROPICAL_OPENFST_TYPE, 
+                       /*LOG_OPENFST_TYPE,*/ 
+                       FOMA_TYPE,
+                       HFST_OL_TYPE,
+                       HFST_OLW_TYPE};
 
 
   /* For all transducer implementation types, perform the following tests: */
@@ -84,23 +84,23 @@ int main(int argc, char **argv)
 
       std::set<StringPair> result_strings;
       for (HfstTwoLevelPaths::const_iterator it = results.begin();
-	   it != results.end(); it++)
-	{
-	  std::string istring;
-	  std::string ostring;
-	  for (StringPairVector::const_iterator IT = it->second.begin();
-	       IT != it->second.end(); IT++)
-	    {
-	      istring.append(IT->first);
-	      ostring.append(IT->second);
-	    }
-	  result_strings.insert(StringPair(istring, ostring));
-	}
+       it != results.end(); it++)
+    {
+      std::string istring;
+      std::string ostring;
+      for (StringPairVector::const_iterator IT = it->second.begin();
+           IT != it->second.end(); IT++)
+        {
+          istring.append(IT->first);
+          ostring.append(IT->second);
+        }
+      result_strings.insert(StringPair(istring, ostring));
+    }
       
       assert(result_strings.find(StringPair("ac","ac")) 
-	     != result_strings.end());
+         != result_strings.end());
       assert(result_strings.find(StringPair("bd","bd")) 
-	     != result_strings.end());
+         != result_strings.end());
       
 
       // TODO: More tests...

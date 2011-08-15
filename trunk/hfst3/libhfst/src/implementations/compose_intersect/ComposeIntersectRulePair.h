@@ -53,7 +53,7 @@ namespace hfst
       void compute_transition_set(HfstState,size_t);
       HfstState get_state(const StatePair &);
       void add_transition
-	(TransitionSet &,HfstState target,size_t,size_t,float);
+    (TransitionSet &,HfstState target,size_t,size_t,float);
     };
   }
 }

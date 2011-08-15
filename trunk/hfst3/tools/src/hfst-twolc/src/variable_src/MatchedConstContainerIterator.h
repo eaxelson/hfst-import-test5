@@ -39,8 +39,8 @@ public ConstContainerIterator<T>
   int operator++(void)
    {
      for (size_t i = 0; 
-	  i < ConstContainerIterator<T>::iterator_vector.size(); 
-	  ++i)
+      i < ConstContainerIterator<T>::iterator_vector.size(); 
+      ++i)
        { ++ConstContainerIterator<T>::iterator_vector.at(i); }
      return 1;
    };  

@@ -333,7 +333,7 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
         {
           SFST::Transducer * sfst_temp = 
             sfst_funct(implementation.sfst,
-		       another_->implementation.sfst);
+               another_->implementation.sfst);
           delete implementation.sfst;
           implementation.sfst = sfst_temp;
           break;

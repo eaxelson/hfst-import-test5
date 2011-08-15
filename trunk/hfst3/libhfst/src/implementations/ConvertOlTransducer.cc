@@ -175,30 +175,30 @@ unsigned int hfst_ol_to_hfst_basic_add_state
       std::vector<hfst_ol::StatePlaceholder> state_placeholders;
 
       std::map<unsigned int, unsigned int> * relabeled_states =
-	  new std::map<unsigned int, unsigned int>();
+      new std::map<unsigned int, unsigned int>();
       unsigned int first_transition = 0;
 
       unsigned int source_state=0;
       for (HfstBasicTransducer::const_iterator it = t->begin(); 
            it != t->end(); ++it) {
-	  unsigned int state_number = state_placeholders.size();
-	  if (state_number != source_state) {
-	      relabeled_states->operator[](source_state) = state_number;
-	  }
-	  hfst_ol::Weight final_w = 0.0;
-	  if (t->is_final_state(source_state)) {
-	      final_w = t->get_final_weight(source_state);    
-	  }
-	  state_placeholders.push_back(hfst_ol::StatePlaceholder(
-					   state_number,
-					   t->is_final_state(source_state),
-					   first_transition,
-					   final_w));
-	  ++first_transition; // there's a padding entry between states
+      unsigned int state_number = state_placeholders.size();
+      if (state_number != source_state) {
+          relabeled_states->operator[](source_state) = state_number;
+      }
+      hfst_ol::Weight final_w = 0.0;
+      if (t->is_final_state(source_state)) {
+          final_w = t->get_final_weight(source_state);    
+      }
+      state_placeholders.push_back(hfst_ol::StatePlaceholder(
+                       state_number,
+                       t->is_final_state(source_state),
+                       first_transition,
+                       final_w));
+      ++first_transition; // there's a padding entry between states
           for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
-		   = it->begin();
+           = it->begin();
                tr_it != it->end(); ++tr_it) {
-	      ++first_transition;
+          ++first_transition;
               if (FdOperation::is_diacritic(tr_it->get_input_symbol())) {
                   flag_diacritics->insert(tr_it->get_input_symbol());
               } else {
@@ -206,7 +206,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
               }
               other_symbols->insert(tr_it->get_output_symbol());
           }
-	  source_state++;
+      source_state++;
       }
       
       SymbolNumber seen_input_symbols = 1; // We always have epsilon
@@ -265,10 +265,10 @@ unsigned int hfst_ol_to_hfst_basic_add_state
         for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
                = it->begin();
              tr_it != it->end(); ++tr_it) {
-	    unsigned int state_number = source_state;
-	    if (relabeled_states->count(state_number) != 0) {
-		state_number = relabeled_states->operator[](state_number);
-	    }
+        unsigned int state_number = source_state;
+        if (relabeled_states->count(state_number) != 0) {
+        state_number = relabeled_states->operator[](state_number);
+        }
             // check for previously unseen inputs
             if (state_placeholders[state_number].inputs.count(
                     string_symbol_map->operator[](
@@ -277,19 +277,19 @@ unsigned int hfst_ol_to_hfst_basic_add_state
                     string_symbol_map->operator[](tr_it->get_input_symbol())] =
                     std::vector<hfst_ol::TransitionPlaceholder>();
             }
-	    unsigned int target = tr_it->get_target_state();
-	    if (relabeled_states->count(target) != 0) {
-		target = relabeled_states->operator[](target);
-	    }
+        unsigned int target = tr_it->get_target_state();
+        if (relabeled_states->count(target) != 0) {
+        target = relabeled_states->operator[](target);
+        }
             hfst_ol::TransitionPlaceholder trans(
                 target,
                 string_symbol_map->operator[](tr_it->get_output_symbol()),
                 tr_it->get_weight());
             state_placeholders[state_number]
                 .inputs[string_symbol_map->operator[](
-		    tr_it->get_input_symbol())].push_back(trans);
+            tr_it->get_input_symbol())].push_back(trans);
         }
-	source_state++;
+    source_state++;
     }
     delete relabeled_states;
     delete string_symbol_map;
@@ -297,8 +297,8 @@ unsigned int hfst_ol_to_hfst_basic_add_state
     // For determining the index table we first sort the states (excepting
     // the starting state) by number of different input symbols.
     if (state_placeholders.begin() != state_placeholders.end()) {
-	std::sort(state_placeholders.begin() + 1, state_placeholders.end(),
-		  hfst_ol::compare_states_by_input_size);
+    std::sort(state_placeholders.begin() + 1, state_placeholders.end(),
+          hfst_ol::compare_states_by_input_size);
     }
 
     hfst_ol::IndexPlaceholders * used_indices =
@@ -327,18 +327,18 @@ unsigned int hfst_ol_to_hfst_basic_add_state
         unsigned int i = first_available_index;
 
         // While this index is not suitable for a starting index, keep looking
-	if (!quick) {
-	    while (!used_indices->fits(*it, flag_symbols, i)) {
-		++i;
-	    }
-	}
+    if (!quick) {
+        while (!used_indices->fits(*it, flag_symbols, i)) {
+        ++i;
+        }
+    }
         it->start_index = i;
-	previous_successful_index = i;
+    previous_successful_index = i;
         // Once we've found a starting index, insert a finality marker and
-	// mark all the used indices
-	used_indices->operator[](i) =
-	    std::pair<unsigned int, SymbolNumber>(
-		it->state_number, NO_SYMBOL_NUMBER);
+    // mark all the used indices
+    used_indices->operator[](i) =
+        std::pair<unsigned int, SymbolNumber>(
+        it->state_number, NO_SYMBOL_NUMBER);
         for (std::map<SymbolNumber,
                  std::vector<hfst_ol::TransitionPlaceholder> >
                  ::iterator sym_it = it->inputs.begin();
@@ -351,44 +351,44 @@ unsigned int hfst_ol_to_hfst_basic_add_state
                 std::pair<unsigned int, SymbolNumber>
                 (it->state_number, index_offset);
         }
-	if (quick) {
-	    first_available_index = used_indices->rbegin()->first + 1;
-	    continue;
-	}
-	while (used_indices->unsuitable(
-		   first_available_index, seen_input_symbols,
-		   packing_aggression)) {
-	    ++first_available_index;
-	}
-	if (first_available_index == previous_first_index) {
-	    if (floor_stuck_counter > floor_jump_threshold) {
-		SymbolNumber index_offset = it->inputs.rbegin()->first;
-		if (flag_symbols.count(index_offset) != 0) {
-		    index_offset = 0;
-		}
-		first_available_index =
-		    previous_successful_index + 1 + index_offset;
-		while (used_indices->unsuitable(
-			   first_available_index,
-			   seen_input_symbols, packing_aggression)) {
-		    ++first_available_index;
-		}
-		floor_stuck_counter = 0;
-		previous_first_index = first_available_index;
-	    } else {
-		++floor_stuck_counter;
-	    }
-	} else {
-	    previous_first_index = first_available_index;
-	    floor_stuck_counter = 0;
-	}
+    if (quick) {
+        first_available_index = used_indices->rbegin()->first + 1;
+        continue;
+    }
+    while (used_indices->unsuitable(
+           first_available_index, seen_input_symbols,
+           packing_aggression)) {
+        ++first_available_index;
+    }
+    if (first_available_index == previous_first_index) {
+        if (floor_stuck_counter > floor_jump_threshold) {
+        SymbolNumber index_offset = it->inputs.rbegin()->first;
+        if (flag_symbols.count(index_offset) != 0) {
+            index_offset = 0;
+        }
+        first_available_index =
+            previous_successful_index + 1 + index_offset;
+        while (used_indices->unsuitable(
+               first_available_index,
+               seen_input_symbols, packing_aggression)) {
+            ++first_available_index;
+        }
+        floor_stuck_counter = 0;
+        previous_first_index = first_available_index;
+        } else {
+        ++floor_stuck_counter;
+        }
+    } else {
+        previous_first_index = first_available_index;
+        floor_stuck_counter = 0;
+    }
     }
 
     // Now resort by state number for the rest
     // (this could definitely be neater...)
     if (state_placeholders.begin() != state_placeholders.end()) {
-	std::sort(state_placeholders.begin() + 1, state_placeholders.end(),
-		  hfst_ol::compare_states_by_state_number);
+    std::sort(state_placeholders.begin() + 1, state_placeholders.end(),
+          hfst_ol::compare_states_by_state_number);
     }
 
     // Now for each index entry we write its input symbol and target
@@ -404,24 +404,24 @@ unsigned int hfst_ol_to_hfst_basic_add_state
         if (used_indices->count(i) == 0) { // blank entries
             windex_table.append(hfst_ol::TransitionWIndex());
         } else if (used_indices->operator[](i).second ==
-		   NO_SYMBOL_NUMBER) { // finality markers
-	    if (state_placeholders[used_indices->operator[](i).first].final) {
-		windex_table.append(
-		    hfst_ol::TransitionWIndex::create_final(
-			state_placeholders[
-			    used_indices->operator[](i).first].final_weight));
-	    } else {
-		windex_table.append(hfst_ol::TransitionWIndex());
-	    }
-	} else { // actual entries
+           NO_SYMBOL_NUMBER) { // finality markers
+        if (state_placeholders[used_indices->operator[](i).first].final) {
+        windex_table.append(
+            hfst_ol::TransitionWIndex::create_final(
+            state_placeholders[
+                used_indices->operator[](i).first].final_weight));
+        } else {
+        windex_table.append(hfst_ol::TransitionWIndex());
+        }
+    } else { // actual entries
             unsigned int idx = used_indices->operator[](i).first;
             SymbolNumber sym = used_indices->operator[](i).second;
             windex_table.append(
-		hfst_ol::TransitionWIndex(
-		    sym,
-		    state_placeholders[idx].first_transition +
-		    state_placeholders[idx].symbol_offset(
-			sym, flag_symbols) + TA_OFFSET));
+        hfst_ol::TransitionWIndex(
+            sym,
+            state_placeholders[idx].first_transition +
+            state_placeholders[idx].symbol_offset(
+            sym, flag_symbols) + TA_OFFSET));
         }
     }
 

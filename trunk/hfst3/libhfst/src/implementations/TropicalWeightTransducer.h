@@ -183,7 +183,7 @@ namespace implementations
          /*bool include_spv=false*/);
 
       static void extract_random_paths
-	(StdVectorFst *t, HfstTwoLevelPaths &results, int max_num);
+    (StdVectorFst *t, HfstTwoLevelPaths &results, int max_num);
 
       static StdVectorFst * compose(StdVectorFst * t1,
                                    StdVectorFst * t2);
@@ -262,7 +262,7 @@ namespace implementations
         (StdVectorFst *t, const std::string &symbol);
       static StringSet get_alphabet(StdVectorFst *t);
       static unsigned int get_symbol_number(StdVectorFst *t, 
-					    const std::string &symbol);
+                        const std::string &symbol);
 
       static NumberNumberMap create_mapping
         (StdVectorFst * t1, StdVectorFst * t2);

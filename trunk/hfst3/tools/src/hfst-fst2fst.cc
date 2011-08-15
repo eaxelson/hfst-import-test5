@@ -103,7 +103,7 @@ parse_options(int argc, char** argv)
           {"log-weight",         no_argument, 0, 'l'},
           {"optimized-lookup",   no_argument, 0, 'O'},
           {"optimized-lookup-weighted",no_argument, 0, 'w'},
-	  {"quick",              no_argument, 0, 'Q'},
+      {"quick",              no_argument, 0, 'Q'},
           {0,0,0,0}
         };
         int option_index = 0;
@@ -146,9 +146,9 @@ parse_options(int argc, char** argv)
         case 'w':
           output_type = hfst::HFST_OLW_TYPE;
           break;
-	case 'Q':
-	    options = "quick";
-	    break;
+    case 'Q':
+        options = "quick";
+        break;
 #include "inc/getopt-cases-error.h"
         }
     }

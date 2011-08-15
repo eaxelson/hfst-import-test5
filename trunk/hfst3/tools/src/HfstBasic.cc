@@ -40,8 +40,8 @@ namespace hfst {
     for( int i=0; i<size; i++ ) {
       int c=fgetc(file);
       if (c == EOF || c == 0) {
-	buffer[i] = 0;
-	return (c==0);
+    buffer[i] = 0;
+    return (c==0);
       }
       buffer[i] = (char)c;
     }
@@ -64,9 +64,9 @@ namespace hfst {
     if (Switch_Bytes) {
       size_t e=n/2;
       for( size_t i=0; i<e; i++ ) {
-	char tmp=pp[i];
-	pp[i] = pp[--n];
-	pp[n] = tmp;
+    char tmp=pp[i];
+    pp[i] = pp[--n];
+    pp[n] = tmp;
       }
     }
     return result;
