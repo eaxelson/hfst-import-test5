@@ -741,7 +741,7 @@ namespace hfst { namespace implementations {
 
   static bool extract_paths
   (Transducer * t, Node *node,
-   Node2Int &all_visitations, Node2Int &path_visitations,
+   HfstNode2Int &all_visitations, HfstNode2Int &path_visitations,
    hfst::ExtractStringsCb& callback, int cycles,
    std::vector<hfst::FdState<Character> >* fd_state_stack, bool filter_fd,
    StringPairVector &spv)
@@ -841,8 +841,8 @@ namespace hfst { namespace implementations {
     if(!t->root_node())
       return;
     
-    Node2Int all_visitations;
-    Node2Int path_visitations;
+    HfstNode2Int all_visitations;
+    HfstNode2Int path_visitations;
     vector<hfst::FdState<Character> >* fd_state_stack = 
       (fd==NULL) ? NULL : 
       new std::vector<hfst::FdState<Character> >
@@ -866,8 +866,17 @@ namespace hfst { namespace implementations {
        transducer \a t so far. */
     int last_index=0;
 
-    NodeNumbering num(*t); // NODE_NUMBERING
-    unsigned int number_of_nodes = num.number_of_nodes(); // NODE_NUMBERING
+    // OLD...
+#ifdef FOO
+    NodeNumbering num(*t);
+    unsigned int number_of_nodes = num.number_of_nodes();
+#endif
+    // ...END OF OLD
+    // NEW...
+    std::vector<SFST::Node*> indexing;
+    t->nodeindexing(&indexing);
+    unsigned int number_of_nodes = (unsigned int)indexing.size();
+    // ...END OF NEW
 
     /* Whether a state has been visited. */
     std::vector<int> visited;
@@ -886,7 +895,7 @@ namespace hfst { namespace implementations {
 
     while (1) {
 
-      visited[ num[current_t_node] ] = 1; // NODE_NUMBERING
+      visited[ current_t_node->index ] = 1; // NODE_NUMBERING
       
       vector<Arc> t_transitions;
       for ( ArcsIter it( current_t_node->arcs() ); it; it++) {
@@ -895,7 +904,7 @@ namespace hfst { namespace implementations {
       
       /* If we cannot proceed, return the longest path so far. */
       // NODE_NUMBERING
-      if (t_transitions.empty() || broken[num[current_t_node]]) {
+      if (t_transitions.empty() || broken[current_t_node->index]) {
     for (int i=(int)path.second.size()-1; i>=last_index; i--) {
       path.second.pop_back(); 
     }
@@ -933,15 +942,15 @@ namespace hfst { namespace implementations {
 
     /* Give more probability for shorter paths. */
     // NODE_NUMBERING
-    if ( broken[ num[ t_target ] ] == 0 ) {
-      if ( visited[ num[ t_target ] ] == 1 ) 
+    if ( broken[ t_target->index ] == 0 ) {
+      if ( visited[ t_target->index ] == 1 ) 
         if ( (rand() % 4) == 0 )
-          broken[ num[ t_target ] ] = 1;
+          broken[ t_target->index ] = 1;
     }
     
-    if ( visited[ num[ t_target ] ] == 1 ) { 
+    if ( visited[ t_target->index ] == 1 ) { 
       if ( (rand() % 4) == 0 )
-        broken[ num[ t_target ] ] = 1;
+        broken[ t_target->index ] = 1;
     }
 
     /* Proceed to the target state. */
