@@ -1672,6 +1672,15 @@ SFST manual</a>. */
                                   	 StringPairSet		&alphabet);
 
     /** \brief Inversion of the replace_up and the result needs to be composed on the upper side
+       * 	 of the input language. However, matching is done on the output side of \a mapping
+       *
+       * 	 @see replace_up */
+    HfstTransducer left_replace_down_karttunen(	HfstTransducerPair	&context,
+    										HfstTransducer		&mapping,
+    										bool 				optional,
+    										StringPairSet		&alphabet);
+
+    /** \brief Inversion of the replace_up and the result needs to be composed on the upper side
      * 	 of the input language. However, left context matching is done on the input side of \a mapping
      *   and right context on the output side of \a mapping.
      *
