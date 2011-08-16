@@ -57,8 +57,7 @@ Compilation requirements:
     <http://foma.sf.net>`_
 
   - the foma library version 0.9.14alpha or newer must be installed in the
-    running system. MacOSX note: only the source tarball compiles, the svn
-    version does not compile.
+    running system.
 
   - foma requires editline, termcap and zlib libraries to compile, check foma
     site for details
@@ -98,7 +97,7 @@ Compilation requirements:
  - GNU tool-chain is also needed with distributed packages if the user wishes to
    modify Makefile.am or configure.ac files.
 
- - Mac OS X users are advised to use Darwin Ports; Mac OS X 10.6 with
+ - Mac OS X users are advised to use MacPorts; Mac OS X 10.6 with
    XCode 2.3.2 at least is not sufficient
 
 - Versions loaded from version control system may require parser generator 
