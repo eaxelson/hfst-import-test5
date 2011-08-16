@@ -2412,7 +2412,7 @@ HfstTransducer &HfstTransducer::priority_union (const HfstTransducer &another)
 
 }
 
-HfstTransducer HfstTransducer::universal_pair ( ImplementationType type )
+HfstTransducer HfstTransducer::universal_pair( ImplementationType type )
 {
     using namespace implementations;
     HfstBasicTransducer bt;
