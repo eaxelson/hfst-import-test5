@@ -322,8 +322,8 @@ openfst source directory.  Depending on your operation system you may also need
 to execute something like ``ldconfig``, consult your operation system's manual
 for further information.
 
-If you do not wish to use the non-obligatory openfst library backend with HFST you
-can disable it by using the command line switch --without-sfst to 
+If you do not wish to use the non-obligatory openfst library backend with HFST
+you can disable it by using the command line switch --without-sfst to 
 configure. This will, however, result in loss of all weighted finite-state
 technology at the moment, as OpenFst is the only weighted FST library we use.
 
@@ -371,13 +371,13 @@ cat: hvVqf:o:l:u:: No such file or directory
   cat: --: No such file or directory
 
 indicate that script is trying to use Mac OS X's getopt as if it was GNU getopt.
-However default getopt in Mac OS X does not work at all. like GNU getopt.
-Easiest solution is to install working getopt e.g. by using MacPorts::
+However default getopt in Mac OS X does not work at all like GNU getopt.
+Easiest solution is to install working getopt, e.g. by using MacPorts::
 
   sudo port install getopt
 
 The newer versions of bash scripts detect Mac OS X's getopt and fallback to
-using getopts. Note that getopts does not support long options or and filenames
+using getopts. Note that getopts does not support long options and filenames
 must be last parameters on commandline with it, so its use is strongly
 discouraged.
 
