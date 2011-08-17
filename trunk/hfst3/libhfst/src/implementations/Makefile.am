@@ -66,6 +66,7 @@ libhfstimplementations_la_SOURCES=$(IMPLEMENTATION_SRCS) $(BRIDGE_SRCS) \
 # headers of implementation bridge to reveal to public
 hfstincludedir = $(includedir)/hfst
 implincludedir = $(hfstincludedir)/implementations
+compisectincludedir = $(implincludedir)/compose_intersect
 
 implinclude_HEADERS = \
 		ConvertTransducerFormat.h \
@@ -81,6 +82,14 @@ implinclude_HEADERS = \
 		compose_intersect/ComposeIntersectRule.h \
 		compose_intersect/ComposeIntersectFst.h \
 		compose_intersect/ComposeIntersectUtilities.h
+
+compisectinclude_HEADERS=\
+		compose_intersect/ComposeIntersectRulePair.h \
+		compose_intersect/ComposeIntersectLexicon.h \
+		compose_intersect/ComposeIntersectRule.h \
+		compose_intersect/ComposeIntersectFst.h \
+		compose_intersect/ComposeIntersectUtilities.h
+
 
 ### Add here your library ###
 #		MyTransducerLibraryTransducer.h
