@@ -1,6 +1,13 @@
 #ifndef HEADER_COMPOSE_INTERSECT_UTILITIES_H
 #define HEADER_COMPOSE_INTERSECT_UTILITIES_H
 
+#if HAVE_CONFIG_H
+#  include <config.h>
+#  ifndef HAVE_MALLOC
+#    error "your configure failed to find malloc, check README for further instructions"
+#  endif
+#endif
+
 #include <vector>
 #include <algorithm>
 #include <utility>
@@ -65,7 +72,7 @@ namespace hfst
       bool has_element(const X &x) const
       { return find(x) != end(); }
 
-      size_t size(void)
+      size_t size(void) const
       { return container_.size(); }
 
     protected:
