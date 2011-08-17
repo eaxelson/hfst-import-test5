@@ -4,9 +4,9 @@
 #include <set>
 #include <map>
 
+#include "ComposeIntersectUtilities.h"
 #include "../../HfstExceptionDefs.h"
 #include "../HfstTransitionGraph.h"
-#include "ComposeIntersectUtilities.h"
 
 HFST_EXCEPTION_CHILD_DECLARATION(StateNotDefined);
 
@@ -19,15 +19,15 @@ namespace hfst
     public:      
       struct Transition
       {
-    size_t ilabel;
-    size_t olabel;
-    float weight;
-    HfstState target;
-    Transition(const HfstBasicTransition &);
-    Transition(HfstState,size_t,size_t,float);
-    bool operator==(const Transition&) const;
+	size_t ilabel;
+	size_t olabel;
+	float weight;
+	HfstState target;
+	Transition(const HfstBasicTransition &);
+	Transition(HfstState,size_t,size_t,float);
+	bool operator==(const Transition&) const;
       };
-
+      
       struct CompareTransitions
       {
     bool operator() (const Transition &transition1,
@@ -57,6 +57,7 @@ namespace hfst
       Transition get_identity_transition(HfstState);
       bool has_identity_transition(HfstState);
       bool is_known_symbol(size_t) const;
+      size_t get_symbol_number(const std::string &symbol);
       HfstBasicTransducer t;
       SymbolSet symbol_set;
       TransitionMapVector transition_map_vector;

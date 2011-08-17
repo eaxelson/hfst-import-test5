@@ -137,6 +137,9 @@ namespace hfst
       return finality_vector.at(s);
     }
 
+    size_t ComposeIntersectFst::get_symbol_number(const std::string &symbol)
+    { return HfstTropicalTransducerTransitionData::get_number(symbol); }
+
     const ComposeIntersectFst::TransitionSet 
     &ComposeIntersectFst::get_transitions
     (HfstState s,size_t symbol) 
