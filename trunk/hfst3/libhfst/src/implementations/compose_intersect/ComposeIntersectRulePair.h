@@ -24,7 +24,7 @@ namespace hfst
       
       ~ComposeIntersectRulePair(void);
 
-      const TransitionSet &get_transitions(HfstState,size_t);
+      virtual const TransitionSet &get_transitions(HfstState,size_t);
 
       float get_final_weight(HfstState) const;
 
