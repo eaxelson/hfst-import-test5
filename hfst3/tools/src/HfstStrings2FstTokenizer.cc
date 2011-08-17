@@ -118,11 +118,14 @@ StringPairVector HfstStrings2FstTokenizer::make_pair_vector
   StringVector::const_iterator output_it = output.begin();
   while (input_it != input.end() and output_it != output.end())
     { 
+      std::string input_symbol = unescape(*input_it);
+      std::string output_symbol = unescape(*output_it);
+
       spv.push_back
-    (StringPair(input_it->empty() or *input_it == eps ? 
-            EPSILON_SYMBOL : unescape(*input_it),
-            output_it->empty() or *output_it == eps ? 
-            EPSILON_SYMBOL : unescape(*output_it))); 
+	(StringPair(input_symbol.empty() or input_symbol == eps ? 
+		    EPSILON_SYMBOL : input_symbol,
+		    output_symbol.empty() or output_symbol == eps ? 
+		    EPSILON_SYMBOL : output_symbol)); 
       ++input_it;
       ++output_it;
     }
