@@ -131,8 +131,8 @@ print_usage()
         "Option --log precedes option --norm.\n"
         "The FILE of option -m lists all multichar-symbols, each symbol\n"
         "on its own line.\n"   
-        "The backslash '\\' is reserved for escaping a colon (\"\\:\"), \n"
-        "a space (\"\\ \") or a backslash (\"\\\\\").\n"
+        "Backslash '\\' may be used to escape ':', tab and itself. For any\n"
+        "other symbol x '\\x' means x literally, i.e. is the same as 'x'.\n"
         "The weight of a string can be given after the string separated\n"
         "by a tabulator.\n"
         "\n"
@@ -307,6 +307,12 @@ process_stream(HfstOutputStream& outstream)
                  line);              
             }
         }
+      catch (const IncorrectUtf8CodingException &e)
+	{
+	  error
+	    (EXIT_FAILURE, errno,
+	     "Input string \"%s\" is not valid utf-8.",line);
+	}
       // Handle the weight
       float path_weight=0;
 
