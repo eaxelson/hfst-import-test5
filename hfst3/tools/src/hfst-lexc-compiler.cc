@@ -67,8 +67,9 @@ print_usage()
         fprintf(message_out,
                 "If INFILE or OUTFILE are omitted or -, standard streams will "
                 "be used\n"
-                "FORMAT must be one of supported transducer formats, such as "
-                "openfst-tropical, sfst, foma, etc.\n");
+		"The possible values for FORMAT are { sfst, openfst-tropical, "
+		"openfst-log,\n"
+       	"foma, optimized-lookup-unweighted, optimized-lookup-weighted }.\n");
         fprintf(message_out,
             "\n"
             "Examples:\n"
@@ -184,7 +185,7 @@ lexc_streams(LexcCompiler& lexc, HfstOutputStream& outstream)
 
 
 int main( int argc, char **argv ) {
-    hfst_set_program_name(argv[0], "0.1", "HfstLexcCompiler");
+    hfst_set_program_name(argv[0], "0.1", "HfstLexc2Fst");
     int retval = parse_options(argc, argv);
     if (retval != EXIT_CONTINUE)
     {

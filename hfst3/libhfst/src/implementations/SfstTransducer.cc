@@ -866,17 +866,9 @@ namespace hfst { namespace implementations {
        transducer \a t so far. */
     int last_index=0;
 
-    // OLD...
-#ifdef FOO
-    NodeNumbering num(*t);
-    unsigned int number_of_nodes = num.number_of_nodes();
-#endif
-    // ...END OF OLD
-    // NEW...
     std::vector<SFST::Node*> indexing;
     t->nodeindexing(&indexing);
     unsigned int number_of_nodes = (unsigned int)indexing.size();
-    // ...END OF NEW
 
     /* Whether a state has been visited. */
     std::vector<int> visited;

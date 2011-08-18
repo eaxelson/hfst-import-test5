@@ -102,12 +102,8 @@ namespace implementations {
       (const hfst::HfstTransducer &t);
 
 #if HAVE_SFST
-    // NODE_NUMBERING
   static void sfst_to_hfst_basic_transducer
     ( SFST::Node *node, 
-#ifdef FOO
-      SFST::NodeNumbering &index, 
-#endif
       HfstBasicTransducer *net, SFST::Alphabet &alphabet);
 
   static HfstBasicTransducer * sfst_to_hfst_basic_transducer
@@ -116,12 +112,8 @@ namespace implementations {
   static SFST::Transducer * hfst_basic_transducer_to_sfst
     (const HfstBasicTransducer * t);
 
-    // NODE_NUMBERING
   static void sfst_to_hfst_fast_transducer
     ( SFST::Node *node, 
-#ifdef FOO
-      SFST::NodeNumbering &index, 
-#endif
       HfstFastTransducer *net, NumberVector &harmonization_vector);
 
   static HfstFastTransducer * sfst_to_hfst_fast_transducer
@@ -130,12 +122,8 @@ namespace implementations {
   static SFST::Transducer * hfst_fast_transducer_to_sfst
     (const HfstFastTransducer * t);
 
-    // NODE_NUMBERING
   static void sfst_to_hfst_constant_transducer
     ( SFST::Node *node, 
-#ifdef FOO
-      SFST::NodeNumbering &index, 
-#endif
       HfstConstantTransducer *net);
 
   static HfstConstantTransducer * sfst_to_hfst_constant_transducer

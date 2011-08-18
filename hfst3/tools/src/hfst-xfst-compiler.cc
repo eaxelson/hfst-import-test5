@@ -66,8 +66,9 @@ print_usage()
         fprintf(message_out,
                 "If INFILE or OUTFILE are omitted or -, standard streams will "
                 "be used\n"
-                "FORMAT must be one of supported transducer formats, such as "
-                "openfst-tropical, sfst, foma, etc.\n");
+		"The possible values for FORMAT are { sfst, openfst-tropical, "
+		"openfst-log,\n"
+		"foma, optimized-lookup-unweighted, optimized-lookup-weighted }.\n"
         fprintf(message_out,
             "\n"
             "Examples:\n"

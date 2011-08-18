@@ -687,7 +687,10 @@ set_program_name(const char* argv0)
             argv0 = base + 3;
           }
       }
-    program_name = hfst_strdup(argv0);
+    if (strcmp(argv0, "hfst-calculate") == 0)
+      program_name = hfst_strdup("hfst-sfstpl2fst");
+    else
+      program_name = hfst_strdup(argv0);
   }
 #endif
 

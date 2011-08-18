@@ -1279,7 +1279,7 @@ namespace hfst { namespace implementations
   (LogFst * t)
   {
     RmEpsilon<LogArc>(t);
-    EncodeMapper<LogArc> encode_mapper(kEncodeLabels|kEncodeWeights,ENCODE);
+    EncodeMapper<LogArc> encode_mapper(kEncodeLabels/*|kEncodeWeights*/,ENCODE);
     Encode(t, &encode_mapper);
     LogFst * det = new LogFst();
     Determinize<LogArc>(*t, det);
