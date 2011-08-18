@@ -268,22 +268,13 @@ void warn2(const char *text, char *text2)  // HFST: added const
 
 /* print_usage */
 
-/*void print_usage(FILE *file) {
-    fprintf(file,"\nUsage: %s [options] infile outfile\n", "hfst-calculate");
-    fprintf(file,"\nOPTIONS:\n");
-    fprintf(file,"-c\tStore the transducer in fst-infl2 format.\n");
-    fprintf(file,"-l\tStore the transducer in fst-infl3 format.\n");
-    fprintf(file,"-s\tSwitch the upper and lower levels producing a transducer for generation rather than recognition.\n");
-    fprintf(file,"-q\tquiet mode\n\n");  
-}*/
-
 void
 print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
-    fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
+    fprintf(message_out, "Usage: %s %s [OPTIONS...] [INFILE]\n"
         "Compile a file written with SFST programming language into a transducer.\n"
-        "\n", program_name); 
+        "\n", program_name, "(alias hfst-calculate)"); 
         print_common_program_options(message_out);
 	fprintf(message_out, "Input/Output options:\n"
                 "  -i, --input=INFILE     Read input from INFILE\n"
@@ -399,7 +390,7 @@ void get_flags( int *argc, char **argv )
       exit(0);
     }
     else if (strcmp(argv[i],"-v") == 0 || strcmp(argv[i],"--version") == 0) {
-      fprintf(stdout, "hfst-calculate 0.1 (hfst 3.0)\n");
+      fprintf(stdout, "hfst-sfstpl2fst 0.1 (hfst 3.0)\n");
       exit(0);
     }
     else if (strcmp(argv[i],"-s") == 0) {
@@ -444,7 +435,7 @@ int main( int argc, char *argv[] )
 {
   //FILE *file;
 
-  hfst_set_program_name(argv[0], "0.1", "HfstCalculate");
+  hfst_set_program_name(argv[0], "0.1", "HfstSfstPl2Fst");
   int retval = parse_options(argc, argv);
   if (retval != EXIT_CONTINUE)
     return retval;

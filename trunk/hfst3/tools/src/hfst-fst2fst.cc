@@ -66,9 +66,9 @@ print_usage()
     "  -b, --use-backend-format          Write result in implementation format, without any HFST wrappers\n"
     "  -S, --sfst                        Write output in (HFST's) SFST implementation\n"
     "  -F, --foma                        Write output in (HFST's) foma implementation\n"
-    "  -t, --tropical-weight             Write output in (HFST's) tropical weight (OpenFST) implementation\n"
-    "  -l, --log-weight                  Write output in (HFST's) log weight (OpenFST) implementation\n"
-    "  -O, --optimized-lookup            Write output in the HFST optimized-lookup implementation\n"
+    "  -t, --openfst-tropical            Write output in (HFST's) tropical weight (OpenFST) implementation\n"
+    "  -l, --openfst-log                 Write output in (HFST's) log weight (OpenFST) implementation\n"
+    "  -O, --optimized-lookup-unweighted Write output in the HFST optimized-lookup implementation\n"
     "  -w, --optimized-lookup-weighted   Write output in optimized-lookup (weighted) implementation\n"
     "  -Q  --quick                       When converting to optimized-lookup, don't try hard to compress\n");
     fprintf(message_out, "\n");
@@ -99,9 +99,9 @@ parse_options(int argc, char** argv)
           {"format",       required_argument, 0, 'f'},
           {"sfst",               no_argument, 0, 'S'},
           {"foma",               no_argument, 0, 'F'},
-          {"tropical-weight",    no_argument, 0, 't'},
-          {"log-weight",         no_argument, 0, 'l'},
-          {"optimized-lookup",   no_argument, 0, 'O'},
+          {"openfst-tropical",    no_argument, 0, 't'},
+          {"openfst-log",         no_argument, 0, 'l'},
+          {"optimized-lookup-unweighted",   no_argument, 0, 'O'},
           {"optimized-lookup-weighted",no_argument, 0, 'w'},
       {"quick",              no_argument, 0, 'Q'},
           {0,0,0,0}

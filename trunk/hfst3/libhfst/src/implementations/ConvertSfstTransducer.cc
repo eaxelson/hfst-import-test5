@@ -45,13 +45,10 @@ namespace hfst { namespace implementations
      @param net  The HfstBasicTransducer that is being created
      @param alphabet  The alphabet of the SFST transducer
   */
-    // NODE_NUMBERING
+
   void ConversionFunctions::
   sfst_to_hfst_basic_transducer
   ( SFST::Node *node, 
-#ifdef FOO
-    SFST::NodeNumbering &index, 
-#endif
     HfstBasicTransducer *net, SFST::Alphabet &alphabet ) {
   
     // If node has not been visited before
@@ -64,7 +61,7 @@ namespace hfst { namespace implementations
       for( SFST::ArcsIter p(arcs); p; p++ ) {
     number_of_arcs++;
       }
-      // NODE_NUMBERING
+
       net->initialize_transition_vector(node->index, number_of_arcs);
 
       // Go through all transitions and copy them to \a net
@@ -96,7 +93,6 @@ namespace hfst { namespace implementations
           ostring = std::string(internal_epsilon);
         }
 
-    // NODE_NUMBERING
         net->add_transition(node->index, 
                             HfstBasicTransition
                             (arc->target_node()->index,
@@ -105,18 +101,16 @@ namespace hfst { namespace implementations
                              0));
       }
 
-      if (node->is_final())     // NODE_NUMBERING
+      if (node->is_final()) {
         net->set_final_weight(node->index,0);
+      }
 
       // Call this function recursively for all target nodes
       // of the transitions
       for( SFST::ArcsIter p(arcs); p; p++ ) {
         SFST::Arc *arc=p;
         sfst_to_hfst_basic_transducer(arc->target_node(), 
-#ifdef FOO
-                      index,  
-#endif
-                      net, alphabet);
+				      net, alphabet);
       }
     }
   }
@@ -144,20 +138,11 @@ namespace hfst { namespace implementations
     HfstBasicTransducer * net = new HfstBasicTransducer();
     net->initialize_state_vector(number_of_nodes);
     
-#ifdef FOO
-    // A map that maps nodes to integers
-    SFST::NodeNumbering index(*t);     // NODE_NUMBERING
-#endif
-
     if (t->root_node()->check_visited(VMARK))
       VMARK++;
    
     sfst_to_hfst_basic_transducer
       (t->root_node(), 
-#ifdef FOO
-       index,
-#endif
-       //visited_nodes,
        net, t->alphabet);
     
     // Make sure that also symbols that occur in the alphabet of the
@@ -262,13 +247,10 @@ namespace hfst { namespace implementations
      @param visited_nodes  Which nodes have already been visited
      @param net  The HfstFastTransducer that is being created
   */
-    // NODE_NUMBERING
+
   void ConversionFunctions::
   sfst_to_hfst_fast_transducer
   ( SFST::Node *node, 
-#ifdef FOO
-    SFST::NodeNumbering &index,
-#endif 
     HfstFastTransducer *net, NumberVector &harmonization_vector) {
   
     // If node has not been visited before
@@ -281,7 +263,7 @@ namespace hfst { namespace implementations
       for( SFST::ArcsIter p(arcs); p; p++ ) {
     number_of_arcs++;
       }
-      // NODE_NUMBERING
+
       net->initialize_transition_vector(node->index, number_of_arcs);
 
       // Go through all transitions and copy them to \a net
@@ -302,27 +284,24 @@ namespace hfst { namespace implementations
         assert(false);
       }
 
-    // NODE_NUMBERING
-        net->add_transition(node->index, 
-                            HfstFastTransition
-                            (arc->target_node()->index,
-                             in,
-                 out,
-                             0));
+    net->add_transition(node->index, 
+			HfstFastTransition
+			(arc->target_node()->index,
+			 in,
+			 out,
+			 0));
       }
 
-      if (node->is_final())     // NODE_NUMBERING
+      if (node->is_final()) {
         net->set_final_weight(node->index,0);
+      }
 
       // Call this function recursively for all target nodes
       // of the transitions
       for( SFST::ArcsIter p(arcs); p; p++ ) {
         SFST::Arc *arc=p;
         sfst_to_hfst_fast_transducer(arc->target_node(), 
-#ifdef FOO
-                     index, 
-#endif
-                      net, harmonization_vector);
+				     net, harmonization_vector);
       }
     }
   }
@@ -360,19 +339,11 @@ namespace hfst { namespace implementations
     NumberVector harmonization_vector 
       = get_harmonization_vector(coding_vector);
 
-#ifdef FOO
-    // A map that maps nodes to integers
-    SFST::NodeNumbering index(*t);     // NODE_NUMBERING
-#endif
-
     if (t->root_node()->check_visited(VMARK))
       VMARK++;
    
     sfst_to_hfst_fast_transducer
       (t->root_node(), 
-#ifdef FOO
-       index,
-#endif 
        net, harmonization_vector);
     
     return net;
@@ -450,35 +421,28 @@ namespace hfst { namespace implementations
 
   // *** THE NEW FUNCTIONS ***
 
-    // NODE_NUMBERING
   void ConversionFunctions::sfst_to_hfst_constant_transducer
   ( SFST::Node *node, 
-#ifdef FOO
-    SFST::NodeNumbering &index,
- #endif
-    /*std::set<SFST::Node*> &visited_nodes,*/ 
     HfstConstantTransducer *net)
   {
     // If node has not been visited before
-    //if (visited_nodes.find(node) == visited_nodes.end() ) { 
     if (not node->was_visited(VMARK)) {
-      //visited_nodes.insert(node);
-      SFST::Arcs *arcs=node->arcs();
 
+      SFST::Arcs *arcs=node->arcs();
+      
       // Count the number of nodes and initialize the transition
       // vector of net.
       unsigned int number_of_arcs=0;
       for( SFST::ArcsIter p(arcs); p; p++ ) {
-    number_of_arcs++;
+	number_of_arcs++;
       }
-      // NODE_NUMBERING
+
       net->initialize_transition_vector(node->index, number_of_arcs);
       
       // Go through all transitions and copy them to \a net
       for( SFST::ArcsIter p(arcs); p; p++ ) {
         SFST::Arc *arc=p;
 
-    // NODE_NUMBERING
         net->add_transition(node->index, 
                             arc->target_node()->index,
                 arc->label().lower_char(),
@@ -486,7 +450,7 @@ namespace hfst { namespace implementations
                 0);
       }
       
-      if (node->is_final()) {     // NODE_NUMBERING
+      if (node->is_final()) {
         net->set_final_weight(node->index,0);
       }
 
@@ -495,11 +459,7 @@ namespace hfst { namespace implementations
       for( SFST::ArcsIter p(arcs); p; p++ ) {
         SFST::Arc *arc=p;
         sfst_to_hfst_constant_transducer
-      (arc->target_node(), 
-#ifdef FOO
-       index, 
-#endif
-       net);
+      (arc->target_node(), net);
       }
     }    
   }
@@ -507,12 +467,6 @@ namespace hfst { namespace implementations
   HfstConstantTransducer * ConversionFunctions::sfst_to_hfst_constant_transducer
   (SFST::Transducer * t)
   {
-#ifdef FOO
-    // A map that maps nodes to integers
-    SFST::NodeNumbering index(*t);     // NODE_NUMBERING
-    HfstConstantTransducer * net 
-      = new HfstConstantTransducer((unsigned int)index.number_of_nodes());
-#endif
     std::vector<SFST::Node*> indexing;
     t->nodeindexing(&indexing);
     unsigned int number_of_nodes = (unsigned int)indexing.size();
@@ -534,11 +488,7 @@ namespace hfst { namespace implementations
       VMARK++;
 
     sfst_to_hfst_constant_transducer
-      (t->root_node(), 
-#ifdef FOO
-       index,
-#endif 
-       net);
+      (t->root_node(), net);
 
     return net;
   }
