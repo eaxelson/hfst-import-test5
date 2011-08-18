@@ -34,6 +34,7 @@
 
 using std::map;
 using std::string;
+using std::set;
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
