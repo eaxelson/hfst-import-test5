@@ -2320,7 +2320,7 @@ HfstTransducer &HfstTransducer::compose
     #if HAVE_HFSTOL
     case HFST_OL_TYPE:
     case HFST_OLW_TYPE:
-	HFST_THROW(TransducerMismatchException);
+	HFST_THROW(HfstTransducerTypeMismatchException);
 	// This is the exception the tool wants to hear
     #endif
     case ERROR_TYPE:
