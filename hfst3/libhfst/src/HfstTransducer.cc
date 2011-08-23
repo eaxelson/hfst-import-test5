@@ -2456,6 +2456,7 @@ HfstTransducer &HfstTransducer::compose_intersect
     // If rule transducers contain word boundaries, add word boundaries to 
     // the lexicon unless the lexicon already contains them. 
     std::set<std::string> rule_alphabet = first.get_alphabet();
+
     bool remove_word_boundary = false;
     if (rule_alphabet.find("@#@") != rule_alphabet.end())
     { 
@@ -2738,7 +2739,7 @@ convert_to_basic_transducer()
         hfst::implementations::HfstBasicTransducer * net = 
       ConversionFunctions::foma_to_hfst_basic_transducer
       (implementation.foma);
-        delete implementation.foma;
+        free(implementation.foma);
     return net;
       }
 #endif
@@ -3165,7 +3166,7 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
     {
 #if HAVE_FOMA
     case FOMA_TYPE:
-    delete implementation.foma;
+      free(implementation.foma);
     break;
 #endif
 #if HAVE_SFST
