@@ -110,7 +110,7 @@ class HfstBot(irc.IRCClient):
         # Otherwise check to see if it is a message directed at me
         if msg.startswith(self.nickname):
             msg = msg[len(self.nickname) + 1:].strip().split(' ')[0].strip()
-            replyprefix = "%s: " % user
+            replyprefix = "%s: " % user.split('!')[0]
             analysis_results = self.analyzer.analyze(msg)
             if len(analysis_results) == 0:
                 self.notice(user, "I don't know that word!")
