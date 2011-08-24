@@ -49,6 +49,14 @@ using hfst::StringPair;
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
 
+// Added this to accommodate checking for SFST to handle foma better;
+// SH 24.8.2011
+#if HAVE_CONFIG_H
+#include "config.h"
+#else
+#define HAVE_SFST 0
+#endif
+
 static char* from_label = 0;
 static StringPair* from_pair = 0;
 static char* from_file_name = 0;
@@ -517,6 +525,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 	bool got_foma = false;
       transducer_n++;
       HfstTransducer trans(instream);
+#if HAVE_SFST
       if (trans.get_type() == hfst::FOMA_TYPE) {
 	  warning(0, 0, "NB: substitution for foma transducers will be done "
 		  "via conversion to\n"
@@ -524,6 +533,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 	  got_foma = true;
 	  trans = trans.convert(hfst::SFST_TYPE);
       }
+#endif
       char* inputname = strdup(trans.get_name().c_str());
       if (strlen(inputname) <= 0)
         {
@@ -690,9 +700,11 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
       fallback = new HfstBasicTransducer(trans);
       fallback->prune_alphabet();
       trans = HfstTransducer(*fallback, trans.get_type());
+#if HAVE_SFST
       if (got_foma) {
 	  trans = trans.convert(hfst::FOMA_TYPE);
       }
+#endif
       outstream << trans;
       delete fallback;
       free(inputname);
