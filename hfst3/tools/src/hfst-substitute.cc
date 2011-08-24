@@ -510,8 +510,8 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
   while (instream.is_good())
     {
 	// SH 24.8.2011:
-	// for some reason converting between foma and basic transducer for
-	// alphabet pruning can leak lots and lots of space.
+	// for some reason converting between foma and basic transducer
+	// for substitution can leak lots and lots of space.
 	// For this reason we currently do substitution in sfst and finally
 	// convert back to foma.
 	bool got_foma = false;
