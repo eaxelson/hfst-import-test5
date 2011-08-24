@@ -414,7 +414,6 @@ do_substitute(HfstTransducer& trans, size_t transducer_n)
             }
           trans.substitute(from_label, to_label);
         }
-
     }
   else if (from_pair && to_transducer)
     {
@@ -491,8 +490,6 @@ perform_delayed(HfstTransducer& trans)
 int
 process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 {
-  //instream.open();
-  //outstream.open();
   size_t transducer_n = 0;
   HfstTransducer* to_transducer = NULL;
   if (to_transducer_filename)
@@ -677,9 +674,22 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 
         }
       delete fallback;
+      // SH 24.8.2011:
+      // for some reason converting between foma and basic transducer for
+      // alphabet pruning can leak lots and lots of space.
+      // For this reason we currently do substitution in sfst and finally
+      // convert back to foma.
+      bool got_foma = false;
+      if (trans.get_type() == hfst::FOMA_TYPE) {
+	  got_foma = true;
+	  trans = trans.convert(hfst::SFST_TYPE);
+      }
       fallback = new HfstBasicTransducer(trans);
       fallback->prune_alphabet();
       trans = HfstTransducer(*fallback, trans.get_type());
+      if (got_foma) {
+	  trans = trans.convert(hfst::FOMA_TYPE);
+      }
       outstream << trans;
       delete fallback;
       free(inputname);
