@@ -509,8 +509,18 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
   bool fellback = false;
   while (instream.is_good())
     {
+	// SH 24.8.2011:
+	// for some reason converting between foma and basic transducer for
+	// alphabet pruning can leak lots and lots of space.
+	// For this reason we currently do substitution in sfst and finally
+	// convert back to foma.
+	bool got_foma = false;
       transducer_n++;
       HfstTransducer trans(instream);
+      if (trans.get_type() == hfst::FOMA_TYPE) {
+	  got_foma = true;
+	  trans = trans.convert(hfst::SFST_TYPE);
+      }
       char* inputname = strdup(trans.get_name().c_str());
       if (strlen(inputname) <= 0)
         {
@@ -674,16 +684,6 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 
         }
       delete fallback;
-      // SH 24.8.2011:
-      // for some reason converting between foma and basic transducer for
-      // alphabet pruning can leak lots and lots of space.
-      // For this reason we currently do substitution in sfst and finally
-      // convert back to foma.
-      bool got_foma = false;
-      if (trans.get_type() == hfst::FOMA_TYPE) {
-	  got_foma = true;
-	  trans = trans.convert(hfst::SFST_TYPE);
-      }
       fallback = new HfstBasicTransducer(trans);
       fallback->prune_alphabet();
       trans = HfstTransducer(*fallback, trans.get_type());
