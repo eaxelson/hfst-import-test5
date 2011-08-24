@@ -518,6 +518,9 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
       transducer_n++;
       HfstTransducer trans(instream);
       if (trans.get_type() == hfst::FOMA_TYPE) {
+	  warning(0, 0, "NB: substitution for foma transducers will be done "
+		  "via conversion to\n"
+		  "SFST and back (if available)\n");
 	  got_foma = true;
 	  trans = trans.convert(hfst::SFST_TYPE);
       }
