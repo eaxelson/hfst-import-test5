@@ -191,7 +191,7 @@ namespace hfst { namespace implementations
     struct fsm_construct_handle *h;
     struct fsm *net;
     char * emptystr = strdup("");
-    h = fsm_construct_init(emptrystr);
+    h = fsm_construct_init(emptystr);
     free(emptystr);
     
     // Go through all states
@@ -258,7 +258,7 @@ namespace hfst { namespace implementations
     assert(alphabet_after == alphabet_before);
 #endif // DEBUG_CONVERSION
 
-    return net;      
+    return net;
   }
 
 
