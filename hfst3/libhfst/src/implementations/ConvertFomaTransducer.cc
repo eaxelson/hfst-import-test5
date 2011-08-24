@@ -190,7 +190,9 @@ namespace hfst { namespace implementations
 
     struct fsm_construct_handle *h;
     struct fsm *net;
-    h = fsm_construct_init(strdup(std::string("").c_str()));
+    char * emptystr = strdup("");
+    h = fsm_construct_init(emptrystr);
+    free(emptystr);
     
     // Go through all states
     unsigned int source_state=0;
