@@ -38,27 +38,27 @@ namespace hfst { namespace implementations
   HfstBasicTransducer * ConversionFunctions::
   tropical_ofst_to_hfst_basic_transducer
   (fst::StdVectorFst * t, bool has_hfst_header) {
-
+    
     const fst::SymbolTable *inputsym = t->InputSymbols();
     const fst::SymbolTable *outputsym = t->OutputSymbols();
-
+    
     /* An HFST tropical transducer always has an input symbol table. */
     if (has_hfst_header && inputsym == NULL) {
       HFST_THROW(MissingOpenFstInputSymbolTableException);
     }
-
-  HfstBasicTransducer * net = new HfstBasicTransducer();
-
-  // An empty transducer
-  if (t->Start() == fst::kNoStateId)
-    {      
-      /* An empty OpenFst transducer does not necessarily have to have
-         an input or output symbol table. */
-      if (inputsym != NULL) {
-        for ( fst::SymbolTableIterator it = 
-                fst::SymbolTableIterator(*(inputsym));
+    
+    HfstBasicTransducer * net = new HfstBasicTransducer();
+  
+    // An empty transducer
+    if (t->Start() == fst::kNoStateId)
+      {      
+	/* An empty OpenFst transducer does not necessarily have to have
+	   an input or output symbol table. */
+	if (inputsym != NULL) {
+	  for ( fst::SymbolTableIterator it = 
+		  fst::SymbolTableIterator(*(inputsym));
               not it.Done(); it.Next() ) {
-      assert(it.Symbol() != "");
+	  assert(it.Symbol() != "");
 
           if (it.Value() != 0) // epsilon is not inserted
             net->alphabet.insert( it.Symbol() );
@@ -176,7 +176,8 @@ namespace hfst { namespace implementations
     if (it.Value() != 0) // epsilon is not inserted
       net->alphabet.insert( it.Symbol() );
       }    
-    
+
+    assert(net != NULL);
     return net;
 }
 
