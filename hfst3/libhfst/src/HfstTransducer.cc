@@ -2418,32 +2418,33 @@ HfstTransducer &HfstTransducer::priority_union (const HfstTransducer &another)
 
 }
 
+
 HfstTransducer HfstTransducer::universal_pair( ImplementationType type )
 {
-    using namespace implementations;
-    HfstBasicTransducer bt;
-    bt.add_transition
-      (0, HfstBasicTransition
-       (1, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
-    bt.add_transition
-      (0, HfstBasicTransition
-       (1, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0) );
-    bt.set_final_weight(1, 0);
+	using namespace implementations;
+	HfstBasicTransducer bt;
+	bt.add_transition(0, HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
+	bt.add_transition(0, HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0) );
+	bt.add_transition(0, HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "@_EPSILON_SYMBOL_@", 0) );
+	bt.add_transition(0, HfstBasicTransition(1, "@_EPSILON_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0) );
+	bt.set_final_weight(1, 0);
 
-    HfstTransducer final(bt, type);
+	HfstTransducer Retval(bt, type);
 
-    bool DEBUG = false;
-    if ( DEBUG )
-        {
-            printf("--un--\n");
-            final.write_in_att_format(stdout, 1);
-        }
-
-    return final;
+    return Retval;
 }
 
+HfstTransducer HfstTransducer::identity_pair( ImplementationType type )
+{
+	using namespace implementations;
+	HfstBasicTransducer bt;
+	bt.add_transition(0, HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
+	bt.set_final_weight(1, 0);
 
+	HfstTransducer Retval(bt, type);
 
+	return Retval;
+}
 
 HfstTransducer &HfstTransducer::compose_intersect
 (const HfstTransducerVector &v)
@@ -3597,20 +3598,24 @@ void universal_pair_test ( ImplementationType type )
     // Result 1 ( a:a .o. universal pair )
     btResult1.add_transition(0, HfstBasicTransition(1, "a", "a", 0) );
     btResult1.add_transition(0, HfstBasicTransition(1, "a", "@_UNKNOWN_SYMBOL_@", 0) );
+    btResult1.add_transition(0, HfstBasicTransition(1, "a", "@_EPSILON_SYMBOL_@",  0) );
     btResult1.set_final_weight(1, 0);
     // Result 2 ( universal pair .o. a:a )
     btResult2.add_transition(0, HfstBasicTransition(1, "a", "a", 0) );
     btResult2.add_transition(0, HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "a", 0) );
+    btResult2.add_transition(0, HfstBasicTransition(1, "@_EPSILON_SYMBOL_@", "a", 0) );
     btResult2.set_final_weight(1, 0);
     // Result 3 ( a:b .o. universal pair )
     btResult3.add_transition(0, HfstBasicTransition(1, "a", "b", 0) );
     btResult3.add_transition(0, HfstBasicTransition(1, "a", "a", 0) );
     btResult3.add_transition(0, HfstBasicTransition(1, "a", "@_UNKNOWN_SYMBOL_@", 0) );
+    btResult3.add_transition(0, HfstBasicTransition(1, "a", "@_EPSILON_SYMBOL_@", 0) );
     btResult3.set_final_weight(1, 0);
     // Result 4 ( universal pair .o. a:b )
     btResult4.add_transition(0, HfstBasicTransition(1, "a", "b", 0) );
     btResult4.add_transition(0, HfstBasicTransition(1, "b", "b", 0) );
     btResult4.add_transition(0, HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "b", 0) );
+    btResult4.add_transition(0, HfstBasicTransition(1, "@_EPSILON_SYMBOL_@", "b", 0) );
     btResult4.set_final_weight(1, 0);
 
     HfstTransducer tr1(bt, type);

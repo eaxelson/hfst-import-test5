@@ -1179,11 +1179,21 @@ ccc : ddd
     /** \brief Create universal pair transducer of \a type.
      *
      *	The transducer has only one state, and it accepts:
-     *	Identity:Identity and Unknown:Unknown
+     *	Identity:Identity, Unknown:Unknown, Unknown:Epsilon and Epsilon:Unknown
      *
      *	Transducer weight is 0.
      */
     static HfstTransducer universal_pair ( ImplementationType type );
+
+    /** \brief Create identity pair transducer of \a type.
+      *
+      *	The transducer has only one state, and it accepts:
+      *	Identity:Identity
+      *
+      *	Transducer weight is 0.
+      */
+    static HfstTransducer identity_pair ( ImplementationType type );
+
 
 
 
