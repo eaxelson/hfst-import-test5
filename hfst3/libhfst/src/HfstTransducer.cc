@@ -2341,6 +2341,73 @@ HfstTransducer &HfstTransducer::compose
     return *this;
 }
 
+
+
+HfstTransducer &HfstTransducer::cross_product( const HfstTransducer &another )
+{
+
+    if ( this->type != another.type )
+    {
+        HFST_THROW_MESSAGE(HfstTransducerTypeMismatchException, "HfstTransducer::cross_product");
+    }
+
+    HfstTransducer automata1(*this);
+    HfstTransducer automata2(another);
+
+	// Check if both input transducers are automata
+	HfstTransducer t1_proj(automata1);
+	t1_proj.input_project();
+	HfstTransducer t2_proj(automata2);
+	t2_proj.input_project();
+	if ( not t1_proj.compare(automata1) || not t2_proj.compare(automata2) )
+	{
+		HFST_THROW(ContextTransducersAreNotAutomataException);
+	}
+
+	// Put MARK all over lower part of automata1 and upper part of automata2,
+	// and then compose them
+	// Also, there should be created padding after strings, on both sides
+
+	automata1.insert_to_alphabet("@_MARK_@");
+	automata2.insert_to_alphabet("@_MARK_@");
+
+	HfstTokenizer TOK;
+	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+	TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
+	TOK.add_multichar_symbol("@_MARK_@");
+
+
+	// EpsilonToMark and MarkToEpsilon are paddings (if strings are not the same size)
+	HfstTransducer UnknownToMark("@_UNKNOWN_SYMBOL_@", "@_MARK_@", TOK, type);
+	HfstTransducer EpsilonToMark("@_EPSILON_SYMBOL_@", "@_MARK_@", TOK, type);
+
+	HfstTransducer MarkToUnknown(UnknownToMark);
+	MarkToUnknown.invert();
+	HfstTransducer MarkToEpsilon(EpsilonToMark);
+	MarkToEpsilon.invert();
+
+	UnknownToMark.repeat_star().minimize();
+	EpsilonToMark.repeat_star().minimize();
+	MarkToUnknown.repeat_star().minimize();
+	MarkToEpsilon.repeat_star().minimize();
+
+	HfstTransducer a1(automata1);
+	a1.compose(UnknownToMark).minimize().concatenate(EpsilonToMark).minimize();
+
+	HfstTransducer b1(MarkToUnknown);
+	b1.compose(automata2).minimize().concatenate(MarkToEpsilon).minimize();
+
+	HfstTransducer retval(a1);
+	retval.compose(b1).minimize();
+
+	retval.remove_from_alphabet("@_MARK_@");
+
+	*this = retval;
+	return *this;
+
+}
+
+
 HfstTransducer &HfstTransducer::priority_union (const HfstTransducer &another)
 {
     bool DEBUG = false;
@@ -2416,34 +2483,6 @@ HfstTransducer &HfstTransducer::priority_union (const HfstTransducer &another)
 
     return *this;
 
-}
-
-
-HfstTransducer HfstTransducer::universal_pair( ImplementationType type )
-{
-	using namespace implementations;
-	HfstBasicTransducer bt;
-	bt.add_transition(0, HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
-	bt.add_transition(0, HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0) );
-	bt.add_transition(0, HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "@_EPSILON_SYMBOL_@", 0) );
-	bt.add_transition(0, HfstBasicTransition(1, "@_EPSILON_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0) );
-	bt.set_final_weight(1, 0);
-
-	HfstTransducer Retval(bt, type);
-
-    return Retval;
-}
-
-HfstTransducer HfstTransducer::identity_pair( ImplementationType type )
-{
-	using namespace implementations;
-	HfstBasicTransducer bt;
-	bt.add_transition(0, HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
-	bt.set_final_weight(1, 0);
-
-	HfstTransducer Retval(bt, type);
-
-	return Retval;
 }
 
 HfstTransducer &HfstTransducer::compose_intersect
@@ -3149,6 +3188,34 @@ HfstTransducer &HfstTransducer::read_in_att_format
 //
 // -----------------------------------------------------------------------
 
+
+HfstTransducer HfstTransducer::universal_pair( ImplementationType type )
+{
+	using namespace implementations;
+	HfstBasicTransducer bt;
+	bt.add_transition(0, HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
+	bt.add_transition(0, HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0) );
+	bt.add_transition(0, HfstBasicTransition(1, "@_UNKNOWN_SYMBOL_@", "@_EPSILON_SYMBOL_@", 0) );
+	bt.add_transition(0, HfstBasicTransition(1, "@_EPSILON_SYMBOL_@", "@_UNKNOWN_SYMBOL_@", 0) );
+	bt.set_final_weight(1, 0);
+
+	HfstTransducer Retval(bt, type);
+
+    return Retval;
+}
+
+HfstTransducer HfstTransducer::identity_pair( ImplementationType type )
+{
+	using namespace implementations;
+	HfstBasicTransducer bt;
+	bt.add_transition(0, HfstBasicTransition(1, "@_IDENTITY_SYMBOL_@", "@_IDENTITY_SYMBOL_@", 0) );
+	bt.set_final_weight(1, 0);
+
+	HfstTransducer Retval(bt, type);
+
+	return Retval;
+}
+
 HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
 {
     // Check for self-assignment.
@@ -3342,7 +3409,107 @@ std::ostream & operator<<
 using namespace hfst;
 using namespace implementations;
 
-// Priority union test function
+// Cross product unit tests
+void cross_product_subtest1( ImplementationType type )
+{
+	HfstTokenizer TOK;
+
+	HfstTransducer tmp1("dog", TOK, type);
+	HfstTransducer tmp2("cat", TOK, type);
+	HfstTransducer input1(tmp1);
+	input1.disjunct(tmp2).minimize();
+
+	HfstTransducer tmp11("chien", TOK, type);
+	HfstTransducer tmp22("chat", TOK, type);
+	HfstTransducer input2(tmp11);
+	input2.disjunct(tmp22).minimize();
+
+
+	HfstTransducer cp(input1);
+	cp.cross_product(input2);
+
+	HfstTransducer r1("cat", "chien", TOK, type);
+	HfstTransducer r2("cat", "chat", TOK, type);
+	HfstTransducer r3("dog", "chien", TOK, type);
+	HfstTransducer r4("dog", "chat", TOK, type);
+	HfstTransducer result(r1);
+	result.disjunct(r2).disjunct(r3).disjunct(r4).minimize();
+
+	assert(cp.compare(result));
+}
+
+void cross_product_subtest2( ImplementationType type )
+{
+	HfstTokenizer TOK;
+	TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
+
+	HfstTransducer input1( HfstTransducer::identity_pair(type) );
+
+	HfstTransducer input2("a", TOK, type);
+
+	HfstTransducer cp(input1);
+	cp.cross_product(input2);
+
+
+	HfstTransducer r1("a", TOK, type);
+	HfstTransducer r2("@_UNKNOWN_SYMBOL_@", "a", TOK, type);
+	HfstTransducer result(r1);
+	result.disjunct(r2).minimize();
+	assert(cp.compare(result));
+}
+
+void cross_product_subtest3( ImplementationType type )
+{
+	HfstTokenizer TOK;
+	TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
+	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+
+	HfstTransducer input1( HfstTransducer::identity_pair(type) );
+	input1.repeat_star().minimize();
+
+	HfstTransducer input2("a", TOK, type);
+
+	HfstTransducer cp(input1);
+	cp.cross_product(input2);
+
+
+	HfstTransducer r1("a", TOK, type);
+	HfstTransducer r2("@_UNKNOWN_SYMBOL_@", "a", TOK, type);
+	HfstTransducer r3("a", "@_EPSILON_SYMBOL_@", TOK, type);
+	HfstTransducer r4("@_UNKNOWN_SYMBOL_@", "@_EPSILON_SYMBOL_@", TOK, type);
+	HfstTransducer r5("@_EPSILON_SYMBOL_@", "a", TOK, type);
+	r3.disjunct(r4).minimize().repeat_star();
+	r1.disjunct(r2).concatenate(r3).minimize();
+
+	HfstTransducer result(r5);
+	result.disjunct(r1).minimize();
+	assert(cp.compare(result));
+}
+void cross_product_subtest4( ImplementationType type )
+{
+
+	HfstTokenizer TOK;
+	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+
+	HfstTransducer input1("b", TOK, type);
+	HfstTransducer input2("a", TOK, type);
+	input2.repeat_star().minimize();
+
+	HfstTransducer cp(input1);
+	cp.cross_product(input2);
+
+	HfstTransducer r1("b", "a", TOK, type);
+	HfstTransducer r2("@_EPSILON_SYMBOL_@", "a", TOK, type);
+	r2.repeat_star().minimize();
+	r1.concatenate(r2);
+	HfstTransducer result("b", "@_EPSILON_SYMBOL_@", TOK, type);
+	result.disjunct(r1).minimize();
+
+	assert(cp.compare(result));
+}
+
+
+// Priority union unit tests
 void priority_union_test ( ImplementationType type )
 {
     HfstBasicTransducer		btEmpty,
@@ -3710,11 +3877,16 @@ int main(int argc, char * argv[])
         HfstTransducer &substitute(const StringPair &symbol_pair,
                        HfstTransducer &transducer);
     
-        // priority union test
+        // priority_union unit tests
         priority_union_test( types[i] );
 
-        // universal test
-        //HfstTransducer un = HfstTransducer::universal_pair( types[i] );
+        // cross_product unit test
+        cross_product_subtest1( types[i] );
+        cross_product_subtest2( types[i] );
+        cross_product_subtest3( types[i] );
+        cross_product_subtest4( types[i] );
+
+        // universal pair unit tests
         universal_pair_test( types[i] );
 
         void insert_freely_missing_flags_from
