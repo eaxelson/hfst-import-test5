@@ -170,19 +170,29 @@ NEGATIVE_RULE_CONTEXTS RULE_VARIABLES
   // If this rule didn't have variables, display it. Otherwise iterate
   // through its variable value combinations and display the rule using the 
   // different combinations.
-  if (rule_variables.empty())
-    { std::cout << rule_symbol_vector.replace_variables(); }
-  else
+  try
     {
-      for (RuleVariables::const_iterator it = rule_variables.begin();
-	   it != rule_variables.end();
-	   ++it)
-	{ 
-	  it.set_values(variable_value_map); 
-	  std::cout << rule_symbol_vector.replace_variables();
+      if (rule_variables.empty())
+	{ std::cout << rule_symbol_vector.replace_variables(); }
+      else
+	{
+	  for (RuleVariables::const_iterator it = rule_variables.begin();
+	       it != rule_variables.end();
+	       ++it)
+	    { 
+	      it.set_values(variable_value_map); 
+	      std::cout << rule_symbol_vector.replace_variables();
+	    }
 	}
     }
-
+  catch (const UnequalSetSize &)
+    {      
+      std::string error
+	("Variable rules with keyword matched have to have equal length "
+	 "variable value lists.");
+      yyerror(error.c_str());
+      exit(1);
+    }
   // Clear all containers, so that we'll be ready to handle the next rule.
   rule_symbol_vector.clear();
   variable_value_map.clear();

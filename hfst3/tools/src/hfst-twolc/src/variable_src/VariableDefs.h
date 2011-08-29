@@ -38,6 +38,9 @@ typedef HandySet<size_t> IndexSet;
 //! @brief Thrown when trying to access an object in an empty container.
 class EmptyContainer {};
 
+//! Thrown when matched keyword is used with sets of unequal sizes.
+class UnequalSetSize {};
+
 //! The different variable block matchers.
 enum Matcher { FREELY,MATCHED,MIXED };
 
