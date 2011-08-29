@@ -1176,6 +1176,18 @@ ccc : ddd
     HfstTransducer &priority_union(const HfstTransducer &another);
 
 
+    /*
+     *	\brief Make cross product of this transducer with \a.
+     *	It pairs every string of this with every string of \a.
+     *
+     *	Both transducers must be automata, i.e. map strings onto themselves.
+     *
+     *	If strings are not the same length, epsilon padding will be added in the end of the shorter string.
+     *
+     */
+    HfstTransducer &cross_product(const HfstTransducer &another);
+
+
     /** \brief Create universal pair transducer of \a type.
      *
      *	The transducer has only one state, and it accepts:
