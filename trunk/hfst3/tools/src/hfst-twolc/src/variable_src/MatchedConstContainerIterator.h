@@ -33,7 +33,26 @@ public ConstContainerIterator<T>
  public:
   //! @brief Construct from super class instance. 
   MatchedConstContainerIterator(const ConstContainerIterator<T> &another)
-    { ConstContainerIterator<T>::operator=(another); };
+    { 
+      ConstContainerIterator<T>::operator=(another); 
+      
+      int set_sizes = 
+	ConstContainerIterator<T>::begin_iterator_vector.size() == 0 ? 
+	0 
+	: 
+	ConstContainerIterator<T>::end_iterator_vector[0] - 
+	ConstContainerIterator<T>::begin_iterator_vector[0];
+
+      for (size_t i = 0; 
+	   i < ConstContainerIterator<T>::begin_iterator_vector.size(); 
+	   ++i)
+	{
+	  if (ConstContainerIterator<T>::end_iterator_vector[i] - 
+	      ConstContainerIterator<T>::begin_iterator_vector[i] 
+	      != set_sizes)
+	    { throw UnequalSetSize(); }
+	}
+    };
 
   //! @brief Increment.
   int operator++(void)
