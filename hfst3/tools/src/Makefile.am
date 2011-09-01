@@ -49,6 +49,9 @@ endif
 if WANT_DUPLICATE
 MAYBE_DUPLICATE=hfst-duplicate
 endif
+if WANT_EDIT_METADATA
+MAYBE_EDIT_METADATA=hfst-edit-metadata
+endif
 if WANT_FORMAT
 MAYBE_FORMAT=hfst-format
 endif
@@ -168,7 +171,7 @@ bin_PROGRAMS= \
 			  $(MAYBE_AFFIX_GUESSIFY) 									\
 			 $(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_CONCATENATE)     \
 			 $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) $(MAYBE_DISJUNCT)   \
-			 $(MAYBE_DUPLICATE)											\
+			 $(MAYBE_DUPLICATE) $(MAYBE_EDIT_METADATA)                  \
 			 $(MAYBE_FORMAT) $(MAYBE_FST2FST) $(MAYBE_FST2STRINGS)      \
 			 $(MAYBE_FST2TXT) $(MAYBE_GREP) $(MAYBE_HEAD) \
 			 $(MAYBE_INVERT)             \
@@ -184,7 +187,8 @@ bin_PROGRAMS= \
 			 $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME) $(MAYBE_PAIR_TEST)\
 			 $(MAYBE_TRAVERSE)
 
-HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc
+HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc \
+				hfst-tool-metadata.cc
 # sort alphabetically
 hfst_affix_guessify_SOURCES=hfst-affix-guessify.cc $(HFST_COMMON_SRC)
 hfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy HfstCompiler.cc HfstBasic.cc HfstAlphabet.cc HfstUtf8.cc $(HFST_COMMON_SRC)
@@ -196,6 +200,7 @@ hfst_conjunct_SOURCES=hfst-conjunct.cc $(HFST_COMMON_SRC)
 hfst_determinize_SOURCES=hfst-determinize.cc $(HFST_COMMON_SRC)
 hfst_disjunct_SOURCES=hfst-disjunct.cc $(HFST_COMMON_SRC)
 hfst_duplicate_SOURCES=hfst-duplicate.cc $(HFST_COMMON_SRC)
+hfst_edit_metadata_SOURCES=hfst-edit-metadata.cc $(HFST_COMMON_SRC)
 hfst_flag_diacritics_SOURCES=hfst-flag-diacritics.cc $(HFST_COMMON_SRC)
 hfst_format_SOURCES=hfst-format.cc $(HFST_COMMON_SRC)
 hfst_fst2fst_SOURCES=hfst-fst2fst.cc $(HFST_COMMON_SRC)

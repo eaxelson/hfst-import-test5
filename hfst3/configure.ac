@@ -174,6 +174,12 @@ AC_ARG_ENABLE([disjunct],
 			  [enable_disjunct=$enableval],
 			  [enable_disjunct=yes])
 AM_CONDITIONAL([WANT_DISJUNCT], [test x$enable_disjunct != xno])
+AC_ARG_ENABLE([edit_metadata],
+			  [AS_HELP_STRING([--enable-edit-metadata],
+							  [build metadata tool @<:@default=yes@:>@])],
+			  [enable_edit_metadata=$enableval],
+			  [enable_edit_metadata=yes])
+AM_CONDITIONAL([WANT_EDIT_METADATA], [test x$enable_edit_metadata != xno])
 AC_ARG_ENABLE([flag_diacritics],
 			  [AS_HELP_STRING([--enable-flag-diacritics],
 							  [build flag diacritic tool @<:@default=no@:>@])],
