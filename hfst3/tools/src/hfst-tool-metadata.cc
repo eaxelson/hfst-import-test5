@@ -70,7 +70,14 @@ void
 hfst_set_formula(hfst::HfstTransducer& dest, const string& src,
                   const string& op)
   {
-    dest.set_property("formulaic-definition", op + " " + src.substr(0, 1));
+    if ((0 < src.at(0))  && (src.at(0) < 128))
+      {
+        dest.set_property("formulaic-definition", op + " " + src.substr(0, 1));
+      }
+    else 
+      {
+        dest.set_property("formulaic-definition", op + " U8");
+      }
   }
 
 void
