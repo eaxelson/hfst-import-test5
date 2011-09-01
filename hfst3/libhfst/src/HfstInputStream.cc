@@ -512,6 +512,12 @@ namespace hfst
   }
 
   t.set_name(name);
+  for (map<string,string>::const_iterator prop = props.begin();
+       prop != props.end();
+       ++prop)
+    {
+      t.set_property(prop->first, prop->second);
+    }
 
 }
 
@@ -610,7 +616,8 @@ namespace hfst
 
     // (1) first pair "version", "3.0"
     if ( not ( ( strcmp("version", header_data[0].first.c_str()) == 0 ) &&
-               ( strcmp("3.0", header_data[0].second.c_str()) == 0 ) ) ) {
+               ( ( strcmp("3.0", header_data[0].second.c_str()) == 0 ) ||
+                 ( strcmp("3.3", header_data[0].second.c_str()) == 0 ) ) ) ){
       HFST_THROW_MESSAGE(TransducerHeaderException,
                          "Hfst header: transducer version not recognised");
     }
@@ -652,24 +659,14 @@ namespace hfst
     if (header_data[2].first.compare("name") == 0) {
       name = header_data[2].second;
     }
-    // (3) an optional pair "minimal", ("true"|"false") if type == SFST_TYPE
-    // FIXME: forward this information to SfstInputStream's transducer
-    else {
-      if (not (set_implementation_specific_header_data(header_data, 2)) 
-          && warnings)
-        fprintf(stderr, "Warning: Transducer header has extra data that "
-                " cannot be used.\n");
-    }
-
-    if (header_data.size() == 3)
-      return;
-
-    if (not (set_implementation_specific_header_data(header_data, 3)) 
-        && warnings)
-      fprintf(stderr, "Warning: Transducer header has extra data that "
-              " cannot be used.\n");
+    for (StringPairVector::const_iterator prop = header_data.begin();
+         prop != header_data.end();
+         ++prop)
+      {
+        props[prop->first] = prop->second;
+      }
   }
-
+    
 
   /* Try to read a hfst header. If successful, return true and the number 
      of bytes read. If not, return false and 0. Throw a 

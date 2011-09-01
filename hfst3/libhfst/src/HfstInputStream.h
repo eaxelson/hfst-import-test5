@@ -120,6 +120,7 @@ For documentation on the HFST binary transducer format, see
     ImplementationType type;             
     /* Name of next transducer, given in the hfst header */
     std::string name;                    
+    std::map<std::string,std::string> props;
     /* How many bytes have been already read by the function 
        when processing the hfst header */
     unsigned int bytes_to_skip;          

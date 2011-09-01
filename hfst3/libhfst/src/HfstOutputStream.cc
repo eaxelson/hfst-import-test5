@@ -222,7 +222,7 @@ namespace hfst
   void HfstOutputStream::append_hfst_header_data(std::vector<char> &header)
   {
     append(header, "version");
-    append(header, "3.0");
+    append(header, "3.3");
     append(header, "type");
 
     std::string type_value;
@@ -337,6 +337,14 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
       append_hfst_header_data(header); // attributes "version" and "type"
       append(header, "name");
       append(header, transducer.name);
+      for (map<string,string>::const_iterator prop = transducer.props.begin();
+           prop != transducer.props.end();
+           ++prop)
+        {
+          append(header, prop->first);
+          append(header, prop->second);
+        }
+
       append_implementation_specific_header_data(header, transducer);
 
       // write the field that identifies the header as an HFST header

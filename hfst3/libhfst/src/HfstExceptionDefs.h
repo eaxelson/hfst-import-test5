@@ -380,7 +380,7 @@ HFST_EXCEPTION_CHILD_DECLARATION(SymbolNotFoundException);
 //HFST_EXCEPTION_CHILD_DECLARATION(TransducerHasNoStartStateException);
 //HFST_EXCEPTION_CHILD_DECLARATION(TransducerHasMoreThanOneStartStateException);
 
-
+HFST_EXCEPTION_CHILD_DECLARATION(MetadataException);
 
 
 #endif // #ifndef _HFST_EXCEPTION_DEFS_H_

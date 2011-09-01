@@ -378,6 +378,8 @@ This exception suggests that there is something wrong in the HFST code. */
 class TransducerHasMoreThanOneStartStateException :
 public HfstFatalException {};
 
+class MetadataException :
+    public HfstInterfaceException {};
 
 } }
 #endif
