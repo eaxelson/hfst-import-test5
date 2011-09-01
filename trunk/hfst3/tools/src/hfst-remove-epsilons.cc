@@ -32,6 +32,7 @@
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
+#include "hfst-tool-metadata.h"
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
@@ -114,7 +115,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
     {
         transducer_n++;
         HfstTransducer trans(instream);
-        char* inputname = strdup(trans.get_name().c_str());
+        char* inputname = hfst_get_name(trans, inputfilename);
         if (strlen(inputname) <= 0)
           {
             inputname = strdup(inputfilename);
@@ -128,15 +129,8 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           verbose_printf("Removing epsilons %s...%zu\n", inputname, transducer_n); 
         }
         trans.remove_epsilons();
-        char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
-                                             (strlen(inputname) +
-                                              strlen("hfst-remove-epsilons=(%s)")) 
-                                             + 1));
-        if (sprintf(composed_name, "hfst-remove-epsilons=(%s)",
-                    inputname) > 0)
-          {
-            trans.set_name(composed_name);
-          }
+        hfst_set_name(trans, trans, "remove-epsilons");
+        hfst_set_formula(trans, trans, "Id");
         outstream << trans;
     }
     instream.close();

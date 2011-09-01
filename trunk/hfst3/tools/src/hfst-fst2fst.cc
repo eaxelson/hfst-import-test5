@@ -32,6 +32,7 @@
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
+#include "hfst-tool-metadata.h"
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
@@ -175,11 +176,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
     {
         transducer_n++;
         HfstTransducer orig(instream);
-        char* inputname = strdup(orig.get_name().c_str());
-        if (strlen(inputname) <= 0 )
-          {
-            inputname = strdup(inputfilename);
-          }
+        char* inputname = hfst_get_name(orig, inputfilename);
         if (transducer_n == 1)
         {
           verbose_printf("Converting %s...\n", inputname); 
@@ -192,17 +189,8 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         try {
             orig.convert(output_type, options);
         } HFST_CATCH(HfstException)
-        char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
-                                             (strlen(inputname) +
-                                              strlen("hfst-fst2fst=(%s)")) 
-                                             + 1));
-        if (sprintf(composed_name, "hfst-fst2fst=(%s)", 
-                    inputname) > 0)
-          {
-            orig.set_name(composed_name);
-          }
-
-
+        hfst_set_name(orig, orig, "convert");
+        hfst_set_formula(orig, orig, "Id");
         outstream << orig;
     }
     instream.close();

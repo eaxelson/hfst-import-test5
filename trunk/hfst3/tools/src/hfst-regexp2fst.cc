@@ -44,6 +44,7 @@ using std::pair;
 #include "parsers/XreCompiler.h"
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
+#include "hfst-tool-metadata.h"
 
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
@@ -75,8 +76,8 @@ print_usage()
         print_common_unary_program_options(message_out); 
         fprintf(message_out, "String and format options:\n"
                 "  -f, --format=FMT          Write result in FMT format\n"
-                "  -j, --disjunct-strings    Disjunct all strings instead of "
-                    "transforming each string into a separate transducer\n"
+                "  -j, --disjunct            Disjunct all regexps instead of "
+                    "transforming each regexp into a separate transducer\n"
                 "      --sum                 Sum weights of duplicate strings "
                     "instead of taking minimum\n"
                 "      --norm                Divide each weight by sum "
@@ -92,7 +93,7 @@ print_usage()
             "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
             "FMT must be name of a format usable by libhfst, such as "
             "openfst-tropical, sfst, foma or hfst-optimized-weighted\n"
-            "If EPS is not defined, the default representation of @0@ is used\n"
+            "If EPS is not defined, the default representation of 0 is used\n"
             );
 
         fprintf(message_out, "Examples:\n"
@@ -116,7 +117,7 @@ parse_options(int argc, char** argv)
         {
         HFST_GETOPT_COMMON_LONG,
         HFST_GETOPT_UNARY_LONG,
-          {"disjunct-strings", no_argument, 0, 'j'},
+          {"disjunct", no_argument, 0, 'j'},
           {"epsilon", required_argument, 0, 'e'},
           {"sum", no_argument, 0, '1'},
           {"norm", no_argument, 0, '2'},
@@ -197,8 +198,13 @@ process_stream(HfstOutputStream& outstream)
     {
       delim = ';';
     }
+  char* first_line = 0;
   while (hfst_getdelim(&line, &len, delim, inputfile) != -1)
     {
+      if (first_line = 0)
+        {
+          first_line = strdup(line);
+        }
       transducer_n++;
       line_count++;
       HfstTransducer* compiled;
@@ -210,14 +216,19 @@ process_stream(HfstOutputStream& outstream)
         }
       else
         {
-          char* name = static_cast<char*>(malloc(sizeof(char)*(strlen("hfst-regexp2fst ") + strlen(line) + 1)));
-          if (sprintf(name, "hfst-regexp2fst %s", line) > 0)
+          if (delim == '\n')
             {
-              compiled->set_name(name);
+              hfst_set_name(*compiled, 
+                            string(line).substr(0, strlen(line) - 1),
+                            "xre");
+              hfst_set_formula(*compiled,
+                               string(line).substr(0 ,strlen(line) - 1),
+                               "X");
             }
           else
             {
-              compiled->set_name("hfst-regexp2fst <error in sprintf>");
+              hfst_set_name(*compiled, line, "xre");
+              hfst_set_formula(*compiled, line, "X");
             }
           outstream << *compiled;
         }
@@ -225,18 +236,24 @@ process_stream(HfstOutputStream& outstream)
     }
   if (disjunct_expressions)
     {
-      char* name = static_cast<char*>(malloc(sizeof(char)*(strlen("hfst-regexp2fst ") + strlen(inputfilename) + 1)));
-      if (sprintf(name, "hfst-regexp2fst %s", inputfilename) > 0)
-        {
-          disjunction.set_name(name);
-        }
-      else
-        {
-          disjunction.set_name("hfst-regexp2fst <error in sprintf>");
-        }
+          if (delim == '\n')
+            {
+              hfst_set_name(disjunction, 
+                            string(line).substr(0, strlen(line) - 1) + "...",
+                            "xre");
+              hfst_set_formula(disjunction,
+                               string(line).substr(0 ,strlen(line) - 1) + "...",
+                               "X");
+            }
+          else
+            {
+              hfst_set_name(disjunction, string(line) + "...", "xre");
+              hfst_set_formula(disjunction, string(line) + "...", "X");
+            }
       outstream << disjunction;
     }
   free(line);
+  free(first_line);
   return EXIT_SUCCESS;
 }
 

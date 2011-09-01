@@ -32,6 +32,7 @@
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
+#include "hfst-tool-metadata.h"
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
@@ -114,11 +115,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
     {
         transducer_n++;
         HfstTransducer trans(instream);
-        char* inputname = strdup(trans.get_name().c_str());
-        if (strlen(inputname) <= 0)
-          {
-            inputname = strdup(inputfilename);
-          }
+        char* inputname = hfst_get_name(trans, inputfilename);
         if (transducer_n==1)
         {
           verbose_printf("Inverting %s...\n", inputname); 
@@ -128,16 +125,8 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           verbose_printf("Inverting %s...%zu\n", inputname, transducer_n); 
         }
         trans.invert();
-        char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
-                                             (strlen(inputname) +
-                                              strlen("hfst-invert=(%s)")) 
-                                             + 1));
-        if (sprintf(composed_name, "hfst-invert=(%s)", 
-                    inputname) > 0)
-          {
-            trans.set_name(composed_name);
-          }
-
+        hfst_set_name(trans, trans, "invert");
+        hfst_set_formula(trans, trans, "⁻¹");
         outstream << trans;
     }
     instream.close();

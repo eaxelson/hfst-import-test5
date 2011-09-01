@@ -43,7 +43,7 @@ using hfst::lexc::LexcCompiler;
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
-
+#include "hfst-tool-metadata.h"
 
 #include "inc/globals-common.h"
 static char** lexcfilenames = 0;
@@ -164,17 +164,8 @@ lexc_streams(LexcCompiler& lexc, HfstOutputStream& outstream)
       }
     verbose_printf("Compiling... ");
     HfstTransducer* res = lexc.compileLexical();
-    char* name = static_cast<char*>(malloc(sizeof(char) * 
-                                    (strlen(lexcfilenames[0]) +
-                                     strlen("lexc(...)") + 1)));
-    if ((sprintf(name, "lexc(%s...)", lexcfilenames[0])))
-      {
-        res->set_name(name);
-      }
-    else
-      {
-        res->set_name("lexc(sprintf failed?)");
-      }
+    hfst_set_name(*res, lexcfilenames[0], "lexc");
+    hfst_set_formula(*res, lexcfilenames[0], "L");
     verbose_printf("\nWriting... ");
     outstream << *res;
     verbose_printf("done\n");

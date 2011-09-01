@@ -42,6 +42,7 @@ using hfst::ImplementationType;
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
+#include "hfst-tool-metadata.h"
 #include "inc/globals-common.h"
 #include "inc/globals-binary.h"
 
@@ -122,16 +123,8 @@ disjunct_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
         transducer_n++;
         HfstTransducer first(firststream);
         HfstTransducer second(secondstream);
-        char* firstname = strdup(first.get_name().c_str());
-        if (strlen(firstname) <= 0 )
-          {
-            firstname = strdup(firstfilename);
-          }
-        char* secondname = strdup(second.get_name().c_str());
-        if (strlen(secondname) <= 0 )
-          {
-            secondname = strdup(secondfilename);
-          }
+        char* firstname = hfst_get_name(first, firstfilename);
+        char* secondname = hfst_get_name(second, secondfilename);
         if (transducer_n == 1)
         {
             verbose_printf("Disjuncting %s and %s...\n", firstname, 
@@ -154,16 +147,8 @@ disjunct_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                   hfst_strformat(firststream.get_type()),
                   hfst_strformat(secondstream.get_type()));
           }
-        char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
-                                             (strlen(firstname) +
-                                              strlen(secondname) +
-                                              strlen("hfst-union=(%s | %s)")) 
-                                             + 1));
-        if (sprintf(composed_name, "hfst-union=(%s | %s)", 
-                    firstname, secondname) > 0)
-          {
-            first.set_name(composed_name);
-          }
+        hfst_set_name(first, first, second, "union");
+        hfst_set_formula(first, first, second, "∪");
         outstream << first;
         bothInputs = firststream.is_good() && secondstream.is_good();
     }

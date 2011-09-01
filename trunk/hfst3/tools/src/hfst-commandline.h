@@ -305,5 +305,7 @@ char* hfst_setlocale();
  */
 int get_compatible_fst_format(std::istream& is1, std::istream& is2);
 
+
+
 #endif
 // vim: set ft=cpp.doxygen:

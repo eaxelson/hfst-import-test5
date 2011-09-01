@@ -45,6 +45,7 @@ using hfst::StringPair;
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
+#include "hfst-tool-metadata.h"
 
 #include "inc/globals-common.h"
 #include "inc/globals-unary.h"
@@ -652,45 +653,74 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
       if (from_file)
         {
             char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
-                                         (strlen(inputname) +
-                                          strlen(from_file_name) +
-                                          strlen("hfst-substitute=(%s, @%s)")) 
-                                         + 1));
-            if (sprintf(composed_name, "hfst-substitute=(%s, @%s))",
-                        inputname, from_file_name) > 0)
+                                         (strlen(from_file_name) +
+                                          strlen("substitutions-from-%s")) 
+                                          + 1));
+            if (sprintf(composed_name, "substitute-from-%s",
+                        from_file_name) > 0)
               {
-                trans.set_name(composed_name);
+                hfst_set_name(trans, trans, composed_name);
+                free(composed_name);
+              }
+            composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                         (strlen(from_file_name) +
+                                          strlen("♲%s")) 
+                                          + 1));
+            if (sprintf(composed_name, "♲%s",
+                        from_file_name) > 0)
+              {
+                hfst_set_formula(trans, trans, composed_name);
                 free(composed_name);
               }
         }
       else if (from_label && to_label)
         {
             char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
-                                         (strlen(inputname) +
-                                          strlen(from_label) +
+                                         (strlen(from_label) +
                                           strlen(to_label) +
-                                          strlen("hfst-substitute=(%s, %s->%s)")) 
-                                         + 1));
-            if (sprintf(composed_name, "hfst-substitute=(%s, %s->%s))",
-                        inputname, from_label, to_label) > 0)
+                                          strlen("substitute-%s-with-%s")) 
+                                          + 1));
+            if (sprintf(composed_name, "substitute-%s-with-%s",
+                        from_label, to_label) > 0)
               {
-                trans.set_name(composed_name);
+                hfst_set_name(trans, trans, composed_name);
                 free(composed_name);
               }
-
+            composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                         (strlen(from_label) +
+                                          strlen(to_label) +
+                                          strlen("%s ♲ %s")) 
+                                          + 1));
+            if (sprintf(composed_name, "%s ♲ %s",
+                        from_label, to_label) > 0)
+              {
+                hfst_set_formula(trans, trans, composed_name);
+                free(composed_name);
+              }
+            
         }
       else if (to_transducer_filename)
         {
             char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
-                                         (strlen(inputname) +
-                                          strlen(from_label) +
+                                         (strlen(from_label) +
                                           strlen(to_transducer_filename) +
-                                          strlen("hfst-substitute=(%s, %s->(%s))")) 
+                                          strlen("substitute-%s-with-net-%s")) 
                                          + 1));
-            if (sprintf(composed_name, "hfst-substitute=(%s, %s->(%s))",
-                        inputname, from_label, to_transducer_filename) > 0)
+            if (sprintf(composed_name, "substitute-%s-with-net-%s",
+                        from_label, to_transducer_filename) > 0)
               {
-                trans.set_name(composed_name);
+                hfst_set_name(trans, trans, composed_name);
+                free(composed_name);
+              }
+            composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                         (strlen(from_label) +
+                                          strlen(to_transducer_filename) +
+                                          strlen("%s ♲ %s")) 
+                                         + 1));
+            if (sprintf(composed_name, "%s ♲ %s",
+                        from_label, to_transducer_filename) > 0)
+              {
+                hfst_set_formula(trans, trans, composed_name);
                 free(composed_name);
               }
 

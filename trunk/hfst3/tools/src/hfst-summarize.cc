@@ -139,7 +139,17 @@ process_stream(HfstInputStream& instream)
       std::pair<string,unsigned int> most_ambiguous_input;
       std::pair<string,unsigned int> most_ambiguous_output;
       unsigned int initial_state = 0; // mutt.get_initial_state();
-      StringSet transducerAlphabet = trans->get_alphabet();
+      StringSet transducerAlphabet;
+      bool transducerKnowsAlphabet = false;
+      try
+        {
+          transducerAlphabet = trans->get_alphabet();
+          transducerKnowsAlphabet = true;
+        }
+      catch (FunctionNotImplementedException)
+        {
+          transducerKnowsAlphabet = false;
+        }
       StringSet foundAlphabet;
       bool expanded = true;
       bool is_mutable = true;
@@ -252,6 +262,16 @@ process_stream(HfstInputStream& instream)
                 {
                   output_deterministic = false;
                 }
+              if (it == mutt->begin() && (tr_it->get_target_state() == 0))
+                {
+                  cyclic = true;
+                  cyclic_at_initial_state = true;
+                }
+              if (source_state == tr_it->get_target_state())
+                {
+                  cyclic = true;
+                }
+                
             }
           if (arcs_here > densest_arcs)
             {
@@ -364,8 +384,8 @@ process_stream(HfstInputStream& instream)
               "input label sorted: ???\n"
               "output label sorted: ???\n"
               "weighted: %s\n"
-              "cyclic: ???\n"
-              "cyclic at initial state: ???\n"
+              "cyclic: %s\n"
+              "cyclic at initial state: %s\n"
               "topologically sorted: ???\n"
               "accessible: ???\n"
               "coaccessible: ???\n"
@@ -375,7 +395,9 @@ process_stream(HfstInputStream& instream)
               acceptor? "yes": "no",
               input_deterministic? "yes": "no",
               output_deterministic? "yes": "no",
-              weighted? "yes": "no");
+              weighted? "yes": "no",
+              cyclic? "yes": "no",
+              cyclic_at_initial_state? "yes": "no");
       if (verbose)
         {
           // our extensions for nice statistics maybe
@@ -397,21 +419,28 @@ process_stream(HfstInputStream& instream)
           // alphabets
           fprintf(outfile,
                   "sigma set:\n");
-          bool first = true;
-          for (StringSet::const_iterator s = transducerAlphabet.begin();
-               s != transducerAlphabet.end();
-               ++s)
+          if (transducerKnowsAlphabet)
             {
-              if (!first) 
+              bool first = true;
+              for (StringSet::const_iterator s = transducerAlphabet.begin();
+                   s != transducerAlphabet.end();
+                   ++s)
                 {
-                  fprintf(outfile, ", ");
+                  if (!first) 
+                    {
+                      fprintf(outfile, ", ");
+                    }
+                  fprintf(outfile, "%s", s->c_str());
+                  first = false;
                 }
-              fprintf(outfile, "%s", s->c_str());
-              first = false;
+              fprintf(outfile, "\n");
             }
-          fprintf(outfile, "\n");
+          else
+            {
+              fprintf(outfile, "<Unknown in used transducer format>\n");
+            }
           fprintf(outfile, "arc symbols actually seen in transducer:\n");
-          first = true;
+          bool first = true;
           for (StringSet::const_iterator s = foundAlphabet.begin();
                s != foundAlphabet.end();
                ++s)
@@ -424,28 +453,35 @@ process_stream(HfstInputStream& instream)
               first = false;
             }
           fprintf(outfile, "\n");
-          StringSet transducerMinusSet;
-          std::set_difference(transducerAlphabet.begin(), 
-                              transducerAlphabet.end(),
-                              foundAlphabet.begin(), 
-                              foundAlphabet.end(),
-                              std::inserter(transducerMinusSet, 
-                                            transducerMinusSet.end()));
           fprintf(outfile, "sigma symbols missing from transducer:\n");
-          first = true;
-          for (StringSet::const_iterator s = transducerMinusSet.begin();
-               s != transducerMinusSet.end();
-               ++s)
+          if (transducerKnowsAlphabet)
             {
-              if (!first) 
-                {
-                  fprintf(outfile, ", ");
-                }
-              fprintf(outfile, "%s", s->c_str());
-              first = false;
-            }
-          fprintf(outfile, "\n");
+              StringSet transducerMinusSet;
+              std::set_difference(transducerAlphabet.begin(), 
+                                  transducerAlphabet.end(),
+                                  foundAlphabet.begin(), 
+                                  foundAlphabet.end(),
+                                  std::inserter(transducerMinusSet, 
+                                                transducerMinusSet.end()));
 
+              first = true;
+              for (StringSet::const_iterator s = transducerMinusSet.begin();
+                   s != transducerMinusSet.end();
+                   ++s)
+                {
+                  if (!first) 
+                    {
+                      fprintf(outfile, ", ");
+                    }
+                  fprintf(outfile, "%s", s->c_str());
+                  first = false;
+                }
+              fprintf(outfile, "\n");
+            }
+          else
+            {
+              fprintf(outfile, "<Unknown in used transducer format>\n");
+            }
         }
     }
   return EXIT_SUCCESS;
