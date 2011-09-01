@@ -1,0 +1,17 @@
+# Finnish to English
+hfst-fst2strings FinnishToEnglishNumerals.hfst | sort > TMP;
+if (diff TMP finnish_to_english_numerals_expected); then
+  echo "OK: test passed"
+else
+  echo "FAIL: test failed"
+fi
+
+# English to Finnish
+hfst-fst2strings EnglishToFinnishNumerals.hfst | sort > TMP;
+if (diff TMP english_to_finnish_numerals_expected); then
+  echo "OK: test passed"
+else
+  echo "FAIL: test failed"
+fi
+
+ 

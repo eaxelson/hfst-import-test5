@@ -1,0 +1,11 @@
+hfst-xfst -f DateParser.xfst.script;
+sh DateParser.hfst.script;
+
+hfst-project -p input DateParser.xfst.hfst > xfst.input;
+hfst-project -p output DateParser.xfst.hfst > xfst.output;
+
+hfst-project -p input DateParser.hfst.hfst > hfst.input;
+hfst-project -p output DateParser.hfst.hfst > hfst.output;
+
+hfst-compare -v xfst.input hfst.input;
+hfst-compare -v xfst.output hfst.output;
