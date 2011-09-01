@@ -18,6 +18,7 @@
 
 #include "HfstTransducer.h"
 #include "HfstFlagDiacritics.h"
+#include "HfstExceptions.h"
 #include "implementations/compose_intersect/ComposeIntersectLexicon.h"
 
 using hfst::implementations::ConversionFunctions;
@@ -1064,11 +1065,39 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
 ImplementationType HfstTransducer::get_type(void) const {
     return this->type; }
 void HfstTransducer::set_name(const std::string &name) {
-    HfstTokenizer::check_utf8_correctness(name);
-    this->name = name; }   
+    this->set_property("name", name);
+}   
 std::string HfstTransducer::get_name() const {
-    return this->name; }
+    return this->get_property("name"); }
 
+void
+HfstTransducer::set_property(const string& property, const string& name)
+  {
+    HfstTokenizer::check_utf8_correctness(name);
+    this->props[property] = name;
+    if (property == "name")
+      {
+        this->name = name;
+      }
+  }
+
+const string&
+HfstTransducer::get_property(const string& property) const
+  {
+    if (this->props.find(property) != this->props.end())
+      {
+        return this->props.find(property)->second;
+      }
+    else
+      {
+        return *(new string(""));
+      }
+  }
+const map<string,string>&
+HfstTransducer::get_properties() const
+  {
+    return this->props;
+  }
 
 // -----------------------------------------------------------------------
 //

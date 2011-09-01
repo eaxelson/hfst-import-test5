@@ -223,7 +223,7 @@ An example:
     bool anonymous;    // currently not used
     bool is_trie;      // currently not used
     std::string name;  /* The name of the transducer */
-
+    std::map<std::string,std::string> props;    // rest of fst metadata
     /* The union of possible backend implementations. */
     union TransducerImplementation
     {
@@ -623,6 +623,26 @@ in \a ifile.
         @see set_name */
     std::string get_name() const;
 
+    /**
+     * @brief Set arbitrary string property @a property to @a value.
+     *        set_property("name") equals @c set_name(string&).
+     * @note  While this function is capable of creating endless amounts of
+     *        arbitrary metadata, it is suggested that property names are
+     *        drawn from central repository, or prefixed with "x-". A property
+     *        that does not follow this convention may affect the behavior of
+     *        transducer in future releases.
+     */
+    void set_property(const std::string& property, const std::string& value);
+    
+    /** 
+     * @brief Get arbitrary string propert @a property.
+     *        get_property("name") works like get_name.
+     */
+    const std::string& get_property(const std::string& property) const;
+    /**
+     *  @brief Get all properties form transducer.
+     */
+    const std::map<std::string,std::string>& get_properties() const;
     /** \brief Get the alphabet of the transducer. 
     
     The alphabet is defined as the set of symbols known 
