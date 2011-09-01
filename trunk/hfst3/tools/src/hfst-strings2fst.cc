@@ -239,8 +239,6 @@ process_stream(HfstOutputStream& outstream)
   HfstBasicTransducer disjunction;
   size_t line_n = 0;
 
-  try {
-
   HfstStrings2FstTokenizer
     multichar_symbol_tokenizer(multichar_symbols,std::string(epsilonname));
 
@@ -249,6 +247,7 @@ process_stream(HfstOutputStream& outstream)
       transducer_n++;
       line_n++;
       verbose_printf("Parsing line %u...\n", line_n);
+      char* orig_line = hfst_strdup(line);
       // parse line end and weight
       char* tab = strstr(line, "\t");
       char* string_end = tab;
@@ -292,26 +291,26 @@ process_stream(HfstOutputStream& outstream)
         { 
           if (pairstrings)
             {
-              error
-                (EXIT_FAILURE, errno, 
-                 "String \"%s\" contains unescaped ':'-symbols,\n"
-                 "which are not pair separators. Use '\\:' for literal ':'.",
+              error_at_line
+                (EXIT_FAILURE, errno, inputfilename, line_n,
+                 "String `%s' contains unescaped ':'-symbols,\n"
+                 "which are not pair separators. Use `\\:' for literal `:'.",
                  line);
             }
           else
             {
-              error
-                (EXIT_FAILURE, errno, 
-                 "String \"%s\" contains unescaped ':'-symbols,\n"
-                 "which are not pair separators. Use '\\:\' for literal ':'.\n"
+              error_at_line
+                (EXIT_FAILURE, errno, inputfilename, line_n,
+                 "String `%s' contains unescaped `:'-symbols,\n"
+                 "which are not pair separators. Use `\\:\' for literal `:'.\n"
                  "If you are compiling pair strings, use option -p.",
                  line);              
             }
         }
       catch (const IncorrectUtf8CodingException &e)
         {
-            error(EXIT_FAILURE, errno, 
-                  "Input string \"%s\" is not valid utf-8.", line);
+            error_at_line(EXIT_FAILURE, errno, inputfilename, line_n,
+                  "Input string `%s' is not valid utf-8.", line);
         }
       // Handle the weight
       float path_weight=0;
@@ -335,15 +334,17 @@ process_stream(HfstOutputStream& outstream)
           HfstBasicTransducer tr;
           tr.disjunct(spv, path_weight);
           HfstTransducer res(tr, output_format);
-          hfst_set_name(res, line, "string");
-          hfst_set_formula(res, line, "S");
+          hfst_set_name(res, orig_line, "string");
+          hfst_set_formula(res, orig_line, "S");
           outstream << res;
+          free(orig_line);
         }
       else // disjunct all strings into a single transducer
         {
           disjunction.disjunct(spv, path_weight);
         }
     }
+  free(line);
   if (disjunct_strings)
     {
       HfstTransducer res(disjunction, output_format);
@@ -360,14 +361,7 @@ process_stream(HfstOutputStream& outstream)
       hfst_set_formula(res, inputfilename, "S");
       outstream << res;
     }
-  free(line);
   return EXIT_SUCCESS;
-  }
-  catch(IncorrectUtf8CodingException e)
-    {
-      error(EXIT_FAILURE, errno, "Incorrect utf-8 coding.");
-      return EXIT_FAILURE;
-    }
 }
 
 
