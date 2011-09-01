@@ -7,7 +7,7 @@ for f in $comparables; do
     fi
     for g in $comparables ; do
         if test $f != $g ; then
-            if hfst-compare $f $g  ; then
+            if ../../tools/src/hfst-compare $f $g  ; then
                 echo hfst-compare matches $f $g
                 exit 1
             fi

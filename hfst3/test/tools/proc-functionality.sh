@@ -39,7 +39,7 @@ fi
 if ! diff test.strings $srcdir/proc-caps-out1.strings ; then
     exit 1
 fi
-if ! hfst-proc -g proc-caps.gen.hfst.ol < $srcdir/proc-caps-gen.strings > test.strings ; then
+if ! ../../tools/src/hfst-proc/hfst-proc -g proc-caps.gen.hfst.ol < $srcdir/proc-caps-gen.strings > test.strings ; then
     echo uppercase roundtrip fail:
     cat test.strings
     exit 1
