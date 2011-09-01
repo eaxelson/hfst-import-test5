@@ -1,4 +1,4 @@
-//! @file hfst-lexc-compiler.cc
+//! @file hfst-lexc.cc
 //!
 //! @brief Lexc compilation command line tool
 //!
@@ -42,7 +42,7 @@ using hfst::ImplementationType;
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
-
+#include "hfst-tool-metadata.h"
 
 #include "inc/globals-common.h"
 static char** lexcfilenames = 0;
@@ -264,17 +264,8 @@ lexc_streams(HfstOutputStream& outstream)
             trans = HfstTransducer::read_lexc(lexcfilenames[i], format);
           }
       }
-    char* name = static_cast<char*>(malloc(sizeof(char) * 
-                                    (strlen(lexcfilenames[0]) +
-                                     strlen("lexc(...)") + 1)));
-    if ((sprintf(name, "lexc(%s...)", lexcfilenames[0])))
-      {
-        trans->set_name(name);
-      }
-    else
-      {
-        trans->set_name("lexc(sprintf failed?)");
-      }
+    hfst_set_name(*trans, lexcfilenames[0], "lexc");
+    hfst_set_formula(*trans, lexcfilenames[0], "L");
     verbose_printf("\nWriting... ");
     outstream << *trans;
     verbose_printf("done\n");

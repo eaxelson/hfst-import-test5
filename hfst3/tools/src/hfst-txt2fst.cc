@@ -35,6 +35,7 @@
 #include "HfstOutputStream.h"
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
+#include "hfst-tool-metadata.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstOutputStream;
@@ -159,26 +160,12 @@ process_stream(HfstOutputStream& outstream)
         {
           verbose_printf("Reading transducer table %zu...\n", transducer_n);
         }
-      try {
         HfstTransducer t(inputfile,
              output_format,
              std::string(epsilonname));
-        char* name = static_cast<char*>(malloc(sizeof(char)*(strlen("hfst-regexp2fst ") + strlen(inputfilename) + 1)));
-        if (sprintf(name, "hfst-txt2fst %s", inputfilename) > 0)
-          {
-            t.set_name(name);
-          }
-        else
-          {
-            t.set_name("hfst-txt2fst <error in sprintf>");
-          }
-          outstream << t;
-        }
-      catch (HfstException e)
-        {
-          std::cerr << e() << std::endl;
-          return EXIT_FAILURE;
-        }
+        hfst_set_name(t, inputfilename, "text");
+        hfst_set_formula(t, inputfilename, "T");
+        outstream << t;
     }
   outstream.close();
   return EXIT_SUCCESS;

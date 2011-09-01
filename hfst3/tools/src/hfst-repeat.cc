@@ -32,6 +32,7 @@
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
+#include "hfst-tool-metadata.h"
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
@@ -143,11 +144,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
       {
         transducer_n++;
         HfstTransducer trans(instream);
-        char* inputname = strdup(trans.get_name().c_str());
-        if (strlen(inputname) <= 0) 
-          {
-            inputname = strdup(inputfilename);
-          }
+        char* inputname = hfst_get_name(trans, inputfilename);
         if (transducer_n==1)
           {
             if (!from_infinity && !to_infinity)
@@ -196,41 +193,49 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
           {
             trans.repeat_n_to_k(at_least, at_most);
             char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
-                                             (strlen(inputname) +
-                                              strlen("hfst-repeat=(%s^{%lu,%lu})")) 
+                                             (strlen("repeat-%lu-to-%lu"))
                                              + 1 + 32 + 32));
-            if (sprintf(composed_name, "hfst-repeat=(%s^{%lu,%lu})",
-                        inputname, at_least, at_most) > 0)
+            if (sprintf(composed_name, "repeat-%lu-to-%lu",
+                        at_least, at_most) > 0)
               {
-                trans.set_name(composed_name);
+                hfst_set_name(trans, trans, composed_name);
               }
-
+            composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                             (strlen("_%lu^%lu"))
+                                             + 1 + 32 + 32));
+            if (sprintf(composed_name, "_%lu^%lu",
+                        at_least, at_most) > 0)
+              {
+                hfst_set_formula(trans, trans, composed_name);
+              }
+            free(composed_name);
           }
         else if (from_infinity && to_infinity)
           {
             trans.repeat_star();
-            char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
-                                             (strlen(inputname) +
-                                              strlen("hfst-repeat=(%s^{0,})")) 
-                                             + 1 + 32 + 32));
-            if (sprintf(composed_name, "hfst-repeat=(%s^{0,})",
-                        inputname) > 0)
-              {
-                trans.set_name(composed_name);
-              }
+            hfst_set_name(trans, trans, "repeat-star");
+            hfst_set_formula(trans, trans, "⋆");
           }
         else if (!from_infinity && to_infinity)
           {
             trans.repeat_n_plus(at_least);
             char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
-                                             (strlen(inputname) +
-                                              strlen("hfst-repeat=(%s^{%lu,})")) 
+                                             (strlen("repeat-%lu-plus")) 
                                              + 1 + 32 + 32));
-            if (sprintf(composed_name, "hfst-repeat=(%s^{%lu,})",
-                        inputname, at_least) > 0)
+            if (sprintf(composed_name, "repeat-%lu-plus",
+                        at_least) > 0)
               {
-                trans.set_name(composed_name);
+                hfst_set_name(trans, trans, composed_name);
               }
+            composed_name = static_cast<char*>(malloc(sizeof(char) * 
+                                             (strlen("_%lu^∞")) 
+                                             + 1 + 32 + 32));
+            if (sprintf(composed_name, "_%lu^∞",
+                        at_least) > 0)
+              {
+                hfst_set_formula(trans, trans, composed_name);
+              }
+            free(composed_name);
           }
         else if (from_infinity && !to_infinity)
           {

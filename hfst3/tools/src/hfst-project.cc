@@ -32,6 +32,7 @@
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
+#include "hfst-tool-metadata.h"
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
@@ -145,11 +146,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
     {
         transducer_n++;
         HfstTransducer trans(instream);
-        char* inputname = strdup(trans.get_name().c_str());
-        if (strlen(inputname) <= 0)
-          {
-            inputname = strdup(inputfilename);
-          }
+        char* inputname = hfst_get_name(trans, inputfilename);
         if (transducer_n==1)
         {
           if (project_input)
@@ -178,30 +175,14 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         if (project_input)
           {
             trans.input_project();
-            char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
-                                             (strlen(inputname) +
-                                              strlen("hfst-project=(%s.1)")) 
-                                             + 1));
-            if (sprintf(composed_name, "hfst-project=(%s.1)", 
-                        inputname) > 0)
-              {
-                trans.set_name(composed_name);
-              }
-
+            hfst_set_name(trans, trans, "project-1st");
+            hfst_set_formula(trans, trans, "¹");
           }
         else
           {
             trans.output_project();
-            char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
-                                             (strlen(inputname) +
-                                              strlen("hfst-project=(%s.2)")) 
-                                             + 1));
-            if (sprintf(composed_name, "hfst-project=(%s.2)", 
-                        inputname) > 0)
-              {
-                trans.set_name(composed_name);
-              }
-
+            hfst_set_name(trans, trans, "project-2nd");
+            hfst_set_formula(trans, trans, "²");
           }
         outstream << trans;
     }

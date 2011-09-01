@@ -44,6 +44,7 @@ using std::pair;
 #include "implementations/HfstTransitionGraph.h"
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
+#include "hfst-tool-metadata.h"
 #include "HfstStrings2FstTokenizer.h"
 
 #include "inc/globals-common.h"
@@ -335,16 +336,8 @@ process_stream(HfstOutputStream& outstream)
           HfstBasicTransducer tr;
           tr.disjunct(spv, path_weight);
           HfstTransducer res(tr, output_format);
-          char* name = static_cast<char*>(malloc(sizeof(char)*(strlen("hfst-strings2fst ") + strlen(line) + 1)));
-          if (sprintf(name, "hfst-strings2fst %s", line) > 0)
-            {
-              res.set_name(name);
-            }
-          else
-            {
-              res.set_name("hfst-strings2fst <error in sprintf>");
-            }
-
+          hfst_set_name(res, line, "string");
+          hfst_set_formula(res, line, "S");
           outstream << res;
         }
       else // disjunct all strings into a single transducer
@@ -364,15 +357,8 @@ process_stream(HfstOutputStream& outstream)
           else
             res.transform_weights(&divide_by_sum_of_weights_log);
         }
-      char* name = static_cast<char*>(malloc(sizeof(char)*(strlen("hfst-strings2fst ") + strlen(inputfilename) + 1)));
-      if (sprintf(name, "hfst-strings2fst %s", inputfilename) > 0)
-        {
-          res.set_name(name);
-        }
-      else
-        {
-          res.set_name("hfst-strings2fst <error in sprintf>");
-        }
+      hfst_set_name(res, inputfilename, "strings");
+      hfst_set_formula(res, inputfilename, "S");
       outstream << res;
     }
   free(line);

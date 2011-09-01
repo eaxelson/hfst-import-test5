@@ -42,6 +42,8 @@ using hfst::HfstTransducerVector;
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
+#include "hfst-tool-metadata.h"
+
 #include "inc/globals-common.h"
 #include "inc/globals-binary.h"
 
@@ -111,22 +113,17 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
     bool bothInputs = firststream.is_good() && secondstream.is_good();
     if (firststream.get_type() != secondstream.get_type())
       {
-        warning(0, 0, "Transducer type mismatch in %s and %s "
-                  "(types %s and %s);\n",
-                  "using type %s as output",
+        warning(0, 0, "Transducer type mismatch in %1$s and %2$s "
+                  "(types %3$s and %4$s);\n"
+                  "using type %3$s as output",
                   firstfilename, secondfilename,
                   hfst_strformat(firststream.get_type()),
-                  hfst_strformat(secondstream.get_type()),
-                  hfst_strformat(firststream.get_type()));
+                  hfst_strformat(secondstream.get_type()));
       }
 
     verbose_printf("Reading lexicon...");
     HfstTransducer lexicon(firststream);
-    const char* lexiconname = lexicon.get_name().c_str();
-    if (strlen(lexiconname) < 1) 
-      {
-        lexiconname = hfst_strdup(firstfilename);
-      }
+    char* lexiconname = hfst_get_name(lexicon, firstfilename);
     verbose_printf(" %s read\n", lexiconname);
     HfstTransducerVector rules;
     size_t transducer_n = 1;
@@ -152,14 +149,14 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
     char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
                                              (strlen(lexiconname) +
                                               strlen(secondfilename) +
-                                              strlen("hfst-compose-intersect=(%s o &(%s))")) 
+                                              strlen("compose(%s, interserct(%s))")) 
                                              + 1));
-    if (sprintf(composed_name, "hfst-compose-intersect=(%s o &(%s))", 
+    if (sprintf(composed_name, "compose(%s, intersect(%s))", 
                 lexiconname, secondfilename) > 0)
       {
         lexicon.set_name(composed_name);
       }
-
+    hfst_set_formula(lexicon, lexicon, " ∘ ⋂R");
 
     verbose_printf("Storing result in %s...\n", outfilename);
     outstream << lexicon;

@@ -779,7 +779,7 @@ int main( int argc, char **argv ) {
 #if HFST_OPTIMISED_LOOKUP_CAN_IDENTITY_SYMBOL
     optimise_matcher();
 #endif
-    for (int i = 0; i < infile_n; i++)
+    for (unsigned int i = 0; i < infile_n; i++)
       {
         inputfilename = infilenames[i];
         linen = 0;

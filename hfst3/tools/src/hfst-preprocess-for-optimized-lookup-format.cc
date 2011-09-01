@@ -32,6 +32,7 @@
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
+#include "hfst-tool-metadata.h"
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "HfstOutputStream.h"
@@ -118,11 +119,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
     {
         transducer_n++;
         HfstTransducer trans(instream);
-        char* inputname = strdup(trans.get_name().c_str());
-        if (strlen(inputname) <= 0)
-          {
-            inputname = strdup(inputfilename);
-          }
+        char* inputname = hfst_get_name(trans, inputfilename);
         if (transducer_n==1)
         {
           verbose_printf("Removing epsilons %s...\n", inputname); 
@@ -145,7 +142,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         HfstState state_count = 1;
         std::map<HfstState,HfstState> rebuilt;
         rebuilt[0] = 0;
-    HfstState source_state=0;
+        HfstState source_state=0;
         for (HfstBasicTransducer::const_iterator state = original.begin();
              state != original.end();
              ++state)
@@ -186,16 +183,8 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         source_state++;
           }
         trans = HfstTransducer(replication, trans.get_type());
-        char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
-                                             (strlen(inputname) +
-                                              strlen("hfst-fu=(%s)")) 
-                                             + 1));
-        if (sprintf(composed_name, "hfst-fu=(%s)", 
-                    inputname) > 0)
-          {
-            trans.set_name(composed_name);
-          }
-
+        hfst_set_name(trans, trans, "fu");
+        hfst_set_formula(trans, trans, "FU");
         outstream << trans.remove_epsilons();
     }
     instream.close();

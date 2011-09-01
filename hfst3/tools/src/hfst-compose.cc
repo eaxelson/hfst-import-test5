@@ -41,6 +41,7 @@ using hfst::ImplementationType;
 
 
 #include "hfst-commandline.h"
+#include "hfst-tool-metadata.h"
 #include "hfst-program-options.h"
 #include "inc/globals-common.h"
 #include "inc/globals-binary.h"
@@ -130,16 +131,8 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
         transducer_n++;
         HfstTransducer first(firststream);
         HfstTransducer second(secondstream);
-        char* firstname = strdup(first.get_name().c_str());
-        char* secondname = strdup(second.get_name().c_str());
-        if (strlen(firstname) <= 0) 
-          {
-            firstname = strdup(firstfilename);
-          }
-        if (strlen(secondname) <= 0)
-          {
-            secondname = strdup(secondfilename);
-          }
+        char* firstname = hfst_get_name(first, firstfilename);
+        char* secondname = hfst_get_name(second, secondfilename);
         if (transducer_n == 1)
         {
             verbose_printf("Composing %s and %s...\n", firstname, 
@@ -183,17 +176,9 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                 second.insert_freely_missing_flags_from(first);
               }
         }
-        char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
-                                         (strlen(firstname) +
-                                          strlen(secondname) +
-                                          strlen("hfst-compose=(%s o %s)") + 
-                                          1)));
+        hfst_set_name(first, first, second, "compose");
+        hfst_set_formula(first, first, second, "∘");
         first.compose(second);
-        if (sprintf(composed_name, "hfst-compose=(%s o %s)", firstname, 
-                    secondname) > 0)
-          {
-            first.set_name(composed_name);
-          }
         outstream << first;
 
         }
