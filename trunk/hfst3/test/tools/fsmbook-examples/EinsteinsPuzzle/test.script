@@ -1,0 +1,7 @@
+echo "yellow Norwegian water Dunhill cats | blue Dane tea Blend horses | red Englishman milk PallMall birds | green German coffee Prince fish | white Swede bier BlueMaster dogs " > expected_result
+
+if (diff result expected_result); then
+  echo "OK: test passed"
+else
+  echo "FAIL: test failed"
+fi

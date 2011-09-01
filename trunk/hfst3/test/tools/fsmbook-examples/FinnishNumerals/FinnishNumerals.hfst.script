@@ -1,0 +1,41 @@
+FORMAT=openfst-tropical
+
+# First, we create a transducer that maps numbers 2 ... 9 to the corresponding numerals:
+echo "2:kaksi
+3:kolme
+4:neljä
+5:viisi
+6:kuusi
+7:seitsemän
+8:kahdeksan
+9:yhdeksän" | hfst-strings2fst -f $FORMAT -j > 2to9.hfst;
+
+# and 1 ... 9:
+echo "1:yksi" | hfst-strings2fst -f $FORMAT | hfst-disjunct 2to9.hfst > 1to9.hfst;
+
+# 10 is handled as a separate case:
+echo "10:kymmenen" | hfst-strings2fst -f $FORMAT > 10.hfst;
+
+# From 11 to 19, i.e.  [ 1:0 1to9 0:toista ]:
+echo "1:" | hfst-strings2fst -f $FORMAT > 1toEps.hfst;
+echo ":toista" | hfst-strings2fst -f $FORMAT > EpsToToista.hfst;
+hfst-concatenate 1toEps.hfst 1to9.hfst | hfst-concatenate EpsToToista.hfst > 11to19.hfst;
+
+# From 20 to 99, i.e.  [ 2to9 0:kymmentä ( "0":0 | 1to9 ) ]:
+echo ":kymmentä" | hfst-strings2fst -f $FORMAT > EpsToKymmenta.hfst;
+echo "0:" | hfst-strings2fst -f $FORMAT > 0toEps.hfst;
+hfst-concatenate 2to9.hfst EpsToKymmenta.hfst > TMP;
+hfst-disjunct 0toEps.hfst 1to9.hfst | hfst-concatenate -1 TMP > 20to99.hfst;
+
+# Finally, from 1 to 99:
+hfst-disjunct 1to9.hfst 10.hfst | hfst-disjunct 11to19.hfst | hfst-disjunct 20to99.hfst > FinnishNumerals.hfst;
+
+# To get transducers that map Finnish to English numerals and vice versa, we use
+# composition and inversion.
+# NOTE: we assume that the file NumbersToNumerals.hfst is already created
+hfst-invert FinnishNumerals.hfst | hfst-compose ../NumbersToNumerals/NumbersToNumerals.hfst > FinnishToEnglishNumerals.hfst;
+hfst-invert FinnishToEnglishNumerals.hfst > EnglishToFinnishNumerals.hfst;
+
+# Now we can test the transducers:
+# TODO...
+
