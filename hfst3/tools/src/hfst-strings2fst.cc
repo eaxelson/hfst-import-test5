@@ -309,11 +309,10 @@ process_stream(HfstOutputStream& outstream)
             }
         }
       catch (const IncorrectUtf8CodingException &e)
-	{
-	  error
-	    (EXIT_FAILURE, errno,
-	     "Input string \"%s\" is not valid utf-8.",line);
-	}
+        {
+            error(EXIT_FAILURE, errno, 
+                  "Input string \"%s\" is not valid utf-8.", line);
+        }
       // Handle the weight
       float path_weight=0;
 
