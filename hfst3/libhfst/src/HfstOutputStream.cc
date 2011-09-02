@@ -337,7 +337,8 @@ HfstOutputStream::append_implementation_specific_header_data(std::vector<char>&,
       append_hfst_header_data(header); // attributes "version" and "type"
       append(header, "name");
       append(header, transducer.name);
-      for (map<string,string>::const_iterator prop = transducer.props.begin();
+      for (std::map<string,string>::const_iterator prop =
+	       transducer.props.begin();
            prop != transducer.props.end();
            ++prop)
         {

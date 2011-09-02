@@ -1093,7 +1093,7 @@ HfstTransducer::get_property(const string& property) const
         return *(new string(""));
       }
   }
-const map<string,string>&
+const std::map<string,string>&
 HfstTransducer::get_properties() const
   {
     return this->props;
@@ -2034,8 +2034,8 @@ HfstTransducer &HfstTransducer::substitute
     // use the default HfstBasicTransducer function
     hfst::implementations::HfstBasicTransducer * net =
       convert_to_basic_transducer();
-    net->substitute(old_symbol, 
-            new_symbol, 
+    net->substitute(old_symbol,
+            new_symbol,
             input_side, output_side);
     return convert_to_hfst_transducer(net);
 }
