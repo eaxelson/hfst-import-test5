@@ -512,7 +512,7 @@ namespace hfst
   }
 
   t.set_name(name);
-  for (map<string,string>::const_iterator prop = props.begin();
+  for (std::map<string,string>::const_iterator prop = props.begin();
        prop != props.end();
        ++prop)
     {
