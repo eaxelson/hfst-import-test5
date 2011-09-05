@@ -25,6 +25,11 @@ AM_CXXFLAGS = -Wno-deprecated
 if WANT_AFFIX_GUESSIFY
 MAYBE_AFFIX_GUESSIFY=hfst-affix-guessify
 endif
+if WANT_APERTIUM2FST
+MAYBE_APERTIUM2FST=hfst-apertium2fst
+hfst_apertium2fst_CXXFLAGS=$(AM_CXXFLAGS) $(CXXFLAGS) $(LIBXML_CFLAGS)
+hfst_apertium2fst_LDFLAGS=$(AM_LDFLAGS) $(LDFLAGS) $(LIBXML_LIBS)
+endif
 if WANT_COMPARE
 MAYBE_COMPARE=hfst-compare
 endif
@@ -168,7 +173,7 @@ noinst_HEADERS= \
 # finish with xyz
 # see <http://en.wikipedia.org/wiki/Alphabets#Alphabetic_order> for details
 bin_PROGRAMS= \
-			  $(MAYBE_AFFIX_GUESSIFY) 									\
+			  $(MAYBE_AFFIX_GUESSIFY) $(MAYBE_APERTIUM2FST)             \
 			 $(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_CONCATENATE)     \
 			 $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) $(MAYBE_DISJUNCT)   \
 			 $(MAYBE_DUPLICATE) $(MAYBE_EDIT_METADATA)                  \
@@ -191,6 +196,7 @@ HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc \
 				hfst-tool-metadata.cc
 # sort alphabetically
 hfst_affix_guessify_SOURCES=hfst-affix-guessify.cc $(HFST_COMMON_SRC)
+hfst_apertium2fst_SOURCES=hfst-apertium2fst.cc $(HFST_COMMON_SRC)
 hfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy HfstCompiler.cc HfstBasic.cc HfstAlphabet.cc HfstUtf8.cc $(HFST_COMMON_SRC)
 hfst_compare_SOURCES=hfst-compare.cc $(HFST_COMMON_SRC)
 hfst_compose_intersect_SOURCES=hfst-compose-intersect.cc $(HFST_COMMON_SRC)
