@@ -14,12 +14,13 @@
 // All programs
 void print_common_program_options(FILE *file);
 // Use in getopt arguments
-#define HFST_GETOPT_COMMON_SHORT ":hVvqs"
+#define HFST_GETOPT_COMMON_SHORT ":hVvqsd"
 #define HFST_GETOPT_COMMON_LONG  {"help", no_argument, 0, 'h'},\
   {"version", no_argument, 0, 'V'},\
   {"verbose", no_argument, 0, 'v'},\
   {"quiet", no_argument, 0, 'q'},\
-  {"silent", no_argument, 0, 's'}
+  {"silent", no_argument, 0, 's'},\
+  {"debug", no_argument, 0, 'd'}
 
 
 // One transducer to one transducer:

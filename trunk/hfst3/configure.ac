@@ -120,6 +120,12 @@ AC_ARG_ENABLE([affix_guessify],
 			  [enable_affix_guessify=$enableval],
 			  [enable_affix_guessify=yes])
 AM_CONDITIONAL([WANT_AFFIX_GUESSIFY], [test x$enable_affix_guessify != xno])
+AC_ARG_ENABLE([apertium2fst],
+			  [AS_HELP_STRING([--enable-apertium2fst],
+							  [build apertium2fst tool @<:@default=yes@:>@])],
+			  [enable_apertium2fst=$enableval],
+			  [enable_apertium2fst=yes])
+AM_CONDITIONAL([WANT_APERTIUM2FST], [test x$enable_apertium2fst != xno])
 AC_ARG_ENABLE([calculate],
 			  [AS_HELP_STRING([--enable-calculate],
 							  [build calculate tool @<:@default=yes@:>@])],
@@ -450,6 +456,8 @@ AS_IF([test "x$with_readline" = "xyes"],
                       [AC_DEFINE([HAVE_READLINE], 1, [if readline can be used])], 
                       [AC_MSG_FAILURE([readline test failed (--without-readline to disable)])])])
 
+AS_IF([test "x$enable_apertium2fst" != "xno"],
+      [PKG_CHECK_MODULES([LIBXML], [libxml-2.0 >= 2.6.19])])
 
 ### Add here your library ###
 #AS_IF([test "x$with_my_transducer_library" != "xno"],
@@ -488,7 +496,7 @@ AC_TYPE_SIZE_T
 
 # Checks for structures
 AC_CHECK_DECLS([program_name, program_invocation_name, program_invocation_short_name])
-AC_CHECK_DECLS([rl_completion_suppress_append rl_completion_matches])
+AC_CHECK_DECLS([rl_completion_suppress_append, rl_completion_matches])
 
 # Checks for compiler characteristics
 AC_C_INLINE

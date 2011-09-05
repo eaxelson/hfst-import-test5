@@ -201,7 +201,7 @@ process_stream(HfstOutputStream& outstream)
   char* first_line = 0;
   while (hfst_getdelim(&line, &len, delim, inputfile) != -1)
     {
-      if (first_line = 0)
+      if (first_line == 0)
         {
           first_line = strdup(line);
         }
