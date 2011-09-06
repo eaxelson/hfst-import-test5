@@ -27,11 +27,13 @@
 #include <string>
 #include <vector>
 #include <map>
+#include <set>
 
 using std::map;
 using std::pair;
 using std::string;
 using std::vector;
+using std::set;
 
 typedef pair<string,string> StringPair;
 
@@ -50,6 +52,7 @@ typedef pair<string,string> StringPair;
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 #include "hfst-tool-metadata.h"
+
 
 using hfst::HfstTransducer;
 using hfst::HfstOutputStream;
