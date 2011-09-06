@@ -24,6 +24,7 @@
 
 #include <iostream>
 #include <fstream>
+#include <map>
 
 #include <cstdio>
 #include <cstdlib>
@@ -43,6 +44,7 @@ using hfst::HfstTransducer;
 using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 
+using std::map;
 
 // add tools-specific variables here
 
