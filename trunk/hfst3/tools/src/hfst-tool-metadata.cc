@@ -16,7 +16,11 @@
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "hfst-tool-metadata.h"
+
 #include <stdexcept>
+#include <string>
+
+using std::string;
 
 void
 hfst_set_name(hfst::HfstTransducer& dest, const string& src,
