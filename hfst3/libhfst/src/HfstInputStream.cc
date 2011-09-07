@@ -9,9 +9,13 @@
 //
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
-//
-//       FIXME: The structure of this class and its functions is disorganised.
-//
+
+//! @FIXME: The structure of this class and its functions is disorganised.
+
+#include <string>
+
+using std::string;
+
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
 #include "implementations/ConvertTransducerFormat.h"
@@ -607,7 +611,7 @@ namespace hfst
   }
 
   void HfstInputStream::process_header_data
-  (StringPairVector &header_data, bool warnings)
+  (StringPairVector &header_data, bool )
   {
     if (header_data.size() < 2) {
       HFST_THROW_MESSAGE(TransducerHeaderException,

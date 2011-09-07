@@ -27,7 +27,9 @@
 
 #include <vector>
 #include <map>
+#include <string>
 
+using std::string;
 using std::vector;
 using std::pair;
 

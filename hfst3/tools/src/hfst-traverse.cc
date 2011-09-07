@@ -25,8 +25,13 @@
 #include <iostream>
 #include <fstream>
 #include <map>
+#include <string>
+#include <vector>
 
 using std::multimap;
+using std::string;
+using std::vector;
+using std::pair;
 
 #include <cstdio>
 #include <cstdlib>

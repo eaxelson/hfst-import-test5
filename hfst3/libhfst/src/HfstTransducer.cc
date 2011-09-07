@@ -16,6 +16,10 @@
     The implementations call backend implementations that are declared in
     files in the directory implementations. */
 
+#include <string>
+
+using std::string;
+
 #include "HfstTransducer.h"
 #include "HfstFlagDiacritics.h"
 #include "HfstExceptions.h"

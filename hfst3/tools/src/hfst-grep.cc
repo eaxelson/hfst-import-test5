@@ -24,11 +24,20 @@
 
 #include <iostream>
 #include <fstream>
+#include <string>
+#include <vector>
+#include <map>
+
+using std::string;
+using std::vector;
+using std::pair;
+using std::map;
 
 #include <cstdio>
 #include <cstdlib>
 #include <cstring>
 #include <getopt.h>
+#include <stdint.h>
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
