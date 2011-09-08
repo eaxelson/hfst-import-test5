@@ -3272,7 +3272,8 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
     // set some features
     anonymous = another.anonymous;
     is_trie = another.is_trie;
-  
+    this->set_name(another.get_name());
+
     // Delete old transducer.
     switch (this->type)
     {
@@ -3296,8 +3297,9 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
 #endif
     case HFST_OL_TYPE:
     case HFST_OLW_TYPE:
-      HFST_THROW_MESSAGE(FunctionNotImplementedException, 
-             "HfstTransducer::operator= for type HFST_OL(W)_TYPE");
+      //HFST_THROW_MESSAGE(FunctionNotImplementedException, 
+      //	       "HfstTransducer::operator= for type HFST_OL(W)_TYPE");
+      delete implementation.hfst_ol;
       break;
     /* Add here your implementation. */
     //#if HAVE_MY_TRANSDUCER_LIBRARY
@@ -3342,6 +3344,16 @@ HfstTransducer &HfstTransducer::operator=(const HfstTransducer &another)
         log_ofst_interface.copy(another_1.implementation.log_ofst);
     break;
 #endif
+    case HFST_OL_TYPE:
+      implementation.hfst_ol 
+	= another_1.implementation.hfst_ol->
+	copy(another_1.implementation.hfst_ol, false);
+      break;
+    case HFST_OLW_TYPE:
+      implementation.hfst_ol 
+	= another_1.implementation.hfst_ol->
+	copy(another_1.implementation.hfst_ol, true);
+      break;
     /* Add here your implementation. */
     default:
     (void)1;
