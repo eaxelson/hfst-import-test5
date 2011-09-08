@@ -74,10 +74,6 @@ namespace hfst
   //!
   //! Used by functions in namespace \link hfst::rules rules\endlink
   typedef std::pair <HfstTransducer,HfstTransducer> HfstTransducerPair;
-  //! @brief A set of transducer pairs
-  //!
-  //! Used by functions in namespace \link hfst::rules rules\endlink
-  typedef std::set <HfstTransducerPair> HfstTransducerPairSet;
   //! @brief A vector of transducer pairs
   //!
   //! Used by functions in namespace \link hfst::rules rules\endlink
