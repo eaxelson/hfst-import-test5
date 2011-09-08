@@ -1,11 +1,17 @@
-hfst-xfst -f NumbersToNumerals.xfst.script;
-sh NumbersToNumerals.hfst.script;
+hfst-xfst -f NumbersToNumerals.xfst.script
+hfst-project -p input NumbersToNumerals.xfst.hfst > expected_input
+hfst-project -p output NumbersToNumerals.xfst.hfst > expected_output
 
-hfst-project -p input NumbersToNumerals.xfst.hfst > xfst.input;
-hfst-project -p output NumbersToNumerals.xfst.hfst > xfst.output;
-
-hfst-project -p input NumbersToNumerals.hfst.hfst > hfst.input;
-hfst-project -p output NumbersToNumerals.hfst.hfst > hfst.output;
-
-hfst-compare -v xfst.input hfst.input;
-hfst-compare -v xfst.output hfst.output;
+for i in sfst openfst-tropical foma; do
+  sed -i "1s/TRANSDUCER_FORMAT/"$i"/;" NumbersToNumerals.hfst.script
+  echo "Testing" $i "..."
+  sh NumbersToNumerals.hfst.script
+  sed -i "1s/"$i"/TRANSDUCER_FORMAT/;" NumbersToNumerals.hfst.script
+  hfst-project -p input NumbersToNumerals.hfst.hfst \
+  | hfst-fst2fst -f openfst-tropical > result_input
+  hfst-project -p output NumbersToNumerals.hfst.hfst \
+  | hfst-fst2fst -f openfst-tropical > result_output
+  hfst-compare -q expected_input result_input && \
+  hfst-compare -q expected_input result_input && \
+  echo "TEST PASSED";
+done

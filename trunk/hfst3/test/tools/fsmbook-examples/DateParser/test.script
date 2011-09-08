@@ -1,14 +1,10 @@
 hfst-xfst -f DateParser.xfst.script
 
-for i in sfst openfst-tropical foma; do
-  echo "Testing" $i "..."
+for i in sfst openfst-tropical; do # foma
   sed -i "1s/TRANSDUCER_FORMAT/"$i"/;" DateParser.hfst.script
+  echo "Testing" $i "..."
   sh DateParser.hfst.script
   sed -i "1s/"$i"/TRANSDUCER_FORMAT/;" DateParser.hfst.script
-  hfst-project -p input DateParser.xfst.hfst | hfst-fst2fst -f $i > xfst.input
-  hfst-project -p output DateParser.xfst.hfst | hfst-fst2fst -f $i > xfst.output
-  hfst-project -p input DateParser.hfst.hfst > hfst.input
-  hfst-project -p output DateParser.hfst.hfst > hfst.output
-  hfst-compare -q xfst.input hfst.input && echo "OK"
-  hfst-compare -q xfst.output hfst.output && echo "OK"; 
+  hfst-fst2fst -f openfst-tropical DateParser.hfst.hfst > TMP
+  hfst-compare -q TMP DateParser.xfst.hfst && echo "TEST PASSED";
 done

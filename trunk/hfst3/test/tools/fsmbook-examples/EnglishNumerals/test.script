@@ -1,3 +1,10 @@
-hfst-xfst -f EnglishNumerals.xfst.script;
-sh EnglishNumerals.hfst.script;
-hfst-compare EnglishNumerals.xfst.hfst EnglishNumerals.hfst.hfst
+hfst-xfst -f EnglishNumerals.xfst.script
+
+for i in sfst openfst-tropical foma; do
+  sed -i "1s/TRANSDUCER_FORMAT/"$i"/;" EnglishNumerals.hfst.script
+  echo "Testing" $i "..."
+  sh EnglishNumerals.hfst.script
+  sed -i "1s/"$i"/TRANSDUCER_FORMAT/;" EnglishNumerals.hfst.script
+  hfst-fst2fst -f openfst-tropical EnglishNumerals.hfst.hfst > TMP
+  hfst-compare -q TMP EnglishNumerals.xfst.hfst && echo "TEST PASSED";
+done
