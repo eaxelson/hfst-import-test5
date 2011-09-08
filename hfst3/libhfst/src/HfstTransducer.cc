@@ -841,7 +841,15 @@ HfstTransducer::HfstTransducer(const HfstTransducer &another):
 {
     if (not is_implementation_type_available(type))
     HFST_THROW(ImplementationTypeNotAvailableException);
-
+    for (map<string,string>::const_iterator prop = another.props.begin();
+         prop != another.props.end();
+         ++prop)
+      {
+        if ((prop->first != "type"))
+          {
+            this->props[prop->first] = prop->second;
+          }
+      }
     switch (type)
     {
 #if HAVE_SFST

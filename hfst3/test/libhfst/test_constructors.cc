@@ -98,9 +98,15 @@ int main(int argc, char **argv)
       assert(foobar.compare(foobar2));
       HfstTransducer empty_ol(HFST_OL_TYPE);
       HfstTransducer empty_olw(HFST_OLW_TYPE);
+      /* reserving props in copy constructor (bug: #3405831) */
+      HfstTransducer t("a",TROPICAL_OPENFST_TYPE);
+      t.convert(HFST_OLW_TYPE);
+      t.set_name("foo");
+      HfstTransducer s(t);
+      assert(s.get_name() == t.get_name());
       try {
-    empty_ol = foobar2.convert(HFST_OL_TYPE);
-    empty_olw = foobar2.convert(HFST_OLW_TYPE);
+        empty_ol = foobar2.convert(HFST_OL_TYPE);
+        empty_olw = foobar2.convert(HFST_OLW_TYPE);
       }
       catch (const FunctionNotImplementedException e)
     {
