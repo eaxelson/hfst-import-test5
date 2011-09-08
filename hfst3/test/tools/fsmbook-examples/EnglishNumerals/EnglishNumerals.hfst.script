@@ -1,4 +1,4 @@
-FORMAT=openfst-tropical
+FORMAT=TRANSDUCER_FORMAT
 
 # From "one" to "nine":
 
