@@ -1,11 +1,14 @@
-hfst-xfst -f DateParser.xfst.script;
-sh DateParser.hfst.script;
+hfst-xfst -f DateParser.xfst.script
 
-hfst-project -p input DateParser.xfst.hfst > xfst.input;
-hfst-project -p output DateParser.xfst.hfst > xfst.output;
-
-hfst-project -p input DateParser.hfst.hfst > hfst.input;
-hfst-project -p output DateParser.hfst.hfst > hfst.output;
-
-hfst-compare -v xfst.input hfst.input;
-hfst-compare -v xfst.output hfst.output;
+for i in sfst openfst-tropical foma; do
+  echo "Testing" $i "..."
+  sed -i "1s/TRANSDUCER_FORMAT/"$i"/;" DateParser.hfst.script
+  sh DateParser.hfst.script
+  sed -i "1s/"$i"/TRANSDUCER_FORMAT/;" DateParser.hfst.script
+  hfst-project -p input DateParser.xfst.hfst | hfst-fst2fst -f $i > xfst.input
+  hfst-project -p output DateParser.xfst.hfst | hfst-fst2fst -f $i > xfst.output
+  hfst-project -p input DateParser.hfst.hfst > hfst.input
+  hfst-project -p output DateParser.hfst.hfst > hfst.output
+  hfst-compare -q xfst.input hfst.input && echo "OK"
+  hfst-compare -q xfst.output hfst.output && echo "OK"; 
+done
