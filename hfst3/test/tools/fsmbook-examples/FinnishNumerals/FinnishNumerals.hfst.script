@@ -1,4 +1,4 @@
-FORMAT=openfst-tropical
+FORMAT=TRANSDUCER_FORMAT
 
 # First, we create a transducer that maps numbers 2 ... 9 to the corresponding numerals:
 echo "2:kaksi
@@ -33,9 +33,9 @@ hfst-disjunct 1to9.hfst 10.hfst | hfst-disjunct 11to19.hfst | hfst-disjunct 20to
 # To get transducers that map Finnish to English numerals and vice versa, we use
 # composition and inversion.
 # NOTE: we assume that the file NumbersToNumerals.hfst is already created
-hfst-invert FinnishNumerals.hfst | hfst-compose ../NumbersToNumerals/NumbersToNumerals.hfst > FinnishToEnglishNumerals.hfst;
-hfst-invert FinnishToEnglishNumerals.hfst > EnglishToFinnishNumerals.hfst;
+hfst-fst2fst -f $FORMAT ../NumbersToNumerals/NumbersToNumerals.hfst.hfst > TMP
 
-# Now we can test the transducers:
-# TODO...
+hfst-invert FinnishNumerals.hfst | hfst-compose TMP | hfst-minimize > FinnishToEnglishNumerals.hfst;
+hfst-invert FinnishToEnglishNumerals.hfst | hfst-minimize > EnglishToFinnishNumerals.hfst;
+
 

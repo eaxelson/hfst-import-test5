@@ -1,10 +1,13 @@
-hfst-xfst -f FOO.xfst.script
+echo "yellow Norwegian water Dunhill cats |"\
+     "blue Dane tea Blend horses |"\
+     "red Englishman milk PallMall birds |"\
+     "green German coffee Prince fish |"\
+     "white Swede bier BlueMaster dogs " > expected_result
 
-for i in sfst openfst-tropical foma; do
-  sed -i "1s/TRANSDUCER_FORMAT/"$i"/;" FOO.hfst.script
+for i in sfst openfst-tropical; do # foma
+  sed -i "1s/TRANSDUCER_FORMAT/"$i"/;" EinsteinsPuzzle.hfst.script
   echo "Testing" $i "..."
-  sh FOO.hfst.script
-  sed -i "1s/"$i"/TRANSDUCER_FORMAT/;" FOO.hfst.script
-  hfst-fst2fst -f openfst-tropical FOO.hfst.hfst > TMP
-  hfst-compare -q TMP FOO.xfst.hfst && echo "TEST PASSED";
+  bash EinsteinsPuzzle.hfst.script
+  sed -i "1s/"$i"/TRANSDUCER_FORMAT/;" EinsteinsPuzzle.hfst.script
+  diff -q result expected_result && echo "TEST PASSED"; 
 done

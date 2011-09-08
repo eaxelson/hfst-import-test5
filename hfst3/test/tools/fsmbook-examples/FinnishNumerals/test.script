@@ -1,10 +1,13 @@
-hfst-xfst -f FOO.xfst.script
-
-for i in sfst openfst-tropical foma; do
-  sed -i "1s/TRANSDUCER_FORMAT/"$i"/;" FOO.hfst.script
+# sfst composition filter..
+# foma composition filter and same paths printed many times...
+for i in openfst-tropical; do 
+  sed -i "1s/TRANSDUCER_FORMAT/"$i"/;" FinnishNumerals.hfst.script
   echo "Testing" $i "..."
-  sh FOO.hfst.script
-  sed -i "1s/"$i"/TRANSDUCER_FORMAT/;" FOO.hfst.script
-  hfst-fst2fst -f openfst-tropical FOO.hfst.hfst > TMP
-  hfst-compare -q TMP FOO.xfst.hfst && echo "TEST PASSED";
+  sh FinnishNumerals.hfst.script
+  sed -i "1s/"$i"/TRANSDUCER_FORMAT/;" FinnishNumerals.hfst.script
+  hfst-fst2strings EnglishToFinnishNumerals.hfst | uniq | sort > TMP1
+  hfst-fst2strings FinnishToEnglishNumerals.hfst | uniq | sort > TMP2
+  diff -q english_to_finnish_numerals_expected TMP1 &&
+  diff -q finnish_to_english_numerals_expected TMP2 &&
+  echo "TEST PASSED";
 done
