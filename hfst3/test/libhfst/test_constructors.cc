@@ -94,7 +94,9 @@ int main(int argc, char **argv)
       /* Operator=. */
       verbose_print("Operator=", types[i]);
       HfstTransducer foobar2("baz", types[i]);
+      assert(foobar.get_name().compare("foobar") == 0);
       foobar2 = foobar;
+      assert(foobar2.get_name().compare("foobar") == 0);
       assert(foobar.compare(foobar2));
       HfstTransducer empty_ol(HFST_OL_TYPE);
       HfstTransducer empty_olw(HFST_OLW_TYPE);
@@ -107,10 +109,13 @@ int main(int argc, char **argv)
       try {
         empty_ol = foobar2.convert(HFST_OL_TYPE);
         empty_olw = foobar2.convert(HFST_OLW_TYPE);
+	assert(empty_ol.get_name().compare("foobar") == 0);
+	assert(empty_olw.get_name().compare("foobar") == 0);
       }
       catch (const FunctionNotImplementedException e)
-    {
-    }
+	{
+	  assert(false);
+	}
 
     }
 
