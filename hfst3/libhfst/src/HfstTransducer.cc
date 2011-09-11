@@ -17,8 +17,10 @@
     files in the directory implementations. */
 
 #include <string>
+#include <map>
 
 using std::string;
+using std::map;
 
 #include "HfstTransducer.h"
 #include "HfstFlagDiacritics.h"
