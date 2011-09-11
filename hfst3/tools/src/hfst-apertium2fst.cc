@@ -66,6 +66,10 @@ static hfst::ImplementationType format = hfst::UNSPECIFIED_TYPE;
 static set<string> tags;
 static map<string, vector<pair<string,string> > > pardefs;
 static map<string, vector<pair<string,string> > > sections;
+static map<string, vector<pair<string,string> > > preblanks;
+static map<string, vector<pair<string,string> > > postblanks;
+static map<string, vector<pair<string,string> > > inconditionals;
+
 static char* alphabets = 0;
 
 
@@ -273,7 +277,7 @@ process_stream(HfstOutputStream& outstream)
                       if (xmlStrcmp(e->name, xmlCharStrdup("e")) == 0)
                         {
                           // in e; expect:
-                          // [p | i | par]+
+                          // [p | i | par | re]+
                           affixes++;
                           string left;
                           string right;
@@ -308,6 +312,7 @@ process_stream(HfstOutputStream& outstream)
                                       if (xmlStrcmp(rl->name, xmlCharStrdup("l")) == 0)
                                         {
                                           xmlNodePtr l = rl->xmlChildrenNode;
+                                          bool emptiness = true;
                                           while (l != NULL)
                                             {
                                               if (xmlStrcmp(l->name, xmlCharStrdup("s")) == 0)
@@ -316,6 +321,7 @@ process_stream(HfstOutputStream& outstream)
                                                   left += string("<") + 
                                                     reinterpret_cast<char*>(tagname) +
                                                     ">";
+                                                  emptiness = false;
                                                 }
                                               else if (xmlNodeIsText(l))
                                                 {
@@ -323,13 +329,21 @@ process_stream(HfstOutputStream& outstream)
                                                                                        l,
                                                                                        1);
                                                   left += reinterpret_cast<char*>(surf);
+                                                  emptiness = false;
                                                 }
                                               l = l->next;
+                                            } // while l
+                                          if (emptiness)
+                                            {
+                                              left += string("@@EMPTY_MORPH_DONT_LEAK@@");
+                                              tok.add_multichar_symbol("@@EMPTY_MORPH_DONT_LEAK@@");
                                             }
+
                                         } // if l
                                       else if (xmlStrcmp(rl->name, xmlCharStrdup("r")) == 0)
                                         {
                                           xmlNodePtr r = rl->xmlChildrenNode;
+                                          bool emptiness = true;
                                           while (r != NULL)
                                             {
                                               if (xmlStrcmp(r->name, xmlCharStrdup("s")) == 0)
@@ -338,6 +352,7 @@ process_stream(HfstOutputStream& outstream)
                                                   right += string("<") + 
                                                     reinterpret_cast<char*>(tagname) +
                                                     ">";
+                                                  emptiness = false;
                                                 }
                                               else if (xmlNodeIsText(r))
                                                 {
@@ -345,9 +360,16 @@ process_stream(HfstOutputStream& outstream)
                                                                                        r,
                                                                                        1);
                                                   right += reinterpret_cast<char*>(surf);
+                                                  emptiness = false;
                                                 }
                                               r = r->next;
+                                            } // while r
+                                          if (emptiness)
+                                            {
+                                              right += string("@@EMPTY_MORPH_DONT_LEAK@@");
+                                              tok.add_multichar_symbol("@@EMPTY_MORPH_DONT_LEAK@@");
                                             }
+
                                         } // if r
                                       rl = rl->next;
                                     } // while rl
@@ -355,6 +377,7 @@ process_stream(HfstOutputStream& outstream)
                               else if (xmlStrcmp(pair->name, xmlCharStrdup("i")) == 0)
                                 {
                                   xmlNodePtr i = pair->xmlChildrenNode;
+                                  bool emptiness = true;
                                   while (i != NULL)
                                     {
                                       if (xmlStrcmp(i->name, xmlCharStrdup("s")) == 0)
@@ -366,6 +389,7 @@ process_stream(HfstOutputStream& outstream)
                                           right += string("<") +
                                            reinterpret_cast<char*>(tagname) +
                                            ">";
+                                          emptiness = false;
                                         }
                                       else if (xmlNodeIsText(i))
                                         {
@@ -374,9 +398,16 @@ process_stream(HfstOutputStream& outstream)
                                                                                1);
                                           left += reinterpret_cast<char*>(surf);
                                           right += reinterpret_cast<char*>(surf);
+                                          emptiness = false;
                                         }
                                       i = i->next;
                                     } // while i
+                                  if (emptiness)
+                                    {
+                                      left += string("@@EMPTY_MORPH_DONT_LEAK@@");
+                                      right += string("@@EMPTY_MORPH_DONT_LEAK@@");
+                                      tok.add_multichar_symbol("@@EMPTY_MORPH_DONT_LEAK@@");
+                                    }
                                 } // if i
                               else if (xmlStrcmp(pair->name, xmlCharStrdup("par")) == 0)
                                 {
@@ -389,6 +420,20 @@ process_stream(HfstOutputStream& outstream)
                                     "@";
 
                                 } // if par
+                              else if (xmlStrcmp(pair->name, xmlCharStrdup("re")) == 0)
+                                {
+                                  xmlChar* re = xmlNodeListGetString(doc, 
+                                                                     pair->children,
+                                                                     1);
+                                  left += string("@ERE<@") + 
+                                      reinterpret_cast<char*>(re)
+                                      + "@>ERE@";
+                                  right += string("@ERE<@") +
+                                      reinterpret_cast<char*>(re)
+                                      + "@>ERE@";
+                                  tok.add_multichar_symbol("@ERE>@");
+                                  tok.add_multichar_symbol("@>ERE@");
+                                } // if re
                               pair = pair->next;
                             } // while pair
                           if (right == "")
@@ -456,15 +501,6 @@ process_stream(HfstOutputStream& outstream)
                           tok.add_multichar_symbol("@R.LR.FALSE@");
                         }
                     }
-                  left += string("@P.SECTYPE.") +
-                    reinterpret_cast<char*>(sectype) +
-                    "@";
-                  right += string("@P.SECTYPE.") +
-                    reinterpret_cast<char*>(sectype) +
-                    "@";
-                  tok.add_multichar_symbol(string("@P.SECTYPE.") +
-                                           reinterpret_cast<char*>(sectype) +
-                                           "@");
                   xmlNodePtr pair = e->xmlChildrenNode;
                   while (pair != NULL)
                     {
@@ -476,6 +512,7 @@ process_stream(HfstOutputStream& outstream)
                               if (xmlStrcmp(rl->name, xmlCharStrdup("l")) == 0)
                                 {
                                   xmlNodePtr l = rl->xmlChildrenNode;
+                                  bool emptiness = true;
                                   while (l != NULL)
                                     {
                                       if (xmlStrcmp(l->name, xmlCharStrdup("s")) == 0)
@@ -484,6 +521,7 @@ process_stream(HfstOutputStream& outstream)
                                           left += string("<") + 
                                             reinterpret_cast<char*>(tagname) +
                                             ">";
+                                          emptiness = false;
                                         }
                                       else if (xmlNodeIsText(l))
                                         {
@@ -491,13 +529,20 @@ process_stream(HfstOutputStream& outstream)
                                                                                l,
                                                                                1);
                                           left += reinterpret_cast<char*>(surf);
+                                          emptiness = false;
                                         }
                                       l = l->next;
+                                    } // while l
+                                  if (emptiness)
+                                    {
+                                      left += string("@@EMPTY_MORPH_DONT_LEAK@@");
+                                      tok.add_multichar_symbol("@@EMPTY_MORPH_DONT_LEAK@@");
                                     }
                                 } // if l
                               else if (xmlStrcmp(rl->name, xmlCharStrdup("r")) == 0)
                                 {
                                   xmlNodePtr r = rl->xmlChildrenNode;
+                                  bool emptiness = true;
                                   while (r != NULL)
                                     {
                                       if (xmlStrcmp(r->name, xmlCharStrdup("s")) == 0)
@@ -506,6 +551,7 @@ process_stream(HfstOutputStream& outstream)
                                           right += string("<") + 
                                             reinterpret_cast<char*>(tagname) +
                                             ">";
+                                          emptiness = false;
                                         }
                                       else if (xmlNodeIsText(r))
                                         {
@@ -513,8 +559,14 @@ process_stream(HfstOutputStream& outstream)
                                                                                r,
                                                                                1);
                                           right += reinterpret_cast<char*>(surf);
+                                          emptiness = false;
                                         }
                                       r = r->next;
+                                    }
+                                  if (emptiness)
+                                    {
+                                      right += string("@@EMPTY_MORPH_DONT_LEAK@@");
+                                      tok.add_multichar_symbol("@@EMPTY_MORPH_DONT_LEAK@@");
                                     }
                                 } // if r
                               rl = rl->next;
@@ -523,6 +575,7 @@ process_stream(HfstOutputStream& outstream)
                       else if (xmlStrcmp(pair->name, xmlCharStrdup("i")) == 0)
                         {
                           xmlNodePtr i = pair->xmlChildrenNode;
+                          bool emptiness = true;
                           while (i != NULL)
                             {
                               if (xmlStrcmp(i->name, xmlCharStrdup("s")) == 0)
@@ -534,6 +587,7 @@ process_stream(HfstOutputStream& outstream)
                                   right += string("<") +
                                    reinterpret_cast<char*>(tagname) +
                                    ">";
+                                  emptiness = false;
                                 }
                               else if (xmlNodeIsText(i))
                                 {
@@ -542,9 +596,17 @@ process_stream(HfstOutputStream& outstream)
                                                                        1);
                                   left += reinterpret_cast<char*>(surf);
                                   right += reinterpret_cast<char*>(surf);
+                                  emptiness = false;
                                 }
                               i = i->next;
                             } // while i
+                          if (emptiness)
+                            {
+                              left += string("@@EMPTY_MORPH_DONT_LEAK@@");
+                              right += string("@@EMPTY_MORPH_DONT_LEAK@@");
+                              tok.add_multichar_symbol("@@EMPTY_MORPH_DONT_LEAK@@");
+                            }
+
                         } // if i
                       else if (xmlStrcmp(pair->name, xmlCharStrdup("par")) == 0)
                         {
@@ -556,6 +618,18 @@ process_stream(HfstOutputStream& outstream)
                             reinterpret_cast<char*>(parref) + 
                             "@";
                         } // if pair
+                      else if (xmlStrcmp(pair->name, xmlCharStrdup("re")) == 0)
+                        {
+                          xmlChar* re = xmlNodeListGetString(doc, pair->children, 1);
+                          left += string("@ERE<@") + 
+                              reinterpret_cast<char*>(re)
+                              + "@>ERE@";
+                          right += string("@ERE<@") +
+                              reinterpret_cast<char*>(re)
+                              + "@>ERE@";
+                          tok.add_multichar_symbol("@ERE<@");
+                          tok.add_multichar_symbol("@>ERE@");
+                        } // if re
                       pair = pair->next;
                     } // while pair
                   if (right == "")
@@ -572,14 +646,30 @@ process_stream(HfstOutputStream& outstream)
               e = e->next;
             } // while e
           verbose_printf("%lu\n", roots);
-          sections[reinterpret_cast<char*>(secid)] = es;
+          if (xmlStrcmp(sectype, reinterpret_cast<const xmlChar*>("standard")) == 0)
+            {
+              sections[reinterpret_cast<char*>(secid)] = es;
+            }
+          else if (xmlStrcmp(sectype, reinterpret_cast<const xmlChar*>("preblank")) == 0)
+            {
+              preblanks[reinterpret_cast<char*>(secid)] = es;
+            }
+          else if (xmlStrcmp(sectype, reinterpret_cast<const xmlChar*>("postblank")) == 0)
+            {
+              postblanks[reinterpret_cast<char*>(secid)] = es;
+            }
+          else if (xmlStrcmp(sectype, reinterpret_cast<const xmlChar*>("inconditional")) == 0)
+            {
+              inconditionals[reinterpret_cast<char*>(secid)] = es;
+            }
         } // if section
       node = node->next;
     } // while node
   // create PARDEF* ROOT PARDEF*
   verbose_printf("Turning parsed string into HFST automaton...\n");
   HfstTransducer t(format);
-  HfstTransducer pardefsTrans(format);
+  HfstTransducer prefixPardefsTrans(format);
+  HfstTransducer suffixPardefsTrans(format);
   verbose_printf("Joining pardefs... ");
   for (map<string, vector<StringPair> >::const_iterator par = pardefs.begin();
        par != pardefs.end();
@@ -599,20 +689,24 @@ process_stream(HfstOutputStream& outstream)
           HfstTransducer morphTrans(morph->first, morph->second, tok, format);
           morphs.disjunct(morphTrans);
         }
-      HfstTransducer pardefTrans(parJoinerLeft);
-      pardefTrans.concatenate(morphs).concatenate(parJoinerRight);
-      pardefTrans.minimize();
-      pardefsTrans.disjunct(pardefTrans);
+      HfstTransducer suffixPardefTrans(parJoinerLeft);
+      suffixPardefTrans.concatenate(morphs);
+      suffixPardefTrans.minimize();
+      suffixPardefsTrans.disjunct(suffixPardefTrans);
+      HfstTransducer prefixPardefTrans(morphs);
+      prefixPardefTrans.concatenate(parJoinerRight);
+      prefixPardefTrans.minimize();
+      prefixPardefsTrans.disjunct(prefixPardefTrans);
     }
   verbose_printf("\nRepeating and minimising...\n");
-  pardefsTrans.repeat_star().minimize();
+  prefixPardefsTrans.repeat_star().minimize();
+  suffixPardefsTrans.repeat_star().minimize();
   if (debug)
     {
-      std::cerr << "pardefs:" << std::endl << pardefsTrans << std::endl;
+      std::cerr << "prefix pardefs:" << std::endl << prefixPardefsTrans << std::endl;
+      std::cerr << "suffix pardefs:" << std::endl << suffixPardefsTrans << std::endl;
     }
-  HfstTransducer prefixes(pardefsTrans);
-  HfstTransducer suffixes(pardefsTrans);
-  verbose_printf("Joining sections... ");
+  verbose_printf("Joining standard sections... ");
   HfstTransducer sectionsTrans(format);
   for (map<string, vector<StringPair> >::const_iterator root = sections.begin();
        root != sections.end();
@@ -629,16 +723,77 @@ process_stream(HfstOutputStream& outstream)
         }
       sectionsTrans.disjunct(roots);
     }
+  verbose_printf("\npreblanks... ");
+  HfstTransducer preblanksTrans(hfst::internal_epsilon, hfst::internal_epsilon,
+                                format);
+  for (map<string, vector<StringPair> >::const_iterator root = preblanks.begin();
+       root != preblanks.end();
+       ++root)
+    {
+      verbose_printf("%s... ", root->first.c_str());
+      HfstTransducer roots(format);
+      for (vector<StringPair>::const_iterator morph = root->second.begin();
+           morph != root->second.end();
+           ++morph)
+        {
+          HfstTransducer morphTrans(morph->first, morph->second, tok, format);
+          roots.disjunct(morphTrans);
+        }
+      preblanksTrans.disjunct(roots);
+    }
+  preblanksTrans.optionalize();
+  verbose_printf("\npostblanks... ");
+  HfstTransducer postblanksTrans(hfst::internal_epsilon, hfst::internal_epsilon,
+                                 format);
+  for (map<string, vector<StringPair> >::const_iterator root = postblanks.begin();
+       root != postblanks.end();
+       ++root)
+    {
+      verbose_printf("%s... ", root->first.c_str());
+      HfstTransducer roots(format);
+      for (vector<StringPair>::const_iterator morph = root->second.begin();
+           morph != root->second.end();
+           ++morph)
+        {
+          HfstTransducer morphTrans(morph->first, morph->second, tok, format);
+          roots.disjunct(morphTrans);
+        }
+      postblanksTrans.disjunct(roots);
+    }
+  postblanksTrans.optionalize();
+  verbose_printf("\ninconditionals... ");
+  HfstTransducer inconditionalsTrans(format);
+  for (map<string, vector<StringPair> >::const_iterator root = inconditionals.begin();
+       root != inconditionals.end();
+       ++root)
+    {
+      verbose_printf("%s... ", root->first.c_str());
+      HfstTransducer roots(format);
+      for (vector<StringPair>::const_iterator morph = root->second.begin();
+           morph != root->second.end();
+           ++morph)
+        {
+          HfstTransducer morphTrans(morph->first, morph->second, tok, format);
+          roots.disjunct(morphTrans);
+        }
+      inconditionalsTrans.disjunct(roots);
+    }
   verbose_printf("\nMinimising...\n");
   sectionsTrans.minimize();
+  preblanksTrans.minimize();
+  postblanksTrans.minimize();
+  inconditionalsTrans.minimize();
   if (debug)
     {
-      std::cerr << "Sections:" << std::endl << sectionsTrans << std::endl;
+      std::cerr << "Standard sections:" << std::endl << sectionsTrans << std::endl;
+      std::cerr << "Postblanks:" << std::endl << postblanksTrans << std::endl;
+      std::cerr << "Preblanks:" << std::endl << preblanksTrans << std::endl;
+      std::cerr << "Inconditionals:" << std::endl << inconditionalsTrans << std::endl;
     }
   verbose_printf("Concatenating...\n");
-  HfstTransducer result(prefixes);
+  HfstTransducer result(prefixPardefsTrans);
   result.concatenate(sectionsTrans);
-  result.concatenate(suffixes);
+  result.concatenate(suffixPardefsTrans);
   if (debug)
     {
       std::cerr << "prefixes-root-suffixes:" <<
@@ -646,6 +801,7 @@ process_stream(HfstOutputStream& outstream)
     }
   verbose_printf("Creating morphotax...");
   HfstTransducer joiners(format);
+  HfstTransducer joinerPairs(format);
   for (map<string, vector<StringPair> >::const_iterator pardef = pardefs.begin();
        pardef != pardefs.end();
        ++pardef)
@@ -656,19 +812,16 @@ process_stream(HfstOutputStream& outstream)
       parJoinerString.append("@");
       HfstTransducer parJoiner(parJoinerString, parJoinerString, format);
       joiners.disjunct(parJoiner);
+      joinerPairs.disjunct(parJoiner.repeat_n(2));
     }
   HfstTransducer sigmaMinusJoiners(hfst::internal_identity,
                                    hfst::internal_identity,
                                    format);
   sigmaMinusJoiners.subtract(joiners);
-  HfstTransducer joinerPair(joiners);
-  joinerPair.repeat_n(2);
-  joinerPair.disjunct(sigmaMinusJoiners);
-  joiners.optionalize();
-  HfstTransducer morphotax(joiners);
-  morphotax.concatenate(joinerPair);
-  morphotax.concatenate(joiners);
+  HfstTransducer morphotax(joinerPairs.disjunct(sigmaMinusJoiners));
   morphotax.repeat_star();
+  morphotax.minimize();
+  morphotax.insert_freely_missing_flags_from(result);
   morphotax.minimize();
   if (debug)
     {
@@ -676,6 +829,11 @@ process_stream(HfstOutputStream& outstream)
     }
   verbose_printf("Applying morphotax...\n");
   t = morphotax.compose(result);
+  verbose_printf("Minimising...\n");
+  t.minimize();
+  verbose_printf("Adding other sections");
+  t = postblanksTrans.concatenate(t).concatenate(preblanksTrans);
+  t.disjunct(inconditionalsTrans);
   verbose_printf("Discarding joiners...\n");
   for (map<string, vector<StringPair> >::const_iterator pardef = pardefs.begin();
        pardef != pardefs.end();
@@ -687,6 +845,7 @@ process_stream(HfstOutputStream& outstream)
       parJoinerString.append("@");
       t.substitute(parJoinerString, hfst::internal_epsilon);
     }
+  t.substitute("@@EMPTY_MORPH_DONT_LEAK@@", hfst::internal_epsilon);
   verbose_printf("\nMinimising...\n");
   t.minimize();
   if (debug)
