@@ -424,13 +424,13 @@ AC_PATH_PROG([DOXYGEN], [doxygen], [no])
 AM_CONDITIONAL([CAN_DOXYGEN], [test x$DOXYGEN != xno])
 
 # Checks for libraries
-AC_CHECK_LIB([pthread], [main])
-AC_CHECK_LIB([dl], [main])
 
 AC_LANG_PUSH([C++])
 AS_IF([test "x$with_openfst" != "xno"], 
       [AC_CHECK_LIB([fst], [main], [],
                  [AC_MSG_FAILURE([openfst test failed (--without-openfst to disable)])])]
+      [AC_CHECK_LIB([pthread], [main])]
+      [AC_CHECK_LIB([dl], [main])]
       [AC_CHECK_LIB([m], [main])])
 AS_IF([test "x$with_sfst" != "xno"],
       [AC_CHECK_LIB([sfst], [main])]
