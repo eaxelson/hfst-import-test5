@@ -53,7 +53,7 @@ typedef pair<string,string> StringPair;
 #include "hfst-program-options.h"
 #include "hfst-tool-metadata.h"
 
-
+using hfst::HfstBasicTransducer;
 using hfst::HfstTransducer;
 using hfst::HfstOutputStream;
 using hfst::HfstTokenizer;
@@ -681,19 +681,19 @@ process_stream(HfstOutputStream& outstream)
       parJoinerString.append("@");
       HfstTransducer parJoinerLeft(parJoinerString, parJoinerString, format);
       HfstTransducer parJoinerRight(parJoinerLeft);
-      HfstTransducer morphs(format);
+      HfstBasicTransducer morphs;
       for (vector<StringPair>::const_iterator morph = par->second.begin();
            morph != par->second.end();
            ++morph)
         {
-          HfstTransducer morphTrans(morph->first, morph->second, tok, format);
-          morphs.disjunct(morphTrans);
+          hfst::StringPairVector spv = tok.tokenize(morph->first, morph->second);
+          morphs.disjunct(spv, 0);
         }
       HfstTransducer suffixPardefTrans(parJoinerLeft);
-      suffixPardefTrans.concatenate(morphs);
+      suffixPardefTrans.concatenate(HfstTransducer(morphs, format));
       suffixPardefTrans.minimize();
       suffixPardefsTrans.disjunct(suffixPardefTrans);
-      HfstTransducer prefixPardefTrans(morphs);
+      HfstTransducer prefixPardefTrans(HfstTransducer(morphs, format));
       prefixPardefTrans.concatenate(parJoinerRight);
       prefixPardefTrans.minimize();
       prefixPardefsTrans.disjunct(prefixPardefTrans);
@@ -713,15 +713,21 @@ process_stream(HfstOutputStream& outstream)
        ++root)
     {
       verbose_printf("%s... ", root->first.c_str());
-      HfstTransducer roots(format);
+      HfstBasicTransducer roots;
+      unsigned long root_count = 0;
       for (vector<StringPair>::const_iterator morph = root->second.begin();
            morph != root->second.end();
            ++morph)
         {
-          HfstTransducer morphTrans(morph->first, morph->second, tok, format);
-          roots.disjunct(morphTrans);
+          root_count++;
+          if ((root_count % 1000) == 0)
+            {
+              verbose_printf("%lu... ", root_count);
+            }
+          hfst::StringPairVector spv = tok.tokenize(morph->first, morph->second);
+          roots.disjunct(spv, 0);
         }
-      sectionsTrans.disjunct(roots);
+      sectionsTrans.disjunct(HfstTransducer(roots, format));
     }
   verbose_printf("\npreblanks... ");
   HfstTransducer preblanksTrans(hfst::internal_epsilon, hfst::internal_epsilon,
@@ -827,14 +833,14 @@ process_stream(HfstOutputStream& outstream)
     {
       std::cerr << "morphotax:" << std::endl << morphotax << std::endl;
     }
-  verbose_printf("Applying morphotax...\n");
+  verbose_printf("\nApplying morphotax...\n");
   t = morphotax.compose(result);
   verbose_printf("Minimising...\n");
   t.minimize();
-  verbose_printf("Adding other sections");
+  verbose_printf("Adding other sections...\n");
   t = postblanksTrans.concatenate(t).concatenate(preblanksTrans);
   t.disjunct(inconditionalsTrans);
-  verbose_printf("Discarding joiners...\n");
+  verbose_printf("Discarding joiners... ");
   for (map<string, vector<StringPair> >::const_iterator pardef = pardefs.begin();
        pardef != pardefs.end();
        ++pardef)
