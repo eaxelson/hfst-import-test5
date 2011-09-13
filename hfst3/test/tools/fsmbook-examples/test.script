@@ -1,0 +1,8 @@
+for i in DateParser EinsteinsPuzzle EnglishNumerals \
+FinnishNumerals NumbersToNumerals; \
+do \
+  echo " --- Directory:" $i "---"; 
+  cd $i && \
+  bash test.script && \
+  cd ..; \
+done

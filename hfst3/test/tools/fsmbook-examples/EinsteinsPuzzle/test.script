@@ -4,7 +4,7 @@ echo "yellow Norwegian water Dunhill cats |"\
      "green German coffee Prince fish |"\
      "white Swede bier BlueMaster dogs " > expected_result
 
-for i in sfst openfst-tropical; do # foma
+for i in sfst openfst-tropical foma; do
   sed -i "1s/TRANSDUCER_FORMAT/"$i"/;" EinsteinsPuzzle.hfst.script
   echo "Testing" $i "..."
   bash EinsteinsPuzzle.hfst.script
