@@ -873,12 +873,17 @@ namespace hfst { namespace implementations {
         printf("File format error!\n");
         return NULL;
     }
-    net->states = (fsm_state*) malloc(net->linecount*sizeof(struct fsm_state));
+    net->states = (fsm_state*) malloc(net->linecount*sizeof(struct fsm_state)); // error
+    // DEBUG
+    //fprintf(stderr, "Reserved space for %i state lines\n", net->linecount);
     fsm = net->states;
     laststate = -1;
     for (i=0; ;i++) {
       io_gets(infile, buf);
         if (buf[0] == '#') break;
+
+	// DEBUG
+	//fprintf(stderr, "  state line number %i: %s\n", i, buf);
 
         /* scanf is just too slow here */
 
@@ -912,7 +917,7 @@ namespace hfst { namespace implementations {
             last_final = lineint[3];
             break;
         case 5:
-            (fsm+i)->state_no = lineint[0];
+	  (fsm+i)->state_no = lineint[0]; // error
             (fsm+i)->in = lineint[1];
             (fsm+i)->out = lineint[2];
             (fsm+i)->target = lineint[3];
@@ -991,6 +996,9 @@ static inline int explode_line (char *buf, int *values) {
     struct fsm_state *fsm;
     int i, maxsigma, laststate, *cm;
 
+    // If this is not done, linecount can return a false value.
+    fsm_count(net);
+
     /* Header */
     fprintf(outfile, "%s","##foma-net 1.0##\n");
 
@@ -1022,6 +1030,7 @@ static inline int explode_line (char *buf, int *values) {
     laststate = -1;
     fsm = net->states;
     fprintf(outfile, "%s","##states##\n");
+
     for (fsm = net->states; fsm->state_no !=-1; fsm++) {
         if (fsm->state_no != laststate) {
             if (fsm->in != fsm->out) {
