@@ -1,6 +1,6 @@
 hfst-xfst -f DateParser.xfst.script
 
-for i in sfst openfst-tropical; do # foma
+for i in sfst openfst-tropical foma; do
   sed -i "1s/TRANSDUCER_FORMAT/"$i"/;" DateParser.hfst.script
   echo "Testing" $i "..."
   sh DateParser.hfst.script
