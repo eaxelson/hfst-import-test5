@@ -1,3 +1,4 @@
+#!/bin/bash
 # hfst-xfst -f DateParser.xfst.script
 hfst-txt2fst -f openfst-tropical DateParser.xfst.att > \
   DateParser.xfst.hfst

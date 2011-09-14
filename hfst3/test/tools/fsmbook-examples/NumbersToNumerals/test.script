@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # hfst-xfst -f NumbersToNumerals.xfst.script
 hfst-txt2fst -f openfst-tropical NumbersToNumerals.xfst.att > \
   NumbersToNumerals.xfst.hfst
