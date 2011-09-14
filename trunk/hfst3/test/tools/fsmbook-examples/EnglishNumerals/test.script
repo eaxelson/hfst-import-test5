@@ -1,4 +1,6 @@
-hfst-xfst -f EnglishNumerals.xfst.script
+# hfst-xfst -f EnglishNumerals.xfst.script
+hfst-txt2fst -f openfst-tropical EnglishNumerals.xfst.att > \
+  EnglishNumerals.xfst.hfst
 
 for i in sfst openfst-tropical foma; do
   sed -i "1s/TRANSDUCER_FORMAT/"$i"/;" EnglishNumerals.hfst.script

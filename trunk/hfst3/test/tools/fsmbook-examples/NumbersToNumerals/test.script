@@ -1,4 +1,6 @@
-hfst-xfst -f NumbersToNumerals.xfst.script
+# hfst-xfst -f NumbersToNumerals.xfst.script
+hfst-txt2fst -f openfst-tropical NumbersToNumerals.xfst.att > \
+  NumbersToNumerals.xfst.hfst
 hfst-project -p input NumbersToNumerals.xfst.hfst > expected_input
 hfst-project -p output NumbersToNumerals.xfst.hfst > expected_output
 
