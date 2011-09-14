@@ -1,3 +1,5 @@
+#!/bin/bash
+
 # sfst composition filter..
 # foma composition filter and same paths printed many times...
 for i in openfst-tropical; do 
@@ -10,4 +12,5 @@ for i in openfst-tropical; do
   diff -q english_to_finnish_numerals_expected TMP1 &&
   diff -q finnish_to_english_numerals_expected TMP2 &&
   echo "TEST PASSED";
+  exit 1;
 done
