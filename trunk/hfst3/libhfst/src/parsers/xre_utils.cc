@@ -259,6 +259,7 @@ parse_quoted(const char *s)
               }
           }
       }
+    *r = '\0';
     free(quoted);
     return rv;
 }
