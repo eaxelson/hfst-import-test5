@@ -1,0 +1,9 @@
+#!/bin/bash
+
+for i in sfst openfst-tropical; do # hfst-reverse with foma does not work..
+  sed -i "1s/TRANSDUCER_FORMAT/"$i"/;" Palindroms.hfst.script
+  echo "Testing" $i "..."
+  sh Palindroms.hfst.script
+  sed -i "1s/"$i"/TRANSDUCER_FORMAT/;" Palindroms.hfst.script
+  diff -q result expected_result && echo "TEST PASSED";
+done

@@ -1,0 +1,33 @@
+FORMAT=TRANSDUCER_FORMAT
+
+# We first construct BidirEnglish that
+# contains all the words whose reverse is also a word of English,
+# for example, "madam" and "dog". We wish to keep "madam" (reversed "madam") and
+# eliminate "dog" (reversed "god").
+
+cat words.txt | hfst-strings2fst -f $FORMAT -j > English
+
+# We intersect English with its reverse. We only take into account
+# words that contain at least two characters. (Words like "a"
+# and "I" are not interesting here.)
+
+echo '[? ?+]' | hfst-regexp2fst -f $FORMAT > MinTwoChars
+hfst-reverse English | hfst-conjunct English | hfst-conjunct MinTwoChars > BidirEnglish
+
+# Next we print all strings recognized by =BidirPaths= and construct a stream
+# of transducers where each transducer contains one string recognized
+# by =BidirPaths=. Then we create a corresponding stream of reversed transducers and
+# conjunct the streams. The resulting stream will contain transducers that
+# represent a palindrom (e.g. "madam") and empty transducers (e.g. the transducers
+# resulting from the intersection of "dog" and "god" and vice versa).
+
+hfst-fst2strings BidirEnglish | hfst-strings2fst -f $FORMAT > BidirPaths
+hfst-reverse BidirPaths > BidirPathsReversed
+hfst-conjunct BidirPaths BidirPathsReversed > Palindroms
+
+# We finally print all palindroms. Empty conjunctions are printed as empty strings so we only need to
+# filter out the lines that separate strings coming from separate transducers,
+# i.e. lines =--=.
+
+hfst-fst2strings Palindroms | grep -v "\-\-" | sort > result
+

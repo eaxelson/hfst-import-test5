@@ -1,0 +1,132 @@
+FORMAT=TRANSDUCER_FORMAT
+
+# The data
+
+echo "kalastelet
+kalasteleminen
+ilmoittautuminen
+järjestelemättömyydestänsä
+kalastelemme
+ilmoittautumisesta
+järjestelmällisyydelläni
+järjestelmällistämätöntä
+voimisteluttelemasta
+opiskelija
+opettamassa
+kalastelet
+strukturalismi
+onnittelemanikin
+mäki
+perijä
+repeämä
+ergonomia
+puhelimellani
+matematiikka
+puhelimistani
+rakastajattariansa
+kuningas
+kainostelijat
+ravintolat
+merkonomin" | hfst-strings2fst -f $FORMAT -j > FinnWords.hfst
+
+
+# Some definitions:
+
+echo "[u | y | i]" | hfst-regexp2fst -f $FORMAT > HighV                       # High vowel
+echo "[e | o | ö]" | hfst-regexp2fst -f $FORMAT > MidV                        # Mid vowel
+echo "[a | ä]" | hfst-regexp2fst -f $FORMAT > LowV                            # Low vowel
+echo '[ @"HighV" | @"MidV" | @"LowV" ]' | hfst-regexp2fst -f $FORMAT > USV    # Unstressed Vowel
+
+echo "[ b | c | d | f | g | h | j | k | l | m | n | p "\
+     "| q | r | s | t | v | w | x | z ]" | hfst-regexp2fst -f $FORMAT > C     # Consonant
+
+echo '[á | é | í | ó | ú | ý | "ä&#769;" | "ö&#769;"]' \
+| hfst-regexp2fst -f $FORMAT > MSV
+echo '[à | è | ì | ò | ù | "y&#768;" | "ä&#768;" | "ö&#768;"]' \
+| hfst-regexp2fst -f $FORMAT > SSV
+echo '[ @"MSV" | @"SSV" ]' | hfst-regexp2fst -f $FORMAT > SV                  # Stressed vowel
+echo '[ @"USV" | @"SV" ]' | hfst-regexp2fst -f $FORMAT > V                    # Vowel
+
+echo '[ @"V" | @"C" ]' | hfst-regexp2fst -f $FORMAT > P                       # Phone
+
+echo '[[\@"P"+] | .#.]' | hfst-regexp2fst -f $FORMAT > B                      # Boundary
+echo '[.#. | "."]' | hfst-regexp2fst -f $FORMAT > E                           # Edge
+echo '[~$"." "." ~$"."]' | hfst-regexp2fst -f $FORMAT > SB                    # At most one syllable boundary
+
+echo '[ @"C"* @"V" ]'| hfst-regexp2fst -f $FORMAT > Light                     # Light syllable
+echo '[ @"Light" @"P"+ ]'| hfst-regexp2fst -f $FORMAT > Heavy                 # Heavy syllable
+
+echo '[ @"Heavy" | @"Light" ]' | hfst-regexp2fst -f $FORMAT > S               # Syllable
+echo '[ @"S" & $@"SV" ]' | hfst-regexp2fst -f $FORMAT > SS                    # Stressed syllable
+echo '[ @"S" & ~@"SV" ]' | hfst-regexp2fst -f $FORMAT > US                    # Unstressed syllable
+echo '[ @"S" & $@"MSV" ]' | hfst-regexp2fst -f $FORMAT > MSS                  # Syllable with main stress
+
+echo '[ @"S" "." @"S" ]' | hfst-regexp2fst -f $FORMAT > BF                    # Binary foot
+
+
+# Rules for prosody:
+
+echo '[ [. .] -> "." || [ @"HighV" | @"MidV" ]'\
+  '_ @"LowV",'\
+  'i _ [@"MidV" - e],'\
+  'u _ [@"MidV" - o],'\
+  'y _ [@"MidV" - ö] ]'\
+| hfst-regexp2fst -f $FORMAT > MarkNonDiphtongs      # y.e
+
+# The general syllabification rule has exceptions. In particular, loan
+# words such as ate.isti 'atheist' must be partially syllabified in the
+# lexicon.
+
+echo ' @"C"*  @"V"+ @"C"* @-> ... "." || _ @"C" @"V" ' \
+| hfst-regexp2fst -f $FORMAT > Syllabify
+
+echo ' @"BF" "." @"Light" @-> "(" ... ")" '\
+     '// [{).} | .#.] [@"BF" "."]*  _'\
+     '["." @"Heavy" "." @"S" ] | .#. ' \
+| hfst-regexp2fst -f $FORMAT > TernaryFeet
+
+# Scan all the unfooted material into binary feet.
+
+echo ' @"BF" @-> "(" ... ")" || .#.|"." _ .#.|"." ' | hfst-regexp2fst -f $FORMAT > BinaryFeet
+
+# Assign the primary stress to the first vowel of the first syllable.
+
+echo ' a -> á, e -> é, i -> í, o -> ó,'\
+     'u -> ú, y -> ý, ä -> "ä&#769;", ö -> "ö&#769;" || .#. "(" @"C"* _' \
+| hfst-regexp2fst -f $FORMAT > MainStress
+
+# Assign secondary stress to all initial vowels of non-initial syllables.
+
+echo ' a -> à, e -> è, i -> ì, o -> ò,'\
+     'u -> ù, y -> "y&#768;", ä -> "ä&#768;", ö -> "ö&#768;"'\
+     '|| "(" @"C"* _ ' | hfst-regexp2fst -f $FORMAT > SecondaryStress
+
+# Assign an optional secondary stress to an unfooted final syllable
+# if it is heavy.
+
+echo 'a (->) à, e (->) è, i (->) ì,'\
+     'o (->) ò, u (->) ù, y (->) "y&#768;",'\
+     'ä (->) "ä&#768;", ö (->) "ö&#768;" || "." @"C"* _ @"P" .#. ' \
+| hfst-regexp2fst -f $FORMAT > OptFinalStress
+
+
+# Calculate the composition of rules from =MarkNonDiphtongs= to =OptFinalStress=
+# and compose the lexicon with the composition of rules.
+
+cp MarkNonDiphtongs Rules;
+for i in
+  Syllabify \
+  TernaryFeet \
+  BinaryFeet \
+  MainStress \
+  SecondaryStress \
+  OptFinalStress; \
+do
+  cat Rules | hfst-compose $i > TMP;
+  mv TMP Rules;
+done
+
+cat FinnWords | hfst-compose Rules > FinnProsody
+
+# Print the lexicon with prosody indicated.
+# cat FinnProsody | hfst-project -p output | hfst-fst2strings

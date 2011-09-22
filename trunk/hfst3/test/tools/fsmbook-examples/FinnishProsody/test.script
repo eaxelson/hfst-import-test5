@@ -1,0 +1,17 @@
+#!/bin/bash
+
+for i in sfst openfst-tropical foma; do
+  sed -i "1s/TRANSDUCER_FORMAT/"$i"/;" FinnishProsody.hfst.script
+  echo "Testing" $i "..."
+  sh FinnishProsody.hfst.script
+  sed -i "1s/"$i"/TRANSDUCER_FORMAT/;" FinnishProsody.hfst.script
+  echo expected_result.strings | hfst-strings2fst -f $FORMAT -j \
+    > ExpectedResult;	
+  hfst-project -p output FinnProsody | hfst-compare -q ExpectedResult && \	
+    echo "TEST PASSED";
+done
+
+
+
+
+
