@@ -861,6 +861,18 @@ int main(int argc, char **argv)
       assert(id2id_copy.get_alphabet() == id2id_copy2.get_alphabet());
     }
 
+    /* Test that binary functions work when the argument and the calling 
+       object are the same. */
+    {
+      HfstTransducer foo("foo", types[i]);
+      foo.concatenate(foo);
+      HfstTransducer foofoo("foo", types[i]);
+      HfstTransducer foo2("foo", types[i]);
+      foofoo.concatenate(foo2);
+      assert(foo.compare(foofoo));
+    }
+    
+    
       }
     }
 
