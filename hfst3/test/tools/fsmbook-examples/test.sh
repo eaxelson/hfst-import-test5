@@ -1,6 +1,6 @@
 #!/bin/bash
-# Rules must be implemented before directories FinnishProsody and 
-# PlusOrMinus can be tested 
+# Rules must be implemented before directories FinnishProsody, PlusOrMinus
+# and FinnishOTProsody can be tested 
 for i in DateParser EinsteinsPuzzle EnglishNumerals \
 FinnishNumerals NumbersToNumerals Palindroms; do \
 cd $i; 
