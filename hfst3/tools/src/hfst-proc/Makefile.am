@@ -15,12 +15,11 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-LDADD = $(top_builddir)/libhfst/src/libhfst.la $(GLIB_LIBS)
 AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib 
 AM_CXXFLAGS = $(WERR_CFLAGS) $(GLIB_CFLAGS)
 
 if WANT_PROC
-MAYBE_PROC=hfst-proc
+MAYBE_PROC=hfst-apertium-proc
 endif
 
 noinst_HEADERS = \
@@ -28,5 +27,6 @@ noinst_HEADERS = \
 	transducer.h buffer.h applicators.h alphabet.h
 
 bin_PROGRAMS=$(MAYBE_PROC)
-hfst_proc_SOURCES = hfst-proc.cc formatter.cc lookup-path.cc lookup-state.cc tokenizer.cc transducer.cc applicators.cc alphabet.cc
+hfst_apertium_proc_SOURCES = hfst-proc.cc formatter.cc lookup-path.cc lookup-state.cc tokenizer.cc transducer.cc applicators.cc alphabet.cc
+hfst_apertium_proc_LDADD = $(top_builddir)/libhfst/src/libhfst.la $(GLIB_LIBS)
 

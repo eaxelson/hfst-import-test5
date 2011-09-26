@@ -8,4 +8,7 @@ for i in sfst openfst-tropical foma; do
         exit 1
     fi
     rm test.hfst;
+    if ! ../../tools/src/hfst-regexp2fst -f $i $srcdir/at_file_quote.$i.xre > test.fst ; then
+        exit 1
+    fi
 done
