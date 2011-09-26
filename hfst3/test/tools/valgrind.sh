@@ -140,14 +140,14 @@ for i in "" .sfst .ofst .foma; do
     fi
 done
 p=proc
-echo "cat" | $VALGRIND --log-file=valgrind-logs/${p}cat.hfst${i}.log  ../../tools/src/hfst-apertium-proc/hfst-apertium-proc cat2dog.hfst.ol
+echo "cat" | $VALGRIND --log-file=valgrind-logs/${p}cat.hfst${i}.log  ../../tools/src/hfst-proc/hfst-apertium-proc cat2dog.hfst.ol
 echo "^dog$" | $VALGRIND --log-file=valgrind-logs/${p}gen.hfst${i}.log  ../../tools/src/hfst-apertium-proc/hfst-apertium-proc -g cat2dog.gen.hfst.ol
-echo "cat" | $VALGRIND --log-file=valgrind-logs/${p}weight.hfst${i}.log  ../../tools/src/hfst-apertium-proc/hfst-apertium-proc -W cat_weight_final.hfst.ol 
-$VALGRIND --log-file=valgrind-logs/${p}caps.hfst${i}.log  ../../tools/src/hfst-apertium-proc/hfst-apertium-proc proc-caps.hfst.ol < $srcdir/proc-caps-in.strings
+echo "cat" | $VALGRIND --log-file=valgrind-logs/${p}weight.hfst${i}.log  ../../tools/src/hfst-proc/hfst-apertium-proc -W cat_weight_final.hfst.ol 
+$VALGRIND --log-file=valgrind-logs/${p}caps.hfst${i}.log  ../../tools/src/hfst-apertium-proc/hfst-proc proc-caps.hfst.ol < $srcdir/proc-caps-in.strings
 $VALGRIND --log-file=valgrind-logs/${p}capsgen.hfst${i}.log  hfst-apertium-proc -g proc-caps.gen.hfst.ol < $srcdir/proc-caps-gen.strings
-$VALGRIND --log-file=valgrind-logs/${p}capsc.hfst${i}.log  ../../tools/src/hfst-apertium-proc/hfst-apertium-proc -c proc-caps.hfst.ol < $srcdir/proc-caps-in.strings
-$VALGRIND --log-file=valgrind-logs/${p}capsw.hfst${i}.log  ../../tools/src/hfst-apertium-proc/hfst-apertium-proc -w proc-caps.hfst.ol < $srcdir/proc-caps-in.strings
-$VALGRIND --log-file=valgrind-logs/${p}rawcg.hfst${i}.log  ../../tools/src/hfst-apertium-proc/hfst-apertium-proc --cg --raw proc-caps.hfst.ol < $srcdir/proc-caps-in.strings
+$VALGRIND --log-file=valgrind-logs/${p}capsc.hfst${i}.log  ../../tools/src/hfst-apertium-proc/hfst-proc -c proc-caps.hfst.ol < $srcdir/proc-caps-in.strings
+$VALGRIND --log-file=valgrind-logs/${p}capsw.hfst${i}.log  ../../tools/src/hfst-apertium-proc/hfst-proc -w proc-caps.hfst.ol < $srcdir/proc-caps-in.strings
+$VALGRIND --log-file=valgrind-logs/${p}rawcg.hfst${i}.log  ../../tools/src/hfst-apertium-proc/hfst-proc --cg --raw proc-caps.hfst.ol < $srcdir/proc-caps-in.strings
 p=project
 for i in "" .sfst .ofst .foma; do
     if test -f cat2dog.hfst$i -a cat.hfst$i -a dog.hfst$i ; then
