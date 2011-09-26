@@ -39,7 +39,7 @@ Treat input files as latin1 (convert if possible)
 \fB\-F\fR\fIFORMAT\fR
 Convert into HFST transducer format FORMAT
 .PP
-If OUTFILES is missing the script tries hard to guess automata files from
+If OUTFILES is missing, the script tries hard to guess automata files from
 the script contents. If script is parsed from standard input, the OUTFILES is
 required.
 .PP
@@ -63,7 +63,12 @@ hfst\-foma\-wrapper.sh home page:
 General help using HFST software:
 <https://kitwiki.csc.fi/twiki/bin/view/KitWiki//HfstHome>
 .SH BUGS
-Options -flush and -stop are not supported. Xfst binartyfile loading is not
+Do not use hfst-xfst; use foma instead. Foma transducers can be read by hfst
+tools after gunzipping.
+.PP
+Options \-flush and \-stop are not supported. Xfst binaryfile loading is not
+supported. Binary file loading from the scripts is not supported. Operators
+on negation or universal language, or symbols requiring unknown symbols are not
 supported. Latin1 support depends on recode and only works with input files,
 not stdin input (working in latin1 environments has been deprecated forever
 already).
