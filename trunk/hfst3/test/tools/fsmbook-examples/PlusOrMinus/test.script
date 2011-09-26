@@ -6,7 +6,7 @@
 #   echo "--" >> TMP;
 # done
 # cat PlusMinusTen >> TMP;
-# cat TMP | ./xfst-att-to-hfst-att.sh > PlusOrMinus.xfst.hfst
+# cat TMP | ../xfst-att-to-hfst-att.sh > PlusOrMinus.xfst.hfst
 
 hfst-txt2fst -f openfst-tropical PlusOrMinus.xfst.att > \
   PlusOrMinus.xfst.hfst
