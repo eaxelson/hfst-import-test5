@@ -1,0 +1,91 @@
+# PlusOrMinus.script
+
+# Copyright (C) 2004  Lauri Karttunen
+#
+# This program is free software; you can redistribute it and/or modify
+# it under the terms of GNU General Public Licenseas published by
+# the Free Software Foundation; either version 2 of the License, or
+# (at your option) any later version.
+#   This program is distributed in the hope that it will be useful,
+#   but WITHOUT ANY WARRANTY; without even the implied warranty of
+#   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#   GNU General Public License for more details.
+
+# This script creates a set of Adding/Subtracting transducers for
+# non-negative integers with no leading zeros.
+
+define N [1|2|3|4|5|6|7|8|9];
+define Z ["0" | N];
+
+# Insert an initial 1 in front of a sequence of zeros. To make
+# this relation functional in both directions, we need two
+# replace expressions. One introduces 1, the other removes 1.
+# The composition of the two is a relation that uniquely maps,
+# for example, 100 to 99 and, conversely, 99 to 100.
+
+define CarryUp [ 1 <- [. .] || .#. _ "0"+ .#.
+                            .o.
+                 1 ->   0   || .#. _ "0"+ .#. ];
+
+define AddUp  [1 <- "0", 2 <- 1, 3 <- 2, 4 <- 3,  5  <- 4,
+               6 <-  5 , 7 <- 6, 8 <- 7, 9 <- 8, "0" <- 9
+               || .#. ("+") Z* _ 9* .#.];
+
+define NoLeadingZero [ "0" => .#. N Z* _ , .#. _ .#. ];
+
+# PlusMinusOne maps any natural number N to (N-1), and vice versa.
+
+define PlusMinusOne [CarryUp .o. AddUp .o. NoLeadingZero];
+
+define PlusMinusTwo   [PlusMinusOne   .o. PlusMinusOne];
+define PlusMinusThree [PlusMinusTwo   .o. PlusMinusOne];
+define PlusMinusFour  [PlusMinusThree .o. PlusMinusOne];
+define PlusMinusFive  [PlusMinusFour  .o. PlusMinusOne];
+define PlusMinusSix   [PlusMinusFive  .o. PlusMinusOne];
+define PlusMinusSeven [PlusMinusSix   .o. PlusMinusOne];
+define PlusMinusEight [PlusMinusSeven .o. PlusMinusOne];
+define PlusMinusNine  [PlusMinusEight .o. PlusMinusOne];
+define PlusMinusTen   [PlusMinusNine  .o. PlusMinusOne];
+
+# Save the transducers in a file
+
+push PlusMinusOne
+write att PlusMinusOne BAR BAZ
+
+push PlusMinusTwo
+write att PlusMinusTwo BAR BAZ
+
+push PlusMinusThree
+write att PlusMinusThree BAR BAZ
+
+push PlusMinusFour
+write att PlusMinusFour BAR BAZ
+
+push PlusMinusFive
+write att PlusMinusFive BAR BAZ
+
+push PlusMinusSix
+write att PlusMinusSix BAR BAZ
+
+push PlusMinusSeven
+write att PlusMinusSeven BAR BAZ
+
+push PlusMinusEight
+write att PlusMinusEight BAR BAZ
+
+push PlusMinusNine
+write att PlusMinusNine BAR BAZ
+
+push PlusMinusTen
+write att PlusMinusTen BAR BAZ
+
+
+#echo Testing PlusMinusSeven...
+#push PlusMinusSeven
+
+#echo apply up input: 24
+#apply up 24
+
+#echo apply down input: 64
+#apply down 64
+
