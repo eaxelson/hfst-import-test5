@@ -32,6 +32,8 @@ hfst-compose PlusMinusSeven PlusMinusOne > PlusMinusEight.hfst
 hfst-compose PlusMinusEight PlusMinusOne > PlusMinusNine.hfst
 hfst-compose PlusMinusNine PlusMinusOne > PlusMinusTen.hfst
 
+rm -f PlusOrMinus.hfst.hfst
+
 for i in One Two Three Four Five Six Seven Eight Nine Ten; do \
   cat "PlusMinus"$i >> PlusOrMinus.hfst.hfst;
 done

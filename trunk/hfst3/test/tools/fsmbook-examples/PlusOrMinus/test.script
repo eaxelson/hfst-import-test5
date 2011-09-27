@@ -1,12 +1,13 @@
 #!/bin/bash
 
 # xfst -f PlusOrMinus.xfst.script
+# rm -f TMP
 # for i in One Two Three Four Five Six Seven Eight Nine; do \
-#   cat "PlusMinus"$i >> TMP;
+#   cat "PlusMinus"$i".att" >> TMP;
 #   echo "--" >> TMP;
 # done
-# cat PlusMinusTen >> TMP;
-# cat TMP | ../xfst-att-to-hfst-att.sh > PlusOrMinus.xfst.hfst
+# cat PlusMinusTen.att >> TMP;
+# cat TMP | ../xfst-att-to-hfst-att.sh > PlusOrMinus.xfst.att
 
 hfst-txt2fst -f openfst-tropical PlusOrMinus.xfst.att > \
   PlusOrMinus.xfst.hfst
