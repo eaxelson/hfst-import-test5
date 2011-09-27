@@ -1,6 +1,6 @@
 #!/bin/bash
 
-for i in sfst openfst-tropical; do # hfst-reverse with foma does not work..
+for i in sfst openfst-tropical foma; do
   sed -i "1s/TRANSDUCER_FORMAT/"$i"/;" Palindroms.hfst.script
   echo "Testing" $i "..."
   sh Palindroms.hfst.script
