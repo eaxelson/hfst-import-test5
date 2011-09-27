@@ -50,34 +50,34 @@ define PlusMinusTen   [PlusMinusNine  .o. PlusMinusOne];
 # Save the transducers in a file
 
 push PlusMinusOne
-write att PlusMinusOne BAR BAZ
+write att PlusMinusOne.att BAR BAZ
 
 push PlusMinusTwo
-write att PlusMinusTwo BAR BAZ
+write att PlusMinusTwo.att BAR BAZ
 
 push PlusMinusThree
-write att PlusMinusThree BAR BAZ
+write att PlusMinusThree.att BAR BAZ
 
 push PlusMinusFour
-write att PlusMinusFour BAR BAZ
+write att PlusMinusFour.att BAR BAZ
 
 push PlusMinusFive
-write att PlusMinusFive BAR BAZ
+write att PlusMinusFive.att BAR BAZ
 
 push PlusMinusSix
-write att PlusMinusSix BAR BAZ
+write att PlusMinusSix.att BAR BAZ
 
 push PlusMinusSeven
-write att PlusMinusSeven BAR BAZ
+write att PlusMinusSeven.att BAR BAZ
 
 push PlusMinusEight
-write att PlusMinusEight BAR BAZ
+write att PlusMinusEight.att BAR BAZ
 
 push PlusMinusNine
-write att PlusMinusNine BAR BAZ
+write att PlusMinusNine.att BAR BAZ
 
 push PlusMinusTen
-write att PlusMinusTen BAR BAZ
+write att PlusMinusTen.att BAR BAZ
 
 
 #echo Testing PlusMinusSeven...
