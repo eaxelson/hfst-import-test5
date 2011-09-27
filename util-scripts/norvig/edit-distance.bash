@@ -13,11 +13,12 @@ if test $# -lt 4 ; then
 fi
 echo 0
 n=$1
+let "m=$n - 1"
 shift
 w=$1
 shift
 j=$n
-for i in $(seq 0 $((n-1))) ; do
+for (( i = 0; i <= $m ; i++ )) ; do
 	for c in $@ ; do
 		echo "$i	$i	$c	$c	0"
 		echo "$i	$((i+1))	$c	@0@	$w"
