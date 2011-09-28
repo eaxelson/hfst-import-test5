@@ -23,7 +23,7 @@ echo '[HighV | MidV | LowV]' | hfst-regexp2fst -f $FORMAT > USV                 
 echo '[b | c | d | f | g | h | j | k | l | m |
           n | p | q | r | s | t | v | w | x | z]' | hfst-regexp2fst -f $FORMAT > C  # Consonant
 
-echo '[á | é | í | ó | ú | ý | ä&#180; | ö&#180;]' | hfst-regexp2fst -f $FORMAT > MSV
+echo '[á | é | í | ó | ú | ý | ä´; | ö´;]' | hfst-regexp2fst -f $FORMAT > MSV
 echo '[à | è | ì | ò | ù | y` | ä` | ö`]' | hfst-regexp2fst -f $FORMAT > SSV 
 echo '[@"MSV" | @"SSV"]' | hfst-regexp2fst -f $FORMAT > SV                              # Stressed vowel
 echo '[@"USV" | @"SV"] ' | hfst-regexp2fst -f $FORMAT > V                               # Vowel
@@ -67,7 +67,7 @@ echo '@"C"* @"V"+ @"C"* @-> ... "." || _ @"C" @"V"' | hfst-regexp2fst -f $FORMAT
 # of each syllable.
 
 echo 'a (->) á|à, e (->) é|è, i (->) í|ì, o (->) ó|ò,
-              u (->) ú|ù, y (->) ý|y`, ä (->) ä&#180;|ä`, ö (->) ö&#180;|ö`
+              u (->) ú|ù, y (->) ý|y`, ä (->) ä´|ä`, ö (->) ö´;|ö`
               || @"E" @"C"* _' | hfst-regexp2fst -f $FORMAT > Stress
 
 # Scan the word, optionally dividing it to any combination of

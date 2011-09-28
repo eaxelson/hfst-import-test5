@@ -81,8 +81,8 @@ define USV [HighV | MidV | LowV];                  # Unstressed Vowel
 define C [b | c | d | f | g | h | j | k | l | m |
           n | p | q | r | s | t | v | w | x | z];  # Consonant
 
-define MSV [á | é | í | ó | ú | ý | "ä?" | "ö?"];
-define SSV [à | è | ì | ò | ù | "y?" | "ä?" | "ö?"];
+define MSV [á | é | í | ó | ú | ý | "ä´" | "ö´"];
+define SSV [à | è | ì | ò | ù | "y`" | "ä`" | "ö`"];
 define SV [MSV | SSV];                             # Stressed vowel
 define V [USV | SV] ;                              # Vowel
 
@@ -125,7 +125,7 @@ define Syllabify C* V+ C* @-> ... "." || _ C V ;
 # of each syllable.
 
 define Stress a (->) á|à, e (->) é|è, i (->) í|ì, o (->) ó|ò,
-              u (->) ú|ù, y (->) ý|"y?", ä (->) "ä?"|"ä?", ö (->) "ö?"|"ö?"
+              u (->) ú|ù, y (->) ý|"y`", ä (->) "ä´"|"ä`", ö (->) "ö´"|"ö`"
               || E C* _ ;
 
 # Scan the word, optionally dividing it to any combination of
@@ -286,13 +286,13 @@ write att FinnishOTProsody FOO BAR
 # (ér.go).(nò.mi).a
 # (vói.mis).te.(lùt.te).le.(màs.ta)
 # (strúk.tu).ra.(lìs.mi)
-# (ré.pe).(ä?.mä)
+# (ré.pe).(ä`.mä)
 # (rá.vin).(tò.lat)
 # (rá.kas).ta.(jàt.ta).ri.(àn.sa)
 # (pú.he).li.(mìs.ta).ni
 # (pú.he).li.(mèl.la).ni
 # (pé.ri).jä
-# (mä?.ki)
+# (mä´.ki)
 # (mér.ko).(nò.min)
 # (má.te).ma.(tìik.ka)
 # (kú.nin).gas
@@ -300,7 +300,7 @@ write att FinnishOTProsody FOO BAR
 # (ká.las).te.(lèm.me) 
 # (ká.las).te.(lè.mi).nen  <==== Error
 # (ká.las).(tè.let)
-# (jä?r.jes).tel.(mä?l.li).syy.(dèl.lä).ni  <===== Error
-# (jä?r.jes).(tèl.mät).tö.(my?y.des).(tä?n.sä)
-# (jä?r.jes).(tèl.mäl).(lìs.tä).mä.(tö?n.tä)
+# (jä´r.jes).tel.(mä`l.li).syy.(dèl.lä).ni  <===== Error
+# (jä´r.jes).(tèl.mät).tö.(my`y.des).(tä`n.sä)
+# (jä´r.jes).(tèl.mäl).(lìs.tä).mä.(tö`n.tä)
         
