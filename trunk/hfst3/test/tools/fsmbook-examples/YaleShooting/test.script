@@ -1,7 +1,7 @@
 #!/bin/bash
 
-xfst -f YaleShooting.xfst.script
-cat YaleShooting | ../xfst-att-to-hfst-att.sh > YaleShooting.xfst.att
+# xfst -f YaleShooting.xfst.script
+# cat YaleShooting | ../xfst-att-to-hfst-att.sh > YaleShooting.xfst.att
 
 hfst-txt2fst -f openfst-tropical YaleShooting.xfst.att > \
   YaleShooting.xfst.hfst
