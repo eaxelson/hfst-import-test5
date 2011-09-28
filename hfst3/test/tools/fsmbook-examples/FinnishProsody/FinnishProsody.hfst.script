@@ -92,21 +92,21 @@ echo ' @"BF" @-> "(" ... ")" || .#.|"." _ .#.|"." ' | hfst-regexp2fst -f $FORMAT
 # Assign the primary stress to the first vowel of the first syllable.
 
 echo ' a -> á, e -> é, i -> í, o -> ó,'\
-     'u -> ú, y -> ý, ä -> "ä&#769;", ö -> "ö&#769;" || .#. "(" @"C"* _' \
+     'u -> ú, y -> ý, ä -> "ä´", ö -> "ö´" || .#. "(" @"C"* _' \
 | hfst-regexp2fst -f $FORMAT > MainStress
 
 # Assign secondary stress to all initial vowels of non-initial syllables.
 
 echo ' a -> à, e -> è, i -> ì, o -> ò,'\
-     'u -> ù, y -> "y&#768;", ä -> "ä&#768;", ö -> "ö&#768;"'\
+     'u -> ù, y -> "y`", ä -> "ä`", ö -> "ö`"'\
      '|| "(" @"C"* _ ' | hfst-regexp2fst -f $FORMAT > SecondaryStress
 
 # Assign an optional secondary stress to an unfooted final syllable
 # if it is heavy.
 
 echo 'a (->) à, e (->) è, i (->) ì,'\
-     'o (->) ò, u (->) ù, y (->) "y&#768;",'\
-     'ä (->) "ä&#768;", ö (->) "ö&#768;" || "." @"C"* _ @"P" .#. ' \
+     'o (->) ò, u (->) ù, y (->) "y`",'\
+     'ä (->) "ä`", ö (->) "ö`" || "." @"C"* _ @"P" .#. ' \
 | hfst-regexp2fst -f $FORMAT > OptFinalStress
 
 
