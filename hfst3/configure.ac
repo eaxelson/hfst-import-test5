@@ -318,6 +318,12 @@ AC_ARG_ENABLE([reverse],
 			  [enable_reverse=$enableval],
 			  [enable_reverse=yes])
 AM_CONDITIONAL([WANT_REVERSE], [test x$enable_reverse != xno])
+AC_ARG_ENABLE([reweight],
+			  [AS_HELP_STRING([--enable-reweight],
+							  [build reweight tool @<:@default=yes@:>@])],
+			  [enable_reweight=$enableval],
+			  [enable_reweight=yes])
+AM_CONDITIONAL([WANT_REWEIGHT], [test x$enable_reweight != xno])
 AC_ARG_ENABLE([split],
 			  [AS_HELP_STRING([--enable-split],
 							  [build split tool @<:@default=yes@:>@])],
