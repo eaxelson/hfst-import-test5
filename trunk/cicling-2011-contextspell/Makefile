@@ -17,20 +17,37 @@ NORVIG=hfst/en
 prefix=/usr/local
 sharedir=$(prefix)/share
 
-# finnish automata
-# make these from different runs of omorfi or whatever; e.g.
-# configure options --enable-tokenweights --enable-tagweights
-$(OMORFI)/dictionary.default.unw.hfst: $(sharedir)/hfst/fi/dictionary.default.hfstol
-	cp -v $< $@
+# finnish automata; gather dictionares from omorfi
+# NB: backoff at 5.25667 needs to be changed if other wiki is used
+$(OMORFI)/dictionary.limited.hfst: $(sharedir)/hfst/fi/dictionary.filtered.hfst $(OMORFI)/dictionary.fiwiki.hfst
+	hfst-fst2fst $(sharedir)/hfst/fi/dictionary.filtered.hfst -f openfst-tropical |\
+		hfst-reweight -e -a 5.2667 |\
+		hfst-union $(OMORFI)/dictionary.fiwiki.hfst |\
+		hfst-minimize |\
+		hfst-fst2fst -f  olw -o $@
 
-$(OMORFI)/dictionary.default.tokenweights-no-boundaries.hfst: $(sharedir)/hfst/fi/dictionary.default.hfstol
-	cp -v $< $@
+# ensure current svn revision with boundary weighting
+$(OMORFI)/dictionary.default-boundaryweight.hfst: $(sharedir)/hfst/fi/dictionary.default.hfst $(OMORFI)/dictionary.fiwiki.hfst
+	hfst-fst2fst $(sharedir)/hfst/fi/dictionary.default.hfst -f openfst-tropical |\
+		hfst-reweight -e -a 5.2667 |\
+		hfst-union $(OMORFI)/dictionary.fiwiki.hfst |\
+		hfst-minimize |\
+		hfst-fst2fst -f  olw -o $@
 
-$(OMORFI)/dictionary.default.tokenweights-boundary-maxw.hfst: $(sharedir)/hfst/fi/dictionary.default.hfstol
-	cp -v $< $@
+$(OMORFI)/dictionary.default-no-boundaries.hfst: $(sharedir)/hfst/fi/dictionary.default.hfst $(OMORFI)/dictionary.fiwiki.hfst
+	hfst-fst2fst $(sharedir)/hfst/fi/dictionary.default.hfst -f openfst-tropical |\
+		hfst-reweight -b 0 |\
+		hfst-reweight -e -a 5.2667 |\
+		hfst-union $(OMORFI)/dictionary.fiwiki.hfst |\
+		hfst-minimize |\
+		hfst-fst2fst -f  olw -o $@
 
-$(OMORFI)/dictionary.limited.hfst: $(sharedir)/hfst/fi/dictionary.filtered.hfstol
-	cp -v $< $@
+$(OMORFI)/dictionary.fiwiki.hfst: fiwiki.strings
+	sort < fiwiki.strings | uniq -c | sort -nr > train
+	awk -f tropicalize-uniq-c.awk --assign CS=`wc -l < words` < train > tropical
+	hfst-strings2fst -j -f openfst-tropical tropical -v |\
+		hfst-minimize -v -o $@
+
 
 # 6.90878 = -log(1/1000) i.e. one typo per 1000 words
 $(OMORFI)/error.edit-distance-2.hfst: 
@@ -60,8 +77,17 @@ $(NORVIG)/error.edit-distance-2.hfst: edit-distance.bash
 		hfst-fst2fst -v -f olw -o $@
 
 # automata testing rules
-results/fi-FI.fiwiki.dictionary-full-unweighted.edit-distance-2.unigrams: fi-FI.fiwiki-gutenberg.contextspell $(OMORFI)/dictionary.default.unw.hfst $(OMORFI)/error.edit-distance-2.hfst
-	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2.hfst $(OMORFI)/dictionary.default.unw.hfst < fi-FI.fiwiki-gutenberg.contextspell > $@
+results: results-fi results-en
+
+results-fi: results/fi-FI.fiwiki.dictionary-full-boundaries.edit-distance-2.unigrams results/fi-FI.fiwiki.dictionary-full-unweighted.edit-distance-2.hfst
+
+results-en: results/en-US.norvig1.dictionary-norvig.edit-distance-2.unigrams results/en-US.norvig2.dictionary-norvig.edit-distance-2.unigrams 
+
+results/fi-FI.fiwiki.dictionary-full-boundaries.edit-distance-2.unigrams: fi-FI.fiwiki-gutenberg.contextspell $(OMORFI)/dictionary.default-boundaryweight.hfst $(OMORFI)/error.edit-distance-2.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2.hfst $(OMORFI)/dictionary.default-boundaryweight.hfst < fi-FI.fiwiki-gutenberg.contextspell > $@
+
+results/fi-FI.fiwiki.dictionary-full-unweighted.edit-distance-2.unigrams: fi-FI.fiwiki-gutenberg.contextspell $(OMORFI)/dictionary.default-no-boundaries.hfst $(OMORFI)/error.edit-distance-2.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2.hfst $(OMORFI)/dictionary.default-no-boundaries.hfst < fi-FI.fiwiki-gutenberg.contextspell > $@
 
 results/en-US.norvig1.dictionary-norvig.edit-distance-2.unigrams: norvig1.contextspell $(NORVIG)/dictionary.default.hfst $(NORVIG)/error.edit-distance-2.hfst
 	hfst-ospell-cicling $(NORVIG)/error.edit-distance-2.hfst $(NORVIG)/dictionary.default.hfst < norvig1.contextspell > $@
