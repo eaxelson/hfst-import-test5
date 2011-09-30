@@ -67,6 +67,7 @@ float lower_bound = 0;
 char* input_symbol = 0;
 char* output_symbol = 0;
 char* symbol = 0;
+bool ends_only = false;
 
 void
 print_usage()
@@ -88,6 +89,7 @@ print_usage()
             "  -I, --input-symbol=ISYM    match arcs with input symbol ISYM\n"
             "  -O, --output-symbol=OSYM   match arcs with output symbol OSYM\n"
             "  -S, --symbol=SYM           match arcs havins symbol SYM\n"
+            "  -e, --end-states-only      match end states only, no arcs\n"
             "\n");
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
@@ -106,7 +108,8 @@ print_usage()
             "The formula is applied iff\n"
             "((LVAL <= w) && (w <= UVAL)),\n"
             "where w is weight of arc, and \n"
-            "(ISYM == i) && (OSYM == o) && ((SYM == i) || (SYM == o)).\n"
+            "(ISYM == i) && (OSYM == o) && ((SYM == i) || (SYM == o)) ^^ \n"
+            "(end state && -e).\n"
             "\n");
     fprintf(message_out, "\n");
     print_report_bugs();
@@ -135,12 +138,13 @@ parse_options(int argc, char** argv)
             {"input-symbol", required_argument, 0, 'I'},
             {"output-symbol", required_argument, 0, 'O'},
             {"symbol", required_argument, 0, 'S'},
+            {"end-state-only", required_argument, 0, 'e'},
             {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "a:b:F:l:u:I:O:S:",
+                             HFST_GETOPT_UNARY_SHORT "a:b:F:l:u:I:O:S:e",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -241,6 +245,9 @@ parse_options(int argc, char** argv)
         case 'S':
           symbol = hfst_strdup(optarg);
           break;
+        case 'e':
+          ends_only = true;
+          break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -270,7 +277,11 @@ reweight(float w, const char* i, const char* o)
     }
   if ((i != 0) && (o != 0))
     {
-      if ((symbol != 0) && ((strcmp(i, symbol) != 0) && 
+      if (ends_only)
+        {
+          return w;
+        }
+      else if ((symbol != 0) && ((strcmp(i, symbol) != 0) && 
                             (strcmp(o, symbol) != 0) ) )
         {
           // symbol doesn't match, don't apply
@@ -283,7 +294,7 @@ reweight(float w, const char* i, const char* o)
         }
       else if ((output_symbol != 0) && (strcmp(o, output_symbol) != 0))
         {
-          // oytput doesn't match, don't apply
+          // output doesn't match, don't apply
           return w;
         }
     }
@@ -390,6 +401,22 @@ int main( int argc, char **argv ) {
         inputfilename, outfilename);
     verbose_printf("Modifying weights %f < w < %f as %f * %s(w) + %f\n",
                    lower_bound, upper_bound, multiplier, funcname, addition);
+    if (symbol)
+      {
+        verbose_printf("only if arc has symbol %s\n", symbol);
+      }
+    if (input_symbol)
+      {
+        verbose_printf("only if first symbol is %s\n", input_symbol);
+      }
+    if (output_symbol)
+      {
+        verbose_printf("only if second symbol is %s\n", output_symbol);
+      }
+    if (ends_only)
+      {
+        verbose_printf("only on final weights");
+      }
     // here starts the buffer handling part
     HfstInputStream* instream = NULL;
     try {
