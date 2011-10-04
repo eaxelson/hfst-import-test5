@@ -75,15 +75,15 @@
 
 # set to minimum acceptible version of autoconf
 if [ "x$AUTOCONF_VERSION" = "x" ] ; then
-    AUTOCONF_VERSION=2.62
+    AUTOCONF_VERSION=1.0
 fi
 # set to minimum acceptible version of automake
 if [ "x$AUTOMAKE_VERSION" = "x" ] ; then
-    AUTOMAKE_VERSION=1.11.0
+    AUTOMAKE_VERSION=1.0
 fi
 # set to minimum acceptible version of libtool
 if [ "x$LIBTOOL_VERSION" = "x" ] ; then
-    LIBTOOL_VERSION=2.2.6
+    LIBTOOL_VERSION=1.0
 fi
 
 
