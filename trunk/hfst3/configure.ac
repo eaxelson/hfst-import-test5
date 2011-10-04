@@ -28,21 +28,10 @@ LIBHFST_MINOR=2
 LIBHFST_EXTENSION=0
 LIBHFST_VERSION=$LIBHFST_MAJOR.$LIBHFST_MINOR.$LIBHFST_EXTENSION
 
-# autoconf >= 2.62 required for ASSERT, REALLOC
-AC_PREREQ([2.62])
-
-# init must be at the start
 AC_INIT([hfst], [3.2.0], [hfst-bugs@helsinki.fi], [hfst], [http://hfst.sf.net])
 AC_CONFIG_AUX_DIR([build-aux])
+AM_INIT_AUTOMAKE([-Wall -Werror std-options foreign check-news])
 
-# automake >= 1.11 required for color-tests, silent-rules
-AM_INIT_AUTOMAKE([1.11 -Wall -Werror std-options foreign check-news color-tests silent-rules])
-AM_SILENT_RULES([yes])
-
-# libtool 2 required since some distros totally hose their libtoolses
-LT_PREREQ([2.2.6])
-
-AC_REVISION([$Revision: 1.9 $])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([libhfst/src/HfstTransducer.h])
 AC_CONFIG_HEADERS([config.h])
@@ -103,15 +92,15 @@ AS_IF([test "x$with_sfst" == "xno" -a "x$with_openfst" == "xno" -a "x$with_foma"
 # relay unicode support to which backend library
 AC_ARG_WITH([unicode_handler],
             [AS_HELP_STRING([--with-unicode-handler=backend],
-                            [select library to use for unicode handling @<:@default=glib@:>@])],
+                            [select library to use for unicode handling @<:@default=hfst@:>@])],
             [with_unicode_handler=$withval],
-            [with_unicode_handler=glib])
+            [with_unicode_handler=hfst])
 # make readline optional since mac os x has sucky implementation of readline
 AC_ARG_WITH([readline],
             [AS_HELP_STRING([--with-readline],
-                            [use readline for interactive programs @<:@default=yes@:>@])],
+                            [use readline for interactive programs @<:@default=no@:>@])],
             [with_readline=$withval],
-            [with_readline=yes])
+            [with_readline=no])
 
 # allow programs to be built separately (sort alphabetically)
 AC_ARG_ENABLE([affix_guessify],
@@ -122,15 +111,15 @@ AC_ARG_ENABLE([affix_guessify],
 AM_CONDITIONAL([WANT_AFFIX_GUESSIFY], [test x$enable_affix_guessify != xno])
 AC_ARG_ENABLE([apertium2fst],
 			  [AS_HELP_STRING([--enable-apertium2fst],
-							  [build apertium2fst tool @<:@default=yes@:>@])],
+							  [build apertium2fst tool @<:@default=yno@:>@])],
 			  [enable_apertium2fst=$enableval],
-			  [enable_apertium2fst=yes])
+			  [enable_apertium2fst=no])
 AM_CONDITIONAL([WANT_APERTIUM2FST], [test x$enable_apertium2fst != xno])
 AC_ARG_ENABLE([calculate],
 			  [AS_HELP_STRING([--enable-calculate],
-							  [build calculate tool @<:@default=yes@:>@])],
+							  [build calculate tool @<:@default=no@:>@])],
 			  [enable_calculate=$enableval],
-			  [enable_calculate=yes])
+			  [enable_calculate=no])
 AM_CONDITIONAL([WANT_CALCULATE], [test x$enable_calculate != xno])
 AC_ARG_ENABLE([compare],
 			  [AS_HELP_STRING([--enable-compare],
@@ -236,9 +225,9 @@ AC_ARG_ENABLE([invert],
 AM_CONDITIONAL([WANT_INVERT], [test x$enable_invert != xno])
 AC_ARG_ENABLE([lexc],
               [AS_HELP_STRING([--enable-lexc],
-                              [build lexc cli and readline @<:@default=yes@:>@])],
+                              [build lexc cli and readline @<:@default=no@:>@])],
               [enable_lexc=$enableval],
-              [enable_lexc=yes])
+              [enable_lexc=no])
 AM_CONDITIONAL([WANT_LEXC], [test "x$enable_lexc" != xno])
 AC_ARG_ENABLE([lexc2fst],
               [AS_HELP_STRING([--enable-lexc2fst],
@@ -368,9 +357,9 @@ AC_ARG_ENABLE([tail],
 AM_CONDITIONAL([WANT_TAIL], [test x$enable_tail != xno])
 AC_ARG_ENABLE([traverse],
 			  [AS_HELP_STRING([--enable-traverse],
-							  [build traversal tool @<:@default=yes@:>@])],
+							  [build traversal tool @<:@default=no@:>@])],
 			  [enable_traverse=$enableval],
-			  [enable_traverse=yes])
+			  [enable_traverse=no])
 AM_CONDITIONAL([WANT_TRAVERSE], [test x$enable_test != xno])
 AC_ARG_ENABLE([test],
 			  [AS_HELP_STRING([--enable-test],
@@ -494,24 +483,9 @@ AS_IF([test "x$with_readline" = "xyes"],
 #AS_IF([test "x$with_my_transducer_library" != "xno"],
 #      [AC_CHECK_HEADERS([my_transducer_library/MyTransducerLibrary.h])])
 
-AC_HEADER_STDBOOL
-AC_HEADER_ASSERT
-
-# Checks for types
-AC_TYPE_SIZE_T
-
 # Checks for structures
 AC_CHECK_DECLS([program_name, program_invocation_name, program_invocation_short_name])
 AC_CHECK_DECLS([rl_completion_suppress_append, rl_completion_matches])
-
-# Checks for compiler characteristics
-AC_C_INLINE
-
-# Checks for library functions
-AC_FUNC_ERROR_AT_LINE
-AC_FUNC_MALLOC
-AC_FUNC_REALLOC
-AC_FUNC_STRTOD
 AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strcspn strtol strtoul error error_at_line strndup getline getdelim getopt_long strtod xstrdup set_program_name setprogname setlocale nl_langinfo])
 
 # Checks for system services

@@ -14,9 +14,6 @@
 
 #if HAVE_CONFIG_H
 #  include <config.h>
-#  ifndef HAVE_MALLOC
-#    error "your configure failed to find malloc, check README for further instructions"
-#  endif
 #endif
 
 #include "HfstDataTypes.h"
