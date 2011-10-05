@@ -12,11 +12,11 @@
 \author{Tommi A Pirinen\\
   University of Helsinki\\
   Helsinki, Finland\\
-  {\tt \{tommi.pirinen,} And
+  {\tt \{tommi.pirinen,} \and
   Miikka Silfverberb\\
   University of Helsinki\\
   Helsinki, Finland\\
-  {\tt miikka.silfverberg,} And
+  {\tt miikka.silfverberg,} \and
   Krister Lind\'{e}n\\
   University of Helsinki\\
   Helsinki, Finland\\
@@ -319,8 +319,8 @@ during correction phase.
     \hline
     \multicolumn{4}{c}{\textbf{English}} \\
     \hline
-    Dictionary & 102,393 & 102,392 & 2.7 MiB \\
-    Error model & 5,727 & 11,826 & 208 KiB \\
+    Dictionary & 25,330 & 42,448 & 1.2 MiB \\
+    Error model & 1,303 & 492,232 & 5.9 MiB \\
     \hline
     Analysis 3-grams & & & \\
     Surface 3-grams & & & \\
@@ -329,8 +329,8 @@ during correction phase.
     \hline
     \multicolumn{4}{c}{\textbf{Finnish}} \\
     \hline
-    Dictionary & 460,227 & 1,700,978 & 38 MiB \\
-    Error model & 7,324 & 18,838 & 353 KiB \\
+    Dictionary & 179,035 & 395,032 & 16 MiB \\
+    Error model & 1,863 & 983,227 & 12 MiB \\
     \hline
     Analysis 3-grams & & & \\
     Surface 3-grams & & & \\
@@ -355,12 +355,12 @@ formulae $a^3 + b^3 = c^3$.
 \subsection{Finnish-Specific Finite-State Weighting Methods}
 
 The Finnish language model was based on a readily-available morphological
-weighted FST analyser of Finnish language~\cite{pirinen/2008}.  We furthermore
-modified the automaton to discount suggestions of newly created compounds and
-derivations by weight greater than maximum weight of automaton before that,
-i.e. $-10\log\frac{1}{CS+1}$ for the automatons training material. This has
-nearly the same effect as using separate dictionary for suggestions, that
-excludes the heavily weighted forms, without requiring the extra space.
+weighted FST analyser of Finnish language~\cite{pirinen/2011/nodalida}.  We
+furthermore modified the automaton to discount suggestions of newly created
+compounds and derivations by weight greater than maximum weight of automaton
+before that, i.e. $-10\log\frac{1}{CS+1}$ for the automatons training material.
+This has nearly the same effect as using separate dictionary for suggestions,
+that excludes the heavily weighted forms, without requiring the extra space.
 
 In the initial Finnish parser model there were relatively large tagset, all of
 which did not contain information we found necessary for task of
@@ -391,19 +391,17 @@ distance model alone.
     \begin{scriptsize}
       \begin{tabular}{l|llll|l|l|l}
         \hline
-        Algorithm & 1 & 2 & 3 & 4 & Lower & None & Total \\
+        Algorithm & 1 & 2 & 3 & 4 & None & Total \\
         \hline
-        \multicolumn{8}{c}{\textbf{English}} \\
+        \multicolumn{7}{c}{\textbf{English}} \\
         \hline
-        Unigrams
- & 1429      & 382       & 217       & 110       & 748       & 1105      & 3991     \\
+        Unigrams 
+& 60 & 1 & 65 & 2 & 1 & 138 \\
         (baseline) 
- &  35.81 \% &   9.57 \% &   5.44 \% &   2.76 \% &  18.74 \% &  27.69 \% & 100.00 \%\\
+& 43.5 \% & 0.7 \% & 47.1 \% & 1.4 \% & 0.7 \%  & 100.0 \% \\
         \hline
-        Analysis
- & 1100      & 344       & 225       & 107       & 687       & 1373      & 3991     \\
-        trigrams
- &  30.25 \% &   9.46 \% &   6.19 \% &   2.94 \% &  18.89 \% &  32.26 \% & 100.00 \%\\
+        Analysis & & & & & & & \\
+        Trigrams & & & & & & & \\
         \hline
         Surface  &       &      &      &      &       &       &     \\
         trigrams &    \% &   \% &   \% &   \% &    \% &    \% & 100 \% \\
@@ -414,17 +412,18 @@ distance model alone.
         Another  &       &      &      &      &       &       &     \\
         hybrid   &    \% &   \% &   \% &   \% &    \% &    \% & 100 \% \\
         \hline
-        \multicolumn{8}{c}{\textbf{Finnish}} \\
+        \multicolumn{7}{c}{\textbf{Finnish}} \\
         \hline
         Unigrams  
- & 232       & 26        & 8         & 8         & 24        & 25        & 322      \\
         (baseline) 
- &  72.05 \% &   8.07 \% &   2.48 \% &   2.48 \% &   7.45 \% &   7.76 \% & 100.00 \%\\
+& 221    & 21    & 13    & 15    & 24    & 322 \\
+& 68.6 \% & 6.5 \% & 4.0 \% & 4.7 \% & 7.5 \% & 100.0 \% \\
+
         \hline
         Analysis
- & 109       & 44        & 11        & 11        & 30        & 117       & 322      \\
+&       &      &      &      &       &       &     \\
         trigrams
- &  33.96 \% &  13.71 \% &   3.43 \% &   3.43 \% &   9.35 \% &  36.14 \% & 100.00 \%\\
+&       &      &      &      &       &       &     \\
         \hline
         Surface  
 &       &      &      &      &       &       &     \\
@@ -536,8 +535,8 @@ speed of performing the experiments in tables~\ref{table:real-eval}~and~\ref{tab
         Material  & English & automatic & Finnish & automatic \\
         Algorithm & real    &           & real    &           \\
         \hline
-        Unigrams   &    10.0 s &      s & 138.2 s &     s  \\
-        (baseline) & 399.1 wps &    wps & 2.3 wps &   wps  \\
+        Unigrams   &    10.0 s &      s & 52.9 s &     s  \\
+        (baseline) & 399.1 wps &    wps & 6.0 wps &   wps  \\
         \hline
         Analysis &   377.4 s &     s & 3593.3 s &     s  \\
         trigrams & 10.6  wps &   wps & 0.08 wps &   wps  \\
