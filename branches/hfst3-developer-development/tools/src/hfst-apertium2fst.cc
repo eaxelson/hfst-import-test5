@@ -208,6 +208,13 @@ process_stream(HfstOutputStream& outstream)
           verbose_printf("parsing alphabet...\n");
           xmlChar* alpha = xmlNodeListGetString(doc,
                                                 node->xmlChildrenNode, 1);
+          if (alpha == NULL)
+            {
+              error(EXIT_FAILURE, 0, "A transducer collection with empty "
+                    "alphabet would not be able to analyse anything;\n"
+                    "refusing to create broken automata");
+            }
+
           HfstTransducer alphaTrans(reinterpret_cast<char*>(alpha), tok,
                                     format);
           if (verbose)
