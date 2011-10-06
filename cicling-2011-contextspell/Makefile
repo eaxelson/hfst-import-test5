@@ -68,7 +68,7 @@ $(OMORFI)/dictionary.default-boundaryweight-none.hfst: $(sharedir)/hfst/fi/dicti
 
 $(OMORFI)/dictionary.fiwiki.hfst: fiwiki.strings
 	sort < fiwiki.strings | uniq -c | sort -nr > train
-	awk -f tropicalize-uniq-c.awk --assign CS=`wc -l < words` < train > tropical
+	awk -f tropicalize-uniq-c.awk --assign CS=`wc -l < fiwiki.strings` < train > tropical
 	hfst-strings2fst -j -f openfst-tropical tropical -v |\
 		hfst-minimize -v -o $@
 
