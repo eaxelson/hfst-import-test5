@@ -27,6 +27,7 @@ from twisted.internet import reactor, protocol
 
 # system imports
 import sys
+import time
 
 import libhfst
 from itertools import ifilterfalse as ffilter
@@ -108,7 +109,7 @@ class HfstBot(irc.IRCClient):
             return
 
         # Otherwise check to see if it is a message directed at me
-        if msg.startswith(self.nickname):
+        if msg.startswith(self.nickname) and msg[len(self.nickname)] in ':,':
             msg = msg[len(self.nickname) + 1:].strip().split(' ')[0].strip()
             replyprefix = "%s: " % user.split('!')[0]
             analysis_results = self.analyzer.analyze(msg)
@@ -120,7 +121,7 @@ class HfstBot(irc.IRCClient):
                 timeout = 0
                 for result in analysis_results:
                     if timeout == 5:
-                        sleep(1)
+                        time.sleep(1)
                         timeout = 0
                     self.msg(channel, replyprefix + result)
                     timeout += 1
