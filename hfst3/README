@@ -15,9 +15,22 @@ There's an online wiki-based information source about HFST in
 Dependencies
 ------------
 
+Please note that the dependencies for the library can be set during the compile
+time. Settings that determine dependencies relate to features the resulting
+library will have; e.g. if you *disable* openfst you cannot use weighted
+finite-state automata. If you *enable* foma, you will be able to read foma
+format automata as HFST files and use foma's algorithms to process automata.
+
+The selection of tools may incur additional dependencies; e.g. if you enable
+``apertium2fst`` tool, you will need libxml2_ and its dependencies, since the
+tool must read XML format dictionaries. The tools with interactive, text based
+interfaces require a compatible version of libreadline_ to be installed in
+order to work; notably the supplement library distributed with Mac OS X does not
+suffice, since it cannot even handle unicode properly.
+
 Compilation requirements:
 
-- For OpenFST backend:
+- To use the OpenFST_ backend (default):
 
   - the OpenFST libary can be downloaded from the `OpenFST wiki
     <http://www.openfst.org>`_
@@ -34,7 +47,7 @@ Compilation requirements:
   - to disable OpenFST support, configure switch ``--without-openfst`` may
     be used
 
-- For SFST backend:
+- To use the SFST_ backend (optional):
 
   - the SFST can be downloaded from `university of Stuttgart SFST pages
     <http://www.ims.uni-stuttgart.de/projekte/gramotron/SOFTWARE/SFST.html>`_
@@ -46,25 +59,26 @@ Compilation requirements:
   - SFST requires readline and ncurses, check SFST site for details
 
   - The SFST *frontend* a.k.a. the SFST-PL parser a.k.a. ``hfst-sfstpl2fst``
-    do **not** require the SFST library to be installed; the library is only
+    does **not** require the SFST library to be installed; the library is only
     used for library-stuff like reading SFST format automata.
 
-  - to disable SFST backend, configure switch ``--without-sfst`` may be used
+  - to enable SFST backend, configure switch ``--with-sfst`` must be used
 
-- For foma backend:
+- To use the foma_ backend (optional):
 
   - foma library and tools can be downloaded from `foma website
     <http://foma.sf.net>`_
 
-  - the foma library version 0.9.14alpha or newer must be installed in the
+  - the foma library version 0.9.15alpha or newer must be installed in the
     running system.
 
   - foma requires editline, termcap and zlib libraries to compile, check foma
     site for details
 
-  - to disable foma backend, configure switch ``--without-foma`` may be used
+  - to enable foma backend, configure switch ``--with-foma`` may be used
 
-  - the *hfst-xfst* frontend **requires** foma binary
+  - the *hfst-xfst* frontend **requires** foma binary; library is not needed to
+    be linked for this.
 
 - For proper Unicode support in corpus tools:
 
@@ -73,18 +87,30 @@ Compilation requirements:
   - Pkg-config 0.14 or newer
 
   - Without unicode libraries the corpus tools may be unable to handle
-    operations such as *case-folding* properly
+    operations such as *case-folding* properly (default)
 
-- Local libraries:
+  - To compile corpus processing tool ``hfst-proc``, you need to use the
+    ``configure`` switch ``--enable-proc``.
 
-  - If you only have a local version of a library, you can use it with
-    appropriate LDFLAGS and CXXFLAGS, eg.
-    ``./configure LDFLAGS=-L/path/to/local/lib
-    --prefix=/path/to/local/installation`` and
-    ``make CXXFLAGS=-I/path/to/local/headers``
+- For XML based lexicon formats:
 
-- Versions loaded from version control systems require a relatively new GNU
-  tool-chain to build: 
+  - libxml2_ version 2.2 or newer
+
+  - To compile apertium_ monodix compiler ``hfst-apertium2fst``, use the
+    ``configure`` switch ``--enable-apertium2fst``.
+
+Note that if you did install dependent libraries, such as openfst, sfst, foma,
+libxml or glib to your home directory instead of using your system's package
+manager (or supported default location):
+
+- If you only have a local version of a library, you can use it with
+  appropriate LDFLAGS and CXXFLAGS, eg.
+  ``./configure LDFLAGS=-L/path/to/local/lib
+  --prefix=/path/to/local/installation`` and
+  ``make CXXFLAGS=-I/path/to/local/headers``
+
+If you are building a development version you *loaded from the version control
+system*, you must have new brand of GNU development tools installed:
 
  - autoconf >=2.62
 
@@ -100,22 +126,28 @@ Compilation requirements:
  - Mac OS X users are advised to use MacPorts; Mac OS X 10.6 with
    XCode 2.3.2 at least is not sufficient
 
-- Versions loaded from version control system may require parser generator 
-  system:
+ - A package loaded from hfst web site does *not* have these requirements
 
-   - GNU flex 2.5.35 or compatible and
+The source codes *loaded from the version controls system* will also require
+parse generator system:
 
-   - GNU bison 1.31 (2.4 suggested) or compatible
+- GNU flex 2.5.35 or compatible and
 
-   - flex 2.5.4-2.5.33 will choke on perfectly valid rules used in hfst
+- GNU bison 1.31 (2.4 suggested) or compatible
 
-   - bison older than 1.31 do not support name-prefix needed for having
-     multiple parsers in one library
+- flex 2.5.4-2.5.33 will choke on perfectly valid rules used in hfst
 
-   - Flex and bison are needed with distribution versions as well if the user
-     wishes to modify .yy or .ll files.
+- bison older than 1.31 do not support name-prefix needed for having
+  multiple parsers in one library
 
-Runtime requirements:
+- A package loaded from hfst web site does *not* have these requirements
+
+- source code loaded from version control system requires them only to
+  bootstrap; if you use systems with archaic versions of flex or bison and
+  cannot install updates, you might be able to get the needed files from
+  somewhere
+
+When running HFST software or using HFST libraries from HFST-enabled software:
 
 - If the executable is dynamically linked (almost always), the operating system
   *must* be able to find hfst libraries, and libraries of backends that are
