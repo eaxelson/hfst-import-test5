@@ -17,7 +17,7 @@ NORVIG=hfst/en
 prefix=/usr/local
 sharedir=$(prefix)/share
 
-$
+
 $(OMORFI):
 	mkdir -p $@
 
