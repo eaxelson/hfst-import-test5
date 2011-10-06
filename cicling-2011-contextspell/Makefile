@@ -17,6 +17,13 @@ NORVIG=hfst/en
 prefix=/usr/local
 sharedir=$(prefix)/share
 
+$
+$(OMORFI):
+	mkdir -p $@
+
+$(NORVIG):
+	mkdir -p $@
+
 .PHONY: automata automata-fi automata-en results results-fi results-en textables textables-fi textables-en
 
 automata: automata-fi automata-en
