@@ -491,42 +491,63 @@ namespace hfst {
       protected:
         /* Change state numbers s1 to s2 and vice versa. */
         void swap_state_numbers(HfstState s1, HfstState s2) {
-
-      HfstTransitions s1_copy = state_vector[s1];
-      state_vector[s1] = state_vector[s2];
-      state_vector[s2] = s1_copy;
-
+	  
+	  HfstTransitions s1_copy = state_vector[s1];
+	  state_vector[s1] = state_vector[s2];
+	  state_vector[s2] = s1_copy;
+	  
           // ----- Go through all states -----
           for (iterator it = begin(); it != end(); it++)
             {
-          // Go through all transitions
+	      // Go through all transitions
               for (unsigned int i=0; i < it->size(); i++)
                 {
-          HfstTransition<C> &tr_it = it->operator[](i);
+		  HfstTransition<C> &tr_it = it->operator[](i);
+		  
+		  HfstState new_target;
+		  if (tr_it.get_target_state() == s1)
+		    new_target = s2;
+		  if (tr_it.get_target_state() == s2)
+		    new_target = s1;
+		  
+		  if (new_target != tr_it.get_target_state())
+		    {
+		      HfstTransition<C> tr
+			(new_target,
+			 tr_it.get_input_symbol(),
+			 tr_it.get_output_symbol(),
+			 tr_it.get_weight());
+		      
+		      it->operator[](i) = tr;
+		    }
+		  
+		} // all transitions gone through
+	      
+	    } // ----- all states gone through -----
+	  
+	  // Swap final states, if needed
+	  typename FinalWeightMap::iterator s1_it = final_weight_map.find(s1);
+	  typename FinalWeightMap::iterator s2_it = final_weight_map.find(s2);
+	  typename FinalWeightMap::iterator end_it = final_weight_map.end();
 
-          HfstState new_target;
-          if (tr_it.get_target_state() == s1)
-            new_target = s2;
-          if (tr_it.get_target_state() == s2)
-            new_target = s1;
+	  if (s1_it != end_it && s2_it != end_it) {
+	    typename C::WeightType s1_weight = s1_it->second;
+	    final_weight_map[s1] = s2_it->second;
+	    final_weight_map[s2] = s1_weight;
+	  }
+	  if (s1_it != end_it) {
+	    typename C::WeightType w = s1_it->second;
+	    final_weight_map.erase(s1);
+	    final_weight_map[s2] = w;
+	  }
+	  if (s2_it != end_it) {
+	    typename C::WeightType w = s2_it->second;
+	    final_weight_map.erase(s2);
+	    final_weight_map[s1] = w;
+	  }
 
-          if (new_target != tr_it.get_target_state())
-            {
-              HfstTransition<C> tr
-            (new_target,
-             tr_it.get_input_symbol(),
-             tr_it.get_output_symbol(),
-             tr_it.get_weight());
-              
-              it->operator[](i) = tr;
-            }
-          
-        } // all transitions gone through
-
-        } // ----- all states gone through -----
-
-      return;
-
+	  return;
+	  
         }
     
         /* Replace all strings \a str1 in \a symbol with \a str2. */

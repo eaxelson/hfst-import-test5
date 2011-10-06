@@ -76,6 +76,10 @@ htwolcpre3_SOURCES=htwolcpre3.yy scanner3.ll HfstTwolcDefs.h \
 		   $(RULE_SRC)/TwolCGrammar.cc \
 		   $(RULE_SRC)/TwolCGrammar.h
 
+# some systems might require all these
+BUILT_SOURCES=htwolcpre1.h htwolcpre2.h htwolcpre3.h
+
+
 hfst-twolc$(EXEEXT): hfst-twolc.sh
 	cat $< | sed -e 's|BINDIR|$(bindir)|' > $@
 	chmod ogu+rx hfst-twolc

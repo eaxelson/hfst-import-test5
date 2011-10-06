@@ -30,7 +30,7 @@ bootstrappable=hfst-compare.1 hfst-compose.1 \
 			   hfst-calculate.1 hfst-compose-intersect.1 \
 			   hfst-lookup.1 \
 			   hfst-substitute.1
-broken=hfst-xfst.1 hfst-foma-wrapper.1 hfst-proc.1 hfst-lexc.1
+broken=hfst-xfst.1 hfst-foma-wrapper.1 hfst-apertium-proc.1 hfst-lexc.1
 dist_man1_MANS=$(bootstrappable) $(broken)
 
 bootstrap: 

@@ -117,6 +117,9 @@ endif
 if WANT_REVERSE
 MAYBE_REVERSE=hfst-reverse
 endif
+if WANT_REWEIGHT
+MAYBE_REWEIGHT=hfst-reweight
+endif
 if WANT_SPLIT
 MAYBE_SPLIT=hfst-split
 endif
@@ -178,12 +181,13 @@ bin_PROGRAMS= \
 			 $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) $(MAYBE_DISJUNCT)   \
 			 $(MAYBE_DUPLICATE) $(MAYBE_EDIT_METADATA)                  \
 			 $(MAYBE_FORMAT) $(MAYBE_FST2FST) $(MAYBE_FST2STRINGS)      \
-			 $(MAYBE_FST2TXT) $(MAYBE_GREP) $(MAYBE_HEAD) \
-			 $(MAYBE_INVERT)             \
+			 $(MAYBE_FST2TXT) $(MAYBE_GREP) $(MAYBE_HEAD)               \
+			 $(MAYBE_INVERT)                                            \
 			 $(MAYBE_LOOKUP) $(MAYBE_MINIMIZE) $(MAYBE_NAME)            \
 			 $(MAYBE_PROJECT) $(MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP)  \
 			 $(MAYBE_PUSH_WEIGHTS) $(MAYBE_REGEXP2FST)                  \
 			 $(MAYBE_REMOVE_EPSILONS) $(MAYBE_REPEAT) $(MAYBE_REVERSE)  \
+			 $(MAYBE_REWEIGHT)                                          \
 			 $(MAYBE_SPLIT) $(MAYBE_STRINGS2FST) $(MAYBE_STRIP_HEADER)  \
 			 $(MAYBE_SUBTRACT) $(MAYBE_SUMMARIZE) $(MAYBE_TAIL)         \
 			 $(MAYBE_TXT2FST) $(MAYBE_CALCULATE) $(MAYBE_SUBSTITUTE)    \
@@ -239,6 +243,7 @@ hfst_regexp2fst_SOURCES=hfst-regexp2fst.cc $(HFST_COMMON_SRC)
 hfst_remove_epsilons_SOURCES=hfst-remove-epsilons.cc $(HFST_COMMON_SRC)
 hfst_repeat_SOURCES=hfst-repeat.cc $(HFST_COMMON_SRC)
 hfst_reverse_SOURCES=hfst-reverse.cc $(HFST_COMMON_SRC)
+hfst_reweight_SOURCES=hfst-reweight.cc $(HFST_COMMON_SRC)
 hfst_split_SOURCES=hfst-split.cc $(HFST_COMMON_SRC)
 hfst_strings2fst_SOURCES=hfst-strings2fst.cc $(HFST_COMMON_SRC) \
 HfstStrings2FstTokenizer.cc

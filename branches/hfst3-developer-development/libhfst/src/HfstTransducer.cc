@@ -315,8 +315,8 @@ HfstTransducer * HfstTransducer::harmonize_(const HfstTransducer &another)
     case (TROPICAL_OPENFST_TYPE):
     case (LOG_OPENFST_TYPE):
       {
-    HfstBasicTransducer * this_basic = this->convert_to_basic_transducer();
     HfstBasicTransducer * another_basic = another.get_basic_transducer();
+    HfstBasicTransducer * this_basic = this->convert_to_basic_transducer();
 
     this_basic->harmonize(*another_basic);
 
