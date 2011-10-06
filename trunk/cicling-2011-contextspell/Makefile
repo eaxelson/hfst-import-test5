@@ -17,7 +17,6 @@ NORVIG=hfst/en
 prefix=/usr/local
 sharedir=$(prefix)/share
 
-
 $(OMORFI):
 	mkdir -p $@
 
@@ -160,7 +159,7 @@ results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-small.unig
 	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-small.hfst $(OMORFI)/dictionary.default-boundaryweight-small.hfst < fi-FI.fiwiki-gutenberg.contextspell > $@
 
 results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-small.unigrams: fi-FI.fiwiki-gutenberg.contextspell $(OMORFI)/dictionary.default-boundaryweight-medium.hfst $(OMORFI)/error.edit-distance-2-small.hfst
-	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-medium.hfst $(OMORFI)/dictionary.default-boundaryweight-small.hfst < fi-FI.fiwiki-gutenberg.contextspell > $@
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-small.hfst $(OMORFI)/dictionary.default-boundaryweight-medium.hfst < fi-FI.fiwiki-gutenberg.contextspell > $@
 
 results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-small.unigrams: fi-FI.fiwiki-gutenberg.contextspell $(OMORFI)/dictionary.default-boundaryweight-huge.hfst $(OMORFI)/error.edit-distance-2-small.hfst
 	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-small.hfst $(OMORFI)/dictionary.default-boundaryweight-huge.hfst < fi-FI.fiwiki-gutenberg.contextspell > $@
