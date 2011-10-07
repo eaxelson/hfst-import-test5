@@ -1621,11 +1621,12 @@ int main(int argc, char * argv[])
 
     ImplementationType types[] = {SFST_TYPE, TROPICAL_OPENFST_TYPE, FOMA_TYPE};
     unsigned int NUMBER_OF_TYPES=3;
-    //TODO: add FOMA_TYPE
-
 
     for (unsigned int i=0; i < NUMBER_OF_TYPES; i++)
     {
+      if (! HfstTransducer::is_implementation_type_available(types[i]))
+	continue;
+
     	// Normal
         right_arrow_test1(types[i]);
         left_arrow_test1(types[i]);
