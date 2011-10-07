@@ -174,7 +174,27 @@ const char * arr1[2] = { "a","b" };
 const char * arr2[3] = { "a","b","c" };
 int main(void)
 {
-  OtherSymbolTransducer::set_transducer_type(hfst::TROPICAL_OPENFST_TYPE);
+  bool have_openfst = false;
+#if HAVE_OPENFST
+  have_openfst = true; 
+#endif //HAVE_OPENFST
+
+  bool have_sfst = false;
+#if HAVE_SFST
+  have_sfst = true; 
+#endif //HAVE_SFST
+
+  bool have_foma = false;
+#if HAVE_FOMA
+  have_foma = true; 
+#endif // HAVE_FOMA
+
+  OtherSymbolTransducer::set_transducer_type
+    (have_openfst ? hfst::TROPICAL_OPENFST_TYPE : 
+     have_sfst ? hfst::SFST_TYPE :
+     have_foma ? hfst::FOMA_TYPE : 
+     hfst::ERROR_TYPE);
+
   Alphabet alphabet;
   std::string name1 = "X";
   SymbolRange sr1(arr1,arr1+2);

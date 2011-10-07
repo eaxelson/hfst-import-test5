@@ -41,11 +41,31 @@ OtherSymbolTransducer LeftArrowRule::compile(void)
 
 #ifdef TEST_LEFT_ARROW_RULE
 #include <cassert>
-using hfst::TROPICAL_OPENFST_TYPE;
-ImplementationType transducer_type = TROPICAL_OPENFST_TYPE;
 
 int main(void)
 {
+  bool have_openfst = false;
+#if HAVE_OPENFST
+  have_openfst = true; 
+#endif // HAVE_OPENFST
+
+  bool have_sfst = false;
+#if HAVE_SFST
+  have_sfst = true; 
+#endif // HAVE_SFST
+
+  bool have_foma = false;
+#if HAVE_FOMA
+  have_foma = true; 
+#endif // HAVE_FOMA
+
+ImplementationType transducer_type 
+= have_openfst ? hfst::TROPICAL_OPENFST_TYPE : 
+  have_sfst ? hfst::SFST_TYPE :
+  have_foma ? hfst::FOMA_TYPE : 
+  hfst::ERROR_TYPE;
+
+
   HandySet<SymbolPair> symbols;
   symbols.insert(SymbolPair("a","b"));
   symbols.insert(SymbolPair(TWOLC_EPSILON,"c"));
