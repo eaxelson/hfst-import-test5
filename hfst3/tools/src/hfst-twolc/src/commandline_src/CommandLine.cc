@@ -67,7 +67,7 @@ void CommandLine::print_help(void)
         << "  -f, --format=FORMAT    Store result in format FORMAT." 
         << std::endl << std::endl;
   
-  std::cerr << "Format may be one of log-openfst, tropical-openfst, foma or sfst."
+  std::cerr << "Format may be one of openfst-log, openfst-tropical, foma or sfst."
         << std::endl << std::endl;
 }
 
@@ -149,9 +149,13 @@ int CommandLine::parse_options(int argc, char** argv)
         { form = hfst::LOG_OPENFST_TYPE; }
       else if (std::string("tropical-openfst") == optarg)
         { form = hfst::TROPICAL_OPENFST_TYPE; }
+      else if (std::string("openfst-tropical") == optarg)
+        { form = hfst::TROPICAL_OPENFST_TYPE; }
       else if (std::string("log-weight") == optarg)
         { form = hfst::LOG_OPENFST_TYPE; }
       else if (std::string("log-openfst") == optarg)
+        { form = hfst::LOG_OPENFST_TYPE; }
+      else if (std::string("openfst-log") == optarg)
         { form = hfst::LOG_OPENFST_TYPE; }
       else if (std::string("openfst") == optarg)
         { form = hfst::TROPICAL_OPENFST_TYPE; }
