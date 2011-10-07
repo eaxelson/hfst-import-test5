@@ -6,57 +6,90 @@ GENERATED_FILES="temp.hfst temp.twolc.hfst temp.twolc.hfst0 temp.twolc.hfst1 tem
 
 echo "There are $NUMBER_OF_TESTS substests for hfst-twolc."
 
+echo "" | ../../hfst-txt2fst -f foma > /dev/null
+FOMA_EXISTS=$?
+
+echo "" | ../../hfst-txt2fst -f openfst-log > /dev/null
+LOG_OPENFST_EXISTS=$?
+# Don't run tests for log-weight format.
+LOG_OPENFST_EXISTS=1
+
+echo "" | ../../hfst-txt2fst -f openfst-tropical > /dev/null
+TROPICAL_OPENFST_EXISTS=$?
+
+echo "" | ../../hfst-txt2fst -f sfst > /dev/null
+SFST_EXISTS=$?
+
 for f in $(ls -d $srcdir/* | egrep "test[0-9][0-9]*$" | sort -n)
 do
-	cat "$f" | ../src/hfst-twolc-loc -R -s -f foma             > temp.twolc.hfst0
-#	cat "$f" | ../src/hfst-twolc-loc -R -s -f log-openfst      > temp.twolc.hfst1
-	cat "$f" | ../src/hfst-twolc-loc -R -s -f tropical-openfst > temp.twolc.hfst2
-	cat "$f" | ../src/hfst-twolc-loc -R -s -f sfst             > temp.twolc.hfst3
+        if [ $FOMA_EXISTS -eq 0 ]
+	then
+	    cat "$f" | ../src/hfst-twolc-loc -R -s -f foma             > temp.twolc.hfst0
+	fi
+
+	if [ $LOG_OPENFST_EXISTS -eq 0 ]
+	then
+	    cat "$f" | ../src/hfst-twolc-loc -R -s -f openfst-log      > temp.twolc.hfst1
+	fi
+
+	if [ $TROPICAL_OPENFST_EXISTS -eq 0 ]
+	then
+	    cat "$f" | ../src/hfst-twolc-loc -R -s -f openfst-tropical > temp.twolc.hfst2
+	fi
+
+	if [ $SFST_EXISTS -eq 0 ]
+	then
+	    cat "$f" | ../src/hfst-twolc-loc -R -s -f sfst             > temp.twolc.hfst3
+	fi
+
 	if  [ $? -ne 0 ] 
 	then
 	        rm -f $GENERATED_FILES
 	        exit 1
 	fi
 	cat "$f.txt_fst" | ../../hfst-txt2fst -e"@_EPSILON_SYMBOL_@" > temp.hfst
-#	for n in 0 1 2 3  
-	for n in 0 2  	
+	for n in 0 1 2 3  
 	do
-	    cat temp.twolc.hfst"$n" | ../../hfst-fst2txt | ../../hfst-txt2fst -e"@_EPSILON_SYMBOL_@" > temp.twolc.hfst
-	    cat "$f" | ../src/hfst-twolc-loc -R -s &> /dev/null
-	    if ! ../../hfst-compare -q -1 temp.hfst -2 temp.twolc.hfst &> /dev/null
+	    cat temp.twolc.hfst"$n" > /dev/null 2> /dev/null
+	    if [ $? -eq 0 ]
 	    then
-		echo "hfst-twolc sub$(basename $f) failed."
-		if [ $n -eq 0 ]
+		cat temp.twolc.hfst"$n" | ../../hfst-fst2txt | ../../hfst-txt2fst -e"@_EPSILON_SYMBOL_@" > temp.twolc.hfst
+		cat "$f" | ../src/hfst-twolc-loc -R -s &> /dev/null
+		if ! ../../hfst-compare -q -1 temp.hfst -2 temp.twolc.hfst &> /dev/null
 		then
-		    echo "For foma type."
+		    echo "hfst-twolc sub$(basename $f) failed."
+		    if [ $n -eq 0 ]
+		    then
+			echo "For foma type."
+		    fi
+		    if [ $n -eq 1 ]
+		    then
+			echo "For log-openfst type."
+		    fi
+		    if [ $n -eq 2 ]
+		    then
+			echo "For tropical-openfst type."
+		    fi
+		    if [ $n -eq 3 ]
+		    then
+			echo "For sfst type."
+		    fi
+		    echo
+		    echo "Grammar:"
+		    echo
+		    cat "$f"
+		    echo
+		    echo "Should be:"
+		    echo
+		    ../../hfst-fst2txt temp.hfst
+		    echo
+		    echo "Is:"
+		    echo
+		    ../../hfst-fst2txt temp.twolc.hfst
+		    echo
+		    rm -f $GENERATED_FILES
+		    exit 1
 		fi
-		if [ $n -eq 1 ]
-		then
-		    echo "For log-openfst type."
-		fi
-		if [ $n -eq 2 ]
-		then
-		    echo "For tropical-openfst type."
-		fi
-		if [ $n -eq 3 ]
-		then
-		    echo "For sfst type."
-		fi
-		echo
-		echo "Grammar:"
-		echo
-		cat "$f"
-		echo
-		echo "Should be:"
-		echo
-		../../hfst-fst2txt temp.hfst
-		echo
-		echo "Is:"
-		echo
-		../../hfst-fst2txt temp.twolc.hfst
-		echo
-		rm -f $GENERATED_FILES
-		exit 1
 	    fi
 	done
 	echo "hfst-twolc sub$(basename $f) passed."
