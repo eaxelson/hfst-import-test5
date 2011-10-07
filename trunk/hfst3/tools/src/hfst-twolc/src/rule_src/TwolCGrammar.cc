@@ -181,6 +181,30 @@ void TwolCGrammar::compile_and_store(HfstOutputStream &out)
 #include "../alphabet_src/Alphabet.h"
 int main(void)
 {
+
+  bool have_openfst = false;
+#if HAVE_OPENFST
+  have_openfst = true; 
+#endif // HAVE_OPENFST
+
+  bool have_sfst = false;
+#if HAVE_SFST
+  have_sfst = true; 
+#endif // HAVE_SFST
+
+  bool have_foma = false;
+#if HAVE_FOMA
+  have_foma = true; 
+#endif // HAVE_FOMA
+
+ImplementationType transducer_type 
+= have_openfst ? hfst::TROPICAL_OPENFST_TYPE : 
+  have_sfst ? hfst::SFST_TYPE :
+  have_foma ? hfst::FOMA_TYPE : 
+  hfst::ERROR_TYPE;
+
+ OtherSymbolTransducer::set_transducer_type(transducer_type);
+
   TwolCGrammar g(true,false,true);
 
   /*HandySet<SymbolPair> symbols;
