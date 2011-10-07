@@ -726,6 +726,7 @@ ImplementationType transducer_type
   have_foma ? hfst::FOMA_TYPE : 
    hfst::ERROR_TYPE);
 
+ OtherSymbolTransducer::set_transducer_type(transducer_type);
 
   HandySet<SymbolPair> symbol_pairs;
   symbol_pairs.insert(SymbolPair("a","b"));
