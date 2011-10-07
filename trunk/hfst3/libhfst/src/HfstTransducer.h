@@ -314,10 +314,12 @@ An example:
     static HfstTransducer &read_in_att_format
       (FILE *ifile, ImplementationType type, const std::string &epsilon_symbol);
 
-    /* For internal use: whether HFST is linked to the transducer library 
+  public:
+    /* whether HFST is linked to the transducer library 
        needed by implementation type \a type. */
     static bool is_implementation_type_available(ImplementationType type);
 
+  protected:
     /* For internal use: Create a tokenizer that recognizes all symbols 
        that occur in the transducer. */
     HfstTokenizer create_tokenizer();

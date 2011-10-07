@@ -3877,13 +3877,16 @@ int main(int argc, char * argv[])
 {
     std::cout << "Unit tests for " __FILE__ ":" << std::endl;
     
-    ImplementationType types[] = {SFST_TYPE, TROPICAL_OPENFST_TYPE,
-                  FOMA_TYPE};
+    ImplementationType types[] = {SFST_TYPE, 
+				  TROPICAL_OPENFST_TYPE,
+				  FOMA_TYPE};
     unsigned int NUMBER_OF_TYPES=3;
 
     for (unsigned int i=0; i < NUMBER_OF_TYPES; i++) 
     {
-    
+      if (! HfstTransducer::is_implementation_type_available(types[i]))
+	continue;
+
     	// Test alphabet after substitute
 
         HfstTransducer t("a", "b", types[i]);
