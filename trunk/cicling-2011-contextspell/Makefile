@@ -25,6 +25,9 @@ $(NORVIG):
 
 .PHONY: automata automata-fi automata-en results results-fi results-en textables textables-fi textables-en
 
+context_speller:
+	$(MAKE) -C src/ install
+
 automata: automata-fi automata-en
 
 automata-fi: $(OMORFI)/dictionary.limited.hfst $(OMORFI)/dictionary.default-boundaryweight-medium.hfst $(OMORFI)/dictionary.default-boundaryweight-small.hfst $(OMORFI)/dictionary.default-boundaryweight-huge.hfst $(OMORFI)/dictionary.default-boundaryweight-none.hfst $(OMORFI)/error.edit-distance-2-medium.hfst $(OMORFI)/error.edit-distance-2-small.hfst $(OMORFI)/error.edit-distance-2-none.hfst $(OMORFI)/error.edit-distance-2-huge.hfst
