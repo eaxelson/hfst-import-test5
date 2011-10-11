@@ -27,7 +27,9 @@ tools:
 
 fsts:$(FSTS)
 
-all-results:$(TRAINING_DATA_SIZES:%=$(FI_RESULTS)/result.%.txt) $(TRAINING_DATA_SIZES:%=$(FI_RESULTS)/result.kpc.%.txt)
+all-results:all-results-fi
+
+all-results-fi:$(TRAINING_DATA_SIZES:%=$(FI_RESULTS)/result.%.txt) $(TRAINING_DATA_SIZES:%=$(FI_RESULTS)/result.kpc.%.txt)
 
 $(FST_BIN)/text_to_numbers.hfst:$(FST_SRC)/numbers_to_text.txt
 	cat $^ | hfst-txt2fst | hfst-invert > $@
