@@ -38,12 +38,20 @@ int main(int argc, char * argv[])
 
   while (std::cin.peek() != EOF)
     {
-      SuggestionsInContext suggestions_in_context(std::cin);
-      std::string speller_suggestion = 
-	speller.get_correct_spelling(suggestions_in_context);
+      try
+	{
+	  SuggestionsInContext suggestions_in_context(std::cin);
 
-      std::cout << suggestions_in_context.typo << "\t"
-		<< suggestions_in_context.correct_suggestion << "\t"
-		<< speller_suggestion << std::endl;
+	  std::cout << suggestions_in_context.typo << "\t"
+		    << suggestions_in_context.correct_suggestion << "\t";
+
+	  std::string speller_suggestion = 
+	    speller.get_correct_spelling(suggestions_in_context);
+	  std::cout << speller_suggestion << std::endl;
+	}
+      catch (const InvalidInput &)
+	{
+	  std::cout << "<ERROR>\t<error>\t<ERROR>\t<ERROR>\t<ERROR>\t<ERROR>\t<ERROR>";
+	}
     }
 }

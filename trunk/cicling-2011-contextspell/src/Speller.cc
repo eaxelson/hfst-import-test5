@@ -66,7 +66,7 @@ std::string Speller::get_correct_spelling
   temp.input_project();
   sentence_with_weights = HfstBasicTransducer(temp);
 
-  for (size_t i = 0; i < 5; ++i)
+  for (size_t i = 0; i < 5 && i < s.suggestions.size(); ++i)
     {
       StringPairVector result = get_vector(sentence_with_weights);
       

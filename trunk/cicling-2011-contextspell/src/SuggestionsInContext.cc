@@ -102,7 +102,7 @@ WeightedString SuggestionsInContext::parse_weighted_string
   in >> weight;
 
   if (in.fail())
-    { throw InvalidInput(); }
+    { weight = 1000000000.0; }
 
   return WeightedString(weight,wf);
 }
