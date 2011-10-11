@@ -330,13 +330,27 @@ process_stream(HfstOutputStream& outstream)
                                                     ">";
                                                   emptiness = false;
                                                 }
+                                              else if (xmlStrcmp(l->name, xmlCharStrdup("b")) == 0)
+                                                {
+                                                  left += string(" ");
+                                                  emptiness = false;
+                                                }
+                                              else if (xmlStrcmp(l->name, xmlCharStrdup("j")) == 0)
+                                                {
+                                                  left += string("+");
+                                                  emptiness = false;
+                                                }
                                               else if (xmlNodeIsText(l))
                                                 {
-                                                  xmlChar* surf = xmlNodeListGetString(doc,
-                                                                                       l,
-                                                                                       1);
+                                                  xmlChar* surf = xmlNodeGetContent(l);
                                                   left += reinterpret_cast<char*>(surf);
                                                   emptiness = false;
+                                                }
+                                              else
+                                                {
+                                                  error(0, 0,
+                                                        "Unrecognised %s in <l>",
+                                                        reinterpret_cast<const char*>(l->name));
                                                 }
                                               l = l->next;
                                             } // while l
@@ -361,13 +375,27 @@ process_stream(HfstOutputStream& outstream)
                                                     ">";
                                                   emptiness = false;
                                                 }
+                                              else if (xmlStrcmp(r->name, xmlCharStrdup("b")) == 0)
+                                                {
+                                                  right += string(" ");
+                                                  emptiness = false;
+                                                }
+                                              else if (xmlStrcmp(r->name, xmlCharStrdup("j")) == 0)
+                                                {
+                                                  right += string("+");
+                                                  emptiness = false;
+                                                }
                                               else if (xmlNodeIsText(r))
                                                 {
-                                                  xmlChar* surf = xmlNodeListGetString(doc,
-                                                                                       r,
-                                                                                       1);
+                                                  xmlChar* surf = xmlNodeGetContent(r);
                                                   right += reinterpret_cast<char*>(surf);
                                                   emptiness = false;
+                                                }
+                                              else
+                                                {
+                                                  error(0, 0,
+                                                        "Unrecognised %s in <r>",
+                                                        reinterpret_cast<const char*>(r->name));
                                                 }
                                               r = r->next;
                                             } // while r
@@ -398,14 +426,30 @@ process_stream(HfstOutputStream& outstream)
                                            ">";
                                           emptiness = false;
                                         }
+                                      else if (xmlStrcmp(i->name, xmlCharStrdup("b")) == 0)
+                                        {
+                                          left += string(" ");
+                                          right += string(" ");
+                                          emptiness = false;
+                                        }
+                                      else if (xmlStrcmp(i->name, xmlCharStrdup("j")) == 0)
+                                        {
+                                          left += string("+");
+                                          right += string("+");
+                                          emptiness = false;
+                                        }
                                       else if (xmlNodeIsText(i))
                                         {
-                                          xmlChar* surf = xmlNodeListGetString(doc,
-                                                                               i,
-                                                                               1);
+                                          xmlChar* surf = xmlNodeGetContent(i);
                                           left += reinterpret_cast<char*>(surf);
                                           right += reinterpret_cast<char*>(surf);
                                           emptiness = false;
+                                        }
+                                      else
+                                        {
+                                          error(0, 0,
+                                                "Unrecognised %s in <i>",
+                                                reinterpret_cast<const char*>(i->name));
                                         }
                                       i = i->next;
                                     } // while i
@@ -530,13 +574,27 @@ process_stream(HfstOutputStream& outstream)
                                             ">";
                                           emptiness = false;
                                         }
+                                      else if (xmlStrcmp(l->name, xmlCharStrdup("b")) == 0)
+                                        {
+                                          left += string(" ");
+                                          emptiness = false;
+                                        }
+                                      else if (xmlStrcmp(l->name, xmlCharStrdup("j")) == 0)
+                                        {
+                                          left += string("+");
+                                          emptiness = false;
+                                        }
                                       else if (xmlNodeIsText(l))
                                         {
-                                          xmlChar* surf = xmlNodeListGetString(doc,
-                                                                               l,
-                                                                               1);
+                                          xmlChar* surf = xmlNodeGetContent(l);
                                           left += reinterpret_cast<char*>(surf);
                                           emptiness = false;
+                                        }
+                                      else
+                                        {
+                                          error(0, 0,
+                                                "Unrecognised %s in <l>",
+                                                reinterpret_cast<const char*>(l->name));
                                         }
                                       l = l->next;
                                     } // while l
@@ -560,13 +618,27 @@ process_stream(HfstOutputStream& outstream)
                                             ">";
                                           emptiness = false;
                                         }
+                                      else if (xmlStrcmp(r->name, xmlCharStrdup("b")) == 0)
+                                        {
+                                          right += string(" ");
+                                          emptiness = false;
+                                        }
+                                      else if (xmlStrcmp(r->name, xmlCharStrdup("j")) == 0)
+                                        {
+                                          right += string("+");
+                                          emptiness = false;
+                                        }
                                       else if (xmlNodeIsText(r))
                                         {
-                                          xmlChar* surf = xmlNodeListGetString(doc,
-                                                                               r,
-                                                                               1);
+                                          xmlChar* surf = xmlNodeGetContent(r);
                                           right += reinterpret_cast<char*>(surf);
                                           emptiness = false;
+                                        }
+                                      else
+                                        {
+                                          error(0, 0,
+                                                "Unrecognised %s in <r>",
+                                                reinterpret_cast<const char*>(r->name));
                                         }
                                       r = r->next;
                                     }
@@ -596,14 +668,30 @@ process_stream(HfstOutputStream& outstream)
                                    ">";
                                   emptiness = false;
                                 }
+                              else if (xmlStrcmp(i->name, xmlCharStrdup("b")) == 0)
+                                {
+                                  left += string(" ");
+                                  right += string(" ");
+                                  emptiness = false;
+                                }
+                              else if (xmlStrcmp(i->name, xmlCharStrdup("j")) == 0)
+                                {
+                                  left += string("+");
+                                  right += string("+");
+                                  emptiness = false;
+                                }
                               else if (xmlNodeIsText(i))
                                 {
-                                  xmlChar* surf = xmlNodeListGetString(doc,
-                                                                       i,
-                                                                       1);
+                                  xmlChar* surf = xmlNodeGetContent(i);
                                   left += reinterpret_cast<char*>(surf);
                                   right += reinterpret_cast<char*>(surf);
                                   emptiness = false;
+                                }
+                              else
+                                {
+                                  error(0, 0,
+                                        "Unrecognised %s in <i>",
+                                        reinterpret_cast<const char*>(i->name));
                                 }
                               i = i->next;
                             } // while i
