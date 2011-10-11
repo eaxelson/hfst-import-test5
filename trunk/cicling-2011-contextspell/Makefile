@@ -173,9 +173,7 @@ alice%.ngrams: alice%.unigrams
 	done
 
 en%.ngrams: en%.unigrams
-	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 10.0 > $@.10 ;
-
-results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-huge.ngrams:
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 10.0 > $@.10
 
 
 textables: textables-fi textables-en
