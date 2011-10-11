@@ -76,6 +76,10 @@ all:$(PROGS)
 
 install:all
 	cp $(PROGS) ../bin
+	cp morfessor1.0.perl ../bin
+	chmod u+x ../bin/morfessor1.0.perl
+	cp rewrite_morfessor_output.pl ../bin
+	chmod u+x ../bin/rewrite_morfessor_output.pl
 
 clean:
 	rm -f $(PROGS)
