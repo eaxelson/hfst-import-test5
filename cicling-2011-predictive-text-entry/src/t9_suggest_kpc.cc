@@ -342,8 +342,8 @@ int main(int argc, char * argv[])
 	  //	    << std::endl;
 
 	  std::cout << *it << "\t";
-	  //bool found = false;
-	  //size_t pos = 0;
+	  bool found = false;
+	  size_t pos = 0;
 	  for (HfstTwoLevelPaths::const_iterator jt = output_paths.begin();
 	       jt != output_paths.end();
 	       ++jt)
@@ -362,18 +362,17 @@ int main(int argc, char * argv[])
 		    (kt->first == "<DEFAULT>" ? "" : kt->first); 
 		}
 
-	      //if (output_string == *it)
-	      //	{ 
-	      //	  found = true;
-	      //	  std::cout << pos; 
-	      //	  break;
-	      //	}
-	      //++pos;
-	      std::cout << output_string << "\t";
+	      if (output_string == *it)
+	      	{ 
+	      	  found = true;
+	      	  std::cout << pos; 
+	      	  break;
+	      	}
+	      ++pos;
 	    }
 	  
-	  //if (not found)
-	  // { std::cout << "infty"; }
+	  if (not found)
+	   { std::cout << "infty"; }
 
 	  std::cout << std::endl;
 	}
