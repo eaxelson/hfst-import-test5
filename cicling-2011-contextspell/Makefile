@@ -17,6 +17,10 @@ NORVIG=hfst/en
 prefix=/usr/local
 sharedir=$(prefix)/share
 
+CONTEXT_SPELLER=bin/context_speller 
+EN_TAGGER=taggers/en/hmm_model.lex taggers/en/hmm_model.seq
+FI_TAGGER=taggers/fin/hmm_model.lex taggers/fin/hmm_model.seq
+
 $(OMORFI):
 	mkdir -p $@
 
@@ -130,9 +134,49 @@ $(NORVIG)/error.edit-distance-2.hfst: edit-distance.bash
 # automata testing rules
 results: results-fi results-en
 
-results-fi: results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-none.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-none.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-none.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-none.unigrams  results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-small.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-small.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-small.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-small.unigrams  results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-medium.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-medium.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-medium.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-medium.unigrams  results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-huge.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-huge.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-huge.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-huge.unigrams 
+RESULTS_FI=results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-none.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-none.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-none.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-none.unigrams  results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-small.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-small.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-small.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-small.unigrams  results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-medium.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-medium.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-medium.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-medium.unigrams  results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-huge.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-huge.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-huge.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-huge.unigrams 
 
-results-en: results/en-US.norvig1.dictionary-norvig.edit-distance-2.unigrams results/en-US.norvig2.dictionary-norvig.edit-distance-2.unigrams 
+ADJUSTMENT_RESULTS_FI=results/juha_excerpt_with_errors.dictionary-full-boundaries-none.edit-distance-2-none.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-small.edit-distance-2-none.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-medium.edit-distance-2-none.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-huge.edit-distance-2-none.unigrams  results/juha_excerpt_with_errors.dictionary-full-boundaries-none.edit-distance-2-small.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-small.edit-distance-2-small.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-medium.edit-distance-2-small.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-huge.edit-distance-2-small.unigrams  results/juha_excerpt_with_errors.dictionary-full-boundaries-none.edit-distance-2-medium.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-small.edit-distance-2-medium.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-medium.edit-distance-2-medium.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-huge.edit-distance-2-medium.unigrams  results/juha_excerpt_with_errors.dictionary-full-boundaries-none.edit-distance-2-huge.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-small.edit-distance-2-huge.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-medium.edit-distance-2-huge.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-huge.edit-distance-2-huge.unigrams 
+
+results-fi: $(RESULTS_FI)
+
+RESULTS_EN=results/en-US.norvig1.dictionary-norvig.edit-distance-2.unigrams results/en-US.norvig2.dictionary-norvig.edit-distance-2.unigrams 
+
+# context speller result files
+context-results: context-results-fi context-results-en
+
+context-results-fi:results-fi $(RESULTS_FI:%.unigrams=%.ngrams)
+
+context-results-en:results-en $(RESULTS_EN:%.unigrams=%.ngrams)
+
+results-en:$(RESULTS_EN) 
+
+context-adjustment-results:context-adjustment-results-fi juha_excerpt_with_errors.txt context-results-fi alice_excerpt_with_errors.txt context-adjustment-results-en
+
+context-adjustment-results-fi:adjustment-results-fi $(ADJUSTMENT_RESULTS_FI:%.unigrams=%.ngrams)
+
+adjustment-results-fi:$(ADJUSTMENT_RESULTS_FI)
+
+fi%.ngrams: fi%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 10.0 > $@.10 ;
+
+juha%.ngrams: juha%.unigrams
+	for i in 1 2 3 4 5 6 7 8 9 10 ; \
+	do \
+		cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) $$i > $@.$$i ; \
+	done
+
+alice%.ngrams: alice%.unigrams
+	for i in 1 2 3 4 5 6 7 8 9 10 ; \
+	do \
+		cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) $$i > $@.$$i ; \
+	done
+
+en%.ngrams: en%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 10.0 > $@.10 ;
+
+results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-huge.ngrams:
+
 
 textables: textables-fi textables-en
 
@@ -197,5 +241,94 @@ results/en-US.norvig1.dictionary-norvig.edit-distance-2.unigrams: norvig1.contex
 results/en-US.norvig2.dictionary-norvig.edit-distance-2.unigrams: norvig2.contextspell $(NORVIG)/dictionary.default.hfst $(NORVIG)/error.edit-distance-2.hfst
 	hfst-ospell-cicling $(NORVIG)/error.edit-distance-2.hfst $(NORVIG)/dictionary.default.hfst < norvig2.contextspell > $@
 
+
+results/juha_excerpt_with_errors.dictionary-full-boundaries-huge.edit-distance-2-huge.unigrams: juha_excerpt_with_errors.txt  $(OMORFI)/dictionary.default-boundaryweight-huge.hfst $(OMORFI)/error.edit-distance-2-huge.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-huge.hfst $(OMORFI)/dictionary.default-boundaryweight-huge.hfst < juha_excerpt_with_errors.txt > $@
+results/juha_excerpt_with_errors.dictionary-full-boundaries-huge.edit-distance-2-medium.unigrams: juha_excerpt_with_errors.txt  $(OMORFI)/dictionary.default-boundaryweight-huge.hfst $(OMORFI)/error.edit-distance-2-huge.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-medium.hfst $(OMORFI)/dictionary.default-boundaryweight-medium.hfst < juha_excerpt_with_errors.txt > $@
+results/juha_excerpt_with_errors.dictionary-full-boundaries-huge.edit-distance-2-none.unigrams: juha_excerpt_with_errors.txt  $(OMORFI)/dictionary.default-boundaryweight-huge.hfst $(OMORFI)/error.edit-distance-2-huge.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-none.hfst $(OMORFI)/dictionary.default-boundaryweight-none.hfst < juha_excerpt_with_errors.txt > $@
+results/juha_excerpt_with_errors.dictionary-full-boundaries-huge.edit-distance-2-small.unigrams: juha_excerpt_with_errors.txt  $(OMORFI)/dictionary.default-boundaryweight-huge.hfst $(OMORFI)/error.edit-distance-2-huge.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-small.hfst $(OMORFI)/dictionary.default-boundaryweight-small.hfst < juha_excerpt_with_errors.txt > $@
+results/juha_excerpt_with_errors.dictionary-full-boundaries-medium.edit-distance-2-huge.unigrams: juha_excerpt_with_errors.txt  $(OMORFI)/dictionary.default-boundaryweight-medium.hfst $(OMORFI)/error.edit-distance-2-medium.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-huge.hfst $(OMORFI)/dictionary.default-boundaryweight-huge.hfst < juha_excerpt_with_errors.txt > $@
+results/juha_excerpt_with_errors.dictionary-full-boundaries-medium.edit-distance-2-medium.unigrams: juha_excerpt_with_errors.txt  $(OMORFI)/dictionary.default-boundaryweight-medium.hfst $(OMORFI)/error.edit-distance-2-medium.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-medium.hfst $(OMORFI)/dictionary.default-boundaryweight-medium.hfst < juha_excerpt_with_errors.txt > $@
+results/juha_excerpt_with_errors.dictionary-full-boundaries-medium.edit-distance-2-none.unigrams: juha_excerpt_with_errors.txt  $(OMORFI)/dictionary.default-boundaryweight-medium.hfst $(OMORFI)/error.edit-distance-2-medium.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-none.hfst $(OMORFI)/dictionary.default-boundaryweight-none.hfst < juha_excerpt_with_errors.txt > $@
+results/juha_excerpt_with_errors.dictionary-full-boundaries-medium.edit-distance-2-small.unigrams: juha_excerpt_with_errors.txt  $(OMORFI)/dictionary.default-boundaryweight-medium.hfst $(OMORFI)/error.edit-distance-2-medium.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-small.hfst $(OMORFI)/dictionary.default-boundaryweight-small.hfst < juha_excerpt_with_errors.txt > $@
+results/juha_excerpt_with_errors.dictionary-full-boundaries-none.edit-distance-2-huge.unigrams: juha_excerpt_with_errors.txt  $(OMORFI)/dictionary.default-boundaryweight-none.hfst $(OMORFI)/error.edit-distance-2-none.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-huge.hfst $(OMORFI)/dictionary.default-boundaryweight-huge.hfst < juha_excerpt_with_errors.txt > $@
+results/juha_excerpt_with_errors.dictionary-full-boundaries-none.edit-distance-2-medium.unigrams: juha_excerpt_with_errors.txt  $(OMORFI)/dictionary.default-boundaryweight-none.hfst $(OMORFI)/error.edit-distance-2-none.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-medium.hfst $(OMORFI)/dictionary.default-boundaryweight-medium.hfst < juha_excerpt_with_errors.txt > $@
+results/juha_excerpt_with_errors.dictionary-full-boundaries-none.edit-distance-2-none.unigrams: juha_excerpt_with_errors.txt  $(OMORFI)/dictionary.default-boundaryweight-none.hfst $(OMORFI)/error.edit-distance-2-none.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-none.hfst $(OMORFI)/dictionary.default-boundaryweight-none.hfst < juha_excerpt_with_errors.txt > $@
+results/juha_excerpt_with_errors.dictionary-full-boundaries-none.edit-distance-2-small.unigrams: juha_excerpt_with_errors.txt  $(OMORFI)/dictionary.default-boundaryweight-none.hfst $(OMORFI)/error.edit-distance-2-none.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-small.hfst $(OMORFI)/dictionary.default-boundaryweight-small.hfst < juha_excerpt_with_errors.txt > $@
+results/juha_excerpt_with_errors.dictionary-full-boundaries-small.edit-distance-2-huge.unigrams: juha_excerpt_with_errors.txt  $(OMORFI)/dictionary.default-boundaryweight-small.hfst $(OMORFI)/error.edit-distance-2-small.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-huge.hfst $(OMORFI)/dictionary.default-boundaryweight-huge.hfst < juha_excerpt_with_errors.txt > $@
+results/juha_excerpt_with_errors.dictionary-full-boundaries-small.edit-distance-2-medium.unigrams: juha_excerpt_with_errors.txt  $(OMORFI)/dictionary.default-boundaryweight-small.hfst $(OMORFI)/error.edit-distance-2-small.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-medium.hfst $(OMORFI)/dictionary.default-boundaryweight-medium.hfst < juha_excerpt_with_errors.txt > $@
+results/juha_excerpt_with_errors.dictionary-full-boundaries-small.edit-distance-2-none.unigrams: juha_excerpt_with_errors.txt  $(OMORFI)/dictionary.default-boundaryweight-small.hfst $(OMORFI)/error.edit-distance-2-small.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-none.hfst $(OMORFI)/dictionary.default-boundaryweight-none.hfst < juha_excerpt_with_errors.txt > $@
+results/juha_excerpt_with_errors.dictionary-full-boundaries-small.edit-distance-2-small.unigrams: juha_excerpt_with_errors.txt  $(OMORFI)/dictionary.default-boundaryweight-small.hfst $(OMORFI)/error.edit-distance-2-small.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-small.hfst $(OMORFI)/dictionary.default-boundaryweight-small.hfst < juha_excerpt_with_errors.txt > $@
+
+
+results/alice_excerpt_with_errors.dictionary-full-boundaries-huge.edit-distance-2-huge.unigrams: alice_excerpt_with_errors.txt  $(NORVIG)/dictionary.default-boundaryweight-huge.hfst $(NORVIG)/error.edit-distance-2-huge.hfst
+	hfst-ospell-cicling $(NORVIG)/error.edit-distance-2-huge.hfst $(NORVIG)/dictionary.default-boundaryweight-huge.hfst < alice_excerpt_with_errors.txt > $@
+results/alice_excerpt_with_errors.dictionary-full-boundaries-huge.edit-distance-2-medium.unigrams: alice_excerpt_with_errors.txt  $(NORVIG)/dictionary.default-boundaryweight-huge.hfst $(NORVIG)/error.edit-distance-2-huge.hfst
+	hfst-ospell-cicling $(NORVIG)/error.edit-distance-2-medium.hfst $(NORVIG)/dictionary.default-boundaryweight-medium.hfst < alice_excerpt_with_errors.txt > $@
+results/alice_excerpt_with_errors.dictionary-full-boundaries-huge.edit-distance-2-none.unigrams: alice_excerpt_with_errors.txt  $(NORVIG)/dictionary.default-boundaryweight-huge.hfst $(NORVIG)/error.edit-distance-2-huge.hfst
+	hfst-ospell-cicling $(NORVIG)/error.edit-distance-2-none.hfst $(NORVIG)/dictionary.default-boundaryweight-none.hfst < alice_excerpt_with_errors.txt > $@
+results/alice_excerpt_with_errors.dictionary-full-boundaries-huge.edit-distance-2-small.unigrams: alice_excerpt_with_errors.txt  $(NORVIG)/dictionary.default-boundaryweight-huge.hfst $(NORVIG)/error.edit-distance-2-huge.hfst
+	hfst-ospell-cicling $(NORVIG)/error.edit-distance-2-small.hfst $(NORVIG)/dictionary.default-boundaryweight-small.hfst < alice_excerpt_with_errors.txt > $@
+results/alice_excerpt_with_errors.dictionary-full-boundaries-medium.edit-distance-2-huge.unigrams: alice_excerpt_with_errors.txt  $(NORVIG)/dictionary.default-boundaryweight-medium.hfst $(NORVIG)/error.edit-distance-2-medium.hfst
+	hfst-ospell-cicling $(NORVIG)/error.edit-distance-2-huge.hfst $(NORVIG)/dictionary.default-boundaryweight-huge.hfst < alice_excerpt_with_errors.txt > $@
+results/alice_excerpt_with_errors.dictionary-full-boundaries-medium.edit-distance-2-medium.unigrams: alice_excerpt_with_errors.txt  $(NORVIG)/dictionary.default-boundaryweight-medium.hfst $(NORVIG)/error.edit-distance-2-medium.hfst
+	hfst-ospell-cicling $(NORVIG)/error.edit-distance-2-medium.hfst $(NORVIG)/dictionary.default-boundaryweight-medium.hfst < alice_excerpt_with_errors.txt > $@
+results/alice_excerpt_with_errors.dictionary-full-boundaries-medium.edit-distance-2-none.unigrams: alice_excerpt_with_errors.txt  $(NORVIG)/dictionary.default-boundaryweight-medium.hfst $(NORVIG)/error.edit-distance-2-medium.hfst
+	hfst-ospell-cicling $(NORVIG)/error.edit-distance-2-none.hfst $(NORVIG)/dictionary.default-boundaryweight-none.hfst < alice_excerpt_with_errors.txt > $@
+results/alice_excerpt_with_errors.dictionary-full-boundaries-medium.edit-distance-2-small.unigrams: alice_excerpt_with_errors.txt  $(NORVIG)/dictionary.default-boundaryweight-medium.hfst $(NORVIG)/error.edit-distance-2-medium.hfst
+	hfst-ospell-cicling $(NORVIG)/error.edit-distance-2-small.hfst $(NORVIG)/dictionary.default-boundaryweight-small.hfst < alice_excerpt_with_errors.txt > $@
+results/alice_excerpt_with_errors.dictionary-full-boundaries-none.edit-distance-2-huge.unigrams: alice_excerpt_with_errors.txt  $(NORVIG)/dictionary.default-boundaryweight-none.hfst $(NORVIG)/error.edit-distance-2-none.hfst
+	hfst-ospell-cicling $(NORVIG)/error.edit-distance-2-huge.hfst $(NORVIG)/dictionary.default-boundaryweight-huge.hfst < alice_excerpt_with_errors.txt > $@
+results/alice_excerpt_with_errors.dictionary-full-boundaries-none.edit-distance-2-medium.unigrams: alice_excerpt_with_errors.txt  $(NORVIG)/dictionary.default-boundaryweight-none.hfst $(NORVIG)/error.edit-distance-2-none.hfst
+	hfst-ospell-cicling $(NORVIG)/error.edit-distance-2-medium.hfst $(NORVIG)/dictionary.default-boundaryweight-medium.hfst < alice_excerpt_with_errors.txt > $@
+results/alice_excerpt_with_errors.dictionary-full-boundaries-none.edit-distance-2-none.unigrams: alice_excerpt_with_errors.txt  $(NORVIG)/dictionary.default-boundaryweight-none.hfst $(NORVIG)/error.edit-distance-2-none.hfst
+	hfst-ospell-cicling $(NORVIG)/error.edit-distance-2-none.hfst $(NORVIG)/dictionary.default-boundaryweight-none.hfst < alice_excerpt_with_errors.txt > $@
+results/alice_excerpt_with_errors.dictionary-full-boundaries-none.edit-distance-2-small.unigrams: alice_excerpt_with_errors.txt  $(NORVIG)/dictionary.default-boundaryweight-none.hfst $(NORVIG)/error.edit-distance-2-none.hfst
+	hfst-ospell-cicling $(NORVIG)/error.edit-distance-2-small.hfst $(NORVIG)/dictionary.default-boundaryweight-small.hfst < alice_excerpt_with_errors.txt > $@
+results/alice_excerpt_with_errors.dictionary-full-boundaries-small.edit-distance-2-huge.unigrams: alice_excerpt_with_errors.txt  $(NORVIG)/dictionary.default-boundaryweight-small.hfst $(NORVIG)/error.edit-distance-2-small.hfst
+	hfst-ospell-cicling $(NORVIG)/error.edit-distance-2-huge.hfst $(NORVIG)/dictionary.default-boundaryweight-huge.hfst < alice_excerpt_with_errors.txt > $@
+results/alice_excerpt_with_errors.dictionary-full-boundaries-small.edit-distance-2-medium.unigrams: alice_excerpt_with_errors.txt  $(NORVIG)/dictionary.default-boundaryweight-small.hfst $(NORVIG)/error.edit-distance-2-small.hfst
+	hfst-ospell-cicling $(NORVIG)/error.edit-distance-2-medium.hfst $(NORVIG)/dictionary.default-boundaryweight-medium.hfst < alice_excerpt_with_errors.txt > $@
+results/alice_excerpt_with_errors.dictionary-full-boundaries-small.edit-distance-2-none.unigrams: alice_excerpt_with_errors.txt  $(NORVIG)/dictionary.default-boundaryweight-small.hfst $(NORVIG)/error.edit-distance-2-small.hfst
+	hfst-ospell-cicling $(NORVIG)/error.edit-distance-2-none.hfst $(NORVIG)/dictionary.default-boundaryweight-none.hfst < alice_excerpt_with_errors.txt > $@
+results/alice_excerpt_with_errors.dictionary-full-boundaries-small.edit-distance-2-small.unigrams: alice_excerpt_with_errors.txt  $(NORVIG)/dictionary.default-boundaryweight-small.hfst $(NORVIG)/error.edit-distance-2-small.hfst
+	hfst-ospell-cicling $(NORVIG)/error.edit-distance-2-small.hfst $(NORVIG)/dictionary.default-boundaryweight-small.hfst < alice_excerpt_with_errors.txt > $@
+
+juha.txt:
+	wget http://www.gutenberg.org/cache/epub/10863/pg10863.txt
+	cat pg10863.txt | tail -n +150 | dos2unix > $@
+
+juha_excerpt.txt:juha.txt
+	cat $< | egrep -v "^$$" | tr -s '.?!\n' '\n' | tr -cd 'A-Za-z \n' |  sed 's/^ //' | egrep "[^ ]* [^ ]* [^ ]* [^ ]* [^ ]*" | sed 's/\([^ ]* [^ ]* [^ ]* [^ ]* [^ ]*\) .*/\1/' | head -150 > $@
+
+juha_excerpt_with_errors.txt:juha_excerpt.txt
+	cat $< | bin/induce_errors.pl > $@
+
+alice.txt:
+	wget http://www.gutenberg.org/cache/epub/11/pg11.txt
+	cat pg11.txt | tail -n +150 | dos2unix > $@
+
+alice_excerpt.txt:alice.txt
+	cat alice.txt | egrep -v "^$$" | tr -s '.?!\n' '\n' | tr -cd 'A-Za-z \n' |  sed 's/^ //' | egrep "[^ ]* [^ ]* [^ ]* [^ ]* [^ ]*" | sed 's/\([^ ]* [^ ]* [^ ]* [^ ]* [^ ]*\) .*/\1/' | head -150 > $@
+
+alice_excerpt_with_errors.txt:alice_excerpt.txt
+	cat $< | bin/induce_errors.pl > $@
+
 clean:
 	-rm -f cicling-2011-contextspell.aux cicling-2011-contextspell.bbl cicling-2011-contextspell.pdf words train tropical
+	-rm -f juha* alice* results/juha* results/alice*

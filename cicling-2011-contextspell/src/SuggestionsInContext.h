@@ -16,6 +16,9 @@ typedef std::vector<StringPair> StringPairVector;
 class InvalidInput
 {};
 
+class InvalidFloat
+{};
+
 class SuggestionsInContext
 {
  public:
