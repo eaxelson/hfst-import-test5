@@ -9,7 +9,7 @@ FI_RESULTS=results/finnish
 MODELS=models
 FSTS=$(FST_BIN)/text_to_numbers.hfst $(FST_BIN)/combinatorics.hfst
 TRAINING_DATA_SIZES=1000 35000 69000 103000 137000 171000 205000 239000 \
-                    307000 341000 345423
+                    307000 341000 345398
 
 all:tools fsts training_data all-results
 

@@ -1363,7 +1363,6 @@ vessa
 asiaa
 sitten
 vuoden
-
 kuningas
 ripulin
 oliksiinä
@@ -2331,7 +2330,6 @@ maksanut
 hiustenleikkuusta
 sitten
 vuoden
-
 miten
 sää
 raupertti
@@ -2408,7 +2406,6 @@ bileet
 joissa
 leikattiin
 tukka
-
 jälkeen
 tosin
 ei
@@ -2420,7 +2417,6 @@ tukkalähti
 vasta
 sivarista
 päästyäni
-
 kävin
 ny
 täällä
@@ -19441,8 +19437,6 @@ musta
 on
 kivempi
 kirjoittaa
-
-
 kuin
 ei
 tarvi
@@ -22137,7 +22131,6 @@ katoit
 niin
 ilmeettömänä
 eteenpäin
-
 jaa
 tää
 on
@@ -60323,12 +60316,10 @@ kun
 siekkarit
 oikeesti
 vaikutti
-
 nauhoitettu
 aa
 okei
 julkaistiin
-
 oho
 ehdit
 ensin
@@ -81317,7 +81308,6 @@ do
 l
 f
 d
-
 if
 test
 eq
@@ -87615,7 +87605,6 @@ mun
 ekaan
 zineen
 vuonna
-
 herranjestas
 noitten
 saitti
@@ -91316,7 +91305,6 @@ kesken
 konsolipeli
 impro
 vuodelta
-
 improvisoitu
 kappale
 peelin
@@ -136998,3 +136986,15 @@ vaan
 siis
 voi
 vitun
+vitun
+vittu
+kuinka
+lujaa
+tähän
+aikaan
+päivästä
+pitäis
+soitattaa
+musiikkia
+että
+idioottimmatkin
