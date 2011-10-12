@@ -1363,7 +1363,6 @@ vessa
 asiaa
 sitten
 vuoden
-
 kuningas
 ripulin
 oliksiinä
@@ -2331,7 +2330,6 @@ maksanut
 hiustenleikkuusta
 sitten
 vuoden
-
 miten
 sää
 raupertti
@@ -2408,7 +2406,6 @@ bileet
 joissa
 leikattiin
 tukka
-
 jälkeen
 tosin
 ei
@@ -2420,7 +2417,6 @@ tukkalähti
 vasta
 sivarista
 päästyäni
-
 kävin
 ny
 täällä
@@ -19441,8 +19437,6 @@ musta
 on
 kivempi
 kirjoittaa
-
-
 kuin
 ei
 tarvi
@@ -22137,7 +22131,6 @@ katoit
 niin
 ilmeettömänä
 eteenpäin
-
 jaa
 tää
 on
@@ -60323,12 +60316,10 @@ kun
 siekkarit
 oikeesti
 vaikutti
-
 nauhoitettu
 aa
 okei
 julkaistiin
-
 oho
 ehdit
 ensin
@@ -81317,7 +81308,6 @@ do
 l
 f
 d
-
 if
 test
 eq
@@ -87615,7 +87605,6 @@ mun
 ekaan
 zineen
 vuonna
-
 herranjestas
 noitten
 saitti
@@ -91316,7 +91305,6 @@ kesken
 konsolipeli
 impro
 vuodelta
-
 improvisoitu
 kappale
 peelin
@@ -154861,7 +154849,6 @@ siis
 oli
 tiedostonimessä
 ollut
-
 merkki
 joka
 sekoitti
@@ -173177,7 +173164,6 @@ se
 on
 prepositio
 b
-
 ssa
 jossa
 on
@@ -187874,7 +187860,6 @@ kloonata
 he
 he
 akabaneencodeutf
-
 akabane
 new
 teinipissis
@@ -192383,7 +192368,6 @@ hauska
 tyyppi
 noin
 irl
-
 siis
 ei
 nää
@@ -239734,7 +239718,6 @@ kiva
 tulee
 aina
 unmatched
-
 mut
 ei
 se
@@ -242673,12 +242656,7 @@ parvekevarkaat
 pumm
 jomm
 jomm
-
-
-
 o
-
-
 on
 animuhymiö
 enkä
@@ -288802,7 +288780,6 @@ semmonen
 bändi
 itseasiassaon
 kun
-
 no
 sinä
 voit
@@ -323810,7 +323787,6 @@ on
 hell
 is
 empty
-
 ja
 se
 tais
@@ -333700,7 +333676,6 @@ jättämään
 vanhat
 kaiverrukset
 vuodelta
-
 oon
 huomannu
 myös
@@ -340998,3 +340973,28 @@ pintoihin
 no
 huuhdellaan
 toki
+vedellä
+pois
+lightcolasta
+ei
+jää
+mut
+siis
+kolassa
+on
+fosforihappoa
+joka
+on
+ihan
+passeli
+puhdistus
+ja
+ruosteenpoistoaine
+ts
+happamuudensäätöaine
+e
+ai
+hmm
+ruosteenpoistoaine
+itseasiassa
+tulisikin

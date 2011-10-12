@@ -1363,7 +1363,6 @@ vessa
 asiaa
 sitten
 vuoden
-
 kuningas
 ripulin
 oliksiinä
@@ -2331,7 +2330,6 @@ maksanut
 hiustenleikkuusta
 sitten
 vuoden
-
 miten
 sää
 raupertti
@@ -2408,7 +2406,6 @@ bileet
 joissa
 leikattiin
 tukka
-
 jälkeen
 tosin
 ei
@@ -2420,7 +2417,6 @@ tukkalähti
 vasta
 sivarista
 päästyäni
-
 kävin
 ny
 täällä
@@ -19441,8 +19437,6 @@ musta
 on
 kivempi
 kirjoittaa
-
-
 kuin
 ei
 tarvi
@@ -22137,7 +22131,6 @@ katoit
 niin
 ilmeettömänä
 eteenpäin
-
 jaa
 tää
 on
@@ -34998,3 +34991,10 @@ pystyy
 lukemaan
 ees
 irkkii
+öö
+no
+jää
+kotiin
+potemaan
+ois
+myös
