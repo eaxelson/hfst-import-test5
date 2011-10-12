@@ -69,6 +69,7 @@ static map<string, vector<pair<string,string> > > sections;
 static map<string, vector<pair<string,string> > > preblanks;
 static map<string, vector<pair<string,string> > > postblanks;
 static map<string, vector<pair<string,string> > > inconditionals;
+static HfstTokenizer tok;
 
 static char* alphabets = 0;
 
@@ -150,6 +151,503 @@ break;
     return EXIT_CONTINUE;
 }
 
+static
+char*
+parse_alphabet(xmlDocPtr doc, xmlNodePtr alphabet)
+{
+  // in alphabet; expect
+  // PCDATA
+  verbose_printf("parsing alphabet...\n");
+  xmlChar* alpha = xmlNodeListGetString(doc,
+                                        alphabet->xmlChildrenNode, 1);
+  if (alpha == NULL)
+    {
+      error(EXIT_FAILURE, 0, "A transducer collection with empty "
+            "alphabet would not be able to analyse anything;\n"
+            "refusing to create broken automata");
+    }
+
+  HfstTransducer alphaTrans(reinterpret_cast<char*>(alpha), tok,
+                            format);
+  if (verbose)
+    {
+      StringSet alphas = alphaTrans.get_alphabet();
+      for (StringSet::const_iterator s = alphas.begin();
+           s != alphas.end();
+           ++s)
+        {
+          verbose_printf("%s ", s->c_str());
+        }
+    }
+  verbose_printf("\n");
+  char* rv = strdup(reinterpret_cast<char*>(alpha));
+  xmlFree(alpha);
+  return rv;
+}
+
+static
+void
+parse_sdefs(xmlDocPtr doc, xmlNodePtr sdefs)
+{
+  // in sdefs; expect:
+  // sdef+
+  verbose_printf("parsing sdefs...\n");
+  xmlNodePtr sdef = sdefs->xmlChildrenNode;
+  while (sdef != NULL)
+    {
+      xmlChar* anal_tag = xmlGetProp(sdef, reinterpret_cast<const xmlChar*>("n"));
+      if (anal_tag != NULL)
+        {
+          verbose_printf("<%s>\n", reinterpret_cast<char*>(anal_tag));
+          tags.insert(string("<") + 
+                  reinterpret_cast<char*>(anal_tag) + ">");
+          tok.add_multichar_symbol(string("<") + 
+                  reinterpret_cast<char*>(anal_tag) + ">");
+          xmlFree(anal_tag);
+        }
+      sdef = sdef->next;
+    }
+}
+
+static
+void
+parse_s(xmlDocPtr doc, xmlNodePtr s, string& lrs)
+{
+  // in s; expect:
+  // EMPTY
+  xmlChar* tagname = xmlGetProp(s, reinterpret_cast<const xmlChar*>("n"));
+  lrs += string("<") + 
+    reinterpret_cast<char*>(tagname) +
+    ">";
+  xmlFree(tagname);
+}
+
+static
+string*
+parse_b(xmlDocPtr doc, xmlNodePtr b, string& lrs)
+{
+  // in b; expect:
+  // EMPTY
+  lrs += string(" ");
+}
+
+static
+string*
+parse_j(xmlDocPtr doc, xmlNodePtr j, string& lrs)
+{
+  // in j; expect:
+  // EMPTY
+  lrs += string("+");
+}
+
+static
+void
+parse_l(xmlDocPtr doc, xmlNodePtr l, string& left, string& right)
+{
+  // in l; expect:
+  // [CDATA | s | b | j | g]+
+  xmlNodePtr lc = l->xmlChildrenNode;
+  bool emptiness = true;
+  while (lc != NULL)
+    {
+      if (xmlStrcmp(lc->name, reinterpret_cast<const xmlChar*>("s")) == 0)
+        {
+          parse_s(doc, lc, left);
+          emptiness = false;
+        }
+      else if (xmlStrcmp(lc->name, reinterpret_cast<const xmlChar*>("b")) == 0)
+        {
+          parse_b(doc, lc, left);
+          emptiness = false;
+        }
+      else if (xmlStrcmp(lc->name, reinterpret_cast<const xmlChar*>("j")) == 0)
+        {
+          parse_j(doc, lc, left);
+          emptiness = false;
+        }
+      else if (xmlNodeIsText(lc))
+        {
+          xmlChar* surf = xmlNodeGetContent(lc);
+          left += reinterpret_cast<char*>(surf);
+          xmlFree(surf);
+          emptiness = false;
+        }
+      else if (!xmlIsBlankNode(lc) && (lc->type != XML_COMMENT_NODE))
+        {
+          error(0, 0,
+                "Unrecognised %s in <l>",
+                reinterpret_cast<const char*>(lc->name));
+        }
+      lc = lc->next;
+    } // while lc
+  if (emptiness)
+    {
+      left += string("@@EMPTY_MORPH_DONT_LEAK@@");
+      tok.add_multichar_symbol("@@EMPTY_MORPH_DONT_LEAK@@");
+    }
+}
+
+static
+void
+parse_r(xmlDocPtr doc, xmlNodePtr r, string& left, string& right)
+{
+  // in r; expect:
+  // [CDATA | s | b | j | g]+
+  xmlNodePtr rc = r->xmlChildrenNode;
+  bool emptiness = true;
+  while (rc != NULL)
+    {
+      if (xmlStrcmp(rc->name, reinterpret_cast<const xmlChar*>("s")) == 0)
+        {
+          parse_s(doc, rc, right);
+          emptiness = false;
+        }
+      else if (xmlStrcmp(rc->name, reinterpret_cast<const xmlChar*>("b")) == 0)
+        {
+          parse_b(doc, rc, right);
+          emptiness = false;
+        }
+      else if (xmlStrcmp(rc->name, reinterpret_cast<const xmlChar*>("j")) == 0)
+        {
+          parse_j(doc, rc, right);
+          emptiness = false;
+        }
+      else if (xmlNodeIsText(rc))
+        {
+          xmlChar* surf = xmlNodeGetContent(rc);
+          right += reinterpret_cast<char*>(surf);
+          xmlFree(surf);
+          emptiness = false;
+        }
+      else if (!xmlIsBlankNode(rc) && (rc->type != XML_COMMENT_NODE))
+        {
+          error(0, 0,
+                "Unrecognised %s in <r>",
+                reinterpret_cast<const char*>(rc->name));
+        }
+      rc = rc->next;
+    } // while rc
+  if (emptiness)
+    {
+      right += string("@@EMPTY_MORPH_DONT_LEAK@@");
+      tok.add_multichar_symbol("@@EMPTY_MORPH_DONT_LEAK@@");
+    }
+}
+
+static
+void
+parse_i(xmlDocPtr doc, xmlNodePtr i, string& left, string& right)
+{
+  // in i; expect:
+  // [CDATA | s | b | j | g]+
+  xmlNodePtr ic = i->xmlChildrenNode;
+  bool emptiness = true;
+  while (ic != NULL)
+    {
+      if (xmlStrcmp(ic->name, reinterpret_cast<const xmlChar*>("s")) == 0)
+        {
+          parse_s(doc, ic, left);
+          parse_s(doc, ic, right);
+          emptiness = false;
+        }
+      else if (xmlStrcmp(ic->name, reinterpret_cast<const xmlChar*>("b")) == 0)
+        {
+          parse_b(doc, ic, left);
+          parse_b(doc, ic, right);
+          emptiness = false;
+        }
+      else if (xmlStrcmp(ic->name, reinterpret_cast<const xmlChar*>("j")) == 0)
+        {
+          parse_j(doc, ic, left);
+          parse_j(doc, ic, right);
+          emptiness = false;
+        }
+      else if (xmlNodeIsText(ic))
+        {
+          xmlChar* surf = xmlNodeGetContent(ic);
+          left += reinterpret_cast<char*>(surf);
+          right += reinterpret_cast<char*>(surf);
+          xmlFree(surf);
+          emptiness = false;
+        }
+      else if (!xmlIsBlankNode(ic) && (ic->type != XML_COMMENT_NODE))
+        {
+          error(0, 0,
+                "Unrecognised %s in <i>",
+                reinterpret_cast<const char*>(ic->name));
+        }
+      ic = ic->next;
+    } // while i
+  if (emptiness)
+    {
+      left += string("@@EMPTY_MORPH_DONT_LEAK@@");
+      right += string("@@EMPTY_MORPH_DONT_LEAK@@");
+      tok.add_multichar_symbol("@@EMPTY_MORPH_DONT_LEAK@@");
+    }
+}
+
+static
+void
+parse_p(xmlDocPtr doc, xmlNodePtr p, string& left, string& right)
+{
+  // in p; expect:
+  // l r 
+  xmlNodePtr rl = p->xmlChildrenNode;
+  while (rl != NULL)
+    {
+      if (xmlStrcmp(rl->name, reinterpret_cast<const xmlChar*>("l")) == 0)
+        {
+          parse_l(doc, rl, left, right);
+        } // if l
+      else if (xmlStrcmp(rl->name, reinterpret_cast<const xmlChar*>("r")) == 0)
+        {
+          parse_r(doc, rl, left, right);
+
+        } // if r
+      else if (!xmlIsBlankNode(rl) && (rl->type != XML_COMMENT_NODE))
+        {
+          error(0, 0, "Unrecognised %s in <p>",
+                reinterpret_cast<const char*>(rl->name));
+        }
+      rl = rl->next;
+    } // while rl
+}
+
+static
+void
+parse_par(xmlDocPtr doc, xmlNodePtr par, string& left, string& right)
+{
+  xmlChar* parref = xmlGetProp(par, reinterpret_cast<const xmlChar*>("n"));
+  left += string("@APERTIUM_JOINER.") + 
+    reinterpret_cast<char*>(parref) +
+    "@";
+  right += string("@APERTIUM_JOINER.") +
+    reinterpret_cast<char*>(parref) + 
+    "@";
+  xmlFree(parref);
+}
+
+static
+void
+parse_re(xmlDocPtr doc, xmlNodePtr re, string& left, string& right)
+{
+  xmlChar* regex = xmlNodeListGetString(doc, 
+                                     re->children,
+                                     1);
+  error(0, 0, "regexps unsupported, %s is left as is",
+        reinterpret_cast<char*>(regex));
+  left += string("@ERE<@") + 
+      reinterpret_cast<char*>(regex)
+      + "@>ERE@";
+  right += string("@ERE<@") +
+      reinterpret_cast<char*>(regex)
+      + "@>ERE@";
+  tok.add_multichar_symbol("@ERE>@");
+  tok.add_multichar_symbol("@>ERE@");
+  xmlFree(regex);
+}
+
+static
+void
+parse_e(xmlDocPtr doc, xmlNodePtr e, vector<pair<string,string> >& es)
+{
+  // in e; expect:
+  // [p | i | par | re]+
+  string left;
+  string right;
+  xmlChar* ignore = xmlGetProp(e, reinterpret_cast<const xmlChar*>("i"));
+  if (ignore != NULL)
+    {
+      xmlFree(ignore);
+      return;
+    }
+  xmlChar* oneway = xmlGetProp(e, reinterpret_cast<const xmlChar*>("r"));
+  if (oneway != NULL)
+    {
+      if (xmlStrcmp(oneway, 
+                    reinterpret_cast<const xmlChar*>("LR")))
+        {
+          left += "@P.LR.TRUE@";
+          right += "@R.LR.TRUE@";
+          tok.add_multichar_symbol("@P.LR.TRUE@");
+          tok.add_multichar_symbol("@R.LR.TRUE@");
+        }
+      else if (xmlStrcmp(oneway, 
+                         reinterpret_cast<const xmlChar*>("RL")))
+        {
+          left += "@R.LR.FALSE@";
+          right += "@P.LR.FALSE@";
+          tok.add_multichar_symbol("@P.LR.FALSE@");
+          tok.add_multichar_symbol("@R.LR.FALSE@");
+        }
+      else
+        {
+          error(0, 0, "unrecognised @r in <e>: %s",
+                reinterpret_cast<char*>(oneway));
+        }
+      xmlFree(oneway);
+    }
+  xmlNodePtr pair = e->xmlChildrenNode;
+  while (pair != NULL)
+    {
+      if (xmlStrcmp(pair->name, 
+                    reinterpret_cast<const xmlChar*>("p")) == 0)
+        {
+          parse_p(doc, pair, left, right);
+        } // if p
+      else if (xmlStrcmp(pair->name,
+                         reinterpret_cast<const xmlChar*>("i")) == 0)
+        {
+          parse_i(doc, pair, left, right);
+        } // if i
+      else if (xmlStrcmp(pair->name, 
+                         reinterpret_cast<const xmlChar*>("par")) == 0)
+        {
+          parse_par(doc, pair, left, right);
+
+        } // if par
+      else if (xmlStrcmp(pair->name, 
+                         reinterpret_cast<const xmlChar*>("re")) == 0)
+        {
+          parse_re(doc, pair, left, right);
+        } // if re
+      else if (!xmlIsBlankNode(pair) && (pair->type != XML_COMMENT_NODE))
+        {
+          error(0, 0, "unrecognised %s in <e>",
+                reinterpret_cast<const char*>(pair->name));
+        }
+      pair = pair->next;
+    } // while pair
+  if (right == "")
+    {
+      right = hfst::internal_epsilon;
+    }
+  if (left == "")
+    {
+      left = hfst::internal_epsilon;
+    }
+  es.push_back(StringPair(left, right));
+  verbose_printf("%s:%s\n", left.c_str(), right.c_str());
+}
+
+static
+void
+parse_pardef(xmlDocPtr doc, xmlNodePtr pardef)
+{
+  // in pardef; expect:
+  // e+
+  xmlChar* parname = xmlGetProp(pardef, 
+                                reinterpret_cast<const xmlChar*>("n"));
+  if (parname != NULL)
+    {
+      verbose_printf("%s... ", reinterpret_cast<char*>(parname));
+      tok.add_multichar_symbol(string("@APERTIUM_JOINER.") +
+                               reinterpret_cast<char*>(parname) +
+                               "@");
+    }
+  else
+    {
+      error(0, 0, "unnamed pardef?");
+      pardef = pardef->next;
+      return;
+    }
+  xmlNodePtr e = pardef->xmlChildrenNode;
+  vector<pair<string,string> > es;
+  while (e != NULL)
+    {
+      if (xmlStrcmp(e->name, reinterpret_cast<const xmlChar*>("e")) == 0)
+        {
+          parse_e(doc, e, es);
+        } // if e
+      else if (!xmlIsBlankNode(e) && (e->type != XML_COMMENT_NODE))
+        {
+          error(0, 0, "Unrecognised %s in pardef",
+                reinterpret_cast<const char*>(e->name));
+        }
+      e = e->next;
+    } // while e
+  verbose_printf("%lu\n", es.size());
+  pardefs[reinterpret_cast<char*>(parname)] = es;
+  xmlFree(parname);
+
+}
+
+static
+void
+parse_pardefs(xmlDocPtr doc, xmlNodePtr pardefs)
+{
+  // in pardefs; expect:
+  // pardef+
+  verbose_printf("parsing pardefs...\n");
+  xmlNodePtr pardef = pardefs->xmlChildrenNode;
+  while (pardef != NULL)
+    {
+      if (xmlStrcmp(pardef->name, 
+                    reinterpret_cast<const xmlChar*>("pardef")) == 0)
+        {
+          parse_pardef(doc, pardef);
+        } // if pardef
+      else if (!xmlIsBlankNode(pardef) && (pardef->type != XML_COMMENT_NODE))
+        {
+          error(0, 0, "Unrecognised %s in pardefs",
+                reinterpret_cast<const xmlChar*>(pardef->name));
+        }
+      pardef = pardef->next;
+    } // while pardef
+}
+
+static
+void
+parse_section(xmlDocPtr doc, xmlNodePtr section)
+{
+  // in section; expect:
+  // e+
+  xmlChar* secid = xmlGetProp(section,
+                              reinterpret_cast<const xmlChar*>("id"));
+  xmlChar* sectype = xmlGetProp(section,
+                                reinterpret_cast<const xmlChar*>("type"));
+  verbose_printf("Parsing %s section %s...\n",
+                 reinterpret_cast<char*>(sectype),
+                 reinterpret_cast<char*>(secid));
+  xmlNodePtr e = section->children;
+  vector<StringPair> es;
+  while (e != NULL)
+    {
+      if (xmlStrcmp(e->name, reinterpret_cast<const xmlChar*>("e")) == 0)
+        {
+          parse_e(doc, e, es);
+        } // if e
+      else if (!xmlIsBlankNode(e) && (e->type != XML_COMMENT_NODE))
+        {
+          error(0, 0, "Unrecognised %s in section",
+                reinterpret_cast<const char*>(e->name));
+        }
+      e = e->next;
+    } // while e
+  verbose_printf("%lu\n", es.size());
+  if (xmlStrcmp(sectype, 
+                reinterpret_cast<const xmlChar*>("standard")) == 0)
+    {
+      sections[reinterpret_cast<char*>(secid)] = es;
+    }
+  else if (xmlStrcmp(sectype, 
+                     reinterpret_cast<const xmlChar*>("preblank")) == 0)
+    {
+      preblanks[reinterpret_cast<char*>(secid)] = es;
+    }
+  else if (xmlStrcmp(sectype, 
+                     reinterpret_cast<const xmlChar*>("postblank")) == 0)
+    {
+      postblanks[reinterpret_cast<char*>(secid)] = es;
+    }
+  else if (xmlStrcmp(sectype,
+                     reinterpret_cast<const xmlChar*>("inconditional")) == 0)
+    {
+      inconditionals[reinterpret_cast<char*>(secid)] = es;
+    }
+  xmlFree(secid);
+  xmlFree(sectype);
+}
 int
 process_stream(HfstOutputStream& outstream)
 {
@@ -158,7 +656,6 @@ process_stream(HfstOutputStream& outstream)
   xmlNodePtr node;
   doc = xmlParseFile(inputfilename);
   node = xmlDocGetRootElement(doc);
-  HfstTokenizer tok;
   tok.add_skip_symbol(hfst::internal_epsilon);
   if (NULL == node)
     {
@@ -166,7 +663,8 @@ process_stream(HfstOutputStream& outstream)
       error(EXIT_FAILURE, 0, "Libxml could not parse %s",
             inputfilename);
     }
-  if (xmlStrcmp(node->name, xmlCharStrdup("dictionary")) != 0)
+  if (xmlStrcmp(node->name, 
+                reinterpret_cast<const xmlChar*>("dictionary")) != 0)
     {
       xmlFreeDoc(doc);
       error(EXIT_FAILURE, 0, "Root element of %s is not monodix",
@@ -196,570 +694,39 @@ process_stream(HfstOutputStream& outstream)
   // 
   // a + is if statement
   // a ... is while statement
+      // we're under dictionary; expect
+      // alphabet sdefs pardefs section+
   node = node->xmlChildrenNode;
   while (node != NULL)
     {
-      // we're under dictionary; expect
-      // alphabet sdefs pardefs section+
-      if (xmlStrcmp(node->name, xmlCharStrdup("alphabet")) == 0)
+      if (xmlStrcmp(node->name, 
+                    reinterpret_cast<const xmlChar*>("alphabet")) == 0)
         {
-          // in alphabet; expect
-          // PCDATA
-          verbose_printf("parsing alphabet...\n");
-          xmlChar* alpha = xmlNodeListGetString(doc,
-                                                node->xmlChildrenNode, 1);
-          if (alpha == NULL)
-            {
-              error(EXIT_FAILURE, 0, "A transducer collection with empty "
-                    "alphabet would not be able to analyse anything;\n"
-                    "refusing to create broken automata");
-            }
-
-          HfstTransducer alphaTrans(reinterpret_cast<char*>(alpha), tok,
-                                    format);
-          if (verbose)
-            {
-              StringSet alphas = alphaTrans.get_alphabet();
-              for (StringSet::const_iterator s = alphas.begin();
-                   s != alphas.end();
-                   ++s)
-                {
-                  verbose_printf("%s ", s->c_str());
-                }
-            }
-          verbose_printf("\n");
-          alphabets = strdup(reinterpret_cast<char*>(alpha));
+          alphabets = parse_alphabet(doc, node);
         }
-      else if (xmlStrcmp(node->name, xmlCharStrdup("sdefs")) == 0)
+      else if (xmlStrcmp(node->name,
+                         reinterpret_cast<const xmlChar*>("sdefs")) == 0)
         {
-          // in sdefs; expect:
-          // sdef+
-          verbose_printf("parsing sdefs...\n");
-          xmlNodePtr sdef = node->xmlChildrenNode;
-          while (sdef != NULL)
-            {
-              xmlChar* anal_tag = xmlGetProp(sdef, xmlCharStrdup("n"));
-              if (anal_tag != NULL)
-                {
-                  verbose_printf("<%s>\n", reinterpret_cast<char*>(anal_tag));
-                  tags.insert(string("<") + 
-                          reinterpret_cast<char*>(anal_tag) + ">");
-                  tok.add_multichar_symbol(string("<") + 
-                          reinterpret_cast<char*>(anal_tag) + ">");
-                }
-              sdef = sdef->next;
-            }
+          parse_sdefs(doc, node);
         }
-      else if (xmlStrcmp(node->name, xmlCharStrdup("pardefs")) == 0)
+      else if (xmlStrcmp(node->name, 
+                         reinterpret_cast<const xmlChar*>("pardefs")) == 0)
         {
-          // in pardefs; expect:
-          // pardef+
-          verbose_printf("parsing pardefs...\n");
-          xmlNodePtr pardef = node->xmlChildrenNode;
-          while (pardef != NULL)
-            {
-              if (xmlStrcmp(pardef->name, xmlCharStrdup("pardef")) == 0)
-                {
-                  // in pardef; expect:
-                  // e+
-                  unsigned long affixes = 0;
-                  xmlChar* parname = xmlGetProp(pardef, xmlCharStrdup("n"));
-                  if (parname != NULL)
-                    {
-                      verbose_printf("%s... ", reinterpret_cast<char*>(parname));
-                      tok.add_multichar_symbol(string("@APERTIUM_JOINER.") +
-                                               reinterpret_cast<char*>(parname) +
-                                               "@");
-                    }
-                  else
-                    {
-                      warning(0, 0, "unnamed pardef?");
-                      pardef = pardef->next;
-                      continue;
-                    }
-                  xmlNodePtr e = pardef->xmlChildrenNode;
-                  vector<pair<string,string> > es;
-                  while (e != NULL)
-                    {
-                      if (xmlStrcmp(e->name, xmlCharStrdup("e")) == 0)
-                        {
-                          // in e; expect:
-                          // [p | i | par | re]+
-                          affixes++;
-                          string left;
-                          string right;
-                          xmlChar* oneway = xmlGetProp(e, xmlCharStrdup("r"));
-                          if (oneway != NULL)
-                            {
-                              if (xmlStrcmp(oneway, xmlCharStrdup("LR")))
-                                {
-                                  left += "@P.LR.TRUE@";
-                                  right += "@R.LR.TRUE@";
-                                  tok.add_multichar_symbol("@P.LR.TRUE@");
-                                  tok.add_multichar_symbol("@R.LR.TRUE@");
-                                }
-                              else if (xmlStrcmp(oneway, xmlCharStrdup("RL")))
-                                {
-                                  left += "@R.LR.FALSE@";
-                                  right += "@P.LR.FALSE@";
-                                  tok.add_multichar_symbol("@P.LR.FALSE@");
-                                  tok.add_multichar_symbol("@R.LR.FALSE@");
-                                }
-                            }
-                          xmlNodePtr pair = e->xmlChildrenNode;
-                          while (pair != NULL)
-                            {
-                              if (xmlStrcmp(pair->name, xmlCharStrdup("p")) == 0)
-                                {
-                                  // in p; expect:
-                                  // l r 
-                                  xmlNodePtr rl = pair->xmlChildrenNode;
-                                  while (rl != NULL)
-                                    {
-                                      if (xmlStrcmp(rl->name, xmlCharStrdup("l")) == 0)
-                                        {
-                                          xmlNodePtr l = rl->xmlChildrenNode;
-                                          bool emptiness = true;
-                                          while (l != NULL)
-                                            {
-                                              if (xmlStrcmp(l->name, xmlCharStrdup("s")) == 0)
-                                                {
-                                                  xmlChar* tagname = xmlGetProp(l, xmlCharStrdup("n"));
-                                                  left += string("<") + 
-                                                    reinterpret_cast<char*>(tagname) +
-                                                    ">";
-                                                  emptiness = false;
-                                                }
-                                              else if (xmlStrcmp(l->name, xmlCharStrdup("b")) == 0)
-                                                {
-                                                  left += string(" ");
-                                                  emptiness = false;
-                                                }
-                                              else if (xmlStrcmp(l->name, xmlCharStrdup("j")) == 0)
-                                                {
-                                                  left += string("+");
-                                                  emptiness = false;
-                                                }
-                                              else if (xmlNodeIsText(l))
-                                                {
-                                                  xmlChar* surf = xmlNodeGetContent(l);
-                                                  left += reinterpret_cast<char*>(surf);
-                                                  emptiness = false;
-                                                }
-                                              else
-                                                {
-                                                  error(0, 0,
-                                                        "Unrecognised %s in <l>",
-                                                        reinterpret_cast<const char*>(l->name));
-                                                }
-                                              l = l->next;
-                                            } // while l
-                                          if (emptiness)
-                                            {
-                                              left += string("@@EMPTY_MORPH_DONT_LEAK@@");
-                                              tok.add_multichar_symbol("@@EMPTY_MORPH_DONT_LEAK@@");
-                                            }
-
-                                        } // if l
-                                      else if (xmlStrcmp(rl->name, xmlCharStrdup("r")) == 0)
-                                        {
-                                          xmlNodePtr r = rl->xmlChildrenNode;
-                                          bool emptiness = true;
-                                          while (r != NULL)
-                                            {
-                                              if (xmlStrcmp(r->name, xmlCharStrdup("s")) == 0)
-                                                {
-                                                  xmlChar* tagname = xmlGetProp(r, xmlCharStrdup("n"));
-                                                  right += string("<") + 
-                                                    reinterpret_cast<char*>(tagname) +
-                                                    ">";
-                                                  emptiness = false;
-                                                }
-                                              else if (xmlStrcmp(r->name, xmlCharStrdup("b")) == 0)
-                                                {
-                                                  right += string(" ");
-                                                  emptiness = false;
-                                                }
-                                              else if (xmlStrcmp(r->name, xmlCharStrdup("j")) == 0)
-                                                {
-                                                  right += string("+");
-                                                  emptiness = false;
-                                                }
-                                              else if (xmlNodeIsText(r))
-                                                {
-                                                  xmlChar* surf = xmlNodeGetContent(r);
-                                                  right += reinterpret_cast<char*>(surf);
-                                                  emptiness = false;
-                                                }
-                                              else
-                                                {
-                                                  error(0, 0,
-                                                        "Unrecognised %s in <r>",
-                                                        reinterpret_cast<const char*>(r->name));
-                                                }
-                                              r = r->next;
-                                            } // while r
-                                          if (emptiness)
-                                            {
-                                              right += string("@@EMPTY_MORPH_DONT_LEAK@@");
-                                              tok.add_multichar_symbol("@@EMPTY_MORPH_DONT_LEAK@@");
-                                            }
-
-                                        } // if r
-                                      rl = rl->next;
-                                    } // while rl
-                                } // if p
-                              else if (xmlStrcmp(pair->name, xmlCharStrdup("i")) == 0)
-                                {
-                                  xmlNodePtr i = pair->xmlChildrenNode;
-                                  bool emptiness = true;
-                                  while (i != NULL)
-                                    {
-                                      if (xmlStrcmp(i->name, xmlCharStrdup("s")) == 0)
-                                        {
-                                          xmlChar* tagname = xmlGetProp(i, xmlCharStrdup("n"));
-                                          left += string("<") + 
-                                            reinterpret_cast<char*>(tagname) +
-                                            ">";
-                                          right += string("<") +
-                                           reinterpret_cast<char*>(tagname) +
-                                           ">";
-                                          emptiness = false;
-                                        }
-                                      else if (xmlStrcmp(i->name, xmlCharStrdup("b")) == 0)
-                                        {
-                                          left += string(" ");
-                                          right += string(" ");
-                                          emptiness = false;
-                                        }
-                                      else if (xmlStrcmp(i->name, xmlCharStrdup("j")) == 0)
-                                        {
-                                          left += string("+");
-                                          right += string("+");
-                                          emptiness = false;
-                                        }
-                                      else if (xmlNodeIsText(i))
-                                        {
-                                          xmlChar* surf = xmlNodeGetContent(i);
-                                          left += reinterpret_cast<char*>(surf);
-                                          right += reinterpret_cast<char*>(surf);
-                                          emptiness = false;
-                                        }
-                                      else
-                                        {
-                                          error(0, 0,
-                                                "Unrecognised %s in <i>",
-                                                reinterpret_cast<const char*>(i->name));
-                                        }
-                                      i = i->next;
-                                    } // while i
-                                  if (emptiness)
-                                    {
-                                      left += string("@@EMPTY_MORPH_DONT_LEAK@@");
-                                      right += string("@@EMPTY_MORPH_DONT_LEAK@@");
-                                      tok.add_multichar_symbol("@@EMPTY_MORPH_DONT_LEAK@@");
-                                    }
-                                } // if i
-                              else if (xmlStrcmp(pair->name, xmlCharStrdup("par")) == 0)
-                                {
-                                  xmlChar* parref = xmlGetProp(pair, xmlCharStrdup("n"));
-                                  left += string("@APERTIUM_JOINER.") + 
-                                    reinterpret_cast<char*>(parref) +
-                                    "@";
-                                  right += string("@APERTIUM_JOINER.") +
-                                    reinterpret_cast<char*>(parref) + 
-                                    "@";
-
-                                } // if par
-                              else if (xmlStrcmp(pair->name, xmlCharStrdup("re")) == 0)
-                                {
-                                  xmlChar* re = xmlNodeListGetString(doc, 
-                                                                     pair->children,
-                                                                     1);
-                                  left += string("@ERE<@") + 
-                                      reinterpret_cast<char*>(re)
-                                      + "@>ERE@";
-                                  right += string("@ERE<@") +
-                                      reinterpret_cast<char*>(re)
-                                      + "@>ERE@";
-                                  tok.add_multichar_symbol("@ERE>@");
-                                  tok.add_multichar_symbol("@>ERE@");
-                                } // if re
-                              pair = pair->next;
-                            } // while pair
-                          if (right == "")
-                            {
-                              right = hfst::internal_epsilon;
-                            }
-                          if (left == "")
-                            {
-                              left = hfst::internal_epsilon;
-                            }
-                          es.push_back(StringPair(left, right));
-                          verbose_printf("%s:%s\n", left.c_str(), right.c_str());
-                        } // if e
-                      e = e->next;
-                    } // while e
-                  verbose_printf("%lu\n", affixes);
-                  pardefs[reinterpret_cast<char*>(parname)] = es;
-                } // if pardef
-              pardef = pardef->next;
-            } // while pardef
+          parse_pardefs(doc, node);
         } // if pardefs
-      else if (xmlStrcmp(node->name, xmlCharStrdup("section")) == 0)
+      else if (xmlStrcmp(node->name, 
+                         reinterpret_cast<const xmlChar*>("section")) == 0)
         {
-          // in section; expect:
-          // e+
-          xmlChar* secid = xmlGetProp(node, xmlCharStrdup("id"));
-          xmlChar* sectype = xmlGetProp(node, xmlCharStrdup("type"));
-          verbose_printf("Parsing %s section %s...\n",
-                         reinterpret_cast<char*>(sectype),
-                         reinterpret_cast<char*>(secid));
-          xmlNodePtr e = node->children;
-          vector<StringPair> es;
-          unsigned long roots = 0;
-          while (e != NULL)
-            {
-              if (xmlStrcmp(e->name, xmlCharStrdup("e")) == 0)
-                {
-                  // in e; expect:
-                  // [p | i | par]+
-                  roots++;
-                  string left;
-                  string right;
-                  xmlChar* ignore = xmlGetProp(e, xmlCharStrdup("i"));
-                  if (ignore != NULL)
-                    {
-                      roots--;
-                      e = e->next;
-                      continue;
-                    }
-                  xmlChar* oneway = xmlGetProp(e, xmlCharStrdup("r"));
-                  if (oneway != NULL)
-                    {
-                      if (xmlStrcmp(oneway, xmlCharStrdup("LR")))
-                        {
-                          left += "@P.LR.TRUE@";
-                          right += "@R.LR.TRUE@";
-                          tok.add_multichar_symbol("@P.LR.TRUE@");
-                          tok.add_multichar_symbol("@R.LR.TRUE@");
-                        }
-                      else if (xmlStrcmp(oneway, xmlCharStrdup("RL")))
-                        {
-                          left += "@R.LR.FALSE@";
-                          right += "@P.LR.FALSE@";
-                          tok.add_multichar_symbol("@P.LR.FALSE@");
-                          tok.add_multichar_symbol("@R.LR.FALSE@");
-                        }
-                    }
-                  xmlNodePtr pair = e->xmlChildrenNode;
-                  while (pair != NULL)
-                    {
-                      if (xmlStrcmp(pair->name, xmlCharStrdup("p")) == 0)
-                        {
-                          xmlNodePtr rl = pair->xmlChildrenNode;
-                          while (rl != NULL)
-                            {
-                              if (xmlStrcmp(rl->name, xmlCharStrdup("l")) == 0)
-                                {
-                                  xmlNodePtr l = rl->xmlChildrenNode;
-                                  bool emptiness = true;
-                                  while (l != NULL)
-                                    {
-                                      if (xmlStrcmp(l->name, xmlCharStrdup("s")) == 0)
-                                        {
-                                          xmlChar* tagname = xmlGetProp(l, xmlCharStrdup("n"));
-                                          left += string("<") + 
-                                            reinterpret_cast<char*>(tagname) +
-                                            ">";
-                                          emptiness = false;
-                                        }
-                                      else if (xmlStrcmp(l->name, xmlCharStrdup("b")) == 0)
-                                        {
-                                          left += string(" ");
-                                          emptiness = false;
-                                        }
-                                      else if (xmlStrcmp(l->name, xmlCharStrdup("j")) == 0)
-                                        {
-                                          left += string("+");
-                                          emptiness = false;
-                                        }
-                                      else if (xmlNodeIsText(l))
-                                        {
-                                          xmlChar* surf = xmlNodeGetContent(l);
-                                          left += reinterpret_cast<char*>(surf);
-                                          emptiness = false;
-                                        }
-                                      else
-                                        {
-                                          error(0, 0,
-                                                "Unrecognised %s in <l>",
-                                                reinterpret_cast<const char*>(l->name));
-                                        }
-                                      l = l->next;
-                                    } // while l
-                                  if (emptiness)
-                                    {
-                                      left += string("@@EMPTY_MORPH_DONT_LEAK@@");
-                                      tok.add_multichar_symbol("@@EMPTY_MORPH_DONT_LEAK@@");
-                                    }
-                                } // if l
-                              else if (xmlStrcmp(rl->name, xmlCharStrdup("r")) == 0)
-                                {
-                                  xmlNodePtr r = rl->xmlChildrenNode;
-                                  bool emptiness = true;
-                                  while (r != NULL)
-                                    {
-                                      if (xmlStrcmp(r->name, xmlCharStrdup("s")) == 0)
-                                        {
-                                          xmlChar* tagname = xmlGetProp(r, xmlCharStrdup("n"));
-                                          right += string("<") + 
-                                            reinterpret_cast<char*>(tagname) +
-                                            ">";
-                                          emptiness = false;
-                                        }
-                                      else if (xmlStrcmp(r->name, xmlCharStrdup("b")) == 0)
-                                        {
-                                          right += string(" ");
-                                          emptiness = false;
-                                        }
-                                      else if (xmlStrcmp(r->name, xmlCharStrdup("j")) == 0)
-                                        {
-                                          right += string("+");
-                                          emptiness = false;
-                                        }
-                                      else if (xmlNodeIsText(r))
-                                        {
-                                          xmlChar* surf = xmlNodeGetContent(r);
-                                          right += reinterpret_cast<char*>(surf);
-                                          emptiness = false;
-                                        }
-                                      else
-                                        {
-                                          error(0, 0,
-                                                "Unrecognised %s in <r>",
-                                                reinterpret_cast<const char*>(r->name));
-                                        }
-                                      r = r->next;
-                                    }
-                                  if (emptiness)
-                                    {
-                                      right += string("@@EMPTY_MORPH_DONT_LEAK@@");
-                                      tok.add_multichar_symbol("@@EMPTY_MORPH_DONT_LEAK@@");
-                                    }
-                                } // if r
-                              rl = rl->next;
-                            } // while rl
-                        } // if p
-                      else if (xmlStrcmp(pair->name, xmlCharStrdup("i")) == 0)
-                        {
-                          xmlNodePtr i = pair->xmlChildrenNode;
-                          bool emptiness = true;
-                          while (i != NULL)
-                            {
-                              if (xmlStrcmp(i->name, xmlCharStrdup("s")) == 0)
-                                {
-                                  xmlChar* tagname = xmlGetProp(i, xmlCharStrdup("n"));
-                                  left += string("<") + 
-                                    reinterpret_cast<char*>(tagname) +
-                                    ">";
-                                  right += string("<") +
-                                   reinterpret_cast<char*>(tagname) +
-                                   ">";
-                                  emptiness = false;
-                                }
-                              else if (xmlStrcmp(i->name, xmlCharStrdup("b")) == 0)
-                                {
-                                  left += string(" ");
-                                  right += string(" ");
-                                  emptiness = false;
-                                }
-                              else if (xmlStrcmp(i->name, xmlCharStrdup("j")) == 0)
-                                {
-                                  left += string("+");
-                                  right += string("+");
-                                  emptiness = false;
-                                }
-                              else if (xmlNodeIsText(i))
-                                {
-                                  xmlChar* surf = xmlNodeGetContent(i);
-                                  left += reinterpret_cast<char*>(surf);
-                                  right += reinterpret_cast<char*>(surf);
-                                  emptiness = false;
-                                }
-                              else
-                                {
-                                  error(0, 0,
-                                        "Unrecognised %s in <i>",
-                                        reinterpret_cast<const char*>(i->name));
-                                }
-                              i = i->next;
-                            } // while i
-                          if (emptiness)
-                            {
-                              left += string("@@EMPTY_MORPH_DONT_LEAK@@");
-                              right += string("@@EMPTY_MORPH_DONT_LEAK@@");
-                              tok.add_multichar_symbol("@@EMPTY_MORPH_DONT_LEAK@@");
-                            }
-
-                        } // if i
-                      else if (xmlStrcmp(pair->name, xmlCharStrdup("par")) == 0)
-                        {
-                          xmlChar* parref = xmlGetProp(pair, xmlCharStrdup("n"));
-                          left += string("@APERTIUM_JOINER.") + 
-                            reinterpret_cast<char*>(parref) +
-                            "@";
-                          right += string("@APERTIUM_JOINER.") +
-                            reinterpret_cast<char*>(parref) + 
-                            "@";
-                        } // if pair
-                      else if (xmlStrcmp(pair->name, xmlCharStrdup("re")) == 0)
-                        {
-                          xmlChar* re = xmlNodeListGetString(doc, pair->children, 1);
-                          left += string("@ERE<@") + 
-                              reinterpret_cast<char*>(re)
-                              + "@>ERE@";
-                          right += string("@ERE<@") +
-                              reinterpret_cast<char*>(re)
-                              + "@>ERE@";
-                          tok.add_multichar_symbol("@ERE<@");
-                          tok.add_multichar_symbol("@>ERE@");
-                        } // if re
-                      pair = pair->next;
-                    } // while pair
-                  if (right == "")
-                    {
-                      right = hfst::internal_epsilon;
-                    }
-                  if (left == "")
-                    {
-                      left = hfst::internal_epsilon;
-                    }
-                  es.push_back(StringPair(left, right));
-                  verbose_printf("%s:%s\n", left.c_str(), right.c_str());
-                } // if e
-              e = e->next;
-            } // while e
-          verbose_printf("%lu\n", roots);
-          if (xmlStrcmp(sectype, reinterpret_cast<const xmlChar*>("standard")) == 0)
-            {
-              sections[reinterpret_cast<char*>(secid)] = es;
-            }
-          else if (xmlStrcmp(sectype, reinterpret_cast<const xmlChar*>("preblank")) == 0)
-            {
-              preblanks[reinterpret_cast<char*>(secid)] = es;
-            }
-          else if (xmlStrcmp(sectype, reinterpret_cast<const xmlChar*>("postblank")) == 0)
-            {
-              postblanks[reinterpret_cast<char*>(secid)] = es;
-            }
-          else if (xmlStrcmp(sectype, reinterpret_cast<const xmlChar*>("inconditional")) == 0)
-            {
-              inconditionals[reinterpret_cast<char*>(secid)] = es;
-            }
+          parse_section(doc, node);
         } // if section
+      else if (!xmlIsBlankNode(node) && (node->type != XML_COMMENT_NODE))
+        {
+          error(0, 0, "unrecognised %s in dictionary",
+                reinterpret_cast<const char*>(node->name));
+        }
       node = node->next;
     } // while node
+  xmlFreeDoc(doc);
   // create PARDEF* ROOT PARDEF*
   verbose_printf("Turning parsed string into HFST automaton...\n");
   HfstTransducer t(format);
