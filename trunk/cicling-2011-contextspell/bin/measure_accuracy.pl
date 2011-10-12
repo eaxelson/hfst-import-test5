@@ -11,13 +11,13 @@ while (<>)
 
     @fields = split(/\t/,$_);
 
-    if ($#fields != 2)
+    if ($#fields != 1)
     {
 	print "Syntax error on line $total";
 	exit 1;
     }
 
-    if ($fields[1] eq $fields[2])
+    if ($fields[0] eq $fields[1])
     { ++$correct; }
 }
 
