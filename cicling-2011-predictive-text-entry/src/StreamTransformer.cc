@@ -49,6 +49,8 @@ void StreamTransformer::transform_input_data
   size_t begin_pos = std::string::npos;
   size_t newline_pos = std::string::npos;
 
+  size_t current_line = 1;
+
   do
     {
       begin_pos = newline_pos + 1;
@@ -66,12 +68,22 @@ void StreamTransformer::transform_input_data
       std::string line = input_data.substr(begin_pos,
 					   newline_pos - begin_pos);
       
-      line_transformer.input_line(line);
+      try
+	{
+	  line_transformer.input_line(line);
+	}
+      catch (const MalformedInputData &e)
+	{
+	  std::cerr << "at line " << current_line << std::endl;
+	  throw e;
+	}
+
       if (line_transformer.output_exists())
 	{ 
 	  std::string transformed_line = line_transformer.output_line();
 	  transformed_input_data += transformed_line + "\n";	  
 	}
+      ++current_line;
     } 
   while (newline_pos != std::string::npos);
   

@@ -4,7 +4,7 @@
 
 $total_words=0;
 
-while (<>)
+while (<stdin>)
 {
     ++$total_words;
     
@@ -14,7 +14,7 @@ while (<>)
     
     $correct_word = $fields[0];
 
-    @suggestions = @fields[1,10];
+    @suggestions = @fields[1 .. 10];
 
     $position=0;
     $found=0;
@@ -26,18 +26,20 @@ while (<>)
 	    $found=1;
 	    last;
 	}
-	++$position;
+	$position = $position + 1;
+	
     }
 
     if ($found==1)
     {
-	++$correct_suggestions[$position];
+	$correct_suggestions[$position] = $correct_suggestions[$position] + 1;
     }
 }
 
+print "$ARGV[0]\t";
 foreach (@correct_suggestions)
 {
-    print $_/$total_words;
+    printf("& %.4f\\\%",100*$_/$total_words);
     print " ";
 }
-print "\n"
+print "\\\\\n"
