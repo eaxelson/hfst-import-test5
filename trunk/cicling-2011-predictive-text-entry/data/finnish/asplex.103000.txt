@@ -42137,8 +42137,6 @@ know
 what
 arabs
 say
-√√√√√√√√§√√√√§
-√√√√√√
 i
 cant
 read
@@ -89998,7 +89996,7 @@ lastfm
 ryhm√§ss√§
 vihaan
 theres
-nothing√√
+nothing
 better
 than
 watching
@@ -102998,3 +102996,5 @@ bileiss√§
 etk√∂
 keksiny
 asua
+ei
+keksinyt
