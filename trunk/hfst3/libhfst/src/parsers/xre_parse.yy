@@ -11,7 +11,7 @@ using hfst::HfstTransducer;
 
 #include "xre_utils.h"
 
-extern void xreerror(char * text);
+extern void xreerror(const char * text);
 extern int xrelex();
 
 %}
