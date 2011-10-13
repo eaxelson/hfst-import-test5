@@ -8,8 +8,8 @@ for i in "" .sfst .ofst .foma; do
             exit 1
         fi
         rm test.hfst;
-    else
-	exit 1 ;
+#    else
+#	exit 1 ;
     fi
 # test the empty transducer
     if test -f empty.hfst$i ; then
@@ -19,9 +19,9 @@ for i in "" .sfst .ofst .foma; do
 	if ! ../../tools/src/hfst-compare test.hfst empty.hfst$i ; then
 	    exit 1
 	fi
-    else
-        echo "FAIL: Missing files in empty transducer tests"
-	exit 1 ;
+#    else
+#        echo "FAIL: Missing files in empty transducer tests"
+#	exit 1 ;
     fi
 # test that the complement [ [ID:ID | UNK:UNK]* - transducer ] works
     if test -f unk_or_id_star.hfst$i -a a2b.hfst$i -a a2b_complement.hfst$i -a a2b_input_projection_complement.hfst$i ; then
@@ -45,9 +45,9 @@ for i in "" .sfst .ofst .foma; do
 	fi
 	rm a2b_input.hfst
 	rm test.hfst;
-    else
-	echo "FAIL: Missing files in complement tests"
-	exit 1 ;
+#    else
+#	echo "FAIL: Missing files in complement tests"
+#	exit 1 ;
     fi
 done
 
@@ -66,7 +66,7 @@ if test -f cat2dog_0.3.hfst.ofst -a -f cat2dog_0.5.hfst.ofst ; then
 	exit 1;
     fi
     rm test.hfst;
-else
-    echo "FAIL: Missing files in weight tests"
-    exit 1 ;
+#else
+#    echo "FAIL: Missing files in weight tests"
+#    exit 1 ;
 fi
