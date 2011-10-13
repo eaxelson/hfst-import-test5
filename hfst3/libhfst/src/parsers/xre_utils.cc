@@ -19,7 +19,7 @@ extern int xreparse();
 extern int xrenerrs;
 
 int
-xreerror(char *msg)
+xreerror(const char *msg)
 {
 #ifndef NDEBUG
     fprintf(stderr, "*** xre parsing failed: %s\n", msg);
