@@ -20,6 +20,9 @@ int main(int argc, char **argv)
   for (unsigned int i=0; i<TYPES_SIZE; i++)
     {
 
+      if (not HfstTransducer::is_implementation_type_available(types[i]))
+	continue;
+
       /* From AT&T format. */
       verbose_print("Construction from AT&T format", types[i]);
 

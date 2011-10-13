@@ -22,6 +22,8 @@ int main(int argc, char **argv)
 
   for (unsigned int i=0; i<TYPES_SIZE; i++)
     {
+      if (not HfstTransducer::is_implementation_type_available(types[i]))
+	continue;
 
       /* The empty transducer. */
       verbose_print("The empty transducer", types[i]);

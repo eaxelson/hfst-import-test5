@@ -137,12 +137,15 @@ int main(int argc, char **argv)
     
     // tr2 is now [ [ ?:? ] [ bar:bar ] ]
     
-    ImplementationType type = SFST_TYPE;
-    HfstTransducer Tr1(tr1, type);
-    HfstTransducer Tr2(tr2, type);
-    Tr1.disjunct(Tr2);
+    if (HfstTransducer::is_implementation_type_available(SFST_TYPE))
+      {
+	ImplementationType type = SFST_TYPE;
+	HfstTransducer Tr1(tr1, type);
+	HfstTransducer Tr2(tr2, type);
+	Tr1.disjunct(Tr2);
     
-    // Tr1 is now [ [ ?:foo | bar:foo ]  |  [[ ?:? | foo:foo ] [ bar:bar ]] ]
+	// Tr1 is now [ [ ?:foo | bar:foo ]  |  [[ ?:? | foo:foo ] [ bar:bar ]]]
+      }
   }
 
 

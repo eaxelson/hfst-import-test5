@@ -48,6 +48,8 @@ int main(int argc, char **argv)
   for (unsigned int i=0; i<TYPES_SIZE-2; i++) 
     // FIXME: infinite loop in HFST_OL_TYPE
     {
+      if (not HfstTransducer::is_implementation_type_available(types[i]))
+	continue;
 
       if (types[i] != LOG_OPENFST_TYPE) {
 

@@ -88,6 +88,9 @@ int main(int argc, char **argv)
   // For all transducer implementation types, perform the following tests: */
   for (unsigned int i=0; i<TYPES_SIZE; i++)
     {
+      if (not HfstTransducer::is_implementation_type_available(types[i]))
+	continue;
+
       verbose_print("expanding unknowns", types[i]);
       
       HfstTransducer Tr1(tr1, types[i]);
@@ -119,6 +122,7 @@ int main(int argc, char **argv)
     }
       remove("testfile.att");
 
+      if (HfstTransducer::is_implementation_type_available(FOMA_TYPE))
   {
     ImplementationType type=FOMA_TYPE;
     
@@ -195,6 +199,7 @@ int main(int argc, char **argv)
   }
 
 
+      if (HfstTransducer::is_implementation_type_available(SFST_TYPE))
   {
     ImplementationType type = SFST_TYPE;
 
@@ -227,6 +232,7 @@ int main(int argc, char **argv)
   }
 
 
+      if (HfstTransducer::is_implementation_type_available(SFST_TYPE))
   {
     HfstTransducer t("a", "a", SFST_TYPE);
     t.substitute(&function);
