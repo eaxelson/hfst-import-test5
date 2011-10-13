@@ -228,6 +228,9 @@ int main(int argc, char **argv)
   for (unsigned int i=0; i<TYPES_SIZE; i++)
     {
 
+      if (not HfstTransducer::is_implementation_type_available(types[i]))
+	continue;
+
       /* Function compare. */
       {
     verbose_print("function compare", types[i]);
@@ -292,7 +295,9 @@ int main(int argc, char **argv)
        and get back to the original one.*/
     for (unsigned int j=0; j<=TYPES_SIZE; j++)
       {
-        t1.convert(types[(i+j)%TYPES_SIZE]);
+	unsigned int index = (i+j)%TYPES_SIZE;
+	if (HfstTransducer::is_implementation_type_available(types[index]))
+	  t1.convert(types[index]);
         assert(compare_alphabets(t1, t2));
       }
     assert(t1.compare(t2));
@@ -878,6 +883,9 @@ int main(int argc, char **argv)
 
   // A special case..
 
+  if (HfstTransducer::is_implementation_type_available(SFST_TYPE) &&
+      HfstTransducer::is_implementation_type_available(TROPICAL_OPENFST_TYPE) &&
+      HfstTransducer::is_implementation_type_available(FOMA_TYPE))
   {
     HfstTransducer t_sfst("c", "c", SFST_TYPE);
     t_sfst.convert(TROPICAL_OPENFST_TYPE);

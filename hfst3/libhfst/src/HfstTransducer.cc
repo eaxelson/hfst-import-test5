@@ -2928,6 +2928,12 @@ bool HfstTransducer::is_implementation_type_available
 HfstTransducer &HfstTransducer::convert(ImplementationType type,
                     std::string options)
 {
+  if (not is_implementation_type_available(this->type)) {
+    HFST_THROW_MESSAGE(HfstFatalException,
+		       "HfstTransducer::convert: the original type "
+		       "of the transducer is not available!");
+  }
+
     if (type == ERROR_TYPE)
     { 
         HFST_THROW_MESSAGE(SpecifiedTypeRequiredException,
@@ -2935,12 +2941,12 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
     if (type == this->type)
     { return *this; }
     if (not is_implementation_type_available(type)) {
-    HFST_THROW_MESSAGE(ImplementationTypeNotAvailableException,
-               "HfstTransducer::convert");
+      HFST_THROW_MESSAGE(ImplementationTypeNotAvailableException,
+			 "HfstTransducer::convert");
     }
 
-    try 
-    {
+    /*    try 
+	  {*/
         hfst::implementations::HfstBasicTransducer * internal=NULL;
     hfst::implementations::HfstFastTransducer * fast_internal=NULL;
         switch (this->type)
@@ -3009,10 +3015,10 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
             delete implementation.hfst_ol;
             break;
 #endif
-        case ERROR_TYPE:
-        default:
-        HFST_THROW(TransducerHasWrongTypeException);
-        break;
+    case ERROR_TYPE:
+    default:
+      HFST_THROW(TransducerHasWrongTypeException);
+      break;
     }
 
     ImplementationType original_type = this->type;
@@ -3068,9 +3074,11 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
             break;
     case HFST_OL_TYPE:
     case HFST_OLW_TYPE:
-        implementation.hfst_ol = ConversionFunctions::hfst_basic_transducer_to_hfst_ol(internal, this->type==HFST_OLW_TYPE?true:false, options);
-            delete internal;
-            break;
+        implementation.hfst_ol = 
+	  ConversionFunctions::hfst_basic_transducer_to_hfst_ol
+	  (internal, this->type==HFST_OLW_TYPE?true:false, options);
+	delete internal;
+	break;
 #endif
 #if HAVE_FOMA
     case FOMA_TYPE:
@@ -3089,12 +3097,12 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
 #endif
         case ERROR_TYPE:
         default:
-        HFST_THROW(TransducerHasWrongTypeException);
+	  HFST_THROW(TransducerHasWrongTypeException);
     }
-    }
+	/*}
     catch (const HfstException e)
       { 
-    throw e; }
+      throw e; }*/
     return *this;
 }
 
