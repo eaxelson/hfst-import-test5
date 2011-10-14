@@ -37,9 +37,27 @@ while (<stdin>)
 }
 
 print "$ARGV[0]\t";
+$total_corr = 0;
+$third_or_less_corr = 0;
+$fifth_or_less_corr = 0;
+$pos = 0;
 foreach (@correct_suggestions)
 {
-    printf("& %.4f\\\%",100*$_/$total_words);
-    print " ";
+    if ($pos < 3)
+    {
+	$third_or_less_corr = $third_or_less_corr + $_;
+    }
+    if ($pos < 5)
+    {
+	$fifth_or_less_corr = $fifth_or_less_corr + $_;
+    }
+
+    $total_corr = $total_corr + $_;
+
+    printf("& %.4f\\\% ",100*$_/$total_words);
+    ++$pos;
 }
-print "\\\\\n"
+printf("& %.4f\\\% ",100*$third_or_less_corr/$total_words);
+printf("& %.4f\\\% ",100*$fifth_or_less_corr/$total_words);
+printf("& %.4f\\\% ",100*$total_corr/$total_words);
+print "\\\\\n";

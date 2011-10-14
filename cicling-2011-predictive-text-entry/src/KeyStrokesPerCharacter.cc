@@ -99,8 +99,17 @@ void KeyStrokesPerCharacter::read_next_unknown_word(std::string word,
   
   if (compute_penalty)
     {
+      // Enter word characcters.
       key_strokes += tokenized_line.size();
+
+      // Scroll through suggestions.
       key_strokes += fixed_penalty_for_unknown_words;
+
+      // switch to multitap.
+      key_strokes += 1;
+
+      // Delete  incorrect suggestion.
+      key_strokes += tokenized_line.size();
     }
 
   for (StringVector::const_iterator it = tokenized_line.begin();
@@ -120,6 +129,12 @@ void KeyStrokesPerCharacter::read_next_unknown_word(std::string word,
 	}
     }
   
+  if (compute_penalty)
+    {
+      // switch to predictive text entry.
+      key_strokes += 1;
+    }
+
   total_chars += tokenized_line.size();
 }
 
@@ -175,7 +190,7 @@ std::string get_word(std::string line)
 int main(void)
 {
   KeyStrokesPerCharacter multitap;
-  KeyStrokesPerCharacter new_method(5);
+  KeyStrokesPerCharacter new_method(10);
 
   try
     {

@@ -82,6 +82,8 @@ install:all
 	chmod u+x ../bin/rewrite_morfessor_output.pl
 	cp measure_accuracy.pl ../bin
 	chmod u+x ../bin/measure_accuracy.pl
+	cp print_errors.pl ../bin
+	chmod u+x ../bin/print_errors.pl
 
 clean:
 	rm -f $(PROGS)
