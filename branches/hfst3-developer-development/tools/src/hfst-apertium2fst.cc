@@ -52,6 +52,7 @@ typedef pair<string,string> StringPair;
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
 #include "hfst-tool-metadata.h"
+#include "edit-distance.h"
 
 using hfst::HfstBasicTransducer;
 using hfst::HfstTransducer;
@@ -71,7 +72,10 @@ static map<string, vector<pair<string,string> > > postblanks;
 static map<string, vector<pair<string,string> > > inconditionals;
 static HfstTokenizer tok;
 
-static char* alphabets = 0;
+static set<string> alphabets;
+
+static char* error_filename = 0;
+static FILE* error_file = 0;
 
 
 void
@@ -86,7 +90,8 @@ print_usage()
     print_common_unary_program_options(message_out);
     // fprintf(message_out, (tool-specific options and short descriptions)
     fprintf(message_out, "Format options:\n"
-            "  -f, --format=FMT    Write result using FMT as backend format\n");
+            "  -f, --format=FMT     Write result using FMT as backend format\n"
+            "  -e, --errmodel=ERR   Write error model for spelller to ERR\n");
     fprintf(message_out, "\n");
     fprintf(message_out, 
         "If OUTFILE or INFILE is missing or -,"
@@ -114,13 +119,14 @@ parse_options(int argc, char** argv)
         HFST_GETOPT_COMMON_LONG,
         HFST_GETOPT_UNARY_LONG,
           // add tool-specific options here
-            {"format", required_argument, 0, 'f'}, 
+            {"format", required_argument, 0, 'f'},
+            {"errmodel", required_argument, 0, 'e'},
             {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "e:nf:",
+                             HFST_GETOPT_UNARY_SHORT "e:f:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -134,6 +140,10 @@ break;
           // add tool-specific cases here
         case 'f':
             format = hfst_parse_format_name(optarg);
+            break;
+        case 'e':
+            error_filename = hfst_strdup(optarg);
+            error_file = hfst_fopen(error_filename, "w");
             break;
 #include "inc/getopt-cases-error.h"
           }
@@ -152,7 +162,7 @@ break;
 }
 
 static
-char*
+set<string>*
 parse_alphabet(xmlDocPtr doc, xmlNodePtr alphabet)
 {
   // in alphabet; expect
@@ -166,21 +176,23 @@ parse_alphabet(xmlDocPtr doc, xmlNodePtr alphabet)
             "alphabet would not be able to analyse anything;\n"
             "refusing to create broken automata");
     }
-
+  set<string>* rv = new set<string>;
   HfstTransducer alphaTrans(reinterpret_cast<char*>(alpha), tok,
                             format);
-  if (verbose)
+  unsigned int i = 0;
+  StringSet alphas = alphaTrans.get_alphabet();
+  for (StringSet::const_iterator s = alphas.begin();
+       s != alphas.end();
+       ++s)
     {
-      StringSet alphas = alphaTrans.get_alphabet();
-      for (StringSet::const_iterator s = alphas.begin();
-           s != alphas.end();
-           ++s)
+      if (s->substr(0, 1) != "@")
         {
           verbose_printf("%s ", s->c_str());
+          rv->insert(*s);
+          i++;
         }
     }
   verbose_printf("\n");
-  char* rv = strdup(reinterpret_cast<char*>(alpha));
   xmlFree(alpha);
   return rv;
 }
@@ -649,7 +661,7 @@ parse_section(xmlDocPtr doc, xmlNodePtr section)
   xmlFree(sectype);
 }
 int
-process_stream(HfstOutputStream& outstream)
+process_stream(HfstOutputStream& outstream, HfstOutputStream* errstream)
 {
   verbose_printf("Reading apertium XML...\n");
   xmlDocPtr doc;
@@ -702,7 +714,7 @@ process_stream(HfstOutputStream& outstream)
       if (xmlStrcmp(node->name, 
                     reinterpret_cast<const xmlChar*>("alphabet")) == 0)
         {
-          alphabets = parse_alphabet(doc, node);
+          alphabets = *(parse_alphabet(doc, node));
         }
       else if (xmlStrcmp(node->name,
                          reinterpret_cast<const xmlChar*>("sdefs")) == 0)
@@ -924,6 +936,14 @@ process_stream(HfstOutputStream& outstream)
   hfst_set_formula(t, inputfilename, "A");
   outstream << t;
   outstream.close();
+  if (errstream != 0)
+    {
+      HfstTransducer* errmodel = create_edit_distance(alphabets, 1, 1.0f,
+                                                      format);
+
+      errstream->operator<<(*errmodel);
+      errstream->close();
+    }
   return EXIT_SUCCESS;
 }
 
@@ -942,6 +962,10 @@ int main( int argc, char **argv )
     {
         fclose(outfile);
     }
+    if ((error_file != 0) && (error_file != stdout))
+      {
+        fclose(error_file);
+      }
     verbose_printf("Reading from %s, writing to %s\n", 
         inputfilename, outfilename);
     switch (format)
@@ -972,7 +996,14 @@ int main( int argc, char **argv )
     HfstOutputStream* outstream = (outfile != stdout) ?
                 new HfstOutputStream(outfilename, format) :
                 new HfstOutputStream(format);
-    process_stream(*outstream);
+    HfstOutputStream* errstream = 0;
+    if (error_file != 0)
+      {
+        errstream = (error_file != stdout) ?
+            new HfstOutputStream(error_filename, format):
+            new HfstOutputStream(format);
+      }
+    process_stream(*outstream, errstream);
     if (inputfile != stdin)
       {
         fclose(inputfile);
