@@ -326,6 +326,20 @@ times2: apertium-sv-da.sv.times2
 	time lt-comp lr $< /dev/null >> $@ 2>&1
 	time lt-comp lr $< /dev/null >> $@ 2>&1
 
+# (6) compile spellers
+spell: apertium-sv-da.sv.zhfst
+
+%.zhfst: %.dix
+	hfst-apertium2fst -v $< -o $@.tmp -e $*.errmodel.tmp
+	hfst-minimize -v $*.errmodel.tmp |\
+		hfst-fst2fst -v -f olw -o errmodel.default.hfst
+	hfst-project -v -p input $@.tmp |\
+		hfst-minimize -v |\
+		hfst-fst2fst -v -f olw -o acceptor.default.hfst
+	sed -e "s/@APERTIUM_NAME@/$*/" index.xml.template > index.xml
+	zip -9 $@ errmodel.default.hfst acceptor.default.hfst index.xml
+	rm -f $@.tmp $*.errmodel.tmp acceptor.default.hfst index.xml
+
 # here the actual compilation for other tests
 %.hfst: %.dix
 	hfst-apertium2fst -v $< -o $@.tmp
