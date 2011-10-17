@@ -11,8 +11,12 @@ while (<>)
     { next; }
 
     @fields = split('\t');
-    
+
+    $correct_word = $fields[0];
+
     @suggestions = @fields[1 .. 10];
+
+    $found = 0;
 
     foreach (@suggestions)
     {

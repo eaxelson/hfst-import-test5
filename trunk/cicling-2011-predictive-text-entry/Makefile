@@ -11,7 +11,7 @@ FSTS=$(FST_BIN)/text_to_numbers.hfst $(FST_BIN)/combinatorics.hfst
 TRAINING_DATA_SIZES=1000 35000 69000 103000 137000 171000 205000 239000 \
                     307000 341000 345337
 
-all:tools fsts training_data all-results
+all:tools fsts training_data models all-results
 
 clean:
 	-rm -f $(BIN)/*
@@ -58,6 +58,10 @@ $(FI_PROCESSED_DATA)/letter_training_data.%.txt:$(FI_DATA)/asplex.%.txt
 	echo "||\t||\n||\t||" > header
 	cat header temp3 > $@
 	rm temp1 temp2 temp3 header
+
+models:$(TRAINING_DATA_SIZES:%=$(MODELS)/hmm_model_%.lex) \
+       $(TRAINING_DATA_SIZES:%=$(MODELS)/sequencer.%.hfst)\
+       $(TRAINING_DATA_SIZES:%=$(MODELS)/morpheme_sequence_model.%.hfst)
 
 $(MODELS)/hmm_model_%.lex:$(FI_PROCESSED_DATA)/letter_training_data.%.txt
 	$(BIN)/train_hmm_4_tagger $< $(MODELS)/hmm_model_$*
