@@ -1,0 +1,4 @@
+FORMAT=TRANSDUCER_FORMAT
+
+echo "[ [b i r d] | [h u n d] ]" | hfst-regexp2fst -f $FORMAT \
+     > EsperantoNounsAndAdjectives.hfst.hfst
