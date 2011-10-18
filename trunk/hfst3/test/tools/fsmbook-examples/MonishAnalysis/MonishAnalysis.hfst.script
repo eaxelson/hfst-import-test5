@@ -12,22 +12,30 @@ echo '[ r u u z o d | t s a r l ó k | n t o n ó l | b u n o o t s |' \
 
 echo '[ %+Int .x. [ %^U %^U k ] ]' | hfst-regexp2fst -f $FORMAT > Suff1
 
-echo [ %+Perf .x. [ %^O n ] ] |
-       	     [ %+Imperf .x. [ %^Ó m b ] ] |
-	     [ %+Opt .x. [ %^U d d ] ] > Suff2
+echo '[ %+Perf .x. [ %^O n ] ] | ' \
+     '[ %+Imperf .x. [ %^Ó m b ] ] | ' \
+     '[ %+Opt .x. [ %^U d d ] ] ' > Suff2
 
-echo [ %+True .x. [ %^A n k ] ] |
-       	     [ %+Belief .x. [ %^A %^A v %^O  t ] ] |
-	     [ %+Doubt .x. [ %^U %^U z ] ] |
-	     [ %+False .x. [ %^Ó q ] ] > Suff3
+echo '[ %+True .x. [ %^A n k ] ] | ' \
+     '[ %+Belief .x. [ %^A %^A v %^O  t ] ] | ' \
+     '[ %+Doubt .x. [ %^U %^U z ] ] | ' \
+     '[ %+False .x. [ %^Ó q ] ] ' > Suff3
 
-echo [ %+1P %+Sg .x. %^A %^A b %^A ] |
-     [ %+2P %+Sg .x. %^Ó m %^A ] |
-     [ %+3P %+Sg .x. %^U v v %^U ] |
-     [ %+1P %+Pl %+Excl .x. %^A %^A b %^O r %^A ] | 
-     [ %+1P %+Pl %+Incl .x. %^A %^A b %^U g %^A ] |
-     [ %+2P %+Pl .x. %^Ó m %^O r %^A ] |
-     [ %+3P %+Pl .x. %^U v v %^O r %^U ] > Suff4
+echo '[ %+1P %+Sg .x. %^A %^A b %^A ] |' \
+     '[ %+2P %+Sg .x. %^Ó m %^A ] |' \
+     '[ %+3P %+Sg .x. %^U v v %^U ] |' \
+     '[ %+1P %+Pl %+Excl .x. %^A %^A b %^O r %^A ] |' \ 
+     '[ %+1P %+Pl %+Incl .x. %^A %^A b %^U g %^A ] |' \
+     '[ %+2P %+Pl .x. %^Ó m %^O r %^A ] |' \
+     '[ %+3P %+Pl .x. %^U v v %^O r %^U ]' > Suff4
 
-[ Root (Suff1) Suff2 (Suff3) Suff4 ];
- > MonishAnalysis.hfst.hfst
+echo '[ %^U -> u , %^O -> o, %^Ó -> ó , %^A -> a || @"BackV" ?* _ ]' | \
+     hfst-regexep2fst -f $FORMAT > Rule1
+
+echo '[ %^U -> i , %^O -> e , %^Ó -> é , %^A -> ä ]' | \
+     hfst-regexp2fst -f $FORMAT > Rule2
+
+echo '[ @"Root (@"Suff1") @"Suff2" (@"Suff3") @"Suff4" ]' | \
+     hfst-regexp2fst -f $FORMAT | \
+     hfst-compose -2 Rule1 | hfst-compose -2 Rule2 \
+       > MonishAnalysis.hfst.hfst

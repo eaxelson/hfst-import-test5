@@ -1,38 +1,42 @@
-clear stack
+$FORMAT=TRANSDUCER_FORMAT
 
-define FrontV [ i | e | é | ä ];
+echo '[ i | e | é | ä ]' | hfst-regexp2fst -f $FORMAT > FrontV
 
-define BackV [ u | o | ó | a ];
+echo '[ u | o | ó | a ]' | hfst-regexp2fst -f $FORMAT > BackV
 
-define MorphoV [ %^U | %^O | %^Ó | %^A ];
+echo '[ %^U | %^O | %^Ó | %^A ]' | hfst-regexp2fst -f $FORMAT > MorphoV
 
-define Root [ [ ? - [ BackV | MorphoV ] ]+ & $[ FrontV ] ] |
-[ [ ? - [ FrontV | MorphoV ] ]+ & $[ BackV ] ] ;
+echo '[ [ ? - [ BackV | MorphoV ] ]+ & $[ FrontV ] ] |' \
+      [ [ ? - [ FrontV | MorphoV ] ]+ & $[ BackV ] ]' | \ 
+        hfst-regexp2fst -f $FORMAT > Root
 
-define Suff1 [ %+Int .x. [ %^U %^U k ] ];
+echo '[ %+Int .x. [ %^U %^U k ] ]' | hfst-regexp2fst -f $FORMAT > Suff1
 
-define Suff2 [ %+Perf .x. [ %^O n ] ] |
-       	     [ %+Imperf .x. [ %^Ó m b ] ] |
-	     [ %+Opt .x. [ %^U d d ] ] ;
+echo '[ %+Perf .x. [ %^O n ] ] |' \
+     '[ %+Imperf .x. [ %^Ó m b ] ] |' \
+     '[ %+Opt .x. [ %^U d d ] ]' | hfst-regexp2fst -f $FORMAT > Suff2
 
-define Suff3 [ %+True .x. [ %^A n k ] ] |
-       	     [ %+Belief .x. [ %^A %^A v %^O  t ] ] |
-	     [ %+Doubt .x. [ %^U %^U z ] ] |
-	     [ %+False .x. [ %^Ó q ] ] ;
+echo '[ %+True .x. [ %^A n k ] ] |' \
+     '[ %+Belief .x. [ %^A %^A v %^O  t ] ] |' \
+     '[ %+Doubt .x. [ %^U %^U z ] ] |' \
+     '[ %+False .x. [ %^Ó q ] ]' | hfst-regexp2fst -f $FORMAT > Suff3
 
-define Suff4 [ %+1P %+Sg .x. %^A %^A b %^A ] |
-       	     [ %+2P %+Sg .x. %^Ó m %^A ] |
-	     [ %+3P %+Sg .x. %^U v v %^U ] |
-	     [ %+1P %+Pl %+Excl .x. %^A %^A b %^O r %^A ] | 
-	     [ %+1P %+Pl %+Incl .x. %^A %^A b %^U g %^A ] |
-	     [ %+2P %+Pl .x. %^Ó m %^O r %^A ] |
-	     [ %+3P %+Pl .x. %^U v v %^O r %^U ] ; 
+echo '[ %+1P %+Sg .x. %^A %^A b %^A ] |' \
+     '[ %+2P %+Sg .x. %^Ó m %^A ] |' \
+     '[ %+3P %+Sg .x. %^U v v %^U ] |' \
+     '[ %+1P %+Pl %+Excl .x. %^A %^A b %^O r %^A ] |' \ 
+     '[ %+1P %+Pl %+Incl .x. %^A %^A b %^U g %^A ] |' \
+     '[ %+2P %+Pl .x. %^Ó m %^O r %^A ] |' \
+     '[ %+3P %+Pl .x. %^U v v %^O r %^U ]' | \
+       hfst-regexp2fst -f $FORMAT > Suff4
 
-define Verbs [ Root (Suff1) Suff2 (Suff3) Suff4 ];
+echo '[ %^U -> u , %^O -> o, %^Ó -> ó , %^A -> a || BackV ?* _ ]' \
+       | hfst-regexp2fst -f $FORMAT > Rule1  
 
-define Rules [ %^U -> u , %^O -> o, %^Ó -> ó , %^A -> a || BackV ?* _ ]
-                                     .o.
-                  [ %^U -> i , %^O -> e , %^Ó -> é , %^A -> ä ] ;
+echo '[ %^U -> i , %^O -> e , %^Ó -> é , %^A -> ä ]' \
+       | hfst-regexp2fst -f $FORMAT > Rule2  
 
-read regex Verbs .o. Rules ;
-write att MonishGuesserAnalyzer FOO BAR
+echo '[ @"Root" (@"Suff1") @"Suff2" (@"Suff3") @"Suff4" ]' \
+       | hfst-regexp2fst -f $FORMAT | hfst-compose -2 Rule1 \
+       | hfst-compose -2 Rule2 \ 
+         > MonishGuesserAnalyzer.hfst.hfst
