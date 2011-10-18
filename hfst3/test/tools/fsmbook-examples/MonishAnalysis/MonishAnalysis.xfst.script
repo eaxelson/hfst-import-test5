@@ -33,5 +33,9 @@ define Suff4 [ %+1P %+Sg .x. %^A %^A b %^A ] |
 	     [ %+2P %+Pl .x. %^Ó m %^O r %^A ] |
 	     [ %+3P %+Pl .x. %^U v v %^O r %^U ] ; 
 
-read regex [ Root (Suff1) Suff2 (Suff3) Suff4 ];
+define Rules [ %^U -> u , %^O -> o, %^Ó -> ó , %^A -> a || BackV ?* _ ]
+                                     .o.
+                  [ %^U -> i , %^O -> e , %^Ó -> é , %^A -> ä ] ;
+
+read regex [ Root (Suff1) Suff2 (Suff3) Suff4 ] .o. Rules ;
 write att MonishAnalysis FOO BAR
