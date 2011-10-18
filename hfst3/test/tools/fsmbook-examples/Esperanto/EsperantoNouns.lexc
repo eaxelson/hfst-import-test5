@@ -1,0 +1,6 @@
+LEXICON Root
+	Nouns ;
+
+LEXICON Nouns
+	bird # ;
+	hund # ;
