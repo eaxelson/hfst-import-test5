@@ -1,4 +1,44 @@
 FORMAT=TRANSDUCER_FORMAT
 
-echo "[ [b i r d] | [h u n d] ]" | hfst-regexp2fst -f $FORMAT \
-     > EsperantoNounsAndAdjectivesWithTags.hfst.hfst
+echo '([MF%+:g e])' | hfst-regexp2fst -f $FORMAT > NounPrefix
+
+echo "bird
+hund
+kat
+elefant" | hfst-strings2fst -j -f $FORMAT > NounRoots
+
+echo "bon
+long
+jun
+alt
+grav" | hfst-strings2fst -j -f $FORMAT > AdjRoots
+
+echo '%+Noun:0' | hfst-regexp2fst -f $FORMAT > Nmf
+
+echo '%+NSuff:o' | hfst-regexp2fst -f $FORMAT > Nend
+
+echo '%+ASuff:a' | hfst-regexp2fst -f $FORMAT > Adjend
+
+echo '[[%+Fem:i n] | [%+Dim:e t] | [%+Aug:e g]]* [@"Nend" | @"Adjend"]' | \
+  hfst-regexp2fst -f $FORMAT > AugDimFem 
+
+echo '([Op%+:m a l] | [Neg%+:n e])' | hfst-regexp2fst -f $FORMAT > AdjPrefixes
+
+echo '[[%+Aug:e g] | [%+Dim:e t]]* [[[%+Nize:e c] @"Nend"] | [@"Adjend"]]' | \
+     hfst-regexp2fst -f $FORMAT > AugDimNize
+
+echo '%+Adj:0' | hfst-regexp2fst -f $FORMAT > Adj
+
+echo '%+Pl:j | %+Sg:0' | hfst-regexp2fst -f $FORMAT > Number
+
+echo '(%+Acc:n)' | hfst-regexp2fst -f $FORMAT > Case
+	
+
+hfst-concatenate NounPrefix NounRoots | hfst-concatenate -2 Nmf | \
+  hfst-concatenate -2 AugDimFem  > NounStem
+hfst-concatenate AdjPrefixes AdjRoots | hfst-concatenate -2 Adj | \
+  hfst-concatenate -2 AugDimNize > AdjectiveStem
+hfst-disjunct NounStem AdjectiveStem > Stems
+hfst-concatenate Number Case | hfst-concatenate -1 Stems > Result
+
+hfst-minimize Result > EsperantoNounsAndAdjectivesWithTags.hfst.hfst
