@@ -1,4 +1,23 @@
 FORMAT=TRANSDUCER_FORMAT
 
-echo "[ [b i r d] | [h u n d] ]" | hfst-regexp2fst -f $FORMAT \
-     > EsperantoNouns.hfst.hfst
+echo 'bird
+hund
+kat
+elefant' | hfst-strings2fst -j -f $FORMAT > Nouns
+
+echo '[ [i n] | [e t] | [e g] ]*'| hfst-regexp2fst -f $FORMAT > Nmf
+
+echo '[o]' | hfst-regexp2fst -f $FORMAT > Nend
+
+echo '[(j)]' | hfst-regexp2fst -f $FORMAT > Number
+
+echo '[(n)]' | hfst-regexp2fst -f $FORMAT > Case
+
+echo '[0]' | hfst-regexp2fst -f $FORMAT > Result
+for i in Nouns Nmf Nend Number Case;
+do
+  hfst-concatenate Result $i > TMP;
+  mv TMP Result;
+done
+
+hfst-minimize Result > EsperantoNouns.hfst.hfst
