@@ -1,55 +1,37 @@
-LEXICON Root
-	Nouns ;
-	Adjectives ;
+FORMAT=TRANSDUCER_FORMAT
 
-LEXICON Nouns
-	NounRoots ;
-ge	NounRoots ;
+echo "bird
+hund
+kat
+elefant" | hfst-strings2fst -j -f $FORMAT > NounRoots
 
-LEXICON NounRoots
-bird	Nmf ;
-hund	Nmf ;
-kat	Nmf ;
-elefant	Nmf ;
+echo "bon
+long
+jun
+alt
+grav" | hfst-strings2fst -j -f $FORMAT > AdjRoots
 
-LEXICON Nmf
-in	Nmf ;
-et	Nmf ;
-eg	Nmf ;
-	Nend ;
-	Adjend ;
+echo '[(g e)]' | hfst-regexp2fst -f $FORMAT > NounPrefix
 
-LEXICON Nend
-o	Number ;
+echo '[ ([m a l] | [n e]) ]' | hfst-regexp2fst -f $FORMAT > AdjPrefixes
 
-LEXICON Adjectives
-	AdjPrefixes ;
-	AdjRoots ;
+echo '[o]' | hfst-regexp2fst -f $FORMAT -j > Nend
 
-LEXICON AdjPrefixes
-mal	AdjRoots ;
-ne	AdjRoots ;
+echo '[a]' | hfst-regexp2fst -f $FORMAT -j > Adjend
 
-LEXICON AdjRoots
-bon	Adj ;
-long	Adj ;
-jun	Adj ;
-alt	Adj ;
-grav	Adj ;
+echo '[(j)]' | hfst-regexp2fst -f $FORMAT -j > Number
 
-LEIXCON Adj
-eg	Adj ;
-et	Adj ;
-	Adjend ;
-ec	Nend ;
+echo '[(n)]' | hfst-regexp2fst -f $FORMAT -j > Case
 
-LEXICON Adjend
-a	Number ;
+echo '[ ([i n] | [e t] | [e g])* [@"Nend" | @"Adjend"] ]' | \
+     hfst-regexp2fst -f $FORMAT > Nmf
 
-LEXICON Number
-j	Case ;
-	Case ;
+echo '([e g] | [e t])* [@"Adjend" | [e c @"Nend"]]' | \
+     hfst-regexp2fst -f $FORMAT > Adj
 
-LEXICON Case
-n	# ;
-	# ;
+hfst-concatenate NounPrefix NounRoots | hfst-concatenate -2 Nmf > NounStem
+hfst-concatenate AdjPrefixes AdjRoots | hfst-concatenate -2 Adj > AdjectiveStem
+hfst-disjunct NounStem AdjectiveStem > Stems
+hfst-concatenate Number Case | hfst-concatenate -1 Stems > Result
+
+hfst-minimize Result > EsperantoNounsAndAdjectives.hfst.hfst
