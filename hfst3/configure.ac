@@ -397,15 +397,7 @@ AC_PROG_CPP
 AC_PROG_YACC
 AC_PROG_LEX
 AC_PATH_PROG([FOMACLI], [foma], [false])
-AC_PATH_PROG([GETOPT], [getopt getopts], [false])
-AC_CACHE_CHECK([for gnu compatible getopt with long options],
-               [ac_cv_path_GNU_GETOPT],
-               [AC_PATH_PROGS_FEATURE_CHECK([GNU_GETOPT], 
-                                            [getopt ggetopt], 
-                            [[m4out=`$ac_path_GNU_GETOPT -V | fgrep getopt`
-                             test -z "$m4out" || ac_cv_path_GNU_GETOPT=$ac_path_GNU_GETOPT ac_path_GNU_GETOPT_found=:]],
-                            [ac_cv_path_GNU_GETOPT=no])])
-AC_SUBST([GNU_GETOPT], [$ac_cv_path_GNU_GETOPT])
+AC_PATH_PROG([GETOPT], [getopts], [false])
 AM_CONDITIONAL([CAN_FOMAWRAP], [test x$FOMACLI != xfalse])
 # if flex 3.X ever comes out, this breaks :)
 LEX_VERSION=`$LEX --version`
