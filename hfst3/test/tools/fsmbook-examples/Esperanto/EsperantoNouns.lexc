@@ -2,5 +2,24 @@ LEXICON Root
 	Nouns ;
 
 LEXICON Nouns
-	bird # ;
-	hund # ;
+bird	Nmf ;
+hund	Nmf ;
+kat	Nmf ;
+elefant	Nmf ;
+
+LEXICON Nmf
+in	Nmf ;
+et	Nmf ;
+eg	Nmf ;
+	Nend ;
+
+LEXICON Nend
+o	Number ;
+
+LEXICON Number
+j	Case ;
+	Case ;
+
+LEXICON Case
+n	# ;
+	# ;
