@@ -415,13 +415,24 @@ discouraged.
 
 error: ‘class SFST::Node’ has no member named ‘index’
 '''''''''''''''''''''''''''''''''''''''''''''''''''''
-**During compilation phase**, error messages about SFST::Node, nodeindexing or
-similar things may be caused by SFST version being too old. For HFST versions
-newer than 3.2.0, SFST must be at least version 1.4.6a, which is where new
-Nodes and nodeindexing are introduced. Note that if you do not require
-support for SFST binary automata or SFST's specific algorithms, you have the
-option of disabling SFST backend support without any loss of functionality using
-the configure option ``without-sfst``.
+**During compilation phase**, error messages of form::
+
+  ConvertTransducerFormat.h:106: error: &#8216;SFST::NodeNumbering&#8217; has not been declared
+  ConvertTransducerFormat.h:116: error: &#8216;SFST::NodeNumbering&#8217; has not been declared
+  ConvertTransducerFormat.h:126: error: &#8216;SFST::NodeNumbering&#8217; has not been declared
+
+or::
+
+  ConvertSfstTransducer.cc:65: error: 'class SFST::Node' has no member named 'index'
+  ConvertSfstTransducer.cc:96: error: 'class SFST::Node' has no member named 'index'
+  ConvertSfstTransducer.cc:98: error: 'class SFST::Node' has no member named 'index'
+
+are caused by wrong SFST version.  For HFST versions newer than 3.2.0, SFST
+must be at least version 1.4.6a, which is where new Nodes and nodeindexing are
+introduced. Note that if you do not require support for SFST binary automata or
+SFST's specific algorithms, you have the option of disabling SFST backend
+support without any loss of functionality using the configure option
+``without-sfst``.
 
 
 Further information
