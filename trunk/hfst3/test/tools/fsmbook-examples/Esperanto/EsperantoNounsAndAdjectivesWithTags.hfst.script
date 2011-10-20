@@ -1,6 +1,6 @@
 FORMAT=TRANSDUCER_FORMAT
 
-echo '([MF%+:g e])' | hfst-regexp2fst -f $FORMAT > NounPrefix
+echo '([MF%+:g 0:e])' | hfst-regexp2fst -f $FORMAT > NounPrefix
 
 echo "bird
 hund
@@ -19,13 +19,14 @@ echo '%+NSuff:o' | hfst-regexp2fst -f $FORMAT > Nend
 
 echo '%+ASuff:a' | hfst-regexp2fst -f $FORMAT > Adjend
 
-echo '[[%+Fem:i n] | [%+Dim:e t] | [%+Aug:e g]]* [@"Nend" | @"Adjend"]' | \
-  hfst-regexp2fst -f $FORMAT > AugDimFem 
+echo '[[%+Fem:i 0:n] | [%+Dim:e 0:t] | [%+Aug:e 0:g]]* [@"Nend" | @"Adjend"]' \
+     | hfst-regexp2fst -f $FORMAT > AugDimFem 
 
-echo '([Op%+:m a l] | [Neg%+:n e])' | hfst-regexp2fst -f $FORMAT > AdjPrefixes
+echo '([Op%+:m 0:a 0:l] | [Neg%+:n 0:e])' | hfst-regexp2fst -f $FORMAT \
+     > AdjPrefixes
 
-echo '[[%+Aug:e g] | [%+Dim:e t]]* [[[%+Nize:e c] @"Nend"] | [@"Adjend"]]' | \
-     hfst-regexp2fst -f $FORMAT > AugDimNize
+echo '[[%+Aug:e 0:g] | [%+Dim:e 0:t]]* [[[%+Nize:e 0:c] @"Nend"]|[@"Adjend"]]' \
+     | hfst-regexp2fst -f $FORMAT > AugDimNize
 
 echo '%+Adj:0' | hfst-regexp2fst -f $FORMAT > Adj
 
