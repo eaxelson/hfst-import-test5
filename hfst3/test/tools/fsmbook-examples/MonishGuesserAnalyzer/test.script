@@ -7,8 +7,7 @@ cat MonishGuesserAnalyzer | ../xfst-att-to-hfst-att.sh \
 hfst-txt2fst -f openfst-tropical MonishGuesserAnalyzer.xfst.att > \
   MonishGuesserAnalyzer.xfst.hfst
 
-for i in openfst-tropical; do
-# for i in sfst openfst-tropical foma; do
+for i in sfst openfst-tropical foma; do
   sed -i "1s/TRANSDUCER_FORMAT/"$i"/;" MonishGuesserAnalyzer.hfst.script
   echo "Testing" $i "..."
   sh MonishGuesserAnalyzer.hfst.script
