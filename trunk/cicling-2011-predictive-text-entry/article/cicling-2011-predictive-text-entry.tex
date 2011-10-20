@@ -3,20 +3,43 @@
 
 \begin{document}
 
-\title{Modelling Morphotax for Predictive Text Entry of Agglutinative 
-Languages}
+\title{Predictive Text Entry of Agglutinative Languages using Morphological Segmentation and Phonological Restrictions}
 
 \author{\ldots}
-\institute{\ldots\\
-           \ldots\\
-           \ldots\\
-           \ldots}
+\institute{\ldots}
 
 \maketitle
 
 \begin{abstract}
 
-\ldots
+Linguistic models for predictive text entry on ambiguous keyboards
+typically rely on large dictionaries, which are used to disambiguate
+between words matching user input. This approach is insufficient for
+heavily agglutinative languages, like Finnish or Turkish, where
+morphological phenomena such as inflection and compounding increase
+the rate of out-of-vocabulary words. We propose a method for text
+entry, which circumvents the problem of out-of-vocabulary words, by
+replacing the dictionary with a Markov chain on morpheme sequences
+constructed from morphologically segmented training data. The Markov
+chain is combined with a third order hidden Markov model (HMM) mapping
+key sequences to letter sequences. Additionally we use rules, which
+enforce phonotactic restrictions such as vowel harmony in Finnish. We
+evaluate our method by constructing text entry systems for Finnish and
+Turkish mobile phone keypads. We compare the Turkish text entry system
+with an existing system, which is based on an HMM of letter sequences
+\cite{Tantug:2010} and show that we achieve superior results measured
+by the keystrokes per character ratio (KSPC)
+\cite{MacKenzie02kspc}. We also compare the Finnish text entry system
+to an existing system, which utilizes a dictionary
+\cite{silfverberg/2011/cla} and show that we achieve superior
+KSPC. For segmenting the training data, we use Morfessor, a system for
+unsupervised morphological segmentation \cite{Creutz07ACMTSLP}. For
+constructing the probabilistic models needed for the text entry
+systems, we use tools for POS tagging from the HFST interface
+\cite{Silfverberg/2011}, which is an open-source interface for
+weighted finite-state calculus. We also utilize an open-source
+two-level phonology rule compiler, hfst-twolc, for implementing the
+vowel harmony rules needed for text entry of Finnish \cite{hfst/2011}.
 
 \end{abstract}
 
