@@ -1,4 +1,4 @@
-$FORMAT=TRANSDUCER_FORMAT
+FORMAT=TRANSDUCER_FORMAT
 
 echo '[ i | e | é | ä ]' | hfst-regexp2fst -f $FORMAT > FrontV
 
@@ -6,8 +6,8 @@ echo '[ u | o | ó | a ]' | hfst-regexp2fst -f $FORMAT > BackV
 
 echo '[ %^U | %^O | %^Ó | %^A ]' | hfst-regexp2fst -f $FORMAT > MorphoV
 
-echo '[ [ ? - [ BackV | MorphoV ] ]+ & $[ FrontV ] ] |' \
-      [ [ ? - [ FrontV | MorphoV ] ]+ & $[ BackV ] ]' | \ 
+echo '[ [ ? - [ @"BackV" | @"MorphoV" ] ]+ & $[ @"FrontV" ] ] |' \
+      [ [ ? - [ @"FrontV" | @"MorphoV" ] ]+ & $[ @"BackV" ] ]' | \ 
         hfst-regexp2fst -f $FORMAT > Root
 
 echo '[ %+Int .x. [ %^U %^U k ] ]' | hfst-regexp2fst -f $FORMAT > Suff1
@@ -37,6 +37,6 @@ echo '[ %^U -> i , %^O -> e , %^Ó -> é , %^A -> ä ]' \
        | hfst-regexp2fst -f $FORMAT > Rule2  
 
 echo '[ @"Root" (@"Suff1") @"Suff2" (@"Suff3") @"Suff4" ]' \
-       | hfst-regexp2fst -f $FORMAT | hfst-compose -2 Rule1 \
-       | hfst-compose -2 Rule2 \ 
+     | hfst-regexp2fst -f $FORMAT | hfst-compose -2 Rule1 \
+     | hfst-compose -2 Rule2 \ 
          > MonishGuesserAnalyzer.hfst.hfst

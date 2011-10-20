@@ -30,12 +30,12 @@ echo '[ %+1P %+Sg .x. %^A %^A b %^A ] |' \
      '[ %+3P %+Pl .x. %^U v v %^O r %^U ]' > Suff4
 
 echo '[ %^U -> u , %^O -> o, %^Ó -> ó , %^A -> a || @"BackV" ?* _ ]' | \
-     hfst-regexep2fst -f $FORMAT > Rule1
+     hfst-regexp2fst -f $FORMAT > Rule1
 
 echo '[ %^U -> i , %^O -> e , %^Ó -> é , %^A -> ä ]' | \
      hfst-regexp2fst -f $FORMAT > Rule2
 
-echo '[ @"Root (@"Suff1") @"Suff2" (@"Suff3") @"Suff4" ]' | \
+echo '[ @"Root" (@"Suff1") @"Suff2" (@"Suff3") @"Suff4" ]' | \
      hfst-regexp2fst -f $FORMAT | \
      hfst-compose -2 Rule1 | hfst-compose -2 Rule2 \
        > MonishAnalysis.hfst.hfst
