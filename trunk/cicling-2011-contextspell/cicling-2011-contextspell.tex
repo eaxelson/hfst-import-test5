@@ -1,35 +1,29 @@
-\documentclass[11pt,a4paper]{article}
+\documentclass{llncs}
+\usepackage{llncsdoc}
 \usepackage{times}
 \usepackage{url}
 \usepackage{latexsym}
 \usepackage{xltxtra}
+%\usepackage{hyperref}
+%\usepackage{ifpdf}
 
-%\setlength\titlebox{6.5cm}    % You can expand the title box if you
-% really have to
+\begin{document}
+\title{Improving Finite-State Spell-Checker's Corrections with POS Tagger's Context N-Grams}
 
-\title{Improving Finite-State Spell-Checker's Corrections with Combinations of Word-Form and Morphosyntactic n-grams}
+%\author{Tommi A Pirinen and Miikka Silfverberg and Krister Lind\'{e}n}
 
-\author{Tommi A Pirinen\\
-  University of Helsinki\\
-  Helsinki, Finland\\
-  {\tt \{tommi.pirinen,} \and
-  Miikka Silfverberb\\
-  University of Helsinki\\
-  Helsinki, Finland\\
-  {\tt miikka.silfverberg,} \and
-  Krister Lind\'{e}n\\
-  University of Helsinki\\
-  Helsinki, Finland\\
-  {\tt krister.linden\}@helsinki.fi}
-}
+%\institute{University of Helsinki\\
+%Department of Modern Languages\\
+%University of Helsinki, 00014\\
+%tommi.pirinen@helsinki.fi, miikka.silfverberg@helsinki.fi, krister.linden@helsinki.fi}
 
 \date{\today}
 
-\begin{document}
 \maketitle
+
 \begin{abstract}
-  In this paper we demonstrate an finite-state implementation of context-aware
-  spell checking utilising both surface and analysis n-grams to improve the
+  In this paper we demonstrate a finite-state implementation of context-aware
+  spell checking utilising n-gram based pos-tagger to rerank the
   quality of suggestions by simple edit-distance based spell-checker. We
   demonstrate the context-aware spell-checking for English and Finnish and
   suggest the modifications that are necessary to have traditional n-gram
@@ -137,7 +131,7 @@ roughly the probability of $\frac{1}{33}$ per character in running text, each
 error type has exactly quarter of this probability\footnote{with exception of
 swapping of two adjacent characters at the word-final character}. 
 
-The corpora used are summarised in table~\ref{table:corpora}, the sizes are
+The corpora used are summarised in Table~\ref{table:corpora}, the sizes are
 provided for use of reconstruction of the systems, in practice they are newest
 available versions of the respective corpora at the time of testing. In the
 table, the first row is the training material used for the finite-state
@@ -151,12 +145,12 @@ lesser resourced languages the number will drop enough to make such statistical
 approaches less useful (e.g. the example of Northern S\'{a}mi in
 \cite{pirinen/2010/lrec}).
 
-\begin{table}[h]
-  \begin{center}
-    \caption{Sizes of training corpora
+\begin{table}
+    \caption{Sizes of training corpora.
     \label{table:corpora}}
+  \begin{center}
     \begin{scriptsize}
-      \begin{tabular}{l|rrr}
+      \begin{tabular}{lrrr}
         \hline
         Count unit$\rightarrow$ & Sentences & Tokens & Word-forms \\
         $\downarrow$Language    & (lines)   &        &  \\
@@ -244,45 +238,58 @@ contemporary and old texts in wide range of styles.
 \section{Methods}
 \label{sec:methods}
 
-In this article we use the finite-state formulation of
-spell-checking~\cite{pirinen/2010/cla}. We assume the standard notation for
-finite-state algebra and define the language model as weighted finite-state
-automaton assigning a weight to each correctly spelled word-form of a language,
-and an error model automaton mapping a misspelled string to set of corrected
-strings and their weights.
+In this article we use the finite-state formulation of spell-checking. We
+assume the standard notation for finite-state algebra and define the language
+model as weighted finite-state automaton assigning a weight to each correctly
+spelled word-form of a language, and an error model automaton mapping a
+misspelled string to set of corrected strings and their weights. The
+probabilistic interpretation of the components is such that the weighted fsa of
+language model assigns weight $w(s)$ to word $s$ corresponding probability
+$P(s)$ for the word to be the correct word in language. The error model assigns
+weight $w(s:r)$ to string pair $s, r$ corresponding probability $P(s|r)$ of
+user writing word r when intending to write the word $s$, and the context model
+assigns weight $w(s_3 A_3)$ word $s_3$ with associated pos tagging $a_3$
+corresponding probability $P(s_3 A_3|s_1 A_1, S_2 A_2, s_3 A_3, s_4 A_4, s_5
+A_5)$ of the analysis being in that 3-gram context set.
 
-The only methodological modification that is needed to compile frequency based
-word-form list into a weighted finite-state automaton is transforming the
-weights, in this case we use the tropical semi-ring by transforming the
+In weighted finite-state system, the probabilistic data needs to be converted
+to the algebra supported by the finite-state weight structure.
+In this case we use the tropical semi-ring by transforming the
 frequencies into penalty weights with formula $-\log\frac{f}{CS}$, where $f$ is
-the frequency and $CS$ the corpus size in number of tokens.
+the frequency and $CS$ the corpus size in number of tokens. If the language
+model allows for words that are not in dictionary, a maximal weight is assigned
+to the unseen word forms that may be in language model but not in training
+corpus, i.e.  any unseen word has penalty weight of $-\log\frac{1}{CS}$.
 
 The spelling suggestion lists from these unigram lexicon-based spell-checkers
 are initially generated by composing a edit distance
-automaton~\cite{agata/2002} with error weight of $-\log\frac{1}{CS+1}$ per edit
-distance type of error. In practice this means that the corrections are
+automaton~\cite{agata/2002} with error weight from probability of error
+estimated from corpus, i.e. $-\log\frac{f_{F}}{CS+1}$, where $f_F$ is frequency
+of missplellings in corpus. This weight is attached to one edit distance type
+of error. In practice this typically still means that the corrections are
 initially ordered primarily by the edit distance of the correction, and
 secondarily by the unigram frequency of the word-form in reference corpus.
 This order is implicitly encoded in the weighted paths of the resulting
 automaton; to list the corrections we use the n best paths
 algorithm~\cite{mohri/2002}. This ordering is also used as our baseline.
 
-For context-based ordering of the corrections we use both the probabilities of
-the surface word-form n-grams and the probabilities of the n-grams of the
-analysis annotations. The implementation of analysis n-gram probability
-estimation is similar as described in \cite{silfverberg/2010} with following
-adaptations for the spelling correction. The suggestion which gives the highest
-ranking, most likely analysis is selected.  The n-gram probability is estimated
-separately with each spelling suggestion and then combined with the baseline
-probability given by the unigram probability and the edit distance weight using
-scaling formula of $1+2=3$
+For context-based reordering of the corrections we use the pos tagging
+probabilities for the given suggestions. The implementation of analysis n-gram
+probability estimation is similar as described in \cite{silfverberg/2010} with
+following adaptations for the spelling correction. The suggestion which gives
+the highest ranking, most likely analysis is selected.  The n-gram probability
+is estimated separately with each spelling suggestion and then combined with
+the baseline probability given by the unigram probability and the edit distance
+weight. The ideal scaling scheme for the weights of unigram probabilities,
+edit distance probabilities with respect to n-gram probabilities was acquired
+by performing the tests to automatically generated spelling error corpus.
 
 For example when correcting the misspelling of `an' as `anx' in sentence ``this
 is anx example sentence'', as shown in the figure~\ref{fig:example}, we have
 the surface trigrams \{this, is, \_\}, \{is, \_, example\}, \{\_, example,
 sentence\}, and corresponding analysis trigrams \{DET, VVBZ, \_\}, \{VVBZ, \_,
 NN\}, \{\_, NN, NN\}. The suggestions for anx at edit distance of one include
-`ax' (one deletion), `ant', `and', `any' (one change) and so on. To rank
+`ax', `an' (one deletion), `ant', `and', `any' (one change) and so on. To rank
 possible suggestions we substitute s3 for the suggestions, and estimate its
 likely analysis, then use the ones with highest combined likelihood of n-gram
 formula $P(s1:s5)$ etc.
@@ -303,16 +310,15 @@ DET$_{a1}$ & VVBZ$_{a2}$ & \_ $_{a3}$& NN$_{a4}$ & NN$_{a5}$\\
 
 The resulting Finite-state system consists of three automata, the dictionary
 for spell-checking and error-modelling as described in
-\cite{pirinen/2010/lrec}, and the new n-gram model automata, of which
-we present four different variants in this paper. These automata sizes are given
-in the table~\ref{table:sizes} for reference. The sizes also give some estimate
-on memory usage of the spell-checking system, although the actual memory-usage
-during correction will raise depending on the actual extents of search space
-during correction phase.
+\cite{pirinen/2010/lrec}, and the new n-gram model automata. These automata
+sizes are given in the Table~\ref{table:sizes} for reference. The sizes also
+give some estimate on memory usage of the spell-checking system, although the
+actual memory-usage during correction will raise depending on the actual
+extents of search space during correction phase.
 
 \begin{table}
+\caption{Automata sizes\label{table:sizes}.}
 \begin{centering}
-\caption{Automata sizes\label{table:sizes}}
 \begin{scriptsize}
 \begin{tabular}{lrrr}
     Automaton & States & Transitions & Bytes \\
@@ -321,21 +327,15 @@ during correction phase.
     \hline
     Dictionary & 25,330 & 42,448 & 1.2 MiB \\
     Error model & 1,303 & 492,232 & 5.9 MiB \\
-    \hline
-    Analysis 3-grams & & & \\
-    Surface 3-grams & & & \\
-    Some Hybrid & & & \\
-    Another Hybrid & & & \\
+    N-gram lexicon & 363,053 & 1,253,315 & 42 MiB \\
+    N-gram sequences & 46,517 & 200,168 & 4.2 MiB \\
     \hline
     \multicolumn{4}{c}{\textbf{Finnish}} \\
     \hline
     Dictionary & 179,035 & 395,032 & 16 MiB \\
     Error model & 1,863 & 983,227 & 12 MiB \\
-    \hline
-    Analysis 3-grams & & & \\
-    Surface 3-grams & & & \\
-    Some Hybrid & & & \\
-    Another Hybrid & & & \\
+    N-gram lexicon & 70,665 & 263,298 & 8.0 MiB \\
+    N-gram sequences & 3,325 & 22,418 & 430 KiB \\
     \hline
 \end{tabular}
 \end{scriptsize}
@@ -344,13 +344,15 @@ during correction phase.
 
 \subsection{English-Specific Finite-State Weighting Methods}
 
-The language model of English was created as described in \cite{norvig/2010}.
-It consists of only the word-form probabilities in the corpora. Similarly for
-English n-gram material, the initial analyses found in the WSJ corpora were
-taught to the finite-state parser verbatim. The scaling of surface and analysis
-models and the unigram model and the edit-distance models requires complex
-formulae $a^3 + b^3 = c^3$.
-
+The language model of English was created as described in
+\cite{norvig/2010}\footnote{The finite-state formulation of this is informally
+described in \url{}}.  It consists of only the word-form probabilities in the
+corpora. The edit distance is composed of standard English alphabet with
+estimated error likelihood of 1 in 1000 words.  Similarly for English n-gram
+material, the initial analyses found in the WSJ corpora were taught to the
+finite-state parser verbatim. The scaling of dictionary probability model and
+the edit distance was acquired by estimating optimal multipliers from automatic
+mispelling and correcting of a Project Gutenberg Ebook\footnote{\url{}}.
 
 \subsection{Finnish-Specific Finite-State Weighting Methods}
 
@@ -358,38 +360,42 @@ The Finnish language model was based on a readily-available morphological
 weighted FST analyser of Finnish language~\cite{pirinen/2011/nodalida}.  We
 furthermore modified the automaton to discount suggestions of newly created
 compounds and derivations by weight greater than maximum weight of automaton
-before that, i.e. $-10\log\frac{1}{CS+1}$ for the automatons training material.
-This has nearly the same effect as using separate dictionary for suggestions,
-that excludes the heavily weighted forms, without requiring the extra space.
+before that, i.e. $-A\log\frac{1}{CS+1}$ for the automatons training material,
+here multiplier a was also estimated by automatical misspelling and correction
+of a project Gutenberg Ebook\footnote{\url{}}.
 
 In the initial Finnish parser model there were relatively large tagset, all of
 which did not contain information we found necessary for task of
 spell-checking, such as discourse particles, which are relatively
 context-agnostic~\cite{visk}, so we opted to simplify the tagging on these
 parts. Furthermore the parser used for training produced heuristic readings for
-unrecognised word-forms, which we also removed.
+unrecognised word-forms, which we also removed. Finally, we needed to add
+extra discount for the word forms unknown to dictionary for the n-gram model,
+since they were more common and diverse for Finnish than English.
 
 \section{Tests and Evaluation}
 \label{sec:evaluation}
 
-The evaluation of the correction suggestion quality is descrcribed in
-tables~\ref{table:real-eval}~and~\ref{table:fake-eval}. The
-table~\ref{table:real-eval} contains precision values for the spelling errors
-from real texts, and table~\ref{table:fake-eval} for the automatically
+The evaluation of the correction suggestion quality is described in
+Tables~\ref{table:real-eval}~and~\ref{table:fake-eval}. The
+Table~\ref{table:real-eval} contains precision values for the spelling errors
+from real texts, and Table~\ref{table:fake-eval} for the automatically
 introduced spelling errors. The precision is measured by ranked suggestions. In
-the tables, we give the results separately for ranks 1---4, and for the
-remaining lower ranks.  In the last column, we have the cases where a correctly
-written word could not be found with the tested suggestion algorithm.  The rows
-of table represent different combinations of the n-gram models. The first row
-is a baseline score achieved by the unigram dictionary and the weighted edit
-distance model alone.
+the tables, we give the results separately for ranks 1---4, and for the cases
+that are beyond the error or langauge model used.  In the last column, we have
+the cases where a correctly This has nearly the same effect as using separate
+dictionary for suggestions, that excludes the heavily weighted forms, without
+requiring the extra space.  written word could not be found with the tested
+suggestion algorithm.  The rows of table represent different combinations of
+the n-gram models. The first row is a baseline score achieved by the unigram
+dictionary and the weighted edit distance model alone.
 
 \begin{table*}[h]
-  \begin{center}
-    \caption{Precision of suggestion algorithms with real spelling errors
+    \caption{Precision of suggestion algorithms with real spelling errors.
     \label{table:real-eval}}
+  \begin{center}
     \begin{scriptsize}
-      \begin{tabular}{l|llll|l|l|l}
+      \begin{tabular}{lrrrrrrr}
         \hline
         Algorithm & 1 & 2 & 3 & 4 & None & Total \\
         \hline
@@ -400,17 +406,9 @@ distance model alone.
         (baseline) 
 & 43.5 \% & 0.7 \% & 47.1 \% & 1.4 \% & 0.7 \%  & 100.0 \% \\
         \hline
-        Analysis & & & & & & & \\
-        Trigrams & & & & & & & \\
-        \hline
-        Surface  &       &      &      &      &       &       &     \\
-        trigrams &    \% &   \% &   \% &   \% &    \% &    \% & 100 \% \\
-        \hline
-        Some     &       &      &      &      &       &       &     \\
-        hybrid   &    \% &   \% &   \% &   \% &    \% &    \% & 100 \% \\
-        \hline
-        Another  &       &      &      &      &       &       &     \\
-        hybrid   &    \% &   \% &   \% &   \% &    \% &    \% & 100 \% \\
+        N-grams 
+& & & & & & & \\
+& & & & & & & \\
         \hline
         \multicolumn{7}{c}{\textbf{Finnish}} \\
         \hline
@@ -420,73 +418,45 @@ distance model alone.
 & 68.6 \% & 6.5 \% & 4.0 \% & 4.7 \% & 7.5 \% & 100.0 \% \\
 
         \hline
-        Analysis
+        N-grams
 &       &      &      &      &       &       &     \\
-        trigrams
 &       &      &      &      &       &       &     \\
-        \hline
-        Surface  
-&       &      &      &      &       &       &     \\
-        trigrams 
-&    \% &   \% &   \% &   \% &    \% &    \% & 100 \% \\
-        \hline
-        Some    
-&       &      &      &      &       &       &     \\
-        hybrid  
-&    \% &   \% &   \% &   \% &    \% &    \% & 100 \% \\
-        \hline
-        Another  
-&       &      &      &      &       &       &     \\
-        hybrid   
-&    \% &   \% &   \% &   \% &    \% &    \% & 100 \% \\
         \hline
       \end{tabular}
     \end{scriptsize}
   \end{center}
 \end{table*}
 
-\begin{table*}[h]
-  \begin{center}
-    \caption{Precision of suggestion algorithms with automated spelling errors
+\begin{table*}
+    \caption{Precision of suggestion algorithms with automated spelling errors.
     \label{table:fake-eval}}
+  \begin{center}
     \begin{scriptsize}
-      \begin{tabular}{l|rrrr|r|r|r}
+      \begin{tabular}{lrrrrrr}
         \hline
-        Algorithm & 1 & 2 & 3 & 4 & Lower & None & Total \\
+        Algorithm & 1 & 2 & 3 & 4 & None & Total \\
         \hline
-        \multicolumn{8}{c}{\textbf{English}} \\
+        \multicolumn{7}{c}{\textbf{English}} \\
         \hline
-        Unigrams   &     &       &      &      &       &       &     \\
-        (baseline) &  \% &    \% &   \% &   \% &    \% &    \% & 100 \% \\
+        Unigrams
+ &     &       &      &      &        &     \\
+        (baseline)
+ &  \% &    \% &   \% &   \% &    \%  & 100 \% \\
         \hline
-        Analysis &       &      &      &      &       &       &     \\
-        trigrams &    \% &   \% &   \% &   \% &    \% &    \% & 100 \% \\
+        N-grams
+&       &      &      &      &       &     \\
+&    \% &   \% &   \% &   \% &    \% & 100 \% \\
         \hline
-        Surface  &       &      &      &      &       &       &     \\
-        trigrams &    \% &   \% &   \% &   \% &    \% &    \% & 100 \% \\
+        \multicolumn{7}{c}{\textbf{Finnish}} \\
         \hline
-        Some     &       &      &      &      &       &       &     \\
-        hybrid   &    \% &   \% &   \% &   \% &    \% &    \% & 100 \% \\
+        Unigrams
+   &     &       &      &      &       &     \\
+        (baseline)
+ &  \% &    \% &   \% &   \% &    \% & 100 \% \\
         \hline
-        Another  &       &      &      &      &       &       &     \\
-        hybrid   &    \% &   \% &   \% &   \% &    \% &    \% & 100 \% \\
-        \hline
-        \multicolumn{8}{c}{\textbf{Finnish}} \\
-        \hline
-        Unigrams   &     &       &      &      &       &       &     \\
-        (baseline) &  \% &    \% &   \% &   \% &    \% &    \% & 100 \% \\
-        \hline
-        Analysis &       &      &      &      &       &       &     \\
-        trigrams &    \% &   \% &   \% &   \% &    \% &    \% & 100 \% \\
-        \hline
-        Surface  &       &      &      &      &       &       &     \\
-        trigrams &    \% &   \% &   \% &   \% &    \% &    \% & 100 \% \\
-        \hline
-        Some     &       &      &      &      &       &       &     \\
-        hybrid   &    \% &   \% &   \% &   \% &    \% &    \% & 100 \% \\
-        \hline
-        Another  &       &      &      &      &       &       &     \\
-        hybrid   &    \% &   \% &   \% &   \% &    \% &    \% & 100 \% \\
+        N-grams 
+&       &      &      &      &       &     \\
+ &    \% &   \% &   \% &   \% &    \% & 100 \% \\
         \hline
       \end{tabular}
     \end{scriptsize}
@@ -522,15 +492,15 @@ only residue of following hard cases to be solved.
 
 We did not perform any work to optimize the trigram analysis and selection,
 but we found that the speed of the system is reasonable---even in its current
-form. The table~\ref{table:speed-eval} summarises the average
-speed of performing the experiments in tables~\ref{table:real-eval}~and~\ref{table:fake-eval}
+form. The Table~\ref{table:speed-eval} summarises the average
+speed of performing the experiments in Tables~\ref{table:real-eval}~and~\ref{table:fake-eval}
 
 \begin{table}[h]
-  \begin{center}
-    \caption{The speed of ranking the errors
+    \caption{The speed of ranking the errors.
     \label{table:speed-eval}}
+  \begin{center}
     \begin{scriptsize}
-      \begin{tabular}{l|rrrr}
+      \begin{tabular}{lrrrr}
         \hline
         Material  & English & automatic & Finnish & automatic \\
         Algorithm & real    &           & real    &           \\
@@ -588,7 +558,7 @@ more than 0~\%.
 % We are grateful to Sam Hardwick for the spell checking software and the
 % HFST research group for fruitful discussions.
 
-\bibliographystyle{unsrt}
+\bibliographystyle{splncs}
 \bibliography{cicling2011}
 
 

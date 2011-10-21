@@ -10,16 +10,23 @@ cicling-2011-contextspell.pdf: cicling-2011-contextspell.tex cicling2011.bib
 	$(TEX) cicling-2011-contextspell.tex
 	$(TEX) cicling-2011-contextspell.tex
 
-# automata building rules
+# dictionary and edit distance targets
 OMORFI=hfst/fi
 NORVIG=hfst/en
 
+# locally installed dictionarise
 prefix=/usr/local
 sharedir=$(prefix)/share
 
+# context model targets
 CONTEXT_SPELLER=bin/context_speller 
 EN_TAGGER=taggers/en/hmm_model.lex taggers/en/hmm_model.seq
 FI_TAGGER=taggers/fin/hmm_model.lex taggers/fin/hmm_model.seq
+
+# parameters
+UNIGRAM_BACKOFF=5.2667
+# 6.90878 = -log(1/1000) i.e. one typo per 1000 words
+ERROR_PROBABILITY=6.9078
 
 $(OMORFI):
 	mkdir -p $@
@@ -27,9 +34,11 @@ $(OMORFI):
 $(NORVIG):
 	mkdir -p $@
 
-.PHONY: automata automata-fi automata-en results results-fi results-en textables textables-fi textables-en
+.PHONY: automata automata-fi automata-en results results-fi results-en textables textables-fi textables-en context_speller context-results
 
-context_speller:
+# rulem amiking stuff
+context_speller: bin/context_speller
+bin/context_speller:
 	$(MAKE) -C src/ install
 
 automata: automata-fi automata-en
@@ -39,10 +48,11 @@ automata-fi: $(OMORFI)/dictionary.limited.hfst $(OMORFI)/dictionary.default-boun
 automata-en: $(NORVIG)/dictionary.default.hfst $(NORVIG)/edit-distance-2.hfst
 
 # finnish automata; gather dictionares from omorfi
-# NB: backoff at 5.25667 needs to be changed if other wiki is used
+
+
 $(OMORFI)/dictionary.limited.hfst: $(sharedir)/hfst/fi/dictionary.filtered.hfst $(OMORFI)/dictionary.fiwiki.hfst
 	hfst-fst2fst $(sharedir)/hfst/fi/dictionary.filtered.hfst -f openfst-tropical |\
-		hfst-reweight -e -a 5.2667 |\
+		hfst-reweight -e -a $(UNIGRAM_BACKOFF) |\
 		hfst-union $(OMORFI)/dictionary.fiwiki.hfst |\
 		hfst-minimize |\
 		hfst-fst2fst -f  olw -o $@
@@ -50,7 +60,7 @@ $(OMORFI)/dictionary.limited.hfst: $(sharedir)/hfst/fi/dictionary.filtered.hfst 
 # ensure current svn revision with boundary weighting
 $(OMORFI)/dictionary.default-boundaryweight-medium.hfst: $(sharedir)/hfst/fi/dictionary.default.hfst $(OMORFI)/dictionary.fiwiki.hfst
 	hfst-fst2fst $(sharedir)/hfst/fi/dictionary.default.hfst -f openfst-tropical |\
-		hfst-reweight -e -a 5.2667 |\
+		hfst-reweight -e -a $(UNIGRAM_BACKOFF) |\
 		hfst-union $(OMORFI)/dictionary.fiwiki.hfst |\
 		hfst-minimize |\
 		hfst-fst2fst -f  olw -o $@
@@ -58,7 +68,7 @@ $(OMORFI)/dictionary.default-boundaryweight-medium.hfst: $(sharedir)/hfst/fi/dic
 $(OMORFI)/dictionary.default-boundaryweight-small.hfst: $(sharedir)/hfst/fi/dictionary.default.hfst $(OMORFI)/dictionary.fiwiki.hfst
 	hfst-fst2fst $(sharedir)/hfst/fi/dictionary.default.hfst -f openfst-tropical |\
 		hfst-reweight -b 0.01 |\
-		hfst-reweight -e -a 5.2667 |\
+		hfst-reweight -e -a $(UNIGRAM_BACKOFF) |\
 		hfst-union $(OMORFI)/dictionary.fiwiki.hfst |\
 		hfst-minimize |\
 		hfst-fst2fst -f  olw -o $@
@@ -66,7 +76,7 @@ $(OMORFI)/dictionary.default-boundaryweight-small.hfst: $(sharedir)/hfst/fi/dict
 $(OMORFI)/dictionary.default-boundaryweight-huge.hfst: $(sharedir)/hfst/fi/dictionary.default.hfst $(OMORFI)/dictionary.fiwiki.hfst
 	hfst-fst2fst $(sharedir)/hfst/fi/dictionary.default.hfst -f openfst-tropical |\
 		hfst-reweight -b 100 |\
-		hfst-reweight -e -a 5.2667 |\
+		hfst-reweight -e -a $(UNIGRAM_BACKOFF) |\
 		hfst-union $(OMORFI)/dictionary.fiwiki.hfst |\
 		hfst-minimize |\
 		hfst-fst2fst -f  olw -o $@
@@ -74,7 +84,7 @@ $(OMORFI)/dictionary.default-boundaryweight-huge.hfst: $(sharedir)/hfst/fi/dicti
 $(OMORFI)/dictionary.default-boundaryweight-none.hfst: $(sharedir)/hfst/fi/dictionary.default.hfst $(OMORFI)/dictionary.fiwiki.hfst
 	hfst-fst2fst $(sharedir)/hfst/fi/dictionary.default.hfst -f openfst-tropical |\
 		hfst-reweight -b 0 |\
-		hfst-reweight -e -a 5.2667 |\
+		hfst-reweight -e -a $(UNIGRAM_BACKOFF) |\
 		hfst-union $(OMORFI)/dictionary.fiwiki.hfst |\
 		hfst-minimize |\
 		hfst-fst2fst -f  olw -o $@
@@ -86,9 +96,8 @@ $(OMORFI)/dictionary.fiwiki.hfst: fiwiki.strings
 		hfst-minimize -v -o $@
 
 
-# 6.90878 = -log(1/1000) i.e. one typo per 1000 words
 $(OMORFI)/error.edit-distance-2-medium.hfst:  edit-distance.bash
-	./edit-distance.bash 2 6.9078 a b c d e f g h i j k l m n o p q r s š t u v w x y z ž å ä ö |\
+	./edit-distance.bash 2 $(ERROR_PROBABILITY) a b c d e f g h i j k l m n o p q r s š t u v w x y z ž å ä ö |\
 		hfst-txt2fst -v -f openfst-tropical |\
 		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
@@ -124,9 +133,8 @@ $(NORVIG)/dictionary.default.hfst: big.txt tropicalize-uniq-c.awk
 		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
 
-# 6.90878 = -log(1/1000) i.e. one typo per 1000 words
 $(NORVIG)/error.edit-distance-2.hfst: edit-distance.bash 
-	./edit-distance.bash 2 6.9078 a b c d e f g h i j k l m n o p q r s t u v w x y z |\
+	./edit-distance.bash 2 $(ERROR_PROBABILITY) a b c d e f g h i j k l m n o p q r s t u v w x y z |\
 		hfst-txt2fst -v -f openfst-tropical |\
 		hfst-minimize -v  |\
 		hfst-fst2fst -v -f olw -o $@
@@ -145,9 +153,9 @@ RESULTS_EN=results/en-US.norvig1.dictionary-norvig.edit-distance-2.unigrams resu
 # context speller result files
 context-results: context-results-fi context-results-en
 
-context-results-fi:results-fi $(RESULTS_FI:%.unigrams=%.ngrams)
+context-results-fi:results-fi $(RESULTS_FI:%.unigrams=%.ngrams.10)
 
-context-results-en:results-en $(RESULTS_EN:%.unigrams=%.ngrams)
+context-results-en:results-en $(RESULTS_EN:%.unigrams=%.ngrams.10)
 
 results-en:$(RESULTS_EN) 
 
@@ -157,23 +165,132 @@ context-adjustment-results-fi:adjustment-results-fi $(ADJUSTMENT_RESULTS_FI:%.un
 
 adjustment-results-fi:$(ADJUSTMENT_RESULTS_FI)
 
-fi%.ngrams: fi%.unigrams
-	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 10.0 > $@.10 ;
+fi%.ngrams: fi%.ngrams.1 fi%.ngrams.2 fi%.ngrams.3 fi%.ngrams.4 fi%.ngrams.5 fi%.ngrams.6 fi%.ngrams.7 fi%.ngrams.8 fi%.ngrams.9 fi%.ngrams.10
 
-juha%.ngrams: juha%.unigrams
-	for i in 1 2 3 4 5 6 7 8 9 10 ; \
-	do \
-		cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) $$i > $@.$$i ; \
-	done
+fi%.ngrams.1: fi%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 1.0 > $@
 
-alice%.ngrams: alice%.unigrams
-	for i in 1 2 3 4 5 6 7 8 9 10 ; \
-	do \
-		cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) $$i > $@.$$i ; \
-	done
+fi%.ngrams.2: fi%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 2.0 > $@
 
-en%.ngrams: en%.unigrams
-	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 10.0 > $@.10
+fi%.ngrams.3: fi%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 3.0 > $@
+
+fi%.ngrams.4: fi%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 4.0 > $@
+
+fi%.ngrams.5: fi%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 5.0 > $@
+
+fi%.ngrams.6: fi%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 6.0 > $@
+
+fi%.ngrams.7: fi%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 7.0 > $@
+
+fi%.ngrams.8: fi%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 8.0 > $@
+
+fi%.ngrams.9: fi%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 9.0 > $@
+
+fi%.ngrams.10: fi%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 10.0 > $@
+
+juha%.ngrams: juha%.ngrams.1 juha%.ngrams.2 juha%.ngrams.3 juha%.ngrams.4 juha%.ngrams.5 juha%.ngrams.6 juha%.ngrams.7 juha%.ngrams.8 juha%.ngrams.9 juha%.ngrams.10
+alice%.ngrams: alice%.ngrams.1 alice%.ngrams.2 alice%.ngrams.3 alice%.ngrams.4 alice%.ngrams.5 alice%.ngrams.6 alice%.ngrams.7 alice%.ngrams.8 alice%.ngrams.9 alice%.ngrams.10
+
+juha%.ngrams.1: juha%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 1 > $@
+
+alice%.ngrams.1: alice%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 1 > $@
+
+juha%.ngrams.2: juha%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 2 > $@
+
+alice%.ngrams.2: alice%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 2 > $@
+
+juha%.ngrams.3: juha%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 3 > $@
+
+alice%.ngrams.3: alice%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 3 > $@
+
+juha%.ngrams.4: juha%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 4 > $@
+
+alice%.ngrams.4: alice%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 4 > $@
+
+juha%.ngrams.5: juha%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 5 > $@
+
+alice%.ngrams.5: alice%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 5 > $@
+
+juha%.ngrams.6: juha%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 6 > $@
+
+alice%.ngrams.6: alice%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 6 > $@
+
+juha%.ngrams.7: juha%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 7 > $@
+
+alice%.ngrams.7: alice%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 7 > $@
+
+juha%.ngrams.8: juha%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 8 > $@
+
+alice%.ngrams.8: alice%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 8 > $@
+
+juha%.ngrams.9: juha%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 9 > $@
+
+alice%.ngrams.9: alice%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 9 > $@
+
+juha%.ngrams.10: juha%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(FI_TAGGER) 10 > $@
+
+alice%.ngrams.10: alice%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 10 > $@
+
+en%.ngrams: en%.ngrams.1 en%.ngrams.2 en%.ngrams.3 en%.ngrams.4 en%.ngrams.5 en%.ngrams.6 en%.ngrams.7 en%.ngrams.8 en%.ngrams.9 en%.ngrams.10
+
+en%.ngrams.1: en%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 1.0 > $@
+
+en%.ngrams.2: en%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 2.0 > $@
+
+en%.ngrams.3: en%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 3.0 > $@
+
+en%.ngrams.4: en%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 4.0 > $@
+
+en%.ngrams.5: en%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 5.0 > $@
+
+en%.ngrams.6: en%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 6.0 > $@
+
+en%.ngrams.7: en%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 7.0 > $@
+
+en%.ngrams.8: en%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 8.0 > $@
+
+en%.ngrams.9: en%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 9.0 > $@
+
+en%.ngrams.10: en%.unigrams
+	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 10.0 > $@
 
 
 textables: textables-fi textables-en
@@ -182,8 +299,9 @@ textables-fi: results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance
 
 textables-en: results/en-US.norvig1.dictionary-norvig.edit-distance-2.tex results/en-US.norvig2.dictionary-norvig.edit-distance-2.tex
 
-results/%.tex: results/%.unigrams
-	sed -e 's/\[[^]]*\]//g' < $< | awk -f results2tex.awk > $@
+results/%.tex: results/%.unigrams results/%.ngrams.10
+	sed -e 's/\[[^]]*\]//g' < results/$*.unigrams | awk -f results2tex.awk > $@
+	sed -e 's/\[[^]]*\]//g' < results/$*.ngrams.10 | awk -f results2tex.awk >> $@
 
 results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-none.unigrams: fi-FI.fiwiki-gutenberg.contextspell $(OMORFI)/dictionary.default-boundaryweight-none.hfst $(OMORFI)/error.edit-distance-2-none.hfst
 	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-none.hfst $(OMORFI)/dictionary.default-boundaryweight-none.hfst < fi-FI.fiwiki-gutenberg.contextspell > $@
