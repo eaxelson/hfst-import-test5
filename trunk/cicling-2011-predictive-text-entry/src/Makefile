@@ -2,7 +2,8 @@ CXXFLAGS=-Wall -Wextra -Wfatal-errors -O3
 LDFLAGS=-lhfst
 
 PROGS=train_hmm_4_tagger train_sequencer train_morpheme_sequence_model \
-      t9_suggest t9_suggest_kpc compute_kpc deleted_interpolation
+      t9_suggest t9_suggest_kpc compute_kpc deleted_interpolation \
+      train_hmm_4_tagger_tur train_morpheme_sequence_model_tur
 
 SequenceWeighter_EXT_SOURCES=SequenceCounter.cc
 SequenceWeightTable_EXT_SOURCES=StringTransformerList.cc SequenceCounter.cc \
@@ -89,10 +90,13 @@ clean:
 	rm -f $(PROGS)
 
 train_hmm_4_tagger:train_hmm_4_tagger.cc HMM4Tagger.cc $(HMMTagger_EXT_SOURCES)
+train_hmm_4_tagger_tur:train_hmm_4_tagger_tur.cc HMM4TaggerTur.cc $(HMMTagger_EXT_SOURCES)
 t9_suggest: t9_suggest.cc Sequencer.cc HMMTagger.cc $(HMMTagger_EXT_SOURCES)
 t9_suggest_kpc: t9_suggest_kpc.cc Sequencer.cc HMMTagger.cc $(HMMTagger_EXT_SOURCES)
 train_sequencer:train_sequencer.cc Sequencer.cc $(Sequencer_EXT_SOURCES)
 train_morpheme_sequence_model:train_morpheme_sequence_model.cc \
+                              SequenceModel.cc $(SequenceModel_EXT_SOURCES)
+train_morpheme_sequence_model_tur:train_morpheme_sequence_model_tur.cc \
                               SequenceModel.cc $(SequenceModel_EXT_SOURCES)
 compute_kpc:KeyStrokesPerCharacter.cc
 	g++ -o compute_kpc KeyStrokesPerCharacter.cc -lhfst
