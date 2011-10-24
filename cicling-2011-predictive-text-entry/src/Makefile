@@ -2,7 +2,7 @@ CXXFLAGS=-Wall -Wextra -Wfatal-errors -O3
 LDFLAGS=-lhfst
 
 PROGS=train_hmm_4_tagger train_sequencer train_morpheme_sequence_model \
-      t9_suggest t9_suggest_kpc compute_kpc
+      t9_suggest t9_suggest_kpc compute_kpc deleted_interpolation
 
 SequenceWeighter_EXT_SOURCES=SequenceCounter.cc
 SequenceWeightTable_EXT_SOURCES=StringTransformerList.cc SequenceCounter.cc \
