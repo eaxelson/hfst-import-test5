@@ -13,7 +13,7 @@ ConfigStringPair config_string_pairs[2] =
 ConfigStringPairVector config_string_pair_vector(config_string_pairs,
 						 config_string_pairs + 2);
 
-float coeffs[2] = {1.0,1.0};
+float coeffs[2] = {0.894701,0.105298};
 
 FloatVector coefficients(coeffs,coeffs+2);
 
