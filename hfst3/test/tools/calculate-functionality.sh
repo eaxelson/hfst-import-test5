@@ -1,4 +1,8 @@
 #!/bin/sh
+if ! test -x ../../tools/src/hfst-calculate; then
+    exit 0;
+fi
+
 for i in "" .sfst .ofst .foma; do
     FFLAG=
     case $i in
