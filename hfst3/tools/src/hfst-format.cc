@@ -38,27 +38,37 @@
 using std::ifstream;
 using std::ios;
 
-//using hfst::ImplementationType;
-//using hfst::HfstInputStream;
+using hfst::HfstTransducer;
 
-//bool verbose = false;
+static bool list_formats = false;
+static char * format_to_test = NULL;
 
 void
 print_usage()
 {
-        // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
-        fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
-                   "determine HFST transducer format\n"
-                "\n", program_name);
-
-        print_common_program_options(message_out);
-        print_common_unary_program_options(message_out);
-        fprintf(message_out, "\n");
-    print_common_unary_program_parameter_instructions(message_out);
-    fprintf(message_out, "\n");
-    print_report_bugs();
-    fprintf(message_out, "\n");
-    print_more_info();
+  // c.f. 
+  // http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
+  fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
+	  "determine HFST transducer format\n"
+	  "\n", program_name);
+  
+  print_common_program_options(message_out);
+  print_common_unary_program_options(message_out);
+  fprintf
+    (message_out, 
+     "Tool-specific options:\n"
+     "  -l, --list-formats     List available transducer formats\n"
+     "                         and print them to standard output\n");
+  fprintf
+    (message_out, 
+     "  -t, --test-format FMT  Whether the format FMT is available,\n"
+     "                         exits with 0 if it is, else with 1\n");
+  fprintf(message_out, "\n");
+  print_common_unary_program_parameter_instructions(message_out);
+  fprintf(message_out, "\n");
+  print_report_bugs();
+  fprintf(message_out, "\n");
+  print_more_info();
 }
 
 
@@ -74,12 +84,13 @@ parse_options(int argc, char** argv)
           HFST_GETOPT_UNARY_LONG,
           {"input1", required_argument, 0, '1'},
           {"input2", required_argument, 0, '2'},
-          {"lexicon", required_argument, 0, 'l'},
+          {"list-formats", no_argument, 0, 'l'},
+	  {"test-format", required_argument, 0, 't'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "1:2:l:",
+                             HFST_GETOPT_UNARY_SHORT "1:2:lt:",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -95,15 +106,79 @@ parse_options(int argc, char** argv)
         case '2':
           inputfilename = strdup(optarg);
           break;
-        case 'l':
+	  /*case 'l':
           inputfilename = strdup(optarg);
-          break;
+          break;*/
+	case 'l':
+	  list_formats=true;
+	  break;
+	case 't':
+	  format_to_test= strdup(optarg);
+	  break;
         default:
           // I suppose it's crucial for this tool to ignore other options
           break;
         }
     }
 
+    if (format_to_test != NULL)
+      {
+	if ((strcmp(format_to_test, "sfst") == 0 &&
+	     HfstTransducer::is_implementation_type_available
+	     (hfst::SFST_TYPE))
+	    ||
+	    (strcmp(format_to_test, "openfst-tropical") == 0 &&
+	     HfstTransducer::is_implementation_type_available
+	     (hfst::TROPICAL_OPENFST_TYPE))
+	    ||
+	    (strcmp(format_to_test, "openfst-log") == 0 &&
+	     HfstTransducer::is_implementation_type_available
+	     (hfst::LOG_OPENFST_TYPE))
+	    ||
+	    (strcmp(format_to_test, "foma") == 0 &&
+	     HfstTransducer::is_implementation_type_available
+	     (hfst::FOMA_TYPE))
+	    ||
+	    (strcmp(format_to_test, "optimized-lookup-unweighted") == 0 &&
+	     HfstTransducer::is_implementation_type_available
+	     (hfst::HFST_OL_TYPE))
+	    ||
+	    (strcmp(format_to_test, "optimized-lookup-weighted") == 0 &&
+	     HfstTransducer::is_implementation_type_available
+	     (hfst::HFST_OLW_TYPE))
+	    )
+	  exit(0);
+	exit(1);
+	}
+
+    if (list_formats)
+      {
+	if (HfstTransducer::is_implementation_type_available
+	    (hfst::SFST_TYPE))
+	  fprintf(stdout, "sfst\n");
+
+	if (HfstTransducer::is_implementation_type_available
+	    (hfst::TROPICAL_OPENFST_TYPE))
+	  fprintf(stdout, "openfst-tropical\n");
+	
+	if (HfstTransducer::is_implementation_type_available
+	    (hfst::LOG_OPENFST_TYPE))
+	  fprintf(stdout, "openfst-log\n");
+	
+	if (HfstTransducer::is_implementation_type_available
+	    (hfst::FOMA_TYPE))
+	  fprintf(stdout, "foma\n");
+	
+	if (HfstTransducer::is_implementation_type_available
+	    (hfst::HFST_OL_TYPE))
+	  fprintf(stdout, "optimized-lookup-unweighted\n");	      
+	
+	if (HfstTransducer::is_implementation_type_available
+	    (hfst::HFST_OLW_TYPE))
+	  fprintf(stdout, "optimized-lookup-weighted\n");
+	
+	exit(0);
+      }
 
     (void)inputfilename;
     (void)inputNamed;
