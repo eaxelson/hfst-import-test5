@@ -18,7 +18,8 @@ ConfigStringPairVector hmm_config_string_pair_vector(config_string_pairs,
 float f = 0.60;
 float k = 1.4;
 //float coeffs[3] = {k*0.28,k*0.34,k*0.38};
-float coeffs[4] = {k*0.4,f*k*0.48,f*k*0.24,f*k*0.28};
+//float coeffs[4] = {k*0.4,f*k*0.48,f*k*0.24,f*k*0.28};
+float coeffs[4] = {0.232394,0.189567,0.578038,0};
 
 FloatVector coefficients(coeffs,coeffs+4);
 
