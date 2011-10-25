@@ -165,7 +165,8 @@ noinst_HEADERS= \
 	inc/getopt-cases-common.h inc/getopt-cases-error.h  \
 	inc/getopt-cases-unary.h  inc/globals-binary.h      \
 	inc/globals-common.h      inc/globals-unary.h \
-	HfstStrings2FstTokenizer.h HfstLookupFlagDiacritics.h
+	HfstStrings2FstTokenizer.h HfstLookupFlagDiacritics.h \
+	hfst-tool-metadata.h
 # parsers/XreCompiler.h parsers/xre_utils.h
 
 # sort alphabetically
