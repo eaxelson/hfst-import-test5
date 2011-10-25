@@ -1,5 +1,5 @@
 #!/bin/sh
-if ! ../../tools/src/hfst-lookup cat.hfst < cat.strings > test.lookups ; then
+if ! ../../tools/src/hfst-lookup -s cat.hfst < cat.strings > test.lookups ; then
     exit 1
 fi
 
@@ -10,7 +10,7 @@ for i in "" .sfst .ofst .foma; do
 
     if test -f abid.hfst$i ; then
 
-	if ! echo "aa" | ../../tools/src/hfst-lookup abid.hfst$i \
+	if ! echo "aa" | ../../tools/src/hfst-lookup -s abid.hfst$i \
 	    > test.lookups; 
 	then
 	    exit 1
@@ -20,7 +20,7 @@ for i in "" .sfst .ofst .foma; do
 	    exit 1
 	fi
 	
-	if ! echo "ab" | ../../tools/src/hfst-lookup abid.hfst$i \
+	if ! echo "ab" | ../../tools/src/hfst-lookup -s abid.hfst$i \
 	    > test.lookups; 
 	then
 	    exit 1
@@ -30,7 +30,7 @@ for i in "" .sfst .ofst .foma; do
 	    exit 1
 	fi
 	
-	if ! echo "ac" | ../../tools/src/hfst-lookup abid.hfst$i \
+	if ! echo "ac" | ../../tools/src/hfst-lookup -s abid.hfst$i \
 	    > test.lookups; 
 	then
 	    exit 1
