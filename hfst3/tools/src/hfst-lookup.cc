@@ -1760,12 +1760,14 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
             if (!internal_transducers)
               {
                 char* format_string = hfst_strformat(cascade[0].get_type());
-                warning(0, 0, 
-                        "It is not possible to perform fast lookups with %s "
-                        "format automata.\n"
-                        "Converting to HFST basic transducer format "
-                        "and performing slow lookups",
-                        format_string);
+		if (!silent) {
+		  warning(0, 0, 
+			  "It is not possible to perform fast lookups with %s "
+			  "format automata.\n"
+			  "Converting to HFST basic transducer format "
+			  "and performing slow lookups",
+			  format_string);
+		}
                 free(format_string);
                 for (unsigned int i=0; i<cascade.size(); i++) 
                   {
