@@ -109,12 +109,6 @@ AC_ARG_ENABLE([affix_guessify],
 			  [enable_affix_guessify=$enableval],
 			  [enable_affix_guessify=yes])
 AM_CONDITIONAL([WANT_AFFIX_GUESSIFY], [test x$enable_affix_guessify != xno])
-AC_ARG_ENABLE([apertium2fst],
-			  [AS_HELP_STRING([--enable-apertium2fst],
-							  [build apertium2fst tool @<:@default=yno@:>@])],
-			  [enable_apertium2fst=$enableval],
-			  [enable_apertium2fst=no])
-AM_CONDITIONAL([WANT_APERTIUM2FST], [test x$enable_apertium2fst != xno])
 AC_ARG_ENABLE([calculate],
 			  [AS_HELP_STRING([--enable-calculate],
 							  [build calculate tool @<:@default=no@:>@])],
@@ -175,12 +169,6 @@ AC_ARG_ENABLE([edit_metadata],
 			  [enable_edit_metadata=$enableval],
 			  [enable_edit_metadata=yes])
 AM_CONDITIONAL([WANT_EDIT_METADATA], [test x$enable_edit_metadata != xno])
-AC_ARG_ENABLE([flag_diacritics],
-			  [AS_HELP_STRING([--enable-flag-diacritics],
-							  [build flag diacritic tool @<:@default=no@:>@])],
-			  [enable_flag_diacritics=$enableval],
-			  [enable_flag_diacritics=no])
-AM_CONDITIONAL([WANT_FLAG_DIACRITICS], [test x$enable_flag_diacritics != xno])
 AC_ARG_ENABLE([format],
 			  [AS_HELP_STRING([--enable-format],
 							  [build format tool @<:@default=yes@:>@])],
@@ -373,12 +361,6 @@ AC_ARG_ENABLE([txt2fst],
 			  [enable_txt2fst=$enableval],
 			  [enable_txt2fst=yes])
 AM_CONDITIONAL([WANT_TXT2FST], [test x$enable_txt2fst != xno])
-AC_ARG_ENABLE([xfst-compiler],
-			  [AS_HELP_STRING([--enable-xfst-compiler],
-							  [build xfst2fst cli tool @<:@default=no@:>@])],
-			  [enable_xfst_compiler=$enableval],
-			  [enable_xfst_compiler=no])
-AM_CONDITIONAL([WANT_XFST_COMPILER], [test x$enable_xfst_compiler != xno])
 
 # Disable stress tests by default
 AC_ARG_ENABLE([stress-tests],
@@ -442,9 +424,6 @@ AS_IF([test "x$with_readline" = "xyes"],
       [AC_SEARCH_LIBS([readline], [readline editline], 
                       [AC_DEFINE([HAVE_READLINE], 1, [if readline can be used])], 
                       [AC_MSG_FAILURE([readline test failed (--without-readline to disable)])])])
-
-AS_IF([test "x$enable_apertium2fst" != "xno"],
-      [PKG_CHECK_MODULES([LIBXML], [libxml-2.0 >= 2.6.19])])
 
 ### Add here your library ###
 #AS_IF([test "x$with_my_transducer_library" != "xno"],
@@ -511,14 +490,12 @@ cat <<EOF
     *         with foma: $with_foma
     *         with optimized lookup: $with_hfstol
     * tools including calculate: $enable_calculate (sfst-compiler)
-    *                 apertium2fst: $enable_apertium2fst
     *                 compare: $enable_compare
     *                 compose: $enable_compose
     *                 concatenate: $enable_concatenate
     *                 conjunct: $enable_conjunct (intersect)
     *                 determinize: $enable_determinize (determinise)
     *                 disjunct: $enable_disjunct (union)
-    *                 flag-diacritics: $enable_flag_diacritics
     *                 format: $enable_format
     *                 fst2fst: $enable_fst2fst
     *                 fst2strings: $enable_fst2strings (expand)
@@ -547,7 +524,6 @@ cat <<EOF
     *                 tail: $enable_tail
     *                 test: $enable_test
     *                 txt2fst: $enable_txt2fst
-    *                 xfst2fst: $enable_xfst_compiler
     * foma used for xfst: -> $FOMACLI
     * unicode parsed in corpus tools with: $with_unicode_handler
 EOF

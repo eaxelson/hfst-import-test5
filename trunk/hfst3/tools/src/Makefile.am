@@ -25,11 +25,6 @@ AM_CXXFLAGS = -Wno-deprecated
 if WANT_AFFIX_GUESSIFY
 MAYBE_AFFIX_GUESSIFY=hfst-affix-guessify
 endif
-if WANT_APERTIUM2FST
-MAYBE_APERTIUM2FST=hfst-apertium2fst
-hfst_apertium2fst_CXXFLAGS=$(AM_CXXFLAGS) $(CXXFLAGS) $(LIBXML_CFLAGS)
-hfst_apertium2fst_LDFLAGS=$(AM_LDFLAGS) $(LDFLAGS) $(LIBXML_LIBS)
-endif
 if WANT_COMPARE
 MAYBE_COMPARE=hfst-compare
 endif
@@ -150,12 +145,6 @@ endif
 if WANT_SUBSTITUTE
 MAYBE_SUBSTITUTE=hfst-substitute
 endif
-if WANT_FLAG_DIACRITICS
-MAYBE_FLAG_DIACRITICS=hfst-flag-diacritics
-endif
-if WANT_XFST_COMPILER
-MAYBE_XFST_COMPILER=hfst-xfst2fst
-endif
 
 noinst_HEADERS= \
 	calculate_functions.h hfst-commandline.h hfst-program-options.h \
@@ -177,7 +166,7 @@ noinst_HEADERS= \
 # finish with xyz
 # see <http://en.wikipedia.org/wiki/Alphabets#Alphabetic_order> for details
 bin_PROGRAMS= \
-			  $(MAYBE_AFFIX_GUESSIFY) $(MAYBE_APERTIUM2FST)             \
+			  $(MAYBE_AFFIX_GUESSIFY)              \
 			 $(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_CONCATENATE)     \
 			 $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) $(MAYBE_DISJUNCT)   \
 			 $(MAYBE_DUPLICATE) $(MAYBE_EDIT_METADATA)                  \
@@ -192,8 +181,8 @@ bin_PROGRAMS= \
 			 $(MAYBE_SPLIT) $(MAYBE_STRINGS2FST) $(MAYBE_STRIP_HEADER)  \
 			 $(MAYBE_SUBTRACT) $(MAYBE_SUMMARIZE) $(MAYBE_TAIL)         \
 			 $(MAYBE_TXT2FST) $(MAYBE_CALCULATE) $(MAYBE_SUBSTITUTE)    \
-			 $(MAYBE_FLAG_DIACRITICS) $(MAYBE_LEXC2FST) $(MAYBE_LEXC)   \
-			 $(MAYBE_XFST_COMPILER) $(MAYBE_FORMAT)                     \
+			 $(MAYBE_LEXC2FST) $(MAYBE_LEXC)   \
+			 $(MAYBE_FORMAT)                     \
 			 $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME) $(MAYBE_PAIR_TEST)\
 			 $(MAYBE_TRAVERSE)
 
@@ -201,7 +190,6 @@ HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc \
 				hfst-tool-metadata.cc
 # sort alphabetically
 hfst_affix_guessify_SOURCES=hfst-affix-guessify.cc $(HFST_COMMON_SRC)
-hfst_apertium2fst_SOURCES=hfst-apertium2fst.cc $(HFST_COMMON_SRC)
 hfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy HfstCompiler.cc HfstBasic.cc HfstAlphabet.cc HfstUtf8.cc $(HFST_COMMON_SRC)
 hfst_compare_SOURCES=hfst-compare.cc $(HFST_COMMON_SRC)
 hfst_compose_intersect_SOURCES=hfst-compose-intersect.cc $(HFST_COMMON_SRC)
@@ -212,7 +200,6 @@ hfst_determinize_SOURCES=hfst-determinize.cc $(HFST_COMMON_SRC)
 hfst_disjunct_SOURCES=hfst-disjunct.cc $(HFST_COMMON_SRC)
 hfst_duplicate_SOURCES=hfst-duplicate.cc $(HFST_COMMON_SRC)
 hfst_edit_metadata_SOURCES=hfst-edit-metadata.cc $(HFST_COMMON_SRC)
-hfst_flag_diacritics_SOURCES=hfst-flag-diacritics.cc $(HFST_COMMON_SRC)
 hfst_format_SOURCES=hfst-format.cc $(HFST_COMMON_SRC)
 hfst_fst2fst_SOURCES=hfst-fst2fst.cc $(HFST_COMMON_SRC)
 hfst_fst2strings_SOURCES=hfst-fst2strings.cc $(HFST_COMMON_SRC)
@@ -255,13 +242,6 @@ hfst_summarize_SOURCES=hfst-summarize.cc $(HFST_COMMON_SRC)
 hfst_tail_SOURCES=hfst-tail.cc $(HFST_COMMON_SRC)
 hfst_traverse_SOURCES=hfst-traverse.cc $(HFST_COMMON_SRC)
 hfst_txt2fst_SOURCES=hfst-txt2fst.cc $(HFST_COMMON_SRC)
-hfst_xfst2fst_SOURCES=hfst-xfst-compiler.cc $(HFST_COMMON_SRC) \
-					  parsers/XfstCompiler.cc parsers/xfst-parser.yy \
-					  parsers/xfst-lexer.ll parsers/xfst-utils.cc
-#					  parsers/LexcCompiler.cc parsers/lexc-parser.yy \
-#					  parsers/lexc-lexer.ll parsers/lexc-utils.cc \
-#					  parsers/XreCompiler.cc parsers/xre_parse.yy \
-#					  parsers/xre_lex.ll parsers/xre_utils.cc
 
 # aliases:
 hfst-determinise$(EXEEXT): hfst-determinize$(EXEEXT)
