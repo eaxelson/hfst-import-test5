@@ -6,18 +6,18 @@ GENERATED_FILES="temp.hfst temp.twolc.hfst temp.twolc.hfst0 temp.twolc.hfst1 tem
 
 echo "There are $NUMBER_OF_TESTS substests for hfst-twolc."
 
-echo "" | ../../hfst-txt2fst -f foma > /dev/null
+echo "" | ../../hfst-format --test-format foma > /dev/null
 FOMA_EXISTS=$?
 
-echo "" | ../../hfst-txt2fst -f openfst-log > /dev/null
+echo "" | ../../hfst-format --test-format openfst-log > /dev/null
 LOG_OPENFST_EXISTS=$?
 # Don't run tests for log-weight format.
 LOG_OPENFST_EXISTS=1
 
-echo "" | ../../hfst-txt2fst -f openfst-tropical > /dev/null
+echo "" | ../../hfst-format --test-format openfst-tropical > /dev/null
 TROPICAL_OPENFST_EXISTS=$?
 
-echo "" | ../../hfst-txt2fst -f sfst > /dev/null
+echo "" | ../../hfst-format --test-format sfst > /dev/null
 SFST_EXISTS=$?
 
 for f in $(ls -d $srcdir/* | egrep "test[0-9][0-9]*$" | sort -n)
