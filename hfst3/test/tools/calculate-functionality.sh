@@ -8,17 +8,17 @@ for i in "" .sfst .ofst .foma; do
     case $i in
         .sfst)
             FFLAG="-f sfst"
-	    if ! (../../tools/src/hfst-format --list-formats | grep "sfst") ; then
+	    if ! (../../tools/src/hfst-format --list-formats | grep "sfst" > /dev/null) ; then
 		continue;
 	    fi;;
         .ofst)
             FFLAG="-f openfst-tropical"
-	    if ! (../../tools/src/hfst-format --list-formats | grep "openfst-tropical") ; then
+	    if ! (../../tools/src/hfst-format --list-formats | grep "openfst-tropical" > /dev/null) ; then
 		continue;
 	    fi;;
         .foma)
             FFLAG="-f foma"
-	    if ! (../../tools/src/hfst-format --list-formats | grep "foma") ; then
+	    if ! (../../tools/src/hfst-format --list-formats | grep "foma" > /dev/null) ; then
 		continue;
 	    fi;;
         *)
