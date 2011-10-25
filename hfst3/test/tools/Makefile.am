@@ -64,7 +64,7 @@ DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   a2b_complement.hfst a2b_input_projection_complement.hfst empty.hfst \
 		   walk_or_dog.hfst
 OL_CHECKS=cat2dog.hfst.ol cat2dog.gen.hfst.ol cat_weight_final.hfst.ol \
-			proc-caps.hfst.ol proc-caps.gen.hfst.ol  \
+			proc-caps.hfst.ol proc-caps.gen.hfst.ol \
 			compounds.hfst.ol
 if WANT_SFST
 SFST_CHECKS=0to3cats.hfst.sfst 2to4cats.hfst.sfst 4cats.hfst.sfst\
@@ -137,14 +137,15 @@ FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-gen.strings \
 			proc-caps-out3.strings proc-caps-out4.strings \
 			proc-caps-out5.strings \
 			proc-cat-out.strings proc-cat-weighted-out.strings \
-			proc-compounds-out.strings \
+			proc-compounds-out.strings proc-compounds.strings \
 			utf-8.strings latin-1.strings \
 			cat2dog.strings heavycat.strings
 FST_PAIRS=cat2dog.pairs
 FST_PAIRSTRINGS=cat2dog.pairstring
 FST_SPACESTRINGS=cat2dog.spaces
 SUBSTITUTE_TXTS=cat2dog.substitute
-XRE_TXTS=cats_and_dogs.xre cats_and_dogs_semicolon.xre
+XRE_TXTS=cats_and_dogs.xre cats_and_dogs_semicolon.xre \
+	 at_file_quote.openfst-tropical.xre
 LEXC_TXTS=basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc \
 		  basic.empty-sides.lexc basic.end.lexc basic.escapes.lexc \
 		  basic.infostrings.lexc basic.initial-lexicon-empty.lexc \

@@ -24,7 +24,7 @@ using std::map;
 
 #include "HfstTransducer.h"
 #include "HfstFlagDiacritics.h"
-#include "HfstExceptions.h"
+#include "HfstExceptionDefs.h"
 #include "implementations/compose_intersect/ComposeIntersectLexicon.h"
 
 using hfst::implementations::ConversionFunctions;
