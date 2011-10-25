@@ -1,32 +1,32 @@
 #!/bin/sh
 if [ -x ../../tools/src/hfst-compare ] ; then
     # well, not all permutations, but reasonable
-    if ../../tools/src/hfst-compare -1 cat.hfst -2 dog.hfst  ; then
+    if ../../tools/src/hfst-compare -s -1 cat.hfst -2 dog.hfst  ; then
        exit 1
     fi
-    if ../../tools/src/hfst-compare -1 cat.hfst dog.hfst  ; then
+    if ../../tools/src/hfst-compare -s -1 cat.hfst dog.hfst  ; then
        exit 1
     fi
-    if ../../tools/src/hfst-compare -2 dog.hfst cat.hfst  ; then
+    if ../../tools/src/hfst-compare -s -2 dog.hfst cat.hfst  ; then
        exit 1
     fi
-    if ../../tools/src/hfst-compare dog.hfst -1 cat.hfst  ; then
+    if ../../tools/src/hfst-compare -s dog.hfst -1 cat.hfst  ; then
        exit 1
     fi
-    if ../../tools/src/hfst-compare cat.hfst -2 dog.hfst  ; then
+    if ../../tools/src/hfst-compare -s cat.hfst -2 dog.hfst  ; then
        exit 1
     fi
-    if ../../tools/src/hfst-compare cat.hfst < dog.hfst  ; then
+    if ../../tools/src/hfst-compare -s cat.hfst < dog.hfst  ; then
         exit 1
     fi
-    if ../../tools/src/hfst-compare -1 cat.hfst < dog.hfst  ; then
+    if ../../tools/src/hfst-compare -s -1 cat.hfst < dog.hfst  ; then
         exit 1
     fi
-    if ../../tools/src/hfst-compare -2 dog.hfst < cat.hfst  ; then
+    if ../../tools/src/hfst-compare -s -2 dog.hfst < cat.hfst  ; then
         exit 1
     fi
 fi
-rm test_*.hfst
+rm -f test_*.hfst
 for f in ../../tools/src/hfst-{conjunct,disjunct,compose,subtract,compose,compose-intersect} ; do
     if [ -x "$f" ] ; then
         # well, not all permutations, but reasonable
@@ -50,13 +50,13 @@ for f in ../../tools/src/hfst-{conjunct,disjunct,compose,subtract,compose,compos
         $f -2 dog.hfst -o test_named2stdin1namedout.hfst < cat.hfst  || exit 1
         for g in test_*.hfst ; do
             for h in test_*.hfst ; do
-                if ! ../../tools/src/hfst-compare $g $h  ; then
+                if ! ../../tools/src/hfst-compare -s $g $h  ; then
                     echo "$f builds $g and $h differently from same sources"
                     exit 1
                 fi
             done
         done
-        rm test_*.hfst
+        rm -f test_*.hfst
     fi
 done
 
@@ -68,13 +68,13 @@ for f in ../../tools/src/hfst-{determinize,invert,minimize,remove-epsilons,rever
         $f cat.hfst -o test_fileinnamedout.hfst || exit 1
         for g in test_*.hfst ; do
             for h in test_*.hfst ; do
-                if ! ../../tools/src/hfst-compare $g $h  ; then
+                if ! ../../tools/src/hfst-compare -s $g $h  ; then
                     echo "$f builds $g and $h differently from same sources"
                     exit 1
                 fi
             done
         done
-        rm test_*.hfst
+        rm -f test_*.hfst
     fi
 done
 
@@ -92,7 +92,7 @@ for f in ../../tools/src/hfst-{fst2strings,fst2txt} ; do
                 fi
             done
         done
-        rm test_*.txt
+        rm -f test_*.txt
     fi
 done
 

@@ -30,10 +30,10 @@ done
 p=compare
 comparables="cat.hfst dog.hfst tac.hfst cat2dog.hfst dog2cat.hfst cat_or_dog.hfst catdog.hfst"
 for f in $comparables; do
-    $VALGRIND --log-file=valgrind-logs/${p}${f}${f}.log ../../tools/src/hfst-compare $f $f $HFST_FLAGS
+    $VALGRIND --log-file=valgrind-logs/${p}${f}${f}.log ../../tools/src/hfst-compare -s $f $f $HFST_FLAGS
     for g in $comparables ; do
         if test $f != $g ; then
-            $VALGRIND --log-file=valgrind-logs/${p}${f}${g} hfst-compare $f $g
+            $VALGRIND --log-file=valgrind-logs/${p}${f}${g} hfst-compare -s $f $g
         fi
     done
 done

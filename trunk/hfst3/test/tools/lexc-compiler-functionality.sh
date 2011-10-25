@@ -40,7 +40,7 @@ for i in .sfst .ofst .foma ; do
             echo lexc2fst $FFLAG cat.lexc failed with $?
             exit 1
         fi
-        if ! ../../tools/src/hfst-compare cat.hfst$i test.hfst ; then
+        if ! ../../tools/src/hfst-compare -s cat.hfst$i test.hfst ; then
             exit 1
         fi
         rm test.hfst
@@ -58,7 +58,7 @@ for i in .sfst .ofst .foma ; do
         echo lexc2fst $FFLAG basic.multi-file-{1,2,3}.lexc failed with $?
         exit 1
     fi
-    if ! ../../tools/src/hfst-compare walk_or_dog.hfst$i test.hfst ; then
+    if ! ../../tools/src/hfst-compare -s walk_or_dog.hfst$i test.hfst ; then
         exit 1
     fi
 done

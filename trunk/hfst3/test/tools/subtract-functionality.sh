@@ -4,7 +4,7 @@ for i in "" .sfst .ofst .foma; do
         if ! ../../tools/src/hfst-subtract cat_or_dog.hfst$i dog.hfst$i > test.hfst ; then
             exit 1
         fi
-        if ! ../../tools/src/hfst-compare test.hfst cat.hfst$i  ; then
+        if ! ../../tools/src/hfst-compare -s test.hfst cat.hfst$i  ; then
             exit 1
         fi
         rm test.hfst;
@@ -16,7 +16,7 @@ for i in "" .sfst .ofst .foma; do
 	if ! ../../tools/src/hfst-subtract empty.hfst$i empty.hfst$i > test.hfst ; then
 	    exit 1
 	fi
-	if ! ../../tools/src/hfst-compare test.hfst empty.hfst$i ; then
+	if ! ../../tools/src/hfst-compare -s test.hfst empty.hfst$i ; then
 	    exit 1
 	fi
 #    else
@@ -56,13 +56,13 @@ if test -f cat2dog_0.3.hfst.ofst -a -f cat2dog_0.5.hfst.ofst ; then
     if ! ../../tools/src/hfst-subtract -1 cat2dog_0.3.hfst.ofst -2 cat2dog_0.5.hfst.ofst > test.hfst ; then
 	exit 1;
     fi
-    if ! ../../tools/src/hfst-compare empty.hfst.ofst test.hfst ; then
+    if ! ../../tools/src/hfst-compare -s empty.hfst.ofst test.hfst ; then
 	exit 1;
     fi
     if ! ../../tools/src/hfst-subtract -2 cat2dog_0.3.hfst.ofst -1 cat2dog_0.5.hfst.ofst > test.hfst ; then
 	exit 1;
     fi
-    if ! ../../tools/src/hfst-compare empty.hfst.ofst test.hfst ; then
+    if ! ../../tools/src/hfst-compare -s empty.hfst.ofst test.hfst ; then
 	exit 1;
     fi
     rm test.hfst;

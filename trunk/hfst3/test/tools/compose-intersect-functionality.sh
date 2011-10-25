@@ -27,7 +27,7 @@ for i in "" .sfst .ofst .foma; do
         if ! echo "cat|dog|{cat}:{Cat}|{dog}:{Dog}" | ../../tools/src/hfst-calculate $FFLAG > test2.hfst ; then
             exit 1
         fi
-        if ! ../../tools/src/hfst-compare test.hfst test2.hfst  ; then
+        if ! ../../tools/src/hfst-compare -s test.hfst test2.hfst  ; then
             exit 1
         fi
         rm test.hfst test2.hfst lexicon.hfst rules.hfst
