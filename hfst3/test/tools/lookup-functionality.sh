@@ -1,5 +1,5 @@
 #!/bin/sh
-if ! ../../tools/src/hfst-lookup -s cat.hfst < cat.strings > test.lookups ; then
+if ! ../../tools/src/hfst-lookup -s cat.hfst < $srcdir/cat.strings > test.lookups ; then
     exit 1
 fi
 

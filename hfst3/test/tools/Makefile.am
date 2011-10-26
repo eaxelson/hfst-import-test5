@@ -145,7 +145,8 @@ FST_PAIRSTRINGS=cat2dog.pairstring
 FST_SPACESTRINGS=cat2dog.spaces
 SUBSTITUTE_TXTS=cat2dog.substitute
 XRE_TXTS=cats_and_dogs.xre cats_and_dogs_semicolon.xre \
-	 at_file_quote.openfst-tropical.xre
+	 at_file_quote.openfst-tropical.xre \
+	 at_file_quote.sfst.xre at_file_quote.foma.xre
 LEXC_TXTS=basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc \
 		  basic.empty-sides.lexc basic.end.lexc basic.escapes.lexc \
 		  basic.infostrings.lexc basic.initial-lexicon-empty.lexc \
