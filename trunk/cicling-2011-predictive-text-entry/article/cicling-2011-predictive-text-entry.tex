@@ -52,7 +52,7 @@ implementing the vowel harmony rules needed for text entry of Finnish
 
 \section{A Probabilistic Model of Word Structure}
 
-\subsection{An Hidden Markov Model for Predicting Letter Sequences from Key Sequences}
+\subsection{A Hidden Markov Model for Predicting Letter Sequences from Key Sequences}
 
 \subsection{A Markov Chain of Morphs}
 
@@ -64,27 +64,120 @@ implementing the vowel harmony rules needed for text entry of Finnish
 
 \subsection{Finnish}
 
+For training and testing the Finnish text entry system, we use the
+same data as \cite{silfverberg/2011/cla}, though they use a
+morphological analyzer, which we do not utilize. The training material is extracted from Finnish IRC logs and contains some 350000 words. The test material is actual text message data and contains $6663$ words~\footnote{The original test data contains $10851$ words, but it turned out that the latter part of the test data file is actually a list of unique words, which would skew test results, so we decided to only use the earlier half of the material}. 
+
 \subsection{Turkish}
 
+For training and testing the Turkish text entry system, we use the
+same materials as \cite{Tantug:2010}. The material is divided into a
+test corpus containing $2597$ words and a training corpus which
+includes the rest of the words in the material. Thus the training data
+and test data are disjoint.
+
 \section{Evaluation}
+
+In this section, we present the results of experiments using the
+Finnish and Turkish training data and test data presented in the
+previous section. For Finnish we examine the impact of varying the
+amount of training data on the performance of the predictive text
+entry system. For Turkish we present results on the whole test
+material.
+
+\subsection{The Keystrokes Per Characters Ratio}
 
 Many factors influence the efficiency of mobile phone text entry in
 practice. E.g. the general user interface design of the phone and
 specifically the design of the keyboard have a large
 impact. Nevertheless such factors are in some sense isolated from the
-predicitve text entry algorithm itself, which makes it plausible to
+predictive text entry algorithm itself, which makes it plausible to
 evaluate the algorithms in isolation from the rest of the user
 interface of mobile phones. In this paper we use the keystrokes per
-character (KPC) ratio~\cite{MacKenzie02kspc} for measuring the efficiency of text entry. It
-measures the average number of keystrokes required to input one letter
-in a text message.
+character (KPC) ratio~\cite{MacKenzie02kspc} for measuring the
+efficiency of text entry. It measures the average number of keystrokes
+required to input one letter in a text message. As a measure of the
+efficiency of predictive text input, keystrokes per character leaves
+something to be desired, since it in no way incorporates factors such
+as cognitive workload, but such factors could not be adequately
+addressed in a paper on computational linguistics. Moreover they
+cannot be studied in isolation from the user interface of the mobile
+phone.
+
+The keystroke per character ratio is computed on test data as the
+ratio of keystrokes used to enter the data using a given text entry
+method and the number of letters in the words in the data. Following
+\cite{Tantug:2010}, we do not consider space characters as a part of
+the test data.
+
+For the multitap method inputting the Finnish word "kukka" (flower) on
+a typical Finnish 12-key mobile phone keyboard requires 10 keystrokes
+as shown in figure~\ref{kukka-kpc}. Hence the KPC ratio for test data
+consisting of the single word "kukka" would be $10/5 = 2.0$.
+
+For our own method we compute KPC similarly as for multitap, by
+dividing the number of keystrokes used by the number of letters in the
+test data. If our method cannot provide the correct suggestion for
+some input sequence, we use multitap as a fallback method. Naturally
+we cannot know that a word is not given by the text entry method
+before scrolling through all of the suggestions, so entering an
+unknown word requires:
+\begin{enumerate}
+\item Entering the keys used to write the word (one keystroke per letter)
+\item Scrolling through the suggestions ($9$ keystrokes in the current system, since there are $10$ suggestions)
+\item Deleting the last suggestion one letter at a time (one keystroke per letter)
+\item Switching to multitap mode (one keystroke)
+\item Inputting the word in multitap mode (keystroke count varies depending on the word).
+\end{enumerate}
+
+Figure \ref{new-method-kpc-known} demonstrates how KPC is computed for
+entering the word "\"{o}it\"{a}" (nights) using our own text entry
+method. The figure \ref{new-method-kpc-unknown} shows inputting the word "subi" (probably a
+Finnish version of sub). The correct form of "subi" is not found using our text
+entry method, which means we need to use multitap as fallback.
+
+\begin{figure}[htb!]
+\begin{center}
+\begin{tabular}{llllll}
+\texttt{k} & \texttt{u} & \texttt{k} & & \texttt{k} & \texttt{a}
+\\ \texttt{5-5} & \texttt{8-8} & \texttt{5-5} & \texttt{<NEXT>} &
+\texttt{5-5} & \texttt{2}
+\end{tabular}
+\caption{Inputting the Finnish word "kukka" using the multitap method
+  for text entry requires $10$ keystrokes. Pressing the
+  \texttt{<NEXT>} key is required, since there are two consecutive
+  letters "k" in "kukka".}\label{kukka-kpc}
+\end{center}
+\end{figure}
+
+\begin{figure}[htb!]
+\begin{center}
+\begin{tabular}{lllllllllllllllllllll}
+\texttt{\"{m}} & \texttt{i} & \texttt{t} & \texttt{\"{a}} & \\ 
+\texttt{\"{o}} & \texttt{i} & \texttt{t} & \texttt{\"{a}} & \\ 
+\texttt{6} & \texttt{4} & \texttt{8} & \texttt{2} & \texttt{<NEXT>}\\\\
+\end{tabular}
+\end{center}
+\caption{Inputting the Finnish words "\"{o}it\"{a}" and "subi". The first suggestion for the input sequence \texttt{6-4-8-2} is "mit\"{a}" (what). Hence we need to press \texttt{<NEXT>} once to reach the second suggestion which is correct. All in all, this makes \texttt{4 + 1 = 5} keystrokes.} \label{new-method-kpc-known}
+\end{figure}
+
+\begin{figure}[htb!]
+\begin{center}
+\begin{tabular}{lllllllllllllllllllll}
+\texttt{s} & \texttt{u} & \texttt{c} & \texttt{h}\\
+...\\
+\texttt{s} & \texttt{t} & \texttt{a} & \texttt{h}\\
+\texttt{s} & \texttt{u} & \texttt{b} & \texttt{i}\\    
+\texttt{7} & \texttt{8} & \texttt{2} & \texttt{4} & \texttt{<NEXT>} & \texttt{...} & \texttt{<NEXT>} & \texttt{<C>} & \texttt{<C>} & \texttt{<C>} & \texttt{<C>} & \texttt{<MUL>} & \texttt{7-7-7-7} & \texttt{8-8} & \texttt{2-2} & \texttt{4-4-4} & \texttt{<PRED>}
+\end{tabular}
+
+\caption{The word "subi" is not given by our method, so we need to scroll through ten suggestions using \texttt{<NEXT>} nine times, then delete the letters in the last suggestion "stah", switch to multitap mode using the key \texttt{<MUL>}, input "subi" in multitap and switch back to predictive mode using the key \texttt{<PRED>}. Thus inputting "subi" requires $4 + 9 + 4 + 1 + 11 + 1 = 30$ keystrokes.} \label{new-method-kpc-unknown}
+\end{center}
+\end{figure}
 
 
-\subsection{The Keystrokes Per Characters Ratio}
 
-
-
-\begin{figure}[hbt]
+\begin{figure}[hbt!]
 \includegraphics[width=4in]{finnish_kpc_figure.pdf}
 \end{figure}
 
