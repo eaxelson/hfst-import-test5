@@ -85,7 +85,7 @@ to be reasonably efficient \cite[for non-word cases]{church/1991} and
 improvement of the correcting suggestions is to use morphosyntactically
 relevant analyses in stead of surface forms to improve the corrections. In this
 article we evaluate a hybrid model combining a shallow statistical
-morphological parser~\cite{silfverberg/2010} with the surface word-form
+morphological parser~\cite{silfverberg/2011} with the surface word-form
 n-grams.
 
 Furthermore we test the context-based spelling methods for both English and
@@ -275,7 +275,7 @@ algorithm~\cite{mohri/2002}. This ordering is also used as our baseline.
 
 For context-based reordering of the corrections we use the pos tagging
 probabilities for the given suggestions. The implementation of analysis n-gram
-probability estimation is similar as described in \cite{silfverberg/2010} with
+probability estimation is similar as described in \cite{silfverberg/2011} with
 following adaptations for the spelling correction. The suggestion which gives
 the highest ranking, most likely analysis is selected.  The n-gram probability
 is estimated separately with each spelling suggestion and then combined with
@@ -407,8 +407,8 @@ dictionary and the weighted edit distance model alone.
 & 43.5 \% & 0.7 \% & 47.1 \% & 1.4 \% & 0.7 \%  & 100.0 \% \\
         \hline
         N-grams 
-& & & & & & & \\
-& & & & & & & \\
+& 55    & 8    & 47    & 15    & 13    & 138 \\
+& 40.0 \% & 5.8 \% & 34.0 \% & 10.9 \% & 9.4 \% & 100.0 \% \\
         \hline
         \multicolumn{7}{c}{\textbf{Finnish}} \\
         \hline
@@ -419,8 +419,8 @@ dictionary and the weighted edit distance model alone.
 
         \hline
         N-grams
-&       &      &      &      &       &       &     \\
-&       &      &      &      &       &       &     \\
+& 230    & 30    & 4    & 11    & 47    & 322 \\
+& 71.4 \% & 9.3 \% & 1.2 \% & 3.4 \% & 14.6 \% & 100.0 \% \\
         \hline
       \end{tabular}
     \end{scriptsize}
@@ -472,7 +472,9 @@ subsections.
 
 \subsection{English Error-Analysis}
 
-The English is entirely uninteresting in the first place.
+In \cite{norvig/2010} authors identify errors that are not solved using simple
+unigram weights, such as\ldots. Our tests here show that it helps in few
+cases, such as.
 
 \subsection{Finnish Error-Analysis}
 
@@ -482,11 +484,6 @@ most commonly happens in nominals where the expected correction in oblique
 cases is shadowed by other correction of grammatical cases; since word-ordering
 of verbal complements and adjuncts is relatively free it is expected that
 statistically more common cases are statistically more common in all positions.
-
-In the surface n-gram model we discover just the same.
-
-The combination of surface and analysis n-grams like so works better, leaving
-only residue of following hard cases to be solved.
 
 \subsection{Performance Evaluation}
 
@@ -505,20 +502,11 @@ speed of performing the experiments in Tables~\ref{table:real-eval}~and~\ref{tab
         Material  & English & automatic & Finnish & automatic \\
         Algorithm & real    &           & real    &           \\
         \hline
-        Unigrams   &    10.0 s &      s & 52.9 s &     s  \\
-        (baseline) & 399.1 wps &    wps & 6.0 wps &   wps  \\
+        Unigrams   &    10.0 s &      s & 51.8 s &     s  \\
+        (baseline) & 399.1 wps &    wps & 6.2 wps &   wps  \\
         \hline
-        Analysis &   377.4 s &     s & 3593.3 s &     s  \\
-        trigrams & 10.6  wps &   wps & 0.08 wps &   wps  \\
-        \hline
-        Surface  &      s &     s &     s &     s  \\
-        trigrams &    wps &   wps &   wps &   wps  \\
-        \hline
-        Some     &      s &     s &     s &     s  \\
-        hybrid   &    wps &   wps &   wps &   wps  \\
-        \hline
-        Another  &      s &     s &     s &     s  \\
-        hybrid   &    wps &   wps &   wps &   wps  \\
+        POS      &   377.4 s &     s & 3593.3 s &     s  \\
+        n-grams  & 10.6  wps &   wps & 0.08 wps &   wps  \\
         \hline
       \end{tabular}
     \end{scriptsize}
