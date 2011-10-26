@@ -15,6 +15,6 @@ NF > 3 {thismiss = 1;
 }
 END { printf("1st   & 2nd   & 3rd   & 4th   & miss  & all \\\\\n");
       printf("%d    & %d    & %d    & %d    & %d    & %d \\\\\n", firsts, seconds, thirds, fourths, misses, rows);
-      printf("%f %% & %f %% & %f %% & %f %% & %f %% & %f %% \\\\\n", 100*firsts/rows, 100*seconds/rows, 100*thirds/rows, 100*fourths/rows, 100*misses/rows, 100*rows/rows);
+      printf("%f \\%% & %f \\%% & %f \\%% & %f \\%% & %f \\%% & %f \\%% \\\\\n", 100*firsts/rows, 100*seconds/rows, 100*thirds/rows, 100*fourths/rows, 100*misses/rows, 100*rows/rows);
       
   }
