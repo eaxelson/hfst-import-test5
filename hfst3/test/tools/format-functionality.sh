@@ -42,6 +42,6 @@ if ../../tools/src/hfst-format --test-format foma; then
 fi
 
 rm -f test.hfst
-rm -f TMP;
+rm -f TMP
 rm -f TMP1
 rm -f TMP2
