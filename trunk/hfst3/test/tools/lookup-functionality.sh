@@ -44,4 +44,5 @@ for i in "" .sfst .ofst .foma; do
 
 done
 
+rm TMP
 rm test.lookups

@@ -15,3 +15,5 @@ for i in sfst openfst-tropical foma; do
         exit 1
     fi
 done
+
+rm -f test.fst
