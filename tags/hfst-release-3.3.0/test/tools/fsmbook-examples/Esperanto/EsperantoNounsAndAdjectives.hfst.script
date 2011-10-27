@@ -1,0 +1,37 @@
+FORMAT=TRANSDUCER_FORMAT
+
+echo "bird
+hund
+kat
+elefant" | hfst-strings2fst -j -f $FORMAT > NounRoots
+
+echo "bon
+long
+jun
+alt
+grav" | hfst-strings2fst -j -f $FORMAT > AdjRoots
+
+echo '[(g e)]' | hfst-regexp2fst -f $FORMAT > NounPrefix
+
+echo '[ ([m a l] | [n e]) ]' | hfst-regexp2fst -f $FORMAT > AdjPrefixes
+
+echo '[o]' | hfst-regexp2fst -f $FORMAT -j > Nend
+
+echo '[a]' | hfst-regexp2fst -f $FORMAT -j > Adjend
+
+echo '[(j)]' | hfst-regexp2fst -f $FORMAT -j > Number
+
+echo '[(n)]' | hfst-regexp2fst -f $FORMAT -j > Case
+
+echo '[ ([i n] | [e t] | [e g])* [@"Nend" | @"Adjend"] ]' | \
+     hfst-regexp2fst -f $FORMAT > Nmf
+
+echo '([e g] | [e t])* [@"Adjend" | [e c @"Nend"]]' | \
+     hfst-regexp2fst -f $FORMAT > Adj
+
+hfst-concatenate NounPrefix NounRoots | hfst-concatenate -2 Nmf > NounStem
+hfst-concatenate AdjPrefixes AdjRoots | hfst-concatenate -2 Adj > AdjectiveStem
+hfst-disjunct NounStem AdjectiveStem > Stems
+hfst-concatenate Number Case | hfst-concatenate -1 Stems > Result
+
+hfst-minimize Result > EsperantoNounsAndAdjectives.hfst.hfst
