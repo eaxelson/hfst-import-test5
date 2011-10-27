@@ -157,7 +157,7 @@ context-results: context-results-fi context-results-en
 
 context-results-fi:results-fi $(RESULTS_FI:%.unigrams=%.ngrams.10)
 
-context-results-en:results-en $(RESULTS_EN:%.unigrams=%.ngrams.0.25)
+context-results-en:results-en $(RESULTS_EN:%.unigrams=%.ngrams.0.85)
 
 results-en:$(RESULTS_EN) 
 
