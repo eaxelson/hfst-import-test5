@@ -6,7 +6,7 @@
 
 \title{Predictive Text Entry of Agglutinative Languages using Morphological Segmentation and Phonological Restrictions}
 
-\author{\ldots}
+\author{\ldots\\\ldots\\\ldots}
 \institute{\ldots}
 
 \maketitle
@@ -48,6 +48,66 @@ implementing the vowel harmony rules needed for text entry of Finnish
 
 \section{Introduction}
 
+Mobile phone text messages are a hugely popular means of
+communication, but mobile phones are not especially well suited for
+inputting text because of their small size and often limited
+keyboard. There exist several technological solutions for inputting text
+on mobile phones and other limited keyboard devices. This paper is
+concerned with a technology called predictive text entry, which
+utilizes redundancy in natural language in order to enable efficient
+text entry using limited keyboards (typically having 12 keys).
+
+The subject of predictive text entry has been extensively studied, but
+the studies have mainly concerned on predictive text entry of
+English. Because of the limited morphological complexity of English,
+these approaches have usually been able to rely on an extensive
+dictionary along with word frequencies, since a sufficiently large
+English dictionary nearly eliminates the problem of out-of-vocabulary
+words. 
+
+For morphologically complex languages like Finnish or Turkish,
+productive inflection, derivation and compounding raise the number of
+out-of-vocabulary words regardless of the size of the dictionary,
+which means that out-of-vocabulary words present a serious problem for
+dictionary based approaches to predictive text entry.
+
+In this paper we present an approach to predictive text entry which is
+based upon a morphologically segmented training corpus and a
+probabilistic model on phonotax. We additionally use a probabilistic
+model on letter sequences and phonological rules governing the vowel
+harmony phenomenon in Finnish. We show that this model delivers
+superior results compared to an existing dictionary based model for
+text entry of Finnish when evaluated on actual text-message data using
+the keystroke per character ratio (KPC). We also compare our method to
+the predictive text entry in three commercially available mobile
+phones and show that our approach gives superior KPC.
+
+Apart from phonological rules, our approach is entirely unsupervised
+and data-driven, since we us the unsupervised morphological
+segmentation system Morfessor \cite{Creutz07ACMTSLP} for segmenting
+the training corpus and the tools for constructing POS-taggers form the HFST interface~\cite{hfst/2011}. We show that it can be applied to another
+agglutinative language besides Finnish, namely Turkish. We compare the
+Turkish text entry system to an existing text entry system, which is
+based on a hidden Markov model and show that our approach gives a
+substantial improvement in KPC.
+
+The paper is structured as follows. In section~\ref{earlier-work} we
+present some earlier approaches to predictive text entry. In
+section~\ref{model}, we present our probabilistic model for text entry
+together with the phonological rules which are used to realize vowel
+harmony and explain how these models are combined into a system for
+predictive text entry. Section~\ref{data} describes the training and
+test corpora used in constructing and testing predictive text entry
+systems for Finnish and Turkish. Evaluation of the systems is
+presented in section~\ref{evaluation} and the results are discussed in
+section~\ref{discussion}. Finally we present some concluding remarks
+and future work directions in section~\ref{conclusion}.
+
+\section{Earlier Approaches to Predictive Text Entry}\label{earlier-work}
+
+
+\section{A Probabilistic Model of Word Structure}\label{model}
+
 Predictive text entry can be seen as a labelling task, where every key
 in a sequence of keys is assigned its most likely letter. An obvious
 and well teted approach to modelling such correspondences of keystroke
@@ -62,11 +122,6 @@ difficulties, since it is difficult to separate stems from affixes in
 an adequate manner. It is also impossible to encode phonological
 dependencies like vowel harmony using HMMs.
 
-
-\section{Earlier Approaches to Predictive Text Entry}
-
-\section{A Probabilistic Model of Word Structure}
-
 \subsection{A Hidden Markov Model for Predicting Letter Sequences from Key Sequences}
 
 \subsection{A Markov Chain of Morphs}
@@ -75,7 +130,7 @@ dependencies like vowel harmony using HMMs.
 
 \subsection{Combining Models using Weighted Finite-State Calculus}
 
-\section{Training Materials and Test Materials for Finnish and Turkish}
+\section{Training Materials and Test Materials for Finnish and Turkish}\label{data}
 
 \subsection{Finnish}
 
@@ -91,7 +146,7 @@ test corpus containing $2597$ words and a training corpus which
 includes the rest of the words in the material. Thus the training data
 and test data are disjoint.
 
-\section{Evaluation}
+\section{Evaluation}\label{evaluation}
 
 In this section, we present the results of experiments using the
 Finnish and Turkish training data and test data presented in the
@@ -196,9 +251,9 @@ entry method, which means we need to use multitap as fallback.
 \includegraphics[width=4in]{finnish_kpc_figure.pdf}
 \end{figure}
 
-\section{Discussion}
+\section{Discussion}\label{discussion}
 
-\section{Conclusions}
+\section{Conclusions and future work}\label{conclusion}
 
 \section{Acknowledgments}
 
