@@ -8,14 +8,15 @@
 %\usepackage{ifpdf}
 
 \begin{document}
-\title{Improving Finite-State Spell-Checker's Corrections with POS Tagger's Context N-Grams}
+\title{Improving~Finite-State~Spell-Checker's~Corrections with 
+POS~Tagger's~Context~N-Grams}
 
-%\author{Tommi A Pirinen and Miikka Silfverberg and Krister Lind\'{e}n}
+\author{Tommi A Pirinen and Miikka Silfverberg and Krister Lind\'{e}n}
 
-%\institute{University of Helsinki\\
-%Department of Modern Languages\\
-%University of Helsinki, 00014\\
-%tommi.pirinen@helsinki.fi, miikka.silfverberg@helsinki.fi, krister.linden@helsinki.fi}
+\institute{University of Helsinki\\
+Department of Modern Languages\\
+University of Helsinki, 00014\\
+tommi.pirinen@helsinki.fi, miikka.silfverberg@helsinki.fi, krister.linden@helsinki.fi}
 
 \date{\today}
 
@@ -149,7 +150,6 @@ approaches less useful (e.g. the example of Northern S\'{a}mi in
     \caption{Sizes of training corpora.
     \label{table:corpora}}
   \begin{center}
-    \begin{scriptsize}
       \begin{tabular}{lrrr}
         \hline
         Count unit$\rightarrow$ & Sentences & Tokens & Word-forms \\
@@ -177,7 +177,6 @@ approaches less useful (e.g. the example of Northern S\'{a}mi in
         (generated) & 9,640 & 723,526 & 14,983 \\
         \hline
       \end{tabular}
-    \end{scriptsize}
   \end{center}
 \end{table}
 
@@ -294,19 +293,17 @@ possible suggestions we substitute s3 for the suggestions, and estimate its
 likely analysis, then use the ones with highest combined likelihood of n-gram
 formula $P(s1:s5)$ etc.
 
-\begin{figure}[h]
-\begin{centering}
+\begin{table}
 \caption{Example trigram combinations\label{fig:example}}
-\begin{scriptsize}
+\begin{center}
 \begin{tabular}{llcrr}
 \hline
 this$_{s1}$ & is$_{s2}$ & \_$_{s3}$ & example$_{s4}$ & sentence$_{s5}$\\
 DET$_{a1}$ & VVBZ$_{a2}$ & \_ $_{a3}$& NN$_{a4}$ & NN$_{a5}$\\
 \hline
 \end{tabular}
-\end{scriptsize}
-\end{centering}
-\end{figure}
+\end{center}
+\end{table}
 
 The resulting Finite-state system consists of three automata, the dictionary
 for spell-checking and error-modelling as described in
@@ -319,7 +316,6 @@ extents of search space during correction phase.
 \begin{table}
 \caption{Automata sizes\label{table:sizes}.}
 \begin{centering}
-\begin{scriptsize}
 \begin{tabular}{lrrr}
     Automaton & States & Transitions & Bytes \\
     \hline
@@ -338,7 +334,6 @@ extents of search space during correction phase.
     N-gram sequences & 3,325 & 22,418 & 430 KiB \\
     \hline
 \end{tabular}
-\end{scriptsize}
 \end{centering}
 \end{table}
 
@@ -390,11 +385,10 @@ suggestion algorithm.  The rows of table represent different combinations of
 the n-gram models. The first row is a baseline score achieved by the unigram
 dictionary and the weighted edit distance model alone.
 
-\begin{table*}[h]
+\begin{table*}
     \caption{Precision of suggestion algorithms with real spelling errors.
     \label{table:real-eval}}
   \begin{center}
-    \begin{scriptsize}
       \begin{tabular}{lrrrrrrr}
         \hline
         Algorithm & 1 & 2 & 3 & 4 & None & Total \\
@@ -402,13 +396,13 @@ dictionary and the weighted edit distance model alone.
         \multicolumn{7}{c}{\textbf{English}} \\
         \hline
         Unigrams 
-& 60 & 1 & 65 & 2 & 1 & 138 \\
+&    &   &    &   &   &     \\
         (baseline) 
-& 43.5 \% & 0.7 \% & 47.1 \% & 1.4 \% & 0.7 \%  & 100.0 \% \\
+& 28.2 \% & 5.9 \% & 29.4 \% &     \% &     \%  &       \% \\
         \hline
         N-grams 
-& 83    & 25    & 6    & 9    & 15    & 138 \\
-& 60.1 \% & 18.1 \% & 4.3 \% & 6.5 \% & 10.9 \% & 100.0 \% \\
+&       &       &      &      &       &     \\
+& 41.2 \% & 50.6 \% & 2.3 \% &     \% &      \% &       \% \\
 \hline
         \multicolumn{7}{c}{\textbf{Finnish}} \\
         \hline
@@ -423,7 +417,6 @@ dictionary and the weighted edit distance model alone.
 & 71.4 \% & 9.3 \% & 1.2 \% & 3.4 \% & 14.6 \% & 100.0 \% \\
         \hline
       \end{tabular}
-    \end{scriptsize}
   \end{center}
 \end{table*}
 
@@ -431,7 +424,6 @@ dictionary and the weighted edit distance model alone.
     \caption{Precision of suggestion algorithms with automated spelling errors.
     \label{table:fake-eval}}
   \begin{center}
-    \begin{scriptsize}
       \begin{tabular}{lrrrrrr}
         \hline
         Algorithm & 1 & 2 & 3 & 4 & None & Total \\
@@ -459,7 +451,6 @@ dictionary and the weighted edit distance model alone.
  &    \% &   \% &   \% &   \% &    \% & 100 \% \\
         \hline
       \end{tabular}
-    \end{scriptsize}
   \end{center}
 \end{table*}
 
@@ -473,9 +464,12 @@ subsections.
 \subsection{English Error-Analysis}
 
 In \cite{norvig/2010} authors identify errors that are not solved using simple
-unigram weights, such as\ldots. Our tests here show that it helps in few
-cases, such as.
-
+unigram weights, such as correcting \emph{rember} to \emph{remember} instead of
+\emph{member}. Here, our scaled context-model which can bypass edit distance
+model in weight will select correct corrections. However, correcting
+\emph{ment} to \emph{meant} in stead of \emph{went} or \emph{met} the POS
+based context reranking gives no help.
+ 
 \subsection{Finnish Error-Analysis}
 
 For Finnish material the traditional methods of using analysis n-grams results
@@ -492,11 +486,10 @@ but we found that the speed of the system is reasonable---even in its current
 form. The Table~\ref{table:speed-eval} summarises the average
 speed of performing the experiments in Tables~\ref{table:real-eval}~and~\ref{table:fake-eval}
 
-\begin{table}[h]
+\begin{table}
     \caption{The speed of ranking the errors.
     \label{table:speed-eval}}
   \begin{center}
-    \begin{scriptsize}
       \begin{tabular}{lrrrr}
         \hline
         Material  & English & automatic & Finnish & automatic \\
@@ -509,7 +502,6 @@ speed of performing the experiments in Tables~\ref{table:real-eval}~and~\ref{tab
         n-grams  & 10.6  wps &   wps & 0.14 wps &   wps  \\
         \hline
       \end{tabular}
-    \end{scriptsize}
   \end{center}
 \end{table}
 
