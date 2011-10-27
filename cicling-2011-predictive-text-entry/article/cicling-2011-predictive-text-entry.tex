@@ -48,6 +48,21 @@ implementing the vowel harmony rules needed for text entry of Finnish
 
 \section{Introduction}
 
+Predictive text entry can be seen as a labelling task, where every key
+in a sequence of keys is assigned its most likely letter. An obvious
+and well teted approach to modelling such correspondences of keystroke
+sequences and letters is using a stochastic model with hidden
+variables, such as a hidden Markov model.
+
+Though suggestions can be modelled fairly well using hidden Markov
+models on key sequences, there are problems with this approach, which
+suggests an improved model should be used. A second or third order HMM
+cannot encode very long dependencies inside words. This leads to
+difficulties, since it is difficult to separate stems from affixes in
+an adequate manner. It is also impossible to encode phonological
+dependencies like vowel harmony using HMMs.
+
+
 \section{Earlier Approaches to Predictive Text Entry}
 
 \section{A Probabilistic Model of Word Structure}
