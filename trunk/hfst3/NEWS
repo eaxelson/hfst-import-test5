@@ -6,6 +6,19 @@ This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
 
+Noteworthy changes in 3.3.0
+---------------------------
+
+* HFST updated to work with the newest versions of backend libraries
+
+* a new replace down function by Karttunen added
+
+* HfstTransitionGraph and conversions between formats made less error-prone
+
+* protected/public changes in API
+
+* SFST and foma libraries are disabled from default build
+
 Noteworthy changes in 3.2.0
 ---------------------------
 
