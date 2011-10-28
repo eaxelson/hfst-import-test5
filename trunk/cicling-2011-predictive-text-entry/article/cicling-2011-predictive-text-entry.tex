@@ -128,57 +128,123 @@ approach to modeling such correspondences of keystroke sequences and
 letters is using a stochastic model with hidden variables, such as a
 hidden Markov model.
 
-Though suggestions can be modeled fairly well using hidden Markov
-models on key sequences, there are problems with this approach, which
-suggests an improved model should be used for agglutinative
-languages. A second or third order HMM cannot encode very long
-dependencies inside words. This leads to difficulties, since it is
-difficult to separate stems from affixes in an adequate manner. It is
-also impossible to encode phonological dependencies like vowel harmony
-using HMMs. On the other hand higher order HMMs suffer both from the
-data sparseness problem and efficiency problems, which limits their
+Though predictive text entry can be modeled fairly well using hidden
+Markov models on key sequences as demonstrated by~\cite{Tantug:2010},
+there are problems with this approach for agglutinative languages. A
+second or third order HMM cannot encode very long dependencies inside
+words. This leads to difficulties in processing agglutinative
+languages, since it is difficult to separate stems from affixes in an
+adequate manner and to handle arbitrarily long phonological
+dependencies like vowel harmony in Finnish and Turkish. Using higher
+order HMMs could in theory lead to better accuracy for longer
+dependencies, but higher order HMMs suffer both from the data
+sparseness problem and efficiency problems, which limit their
 usability.
 
-We observe that number of word stems seen in training corpora of
-comparable sizes for agglutinative and isolating languages are
-comparable. The reasons that make dictionary based models fare poorly
-for agglutinative languages are thus inflection, compounding and
-derivation. Therefore we model words as sequences of morphs, which are
-extracted from an automatically segmented training corpus. As the
-statistical model we use a Markov chain.
+We observed earlier that dictionary based methods produce poor results
+for agglutinative languages. Still the number of word stems seen in
+training corpora of comparable sizes for agglutinative and isolating
+languages are comparable. The reasons that make dictionary based
+models fare poorly for agglutinative languages are thus inflection,
+compounding and derivation. 
 
-A Markov chain on morph sequences is likely to suffer from the data
+In order to get a general enough model of words and still be able to
+model word structure at a global level, we model words as sequences of
+morphs, which are extracted from an automatically segmented training
+corpus. To illustrate our approach we need to look at some Finnish
+training data. There will probably be some occurrences of the word
+form "taloa" (sg. partitive case of the word house). Automatic
+segmentation of the training corpus might give the segmentation "talo
++ a", where the stem "talo" and the ending "a" are segmented into
+different morphs. If the word form "taloakin" (sg. partitive case of
+the word house with the clitic "kin") doesn't occur in the training
+data, we can still esitmate its probability by looking at how probable
+the morph combinations "talo + a" and "a + kin" are in the training
+corpus.
+
+The model we have chosen is a Markov chain of morph sequences. A
+Markov chain on morph sequences is likely to suffer from the data
 sparseness problem especially when trying to estimate the probability
-of word forms whose lemma has occurred few times in the training
-corpus. We therefore combine the Markov chain with an HMM which maps
-key sequences to letter sequences.
+of word forms whose stem has occurred few times (perhaps only once) in
+the training corpus. Also productive compounding presents a problem,
+because there are infinitely many ways in which word stems can combine
+to form new word forms. We therefore combine the Markov chain of morph
+sequences with an HMM which maps key sequences to letter sequences.
 
-Lastly agglutinative languages like Finnish incorporate phonological
-phenomena, such as vowel harmony, which span over entire word forms
-consisting of several morphs. These phenomena cannot be adequately
-captured using n-gram models of morphs or letters, so we include
-phonological rules which realize the constraints.
+For the Finnish example in the previous paragraph, the HMM gives an
+estimate for the probability of the sequence of letters "t-a-l-o",
+given the input key-sequence "8-2-5-6". The HMM doesn't include
+morph boundaries, so it gives some estimate for the probability of
+the wordform "a-l-a-t-a-l-o" (a common Finnish surname) given its keystring
+"2-5-2-8-2-5-6", even though the combination of morphs "ala + talo"
+would never have been observed in the training data and the morph
+sequence model would therefore be unable to give a good estimate for
+the probability of the compound word.
+
+Finally many agglutinative languages like Finnish and Turkish
+incorporate phonological phenomena, such as vowel harmony, which span
+over entire word forms consisting of several morphs. E.g. the Finnish
+inessive case ending is "ssA", where "A" is either "a" or "\"{a}"
+depending on whether the stem of the wordform has front vowels "ä",
+"ö", "y" or back vowels "a", "o", "u" (usually front vowels and back
+vowels cannot be mixed). Since "a" and "\"{a}" are typed using the
+same key "2", the vowel is always ambiguous in the ending. Consider
+the segmented form "talo + i + ssa" (pl. inessive case of the word
+house), the final is "a" which can be deduced from the vowel "o" in
+the stem, but neither the morph sequence model nor the letter HMM can
+disambiguate between "a" and "ä". The morpheme sequence model doesn't
+aid in disambiguation, since it looks at adjacent morphs and the stem
+and ending "ss\"{a}" are separated by the plural morph "i". Also the
+letter sequence HMM fails to disambiguate between the front and back
+vowel, since it can only consider the co-occurrence of letters that
+are separated by less than three letters and the letters "o" and "a"
+in the word form "taloissa" are separated by exactly three letters
+(including "a" and "o").
+
+Using a second order morph sequence model, might possibly handle some
+cases of vowel harmony, but data sparseness is a serious problem with
+the morph sequence model, since there are tens of thousands of
+distinct morphs. Therefore long range phenomena like vowel harmony
+cannot be adequately captured using n-gram models of morphs or
+letters, which has prompted us to use phonological rules which realize
+the constraints as part of our system.
+
+The statistical models and phonological rules are implemented as
+weighted finite-state transducers, which allows combining them using
+the algebraic operations for finite-state transducers. Transducers are
+a natural choice for coding arbitrarily long dependencies such as
+vowel harmony, which cannot be captured by Markov models.
 
 \subsection{A Hidden Markov Model for Predicting Letter Sequences from Key Sequences}
 
-We denote a sequence of keys of length $n$ by $K = (k_i)_{i=1}^{n}$. Here
-each $k_i$ corresponds to a key on the mobile phone keypad. For the
-key $k$, we denote the set of letters corresponding to the key $k$ by ${\rm
-  M}(k)$. E.g. ${\rm M}(2) = \{$ a, b, c, \"{a}$\}$ on a typical
-Finnish mobile phone keyboard.
+We denote a sequence of mobile phone keypad keys of length $n$ by $K =
+(k_i)_{i=1}^{n}$. Here each $k_i$ corresponds to a key on the mobile
+phone keypad. For the key $k$, we denote the set of letters
+corresponding to the key $k$ by ${\rm M}(k)$. E.g. ${\rm M}(2) = \{$
+a, b, c, \"{a}$\}$ on a typical Finnish mobile phone
+keyboard. Correspondingly, we denote a sequences of letter of length
+$m$ by $L = (l_i)_{i=1}^{m}$.
+
+The task in the letter model is to give the probability of a letter
+sequence $L$ given a sequence of keys $K$. Naturally ${\rm P}(L|K) > 0$, iff
+$L \in {\rm M}(K)$. The probability ${\rm P}(L|K)$ is given in equation (\ref{letter-chain-eqn}).  
+
 
 \subsection{A Markov Chain of Morphs}
 
-We denote a morph of $n$ letters in the training-data by
-$L = (l_i)_{i=1}^{n}$. A key sequence $K = (K_i)_{i=1}^{m}$ corresponds to a
-sequence of morphs $L_1{\rm ... }L_k$ , where each $L_j = (l_{j_i})_{i=1}^{n_j}$, iff $\Sigma_{j = 1}^{k} n_j = m$ and
-$l_{j_i} \in {\rm M}(k_{m_1 + {\rm ... } + m_{j - 1} + i})$. We denote
-the set of morph sequences that correspond to a key sequence
-$K$ by ${\rm M}(K)$.
+A morph of $n$ letters in the training-data is just a sequence of $n$
+letters, so we denote it by $L = (l_i)_{i=1}^{n}$. A key sequence $K =
+(k_i)_{i=1}^{m}$ corresponds to a sequence of morphs $L_1{\rm
+  ... }L_k$ , where each $L_j = (l_{j_i})_{i=1}^{n_j}$, iff $\Sigma_{j
+  = 1}^{k} n_j = m$ and $l_{j_i} \in {\rm M}(k_{m_1 + {\rm ... } +
+  m_{j - 1} + i})$ for all $l_{j_i}$. We denote the set of morph
+sequences that correspond to a key sequence $K$ by ${\rm M}(K)$.
 
 The task of the morph model is to assign a probability for each
-sequence of morphs in ${\rm M}(K)$ for each key
-sequence $K$. The probability of a sequence of morphs $L_1{\rm ... }L_k \in {\rm M}(K)$ is given by the chain rule of probabilities in equation (\ref{chain-eqn}).
+sequence of morphs in ${\rm M}(K)$ for a key sequence $K$. The
+probability of a sequence of morphs $L_1{\rm ... }L_k \in {\rm M}(K)$
+is given by the chain rule of probabilities in equation
+(\ref{chain-eqn}).
 \begin{equation}\label{chain-eqn}
 {\rm P}\big(L_1{\rm, ..., }\ L_k\big) = {\rm P}(L_1 | L_2 {\rm, ..., }\ L_k) {\rm P}(L_2 | L_3 {\rm, ..., }\ L_k)\ {\rm ... }\ {\rm P}(L_{k-1} | L_k){\rm P}(L_k)
 \end{equation}
@@ -187,6 +253,10 @@ We make the standard assumptions for a first order Markov model and approximate 
 \begin{equation}\label{markov-eqn}
 {\rm P}\big(L_1{\rm, ..., }L_k\big) = {\rm P}\big(L_1 | L_2){\rm P}\big(L_2 | L_3)\ {\rm ... }\ {\rm P}(L_{k-1} | L_k){\rm P}(L_k)
 \end{equation}
+
+It should be noted that we are dealing with morph sequences and not
+letter strings. This is important, since several morph sequences can
+correspond to the same string of letters.
 
 \subsection{Phonological Constraints}
 
