@@ -142,7 +142,7 @@ $(NORVIG)/error.edit-distance-2.hfst: edit-distance.bash
 # automata testing rules
 results: results-fi results-en
 
-RESULTS_FI=results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-none.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-none.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-none.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-none.unigrams  results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-small.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-small.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-small.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-small.unigrams  results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-medium.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-medium.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-medium.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-medium.unigrams  results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-huge.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-huge.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-huge.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-huge.unigrams 
+RESULTS_FI=results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-none.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-none.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-none.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-none.unigrams  results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-small.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-small.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-small.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-small.unigrams  results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-medium.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-medium.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-medium.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-medium.unigrams  results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-huge.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-huge.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-huge.unigrams results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-huge.unigrams results/fi-FI.autogen.dictionary-full-boundaries-none.edit-distance-2-none.unigrams results/fi-FI.autogen.dictionary-full-boundaries-small.edit-distance-2-none.unigrams results/fi-FI.autogen.dictionary-full-boundaries-medium.edit-distance-2-none.unigrams results/fi-FI.autogen.dictionary-full-boundaries-huge.edit-distance-2-none.unigrams  results/fi-FI.autogen.dictionary-full-boundaries-none.edit-distance-2-small.unigrams results/fi-FI.autogen.dictionary-full-boundaries-small.edit-distance-2-small.unigrams results/fi-FI.autogen.dictionary-full-boundaries-medium.edit-distance-2-small.unigrams results/fi-FI.autogen.dictionary-full-boundaries-huge.edit-distance-2-small.unigrams  results/fi-FI.autogen.dictionary-full-boundaries-none.edit-distance-2-medium.unigrams results/fi-FI.autogen.dictionary-full-boundaries-small.edit-distance-2-medium.unigrams results/fi-FI.autogen.dictionary-full-boundaries-medium.edit-distance-2-medium.unigrams results/fi-FI.autogen.dictionary-full-boundaries-huge.edit-distance-2-medium.unigrams  results/fi-FI.autogen.dictionary-full-boundaries-none.edit-distance-2-huge.unigrams results/fi-FI.autogen.dictionary-full-boundaries-small.edit-distance-2-huge.unigrams results/fi-FI.autogen.dictionary-full-boundaries-medium.edit-distance-2-huge.unigrams results/fi-FI.autogen.dictionary-full-boundaries-huge.edit-distance-2-huge.unigrams 
 
 ADJUSTMENT_RESULTS_FI=results/juha_excerpt_with_errors.dictionary-full-boundaries-none.edit-distance-2-none.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-small.edit-distance-2-none.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-medium.edit-distance-2-none.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-huge.edit-distance-2-none.unigrams  results/juha_excerpt_with_errors.dictionary-full-boundaries-none.edit-distance-2-small.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-small.edit-distance-2-small.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-medium.edit-distance-2-small.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-huge.edit-distance-2-small.unigrams  results/juha_excerpt_with_errors.dictionary-full-boundaries-none.edit-distance-2-medium.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-small.edit-distance-2-medium.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-medium.edit-distance-2-medium.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-huge.edit-distance-2-medium.unigrams  results/juha_excerpt_with_errors.dictionary-full-boundaries-none.edit-distance-2-huge.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-small.edit-distance-2-huge.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-medium.edit-distance-2-huge.unigrams results/juha_excerpt_with_errors.dictionary-full-boundaries-huge.edit-distance-2-huge.unigrams 
 
@@ -150,7 +150,9 @@ ADJUSTMENT_RESULTS_EN=results/alice_excerpt_with_errors.dictionary-default.edit-
 
 results-fi: $(RESULTS_FI)
 
-RESULTS_EN=results/en-US.norvig1.dictionary-norvig.edit-distance-2.unigrams results/en-US.norvig2.dictionary-norvig.edit-distance-2.unigrams 
+RESULTS_EN=results/en-US.norvig1.dictionary-norvig.edit-distance-2.unigrams results/en-US.norvig2.dictionary-norvig.edit-distance-2.unigrams results/en-US.autogen.dictionary-norvig.edit-distance-2.unigrams
+
+results-en: $(RESULTS_EN)
 
 # context speller result files
 context-results: context-results-fi context-results-en
@@ -297,6 +299,8 @@ juha%.ngrams.10: juha%.unigrams
 alice%.ngrams.1.0: alice%.unigrams
 	cat $< | $(CONTEXT_SPELLER) $(EN_TAGGER) 1.0 > $@
 
+alice%.ngrams: alice%.ngrams.0.05 alice%.ngrams.0.1 alice%.ngrams.0.15 alice%.ngrams.0.2 alice%.ngrams.0.25 alice%.ngrams.0.3 alice%.ngrams.0.35 alice%.ngrams.0.4 alice%.ngrams.0.45 alice%.ngrams.0.5 alice%.ngrams.0.55 alice%.ngrams.0.6 alice%.ngrams.0.65 alice%.ngrams.0.7 alice%.ngrams.0.75 alice%.ngrams.0.8 alice%.ngrams.0.85 alice%.ngrams.0.9 alice%.ngrams.0.95 alice%.ngrams.1.0
+
 en%.ngrams: en%.ngrams.0.05 en%.ngrams.0.1 en%.ngrams.0.15 en%.ngrams.0.2 en%.ngrams.0.25 en%.ngrams.0.3 en%.ngrams.0.35 en%.ngrams.0.4 en%.ngrams.0.45 en%.ngrams.0.5 en%.ngrams.0.55 en%.ngrams.0.6 en%.ngrams.0.65 en%.ngrams.0.7 en%.ngrams.0.75 en%.ngrams.0.8 en%.ngrams.0.85 en%.ngrams.0.9 en%.ngrams.0.95 en%.ngrams.1.0
 
 en%.ngrams.0.05: en%.unigrams
@@ -362,13 +366,64 @@ en%.ngrams.1.0: en%.unigrams
 
 textables: textables-fi textables-en
 
-textables-fi: results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-none.tex results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-none.tex results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-none.tex results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-none.tex  results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-small.tex results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-small.tex results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-small.tex results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-small.tex  results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-medium.tex results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-medium.tex results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-medium.tex results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-medium.tex  results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-huge.tex results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-huge.tex results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-huge.tex results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-huge.tex 
+textables-fi: results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-none.tex results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-none.tex results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-none.tex results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-none.tex  results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-small.tex results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-small.tex results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-small.tex results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-small.tex  results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-medium.tex results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-medium.tex results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-medium.tex results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-medium.tex  results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-huge.tex results/fi-FI.fiwiki.dictionary-full-boundaries-small.edit-distance-2-huge.tex results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-huge.tex results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-huge.tex results/fi-FI.autogen.dictionary-full-boundaries-none.edit-distance-2-none.tex results/fi-FI.autogen.dictionary-full-boundaries-small.edit-distance-2-none.tex results/fi-FI.autogen.dictionary-full-boundaries-medium.edit-distance-2-none.tex results/fi-FI.autogen.dictionary-full-boundaries-huge.edit-distance-2-none.tex  results/fi-FI.autogen.dictionary-full-boundaries-none.edit-distance-2-small.tex results/fi-FI.autogen.dictionary-full-boundaries-small.edit-distance-2-small.tex results/fi-FI.autogen.dictionary-full-boundaries-medium.edit-distance-2-small.tex results/fi-FI.autogen.dictionary-full-boundaries-huge.edit-distance-2-small.tex  results/fi-FI.autogen.dictionary-full-boundaries-none.edit-distance-2-medium.tex results/fi-FI.autogen.dictionary-full-boundaries-small.edit-distance-2-medium.tex results/fi-FI.autogen.dictionary-full-boundaries-medium.edit-distance-2-medium.tex results/fi-FI.autogen.dictionary-full-boundaries-huge.edit-distance-2-medium.tex  results/fi-FI.autogen.dictionary-full-boundaries-none.edit-distance-2-huge.tex results/fi-FI.autogen.dictionary-full-boundaries-small.edit-distance-2-huge.tex results/fi-FI.autogen.dictionary-full-boundaries-medium.edit-distance-2-huge.tex results/fi-FI.autogen.dictionary-full-boundaries-huge.edit-distance-2-huge.tex 
 
-textables-en: results/en-US.norvig1.dictionary-norvig.edit-distance-2.tex results/en-US.norvig2.dictionary-norvig.edit-distance-2.tex
+textables-en: results/en-US.norvig1.dictionary-norvig.edit-distance-2.tex results/en-US.norvig2.dictionary-norvig.edit-distance-2.tex results/en-US.autogen.edit-distance-2.tex
 
-results/%.tex: results/%.unigrams results/%.ngrams.10
-	sed -e 's/\[[^]]*\]//g' < results/$*.unigrams | awk -f results2tex.awk > $@
-	sed -e 's/\[[^]]*\]//g' < results/$*.ngrams.10 | awk -f results2tex.awk >> $@
+results/fi-FI%.tex: results/fi-FI%.unigrams results/fi-FI%.ngrams.10
+	sed -e 's/\[[^]]*\]//g' < results/fi-FI$*.unigrams | awk -f results2tex.awk > $@
+	sed -e 's/\[[^]]*\]//g' < results/fi-FI$*.ngrams.10 | awk -f results2tex.awk >> $@
+results/en-US%.tex: results/en-US%.unigrams results/en-US%.ngrams.10
+	sed -e 's/\[[^]]*\]//g' < results/en-US$*.unigrams | awk -f results2tex.awk > $@
+	sed -e 's/\[[^]]*\]//g' < results/en-US$*.ngrams.10 | awk -f results2tex.awk >> $@
+
+results/fi-FI.autogen.dictionary-full-boundaries-none.edit-distance-2-none.unigrams: fi-FI.autogen.contextspell $(OMORFI)/dictionary.default-boundaryweight-none.hfst $(OMORFI)/error.edit-distance-2-none.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-none.hfst $(OMORFI)/dictionary.default-boundaryweight-none.hfst < fi-FI.autogen.contextspell > $@
+
+results/fi-FI.autogen.dictionary-full-boundaries-small.edit-distance-2-none.unigrams: fi-FI.autogen.contextspell $(OMORFI)/dictionary.default-boundaryweight-small.hfst $(OMORFI)/error.edit-distance-2-none.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-none.hfst $(OMORFI)/dictionary.default-boundaryweight-small.hfst < fi-FI.autogen.contextspell > $@
+
+results/fi-FI.autogen.dictionary-full-boundaries-medium.edit-distance-2-none.unigrams: fi-FI.autogen.contextspell $(OMORFI)/dictionary.default-boundaryweight-medium.hfst $(OMORFI)/error.edit-distance-2-none.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-none.hfst $(OMORFI)/dictionary.default-boundaryweight-medium.hfst < fi-FI.autogen.contextspell > $@
+
+results/fi-FI.autogen.dictionary-full-boundaries-huge.edit-distance-2-none.unigrams: fi-FI.autogen.contextspell $(OMORFI)/dictionary.default-boundaryweight-huge.hfst $(OMORFI)/error.edit-distance-2-none.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-none.hfst $(OMORFI)/dictionary.default-boundaryweight-huge.hfst < fi-FI.autogen.contextspell > $@
+
+results/fi-FI.autogen.dictionary-full-boundaries-none.edit-distance-2-small.unigrams: fi-FI.autogen.contextspell $(OMORFI)/dictionary.default-boundaryweight-none.hfst $(OMORFI)/error.edit-distance-2-small.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-small.hfst $(OMORFI)/dictionary.default-boundaryweight-none.hfst < fi-FI.autogen.contextspell > $@
+
+results/fi-FI.autogen.dictionary-full-boundaries-small.edit-distance-2-small.unigrams: fi-FI.autogen.contextspell $(OMORFI)/dictionary.default-boundaryweight-small.hfst $(OMORFI)/error.edit-distance-2-small.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-small.hfst $(OMORFI)/dictionary.default-boundaryweight-small.hfst < fi-FI.autogen.contextspell > $@
+
+results/fi-FI.autogen.dictionary-full-boundaries-medium.edit-distance-2-small.unigrams: fi-FI.autogen.contextspell $(OMORFI)/dictionary.default-boundaryweight-medium.hfst $(OMORFI)/error.edit-distance-2-small.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-small.hfst $(OMORFI)/dictionary.default-boundaryweight-medium.hfst < fi-FI.autogen.contextspell > $@
+
+results/fi-FI.autogen.dictionary-full-boundaries-huge.edit-distance-2-small.unigrams: fi-FI.autogen.contextspell $(OMORFI)/dictionary.default-boundaryweight-huge.hfst $(OMORFI)/error.edit-distance-2-small.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-small.hfst $(OMORFI)/dictionary.default-boundaryweight-huge.hfst < fi-FI.autogen.contextspell > $@
+
+results/fi-FI.autogen.dictionary-full-boundaries-none.edit-distance-2-medium.unigrams: fi-FI.autogen.contextspell $(OMORFI)/dictionary.default-boundaryweight-none.hfst $(OMORFI)/error.edit-distance-2-medium.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-medium.hfst $(OMORFI)/dictionary.default-boundaryweight-none.hfst < fi-FI.autogen.contextspell > $@
+
+results/fi-FI.autogen.dictionary-full-boundaries-small.edit-distance-2-medium.unigrams: fi-FI.autogen.contextspell $(OMORFI)/dictionary.default-boundaryweight-small.hfst $(OMORFI)/error.edit-distance-2-medium.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-medium.hfst $(OMORFI)/dictionary.default-boundaryweight-small.hfst < fi-FI.autogen.contextspell > $@
+
+results/fi-FI.autogen.dictionary-full-boundaries-medium.edit-distance-2-medium.unigrams: fi-FI.autogen.contextspell $(OMORFI)/dictionary.default-boundaryweight-medium.hfst $(OMORFI)/error.edit-distance-2-medium.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-medium.hfst $(OMORFI)/dictionary.default-boundaryweight-medium.hfst < fi-FI.autogen.contextspell > $@
+
+results/fi-FI.autogen.dictionary-full-boundaries-huge.edit-distance-2-medium.unigrams: fi-FI.autogen.contextspell $(OMORFI)/dictionary.default-boundaryweight-huge.hfst $(OMORFI)/error.edit-distance-2-medium.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-medium.hfst $(OMORFI)/dictionary.default-boundaryweight-huge.hfst < fi-FI.autogen.contextspell > $@
+
+results/fi-FI.autogen.dictionary-full-boundaries-none.edit-distance-2-huge.unigrams: fi-FI.autogen.contextspell $(OMORFI)/dictionary.default-boundaryweight-none.hfst $(OMORFI)/error.edit-distance-2-huge.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-huge.hfst $(OMORFI)/dictionary.default-boundaryweight-medium.hfst < fi-FI.autogen.contextspell > $@
+
+results/fi-FI.autogen.dictionary-full-boundaries-small.edit-distance-2-huge.unigrams: fi-FI.autogen.contextspell $(OMORFI)/dictionary.default-boundaryweight-small.hfst $(OMORFI)/error.edit-distance-2-huge.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-huge.hfst $(OMORFI)/dictionary.default-boundaryweight-small.hfst < fi-FI.autogen.contextspell > $@
+
+results/fi-FI.autogen.dictionary-full-boundaries-medium.edit-distance-2-huge.unigrams: fi-FI.autogen.contextspell $(OMORFI)/dictionary.default-boundaryweight-medium.hfst $(OMORFI)/error.edit-distance-2-huge.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-huge.hfst $(OMORFI)/dictionary.default-boundaryweight-medium.hfst < fi-FI.autogen.contextspell > $@
+
+results/fi-FI.autogen.dictionary-full-boundaries-huge.edit-distance-2-huge.unigrams: fi-FI.autogen.contextspell $(OMORFI)/dictionary.default-boundaryweight-huge.hfst $(OMORFI)/error.edit-distance-2-huge.hfst
+	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-huge.hfst $(OMORFI)/dictionary.default-boundaryweight-huge.hfst < fi-FI.autogen.contextspell > $@
 
 results/fi-FI.fiwiki.dictionary-full-boundaries-none.edit-distance-2-none.unigrams: fi-FI.fiwiki-gutenberg.contextspell $(OMORFI)/dictionary.default-boundaryweight-none.hfst $(OMORFI)/error.edit-distance-2-none.hfst
 	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-none.hfst $(OMORFI)/dictionary.default-boundaryweight-none.hfst < fi-FI.fiwiki-gutenberg.contextspell > $@
@@ -417,6 +472,9 @@ results/fi-FI.fiwiki.dictionary-full-boundaries-medium.edit-distance-2-huge.unig
 
 results/fi-FI.fiwiki.dictionary-full-boundaries-huge.edit-distance-2-huge.unigrams: fi-FI.fiwiki-gutenberg.contextspell $(OMORFI)/dictionary.default-boundaryweight-huge.hfst $(OMORFI)/error.edit-distance-2-huge.hfst
 	hfst-ospell-cicling $(OMORFI)/error.edit-distance-2-huge.hfst $(OMORFI)/dictionary.default-boundaryweight-huge.hfst < fi-FI.fiwiki-gutenberg.contextspell > $@
+
+results/en-US.autogen.dictionary-norvig.edit-distance-2.unigrams: en-US.autogen.contextspell $(NORVIG)/dictionary.default.hfst $(NORVIG)/error.edit-distance-2.hfst
+	hfst-ospell-cicling $(NORVIG)/error.edit-distance-2.hfst $(NORVIG)/dictionary.default.hfst < en-US.autogen.contextspell > $@
 
 results/en-US.norvig1.dictionary-norvig.edit-distance-2.unigrams: norvig1.contextspell $(NORVIG)/dictionary.default.hfst $(NORVIG)/error.edit-distance-2.hfst
 	hfst-ospell-cicling $(NORVIG)/error.edit-distance-2.hfst $(NORVIG)/dictionary.default.hfst < norvig1.contextspell > $@
