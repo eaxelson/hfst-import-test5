@@ -19,7 +19,7 @@
 # prefer alphabetical order, except for core tests others depend upon
 # If compare doesn't function 99 % of other tests will fail anyways
 
-# SUBDIRS=fsmbook-examples
+SUBDIRS=fsmbook-examples
 
 if WANT_STRESSTESTS
 STRESSES=lexc2fst-stress.sh lookup-stress.sh proc-stress.sh valgrind.sh

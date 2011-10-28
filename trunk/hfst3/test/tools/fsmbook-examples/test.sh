@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Perform check in each directory.
-# Rules must be implemented before directories FinnishProsody, PlusOrMinus,
-# FinnishOTProsody and YaleShooting can be tested. 
+# Rules must be implemented before all directories can be tested. 
 # Directory Lingala requires a professional licence of xfst so that
 # the resulting transducer can be written in att format. 
 
