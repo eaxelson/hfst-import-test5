@@ -128,18 +128,18 @@ approach to modeling such correspondences of keystroke sequences and
 letters is using a stochastic model with hidden variables, such as a
 hidden Markov model.
 
-Though predictive text entry can be modeled fairly well using hidden
-Markov models on key sequences as demonstrated by~\cite{Tantug:2010},
-there are problems with this approach for agglutinative languages. A
-second or third order HMM cannot encode very long dependencies inside
-words. This leads to difficulties in processing agglutinative
-languages, since it is difficult to separate stems from affixes in an
-adequate manner and to handle arbitrarily long phonological
-dependencies like vowel harmony in Finnish and Turkish. Using higher
-order HMMs could in theory lead to better accuracy for longer
-dependencies, but higher order HMMs suffer both from the data
-sparseness problem and efficiency problems, which limit their
-usability.
+Though predictive text entry can be modeled fairly well using HMMs on
+key sequences and even using simply n-grams of letter sequences as
+demonstrated by~\cite{Tantug:2010}, there are problems with these
+approaches for agglutinative languages. A second or third order HMM
+cannot encode very long dependencies inside words. This leads to
+difficulties in processing agglutinative languages, since it is
+difficult to separate stems from affixes in an adequate manner and to
+handle arbitrarily long phonological dependencies like vowel harmony
+in Finnish and Turkish. Using higher order HMMs could in theory lead
+to better accuracy for longer dependencies, but higher order HMMs
+suffer both from the data sparseness problem and efficiency problems,
+which limit their usability.
 
 We observed earlier that dictionary based methods produce poor results
 for agglutinative languages. Still the number of word stems seen in
@@ -167,9 +167,10 @@ Markov chain on morph sequences is likely to suffer from the data
 sparseness problem especially when trying to estimate the probability
 of word forms whose stem has occurred few times (perhaps only once) in
 the training corpus. Also productive compounding presents a problem,
-because there are infinitely many ways in which word stems can combine
-to form new word forms. We therefore combine the Markov chain of morph
-sequences with an HMM which maps key sequences to letter sequences.
+because (for practical purposes) there are infinitely many ways in
+which word stems can combine to form new word forms. We therefore
+combine the Markov chain of morph sequences with an HMM which maps key
+sequences to letter sequences.
 
 For the Finnish example in the previous paragraph, the HMM gives an
 estimate for the probability of the sequence of letters "t-a-l-o",
@@ -194,7 +195,8 @@ house), the final is "a" which can be deduced from the vowel "o" in
 the stem, but neither the morph sequence model nor the letter HMM can
 disambiguate between "a" and "ä". The morpheme sequence model doesn't
 aid in disambiguation, since it looks at adjacent morphs and the stem
-and ending "ss\"{a}" are separated by the plural morph "i". Also the
+and ending "ss\"{a}" are separated by the plural morph "i" (the vowel
+"i" is neutral with regard to the vowel harmony phenomenon). Also the
 letter sequence HMM fails to disambiguate between the front and back
 vowel, since it can only consider the co-occurrence of letters that
 are separated by less than three letters and the letters "o" and "a"
@@ -220,12 +222,11 @@ vowel harmony, which cannot be captured by Markov models.
 We denote a sequence of mobile phone keypad keys of length $n$ by $K =
 (k_i)_{i=1}^{n}$. Here each $k_i$ corresponds to a key on the mobile
 phone keypad. For the key $k$, we denote the set of letters
-corresponding to the key $k$ by ${\rm M}(k)$. E.g. ${\rm M}(2) = \{$
-a, b, c, \"{a}$\}$ on a typical Finnish mobile phone
+corresponding to the key $k$ by ${\rm M}(k)$. E.g. ${\rm M}(2) = \{$a,~b,~c,~\"{a}$\}$ on a typical Finnish mobile phone
 keyboard. Correspondingly, we denote a sequences of letter of length
 $m$ by $L = (l_i)_{i=1}^{m}$.
 
-The task in the letter model is to give the probability of a letter
+The task of the letter model is to give the probability of a letter
 sequence $L$ given a sequence of keys $K$. Naturally ${\rm P}(L|K) > 0$, iff
 $L \in {\rm M}(K)$. The probability ${\rm P}(L|K)$ is given in equation (\ref{letter-chain-eqn}).  
 \begin{equation}\label{letter-chain-eqn}
@@ -248,12 +249,39 @@ probability of a sequence of morphs $L_1{\rm ... }L_k \in {\rm M}(K)$
 is given by the chain rule of probabilities in equation
 (\ref{chain-eqn}).
 \begin{equation}\label{chain-eqn}
-{\rm P}\big(L_1{\rm, ..., }\ L_k\big) = {\rm P}(L_1 | L_2 {\rm, ..., }\ L_k) {\rm P}(L_2 | L_3 {\rm, ..., }\ L_k)\ {\rm ... }\ {\rm P}(L_{k-1} | L_k){\rm P}(L_k)
+{\rm P}(L_1{\rm, ..., }\ L_k) = {\rm P}(L_1){\rm P}(L_2|L_1)\ {\rm ... }\ P(L_k| L_1{\rm, ..., }\ L_{k - 1})
 \end{equation}
 
-We make the standard assumptions for a first order Markov model and approximate equation (\ref{chain-eqn}) by equation (\ref{markov-eqn}).
+We make the standard assumptions for a first order Markov model,
+namely that ${\rm P}(L_i | L_1{\rm, ..., }\ L_{i-1}) = {\rm P}(L_i |
+L_{i-1})$, which means that we assume that the probability of a morph
+occurring depends only on its neighboring morphs and the morph
+itself. This allows us to approximate equation (\ref{chain-eqn}) by
+equation (\ref{markov-eqn}).
 \begin{equation}\label{markov-eqn}
-{\rm P}\big(L_1{\rm, ..., }L_k\big) = {\rm P}\big(L_1 | L_2){\rm P}\big(L_2 | L_3)\ {\rm ... }\ {\rm P}(L_{k-1} | L_k){\rm P}(L_k)
+{\rm P}\big(L_1{\rm, ..., }L_k\big) = {\rm P}(L_1){\rm P}\big(L_2 | L_1){\rm P}\big(L_3 | L_2)\ {\rm ... }\ {\rm P}(L_{k} | L_{k-1})
+\end{equation}
+
+In practice we use a training corpus for estimating the probability
+${\rm P}(L_i | L_{i-1})$. For the morphs $L_i$ and $L_{i-1}$ we
+use the estimate in equation~(\ref{count-estimate}), where ${\rm
+  C}(L_{i-1},\ L_i)$ is the number of times that the morph $L_{i-1}$
+was followed by the morph $L_i$ in the training corpus and ${\rm
+  C}(L_{i-1})$ is the count of the morph $L_{i-1}$ in the training
+corpus.
+\begin{equation}\label{count-estimate}
+{\rm \hat{P}}(L_i | L_{i-1}) = {\rm C}(L_{i - 1},\ L_i) / {\rm C}(L_{i-1})
+\end{equation}
+
+Since many morphs $L_i$ and $L_{i-1}$
+do not occur adjacently anywhere in the training corpus, we also
+utilize the unigram estimates ${\rm \hat{P}}(L_i) = {\rm C}(L_i)/M$
+when estimating the probabilities ${\rm P}(L_i | L_{i-1})$. Here $M$
+is the size of the training corpus. The actual estimate for the
+probability ${\rm P}(L_i | L_{i-1})$ is given in
+equation~(\ref{bigram-estimate}). The coefficient $a$ is determined by deleted interpolation (see \cite{Brants:2000}).
+\begin{equation}\label{bigram-estimate}
+{\rm P}(L_i | L_{i-1}) = {\rm \hat{P}}(L_i | L_{i-1})^a{\rm \hat{P}}(L_i)^{1 - a}{\rm,\ where }\ 0\leq a \leq 1\ {\rm.} 
 \end{equation}
 
 It should be noted that we are dealing with morph sequences and not
@@ -353,6 +381,21 @@ entry method, which means we need to use multitap as fallback.
   letters "k" in "kukka".}\label{kukka-kpc}
 \end{center}
 \end{figure}
+
+\begin{table}
+\caption{KPC for Turkish}\label{Turkish-kpc-table}
+\begin{center}
+\begin{tabular}{ll}
+\hline
+Method &~~~~KPC\\
+\hline
+Our method &~~~~1.1768\\
+Letter n-grams~\cite{Tantug:2010} &~~~~..\\
+Multitap &~~~~2.43855\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
 
 \begin{figure}[htb!]
 \begin{center}
