@@ -1,6 +1,7 @@
 \documentclass{llncs}
 \usepackage{epsf}
 \usepackage{graphicx}
+\usepackage[utf8]{inputenc}
 
 \begin{document}
 
@@ -48,6 +49,16 @@ implementing the vowel harmony rules needed for text entry of Finnish
 
 \section{Introduction}
 
+\begin{figure}[hbt!]
+\begin{center}
+\includegraphics[width=1.8in]{finnish_mobile_phone_keypad.pdf}
+\caption{The 12-key keypad of a typical Finnish mobile phone. There are three letters in the Finnish alphabet "\"{a}", "å" and "\"{o}", which are not shown on the keypad. The
+  letters "\"{a}" and "å" are entered pressing key "2" four times and
+  five times respectively. The letter "\"{o}" is entered by pressing
+  the key "6" four times.}\label{keypad}
+\end{center}
+\end{figure}
+
 Mobile phone text messages are a hugely popular means of
 communication, but mobile phones are not especially well suited for
 inputting text because of their small size and often limited
@@ -56,6 +67,8 @@ on mobile phones and other limited keyboard devices. This paper is
 concerned with a technology called predictive text entry, which
 utilizes redundancy in natural language in order to enable efficient
 text entry using limited keyboards (typically having 12 keys).
+
+
 
 The subject of predictive text entry has been extensively studied, but
 the studies have mainly concerned on predictive text entry of
@@ -105,26 +118,75 @@ and future work directions in section~\ref{conclusion}.
 
 \section{Earlier Approaches to Predictive Text Entry}\label{earlier-work}
 
+Lore ipsum...
 
 \section{A Probabilistic Model of Word Structure}\label{model}
 
-Predictive text entry can be seen as a labelling task, where every key
+Predictive text entry can be seen as a labeling task, where every key
 in a sequence of keys is assigned its most likely letter. An obvious
-and well teted approach to modelling such correspondences of keystroke
-sequences and letters is using a stochastic model with hidden
-variables, such as a hidden Markov model.
+approach to modeling such correspondences of keystroke sequences and
+letters is using a stochastic model with hidden variables, such as a
+hidden Markov model.
 
-Though suggestions can be modelled fairly well using hidden Markov
+Though suggestions can be modeled fairly well using hidden Markov
 models on key sequences, there are problems with this approach, which
-suggests an improved model should be used. A second or third order HMM
-cannot encode very long dependencies inside words. This leads to
-difficulties, since it is difficult to separate stems from affixes in
-an adequate manner. It is also impossible to encode phonological
-dependencies like vowel harmony using HMMs.
+suggests an improved model should be used for agglutinative
+languages. A second or third order HMM cannot encode very long
+dependencies inside words. This leads to difficulties, since it is
+difficult to separate stems from affixes in an adequate manner. It is
+also impossible to encode phonological dependencies like vowel harmony
+using HMMs. On the other hand higher order HMMs suffer both from the
+data sparseness problem and efficiency problems, which limits their
+usability.
+
+We observe that number of word stems seen in training corpora of
+comparable sizes for agglutinative and isolating languages are
+comparable. The reasons that make dictionary based models fare poorly
+for agglutinative languages are thus inflection, compounding and
+derivation. Therefore we model words as sequences of morphs, which are
+extracted from an automatically segmented training corpus. As the
+statistical model we use a Markov chain.
+
+A Markov chain on morph sequences is likely to suffer from the data
+sparseness problem especially when trying to estimate the probability
+of word forms whose lemma has occurred few times in the training
+corpus. We therefore combine the Markov chain with an HMM which maps
+key sequences to letter sequences.
+
+Lastly agglutinative languages like Finnish incorporate phonological
+phenomena, such as vowel harmony, which span over entire word forms
+consisting of several morphs. These phenomena cannot be adequately
+captured using n-gram models of morphs or letters, so we include
+phonological rules which realize the constraints.
 
 \subsection{A Hidden Markov Model for Predicting Letter Sequences from Key Sequences}
 
+We denote a sequence of keys of length $n$ by $K = (k_i)_{i=1}^{n}$. Here
+each $k_i$ corresponds to a key on the mobile phone keypad. For the
+key $k$, we denote the set of letters corresponding to the key $k$ by ${\rm
+  M}(k)$. E.g. ${\rm M}(2) = \{$ a, b, c, \"{a}$\}$ on a typical
+Finnish mobile phone keyboard.
+
 \subsection{A Markov Chain of Morphs}
+
+We denote a morph of $n$ letters in the training-data by
+$L = (l_i)_{i=1}^{n}$. A key sequence $K = (K_i)_{i=1}^{m}$ corresponds to a
+sequence of morphs $L_1{\rm ... }L_k$ , where each $L_j = (l_{j_i})_{i=1}^{n_j}$, iff $\Sigma_{j = 1}^{k} n_j = m$ and
+$l_{j_i} \in {\rm M}(k_{m_1 + {\rm ... } + m_{j - 1} + i})$. We denote
+the set of morph sequences that correspond to a key sequence
+$K$ by ${\rm M}(K)$.
+
+The task of the morph model is to assign a probability for each
+sequence of morphs in ${\rm M}(K)$ for each key
+sequence $K$. The probability of a sequence of morphs $L_1{\rm ... }L_k \in {\rm M}(K)$ is given by the chain rule of probabilities in equation (\ref{chain-eqn}).
+\begin{equation}\label{chain-eqn}
+{\rm P}\big(L_1{\rm, ..., }\ L_k\big) = {\rm P}(L_1 | L_2 {\rm, ..., }\ L_k) {\rm P}(L_2 | L_3 {\rm, ..., }\ L_k)\ {\rm ... }\ {\rm P}(L_{k-1} | L_k){\rm P}(L_k)
+\end{equation}
+
+We make the standard assumptions for a first order Markov model and approximate equation (\ref{chain-eqn}) by equation (\ref{markov-eqn}).
+\begin{equation}\label{markov-eqn}
+{\rm P}\big(L_1{\rm, ..., }L_k\big) = {\rm P}\big(L_1 | L_2){\rm P}\big(L_2 | L_3)\ {\rm ... }\ {\rm P}(L_{k-1} | L_k){\rm P}(L_k)
+\end{equation}
 
 \subsection{Phonological Constraints}
 
