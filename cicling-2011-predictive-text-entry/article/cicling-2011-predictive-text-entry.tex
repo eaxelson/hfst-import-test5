@@ -52,23 +52,23 @@ implementing the vowel harmony rules needed for text entry of Finnish
 \begin{figure}[hbt!]
 \begin{center}
 \includegraphics[width=1.2in]{Nappaimet.pdf}
-\caption{The 12-key keypad of a typical Finnish mobile phone. There are three letters in the Finnish alphabet "\"{a}", "å" and "\"{o}", which are not shown on the keypad. The
-  letters "\"{a}" and "å" are entered pressing key "2" four times and
-  five times respectively. The letter "\"{o}" is entered by pressing
-  the key "6" four times.}\label{keypad}
+\caption{The 12-key keypad of a typical Finnish mobile phone. There
+  are three letters in the Finnish alphabet "\"{a}", "å" and "\"{o}",
+  which are not shown on the keypad. The letters "\"{a}" and "å" are
+  entered pressing key "2" four times and five times respectively. The
+  letter "\"{o}" is entered by pressing the key "6" four
+  times.}\label{keypad}
 \end{center}
 \end{figure}
 
 Mobile phone text messages are a hugely popular means of
 communication, but mobile phones are not especially well suited for
 inputting text because of their small size and often limited
-keyboard. There exist several technological solutions for inputting text
-on mobile phones and other limited keyboard devices. This paper is
-concerned with a technology called predictive text entry, which
+keyboard. There exist several technological solutions for inputting
+text on mobile phones and other limited keyboard devices. This paper
+is concerned with a technology called predictive text entry, which
 utilizes redundancy in natural language in order to enable efficient
 text entry using limited keyboards (typically having 12 keys).
-
-
 
 The subject of predictive text entry has been extensively studied, but
 the studies have mainly concerned on predictive text entry of
@@ -98,11 +98,12 @@ phones and show that our approach gives superior KPC.
 Apart from phonological rules, our approach is entirely unsupervised
 and data-driven, since we us the unsupervised morphological
 segmentation system Morfessor \cite{Creutz07ACMTSLP} for segmenting
-the training corpus and the tools for constructing POS-taggers form the HFST interface~\cite{hfst/2011}. We show that it can be applied to another
-agglutinative language besides Finnish, namely Turkish. We compare the
-Turkish text entry system to an existing text entry system, which is
-based on a hidden Markov model and show that our approach gives a
-substantial improvement in KPC.
+the training corpus and the tools for constructing POS-taggers form
+the HFST interface~\cite{hfst/2011}. We show that it can be applied to
+another agglutinative language besides Finnish, namely Turkish. We
+compare the Turkish text entry system to an existing text entry
+system, which is based on a hidden Markov model and show that our
+approach gives a substantial improvement in KPC.
 
 The paper is structured as follows. In section~\ref{earlier-work} we
 present some earlier approaches to predictive text entry. In
@@ -119,6 +120,8 @@ and future work directions in section~\ref{conclusion}.
 \section{Earlier Approaches to Predictive Text Entry}\label{earlier-work}
 
 Lore ipsum...
+
+\section{Inputting text on a Mobile Phone}
 
 \section{A Probabilistic Model of Word Structure}\label{model}
 
@@ -222,7 +225,8 @@ vowel harmony, which cannot be captured by Markov models.
 We denote a sequence of mobile phone keypad keys of length $n$ by $K =
 (k_i)_{i=1}^{n}$. Here each $k_i$ corresponds to a key on the mobile
 phone keypad. For the key $k$, we denote the set of letters
-corresponding to the key $k$ by ${\rm M}(k)$. E.g. ${\rm M}(2) = \{$a,~b,~c,~\"{a}$\}$ on a typical Finnish mobile phone
+corresponding to the key $k$ by ${\rm M}(k)$. E.g. ${\rm M}(2) =
+\{$a,~b,~c,~\"{a}$\}$ on a typical Finnish mobile phone
 keyboard. Correspondingly, we denote a sequences of letter of length
 $m$ by $L = (l_i)_{i=1}^{m}$.
 
@@ -249,7 +253,8 @@ probability of a sequence of morphs $L_1{\rm ... }L_k \in {\rm M}(K)$
 is given by the chain rule of probabilities in equation
 (\ref{chain-eqn}).
 \begin{equation}\label{chain-eqn}
-{\rm P}(L_1{\rm, ..., }\ L_k) = {\rm P}(L_1){\rm P}(L_2|L_1)\ {\rm ... }\ P(L_k| L_1{\rm, ..., }\ L_{k - 1})
+{\rm P}(L_1{\rm, ..., }\ L_k) = {\rm P}(L_1){\rm P}(L_2|L_1)\ {\rm
+  ... }\ P(L_k| L_1{\rm, ..., }\ L_{k - 1})
 \end{equation}
 
 We make the standard assumptions for a first order Markov model,
@@ -259,7 +264,8 @@ occurring depends only on its neighboring morphs and the morph
 itself. This allows us to approximate equation (\ref{chain-eqn}) by
 equation (\ref{markov-eqn}).
 \begin{equation}\label{markov-eqn}
-{\rm P}\big(L_1{\rm, ..., }L_k\big) = {\rm P}(L_1){\rm P}\big(L_2 | L_1){\rm P}\big(L_3 | L_2)\ {\rm ... }\ {\rm P}(L_{k} | L_{k-1})
+{\rm P}\big(L_1{\rm, ..., }L_k\big) = {\rm P}(L_1){\rm P}\big(L_2 |
+L_1){\rm P}\big(L_3 | L_2)\ {\rm ... }\ {\rm P}(L_{k} | L_{k-1})
 \end{equation}
 
 In practice we use a training corpus for estimating the probability
@@ -270,18 +276,21 @@ was followed by the morph $L_i$ in the training corpus and ${\rm
   C}(L_{i-1})$ is the count of the morph $L_{i-1}$ in the training
 corpus.
 \begin{equation}\label{count-estimate}
-{\rm \hat{P}}(L_i | L_{i-1}) = {\rm C}(L_{i - 1},\ L_i) / {\rm C}(L_{i-1})
+{\rm \hat{P}}(L_i | L_{i-1}) = {\rm C}(L_{i - 1},\ L_i) / {\rm
+  C}(L_{i-1})
 \end{equation}
 
-Since many morphs $L_i$ and $L_{i-1}$
-do not occur adjacently anywhere in the training corpus, we also
-utilize the unigram estimates ${\rm \hat{P}}(L_i) = {\rm C}(L_i)/M$
-when estimating the probabilities ${\rm P}(L_i | L_{i-1})$. Here $M$
-is the size of the training corpus. The actual estimate for the
-probability ${\rm P}(L_i | L_{i-1})$ is given in
-equation~(\ref{bigram-estimate}). The coefficient $a$ is determined by deleted interpolation (see \cite{Brants:2000}).
+Since many morphs $L_i$ and $L_{i-1}$ do not occur adjacently anywhere
+in the training corpus, we also utilize the unigram estimates ${\rm
+  \hat{P}}(L_i) = {\rm C}(L_i)/M$ when estimating the probabilities
+${\rm P}(L_i | L_{i-1})$. Here $M$ is the size of the training
+corpus. The actual estimate for the probability ${\rm P}(L_i |
+L_{i-1})$ is given in equation~(\ref{bigram-estimate}). The
+coefficient $a$ is determined by deleted interpolation (see
+\cite{Brants:2000}).
 \begin{equation}\label{bigram-estimate}
-{\rm P}(L_i | L_{i-1}) = {\rm \hat{P}}(L_i | L_{i-1})^a{\rm \hat{P}}(L_i)^{1 - a}{\rm,\ where }\ 0\leq a \leq 1\ {\rm.} 
+{\rm P}(L_i | L_{i-1}) = {\rm \hat{P}}(L_i | L_{i-1})^a{\rm
+  \hat{P}}(L_i)^{1 - a}{\rm,\ where }\ 0\leq a \leq 1\ {\rm.}
 \end{equation}
 
 It should be noted that we are dealing with morph sequences and not
@@ -380,25 +389,15 @@ material.
 Many factors influence the efficiency of mobile phone text entry in
 practice. E.g. the general user interface design of the phone and
 specifically the design of the keyboard have a large
-impact. Nevertheless such factors are in some sense isolated from the
+impact. Nevertheless such factors are in some sense separate from the
 predictive text entry algorithm itself, which makes it plausible to
 evaluate the algorithms in isolation from the rest of the user
 interface of mobile phones. In this paper we use the keystrokes per
 character (KPC) ratio~\cite{MacKenzie02kspc} for measuring the
-efficiency of text entry. It measures the average number of keystrokes
-required to input one letter in a text message. As a measure of the
-efficiency of predictive text input, keystrokes per character leaves
-something to be desired, since it in no way incorporates factors such
-as cognitive workload, but such factors could not be adequately
-addressed in a paper on computational linguistics. Moreover they
-cannot be studied in isolation from the user interface of the mobile
-phone.
-
-The keystroke per character ratio for a text entry method on test data
-is computed as the ratio of keystrokes used to enter the data and the
-number of letters in the words in the data. Following
-\cite{Tantug:2010}, we do not consider space characters as a part of
-the test data.
+efficiency of text entry. The KPC ratio for a text entry method is
+computed as the average number of keystrokes required to input one
+letter in a test corpus. Following \cite{Tantug:2010}, we do not
+consider space characters as a part of the test data.
 
 \begin{figure}[htb!]
 \begin{center}
@@ -428,51 +427,44 @@ that multitap is used as a fallback method when entering OOV words,
 i.e. words that are not found among the suggestions given by the
 system. In detail, entering an OOV word requires:
 \begin{enumerate}
-\item Entering the keys for the letters used to write the word (one keystroke per letter).
-\item Scrolling through the suggestions ($9$ keystrokes in our system, since $10$ suggestions are given).
-\item Deleting the last suggestion one letter at a time using a backspace key {\tt <C> } (one keystroke per letter).
-\item Switching to multitap mode using a special key {\tt <MOD> } (one keystroke).
-\item Inputting the word in multitap mode (keystroke count varies depending on the word).
-\item Switching back to predictive text entry mode using the key {\tt <MOD> } (one keystroke).
+\item Entering the keys for the letters used to write the word (one
+  keystroke per letter).
+\item Scrolling through the suggestions ($9$ keystrokes in our system,
+  since $10$ suggestions are given).
+\item Deleting the last suggestion one letter at a time using a
+  backspace key {\tt <C> } (one keystroke per letter).
+\item Switching to multitap mode using a special key {\tt <MOD> } (one
+  keystroke).
+\item Inputting the word in multitap mode (keystroke count varies
+  depending on the word).
+\item Switching back to predictive text entry mode using the key {\tt
+  <MOD> } (one keystroke).
 \end{enumerate}
 
-\begin{figure}[htb!]
-\begin{center}
-\begin{tabular}{lllllllllllllllllllll}
-1. & \texttt{m} & \texttt{i} & \texttt{t} & \texttt{\"{a}} & \\ 
-2. & \texttt{\"{o}} & \texttt{i} & \texttt{t} & \texttt{\"{a}} & \\ 
-\hline
- & \texttt{6} & \texttt{4} & \texttt{8} & \texttt{2} & \texttt{<NEXT>}\\\\
-\end{tabular}
-\end{center}
-\caption{Inputting the Finnish word "\"{o}it\"{a}" requires pressing \texttt{<NEXT>} to reach the second suggestion which is correct. Totally $5$ keystrokes are required to input "\"{o}it\"{a}".} \label{new-method-kpc-known}
-\end{figure}
+\subsection{Results for Finnish}
 
+We constructed $12$ text entry systems using different portions of the
+training data for Finnish presented in section~\ref{data}. We used the
+first $1000$, $35000$, $69000$, $103000$, $137000$, $171000$,
+$205000$, $239000$, $273000$, $307000$, $341000$ and $345337$ words
+respectively. The impact of the size of the training data is shown in
+figure~\ref{fi-kpc-graph}. The minimum KPC ratio $1.3818$ was attained
+for the entire training data consisting of $345337$ words.
 
-Figure \ref{new-method-kpc-known} demonstrates the key sequence used
-to enter the word "\"{o}it\"{a}" (nights) using our own text entry
-method. Since "\"{o}it\"{a}" is the second suggestion, the {\tt
-  <NEXT>}-key needs to be pressed once. The figure
-\ref{new-method-kpc-unknown} shows inputting the word "subi" (probably
-a Finnish version of sub). The word "subi" is and OOV word in our
-system, which means we need to use multitap as fallback.
+We also evaluated the effect of the different components on the KPC of
+the predictive text entry system. The results are shown in
+figure~\ref{Finnish-kpc-table}.
 
-\begin{figure}[htb!]
-
-\begin{center}
-\begin{tabular}{rlllllllllllllllllllll}
-1. & \texttt{s} & \texttt{u} & \texttt{c} & \texttt{h}\\
- & . & . & .\\
-10. & \texttt{s} & \texttt{t} & \texttt{a} & \texttt{h}\\
-\\
-    & \texttt{s} & \texttt{u} & \texttt{b} & \texttt{i}\\    
-\hline
- & \texttt{7} & \texttt{8} & \texttt{2} & \texttt{4} & \texttt{<NEXT>} & \texttt{...} & \texttt{<NEXT>} & \texttt{<C>} & \texttt{<C>} & \texttt{<C>} & \texttt{<C>} & \texttt{<MOD>} & \texttt{7-7-7-7} & \texttt{8-8} & \texttt{2-2} & \texttt{4-4-4} & \texttt{<MOD>}
-\end{tabular}
-
-\caption{Entering the word "subi" which is not given by our method, requires $30$ keystrokes.} \label{new-method-kpc-unknown}
-\end{center}
-\end{figure}
+We compared our system to another published Finnish text-entry system
+by~\cite{silfverberg/2011/cla}.  They do not evaluate their system
+using the KPC ratio, but we were able to obtain their test results and
+according to our experiments they achieve a KPC ratio of
+$1.6120$.~\footnote{When examining the test data used by
+  \cite{silfverberg/2011/cla}, we discovered, that the latter half of
+  the data consisted of a uniquefied wordlist, which effected their
+  results negatively. We have computed the KPC ratio for both our own
+  system and the system of \cite{silfverberg/2011/cla} using only the
+  $6663$ first words in the test data.}
 
 \begin{table}
 \begin{center}
@@ -483,37 +475,41 @@ system, which means we need to use multitap as fallback.
 \hline
 Method &~~~~KPC &~~~~Improvement\\
 \hline
-Multitap                                       &~~~~2.4018 &~~~~0\%\\
-Letter n-grams                                 &~~~~1.7368 &~~~~27.7\%\\
-Letter n-grams and morph sequence model        &~~~~1.3825 &~~~~43.4\%\\
-Letter n-grams, morph sequence model and rules &~~~~1.3818 &~~~~43.5\%\\
+Multitap                                       &~~~~2.4018 &~~~~0 \%\\
+Letter n-grams                                 &~~~~1.7368 &~~~~27.7 \%\\
+Letter n-grams and morph sequence model        &~~~~1.3825 &~~~~43.4 \%\\
+Letter n-grams, morph sequence model and rules &~~~~1.3818 &~~~~43.5 \%\\
 \hline
 \end{tabular}
 \end{center}
 \end{table}
 
+\begin{figure}[hbt!]
+\includegraphics[width=4in]{finnish_kpc_figure.pdf}
+\caption{The effect of the amount of training data on the KPC ratio of
+  the Finnish predictive text entry system. The dashed line shows the
+  KPC for multitap.}\label{fi-kpc-graph}
+\end{figure}
+
+\subsection{Results for Turkish}
+
+
 \begin{table}
-\caption{KPC for Turkish using different input methods. the multitap method. The third column shows the improvement over
+\caption{KPC for Turkish using different input methods. the multitap
+  method. The third column shows the improvement over
   multitap}\label{Turkish-kpc-table}
 \begin{center}
 \begin{tabular}{lll}
 \hline
 Method &~~~~KPC &~~~~Improvement\\
 \hline
-Multitap                          &~~~~2.4386 &~~~~0\%\\
-Letter n-grams~\cite{Tantug:2010} &~~~~1.4382 &~~~~41.0\%\\
-Our method                        &~~~~1.1768 &~~~~51.7\%\\
+Multitap                          &~~~~2.4386 &~~~~0 \%\\
+Letter n-grams~\cite{Tantug:2010} &~~~~1.4382 &~~~~41.0 \%\\
+Our method                        &~~~~1.1768 &~~~~51.7 \%\\
 \hline
 \end{tabular}
 \end{center}
 \end{table}
-
-
-
-
-\begin{figure}[hbt!]
-\includegraphics[width=4in]{finnish_kpc_figure.pdf}
-\end{figure}
 
 \section{Discussion}\label{discussion}
 
