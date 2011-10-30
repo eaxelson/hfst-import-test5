@@ -51,7 +51,7 @@ implementing the vowel harmony rules needed for text entry of Finnish
 
 \begin{figure}[hbt!]
 \begin{center}
-\includegraphics[width=1.8in]{Nappaimet.pdf}
+\includegraphics[width=1.2in]{Nappaimet.pdf}
 \caption{The 12-key keypad of a typical Finnish mobile phone. There are three letters in the Finnish alphabet "\"{a}", "å" and "\"{o}", which are not shown on the keypad. The
   letters "\"{a}" and "å" are entered pressing key "2" four times and
   five times respectively. The letter "\"{o}" is entered by pressing
@@ -290,15 +290,73 @@ correspond to the same string of letters.
 
 \subsection{Phonological Constraints}
 
+We use phonological constraints which are used to filter the results
+given by the statistical components of the system. The result given by
+the system is thus the most probable string, which satisfies the
+phonological constraints. 
+
+The phonological constraints apply on the output of the morph sequence
+model and can thus refer to morpheme boundaries. Formally they are
+two-level constraints, which can be implemented using the two-level
+compiler hfst-twolc.
+
 \subsection{Combining Models using Weighted Finite-State Calculus}
 
-\section{Training Materials and Test Materials for Finnish and Turkish}\label{data}
+\section{Data and Linguistic Resources}\label{data}
+
+We trained predictive text entry systems for Finnish and Turkish to
+evaluate our method. We compare our results with two existing text
+entry systems by \cite{silfverberg/2011/cla} and
+\cite{Tantug:2010}. There are no standardized test materials for
+predictive text entry for Finnish or Turkish, but we were able to
+obtain the training materials and test materials used in the previous
+systems.
+
+The training materials and test materials for both Finnish and Turkish
+were processed in the same way. All uppercase letters were transformed
+into lowercase letters and all words that included non-alphabetical
+characters were removed. This included among other characters all
+numbers and punctuation except the symbol "'" in Turkish, which is
+used to signify the boundary between the stem and affix in some word
+forms.
 
 \subsection{Finnish}
 
 For training and testing the Finnish text entry system, we use the
 same data as \cite{silfverberg/2011/cla}, though they use a
-morphological analyzer, which we do not utilize. The training material is extracted from Finnish IRC logs and contains some 350000 words. The test material is actual text message data and contains $6663$ words~\footnote{The original test data contains $10851$ words, but it turned out that the latter part of the test data file is actually a list of unique words, which would skew test results, so we decided to only use the earlier half of the material}. 
+morphological analyzer, which we do not utilize. The training material
+is extracted from Finnish IRC logs and contains some 350000 words. The
+test material is actual text message data and contains $6663$
+words~\footnote{The original test data contains $10851$ words, but it
+  turned out that the latter part of the test data file is actually a
+  list of unique words, which would skew test results, so we decided
+  to only use the earlier half of the material}.
+
+\subsubsection{Phonological Constraints for Finnish}
+
+In Finnish a word form, which is not a compound word, cannot contain
+both back-vowels ("a", "o", "u") and front-vowels ("ä", "ö", "y"). We
+implemented two-level rules, which realize this constraint on a
+morphologically segmented word form.
+
+Figure \ref{fi-constraints} shows the rules we use for Finnish. The
+rules disallow an affix with back-vowels, which joins to a stem with
+front-vowels. The named regular expressions \verb|Affix|,
+\verb|FrontAffix| and \verb|BackAffix| are sets of know inflective and
+derivational affixes in Finnish. The expressions \verb|FrontStem| and
+\verb|BackStem| denote an arbitrary morph, whose length exceeds three
+characters.
+
+\begin{figure}
+\begin{verbatim}
+"Front Vowel Harmony"
+  <[ FrontAffix ]> /<== BackStem Affix* _ ; 
+
+"Back Vowel Harmony"
+  <[ BackAffix ]>  /<== FrontStem Affix* _ ; 
+\end{verbatim}
+\caption{Rules for Finnish vowel harmony.}\label{fi-constraints}
+\end{figure}
 
 \subsection{Turkish}
 
@@ -336,91 +394,120 @@ addressed in a paper on computational linguistics. Moreover they
 cannot be studied in isolation from the user interface of the mobile
 phone.
 
-The keystroke per character ratio is computed on test data as the
-ratio of keystrokes used to enter the data using a given text entry
-method and the number of letters in the words in the data. Following
+The keystroke per character ratio for a text entry method on test data
+is computed as the ratio of keystrokes used to enter the data and the
+number of letters in the words in the data. Following
 \cite{Tantug:2010}, we do not consider space characters as a part of
 the test data.
-
-For the multitap method inputting the Finnish word "kukka" (flower) on
-a typical Finnish 12-key mobile phone keyboard requires 10 keystrokes
-as shown in figure~\ref{kukka-kpc}. Hence the KPC ratio for test data
-consisting of the single word "kukka" would be $10/5 = 2.0$.
-
-For our own method we compute KPC similarly as for multitap, by
-dividing the number of keystrokes used by the number of letters in the
-test data. If our method cannot provide the correct suggestion for
-some input sequence, we use multitap as a fallback method. Naturally
-we cannot know that a word is not given by the text entry method
-before scrolling through all of the suggestions, so entering an
-unknown word requires:
-\begin{enumerate}
-\item Entering the keys used to write the word (one keystroke per letter)
-\item Scrolling through the suggestions ($9$ keystrokes in the current system, since there are $10$ suggestions)
-\item Deleting the last suggestion one letter at a time (one keystroke per letter)
-\item Switching to multitap mode (one keystroke)
-\item Inputting the word in multitap mode (keystroke count varies depending on the word).
-\end{enumerate}
-
-Figure \ref{new-method-kpc-known} demonstrates how KPC is computed for
-entering the word "\"{o}it\"{a}" (nights) using our own text entry
-method. The figure \ref{new-method-kpc-unknown} shows inputting the word "subi" (probably a
-Finnish version of sub). The correct form of "subi" is not found using our text
-entry method, which means we need to use multitap as fallback.
 
 \begin{figure}[htb!]
 \begin{center}
 \begin{tabular}{llllll}
-\texttt{k} & \texttt{u} & \texttt{k} & & \texttt{k} & \texttt{a}
-\\ \texttt{5-5} & \texttt{8-8} & \texttt{5-5} & \texttt{<NEXT>} &
+\texttt{k} & \texttt{u} & \texttt{k} & & \texttt{k} & \texttt{a} \\ 
+\hline
+\texttt{5-5} & \texttt{8-8} & \texttt{5-5} & \texttt{<NEXT>} &
 \texttt{5-5} & \texttt{2}
 \end{tabular}
 \caption{Inputting the Finnish word "kukka" using the multitap method
-  for text entry requires $10$ keystrokes. Pressing the
-  \texttt{<NEXT>} key is required, since there are two consecutive
-  letters "k" in "kukka".}\label{kukka-kpc}
+  for text entry requires $10$ keystrokes.}\label{kukka-kpc}
+\end{center}
+\end{figure}
+
+Figure~\ref{kukka-kpc} shows how to enter the word "kukka" (flower) on
+a mobile phone with Finnish keypad. Since there are two consecutive
+letters "k" in "kukka", a special {\tt <NEXT>}-symbol needs to be
+pressed after entering the first "k", in order to tell the text entry
+that the next press of key {\tt 5} starts a new symbol, namely the
+second "k". This increases the number of keystrokes from $9$ to
+$10$. On a training data consisting solely of the word "kukka" the KPC
+ratio would thus be "10/5 = 2.0".
+
+
+When computing the KPC ratio for predictive text entry methods, we assume
+that multitap is used as a fallback method when entering OOV words,
+i.e. words that are not found among the suggestions given by the
+system. In detail, entering an OOV word requires:
+\begin{enumerate}
+\item Entering the keys for the letters used to write the word (one keystroke per letter).
+\item Scrolling through the suggestions ($9$ keystrokes in our system, since $10$ suggestions are given).
+\item Deleting the last suggestion one letter at a time using a backspace key {\tt <C> } (one keystroke per letter).
+\item Switching to multitap mode using a special key {\tt <MOD> } (one keystroke).
+\item Inputting the word in multitap mode (keystroke count varies depending on the word).
+\item Switching back to predictive text entry mode using the key {\tt <MOD> } (one keystroke).
+\end{enumerate}
+
+\begin{figure}[htb!]
+\begin{center}
+\begin{tabular}{lllllllllllllllllllll}
+1. & \texttt{m} & \texttt{i} & \texttt{t} & \texttt{\"{a}} & \\ 
+2. & \texttt{\"{o}} & \texttt{i} & \texttt{t} & \texttt{\"{a}} & \\ 
+\hline
+ & \texttt{6} & \texttt{4} & \texttt{8} & \texttt{2} & \texttt{<NEXT>}\\\\
+\end{tabular}
+\end{center}
+\caption{Inputting the Finnish word "\"{o}it\"{a}" requires pressing \texttt{<NEXT>} to reach the second suggestion which is correct. Totally $5$ keystrokes are required to input "\"{o}it\"{a}".} \label{new-method-kpc-known}
+\end{figure}
+
+
+Figure \ref{new-method-kpc-known} demonstrates the key sequence used
+to enter the word "\"{o}it\"{a}" (nights) using our own text entry
+method. Since "\"{o}it\"{a}" is the second suggestion, the {\tt
+  <NEXT>}-key needs to be pressed once. The figure
+\ref{new-method-kpc-unknown} shows inputting the word "subi" (probably
+a Finnish version of sub). The word "subi" is and OOV word in our
+system, which means we need to use multitap as fallback.
+
+\begin{figure}[htb!]
+
+\begin{center}
+\begin{tabular}{rlllllllllllllllllllll}
+1. & \texttt{s} & \texttt{u} & \texttt{c} & \texttt{h}\\
+ & . & . & .\\
+10. & \texttt{s} & \texttt{t} & \texttt{a} & \texttt{h}\\
+\\
+    & \texttt{s} & \texttt{u} & \texttt{b} & \texttt{i}\\    
+\hline
+ & \texttt{7} & \texttt{8} & \texttt{2} & \texttt{4} & \texttt{<NEXT>} & \texttt{...} & \texttt{<NEXT>} & \texttt{<C>} & \texttt{<C>} & \texttt{<C>} & \texttt{<C>} & \texttt{<MOD>} & \texttt{7-7-7-7} & \texttt{8-8} & \texttt{2-2} & \texttt{4-4-4} & \texttt{<MOD>}
+\end{tabular}
+
+\caption{Entering the word "subi" which is not given by our method, requires $30$ keystrokes.} \label{new-method-kpc-unknown}
 \end{center}
 \end{figure}
 
 \begin{table}
-\caption{KPC for Turkish}\label{Turkish-kpc-table}
 \begin{center}
-\begin{tabular}{ll}
+\caption{KPC for Finnish Multitap and using the different component of
+  our system. The third column shows the improvement over
+  multitap.}\label{Finnish-kpc-table}
+\begin{tabular}{lll}
 \hline
-Method &~~~~KPC\\
+Method &~~~~KPC &~~~~Improvement\\
 \hline
-Our method &~~~~1.1768\\
-Letter n-grams~\cite{Tantug:2010} &~~~~..\\
-Multitap &~~~~2.43855\\
+Multitap                                       &~~~~2.4018 &~~~~0\%\\
+Letter n-grams                                 &~~~~1.7368 &~~~~27.7\%\\
+Letter n-grams and morph sequence model        &~~~~1.3825 &~~~~43.4\%\\
+Letter n-grams, morph sequence model and rules &~~~~1.3818 &~~~~43.5\%\\
 \hline
 \end{tabular}
 \end{center}
 \end{table}
 
-\begin{figure}[htb!]
+\begin{table}
+\caption{KPC for Turkish using different input methods. the multitap method. The third column shows the improvement over
+  multitap}\label{Turkish-kpc-table}
 \begin{center}
-\begin{tabular}{lllllllllllllllllllll}
-\texttt{\"{m}} & \texttt{i} & \texttt{t} & \texttt{\"{a}} & \\ 
-\texttt{\"{o}} & \texttt{i} & \texttt{t} & \texttt{\"{a}} & \\ 
-\texttt{6} & \texttt{4} & \texttt{8} & \texttt{2} & \texttt{<NEXT>}\\\\
+\begin{tabular}{lll}
+\hline
+Method &~~~~KPC &~~~~Improvement\\
+\hline
+Multitap                          &~~~~2.4386 &~~~~0\%\\
+Letter n-grams~\cite{Tantug:2010} &~~~~1.4382 &~~~~41.0\%\\
+Our method                        &~~~~1.1768 &~~~~51.7\%\\
+\hline
 \end{tabular}
 \end{center}
-\caption{Inputting the Finnish words "\"{o}it\"{a}" and "subi". The first suggestion for the input sequence \texttt{6-4-8-2} is "mit\"{a}" (what). Hence we need to press \texttt{<NEXT>} once to reach the second suggestion which is correct. All in all, this makes \texttt{4 + 1 = 5} keystrokes.} \label{new-method-kpc-known}
-\end{figure}
+\end{table}
 
-\begin{figure}[htb!]
-\begin{center}
-\begin{tabular}{lllllllllllllllllllll}
-\texttt{s} & \texttt{u} & \texttt{c} & \texttt{h}\\
-...\\
-\texttt{s} & \texttt{t} & \texttt{a} & \texttt{h}\\
-\texttt{s} & \texttt{u} & \texttt{b} & \texttt{i}\\    
-\texttt{7} & \texttt{8} & \texttt{2} & \texttt{4} & \texttt{<NEXT>} & \texttt{...} & \texttt{<NEXT>} & \texttt{<C>} & \texttt{<C>} & \texttt{<C>} & \texttt{<C>} & \texttt{<MUL>} & \texttt{7-7-7-7} & \texttt{8-8} & \texttt{2-2} & \texttt{4-4-4} & \texttt{<PRED>}
-\end{tabular}
-
-\caption{The word "subi" is not given by our method, so we need to scroll through ten suggestions using \texttt{<NEXT>} nine times, then delete the letters in the last suggestion "stah", switch to multitap mode using the key \texttt{<MUL>}, input "subi" in multitap and switch back to predictive mode using the key \texttt{<PRED>}. Thus inputting "subi" requires $4 + 9 + 4 + 1 + 11 + 1 = 30$ keystrokes.} \label{new-method-kpc-unknown}
-\end{center}
-\end{figure}
 
 
 
