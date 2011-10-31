@@ -23,11 +23,11 @@ out-of-vocabulary words, by replacing the dictionary with a Markov
 chain on morph sequences combined with a third order hidden Markov
 model (HMM) mapping key sequences to letter sequences and phonological
 constraints for pruning suggestion lists. We evaluate our method by
-constructing text entry systems for Finnish and Turkish mobile phone
-keypads and comparing our systems published text entry systems for
-Finnish and Turkish and three commerical mobile phones. Measured using
-the keystrokes per character ratio (KPC) \cite{MacKenzie02kspc}, we
-achieve superior results. For training, we use training data, which is
+constructing text entry systems for Finnish and Turkish and comparing
+our systems to published text entry systems and the text entry systems
+of three commerically available mobile phones. Measured using the
+keystrokes per character ratio (KPC) \cite{MacKenzie02kspc}, we
+achieve superior results. For training, we use corpora, which are
 segmented using unsupervised morphological segmentation.
 \end{abstract}
 
@@ -38,7 +38,7 @@ communication, but mobile phones are not especially well suited for
 inputting text because of their small size and often limited
 keyboard. There exist several technological solutions for text entry
 on mobile phones and other limited keyboard devices. This paper is
-concerned with a technology called predictive text entry, which
+concerned with a technology called \textit{predictive text entry}, which
 utilizes redundancy in natural language in order to enable efficient
 text entry using limited keyboards (typically having 12 keys).
 
@@ -48,16 +48,18 @@ English. Because of the limited morphological complexity of English,
 these approaches have usually been able to rely on an extensive
 dictionary along with word frequencies, since a sufficiently large
 English dictionary almost eliminates the problem of out-of-vocabulary
-(OOV) words. E.g. \cite{klarlund/2002} reports OOV word rates of 1.42
-\% for a training set containing the $40,000$ most frequent words in
-the North American Business News Corpus and a test set
-consisting of $54,265$ sentences from the same corpus.
+(OOV) words. E.g. \cite{klarlund/2002} reports low OOV word rates of
+1.42 \% for a training set containing the $40,000$ most frequent words
+in the North American Business News Corpus and a test set consisting
+of $54,265$ sentences from the same corpus.
 
-For morphologically complex languages like Finnish or Turkish,
+For morphologically complex languages like Finnish and Turkish,
 productive inflection, derivation and compounding raise the number of
-out-of-vocabulary words regardless of the size of the dictionary, i.e. the vocabulary growth rate does not converge~\cite{Creutz_morph-basedspeech},
-which means that out-of-vocabulary words present a serious problem for
-dictionary based approaches to predictive text entry.
+out-of-vocabulary words regardless of the size of the dictionary,
+i.e. the vocabulary growth rate does not
+converge~\cite{Creutz_morph-basedspeech}, which means that
+out-of-vocabulary words present a serious problem for dictionary based
+approaches to predictive text entry.
 
 In this paper we present an approach to predictive text entry which is
 based upon a morphologically segmented training corpus, which is used
@@ -72,42 +74,52 @@ method to the predictive text entry in three commercially available
 mobile phones and show that our approach gives superior KPC.
 
 Apart from phonological rules, our approach is entirely unsupervised
-and data-driven, since we us the unsupervised morphological
+and data-driven, since we use the unsupervised morphological
 segmentation system Morfessor \cite{Creutz07ACMTSLP} for segmenting
-the training corpus and the tools for constructing POS-taggers form
-the HFST interface~\cite{hfst/2011}. We show that it can be applied to
-another agglutinative language besides Finnish, namely Turkish. We
-compare the Turkish text entry system to an existing text entry
-system, which is based on a hidden Markov model and show that our
-approach gives a substantial improvement in KPC.
+the training corpus and the tools for constructing POS-taggers from
+the HFST interface~\cite{hfst/2011}. We show that our method can also
+be applied to another agglutinative language besides Finnish, namely
+Turkish. We compare the Turkish text entry system to an existing text
+entry system, which is based on a hidden Markov model and show that
+our approach gives a substantial improvement in KPC.
 
 The paper is structured as follows. In section~\ref{earlier-work} we
 present some earlier approaches to predictive text entry. In
-section~\ref{model}, we present our probabilistic model for text entry
-together with the phonological rules which are used to realize vowel
-harmony and explain how these models are combined into a system for
-predictive text entry. Section~\ref{data} describes the training and
-test corpora used in constructing and testing predictive text entry
-systems for Finnish and Turkish. Evaluation of the systems is
-presented in section~\ref{evaluation} and the results are discussed in
+section~\ref{model}, we present the components of our model for text
+entry and explain how these models are combined into a system for
+predictive text entry..  In Section~\ref{data} we describe the
+training and test corpora used in constructing and testing predictive
+text entry systems for Finnish and Turkish together with the
+phonological rules which are used to realize Finnish vowel
+harmony. Evaluation of the systems is presented in
+section~\ref{evaluation} and the results are discussed in
 section~\ref{discussion}. Finally we present some concluding remarks
 and future work directions in section~\ref{conclusion}.
 
 \section{Related Approaches to Text Entry}\label{earlier-work}
 
 The mobile phone keypad is a so called clustered keyboard, where each
-key can be used to enter several letters. E.g. on the Finniah mobile
+key can be used to enter several letters. E.g. on the Finnish mobile
 phone keypad in figure~\ref{keypad} the key 2 is used to enter the
 letters "a", "b", "c", "\"{a}" and "å".
 
 The original method for text entry is the so called
-multitap-method. When entering text in multitap mode, each key is
+\textit{multitap-method}. When entering text in multitap mode, each key is
 pressed multiple times to scroll through the list of letters that are
-associated to the key. As text-messages have gained popularity, other
-faster methods for text entry have been devised. This can broadly be
+associated with the key. As text-messages have gained popularity, other
+faster methods for text entry have been devised. These can broadly be
 classified into movement minimization techniques, which concentrate on
 keypad layout and language prediction techniques, which use linguistic
 models to disambiguate ambiguous user input~\cite{Mackenzie/HCI/2002}.
+
+The most widely used language prediction techniques are dictionary
+based techniques, which disambiguate suggestions based on word
+frequencies. The best known example of a dictionary based system is
+the commercially successful T9-system~\cite{t9-patent}. There are many
+variants of dictionary based methods. E.g. some methods try to guess
+the word before all characters have been typed. Some approaches also
+include information on the probability of word
+sequences~\cite{Mackenzie/HCI/2002}.
 
 \begin{figure}[hbt!]
 \begin{center}
@@ -120,16 +132,6 @@ models to disambiguate ambiguous user input~\cite{Mackenzie/HCI/2002}.
   times.}\label{keypad}
 \end{center}
 \end{figure}
-
-
-The most widely used language prediction techniques are probably
-dictionary based techniques, which disambiguate suggestions based on
-frequencies of words. The best known example of a dictionary based
-system is the commercially successful
-T9-system~\cite{t9-patent}. There are many variants of dictionary
-based methods. E.g. some methods try to guess the word before all
-characters have been typed. Some approaches also include information
-on the probability of word sequences~\cite{Mackenzie/HCI/2002}.
 
 As we noted in the introduction, dictionary based methods are not
 optimal for agglutinative languages, where the OOV rate remains high
@@ -146,54 +148,52 @@ letters in the word and then scrolls through a list of suggestion
 words matching the input.
 
 Our own method utilizes a similar probabilistic model on letter
-sequences as~\cite{Tantug:2010}, though we use an hidden Markov
+sequences as~\cite{Tantug:2010}, though we use a hidden Markov
 model. The novel aspects of our method are (1) utilizing a
 morphologically segmented training corpus in order to construct a
 probabilistic model of words as morph sequences and (2) using
-phonlogical constraints for filtering impossible suggestions. To the
+phonological constraints for filtering impossible suggestions. To the
 best of our knowledge, this has not been tried before in the domain of
 text-entry. In the related domain of speech recognition, similar
-approaches have yielded good results for agglutinative
-languages~\cite{Creutz_morph-basedspeech}.
+approaches have yielded good results~\cite{Creutz_morph-basedspeech}
+for agglutinative languages.
 
 \section{A Probabilistic Model of Word Structure}\label{model}
 
 Predictive text entry can be seen as a labeling task, where every key
-in a sequence of keys is assigned its most likely letter. An obvious
-approach to modeling such correspondences of keystroke sequences and
-letters is using a stochastic model with hidden variables, such as a
-hidden Markov model.
+in a sequence of keys is assigned its most likely letter. The usual
+approach to such tasks are stochastic model with hidden variables,
+such as an HMM.
 
-Though predictive text entry can be modeled fairly well using HMMs on
-key sequences, as exemplified by~\cite{Tantug:2010}, there are
-problems with this approach. A second or third order HMM cannot encode
-very long dependencies inside words, which leads to difficulties since
-it is not possible to adequately separate stems from affixes or to
-handle long phonological dependencies like vowel harmony in Finnish
-and Turkish. Using higher order HMMs could in theory improve the
-results, but in practice the data sparseness problem and efficiency
-problems, which limit their usability.
+Though predictive text entry can be implemented fairly well using
+n-gram models (such as HMMs) on letter sequences, as exemplified
+by~\cite{Tantug:2010}, there are problems with this approach. An HMM
+cannot encode very long dependencies inside words, which leads to
+difficulties since it is not possible to adequately separate stems
+from affixes or to handle long phonological dependencies like vowel
+harmony. Higher order HMMs are not useful in practice because of
+efficiency problems~\cite{Tantug:2010}.
 
-In order to get a general enough model of words and still be able to
-model word structure at a higher level than the level of single
-letters, we represent words as sequences of morphs, which are
+In order to construct a general prediction model, which still
+represents word structure at a higher level than at the level of
+single letters, we represent words as morph sequences, which are
 extracted from an automatically segmented training corpus.
 
-To illustrate our approach we look at some Finnish training
-data. Consider the word form "taloa" (sg. partitive case of the word
-house). Automatic segmentation of the training corpus might give the
-segmentation "talo+a", into the stem "talo" and the ending "a". If the
-word form "taloakin" (sg. partitive case of "talo" with the clitic
-"kin") does not occur in the training data, we can still esitmate its
-probability by looking at frequencies of the morph combinations "talo
-+ a" and "a + kin",
+To illustrate the usefulness of our approach we look at some Finnish
+word forms. Consider the word form "taloa" (sg. partitive case of
+the word house). Automatic segmentation of the training corpus might
+give the segmentation "talo+a", into the stem "talo" and the ending
+"a". If the word form "taloakin" (sg. partitive case of "talo" with
+the clitic "kin") does not occur in the training data, we can still
+esitmate its probability by utilizing the frequencies of the morph
+combinations "talo + a" and "a + kin",
 
 Our model for word structure is a Markov chain of morph
 sequences. Data sparseness is likely to be a serious problem, since
 there are tens of thousands of morphs, many of which only occur
-once. We therefore combine the Markov chain of morph sequences with an
-HMM which maps key sequences to letter sequences. The HMM doesn't
-include morph boundaries, so it gives some estimate for the
+once. We therefore combine the Markov chain with an
+HMM which maps key sequences to letter sequences. The HMM does not
+utilize morph boundaries, so it gives some estimate for the
 probability of a word form like "a-l-a-t-a-l-o" (a common Finnish
 surname), even though the combination of morphs "ala+talo" would never
 have been observed in the training data and the morph sequence model
@@ -208,40 +208,38 @@ which has prompted us to include phonological constraints in our
 system.
 
 The statistical models and phonological rules are implemented as
-weighted finite-state transducers, which allows combining them using
+weighted finite-state transducers, which allows us to combine them using
 the algebraic operations for finite-state transducers. Transducers are
 a natural choice for coding arbitrarily long dependencies such as
-vowel harmony, which cannot be captured by Markov models.
+vowel harmony.
 
 \subsection{A Hidden Markov Model for Predicting Letter Sequences from Key Sequences}
 
-We denote a sequence of mobile phone keypad keys of length $n$ by $K =
-(k_i)_{i=1}^{n}$. Here each $k_i$ corresponds to a key on the mobile
-phone keypad. For the key $k$, we denote the set of letters
-corresponding to the key $k$ by ${\rm M}(k)$. E.g. ${\rm M}(2) =
+We denote a sequence of mobile phone keys $k_i$ of length $n$ by $K =
+(k_i)_{i=1}^{n}$. For the key $k_i$, we denote the set of letters
+corresponding to the key by ${\rm M}(k_i)$. E.g. ${\rm M}(2) =
 \{$a,~b,~c,~\"{a}$\}$ on a typical Finnish mobile phone
 keyboard. Correspondingly, we denote a sequences of letter of length
-$m$ by $L = (l_i)_{i=1}^{m}$.
+$n$ by $L = (l_i)_{i=1}^{n}$.
 
 The task of the letter model is to give the probability of a letter
 sequence $L$ given a sequence of keys $K$. Naturally ${\rm P}(L|K) >
-0$, iff $L \in {\rm M}(K)$. We use the standard HMM approximation for
-the ${\rm P}(L|K)$. the approximation is given in equation
-(\ref{letter-chain-eqn}).  The second equality follows by noting that
-${\rm P}(k_i|l_i) = 1$ for all $i$ since every letter corresponds to
-only one key. The letters $l_{0}$ and $l_{-1}$ are special buffer
-letters, that are added both to the training data and suggestions.
+0$, iff $L \in {\rm M}(K)$. We give the standard HMM approximation for
+${\rm P}(L|K)$ in equation (\ref{letter-chain-eqn}).  The second
+equality follows by noting that ${\rm P}(k_i|l_i) = 1$ for all $i$,
+since every letter corresponds to only one key. Two special letters
+$l_{0}$ and $l_{-1}$ are required to make the approximation work. This
+buffer symbols are added both to the training data and the
+suggestions. To counteract data sparseness, we smooth probabilities
+using lower order HMMs as explained in the following subsection.
 
-\begin{eqnarray}\label{letter-chain-eqn}
-{\rm P}(L|K) & = & {\rm P}(k_1|l_1){\rm P}(l_1|l_{0},l_{-1}){\rm
-  P}(l_2|k_2){\rm P}(l_2|l_{1},l_{0}){\rm\ ...\ }{\rm P}(k_n|l_n){\rm
-  P}(l_n|l_{n-1},l_{n-2})\\ & = & {\rm P}(l_1|l_{0},l_{-1}){\rm
-  P}(l_2|l_{1},l_{0}){\rm\ ...\ }{\rm P}(l_n|l_{n-1},l_{n-2})
-\end{eqnarray}
+\begin{equation}\label{letter-chain-eqn}
+{\rm P}(L|K) = \prod_{i=1}^{n}{\rm P}(k_i|l_i){\rm P}(l_i|l_{i-2},l_{i-1}) = \prod_{i=1}^{n}{\rm P}(l_i|l_{i-2},l_{i-1})
+\end{equation}
 
 \subsection{A Markov Chain of Morphs}
 
-A morph of $n$ letters in the training-data is just a sequence of $n$
+A morph of $n$ letters in the training-data is simply a sequence of $n$
 letters, so we denote it by $L = (l_i)_{i=1}^{n}$. A key sequence $K =
 (k_i)_{i=1}^{m}$ corresponds to a sequence of morphs $L_1{\rm
   ... }L_k$ , where each $L_j = (l_{j_i})_{i=1}^{n_j}$, iff $\Sigma_{j
@@ -250,7 +248,7 @@ letters, so we denote it by $L = (l_i)_{i=1}^{n}$. A key sequence $K =
 sequences that correspond to a key sequence $K$ by ${\rm M}(K)$.
 
 The task of the morph model is to assign a probability for each
-sequence of morphs in ${\rm M}(K)$ for a key sequence $K$. The
+sequence of morphs in ${\rm M}(K)$ for the key sequence $K$. The
 probability of a sequence of morphs $L_1{\rm ... }L_k \in {\rm M}(K)$
 is given by the chain rule of probabilities in equation
 (\ref{chain-eqn}).
@@ -262,7 +260,7 @@ is given by the chain rule of probabilities in equation
 We make the standard assumptions for a first order Markov model,
 namely that ${\rm P}(L_i | L_1{\rm, ..., }\ L_{i-1}) = {\rm P}(L_i |
 L_{i-1})$, which means that we assume that the probability of a morph
-occurring depends only on its neighboring morphs and the morph
+occurring depends only on its left neighboring morph and the morph
 itself. This allows us to approximate equation (\ref{chain-eqn}) by
 equation (\ref{markov-eqn}).
 \begin{equation}\label{markov-eqn}
@@ -295,21 +293,14 @@ coefficient $a$ is determined by deleted interpolation (see
   \hat{P}}(L_i)^{1 - a}{\rm,\ where }\ 0\leq a \leq 1\ {\rm.}
 \end{equation}
 
-It should be noted that we are dealing with morph sequences and not
-letter strings. This is important, since several morph sequences can
-correspond to the same string of letters.
-
 \subsection{Phonological Constraints}
 
-We use phonological constraints which are used to filter the results
-given by the statistical components of the system. The result given by
-the system is thus the most probable string, which satisfies the
-phonological constraints. 
-
-The phonological constraints apply on the output of the morph sequence
-model and can thus refer to morpheme boundaries. Formally they are
-two-level constraints, which can be implemented using the two-level
-compiler hfst-twolc\footnote{\url{https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstTwolC}}.
+We use phonological constraints to filter the results given by the
+statistical components of the system. The result given by the system
+is thus the most probable string, which satisfies the phonological
+constraints. Formally they are two-level constraints, which can be
+implemented using the two-level compiler
+hfst-twolc\footnote{\url{https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstTwolC}}.
 
 \subsection{Combining Models using Weighted Finite-State Calculus}
 
@@ -317,20 +308,19 @@ Both the HMM on letter sequences and the morph sequence model are
 implemented as sets of weighted finite-state transducers. The models
 are compiled using the POS tagger tools (see
 \cite{Silfverberg/2010/IceTal} and \cite{Silfverberg/2011}) in the
-hfst-interface\footnote{\url{http://hfst.sf.net}}. The models were
-constructed as POS taggers by replacing words and tags with keys,
-letters and morphs.
+hfst-interface\footnote{\url{http://hfst.sf.net}}. We simply replace
+words and tags by keys, letters and morphs.
 
-The original input key sequence is compiled in to a finite state
+The input key sequence entered by the user is compiled in to a finite state
 transducer, which codes all possible realizations of the key sequence
-as a letter sequence. The realizations are weighted using the HMM
+as letter sequences. The realizations are weighted using the HMM
 model on letter sequences and the weighted letter sequences are coded
 into morph sequences. These morph sequences are re-scored using the
 morph sequence model. Finally those morph sequences which do not
 satisfy the phonological constraints are filtered out. 
 
-Finally morph boundaries are removed and the ten most likely letter
-sequences are given as suggestions for the input key sequence.
+In a last processing step, the morpheme boundaries are removed and the
+ten most likely letter sequences are extracted.
 
 \section{Data and Linguistic Resources}\label{data}
 
@@ -355,12 +345,12 @@ forms.
 For training and testing the Finnish text entry system, we use the
 same data as \cite{silfverberg/2011/cla}, though they use a
 morphological analyzer, which we do not utilize. The training material
-is extracted from Finnish IRC logs and contains some 350000 words. The
-test material is actual text message data and contains $6663$.
-words~\footnote{The original test data contains $10851$ words, but it
-  turned out that the latter part of the test data file is actually a
-  uniquified list of words, which skews test results, so we decided
-  to only use the earlier half of the material}.
+is extracted from Finnish IRC logs and contains some 350,000
+words. The test material consists of $6663$ words of actual text
+message data~\footnote{The original test data contains $10851$ words,
+  but it turned out that the latter part of the test data file is
+  actually a uniquified list of words, which skews test results, so we
+  decided to only use the earlier half of the material}.
 
 \subsubsection{Phonological Constraints for Finnish}
 
@@ -369,13 +359,13 @@ both back-vowels ("a", "o", "u") and front-vowels ("ä", "ö", "y"). We
 implemented two-level rules~\cite{koskenniemi/1983}, which realize
 this constraint on a morphologically segmented word form.
 
-Figure \ref{fi-constraints} shows the rules we use for Finnish. The
-rules disallow an affix with back-vowels, which joins to a stem with
-front-vowels. The named regular expressions \verb|Affix|,
-\verb|FrontAffix| and \verb|BackAffix| are sets of know inflective and
-derivational affixes in Finnish. The expressions \verb|FrontStem| and
-\verb|BackStem| denote an arbitrary morph, whose length exceeds three
-characters.
+Figure \ref{fi-constraints} shows one of the rules. The rule disallows
+an affix with front-vowels, together with a stem with back-vowels. The
+named regular expressions \verb|Affix|, \verb|FrontAffix| and
+\verb|BackAffix| are sets of know inflective and derivational affixes
+in Finnish. The expressions \verb|FrontStem| and \verb|BackStem|
+denote arbitrary morphs with back- and front-vowels respectively,
+whose length exceeds three characters.
 
 \begin{figure}
 \begin{verbatim}
@@ -388,7 +378,7 @@ characters.
 \subsection{Turkish}
 
 For training and testing the Turkish text entry system, we use the
-same materials as \cite{Tantug:2010}. It is a corpus of new paper text
+same materials as \cite{Tantug:2010}. It is a corpus of news paper text
 containing some $20$ million words. The material is divided into a
 test corpus containing $2597$ words and a training corpus which
 includes the rest of the words in the material. Thus the training data
@@ -417,11 +407,12 @@ characters as a part of the test data.
 By examining the schematic picture of a mobile phone keypad in
 figure~\ref{keypad}, it can be seen that the key sequence needed to
 input the word "kukka" (flower) on a mobile phone with Finnish keypad
-is {\tt 5-5-8-8-5-5-<NEXT>-5-5-2}. The {\tt <NEXT>}-key is required
-after entering the first "k" in order to tell the text entry that the
-next press of key {\tt 5} starts a new symbol. This increases the
-number of keystrokes from $9$ to $10$. On a training data consisting
-solely of the word "kukka" the KPC ratio would thus be "10/5 = 2.0".
+and using the multitap input method is {\tt
+  5-5-8-8-5-5-<NEXT>-5-5-2}. The {\tt <NEXT>}-key is required after
+entering the first "k" in order to tell the text entry that the next
+press of key {\tt 5} starts a new symbol. This increases the number of
+keystrokes from $9$ to $10$. On a training data consisting solely of
+the word "kukka" the KPC ratio would thus be "10/5 = 2.0".
 
 
 When computing the KPC ratio for predictive text entry methods, we assume
@@ -446,11 +437,11 @@ system. In detail, entering an OOV word requires:
 
 We constructed $12$ text entry systems using different portions of the
 training data for Finnish presented in section~\ref{data}. We used the
-first $1000$, $35000$, $69000$, $103000$, $137000$, $171000$,
-$205000$, $239000$, $273000$, $307000$, $341000$ and $345337$ words
+first $1,000$, $35,000$, $69,000$, $103,000$, $137,000$, $171,000$,
+$205,000$, $239,000$, $273,000$, $307,000$, $341,000$ and $345,337$ words
 respectively. The impact of the size of the training data is shown in
 figure~\ref{fi-kpc-graph}. The minimum KPC ratio $1.3818$ was attained
-for the entire training data consisting of $345337$ words.
+for the entire training data consisting of $345,337$ words.
 
 We also evaluated the effect of the different components on the KPC of
 the predictive text entry system. The results are shown in
@@ -483,7 +474,7 @@ analyzer. \footnote{When examining the test data used by
 
 \begin{table}
 \begin{center}
-\caption{KPC for Finnish Multitap and using the different component of
+\caption{KPC for Finnish Multitap and using including different components of
   our system. The third column shows the improvement over
   multitap.}\label{Finnish-kpc-table}
 \begin{tabular}{lcr}
@@ -561,7 +552,7 @@ characters. If we substitute the length of words in utf-8 characters
 by the incorrect length. We arrive at a figure $2.20914$, which is
 very close to $2.2014$. Because of this inconsistency, it is possible
 that our results are not entirely comparable to the results
-of~\cite{Tantug:2010}. The increase in KPC ratio given for the method
+of~\cite{Tantug:2010}. The improvement in KPC ratio given for the method
 by~\cite{Tantug:2010} is computed using our figure for the KPC ratio
 of the multitap method. The improvement given by~\cite{Tantug:2010} is
 $35\%$.
@@ -608,26 +599,26 @@ at random from our test data. This shows that our approach has great
 practical potential.
 
 As can be seen in table~\ref{Turkish-kpc-table} our method achieves an
-additional $10\%$ point reduction in KPC compared to the system
-in~\cite{Tantug:2010}. Our KPC ratio $1.1768$ needs to be related to
-the fact that our method can never achieve a KPC ratio lower than $1$,
-since every letter in a word needs to be typed. We achieve a $51.7\%$
-reduction in KPC for the Turkish test data compared to the multitap
-method. A fast computation reveals that the maximal possible reduction
-is only $59.0\%$, which demonstrates that our system is nearly optimal
-on the Turkish data.
+additional $10\%$ point reduction in KPC for Turkish compared to the
+system in~\cite{Tantug:2010}. Our KPC ratio $1.1768$ needs to be
+related to the fact that our method can never achieve a KPC ratio
+lower than $1$, since every letter in a word needs to be typed. We
+achieve a $51.7\%$ reduction in KPC for the Turkish test data compared
+to the multitap method. A fast computation reveals that the maximal
+possible reduction is only $59.0\%$, which demonstrates that our
+system is nearly optimal on the Turkish data.
 
 \section{Conclusions and future work}\label{conclusion}
 
-We have demonstrated highly efficient predictive text entry system,
-which can be constructed using only unsupervised methods. Additionally
+We have demonstrated a highly efficient predictive text entry model,
+which can be constructed using unsupervised methods. Additionally
 linguistic rules can be added to improve the performance of the
-system. 
+system.
 
 There are several interesting future research directions. In order to
-reduce the KPC ratio to under $1$, the system should be able to
-predict morphs before they are completely typed. A model, which
-extends over word boundaries would almost certainly also be useful.
+reduce the KPC ratio to $< 1$, the system should be able to predict
+morphs before they are completely typed. We should also consider
+adding a model, which extends over word boundaries.
 
 It would be interesting to examine the effect of the segmentation of
 the training corpus on the function of the phonological rules. A
