@@ -3,7 +3,10 @@ LDFLAGS=-lhfst
 
 PROGS=train_hmm_4_tagger train_sequencer train_morpheme_sequence_model \
       t9_suggest t9_suggest_kpc compute_kpc deleted_interpolation \
-      train_hmm_4_tagger_tur train_morpheme_sequence_model_tur
+      train_hmm_4_tagger_tur train_morpheme_sequence_model_tur \
+      t9_suggest_kpc_tur t9_suggest_tur compute_kpc_tur \
+      count_average_word_length t9_suggest_only_hmm \
+      t9_suggest_only_hmm_and_morpheme
 
 SequenceWeighter_EXT_SOURCES=SequenceCounter.cc
 SequenceWeightTable_EXT_SOURCES=StringTransformerList.cc SequenceCounter.cc \
@@ -92,7 +95,11 @@ clean:
 train_hmm_4_tagger:train_hmm_4_tagger.cc HMM4Tagger.cc $(HMMTagger_EXT_SOURCES)
 train_hmm_4_tagger_tur:train_hmm_4_tagger_tur.cc HMM4TaggerTur.cc $(HMMTagger_EXT_SOURCES)
 t9_suggest: t9_suggest.cc Sequencer.cc HMMTagger.cc $(HMMTagger_EXT_SOURCES)
-t9_suggest_kpc: t9_suggest_kpc.cc Sequencer.cc HMMTagger.cc $(HMMTagger_EXT_SOURCES)
+t9_suggest_kpc:t9_suggest_kpc.cc Sequencer.cc HMMTagger.cc $(HMMTagger_EXT_SOURCES)
+t9_suggest_only_hmm:t9_suggest_only_hmm.cc HMMTagger.cc $(HMMTagger_EXT_SOURCES)
+t9_suggest_only_hmm_and_morpheme:t9_suggest_only_hmm_and_morpheme.cc HMMTagger.cc Sequencer.cc $(HMMTagger_EXT_SOURCES)
+t9_suggest_kpc_tur:t9_suggest_kpc_tur.cc Sequencer.cc HMMTagger.cc $(HMMTagger_EXT_SOURCES)
+t9_suggest_tur:t9_suggest_tur.cc Sequencer.cc HMMTagger.cc $(HMMTagger_EXT_SOURCES)
 train_sequencer:train_sequencer.cc Sequencer.cc $(Sequencer_EXT_SOURCES)
 train_morpheme_sequence_model:train_morpheme_sequence_model.cc \
                               SequenceModel.cc $(SequenceModel_EXT_SOURCES)
@@ -100,3 +107,7 @@ train_morpheme_sequence_model_tur:train_morpheme_sequence_model_tur.cc \
                               SequenceModel.cc $(SequenceModel_EXT_SOURCES)
 compute_kpc:KeyStrokesPerCharacter.cc
 	g++ -o compute_kpc KeyStrokesPerCharacter.cc -lhfst
+compute_kpc_tur:KeyStrokesPerCharacterTur.cc
+	g++ -o compute_kpc_tur KeyStrokesPerCharacterTur.cc -lhfst
+count_average_word_length:count_average_word_length.cc
+	g++ -o $@ $^ -lhfst
