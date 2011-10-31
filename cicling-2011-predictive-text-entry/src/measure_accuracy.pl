@@ -40,6 +40,7 @@ print "$ARGV[0]\t";
 $total_corr = 0;
 $third_or_less_corr = 0;
 $fifth_or_less_corr = 0;
+$sixth_or_more_corr = 0;
 $pos = 0;
 foreach (@correct_suggestions)
 {
@@ -51,12 +52,21 @@ foreach (@correct_suggestions)
     {
 	$fifth_or_less_corr = $fifth_or_less_corr + $_;
     }
+    if ($pos > 5)
+    {
+	$sixth_or_more_corr = $sixth_or_more_corr + $_;
+    }
+
 
     $total_corr = $total_corr + $_;
 
-    printf("& %.4f\\\% ",100*$_/$total_words);
+    if ($pos < 5)
+    {
+	printf("& %.4f\\\% ",100*$_/$total_words);
+    }
     ++$pos;
 }
+printf("& %.4f\\\% ",100*$sixth_or_more_corr/$total_words);
 printf("& %.4f\\\% ",100*$third_or_less_corr/$total_words);
 printf("& %.4f\\\% ",100*$fifth_or_less_corr/$total_words);
 printf("& %.4f\\\% ",100*$total_corr/$total_words);

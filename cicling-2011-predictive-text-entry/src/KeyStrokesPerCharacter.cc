@@ -224,10 +224,10 @@ int main(void)
       exit(1);
     }
 
-  std::cerr << "multitap: " << multitap.get_key_strokes_per_character()
+  std::cout << "multitap: " << multitap.get_key_strokes_per_character()
 	    << " kspc" << std::endl;
 
-  std::cerr << "new_method: " << new_method.get_key_strokes_per_character()
+  std::cout << "new_method: " << new_method.get_key_strokes_per_character()
 	    << " kspc" << std::endl;
 
 }
