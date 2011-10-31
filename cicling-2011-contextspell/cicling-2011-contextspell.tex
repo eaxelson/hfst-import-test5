@@ -3,7 +3,7 @@
 \usepackage{times}
 \usepackage{url}
 \usepackage{latexsym}
-%\usepackage{xltxtra}
+\usepackage{xltxtra}
 %\usepackage{hyperref}
 %\usepackage{ifpdf}
 
@@ -99,15 +99,176 @@ English has the largest amount of freely available text corpora. For other
 languages, the availability of free corpora, especially annotated material, is
 often seen as a problem.
 
-The article is laid out as follows: in Section~\ref{sec:material}, we introduce
-the corpora and dictionaries used for spell-checking and training material as
-well as the corpora used for obtaining the spelling errors with context. In
-Section~\ref{sec:methods}, we outline the implementation of a finite-state
-context-aware spell-checker and describe the statistical methods used. In
+The article is laid out as follows: In Section~\ref{sec:methods}, we outline
+the implementation of a finite-state context-aware spell-checker and describe
+the statistical methods used.  In Section~\ref{sec:material}, we introduce the
+corpora and dictionaries used for spell-checking and training material as well
+as the corpora used for obtaining the spelling errors with context. In
 Section~\ref{sec:evaluation}, we show how the created spelling correctors
 improve the results and explain the errors left. In
 Section~\ref{sec:future-work}, we compare our work to other current systems and
 enumerate possible improvements for both.
+
+\section{Methods}
+\label{sec:methods}
+
+The spelling correction in this article is performed in n phases: assuming 
+misspelled word \emph{cta} for \emph{cat}, we first apply error model to
+the already known incorrect string \emph{cta} to produce candidates for probable
+mistypings. For this purpose we use simple Damerau-Levenshtein edit-distance
+algorithm in finite-state form. When applied to \emph{cta} we get all strings
+with one or two typing mistakes, i.e. \emph{ata}, \emph{bta}, \ldots, 
+\emph{acta}, \emph{bcta}, \ldots, \emph{ta}, \emph{ca}, \ldots, \emph{tca}, and
+the correct \emph{cat}. This set of strings is simultaneously matched against
+the language model, which will produce a set of corrections, such as 
+\emph{cat}, \emph{act} or \emph{car}. Since both the error-model and language
+model contain information on likelihoods of errors and words respectively, the
+resulting list will be sorted according to combination of edit distance measure
+and the probability of the word in reference corpus. The rankings based on
+edit distance alone and edit distance combined with word probabilities form
+our two baseline models. 
+
+The context-based models we introduce here, use the suggestion list gained
+from contextless spelling-checker and the context of the words as input to
+rerank suggestions based on N-gram models. Each of the suggestions is tried
+against the N-gram models, and the ones which contain higher likelihoods will
+be lifted.
+For example when correcting the misspelling of `an' as `anx' in the sentence ``this
+is anx example sentence'', as shown in the figure~\ref{fig:example}, we have
+the surface trigrams \{this, is, \_\}, \{is, \_, example\}, \{\_, example,
+sentence\}, and corresponding analysis trigrams \{DET, VVBZ, \_\}, \{VVBZ, \_,
+NN\}, \{\_, NN, NN\}. The suggestions for anx at edit distance one include
+`ax', `an' (one deletion), `ant', `and', `any' (one change) and so on. To rank the
+possible suggestions, we substitute $s_3$ for the suggestions, and estimate its
+likely analysis. Then we use the ones with the highest combined likelihood of the n-gram
+formula $P(s_1:s_5)$ etc.
+
+\begin{table}
+\caption{Example trigram combinations\label{fig:example}}
+\begin{center}
+\begin{tabular}{llcrr}
+\hline
+this$_{s_1}$ & is$_{s_2}$ & \_$_{s_3}$ & example$_{s_4}$ & sentence$_{s_5}$\\
+DET$_{a_1}$ & VVBZ$_{a_2}$ & \_ $_{a_3}$& NN$_{a_4}$ & NN$_{a_5}$\\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\subsection{Weighted Finite-State Interpretation of the Method}
+
+In this article we use a finite-state formulation of spell-checking. We
+assume the standard notation for finite-state algebra and define the language
+model as a weighted finite-state automaton assigning a weight to each correctly
+spelled word-form of a language, and an error model automaton mapping a
+misspelled string to a set of corrected strings and their weights. The
+probabilistic interpretation of the components is such that the weighted fsa as
+a language model assigns weight $w(s)$ to word $s$ corresponding to the probability
+$P(s)$ for the word to be a correct word in the language. The error model assigns
+weight $w(s:r)$ to string pair $s, r$ corresponding to the probability $P(s|r)$ of a
+user writing word r when intending to write the word $s$, and the context model
+assigns weight $w(s_3 a_3)$ to word $s_3$ with associated POS tagging $a_3$
+corresponding to probability $P(s_3 a_3|s_1 a_1, s_2 a_2, s_3 a_3, s_4 a_4, s_5
+a_5)$ of the analysis being in a 3-gram context.
+
+In a weighted finite-state system, the probabilistic data needs to be converted
+to the algebra supported by the finite-state weight structure.
+In this case we use the tropical semi-ring by transforming the
+frequencies into penalty weights with the formula $-\log\frac{f}{CS}$, where $f$ is
+the frequency and $CS$ the corpus size in number of tokens. If the language
+model allows for words that are not in the dictionary, a maximal weight is assigned
+to the unseen word forms that may be in the language model but not in the training
+corpus, i.e.  any unseen word has a penalty weight of $-\log\frac{1}{CS}$.
+
+The spelling corrections suggested by these unigram lexicon-based spell-checkers
+are initially generated by composing an edit-distance automaton~\cite{agata/2002} 
+with an  error weight corresponding to the probability of the error
+estimated in a corpus, i.e. $-\log\frac{f_{F}}{CS+1}$, where $f_F$ is the frequency
+of the misspelling in a corpus. This weight is attached to the edit distance type
+error. In practice, this typically still means that the corrections are
+initially ordered primarily by the edit distance of the correction, and
+secondarily by the unigram frequency of the word-form in the reference corpus.
+This order is implicitly encoded in the weighted paths of the resulting
+automaton; to list the corrections we use the n-best paths
+algorithm~\cite{mohri/2002}. This ordering is also used as our baseline.
+
+For a context-based reordering of the corrections, we use the POS tagging
+probabilities for the given suggestions. The implementation of the analysis n-gram
+probability estimation is similar to the one described in \cite{silfverberg/2011} with
+the following adaptations for the spelling correction. For the suggestion which gives
+the highest ranking, the most likely analysis is selected.  The n-gram probability
+is estimated separately with each spelling suggestion and then combined with
+the baseline probability given by the unigram probability and the edit distance
+weight. The ideal scaling for the weights of unigram probabilities, i.e.
+edit distance probabilities with respect to n-gram probabilities, was acquired
+by performing tests on an automatically generated spelling error corpus.
+
+
+The resulting finite-state system consists of three sets of automata, i.e. the dictionary
+for spell-checking, the error-model as described in
+\cite{pirinen/2010/lrec}, and the new n-gram model automata. The automata
+sizes are given in Table~\ref{table:sizes} for reference. The sizes also
+give an estimate of the memory usage of the spell-checking system, although the
+actual memory-usage during correction will rise depending on the actual
+extent of the search space during the correction phase.
+
+\begin{table}
+\caption{Automata sizes\label{table:sizes}.}
+\begin{center}
+\begin{tabular}{lrrr}
+    Automaton & States & Transitions & Bytes \\
+    \hline
+    \multicolumn{4}{c}{\textbf{English}} \\
+    \hline
+    Dictionary & 25,330 & 42,448 & 1.2 MiB \\
+    Error model & 1,303 & 492,232 & 5.9 MiB \\
+    N-gram lexicon & 363,053 & 1,253,315 & 42 MiB \\
+    N-gram sequences & 46,517 & 200,168 & 4.2 MiB \\
+    \hline
+    \multicolumn{4}{c}{\textbf{Finnish}} \\
+    \hline
+    Dictionary & 179,035 & 395,032 & 16 MiB \\
+    Error model & 1,863 & 983,227 & 12 MiB \\
+    N-gram lexicon & 70,665 & 263,298 & 8.0 MiB \\
+    N-gram sequences & 3,325 & 22,418 & 430 KiB \\
+    \hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\subsection{English-Specific Finite-State Weighting Methods}
+
+The language model for English was created as described in
+\cite{norvig/2010}
+%\footnote{The finite-state formulation of this is informally
+%described in \url{http://blogs.helsinki.fi/tapirine/2011/07/21/how-to-write-an-hfst-spelling-corrector/}}.
+  It consists of the word-forms and their  probabilities in the
+corpora. The edit distance is composed of the standard English alphabet with
+an estimated error likelihood of 1 in 1000 words.  Similarly for the English n-gram
+material, the initial analyses found in the WSJ corpus were used in the
+finite-state tagger as such. The scaling factor between the dictionary probability model and
+the edit distance model was acquired by estimating the optimal multipliers using the automatic
+misspellings and corrections of a Project Gutenberg Ebook\footnote{\url{http://www.gutenberg.org/cache/epub/11/pg11.txt}} \emph{Alice's Adventures in Wonderland}.
+
+\subsection{Finnish-Specific Finite-State Weighting Methods}
+
+The Finnish language model was based on a readily-available morphological
+weighted analyser of Finnish language~\cite{pirinen/2011/nodalida}.  We
+further modified the automaton to penalize suggestions with newly created
+compounds and derivations by adding a weight greater than the maximum to such suggestions, 
+i.e. $-A\log\frac{1}{CS+1}$ in the training material. This has nearly the same effect as using a separate
+dictionary for suggestions that excludes the heavily weighted forms without
+requiring the extra space.  Also for Finnish, a scaling factor was estimated by using automatic misspellings and corrections
+of a Project Gutenberg Ebook\footnote{\url{http://www.gutenberg.org/cache/epub/10863/pg10863.txt}} \emph{Juha}.
+
+In the initial Finnish tagger, there was a relatively large tagset, all of
+which did not contain information necessary for the task of
+spell-checking, such as discourse particles, which are relatively
+context-agnostic~\cite{visk}, so we opted to simplify the tagging in these
+cases. Furthermore, the tagger used for training produced heuristic readings for
+unrecognized word-forms, which we also removed. Finally, we needed to add
+some extra penalties to the word forms unknown to the dictionary in the n-gram model,
+since this phenomenon was more frequent and diverse for Finnish than English.
 
 \section{Material}
 \label{sec:material}
@@ -218,8 +379,8 @@ analyser, however, is capable of infinite compounding and derivation, which
 makes it a notably different approach to spell checking than the English finite
 word-form list. 
 
-The Finnish morphosyntactic n-gram model was trained using the europarl corpus\footnote{xyz}
-analysed with fdg\footnote{xyz}. In this format, the annotation is based on a sequence of
+The Finnish morphosyntactic n-gram model was trained using the europarl corpus\footnote{http://www.statmt.org/europarl/}
+analysed with ZYX??\footnote{xyz}. In this format, the annotation is based on a sequence of
 tags, encoding part of speech and inflectional form. The total number of
 different tag sequences for this annotation is ABCDEF! So  the
 statistics for these is likely to be different than for English.
@@ -234,141 +395,6 @@ Wikipedia, europarl and Gutenberg provides a reasonable variety of both
 contemporary and old texts in a wide range of styles.
 
 
-
-\section{Methods}
-\label{sec:methods}
-
-In this article we use a finite-state formulation of spell-checking. We
-assume the standard notation for finite-state algebra and define the language
-model as a weighted finite-state automaton assigning a weight to each correctly
-spelled word-form of a language, and an error model automaton mapping a
-misspelled string to a set of corrected strings and their weights. The
-probabilistic interpretation of the components is such that the weighted fsa as
-a language model assigns weight $w(s)$ to word $s$ corresponding to the probability
-$P(s)$ for the word to be a correct word in the language. The error model assigns
-weight $w(s:r)$ to string pair $s, r$ corresponding to the probability $P(s|r)$ of a
-user writing word r when intending to write the word $s$, and the context model
-assigns weight $w(s_3 a_3)$ to word $s_3$ with associated POS tagging $a_3$
-corresponding to probability $P(s_3 a_3|s_1 a_1, s_2 a_2, s_3 a_3, s_4 a_4, s_5
-a_5)$ of the analysis being in a 3-gram context.
-
-In a weighted finite-state system, the probabilistic data needs to be converted
-to the algebra supported by the finite-state weight structure.
-In this case we use the tropical semi-ring by transforming the
-frequencies into penalty weights with the formula $-\log\frac{f}{CS}$, where $f$ is
-the frequency and $CS$ the corpus size in number of tokens. If the language
-model allows for words that are not in the dictionary, a maximal weight is assigned
-to the unseen word forms that may be in the language model but not in the training
-corpus, i.e.  any unseen word has a penalty weight of $-\log\frac{1}{CS}$.
-
-The spelling corrections suggested by these unigram lexicon-based spell-checkers
-are initially generated by composing an edit-distance automaton~\cite{agata/2002} 
-with an  error weight corresponding to the probability of the error
-estimated in a corpus, i.e. $-\log\frac{f_{F}}{CS+1}$, where $f_F$ is the frequency
-of the misspelling in a corpus. This weight is attached to the edit distance type
-error. In practice, this typically still means that the corrections are
-initially ordered primarily by the edit distance of the correction, and
-secondarily by the unigram frequency of the word-form in the reference corpus.
-This order is implicitly encoded in the weighted paths of the resulting
-automaton; to list the corrections we use the n-best paths
-algorithm~\cite{mohri/2002}. This ordering is also used as our baseline.
-
-For a context-based reordering of the corrections, we use the POS tagging
-probabilities for the given suggestions. The implementation of the analysis n-gram
-probability estimation is similar to the one described in \cite{silfverberg/2011} with
-the following adaptations for the spelling correction. For the suggestion which gives
-the highest ranking, the most likely analysis is selected.  The n-gram probability
-is estimated separately with each spelling suggestion and then combined with
-the baseline probability given by the unigram probability and the edit distance
-weight. The ideal scaling for the weights of unigram probabilities, i.e.
-edit distance probabilities with respect to n-gram probabilities, was acquired
-by performing tests on an automatically generated spelling error corpus.
-
-For example when correcting the misspelling of `an' as `anx' in the sentence ``this
-is anx example sentence'', as shown in the figure~\ref{fig:example}, we have
-the surface trigrams \{this, is, \_\}, \{is, \_, example\}, \{\_, example,
-sentence\}, and corresponding analysis trigrams \{DET, VVBZ, \_\}, \{VVBZ, \_,
-NN\}, \{\_, NN, NN\}. The suggestions for anx at edit distance one include
-`ax', `an' (one deletion), `ant', `and', `any' (one change) and so on. To rank the
-possible suggestions, we substitute $s_3$ for the suggestions, and estimate its
-likely analysis. Then we use the ones with the highest combined likelihood of the n-gram
-formula $P(s_1:s_5)$ etc.
-
-\begin{table}
-\caption{Example trigram combinations\label{fig:example}}
-\begin{center}
-\begin{tabular}{llcrr}
-\hline
-this$_{s_1}$ & is$_{s_2}$ & \_$_{s_3}$ & example$_{s_4}$ & sentence$_{s_5}$\\
-DET$_{a_1}$ & VVBZ$_{a_2}$ & \_ $_{a_3}$& NN$_{a_4}$ & NN$_{a_5}$\\
-\hline
-\end{tabular}
-\end{center}
-\end{table}
-
-The resulting finite-state system consists of three automata, i.e. the dictionary
-for spell-checking, the error-model as described in
-\cite{pirinen/2010/lrec}, and the new n-gram model automata. The automata
-sizes are given in Table~\ref{table:sizes} for reference. The sizes also
-give an estimate of the memory usage of the spell-checking system, although the
-actual memory-usage during correction will rise depending on the actual
-extent of the search space during the correction phase.
-
-\begin{table}
-\caption{Automata sizes\label{table:sizes}.}
-\begin{center}
-\begin{tabular}{lrrr}
-    Automaton & States & Transitions & Bytes \\
-    \hline
-    \multicolumn{4}{c}{\textbf{English}} \\
-    \hline
-    Dictionary & 25,330 & 42,448 & 1.2 MiB \\
-    Error model & 1,303 & 492,232 & 5.9 MiB \\
-    N-gram lexicon & 363,053 & 1,253,315 & 42 MiB \\
-    N-gram sequences & 46,517 & 200,168 & 4.2 MiB \\
-    \hline
-    \multicolumn{4}{c}{\textbf{Finnish}} \\
-    \hline
-    Dictionary & 179,035 & 395,032 & 16 MiB \\
-    Error model & 1,863 & 983,227 & 12 MiB \\
-    N-gram lexicon & 70,665 & 263,298 & 8.0 MiB \\
-    N-gram sequences & 3,325 & 22,418 & 430 KiB \\
-    \hline
-\end{tabular}
-\end{center}
-\end{table}
-
-\subsection{English-Specific Finite-State Weighting Methods}
-
-The language model for English was created as described in
-\cite{norvig/2010}\footnote{The finite-state formulation of this is informally
-described in \url{}}.  It consists of the word-forms and their  probabilities in the
-corpora. The edit distance is composed of the standard English alphabet with
-an estimated error likelihood of 1 in 1000 words.  Similarly for the English n-gram
-material, the initial analyses found in the WSJ corpus were used in the
-finite-state tagger as such. The scaling factor between the dictionary probability model and
-the edit distance model was acquired by estimating the optimal multipliers using the automatic
-misspellings and corrections of a Project Gutenberg Ebook\footnote{\url{}}.
-
-\subsection{Finnish-Specific Finite-State Weighting Methods}
-
-The Finnish language model was based on a readily-available morphological
-weighted analyser of Finnish language~\cite{pirinen/2011/nodalida}.  We
-further modified the automaton to penalize suggestions with newly created
-compounds and derivations by adding a weight greater than the maximum to such suggestions, 
-i.e. $-A\log\frac{1}{CS+1}$ in the training material. This has nearly the same effect as using a separate
-dictionary for suggestions that excludes the heavily weighted forms without
-requiring the extra space.  Also for Finnish, a scaling factor was estimated by using automatic misspellings and corrections
-of a Project Gutenberg Ebook\footnote{\url{}}.
-
-In the initial Finnish tagger, there was a relatively large tagset, all of
-which did not contain information necessary for the task of
-spell-checking, such as discourse particles, which are relatively
-context-agnostic~\cite{visk}, so we opted to simplify the tagging in these
-cases. Furthermore, the tagger used for training produced heuristic readings for
-unrecognized word-forms, which we also removed. Finally, we needed to add
-some extra penalties to the word forms unknown to the dictionary in the n-gram model,
-since this phenomenon was more frequent and diverse for Finnish than English.
 
 \section{Tests and Evaluation}
 \label{sec:evaluation}
@@ -395,22 +421,38 @@ dictionary and the weighted edit distance model alone.
         \hline
         \multicolumn{7}{c}{\textbf{English}} \\
         \hline
-        Unigrams         (baseline) 
+        Edit distance 2 (baseline) 
 &    ?   &       &      &      &       &     \\
 & 28.2 \% & 5.9 \% & 29.4 \% &     \% &     \%  &       \% \\
         \hline
-        N-grams 
+        Edit distance 2 with Unigrams 
+&    ?   &       &      &      &       &     \\
+& 28.2 \% & 5.9 \% & 29.4 \% &     \% &     \%  &       \% \\
+        \hline
+        Edit distance 2 with Word N-grams 
+&     ?  &       &      &      &       &     \\
+& 41.2 \% & 50.6 \% & 2.3 \% &     \% &      \% &       \% \\
+        \hline
+        Edit distance 2 with POS N-grams 
 &     ?  &       &      &      &       &     \\
 & 41.2 \% & 50.6 \% & 2.3 \% &     \% &      \% &       \% \\
 \hline
         \multicolumn{7}{c}{\textbf{Finnish}} \\
         \hline
-        Unigrams          (baseline) 
+        Edit distance 2 (baseline)
+& 221    & 21    & 13    & 15    & 24    & 322 \\
+& 68.6 \% & 6.5 \% & 4.0 \% & 4.7 \% & 7.5 \% & 100.0 \% \\
+        \hline
+        Edit distance 2 with Unigrams 
 & 221    & 21    & 13    & 15    & 24    & 322 \\
 & 68.6 \% & 6.5 \% & 4.0 \% & 4.7 \% & 7.5 \% & 100.0 \% \\
 
         \hline
-        N-grams
+        Edit distance 2 with Word N-grams
+& 230    & 30    & 4    & 11    & 47    & 322 \\
+& 71.4 \% & 9.3 \% & 1.2 \% & 3.4 \% & 14.6 \% & 100.0 \% \\
+        \hline
+        Edit distance 2 with POS N-grams
 & 230    & 30    & 4    & 11    & 47    & 322 \\
 & 71.4 \% & 9.3 \% & 1.2 \% & 3.4 \% & 14.6 \% & 100.0 \% \\
         \hline
@@ -428,52 +470,63 @@ dictionary and the weighted edit distance model alone.
         \hline
         \multicolumn{7}{c}{\textbf{English}} \\
         \hline
-        Unigrams          (baseline)
- &     &       &      &      &        &     \\
- &  \% &    \% &   \% &   \% &    \%  & 100 \% \\
+        Edit distance 2 (baseline) 
+&    ?   &       &      &      &       &     \\
+& 28.2 \% & 5.9 \% & 29.4 \% &     \% &     \%  &       \% \\
         \hline
-        N-grams
-&       &      &      &      &       &     \\
-&    \% &   \% &   \% &   \% &    \% & 100 \% \\
+        Edit distance 2 with Unigrams 
+&    ?   &       &      &      &       &     \\
+& 28.2 \% & 5.9 \% & 29.4 \% &     \% &     \%  &       \% \\
+        \hline
+        Edit distance 2 with Word N-grams 
+&     ?  &       &      &      &       &     \\
+& 41.2 \% & 50.6 \% & 2.3 \% &     \% &      \% &       \% \\
+        \hline
+        Edit distance 2 with POS N-grams 
+&     ?  &       &      &      &       &     \\
+& 41.2 \% & 50.6 \% & 2.3 \% &     \% &      \% &       \% \\
         \hline
         \multicolumn{7}{c}{\textbf{Finnish}} \\
         \hline
-        Unigrams        (baseline)
-   &     &       &      &      &       &     \\
- &  \% &    \% &   \% &   \% &    \% & 100 \% \\
+        Edit distance 2 (baseline) 
+&    ?   &       &      &      &       &     \\
+& 28.2 \% & 5.9 \% & 29.4 \% &     \% &     \%  &       \% \\
         \hline
-        N-grams 
-&       &      &      &      &       &     \\
- &    \% &   \% &   \% &   \% &    \% & 100 \% \\
+        Edit distance 2 with Unigrams 
+&    ?   &       &      &      &       &     \\
+& 28.2 \% & 5.9 \% & 29.4 \% &     \% &     \%  &       \% \\
+        \hline
+        Edit distance 2 with Word N-grams 
+&     ?  &       &      &      &       &     \\
+& 41.2 \% & 50.6 \% & 2.3 \% &     \% &      \% &       \% \\
+        \hline
+        Edit distance 2 with POS N-grams 
+&     ?  &       &      &      &       &     \\
+& 41.2 \% & 50.6 \% & 2.3 \% &     \% &      \% &       \% \\
         \hline
       \end{tabular}
   \end{center}
 \end{table*}
 
-We note that using the hybrid model, we get an improvement regardless
-of the language used, whereas the traditional methods of only using either surface 
-or POS n-grams result in deterioration for the morphologically complex Finnish material ?????. A reason
-for this may be the relative sparseness of n-grams in the Finnish
-material. We present a further analysis of both languages in the following 
-subsections.
+We note that using the POS N-grams model, we get an improvement regardless of
+the language used, whereas the traditional methods of only using either surface
+n-grams result in deterioration for the morphologically complex Finnish
+material ?????. A reason for this may be the relative sparseness of n-grams in
+the Finnish material. We present a further analysis of both languages in the
+following subsections.
 
 \subsection{English Error-Analysis}
 
-In \cite{norvig/2010}, the authors identify errors that are not solved using simple
-unigram weights, such as correcting \emph{rember} to \emph{remember} instead of
-\emph{member}. Here, our scaled context-model which can bypass the edit distance
-model weight will select the correct suggestion. However, when correcting e.g.
-\emph{ment} to \emph{meant} in stead of \emph{went} or \emph{met} the POS
-based context reranking gives no help as the POS stays the same.
+In \cite{norvig/2010}, the authors identify errors that are not solved using
+simple unigram weights, such as correcting \emph{rember} to \emph{remember}
+instead of \emph{member}. Here, our scaled POS n-gram context-model as well
+as the simpler word n-gram model, which can bypass the
+edit distance model weight will select the correct suggestion. However, when
+correcting e.g.  \emph{ment} to \emph{meant} in stead of \emph{went} or
+\emph{met} the POS based context reranking gives no help as the POS stays the
+same.
  
 \subsection{Finnish Error-Analysis}
-
-In the Finnish material, the traditional method of using POS n-grams results
-in approximately 50 \% good suggestions ???????????. Looking at the examples, this
-most commonly happens in nominals where the expected correction in oblique
-cases is shadowed by some other correction of the grammatical cases; since word-ordering
-of verbal complements and adjuncts is relatively free the model expects that
-statistically more common cases are statistically more common in all positions.
 
 \subsection{Performance Evaluation}
 
@@ -501,11 +554,16 @@ speed of performing the experiments in Tables~\ref{table:real-eval}~and~\ref{tab
   \end{center}
 \end{table}
 
+The performance penalty that is incurred on Finnish spell-checking but not so
+much on English comes from the method of determining readings for words unknown
+to the language model, or a guesser. The amount of words unknown to language
+model in Finnish was greater than with English due to training data sparseness
+and morphological complexity of the language.
 
 \section{Future Work and Discussion}
 \label{sec:future-work}
 
-We have shown that the combined n-gram models are suitable for improving the
+We have shown that the POS based n-gram models are suitable for improving the
 spelling corrections for both morphologically more complex languages such as
 Finnish and for further improving languages with simpler morphologies like English. To
 further verify the suitability of the method, it still needs to be tested on
@@ -521,12 +579,12 @@ unigram based spell checker demonstrated in~\cite{pirinen/2010/lrec}.
 
 \section{Conclusion}
 
-In this paper we have demonstrated the use of finite-state methods for trigram based
-generation of spelling suggestions. We have shown that the basic trigram
-methods suggested for languages like English are not
-useful without modification for morphologically more complex languages like
-Finnish.  Instead a more elaborate n-gram scheme combining surface forms and 
-POS n-grams is successful for Finnish as well as English.
+In this paper we have demonstrated the use of finite-state methods for trigram
+based generation of spelling suggestions. We have shown that the basic trigram
+methods suggested for languages like English are not useful without
+modification for morphologically more complex languages like Finnish.  Instead
+a more elaborate n-gram scheme using  POS n-grams is successful for Finnish as
+well as English.
 
 %\section*{Acknowledgements}
 
