@@ -201,18 +201,11 @@ would therefore be unable to give a good estimate for the probability
 of the compound word.
 
 Finally many agglutinative languages like Finnish and Turkish
-incorporate phonological phenomena, such as vowel harmony, which span
-over entire word forms consisting of several morphs. Consider the
-Finnish word form "talo + i + ssa" (in the houses), The morpheme
-"ssA", used to signify inessive case, has two variants "ssa" and
-"ss\"{a}". The choice between the endings is determined by the last
-non-neutral stem vowel, which is "o" in this case. A first order morph
-sequence model cannot disambiguate between the "ssa" and "ssä", since
-the stem and ending are separated by the plural morph "i". A third
-order letter sequence model does not help either, since the distance
-between "o" and "a" is exactly three letters. Thus vowel harmony
-cannot be handled using the probabilistic models, which has prompted
-us to include phonological constraints in our system.
+incorporate phonological phenomena, such as vowel harmony, which can
+span over arbitrarily long distances in word forms. These phenomena
+cannot be adequately handled using n-gram models of morphs or letters,
+which has prompted us to include phonological constraints in our
+system.
 
 The statistical models and phonological rules are implemented as
 weighted finite-state transducers, which allows combining them using
@@ -231,11 +224,20 @@ keyboard. Correspondingly, we denote a sequences of letter of length
 $m$ by $L = (l_i)_{i=1}^{m}$.
 
 The task of the letter model is to give the probability of a letter
-sequence $L$ given a sequence of keys $K$. Naturally ${\rm P}(L|K) > 0$, iff
-$L \in {\rm M}(K)$. The probability ${\rm P}(L|K)$ is given in equation (\ref{letter-chain-eqn}).  
-\begin{equation}\label{letter-chain-eqn}
-1
-\end{equation}
+sequence $L$ given a sequence of keys $K$. Naturally ${\rm P}(L|K) >
+0$, iff $L \in {\rm M}(K)$. We use the standard HMM approximation for
+the ${\rm P}(L|K)$. the approximation is given in equation
+(\ref{letter-chain-eqn}).  The second equality follows by noting that
+${\rm P}(k_i|l_i) = 1$ for all $i$ since every letter corresponds to
+only one key. The letters $l_{0}$ and $l_{-1}$ are special buffer
+letters, that are added both to the training data and suggestions.
+
+\begin{eqnarray}\label{letter-chain-eqn}
+{\rm P}(L|K) & = & {\rm P}(k_1|l_1){\rm P}(l_1|l_{0},l_{-1}){\rm
+  P}(l_2|k_2){\rm P}(l_2|l_{1},l_{0}){\rm\ ...\ }{\rm P}(k_n|l_n){\rm
+  P}(l_n|l_{n-1},l_{n-2})\\ & = & {\rm P}(l_1|l_{0},l_{-1}){\rm
+  P}(l_2|l_{1},l_{0}){\rm\ ...\ }{\rm P}(l_n|l_{n-1},l_{n-2})
+\end{eqnarray}
 
 \subsection{A Markov Chain of Morphs}
 
@@ -354,7 +356,7 @@ For training and testing the Finnish text entry system, we use the
 same data as \cite{silfverberg/2011/cla}, though they use a
 morphological analyzer, which we do not utilize. The training material
 is extracted from Finnish IRC logs and contains some 350000 words. The
-test material is actual text message data and contains $6663$
+test material is actual text message data and contains $6663$.
 words~\footnote{The original test data contains $10851$ words, but it
   turned out that the latter part of the test data file is actually a
   uniquified list of words, which skews test results, so we decided
@@ -386,10 +388,13 @@ characters.
 \subsection{Turkish}
 
 For training and testing the Turkish text entry system, we use the
-same materials as \cite{Tantug:2010}. The material is divided into a
+same materials as \cite{Tantug:2010}. It is a corpus of new paper text
+containing some $20$ million words. The material is divided into a
 test corpus containing $2597$ words and a training corpus which
 includes the rest of the words in the material. Thus the training data
 and test data are disjoint.
+
+With Turkish we do not use phonological constraints.
 
 \section{Evaluation}\label{evaluation}
 
@@ -453,7 +458,7 @@ figure~\ref{Finnish-kpc-table}.
 
 \begin{figure}[hbt!]
 \begin{center}
-\includegraphics[width=3in]{finnish_kpc_figure.pdf}
+\includegraphics[width=2.5in]{finnish_kpc_figure.pdf}
 \end{center}
 \caption{The effect of the amount of training data (horizontal axis)
   on the KPC ratio (vertical axis) of the Finnish predictive text
@@ -462,10 +467,14 @@ figure~\ref{Finnish-kpc-table}.
 \end{figure}
 
 We compared our system to another published Finnish text-entry system
-by~\cite{silfverberg/2011/cla}.  They do not evaluate their system
-using the KPC ratio, but we were able to obtain their test results and
-according to our experiments they achieve a KPC ratio of
-$1.6120$.~\footnote{When examining the test data used by
+by~\cite{silfverberg/2011/cla}, which is based on a morphological
+analyzer and a colloquial dictionary. They do not evaluate their
+system using the KPC ratio, but we were able to obtain their test
+results and according to our experiments they achieve a KPC ratio of
+$1.6120$. This means that our system achieves a 14.3\% decrease in KPC
+compared to the dictionary-based system using the same training
+materials and test data, but without using the morphological
+analyzer. \footnote{When examining the test data used by
   \cite{silfverberg/2011/cla}, we discovered, that the latter half of
   the data consisted of a uniquified word list, which effected their
   results negatively. We have computed the KPC ratio for both our own
@@ -490,12 +499,12 @@ Letter n-grams, morph sequence model and rules &1.3818 & 43.5~~~~~~~~~~\\
 \end{center}
 \end{table}
 
-In practice, the number of suggestions for an input sequence is rather
-high. Few users are likely to scroll through ten suggestions
-especially if there are many non-words in the suggestion
-list. Therefore we also computed the KPC ratio for the entire training
-data as a function of the number of suggestions given by the
-system. The results are shown in figure~\ref{fi-kpc-suggestions}.
+In practice, ten suggestions for an input sequence is quite a lot. Few
+users are likely to scroll through ten suggestions especially if there
+are many non-words in the suggestion list. Therefore we also computed
+the KPC ratio for the entire training data as a function of the number
+of suggestions given by the system. The results are shown in
+figure~\ref{fi-kpc-suggestions}.
 
 \begin{table}\label{fi-kpc-suggestions}
 \caption{The effect of the number of suggestions on the KPC ratio of the Finnish text entry system using all of the training data.}
@@ -515,13 +524,14 @@ text entry systems. To accomplish this, we took a list of thirty words
 chosen at random from the training data, entered the words into three
 commercially available mobile phones and computed the KPC ratio. We
 also tested our own system using the words. Since the text entry
-system of the mobile phones did not give ten suggestion, we computed
-results only on the three first guesses given by each system.
+system of the mobile phones did not give ten suggestions, we computed
+results only on the three first guesses given by each system. The
+results are shown in table~\ref{mobile-phone-kpc}.
 
 \begin{table}
 \caption{The KPC ratio for the text entry of two commercial phones and
   our system using a $30$ word random sample from our test data. Only
-  the three first suggestions were considered for each system.}
+  the three first suggestions were considered for each system.}\label{mobile-phone-kpc}
 \begin{center}
 \begin{tabular}{lc}
 \hline
@@ -529,6 +539,7 @@ System & KPC\\
 \hline
 Nokia 2600       & 1.9576\\
 Samsung SGH M310 & 1.9576\\
+Nokia C7         & 2.1557\\
 Our system       & 1.3350\\
 \hline
 \end{tabular}
@@ -550,7 +561,10 @@ characters. If we substitute the length of words in utf-8 characters
 by the incorrect length. We arrive at a figure $2.20914$, which is
 very close to $2.2014$. Because of this inconsistency, it is possible
 that our results are not entirely comparable to the results
-of~\cite{Tantug:2010}. The increase in KPC ratio given for the method by~\cite{Tantug:2010} is computed using our figure for the KPC ratio of the multitap method. The improvement given by~\cite{Tantug:2010} is $35\%$.
+of~\cite{Tantug:2010}. The increase in KPC ratio given for the method
+by~\cite{Tantug:2010} is computed using our figure for the KPC ratio
+of the multitap method. The improvement given by~\cite{Tantug:2010} is
+$35\%$.
 
 \begin{table}
 \caption{KPC for Turkish using different input methods. the multitap
@@ -571,9 +585,60 @@ Our method                        &  1.1768 &51.7~~~~~~~~~~\\
 
 \section{Discussion}\label{discussion}
 
+For Finnish our system achieves a substantial $14.3\%$ drop in KPC
+ratio compared to the other system which utilizes a morphological
+analyzer. In their Finnish text entry
+system~\cite{silfverberg/2011/cla} give only $3$ suggestions. Looking
+at table~\ref{fi-kpc-suggestions} we see that the KPC ratio for our
+system is $1.6036$, when only considering the three first suggestions,
+which is still lower than the KPC ratio $1.6120$, which their system
+achieves. Considering, that except the phonological constraints, we
+use only language independent components, this is remarkable.
+
+The phonological constraints seem to be having very little effect, as
+can be seen in table~\ref{Finnish-kpc-table}. The decrease in KPC when
+using the phonological constraints is only about $0.1\%$. This may be
+a result of the unsupervised segmentation, which does not always
+succeed in finding the correct morpheme boundaries and therefore may
+prevent the rules from being triggered.
+
+As figure~\ref{mobile-phone-kpc} shows, our system outperforms three
+commercially available mobile phones on a thirty word test set chosen
+at random from our test data. This shows that our approach has great
+practical potential.
+
+As can be seen in table~\ref{Turkish-kpc-table} our method achieves an
+additional $10\%$ point reduction in KPC compared to the system
+in~\cite{Tantug:2010}. Our KPC ratio $1.1768$ needs to be related to
+the fact that our method can never achieve a KPC ratio lower than $1$,
+since every letter in a word needs to be typed. We achieve a $51.7\%$
+reduction in KPC for the Turkish test data compared to the multitap
+method. A fast computation reveals that the maximal possible reduction
+is only $59.0\%$, which demonstrates that our system is nearly optimal
+on the Turkish data.
+
 \section{Conclusions and future work}\label{conclusion}
 
+We have demonstrated highly efficient predictive text entry system,
+which can be constructed using only unsupervised methods. Additionally
+linguistic rules can be added to improve the performance of the
+system. 
+
+There are several interesting future research directions. In order to
+reduce the KPC ratio to under $1$, the system should be able to
+predict morphs before they are completely typed. A model, which
+extends over word boundaries would almost certainly also be useful.
+
+It would be interesting to examine the effect of the segmentation of
+the training corpus on the function of the phonological rules. A
+linguistically soundly segmented training corpus would probably allow
+the rules to act more often and thus improve the KPC ratio.
+
 \section{Acknowledgments}
+\ldots\\
+\ldots\\
+\ldots
+
 
 \bibliographystyle{splncs03}
 \bibliography{cicling2011.bib}
