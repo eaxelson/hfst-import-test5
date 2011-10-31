@@ -8,6 +8,9 @@ SCPDIR=public_html/tmp/
 PAPER_SOURCES=cicling-2011-contextspell.tex cicling2011.bib
 PAPER_PDF=cicling-2011-contextspell.pdf
 
+ERROR_CORPORA=en-US.autogen.contextspell en-US.birkbeck.contextspell fi-FI.autogen.contextspell fi-FI.fiwiki-gutenberg.contextspell norvig1.contextspell norvig2.contextspell
+DOCS=README LICENCE
+
 cicling-2011-contextspell.pdf: cicling-2011-contextspell.tex cicling2011.bib
 	$(TEX) cicling-2011-contextspell.tex
 	$(BIB) cicling-2011-contextspell
@@ -644,4 +647,18 @@ clean:
 
 upload: $(PAPER_PDF)
 	$(SCP) $< $(SCPHOST):$(SCPDIR)
+
+SOFTWARE=hfst-3.3.0.tar.gz openfst-1.2.7.tar.gz hfstospell-0.2.0.tar.gz
+
+openfst-1.2.7.tar.gz:
+	wget http://www.openfst.org/twiki/pub/FST/FstDownload/openfst-1.2.7.tar.gz
+
+hfst-3.3.0.tar.gz:
+	wget -O $@ http://sourceforge.net/projects/hfst/files/hfst/hfst-3.3.0.tar.gz/download
+
+hfst-ospell-0.2.0.tar.gz:
+	wget -O $@ http://sourceforge.net/projects/hfst/files/hfst/hfst-ospell-0.2.0.tar.gz/download
+
+cicling-2011-contextspell.zip: $(PAPER_PDF) $(PAPER_SOURCES) $(SOFTWARE) $(SPELLING_CORPORA) $(DOCS) $(ERROR_CORPORA) edit-distance.bash
+	zip -x .svn -x \*.svn-base -r -v -9 $@ $^ bin taggers hfst results
 
