@@ -2,6 +2,11 @@
 
 TEX=xelatex
 BIB=bibtex
+SCP=scp
+SCPHOST=ruuvi
+SCPDIR=public_html/tmp/
+PAPER_SOURCES=cicling-2011-contextspell.tex cicling2011.bib
+PAPER_PDF=cicling-2011-contextspell.pdf
 
 cicling-2011-contextspell.pdf: cicling-2011-contextspell.tex cicling2011.bib
 	$(TEX) cicling-2011-contextspell.tex
@@ -36,7 +41,7 @@ $(OMORFI):
 $(NORVIG):
 	mkdir -p $@
 
-.PHONY: automata automata-fi automata-en results results-fi results-en textables textables-fi textables-en context_speller context-results
+.PHONY: automata automata-fi automata-en results results-fi results-en textables textables-fi textables-en context_speller context-results upload
 
 # rulem amiking stuff
 context_speller: bin/context_speller
@@ -636,3 +641,7 @@ alice_excerpt_with_errors.txt:alice_excerpt.txt
 clean:
 	-rm -f cicling-2011-contextspell.aux cicling-2011-contextspell.bbl cicling-2011-contextspell.pdf words train tropical
 	-rm -f juha* alice* results/juha* results/alice*
+
+upload: $(PAPER_PDF)
+	$(SCP) $< $(SCPHOST):$(SCPDIR)
+
