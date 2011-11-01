@@ -661,8 +661,9 @@ hfst_setlocale()
     char* charset = nl_langinfo(CODESET);
     if (strcmp(charset, "UTF-8") != 0)
       {
-        error(EXIT_FAILURE, 0, "Character set %s not supported; exiting to "
-              "avoid data corruption", charset);
+        error(EXIT_FAILURE, 0, "Your environment's character set %s is not "
+              " supported.\nPlease use a locale with UTF-8 as the charset."
+	      , charset);
       }
 #endif
 #else
