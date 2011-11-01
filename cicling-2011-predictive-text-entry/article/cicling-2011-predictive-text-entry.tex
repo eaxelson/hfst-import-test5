@@ -163,8 +163,8 @@ for agglutinative languages.
 
 Predictive text entry can be seen as a labeling task, where every key
 in a sequence of keys is assigned its most likely letter. The usual
-approach to such tasks are stochastic model with hidden variables,
-such as an HMM.
+approach to such tasks is stochastic models with hidden variables,
+such as an HMMs.
 
 Though predictive text entry can be implemented fairly well using
 n-gram models (such as HMMs) on letter sequences, as exemplified
@@ -243,19 +243,19 @@ using lower order HMMs as explained in the following subsection.
 A morph of $n$ letters in the training-data is simply a sequence of $n$
 letters, so we denote it by $L = (l_i)_{i=1}^{n}$. A key sequence $K =
 (k_i)_{i=1}^{m}$ corresponds to a sequence of morphs $L_1{\rm
-  ... }L_k$ , where each $L_j = (l_{j_i})_{i=1}^{n_j}$, iff $\Sigma_{j
-  = 1}^{k} n_j = m$ and $l_{j_i} \in {\rm M}(k_{m_1 + {\rm ... } +
-  m_{j - 1} + i})$ for all $l_{j_i}$. We denote the set of morph
+  ... }L_s$ , where each $L_j = (l_{j_i})_{i=1}^{n_j}$, iff $\Sigma_{j
+  = 1}^{s} n_j = m$ and $l_{j_i} \in {\rm M}(k_{n_1 + {\rm ... } +
+  n_{j - 1} + i})$ for all $l_{j_i}$. We denote the set of morph
 sequences that correspond to a key sequence $K$ by ${\rm M}(K)$.
 
 The task of the morph model is to assign a probability for each
 sequence of morphs in ${\rm M}(K)$ for the key sequence $K$. The
-probability of a sequence of morphs $L_1{\rm ... }L_k \in {\rm M}(K)$
+probability of a sequence of $s$ morphs $(L_1{\rm,\ ...,\ }L_s) \in {\rm M}(K)$
 is given by the chain rule of probabilities in equation
 (\ref{chain-eqn}).
 \begin{equation}\label{chain-eqn}
-{\rm P}(L_1{\rm, ..., }\ L_k) = {\rm P}(L_1){\rm P}(L_2|L_1)\ {\rm
-  ... }\ P(L_k| L_1{\rm, ..., }\ L_{k - 1})
+{\rm P}(L_1{\rm, ..., }\ L_s) = {\rm P}(L_1){\rm P}(L_2|L_1)\ {\rm
+  ... }\ P(L_s| L_1{\rm, ..., }\ L_{s - 1})
 \end{equation}
 
 We make the standard assumptions for a first order Markov model,
@@ -265,8 +265,8 @@ occurring depends only on its left neighboring morph and the morph
 itself. This allows us to approximate equation (\ref{chain-eqn}) by
 equation (\ref{markov-eqn}).
 \begin{equation}\label{markov-eqn}
-{\rm P}\big(L_1{\rm, ..., }L_k\big) = {\rm P}(L_1){\rm P}\big(L_2 |
-L_1){\rm P}\big(L_3 | L_2)\ {\rm ... }\ {\rm P}(L_{k} | L_{k-1})
+{\rm P}\big(L_1{\rm, ..., }L_s\big) = {\rm P}(L_1){\rm P}\big(L_2 |
+L_1){\rm P}\big(L_3 | L_2)\ {\rm ... }\ {\rm P}(L_{s} | L_{s-1})
 \end{equation}
 
 In practice we use a training corpus for estimating the probability
@@ -471,7 +471,7 @@ analyzer. \footnote{When examining the test data used by
   the data consisted of a uniquified word list, which affected their
   results negatively. We have computed the KPC ratio for both our own
   system and the system of \cite{silfverberg/2011/cla} using only the
-  $6663$ first words in the test data.}
+  $6663$ first words in the test data.}.
 
 \begin{table}
 \begin{center}
@@ -550,7 +550,7 @@ slightly from the figure $2.2014$ given by~\cite{Tantug:2010}. There
 is some concern that the figure $2.2014$ is erroneously computed by
 computing the length of words in bytes rather than in utf-8
 characters. If we substitute the length of words in utf-8 characters
-by the incorrect length. We arrive at a figure $2.20914$, which is
+by the incorrect length, we arrive at a figure $2.20914$, which is
 very close to $2.2014$. Because of this inconsistency, it is possible
 that our results are not entirely comparable to the results
 of~\cite{Tantug:2010}. The improvement in KPC ratio given for the method
