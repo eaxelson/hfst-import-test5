@@ -662,7 +662,7 @@ hfst_setlocale()
     if (strcmp(charset, "UTF-8") != 0)
       {
         error(EXIT_FAILURE, 0, "Your environment's character set %s is not "
-              " supported.\nPlease use a locale with UTF-8 as the charset."
+              "supported.\nPlease use a locale with UTF-8 as the charset."
 	      , charset);
       }
 #endif
