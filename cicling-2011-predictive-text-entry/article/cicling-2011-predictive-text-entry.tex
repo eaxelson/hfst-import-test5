@@ -49,9 +49,9 @@ these approaches have usually been able to rely on an extensive
 dictionary along with word frequencies, since a sufficiently large
 English dictionary almost eliminates the problem of out-of-vocabulary
 (OOV) words. E.g. \cite{klarlund/2002} reports low OOV word rates of
-1.42 \% for a training set containing the $40,000$ most frequent words
+1.42 \% for a training set containing the $40\ 000$ most frequent words
 in the North American Business News Corpus and a test set consisting
-of $54,265$ sentences from the same corpus.
+of $54\ 265$ sentences from the same corpus.
 
 For morphologically complex languages like Finnish and Turkish,
 productive inflection, derivation and compounding raise the number of
@@ -348,7 +348,7 @@ same data as \cite{silfverberg/2011/cla}, though they use a
 morphological analyzer, which we do not utilize. The training material
 is extracted from Finnish IRC logs and contains some 350,000
 words. The test material consists of $6663$ words of actual text
-message data~\footnote{The original test data contains $10851$ words,
+message data~\footnote{The original test data contains $10\ 851$ words,
   but it turned out that the latter part of the test data file is
   actually a uniquified list of words, which skews test results, so we
   decided to only use the earlier half of the material}.
@@ -413,7 +413,7 @@ and using the multitap input method is {\tt
 entering the first "k" in order to tell the text entry that the next
 press of key {\tt 5} starts a new symbol. This increases the number of
 keystrokes from $9$ to $10$. On a training data consisting solely of
-the word "kukka" the KPC ratio would thus be "10/5 = 2.0".
+the word "kukka" the KPC ratio would thus be $10/5 = 2.0$.
 
 
 When computing the KPC ratio for predictive text entry methods, we assume
@@ -438,11 +438,11 @@ system. In detail, entering an OOV word requires:
 
 We constructed $12$ text entry systems using different portions of the
 training data for Finnish presented in section~\ref{data}. We used the
-first $1,000$, $35,000$, $69,000$, $103,000$, $137,000$, $171,000$,
-$205,000$, $239,000$, $273,000$, $307,000$, $341,000$ and $345,337$ words
+first $1000$, $35\ 000$, $69\ 000$, $103\ 000$, $137\ 000$, $171\ 000$,
+$205\ 000$, $239\ 000$, $273\ 000$, $307\ 000$, $341\ 000$ and $345\ 337$ words
 respectively. The impact of the size of the training data is shown in
 Figure~\ref{fi-kpc-graph}. The minimum KPC ratio $1.3818$ was attained
-for the entire training data consisting of $345,337$ words.
+for the entire training data consisting of $345\ 337$ words.
 
 We also evaluated the effect of the different components on the KPC of
 the predictive text entry system. The results are shown in
@@ -454,8 +454,8 @@ Figure~\ref{Finnish-kpc-table}.
 \end{center}
 \caption{The effect of the amount of training data (horizontal axis)
   on the KPC ratio (vertical axis) of the Finnish predictive text
-  entry system. The dashed line shows the KPC for
-  multitap. The minimal KPC ratio is 1.3818.}\label{fi-kpc-graph}
+  entry system. The dashed line marks the KPC for
+  multitap $2.4018$. The minimal KPC ratio is $1.3818$.}\label{fi-kpc-graph}
 \end{figure}
 
 We compared our system to another published Finnish text-entry system
