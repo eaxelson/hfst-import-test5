@@ -660,5 +660,10 @@ hfst-ospell-0.2.0.tar.gz:
 	wget -O $@ http://sourceforge.net/projects/hfst/files/hfst/hfst-ospell-0.2.0.tar.gz/download
 
 cicling-2011-contextspell.zip: $(PAPER_PDF) $(PAPER_SOURCES) $(SOFTWARE) $(SPELLING_CORPORA) $(DOCS) $(ERROR_CORPORA) edit-distance.bash
-	zip -x .svn -x \*.svn-base -r -v -9 $@ $^ bin taggers hfst results
+	zip -x .svn -x \*.svn-base -r -v -9 $@ $^ Makefile bin results hfst taggers
+
+cicling-2011-contextspell-small.zip:  $(PAPER_PDF) $(PAPER_SOURCES) $(SOFTWARE) $(SPELLING_CORPORA) $(DOCS) $(ERROR_CORPORA) edit-distance.bash $(RESULTS_FI) $(RESULTS_EN)
+	zip -x .svn -x \*.svn-base -x \*autogen\* -r -v -9 $@ $^ Makefile  bin
+
+
 
