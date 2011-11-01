@@ -24,7 +24,7 @@ chain on morph sequences combined with a third order hidden Markov
 model (HMM) mapping key sequences to letter sequences and phonological
 constraints for pruning suggestion lists. We evaluate our method by
 constructing text entry systems for Finnish and Turkish and comparing
-our systems to published text entry systems and the text entry systems
+our systems with published text entry systems and the text entry systems
 of three commerically available mobile phones. Measured using the
 keystrokes per character ratio (KPC) \cite{MacKenzie02kspc}, we
 achieve superior results. For training, we use corpora, which are
@@ -34,7 +34,7 @@ segmented using unsupervised morphological segmentation.
 \section{Introduction}
 
 Mobile phone text messages are a hugely popular means of
-communication, but mobile phones are not especially well suited for
+communication, but mobile phones are not especially well-suited for
 inputting text because of their small size and often limited
 keyboard. There exist several technological solutions for text entry
 on mobile phones and other limited keyboard devices. This paper is
@@ -43,7 +43,7 @@ utilizes redundancy in natural language in order to enable efficient
 text entry using limited keyboards (typically having 12 keys).
 
 The subject of predictive text entry has been extensively studied, but
-the studies have mainly concerned on predictive text entry of
+the studies have mainly concentrated on predictive text entry of
 English. Because of the limited morphological complexity of English,
 these approaches have usually been able to rely on an extensive
 dictionary along with word frequencies, since a sufficiently large
@@ -79,15 +79,16 @@ segmentation system Morfessor \cite{Creutz07ACMTSLP} for segmenting
 the training corpus and the tools for constructing POS-taggers from
 the HFST interface~\cite{hfst/2011}. We show that our method can also
 be applied to another agglutinative language besides Finnish, namely
-Turkish. We compare the Turkish text entry system to an existing text
-entry system, which is based on a hidden Markov model and show that
-our approach gives a substantial improvement in KPC.
+Turkish. We compare the Turkish text entry system with an existing
+text entry system, which is based on a Markov model on letter
+sequences and show that our approach gives a substantial improvement
+in KPC.
 
 The paper is structured as follows. In section~\ref{earlier-work} we
 present some earlier approaches to predictive text entry. In
 section~\ref{model}, we present the components of our model for text
 entry and explain how these models are combined into a system for
-predictive text entry..  In Section~\ref{data} we describe the
+predictive text entry.  In Section~\ref{data} we describe the
 training and test corpora used in constructing and testing predictive
 text entry systems for Finnish and Turkish together with the
 phonological rules which are used to realize Finnish vowel
@@ -100,7 +101,7 @@ and future work directions in section~\ref{conclusion}.
 
 The mobile phone keypad is a so called clustered keyboard, where each
 key can be used to enter several letters. E.g. on the Finnish mobile
-phone keypad in figure~\ref{keypad} the key 2 is used to enter the
+phone keypad in Figure~\ref{keypad} the key 2 is used to enter the
 letters "a", "b", "c", "\"{a}" and "å".
 
 The original method for text entry is the so called
@@ -219,7 +220,7 @@ We denote a sequence of mobile phone keys $k_i$ of length $n$ by $K =
 (k_i)_{i=1}^{n}$. For the key $k_i$, we denote the set of letters
 corresponding to the key by ${\rm M}(k_i)$. E.g. ${\rm M}(2) =
 \{$a,~b,~c,~\"{a}$\}$ on a typical Finnish mobile phone
-keyboard. Correspondingly, we denote a sequences of letter of length
+keyboard. Correspondingly, we denote a sequence of letters of length
 $n$ by $L = (l_i)_{i=1}^{n}$.
 
 The task of the letter model is to give the probability of a letter
@@ -228,7 +229,7 @@ sequence $L$ given a sequence of keys $K$. Naturally ${\rm P}(L|K) >
 ${\rm P}(L|K)$ in equation (\ref{letter-chain-eqn}).  The second
 equality follows by noting that ${\rm P}(k_i|l_i) = 1$ for all $i$,
 since every letter corresponds to only one key. Two special letters
-$l_{0}$ and $l_{-1}$ are required to make the approximation work. This
+$l_{0}$ and $l_{-1}$ are required to make the approximation work. These
 buffer symbols are added both to the training data and the
 suggestions. To counteract data sparseness, we smooth probabilities
 using lower order HMMs as explained in the following subsection.
@@ -306,12 +307,12 @@ hfst-twolc\footnote{\url{https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstTwolC
 
 Both the HMM on letter sequences and the morph sequence model are
 implemented as sets of weighted finite-state transducers. The models
-are compiled using the POS tagger tools (see
-\cite{Silfverberg/2010/IceTal} and \cite{Silfverberg/2011}) in the
+are compiled using the POS tagger tools,
+\cite{Silfverberg/2010/IceTal} and \cite{Silfverberg/2011}, in the
 hfst-interface\footnote{\url{http://hfst.sf.net}}. We simply replace
 words and tags by keys, letters and morphs.
 
-The input key sequence entered by the user is compiled in to a finite state
+The input key sequence entered by the user is compiled into a finite state
 transducer, which codes all possible realizations of the key sequence
 as letter sequences. The realizations are weighted using the HMM
 model on letter sequences and the weighted letter sequences are coded
@@ -335,7 +336,7 @@ systems.
 The training materials and test materials for both Finnish and Turkish
 were processed in the same way. All uppercase letters were transformed
 into lowercase letters and all words that included non-alphabetical
-characters were removed. This included among other characters all
+characters were removed. This included among other characters such as
 numbers and punctuation except the symbol "'" in Turkish, which is
 used to signify the boundary between the stem and affix in some word
 forms.
@@ -361,9 +362,9 @@ this constraint on a morphologically segmented word form.
 
 Figure \ref{fi-constraints} shows one of the rules. The rule disallows
 an affix with front-vowels, together with a stem with back-vowels. The
-named regular expressions \verb|Affix|, \verb|FrontAffix| and
-\verb|BackAffix| are sets of know inflective and derivational affixes
-in Finnish. The expressions \verb|FrontStem| and \verb|BackStem|
+named regular expressions \verb|Affix|, \verb|FrontVowelAffix| and
+\verb|BackVowelAffix| are sets of know inflective and derivational affixes
+in Finnish. The expressions \verb|FrontVowelStem| and \verb|BackVowelStem|
 denote arbitrary morphs with back- and front-vowels respectively,
 whose length exceeds three characters.
 
@@ -405,7 +406,7 @@ corpus. Following \cite{Tantug:2010}, we do not consider space
 characters as a part of the test data.
 
 By examining the schematic picture of a mobile phone keypad in
-figure~\ref{keypad}, it can be seen that the key sequence needed to
+Figure~\ref{keypad}, it can be seen that the key sequence needed to
 input the word "kukka" (flower) on a mobile phone with Finnish keypad
 and using the multitap input method is {\tt
   5-5-8-8-5-5-<NEXT>-5-5-2}. The {\tt <NEXT>}-key is required after
@@ -440,12 +441,12 @@ training data for Finnish presented in section~\ref{data}. We used the
 first $1,000$, $35,000$, $69,000$, $103,000$, $137,000$, $171,000$,
 $205,000$, $239,000$, $273,000$, $307,000$, $341,000$ and $345,337$ words
 respectively. The impact of the size of the training data is shown in
-figure~\ref{fi-kpc-graph}. The minimum KPC ratio $1.3818$ was attained
+Figure~\ref{fi-kpc-graph}. The minimum KPC ratio $1.3818$ was attained
 for the entire training data consisting of $345,337$ words.
 
 We also evaluated the effect of the different components on the KPC of
 the predictive text entry system. The results are shown in
-figure~\ref{Finnish-kpc-table}.
+Figure~\ref{Finnish-kpc-table}.
 
 \begin{figure}[hbt!]
 \begin{center}
@@ -463,18 +464,18 @@ analyzer and a colloquial dictionary. They do not evaluate their
 system using the KPC ratio, but we were able to obtain their test
 results and according to our experiments they achieve a KPC ratio of
 $1.6120$. This means that our system achieves a 14.3\% decrease in KPC
-compared to the dictionary-based system using the same training
+compared with the dictionary-based system using the same training
 materials and test data, but without using the morphological
 analyzer. \footnote{When examining the test data used by
   \cite{silfverberg/2011/cla}, we discovered, that the latter half of
-  the data consisted of a uniquified word list, which effected their
+  the data consisted of a uniquified word list, which affected their
   results negatively. We have computed the KPC ratio for both our own
   system and the system of \cite{silfverberg/2011/cla} using only the
   $6663$ first words in the test data.}
 
 \begin{table}
 \begin{center}
-\caption{KPC for Finnish Multitap and using including different components of
+\caption{KPC for Finnish Multitap and for using different components of
   our system. The third column shows the improvement over
   multitap.}\label{Finnish-kpc-table}
 \begin{tabular}{lcr}
@@ -495,7 +496,7 @@ users are likely to scroll through ten suggestions especially if there
 are many non-words in the suggestion list. Therefore we also computed
 the KPC ratio for the entire training data as a function of the number
 of suggestions given by the system. The results are shown in
-figure~\ref{fi-kpc-suggestions}.
+Figure~\ref{fi-kpc-suggestions}.
 
 \begin{table}\label{fi-kpc-suggestions}
 \caption{The effect of the number of suggestions on the KPC ratio of the Finnish text entry system using all of the training data.}
@@ -517,7 +518,7 @@ commercially available mobile phones and computed the KPC ratio. We
 also tested our own system using the words. Since the text entry
 system of the mobile phones did not give ten suggestions, we computed
 results only on the three first guesses given by each system. The
-results are shown in table~\ref{mobile-phone-kpc}.
+results are shown in Table~\ref{mobile-phone-kpc}.
 
 \begin{table}
 \caption{The KPC ratio for the text entry of two commercial phones and
@@ -558,9 +559,8 @@ of the multitap method. The improvement given by~\cite{Tantug:2010} is
 $35\%$.
 
 \begin{table}
-\caption{KPC for Turkish using different input methods. the multitap
-  method. The third column shows the improvement over
-  multitap}\label{Turkish-kpc-table}
+\caption{KPC for Turkish using different input methods. The third
+  column shows the improvement over the multitap method.}\label{Turkish-kpc-table}
 \begin{center}
 \begin{tabular}{lcr}
 \hline
@@ -577,28 +577,28 @@ Our method                        &  1.1768 &51.7~~~~~~~~~~\\
 \section{Discussion}\label{discussion}
 
 For Finnish our system achieves a substantial $14.3\%$ drop in KPC
-ratio compared to the other system which utilizes a morphological
+ratio compared with the other system which utilizes a morphological
 analyzer. In their Finnish text entry
 system~\cite{silfverberg/2011/cla} give only $3$ suggestions. Looking
-at table~\ref{fi-kpc-suggestions} we see that the KPC ratio for our
+at Table~\ref{fi-kpc-suggestions} we see that the KPC ratio for our
 system is $1.6036$, when only considering the three first suggestions,
 which is still lower than the KPC ratio $1.6120$, which their system
 achieves. Considering, that except the phonological constraints, we
 use only language independent components, this is remarkable.
 
 The phonological constraints seem to be having very little effect, as
-can be seen in table~\ref{Finnish-kpc-table}. The decrease in KPC when
+can be seen in Table~\ref{Finnish-kpc-table}. The decrease in KPC when
 using the phonological constraints is only about $0.1\%$. This may be
 a result of the unsupervised segmentation, which does not always
 succeed in finding the correct morpheme boundaries and therefore may
 prevent the rules from being triggered.
 
-As figure~\ref{mobile-phone-kpc} shows, our system outperforms three
+As Figure~\ref{mobile-phone-kpc} shows, our system outperforms three
 commercially available mobile phones on a thirty word test set chosen
 at random from our test data. This shows that our approach has great
 practical potential.
 
-As can be seen in table~\ref{Turkish-kpc-table} our method achieves an
+As can be seen in Table~\ref{Turkish-kpc-table} our method achieves an
 additional $10\%$ point reduction in KPC for Turkish compared to the
 system in~\cite{Tantug:2010}. Our KPC ratio $1.1768$ needs to be
 related to the fact that our method can never achieve a KPC ratio
