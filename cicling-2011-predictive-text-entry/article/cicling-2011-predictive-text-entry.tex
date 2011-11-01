@@ -149,15 +149,14 @@ letters in the word and then scrolls through a list of suggestion
 words matching the input.
 
 Our own method utilizes a similar probabilistic model on letter
-sequences as~\cite{Tantug:2010}, though we use a hidden Markov
-model. The novel aspects of our method are (1) utilizing a
-morphologically segmented training corpus in order to construct a
-probabilistic model of words as morph sequences and (2) using
-phonological constraints for filtering impossible suggestions. To the
-best of our knowledge, this has not been tried before in the domain of
-text-entry. In the related domain of speech recognition, similar
-approaches have yielded good results~\cite{Creutz_morph-basedspeech}
-for agglutinative languages.
+sequences as~\cite{Tantug:2010}. The novel aspects of our method are
+(1) utilizing a morphologically segmented training corpus in order to
+construct a probabilistic model of words as morph sequences and (2)
+using phonological constraints for filtering impossible
+suggestions. To the best of our knowledge, this has not been tried
+before in the domain of text-entry. In the related domain of speech
+recognition, similar approaches have yielded good
+results~\cite{Creutz_morph-basedspeech} for agglutinative languages.
 
 \section{A Probabilistic Model of Word Structure}\label{model}
 
@@ -196,7 +195,7 @@ once. We therefore combine the Markov chain with an
 HMM which maps key sequences to letter sequences. The HMM does not
 utilize morph boundaries, so it gives some estimate for the
 probability of a word form like "a-l-a-t-a-l-o" (a common Finnish
-surname), even though the combination of morphs "ala+talo" would never
+surname), even though the combination of morphs "ala + talo" would never
 have been observed in the training data and the morph sequence model
 would therefore be unable to give a good estimate for the probability
 of the compound word.
@@ -225,17 +224,19 @@ $n$ by $L = (l_i)_{i=1}^{n}$.
 
 The task of the letter model is to give the probability of a letter
 sequence $L$ given a sequence of keys $K$. Naturally ${\rm P}(L|K) >
-0$, iff $L \in {\rm M}(K)$. We give the standard HMM approximation for
-${\rm P}(L|K)$ in equation (\ref{letter-chain-eqn}).  The second
-equality follows by noting that ${\rm P}(k_i|l_i) = 1$ for all $i$,
-since every letter corresponds to only one key. Two special letters
-$l_{0}$ and $l_{-1}$ are required to make the approximation work. These
-buffer symbols are added both to the training data and the
-suggestions. To counteract data sparseness, we smooth probabilities
-using lower order HMMs as explained in the following subsection.
+0$, iff $L \in {\rm M}(K)$. We give the standard third order HMM
+approximation for ${\rm P}(L|K)$ in equation (\ref{letter-chain-eqn}).
+The second equality follows by noting that ${\rm P}(k_i|l_i) = 1$ for
+all $i$, since every letter corresponds to exactly one key. This
+effectively makes our HMM equivalent to a Markov chain. Three special
+letters $l_{-2}$, $l_{-1}$, $l_{0}$ are required to make the
+approximation work. These buffer symbols are added both to the
+training data and the suggestions. To counteract data sparseness, we
+smooth probabilities using lower order HMMs as explained in the
+following subsection.
 
 \begin{equation}\label{letter-chain-eqn}
-{\rm P}(L|K) = \prod_{i=1}^{n}{\rm P}(k_i|l_i){\rm P}(l_i|l_{i-2},l_{i-1}) = \prod_{i=1}^{n}{\rm P}(l_i|l_{i-2},l_{i-1})
+{\rm P}(L|K) = \prod_{i=1}^{n}{\rm P}(k_i|l_i){\rm P}(l_i|l_{1-3},l_{i-2},l_{i-1}) = \prod_{i=1}^{n}{\rm P}(l_i|l_{i-3},l_{i-2},l_{i-1})
 \end{equation}
 
 \subsection{A Markov Chain of Morphs}
