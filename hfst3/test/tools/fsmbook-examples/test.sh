@@ -5,10 +5,13 @@
 # Directory Lingala requires a professional licence of xfst so that
 # the resulting transducer can be written in att format. 
 
-for i in DateParser EinsteinsPuzzle EnglishNumerals \
-FinnishNumerals NumbersToNumerals Palindromes; do \
+# EinsteinsPuzzle Palindromes
+# FinnishNumerals NumbersToNumerals
+
+for i in DateParser EnglishNumerals \
+; do \
 cd $i; 
-if !(make check); then
+if !(../kokeilu.sh $i); then
     exit 1
 fi
 cd ..; 

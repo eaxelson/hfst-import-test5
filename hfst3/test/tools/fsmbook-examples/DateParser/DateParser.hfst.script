@@ -1,4 +1,4 @@
-FORMAT=TRANSDUCER_FORMAT
+#!/bin/bash
 
 # Numbers from one to nine.
 
@@ -10,11 +10,12 @@ echo "1
 6
 7
 8
-9" | hfst-strings2fst -f $FORMAT -j > OneToNine.hfst;
+9" | hfst-strings2fst -f $1 -j > OneToNine.hfst;
 
 # Numbers from zero to nine.
 
-echo "0" | hfst-strings2fst -f $FORMAT | hfst-disjunct OneToNine.hfst > ZeroToNine.hfst;
+echo "0" | hfst-strings2fst -f $1 | hfst-disjunct OneToNine.hfst \
+  > ZeroToNine.hfst;
 
 # Even numbers.
 
@@ -22,7 +23,7 @@ echo "0
 2
 4
 6
-8" | hfst-strings2fst -f $FORMAT -j > Even.hfst;
+8" | hfst-strings2fst -f $1 -j > Even.hfst;
 
 # Odd numbers.
 
@@ -30,7 +31,7 @@ echo "1
 3
 5
 7
-9" | hfst-strings2fst -f $FORMAT -j > Odd.hfst;
+9" | hfst-strings2fst -f $1 -j > Odd.hfst;
 
 # Even and odd numbers.
 
@@ -44,18 +45,18 @@ Wednesday
 Thursday
 Friday
 Saturday
-Sunday" | hfst-strings2fst -f $FORMAT -j > Day.hfst;
+Sunday" | hfst-strings2fst -f $1 -j > Day.hfst;
 
 # A special month that usually has only 28 days.
 
-echo "February" | hfst-strings2fst -f $FORMAT > Month28.hfst;
+echo "February" | hfst-strings2fst -f $1 > Month28.hfst;
 
 # Months that have 30 days.
 
 echo "April
 June
 September
-November" | hfst-strings2fst -f $FORMAT -j > Month30.hfst;
+November" | hfst-strings2fst -f $1 -j > Month30.hfst;
 
 # Months that have 31 days.
 
@@ -65,79 +66,99 @@ May
 July
 August
 October
-December" | hfst-strings2fst -f $FORMAT -j > Month31.hfst;
+December" | hfst-strings2fst -f $1 -j > Month31.hfst;
 
 # All months.
 
-hfst-disjunct Month28.hfst Month30.hfst | hfst-disjunct Month31.hfst > Month.hfst;
+hfst-disjunct Month28.hfst Month30.hfst | hfst-disjunct Month31.hfst \
+  > Month.hfst;
 
 # Numbers from 1 to 31
 
 echo "1
-2" | hfst-strings2fst -f $FORMAT -j | hfst-concatenate ZeroToNine.hfst |
+2" | hfst-strings2fst -f $1 -j | hfst-concatenate ZeroToNine.hfst |
 hfst-disjunct OneToNine.hfst > TMP.hfst;
 echo "30
-31" | hfst-strings2fst -f $FORMAT -j | hfst-disjunct TMP.hfst > Date.hfst;
+31" | hfst-strings2fst -f $1 -j | hfst-disjunct TMP.hfst > Date.hfst;
 
 # Numbers from 1 to 9999
 
-hfst-repeat -t 3 ZeroToNine.hfst | hfst-concatenate -1 OneToNine.hfst > Year.hfst;
-
-# At this point, we can test if the transducers are correct by printing for each transducer, say, 5 random strings recognized by that transducer:
-
-# for i in *.hfst; do echo $i:; hfst-fst2strings -r 5 $i; echo "" ; done
+hfst-repeat -t 3 ZeroToNine.hfst | hfst-concatenate -1 OneToNine.hfst \
+  > Year.hfst;
 
 # Day or [Month and Date] with optional Day and Year, excluding leap dates.
 
-echo ", " | hfst-strings2fst -f $FORMAT > CommaSpace.hfst;
-echo " " | hfst-strings2fst -f $FORMAT > Space.hfst;
-echo "" | hfst-strings2fst -f $FORMAT > Epsilon.hfst;
+echo ", " | hfst-strings2fst -f $1 > CommaSpace.hfst;
+echo " " | hfst-strings2fst -f $1 > Space.hfst;
+echo "" | hfst-strings2fst -f $1 > Epsilon.hfst;
 
 # Day followed by a comma and a space. e.g. "Thursday, ".
 
-hfst-concatenate Day.hfst CommaSpace.hfst | hfst-disjunct Epsilon.hfst > OptionalDay.hfst;
+hfst-concatenate Day.hfst CommaSpace.hfst | hfst-disjunct Epsilon.hfst \
+  > OptionalDay.hfst;
 
 # Month and a date, e.g. "January, 14".
 
-hfst-concatenate Month.hfst Space.hfst | hfst-concatenate -2 Date.hfst > MonthDate_.hfst;
+hfst-concatenate Month.hfst Space.hfst | hfst-concatenate -2 Date.hfst \
+  > MonthDate_.hfst;
 
 # Constraints on dates 29, 30 and 31.
 
-echo "29" | hfst-strings2fst -f $FORMAT > 29.hfst;
-echo "30" | hfst-strings2fst -f $FORMAT > 30.hfst;
-echo "31" | hfst-strings2fst -f $FORMAT > 31.hfst;
+echo "29" | hfst-strings2fst -f $1 > 29.hfst;
+echo "30" | hfst-strings2fst -f $1 > 30.hfst;
+echo "31" | hfst-strings2fst -f $1 > 31.hfst;
 
-hfst-concatenate Month30.hfst Space.hfst | hfst-concatenate 31.hfst > Constraint30.hfst;
+hfst-concatenate Month30.hfst Space.hfst | hfst-concatenate 31.hfst \
+  > Constraint30.hfst;
 hfst-disjunct 30.hfst 31.hfst | hfst-disjunct 29.hfst > TMP.hfst;
-hfst-concatenate Month28.hfst Space.hfst | hfst-concatenate TMP.hfst > Constraint28.hfst;
+hfst-concatenate Month28.hfst Space.hfst | hfst-concatenate TMP.hfst \
+  > Constraint28.hfst;
 
-hfst-subtract MonthDate_.hfst Constraint30.hfst | hfst-subtract -2 Constraint28.hfst > MonthDate.hfst;
+hfst-subtract MonthDate_.hfst Constraint30.hfst | \
+hfst-subtract -2 Constraint28.hfst > MonthDate.hfst;
 
 # An optional year, e.g. ", 1995".
 
-hfst-concatenate CommaSpace.hfst Year.hfst | hfst-disjunct Epsilon.hfst > OptionalYear.hfst;
+hfst-concatenate CommaSpace.hfst Year.hfst | hfst-disjunct Epsilon.hfst \
+  > OptionalYear.hfst;
 
 # Get all valid dates, except leap dates.
 
-hfst-concatenate OptionalDay.hfst MonthDate.hfst | hfst-concatenate -2 OptionalYear.hfst | hfst-disjunct Day.hfst > ValidDates.hfst;
+hfst-concatenate OptionalDay.hfst MonthDate.hfst | \
+hfst-concatenate -2 OptionalYear.hfst | hfst-disjunct Day.hfst \
+  > ValidDates.hfst;
 
-#Get numbers divisible by 4. Of single digit numbers, 4 and 8 are divisible by 4. In larger numbers divisible with 4, if the penultimate is even, the last number is 0, 4, or 8. If the penultimate is odd, the last number is 2 or 6. This time we resort to the SFST programming language parser.
+# Get numbers divisible by 4. Of single digit numbers, 4 and 8 are divisible 
+# by 4. In larger numbers divisible with 4, if the penultimate is even, the 
+# last number is 0, 4, or 8. If the penultimate is odd, the last number is 2 
+# or 6. This time we resort to the SFST programming language parser.
 
-echo "4 | 8 | (0|1|2|3|4|5|6|7|8|9)* ( (0|2|4|6|8)(0|4|8) | (1|3|5|7|9)(2|6) )" | hfst-sfstpl2fst -f $FORMAT > Div4.hfst;
+echo "4 | 8 | (0|1|2|3|4|5|6|7|8|9)* ( (0|2|4|6|8)(0|4|8) | (1|3|5|7|9)(2|6) )"\
+ | hfst-sfstpl2fst -f $1 > Div4.hfst;
 
-# Leap years are divisible by 4 but we have to subtract centuries that are not divisible by 400.
+# Leap years are divisible by 4 but we have to subtract centuries that are not
+#  divisible by 400.
 
-echo "00" | hfst-strings2fst -f $FORMAT > 00.hfst;
-hfst-repeat -f 1 N.hfst | hfst-subtract Div4.hfst | hfst-concatenate -2 00.hfst | hfst-subtract -1 Div4.hfst > LeapYear.hfst;
+echo "00" | hfst-strings2fst -f $1 > 00.hfst;
+hfst-repeat -f 1 N.hfst | hfst-subtract Div4.hfst | \
+hfst-concatenate -2 00.hfst | hfst-subtract -1 Div4.hfst > LeapYear.hfst;
 
 # An optional leap year, e.g. ", 1916".
 
-hfst-conjunct LeapYear.hfst Year.hfst | hfst-concatenate -1 CommaSpace.hfst | hfst-disjunct Epsilon.hfst > OptionalLeapYear.hfst;
+hfst-conjunct LeapYear.hfst Year.hfst | hfst-concatenate -1 CommaSpace.hfst \
+  | hfst-disjunct Epsilon.hfst > OptionalLeapYear.hfst;
 
 # Construct leap dates.
 
-hfst-concatenate Month28.hfst Space.hfst | hfst-concatenate 29.hfst | hfst-concatenate -1 OptionalDay.hfst | hfst-concatenate -2 OptionalLeapYear.hfst > LeapDates.hfst;
+hfst-concatenate Month28.hfst Space.hfst | hfst-concatenate 29.hfst | \
+hfst-concatenate -1 OptionalDay.hfst | \
+hfst-concatenate -2 OptionalLeapYear.hfst > LeapDates.hfst;
 
 # Get all possible dates.
 
 hfst-disjunct ValidDates.hfst LeapDates.hfst > DateParser.hfst.hfst
+
+# remove extra files
+
+ls | grep ".hfst" | grep -v ".hfst.hfst" | grep -v ".xfst" | \
+grep -v ".script" | sed 's/^\(.*\)$/rm \1/;' | bash

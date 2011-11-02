@@ -1,4 +1,4 @@
-FORMAT=TRANSDUCER_FORMAT
+
 
 # The data
 
@@ -27,41 +27,41 @@ rakastajattariansa
 kuningas
 kainostelijat
 ravintolat
-merkonomin" | hfst-strings2fst -f $FORMAT -j > FinnWords.hfst
+merkonomin" | hfst-strings2fst -f $1 -j > FinnWords.hfst
 
 
 # Some definitions:
 
-echo "[u | y | i]" | hfst-regexp2fst -f $FORMAT > HighV                       # High vowel
-echo "[e | o | ö]" | hfst-regexp2fst -f $FORMAT > MidV                        # Mid vowel
-echo "[a | ä]" | hfst-regexp2fst -f $FORMAT > LowV                            # Low vowel
-echo '[ @"HighV" | @"MidV" | @"LowV" ]' | hfst-regexp2fst -f $FORMAT > USV    # Unstressed Vowel
+echo "[u | y | i]" | hfst-regexp2fst -f $1 > HighV                       # High vowel
+echo "[e | o | ö]" | hfst-regexp2fst -f $1 > MidV                        # Mid vowel
+echo "[a | ä]" | hfst-regexp2fst -f $1 > LowV                            # Low vowel
+echo '[ @"HighV" | @"MidV" | @"LowV" ]' | hfst-regexp2fst -f $1 > USV    # Unstressed Vowel
 
 echo "[ b | c | d | f | g | h | j | k | l | m | n | p "\
-     "| q | r | s | t | v | w | x | z ]" | hfst-regexp2fst -f $FORMAT > C     # Consonant
+     "| q | r | s | t | v | w | x | z ]" | hfst-regexp2fst -f $1 > C     # Consonant
 
 echo '[á | é | í | ó | ú | ý | "ä&#769;" | "ö&#769;"]' \
-| hfst-regexp2fst -f $FORMAT > MSV
+| hfst-regexp2fst -f $1 > MSV
 echo '[à | è | ì | ò | ù | "y&#768;" | "ä&#768;" | "ö&#768;"]' \
-| hfst-regexp2fst -f $FORMAT > SSV
-echo '[ @"MSV" | @"SSV" ]' | hfst-regexp2fst -f $FORMAT > SV                  # Stressed vowel
-echo '[ @"USV" | @"SV" ]' | hfst-regexp2fst -f $FORMAT > V                    # Vowel
+| hfst-regexp2fst -f $1 > SSV
+echo '[ @"MSV" | @"SSV" ]' | hfst-regexp2fst -f $1 > SV                  # Stressed vowel
+echo '[ @"USV" | @"SV" ]' | hfst-regexp2fst -f $1 > V                    # Vowel
 
-echo '[ @"V" | @"C" ]' | hfst-regexp2fst -f $FORMAT > P                       # Phone
+echo '[ @"V" | @"C" ]' | hfst-regexp2fst -f $1 > P                       # Phone
 
-echo '[[\@"P"+] | .#.]' | hfst-regexp2fst -f $FORMAT > B                      # Boundary
-echo '[.#. | "."]' | hfst-regexp2fst -f $FORMAT > E                           # Edge
-echo '[~$"." "." ~$"."]' | hfst-regexp2fst -f $FORMAT > SB                    # At most one syllable boundary
+echo '[[\@"P"+] | .#.]' | hfst-regexp2fst -f $1 > B                      # Boundary
+echo '[.#. | "."]' | hfst-regexp2fst -f $1 > E                           # Edge
+echo '[~$"." "." ~$"."]' | hfst-regexp2fst -f $1 > SB                    # At most one syllable boundary
 
-echo '[ @"C"* @"V" ]'| hfst-regexp2fst -f $FORMAT > Light                     # Light syllable
-echo '[ @"Light" @"P"+ ]'| hfst-regexp2fst -f $FORMAT > Heavy                 # Heavy syllable
+echo '[ @"C"* @"V" ]'| hfst-regexp2fst -f $1 > Light                     # Light syllable
+echo '[ @"Light" @"P"+ ]'| hfst-regexp2fst -f $1 > Heavy                 # Heavy syllable
 
-echo '[ @"Heavy" | @"Light" ]' | hfst-regexp2fst -f $FORMAT > S               # Syllable
-echo '[ @"S" & $@"SV" ]' | hfst-regexp2fst -f $FORMAT > SS                    # Stressed syllable
-echo '[ @"S" & ~@"SV" ]' | hfst-regexp2fst -f $FORMAT > US                    # Unstressed syllable
-echo '[ @"S" & $@"MSV" ]' | hfst-regexp2fst -f $FORMAT > MSS                  # Syllable with main stress
+echo '[ @"Heavy" | @"Light" ]' | hfst-regexp2fst -f $1 > S               # Syllable
+echo '[ @"S" & $@"SV" ]' | hfst-regexp2fst -f $1 > SS                    # Stressed syllable
+echo '[ @"S" & ~@"SV" ]' | hfst-regexp2fst -f $1 > US                    # Unstressed syllable
+echo '[ @"S" & $@"MSV" ]' | hfst-regexp2fst -f $1 > MSS                  # Syllable with main stress
 
-echo '[ @"S" "." @"S" ]' | hfst-regexp2fst -f $FORMAT > BF                    # Binary foot
+echo '[ @"S" "." @"S" ]' | hfst-regexp2fst -f $1 > BF                    # Binary foot
 
 
 # Rules for prosody:
@@ -71,35 +71,35 @@ echo '[ [. .] -> "." || [ @"HighV" | @"MidV" ]'\
   'i _ [@"MidV" - e],'\
   'u _ [@"MidV" - o],'\
   'y _ [@"MidV" - ö] ]'\
-| hfst-regexp2fst -f $FORMAT > MarkNonDiphtongs      # y.e
+| hfst-regexp2fst -f $1 > MarkNonDiphtongs      # y.e
 
 # The general syllabification rule has exceptions. In particular, loan
 # words such as ate.isti 'atheist' must be partially syllabified in the
 # lexicon.
 
 echo ' @"C"*  @"V"+ @"C"* @-> ... "." || _ @"C" @"V" ' \
-| hfst-regexp2fst -f $FORMAT > Syllabify
+| hfst-regexp2fst -f $1 > Syllabify
 
 echo ' @"BF" "." @"Light" @-> "(" ... ")" '\
      '// [{).} | .#.] [@"BF" "."]*  _'\
      '["." @"Heavy" "." @"S" ] | .#. ' \
-| hfst-regexp2fst -f $FORMAT > TernaryFeet
+| hfst-regexp2fst -f $1 > TernaryFeet
 
 # Scan all the unfooted material into binary feet.
 
-echo ' @"BF" @-> "(" ... ")" || .#.|"." _ .#.|"." ' | hfst-regexp2fst -f $FORMAT > BinaryFeet
+echo ' @"BF" @-> "(" ... ")" || .#.|"." _ .#.|"." ' | hfst-regexp2fst -f $1 > BinaryFeet
 
 # Assign the primary stress to the first vowel of the first syllable.
 
 echo ' a -> á, e -> é, i -> í, o -> ó,'\
      'u -> ú, y -> ý, ä -> "ä´", ö -> "ö´" || .#. "(" @"C"* _' \
-| hfst-regexp2fst -f $FORMAT > MainStress
+| hfst-regexp2fst -f $1 > MainStress
 
 # Assign secondary stress to all initial vowels of non-initial syllables.
 
 echo ' a -> à, e -> è, i -> ì, o -> ò,'\
      'u -> ù, y -> "y`", ä -> "ä`", ö -> "ö`"'\
-     '|| "(" @"C"* _ ' | hfst-regexp2fst -f $FORMAT > SecondaryStress
+     '|| "(" @"C"* _ ' | hfst-regexp2fst -f $1 > SecondaryStress
 
 # Assign an optional secondary stress to an unfooted final syllable
 # if it is heavy.
@@ -107,7 +107,7 @@ echo ' a -> à, e -> è, i -> ì, o -> ò,'\
 echo 'a (->) à, e (->) è, i (->) ì,'\
      'o (->) ò, u (->) ù, y (->) "y`",'\
      'ä (->) "ä`", ö (->) "ö`" || "." @"C"* _ @"P" .#. ' \
-| hfst-regexp2fst -f $FORMAT > OptFinalStress
+| hfst-regexp2fst -f $1 > OptFinalStress
 
 
 # Calculate the composition of rules from =MarkNonDiphtongs= to =OptFinalStress=
