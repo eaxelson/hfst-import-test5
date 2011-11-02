@@ -1,28 +1,28 @@
-FORMAT=TRANSDUCER_FORMAT
+
 
 # matches all symbols
 echo "0 0 @_IDENTITY_SYMBOL_@ @_IDENTITY_SYMBOL_@
-0" | hfst-txt2fst -f $FORMAT > pi.hfst
+0" | hfst-txt2fst -f $1 > pi.hfst
 
 # matches all symbols except "|"
 echo "0 0 @_IDENTITY_SYMBOL_@ @_IDENTITY_SYMBOL_@
 0 1 | |
-0" | hfst-txt2fst -f $FORMAT > pi_house.hfst
+0" | hfst-txt2fst -f $1 > pi_house.hfst
 
 # The possible values of a house color (spaces are added for better readability)
-echo -e "blue \ngreen \nred \nwhite \nyellow " | hfst-strings2fst -f $FORMAT -j > Color.hfst
+echo -e "blue \ngreen \nred \nwhite \nyellow " | hfst-strings2fst -f $1 -j > Color.hfst
 
 # The possible values of nationality
-echo -e "Dane \nEnglishman \nGerman \nSwede \nNorwegian " | hfst-strings2fst -f $FORMAT -j > Nationality.hfst
+echo -e "Dane \nEnglishman \nGerman \nSwede \nNorwegian " | hfst-strings2fst -f $1 -j > Nationality.hfst
 
 # The possible values of a drink
-echo -e "bier \ncoffee \nmilk \ntea \nwater " | hfst-strings2fst -f $FORMAT -j > Drink.hfst
+echo -e "bier \ncoffee \nmilk \ntea \nwater " | hfst-strings2fst -f $1 -j > Drink.hfst
 
 # The possible values of cigarettes
-echo -e "Blend \nBlueMaster \nDunhill \nPallMall \nPrince " | hfst-strings2fst -f $FORMAT -j > Cigarette.hfst
+echo -e "Blend \nBlueMaster \nDunhill \nPallMall \nPrince " | hfst-strings2fst -f $1 -j > Cigarette.hfst
 
 # The possible values of animals
-echo -e "birds \ncats \ndogs \nfish \nhorses " | hfst-strings2fst -f $FORMAT -j > Pet.hfst
+echo -e "birds \ncats \ndogs \nfish \nhorses " | hfst-strings2fst -f $1 -j > Pet.hfst
 
 # Convert all strings into transducers
 for i in blue green red white yellow \
@@ -31,14 +31,14 @@ bier coffee milk tea water \
 Blend BlueMaster Dunhill PallMall Prince \
 birds cats dogs fish horses; \
 do 
-  echo $i" " | hfst-strings2fst -f $FORMAT > $i.hfst
+  echo $i" " | hfst-strings2fst -f $1 > $i.hfst
 done
 
 # Separator character (spaces are included for better readability)
-echo "| " | hfst-strings2fst -f $FORMAT > HouseSeparator.hfst
+echo "| " | hfst-strings2fst -f $1 > HouseSeparator.hfst
 
 # House contains the consecutive values "ColorNationalityDrinkCigarettePet"
-echo "" | hfst-strings2fst -f $FORMAT > House.hfst
+echo "" | hfst-strings2fst -f $1 > House.hfst
 for i in Color Nationality Drink Cigarette Pet; 
 do 
   hfst-concatenate House.hfst $i.hfst > TMP
@@ -53,7 +53,7 @@ mv TMP Houses.hfst
 # 1. The Englishman lives in the red house.
 # Since color and nationality are adjacent, it is enough to accept all strings that contain "red Englishman"
 echo "red Englishman" | 
-hfst-strings2fst -f $FORMAT |  # "red Englishman"
+hfst-strings2fst -f $1 |  # "red Englishman"
 hfst-concatenate -1 pi.hfst |  # .* "red Englishman"
 hfst-concatenate -2 pi.hfst > C1.hfst  # .* "red Englishman" .*
 
@@ -64,10 +64,10 @@ hfst-concatenate -2 pi.hfst > C1.hfst  # .* "red Englishman" .*
 # 2. The Swede keeps dogs.
 # Now we must match the string between Swede and dog inside the same house.
 echo "Swede" | 
-hfst-strings2fst -f $FORMAT |  # "Swede"
+hfst-strings2fst -f $1 |  # "Swede"
 hfst-concatenate pi_house.hfst > TMP;  # "Swede" .*
 echo "dogs" | 
-hfst-strings2fst -f $FORMAT |  # "dogs"
+hfst-strings2fst -f $1 |  # "dogs"
 hfst-concatenate -1 TMP |  # "Swede" .* "dogs"
 hfst-concatenate -1 pi.hfst |  # .* "Swede" .* "dogs"
 hfst-concatenate -2 pi.hfst > C2.hfst  # .* "Swede" .* "dogs" .*
@@ -97,7 +97,7 @@ hfst-concatenate PallMall.hfst birds.hfst | hfst-concatenate -1 pi.hfst | hfst-c
 hfst-concatenate yellow.hfst pi_house.hfst | hfst-concatenate Dunhill.hfst | hfst-concatenate -1 pi.hfst | hfst-concatenate -2 pi.hfst > C7.hfst
 
 # 8. The man in the center house drinks milk
-echo "" | hfst-strings2fst -f $FORMAT > C8.hfst
+echo "" | hfst-strings2fst -f $1 > C8.hfst
 for i in pi_house.hfst HouseSeparator.hfst pi_house.hfst HouseSeparator.hfst pi_house.hfst milk.hfst pi_house.hfst HouseSeparator.hfst pi_house.hfst HouseSeparator.hfst pi_house.hfst; \
 do  hfst-concatenate C8.hfst $i > TMP; mv TMP C8.hfst ; done  
 
@@ -105,47 +105,47 @@ do  hfst-concatenate C8.hfst $i > TMP; mv TMP C8.hfst ; done
 hfst-concatenate pi_house.hfst Norwegian.hfst | hfst-concatenate pi.hfst > C9.hfst
 
 # 10. The Blend smoker has a neighbor who keeps cats
-echo "" | hfst-strings2fst -f $FORMAT > C10_1.hfst
+echo "" | hfst-strings2fst -f $1 > C10_1.hfst
 for i in pi.hfst Blend.hfst Pet.hfst HouseSeparator.hfst pi_house.hfst cats.hfst pi.hfst; \
 do  hfst-concatenate C10_1.hfst $i > TMP; mv TMP C10_1.hfst;  done
-echo "" | hfst-strings2fst -f $FORMAT > C10_2.hfst
+echo "" | hfst-strings2fst -f $1 > C10_2.hfst
 for i in pi.hfst cats.hfst pi_house.hfst HouseSeparator.hfst pi_house.hfst Blend.hfst pi.hfst; \
 do  hfst-concatenate C10_2.hfst $i > TMP; mv TMP C10_2.hfst;  done
 hfst-disjunct C10_1.hfst C10_2.hfst | hfst-minimize > C10.hfst
 
 # 11. The man who keeps horses lives next to the Dunhill smoker
-echo "" | hfst-strings2fst -f $FORMAT > C11_1.hfst
+echo "" | hfst-strings2fst -f $1 > C11_1.hfst
 for i in pi.hfst horses.hfst HouseSeparator.hfst pi_house.hfst Dunhill.hfst pi.hfst; \
 do hfst-concatenate C11_1.hfst $i > TMP; mv TMP C11_1.hfst;  done
-echo "" | hfst-strings2fst -f $FORMAT > C11_2.hfst
+echo "" | hfst-strings2fst -f $1 > C11_2.hfst
 for i in pi.hfst Dunhill.hfst pi_house.hfst HouseSeparator.hfst pi_house.hfst horses.hfst pi.hfst; \
 do hfst-concatenate C11_2.hfst $i > TMP; mv TMP C11_2.hfst;  done
 hfst-disjunct C11_1.hfst C11_2.hfst | hfst-minimize > C11.hfst
 
 # 12. The man who smokes Blue Masters drinks bier.
-echo "" | hfst-strings2fst -f $FORMAT > C12.hfst
+echo "" | hfst-strings2fst -f $1 > C12.hfst
 for i in pi.hfst bier.hfst BlueMaster.hfst pi.hfst; \
 do hfst-concatenate C12.hfst $i > TMP; mv TMP C12.hfst;  done
 
 # 13. The German smokes Prince
-echo "" | hfst-strings2fst -f $FORMAT > C13.hfst
+echo "" | hfst-strings2fst -f $1 > C13.hfst
 for i in pi.hfst German.hfst Drink.hfst Prince.hfst pi.hfst; \
 do hfst-concatenate C13.hfst $i > TMP; mv TMP C13.hfst;  done
 
 # 14. The Norwegian lives next to the blue house
-echo "" | hfst-strings2fst -f $FORMAT > C14_1.hfst
+echo "" | hfst-strings2fst -f $1 > C14_1.hfst
 for i in pi.hfst Norwegian.hfst pi_house.hfst HouseSeparator.hfst blue.hfst pi.hfst; \
 do hfst-concatenate C14_1.hfst $i > TMP; mv TMP C14_1.hfst;  done
-echo "" | hfst-strings2fst -f $FORMAT > C14_2.hfst
+echo "" | hfst-strings2fst -f $1 > C14_2.hfst
 for i in pi.hfst blue.hfst pi_house.hfst HouseSeparator.hfst Color.hfst Norwegian.hfst pi.hfst; \
 do hfst-concatenate C14_2.hfst $i > TMP; mv TMP C14_2.hfst;  done
 hfst-disjunct C14_1.hfst C14_2.hfst | hfst-minimize > C14.hfst
 
 # 15. The Blend smoker has a neighbor who drinks water
-echo "" | hfst-strings2fst -f $FORMAT > C15_1.hfst
+echo "" | hfst-strings2fst -f $1 > C15_1.hfst
 for i in pi.hfst Blend.hfst Pet.hfst HouseSeparator.hfst pi_house.hfst water.hfst pi.hfst; \
 do hfst-concatenate C15_1.hfst $i > TMP; mv TMP C15_1.hfst;  done
-echo "" | hfst-strings2fst -f $FORMAT > C15_2.hfst
+echo "" | hfst-strings2fst -f $1 > C15_2.hfst
 for i in pi.hfst water.hfst pi_house.hfst HouseSeparator.hfst pi_house.hfst Blend.hfst pi.hfst; \
 do hfst-concatenate C15_2.hfst $i > TMP; mv TMP C15_2.hfst;  done
 hfst-disjunct C15_1.hfst C15_2.hfst | hfst-minimize > C15.hfst

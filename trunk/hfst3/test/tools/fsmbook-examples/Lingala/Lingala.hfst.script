@@ -3,19 +3,19 @@ echo "[ {bet} | {béb} | {bomb} | {bóndel} | {bóngol} | {bót} | {búk} |
  {lí}  | {lob} | {luk} | {ndim} | {palangan} | {pangwis} | {sál} |
  {sepel} | {sómb} | {tál} | {támbol} | {tambwis} | {tataban} |
  {tún} | {yébis}
-]" | hfst-regexp2fst -f $FORMAT > Stems
+]" | hfst-regexp2fst -f $1 > Stems
 
 echo "[a|b|c|d|e|f|g|h|i|j|k|l|m|n|o|p|q|r|s|t|u|v|w|x|y|z|
-       á|é|í|ó|ú]" | hfst-regexp2fst -f $FORMAT > L
+       á|é|í|ó|ú]" | hfst-regexp2fst -f $1 > L
 
-echo '[Per ":" 1]' | hfst-regexp2fst -f $FORMAT > Person1
-echo '[Per ":" 2]' | hfst-regexp2fst -f $FORMAT > Person2
-echo '[Per ":" 3]' | hfst-regexp2fst -f $FORMAT > Person3
-echo '[Num ":" [Sg|Pl] ]' | hfst-regexp2fst -f $FORMAT > Number
+echo '[Per ":" 1]' | hfst-regexp2fst -f $1 > Person1
+echo '[Per ":" 2]' | hfst-regexp2fst -f $1 > Person2
+echo '[Per ":" 3]' | hfst-regexp2fst -f $1 > Person3
+echo '[Num ":" [Sg|Pl] ]' | hfst-regexp2fst -f $1 > Number
 # define Gender [Gen ":" [[1["0"|1]|2|3|4|5|6|7|8|9] "." [1[4|5]|[1|9|10]a]]];
 echo '[Gen ":" [1 "." 2 | 1a "." 2 | 3 "." 4 | 5 "." 6 |
                 7 "." 8 | 9a "." 10a | 10 | 11 "." 6 |
-                14 "." 6 | 15]]' | hfst-regexp2fst -f $FORMAT > Gender3
+                14 "." 6 | 15]]' | hfst-regexp2fst -f $1 > Gender3
  
 # define Reflexive [No | Yes];
 
@@ -32,12 +32,12 @@ echo '[Gen ":" [1 "." 2 | 1a "." 2 | 3 "." 4 | 5 "." 6 |
 # alobaloba 'he/she speak SP ITER'
 # alíalia   'he eat SP ITER'
 
-echo '[Past ":" [Rec|Hist|MoreRem|MostRem]]' | hfst-regexp2fst -f $FORMAT > PastTense
-echo '[Pres ":" [Cont|Hab1|Hab2]]' | hfst-regexp2fst -f $FORMAT > PresTense
-echo '[Fut ":" [Immed|MostRem]]' | hfst-regexp2fst -f $FORMAT > FutTense
+echo '[Past ":" [Rec|Hist|MoreRem|MostRem]]' | hfst-regexp2fst -f $1 > PastTense
+echo '[Pres ":" [Cont|Hab1|Hab2]]' | hfst-regexp2fst -f $1 > PresTense
+echo '[Fut ":" [Immed|MostRem]]' | hfst-regexp2fst -f $1 > FutTense
 
 # define Reflexive [Refl ":" [No|Yes]];
-echo '[Tns ":" [PastTense|PresTense|FutTense]]' | hfst-regexp2fst -f $FORMAT > Tense
+echo '[Tns ":" [PastTense|PresTense|FutTense]]' | hfst-regexp2fst -f $1 > Tense
 # define Polarity [Pol ":" [Pos|Neg]];
 
 define Agreement [[[Person1 | Person2] " " Number] |
@@ -46,104 +46,104 @@ define Agreement [[[Person1 | Person2] " " Number] |
 # For Gender 15 we have only singular subject marker, no plural
 # and no object markers. Missing info?
 
-echo '[Sub ":" Agreement]  - [$Pl & $15]' | hfst-regexp2fst -f $FORMAT > SubjAgr
-echo ' [Obj ":" Agreement] - $15 ' | hfst-regexp2fst -f $FORMAT > ObjAgr
-echo '  [Func ":" Agreement]' | hfst-regexp2fst -f $FORMAT > Agr
+echo '[Sub ":" Agreement]  - [$Pl & $15]' | hfst-regexp2fst -f $1 > SubjAgr
+echo ' [Obj ":" Agreement] - $15 ' | hfst-regexp2fst -f $1 > ObjAgr
+echo '  [Func ":" Agreement]' | hfst-regexp2fst -f $1 > Agr
 
 #define Features [SubjAgr " " ObjAgr " "  Tense " " Polarity];
 
-echo ' [SubjAgr " " ObjAgr " " Tense]' | hfst-regexp2fst -f $FORMAT > Features
+echo ' [SubjAgr " " ObjAgr " " Tense]' | hfst-regexp2fst -f $1 > Features
 
-echo '"<" Stems "," Features ">" ' | hfst-regexp2fst -f $FORMAT > VerbLex
+echo '"<" Stems "," Features ">" ' | hfst-regexp2fst -f $1 > VerbLex
 
 # Common singular agreement markers.
 
-echo '[[. .] -> {mo} || "<" _ [$[Agr & $Person3 & $Sg & $4]]]' | hfst-regexp2fst -f $FORMAT > RAgr1
-echo '[[. .] -> {li} || "<" _ [$[Agr & $Person3 & $Sg & $5]]]' | hfst-regexp2fst -f $FORMAT > RAgr2
-echo '[[. .] -> e  || "<" _ [$[Agr & $Person3 & $Sg & $[9a"."10a]]]]' | hfst-regexp2fst -f $FORMAT > RAgr3
-echo '[[. .] -> {lo} || "<" _ [$[Agr & $Person3 & $Sg & $[10|11]]]]' | hfst-regexp2fst -f $FORMAT > RAgr4
-echo '[[. .] -> {bo} || "<" _ [$[Agr & $Person3 & $Sg & $14]]]' | hfst-regexp2fst -f $FORMAT > RAgr5
+echo '[[. .] -> {mo} || "<" _ [$[Agr & $Person3 & $Sg & $4]]]' | hfst-regexp2fst -f $1 > RAgr1
+echo '[[. .] -> {li} || "<" _ [$[Agr & $Person3 & $Sg & $5]]]' | hfst-regexp2fst -f $1 > RAgr2
+echo '[[. .] -> e  || "<" _ [$[Agr & $Person3 & $Sg & $[9a"."10a]]]]' | hfst-regexp2fst -f $1 > RAgr3
+echo '[[. .] -> {lo} || "<" _ [$[Agr & $Person3 & $Sg & $[10|11]]]]' | hfst-regexp2fst -f $1 > RAgr4
+echo '[[. .] -> {bo} || "<" _ [$[Agr & $Person3 & $Sg & $14]]]' | hfst-regexp2fst -f $1 > RAgr5
 
 # Common plural agreement markers
 
-echo '[[. .] -> {bo} || "<" _ [$[Agr & $Person2 & $Pl]]] ' | hfst-regexp2fst -f $FORMAT > RAgr6
-echo '[[. .] -> {ba} || "<" _ [$[Agr & $Person3 & $Pl & $2]]]' | hfst-regexp2fst -f $FORMAT > RAgr7
-echo '[[. .] -> {mi} || "<" _ [$[Agr & $Person3 & $Pl & $4]]]' | hfst-regexp2fst -f $FORMAT > RAgr8
-echo '[[. .] -> {ma} || "<" _ [$[Agr & $Person3 & $Pl & $[5|6]]]]' | hfst-regexp2fst -f $FORMAT > RAgr9
-echo '[[. .] -> {bi}  || "<" _ [$[Agr & $Person3 & $Pl & $7]]]' | hfst-regexp2fst -f $FORMAT > RAgr10
-echo '[[. .] -> i  || "<" _ [$[Agr & $Person3 & $Pl & $[9a|10]]]]' | hfst-regexp2fst -f $FORMAT > RAgr11
+echo '[[. .] -> {bo} || "<" _ [$[Agr & $Person2 & $Pl]]] ' | hfst-regexp2fst -f $1 > RAgr6
+echo '[[. .] -> {ba} || "<" _ [$[Agr & $Person3 & $Pl & $2]]]' | hfst-regexp2fst -f $1 > RAgr7
+echo '[[. .] -> {mi} || "<" _ [$[Agr & $Person3 & $Pl & $4]]]' | hfst-regexp2fst -f $1 > RAgr8
+echo '[[. .] -> {ma} || "<" _ [$[Agr & $Person3 & $Pl & $[5|6]]]]' | hfst-regexp2fst -f $1 > RAgr9
+echo '[[. .] -> {bi}  || "<" _ [$[Agr & $Person3 & $Pl & $7]]]' | hfst-regexp2fst -f $1 > RAgr10
+echo '[[. .] -> i  || "<" _ [$[Agr & $Person3 & $Pl & $[9a|10]]]]' | hfst-regexp2fst -f $1 > RAgr11
 
 # Rule Block 1
 
 # Singular specific subject markers
 
-echo '[[. .] -> {na} || "<" _ [$[SubjAgr & $Person1 & $Sg]]] ' | hfst-regexp2fst -f $FORMAT > R101
-echo '[[. .] -> o || "<" _ [$[SubjAgr & $Person2 & $Sg]]] ' | hfst-regexp2fst -f $FORMAT > R102
-echo '[[. .] -> a || "<" _ [$[SubjAgr & $Person3 & $Sg & $2]]]' | hfst-regexp2fst -f $FORMAT > R103
-echo '[[. .] -> e  || "<" _ [$[SubjAgr & $Person3 & $Sg & $7]]]' | hfst-regexp2fst -f $FORMAT > R104
-echo '[[. .] -> {ei} || "<" _[$[SubjAgr & $Person3 & $Sg & $15]]]' | hfst-regexp2fst -f $FORMAT > R105
+echo '[[. .] -> {na} || "<" _ [$[SubjAgr & $Person1 & $Sg]]] ' | hfst-regexp2fst -f $1 > R101
+echo '[[. .] -> o || "<" _ [$[SubjAgr & $Person2 & $Sg]]] ' | hfst-regexp2fst -f $1 > R102
+echo '[[. .] -> a || "<" _ [$[SubjAgr & $Person3 & $Sg & $2]]]' | hfst-regexp2fst -f $1 > R103
+echo '[[. .] -> e  || "<" _ [$[SubjAgr & $Person3 & $Sg & $7]]]' | hfst-regexp2fst -f $1 > R104
+echo '[[. .] -> {ei} || "<" _[$[SubjAgr & $Person3 & $Sg & $15]]]' | hfst-regexp2fst -f $1 > R105
 
 # Rules of referral for singular subject markers
 
-echo '`[RAgr1, Func, Sub]' | hfst-regexp2fst -f $FORMAT > R106
-echo '`[RAgr2, Func, Sub]' | hfst-regexp2fst -f $FORMAT > R107
-echo '`[RAgr3, Func, Sub]' | hfst-regexp2fst -f $FORMAT > R108
-echo '`[RAgr4, Func, Sub]' | hfst-regexp2fst -f $FORMAT > R109
-echo '`[RAgr5, Func, Sub]' | hfst-regexp2fst -f $FORMAT > R110
+echo '`[RAgr1, Func, Sub]' | hfst-regexp2fst -f $1 > R106
+echo '`[RAgr2, Func, Sub]' | hfst-regexp2fst -f $1 > R107
+echo '`[RAgr3, Func, Sub]' | hfst-regexp2fst -f $1 > R108
+echo '`[RAgr4, Func, Sub]' | hfst-regexp2fst -f $1 > R109
+echo '`[RAgr5, Func, Sub]' | hfst-regexp2fst -f $1 > R110
 
 # Plural specific subject markers
 
-echo '[[. .] -> {to} || "<" _ [$[SubjAgr & $Person1 & $Pl]]] ' | hfst-regexp2fst -f $FORMAT > R111
+echo '[[. .] -> {to} || "<" _ [$[SubjAgr & $Person1 & $Pl]]] ' | hfst-regexp2fst -f $1 > R111
 
 # Rules of referral for plural subject markers.
 
-echo '`[RAgr6, Func, Sub]' | hfst-regexp2fst -f $FORMAT > R112
-echo '`[RAgr7, Func, Sub]' | hfst-regexp2fst -f $FORMAT > R113
-echo '`[RAgr8, Func, Sub]' | hfst-regexp2fst -f $FORMAT > R114
-echo '`[RAgr9, Func, Sub]' | hfst-regexp2fst -f $FORMAT > R115
-echo '`[RAgr10, Func, Sub]' | hfst-regexp2fst -f $FORMAT > R116
-echo '`[RAgr11, Func, Sub]' | hfst-regexp2fst -f $FORMAT > R117
+echo '`[RAgr6, Func, Sub]' | hfst-regexp2fst -f $1 > R112
+echo '`[RAgr7, Func, Sub]' | hfst-regexp2fst -f $1 > R113
+echo '`[RAgr8, Func, Sub]' | hfst-regexp2fst -f $1 > R114
+echo '`[RAgr9, Func, Sub]' | hfst-regexp2fst -f $1 > R115
+echo '`[RAgr10, Func, Sub]' | hfst-regexp2fst -f $1 > R116
+echo '`[RAgr11, Func, Sub]' | hfst-regexp2fst -f $1 > R117
 
-echo '[[. .] -> {ko} || "<" _ [$[Fut":"Immed]]] ' | hfst-regexp2fst -f $FORMAT > R201
+echo '[[. .] -> {ko} || "<" _ [$[Fut":"Immed]]] ' | hfst-regexp2fst -f $1 > R201
 
 # Singular specific object markers
 
-echo '[[. .] -> n || "<" _ [$[ObjAgr & $Person1 & $Sg]]] ' | hfst-regexp2fst -f $FORMAT > R301
-echo '[[. .] -> {ko} || "<" _ [$[ObjAgr & $Person2 & $Sg]]] ' | hfst-regexp2fst -f $FORMAT > R302
-echo '[[. .] -> {mo} || "<" _ [$[ObjAgr & $Person3 & $Sg & $2]]]' | hfst-regexp2fst -f $FORMAT > R303
-echo '[[. .] -> {ei}  || "<" _ [$[ObjAgr & $Person3 & $Sg & $7]]]' | hfst-regexp2fst -f $FORMAT > R304
+echo '[[. .] -> n || "<" _ [$[ObjAgr & $Person1 & $Sg]]] ' | hfst-regexp2fst -f $1 > R301
+echo '[[. .] -> {ko} || "<" _ [$[ObjAgr & $Person2 & $Sg]]] ' | hfst-regexp2fst -f $1 > R302
+echo '[[. .] -> {mo} || "<" _ [$[ObjAgr & $Person3 & $Sg & $2]]]' | hfst-regexp2fst -f $1 > R303
+echo '[[. .] -> {ei}  || "<" _ [$[ObjAgr & $Person3 & $Sg & $7]]]' | hfst-regexp2fst -f $1 > R304
 
 # Rules of referral for singular object markers
 
-echo '`[RAgr1, Func, Obj]' | hfst-regexp2fst -f $FORMAT > R305
-echo '`[RAgr2, Func, Obj]' | hfst-regexp2fst -f $FORMAT > R306
-echo '`[RAgr3, Func, Obj]' | hfst-regexp2fst -f $FORMAT > R307
-echo '`[RAgr4, Func, Obj]' | hfst-regexp2fst -f $FORMAT > R308
-echo '`[RAgr5, Func, Obj]' | hfst-regexp2fst -f $FORMAT > R309
+echo '`[RAgr1, Func, Obj]' | hfst-regexp2fst -f $1 > R305
+echo '`[RAgr2, Func, Obj]' | hfst-regexp2fst -f $1 > R306
+echo '`[RAgr3, Func, Obj]' | hfst-regexp2fst -f $1 > R307
+echo '`[RAgr4, Func, Obj]' | hfst-regexp2fst -f $1 > R308
+echo '`[RAgr5, Func, Obj]' | hfst-regexp2fst -f $1 > R309
 
 # Plural specific object markers
 
-echo '[[. .] -> {lo} || "<" _ [$[ObjAgr & $Person1 & $Pl]]] ' | hfst-regexp2fst -f $FORMAT > R310
+echo '[[. .] -> {lo} || "<" _ [$[ObjAgr & $Person1 & $Pl]]] ' | hfst-regexp2fst -f $1 > R310
 
 # Rules of referral for plural object markers
 
-echo '`[RAgr6, Func, Obj]' | hfst-regexp2fst -f $FORMAT > R311
-echo '`[RAgr7, Func, Obj]' | hfst-regexp2fst -f $FORMAT > R312
-echo '`[RAgr8, Func, Obj]' | hfst-regexp2fst -f $FORMAT > R313
-echo '`[RAgr9, Func, Obj]' | hfst-regexp2fst -f $FORMAT > R314
-echo '`[RAgr10, Func, Obj]' | hfst-regexp2fst -f $FORMAT > R315
-echo '`[RAgr11, Func, Obj]' | hfst-regexp2fst -f $FORMAT > R316
+echo '`[RAgr6, Func, Obj]' | hfst-regexp2fst -f $1 > R311
+echo '`[RAgr7, Func, Obj]' | hfst-regexp2fst -f $1 > R312
+echo '`[RAgr8, Func, Obj]' | hfst-regexp2fst -f $1 > R313
+echo '`[RAgr9, Func, Obj]' | hfst-regexp2fst -f $1 > R314
+echo '`[RAgr10, Func, Obj]' | hfst-regexp2fst -f $1 > R315
+echo '`[RAgr11, Func, Obj]' | hfst-regexp2fst -f $1 > R316
 
 # Tense rules
 echo '[[. .] -> {ak} || _ "," [$[Pres":"[Hab1|Hab2]|
-                                 Past":"[Hist|MostRem]]]]' | hfst-regexp2fst -f $FORMAT > R401 
-echo '[[. .] -> a    || _ "," [$[Pres":"Cont|Fut":"Immed]]]' | hfst-regexp2fst -f $FORMAT > R402
+                                 Past":"[Hist|MostRem]]]]' | hfst-regexp2fst -f $1 > R401 
+echo '[[. .] -> a    || _ "," [$[Pres":"Cont|Fut":"Immed]]]' | hfst-regexp2fst -f $1 > R402
 
-echo '[[. .] -> i || _ "," [$[Fut":"MostRem|Past":"[Rec|Hist]]]]' | hfst-regexp2fst -f $FORMAT > R501
+echo '[[. .] -> i || _ "," [$[Fut":"MostRem|Past":"[Rec|Hist]]]]' | hfst-regexp2fst -f $1 > R501
 
 # Eliminate Features and auxiliary symbols from the lower side.
 
-echo '\L -> 0' | hfst-regexp2fst -f $FORMAT > Cleanup
+echo '\L -> 0' | hfst-regexp2fst -f $1 > Cleanup
 
 # Build the Lingala Verb Transducer
 
@@ -165,4 +165,4 @@ echo  'VerbLex
         .o.
    R401 .o. R402 .o. R501                      
         .o.
-       Cleanup' | hfst-fst2regexp -f $FORMAT > Lingala.hfst.hfst
+       Cleanup' | hfst-fst2regexp -f $1 > Lingala.hfst.hfst
