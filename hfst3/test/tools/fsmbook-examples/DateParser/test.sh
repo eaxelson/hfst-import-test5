@@ -1,3 +1,4 @@
 #!/bin/bash
 
-../test-example.sh DateParser
+$srcdir/test-example.sh DateParser
+

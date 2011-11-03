@@ -102,7 +102,7 @@ LIBHFST_MINOR =
 LIBHFST_NAME = 
 LIBHFST_VERSION = 
 LIBOBJS = 
-LIBS = -lfoma -lz -lsfst -lm -lfst -ldl -lpthread 
+LIBS = -lm -lfst -ldl -lpthread 
 LIBTOOL = $(SHELL) $(top_builddir)/libtool
 LIPO = 
 LN_S = ln -s
@@ -189,7 +189,7 @@ top_builddir = ../../../..
 top_srcdir = ../../../..
 TESTS = test.sh
 EXTRA_DIST = test.sh DateParser.hfst.script DateParser.xfst.script \
-	   DateParser.xfst.att
+	   DateParser.xfst.att test-example.sh remove-complement.sh
 
 all: all-am
 
@@ -471,7 +471,8 @@ uninstall-am:
 
 
 clean-local:
-	../remove-complement.sh $(EXTRA_DIST) Makefile.am Makefile.in Makefile
+	$(srcdir)/remove-complement.sh $(EXTRA_DIST) \
+	Makefile.am Makefile.in Makefile
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

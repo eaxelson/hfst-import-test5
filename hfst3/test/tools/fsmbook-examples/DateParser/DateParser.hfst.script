@@ -158,7 +158,3 @@ hfst-concatenate -2 OptionalLeapYear.hfst > LeapDates.hfst;
 
 hfst-disjunct ValidDates.hfst LeapDates.hfst > DateParser.hfst.hfst
 
-# remove extra files
-
-ls | grep ".hfst" | grep -v ".hfst.hfst" | grep -v ".xfst" | \
-grep -v ".script" | sed 's/^\(.*\)$/rm \1/;' | bash
