@@ -456,7 +456,7 @@ Figure~\ref{Finnish-kpc-table}.
 \caption{The effect of the amount of training data (horizontal axis)
   on the KPC ratio (vertical axis) of the Finnish predictive text
   entry system. The dashed line marks the KPC for
-  multitap $2.4018$. The minimal KPC ratio is $1.3818$.}\label{fi-kpc-graph}
+  multitap $2.4018$. The minimal KPC ratio is $1.3738$.}\label{fi-kpc-graph}
 \end{figure}
 
 We compared our system to another published Finnish text-entry system
@@ -485,8 +485,8 @@ Method ~~~~& ~~~~KPC~~~~ &~~~~Improvement (\%)\\
 \hline
 Multitap                                       &2.4018 & 0.0~~~~~~~~~~\\
 Letter n-grams                                 &1.7368 & 27.7~~~~~~~~~~\\
-Letter n-grams and morph sequence model        &1.3825 & 43.4~~~~~~~~~~\\
-Letter n-grams, morph sequence model and rules &1.3818 & 43.5~~~~~~~~~~\\
+Letter n-grams and morph sequence model        &1.3751 & 42.7~~~~~~~~~~\\
+Letter n-grams, morph sequence model and rules &1.3748 & 42.8~~~~~~~~~~\\
 \hline
 \end{tabular}
 \end{center}
@@ -506,7 +506,7 @@ Figure~\ref{fi-kpc-suggestions}.
 \hline
 \# of Sugg.~~&  1 & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & 10\\
 \hline
-KPC & 2.1428 & 1.7431 & 1.6036 & 1.5251 & 1.4845 & 1.4355 & 1.4065 & 1.3920 & 1.3846 & 1.3818\\
+KPC & 2.1478 & 1.7362 & 1.5871 & 1.5153 & 1.4602 & 1.4257 & 1.3998 & 1.3849 & 1.3798 & 1.3748\\
 \hline
 \end{tabular}
 \end{center}
@@ -533,7 +533,7 @@ System & KPC\\
 Nokia 2600       & 1.9576\\
 Samsung SGH M310 & 1.9576\\
 Nokia C7         & 2.1557\\
-Our system       & 1.3350\\
+Our system       & 1.1085\\
 \hline
 \end{tabular}
 \end{center}
@@ -569,7 +569,7 @@ Method~~~~& ~~~~KPC~~~~ & ~~~~Improvement (\%)\\
 \hline
 Multitap                          &  2.4386 &0.0~~~~~~~~~~\\
 Letter n-grams~\cite{Tantug:2010} &  1.4382 &41.0~~~~~~~~~~\\
-Our method                        &  1.1768 &51.7~~~~~~~~~~\\
+Our method                        &  1.1800 &51.6~~~~~~~~~~\\
 \hline
 \end{tabular}
 \end{center}
@@ -577,12 +577,12 @@ Our method                        &  1.1768 &51.7~~~~~~~~~~\\
 
 \section{Discussion}\label{discussion}
 
-For Finnish our system achieves a substantial $14.3\%$ drop in KPC
+For Finnish, our system achieves a substantial $15.1\%$ point drop in KPC
 ratio compared with the other system which utilizes a morphological
 analyzer. In their Finnish text entry
 system~\cite{silfverberg/2011/cla} give only $3$ suggestions. Looking
 at Table~\ref{fi-kpc-suggestions} we see that the KPC ratio for our
-system is $1.6036$, when only considering the three first suggestions,
+system is $1.5871$, when only considering the three first suggestions,
 which is still lower than the KPC ratio $1.6120$, which their system
 achieves. Considering, that except the phonological constraints, we
 use only language independent components, this is remarkable.
@@ -601,12 +601,12 @@ practical potential.
 
 As can be seen in Table~\ref{Turkish-kpc-table} our method achieves an
 additional $10\%$ point reduction in KPC for Turkish compared to the
-system in~\cite{Tantug:2010}. Our KPC ratio $1.1768$ needs to be
+system in~\cite{Tantug:2010}. Our KPC ratio $1.1800$ needs to be
 related to the fact that our method can never achieve a KPC ratio
 lower than $1$, since every letter in a word needs to be typed. We
-achieve a $51.7\%$ reduction in KPC for the Turkish test data compared
+achieve a $52\%$ reduction in KPC for the Turkish test data compared
 to the multitap method. A fast computation reveals that the maximal
-possible reduction is only $59.0\%$, which demonstrates that our
+possible reduction is only $59\%$, which demonstrates that our
 system is nearly optimal on the Turkish data.
 
 \section{Conclusions and future work}\label{conclusion}
