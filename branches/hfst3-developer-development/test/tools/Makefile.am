@@ -35,7 +35,9 @@ TESTS=hfst-check-version.sh hfst-check-help.sh hfst-check-environment.sh \
 	  subtract-functionality.sh \
 	  determinize-functionality.sh minimize-functionality.sh \
 	  remove-epsilons-functionality.sh \
-	  invert-functionality.sh project-functionality.sh repeat-functionality.sh \
+	  invert-functionality.sh \
+	  info-functionality.sh \
+	  project-functionality.sh repeat-functionality.sh \
 	  reverse-functionality.sh reweight-functionality.sh \
 	  substitute-functionality.sh \
 	  strings2fst-functionality.sh fst2strings-functionality.sh\
