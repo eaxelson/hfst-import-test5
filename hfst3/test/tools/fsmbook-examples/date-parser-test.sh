@@ -8,14 +8,14 @@
 # EinsteinsPuzzle Palindromes
 # FinnishNumerals NumbersToNumerals
 
-for i in DateParser EnglishNumerals \
-; do \
-cd $i; 
-if !(../kokeilu.sh $i); then
-    exit 1
-fi
-cd ..; 
-done
+
+cd DateParser;
+if make check; then
+    cd ..;
+    exit 0;
+fi;
+exit 1;
+
 
 # We usually have in each file "Foo"
 # - an xfst script "Foo.xfst.script" that is basically the xfst file found

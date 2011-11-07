@@ -1,9 +1,9 @@
 #check:
 #	$(top_srcdir)/test/tools/fsmbook-examples/test-example.sh \
-#	$(srcdir)/DateParser $(builddir)/DateParser
+#	$(srcdir)/EnglishNumerals $(builddir)/EnglishNumerals
 
-EXTRA_DIST=DateParser.hfst.script DateParser.xfst.script \
-	   DateParser.xfst.att
+EXTRA_DIST=EnglishNumerals.hfst.script EnglishNumerals.xfst.script \
+	   EnglishNumerals.xfst.att
 
 clean-local:
 	$(top_srcdir)/test/tools/fsmbook-examples/remove-complement.sh \
