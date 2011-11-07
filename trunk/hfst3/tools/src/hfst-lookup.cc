@@ -880,6 +880,7 @@ string_to_utf8(char* p)
           }
         char* nextu8 = hfst_strndup(p, u8len);
         path->push_back(nextu8);
+	free(nextu8);
         p += u8len;
       }
     return path;
