@@ -94,6 +94,20 @@ class CGOutputFormatter: public OutputFormatter
   
   bool preserve_nonalphabetic() const {return false;}
 };
+class TsvOutputFormatter: public OutputFormatter
+{
+  std::string process_final(const SymbolNumberVector& symbols, CapitalizationState caps) const;
+ public:
+  TsvOutputFormatter(TokenIOStream& s, bool f): OutputFormatter(s,f) {}
+  
+  std::set<std::string> process_finals(const LookupPathSet& finals,
+                                          CapitalizationState caps) const;
+  void print_word(const TokenVector& surface_form, 
+                  std::set<std::string> const &analyzed_forms) const;
+  void print_unknown_word(const TokenVector& surface_form) const;
+  
+  bool preserve_nonalphabetic() const {return false;}
+};
 
 class XeroxOutputFormatter: public OutputFormatter
 {

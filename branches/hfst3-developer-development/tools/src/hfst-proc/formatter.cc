@@ -288,4 +288,100 @@ XeroxOutputFormatter::print_unknown_word(const TokenVector& surface_form) const
   token_stream.ostream() << token_stream.tokens_to_string(clear_superblanks(surface_form))
                          << "\t+?" << std::endl << std::endl;
 }
+//////////Function definitions for TsvOutputFormatter
+
+std::string
+TsvOutputFormatter::process_final(const SymbolNumberVector& symbols, CapitalizationState caps) const
+{
+  std::ostringstream res;
+  size_t start_pos = 0;
+  
+  while(start_pos < symbols.size())
+  {
+    size_t tag_start = symbols.size();
+    size_t compound_split = symbols.size();
+    for(size_t i=start_pos; i<symbols.size(); i++)
+    {
+      if(tag_start == symbols.size() &&
+         token_stream.get_alphabet().is_tag(symbols[i]))
+        tag_start = i;
+      
+      if(compound_split == symbols.size())
+      {
+        std::string s = token_stream.get_alphabet().symbol_to_string(symbols[i]);
+        if(s == "#" || s == "+" || s[s.length()-1] == '+')
+          compound_split = i;
+      }
+      
+      if(tag_start != symbols.size() && compound_split != symbols.size())
+        break;
+    }
+    
+    // grab the base form without tags
+    res << token_stream.get_alphabet().symbols_to_string(
+      SymbolNumberVector(symbols.begin()+start_pos,symbols.begin()+tag_start), caps);
+    
+    // look for compounding. Don't output the tags for non-final segments
+    if(compound_split != symbols.size())
+    {
+      res << "#";
+      start_pos = compound_split+1;
+    }
+    else
+    {
+      if(tag_start != symbols.size())
+      {
+        for(size_t i=tag_start; i<symbols.size(); i++)
+        {
+          std::string tag = token_stream.get_alphabet().symbol_to_string(symbols[i]);
+          // remove the < and >
+          if(tag.size() > 0 && tag[0] == '<')
+          {
+            tag = tag.substr(1);
+            if(tag.size() > 0 && tag[tag.length()-1] == '>')
+              tag = tag.substr(0,tag.length()-1);
+          }
+          
+          res << " " << tag;
+        }
+      }
+      
+      break;
+    }
+  }
+  
+  return res.str();
+}
+
+std::set<std::string>
+TsvOutputFormatter::process_finals(const LookupPathSet& finals, CapitalizationState caps) const
+{
+  std::set<std::string> results;
+  LookupPathSet new_finals = preprocess_finals(finals);
+  
+  for(LookupPathSet::const_iterator it=new_finals.begin(); it!=new_finals.end(); it++)
+    results.insert(process_final((*it)->get_output_symbols(), caps));
+  
+  return results;
+}
+
+void
+TsvOutputFormatter::print_word(const TokenVector& surface_form,
+                                std::set<std::string> const &analyzed_forms) const
+{
+  token_stream.ostream() << token_stream.tokens_to_string(clear_superblanks(surface_form));
+  
+  for(std::set<std::string>::const_iterator it=analyzed_forms.begin(); it!=analyzed_forms.end(); it++)
+    token_stream.ostream() << "\t" << *it;
+  token_stream.ostream() << std::endl;
+}
+
+void
+TsvOutputFormatter::print_unknown_word(const TokenVector& surface_form) const
+{
+  std::string form = token_stream.tokens_to_string(clear_superblanks(surface_form));
+  token_stream.ostream() << form << std::endl;
+}
+
+
 

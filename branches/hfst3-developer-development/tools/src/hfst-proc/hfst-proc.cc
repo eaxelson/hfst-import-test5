@@ -104,6 +104,7 @@ bool print_usage(void)
     "  -p  --apertium          Apertium output format for analysis (default)\n" <<
     "  -C  --cg                Constraint Grammar output format for analysis\n" <<
     "  -x, --xerox             Xerox output format for analysis\n" <<
+    "  -T, --tsv               Tab separated values format for analysis\n" <<
     "  -e, --do-compounds      Treat '+' and '#' as compound boundaries\n" <<
     "  -k, --keep-compounds    Retain compound analyses even when analyses with fewer\n" <<
     "                          compound-boundaries are available\n" <<
@@ -171,6 +172,7 @@ int main(int argc, char **argv)
       {"apertium",       no_argument,       0, 'p'},
       {"xerox",          no_argument,       0, 'x'},
       {"cg",             no_argument,       0, 'C'},
+      {"tsv",            no_argument,       0, 'T'},
       {"keep-compounds", no_argument,       0, 'k'},
       {"do-compounds",   no_argument,       0, 'e'},
       {"show-weights",   no_argument,       0, 'W'},
@@ -183,7 +185,7 @@ int main(int argc, char **argv)
     };
     
     int option_index = 0;
-    int c = getopt_long(argc, argv, "hVvqsagndtpxCkeWN:cwzX", long_options, &option_index);
+    int c = getopt_long(argc, argv, "hVvqsagndtpxCkeWN:cwzXT", long_options, &option_index);
 
     if (c == -1) // no more options to look at
       break;
@@ -237,6 +239,7 @@ int main(int argc, char **argv)
     case 'p':
     case 'C':
     case 'x':
+    case 'T':
       if(output_type == 0)
         output_type = c;
       else
@@ -385,6 +388,9 @@ int main(int argc, char **argv)
             break;
           case 'x':
             output_formatter = (OutputFormatter*)new XeroxOutputFormatter(token_stream, filter_compound_analyses);
+            break;
+          case 'T':
+            output_formatter = (OutputFormatter*)new TsvOutputFormatter(token_stream, filter_compound_analyses);
             break;
           default:
             output_formatter = (OutputFormatter*)new ApertiumOutputFormatter(token_stream, filter_compound_analyses);
