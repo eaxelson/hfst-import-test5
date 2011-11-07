@@ -152,6 +152,12 @@ parse_options(int argc, char** argv)
         }
     }
 #include "inc/check-params-common.h"
+    if ((min_version == -1L) && (max_version == -1L) && (exact_version == -1L)
+        && (required_features.size() == 0) && (verbose == false))
+      {
+        verbose = true;
+        verbose_printf("No tests selected; printing known data\n");
+      }
     return EXIT_CONTINUE;
 }
 
@@ -226,7 +232,7 @@ int main (int argc, char * argv[])
                 "and therefore assumed to be missing", f->c_str());
         }
     }
-  fprintf(message_out, "HFST info version: %s\n"
+  verbose_printf("HFST info version: %s\n"
           "HFST packaging: %s <%s> <mailto:%s>\n"
           "HFST version: %s\n"
           "HFST long version: %ld\n"
@@ -237,20 +243,20 @@ int main (int argc, char * argv[])
           HFST_LONGVERSION,
           HFST_REVISION);
 #if HAVE_OPENFST
-  fprintf(message_out, "OpenFst supported\n");
+  verbose_printf("OpenFst supported\n");
 #endif
 #if HAVE_SFST
-  fprintf(message_out, "SFST supported\n");
+  verbose_printf("SFST supported\n");
 #endif
 #if HAVE_FOMA
-  fprintf(message_out, "foma supported\n");
+  verbose_printf("foma supported\n");
 #endif
 #if USE_GLIB_UNICODE
-  fprintf(message_out, "Unicode support: glib\n");
+  verbose_printf("Unicode support: glib\n");
 #elif USE_ICU_UNICODE
-  fprintf(message_out, "Unicode support: ICU\n");
+  verbose_printf("Unicode support: ICU\n");
 #else
-  fprintf(message_out, "Unicode support: no (hfst)\n");
+  verbose_printf("Unicode support: no (hfst)\n");
 #endif
 
   return EXIT_SUCCESS;
