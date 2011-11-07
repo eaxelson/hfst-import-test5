@@ -21,17 +21,17 @@
 
 
 # Convert the AT&T format into an HFST transducer in format openfst-tropical.
-  hfst-txt2fst -f openfst-tropical $srcdir/$1.xfst.att > $1.xfst.hfst
+  hfst-txt2fst -f openfst-tropical $1.xfst.att > $2.xfst.hfst
 
 # For all HFST implementation types,
   for i in sfst openfst-tropical foma; do
 
-    echo "Testing" $i "..."
+    # echo "Testing" $i "..."
   # run the HFST script using the implementation type,
-    sh $srcdir/$1.hfst.script $i
+    sh $1.hfst.script $i
   # convert the result into openfst-tropical type
-    hfst-fst2fst -f openfst-tropical $1.hfst.hfst > TMP
+    hfst-fst2fst -f openfst-tropical $2.hfst.hfst > TMP
   # and compare it with the expected result.
-    hfst-compare -q TMP $1.xfst.hfst && echo "TEST PASSED";
+    hfst-compare -q TMP $2.xfst.hfst # && echo "TEST PASSED";
 
   done
