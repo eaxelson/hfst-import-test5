@@ -78,6 +78,9 @@ endif
 if WANT_INVERT
 MAYBE_INVERT=hfst-invert
 endif
+if WANT_INFO
+MAYBE_INFO=hfst-info
+endif
 if WANT_LEXC
 MAYBE_LEXC=hfst-lexc
 endif
@@ -182,7 +185,7 @@ bin_PROGRAMS= \
 			 $(MAYBE_DUPLICATE) $(MAYBE_EDIT_METADATA)                  \
 			 $(MAYBE_FORMAT) $(MAYBE_FST2FST) $(MAYBE_FST2STRINGS)      \
 			 $(MAYBE_FST2TXT) $(MAYBE_GREP) $(MAYBE_HEAD)               \
-			 $(MAYBE_INVERT)                                            \
+			 $(MAYBE_INFO) $(MAYBE_INVERT)                              \
 			 $(MAYBE_LOOKUP) $(MAYBE_MINIMIZE) $(MAYBE_NAME)            \
 			 $(MAYBE_PROJECT) $(MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP)  \
 			 $(MAYBE_PUSH_WEIGHTS) $(MAYBE_REGEXP2FST)                  \
@@ -218,6 +221,7 @@ hfst_fst2strings_SOURCES=hfst-fst2strings.cc $(HFST_COMMON_SRC)
 hfst_fst2txt_SOURCES=hfst-fst2txt.cc $(HFST_COMMON_SRC)
 hfst_grep_SOURCES=hfst-grep.cc $(HFST_COMMON_SRC)
 hfst_head_SOURCES=hfst-head.cc $(HFST_COMMON_SRC)
+hfst_info_SOURCES=info.cc $(HFST_COMMON_SRC)
 hfst_invert_SOURCES=hfst-invert.cc $(HFST_COMMON_SRC)
 hfst_lexc_SOURCES=hfst-lexc.cc lexc-readline-ui.cc $(HFST_COMMON_SRC)
 hfst_lexc2fst_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC)
