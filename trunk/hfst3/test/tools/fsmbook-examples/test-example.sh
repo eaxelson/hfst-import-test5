@@ -13,10 +13,10 @@
 #                      The file stores its result in a file named $1.hfst.hfst.
 
 
-# # If $1.xfst.att does not exist, compile it.
-# if ! [ -f $1.xfst.att]; then
+# If $1.xfst.att does not exist, compile it.
+# if ! [ -f $1.xfst.att ]; then
 #   xfst -f $1.xfst.script;
-#   cat $1 | ./xfst-att-to-hfst-att.sh > $1.xfst.att;
+#   cat $1 | ../xfst-att-to-hfst-att.sh > $1.xfst.att;
 # fi
 
 

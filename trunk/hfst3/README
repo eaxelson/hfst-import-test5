@@ -19,7 +19,9 @@ Please note that the dependencies for the library can be set during the compile
 time. Settings that determine dependencies relate to features the resulting
 library will have; e.g. if you *disable* openfst you cannot use weighted
 finite-state automata. If you *enable* foma, you will be able to read foma
-format automata as HFST files and use foma's algorithms to process automata.
+format automata as HFST files and use foma's algorithms to process automata. 
+The command ``./configure --help`` lists all features that can be controlled
+with configure switches and whether they are enabled or disabled by default.
 
 The selection of tools may incur additional dependencies; e.g. if you enable
 ``apertium2fst`` tool, you will need libxml2_ and its dependencies, since the

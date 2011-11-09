@@ -1,22 +1,22 @@
-FORMAT=TRANSDUCER_FORMAT
+#!/bin/bash
 
-echo '[( [m a l] | [n e] )]' | hfst-regexp2fst -f $FORMAT -j > AdjPrefix
+echo '[( [m a l] | [n e] )]' | hfst-regexp2fst -f $1 -j > AdjPrefix
 
 echo "bon
 long
 jun
 alt
-grav" | hfst-strings2fst -f $FORMAT -j > Adjectives
+grav" | hfst-strings2fst -f $1 -j > Adjectives
 
-echo '[[e g] | [e t]]*' | hfst-regexp2fst -f $FORMAT -j > Adj
+echo '[[e g] | [e t]]*' | hfst-regexp2fst -f $1 -j > Adj
 
-echo '[a]' | hfst-regexp2fst -f $FORMAT -j > AdjEnd
+echo '[a]' | hfst-regexp2fst -f $1 -j > AdjEnd
 
-echo '[(j)]' | hfst-regexp2fst -f $FORMAT -j > Number
+echo '[(j)]' | hfst-regexp2fst -f $1 -j > Number
 
-echo '[(n)]' | hfst-regexp2fst -f $FORMAT -j > Case
+echo '[(n)]' | hfst-regexp2fst -f $1 -j > Case
 
-echo '[0]' | hfst-regexp2fst -f $FORMAT > Result
+echo '[0]' | hfst-regexp2fst -f $1 > Result
 for i in AdjPrefix Adjectives Adj AdjEnd Number Case;
 do
   hfst-concatenate Result $i > TMP;
