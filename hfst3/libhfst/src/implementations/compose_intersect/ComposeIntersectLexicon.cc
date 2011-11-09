@@ -125,32 +125,37 @@ namespace hfst
         }
       else if (is_flag_diacritic(it->first) and 
            (not rules->known_symbol(it->first)))
-        { lexicon_skip_symbol_compose(it->second,p.second,state); }
+        { 
+	  lexicon_skip_symbol_compose(it->second,p.second,state); 
+          lexicon_eps_transition_found = true;
+	}
       else
-        { compose(it->second,rules->get_transitions
-              (p.second,it->first),state); }
+        { 
+	  compose(it->second,rules->get_transitions
+              (p.second,it->first),state); 
+	}
     }
       
       if (!lexicon_eps_transition_found)
-    {
-      rule_skip_symbol_compose
+	{
+	  rule_skip_symbol_compose
             (rules->get_transitions
-         (p.second,HfstTropicalTransducerTransitionData::get_number
-          ("@_EPSILON_SYMBOL_@")),p.first,state);
-    }
+	     (p.second,HfstTropicalTransducerTransitionData::get_number
+	      ("@_EPSILON_SYMBOL_@")),p.first,state);
+	}
     }
     
     void ComposeIntersectLexicon::lexicon_skip_symbol_compose
     (const TransitionSet &transitions,HfstState rule_state,HfstState origin)
     {
       for (TransitionSet::const_iterator it = transitions.begin();
-       it != transitions.end();
-       ++it)
-    { 
-      add_transition
-        (origin,it->ilabel,it->olabel,it->weight,
-         get_state(StatePair(it->target,rule_state))); 
-    }
+	   it != transitions.end();
+	   ++it)
+	{ 
+	  add_transition
+	    (origin,it->ilabel,it->olabel,it->weight,
+	     get_state(StatePair(it->target,rule_state))); 
+	}
     }
 
     void ComposeIntersectLexicon::rule_skip_symbol_compose
