@@ -1,6 +1,6 @@
-#check:
-#	$(top_srcdir)/test/tools/fsmbook-examples/test-example.sh \
-#	$(srcdir)/DateParser $(builddir)/DateParser
+check:
+	$(top_srcdir)/test/tools/fsmbook-examples/test-example.sh \
+	$(srcdir)/DateParser $(builddir)/DateParser
 
 EXTRA_DIST=DateParser.hfst.script DateParser.xfst.script \
 	   DateParser.xfst.att

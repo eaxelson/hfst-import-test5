@@ -76,4 +76,4 @@ define ValidDates [AllDates & MaxDays & LeapDates];
 
 push ValidDates
 
-save stack DateParser.xfst.hfst
+write att DateParser FOO BAR

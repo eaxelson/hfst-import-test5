@@ -467,6 +467,10 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 test/tools/fsmbook-examples/Makefile
 		 test/tools/fsmbook-examples/DateParser/Makefile
 		 test/tools/fsmbook-examples/EnglishNumerals/Makefile
+		 test/tools/fsmbook-examples/NumbersToNumerals/Makefile
+		 test/tools/fsmbook-examples/FinnishNumerals/Makefile
+		 test/tools/fsmbook-examples/EinsteinsPuzzle/Makefile
+		 test/tools/fsmbook-examples/Esperanto/Makefile
                  libhfst/Makefile libhfst/src/Makefile
                  libhfst/src/implementations/Makefile
 		 libhfst/src/parsers/Makefile 

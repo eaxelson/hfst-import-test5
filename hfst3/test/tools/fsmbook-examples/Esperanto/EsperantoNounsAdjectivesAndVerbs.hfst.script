@@ -13,6 +13,23 @@ jun
 alt
 grav" | hfst-strings2fst -j -f $1 > AdjRoots
 
+echo "don
+est
+pens
+dir
+fal" | hfst-strings2fst -j -f $1 > VerbRoots
+
+echo '([Op%+:m 0:a 0:l] | [Neg%+:n 0:e])' | hfst-regexp2fst -f $1 \
+     > VerbPrefixes
+
+echo '[%+Verb:0]' | hfst-regexp2fst -f $1 > Verb
+
+echo '([%+Cont:a 0:d])' | hfst-regexp2fst -f $1 > Aspect
+
+echo '[%+Inf:i] | [%+Pres:a 0:s] | [%+Past:i 0:s] | [%+Fut:o 0:s] | ' \
+     '[%+Cond:u 0:s] | [%+Subj:u]' | hfst-regexp2fst -f $1 > Vend
+
+
 echo '%+Noun:0' | hfst-regexp2fst -f $1 > Nmf
 
 echo '%+NSuff:o' | hfst-regexp2fst -f $1 > Nend
@@ -37,9 +54,15 @@ echo '(%+Acc:n)' | hfst-regexp2fst -f $1 > Case
 
 hfst-concatenate NounPrefix NounRoots | hfst-concatenate -2 Nmf | \
   hfst-concatenate -2 AugDimFem  > NounStem
+
 hfst-concatenate AdjPrefixes AdjRoots | hfst-concatenate -2 Adj | \
   hfst-concatenate -2 AugDimNize > AdjectiveStem
-hfst-disjunct NounStem AdjectiveStem > Stems
-hfst-concatenate Number Case | hfst-concatenate -1 Stems > Result
 
-hfst-minimize Result > EsperantoNounsAndAdjectivesWithTags.hfst.hfst
+hfst-disjunct NounStem AdjectiveStem > NounAdjStems
+hfst-concatenate Number Case | hfst-concatenate -1 NounAdjStems > NounAdjs
+
+hfst-concatenate VerbPrefixes VerbRoots | hfst-concatenate -2 Verb | \
+hfst-concatenate -2 Aspect | hfst-concatenate -2 Vend > Verbs
+
+hfst-disjunct NounAdjs Verbs | hfst-minimize \
+  > EsperantoNounsAdjectivesAndVerbs.hfst.hfst
