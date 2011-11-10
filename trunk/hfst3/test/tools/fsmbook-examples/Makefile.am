@@ -7,4 +7,4 @@ TESTS=date-parser-test.sh english-numerals-test.sh \
       einsteins-puzzle-test.sh esperanto-test.sh
 
 EXTRA_DIST=xfst-att-to-hfst-att.sh remove-complement.sh test-example.sh \
-	   $(TESTS)
+	   foma-att-to-hfst-att.sh $(TESTS)
