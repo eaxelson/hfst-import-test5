@@ -1775,7 +1775,7 @@ void HfstTransducer::insert_freely_missing_flags_from
     }
 }
 
-bool has_flag_diacritics(const HfstTransducer &fst)
+bool has_flags(const HfstTransducer &fst)
 {
   StringSet alphabet = fst.get_alphabet();
   for (StringSet::const_iterator it = alphabet.begin();
@@ -1786,6 +1786,9 @@ bool has_flag_diacritics(const HfstTransducer &fst)
     }
   return false;	
 }
+
+bool HfstTransducer::has_flag_diacritics(void) const
+{ return has_flags(*this); }
 
 std::string add_suffix_to_feature_name(const std::string &flag_diacritic,
 				       const std::string &suffix)
@@ -1848,8 +1851,8 @@ void rename_flag_diacritics(HfstTransducer &fst,const std::string &suffix)
 
 void HfstTransducer::harmonize_flag_diacritics(HfstTransducer &another)
 {
-  bool this_has_flag_diacritics    = has_flag_diacritics(*this);
-  bool another_has_flag_diacritics = has_flag_diacritics(another);
+  bool this_has_flag_diacritics    = has_flags(*this);
+  bool another_has_flag_diacritics = has_flags(another);
 
   if (this_has_flag_diacritics and another_has_flag_diacritics)
     {
