@@ -84,6 +84,7 @@ int main(int argc, char **argv)
       HfstInputStream in("testfile.hfst");
       HfstTransducer foobar_stream(in);
       in.close();
+      remove("testfile.hfst");
       assert(foobar.compare(foobar_stream));
       assert(foobar_stream.get_name().compare("foobar") == 0);
       assert(foobar_stream.get_type() == types[i]);

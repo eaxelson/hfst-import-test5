@@ -93,6 +93,7 @@ int main(int argc, char **argv)
       transducers_read++;
     }
       in.close();
+      remove("testfile.hfst");
 
 
       assert(transducers_read == 4);
