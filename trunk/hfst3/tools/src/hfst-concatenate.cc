@@ -46,6 +46,8 @@ using hfst::ImplementationType;
 #include "inc/globals-common.h"
 #include "inc/globals-binary.h"
 
+static bool harmonize_flags=false;
+
 void
 print_usage()
 {
@@ -57,6 +59,9 @@ print_usage()
         print_common_binary_program_options(message_out);
         fprintf(message_out, "\n");
         print_common_binary_program_parameter_instructions(message_out);
+        fprintf(message_out,
+                "Flag diacritics:\n"
+                "  -F, --harmonize-flags  Harmonize flag diacritics\n");
         fprintf(message_out, "\n");
         fprintf(message_out,
             "\n"
@@ -81,11 +86,12 @@ parse_options(int argc, char** argv)
         {
           HFST_GETOPT_COMMON_LONG,
           HFST_GETOPT_BINARY_LONG,
+          {"harmonize-flags", no_argument, 0, 'F'},
           {0,0,0,0}
         };
         int option_index = 0;
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_BINARY_SHORT,
+                             HFST_GETOPT_BINARY_SHORT "F",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -95,6 +101,9 @@ parse_options(int argc, char** argv)
         {
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-binary.h"
+        case 'F':
+          harmonize_flags=true;
+          break;
 #include "inc/getopt-cases-error.h"
         }
     }
@@ -135,6 +144,22 @@ concatenate_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
         {
             verbose_printf("Concatenating %s and %s... %zu\n", firstname,
                            secondname, transducer_n);
+        }
+        if (first.has_flag_diacritics() and second.has_flag_diacritics()) 
+          {
+            if (not harmonize_flags)
+              {
+                if (not silent) 
+                  {
+                    warning(0, 0, "The argumentes contain "
+			    "flag diacritics. Use -F to harmonize them.", 
+			    secondname, firstname);
+		  }
+              }
+            else
+              {
+		first.harmonize_flag_diacritics(second,false);
+              }
         }
         try
           {
