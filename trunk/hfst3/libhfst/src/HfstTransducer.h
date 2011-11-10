@@ -1452,6 +1452,9 @@ transducer.transform_weights(&func);
        that are not included in the alphabet of this transducer. */
     bool check_for_missing_flags_in(const HfstTransducer &another) const;
 
+    /* Return true if \a this has flag diacritics in the alphabet. */
+    bool has_flag_diacritics(void) const;
+
     // *** Friends **** //
 
     friend std::ostream& operator<<(std::ostream &out, const HfstTransducer &t);
