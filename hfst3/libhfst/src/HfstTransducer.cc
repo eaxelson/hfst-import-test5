@@ -1775,6 +1775,95 @@ void HfstTransducer::insert_freely_missing_flags_from
     }
 }
 
+bool has_flag_diacritics(const HfstTransducer &fst)
+{
+  StringSet alphabet = fst.get_alphabet();
+  for (StringSet::const_iterator it = alphabet.begin();
+       it != alphabet.end(); it++)
+    {
+      if (FdOperation::is_diacritic(*it))
+	{ return true; }
+    }
+  return false;	
+}
+
+std::string add_suffix_to_feature_name(const std::string &flag_diacritic,
+				       const std::string &suffix)
+{
+  return 
+    "@" +
+    FdOperation::get_operator(flag_diacritic) +
+    "." +
+    FdOperation::get_feature(flag_diacritic) + suffix +
+
+    (FdOperation::has_value(flag_diacritic) ?
+     "." +
+     FdOperation::get_value(flag_diacritic) :
+     "") +
+
+    "@";
+}
+
+void rename_flag_diacritics(HfstTransducer &fst,const std::string &suffix)
+{
+  
+  HfstBasicTransducer basic_fst(fst);
+  HfstBasicTransducer basic_fst_copy;
+  (void)basic_fst_copy.add_state(basic_fst.get_max_state());
+
+  hfst::implementations::HfstState s = 0;
+
+  for (HfstBasicTransducer::const_iterator it = basic_fst.begin();
+       it != basic_fst.end();
+       ++it)
+    {
+      for (HfstBasicTransducer::HfstTransitions::const_iterator jt = 
+	     it->begin();
+	   jt != it->end();
+	   ++jt)
+	{
+	  basic_fst_copy.add_transition
+	    (s,
+	     HfstBasicTransition
+	     (jt->get_target_state(),
+
+	      FdOperation::is_diacritic(jt->get_input_symbol())  ?
+	      add_suffix_to_feature_name(jt->get_input_symbol(),suffix) :
+	      jt->get_input_symbol(),
+
+	      FdOperation::is_diacritic(jt->get_output_symbol())  ?
+	      add_suffix_to_feature_name(jt->get_output_symbol(),suffix) :
+	      jt->get_output_symbol(),
+
+	      jt->get_weight()));
+	}
+
+      if (basic_fst.is_final_state(s))
+	{ basic_fst_copy.set_final_weight(s,basic_fst.get_final_weight(s)); }
+
+      ++s;
+    }
+  fst = HfstTransducer(basic_fst_copy,fst.get_type());
+}
+
+void HfstTransducer::harmonize_flag_diacritics(HfstTransducer &another)
+{
+  bool this_has_flag_diacritics    = has_flag_diacritics(*this);
+  bool another_has_flag_diacritics = has_flag_diacritics(another);
+
+  if (this_has_flag_diacritics and another_has_flag_diacritics)
+    {
+      rename_flag_diacritics(*this,"_1");
+      rename_flag_diacritics(another,"_2");
+      this->insert_freely_missing_flags_from(another);
+      another.insert_freely_missing_flags_from(*this);
+    }
+  else if (this_has_flag_diacritics)
+    { another.insert_freely_missing_flags_from(*this); }
+  else if (another_has_flag_diacritics)
+    { this->insert_freely_missing_flags_from(another); }
+}
+
 bool HfstTransducer::check_for_missing_flags_in
 (const HfstTransducer &another) const
 {
@@ -3881,6 +3970,19 @@ void universal_pair_test ( ImplementationType type )
 
 }
 
+StringVector remove_flags(const StringVector &v)
+{
+  StringVector v_wo_flags;
+  for (StringVector::const_iterator it = v.begin();
+       it != v.end();
+       ++it)
+    {
+      if (not FdOperation::is_diacritic(*it))
+	{ v_wo_flags.push_back(*it); }
+    }
+  return v_wo_flags;
+}
+
 int main(int argc, char * argv[])
 {
     std::cout << "Unit tests for " __FILE__ ":" << std::endl;
@@ -3957,8 +4059,106 @@ int main(int argc, char * argv[])
 
         void insert_freely_missing_flags_from
           (const HfstTransducer &another);
-    
+
+	// Flag diacritic harmonization test
+	HfstTokenizer flag_tokenizer;
+	flag_tokenizer.add_multichar_symbol("@P.Char.ON@");
+	flag_tokenizer.add_multichar_symbol("@R.Char.ON@");	
+
+	HfstTransducer any_a("A",types[i]);
+	HfstTransducer any_b("B",types[i]);
+	HfstTransducer any_c("C",types[i]);
+	any_a.disjunct(any_b).disjunct(any_c).minimize();
+	HfstTransducer any_symbol(any_a);
+	HfstTransducer any(any_symbol);
+	any.repeat_star();
+
+	HfstTransducer a_paths("A" "@P.Char.ON@",
+			       flag_tokenizer,
+			       types[i]);
+	a_paths.concatenate(any);
+	HfstTransducer a_end("@R.Char.ON@" "A",
+			     flag_tokenizer,
+			     types[i]);
+	a_paths.concatenate(a_end).minimize();
+
+	HfstTransducer a_paths_copy(a_paths);
+
+	a_paths_copy.convert(HFST_OLW_TYPE);
+
+	HfstOneLevelPaths * results = 
+	  a_paths_copy.lookup_fd(flag_tokenizer.tokenize_one_level("ABCBA"));
+	assert(results->size() == 1);
+	assert(remove_flags(results->begin()->second) ==
+	       flag_tokenizer.tokenize_one_level("ABCBA"));
+	delete results;
+
+	results = 
+	  a_paths_copy.lookup_fd(flag_tokenizer.tokenize_one_level("ABCAA"));
+	assert(results->size() == 1);
+	assert(remove_flags(results->begin()->second) ==
+	       flag_tokenizer.tokenize_one_level("ABCAA"));
+	delete results;
+
+	HfstTransducer b_paths(any_symbol);
+	HfstTransducer b_paths_("B" 
+				"@P.Char.ON@",
+				flag_tokenizer,
+				types[i]);
+	b_paths.concatenate(b_paths_);
+	b_paths.concatenate(any);
+	HfstTransducer b_end("@R.Char.ON@" "B", 
+			     flag_tokenizer,
+			     types[i]);
+	b_end.concatenate(any_symbol);
+	b_paths.concatenate(b_end).minimize();
+
+	HfstTransducer b_paths_copy(b_paths);
+	b_paths_copy.convert(HFST_OLW_TYPE);
+
+	results = 
+	  b_paths_copy.lookup_fd(flag_tokenizer.tokenize_one_level("ABCBA"));
+	assert(results->size() == 1);
+	assert(remove_flags(results->begin()->second) ==
+	       flag_tokenizer.tokenize_one_level("ABCBA"));
+	delete results;
+
+	results = 
+	  b_paths_copy.lookup_fd(flag_tokenizer.tokenize_one_level("ABCBB"));
+	assert(results->size() == 1);
+	assert(remove_flags(results->begin()->second) ==
+	       flag_tokenizer.tokenize_one_level("ABCBB"));
+	delete results;
+
+	a_paths.harmonize_flag_diacritics(b_paths);
+
+	a_paths.intersect(b_paths).minimize();
+	
+	a_paths.convert(HFST_OLW_TYPE);
+	
+	HfstOneLevelPaths * one_result = 
+	  a_paths.lookup_fd(flag_tokenizer.tokenize_one_level("ABCBA"));
+	assert(one_result->size() == 1);
+	       assert(remove_flags(one_result->begin()->second) ==
+	       flag_tokenizer.tokenize_one_level("ABCBA"));
+	delete one_result;
+
+	HfstOneLevelPaths * no_results = 
+	  a_paths.lookup_fd(flag_tokenizer.tokenize_one_level("ABCBB"));
+	assert(no_results->size() == 0);
+	delete no_results;
+
+	no_results = 
+	  a_paths.lookup_fd(flag_tokenizer.tokenize_one_level("ABCAA"));
+	assert(no_results->size() == 0);
+	delete no_results;
+
+	no_results = 
+	  a_paths.lookup_fd(flag_tokenizer.tokenize_one_level("ABCCC"));
+	assert(no_results->size() == 0);
+	delete no_results;
     }
+
     
     std::cout << "ok" << std::endl;
     return 0;
