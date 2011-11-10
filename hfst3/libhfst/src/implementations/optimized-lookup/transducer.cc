@@ -586,33 +586,52 @@ TransitionTableIndexSet Transducer::get_transitions_from_state(
 {
     TransitionTableIndexSet transitions;
   
-    if(indexes_transition_index_table(state_index))
-    {
+    if(indexes_transition_index_table(state_index)) {
     // for each input symbol that has a transition from this state
-    for(SymbolNumber symbol=0; symbol < header->symbol_count(); symbol++)
-    {
-        const TransitionIndex& test_transition_index =
-        get_index(state_index+1+symbol);
-        if(test_transition_index.matches(symbol))
-        {
-        // there are one or more transitions with this input symbol,
-        // starting at test_transition_index.get_target()
-        TransitionTableIndex transition_i =
-            test_transition_index.get_target();
-        while(true)
-        {
-            if(get_transition(transition_i).matches(
-               test_transition_index.get_input_symbol()))
-            transitions.insert(transition_i);
-            else
-            break;
-            transition_i++;
-        }
-        }
+    for(SymbolNumber symbol=0; symbol < header->symbol_count(); symbol++) {
+	// There may be flags at index 0 even if there aren't
+	// any epsilons, so those have to be checked for
+ 	if (alphabet->is_flag_diacritic(symbol)) {
+	    TransitionTableIndex transition_i =
+		get_index(state_index+1).get_target();
+	    if (!get_index(state_index+1).matches(0)) {
+		continue;
+	    }
+	    while(true) {
+		// First skip any epsilons
+		if(get_transition(transition_i).matches(0)) {
+		    ++transition_i;
+		    continue;
+		} else if (get_transition(transition_i).matches(symbol)) {
+		    transitions.insert(transition_i);
+		    ++transition_i;
+		    continue;
+		} else {
+		    break;
+		}
+	    }
+	} else { // not a flag
+	    const TransitionIndex& test_transition_index =
+		get_index(state_index+1+symbol);
+	    if(test_transition_index.matches(symbol)) {
+		// there are one or more transitions with this input symbol,
+		// starting at test_transition_index.get_target()
+		TransitionTableIndex transition_i =
+		    test_transition_index.get_target();
+		while(true)
+		{
+		    if(get_transition(transition_i).matches(
+			   test_transition_index.get_input_symbol())) {
+			transitions.insert(transition_i);
+		    } else {
+			break;
+		    }
+		    ++transition_i;
+		}
+	    }
+	}
     }
-    }
-    else // indexes transition table
-    {
+    } else { // indexes transition table
     const Transition& transition = get_transition(state_index);
     if(transition.get_input_symbol() != NO_SYMBOL_NUMBER ||
        transition.get_output_symbol() != NO_SYMBOL_NUMBER)
@@ -625,7 +644,7 @@ TransitionTableIndexSet Transducer::get_transitions_from_state(
     while(true)
     {
         if(get_transition(transition_i)
-           .get_input_symbol() != NO_SYMBOL_NUMBER)
+	   .get_input_symbol() != NO_SYMBOL_NUMBER)
         transitions.insert(transition_i);
         else
         break;
