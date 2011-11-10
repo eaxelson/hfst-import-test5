@@ -46,7 +46,7 @@ using hfst::ImplementationType;
 #include "inc/globals-common.h"
 #include "inc/globals-binary.h"
 
-static bool insert_missing_flags=false;
+static bool harmonize_flags=false;
 
 void
 print_usage()
@@ -59,9 +59,7 @@ print_usage()
         print_common_binary_program_options(message_out);
         fprintf(message_out,
                 "Flag diacritics:\n"
-                "  -F, --insert-missing-flags  Insert missing flag "
-                "diacritics from\n                              "
-                "one transducer to another\n"); 
+                "  -F, --harmonize-flags  Harmonize flag diacritics\n");
         fprintf(message_out, "\n");
         print_common_binary_program_parameter_instructions(message_out);
         fprintf(message_out, "\n");
@@ -87,7 +85,7 @@ parse_options(int argc, char** argv)
         {
           HFST_GETOPT_COMMON_LONG,
           HFST_GETOPT_BINARY_LONG,
-          {"insert-missing-flags", no_argument, 0, 'F'},
+          {"harmonize-flags", no_argument, 0, 'F'},
           {0,0,0,0}
         };
         int option_index = 0;
@@ -103,7 +101,7 @@ parse_options(int argc, char** argv)
 #include "inc/getopt-cases-common.h"
 #include "inc/getopt-cases-binary.h"
         case 'F':
-          insert_missing_flags=true;
+          harmonize_flags=true;
           break;
 #include "inc/getopt-cases-error.h"
         }
@@ -146,37 +144,23 @@ conjunct_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                            firstname, secondname, transducer_n);
         }
 
-        if (first.check_for_missing_flags_in(second)) 
+        if (first.has_flag_diacritics() or second.has_flag_diacritics()) 
           {
-            if (not insert_missing_flags)
+            if (not harmonize_flags)
               {
                 if (not silent) 
                   {
-                    warning(0, 0, "Warning: %s contains flag diacritics not "
-                            "found in %s", secondname, firstname);
-                }
+                    warning(0, 0, "At least one of the argumentes contains "
+			    "flag diacritics. Use -F to harmonize them.", 
+			    secondname, firstname);
+		  }
               }
             else
               {
-                first.insert_freely_missing_flags_from(second);
+		first.harmonize_flag_diacritics(second);
               }
         }
 
-        if (second.check_for_missing_flags_in(first)) 
-          {
-            if (not insert_missing_flags)
-              {
-                if (not silent)
-                  {
-                    warning(0, 0, "Warning: %s contains flag diacritics not "
-                            "found in %s", firstname, secondname);
-                  }
-              }
-            else
-              {
-                second.insert_freely_missing_flags_from(first);
-              }
-        }
         try 
           {
             first.intersect(second);
