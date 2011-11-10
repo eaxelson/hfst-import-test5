@@ -1445,8 +1445,12 @@ transducer.transform_weights(&func);
       If both \a this and \a another contain flag diacritics, replace flag
       diacritic @X.Y.(.Z)@ by @X.Y_1(.Z)@ in \a this and replace it by
       @X.Y_2(.Z)@ in \a another. 
+      
+      If \a insert_renamed_flags is true, then the flags from \a this are 
+      inserted freely in \a another and vice versa after replacing.
      */
-    void harmonize_flag_diacritics(HfstTransducer &another);
+    void harmonize_flag_diacritics(HfstTransducer &another,
+				   bool insert_renamed_flags=true);
 
     /* Whether the alphabet of transducer \a another includes flag diacritics
        that are not included in the alphabet of this transducer. */

@@ -1849,7 +1849,8 @@ void rename_flag_diacritics(HfstTransducer &fst,const std::string &suffix)
   fst = HfstTransducer(basic_fst_copy,fst.get_type());
 }
 
-void HfstTransducer::harmonize_flag_diacritics(HfstTransducer &another)
+void HfstTransducer::harmonize_flag_diacritics(HfstTransducer &another,
+					       bool insert_renamed_flags)
 {
   bool this_has_flag_diacritics    = has_flags(*this);
   bool another_has_flag_diacritics = has_flags(another);
@@ -1858,12 +1859,15 @@ void HfstTransducer::harmonize_flag_diacritics(HfstTransducer &another)
     {
       rename_flag_diacritics(*this,"_1");
       rename_flag_diacritics(another,"_2");
-      this->insert_freely_missing_flags_from(another);
-      another.insert_freely_missing_flags_from(*this);
+      if (insert_renamed_flags)
+	{
+	  this->insert_freely_missing_flags_from(another);
+	  another.insert_freely_missing_flags_from(*this);
+	}
     }
-  else if (this_has_flag_diacritics)
+  else if (this_has_flag_diacritics and insert_renamed_flags)
     { another.insert_freely_missing_flags_from(*this); }
-  else if (another_has_flag_diacritics)
+  else if (another_has_flag_diacritics and insert_renamed_flags)
     { this->insert_freely_missing_flags_from(another); }
 }
 
