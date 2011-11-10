@@ -18,7 +18,7 @@ done
 
 # list all non-directories, append 'rm' to the beginning and execute
 # the remove commands
-ls -F | egrep -v '/$' | sed 's/^\(.*\)$/rm \1/;' | bash
+ls -F | egrep -v '/$' | sed 's/^\(.*\)$/rm "\1"/;' | bash
 
 
 mv tempdir/* .;
