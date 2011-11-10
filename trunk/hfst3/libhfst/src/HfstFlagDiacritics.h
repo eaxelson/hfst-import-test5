@@ -53,6 +53,11 @@ public:
     static std::string::size_type find_diacritic
       (const std::string& diacritic_str,
        std::string::size_type& length);
+
+    static std::string get_operator(const std::string& diacritic);
+    static std::string get_feature(const std::string& diacritic);
+    static std::string get_value(const std::string& diacritic);
+    static bool has_value(const std::string& diacritic); 
 };
 
 template<class T> class FdState;
