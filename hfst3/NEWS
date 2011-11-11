@@ -6,6 +6,16 @@ This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
 
+Noteworthy changes in 3.3.1
+---------------------------
+
+* Handling of flag diacritics improved.
+
+* More examples in fsmbook-examples included in tests.
+
+* Extra files created during tests as well as generated autotools files 
+  are now ignored by svn.
+
 Noteworthy changes in 3.3.0
 ---------------------------
 
