@@ -637,7 +637,7 @@ in \a ifile.
      * @brief Get arbitrary string propert @a property.
      *        get_property("name") works like get_name.
      */
-    const std::string& get_property(const std::string& property) const;
+    std::string get_property(const std::string& property) const;
     /**
      *  @brief Get all properties form transducer.
      */

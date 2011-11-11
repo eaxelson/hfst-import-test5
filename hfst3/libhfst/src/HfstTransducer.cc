@@ -1095,8 +1095,7 @@ HfstTransducer::set_property(const string& property, const string& name)
       }
   }
 
-const string&
-HfstTransducer::get_property(const string& property) const
+string HfstTransducer::get_property(const string& property) const
   {
     if (this->props.find(property) != this->props.end())
       {
@@ -1104,7 +1103,7 @@ HfstTransducer::get_property(const string& property) const
       }
     else
       {
-        return *(new string(""));
+        return "";
       }
   }
 const std::map<string,string>&
