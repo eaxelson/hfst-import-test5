@@ -69,8 +69,8 @@ HfstTransducer constraintComposition( HfstTransducer t, HfstTransducer Constrain
 	HfstTransducer tmp(tInputPr);
 
 	tmp.compose(Constraint).minimize();
-//	printf("first composition \n");
-//	tmp.write_in_att_format(stdout, 1);
+//printf("first composition \n");
+//tmp.write_in_att_format(stdout, 1);
 	tmp.compose(tInputPr).minimize();
 
 
@@ -108,23 +108,36 @@ HfstTransducer constraintComposition( HfstTransducer t, HfstTransducer Constrain
  * 		(same for left context, (.* Cl))
 */
 
-HfstTransducer unconditionalReplace(  HfstTransducerPairVector ContextVector,
+HfstTransducer bracketedReplace(  HfstTransducerPairVector ContextVector,
                                       HfstTransducerPair mappingPair,
-                                      ReplaceType replType)
+                                      ReplaceType replType,
+                                      bool optional)
 {
 	//enum ReplaceType {REPL_UP, REPL_DOWN, REPL_RIGHT, REPL_LEFT};
 	HfstTokenizer TOK;
 	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 	String leftMarker("@_LM_@");
 	String rightMarker("@_RM_@");
+
+	String leftMarker2("@_LM2_@");
+	String rightMarker2("@_RM2_@");
+
+
 	String tmpMarker("@_TMPM_@");
 	TOK.add_multichar_symbol(leftMarker);
 	TOK.add_multichar_symbol(rightMarker);
+	TOK.add_multichar_symbol(leftMarker2);
+		TOK.add_multichar_symbol(rightMarker2);
 	TOK.add_multichar_symbol(tmpMarker);
 
 	HfstTransducer leftBracket(leftMarker, TOK, TYPE);
 	HfstTransducer rightBracket(rightMarker, TOK, TYPE);
+
+	HfstTransducer leftBracket2(leftMarker2, TOK, TYPE);
+	HfstTransducer rightBracket2(rightMarker2, TOK, TYPE);
+
 	HfstTransducer tmpBracket(tmpMarker, TOK, TYPE);
+
 
 //	printf("leftMapping: \n");
 //	leftMapping.write_in_att_format(stdout, 1);
@@ -136,9 +149,6 @@ HfstTransducer unconditionalReplace(  HfstTransducerPairVector ContextVector,
 	HfstTransducer mapping(mappingPair.first);
 	mapping.cross_product(mappingPair.second);
 
-	//printf("mapping: \n");
-	//mapping.write_in_att_format(stdout, 1);
-
 
 	// Surround mapping with brackets
 	HfstTransducer tmpMapping(leftBracket);
@@ -149,14 +159,51 @@ HfstTransducer unconditionalReplace(  HfstTransducerPairVector ContextVector,
 //printf("mappingWithBrackets: \n");
 //mappingWithBrackets.minimize().write_in_att_format(stdout, 1);
 
+
+
+
+
+	// non - optional
+	// mapping = T<a:b>T u T<a:a>T
+
+	//bool optional = true;
+	HfstTransducer mapping2(mappingPair.first);
+
+	// Surround mapping with brackets
+	HfstTransducer tmpMapping2(leftBracket2);
+	tmpMapping2.concatenate(mapping2).concatenate(rightBracket2).minimize();
+	HfstTransducer mappingWithBrackets2(tmpMapping2);
+
+/*
+	// Surround mapping with tmp boudaries
+	HfstTransducer mappingWithBracketsAndTmpBoundary2(tmpBracket);
+	mappingWithBracketsAndTmpBoundary2.concatenate(mappingWithBrackets2).concatenate(tmpBracket).minimize();
+
+	// disjunct can be done before surrounding with tmp boundary...
+	HfstTransducer mappingWithBracketsAndTmpBoundaryDisjunced(mappingWithBracketsAndTmpBoundary);
+	mappingWithBracketsAndTmpBoundaryDisjunced.disjunct(mappingWithBracketsAndTmpBoundary2).minimize();
+*/
+	if ( optional != true )
+	{
+
+// mappingWithBrackets...... expanded
+		mappingWithBrackets.disjunct(mappingWithBrackets2).minimize();
+
+
+
+
+	}
+
+	//printf("mappingWithBrackets after if: \n");
+	//mappingWithBrackets.minimize().write_in_att_format(stdout, 1);
+
 	// Surround mapping with tmp boudaries
 	HfstTransducer mappingWithBracketsAndTmpBoundary(tmpBracket);
 	mappingWithBracketsAndTmpBoundary.concatenate(mappingWithBrackets).concatenate(tmpBracket).minimize();
 
-	//mapping = mappingWithBracketsAndTmpBoundary;
+//printf("mappingWithBracketsAndTmpBoundary: \n");
+//mappingWithBracketsAndTmpBoundary.minimize().write_in_att_format(stdout, 1);
 
-//	printf("mappingWithBracketsAndTmpBoundary: \n");
-//	mappingWithBracketsAndTmpBoundary.minimize().write_in_att_format(stdout, 1);
 
 
 	// Identity pair
@@ -168,6 +215,9 @@ HfstTransducer unconditionalReplace(  HfstTransducerPairVector ContextVector,
 
 	identityExpanded.insert_to_alphabet(leftMarker);
 	identityExpanded.insert_to_alphabet(rightMarker);
+	identityExpanded.insert_to_alphabet(leftMarker2);
+	identityExpanded.insert_to_alphabet(rightMarker2);
+
 	identityExpanded.insert_to_alphabet(tmpMarker);
 
 	identityExpanded.disjunct(mappingWithBrackets).minimize();
@@ -176,25 +226,12 @@ HfstTransducer unconditionalReplace(  HfstTransducerPairVector ContextVector,
 	//printf("identityExpanded: \n");
 	//identityExpanded.write_in_att_format(stdout, 1);
 
-	// .* T<a:b>T :*
-	HfstTransducer unconditionalReplace(identityExpanded);
-	unconditionalReplace.concatenate(mappingWithBracketsAndTmpBoundary).concatenate(identityExpanded).minimize();
+	// .* <a:b> :*
+	HfstTransducer bracketedReplace(identityExpanded);
+	bracketedReplace.concatenate(mappingWithBracketsAndTmpBoundary).concatenate(identityExpanded).minimize();
 
-	//printf("unconditionalReplace: \n");
-	//unconditionalReplace.write_in_att_format(stdout, 1);
-
-
-
-	// enum ReplaceType {REPL_UP, REPL_DOWN, REPL_RIGHT, REPL_LEFT};
-	//ReplaceType replType = REPL_UP;
-	//ReplaceType replType = REPL_RIGHT;
-	//ReplaceType replType = REPL_LEFT;
-	//ReplaceType replType = REPL_DOWN;
-
-
-
-
-
+	//printf("bracketedReplace: \n");
+	//bracketedReplace.write_in_att_format(stdout, 1);
 
 
 	HfstTransducer unionContextReplace(TYPE);
@@ -220,11 +257,15 @@ HfstTransducer unconditionalReplace(  HfstTransducerPairVector ContextVector,
 			ContextVector[i].first = tmp;
 			ContextVector[i].first.insert_freely(leftBracket).minimize();
 			ContextVector[i].first.insert_freely(rightBracket).minimize();
+			ContextVector[i].first.insert_freely(leftBracket2).minimize();
+			ContextVector[i].first.insert_freely(rightBracket2).minimize();
 
 			// Rc =  (Rc .*) << {<,>}
 			ContextVector[i].second.concatenate(identityExpanded).minimize();
 			ContextVector[i].second.insert_freely(leftBracket).minimize();
 			ContextVector[i].second.insert_freely(rightBracket).minimize();
+			ContextVector[i].second.insert_freely(leftBracket2).minimize();
+			ContextVector[i].second.insert_freely(rightBracket2).minimize();
 
 
 			HfstTransducer leftContextExpanded(TYPE);
@@ -294,12 +335,12 @@ HfstTransducer unconditionalReplace(  HfstTransducerPairVector ContextVector,
 	}
 
 	// subtract all mappings in contexts from replace without contexts
-	HfstTransducer replaceWithoutContexts(unconditionalReplace);
+	HfstTransducer replaceWithoutContexts(bracketedReplace);
 	replaceWithoutContexts.subtract(unionContextReplace).minimize();
 
 
 //printf("uncondidtionalTr with tmp marker: \n");
-//unconditionalReplace.write_in_att_format(stdout, 1);
+//bracketedReplace.write_in_att_format(stdout, 1);
 
 
 
@@ -312,8 +353,8 @@ HfstTransducer unconditionalReplace(  HfstTransducerPairVector ContextVector,
 	HfstTransducer uncondidtionalTr(identityExpanded);
 	uncondidtionalTr.subtract(replaceWithoutContexts).minimize();
 
-	//printf("uncondidtionalTr: \n");
-	//uncondidtionalTr.write_in_att_format(stdout, 1);
+//printf("uncondidtionalTr: \n");
+//uncondidtionalTr.write_in_att_format(stdout, 1);
 
 	return uncondidtionalTr;
 
@@ -370,83 +411,6 @@ HfstTransducer constraintsRightPart()
 
 
 
-// [ (<:0 ?+ >:0) | B:B | ? ]*
-HfstTransducer mostBracketsPlusConstraint( HfstTransducer uncondidtionalTr )
-{
-	HfstTokenizer TOK;
-	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-	TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
-
-	String LeftMarker("@_LM_@");
-	String RightMarker("@_RM_@");
-	TOK.add_multichar_symbol(LeftMarker);
-	TOK.add_multichar_symbol(RightMarker);
-
-	HfstTransducer leftBracket(LeftMarker, TOK, TYPE);
-	HfstTransducer rightBracket(RightMarker, TOK, TYPE);
-
-
-	// Identity (normal)
-	HfstTransducer identityPair = HfstTransducer::identity_pair( TYPE );
-	HfstTransducer identity (identityPair);
-	identity.repeat_star().minimize();
-
-	HfstTransducer identityPlus (identityPair);
-	identityPlus.repeat_plus().minimize();
-
-
-
-	// epsilon
-	HfstTransducer epsilon("@_EPSILON_SYMBOL_@", TOK, TYPE);
-	// B
-	HfstTransducer B(leftBracket);
-	B.disjunct(rightBracket).minimize();
-
-	// (B:0)*
-	HfstTransducer bracketsToEpsilonStar(B);
-	bracketsToEpsilonStar.cross_product(epsilon).minimize().repeat_star().minimize();
-
-	// (I-B) and (I-B)+
-	HfstTransducer identityPairMinusBrackets(identityPair);
-	identityPairMinusBrackets.subtract(B).minimize();
-
-	HfstTransducer identityPairMinusBracketsPlus(identityPairMinusBrackets);
-	identityPairMinusBracketsPlus.repeat_plus().minimize();
-
-	HfstTransducer identityPairMinusBracketsStar(identityPairMinusBrackets);
-	identityPairMinusBracketsStar.repeat_star().minimize();
-
-
-	HfstTransducer LeftBracketToEpsilon(LeftMarker, "@_EPSILON_SYMBOL_@", TOK, TYPE);
-	HfstTransducer RightBracketToEpsilon(RightMarker, "@_EPSILON_SYMBOL_@", TOK, TYPE);
-
-
-	// [ (<:0 ?+ >:0) | B:B | ? ]*
-
-	HfstTransducer Constraint(LeftBracketToEpsilon);
-	Constraint.concatenate(identityPlus).concatenate(RightBracketToEpsilon).minimize();
-	Constraint.disjunct(B).minimize().disjunct(identityPair).minimize();
-//	Constraint.disjunct(identityPair).minimize();
-	Constraint.repeat_star().minimize();
-
-
-//printf("Constraint: \n");
-//Constraint.write_in_att_format(stdout, 1);
-
-
-	//// Compose with unconditional replace transducer
-	// tmp = t.1 .o. Constr .o. t.1
-	// (t.1 - tmp.2) .o. t
-
-	HfstTransducer retval(TYPE);
-	retval = constraintComposition(uncondidtionalTr, Constraint);
-
-
-//printf("Constraint: \n");
-//Constraint.write_in_att_format(stdout, 1);
-	return retval;
-
-}
 
 
 
@@ -740,72 +704,204 @@ HfstTransducer shortestMatchLeftMostConstraint( HfstTransducer uncondidtionalTr 
 
 }
 
+
+// ?* [ BL:0 (?-B)+ BR:0 ?* ]+
+HfstTransducer mostBracketsPlusConstraint( HfstTransducer uncondidtionalTr )
+{
+	HfstTokenizer TOK;
+	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+
+	String leftMarker("@_LM_@");
+	String rightMarker("@_RM_@");
+	String leftMarker2("@_LM2_@");
+	String rightMarker2("@_RM2_@");
+	TOK.add_multichar_symbol(leftMarker);
+	TOK.add_multichar_symbol(rightMarker);
+	TOK.add_multichar_symbol(leftMarker2);
+	TOK.add_multichar_symbol(rightMarker2);
+
+	HfstTransducer leftBracket(leftMarker, TOK, TYPE);
+	HfstTransducer rightBracket(rightMarker, TOK, TYPE);
+
+	HfstTransducer leftBracket2(leftMarker2, TOK, TYPE);
+	HfstTransducer rightBracket2(rightMarker2, TOK, TYPE);
+
+
+	// Identity (normal)
+	HfstTransducer identityPair = HfstTransducer::identity_pair( TYPE );
+	HfstTransducer identity (identityPair);
+	identity.repeat_star().minimize();
+
+	HfstTransducer identityPlus (identityPair);
+	identityPlus.repeat_plus().minimize();
+
+
+	HfstTransducer identityStar (identityPair);
+	identityStar.repeat_star().minimize();
+
+
+	// epsilon
+	String epsilon("@_EPSILON_SYMBOL_@");
+
+	// BL:0 ( <1 : 0, <2 : 0)
+	HfstTransducer leftBracketToEpsilon(leftMarker, epsilon, TOK, TYPE );
+	HfstTransducer leftBracket2ToEpsilon(leftMarker2, epsilon, TOK, TYPE );
+	HfstTransducer allLeftBracketsToEpsilon(leftBracketToEpsilon);
+	allLeftBracketsToEpsilon.disjunct(leftBracket2ToEpsilon).minimize();
+
+
+//	printf("allLeftBracketsToEpsilon: \n");
+//	allLeftBracketsToEpsilon.write_in_att_format(stdout, 1);
+
+	// BR:0 ( >1 : 0, >2 : 0)
+	HfstTransducer rightBracketToEpsilon(rightMarker, epsilon, TOK, TYPE );
+	HfstTransducer rightBracket2ToEpsilon(rightMarker2, epsilon, TOK, TYPE );
+	HfstTransducer allRightBracketsToEpsilon(rightBracketToEpsilon);
+	allRightBracketsToEpsilon.disjunct(rightBracket2ToEpsilon).minimize();
+
+	// B (B1 | B2)
+	HfstTransducer B(leftBracket);
+	B.disjunct(rightBracket).minimize();
+	B.disjunct(leftBracket2).minimize();
+	B.disjunct(rightBracket2).minimize();
+
+
+
+	// (? - B)+
+	HfstTransducer identityPairMinusBracketsPlus(identityPair);
+	identityPairMinusBracketsPlus.subtract(B).minimize().repeat_plus().minimize();
+
+	// repeatingPart ( BL:0 (?-B)+ BR:0 ?* )+
+	HfstTransducer repeatingPart(allLeftBracketsToEpsilon);
+	repeatingPart.concatenate(identityPairMinusBracketsPlus).minimize();
+	repeatingPart.concatenate(allRightBracketsToEpsilon).minimize();
+	repeatingPart.concatenate(identityStar).minimize();
+	repeatingPart.repeat_plus().minimize();
+//printf("middlePart: \n");
+//middlePart.write_in_att_format(stdout, 1);
+
+
+
+	HfstTransducer Constraint(identityStar);
+	Constraint.concatenate(repeatingPart).minimize();
+
+
+//printf("Constraint: \n");
+//Constraint.write_in_att_format(stdout, 1);
+
+
+	//// Compose with unconditional replace transducer
+	// tmp = t.1 .o. Constr .o. t.1
+	// (t.1 - tmp.2) .o. t
+
+	HfstTransducer retval(TYPE);
+	retval = constraintComposition(uncondidtionalTr, Constraint);
+
+
+//printf("After composition: \n");
+//retval.write_in_att_format(stdout, 1);
+
+	return retval;
+
+}
+
+// ?* B2 ?*
+HfstTransducer removeB2Constraint( HfstTransducer t )
+{
+	HfstTokenizer TOK;
+	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+
+
+	String leftMarker2("@_LM2_@");
+	String rightMarker2("@_RM2_@");
+
+	TOK.add_multichar_symbol(leftMarker2);
+	TOK.add_multichar_symbol(rightMarker2);
+
+	HfstTransducer leftBracket2(leftMarker2, TOK, TYPE);
+	HfstTransducer rightBracket2(rightMarker2, TOK, TYPE);
+
+
+	// Identity (normal)
+	HfstTransducer identityPair = HfstTransducer::identity_pair( TYPE );
+	HfstTransducer identity (identityPair);
+	identity.repeat_star().minimize();
+
+	HfstTransducer identityStar (identityPair);
+	identityStar.repeat_star().minimize();
+
+	// B (B2)
+	HfstTransducer B(leftBracket2);
+	B.disjunct(rightBracket2).minimize();
+
+
+	HfstTransducer Constraint(identityStar);
+	Constraint.concatenate(B).minimize();
+	Constraint.concatenate(identityStar).minimize();
+
+
+	//// Compose with unconditional replace transducer
+	// tmp = t.1 .o. Constr .o. t.1
+	// (t.1 - tmp.2) .o. t
+
+	HfstTransducer retval(TYPE);
+	retval = constraintComposition(t, Constraint);
+
+
+//printf("Remove B2 After composition: \n");
+//retval.write_in_att_format(stdout, 1);
+
+	return retval;
+
+}
+
 //---------------------------------
-//	REPLACE FUNCTIONS
+//	REPLACE FUNCTIONS - INTERFACE
 //---------------------------------
 
-HfstTransducer replace_unconditional_optional( HfstTransducerPairVector ContextVector,
-												HfstTransducerPair mappingPair,
-												ReplaceType replType)
+// replace up, left, right, down
+HfstTransducer replace(	HfstTransducerPairVector context,
+						HfstTransducerPair mapping,
+						ReplaceType replType,
+						bool optional)
 {
-	HfstTransducer retval = unconditionalReplace(ContextVector, mappingPair, replType);
+	HfstTransducer retval(TYPE);
+
+	retval = bracketedReplace(context, mapping, replType, optional);
+
+
+	if ( !optional )
+	{
+		retval = mostBracketsPlusConstraint(retval);
+		retval = removeB2Constraint(retval);
+
+	}
+
 	retval = removeMarkers( retval );
 	return retval;
 }
-
-
-// non optional replace
-//(only for up and left!)
-HfstTransducer replace_non_optional( HfstTransducerPairVector ContextVector,
-								HfstTransducerPair mappingPair,
-								ReplaceType replType)
+// replace without context, default is REPL_UP
+HfstTransducer replace(	HfstTransducerPair mapping, bool optional)
 {
 
-	HfstTransducer uncondidtionalTr(TYPE);
-	uncondidtionalTr = unconditionalReplace(ContextVector, mappingPair, replType);
+	HfstTokenizer TOK;
+	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
+	HfstTransducerPair contextPair(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, TYPE), HfstTransducer("@_EPSILON_SYMBOL_@", TOK, TYPE));
+	HfstTransducerPairVector context;
+	context.push_back(contextPair);
 
+	HfstTransducer retval(TYPE);
+	retval = bracketedReplace(context, mapping, REPL_UP, optional);
 
-	HfstTransducer retval (TYPE);
-
-
-	if ( replType == REPL_UP )
+	if ( !optional )
 	{
-		//printf("up\n");
-
-
-		retval = uncondidtionalTr;
-	}
-	else if ( replType == REPL_RIGHT )
-	{
-		//printf("right\n");
-		retval = leftMostConstraint(uncondidtionalTr);
-
+		retval = mostBracketsPlusConstraint(retval);
+		retval = removeB2Constraint(retval);
 
 	}
-	else if ( replType == REPL_LEFT )
-	{
-		//printf("LLLLL\n");
-		retval = rightMostConstraint(uncondidtionalTr);
-
-
-	}
-	else if ( replType == REPL_DOWN )
-	{
-		//printf("DOWN\n");
-
-		retval = mostBracketsPlusConstraint(uncondidtionalTr);
-		// TODO
-	}
-//printf("leftMostConstraint before remove markers: \n");
-//retval.write_in_att_format(stdout, 1);
 
 	retval = removeMarkers( retval );
-
-	//printf("leftMostConstraint: \n");
-	//retval.write_in_att_format(stdout, 1);
-
-
 	return retval;
 }
 
@@ -816,7 +912,7 @@ HfstTransducer replace_leftmost_longest_match( HfstTransducerPairVector ContextV
 {
 
 	HfstTransducer uncondidtionalTr(TYPE);
-	uncondidtionalTr = unconditionalReplace(ContextVector, mappingPair, replType);
+	uncondidtionalTr = bracketedReplace(ContextVector, mappingPair, replType, true);
 
 	HfstTransducer retval (TYPE);
 	retval = leftMostConstraint(uncondidtionalTr);
@@ -840,7 +936,7 @@ HfstTransducer replace_rightmost_longest_match( HfstTransducerPairVector Context
 {
 
 	HfstTransducer uncondidtionalTr(TYPE);
-	uncondidtionalTr = unconditionalReplace(ContextVector, mappingPair, replType);
+	uncondidtionalTr = bracketedReplace(ContextVector, mappingPair, replType, true);
 
 	HfstTransducer retval (TYPE);
 	retval = rightMostConstraint(uncondidtionalTr);
@@ -863,7 +959,7 @@ HfstTransducer replace_leftmost_shortest_match( HfstTransducerPairVector Context
 {
 
 	HfstTransducer uncondidtionalTr(TYPE);
-	uncondidtionalTr = unconditionalReplace(ContextVector, mappingPair, replType);
+	uncondidtionalTr = bracketedReplace(ContextVector, mappingPair, replType, true);
 
 	HfstTransducer retval (TYPE);
 	retval = leftMostConstraint(uncondidtionalTr);
@@ -880,111 +976,6 @@ HfstTransducer replace_leftmost_shortest_match( HfstTransducerPairVector Context
 
 
 
-//---------------------------------
-//	REPLACE FUNCTIONS - INTERFACE
-//---------------------------------
-
-HfstTransducer replace_up( HfstTransducerPairVector context,
-                           HfstTransducerPair mapping,
-                           bool optional)
-{
-	if ( optional )
-		return replace_unconditional_optional(context, mapping, REPL_UP);
-	else
-		return replace_non_optional(context, mapping, REPL_UP);
-}
-HfstTransducer replace_up( HfstTransducerPair mapping,
-                           bool optional)
-{
-	HfstTokenizer TOK;
-	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-
-	HfstTransducerPair Context(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, TYPE), HfstTransducer("@_EPSILON_SYMBOL_@", TOK, TYPE));
-	HfstTransducerPairVector ContextVector;
-	ContextVector.push_back(Context);
-
-	if ( optional )
-			return replace_unconditional_optional(ContextVector, mapping, REPL_UP);
-	else
-			return replace_non_optional(ContextVector, mapping, REPL_UP);
-}
-
-HfstTransducer replace_left( HfstTransducerPairVector context,
-                           HfstTransducerPair mapping,
-                           bool optional)
-{
-	if ( optional )
-		return replace_unconditional_optional(context, mapping, REPL_LEFT);
-	else
-		return replace_non_optional(context, mapping, REPL_LEFT);
-}
-HfstTransducer replace_left( HfstTransducerPair mapping,
-                           bool optional)
-{
-	HfstTokenizer TOK;
-	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-
-	HfstTransducerPair Context(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, TYPE), HfstTransducer("@_EPSILON_SYMBOL_@", TOK, TYPE));
-	HfstTransducerPairVector ContextVector;
-	ContextVector.push_back(Context);
-
-	if ( optional )
-			return replace_unconditional_optional(ContextVector, mapping, REPL_LEFT);
-	else
-			return replace_non_optional(ContextVector, mapping, REPL_LEFT);
-}
-
-HfstTransducer replace_right( HfstTransducerPairVector context,
-                           HfstTransducerPair mapping,
-                           bool optional)
-{
-	if ( optional )
-		return replace_unconditional_optional(context, mapping, REPL_RIGHT);
-	else
-		return replace_non_optional(context, mapping, REPL_RIGHT);
-}
-HfstTransducer replace_right( HfstTransducerPair mapping,
-                           bool optional)
-{
-	HfstTokenizer TOK;
-	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-
-	HfstTransducerPair Context(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, TYPE), HfstTransducer("@_EPSILON_SYMBOL_@", TOK, TYPE));
-	HfstTransducerPairVector ContextVector;
-	ContextVector.push_back(Context);
-
-	if ( optional )
-			return replace_unconditional_optional(ContextVector, mapping, REPL_RIGHT);
-	else
-			return replace_non_optional(ContextVector, mapping, REPL_RIGHT);
-}
-
-HfstTransducer replace_down( HfstTransducerPairVector context,
-                           HfstTransducerPair mapping,
-                           bool optional)
-{
-	if ( optional )
-		return replace_unconditional_optional(context, mapping, REPL_DOWN);
-	else
-		return replace_non_optional(context, mapping, REPL_DOWN);
-}
-HfstTransducer replace_down( HfstTransducerPair mapping,
-                           bool optional)
-{
-	HfstTokenizer TOK;
-	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-
-	HfstTransducerPair Context(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, TYPE), HfstTransducer("@_EPSILON_SYMBOL_@", TOK, TYPE));
-	HfstTransducerPairVector ContextVector;
-	ContextVector.push_back(Context);
-
-	if ( optional )
-			return replace_unconditional_optional(ContextVector, mapping, REPL_DOWN);
-	else
-			return replace_non_optional(ContextVector, mapping, REPL_DOWN);
-}
-
-
 
 
 
@@ -998,7 +989,7 @@ HfstTransducer replace_down( HfstTransducerPair mapping,
 
 void test6()
 {
-printf("Test 6\n");
+//printf("Test 6\n");
 
 	HfstTokenizer TOK;
 	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
@@ -1009,19 +1000,20 @@ printf("Test 6\n");
 	TOK.add_multichar_symbol(RightMarker);
 
 	// Mapping
-	HfstTransducer leftMapping("aa", TOK, TYPE);
+	HfstTransducer leftMapping("ab", TOK, TYPE);
 	HfstTransducer rightMapping("x", TOK, TYPE);
 
 	HfstTransducerPair mappingPair(leftMapping, rightMapping);
 
 	// Context
 	// TODO: context -> transducer pair set
-	HfstTransducerPair Context(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, TYPE), HfstTransducer("@_EPSILON_SYMBOL_@", TOK, TYPE));
+	//HfstTransducerPair Context(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, TYPE), HfstTransducer("@_EPSILON_SYMBOL_@", TOK, TYPE));
+	HfstTransducerPair Context(HfstTransducer("ab", TOK, TYPE), HfstTransducer("a", TOK, TYPE));
 
 	HfstTransducerPairVector ContextVector;
 	ContextVector.push_back(Context);
 
-	HfstTransducer input1("aaa", TOK, TYPE);
+	HfstTransducer input1("abababa", TOK, TYPE);
 
 
 	// results:
@@ -1034,21 +1026,26 @@ printf("Test 6\n");
 
 	HfstTransducer replaceTrUp(TYPE);
 
+	HfstTransducer tmp2(TYPE);
+/*
 	// optional
-	replaceTrUp 	= replace_up(ContextVector, mappingPair, true);
+	replaceTrUp 	= replace(ContextVector, mappingPair, REPL_UP, true);
 
 	// Unconditional optional replace
-	HfstTransducer tmp2(TYPE);
+
 	tmp2 = input1;
 	tmp2.compose(replaceTrUp).minimize();
 //printf("Unconditional optional replace 6 up: \n");
 //tmp2.write_in_att_format(stdout, 1);
 //	assert(tmp2.compare(result3));
-
+*/
 
 
 	// Non optional
-	replaceTrUp		= replace_up(ContextVector, mappingPair, false);
+	replaceTrUp		= replace(ContextVector, mappingPair, REPL_RIGHT, false);
+
+	//printf("Replace right: \n");
+	//replaceTrUp.write_in_att_format(stdout, 1);
 
 
 	tmp2 = input1;
@@ -1136,10 +1133,10 @@ void test2()
 	HfstTransducer replaceTrDown(TYPE);
 
 	// Unconditional optional replace
-	replaceTrUp 	= replace_up(ContextVector, mappingPair, true);
-	replaceTrLeft 	= replace_left(ContextVector, mappingPair, true);
-	replaceTrRight	= replace_right(ContextVector, mappingPair, true);
-	replaceTrDown	= replace_down(ContextVector, mappingPair, true);
+	replaceTrUp 	= replace(ContextVector, mappingPair, REPL_UP, true);
+	replaceTrLeft 	= replace(ContextVector, mappingPair, REPL_LEFT, true);
+	replaceTrRight	= replace(ContextVector, mappingPair, REPL_RIGHT, true);
+	replaceTrDown	= replace(ContextVector, mappingPair, REPL_DOWN, true);
 
 
 	HfstTransducer tmp2(TYPE);
@@ -1173,18 +1170,24 @@ void test2()
 
 	// Non optional replacements
 
-	replaceTrUp 	= replace_up(ContextVector, mappingPair, false);
-	//replaceTrLeft 	= replace_left(ContextVector, mappingPair, false);
-	//replaceTrRight	= replace_right(ContextVector, mappingPair, false);
-	//replaceTrDown	= replace_down(ContextVector, mappingPair, false);
+	HfstTransducer a(TYPE);
 
+	a = replace(ContextVector, mappingPair, REPL_UP, false);
+	replaceTrUp 	= replace(ContextVector, mappingPair, REPL_UP, false);
+	replaceTrLeft 	= replace(ContextVector, mappingPair, REPL_LEFT, false);
+	replaceTrRight	= replace(ContextVector, mappingPair, REPL_RIGHT, false);
+	replaceTrDown	= replace(ContextVector, mappingPair, REPL_DOWN, false);
+
+	//printf("a: \n");
+	//replaceTrUp.write_in_att_format(stdout, 1);
 
 	tmp2 = input1;
 	tmp2.compose(replaceTrUp).minimize();
 	//printf("input 1 repl U: \n");
 	//tmp2.write_in_att_format(stdout, 1);
 	assert(tmp2.compare(result2));
-/*
+
+	/*
 //TODO left
 // axa i aaxa
 	tmp2 = input1;
@@ -1300,10 +1303,10 @@ void test4a()
 	HfstTransducer replaceTrDown(TYPE);
 
 	// optional
-	replaceTrUp 	= replace_up(ContextVector, mappingPair, true);
-	replaceTrLeft 	= replace_left(ContextVector, mappingPair, true);
-	replaceTrRight	= replace_right(ContextVector, mappingPair, true);
-	replaceTrDown	= replace_down(ContextVector, mappingPair, true);
+	replaceTrUp 	= replace(ContextVector, mappingPair, REPL_UP, true);
+	replaceTrLeft 	= replace(ContextVector, mappingPair, REPL_LEFT, true);
+	replaceTrRight	= replace(ContextVector, mappingPair, REPL_RIGHT, true);
+	replaceTrDown	= replace(ContextVector, mappingPair, REPL_DOWN, true);
 
 
 	// Unconditional optional replace
@@ -1317,8 +1320,8 @@ void test4a()
 
 	tmp2 = input1;
 	tmp2.compose(replaceTrLeft).minimize();
-printf("Unconditional optional replace 4a L: \n");
-tmp2.write_in_att_format(stdout, 1);
+//printf("Unconditional optional replace 4a L: \n");
+//tmp2.write_in_att_format(stdout, 1);
 //	assert(tmp2.compare(result3));
 
 
@@ -1333,10 +1336,10 @@ tmp2.write_in_att_format(stdout, 1);
 
 
 	// Non optional
-	replaceTrUp		= replace_up(ContextVector, mappingPair, false);
-	replaceTrLeft	= replace_left(ContextVector, mappingPair, false);
-	replaceTrRight	= replace_right(ContextVector, mappingPair, false);
-	replaceTrDown	= replace_down(ContextVector, mappingPair, false);
+	replaceTrUp 	= replace(ContextVector, mappingPair, REPL_UP, false);
+	replaceTrLeft 	= replace(ContextVector, mappingPair, REPL_LEFT, false);
+	replaceTrRight	= replace(ContextVector, mappingPair, REPL_RIGHT, false);
+	replaceTrDown	= replace(ContextVector, mappingPair, REPL_DOWN, false);
 
 	tmp2 = input1;
 	tmp2.compose(replaceTrUp).minimize();
@@ -1346,8 +1349,8 @@ tmp2.write_in_att_format(stdout, 1);
 
 	tmp2 = input1;
 	tmp2.compose(replaceTrLeft).minimize();
-printf("Replace left: \n");
-tmp2.write_in_att_format(stdout, 1);
+//printf("Replace left: \n");
+//tmp2.write_in_att_format(stdout, 1);
 	assert(tmp2.compare(result2));
 
 	tmp2 = input1;
@@ -1403,10 +1406,10 @@ void test4b()
 	HfstTransducer replaceTrDown(TYPE);
 
 	// optional
-	replaceTrUp 	= replace_up(ContextVector, mappingPair, true);
-	replaceTrLeft 	= replace_left(ContextVector, mappingPair, true);
-	replaceTrRight	= replace_right(ContextVector, mappingPair, true);
-	replaceTrDown	= replace_down(ContextVector, mappingPair, true);
+	replaceTrUp 	= replace(ContextVector, mappingPair, REPL_UP, true);
+	replaceTrLeft 	= replace(ContextVector, mappingPair, REPL_LEFT, true);
+	replaceTrRight	= replace(ContextVector, mappingPair, REPL_RIGHT, true);
+	replaceTrDown	= replace(ContextVector, mappingPair, REPL_DOWN, true);
 
 	HfstTransducer input1("abbb", TOK, TYPE);
 
@@ -1425,10 +1428,10 @@ void test4b()
 	assert(tmp2.compare(result3));
 
 	// Non optional
-	replaceTrUp		= replace_up(ContextVector, mappingPair, false);
-	replaceTrLeft	= replace_left(ContextVector, mappingPair, false);
-	replaceTrRight	= replace_right(ContextVector, mappingPair, false);
-	replaceTrDown	= replace_down(ContextVector, mappingPair, false);
+	replaceTrUp 	= replace(ContextVector, mappingPair, REPL_UP, false);
+	replaceTrLeft 	= replace(ContextVector, mappingPair, REPL_LEFT, false);
+	replaceTrRight	= replace(ContextVector, mappingPair, REPL_RIGHT, false);
+	replaceTrDown	= replace(ContextVector, mappingPair, REPL_DOWN, false);
 
 
 
@@ -1509,10 +1512,10 @@ void test4c()
 
 
 	// optional
-	replaceTrUp 	= replace_up(ContextVector, mappingPair, true);
-	replaceTrLeft 	= replace_left(ContextVector, mappingPair, true);
-	replaceTrRight	= replace_right(ContextVector, mappingPair, true);
-	replaceTrDown	= replace_down(ContextVector, mappingPair, true);
+	replaceTrUp 	= replace(ContextVector, mappingPair, REPL_UP, true);
+	replaceTrLeft 	= replace(ContextVector, mappingPair, REPL_LEFT, true);
+	replaceTrRight	= replace(ContextVector, mappingPair, REPL_RIGHT, true);
+	replaceTrDown	= replace(ContextVector, mappingPair, REPL_DOWN, true);
 
 	HfstTransducer tmp2(TYPE);
 
@@ -1546,10 +1549,10 @@ void test4c()
 
 
 	// non optional
-	replaceTrUp		= replace_up(ContextVector, mappingPair, false);
-	replaceTrLeft	= replace_left(ContextVector, mappingPair, false);
-	replaceTrRight	= replace_right(ContextVector, mappingPair, false);
-	replaceTrDown	= replace_down(ContextVector, mappingPair, false);
+	replaceTrUp 	= replace(ContextVector, mappingPair, REPL_UP, false);
+	replaceTrLeft 	= replace(ContextVector, mappingPair, REPL_LEFT, false);
+	replaceTrRight	= replace(ContextVector, mappingPair, REPL_RIGHT, false);
+	replaceTrDown	= replace(ContextVector, mappingPair, REPL_DOWN, false);
 
 	//printf("non-optional 4c: \n");
 
@@ -1624,7 +1627,7 @@ void test3c()
 
 	// Unconditional  optional replace
 	HfstTransducer replaceTr(TYPE);
-	replaceTr = replace_unconditional_optional(ContextVector, mappingPair, REPL_UP);
+	replaceTr = replace(ContextVector, mappingPair, REPL_UP, true);
 
 	HfstTransducer tmp2(TYPE);
 	tmp2 = input1;
@@ -1676,7 +1679,7 @@ void test3b()
 
 	// Unconditional  optional replace
 	HfstTransducer replaceTr(TYPE);
-	replaceTr = replace_unconditional_optional(ContextVector, mappingPair, REPL_UP);
+	replaceTr = replace(ContextVector, mappingPair, REPL_UP, true);
 
 	HfstTransducer tmp2(TYPE);
 	tmp2 = input1;
@@ -1724,7 +1727,7 @@ void test3a()
 
 	// Unconditional  optional replace
 	HfstTransducer replaceTr(TYPE);
-	replaceTr = replace_unconditional_optional(ContextVector, mappingPair, REPL_UP);
+	replaceTr = replace(ContextVector, mappingPair, REPL_UP, true);
 
 	HfstTransducer tmp2(TYPE);
 	tmp2 = input1;
@@ -1771,7 +1774,7 @@ void test3d()
 
 	// Unconditional  optional replace
 	HfstTransducer replaceTr(TYPE);
-	replaceTr = replace_unconditional_optional(ContextVector, mappingPair, REPL_UP);
+	replaceTr = replace(ContextVector, mappingPair, REPL_UP, true);
 
 	HfstTransducer tmp2(TYPE);
 	tmp2 = input1;
@@ -1782,201 +1785,7 @@ void test3d()
 
 }
 
-/*
 
-// a+ -> x || a _ a
-// a+ -> x // a _ a
-// a+ -> x \\ a _ a
-// a+ -> x \/ a _ a
-void test2()
-{
-
-	HfstTokenizer TOK;
-	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-	TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
-	TOK.add_multichar_symbol("@_IDENTITY_SYMBOL_@");
-
-	String LeftMarker("@_LM_@");
-	String RightMarker("@_RM_@");
-	TOK.add_multichar_symbol(LeftMarker);
-	TOK.add_multichar_symbol(RightMarker);
-
-	// Mapping
-	HfstTransducer leftMapping("a", TOK, TYPE);
-	leftMapping.repeat_plus().minimize();
-	HfstTransducer rightMapping("x", TOK, TYPE);
-
-	HfstTransducerPair mappingPair(leftMapping, rightMapping);
-
-	// Context
-	HfstTransducerPair Context(HfstTransducer("a", TOK, TYPE), HfstTransducer("a", TOK, TYPE));
-
-	HfstTransducerPairVector ContextVector;
-	ContextVector.push_back(Context);
-
-
-	HfstTransducer input1("aaaa", TOK, TYPE);
-	HfstTransducer input2("aaaaabaaaa", TOK, TYPE);
-	HfstTransducer input3("aaaaabaaaacaaaa", TOK, TYPE);
-
-	// results:
-
-	HfstTransducer result1("aaaa", TOK, TYPE);
-	HfstTransducer r1tmp("aaaa","ax@_EPSILON_SYMBOL_@a",TOK, TYPE);
-	HfstTransducer r2tmp("aaaa","axaa",TOK, TYPE);
-	HfstTransducer r3tmp("aaaa","aaxa",TOK, TYPE);
-	HfstTransducer r4tmp("aaaa","axxa",TOK, TYPE);
-
-	result1.disjunct(r1tmp).minimize().disjunct(r2tmp).minimize().disjunct(r3tmp).minimize();
-	HfstTransducer result8(result1);
-	result8.disjunct(r4tmp).minimize();
-
-	HfstTransducer result2(r1tmp);
-	result2.disjunct(r4tmp).minimize();
-
-	HfstTransducer result3(r1tmp);
-
-	HfstTransducer result9(r1tmp);
-	result9.disjunct(r2tmp).minimize();
-
-	HfstTransducer result10(r1tmp);
-	result10.disjunct(r3tmp).minimize();
-
-	HfstTransducer result4("aaaaabaaaa","ax@_EPSILON_SYMBOL_@@_EPSILON_SYMBOL_@abax@_EPSILON_SYMBOL_@a",TOK, TYPE);
-	HfstTransducer result5("aaaaabaaaa","axxxabaxxa",TOK, TYPE);
-
-	HfstTransducer result6("aaaaabaaaacaaaa","ax@_EPSILON_SYMBOL_@@_EPSILON_SYMBOL_@abax@_EPSILON_SYMBOL_@acax@_EPSILON_SYMBOL_@a",TOK, TYPE);
-	HfstTransducer result7("aaaaabaaaacaaaa","axxxabaxxacaxxa",TOK, TYPE);
-
-
-
-
-
-
-	HfstTransducer replaceTrUp(TYPE);
-	HfstTransducer replaceTrLeft(TYPE);
-	HfstTransducer replaceTrRight(TYPE);
-	HfstTransducer replaceTrDown(TYPE);
-
-	// Unconditional optional replace
-	replaceTrUp 	= replace_up(ContextVector, mappingPair, true);
-	replaceTrLeft 	= replace_left(ContextVector, mappingPair, true);
-	replaceTrRight	= replace_right(ContextVector, mappingPair, true);
-	replaceTrDown	= replace_down(ContextVector, mappingPair, true);
-
-
-	HfstTransducer tmp2(TYPE);
-	tmp2 = input1;
-	tmp2.compose(replaceTrUp).minimize();
-	//printf("Unconditional optional replace: \n");
-	//tmp2.write_in_att_format(stdout, 1);
-	assert(tmp2.compare(result8));
-
-	tmp2 = input1;
-	tmp2.compose(replaceTrLeft).minimize();
-printf("Unconditional optional replace L: \n");
-tmp2.write_in_att_format(stdout, 1);
-	assert(tmp2.compare(result1));
-
-	tmp2 = input1;
-	tmp2.compose(replaceTrRight).minimize();
-	//printf("Unconditional optional replace R: \n");
-	//tmp2.write_in_att_format(stdout, 1);
-	assert(tmp2.compare(result1));
-
-	tmp2 = input1;
-	tmp2.compose(replaceTrDown).minimize();
-	//printf("Unconditional optional replace D: \n");
-	//tmp2.write_in_att_format(stdout, 1);
-	assert(tmp2.compare(result1));
-
-
-
-
-
-	// Non optional replacements
-
-	replaceTrUp 	= replace_up(ContextVector, mappingPair, false);
-	replaceTrLeft 	= replace_left(ContextVector, mappingPair, false);
-	replaceTrRight	= replace_right(ContextVector, mappingPair, false);
-	//replaceTrDown	= replace_down(ContextVector, mappingPair, false);
-
-
-	tmp2 = input1;
-	tmp2.compose(replaceTrUp).minimize();
-	//printf("input 1 repl U: \n");
-	//tmp2.write_in_att_format(stdout, 1);
-	assert(tmp2.compare(result2));
-
-//TODO left
-// axa i aaxa
-	tmp2 = input1;
-	tmp2.compose(replaceTrLeft).minimize();
-printf("input 1 repl L: \n");
-tmp2.write_in_att_format(stdout, 1);
-	assert(tmp2.compare(result10));
-
-
-	tmp2 = input1;
-	tmp2.compose(replaceTrRight).minimize();
-	//printf("input 1 repl R: \n");
-	//tmp2.write_in_att_format(stdout, 1);
-	assert(tmp2.compare(result9));
-
-	//TODO: down
-
-
-
-	//	printf(".... Left most longest match replace ....\n");
-	// Left most longest match Constraint test
-
-	HfstTransducer replaceTr(TYPE);
-	replaceTr = replace_leftmost_longest_match(ContextVector, mappingPair, REPL_UP);
-
-	tmp2 = input1;
-	tmp2.compose(replaceTr).minimize();
-	//	printf("leftmost longest match: \n");
-	//	tmp2.write_in_att_format(stdout, 1);
-	assert(tmp2.compare(result3));
-
-	tmp2 = input2;
-	tmp2.compose(replaceTr).minimize();
-	//printf("input2 longest m: \n");
-	//tmp2.write_in_att_format(stdout, 1);
-	assert(tmp2.compare(result4));
-
-	tmp2 = input3;
-	tmp2.compose(replaceTr).minimize();
-	//printf("input2 longest m: \n");
-	//tmp2.write_in_att_format(stdout, 1);
-	assert(tmp2.compare(result6));
-
-
-
-	// replace_leftmost_shortest_match
-	// Left most shortest match Constraint test
-
-	replaceTr = replace_leftmost_shortest_match(ContextVector, mappingPair, REPL_UP);
-
-	tmp2 = input1;
-	tmp2.compose(replaceTr).minimize();
-	//	printf("shortest match 1: \n");
-	//	tmp2.write_in_att_format(stdout, 1);
-	assert(tmp2.compare(r4tmp));
-
-	tmp2 = input2;
-	tmp2.compose(replaceTr).minimize();
-	//	printf("shortest match 2: \n");
-	//	tmp2.write_in_att_format(stdout, 1);
-	assert(tmp2.compare(result5));
-
-	tmp2 = input3;
-	tmp2.compose(replaceTr).minimize();
-	//printf("shortest match 2: \n");
-	//tmp2.write_in_att_format(stdout, 1);
-	assert(tmp2.compare(result7));
-}
-*/
 // ab->x  ab_a
 void test1()
 {
@@ -2012,7 +1821,7 @@ void test1()
 
 	// Unconditional  optional replace
 	HfstTransducer replaceTr(TYPE);
-	replaceTr = replace_unconditional_optional(ContextVector, mappingPair, REPL_UP);
+	replaceTr = replace(ContextVector, mappingPair, REPL_UP, true);
 
 	HfstTransducer tmp2(TYPE);
 	tmp2 = input1;
@@ -2024,7 +1833,7 @@ void test1()
 
 	//replace up non optional
 	// Left most optional
-	replaceTr = replace_non_optional(ContextVector, mappingPair, REPL_UP);
+	replaceTr = replace(ContextVector, mappingPair, REPL_UP, false);
 	tmp2 = input1;
 	tmp2.compose(replaceTr).minimize();
 	//printf("left most: \n");
@@ -2080,7 +1889,7 @@ void test1b()
 
 	// Unconditional  optional replace
 	HfstTransducer replaceTr(TYPE);
-	replaceTr = replace_unconditional_optional(ContextVector, mappingPair, REPL_UP);
+	replaceTr = replace(ContextVector, mappingPair, REPL_UP, true);
 
 	HfstTransducer tmp2(TYPE);
 	tmp2 = input1;
@@ -2090,8 +1899,8 @@ void test1b()
 	assert(tmp2.compare(result1));
 
 
-	// Left most
-	replaceTr = replace_non_optional(ContextVector, mappingPair, REPL_UP);
+	// non optional
+	replaceTr = replace(ContextVector, mappingPair, REPL_UP, false);
 	tmp2 = input1;
 	tmp2.compose(replaceTr).minimize();
 	//printf("left most: \n");
@@ -2123,105 +1932,6 @@ void test1b()
 }
 
 
-void test5a()
-{
-
-	HfstTokenizer TOK;
-	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-
-	String LeftMarker("@_LM_@");
-	String RightMarker("@_RM_@");
-	TOK.add_multichar_symbol(LeftMarker);
-	TOK.add_multichar_symbol(RightMarker);
-
-	// Mapping
-
-	HfstTransducer aPlus("a", TOK, TYPE);
-	aPlus.repeat_plus().minimize();
-	HfstTransducer bPlus("b", TOK, TYPE);
-	bPlus.repeat_plus().minimize();
-
-	HfstTransducer aPlusbPlus(aPlus);
-	aPlusbPlus.concatenate(bPlus).minimize();
-
-	HfstTransducer bPlusaPlus(bPlus);
-	bPlusaPlus.concatenate(aPlus).minimize();
-
-	HfstTransducer leftMapping(aPlusbPlus);
-	leftMapping.disjunct(bPlusaPlus).minimize();
-
-	HfstTransducer rightMapping("x", TOK, TYPE);
-
-	printf("left mapping: \n");
-	leftMapping.write_in_att_format(stdout, 1);
-
-	HfstTransducerPair mappingPair(leftMapping, rightMapping);
-
-	// Context
-	// TODO: context -> transducer pair set
-	HfstTransducerPair Context(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, TYPE), HfstTransducer("@_EPSILON_SYMBOL_@", TOK, TYPE));
-
-	HfstTransducerPairVector ContextVector;
-	ContextVector.push_back(Context);
-
-
-
-	HfstTransducer input1("aabbaa", TOK, TYPE);
-
-	HfstTransducer result1("aaana", TOK, TYPE);
-	HfstTransducer result2("aaana", "xxxnx", TOK, TYPE);
-
-
-	// Unconditional  optional replace
-	HfstTransducer replaceTrUp(TYPE);
-	replaceTrUp 	= replace_up(mappingPair, true);
-
-	HfstTransducer tmp2(TYPE);
-	tmp2 = input1;
-	tmp2.compose(replaceTrUp).minimize();
-//printf("5a optional: \n");
-//tmp2.write_in_att_format(stdout, 1);
-	//assert(tmp2.compare(result1));
-
-
-
-	// Right most non optional
-	HfstTransducer replaceTrRight(TYPE);
-	replaceTrRight = replace_right(mappingPair, false);
-	tmp2 = input1;
-	tmp2.compose(replaceTrRight).minimize();
-printf("right most: \n");
-tmp2.write_in_att_format(stdout, 1);
-	//assert(tmp2.compare(result2));
-
-
-	//	printf(".... Left most longest match replace ....\n");
-	// Left most longest match Constraint test
-	HfstTransducer replaceTr(TYPE);
-	replaceTr = replace_rightmost_longest_match(ContextVector, mappingPair, REPL_UP);
-
-	tmp2 = input1;
-	tmp2.compose(replaceTr).minimize();
-printf("righttmost longest match: \n");
-tmp2.write_in_att_format(stdout, 1);
-	assert(tmp2.compare(result2));
-
-/*
-
-	// replace_leftmost_shortest_match
-	// Left most shortest match Constraint test
-	replaceTr = replace_leftmost_shortest_match(ContextVector, mappingPair, REPL_UP);
-
-	tmp2 = input1;
-	tmp2.compose(replaceTr).minimize();
-	//printf("shortest match 1: \n");
-	//tmp2.write_in_att_format(stdout, 1);
-	assert(tmp2.compare(result2));
-
-	*/
-}
-
-
 int main()
 {
 	HfstTokenizer TOK;
@@ -2235,39 +1945,35 @@ int main()
 	// ab -> x  ab_a
 	// also @-> and @>
 
-//	printf("--test1---\n\n");
-//	test1();
-//	test1b();
+	printf("--test1---\n\n");
+	test1();
+	test1b();
 
 	// a+ -> x  a_a
 	// also @-> and @>
-//	printf("--test2---\n\n");
-//	test2();
+	printf("--test2---\n\n");
+	test2();
 
 	// testin unconditional replace with and without contexts
-/*
-	printf("--test3--- unconditional replace\n\n");
+
+	printf("--test3--- \n\n");
 	test3a();
 	test3b();
 	test3c();
 	test3d();
-*/
+
 	// left - right - down tests
 	// b -> a  || _a (r: bbaa)
 	// b -> a  \\ _a (r:aaaa)
 	// input: bbba
-	//printf("--test4---\n\n");
-	//test4a();
-	//test4b();
-	//test4c();
-
-	// ->@
-	// >@
-//	printf("--test5---\n\n"); -- one composition off constraints
-//	test5a();
+	printf("--test4---\n\n");
+	test4a();
+	test4b();
+	test4c();
 
 	// aa -> x non optionality test
 printf("--test6---\n\n");
 test6();
+
 	return 0;
 }
