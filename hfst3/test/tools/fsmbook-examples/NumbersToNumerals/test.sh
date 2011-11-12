@@ -1,6 +1,10 @@
 #!/bin/bash
 
 # hfst-xfst -f NumbersToNumerals.xfst.script
+# rm FOO BAR
+# cat NumbersToNumerals | ../xfst-att-to-hfst-att.sh \
+# > NumbersToNumerals.xfst.att
+
 hfst-txt2fst -f openfst-tropical $1/NumbersToNumerals.xfst.att > \
   $2/NumbersToNumerals.xfst.hfst
 hfst-project -p input $2/NumbersToNumerals.xfst.hfst > $2/expected_input

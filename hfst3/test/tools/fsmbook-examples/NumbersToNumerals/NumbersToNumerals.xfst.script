@@ -39,4 +39,4 @@ define OneToNinetyNine [ OneToNine | Teens | Tens ];
 
 push OneToNinetyNine
 
-save stack NumbersToNumerals.xfst.hfst
+write att NumbersToNumerals FOO BAR
