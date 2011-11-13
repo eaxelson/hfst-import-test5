@@ -1,5 +1,5 @@
 check:
-	$(srcdir)/test.sh $(srcdir) $(builddir)
+	$(srcdir)/test.sh $(srcdir) $(builddir) ../../../../tools/src/
 
 EXTRA_DIST=FinnishNumerals.hfst.script test.sh \
 	   english_to_finnish_numerals_expected \
