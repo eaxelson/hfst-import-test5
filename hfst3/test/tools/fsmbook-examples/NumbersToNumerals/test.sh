@@ -1,12 +1,33 @@
 #!/bin/bash
 
-# hfst-xfst -f NumbersToNumerals.xfst.script
-# rm FOO BAR
-# cat NumbersToNumerals | ../xfst-att-to-hfst-att.sh \
-# > NumbersToNumerals.xfst.att
+if [ "$4" = "--full-test" ] ; then
+# Compile using xfst
+    hfst-xfst -f NumbersToNumerals.xfst.script
+    rm FOO BAR
+    cat NumbersToNumerals | ../xfst-att-to-hfst-att.sh \
+      > NumbersToNumerals.xfst.att
+
+# If $1.foma.att does not exist, compile it.
+if ! [ -f $1/NumbersToNumerals.foma.att ]; then
+  foma -f $1/NumbersToNumerals.xfst.script 2>1 > /dev/null;
+  cat $1" FOO BAR" | ../foma-att-to-hfst-att.sh > $1/NumbersToNumerals.foma.att;
+  rm $1" FOO BAR";
+fi
+fi
 
 $3/hfst-txt2fst -f openfst-tropical $1/NumbersToNumerals.xfst.att > \
   $2/NumbersToNumerals.xfst.hfst
+
+if [ "$4" = "--full-test" ] ; then
+  $3/hfst-txt2fst -f openfst-tropical $1/NumbersToNumerals.foma.att > \
+      $2/NumbersToNumerals.foma.hfst
+  if ! ( $3/hfst-compare -q $2/NumbersToNumerals.foma.hfst \
+      $2/NumbersToNumerals.xfst.hfst ); then
+    exit 1;
+  fi
+fi
+
+
 $3/hfst-project -p input $2/NumbersToNumerals.xfst.hfst > $2/expected_input
 $3/hfst-project -p output $2/NumbersToNumerals.xfst.hfst > $2/expected_output
 
