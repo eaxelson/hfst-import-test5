@@ -1,5 +1,6 @@
 check:
 	$(srcdir)/test.sh $(srcdir) $(builddir) ../../../../tools/src/
+# --test-full
 
 EXTRA_DIST=NumbersToNumerals.hfst.script NumbersToNumerals.xfst.script \
 	   NumbersToNumerals.xfst.att test.sh
