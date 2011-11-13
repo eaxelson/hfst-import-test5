@@ -1,5 +1,5 @@
 check:
-	$(srcdir)/test.sh $(srcdir) $(builddir)
+	$(srcdir)/test.sh $(srcdir) $(builddir) ../../../../tools/src/
 
 EXTRA_DIST=EinsteinsPuzzle.hfst.script test.sh expected_result
 
