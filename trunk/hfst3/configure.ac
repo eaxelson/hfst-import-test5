@@ -415,11 +415,10 @@ AS_IF([test "x$with_foma" != "xno"],
 AC_LANG_POP
 
 AS_IF([test "x$with_unicode_handler" = "xglib"],
-      [PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.12])
+      [AC_CHECK_LIB([glib-2.0], [main])
        AC_DEFINE([USE_GLIB_UNICODE], 1, [if using glib for unicode string handling])])
 AS_IF([test "x$with_unicode_handler" = "xicu"],
-      [PKG_CHECK_MODULES([ICU], [icu-uc >= 4.6])
-       AC_DEFINE([USE_ICU_UNICODE], 1, [if using ICU for unicode string handling])])
+      [AC_MSG_FAILURE([ICU not yet implemented (--with-unicode-handler=hfst to disable)])])
 AS_IF([test "x$with_readline" = "xyes"],
       [AC_SEARCH_LIBS([readline], [readline editline], 
                       [AC_DEFINE([HAVE_READLINE], 1, [if readline can be used])], 
@@ -449,6 +448,14 @@ AC_LANG_POP
 AC_LANG_PUSH([C])
 AS_IF([test "x$with_readline" = "xyes"],
       [AC_CHECK_HEADERS([readline/readline.h readline/history.h])])
+AS_IF([test "x$with_unicode_handler" = "xglib"],
+      [AC_PATH_PROG([PKG_CONFIG], [pkg-config])
+       AS_IF([test "x$PKG_CONFIG" != "xno"],
+             [AC_SUBST([GLIB_CPPFLAGS], [`$PKG_CONFIG glib-2.0 --cflags`])
+              AC_SUBST([GLIB_LIBS], [`$PKG_CONFIG glib-2.0 --libs`])
+             ],
+             [AC_CHECK_HEADERS([glib.h], [], 
+                        [AC_MSG_ERROR([glib headers not found; set CPPFLAGS to -I glib install directiories or use other unicode handler instead])])])])
 
 ### Add here your library ###
 #AS_IF([test "x$with_my_transducer_library" != "xno"],
@@ -541,10 +548,6 @@ AS_IF([test "x$with_foma" != "xno" -a "x$with_openfst" != "xno"],
 dnl hope end users never disable ofst 
 AS_IF([test "x$with_openfst" == "xno"],
       [AC_MSG_WARN([Disabling openfst backend will severely cripple libhfst])])
-dnl without gnu getopt, shell scripts cannot support long options or option 
-dnl permutation
-AS_IF([test "x$GNU_GETOPT" = xno], 
-      [AC_MSG_WARN([hfst-xfst will only support part of short options or option permutation, since GNU getopt is missing])])
 dnl without foma, foma-based scripts cannot work
 AS_IF([test "x$FOMACLI" = "xfalse"],
       [AC_MSG_WARN([using hfst-xfst is disabled because foma binary was not found])])

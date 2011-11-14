@@ -15,8 +15,7 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib 
-AM_CXXFLAGS = $(WERR_CFLAGS) $(GLIB_CFLAGS)
+AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/lib -I${top_builddir}/lib $(GLIB_CPPFLAGS)
 
 if WANT_PROC
 MAYBE_PROC=hfst-apertium-proc
