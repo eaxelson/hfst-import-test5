@@ -65,8 +65,7 @@ define YaleShooting   [Alive & ~Loaded]
 
 regex YaleShooting & InertLoaded & InertAlive & LoadFLoaded & ShootFAlive & ShootFLoaded;
 
-# extra arguments needed in xfst: FOO BAR
-write att YaleShooting.xfst.att
+write att YaleShooting FOO BAR
 
 # The resulting network contains an infinite number of valid instantiations of the Yale Shooting scenario. For example, it includes the following frame sequence where the target dies:
 

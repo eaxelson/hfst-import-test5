@@ -10,4 +10,4 @@ N^5/\N @-> ...  "[COLA]"
 
 regex Solution;
 
-write att BetterColaMachine FOO BAR;
+write att BetterColaMachine FOO BAR
