@@ -220,6 +220,6 @@ regex VerbLex
         .o.
        Cleanup ;
 
-write att Lingala.xfst.att FOO BAR
+write att Lingala FOO BAR
 
 
