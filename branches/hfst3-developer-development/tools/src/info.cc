@@ -27,10 +27,10 @@
 #include <getopt.h>
 
 #include "hfst.hpp"
-#include "hfst-commandline.h"
-#include "hfst-program-options.h"
+#include "conventions/commandline.h"
+#include "conventions/options.h"
 
-#include "inc/globals-common.h"
+#include "conventions/globals-common.h"
 
 #include <set>
 #include <string>
@@ -134,7 +134,7 @@ parse_options(int argc, char** argv)
         }
         switch (c)
         {
-#include "inc/getopt-cases-common.h"
+#include "conventions/getopt-cases-common.h"
         case 'a':
           min_version = parse_version_string(optarg);
           break;
@@ -148,10 +148,10 @@ parse_options(int argc, char** argv)
           required_features.insert(optarg);
           break;
 
-#include "inc/getopt-cases-error.h"
+#include "conventions/getopt-cases-error.h"
         }
     }
-#include "inc/check-params-common.h"
+#include "conventions/check-params-common.h"
     if ((min_version == -1L) && (max_version == -1L) && (exact_version == -1L)
         && (required_features.size() == 0) && (verbose == false))
       {

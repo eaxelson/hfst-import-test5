@@ -147,8 +147,8 @@ endif
 if WANT_TXT2FST
 MAYBE_TXT2FST=hfst-txt2fst
 endif
-if WANT_CALCULATE
-MAYBE_CALCULATE=hfst-calculate
+if WANT_SFSTPL2FST
+MAYBE_SFSTPL2FST=hfst-sfstpl2fst
 endif
 if WANT_SUBSTITUTE
 MAYBE_SUBSTITUTE=hfst-substitute
@@ -161,14 +161,14 @@ MAYBE_XFST_COMPILER=hfst-xfst2fst
 endif
 
 noinst_HEADERS= \
-	calculate_functions.h hfst-commandline.h hfst-program-options.h \
-	hfst-compiler.h HfstCompiler.h HfstBasic.h HfstAlphabet.h HfstUtf8.h \
-	inc/check-params-binary.h inc/check-params-common.h \
-	inc/check-params-unary.h  inc/getopt-cases-binary.h \
-	inc/getopt-cases-common.h inc/getopt-cases-error.h  \
-	inc/getopt-cases-unary.h  inc/globals-binary.h      \
-	inc/globals-common.h      inc/globals-unary.h \
-	HfstStrings2FstTokenizer.h HfstLookupFlagDiacritics.h
+	conventions/commandline.h conventions/options.h \
+	sfst/Compiler.h sfst/HfstAlphabet.h sfst/HfstUtf8.h \
+	conventions/check-params-binary.h conventions/check-params-common.h \
+	conventions/check-params-unary.h  conventions/getopt-cases-binary.h \
+	conventions/getopt-cases-common.h conventions/getopt-cases-error.h  \
+	conventions/getopt-cases-unary.h  conventions/globals-binary.h      \
+	conventions/globals-common.h      conventions/globals-unary.h \
+	utils/HfstStrings2FstTokenizer.h utils/HfstLookupFlagDiacritics.h
 # parsers/XreCompiler.h parsers/xre_utils.h
 
 # sort alphabetically
@@ -190,7 +190,7 @@ bin_PROGRAMS= \
 			 $(MAYBE_PROJECT) $(MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP)  \
 			 $(MAYBE_PUSH_WEIGHTS) $(MAYBE_REGEXP2FST)                  \
 			 $(MAYBE_REMOVE_EPSILONS) $(MAYBE_REPEAT) $(MAYBE_REVERSE)  \
-			 $(MAYBE_REWEIGHT)                                          \
+			 $(MAYBE_REWEIGHT) $(MAYBE_SFSTPL2FST)                      \
 			 $(MAYBE_SPLIT) $(MAYBE_STRINGS2FST) $(MAYBE_STRIP_HEADER)  \
 			 $(MAYBE_SUBTRACT) $(MAYBE_SUMMARIZE) $(MAYBE_TAIL)         \
 			 $(MAYBE_TXT2FST) $(MAYBE_CALCULATE) $(MAYBE_SUBSTITUTE)    \
@@ -199,72 +199,66 @@ bin_PROGRAMS= \
 			 $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME) $(MAYBE_PAIR_TEST)\
 			 $(MAYBE_TRAVERSE)
 
-HFST_COMMON_SRC=hfst-program-options.cc hfst-commandline.cc \
-				hfst-tool-metadata.cc
+HFST_COMMON_SRC=conventions/options.cc \
+				conventions/commandline.cc \
+				conventions/metadata.cc
 # sort alphabetically
-hfst_affix_guessify_SOURCES=hfst-affix-guessify.cc $(HFST_COMMON_SRC)
-hfst_apertium2fst_SOURCES=hfst-apertium2fst.cc $(HFST_COMMON_SRC) edit-distance.cc
-hfst_calculate_SOURCES=hfst-scanner.ll hfst-compiler.yy HfstCompiler.cc HfstBasic.cc HfstAlphabet.cc HfstUtf8.cc $(HFST_COMMON_SRC)
-hfst_compare_SOURCES=hfst-compare.cc $(HFST_COMMON_SRC)
-hfst_compose_intersect_SOURCES=hfst-compose-intersect.cc $(HFST_COMMON_SRC)
-hfst_compose_SOURCES=hfst-compose.cc $(HFST_COMMON_SRC)
-hfst_concatenate_SOURCES=hfst-concatenate.cc $(HFST_COMMON_SRC)
-hfst_conjunct_SOURCES=hfst-conjunct.cc $(HFST_COMMON_SRC)
-hfst_determinize_SOURCES=hfst-determinize.cc $(HFST_COMMON_SRC)
-hfst_disjunct_SOURCES=hfst-disjunct.cc $(HFST_COMMON_SRC)
-hfst_duplicate_SOURCES=hfst-duplicate.cc $(HFST_COMMON_SRC)
-hfst_edit_metadata_SOURCES=hfst-edit-metadata.cc $(HFST_COMMON_SRC)
-hfst_flag_diacritics_SOURCES=hfst-flag-diacritics.cc $(HFST_COMMON_SRC)
-hfst_format_SOURCES=hfst-format.cc $(HFST_COMMON_SRC)
-hfst_fst2fst_SOURCES=hfst-fst2fst.cc $(HFST_COMMON_SRC)
-hfst_fst2strings_SOURCES=hfst-fst2strings.cc $(HFST_COMMON_SRC)
-hfst_fst2txt_SOURCES=hfst-fst2txt.cc $(HFST_COMMON_SRC)
-hfst_grep_SOURCES=hfst-grep.cc $(HFST_COMMON_SRC)
-hfst_head_SOURCES=hfst-head.cc $(HFST_COMMON_SRC)
+hfst_affix_guessify_SOURCES=affix-guessify.cc $(HFST_COMMON_SRC)
+hfst_apertium2fst_SOURCES=apertium2fst.cc $(HFST_COMMON_SRC) \
+						 utils/edit-distance.cc
+hfst_compare_SOURCES=compare.cc $(HFST_COMMON_SRC)
+hfst_compose_intersect_SOURCES=compose-intersect.cc $(HFST_COMMON_SRC)
+hfst_compose_SOURCES=compose.cc $(HFST_COMMON_SRC)
+hfst_concatenate_SOURCES=concatenate.cc $(HFST_COMMON_SRC)
+hfst_conjunct_SOURCES=conjunct.cc $(HFST_COMMON_SRC)
+hfst_determinize_SOURCES=determinize.cc $(HFST_COMMON_SRC)
+hfst_disjunct_SOURCES=disjunct.cc $(HFST_COMMON_SRC)
+hfst_duplicate_SOURCES=duplicate.cc $(HFST_COMMON_SRC)
+hfst_edit_metadata_SOURCES=edit-metadata.cc $(HFST_COMMON_SRC)
+hfst_flag_diacritics_SOURCES=flag-diacritics.cc $(HFST_COMMON_SRC)
+hfst_format_SOURCES=format.cc $(HFST_COMMON_SRC)
+hfst_fst2fst_SOURCES=fst2fst.cc $(HFST_COMMON_SRC)
+hfst_fst2strings_SOURCES=fst2strings.cc $(HFST_COMMON_SRC)
+hfst_fst2txt_SOURCES=fst2txt.cc $(HFST_COMMON_SRC)
+hfst_grep_SOURCES=grep.cc $(HFST_COMMON_SRC)
+hfst_head_SOURCES=head.cc $(HFST_COMMON_SRC)
 hfst_info_SOURCES=info.cc $(HFST_COMMON_SRC)
-hfst_invert_SOURCES=hfst-invert.cc $(HFST_COMMON_SRC)
-hfst_lexc_SOURCES=hfst-lexc.cc lexc-readline-ui.cc $(HFST_COMMON_SRC)
-hfst_lexc2fst_SOURCES=hfst-lexc-compiler.cc $(HFST_COMMON_SRC)
-#					  parsers/LexcCompiler.cc parsers/lexc-parser.yy \
-#					  parsers/lexc-lexer.ll parsers/lexc-utils.cc \
-#					  parsers/XreCompiler.cc parsers/xre_parse.yy \
-#					  parsers/xre_lex.ll parsers/xre_utils.cc \
-#					  parsers/LexcCompiler.h parsers/lexc-utils.h
-#hfst_lexc2fst_BUILT=parsers/lexc-parser.h parsers/xre_parse.h
-hfst_lookup_SOURCES=hfst-lookup.cc $(HFST_COMMON_SRC) \
-HfstStrings2FstTokenizer.cc HfstLookupFlagDiacritics.cc
-hfst_pair_test_SOURCES=hfst-pair-test.cc $(HFST_COMMON_SRC) \
-HfstStrings2FstTokenizer.cc 
-hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
-hfst_name_SOURCES=hfst-name.cc $(HFST_COMMON_SRC)
-hfst_preprocess_for_optimized_lookup_format_SOURCES=hfst-preprocess-for-optimized-lookup-format.cc\
+hfst_invert_SOURCES=invert.cc $(HFST_COMMON_SRC)
+hfst_lexc2fst_SOURCES=lexc2fst.cc $(HFST_COMMON_SRC)
+hfst_lexc_SOURCES=lexc.cc lexc-readline-ui.cc $(HFST_COMMON_SRC)
+hfst_lookup_SOURCES=lookup.cc $(HFST_COMMON_SRC) \
+					utils/HfstStrings2FstTokenizer.cc\
+					utils/HfstLookupFlagDiacritics.cc
+hfst_minimize_SOURCES=minimize.cc $(HFST_COMMON_SRC)
+hfst_name_SOURCES=name.cc $(HFST_COMMON_SRC)
+hfst_pair_test_SOURCES=pair-test.cc $(HFST_COMMON_SRC) \
+					   utils/HfstStrings2FstTokenizer.cc 
+hfst_preprocess_for_optimized_lookup_format_SOURCES=preprocess-for-optimized-lookup-format.cc\
 													 $(HFST_COMMON_SRC)
-hfst_project_SOURCES=hfst-project.cc $(HFST_COMMON_SRC)
-hfst_push_weights_SOURCES=hfst-push-weights.cc $(HFST_COMMON_SRC)
-hfst_regexp2fst_SOURCES=hfst-regexp2fst.cc $(HFST_COMMON_SRC)
-#						parsers/XreCompiler.cc parsers/xre_parse.yy \
-#						parsers/xre_lex.ll parsers/xre_utils.cc
-hfst_remove_epsilons_SOURCES=hfst-remove-epsilons.cc $(HFST_COMMON_SRC)
-hfst_repeat_SOURCES=hfst-repeat.cc $(HFST_COMMON_SRC)
-hfst_reverse_SOURCES=hfst-reverse.cc $(HFST_COMMON_SRC)
-hfst_reweight_SOURCES=hfst-reweight.cc $(HFST_COMMON_SRC)
-hfst_split_SOURCES=hfst-split.cc $(HFST_COMMON_SRC)
-hfst_strings2fst_SOURCES=hfst-strings2fst.cc $(HFST_COMMON_SRC) \
-HfstStrings2FstTokenizer.cc
-hfst_strip_header_SOURCES=hfst-strip-header.cc $(HFST_COMMON_SRC)
-hfst_substitute_SOURCES=hfst-substitute.cc $(HFST_COMMON_SRC)
-hfst_subtract_SOURCES=hfst-subtract.cc $(HFST_COMMON_SRC)
-hfst_summarize_SOURCES=hfst-summarize.cc $(HFST_COMMON_SRC)
-hfst_tail_SOURCES=hfst-tail.cc $(HFST_COMMON_SRC)
-hfst_traverse_SOURCES=hfst-traverse.cc $(HFST_COMMON_SRC)
-hfst_txt2fst_SOURCES=hfst-txt2fst.cc $(HFST_COMMON_SRC)
-hfst_xfst2fst_SOURCES=hfst-xfst-compiler.cc $(HFST_COMMON_SRC) \
+hfst_project_SOURCES=project.cc $(HFST_COMMON_SRC)
+hfst_push_weights_SOURCES=push-weights.cc $(HFST_COMMON_SRC)
+hfst_regexp2fst_SOURCES=regexp2fst.cc $(HFST_COMMON_SRC)
+hfst_remove_epsilons_SOURCES=remove-epsilons.cc $(HFST_COMMON_SRC)
+hfst_repeat_SOURCES=repeat.cc $(HFST_COMMON_SRC)
+hfst_reverse_SOURCES=reverse.cc $(HFST_COMMON_SRC)
+hfst_reweight_SOURCES=reweight.cc $(HFST_COMMON_SRC)
+hfst_sfstpl2fst_SOURCES=sfst/scanner.ll sfst/compiler.yy\
+						sfst/Compiler.cc sfst/HfstBasic.cc\
+						sfst/HfstAlphabet.cc sfst/HfstUtf8.cc\
+						$(HFST_COMMON_SRC)
+hfst_split_SOURCES=split.cc $(HFST_COMMON_SRC)
+hfst_strings2fst_SOURCES=strings2fst.cc $(HFST_COMMON_SRC) \
+						 utils/HfstStrings2FstTokenizer.cc
+hfst_strip_header_SOURCES=strip-header.cc $(HFST_COMMON_SRC)
+hfst_substitute_SOURCES=substitute.cc $(HFST_COMMON_SRC)
+hfst_subtract_SOURCES=subtract.cc $(HFST_COMMON_SRC)
+hfst_summarize_SOURCES=summarize.cc $(HFST_COMMON_SRC)
+hfst_tail_SOURCES=tail.cc $(HFST_COMMON_SRC)
+hfst_traverse_SOURCES=traverse.cc $(HFST_COMMON_SRC)
+hfst_txt2fst_SOURCES=txt2fst.cc $(HFST_COMMON_SRC)
+hfst_xfst2fst_SOURCES=xfst2fst.cc $(HFST_COMMON_SRC) \
 					  parsers/XfstCompiler.cc parsers/xfst-parser.yy \
 					  parsers/xfst-lexer.ll parsers/xfst-utils.cc
-#					  parsers/LexcCompiler.cc parsers/lexc-parser.yy \
-#					  parsers/lexc-lexer.ll parsers/lexc-utils.cc \
-#					  parsers/XreCompiler.cc parsers/xre_parse.yy \
-#					  parsers/xre_lex.ll parsers/xre_utils.cc
 
 # aliases:
 hfst-determinise$(EXEEXT): hfst-determinize$(EXEEXT)
@@ -278,11 +272,11 @@ install-exec-hook:
 		$(LN_S) -f hfst-lookup$(EXEEXT) hfst-optimized-lookup$(EXEEXT) && \
 		$(LN_S) -f hfst-lookup$(EXEEXT) hfst-optimised-lookup$(EXEEXT) && \
 		$(LN_S) -f hfst-preprocess-for-optimized-lookup-format$(EXEEXT) hfst-preprocess-for-optimised-lookup-format$(EXEEXT) && \
-		$(LN_S) -f hfst-calculate$(EXEEXT) hfst-sfstpl2fst$(EXEEXT) && \
+		$(LN_S) -f hfst-sfstpl2fst$(EXEEXT) hfst-calculate$(EXEEXT) && \
 		$(LN_S) -f hfst-summarize$(EXEEXT) hfst-summarise$(EXEEXT) && \
 		$(LN_S) -f hfst-disjunct$(EXEEXT) hfst-union$(EXEEXT)
 
-BUILT_SOURCES=hfst-scanner.h hfst-compiler.h $(hfst_lexc2fst_BUILT)
+BUILT_SOURCES=$(hfst_sfstpl2fst_BUILT) $(hfst_lexc2fst_BUILT)
 
 # make make realise headers automatically follow from flexing
 hfst-scanner.h: hfst-scanner.cc

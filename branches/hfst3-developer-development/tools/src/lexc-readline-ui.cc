@@ -39,7 +39,7 @@
 #include "HfstTransducer.h"
 #include "HfstOutputStream.h"
 #include "parsers/LexcCompiler.h"
-#include "hfst-commandline.h"
+#include "conventions/commandline.h"
 
 using hfst::HfstTransducer;
 using hfst::HfstTransducerVector;
