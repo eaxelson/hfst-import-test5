@@ -1,3 +1,86 @@
+2011-11-16 09:47  mpsilfve
+
+	* libhfst/src/implementations/ConvertTropicalWeightTransducer.cc:
+	  Use NumArcs as a member function instead of using NumArcs from
+	  the OpenFst internal namespace.
+
+2011-11-16 09:25  hardwick
+
+	* libhfst/src/implementations/ConvertTropicalWeightTransducer.cc:
+	  OpenFst has moved NumArcs into the namespace ::internal. This
+	  commit reflects
+	  that, fixing compilation with the newest version of OpenFst.
+	  NOTE:
+	  THIS BREAKS BACKWARDS COMPATIBILITY, you need the newest OFST to
+	  compile after
+	  this commit.
+
+2011-11-14 07:52  eaxelson
+
+	* test/tools/fsmbook-examples/BetterColaMachine/BetterColaMachine.xfst.script,
+	  test/tools/fsmbook-examples/EinsteinsPuzzle/test.sh,
+	  test/tools/fsmbook-examples/Esperanto/test.sh,
+	  test/tools/fsmbook-examples/FinnishNumerals/test.sh,
+	  test/tools/fsmbook-examples/Lingala/Lingala.xfst.script,
+	  test/tools/fsmbook-examples/Makefile.am,
+	  test/tools/fsmbook-examples/NumbersToNumerals/test.sh,
+	  test/tools/fsmbook-examples/YaleShooting/YaleShooting.xfst.script:
+	  Fixed svn properties of executables in fsmbook-tests.
+
+2011-11-14 03:06  mie
+
+	* configure.ac, tools/src/hfst-proc/Makefile.am: Remove PKG_ macros
+	  from end user builds since they do not work nicely on
+	  all platforms.
+
+2011-11-13 14:33  eaxelson
+
+	* test/tools/fsmbook-examples/DateParser/Makefile.am,
+	  test/tools/fsmbook-examples/EinsteinsPuzzle/EinsteinsPuzzle.xfst.script,
+	  test/tools/fsmbook-examples/EinsteinsPuzzle/Makefile.am,
+	  test/tools/fsmbook-examples/EinsteinsPuzzle/expected_result_foma,
+	  test/tools/fsmbook-examples/EinsteinsPuzzle/test.sh,
+	  test/tools/fsmbook-examples/EnglishNumerals/Makefile.am,
+	  test/tools/fsmbook-examples/Esperanto/Makefile.am,
+	  test/tools/fsmbook-examples/Esperanto/test.sh,
+	  test/tools/fsmbook-examples/NumbersToNumerals/Makefile.am,
+	  test/tools/fsmbook-examples/NumbersToNumerals/test.sh,
+	  test/tools/fsmbook-examples/foma-att-to-hfst-att.sh,
+	  test/tools/fsmbook-examples/test-example.sh: Tentatively added to
+	  fsmbook-examples tests where the results from foma and xfst are
+	  compared.
+
+2011-11-13 12:13  eaxelson
+
+	* test/tools/fsmbook-examples/EinsteinsPuzzle/Makefile.am,
+	  test/tools/fsmbook-examples/EinsteinsPuzzle/test.sh,
+	  test/tools/fsmbook-examples/EnglishNumerals/EnglishNumerals.hfst.script,
+	  test/tools/fsmbook-examples/Esperanto/Makefile.am,
+	  test/tools/fsmbook-examples/Esperanto/test.sh,
+	  test/tools/fsmbook-examples/FinnishNumerals/Makefile.am,
+	  test/tools/fsmbook-examples/FinnishNumerals/test.sh,
+	  test/tools/fsmbook-examples/NumbersToNumerals/Makefile.am,
+	  test/tools/fsmbook-examples/NumbersToNumerals/NumbersToNumerals.hfst.script,
+	  test/tools/fsmbook-examples/NumbersToNumerals/test.sh: Now all
+	  tests in fsmbook-examples use the tools in tools/src/ instead of
+	  installed tools.
+
+2011-11-12 14:37  eaxelson
+
+	* test/tools/fsmbook-examples/DateParser/DateParser.hfst.script,
+	  test/tools/fsmbook-examples/DateParser/Makefile.am,
+	  test/tools/fsmbook-examples/EnglishNumerals/Makefile.am,
+	  test/tools/fsmbook-examples/NumbersToNumerals/NumbersToNumerals.xfst.script,
+	  test/tools/fsmbook-examples/NumbersToNumerals/test.sh,
+	  test/tools/fsmbook-examples/test-example.sh: Tentatively fixed
+	  parts of fsmbook-tests where intalled commandline tools are used
+	  instead of tools in tools/src/.
+
+2011-11-11 14:35  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am: Ready for release 3.3.1
+
 2011-11-11 08:44  mpsilfve
 
 	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h:

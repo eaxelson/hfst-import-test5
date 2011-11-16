@@ -6,6 +6,14 @@ This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
 
+Noteworthy changes in 3.3.2
+---------------------------
+
+* Forward compatibility with OpenFst 1.2.8 is achieved.
+
+* PKG_ macros removed from end user builds since they do not work nicely on
+  all platforms.
+
 Noteworthy changes in 3.3.1
 ---------------------------
 
