@@ -1,3 +1,255 @@
+2011-11-11 08:44  mpsilfve
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h:
+	  Fixed memory leak in HfstTransducer::get_property
+
+2011-11-11 07:50  mpsilfve
+
+	* tools/src/hfst-twolc/src/rule_src/Rule.cc: Remove escape sequence
+	  __HFST_TWOLC_ from symbols in rule names.
+
+2011-11-10 23:39  mpsilfve
+
+	* tools/src/hfst-compose.cc, tools/src/hfst-concatenate.cc,
+	  tools/src/hfst-conjunct.cc, tools/src/hfst-subtract.cc: Changed
+	  flag diacritics handling in hfst-compose, hfst-conjunct,
+	  hfst-concatenate and hfst-subtract. Now flags are harmonized
+	  using HfstTransducer::harmonize_flag_diacritics(...).
+
+2011-11-10 23:36  mpsilfve
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h:
+	  Added a function for querying if a transducer has flag diacritics
+	  and added a parameter in harmonize_flag_diacritics for diabling
+	  insertion of missgin flags (needed for hfst-concatenate).
+
+2011-11-10 21:28  mpsilfve
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h:
+	  Added function bool HfstTransducer::has_flag_diacritics(void)
+	  const
+
+2011-11-10 18:08  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc: When
+	  looking for indexes with a particular symbol (which is used for
+	  converting to other transducer types), handle flag diacritics
+	  specially
+	  as per their indexing rules.
+
+2011-11-10 17:44  mpsilfve
+
+	* libhfst/src/HfstFlagDiacritics.cc,
+	  libhfst/src/HfstFlagDiacritics.h, libhfst/src/HfstTransducer.cc,
+	  libhfst/src/HfstTransducer.h: Added
+	  HfstTransducer::hamonize_flag_diacritcs(HfstTransducer &another)
+
+2011-11-10 17:03  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/convert.h: 1) Report
+	  the correct indexing offset for epsilon as 0 even when there
+	  aren't
+	  any epsilons
+	  2) Put the exception about trying to find the offset of absent
+	  symbols in
+	  the proper scope so it actually gets thrown
+
+2011-11-10 13:10  eaxelson
+
+	* test/tools/fsmbook-examples/EnglishNumerals/EnglishNumerals.xfst.script,
+	  test/tools/fsmbook-examples/Makefile.am,
+	  test/tools/fsmbook-examples/foma-att-to-hfst-att.sh,
+	  test/tools/fsmbook-examples/remove-complement.sh,
+	  test/tools/fsmbook-examples/test-example.sh: Tentatively added to
+	  fsmbook-examples tests where results from foma and xfst are
+	  compared. Also fixed a small bug in remove-complement.sh.
+
+2011-11-10 11:00  eaxelson
+
+	* test/libhfst, test/libhfst/test_constructors.cc,
+	  test/libhfst/test_streams.cc, test/tools,
+	  test/tools/fsmbook-examples/Esperanto,
+	  test/tools/fsmbook-examples/FinnishNumerals,
+	  test/tools/fsmbook-examples/NumbersToNumerals: Extra files
+	  created during tests are no ignored by svn.
+
+2011-11-10 05:25  moshagen
+
+	* test/tools/fsmbook-examples/EinsteinsPuzzle,
+	  test/tools/fsmbook-examples/EnglishNumerals: Ignore generated
+	  autotools files.
+
+2011-11-09 23:23  mpsilfve
+
+	* libhfst/src/implementations/compose_intersect/ComposeIntersectLexicon.cc:
+	  Added flag diacritics to the epsilon filter.
+
+2011-11-09 21:14  eaxelson
+
+	* test/tools/fsmbook-examples/EinsteinsPuzzle/Makefile.am: Added
+	  missing file.
+
+2011-11-09 14:35  eaxelson
+
+	* README, configure.ac,
+	  test/tools/fsmbook-examples/DateParser/DateParser.xfst.att,
+	  test/tools/fsmbook-examples/DateParser/DateParser.xfst.script,
+	  test/tools/fsmbook-examples/DateParser/Makefile.am,
+	  test/tools/fsmbook-examples/EinsteinsPuzzle/Makefile,
+	  test/tools/fsmbook-examples/EinsteinsPuzzle/expected_result,
+	  test/tools/fsmbook-examples/EinsteinsPuzzle/test.script,
+	  test/tools/fsmbook-examples/EinsteinsPuzzle/test.sh,
+	  test/tools/fsmbook-examples/EnglishNumerals/Makefile.am,
+	  test/tools/fsmbook-examples/Esperanto/EsperantoAdjectives.hfst.script,
+	  test/tools/fsmbook-examples/Esperanto/EsperantoNouns.hfst.script,
+	  test/tools/fsmbook-examples/Esperanto/EsperantoNounsAdjectivesAndVerbs.hfst.script,
+	  test/tools/fsmbook-examples/Esperanto/EsperantoNounsAndAdjectives.hfst.script,
+	  test/tools/fsmbook-examples/Esperanto/EsperantoNounsAndAdjectivesWithTags.hfst.script,
+	  test/tools/fsmbook-examples/Esperanto/Makefile.am,
+	  test/tools/fsmbook-examples/Esperanto/test.script,
+	  test/tools/fsmbook-examples/Esperanto/test.sh,
+	  test/tools/fsmbook-examples/FinnishNumerals/Makefile,
+	  test/tools/fsmbook-examples/FinnishNumerals/Makefile.am,
+	  test/tools/fsmbook-examples/FinnishNumerals/test.script,
+	  test/tools/fsmbook-examples/FinnishNumerals/test.sh,
+	  test/tools/fsmbook-examples/Makefile.am,
+	  test/tools/fsmbook-examples/NumbersToNumerals/Makefile,
+	  test/tools/fsmbook-examples/NumbersToNumerals/Makefile.am,
+	  test/tools/fsmbook-examples/NumbersToNumerals/NumbersToNumerals.hfst.script,
+	  test/tools/fsmbook-examples/NumbersToNumerals/test.script,
+	  test/tools/fsmbook-examples/NumbersToNumerals/test.sh,
+	  test/tools/fsmbook-examples/einsteins-puzzle-test.sh,
+	  test/tools/fsmbook-examples/esperanto-test.sh,
+	  test/tools/fsmbook-examples/finnish-numerals-test.sh,
+	  test/tools/fsmbook-examples/numbers-to-numerals-test.sh,
+	  test/tools/fsmbook-examples/test-example.sh: Added a note on
+	  configure enable/disable switches to README. Changed
+	  fsmbook-examples so that now all examples that can be compiled
+	  with the current HFST tools are included in the tests.
+
+2011-11-07 20:37  eaxelson
+
+	* configure.ac: Forgot to commit configure.ac last time, now
+	  automake should work.
+
+2011-11-07 16:14  eaxelson
+
+	* test/tools/fsmbook-examples/DateParser/Makefile.am,
+	  test/tools/fsmbook-examples/DateParser/remove-complement.sh,
+	  test/tools/fsmbook-examples/DateParser/test-example.sh,
+	  test/tools/fsmbook-examples/DateParser/test.sh,
+	  test/tools/fsmbook-examples/EnglishNumerals/Makefile,
+	  test/tools/fsmbook-examples/EnglishNumerals/Makefile.am,
+	  test/tools/fsmbook-examples/EnglishNumerals/test.script,
+	  test/tools/fsmbook-examples/Makefile.am,
+	  test/tools/fsmbook-examples/date-parser-test.sh,
+	  test/tools/fsmbook-examples/english-numerals-test.sh,
+	  test/tools/fsmbook-examples/remove-complement.sh,
+	  test/tools/fsmbook-examples/test-example.sh,
+	  test/tools/fsmbook-examples/test.sh: Made some modifications to
+	  fsmbook tests.
+
+2011-11-07 13:23  moshagen
+
+	* test/tools/fsmbook-examples,
+	  test/tools/fsmbook-examples/DateParser: Ignore auto-generated
+	  files by auto-tools.
+
+2011-11-07 11:44  hardwick
+
+	* tools/src/hfst-grep.cc: Same leak issue as in r1846
+
+2011-11-07 10:38  hardwick
+
+	* tools/src/hfst-lookup.cc: free() char*'s that get strdup'd in a
+	  loop (which leaks memory if not free()'d).
+
+2011-11-04 14:15  eaxelson
+
+	* test/tools/fsmbook-examples/DateParser/Makefile,
+	  test/tools/fsmbook-examples/DateParser/Makefile.am: Added missing
+	  file.
+
+2011-11-03 16:16  eaxelson
+
+	* test/tools/fsmbook-examples/DateParser/Makefile,
+	  test/tools/fsmbook-examples/DateParser/test.sh: Made small
+	  changes to the tests under fsmbook-examples, now make distcheck
+	  should work also when scripts in an upper-level directory are
+	  used.
+
+2011-11-03 14:41  eaxelson
+
+	* configure.ac, test/tools/Makefile.am,
+	  test/tools/fsmbook-examples/DateParser/DateParser.hfst.script,
+	  test/tools/fsmbook-examples/DateParser/Makefile,
+	  test/tools/fsmbook-examples/DateParser/remove-complement.sh,
+	  test/tools/fsmbook-examples/DateParser/test-example.sh,
+	  test/tools/fsmbook-examples/DateParser/test.sh: Tentatively added
+	  one subdirectory of fsmbook-examples to the tests performed in
+	  make check.
+
+2011-11-02 14:02  eaxelson
+
+	* test/tools/Makefile.am,
+	  test/tools/fsmbook-examples/BetterColaMachine/BetterColaMachine.hfst.script,
+	  test/tools/fsmbook-examples/DateParser/DateParser.hfst.script,
+	  test/tools/fsmbook-examples/DateParser/Makefile,
+	  test/tools/fsmbook-examples/DateParser/test.script,
+	  test/tools/fsmbook-examples/DateParser/test.sh,
+	  test/tools/fsmbook-examples/EinsteinsPuzzle/EinsteinsPuzzle.hfst.script,
+	  test/tools/fsmbook-examples/EnglishNumerals/EnglishNumerals.hfst.script,
+	  test/tools/fsmbook-examples/EnglishNumerals/Makefile,
+	  test/tools/fsmbook-examples/FinnishNumerals/FinnishNumerals.hfst.script,
+	  test/tools/fsmbook-examples/FinnishOTProsody/FinnishOTProsody.hfst.script,
+	  test/tools/fsmbook-examples/FinnishProsody/FinnishProsody.hfst.script,
+	  test/tools/fsmbook-examples/Lingala/Lingala.hfst.script,
+	  test/tools/fsmbook-examples/Makefile,
+	  test/tools/fsmbook-examples/Makefile.am,
+	  test/tools/fsmbook-examples/MonishAnalysis/MonishAnalysis.hfst.script,
+	  test/tools/fsmbook-examples/MonishGuesserAnalyzer/MonishGuesserAnalyzer.hfst.script,
+	  test/tools/fsmbook-examples/NumbersToNumerals/NumbersToNumerals.hfst.script,
+	  test/tools/fsmbook-examples/Palindromes/Palindromes.hfst.script,
+	  test/tools/fsmbook-examples/PlusOrMinus/PlusOrMinus.hfst.script,
+	  test/tools/fsmbook-examples/YaleShooting/YaleShooting.hfst.script,
+	  test/tools/fsmbook-examples/test.sh: Tentatively added some
+	  testing scripts to fstbook-examples
+
+2011-11-01 14:20  hardwick
+
+	* tools/src/hfst-commandline.cc: Remove spurious space character
+	  from error message
+
+2011-11-01 14:19  hardwick
+
+	* tools/src/hfst-commandline.cc: Give more guidance when ejecting
+	  the user for having a non-UTF-8 charset
+
+2011-10-28 19:05  hardwick
+
+	* test/tools/Makefile.am: Comment out fsmbook-subdir; it's broken
+
+2011-10-28 11:16  eaxelson
+
+	* test/tools/Makefile.am, test/tools/fsmbook-examples/Makefile,
+	  test/tools/fsmbook-examples/Makefile.am,
+	  test/tools/fsmbook-examples/Palindromes/Makefile,
+	  test/tools/fsmbook-examples/test.sh: fsmbook-examples are now
+	  included in tests.
+
+2011-10-27 13:25  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am: Ready for HFST release 3.3.0.
+
+2011-10-27 12:50  eaxelson
+
+	* test/tools/format-functionality.sh,
+	  test/tools/lexc-compiler-functionality.sh,
+	  test/tools/lookup-functionality.sh,
+	  test/tools/regexp2fst-functionality.sh: missing added to some
+	  tests so that they pass distcheck
+
 2011-10-26 15:48  eaxelson
 
 	* test/tools/Makefile.am: lexc-functionality updated
