@@ -107,7 +107,7 @@ namespace hfst { namespace implementations
       else if (origin == 0)
     origin = initial_state;
 
-      unsigned int number_of_arcs = fst::NumArcs(*t, s);
+      unsigned int number_of_arcs = fst::internal::NumArcs(*t, s);
       net->initialize_transition_vector(s, number_of_arcs);
 
       /* Go through all transitions in a state */
@@ -429,7 +429,7 @@ namespace hfst { namespace implementations
       else if (origin == 0)
     origin = initial_state;
 
-      unsigned int number_of_arcs = fst::NumArcs(*t, s);
+      unsigned int number_of_arcs = fst::internal::NumArcs(*t, s);
       net->initialize_transition_vector(s, number_of_arcs);
 
       /* Go through all transitions in a state */
@@ -615,7 +615,7 @@ namespace hfst { namespace implementations
     else if (origin == 0)
       origin = initial_state;
     
-    unsigned int number_of_arcs = fst::NumArcs(*t, s);
+    unsigned int number_of_arcs = fst::internal::NumArcs(*t, s);
     net->initialize_transition_vector(s, number_of_arcs);
 
     /* Go through all transitions in a state */
