@@ -695,6 +695,9 @@ bool OtherSymbolTransducer::empty(const HfstBasicTransducer &fsm)
   return true;
 }
 
+bool OtherSymbolTransducer::is_empty(void) const
+{ return empty(HfstBasicTransducer(transducer)); }
+
 std::ostream &operator<<(std::ostream &out,const OtherSymbolTransducer &o)
 { return out << "FST:" << std::endl << o.transducer; }
 

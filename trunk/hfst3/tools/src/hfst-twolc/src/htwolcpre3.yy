@@ -410,7 +410,36 @@ PAIR: PAIR_SYMBOL COLON PAIR_SYMBOL
     }  
   else
     { $$ = new OtherSymbolTransducer
-	(alphabet.get_transducer(SymbolPair($1,$3))); }
+	(alphabet.get_transducer(SymbolPair($1,$3))); 
+      if (alphabet.is_empty_pair(SymbolPair($1,$3)))
+	{
+	  std::string error;
+	  if (std::string($1) == std::string($3))
+	    {
+	      std::string symbol = Rule::get_print_name($1);
+
+	      error = std::string("The pair set ") + symbol + " is empty.";
+	    }
+	  else
+	    {
+	      std::string symbol1 = Rule::get_print_name($1);
+	      std::string symbol2 = Rule::get_print_name($3);
+
+	      error = std::string("The pair set ") + symbol1 + ":" + symbol2 + 
+		" is empty.";
+	    }
+	  error +=  std::string("\n\n") +
+	    "Note that a pair set X:Y can be empty, even if the sets X and\n"+
+            "are non-empty, since every symbol pair has to be declared in\n" +
+	    "the alphabet or it has to be the center of a rule, or be in\n"  +
+	    "the context of a rule or result from substituting values for\n" +
+	    "variables in a rule with variables.\n\n" +
+	    "Compilation is terminated because a rule context, definition\n" + 
+	    "or rule center becomes empty.\n\n";
+
+	  semantic_error(error.c_str());
+	}
+    }
 
   free($1);
   free($3);
@@ -460,7 +489,7 @@ void yyerror(const char * text)
 // Print error messge and exit 1.
 void semantic_error(const char * text) 
 { 
-  input_reader.error(text);
+  std::cerr << std::endl << "Error: " << text << std::endl;
   exit(1);
 }
 

@@ -65,6 +65,10 @@ std::string Rule::get_print_name(const std::string &s)
     { ss.replace(ss.find("__HFST_TWOLC_RULE_NAME="),
          std::string("__HFST_TWOLC_RULE_NAME=").size()," "); }
 
+  while (ss.find("__HFST_TWOLC_SET_NAME=") != std::string::npos)
+    { ss.replace(ss.find("__HFST_TWOLC_SET_NAME="),
+         std::string("__HFST_TWOLC_SET_NAME=").size(),""); }
+
   while (ss.find("__HFST_TWOLC_") != std::string::npos)
     { ss.replace(ss.find("__HFST_TWOLC_"),
          std::string("__HFST_TWOLC_").size(),""); }
