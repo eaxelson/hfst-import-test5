@@ -269,6 +269,9 @@ class OtherSymbolTransducer
   //! @brief Return the symbol pairs in the transitions from the start state.
   void get_initial_transition_pairs(SymbolPairVector &pair_container) const;
 
+  //! @brief Return true if this is empty and false otherwise.
+  bool is_empty(void) const;
+
   friend class Rule;
 
   friend std::ostream &operator<<(std::ostream &,

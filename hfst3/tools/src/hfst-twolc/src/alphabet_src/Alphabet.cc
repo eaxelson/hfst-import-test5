@@ -36,13 +36,22 @@ bool Alphabet::is_pair(const std::string &input,const std::string &output)
 {
   if (input == "__HFST_TWOLC_?" and output == "__HFST_TWOLC_?")
     { return true; }
+  if (diacritics.has_element(input) and input == output)
+    { return true; }
+  if (diacritics.has_element(input) and output == "__HFST_TWOLC_?")
+    { return true; }
   if (input == "__HFST_TWOLC_?")
     { return output_symbols.has_element(output); }
   if (output == "__HFST_TWOLC_?")
     { return input_symbols.has_element(input); }
-  if (diacritics.has_element(input) and input == output)
-    { return true; }
+
   return alphabet_set.has_element(SymbolPair(input,output));
+}
+
+bool Alphabet::is_empty_pair(const SymbolPair &pair)
+{
+  assert(is_pair(pair.first,pair.second));
+  return alphabet[pair].is_empty();
 }
 
 void Alphabet::define_singleton_set(const std::string &name)
@@ -84,6 +93,7 @@ const OtherSymbolTransducer &Alphabet::compute(const SymbolPair &pair)
     }
   else if (input == TWOLC_UNKNOWN)
     {
+      output_symbols.insert(pair.second);
       const SymbolRange &output_set = sets[output];
       for (SymbolRange::const_iterator it = output_set.begin();
        it != output_set.end();
@@ -103,6 +113,7 @@ const OtherSymbolTransducer &Alphabet::compute(const SymbolPair &pair)
     }
   else if (output == TWOLC_UNKNOWN)
     {
+      input_symbols.insert(pair.first);
       const SymbolRange &input_set = sets[input];
       for (SymbolRange::const_iterator it = input_set.begin();
        it != input_set.end();
@@ -142,6 +153,7 @@ const OtherSymbolTransducer &Alphabet::compute(const SymbolPair &pair)
     }
     }
   alphabet[pair] = pair_transducer;
+  alphabet_set.insert(pair);
   return alphabet[pair];
 }
 
