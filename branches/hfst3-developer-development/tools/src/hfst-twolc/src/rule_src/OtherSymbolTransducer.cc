@@ -695,15 +695,42 @@ bool OtherSymbolTransducer::empty(const HfstBasicTransducer &fsm)
   return true;
 }
 
+bool OtherSymbolTransducer::is_empty(void) const
+{ return empty(HfstBasicTransducer(transducer)); }
+
 std::ostream &operator<<(std::ostream &out,const OtherSymbolTransducer &o)
 { return out << "FST:" << std::endl << o.transducer; }
 
 #ifdef TEST_OTHER_SYMBOL_TRANSDUCER
 #include <cassert>
 #include <iostream>
-ImplementationType transducer_type = hfst::TROPICAL_OPENFST_TYPE;
+
 int main(void)
 {
+bool have_openfst = false;
+#if HAVE_OPENFST
+  have_openfst = true; 
+#endif // HAVE_OPENFST
+
+bool have_sfst = false;
+#if HAVE_SFST
+  have_sfst = true; 
+#endif // HAVE_SFST
+
+bool have_foma = false;
+#if HAVE_FOMA
+  have_foma = true; 
+#endif // HAVE_FOMA
+
+
+ImplementationType transducer_type 
+= (have_openfst ? hfst::TROPICAL_OPENFST_TYPE : 
+  have_sfst ? hfst::SFST_TYPE :
+  have_foma ? hfst::FOMA_TYPE : 
+   hfst::ERROR_TYPE);
+
+ OtherSymbolTransducer::set_transducer_type(transducer_type);
+
   HandySet<SymbolPair> symbol_pairs;
   symbol_pairs.insert(SymbolPair("a","b"));
   symbol_pairs.insert(SymbolPair("c","d"));

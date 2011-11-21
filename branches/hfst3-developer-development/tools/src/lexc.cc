@@ -127,7 +127,10 @@ parse_options(int argc, char** argv)
           return EXIT_FAILURE;
           break;
         case 'u':
-          warning(0, 0, "UTF-8 is always the default in HFST tools");
+          if (!silent)
+            {
+              warning(0, 0, "UTF-8 is always the default in HFST tools");
+            }
           break;
         case 'X':
           start_readline = true;
@@ -140,14 +143,20 @@ parse_options(int argc, char** argv)
     if (format == hfst::UNSPECIFIED_TYPE)
       {
 #if HAVE_FOMA
-        warning(0, 0, "Defaulting to foma type "
+        if (!silent)
+          {
+            warning(0, 0, "Defaulting to foma type "
                 "(since it has native lexc support);\n"
                 "Use command-line option --format to override");
+          }
         format = hfst::FOMA_TYPE;
 #elif HAVE_OPENFST
-        warning(0, 0, "Defaulting to using OpenFst with legacy lexc "
+        if (!silent)
+          {
+            warning(0, 0, "Defaulting to using OpenFst with legacy lexc "
                 "compilation scheme\n"
                 "Use command-line option --format to override");
+          }
         format = hfst::TROPICAL_OPENFST_TYPE;
 #else
         error(EXIT_FAILURE, 0, "Format not given and cannot deduce sensible "
@@ -170,13 +179,19 @@ parse_options(int argc, char** argv)
     else if (!start_readline && (argc == optind))
       {
 #if AT_END_OF_DEPRECATION_PERIOD
-        warning(0, 0, "Reading lexc script (not a lexicon) "
+        if (!silent)
+          {
+            warning(0, 0, "Reading lexc script (not a lexicon) "
                 "from stdin with readline");
+          }
         start_readline = true;
 #else
-        warning(0, 0, "Reading lexicons from stdin is deprecated and will "
+        if (!silent)
+          {
+            warning(0, 0, "Reading lexicons from stdin is deprecated and will "
                 "be removed in next versions;\n"
                 "this is not even supported by the original lexc");
+          }
         char* tempfilename = hfst_strdup("/tmp/hfst-lexcXXXXXX");
         int temporary_fd = hfst_mkstemp(tempfilename);
         verbose_printf("Copying data from <stdin> to temporary file\n");
@@ -219,9 +234,12 @@ parse_options(int argc, char** argv)
 
     if (lexccount > 1)
       {
-        warning(0, 0, "multiple file handling is not supported by all "
+        if (!silent)
+          {
+            warning(0, 0, "multiple file handling is not supported by all "
                 "backends;\n"
                 "concatenating to temporary file");
+          }
         char* tempfilename = hfst_strdup("/tmp/hfst-lexcXXXXXX");
         int temporary_fd = hfst_mkstemp(tempfilename);
         for (unsigned int i = 0; i < lexccount; i++)

@@ -1,13 +1,26 @@
 #!/bin/sh
+if ! test -x ../../tools/src/hfst-calculate; then
+    exit 0;
+fi
+
 for i in "" .sfst .ofst .foma; do
     FFLAG=
     case $i in
         .sfst)
-            FFLAG="-f sfst";;
+            FFLAG="-f sfst"
+	    if ! (../../tools/src/hfst-format --list-formats | grep "sfst") ; then
+		continue;
+	    fi;;
         .ofst)
-            FFLAG="-f openfst-tropical";;
+            FFLAG="-f openfst-tropical"
+	    if ! (../../tools/src/hfst-format --list-formats | grep "openfst-tropical") ; then
+		continue;
+	    fi;;
         .foma)
-            FFLAG="-f foma";;
+            FFLAG="-f foma"
+	    if ! (../../tools/src/hfst-format --list-formats | grep "foma") ; then
+		continue;
+	    fi;;
         *)
             FFLAG=;;
     esac

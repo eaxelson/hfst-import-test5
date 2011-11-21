@@ -30,7 +30,7 @@ HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc HfstOutputStream.cc\
 		  HarmonizeUnknownAndIdentitySymbols.cc
 
 # libtool takes over
-libhfst_la_SOURCES =  $(HFST_SRCS)
+libhfst_la_SOURCES = $(HFST_SRCS)
 libhfst_la_LIBADD = implementations/libhfstimplementations.la \
 			parsers/libhfstparsers.la
 
@@ -70,7 +70,7 @@ HFST_HDRS = \
 
 hfstinclude_HEADERS = $(HFST_HDRS)
 
-libhfst_la_LDFLAGS = -no-undefined -version-info 7:0:0
+libhfst_la_LDFLAGS = -no-undefined -version-info 9:1:0
 
 LIBHFST_TSTS=HfstApply HfstInputStream HfstTransducer \
 		HfstOutputStream HfstRules HfstSymbolDefs \

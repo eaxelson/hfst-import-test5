@@ -19,21 +19,21 @@
 HFST_NAME=hfst
 HFST_MAJOR=3
 HFST_MINOR=3
-HFST_EXTENSION=0
+HFST_EXTENSION=2
 HFST_VERSION=$HFST_MAJOR.$HFST_MINOR.$HFST_EXTENSION
 
 # for package-config pc file
 LIBHFST_NAME=hfst
 LIBHFST_MAJOR=3
 LIBHFST_MINOR=3
-LIBHFST_EXTENSION=0
+LIBHFST_EXTENSION=2
 LIBHFST_VERSION=$LIBHFST_MAJOR.$LIBHFST_MINOR.$LIBHFST_EXTENSION
 
 # autoconf >= 2.62 required for ASSERT, REALLOC
 AC_PREREQ([2.62])
 
 # init must be at the start
-AC_INIT([hfst], [3.2.0], [hfst-bugs@helsinki.fi], [hfst], [http://hfst.sf.net])
+AC_INIT([hfst], [3.3.2], [hfst-bugs@helsinki.fi], [hfst], [http://hfst.sf.net])
 AC_CONFIG_AUX_DIR([build-aux])
 
 # automake >= 1.11 required for color-tests, silent-rules
@@ -54,8 +54,8 @@ AC_SUBST(LIBHFST_EXTENSION)
 AC_SUBST(LIBHFST_VERSION)
 AC_SUBST(LIBHFST_NAME)
 # long version = version vector cast in base 10000, for comparisons
-# now: 3.3.0 = 0003 0000 0000 + 0003 0000 + 0000
-AC_DEFINE([HFST_LONGVERSION], [300030000L],
+# e.g.: 3.3.2 = 0003 0000 0000 + 0003 0000 + 0002
+AC_DEFINE([HFST_LONGVERSION], [300030002L],
           [Define to hfst version vector as long in base 10000])
 AC_DEFINE([HFST_REVISION], ["$Revision$"],
           [Automatically substitute to configure.ac revision])
@@ -557,6 +557,7 @@ cat <<EOF
     *         with foma: $with_foma
     *         with optimized lookup: $with_hfstol
     * tools including sfstpl2fst: $enable_sfstpl2fst (sfst-compiler)
+    *                 apertium2fst: $enable_apertium2fst
     *                 compare: $enable_compare
     *                 compose: $enable_compose
     *                 concatenate: $enable_concatenate

@@ -6,6 +6,37 @@ This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
 
+Noteworthy changes in 3.3.2
+---------------------------
+
+* Forward compatibility with OpenFst 1.2.8 is achieved.
+
+* PKG_ macros removed from end user builds since they do not work nicely on
+  all platforms.
+
+Noteworthy changes in 3.3.1
+---------------------------
+
+* Handling of flag diacritics improved.
+
+* More examples in fsmbook-examples included in tests.
+
+* Extra files created during tests as well as generated autotools files 
+  are now ignored by svn.
+
+Noteworthy changes in 3.3.0
+---------------------------
+
+* HFST updated to work with the newest versions of backend libraries
+
+* a new replace down function by Karttunen added
+
+* HfstTransitionGraph and conversions between formats made less error-prone
+
+* protected/public changes in API
+
+* SFST and foma libraries are disabled from default build
+
 Noteworthy changes in 3.2.0
 ---------------------------
 

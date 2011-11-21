@@ -517,21 +517,25 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
   bool fellback = false;
   while (instream.is_good())
     {
-	// SH 24.8.2011:
-	// for some reason converting between foma and basic transducer
-	// for substitution can leak lots and lots of space.
-	// For this reason we currently do substitution in sfst and finally
-	// convert back to foma.
-	bool got_foma = false;
+    // SH 24.8.2011:
+    // for some reason converting between foma and basic transducer
+    // for substitution can leak lots and lots of space.
+    // For this reason we currently do substitution in sfst and finally
+    // convert back to foma.
+    bool got_foma = false;
       transducer_n++;
       HfstTransducer trans(instream);
 #if HAVE_SFST
-      if (trans.get_type() == hfst::FOMA_TYPE) {
-	  warning(0, 0, "NB: substitution for foma transducers will be done "
-		  "via conversion to\n"
-		  "SFST and back (if available)\n");
-	  got_foma = true;
-	  trans = trans.convert(hfst::SFST_TYPE);
+      if (trans.get_type() == hfst::FOMA_TYPE) 
+        {
+          if (!silent)
+            {
+              warning(0, 0, "NB: substitution for foma transducers will be done "
+                    "via conversion to\n"
+                    "SFST and back (if available)\n");
+            }
+      got_foma = true;
+      trans = trans.convert(hfst::SFST_TYPE);
       }
 #endif
       char* inputname = strdup(trans.get_name().c_str());
@@ -610,8 +614,12 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                 {
                   if (!warnedAlready)
                     {
-                      warning(0, 0, "substitution is not supported for this transducer type"
-                              " falling back to internal formats and trying...");
+                      if (!silent)
+                        {
+                          warning(0, 0, "substitution is not supported for "
+                                  "this transducer type falling back to "
+                                  "internal formats and trying...");
+                        }
                       fallback = new HfstBasicTransducer(trans);
                       warnedAlready = true;
                     }
@@ -633,8 +641,12 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
             {
               if (!warnedAlready)
                 {
-                  warning(0, 0, "substitution is not supported for this transducer type"
-                          " falling back to internal formats and trying...");
+                  if (!silent)
+                    {
+                      warning(0, 0, "substitution is not supported for this "
+                              "transducer type falling back to internal format "
+                              " and trying...");
+                    }
                   fallback = new HfstBasicTransducer(trans);
                 }
               do_substitute(*fallback, transducer_n);
@@ -731,7 +743,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
       trans = HfstTransducer(*fallback, trans.get_type());
 #if HAVE_SFST
       if (got_foma) {
-	  trans = trans.convert(hfst::FOMA_TYPE);
+      trans = trans.convert(hfst::FOMA_TYPE);
       }
 #endif
       outstream << trans;

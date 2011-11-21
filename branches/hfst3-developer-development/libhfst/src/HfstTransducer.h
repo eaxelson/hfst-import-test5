@@ -317,10 +317,12 @@ An example:
     static HfstTransducer &read_in_att_format
       (FILE *ifile, ImplementationType type, const std::string &epsilon_symbol);
 
-    /* For internal use: whether HFST is linked to the transducer library 
+  public:
+    /* whether HFST is linked to the transducer library 
        needed by implementation type \a type. */
     static bool is_implementation_type_available(ImplementationType type);
 
+  protected:
     /* For internal use: Create a tokenizer that recognizes all symbols 
        that occur in the transducer. */
     HfstTokenizer create_tokenizer();
@@ -1442,9 +1444,23 @@ transducer.transform_weights(&func);
     void insert_freely_missing_flags_from
       (const HfstTransducer &another);
 
+    /*
+      If both \a this and \a another contain flag diacritics, replace flag
+      diacritic @X.Y.(.Z)@ by @X.Y_1(.Z)@ in \a this and replace it by
+      @X.Y_2(.Z)@ in \a another. 
+      
+      If \a insert_renamed_flags is true, then the flags from \a this are 
+      inserted freely in \a another and vice versa after replacing.
+     */
+    void harmonize_flag_diacritics(HfstTransducer &another,
+				   bool insert_renamed_flags=true);
+
     /* Whether the alphabet of transducer \a another includes flag diacritics
        that are not included in the alphabet of this transducer. */
     bool check_for_missing_flags_in(const HfstTransducer &another) const;
+
+    /* Return true if \a this has flag diacritics in the alphabet. */
+    bool has_flag_diacritics(void) const;
 
     // *** Friends **** //
 

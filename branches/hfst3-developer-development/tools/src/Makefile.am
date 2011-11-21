@@ -169,7 +169,6 @@ noinst_HEADERS= \
 	conventions/getopt-cases-unary.h  conventions/globals-binary.h      \
 	conventions/globals-common.h      conventions/globals-unary.h \
 	utils/HfstStrings2FstTokenizer.h utils/HfstLookupFlagDiacritics.h
-# parsers/XreCompiler.h parsers/xre_utils.h
 
 # sort alphabetically
 # sort alphabetically

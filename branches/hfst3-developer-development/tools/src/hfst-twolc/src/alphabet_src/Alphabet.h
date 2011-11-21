@@ -46,6 +46,7 @@ class Alphabet
   void define_alphabet_pair(const SymbolPair &pair);
   void alphabet_done(void);
   void define_diacritics(const SymbolRange &);
+  bool is_empty_pair(const SymbolPair &pair);
   const OtherSymbolTransducer &get_transducer(const SymbolPair &pair);
   SymbolPairVector * get_symbol_pair_vector(const SymbolPair &pair);
 };
