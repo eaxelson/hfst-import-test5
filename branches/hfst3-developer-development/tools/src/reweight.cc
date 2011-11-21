@@ -1,4 +1,4 @@
-//! @file hfst-reweight.cc
+//! @file reweight.cc
 //!
 //! @brief Transducer reweighting tool
 //!
@@ -367,9 +367,10 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                                                 arc->get_output_symbol().c_str()));
                 replication.add_transition(rebuilt[source_state], nu);
               }
-        source_state++;
+            source_state++;
           }
         trans = HfstTransducer(replication, trans.get_type());
+        trans.set_name(inputname);
         hfst_set_name(trans, trans, "reweight");
         hfst_set_formula(trans, trans, "W");
         outstream << trans.remove_epsilons();
