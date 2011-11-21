@@ -134,6 +134,9 @@ EOHEAD
         LANGCODE=$(echo $ll | sed -e 's/^hfst\///' -e 's/\/$//')
         if test -r $ll/functions.js ; then
             echo "  if (languages[languages.selectedIndex].value == '$LANGCODE') {"
+            if test -r $ll/placeholder.string ; then
+                echo "document.getElementById('wf').placeholder = '$(cat $ll/placeholder.string)'"
+            fi
             cat $ll/functions.js | sed -e 's/^/    /'
             echo "  }"
         fi
@@ -219,6 +222,15 @@ EOHEADING
     if test -r hfst/$LL/heading.$FUNCTION.$VARIANT.html ; then
         cat hfst/$LL/heading.$FUNCTION.$VARIANT.html
     fi
+    if test -r hfst/$LL/placeholder.string ; then
+        echo "<p style=\"font-style: smaller;\">
+            If you do not understand the langauge you are experimenting
+            with and are unable to obtain example word from <a 
+             href='http://$LL.wikipedia.org/'>$LL wikipedia</a>, you may
+            use <tt>"
+        cat hfst/$LL/placeholder.string
+        echo "</tt> as a test case</p>"
+    fi
 }
 
 function print_html_footer() {
@@ -292,11 +304,16 @@ EOEND
 }
 
 function print_forms() {
+    if test -r hfst/$LL/placeholder.string ; then
+        PLACEHOLDER=$(cat hfst/$LL/placeholder.string)
+    else
+        PLACEHOLDER="insert wordform"
+    fi
     cat <<FORMS
     <form action='$SCRIPT_NAME' method='GET' accept-charset='UTF-8'>
       <fieldset>
       <legend>Process single word form</legend>
-      <label>Word form to process: <input type="text" name="wf" id="wf" value="$WORDFORM" required></label>
+      <label>Word form to process: <input type="text" name="wf" id="wf" value="$WORDFORM" required placeholder="$PLACEHOLDER"></label>
       <!-- these defaults are left in if javascript fails -->
       <label>Language <select name="language" id="languages" onchange="populate_functions()">
         <option value="">Select to get list of options:</option>
