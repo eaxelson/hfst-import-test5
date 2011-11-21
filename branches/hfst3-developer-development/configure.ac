@@ -132,12 +132,12 @@ AC_ARG_ENABLE([apertium2fst],
               [enable_apertium2fst=$enableval],
               [enable_apertium2fst=yes])
 AM_CONDITIONAL([WANT_APERTIUM2FST], [test x$enable_apertium2fst != xno])
-AC_ARG_ENABLE([calculate],
-              [AS_HELP_STRING([--enable-calculate],
-                              [build calculate tool @<:@default=yes@:>@])],
-              [enable_calculate=$enableval],
-              [enable_calculate=yes])
-AM_CONDITIONAL([WANT_CALCULATE], [test x$enable_calculate != xno])
+AC_ARG_ENABLE([sfstpl2fst],
+              [AS_HELP_STRING([--enable-sfstpl2fst],
+                              [build sfstpl2fst tool @<:@default=yes@:>@])],
+              [enable_sfstpl2fst=$enableval],
+              [enable_sfstpl2fst=yes])
+AM_CONDITIONAL([WANT_SFSTPL2FST], [test x$enable_sfstpl2fst != xno])
 AC_ARG_ENABLE([compare],
               [AS_HELP_STRING([--enable-compare],
                               [build compare tool @<:@default=yes@:>@])],
@@ -556,7 +556,7 @@ cat <<EOF
     *         with openfst: $with_openfst
     *         with foma: $with_foma
     *         with optimized lookup: $with_hfstol
-    * tools including calculate: $enable_calculate (sfst-compiler)
+    * tools including sfstpl2fst: $enable_sfstpl2fst (sfst-compiler)
     *                 compare: $enable_compare
     *                 compose: $enable_compose
     *                 concatenate: $enable_concatenate
