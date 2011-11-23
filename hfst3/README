@@ -301,6 +301,26 @@ applies for libraries installed to e.g. home directory.
 
 See also the previous error description.
 
+undefined reference to `dlopen'
+'''''''''''''''''''''''''''''''
+
+This error is encountered when compiling OpenFst on recently updated Ubuntus,
+see
+
+  https://wiki.ubuntu.com/OneiricOcelot/ReleaseNotes#GCC_4.6_Toolchain
+
+The simplest currently known solution is to edit the Makefile.am in
+OpenFst's /src/bin so that the -ld directives occur before library names.
+Change the line
+
+  AM_LDFLAGS = -lm -ldl
+
+to
+
+  AM_LDFLAGS = ../script/libfstscript.la ../lib/libfst.la -lm -ldl
+
+and comment out (or remove) all the tool-specific LDADD lines.
+
 Request for member c_str in ... which is of non-class type const char*
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
