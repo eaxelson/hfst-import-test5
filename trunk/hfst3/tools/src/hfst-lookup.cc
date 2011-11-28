@@ -939,9 +939,7 @@ line_to_lookup_path(char** s, HfstStrings2FstTokenizer& tok,
         {
           if (optimized_lookup)
             {
-              vector<string>* path = string_to_utf8(*s);
-              rv->second = *path;
-              delete path;
+                rv->second.push_back(std::string(*s));
             }
           else
             {
@@ -1106,7 +1104,7 @@ bool is_lookup_infinitely_ambiguous(HfstBasicTransducer &t,
   return is_lookup_infinitely_ambiguous(t, s, index, initial_state, 
                     epsilon_path_states);
 }
-// HERE
+
 HfstOneLevelPaths*
 lookup_simple(const HfstOneLevelPath& s, HfstTransducer& t, bool* infinity)
 {
@@ -1643,13 +1641,19 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
     std::vector<HfstTransducer> cascade;
     std::vector<HfstBasicTransducer> cascade_mut;
     bool internal_transducers=false;
-
+    // set to false if non-ol trasnducer is pushed into the cascade
+    bool only_optimized_lookup=true;
+    
     size_t transducer_n=0;
     StringVector mc_symbols;
     while (inputstream.is_good())
-      {
+    {
         transducer_n++;
         HfstTransducer trans(inputstream);
+        if (trans.get_type() != HFST_OL_TYPE and
+            trans.get_type() != HFST_OLW_TYPE) {
+            only_optimized_lookup = false;
+        }
         char* inputname = strdup(trans.get_name().c_str());
         if (strlen(inputname) <= 0)
           {
@@ -1671,7 +1675,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
             type == hfst::TROPICAL_OPENFST_TYPE ||
             type == hfst::LOG_OPENFST_TYPE ||
             type == hfst::FOMA_TYPE)
-          {
+        {
             HfstBasicTransducer basic(trans);
             for (HfstBasicTransducer::const_iterator it = basic.begin();
                  it != basic.end(); it++)
@@ -1728,15 +1732,21 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
         char* markup = 0;
         bool unknown = false;
         bool infinite = false;
+        HfstOneLevelPaths* kvs;
 
-        bool optimized_lookup=
-          (cascade[0].get_type() == HFST_OL_TYPE ||
-           cascade[0].get_type() == HFST_OLW_TYPE);
+        // For the most common use case - looking up on a single ol transducer
+        // - we short circuit the mess of overloaded and specialized template
+        // functions that don't really get used anyway because lookup isn't
+        // implemented for most types.
+
+        if (only_optimized_lookup && cascade.size() == 1) {
+            kvs = cascade[0].lookup_fd(line);
+        }
 
         HfstOneLevelPath* kv = line_to_lookup_path(&line, input_tokenizer,
                                                    &markup,
-                                                   &unknown, optimized_lookup);
-        HfstOneLevelPaths* kvs;
+                                                   &unknown, only_optimized_lookup);
+
         if (verbose)
           {
             verbose_printf("Tokenized to: ");
