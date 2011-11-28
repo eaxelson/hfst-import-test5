@@ -181,31 +181,26 @@ bool Transducer::initialize_input(char * input_str)
 HfstOneLevelPaths * Transducer::lookup_fd(const StringVector & s)
 
 {
-    HfstOneLevelPaths * results = new HfstOneLevelPaths;
-    lookup_paths = results;
     std::string input_str;
     for (StringVector::const_iterator it = s.begin(); it != s.end(); ++it) {
     input_str.append(*it);
     }
-    if (!initialize_input(const_cast<char *>(input_str.c_str()))) {
-    lookup_paths = NULL;
-    return results;
-    }
-    //current_weight += s.second;
-    get_analyses(input_tape, output_tape, output_tape, 0);
-    //current_weight -= s.second;
-    lookup_paths = NULL;
-    return results;
+    return lookup_fd(input_str);
 }
 
 HfstOneLevelPaths * Transducer::lookup_fd(const std::string & s)
 {
+    return lookup_fd(s.c_str());
+}
+
+HfstOneLevelPaths * Transducer::lookup_fd(char * s)
+{
     HfstOneLevelPaths * results = new HfstOneLevelPaths;
     lookup_paths = results;
     std::string input_str;
-    if (!initialize_input(const_cast<char *>(s.c_str()))) {
-    lookup_paths = NULL;
-    return results;
+    if (!initialize_input(const_cast<char *>(s))) {
+        lookup_paths = NULL;
+        return results;
     }
     //current_weight += s.second;
     get_analyses(input_tape, output_tape, output_tape, 0);
