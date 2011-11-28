@@ -160,11 +160,12 @@ SymbolNumber Encoder::find_key(char ** p)
     return s;
 }
 
-bool Transducer::initialize_input(char * input_str)
+bool Transducer::initialize_input(const char * input_str)
 {
+    char * c = strdupa(input_str);
     int i = 0;
     SymbolNumber k = NO_SYMBOL_NUMBER;
-    for ( char ** Str = &input_str; **Str != 0; )
+    for ( char ** Str = &c; **Str != 0; )
     {
     k = encoder->find_key(Str);
     if (k == NO_SYMBOL_NUMBER)
@@ -193,12 +194,11 @@ HfstOneLevelPaths * Transducer::lookup_fd(const std::string & s)
     return lookup_fd(s.c_str());
 }
 
-HfstOneLevelPaths * Transducer::lookup_fd(char * s)
+HfstOneLevelPaths * Transducer::lookup_fd(const char * s)
 {
     HfstOneLevelPaths * results = new HfstOneLevelPaths;
     lookup_paths = results;
-    std::string input_str;
-    if (!initialize_input(const_cast<char *>(s))) {
+    if (!initialize_input(s)) {
         lookup_paths = NULL;
         return results;
     }
