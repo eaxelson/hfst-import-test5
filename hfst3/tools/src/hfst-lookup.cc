@@ -1734,15 +1734,6 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
         bool infinite = false;
         HfstOneLevelPaths* kvs;
 
-        // For the most common use case - looking up on a single ol transducer
-        // - we short circuit the mess of overloaded and specialized template
-        // functions that don't really get used anyway because lookup isn't
-        // implemented for most types.
-
-        if (only_optimized_lookup && cascade.size() == 1) {
-            kvs = cascade[0].lookup_fd(line);
-        }
-
         HfstOneLevelPath* kv = line_to_lookup_path(&line, input_tokenizer,
                                                    &markup,
                                                    &unknown, only_optimized_lookup);
