@@ -768,10 +768,10 @@ public:
     TransitionTableIndex state_index) const;
 
 
-    bool initialize_input(char * input_str);
+    bool initialize_input(const char * input_str);
     HfstOneLevelPaths * lookup_fd(const StringVector & s);
     HfstOneLevelPaths * lookup_fd(const std::string & s);
-    HfstOneLevelPaths * lookup_fd(char * s);
+    HfstOneLevelPaths * lookup_fd(const char * s);
     void note_analysis(SymbolNumber * whole_output_tape);
 
     friend class ConvertTransducer;
