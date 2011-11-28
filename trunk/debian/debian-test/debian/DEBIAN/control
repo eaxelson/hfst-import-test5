@@ -1,11 +1,11 @@
-Package: foo-dev
-Source: foo
+Package: hfst-dev
+Source: hfst
 Version: 1-1.1
 Section: devel
 Priority: optional
 Architecture: amd64
-Provides: libbar
+Provides: libfst0
 Depends: libc6 (>= 1.1)
-Maintainer: FOO team <foo@bar.fi>
-Description: This package contains FOO library and commandline tools
+Maintainer: HFST team <foo@bar.fi>
+Description: This package contains HFST library and commandline tools
   More description here.
