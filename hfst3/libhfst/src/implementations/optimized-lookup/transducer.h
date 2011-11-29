@@ -343,6 +343,8 @@ protected:
     SymbolNumber input_symbol;
     TransitionTableIndex first_transition_index;
 public:
+    static const size_t size =
+        sizeof(input_symbol) + sizeof(first_transition_index);
     TransitionIndex(): input_symbol(NO_SYMBOL_NUMBER),
                first_transition_index(NO_TABLE_INDEX) {}
     TransitionIndex(SymbolNumber input,
@@ -357,6 +359,11 @@ public:
         is.read(reinterpret_cast<char*>(&first_transition_index),
             sizeof(TransitionTableIndex));
     }
+    // A constructor for reading from a char array at p
+    TransitionIndex(char * p):
+        input_symbol(*((SymbolNumber*) p)),
+        first_transition_index((*(TransitionTableIndex*)
+                                (p + sizeof(SymbolNumber)))) {}
     virtual ~TransitionIndex() {}
   
     void write(std::ostream& os, bool weighted) const
@@ -400,6 +407,8 @@ public:
     TransitionIndex(input, first_transition) {}
     TransitionWIndex(std::istream& is):
     TransitionIndex(is) {}
+    TransitionWIndex(char * p):
+        TransitionIndex(p) {}
     
     Weight final_weight(void) const;
   
@@ -425,6 +434,8 @@ protected:
     SymbolNumber output_symbol;
     TransitionTableIndex target_index;
 public:
+    static const  size_t size = sizeof(input_symbol) + sizeof(output_symbol) +
+        sizeof(target_index);
     Transition(SymbolNumber input, SymbolNumber output,
            TransitionTableIndex target, Weight bogus=0.0f):
     input_symbol(input), output_symbol(output), target_index(target)
@@ -443,6 +454,12 @@ public:
         is.read(reinterpret_cast<char*>(&target_index),
             sizeof(target_index));
     }
+    // A constructor for reading from char array
+    Transition(char * p):
+        input_symbol(*(SymbolNumber*) p),
+        output_symbol(*(SymbolNumber*) (p + sizeof(SymbolNumber))),
+        target_index(*(TransitionTableIndex*) (p + 2 * sizeof(SymbolNumber)))
+        {}
   
     virtual ~Transition() {}
   
@@ -475,6 +492,9 @@ class TransitionW : public Transition
 protected:
     Weight transition_weight;
 public:
+    static const size_t size = sizeof(input_symbol) + sizeof(output_symbol) +
+        sizeof(target_index);
+
     TransitionW(SymbolNumber input, SymbolNumber output,
         TransitionTableIndex target, Weight w):
     Transition(input, output, target), transition_weight(w) {}
@@ -482,6 +502,12 @@ public:
     Transition(final), transition_weight(w) {}
     TransitionW(std::istream& is): Transition(is), transition_weight(0.0f)
     {is.read(reinterpret_cast<char*>(&transition_weight), sizeof(Weight));}
+    TransitionW(char * p):
+        Transition(p),
+        transition_weight(*((Weight*)
+                          (p + 2 * sizeof(SymbolNumber)
+                           + sizeof(TransitionTableIndex))))
+        {}
   
     void write(std::ostream& os, bool weighted) const
     {
@@ -509,8 +535,15 @@ public:
     TransducerTable(
     std::istream& is, TransitionTableIndex index_count): table()
     {
-        for(size_t i=0; i<index_count; i++)
-        table.push_back(T(is));
+        char * p = (char*) malloc(T::size * index_count);
+        is.read(p, T::size * index_count);
+        char * p_orig = p;
+        while(index_count) {
+            table.push_back(T(p));
+            --index_count;
+            p += T::size;
+        }
+        free(p_orig);
     }
     TransducerTable(const TransducerTable& t): table(t.table) {}
   
