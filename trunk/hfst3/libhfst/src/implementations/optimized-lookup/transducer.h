@@ -493,7 +493,7 @@ protected:
     Weight transition_weight;
 public:
     static const size_t size = sizeof(input_symbol) + sizeof(output_symbol) +
-        sizeof(target_index);
+        sizeof(target_index) + sizeof(transition_weight);
 
     TransitionW(SymbolNumber input, SymbolNumber output,
         TransitionTableIndex target, Weight w):
