@@ -162,7 +162,8 @@ SymbolNumber Encoder::find_key(char ** p)
 
 bool Transducer::initialize_input(const char * input_str)
 {
-    char * c = strdupa(input_str);
+    char * c = strdup(input_str);
+    char * c_orig = c;
     int i = 0;
     SymbolNumber k = NO_SYMBOL_NUMBER;
     for ( char ** Str = &c; **Str != 0; )
@@ -170,12 +171,14 @@ bool Transducer::initialize_input(const char * input_str)
     k = encoder->find_key(Str);
     if (k == NO_SYMBOL_NUMBER)
     {
+        free(c_orig);
         return false; // tokenization failed
     }
     input_tape[i] = k;
     ++i;
     }
     input_tape[i] = NO_SYMBOL_NUMBER;
+    free(c_orig);
     return true;
 }
 
