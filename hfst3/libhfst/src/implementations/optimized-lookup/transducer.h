@@ -344,7 +344,7 @@ protected:
     TransitionTableIndex first_transition_index;
 public:
     static const size_t size =
-        sizeof(input_symbol) + sizeof(first_transition_index);
+        sizeof(SymbolNumber) + sizeof(TransitionTableIndex);
     TransitionIndex(): input_symbol(NO_SYMBOL_NUMBER),
                first_transition_index(NO_TABLE_INDEX) {}
     TransitionIndex(SymbolNumber input,
@@ -434,8 +434,8 @@ protected:
     SymbolNumber output_symbol;
     TransitionTableIndex target_index;
 public:
-    static const  size_t size = sizeof(input_symbol) + sizeof(output_symbol) +
-        sizeof(target_index);
+    static const size_t size = 2 * sizeof(SymbolNumber) +
+        sizeof(TransitionTableIndex);
     Transition(SymbolNumber input, SymbolNumber output,
            TransitionTableIndex target, Weight bogus=0.0f):
     input_symbol(input), output_symbol(output), target_index(target)
@@ -492,8 +492,8 @@ class TransitionW : public Transition
 protected:
     Weight transition_weight;
 public:
-    static const size_t size = sizeof(input_symbol) + sizeof(output_symbol) +
-        sizeof(target_index) + sizeof(transition_weight);
+    static const size_t size = 2 * sizeof(SymbolNumber) +
+        sizeof(TransitionTableIndex) + sizeof(Weight);
 
     TransitionW(SymbolNumber input, SymbolNumber output,
         TransitionTableIndex target, Weight w):
