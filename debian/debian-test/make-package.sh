@@ -89,6 +89,16 @@ chmod 0644 debian/usr/include/*
 #mkdir debian/usr/include/hfst
 chmod 0755 debian/usr/include/hfst
 
+# Remove the rpaths from HFST tools
+cd debian/usr/bin
+for program in *; 
+do  
+    if ! [ -L "$program" ]; then 
+	chrpath -d $program ; 
+    fi; 
+done
+cd ../../..
+
 # Configure the libraries
 cp debian/DEBIAN/control debian/control
 dpkg-shlibdeps debian/usr/bin/*
