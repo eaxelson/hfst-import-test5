@@ -4,6 +4,7 @@
 #include <cassert>
 #include <cstdio>
 #include <iostream>
+#include <vector>
 #include "../HfstExceptionDefs.h"
 
 namespace hfst {
@@ -39,8 +40,8 @@ namespace hfst {
       /** @brief A set of symbols. */
       typedef std::set<SymbolType> SymbolTypeSet;
       
-      typedef std::map<unsigned int, SymbolType> 
-        Number2SymbolMap;
+      typedef std::vector<SymbolType> 
+        Number2SymbolVector;
       typedef std::map<SymbolType, unsigned int, string_comparison> 
         Symbol2NumberMap;
 
@@ -62,23 +63,16 @@ namespace hfst {
     public: /* FIXME: Should be private. */
       /* Maps that contain information of the mappings between strings 
          and numbers */
-      static Number2SymbolMap number2symbol_map;
+      static Number2SymbolVector number2symbol_map;
       static Symbol2NumberMap symbol2number_map;
       /* Next free number */
       static unsigned int max_number;
 
     protected:
       /* Get the symbol that is mapped as number */
-      static std::string get_symbol(unsigned int number) {
+      static const std::string &get_symbol(unsigned int number) {
 
-    assert(symbol2number_map.find("") == symbol2number_map.end());
-    
-
-        Number2SymbolMap::const_iterator it = number2symbol_map.find(number);
-
-    assert(not(it->second == ""));
-
-        if (it == number2symbol_map.end()) {
+        if (number >= number2symbol_map.size()) {
           /*fprintf(stderr, "ERROR: "
                   "HfstTropicalTransducerTransitionData::get_symbol"
                   "(unsigned int number) "
@@ -95,7 +89,7 @@ namespace hfst {
 
         }
 
-        return it->second;
+        return number2symbol_map[number];
       }
 
       /* Get the number that is used to represent the symbol */
@@ -118,7 +112,8 @@ namespace hfst {
         if (it == symbol2number_map.end()) {
           max_number++;
           symbol2number_map[symbol] = max_number;
-          number2symbol_map[max_number] = symbol;
+          number2symbol_map.push_back(symbol);
+	  
           return max_number;
         }
         return it->second;
@@ -172,12 +167,12 @@ namespace hfst {
       }
 
       /** @brief Get the input symbol. */
-      SymbolType get_input_symbol() const {
+      const SymbolType &get_input_symbol() const {
         return get_symbol(input_number);
       }
 
       /** @brief Get the output symbol. */
-      SymbolType get_output_symbol() const {
+      const SymbolType &get_output_symbol() const {
         return get_symbol(output_number);
       }
 
@@ -248,10 +243,10 @@ namespace hfst {
     class Number2SymbolMapInitializer {
     public:
       Number2SymbolMapInitializer
-        (HfstTropicalTransducerTransitionData::Number2SymbolMap &map) {
-        map[0] = std::string("@_EPSILON_SYMBOL_@");
-        map[1] = std::string("@_UNKNOWN_SYMBOL_@");
-        map[2] = std::string("@_IDENTITY_SYMBOL_@");
+        (HfstTropicalTransducerTransitionData::Number2SymbolVector &map) {
+        map.push_back(std::string("@_EPSILON_SYMBOL_@"));
+        map.push_back(std::string("@_UNKNOWN_SYMBOL_@"));
+        map.push_back(std::string("@_IDENTITY_SYMBOL_@"));
       }
     };
 
