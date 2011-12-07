@@ -189,4 +189,4 @@ HfstConstantTransducer_SOURCES=HfstConstantTransducer.cc
 HfstConstantTransducer_CXXFLAGS=-DMAIN_TEST
 HfstConstantTransducer_LDADD=../libhfst.la
 
-TESTS=$(FOMA_TSTS) $(HFSTOL_TSTS) $(OFST_TSTS) $(SFST_TSTS)
+TESTS=$(FOMA_TSTS) $(HFSTOL_TSTS) $(OFST_TSTS) $(SFST_TSTS) $(LIBHFST_TSTS)
