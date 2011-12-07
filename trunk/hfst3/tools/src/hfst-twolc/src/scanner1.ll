@@ -386,10 +386,12 @@ in/{RESERVED_SYMBOL} { return IN; }
 }
 (([%]({RESERVED_SYMBOL}|{FREE_SYMBOL}))|{FREE_SYMBOL})+/[:] { 
   // A symbol which is the left side of a pair e.g. "a" in "a:b".
-  if (std::string(yytext) == "#")
+  std::string symbol = 
+    remove_white_space(replace_substr(yytext,"\n","__HFST_TWOLC_\\n"));
+  if (symbol == "#")
     { symbol_queue.push_back("__HFST_TWOLC_#"); }
   else
-    { symbol_queue.push_back(yytext); }
+    { symbol_queue.push_back(symbol); }
   return SYMBOL; 
 }
 
