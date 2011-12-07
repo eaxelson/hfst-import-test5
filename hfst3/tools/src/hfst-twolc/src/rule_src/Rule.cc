@@ -92,6 +92,9 @@ void Rule::store(HfstOutputStream &out)
             true,true);
   rule_transducer.apply(&HfstTransducer::substitute,"__HFST_TWOLC_.#.","@#@",
             true,true);
+  rule_transducer.apply(&HfstTransducer::substitute,"__HFST_TWOLC_SPACE",
+			"@_SPACE_@",
+            true,true);
   rule_transducer.apply(&HfstTransducer::substitute,SymbolPair("@#@","@#@"),
             SymbolPair("@#@",HFST_EPSILON));
   rule_transducer.apply(&HfstTransducer::substitute,TWOLC_IDENTITY,

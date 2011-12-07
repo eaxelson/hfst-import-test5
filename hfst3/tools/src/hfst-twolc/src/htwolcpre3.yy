@@ -429,11 +429,13 @@ PAIR: PAIR_SYMBOL COLON PAIR_SYMBOL
 		" is empty.";
 	    }
 	  error +=  std::string("\n\n") +
+
 	    "Note that a pair set X:Y can be empty, even if the sets X and\n"+
             "Y are non-empty, since every symbol pair has to be declared in\n"+
 	    "the alphabet or it has to be the center of a rule, or be in\n"  +
 	    "the context of a rule or result from substituting values for\n" +
 	    "variables in a rule with variables.\n\n" +
+
 	    "Compilation is terminated because a rule context, definition\n" + 
 	    "or rule center becomes empty.\n\n";
 
