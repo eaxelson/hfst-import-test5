@@ -289,7 +289,7 @@ ohd8nd9eIrBlUefoJjnFWuAmy/9fmizVmrnIzQK+zalpu4GqNHkxBdiucoIxiqT7LW//Od4byHH8
 r7c/z1YO1LrIPQbMNG8rAkDLFUlX6/ORRK0qy9uuE3UDzfSm9NT9H7UGKpUn+ovb60VLe0VZC4EF
 WZ3Yafuc2/8ArY/Dax67qJ0AAAAASUVORK5CYII="/>
     </a>,
-    <a href="http://hfst.svn.sourceforge.net/viewvc/hfst/web-demo-bash/$SCRIPT_NAME">
+    <a href="http://hfst.svn.sourceforge.net/viewvc/hfst/web-demo-bash/$(basename $SCRIPT_NAME)">
       the demo source code is available in HFST svn
     </a>.
 EOFOOT
