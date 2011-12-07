@@ -454,14 +454,50 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 
 
 
-  }}
+                 }}
 #else // MAIN_TEST was defined
 
 #include <iostream>
+#include <cassert>
 
 int main(int argc, char * argv[])
 {
     std::cout << "Unit tests for " __FILE__ ":" << std::endl;
+
+    if (not hfst::HfstTransducer::
+        is_implementation_type_available(hfst::TROPICAL_OPENFST_TYPE)) {
+        std::cout << "No tests run in absence of OpenFst library" << std::endl;
+        return 0;
+    }
+
+    hfst::HfstBasicTransducer basic;
+    basic.add_state(1);
+    basic.add_state(2);
+    basic.add_transition(0, hfst::HfstBasicTransition(1, "a", "a", 0));
+    basic.add_transition(1, hfst::HfstBasicTransition(2, "a", "a", 0));
+    basic.add_transition(1, hfst::HfstBasicTransition(2, "a", "b", 0));
+    basic.add_transition(0, hfst::HfstBasicTransition(
+                             2, "a", hfst::internal_epsilon, 0));
+    basic.set_final_weight(2, 0);
+    hfst::HfstBasicTransducer basic_w(basic);
+    basic_w.set_final_weight(2, 1.0);
+    hfst_ol::Transducer * basic_ol =
+        hfst::implementations::ConversionFunctions::
+        hfst_basic_transducer_to_hfst_ol(& basic, false);
+    hfst_ol::Transducer * basic_olw =
+        hfst::implementations::ConversionFunctions::
+        hfst_basic_transducer_to_hfst_ol(& basic_w, true);
+    hfst::HfstBasicTransducer * basic_converted =
+        hfst::implementations::ConversionFunctions::
+        hfst_ol_to_hfst_basic_transducer(basic_ol);
+    hfst::HfstBasicTransducer * basic_converted_w =
+        hfst::implementations::ConversionFunctions::
+        hfst_ol_to_hfst_basic_transducer(basic_olw);
+
+    hfst::HfstTransducer cmp(basic, hfst::TROPICAL_OPENFST_TYPE);
+    hfst::HfstTransducer cmp_w(basic_w, hfst::TROPICAL_OPENFST_TYPE);
+    assert(cmp.compare(hfst::HfstTransducer(*basic_converted, hfst::TROPICAL_OPENFST_TYPE)));
+    assert(cmp_w.compare(hfst::HfstTransducer(*basic_converted_w, hfst::TROPICAL_OPENFST_TYPE)));
     
     std::cout << "ok" << std::endl;
     return 0;
