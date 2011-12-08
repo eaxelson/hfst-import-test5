@@ -72,7 +72,7 @@ print_usage()
         "If FMT is not given, OpenFst's tropical format will be used.\n"
         "The possible values for FMT are { sfst, openfst-tropical, "
         "openfst-log,\n"
-	"foma, optimized-lookup-unweighted, optimized-lookup-weighted }.\n"
+        "foma, optimized-lookup-unweighted, optimized-lookup-weighted }.\n"
         "If EPS is not given, @0@ will be used\n\n"
         );
     fprintf(message_out, "\n");
