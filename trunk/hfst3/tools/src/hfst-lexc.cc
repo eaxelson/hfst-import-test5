@@ -73,7 +73,7 @@ print_usage()
                 "be used\n"
         "The possible values for FORMAT are { sfst, openfst-tropical, "
         "openfst-log,\n"
-       	"foma, optimized-lookup-unweighted, optimized-lookup-weighted }.\n");
+        "foma, optimized-lookup-unweighted, optimized-lookup-weighted }.\n");
         fprintf(message_out,
             "\n"
             "Examples:\n"
@@ -140,18 +140,18 @@ parse_options(int argc, char** argv)
     if (format == hfst::UNSPECIFIED_TYPE)
       {
 #if HAVE_FOMA
-	if (!silent) {
-	  warning(0, 0, "Defaulting to foma type "
-		  "(since it has native lexc support);\n"
-		  "Use command-line option --format to override");
-	}
+        if (!silent) {
+          warning(0, 0, "Defaulting to foma type "
+                  "(since it has native lexc support);\n"
+                  "Use command-line option --format to override");
+        }
         format = hfst::FOMA_TYPE;
 #elif HAVE_OPENFST
-	if (!silent) {
-	  warning(0, 0, "Defaulting to using OpenFst with legacy lexc "
-		  "compilation scheme\n"
-		  "Use command-line option --format to override");
-	}
+        if (!silent) {
+          warning(0, 0, "Defaulting to using OpenFst with legacy lexc "
+                  "compilation scheme\n"
+                  "Use command-line option --format to override");
+        }
         format = hfst::TROPICAL_OPENFST_TYPE;
 #else
         error(EXIT_FAILURE, 0, "Format not given and cannot deduce sensible "
@@ -174,17 +174,17 @@ parse_options(int argc, char** argv)
     else if (!start_readline && (argc == optind))
       {
 #if AT_END_OF_DEPRECATION_PERIOD
-	if (!silent) {
-	  warning(0, 0, "Reading lexc script (not a lexicon) "
-		  "from stdin with readline");
-	}
+        if (!silent) {
+          warning(0, 0, "Reading lexc script (not a lexicon) "
+                  "from stdin with readline");
+        }
         start_readline = true;
 #else
-	if (!silent) {
-	  warning(0, 0, "Reading lexicons from stdin is deprecated and will "
-		  "be removed in next versions;\n"
-		  "this is not even supported by the original lexc");
-	}
+        if (!silent) {
+          warning(0, 0, "Reading lexicons from stdin is deprecated and will "
+                  "be removed in next versions;\n"
+                  "this is not even supported by the original lexc");
+        }
         char* tempfilename = hfst_strdup("/tmp/hfst-lexcXXXXXX");
         int temporary_fd = hfst_mkstemp(tempfilename);
         verbose_printf("Copying data from <stdin> to temporary file\n");
@@ -227,11 +227,11 @@ parse_options(int argc, char** argv)
 
     if (lexccount > 1)
       {
-	if (!silent) {
-	  warning(0, 0, "multiple file handling is not supported by all "
-		  "backends;\n"
-		  "concatenating to temporary file");
-	}
+        if (!silent) {
+          warning(0, 0, "multiple file handling is not supported by all "
+                  "backends;\n"
+                  "concatenating to temporary file");
+        }
         char* tempfilename = hfst_strdup("/tmp/hfst-lexcXXXXXX");
         int temporary_fd = hfst_mkstemp(tempfilename);
         for (unsigned int i = 0; i < lexccount; i++)
