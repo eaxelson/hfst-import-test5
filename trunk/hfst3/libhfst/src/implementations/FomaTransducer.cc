@@ -849,8 +849,10 @@ namespace hfst { namespace implementations {
            &net->is_loop_free, 
            &net->is_completed, 
            buf);
-    strcpy(net->name, buf);
-    //*net_name = strdup(buf);
+    // The following strcpy is commented out because we want to leave the
+    // empty name we've written earlier and use HFST3's name scheme
+    // for everything. NB: There's a limit of 40 chars for net->name.
+    //strcpy(net->name, buf); 
     io_gets(infile, buf);
 
     /* Sigma */
@@ -961,7 +963,7 @@ static int io_gets(FILE *infile, char *target) {
     int c = getc(infile);
     for (i = 0; c != '\n' && c != '\0'; i++) {
         *(target+i) = c;
-    c = getc(infile);
+        c = getc(infile);
     }   
     *(target+i) = '\0';
     if (c == '\0')
