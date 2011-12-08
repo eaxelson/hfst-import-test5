@@ -504,7 +504,7 @@ namespace hfst {
                 {
 		  HfstTransition<C> &tr_it = it->operator[](i);
 		  
-		  HfstState new_target;
+		  HfstState new_target=tr_it.get_target_state();
 		  if (tr_it.get_target_state() == s1)
 		    new_target = s2;
 		  if (tr_it.get_target_state() == s2)
