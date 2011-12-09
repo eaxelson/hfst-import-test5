@@ -6,6 +6,15 @@ This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
 
+Noteworthy changes in 3.3.3
+---------------------------
+
+* HfstTransitionGraph and optimized lookup transducer code optimized
+
+* Foma transducer name is not copied to the net but is left empty
+
+* Small fixes to twolc
+
 Noteworthy changes in 3.3.2
 ---------------------------
 
