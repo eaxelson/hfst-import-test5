@@ -19,16 +19,16 @@
 HFST_NAME=hfst
 HFST_MAJOR=3
 HFST_MINOR=3
-HFST_EXTENSION=2
+HFST_EXTENSION=3
 HFST_VERSION=$HFST_MAJOR.$HFST_MINOR.$HFST_EXTENSION
 # for package-config pc file
 LIBHFST_NAME=hfst
 LIBHFST_MAJOR=3
 LIBHFST_MINOR=3
-LIBHFST_EXTENSION=2
+LIBHFST_EXTENSION=3
 LIBHFST_VERSION=$LIBHFST_MAJOR.$LIBHFST_MINOR.$LIBHFST_EXTENSION
 
-AC_INIT([hfst], [3.3.2], [hfst-bugs@helsinki.fi], [hfst], [http://hfst.sf.net])
+AC_INIT([hfst], [3.3.3], [hfst-bugs@helsinki.fi], [hfst], [http://hfst.sf.net])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall -Werror std-options foreign check-news])
 
@@ -472,7 +472,6 @@ AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strcspn strtol strtoul 
 AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
                  test/libhfst/Makefile test/tools/Makefile
 		 test/tools/fsmbook-examples/Makefile
-		 test/tools/fsmbook-examples/DateParser/Makefile
 		 test/tools/fsmbook-examples/EnglishNumerals/Makefile
 		 test/tools/fsmbook-examples/NumbersToNumerals/Makefile
 		 test/tools/fsmbook-examples/FinnishNumerals/Makefile
@@ -489,6 +488,7 @@ AC_CONFIG_FILES([Makefile doc/Makefile test/Makefile
 		 man/Makefile 
                  scripts/Makefile scripts/hfst-foma-wrapper.sh],
                  [chmod +x scripts/hfst-foma-wrapper.sh])
+#		 test/tools/fsmbook-examples/DateParser/Makefile
 
 # output
 AC_OUTPUT
