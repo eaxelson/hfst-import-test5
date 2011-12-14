@@ -363,19 +363,26 @@ int test(const StringPairVector &tokenized_pair_string,
   if (positive)
     {
       if (positive_exit_code == 1 and not silent)
-    { fprintf(outfile,"%s DISALLOWED\n\n",pair_string.c_str()); }
+    { 
+      fprintf(outfile,"FAIL: %s REJECTED\n\n",pair_string.c_str()); 
+    }
       if (positive_exit_code == 0 and verbose)
-    { fprintf(outfile,"%s ALLOWED\n\n",pair_string.c_str()); }
+    { 
+      fprintf(outfile,"%s PASSED\n\n",pair_string.c_str()); }
       return positive_exit_code;
     }
   else
     {
       if (negative_exit_code == 1 and not silent)
-    { fprintf(outfile,"%s ALLOWED\n\n",pair_string.c_str()); }
+    { 
+      fprintf(outfile,"FAIL: %s PASSED\n\n",pair_string.c_str()); 
+    }
       if (negative_exit_code == 0 and verbose)
-    { fprintf(outfile,"%s DISALLOWED\n\n",pair_string.c_str()); }
+    { 
+      fprintf(outfile,"%s REJECTED\n\n",pair_string.c_str()); }
       return negative_exit_code;
     }
+  return 1;
 }
 
 std::string demangle(std::string name)
@@ -497,7 +504,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
           (tokenized_pair_string.end(),
            StringPair("@#@",hfst::internal_epsilon));
 
-        int new_exit_code = 
+        new_exit_code = 
           test(tokenized_pair_string,line,grammar,rule_names,
            positive_test,outfile,known_symbols);
         
