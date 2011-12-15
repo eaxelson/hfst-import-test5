@@ -6,12 +6,12 @@ fi
 WORDFORM=$1
 LL=$2
 VARIANT=$3
-if ! test -r hfst/$LL/synonyms.$VARIANT.hfstol ; then
-    echo "<div>Missing hfst/$LL/synonyms.$VARIANT.hfstol</div>"
+if ! test -r hfst/$LL/translation.$VARIANT.hfstol ; then
+    echo "<div>Missing hfst/$LL/translation.$VARIANT.hfstol</div>"
     exit 1
 fi
 
-echo "<p>Finding synonyms for <em>"
+echo "<p>Finding translations for <em>"
 echo $WORDFORM | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g'
 echo "</em>:</p>"
 case $VARIANT in
@@ -21,14 +21,14 @@ case $VARIANT in
         echo $WORDFORM | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g'
         echo '</a></dt>'
         echo "$WORDFORM" |\
-            hfst-lookup hfst/$LL/synonyms.$VARIANT.hfstol 2>&1 |\
-            awk '{printf("<dd><a href=\"http://www.ling.helsinki.fi/cgi-bin/fiwn/search?wn=fi&w=%s&t=over&sm=Search\" title=\"search fiwn for %s\">%s</a></dd>\n", $2, $2, $2);}' |\
+            hfst-lookup hfst/$LL/translation.$VARIANT.hfstol 2>&1 |\
+            awk '{printf("<dd><a href=\"http://www.ling.helsinki.fi/cgi-bin/fiwn/search?wn=en&w=%s&t=over&sm=Search\" title=\"search fiwn for %s\">%s</a></dd>\n", $2, $2, $2);}' |\
             sort | uniq;
         echo '</dl>';;
     *)
         echo "<pre>";
         echo "$WORDFORM" |\
-            hfst-lookup hfst/$LL/synonyms.$VARIANT.hfstol 2>&1 |\
+            hfst-lookup hfst/$LL/translation.$VARIANT.hfstol 2>&1 |\
             sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g' |\
             sort | uniq ;
         echo "</pre>";;
