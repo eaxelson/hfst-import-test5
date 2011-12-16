@@ -104,6 +104,35 @@ namespace hfst { namespace implementations
     return (unsigned int)i;
   }
 
+  unsigned int TropicalWeightTransducer::get_biggest_symbol_number
+  (StdVectorFst *t)
+  {
+    unsigned int biggest_number=0;
+    for ( fst::SymbolTableIterator it 
+            = fst::SymbolTableIterator(*(t->InputSymbols()));
+          not it.Done(); it.Next() ) {
+      if (it.Value() > biggest_number) 
+	biggest_number = it.Value();
+    }      
+    return biggest_number;
+  }
+
+  StringVector TropicalWeightTransducer::get_symbol_vector
+  (StdVectorFst *t)
+  {
+    unsigned int biggest_symbol_number = get_biggest_symbol_number(t);
+    StringVector symbol_vector;
+    symbol_vector.resize(biggest_symbol_number+1,"");
+
+    StringSet alphabet = get_alphabet(t);
+    for (StringSet::const_iterator it = alphabet.begin(); it != alphabet.end(); it++)
+      {
+	unsigned int symbol_number = get_symbol_number(t, *it);
+	symbol_vector.at(symbol_number) = *it;
+      }
+    return symbol_vector;
+  }
+
   /* Find the number-to-number mappings needed to be performed to t1 
      so that it will follow the same symbol-to-number encoding as t2.
      @pre t2's symbol table must contain all symbols in t1's symbol table. 

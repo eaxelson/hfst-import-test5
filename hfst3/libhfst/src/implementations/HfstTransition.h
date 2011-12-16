@@ -48,6 +48,14 @@ namespace hfst {
         target_state(s), transition_data(isymbol, osymbol, weight)
           {}
 
+        HfstTransition(HfstState s, 
+                       unsigned int inumber, 
+                       unsigned int onumber, 
+                       typename C::WeightType weight,
+		       bool foo):
+        target_state(s), transition_data(inumber, onumber, weight)
+          {}
+
         /** @brief Create a deep copy of transition \a another. */
       HfstTransition(const HfstTransition<C> &another): 
         target_state(another.target_state), 
