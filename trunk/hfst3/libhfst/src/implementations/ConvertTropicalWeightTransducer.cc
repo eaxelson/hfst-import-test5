@@ -78,7 +78,7 @@ namespace hfst { namespace implementations
         }    
       }
       return net;
-    }
+      }
 
   /* A non-empty OpenFst transducer must have at least an input symbol table.
      If the output symbol table is missing, we assume that it would be 
@@ -88,6 +88,15 @@ namespace hfst { namespace implementations
   }
   if (outputsym == NULL)
     outputsym = inputsym;
+
+  StringVector symbol_vector = TropicalWeightTransducer::get_symbol_vector(t);
+  std::vector<unsigned int> harmonization_vector 
+    = HfstTropicalTransducerTransitionData::get_harmonization_vector(symbol_vector);
+
+  //unsigned int index=0;
+  /*  for (StringVector::const_iterator it = symbol_vector.begin(); it != symbol_vector.end(); it++) {
+      std::cerr << index << "\t" << *it << std::endl; 
+      index++; }*/
 
   /* This takes care that initial state is always number zero
      and state number zero (if it is not initial) is some other number
@@ -103,17 +112,17 @@ namespace hfst { namespace implementations
 
       HfstState origin = s;
       if (origin == initial_state)
-    origin = 0;
+	origin = 0;
       else if (origin == 0)
-    origin = initial_state;
+	origin = initial_state;
 
       unsigned int number_of_arcs = t->NumArcs(s);
       net->initialize_transition_vector(s, number_of_arcs);
-
+      
       /* Go through all transitions in a state */
       for (fst::ArcIterator<fst::StdVectorFst> aiter(*t,s); 
-       !aiter.Done(); aiter.Next())
-    {
+	   !aiter.Done(); aiter.Next())
+	{
       const fst::StdArc &arc = aiter.Value();
 
       HfstState target = arc.nextstate;
@@ -145,17 +154,18 @@ namespace hfst { namespace implementations
       net->add_transition(origin, 
                   HfstBasicTransition
                   (target,
-                   istring,
-                   ostring,
-                   arc.weight.Value()
+                   /*harmonization_vector[arc.ilabel],*/ istring,
+		   /*harmonization_vector[arc.olabel],*/ ostring,
+                   arc.weight.Value()/*,
+				       false*/
                    ));
     } 
 
       if (t->Final(s) != fst::TropicalWeight::Zero()) {
-    // Set the state as final
-    net->set_final_weight(origin, t->Final(s).Value());
+	// Set the state as final
+	net->set_final_weight(origin, t->Final(s).Value());
       }
-
+      
     }
 
     /* Make sure that also the symbols that occur only in the alphabet
@@ -164,17 +174,17 @@ namespace hfst { namespace implementations
             fst::SymbolTableIterator(*(inputsym));
           not it.Done(); it.Next() ) 
       {
-    assert(it.Symbol() != "");
-    if (it.Value() != 0) // epsilon is not inserted
-      net->alphabet.insert( it.Symbol() );
+	assert(it.Symbol() != "");
+	if (it.Value() != 0) // epsilon is not inserted
+	  net->alphabet.insert( it.Symbol() );
       }    
     for ( fst::SymbolTableIterator it = 
             fst::SymbolTableIterator(*(outputsym));
           not it.Done(); it.Next() ) 
       {
-    assert(it.Symbol() != "");
-    if (it.Value() != 0) // epsilon is not inserted
-      net->alphabet.insert( it.Symbol() );
+	assert(it.Symbol() != "");
+	if (it.Value() != 0) // epsilon is not inserted
+	  net->alphabet.insert( it.Symbol() );
       }    
 
     assert(net != NULL);
@@ -685,12 +695,12 @@ namespace hfst { namespace implementations
             // Copy the transition
             t->AddArc( i,
                        fst::StdArc
-               (
-            tr_it->input,
-            tr_it->output,
-            tr_it->weight,
-            tr_it->target
-             ));
+		       (
+			tr_it->input,
+			tr_it->output,
+			tr_it->weight,
+			tr_it->target
+			));
           }
       }
     

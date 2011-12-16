@@ -54,6 +54,8 @@ namespace hfst
   /* A set of strings. */
   typedef std::set<String> StringSet;
 
+  typedef std::vector<String> StringVector; 
+
   /** \brief A symbol pair in a transition. 
 
       @see HfstTransducer::substitute(const StringPair&, const StringPair&) 

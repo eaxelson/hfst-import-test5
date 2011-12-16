@@ -263,6 +263,8 @@ namespace implementations
       static StringSet get_alphabet(StdVectorFst *t);
       static unsigned int get_symbol_number(StdVectorFst *t, 
                         const std::string &symbol);
+      static unsigned int get_biggest_symbol_number(StdVectorFst *t);
+      static StringVector get_symbol_vector(StdVectorFst *t);
 
       static NumberNumberMap create_mapping
         (StdVectorFst * t1, StdVectorFst * t2);

@@ -68,6 +68,19 @@ namespace hfst {
       /* Next free number */
       static unsigned int max_number;
 
+      static std::vector<unsigned int> get_harmonization_vector
+	(const std::vector<SymbolType> &symbols)
+      {
+	std::vector<unsigned int> harmv;
+	harmv.resize(symbols.size(), 0);
+	for (unsigned int i=0; i<symbols.size(); i++)
+	  {
+	    if (symbols.at(i) != "")
+	      harmv.at(i) = get_number(symbols.at(i));
+	  }
+	return harmv;
+      }
+
     protected:
       /* Get the symbol that is mapped as number */
       static const std::string &get_symbol(unsigned int number) {
@@ -164,6 +177,15 @@ namespace hfst {
         input_number = get_number(isymbol);
         output_number = get_number(osymbol);
         this->weight = weight;
+      }
+
+      HfstTropicalTransducerTransitionData
+	(unsigned int inumber,
+	 unsigned int onumber,
+	 WeightType weight) {
+	input_number = inumber;
+	output_number = onumber;
+	this->weight = weight;
       }
 
       /** @brief Get the input symbol. */
