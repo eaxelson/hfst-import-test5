@@ -309,6 +309,41 @@ namespace hfst {
         }
     }
 
+    /* Remove all symbols that are given in \a symbols but do not occur 
+       in transitions of the graph from its alphabet. */
+    void prune_alphabet_after_substitution(const std::set<unsigned int> &symbols)
+    {
+      if (symbols.size() == 0)
+	return;
+
+      std::vector<bool> symbols_found;
+      symbols_found.resize
+	(HfstTropicalTransducerTransitionData::max_number+1, false);
+
+      // Go through all transitions
+      for (iterator it = begin(); it != end(); it++)
+	{
+	  for (typename HfstTransitions::iterator tr_it
+		 = it->begin();
+	       tr_it != it->end(); tr_it++)
+	    {
+	      const C & data = tr_it->get_transition_data();
+	      symbols_found.at(data.get_input_number()) = true;
+	      symbols_found.at(data.get_output_number()) = true;
+	    }
+	}
+
+      // Remove symbols in \a symbols from the alphabet if they did not
+      // occur in any transitions
+      for (std::set<unsigned int>::const_iterator it = symbols.begin();
+	   it != symbols.end(); it++)
+	{
+	  if (! symbols_found.at(*it))
+	    alphabet.erase(HfstTropicalTransducerTransitionData::get_symbol(*it));
+	}
+      
+    }
+
         /** @brief Remove all symbols that do not occur in transitions of
             the graph from its alphabet. 
 
@@ -871,6 +906,11 @@ namespace hfst {
     void substitute_(const HfstSymbolPair &old_sp, 
              const HfstSymbolPairSet &new_sps)
     {
+      unsigned int old_input_number
+	= HfstTropicalTransducerTransitionData::get_number(old_sp.first);
+      unsigned int old_output_number
+	= HfstTropicalTransducerTransitionData::get_number(old_sp.second);
+
       // Whether any substitution was performed
       bool substitution_performed=false;
 
@@ -886,8 +926,8 @@ namespace hfst {
           HfstTransition<C> &tr_it = it->operator[](i);
 
           // If a match was found, substitute:
-          if (tr_it.get_input_symbol() == old_sp.first &&
-              tr_it.get_output_symbol() == old_sp.second)
+          if (tr_it.get_input_number() == old_input_number &&
+              tr_it.get_output_number() == old_output_number)
             {
               substitution_performed=true;
               
@@ -938,6 +978,16 @@ namespace hfst {
       if (substitution_performed) {
         add_symbols_to_alphabet(new_sps);
       }
+
+      // Remove symbols that were removed because of substitutions
+      // (or didn't occur in the graph in the first place)
+      std::set<unsigned int> syms;
+      for (typename HfstSymbolPairSet::const_iterator it = new_sps.begin();
+	   it != new_sps.end(); it++) {
+	syms.insert(HfstTropicalTransducerTransitionData::get_number(it->first));
+	syms.insert(HfstTropicalTransducerTransitionData::get_number(it->second));
+      }
+      prune_alphabet_after_substitution(syms);
 
       return;
     }

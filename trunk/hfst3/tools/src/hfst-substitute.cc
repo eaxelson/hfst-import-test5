@@ -733,6 +733,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 
         }
       delete fallback;
+      // TODO: remove this, this should be taken care in the interface
       fallback = new HfstBasicTransducer(trans);
       fallback->prune_alphabet();
       trans = HfstTransducer(*fallback, trans.get_type());
