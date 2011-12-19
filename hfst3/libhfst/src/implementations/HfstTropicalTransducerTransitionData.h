@@ -16,10 +16,10 @@ namespace hfst {
         return (str1.compare(str2) < 0);
       }
     };
-
+    
     /** @brief One implementation of template class C in 
         HfstTransition. 
-
+	
         A HfstTropicalTransducerTransitionData has an input symbol and an 
         output symbol of type SymbolType (string) and a weight of type 
         WeightType (float).
@@ -29,7 +29,7 @@ namespace hfst {
         implementation is hidden from the user.
         The class has two static maps and functions that take care of conversion
         between strings and internal numbers.
-
+	
         @see HfstTransition HfstBasicTransition */
     class HfstTropicalTransducerTransitionData {
     public:
@@ -47,31 +47,54 @@ namespace hfst {
 
       static SymbolType get_epsilon()
       {
-    return SymbolType("@_EPSILON_SYMBOL_@");
+	return SymbolType("@_EPSILON_SYMBOL_@");
       }
-
+      
       static SymbolType get_unknown()
       {
-    return SymbolType("@_UNKNOWN_SYMBOL_@");
+	return SymbolType("@_UNKNOWN_SYMBOL_@");
       }
-
+      
       static SymbolType get_identity()
       {
-    return SymbolType("@_IDENTITY_SYMBOL_@");
+	return SymbolType("@_IDENTITY_SYMBOL_@");
       }
-
+      
     public: /* FIXME: Should be private. */
       /* Maps that contain information of the mappings between strings 
          and numbers */
-      static Number2SymbolVector number2symbol_map;
+      static Number2SymbolVector number2symbol_vector;
       static Symbol2NumberMap symbol2number_map;
-      /* Next free number */
+      /* The biggest number in use. */
       static unsigned int max_number;
 
+      /* Get the biggest number used to represent a symbol. */
+      static unsigned int get_max_number() {
+	return max_number;
+      }
+
+      /* 
+	 Get a vector that defines how numbers of a transducer must
+	 be changed, i.e. harmonized, so that it follows the same 
+	 number-to-string encoding as all transducers that use the datatype
+	 HfstTropicalTransducerTransitionData.
+
+	 \a symbols defines how numbers are mapped to strings in the
+	 original transducer so that each index in \a symbols 
+	 is the number that corresponds to the string at that index.
+	 An empty string at an index means that the index is not
+	 used in the original transducer.
+
+	 The result is a vector whose each index is the number that
+	 must be replaced by the number at that index when a
+	 transducer is harmonized. If an index is not used in the
+	 transducer, the result will contain a zero at that index.
+      */
       static std::vector<unsigned int> get_harmonization_vector
 	(const std::vector<SymbolType> &symbols)
       {
 	std::vector<unsigned int> harmv;
+	harmv.reserve(symbols.size());
 	harmv.resize(symbols.size(), 0);
 	for (unsigned int i=0; i<symbols.size(); i++)
 	  {
@@ -82,53 +105,46 @@ namespace hfst {
       }
 
     protected:
-      /* Get the symbol that is mapped as number */
-      static const std::string &get_symbol(unsigned int number) {
-
-        if (number >= number2symbol_map.size()) {
-          /*fprintf(stderr, "ERROR: "
-                  "HfstTropicalTransducerTransitionData::get_symbol"
-                  "(unsigned int number) "
-                  "number is not mapped to any symbol\n");*/
+      /* Get the symbol that is mapped as \a number */
+      static const std::string &get_symbol(unsigned int number) 
+      {	
+        if (number >= number2symbol_vector.size()) {
           std::string message("HfstTropicalTransducerTransitionData: "
-                      "number ");
+			      "number ");
           std::ostringstream oss;
           oss << number;
           message.append(oss.str());
           message.append(" is not mapped to any symbol");
           HFST_THROW_MESSAGE
-            (HfstFatalException,
-             message);
-
+            (HfstFatalException, message);
         }
-
-        return number2symbol_map[number];
+        return number2symbol_vector[number];
       }
 
-      /* Get the number that is used to represent the symbol */
-      static unsigned int get_number(const std::string &symbol) {
-
-    if(symbol == "") { // FAIL
-      Symbol2NumberMap::iterator it = symbol2number_map.find(symbol);
-      if (it == symbol2number_map.end()) {
-        std::cerr << "ERROR: No number for the empty symbol\n" 
-              << std::endl;
-      }
-      else {
-        std::cerr << "ERROR: The empty symbol corresdponds to number " 
-              << it->second << std::endl;
-      }
-      assert(false);
-    }
-
+      /* Get the number that is used to represent \a symbol */
+      static unsigned int get_number(const std::string &symbol) 
+      {
+	if(symbol == "") { // FAIL
+	  Symbol2NumberMap::iterator it = symbol2number_map.find(symbol);
+	  if (it == symbol2number_map.end()) {
+	    std::cerr << "ERROR: No number for the empty symbol\n" 
+		      << std::endl;
+	  }
+	  else {
+	    std::cerr << "ERROR: The empty symbol corresdponds to number " 
+		      << it->second << std::endl;
+	  }
+	  assert(false);
+	}
+	
         Symbol2NumberMap::iterator it = symbol2number_map.find(symbol);
-        if (it == symbol2number_map.end()) {
-          max_number++;
-          symbol2number_map[symbol] = max_number;
-          number2symbol_map.push_back(symbol);
-	  
-          return max_number;
-        }
+        if (it == symbol2number_map.end()) 
+	  {
+	    max_number++;
+	    symbol2number_map[symbol] = max_number;
+	    number2symbol_vector.push_back(symbol);	    
+	    return max_number;
+	  }
         return it->second;
       }
 
@@ -152,7 +168,7 @@ namespace hfst {
           epsilon input and output strings and weight zero. */
     HfstTropicalTransducerTransitionData(): 
       input_number(0), output_number(0), weight(0) {}
-
+      
       /** @brief Create a deep copy of HfstTropicalTransducerTransitionData 
           \a data. */
       HfstTropicalTransducerTransitionData
@@ -205,7 +221,7 @@ namespace hfst {
       unsigned int get_output_number() const {
 	return output_number;
       }
-
+      
       /** @brief Get the weight. */
       WeightType get_weight() const {
         return weight;
@@ -222,19 +238,19 @@ namespace hfst {
         return (symbol.compare("@_IDENTITY_SYMBOL_@") == 0);
       }
       static bool is_valid_symbol(const SymbolType &symbol) {
-    if (symbol == "")
-      return false;
-    return true;
+	if (symbol == "")
+	  return false;
+	return true;
       }
 
       static SymbolType get_marker(const SymbolTypeSet &sts) {
-    (void)sts;
-    return SymbolType("@_MARKER_SYMBOL_@");
+	(void)sts;
+	return SymbolType("@_MARKER_SYMBOL_@");
       }
 
       /** @brief Whether this transition is less than transition 
           \a another. 
-
+	  
           /internal is it too slow if string comparison is used instead?
       */
       bool operator<(const HfstTropicalTransducerTransitionData &another) 
@@ -249,15 +265,15 @@ namespace hfst {
           return false;
         return (weight < another.weight);
       }
-
+      
       void operator=(const HfstTropicalTransducerTransitionData &another)
-    {
-      input_number = another.input_number;
-      output_number = another.output_number;
-      weight = another.weight;
-    }
-
-      friend class Number2SymbolMapInitializer;
+	{
+	  input_number = another.input_number;
+	  output_number = another.output_number;
+	  weight = another.weight;
+	}
+      
+      friend class Number2SymbolVectorInitializer;
       friend class Symbol2NumberMapInitializer;
 
       friend class ComposeIntersectFst;
@@ -270,13 +286,13 @@ namespace hfst {
 
     // Initialization of static members in class 
     // HfstTropicalTransducerTransitionData..
-    class Number2SymbolMapInitializer {
+    class Number2SymbolVectorInitializer {
     public:
-      Number2SymbolMapInitializer
-        (HfstTropicalTransducerTransitionData::Number2SymbolVector &map) {
-        map.push_back(std::string("@_EPSILON_SYMBOL_@"));
-        map.push_back(std::string("@_UNKNOWN_SYMBOL_@"));
-        map.push_back(std::string("@_IDENTITY_SYMBOL_@"));
+      Number2SymbolVectorInitializer
+        (HfstTropicalTransducerTransitionData::Number2SymbolVector &vect) {
+        vect.push_back(std::string("@_EPSILON_SYMBOL_@"));
+        vect.push_back(std::string("@_UNKNOWN_SYMBOL_@"));
+        vect.push_back(std::string("@_IDENTITY_SYMBOL_@"));
       }
     };
 
