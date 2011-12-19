@@ -198,6 +198,14 @@ namespace hfst {
         return get_symbol(output_number);
       }
 
+      unsigned int get_input_number() const {
+	return input_number;
+      }
+
+      unsigned int get_output_number() const {
+	return output_number;
+      }
+
       /** @brief Get the weight. */
       WeightType get_weight() const {
         return weight;

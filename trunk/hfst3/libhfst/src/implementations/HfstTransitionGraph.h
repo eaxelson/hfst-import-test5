@@ -403,16 +403,19 @@ namespace hfst {
         /** @brief Add a transition \a transition to state \a s. 
 
             If state \a s does not exist, it is created. */
-        void add_transition(HfstState s, const HfstTransition<C> & transition) {
+    void add_transition(HfstState s, const HfstTransition<C> & transition,
+			bool add_symbols_to_alphabet=true) {
 
           C data = transition.get_transition_data();
 
           add_state(s);
           add_state(transition.get_target_state());
-          alphabet.insert(data.get_input_symbol());
-          alphabet.insert(data.get_output_symbol());
+	  if (add_symbols_to_alphabet) {
+	    alphabet.insert(data.get_input_symbol());
+	    alphabet.insert(data.get_output_symbol());
+	  }
           state_vector[s].push_back(transition);
-        }
+    }
 
         /** @brief Whether state \a s is final. 
         FIXME: return positive infinity instead if not final. */

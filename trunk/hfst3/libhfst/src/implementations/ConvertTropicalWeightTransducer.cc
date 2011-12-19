@@ -132,7 +132,7 @@ namespace hfst { namespace implementations
         target = initial_state;
 
       // Copy the transition
-      std::string istring = inputsym->Find(arc.ilabel);
+      /*      std::string istring = inputsym->Find(arc.ilabel);
       std::string ostring = outputsym->Find(arc.olabel);
 
       if(istring == "") {
@@ -150,15 +150,16 @@ namespace hfst { namespace implementations
       if (arc.olabel == 0) {
         ostring = std::string(internal_epsilon);
       }
+      */
 
       net->add_transition(origin, 
                   HfstBasicTransition
                   (target,
-                   /*harmonization_vector[arc.ilabel],*/ istring,
-		   /*harmonization_vector[arc.olabel],*/ ostring,
-                   arc.weight.Value()/*,
-				       false*/
-                   ));
+                   harmonization_vector[arc.ilabel], //istring,
+		   harmonization_vector[arc.olabel], //ostring,
+                   arc.weight.Value(),
+		   false), // dummy parameter needed because numbers are used 
+			  false); // do not insert symbols to alphabet
     } 
 
       if (t->Final(s) != fst::TropicalWeight::Zero()) {
@@ -252,33 +253,33 @@ namespace hfst { namespace implementations
           {
             // Copy the transition
 
-        assert(not tr_it->get_input_symbol().empty());
-        assert(not tr_it->get_output_symbol().empty());
+	    //assert(not tr_it->get_input_symbol().empty());
+	    //assert(not tr_it->get_output_symbol().empty());
 
-        unsigned int in = st.Find(tr_it->get_input_symbol());
-        unsigned int out = st.Find(tr_it->get_output_symbol());
+	    unsigned int in = tr_it->get_input_number(); // st.Find(tr_it->get_input_symbol());
+	    unsigned int out = tr_it->get_output_number(); // st.Find(tr_it->get_output_symbol());
 
         if (in == -1)
           {
         // FIXME: a temporary solution
-        st.AddSymbol(tr_it->get_input_symbol(), 
+        /*st.AddSymbol(tr_it->get_input_symbol(), 
                  net->get_symbol_number
                    (tr_it->get_input_symbol()));
-        in = st.Find(tr_it->get_input_symbol());
-        /* std::cerr << "ERROR: no number found for input symbol "
+		   in = st.Find(tr_it->get_input_symbol());*/
+        std::cerr << "ERROR: no number found for input symbol "
               << tr_it->get_input_symbol() << std::endl;
-              assert(false); */
+              assert(false);
           }
         if (out == -1)
           {
         // FIXME: a temporary solution
-        st.AddSymbol(tr_it->get_output_symbol(), 
+        /*st.AddSymbol(tr_it->get_output_symbol(), 
                  net->get_symbol_number
                    (tr_it->get_output_symbol()));
-        out = st.Find(tr_it->get_output_symbol());
-        /* std::cerr << "ERROR: no number found for output symbol "
+		   out = st.Find(tr_it->get_output_symbol());*/
+        std::cerr << "ERROR: no number found for output symbol "
               << tr_it->get_output_symbol() << std::endl;
-              assert(false); */
+              assert(false);
           }
 
         // DEBUG
