@@ -97,6 +97,14 @@ namespace hfst {
           return transition_data.get_output_symbol();
         }
 
+	unsigned int get_input_number() const {
+	  return transition_data.get_input_number();
+	}
+
+	unsigned int get_output_number() const {
+	  return transition_data.get_output_number();
+	}
+
         /** @brief Get the weight of the transition. */
         typename C::WeightType get_weight() const {
           return transition_data.get_weight();
