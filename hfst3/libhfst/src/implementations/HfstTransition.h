@@ -54,7 +54,7 @@ namespace hfst {
 		     typename C::WeightType weight,
 		     bool foo):
         target_state(s), transition_data(inumber, onumber, weight)
-          {}
+          { (void)foo; }
 	
         /** @brief Create a deep copy of transition \a another. */
       HfstTransition(const HfstTransition<C> &another): 

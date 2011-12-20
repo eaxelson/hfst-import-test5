@@ -5,9 +5,9 @@ namespace hfst {
   namespace implementations {
 
     HfstTropicalTransducerTransitionData::Number2SymbolVector
-    HfstTropicalTransducerTransitionData::number2symbol_vector;
+    HfstTropicalTransducerTransitionData::number2symbol_map;
     Number2SymbolVectorInitializer 
-    dummy1(HfstTropicalTransducerTransitionData::number2symbol_vector);
+    dummy1(HfstTropicalTransducerTransitionData::number2symbol_map);
     
     HfstTropicalTransducerTransitionData::Symbol2NumberMap 
     HfstTropicalTransducerTransitionData::symbol2number_map;

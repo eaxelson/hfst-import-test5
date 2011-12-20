@@ -63,7 +63,7 @@ namespace hfst {
     public: /* FIXME: Should be private. */
       /* Maps that contain information of the mappings between strings 
          and numbers */
-      static Number2SymbolVector number2symbol_vector;
+      static Number2SymbolVector number2symbol_map;
       static Symbol2NumberMap symbol2number_map;
       /* The biggest number in use. */
       static unsigned int max_number;
@@ -108,7 +108,7 @@ namespace hfst {
       /* Get the symbol that is mapped as \a number */
       static const std::string &get_symbol(unsigned int number) 
       {	
-        if (number >= number2symbol_vector.size()) {
+        if (number >= number2symbol_map.size()) {
           std::string message("HfstTropicalTransducerTransitionData: "
 			      "number ");
           std::ostringstream oss;
@@ -118,7 +118,7 @@ namespace hfst {
           HFST_THROW_MESSAGE
             (HfstFatalException, message);
         }
-        return number2symbol_vector[number];
+        return number2symbol_map[number];
       }
 
       /* Get the number that is used to represent \a symbol */
@@ -142,7 +142,7 @@ namespace hfst {
 	  {
 	    max_number++;
 	    symbol2number_map[symbol] = max_number;
-	    number2symbol_vector.push_back(symbol);	    
+	    number2symbol_map.push_back(symbol);	    
 	    return max_number;
 	  }
         return it->second;
