@@ -138,7 +138,7 @@ namespace hfst {
 
       static unsigned int get_biggest_symbol_number(fsm * t);
       static StringVector get_symbol_vector(fsm * t);
-
+      static std::map<std::string, unsigned int> get_symbol_map(fsm * t);
 
       static void insert_to_alphabet(fsm *t, const std::string &symbol);
       static void remove_from_alphabet(fsm *t, const std::string &symbol);

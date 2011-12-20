@@ -471,7 +471,18 @@ namespace hfst { namespace implementations {
 	}
       return symbol_vector;
     }
-
+    
+    std::map<std::string, unsigned int> SfstTransducer::get_symbol_map
+    (Transducer * t)
+    {
+      StringSet alphabet = get_alphabet(t);
+      std::map<std::string, unsigned int> symbol_map;
+      for (StringSet::const_iterator it = alphabet.begin(); it != alphabet.end(); it++)
+	{
+	  symbol_map[*it] = get_symbol_number(t, it->c_str());
+	}
+      return symbol_map;
+    }
 
   void SfstTransducer::print_alphabet(Transducer *t) {
     fprintf(stderr, "alphabet..\n");

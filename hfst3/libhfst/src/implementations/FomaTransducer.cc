@@ -704,6 +704,19 @@ namespace hfst { namespace implementations {
       return symbol_vector;
     }
 
+    std::map<std::string, unsigned int> FomaTransducer::get_symbol_map
+    (fsm * t)
+    {
+      StringSet alphabet = get_alphabet(t);
+      std::map<std::string, unsigned int> symbol_map;
+      for (StringSet::const_iterator it = alphabet.begin(); it != alphabet.end(); it++)
+        {
+          symbol_map[*it] = get_symbol_number(t, it->c_str());
+        }
+      return symbol_map;
+    }
+
+
 
   FdTable<int>* FomaTransducer::get_flag_diacritics(fsm * t)
   {

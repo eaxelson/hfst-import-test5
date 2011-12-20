@@ -104,6 +104,22 @@ namespace hfst {
 	return harmv;
       }
 
+      static std::vector<unsigned int> get_reverse_harmonization_vector
+	(const std::map<SymbolType, unsigned int> &symbols)
+      {
+	std::vector<unsigned int> harmv;
+	harmv.reserve(max_number+1);
+	harmv.resize(max_number+1, 0);
+	for (unsigned int i=0; i<harmv.size(); i++)
+	  {
+	    std::map<SymbolType, unsigned int>::const_iterator it
+	      = symbols.find(get_symbol(i));
+	    if (it != symbols.end())
+	      harmv.at(i) = it->second;
+	  }
+	return harmv;
+      }
+
     protected:
       /* Get the symbol that is mapped as \a number */
       static const std::string &get_symbol(unsigned int number) 

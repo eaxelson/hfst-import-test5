@@ -177,25 +177,25 @@ namespace hfst {
         return *this;
       }
 
-        /** @brief Create a deep copy of HfstTransitionGraph \a graph. */
-        HfstTransitionGraph(const HfstTransitionGraph &graph) {
-          state_vector = graph.state_vector;
-          final_weight_map = graph.final_weight_map;
-          alphabet = graph.alphabet;
+    /** @brief Create a deep copy of HfstTransitionGraph \a graph. */
+    HfstTransitionGraph(const HfstTransitionGraph &graph) {
+      state_vector = graph.state_vector;
+      final_weight_map = graph.final_weight_map;
+      alphabet = graph.alphabet;
       assert(alphabet.count(HfstSymbol()) == 0);
-        }
-
-        /** @brief Create an HfstTransitionGraph equivalent to HfstTransducer 
-            \a transducer. FIXME: move to a separate file */
-        HfstTransitionGraph(const hfst::HfstTransducer &transducer) {
-          HfstTransitionGraph<HfstTropicalTransducerTransitionData>
-            *fsm = ConversionFunctions::
-              hfst_transducer_to_hfst_basic_transducer(transducer);
-          state_vector = fsm->state_vector;
-          final_weight_map = fsm->final_weight_map;
-          alphabet = fsm->alphabet;
-          delete fsm;
-        }
+    }
+    
+    /** @brief Create an HfstTransitionGraph equivalent to HfstTransducer 
+	\a transducer. FIXME: move to a separate file */
+    HfstTransitionGraph(const hfst::HfstTransducer &transducer) {
+      HfstTransitionGraph<HfstTropicalTransducerTransitionData>
+	*fsm = ConversionFunctions::
+	hfst_transducer_to_hfst_basic_transducer(transducer);
+      state_vector = fsm->state_vector;
+      final_weight_map = fsm->final_weight_map;
+      alphabet = fsm->alphabet;
+      delete fsm;
+    }
 
 
     // --------------------------------------------------
