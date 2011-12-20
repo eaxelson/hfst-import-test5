@@ -192,6 +192,11 @@ namespace hfst { namespace implementations
       t->alphabet.add_symbol(it->c_str(), net->get_symbol_number(*it));
   }
 
+  // How symbols occurring in the basic transducer must be recoded
+  // in the SFST transducer
+  
+  
+
   std::vector<SFST::Node*> state_vector;
   state_vector.push_back(t->root_node());
   for (unsigned int i=1; i <= (net->get_max_state()); i++) {

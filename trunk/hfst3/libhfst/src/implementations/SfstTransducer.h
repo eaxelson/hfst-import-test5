@@ -187,6 +187,7 @@ namespace implementations
 
       static StringVector get_symbol_vector(Transducer * t);
 
+      static std::map<std::string, unsigned int> get_symbol_map(Transducer * t);
 
       static Transducer * disjunct(Transducer * t, const StringPairVector &spv);
 
