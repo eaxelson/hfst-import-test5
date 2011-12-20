@@ -136,6 +136,10 @@ namespace hfst {
 
       static FdTable<int>* get_flag_diacritics(fsm * t);
 
+      static unsigned int get_biggest_symbol_number(fsm * t);
+      static StringVector get_symbol_vector(fsm * t);
+
+
       static void insert_to_alphabet(fsm *t, const std::string &symbol);
       static void remove_from_alphabet(fsm *t, const std::string &symbol);
       static StringSet get_alphabet(fsm *t);

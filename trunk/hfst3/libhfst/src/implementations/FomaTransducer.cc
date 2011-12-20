@@ -748,6 +748,12 @@ namespace hfst { namespace implementations {
   (fsm *t, 
    const std::string &symbol)
   {
+    if (symbol == internal_epsilon)
+      return 0;
+    if (symbol == internal_unknown)
+      return 1;
+    if (symbol == internal_identity)
+      return 2;
     const char * c = symbol.c_str();
     for(struct sigma* p = t->sigma; p!=NULL; p=p->next)
       {
@@ -758,6 +764,37 @@ namespace hfst { namespace implementations {
       }
     HFST_THROW(SymbolNotFoundException);
   }
+
+    unsigned int FomaTransducer::get_biggest_symbol_number(fsm * t)
+    {
+      unsigned int biggest_number=0;
+      for(struct sigma* p = t->sigma; p!=NULL; p=p->next)
+	{
+	  if (p->symbol == NULL)
+	    break;
+	  if (biggest_number < (unsigned int)p->number)
+	    biggest_number = (unsigned int)p->number;
+	}
+      return biggest_number;
+    }
+
+    StringVector FomaTransducer::get_symbol_vector
+    (fsm * t)
+    {
+      unsigned int biggest_symbol_number = get_biggest_symbol_number(t);
+      StringVector symbol_vector;
+      symbol_vector.reserve(biggest_symbol_number+1);
+      symbol_vector.resize(biggest_symbol_number+1,"");
+
+      StringSet alphabet = get_alphabet(t);
+      for (StringSet::const_iterator it = alphabet.begin(); it != alphabet.end(); it++)
+        {
+          unsigned int symbol_number = get_symbol_number(t, *it);
+          symbol_vector.at(symbol_number) = *it;
+        }
+      return symbol_vector;
+    }
+
 
   FdTable<int>* FomaTransducer::get_flag_diacritics(fsm * t)
   {

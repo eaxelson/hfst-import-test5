@@ -183,6 +183,11 @@ namespace implementations
       static void print_test(Transducer *t);
       static void print_alphabet(Transducer *t);
 
+      static unsigned int get_biggest_symbol_number(Transducer * t);
+
+      static StringVector get_symbol_vector(Transducer * t);
+
+
       static Transducer * disjunct(Transducer * t, const StringPairVector &spv);
 
       static StringPairSet get_symbol_pairs(Transducer *t);

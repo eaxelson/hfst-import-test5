@@ -443,6 +443,36 @@ namespace hfst { namespace implementations {
     std::cerr << *t;
   }
 
+    unsigned int SfstTransducer::get_biggest_symbol_number(Transducer * t)
+    {
+      unsigned int biggest_number=0;
+      SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
+      for (SFST::Alphabet::CharMap::const_iterator it = cm.begin(); 
+	   it != cm.end(); it++) {
+	if (it->first > biggest_number)
+	  biggest_number = it->first;
+      }
+      return biggest_number;
+    }
+
+    StringVector SfstTransducer::get_symbol_vector
+    (Transducer * t)
+    {
+      unsigned int biggest_symbol_number = get_biggest_symbol_number(t);
+      StringVector symbol_vector;
+      symbol_vector.reserve(biggest_symbol_number+1);
+      symbol_vector.resize(biggest_symbol_number+1,"");
+      
+      StringSet alphabet = get_alphabet(t);
+      for (StringSet::const_iterator it = alphabet.begin(); it != alphabet.end(); it++)
+	{
+	  unsigned int symbol_number = get_symbol_number(t, it->c_str());
+	  symbol_vector.at(symbol_number) = *it;
+	}
+      return symbol_vector;
+    }
+
+
   void SfstTransducer::print_alphabet(Transducer *t) {
     fprintf(stderr, "alphabet..\n");
     SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
@@ -1123,7 +1153,6 @@ namespace hfst { namespace implementations {
   void SfstTransducer::insert_to_alphabet
     (Transducer * t, const std::string &symbol)
   {
-    std::cerr << "adding symbol " << symbol << std::endl;
     t->alphabet.add_symbol(symbol.c_str());
   }
 
@@ -1181,12 +1210,16 @@ namespace hfst { namespace implementations {
     return s;
   }
 
-  unsigned int SfstTransducer::get_symbol_number(Transducer *t, 
-                         const std::string &symbol)
+    unsigned int SfstTransducer::get_symbol_number
+    (Transducer *t, 
+     const std::string &symbol)
   {
+    if (symbol == "@_EPSILON_SYMBOL_@")
+      return 0;
     int i = t->alphabet.symbol2code(symbol.c_str());
-    if (i == EOF)
+    if (i == EOF) {
       HFST_THROW(SymbolNotFoundException);
+    }
     return (unsigned int)i;
   }
 

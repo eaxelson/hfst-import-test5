@@ -104,7 +104,8 @@ namespace implementations {
 #if HAVE_SFST
   static void sfst_to_hfst_basic_transducer
     ( SFST::Node *node, 
-      HfstBasicTransducer *net, SFST::Alphabet &alphabet);
+      HfstBasicTransducer *net, SFST::Alphabet &alphabet,
+      std::vector<unsigned int> &harmonization_vector);
 
   static HfstBasicTransducer * sfst_to_hfst_basic_transducer
     (SFST::Transducer * t);

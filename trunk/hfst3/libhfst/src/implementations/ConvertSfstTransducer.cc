@@ -49,7 +49,8 @@ namespace hfst { namespace implementations
   void ConversionFunctions::
   sfst_to_hfst_basic_transducer
   ( SFST::Node *node, 
-    HfstBasicTransducer *net, SFST::Alphabet &alphabet ) {
+    HfstBasicTransducer *net, SFST::Alphabet &alphabet,
+    std::vector<unsigned int> &harmonization_vector) {
   
     // If node has not been visited before
     if (not node->was_visited(VMARK)) {
@@ -59,7 +60,7 @@ namespace hfst { namespace implementations
       // vector of net.
       unsigned int number_of_arcs=0;
       for( SFST::ArcsIter p(arcs); p; p++ ) {
-    number_of_arcs++;
+	number_of_arcs++;
       }
 
       net->initialize_transition_vector(node->index, number_of_arcs);
@@ -68,7 +69,7 @@ namespace hfst { namespace implementations
       for( SFST::ArcsIter p(arcs); p; p++ ) {
         SFST::Arc *arc=p;
 
-    const char *isymbol = alphabet.code2symbol(arc->label().lower_char());
+	/*    const char *isymbol = alphabet.code2symbol(arc->label().lower_char());
     if (isymbol == NULL) {
       std::cerr << "ERROR: no string found for number " 
             << arc->label().lower_char() << std::endl;
@@ -84,7 +85,7 @@ namespace hfst { namespace implementations
       assert(false);
     }
         std::string ostring
-          (osymbol);
+	(osymbol);
 
         if (istring.compare("<>") == 0) {
           istring = std::string(internal_epsilon);
@@ -92,13 +93,15 @@ namespace hfst { namespace implementations
         if (ostring.compare("<>") == 0) {
           ostring = std::string(internal_epsilon);
         }
+	*/
 
-        net->add_transition(node->index, 
-                            HfstBasicTransition
-                            (arc->target_node()->index,
-                             istring,
-                             ostring,
-                             0));
+        net->add_transition
+	  (node->index, 
+	   HfstBasicTransition
+	   (arc->target_node()->index,
+	    harmonization_vector.at(arc->label().lower_char()),
+	    harmonization_vector.at(arc->label().upper_char()),
+	    0, false), false);
       }
 
       if (node->is_final()) {
@@ -110,7 +113,8 @@ namespace hfst { namespace implementations
       for( SFST::ArcsIter p(arcs); p; p++ ) {
         SFST::Arc *arc=p;
         sfst_to_hfst_basic_transducer(arc->target_node(), 
-				      net, alphabet);
+				      net, alphabet,
+				      harmonization_vector);
       }
     }
   }
@@ -130,6 +134,11 @@ namespace hfst { namespace implementations
     else
       alphabet_before.insert(internal_epsilon);
       }  
+
+    StringVector symbol_vector = SfstTransducer::get_symbol_vector(t);
+    symbol_vector.at(0) = "@_EPSILON_SYMBOL_@";
+    std::vector<unsigned int> harmonization_vector
+      = HfstTropicalTransducerTransitionData::get_harmonization_vector(symbol_vector);
     
     std::vector<SFST::Node*> indexing;
     t->nodeindexing(&indexing);
@@ -143,7 +152,7 @@ namespace hfst { namespace implementations
    
     sfst_to_hfst_basic_transducer
       (t->root_node(), 
-       net, t->alphabet);
+       net, t->alphabet, harmonization_vector);
     
     // Make sure that also symbols that occur in the alphabet of the
     // transducer t but not in its transitions are inserted to net
