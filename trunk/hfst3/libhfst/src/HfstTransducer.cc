@@ -3040,22 +3040,14 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
 			 "HfstTransducer::convert");
     }
 
-    /*    try 
-	  {*/
-        hfst::implementations::HfstBasicTransducer * internal=NULL;
-    hfst::implementations::HfstFastTransducer * fast_internal=NULL;
-        switch (this->type)
-    {
+    hfst::implementations::HfstBasicTransducer * internal=NULL;
+    switch (this->type)
+      {
 #if HAVE_FOMA
     case FOMA_TYPE:
-      if (false && (type == SFST_TYPE || type == TROPICAL_OPENFST_TYPE))
-            fast_internal =
-          ConversionFunctions::foma_to_hfst_fast_transducer
-          (implementation.foma);
-      else
-        internal =
-          ConversionFunctions::foma_to_hfst_basic_transducer
-          (implementation.foma);
+      internal =
+	ConversionFunctions::foma_to_hfst_basic_transducer
+	(implementation.foma);
       foma_interface.delete_foma(implementation.foma);
       break;
 #endif
@@ -3071,69 +3063,47 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
             //#endif
 #if HAVE_SFST
     case SFST_TYPE:
-      if (false && (type == TROPICAL_OPENFST_TYPE || type == FOMA_TYPE))
-          fast_internal = 
-        ConversionFunctions::sfst_to_hfst_fast_transducer
-        (implementation.sfst);
-        else 
-          internal = 
+      internal = 
         ConversionFunctions::sfst_to_hfst_basic_transducer
         (implementation.sfst);
-            delete implementation.sfst;
-            break;
+      delete implementation.sfst;
+      break;
 #endif
 #if HAVE_OPENFST
     case TROPICAL_OPENFST_TYPE:
-      if (false && (type == SFST_TYPE || type == FOMA_TYPE))
-        fast_internal = 
-          ConversionFunctions::tropical_ofst_to_hfst_fast_transducer
-          (implementation.tropical_ofst);
-      else {
-	internal =
-	  ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
-	  (implementation.tropical_ofst);
-	assert(internal != NULL);
-      }
+      internal =
+	ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
+	(implementation.tropical_ofst);
+      assert(internal != NULL);
       delete implementation.tropical_ofst;
       break;
     case LOG_OPENFST_TYPE:
         internal =
         ConversionFunctions::log_ofst_to_hfst_basic_transducer
-        (implementation.log_ofst);
+	  (implementation.log_ofst);
         delete implementation.log_ofst;
-            break;
-    case HFST_OL_TYPE:
-    case HFST_OLW_TYPE:
-            internal =
-        ConversionFunctions::hfst_ol_to_hfst_basic_transducer
-        (implementation.hfst_ol);
-            delete implementation.hfst_ol;
-            break;
+	break;
+      case HFST_OL_TYPE:
+      case HFST_OLW_TYPE:
+	internal =
+	  ConversionFunctions::hfst_ol_to_hfst_basic_transducer
+	  (implementation.hfst_ol);
+	delete implementation.hfst_ol;
+	break;
 #endif
     case ERROR_TYPE:
     default:
       HFST_THROW(TransducerHasWrongTypeException);
       break;
     }
-
-    ImplementationType original_type = this->type;
-        this->type = type;
-        switch (this->type)
+    this->type = type;
+    switch (this->type)
     {
 #if HAVE_SFST
     case SFST_TYPE:
-      if (false && (original_type == TROPICAL_OPENFST_TYPE || 
-		    original_type == FOMA_TYPE)) {
-        implementation.sfst = 
-          ConversionFunctions::hfst_fast_transducer_to_sfst
-          (fast_internal);
-        delete fast_internal;
-      }
-      else {
-            implementation.sfst = 
-          ConversionFunctions::hfst_basic_transducer_to_sfst(internal);
-            delete internal;
-      }
+      implementation.sfst = 
+	ConversionFunctions::hfst_basic_transducer_to_sfst(internal);
+      delete internal;
       break;
 #endif
         /* Add here your implementation. */
@@ -3148,56 +3118,36 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
             //#endif
 #if HAVE_OPENFST
     case TROPICAL_OPENFST_TYPE:
-      if (false && (original_type == SFST_TYPE || 
-		    original_type == FOMA_TYPE)) {
-        implementation.tropical_ofst = 
-          ConversionFunctions::hfst_fast_transducer_to_tropical_ofst
-          (fast_internal);
-        delete fast_internal; 
-      }
-      else {
-            implementation.tropical_ofst =
-          ConversionFunctions::hfst_basic_transducer_to_tropical_ofst
-          (internal);
-            delete internal;
-      }
-            break;
+      implementation.tropical_ofst =
+	ConversionFunctions::hfst_basic_transducer_to_tropical_ofst
+	(internal);
+      delete internal;
+      break;
     case LOG_OPENFST_TYPE:
-            implementation.log_ofst =
-        ConversionFunctions::hfst_basic_transducer_to_log_ofst(internal);
-            delete internal;
-            break;
+      implementation.log_ofst =
+	ConversionFunctions::hfst_basic_transducer_to_log_ofst(internal);
+      delete internal;
+      break;
     case HFST_OL_TYPE:
     case HFST_OLW_TYPE:
-        implementation.hfst_ol = 
-	  ConversionFunctions::hfst_basic_transducer_to_hfst_ol
-	  (internal, this->type==HFST_OLW_TYPE?true:false, options);
-	delete internal;
-	break;
+      implementation.hfst_ol = 
+	ConversionFunctions::hfst_basic_transducer_to_hfst_ol
+	(internal, this->type==HFST_OLW_TYPE?true:false, options);
+      delete internal;
+      break;
 #endif
 #if HAVE_FOMA
     case FOMA_TYPE:
-      if (false && (original_type == SFST_TYPE || 
-		    original_type == TROPICAL_OPENFST_TYPE)) {
-        implementation.foma =
-          ConversionFunctions::hfst_fast_transducer_to_foma(fast_internal);
-            delete fast_internal;
-      }
-      else {
-            implementation.foma =
-          ConversionFunctions::hfst_basic_transducer_to_foma(internal);
-            delete internal;
-      }
-            break;
+      implementation.foma =
+	ConversionFunctions::hfst_basic_transducer_to_foma(internal);
+      delete internal;
+      break;
 #endif
         case ERROR_TYPE:
-        default:
-	  HFST_THROW(TransducerHasWrongTypeException);
+    default:
+      HFST_THROW(TransducerHasWrongTypeException);
     }
-	/*}
-    catch (const HfstException e)
-      { 
-      throw e; }*/
+
     return *this;
 }
 
