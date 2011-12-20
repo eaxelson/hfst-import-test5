@@ -122,6 +122,7 @@ namespace hfst { namespace implementations
   {
     unsigned int biggest_symbol_number = get_biggest_symbol_number(t);
     StringVector symbol_vector;
+    symbol_vector.reserve(biggest_symbol_number+1);
     symbol_vector.resize(biggest_symbol_number+1,"");
 
     StringSet alphabet = get_alphabet(t);
