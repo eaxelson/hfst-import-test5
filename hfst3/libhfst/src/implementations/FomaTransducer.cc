@@ -120,18 +120,9 @@ namespace hfst { namespace implementations {
     if (header_count != 1)
       {  
         HFST_THROW(NotTransducerStreamException); }
-    //int c = fgetc(input_file);
-    //switch (c)
-    //{
-    // case 0:
     try { skip_identifier_version_3_0(); }
-    //catch (NotTransducerStreamException e) { throw e; }
     catch (const HfstException e)
       { throw e; }
-    //break;
-    //default:
-    //assert(false);
-    //}
   }
 
     void FomaInputStream::ignore(unsigned int n)
@@ -284,10 +275,6 @@ namespace hfst { namespace implementations {
 
     net = fsm_construct_done(h);
     fsm_count(net);
-
-    //sigma_add_special (0, net->sigma);
-    //sigma_add_special (1, net->sigma);
-    //sigma_add_special (2, net->sigma);
     
     return net;      
   }
@@ -479,50 +466,16 @@ namespace hfst { namespace implementations {
   (fsm * t, int state,
    std::map<int,unsigned short> all_visitations, 
    std::map<int, unsigned short> path_visitations,
-   /*std::vector<char>& lbuffer, int lpos, 
-     std::vector<char>& ubuffer, int upos,*/
    ExtractStringsCb& callback, int cycles,
    std::vector<hfst::FdState<int> >* fd_state_stack, 
    bool filter_fd, 
-   /*bool include_spv,*/ StringPairVector &spv)
+   StringPairVector &spv)
   {
     if(cycles >= 0 && path_visitations[state] > cycles)
       return true;
     all_visitations[state]++;
     path_visitations[state]++;
     
-    /*
-    if(lpos > 0 && upos > 0)
-    {
-      lbuffer[lpos] = 0;
-      ubuffer[upos] = 0;
-      
-      //check finality
-      bool final = false;
-      for(int i=0; ((t->states)+i)->state_no != -1; i++)
-      {
-        fsm_state* s = (t->states)+i;
-        if(s->state_no == state && s->final_state == 1)
-        {
-          final = true;
-          break;
-        }
-      }
-      
-      hfst::WeightedPath<float> path(&lbuffer[0],&ubuffer[0],0);
-      if (include_spv) {
-        path.spv = spv;
-        path.is_spv_in_use = true;
-      }
-      hfst::ExtractStringsCb::RetVal ret = callback(path, final);
-      if(!ret.continueSearch || !ret.continuePath)
-      {
-        path_visitations[state]--;
-        return ret.continueSearch;
-      }
-    }
-    */
-
     if (spv.size() != 0)
       {
         //check finality
@@ -586,55 +539,6 @@ namespace hfst { namespace implementations {
         }
       }
       
-      /*
-      int lp=lpos;
-      int up=upos;
-      
-      if(arc->in != 0 && 
-         (!filter_fd || 
-          fd_state_stack->back().get_table().get_operation(arc->in)==NULL))
-      {
-        //find the key in sigma
-        char* c=NULL;
-        for(struct sigma* sig=t->sigma; sig!=NULL&&sig->symbol!=NULL; 
-            sig=sig->next)
-        {
-          if(sig->number == arc->in)
-          {
-            c = sig->symbol;
-            break;
-          }
-        }
-        size_t clen = strlen(c);
-        if(lpos+clen >= lbuffer.size())
-          lbuffer.resize(lbuffer.size()*2, 0);
-        strcpy(&lbuffer[lpos], c);
-        lp += clen;
-      }
-      if(arc->out != 0 && 
-         (!filter_fd || 
-          fd_state_stack->back().get_table().get_operation(arc->out)==NULL))
-      {
-        //find the key in sigma
-        char* c=NULL;
-        for(struct sigma* sig=t->sigma; sig!=NULL&&sig->symbol!=NULL; 
-            sig=sig->next)
-        {
-          if(sig->number == arc->out)
-          {
-            c = sig->symbol;
-            break;
-          }
-        }
-        size_t clen = strlen(c);
-        if(upos+clen > ubuffer.size())
-          ubuffer.resize(ubuffer.size()*2, 0);
-        strcpy(&ubuffer[upos], c);
-        up += clen;
-      }
-      */      
-
-
       /* Handle spv here. Special symbols (flags, epsilons) 
          are always inserted. */
 
@@ -670,9 +574,9 @@ namespace hfst { namespace implementations {
       spv.push_back(StringPair(istring, ostring));
 
       res = extract_paths(t, arc->target, all_visitations, path_visitations,
-                            /*lbuffer, lp, ubuffer, up,*/ callback, cycles,
+                            callback, cycles,
                             fd_state_stack, filter_fd,
-                            /*include_spv,*/ spv);
+                            spv);
 
       spv.pop_back();
 
@@ -775,6 +679,10 @@ namespace hfst { namespace implementations {
 	  if (biggest_number < (unsigned int)p->number)
 	    biggest_number = (unsigned int)p->number;
 	}
+      // epsilon, unknown and identity are always included and
+      // get_symbol_number always returns a value for them
+      if (biggest_number < 2)
+	return 2; 
       return biggest_number;
     }
 
@@ -782,6 +690,7 @@ namespace hfst { namespace implementations {
     (fsm * t)
     {
       unsigned int biggest_symbol_number = get_biggest_symbol_number(t);
+
       StringVector symbol_vector;
       symbol_vector.reserve(biggest_symbol_number+1);
       symbol_vector.resize(biggest_symbol_number+1,"");

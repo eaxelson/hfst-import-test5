@@ -49,30 +49,15 @@ namespace hfst { namespace implementations
     alphabet_before.insert(internal_identity);
 #endif // DEBUG_CONVERSION
 
-    //StringVector symbol_vector = FomaTransducer::get_symbol_vector(t);
-
-    unsigned int index=0;
-    /*    for (StringVector::const_iterator it = symbol_vector.begin();
-	 it != symbol_vector.end(); it++) {
-      std::cerr << "[" << index << "] = " << *it << std::endl; 
-	index++;
-	}*/
-
-    //std::vector<unsigned int> harmonization_vector
-    //= HfstTropicalTransducerTransitionData::get_harmonization_vector(symbol_vector);
+    StringVector symbol_vector = FomaTransducer::get_symbol_vector(t);
+    std::vector<unsigned int> harmonization_vector
+      = HfstTropicalTransducerTransitionData::get_harmonization_vector(symbol_vector);
     
-    /*    index=0;
-    for (std::vector<unsigned int>::const_iterator it = harmonization_vector.begin();
-	 it != harmonization_vector.end(); it++) {
-      std::cerr << "[" << index << "] = " << *it << std::endl; 
-	index++;
-	}*/
-
-  HfstBasicTransducer * net = new HfstBasicTransducer();
-  struct fsm_state *fsm;
-  fsm = t->states;
-  int start_state_id = -1;
-  bool start_state_found=false;
+    HfstBasicTransducer * net = new HfstBasicTransducer();
+    struct fsm_state *fsm;
+    fsm = t->states;
+    int start_state_id = -1;
+    bool start_state_found=false;
 
   // For every line in foma transducer:
   for (int i=0; (fsm+i)->state_no != -1; i++) {    
@@ -125,11 +110,11 @@ namespace hfst { namespace implementations
           ((fsm+i)->state_no,
            HfstBasicTransition
            ((fsm+i)->target,
-            //harmonization_vector.at((fsm+i)->in), 
-            //harmonization_vector.at((fsm+i)->out), 
-	    std::string (sigma_string((fsm+i)->in, t->sigma)),
-	    std::string (sigma_string((fsm+i)->out, t->sigma)),
-            0));    
+            harmonization_vector.at((fsm+i)->in), 
+            harmonization_vector.at((fsm+i)->out), 
+	    //std::string (sigma_string((fsm+i)->in, t->sigma)),
+	    //std::string (sigma_string((fsm+i)->out, t->sigma)),
+            0, false), false);    
       }
     
     // 3. If the source state is final in foma,
