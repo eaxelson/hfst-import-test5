@@ -31,7 +31,99 @@ namespace hfst { namespace implementations
 
 #if HAVE_FOMA
 
-  /* Create an HfstBasicTransducer equivalent to foma transducer \a t. */
+
+  /* -----------------------------------------------------------------
+     
+     Internal functions used by the actual conversion functions. 
+     
+     ----------------------------------------------------------------- */
+
+  /* Get the number of transitions in state \a fsm */
+  static unsigned int get_number_of_transitions(struct fsm_state * fsm)
+  {
+    unsigned int number_of_transitions=0;
+    for (unsigned int j=0;
+         (fsm+j)->target != -1 &&
+           (fsm+j)->state_no == (fsm)->state_no;
+         j++)
+      {
+        number_of_transitions++;
+      }
+    return number_of_transitions;
+  }
+
+  /* 
+     Handle a start state in a foma transducer. 
+     
+     @param fsm            The start state.
+     @param start_state_id The number of the start state, the value -1 means
+                           not defined.
+     @param start_state_found Whether the start state has been encountered
+                              at some point.
+    */
+  static void handle_start_state
+      (struct fsm_state * fsm, 
+       int &start_state_id,
+       bool &start_state_found)
+    {
+        // If the start state has not yet been encountered.
+      if (not start_state_found) {
+	start_state_id = (fsm)->state_no; // define the start state
+	start_state_found=true;           // define that it is found
+      }
+      // If the start state is encountered again, 
+      else if ((fsm)->state_no == start_state_id) {
+	// do nothing.
+      }
+      // If there are several initial states in foma transducer,
+      else {
+	// throw an exception.
+	HFST_THROW_MESSAGE
+	  (HfstFatalException,
+	   "Foma transducer has more than one start state");
+      }
+    }
+
+  /* Copy the alphabet of foma transducer \a t to HFST basic transducer 
+     \a net. */
+  static void copy_alphabet(const struct fsm * t, HfstBasicTransducer * net)
+  {
+    struct sigma * p = t->sigma;
+    while (p != NULL) {
+      if (p->symbol == NULL)
+	break;
+      net->add_symbol_to_alphabet(std::string(p->symbol));
+      p = p->next;
+    }
+  }
+
+  /* Copy the alphabet of hfst basic transducer \a hfst_fsm
+     to fsm construct handle \a h. */
+  static void copy_alphabet(const HfstBasicTransducer * hfst_fsm,
+			    struct fsm_construct_handle * h)
+  {
+    const HfstBasicTransducer::HfstTransitionGraphAlphabet & alpha
+      = hfst_fsm->get_alphabet();
+    for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it 
+           = alpha.begin();
+	 it != alpha.end(); it++)
+      {
+	char *symbol = strdup(it->c_str());
+	if ( fsm_construct_check_symbol(h,symbol) == -1 ) {
+	  fsm_construct_add_symbol(h,symbol);
+	}
+	free(symbol);
+      }
+  }
+
+
+  
+  /* ----------------------------------------------------------------------
+
+     Create an HfstBasicTransducer equivalent to foma transducer \a t. 
+     
+     ---------------------------------------------------------------------- */
+
   HfstBasicTransducer * ConversionFunctions::
   foma_to_hfst_basic_transducer(struct fsm * t) {
 
@@ -63,44 +155,19 @@ namespace hfst { namespace implementations
   for (int i=0; (fsm+i)->state_no != -1; i++) {    
 
     // Count the number of transitions in the current state
-    // and initialize the transition vector of net.
+    // and initialize the transition vector of the net accordingly
     if ((fsm+i)->target != -1 )
       {
-    unsigned int number_of_transitions=0;
-    for (unsigned int j=0; 
-         (fsm+i+j)->target != -1 &&
-           (fsm+i+j)->state_no == (fsm+i)->state_no;
-         j++)
-      {
-        number_of_transitions++;
-      }
-    net->initialize_transition_vector((fsm+i)->state_no, 
-                      number_of_transitions);
+	unsigned int number_of_transitions = get_number_of_transitions(fsm+i);
+	net->initialize_transition_vector
+	  ((fsm+i)->state_no, 
+	   number_of_transitions);
       }
 
     // 1. If the source state is an initial state in foma:
-    if ((fsm+i)->start_state == 1) 
-      {
-        // If the start state has not yet been encountered.
-        if (not start_state_found) {
-          start_state_id = (fsm+i)->state_no;
-          //if (start_state_id != 0) {
-          //  throw ErrorException();
-          //}
-          start_state_found=true;
-        }
-        // If the start state is encountered again, 
-        else if ((fsm+i)->state_no == start_state_id) {
-          // do nothing.
-        }
-        // If there are several initial states in foma transducer,
-        else {
-          // throw an exception.
-          HFST_THROW_MESSAGE
-            (HfstFatalException,
-             "Foma transducer has more than one start state");
-        }
-      }
+    if ((fsm+i)->start_state == 1) {
+      handle_start_state(fsm+i, start_state_id, start_state_found);
+    }
 
     // 2. If there are transitions leaving from the state,
     if ((fsm+i)->target != -1) 
@@ -112,17 +179,14 @@ namespace hfst { namespace implementations
            ((fsm+i)->target,
             harmonization_vector.at((fsm+i)->in), 
             harmonization_vector.at((fsm+i)->out), 
-	    //std::string (sigma_string((fsm+i)->in, t->sigma)),
-	    //std::string (sigma_string((fsm+i)->out, t->sigma)),
             0, false), false);    
       }
     
     // 3. If the source state is final in foma,
-    if ((fsm+i)->final_state == 1) 
-      {
-        // set the state as final.
-        net->set_final_weight((fsm+i)->state_no, 0);
-      }
+    if ((fsm+i)->final_state == 1) {
+      // set the state as final.
+      net->set_final_weight((fsm+i)->state_no, 0);
+    }
     
   }
 
@@ -140,15 +204,8 @@ namespace hfst { namespace implementations
     net->swap_state_numbers(start_state_id,0);
   }
 
-  /* Make sure that also the symbols that occur only in the alphabet
-     but not in transitions are copied. */
-  struct sigma * p = t->sigma;
-  while (p != NULL) {
-    if (p->symbol == NULL)
-      break;
-    net->alphabet.insert(std::string(p->symbol));
-    p = p->next;
-  }
+  /* Copy the alphabet */
+  copy_alphabet(t, net);
 
 #ifdef DEBUG_CONVERSION
   StringSet alphabet_after = net->get_alphabet();
@@ -183,7 +240,13 @@ namespace hfst { namespace implementations
 }
 
 
-  /* Create a foma transducer equivalent to HfstBasicTransducer \a hfst_fsm. */
+
+  /* ------------------------------------------------------------------------
+     
+     Create a foma transducer equivalent to HfstBasicTransducer \a hfst_fsm. 
+
+     ------------------------------------------------------------------------ */
+
   struct fsm * ConversionFunctions::
     hfst_basic_transducer_to_foma(const HfstBasicTransducer * hfst_fsm) {
 
@@ -200,12 +263,12 @@ namespace hfst { namespace implementations
     h = fsm_construct_init(emptystr);
     free(emptystr);
     
-    // Go through all states
+    // ----- Go through all states -----
     unsigned int source_state=0;
     for (HfstBasicTransducer::const_iterator it = hfst_fsm->begin();
          it != hfst_fsm->end(); it++)
       {
-        // Go through the set of transitions in each state
+        // ----- Go through the set of transitions in each state -----
         for (HfstBasicTransducer::HfstTransitions::const_iterator tr_it 
                = it->begin();
              tr_it != it->end(); tr_it++)
@@ -221,10 +284,13 @@ namespace hfst { namespace implementations
             free(input);
             free(output);
           }
-    source_state++;
-      }
+	// ----- transitions gone through -----
+	source_state++;
+      }  
+    // ----- all states gone through -----
     
-    // Go through the final states
+
+    // ----- Go through the final states -----
     for (HfstBasicTransducer::FinalWeightMap::const_iterator it 
            = hfst_fsm->final_weight_map.begin();
          it != hfst_fsm->final_weight_map.end(); it++) 
@@ -232,19 +298,11 @@ namespace hfst { namespace implementations
         // Set the state as final
         fsm_construct_set_final(h, (int)it->first);
       }
+    // ----- final states gone through -----
+
     
-    /* Make sure that also the symbols that occur only in the alphabet
-       but not in transitions are copied. */
-    for (HfstBasicTransducer::HfstTransitionGraphAlphabet::iterator it 
-           = hfst_fsm->alphabet.begin();
-         it != hfst_fsm->alphabet.end(); it++)
-      {
-        char *symbol = strdup(it->c_str());
-        if ( fsm_construct_check_symbol(h,symbol) == -1 ) {
-          fsm_construct_add_symbol(h,symbol);
-        }
-        free(symbol);
-      }
+    // Copy the alphabet
+    copy_alphabet(hfst_fsm, h);
     
     fsm_construct_set_initial(h, 0);
     net = fsm_construct_done(h);
@@ -268,6 +326,7 @@ namespace hfst { namespace implementations
   }
 
 #endif // HAVE_FOMA
+
 
 
 
