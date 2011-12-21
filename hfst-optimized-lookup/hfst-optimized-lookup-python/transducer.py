@@ -14,7 +14,8 @@ class Transducer:
             return match(self.inputSymbol, symbol)
         
         def isFinal(self):
-            return self.target == 1
+            return self.inputSymbol == NO_SYMBOL_NUMBER and \
+                self.target != NO_TABLE_INDEX
 
     class IndexTable:
 
@@ -35,8 +36,9 @@ class Transducer:
             return match(self.inputSymbol, symbol)
 
         def isFinal(self):
-            return self.target == 1
-            
+            return self.inputSymbol == NO_SYMBOL_NUMBER and \
+                self.outputSymbol == NO_SYMBOL_NUMBER and \
+                self.target == 1
 
     class TransitionTable:
 
@@ -54,11 +56,11 @@ class Transducer:
                 self.position = pos
 
         def at(self, pos):
-            return transitions[pos - TRANSITION_TARGET_TABLE_START]
+            return self.transitions[pos - TRANSITION_TARGET_TABLE_START]
         
         def isFinal(self, pos):
             if pos >= TRANSITION_TARGET_TABLE_START:
-                return transitions[pos - TRANSITION_TARGET_TABLE_START].isFinal()
+                return self.transitions[pos - TRANSITION_TARGET_TABLE_START].isFinal()
             return self.transitions[pos].isFinal()
 
     def __init__(self, file, header, alphabet):
@@ -175,11 +177,6 @@ class TransducerW(Transducer):
 
     class TransitionIndex(Transducer.TransitionIndex):
 
-        def isFinal(self):
-            if self.inputSymbol != NO_SYMBOL_NUMBER:
-                return False
-            return float(self.target) != INFINITE_WEIGHT
-
         def getFinalWeight(self):
             return float(self.target)
 
@@ -191,19 +188,12 @@ class TransducerW(Transducer):
                 [TransducerW.TransitionIndex(struct.unpack_from("<HI", bytes, x*6)) \
                      for x in xrange(number_of_indices)]
 
-
     class Transition(Transducer.Transition):
             
         def __init__(self, (input, output, target, weight)):
             Transducer.Transition.__init__(self, (input, output, target))
             self.weight = weight
             
-            def isFinal(self):
-                if self.inputSymbol != NO_SYMBOL_NUMBER or \
-                        self.outputSymbol != NO_SYMBOL_NUMBER:
-                    return False
-                return self.weight != INFINITE_WEIGHT
-
     class TransitionTable(Transducer.TransitionTable):
 
         def __init__(self, file, number_of_transitions):
@@ -301,4 +291,4 @@ class TransducerW(Transducer):
             if x == NO_SYMBOL_NUMBER:
                 break
             output += self.alphabet.keyTable[x]
-            self.displayVector.append(output + '\t' + str(self.current_weight))
+        self.displayVector.append(output + '\t' + str(self.current_weight))
