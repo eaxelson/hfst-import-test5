@@ -64,6 +64,7 @@ class Alphabet:
                     self.keyTable.append(symbol)
                     break
                 symbol += byte
+        self.keyTable[0] = u""
 
 class LetterTrie:
     """Insert and prefix-retrieve string / symbol number pairs"""
