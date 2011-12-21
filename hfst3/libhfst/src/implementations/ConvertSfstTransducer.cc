@@ -194,8 +194,12 @@ namespace hfst { namespace implementations
 
   // How symbols occurring in the basic transducer must be recoded
   // in the SFST transducer
-  
-  
+  std::map<std::string, unsigned int> symbol_map = SfstTransducer::get_symbol_map(t);
+  symbol_map.erase("<>");
+  symbol_map[internal_epsilon] = 0;
+  std::vector<unsigned int> harm =
+    HfstTropicalTransducerTransitionData::get_reverse_harmonization_vector
+    (symbol_map);
 
   std::vector<SFST::Node*> state_vector;
   state_vector.push_back(t->root_node());
@@ -213,6 +217,7 @@ namespace hfst { namespace implementations
              = it->begin();
            tr_it != it->end(); tr_it++)
         {
+	  /*
           std::string istring(tr_it->get_input_symbol());
           std::string ostring(tr_it->get_output_symbol());
 
@@ -222,11 +227,14 @@ namespace hfst { namespace implementations
 
           if (is_epsilon(ostring)) {
             ostring = std::string("<>");
-          }
+	    }*/
 
-          SFST::Label l
+          /*SFST::Label l
             (t->alphabet.symbol2code(istring.c_str()),
-             t->alphabet.symbol2code(ostring.c_str()));
+	    t->alphabet.symbol2code(ostring.c_str()));*/
+	  SFST::Label l
+	    (harm.at(tr_it->get_input_number()),
+	     harm.at(tr_it->get_output_number()));
           
           // Copy transition to node
       state_vector[source_state]->add_arc
