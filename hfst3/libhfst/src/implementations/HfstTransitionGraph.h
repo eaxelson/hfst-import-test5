@@ -140,6 +140,11 @@ namespace hfst {
     /* The alphabet of the graph. */
         HfstTransitionGraphAlphabet alphabet;
 
+	/* Used by substitute function. */
+	typedef unsigned int HfstNumber;
+	typedef std::pair<HfstNumber, HfstNumber> HfstNumberPair;
+	typedef std::map<HfstNumberPair, HfstNumberPair> HfstSubstitutions_;
+
       protected:
         /* @brief An iterator type that points to a state in a graph. 
         
@@ -845,8 +850,8 @@ namespace hfst {
 
     /* A function that performs in-place-substitution in the graph. */
 
-	void substitute_(const HfstSymbol &old_symbol, 
-			 const HfstSymbol &new_symbol,
+	void substitute_(HfstSymbol old_symbol,
+			 HfstSymbol new_symbol,
 			 bool input_side=true, 
 			 bool output_side=true)
 	{
@@ -900,7 +905,54 @@ namespace hfst {
 	  
 	  return;
 	}
-	
+
+	/* A function that performs in-place substitutions in the graph
+	   as defined in \a substitutions. */
+	void substitute_(const HfstSubstitutions_ &substitutions)
+	{
+          // ----- Go through all states -----
+          for (iterator it = begin(); it != end(); it++)
+            {
+	      // Go through all transitions
+              for (unsigned int i=0; i < it->size(); i++)
+                {
+		  HfstTransition<C> &tr_it = it->operator[](i);
+
+		  HfstNumberPair old_number_pair
+		    ( tr_it.get_input_number(),
+		      tr_it.get_output_number() );
+		  
+		  HfstSubstitutions_::const_iterator subst_it
+		    = substitutions.find(old_number_pair);
+		    
+		    // If a substitution is to be performed,
+		  if (subst_it != substitutions.end()) {
+		    
+		    HfstNumber new_input_number = subst_it->second.first;
+		    HfstNumber new_output_number = subst_it->second.second;
+
+		    add_symbol_to_alphabet(HfstTropicalTransducerTransitionData::
+					   get_symbol(new_input_number));
+		    add_symbol_to_alphabet(HfstTropicalTransducerTransitionData::
+					   get_symbol(new_output_number));
+		    
+		    // change the current transition accordingly.
+		    HfstTransition<C> tr
+		      (tr_it.get_target_state(),
+		       new_input_number,
+		       new_output_number,
+		       tr_it.get_weight(), false);
+		    
+		    it->operator[](i) = tr;
+		  }
+		  
+		} // all transitions gone through
+	      
+	    } // ----- all states gone through -----
+	  
+	  return;
+	}
+
 	/* A function that performs in-place-substitution in the graph. */
 	void substitute_(const HfstSymbolPair &old_sp, 
 			 const HfstSymbolPairSet &new_sps)
@@ -1125,6 +1177,35 @@ namespace hfst {
 
           return *this;
         }
+
+	/** @brief Substitute all transitions as defined in \a substitutions.
+	    
+	    For each transition x:y, \a substitutions is searched and if 
+	    a mapping x:y -> X:Y is found, the transition x:y is replaced
+	    with X:Y. If no mapping is found, the transition remains the same.
+	 */
+	HfstTransitionGraph &substitute
+	  (const HfstSymbolPairSubstitutions &substitutions)
+	  {
+	    // Convert from symbols to numbers
+	    HfstSubstitutions_ substitutions_;
+	    for (HfstSymbolPairSubstitutions::const_iterator it 
+		   = substitutions.begin();
+		 it != substitutions.end(); it++)
+	      {
+		HfstNumberPair from_transition
+		  (get_symbol_number(it->first.first), 
+		   get_symbol_number(it->first.second));
+		HfstNumberPair to_transition
+		  (get_symbol_number(it->second.first), 
+		   get_symbol_number(it->second.second));
+		substitutions_[from_transition] = to_transition;
+	      }
+
+	    substitute_(substitutions_);
+
+	    return *this;
+	  }
 
         /** @brief Substitute all transitions \a sp with a set of transitions
             \a sps. */

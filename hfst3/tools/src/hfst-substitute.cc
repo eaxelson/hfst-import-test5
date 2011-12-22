@@ -41,7 +41,10 @@ using hfst::HfstOutputStream;
 using hfst::implementations::HfstState;
 using hfst::implementations::HfstBasicTransducer;
 using hfst::implementations::HfstBasicTransition;
+using hfst::String;
 using hfst::StringPair;
+typedef std::map<String, String> HfstSymbolSubstitutions;
+typedef std::map<StringPair, StringPair> HfstSymbolPairSubstitutions;
 
 #include "hfst-commandline.h"
 #include "hfst-program-options.h"
@@ -69,6 +72,8 @@ static HfstTransducer* to_transducer = 0;
 static bool compose = false;
 static HfstTransducer* substitution_trans = 0;
 static bool delayed = false;
+static HfstSymbolSubstitutions* label_substitution_map = 0;
+static HfstSymbolPairSubstitutions* pair_substitution_map = 0;
 
 /**
  * @brief parse string pair from arc label.
@@ -154,6 +159,7 @@ print_usage()
             "  -T, --to-transducer=TFILE    replace with transducer "
             "read from TFILE\n"
             "  -F, --from-file=LABELFILE    read replacements from LABELFILE\n"
+	    "  -R,  --in-order              keep the order of the replacements\n"
             "Transient optimisation schemes:\n"
             "  -9, --compose                compose substitutions when possible\n"
            );
@@ -193,13 +199,14 @@ parse_options(int argc, char** argv)
             {"from-file", required_argument, 0, 'F'},
             {"to-label", required_argument, 0, 't'},
             {"to-transducer", required_argument, 0, 'T'},
+	    {"in-order", no_argument, 0, 'R'},
             {"compose", no_argument, 0, '9'},
             {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "f:F:t:T:9",
+                             HFST_GETOPT_UNARY_SHORT "f:F:t:T:R9",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -250,6 +257,9 @@ parse_options(int argc, char** argv)
             }
             fclose(f);
             break;
+	case 'R':
+	    error(EXIT_FAILURE, 0, "option --in-order is not implemented\n");
+	    break;
         case '9':
             compose = true;
             break;
@@ -499,6 +509,9 @@ perform_delayed(HfstTransducer& trans)
 int
 process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 {
+  bool symbol_pair_map_in_use=false;
+  bool symbol_map_in_use=false;
+
   size_t transducer_n = 0;
   HfstTransducer* to_transducer = NULL;
   if (to_transducer_filename)
@@ -605,28 +618,80 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
                                 hfst::internal_epsilon.c_str());
                 }
 
-              try 
-                {
-                  do_substitute(trans, transducer_n);
-                }
-              catch (FunctionNotImplementedException fnse)
-                {
-                  if (!warnedAlready)
-                    {
-		      if (!silent) {
-			warning(0, 0, "substitution is not supported for this transducer type"
-				" falling back to internal formats and trying..."); 
-		      }
+	      if (from_pair && to_pair) 
+		{
+		  pair_substitution_map->operator[](*from_pair) = *to_pair;
+		  symbol_pair_map_in_use=true;
+		}
+	      else if (from_label && to_label) 
+		{
+		  label_substitution_map->operator[](std::string(from_label)) = std::string(to_label);
+		  symbol_map_in_use=true;
+		}
+	      else {
+		try 
+		  {
+		    do_substitute(trans, transducer_n);
+		  }
+		catch (FunctionNotImplementedException fnse)
+		  {
+		    if (!warnedAlready)
+		      {
+			if (!silent) {
+			  warning(0, 0, "substitution is not supported for this transducer type"
+				  " falling back to internal formats and trying..."); 
+			}
 			fallback = new HfstBasicTransducer(trans);
-                      warnedAlready = true;
-                    }
-                  do_substitute(*fallback, transducer_n);
-                  fellback = true;
-                }
-              free(from_label);
-              free(to_label);
+			warnedAlready = true;
+		      }
+		    do_substitute(*fallback, transducer_n);
+		    fellback = true;
+		  }
+		free(from_label);
+		free(to_label);
+	      }
             } // while getline
           free(line);
+
+	  if (symbol_map_in_use) {
+
+#ifdef DEBUG_SUBSTITUTE
+	    std::cerr << "Symbol substitution map now includes" << std::endl;
+	    for (HfstSymbolSubstitutions::const_iterator it 
+		   = label_substitution_map->begin();
+		 it != label_substitution_map->end(); it++)
+	      {
+		std::cerr << it->first << " -> "
+			  << it->second << std::endl;
+	      }
+	    std::cerr << std::endl;
+#endif	    
+
+	    trans.substitute(*label_substitution_map);
+	    symbol_map_in_use=false;
+	  }
+
+
+	  if (symbol_pair_map_in_use) {
+
+#ifdef DEBUG_SUBSTITUTE
+	    std::cerr << "Symbol pair substitution map now includes" << std::endl;
+	    for (HfstSymbolPairSubstitutions::const_iterator it = 
+		   pair_substitution_map->begin();
+		 it != pair_substitution_map->end(); it++)
+	      {
+		std::cerr << it->first.first << ":"
+			  << it->first.second << " -> "
+			  << it->second.first << ":"
+			  << it->second.second << std::endl;
+	      }
+	    std::cerr << std::endl;
+#endif	    
+
+	    trans.substitute(*pair_substitution_map);
+	    symbol_pair_map_in_use=false;
+	  }
+
         }
       else
         {
@@ -770,6 +835,17 @@ int main( int argc, char **argv )
     }
     verbose_printf("Reading from %s, writing to %s\n", 
         inputfilename, outfilename);
+
+    if (from_file != NULL)
+      {
+#ifdef DEBUG_SUBSTITUTE
+	std::cerr << "from_file != NULL\n" << std::endl;
+#endif
+	label_substitution_map = new HfstSymbolSubstitutions();
+	pair_substitution_map = new HfstSymbolPairSubstitutions();
+	// TODO: delete
+      }
+
     // here starts the buffer handling part
     HfstInputStream* instream = NULL;
     try {

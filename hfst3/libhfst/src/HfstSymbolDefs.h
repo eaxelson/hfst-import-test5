@@ -73,6 +73,14 @@ namespace hfst
      @see HfstTransducer::substitute(const StringPair&, const StringPairSet &)
      #hfst::rules */
   typedef std::set<StringPair> StringPairSet;
+
+  /** \brief A map of substitutions used when performing multiple
+      symbol-to-symbol substitutions. */
+  typedef std::map<String, String> HfstSymbolSubstitutions;
+
+  /** \brief A map of substitutions used when performing multiple
+      symbol pair-to-symbol pair substitutions. */
+  typedef std::map<StringPair, StringPair> HfstSymbolPairSubstitutions;
   
 /* The internal representations */
   const std::string internal_epsilon = "@_EPSILON_SYMBOL_@";
