@@ -25,10 +25,10 @@
 
 using namespace hfst;
 using namespace std;
-using namespace implementations;
-using namespace rules;
+//using namespace implementations;
+//using namespace rules;
 
-//enum ReplaceType {REPL_UP, REPL_DOWN, REPL_RIGHT, REPL_LEFT};
+enum ReplaceType {REPL_UP, REPL_DOWN, REPL_RIGHT, REPL_LEFT};
 
 
 //ImplementationType TYPE = TROPICAL_OPENFST_TYPE;
@@ -46,17 +46,17 @@ class Rule
 	ReplaceType replType;
 
   public:
-	Rule ( HfstTransducer, ReplaceType ); // mapping
-	Rule ( HfstTransducer,  HfstTransducerPairVector, ReplaceType); // mapping, context
-	Rule ( HfstTransducerPair, ReplaceType );
-	Rule ( HfstTransducerPair, HfstTransducerPairVector, ReplaceType );
+	Rule ( const HfstTransducer& ); // mapping
+	Rule ( const HfstTransducer&, const HfstTransducerPairVector&, ReplaceType); // mapping, context
+	Rule ( const HfstTransducerPair& );
+	Rule ( const HfstTransducerPair&, const HfstTransducerPairVector&, ReplaceType );
 
-	HfstTransducer get_mapping();
-	HfstTransducerPairVector get_context();
-	ReplaceType get_replType();
+	HfstTransducer get_mapping() const;
+	HfstTransducerPairVector get_context() const;
+	ReplaceType get_replType() const;
 };
 
-Rule::Rule ( HfstTransducer a_mapping, ReplaceType a_replType )
+Rule::Rule ( const HfstTransducer &a_mapping )
 {
 	HfstTokenizer TOK;
 	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
@@ -68,16 +68,16 @@ Rule::Rule ( HfstTransducer a_mapping, ReplaceType a_replType )
 
 	mapping = a_mapping;
 	context = epsilonContext;
-	replType = a_replType;
+	replType = REPL_UP;
 }
-Rule::Rule ( HfstTransducer a_mapping, HfstTransducerPairVector a_context, ReplaceType a_replType )
+Rule::Rule ( const HfstTransducer &a_mapping, const HfstTransducerPairVector &a_context, ReplaceType a_replType )
 {
 	mapping = a_mapping;
 	context = a_context;
 	replType = a_replType;
 }
 
-Rule::Rule ( HfstTransducerPair mappingPair, ReplaceType a_replType )
+Rule::Rule ( const HfstTransducerPair &mappingPair )
 {
 	HfstTokenizer TOK;
 	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
@@ -94,10 +94,10 @@ Rule::Rule ( HfstTransducerPair mappingPair, ReplaceType a_replType )
 
 	mapping = tmpMapping;
 	context = epsilonContext;
-	replType = a_replType;
+	replType = REPL_UP;
 
 }
-Rule::Rule ( HfstTransducerPair mappingPair, HfstTransducerPairVector a_context, ReplaceType a_replType )
+Rule::Rule ( const HfstTransducerPair &mappingPair, const HfstTransducerPairVector &a_context, ReplaceType a_replType )
 {
 	HfstTransducer tmpMapping(mappingPair.first);
 	tmpMapping.cross_product(mappingPair.second).minimize();
@@ -107,16 +107,16 @@ Rule::Rule ( HfstTransducerPair mappingPair, HfstTransducerPairVector a_context,
 	replType = a_replType;
 }
 
-HfstTransducer Rule::get_mapping()
+HfstTransducer Rule::get_mapping() const
 {
 	return mapping;
 }
 
-HfstTransducerPairVector Rule::get_context()
+HfstTransducerPairVector Rule::get_context() const
 {
 	return context;
 }
-ReplaceType Rule::get_replType()
+ReplaceType Rule::get_replType() const
 {
 	return replType;
 }
@@ -132,43 +132,38 @@ class MarkUpRule : public Rule
   public:
 	// for mark up replace
 
-	MarkUpRule ( HfstTransducer, ReplaceType, StringPair ); // mapping
-//	MarkUpRule ( HfstTransducer,  HfstTransducerPairVector, ReplaceType, StringPair); // mapping, context
-//	MarkUpRule ( HfstTransducerPair, ReplaceType, StringPair );
-//	MarkUpRule ( HfstTransducerPair, HfstTransducerPairVector, ReplaceType, StringPair );
-	StringPair get_marks();
+	MarkUpRule ( const HfstTransducer&, StringPair ); // mapping
+	MarkUpRule ( const HfstTransducer&,  const HfstTransducerPairVector&, ReplaceType, StringPair); // mapping, context
+	MarkUpRule ( const HfstTransducerPair&, StringPair );
+	MarkUpRule ( const HfstTransducerPair&, const HfstTransducerPairVector&, ReplaceType, StringPair );
+	StringPair get_marks() const;
 };
 
-MarkUpRule::MarkUpRule ( HfstTransducer a_mapping, ReplaceType a_replType, StringPair a_marks ):
-		Rule(a_mapping, a_replType), marks(a_marks)
+MarkUpRule::MarkUpRule ( const HfstTransducer &a_mapping, StringPair a_marks ):
+		Rule(a_mapping), marks(a_marks)
 {
-
-	//marks = a_marks;
+	marks = a_marks;
+}
+MarkUpRule::MarkUpRule ( const HfstTransducer &a_mapping, const HfstTransducerPairVector &a_contextVector,  ReplaceType a_replType, StringPair a_marks ):
+		Rule(a_mapping, a_contextVector, a_replType), marks(a_marks)
+{
+	marks = a_marks;
+}
+MarkUpRule::MarkUpRule ( const HfstTransducerPair &a_mapping, StringPair a_marks ):
+		Rule(a_mapping), marks(a_marks)
+{
+	marks = a_marks;
+}
+MarkUpRule::MarkUpRule ( const HfstTransducerPair &a_mapping, const HfstTransducerPairVector &a_contextVector,  ReplaceType a_replType, StringPair a_marks  ):
+		Rule(a_mapping, a_contextVector, a_replType), marks(a_marks)
+{
+	marks = a_marks;
 }
 
-StringPair MarkUpRule::get_marks()
+StringPair MarkUpRule::get_marks() const
 {
 	return marks;
 }
-
-
-
-/*
-class RuleSenka: public Rule
-{
-  StringPair marks;
-
-  public:
-    RuleSenka ( HfstTransducer, ReplaceType, StringPair ); // mapping
-
-}
-
-
-RuleSenka::RuleSenka(HfstTransducer a, ReplaceType b, StringPair c):
-Rule(a, b), marks(c)
-{}
-*/
-
 
 
 //////////////////////////////////////////////
@@ -179,65 +174,58 @@ Rule(a, b), marks(c)
 
 
 
-
-
-
-
-
-
-HfstTransducer removeMarkers( HfstTransducer &tr )
+HfstTransducer removeMarkers( const HfstTransducer &tr )
 {
 	String LeftMarker("@_LM_@");
 	String RightMarker("@_RM_@");
 
-	tr.substitute(StringPair(LeftMarker, LeftMarker), StringPair("@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@")).minimize();
-	tr.substitute(StringPair(RightMarker, RightMarker), StringPair("@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@")).minimize();
+	HfstTransducer retval(tr);
+
+	retval.substitute(StringPair(LeftMarker, LeftMarker), StringPair("@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@")).minimize();
+	retval.substitute(StringPair(RightMarker, RightMarker), StringPair("@_EPSILON_SYMBOL_@", "@_EPSILON_SYMBOL_@")).minimize();
 
 
-	tr.remove_from_alphabet(LeftMarker);
-	tr.remove_from_alphabet(RightMarker);
+	retval.remove_from_alphabet(LeftMarker);
+	retval.remove_from_alphabet(RightMarker);
 
-	tr.minimize();
+	retval.minimize();
 
 	//printf("tr without markers: \n");
 	//tr.write_in_att_format(stdout, 1);
 
-	return tr;
+	return retval;
 }
 
 // tmp = t.1 .o. Constr .o. t.1
 // (t.1 - tmp.2) .o. t
-HfstTransducer constraintComposition( HfstTransducer t, HfstTransducer Constraint )
+HfstTransducer constraintComposition( const HfstTransducer &t, const HfstTransducer &Constraint )
 {
+	HfstTransducer retval(t);
+	retval.input_project().minimize();
 
-	HfstTransducer tInputPr(t);
-	tInputPr.input_project().minimize();
+	//printf("retval: \n");
+	//retval.write_in_att_format(stdout, 1);
 
-	//printf("tInputPr: \n");
-	//tInputPr.write_in_att_format(stdout, 1);
-
-	HfstTransducer tmp(tInputPr);
+	HfstTransducer tmp(retval);
 
 	tmp.compose(Constraint).minimize();
 	//printf("first composition \n");
 	//tmp.write_in_att_format(stdout, 1);
-	tmp.compose(tInputPr).minimize();
+	tmp.compose(retval).minimize();
 	//printf("tmp: \n");
 	//tmp.write_in_att_format(stdout, 1);
 
 	tmp.output_project().minimize();
-	tInputPr.subtract(tmp).minimize();
+	retval.subtract(tmp).minimize();
 
-	tInputPr.compose(t);
+	retval.compose(t).minimize();
 
-	t = tInputPr;
-
-	return t;
+	return retval;
 }
 
 
 
-HfstTransducer insertFreelyAllTheBrackets( HfstTransducer t, bool optional )
+void insertFreelyAllTheBrackets( HfstTransducer &t, bool optional )
 {
 	HfstTokenizer TOK;
 	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
@@ -267,16 +255,14 @@ HfstTransducer insertFreelyAllTheBrackets( HfstTransducer t, bool optional )
 		t.insert_freely(leftBracket2).minimize();
 		t.insert_freely(rightBracket2).minimize();
 	}
-	t.minimize();
+	//return retval;
 
-
-	return t;
 }
 
 
-HfstTransducer expandContextsWithMapping (HfstTransducerPairVector ContextVector,
-								HfstTransducer mappingWithBracketsAndTmpBoundary,
-								HfstTransducer identityExpanded,
+HfstTransducer expandContextsWithMapping (const HfstTransducerPairVector &ContextVector,
+								const HfstTransducer &mappingWithBracketsAndTmpBoundary,
+								const HfstTransducer &identityExpanded,
 								ReplaceType replType,
 								bool optional)
 {
@@ -286,23 +272,21 @@ HfstTransducer expandContextsWithMapping (HfstTransducerPairVector ContextVector
 
 	for ( unsigned int i = 0; i < ContextVector.size(); i++ )
 	{
-
-
 			// Expand context with mapping
 			// Cr' = (Rc .*) << Markers (<,>,|) .o. [I:I | <a:b>]*
 			// Cr = Cr|Cr'
 			// (same for left context)
 
 			// Lc = (*. Lc) << {<,>}
-			HfstTransducer tmp(identityExpanded);
-			tmp.concatenate(ContextVector[i].first).minimize();
-			ContextVector[i].first = tmp;
+			HfstTransducer firstContext(identityExpanded);
+			firstContext.concatenate(ContextVector[i].first).minimize();
 
-			ContextVector[i].first = insertFreelyAllTheBrackets( ContextVector[i].first, optional );
+			insertFreelyAllTheBrackets( firstContext, optional );
 
 			// Rc =  (Rc .*) << {<,>}
-			ContextVector[i].second.concatenate(identityExpanded).minimize();
-			ContextVector[i].second = insertFreelyAllTheBrackets( ContextVector[i].second, optional);
+			HfstTransducer secondContext(ContextVector[i].second);
+			secondContext.concatenate(identityExpanded).minimize();
+			insertFreelyAllTheBrackets( secondContext, optional);
 
 			/* RULE:	LC:		RC:
 			 * up		up		up
@@ -319,8 +303,8 @@ HfstTransducer expandContextsWithMapping (HfstTransducerPairVector ContextVector
 			{
 
 				// compose them with [I:I | <a:b>]*
-				leftContextExpanded = ContextVector[i].first;
-				rightContextExpanded = ContextVector[i].second;
+				leftContextExpanded = firstContext;
+				rightContextExpanded = secondContext;
 
 				leftContextExpanded.compose(identityExpanded).minimize();
 				rightContextExpanded.compose(identityExpanded).minimize();
@@ -332,20 +316,20 @@ HfstTransducer expandContextsWithMapping (HfstTransducerPairVector ContextVector
 
 				// left compose opposite way
 				leftContextExpanded = identityExpanded;
-				rightContextExpanded = ContextVector[i].second;
+				rightContextExpanded = secondContext;
 
-				leftContextExpanded.compose(ContextVector[i].first).minimize();
+				leftContextExpanded.compose(firstContext).minimize();
 				rightContextExpanded.compose(identityExpanded).minimize();
 			}
 			// right context is in lower language, left in upper ( \\ )
 			if ( replType == REPL_LEFT )
 			{
 				// compose them with [I:I | <a:b>]*
-				leftContextExpanded = ContextVector[i].first;
+				leftContextExpanded = firstContext;
 				rightContextExpanded = identityExpanded;
 
 				leftContextExpanded.compose(identityExpanded).minimize();
-				rightContextExpanded.compose(ContextVector[i].second).minimize();
+				rightContextExpanded.compose(secondContext).minimize();
 			}
 			if ( replType == REPL_DOWN )
 			{
@@ -353,18 +337,18 @@ HfstTransducer expandContextsWithMapping (HfstTransducerPairVector ContextVector
 				leftContextExpanded = identityExpanded;
 				rightContextExpanded = identityExpanded;
 
-				leftContextExpanded.compose(ContextVector[i].first).minimize();
-				rightContextExpanded.compose(ContextVector[i].second).minimize();
+				leftContextExpanded.compose(firstContext).minimize();
+				rightContextExpanded.compose(secondContext).minimize();
 			}
 
-			ContextVector[i].first.disjunct(leftContextExpanded).minimize();
-			ContextVector[i].second.disjunct(rightContextExpanded).minimize();
+			firstContext.disjunct(leftContextExpanded).minimize();
+			secondContext.disjunct(rightContextExpanded).minimize();
 
 
 		// put mapping between (expanded) contexts
-		HfstTransducer oneContextReplace(ContextVector[i].first);
+		HfstTransducer oneContextReplace(firstContext);
 		oneContextReplace.concatenate(mappingWithBracketsAndTmpBoundary).
-					concatenate(ContextVector[i].second);
+					concatenate(secondContext);
 
 		unionContextReplace.disjunct(oneContextReplace).minimize();
 	}
@@ -385,7 +369,7 @@ HfstTransducer expandContextsWithMapping (HfstTransducerPairVector ContextVector
  * 		(same for left context, (.* Cl))
 */
 
-HfstTransducer bracketedReplace(  Rule rule, bool optional)
+HfstTransducer bracketedReplace( const Rule &rule, bool optional)
 {
 	HfstTokenizer TOK;
 	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
@@ -555,7 +539,7 @@ HfstTransducer bracketedReplace(  Rule rule, bool optional)
 
 
 // bracketed replace for parallel rules
-HfstTransducer parallelBracketedReplace( vector<Rule> ruleVector, bool optional)
+HfstTransducer parallelBracketedReplace( const vector<Rule> &ruleVector, bool optional)
 {
 	HfstTokenizer TOK;
 	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
@@ -727,21 +711,6 @@ HfstTransducer parallelBracketedReplace( vector<Rule> ruleVector, bool optional)
 }
 
 
-/*
-HfstTransducer bracketedReplace(  HfstTransducerPairVector ContextVector,
-                                      HfstTransducerPair mappingPair,
-                                      ReplaceType replType,
-                                      bool optional)
-{
-	// Mapping crossproduct
-	HfstTransducer mapping(mappingPair.first);
-	mapping.cross_product(mappingPair.second);
-
-	HfstTransducer retval(TYPE);
-	retval = bracketedReplace(ContextVector, mapping, replType, optional);
-	return retval;
-}
-*/
 
 //---------------------------------
 //	CONSTRAINTS
@@ -793,7 +762,7 @@ HfstTransducer constraintsRightPart()
 
 
 // ?* <:0 [B:0]* [I-B] [ B:0 | 0:B | ?-B ]*
-HfstTransducer leftMostConstraint( HfstTransducer uncondidtionalTr )
+HfstTransducer leftMostConstraint( const HfstTransducer &uncondidtionalTr )
 {
 	HfstTokenizer TOK;
 	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
@@ -865,7 +834,7 @@ HfstTransducer leftMostConstraint( HfstTransducer uncondidtionalTr )
 }
 
 // [ B:0 | 0:B | ?-B ]* [I-B]+  >:0 [ ?-B ]*
-HfstTransducer rightMostConstraint( HfstTransducer uncondidtionalTr )
+HfstTransducer rightMostConstraint( const HfstTransducer &uncondidtionalTr )
 {
 	HfstTokenizer TOK;
 	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
@@ -943,7 +912,7 @@ HfstTransducer rightMostConstraint( HfstTransducer uncondidtionalTr )
 // Longest match
 // it should be composed to left most transducer........
 // ?* < [?-B]+ 0:> [ ? | 0:< | <:0 | 0:> | B ] [ B:0 | 0:B | ?-B ]*
-HfstTransducer longestMatchLeftMostConstraint( HfstTransducer uncondidtionalTr )
+HfstTransducer longestMatchLeftMostConstraint( const HfstTransducer &uncondidtionalTr )
 {
 
 	HfstTokenizer TOK;
@@ -1027,7 +996,7 @@ HfstTransducer longestMatchLeftMostConstraint( HfstTransducer uncondidtionalTr )
 }
 
 // Longest match RIGHT most
-HfstTransducer longestMatchRightMostConstraint( HfstTransducer uncondidtionalTr )
+HfstTransducer longestMatchRightMostConstraint(const HfstTransducer &uncondidtionalTr )
 {
 	HfstTokenizer TOK;
 	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
@@ -1112,7 +1081,7 @@ HfstTransducer longestMatchRightMostConstraint( HfstTransducer uncondidtionalTr 
 // ?* < [?-B]+ >:0
 // [?-B] or [ ? | 0:< | <:0 | >:0 | B ][?-B]+
 // [ B:0 | 0:B | ?-B ]*
-HfstTransducer shortestMatchLeftMostConstraint( HfstTransducer uncondidtionalTr )
+HfstTransducer shortestMatchLeftMostConstraint( const HfstTransducer &uncondidtionalTr )
 {
 
 	HfstTokenizer TOK;
@@ -1197,7 +1166,7 @@ HfstTransducer shortestMatchLeftMostConstraint( HfstTransducer uncondidtionalTr 
 //[ B:0 | 0:B | ?-B ]*
 // [?-B] or [?-B]+  [ ? | 0:> | >:0 | <:0 | B ]
 // <:0 [?-B]+   > ?*
-HfstTransducer shortestMatchRightMostConstraint( HfstTransducer uncondidtionalTr )
+HfstTransducer shortestMatchRightMostConstraint( const HfstTransducer &uncondidtionalTr )
 {
 
 	HfstTokenizer TOK;
@@ -1280,7 +1249,7 @@ HfstTransducer shortestMatchRightMostConstraint( HfstTransducer uncondidtionalTr
 
 
 // ?* [ BL:0 (?-B)+ BR:0 ?* ]+
-HfstTransducer mostBracketsPlusConstraint( HfstTransducer uncondidtionalTr )
+HfstTransducer mostBracketsPlusConstraint( const HfstTransducer &uncondidtionalTr )
 {
 	HfstTokenizer TOK;
 	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
@@ -1380,7 +1349,7 @@ HfstTransducer mostBracketsPlusConstraint( HfstTransducer uncondidtionalTr )
 }
 
 // ?* [ BL:0 (?-B)* BR:0 ?* ]+
-HfstTransducer mostBracketsStarConstraint( HfstTransducer uncondidtionalTr )
+HfstTransducer mostBracketsStarConstraint( const HfstTransducer &uncondidtionalTr )
 {
 	HfstTokenizer TOK;
 	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
@@ -1481,7 +1450,7 @@ HfstTransducer mostBracketsStarConstraint( HfstTransducer uncondidtionalTr )
 
 }
 // ?* B2 ?*
-HfstTransducer removeB2Constraint( HfstTransducer t )
+HfstTransducer removeB2Constraint( const HfstTransducer &t )
 {
 	HfstTokenizer TOK;
 	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
@@ -1530,7 +1499,7 @@ HfstTransducer removeB2Constraint( HfstTransducer t )
 
 }
 // to avoid repetition in empty replace rule
-HfstTransducer noRepetitionConstraint( HfstTransducer t )
+HfstTransducer noRepetitionConstraint( const HfstTransducer &t )
 {
 	HfstTokenizer TOK;
 	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
@@ -1598,7 +1567,7 @@ HfstTransducer noRepetitionConstraint( HfstTransducer t )
 
 
 // replace up, left, right, down
-HfstTransducer replace(	Rule rule, bool optional)
+HfstTransducer replace(	const Rule &rule, bool optional)
 {
 	HfstTransducer retval(TYPE);
 
@@ -1620,7 +1589,7 @@ HfstTransducer replace(	Rule rule, bool optional)
 }
 
 // for parallel rules
-HfstTransducer replace(	vector<Rule> ruleVector, bool optional)
+HfstTransducer replace(	const vector<Rule> &ruleVector, bool optional)
 {
 	HfstTransducer retval(TYPE);
 
@@ -1643,7 +1612,7 @@ HfstTransducer replace(	vector<Rule> ruleVector, bool optional)
 
 
 // left to right
-HfstTransducer replace_leftmost_longest_match( Rule rule )
+HfstTransducer replace_leftmost_longest_match( const Rule &rule )
 {
 
 	HfstTransducer uncondidtionalTr(TYPE);
@@ -1670,7 +1639,7 @@ HfstTransducer replace_leftmost_longest_match( Rule rule )
 	return retval;
 }
 // left to right
-HfstTransducer replace_leftmost_longest_match( vector<Rule> ruleVector )
+HfstTransducer replace_leftmost_longest_match( const vector<Rule> &ruleVector )
 {
 
 	HfstTransducer uncondidtionalTr(TYPE);
@@ -1694,7 +1663,7 @@ HfstTransducer replace_leftmost_longest_match( vector<Rule> ruleVector )
 
 
 // right to left
-HfstTransducer replace_rightmost_longest_match( Rule rule )
+HfstTransducer replace_rightmost_longest_match( const Rule &rule )
 {
 
 	HfstTransducer uncondidtionalTr(TYPE);
@@ -1718,7 +1687,7 @@ HfstTransducer replace_rightmost_longest_match( Rule rule )
 
 
 // right to left
-HfstTransducer replace_rightmost_longest_match( vector<Rule> ruleVector )
+HfstTransducer replace_rightmost_longest_match( const vector<Rule> &ruleVector )
 {
 
 	HfstTransducer uncondidtionalTr(TYPE);
@@ -1740,7 +1709,7 @@ HfstTransducer replace_rightmost_longest_match( vector<Rule> ruleVector )
 	return retval;
 }
 
-HfstTransducer replace_leftmost_shortest_match( Rule rule)
+HfstTransducer replace_leftmost_shortest_match( const Rule &rule)
 {
 
 	HfstTransducer uncondidtionalTr(TYPE);
@@ -1760,7 +1729,7 @@ HfstTransducer replace_leftmost_shortest_match( Rule rule)
 }
 
 
-HfstTransducer replace_leftmost_shortest_match( vector<Rule> ruleVector )
+HfstTransducer replace_leftmost_shortest_match(const vector<Rule> &ruleVector )
 {
 
 	HfstTransducer uncondidtionalTr(TYPE);
@@ -1779,7 +1748,7 @@ HfstTransducer replace_leftmost_shortest_match( vector<Rule> ruleVector )
 	return retval;
 }
 
-HfstTransducer replace_rightmost_shortest_match( Rule rule )
+HfstTransducer replace_rightmost_shortest_match( const Rule &rule )
 {
 
 	HfstTransducer uncondidtionalTr(TYPE);
@@ -1798,7 +1767,7 @@ HfstTransducer replace_rightmost_shortest_match( Rule rule )
 	return retval;
 }
 
-HfstTransducer replace_rightmost_shortest_match( vector<Rule> ruleVector )
+HfstTransducer replace_rightmost_shortest_match( const vector<Rule> &ruleVector )
 {
 
 	HfstTransducer uncondidtionalTr(TYPE);
@@ -1817,8 +1786,8 @@ HfstTransducer replace_rightmost_shortest_match( vector<Rule> ruleVector )
 	return retval;
 }
 
-HfstTransducer mark_up_replace(	Rule rule,
-						StringPair marks,
+HfstTransducer mark_up_replace(	const Rule &rule,
+						const StringPair &marks,
 						bool optional)
 {
 	HfstTokenizer TOK;
@@ -1849,6 +1818,7 @@ HfstTransducer mark_up_replace(	Rule rule,
 			concatenate(epsilonToRightMark).
 			minimize();
 
+
 	Rule newRule(mapping, rule.get_context(), rule.get_replType());
 	//printf("epsilonToRightMark: \n");
 	//epsilonToRightMark.write_in_att_format(stdout, 1);
@@ -1860,7 +1830,7 @@ HfstTransducer mark_up_replace(	Rule rule,
 }
 
 // TODO:
-HfstTransducer mark_up_replace(	vector<MarkUpRule> markUpRuleVector,
+HfstTransducer mark_up_replace(	const vector<MarkUpRule> &markUpRuleVector,
 						bool optional)
 {
 	HfstTokenizer TOK;
@@ -1896,7 +1866,7 @@ HfstTransducer mark_up_replace(	vector<MarkUpRule> markUpRuleVector,
 				minimize();
 
 		//Rule newRule(mapping, markUpRuleVector[i].get_context(), markUpRuleVector[i].get_replType());
-		Rule newRule(mapping, markUpRuleVector[i].get_replType());
+		Rule newRule(mapping);
 
 		// create parallel rule vector and call replace f w it
 		// without context
@@ -1910,7 +1880,7 @@ HfstTransducer mark_up_replace(	vector<MarkUpRule> markUpRuleVector,
 
 
 // replace up, left, right, down
-HfstTransducer replace_epenthesis(	Rule rule, bool optional)
+HfstTransducer replace_epenthesis(	const Rule &rule, bool optional)
 {
 	HfstTransducer retval(TYPE);
 
@@ -1952,7 +1922,7 @@ HfstTransducer replace_epenthesis(	Rule rule, bool optional)
 }
 
 // replace up, left, right, down
-HfstTransducer replace_epenthesis(	vector<Rule> ruleVector, bool optional)
+HfstTransducer replace_epenthesis(	const vector<Rule> &ruleVector, bool optional)
 {
 	HfstTransducer retval(TYPE);
 
@@ -2408,7 +2378,7 @@ void test2b()
 
 
 
-	Rule ruleUp(mappingPair, REPL_UP);
+	Rule ruleUp(mappingPair);
 
 
 	HfstTransducer replaceTr(TYPE);
@@ -3244,8 +3214,8 @@ void test7a()
 	mapping2.cross_product(mappingPair2.second);
 
 	// without context
-	Rule rule1(mapping1, REPL_UP);
-	Rule rule2(mapping2, REPL_UP);
+	Rule rule1(mapping1);
+	Rule rule2(mapping2);
 
 	vector<Rule> ruleVector;
 
@@ -3295,8 +3265,8 @@ void test7b()
 
 
 	// without context
-	Rule rule1(mapping1, REPL_UP);
-	Rule rule2(mapping2, REPL_UP);
+	Rule rule1(mapping1);
+	Rule rule2(mapping2);
 
 	vector<Rule> ruleVector;
 
@@ -3363,8 +3333,8 @@ void test7c()
 	//mapping2.write_in_att_format(stdout, 1);
 
 	// without context
-	Rule rule1(mapping1, REPL_UP);
-	Rule rule2(mapping2, REPL_UP);
+	Rule rule1(mapping1);
+	Rule rule2(mapping2);
 
 	vector<Rule> ruleVector;
 
@@ -3587,12 +3557,12 @@ void test7e()
 	StringPair marks2("|","|");
 
 	// without context
-	Rule rule1(leftMapping1, REPL_UP);
-	Rule rule2(leftMapping2, REPL_UP);
+	Rule rule1(leftMapping1);
+	Rule rule2(leftMapping2);
 
 
-	MarkUpRule markUpRule1(leftMapping1, REPL_UP, marks1 );
-	MarkUpRule markUpRule2(leftMapping2, REPL_UP, marks2 );
+	MarkUpRule markUpRule1(leftMapping1, marks1 );
+	MarkUpRule markUpRule2(leftMapping2, marks2 );
 
 	vector<MarkUpRule> markUpRuleVector;
 	markUpRuleVector.push_back(markUpRule1);
