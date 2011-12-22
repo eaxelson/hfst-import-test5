@@ -2185,6 +2185,39 @@ HfstTransducer &HfstTransducer::substitute
 }
 
 HfstTransducer &HfstTransducer::substitute
+(const HfstSymbolSubstitutions &substitutions)
+{
+  hfst::implementations::HfstBasicTransducer * net 
+    = convert_to_basic_transducer();
+  // TODO: optimize when HfstTropicalTransducer supports this function
+  for (HfstSymbolSubstitutions::const_iterator it =
+	 substitutions.begin(); it != substitutions.end(); it++)
+    {
+      net->substitute(it->first, it->second, true, true);
+    }
+  return convert_to_hfst_transducer(net);  
+
+  /*
+  hfst::implementations::HfstBasicTransducer * net 
+    = convert_to_basic_transducer();
+  net->substitute(substitutions);
+  return convert_to_hfst_transducer(net);  
+  return *this;
+  */
+
+}
+
+HfstTransducer &HfstTransducer::substitute
+(const HfstSymbolPairSubstitutions &substitutions)
+{ 
+  hfst::implementations::HfstBasicTransducer * net 
+    = convert_to_basic_transducer();
+  net->substitute(substitutions);
+  return convert_to_hfst_transducer(net);  
+}
+
+
+HfstTransducer &HfstTransducer::substitute
 (const StringPair &symbol_pair,
  HfstTransducer &transducer)
 { 

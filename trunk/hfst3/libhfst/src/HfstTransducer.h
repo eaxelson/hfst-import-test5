@@ -1363,6 +1363,10 @@ t.substitute(&function);
     HfstTransducer &substitute(const StringPair &old_symbol_pair,
                                const StringPairSet &new_symbol_pair_set);
 
+    HfstTransducer &substitute(const HfstSymbolSubstitutions &substitutions);
+
+    HfstTransducer &substitute(const HfstSymbolPairSubstitutions &substitutions);
+
     /** \brief Substitute all transitions equal to \a symbol_pair 
         with a copy of transducer \a transducer. 
 
