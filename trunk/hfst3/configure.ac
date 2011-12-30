@@ -502,7 +502,7 @@ cat <<EOF
     *         with openfst: $with_openfst
     *         with foma: $with_foma
     *         with optimized lookup: $with_hfstol
-    * tools including calculate: $enable_calculate (sfst-compiler)
+    * tools including calculate: $enable_calculate (sfstpl2fst)
     *                 compare: $enable_compare
     *                 compose: $enable_compose
     *                 concatenate: $enable_concatenate
@@ -544,7 +544,7 @@ dnl stick important warnings to bottom
 dnl important licensing information
 dnl according to GNU GPLv2 strict (not plus) is incompatible with Apache
 AS_IF([test "x$with_foma" != "xno" -a "x$with_openfst" != "xno"],
-      [AC_MSG_WARN([NB: foma licensing exception is limited to HFST team’s redistribution; if you consider GPLv2 strict and Apache licence conflicting you may not _redistribute_ your binaries])])
+      [AC_MSG_WARN([foma licensing exception is limited to HFST team’s redistribution; if you consider GPLv2 strict and Apache licence conflicting you may not _redistribute_ your binaries])])
 dnl hope end users never disable ofst 
 AS_IF([test "x$with_openfst" == "xno"],
       [AC_MSG_WARN([Disabling openfst backend will severely cripple libhfst])])
@@ -555,4 +555,11 @@ dnl HFST's case mapping in corpus tools is mainly MES-2 set with other character
 dnl added as we go
 AS_IF([test "x$with_unicode_handler" = "xhfst"],
       [AC_MSG_WARN([HFST only supports basic unicode handling with limited case mapping tables etc.; for better support consider using glib or ICU --with-unicode-handler])])
+dnl warn about missing "important" tools
+AS_IF([test "x$enable_lexc" == "xno"],
+      [AC_MSG_WARN([hfst-lexc is not enabled; hfst-lexc2fst toy will only offer limited support to compile lexc lexicons; enable with --enable-lexc])])
+AS_IF([test "x$enable_twolc" == "xno"],
+      [AC_MSG_WARN([hfst-twolc is not enabled; you will not be able to compile xerox twolc grammars; enable using --enable-twolc])])
+AS_IF([test "x$enable_calculate" == "xno"],
+      [AC_MSG_WARN([hfst-calculate is not enabled; you will not be able to compile SFST-PL scripts; enable using --enable-calculate])])
 
