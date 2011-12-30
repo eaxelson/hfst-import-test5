@@ -309,13 +309,13 @@ see
 
   https://wiki.ubuntu.com/OneiricOcelot/ReleaseNotes#GCC_4.6_Toolchain
 
-The simplest currently known solution is to edit the Makefile.am in
-OpenFst's /src/bin so that the -ld directives occur before library names.
-Change the line
+Please update your OpenFst to version 1.2.10. For older versions, you may edit
+the Makefile.am in OpenFst's /src/bin so that the -ld directives occur before
+library names.  Change the line::
 
   AM_LDFLAGS = -lm -ldl
 
-to
+to::
 
   AM_LDFLAGS = ../script/libfstscript.la ../lib/libfst.la -lm -ldl
 
@@ -337,11 +337,11 @@ installation to 1.2 and ensure that older (or newer?) headers are not around.
 chmod: cannot access 'scripts/hfst-foma-wrapper.sh': No such file or directory
 ''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''''
 
-**During the configuration phase.** This is a case of autoconf being silly; the commands for creating a script and
-making it executable from autoconf are ran in parallel but must be ran once
-per file and autoconf just doesn't keep track of the files it creates. The
-script for doing this is copied to configure.ac from autoconf manual so it
-supposably will always work correctly...
+**During the configuration phase.** This is a case of autoconf being silly; the
+commands for creating a script and making it executable from autoconf are ran
+in parallel but must be ran once per file and autoconf just doesn't keep track
+of the files it creates. The script for doing this is copied to configure.ac
+from autoconf manual so it supposably will always work correctly...
 
 ....libs/lt-hfst-strings2fst: Incorrect utf-8 coding
 ''''''''''''''''''''''''''''''''''''''''''''''''''''
@@ -439,9 +439,9 @@ error: ‘class SFST::Node’ has no member named ‘index’
 '''''''''''''''''''''''''''''''''''''''''''''''''''''
 **During compilation phase**, error messages of form::
 
-  ConvertTransducerFormat.h:106: error: &#8216;SFST::NodeNumbering&#8217; has not been declared
-  ConvertTransducerFormat.h:116: error: &#8216;SFST::NodeNumbering&#8217; has not been declared
-  ConvertTransducerFormat.h:126: error: &#8216;SFST::NodeNumbering&#8217; has not been declared
+  ConvertTransducerFormat.h:106: error: "SFST::NodeNumbering" has not been declared
+  ConvertTransducerFormat.h:116: error: "SFST::NodeNumbering" has not been declared
+  ConvertTransducerFormat.h:126: error: "SFST::NodeNumbering" has not been declared
 
 or::
 
