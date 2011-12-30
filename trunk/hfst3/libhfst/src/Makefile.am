@@ -24,7 +24,7 @@ AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
 
 # HFST bridge specific stuff
 HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc HfstOutputStream.cc\
-		  HfstRules.cc \
+		  HfstRules.cc HfstXeroxRules.cc \
 		  HfstSymbolDefs.cc HfstTokenizer.cc \
 		  HfstFlagDiacritics.cc HfstExceptionDefs.cc \
 		  HarmonizeUnknownAndIdentitySymbols.cc
@@ -64,6 +64,7 @@ HFST_HDRS = \
 	HfstFlagDiacritics.h \
 	HfstInputStream.h \
 	HfstOutputStream.h \
+	HfstXeroxRules.h \
 	parsers/LexcCompiler.h parsers/XreCompiler.h
 ### Add your library here ###
 #	implementations/MyTransducerLibraryTransducer.h
@@ -73,7 +74,7 @@ hfstinclude_HEADERS = $(HFST_HDRS)
 libhfst_la_LDFLAGS = -no-undefined -version-info 10:0:0
 
 LIBHFST_TSTS=HfstApply HfstInputStream HfstTransducer \
-		HfstOutputStream HfstRules HfstSymbolDefs \
+		HfstOutputStream HfstXeroxRules HfstRules HfstSymbolDefs \
 		HfstTokenizer HfstFlagDiacritics \
 		HarmonizeUnknownAndIdentitySymbols
 
@@ -91,6 +92,9 @@ HfstTransducer_LDADD=libhfst.la
 HfstOutputStream_SOURCES=HfstOutputStream.cc
 HfstOutputStream_CXXFLAGS=-DMAIN_TEST
 HfstOutputStream_LDADD=libhfst.la
+HfstXeroxRules_SOURCES=HfstXeroxRules.cc
+HfstXeroxRules_CXXFLAGS=-DMAIN_TEST
+HfstXeroxRules_LDADD=libhfst.la
 HfstRules_SOURCES=HfstRules.cc
 HfstRules_CXXFLAGS=-DMAIN_TEST
 HfstRules_LDADD=libhfst.la
