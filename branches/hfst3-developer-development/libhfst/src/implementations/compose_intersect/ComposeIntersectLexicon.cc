@@ -253,7 +253,8 @@ int main(int argc, char * argv[])
   
   HfstTransducer right_rule(universal);
   right_rule.subtract(inv_right_rule).minimize();
-  ComposeIntersectRule ci_right_rule(right_rule);
+  ComposeIntersectRule * ci_right_rule = 
+    new ComposeIntersectRule(right_rule);
 
   HfstTransducer left_rule_abstract_center_pair(x);
   left_rule_abstract_center_pair.disjunct(x_a).minimize();
@@ -273,13 +274,16 @@ int main(int argc, char * argv[])
 
   HfstTransducer left_rule(universal);
   left_rule.subtract(inv_left_rule).minimize();
-  ComposeIntersectRule ci_left_rule(left_rule);
+  ComposeIntersectRule * ci_left_rule =
+    new ComposeIntersectRule(left_rule);
 
-  ComposeIntersectRulePair rules(&ci_left_rule,&ci_right_rule);
+  ComposeIntersectRulePair * rules =
+    new ComposeIntersectRulePair(ci_left_rule,ci_right_rule);
   
-  ComposeIntersectRule some_rule(universal);
+  ComposeIntersectRule * some_rule =
+    new ComposeIntersectRule(universal);
   
-  ComposeIntersectRulePair three_rules(&some_rule,&rules);
+  ComposeIntersectRulePair three_rules(some_rule,rules);
   HfstBasicTransducer lex = l.compose_with_rules(&three_rules);
   HfstTransducer lex_fst(lex,TROPICAL_OPENFST_TYPE);
   lex_fst.minimize();

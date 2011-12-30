@@ -392,7 +392,7 @@ ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
   string rv(cased);
   return cased;
 #else
-  static const char* override_upper[16][2] = {{"Ə", "ə"},
+  static const char* override_upper[21][2] = {{"Ə", "ə"},
                                              {"Р", "р"},
                                              {"А", "а"},
                                              {"Ч", "ч"},
@@ -407,9 +407,14 @@ ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
                                              {"Ф", "ф"},
                                              {"Я", "я"},
                                              {"Ц", "ц"},
+                                             {"М", "м"},
+                                             {"Е", "е"},
+                                             {"Х", "х"},
+                                             {"Ҡ", "ҡ"},
+                                             {"Һ", "һ"},
                                              {"Э", "э"}};
 
-  static const char* override_lower[16][2] = {{"ə", "Ə"},
+  static const char* override_lower[21][2] = {{"ə", "Ə"},
                                              {"р", "Р"},
                                              {"а", "А"},
                                              {"ч", "Ч"},
@@ -423,7 +428,12 @@ ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
                                              {"ө", "Ө"},
                                              {"ф", "Ф"},
                                              {"я", "Я"},
+                                             {"е", "Е"},
+                                             {"м", "М"},
+                                             {"ҡ", "Ҡ"},
                                              {"ц", "Ц"},
+                                             {"х", "Х"},
+                                             {"һ", "Һ"},
                                              {"э", "Э"}};
 
   static const char* parallel_ranges[5][2][2] = {{{"A","Z"},{"a","z"}}, // Basic Latin
@@ -444,7 +454,7 @@ ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
                                              {"Ԁ","ԥ"}, // Cyrillic Supplement
                                              {"Ḁ","ỿ"}};//Latin Extended Additional
 
-  for(int i = 0; i < 16; i++) 
+  for(int i = 0; i < 21; i++) 
   {
     if(strcmp(c,override_upper[i][0]) == 0) 
     {
@@ -453,7 +463,7 @@ ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
     }
   }
 
-  for(int i = 0; i < 16; i++) 
+  for(int i = 0; i < 21; i++) 
   {
     if(strcmp(c,override_lower[i][0]) == 0) 
     {

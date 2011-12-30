@@ -104,7 +104,8 @@ namespace implementations {
 #if HAVE_SFST
   static void sfst_to_hfst_basic_transducer
     ( SFST::Node *node, 
-      HfstBasicTransducer *net, SFST::Alphabet &alphabet);
+      HfstBasicTransducer *net,
+      std::vector<unsigned int> &harmonization_vector);
 
   static HfstBasicTransducer * sfst_to_hfst_basic_transducer
     (SFST::Transducer * t);
@@ -112,7 +113,7 @@ namespace implementations {
   static SFST::Transducer * hfst_basic_transducer_to_sfst
     (const HfstBasicTransducer * t);
 
-  static void sfst_to_hfst_fast_transducer
+  /*  static void sfst_to_hfst_fast_transducer
     ( SFST::Node *node, 
       HfstFastTransducer *net, NumberVector &harmonization_vector);
 
@@ -130,7 +131,7 @@ namespace implementations {
     (SFST::Transducer * t);
 
   static SFST::Transducer * hfst_constant_transducer_to_sfst
-    (const HfstConstantTransducer * t);
+  (const HfstConstantTransducer * t); */
 #endif // HAVE_SFST
   
 #if HAVE_FOMA
@@ -140,7 +141,7 @@ namespace implementations {
     (const HfstBasicTransducer * t);
 
 
-  static HfstFastTransducer * foma_to_hfst_fast_transducer(struct fsm * t);
+  /*  static HfstFastTransducer * foma_to_hfst_fast_transducer(struct fsm * t);
 
   static struct fsm * hfst_fast_transducer_to_foma
     (const HfstFastTransducer * t);
@@ -150,7 +151,7 @@ namespace implementations {
     (struct fsm * t);
 
   static struct fsm * hfst_constant_transducer_to_foma
-    (const HfstConstantTransducer * t);
+  (const HfstConstantTransducer * t); */
 #endif // HAVE_FOMA
 
 #if HAVE_OPENFST
@@ -165,7 +166,7 @@ namespace implementations {
     (const HfstBasicTransducer * t);
 
 
-  static HfstFastTransducer * tropical_ofst_to_hfst_fast_transducer
+  /*  static HfstFastTransducer * tropical_ofst_to_hfst_fast_transducer
     (fst::StdVectorFst * t, bool has_hfst_header=true);
 
   static fst::StdVectorFst * hfst_fast_transducer_to_tropical_ofst
@@ -177,7 +178,7 @@ namespace implementations {
     (fst::StdVectorFst * t, bool has_hfst_header=true);
 
   static fst::StdVectorFst * hfst_constant_transducer_to_tropical_ofst
-    (const HfstConstantTransducer * t);
+  (const HfstConstantTransducer * t); */
 
 
   static HfstBasicTransducer * log_ofst_to_hfst_basic_transducer
@@ -191,7 +192,7 @@ namespace implementations {
     (const HfstBasicTransducer * t);
 
 
-  static HfstFastTransducer * log_ofst_to_hfst_fast_transducer
+  /*  static HfstFastTransducer * log_ofst_to_hfst_fast_transducer
     (LogFst * t, bool has_hfst_header=true);
 
   static LogFst * hfst_fast_transducer_to_log_ofst
@@ -202,7 +203,7 @@ namespace implementations {
     (LogFst * t, bool had_hfst_header=true);
 
   static LogFst * hfst_constant_transducer_to_log_ofst
-    (const HfstConstantTransducer * t);
+  (const HfstConstantTransducer * t); */
 
 
 

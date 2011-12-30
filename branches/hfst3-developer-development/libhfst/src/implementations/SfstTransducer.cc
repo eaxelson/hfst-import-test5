@@ -71,33 +71,6 @@ namespace hfst { namespace implementations {
 
   void SfstInputStream::stream_unget(char c) {
     ungetc ( (int)c, input_file ); }
-
-    /*
-  void SfstInputStream::stream_putback(char c) {
-    if (EOF == ungetc(c, input_file))
-      assert(false); }
-
-  void SfstInputStream::stream_getline(char* s, streamsize n, char delim) {
-    if ((int)n == 0)
-      assert(false);
-    unsigned int i=0;
-    while(true)
-      {
-        if (i == ((unsigned int)n-1) ) {
-          s[i] = '\0';
-          break;
-        }
-        int c = getc(input_file);
-        if (feof(input_file) || (c == delim)) {
-          s[i] = '\0';
-          break;
-        }
-        else
-          s[i] = delim;
-        i++;
-      }
-      }*/
-
   
   bool SfstInputStream::is_eof(void)
   {
@@ -226,10 +199,6 @@ namespace hfst { namespace implementations {
 
     try {
 
-    //clock_t startclock = clock();
-
-    //std::cerr << *t1 << "--\n" << *t2;
-
     // 1. Calculate the set of unknown symbols for transducers t1 and t2.
 
     StringSet unknown_t1;    // symbols known to another but not this
@@ -242,19 +211,6 @@ namespace hfst { namespace implementations {
                         t2_symbols, unknown_t2);
       }
 
-    //std::cerr << "Transducer t1:" << std::endl;
-    //std::cerr << *t1 << std::endl;
-    //print_alphabet(t1);
-
-    /*
-    std::cerr << "Transducer t1:" << std::endl;
-    std::cerr << *t1 << std::endl;
-    print_alphabet(t1);
-
-    std::cerr << "Transducer t2:" << std::endl;
-    std::cerr << *t2 << std::endl;
-    print_alphabet(t2);
-    */
 
       Transducer * new_t1 = &t1->copy(false, &t2->alphabet);
       new_t1->alphabet.insert_symbols(t2->alphabet);
@@ -267,16 +223,6 @@ namespace hfst { namespace implementations {
       t2->alphabet.insert_symbols(new_t1->alphabet);
       delete t1;
       t1 = new_t1;
-
-    /*
-    std::cerr << "Transducer t1:" << std::endl;
-    std::cerr << *t1 << std::endl;
-    print_alphabet(t1);
-
-    std::cerr << "Transducer t2:" << std::endl;
-    std::cerr << *t2 << std::endl;
-    print_alphabet(t2);
-    */
 
     // 3. Calculate the set of symbol pairs to which a non-identity "?:?"
     //    transition is expanded for both transducers.
@@ -296,10 +242,6 @@ namespace hfst { namespace implementations {
       harmonized_t2 = &t2->copy();
     }
 
-    //clock_t endclock = clock();
-
-    /* sfst_seconds_in_harmonize = sfst_seconds_in_harmonize + 
-       ( (float)(endclock - startclock) / CLOCKS_PER_SEC); */
 
     return std::pair<Transducer*, Transducer*>(harmonized_t1, harmonized_t2);
 
@@ -354,8 +296,6 @@ namespace hfst { namespace implementations {
 
         Transducer * t = new Transducer(input_file,true);
 
-        //tt.alphabet.clear();
-        //t = &tt.copy();
         if (not is_minimal) {
           t->minimised = false;
           t->deterministic = false;
@@ -414,20 +354,6 @@ namespace hfst { namespace implementations {
       header.push_back('\0');
     }
 
-    /*
-    void SfstOutputStream::write_3_0_library_header(FILE *file, bool is_minimal)
-  {
-    fputs("HFST3",file);
-    fputc(0, file);
-    fputs("SFST_TYPE",file);
-    fputc(0, file);
-    if (is_minimal) {
-      fputs("MINIMAL",file);
-      fputc(0, file); 
-    }
-  }
-    */
-
     void SfstOutputStream::write(const char &c)
     {
       fputc(c,ofile);
@@ -442,6 +368,47 @@ namespace hfst { namespace implementations {
   {
     std::cerr << *t;
   }
+
+    unsigned int SfstTransducer::get_biggest_symbol_number(Transducer * t)
+    {
+      unsigned int biggest_number=0;
+      SFST::Alphabet::CharMap cm = t->alphabet.get_char_map();
+      for (SFST::Alphabet::CharMap::const_iterator it = cm.begin(); 
+	   it != cm.end(); it++) {
+	if (it->first > biggest_number)
+	  biggest_number = it->first;
+      }
+      return biggest_number;
+    }
+
+    StringVector SfstTransducer::get_symbol_vector
+    (Transducer * t)
+    {
+      unsigned int biggest_symbol_number = get_biggest_symbol_number(t);
+      StringVector symbol_vector;
+      symbol_vector.reserve(biggest_symbol_number+1);
+      symbol_vector.resize(biggest_symbol_number+1,"");
+      
+      StringSet alphabet = get_alphabet(t);
+      for (StringSet::const_iterator it = alphabet.begin(); it != alphabet.end(); it++)
+	{
+	  unsigned int symbol_number = get_symbol_number(t, it->c_str());
+	  symbol_vector.at(symbol_number) = *it;
+	}
+      return symbol_vector;
+    }
+    
+    std::map<std::string, unsigned int> SfstTransducer::get_symbol_map
+    (Transducer * t)
+    {
+      StringSet alphabet = get_alphabet(t);
+      std::map<std::string, unsigned int> symbol_map;
+      for (StringSet::const_iterator it = alphabet.begin(); it != alphabet.end(); it++)
+	{
+	  symbol_map[*it] = get_symbol_number(t, it->c_str());
+	}
+      return symbol_map;
+    }
 
   void SfstTransducer::print_alphabet(Transducer *t) {
     fprintf(stderr, "alphabet..\n");
@@ -1123,7 +1090,6 @@ namespace hfst { namespace implementations {
   void SfstTransducer::insert_to_alphabet
     (Transducer * t, const std::string &symbol)
   {
-    std::cerr << "adding symbol " << symbol << std::endl;
     t->alphabet.add_symbol(symbol.c_str());
   }
 
@@ -1181,12 +1147,16 @@ namespace hfst { namespace implementations {
     return s;
   }
 
-  unsigned int SfstTransducer::get_symbol_number(Transducer *t, 
-                         const std::string &symbol)
+    unsigned int SfstTransducer::get_symbol_number
+    (Transducer *t, 
+     const std::string &symbol)
   {
+    if (symbol == "@_EPSILON_SYMBOL_@")
+      return 0;
     int i = t->alphabet.symbol2code(symbol.c_str());
-    if (i == EOF)
+    if (i == EOF) {
       HFST_THROW(SymbolNotFoundException);
+    }
     return (unsigned int)i;
   }
 

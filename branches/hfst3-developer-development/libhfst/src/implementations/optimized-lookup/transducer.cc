@@ -160,52 +160,50 @@ SymbolNumber Encoder::find_key(char ** p)
     return s;
 }
 
-bool Transducer::initialize_input(char * input_str)
+bool Transducer::initialize_input(const char * input_str)
 {
+    char * c = strdup(input_str);
+    char * c_orig = c;
     int i = 0;
     SymbolNumber k = NO_SYMBOL_NUMBER;
-    for ( char ** Str = &input_str; **Str != 0; )
+    for ( char ** Str = &c; **Str != 0; )
     {
     k = encoder->find_key(Str);
     if (k == NO_SYMBOL_NUMBER)
     {
+        free(c_orig);
         return false; // tokenization failed
     }
     input_tape[i] = k;
     ++i;
     }
     input_tape[i] = NO_SYMBOL_NUMBER;
+    free(c_orig);
     return true;
 }
 
 HfstOneLevelPaths * Transducer::lookup_fd(const StringVector & s)
 
 {
-    HfstOneLevelPaths * results = new HfstOneLevelPaths;
-    lookup_paths = results;
     std::string input_str;
     for (StringVector::const_iterator it = s.begin(); it != s.end(); ++it) {
     input_str.append(*it);
     }
-    if (!initialize_input(const_cast<char *>(input_str.c_str()))) {
-    lookup_paths = NULL;
-    return results;
-    }
-    //current_weight += s.second;
-    get_analyses(input_tape, output_tape, output_tape, 0);
-    //current_weight -= s.second;
-    lookup_paths = NULL;
-    return results;
+    return lookup_fd(input_str);
 }
 
 HfstOneLevelPaths * Transducer::lookup_fd(const std::string & s)
 {
+    return lookup_fd(s.c_str());
+}
+
+HfstOneLevelPaths * Transducer::lookup_fd(const char * s)
+{
     HfstOneLevelPaths * results = new HfstOneLevelPaths;
     lookup_paths = results;
-    std::string input_str;
-    if (!initialize_input(const_cast<char *>(s.c_str()))) {
-    lookup_paths = NULL;
-    return results;
+    if (!initialize_input(s)) {
+        lookup_paths = NULL;
+        return results;
     }
     //current_weight += s.second;
     get_analyses(input_tape, output_tape, output_tape, 0);

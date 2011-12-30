@@ -54,6 +54,8 @@ namespace hfst
   /* A set of strings. */
   typedef std::set<String> StringSet;
 
+  typedef std::vector<String> StringVector; 
+
   /** \brief A symbol pair in a transition. 
 
       @see HfstTransducer::substitute(const StringPair&, const StringPair&) 
@@ -71,6 +73,14 @@ namespace hfst
      @see HfstTransducer::substitute(const StringPair&, const StringPairSet &)
      #hfst::rules */
   typedef std::set<StringPair> StringPairSet;
+
+  /** \brief A map of substitutions used when performing multiple
+      symbol-to-symbol substitutions. */
+  typedef std::map<String, String> HfstSymbolSubstitutions;
+
+  /** \brief A map of substitutions used when performing multiple
+      symbol pair-to-symbol pair substitutions. */
+  typedef std::map<StringPair, StringPair> HfstSymbolPairSubstitutions;
   
 /* The internal representations */
   const std::string internal_epsilon = "@_EPSILON_SYMBOL_@";
