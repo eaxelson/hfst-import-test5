@@ -2669,12 +2669,9 @@ HfstTransducer &HfstTransducer::compose_intersect
     // the lexicon unless the lexicon already contains them. 
     std::set<std::string> rule_alphabet = first.get_alphabet();
 
-    bool remove_word_boundary = false;
     if (rule_alphabet.find("@#@") != rule_alphabet.end())
     { 
     std::set<std::string> lexicon_alphabet = get_alphabet();
-    remove_word_boundary = 
-        (lexicon_alphabet.find("@#@") == lexicon_alphabet.end());
     HfstTokenizer tokenizer;
     tokenizer.add_multichar_symbol("@#@");
     tokenizer.add_multichar_symbol(internal_epsilon);
