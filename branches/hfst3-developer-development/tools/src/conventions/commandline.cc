@@ -47,76 +47,9 @@
 #endif
 
 #include "conventions/commandline.h"
+#include "conventions/portability.h"
 #include "HfstOutputStream.h"
 #include "HfstTransducer.h"
-
-#ifndef HAVE_ERROR_AT_LINE
-void error_at_line(int status, int errnum, const char* filename, 
-                   unsigned int linenum, const char* fmt, ...)
-{
-  fprintf(stderr, "%s.%u: ", filename, linenum);
-  va_list ap;
-  va_start(ap, fmt);
-  vfprintf(stderr, fmt, ap);
-  va_end(ap);
-  if (errnum != 0)
-    {
-      fprintf(stderr, "%s", strerror(errnum));
-    }
-  fprintf(stderr, "\n");
-  if (status != 0)
-    {
-      exit(status);
-    }
-}
-#endif
-
-#ifndef HAVE_ERROR
-void
-error(int status, int errnum, const char* fmt, ...)
-{
-  fprintf(stderr, "%s: ", program_name);
-  va_list ap;
-  va_start(ap, fmt);
-  vfprintf(stderr, fmt, ap);
-  va_end(ap);
-  if (errnum != 0)
-    {
-      fprintf(stderr, "%s", strerror(errnum));
-    }
-  fprintf(stderr, "\n");
-  if (status != 0)
-    {
-      exit(status);
-    }
-}
-#endif
-#ifndef HAVE_WARNING
-void
-warning(int status, int errnum, const char* fmt, ...)
-{
-  fprintf(stderr, "%s: warning: ", program_name);
-  va_list ap;
-  va_start(ap, fmt);
-  vfprintf(stderr, fmt, ap);
-  va_end(ap);
-  if (errnum != 0)
-    {
-      fprintf(stderr, "%s", strerror(errnum));
-    }
-  fprintf(stderr, "\n");
-  if (status != 0)
-    {
-      exit(status);
-    }
-}
-#endif
-
-// deprecated; everything's compatible
-int get_compatible_fst_format(std::istream& , std::istream& ) {
-    assert(false);
-    return -1;
-}
 
 // specific printf's wrapped in conditions
 void
@@ -480,24 +413,6 @@ hfst_mkstemp(char* templ)
 }
 
 // str functions
-#ifndef HAVE_STRNDUP
-char*
-strndup(const char* s, size_t n)
-  {
-    char* rv = static_cast<char*>(malloc(sizeof(char)*n+1));
-    if (rv == NULL)
-      {
-        return rv;
-      }
-    rv = static_cast<char*>(memcpy(rv, s, n));
-    if (rv == NULL)
-      {
-        return rv;
-      }
-    rv[n] = '\0';
-    return rv;
-  }
-#endif
 
 char*
 hfst_strdup(const char* s)
@@ -521,84 +436,6 @@ hfst_strndup(const char* s, size_t n)
     return rv;
 }
 
-#ifndef HAVE_GETDELIM
-ssize_t
-getdelim(char** lineptr, size_t* n, int delim, FILE* stream)
-  {
-#define MAX_GETDELIM 8192
-    size_t nn = *n;
-    if (nn == 0)
-      {
-        nn = MAX_GETDELIM;
-      }
-    if (*lineptr == NULL)
-      {
-        *lineptr = static_cast<char*>(malloc(nn));
-        if (*lineptr == NULL)
-          {
-            return -1;
-          }
-      }
-    char* currptr = *lineptr;
-    *currptr = '\0';
-    size_t readin = 0;
-    int readbyte = 0;
-    while ((readbyte = fgetc(stream)) != EOF)
-      {
-        *currptr = static_cast<char>(readbyte);
-        currptr++;
-        readin++;
-        if (readin >= nn)
-          {
-            currptr--;
-            *currptr = '\0';
-            return -1;
-          }
-        else if (readbyte == delim)
-          {
-            *currptr = '\0';
-            return strlen(*lineptr);
-          }
-      }
-    if (readbyte == EOF)
-      {
-        *currptr = '\0';
-        return -1;
-      }
-    if (*lineptr == NULL)
-      {
-        return -1;
-      }
-    return strlen(*lineptr);
-  }
-#endif
-
-#ifndef HAVE_GETLINE
-ssize_t
-getline(char** lineptr, size_t* n, FILE* stream)
-  {
-#define MAX_GETLINE 4096
-    size_t nn = *n;
-    if (nn == 0)
-      {
-        nn = MAX_GETLINE;
-      }
-    if (*lineptr == NULL)
-      {
-        *lineptr = static_cast<char*>(malloc(nn));
-        if (*lineptr == NULL)
-          {
-             return -1;
-          }
-      }
-    *lineptr = fgets(*lineptr, nn, stream);
-    if (*lineptr == NULL)
-      {
-        return -1;
-      }
-    return strlen(*lineptr);
-  }
-#endif
 
 ssize_t
 hfst_getdelim(char** lineptr, size_t* n, int delim, FILE* stream)
@@ -626,20 +463,6 @@ hfst_getline(char** lineptr, size_t* n, FILE* stream)
   return rv;
 }
 
-#ifndef HAVE_READLINE
-char*
-readline(const char* prompt)
-{
-  fprintf(message_out, "%s", prompt);
-  char* line = 0;
-  size_t len = 0;
-  if (hfst_getline(&line, &len, stdin) == -1)
-    {
-      return 0;
-    }
-  return line;
-}
-#endif
 
 char*
 hfst_readline(const char* prompt)
@@ -670,29 +493,6 @@ hfst_setlocale()
 #endif
     return rv;
 }
-#ifndef HAVE_SET_PROGRAM_NAME
-void
-set_program_name(const char* argv0)
-  {
-    // this's gnulib
-    const char *slash;
-    const char *base;
-    slash = strrchr (argv0, '/');
-    base = (slash != NULL ? slash + 1 : argv0);
-    if (base - argv0 >= 7 && strncmp (base - 7, "/.libs/", 7) == 0)
-      {
-        argv0 = base;
-        if (strncmp (base, "lt-", 3) == 0)
-          {
-            argv0 = base + 3;
-          }
-      }
-    if (strcmp(argv0, "hfst-calculate") == 0)
-      program_name = hfst_strdup("hfst-sfstpl2fst");
-    else
-      program_name = hfst_strdup(argv0);
-  }
-#endif
 
 // mem functions
 
@@ -732,7 +532,7 @@ void
 print_short_help()
 {
     fprintf(message_out, "Try ``%s --help'' for more information.\n",
-             program_name);
+             program_short_name);
 }
 
 // print web site reference
@@ -758,7 +558,7 @@ print_version()
              "This is free software: you are free to change and "
              "redistribute it.\n"
              "There is NO WARRANTY, to the extent permitted by law.\n",
-             program_name, hfst_tool_version);
+             program_short_name, hfst_tool_version);
 }
 
 void

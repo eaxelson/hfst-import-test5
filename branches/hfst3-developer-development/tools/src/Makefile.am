@@ -161,13 +161,13 @@ MAYBE_XFST_COMPILER=hfst-xfst2fst
 endif
 
 noinst_HEADERS= \
-	conventions/commandline.h conventions/options.h \
-	sfst/Compiler.h sfst/HfstAlphabet.h sfst/HfstUtf8.h \
-	conventions/check-params-binary.h conventions/check-params-common.h \
-	conventions/check-params-unary.h  conventions/getopt-cases-binary.h \
-	conventions/getopt-cases-common.h conventions/getopt-cases-error.h  \
-	conventions/getopt-cases-unary.h  conventions/globals-binary.h      \
-	conventions/globals-common.h      conventions/globals-unary.h \
+	conventions/commandline.h conventions/options.h conventions/portability.h \
+	sfst/Compiler.h sfst/HfstAlphabet.h sfst/HfstUtf8.h                       \
+	conventions/check-params-binary.h conventions/check-params-common.h       \
+	conventions/check-params-unary.h  conventions/getopt-cases-binary.h       \
+	conventions/getopt-cases-common.h conventions/getopt-cases-error.h        \
+	conventions/getopt-cases-unary.h  conventions/globals-binary.h            \
+	conventions/globals-common.h      conventions/globals-unary.h             \
 	utils/HfstStrings2FstTokenizer.h utils/HfstLookupFlagDiacritics.h
 
 # sort alphabetically
@@ -200,7 +200,8 @@ bin_PROGRAMS= \
 
 HFST_COMMON_SRC=conventions/options.cc \
 				conventions/commandline.cc \
-				conventions/metadata.cc
+				conventions/metadata.cc \
+				conventions/portability.cc
 # sort alphabetically
 hfst_affix_guessify_SOURCES=affix-guessify.cc $(HFST_COMMON_SRC)
 hfst_apertium2fst_SOURCES=apertium2fst.cc $(HFST_COMMON_SRC) \

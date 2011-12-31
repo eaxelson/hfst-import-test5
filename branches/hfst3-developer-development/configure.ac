@@ -483,7 +483,7 @@ AS_IF([test "x$enable_apertium2fst" != "xno"],
 #                [AC_MSG_FAILURE([my transducer library test failed (--without-my-transducer-library to disable)])])])
 
 # Checks for header files
-AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h locale.h langinfo.h])
+AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h locale.h langinfo.h errno.h])
 
 AC_LANG_PUSH([C++])
 
@@ -515,8 +515,8 @@ AC_HEADER_ASSERT
 AC_TYPE_SIZE_T
 
 # Checks for structures
-AC_CHECK_DECLS([program_name, program_invocation_name, program_invocation_short_name])
-AC_CHECK_DECLS([rl_completion_suppress_append, rl_completion_matches])
+AC_CHECK_DECLS([program_invocation_name, program_invocation_short_name], [], [], [#include <errno.h>])
+AC_CHECK_DECLS([rl_completion_suppress_append, rl_completion_matches], [], [], [#include <readline/readline.h>])
 
 # Checks for compiler characteristics
 AC_C_INLINE
