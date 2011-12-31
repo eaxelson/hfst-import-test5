@@ -452,9 +452,9 @@ AS_IF([test "x$with_openfst" != "xno"],
       [AC_CHECK_LIB([m], [main])])
 AS_IF([test "x$with_sfst" != "xno"],
       [AC_CHECK_LIB([sfst], [main])]
-      [AC_CHECK_LIB([sfst1], [main])])
-AS_IF([test "x$ac_cv_lib_sfst_main" == xno -a "x$ac_cv_lib_sfst1_main" == xno],
-      [AC_MSG_FAILURE([sfst tests failed (--without-sfst to disable)])])
+      [AC_CHECK_LIB([sfst1], [main])]
+      [AS_IF([test "x$ac_cv_lib_sfst_main" == xno -a "x$ac_cv_lib_sfst1_main" == xno],
+             [AC_MSG_FAILURE([sfst tests failed (--without-sfst to disable)])])])
 AC_LANG_POP
 AC_LANG_PUSH([C])
 AS_IF([test "x$with_foma" != "xno"],
@@ -490,7 +490,9 @@ AC_LANG_PUSH([C++])
 AS_IF([test "x$with_sfst" != "xno"],
       [AC_CHECK_HEADERS([sfst/fst.h sfst1/fst.h])]
       [AC_CHECK_HEADERS([backward/hash_set ext/hash_set hash_set])]
-      [AC_CHECK_HEADERS([backward/hash_map ext/hash_map hash_map])])
+      [AC_CHECK_HEADERS([backward/hash_map ext/hash_map hash_map])]
+      [AC_DEFINE([_GLIBCXX_PERMIT_BACKWARD_HASH], [1], 
+                 [define to silence gcc warnings from SFST using obsolete data structures])])
 AS_IF([test "x$with_openfst" != "xno"],
       [AC_CHECK_HEADERS([fst/fstlib.h])])
 AC_LANG_POP
