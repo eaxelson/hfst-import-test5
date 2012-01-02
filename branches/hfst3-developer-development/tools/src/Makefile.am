@@ -286,3 +286,12 @@ hfst_calculate_CXXFLAGS= -Wall -Wno-error
 ## YACC and FLEX with autotools argh
 AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c 
+
+# tests
+TOOL_TSTS=utils/unicode
+check_PROGRAMS=$(TOOL_TSTS)
+utils_unicode_SOURCES=utils/unicode.cc utils/unicode_data.cc
+utils_unicode_CXXFLAGS=-DUNIT_TEST
+
+TESTS=$(TOOL_TSTS)
+
