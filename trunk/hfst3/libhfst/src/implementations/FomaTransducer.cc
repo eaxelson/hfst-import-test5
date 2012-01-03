@@ -347,12 +347,12 @@ namespace hfst { namespace implementations {
   
   fsm * FomaTransducer::repeat_n(fsm * t, unsigned int n)
   {     
-    return fsm_concat_n(t, n);
+    return fsm_concat_n(fsm_copy(t), n);
   }
   
   fsm * FomaTransducer::repeat_le_n(fsm * t, unsigned int n)
   { 
-    return fsm_concat_m_n(t,0,n);
+    return fsm_concat_m_n(fsm_copy(t),0,n);
   }
   
   fsm * FomaTransducer::optionalize(fsm * t)
@@ -1048,6 +1048,9 @@ int main(int argc, char * argv[])
       = FomaTransducer::define_transducer("@_EPSILON_SYMBOL_@");
     fsm * epsilon_i = FomaTransducer::extract_input_language(epsilon);
     fsm * epsilon_i_min = FomaTransducer::minimize(fsm_copy(epsilon_i));
+
+    fsm * a = FomaTransducer::define_transducer("a");
+    fsm * a2 = FomaTransducer::repeat_n(a, 2);
     
     std::cout << std::endl << "ok" << std::endl;
     return EXIT_SUCCESS;

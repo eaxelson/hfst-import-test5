@@ -2144,8 +2144,8 @@ HfstTransducer &HfstTransducer::substitute
     hfst::implementations::HfstBasicTransducer * net =
       convert_to_basic_transducer();
     net->substitute(old_symbol,
-            new_symbol,
-            input_side, output_side);
+		    new_symbol,
+		    input_side, output_side);
     return convert_to_hfst_transducer(net);
 }
 
@@ -3986,6 +3986,10 @@ int main(int argc, char * argv[])
       if (! HfstTransducer::is_implementation_type_available(types[i]))
 	continue;
 
+	// One case that fails with FOMA_TYPE
+	HfstTransducer a("a", FOMA_TYPE);
+	a.repeat_n(2);
+
     	// Test alphabet after substitute
 
         HfstTransducer t("a", "b", types[i]);
@@ -4014,6 +4018,7 @@ int main(int argc, char * argv[])
         ab_.compare(ac_);
         assert(ab_.get_alphabet() == ab.get_alphabet());
         assert(ac_.get_alphabet() == ac.get_alphabet());
+
 
         HfstTransducer &compose(const HfstTransducer &another);
 
