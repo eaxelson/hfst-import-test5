@@ -669,46 +669,23 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
             } // while getline
           free(line);
 
-	  if (!in_order && symbol_map_in_use) {
+	  // perform label-to-label substitution right away
+	  if (!in_order && symbol_map_in_use) 
+	    {
+	      trans.substitute(*label_substitution_map);
+	      symbol_map_in_use=false;
+	    }
 
-#ifdef DEBUG_SUBSTITUTE
-	    std::cerr << "Symbol substitution map now includes" << std::endl;
-	    for (HfstSymbolSubstitutions::const_iterator it 
-		   = label_substitution_map->begin();
-		 it != label_substitution_map->end(); it++)
-	      {
-		std::cerr << it->first << " -> "
-			  << it->second << std::endl;
-	      }
-	    std::cerr << std::endl;
-#endif	    
-
-	    trans.substitute(*label_substitution_map);
-	    symbol_map_in_use=false;
-	  }
-
-
-	  if (!in_order && symbol_pair_map_in_use) {
-
-#ifdef DEBUG_SUBSTITUTE
-	    std::cerr << "Symbol pair substitution map now includes" << std::endl;
-	    for (HfstSymbolPairSubstitutions::const_iterator it = 
-		   pair_substitution_map->begin();
-		 it != pair_substitution_map->end(); it++)
-	      {
-		std::cerr << it->first.first << ":"
-			  << it->first.second << " -> "
-			  << it->second.first << ":"
-			  << it->second.second << std::endl;
-	      }
-	    std::cerr << std::endl;
-#endif	    
-
-	    trans.substitute(*pair_substitution_map);
-	    symbol_pair_map_in_use=false;
-	  }
+	  // perform symbol pair-to-symbol pair substitution right away
+	  if (!in_order && symbol_pair_map_in_use) 
+	    {
+	      trans.substitute(*pair_substitution_map);
+	      symbol_pair_map_in_use=false;
+	    }
 
         }
+
+      // if not from file
       else
         {
           try
@@ -815,16 +792,16 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         }
       delete fallback;
       // TODO: remove this, this should be taken care in the interface
-      fallback = new HfstBasicTransducer(trans);
-      fallback->prune_alphabet();
-      trans = HfstTransducer(*fallback, trans.get_type());
-#if HAVE_SFST
-      if (got_foma) {
-	  trans = trans.convert(hfst::FOMA_TYPE);
-      }
-#endif
+      //fallback = new HfstBasicTransducer(trans);
+      //fallback->prune_alphabet();
+      //trans = HfstTransducer(*fallback, trans.get_type());
+      //#if HAVE_SFST
+      //      if (got_foma) {
+      //	  trans = trans.convert(hfst::FOMA_TYPE);
+      //      }
+      //#endif
       outstream << trans;
-      delete fallback;
+      //delete fallback;
       free(inputname);
     }
   delete to_transducer;

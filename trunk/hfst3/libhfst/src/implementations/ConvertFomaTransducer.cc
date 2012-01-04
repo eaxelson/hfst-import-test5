@@ -108,11 +108,11 @@ namespace hfst { namespace implementations
            = alpha.begin();
 	 it != alpha.end(); it++)
       {
-	char *symbol = strdup(it->c_str());
-	if ( fsm_construct_check_symbol(h,symbol) == -1 ) {
-	  fsm_construct_add_symbol(h,symbol);
+	const char * symbol = it->c_str();
+	if ( fsm_construct_check_symbol(h,const_cast<char*>(symbol)) == -1 ) {
+	  fsm_construct_add_symbol(h,const_cast<char*>(symbol));
 	}
-	free(symbol);
+	//free(symbol);
       }
   }
 
@@ -259,9 +259,9 @@ namespace hfst { namespace implementations
 
     struct fsm_construct_handle *h;
     struct fsm *net;
-    char * emptystr = strdup("");
-    h = fsm_construct_init(emptystr);
-    free(emptystr);
+    const char * emptystr = "";
+    h = fsm_construct_init(const_cast<char*>(emptystr));
+    //free(emptystr);
     
     // ----- Go through all states -----
     unsigned int source_state=0;
@@ -274,15 +274,15 @@ namespace hfst { namespace implementations
              tr_it != it->end(); tr_it++)
           {
             // Copy the transition
-            char* input = strdup(tr_it->get_input_symbol().c_str());
-            char* output = strdup(tr_it->get_output_symbol().c_str());
+            const char * input = tr_it->get_input_symbol().c_str();
+            const char * output = tr_it->get_output_symbol().c_str();
             fsm_construct_add_arc(h, 
                                   (int)source_state, 
                                   (int)tr_it->get_target_state(),
-                                  input,
-                                  output );
-            free(input);
-            free(output);
+                                  const_cast<char *>(input),
+                                  const_cast<char *>(output) );
+            //free(input);
+            //free(output);
           }
 	// ----- transitions gone through -----
 	source_state++;
