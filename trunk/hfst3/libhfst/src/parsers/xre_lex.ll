@@ -89,12 +89,28 @@ LWSP [\t\r\n ]
 "<=>" { return LEFT_RIGHT_ARROW; }
 "<=" { return LEFT_ARROW; }
 "=>" { return RIGHT_ARROW; }
-"->" { return REPLACE_ARROW; }
-"(->)" { return OPTIONAL_REPLACE; }
-"@->" { return LTR_LONGEST_REPLACE; }
-"@>" { return LTR_SHORTEST_REPLACE; }
-"->@" { return RTL_LONGEST_REPLACE; }
-">@" { return RTL_SHORTEST_REPLACE; }
+"->" { return REPLACE_RIGHT; }
+"(->)" { return OPTIONAL_REPLACE_RIGHT; }
+"<-" { return REPLACE_LEFT; }
+"(<-)" { return OPTIONAL_REPLACE_LEFT; }
+"<->" { return REPLACE_LEFT_RIGHT; }
+"(<->)" { return OPTIONAL_REPLACE_LEFT_RIGHT; }
+"@->" { return LTR_LONGEST_REPLACE_RIGHT; }
+"@>" { return LTR_SHORTEST_REPLACE_RIGHT; }
+"->@" { return RTL_LONGEST_REPLACE_RIGHT; }
+">@" { return RTL_SHORTEST_REPLACE_RIGHT; }
+"(@->)" { return OPTIONAL_LTR_LONGEST_REPLACE_RIGHT; }
+"(@>)" { return OPTIONAL_LTR_SHORTEST_REPLACE_RIGHT; }
+"(->@)" { return OPTIONAL_RTL_LONGEST_REPLACE_RIGHT; }
+"(>@)" { return OPTIONAL_RTL_SHORTEST_REPLACE_RIGHT; }
+"<-@" { return LTR_LONGEST_REPLACE_LEFT; }
+"<@" { return LTR_SHORTEST_REPLACE_LEFT; }
+"@<-" { return RTL_LONGEST_REPLACE_LEFT; }
+"@<" { return RTL_SHORTEST_REPLACE_LEFT; }
+"(<-@)" { return OPTIONAL_LTR_LONGEST_REPLACE_LEFT; }
+"(<@)" { return OPTIONAL_LTR_SHORTEST_REPLACE_LEFT; }
+"(@<-)" { return OPTIONAL_RTL_LONGEST_REPLACE_LEFT; }
+"(@<)" { return OPTIONAL_RTL_SHORTEST_REPLACE_LEFT; }
 "||" { return REPLACE_CONTEXT_UU; }
 "//" { return REPLACE_CONTEXT_LU; }
 "\\\\" { return REPLACE_CONTEXT_UL; }
@@ -102,6 +118,7 @@ LWSP [\t\r\n ]
 "_"+ { return CENTER_MARKER; }
 "..."+ { return MARKUP_MARKER; }
 
+"\\\\\\" { return LEFT_QUOTIENT; }
 
 "^"{UINTEGER}","{UINTEGER} { 
     xrelval.values = hfst::xre::get_n_to_k(xretext);
@@ -171,7 +188,7 @@ LWSP [\t\r\n ]
 ^":"$ { return PAIR_SEPARATOR_SOLE; }
 {LWSP}":" { return PAIR_SEPARATOR_WO_LEFT; }
 ":"{LWSP} { return PAIR_SEPARATOR_WO_RIGHT; }
-":" {  return PAIR_SEPARATOR; }
+":" { return PAIR_SEPARATOR; }
 
 "::"{WEIGHT} {
     xrelval.weight = hfst::xre::get_weight(xretext + 2);
@@ -183,10 +200,12 @@ LWSP [\t\r\n ]
     return QUOTED_LITERAL;
 }
 
+",," { return COMMACOMMA; }
 "," { return COMMA; }
 
 "\"\"" { return EPSILON_TOKEN; }
 "0" { return EPSILON_TOKEN; }
+"[]" { return EPSILON_TOKEN; }
 "?" { return ANY_TOKEN; }
 
 {NAME_CH}+ {
@@ -205,7 +224,7 @@ LWSP [\t\r\n ]
 
 {LWSP}* { /* ignorable whitespace */ }
 
-"!"[^\n]*$ { /* ignore comments */ }
+("!"|"#")[^\n]*$ { /* ignore comments */ }
 
 . { 
     return LEXER_ERROR;
