@@ -15,8 +15,6 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program. If not, see <http://www.gnu.org/licenses/>.
 
-AUTOMAKE_OPTIONS=std-options subdir-objects
-
 noinst_LTLIBRARIES=libhfstparsers.la
 
 XRE_SRCS=xre_lex.ll xre_parse.yy xre_utils.cc XreCompiler.cc
@@ -42,5 +40,16 @@ extincludedir = $(hfstincludedir)/parsers
 
 extinclude_HEADERS = $(XRE_HDRS) $(LEXC_HDRS)
 
+LIBHFST_PARSER_TSTS=XreCompiler
 
+check_PROGRAMS=$(LIBHFST_PARSER_TSTS)
+
+XreCompiler_SOURCES=XreCompiler.cc xre_utils.cc xre_parse.yy xre_lex.ll
+XreCompiler_CXXFLAGS=-DUNIT_TEST
+XreCompiler_LDADD=../libhfst.la
+#LexcCompiler_SOURCES=LexcCompiler.cc lexc-utils.cc lexc-parser.yy lexc-lexer.ll
+#LexcCompiler_CXXFLAGS=-DUNIT_TEST
+#LexcCompiler_LDADD=../libhfst.la
+
+TESTS=$(LIBHFST_PARSER_TSTS)
 

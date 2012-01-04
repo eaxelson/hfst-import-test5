@@ -350,7 +350,7 @@ strdup_nonconst_part(const char* token, const char* prefix,
 }
 
 void
-error_at_current_token(int status, int errnum, const char* format)
+error_at_current_token(int, int, const char* format)
 {
     char* leader = strdup_token_positions();
     char* token = strdup_token_part();
@@ -359,6 +359,4 @@ error_at_current_token(int status, int errnum, const char* format)
 }
 
 } } 
-
-// vim: set ft=cpp.doxygen:
 
