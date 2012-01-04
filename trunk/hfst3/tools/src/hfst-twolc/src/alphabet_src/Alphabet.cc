@@ -57,6 +57,13 @@ bool Alphabet::is_empty_pair(const SymbolPair &pair)
 void Alphabet::define_singleton_set(const std::string &name)
 { sets[name] = SymbolRange(1,name); }
 
+bool Alphabet::is_set_pair(const SymbolPair &pair) const
+{
+  return 
+    pair.first.find("__HFST_TWOLC_SET_NAME=") != std::string::npos or 
+    pair.second.find("__HFST_TWOLC_SET_NAME=") != std::string::npos;
+}
+
 const OtherSymbolTransducer &Alphabet::compute(const SymbolPair &pair)
 {
   if (not sets.has_key(pair.first))
@@ -84,10 +91,13 @@ const OtherSymbolTransducer &Alphabet::compute(const SymbolPair &pair)
       for (HandySet<SymbolPair>::const_iterator it = alphabet_set.begin();
        it != alphabet_set.end();
        ++it)
-    {
-      pair_transducer.apply(&HfstTransducer::disjunct,
-                OtherSymbolTransducer(it->first,it->second));
-    }
+	{
+	  if (is_set_pair(*it))
+	    { continue; }
+
+	  pair_transducer.apply(&HfstTransducer::disjunct,
+				OtherSymbolTransducer(it->first,it->second));
+	}
       pair_transducer.apply(&HfstTransducer::disjunct,
       			    OtherSymbolTransducer(TWOLC_UNKNOWN));
     }
@@ -103,11 +113,14 @@ const OtherSymbolTransducer &Alphabet::compute(const SymbolPair &pair)
            jt != alphabet_set.end();
            ++jt)
         {
+	  if (is_set_pair(*jt))
+	    { continue; }
+
           if (*it == jt->second)
-        { 
-          pair_transducer.apply(&HfstTransducer::disjunct,
-                    OtherSymbolTransducer
-                    (jt->first,jt->second)); }
+	    { 
+	      pair_transducer.apply(&HfstTransducer::disjunct,
+				    OtherSymbolTransducer
+				    (jt->first,jt->second)); }
         }
     }
     }
@@ -123,11 +136,14 @@ const OtherSymbolTransducer &Alphabet::compute(const SymbolPair &pair)
            jt != alphabet_set.end();
            ++jt)
         {
+	  if (is_set_pair(*jt))
+	    { continue; }
+	  
           if (*it == jt->first)
-        { 
-          pair_transducer.apply(&HfstTransducer::disjunct,
-                    OtherSymbolTransducer
-                    (jt->first,jt->second)); }
+	    { 
+	      pair_transducer.apply(&HfstTransducer::disjunct,
+				    OtherSymbolTransducer
+				    (jt->first,jt->second)); }
         }
     }
     }
@@ -145,10 +161,10 @@ const OtherSymbolTransducer &Alphabet::compute(const SymbolPair &pair)
            ++jt)
         {
           if (is_pair(*it,*jt))
-        { 
-          pair_transducer.apply(&HfstTransducer::disjunct,
-                    OtherSymbolTransducer(*it,*jt));
-        }
+	    { 
+	      pair_transducer.apply(&HfstTransducer::disjunct,
+				    OtherSymbolTransducer(*it,*jt));
+	    }
         }
     }
     }

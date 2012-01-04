@@ -41,6 +41,7 @@ class Alphabet
   const OtherSymbolTransducer &compute(const SymbolPair &pair);
   bool is_pair(const std::string &input,const std::string &output);
   void define_singleton_set(const std::string &name);
+  bool is_set_pair(const SymbolPair &pair) const;
  public:
   void define_set(const std::string &name,const SymbolRange &elements);
   void define_alphabet_pair(const SymbolPair &pair);
