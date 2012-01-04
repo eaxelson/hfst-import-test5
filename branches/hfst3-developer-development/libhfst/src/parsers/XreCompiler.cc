@@ -41,6 +41,8 @@ XreCompiler::compile(const std::string& xre)
 using namespace hfst;
 using namespace hfst::xre;
 
+extern int xredebug;
+
 int
 main(int, char**)
   {
@@ -97,10 +99,11 @@ main(int, char**)
     HfstBasicTransducer basicAaOrBc;
     basicAaOrBc.add_state(1);
     basicAaOrBc.add_state(2);
+    basicAaOrBc.add_state(3);
     basicAaOrBc.add_transition(0, HfstBasicTransition(1, "a", "a", 0));
     basicAaOrBc.add_transition(1, HfstBasicTransition(2, "a", "a", 0));
-    basicAaOrBc.add_transition(0, HfstBasicTransition(1, "b", "b", 0));
-    basicAaOrBc.add_transition(1, HfstBasicTransition(2, "c", "c", 0));
+    basicAaOrBc.add_transition(0, HfstBasicTransition(3, "b", "b", 0));
+    basicAaOrBc.add_transition(3, HfstBasicTransition(2, "c", "c", 0));
     basicAaOrBc.set_final_weight(2, 0);
     std::cout << std::endl << "compilation: ";
 #if HAVE_SFST
