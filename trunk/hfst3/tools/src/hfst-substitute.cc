@@ -74,6 +74,7 @@ static HfstTransducer* substitution_trans = 0;
 static bool delayed = false;
 static HfstSymbolSubstitutions* label_substitution_map = 0;
 static HfstSymbolPairSubstitutions* pair_substitution_map = 0;
+static bool in_order = false;
 
 /**
  * @brief parse string pair from arc label.
@@ -156,27 +157,31 @@ print_usage()
     fprintf(message_out, "Relabeling options:\n"
             "  -f, --from-label=FLABEL      replace FLABEL\n"
             "  -t, --to-label=TLABEL        replace with TLABEL\n"
-            "  -T, --to-transducer=TFILE    replace with transducer "
-            "read from TFILE\n"
+            "  -T, --to-transducer=TFILE    replace with transducer read from TFILE\n"
             "  -F, --from-file=LABELFILE    read replacements from LABELFILE\n"
-	    "  -R,  --in-order              keep the order of the replacements\n"
+	    "  -R, --in-order               keep the order of the replacements\n"
+	    "                               (with -F)\n"
             "Transient optimisation schemes:\n"
             "  -9, --compose                compose substitutions when possible\n"
            );
     fprintf(message_out, "\n");
     print_common_unary_program_parameter_instructions(message_out);
-    fprintf(message_out, "LABEL must be a symbol name in single arc in "
-            "transducer,"
-            " or colon separated pair defining an arc\n"
-            "if TFILE is specified, FLABEL must be a pair\n"
-            "LABELFILE is a 2 column tsv file where col 1 is FLABEL and"
-            "col 2 TLABEL specifications");
+    fprintf(message_out, 
+	    "LABEL must be a symbol name in single arc in transducer,\n"
+	    "or colon separated pair defining an arc.\n"
+            "If TFILE is specified, FLABEL must be a pair.\n"
+            "LABELFILE is a 2 column tsv file where col 1 is FLABEL\n"
+	    "and col 2 gives TLABEL specifications.\n");
     fprintf(message_out,
-           "\n"
-           "Examples:\n"
-           "  %s -o cg.hfst -F omor2cg.relabel omor.hfst  transform omor tags "
-           "cg \n"
-           "\n", program_name);
+	    "\n"
+	    "Examples:\n"
+	    "  %s -i tr.hfst -o tr_relabeled.hfst -f 'a' -t 'A'\n"
+	    "      relabel all symbols 'a' with 'A'\n"
+	    "  %s -i tr.hfst -o tr_relabeled.hfst -f 'a:b' -t 'A:B'\n"
+	    "      relabel all arcs 'a:b' with 'A:B'\n"
+	    "  %s -i tr.hfst -o tr_relabeled.hfst -f 'a:b' -T repl.hfst\n"
+	    "      replace all arcs 'a:b' with transducer repl.hfst\n"
+	    "\n", program_name, program_name, program_name);
     print_report_bugs();
     fprintf(message_out, "\n");
     print_more_info();
@@ -258,7 +263,8 @@ parse_options(int argc, char** argv)
             fclose(f);
             break;
 	case 'R':
-	    error(EXIT_FAILURE, 0, "option --in-order is not implemented\n");
+	  //error(EXIT_FAILURE, 0, "option --in-order is not implemented\n");
+	  in_order=true;
 	    break;
         case '9':
             compose = true;
@@ -539,7 +545,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 	bool got_foma = false;
       transducer_n++;
       HfstTransducer trans(instream);
-#if HAVE_SFST
+      /*#if HAVE_SFST
       if (trans.get_type() == hfst::FOMA_TYPE) {
 	if (!silent) {
 	  warning(0, 0, "NB: substitution for foma transducers will be done "
@@ -549,7 +555,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 	got_foma = true;
 	trans = trans.convert(hfst::SFST_TYPE);
       }
-#endif
+      #endif*/
       char* inputname = strdup(trans.get_name().c_str());
       if (strlen(inputname) <= 0)
         {
@@ -620,13 +626,23 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 
 	      if (from_pair && to_pair) 
 		{
-		  pair_substitution_map->operator[](*from_pair) = *to_pair;
-		  symbol_pair_map_in_use=true;
+		  if (!in_order) {
+		    pair_substitution_map->operator[](*from_pair) = *to_pair;
+		    symbol_pair_map_in_use=true;
+		  }
+		  else {
+		    do_substitute(trans, transducer_n);
+		  }
 		}
 	      else if (from_label && to_label) 
 		{
-		  label_substitution_map->operator[](std::string(from_label)) = std::string(to_label);
-		  symbol_map_in_use=true;
+		  if (!in_order) {
+		    label_substitution_map->operator[](std::string(from_label)) = std::string(to_label);
+		    symbol_map_in_use=true;
+		  }
+		  else {
+		    do_substitute(trans, transducer_n);
+		  }
 		}
 	      else {
 		try 
@@ -653,7 +669,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
             } // while getline
           free(line);
 
-	  if (symbol_map_in_use) {
+	  if (!in_order && symbol_map_in_use) {
 
 #ifdef DEBUG_SUBSTITUTE
 	    std::cerr << "Symbol substitution map now includes" << std::endl;
@@ -672,7 +688,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 	  }
 
 
-	  if (symbol_pair_map_in_use) {
+	  if (!in_order && symbol_pair_map_in_use) {
 
 #ifdef DEBUG_SUBSTITUTE
 	    std::cerr << "Symbol pair substitution map now includes" << std::endl;
