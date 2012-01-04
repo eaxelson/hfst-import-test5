@@ -15,11 +15,10 @@
 ## You should have received a copy of the GNU General Public License
 ## along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-SUBDIRS=hfst-proc hfst-twolc
+SUBDIRS=hfst-twolc
 AUTOMAKE_OPTIONS=std-options subdir-objects
-LDADD = $(top_builddir)/libhfst/src/libhfst.la
-AM_CPPFLAGS = -I${top_srcdir}/libhfst/src -I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/tools/src/parsers 
-AM_CXXFLAGS = -Wno-deprecated
+AM_CPPFLAGS=-Wall -Wextra -Wcast-qual -Wno-deprecated -Wfatal-errors $(HFST_CFLAGS)
+LDADD=$(HFST_LIBS)
 
 # sort alphabetically:
 if WANT_AFFIX_GUESSIFY
@@ -28,7 +27,10 @@ endif
 if WANT_APERTIUM2FST
 MAYBE_APERTIUM2FST=hfst-apertium2fst
 hfst_apertium2fst_CXXFLAGS=$(AM_CXXFLAGS) $(CXXFLAGS) $(LIBXML_CFLAGS)
-hfst_apertium2fst_LDFLAGS=$(AM_LDFLAGS) $(LDFLAGS) $(LIBXML_LIBS)
+hfst_apertium2fst_LDADD=$(LIBXML_LIBS) $(HFST_LIBS)
+endif
+if WANT_APERTIUM_PROC
+MAYBE_APERTIUM_PROC=hfst-apertium-proc
 endif
 if WANT_COMPARE
 MAYBE_COMPARE=hfst-compare
@@ -178,7 +180,8 @@ noinst_HEADERS= \
 # finish with xyz
 # see <http://en.wikipedia.org/wiki/Alphabets#Alphabetic_order> for details
 bin_PROGRAMS= \
-			  $(MAYBE_AFFIX_GUESSIFY) $(MAYBE_APERTIUM2FST)             \
+			 $(MAYBE_AFFIX_GUESSIFY) $(MAYBE_APERTIUM2FST)              \
+			 $(MAYBE_APERTIUM_PROC)                                     \
 			 $(MAYBE_COMPARE) $(MAYBE_COMPOSE) $(MAYBE_CONCATENATE)     \
 			 $(MAYBE_CONJUNCT) $(MAYBE_DETERMINIZE) $(MAYBE_DISJUNCT)   \
 			 $(MAYBE_DUPLICATE) $(MAYBE_EDIT_METADATA)                  \
@@ -206,6 +209,14 @@ HFST_COMMON_SRC=conventions/options.cc \
 hfst_affix_guessify_SOURCES=affix-guessify.cc $(HFST_COMMON_SRC)
 hfst_apertium2fst_SOURCES=apertium2fst.cc $(HFST_COMMON_SRC) \
 						 utils/edit-distance.cc
+hfst_apertium_proc_SOURCES=apertium-proc.cc $(HFST_COMMON_SRC) \
+						   utils/ProcAlphabet.cc \
+						   utils/ProcTransducer.cc \
+						   utils/ProcApplicators.cc \
+						   utils/ProcFormatters.cc \
+						   utils/ProcLookupPath.cc \
+						   utils/ProcLookupState.cc \
+						   utils/ProcTokenizer.cc
 hfst_compare_SOURCES=compare.cc $(HFST_COMMON_SRC)
 hfst_compose_intersect_SOURCES=compose-intersect.cc $(HFST_COMMON_SRC)
 hfst_compose_SOURCES=compose.cc $(HFST_COMMON_SRC)
@@ -288,10 +299,10 @@ AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c 
 
 # tests
-TOOL_TSTS=utils/unicode
-check_PROGRAMS=$(TOOL_TSTS)
-utils_unicode_SOURCES=utils/unicode.cc utils/unicode_data.cc
-utils_unicode_CXXFLAGS=-DUNIT_TEST
+#TOOL_TSTS=utils/unicode
+#check_PROGRAMS=$(TOOL_TSTS)
+#utils_unicode_SOURCES=utils/unicode.cc utils/unicode_data.cc
+#utils_unicode_CXXFLAGS=-DUNIT_TEST
 
-TESTS=$(TOOL_TSTS)
+#TESTS=$(TOOL_TSTS)
 

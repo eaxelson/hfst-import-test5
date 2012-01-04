@@ -26,9 +26,7 @@
 #  include <config.h>
 #endif
 
-
-#include "HfstTransducer.h"
-#include "HfstDataTypes.h"
+#include <hfst.hpp>
 
 void hfst_set_name(hfst::HfstTransducer& dest, const std::string& src,
                    const std::string& op);

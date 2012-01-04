@@ -32,8 +32,7 @@ IMPLEMENTATION_SRCS=HfstTransitionGraph.cc \
                     compose_intersect/ComposeIntersectUtilities.cc \
                     HfstConstantTransducer.cc
 
-AM_CXXFLAGS=-Wno-deprecated -g
-AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
+AM_CPPFLAGS = -I${top_srcdir}/src
 # the bridges
 if WANT_SFST
 MAYBE_SFST=SfstTransducer.cc

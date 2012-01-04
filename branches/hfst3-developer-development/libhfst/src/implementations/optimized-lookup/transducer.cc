@@ -658,7 +658,7 @@ TransitionTableIndexSet Transducer::get_transitions_from_state(
 
 #include <iostream>
 
-int main(int argc, char * argv[])
+int main(int, char**)
 {
     std::cout << "Unit tests for " __FILE__ ":" << std::endl;
     

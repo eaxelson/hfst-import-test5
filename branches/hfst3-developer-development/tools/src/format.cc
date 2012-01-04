@@ -26,11 +26,10 @@
 #include <cstring>
 #include <getopt.h>
 
+#include <hfst.hpp>
+
 #include "conventions/commandline.h"
 #include "conventions/options.h"
-#include "HfstTransducer.h"
-#include "HfstInputStream.h"
-#include "HfstOutputStream.h"
 
 #include "conventions/globals-common.h"
 #include "conventions/globals-unary.h"

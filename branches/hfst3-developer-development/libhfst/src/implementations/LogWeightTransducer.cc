@@ -2375,7 +2375,7 @@ namespace hfst { namespace implementations
 
 using namespace hfst::implementations;
 
-int main(int argc, char * argv[])
+int main(int, char **)
 {
     std::cout << "Unit tests for " __FILE__ ":";
     LogWeightTransducer ofst;

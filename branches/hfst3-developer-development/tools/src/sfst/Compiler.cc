@@ -22,13 +22,7 @@
 
  */
 
-#include "HfstCompiler.h"
-#include "HfstUtf8.h"
-#include "HfstBasic.h"
-#include "HfstTransducer.h"
-#include "HfstInputStream.h"
-#include "HfstOutputStream.h"
-#include "implementations/HfstTransitionGraph.h"
+#include <hfst.hpp>
 
 using hfst::implementations::HfstTransitionGraph;
 using hfst::implementations::HfstBasicTransducer;

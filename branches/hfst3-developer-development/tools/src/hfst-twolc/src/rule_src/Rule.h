@@ -23,8 +23,9 @@
 #  include <config.h>
 #endif
 
+#include <hfst.hpp>
+
 #include <string>
-#include "HfstTransducer.h"
 #include "OtherSymbolTransducer.h"
 #include "grammar_defs.h"
 #include "../string_src/string_manipulation.h"

@@ -19,7 +19,7 @@ template<> CmpInt IntSpaceSavingSet::comparator = CmpInt();
 #include <iostream>
 #include <cassert>
 
-int main(int argc, char * argv[])
+int main(int, char**)
 {
     std::cout << "Unit tests for " __FILE__ ":" << std::endl;
     

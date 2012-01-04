@@ -34,7 +34,7 @@ AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 
 libhfstparsers_la_SOURCES=$(SFST_SRCS) $(XRE_SRCS) $(LEXC_SRCS)
 
-AM_CPPFLAGS=-I${top_srcdir}/libhfst/src/parsers -I${top_srcdir}/libhfst/src
+AM_CPPFLAGS=-I${top_srcdir}/src/parsers -I${top_srcdir}/src
 
 # headers of parsers
 hfstincludedir = $(includedir)/hfst

@@ -460,7 +460,7 @@ unsigned int hfst_ol_to_hfst_basic_add_state
 #include <iostream>
 #include <cassert>
 
-int main(int argc, char * argv[])
+int main(int, char**)
 {
     std::cout << "Unit tests for " __FILE__ ":" << std::endl;
 

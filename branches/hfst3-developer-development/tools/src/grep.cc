@@ -39,11 +39,10 @@ using std::map;
 #include <getopt.h>
 #include <stdint.h>
 
+#include <hfst.hpp>
+
 #include "conventions/commandline.h"
 #include "conventions/options.h"
-#include "HfstTransducer.h"
-#include "HfstTokenizer.h"
-#include "parsers/XreCompiler.h"
 
 #include "conventions/globals-common.h"
 

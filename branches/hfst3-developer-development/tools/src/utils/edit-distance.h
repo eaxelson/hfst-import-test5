@@ -22,7 +22,7 @@
 
 #include <string>
 #include <set>
-#include "HfstTransducer.h"
+#include <hfst.hpp>
 
 hfst::HfstTransducer* create_edit_distance(std::set<std::string>& alphabets, 
                                      unsigned long length,

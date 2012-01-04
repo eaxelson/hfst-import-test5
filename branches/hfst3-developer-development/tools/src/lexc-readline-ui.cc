@@ -36,9 +36,8 @@
 #  include <readline/history.h>
 #endif
 
-#include "HfstTransducer.h"
-#include "HfstOutputStream.h"
-#include "parsers/LexcCompiler.h"
+#include <hfst.hpp>
+
 #include "conventions/commandline.h"
 
 using hfst::HfstTransducer;
@@ -47,8 +46,8 @@ using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 using hfst::ImplementationType;
 
-static HfstTransducer* source_ = 0;
-static HfstTransducer* result_ = 0;
+//static HfstTransducer* source_ = 0;
+//static HfstTransducer* result_ = 0;
 static HfstTransducerVector rules_;
 
 void
@@ -94,7 +93,7 @@ lexc_qmark()
 
 
 int
-lexc_readline_loop(hfst::ImplementationType format)
+lexc_readline_loop(hfst::ImplementationType)
 {
   lexc_banner();
   lexc_qmark();

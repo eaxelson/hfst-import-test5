@@ -3,8 +3,8 @@ exec_prefix=@exec_prefix@
 libdir=@libdir@
 includedir=@includedir@
 
-Name: hfst
+Name: @HFST_NAME@
 Description: Finite-state transducer library bridge for multiple FLOSS packages
-Version: @LIBHFST_VERSION@
-Libs: -L${libdir} -l@LIBHFST_NAME@ @LIBS@
-Cflags: -I${includedir}/hfst/ @GLIB_CFLAGS@
+Version: @HFST_VERSION@
+Libs: -L${libdir} -l@HFST_NAME@ @LIBS@
+Cflags: -I${includedir}/hfst/ 

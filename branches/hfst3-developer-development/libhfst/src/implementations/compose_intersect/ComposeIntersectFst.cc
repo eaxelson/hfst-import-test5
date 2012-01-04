@@ -235,7 +235,7 @@ std::ostream &ComposeIntersectFst::print(std::ostream &out) const
 std::ostream &operator<<(std::ostream &out,const ComposeIntersectFst &fst)
 { return fst.print(out); }
 
-int main(int argc, char * argv[])
+int main(int, char**)
 {
     std::cout << "Unit tests for " __FILE__ ":" << std::endl;
   HfstTokenizer tokenizer;

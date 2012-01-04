@@ -8,8 +8,7 @@
 /*******************************************************************/
 
 #include <stdio.h>
-#include "HfstCompiler.h"
-#include "HfstTransducer.h"
+#include <hfst.hpp>
 
 #include <cstdio>
 #include <cstdlib>

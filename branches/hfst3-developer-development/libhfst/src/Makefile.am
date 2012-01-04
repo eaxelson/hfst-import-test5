@@ -19,9 +19,6 @@ SUBDIRS=implementations parsers
 AUTOMAKE_OPTIONS=subdir-objects
 lib_LTLIBRARIES = libhfst.la
 
-AM_CXXFLAGS=-Wno-deprecated -Wall -Wextra -g
-AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
-
 # HFST bridge specific stuff
 HFST_SRCS=HfstApply.cc HfstInputStream.cc HfstTransducer.cc HfstOutputStream.cc\
 		  HfstRules.cc HfstXeroxRules.cc \
@@ -38,34 +35,35 @@ libhfst_la_LIBADD = implementations/libhfstimplementations.la \
 # structure for various headers, so we do this
 hfstincludedir = $(includedir)/hfst
 
-HFST_HDRS = \
-	HfstTransducer.h \
-	hfst_apply_schemas.h \
-	HfstDataTypes.h \
-	HfstSymbolDefs.h \
-	implementations/SfstTransducer.h \
-	implementations/TropicalWeightTransducer.h \
-	implementations/LogWeightTransducer.h \
-	implementations/FomaTransducer.h \
-	implementations/HfstOlTransducer.h \
-	HfstTokenizer.h \
-	implementations/ConvertTransducerFormat.h \
-	implementations/HfstTransitionGraph.h \
-	implementations/HfstTransition.h \
-	implementations/HfstTropicalTransducerTransitionData.h \
-	implementations/HfstFastTransitionData.h \
-	implementations/compose_intersect/ComposeIntersectRulePair.h \
-	implementations/compose_intersect/ComposeIntersectLexicon.h \
-	implementations/compose_intersect/ComposeIntersectRule.h \
-	implementations/compose_intersect/ComposeIntersectFst.h \
-	HarmonizeUnknownAndIdentitySymbols.h \
-	HfstExceptionDefs.h \
-	HfstExtractStrings.h \
-	HfstFlagDiacritics.h \
-	HfstInputStream.h \
-	HfstOutputStream.h \
-	HfstXeroxRules.h \
-	parsers/LexcCompiler.h parsers/XreCompiler.h
+HFST_HDRS=\
+		  hfst.hpp \
+		  HfstTransducer.h \
+		  hfst_apply_schemas.h \
+		  HfstDataTypes.h \
+		  HfstSymbolDefs.h \
+		  implementations/SfstTransducer.h \
+		  implementations/TropicalWeightTransducer.h \
+		  implementations/LogWeightTransducer.h \
+		  implementations/FomaTransducer.h \
+		  implementations/HfstOlTransducer.h \
+		  HfstTokenizer.h \
+		  implementations/ConvertTransducerFormat.h \
+		  implementations/HfstTransitionGraph.h \
+		  implementations/HfstTransition.h \
+		  implementations/HfstTropicalTransducerTransitionData.h \
+		  implementations/HfstFastTransitionData.h \
+		  implementations/compose_intersect/ComposeIntersectRulePair.h \
+		  implementations/compose_intersect/ComposeIntersectLexicon.h \
+		  implementations/compose_intersect/ComposeIntersectRule.h \
+		  implementations/compose_intersect/ComposeIntersectFst.h \
+		  HarmonizeUnknownAndIdentitySymbols.h \
+		  HfstExceptionDefs.h \
+		  HfstExtractStrings.h \
+		  HfstFlagDiacritics.h \
+		  HfstInputStream.h \
+		  HfstOutputStream.h \
+		  HfstXeroxRules.h \
+		  parsers/LexcCompiler.h parsers/XreCompiler.h
 ### Add your library here ###
 #	implementations/MyTransducerLibraryTransducer.h
 

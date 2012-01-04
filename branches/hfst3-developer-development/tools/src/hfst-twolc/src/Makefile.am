@@ -1,5 +1,6 @@
 AM_YFLAGS= -d -o y.tab.c
-AM_CXXFLAGS= -O3 -g -Wall -Wextra -Wcast-qual -Wno-deprecated -Wfatal-errors
+AM_CPPFLAGS= -Wall -Wextra -Wcast-qual -Wno-deprecated -Wfatal-errors $(HFST_CFLAGS)
+LDADD=$(HFST_LIBS)
 bin_PROGRAMS=htwolcpre1 htwolcpre2 htwolcpre3
 bin_SCRIPTS=hfst-twolc hfst-twolc-loc
 EXTRA_DIST=hfst-twolc.sh
@@ -9,8 +10,6 @@ VARIABLE_SRC=$(srcdir)/variable_src
 RULE_SRC=$(srcdir)/rule_src
 ALPHABET_SRC=$(srcdir)/alphabet_src
 CL_SRC=$(srcdir)/commandline_src
-AM_CPPFLAGS = -I${top_srcdir}/libhfst/src
-LDADD = $(top_builddir)/libhfst/src/libhfst.la
 
 # the preprocessor scripts do not support options per se, so we whitelist
 # them here

@@ -19,12 +19,13 @@
 
 #include <set>
 #include <string>
+#include <sstream>
 
 using std::set;
 using std::string;
+using std::stringstream;
 
-
-#include "HfstTransducer.h"
+#include <hfst.hpp>
 
 using hfst::HfstTransducer;
 using hfst::ImplementationType;
@@ -92,7 +93,18 @@ create_edit_distance(set<string>& alphabet,  unsigned long length,
           }
       }
     HfstTransducer* rv = new HfstTransducer(edit, format);
-    rv->set_name(string("edit1(") + *(alphabet.begin()) + "...)");
+    if (length > 1)
+      {
+        rv->repeat_n(length);
+        stringstream longname;
+        longname << "repeat-n(edit(" << *(alphabet.begin()) << "...), " <<
+            length << ")";
+        rv->set_name(longname.str());
+      }
+    else
+      {
+        rv->set_name(string("edit(") + *(alphabet.begin()) + "...)");
+      }
     return rv;
 }
 

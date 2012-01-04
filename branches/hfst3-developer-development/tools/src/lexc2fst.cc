@@ -30,9 +30,7 @@
 #include <cstring>
 #include <getopt.h>
 
-#include "HfstTransducer.h"
-#include "HfstOutputStream.h"
-#include "parsers/LexcCompiler.h"
+#include <hfst.hpp>
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;

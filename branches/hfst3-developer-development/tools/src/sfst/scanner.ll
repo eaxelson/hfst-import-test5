@@ -14,11 +14,7 @@
 
 #include <string.h>
 
-#include "HfstCompiler.h"
-#include "hfst-compiler.h"
-#include "HfstBasic.h"
-#include "HfstUtf8.h"
-#include "HfstTransducer.h"
+#include <hfst.hpp>
 
 using namespace hfst;
 using namespace basic;

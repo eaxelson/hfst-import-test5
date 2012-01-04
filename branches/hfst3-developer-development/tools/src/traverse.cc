@@ -44,11 +44,10 @@ using std::pair;
 #include <readline/history.h>
 #endif
 
+#include <hfst.hpp>
+
 #include "conventions/commandline.h"
 #include "conventions/options.h"
-#include "HfstTransducer.h"
-#include "HfstInputStream.h"
-#include "HfstOutputStream.h"
 
 #include "conventions/globals-common.h"
 #include "conventions/globals-unary.h"
@@ -86,7 +85,7 @@ arclabel_generator(const char* text, int state)
 
 }
 static char**
-arclabel_completion(const char* text, int start, int end)
+arclabel_completion(const char* text, int start, int)
 {
     char **matches;
     matches = (char **)NULL;
@@ -169,7 +168,7 @@ main_loop(HfstBasicTransducer trans)
     // record current paths with their end states
     multimap<string, HfstState> paths;
     paths.insert(pair<string, HfstState>("", 0));
-    HfstBasicTransducer::const_iterator state = trans.begin();
+    //HfstBasicTransducer::const_iterator state = trans.begin();
 #if HAVE_READLINE_READLINE_H
 #if HAVE_RL_COMPLETION_MATCHES
     rl_attempted_completion_function = arclabel_completion;

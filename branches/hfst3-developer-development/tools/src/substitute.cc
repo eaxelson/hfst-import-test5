@@ -30,10 +30,7 @@
 #include <cstring>
 #include <getopt.h>
 
-#include "HfstTransducer.h"
-#include "HfstInputStream.h"
-#include "HfstOutputStream.h"
-#include "implementations/HfstTransitionGraph.h"
+#include <hfst.hpp>
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;

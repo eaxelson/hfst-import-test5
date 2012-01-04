@@ -30,9 +30,7 @@
 #include <cstring>
 #include <getopt.h>
 
-#include "HfstTransducer.h"
-#include "HfstInputStream.h"
-#include "HfstOutputStream.h"
+#include <hfst.hpp>
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
@@ -47,7 +45,6 @@ using hfst::HfstTransducerVector;
 #include "conventions/globals-common.h"
 #include "conventions/globals-binary.h"
 
-static bool insert_missing_flags=false;
 
 void
 print_usage()
@@ -110,7 +107,6 @@ int
 compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                 HfstOutputStream& outstream)
 {
-    bool bothInputs = firststream.is_good() && secondstream.is_good();
     if (firststream.get_type() != secondstream.get_type())
       {
         warning(0, 0, "Transducer type mismatch in %1$s and %2$s "

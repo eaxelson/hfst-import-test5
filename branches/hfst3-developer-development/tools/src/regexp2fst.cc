@@ -40,10 +40,8 @@ using std::pair;
 #include <math.h>
 #include <errno.h>
 
-#include "HfstTransducer.h"
-#include "HfstInputStream.h"
-#include "HfstOutputStream.h"
-#include "parsers/XreCompiler.h"
+#include <hfst.hpp>
+
 #include "conventions/commandline.h"
 #include "conventions/options.h"
 #include "conventions/metadata.h"

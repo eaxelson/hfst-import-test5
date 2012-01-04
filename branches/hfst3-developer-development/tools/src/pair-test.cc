@@ -32,9 +32,10 @@
 #include <limits>
 #include <math.h>
 
+#include <hfst.hpp>
+
 #include "conventions/commandline.h"
 #include "conventions/options.h"
-#include "HfstTransducer.h"
 
 #include "conventions/globals-common.h"
 #include "conventions/globals-unary.h"
@@ -181,8 +182,7 @@ parse_options(int argc, char** argv)
     if (inputfilename == std::string("<stdin>"))
       { 
         error(EXIT_FAILURE, 0, 
-          "The rule transducer file needs to be given using option -i.",
-              inputfilename);
+          "The rule transducer file needs to be given using option -i");
       }
     return EXIT_CONTINUE;
 }
@@ -219,7 +219,7 @@ bool is_final_state(HfstState s,const HfstBasicTransducer &t)
 int test(const StringPairVector &tokenized_pair_string,
      const HfstBasicTransducer &t,
      bool positive,
-     FILE * outfile,
+     FILE *,
      const SymbolSet &known_symbols)
 {
   HfstState s = 0;
@@ -418,7 +418,7 @@ void get_symbols(HfstBasicTransducer &t,SymbolSet &known_symbols)
 }
 
 int
-process_stream(HfstInputStream& inputstream, FILE* outstream)
+process_stream(HfstInputStream& inputstream, FILE*)
 {
     BasicTransducerVector grammar;
     StringVector rule_names;
@@ -497,8 +497,7 @@ process_stream(HfstInputStream& inputstream, FILE* outstream)
           (tokenized_pair_string.end(),
            StringPair("@#@",hfst::internal_epsilon));
 
-        int new_exit_code = 
-          test(tokenized_pair_string,line,grammar,rule_names,
+        test(tokenized_pair_string,line,grammar,rule_names,
            positive_test,outfile,known_symbols);
         
       }

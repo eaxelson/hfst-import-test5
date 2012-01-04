@@ -1335,7 +1335,7 @@ bool does_sfst_alphabet_contain(SFST::Transducer *t, const char *str)
   return false;
 }
 
-int main(int argc, char * argv[]) 
+int main(int, char**) 
 {
     std::cout << "Unit tests for " __FILE__ ":";
 

@@ -33,9 +33,7 @@
 #include <map>
 #include <stack>
 
-#include "HfstTransducer.h"
-#include "XreCompiler.h"
-#include "LexcCompiler.h"
+#include <hfst.hpp>
 
 namespace hfst { 
 //! @brief hfst::xfst namespace contains all functions needed to parse XFST scritpts

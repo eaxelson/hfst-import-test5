@@ -30,9 +30,7 @@
 #include <cstring>
 #include <getopt.h>
 
-#include "HfstTransducer.h"
-#include "HfstOutputStream.h"
-#include "parsers/LexcCompiler.h"
+#include <hfst.hpp>
 
 using hfst::HfstTransducer;
 using hfst::HfstInputStream;
@@ -269,13 +267,14 @@ parse_options(int argc, char** argv)
 int
 lexc_streams(HfstOutputStream& outstream)
 {
-    HfstTransducer* trans;
+    HfstTransducer* trans = 0;
     for (unsigned int i = 0; i < lexccount; i++)
       {
         verbose_printf("Parsing lexc file %s\n", lexcfilenames[i]);
         if (lexcfiles[i] == stdin)
           {
             error(EXIT_FAILURE, 0, "Cannot read from stdin");
+            return EXIT_FAILURE;
           }
         else
           {

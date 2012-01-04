@@ -46,9 +46,8 @@ typedef pair<string,string> StringPair;
 #include <libxml/parser.h>
 #include <libxml/xmlmemory.h>
 
-#include "HfstTransducer.h"
-#include "HfstInputStream.h"
-#include "HfstOutputStream.h"
+#include <hfst.hpp>
+
 #include "conventions/commandline.h"
 #include "conventions/options.h"
 #include "conventions/metadata.h"
@@ -199,7 +198,7 @@ parse_alphabet(xmlDocPtr doc, xmlNodePtr alphabet)
 
 static
 void
-parse_sdefs(xmlDocPtr doc, xmlNodePtr sdefs)
+parse_sdefs(xmlDocPtr, xmlNodePtr sdefs)
 {
   // in sdefs; expect:
   // sdef+
@@ -223,7 +222,7 @@ parse_sdefs(xmlDocPtr doc, xmlNodePtr sdefs)
 
 static
 void
-parse_s(xmlDocPtr doc, xmlNodePtr s, string& lrs)
+parse_s(xmlDocPtr, xmlNodePtr s, string& lrs)
 {
   // in s; expect:
   // EMPTY
@@ -235,8 +234,8 @@ parse_s(xmlDocPtr doc, xmlNodePtr s, string& lrs)
 }
 
 static
-string*
-parse_b(xmlDocPtr doc, xmlNodePtr b, string& lrs)
+void
+parse_b(xmlDocPtr, xmlNodePtr, string& lrs)
 {
   // in b; expect:
   // EMPTY
@@ -244,8 +243,8 @@ parse_b(xmlDocPtr doc, xmlNodePtr b, string& lrs)
 }
 
 static
-string*
-parse_j(xmlDocPtr doc, xmlNodePtr j, string& lrs)
+void
+parse_j(xmlDocPtr, xmlNodePtr, string& lrs)
 {
   // in j; expect:
   // EMPTY
@@ -254,7 +253,7 @@ parse_j(xmlDocPtr doc, xmlNodePtr j, string& lrs)
 
 static
 void
-parse_l(xmlDocPtr doc, xmlNodePtr l, string& left, string& right)
+parse_l(xmlDocPtr doc, xmlNodePtr l, string& left, string&)
 {
   // in l; expect:
   // [CDATA | s | b | j | g]+
@@ -301,7 +300,7 @@ parse_l(xmlDocPtr doc, xmlNodePtr l, string& left, string& right)
 
 static
 void
-parse_r(xmlDocPtr doc, xmlNodePtr r, string& left, string& right)
+parse_r(xmlDocPtr doc, xmlNodePtr r, string&, string& right)
 {
   // in r; expect:
   // [CDATA | s | b | j | g]+
@@ -427,7 +426,7 @@ parse_p(xmlDocPtr doc, xmlNodePtr p, string& left, string& right)
 
 static
 void
-parse_par(xmlDocPtr doc, xmlNodePtr par, string& left, string& right)
+parse_par(xmlDocPtr, xmlNodePtr par, string& left, string& right)
 {
   xmlChar* parref = xmlGetProp(par, reinterpret_cast<const xmlChar*>("n"));
   left += string("@APERTIUM_JOINER.") + 

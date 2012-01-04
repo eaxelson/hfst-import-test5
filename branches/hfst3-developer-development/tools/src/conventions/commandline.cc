@@ -46,10 +46,10 @@
 #  include <readline/history.h>
 #endif
 
+#include <hfst.hpp>
+
 #include "conventions/commandline.h"
 #include "conventions/portability.h"
-#include "HfstOutputStream.h"
-#include "HfstTransducer.h"
 
 // specific printf's wrapped in conditions
 void
