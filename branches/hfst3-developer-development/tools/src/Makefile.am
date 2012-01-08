@@ -299,10 +299,12 @@ AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c 
 
 # tests
-#TOOL_TSTS=utils/unicode
-#check_PROGRAMS=$(TOOL_TSTS)
-#utils_unicode_SOURCES=utils/unicode.cc utils/unicode_data.cc
-#utils_unicode_CXXFLAGS=-DUNIT_TEST
+TOOL_TSTS=utils/ucd_data utils/utf8
+check_PROGRAMS=$(TOOL_TSTS)
+utils_ucd_data_SOURCES=utils/unicode_data.cc
+utils_ucd_data_CXXFLAGS=-DUNIT_TESTS -DUCD_DATA_PATH='"$(abs_top_srcdir)/src/utils/UnicodeData.txt"'
+utils_utf8_SOURCES=utils/unicode.cc
+utils_utf8_CXXFLAGS=-DUNIT_TEST
 
-#TESTS=$(TOOL_TSTS)
+TESTS=$(TOOL_TSTS)
 

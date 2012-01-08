@@ -27,17 +27,69 @@
 #include <stdlib.h>
 #include <stdint.h>
 
-//! @brief data structure holding fields 2, 12, 13, and 14 of UnicodeData.txt.
+//! @brief data structure holding fields of the UnicodeData.txt.
+//! @note  all fields are loaded iff configured with WANT_FULL_UCD, otherwise
+//!        only simple capitalisation and category is used. general category
+//!        uses 4+3 bytes per code point and case mapping 3*4 bytes per 
+//!        code point. Other auxiliary data may use up to few 100s of bytes
+//!        per code point (names, comments and all that).
 typedef struct {
-    uint32_t upper;
-    uint32_t lower;
-    uint32_t title;
-    const char* category;
-  } unicode_data;
+#   if WANT_FULL_UCD
+    const char* name;
+#   endif
+    const char* general_category;
+#   if WANT_FULL_UCD
+    const char* canonical_combining_class;
+    const char* bidi_class;
+    const char* decomposition_type;
+    const char* decomposition_mapping;
+    const char* numeric_type;
+    double numeric_value;
+    bool bidi_mirrored;
+    const char* unicode_1_name;
+    const char* iso_comment;
+#   endif
+    uint32_t simple_uppercase_mapping;
+    uint32_t simple_lowercase_mapping;
+    uint32_t simple_titlecase_mapping;
+  } ucd_data;
 
 //! @brief an array holding Unicode database up to and excluding plane 16.
-extern unicode_data* unicode;
+extern ucd_data* ucd;
 
-void init_unicode_data();
+//! @brief read unicode character database from well-known location.
+//! @todo  this reads whole database into memory without any compression, i.e.
+//!        wasting some 10 mebi times the ucd data size. End users wishing to
+//!        have efficient version of this who cannot use ICU or glib are
+//!        encouraged to offer better versions.
+//! @return pointer to data on success, NULL if no data found or unreadable.
+ucd_data* init_ucd_data();
+
+//! @brief determine whether codepoint @a cp is a letter. That is, if it's
+//!        general category is @e L.
+bool ucd_is_letter(const ucd_data* ucd, uint32_t cp);
+//! @brief determine whether codepoint @a cp is a number. That is, if it's
+//!        general category is @e N.
+bool ucd_is_number(const ucd_data* ucd, uint32_t cp);
+//! @brief determine whether codepoint @a cp is a mark. That is, if it's
+//!        general category is @e M.
+bool ucd_is_mark(const ucd_data* ucd, uint32_t cp);
+//! @brief determine whether codepoint @a cp is a symbol. That is, if it's
+//!        general category is @e S.
+bool ucd_is_symbol(const ucd_data* ucd, uint32_t cp);
+//! @brief determine whether codepoint @a cp is a separator. That is, if it's
+//!        general category is @e Z.
+bool ucd_is_separator(const ucd_data* ucd, uint32_t cp);
+//! @brief determine whether codepoint @a cp is special control. That is, if 
+//!        it's general category is @e C.
+bool ucd_is_control(const ucd_data* ucd, uint32_t cp);
+//! @brief determine whether codepoint @a cp is of given general category.
+bool ucd_is_general_category(const ucd_data* ucd, const char* general_category);
+//! @brief uppercase @a cp if it has simple uppercasing data.
+uint32_t ucd_simple_uppercasing(const ucd_data* ucd, uint32_t cp);
+//! @brief lowercase @a cp if it has simple lowercasing data.
+uint32_t ucd_simple_lowercasing(const ucd_data* ucd, uint32_t cp);
+//! @brief titlecase @a cp if it has simple titlecasing data.
+uint32_t ucd_simple_titlecasing(const ucd_data* ucd, uint32_t cp);
 #endif
 // vim: set ft=cpp.doxygen:
