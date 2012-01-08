@@ -17,8 +17,8 @@
 
 
 
-#ifndef GUARD_hfst_unicode_data_h
-#define GUARD_hfst_unicode_data_h 1
+#ifndef GUARD_hfst_ucd_data_h
+#define GUARD_hfst_ucd_data_h 1
 
 #if HAVE_CONFIG_H
 #  include <config.h>
@@ -54,9 +54,6 @@ typedef struct {
     uint32_t simple_titlecase_mapping;
   } ucd_data;
 
-//! @brief an array holding Unicode database up to and excluding plane 16.
-extern ucd_data* ucd;
-
 //! @brief read unicode character database from well-known location.
 //! @todo  this reads whole database into memory without any compression, i.e.
 //!        wasting some 10 mebi times the ucd data size. End users wishing to
@@ -83,13 +80,17 @@ bool ucd_is_separator(const ucd_data* ucd, uint32_t cp);
 //! @brief determine whether codepoint @a cp is special control. That is, if 
 //!        it's general category is @e C.
 bool ucd_is_control(const ucd_data* ucd, uint32_t cp);
+//! @brief determine whether codepoint @a cp is punctuation. That is, if 
+//!        it's general category is @e P.
+bool ucd_is_punctuation(const ucd_data* ucd, uint32_t cp);
 //! @brief determine whether codepoint @a cp is of given general category.
-bool ucd_is_general_category(const ucd_data* ucd, const char* general_category);
+bool ucd_is_general_category(const ucd_data* ucd, uint32_t cp, 
+                             const char* general_category);
 //! @brief uppercase @a cp if it has simple uppercasing data.
-uint32_t ucd_simple_uppercasing(const ucd_data* ucd, uint32_t cp);
+uint32_t ucd_simple_uppercase_mapping(const ucd_data* ucd, uint32_t cp);
 //! @brief lowercase @a cp if it has simple lowercasing data.
-uint32_t ucd_simple_lowercasing(const ucd_data* ucd, uint32_t cp);
+uint32_t ucd_simple_lowercase_mapping(const ucd_data* ucd, uint32_t cp);
 //! @brief titlecase @a cp if it has simple titlecasing data.
-uint32_t ucd_simple_titlecasing(const ucd_data* ucd, uint32_t cp);
+uint32_t ucd_simple_titlecase_mapping(const ucd_data* ucd, uint32_t cp);
 #endif
 // vim: set ft=cpp.doxygen:

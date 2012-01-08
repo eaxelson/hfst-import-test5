@@ -42,5 +42,9 @@ size_t strtoutf8(const char* s, char*** rv);
 //!     to @c 0 at the end of string when finished, or to NULL on error.
 char* utf8tok_r(const char* str, char **saveptr);
 
+//! @brief check whether string encodes proper UTF-8 string as defined in
+//!        Unicode standard.
+bool utf8validate(const char* s);
+
 #endif
 // vim: set ft=cpp.doxygen:

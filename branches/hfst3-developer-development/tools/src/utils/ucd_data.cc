@@ -166,7 +166,6 @@ bool
 ucd_is_letter(const ucd_data* ucd, uint32_t cp)
   {
     uint32_t ccp = MIN(cp, UCD_DATA_SIZE - 1);
-    fprintf(stderr, "is_letter(%u)\n", ccp);
     if (*(ucd[ccp].general_category) == 'L')
       {
         return true;
@@ -239,6 +238,21 @@ ucd_is_separator(const ucd_data* ucd, uint32_t cp)
   }
 
 bool
+ucd_is_punctuation(const ucd_data* ucd, uint32_t cp)
+  {
+    uint32_t ccp = MIN(cp, UCD_DATA_SIZE - 1);
+    if (*(ucd[ccp].general_category) == 'P')
+      {
+        return true;
+      }
+    else
+      {
+        return false;
+      }
+    return false;
+  }
+
+bool
 ucd_is_control(const ucd_data* ucd, uint32_t cp) 
   {
     uint32_t ccp = MIN(cp, UCD_DATA_SIZE - 1);
@@ -290,7 +304,7 @@ ucd_simple_titlecase_mapping(const ucd_data* ucd, uint32_t cp)
     return (ucd[ccp].simple_titlecase_mapping);
   }
 
-#if defined UNIT_TESTS
+#if defined UNIT_TEST_UCD_DATA
 #include <assert.h>
 
 int
@@ -392,4 +406,4 @@ main(int, char**)
     fprintf(stdout, " ok.\n");
 
   }
-#endif // UNIT_TESTS
+#endif // UNIT_TEST_UCD_DATA

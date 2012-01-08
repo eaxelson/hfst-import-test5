@@ -299,13 +299,24 @@ AM_YFLAGS=-d
 AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c 
 
 # tests
-TOOL_TSTS=utils/ucd_data utils/utf8
+TOOL_TSTS=utils/ucd_data utils/utf8 conventions/unicode_portability
 check_PROGRAMS=$(TOOL_TSTS)
-check_DATA=utils/UnicodeData.txt
+hfstsharedir=$(prefix)/share/hfst/
+hfstshare_DATA=utils/UnicodeData.txt
 utils_ucd_data_SOURCES=utils/ucd_data.cc
-utils_ucd_data_CXXFLAGS=-DUNIT_TESTS -DUCD_DATA_PATH='"$(abs_top_srcdir)/src/utils/UnicodeData.txt"'
+utils_ucd_data_CPPFLAGS=-DUNIT_TEST_UCD_DATA -DUCD_DATA_PATH='"$(abs_top_srcdir)/src/utils/UnicodeData.txt"'
 utils_utf8_SOURCES=utils/utf8.cc
-utils_utf8_CXXFLAGS=-DUNIT_TEST
+utils_utf8_CPPFLAGS=-DUNIT_TEST_UTF8
+if WANT_HFST_UNICODE
+conventions_unicode_portability_SOURCES=conventions/unicode_portability.cc \
+										utils/ucd_data.cc utils/utf8.cc
+conventions_unicode_portability_CPPFLAGS=-DUNIT_TEST_UNICODE_PORTABILITY -DUCD_DATA_PATH='"$(abs_top_srcdir)/src/utils/UnicodeData.txt"'
+endif
+if WANT_GLIB_UNICODE
+conventions_unicode_portability_SOURCES=conventions/unicode_portability.cc
+conventions_unicode_portability_CPPFLAGS=-DUNIT_TEST_UNICODE_PORTABILITY $(GLIB_CFLAGS)
+conventions_unicode_portability_LDADD=$(GLIB_LIBS)
+endif
 
 TESTS=$(TOOL_TSTS)
 

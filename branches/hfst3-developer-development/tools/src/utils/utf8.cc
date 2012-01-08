@@ -186,8 +186,69 @@ strtoutf8(const char* s, char*** buf)
     return i;
   }
 
+bool
+utf8validate(const char* s)
+  {
+    const char* p = s;
+    while (*p != '\0')
+      {
+        unsigned char u = static_cast<unsigned char>(*p);
+        if (u <= 127)
+          {
+            p++;
+          }
+        else if ( (u & (128 + 64 + 32 + 16)) == (128 + 64 + 32 + 16))
+          {
+            u = static_cast<unsigned char>(*(p+1));
+            if ((u & (128 + 64)) != 128)
+              {
+                return false;
+              }
+            u = static_cast<unsigned char>(*(p+2));
+            if ((u & (128 + 64)) != 128)
+              {
+                return false;
+              }
+            u = static_cast<unsigned char>(*(p+3));
+            if ((u & (128 + 64)) != 128)
+              {
+                return false;
+              }
+            p += 4;
+          }
+        else if ( (u & (128 + 64 + 32)) == (128 + 64 + 32))
+          {
+            u = static_cast<unsigned char>(*(p+1));
+            if ((u & (128 + 64)) != 128)
+              {
+                return false;
+              }
+            u = static_cast<unsigned char>(*(p+2));
+            if ((u & (128 + 64)) != 128)
+              {
+                return false;
+              }
+            p += 3;
+          }
+        else if ( (u & (128 + 64)) == (128 + 64))
+          {
+            u = static_cast<unsigned char>(*(p+1));
+            if ((u & (128 + 64)) != 128)
+              {
+                return false;
+              }
+            p += 2;
+          }
+        else
+          {
+            return false;
+          }
+      }
+    return true;
+  }
 
-#if UNIT_TEST
+
+#if UNIT_TEST_UTF8
 
 #include <stdio.h>
 #include <string.h>
@@ -197,25 +258,42 @@ int
 main(void)
   {
     fprintf(stdout, "unit tests for %s at %u:\n", __FILE__, __LINE__);
+    const char* one = "1";
+    const char* A = "A";
+    const char* a = "a";
+    const char* Auml = "Ä";
+    const char* auml = "ä";
+    const char* ndash = "–";
+    const char* cjk281ab = "𠆫";
+    uint32_t one_cp = 49;
+    uint32_t A_cp = 65;
+    uint32_t a_cp = 97;
+    uint32_t Auml_cp = 196;
+    uint32_t auml_cp = 228;
+    uint32_t ndash_cp = 8211;
+    uint32_t cjk281ab_cp = 131499;
     fprintf(stdout, "utf8tocp:");
-    assert(utf8tocp("1") == 49);
-    assert(utf8tocp("A") == 65);
-    assert(utf8tocp("a") == 97);
-    assert(utf8tocp("Ä") == 196);
-    assert(utf8tocp("ä") == 228);
-    assert(utf8tocp("–") == 8211);
-    assert(utf8tocp("𠆫") == 131499);
+    assert(utf8tocp(one) == one_cp);
+    assert(utf8tocp(A) == A_cp);
+    assert(utf8tocp(a) == a_cp);
+    assert(utf8tocp(Auml) == Auml_cp);
+    assert(utf8tocp(auml) == auml_cp);
+    assert(utf8tocp(ndash) == ndash_cp);
+    assert(utf8tocp(cjk281ab) == cjk281ab_cp);
     fprintf(stdout, " ok.\n");
     fprintf(stdout, "cptoutf8:");
-    assert(strcmp(cptoutf8(49), "1") == 0);
-    assert(strcmp(cptoutf8(65), "A") == 0);
-    assert(strcmp(cptoutf8(97), "a") == 0);
-    assert(strcmp(cptoutf8(196), "Ä") == 0);
-    assert(strcmp(cptoutf8(228), "ä") == 0);
-    assert(strcmp(cptoutf8(8211), "–") == 0);
-    assert(strcmp(cptoutf8(131499), "𠆫") == 0);
+    assert(strcmp(cptoutf8(one_cp), one) == 0);
+    assert(strcmp(cptoutf8(A_cp), A) == 0);
+    assert(strcmp(cptoutf8(a_cp), a) == 0);
+    assert(strcmp(cptoutf8(Auml_cp), Auml) == 0);
+    assert(strcmp(cptoutf8(auml_cp), auml) == 0);
+    assert(strcmp(cptoutf8(ndash_cp), ndash) == 0);
+    assert(strcmp(cptoutf8(cjk281ab_cp), cjk281ab) == 0);
     fprintf(stdout, " ok.\n");
     char* s = strdup("1AaÄä–𠆫");
+    fprintf(stdout, "utf8validate...");
+    assert(utf8validate(s));
+    fprintf(stdout, "ok.\n");
     const char* saveptr;
     fprintf(stdout, "utf8tok_r:");
     char* u8 = utf8tok_r(s, &saveptr);
