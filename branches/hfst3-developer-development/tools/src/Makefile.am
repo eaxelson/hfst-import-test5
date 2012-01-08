@@ -335,3 +335,14 @@ endif
 TESTS=$(TOOL_TSTS)
 
 EXTRA_DIST=utils/UnicodeData.txt
+
+if CAN_VALGRIND
+valgrind: $(TOOL_TSTS)
+	for f in $^ ; do \
+		libtool --mode=execute valgrind --leak-check=full --log-file=$$f.valgrind $$f ;\
+	done
+else
+valgrind:
+	@echo to valgrind install valgrind and reconfigure
+endif
+

@@ -364,6 +364,8 @@ AC_PROG_LN_S
 AC_PROG_MAKE_SET
 AC_PATH_PROG([DOXYGEN], [doxygen], [no])
 AM_CONDITIONAL([CAN_DOXYGEN], [test x$DOXYGEN != xno])
+AC_PATH_PROG([VALGRIND], [valgrind], [no])
+AM_CONDITIONAL([CAN_VALGRIND], [test x$VALGRIND != xno])
 
 # Checks for libraries
 

@@ -17,4 +17,14 @@
 
 SUBDIRS = src test
 
+.PHONY:valgrind
+
+if CAN_VALGRIND
+valgrind:
+	$(MAKE) -C src $@
+	$(MAKE) -C test $@
+else
+valgrind:
+	@echo to valgrind you need to install valgrind and reconfigure
+endif
 
