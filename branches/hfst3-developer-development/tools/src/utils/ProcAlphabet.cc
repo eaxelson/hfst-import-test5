@@ -209,7 +209,7 @@ ProcTransducerAlphabet::check_for_overlapping() const
   for(size_t i=0;i<symbol_table.size();i++)
   {
     std::string str = symbol_table[i];
-    if(str.length() > 1 && !hfst_utf8ispunct(std::string(1, str[0]).c_str()))
+    if(str.length() > 1 && !hfst_utf8ispunct(str.c_str()))
     {
       std::istringstream s(str);
       
