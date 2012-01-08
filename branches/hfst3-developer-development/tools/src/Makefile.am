@@ -301,10 +301,12 @@ AM_LFLAGS=--outfile=$(LEX_OUTPUT_ROOT).c
 # tests
 TOOL_TSTS=utils/ucd_data utils/utf8
 check_PROGRAMS=$(TOOL_TSTS)
-utils_ucd_data_SOURCES=utils/unicode_data.cc
+check_DATA=utils/UnicodeData.txt
+utils_ucd_data_SOURCES=utils/ucd_data.cc
 utils_ucd_data_CXXFLAGS=-DUNIT_TESTS -DUCD_DATA_PATH='"$(abs_top_srcdir)/src/utils/UnicodeData.txt"'
-utils_utf8_SOURCES=utils/unicode.cc
+utils_utf8_SOURCES=utils/utf8.cc
 utils_utf8_CXXFLAGS=-DUNIT_TEST
 
 TESTS=$(TOOL_TSTS)
 
+EXTRA_DIST=utils/UnicodeData.txt
