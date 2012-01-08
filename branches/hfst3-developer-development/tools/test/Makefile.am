@@ -67,7 +67,7 @@ DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   walk_or_dog.hfst
 OL_CHECKS=cat2dog.hfst.ol cat2dog.gen.hfst.ol cat_weight_final.hfst.ol \
 			proc-caps.hfst.ol proc-caps.gen.hfst.ol \
-			compounds.hfst.ol
+			compounds.hfst.ol bashkir.hfst.ol
 SFST_CHECKS=0to3cats.hfst.sfst 2to4cats.hfst.sfst 4cats.hfst.sfst\
 			4toINFcats.hfst.sfst cat2cat_or_CAT_uppercased.hfst.sfst \
 			cat2CAT_uppercased.hfst.sfst cat2dog.hfst.sfst \
@@ -124,18 +124,22 @@ FST_TXTS=0to3cats.txt 2to4cats.txt 4cats.txt 4toINFcats.txt \
 		 non_minimal.txt rule1.txt rule2.txt summarize_test1.txt \
 		 summarize_test2.txt tac.txt proc-caps.txt \
 		 unknown-star.txt identity-star.txt unknown2a.txt identity.txt\
-		 heavycat.txt abid.txt unk2unk.txt cat2dog_0.3.txt cat2dog_0.5.txt empty.txt unk_or_id_star.txt \
+		 heavycat.txt abid.txt unk2unk.txt cat2dog_0.3.txt cat2dog_0.5.txt\
+		 empty.txt unk_or_id_star.txt \
 		 a2b.txt a2b_complement.txt a2b_input_projection_complement.txt \
 		 walk_or_dog.txt \
-		 compounds.txt
+		 compounds.txt\
+		 bashkir.txt
 FST_STRINGS=cat.strings proc-caps-in.strings proc-caps-gen.strings \
 			proc-caps-out1.strings proc-caps-out2.strings \
 			proc-caps-out3.strings proc-caps-out4.strings \
 			proc-caps-out5.strings \
 			proc-cat-out.strings proc-cat-weighted-out.strings \
 			proc-compounds-out.strings proc-compounds.strings \
+			proc-bashkir-out.strings \
 			utf-8.strings latin-1.strings \
-			cat2dog.strings heavycat.strings
+			cat2dog.strings heavycat.strings \
+			bashkir.strings
 FST_PAIRS=cat2dog.pairs
 FST_PAIRSTRINGS=cat2dog.pairstring
 FST_SPACESTRINGS=cat2dog.spaces

@@ -95,4 +95,14 @@ if ! diff test.strings $srcdir/proc-compounds-out.strings ; then
     echo compound mismatched
     exit 1
 fi
+# from bug #3465122
+if ! ../src/hfst-apertium-proc bashkir.hfst.ol < $srcdir/bashkir.strings > test.strings ; then
+    echo bashkir fail:
+    cat test.strings
+    exit 1
+fi
+if ! diff test.strings $srcdir/proc-bashkir-out.strings ; then
+    echo bashkir mismatched
+    exit 1
+fi
 rm test.strings
