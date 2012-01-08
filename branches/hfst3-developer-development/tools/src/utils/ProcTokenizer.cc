@@ -97,7 +97,6 @@ TokenIOStream::read_utf8_char(std::istream& is)
   int c = is.peek();
   if(is.eof())
     return "";
-  
   if (c <= 127)
     u8len = 1;
   else if ( (c & (128 + 64 + 32 + 16)) == (128 + 64 + 32 + 16) )
@@ -109,11 +108,9 @@ TokenIOStream::read_utf8_char(std::istream& is)
   else
     error(EXIT_FAILURE, 0, "Invalid UTF-8 character found at %c",
           c);
-
   char next_u8[u8len+1];
   is.get(next_u8, u8len+1, '\0');
   next_u8[u8len] = '\0';
-  
   return std::string(next_u8);
 }
 

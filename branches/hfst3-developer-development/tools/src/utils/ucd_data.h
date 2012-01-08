@@ -37,7 +37,7 @@ typedef struct {
 #   if WANT_FULL_UCD
     const char* name;
 #   endif
-    const char* general_category;
+    char* general_category;
 #   if WANT_FULL_UCD
     const char* canonical_combining_class;
     const char* bidi_class;
@@ -61,6 +61,9 @@ typedef struct {
 //!        encouraged to offer better versions.
 //! @return pointer to data on success, NULL if no data found or unreadable.
 ucd_data* init_ucd_data();
+
+//! @brief terminate ucd database @a ucd
+void terminate_ucd_data(ucd_data* ucd);
 
 //! @brief determine whether codepoint @a cp is a letter. That is, if it's
 //!        general category is @e L.

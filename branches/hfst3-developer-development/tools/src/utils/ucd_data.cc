@@ -88,7 +88,8 @@ init_ucd_data()
         if (home != NULL)
           {
             char* home_ucd = (char*)malloc(sizeof(char) * strlen(home) +
-                                         strlen("/share/hfst/UnicodeData.txt"));
+                                         strlen("/share/hfst/UnicodeData.txt")
+                                         + 1);
             int rv = sprintf(home_ucd, "%s/share/hfst/UnicodeData.txt", home);
             if (rv == (strlen(home) + strlen("/share/hfst/UnicodeData.txt")))
               {
@@ -134,7 +135,7 @@ init_ucd_data()
                 else
                   {
                     // fill unknown gaps with defaults
-                    ucd[i].general_category = "Cn";
+                    ucd[i].general_category = strdup("Cn");
                     ucd[i].simple_uppercase_mapping = 0;
                     ucd[i].simple_lowercase_mapping = 0;
                     ucd[i].simple_titlecase_mapping = 0;
@@ -142,7 +143,7 @@ init_ucd_data()
               }
           }
         // 2. general category
-        ucd[cp].general_category = fields[2];
+        ucd[cp].general_category = strdup(fields[2]);
         // 12. simple uppercase mapping
         ucd[cp].simple_uppercase_mapping = hextouint32_t(fields[12]);
         // 13. simple lowercase mapping
@@ -154,13 +155,30 @@ init_ucd_data()
             // as per note in UAX# TR 44
             ucd[cp].simple_titlecase_mapping = ucd[cp].simple_uppercase_mapping;
           }
+        if (previous_fields != 0)
+          {
+            for (unsigned int i = 0; i < 15; i++)
+              {
+                free(previous_fields[i]);
+              }
+          }
+        free(previous_fields);
         previous_fields = fields;
         previous_cp = cp;
       }
+    free(line);
     return ucd;
   }
 
-
+void
+terminate_ucd_data(ucd_data* ucd)
+  {
+    for (unsigned int i = 0; i < UCD_DATA_SIZE; i++)
+      {
+        free(ucd[i].general_category);
+      }
+    free(ucd);
+  }
 
 bool
 ucd_is_letter(const ucd_data* ucd, uint32_t cp)
@@ -404,6 +422,9 @@ main(int, char**)
     assert(ucd_simple_titlecase_mapping(ucd, ndash) == 0);
     assert(ucd_simple_titlecase_mapping(ucd, cjk281ab) == 0);
     fprintf(stdout, " ok.\n");
-
+    fprintf(stdout, "ucd_terminate...");
+    terminate_ucd_data(ucd);
+    fprintf(stdout, " ok.\n");
+    return EXIT_SUCCESS;
   }
 #endif // UNIT_TEST_UCD_DATA

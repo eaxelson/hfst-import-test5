@@ -125,13 +125,16 @@ cptoutf8(uint32_t cp)
 char*
 utf8tok_r(const char* str, const char **saveptr)
   {
-    if (*saveptr == NULL)
+    if (str != NULL)
       {
-        *saveptr = str;
-      }
-    if (*saveptr == NULL)
-      {
-        return NULL;
+        if (*saveptr == NULL)
+          {
+            *saveptr = str;
+          }
+        if (*saveptr == NULL)
+          {
+            return NULL;
+          }
       }
     unsigned char c = static_cast<unsigned char>(**saveptr);
     unsigned short u8len = 1;
@@ -282,19 +285,30 @@ main(void)
     assert(utf8tocp(cjk281ab) == cjk281ab_cp);
     fprintf(stdout, " ok.\n");
     fprintf(stdout, "cptoutf8:");
-    assert(strcmp(cptoutf8(one_cp), one) == 0);
-    assert(strcmp(cptoutf8(A_cp), A) == 0);
-    assert(strcmp(cptoutf8(a_cp), a) == 0);
-    assert(strcmp(cptoutf8(Auml_cp), Auml) == 0);
-    assert(strcmp(cptoutf8(auml_cp), auml) == 0);
-    assert(strcmp(cptoutf8(ndash_cp), ndash) == 0);
-    assert(strcmp(cptoutf8(cjk281ab_cp), cjk281ab) == 0);
+    char* rv = cptoutf8(one_cp);
+    assert(strcmp(rv, one) == 0);
+    free(rv);
+    rv = cptoutf8(A_cp);
+    assert(strcmp(rv, A) == 0);
+    free(rv);
+    rv = cptoutf8(a_cp);
+    assert(strcmp(rv, a) == 0);
+    free(rv);
+    rv = cptoutf8(Auml_cp);
+    assert(strcmp(rv, Auml) == 0);
+    free(rv);
+    rv = cptoutf8(ndash_cp);
+    assert(strcmp(rv, ndash) == 0);
+    free(rv);
+    rv = cptoutf8(cjk281ab_cp);
+    assert(strcmp(rv, cjk281ab) == 0);
+    free(rv);
     fprintf(stdout, " ok.\n");
     char* s = strdup("1AaÄä–𠆫");
     fprintf(stdout, "utf8validate...");
     assert(utf8validate(s));
     fprintf(stdout, "ok.\n");
-    const char* saveptr;
+    const char* saveptr = 0;
     fprintf(stdout, "utf8tok_r:");
     char* u8 = utf8tok_r(s, &saveptr);
     assert(u8 != NULL);
@@ -316,6 +330,7 @@ main(void)
         free(u8s[i]);
       }
     free(u8s);
+    free(s);
     fprintf(stdout, " ok.\n");
     return EXIT_SUCCESS;
   }
