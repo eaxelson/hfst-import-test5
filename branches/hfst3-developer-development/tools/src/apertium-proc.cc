@@ -41,11 +41,12 @@ bool null_flush = false;
 bool filter_compound_analyses = true;
 bool displayWeightsFlag = false;
 bool displayUniqueFlag = false;
-
+bool inputIsStdin = false;
+bool outputIsStdout = false;
 
 std::istream* input = &std::cin;
 std::ostream* output = &std::cout;
-
+std::ifstream* in = 0;
 void
 print_usage(void)
   {
@@ -210,13 +211,13 @@ parse_options(int argc, char** argv)
 
     if (optind == (argc-2))
       {
-        // output is stdout
-        out_arg = -1;
+        outputIsStdout = true;
+        inputIsStdin = false;
       }
     else if (optind == (argc-1))
       {
-        // input is stdin
-        in_arg = out_arg = -1;
+        outputIsStdout = true;
+        inputIsStdin = true;
       }
     else if (optind < (argc-3))
       {
@@ -228,15 +229,15 @@ parse_options(int argc, char** argv)
         error(EXIT_FAILURE, 0, "At least transducer file name must be given");
         return EXIT_FAILURE;
       }
-    std::ifstream in(argv[(fst_arg)], std::ios::in | std::ios::binary);
-    if (!in)
+    in = new std::ifstream(argv[(fst_arg)], std::ios::in | std::ios::binary);
+    if (!*in)
       {
         error(EXIT_FAILURE, 0, "Could not open transducer file %s", 
               argv[(optind)]);
         return EXIT_FAILURE;
       }
 
-    if (in_arg != -1)
+    if (!inputIsStdin)
       {
         input = new std::ifstream(argv[in_arg], 
                                   std::ios::in | std::ios::binary);
@@ -246,9 +247,14 @@ parse_options(int argc, char** argv)
                   argv[in_arg]);
             return EXIT_FAILURE;
           }
+        inputIsStdin = false;
+      }
+    else
+      {
+        inputIsStdin = true;
       }
 
-    if (out_arg != -1)
+    if (!outputIsStdout)
       {
         output = new std::ofstream(argv[out_arg],
                                    std::ios::out | std::ios::binary);
@@ -258,12 +264,19 @@ parse_options(int argc, char** argv)
                   argv[out_arg]);
             return EXIT_FAILURE;
           }
+        outputIsStdout = false;
       }
+    else
+      {
+        outputIsStdout = true;
+      }
+    return EXIT_CONTINUE;
   }
 
 
 int main(int argc, char **argv)
   {
+    hfst_set_program_name(argv[0], "0.1", "HfstApertiumProc");
     hfst_setlocale();
     int rv = parse_options(argc, argv);
     if (rv != EXIT_CONTINUE)
@@ -292,8 +305,8 @@ int main(int argc, char **argv)
     try
       {
         verbose_printf("Loading transducer from %s\n");
-        ProcTransducer t(in);
-        in.close();
+        ProcTransducer t(*in);
+        in->close();
 
         TokenIOStream token_stream(*input, *output, 
                                    t.get_alphabet(), null_flush, rawMode);
@@ -356,12 +369,12 @@ int main(int argc, char **argv)
         std::cerr << e.what() << std::endl;
         return EXIT_FAILURE;
       }
-    if (in_arg != -1)
+    if (!inputIsStdin)
       {
         dynamic_cast<std::ifstream*>(input)->close();
         delete input;
       }
-    if (out_arg != -1)
+    if (!outputIsStdout)
       {
         dynamic_cast<std::ofstream*>(output)->close();
         delete output;

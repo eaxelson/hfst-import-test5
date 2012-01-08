@@ -88,9 +88,9 @@ init_ucd_data()
         if (home != NULL)
           {
             char* home_ucd = (char*)malloc(sizeof(char) * strlen(home) +
-                                           strlen("/UnicodeData.txt"));
-            int rv = sprintf(home_ucd, "%s/UnicodeData.txt", home);
-            if (rv == (strlen(home) + strlen("/UnicodeData.txt")))
+                                         strlen("/share/hfst/UnicodeData.txt"));
+            int rv = sprintf(home_ucd, "%s/share/hfst/UnicodeData.txt", home);
+            if (rv == (strlen(home) + strlen("/share/hfst/UnicodeData.txt")))
               {
                 ucd_file = fopen(home_ucd, "r");
               }

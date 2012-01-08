@@ -13,12 +13,14 @@
 #include <cstring>
 #include <cstdlib>
 #include <sstream>
-#include "transducer.h"
-#include "lookup-path.h"
-#include "lookup-state.h"
-#include "tokenizer.h"
-#include "formatter.h"
+#include "utils/ProcTransducer.h"
+#include "utils/ProcLookupPath.h"
+#include "utils/ProcLookupState.h"
+#include "utils/ProcTokenizer.h"
+#include "utils/ProcFormatters.h"
 
+// from commandline conventions
+extern bool verbose;
 
 static LookupPath* create_initial_path(const ProcTransducer& t) { return new LookupPath(t, 0);}
 static LookupPath* create_initial_path_fd(const ProcTransducer& t) { return new LookupPathFd(t, 0);}
@@ -31,8 +33,62 @@ InitialPathCreator ProcTransducer::initial_path_creators[2][2] =
     {{create_initial_path, create_initial_path_fd},
      {create_initial_path_weighted, create_initial_path_weighted_fd}};
 
+static
+bool
+skip_hfst3_header(std::istream& is)
+{
+  const char* header1 = "HFST";
+  int header_loc = 0; // how much of the header has been found
+  int c;
+  for(header_loc = 0; header_loc < strlen(header1) + 1; header_loc++)
+  {
+    c = is.get();
+    if(c != header1[header_loc])
+      break;
+  }
+  if(header_loc == strlen(header1) + 1) // we found it
+  {
+      unsigned short remaining_header_len;
+      is.read(reinterpret_cast<char*>(&remaining_header_len),
+          sizeof(remaining_header_len));
+      if(is.get() != '\0') {
+      HFST_THROW(HfstException);
+      return false;
+      }
+      char * headervalue = new char[remaining_header_len];
+      while(remaining_header_len > 0) {
+      is.getline(headervalue, remaining_header_len + 1, '\0');
+      remaining_header_len -= strlen(headervalue) + 1;
+      if (!strcmp(headervalue, "type")) {
+          is.getline(headervalue, remaining_header_len + 1, '\0');
+          remaining_header_len -= strlen(headervalue) + 1;
+          if (strcmp(headervalue, "HFST_OL") and
+          strcmp(headervalue, "HFST_OLW")) {
+          delete headervalue;
+          HFST_THROW(TransducerHasWrongTypeException);
+          return false;
+          }
+      }
+      }
+      delete headervalue;
+      if (remaining_header_len == 0) {
+      return true;
+      } else {
+      HFST_THROW(HfstException);
+      return false;
+      }
+  } else // nope. put back what we've taken
+  {
+    is.putback(c); // first the non-matching character
+    for(int i=header_loc-1; i>=0; i--) // then the characters that did match (if any)
+      is.putback(header1[i]);
+    
+    return false;
+  }
+}
 ProcTransducer::ProcTransducer(std::istream& is): Transducer()
 {
+  skip_hfst3_header(is);
   header = new TransducerHeader(is);
   alphabet = new ProcTransducerAlphabet(is, header->symbol_count());
   load_tables(is);
@@ -56,7 +112,7 @@ ProcTransducer::ProcTransducer(std::istream& is): Transducer()
 bool
 ProcTransducer::check_for_blank() const
 {
-  if(verboseFlag)
+  if(verbose)
     std::cout << "Checking whether the transducer accepts a single blank as a word..." << std::endl;
   LookupState state(*this);
   state.step(get_alphabet().get_blank_symbol());

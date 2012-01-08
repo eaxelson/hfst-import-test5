@@ -12,7 +12,13 @@
 
 #include <algorithm>
 #include <sstream>
-#include "formatter.h"
+#include "utils/ProcFormatters.h"
+
+// from conventions
+extern bool debug;
+// from frontend
+extern unsigned int maxAnalyses;
+extern bool displayWeightsFlag;
 
 //////////Function definitions for OutputFormatter
 
@@ -54,7 +60,7 @@ OutputFormatter::filter_compound_analyses(LookupPathSet& finals) const
       LookupPathSet::iterator to_delete = it;
       it++;
       finals.erase(to_delete);
-      if(printDebuggingInformationFlag)
+      if(debug)
         std::cout << "Filtering compound analysis with " << boundary_counts[i] << " boundary(s)" << std::endl;
     }
     else
@@ -69,7 +75,7 @@ OutputFormatter::preprocess_finals(const LookupPathSet& finals) const
   if(do_compound_filtering)
   {
     filter_compound_analyses(new_finals);
-    if(printDebuggingInformationFlag)
+    if(debug)
     {
       if(new_finals.size() < finals.size())
         std::cout << "Filtered " << finals.size()-new_finals.size() << " compound analyses" << std::endl;
@@ -127,7 +133,7 @@ ApertiumOutputFormatter::print_word(const TokenVector& surface_form,
       output_surface_form.push_back(*it);
   }
 
-  if(printDebuggingInformationFlag)
+  if(debug)
     std::cout << "surface_form consists of " << output_surface_form.size() << " tokens" << std::endl;
   
   token_stream.ostream() << '^';
@@ -173,7 +179,7 @@ CGOutputFormatter::process_final(const SymbolNumberVector& symbols, Capitalizati
       if(compound_split == symbols.size())
       {
         std::string s = token_stream.get_alphabet().symbol_to_string(symbols[i]);
-        if(s == "#" || s == "+" || s[s.length()-1] == '+')
+        if(s == "#" || s == "+")
           compound_split = i;
       }
       

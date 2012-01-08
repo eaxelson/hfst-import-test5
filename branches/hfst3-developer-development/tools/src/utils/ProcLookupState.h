@@ -13,8 +13,8 @@
 #ifndef _HFST_PROC_LOOKUP_STATE_H_
 #define _HFST_PROC_LOOKUP_STATE_H_
 
-#include "hfst-proc.h"
-#include "lookup-path.h"
+#include "utils/ProcTypes.h"
+#include "utils/ProcLookupPath.h"
 
 /**
  * Represents the current state of a lookup operation

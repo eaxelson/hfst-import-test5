@@ -10,7 +10,10 @@
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-#include "lookup-state.h"
+#include "utils/ProcLookupState.h"
+
+// from commandline conventions
+extern bool debug;
 
 void
 LookupState::init(LookupPath* initial)
@@ -36,7 +39,7 @@ LookupState::step(const SymbolNumber input, const SymbolNumber altinput)
     return;
   }
   
-  if(printDebuggingInformationFlag)
+  if(debug)
   {
     std::cout << "Stepping with '" << transducer.get_alphabet().symbol_to_string(input) << "'";
     if(altinput != NO_SYMBOL_NUMBER)
@@ -112,7 +115,7 @@ LookupState::get_finals() const
 const LookupPathSet
 LookupState::get_finals_set() const
 {
-  if(printDebuggingInformationFlag)
+  if(debug)
     std::cout << "Calculating final paths" << std::endl;
   LookupPathSet finals(LookupPath::compare_pointers);
   for(LookupPathVector::const_iterator i=paths.begin(); i!=paths.end(); ++i)
@@ -127,7 +130,7 @@ LookupState::get_finals_set() const
     
     if(is_final)
     {
-      if(printDebuggingInformationFlag)
+      if(debug)
       {
         std::cout << "  Final path found:";
         for(SymbolNumberVector::const_iterator itr=(*i)->get_output_symbols().begin();itr!=(*i)->get_output_symbols().end(); itr++)
@@ -138,7 +141,7 @@ LookupState::get_finals_set() const
       
       if(loc.second == false) // if this form was already in the set
       {
-        if(printDebuggingInformationFlag)
+        if(debug)
           std::cout << "  Duplicate LookupPath found" << std::endl;
         if(*i < *(loc.first)) // if this form has a lower weight than the one there
         {

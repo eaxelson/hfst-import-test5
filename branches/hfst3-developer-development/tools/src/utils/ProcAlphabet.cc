@@ -14,16 +14,20 @@
 #  include <config.h>
 #endif
 
-#if USE_GLIB_UNICODE
-#  include <glib.h>
-#endif
-
 #include <cstring>
 #include <cstdio>
 #include <sstream>
-#include "alphabet.h"
-#include "tokenizer.h"
+#if HAVE_ERROR_H
+#  include <error.h>
+#endif
 
+#include "conventions/portability.h"
+#include "conventions/unicode_portability.h"
+#include "utils/ProcAlphabet.h"
+#include "utils/ProcTokenizer.h"
+
+// from commandline conventions
+extern bool debug;
 
 
 //////////Function definitions for LetterTrie
@@ -159,7 +163,7 @@ ProcTransducerAlphabet::ProcTransducerAlphabet(std::istream& is,
   for(SymbolNumber k=0; k<symbol_count; k++)
   {
     SymbolProperties prop;
-    prop.alphabetic = is_alphabetic(symbol_table[k].c_str());
+    prop.alphabetic = hfst_utf8isalpha(symbol_table[k].c_str());
     symbol_properties_table.push_back(prop);
     if(fd_table.is_diacritic(k))
       symbol_table[k] = "";
@@ -172,8 +176,6 @@ ProcTransducerAlphabet::ProcTransducerAlphabet(std::istream& is,
   check_for_overlapping();
   setup_blank_symbol();
   calculate_caps();
-  if(printDebuggingInformationFlag)
-    print_table();
 }
 
 void
@@ -194,7 +196,7 @@ ProcTransducerAlphabet::setup_blank_symbol()
     blank_symbol = symbol_table.size();
     std::string str = " ";
     SymbolProperties s;
-    s.alphabetic = is_alphabetic(str.c_str());
+    s.alphabetic = hfst_utf8isalpha(str.c_str());
     add_symbol(str, s);
   }
 }
@@ -207,7 +209,7 @@ ProcTransducerAlphabet::check_for_overlapping() const
   for(size_t i=0;i<symbol_table.size();i++)
   {
     std::string str = symbol_table[i];
-    if(str.length() > 1 && !is_punctuation(std::string(1, str[0]).c_str()))
+    if(str.length() > 1 && !hfst_utf8ispunct(std::string(1, str[0]).c_str()))
     {
       std::istringstream s(str);
       
@@ -228,7 +230,8 @@ ProcTransducerAlphabet::check_for_overlapping() const
       for(size_t j=0;j<chars.size();j++)
       {
         std::string ch = chars[j];
-        if(!is_alphabetic(ch.c_str()) || symbolizer.find_symbol(ch.c_str()) == NO_SYMBOL_NUMBER)
+        if(!hfst_utf8isalpha(ch.c_str()) || 
+           symbolizer.find_symbol(ch.c_str()) == NO_SYMBOL_NUMBER)
         {
           overlaps = false;
           break;
@@ -261,7 +264,7 @@ ProcTransducerAlphabet::print_table() const
     const FdOperation* fd_op = fd_table.get_operation(i);
     std::cout << "Symbol: #" << i << ", '" << (fd_op!=NULL?fd_op->Name():symbol_to_string(i)) << "',"
               << (is_alphabetic(i)?" ":" not ") << "alphabetic, ";
-    if(is_lower(i))
+    if (is_lower(i))
     {
       SymbolNumber s2 = to_upper(i);
       std::cout << "lowercase, upper: " << s2 << "/" << symbol_to_string(s2);
@@ -341,19 +344,19 @@ ProcTransducerAlphabet::calculate_caps()
           prop.lower = symbol_table.size();
         }
         add_symbol(switched, prop);
-        if(printDebuggingInformationFlag)
+        if(debug)
           std::cout << "Added new symbol '" << switched << "' (" << symbol_table.size()-1 << ") as alternate case for '" 
                     << symbol_table[i] << "' (" << i << ")" << std::endl;
       }
       else
       {
-        if(printDebuggingInformationFlag)
+        if(debug)
           std::cout << "Symbol " << i << "'s alternate case is unknown" << std::endl;
       }
     }
     
     
-    if(printDebuggingInformationFlag &&
+    if(debug &&
        symbol_properties_table[i].lower != NO_SYMBOL_NUMBER && symbol_properties_table[i].upper != NO_SYMBOL_NUMBER && 
        symbol_to_string(symbol_properties_table[i].lower).length() != symbol_to_string(symbol_properties_table[i].upper).length())
     {
@@ -365,153 +368,23 @@ ProcTransducerAlphabet::calculate_caps()
 std::string
 ProcTransducerAlphabet::caps_helper_single(const char* c, int& case_res)
 {
-#if USE_ICU_UNICODE
-#error ICU unicode unimplemented
-#elif USE_GLIB_UNICODE
-  glong readed = 0;
-  glong written = 0;
-  GError** gerrno;
-  gunichar* s = g_utf8_to_ucs4(c, -1, &readed, &written, gerrno);
-  gchar* cased = 0;
-  if (g_unichar_isupper(*s))
+  char* cased = 0;
+  if (hfst_utf8isupper(c))
     {
       case_res = 1;
-      cased = g_utf8_strdown(c, -1);
+      cased = hfst_utf8tolower(c);
     }
-  else if (g_unichar_islower(*s))
+  else if (hfst_utf8islower(c))
     {
       case_res = -1;
-      cased = g_utf8_strup(c, -1);
+      cased = hfst_utf8toupper(c);
     }
   else
     {
       case_res = 0;
-      cased = g_strdup("");
+      cased = strdup("");
     }
-  g_free(s);
-  string rv(cased);
   return cased;
-#else
-  static const char* override_upper[21][2] = {{"Ə", "ə"},
-                                             {"Р", "р"},
-                                             {"А", "а"},
-                                             {"Ч", "ч"},
-                                             {"Ы", "ы"},
-                                             {"У", "у"},
-                                             {"Ю", "ю"},
-                                             {"Т", "т"},
-                                             {"С", "с"},
-                                             {"К", "к"},
-                                             {"Ш", "ш"},
-                                             {"Ө", "ө"},
-                                             {"Ф", "ф"},
-                                             {"Я", "я"},
-                                             {"Ц", "ц"},
-                                             {"М", "м"},
-                                             {"Е", "е"},
-                                             {"Х", "х"},
-                                             {"Ҡ", "ҡ"},
-                                             {"Һ", "һ"},
-                                             {"Э", "э"}};
-
-  static const char* override_lower[21][2] = {{"ə", "Ə"},
-                                             {"р", "Р"},
-                                             {"а", "А"},
-                                             {"ч", "Ч"},
-                                             {"ы", "Ы"},
-                                             {"у", "У"},
-                                             {"ю", "Ю"},
-                                             {"т", "Т"},
-                                             {"с", "С"},
-                                             {"к", "К"},
-                                             {"ш", "Ш"},
-                                             {"ө", "Ө"},
-                                             {"ф", "Ф"},
-                                             {"я", "Я"},
-                                             {"е", "Е"},
-                                             {"м", "М"},
-                                             {"ҡ", "Ҡ"},
-                                             {"ц", "Ц"},
-                                             {"х", "Х"},
-                                             {"һ", "Һ"},
-                                             {"э", "Э"}};
-
-  static const char* parallel_ranges[5][2][2] = {{{"A","Z"},{"a","z"}}, // Basic Latin
-                                                 {{"À","Þ"},{"à","þ"}}, // Latin-1 Supplement
-                                                 {{"Α","Ϋ"},{"α","ϋ"}}, // Greek and Coptic
-                                                 {{"А","Я"},{"а","я"}}, // Cyrillic
-                                                 {{"Ѐ","Џ"},{"ѐ","џ"}}};// Cyrillic
-  static const char* serial_ranges[12][3] = {{"Ā","ķ"}, // Latin Extended A
-                                             {"Ĺ","ň"}, // Latin Extended A
-                                             {"Ŋ","ž"}, // Latin Extended A
-                                             {"Ǎ","ǜ"}, // Latin Extended B
-                                             {"Ǟ","ǯ"}, // Latin Extended B
-                                             {"Ǵ","ȳ"}, // Latin Extended B
-                                             {"Ϙ","ϯ"}, // Greek and Coptic
-                                             {"Ѡ","ҿ"}, // Cyrillic
-                                             {"Ӂ","ӎ"}, // Cyrillic
-                                             {"Ӑ","ӿ"}, // Cyrillic
-                                             {"Ԁ","ԥ"}, // Cyrillic Supplement
-                                             {"Ḁ","ỿ"}};//Latin Extended Additional
-
-  for(int i = 0; i < 21; i++) 
-  {
-    if(strcmp(c,override_upper[i][0]) == 0) 
-    {
-      case_res = 1;
-      return override_upper[i][1];
-    }
-  }
-
-  for(int i = 0; i < 21; i++) 
-  {
-    if(strcmp(c,override_lower[i][0]) == 0) 
-    {
-      case_res = -1;
-      return override_lower[i][1];
-    }
-  }
-
-  for(int i=0;i<5;i++) // check parallel ranges
-  {
-    if(strcmp(c,parallel_ranges[i][0][0]) >= 0 &&
-       strcmp(c,parallel_ranges[i][0][1]) <= 0) // in the uppercase section
-    {
-      case_res = 1;
-      int diff = utf8_str_to_int(parallel_ranges[i][1][0]) -
-                 utf8_str_to_int(parallel_ranges[i][0][0]);
-      return utf8_int_to_str(utf8_str_to_int(c)+diff);
-    }
-    else if(strcmp(c,parallel_ranges[i][1][0]) >= 0 &&
-            strcmp(c,parallel_ranges[i][1][1]) <= 0) // in the lowercase section
-    {
-      case_res = -1;
-      int diff = utf8_str_to_int(parallel_ranges[i][1][0]) -
-                 utf8_str_to_int(parallel_ranges[i][0][0]);
-      return utf8_int_to_str(utf8_str_to_int(c)-diff);
-    }
-  }
-  for(int i=0;i<12;i++) // check serial ranges
-  {
-    if(strcmp(c,serial_ranges[i][0]) >= 0 &&
-       strcmp(c,serial_ranges[i][1]) <= 0)
-    {
-      int c_int = utf8_str_to_int(c);
-      if((c_int-utf8_str_to_int(serial_ranges[i][0]))%2 == 0) // uppercase
-      {
-        case_res = 1;
-        return utf8_int_to_str(c_int+1);
-      }
-      else // lowercase
-      {
-        case_res = -1;
-        return utf8_int_to_str(c_int-1);
-      }
-    }
-  }
-  case_res = 0;
-  return "";
-#endif // HFST_UNICODE
 }
 
 std::string
@@ -554,7 +427,7 @@ ProcTransducerAlphabet::utf8_str_to_int(const char* c)
     return (((unsigned char)c[0])<<8)+
            ((unsigned char)c[1]);
   else
-    stream_error("Invalid UTF-8 character found");
+    error(EXIT_FAILURE, 0, "Invalid UTF-8 character found at %s", c);
   return -1;
 }
 std::string
@@ -591,48 +464,21 @@ ProcTransducerAlphabet::symbols_to_string(const SymbolNumberVector& symbols, Cap
 bool
 ProcTransducerAlphabet::is_punctuation(const char* c) const
 {
-  static const char* punct_ranges[8][2] = {{"!","/"},
-                                           {":","@"},
-                                           {"[","`"},
-                                           {"{","~"},
-                                           {"¡","¿"},
-                                           {"‐","⁞"},
-                                           {"₠","₸"},
-                                           {"∀","⋿"}};
-  const char* individual_chars = "×÷";
-  for(int i=0;i<8;i++)
-  {
-    if(strcmp(c,punct_ranges[i][0]) >= 0 && 
-       strcmp(c,punct_ranges[i][1]) <= 0)
-    {
-      // a hack to filter out symbols (e.g. tags) that may start with punctuation
-      // and then contain ASCII text. Tags should be treated as alphabetic.
-      for(;*c!='\0';c++)
-      {
-        if(isalnum(*c))
-          return false;
-      }
-      return true;
-    }
-  }
-  
-  return (strstr(individual_chars, c) != NULL);
+  return hfst_utf8ispunct(c);
 }
 
 bool ProcTransducerAlphabet::is_space(const char* c) const
 {
-  // http://en.wikipedia.org/w/index.php?title=Space_%28punctuation%29&oldid=376453673#Table_of_spaces
-  static const char* space_chars = "   ᠎         ​‌‍  ⁠　﻿";
-  if(isspace(c[0]))
-    return true;
-  return (strstr(space_chars, c) != NULL);
+  return hfst_utf8isspace(c);
 }
 
 bool
 ProcTransducerAlphabet::is_tag(SymbolNumber symbol) const
 {
   std::string str = symbol_to_string(symbol);
-  if(str[0] == '<' && str[str.length()-1] == '>')
+  if (str[0] == '<' && str[str.length()-1] == '>')
+    return true;
+  else if ((str[0] == '+') && (str.length() > 1))
     return true;
   return false;
 }
@@ -645,8 +491,8 @@ extern bool processCompounds ;
   if(!processCompounds) 
     return false;
 
-  if(s == "+" || s[s.length()-1] == '+' ||
-     s == "#" || s[s.length()-1] == '#')
+  if(s == "+" || (s[s.length()-1] == '+') ||
+     s == "#" || (s[s.length()-1] == '#'))
     return true;
   return false;
 }

@@ -10,9 +10,20 @@
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include <cstdlib>
-#include "tokenizer.h"
-#include "transducer.h"
+#if HAVE_ERROR_H
+#  include <error.h>
+#endif
+
+#include "utils/ProcTokenizer.h"
+#include "utils/ProcTransducer.h"
+
+#include "conventions/portability.h"
+extern bool debug;
 
 //////////Function definitions for TokenIOStream
 
@@ -24,7 +35,7 @@ TokenIOStream::TokenIOStream(std::istream& i, std::ostream& o,
   is(i), os(o), alphabet(a), null_flush(flush), is_raw(raw),
   symbolizer(a.get_symbolizer()), superblank_bucket(), token_buffer(1024)
 {
-  if(printDebuggingInformationFlag)
+  if(debug)
     std::cout << "Creating TokenIOStream" << std::endl;
   if(escaped_chars.size() == 0 && !is_raw)
     initialize_escaped_chars();
@@ -96,7 +107,8 @@ TokenIOStream::read_utf8_char(std::istream& is)
   else if ( (c & (128 + 64 )) == (128 + 64))
     u8len = 2;
   else
-    stream_error("Invalid UTF-8 character found");
+    error(EXIT_FAILURE, 0, "Invalid UTF-8 character found at %c",
+          c);
 
   char next_u8[u8len+1];
   is.get(next_u8, u8len+1, '\0');
@@ -154,8 +166,8 @@ TokenIOStream::read_escaped()
 {
   int c = is.get();
   
-  if(c == EOF || escaped_chars.find(c) == escaped_chars.end())
-    stream_error("Found non-reserved character after backslash");
+  if(c == EOF)
+    error(EXIT_FAILURE, 0, "EOF after backslash");
   
   return c;
 }
@@ -180,7 +192,7 @@ TokenIOStream::read_delimited(const char delim)
   }
 
   if(c != delim)
-    stream_error(std::string("Didn't find delimiting character ")+delim);
+    error(EXIT_FAILURE, 0, "Cannot find %c delimiter near %c", delim, c);
 
   return result;
 }

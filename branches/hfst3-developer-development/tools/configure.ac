@@ -59,9 +59,9 @@ AC_ARG_ENABLE([apertium2fst],
 AM_CONDITIONAL([WANT_APERTIUM2FST], [test x$enable_apertium2fst != xno])
 AC_ARG_ENABLE([apertium_proc],
               [AS_HELP_STRING([--enable-apertium-proc],
-                              [build apertium stream processing tool @<:@default=no@:>@])],
+                              [build apertium stream processing tool @<:@default=yes@:>@])],
               [enable_apertium_proc=$enableval],
-              [enable_apertium_proc=no])
+              [enable_apertium_proc=yes])
 AM_CONDITIONAL([WANT_APERTIUM_PROC], [test x$enable_apertium_proc != xno])
 AC_ARG_ENABLE([sfstpl2fst],
               [AS_HELP_STRING([--enable-sfstpl2fst],
@@ -369,12 +369,21 @@ AM_CONDITIONAL([CAN_DOXYGEN], [test x$DOXYGEN != xno])
 
 PKG_CHECK_MODULES([HFST], [hfst >= 3.3.3])
 
+AS_IF([test "x$with_unicode_handler" = "xhfst"],
+      [AC_DEFINE([USE_HFST_UNICODE], 1, 
+                 [if using HFST builitins for unicode string handling])
+      AC_DEFINE([UCD_DATA_PATH], ["$prefix/share/hfst/UnicodeData.txt"],
+                [define to final location of UnicodeData.txt if needed])])
 AS_IF([test "x$with_unicode_handler" = "xglib"],
       [PKG_CHECK_MODULES([GLIB], [glib-2.0 >= 2.12])
-       AC_DEFINE([USE_GLIB_UNICODE], 1, [if using glib for unicode string handling])])
+       AC_DEFINE([USE_GLIB_UNICODE], 1, 
+                 [if using glib for unicode string handling])])
 AS_IF([test "x$with_unicode_handler" = "xicu"],
       [PKG_CHECK_MODULES([ICU], [icu-uc >= 4.6])
-       AC_DEFINE([USE_ICU_UNICODE], 1, [if using ICU for unicode string handling])])
+       AC_DEFINE([USE_ICU_UNICODE], 1, 
+                 [if using ICU for unicode string handling])])
+AM_CONDITIONAL([WANT_HFST_UNICODE], [test "x$with_unicode_handler" = "xhfst"])
+AM_CONDITIONAL([WANT_GLIB_UNICODE], [test "x$with_unicode_handler" = "xglib"])
 AS_IF([test "x$with_readline" = "xyes"],
       [AC_SEARCH_LIBS([readline], [readline editline], 
                       [AC_DEFINE([HAVE_READLINE], 1, [if readline can be used])], 

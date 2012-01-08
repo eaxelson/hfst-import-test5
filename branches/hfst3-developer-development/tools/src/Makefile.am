@@ -197,14 +197,25 @@ bin_PROGRAMS= \
 			 $(MAYBE_SUBTRACT) $(MAYBE_SUMMARIZE) $(MAYBE_TAIL)         \
 			 $(MAYBE_TXT2FST) $(MAYBE_CALCULATE) $(MAYBE_SUBSTITUTE)    \
 			 $(MAYBE_FLAG_DIACRITICS) $(MAYBE_LEXC2FST) $(MAYBE_LEXC)   \
-			 $(MAYBE_XFST_COMPILER) $(MAYBE_FORMAT)                     \
-			 $(MAYBE_COMPOSE_INTERSECT) $(MAYBE_NAME) $(MAYBE_PAIR_TEST)\
+			 $(MAYBE_XFST_COMPILER)                                     \
+			 $(MAYBE_COMPOSE_INTERSECT)  $(MAYBE_PAIR_TEST)             \
 			 $(MAYBE_TRAVERSE)
 
 HFST_COMMON_SRC=conventions/options.cc \
 				conventions/commandline.cc \
 				conventions/metadata.cc \
 				conventions/portability.cc
+if WANT_HFST_UNICODE
+HFST_UNICODE_SRC=conventions/unicode_portability.cc \
+				 utils/utf8.cc utils/ucd_data.cc
+HFST_UNICODE_CPPFLAGS=$(AM_CPPFLAGS)
+HFST_UNICODE_LIBS=$(HFST_LIBS)
+endif
+if WANT_GLIB_UNICODE
+HFST_UNICODE_SRC=conventions/unicode_portability.cc
+HFST_UNICODE_CPPFLAGS=$(AM_CPPFLAGS) $(GLIB_CFLAGS)
+HFST_UNICODE_LIBS=$(HFST_LIBS) $(GLIB_LIBS)
+endif
 # sort alphabetically
 hfst_affix_guessify_SOURCES=affix-guessify.cc $(HFST_COMMON_SRC)
 hfst_apertium2fst_SOURCES=apertium2fst.cc $(HFST_COMMON_SRC) \
@@ -216,7 +227,10 @@ hfst_apertium_proc_SOURCES=apertium-proc.cc $(HFST_COMMON_SRC) \
 						   utils/ProcFormatters.cc \
 						   utils/ProcLookupPath.cc \
 						   utils/ProcLookupState.cc \
-						   utils/ProcTokenizer.cc
+						   utils/ProcTokenizer.cc \
+						   $(HFST_UNICODE_SRC)
+hfst_apertium_proc_CPPFLAGS=$(HFST_UNICODE_CPPFLAGS)
+hfst_apertium_proc_LDADD=$(HFST_UNICODE_LIBS)
 hfst_compare_SOURCES=compare.cc $(HFST_COMMON_SRC)
 hfst_compose_intersect_SOURCES=compose-intersect.cc $(HFST_COMMON_SRC)
 hfst_compose_SOURCES=compose.cc $(HFST_COMMON_SRC)

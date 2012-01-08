@@ -16,11 +16,13 @@
 #include <fstream>
 #include <cstdlib>
 #include <stdexcept>
+
+#include <implementations/optimized-lookup/transducer.h>
+
 #include "utils/ProcTypes.h"
 #include "utils/ProcTokenizer.h"
 #include "utils/ProcAlphabet.h"
 
-#include "implementations/optimized-lookup/transducer.h"
 
 using namespace hfst_ol;
 

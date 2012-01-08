@@ -13,6 +13,10 @@
 #ifndef _HFST_PROC_H_
 #define _HFST_PROC_H_
 
+#ifdef HAVE_CONFIG_H
+#include <config.h>
+#endif
+
 #include <cassert>
 #include <vector>
 #include <set>
@@ -21,11 +25,7 @@
 #include <string>
 #include <iostream>
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include "implementations/optimized-lookup/transducer.h"
+#include <implementations/optimized-lookup/transducer.h>
 
 #define OL_FULL_DEBUG 1
 
@@ -77,9 +77,6 @@ enum CapitalizationMode
  * UpperCase      - The first and last symbols are uppercase
  */
 enum CapitalizationState {Unknown, LowerCase, FirstUpperCase, UpperCase};
-
-void stream_error(const char* e);
-void stream_error(std::string e);
 
 
 #endif

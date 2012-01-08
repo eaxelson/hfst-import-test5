@@ -10,10 +10,21 @@
 //       You should have received a copy of the GNU General Public License
 //       along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
+
 #include <sstream>
-#include "applicators.h"
-#include "lookup-state.h"
-#include "formatter.h"
+#if HAVE_ERROR_H
+#  include <error.h>
+#endif
+#include "utils/ProcApplicators.h"
+#include "utils/ProcLookupState.h"
+#include "utils/ProcFormatters.h"
+
+// from commandline conventions
+extern bool verbose;
+extern bool debug;
 
 //////////Function definitions for TokenizationApplicator
 
@@ -63,10 +74,10 @@ TokenizationApplicator::apply()
   while((next_token=token_stream.get_token()).type != None)
   {
     std::cout << process_token(next_token) << std::endl;
-    if(printDebuggingInformationFlag)
+    if(debug)
       alltokens.insert(next_token);
   }
-  if(verboseFlag)
+  if(verbose)
   {
     std::cout << "Set of tokens:" << std::endl;
     for(std::set<Token>::const_iterator it=alltokens.begin(); it!=alltokens.end(); it++)
@@ -88,7 +99,7 @@ AnalysisApplicator::apply()
   Token next_token;
   while((next_token = token_stream.get_token()).type != None)
   {
-    if(printDebuggingInformationFlag)
+    if(debug)
     {
       if(next_token.type == Symbol)
         std::cout << "Got symbol #" << next_token.symbol << "(" << transducer.get_alphabet().symbol_to_string(next_token.symbol) << ")" << std::endl;
@@ -100,7 +111,8 @@ AnalysisApplicator::apply()
         std::cout << "Got reserved character '" << next_token.character << "'" << std::endl;
     }
     if(next_token.type == ReservedCharacter)
-      stream_error(std::string("Found unexpected character ")+next_token.character+" unescaped in stream");
+      error(EXIT_FAILURE, 0, "Found unexpected character %s unescaped "
+            "in stream", next_token.character);
     
   	if(surface_form.size() > 0 && state.is_final())
   	{
@@ -117,13 +129,13 @@ AnalysisApplicator::apply()
         }
   	  last_stream_location = token_stream.get_pos()-1;
   	  
-  	  if(printDebuggingInformationFlag)
+  	  if(debug)
   	    std::cout << "Final paths (" << finals.size() << ") found and saved, stream location is " << last_stream_location << std::endl;
   	}
   	
   	state.step(token_stream.to_symbol(next_token), caps_mode);
     
-    if(printDebuggingInformationFlag)
+    if(debug)
       std::cout << "After stepping, there are " << state.num_active() << " active paths" << std::endl;
     
     if(state.is_active())
@@ -171,7 +183,7 @@ AnalysisApplicator::apply()
           int revert_count = surface_form.size()-word_length+
                          next_token_is_part_of_word ? 0 : 1;
           
-          if(printDebuggingInformationFlag)
+          if(debug)
             std::cout << "word_length=" << word_length << ", surface_form.size()=" << surface_form.size() 
                       << ", moving back " << revert_count << " characters" << std::endl;
           
@@ -197,7 +209,7 @@ AnalysisApplicator::apply()
     }
   }
   
-  if(verboseFlag)
+  if(verbose)
     std::cout << std::endl << "Got None/EOF symbol; done." << std::endl;
   
   // print any valid transductions stored
@@ -233,7 +245,8 @@ GenerationApplicator::apply()
             break;
           }
           else if(next_token.type == None)
-            stream_error("Stream ended before end-of-word marker $ was found");
+            error(EXIT_FAILURE, 0, "Stream ended before end-of-word marker"
+                 " $ was found");
           else
             form.push_back(next_token);
         }
@@ -278,13 +291,14 @@ GenerationApplicator::apply()
             std::string invariant = token_stream.read_delimited('$');
             invariant = invariant.substr(0, invariant.length()-1);
             token_stream.write_escaped(invariant);
-            if(printDebuggingInformationFlag)
+            if(debug)
               std::cout << std::endl << "Invariant: '" << invariant << "'" << std::endl;
           }
         }
       }
       else
-        stream_error(std::string("Found unexpected character ")+next_token.character+" unescaped in stream");
+        error(EXIT_FAILURE, 0, "Found unexpected character %s unescaped "
+              "in stream", next_token.character);
     }
     else
       token_stream << next_token;
@@ -324,7 +338,7 @@ GenerationApplicator::lookup(const TokenVector& tokens, bool generate_on_fail)
         token_stream.get_capitalization_state(TokenVector(tokens.begin(),tokens.size()>1?tokens.begin()+2:tokens.end()));
     LookupPathSet finals = state.get_finals_set();
     
-    if(printDebuggingInformationFlag)
+    if(debug)
   	    std::cout << "Generated " << finals.size() << " forms" << std::endl;
     
     token_stream.put_symbols((*finals.begin())->get_output_symbols(),capitalization_state);
@@ -354,7 +368,7 @@ GenerationApplicator::lookup(const TokenVector& tokens, bool generate_on_fail)
         if(pos2 != std::string::npos)
           word = word.substr(0,pos1)+word.substr(pos2+1);
         else
-          stream_error("Found tag without closing '>'");
+          error(EXIT_FAILURE, 0, "Found tag without closing '>'");
       }
     }
     token_stream.write_escaped(word);
