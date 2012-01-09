@@ -105,4 +105,14 @@ if ! diff test.strings $srcdir/proc-bashkir-out.strings ; then
     echo bashkir mismatched
     exit 1
 fi
+# from finntreebank boundary bug (priv)
+if ! ../src/hfst-apertium-proc --cg proc-cg-compound-boundary-without-tags.hfst.ol < kaljakassi.strings > test.strings ; then
+    echo kaljakassi fail:
+    cat test.strings
+    exit 1
+fi
+if ! diff test.strings $srcdir/proc-cg-compound-boundary-without-tags.strings ; then
+    echo kaljakassi mismatched
+    exit 1
+fi
 rm test.strings
