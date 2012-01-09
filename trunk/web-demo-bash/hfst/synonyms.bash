@@ -17,12 +17,12 @@ echo "</em>:</p>"
 case $VARIANT in
     fiwn-*)
         echo "<div>click terms for wordnet search</div>"
-        echo "<dl><dt><a href='http://www.ling.helsinki.fi/cgi-bin/fiwn/search?wn=fi&w=$WORDFORM&t=over&sm=Search' title='search fiwn for $WORDFORM'>"
+        echo "<dl><dt><a href='http://www.ling.helsinki.fi/cgi-bin/fiwn/search?wn=$LL&w=$WORDFORM&t=over&sm=Search' title='search fiwn for $WORDFORM'>"
         echo $WORDFORM | sed -e 's/&/\&amp;/g' -e 's/</\&lt;/g'
         echo '</a></dt>'
         echo "$WORDFORM" |\
             hfst-lookup hfst/$LL/synonyms.$VARIANT.hfstol 2>&1 |\
-            awk '{printf("<dd><a href=\"http://www.ling.helsinki.fi/cgi-bin/fiwn/search?wn=fi&w=%s&t=over&sm=Search\" title=\"search fiwn for %s\">%s</a></dd>\n", $2, $2, $2);}' |\
+            awk -F '\t' "{printf(\"<dd><a href='http://www.ling.helsinki.fi/cgi-bin/fiwn/search?wn=$LL&w=%s&t=over&sm=Search' title='search fiwn for %s'>%s</a></dd>\n\", \$2, \$2, \$2);}" |\
             sort | uniq;
         echo '</dl>';;
     *)
