@@ -183,6 +183,11 @@ CGOutputFormatter::process_final(const SymbolNumberVector& symbols, Capitalizati
           compound_split = i;
       }
       
+      // compound boundary that doesn't have tags needs to be printed upto 
+      // that point instead
+      if (tag_start > compound_split)
+        tag_start = compound_split;
+      
       if(tag_start != symbols.size() && compound_split != symbols.size())
         break;
     }
