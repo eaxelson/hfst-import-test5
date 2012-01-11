@@ -6,6 +6,8 @@
 #include <string.h>
 
 #include "HfstTransducer.h"
+#include "HfstInputStream.h"
+#include "HfstXeroxRules.h"
 
 #include "xre_parse.h"
 #include "xre_utils.h"
@@ -17,7 +19,6 @@
 
 extern
 void xreerror(char *text);
-
 
 %}
 
@@ -95,22 +96,12 @@ LWSP [\t\r\n ]
 "(<-)" { return OPTIONAL_REPLACE_LEFT; }
 "<->" { return REPLACE_LEFT_RIGHT; }
 "(<->)" { return OPTIONAL_REPLACE_LEFT_RIGHT; }
-"@->" { return LTR_LONGEST_REPLACE_RIGHT; }
-"@>" { return LTR_SHORTEST_REPLACE_RIGHT; }
-"->@" { return RTL_LONGEST_REPLACE_RIGHT; }
-">@" { return RTL_SHORTEST_REPLACE_RIGHT; }
-"(@->)" { return OPTIONAL_LTR_LONGEST_REPLACE_RIGHT; }
-"(@>)" { return OPTIONAL_LTR_SHORTEST_REPLACE_RIGHT; }
-"(->@)" { return OPTIONAL_RTL_LONGEST_REPLACE_RIGHT; }
-"(>@)" { return OPTIONAL_RTL_SHORTEST_REPLACE_RIGHT; }
-"<-@" { return LTR_LONGEST_REPLACE_LEFT; }
-"<@" { return LTR_SHORTEST_REPLACE_LEFT; }
-"@<-" { return RTL_LONGEST_REPLACE_LEFT; }
-"@<" { return RTL_SHORTEST_REPLACE_LEFT; }
-"(<-@)" { return OPTIONAL_LTR_LONGEST_REPLACE_LEFT; }
-"(<@)" { return OPTIONAL_LTR_SHORTEST_REPLACE_LEFT; }
-"(@<-)" { return OPTIONAL_RTL_LONGEST_REPLACE_LEFT; }
-"(@<)" { return OPTIONAL_RTL_SHORTEST_REPLACE_LEFT; }
+
+"@->" { return LTR_LONGEST_MATCH; }
+"@>" { return LTR_SHORTEST_MATCH; }
+"->@" { return RTL_LONGEST_MATCH; }
+">@" { return RTL_SHORTEST_MATCH; }
+
 "||" { return REPLACE_CONTEXT_UU; }
 "//" { return REPLACE_CONTEXT_LU; }
 "\\\\" { return REPLACE_CONTEXT_UL; }

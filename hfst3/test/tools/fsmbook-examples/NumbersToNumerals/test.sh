@@ -1,3 +1,4 @@
+
 #!/bin/bash
 
 if [ "$4" = "--full-test" ] ; then

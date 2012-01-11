@@ -262,7 +262,8 @@ process_stream(HfstOutputStream& outstream)
 
 int main( int argc, char **argv ) 
 {
-  hfst_set_program_name(argv[0], "0.1", "Regexp2Fst");
+
+ hfst_set_program_name(argv[0], "0.1", "Regexp2Fst");
   int retval = parse_options(argc, argv);
   if (retval != EXIT_CONTINUE)
     {
