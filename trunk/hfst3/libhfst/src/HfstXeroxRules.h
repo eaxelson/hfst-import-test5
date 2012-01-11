@@ -21,8 +21,16 @@ namespace hfst
 	{
 		enum ReplaceType {REPL_UP, REPL_DOWN, REPL_RIGHT, REPL_LEFT};
 
+		enum ReplaceArrow {E_REPLACE_RIGHT,
+						   E_REPLACE_RIGHT_MARKUP,
+						   E_OPTIONAL_REPLACE_RIGHT,
+						   E_RTL_LONGEST_MATCH,
+						   E_RTL_SHORTEST_MATCH,
+						   E_LTR_LONGEST_MATCH,
+						   E_LTR_SHORTEST_MATCH};
+
 		//ImplementationType TYPE = TROPICAL_OPENFST_TYPE;
-		ImplementationType TYPE = SFST_TYPE;
+		//ImplementationType TYPE = SFST_TYPE;
 		//ImplementationType TYPE = FOMA_TYPE;
 
 
@@ -183,6 +191,9 @@ namespace hfst
 		HfstTransducer mark_up_replace(	const Rule &rule,
 								const StringPair &marks,
 								bool optional);
+		 HfstTransducer mark_up_replace(const Rule &rule,
+			 	  						const HfstTransducerPair &marks,
+			 	  						bool optional);
 
 		HfstTransducer mark_up_replace(	const vector<MarkUpRule> &markUpRuleVector,
 								bool optional);

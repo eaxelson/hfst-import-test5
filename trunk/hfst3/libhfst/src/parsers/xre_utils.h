@@ -13,6 +13,7 @@
 
 namespace hfst { namespace xre {
 
+
 extern char* data;
 extern char* startptr;
 extern size_t len;
