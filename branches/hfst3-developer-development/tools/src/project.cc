@@ -56,12 +56,12 @@ print_usage()
            "Project (extract a level) transducer\n"
         "\n", program_name);
 
-    print_common_program_options(message_out);
-    print_common_unary_program_options(message_out);
+    print_common_program_options();
+    print_common_unary_program_options();
     fprintf(message_out, "Projection options:\n"
             "  -p, --project=LEVEL   project extracting tape LEVEL\n");
     fprintf(message_out, "\n");
-    print_common_unary_program_parameter_instructions(message_out);
+    print_common_unary_program_parameter_instructions();
     fprintf(message_out, "LEVEL must be one of upper, input, first, analysis "
             "or lower, output, second, generation\n");
     fprintf(message_out, "\n");

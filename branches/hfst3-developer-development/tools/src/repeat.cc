@@ -58,13 +58,13 @@ print_usage()
            "Repeat transducer\n"
         "\n", program_name);
 
-    print_common_program_options(message_out);
-    print_common_unary_program_options(message_out);
+    print_common_program_options();
+    print_common_unary_program_options();
     fprintf(message_out, "Repetition options:\n"
             "  -f, --from=FNUM   repeat at least FNUM times\n"
             "  -t, --to=TNUM     repeat at most TNUM times\n");
     fprintf(message_out, "\n");
-    print_common_unary_program_parameter_instructions(message_out);
+    print_common_unary_program_parameter_instructions();
     fprintf(message_out, 
             "FNUM and TNUM must be positive integers or infinities "
             "as parsed by strtod(3)\n"

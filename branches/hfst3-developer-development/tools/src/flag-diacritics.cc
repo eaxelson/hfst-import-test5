@@ -59,13 +59,13 @@ print_usage(const char *program_name)
            "handle Xerox flag diacritics in transducer\n"
         "\n", program_name);
 
-    print_common_program_options(message_out);
+    print_common_program_options();
 #               if DEBUG
     fprintf(message_out,
            "  -d, --debug            Print debugging messages and results\n"
         );
 #               endif
-    print_common_unary_program_options(message_out);
+    print_common_unary_program_options();
     fprintf(message_out, 
             "  -p, --print-flags                Print flag diacritics\n"
             "  -e, --eliminate-flag=FLAG        Eliminate flag FLAG by composing relevant rules\n");

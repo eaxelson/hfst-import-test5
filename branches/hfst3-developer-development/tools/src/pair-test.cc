@@ -71,7 +71,7 @@ print_usage()
            "pair test for a twolc rule file.\n"
         "\n", program_name);
 
-    print_common_program_options(message_out);
+    print_common_program_options();
     fprintf(message_out, 
         "Input/Output options:\n"
         "  -i, --input=INFILE     Read input rule file from INFILE\n"

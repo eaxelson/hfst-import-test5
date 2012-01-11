@@ -76,8 +76,8 @@ print_usage()
            "Reweight transducer weights simply\n"
         "\n", program_name);
 
-    print_common_program_options(message_out);
-    print_common_unary_program_options(message_out);
+    print_common_program_options();
+    print_common_unary_program_options();
     fprintf(message_out, "Reweighting options:\n"
             "  -a, --addition=AVAL        add AVAL to matching weights\n"
             "  -b, --multiplier=BVAL      multiply matching weights by BVAL\n"
@@ -90,7 +90,7 @@ print_usage()
             "  -e, --end-states-only      match end states only, no arcs\n"
             "\n");
     fprintf(message_out, "\n");
-    print_common_unary_program_parameter_instructions(message_out);
+    print_common_unary_program_parameter_instructions();
     fprintf(message_out, "If AVAL, BVAL or FNAME are omitted, they default to neutral "
             "elements of addition, multiplication or identity function.\n"
             "If LVAL or UVAL are omitted, they default to minimum and maximum "

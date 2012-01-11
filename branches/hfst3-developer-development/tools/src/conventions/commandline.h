@@ -58,15 +58,22 @@ extern bool debug;
  */
 extern FILE* message_out;
 /** 
- *  @brief set @c hfst_tool_version to version specific to the tool.
+ *  @brief set @a hfst_tool_version to version specific to the tool.
  *  @sa hfst_set_program_name
  */
 extern char* hfst_tool_version;
 /** 
- * @brief set @c hfst_tool_wikiname to name of the kitwiki page for this tool.
+ * @brief set @a hfst_tool_wikiname to name of the kitwiki page for this tool.
  */
 extern char* hfst_tool_wikiname;
-
+/**
+ * @brief set @a profile_fle to target of profiling info writes
+ */
+extern FILE* profile_file;
+/**
+ * @brief set @a profile_start to @c clock() when starting profiling.
+ */
+extern clock_t profile_start;
 /* hfst tools generic helper print functions */
 
 /** save current transducer @c t to file @c filename if debug is @a true. */
@@ -265,6 +272,12 @@ ssize_t hfst_getline(char** lineptr, size_t* n, FILE* stream);
  */
 char* hfst_readline(const char* prompt);
 
+/**
+ * @brief print profiling results to @a stream in neat TSV format.
+ *  The results of the profiling match the fields of struct rusage from
+ *  sys/resource.h, except for first field which is accumulated @c clock() time.
+ */
+void hfst_print_profile_line();
 
 
 #endif

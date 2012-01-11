@@ -57,7 +57,7 @@ print_usage()
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE1...]]\n"
              "Compile lexc files into transducer\n"
         "\n", program_name );
-        print_common_program_options(message_out);
+        print_common_program_options();
         fprintf(message_out, "Input/Output options:\n"
                "  -f, --format=FORMAT     compile into FORMAT transducer\n"
                "  -o, --output=OUTFILE    write result into OUTFILE\n");

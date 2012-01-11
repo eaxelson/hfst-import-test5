@@ -57,8 +57,8 @@ print_usage()
            "Convert AT&T tabular format into a binary transducer\n"
            "\n", program_name);
 
-    print_common_program_options(message_out);
-    print_common_unary_program_options(message_out);
+    print_common_program_options();
+    print_common_unary_program_options();
     // fprintf(message_out, (tool-specific options and short descriptions)
     fprintf(message_out, "Text format options:\n"
             /*"  -n, --number        If numbers are used instead of symbol names\n"*/
@@ -216,6 +216,10 @@ int main( int argc, char **argv )
                 new HfstOutputStream(outfilename, output_format) :
                 new HfstOutputStream(output_format);
     process_stream(*outstream);
+    if (profile_file != 0)
+      {
+        hfst_print_profile_line();
+      }
     if (inputfile != stdin)
       {
         fclose(inputfile);

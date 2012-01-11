@@ -55,10 +55,10 @@ print_usage()
            "Invert a transducer\n"
         "\n", program_name);
 
-    print_common_program_options(message_out);
-    print_common_unary_program_options(message_out);
+    print_common_program_options();
+    print_common_unary_program_options();
     fprintf(message_out, "\n");
-    print_common_unary_program_parameter_instructions(message_out);
+    print_common_unary_program_parameter_instructions();
     fprintf(message_out, "\n");
     print_report_bugs();
     fprintf(message_out, "\n");

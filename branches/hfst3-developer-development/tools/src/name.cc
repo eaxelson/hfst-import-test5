@@ -62,10 +62,10 @@ print_usage()
             "  -n, --name=NAME      Name the transducer NAME\n"
             "  -p, --print-name     Only print the current name\n"
             "  -t, --truncate_length=LEN   Truncate name length to LEN\n");
-    print_common_program_options(message_out);
-    print_common_unary_program_options(message_out);
+    print_common_program_options();
+    print_common_unary_program_options();
     fprintf(message_out, "\n");
-    print_common_unary_program_parameter_instructions(message_out);
+    print_common_unary_program_parameter_instructions();
     fprintf(message_out, "\n");
     print_report_bugs();
     fprintf(message_out, "\n");

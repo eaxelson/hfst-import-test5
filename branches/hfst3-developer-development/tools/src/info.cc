@@ -86,7 +86,7 @@ print_usage()
            "show or test HFST versions and features\n"
             "\n", program_name);
 
-    print_common_program_options(message_out);
+    print_common_program_options();
     fprintf(message_out, "Test features:\n"
             "  -a, --atleast-version=MVER   require at least MVER version "
             "of HFST\n"

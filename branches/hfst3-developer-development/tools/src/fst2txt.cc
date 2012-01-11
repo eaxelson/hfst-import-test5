@@ -55,8 +55,8 @@ print_usage()
         "Print transducer in AT&T tabular format\n"
         "\n", program_name);
 
-    print_common_program_options(message_out);
-    print_common_unary_program_options(message_out);
+    print_common_program_options();
+    print_common_unary_program_options();
     fprintf(message_out, "Text format options:\n"
         "  -w, --print-weights          If weights are printed in all cases\n"
         "  -D, --do-not-print-weights   If weights are not printed in any case\n");
@@ -204,6 +204,10 @@ int main( int argc, char **argv )
     }
     
     retval = process_stream(*instream, outfile);
+    if (profile_file != 0)
+      {
+        hfst_print_profile_line();
+      }
 
     delete instream;
     free(inputfilename);

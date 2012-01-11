@@ -22,3 +22,12 @@ char* hfst_tool_wikiname = 0;
 char* outfilename = 0;
 FILE* outfile = 0;
 bool outputNamed = false;
+char* profile_file_name = 0;
+FILE* profile_file;
+#if HAVE_CLOCK
+clock_t profile_start = 0;
+clock_t profile_end = 0;
+#endif
+#if HAVE_GETRUSAGE
+struct rusage* profile_usage;
+#endif

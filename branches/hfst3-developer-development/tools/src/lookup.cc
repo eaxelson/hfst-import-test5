@@ -201,7 +201,7 @@ print_usage()
            "perform transducer lookup (apply)\n"
         "\n", program_name);
 
-    print_common_program_options(message_out);
+    print_common_program_options();
     fprintf(message_out, 
         "Input/Output options:\n"
         "  -i, --input=INFILE     Read input transducer from INFILE\n"
@@ -216,7 +216,7 @@ print_usage()
             "  -X, --xfst=VARIABLE              Toggle xfst VARIABLE\n"
             "  -c, --cycles=INT                 How many times to follow input epsilon cycles\n");
     fprintf(message_out, "\n");
-    print_common_unary_program_parameter_instructions(message_out);
+    print_common_unary_program_parameter_instructions();
     fprintf(message_out, 
             "OFORMAT is one of {xerox,cg,apertium}, xerox being default\n"
             "IFORMAT is one of {text,spaced,apertium}, default being text,\n"

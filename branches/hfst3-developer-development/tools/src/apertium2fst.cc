@@ -85,21 +85,13 @@ print_usage()
            "Convert apertium XML files into a binary transducer\n"
            "\n", program_name);
 
-    print_common_program_options(message_out);
-    print_common_unary_program_options(message_out);
+    print_common_program_options();
+    print_common_creational_program_options();
     // fprintf(message_out, (tool-specific options and short descriptions)
     fprintf(message_out, "Format options:\n"
-            "  -f, --format=FMT     Write result using FMT as backend format\n"
             "  -e, --errmodel=ERR   Write error model for spelller to ERR\n");
     fprintf(message_out, "\n");
-    fprintf(message_out, 
-        "If OUTFILE or INFILE is missing or -,"
-        "standard streams will be used.\n"
-        "If FMT is not given, OpenFst's tropical format will be used.\n"
-        "The possible values for FMT are { sfst, openfst-tropical, "
-        "openfst-log,\n"
-    "foma, optimized-lookup-unweighted, optimized-lookup-weighted }.\n"
-        );
+    print_common_creational_program_parameter_instructions();
     fprintf(message_out, "\n");
     print_report_bugs();
     fprintf(message_out, "\n");
@@ -949,7 +941,7 @@ process_stream(HfstOutputStream& outstream, HfstOutputStream* errstream)
 
 int main( int argc, char **argv ) 
 {
-  hfst_set_program_name(argv[0], "0.1", "HfstTxt2Fst");
+  hfst_set_program_name(argv[0], "0.1", "HfstApertium2Fst");
     int retval = parse_options(argc, argv);
 
     if (retval != EXIT_CONTINUE)
@@ -1003,12 +995,17 @@ int main( int argc, char **argv )
             new HfstOutputStream(format);
       }
     process_stream(*outstream, errstream);
+    if (profile_file != 0)
+      {
+        hfst_print_profile_line();
+      }
     if (inputfile != stdin)
       {
         fclose(inputfile);
       }
     free(inputfilename);
     free(outfilename);
+    free(profile_file_name);
     return EXIT_SUCCESS;
 }
 

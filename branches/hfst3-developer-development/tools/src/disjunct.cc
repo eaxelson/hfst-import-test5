@@ -51,10 +51,10 @@ print_usage()
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE1 [INFILE2]]\n"
              "Disjunct (union, OR) two transducers\n"
         "\n", program_name );
-        print_common_program_options(message_out);
-        print_common_binary_program_options(message_out);
+        print_common_program_options();
+        print_common_binary_program_options();
         fprintf(message_out, "\n");
-        print_common_binary_program_parameter_instructions(message_out);
+        print_common_binary_program_parameter_instructions();
         fprintf(message_out, "\n");
         fprintf(message_out,
             "\n"
@@ -212,6 +212,10 @@ int main( int argc, char **argv ) {
         new HfstOutputStream(firststream->get_type());
 
     retval = disjunct_streams(*firststream, *secondstream, *outstream);
+    if (profile_file != 0)
+      {
+        hfst_print_profile_line();
+      }
     delete firststream;
     delete secondstream;
     delete outstream;

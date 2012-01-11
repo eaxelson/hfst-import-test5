@@ -51,8 +51,8 @@ print_usage()
 	  "determine HFST transducer format\n"
 	  "\n", program_name);
   
-  print_common_program_options(message_out);
-  print_common_unary_program_options(message_out);
+  print_common_program_options();
+  print_common_unary_program_options();
   fprintf
     (message_out, 
      "Tool-specific options:\n"
@@ -63,7 +63,7 @@ print_usage()
      "  -t, --test-format FMT  Whether the format FMT is available,\n"
      "                         exits with 0 if it is, else with 1\n");
   fprintf(message_out, "\n");
-  print_common_unary_program_parameter_instructions(message_out);
+  print_common_unary_program_parameter_instructions();
   fprintf(message_out, "\n");
   print_report_bugs();
   fprintf(message_out, "\n");

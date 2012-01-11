@@ -180,7 +180,7 @@ readline(const char* prompt)
   fprintf(message_out, "%s", prompt);
   char* line = 0;
   size_t len = 0;
-  if (hfst_getline(&line, &len, stdin) == -1)
+  if (getline(&line, &len, stdin) == -1)
     {
       return 0;
     }
@@ -221,3 +221,10 @@ set_program_name(const char* argv0)
   }
 #endif
 
+#ifndef HAVE_GETRUSAGE
+int
+getrusage(int who, void* usage)
+  {
+    return -1;
+  }
+#endif

@@ -57,7 +57,7 @@ print_usage(void)
            "tokenizing on the fly\n"
         "\n", program_name);
 
-    print_common_program_options(message_out);
+    print_common_program_options();
     fprintf(message_out, "Processing mode options:\n"
     "  -a, --analysis          Morphological analysis (default)\n"
     "  -g, --generation        Morphological generation\n"

@@ -108,7 +108,7 @@ print_usage()
         "\n", program_name);
 
     // options, grouped
-    print_common_program_options(message_out);
+    print_common_program_options();
     fprintf(message_out, 
             "  -9, --format=TYPE       compile expressions to TYPE "
             "automata\n");
@@ -205,7 +205,6 @@ int
 parse_options(int argc, char** argv)
 {
     // use of this function requires options are settable on global scope
-    static const short INVERT_OPT = 19;
     static const short LINEBUFFER_OPT =20;
     static const short LABEL_OPT = 21;
     static const short BINARYFILES_OPT = 22;
@@ -214,6 +213,7 @@ parse_options(int argc, char** argv)
     static const short INCLUDEFROM_OPT = 25;
     static const short EXCLUDEFROM_OPT = 26;
     static const short COLOR_OPT = 27;
+    static const short INVERT_OPT = 28;
     while (true)
     {
         static const struct option long_options[] =

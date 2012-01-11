@@ -400,7 +400,11 @@ AS_IF([test "x$enable_apertium2fst" != "xno"],
 #                [AC_MSG_FAILURE([my transducer library test failed (--without-my-transducer-library to disable)])])])
 
 # Checks for header files
-AC_CHECK_HEADERS([limits.h stdlib.h string.h error.h glob.h locale.h langinfo.h errno.h])
+AC_CHECK_HEADERS([limits.h stdlib.h string.h])
+AC_CHECK_HEADERS([error.h errno.h])
+AC_CHECK_HEADERS([glob.h])
+AC_CHECK_HEADERS([locale.h langinfo.h])
+AC_CHECK_HEADERS([time.h sys/time.h sys/resource.h])
 
 AS_IF([test "x$with_readline" = "xyes"],
       [AC_CHECK_HEADERS([readline/readline.h readline/history.h])])
@@ -427,7 +431,12 @@ AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MALLOC
 AC_FUNC_REALLOC
 AC_FUNC_STRTOD
-AC_CHECK_FUNCS([floor strchr strdup strerror strncasecmp strcspn strtol strtoul error error_at_line strndup getline getdelim getopt_long strtod xstrdup set_program_name setprogname setlocale nl_langinfo])
+AC_CHECK_FUNCS([floor strchr strdup strncasecmp strcspn strtol strtoul strtod strndup getline getdelim xstrdup])
+AC_CHECK_FUNCS([strerror error error_at_line])
+AC_CHECK_FUNCS([strndup getline getdelim getopt_long])
+AC_CHECK_FUNCS([set_program_name setprogname])
+AC_CHECK_FUNCS([setlocale nl_langinfo])
+AC_CHECK_FUNCS([clock getrusage])
 
 # Checks for system services
 

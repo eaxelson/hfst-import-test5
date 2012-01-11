@@ -59,7 +59,7 @@ print_usage()
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE1...]]\n"
              "Compile lexc files into transducer or imitate Xerox lexc\n"
         "\n", program_name );
-        print_common_program_options(message_out);
+        print_common_program_options();
         fprintf(message_out, "Input/Output options:\n"
                "  -f, --format=FORMAT       compile into FORMAT transducer\n"
                "  -o, --output=OUTFILE      write result into OUTFILE\n"
@@ -327,6 +327,10 @@ int main( int argc, char **argv ) {
         new HfstOutputStream(outfilename, format) :
         new HfstOutputStream(format);
     retval = lexc_streams(*outstream);
+    if (profile_file != 0)
+      {
+        hfst_print_profile_line();
+      }
     delete outstream;
     free(lexcfilenames);
     free(outfilename);

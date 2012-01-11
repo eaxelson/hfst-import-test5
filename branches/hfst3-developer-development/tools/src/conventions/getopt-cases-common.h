@@ -41,4 +41,8 @@ case 'o':
     }
   outputNamed = true;
   break;
-
+case PROFILE_OPT:
+  profile_file_name = hfst_strdup(optarg);
+  profile_file = hfst_fopen(profile_file_name, "a");
+  profile_start = clock();
+  break;

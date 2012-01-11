@@ -59,24 +59,12 @@ print_usage()
         "Convert transducers between binary formats\n"
         "\n", program_name);
 
-    print_common_program_options(message_out);
-    print_common_unary_program_options(message_out);
+    print_common_program_options();
+    print_common_creational_program_options();
     fprintf(message_out, "Conversion options:\n"
-    "  -f, --format=FMT                  Write result in FMT format\n"
-    "  -b, --use-backend-format          Write result in implementation format, without any HFST wrappers\n"
-    "  -S, --sfst                        Write output in (HFST's) SFST implementation\n"
-    "  -F, --foma                        Write output in (HFST's) foma implementation\n"
-    "  -t, --openfst-tropical            Write output in (HFST's) tropical weight (OpenFST) implementation\n"
-    "  -l, --openfst-log                 Write output in (HFST's) log weight (OpenFST) implementation\n"
-    "  -O, --optimized-lookup-unweighted Write output in the HFST optimized-lookup implementation\n"
-    "  -w, --optimized-lookup-weighted   Write output in optimized-lookup (weighted) implementation\n"
-    "  -Q  --quick                       When converting to optimized-lookup, don't try hard to compress\n");
+    "  -b, --use-backend-format          Write result in implementation format, without any HFST wrappers\n");
     fprintf(message_out, "\n");
-    print_common_unary_program_parameter_instructions(message_out);
-        fprintf(message_out, 
-            "FMT must be name of a format usable by libhfst, i.e. one of the following:\n"
-        "{ openfst-tropical, openfst-log, sfst, foma,\n"
-        "  optimized-lookup-weighted, optimized-lookup-unweighted }.\n");
+    print_common_creational_program_parameter_instructions();
     fprintf(message_out, "\n");
     print_report_bugs();
     fprintf(message_out, "\n");
@@ -93,7 +81,7 @@ parse_options(int argc, char** argv)
         static const struct option long_options[] =
         {
           HFST_GETOPT_COMMON_LONG,
-          HFST_GETOPT_UNARY_LONG,
+          HFST_GETOPT_CREATIONAL_LONG,
           // add tool-specific options here 
           {"use-backend-format", no_argument, 0, 'b'},
           {"format",       required_argument, 0, 'f'},
@@ -103,13 +91,13 @@ parse_options(int argc, char** argv)
           {"openfst-log",         no_argument, 0, 'l'},
           {"optimized-lookup-unweighted",   no_argument, 0, 'O'},
           {"optimized-lookup-weighted",no_argument, 0, 'w'},
-      {"quick",              no_argument, 0, 'Q'},
+          {"quick",              no_argument, 0, 'Q'},
           {0,0,0,0}
         };
         int option_index = 0;
         // add tool-specific options here 
         char c = getopt_long(argc, argv, HFST_GETOPT_COMMON_SHORT
-                             HFST_GETOPT_UNARY_SHORT "SFtlOwQf:b",
+                             HFST_GETOPT_CREATIONAL_SHORT "SFtlOwQf:b",
                              long_options, &option_index);
         if (-1 == c)
         {
@@ -122,8 +110,8 @@ parse_options(int argc, char** argv)
 #include "conventions/getopt-cases-common.h"
 #include "conventions/getopt-cases-unary.h"
           // add tool-specific cases here
-                case 'f':
-          output_type = hfst_parse_format_name(optarg);
+        case 'f':
+          output_type=hfst_parse_format_name(optarg);
           break;
         case 'b':
           hfst_format=false;
@@ -156,8 +144,7 @@ parse_options(int argc, char** argv)
     if (output_type == hfst::UNSPECIFIED_TYPE)
     {
         error(EXIT_FAILURE, 0, 
-              "You must specify an output type "
-              "(one of -S, -f, -t, -l, -O, or -w)");
+              "You must specify an output format with -f");
     }
 
 #include "conventions/check-params-common.h"
@@ -243,6 +230,10 @@ int main( int argc, char **argv ) {
       new HfstOutputStream(output_type, hfst_format);
 
     retval = process_stream(*instream, *outstream);
+    if (profile_file != 0)
+      {
+        hfst_print_profile_line();
+      }
     delete instream;
     delete outstream;
     free(inputfilename);

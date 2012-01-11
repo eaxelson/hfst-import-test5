@@ -1,3 +1,6 @@
+//! @file options.cc
+//! @brief  implementations of HFST standardised command-line option interfaces.
+
 //       This program is free software: you can redistribute it and/or modify
 //       it under the terms of the GNU General Public License as published by
 //       the Free Software Foundation, version 3 of the License.
@@ -13,74 +16,102 @@
 #if HAVE_CONFIG_H
 #  include <config.h>
 #endif
+
+#include "conventions/commandline.h"
 #include "conventions/options.h"
 
-// All programs
-void print_common_program_options(FILE *file) {
+////////////////////////
+// NB: when messing with this file please pay attention to GNU guidelines for
+// commandline interfaces.
+////////////////////////
 
-  fprintf(file, "Common options:\n"
+void print_common_program_options() {
+
+  fprintf(message_out, "Common options:\n"
           "  -h, --help             Print help message\n"  
           "  -V, --version          Print version info\n"  
           "  -v, --verbose          Print verbosely while processing\n"
           "  -q, --quiet            Do not print output\n"  
-          "  -s, --silent           Alias of --quiet\n");
-   
+          "  -s, --silent           Alias of --quiet\n"
+          "  --profile=PFILE        Write profiling data to PFILE\n"
+          "  -d, --debug            Print all debugging data "
+          "(for bug reports)\n");
 }
 
-// One transducer to one transducer:
-//   compatible
-//   determinize
-//   head
-//   invert
-//   minimize
-//   project
-//   push-weights
-//   remove-epsilons
-//   repeat
-//   reverse
-//   symbols
-//   tail
-//   unweighted2weighted
-//   weighted2unweighted
-void print_common_unary_program_options(FILE *file) {
-
-  fprintf(file, "Input/Output options:\n"
+void
+print_common_unary_program_options() 
+  {
+    fprintf(message_out, "Input/Output options:\n"
         "  -i, --input=INFILE     Read input transducer from INFILE\n"
-        "  -o, --output=OUTFILE   Write output transducer to OUTFILE\n"
-  );
-}
+        "  -o, --output=OUTFILE   Write output transducer to OUTFILE\n");
+  }
 
-void print_common_unary_program_parameter_instructions(FILE *file) {
+void
+print_common_unary_program_parameter_instructions() 
+  {
 
-  fprintf(file, 
+    fprintf(message_out, 
       "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
-      "Format of result depends on format of INFILE\n"
-      );
+      "Format of result depends on format of INFILE\n");
 
-}
+  }
 
-// Two transducers to one transducer
-//   compose
-//   concatenate
-//   conjunct
-//   disjunct, 
-void print_common_binary_program_options(FILE *file) {
+void
+print_common_binary_program_options() 
+  {
 
-  fprintf(file, "Input/Output options:\n"
+    fprintf(message_out, "Input/Output options:\n"
           "  -1, --input1=INFILE1   Read first input transducer from INFILE1\n"
           "  -2, --input2=INFILE2   Read second input transducer from INFILE2\n"
           "  -o, --output=OUTFILE   Write results to OUTFILE\n");
-}
+  }
 
-void print_common_binary_program_parameter_instructions(FILE *file) {
+void
+print_common_binary_program_parameter_instructions() 
+  {
+    fprintf(message_out, 
+        "If OUTFILE, or either INFILE1 or INFILE2 is missing or -,\n"
+        "standard streams will be used.\n"
+        "INFILE1, INFILE2, or both, must be specified.\n"
+        "Format of result depends on format of INFILE1\n"
+        "and INFILE2; both should have the same format.\n");
+  }
 
-  fprintf(file, 
-      "If OUTFILE, or either INFILE1 or INFILE2 is missing or -,\n"
-      "standard streams will be used.\n"
-      "INFILE1, INFILE2, or both, must be specified.\n"
-      "Format of result depends on format of INFILE1\n"
-      "and INFILE2; both should have the same format.\n"
-      );
+void print_common_creational_program_options() 
+  {
+    fprintf(message_out, "Input/Output options:\n"
+          "  -f, --format=FMT       Create automaton using FMT library\n"
+          "  -i, --input=INFILE     Read input data from INFILE\n"
+          "  -o, --output=OUTFILE   Write results to OUTFILE\n");
+  }
 
-}
+void
+print_common_creational_program_parameter_instructions() 
+  {
+
+    fprintf(message_out, 
+      "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
+      "If FMT is not given, "
+#   if HAVE_OPENFST
+      "OpenFst's tropical format"
+#   elif HAVE_SFST
+      "SFST format"
+#   elif HAVE_FOMA
+      "foma format"
+#   else
+      "HFST internal format"
+#   endif
+      " will be used.\n"
+      "The avalaible values for FMT are {"
+#   if HAVE_OPENFST
+      "openfst-tropical, openfst-log, "
+#   endif
+#   if HAVE_SFST
+      "sfst, "
+#   endif
+#   if HAVE_FOMA
+      "foma, "
+#   endif
+      "optimized-lookup-weighted, and optimized-lookup-unweighted }.\n");
+  }
 

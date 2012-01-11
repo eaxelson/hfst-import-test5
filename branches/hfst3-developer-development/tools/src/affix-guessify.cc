@@ -66,15 +66,15 @@ print_usage()
            "Create weighted affix guesser from automaton\n"
         "\n", program_name);
 
-    print_common_program_options(message_out);
-    print_common_unary_program_options(message_out);
+    print_common_program_options();
+    print_common_unary_program_options();
     // fprintf(message_out, (tool-specific options and short descriptions)
     fprintf(message_out, "Guesser parameters:\n"
             "  -D, --direction=DIR   set direction of guessing\n"
             "  -w, --weight=WEIGHT   set weight difference of affix lengths\n"
             "\n");
     fprintf(message_out, "\n");
-    print_common_unary_program_parameter_instructions(message_out);
+    print_common_unary_program_parameter_instructions();
     fprintf(message_out, "DIR is either suffix or prefix, "
             "or suffix if omitted.\n"
             "WEIGHT is a weight of each arc not in the known suffix or "

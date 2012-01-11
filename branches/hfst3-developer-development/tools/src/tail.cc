@@ -57,12 +57,12 @@ print_usage()
            "Get last transducers from an archive\n"
         "\n", program_name);
 
-    print_common_program_options(message_out);
-    print_common_unary_program_options(message_out);
+    print_common_program_options();
+    print_common_unary_program_options();
     fprintf(message_out, "Archive options:\n"
             "  -n, --n-last=NUMBER   Read last NUMBER transducers\n");
     fprintf(message_out, "\n");
-    print_common_unary_program_parameter_instructions(message_out);
+    print_common_unary_program_parameter_instructions();
     fprintf(message_out, "NUMBER must be a positive integer as parsed by "
             "strtoul base 10\n");
     fprintf(message_out, "\n");

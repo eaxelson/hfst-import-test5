@@ -56,12 +56,12 @@ print_usage()
            "Push weights of transducer\n"
         "\n", program_name);
 
-    print_common_program_options(message_out);
-    print_common_unary_program_options(message_out);
+    print_common_program_options();
+    print_common_unary_program_options();
     fprintf(message_out, "Push options:\n"
             "  -p, --push=DIRECTION   push to DIRECTION\n");
     fprintf(message_out, "\n");
-    print_common_unary_program_parameter_instructions(message_out);
+    print_common_unary_program_parameter_instructions();
     fprintf(message_out, "DIRECTION must be one of start, initial, begin "
             "or end, final\n");
     fprintf(message_out, "\n");

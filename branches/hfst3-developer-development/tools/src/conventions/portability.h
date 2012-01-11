@@ -1,6 +1,15 @@
 //! @file portability.h
-//! @brief declares portable versions of certain functions that may not exist
-//!     in non-GNU environments.
+//! @brief declares functions that are known not to exist on all systems, but
+//!     are used to implement hfst commandline conventions. Use
+//!     portability.cc to get naive reimplementations of some of the
+//!     required functions on limited systems such as Mac OS X.
+
+#ifndef GUARD_hfst_portability_h
+#define GUARD_hfst_portability_h
+
+#if HAVE_CONFIG_H
+#  include <config.h>
+#endif
 
 /** 
  * @brief set @c program_name to program's executable name for error messages.
@@ -53,4 +62,10 @@ ssize_t getline(char** lineptr, size_t* n, FILE* stream);
 char* readline(const char* prompt);
 #endif
 
+#ifndef HAVE_GETRUSAGE
+int getrusage(int who, void *usage);
+#endif
 
+#endif // GUARD_hfst_portability_h
+
+// vim: set ft=cpp.doxygen:

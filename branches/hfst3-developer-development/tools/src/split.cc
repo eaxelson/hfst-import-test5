@@ -54,7 +54,7 @@ print_usage()
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
            "Extract transducers from archive with systematic file names\n"
         "\n", program_name);
-    print_common_program_options(message_out);
+    print_common_program_options();
     fprintf(message_out, "Input/Output options:\n"
             "  -i, --input=INFILE    Read input transducer from INFILE\n"
             "  -p, --prefix=PRE      Use the prefix PRE in "

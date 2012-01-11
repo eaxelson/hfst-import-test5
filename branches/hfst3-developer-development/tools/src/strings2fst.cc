@@ -105,8 +105,8 @@ print_usage()
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
         "Compile string pairs and pair-strings into transducer(s)\n"
         "\n", program_name); 
-        print_common_program_options(message_out);
-        print_common_unary_program_options(message_out); 
+        print_common_program_options();
+        print_common_unary_program_options(); 
         fprintf(message_out, "String and format options:\n"
         "  -f, --format=FMT          Write result in FMT format\n"
         "  -j, --disjunct-strings    Disjunct all strings instead of transforming\n"

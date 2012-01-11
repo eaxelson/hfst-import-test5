@@ -78,7 +78,7 @@ print_usage()
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
         "Display the strings recognized by a transducer\n"
         "\n", program_name);
-    print_common_program_options(message_out);
+    print_common_program_options();
     fprintf(message_out, "Fst2strings options:\n"
 "  -n, --max-strings=NSTR     print at most NSTR strings\n"
 "  -N, --nbest=NBEST          print at most NBEST best strings\n"
@@ -99,7 +99,7 @@ print_usage()
 
     fprintf(message_out, "\n");
 
-    print_common_unary_program_parameter_instructions(message_out);
+    print_common_unary_program_parameter_instructions();
     fprintf(message_out, "If all NSTR, NBEST and NCYC are omitted, "
             "all possible paths are printed:\n"
             "NSTR, NBEST and NCYC default to infinity.\n"
