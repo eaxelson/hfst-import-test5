@@ -85,7 +85,6 @@ REGEXP1: REGEXP2 END_OF_EXPRESSION {
    }
    | REGEXP2 {
         hfst::xre::last_compiled = & $1->minimize();
-        std::cerr << *hfst::xre::last_compiled;
         $$ = hfst::xre::last_compiled;
    }
    ;
