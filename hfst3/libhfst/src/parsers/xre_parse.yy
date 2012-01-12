@@ -16,6 +16,7 @@ using namespace hfst::implementations;
 
 #include "xre_utils.h"
 
+
 extern void xreerror(const char * text);
 extern int xrelex();
 
@@ -98,6 +99,9 @@ extern int xrelex();
 %nonassoc <label> READ_BIN READ_TEXT READ_SPACED READ_PROLOG READ_RE
 %token LEFT_BRACKET RIGHT_BRACKET LEFT_PARENTHESIS RIGHT_PARENTHESIS
        LEFT_CURLY RIGHT_CURLY LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED
+PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
+%token EPSILON_TOKEN ANY_TOKEN BOUNDARY_MARKER
+%token LEXER_ERROR
 %token END_OF_EXPRESSION
 %token PAIR_SEPARATOR PAIR_SEPARATOR_SOLE 
        PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
@@ -105,10 +109,7 @@ extern int xrelex();
 %token LEXER_ERROR
 %%
 
-XRE: REGEXP1 
-      {
-         std::cerr << "final tr: \n" << *$$ << "\n" << std::endl;
-      }
+XRE: REGEXP1 { }
      ;
 REGEXP1: REGEXP2 END_OF_EXPRESSION {
        hfst::xre::last_compiled = & $1->minimize();
@@ -129,7 +130,6 @@ REGEXP1: REGEXP2 END_OF_EXPRESSION {
        $$ = hfst::xre::last_compiled;
       // std::cerr << "replace tr after minimization: \n" << *$$ << "\n" << std::endl;  
    }
-
    ;
 
 REGEXP2: REGEXP3 { }
@@ -270,7 +270,6 @@ RULE_MAPPING: REGEXP2 REPLACE_ARROW REGEXP2
          tmp.cross_product(*$3);
          // $$ = & $1->cross_product(*$3);
           $$ =  new pair< ReplaceArrow, HfstTransducer> ($2, tmp);
-          std::cerr << "Replace arrow enum \n"<< $2 << std::endl;
           delete $3;
       }
      /* 
@@ -336,7 +335,8 @@ CONTEXT: REGEXP2 CENTER_MARKER REGEXP2
             HfstTransducer *epsilon = new HfstTransducer(hfst::internal_epsilon, TOK, hfst::xre::format);
                
             $$ = new HfstTransducerPair(*$1, *epsilon);
-            delete $1, epsilon; 
+            delete $1;
+            delete epsilon; 
          }
       | CENTER_MARKER REGEXP2
          {
@@ -544,6 +544,9 @@ REGEXP11: REGEXP12 { }
         ;
 
 REGEXP12: LABEL { }
+        | LABEL WEIGHT { 
+            $$ = & $1->set_final_weights($2);
+        }
         | READ_BIN {
             hfst::HfstInputStream instream($1);
             $$ = new HfstTransducer(instream);
