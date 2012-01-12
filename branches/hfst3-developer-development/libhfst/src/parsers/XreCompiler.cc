@@ -105,6 +105,30 @@ main(int, char**)
     basicAaOrBc.add_transition(0, HfstBasicTransition(3, "b", "b", 0));
     basicAaOrBc.add_transition(3, HfstBasicTransition(2, "c", "c", 0));
     basicAaOrBc.set_final_weight(2, 0);
+    HfstBasicTransducer basicHeavyCat;
+    basicHeavyCat.add_state(1);
+    basicHeavyCat.add_state(2);
+    basicHeavyCat.add_state(3);
+    basicHeavyCat.add_transition(0, HfstBasicTransition(1, "c", "c", 0));
+    basicHeavyCat.add_transition(1, HfstBasicTransition(2, "a", "a", 0));
+    basicHeavyCat.add_transition(2, HfstBasicTransition(3, "t", "t", 0));
+    basicHeavyCat.set_final_weight(3, 3.141);
+    HfstBasicTransducer basicFatCat;
+    basicFatCat.add_state(1);
+    basicFatCat.add_state(2);
+    basicFatCat.add_state(3);
+    basicFatCat.add_transition(0, HfstBasicTransition(1, "c", "c", 1));
+    basicFatCat.add_transition(1, HfstBasicTransition(2, "a", "a", 2.3));
+    basicFatCat.add_transition(2, HfstBasicTransition(3, "t", "t", 4));
+    basicFatCat.set_final_weight(3, 0);
+    HfstBasicTransducer basicCapitalistSwine;
+    basicCapitalistSwine.add_state(1);
+    basicCapitalistSwine.add_state(2);
+    basicCapitalistSwine.add_state(3);
+    basicCapitalistSwine.add_transition(0, HfstBasicTransition(1, "c", "c", 1));
+    basicCapitalistSwine.add_transition(1, HfstBasicTransition(2, "a", "a", 2.3));
+    basicCapitalistSwine.add_transition(2, HfstBasicTransition(3, "t", "t", 4));
+    basicCapitalistSwine.set_final_weight(3, 3.141);
     std::cout << std::endl << "compilation: ";
 #if HAVE_SFST
     std::cout << "sfst compile(c a t)...";
@@ -152,6 +176,29 @@ main(int, char**)
     assert(ofstAaOrBc->compare(HfstTransducer(basicAaOrBc, 
                                               TROPICAL_OPENFST_TYPE)));
     delete ofstAaOrBc;
+    std::cout << "ofst compile(c a t ; 3.141)...";
+    HfstTransducer* ofstHeavyCat = ofstXre.compile("c a t ;\t3.141");
+    assert(ofstHeavyCat != 0);
+    assert(ofstHeavyCat->compare(HfstTransducer(basicHeavyCat,
+                                                TROPICAL_OPENFST_TYPE)));
+    delete ofstHeavyCat;
+    std::cout << "ofst compile(c::1 a::2.3 t::4)...";
+    HfstTransducer* ofstFatCat = ofstXre.compile("c::1 a::2.3 t::4");
+    assert(ofstFatCat != 0);
+    assert(ofstFatCat->compare(HfstTransducer(basicFatCat,
+                                                TROPICAL_OPENFST_TYPE)));
+    delete ofstFatCat;
+    std::cout << "ofst compile(c::1 a::2.3 t::4 ; 3.141)...";
+    HfstTransducer* ofstCapitalistSwine = ofstXre.compile("c::1 a::2.3 t::4 ;\t3.141");
+    assert(ofstCapitalistSwine != 0);
+#if FLOATING_POINT_MATH_BECOMES_EXACT
+    // this won't work because pushing 1 + 2.3 + 4 + 3.141 doesn't match
+    // unpushed version...
+    assert(ofstCapitalistSwine->compare(HfstTransducer(basicCapitalistSwine,
+
+                                                TROPICAL_OPENFST_TYPE)));
+#endif
+    delete ofstCapitalistSwine;
 #endif
 #if HAVE_FOMA
     std::cout << "foma compile(c a t)...";

@@ -530,6 +530,7 @@ namespace hfst
 	  	replaceWithoutContexts.remove_from_alphabet(tmpMarker);
 	  	replaceWithoutContexts.minimize();
 
+
 	  	// final negation
 	  	HfstTransducer uncondidtionalTr(identityExpanded);
 	  	uncondidtionalTr.subtract(replaceWithoutContexts).minimize();
@@ -1516,6 +1517,9 @@ namespace hfst
 	  	retval = constraintComposition(t, Constraint);
 
 
+	  	retval.remove_from_alphabet(leftMarker2);
+	  	retval.remove_from_alphabet(rightMarker2);
+
 	  	//printf("Remove B2 After composition: \n");
 	  	//retval.write_in_att_format(stdout, 1);
 
@@ -1591,7 +1595,7 @@ namespace hfst
 
 
 	  // replace up, left, right, down
-	  HfstTransducer replace(	const Rule &rule, bool optional)
+	  HfstTransducer replace( const Rule &rule, bool optional)
 	  {
 
 	  	HfstTransducer retval( bracketedReplace(rule, optional) );
@@ -1616,23 +1620,31 @@ namespace hfst
 	  // for parallel rules
 	  HfstTransducer replace(	const vector<Rule> &ruleVector, bool optional)
 	  {
+		  HfstTransducer retval;
+		  // If there is only one rule in the vector, it is not parallel
+			if ( ruleVector.size() == 1 )
+			{
+				retval = bracketedReplace( ruleVector[0], optional) ;
+			}
+			else
+			{
+				retval = parallelBracketedReplace(ruleVector, optional);
 
-	  	HfstTransducer retval( parallelBracketedReplace(ruleVector, optional) );
+			}
+			//printf("replace tr: \n");
+			//retval.write_in_att_format(stdout, 1);
 
 
-	  	//printf("replace tr: \n");
-	  	//retval.write_in_att_format(stdout, 1);
+			if ( !optional )
+			{
+				retval = mostBracketsPlusConstraint(retval);
+				retval = removeB2Constraint(retval);
+			}
 
+			retval = removeMarkers( retval );
 
-	  	if ( !optional )
-	  	{
-	  		retval = mostBracketsPlusConstraint(retval);
-	  		retval = removeB2Constraint(retval);
-	  	}
+			return retval;
 
-	  	retval = removeMarkers( retval );
-
-	  	return retval;
 	  }
 
 
@@ -1668,8 +1680,15 @@ namespace hfst
 	  HfstTransducer replace_leftmost_longest_match( const vector<Rule> &ruleVector )
 	  {
 
-	  	HfstTransducer uncondidtionalTr(parallelBracketedReplace(ruleVector, true));
-	  	//uncondidtionalTr = parallelBracketedReplace(ruleVector, true);
+		HfstTransducer uncondidtionalTr;
+		if ( ruleVector.size() == 1 )
+		{
+			uncondidtionalTr = bracketedReplace( ruleVector[0], true) ;
+		}
+		else
+		{
+			uncondidtionalTr = parallelBracketedReplace(ruleVector, true);
+		}
 
 	  	HfstTransducer retval (leftMostConstraint(uncondidtionalTr));
 	  	//retval = leftMostConstraint(uncondidtionalTr);
@@ -1715,9 +1734,16 @@ namespace hfst
 	  // right to left
 	  HfstTransducer replace_rightmost_longest_match( const vector<Rule> &ruleVector )
 	  {
+		HfstTransducer uncondidtionalTr;
+		if ( ruleVector.size() == 1 )
+		{
+			uncondidtionalTr = bracketedReplace( ruleVector[0], true) ;
+		}
+		else
+		{
+			uncondidtionalTr = parallelBracketedReplace(ruleVector, true);
+		}
 
-	  	HfstTransducer uncondidtionalTr(parallelBracketedReplace( ruleVector, true ));
-	  	//uncondidtionalTr = parallelBracketedReplace( ruleVector, true );
 
 	  	HfstTransducer retval (rightMostConstraint(uncondidtionalTr));
 	  	//retval = rightMostConstraint(uncondidtionalTr);
@@ -1757,9 +1783,16 @@ namespace hfst
 
 	  HfstTransducer replace_leftmost_shortest_match(const vector<Rule> &ruleVector )
 	  {
+		HfstTransducer uncondidtionalTr;
+		if ( ruleVector.size() == 1 )
+		{
+			uncondidtionalTr = bracketedReplace( ruleVector[0], true) ;
+		}
+		else
+		{
+			uncondidtionalTr = parallelBracketedReplace(ruleVector, true);
+		}
 
-	  	HfstTransducer uncondidtionalTr(parallelBracketedReplace(ruleVector, true));
-	  	//uncondidtionalTr = parallelBracketedReplace(ruleVector, true);
 
 	  	HfstTransducer retval (leftMostConstraint(uncondidtionalTr));
 	  	//retval = leftMostConstraint(uncondidtionalTr);
@@ -1796,8 +1829,17 @@ namespace hfst
 	  HfstTransducer replace_rightmost_shortest_match( const vector<Rule> &ruleVector )
 	  {
 
-	  	HfstTransducer uncondidtionalTr(parallelBracketedReplace(ruleVector, true));
-	  	//uncondidtionalTr = parallelBracketedReplace(ruleVector, true);
+
+		HfstTransducer uncondidtionalTr;
+		if ( ruleVector.size() == 1 )
+		{
+			uncondidtionalTr = bracketedReplace( ruleVector[0], true) ;
+		}
+		else
+		{
+			uncondidtionalTr = parallelBracketedReplace(ruleVector, true);
+		}
+
 
 	  	HfstTransducer retval (rightMostConstraint(uncondidtionalTr));
 	  	//retval = rightMostConstraint(uncondidtionalTr);
@@ -1854,6 +1896,49 @@ namespace hfst
 
 	  	return retval;
 	  }
+	  HfstTransducer mark_up_replace(	const Rule &rule,
+	 	  						const HfstTransducerPair &marks,
+	 	  						bool optional)
+	 {
+	 	  	HfstTokenizer TOK;
+	 	  	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+
+	 	  	ImplementationType type = rule.get_mapping().get_type();
+
+	 	  	HfstTransducer leftMark(marks.first);
+	 	  	HfstTransducer rightMark(marks.second);
+
+	 	  	HfstTransducer epsilonToLeftMark("@_EPSILON_SYMBOL_@", TOK, type);
+	 	  	epsilonToLeftMark.cross_product(leftMark).minimize();
+
+	 	  	//printf("epsilonToLeftMark: \n");
+	 	  	//epsilonToLeftMark.write_in_att_format(stdout, 1);
+
+
+	 	  	HfstTransducer epsilonToRightMark("@_EPSILON_SYMBOL_@", TOK, type);
+	 	  	epsilonToRightMark.cross_product(rightMark).minimize();
+
+	 	  	//printf("epsilonToRightMark: \n");
+	 	  	//epsilonToRightMark.write_in_att_format(stdout, 1);
+
+	 	  	// Mapping
+	 	  	HfstTransducer mapping(epsilonToLeftMark);
+	 	  	mapping.concatenate(rule.get_mapping()).
+	 	  			minimize().
+	 	  			concatenate(epsilonToRightMark).
+	 	  			minimize();
+
+
+	 	  	Rule newRule(mapping, rule.get_context(), rule.get_replType());
+	 	  	//printf("epsilonToRightMark: \n");
+	 	  	//epsilonToRightMark.write_in_att_format(stdout, 1);
+
+	 	  	HfstTransducer retval(replace(newRule, optional));
+
+
+	 	  	return retval;
+	 	  }
+
 
 	  // TODO:
 	  HfstTransducer mark_up_replace(	const vector<MarkUpRule> &markUpRuleVector,
