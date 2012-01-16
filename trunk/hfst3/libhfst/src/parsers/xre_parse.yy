@@ -166,6 +166,7 @@ REGEXP3: REGEXP4 { }
             $$ = $1;
             delete $3;
         }
+        | REPLACE {}
        ;
 
 REGEXP4: REGEXP5 { }
@@ -192,7 +193,7 @@ REGEXP4: REGEXP5 { }
        
        
        
-       ////////////////////////////
+////////////////////////////
 
 
 
@@ -226,25 +227,30 @@ REPLACE : PARALLEL_RULES
       }
 
        
-PARALLEL_RULES: /* empty */
-      | RULE
+PARALLEL_RULES: RULE
+         {
+            vector<Rule> * ruleVector = new vector<Rule>();
+            ruleVector->push_back($1->second);
+            
+            $$ =  new pair< ReplaceArrow, vector<Rule> > ($1->first, *ruleVector);
+            delete $1;
+         }
+         | PARALLEL_RULES COMMACOMMA RULE
+         {
+            Rule tmpRule($3->second);
+            $1->second.push_back(tmpRule);
+            $$ =  new pair< ReplaceArrow, vector<Rule> > ($3->first, $1->second);
+            delete $3;
+         }
+         ;
+   
+RULE: RULE COMMA RULE_MAPPING
       {
-         vector<Rule> * ruleVector = new vector<Rule>();
-         ruleVector->push_back($1->second);
-         
-         $$ =  new pair< ReplaceArrow, vector<Rule> > ($1->first, *ruleVector);
-         delete $1;
-      }
-      | PARALLEL_RULES COMMACOMMA RULE
-      {
-         Rule tmpRule($3->second);
-         $1->second.push_back(tmpRule);
-         $$ =  new pair< ReplaceArrow, vector<Rule> > ($3->first, $1->second);
+         xreerror("Parallel rules divided by comma not implemented");
+         $$ = $1;
          delete $3;
       }
-      ;
-   
-RULE: RULE_MAPPING
+      | RULE_MAPPING
       {
       
          //  $$ = new Rule($1->second);;
@@ -266,30 +272,43 @@ RULE: RULE_MAPPING
 
 RULE_MAPPING: REGEXP2 REPLACE_ARROW REGEXP2
       {
-         HfstTransducer tmp(*$1);
-         tmp.cross_product(*$3);
-         // $$ = & $1->cross_product(*$3);
-          $$ =  new pair< ReplaceArrow, HfstTransducer> ($2, tmp);
-          delete $3;
+          HfstTransducer mapping(*$1);
+          mapping.cross_product(*$3);
+          $$ =  new pair< ReplaceArrow, HfstTransducer> ($2, mapping);
+         // std::cerr << "Replace arrow enum \n"<< $2 << std::endl;
+          delete $1, $3;
       }
-     /* 
-      | REGEXP2 REPLACE_ARROW STRING MARKUP_MARKER REGEXP2
+     
+      | REGEXP2 REPLACE_ARROW REGEXP2 MARKUP_MARKER REGEXP2
       {
       
-          HfstTransducer tmp(*$1);
-          tmp.cross_product(*$3);
-         // $$ = & $1->cross_product(*$3);
-          $$ =  new pair< ReplaceArrow, HfstTransducer> (E_REPLACE_RIGHT_MARKUP, tmp);
-          std::cerr << "Replace arrow enum \n"<< $2 << std::endl;
-          delete $3;
+          HfstTransducerPair marks(*$3, *$5);
+          HfstTransducer mapping = create_mapping_for_mark_up_replace( *$1, marks );
           
-          
-          HfstTransducer mark_up_replace(const Rule &rule,
-                              const HfstTransducerPair &marks,
-                              bool optional);
-      
+          $$ =  new pair< ReplaceArrow, HfstTransducer> ($2, mapping);
+         delete $1, $3, $5;
       }
-      */
+       | REGEXP2 REPLACE_ARROW REGEXP2 MARKUP_MARKER
+      {
+      
+          HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
+          HfstTransducerPair marks(*$3, epsilon);
+          HfstTransducer mapping = create_mapping_for_mark_up_replace( *$1, marks );
+          
+         
+                                
+          $$ =  new pair< ReplaceArrow, HfstTransducer> ($2, mapping);
+         delete $1, $3;
+      }
+      | REGEXP2 REPLACE_ARROW MARKUP_MARKER REGEXP2
+      {
+          HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
+          HfstTransducerPair marks(epsilon, *$4);
+          HfstTransducer mapping = create_mapping_for_mark_up_replace( *$1, marks );
+          
+          $$ =  new pair< ReplaceArrow, HfstTransducer> ($2, mapping);
+         delete $1, $4;
+      }
       ;    
    
            
@@ -328,24 +347,18 @@ CONTEXT: REGEXP2 CENTER_MARKER REGEXP2
          }
       | REGEXP2 CENTER_MARKER
          {
-               
-            //hfst::internal_epsilon,
-            HfstTokenizer TOK;
-            TOK.add_multichar_symbol(hfst::internal_epsilon);
-            HfstTransducer *epsilon = new HfstTransducer(hfst::internal_epsilon, TOK, hfst::xre::format);
-               
-            $$ = new HfstTransducerPair(*$1, *epsilon);
-            delete $1;
-            delete epsilon; 
+           // std::cerr << "Mapping: \n" << *$1  << std::endl;
+            
+            HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
+            
+           // std::cerr << "Epsilon: \n" << epsilon  << std::endl;
+            $$ = new HfstTransducerPair(*$1, epsilon);
+            delete $1; 
          }
       | CENTER_MARKER REGEXP2
          {
-            //hfst::internal_epsilon,
-            HfstTokenizer TOK;
-            TOK.add_multichar_symbol(hfst::internal_epsilon);
-            HfstTransducer *epsilon = new HfstTransducer(hfst::internal_epsilon, TOK, hfst::xre::format);
-         
-            $$ = new HfstTransducerPair(*epsilon, *$2);
+            HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
+            $$ = new HfstTransducerPair(epsilon, *$2);
             delete $2; 
          }
       ;
