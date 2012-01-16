@@ -142,8 +142,9 @@ namespace hfst {
 
 	/* Used by substitute function. */
 	typedef unsigned int HfstNumber;
+	typedef std::vector<HfstNumber> HfstNumberVector;
 	typedef std::pair<HfstNumber, HfstNumber> HfstNumberPair;
-	typedef std::map<HfstNumberPair, HfstNumberPair> HfstSubstitutions_;
+	typedef std::map<HfstNumberPair, HfstNumberPair> HfstNumberPairSubstitutions;
 
       protected:
         /* @brief An iterator type that points to a state in a graph. 
@@ -907,8 +908,61 @@ namespace hfst {
 	}
 
 	/* A function that performs in-place substitutions in the graph
+	   as defined in \a substitutions.
+ 
+	   substitutions[from_number] = to_number, 
+	   if substitutions[from_number] = no_substitution, no substitution is made */
+	void substitute_(const HfstNumberVector &substitutions,
+			 unsigned int no_substitution)
+	{
+          // ----- Go through all states -----
+          for (iterator it = begin(); it != end(); it++)
+            {
+	      // Go through all transitions
+              for (unsigned int i=0; i < it->size(); i++)
+                {
+		  HfstTransition<C> &tr_it = it->operator[](i);
+
+		  HfstNumber old_inumber = tr_it.get_input_number();
+		  HfstNumber old_onumber = tr_it.get_output_number();
+		  
+		  HfstNumber new_inumber = substitutions.at(old_inumber);
+		  HfstNumber new_onumber = substitutions.at(old_onumber);
+		    
+		    // If a substitution is to be performed,
+		  if (new_inumber != no_substitution ||
+		      new_onumber != no_substitution) 
+		    {
+		      if (new_inumber != no_substitution)
+			add_symbol_to_alphabet(C::get_symbol(new_inumber));
+		      else
+			new_inumber = old_inumber;
+
+		      if (new_onumber != no_substitution)
+			add_symbol_to_alphabet(C::get_symbol(new_onumber));
+		      else
+			new_onumber = old_onumber;
+
+		      // change the current transition accordingly.
+		      HfstTransition<C> tr
+			(tr_it.get_target_state(),
+			 new_inumber,
+			 new_onumber,
+			 tr_it.get_weight(), false);
+		      
+		    it->operator[](i) = tr;
+		  }
+		  
+		} // all transitions gone through
+	      
+	    } // ----- all states gone through -----
+
+	  return;
+	}
+
+	/* A function that performs in-place substitutions in the graph
 	   as defined in \a substitutions. */
-	void substitute_(const HfstSubstitutions_ &substitutions)
+	void substitute_(const HfstNumberPairSubstitutions &substitutions)
 	{
           // ----- Go through all states -----
           for (iterator it = begin(); it != end(); it++)
@@ -922,7 +976,7 @@ namespace hfst {
 		    ( tr_it.get_input_number(),
 		      tr_it.get_output_number() );
 		  
-		  HfstSubstitutions_::const_iterator subst_it
+		  HfstNumberPairSubstitutions::const_iterator subst_it
 		    = substitutions.find(old_number_pair);
 		    
 		    // If a substitution is to be performed,
@@ -1178,6 +1232,31 @@ namespace hfst {
           return *this;
         }
 
+	/** @brief Substitute all transitions as defined in \a substitutions */
+	HfstTransitionGraph &substitute
+	  (const HfstSymbolSubstitutions &substitutions)
+	  {
+	    // how symbol numbers are substituted:
+	    // substitutions_[from_symbol] = to_symbol
+	    std::vector<unsigned int> substitutions_;
+	    // marker that means that no substitution is made
+	    unsigned int no_substitution = C::get_max_number()+substitutions.size()+1;
+	    substitutions_.resize
+	      (C::get_max_number()+1, no_substitution);
+	    for (HfstSymbolSubstitutions::const_iterator it
+		   = substitutions.begin();
+		 it != substitutions.end(); it++)
+	      {
+		HfstNumber from_symbol = get_symbol_number(it->first);
+		HfstNumber to_symbol = get_symbol_number(it->second);
+		substitutions_.at(from_symbol) = to_symbol;
+	      }
+	    
+	    substitute_(substitutions_, no_substitution);
+
+	    return *this;
+	  }
+
 	/** @brief Substitute all transitions as defined in \a substitutions.
 	    
 	    For each transition x:y, \a substitutions is searched and if 
@@ -1188,7 +1267,7 @@ namespace hfst {
 	  (const HfstSymbolPairSubstitutions &substitutions)
 	  {
 	    // Convert from symbols to numbers
-	    HfstSubstitutions_ substitutions_;
+	    HfstNumberPairSubstitutions substitutions_;
 	    for (HfstSymbolPairSubstitutions::const_iterator it 
 		   = substitutions.begin();
 		 it != substitutions.end(); it++)

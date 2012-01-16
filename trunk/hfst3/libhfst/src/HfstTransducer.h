@@ -1363,8 +1363,27 @@ t.substitute(&function);
     HfstTransducer &substitute(const StringPair &old_symbol_pair,
                                const StringPairSet &new_symbol_pair_set);
 
+    /** \brief Substitute all transition symbols as defined in \a substitutions.
+
+	Each symbol old_symbol is substituted with symbol new_symbol, iff 
+	substitutions.find(old_symbol) == new_symbol != substitutions.end(). 
+	Otherwise, old_symbol remains the same.
+
+	This function performs all substitutions at the same time, so it is
+	more efficient than calling substitute separately for each substitution.
+     */
     HfstTransducer &substitute(const HfstSymbolSubstitutions &substitutions);
 
+    /** \brief Substitute all transition symbol pairs as defined in \a substitutions.
+
+	Each symbol pair old_isymbol:old_osymbol is substituted with symbol pair
+	new_isymbol:new_osymbol, iff substitutions.find(old_isymbol:old_osymbol) == 
+	new_isymbol:new_osymbol != substitutions.end(). 
+	Otherwise, old_isymbol:old_osymbol remains the same.
+
+	This function performs all substitutions at the same time, so it is
+	more efficient than calling substitute separately for each substitution.
+     */
     HfstTransducer &substitute(const HfstSymbolPairSubstitutions &substitutions);
 
     /** \brief Substitute all transitions equal to \a symbol_pair 
