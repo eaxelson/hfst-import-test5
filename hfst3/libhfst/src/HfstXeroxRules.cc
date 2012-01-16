@@ -530,6 +530,7 @@ namespace hfst
 	  	replaceWithoutContexts.remove_from_alphabet(tmpMarker);
 	  	replaceWithoutContexts.minimize();
 
+	  	identityExpanded.remove_from_alphabet(tmpMarker);
 
 	  	// final negation
 	  	HfstTransducer uncondidtionalTr(identityExpanded);
@@ -1584,8 +1585,77 @@ namespace hfst
 	  	return retval;
 
 	  }
+		//---------------------------------
+		//	INTERFACE HELPING FUNCTIONS
+		//---------------------------------
+
+	  HfstTransducer create_mapping_for_mark_up_replace( const HfstTransducer &leftMapping,
+														  const StringPair &marks )
+	  {
+		HfstTokenizer TOK;
+		TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+
+		ImplementationType type = leftMapping.get_type();
+
+		HfstTransducer leftMark(marks.first, TOK, type);
+		HfstTransducer rightMark(marks.second, TOK, type);
+
+		HfstTransducer epsilonToLeftMark("@_EPSILON_SYMBOL_@", TOK, type);
+		epsilonToLeftMark.cross_product(leftMark).minimize();
+
+		//printf("epsilonToLeftMark: \n");
+		//epsilonToLeftMark.write_in_att_format(stdout, 1);
 
 
+		HfstTransducer epsilonToRightMark("@_EPSILON_SYMBOL_@", TOK, type);
+		epsilonToRightMark.cross_product(rightMark).minimize();
+
+		//printf("epsilonToRightMark: \n");
+		//epsilonToRightMark.write_in_att_format(stdout, 1);
+
+		// Mapping
+		HfstTransducer retval(epsilonToLeftMark);
+		retval.concatenate(leftMapping).
+				minimize().
+				concatenate(epsilonToRightMark).
+				minimize();
+
+		return retval;
+
+	  }
+	  HfstTransducer create_mapping_for_mark_up_replace( const HfstTransducer &leftMapping,
+															  const HfstTransducerPair &marks )
+	  {
+		HfstTokenizer TOK;
+		TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+
+		ImplementationType type = leftMapping.get_type();
+
+		HfstTransducer leftMark(marks.first);
+		HfstTransducer rightMark(marks.second);
+
+		HfstTransducer epsilonToLeftMark("@_EPSILON_SYMBOL_@", TOK, type);
+		epsilonToLeftMark.cross_product(leftMark).minimize();
+
+		//printf("epsilonToLeftMark: \n");
+		//epsilonToLeftMark.write_in_att_format(stdout, 1);
+
+
+		HfstTransducer epsilonToRightMark("@_EPSILON_SYMBOL_@", TOK, type);
+		epsilonToRightMark.cross_product(rightMark).minimize();
+
+		//printf("epsilonToRightMark: \n");
+		//epsilonToRightMark.write_in_att_format(stdout, 1);
+
+		// Mapping
+		HfstTransducer retval(epsilonToLeftMark);
+		retval.concatenate(leftMapping).
+				minimize().
+				concatenate(epsilonToRightMark).
+				minimize();
+		return retval;
+
+	  }
 
 	  //---------------------------------
 	  //	REPLACE FUNCTIONS - INTERFACE
@@ -1854,39 +1924,14 @@ namespace hfst
 	  	return retval;
 	  }
 
+
+
 	  HfstTransducer mark_up_replace(	const Rule &rule,
 	  						const StringPair &marks,
 	  						bool optional)
 	  {
-	  	HfstTokenizer TOK;
-	  	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
-	  	ImplementationType type = rule.get_mapping().get_type();
-
-	  	HfstTransducer leftMark(marks.first, TOK, type);
-	  	HfstTransducer rightMark(marks.second, TOK, type);
-
-	  	HfstTransducer epsilonToLeftMark("@_EPSILON_SYMBOL_@", TOK, type);
-	  	epsilonToLeftMark.cross_product(leftMark).minimize();
-
-	  	//printf("epsilonToLeftMark: \n");
-	  	//epsilonToLeftMark.write_in_att_format(stdout, 1);
-
-
-	  	HfstTransducer epsilonToRightMark("@_EPSILON_SYMBOL_@", TOK, type);
-	  	epsilonToRightMark.cross_product(rightMark).minimize();
-
-	  	//printf("epsilonToRightMark: \n");
-	  	//epsilonToRightMark.write_in_att_format(stdout, 1);
-
-	  	// Mapping
-	  	HfstTransducer mapping(epsilonToLeftMark);
-	  	mapping.concatenate(rule.get_mapping()).
-	  			minimize().
-	  			concatenate(epsilonToRightMark).
-	  			minimize();
-
-
+		HfstTransducer mapping = create_mapping_for_mark_up_replace(rule.get_mapping(), marks);
 	  	Rule newRule(mapping, rule.get_context(), rule.get_replType());
 	  	//printf("epsilonToRightMark: \n");
 	  	//epsilonToRightMark.write_in_att_format(stdout, 1);
@@ -1900,34 +1945,7 @@ namespace hfst
 	 	  						const HfstTransducerPair &marks,
 	 	  						bool optional)
 	 {
-	 	  	HfstTokenizer TOK;
-	 	  	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
-
-	 	  	ImplementationType type = rule.get_mapping().get_type();
-
-	 	  	HfstTransducer leftMark(marks.first);
-	 	  	HfstTransducer rightMark(marks.second);
-
-	 	  	HfstTransducer epsilonToLeftMark("@_EPSILON_SYMBOL_@", TOK, type);
-	 	  	epsilonToLeftMark.cross_product(leftMark).minimize();
-
-	 	  	//printf("epsilonToLeftMark: \n");
-	 	  	//epsilonToLeftMark.write_in_att_format(stdout, 1);
-
-
-	 	  	HfstTransducer epsilonToRightMark("@_EPSILON_SYMBOL_@", TOK, type);
-	 	  	epsilonToRightMark.cross_product(rightMark).minimize();
-
-	 	  	//printf("epsilonToRightMark: \n");
-	 	  	//epsilonToRightMark.write_in_att_format(stdout, 1);
-
-	 	  	// Mapping
-	 	  	HfstTransducer mapping(epsilonToLeftMark);
-	 	  	mapping.concatenate(rule.get_mapping()).
-	 	  			minimize().
-	 	  			concatenate(epsilonToRightMark).
-	 	  			minimize();
-
+		  HfstTransducer mapping = create_mapping_for_mark_up_replace(rule.get_mapping(), marks);
 
 	 	  	Rule newRule(mapping, rule.get_context(), rule.get_replType());
 	 	  	//printf("epsilonToRightMark: \n");
@@ -1996,10 +2014,7 @@ namespace hfst
 	  {
 	  	HfstTransducer retval(bracketedReplace(rule, optional));
 
-
 	  	//retval = bracketedReplace(rule, optional);
-
-
 
 	  	//printf("bracketedReplace: \n");
 	  	//retval.write_in_att_format(stdout, 1);
@@ -2040,8 +2055,6 @@ namespace hfst
 
 
 	  	//retval = parallelBracketedReplace(ruleVector, optional);
-
-
 
 	  	//printf("bracketedReplace: \n");
 	  	//retval.write_in_att_format(stdout, 1);

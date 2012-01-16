@@ -166,6 +166,15 @@ namespace hfst
 
 
 		//---------------------------------
+		//	INTERFACE HELPING FUNCTIONS
+		//---------------------------------
+
+		HfstTransducer create_mapping_for_mark_up_replace( const HfstTransducer &leftMapping,
+					  	  	  	  	  	  	  	  	  	  	  	  const StringPair &marks );
+
+		HfstTransducer create_mapping_for_mark_up_replace( const HfstTransducer &leftMapping,
+			 			  	  	  	  	  	  	  	  	  	  	  	  const HfstTransducerPair &marks );
+		//---------------------------------
 		//	REPLACE FUNCTIONS - INTERFACE
 		//---------------------------------
 
