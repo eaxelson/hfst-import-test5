@@ -145,10 +145,10 @@ same file. Now the file can be used by HFST:
       Extract all files with the command
 
 \verbatim
-tar -xzvf hfst-3.0.tar.gz
+tar -xzvf hfst-3.X.X.tar.gz
 \endverbatim
 
-      move to directory hfst-3.0 and run the commands
+      move to directory hfst-3.X.X and run the commands
 
 \verbatim
 autoreconf -i && ./configure && make && make install
@@ -890,7 +890,7 @@ The examples given in this documentation use
 
 \section what_is_new What is new in version 3.0
 
-   - A third transducer library, <a href="http://foma.sourceforge.net/">foma</a>, is included
+   - A third transducer library, <a href="http://code.google.com/p/foma/">foma</a>, is included
 
    - <a href="AddingYourImplementation.html">Adding</a> your own implementation under the HFST interface is easy
 

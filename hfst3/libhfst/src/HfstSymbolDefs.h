@@ -75,11 +75,15 @@ namespace hfst
   typedef std::set<StringPair> StringPairSet;
 
   /** \brief A map of substitutions used when performing multiple
-      symbol-to-symbol substitutions. */
+      symbol-to-symbol substitutions. 
+
+      @see HfstTransducer::substitute(const HfstSymbolSubstitutions&) */
   typedef std::map<String, String> HfstSymbolSubstitutions;
 
   /** \brief A map of substitutions used when performing multiple
-      symbol pair-to-symbol pair substitutions. */
+      symbol pair-to-symbol pair substitutions. 
+
+      @see HfstTransducer::substitute(const HfstSymbolPairSubstitutions&) */
   typedef std::map<StringPair, StringPair> HfstSymbolPairSubstitutions;
   
 /* The internal representations */
