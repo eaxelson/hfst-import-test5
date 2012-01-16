@@ -782,8 +782,29 @@ int main(int argc, char **argv)
     tok.add_multichar_symbol("<ID>");
     HfstTransducer t5_("<ID><ID><ID>", "<ID><ID><ID>s", tok, types[i]);
     assert(t5.compare(t5_));
-      }
 
+    /* Perform multiple string-to-string substitutions. */
+    HfstTransducer t6(t);
+    HfstSymbolSubstitutions subs_symbol;
+    subs_symbol["c"] = "C";
+    subs_symbol["a"] = "A";
+    subs_symbol["t"] = "T";
+    subs_symbol["s"] = "S";
+    t6.substitute(subs_symbol);
+    HfstTransducer t6_("CAT", "CATS", tok, types[i]);
+    assert(t6.compare(t6_));
+
+    /* Perform multiple string pair-to-string pair substitutions. */
+    HfstTransducer t7(t);
+    HfstSymbolPairSubstitutions subs_pair;
+    subs_pair[StringPair("a", "a")] = StringPair("A", "a");
+    subs_pair[StringPair("s", "s")] = StringPair("S", "S");
+    subs_pair[StringPair("t", "t")] = StringPair("t", "T");
+    t7.substitute(subs_pair);
+    HfstTransducer t7_("cAt", "caTs", tok, types[i]);
+    assert(t7.compare(t7_));
+
+      }
 
       {
     verbose_print("alphabets", types[i]);

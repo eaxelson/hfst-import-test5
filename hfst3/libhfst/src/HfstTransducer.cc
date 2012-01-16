@@ -2189,22 +2189,18 @@ HfstTransducer &HfstTransducer::substitute
 {
   hfst::implementations::HfstBasicTransducer * net 
     = convert_to_basic_transducer();
-  // TODO: optimize when HfstTropicalTransducer supports this function
-  for (HfstSymbolSubstitutions::const_iterator it =
-	 substitutions.begin(); it != substitutions.end(); it++)
-    {
+
+  try  {
+    net->substitute(substitutions);
+  } 
+  catch (const FunctionNotImplementedException & e) {
+    for (HfstSymbolSubstitutions::const_iterator it =
+	   substitutions.begin(); it != substitutions.end(); it++) {
       net->substitute(it->first, it->second, true, true);
     }
+  }
+  
   return convert_to_hfst_transducer(net);  
-
-  /*
-  hfst::implementations::HfstBasicTransducer * net 
-    = convert_to_basic_transducer();
-  net->substitute(substitutions);
-  return convert_to_hfst_transducer(net);  
-  return *this;
-  */
-
 }
 
 HfstTransducer &HfstTransducer::substitute
