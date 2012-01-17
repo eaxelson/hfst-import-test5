@@ -1,3 +1,251 @@
+2012-01-16 15:37  eaxelson
+
+	* api_documentation.dox, libhfst/src/HfstSymbolDefs.h: Added some
+	  documentation for HfstSymbolSubstitutions and
+	  HfstSymbolPairSubstitutions. Also updated the doxygen
+	  documentation.
+
+2012-01-16 14:03  eaxelson
+
+	* libhfst/src/HfstTransducer.cc,
+	  test/libhfst/test_transducer_functions.cc: Now HfstTransducer
+	  supports making several substitutions at the same time. Also made
+	  a test for these functions. Adding documentation soon.
+
+2012-01-16 12:57  eaxelson
+
+	* libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h: Tentatively
+	  added a symbol-to-symbol substitution function to
+	  HfstTransitionGraph.
+
+2012-01-16 12:15  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRules.h,
+	  libhfst/src/parsers/xre_parse.yy: newer version of the rules
+	  parser
+
+2012-01-12 03:11  mie
+
+	* libhfst/src/parsers/xre_parse.yy: weighted expressions
+
+2012-01-11 17:58  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRules.h,
+	  libhfst/src/parsers/xre_lex.ll, libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.h,
+	  test/tools/fsmbook-examples/NumbersToNumerals/test.sh,
+	  tools/src/hfst-regexp2fst.cc: added some xerox rules to
+	  xre_parser (hfst-regexp2fst). Also, slightly modified xerox rules
+
+2012-01-11 08:43  mie
+
+	* libhfst/src/parsers/xre_parse.yy: Remove some debugging printout
+
+2012-01-04 17:14  mie
+
+	* libhfst/src/parsers, libhfst/src/parsers/Makefile.am,
+	  libhfst/src/parsers/XreCompiler.cc,
+	  libhfst/src/parsers/lexc-utils.cc,
+	  libhfst/src/parsers/xre_lex.ll, libhfst/src/parsers/xre_parse.yy:
+	  Merge xre precedence fixes
+
+2012-01-04 16:21  eaxelson
+
+	* libhfst/src/implementations/ConvertFomaTransducer.cc,
+	  tools/src/hfst-substitute.cc: Now const_cast<char*> is used
+	  instead of strdup/free in
+	  ConvertFomaTransducer::hfst_basic_transducer_to_foma. Also
+	  modified hfst-substitute so that the alphabet is not pruned after
+	  substitution.
+
+2012-01-04 14:49  eaxelson
+
+	* tools/src/hfst-substitute.cc: hfst-substitute now implements the
+	  option --in-order.
+
+2012-01-04 11:55  mpsilfve
+
+	* tools/src/hfst-twolc/src/alphabet_src/Alphabet.cc,
+	  tools/src/hfst-twolc/src/alphabet_src/Alphabet.h: Fixed bug,
+	  which prevented compilation of grammars with both set
+	  constructions and : or ?.
+
+2012-01-04 11:54  mpsilfve
+
+	* tools/src/hfst-twolc/test/test60,
+	  tools/src/hfst-twolc/test/test60.txt_fst: Unit test for grammars
+	  which have both set constructions and : or ?
+
+2012-01-03 13:45  eaxelson
+
+	* libhfst/src/HfstTransducer.cc,
+	  libhfst/src/implementations/FomaTransducer.cc:
+	  FomaTransducer::repeat_n now takes a copy of its argument
+	  transducer to avoid double delete caused by new foma interface.
+	  Fixes bug 3468373.
+
+2011-12-30 19:51  mie
+
+	* README: OpenFst linking bug is fixed in 1.2.10; also gqipped some
+	  paras
+
+2011-12-30 18:28  mie
+
+	* configure.ac: Warn end users about disabled "important" tools
+
+2011-12-30 15:17  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRules.h,
+	  libhfst/src/Makefile.am: Xerox rules added to the library
+
+2011-12-25 02:03  spectre360
+
+	* tools/src/hfst-proc/alphabet.cc: more alphabet hacks
+
+2011-12-24 23:25  spectre360
+
+	* tools/src/hfst-proc/alphabet.cc: more alphabet hacks
+
+2011-12-22 17:23  eaxelson
+
+	* libhfst/src/HfstSymbolDefs.h, libhfst/src/HfstTransducer.cc,
+	  libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/hfst-substitute.cc: Added new substitution functions.
+	  Now it is possible to perform many string pair-to-string pair
+	  mappings at the same time on a transducer. Also tentatively added
+	  a functions that performs many string-to-string mappings at the
+	  same time.
+
+2011-12-22 12:00  sdrobac
+
+	* test/tools/fsmbook-examples/EinsteinsPuzzle/EinsteinsPuzzle.hfst.script:
+	  Now the test EinsteinsPuzzle uses local tools instead of the
+	  installed ones.
+
+2011-12-22 11:56  eaxelson
+
+	* test/tools/fsmbook-examples/FinnishNumerals/FinnishNumerals.hfst.script:
+	  Now the test FinnishNumerals uses local tools, no the installed
+	  ones.
+
+2011-12-21 17:12  eaxelson
+
+	* libhfst/src/implementations/ConvertTropicalWeightTransducer.cc:
+	  Conversions between HfstTropicalTransducer and
+	  HfstBasicTransducer also made more modular.
+
+2011-12-21 16:32  eaxelson
+
+	* libhfst/src/implementations/ConvertFomaTransducer.cc,
+	  libhfst/src/implementations/ConvertSfstTransducer.cc,
+	  libhfst/src/implementations/ConvertTransducerFormat.h,
+	  libhfst/src/implementations/SfstTransducer.cc: Made conversion
+	  functions more modular by moving code to subroutines. Also
+	  removed commented code from files.
+
+2011-12-21 14:30  eaxelson
+
+	* libhfst/src/implementations/ConvertSfstTransducer.cc: Now
+	  conversions between transducer formats openfst-tropical, sfst and
+	  foma are carried out using numbers always when possible.
+
+2011-12-20 23:45  eaxelson
+
+	* libhfst/src/implementations/ConvertSfstTransducer.cc,
+	  libhfst/src/implementations/FomaTransducer.cc,
+	  libhfst/src/implementations/FomaTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  libhfst/src/implementations/HfstTropicalTransducerTransitionData.h,
+	  libhfst/src/implementations/SfstTransducer.cc,
+	  libhfst/src/implementations/SfstTransducer.h: Tentatively added
+	  functions for fast conversion between transducer formats.
+
+2011-12-20 22:39  eaxelson
+
+	* libhfst/src/implementations/ConvertFomaTransducer.cc,
+	  libhfst/src/implementations/FomaTransducer.cc: Now also
+	  conversion from foma to basic transducer uses numbers. Some
+	  commented code also removed.
+
+2011-12-20 17:36  eaxelson
+
+	* libhfst/src/implementations/ConvertFomaTransducer.cc,
+	  libhfst/src/implementations/ConvertSfstTransducer.cc,
+	  libhfst/src/implementations/ConvertTransducerFormat.h,
+	  libhfst/src/implementations/FomaTransducer.cc,
+	  libhfst/src/implementations/FomaTransducer.h,
+	  libhfst/src/implementations/SfstTransducer.cc,
+	  libhfst/src/implementations/SfstTransducer.h,
+	  libhfst/src/implementations/TropicalWeightTransducer.cc: Some
+	  conversion functions are not carreid out using numbers directly.
+
+2011-12-20 15:27  eaxelson
+
+	* libhfst/src/HfstTransducer.cc,
+	  libhfst/src/implementations/ConvertFomaTransducer.cc,
+	  libhfst/src/implementations/ConvertLogWeightTransducer.cc,
+	  libhfst/src/implementations/ConvertSfstTransducer.cc,
+	  libhfst/src/implementations/ConvertTransducerFormat.h,
+	  libhfst/src/implementations/HfstTransition.h,
+	  libhfst/src/implementations/HfstTropicalTransducerTransitionData.cc,
+	  libhfst/src/implementations/HfstTropicalTransducerTransitionData.h:
+	  Renamed HfstTropicalTransitionData variable
+	  'number2symbol_vector' to 'number2symbol_map' to avoid a strange
+	  linking error. Also removed transducer conversion functions that
+	  are not used.
+
+2011-12-19 23:54  eaxelson
+
+	* libhfst/src/implementations/ConvertTropicalWeightTransducer.cc,
+	  libhfst/src/implementations/HfstTransition.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  libhfst/src/implementations/HfstTropicalTransducerTransitionData.cc,
+	  libhfst/src/implementations/HfstTropicalTransducerTransitionData.h:
+	  Removed some extra code.
+
+2011-12-19 18:17  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/hfst-substitute.cc: Tentatively added alphabet pruning
+	  to substitute functions, it still has to be removed from
+	  hfst-substitute.
+
+2011-12-19 15:24  eaxelson
+
+	* libhfst/src/implementations/ConvertTropicalWeightTransducer.cc,
+	  libhfst/src/implementations/HfstTransition.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  libhfst/src/implementations/HfstTropicalTransducerTransitionData.h:
+	  Conversion between HfstBasicTransducer and
+	  TropicalOpenfstTransducer is now more efficient as it is done
+	  using numbers directly.
+
+2011-12-16 17:22  eaxelson
+
+	* libhfst/src/HfstSymbolDefs.h,
+	  libhfst/src/implementations/ConvertTropicalWeightTransducer.cc,
+	  libhfst/src/implementations/HfstTransition.h,
+	  libhfst/src/implementations/HfstTropicalTransducerTransitionData.h,
+	  libhfst/src/implementations/TropicalWeightTransducer.cc,
+	  libhfst/src/implementations/TropicalWeightTransducer.h: Changed
+	  conversion from HfstTropicalTransducer to HfstTransitionGraph so
+	  that it uses transition numbers directly. This improves the
+	  performance greatly.
+
+2011-12-14 13:36  mpsilfve
+
+	* tools/src/hfst-pair-test.cc: Fixed bug which made tests always
+	  pass.
+
+2011-12-09 12:10  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am, test/tools/fsmbook-examples/Makefile.am:
+	  Ready for HFST release 3.3.3. Also disabled DateParser test
+	  because it relies on hfst-calculate.
+
 2011-12-08 17:52  mpsilfve
 
 	* tools/src/hfst-twolc/src/rule_src/Rule.cc: Fixed speces so that

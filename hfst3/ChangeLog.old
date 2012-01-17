@@ -1,3 +1,143 @@
+2011-12-08 17:52  mpsilfve
+
+	* tools/src/hfst-twolc/src/rule_src/Rule.cc: Fixed speces so that
+	  the space symbol is used in the transition instead of @_SPACE_@.
+
+2011-12-08 13:18  hardwick
+
+	* libhfst/src/implementations/FomaTransducer.cc: Skip copying the
+	  foma transducer name to the net, leaving an empty string.
+	  Rationale: foma has a limiting 40 char ceiling on names, and we
+	  might as well
+	  use HFST3-style names for everything.
+
+2011-12-08 12:37  eaxelson
+
+	* tools/src/hfst-txt2fst.cc: Removed hard tab indentation from
+	  hfst-txt2fst.cc
+
+2011-12-08 12:34  eaxelson
+
+	* tools/src/hfst-lexc.cc: Replaced tabs with spaces in hfst-lexc.cc
+
+2011-12-08 12:25  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h: Fixed
+	  HfstTransitionGraph:swap_states so that the variable new_target
+	  is no longer used uninitialized.
+
+2011-12-08 12:10  eaxelson
+
+	* test/tools/fsmbook-examples/DateParser/DateParser.hfst.script:
+	  DateParser test fixed, the path os hfst-calculate was not
+	  correct.
+
+2011-12-07 12:00  mpsilfve
+
+	* libhfst/src/implementations/compose_intersect/ComposeIntersectLexicon.cc:
+	  Fixed ComposeIntersectLexicon test
+
+2011-12-07 11:45  mpsilfve
+
+	* tools/src/hfst-twolc/src/htwolcpre2.yy,
+	  tools/src/hfst-twolc/src/htwolcpre3.yy,
+	  tools/src/hfst-twolc/src/rule_src/Rule.cc,
+	  tools/src/hfst-twolc/src/scanner1.ll: Now the escape '% ' should
+	  work everywhere.
+
+2011-12-07 11:43  mpsilfve
+
+	* tools/src/hfst-twolc/test/Makefile.am,
+	  tools/src/hfst-twolc/test/test59,
+	  tools/src/hfst-twolc/test/test59.txt_fst: Added test for rules
+	  with space symbols.
+
+2011-12-07 11:24  hardwick
+
+	* libhfst/src/implementations/ConvertOlTransducer.cc,
+	  libhfst/src/implementations/Makefile.am: Added a conversion test
+	  and made the LIBHFST_TST actually run, causing
+	  test failure for the time being
+
+2011-12-02 13:24  mpsilfve
+
+	* libhfst/src/implementations/HfstTropicalTransducerTransitionData.cc,
+	  libhfst/src/implementations/HfstTropicalTransducerTransitionData.h:
+	  Optimized HfstTropicalTransducerTransitionData::get_symbol(...)
+
+2011-11-30 09:21  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.h: Call
+	  sizeof() on type names, not variable names due to OSX compilation
+	  thinking the variables are non-static uninitialized fields.
+	  Fixes #3445592.
+
+2011-11-29 15:53  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.h: Fixed
+	  (serious) typo
+
+2011-11-29 15:23  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.h:
+	  (re-)added a char* constructor for tables, made it the default to
+	  only read
+	  disk once per table
+
+2011-11-29 09:40  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc:
+	  Eliminate use of non-portable strdupa(const char *).
+	  Fixes #3444950.
+
+2011-11-28 13:28  hardwick
+
+	* tools/src/hfst-lookup.cc: Removed some garbage
+
+2011-11-28 13:24  hardwick
+
+	* tools/src/hfst-lookup.cc: Removed some of the unnecessary work
+	  done in tokenizing for ol-lookup
+
+2011-11-28 13:23  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h: Fixed
+	  a name shadowing bug
+
+2011-11-28 12:56  hardwick
+
+	* libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h: Added
+	  a lookup_fd(char *), reduced code duplication in interface
+	  functions
+
+2011-11-23 17:42  hardwick
+
+	* README: Added note about current OpenFst / Ubuntu problems.
+
+2011-11-17 17:09  mpsilfve
+
+	* tools/src/hfst-twolc/src/htwolcpre3.yy: Fixed error message.
+
+2011-11-17 16:31  mpsilfve
+
+	* tools/src/hfst-twolc/src/alphabet_src/Alphabet.cc,
+	  tools/src/hfst-twolc/src/alphabet_src/Alphabet.h,
+	  tools/src/hfst-twolc/src/htwolcpre3.yy,
+	  tools/src/hfst-twolc/src/rule_src/OtherSymbolTransducer.cc,
+	  tools/src/hfst-twolc/src/rule_src/OtherSymbolTransducer.h,
+	  tools/src/hfst-twolc/src/rule_src/Rule.cc: Now terminating
+	  compilation, if an empty pair is found in a defintion, rule
+	  center or rule context.
+
+2011-11-16 11:46  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am,
+	  test/tools/fsmbook-examples/numbers-to-numerals-test.sh: Ready
+	  for release 3.3.2
+
 2011-11-16 09:47  mpsilfve
 
 	* libhfst/src/implementations/ConvertTropicalWeightTransducer.cc:
