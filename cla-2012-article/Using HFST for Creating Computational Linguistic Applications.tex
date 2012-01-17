@@ -68,10 +68,85 @@ lookup.
 \section{Building Morphologies}
 
 \subsection{Introduction}
-% Miikka
 
-\subsection{Parallel Rules with Negation and Regular Expression}
-% Miikka
+One of the earliest and most important goals of the HFST project has
+been to provide open-source utilities for compiling full-fledged
+morphological analyzer, which can be used in constructing spellers,
+taggers and other language technological utilities of good
+quality. The Xerox toolkit \cite{beesley/2003} is among the most
+widely used frameworks for constructing morphological utilities. The
+toolkit is used to compile linguistic description into morphological
+analyzers. More specifically, Xerox tools include the finite-state
+lexicon compiler lexc, the two-level rule compiler twolc and the
+cascading replace rule compiler xfst. HFST includes the tools
+hfst-lexc, hfst-twolc and hfst-xfst, which provide full backward
+compatibility with Xerox tools and augment their functionality.
+
+An lexicon-file for the lexicon compiler hfst-lexc the morphotax of a
+language using sub-lexicons which are lists of morphs. Later a rule
+component is used to realize phonological changes which occur at the
+boundaries of morphs.
+
+The rule compilers hfst-xfst and hfst-twolc provide partially the same
+functionality. Both are used to realize morphophonological variations
+on an hfst-lexc lexicon. The difference between the tools is that
+hfst-xfst rules are applied in succession gradually altering the
+lexicon and hfst-twolc rules are applied as parallel constraints,
+which limit the realizations of morphophonemes used in the hfst-lexc
+lexicon..
+
+\subsection{Parallel Rules with Negative Contexts and Regular Expression Centers}
+
+The rule compiler hfst-twolc provides backward compatibility with the
+Xerox tool twolc, but it augments twolc functionality by providing two
+new types of rules. In hfst-twolc rules can have centers which are
+regular expressions and the can have negative contexts.
+
+\begin{figure}
+\begin{verbatim}
+"Rule with negative context"
+x:y <=> a b _     ;
+        except
+            _ ( c ) d ;
+
+"Rule without negative context"
+x:y <=> a b _ [ ? - [ c | d ] | c [ ? - d ] | .#. ] ;
+\end{verbatim}
+\caption{Negative context rule and corresponding traditional two-level
+  rule}\label{negative-context-rule}
+\end{figure}
+
+In traditional two-level rules it can be very difficult to express
+that a certain alternation should not occur in a given
+context. Sometimes conflict resolution of two-level rules handles
+this, but conflict resolution works only if rules can be ordered into
+chains of sub cases. Often this can be difficult to accomplish,
+especially for grammar writers who are not especially well acquainted
+to writing regular expressions.
+
+Using an extension to the xerox two-level rule syntax in hfst-twolc,
+it is possible to formulate rules with negative context, i.e. context
+which prohibit the triggering of the
+rule. Figure~\ref{negative-context-rule} shows a schematic example of
+a negative context rule and a traditional xerox style rule, which has
+the same effect as the rule with the negative context.
+
+\begin{figure}
+\begin{verbatim}
+"ZZ normally realized as xy except between two a:s"
+<[ Z:x Z:y ]> <==> _      ;
+                   except
+                   a _ a  ;
+
+"Swap x and y between two a:s"
+<[ Z:y Z:x ]> <==> a _ a ; 
+\end{verbatim}
+\caption{Rule with regular expression center and two auxiliary rules which}
+\end{figure}
+
+Regular expression centers allow rules to govern longer segments than
+single symbols. This can be useful when describing languages, with
+complex allomorphy.
 
 \subsection{Cascaded Rules: Explanations and Examples}
 % Senka
@@ -154,11 +229,46 @@ growth of couple of seconds can be noticed.
 \subsection{Introduction}
 % Miikka
 
+\begin{itemize}
+\item Possible to construct HMM type taggers using different
+  combinations of tags and wordforms~\cite{Silfverberg/2010/IceTal}
+  and \cite{Silfverberg/2011}.
+\item Accuracy comparable with TnT~\cite{Brants:2000}.
+\item There are some new optimizations to the lexical model and
+  sequence model. Especially we implement a version of the Viterbi
+  algorithm for weighted treansducers.
+\end{itemize}
+
+
 \subsection{Including Morphologies without Harmonizing Tagsets}
 % Miikka
 
+\begin{itemize}
+\item Tnt-type guesser work poorly for agglutinative languages.
+\item Paradigm-based guessers for agglutinative languages using
+  morphological analyzers work better.
+\item Differing tag sets are a problem. It is sometimes difficult to
+  find good translations between tag sets because the underlying
+  linguistic description can differ a lot.
+\item HFST provides a way to use a morphological analyzer to construct
+  a paradigm based guesser, without harmonizing tag sets.
+\item Words are transformed to their corresponding analysis sets and
+  the analysis sets are associated with tags and corresponding
+  conditional probabilities.
+\item When a previously unseen word is encountered while tagging, it
+  is transformed into its set of analyses and the tag probabilities
+  for that set are used.
+\item For words unknown to the morphological analyzer or for words
+  whose analysis set does not figure in the training data, a
+  suffix-based guesser is used.
+\end{itemize}
+
 \subsection{Optimization}
 % Miikka
+\begin{itemize}
+\item Viterbi-style optimization.
+\item Beam-search for Finnish, where the tag set is huge.
+\end{itemize}
 
 \section{Applying Transducers}
 
@@ -190,7 +300,7 @@ growth of couple of seconds can be noticed.
 
 \bibliographystyle{splncs03}
 
-%\bibliography{hfst2012}
+\bibliography{hfst2012}
 
 \end{document}
 % vim: set spell
