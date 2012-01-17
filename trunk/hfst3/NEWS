@@ -6,6 +6,18 @@ This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
 
+Noteworthy changes in 3.3.4
+---------------------------
+
+* Substitution functions optimized and new substitution functions added that
+  perform multiple substitutions at the same time.
+
+* The tool hfst-substitute now implements the option --in-order.
+
+* Updated to OpenFst version 1.2.10.
+
+* Conversions between transducer formats are more efficient.
+
 Noteworthy changes in 3.3.3
 ---------------------------
 

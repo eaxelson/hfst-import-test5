@@ -3983,7 +3983,7 @@ int main(int argc, char * argv[])
 	continue;
 
 	// One case that fails with FOMA_TYPE
-	HfstTransducer a("a", FOMA_TYPE);
+	HfstTransducer a("a", types[i]);
 	a.repeat_n(2);
 
     	// Test alphabet after substitute
