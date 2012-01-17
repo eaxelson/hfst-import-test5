@@ -151,7 +151,45 @@ complex allomorphy.
 \subsection{Cascaded Rules: Explanations and Examples}
 % Senka
 
-\subsection{Morphosyntax and Morphological Formulae}
+\subsection{Morphosyntax and Morphological Formul\ae}
+
+Morphosyntax is the component dealing with morphological combinatorics in
+language descriptions. This concerns word-formation processes, such as
+affixation, compounding and more. There are numerous more or less widely
+accepted formalisms for describing the morphosyntax in natural language
+processing applications, such as
+hunspell\footnote{\url{http://hunspell.sf.net}} (and its older *spell
+relatives), apertium lttoolbox\footnote{\url{http://apertium.sf.net}} or Xerox
+lexc\cite{beesley/2003}. The HFST tool set contains parsers and compilers to
+read descriptions in those languages and compile a finite-state automaton for
+rest of the HFST tools to process out from them
+\cite{pirinen/il/2010,pirinene/2009/sfcm,pirinen/2012/lrec}. In this sections
+we draw shortly summarise the common features of the algorithms used to compile
+all the descriptions and generalise the formula over morphosyntax for
+finite-state automata, described fully in terms of standard finite-state
+operations.
+
+It is true for all the contemporary morphosyntax implementations that they more
+or less draw from item-and-arrangement style combinatorics over sets of
+morphs or morphemes. In general form such a system can be described as a
+disjunction of morphs repeated infinitely over each other, combined with
+morphosyntactic filter describing precisely the right combinations of morphemes.
+Both morphemes and the filters can be trivially described in finite-state form.
+
+As an example, starting from a morpheme, that is a path or a language, e.g.  a
+morpheme \emph{dog} would be automaton encoding a path \texttt{d o g}, and
+\emph{cat} path \texttt{c a t}, similarly a plural marker \emph{-s} of English
+would be a path \texttt{s} whereas singular marker \emph{$\emptyset$}
+\texttt{$\varepsilon$} (marking empty morph). For morphosyntax of this language
+\emph{dog} and \emph{cat} would form a set called e.g. \emph{Nouns} and
+\emph{$\emptyset$} and \emph{s} a set of called \emph{Number}. A valid
+morphosyntax here would be Start $\rightarrow$ Nouns $\rightarrow$ Number
+$\rightarrow$ End. Now, that morphosyntax can be compiled as finite-state
+automaton such that we replace $\rightarrow$ in the former description with the
+morphs. Then we decorate the actual morphs with markers for e.g. starts of the
+sets named \emph{Nouns} and \emph{Number}. The final language is now simply
+composition of that morphosyntax over the kleene plus closure of morpheme sets.
+
 
 \subsubsection{For Lexicographers}
 % Tommi
@@ -195,7 +233,7 @@ versions are also shown.
     The times are expressed in minutes and seconds.}
   \label{tab:compilation_times_versions}
   \begin{tabular}{ c  c  c  c }
-%  \multicolumn{4}{c}{Compilation times} \\                                                                                                                                                                                                  
+%  \multicolumn{4}{c}{Compilation times} \\
 \hline
   Back-End                 & version  & Finnish  & German \\ \hline
   \multirow{2}{*}{SFST}    & 1.4.2    & 5:02     & 6:39 \\
@@ -277,14 +315,58 @@ growth of couple of seconds can be noticed.
 
 \subsection{Spellers}
 
+The task of finite-state spell-checking is well researched and documented. It
+consists mainly of two phases, identifying incorrect word forms and creating
+suggestions for corrections. For incorrect word-forms there are two types of
+mistakes, non-word spelling errors, such as writing \emph{cta} where \emph{cat}
+is meant, and real-word spelling errors, such as writing \emph{there} where
+\emph{their} is intended. The method for finding former in finite-state system
+is simply applying the dictionary to the text word by word, any unrecognised
+string not belonging to the language of the dictionary automaton is a non-word
+spelling error. For real-word errors a statistical n-gram model or syntactic
+parser is typically required\cite{}. To correct a spelling error in finite-state
+system, a two-tape automaton modeling the typing errors should be applied to
+the misspelt string to get set of potential corrections\cite{pirinen/lrec/2010}.
+For practical purposes the error model can also be implemented as
+fuzzy finite-state traversal algorithm or similar methods\cite{,}. The result
+of the correction step is a set of word-forms that are correct in the
+language of the spell-checking dictionary. Another related task is to rank this
+set to provide the most likely corrections first for the end-user of spelling
+correction system. A trivial way to perform such ranking would be to use
+unigram \cite{pirinen/lrec/2010} or n-gram probabilities of the words 
+\cite{mays/1991} or word-form analyses \cite{pirinen/cicling/2012}.
+
 \subsubsection{Creating Spellers}
 % Tommi
+
+The creation of finite-state speller requires compiling of (at least) two
+automata: a dictionary that contains the correctly spelt word-forms and the
+error model that can rewrite misspelt word-forms into correctly spelled ones.
+The former automaton can be as simple as a reference corpus, containing larger
+quantities of correctly spelled words and (possibly) smaller quantities of
+misspelt ones\cite{norvig/2010}. Also more elaborate dictionaries, such as
+morphological analysers described in sections \ref{,,} can be used, and also
+trained for spell-checking purposes with reference corpora without any big
+modifications to underlying implementation\cite{pirinen/lrec/2010}.
+
+For the error-model we can trivially construct an automaton corresponding to
+Levenshtein edit distance algorithm\cite{,}. For more elaborate error models
+it is possible to use hunspell algorithms as automata \cite{pirinen/il/2010} or
+construct further extensions by hand \cite{pirinen/lrec/2010}. Given a possibly
+aligned error corpus it is also possible to construct a weighted error model
+automaton automatically \cite{}.
 
 \subsubsection{Checking Strings and Generating Suggestions}
 % Sam
 
 \subsubsection{Ranking Suggestions}
 % Tommi & Miikka
+
+Applying the error model and the language model to the spelling error strings,
+a result is typically an ordered set of corrected strings with some probability
+associated to each correction. After applying the contextless error correction
+described earlier it is possible to use context words and their potential
+analyses to re-rank the corrections \cite{pirinen/cicling/2012}.
 
 \subsection{Synonym and Translation Dictionaries}
 % Krister
@@ -303,4 +385,4 @@ growth of couple of seconds can be noticed.
 \bibliography{hfst2012}
 
 \end{document}
-% vim: set spell
+% vim: set spell:
