@@ -8,9 +8,9 @@ fi
 # test what strings the transducer [a:b (ID:ID)*] recognizes
 for i in "" .sfst .ofst .foma; do
 
-    if test -f abid.hfst$i ; then
+    if test -f abid$i ; then
 
-	if ! echo "aa" | ../../tools/src/hfst-lookup -s abid.hfst$i \
+	if ! echo "aa" | ../../tools/src/hfst-lookup -s abid$i \
 	    > test.lookups; 
 	then
 	    exit 1
@@ -20,7 +20,7 @@ for i in "" .sfst .ofst .foma; do
 	    exit 1
 	fi
 	
-	if ! echo "ab" | ../../tools/src/hfst-lookup -s abid.hfst$i \
+	if ! echo "ab" | ../../tools/src/hfst-lookup -s abid$i \
 	    > test.lookups; 
 	then
 	    exit 1
@@ -30,7 +30,7 @@ for i in "" .sfst .ofst .foma; do
 	    exit 1
 	fi
 	
-	if ! echo "ac" | ../../tools/src/hfst-lookup -s abid.hfst$i \
+	if ! echo "ac" | ../../tools/src/hfst-lookup -s abid$i \
 	    > test.lookups; 
 	then
 	    exit 1

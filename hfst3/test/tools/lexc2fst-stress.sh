@@ -13,9 +13,9 @@ for i in "" .sfst .ofst .foma ; do
             FFLAG=;;
     esac
     for f in $LEXCTESTS ; do
-        if ! ../../tools/src/hfst-lexc2fst $FFLAG $srcdir/$f > test.hfst ; then
+        if ! ../../tools/src/hfst-lexc2fst $FFLAG $srcdir/$f > test ; then
             exit 1
         fi
-        rm test.hfst
+        rm test
     done
 done

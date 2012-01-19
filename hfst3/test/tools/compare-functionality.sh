@@ -1,14 +1,14 @@
 #!/bin/sh
-comparables="cat.hfst dog.hfst tac.hfst cat2dog.hfst dog2cat.hfst cat_or_dog.hfst catdog.hfst"
+comparables="cat dog tac cat2dog dog2cat cat_or_dog catdog"
 for f in $comparables; do
-    if ! ../../tools/src/hfst-compare -s $f $f  ; then
-        echo hfst-compare -s mismatches $f $f
+    if ! ../../tools/src/hfst-compare -s $f.hfst $f.hfst  ; then
+        echo "compare -s mismatches" $f.hfst $f.hfst
         exit 1
     fi
     for g in $comparables ; do
         if test $f != $g ; then
-            if ../../tools/src/hfst-compare -s $f $g  ; then
-                echo hfst-compare -s matches $f $g
+            if ../../tools/src/hfst-compare -s $f.hfst $g.hfst  ; then
+                echo "compare -s matches" $f.hfst $g.hfst
                 exit 1
             fi
         fi

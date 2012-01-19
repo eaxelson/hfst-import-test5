@@ -1,11 +1,11 @@
 #!/bin/sh
 for f in "" .sfst .foma .openfst; do
     for g in "" .sfst .foma .openfst; do
-        if test cat.hfst$f != cat.hfst$g ; then
-            if test -f cat.hfst$f -a -f cat.hfst$g ; then
+        if test cat$f != cat$g ; then
+            if test -f cat$f -a -f cat$g ; then
                 for p in compare compose concatenate conjunct disjunct subtract ; do
-                    if ../../tools/src/hfst-$p cat.hfst$f cat.hfst$g 2>1 > /dev/null; then
-                        echo hfst-$p does not fail cat.hfst$f cat.hfst$g
+                    if ../../tools/src/hfst-$p cat$f cat$g 2>1 > /dev/null; then
+                        echo-$p does not fail cat$f cat$g
                         exit 0
                     fi
                 done

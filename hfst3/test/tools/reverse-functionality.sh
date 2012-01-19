@@ -1,12 +1,12 @@
 #!/bin/sh
 for i in "" .sfst .ofst .foma; do
-    if test -f cat2dog.hfst$i -a -f dog2cat.hfst$i ; then
-        if ! ../../tools/src/hfst-invert cat2dog.hfst$i > test.hfst ; then
+    if test -f cat2dog$i -a -f dog2cat$i ; then
+        if ! ../../tools/src/hfst-invert cat2dog$i > test ; then
             exit 1
         fi
-        if ! ../../tools/src/hfst-compare -s test.hfst dog2cat.hfst$i  ; then
+        if ! ../../tools/src/hfst-compare -s test dog2cat$i  ; then
             exit 1
         fi
-        rm test.hfst;
+        rm test;
     fi
 done
