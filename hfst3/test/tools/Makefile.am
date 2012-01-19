@@ -63,57 +63,57 @@ DEFAULT_CHECKS=0to3cats.hfst 2to4cats.hfst 4cats.hfst 4toINFcats.hfst \
 		   heavycat.hfst abid.hfst unk2unk.hfst unk_or_id_star.hfst a2b.hfst \
 		   a2b_complement.hfst a2b_input_projection_complement.hfst empty.hfst \
 		   walk_or_dog.hfst
-OL_CHECKS=cat2dog.hfst.ol cat2dog.gen.hfst.ol cat_weight_final.hfst.ol \
-			proc-caps.hfst.ol proc-caps.gen.hfst.ol \
-			compounds.hfst.ol
+OL_CHECKS=cat2dog.hfstol cat2dog.genhfstol cat_weight_final.hfstol \
+			proc-caps.hfstol proc-caps.genhfstol \
+			compounds.hfstol
 if WANT_SFST
-SFST_CHECKS=0to3cats.hfst.sfst 2to4cats.hfst.sfst 4cats.hfst.sfst\
-			4toINFcats.hfst.sfst cat2cat_or_CAT_uppercased.hfst.sfst \
-			cat2CAT_uppercased.hfst.sfst cat2dog.hfst.sfst \
-			cat+dog.hfst.sfst catdog.hfst.sfst cat_or_dog.hfst.sfst \
-			cat.hfst.sfst CAT_uppercased2cat.hfst.sfst CAT_uppercased.hfst.sfst\
-			cat_weight_final.hfst.sfst cat_weight_initial.hfst.sfst \
-			cat_weight_middle.hfst.sfst dog2cat.hfst.sfst dog.hfst.sfst \
-			infinitely_ambiguous.hfst.sfst non_minimal.hfst.sfst \
-			rule1.hfst.sfst rule2.hfst.sfst summarize_test1.hfst.sfst \
-			summarize_test2.hfst.sfst tac.hfst.sfst unknown2a.hfst.sfst\
-			identity.hfst.sfst abid.hfst.sfst unk2unk.hfst.sfst unk_or_id_star.hfst.sfst \
-			a2b.hfst.sfst a2b_complement.hfst.sfst a2b_input_projection_complement.hfst.sfst \
-			empty.hfst.sfst \
-			walk_or_dog.hfst.sfst
+SFST_CHECKS=0to3cats.sfst 2to4cats.sfst 4cats.sfst\
+			4toINFcats.sfst cat2cat_or_CAT_uppercased.sfst \
+			cat2CAT_uppercased.sfst cat2dog.sfst \
+			cat+dog.sfst catdog.sfst cat_or_dog.sfst \
+			cat.sfst CAT_uppercased2cat.sfst CAT_uppercased.sfst\
+			cat_weight_final.sfst cat_weight_initial.sfst \
+			cat_weight_middle.sfst dog2cat.sfst dog.sfst \
+			infinitely_ambiguous.sfst non_minimal.sfst \
+			rule1.sfst rule2.sfst summarize_test1.sfst \
+			summarize_test2.sfst tac.sfst unknown2a.sfst\
+			identity.sfst abid.sfst unk2unk.sfst unk_or_id_star.sfst \
+			a2b.sfst a2b_complement.sfst a2b_input_projection_complement.sfst \
+			empty.sfst \
+			walk_or_dog.sfst
 endif
 if WANT_OPENFST
-OFST_CHECKS=0to3cats.hfst.ofst \
-			2to4cats.hfst.ofst 4cats.hfst.ofst 4toINFcats.hfst.ofst \
-			cat2cat_or_CAT_uppercased.hfst.ofst cat2CAT_uppercased.hfst.ofst \
-			cat2dog.hfst.ofst cat+dog.hfst.ofst catdog.hfst.ofst \
-			cat_or_dog.hfst.ofst cat.hfst.ofst CAT_uppercased2cat.hfst.ofst \
-			CAT_uppercased.hfst.ofst cat_weight_final.hfst.ofst \
-			cat_weight_initial.hfst.ofst cat_weight_middle.hfst.ofst \
-			dog2cat.hfst.ofst dog.hfst.ofst infinitely_ambiguous.hfst.ofst \
-			non_minimal.hfst.ofst rule1.hfst.ofst rule2.hfst.ofst \
-			summarize_test1.hfst.ofst summarize_test2.hfst.ofst tac.hfst.ofst\
-			unknown2a.hfst.ofst identity.hfst.ofst \
-			heavycat.hfst abid.hfst.ofst unk2unk.hfst.ofst \
-			cat2dog_0.3.hfst.ofst cat2dog_0.5.hfst.ofst empty.hfst.ofst unk_or_id_star.hfst.ofst \
-			a2b.hfst.ofst a2b_complement.hfst.ofst a2b_input_projection_complement.hfst.ofst \
-			walk_or_dog.hfst.ofst
+OFST_CHECKS=0to3cats.ofst \
+			2to4cats.ofst 4cats.ofst 4toINFcats.ofst \
+			cat2cat_or_CAT_uppercased.ofst cat2CAT_uppercased.ofst \
+			cat2dog.ofst cat+dog.ofst catdog.ofst \
+			cat_or_dog.ofst cat.ofst CAT_uppercased2cat.ofst \
+			CAT_uppercased.ofst cat_weight_final.ofst \
+			cat_weight_initial.ofst cat_weight_middle.ofst \
+			dog2cat.ofst dog.ofst infinitely_ambiguous.ofst \
+			non_minimal.ofst rule1.ofst rule2.ofst \
+			summarize_test1.ofst summarize_test2.ofst tac.ofst\
+			unknown2a.ofst identity.ofst \
+			heavycat.hfst abid.ofst unk2unk.ofst \
+			cat2dog_0.3.ofst cat2dog_0.5.ofst empty.ofst unk_or_id_star.ofst \
+			a2b.ofst a2b_complement.ofst a2b_input_projection_complement.ofst \
+			walk_or_dog.ofst
 endif
 if WANT_FOMA
-FOMA_CHECKS=0to3cats.hfst.foma 2to4cats.hfst.foma 4cats.hfst.foma \
-			4toINFcats.hfst.foma cat2cat_or_CAT_uppercased.hfst.foma \
-			cat2CAT_uppercased.hfst.foma cat2dog.hfst.foma \
-			cat+dog.hfst.foma catdog.hfst.foma cat_or_dog.hfst.foma \
-			cat.hfst.foma CAT_uppercased2cat.hfst.foma \
-			CAT_uppercased.hfst.foma cat_weight_final.hfst.foma \
-			cat_weight_initial.hfst.foma cat_weight_middle.hfst.foma \
-			dog2cat.hfst.foma dog.hfst.foma infinitely_ambiguous.hfst.foma \
-			non_minimal.hfst.foma rule1.hfst.foma rule2.hfst.foma \
-			summarize_test1.hfst.foma summarize_test2.hfst.foma tac.hfst.foma\
-			unknown2a.hfst.foma identity.hfst.foma abid.hfst.foma unk2unk.hfst.foma unk_or_id_star.hfst.foma \
-			a2b.hfst.foma a2b_complement.hfst.foma a2b_input_projection_complement.hfst.foma \
-			empty.hfst.foma \
-			walk_or_dog.hfst.foma
+FOMA_CHECKS=0to3cats.foma 2to4cats.foma 4cats.foma \
+			4toINFcats.foma cat2cat_or_CAT_uppercased.foma \
+			cat2CAT_uppercased.foma cat2dog.foma \
+			cat+dog.foma catdog.foma cat_or_dog.foma \
+			cat.foma CAT_uppercased2cat.foma \
+			CAT_uppercased.foma cat_weight_final.foma \
+			cat_weight_initial.foma cat_weight_middle.foma \
+			dog2cat.foma dog.foma infinitely_ambiguous.foma \
+			non_minimal.foma rule1.foma rule2.foma \
+			summarize_test1.foma summarize_test2.foma tac.foma\
+			unknown2a.foma identity.foma abid.foma unk2unk.foma unk_or_id_star.foma \
+			a2b.foma a2b_complement.foma a2b_input_projection_complement.foma \
+			empty.foma \
+			walk_or_dog.foma
 endif
 
 check_DATA=$(DEFAULT_CHECKS) $(SFST_CHECKS) $(OFST_CHECKS) $(FOMA_CHECKS) $(OL_CHECKS)
@@ -167,23 +167,31 @@ LEXC_TXTS=basic.cat-dog-bird.lexc basic.colons.lexc basic.comments.lexc \
 ALL_SRCS=$(FST_TXTS) $(FST_STRINGS) $(FST_PAIRS) $(FST_PAIRSTRINGS) \
 		$(FST_SPACESTRINGS) $(SUBSTITUTE_TXTS) $(XRE_TEXTS)
 
+.SUFFIXES= .txt .hfst .hfst.sfst .hfst.ofst .hfst.foma .hfstol .genhfstol
+
 # this compilation is uesd by check target before running the tests
-%.hfst: %.txt
+#%.hfst: %.txt
+.txt.hfst:
 	${top_builddir}/tools/src/hfst-txt2fst -e '@0@' $< > $@
 
-%.hfst.sfst: %.txt
+#%.sfst: %.txt
+.txt.sfst:
 	${top_builddir}/tools/src/hfst-txt2fst -f sfst -e '@0@' $< > $@
 
-%.hfst.ofst: %.txt
+#%.ofst: %.txt
+.txt.ofst:
 	${top_builddir}/tools/src/hfst-txt2fst -f openfst-tropical -e '@0@' $< > $@
 
-%.hfst.foma: %.txt
+#%.foma: %.txt
+.txt.foma:
 	${top_builddir}/tools/src/hfst-txt2fst -f foma -e '@0@' $< > $@
 
-%.hfst.ol: %.txt
+#%.hfstol: %.txt
+.txt.hfstol:
 	${top_builddir}/tools/src/hfst-txt2fst -e '@0@' -i $< | ${top_builddir}/tools/src/hfst-fst2fst -w -o $@
 
-%.gen.hfst.ol: %.txt
+#%.genhfstol: %.txt
+.txt.genhfstol:
 	${top_builddir}/tools/src/hfst-txt2fst -e '@0@' -i $< | ${top_builddir}/tools/src/hfst-invert | ${top_builddir}/tools/src/hfst-fst2fst -w -o $@
 
 EXTRA_FILES=cat2dog.substitute cat.strings cat.txt cats_and_dogs.xre utf-8.strings latin-1.strings c_a_t.strings
