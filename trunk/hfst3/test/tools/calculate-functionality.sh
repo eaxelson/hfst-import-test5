@@ -24,22 +24,22 @@ for i in "" .sfst .ofst .foma; do
         *)
             FFLAG=;;
     esac
-    if test -f 4toINFcats.hfst$i ; then
-        if ! echo "catcatcat(cat)+" | ../../tools/src/hfst-calculate $FFLAG > test.hfst ; then
+    if test -f 4toINFcats$i ; then
+        if ! echo "catcatcat(cat)+" | ../../tools/src/hfst-calculate $FFLAG > test ; then
             exit 1
         fi
-        if ! ../../tools/src/hfst-compare -s 4toINFcats.hfst$i test.hfst  ; then
+        if ! ../../tools/src/hfst-compare -s 4toINFcats$i test  ; then
             exit 1
         fi
-        rm test.hfst
+        rm test
     fi
-    if test -f cat2dog.hfst$i ; then
-        if ! echo "{cat}:{dog}" | ../../tools/src/hfst-calculate $FFLAG > test.hfst ; then
+    if test -f cat2dog$i ; then
+        if ! echo "{cat}:{dog}" | ../../tools/src/hfst-calculate $FFLAG > test ; then
             exit 1
         fi
-        if ! ../../tools/src/hfst-compare -s cat2dog.hfst$i test.hfst  ; then
+        if ! ../../tools/src/hfst-compare -s cat2dog$i test  ; then
             exit 1
         fi
-        rm test.hfst
+        rm test
     fi
 done

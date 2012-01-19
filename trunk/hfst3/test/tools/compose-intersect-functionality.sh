@@ -11,25 +11,25 @@ for i in "" .sfst .ofst .foma; do
         *)
             FFLAG=;;
     esac
-    if test -f cat.hfst$i ; then
-        if ! echo "cat|dog" | ../../tools/src/hfst-calculate $FFLAG > lexicon.hfst ; then
+    if test -f cat$i ; then
+        if ! echo "cat|dog" | ../../tools/src/hfst-calculate $FFLAG > lexicon ; then
             exit 1
         fi
-        if ! echo "([catdog]|d:D|c:C)*" | ../../tools/src/hfst-calculate $FFLAG > rules.hfst ; then
+        if ! echo "([catdog]|d:D|c:C)*" | ../../tools/src/hfst-calculate $FFLAG > rules ; then
             exit 1
         fi
-        if ! echo "([catdog]|d:D|c:C)*" | ../../tools/src/hfst-calculate $FFLAG >> rules.hfst ; then
+        if ! echo "([catdog]|d:D|c:C)*" | ../../tools/src/hfst-calculate $FFLAG >> rules ; then
             exit 1
         fi
-        if ! ../../tools/src/hfst-compose-intersect -1 lexicon.hfst -2 rules.hfst > test.hfst ; then
+        if ! ../../tools/src/hfst-compose-intersect -1 lexicon -2 rules > test ; then
             exit 1
         fi
-        if ! echo "cat|dog|{cat}:{Cat}|{dog}:{Dog}" | ../../tools/src/hfst-calculate $FFLAG > test2.hfst ; then
+        if ! echo "cat|dog|{cat}:{Cat}|{dog}:{Dog}" | ../../tools/src/hfst-calculate $FFLAG > test2 ; then
             exit 1
         fi
-        if ! ../../tools/src/hfst-compare -s test.hfst test2.hfst  ; then
+        if ! ../../tools/src/hfst-compare -s test test2  ; then
             exit 1
         fi
-        rm test.hfst test2.hfst lexicon.hfst rules.hfst
+        rm test test2 lexicon rules
     fi
 done
