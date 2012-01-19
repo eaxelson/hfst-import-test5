@@ -8,7 +8,7 @@ for f in ../../tools/src/hfst-{compare,compose,compose-intersect,concatenate,dis
             echo $f has broken version
             exit 1
         fi
-        if ! grep -m 1 '-[^ ]\+ [0-9.]\+' version.out > /dev/null \
+        if ! grep -m 1 'hfst-[^ ]\+ [0-9.]\+' version.out > /dev/null \
         ; then
             rm version.out
             echo $f has malformed version
