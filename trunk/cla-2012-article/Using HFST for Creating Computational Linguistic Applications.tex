@@ -150,23 +150,23 @@ complex allomorphy.
 
 \subsection{Cascaded Rules: Explanations and Examples}
 % Senka
-HFST replace rules provide backward compatibility with XFST replace rules, described in Kempe and Karttunen \cite{Kempe96parallelreplacement} and Finite State Morphology book \cite{beesley/2003}. Although they share the same notation, HFST replace rules were developed on a concept of Generalized Lenient Composition, described in Yli-Jyr\"{a} \cite{YliJyra/2008b}. 
+HFST replace rules provide backward compatibility with XFST replace rules, described in Kempe and Karttunen \cite{Kempe96parallelreplacement} and the Finite State Morphology book \cite{beesley/2003}. Although they share the same notation, HFST replace rules were developed from the concept of Generalized Lenient Composition, described in Yli-Jyr\"{a} \cite{YliJyra/2008b}. 
 
-In this paper section, there will be described how to use Replace Rules with HFST tools. For detailed description of each rule, see Beesley and Karttunen \cite{beesley/2003}.
+In this paper section, we will describe how to use Replace Rules with HFST tools. For a detailed description of each rule, see Beesley and Karttunen \cite{beesley/2003}.
 
 
 
 % Simple rules
 
-\textbf{Simple rules.} Simple right arrow replace rule,
+\textbf{Simple rules.} A simple right arrow replace rule,
 \begin{equation}
 A \rightarrow\ B
 \end{equation}
 
-where A and B are regular expressions that describe languages, states that A in upper language maps to B in lower language.
+where A and B are regular expressions that describe languages, states that A in the upper language maps to B in the lower language.
 
 Replace rules can be compiled into transducer using HFST tool \textbf{hfst-regexp\-2fst}.
-This tool takes regular expresion as input and gives a corresponding transducer written in a binary file as output. To convert transducers from binary format to text format, there is a HFST tool \textbf{hfst-fst2txt}. Therefore, the upper rule could be compiled as in Figure~\ref{fig:simple_replace}.
+This tool takes a regular expresion as input and gives a corresponding transducer written in a binary file as output. To convert transducers from binary format to text format, there is a HFST tool \textbf{hfst-fst2txt}. Therefore, the upper rule could be compiled as in Figure~\ref{fig:simple_replace}.
 
 \begin{figure} [h!]
 \begin{verbatim}
@@ -190,7 +190,7 @@ $ hfst-fst2txt transducer
 \end{figure}
 
 
-Rules can be applied to any language by using composition. By composing previous rule \verb!A -> B! to a word \verb!ABCD!, the result is the transducer on Figure~\ref{fig:replace_compose}. It has 5 states (0 -- 4), and only state 4 is final. The \textbf{hfst-regexp2fst's} default output transducer format is \textbf{tropical\_openfst}, which has a support for weights. Since weights aren't used in replace rules, in this example all of them have value 0.000000. Other formats that can be used with this, and other HFST tools, are \textbf{sfst} and \textbf{foma}.
+Rules can be applied to any language by using composition. By composing a word \verb!ABCD! with the previous rule \verb!A -> B!, the result is the transducer in Figure~\ref{fig:replace_compose}. It has 5 states (0 -- 4), and only state 4 is final. The \textbf{hfst-regexp2fst's} default output transducer format is \textbf{tropical\_openfst}, which has a support for weights. Since weights aren't used in replace rules, in this example all of them have value 0.000000. Other formats that can be used with this, and other HFST tools, are \textbf{sfst} and \textbf{foma}.
 
 \begin{figure} [h!]
 \begin{verbatim}
@@ -224,17 +224,17 @@ $ echo "c a t .o. c a t -> c a t s  ;" |
 
 % Context
 
-\textbf{Context.} Every rule can have a context in which the replacement is made. Just like A and B, L and R are also regular expresions that describe languages. Therefore, A will be mapped with B only, and only if, it is between L and R.
+\textbf{Context.} Every rule can have a context in which the replacement is made. Just like A and B, L and R are also regular expresions that describe languages. Therefore, A will be mapped to B if, and only if, it is between L and R.
 \begin{equation}
 A \rightarrow\ B\ ||\ L \_\  R
 \end{equation}
  
-Also, multiple context pairs are supported, when separated with comma.
+Also, multiple context pairs are supported, when separated by comma.
 \begin{equation}
 A \rightarrow\ B\ ||\ L_1 \_\  R_1 ,\ \ldots\ ,\ L_i \_\  R_i
 \end{equation}
 
-In Figure~\ref{fig:multiple_contexts}, the rule expression says that \verb!a! in upper language is mapped with \verb!b! in lower language when between \verb!m! and \verb!n!, or in front of \verb!b!. In word \verb!manaab!, first and last \verb!a! are mapped to \verb!b!, because they are in betwwen corresponding contexts, but second \verb!a! is kept unchanged.
+In Figure~\ref{fig:multiple_contexts}, the rule expression says that \verb!a! in the upper language is mapped to \verb!b! in lower language when between \verb!m! and \verb!n!, or in front of \verb!b!. In the word \verb!manaab!, the first and last \verb!a! are mapped to \verb!b!, because they are betwwen corresponding contexts, but the second \verb!a! is kept unchanged.
 
 \begin{figure} [h!]
 \begin{verbatim}
@@ -265,7 +265,7 @@ $ echo " m a n a a b .o. a -> b || m _ n , _ b;" |
 \label{tab:context_directions}
 \end{table}
 
-In every replace rule, where A is upper, and B lower language, there are four context directions that can be used with replace rules. For example, when \ \verb!//!\ sign is used as context orientation operator, left context will be taken from lower language. It means that it is posible for replace function to write it's own context. This is shown in Figure~\ref{fig:context_orientation}. 
+In every replace rule, where A is the upper, and B the lower language, there are four context directions that can be used with replace rules. For example, when the \ \verb!//!\ sign is used as context orientation operator, the left context will be taken from the lower language. It means that it is possible for the replace function to write it's own context. This is shown in Figure~\ref{fig:context_orientation}. 
 
 \begin{figure} [h!]
  \begin{verbatim}
@@ -284,7 +284,7 @@ $ echo " b a a .o. a -> b // b _ ;" | ./hfst-regexp2fst | hfst-fst2txt
 
 % Other replace functions
 
-\textbf{Other replace functions.} In all examples is used the right arrow replace operator, but there are many other operators that can be used. All the operators listed in Table~\ref{tab:replace_operators} have their left arrow version, which are inversion of the right operator. Furthermore, all the rules can be used with epenthesis \verb![. .]! and markup \verb!...! operators. Epenthesis operator should be used with empty strings to avoid replacing infintly many epsilons, while markup operator is used to insert markers around a word.
+\textbf{Other replace functions.} In all examples, we used the right arrow replace operator, but there are many other operators that can be used. All the operators listed in Table~\ref{tab:replace_operators} have their left arrow version, which are the inversion of the right operator. Furthermore, all the rules can be used with epenthesis \verb![. .]! and markup \verb!...! operators. The epenthesis operator should be used with empty strings to avoid replacing infinitely many epsilons, while the markup operator is used to insert markers around a word.
 
 \begin{table} [h!]
 \centering
@@ -316,12 +316,12 @@ $ echo " b a a b .o. a @-> %[ ... %] ;" | hfst-regexp2fst > b.fst
 
 % Parallel rules
 
-\textbf{Parallel rules.} Paralel rules are used to have multiple replacements in the same time. The general parallel replace rule expression consists of individual replace rules divided with two commas.
+\textbf{Parallel rules.} Parallel rules are used when there are multiple replacements at the same time. The general parallel replace rule expression consists of individual replace rules divided with two commas.
 \begin{equation}
 A_1 \rightarrow\ B_1\ ||\ L_1 \_\  R_1\ ,,\ \ldots\ ,,\ A_i \rightarrow\ B_i\ ||\ L_i \_\ R_i
 \end{equation}
 
-In XFST, all rules in parallel rule expression have to have the same format. They need to have the same arrow and the same context layout. In HFST, the restraint that all the rules need to have the same arrow is kept, but the context format for each rule can differ from each other. Therefore, the rule expression in Figure ~\ref{fig:parallel_rules} would not be allowed in XFST, but is valid in HFST.
+In XFST, all rules in a parallel rule expression have to have the same format. They need to have the same arrow and the same context layout. In HFST, the restraint that all the rules need to have the same arrow is kept, but the context format for each rule can differ from each other. Therefore, the rule expression in Figure ~\ref{fig:parallel_rules} would not be allowed in XFST, but is valid in HFST.
 \begin{figure}
  \begin{verbatim}
 $  echo " a -> b || m _ n ,, c -> d ;" | ./hfst-regexp2fst | hfst-fst2txt
