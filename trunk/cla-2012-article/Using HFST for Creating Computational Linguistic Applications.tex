@@ -382,42 +382,39 @@ composition of that morphosyntax over the kleene plus closure of morpheme sets.
 \subsection{Performance}
 % Erik
 
-In table X we present compilation times for different morphologies using 
-different HFST backends. The morphologies are OMorFi for Finnish, Morphisto 
-for German, Morph-it for Italian, Swelex for Swedish and TrMorph for Turkish 
-(todo: add footnotes). OMorFi, Morphisto and Morph-it contain several rules for
-inflection and compounding. Morph-it and Swelex are basically word-lists.
+In Table~\ref{tab:compilation_times} we show compilation times for different 
+morphologies using different HFST back-ends. The morphologies are OMorFi for Finnish,
+Morphisto for German, Morph-it for Italian, Swelex for Swedish and TrMorph for Turkish 
+(todo: add footnotes). OMorFi, Morphisto and Morph-it have several rules for
+inflection and compounding, Morph-it and Swelex are basically word-lists.
+The HFST back-ends are SFST, OpenFst and foma.
 
-
-\begin{table}
-  \caption{Compilation times for different morphologies with
-    different HFST backends. The times are expressed in minutes and seconds.}
-  \label{tab:compilation_times}
-  \begin{tabular}{ c  c  c  c }
+\begin{table} [h!]
+\centering
+  \begin{tabular}{| c | c | c | c |}
     \hline
-    Morphology & SFST & OpenFst & foma \\ \hline
+    Morphology & SFST & OpenFst & foma \\ \hline\hline
     Finnish & 2:48 & 7:52 & 1:52 \\ \hline
     German & 2:12 & 7:45 & 1:33 \\ \hline
     Italian & 0:30 & 2:24 & 0:31 \\ \hline
     Swedish & 0:13 & 0:49 & 0:13 \\ \hline
     Turkish & 0:12 & 0:40 & 0:05 \\ \hline
     \end{tabular}
+  \caption{Compilation times for different morphologies with
+    different HFST back-ends. The times are given in minutes and seconds.}
+  \label{tab:compilation_times}
 \end{table}
 
 
-In table X we also present the compilation times for Finnish and German compared
-with the results that we obtained in our previous benchmarking. The backend
-versions are also shown.
+In Table~\ref{tab:compilation_times_versions} we also show the compilation 
+times for Finnish and German compared with the results that we got in our 
+earlier benchmarking (footnote). The back-end versions are also shown.
 
-\begin{table}
-  \caption{Compilation times for different morphologies with
-    different HFST backends and versions. 
-    The times are expressed in minutes and seconds.}
-  \label{tab:compilation_times_versions}
-  \begin{tabular}{ c  c  c  c }
-%  \multicolumn{4}{c}{Compilation times} \\
-\hline
-  Back-End                 & version  & Finnish  & German \\ \hline
+\begin{table} [h!]
+\centering
+  \begin{tabular}{| c | c | c | c |}
+  \hline
+  Back-End                 & version  & Finnish  & German \\ \hline\hline
   \multirow{2}{*}{SFST}    & 1.4.2    & 5:02     & 6:39 \\
                            & 1.4.6    & 2:48     & 2:12 \\ \hline
   \multirow{2}{*}{OpenFst} & 1.2.7    & 6:51     & 6:28 \\
@@ -426,22 +423,25 @@ versions are also shown.
                            & 0.1.16   & 1:52     & 1:33 \\
 \hline
   \end{tabular}
-
+  \caption{Compilation times for different morphologies with
+    different HFST back-ends and versions. 
+    The times are given in minutes and seconds.}
+  \label{tab:compilation_times_versions}
 \end{table}
 
-It can be clearly seen that the performance of HFST with SFST as backend 
-has improved. The current compilation time of the Finnish morphology has almost
-halved. The compilation time of the German morphology is only one third of the
+It can be clearly seen that the performance of HFST with SFST as back-end 
+has improved: the current compilation time of the Finnish morphology has almost
+halved and the compilation time of the German morphology is only one third of the
 result at previous benchmarking. 
 This is because SFST has new efficient minimization and composition functions
-developed in collaboration with the HFST team.
+developed jointly with the HFST team based on our previous benchmarking.
 
-The performance of HFST with OpenFst as backend has become slower. It is not
+The compilation times of HFST with OpenFst as back-end have become slower. It is not
 clear whether this is because of the newer version of OpenFst or changes in the 
 actual HFST code (todo: find out).
 
-The performance of HFST with foma has stayed almost the same, only a minor
-growth of couple of seconds can be noticed. 
+The performance of HFST with foma has stayed almost the same, only a small
+growth of couple of seconds can be seen. 
  
 
 \section{Building Taggers}
