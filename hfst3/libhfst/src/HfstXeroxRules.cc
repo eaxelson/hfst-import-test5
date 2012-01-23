@@ -968,17 +968,16 @@ namespace hfst
 	  	HfstTransducer rightPart(type);
 	  	rightPart = constraintsRightPart(type);
 
-
-
 	  	HfstTransducer RightBracketToEpsilon(RightMarker, "@_EPSILON_SYMBOL_@", TOK, type);
 	  	HfstTransducer epsilonToRightBracket("@_EPSILON_SYMBOL_@", RightMarker, TOK, type);
 	  	HfstTransducer LeftBracketToEpsilon(LeftMarker, "@_EPSILON_SYMBOL_@", TOK, type);
 	  	HfstTransducer epsilonToLeftBracket("@_EPSILON_SYMBOL_@", LeftMarker, TOK, type);
 
 	  	//[ ? | 0:< | <:0 | 0:> | B ]
-	  	HfstTransducer nonClosingBracketInsertion(identityPair);
+	 // 	HfstTransducer nonClosingBracketInsertion(identityPair);
+	  	HfstTransducer nonClosingBracketInsertion(epsilonToLeftBracket);
 	  	nonClosingBracketInsertion.
-	  			disjunct(epsilonToLeftBracket).
+	  			//disjunct(epsilonToLeftBracket).
 	  			disjunct(LeftBracketToEpsilon).
 	  			disjunct(epsilonToRightBracket).
 	  			disjunct(B).
@@ -986,19 +985,25 @@ namespace hfst
 	  	//	printf("nonClosingBracketInsertion: \n");
 	  	//	nonClosingBracketInsertion.write_in_att_format(stdout, 1);
 
+
+	  	nonClosingBracketInsertion.concatenate(identityPairMinusBracketsPlus).minimize();
+
+	  	HfstTransducer middlePart(identityPairMinusBrackets);
+	  	middlePart.disjunct(nonClosingBracketInsertion).minimize();
+
+
 	  	// ?* < [?-B]+ 0:> [ ? | 0:< | <:0 | 0:> | B ] [?-B]+ [ B:0 | 0:B | ?-B ]*
 	  	HfstTransducer Constraint(identity);
 	  	Constraint.concatenate(leftBracket).
 	  			concatenate(identityPairMinusBracketsPlus).
 	  			concatenate(epsilonToRightBracket).
-	  			concatenate(nonClosingBracketInsertion).
-	  			minimize().
-	  			concatenate(identityPairMinusBracketsPlus).
+	  		//	concatenate(nonClosingBracketInsertion).
+	  		//	concatenate(identityPairMinusBracketsPlus).
+	  			concatenate(middlePart).
 	  			concatenate(rightPart).
 	  			minimize();
-
-	  	//printf("Constraint Longest Match: \n");
-	  	//Constraint.write_in_att_format(stdout, 1);
+//printf("Constraint Longest Match: \n");
+//Constraint.write_in_att_format(stdout, 1);
 
 
 	  	//uncondidtionalTr should be left most for the left most longest match
@@ -1688,7 +1693,7 @@ namespace hfst
 	  }
 
 	  // for parallel rules
-	  HfstTransducer replace(	const vector<Rule> &ruleVector, bool optional)
+	  HfstTransducer replace( const vector<Rule> &ruleVector, bool optional)
 	  {
 		  HfstTransducer retval;
 		  // If there is only one rule in the vector, it is not parallel
@@ -1718,6 +1723,20 @@ namespace hfst
 	  }
 
 
+	  // replace left
+	  HfstTransducer replace_left( const Rule &rule, bool optional)
+	  {
+		  HfstTransducer newMapping = rule.get_mapping();
+		  newMapping.invert().minimize();
+		  Rule newRule ( newMapping, rule.get_context(), rule.get_replType());
+		  return replace( newRule, optional);
+	  }
+	  // replace left parallel
+	  HfstTransducer replace_left( const vector<Rule> &ruleVector, bool optional)
+	  {
+		  return replace( ruleVector, optional).invert();
+	  }
+
 	  // left to right
 	  HfstTransducer replace_leftmost_longest_match( const Rule &rule )
 	  {
@@ -1725,8 +1744,7 @@ namespace hfst
 	  	HfstTransducer uncondidtionalTr( bracketedReplace(rule, true) );
 	  	//uncondidtionalTr = bracketedReplace(rule, true);
 
-
-	  	//printf("bracketedReplace: \n");
+	  	//printf("uncondidtionalTr: \n");
 	  	//uncondidtionalTr.write_in_att_format(stdout, 1);
 
 
@@ -1760,11 +1778,13 @@ namespace hfst
 			uncondidtionalTr = parallelBracketedReplace(ruleVector, true);
 		}
 
+
+
 	  	HfstTransducer retval (leftMostConstraint(uncondidtionalTr));
 	  	//retval = leftMostConstraint(uncondidtionalTr);
 
-	  	//printf("leftMostConstraint: \n");
-	  	//retval.write_in_att_format(stdout, 1);
+		//printf("leftMostConstraint: \n");
+		//retval.write_in_att_format(stdout, 1);
 
 	  	retval = longestMatchLeftMostConstraint( retval );
 
@@ -2123,7 +2143,37 @@ using namespace hfst::xeroxRules;
 
 
 
+// ab->x  ab_a
+void test8( ImplementationType type )
+{
 
+	HfstTokenizer TOK;
+	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+
+
+	// Mapping
+	HfstTransducer mapping1("a","b", TOK, type);
+	HfstTransducer mapping2("b","a", TOK, type);
+	mapping1.disjunct(mapping2).minimize();
+
+
+	HfstTransducer input1("abba", TOK, type);
+	HfstTransducer result1("abba", "baab", TOK, type);
+
+	Rule rule(mapping1);
+
+	// Unconditional  optional replace
+	HfstTransducer replaceTr(type);
+	replaceTr = replace(rule, false);
+
+	HfstTransducer tmp2(type);
+	tmp2 = input1;
+	tmp2.compose(replaceTr).minimize();
+	//printf("abba optional: \n");
+	//tmp2.write_in_att_format(stdout, 1);
+	assert(tmp2.compare(result1));
+
+}
 
 // ab->x  ab_a
 void test1( ImplementationType type )
@@ -2184,7 +2234,7 @@ void test1( ImplementationType type )
 
 
 
-// a @-> x
+// a -> x
 void test1b( ImplementationType type )
 {
 
@@ -2275,10 +2325,10 @@ void test1b( ImplementationType type )
 }
 
 
-// a+ -> x || a _ a
-// a+ -> x // a _ a
-// a+ -> x \\ a _ a
-// a+ -> x \/ a _ a
+// a+ @-> x || a _ a
+// a+ @-> x // a _ a
+// a+ @-> x \\ a _ a
+// a+ @-> x \/ a _ a
 void test2a( ImplementationType type )
 {
 
@@ -2595,6 +2645,54 @@ void test2b( ImplementationType type )
 
 
 
+// a+ @-> x || c _
+
+void test2c( ImplementationType type )
+{
+
+	HfstTokenizer TOK;
+	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+	TOK.add_multichar_symbol("@_UNKNOWN_SYMBOL_@");
+	TOK.add_multichar_symbol("@_IDENTITY_SYMBOL_@");
+
+	String LeftMarker("@_LM_@");
+	String RightMarker("@_RM_@");
+	TOK.add_multichar_symbol(LeftMarker);
+	TOK.add_multichar_symbol(RightMarker);
+
+	// Mapping
+	HfstTransducer leftMapping("a", TOK, type);
+	leftMapping.repeat_plus().minimize();
+	HfstTransducer rightMapping("x", TOK, type);
+
+	HfstTransducerPair mappingPair(leftMapping, rightMapping);
+
+	// Context
+	HfstTransducerPair Context(HfstTransducer("c", TOK, type), HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type));
+
+	HfstTransducerPairVector ContextVector;
+	ContextVector.push_back(Context);
+
+
+	HfstTransducer input1("caav", TOK, type);
+
+	// results:
+
+	HfstTransducer result1("caav", "cx@_EPSILON_SYMBOL_@v", TOK, type);
+
+
+	Rule ruleUp(mappingPair, ContextVector, REPL_UP);
+
+	HfstTransducer replaceTr = replace_leftmost_longest_match(ruleUp);
+
+	HfstTransducer tmp2 = input1;
+	tmp2.compose(replaceTr).minimize();
+	//printf("leftmost longest match: \n");
+	//tmp2.write_in_att_format(stdout, 1);
+	assert(tmp2.compare(result1));
+
+
+}
 // test multiple contexts
 // a -> b ||  x _ x ;
 void test3a( ImplementationType type )
@@ -3761,10 +3859,10 @@ int main(int argc, char * argv[])
 
 			// a+ -> x  a_a
 			// also @-> and @>
-
 			test2a( types[i] );
 			// >@ ->@
 			test2b( types[i] );
+			test2c( types[i] );
 
 			// testing unconditional replace with and without contexts
 
@@ -3801,6 +3899,10 @@ int main(int argc, char * argv[])
 			// 0 .o. [ [. 0 .] -> a \/ _ b a , a b _ ,, [. 0 .] -> b \/ a _ a ]
 			test7d( types[i] );
 			test7e( types[i] );
+
+
+
+			test8( types[i] );
 
 
 	      }

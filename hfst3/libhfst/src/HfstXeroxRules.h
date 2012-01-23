@@ -21,13 +21,18 @@ namespace hfst
 	{
 		enum ReplaceType {REPL_UP, REPL_DOWN, REPL_RIGHT, REPL_LEFT};
 
-		enum ReplaceArrow {E_REPLACE_RIGHT,
-						   E_REPLACE_RIGHT_MARKUP,
-						   E_OPTIONAL_REPLACE_RIGHT,
-						   E_RTL_LONGEST_MATCH,
-						   E_RTL_SHORTEST_MATCH,
-						   E_LTR_LONGEST_MATCH,
-						   E_LTR_SHORTEST_MATCH};
+		// this enum is used in xre_parse.yy for the regex2pfst tool
+		// it is not in the xre_parse.yy file because we couldn't make it work there
+		enum ReplaceArrow {	E_REPLACE_RIGHT,
+							E_OPTIONAL_REPLACE_RIGHT,
+							E_REPLACE_LEFT,
+							E_OPTIONAL_REPLACE_LEFT,
+							E_REPLACE_RIGHT_MARKUP,
+							E_RTL_LONGEST_MATCH,
+							E_RTL_SHORTEST_MATCH,
+							E_LTR_LONGEST_MATCH,
+							E_LTR_SHORTEST_MATCH
+						};
 
 		//ImplementationType TYPE = TROPICAL_OPENFST_TYPE;
 		//ImplementationType TYPE = SFST_TYPE;
@@ -182,6 +187,10 @@ namespace hfst
 		HfstTransducer replace(	const Rule &rule, bool optional);
 		// for parallel rules
 		HfstTransducer replace(	const vector<Rule> &ruleVector, bool optional);
+		// replace up, left, right, down
+		HfstTransducer replace_left( const Rule &rule, bool optional);
+		// for parallel rules
+		HfstTransducer replace_left( const vector<Rule> &ruleVector, bool optional);
 		// left to right
 		HfstTransducer replace_leftmost_longest_match( const Rule &rule );
 		// left to right
