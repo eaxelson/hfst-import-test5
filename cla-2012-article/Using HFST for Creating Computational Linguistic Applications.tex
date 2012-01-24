@@ -627,8 +627,19 @@ $I$ ("increment $q^I$") or be closer to requiring an edge in $I$ to be traversed
 (due to a finite sequence of epsilon edges becoming shorter), establishing a
 loop variant.
 
-- weight stuff (equal weighting assumed)
-- unknown symbol?
+Weights representing the probability of a particular correction being the
+correct one are a natural extension, and in \verb!hfst-ospell! are implemented
+as multiplication in the tropical semiring
+($x \oplus y = \min(\{x, y\}), x \otimes y = x + y$) of each edge traversed.
+Each state in the queue is recorded with an accumulated weight, and its
+successor states have this weight incremented by the sum of the weights of
+the edges tranversed in the component transducers.
+
+The alphabet of $I$ cannot be determined in advance, and in practice is taken
+to be the set of Unicode code points. To allow the error model to correct
+unexpected symbols in this large space, \verb!hfst-ospell! uses a special
+symbol, \verb!@_UNKNOWN_SYMBOL_@! which is taken to be equal to any symbol
+that is otherwise absent.
 
 \subsubsection{Ranking Suggestions}
 % Tommi & Miikka
@@ -644,6 +655,71 @@ analyses to re-rank the corrections \cite{pirinen/cicling/2012}.
 
 \section{Extending Transducers for Pattern Matching}
 % Sam
+Advanced, fast and flexible pattern matching is a major requirement for a
+variety of tasks in information extraction, such as named entity recognition.
+An approach to this task was presented by Lauri Karttunen in
+\cite{karttunen2011}, and an outline of implementing it in HFST is given here.
+
+\subsection{The Task}
+
+Some desiderata for pattern matching are:
+
+\begin{itemize}
+\item Several patterns, including nested matches,
+should be able to operate in parallel
+\item It should be possible to impose contextual requirements (rules) on
+the patterns to be matched
+\item Matching should be efficient in space and time - in particular, writing
+opening and closing tags around a match shouldn't introduce long-range
+dependencies which are awkward for FST transformations
+\item A facility for referring to common subpatterns, such as dates, by name
+\end{itemize}
+
+\subsection{The pmatch Approach}
+
+For a detailed overview the reader is directed to \cite{karttunen2011}.
+Here we focus on the aspects of \verb!pmatch! that necessitate extensions
+to a FST formalism from the point of view of the implementation.
+
+\verb!pmatch! is presented as a tool for general-purpose pattern matching,
+tokenizing and parsing. It is given a series of definitions and a
+specialised regular expression, and it then operates on strings, passing
+through unmodified any parts of them that fail to match the expression,
+and applying transformations to any matched parts. If several matches beginning
+from a common point in the input can be made, matches of less than maximal
+length are considered invalid.
+
+The expressions may refer to other expressions (possibly combined with each
+other by operations on regular languages), contextual conditions
+(left or right side, with negation, \verb!OR! and \verb!AND!) and certain
+built-in transformation rules. The most interesting of these transformation
+rules is \verb!EndTag()!, which triggers a wrap-around XML tag to be inserted
+on either side of the match.
+
+Referencing other regexes (including self-reference) is unrestricted, so
+the complete system has the power of a recursive transition network (RTN),
+and matching is therefore context-free.
+
+The crucial extension-demanding features, as we see them, for a HFST utility
+with similar applications are:
+
+\begin{itemize}
+\item A distinction between an augmented universal transducer (the top level
+which echoes all input in the absence of matches) and sub-transducers
+\item Ignoring non-maximal matching, ie. a left-to-right longest-distance
+matcher
+\item An unrestricted system for referencing other transducers by name
+\item Special handling of \verb!EndTag()! and instructions for context
+checking
+\item Reserved symbols for implementing transducer insertion/reference,
+\verb!EndTag()! and contexts
+\end{itemize}
+
+The referencing system is apparently the only one of these that would be
+impossible to implement in a strict FST framework; the others suggest
+compilations to larger, less efficient transducers.
+
+\subsection{Implementation in a FST library}
 
 \section{Discussion}
 
