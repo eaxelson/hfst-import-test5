@@ -389,11 +389,14 @@ composition of that morphosyntax over the kleene plus closure of morpheme sets.
 % Erik
 
 In Table~\ref{tab:compilation_times} we show compilation times for different 
-morphologies using different HFST back-ends. The morphologies are OMorFi for Finnish,
-Morphisto for German, Morph-it for Italian, Swelex for Swedish and TrMorph for Turkish 
-(todo: add footnotes). OMorFi, Morphisto and Morph-it have several rules for
+morphologies using different HFST back-ends. The morphologies are OMorFi 
+\cite{pirinen/2008} for Finnish, Morphisto \cite{zielinski/2009} for German,
+Morph-it \cite{Zanchetta_2005-1} for Italian, Swelex 
+\footnote{\url{https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstSwelex}} 
+for Swedish and TrMorph \cite{Coltekin/2010} for Turkish. 
+OMorFi, Morphisto and Morph-it have several rules for
 inflection and compounding, Morph-it and Swelex are basically word-lists.
-The HFST back-ends are SFST, OpenFst and foma.
+The HFST back-ends are SFST, OpenFst and foma. The HFST version is the newest one, 3.3.4.
 
 \begin{table} [h!]
 \centering
@@ -414,7 +417,7 @@ The HFST back-ends are SFST, OpenFst and foma.
 
 In Table~\ref{tab:compilation_times_versions} we also show the compilation 
 times for Finnish and German compared with the results that we got in our 
-earlier benchmarking (footnote). The back-end versions are also shown.
+earlier benchmarking \cite{hfst/2011}. The back-end versions are also shown.
 
 \begin{table} [h!]
 \centering
@@ -650,7 +653,7 @@ analyses to re-rank the corrections \cite{pirinen/cicling/2012}.
 
 \bibliographystyle{splncs03}
 
-\bibliography{hfst2012}
+\bibliography{hfst2012,cla2012hfst}
 
 \end{document}
 % vim: set spell:
