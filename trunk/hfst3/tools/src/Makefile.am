@@ -91,6 +91,9 @@ endif
 if WANT_NAME
 MAYBE_NAME=hfst-name
 endif
+if WANT_OPTIMIZED_LOOKUP
+MAYBE_OPTIMIZED_LOOKUP=hfst-optimized-lookup
+endif
 if WANT_PREPROCESS_FOR_OPTIMIZED_LOOKUP
 MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP=hfst-preprocess-for-optimized-lookup-format
 endif
@@ -155,7 +158,7 @@ noinst_HEADERS= \
 	inc/getopt-cases-unary.h  inc/globals-binary.h      \
 	inc/globals-common.h      inc/globals-unary.h \
 	HfstStrings2FstTokenizer.h HfstLookupFlagDiacritics.h \
-	hfst-tool-metadata.h
+	hfst-tool-metadata.h hfst-optimized-lookup.h
 # parsers/XreCompiler.h parsers/xre_utils.h
 
 # sort alphabetically
@@ -174,6 +177,7 @@ bin_PROGRAMS= \
 			 $(MAYBE_FST2TXT) $(MAYBE_GREP) $(MAYBE_HEAD)               \
 			 $(MAYBE_INVERT)                                            \
 			 $(MAYBE_LOOKUP) $(MAYBE_MINIMIZE) $(MAYBE_NAME)            \
+			 $(MAYBE_OPTIMIZED_LOOKUP)                                  \
 			 $(MAYBE_PROJECT) $(MAYBE_PREPROCESS_FOR_OPTIMIZED_LOOKUP)  \
 			 $(MAYBE_PUSH_WEIGHTS) $(MAYBE_REGEXP2FST)                  \
 			 $(MAYBE_REMOVE_EPSILONS) $(MAYBE_REPEAT) $(MAYBE_REVERSE)  \
@@ -221,6 +225,7 @@ hfst_pair_test_SOURCES=hfst-pair-test.cc $(HFST_COMMON_SRC) \
 HfstStrings2FstTokenizer.cc 
 hfst_minimize_SOURCES=hfst-minimize.cc $(HFST_COMMON_SRC)
 hfst_name_SOURCES=hfst-name.cc $(HFST_COMMON_SRC)
+hfst_optimized_lookup_SOURCES=hfst-optimized-lookup.cc
 hfst_preprocess_for_optimized_lookup_format_SOURCES=hfst-preprocess-for-optimized-lookup-format.cc\
 													 $(HFST_COMMON_SRC)
 hfst_project_SOURCES=hfst-project.cc $(HFST_COMMON_SRC)
@@ -252,8 +257,6 @@ install-exec-hook:
 		$(LN_S) -f hfst-conjunct$(EXEEXT) hfst-intersect$(EXEEXT) && \
 		$(LN_S) -f hfst-minimize$(EXEEXT) hfst-minimise$(EXEEXT) && \
 		$(LN_S) -f hfst-subtract$(EXEEXT) hfst-minus$(EXEEXT) && \
-		$(LN_S) -f hfst-lookup$(EXEEXT) hfst-optimized-lookup$(EXEEXT) && \
-		$(LN_S) -f hfst-lookup$(EXEEXT) hfst-optimised-lookup$(EXEEXT) && \
 		$(LN_S) -f hfst-preprocess-for-optimized-lookup-format$(EXEEXT) hfst-preprocess-for-optimised-lookup-format$(EXEEXT) && \
 		$(LN_S) -f hfst-calculate$(EXEEXT) hfst-sfstpl2fst$(EXEEXT) && \
 		$(LN_S) -f hfst-summarize$(EXEEXT) hfst-summarise$(EXEEXT) && \
