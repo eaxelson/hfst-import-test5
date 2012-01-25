@@ -396,7 +396,9 @@ Morph-it \cite{Zanchetta_2005-1} for Italian, Swelex
 for Swedish and TrMorph \cite{Coltekin/2010} for Turkish. 
 OMorFi, Morphisto and Morph-it have several rules for
 inflection and compounding, Morph-it and Swelex are basically word-lists.
-The HFST back-ends are SFST, OpenFst and foma. The HFST version is the newest one, 3.3.4.
+We use the newest version of HFST, 3.3.4, with SFST, OpenFst and foma as
+back-ends. The times are average values counted from 10 compilations.
+
 
 \begin{table} [h!]
 \centering
@@ -439,18 +441,18 @@ earlier benchmarking \cite{hfst/2011}. The back-end versions are also shown.
 \end{table}
 
 It can be clearly seen that the performance of HFST with SFST as back-end 
-has improved: the current compilation time of the Finnish morphology has almost
+has improved: the compilation time of the Finnish morphology has almost
 halved and the compilation time of the German morphology is only one third of the
-result at previous benchmarking. 
-This is because SFST has new efficient minimization and composition functions
-developed jointly with the HFST team based on our previous benchmarking.
+time at previous benchmarking. 
+This improvement comes from SFST's new efficient minimization and composition functions
+that were developed jointly with the HFST team based on our previous benchmarking.
 
-The compilation times of HFST with OpenFst as back-end have become slower. It is not
-clear whether this is because of the newer version of OpenFst or changes in the 
-actual HFST code (todo: find out).
-
+The compilation times of HFST with OpenFst as back-end have become slower.
+We are still looking into this fact trying to find out whether
+the problem lies in the HFST code or if we are not using the features of 
+OpenFst's newer version right.
 The performance of HFST with foma has stayed almost the same, only a small
-growth of couple of seconds can be seen. 
+growth of couple of seconds can be seen.
  
 
 \section{Building Taggers}
