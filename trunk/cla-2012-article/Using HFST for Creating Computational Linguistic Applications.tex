@@ -669,8 +669,8 @@ Some desiderata for pattern matching are:
 should be able to operate in parallel
 \item It should be possible to impose contextual requirements (rules) on
 the patterns to be matched
-\item Matching should be efficient in space and time - in particular, writing
-opening and closing tags around a match shouldn't introduce long-range
+\item Matching should be efficient in space and time - in particular, it should
+be possible to avoid long-range
 dependencies which are awkward for FST transformations
 \item A facility for referring to common subpatterns, such as dates, by name
 \end{itemize}
@@ -720,6 +720,29 @@ impossible to implement in a strict FST framework; the others suggest
 compilations to larger, less efficient transducers.
 
 \subsection{Implementation in a FST library}
+
+Whereas \verb!pmatch! offers a unified interface with various built-in
+transformations, sets and a Xerox-inherited syntax and environment,
+the present effort is focused on an API that would support the development
+of more specific applications.
+
+The call stack is a convenient metaphor for the referential system. When a
+transducer is loaded for matching in the initial position, a referential space
+of transducers is populated by recursively traversing the alphabet, looking
+for references to other transducers. This process is repeated until all
+possible references have been located.
+
+At every symbol in the input, the top level attempts to transform the longest
+possible continuation (or, if the same maximal continuation can be transformed
+in multiple ways, returns one of them, typically with a weighting system).
+Failures to do this are interpreted as successful identity matches.
+
+The encountering of an insertion symbol (eg. \verb!@I.FinnishAdjective@!)
+triggers the calling of a subnetwork transducer with the transducer in
+question. These transducers share the full input buffer (for checking
+an arbitrary amount of context) but have independent spaces for flag
+diacritics, possible alphabet-dependant special symbols (such as \verb!IDENTITY!
+or \verb!UNKNOWN!).
 
 \section{Discussion}
 
