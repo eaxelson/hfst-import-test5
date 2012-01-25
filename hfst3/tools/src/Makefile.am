@@ -256,6 +256,7 @@ install-exec-hook:
 		$(LN_S) -f hfst-fst2strings$(EXEEXT) hfst-expand$(EXEEXT) && \
 		$(LN_S) -f hfst-conjunct$(EXEEXT) hfst-intersect$(EXEEXT) && \
 		$(LN_S) -f hfst-minimize$(EXEEXT) hfst-minimise$(EXEEXT) && \
+		$(LN_S) -f hfst-optimised-lookup$(EXEEXT) hfst-optimized-lookup$(EXEEXT) && \
 		$(LN_S) -f hfst-subtract$(EXEEXT) hfst-minus$(EXEEXT) && \
 		$(LN_S) -f hfst-preprocess-for-optimized-lookup-format$(EXEEXT) hfst-preprocess-for-optimised-lookup-format$(EXEEXT) && \
 		$(LN_S) -f hfst-calculate$(EXEEXT) hfst-sfstpl2fst$(EXEEXT) && \

@@ -1,4 +1,4 @@
-/*
+ /*
   
   Copyright 2009 University of Helsinki
   
@@ -15,6 +15,14 @@
   limitations under the License.
   
 */
+
+/*
+config.h-defined constants
+ */
+
+const char * PACKAGE_NAME = "hfst-optimized-lookup";
+const char * PACKAGE_BUGREPORT = "hfst-bugs@helsinki.fi";
+const char * PACKAGE_STRING = "hfst-optimized-lookup 1.2";
 
 /*
   NOTE:
@@ -34,11 +42,6 @@
 #include <ctime>
 #include <iostream>
 
-#ifdef HAVE_CONFIG_H
-#include <config.h>
-#endif
-
-#include <config.h>
 
 enum OutputType {HFST, xerox};
 OutputType outputType = xerox;
