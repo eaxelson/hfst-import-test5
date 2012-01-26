@@ -757,6 +757,9 @@ This will yield a file "testfile.att" that looks as follows:
         @see HfstTransducer(FILE*, ImplementationType, const std::string&) */
     void write_in_att_format(FILE * ofile, bool write_weights=true) const;
 
+    void write_in_att_format_number
+      (FILE * ofile, bool write_weights=true) const;
+
 
     /** \brief \brief Write the transducer in AT&T format to FILE 
         named \a filename. \a write_weights

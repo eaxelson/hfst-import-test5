@@ -44,7 +44,7 @@ using hfst::HfstInputStream;
 
 
 // add tools-specific variables here
-static bool use_numbers=false; // not implemented
+static bool use_numbers=false;
 static bool print_weights=false;
 static bool do_not_print_weights=false;
 
@@ -166,7 +166,10 @@ process_stream(HfstInputStream& instream, FILE* outf)
     else  // this should not happen
       printw = true;
 
-    t.write_in_att_format(outf,printw);
+    if (use_numbers)
+      t.write_in_att_format_number(outf,printw);
+    else
+      t.write_in_att_format(outf,printw);
     }
     instream.close();
     if (outf != stdout)

@@ -705,6 +705,45 @@ namespace hfst {
             }          
         }
 
+        /** @brief Write the graph in AT&T format to FILE \a file using numbers
+	    instead of symbol names.
+            \a write_weights defines whether weights are printed. */
+        void write_in_att_format_number(FILE *file, bool write_weights=true) 
+        {
+	  unsigned int source_state=0;
+          for (iterator it = begin(); it != end(); it++)
+            {
+              for (typename HfstTransitions::iterator tr_it
+                     = it->begin();
+                   tr_it != it->end(); tr_it++)
+                {
+                  C data = tr_it->get_transition_data();
+                  
+                  fprintf(file, "%i\t%i\t%i\t%i",
+                          source_state,
+                          tr_it->get_target_state(),
+			  tr_it->get_input_number(),
+			  tr_it->get_output_number());
+		  
+		  if (write_weights)
+		    fprintf(file, "\t%f",
+			    data.get_weight()); 
+		  fprintf(file, "\n");
+			  
+		  if (is_final_state(source_state))
+		    {
+		      fprintf(file, "%i", source_state);
+		      if (write_weights)
+			fprintf(file, "\t%f", 
+				get_final_weight(source_state));
+		      fprintf(file, "\n");
+		    }
+		}
+	      source_state++;
+	    }
+	}
+
+
         /* Create an HfstTransitionGraph as defined in AT&T format 
            in istream \a is or FILE \a file. \a epsilon_symbol defines
            how epsilon is represented. 
