@@ -260,6 +260,7 @@ $ echo " m a n a a b .o. a -> b || m _ n , _ b;" |
 
 \begin{table} [h!]
 \centering
+\caption{Different context directions in Replace Rules}
 \begin{tabular}{ | c | c | }
 \hline
 \ \verb!||!\ & \ both contexts are taken from the upper language \\ \hline
@@ -267,7 +268,6 @@ $ echo " m a n a a b .o. a -> b || m _ n , _ b;" |
 \ \verb!\\!\ & \ left context is taken from the upper language, right from the lower \\ \hline
 \ \verb!\/!\ & \ both contexts are taken from the lower language. \\ \hline
 \end{tabular}
-\caption{Different context directions in Replace Rules}
 \label{tab:context_directions}
 \end{table}
 
@@ -294,6 +294,7 @@ $ echo " b a a .o. a -> b // b _ ;" | ./hfst-regexp2fst | hfst-fst2txt
 
 \begin{table} [h!]
 \centering
+\caption{List of right replace operators that can be used in HFST}
 \begin{tabular}{| c | c |} 
 \hline
 Right replace operators & Replace function \\ \hline\hline
@@ -304,7 +305,6 @@ Right replace operators & Replace function \\ \hline\hline
 \verb!@>!   & Shortest match from left to right \\ \hline
 \verb!>@!   & Shortest match from right to left \\ \hline
 \end{tabular}
-\caption{List of right replace operators that can be used in HFST}
 \label{tab:replace_operators}
 \end{table}
 
@@ -402,6 +402,9 @@ back-ends. The times are average values counted from 10 compilations.
 
 \begin{table} [h!]
 \centering
+  \caption{Compilation times for different morphologies with
+    different HFST back-ends. The times are given in minutes and seconds
+    and averaged over 10 compilations. HFST version is 3.3.4.}
   \begin{tabular}{| c | c | c | c | c | c |}
     \hline
     Back-End & Finnish & German & Italian & Swedish & Turkish \\ \hline\hline
@@ -409,19 +412,19 @@ back-ends. The times are average values counted from 10 compilations.
     OpenFst & 7:52 & 7:45 & 2:24 & 0:49 & 0:40 \\ \hline
     foma & 1:52 & 1:33 & 0:31 & 0:13 & 0:05 \\ \hline
     \end{tabular}
-  \caption{Compilation times for different morphologies with
-    different HFST back-ends. The times are given in minutes and seconds
-    and averaged over 10 compilations. HFST version is 3.3.4.}
   \label{tab:compilation_times}
 \end{table}
 
 
-In Table~\ref{tab:compilation_times_versions} we also show the compilation 
-times for Finnish and German compared with the results that we got in our 
-earlier benchmarking \cite{hfst/2011}. The back-end versions are also shown.
+In Table~\ref{tab:compilation_times_versions} we show both the current compilation 
+times and the ones that we got in our earlier benchmarking \cite{hfst/2011} for 
+Finnish and German. We also show the back-end versions used.
 
 \begin{table} [h!]
 \centering
+  \caption{Compilation times for different morphologies with
+    different HFST back-ends and their versions. 
+    The times are given in minutes and seconds.}
   \begin{tabular}{| c | c | c | c |}
   \hline
   Back-End                 & version  & Finnish  & German \\ \hline\hline
@@ -429,13 +432,10 @@ earlier benchmarking \cite{hfst/2011}. The back-end versions are also shown.
                            & 1.4.6    & 2:48     & 2:12 \\ \hline
   \multirow{2}{*}{OpenFst} & 1.2.7    & 6:51     & 6:28 \\
                            & 1.2.10   & 7:52     & 7:45 \\ \hline
-  \multirow{2}{*}{foma}    & ?        & 1:49     & 1:29 \\
+  \multirow{2}{*}{foma}    & 0.1.14   & 1:49     & 1:29 \\
                            & 0.1.16   & 1:52     & 1:33 \\
 \hline
   \end{tabular}
-  \caption{Compilation times for different morphologies with
-    different HFST back-ends and versions. 
-    The times are given in minutes and seconds.}
   \label{tab:compilation_times_versions}
 \end{table}
 
@@ -443,7 +443,7 @@ It can be clearly seen that the performance of HFST with SFST as back-end
 has improved: the compilation time of the Finnish morphology has almost
 halved and the compilation time of the German morphology is only one third of the
 time at previous benchmarking. 
-This improvement comes from the new version of SFST that has more optimized
+This improvement comes from the newer version of SFST that has more optimized
 composition and Hopcroft minimization functions. The improved functions 
 were developed jointly with the HFST team based on our previous benchmarking.
 
