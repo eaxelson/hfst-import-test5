@@ -29,6 +29,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <getopt.h>
+#include <set>
 
 #include "HfstTransducer.h"
 #include "HfstInputStream.h"
@@ -106,6 +107,101 @@ parse_options(int argc, char** argv)
     return EXIT_CONTINUE;
 }
 
+using hfst::implementations::HfstBasicTransducer;
+using hfst::implementations::HfstState;
+using hfst::HfstTokenizer;
+
+typedef std::set<std::string> StringSet;
+
+bool is_special_symbol(const std::string &symbol)
+{ return symbol.size() > 2 and symbol[0] == '@' and *(symbol.rbegin()) == '@';}
+
+std::string check_all_symbols(const HfstTransducer &lexicon,
+			      const HfstTransducer &rule)
+{
+  HfstBasicTransducer rule_b(rule);
+
+  StringSet rule_input_symbols;
+
+  for (HfstState s = 0; s <= rule_b.get_max_state(); ++s)
+    {
+      for (HfstBasicTransducer::HfstTransitions::const_iterator it = 
+	     rule_b[s].begin();
+	   it != rule_b[s].end();
+	   ++it)
+	{ 
+	  const std::string &input_symbol = it->get_input_symbol();
+	  rule_input_symbols.insert(input_symbol); 
+	}
+    }
+
+  if (rule_input_symbols.count(hfst::internal_identity) != 0)
+    { return ""; }
+
+  HfstBasicTransducer lexicon_b(lexicon);
+
+  for (HfstState s = 0; s <= lexicon_b.get_max_state(); ++s)
+    {
+      for (HfstBasicTransducer::HfstTransitions::const_iterator it = 
+	     lexicon_b[s].begin();
+	   it != lexicon_b[s].end();
+	   ++it)
+	{ 
+	  const std::string &output_symbol = it->get_output_symbol();
+
+	  if (rule_input_symbols.count(output_symbol) == 0)
+	    { return output_symbol; }
+	}
+    }
+  
+  return "";
+}
+
+std::string check_multi_char_symbols
+(const HfstTransducer &lexicon, const HfstTransducer &rule)
+{
+  HfstBasicTransducer lexicon_b(lexicon);
+  HfstBasicTransducer rule_b(rule);
+
+  HfstTokenizer tokenizer;
+
+  StringSet rule_input_symbols;
+
+  for (HfstState s = 0; s <= rule_b.get_max_state(); ++s)
+    {
+      for (HfstBasicTransducer::HfstTransitions::const_iterator it = 
+	     rule_b[s].begin();
+	   it != rule_b[s].end();
+	   ++it)
+	{ 
+	  const std::string &input_symbol = it->get_input_symbol();
+	  rule_input_symbols.insert(input_symbol); 
+	}
+    }
+
+  for (HfstState s = 0; s <= lexicon_b.get_max_state(); ++s)
+    {
+      for (HfstBasicTransducer::HfstTransitions::const_iterator it = 
+	     lexicon_b[s].begin();
+	   it != lexicon_b[s].end();
+	   ++it)
+	{ 
+	  const std::string &output_symbol = it->get_output_symbol();
+
+	  if (rule_input_symbols.count(output_symbol) == 0)
+	    {
+	      if (is_special_symbol(output_symbol))
+		{ continue; }
+
+	      if (tokenizer.tokenize_one_level(output_symbol).size() > 1)
+		{ return output_symbol; }
+	    }
+	}
+    }
+  
+  return "";
+}
+
 int
 compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                 HfstOutputStream& outstream)
@@ -143,8 +239,31 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
       rule.minimize();
       rules.push_back(rule);      
     }
-    
+ 
     verbose_printf("Computing intersecting composition...\n");
+
+    if (rules.size() > 0)
+      {
+	std::string symbol;
+	if ((symbol = check_all_symbols(lexicon,rules[0])) != "")
+	  {
+	    warning(0, 0, 
+		    "\nFound output symbols (e.g. \"%1s\") in transducer in\n"
+		    "file %2$s which will be filtered out because they are\n"
+		    "not found on the output tapes of transducers in file\n"
+		    "%3$s.",
+		    symbol.c_str(), firstfilename, secondfilename);
+	  }
+	  else if ((symbol = check_multi_char_symbols(lexicon,rules[0])) != "")
+	  { 
+	    warning(0, 0, 
+		    "\nFound output multi-char symbols (e.g. \"%1s\") in \n"
+		    "transducer in file %2$s which are not found on the\n"
+		    "output tape of transducers in file %3$s.",
+		    symbol.c_str(), firstfilename, secondfilename);
+	  }
+      }
+    
     lexicon.compose_intersect(rules);
     char* composed_name = static_cast<char*>(malloc(sizeof(char) * 
                                              (strlen(lexiconname) +
