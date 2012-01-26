@@ -27,7 +27,7 @@
 
 bool print_usage(void)
 {
-  std::cerr <<
+  std::cout <<
     "\n" <<
     "Usage: " << PACKAGE_NAME << " [OPTIONS] TRANSDUCER\n" <<
     "Run a transducer on standard input (one word per line) and print analyses\n" <<
@@ -60,7 +60,7 @@ bool print_usage(void)
 
 bool print_version(void)
 {
-  std::cerr <<
+  std::cout <<
     "\n" <<
     PACKAGE_STRING << std::endl <<
     __DATE__ << " " __TIME__ << std::endl <<
