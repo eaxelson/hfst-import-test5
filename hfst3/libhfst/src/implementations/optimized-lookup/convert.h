@@ -63,7 +63,7 @@ struct StatePlaceholder {
     final_weight(0.0)
     { }
     
-    bool const is_simple(std::set<SymbolNumber> const & flag_symbols) const
+    bool is_simple(std::set<SymbolNumber> const & flag_symbols) const
     {
         if (state_number == 0) {
         return false;
@@ -90,7 +90,7 @@ struct StatePlaceholder {
         return true;
     }
     
-    unsigned int const number_of_transitions(void) const {
+    unsigned int number_of_transitions(void) const {
     unsigned int count = 0;
     for(SymbolTransitionsMap::const_iterator it = inputs.begin();
         it != inputs.end(); ++it) {
@@ -99,7 +99,7 @@ struct StatePlaceholder {
     return count;
     }
     
-    unsigned int const symbol_offset(
+    unsigned int symbol_offset(
 	SymbolNumber const symbol,
 	std::set<SymbolNumber> const & flag_symbols) const {
 	if (symbol == 0) {
@@ -149,18 +149,18 @@ struct StatePlaceholder {
     }
 };
 
-bool const compare_states_by_input_size(
+bool compare_states_by_input_size(
     const StatePlaceholder & lhs, const StatePlaceholder & rhs);
-bool const compare_states_by_state_number(
+bool compare_states_by_state_number(
     const StatePlaceholder & lhs, const StatePlaceholder & rhs);
 
 class IndexPlaceholders: public std::map<unsigned int,
         std::pair<unsigned int, SymbolNumber> >
 {
 public:
-    bool const fits(StatePlaceholder const & state,
-            std::set<SymbolNumber> const & flag_symbols,
-            unsigned int const position) const
+    bool fits(StatePlaceholder const & state,
+	      std::set<SymbolNumber> const & flag_symbols,
+	      unsigned int const position) const
     {
     if (count(position) != 0) {
         return false;
@@ -178,9 +178,9 @@ public:
     return true;
     }
 
-    bool const unsuitable(unsigned int const index,
-              SymbolNumber const symbols,
-              float const packing_aggression) const
+    bool unsuitable(unsigned int const index,
+		    SymbolNumber const symbols,
+		    float const packing_aggression) const
     {
     if (count(index) != 0) {
         return true;
