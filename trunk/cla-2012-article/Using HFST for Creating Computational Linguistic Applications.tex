@@ -760,6 +760,10 @@ for some
 $\sigma' \in \Sigma^I \cap \Sigma^E, \sigma'' \in \Sigma^E \cup \Sigma^L$,
 where $q_n = (q^I_n, q^E_n, q^L_n)$ and $\sigma_1 \neq \epsilon \neq \sigma_2$.
 
+The set of the states of the composition, $Q$, are the reachable subset
+(in the sense of having a path from $0$ to the state) of
+$Q^I \times Q^E \times Q^L$.
+
 If in a given state any of the component transducers has an edge involving
 epsilon and the other symbols match as above, the resulting composed edges
 go to states such that any state to the left of an input epsilon or to the
@@ -768,7 +772,7 @@ $(q^I_1, (\sigma, \sigma'), q^{I'})$, $(q^E_1, (\epsilon, \sigma''), q^{E'})$ an
 $(q^L_1, (\sigma'', \sigma'''), q^{L'})$, a successor state of $q_1$ will be
 $(q^I_1, q^E_2, q^L_2)$.
 
-The final states are $T = T^I \times T^E \times T^L$.
+The final states are the reachable subset of $T = T^I \times T^E \times T^L$.
 
 It can trivially be verified that this is equivalent to taking the two
 compositions $(I \circ E) \circ L$.
