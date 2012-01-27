@@ -16,14 +16,14 @@
 \title{Using HFST for Creating Computational Linguistic Applications}
 %
 \author{Krister Lind\'{e}n \and Erik Axelson \and Senka Drobac \and\\
-Sam Hardwick \and Tommi A Pirinen \and Miikka Silfverberg}
+Sam Hardwick \and Miikka Silfverberg \and Tommi A Pirinen }
 
 \institute{University of Helsinki\\
 Department of Modern Languages\\
 Unioninkatu 40 A\\
 FI-00014 Helsingin yliopisto, Finland\\
 \email{\{krister.linden, erik.axelson, senka.drobac, sam.hardwick,\\
-tommi.pirinen, miikka silfverberg\}@helsinki.fi}}
+miikka silfverberg,tommi.pirinen\}@helsinki.fi}}
 
 \maketitle
 
@@ -341,25 +341,161 @@ $  echo " a -> b || m _ n ,, c -> d ;" | ./hfst-regexp2fst | hfst-fst2txt
 
 \subsection{Morphosyntax and Morphological Formul\ae}
 
-Morphosyntax is the component dealing with morphological combinatorics in
-language descriptions. This concerns word-formation processes, such as
-affixation, compounding and more. There are numerous more or less widely
-accepted formalisms for describing the morphosyntax in natural language
-processing applications, such as
-hunspell\footnote{\url{http://hunspell.sf.net}} (and its older *spell
-relatives), apertium lttoolbox\footnote{\url{http://apertium.sf.net}} or Xerox
-lexc\cite{beesley/2003}. The HFST tool set contains parsers and compilers to
-read descriptions in those languages and compile a finite-state automaton for
-rest of the HFST tools to process out from them
-\cite{pirinen/2010/il,pirinen/2009/sfcm,pirinen/2012/lrec}. In this sections
-we draw shortly summarise the common features of the algorithms used to compile
-all the descriptions and generalise the formula over morphosyntax for
-finite-state automata, described fully in terms of standard finite-state
+Morphosyntax
+is
+the
+component
+dealing
+with
+morphological
+combinatorics
+in
+language
+descriptions.
+This
+concerns
+word-formation
+processes,
+such
+as
+affixation,
+compounding
+and
+more.
+There
+are
+numerous
+more
+or
+less
+widely
+accepted
+formalisms
+for
+describing
+the
+morphosyntax
+in
+natural
+language
+processing
+applications,
+such
+as
+hunspell\footnote{\url{http://hunspell.sf.net}}
+(and
+its
+older
+*spell
+relatives),
+apertium
+lttoolbox\footnote{\url{http://apertium.sf.net}}
+or
+Xerox
+lexc\cite{beesley/2003}.
+The
+HFST
+tool
+set
+contains
+parsers
+and
+compilers
+to
+read
+descriptions
+in
+those
+languages
+and
+compile
+a
+finite-state
+automaton
+for
+rest
+of
+the
+HFST
+tools
+to
+process
+out
+from
+them
+\cite{pirinen/2010/il,pirinen/2009/sfcm,pirinen/2012/lrec}.
+In
+this
+sections
+we
+draw
+shortly
+summarise
+the
+common
+features
+of
+the
+algorithms
+used
+to
+compile
+all
+the
+descriptions
+and
+generalise
+the
+formula
+over
+morphosyntax
+for
+finite-state
+automata,
+described
+fully
+in
+terms
+of
+standard
+finite-state
 operations.
-
-It is true for all the contemporary morphosyntax implementations that they more
-or less draw from item-and-arrangement style combinatorics over sets of
-morphs or morphemes. In general form such a system can be described as a
+It
+is
+true
+for
+all
+the
+contemporary
+morphosyntax
+implementations
+that
+they
+more
+or
+less
+draw
+from
+item-and-arrangement
+style
+combinatorics
+over
+sets
+of
+morphs
+or
+morphemes.
+In
+general
+form
+such
+a
+system
+can
+be
+described
+as
+a
 disjunction of morphs repeated infinitely over each other, combined with
 morphosyntactic filter describing precisely the right combinations of morphemes.
 Both morphemes and the filters can be trivially described in finite-state form.
@@ -645,10 +781,43 @@ Basic HFST  & 96.68\%  &    80.71\% & 96.23\% \\
 \end{center}
 \end{table}
 
-\section{Applying Transducers}
+\section{Transducer applications}
 
 \subsection{Introduction}
 % Tommi
+
+The automata technology is a general framework of describing language models
+and phenomena from wide range of linguistic fields from phonology to
+morphology, and even syntax and semantics (as needed with pos tagging and
+machine translation).  The practical applications covered  covering
+applications from spell-checking, as demonstrated in voikko\footnote{} with
+bindings to LibreOffice, Gnome desktop, mozilla and Mac OS X Spell Service, to
+morphological and syntactic analysis and, as demonstrated in native HFST tools
+from HFST downloads\footnote{}, and to machine translation as demonstrated in
+several released language pairs in machine translation system
+apertium\footnote{}. This gives raise to very important feature of the HFST
+technology at large, alluded to in previous chapters, that given language model
+described with one tool in one theoretical and practical framework. For example
+given pre-existing morphological analysers for Sámi languages found in the
+internet\footnote{\url{}}, written in Xerox lexc formalism, it was matter of
+one evening to create a spell checker for, evaluated in
+\cite{pirinen/2010/lrec}, with additional training from likewise freely
+available Sámi wikipedia. Similar results of using machine translation
+dictionaries from free/libre open source project
+apertium\footnote{\url{http://apertium.sf.net}} to create not only
+dictionaries, but also morphological analysers and spell checkers is
+demonstrated in \cite{pirinen/lrec/2012} \footnote{examples also reachable from
+\url{http:/www.ling.helsinki.fi/cgi-bin/omor/omordemo.bash}}.  
+
+Noteworthy about the general applicability of different finite-state
+language model over practical applicatoins it is so that we can now generate
+e.g. spelling checkers for languages that lack such a tool but have machine
+translation dictionaries (such as Manx) or morphological analysers (such as
+Greenlandic, which arguably is not plausibly implementably under classical
+spell-checkig formalisms). This adaptations of such models to baseline
+spell-checkers (with homogenous Damerau-Levenshtein edit distance a
+error model) could be performed without any feedback from linguist or
+even a native speakers.
 
 \subsection{Spellers}
 
@@ -665,7 +834,7 @@ parser is typically required\cite{}. To correct a spelling error in finite-state
 system, a two-tape automaton modeling the typing errors should be applied to
 the misspelt string to get set of potential corrections\cite{pirinen/2010/lrec}.
 For practical purposes the error model can also be implemented as
-fuzzy finite-state traversal algorithm or similar methods\cite{,}. The result
+fuzzy finite-state traversal algorithm or similar methods\cite{oflazer/2002}. The result
 of the correction step is a set of word-forms that are correct in the
 language of the spell-checking dictionary. Another related task is to rank this
 set to provide the most likely corrections first for the end-user of spelling
