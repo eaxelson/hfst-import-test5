@@ -643,6 +643,48 @@ unexpected symbols in this large space, \verb!hfst-ospell! uses a special
 symbol, \verb!@_UNKNOWN_SYMBOL_@! which is taken to be equal to any symbol
 that is otherwise absent.
 
+\subsubsection{Error model tool and optimizations}
+For the most common case of generating Levenshtein and
+Damerau-Levenshtein (in which transposition of adjacent symbols constitutes
+one operation) distance error models, a tool (\verb!editdist.py!) and
+definition format was developed.
+
+The definition format serves the purposes of minimizing the number of symbols
+used in the error source (the number of transitions is $\mathrm{O}(|\Sigma|^2)$)
+and introducing weights for edits. Typical
+morphologies have a number of unusual characters (punctuation, special symbols)
+or internally used symbols (eg. flag diacritics) that should be filtered for
+more efficient correction. This is accomplished by providing a facility for
+reading the alphabet from a transducer, ignoring any symbols of more than
+one Unicode code point, and reading further ignorable symbols from a
+configuration file.
+
+The configuration file allows specifying weights to be added to any edit
+involving a particular character or a particular edit operation (for example,
+assigning a low weight to the edit o $\rightarrow$ ö for an OCR application).
+
+Certain characteristics of the spelling correction task permit
+efficiency-oriented improvements to error models. A naive Levenshtein error
+model with edit distance 2 in \verb!ospell! would, when given the word
+word \verb!arrivew! where the French word \verb!arriver! was intended would
+do the following useless work:
+
+\begin{verbatim}
+a:0 0:a r r i v e    [failure]
+0:a a:0 r r i v e    [failure]
+a r:0 0:r r i v e    [failure]
+a 0:r r:0 r i v e    [failure]
+...
+a r r i v e w:0      [success]
+a r r i v e w:z      [success]
+a r r i v e w:r      [success]
+...
+\end{verbatim}
+
+When the correctable error is near the end, almost every symbol is deleted and
+inserted with no effect. This may be circumvented by adding, for each deletion
+and insertion, a special successor state from which its inverse is absent.
+
 \subsubsection{Ranking Suggestions}
 % Tommi & Miikka
 
