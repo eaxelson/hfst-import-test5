@@ -783,6 +783,11 @@ and the target of every edge is computed and pushed onto the
 queue. The starting state is then discarded, and the process is repeated
 with a new state popped from the queue until the queue is empty.
 
+Conceptually, the state space of $E \circ L$, which contains all the
+misspellings (in the sense of $E$) of all the entries in the lexicon, is
+explored in such a way that only the states visited when looking up $I$ are
+generated.
+
 For this process to be guaranteed to terminate, it is sufficient that none of
 the component transducers have input-epsilon loops and that the input
 transducer accepts strings of only finite length. This is because every newly
