@@ -690,10 +690,10 @@ To circumvent these problems, a three-way online composition of $I$, $E$ and
 $L$ was implemented (distributed as \verb!hfst-ospell!
 under the GPL and Apache licenses).
 
-We write $I = {Q^I, 0^I, T^I, E^I}$ and so on, where $Q$
+We write $I = (Q^I, 0^I, T^I, E^I)$, where $Q$
 is the set of states, $0$ is the starting state, $T$ is the set of terminal
 states and $E$ is the set of transitions (triples of (state, symbol pair
-(input and output), state)).
+(input and output), state)), and similarity for $E$ and $L$.
 
 Eliding for the time being weights and flag diacritics, states in the
 composition transducer are triples of states of the component transducers.
