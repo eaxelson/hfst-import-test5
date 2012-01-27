@@ -699,9 +699,9 @@ Eliding for the time being weights and flag diacritics, states in the
 composition transducer are triples of states of the component transducers.
 Analogously with two-way composition, the starting state is $(0^I, 0^E, 0^L)$
 and the edge $e = (q_1, (\sigma_1, \sigma_2), q_2)$ exists if edges
-$(q^I_1), (\sigma_1, \sigma'), q^I_2)$,
-$(q^E_1), (\sigma', \sigma''), q^E_2)$ and
-$(q^L_1), (\sigma'', \sigma_2), q^L_2)$ exist in the respective transducers
+$(q^I_1, (\sigma_1, \sigma'), q^I_2)$,
+$(q^E_1, (\sigma', \sigma''), q^E_2)$ and
+$(q^L_1, (\sigma'', \sigma_2), q^L_2)$ exist in the respective transducers
 for some
 $\sigma' \in \Sigma^I \cap \Sigma^E, \sigma'' \in \Sigma^E \cup \Sigma^L$,
 where $q_n = (q^I_n, q^E_n, q^L_n)$ and $\sigma_1 \neq \epsilon \neq \sigma_2$.
