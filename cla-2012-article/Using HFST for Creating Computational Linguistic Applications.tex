@@ -460,46 +460,150 @@ growth of a couple of seconds can be seen.
 \subsection{Introduction}
 % Miikka
 
-\begin{itemize}
-\item Possible to construct HMM type taggers using different
-  combinations of tags and wordforms~\cite{Silfverberg/2010/IceTal}
-  and \cite{Silfverberg/2011}.
-\item Accuracy comparable with TnT~\cite{Brants:2000}.
-\item There are some new optimizations to the lexical model and
-  sequence model. Especially we implement a version of the Viterbi
-  algorithm for weighted treansducers.
-\end{itemize}
+The Hfst library includes tools for constructing statistical
+ part-of-speech taggers which resemble Hidden Markov Models (HMM) from
+ tagged training data. Hfst taggers differ from other HMM taggers such
+ as Tnt~\cite{Brants:2000} and Hunpos~\cite{Halascy:2007} in that Hfst
+ allows combining different estimates for tag probabilities during
+ tagging. It is possible to use e.g. the surrounding word forms in
+ estimating the probability of a given tag. This is more thoroughly
+ explained in \cite{Silfverberg/2010/IceTal,Silfverberg/2011} The
+ accuracy for basic HMM taggers implemented using Hfst tools is
+ comparable to the accuracy of Tnt and Hunpos as demonstrated below.
+
+HMM type taggers include lexical model and a tag sequence model. The
+ lexical model is needed for determining probabilities for the
+ co-occurrence of tags and word forms disregarding context and the tag
+ sequence model is used for determining the probabilities for the
+ co-occurrence of tags of neighbouring words. The lexical models in
+ Hfst taggers include suffix guessers which can be modified to suit
+ the needs of particular languages. Additionally Hfst supports using
+ morphological analyzers in tagging.
+
+\subsection{The structure of Hfst Taggers}
+
+HMM taggers are statistical models, which determine the most likely
+ part-of-speech tag from some tag set for each word in a sentence. For
+ determining the likeliest part-of-speech tags, the taggers use
+ lexical probabilities ${\rm p}(w|t)$ for each word $w$ and each tag
+ $t$ together with so called transition probabilities for the tag of a
+ word at a given position given the tags of the preceding words ${\rm
+ p}(t_i | t_{i - 1},\ ...\, t_{i-n})$. The integer $n$ determines how
+ many preceding tags are considered when estimating the probability of
+ tags. It is called the order of the HMM tagger. Second order HMM
+ taggers are the most common in part-of-speech tagging.
+
+Hfst taggers extend traditional HMM taggers by allowing modifications
+ to the traditional estimate ${\rm p}(t_i | t_{i - 1},\ ...\,
+ t_{i-n})$. Together with preceding tags, succeeding tags and word
+ forms can be used when deciding the probability of a tag at a given
+ position. These estimates are combined using finite-state calculus.
+
+In Hfst taggers the lexical probabilities ${\rm p}(w|t)$ are given by
+ the lexical component of the tagger and the transition probabilities
+ ${\rm p}(t_i | t_{i - 1},\ ...\, t_{i-n})$ are given by the sequence
+ component of the tagger. Both models are trained using tagged
+ training data.
+
+Both components can be modified to suit the needs of a particular
+ language. In \cite{Silfverberg/2011} it is explained how the sequence
+ model can be modified to include preceding and succeeding words in
+ the estimates of the probabilities of tags and how suffix guessers
+ can be modified to better suit agglutinative languages. In this paper
+ we show how a morphological analyzer can be integrated with an Hfst
+ tagger to improve the accuracy of the tagger, when there are a lot of
+ out-of-vocabulary words.
 
 
-\subsection{Including Morphologies without Harmonizing Tagsets}
+\subsection{The Lexical Model of Hfst Taggers}
 % Miikka
 
-\begin{itemize}
-\item Tnt-type guesser work poorly for agglutinative languages.
-\item Paradigm-based guessers for agglutinative languages using
-  morphological analyzers work better.
-\item Differing tag sets are a problem. It is sometimes difficult to
-  find good translations between tag sets because the underlying
-  linguistic description can differ a lot.
-\item HFST provides a way to use a morphological analyzer to construct
-  a paradigm based guesser, without harmonizing tag sets.
-\item Words are transformed to their corresponding analysis sets and
-  the analysis sets are associated with tags and corresponding
-  conditional probabilities.
-\item When a previously unseen word is encountered while tagging, it
-  is transformed into its set of analyses and the tag probabilities
-  for that set are used.
-\item For words unknown to the morphological analyzer or for words
-  whose analysis set does not figure in the training data, a
-  suffix-based guesser is used.
-\end{itemize}
+The accuracy of traditional part-of-speech taggers suffers greatly
+ because out-of-vocabulary (OOV) words, that is word forms which were
+ not observed during training of the tagger. For languages like
+ English with few morphological phenomena and little compounding, this
+ is not a big problem when the genres of the training data and the data
+ that is tagged are sufficiently similar. When the genres differ
+ considerably there are a lot more OOV words and consequently accuracy
+ is reduced. When building taggers for morphologically rich languages
+ such as Turkish, Finnish or Hungarian OOV words become a major
+ problem even when no change of genre is involved. In morphologically
+ rich languages OOV words arise from inflection, derivation and
+ compounding.
+ 
+Hfst taggers offer two ways to tackle the problem of OOV words (1) the
+ tagger builder can adjust the way probability distribution for
+ different length suffixes are combined to form estimates for the
+ probabilities of tags and (2) an option to combine taggers with
+ morphological analyzers.
 
-\subsection{Optimization}
-% Miikka
-\begin{itemize}
-\item Viterbi-style optimization.
-\item Beam-search for Finnish, where the tag set is huge.
-\end{itemize}
+E.g. in Finnish a suffix guesser proposed by \cite{Brants:2000} gives
+ poor results. Such a suffix guesser computes tag probabilities for
+ each suffix of a word which is shorter than a given threshold and
+ combines the estimates to give a probability for the OOV word and
+ each tag. In \cite{Silfverberg/2011} it was observed that a guesser
+ which only uses the longest suffix of the OOV word found in the
+ training data gives better results. Therefore the type of suffix
+ guesser which gives the best results is language dependent. Hfst
+ allows for changing the way the suffix probabilities are combined.
+
+Research in tagging morphologically complex languages has utilized
+ morphological analyzers e.g. \cite{Tzoukerman:1996,Oravecz:2002}, but
+ the tag set of the part-of-speech tagger and the tag set of the
+ morphological analyzer has had to be the same. In such approaches, a
+ lexical model is constructed from the analysis sets given by the
+ morphological analyzer for each word. E.g. the English word "man" is
+ ambiguous between the interpretation singular noun "+Noun+Sg" and
+ infinitive verb "+Verb+Inf". In the training data, each occurrence of
+ the word "man" could thus be substituted by the set $S_{man} = \{$
+ "+Noun+Sg", "+Verb+Inf" $\}$. And the lexical model would thus give
+ probabilities ${\rm p}(S_{man}|t)$ for each tag $t$. 
+
+Previous research has focused on the case where the tag set of the
+ morphological analyzer and the tag set of the training corpus are the
+ same. We note here ,that it is not necessary that the tag sets are
+ the same. It is still possible to train a lexical model based on
+ ambiguity classes. When an OOV word is encountered, its ambiguity
+ class is constructed using the morphological analyzer and the lexical
+ probabilities of the ambiguity class are looked up.
+
+It is a problem in practice if the tag sets are required to be the
+ same, since there are often different conventions for tagging a
+ language and there is not always a straight forward conversion
+ between the tag set of the training corpus and the tag set of the
+ part-of-speech tagger. Such a conversion can be difficult if the tag
+ set of either resource is coarser than the tag set of the other
+ resource.
+
+\subsection{Results}
+
+\begin{table}
+\caption{Results for Finnish taggers}
+\begin{center}
+\begin{tabular}{lccc}
+\hline 
+Model            & ~~~~Seen & ~~~~Unseen & ~~~~All \\
+\hline 
+Basic HFST       &  97.51\% &    77.51\% & 95.23\% \\
+With Morph HFST  &  97.53\% &    83.65\% & 95.90\% \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
+\begin{table}
+\caption{Results for English taggers}
+\begin{center}
+\begin{tabular}{lccc}
+\hline
+Model       & ~~~~Seen & ~~~~Unseen & ~~~~All \\
+\hline
+TNT         & 96.77\%  &    85.19\% & 96.46\% \\
+Basic HFST  & 96.68\%  &    80.71\% & 96.23\% \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
 
 \section{Applying Transducers}
 
