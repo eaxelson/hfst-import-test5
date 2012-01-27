@@ -719,16 +719,30 @@ where $\pi_2$ is the output projection.
 It is undesirable to compute either of the intermediate compositions
 $I \circ E$ and $E \circ L$; the former will require futile work (producing
 strings that aren't in the lexicon) and the latter, though possible to
-precompute, will be very large. For most typical case of an edit-distance
-error model with $a$ symbols and distance $d$ acting on a lexical entry with
-length $l$, there are on the order of $(a \times l)^d$
-copies of the lexical transducer along the path (for each transition,
-an edit may or may not be made, leading to as many different continuations
-as edits can be made).
+precompute, will be very large (see table \ref{composed_error_table}).
+
+\begin{table}
+  \centering
+  \caption{Size of two lexical transducers composed with
+    Damerau-Levenshtein edit distance transducers, all results minimized}
+  \label{composed_error_table}
+  \begin{tabular}{ |c| c c c| }
+\hline
+  Transducer               & states   & transitions & SFST file size \\ \hline
+  Morphalou (French)       & 77.0K    & 190.7K   & 1.7MB \\
+  With edit distance 1     & 9.6K     & 733.6K   & 5.7MB \\
+  With edit distance 2     & 18.2K    & 344.7K  & 28MB \\ \hline
+  Omorfi (Finnish)         & 203.8K   & 437.9K   & 4.0M \\
+  With edit distance 1     & 17.7K    & 16186.6K & 120MB \\
+  With edit distance 2     & 30.5K    & 53738.2K & 410MB \\ \hline
+  \end{tabular}
+
+\end{table}
 
 To circumvent these problems, a three-way online composition of $I$, $E$ and
 $L$ was implemented (distributed as \verb!hfst-ospell!
-under the GPL and Apache licenses).
+under the GPL and Apache licenses) (for a more general and complex algorithm,
+see \cite{Allauzen-Mohri2009}).
 
 We write $I = (Q^I, 0^I, T^I, E^I)$, where $Q$
 is the set of states, $0$ is the starting state, $T$ is the set of terminal
