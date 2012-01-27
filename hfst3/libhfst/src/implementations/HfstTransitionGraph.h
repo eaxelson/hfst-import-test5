@@ -1275,6 +1275,15 @@ namespace hfst {
 	HfstTransitionGraph &substitute
 	  (const HfstSymbolSubstitutions &substitutions)
 	  {
+	    // add symbols to the global HfstTransition alphabet
+	    for (HfstSymbolSubstitutions::const_iterator it
+		   = substitutions.begin();
+		 it != substitutions.end(); it++)
+	      {
+		(void)get_symbol_number(it->first);
+		(void)get_symbol_number(it->second);
+	      }
+
 	    // how symbol numbers are substituted:
 	    // substitutions_[from_symbol] = to_symbol
 	    std::vector<unsigned int> substitutions_;
@@ -1288,6 +1297,7 @@ namespace hfst {
 	      {
 		HfstNumber from_symbol = get_symbol_number(it->first);
 		HfstNumber to_symbol = get_symbol_number(it->second);
+		
 		substitutions_.at(from_symbol) = to_symbol;
 	      }
 	    
