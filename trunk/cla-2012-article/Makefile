@@ -9,7 +9,7 @@ Using\ HFST\ for\ Creating\ Computational\ Linguistic\ Applications.pdf:Using\ H
 
 ## Use make to create article pdfs or recreate test results
 
-TEX=xelatex
+TEX=pdflatex
 BIB=bibtex
 SCP=scp
 SCPHOST=ruuvi
