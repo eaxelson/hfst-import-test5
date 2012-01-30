@@ -72,6 +72,7 @@ lookup.
 % Krister
 
 \section{Building Morphologies}
+\label{sec:morphology}
 
 \subsection{Introduction}
 
@@ -341,184 +342,48 @@ $  echo " a -> b || m _ n ,, c -> d ;" | ./hfst-regexp2fst | hfst-fst2txt
 
 \subsection{Morphosyntax and Morphological Formul\ae}
 
-Morphosyntax
-is
-the
-component
-dealing
-with
-morphological
-combinatorics
-in
-language
-descriptions.
-This
-concerns
-word-formation
-processes,
-such
-as
-affixation,
-compounding
-and
-more.
-There
-are
-numerous
-more
-or
-less
-widely
-accepted
-formalisms
-for
-describing
-the
-morphosyntax
-in
-natural
-language
-processing
-applications,
-such
-as
-hunspell\footnote{\url{http://hunspell.sf.net}}
-(and
-its
-older
-*spell
-relatives),
-apertium
-lttoolbox\footnote{\url{http://apertium.sf.net}}
-or
-Xerox
-lexc\cite{beesley/2003}.
-The
-HFST
-tool
-set
-contains
-parsers
-and
-compilers
-to
-read
-descriptions
-in
-those
-languages
-and
-compile
-a
-finite-state
-automaton
-for
-rest
-of
-the
-HFST
-tools
-to
-process
-out
-from
-them
-\cite{pirinen/2010/il,pirinen/2009/sfcm,pirinen/2012/lrec}.
-In
-this
-sections
-we
-draw
-shortly
-summarise
-the
-common
-features
-of
-the
-algorithms
-used
-to
-compile
-all
-the
-descriptions
-and
-generalise
-the
-formula
-over
-morphosyntax
-for
-finite-state
-automata,
-described
-fully
-in
-terms
-of
-standard
-finite-state
-operations.
-It
-is
-true
-for
-all
-the
-contemporary
-morphosyntax
-implementations
-that
-they
-more
-or
-less
-draw
-from
-item-and-arrangement
-style
-combinatorics
-over
-sets
-of
-morphs
-or
-morphemes.
-In
-general
-form
-such
-a
-system
-can
-be
-described
-as
-a
-disjunction of morphs repeated infinitely over each other, combined with
-morphosyntactic filter describing precisely the right combinations of morphemes.
-Both morphemes and the filters can be trivially described in finite-state form.
+Morphosyntax is the component dealing with morphological combinatorics in
+language descriptions.  This concerns word-formation processes, such as
+affixation, compounding and more.  There are numerous more or less widely
+accepted formalisms for describing the morphosyntax in natural language
+processing applications, such as
+hunspell\footnote{\url{http://hunspell.sf.net}} (and its older *spell
+relatives), apertium lttoolbox\footnote{\url{http://apertium.sf.net}} or Xerox
+lexc\cite{beesley/2003}.  The HFST tool set contains parsers and compilers to
+read descriptions in those languages and compile a finite-state automaton for
+rest of the HFST tools to process out from them
+\cite{pirinen/2010/il,pirinen/2009/sfcm}.
+% pirinen/2012/lrec not accepted yet
+In this sections we draw shortly summarise the common features of the
+algorithms used to compile all the descriptions and generalise the formula over
+morphosyntax for finite-state automata, described fully in terms of standard
+finite-state operations.  It is true for all the contemporary morphosyntax
+implementations that they more or less draw from item-and-arrangement style
+combinatorics over sets of morphs or morphemes.  In general form such a system
+can be described as a disjunction of morphs repeated infinitely over each
+other, combined with morphosyntactic filter describing precisely the right
+combinations of morphemes.  Both morphemes and the filters can be trivially
+described in finite-state form.
 
-Consider a trivial language of English nouns cat and dog, and plurality identifier s, we show in figure \ref{fig:morphology} the command-line simulation of
-the morphosyntactic combinatorics. It should be noted that I use here
-the standard POSIX shell tool echo, to generate the morphs one per each line;
-for practical applications these should of course be drawn from a database
-holding dictionary and perhaps the morphosyntactic description.
-Starting from a morpheme,
-that is a path or a language, e.g.  a morpheme \emph{dog} would be automaton
-encoding a path \texttt{d o g}, and \emph{cat} path \texttt{c a t}, similarly a
-plural marker \emph{-s} of English would be a path \texttt{s} whereas singular
-marker \emph{$\emptyset$} \texttt{$\varepsilon$} (marking empty morph). For
-morphosyntax of this language \emph{dog} and \emph{cat} would form a set called
-e.g. \emph{Nouns} and \emph{$\emptyset$} and \emph{s} a set of called
-\emph{Number}. A valid morphosyntax here would be Start $\rightarrow$ Nouns
-$\rightarrow$ Number $\rightarrow$ End. Now, that morphosyntax can be compiled
-as finite-state automaton such that we replace $\rightarrow$ in the former
-description with the morphs. Then we decorate the actual morphs with markers
-for e.g. starts of the sets named \emph{Nouns} and \emph{Number}. The final
-language is now simply composition of that morphosyntax over the kleene plus
-closure of morpheme sets.
+Consider a trivial language of English nouns cat and dog, and plurality
+identifier s, we show in figure \ref{fig:morphology} the command-line
+simulation of the morphosyntactic combinatorics. It should be noted that I use
+here the standard POSIX shell tool echo, to generate the morphs one per each
+line; for practical applications these should of course be drawn from a
+database holding dictionary and perhaps the morphosyntactic description.
+Starting from a morpheme, that is a path or a language, e.g.  a morpheme
+\emph{dog} would be automaton encoding a path \texttt{d o g}, and \emph{cat}
+path \texttt{c a t}, similarly a plural marker \emph{-s} of English would be a
+path \texttt{s} whereas singular marker \emph{$\emptyset$}
+\texttt{$\varepsilon$} (marking empty morph). For morphosyntax of this language
+\emph{dog} and \emph{cat} would form a set called e.g. \emph{Nouns} and
+\emph{$\emptyset$} and \emph{s} a set of called \emph{Number}. A valid
+morphosyntax here would be Start $\rightarrow$ Nouns $\rightarrow$ Number
+$\rightarrow$ End. Now, that morphosyntax can be compiled as finite-state
+automaton such that we replace $\rightarrow$ in the former description with the
+morphs. Then we decorate the actual morphs with markers for e.g. starts of the
+sets named \emph{Nouns} and \emph{Number}. The final language is now simply
+composition of that morphosyntax over the kleene plus closure of morpheme sets.
 
 \begin{figure} [h!]
 \begin{verbatim}
@@ -542,9 +407,9 @@ $ hfst-compose bag-of-morphs.hfst morphosyntax.hfst > lexicon.hfst
 \end{figure}
 
 Now since all morphosyntactic systems are basically variations of this formula
-we can build on that to generalise other components of grammar building, knowing
-that it doesn't depend on description languages of the morphosyntax what is
-implemented on other modules. This makes additions like compound based
+we can build on that to generalise other components of grammar building,
+knowing that it doesn't depend on description languages of the morphosyntax
+what is implemented on other modules. This makes additions like compound based
 weighting of the language model \cite{pirinen/2009/fsmnlp} generally
 applicable.
 
@@ -794,34 +659,38 @@ The automata technology is a general framework of describing language models
 and phenomena from wide range of linguistic fields from phonology to
 morphology, and even syntax and semantics (as needed with pos tagging and
 machine translation).  The practical applications covered  covering
-applications from spell-checking, as demonstrated in voikko\footnote{} with
-bindings to LibreOffice, Gnome desktop, mozilla and Mac OS X Spell Service, to
-morphological and syntactic analysis and, as demonstrated in native HFST tools
-from HFST downloads\footnote{}, and to machine translation as demonstrated in
-several released language pairs in machine translation system
-apertium\footnote{}. This gives raise to very important feature of the HFST
-technology at large, alluded to in previous chapters, that given language model
-described with one tool in one theoretical and practical framework. For example
-given pre-existing morphological analysers for Sámi languages found in the
-internet\footnote{\url{}}, written in Xerox lexc formalism, it was matter of
-one evening to create a spell checker for, evaluated in
-\cite{pirinen/2010/lrec}, with additional training from likewise freely
-available Sámi wikipedia. Similar results of using machine translation
-dictionaries from free/libre open source project
+applications from spell-checking, as demonstrated in
+voikko\footnote{\url{http://voikko.sf.net}} with bindings to LibreOffice, Gnome
+desktop, mozilla and Mac OS X Spell Service, to morphological and syntactic
+analysis and, as demonstrated in native HFST tools from HFST
+downloads\footnote{\url{http://sf.net/projects/hfst}}, and to machine
+translation as demonstrated in several released language pairs in machine
+translation system apertium\footnote{\url{http://apertium.sf.net}}. This gives
+raise to very important feature of the HFST technology at large, alluded to in
+previous chapters, that given language model described with one tool in one
+theoretical and practical framework. For example given pre-existing
+morphological analysers for Sámi languages found in the
+internet\footnote{\url{https://victorio.uit.no/langtech/trunk}}, written in
+Xerox lexc formalism, it was matter of one evening to create a spell checker
+for, evaluated in \cite{pirinen/2010/lrec}, with additional training from
+likewise freely available Sámi wikipedia. Similar results of using machine
+translation dictionaries from free/libre open source project
 apertium\footnote{\url{http://apertium.sf.net}} to create not only
 dictionaries, but also morphological analysers and spell checkers is
-demonstrated in \cite{pirinen/lrec/2012} \footnote{examples also reachable from
+demonstrated 
+%in \cite{pirinen/lrec/2012}
+\footnote{examples also reachable from
 \url{http:/www.ling.helsinki.fi/cgi-bin/omor/omordemo.bash}}.  
 
 Noteworthy about the general applicability of different finite-state
-language model over practical applicatoins it is so that we can now generate
+language model over practical applications it is so that we can now generate
 e.g. spelling checkers for languages that lack such a tool but have machine
 translation dictionaries (such as Manx) or morphological analysers (such as
 Greenlandic, which arguably is not plausibly implementably under classical
-spell-checkig formalisms). This adaptations of such models to baseline
-spell-checkers (with homogenous Damerau-Levenshtein edit distance a
+spell-checking formalisms). This adaptations of such models to baseline
+spell-checkers (with homogenous Damereau-Levenshtein edit distance a
 error model) could be performed without any feedback from linguist or
-even a native speakers.
+even a native speaker.
 
 \subsection{Spellers}
 
@@ -834,17 +703,18 @@ is meant, and real-word spelling errors, such as writing \emph{there} where
 is simply applying the dictionary to the text word by word, any unrecognised
 string not belonging to the language of the dictionary automaton is a non-word
 spelling error. For real-word errors a statistical n-gram model or syntactic
-parser is typically required\cite{}. To correct a spelling error in finite-state
-system, a two-tape automaton modeling the typing errors should be applied to
-the misspelt string to get set of potential corrections\cite{pirinen/2010/lrec}.
-For practical purposes the error model can also be implemented as
-fuzzy finite-state traversal algorithm or similar methods\cite{oflazer/2002}. The result
-of the correction step is a set of word-forms that are correct in the
-language of the spell-checking dictionary. Another related task is to rank this
-set to provide the most likely corrections first for the end-user of spelling
-correction system. A trivial way to perform such ranking would be to use
-unigram \cite{pirinen/2010/lrec} or n-gram probabilities of the words 
-\cite{mays/1991} or word-form analyses \cite{pirinen/2012/cicling}.
+parser is typically required. To correct a spelling error in
+finite-state system, a two-tape automaton modeling the typing errors should be
+applied to the misspelt string to get set of potential
+corrections\cite{pirinen/2010/lrec}.  For practical purposes the error model
+can also be implemented as fuzzy finite-state traversal algorithm or similar
+methods\cite{oflazer/1996}. The result of the correction step is a set of
+word-forms that are correct in the language of the spell-checking dictionary.
+Another related task is to rank this set to provide the most likely corrections
+first for the end-user of spelling correction system. A trivial way to perform
+such ranking would be to use unigram \cite{pirinen/2010/lrec} or n-gram
+probabilities of the words \cite{mays/1991} or word-form analyses
+\cite{pirinen/2012/cicling}.
 
 \subsubsection{Creating Spellers}
 % Tommi
@@ -855,16 +725,16 @@ error model that can rewrite misspelt word-forms into correctly spelled ones.
 The former automaton can be as simple as a reference corpus, containing larger
 quantities of correctly spelled words and (possibly) smaller quantities of
 misspelt ones\cite{norvig/2010}. Also more elaborate dictionaries, such as
-morphological analysers described in sections \ref{,,} can be used, and also
-trained for spell-checking purposes with reference corpora without any big
-modifications to underlying implementation\cite{pirinen/2010/lrec}.
+morphological analysers described in chapter\ref{sec:morphology} can be used,
+and also trained for spell-checking purposes with reference corpora without any
+big modifications to underlying implementation\cite{pirinen/2010/lrec}.
 
 For the error-model we can trivially construct an automaton corresponding to
 Levenshtein edit distance algorithm\cite{oflazer/1996,agata/2002}. For more elaborate error models
 it is possible to use hunspell algorithms as automata \cite{pirinen/2010/il} or
 construct further extensions by hand \cite{pirinen/2010/lrec}. Given a possibly
 aligned error corpus it is also possible to construct a weighted error model
-automaton automatically \cite{}.
+automaton automatically \cite{brill/2000}.
 
 \subsubsection{Checking Strings and Generating Suggestions}
 % Sam
