@@ -938,9 +938,11 @@ $I$ ("increment $q^I$") or be closer to requiring an edge in $I$ to be traversed
 loop variant.
 
 Weights representing the probability of a particular correction being the
-correct one are a natural extension, and in \verb!hfst-ospell! are implemented
-as multiplication in the tropical semiring
-($x \oplus y = \min(\{x, y\}), x \otimes y = x + y$) of each edge traversed.
+correct one are a natural extension, and in \verb!hfst-ospell! correspond to
+multiplication in the tropical semiring (for details see \cite{openfst/2007})
+of the weight each edge
+traversed. Multiplication in this semiring is the standard addition operation
+of positive real numbers, which we approximate by addition of \verb!float!s.
 Each state in the queue is recorded with an accumulated weight, and its
 successor states have this weight incremented by the sum of the weights of
 the edges traversed in the component transducers.
