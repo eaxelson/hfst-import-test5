@@ -92,7 +92,7 @@ quality. The Xerox toolkit \cite{beesley/2003} is among the most
 widely used frameworks for constructing morphological utilities. The
 toolkit is used to compile linguistic description into morphological
 analyzers. More specifically, Xerox tools include the finite-state
-lexicon compiler lexc, the two-level rule compiler twolc and the
+lexicon compiler lexc, the two-level rule compiler \verb|twolc| and the
 cascading replace rule compiler xfst. HFST includes the tools
 \textbf{hfst-lexc}, \textbf{hfst-twolc} and \textbf{hfst-xfst}, which provide full backward
 compatibility with Xerox tools and augment their functionality.
@@ -118,6 +118,8 @@ regular expressions and the can have negative contexts.
 
 \begin{figure}
 \begin{verbatim}
+! Change x to y after the string "a b" unless "d" or 
+! "c d" follows.
 "Rule with negative context"
 x:y <=> a b _     ;
         except
@@ -132,35 +134,23 @@ x:y <=> a b _ [ ? - [ c | d ] | c [ ? - d ] | .#. ] ;
 
 In traditional two-level rules, it can be very difficult to express
 that a certain alternation should not occur in a given
-context. Sometimes conflict resolution of two-level rules handles
-this, but conflict resolution works only if rules can be ordered into
-chains of sub cases. Often this can be difficult to accomplish,
-especially for grammar writers who are not especially well acquainted
-to writing regular expressions.
+context. Sometimes conflict resolution~\cite{silfverberg/2009/2} of
+two-level rules handles this, but conflict resolution works only if
+rules can be ordered into chains of sub cases. Often this can be
+difficult to accomplish, especially for grammar writers who are not
+especially well acquainted with writing regular expressions.
 
-Using an extension to the xerox two-level rule syntax in \textbf{hfst-twolc},
-it is possible to formulate rules with negative context, i.e. context
-which prohibit the triggering of the rule. 
-Figure~\ref{negative-context-rule} shows a schematic example of
-a negative context rule and a traditional xerox style rule, which has
+Using an extension to the Xerox two-level rule syntax in
+\verb|hfst-twolc|, it is possible to formulate rules with negative
+context, i.e. context which prohibit the triggering of the
+rule. Figure~\ref{negative-context-rule} shows a schematic example of
+a negative context rule and a traditional Xerox style rule, which has
 the same effect as the rule with the negative context.
 
-\begin{figure}
-\begin{verbatim}
-"ZZ normally realized as xy except between two a:s"
-<[ Z:x Z:y ]> <==> _      ;
-                   except
-                   a _ a  ;
-
-"Swap x and y between two a:s"
-<[ Z:y Z:x ]> <==> a _ a ; 
-\end{verbatim}
-\caption{Rule with regular expression center and two auxiliary rules which}\label{regular-center}
-\end{figure}
-
-Regular expression centers allow rules to govern longer segments than
-single symbols, e.g. see Figure~\ref{regular-center}. This can be useful 
-when describing languages with complex allomorphy.
+Rules with negatve contexts are used in the Kyrgyz morphology
+developed in the Apertium project~\footnote{http://www.apertium.org/},
+where they have significantly simplified the two-level
+grammar~\footnote{Personal communication with Francis Tyers.}.
 
 \subsection{Cascaded Rules: Explanations and Examples}
 % Senka
@@ -684,35 +674,85 @@ part-of-speech tagger. Such a conversion can be difficult if the tag
 set of either resource is coarser than the tag set of the other
 resource.
 
-\subsection{Results}
+\subsection{Experiments with HFST taggers}
+
+We demonstrate Hfst taggers by constructing POS taggers for Finnish
+ and English. For English we construct a regular second order HMM
+ tagger. For Finnish, we construct two taggers: one regular second
+ order HMM tagger and another second order HMM tagger which utilizes
+ the Omorfi morphological analyzer for Finnish~\cite{pirinen/2008}.
+
+The English training data and test data come from the Penn
+ Treebank. Sections 1 to 18 were used for training and sections 22 to
+ 24 for testing. The Finnish training and test data come from Finnish
+ newspaper text which has been automatically tagged using the
+ Textmorfo parser~\footnote{http://www.csc.fi/kielipankki/}. The data
+ is described in Table~\ref{data-taggers}.
 
 \begin{table}
-\caption{Results for Finnish taggers}
+\caption{Data used for training and testing the English and Finnish taggers.}\label{data-taggers}
 \begin{center}
-\begin{tabular}{lccc}
-\hline 
-Model            & ~~~~Seen & ~~~~Unseen & ~~~~All \\
-\hline 
-Basic HFST       &  97.51\% &    77.51\% & 95.23\% \\
-With Morph HFST  &  97.53\% &    83.65\% & 95.90\% \\
+\begin{tabular}{lrrr}
+\hline
+Language       & ~Training data size (tokens)~& Test data size (tokens)~& Distinct tags\\
+\hline
+English        &   912,344~~~~~~~~~~~~~~    & 129,654~~~~~~~~~~ &  45~~~~~~~ \\
+Finnish        & 1,027,511~~~~~~~~~~~~~~    & 156,572~~~~~~~~~~ & 764~~~~~~~ \\
 \hline
 \end{tabular}
 \end{center}
 \end{table}
 
+As Table~\ref{eng-tagging-acc} shows, Hfst taggers achieve comparable
+ results to the well known second order HMM tagger TNT. The accuracy
+ for unknown words is slightly worse using the HFST tagger, but for
+ known words the accuracies are nearly identical.
+
 \begin{table}
-\caption{Results for English taggers}
+\caption{Results for second order HMM taggers of English. The accuracy
+ figures for TNT can be found in~\cite{Halascy:2007}.}\label{eng-tagging-acc}
 \begin{center}
 \begin{tabular}{lccc}
 \hline
 Model       & ~~~~Seen & ~~~~Unseen & ~~~~All \\
 \hline
 TNT         & 96.77\%  &    85.19\% & 96.46\% \\
-Basic HFST  & 96.68\%  &    80.71\% & 96.23\% \\
+Basic Hfst  & 96.68\%  &    80.71\% & 96.23\% \\
 \hline
 \end{tabular}
 \end{center}
 \end{table}
+
+For Finnish, the accuracy for the basic second order HMM tagger is
+ poorer than for English as seen in Table~\ref{fin-tagging-acc}. This
+ is mostly caused by words in the test data that are
+ missing from the training data, i.e. OOV words. In the Finnish test
+ data 11.51\% of the words are OOV words. For comparison, only 2.81\%
+ of the words in the English test data are OOV words.
+
+To reduce the number of OOV words in the Finnish test data, a
+ morphological analyzer was used as explained above. Using the
+ morphological analyzer, only 2.73\% of the words in the test data
+ were OOV words. Consequently a significant increase in total tagging
+ accuracy is seen. See Table~\ref{fin-tagging-acc}. The increase is
+ negligible for known words, but significant for unknown words.
+
+\begin{table}
+\caption{Results for Finnish taggers. The model Basic Hfst is a
+ regular second order HMM tagger. The model With Morph Hfst is
+ augmented with a morphological analyzer.}\label{fin-tagging-acc}
+\begin{center}
+\begin{tabular}{lccc}
+\hline 
+Model            & ~~~~Seen & ~~~~Unseen & ~~~~All \\
+\hline 
+Basic Hfst       &  97.51\% &    77.51\% & 95.23\% \\
+With Morph Hfst  &  97.53\% &    83.65\% & 95.90\% \\
+\hline
+\end{tabular}
+\end{center}
+\end{table}
+
 
 \section{Transducer applications}\label{Applications}
 
