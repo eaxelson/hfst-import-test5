@@ -5,6 +5,7 @@ Using\ HFST\ for\ Creating\ Computational\ Linguistic\ Applications.pdf:Using\ H
 	bibtex   Using\ HFST\ for\ Creating\ Computational\ Linguistic\ Applications
 	pdflatex Using\ HFST\ for\ Creating\ Computational\ Linguistic\ Applications
 	pdflatex Using\ HFST\ for\ Creating\ Computational\ Linguistic\ Applications
+	pdflatex Using\ HFST\ for\ Creating\ Computational\ Linguistic\ Applications
 
 
 ## Use make to create article pdfs or recreate test results
