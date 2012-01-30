@@ -114,7 +114,7 @@ the realizations of morphophonemes used in the \textbf{hfst-lexc} lexicon.
 The rule compiler \textbf{hfst-twolc} provides backward compatibility with the
 Xerox tool twolc, but it augments the twolc functionality by providing two
 new types of rules. In \textbf{hfst-twolc}, rules can have centers which are
-regular expressions and the can have negative contexts.
+regular expressions and can have negative contexts.
 
 \begin{figure}
 \begin{verbatim}
@@ -375,7 +375,7 @@ $  echo " a -> b || m _ n ,, c -> d ;" | ./hfst-regexp2fst | hfst-fst2txt
 \subsection{Introduction}
 % Krister
 
-Popular formalisms for describing the morpotax of a language tend to be some variation 
+Popular formalisms for describing the morphotax of a language tend to be some variation 
 of the item and arrangement scheme. We build on this to generalize from lexc into other 
 item-and-arrangement notations such as  Hunmorph and Apertium. This gives us the option to describe 
 the morpholgoy in a notation that is compiled into finite-state transducers which we can continue to process with other
