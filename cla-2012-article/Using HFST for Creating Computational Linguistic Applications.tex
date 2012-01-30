@@ -813,7 +813,7 @@ correction system. A trivial way to perform such ranking would be to use
 unigram \cite{pirinen/2010/lrec} or n-gram probabilities of the words 
 \cite{mays/1991} or word-form analyses \cite{pirinen/2012/cicling}.
 
-\subsubsection{Creating Spellers}
+\subsubsection{Creating Spellers.}
 % Tommi
 
 The creation of a finite-state speller requires compiling of (at least) two
@@ -833,7 +833,7 @@ construct further extensions by hand \cite{pirinen/2010/lrec}. Given an
 aligned error corpus, it is also possible to construct a weighted error model
 automaton automatically \cite{brill/2000}.
 
-\subsubsection{Checking Strings and Generating Suggestions}
+\subsubsection{Checking Strings and Generating Suggestions.}
 % Sam
 
 String checking is a straightforward process of matching against the lexical
@@ -951,7 +951,7 @@ unexpected symbols in this large space, \verb!hfst-ospell! uses a special
 symbol, \verb!@_UNKNOWN_SYMBOL_@! which is taken to be equal to any symbol
 that is otherwise absent.
 
-\subsubsection{Error model tool and optimizations}
+\subsubsection{Error model tool and optimizations.}
 For the most common case of generating Levenshtein and
 Damerau-Levenshtein (in which transposition of adjacent symbols constitutes
 one operation) distance error models, a tool (\verb!editdist.py!) and
@@ -993,7 +993,7 @@ When the correctable error is near the end, almost every symbol is deleted and
 inserted with no effect. This may be circumvented by adding, for each deletion
 and insertion, a special successor state from which its inverse is absent.
 
-\subsubsection{Ranking Suggestions}
+\subsubsection{Ranking Suggestions.}
 % Tommi & Miikka
 
 When applying the error model and the language model to the spelling error strings,
@@ -1036,7 +1036,7 @@ dependencies which are awkward for FST transformations
 \item A facility for referring to common subpatterns, such as dates, by name
 \end{itemize}
 
-\subsubsection{The pmatch Approach}
+\subsubsection{The pmatch Approach.}
 
 For a more detailed overview the reader is directed to \cite{karttunen/2011}.
 Here we focus on the aspects of \verb!pmatch! that necessitate extensions
