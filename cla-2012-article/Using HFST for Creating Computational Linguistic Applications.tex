@@ -230,7 +230,7 @@ $ echo "c a t .o. c a t -> c a t s  ;" |
 3       4       @0@     s
 4
 \end{verbatim}
-\caption{Using sfst transducer format}
+\caption{Using SFST transducer format}
 \label{fig:sfst_format}
 \end{figure}
 
@@ -238,8 +238,8 @@ $ echo "c a t .o. c a t -> c a t s  ;" |
 % Context
 
 \textbf{Context.} Every rule can have a context in which the replacement is made. 
-Just like A and B, L and R are also regular expression that describe languages. 
-Therefore, A will be mapped to B if, and only if, it is between L and R.
+Here, A will be mapped to B if and only if it is between regular expressions
+L and R.
 \begin{equation}
   A \rightarrow\ B\ ||\ L \_\  R
 \end{equation}
@@ -284,11 +284,11 @@ hfst-regexp2fst | hfst-fst2txt
   \label{tab:context_directions}
 \end{table}
 
-In every replace rule, where A is the upper, and B the lower language, 
-there are four context directions that can be used with replace rules. 
+In a replace rule where A is the upper and B the lower language, 
+there are four contextual directions that can be used with replace rules.
 For example, when the \ \verb!//!\ sign is used as context orientation operator, 
 the left context will be taken from the lower language. 
-It means that it is possible for the replace function to write its own context. 
+It is thus possible for the replace function to write its own context. 
 This is shown in Figure~\ref{fig:context_orientation}. 
 
 \begin{figure} [h!]
@@ -299,7 +299,7 @@ This is shown in Figure~\ref{fig:context_orientation}.
   2       3       a       b       0.000000
   3       0.000000
 \end{verbatim}
-\caption{Replace rule writes it's own context}
+\caption{Replace rule writes its own context}
 \label{fig:context_orientation}
 \end{figure}
 
