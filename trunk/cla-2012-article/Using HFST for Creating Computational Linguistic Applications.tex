@@ -305,10 +305,10 @@ This is shown in Figure~\ref{fig:context_orientation}.
 
 % Other replace functions
 
-\textbf{Other replace functions.} In all examples, we used the right arrow replace operator,
+\textbf{Other replace functions.} We have hitherto only used the right arrow replace operator,
 but there are many other operators that can be used. 
 All the operators listed in Table~\ref{tab:replace_operators} have their left arrow version, 
-which are the inversion of the right operator. Furthermore, all the rules can be used 
+which is the inversion of the right operator. Furthermore, all the rules can be used 
 with epenthesis \verb![. .]! and markup \verb!...! operators. 
 The epenthesis operator should be used with empty strings to avoid replacing infinitely 
 many epsilons, while the markup operator is used to insert markers around a word.
@@ -345,7 +345,7 @@ many epsilons, while the markup operator is used to insert markers around a word
 
 \textbf{Parallel rules.} Parallel rules are used when there are 
 multiple replacements at the same time. The general parallel replace rule expression 
-consists of individual replace rules divided with two commas.
+consists of individual replace rules separated by two commas.
 \begin{equation}
   A_1 \rightarrow\ B_1\ ||\ L_1 \_\  R_1\ ,,\ \ldots\ ,,\ A_i \rightarrow\ B_i\ ||\ L_i \_\ R_i
 \end{equation}
@@ -353,7 +353,7 @@ consists of individual replace rules divided with two commas.
 In XFST, all rules in a parallel rule expression have to have the same format. 
 They need to have the same arrow and the same context layout. 
 In HFST, the constraint that all the rules should have the same arrow is kept, 
-but the context format for each rule can differ from each other. 
+but the context formats can freely differ. 
 Therefore, the rule expression in Figure~\ref{fig:parallel_rules} 
 would not be allowed in XFST, but is valid in HFST.
 \begin{figure}
@@ -370,22 +370,22 @@ would not be allowed in XFST, but is valid in HFST.
 % Krister
 
 Popular formalisms for describing the morphotax of a language tend to be some variation 
-of the item and arrangement scheme. We build on this to generalize from lexc into other 
-item-and-arrangement notations such as  Hunmorph and Apertium. This gives us the option to describe 
-the morpholgoy in a notation that is compiled into finite-state transducers which we can continue to process with other
-HFST tools. We demonstrate how compilation could proceed when reducing a lexc lexicon into a sequence of
-finite-state operations. A morphological programming language like SFST-PL foregoes a standard lexicon interface
-like lexc and only offers the end-user an option to construct the lexicon using finite-state operations.
+of the item and arrangement scheme. We build on this to generalize from \verb!lexc! into other
+item-and-arrangement notations such as Hunmorph and Apertium. This gives us the option to describe 
+morpholgoy in a notation that is compiled into finite-state transducers which we can continue to process with other
+HFST tools. We demonstrate how compilation could proceed when reducing a \verb!lexc! lexicon into a sequence of
+finite-state operations. A morphological programming language like \verb!SFST-PL! forgoes a standard lexicon interface
+like \verb!lexc! and only offers the end user an option to construct the lexicon using finite-state operations.
 
 \subsection{Morphotax and Morphological Formul\ae}
 %Tommi & Krister
 
-The morphotax is the component dealing with morphological combinations
-in language descriptions. This concerns word-formation processes, such as affixation and compounding. 
-There are numerous formalisms for describing the morphotax in natural language processing applications, 
+Morphotax is the component dealing with morphological combinations
+in language description. This concerns word-formation processes, such as affixation and compounding. 
+There are numerous formalisms for describing morphotax in natural language processing applications, 
 such as hunspell\footnote{\url{http://hunspell.sf.net}} (and its older *spell relatives),
 the Apertium lttoolbox\footnote{\url{http://apertium.sf.net}}
-or the Xerox lexc\cite{beesley/2003}. The HFST tool set contains parsers and compilers 
+or the Xerox lexc\cite{beesley/2003}. The HFST toolset contains parsers and compilers 
 for reading descriptions of morphologies written in these formalisms, which can be used for 
 compiling a finite-state automaton for the other HFST tools to process 
 \cite{pirinen/2010/il,linden/2009/sfcm}.
@@ -423,7 +423,7 @@ In its most general form, such a paradigm can be defined using a combination of 
 (2) a morphotactic filter describing the permitted sequence of sublexicons.
 Both the disjunction of morphs and the morphotactic filter can be described in finite-state form.
 
-In Figure~\ref{fig:morphology1}, we demonstrate how the above lexicon is compiled into a disjunction of 
+In Figure~\ref{fig:morphology1}, we demonstrate how the lexicon above is compiled into a disjunction of 
 morphs based on the lexc notation.
 
 \begin{figure} [h]
@@ -475,7 +475,7 @@ This also makes additions like compound-based weighting of the language-model
 choose their favorite notation, e.g. hfst-lexc, Hunspell or Apertium and then continue with other
 HFST tools. In theory, it would also be possible to use this morphotactic formula
 to write implementations for any item-and-arrangement morphology, but in practice
-its easier to simply use some high-level scripting language to convert a lexical database into 
+it's easier to simply use some high-level scripting language to convert a lexical database into 
 e.g. lexc notation.
 
 \subsection{Performance}
