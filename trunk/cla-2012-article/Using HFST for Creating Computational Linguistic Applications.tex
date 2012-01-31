@@ -553,7 +553,7 @@ were developed by Helmut Schmid in cooperation with the HFST team.
 % Miikka
 
 The HFST library includes tools for constructing statistical
-part-of-speech taggers which resemble Hidden Markov Models (HMM) from
+part-of-speech (POS) taggers which resemble Hidden Markov Models (HMM) from
 tagged training data. HFST taggers differ from other HMM taggers such
 as Tnt~\cite{Brants:2000} and Hunpos~\cite{Halascy:2007} in that HFST
 allows combining different estimates for tag probabilities during
@@ -575,7 +575,7 @@ morphological analyzers in tagging.
 \subsection{The structure of Hfst Taggers}
 
 HMM taggers are statistical models which determine the most likely
-part-of-speech tag from some tag set for each word in a sentence. For
+POS tag from some tag set for each word in a sentence. For
 determining the most likely tags, the taggers use
 lexical probabilities ${\rm p}(w|t)$ for each word $w$ and each tag
 $t$ together with \emph{transition probabilities} for the tag of a
@@ -583,7 +583,7 @@ word at a given position given the tags of the preceding words ${\rm
   p}(t_i | t_{i - 1},\ ...\, t_{i-n})$. The integer $n$ determines how
 many preceding tags are considered when estimating the probability of
 tags. It is called the \emph{order} of the HMM tagger. Second order HMM
-taggers are the most common in part-of-speech tagging.
+taggers are the most common in POS tagging.
 
 HFST taggers extend traditional HMM taggers by allowing modifications
 to the traditional estimate ${\rm p}(t_i | t_{i - 1},\ ...\,
@@ -610,7 +610,7 @@ out-of-vocabulary words.
 \subsection{The Lexical Model of Hfst Taggers}
 % Miikka
 
-The accuracy of traditional part-of-speech taggers suffers greatly
+The accuracy of traditional POS taggers suffers greatly
 because of out-of-vocabulary (OOV) words, i.e. word forms which were
 not observed during training of the tagger. For languages like
 English with few morphological phenomena and where compound words are written separately, this
@@ -641,7 +641,7 @@ allows for changing the way the suffix probabilities are combined.
 
 Research in tagging morphologically complex languages has utilized
 morphological analyzers e.g. \cite{Tzoukerman:1996,Oravecz:2002}, but
-the tag set of the part-of-speech tagger and the tag set of the
+the tag set of the POS tagger and the tag set of the
 morphological analyzer has remained the same. In such approaches, a
 lexical model is constructed from the analysis sets given by the
 morphological analyzer for each word. E.g. the English word "man" is
@@ -663,12 +663,12 @@ It is a practical problem if the tag sets are required to be the
 same, since conventions for tagging a
 language vary and there is not always a straightforward conversion
 between the tag set of the training corpus and the tag set of the
-part-of-speech tagger. Such a conversion can be difficult if the tag
+POS tagger. Such a conversion can be difficult if the tag
 set of either resource is coarser than that of the other.
 
 \subsection{Experiments with HFST taggers}
 
-We demonstrate Hfst taggers by constructing POS taggers for Finnish
+We demonstrate HFST taggers by constructing POS taggers for Finnish
 and English. For English we construct a regular second order HMM
 tagger. For Finnish, we construct two taggers: one regular second
 order HMM tagger and another second order HMM tagger which utilizes
