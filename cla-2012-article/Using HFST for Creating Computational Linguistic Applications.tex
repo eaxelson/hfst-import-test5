@@ -201,10 +201,10 @@ $ hfst-fst2txt transducer
 Rules can be applied to any language by using composition. 
 By composing a word \verb!ABCD! with the previous rule \verb!A -> B!, 
 the result is the transducer in Figure~\ref{fig:replace_compose}. 
-It has 5 states (0 -- 4), and only state 4 is final. The default output of \textbf{hfst-regexp2fst} is 
-the transducer format \textbf{tropical\_openfst}, which supports weights. 
-Since weights are not used in replace rules, the weights get value 0.000000 when compiled. 
-Other formats that can be used with this, and other HFST tools, are e.g. \textbf{sfst} and \textbf{foma}.
+It has 5 states (0 -- 4), and only state 4 is final. The default output of \verb!hfst-regexp2fst! is 
+the transducer format \verb!tropical_openfst!, which supports weights. 
+Since weights are not used in replace rules, the weights get the value 0.000000 when compiled. 
+Other formats that can be used with this, and other HFST tools, are e.g. \textbf{SFST} and \textbf{foma}.
 
 \begin{figure} [h!]
 \begin{verbatim}
