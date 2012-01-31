@@ -482,7 +482,7 @@ e.g. lexc notation.
 % Erik
 
 In Table~\ref{tab:compilation_times}, we show compilation times for different 
-morphologies using different HFST backends. The morphologies are OMorFi 
+morphologies using different HFST back-ends. The morphologies are OMorFi 
 \cite{pirinen/2008} for Finnish, Morphisto \cite{zielinski/2009} for German,
 Morph-it \cite{Zanchetta/2005} for Italian, Swelex 
 \footnote{\url{https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstSwelex}} 
@@ -490,8 +490,7 @@ for Swedish and TrMorph \cite{Coltekin/2010} for Turkish.
 OMorFi, Morphisto and TrMorph have several rules for
 inflection and compounding, Morph-it and Swelex are basically word-lists.
 We use HFST version 3.3.4, with SFST, OpenFst and foma as
-back-ends. The times are average values calculated as an average of 10 compilations.
-
+back-ends. The times are averages from runs of 10 compilations.
 
 \begin{table} [h!]
   \centering
@@ -516,7 +515,7 @@ Finnish and German. We also show the back-end versions used.
 \begin{table} [h!]
   \centering
   \caption{Compilation times for different morphologies with
-    different HFST back-ends and their versions. 
+    different HFST back ends and their versions. 
     The times are given in minutes and seconds.}
   \begin{tabular}{| c | c | c | c |}
     \hline
@@ -532,7 +531,7 @@ Finnish and German. We also show the back-end versions used.
   \label{tab:compilation_times_versions}
 \end{table}
 
-It can be clearly seen that the performance of HFST with SFST as back-end 
+It can be clearly seen that the performance of HFST with SFST as a back-end 
 has improved: the compilation time of the Finnish morphology has almost
 halved and the compilation time of the German morphology is only one third of the
 time at the previous benchmarking. 
@@ -553,7 +552,7 @@ were developed by Helmut Schmid in cooperation with the HFST team.
 \subsection{Introduction}
 % Miikka
 
-The Hfst library includes tools for constructing statistical
+The HFST library includes tools for constructing statistical
 part-of-speech taggers which resemble Hidden Markov Models (HMM) from
 tagged training data. Hfst taggers differ from other HMM taggers such
 as Tnt~\cite{Brants:2000} and Hunpos~\cite{Halascy:2007} in that Hfst
