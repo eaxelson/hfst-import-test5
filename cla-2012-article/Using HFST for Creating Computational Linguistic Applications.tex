@@ -793,15 +793,15 @@ is meant, and real-word spelling errors, such as writing \emph{there} where
 is simply applying the dictionary to the text word by word. Any unrecognized
 string not belonging to the language of the dictionary automaton is a non-word
 spelling error. For real-word errors a statistical n-gram model or syntactic
-parser is typically required\cite{}. To correct a spelling error in a finite-state
+parser is typically required. To correct a spelling error in a finite-state
 system, a two-tape automaton modeling the typing errors should be applied to
 the misspelt string to get set of potential corrections\cite{pirinen/2010/lrec}.
 For practical purposes the error model can also be implemented as a
-fuzzy finite-state traversal algorithm or similar methods\cite{oflazer/2002}. The result
+fuzzy finite-state traversal algorithm or similar methods\cite{oflazer/1996}. The result
 of the correction step is a set of word-forms that are correct in the
 language of the spell-checking dictionary. Another related task is to rank this
-set to provide the most likely corrections first for the end-user of the spelling
-correction system. A trivial way to perform such ranking would be to use
+set to provide the most likely corrections first.
+A trivial way to perform such ranking would be to use
 unigram \cite{pirinen/2010/lrec} or n-gram probabilities of the words 
 \cite{mays/1991} or word-form analyses \cite{pirinen/2012/cicling}.
 
