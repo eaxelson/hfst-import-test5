@@ -109,8 +109,8 @@ The rule compiler \textbf{hfst-twolc} provides backward compatibility with the
 Xerox tool twolc, but it augments the twolc functionality by providing two
 new types of rules. In \textbf{hfst-twolc}, rules can have centers which are
 regular expressions and can have negative contexts.
-
 \begin{figure}
+{\scriptsize
 \begin{verbatim}
 ! Change x to y after the string "a b" unless "d" or 
 ! "c d" follows.
@@ -122,6 +122,7 @@ x:y <=> a b _     ;
 "Rule without negative context"
 x:y <=> a b _ [ ? - [ c | d ] | c [ ? - d ] | .#. ] ;
 \end{verbatim}
+}
 \caption{Negative context rule and corresponding traditional two-level
   rule}\label{negative-context-rule}
 \end{figure}
@@ -141,9 +142,9 @@ rule. Figure~\ref{negative-context-rule} shows a schematic example of
 a negative context rule and a traditional Xerox style rule, which has
 the same effect as the rule with the negative context.
 
-Rules with negatve contexts are used in the Kyrgyz morphology
-developed in the Apertium project~\footnote{http://www.apertium.org/},
-where they have significantly simplified the two-level
+Rules with negative contexts are used in the Kyrgyz morphology
+developed in the Apertium project~\footnote{http://www.apertium.org/}.
+They significantly shorten the two-level
 grammar~\footnote{Personal communication with Francis Tyers.}.
 
 \subsection{Cascaded Rules: Explanations and Examples}
@@ -177,9 +178,11 @@ there is an HFST tool \verb!hfst-fst2txt!. Therefore, the upper rule
 could be compiled as in Figure~\ref{fig:simple_replace}.
 
 \begin{figure} [h!]
+{\scriptsize
 \begin{verbatim}
 $ echo "A -> B ;" | hfst-regexp2fst | hfst-fst2txt
 \end{verbatim}
+}
 \caption{Compiling simple replace rule}
 \label{fig:simple_replace}
 \end{figure}
@@ -188,11 +191,13 @@ $ echo "A -> B ;" | hfst-regexp2fst | hfst-fst2txt
 The regular expression can be read from a file, or saved to a file (Figure~\ref{fig:read_from_file}). 
 
 \begin{figure} [h!]
+{\scriptsize
 \begin{verbatim}
 $ echo "A -> B ;" > regex
 $ hfst-regexp2fst -i regex -o transducer
 $ hfst-fst2txt transducer
 \end{verbatim}
+}
 \caption{Reading from, and writing to a file}
 \label{fig:read_from_file}
 \end{figure}
@@ -207,6 +212,7 @@ Since weights are not used in replace rules, the weights get the value 0.000000 
 Other formats that can be used with this, and other HFST tools, are e.g. \textbf{SFST} and \textbf{foma}.
 
 \begin{figure} [h!]
+{\scriptsize
 \begin{verbatim}
 $ echo "A B C D .o. A -> B ;" | hfst-regexp2fst | hfst-fst2txt
 0       1       A       B       0.000000
@@ -215,12 +221,14 @@ $ echo "A B C D .o. A -> B ;" | hfst-regexp2fst | hfst-fst2txt
 3       4       D       D       0.000000
 4       0.000000
 \end{verbatim}
+}
 \caption{Composing rule to a word}
 \label{fig:replace_compose}
 \end{figure}
 
 
 \begin{figure} [h!]
+{\scriptsize
 \begin{verbatim}
 $ echo "c a t .o. c a t -> c a t s  ;" |
 > hfst-regexp2fst -f sfst | hfst-fst2txt
@@ -230,6 +238,7 @@ $ echo "c a t .o. c a t -> c a t s  ;" |
 3       4       @0@     s
 4
 \end{verbatim}
+}
 \caption{Using SFST transducer format}
 \label{fig:sfst_format}
 \end{figure}
@@ -256,6 +265,7 @@ In the word \verb!manaab!, the first and last \verb!a! are mapped to \verb!b!,
 because they occur between corresponding contexts, but the second \verb!a! is kept unchanged.
 
 \begin{figure} [h!]
+{\scriptsize
 \begin{verbatim}
 $ echo " m a n a a b .o. a -> b || m _ n , _ b;" |
 hfst-regexp2fst | hfst-fst2txt
@@ -267,6 +277,7 @@ hfst-regexp2fst | hfst-fst2txt
 5       6       b       b       0.000000
 6       0.000000
 \end{verbatim}
+}
 \caption{Replace rule between two contexts}
 \label{fig:multiple_contexts}
 \end{figure}
@@ -292,6 +303,7 @@ It is thus possible for the replace function to write its own context.
 This is shown in Figure~\ref{fig:context_orientation}. 
 
 \begin{figure} [h!]
+{\scriptsize
 \begin{verbatim}
   $ echo " b a a .o. a -> b // b _ ;" | ./hfst-regexp2fst | hfst-fst2txt
   0       1       b       b       0.000000
@@ -299,6 +311,7 @@ This is shown in Figure~\ref{fig:context_orientation}.
   2       3       a       b       0.000000
   3       0.000000
 \end{verbatim}
+}
 \caption{Replace rule writes its own context}
 \label{fig:context_orientation}
 \end{figure}
@@ -332,10 +345,12 @@ many epsilons, while the markup operator is used to insert markers around a word
 
 
 \begin{figure} [h!]
+{\scriptsize
 \begin{verbatim}
   $ echo " a a a .o. [.a*.] @-> b ;" | hfst-regexp2fst > a.fst
   $ echo " b a a b .o. a @-> %[ ... %] ;" | hfst-regexp2fst > b.fst
 \end{verbatim}
+}
 \caption{Epenthesis and markup operators}
 \label{fig:epenthesis_markup}
 \end{figure}
@@ -357,9 +372,11 @@ but the context formats can freely differ.
 Therefore, the rule expression in Figure~\ref{fig:parallel_rules} 
 would not be allowed in XFST, but is valid in HFST.
 \begin{figure}
+{\scriptsize
 \begin{verbatim}
   $  echo " a -> b || m _ n ,, c -> d ;" | ./hfst-regexp2fst | hfst-fst2txt
 \end{verbatim}
+}
 \caption{Parallel rules with different contexts}
 \label{fig:parallel_rules}
 \end{figure}
@@ -395,6 +412,7 @@ the empty string as the singular marker and \emph{s} and \emph{es} as plural mar
 forming a lexicon as outlined in Figure~\ref{fig:morph0} using lexc notation.
 
 \begin{figure} [h]
+{\scriptsize
 \begin{verbatim}
   LEXICON Root
   Nouns;
@@ -411,6 +429,7 @@ forming a lexicon as outlined in Figure~\ref{fig:morph0} using lexc notation.
   END;
   es END;
 \end{verbatim}
+}
 \caption{Lexicon in lexc notation}
 \label{fig:morph0}
 \end{figure}
@@ -427,6 +446,7 @@ In Figure~\ref{fig:morphology1}, we demonstrate how the lexicon above is compile
 morphs based on the lexc notation.
 
 \begin{figure} [h]
+{\scriptsize
 \begin{verbatim}
   $ echo "@Root@ @Nouns@ @LEX@" > strings
   $ echo "@Nouns@ c a t @NumberS@ @LEX@" >> strings
@@ -438,6 +458,7 @@ morphs based on the lexc notation.
   $ hfst-strings2fst --disjunct-strings < strings  | 
   hfst-repeat -f 1 > bag_of_morphs
 \end{verbatim}
+}
 \caption{Compiling a disjunction of morphs}
 \label{fig:morphology1}
 \end{figure}
@@ -445,6 +466,7 @@ morphs based on the lexc notation.
 In Figure~\ref{fig:morphology2}, we show the command-line simulation for creating the morphotactic filter and how this filter is composed with the disjunction of morphs to create the lexicon. 
 
 \begin{figure} [h!]
+{\scriptsize
 \begin{verbatim}
   $ echo "@Root@ [\@LEX@]*"  |  hfst-regexp2fst > start
   $ echo "@END@ @LEX@"  |  hfst-regexp2fst > end
@@ -461,6 +483,7 @@ In Figure~\ref{fig:morphology2}, we show the command-line simulation for creatin
   # create the lexicon
   $ hfst-compose bag-of-morphs  morphotax > lexicon
 \end{verbatim}
+}
 \caption{Composing the morphotax with the disjunction of morphs into a lexicon}
 \label{fig:morphology2}
 \end{figure}
@@ -971,6 +994,7 @@ model with edit distance 2 in \verb!ospell! would, when given the word
 word \verb!arrivew! where the French word \verb!arriver! was intended,
 do the following useless work:
 
+{\scriptsize
 \begin{verbatim}
   a:0 0:a r r i v e    [failure]
   0:a a:0 r r i v e    [failure]
@@ -982,6 +1006,7 @@ do the following useless work:
   a r r i v e w:r      [success]
   ...
 \end{verbatim}
+}
 
 When the correctable error is near the end, almost every symbol is deleted and
 inserted with no effect. This may be circumvented by adding, for each deletion
