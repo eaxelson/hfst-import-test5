@@ -150,14 +150,14 @@ grammar~\footnote{Personal communication with Francis Tyers.}.
 % Senka
 
 HFST replace rules provide backward compatibility with XFST replace rules, 
-described in \cite{Kempe96parallelreplacement} and 
-the Finite State Morphology book \cite{beesley/2003}. 
-Although they share the same notation, the HFST replace rules were developed 
-from the concept of Generalized Lenient Composition, 
-described in \cite{ylijyra/2008b}. 
+described in \cite{Kempe96parallelreplacement}\cite{beesley/2003}. 
+Although they share the same notation, the HFST replace rules differ in that
+they were developed from the concept of Generalized Lenient Composition, 
+described in \cite{ylijyra/2008b}.
 
-In this paper section, we will describe how to use Replace Rules with HFST tools. 
-For a detailed description of each rule, see The Finite State Morphology book \cite{beesley/2003}.
+We present here a general account of using replace rules with HFST.
+for a detailed description of each rule, see
+The Finite State Morphology book \cite{beesley/2003}.
 
 % Simple rules
 
@@ -166,14 +166,14 @@ For a detailed description of each rule, see The Finite State Morphology book \c
   A \rightarrow\ B
 \end{equation}
 
-where A and B are regular expressions that describe languages, 
-states that A in the upper language maps to B in the lower language.
+where A and B are regular expressions, 
+expresses that A in the upper language maps to B in the lower language.
 
-Replace rules can be compiled into transducer using the HFST tool 
-\textbf{hfst-regexp\-2fst}. This tool takes a regular expresion as input 
+Replace rules can be compiled into a transducer using the HFST tool 
+\verb!hfst-regexp2fst!. This tool takes a regular expresion as input 
 and gives a corresponding transducer written in a binary file as output. 
-To convert transducers from binary format to text format, 
-there is an HFST tool \textbf{hfst-fst2txt}. Therefore, the upper rule 
+To convert transducers from binary format to text (ATT) format, 
+there is an HFST tool \verb!hfst-fst2txt!. Therefore, the upper rule 
 could be compiled as in Figure~\ref{fig:simple_replace}.
 
 \begin{figure} [h!]
