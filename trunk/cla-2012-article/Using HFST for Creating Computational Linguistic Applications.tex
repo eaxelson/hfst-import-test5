@@ -863,15 +863,16 @@ These strings are thus the output language of the composition
 $I \circ \ E \circ L$, where $E$ is the error source.
 
 The desired behavior, or result set $R$, of a speller given input $I$, a
-lexicon $L$ and an error source $E$ is thus
+lexicon $L$ and an error source $E$ is thus given by equation \ref{result_set_eqn},
+where $\pi_2$ is the output projection.
 
-\begin{equation*}R = \begin{cases}
+\begin{equation}
+  \label{result_set_eqn}
+  R = \begin{cases}
     \pi_2(I \circ L), & \mbox{if } \pi_2(I \circ L) \neq \emptyset \\
     \pi_2(I \circ E \circ L) & \mbox{otherwise}\\
   \end{cases}
-\end{equation*}
-
-where $\pi_2$ is the output projection.
+\end{equation}
 
 It is undesirable to compute either of the intermediate compositions
 $I \circ E$ and $E \circ L$; the former will require futile work (producing
