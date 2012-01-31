@@ -22,7 +22,7 @@
 \maketitle
 
 \begin{abstract}
-  \sloppy HFST – Helsinki Finite-State Technology (\url{hfst.sf.net})
+  \sloppy HFST – Helsinki Finite-State Technology (\url{HFST.sf.net})
   is a framework for compiling and applying linguistic descriptions
   with finite-state methods. HFST currently connects some of the most 
   important finite-state tools for creating morphologies and spellers into 
@@ -75,7 +75,7 @@ using finite-state technologies.
 
 \section{Building Morphologies}\label{LexiconTools}
 
-\subsection{Introduction}
+
 %Miikka
 
 One of the earliest and most important goals of the HFST project has
@@ -110,7 +110,7 @@ Xerox tool twolc, but it augments the twolc functionality by providing two
 new types of rules. In \textbf{hfst-twolc}, rules can have centers which are
 regular expressions and can have negative contexts.
 \begin{figure}
-{\scriptsize
+{\footnotesize
 \begin{verbatim}
 ! Change x to y after the string "a b" unless "d" or 
 ! "c d" follows.
@@ -178,7 +178,7 @@ there is an HFST tool \verb!hfst-fst2txt!. Therefore, the upper rule
 could be compiled as in Figure~\ref{fig:simple_replace}.
 
 \begin{figure} [h!]
-{\scriptsize
+{\footnotesize
 \begin{verbatim}
 $ echo "A -> B ;" | hfst-regexp2fst | hfst-fst2txt
 \end{verbatim}
@@ -191,7 +191,7 @@ $ echo "A -> B ;" | hfst-regexp2fst | hfst-fst2txt
 The regular expression can be read from a file, or saved to a file (Figure~\ref{fig:read_from_file}). 
 
 \begin{figure} [h!]
-{\scriptsize
+{\footnotesize
 \begin{verbatim}
 $ echo "A -> B ;" > regex
 $ hfst-regexp2fst -i regex -o transducer
@@ -212,7 +212,7 @@ Since weights are not used in replace rules, the weights get the value 0.000000 
 Other formats that can be used with this, and other HFST tools, are e.g. \textbf{SFST} and \textbf{foma}.
 
 \begin{figure} [h!]
-{\scriptsize
+{\footnotesize
 \begin{verbatim}
 $ echo "A B C D .o. A -> B ;" | hfst-regexp2fst | hfst-fst2txt
 0       1       A       B       0.000000
@@ -227,21 +227,21 @@ $ echo "A B C D .o. A -> B ;" | hfst-regexp2fst | hfst-fst2txt
 \end{figure}
 
 
-\begin{figure} [h!]
-{\scriptsize
-\begin{verbatim}
-$ echo "c a t .o. c a t -> c a t s  ;" |
-> hfst-regexp2fst -f sfst | hfst-fst2txt
-0       1       c       c
-1       2       a       a
-2       3       t       t
-3       4       @0@     s
-4
-\end{verbatim}
-}
-\caption{Using SFST transducer format}
-\label{fig:sfst_format}
-\end{figure}
+%\begin{figure} [h!]
+%{\footnotesize
+%\begin{verbatim}
+%$ echo "c a t .o. c a t -> c a t s  ;" |
+%> hfst-regexp2fst -f sfst | hfst-fst2txt
+%0       1       c       c
+%1       2       a       a
+%2       3       t       t
+%3       4       @0@     s
+%4
+%% \end{verbatim}
+%% }
+%% \caption{Using SFST transducer format}
+%% \label{fig:sfst_format}
+%% \end{figure}
 
 
 % Context
@@ -258,14 +258,8 @@ Also, multiple context pairs are supported, when separated by comma.
   A \rightarrow\ B\ ||\ L_1 \_\  R_1 ,\ \ldots\ ,\ L_i \_\  R_i
 \end{equation}
 
-In Figure~\ref{fig:multiple_contexts}, the rule expression says that \verb!a! in the 
-upper language is mapped to \verb!b! in lower language 
-when between \verb!m! and \verb!n!, or in front of \verb!b!. 
-In the word \verb!manaab!, the first and last \verb!a! are mapped to \verb!b!, 
-because they occur between corresponding contexts, but the second \verb!a! is kept unchanged.
-
 \begin{figure} [h!]
-{\scriptsize
+{\footnotesize
 \begin{verbatim}
 $ echo " m a n a a b .o. a -> b || m _ n , _ b;" |
 hfst-regexp2fst | hfst-fst2txt
@@ -281,6 +275,13 @@ hfst-regexp2fst | hfst-fst2txt
 \caption{Replace rule between two contexts}
 \label{fig:multiple_contexts}
 \end{figure}
+
+In Figure~\ref{fig:multiple_contexts}, the rule expression says that \verb!a! in the 
+upper language is mapped to \verb!b! in lower language 
+when between \verb!m! and \verb!n!, or in front of \verb!b!. 
+In the word \verb!manaab!, the first and last \verb!a! are mapped to \verb!b!, 
+because they occur between corresponding contexts, but the second \verb!a! is kept unchanged.
+
 
 \begin{table} [h!]
   \centering
@@ -303,7 +304,7 @@ It is thus possible for the replace function to write its own context.
 This is shown in Figure~\ref{fig:context_orientation}. 
 
 \begin{figure} [h!]
-{\scriptsize
+{\footnotesize
 \begin{verbatim}
   $ echo " b a a .o. a -> b // b _ ;" | ./hfst-regexp2fst | hfst-fst2txt
   0       1       b       b       0.000000
@@ -345,7 +346,7 @@ many epsilons, while the markup operator is used to insert markers around a word
 
 
 \begin{figure} [h!]
-{\scriptsize
+{\footnotesize
 \begin{verbatim}
   $ echo " a a a .o. [.a*.] @-> b ;" | hfst-regexp2fst > a.fst
   $ echo " b a a b .o. a @-> %[ ... %] ;" | hfst-regexp2fst > b.fst
@@ -372,7 +373,7 @@ but the context formats can freely differ.
 Therefore, the rule expression in Figure~\ref{fig:parallel_rules} 
 would not be allowed in XFST, but is valid in HFST.
 \begin{figure}
-{\scriptsize
+{\footnotesize
 \begin{verbatim}
   $  echo " a -> b || m _ n ,, c -> d ;" | ./hfst-regexp2fst | hfst-fst2txt
 \end{verbatim}
@@ -383,7 +384,7 @@ would not be allowed in XFST, but is valid in HFST.
 
 \section{Morphological Descriptions}\label{MorphTools}
 
-\subsection{Introduction}
+
 % Krister
 
 Popular formalisms for describing the morphotax of a language tend to be some variation 
@@ -412,7 +413,7 @@ the empty string as the singular marker and \emph{s} and \emph{es} as plural mar
 forming a lexicon as outlined in Figure~\ref{fig:morph0} using lexc notation.
 
 \begin{figure} [h]
-{\scriptsize
+{\footnotesize
 \begin{verbatim}
   LEXICON Root
   Nouns;
@@ -446,7 +447,7 @@ In Figure~\ref{fig:morphology1}, we demonstrate how the lexicon above is compile
 morphs based on the lexc notation.
 
 \begin{figure} [h]
-{\scriptsize
+{\footnotesize
 \begin{verbatim}
   $ echo "@Root@ @Nouns@ @LEX@" > strings
   $ echo "@Nouns@ c a t @NumberS@ @LEX@" >> strings
@@ -466,7 +467,7 @@ morphs based on the lexc notation.
 In Figure~\ref{fig:morphology2}, we show the command-line simulation for creating the morphotactic filter and how this filter is composed with the disjunction of morphs to create the lexicon. 
 
 \begin{figure} [h!]
-{\scriptsize
+{\footnotesize
 \begin{verbatim}
   $ echo "@Root@ [\@LEX@]*"  |  hfst-regexp2fst > start
   $ echo "@END@ @LEX@"  |  hfst-regexp2fst > end
@@ -508,7 +509,7 @@ In Table~\ref{tab:compilation_times}, we show compilation times for different
 morphologies using different HFST back-ends. The morphologies are OMorFi 
 \cite{pirinen/2008} for Finnish, Morphisto \cite{zielinski/2009} for German,
 Morph-it \cite{Zanchetta/2005} for Italian, Swelex 
-\footnote{\url{https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HfstSwelex}} 
+\footnote{\url{https://kitwiki.csc.fi/twiki/bin/view/KitWiki/HFSTSwelex}} 
 for Swedish and TrMorph \cite{Coltekin/2010} for Turkish. 
 OMorFi, Morphisto and TrMorph have several rules for
 inflection and compounding, Morph-it and Swelex are basically word-lists.
@@ -572,7 +573,7 @@ were developed by Helmut Schmid in cooperation with the HFST team.
 
 \section{Building Taggers}\label{PosTools}
 
-\subsection{Introduction}
+
 % Miikka
 
 The HFST library includes tools for constructing statistical
@@ -595,7 +596,7 @@ HFST taggers include suffix guessers which can be modified to suit
 the needs of particular languages. Additionally HFST supports using
 morphological analyzers in tagging.
 
-\subsection{The structure of Hfst Taggers}
+\subsection{The structure of HFST Taggers}
 
 HMM taggers are statistical models which determine the most likely
 POS tag from some tag set for each word in a sentence. For
@@ -630,7 +631,7 @@ tagger to improve the accuracy of the tagger when there are a lot of
 out-of-vocabulary words.
 
 
-\subsection{The Lexical Model of Hfst Taggers}
+\subsection{The Lexical Model of HFST Taggers}
 % Miikka
 
 The accuracy of traditional POS taggers suffers greatly
@@ -732,7 +733,7 @@ known words the accuracies are nearly identical.
       Model       & ~~~~Seen & ~~~~Unseen & ~~~~All \\
       \hline
       TNT         & 96.77\%  &    85.19\% & 96.46\% \\
-      Basic Hfst  & 96.68\%  &    80.71\% & 96.23\% \\
+      Basic HFST  & 96.68\%  &    80.71\% & 96.23\% \\
       \hline
     \end{tabular}
   \end{center}
@@ -771,7 +772,7 @@ negligible for known words, but significant for unknown words.
 
 \section{Transducer applications}\label{Applications}
 
-\subsection{Introduction}
+
 % Tommi
 
 Automata technology is a general framework for describing language models
@@ -994,7 +995,7 @@ model with edit distance 2 in \verb!ospell! would, when given the word
 word \verb!arrivew! where the French word \verb!arriver! was intended,
 do the following useless work:
 
-{\scriptsize
+{\footnotesize
 \begin{verbatim}
   a:0 0:a r r i v e    [failure]
   0:a a:0 r r i v e    [failure]
