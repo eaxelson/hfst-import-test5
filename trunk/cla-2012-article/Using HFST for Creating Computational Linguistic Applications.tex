@@ -169,7 +169,7 @@ The Finite State Morphology book \cite{beesley/2003}.
 where A and B are regular expressions, 
 expresses that A in the upper language maps to B in the lower language.
 
-Replace rules can be compiled into a transducer using the HFST tool 
+Replace rules can be compiled into a transducer using
 \verb!hfst-regexp2fst!. This tool takes a regular expresion as input 
 and gives a corresponding transducer written in a binary file as output. 
 To convert transducers from binary format to text (ATT) format, 
@@ -1017,18 +1017,14 @@ variety of tasks in information extraction, such as named entity recognition.
 An approach to this task was presented by Lauri Karttunen in
 \cite{karttunen/2011}, and an outline for implementing it in HFST is given here.
 
-Some desiderata for pattern matching are:
-
-\begin{itemize}
-\item Several patterns, including nested matches,
-  should be able to operate in parallel
-\item It should be possible to impose contextual requirements (rules) on
-  the patterns to be matched
-\item Matching should be efficient in space and time - in particular, it should
-  be possible to avoid long-range
-  dependencies which are awkward for FST transformations
-\item A facility for referring to common subpatterns, such as dates, by name
-\end{itemize}
+\subsubsection{Some desiderata for pattern matching.} Several patterns,
+including nested matches, should be able to operate in parallel, and
+it should be possible to impose contextual requirements (rules) on
+the patterns to be matched. Matching should be efficient in space and
+time --- in particular, it should be possible to avoid long-range
+dependencies which are awkward for FST transformations.
+A powerful system should also have a facility for referring
+to common subpatterns by name.
 
 \subsubsection{The pmatch Approach.}
 
