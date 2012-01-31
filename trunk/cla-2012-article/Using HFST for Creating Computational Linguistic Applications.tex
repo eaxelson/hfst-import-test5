@@ -695,7 +695,7 @@ is described in Table~\ref{data-taggers}.
   \end{center}
 \end{table}
 
-As Table~\ref{eng-tagging-acc} shows, Hfst taggers achieve comparable
+As Table~\ref{eng-tagging-acc} shows, HFST taggers achieve comparable
 results to the well known second order HMM tagger TNT. The accuracy
 for unknown words is slightly worse using the HFST tagger, but for
 known words the accuracies are nearly identical.
@@ -730,16 +730,16 @@ accuracy is seen. See Table~\ref{fin-tagging-acc}. The increase is
 negligible for known words, but significant for unknown words.
 
 \begin{table}
-  \caption{Results for Finnish taggers. The model Basic Hfst is a
-    regular second order HMM tagger. The model With Morph Hfst is
+  \caption{Results for Finnish taggers. The model Basic HFST is a
+    regular second order HMM tagger. The model With Morph HFST is
     augmented with a morphological analyzer.}\label{fin-tagging-acc}
   \begin{center}
     \begin{tabular}{lccc}
       \hline 
       Model            & ~~~~Seen & ~~~~Unseen & ~~~~All \\
       \hline 
-      Basic Hfst       &  97.51\% &    77.51\% & 95.23\% \\
-      With Morph Hfst  &  97.53\% &    83.65\% & 95.90\% \\
+      Basic HFST       &  97.51\% &    77.51\% & 95.23\% \\
+      With Morph HFST  &  97.53\% &    83.65\% & 95.90\% \\
       \hline
     \end{tabular}
   \end{center}
@@ -751,31 +751,31 @@ negligible for known words, but significant for unknown words.
 \subsection{Introduction}
 % Tommi
 
-The automata technology is a general framework for describing language models
+Automata technology is a general framework for describing language models
 and phenomena from a wide range of linguistic fields from phonology to
-morphology, as well as certain areas of syntax and semantics (in part of speech tagging and
+morphology, as well as certain areas of syntax and semantics (in POS tagging and
 machine translation).  The practical applications cover spell-checking, 
 as demonstrated in Voikko\footnote{\url{voikko.sf.net}} with
 bindings to LibreOffice, Gnome desktop, Mozilla and Mac OS X Spell Service, to
-morphological and syntactic analysis and, as demonstrated in native HFST tools
+morphological and syntactic analysis as demonstrated in native HFST tools
 from HFST downloads\footnote{\url{hfst.sf.net}}, and to machine translation as demonstrated in
 several released language pairs in the machine translation system
-Apertium\footnote{\url{www.apertium.org}}. This demonstrates a very important feature of the HFST
-technology, alluded to in previous chapters, i.e. language models can be
+Apertium\footnote{\url{www.apertium.org}}. This demonstrates a very important feature of HFST,
+alluded to in previous chapters, i.e. language models can be
 described with one tool in one theoretical and practical framework. For example,
 existing morphological analyzers for the Sámi languages found on the
-Internet\footnote{\url{divvun.no}}, written with the Xerox formalism was converted into a spell-checker 
+Internet\footnote{\url{divvun.no}}, written with the Xerox formalism were converted into a spell-checker 
 in one evening and evaluated in \cite{pirinen/2010/lrec} with additional training from likewise freely
 available Sámi Wikipedia. Similar results of using machine translation
-dictionaries from free/libre open source project
+dictionaries from the free/libre open source project
 Apertium to create not only
-dictionaries, but morphological analyzers and spell-checkers are also
-demonstrated on our web page.\footnote{The examples are also available at
+dictionaries, but morphological analyzers and spell-checkers, are also
+demonstrated on our web page.\footnote{The examples are available at
   \url{http:/www.ling.helsinki.fi/cgi-bin/omor/omordemo.bash}}
 
-It can be noted about the general applicability of different finite-state
-language models in practical applications that we can now generate,
-e.g., spell-checkers for languages that lack such tools but have machine
+It can be noted about the general applicability of finite-state
+language models in practical applications that we can now generate
+e.g. spell-checkers for languages that lack such tools but have machine
 readable dictionaries (such as Manx) or morphological analyzers (such as
 Greenlandic, which is not easily implemented in other spell-checking formalisms). 
 The adaptation of such models to baseline spell-checkers (with a homogeneous 
