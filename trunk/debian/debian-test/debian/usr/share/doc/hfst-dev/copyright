@@ -1,16 +1,16 @@
 This work was packaged for Debian by:
 
-    Erik Axelson <foo@bar.fi> on Mon, 28 Mar 2011 15:30:00 +0200
+    Erik Axelson <hfst-info@sf.net> on Wed, 01 Feb 2012 16:20:00 +0200
 
 It was downloaded from <http://sf.net/projects/hfst/files/>
 
 Upstream Author(s):
 
-    Erik Axelson <foo@bar.fi>
+    Erik Axelson <hfst-info@sf.net>
 
 Copyright:
 
-    Copyright (C) 2011 University of Helsinki <hfst-bugs@helsinki.fi>
+    Copyright (C) 2012 University of Helsinki <hfst-bugs@helsinki.fi>
 
 License: GPL-3
     This program is free software: you can redistribute it and/or modify
@@ -32,7 +32,7 @@ License: GPL-3
 
 The Debian packaging is:
 
-    Copyright (C) 2011 Erik Axelson <foo@bar.fi>
+    Copyright (C) 2012 Erik Axelson <hfst-info@sf.net>
 
 and is licensed under the GPL version 3,
 see `/usr/share/common-licenses/GPL-3'.
