@@ -128,7 +128,8 @@ gzip --best --force debian/usr/share/man/man1/*.1
 chmod 0755 debian/DEBIAN/postinst
 chmod 0664 debian/DEBIAN/control
 chmod 0644 debian/DEBIAN/shlibs
-#chmod 0664 debian/substvars
+chmod 0644 debian/usr/share/doc/hfst-dev/changelog.Debian.gz
+chmod 0644 debian/usr/share/doc/hfst-dev/copyright
 
 find . -type d -exec chmod 755 {} \; 
 
