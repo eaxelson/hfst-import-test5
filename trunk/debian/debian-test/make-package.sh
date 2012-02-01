@@ -32,6 +32,7 @@ cd ../../..
 # ---------------------
 
 cp -P $HFST_PREFIX/lib/* debian/usr/lib/
+rm debian/usr/lib/libhfst.la
 
 
 # ---------------------------
@@ -79,6 +80,13 @@ chmod 0644 debian/usr/include/*
 chmod 0755 debian/usr/include/hfst
 
 
+# ------------------
+# Copy the man pages
+# ------------------
+
+cp $HFST_PREFIX/share/man/man1/*.1 debian/usr/share/man/man1
+
+
 # ---------------------------------
 # Remove the rpaths from HFST tools
 # ---------------------------------
@@ -113,9 +121,16 @@ fi
 gzip --best --force debian/usr/share/man/man1/*.1
 
 
-echo "Exiting..."
-exit 0;
-echo "Oops, didn't exit..."
+# ---------------------------------
+# Set file and directory properties
+# ---------------------------------
+
+chmod 0755 debian/DEBIAN/postinst
+chmod 0664 debian/DEBIAN/control
+chmod 0644 debian/DEBIAN/shlibs
+#chmod 0664 debian/substvars
+
+find . -type d -exec chmod 755 {} \; 
 
 
 # -----------------------
