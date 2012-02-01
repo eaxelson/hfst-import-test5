@@ -35,5 +35,8 @@ dist_man1_MANS=$(bootstrappable) $(broken)
 
 bootstrap: 
 	for f in $(bootstrappable) ; do \
-		help2man -s 1 -o $$f -N -S HFST `echo $$f | sed 's/.1//'`; \
+		N=`echo $$f | sed 's/.1/ \-\-help/' | sh | sed -n 2p`; \
+		help2man \
+		-n="$$N" \
+		-s 1 -o $$f -N -S HFST `echo $$f | sed 's/.1//'`; \
 	done
