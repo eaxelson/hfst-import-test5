@@ -29,9 +29,12 @@ bootstrappable=hfst-compare.1 hfst-compose.1 \
 			   hfst-subtract.1 hfst-summarize.1 hfst-tail.1 hfst-txt2fst.1 \
 			   hfst-calculate.1 hfst-compose-intersect.1 \
 			   hfst-lookup.1 \
-			   hfst-substitute.1
+			   hfst-substitute.1 hfst-format.1 hfst-name.1
 broken=hfst-xfst.1 hfst-foma-wrapper.1 hfst-apertium-proc.1 hfst-lexc.1
-dist_man1_MANS=$(bootstrappable) $(broken)
+aliases= hfst-determinise.1 hfst-expand.1 hfst-intersect.1 hfst-minimise.1 \
+	 hfst-minus.1 hfst-sfstpl2fst.1 hfst-summarise.1 hfst-union.1
+dist_man1_MANS=$(bootstrappable) $(aliases) $(broken)
+LN_S=ln -s
 
 bootstrap: 
 	for f in $(bootstrappable) ; do \
@@ -39,4 +42,12 @@ bootstrap:
 		help2man \
 		-n="$$N" \
 		-s 1 -o $$f -N -S HFST `echo $$f | sed 's/.1//'`; \
-	done
+	done; \
+        $(LN_S) -f hfst-determinize.1 hfst-determinise.1 && \
+        $(LN_S) -f hfst-fst2strings.1 hfst-expand.1 && \
+        $(LN_S) -f hfst-conjunct.1 hfst-intersect.1 && \
+        $(LN_S) -f hfst-minimize.1 hfst-minimise.1 && \
+        $(LN_S) -f hfst-subtract.1 hfst-minus.1 && \
+        $(LN_S) -f hfst-calculate.1 hfst-sfstpl2fst.1 && \
+        $(LN_S) -f hfst-summarize.1 hfst-summarise.1 && \
+        $(LN_S) -f hfst-disjunct.1 hfst-union.1
