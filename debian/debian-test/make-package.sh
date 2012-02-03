@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 #
 #  -------------------------------------------------
 #  A script for creating the debian package for HFST
@@ -7,6 +7,9 @@
 
 HFST_PREFIX="$HOME/hfst-installation/"
 BACKEND_PREFIX="/usr/local/"
+SFST_PREFIX=$BACKEND_PREFIX
+OPENFST_PREFIX=$BACKEND_PREFIX
+FOMA_PREFIX=$BACKEND_PREFIX
 
 # -------------------
 # Copy the HFST tools
@@ -20,7 +23,7 @@ done
 cd debian/usr/bin;
 for tool in hfst-*;
 do
-    if (readelf -a $tool 2>&1 > /dev/null); then
+    if (readelf -a $tool 1> /dev/null 2> /dev/null); then
 	strip $tool;
     fi;
 done
