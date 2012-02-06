@@ -108,7 +108,10 @@ print_usage()
         "Compile string pairs and pair-strings into transducer(s)\n"
         "\n", program_name); 
         print_common_program_options(message_out);
-        print_common_unary_program_options(message_out); 
+        fprintf(message_out, 
+	"Input/Output options:\n"
+	"  -i, --input=INFILE     Read input strings from INFILE\n"
+	"  -o, --output=OUTFILE   Write output transducer to OUTFILE\n");
         fprintf(message_out, "String and format options:\n"
         "  -f, --format=FMT          Write result in FMT format\n"
         "  -j, --disjunct-strings    Disjunct all strings instead of transforming\n"
