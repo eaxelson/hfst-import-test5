@@ -24,7 +24,7 @@ IMPLEMENTATION_SRCS=HfstTransitionGraph.cc \
 		    HfstTropicalTransducerTransitionData.cc \
 		    ConvertSfstTransducer.cc ConvertTropicalWeightTransducer.cc \
 		    ConvertLogWeightTransducer.cc ConvertFomaTransducer.cc \
-	  	    ConvertOlTransducer.cc \
+	  	    ConvertOlTransducer.cc ConvertBooleanWeightTransducer.cc \
                     compose_intersect/ComposeIntersectRulePair.cc \
                     compose_intersect/ComposeIntersectLexicon.cc \
                     compose_intersect/ComposeIntersectRule.cc \
@@ -39,7 +39,7 @@ if WANT_SFST
 MAYBE_SFST=SfstTransducer.cc
 endif
 if WANT_OPENFST
-MAYBE_OPENFST=TropicalWeightTransducer.cc LogWeightTransducer.cc
+MAYBE_OPENFST=TropicalWeightTransducer.cc LogWeightTransducer.cc BooleanWeightTransducer.cc
 endif
 if WANT_FOMA
 MAYBE_FOMA=FomaTransducer.cc
@@ -74,6 +74,7 @@ implinclude_HEADERS = \
 		FomaTransducer.h \
 		LogWeightTransducer.h \
 		SfstTransducer.h TropicalWeightTransducer.h \
+		BooleanWeightTransducer.h \
 		HfstOlTransducer.h HfstTransitionGraph.h HfstTransition.h \
 		HfstTropicalTransducerTransitionData.h \
 		HfstFastTransitionData.h \
@@ -118,6 +119,7 @@ endif
 LIBHFST_TSTS=HfstTransitionGraph ConvertTransducerFormat \
 		ConvertSfstTransducer ConvertTropicalWeightTransducer \
 		ConvertLogWeightTransducer ConvertFomaTransducer \
+		ConvertBooleanWeightTransducer \
 		ConvertOlTransducer \
 		compose_intersect/ComposeIntersectRulePair \
 		compose_intersect/ComposeIntersectLexicon \
@@ -155,6 +157,9 @@ ConvertSfstTransducer_LDADD=../libhfst.la
 ConvertTropicalWeightTransducer_SOURCES=ConvertTropicalWeightTransducer.cc
 ConvertTropicalWeightTransducer_CXXFLAGS=-DMAIN_TEST
 ConvertTropicalWeightTransducer_LDADD=../libhfst.la
+ConvertBooleanWeightTransducer_SOURCES=ConvertBooleanWeightTransducer.cc
+ConvertBooleanWeightTransducer_CXXFLAGS=-DMAIN_TEST
+ConvertBooleanWeightTransducer_LDADD=../libhfst.la
 ConvertLogWeightTransducer_SOURCES=ConvertLogWeightTransducer.cc
 ConvertLogWeightTransducer_CXXFLAGS=-DMAIN_TEST
 ConvertLogWeightTransducer_LDADD=../libhfst.la
