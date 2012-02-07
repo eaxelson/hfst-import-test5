@@ -48,6 +48,8 @@ hfst::implementations::SfstTransducer HfstTransducer::sfst_interface;
 #if HAVE_OPENFST
 hfst::implementations::TropicalWeightTransducer 
   HfstTransducer::tropical_ofst_interface;
+hfst::implementations::BooleanWeightTransducer 
+  HfstTransducer::boolean_ofst_interface;
 hfst::implementations::LogWeightTransducer
   HfstTransducer::log_ofst_interface;
 #endif
@@ -1219,6 +1221,7 @@ HfstTransducer &HfstTransducer::remove_epsilons()
 #endif
 #if HAVE_OPENFST
     &hfst::implementations::TropicalWeightTransducer::remove_epsilons,
+    &hfst::implementations::BooleanWeightTransducer::remove_epsilons,
     &hfst::implementations::LogWeightTransducer::remove_epsilons,
 #endif
 #if HAVE_FOMA
@@ -1238,6 +1241,7 @@ HfstTransducer &HfstTransducer::determinize()
 #endif
 #if HAVE_OPENFST
     &hfst::implementations::TropicalWeightTransducer::determinize,
+    &hfst::implementations::BooleanWeightTransducer::determinize,
     &hfst::implementations::LogWeightTransducer::determinize,
 #endif
 #if HAVE_FOMA
@@ -1254,6 +1258,7 @@ HfstTransducer &HfstTransducer::minimize()
 #endif
 #if HAVE_OPENFST
     &hfst::implementations::TropicalWeightTransducer::minimize,
+    &hfst::implementations::BooleanWeightTransducer::minimize,
     &hfst::implementations::LogWeightTransducer::minimize,
 #endif
 #if HAVE_FOMA
@@ -1278,6 +1283,7 @@ HfstTransducer &HfstTransducer::repeat_star()
 #endif
 #if HAVE_OPENFST
     &hfst::implementations::TropicalWeightTransducer::repeat_star,
+    &hfst::implementations::BooleanWeightTransducer::repeat_star,
     &hfst::implementations::LogWeightTransducer::repeat_star,
 #endif
 #if HAVE_FOMA
@@ -1294,6 +1300,7 @@ HfstTransducer &HfstTransducer::repeat_plus()
 #endif
 #if HAVE_OPENFST
     &hfst::implementations::TropicalWeightTransducer::repeat_plus,
+    &hfst::implementations::BooleanWeightTransducer::repeat_plus,
     &hfst::implementations::LogWeightTransducer::repeat_plus,
 #endif
 #if HAVE_FOMA
@@ -1310,6 +1317,7 @@ HfstTransducer &HfstTransducer::repeat_n(unsigned int n)
 #endif
 #if HAVE_OPENFST
     &hfst::implementations::TropicalWeightTransducer::repeat_n,
+    &hfst::implementations::BooleanWeightTransducer::repeat_n,
     &hfst::implementations::LogWeightTransducer::repeat_n,
 #endif
 #if HAVE_FOMA
@@ -1335,6 +1343,7 @@ HfstTransducer &HfstTransducer::repeat_n_minus(unsigned int n)
 #endif
 #if HAVE_OPENFST
     &hfst::implementations::TropicalWeightTransducer::repeat_le_n,
+    &hfst::implementations::BooleanWeightTransducer::repeat_le_n,
     &hfst::implementations::LogWeightTransducer::repeat_le_n,
 #endif
 #if HAVE_FOMA
@@ -1365,6 +1374,7 @@ HfstTransducer &HfstTransducer::optionalize()
 #endif
 #if HAVE_OPENFST
     &hfst::implementations::TropicalWeightTransducer::optionalize,
+    &hfst::implementations::BooleanWeightTransducer::optionalize,
     &hfst::implementations::LogWeightTransducer::optionalize,
 #endif
 #if HAVE_FOMA
@@ -1381,6 +1391,7 @@ HfstTransducer &HfstTransducer::invert()
 #endif
 #if HAVE_OPENFST
     &hfst::implementations::TropicalWeightTransducer::invert,
+    &hfst::implementations::BooleanWeightTransducer::invert,
     &hfst::implementations::LogWeightTransducer::invert,
 #endif
 #if HAVE_FOMA
@@ -1397,6 +1408,7 @@ HfstTransducer &HfstTransducer::reverse()
 #endif
 #if HAVE_OPENFST
     &hfst::implementations::TropicalWeightTransducer::reverse,
+    &hfst::implementations::BooleanWeightTransducer::reverse,
     &hfst::implementations::LogWeightTransducer::reverse,
 #endif
 #if HAVE_FOMA
@@ -1413,6 +1425,7 @@ HfstTransducer &HfstTransducer::input_project()
 #endif
 #if HAVE_OPENFST
     &hfst::implementations::TropicalWeightTransducer::extract_input_language,
+    &hfst::implementations::BooleanWeightTransducer::extract_input_language,
     &hfst::implementations::LogWeightTransducer::extract_input_language,
 #endif
 #if HAVE_FOMA
@@ -1429,6 +1442,8 @@ HfstTransducer &HfstTransducer::output_project()
 #endif
 #if HAVE_OPENFST
     &hfst::implementations::TropicalWeightTransducer::
+    extract_output_language,
+    &hfst::implementations::BooleanWeightTransducer::
     extract_output_language,
     &hfst::implementations::LogWeightTransducer::extract_output_language,
 #endif
@@ -1479,6 +1494,10 @@ void HfstTransducer::extract_paths(ExtractStringsCb& callback, int cycles)
         break;
     case TROPICAL_OPENFST_TYPE:
         hfst::implementations::TropicalWeightTransducer::extract_paths
+        (implementation.tropical_ofst,callback,cycles,NULL,false);
+        break;
+    case BOOLEAN_OPENFST_TYPE:
+        hfst::implementations::BooleanWeightTransducer::extract_paths
         (implementation.tropical_ofst,callback,cycles,NULL,false);
         break;
 #endif
@@ -1533,6 +1552,17 @@ void HfstTransducer::extract_paths_fd(ExtractStringsCb& callback,
         (implementation.tropical_ofst,callback,cycles,
          t_tropical_ofst,filter_fd);
         delete t_tropical_ofst;
+    }
+    break;
+    case BOOLEAN_OPENFST_TYPE:
+    {
+        FdTable<int64>* t_boolean_ofst 
+        = hfst::implementations::BooleanWeightTransducer::
+            get_flag_diacritics(implementation.boolean_ofst);
+        hfst::implementations::BooleanWeightTransducer::extract_paths
+        (implementation.tropical_ofst,callback,cycles,
+         t_boolean_ofst,filter_fd);
+        delete t_boolean_ofst;
     }
     break;
 #endif
@@ -1697,6 +1727,15 @@ HfstTransducer &HfstTransducer::n_best(unsigned int n)
     {
     fst::StdVectorFst * temp =
             hfst::implementations::TropicalWeightTransducer::n_best
+            (implementation.tropical_ofst,(int)n);
+    delete implementation.tropical_ofst;
+    implementation.tropical_ofst = temp;
+    break;
+    }
+    case BOOLEAN_OPENFST_TYPE:
+    {
+    fst::StdVectorFst * temp =
+            hfst::implementations::BooleanWeightTransducer::n_best
             (implementation.tropical_ofst,(int)n);
     delete implementation.tropical_ofst;
     implementation.tropical_ofst = temp;
@@ -1904,8 +1943,14 @@ HfstTransducer &HfstTransducer::insert_freely
     {
 #if HAVE_OPENFST
     case TROPICAL_OPENFST_TYPE:
+      {
+	hfst::implementations::TropicalWeightTransducer::insert_freely
+	  (implementation.tropical_ofst,symbol_pair);
+	break;
+      }
+    case BOOLEAN_OPENFST_TYPE:
     {
-    hfst::implementations::TropicalWeightTransducer::insert_freely
+    hfst::implementations::BooleanWeightTransducer::insert_freely
             (implementation.tropical_ofst,symbol_pair);
     break;
     }
@@ -2735,6 +2780,7 @@ HfstTransducer &HfstTransducer::concatenate
 #endif
 #if HAVE_OPENFST
         &hfst::implementations::TropicalWeightTransducer::concatenate,
+        &hfst::implementations::BooleanWeightTransducer::concatenate,
         &hfst::implementations::LogWeightTransducer::concatenate,
 #endif
 #if HAVE_FOMA
@@ -2816,6 +2862,7 @@ HfstTransducer &HfstTransducer::disjunct
 #endif
 #if HAVE_OPENFST
     &hfst::implementations::TropicalWeightTransducer::disjunct,
+    &hfst::implementations::BooleanWeightTransducer::disjunct,
     &hfst::implementations::LogWeightTransducer::disjunct,
 #endif
 #if HAVE_FOMA
@@ -2833,6 +2880,7 @@ HfstTransducer &HfstTransducer::intersect
 #endif
 #if HAVE_OPENFST
     &hfst::implementations::TropicalWeightTransducer::intersect,
+    &hfst::implementations::BooleanWeightTransducer::intersect,
     &hfst::implementations::LogWeightTransducer::intersect,
 #endif
 #if HAVE_FOMA
@@ -2850,6 +2898,7 @@ HfstTransducer &HfstTransducer::subtract
 #endif
 #if HAVE_OPENFST
     &hfst::implementations::TropicalWeightTransducer::subtract,
+    &hfst::implementations::BooleanWeightTransducer::subtract,
     &hfst::implementations::LogWeightTransducer::subtract,
 #endif
 #if HAVE_FOMA
@@ -3240,6 +3289,11 @@ HfstTransducer::HfstTransducer(FILE * ifile,
     case TROPICAL_OPENFST_TYPE:
         implementation.tropical_ofst 
         = ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(&net);
+          
+        break;
+    case BOOLEAN_OPENFST_TYPE:
+        implementation.tropical_ofst 
+        = ConversionFunctions::hfst_basic_transducer_to_boolean_ofst(&net);
           
         break;
     case LOG_OPENFST_TYPE:
