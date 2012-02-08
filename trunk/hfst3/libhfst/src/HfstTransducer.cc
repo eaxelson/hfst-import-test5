@@ -167,9 +167,6 @@ void HfstTransducer::insert_to_alphabet(const std::string &symbol)
     case TROPICAL_OPENFST_TYPE:
         tropical_ofst_interface.insert_to_alphabet
         (implementation.tropical_ofst, symbol);
-    case BOOLEAN_OPENFST_TYPE:
-        boolean_ofst_interface.insert_to_alphabet
-        (implementation.boolean_ofst, symbol);
     case LOG_OPENFST_TYPE:
         log_ofst_interface.insert_to_alphabet
         (implementation.log_ofst, symbol);
@@ -216,9 +213,6 @@ void HfstTransducer::remove_from_alphabet(const std::string &symbol)
     case TROPICAL_OPENFST_TYPE:
       tropical_ofst_interface.remove_from_alphabet
     (implementation.tropical_ofst, symbol);
-    case BOOLEAN_OPENFST_TYPE:
-      boolean_ofst_interface.remove_from_alphabet
-    (implementation.boolean_ofst, symbol);
     case LOG_OPENFST_TYPE:
       log_ofst_interface.remove_from_alphabet
     (implementation.log_ofst, symbol);
@@ -251,9 +245,6 @@ StringSet HfstTransducer::get_alphabet() const
     case TROPICAL_OPENFST_TYPE:
         return tropical_ofst_interface.get_alphabet
         (implementation.tropical_ofst);
-    case BOOLEAN_OPENFST_TYPE:
-        return boolean_ofst_interface.get_alphabet
-        (implementation.boolean_ofst);
     case LOG_OPENFST_TYPE:
         return log_ofst_interface.get_alphabet(implementation.log_ofst);
 #endif
@@ -282,9 +273,6 @@ unsigned int HfstTransducer::get_symbol_number(const std::string &symbol)
     case TROPICAL_OPENFST_TYPE:
       return tropical_ofst_interface.get_symbol_number
     (implementation.tropical_ofst, symbol);
-    case BOOLEAN_OPENFST_TYPE:
-      return boolean_ofst_interface.get_symbol_number
-    (implementation.boolean_ofst, symbol);
     case LOG_OPENFST_TYPE:
       return log_ofst_interface.get_symbol_number(implementation.log_ofst,
                           symbol);
@@ -325,7 +313,6 @@ HfstTransducer * HfstTransducer::harmonize_(const HfstTransducer &another)
 #if HAVE_SFST || HAVE_OPENFST
     case (SFST_TYPE):
     case (TROPICAL_OPENFST_TYPE):
-    case (BOOLEAN_OPENFST_TYPE):
     case (LOG_OPENFST_TYPE):
       {
     HfstBasicTransducer * another_basic = another.get_basic_transducer();
@@ -374,7 +361,6 @@ void HfstTransducer::harmonize(HfstTransducer &another)
 #if HAVE_SFST || HAVE_OPENFST
     case (SFST_TYPE):
     case (TROPICAL_OPENFST_TYPE):
-    case (BOOLEAN_OPENFST_TYPE):
     case (LOG_OPENFST_TYPE):
       {
     HfstBasicTransducer * this_basic = this->convert_to_basic_transducer();
@@ -411,9 +397,6 @@ void HfstTransducer::print_alphabet()
     if (this->type == TROPICAL_OPENFST_TYPE)
       this->tropical_ofst_interface.print_alphabet
     (this->implementation.tropical_ofst);
-    if (this->type == BOOLEAN_OPENFST_TYPE)
-      this->boolean_ofst_interface.print_alphabet
-    (this->implementation.boolean_ofst);
 #endif
 #if HAVE_FOMA
     if (this->type == FOMA_TYPE)
@@ -462,7 +445,7 @@ HfstOneLevelPaths * HfstTransducer::lookup_fd(const StringVector& s,
     default:
     (void)s;
     (void)limit;
-    HFST_THROW_MESSAGE(FunctionNotImplementedException, "HfstTransducer::lookup_fd");
+    HFST_THROW(FunctionNotImplementedException);
     }
 }
 
@@ -482,7 +465,7 @@ HfstOneLevelPaths * HfstTransducer::lookup_fd(const std::string & s,
     default:
     (void)s;
     (void)limit;
-    HFST_THROW_MESSAGE(FunctionNotImplementedException, "HfstTransducer::lookup_fd");
+    HFST_THROW(FunctionNotImplementedException);
     }
 }
 
@@ -558,11 +541,6 @@ HfstTransducer::HfstTransducer(ImplementationType type):
         tropical_ofst_interface.create_empty_transducer();
         this->type = TROPICAL_OPENFST_TYPE;
         break;
-    case BOOLEAN_OPENFST_TYPE:
-        implementation.boolean_ofst = 
-        boolean_ofst_interface.create_empty_transducer();
-        this->type = BOOLEAN_OPENFST_TYPE;
-        break;
     case LOG_OPENFST_TYPE:
         implementation.log_ofst = 
         log_ofst_interface.create_empty_transducer();
@@ -588,9 +566,7 @@ HfstTransducer::HfstTransducer(ImplementationType type):
     case ERROR_TYPE:
         HFST_THROW(SpecifiedTypeRequiredException);
     default:
-      HFST_THROW_MESSAGE
-	(FunctionNotImplementedException, 
-	 "HfstTransducer(ImplementatationType)");
+        HFST_THROW(FunctionNotImplementedException);
     }
 }
 
@@ -624,11 +600,6 @@ HfstTransducer::HfstTransducer(const std::string& utf8_str,
         implementation.tropical_ofst = 
         tropical_ofst_interface.define_transducer(spv);
         this->type = TROPICAL_OPENFST_TYPE;
-        break;
-    case BOOLEAN_OPENFST_TYPE:
-        implementation.boolean_ofst = 
-        boolean_ofst_interface.define_transducer(spv);
-        this->type = BOOLEAN_OPENFST_TYPE;
         break;
     case LOG_OPENFST_TYPE:
         implementation.log_ofst = 
@@ -677,11 +648,6 @@ HfstTransducer::HfstTransducer(const StringPairVector & spv,
         implementation.tropical_ofst = 
         tropical_ofst_interface.define_transducer(spv);
         this->type = TROPICAL_OPENFST_TYPE;
-        break;
-    case BOOLEAN_OPENFST_TYPE:
-        implementation.boolean_ofst = 
-        boolean_ofst_interface.define_transducer(spv);
-        this->type = BOOLEAN_OPENFST_TYPE;
         break;
     case LOG_OPENFST_TYPE:
         implementation.log_ofst = 
@@ -733,11 +699,6 @@ HfstTransducer::HfstTransducer(const StringPairSet & sps,
         implementation.tropical_ofst = 
         tropical_ofst_interface.define_transducer(sps,cyclic);
         this->type = TROPICAL_OPENFST_TYPE;
-        break;
-    case BOOLEAN_OPENFST_TYPE:
-        implementation.boolean_ofst = 
-        boolean_ofst_interface.define_transducer(sps,cyclic);
-        this->type = BOOLEAN_OPENFST_TYPE;
         break;
     case LOG_OPENFST_TYPE:
         implementation.log_ofst = 
@@ -794,11 +755,6 @@ HfstTransducer::HfstTransducer(const std::vector<StringPairSet> & spsv,
         tropical_ofst_interface.define_transducer(spsv);
         this->type = TROPICAL_OPENFST_TYPE;
         break;
-    case BOOLEAN_OPENFST_TYPE:
-        implementation.boolean_ofst = 
-        boolean_ofst_interface.define_transducer(spsv);
-        this->type = BOOLEAN_OPENFST_TYPE;
-        break;
     case LOG_OPENFST_TYPE:
         implementation.log_ofst = 
         log_ofst_interface.define_transducer(spsv);
@@ -851,11 +807,6 @@ HfstTransducer::HfstTransducer(const std::string& upper_utf8_str,
         implementation.tropical_ofst = 
         tropical_ofst_interface.define_transducer(spv);
         this->type = TROPICAL_OPENFST_TYPE;
-        break;
-    case BOOLEAN_OPENFST_TYPE:
-        implementation.boolean_ofst = 
-        boolean_ofst_interface.define_transducer(spv);
-        this->type = BOOLEAN_OPENFST_TYPE;
         break;
     case LOG_OPENFST_TYPE:
         implementation.log_ofst = 
@@ -913,10 +864,6 @@ HfstTransducer::HfstTransducer(const HfstTransducer &another):
         implementation.tropical_ofst =
         tropical_ofst_interface.copy(another.implementation.tropical_ofst);
         break;
-    case BOOLEAN_OPENFST_TYPE:
-        implementation.boolean_ofst =
-        boolean_ofst_interface.copy(another.implementation.boolean_ofst);
-        break;
     case LOG_OPENFST_TYPE:
         implementation.log_ofst =
         log_ofst_interface.copy(another.implementation.log_ofst);
@@ -965,10 +912,6 @@ HfstTransducer::HfstTransducer
         implementation.tropical_ofst = 
       ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(&net);
         break;
-    case BOOLEAN_OPENFST_TYPE:
-        implementation.boolean_ofst = 
-      ConversionFunctions::hfst_basic_transducer_to_boolean_ofst(&net);
-        break;
     case LOG_OPENFST_TYPE:
         implementation.log_ofst = 
         ConversionFunctions::hfst_basic_transducer_to_log_ofst(&net);
@@ -1010,9 +953,6 @@ HfstTransducer::~HfstTransducer(void)
 #if HAVE_OPENFST
     case TROPICAL_OPENFST_TYPE:
         delete implementation.tropical_ofst;
-        break;
-    case BOOLEAN_OPENFST_TYPE:
-        delete implementation.boolean_ofst;
         break;
     case LOG_OPENFST_TYPE:
         delete implementation.log_ofst;
@@ -1062,11 +1002,6 @@ HfstTransducer::HfstTransducer(const std::string &symbol,
         tropical_ofst_interface.define_transducer(symbol);
         this->type = TROPICAL_OPENFST_TYPE;
         break;
-    case BOOLEAN_OPENFST_TYPE:
-        implementation.boolean_ofst = 
-        boolean_ofst_interface.define_transducer(symbol);
-        this->type = BOOLEAN_OPENFST_TYPE;
-        break;
     case LOG_OPENFST_TYPE:
         implementation.log_ofst = log_ofst_interface.define_transducer(symbol);
         break;
@@ -1114,11 +1049,6 @@ HfstTransducer::HfstTransducer(const std::string &isymbol,
         implementation.tropical_ofst 
         = tropical_ofst_interface.define_transducer(isymbol, osymbol);
         this->type = TROPICAL_OPENFST_TYPE;
-        break;
-    case BOOLEAN_OPENFST_TYPE:
-        implementation.boolean_ofst 
-        = boolean_ofst_interface.define_transducer(isymbol, osymbol);
-        this->type = BOOLEAN_OPENFST_TYPE;
         break;
     case LOG_OPENFST_TYPE:
         implementation.log_ofst 
@@ -1212,10 +1142,6 @@ bool HfstTransducer::compare(const HfstTransducer &another) const
         return one_copy.tropical_ofst_interface.are_equivalent(
         one_copy.implementation.tropical_ofst, 
         another_copy.implementation.tropical_ofst);
-    case BOOLEAN_OPENFST_TYPE:
-        return one_copy.boolean_ofst_interface.are_equivalent(
-        one_copy.implementation.boolean_ofst, 
-        another_copy.implementation.boolean_ofst);
     case LOG_OPENFST_TYPE:
         return one_copy.log_ofst_interface.are_equivalent(
         one_copy.implementation.log_ofst, 
@@ -1246,8 +1172,6 @@ bool HfstTransducer::is_cyclic(void) const
 #if HAVE_OPENFST
     case TROPICAL_OPENFST_TYPE:
         return tropical_ofst_interface.is_cyclic(implementation.tropical_ofst);
-    case BOOLEAN_OPENFST_TYPE:
-        return boolean_ofst_interface.is_cyclic(implementation.boolean_ofst);
     case LOG_OPENFST_TYPE:
         return log_ofst_interface.is_cyclic(implementation.log_ofst);
 #endif
@@ -1271,9 +1195,6 @@ unsigned int HfstTransducer::number_of_states() const
     if (type == TROPICAL_OPENFST_TYPE)
     return this->tropical_ofst_interface.number_of_states
         (this->implementation.tropical_ofst);
-    if (type == BOOLEAN_OPENFST_TYPE)
-    return this->boolean_ofst_interface.number_of_states
-        (this->implementation.boolean_ofst);
 #endif
 #if HAVE_SFST
     if (type == SFST_TYPE)
@@ -1711,12 +1632,6 @@ void HfstTransducer::extract_random_paths
     (this->implementation.tropical_ofst, results, max_num);
     }
     break;
-    case BOOLEAN_OPENFST_TYPE:
-    {
-      this->boolean_ofst_interface.extract_random_paths
-    (this->implementation.boolean_ofst, results, max_num);
-    }
-    break;
     case LOG_OPENFST_TYPE:
     {
       this->log_ofst_interface.extract_random_paths
@@ -2079,26 +1994,6 @@ HfstTransducer &HfstTransducer::insert_freely
     delete substituting_net;
     implementation.tropical_ofst = 
             ConversionFunctions::hfst_basic_transducer_to_tropical_ofst(net);
-    delete net;
-    return *this;
-    break;
-    }
-    case BOOLEAN_OPENFST_TYPE:
-    {
-    hfst::implementations::HfstBasicTransducer * net = 
-            ConversionFunctions::boolean_ofst_to_hfst_basic_transducer
-            (implementation.boolean_ofst);
-    delete implementation.boolean_ofst;
-          
-    hfst::implementations::HfstBasicTransducer * substituting_net = 
-            ConversionFunctions::boolean_ofst_to_hfst_basic_transducer
-            (tr_harmonized->implementation.boolean_ofst);
-    delete tr_harmonized;
-          
-    net->insert_freely(*substituting_net);
-    delete substituting_net;
-    implementation.boolean_ofst = 
-            ConversionFunctions::hfst_basic_transducer_to_boolean_ofst(net);
     delete net;
     return *this;
     break;
@@ -2990,13 +2885,6 @@ get_basic_transducer() const
       (implementation.tropical_ofst);
     return net;
       }
-    if (this->type == BOOLEAN_OPENFST_TYPE)
-      {
-	        hfst::implementations::HfstBasicTransducer * net = 
-      ConversionFunctions::boolean_ofst_to_hfst_basic_transducer
-      (implementation.boolean_ofst);
-    return net;
-      }
     if (this->type == LOG_OPENFST_TYPE)
       {
         hfst::implementations::HfstBasicTransducer * net = 
@@ -3041,14 +2929,6 @@ convert_to_basic_transducer()
       ConversionFunctions::tropical_ofst_to_hfst_basic_transducer
       (implementation.tropical_ofst);
         delete implementation.tropical_ofst;
-    return net;
-      }
-    if (this->type == BOOLEAN_OPENFST_TYPE)
-      {
-        hfst::implementations::HfstBasicTransducer * net = 
-      ConversionFunctions::boolean_ofst_to_hfst_basic_transducer
-      (implementation.boolean_ofst);
-        delete implementation.boolean_ofst;
     return net;
       }
     if (this->type == LOG_OPENFST_TYPE)
@@ -3157,8 +3037,7 @@ bool HfstTransducer::is_implementation_type_available
     return false;
 #endif
 #if !HAVE_OPENFST
-    if (type == TROPICAL_OPENFST_TYPE || type == LOG_OPENFST_TYPE || 
-	type == BOOLEAN_OPENFST_TYPE)
+    if (type == TROPICAL_OPENFST_TYPE || type == LOG_OPENFST_TYPE)
     return false;
 #endif
     /* Add here your implementation. */
@@ -3233,12 +3112,6 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
 	  (implementation.log_ofst);
         delete implementation.log_ofst;
 	break;
-    case BOOLEAN_OPENFST_TYPE:
-        internal =
-        ConversionFunctions::boolean_ofst_to_hfst_basic_transducer
-	  (implementation.boolean_ofst);
-        delete implementation.boolean_ofst;
-	break;
       case HFST_OL_TYPE:
       case HFST_OLW_TYPE:
 	internal =
@@ -3282,11 +3155,6 @@ HfstTransducer &HfstTransducer::convert(ImplementationType type,
     case LOG_OPENFST_TYPE:
       implementation.log_ofst =
 	ConversionFunctions::hfst_basic_transducer_to_log_ofst(internal);
-      delete internal;
-      break;
-    case BOOLEAN_OPENFST_TYPE:
-      implementation.boolean_ofst =
-	ConversionFunctions::hfst_basic_transducer_to_boolean_ofst(internal);
       delete internal;
       break;
     case HFST_OL_TYPE:
