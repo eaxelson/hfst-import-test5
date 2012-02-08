@@ -222,8 +222,7 @@ int main(int argc, char **argv)
   const ImplementationType types [] = {SFST_TYPE, 
                        TROPICAL_OPENFST_TYPE, 
                        /*LOG_OPENFST_TYPE,*/ 
-				       FOMA_TYPE,
-				       BOOLEAN_OPENFST_TYPE};
+				       FOMA_TYPE};
 
   /* For all transducer implementation types, perform the following tests: */
   for (unsigned int i=0; i<TYPES_SIZE; i++)
