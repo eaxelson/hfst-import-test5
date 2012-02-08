@@ -27,7 +27,6 @@
 
 #if HAVE_OPENFST
 #include "implementations/TropicalWeightTransducer.h"
-#include "implementations/BooleanWeightTransducer.h"
 #include "implementations/LogWeightTransducer.h"
 #endif
 
@@ -83,7 +82,6 @@ namespace hfst
   using hfst::implementations::TropicalWeightTransducer;
   using hfst::implementations::TropicalWeightState;
   using hfst::implementations::TropicalWeightStateIterator;
-  using hfst::implementations::BooleanWeightTransducer;
   using hfst::implementations::LogWeightTransducer;
 #endif // #if HAVE_OPENFST
 
@@ -231,7 +229,6 @@ An example:
 #endif
 #if HAVE_OPENFST
       hfst::implementations::StdVectorFst * tropical_ofst;
-      hfst::implementations::StdVectorFst * boolean_ofst;
       hfst::implementations::LogFst * log_ofst;
 #endif
 #if HAVE_FOMA
@@ -260,8 +257,6 @@ An example:
 #if HAVE_OPENFST
     static hfst::implementations::TropicalWeightTransducer 
       tropical_ofst_interface;
-    static hfst::implementations::BooleanWeightTransducer 
-      boolean_ofst_interface;
     static hfst::implementations::LogWeightTransducer log_ofst_interface;
 #endif
 #if HAVE_FOMA

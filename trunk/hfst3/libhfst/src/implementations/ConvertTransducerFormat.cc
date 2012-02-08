@@ -82,9 +82,6 @@ namespace hfst { namespace implementations
     if (t.type == TROPICAL_OPENFST_TYPE)
       return tropical_ofst_to_hfst_basic_transducer
         (t.implementation.tropical_ofst); 
-    if (t.type == BOOLEAN_OPENFST_TYPE)
-      return boolean_ofst_to_hfst_basic_transducer
-        (t.implementation.boolean_ofst); 
     if (t.type == LOG_OPENFST_TYPE)
       return log_ofst_to_hfst_basic_transducer(t.implementation.log_ofst); 
 #endif // HAVE_OPENFST

@@ -13,6 +13,9 @@ void verbose_print(const char *msg,
       case hfst::TROPICAL_OPENFST_TYPE:
     fprintf(stderr, "TROPICAL_OPENFST_TYPE");
     break;
+      case hfst::BOOLEAN_OPENFST_TYPE:
+    fprintf(stderr, "BOOLEAN_OPENFST_TYPE");
+    break;
       case hfst::LOG_OPENFST_TYPE:
     fprintf(stderr, "LOG_OPENFST_TYPE");
     break;

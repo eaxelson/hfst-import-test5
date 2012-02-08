@@ -165,12 +165,6 @@ namespace implementations {
   static fst::StdVectorFst * hfst_basic_transducer_to_tropical_ofst
     (const HfstBasicTransducer * t);
 
-  static HfstBasicTransducer * boolean_ofst_to_hfst_basic_transducer
-    (fst::StdVectorFst * t, bool has_hfst_header=true);
-
-  static fst::StdVectorFst * hfst_basic_transducer_to_boolean_ofst
-    (const HfstBasicTransducer * t);
-
 
   /*  static HfstFastTransducer * tropical_ofst_to_hfst_fast_transducer
     (fst::StdVectorFst * t, bool has_hfst_header=true);
