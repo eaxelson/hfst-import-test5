@@ -29,13 +29,7 @@ namespace hfst
     if (original == TROPICAL_OPENFST_TYPE && converted == LOG_OPENFST_TYPE) {
       return false;
     }
-    if (original == TROPICAL_OPENFST_TYPE && converted == BOOLEAN_OPENFST_TYPE) {
-      return false;
-    }
     if (original == LOG_OPENFST_TYPE && converted == TROPICAL_OPENFST_TYPE) {
-      return false;
-    }
-    if (original == BOOLEAN_OPENFST_TYPE && converted == TROPICAL_OPENFST_TYPE) {
       return false;
     }
     if (original == TROPICAL_OPENFST_TYPE || original == LOG_OPENFST_TYPE) {
@@ -71,7 +65,6 @@ namespace hfst
 #endif
 #if HAVE_OPENFST
  fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *),
- fst::StdVectorFst * (*boolean_ofst_funct)(fst::StdVectorFst *),
  hfst::implementations::LogFst * 
  (*log_ofst_funct)(hfst::implementations::LogFst *),
 #endif
@@ -151,8 +144,6 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
 #if HAVE_OPENFST
    fst::StdVectorFst * (*tropical_ofst_funct)
 (fst::StdVectorFst *, unsigned int n),
-   fst::StdVectorFst * (*boolean_ofst_funct)
-(fst::StdVectorFst *, unsigned int n),
    hfst::implementations::LogFst * (*log_ofst_funct)
    (hfst::implementations::LogFst *, unsigned int n),
 #endif
@@ -231,8 +222,6 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
 #endif
 #if HAVE_OPENFST
    fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,String, 
-                                              String),
-   fst::StdVectorFst * (*boolean_ofst_funct)(fst::StdVectorFst *,String, 
                                               String),
    hfst::implementations::LogFst * (*log_ofst_funct)
    (hfst::implementations::LogFst *,String, String),
@@ -314,8 +303,6 @@ SFST::Transducer * (*sfst_funct)(SFST::Transducer *, unsigned int n),
 #endif
 #if HAVE_OPENFST
    fst::StdVectorFst * (*tropical_ofst_funct)(fst::StdVectorFst *,
-                                              fst::StdVectorFst *),
-   fst::StdVectorFst * (*boolean_ofst_funct)(fst::StdVectorFst *,
                                               fst::StdVectorFst *),
    hfst::implementations::LogFst * (*log_ofst_funct)
    (hfst::implementations::LogFst *,hfst::implementations::LogFst *),

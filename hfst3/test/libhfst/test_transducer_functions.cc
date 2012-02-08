@@ -218,11 +218,12 @@ bool modify_transitions(const StringPair &sp, StringPairSet &sps)
 int main(int argc, char **argv) 
 {
 
-  const unsigned int TYPES_SIZE=3;
+  const unsigned int TYPES_SIZE=4;
   const ImplementationType types [] = {SFST_TYPE, 
                        TROPICAL_OPENFST_TYPE, 
                        /*LOG_OPENFST_TYPE,*/ 
-                       FOMA_TYPE};
+				       FOMA_TYPE,
+				       BOOLEAN_OPENFST_TYPE};
 
   /* For all transducer implementation types, perform the following tests: */
   for (unsigned int i=0; i<TYPES_SIZE; i++)
@@ -230,6 +231,8 @@ int main(int argc, char **argv)
 
       if (not HfstTransducer::is_implementation_type_available(types[i]))
 	continue;
+
+      try {
 
       /* Function compare. */
       {
@@ -629,7 +632,11 @@ int main(int argc, char **argv)
     t1.repeat_star();
     assert(t1.is_cyclic());
       }
-
+      }
+      catch (const HfstException & e)
+	{
+	  std::cerr << e() << std::endl;
+	}
 
       /* Function push_weights. */
       {
