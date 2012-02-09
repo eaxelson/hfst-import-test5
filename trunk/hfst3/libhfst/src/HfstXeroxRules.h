@@ -15,8 +15,14 @@
 //#include "HfstSymbolDefs.h"
 #include "HfstTransducer.h"
 
+
+/** @file HfstXeroxRules.h
+    \brief Declarations of HFST-XFST replace functions and data types. */
+
+
 namespace hfst
 {
+	/** \brief A namespace for HFST xeroxRules functions and data types. */
 	namespace xeroxRules
 	{
 		enum ReplaceType {REPL_UP, REPL_DOWN, REPL_RIGHT, REPL_LEFT};
@@ -34,16 +40,18 @@ namespace hfst
 							E_LTR_SHORTEST_MATCH
 						};
 
-		//ImplementationType TYPE = TROPICAL_OPENFST_TYPE;
-		//ImplementationType TYPE = SFST_TYPE;
-		//ImplementationType TYPE = FOMA_TYPE;
-
-
-
+		/**
+		 * \brief A rule that contains mapping and context and replace type (if any).
+		 * If rule is A -> B || L _ R , than mapping is cross product of transducers A and B,
+		 * 	context is pair of transducers L and R, and replType is enum REPL_UP.
+		 */
 		class Rule
 		{
+			/* cross product of mapping transducers */
 			HfstTransducer mapping;
+			/* context */
 			HfstTransducerPairVector context;
+			/* if there is a context, it needs to have a direction (up, left, down or right) */
 			ReplaceType replType;
 
 		  public:
@@ -57,6 +65,10 @@ namespace hfst
 			ReplaceType get_replType() const;
 		};
 
+		/**
+		 * \brief Mark up rule has two markers on the right side of the mapping.
+		 * Mapping is only left side of the mapping.
+		 */
 		class MarkUpRule : public Rule
 		{
 			StringPair marks;
@@ -77,17 +89,27 @@ namespace hfst
 
 
 
-
-
-
-
-
+		/**
+		 *  \brief Remove makers used in replace functions from a \a tr.
+		 *  */
 		HfstTransducer removeMarkers( const HfstTransducer &tr );
 
+		/** \brief Generalized Lenient Composition (by Anssi Yli-Jyrä) of a \a t and a \a Constraint.
+		 * More about this composition can be found in:
+		 * http://www.ling.helsinki.fi/users/aylijyra/all/YliJyra-2008b:trafropar:inp.pdf
+		*/
 		HfstTransducer constraintComposition( const HfstTransducer &t, const HfstTransducer &Constraint );
 
+		/** \brief If \a optional is false, the function freely inserts in \a t @_LM_@ and @_RM_@.
+		 * If it is true, it also inserts @_LM2_@ and @_RM2_@
+		 */
 		void insertFreelyAllTheBrackets( HfstTransducer &t, bool optional );
 
+		/** \brief It is used in bracketedReplace, when the replace expression has context.
+		 * 	Cr' = (Rc .*) << Markers (<,>,|) .o. [I:I | <a:b>]*
+		 * 	Cr = Cr | Cr'
+		 * 	(same for left context, (.* Cl))
+		 */
 		HfstTransducer expandContextsWithMapping (const HfstTransducerPairVector &ContextVector,
 										const HfstTransducer &mappingWithBracketsAndTmpBoundary,
 										const HfstTransducer &identityExpanded,
@@ -95,8 +117,8 @@ namespace hfst
 										bool optional);
 
 
-		/*
-		 * unconditional replace, in multiple contexts
+		/**  \brief
+		 * Unconditional replace, in multiple contexts
 		 * first: (.* T<a:b>T .*) - [( .* L1 T<a:b>T R1 .*) u (.* L2 T<a:b>T R2 .*)...],
 		 * 						where .* = [I:I (+ {tmpMarker (T), <,>} in alphabet) | <a:b>]*
 		 * then: remove tmpMarker from transducer and alphabet, and do negation:
@@ -109,7 +131,7 @@ namespace hfst
 		*/
 		HfstTransducer bracketedReplace( const Rule &rule, bool optional);
 
-		// bracketed replace for parallel rules
+		/**  \brief Bracketed replace for parallel rules */
 		HfstTransducer parallelBracketedReplace( const vector<Rule> &ruleVector, bool optional);
 
 
@@ -209,7 +231,7 @@ namespace hfst
 		HfstTransducer mark_up_replace(	const Rule &rule,
 								const StringPair &marks,
 								bool optional);
-		 HfstTransducer mark_up_replace(const Rule &rule,
+		HfstTransducer mark_up_replace(const Rule &rule,
 			 	  						const HfstTransducerPair &marks,
 			 	  						bool optional);
 
@@ -219,24 +241,5 @@ namespace hfst
 		HfstTransducer replace_epenthesis(	const Rule &rule, bool optional);
 		// replace up, left, right, down
 		HfstTransducer replace_epenthesis(	const vector<Rule> &ruleVector, bool optional);
-
-
-
-
-
-
-
-
-
-		//---------------------------------
-		//	UNIT TESTS
-		//---------------------------------
-
-
-		// ab->x  ab_a
-		//void test1();
-
-
-
 	}
 }
