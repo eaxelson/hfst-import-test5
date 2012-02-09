@@ -1,6 +1,6 @@
 Package: hfst-dev
 Source: hfst
-Version: 1-1.1
+Version: 3.3.5
 Section: devel
 Priority: optional
 Architecture: amd64
@@ -8,4 +8,6 @@ Provides: libfst0, libfoma0, libsfst0
 Depends: libc6 (>= 1.1)
 Maintainer: HFST team <foo@bar.fi>
 Description: This package contains HFST library and commandline tools
- More description here.
+ The backend formats included are SFST, OpenFst and foma.
+ For more information on HFST, see the homepage below.
+Homepage: http://hfst.sf.net
