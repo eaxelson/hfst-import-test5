@@ -36,6 +36,33 @@ aliases= hfst-determinise.1 hfst-expand.1 hfst-intersect.1 hfst-minimise.1 \
 dist_man1_MANS=$(bootstrappable) $(aliases) $(broken)
 LN_S=ln -s
 
+hfst-determinise.1:
+	$(LN_S) -f hfst-determinize.1 hfst-determinise.1 
+
+hfst-expand.1:
+	$(LN_S) -f hfst-fst2strings.1 hfst-expand.1 
+
+hfst-intersect.1:
+	$(LN_S) -f hfst-conjunct.1 hfst-intersect.1 
+
+hfst-minimise.1:
+	$(LN_S) -f hfst-minimize.1 hfst-minimise.1 
+
+hfst-minus.1:
+	$(LN_S) -f hfst-subtract.1 hfst-minus.1 
+
+hfst-sfstpl2fst.1:
+	$(LN_S) -f hfst-calculate.1 hfst-sfstpl2fst.1 
+
+hfst-summarise.1: 
+	$(LN_S) -f hfst-summarize.1 hfst-summarise.1 
+
+hfst-union.1:
+	$(LN_S) -f hfst-disjunct.1 hfst-union.1
+
+all:
+	make bootstrap
+
 bootstrap: 
 	for f in $(bootstrappable) ; do \
 		N=`echo $$f | sed 's/.1/ \-\-help/' | sh | sed -n 2p`; \
