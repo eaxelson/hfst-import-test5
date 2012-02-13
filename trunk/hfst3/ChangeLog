@@ -1,3 +1,231 @@
+2012-02-13 13:34  eaxelson
+
+	* man/hfst-fst2txt.1, man/hfst-strings2fst.1: Man pages updated.
+
+2012-02-09 15:27  eaxelson
+
+	* man/Makefile.am: Modified Makefile.am.
+
+2012-02-09 14:07  sdrobac
+
+	* libhfst/src/HfstXeroxRules.h: Added some comments
+
+2012-02-09 11:15  eaxelson
+
+	* test/tools/fst2txt-functionality.sh: Fixed a small bug in
+	  hfst-fst2txt functionality test.
+
+2012-02-08 13:55  mie
+
+	* test/tools/fst2txt-functionality.sh, tools/src/hfst-fst2txt.cc:
+	  Output dot/graphviz
+
+2012-02-08 12:29  eaxelson
+
+	* libhfst/src/HfstTransducer.cc: Maybe finally the reversion is
+	  working..
+
+2012-02-08 12:26  eaxelson
+
+	* test/libhfst/auxiliary_functions.cc,
+	  test/libhfst/test_transducer_functions.cc: Made yet some changes
+	  to revert to the older revision.'
+
+2012-02-08 12:11  eaxelson
+
+	* BUGS.old, INSTALL, Makefile.am, README, configure.ac,
+	  libhfst/src/HfstApply.cc, libhfst/src/HfstDataTypes.h,
+	  libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/hfst_apply_schemas.h,
+	  libhfst/src/implementations/BooleanWeightTransducer.cc,
+	  libhfst/src/implementations/BooleanWeightTransducer.h,
+	  libhfst/src/implementations/ConvertBooleanWeightTransducer.cc,
+	  libhfst/src/implementations/ConvertTransducerFormat.cc,
+	  libhfst/src/implementations/ConvertTransducerFormat.h,
+	  libhfst/src/implementations/Makefile.am,
+	  test/libhfst/auxiliary_functions.cc,
+	  test/libhfst/test_transducer_functions.cc: Reverted to revision
+	  2076.
+
+2012-02-07 10:15  eaxelson
+
+	* libhfst/src/implementations/BooleanWeightTransducer.cc,
+	  libhfst/src/implementations/BooleanWeightTransducer.h,
+	  libhfst/src/implementations/ConvertBooleanWeightTransducer.cc:
+	  Forgot to add the new files for BooleanWeightTransducer.
+
+2012-02-07 10:13  eaxelson
+
+	* libhfst/src/HfstApply.cc, libhfst/src/HfstDataTypes.h,
+	  libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/hfst_apply_schemas.h,
+	  libhfst/src/implementations/ConvertTransducerFormat.cc,
+	  libhfst/src/implementations/ConvertTransducerFormat.h,
+	  libhfst/src/implementations/Makefile.am: Tentatively added a new
+	  HfstTransducer type, BOOLEAN_WEIGHT_TYPE.
+
+2012-02-06 14:50  eaxelson
+
+	* tools/src/hfst-strings2fst.cc: Fixed a small error in the options
+	  handling part of the help message for hfst-strings2fst.
+
+2012-02-02 13:05  eaxelson
+
+	* man, man/Makefile.am, man/hfst-format.1, man/hfst-name.1: Added
+	  new man pages for hfst-name and hfst-format and links to man
+	  pages for tool aliases.
+
+2012-02-01 15:07  eaxelson
+
+	* man/Makefile.am, man/hfst-calculate.1, man/hfst-compare.1,
+	  man/hfst-compose-intersect.1, man/hfst-compose.1,
+	  man/hfst-concatenate.1, man/hfst-conjunct.1,
+	  man/hfst-determinize.1, man/hfst-disjunct.1, man/hfst-fst2fst.1,
+	  man/hfst-fst2strings.1, man/hfst-fst2txt.1, man/hfst-head.1,
+	  man/hfst-invert.1, man/hfst-minimize.1, man/hfst-project.1,
+	  man/hfst-push-weights.1, man/hfst-regexp2fst.1,
+	  man/hfst-remove-epsilons.1, man/hfst-repeat.1,
+	  man/hfst-reverse.1, man/hfst-split.1, man/hfst-strings2fst.1,
+	  man/hfst-substitute.1, man/hfst-subtract.1, man/hfst-summarize.1,
+	  man/hfst-tail.1, man/hfst-txt2fst.1: Now the man pages also have
+	  a short description of the tool, i.e. the one given by hfst-foo
+	  --help.
+
+2012-01-27 14:59  eaxelson
+
+	* test/tools/cat2dog.substitute: Added a test case for the bug
+	  fixed in revision 2016 (out_of_range thrown by substitute
+	  function).
+
+2012-01-27 14:58  hardwick
+
+	* tools/src/hfst-compose.cc: De-spanishify hint string
+	  ("argumentes" -> "arguments")
+
+2012-01-27 14:32  eaxelson
+
+	* libhfst/src/implementations/HfstTransitionGraph.h: Now
+	  HfstTransitionGraph:substitute(const HfstSymbolSubstitutions &
+	  subs) adds all symbols in subs to the global alphabet before
+	  relabeling, thus avoiding the out_of_range exceptions thrown
+	  earlier by this function.
+
+2012-01-26 21:05  mpsilfve
+
+	* tools/src/hfst-compose-intersect.cc: Changed
+	  hfst-compose-intersect so that it gives a warning (1) when the
+	  rule does not contain the identity symbol and the output tape of
+	  the lexicon contains a symbol not found on the input tape of the
+	  first rule, and (2) when the output tape of the lexicon contains
+	  multi character symbols not found on the input tape of the first
+	  rule.
+
+2012-01-26 16:39  eaxelson
+
+	* libhfst/src/implementations/optimized-lookup/convert.cc,
+	  libhfst/src/implementations/optimized-lookup/convert.h: Removed
+	  spurious consts from optimized lookup conversion functions. Fixes
+	  bug ID 3469227.
+
+2012-01-26 16:27  eaxelson
+
+	* test/tools/fsmbook-examples/FinnishNumerals/test.sh: Bug on mac
+	  os caused by its sort order (bug ID: 3462485) fixed.
+
+2012-01-26 14:24  eaxelson
+
+	* libhfst/src/HfstTransducer.cc, libhfst/src/HfstTransducer.h,
+	  libhfst/src/implementations/HfstTransitionGraph.h,
+	  tools/src/hfst-fst2txt.cc, tools/src/hfst-optimized-lookup.cc:
+	  Added function write_in_att_format_number. Also fixed
+	  hfst-optimized-lookup so that --version and --help print to
+	  standard output instead of standard error.
+
+2012-01-25 18:25  hardwick
+
+	* tools/src/Makefile.am, tools/src/hfst-optimized-lookup.h:
+	  hfst-optimized-lookup softlink and some package strings for
+	  hfst-optimized-lookup.h
+
+2012-01-25 09:20  hardwick
+
+	* configure.ac, tools/src/Makefile.am,
+	  tools/src/hfst-optimized-lookup.cc,
+	  tools/src/hfst-optimized-lookup.h: Heavy-handed bundling of the
+	  hfst-optimized-lookup standalone
+
+2012-01-23 15:25  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRules.h,
+	  libhfst/src/parsers/xre_parse.yy: Rules parser - added epenthesis
+
+2012-01-19 15:51  eaxelson
+
+	* test/tools/hfst-check-environment.sh,
+	  test/tools/hfst-check-help.sh, test/tools/hfst-check-version.sh:
+	  Still needed to fix some errors caused by in-place sed.. Now
+	  everything should work in commandline tools tests.
+
+2012-01-19 15:20  eaxelson
+
+	* test/tools/calculate-functionality.sh,
+	  test/tools/compare-functionality.sh,
+	  test/tools/compose-functionality.sh,
+	  test/tools/compose-intersect-functionality.sh,
+	  test/tools/concatenate-functionality.sh,
+	  test/tools/conjunct-functionality.sh,
+	  test/tools/determinize-functionality.sh,
+	  test/tools/disjunct-functionality.sh,
+	  test/tools/format-functionality.sh,
+	  test/tools/fst2strings-functionality.sh,
+	  test/tools/fst2txt-functionality.sh,
+	  test/tools/head-functionality.sh,
+	  test/tools/hfst-check-environment.sh,
+	  test/tools/hfst-check-help.sh, test/tools/hfst-check-version.sh,
+	  test/tools/incompatible-formats.sh,
+	  test/tools/invert-functionality.sh,
+	  test/tools/latin-1-strings.sh,
+	  test/tools/lexc-compiler-functionality.sh,
+	  test/tools/lexc-functionality.sh, test/tools/lexc2fst-stress.sh,
+	  test/tools/lookup-functionality.sh, test/tools/lookup-stress.sh,
+	  test/tools/minimize-functionality.sh,
+	  test/tools/permutate-file-params.sh, test/tools/proc-stress.sh,
+	  test/tools/project-functionality.sh,
+	  test/tools/push-weights-functionality.sh,
+	  test/tools/regexp2fst-functionality.sh,
+	  test/tools/remove-epsilons-functionality.sh,
+	  test/tools/repeat-functionality.sh,
+	  test/tools/reverse-functionality.sh,
+	  test/tools/reweight-functionality.sh,
+	  test/tools/split-functionality.sh,
+	  test/tools/strings2fst-functionality.sh,
+	  test/tools/substitute-functionality.sh,
+	  test/tools/subtract-functionality.sh,
+	  test/tools/summarize-functionality.sh,
+	  test/tools/tail-functionality.sh,
+	  test/tools/txt2fst-functionality.sh, test/tools/utf-8-strings.sh,
+	  test/tools/valgrind.sh: Fixed problems in test/tools that came
+	  after updating the Makefile.
+
+2012-01-19 13:46  eaxelson
+
+	* test/tools/Makefile.am, test/tools/at_file_quote.foma.xre,
+	  test/tools/at_file_quote.openfst-tropical.xre,
+	  test/tools/at_file_quote.sfst.xre,
+	  test/tools/lexc-compiler-functionality.sh,
+	  test/tools/proc-functionality.sh,
+	  test/tools/regexp2fst-functionality.sh: Removed commas from
+	  filename suffixes (e.g. .hfst.sfst -> .sfst) in test/tools. Also
+	  replaced compilation rules using %-symbol in Makefile.am with
+	  old-fashioned suffix rules. Now commandline tool tests should
+	  work with older versions of make as well.
+
+2012-01-17 12:01  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/HfstTransducer.cc, libhfst/src/Makefile.am: Ready for
+	  HFST release 3.3.4.
+
 2012-01-16 15:37  eaxelson
 
 	* api_documentation.dox, libhfst/src/HfstSymbolDefs.h: Added some
