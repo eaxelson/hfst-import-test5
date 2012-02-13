@@ -5,7 +5,7 @@
 #  -------------------------------------------------
 #
 
-HFST_PREFIX="$HOME/hfst-installation/"
+HFST_PREFIX="/usr/local/"
 BACKEND_PREFIX="/usr/local/"
 SFST_PREFIX=$BACKEND_PREFIX
 OPENFST_PREFIX=$BACKEND_PREFIX
