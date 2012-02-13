@@ -6,6 +6,15 @@ This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
 
+Noteworthy changes in 3.3.5
+---------------------------
+
+* hfst-fst2txt.cc also writes to dot/graphviz format
+
+* Epenthesis added for Xerox rules parser
+
+* hfst-compose-intersect gives warnings on missing symbols
+
 Noteworthy changes in 3.3.4
 ---------------------------
 
