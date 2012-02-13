@@ -37,10 +37,14 @@ If weights are printed in all cases
 .TP
 \fB\-D\fR, \fB\-\-do\-not\-print\-weights\fR
 If weights are not printed in any case
+.TP
+\fB\-f\fR, \fB\-\-format\fR=\fITFMT\fR
+Print output in TFMT format [default=att]
 .PP
 If OUTFILE or INFILE is missing or \-, standard streams will be used.
 Unless explicitly requested with option \fB\-w\fR or \fB\-D\fR, weights are printed
 if and only if the transducer is in weighted format.
+TFMT is one of {att, dot, pckimmo}
 .SH "REPORTING BUGS"
 Report bugs to <hfst\-bugs@helsinki.fi> or directly to our bug tracker at:
 <https://sourceforge.net/tracker/?atid=1061990&group_id=224521&func=browse>
