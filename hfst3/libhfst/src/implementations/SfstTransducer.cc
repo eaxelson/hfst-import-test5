@@ -610,7 +610,7 @@ namespace hfst { namespace implementations {
   Transducer * SfstTransducer::repeat_n(Transducer * t, unsigned int n)
   {
     Transducer * power = create_epsilon_transducer();
-    for (int i = 0; i < n; ++i)
+    for (unsigned int i = 0; i < n; ++i)
       {
         Transducer * temp = &(*power + *t);
         delete power;
@@ -621,7 +621,7 @@ namespace hfst { namespace implementations {
   Transducer * SfstTransducer::repeat_le_n(Transducer * t, unsigned int n)
   {
     Transducer * result = create_empty_transducer();
-    for (int i = 0; i < n+1; ++i)
+    for (unsigned int i = 0; i < n+1; ++i)
       {
         Transducer * power = repeat_n(t,i);
         Transducer * temp = &(*power | *result);

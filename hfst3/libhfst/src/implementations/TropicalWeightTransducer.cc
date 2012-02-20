@@ -1558,7 +1558,7 @@ namespace hfst { namespace implementations
       { return create_epsilon_transducer(); }
 
     StdVectorFst * repetition = create_epsilon_transducer();
-    for (int i = 0; i < n; ++i)
+    for (unsigned int i = 0; i < n; ++i)
       { Concat(repetition,*t); }
     repetition->SetInputSymbols(t->InputSymbols());
     return repetition;
@@ -1571,7 +1571,7 @@ namespace hfst { namespace implementations
       { return create_epsilon_transducer(); }
 
     StdVectorFst * repetition = create_epsilon_transducer();
-    for (int i = 0; i < n; ++i)
+    for (unsigned int i = 0; i < n; ++i)
       {
         StdVectorFst * optional_t = optionalize(t);
         Concat(repetition,*optional_t);
@@ -1637,12 +1637,12 @@ namespace hfst { namespace implementations
 
 
 
-  static StdVectorFst * substitute(StdVectorFst * t,
+  /*  static StdVectorFst * substitute(StdVectorFst * t,
                                    StringPair old_symbol_pair,
                                    StringPair new_symbol_pair);
   static StdVectorFst * substitute(StdVectorFst * t,
                                    const StringPair old_symbol_pair,
-                                   StdVectorFst *transducer);
+                                   StdVectorFst *transducer);*/
 
   StdVectorFst * TropicalWeightTransducer::insert_freely
   (StdVectorFst * t, const StringPair &symbol_pair)
@@ -1661,7 +1661,7 @@ namespace hfst { namespace implementations
     return t;
   }
 
-  static StdVectorFst * insert_freely
+  /*  static StdVectorFst * insert_freely
   (StdVectorFst * t, const NumberPair &number_pair) 
   {
     for (fst::StateIterator<fst::StdFst> siter(*t); 
@@ -1672,7 +1672,7 @@ namespace hfst { namespace implementations
                             0, state_id));
     }
     return t;
-  }
+    }*/
 
   StdVectorFst * TropicalWeightTransducer::substitute
   (StdVectorFst * t,unsigned int old_key,unsigned int new_key)
@@ -1900,7 +1900,7 @@ namespace hfst { namespace implementations
   {
 
     int states = t->NumStates();
-    for( int i = 0; i < states; ++i ) {
+    for( unsigned int i = 0; i < (unsigned int)states; ++i ) {
 
       for (fst::MutableArcIterator<fst::StdVectorFst> it(t,i);
            not it.Done();
@@ -1909,8 +1909,8 @@ namespace hfst { namespace implementations
         fst::StdArc arc = it.Value();
 
         // find arcs that must be replaced
-        if ( arc.ilabel == old_number_pair.first && 
-             arc.olabel == old_number_pair.second ) 
+        if ( arc.ilabel == (int)old_number_pair.first && 
+             arc.olabel == (int)old_number_pair.second ) 
           {
 
           StateId destination_state = arc.nextstate;
@@ -2051,7 +2051,7 @@ namespace hfst { namespace implementations
         for(fst::ArcIterator<StdVectorFst> it(*t,s); !it.Done(); it.Next())
           {
             const StdArc& a = it.Value();
-            if (a.ilabel == inumber && a.olabel == onumber) {
+            if (a.ilabel == (int)inumber && a.olabel == (int)onumber) {
               transition_found=true;
               s = a.nextstate;
               break;
@@ -2086,7 +2086,7 @@ namespace hfst { namespace implementations
         for(fst::ArcIterator<StdVectorFst> it(*t,s); !it.Done(); it.Next())
           {
             const StdArc& a = it.Value();
-            if (a.ilabel == inumber && a.olabel == onumber) {
+            if (a.ilabel == (int)inumber && a.olabel == (int)onumber) {
               transition_found=true;
               s = a.nextstate;
               break;
