@@ -48,7 +48,7 @@ using hfst::HfstTransducerVector;
 #include "inc/globals-common.h"
 #include "inc/globals-binary.h"
 
-static bool insert_missing_flags=false;
+//static bool insert_missing_flags=false;
 
 void
 print_usage()
@@ -207,6 +207,7 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
                 HfstOutputStream& outstream)
 {
     bool bothInputs = firststream.is_good() && secondstream.is_good();
+    (void)bothInputs;
     if (firststream.get_type() != secondstream.get_type())
       {
         warning(0, 0, "Transducer type mismatch in %1$s and %2$s "

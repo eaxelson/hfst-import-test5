@@ -170,6 +170,7 @@ main_loop(HfstBasicTransducer trans)
     multimap<string, HfstState> paths;
     paths.insert(pair<string, HfstState>("", 0));
     HfstBasicTransducer::const_iterator state = trans.begin();
+    (void)state;
 #if HAVE_READLINE_READLINE_H
 #if HAVE_RL_COMPLETION_MATCHES
     rl_attempted_completion_function = arclabel_completion;

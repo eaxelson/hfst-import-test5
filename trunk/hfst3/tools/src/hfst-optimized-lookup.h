@@ -126,6 +126,7 @@ class TransducerHeader
     unsigned int prop;
     unsigned int ret;
     ret = fread(&prop,sizeof(unsigned int),1,f);
+    (void)ret;
     if (prop == 0)
       {
 	property = false;
@@ -157,6 +158,8 @@ class TransducerHeader
 
       val = fread(&number_of_states,sizeof(StateIdNumber),1,f);
       val = fread(&number_of_transitions,sizeof(TransitionNumber),1,f);
+      
+      (void)val;
 
       read_property(weighted,f);
 
@@ -434,6 +437,7 @@ class IndexTableReader
       int dummy_number_of_bytes;
 
       dummy_number_of_bytes = fread(TableIndices,table_size,1,f);
+      (void)dummy_number_of_bytes;
       get_index_vector();
     }
   
@@ -473,6 +477,7 @@ class TransitionTableReader
 	TableTransitions = (char*)(malloc(table_size));
 	int bytes;
 	bytes = fread(TableTransitions,table_size,1,f);
+	(void)bytes;
 	get_transition_vector();
 
       }
@@ -813,6 +818,7 @@ class IndexTableReaderW
       int dummy_number_of_bytes;
 
       dummy_number_of_bytes = fread(TableIndices,table_size,1,f);
+      (void)dummy_number_of_bytes;
       get_index_vector();
     }
   
@@ -853,6 +859,7 @@ class TransitionTableReaderW
 	TableTransitions = (char*)(malloc(table_size));
 	int bytes;
 	bytes = fread(TableTransitions,table_size,1,f);
+	(void)bytes;
 	get_transition_vector();
       }
   
