@@ -40,11 +40,18 @@ cd ../../..
 # ---------------------
 
 cd debian/usr/lib/
+
 cp $HFST_PREFIX/lib/libhfst.so.12.0.0 .
 ln -s -T libhfst.so.12.0.0 libhfst.so.12
 ln -s -T libhfst.so.12 libhfst.so
-cp -P $HFST_PREFIX/lib/libhfstlexc.so* .
-cp -P $HFST_PREFIX/lib/libhfstospell.so* .
+
+cp -P $HFST_PREFIX/lib/libhfstlexc.so.0.0.0 .
+ln -s -T libhfstlexc.so.0.0.0 libhfstlexc.so.0
+ln -s -T libhfstlexc.so.0 libhfstlexc.so
+
+cp -P $HFST_PREFIX/lib/libhfstospell.so.1.0.0 .
+ln -s -T libhfstospell.so.1.0.0 libhfstospell.so.1
+ln -s -T libhfstospell.so.1 libhfstospell.so
 
 # ---------------------------
 # Copy the back-end libraries
