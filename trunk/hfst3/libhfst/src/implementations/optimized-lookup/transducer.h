@@ -439,10 +439,10 @@ public:
     Transition(SymbolNumber input, SymbolNumber output,
            TransitionTableIndex target, Weight bogus=0.0f):
     input_symbol(input), output_symbol(output), target_index(target)
-    {bogus=0.0f;}
+  {(void)bogus; bogus=0.0f;}
     Transition(bool final, Weight bogus=0.0f):
     input_symbol(NO_SYMBOL_NUMBER), output_symbol(NO_SYMBOL_NUMBER),
-    target_index(final?1:NO_TABLE_INDEX) {bogus=0.0f;}
+    target_index(final?1:NO_TABLE_INDEX) {(void)bogus; bogus=0.0f;}
     Transition(std::istream& is):
     input_symbol(NO_SYMBOL_NUMBER), output_symbol(NO_SYMBOL_NUMBER),
     target_index(0)
