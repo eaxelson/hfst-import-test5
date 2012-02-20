@@ -400,17 +400,17 @@ void Transducer::note_analysis(SymbolNumber * whole_output_tape)
 
 
 Transducer::Transducer(): header(NULL), alphabet(NULL), tables(NULL),
-              current_weight(0.0), lookup_paths(NULL), input_tape(NULL),
-              output_tape(NULL), encoder(NULL), flag_state() {}
+              current_weight(0.0), lookup_paths(NULL), encoder(NULL),
+	      input_tape(NULL), output_tape(NULL), flag_state() {}
 
 Transducer::Transducer(std::istream& is):
     header(new TransducerHeader(is)),
     alphabet(new TransducerAlphabet(is, header->symbol_count())),
     tables(NULL), current_weight(0.0), lookup_paths(NULL),
-    input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     encoder(new Encoder(alphabet->get_symbol_table(),
             header->input_symbol_count())),
+    input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
+    output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     flag_state(alphabet->get_fd_table())
 {
     load_tables(is);
@@ -422,10 +422,10 @@ Transducer::Transducer(bool weighted):
     alphabet(new TransducerAlphabet()),
     current_weight(0.0),
     lookup_paths(NULL),
-    input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     encoder(new Encoder(alphabet->get_symbol_table(),
             header->input_symbol_count())),
+    input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
+    output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     flag_state(alphabet->get_fd_table())
 {
     if(weighted)
@@ -444,10 +444,10 @@ Transducer::Transducer(const TransducerHeader& header,
            index_table, transition_table)),
     current_weight(0.0),
     lookup_paths(NULL),
-    input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     encoder(new Encoder(alphabet.get_symbol_table(),
             header.input_symbol_count())),
+    input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
+    output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     flag_state(alphabet.get_fd_table())
 {}
 
@@ -461,10 +461,10 @@ Transducer::Transducer(const TransducerHeader& header,
            index_table, transition_table)),
     current_weight(0.0),
     lookup_paths(NULL),
-    input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     encoder(new Encoder(alphabet.get_symbol_table(),
             header.input_symbol_count())),
+    input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
+    output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
     flag_state(alphabet.get_fd_table())
 {}
 
