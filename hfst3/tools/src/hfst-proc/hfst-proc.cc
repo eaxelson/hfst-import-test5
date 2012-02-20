@@ -33,13 +33,13 @@ static bool handle_hfst3_header(std::istream& is)
   const char* header1 = "HFST";
   int header_loc = 0; // how much of the header has been found
   int c;
-  for(header_loc = 0; header_loc < strlen(header1) + 1; header_loc++)
+  for(header_loc = 0; header_loc < (int)strlen(header1) + 1; header_loc++)
   {
     c = is.get();
     if(c != header1[header_loc])
       break;
   }
-  if(header_loc == strlen(header1) + 1) // we found it
+  if(header_loc == (int)strlen(header1) + 1) // we found it
   {
       unsigned short remaining_header_len;
       is.read(reinterpret_cast<char*>(&remaining_header_len),

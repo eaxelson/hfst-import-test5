@@ -146,6 +146,8 @@ struct StatePlaceholder {
 		(HfstFatalException,
 		 message);
 	}
+	std::string message("error in function StatePlaceholder::symbol_offset");
+	HFST_THROW_MESSAGE(HfstFatalException, message);
     }
 };
 

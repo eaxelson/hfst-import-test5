@@ -542,7 +542,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
 	// for substitution can leak lots and lots of space.
 	// For this reason we currently do substitution in sfst and finally
 	// convert back to foma.
-	bool got_foma = false;
+	//bool got_foma = false;
       transducer_n++;
       HfstTransducer trans(instream);
       /*#if HAVE_SFST

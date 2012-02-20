@@ -47,8 +47,8 @@ using hfst::HfstInputStream;
 using hfst::HfstOutputStream;
 using hfst::ImplementationType;
 
-static HfstTransducer* source_ = 0;
-static HfstTransducer* result_ = 0;
+//static HfstTransducer* source_ = 0;
+//static HfstTransducer* result_ = 0;
 static HfstTransducerVector rules_;
 
 void

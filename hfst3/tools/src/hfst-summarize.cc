@@ -151,21 +151,21 @@ process_stream(HfstInputStream& instream)
           transducerKnowsAlphabet = false;
         }
       StringSet foundAlphabet;
-      bool expanded = true;
+      //bool expanded = true;
       bool is_mutable = true;
       bool acceptor = true;
       bool input_deterministic = true;
       bool output_deterministic = true;
-      bool input_label_sorted = false;
-      bool output_label_sorted = false;
+      //bool input_label_sorted = false;
+      //bool output_label_sorted = false;
       bool weighted = true;
       bool cyclic = false;
       bool cyclic_at_initial_state = false;
-      bool topologically_sorted = false;
-      bool accessible = true;
-      bool coaccessible = true;
-      bool is_string = true;
-      bool minimised = false;
+      //bool topologically_sorted = false;
+      //bool accessible = true;
+      //bool coaccessible = true;
+      //bool is_string = true;
+      //bool minimised = false;
       // assign data from knowledge about source type
       switch (trans->get_type())
         {

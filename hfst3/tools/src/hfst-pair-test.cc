@@ -181,8 +181,8 @@ parse_options(int argc, char** argv)
     if (inputfilename == std::string("<stdin>"))
       { 
         error(EXIT_FAILURE, 0, 
-          "The rule transducer file needs to be given using option -i.",
-              inputfilename);
+	      "The rule transducer file needs to be given using option -i."//,
+              /*inputfilename*/);
       }
     return EXIT_CONTINUE;
 }
@@ -228,7 +228,7 @@ int test(const StringPairVector &tokenized_pair_string,
        ++it)
     {
       s = get_target(it->first,it->second,s,t,known_symbols);
-      if (s == -1)
+      if (s == (unsigned int)-1)
     { 
       if (positive)
         { return 1; }
@@ -291,7 +291,7 @@ void print_recognized_prefix(const StringPairVector &tokenized_pair_string,
       s = get_target(it->first,it->second.c_str(),s,str_transducer,
              known_symbols);
 
-      if (s == -1)
+      if (s == (unsigned int)-1)
     { break; }
 
       if (it->first == it->second)
