@@ -15,12 +15,17 @@ FOMA_PREFIX=$BACKEND_PREFIX
 # Copy the HFST tools
 # -------------------
 
+cd debian/usr/bin;
+
 for tool in $HFST_PREFIX/bin/hfst-*;
 do
-    cp -P $tool debian/usr/bin/;
+    if ! (echo $tool | grep "2$" > /dev/null) && \
+	! (echo $tool | grep "3$" > /dev/null) && \
+	 ! (echo $tool | grep "\~" > /dev/null) ; then
+	cp -P $tool . ;
+    fi
 done
 
-cd debian/usr/bin;
 for tool in hfst-*;
 do
     if (readelf -a $tool 1> /dev/null 2> /dev/null); then
@@ -34,15 +39,16 @@ cd ../../..
 # Copy the HFST library
 # ---------------------
 
-cp -P $HFST_PREFIX/lib/* debian/usr/lib/
-rm debian/usr/lib/libhfst.la
-
+cd debian/usr/lib/
+cp $HFST_PREFIX/lib/libhfst.so.12.0.0 .
+ln -s -T libhfst.so.12.0.0 libhfst.so.12
+ln -s -T libhfst.so.12 libhfst.so
+cp -P $HFST_PREFIX/lib/libhfstlexc.so* .
+cp -P $HFST_PREFIX/lib/libhfstospell.so* .
 
 # ---------------------------
 # Copy the back-end libraries
 # ---------------------------
-
-cd debian/usr/lib/
 
 # OpenFst
 cp $BACKEND_PREFIX/lib/libfst.so.0.0.0 .
@@ -87,7 +93,14 @@ chmod 0755 debian/usr/include/hfst
 # Copy the man pages
 # ------------------
 
-cp $HFST_PREFIX/share/man/man1/*.1 debian/usr/share/man/man1
+for manpage in $HFST_PREFIX/share/man/man1/hfst-*.1; 
+do
+    if ! (echo $manpage | grep "2\.1" > /dev/null) && \
+	! (echo $manpage | grep "3\.1" > /dev/null);
+    then
+	cp -P $manpage debian/usr/share/man/man1;
+    fi
+done
 
 
 # ---------------------------------
