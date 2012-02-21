@@ -843,11 +843,7 @@ namespace hfst { namespace implementations {
       io_gets(infile, buf);
         if (buf[0] == '#') break;
 
-	// DEBUG
-	//fprintf(stderr, "  state line number %i: %s\n", i, buf);
-
         /* scanf is just too slow here */
-
         //items = sscanf(buf, "%i %i %i %i %i",&lineint[0], 
         //&lineint[1], &lineint[2], &lineint[3], &lineint[4]);
 
@@ -1048,9 +1044,11 @@ int main(int argc, char * argv[])
       = FomaTransducer::define_transducer("@_EPSILON_SYMBOL_@");
     fsm * epsilon_i = FomaTransducer::extract_input_language(epsilon);
     fsm * epsilon_i_min = FomaTransducer::minimize(fsm_copy(epsilon_i));
+    (void)epsilon_i_min;
 
     fsm * a = FomaTransducer::define_transducer("a");
     fsm * a2 = FomaTransducer::repeat_n(a, 2);
+    (void)a2;
     
     std::cout << std::endl << "ok" << std::endl;
     return EXIT_SUCCESS;

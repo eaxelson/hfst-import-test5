@@ -47,6 +47,7 @@ int main(int argc, char **argv)
     if (s != s2) {
       try {
     float w = t.get_final_weight(0);
+    (void)w;
     assert(false);
       }
       //catch (StateIsNotFinalException e) {};

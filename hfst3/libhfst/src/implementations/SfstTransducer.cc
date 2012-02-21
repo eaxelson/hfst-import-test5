@@ -124,67 +124,6 @@ namespace hfst { namespace implementations {
            "SfstInputStream: symbol redefined"); }
   }
 
-#ifdef FOO
-  /* Skip the identifier string "MINIMAL" */
-  bool SfstInputStream::skip_minimality_identifier(void)
-  {
-    char c = getc(input_file);
-    ungetc(c,input_file);
-    //fprintf(stderr, "skip_minimality_identifier: c == %c\n", c);
-    if ( c != 'M') 
-        return false;
-    else 
-      {
-        char minimality_identifier[8];
-        int count = fread(minimality_identifier,8,1,input_file);
-        if (count != 1) {
-          HFST_THROW(NotTransducerStreamException); }
-        if (0 != strcmp(minimality_identifier,"MINIMAL")) {
-          HFST_THROW(NotTransducerStreamException);
-        }
-        return true;
-      }
-  }
-
-  /* Skip the identifier string "SFST_TYPE" */
-  bool SfstInputStream::skip_identifier_version_3_0(void)
-  { 
-    char sfst_identifier[10];
-    int sfst_id_count = fread(sfst_identifier,10,1,input_file);
-    if (sfst_id_count != 1)
-      { 
-        HFST_THROW(NotTransducerStreamException); }
-    if (0 != strcmp(sfst_identifier,"SFST_TYPE"))
-      { 
-        HFST_THROW(NotTransducerStreamException); }
-    return skip_minimality_identifier();
-  }
-  
-  bool SfstInputStream::skip_hfst_header(void)
-  {
-    char hfst_header[6];
-    int header_count = fread(hfst_header,6,1,input_file);
-    if (header_count != 1)
-      { 
-        HFST_THROW(NotTransducerStreamException); }
-    try { return skip_identifier_version_3_0(); }
-    //catch (NotTransducerStreamException e) { throw e; }
-    catch (const HfstException e) { throw e; }
-  }
-#endif // FOO  
-
-
-#ifdef foo
-  void SfstTransducer::harmonize(Transducer * t1, Transducer * t2)
-  {
-    Transducer * new_t1 = &t1->copy(false, &t2->alphabet);
-    t2->alphabet.insert_symbols(new_t1->alphabet);
-    delete t1;
-    t1 = new_t1;
-    return;
-  }
-#endif
-
   Transducer * SfstTransducer::expand_arcs(Transducer * t, StringSet &unknown)
   {
     Transducer &tc = t->copy();
@@ -854,7 +793,7 @@ namespace hfst { namespace implementations {
 
     while (1) {
 
-      visited[ current_t_node->index ] = 1; // NODE_NUMBERING
+      visited[ current_t_node->index ] = 1;
       
       vector<Arc> t_transitions;
       for ( ArcsIter it( current_t_node->arcs() ); it; it++) {
@@ -862,7 +801,6 @@ namespace hfst { namespace implementations {
       }
       
       /* If we cannot proceed, return the longest path so far. */
-      // NODE_NUMBERING
       if (t_transitions.empty() || broken[current_t_node->index]) {
     for (int i=(int)path.second.size()-1; i>=last_index; i--) {
       path.second.pop_back(); 
@@ -900,7 +838,7 @@ namespace hfst { namespace implementations {
     } 
 
     /* Give more probability for shorter paths. */
-    // NODE_NUMBERING
+
     if ( broken[ t_target->index ] == 0 ) {
       if ( visited[ t_target->index ] == 1 ) 
         if ( (rand() % 4) == 0 )
