@@ -177,6 +177,7 @@ namespace hfst
      const TransitionSet &rule_transitions,HfstState origin)
     {
       StatePair p = get_pair(origin);
+      (void)p;
       for (TransitionSet::const_iterator it = lex_transitions.begin();
        it != lex_transitions.end();
        ++it)

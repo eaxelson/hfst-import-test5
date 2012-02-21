@@ -720,6 +720,8 @@ namespace hfst
     fprintf(stderr, "ERROR: invalid replace type requested\n");
     exit(1);
       }
+    fprintf(stderr, "ERROR: in function HfstCompiler::replace\n");
+    exit(1);
   }
 
   HfstTransducer * HfstCompiler::make_mapping( Ranges *list1, Ranges *list2, ImplementationType type ) {
