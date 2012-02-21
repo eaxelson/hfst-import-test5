@@ -369,7 +369,6 @@ namespace hfst
               n = n + (unsigned short)stream_get() * 1;
               n = n + (unsigned short)stream_get() * 256;
               
-              //fprintf(stderr, "alphabet size is %i\n", (int)n );
 
               // special symbol-to-number mappings
               std::vector<std::pair<unsigned short, std::string> > 
@@ -397,9 +396,6 @@ namespace hfst
                   c = stream_get();
                 }
 
-                //fprintf(stderr, "read number %hu and symbol %s\n", 
-                //symbol_number, symbol_string.c_str());
-
                 // epsilon, unknown and identity numbers must be handled 
                 //separately
                 if (symbol_number == 0 || symbol_number == 1 || 
@@ -422,7 +418,7 @@ namespace hfst
                 if (special_cases[i].first == 0) {
                 }
                 else {
-                  //fprintf(stderr, "substituting number %hu with %hu...\n", 
+
                   //special_cases[i].first, max_number+1);
                   fst::StdVectorFst * tmp = 
                     t.tropical_ofst_interface.substitute
@@ -430,12 +426,11 @@ namespace hfst
                      special_cases[i].first, 
                      (unsigned short)++max_number);
                   t.implementation.tropical_ofst = tmp;
-                  //delete t.implementation.tropical_ofst;
 
                   symbol_mappings.push_back
                     (std::pair<unsigned short, std::string>
                      (max_number, special_cases[i].second));
-                  //fprintf(stderr, "...substituted\n");
+
                 }
               }
 
@@ -448,7 +443,6 @@ namespace hfst
               to_skip = to_skip + (unsigned short)stream_get() * 256;
               unsigned int to_skip_ = 4 * (unsigned int)to_skip;
 
-              //fprintf(stderr, "skipping %i bytes\n", (int)to_skip_);
 
               for( unsigned int i=0; i<to_skip_; i++)
                 stream_get();
@@ -508,7 +502,6 @@ namespace hfst
         { t.convert(type); }
         break;
       case ERROR_TYPE:
-        //case UNSPECIFIED_TYPE:
       default:
         debug_error("#1");
         HFST_THROW(NotTransducerStreamException);
@@ -809,7 +802,7 @@ namespace hfst
 
         if (bytes_read > header_size) {
           debug_error("#7");
-          //fprintf(stderr, "%i > %i\n", bytes_read, header_size);
+
           HFST_THROW_MESSAGE(NotTransducerStreamException,
                              "HFST header: FATAL: more bytes read than "
                              "the header contains");
@@ -898,7 +891,7 @@ namespace hfst
         HFST_THROW(EndOfStreamException);
       type = stream_fst_type();
     }
-    //catch (hfst::implementations::StreamNotReadableException e)
+
     catch (const HfstException e)
     { throw e; }
 
@@ -970,7 +963,7 @@ namespace hfst
         type = stream_fst_type();
       }
     }
-    //catch (hfst::implementations::StreamNotReadableException e)
+
     catch( const HfstException e)
       { throw e; }
     if ( not HfstTransducer::is_implementation_type_available(type)) {
@@ -1023,7 +1016,7 @@ namespace hfst
       break;
     default:
       debug_error("#10");
-      //throw hfst::implementations::NotTransducerStreamException();
+
       HFST_THROW_MESSAGE(NotTransducerStreamException,
                          "transducer type not recognised");
     }
@@ -1061,7 +1054,6 @@ namespace hfst
         delete implementation.hfst_ol;
         break;
       case ERROR_TYPE:
-        //case UNSPECIFIED_TYPE:
       default:
         debug_error("#11");
         HFST_THROW(NotTransducerStreamException);

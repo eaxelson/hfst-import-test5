@@ -154,42 +154,11 @@ void HfstTransducer::insert_to_alphabet(const std::string &symbol)
       = convert_to_basic_transducer();
     net->add_symbol_to_alphabet(symbol);
     convert_to_hfst_transducer(net);
-    //return *this;
-
-#ifdef FOO
-    switch(type)
-    {
-#if HAVE_SFST
-    case SFST_TYPE:
-        sfst_interface.insert_to_alphabet(implementation.sfst, symbol);
-#endif
-#if HAVE_OPENFST
-    case TROPICAL_OPENFST_TYPE:
-        tropical_ofst_interface.insert_to_alphabet
-        (implementation.tropical_ofst, symbol);
-    case LOG_OPENFST_TYPE:
-        log_ofst_interface.insert_to_alphabet
-        (implementation.log_ofst, symbol);
-#endif
-#if HAVE_FOMA
-    case FOMA_TYPE:
-        foma_interface.insert_to_alphabet(implementation.foma, symbol);
-#endif
-    case ERROR_TYPE:
-        HFST_THROW(TransducerHasWrongTypeException);
-    case HFST_OL_TYPE:
-    case HFST_OLW_TYPE:
-    default:
-        HFST_THROW_MESSAGE(FunctionNotImplementedException,
-                           "insert_to_alphabet");
-    }    
-#endif // FOO
 }
 
 
 void HfstTransducer::remove_from_alphabet(const std::string &symbol) 
 {
-  //HFST_THROW_MESSAGE(FunctionNotImplementedException, "remove_from_alphabet");
 
   HfstTokenizer::check_utf8_correctness(symbol);
 
@@ -200,36 +169,6 @@ void HfstTransducer::remove_from_alphabet(const std::string &symbol)
       = convert_to_basic_transducer();
     net->remove_symbol_from_alphabet(symbol);
     convert_to_hfst_transducer(net);
-    //return *this;
-
-#ifdef FOO
-  switch(type)
-    {
-#if HAVE_SFST
-    case SFST_TYPE:
-      sfst_interface.remove_from_alphabet(implementation.sfst, symbol);
-#endif
-#if HAVE_OPENFST
-    case TROPICAL_OPENFST_TYPE:
-      tropical_ofst_interface.remove_from_alphabet
-    (implementation.tropical_ofst, symbol);
-    case LOG_OPENFST_TYPE:
-      log_ofst_interface.remove_from_alphabet
-    (implementation.log_ofst, symbol);
-#endif
-#if HAVE_FOMA
-    case FOMA_TYPE:
-      foma_interface.remove_from_alphabet(implementation.foma, symbol);
-#endif
-    case ERROR_TYPE:
-      HFST_THROW(TransducerHasWrongTypeException);
-    case HFST_OL_TYPE:
-    case HFST_OLW_TYPE:
-    default:
-      HFST_THROW_MESSAGE(FunctionNotImplementedException,
-             "remove_from_alphabet");
-    }    
-#endif // FOO
 }
 
 
@@ -3842,13 +3781,6 @@ void priority_union_test ( ImplementationType type )
     assert ( testTr.priority_union( tr1 ).compare( result1 ) );
     // normal transducer .p. normal transducer
     testTr = tr1;
-
-    /*
-    std::cerr << testTr.priority_union( tr2 )
-          << "--\n"
-          << result2
-          << std::endl;
-    */
 
     assert ( testTr.priority_union( tr2 ).compare( result2 ) );
 
