@@ -19,12 +19,20 @@ cd debian/usr/bin;
 
 for tool in $HFST_PREFIX/bin/hfst-*;
 do
-    if ! (echo $tool | grep "2$" > /dev/null) && \
-	! (echo $tool | grep "3$" > /dev/null) && \
-	 ! (echo $tool | grep "\~" > /dev/null) ; then
-	cp -P $tool . ;
+    if (ldd $tool | grep "libhfst.so.12" > /dev/null) ; then
+	if ! (echo $tool | grep "2$" > /dev/null) && \
+	    ! (echo $tool | grep "3$" > /dev/null) && \
+	     ! (echo $tool | grep "\~" > /dev/null) ; then
+	    cp -P $tool . ;
+	fi
     fi
 done
+
+for tool in hfst-foma-wrapper.sh hfst-twolc hfst-twolc-loc hfst-xfst;
+do
+    cp -P $HFST_PREFIX/bin/$tool . ;
+done
+
 
 for tool in hfst-*;
 do
