@@ -284,6 +284,13 @@ to ensure that majority of words are not in vocabulary and not fixable by
 standard error models, which should provide to be the worst case scenario test
 for the spell-checking.
 
+The corpora statistics are as follows: the English Wikipedia dump is X terabytes
+in size, it consists of Y tokens of which only Z unique. For our tests we
+only used first gigabyte of data. The Finnish Wikipedia is X gigabytes in size
+and consists of Y tokens of which Z unique. The Greenlandic Wikipedia is only
+X megabytes, consisting Y tokens of which Z unique. For actual tests we only use
+first N gigabytes of data for Finnish and English Wikipedia data.
+
 \section{Evaluation}
 \label{sec:evaluation}
 
@@ -310,7 +317,9 @@ use the error model that may not modify the first character of the word or the
 first character after compound word boundary. On the \emph{Avoid redundancy}
 row we use the error model edit distance 2 with the redundant edit combinations
 removed. On the \emph{foofoo} row we further frobble the baz  in quux models.
-
+In the tables and formul\ae we routinely use the language codes to denote the
+languages: \emph{en} for English, \emph{fi} for Finnish and \emph{kl} for 
+Greenlandic (Kalaallisut). 
 
 \begin{table}[h]
 \begin{center}
@@ -422,6 +431,33 @@ Text in Another language & & & & \\
 \caption{\label{table:language-vs-text-type} Effect of text type on
 error models to speed}
 \end{table}
+
+In Table~\ref{table:automata-sizes} we also summarize the sizes of automata in
+terms of structural elements; the first number is the amount of vertices and the
+second number is the amount of edges. The size of alphabets $|\Sigma|$
+for the automata is: $|\Sigma_{en}| = $, $|\Sigma_{fi}| = $ and $|\Sigma_{kl} =
+$.
+
+\begin{table}[h]
+\begin{center}
+\begin{scriptsize}
+\begin{tabular}{|l|rrrl|}
+\hline
+\bf Automaton & \bf En & \bf Fi & \bf Kl & (Notes) \\ 
+\hline
+Dictionary        & & & & \\
+Edit distance 2   & & & & \\
+Lower order first & & & & \\
+No first edits    & & & & \\
+Avoid redundancy  & & & & \\
+foofoo            & & & & \\
+\hline
+\end{tabular}
+\end{scriptsize}
+\end{center}
+\caption{\label{table:automata-sizes} The sizes of automata}
+\end{table}
+
 
 \section{Conclusions}
 \label{sec:conclusions}

@@ -61,11 +61,6 @@ corp/fi/automisp.words: corp/fi/fiwiki.words
 corp/kl/automisp.words: corp/kl/fiwiki.words
 	python lines2misspell.py --input=$< --output=$@
 
-hfst/fi/omorfi-20110505.hfst:
-	$(WGET) 'http://download.gna.org/omorfi/omorfi-20110505-transducers.tar.xz'
-	tar Jxvf omorfi-20110505-transducers.tar.xz
-	mv omorfi-transducers-20110505/dictionary.default.hfstol $@
-
 # fetching / concocting dictionary automata from external sources
 big.txt:
 	wget http://norvig.com/big.txt
@@ -77,6 +72,11 @@ hfst/en/norvig.hfst: big.txt
 	hfst-strings2fst -j -f openfst-tropical -v < tropical |\
 		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o $@
+
+hfst/fi/omorfi-20110505.hfst:
+	$(WGET) 'http://download.gna.org/omorfi/omorfi-20110505-transducers.tar.xz'
+	tar Jxvf omorfi-20110505-transducers.tar.xz
+	mv omorfi-transducers-20110505/dictionary.default.hfstol $@
 
 hfst/kl/kl.hfst:
 	wget 'http://sourceforge.net/projects/hfst/files/spell-transducers/voikko-kl-linux-x86_64-static.oxt/download' -O voikko-kl-linux-x86_64-static.oxt
