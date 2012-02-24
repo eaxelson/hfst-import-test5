@@ -20,7 +20,9 @@ fsmnlp-2012-speedspelling.pdf: fsmnlp-2012-speedspelling.tex fsmnlp2012.bib
 	$(XELATEX) fsmnlp-2012-speedspelling.tex
 	$(XELATEX) fsmnlp-2012-speedspelling.tex
 
-# tests and tables
+# tests and tables...
+#
+# corpora acquisition
 corp/fi/fiwiki-20120213-pages-articles.10000000.xml:
 	$(WGET) 'http://dumps.wikimedia.org/fiwiki/20120213/fiwiki-20120213-pages-articles.xml.bz2'
 	$(BZCAT) fiwiki-20120213-pages-articles.xml.bz2 | head -n 10000000 > $@
@@ -33,11 +35,38 @@ corp/kl/klwiki-20120214-pages-articles.xml:
 	$(WGET) 'http://dumps.wikimedia.org/klwiki/20120214/klwiki-20120214-pages-articles.xml.bz2'
 	$(BZCAT) klwiki-20120214-pages-articles.xml.bz2 > $@
 
+# corpora preprocessing (ugly fixme plz)
+corp/en/enwiki.words: corp/en/fiwiki-20120211-pages-articles.10000000.xml
+	awk '/<text/,/<\/text/ {print}' < $< |\
+		./wikipedia-deform.sh |\
+		tr -s ' ' '\n' > $@
+
+corp/fi/fiwiki.words: corp/fi/fiwiki-20120213-pages-articles.10000000.xml
+	awk '/<text/,/<\/text/ {print}' < $< |\
+		./wikipedia-deform.sh |\
+		tr -s ' ' '\n' > $@
+
+corp/kl/klwiki.words: corp/fi/fiwiki-20120214-pages-articles.xml
+	awk '/<text/,/<\/text/ {print}' < $< |\
+		./wikipedia-deform.sh |\
+		tr -s ' ' '\n' > $@
+
+# to 1:1 recreate article results please be using --seed=15632753
+corp/en/automisp.words: corp/en/fiwiki.words
+	python lines2misspell.py --input=$< --output=$@
+
+corp/fi/automisp.words: corp/fi/fiwiki.words
+	python lines2misspell.py --input=$< --output=$@
+
+corp/kl/automisp.words: corp/kl/fiwiki.words
+	python lines2misspell.py --input=$< --output=$@
+
 hfst/fi/omorfi-20110505.hfst:
 	$(WGET) 'http://download.gna.org/omorfi/omorfi-20110505-transducers.tar.xz'
 	tar Jxvf omorfi-20110505-transducers.tar.xz
 	mv omorfi-transducers-20110505/dictionary.default.hfstol $@
 
+# fetching / concocting dictionary automata from external sources
 big.txt:
 	wget http://norvig.com/big.txt
 
@@ -55,7 +84,9 @@ hfst/kl/kl.hfst:
 	unzip 2/mor-hfst-kl/speller.zhfst
 	mv acceptor.default.hfst $@
 
-
+# create all error models here
+#
+# Basic ED 1
 hfst/fi/errmodel.edit-distance-1.hfst: hfst/fi/omorfi-20110505.hfst
 	python editdist.py -s --no-elim -d 1 -a $< |\
 		hfst-txt2fst -v |\
@@ -74,8 +105,12 @@ hfst/kl/errmodel.edit-distance-1.hfst: hfst/kl/kl.hfst
 		hfst-minimize -v |\
 		hfst-fst2fst -v olw -o $@
 
-results/table1.tex: foos.tex boos.tex
-	cat $^ > $@
+### FILL errmodels REST HERE (Sam?)
+
+# (re)generate results in neat tables
+# combine all bits and pieces for table 1:
+results/table1.tex: results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex results/fi/table1.dict-omorfi.errm-ed1.corp-wiki.tex results/kl/table1.dict-kl.errm-ed1.corp-wiki.tex
+	paste $^ > $@
 
 results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex: corp/en/enwiki.words
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
@@ -88,3 +123,4 @@ results/en/table2.dict-norvig.errm-ed1.corp-wiki.tex: corp/en/enwiki.words
 		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-1.hfst hfst/en/norvig.hfst corp/ < corp/en/enwiki.words > /dev/null ;\
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
+
