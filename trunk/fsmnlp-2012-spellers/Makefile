@@ -1,0 +1,90 @@
+# Execute this Makefile with GNU compatible make to recreate the test results
+# and paper for article titled
+# `blah' in Proceedings of FSMLNP 2012
+
+# point programs to right binaries
+PYTHON=python3
+HFST_EDIT_DISTANCE=hfst-edit-distance
+HFST_OSPELL=hfst-ospell
+HFST_FST2FST=hfst-fst2fst
+XELATEX=pdflatex
+BIBTEX=bibtex
+WGET=wget
+BZCAT=bzcat
+
+# article
+fsmnlp-2012-speedspelling.pdf: fsmnlp-2012-speedspelling.tex fsmnlp2012.bib
+	$(XELATEX) fsmnlp-2012-speedspelling.tex
+	$(BIBTEX)  fsmnlp-2012-speedspelling
+	$(XELATEX) fsmnlp-2012-speedspelling.tex
+	$(XELATEX) fsmnlp-2012-speedspelling.tex
+	$(XELATEX) fsmnlp-2012-speedspelling.tex
+
+# tests and tables
+corp/fi/fiwiki-20120213-pages-articles.10000000.xml:
+	$(WGET) 'http://dumps.wikimedia.org/fiwiki/20120213/fiwiki-20120213-pages-articles.xml.bz2'
+	$(BZCAT) fiwiki-20120213-pages-articles.xml.bz2 | head -n 10000000 > $@
+
+corp/en/enwiki-20120211.10000000.xml:
+	$(WGET) 'http://dumps.wikimedia.org/enwiki/20120211/enwiki-20120211-pages-articles.xml.bz2'
+	$(BZCAT) enwiki-20120211-pages-articles.xml.bz2 | head -n 10000000 > $@
+
+corp/kl/klwiki-20120214-pages-articles.xml:
+	$(WGET) 'http://dumps.wikimedia.org/klwiki/20120214/klwiki-20120214-pages-articles.xml.bz2'
+	$(BZCAT) klwiki-20120214-pages-articles.xml.bz2 > $@
+
+hfst/fi/omorfi-20110505.hfst:
+	$(WGET) 'http://download.gna.org/omorfi/omorfi-20110505-transducers.tar.xz'
+	tar Jxvf omorfi-20110505-transducers.tar.xz
+	mv omorfi-transducers-20110505/dictionary.default.hfstol $@
+
+big.txt:
+	wget http://norvig.com/big.txt
+
+hfst/en/norvig.hfst: big.txt
+	tr -s '[.:?!;:-][:digit:]' ' ' < big.txt | tr -s '[:space:]' '\n' | tr '[:upper:]' '[:lower:]' > words
+	sort < words | uniq -c | sort -nr > train
+	awk -f tropicalize-uniq-c.awk --assign CS=`wc -l < words` < train > tropical
+	hfst-strings2fst -j -f openfst-tropical -v < tropical |\
+		hfst-minimize -v |\
+		hfst-fst2fst -v -f olw -o $@
+
+hfst/kl/kl.hfst:
+	wget 'http://sourceforge.net/projects/hfst/files/spell-transducers/voikko-kl-linux-x86_64-static.oxt/download' -O voikko-kl-linux-x86_64-static.oxt
+	unzip voikko-kl-linux-x86_64-static.oxt
+	unzip 2/mor-hfst-kl/speller.zhfst
+	mv acceptor.default.hfst $@
+
+
+hfst/fi/errmodel.edit-distance-1.hfst: hfst/fi/omorfi-20110505.hfst
+	python editdist.py -s --no-elim -d 1 -a $< |\
+		hfst-txt2fst -v |\
+		hfst-minimize -v |\
+		hfst-fst2fst -v olw -o $@
+
+hfst/en/errmodel.edit-distance-1.hfst: hfst/en/norvig.hfst
+	python editdist.py -s --no-elim -d 1 -a $< |\
+		hfst-txt2fst -v |\
+		hfst-minimize -v |\
+		hfst-fst2fst -v olw -o $@
+
+hfst/kl/errmodel.edit-distance-1.hfst: hfst/kl/kl.hfst
+	python editdist.py -s --no-elim -d 1 -a $< |\
+		hfst-txt2fst -v |\
+		hfst-minimize -v |\
+		hfst-fst2fst -v olw -o $@
+
+results/table1.tex: foos.tex boos.tex
+	cat $^ > $@
+
+results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex: corp/en/enwiki.words
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-1.hfst hfst/en/norvig.hfst corp/ < corp/en/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/en/table2.dict-norvig.errm-ed1.corp-wiki.tex: corp/en/enwiki.words
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-1.hfst hfst/en/norvig.hfst corp/ < corp/en/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-mems2tex.awk < $@.tsv > $@
