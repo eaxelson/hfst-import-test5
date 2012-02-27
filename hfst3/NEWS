@@ -5,6 +5,13 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.3.6
+---------------------------
+
+* Include directives of foma and SFST header files changed so
+  that standard include path is used instead of source path
+
+* Compilation warnings and some memory leaks fixed
 
 Noteworthy changes in 3.3.5
 ---------------------------
