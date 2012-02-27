@@ -65,10 +65,11 @@ all:
 
 bootstrap: 
 	for f in $(bootstrappable) ; do \
-		N=`echo $$f | sed 's/.1/ \-\-help/' | sh | sed -n 2p`; \
+		N=`echo $$f | sed 's/.1/ \-\-help/' | sed 's/hfst/..\/tools\/src\/hfst/' | sh | sed -n 2p`; \
 		help2man \
+		--no-discard-stderr \
 		-n="$$N" \
-		-s 1 -o $$f -N -S HFST `echo $$f | sed 's/.1//'`; \
+		-s 1 -o $$f -N -S HFST `echo $$f | sed 's/.1//' | sed 's/hfst/..\/tools\/src\/hfst/'`; \
 	done; \
         $(LN_S) -f hfst-determinize.1 hfst-determinise.1 && \
         $(LN_S) -f hfst-fst2strings.1 hfst-expand.1 && \
