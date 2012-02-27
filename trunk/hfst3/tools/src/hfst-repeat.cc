@@ -242,6 +242,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
              error(EXIT_FAILURE, 0, "Repeating *..%lu?", at_most);
           }
         outstream << trans;
+	free(inputname);
     }
     instream.close();
     outstream.close();

@@ -192,6 +192,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         hfst_set_name(orig, orig, "convert");
         hfst_set_formula(orig, orig, "Id");
         outstream << orig;
+	free(inputname);
     }
     instream.close();
     outstream.close();

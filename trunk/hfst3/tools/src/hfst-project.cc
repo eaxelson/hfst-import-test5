@@ -185,6 +185,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
             hfst_set_formula(trans, trans, "²");
           }
         outstream << trans;
+	free(inputname);
     }
     instream.close();
     outstream.close();

@@ -124,6 +124,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         {
           verbose_printf("Inverting %s...%zu\n", inputname, transducer_n); 
         }
+	free(inputname);
         trans.invert();
         hfst_set_name(trans, trans, "invert");
         hfst_set_formula(trans, trans, "⁻¹");
