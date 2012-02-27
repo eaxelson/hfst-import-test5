@@ -27,14 +27,14 @@
 #endif // HAVE_OPENFST
 
 #if HAVE_SFST
-#include "sfst/fst.h"
+#include <sfst/fst.h>
 #endif // HAVE_SFST
 
 #if HAVE_FOMA
 #ifndef _FOMALIB_H_
 #define _FOMALIB_H_
 #include <stdbool.h>
-#include "fomalib.h"
+#include <fomalib.h>
 #endif // _FOMALIB_H_
 #endif // HAVE_FOMA
 
