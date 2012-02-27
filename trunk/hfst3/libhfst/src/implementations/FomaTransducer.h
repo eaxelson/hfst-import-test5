@@ -22,10 +22,10 @@
 
 #ifndef _FOMALIB_H_
 #define _FOMALIB_H_
-#include "fomalib.h"
+#include <fomalib.h>
 #endif
 
-#include "zlib.h"
+#include <zlib.h>
 #include <cstdio>
 #include <string>
 #include <sstream>
