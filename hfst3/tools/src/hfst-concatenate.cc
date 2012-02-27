@@ -178,6 +178,9 @@ concatenate_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
         hfst_set_formula(first, first, second, "⋅");
         outstream << first;
         bothInputs = firststream.is_good() && secondstream.is_good();
+
+	free(firstname);
+	free(secondname);
     }
     
     if (firststream.is_good())

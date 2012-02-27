@@ -176,6 +176,9 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
           }
 
         bothInputs = firststream.is_good() && secondstream.is_good();
+
+	free(firstname);
+	free(secondname);
     }
     
     if (firststream.is_good())
@@ -191,6 +194,7 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
     firststream.close();
     secondstream.close();
     outstream.close();
+
     return EXIT_SUCCESS;
 }
 

@@ -373,6 +373,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         hfst_set_name(trans, trans, "reweight");
         hfst_set_formula(trans, trans, "W");
         outstream << trans.remove_epsilons();
+	free(inputname);
     }
     instream.close();
     outstream.close();

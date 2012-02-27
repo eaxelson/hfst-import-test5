@@ -132,6 +132,7 @@ process_stream(HfstInputStream& instream, HfstOutputStream& outstream)
         hfst_set_name(trans, trans, "remove-epsilons");
         hfst_set_formula(trans, trans, "Id");
         outstream << trans;
+	free(inputname);
     }
     instream.close();
     outstream.close();
