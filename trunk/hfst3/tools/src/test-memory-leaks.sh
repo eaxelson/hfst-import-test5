@@ -2,10 +2,30 @@
 
 VALGRIND="valgrind --tool=memcheck --leak-check=full "
 
+SHORTER_TEST_STRING="(a:bc:de:fg:hi:jk:lm:no:pq:rs:tu:vw:xy:z)| \
+(A:BC:DE:FG:HI:JK:LM:NO:PQ:RS:TU:VW:XY:Z)"
+
+LONGER_TEST_STRING="(a:bc:de:fg:hi:jk:lm:no:pq:rs:tu:vw:xy:z)| \
+(A:BC:DE:FG:HI:JK:LM:NO:PQ:RS:TU:VW:XY:Z)| \
+(A:bc:de:fg:hi:jk:lm:no:pq:rs:tu:vw:xy:Z)| \
+(a:BC:DE:FG:HI:JK:LM:NO:PQ:RS:TU:VW:XY:z)"
+
 for impl in sfst openfst-tropical foma;
 do 
-    echo "a:b" | ./hfst-calculate -f $impl > a2b.$impl;
+    echo $SHORTER_TEST_STRING | ./hfst-calculate -f $impl > tr.$impl;
+    echo $LONGER_TEST_STRING | ./hfst-calculate -f $impl > TR.$impl;
 done
+
+
+if [ "$1" = "--all" ]; then
+    echo "Performing an extensive check";
+else
+    echo "Testing program $1 for implementation type $2...";
+    $VALGRIND .libs/$1 -i tr.$2 -o /dev/null 2> log;
+    $VALGRIND .libs/$1 -i TR.$2 -o /dev/null 2> LOG;
+    echo "Wrote log to files log and LOG."
+    exit 0;
+fi
 
 UNARY_TOOLS="hfst-determinize \
 hfst-fst2fst \
@@ -27,15 +47,17 @@ hfst-tail \
 hfst-txt2fst"
 
 
-for tool in $UNARY_TOOLS
+for tool in $UNARY_TOOLS;
 do
     for impl in sfst openfst-tropical foma;
     do
-	echo "Testing program $tool for implementation type $impl";
-	$VALGRIND .libs/$tool -i a2b.$impl -o /dev/null 2> LOG;
-	grep "definitely" LOG | grep -v "are";
+	echo -n "Testing program $tool for implementation type $impl: ";
+	$VALGRIND .libs/$tool -i tr.$impl -o /dev/null 2> log;
+	grep "definitely" log | grep -v "are" | tr '\n' ' ';
+	$VALGRIND .libs/$tool -i TR.$impl -o /dev/null 2> LOG;
+	grep "definitely" log | grep -v "are";
     done;
 done
 
-rm a2b.sfst a2b.openfst-tropical a2b.foma
-rm LOG
+rm tr.sfst tr.openfst-tropical tr.foma
+rm LOG log
