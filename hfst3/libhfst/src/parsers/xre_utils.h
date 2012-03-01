@@ -13,13 +13,13 @@
 
 namespace hfst { namespace xre {
 
-
 extern char* data;
 extern char* startptr;
 extern size_t len;
 extern std::map<std::string,hfst::HfstTransducer*> definitions;
 extern HfstTransducer* last_compiled;
 extern ImplementationType format;
+
 
 /**
  * @brief input handling function for flex that parses strings.

@@ -23,6 +23,7 @@ extern int xrelex();
 
 %}
 
+
 %name-prefix="xre"
 %error-verbose
 
@@ -38,57 +39,64 @@ extern int xrelex();
     hfst::HfstTransducerPair* transducerPair;
     hfst::HfstTransducerPairVector* transducerPairVector;
     
-    pair<hfst::xeroxRules::ReplaceType, hfst::HfstTransducerPairVector>* contextWithMark;
+   pair<hfst::xeroxRules::ReplaceArrow, vector<hfst::xeroxRules::Rule> >* replaceRuleVectorWithArrow;
+   pair< hfst::xeroxRules::ReplaceArrow, hfst::xeroxRules::Rule>* replaceRuleWithArrow;   
+   pair< hfst::xeroxRules::ReplaceArrow, hfst::HfstTransducerVector>* mappingVectorWithArrow;
+   pair< hfst::xeroxRules::ReplaceArrow, hfst::HfstTransducer>* mappingWithArrow;
     
-    pair<pair<hfst::xeroxRules::ReplaceArrow, bool>, hfst::xeroxRules::Rule>* replaceRuleWithArrow;
-    pair<pair<hfst::xeroxRules::ReplaceArrow, bool>, vector<hfst::xeroxRules::Rule> >* replaceRuleVectorWithArrow;
-    pair< pair<hfst::xeroxRules::ReplaceArrow, bool>, hfst::HfstTransducer>* mappingWithArrow;
-    pair< hfst::xeroxRules::ReplaceArrow, hfst::HfstTransducerVector>* mappingList;
    
-
-    
-   // hfst::xeroxRules::Rule* rule;
-   // vector<hfst::xeroxRules::Rule>* ruleVector;
+   pair<hfst::xeroxRules::ReplaceType, hfst::HfstTransducerPairVector>* contextWithMark;
    
-    hfst::xeroxRules::ReplaceType replType;
-    hfst::xeroxRules::ReplaceArrow replaceArrow; 
+   hfst::xeroxRules::ReplaceType replType;
+   hfst::xeroxRules::ReplaceArrow replaceArrow; 
     
-    
+     
 }
 
 /* some parts have been ripped from foma’s parser now */
 
 %type <transducer> XRE REGEXP1 REGEXP2 REGEXP3 REGEXP4 REGEXP5 REGEXP6 REGEXP7
                     REGEXP8 REGEXP9 REGEXP10 REGEXP11 REGEXP12 LABEL
-                      REPLACE 
-%type <replaceRuleWithArrow> RULE
-%type <replaceRuleVectorWithArrow> PARALLEL_RULES // PARALLEL_RULES2
-%type <replaceArrow> REPLACE_ARROW
-%type <mappingWithArrow> RULE_MAPPING
+                   REPLACE
 
-// %type <mappingList> MAPPING_LIST
 
-%type <replType>  CONTEXT_MARK
+%type <replaceRuleVectorWithArrow> PARALLEL_RULES
+%type <replaceRuleWithArrow>  RULE
+%type <mappingVectorWithArrow> MAPPING_VECTOR
+%type <mappingWithArrow> MAPPING
+
 %type <contextWithMark> CONTEXTS_WITH_MARK
 %type <transducerPairVector> CONTEXTS_VECTOR
 %type <transducerPair> CONTEXT
+%type <replType>  CONTEXT_MARK
+%type <replaceArrow> REPLACE_ARROW
+
+
 %nonassoc <weight> WEIGHT END_OF_WEIGHTED_EXPRESSION
 %nonassoc <label> QUOTED_LITERAL SYMBOL
 
-%left  CROSS_PRODUCT COMPOSITION LENIENT_COMPOSITION
+%left  CROSS_PRODUCT COMPOSITION LENIENT_COMPOSITION INTERSECTION
+
 %left  SHUFFLE
 %right LEFT_RESTRICTION LEFT_ARROW RIGHT_ARROW LEFT_RIGHT_ARROW
-%left  CENTER_MARKER MARKUP_MARKER
-%right REPLACE_RIGHT REPLACE_LEFT OPTIONAL_REPLACE_RIGHT OPTIONAL_REPLACE_LEFT
+
+%left  UNION MINUS UPPER_MINUS LOWER_MINUS UPPER_PRIORITY_UNION
+       LOWER_PRIORITY_UNION
+       
+              
+%left  REPLACE_RIGHT REPLACE_LEFT
+       OPTIONAL_REPLACE_RIGHT OPTIONAL_REPLACE_LEFT
        REPLACE_LEFT_RIGHT OPTIONAL_REPLACE_LEFT_RIGHT
        RTL_LONGEST_MATCH RTL_SHORTEST_MATCH
-       LTR_LONGEST_MATCH LTR_SHORTEST_MATCH
+       LTR_LONGEST_MATCH LTR_SHORTEST_MATCH 
+%left  CENTER_MARKER MARKUP_MARKER
        
 %left  REPLACE_CONTEXT_UU REPLACE_CONTEXT_LU 
        REPLACE_CONTEXT_UL REPLACE_CONTEXT_LL
-       COMMA COMMACOMMA
-%left  UNION INTERSECTION MINUS UPPER_MINUS LOWER_MINUS UPPER_PRIORITY_UNION
-       LOWER_PRIORITY_UNION
+%left  COMMA 
+%left  COMMACOMMA
+       
+       
 %left  BEFORE AFTER
 %left  IGNORING IGNORE_INTERNALLY LEFT_QUOTIENT
 
@@ -101,7 +109,7 @@ extern int xrelex();
 %nonassoc <label> READ_BIN READ_TEXT READ_SPACED READ_PROLOG READ_RE
 %token LEFT_BRACKET RIGHT_BRACKET LEFT_PARENTHESIS RIGHT_PARENTHESIS
        LEFT_CURLY RIGHT_CURLY LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED
-PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
+       PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
 %token EPSILON_TOKEN ANY_TOKEN BOUNDARY_MARKER
 %token LEXER_ERROR
 %token END_OF_EXPRESSION
@@ -114,27 +122,42 @@ PAIR_SEPARATOR_WO_RIGHT PAIR_SEPARATOR_WO_LEFT
 XRE: REGEXP1 { }
      ;
 REGEXP1: REGEXP2 END_OF_EXPRESSION {
+       //std::cerr << "regexp1:regexp2 end of expr \n"<< std::endl; 
        hfst::xre::last_compiled = & $1->minimize();
        $$ = hfst::xre::last_compiled;
    }
    | REGEXP2 END_OF_WEIGHTED_EXPRESSION {
+        //std::cerr << "regexp1:regexp2 end of wighted expr \n"<< std::endl; 
         hfst::xre::last_compiled = & $1->minimize().set_final_weights($2);
         $$ = hfst::xre::last_compiled;
    }
    | REGEXP2 {
+   
+        //std::cerr << "regexp1:regexp2\n"<< std::endl; 
         hfst::xre::last_compiled = & $1->minimize();
         $$ = hfst::xre::last_compiled;
    }
-  | REPLACE END_OF_EXPRESSION
+   | REPLACE
    {
-     //  std::cerr << "replace tr before minimization: \n" << *$1 << "\n" << std::endl;  
-       hfst::xre::last_compiled = & $1->minimize();
-       $$ = hfst::xre::last_compiled;
+        //std::cerr << "regexp1:replace\n"<< std::endl; 
+        hfst::xre::last_compiled = & $1->minimize();
+        $$ = hfst::xre::last_compiled;
+   }
+   | REPLACE END_OF_EXPRESSION
+   {
+         //std::cerr << "regexp1:replace\n"<< std::endl; 
+         hfst::xre::last_compiled = & $1->minimize();
+         $$ = hfst::xre::last_compiled;
    }
    ;
 
-REGEXP2: REGEXP3 { }
+REGEXP2: REGEXP3
+         { 
+
+            //std::cerr << "regexp2:regexp3 \n"<< *$1 << "\n" << std::endl; 
+         }
        | REGEXP2 COMPOSITION REGEXP3 {
+       
             $$ = & $1->compose(*$3);
             delete $3;
         }
@@ -167,7 +190,7 @@ REGEXP3: REGEXP4 { }
             $$ = $1;
             delete $3;
         }
-        | REPLACE {}
+
        ;
 
 REGEXP4: REGEXP5 { }
@@ -193,207 +216,127 @@ REGEXP4: REGEXP5 { }
        
        
        
-       
 ////////////////////////////
 // Replace operators
 ///////////////////////////
 
-
 REPLACE : PARALLEL_RULES
       {
-         //  not epenthesis replace
-         if ( !$1->first.second )
-            switch ( $1->first.first)
-            {
-               case E_REPLACE_RIGHT:
-                 $$ = new HfstTransducer( replace( $1->second, false ) );
-                 break;
-               case E_OPTIONAL_REPLACE_RIGHT:
-                 $$ = new HfstTransducer( replace( $1->second, true ) );
-                 break;
-               case E_REPLACE_LEFT:
-                 $$ = new HfstTransducer( replace_left( $1->second, false ) );
-                 break;
-               case E_OPTIONAL_REPLACE_LEFT:
-                 $$ = new HfstTransducer( replace_left( $1->second, true ) );
-                 break;
-               case E_RTL_LONGEST_MATCH:
-                 $$ = new HfstTransducer( replace_rightmost_longest_match( $1->second ) );
-                 break;
-               case E_RTL_SHORTEST_MATCH:
-                 $$ = new HfstTransducer( replace_rightmost_shortest_match($1->second) );
-                 break;
-               case E_LTR_LONGEST_MATCH:
-                 $$ = new HfstTransducer( replace_leftmost_longest_match( $1->second ) );
-                 break;
-               case E_LTR_SHORTEST_MATCH:
-                 $$ = new HfstTransducer( replace_leftmost_shortest_match( $1->second ) );
-                 break;
-            }
-         else if ( $1->first.second )
-         {
-            switch ( $1->first.first)
-            {
-               // TODO: add other functions
-               case E_REPLACE_RIGHT:
-                  //std::cerr << "replace tr EPEN: \n" << std::endl;
-                  $$ = new HfstTransducer( replace_epenthesis( $1->second, false ) );
-                  break;
-               case E_OPTIONAL_REPLACE_RIGHT:
-                 $$ = new HfstTransducer( replace_epenthesis( $1->second, true ) );
-                 break;
-               case E_REPLACE_LEFT:
-                 xreerror("No replace function.");
-                 break;
-               case E_OPTIONAL_REPLACE_LEFT:
-                 xreerror("No replace function.");
-                 break;
-               case E_RTL_LONGEST_MATCH:
-                 xreerror("No replace function.");
-                 break;
-               case E_RTL_SHORTEST_MATCH:
-                 xreerror("No replace function.");
-                 break;
-               case E_LTR_LONGEST_MATCH:
-                 xreerror("No replace function.");
-                 break;
-               case E_LTR_SHORTEST_MATCH:
-                 xreerror("No replace function.");
-                 break;
-            }
-          }
-        delete $1;
-      }
-      /*
-      | PARALLEL_RULES2
-      {
-         std::cerr << "parallel rules 2 u replace \n"<< std::endl;
+        //std::cerr << "replace:parallel_rules"<< std::endl;        
          switch ( $1->first )
          {
             case E_REPLACE_RIGHT:
               $$ = new HfstTransducer( replace( $1->second, false ) );
               break;
+            case E_OPTIONAL_REPLACE_RIGHT:
+              $$ = new HfstTransducer( replace( $1->second, true ) );
+              break;
+           case E_REPLACE_LEFT:
+              $$ = new HfstTransducer( replace_left( $1->second, false ) );
+              break;
+            case E_OPTIONAL_REPLACE_LEFT:
+              $$ = new HfstTransducer( replace_left( $1->second, true ) );
+              break;
+            case E_RTL_LONGEST_MATCH:
+              $$ = new HfstTransducer( replace_rightmost_longest_match( $1->second ) );
+              break;
+            case E_RTL_SHORTEST_MATCH:
+              $$ = new HfstTransducer( replace_rightmost_shortest_match($1->second) );
+              break;
+            case E_LTR_LONGEST_MATCH:
+              $$ = new HfstTransducer( replace_leftmost_longest_match( $1->second ) );
+              break;
+            case E_LTR_SHORTEST_MATCH:
+              $$ = new HfstTransducer( replace_leftmost_shortest_match( $1->second ) );
+              break;
          }
-         delete $1;
+    
+        delete $1;
       }
-      */
       ;
-      
-
-       
+     
 PARALLEL_RULES: RULE
          {
+            //std::cerr << "parallel_rules:rule"<< std::endl;        
             vector<Rule> * ruleVector = new vector<Rule>();
             ruleVector->push_back($1->second);
             
-            $$ =  new pair< pair<hfst::xeroxRules::ReplaceArrow, bool>, vector<Rule> > ($1->first, *ruleVector);
+            $$ =  new pair< ReplaceArrow, vector<Rule> > ($1->first, *ruleVector);
             delete $1;
          }
          | PARALLEL_RULES COMMACOMMA RULE
          {
+            //std::cerr << "parallel_rules: parallel_rules ,, rule"<< std::endl;      
             Rule tmpRule($3->second);
             $1->second.push_back(tmpRule);
-            $$ =  new pair< pair<hfst::xeroxRules::ReplaceArrow, bool>, vector<Rule> > ($3->first, $1->second);
+            $$ =  new pair< ReplaceArrow, vector<Rule> > ($3->first, $1->second);
             delete $3;
          }
          ;
-         
-RULE: RULE_MAPPING
+
+RULE: MAPPING_VECTOR
       {
-         Rule rule($1->second);;
-         $$ =  new pair< pair<hfst::xeroxRules::ReplaceArrow, bool>, Rule> ($1->first, rule);
+        //std::cerr << "rule: mapping_vector"<< std::endl;      
+         HfstTransducer allMappingsDisjuncted = disjunctVectorMembers($1->second);
+         
+         Rule rule( allMappingsDisjuncted );;
+         $$ =  new pair< ReplaceArrow, Rule> ($1->first, rule);
          delete $1;
       }
-      | RULE_MAPPING CONTEXTS_WITH_MARK
+      | MAPPING_VECTOR CONTEXTS_WITH_MARK
       {
-        Rule rule( $1->second, $2->second, $2->first );
-        $$ =  new pair< pair<hfst::xeroxRules::ReplaceArrow, bool>, Rule> ($1->first, rule);
+        // std::cerr << "rule: mapping_vector contextsWM"<< std::endl;      
+        HfstTransducer allMappingsDisjuncted = disjunctVectorMembers($1->second);
+        
+        Rule rule( allMappingsDisjuncted, $2->second, $2->first );
+        $$ =  new pair< ReplaceArrow, Rule> ($1->first, rule);
         delete $1, $2;
       }
       ;
       
-      
-      
- /*
-      
-      
-PARALLEL_RULES2: MAPPING_LIST
+// Mappings: (ex. a -> b , c -> d , ... , g -> d)
+MAPPING_VECTOR: MAPPING
       {
-         std::cerr << "parallel rules 2 \n"<< std::endl;
-         vector<Rule> * ruleVector = new vector<Rule>();
-         
-         for ( unsigned int i = 0; i < $1->second.size(); i++ )
-         {
-         
-            Rule rule($1->second[i]);
-            ruleVector->push_back(rule);
-            
-          }
-         $$ =  new pair< ReplaceArrow, vector<Rule> > ($1->first, *ruleVector);
-         delete $1;
-           
-        // xreerror("Parallel rules divided by comma not implemented");
-      }
-      | MAPPING_LIST CONTEXTS_WITH_MARK
-      {
-         std::cerr << "parallel rules 2 context \n"<< std::endl;
-         vector<Rule> * ruleVector = new vector<Rule>();
-         
-         for ( unsigned int i = 0; i < $1->second.size(); i++ )
-         {
-         
-            Rule rule($1->second[i], $2->second, $2->first);
-            ruleVector->push_back(rule);
-            
-          }
-         $$ =  new pair< ReplaceArrow, vector<Rule> > ($1->first, *ruleVector);
-         delete $1, $2;
-      
-      }
-      ;
-     
-MAPPING_LIST: RULE_MAPPING
-      {
+         //std::cerr << "mapping_vector : mapping"<< std::endl;      
          HfstTransducerVector * mappingVector = new HfstTransducerVector();
-         mappingVector->push_back($1->second);
-         $$ =  new pair< ReplaceArrow, HfstTransducerVector> ($1->first, *mappingVector);
+         mappingVector->push_back( $1->second );
+         $$ =  new pair< ReplaceArrow, HfstTransducerVector> ($1->first, * mappingVector);
+         delete $1; 
       }
-      | MAPPING_LIST COMMA RULE_MAPPING
+      | MAPPING_VECTOR COMMA MAPPING
       {
-         HfstTransducer tmp($3->second);
-
-         $1->second.push_back(tmp);
-         $$ =  new pair< ReplaceArrow, HfstTransducerVector> ($3->first, $1->second);
-         delete $3;
+         //std::cerr << "mapping_vector : mapping_vector comma mapping"<< std::endl;      
+         // check if new Arrow is the same as the first one
+         if ($1->first != $3->first)
+         {
+            xreerror("Replace arrows should be the same. Calculated as if all replacements had the fist arrow.");
+            //exit(1);
+         }
+         $1->second.push_back($3->second);
+         $$ =  new pair< ReplaceArrow, HfstTransducerVector> ($1->first, $1->second);
+         delete $3; 
+            
       }
       ;
-      
-   */   
-      
-      
-      
-RULE_MAPPING: REGEXP2 REPLACE_ARROW REGEXP2
+
+    
+MAPPING: REGEXP2 REPLACE_ARROW REGEXP2
       {
+         //std::cerr << "mapping : r2 arrow r2"<< std::endl;      
+  
           HfstTransducer mapping(*$1);
           mapping.cross_product(*$3);
-          pair<ReplaceArrow, bool> replacementFunction ($2, false);
-          $$ =  new pair< pair<ReplaceArrow, bool>, HfstTransducer> (replacementFunction, mapping);
-         // std::cerr << "Replace arrow enum \n"<< $2 << std::endl;
+          $$ =  new pair< ReplaceArrow, HfstTransducer> ($2, mapping);
+
           delete $1, $3;
       }
-
       | REGEXP2 REPLACE_ARROW REGEXP2 MARKUP_MARKER REGEXP2
       {
       
           HfstTransducerPair marks(*$3, *$5);
           HfstTransducer mapping = create_mapping_for_mark_up_replace( *$1, marks );
           
-          
-          pair<ReplaceArrow, bool> replacementFunction ($2, false);
-          $$ =  new pair< pair<ReplaceArrow, bool>, HfstTransducer> (replacementFunction, mapping);
-          
-          
-          // $$ =  new pair< ReplaceArrow, HfstTransducer> ($2, mapping);
+          $$ =  new pair< ReplaceArrow, HfstTransducer> ($2, mapping);
          delete $1, $3, $5;
       }
       | REGEXP2 REPLACE_ARROW REGEXP2 MARKUP_MARKER
@@ -404,9 +347,8 @@ RULE_MAPPING: REGEXP2 REPLACE_ARROW REGEXP2
           HfstTransducer mapping = create_mapping_for_mark_up_replace( *$1, marks );
           
          
-          pair<ReplaceArrow, bool> replacementFunction ($2, false);
-          $$ =  new pair< pair<ReplaceArrow, bool>, HfstTransducer> (replacementFunction, mapping);
-
+                                
+          $$ =  new pair< ReplaceArrow, HfstTransducer> ($2, mapping);
          delete $1, $3;
       }
       | REGEXP2 REPLACE_ARROW MARKUP_MARKER REGEXP2
@@ -415,47 +357,24 @@ RULE_MAPPING: REGEXP2 REPLACE_ARROW REGEXP2
           HfstTransducerPair marks(epsilon, *$4);
           HfstTransducer mapping = create_mapping_for_mark_up_replace( *$1, marks );
           
-          pair<ReplaceArrow, bool> replacementFunction ($2, false);
-          $$ =  new pair< pair<ReplaceArrow, bool>, HfstTransducer> (replacementFunction, mapping);
-          
+          $$ =  new pair< ReplaceArrow, HfstTransducer> ($2, mapping);
          delete $1, $4;
       }
-      
-      | LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED REPLACE_ARROW REGEXP2
-      {
-          HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
-          HfstTransducer mapping(epsilon);
-          mapping.cross_product(*$4);
-          pair<ReplaceArrow, bool> replacementFunction ($3, true);
-          $$ =  new pair< pair<ReplaceArrow, bool>, HfstTransducer> (replacementFunction, mapping);
-          delete $4;
-         //  std::cerr << "epenthesis: \n" << std::endl;
-      }
-      | LEFT_BRACKET_DOTTED REGEXP2 RIGHT_BRACKET_DOTTED REPLACE_ARROW REGEXP2
-      {
-        
-          HfstTransducer mapping(*$2);
-          mapping.cross_product(*$5);
-          pair<ReplaceArrow, bool> replacementFunction ($4, true);
-          $$ =  new pair< pair<ReplaceArrow, bool>, HfstTransducer> (replacementFunction, mapping);
-          delete $2, $5;
-         //  std::cerr << "epenthesis: \n" << std::endl;
-      }
       ;    
- 
-      
-      
-      
-// Contexts:
-CONTEXTS_WITH_MARK:  /*empty*/
-      | CONTEXT_MARK CONTEXTS_VECTOR
-      {
-      $$ =  new pair< ReplaceType, HfstTransducerPairVector> ($1, *$2);
-      //$$ = $2;
-      //std::cerr << "Context Mark: \n" << $1  << std::endl;
-
-      }  
-      ;
+   
+         
+// Contexts: ( ex. || k _ f , ... , f _ s )
+CONTEXTS_WITH_MARK:  CONTEXT_MARK CONTEXTS_VECTOR
+         {
+       
+         //std::cerr << "context w mark: conMark conVect"<< std::endl;      
+         
+         $$ =  new pair< ReplaceType, HfstTransducerPairVector> ($1, *$2);
+         //$$ = $2;
+         //std::cerr << "Context Mark: \n" << $1  << std::endl;
+   
+         }  
+         ;
 CONTEXTS_VECTOR: CONTEXT
          {
             HfstTransducerPairVector * ContextVector = new HfstTransducerPairVector();
@@ -517,6 +436,7 @@ CONTEXT_MARK: REPLACE_CONTEXT_UU
 
 
 
+
 REPLACE_ARROW: REPLACE_RIGHT
          {
             $$ = E_REPLACE_RIGHT;
@@ -524,14 +444,6 @@ REPLACE_ARROW: REPLACE_RIGHT
          | OPTIONAL_REPLACE_RIGHT
          {
             $$ = E_OPTIONAL_REPLACE_RIGHT;
-         }
-         | REPLACE_LEFT
-         {
-            $$ = E_REPLACE_LEFT;
-         }
-          | OPTIONAL_REPLACE_LEFT
-         {
-            $$ = E_OPTIONAL_REPLACE_LEFT;
          }
          | RTL_LONGEST_MATCH
           {
@@ -559,6 +471,7 @@ REPLACE_ARROW: REPLACE_RIGHT
 
 
 ////////////////
+
 
 REGEXP5: REGEXP6 { }
        | REGEXP5 UNION REGEXP6 {
@@ -689,6 +602,9 @@ REGEXP11: REGEXP12 { }
             $$ = & $2->minimize();
         }
         | LEFT_PARENTHESIS REGEXP2 RIGHT_PARENTHESIS {
+            $$ = & $2->optionalize();
+        }
+        | LEFT_PARENTHESIS REPLACE RIGHT_PARENTHESIS {
             $$ = & $2->optionalize();
         }
         | LEFT_CURLY REGEXP2 RIGHT_CURLY {

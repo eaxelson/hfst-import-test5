@@ -27,6 +27,10 @@ namespace hfst
 	{
 		enum ReplaceType {REPL_UP, REPL_DOWN, REPL_RIGHT, REPL_LEFT};
 
+
+
+
+
 		// this enum is used in xre_parse.yy for the regex2pfst tool
 		// it is not in the xre_parse.yy file because we couldn't make it work there
 		enum ReplaceArrow {	E_REPLACE_RIGHT,
@@ -39,7 +43,6 @@ namespace hfst
 							E_LTR_LONGEST_MATCH,
 							E_LTR_SHORTEST_MATCH
 						};
-
 		/**
 		 * \brief A rule that contains mapping and context and replace type (if any).
 		 * If rule is A -> B || L _ R , than mapping is cross product of transducers A and B,
@@ -83,11 +86,8 @@ namespace hfst
 			StringPair get_marks() const;
 		};
 
-
-
-
-
-
+		// Disjunct all transducers from TransducerVector
+		HfstTransducer disjunctVectorMembers( const HfstTransducerVector &trVector );
 
 		/**
 		 *  \brief Remove makers used in replace functions from a \a tr.
