@@ -19,8 +19,7 @@ namespace hfst
 {
   namespace xeroxRules
   {
-
-	  Rule::Rule ( const HfstTransducer &a_mapping )
+  	  Rule::Rule ( const HfstTransducer &a_mapping )
 	  {
 		HfstTokenizer TOK;
 		TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
@@ -168,6 +167,32 @@ namespace hfst
 
 
 	  //////////////////////////////////////
+
+
+
+	  HfstTransducer disjunctVectorMembers( const HfstTransducerVector &trVector )
+	  {
+		  HfstTransducer retval( trVector[0] );
+		  for ( unsigned int i = 1; i < trVector.size(); i++ )
+		  {
+			  retval.disjunct(trVector[i]).minimize();
+		  }
+		  return retval;
+	  }
+
+
+
+
+
+
+
+
+	  //////////////////////////////////////
+
+
+
+
+
 
 
 	  HfstTransducer removeMarkers( const HfstTransducer &tr )
@@ -3464,6 +3489,8 @@ void test7a( ImplementationType type )
 	HfstTransducer mapping2(mappingPair2.first);
 	mapping2.cross_product(mappingPair2.second);
 
+
+
 	// without context
 	Rule rule1(mapping1);
 	Rule rule2(mapping2);
@@ -3483,12 +3510,22 @@ void test7a( ImplementationType type )
 
 	replaceTr = replace(ruleVector, false);
 
+
+	//printf("Test 7a Replace tr: \n");
+	//replaceTr.write_in_att_format(stdout, 1);
+
+
 	tmp2 = input1;
 	tmp2.compose(replaceTr).minimize();
-	//printf("Replace leftmost tr2: \n");
+	//printf("Test 7a Replace leftmost tr2: \n");
 	//tmp2.write_in_att_format(stdout, 1);
 	assert(tmp2.compare(result1));
+
+
+
 }
+
+
 
 
 // [. .] -> b , a -> c ;
@@ -3841,6 +3878,114 @@ void test7e( ImplementationType type )
 }
 
 
+
+// a -> b , b -> a
+void test7f( ImplementationType type )
+{
+	HfstTokenizer TOK;
+	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+
+	// Mapping
+
+	HfstTransducer leftMapping1("a", TOK, type);
+	HfstTransducer rightMapping1("b", TOK, type);
+	HfstTransducerPair mappingPair1(leftMapping1, rightMapping1);
+
+	HfstTransducer leftMapping2("b", TOK, type);
+	HfstTransducer rightMapping2("a", TOK, type);
+	HfstTransducerPair mappingPair2(leftMapping2, rightMapping2);
+
+
+	HfstTransducer mapping1(mappingPair1.first);
+	mapping1.cross_product(mappingPair1.second);
+
+	HfstTransducer mapping2(mappingPair2.first);
+	mapping2.cross_product(mappingPair2.second);
+
+
+
+	// without context
+	Rule rule1(mapping1);
+	Rule rule2(mapping2);
+
+	vector<Rule> ruleVector;
+
+	ruleVector.push_back(rule1);
+	ruleVector.push_back(rule2);
+
+
+	HfstTransducer input1("aabbaa", TOK, type);
+	HfstTransducer result1("aabbaa", "bbaabb",TOK, type);
+
+
+	HfstTransducer replaceTr(type);
+	HfstTransducer tmp2(type);
+
+	replaceTr = replace(ruleVector, false);
+
+	tmp2 = input1;
+	tmp2.compose(replaceTr).minimize();
+	//printf("Test 7f Replace leftmost tr2: \n");
+	//tmp2.write_in_att_format(stdout, 1);
+	assert(tmp2.compare(result1));
+
+
+}
+
+
+
+// a -> b b, a -> b
+void test7g( ImplementationType type )
+{
+	HfstTokenizer TOK;
+	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+
+	// Mapping
+
+	HfstTransducer leftMapping1("a", TOK, type);
+	HfstTransducer rightMapping1("bb", TOK, type);
+	HfstTransducerPair mappingPair1(leftMapping1, rightMapping1);
+
+	HfstTransducer leftMapping2("a", TOK, type);
+	HfstTransducer rightMapping2("b", TOK, type);
+	HfstTransducerPair mappingPair2(leftMapping2, rightMapping2);
+
+
+	HfstTransducer mapping1(mappingPair1.first);
+	mapping1.cross_product(mappingPair1.second);
+
+	HfstTransducer mapping2(mappingPair2.first);
+	mapping2.cross_product(mappingPair2.second);
+
+
+
+	// without context
+	Rule rule1(mapping1);
+	Rule rule2(mapping2);
+
+	vector<Rule> ruleVector;
+
+	ruleVector.push_back(rule1);
+	ruleVector.push_back(rule2);
+
+
+	HfstTransducer input1("a", TOK, type);
+	HfstTransducer result1("a", "b",TOK, type);
+	HfstTransducer resultTmp("a@_EPSILON_SYMBOL_@", "bb",TOK, type);
+	result1.disjunct(resultTmp).minimize();
+
+	HfstTransducer replaceTr(type);
+	HfstTransducer tmp2(type);
+
+	replaceTr = replace(ruleVector, false);
+
+	tmp2 = input1;
+	tmp2.compose(replaceTr).minimize();
+	//printf("Test 7f Replace leftmost tr2: \n");
+	//tmp2.write_in_att_format(stdout, 1);
+	assert(tmp2.compare(result1));
+}
+
 int main(int argc, char * argv[])
 	  {
 	      std::cout << "Unit tests for " __FILE__ ":" << std::endl;
@@ -3899,7 +4044,11 @@ int main(int argc, char * argv[])
 			// 0 .o. [ [. 0 .] -> a \/ _ b a , a b _ ,, [. 0 .] -> b \/ a _ a ]
 			test7d( types[i] );
 			test7e( types[i] );
+			// a -> b, b -> a
+			test7f( types[i] );
 
+			// a -> b b , a -> b
+			test7g( types[i] );
 
 
 			test8( types[i] );
