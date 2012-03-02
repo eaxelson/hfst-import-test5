@@ -6,6 +6,22 @@ from shared import Header, Alphabet, LetterTrie
 from transducer import Transducer
 from transducer import TransducerW
 
+class OlTransducer:
+    def __init__(self, filename):
+        handle = open(filename, "rb")
+        self.header = Header(handle)
+        self.alphabet = Alphabet(handle, self.header.number_of_symbols)
+        if self.header.weighted:
+            self.transducer = TransducerW(handle, self.header, self.alphabet)
+        else:
+            self.transducer = Transducer(handle, self.header, self.alphabet)
+        handle.close()
+    def analyse(string):
+        if transducer.analyze(string):
+            return transducer.displayVector
+        else:
+            return []
+        
 if __name__ == "__main__":
     if len(sys.argv) != 2:
         print "Usage: python HfstRuntimeReader FILE"
@@ -24,11 +40,11 @@ if __name__ == "__main__":
 
     while True:
         try:
-            str = raw_input()
+            string = raw_input()
         except EOFError:
             sys.exit(0)
-        print str + ":"
-        if transducer.analyze(str):
+        print string + ":"
+        if transducer.analyze(string):
             transducer.printAnalyses()
             print
         else:
