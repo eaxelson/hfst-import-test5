@@ -70,12 +70,9 @@ class Transducer:
         self.letterTrie = LetterTrie()
         for x in range(header.number_of_symbols):
             self.letterTrie.addString(alphabet.keyTable[x], x)
-        print "lettertrie built"
         self.indexTable = self.IndexTable(file, header.size_of_transition_index_table)
-        print "indextable read"
         self.indices = self.indexTable.indices
         self.transitionTable = self.TransitionTable(file, header.size_of_transition_target_table)
-        print "transition table read"
         self.transitions = self.transitionTable.transitions
         self.displayVector = []
         self.outputString = Indexlist()
@@ -172,7 +169,7 @@ class Transducer:
     def printAnalyses(self):
         for x in self.displayVector:
             print '\t' + x.encode("utf-8")
-        
+
 class TransducerW(Transducer):
 
     class TransitionIndex(Transducer.TransitionIndex):
@@ -213,12 +210,9 @@ class TransducerW(Transducer):
         self.letterTrie = LetterTrie()
         for x in range(header.number_of_symbols):
             self.letterTrie.addString(alphabet.keyTable[x], x)
-        print "lettertrie built"
         self.indexTable = self.IndexTable(file, header.size_of_transition_index_table)
-        print "indextable read"
         self.indices = self.indexTable.indices
         self.transitionTable = self.TransitionTable(file, header.size_of_transition_target_table)
-        print "transition table read"
         self.transitions = self.transitionTable.transitions
         self.displayVector = []
         self.outputString = Indexlist()
