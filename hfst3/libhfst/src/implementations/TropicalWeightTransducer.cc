@@ -1947,9 +1947,24 @@ namespace hfst { namespace implementations
     // is the same as t1's
     // (else OpenFst complains about non-matching check sums... )
     StdVectorFst * t2_ = expand_arcs(t2, foo, false);
-    t2_->SetInputSymbols(t1->InputSymbols());
     t1->SetOutputSymbols(t1->InputSymbols());
-    
+    t2_->SetInputSymbols(t1->OutputSymbols());
+
+#ifdef FOO
+    std::cerr << "t1 output symbols" << std::endl;
+    for ( fst::SymbolTableIterator it 
+            = fst::SymbolTableIterator(*(t1->OutputSymbols()));
+          not it.Done(); it.Next() ) {
+      std::cerr << it.Value() << it.Symbol() << std::endl;
+    }
+    std::cerr << "t2_ input symbols" << std::endl;
+    for ( fst::SymbolTableIterator it 
+            = fst::SymbolTableIterator(*(t2_->InputSymbols()));
+          not it.Done(); it.Next() ) {
+      std::cerr << it.Value() << it.Symbol() << std::endl;
+    }
+#endif
+
     ArcSort(t1, StdOLabelCompare());
     ArcSort(t2_, StdILabelCompare());
 
