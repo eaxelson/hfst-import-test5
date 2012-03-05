@@ -67,7 +67,6 @@ bootstrap:
 	for f in $(bootstrappable) ; do \
 		N=`echo $$f | sed 's/.1/ \-\-help/' | sed 's/hfst/..\/tools\/src\/hfst/' | sh | sed -n 2p`; \
 		help2man \
-		--no-discard-stderr \
 		-n="$$N" \
 		-s 1 -o $$f -N -S HFST `echo $$f | sed 's/.1//' | sed 's/hfst/..\/tools\/src\/hfst/'`; \
 	done; \
