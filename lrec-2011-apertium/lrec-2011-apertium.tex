@@ -1,7 +1,9 @@
-\documentclass[10pt,a4paper]{article}
+\documentclass[a4paper]{article}
 \usepackage{lrec2006}
 \usepackage{url}
+\usepackage{times}
 \usepackage{latexsym}
+\usepackage[small,bf]{caption}
 \usepackage{xltxtra}
 
 %\setlength\titlebox{6.5cm}    % You can expand the title box if you
@@ -20,12 +22,12 @@ in HFST applications}
 \date{\today}
 
 \abstract{
-In this paper we aim to improve interoperability and re-usability of the
-morphological dictionaries of Apertium machine translation system by
-formulating a generic finite-state compilation formula that is implemented in
-in HFST finite-state system to compile Apertium dictionaries into general
-purpose finite-state automata. We demonstrate using of the resulting automaton
-in FST-based spell-checking system.
+  In this paper we aim to improve interoperability and re-usability of the
+  morphological dictionaries of Apertium machine translation system by
+  formulating a generic finite-state compilation formula that is implemented in
+  in HFST finite-state system to compile Apertium dictionaries into general
+  purpose finite-state automata. We demonstrate using of the resulting automaton
+  in FST-based spell-checking system.\\
 \Keywords{finite-state, dictionary, spell-checking}
 }
 
@@ -35,19 +37,19 @@ in FST-based spell-checking system.
 
 \section{Introduction}
 
-Finite-state automata are one of the most effective format for presenting
+Finite-state automata are one of the most effective format for representing
 natural language morphologies in computational format. The finite-state
 automata, once compiled and optimised via process of minimisation are very
 effective for parsing running text. This format is also used when running
 morphological dictionaries in machine-translation system
-Apertium~\cite{Apertium/2011}\footnote{\url{http://Apertium.sf.net}}. In this
+Apertium~\cite{Apertium/2011}\footnote{\url{http://www.apertium.org}}. In this
 paper we propose a generic compilation formula  to compile the
-dictionaries into weighted finite-state automata with for use with any fst
-tools and applications.  We implement this system using a free/libre
+dictionaries into weighted finite-state automata with for use with any FST 
+tool or application.  We implement this system using a free/libre
 open source finite-state API
 HFST~\cite{hfst/2011}\footnote{\url{http://hfst.sf.net}}. HFST is general
-purpose programming interface utilising a selection of freely available
-finite-state libraries for handling of finite-state automata.
+purpose programming interface utilising a selection of freely-available
+finite-state libraries for the handling of finite-state automata.
 
 While Apertium uses the dictionaries and the finite-state automata for machine
 translation, HFST is used in multitude of other applications ranging from
@@ -68,7 +70,6 @@ memory usage of compilation and application of our formula against Apertium's
 own system and show that our system has roughly same coverage and explain
 where the differences arise from.
 
-
 \section{Methods}
 \label{sec:methods}
 
@@ -76,7 +77,7 @@ The compilation of Apertium dictionaries is relatively straight-forward. We
 assume here standard notations for finite-state algebra. The morphological
 combinatorics of Apertium dictionaries are defined in following terms: There is
 one set of root morphs (finite strings) and arbitrary number of named sets of
-affix morphs called pardefs. Each set of affix morphs is associated with a
+affix morphs called {\tt pardef}s. Each set of affix morphs is associated with a
 name. Each morph can also be associated with a paradigm reference pointing to a
 named subset of affixes. As an example, a language of singular and plural of
 \emph{cat} and \emph{dog} in English would be described by root dictionary
@@ -95,21 +96,21 @@ dictionary is extended on the left (for suffixes) or right (for prefixes) by
 the pardef name marker. In the example of \emph{cats, dogs} language this would
 mean finite state paths \texttt{c a t NUMBER}, \texttt{d o g NUMBER},
 \texttt{NUMBER s} and \texttt{NUMBER $\epsilon$}, where $\epsilon$ as usual
-marks zero-length string\footnote{in actual implementation we have used
-temporarily a special non-epsilon marker since this decreases the local
+marks zero-length string\footnote{In the current implementation we have used
+temporarily a special non-epsilon marker as this decreases the local
 indeterminism and thus compilation time}.  These sets of roots and affixes can
 be compiled into disjunction of such joiner delimited morphs.  Now, the
 morphotactics can be defined as related to joiners by any such path that
 contains joiners only as pairs of adjacent identical paradigm references, such
 as \texttt{c a t NUMBER NUMBER s} or \texttt{d o g NUMBER NUMBER $\epsilon$},
 but not \texttt{c a t NUMBER d o g NUMBER} or \texttt{NUMBER s NUMBER s}. The
-finite-state formula for this morphotax is defined by
+finite-state formula for this morphotactics is defined by
 
 \begin{equation}\label{formula:morphotax}
  M_x = (\Sigma \cup \bigcup_{x \in p} x x)^{\star},
 \end{equation}
 
-where p is set of pardef names and $\Sigma$ the set
+where $p$ is set of pardef names and $\Sigma$ the set
 of symbols in morphs not including the set of pardef names.  Now the final
 dictionary is simply composition of these morphotactic rules over the repetion
 of affixes and roots:
@@ -119,14 +120,14 @@ of affixes and roots:
 \end{equation}
 
 where $M_{a}$ is the disjunction of affixes with joiners, $M_{r}$ the
-disjunction of roots with joiners, and $M_x$ the morphotax defined in
+disjunction of roots with joiners, and $M_x$ the morphotactics defined in
 formula~\ref{formula:morphotax}. This is a variation of morphology compilation
 formula presented in various HFST documentation, such as~\cite{hfst/2011}.
 
 \subsection{Implementation Details}
 
 There are lot of finer details we will not thoroughly cover in this article, as
-they are mainly engineering details. In this section we shortly summarize
+they are mainly engineering details. In this section we shortly summarise
 specific features of HFST-based FST compilation that result in meaningful
 differences in automaton structure or working. One of the main source of
 differences is that HFST automata are two-sided and compiled only ones from the
@@ -146,11 +147,11 @@ beginning or end of the word, or disjuncted to the final automata respectively.
 These special morphs include things like article \emph{l'} in French as bound
 form.
 
-\subsection{Creating Spell-Checker Automatically}
+\subsection{Creating a Spell-Checker Automatically}
 
-To create a finite-state spell-checker we need two automata, a one for language
-model, for which the dictionary compiled as described earlier will do, and one
-error model~\cite{pirinen/2010/lrec}. A classical baseline error model is based
+To create a finite-state spell-checker we need two automata, one for the language
+model, for which the dictionary compiled as described earlier will do, and one for the
+error model~\cite{pirinen/2010/lrec}. A classic baseline error model is based
 on the edit distance algorithm~\cite{levenshtein/1966,damerau/1964}, that
 defines typing errors of four types: pressing extra key (insertion), not
 pressing a key (deletion), pressing wrong key (change) and pressing two keys in
@@ -160,27 +161,25 @@ of this where the typing errors of each sort have equal likelihood for each
 letters can be induced from the compiled language model, and this is what we
 use in this paper. The induction of this model is relatively straightforward;
 when compiling the automaton, save each unique UTF-8 codepoint found in the
-morphs\footnote{the description format of apertium requires declaration of
-exemplar character set as well, but to our sampling experience in many of the
-actual descriptions this declaration does not match the reality so we opted to
-induce the set from the morphs}. For each character generate the identities in
+morphs\footnote{The description format of Apertium requires declaration of
+exemplar character set as well, but as this is only used in the tokenisation algorithm \cite{garrido-alenda02}
+, which is not going to be used, we induce the set from the morphs}. For each 
+character generate the identities in
 start and end state to model correctly typed runs. For each of the error types
-the generate one arc from initial state to the end state modeling that error,
-except for swap where it requires one auxiliary state for each character pair.
-
-
+the generate one arc from initial state to the end state modelling that error,
+except for swap which it requires one auxiliary state for each character pair.
 
 \section{Materials}
 \label{sec:materials}
 
 The Apertium project hosts a large number of morphological dictionaries for
 each of the languages translated. From these we have selected three
-dictionaries to be tested: Basque from Basque-Spanish pair as it is biggest
-released dictionary, Norwegian Nynorsk from the Norwegian pair as a language
+dictionaries to be tested: Basque from Basque-Spanish pair as it is 
+released dictionary with the biggest on-disk size, Norwegian Nynorsk from the Norwegian pair as a language
 that has some additional morphological complexity, such as compounding, and
 Manx from  as a language that currently lacks spell-checking tools to
 demonstrate the plausibility of automatic conversion of Apertium dictionary
-into a spell-checker\footnote{we also provide a Makefile script to
+into a spell-checker\footnote{We also provide a Makefile script to
 recreate results of this article for any language in Apertium's repository}.
 
 To evaluate the use of resulting morphological dictionaries and spell-checkers
@@ -191,7 +190,7 @@ dumps\footnote{\url{http://download.wikipedia.org/}}:
 and \texttt{gvwiki-20120215-pages-articles.xml.bz2}. For the purpose of this
 article we performed very crude cleanup and preprocessing to wikipedia data
 picking up the text elements of the article and discarding most of wikipedia
-markup naively\footnote{for details see the script in .}.
+markup naïvely\footnote{For details see the script in .}.
 
 \section{Test Setting and Evaluation}
 \label{sec:evaluation}
@@ -290,7 +289,7 @@ depend on the language which system is a better choice for corpus analysis.
 \begin{center}
 \begin{tabular}{|l|r|r|}
 \hline
-\bf Language & \bf Apertium time & \bf HFST time \\
+\bf Language & \bf Apertium & \bf HFST \\
 \hline
 Basque       & 32.0 s& 18.4 s \\
 Norwegian    & 2.4 s & 5.5  s \\
@@ -303,9 +302,10 @@ Manx         & 1.6 s & 2.2  s \\
 \end{center}
 \end{table}
 
-Similarly we measure the speed of actual compilation process in 
+Similarly we measure the speed of current compilation process in 
 table~\ref{table:compile-speed}. In here there's an obvious advantage to
-manual building of the automaton over the finite-state algebra method, as is
+manual building of the automaton (see \cite{rojas2005} for the precise algorithm
+used) over the finite-state algebra method, as is
 in line with earlier results for lexc building in~\cite{pirinen/2009/sfcm}.
 
 \begin{table}[h]
@@ -339,16 +339,16 @@ finite-state spell-checking see~\cite{hassan/2008}.
 \begin{center}
 \begin{tabular}{|l|r|r|}
 \hline
-\bf Language & \bf Speed  \\
+\bf Language & \bf Speed (words/sec) \\
 \hline
-Basque       &  7.9 s\\
-Norwegian    &  9.2 s\\
-Manx         &  4.7 s\\
+Basque       &  7,900 \\
+Norwegian    &  9,200 \\
+Manx         &  4,700 \\
 \hline
 \end{tabular}
-\caption{Efficiency of spelling in artificial test setup (speed as s of user
-time per 1000 words)
-\label{table:spelling}}
+\caption{Efficiency of spelling correction in artificial test setup, average 
+  over three runs.}
+\label{table:spelling}
 \end{center}
 \end{table}
 
