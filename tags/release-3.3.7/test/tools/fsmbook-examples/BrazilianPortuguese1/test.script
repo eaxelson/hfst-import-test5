@@ -1,0 +1,18 @@
+#!/bin/bash
+
+xfst -f BrazilianPortuguese.xfst.script
+cat BrazilianPortuguese | ../xfst-att-to-hfst-att.sh \
+  > BrazilianPortuguese.xfst.att
+
+hfst-txt2fst -f openfst-tropical BrazilianPortuguese.xfst.att > \
+  BrazilianPortuguese.xfst.hfst
+
+for i in openfst-tropical; do
+# for i in sfst openfst-tropical foma; do
+  sed -i "1s/TRANSDUCER_FORMAT/"$i"/;" BrazilianPortuguese.hfst.script
+  echo "Testing" $i "..."
+  sh BrazilianPortuguese.hfst.script
+  sed -i "1s/"$i"/TRANSDUCER_FORMAT/;" BrazilianPortuguese.hfst.script
+  hfst-fst2fst -f openfst-tropical BrazilianPortuguese.hfst.hfst > TMP
+  hfst-compare -q TMP BrazilianPortuguese.xfst.hfst && echo "TEST PASSED";
+done
