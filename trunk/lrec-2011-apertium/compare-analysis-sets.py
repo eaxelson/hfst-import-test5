@@ -70,7 +70,10 @@ def main():
         for i in range(len(input1sets)):
             sets += 1
             input1slash = input1sets[i].find('/')
-            if j >= len(input2sets):
+            if len(input2sets) == 0:
+                print(lines, ":", i, ": no results")
+                break
+            elif j >= len(input2sets):
                 print(lines, ":", i, ": not enough results")
                 j = len(input2sets) -1
             if not input1slash:

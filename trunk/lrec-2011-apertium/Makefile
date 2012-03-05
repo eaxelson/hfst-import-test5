@@ -13,6 +13,8 @@ XELATEX=xelatex
 BIBTEX=bibtex
 UPLOAD=ruuvi:public_html/tmp
 ARTICLE=lrec-2011-apertium.pdf
+WIKISIZE=102400
+SPELLWORDS=1000
 
 # article
 $(ARTICLE): lrec-2011-apertium.tex lrec2011.bib
@@ -282,7 +284,7 @@ dix-links: $(DIX_SOURCES)
 	analyses1 analyses2
 
 # fetch or create corpora (handpicked)
-texts: apertium-eu-es.eu.text apertium-nb-nn.nn.text apertium-ga-gv.gv.text
+texts: apertium-eu-es.eu.text apertium-nn-nb.nn.text apertium-ga-gv.gv.text
 
 euwiki-20120219-pages-articles.xml.bz2:
 	wget 'http://dumps.wikimedia.org/euwiki/20120219/euwiki-20120219-pages-articles.xml.bz2'
@@ -290,15 +292,17 @@ euwiki-20120219-pages-articles.xml.bz2:
 apertium-eu-es.eu.text: euwiki-20120219-pages-articles.xml.bz2
 	bzcat $< |\
 		awk '/<text/,/<\/text/ {print}' |\
-		./wikipedia-deform.sh > $@
+		./wikipedia-deform.sh |\
+		head -n $(WIKISIZE) > $@
 
 nnwiki-20120215-pages-articles.xml.bz2:
 	wget 'http://dumps.wikimedia.org/nnwiki/20120215/nnwiki-20120215-pages-articles.xml.bz2'
 
-apertium-nb-nn.nn.text: nnwiki-20120215-pages-articles.xml.bz2
+apertium-nn-nb.nn.text: nnwiki-20120215-pages-articles.xml.bz2
 	bzcat $< |\
 		awk '/<text/,/<\/text/ {print}' |\
-		./wikipedia-deform.sh > $@
+		./wikipedia-deform.sh |\
+		head -n $(WIKISIZE) > $@
 
 gvwiki-20120215-pages-articles.xml.bz2:
 	wget 'http://dumps.wikimedia.org/gvwiki/20120215/gvwiki-20120215-pages-articles.xml.bz2'
@@ -306,7 +310,8 @@ gvwiki-20120215-pages-articles.xml.bz2:
 apertium-ga-gv.gv.text: gvwiki-20120215-pages-articles.xml.bz2
 	bzcat $< |\
 		awk '/<text/,/<\/text/ {print}' |\
-		./wikipedia-deform.sh > $@
+		./wikipedia-deform.sh |\
+		head -n $(WIKISIZE) > $@
 
 
 # spectie says:
@@ -321,14 +326,17 @@ apertium-ga-gv.gv.text: gvwiki-20120215-pages-articles.xml.bz2
 # -> apertium-ga-gv.gv.dix
 
 # (1) analyse corpora and compare
-analyses1: apertium-eu-es.eu.hfst.analyses apertium-eu-es.eu.apertium.analyses \
-	apertium-nn-nb.nn.hfst.analyses apertium-nn-nb.nn.apertium.analyses \
-	apertium-ga-gv.gv.hfst.analyses apertium-ga-gv.gv.apertium.analyses
+analyses1: apertium-eu-es.eu.hfst.analyses1 apertium-eu-es.eu.apertium.analyses1 \
+	apertium-nn-nb.nn.hfst.analyses1 apertium-nn-nb.nn.apertium.analyses1 \
+	apertium-ga-gv.gv.hfst.analyses1 apertium-ga-gv.gv.apertium.analyses1
 results1: apertium-eu-es.eu.results1 apertium-nn-nb.nn.results1 \
 	apertium-ga-gv.gv.results1
 
 %.hfst.analyses1: %.hfst %.text
 	hfst-proc $< < $*.text > $@
+
+apertium-nn-nb.nn.apertium.analyses1: apertium-nn-nb.nn.apertium apertium-nn-nb.nn.text
+	lt-proc -e $< < apertium-nn-nb.nn.text > $@
 
 %.apertium.analyses1: %.apertium %.text
 	lt-proc $< < $*.text > $@
@@ -344,62 +352,86 @@ results2: apertium-eu-es.eu.results2 apertium-nn-nb.nn.results2 \
 	lt-expand $< | cut -f 1 -d : | fgrep --invert-match '__REGEXP__' > $@
 
 %.hfst.analyses2: %.hfst %.expand
-	hfst-lookup -O apertium $< < $*.expand > $@
+	apertium-destxt $*.expand | hfst-proc $< > $@
 
 %.apertium.analyses2: %.apertium %.expand
-	lt-proc $< < $*.expand > $@
+	apertium-destxt $*.expand | lt-proc $< > $@
 
 %.results2: %.hfst.analyses2 %.apertium.analyses2
 	$(PYTHON) compare-analysis-sets.py -1 $*.apertium.analyses2 -2 $< -o $@
 
 # (3) analysis speed tests
 results3: times1
-times1: apertium-eu-es.eu.times1
+times1: apertium-eu-es.eu.times1 apertium-nn-nb.nn.times1 \
+	apertium-ga-gv.gv.times1
 
 %.times1: %.hfst %.apertium %.text
 	echo hfst-proc thrice analyzing $*.text > $@
-	time hfst-proc $*.hfst /dev/null < $*.text >> $@ 2>&1 
-	time hfst-proc $*.hfst /dev/null < $*.text >> $@ 2>&1 
-	time hfst-proc $*.hfst /dev/null < $*.text >> $@ 2>&1 
+	time hfst-proc $*.hfst --profile=$*.profile1  $*.text > /dev/null
+	time hfst-proc $*.hfst --profile=$*.profile1  $*.text > /dev/null
+	time hfst-proc $*.hfst --profile=$*.profile1 $*.text  > /dev/null
 	echo lt-proc thrice analyzing $*.text >> $@
-	time lt-proc $*.apertium /dev/null < $*.text >> $@ 2>&1
-	time lt-proc $*.apertium /dev/null < $*.text >> $@ 2>&1
-	time lt-proc $*.apertium /dev/null < $*.text >> $@ 2>&1
+	time lt-proc $*.apertium $*.text /dev/null >> $@
+	time lt-proc $*.apertium $*.text /dev/null >> $@
+	time lt-proc $*.apertium $*.text /dev/null >> $@
 
 # (4) sizes
 results4: sizes
-sizes: apertium-eu-es.eu.sizes
+sizes: apertium-eu-es.eu.hfst-sizes apertium-nn-nb.nn.hfst-sizes \
+	apertium-ga-gv.gv.hfst-sizes apertium-eu-es.eu.apertium-sizes \
+	apertium-nn-nb.nn.apertium-sizes apertium-ga-gv.gv.apertium-sizes
 
-%.sizes: %.hfst
+
+%.hfst-sizes: %.hfst
 	ls -lh $< > $@
 	hfst-summarize $< >> $@
 
+%.apertium-sizes: %.dix
+	lt-comp lr $< $*.apertium.lr > $@
+	lt-comp rl $< $*.apertium.rl >> $@
+	ls -lh $*.apertium.lr $*.apertium.rl >> $@
+
 # (5) look at compilation speed
 results5: times2
-times2: apertium-eu-es.eu.times2
+times2: apertium-eu-es.eu.times2 apertium-nn-nb.nn.times2 \
+	apertium-ga-gv.gv.times2
 
 %.times2: %.dix
 	echo hfst-apertium2fst thrice compiling $< > $@
-	time hfst-apertium2fst $< --profile=$*.profile -o /dev/null >> $@ 2>&1
-	time hfst-apertium2fst $< --profile=$*.profile -o /dev/null >> $@ 2>&1
-	time hfst-apertium2fst $< --profile=$*.profile -o /dev/null >> $@ 2>&1
+	time hfst-apertium2fst $< --profile=$*.profile2 -o /tmp/tmp >> $@ 
+	time hfst-apertium2fst $< --profile=$*.profile2 -o /tmp/tmp >> $@
+	time hfst-apertium2fst $< --profile=$*.profile2 -o /tmp/tmp >> $@
 	echo lt-comp thrice compiling $< > $@
-	time lt-comp lr $< /dev/null >> $@ 2>&1
-	time lt-comp lr $< /dev/null >> $@ 2>&1
-	time lt-comp lr $< /dev/null >> $@ 2>&1
+	time lt-comp lr $< /tmp/tmp >> $@
+	time lt-comp lr $< /tmp/tmp >> $@
+	time lt-comp lr $< /tmp/tmp >> $@
 
 # (6) compile spellers
-results6: spellers
-spellers: apertium-eu-es.eu.zhfst
+results6: spellertimes
+spellers: apertium-eu-es.eu.zhfst apertium-nn-nb.nn.zhfst \
+	apertium-ga-gv.gv.zhfst
+spellertimes: apertium-eu-es.eu.times3 apertium-nn-nb.nn.times3 \
+	apertium-ga-gv.gv.times3
+
+%.misspelt: %.text
+	hfst-proc $*.hfst < $< | egrep -o '\^[^*#/]*/[^*#]' | tr -d '^/' > $*.words
+	python lines2misspell.py --input=$*.words --output=$@
+
+%.times3: %.zhfst %.misspelt
+	awk 'NR < $(SPELLWORDS) {print $$1}' < $*.misspelt | time hfst-ospell-fsmnlp-2012 --profile=$*.profile3 $< > $*.spells
+	awk 'NR < $(SPELLWORDS) {print $$1}' < $*.misspelt | time hfst-ospell-fsmnlp-2012 --profile=$*.profile3 $< > $*.spells
+	awk 'NR < $(SPELLWORDS) {print $$1}' < $*.misspelt | time hfst-ospell-fsmnlp-2012 --profile=$*.profile3 $< > $*.spells
 
 
 %.zhfst: %.dix
-	hfst-apertium2fst -v $< -o $@.tmp -e $*.errmodel.tmp
-	hfst-minimize -v $*.errmodel.tmp |\
-		hfst-fst2fst -v -f olw -o errmodel.default.hfst
+	hfst-apertium2fst -v $< -o $@.tmp
 	hfst-project -v -p input $@.tmp |\
 		hfst-minimize -v |\
 		hfst-fst2fst -v -f olw -o acceptor.default.hfst
+	python editdist.py --no-elim -d 2 -a acceptor.default.hfst |\
+		hfst-txt2fst -v |\
+		hfst-minimize -v |\
+		hfst-fst2fst -f olw -o errmodel.default.hfst
 	sed -e "s/@APERTIUM_NAME@/$*/" index.xml.template > index.xml
 	zip -9 $@ errmodel.default.hfst acceptor.default.hfst index.xml
 	rm -f $@.tmp $*.errmodel.tmp acceptor.default.hfst index.xml
