@@ -11,6 +11,19 @@ HFST_MINIMIZE=hfst-minimize
 HFST_INVERT=hfst-invert
 XELATEX=xelatex
 BIBTEX=bibtex
+UPLOAD=ruuvi:public_html/tmp
+ARTICLE=lrec-2011-apertium.pdf
+
+# article
+$(ARTICLE): lrec-2011-apertium.tex lrec2011.bib
+	$(XELATEX) lrec-2011-apertium.tex
+	$(BIBTEX) lrec-2011-apertium
+	$(XELATEX) lrec-2011-apertium.tex
+	$(XELATEX) lrec-2011-apertium.tex
+	$(XELATEX) lrec-2011-apertium.tex
+
+upload:
+	scp $(ARTICLE) $(UPLOAD)
 
 #  apertium-cy-kw.kw.dix:9: parser error : XML declaration allowed only at the start of the document
 #  apertium-sw-en.sw.dix: empty <alphabet>
@@ -262,12 +275,57 @@ dix-links: $(DIX_SOURCES)
 
 %.dix: dix-links
 
-# the data 
-.PHONY: compilation-speed-tests compile
+# the targets that are not files
+.PHONY: compile texts \
+	results results1 results2 results3 results4 results5 results6 results7 \
+	times1 times2 \
+	analyses1 analyses2
+
+# fetch or create corpora (handpicked)
+texts: apertium-eu-es.eu.text apertium-nb-nn.nn.text apertium-ga-gv.gv.text
+
+euwiki-20120219-pages-articles.xml.bz2:
+	wget 'http://dumps.wikimedia.org/euwiki/20120219/euwiki-20120219-pages-articles.xml.bz2'
+
+apertium-eu-es.eu.text: euwiki-20120219-pages-articles.xml.bz2
+	bzcat $< |\
+		awk '/<text/,/<\/text/ {print}' |\
+		./wikipedia-deform.sh > $@
+
+nnwiki-20120215-pages-articles.xml.bz2:
+	wget 'http://dumps.wikimedia.org/nnwiki/20120215/nnwiki-20120215-pages-articles.xml.bz2'
+
+apertium-nb-nn.nn.text: nnwiki-20120215-pages-articles.xml.bz2
+	bzcat $< |\
+		awk '/<text/,/<\/text/ {print}' |\
+		./wikipedia-deform.sh > $@
+
+gvwiki-20120215-pages-articles.xml.bz2:
+	wget 'http://dumps.wikimedia.org/gvwiki/20120215/gvwiki-20120215-pages-articles.xml.bz2'
+
+apertium-ga-gv.gv.text: gvwiki-20120215-pages-articles.xml.bz2
+	bzcat $< |\
+		awk '/<text/,/<\/text/ {print}' |\
+		./wikipedia-deform.sh > $@
+
+
+# spectie says:
+## The dictionaries I think we could use are:
+##
+## * apertium-eu-es.eu.dix (this is the biggest _released_ dictionary I
+## know of)
+## * apertium-nn-nb.nb.dix (it's well developed, and we can test how word
+## compounding differs)
+## * ... plus one dictionary for a language that doesn't yet have a
+## hunspell speller ...
+# -> apertium-ga-gv.gv.dix
 
 # (1) analyse corpora and compare
-analyses1: apertium-sv-da.sv.text apertium-sv-da.sv.hfst.analyses apertium-sv-da.sv.apertium.analyses
-results1: apertium-sv-da.sv.results1
+analyses1: apertium-eu-es.eu.hfst.analyses apertium-eu-es.eu.apertium.analyses \
+	apertium-nn-nb.nn.hfst.analyses apertium-nn-nb.nn.apertium.analyses \
+	apertium-ga-gv.gv.hfst.analyses apertium-ga-gv.gv.apertium.analyses
+results1: apertium-eu-es.eu.results1 apertium-nn-nb.nn.results1 \
+	apertium-ga-gv.gv.results1
 
 %.hfst.analyses1: %.hfst %.text
 	hfst-proc $< < $*.text > $@
@@ -279,13 +337,14 @@ results1: apertium-sv-da.sv.results1
 	$(PYTHON) compare-analysis-sets.py -1 $*.apertium.analyses1 -2 $< -o $@
 
 # (2) generate dictionary with apertium and analyse both and compare
-results2: apertium-sv-da.sv.results2
+results2: apertium-eu-es.eu.results2 apertium-nn-nb.nn.results2 \
+	apertium-ga-gv.gv.results2
 
 %.expand: %.dix
 	lt-expand $< | cut -f 1 -d : | fgrep --invert-match '__REGEXP__' > $@
 
 %.hfst.analyses2: %.hfst %.expand
-	hfst-proc $< < $*.expand > $@
+	hfst-lookup -O apertium $< < $*.expand > $@
 
 %.apertium.analyses2: %.apertium %.expand
 	lt-proc $< < $*.expand > $@
@@ -294,7 +353,8 @@ results2: apertium-sv-da.sv.results2
 	$(PYTHON) compare-analysis-sets.py -1 $*.apertium.analyses2 -2 $< -o $@
 
 # (3) analysis speed tests
-times1: apertium-sv-da.sv.times1
+results3: times1
+times1: apertium-eu-es.eu.times1
 
 %.times1: %.hfst %.apertium %.text
 	echo hfst-proc thrice analyzing $*.text > $@
@@ -307,27 +367,31 @@ times1: apertium-sv-da.sv.times1
 	time lt-proc $*.apertium /dev/null < $*.text >> $@ 2>&1
 
 # (4) sizes
-sizes: apertium-sv-da.sv.sizes
+results4: sizes
+sizes: apertium-eu-es.eu.sizes
 
 %.sizes: %.hfst
 	ls -lh $< > $@
 	hfst-summarize $< >> $@
 
 # (5) look at compilation speed
-times2: apertium-sv-da.sv.times2
+results5: times2
+times2: apertium-eu-es.eu.times2
 
 %.times2: %.dix
 	echo hfst-apertium2fst thrice compiling $< > $@
-	time hfst-apertium2fst $< -o /dev/null >> $@ 2>&1
-	time hfst-apertium2fst $< -o /dev/null >> $@ 2>&1
-	time hfst-apertium2fst $< -o /dev/null >> $@ 2>&1
+	time hfst-apertium2fst $< --profile=$*.profile -o /dev/null >> $@ 2>&1
+	time hfst-apertium2fst $< --profile=$*.profile -o /dev/null >> $@ 2>&1
+	time hfst-apertium2fst $< --profile=$*.profile -o /dev/null >> $@ 2>&1
 	echo lt-comp thrice compiling $< > $@
 	time lt-comp lr $< /dev/null >> $@ 2>&1
 	time lt-comp lr $< /dev/null >> $@ 2>&1
 	time lt-comp lr $< /dev/null >> $@ 2>&1
 
 # (6) compile spellers
-spell: apertium-sv-da.sv.zhfst
+results6: spellers
+spellers: apertium-eu-es.eu.zhfst
+
 
 %.zhfst: %.dix
 	hfst-apertium2fst -v $< -o $@.tmp -e $*.errmodel.tmp
@@ -353,13 +417,5 @@ spell: apertium-sv-da.sv.zhfst
 %.apertium: %.dix
 	lt-comp lr $< $@
 
-# article
-
-lrec-2011-apertium.pdf: lrec-2011-apertium.tex lrec2011.bib
-	$(XELATEX) lrec-2011-apertium.tex
-	$(BIBTEX) lrec-2011-apertium
-	$(XELATEX) lrec-2011-apertium.tex
-	$(XELATEX) lrec-2011-apertium.tex
-	$(XELATEX) lrec-2011-apertium.tex
 
 
