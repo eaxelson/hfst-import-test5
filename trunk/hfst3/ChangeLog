@@ -1,3 +1,49 @@
+2012-03-05 15:24  eaxelson
+
+	* man/Makefile.am, man/hfst-lookup.1, man/hfst-regexp2fst.1:
+	  Updated tool man pages.
+
+2012-03-05 15:22  eaxelson
+
+	* tools/src/align.sh, tools/src/hfst-regexp2fst.cc,
+	  tools/src/test-memory-leaks.sh: Updated hfst-regexp2fst help
+	  message.
+
+2012-03-05 15:20  eaxelson
+
+	* libhfst/src/implementations/TropicalWeightTransducer.cc: Fixed an
+	  error in composition introduced by the newest version of OpenFst
+	  (1.3.1).
+
+2012-03-05 11:06  eaxelson
+
+	* libhfst/src/parsers/xre_parse.yy: Fixed identities in regexp
+	  parser, now [?] is parsed as identity pair.
+
+2012-03-01 15:36  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRules.h,
+	  libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.h, man/hfst-calculate.1,
+	  man/hfst-compare.1, man/hfst-compose-intersect.1,
+	  man/hfst-compose.1, man/hfst-concatenate.1, man/hfst-conjunct.1,
+	  man/hfst-determinize.1, man/hfst-disjunct.1, man/hfst-format.1,
+	  man/hfst-fst2fst.1, man/hfst-fst2strings.1, man/hfst-fst2txt.1,
+	  man/hfst-head.1, man/hfst-invert.1, man/hfst-lookup.1,
+	  man/hfst-minimize.1, man/hfst-name.1, man/hfst-project.1,
+	  man/hfst-push-weights.1, man/hfst-regexp2fst.1,
+	  man/hfst-remove-epsilons.1, man/hfst-repeat.1,
+	  man/hfst-reverse.1, man/hfst-split.1, man/hfst-strings2fst.1,
+	  man/hfst-substitute.1, man/hfst-subtract.1, man/hfst-summarize.1,
+	  man/hfst-tail.1, man/hfst-txt2fst.1: Updated regexp2fst parser -
+	  rules work fine for themselves, but there remains precedance
+	  issue.
+
+2012-02-27 16:27  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am: Ready for HFST release 3.3.6.
+
 2012-02-27 16:05  eaxelson
 
 	* libhfst/src/implementations/ConvertTransducerFormat.h,
