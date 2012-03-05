@@ -72,35 +72,35 @@ print_usage()
 {
     // c.f. http://www.gnu.org/prep/standards/standards.html#g_t_002d_002dhelp
     fprintf(message_out, "Usage: %s [OPTIONS...] [INFILE]\n"
-        "Compile string pairs and pair-strings into transducer(s)\n"
+    "Compile regular expressions into transducer(s)\n (Experimental version)"
         "\n", program_name); 
         print_common_program_options(message_out);
         print_common_unary_program_options(message_out); 
         fprintf(message_out, "String and format options:\n"
-                "  -f, --format=FMT          Write result in FMT format\n"
-                "  -j, --disjunct            Disjunct all regexps instead of "
-                    "transforming each regexp into a separate transducer\n"
-                "      --sum                 Sum weights of duplicate strings "
-                    "instead of taking minimum\n"
-                "      --norm                Divide each weight by sum "
-                    "of all weights\n"
-                "      --log                 Take negative logarithm "
-                    "of each weight\n"
-                "  -l, --line                Input is line separated\n"
-                "  -S, --semicolon           Input is semicolon separated\n"
-                "  -e, --epsilon=EPS         Map EPS as zero.\n");
+"  -f, --format=FMT          Write result in FMT format\n"
+"  -j, --disjunct            Disjunct all regexps instead of transforming\n"
+"                            each regexp into a separate transducer\n"
+"      --sum (todo)          Sum weights of duplicate strings instead of \n"
+"                            taking minimum\n"
+"      --norm (todo)         Divide each weight by sum of all weights\n"
+"      --log (todo)          Take negative logarithm of each weight\n"
+"  -l, --line                Input is line separated (default)\n"
+"  -S, --semicolon           Input is semicolon separated\n"
+"  -e, --epsilon=EPS         Map EPS as zero.\n");
         fprintf(message_out, "\n");
 
         fprintf(message_out, 
             "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
-            "FMT must be name of a format usable by libhfst, such as "
-            "openfst-tropical, sfst, foma or hfst-optimized-weighted\n"
+            "FMT must be name of a format usable by libhfst, such as\n"
+            "openfst-tropical, sfst, foma or hfst-optimized-weighted.\n"
             "If EPS is not defined, the default representation of 0 is used\n"
+	    "Weights are currently not implemented.\n"
+	    "\n"
             );
 
         fprintf(message_out, "Examples:\n"
-            "  echo \"c:d a:o t:g\" | %s -l      create cat:dog fst\n"
-            "  echo \"c:d a:o t:g ;\" | %s -S    same as pairstring\n"
+"  echo \" c:d a:o t:g \" | %s \n"
+"  echo \" cat ; dog \" | %s -S   create transducers \"cat\" and \"dog\"\n"
             "\n", program_name, program_name);
         print_report_bugs();
         fprintf(message_out, "\n");
@@ -263,7 +263,7 @@ process_stream(HfstOutputStream& outstream)
 int main( int argc, char **argv ) 
 {
 
- hfst_set_program_name(argv[0], "0.1", "Regexp2Fst");
+ hfst_set_program_name(argv[0], "0.2", "Regexp2Fst");
   int retval = parse_options(argc, argv);
   if (retval != EXIT_CONTINUE)
     {
