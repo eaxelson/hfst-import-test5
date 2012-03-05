@@ -1,3 +1,91 @@
+2012-02-27 16:05  eaxelson
+
+	* libhfst/src/implementations/ConvertTransducerFormat.h,
+	  libhfst/src/implementations/FomaTransducer.h,
+	  libhfst/src/implementations/SfstTransducer.h,
+	  tools/src/test-memory-leaks.sh: Changed include directives of
+	  implementation headers (foma, sfst, openfst) so that they search
+	  for headers in default include path first. Also modified memory
+	  leak script.
+
+2012-02-27 14:31  eaxelson
+
+	* tools/src/test-memory-leaks.sh: Updated memory leak test.
+
+2012-02-27 13:04  eaxelson
+
+	* tools/src/test-memory-leaks.sh: Tentatively added a script for
+	  testing memory leaks.
+
+2012-02-27 12:40  eaxelson
+
+	* tools/src/hfst-compose.cc, tools/src/hfst-concatenate.cc,
+	  tools/src/hfst-conjunct.cc, tools/src/hfst-determinize.cc,
+	  tools/src/hfst-disjunct.cc, tools/src/hfst-fst2fst.cc,
+	  tools/src/hfst-invert.cc, tools/src/hfst-minimize.cc,
+	  tools/src/hfst-preprocess-for-optimized-lookup-format.cc,
+	  tools/src/hfst-project.cc, tools/src/hfst-push-weights.cc,
+	  tools/src/hfst-remove-epsilons.cc, tools/src/hfst-repeat.cc,
+	  tools/src/hfst-reverse.cc, tools/src/hfst-reweight.cc,
+	  tools/src/hfst-subtract.cc: Fixed memory leaks caused by
+	  hfst_get_name in command line tools.
+
+2012-02-27 11:07  eaxelson
+
+	* man/Makefile.am, man/hfst-lookup.1: Fixed a bug in hfst-lookup
+	  man page generation, now option --no-discard-stderr is used in
+	  help2man. (However, cannot figure out why this helps..)
+
+2012-02-21 17:17  eaxelson
+
+	* libhfst/src/HfstRules.cc: Removed yet some extra code.
+
+2012-02-21 16:42  eaxelson
+
+	* libhfst/src/HfstInputStream.cc, libhfst/src/HfstOutputStream.cc,
+	  libhfst/src/HfstTransducer.cc: Removed commented code.
+
+2012-02-21 16:16  eaxelson
+
+	* libhfst/src/implementations/FomaTransducer.cc,
+	  libhfst/src/implementations/SfstTransducer.cc,
+	  libhfst/src/implementations/TropicalWeightTransducer.cc,
+	  libhfst/src/implementations/compose_intersect/ComposeIntersectLexicon.cc,
+	  test/libhfst/test_hfst_basic_transducer.cc,
+	  tools/src/HfstCompiler.cc: Fixed some compilation warnings and
+	  removed commented code.
+
+2012-02-20 18:13  eaxelson
+
+	* libhfst/src/HfstTransducer.cc,
+	  libhfst/src/implementations/optimized-lookup/convert.h,
+	  tools/src/hfst-compose-intersect.cc,
+	  tools/src/hfst-optimized-lookup.h, tools/src/hfst-pair-test.cc,
+	  tools/src/hfst-proc/hfst-proc.cc, tools/src/hfst-substitute.cc,
+	  tools/src/hfst-summarize.cc, tools/src/hfst-traverse.cc,
+	  tools/src/lexc-readline-ui.cc: Fixed some more compilation
+	  warnings.
+
+2012-02-20 17:10  eaxelson
+
+	* libhfst/src/implementations/optimized-lookup/transducer.h: Fixed
+	  more compilation warnings.
+
+2012-02-20 16:51  eaxelson
+
+	* libhfst/src/implementations/ConvertTropicalWeightTransducer.cc,
+	  libhfst/src/implementations/LogWeightTransducer.cc,
+	  libhfst/src/implementations/SfstTransducer.cc,
+	  libhfst/src/implementations/TropicalWeightTransducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  test/libhfst/test_transducer_functions.cc: Fixed some compilation
+	  warnings.
+
+2012-02-13 13:37  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am: Ready for HFST release 3.3.5.
+
 2012-02-13 13:34  eaxelson
 
 	* man/hfst-fst2txt.1, man/hfst-strings2fst.1: Man pages updated.

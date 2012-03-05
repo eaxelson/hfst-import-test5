@@ -5,6 +5,13 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.3.7
+---------------------------
+
+* Compatible with OpenFst version 1.3.1
+
+* Identity symbols supported in hfst-regexp2fst
+
 Noteworthy changes in 3.3.6
 ---------------------------
 
