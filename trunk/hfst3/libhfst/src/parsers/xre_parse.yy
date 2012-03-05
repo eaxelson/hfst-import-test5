@@ -710,7 +710,7 @@ LABEL: SYMBOL PAIR_SEPARATOR SYMBOL {
                                 hfst::xre::format);
      }
      | ANY_TOKEN {
-        $$ = new HfstTransducer(hfst::internal_unknown, hfst::internal_unknown,
+        $$ = new HfstTransducer(hfst::internal_identity, hfst::internal_identity,
                                 hfst::xre::format);
      }
      | QUOTED_LITERAL {
