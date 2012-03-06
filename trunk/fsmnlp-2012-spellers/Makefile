@@ -20,6 +20,24 @@ fsmnlp-2012-speedspelling.pdf: fsmnlp-2012-speedspelling.tex fsmnlp2012.bib
 	$(XELATEX) fsmnlp-2012-speedspelling.tex
 	$(XELATEX) fsmnlp-2012-speedspelling.tex
 
+results: corpora dictionaries models tables
+corpora:	corp/fi/fiwiki-20120213-pages-articles.10000000.xml \
+		corp/en/enwiki-20120211.10000000.xml \
+		corp/kl/klwiki-20120214-pages-articles.xml \
+		corp/en/enwiki.words \
+		corp/fi/fiwiki.words \
+		corp/kl/klwiki.words \
+		corp/en/automisp.words \
+		corp/fi/automisp.words \
+		corp/kl/automisp.words
+dictionaries:	hfst/en/norvig.hfst \
+		hfst/fi/omorfi-20110505.hfst \
+		hfst/kl/kl.hfst
+models:		hfst/fi/errmodel.edit-distance-1.hfst \
+		hfst/en/errmodel.edit-distance-1.hfst \
+		hfst/kl/errmodel.edit-distance-1.hfst
+tables:		results/table1.tex
+
 # tests and tables...
 #
 # corpora acquisition
