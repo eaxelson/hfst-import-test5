@@ -1542,9 +1542,9 @@ namespace hfst { namespace implementations
       { return create_epsilon_transducer(); }
 
     StdVectorFst * repetition = create_epsilon_transducer();
+    repetition->SetInputSymbols(t->InputSymbols());
     for (unsigned int i = 0; i < n; ++i)
       { Concat(repetition,*t); }
-    repetition->SetInputSymbols(t->InputSymbols());
     return repetition;
   }
 
@@ -1555,13 +1555,15 @@ namespace hfst { namespace implementations
       { return create_epsilon_transducer(); }
 
     StdVectorFst * repetition = create_epsilon_transducer();
+    repetition->SetInputSymbols(t->InputSymbols());
+
     for (unsigned int i = 0; i < n; ++i)
       {
         StdVectorFst * optional_t = optionalize(t);
+	optional_t->SetInputSymbols(t->InputSymbols());
         Concat(repetition,*optional_t);
         delete optional_t;
       }
-    repetition->SetInputSymbols(t->InputSymbols());
     return repetition;
   }
 
@@ -1569,8 +1571,8 @@ namespace hfst { namespace implementations
   TropicalWeightTransducer::optionalize(StdVectorFst * t)
   {
     StdVectorFst * eps = create_epsilon_transducer();
-    Union(eps,*t);
     eps->SetInputSymbols(t->InputSymbols());
+    Union(eps,*t);
     return eps;
   }
 
@@ -1972,6 +1974,8 @@ namespace hfst { namespace implementations
     Compose(*t1, *t2_, result);
     delete t2_;
 
+    t1->SetOutputSymbols(NULL);
+
     result->SetInputSymbols(t1->InputSymbols());
     return result;
   }
@@ -1980,8 +1984,8 @@ namespace hfst { namespace implementations
                                                        StdVectorFst * t2)
   {
     StdVectorFst * result = new StdVectorFst(*t1);
-    Concat(result,*t2);
     result->SetInputSymbols(t1->InputSymbols());
+    Concat(result,*t2);
     return result;
   }
 
@@ -1989,8 +1993,8 @@ namespace hfst { namespace implementations
                                                     StdVectorFst * t2)
   {
     StdVectorFst * result = new StdVectorFst(*t1);
-    Union(result,*t2);
     result->SetInputSymbols(t1->InputSymbols());
+    Union(result,*t2);
     return result;
   }
 
@@ -2090,6 +2094,10 @@ namespace hfst { namespace implementations
     DecodeFst<StdArc> decode(*foo, encoder);
     delete foo;
     StdVectorFst *result = new StdVectorFst(decode);
+
+    t1->SetOutputSymbols(NULL);
+    t2->SetOutputSymbols(NULL);
+
     result->SetInputSymbols(t1->InputSymbols());
     return result;
   }
@@ -2152,6 +2160,9 @@ namespace hfst { namespace implementations
     delete difference;
 
     if (DEBUG) printf("  ..subtracted\n");
+
+    t1->SetOutputSymbols(NULL);
+    t2->SetOutputSymbols(NULL);
 
     StdVectorFst *result = new StdVectorFst(subtract); 
     result->SetInputSymbols(t1->InputSymbols());
@@ -2539,7 +2550,7 @@ namespace hfst { namespace implementations
     /* When writing a transducer in the backend format,
        both input and output symbol tables are included. */
     fst::SymbolTable *output_st=NULL;
-    if (hfst_format) {
+    if (not hfst_format) {
       output_st = new fst::SymbolTable(*(transducer->InputSymbols()));
       transducer->SetOutputSymbols(output_st);
     }
