@@ -1,3 +1,13 @@
+2012-03-06 11:28  hardwick
+
+	* tools/src/hfst-summarize.cc: Add expected arcs per symbol
+	  statistic
+
+2012-03-05 15:59  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am: Ready for releasing version 3.3.7.
+
 2012-03-05 15:24  eaxelson
 
 	* man/Makefile.am, man/hfst-lookup.1, man/hfst-regexp2fst.1:
