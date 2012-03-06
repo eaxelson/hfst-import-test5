@@ -1,0 +1,4 @@
+#ifndef HFST_TAGGER_HEADER_X_H
+#define HFST_TAGGER_HEADER_X_H
+
+#endif // HFST_TAGGER_HEADER_X_H
