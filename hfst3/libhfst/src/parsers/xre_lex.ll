@@ -16,7 +16,6 @@
 #undef YY_INPUT
 #define YY_INPUT(buf, retval, maxlen)   (retval = hfst::xre::getinput(buf, maxlen))
 
-
 extern
 void xreerror(char *text);
 

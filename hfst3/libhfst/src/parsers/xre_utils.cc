@@ -49,6 +49,7 @@ hfst::HfstTransducer* last_compiled;
 hfst::ImplementationType format;
 size_t len;
 
+
 int*
 get_n_to_k(const char* s)
 {
