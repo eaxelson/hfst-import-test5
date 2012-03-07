@@ -27,6 +27,7 @@ namespace hfst
 
 		ImplementationType type = a_mapping.get_type();
 
+
 		HfstTransducerPair contextPair(HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type),
 									   HfstTransducer("@_EPSILON_SYMBOL_@", TOK, type));
 		HfstTransducerPairVector epsilonContext;
