@@ -471,8 +471,12 @@ namespace hfst { namespace implementations {
    bool filter_fd, 
    StringPairVector &spv)
   {
+
+    // Number of cycles exceeded
     if(cycles >= 0 && path_visitations[state] > cycles)
       return true;
+
+    // Increment number of visitations
     all_visitations[state]++;
     path_visitations[state]++;
     
@@ -518,7 +522,6 @@ namespace hfst { namespace implementations {
         sorted_arcs[j] = s;
       }
     }
-    
 
     bool res = true;
     for(size_t i=0; i<sorted_arcs.size() && res == true; i++)
@@ -599,15 +602,23 @@ namespace hfst { namespace implementations {
     std::vector<hfst::FdState<int> >* fd_state_stack 
       = (fd==NULL) ? NULL : new std::vector<hfst::FdState<int> >
       (1, hfst::FdState<int>(*fd));
+
+    std::set<int> initial_states;
     
     StringPairVector spv;
     bool res = true;
     for (int i=0; ((t->states)+i)->state_no != -1 && res == true; i++) {
-      if (((t->states)+i)->start_state == 1)
+      if (((t->states)+i)->start_state == 1 && 
+	  (initial_states.find(((t->states)+i)->state_no)
+	   == initial_states.end()) ) {
+
+	initial_states.insert(((t->states)+i)->state_no);
+		
         res = hfst::implementations::extract_paths
           (t, ((t->states)+i)->state_no, all_visitations, path_visitations,
            callback, cycles, fd_state_stack, 
            filter_fd, spv);
+      }
     }
   }
 
