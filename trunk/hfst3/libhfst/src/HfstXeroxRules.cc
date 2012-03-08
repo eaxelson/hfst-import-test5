@@ -1616,6 +1616,88 @@ namespace hfst
 	  	return retval;
 
 	  }
+
+
+
+		// to apply boundary marker (.#.)
+	  /*
+	   * [0:.#. | ? - .#.]*
+	   * 		.o.
+	   * 	tr., ie. a -> b || .#. _ ;
+	   * 		.o.
+	   * 	.#. (? - .#.)* .#.
+	   * 		.o.
+	   * [.#.:0 | ? - .#.]*
+	   */
+		HfstTransducer applyBoundaryMark( const HfstTransducer &t )
+		{
+			HfstTokenizer TOK;
+			TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
+
+
+			ImplementationType type = t.get_type();
+
+
+			String boundaryMarker(".#.");
+			TOK.add_multichar_symbol(boundaryMarker);
+
+			HfstTransducer boundary(boundaryMarker, TOK, type);
+
+
+			HfstTransducer identityPair = HfstTransducer::identity_pair( type );
+
+			HfstTransducer identityMinusBoundary(identityPair);
+			identityMinusBoundary.subtract(boundary).minimize();
+
+			HfstTransducer identityMinusBoundaryStar(identityMinusBoundary);
+			identityMinusBoundaryStar.repeat_star().minimize();
+
+
+			HfstTransducer boundaryAnythingBoundary(boundary);
+			boundaryAnythingBoundary.concatenate(identityMinusBoundaryStar)
+									.concatenate(boundary)
+									.minimize();
+
+		   // apply boundary to the transducer
+
+			HfstTransducer newTr(t);
+			newTr.compose(boundaryAnythingBoundary).minimize();
+
+			// remove boundary paths
+
+			// [0:.#. | ? - .#.]*
+
+			HfstTransducer zeroToBoundary("@_EPSILON_SYMBOL_@", boundaryMarker, TOK, type);
+			HfstTransducer retval(zeroToBoundary);
+			retval.disjunct(identityMinusBoundary)
+				  .minimize()
+				  .repeat_star()
+				  .minimize();
+
+			// compose with previous
+			retval.compose(newTr).minimize();
+
+			// [.#.:0 | ? - .#.]*
+			HfstTransducer boundaryToZero(boundaryMarker, "@_EPSILON_SYMBOL_@", TOK, type);
+			HfstTransducer tmp(boundaryToZero);
+			tmp.disjunct(identityMinusBoundary)
+			   .minimize()
+			   .repeat_star()
+			   .minimize();
+
+
+			// compose with [.#.:0 | ? - .#.]*
+			retval.compose(tmp).minimize();
+
+			// remove boundary from alphabet
+			retval.remove_from_alphabet(boundaryMarker);
+
+
+			return retval;
+
+		}
+
+
 		//---------------------------------
 		//	INTERFACE HELPING FUNCTIONS
 		//---------------------------------
@@ -1715,6 +1797,9 @@ namespace hfst
 
 	  	retval = removeMarkers( retval );
 
+	  	// deals with boundary symbol
+	  	retval = applyBoundaryMark( retval );
+
 	  	return retval;
 	  }
 
@@ -1743,6 +1828,11 @@ namespace hfst
 			}
 
 			retval = removeMarkers( retval );
+
+			// deals with boundary symbol
+			retval = applyBoundaryMark( retval );
+
+
 
 			return retval;
 
@@ -1788,6 +1878,9 @@ namespace hfst
 
 	  	retval = removeMarkers( retval );
 
+	  	// deals with boundary symbol
+	  	retval = applyBoundaryMark( retval );
+
 	  	return retval;
 	  }
 	  // left to right
@@ -1819,6 +1912,11 @@ namespace hfst
 
 	  	retval = removeMarkers( retval );
 
+
+	  	// deals with boundary symbol
+	  	retval = applyBoundaryMark( retval );
+
+
 	  	return retval;
 	  }
 
@@ -1842,6 +1940,11 @@ namespace hfst
 	  	//retval.write_in_att_format(stdout, 1);
 
 	  	retval = removeMarkers( retval );
+
+
+	  	// deals with boundary symbol
+	  	retval = applyBoundaryMark( retval );
+
 
 	  	return retval;
 	  }
@@ -1874,6 +1977,9 @@ namespace hfst
 
 	  	retval = removeMarkers( retval );
 
+	  	// deals with boundary symbol
+	  	retval = applyBoundaryMark( retval );
+
 	  	return retval;
 	  }
 
@@ -1892,6 +1998,8 @@ namespace hfst
 
 	  	retval = removeMarkers( retval );
 
+	  	// deals with boundary symbol
+	  	retval = applyBoundaryMark( retval );
 
 	  	return retval;
 	  }
@@ -1919,6 +2027,8 @@ namespace hfst
 
 	  	retval = removeMarkers( retval );
 
+	  	// deals with boundary symbol
+	  	retval = applyBoundaryMark( retval );
 
 	  	return retval;
 	  }
@@ -1938,6 +2048,8 @@ namespace hfst
 
 	  	retval = removeMarkers( retval );
 
+	  	// deals with boundary symbol
+	  	retval = applyBoundaryMark( retval );
 
 	  	return retval;
 	  }
@@ -1966,6 +2078,8 @@ namespace hfst
 
 	  	retval = removeMarkers( retval );
 
+	  	// deals with boundary symbol
+	  	retval = applyBoundaryMark( retval );
 
 	  	return retval;
 	  }
@@ -1983,7 +2097,6 @@ namespace hfst
 	  	//epsilonToRightMark.write_in_att_format(stdout, 1);
 
 	  	HfstTransducer retval(replace(newRule, optional));
-
 
 	  	return retval;
 	  }

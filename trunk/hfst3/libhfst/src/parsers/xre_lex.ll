@@ -82,7 +82,7 @@ LWSP [\t\r\n ]
 ".p." { return LOWER_PRIORITY_UNION; }
 ".-u." { return UPPER_MINUS; }
 ".-l." { return LOWER_MINUS; }
-".#." { return BOUNDARY_MARKER; }
+
 "`[[" { return SUBSTITUTE_LEFT; }
 
 "\\<=" { return LEFT_RESTRICTION; }
