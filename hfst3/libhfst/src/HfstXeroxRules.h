@@ -191,6 +191,19 @@ namespace hfst
 		// to avoid repetition in empty replace rule
 		HfstTransducer noRepetitionConstraint( const HfstTransducer &t );
 
+		/**  \brief
+		   * It applies boundary marker from contexts (.#.) to \a t
+		   *
+		   * [0:.#. | ? - .#.]*
+		   * 		.o.
+		   * 	tr., ie. a -> b || .#. _ ;
+		   * 		.o.
+		   * 	.#. (? - .#.)* .#.
+		   * 		.o.
+		   * [.#.:0 | ? - .#.]*
+		   */
+		HfstTransducer applyBoundaryMark( const HfstTransducer &t );
+
 
 		//---------------------------------
 		//	INTERFACE HELPING FUNCTIONS
