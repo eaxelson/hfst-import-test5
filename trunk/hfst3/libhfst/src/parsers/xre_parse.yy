@@ -1,5 +1,7 @@
 %{
 
+#define YYDEBUG 1 
+
 #include <stdio.h>
 #include <assert.h>
 #include <iostream>
@@ -19,7 +21,7 @@ using namespace hfst::implementations;
 extern void xreerror(const char * text);
 extern int xrelex();
 
-#define YYDEBUG 1 
+
 
 
 %}
@@ -29,6 +31,7 @@ extern int xrelex();
 %debug
 
            
+
 
 
 %union {
@@ -90,7 +93,8 @@ extern int xrelex();
        REPLACE_LEFT_RIGHT OPTIONAL_REPLACE_LEFT_RIGHT
        RTL_LONGEST_MATCH RTL_SHORTEST_MATCH
        LTR_LONGEST_MATCH LTR_SHORTEST_MATCH 
-       REPLACE_CONTEXT_UU REPLACE_CONTEXT_LU 
+      
+%right REPLACE_CONTEXT_UU REPLACE_CONTEXT_LU 
        REPLACE_CONTEXT_UL REPLACE_CONTEXT_LL
 
 %left  UNION MINUS UPPER_MINUS LOWER_MINUS UPPER_PRIORITY_UNION
@@ -255,15 +259,7 @@ RULE: MAPPING_VECTOR
       ;
       
 // Mappings: ( ie. a -> b , c -> d , ... , g -> d)
-MAPPING_VECTOR: MAPPING
-      {
-         // std::cerr << "mapping_vector : mapping"<< std::endl;      
-         HfstTransducerVector * mappingVector = new HfstTransducerVector();
-         mappingVector->push_back( $1->second );
-         $$ =  new pair< ReplaceArrow, HfstTransducerVector> ($1->first, * mappingVector);
-         delete $1; 
-      }
-      | MAPPING_VECTOR COMMA MAPPING
+MAPPING_VECTOR: MAPPING_VECTOR COMMA MAPPING
       {
         // std::cerr << "mapping_vector : mapping_vector comma mapping"<< std::endl;      
          // check if new Arrow is the same as the first one
@@ -277,6 +273,16 @@ MAPPING_VECTOR: MAPPING
          delete $3; 
             
       }
+      
+      | MAPPING
+      {
+         // std::cerr << "mapping_vector : mapping"<< std::endl;      
+         HfstTransducerVector * mappingVector = new HfstTransducerVector();
+         mappingVector->push_back( $1->second );
+         $$ =  new pair< ReplaceArrow, HfstTransducerVector> ($1->first, * mappingVector);
+         delete $1; 
+      }
+     
       ;
 
     
@@ -320,7 +326,30 @@ MAPPING: REPLACE REPLACE_ARROW REPLACE
           $$ =  new pair< ReplaceArrow, HfstTransducer> ($2, mapping);
          delete $1, $4;
       }
+      
+      
+      
+      
+      
+       | LEFT_BRACKET_DOTTED RIGHT_BRACKET_DOTTED REPLACE_ARROW REPLACE
+      {
+          HfstTransducer epsilon(hfst::internal_epsilon, hfst::xre::format);
+          HfstTransducer mappingTr(epsilon);
+          mappingTr.cross_product(*$4);
+          
+          $$ =  new pair< ReplaceArrow, HfstTransducer> ($3, mappingTr);
+          delete $4;
+      }
+      | LEFT_BRACKET_DOTTED REPLACE RIGHT_BRACKET_DOTTED REPLACE_ARROW REPLACE
+      {
+          HfstTransducer mappingTr(*$2);
+          mappingTr.cross_product(*$5);
+
+          $$ =  new pair< ReplaceArrow, HfstTransducer> ($4, mappingTr);
+          delete $2, $5;
+      }
       ;    
+  
    
       
 
