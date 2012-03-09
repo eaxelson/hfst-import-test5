@@ -109,19 +109,19 @@ hfst/fi/errmodel.edit-distance-1.hfst: hfst/fi/omorfi-20110505.hfst
 	python editdist.py -s --no-elim -d 1 -a $< |\
 		hfst-txt2fst -v |\
 		hfst-minimize -v |\
-		hfst-fst2fst -v olw -o $@
+		hfst-fst2fst -v -f w -o $@
 
 hfst/en/errmodel.edit-distance-1.hfst: hfst/en/norvig.hfst
 	python editdist.py -s --no-elim -d 1 -a $< |\
 		hfst-txt2fst -v |\
 		hfst-minimize -v |\
-		hfst-fst2fst -v olw -o $@
+		hfst-fst2fst -v -f w -o $@
 
 hfst/kl/errmodel.edit-distance-1.hfst: hfst/kl/kl.hfst
 	python editdist.py -s --no-elim -d 1 -a $< |\
 		hfst-txt2fst -v |\
 		hfst-minimize -v |\
-		hfst-fst2fst -v olw -o $@
+		hfst-fst2fst -v -f w -o $@
 
 ### FILL errmodels REST HERE (Sam?)
 
@@ -130,15 +130,16 @@ hfst/kl/errmodel.edit-distance-1.hfst: hfst/kl/kl.hfst
 results/table1.tex: results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex results/fi/table1.dict-omorfi.errm-ed1.corp-wiki.tex results/kl/table1.dict-kl.errm-ed1.corp-wiki.tex
 	paste $^ > $@
 
+
 results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex: corp/en/enwiki.words
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-1.hfst hfst/en/norvig.hfst corp/ < corp/en/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-1.hfst hfst/en/norvig.hfst < corp/en/enwiki.words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
-results/en/table2.dict-norvig.errm-ed1.corp-wiki.tex: corp/en/enwiki.words
+results/en/table2.dict-norvig.errm-ed1.corp-wiki.tex: corp/en/enwiki.words $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-1.hfst hfst/en/norvig.hfst corp/ < corp/en/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-1.hfst hfst/en/norvig.hfst < corp/en/enwiki.words > /dev/null ;\
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
