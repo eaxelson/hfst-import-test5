@@ -70,13 +70,13 @@ corp/kl/klwiki.words: corp/kl/klwiki-20120214-pages-articles.xml
 		tr -s ' ' '\n' > $@
 
 # to 1:1 recreate article results please be using --seed=15632753
-corp/en/automisp.words: corp/en/fiwiki.words
+corp/en/automisp.words: corp/en/enwiki.words
 	python lines2misspell.py --input=$< --output=$@
 
 corp/fi/automisp.words: corp/fi/fiwiki.words
 	python lines2misspell.py --input=$< --output=$@
 
-corp/kl/automisp.words: corp/kl/fiwiki.words
+corp/kl/automisp.words: corp/kl/klwiki.words
 	python lines2misspell.py --input=$< --output=$@
 
 # fetching / concocting dictionary automata from external sources
