@@ -127,7 +127,7 @@ hfst/kl/errmodel.edit-distance-1.hfst: hfst/kl/kl.hfst
 
 # (re)generate results in neat tables
 # combine all bits and pieces for table 1:
-results/table1.tex: results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex results/fi/table1.dict-omorfi.errm-ed1.corp-wiki.tex results/kl/table1.dict-kl.errm-ed1.corp-wiki.tex
+results/table1.tex: results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex #results/fi/table1.dict-omorfi.errm-ed1.corp-wiki.tex results/kl/table1.dict-kl.errm-ed1.corp-wiki.tex
 	paste $^ > $@
 
 
