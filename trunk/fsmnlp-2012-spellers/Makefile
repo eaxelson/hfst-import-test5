@@ -109,19 +109,19 @@ hfst/fi/errmodel.edit-distance-1.hfst: hfst/fi/omorfi-20110505.hfst
 	python editdist.py -s --no-elim -d 1 -a $< |\
 		hfst-txt2fst -v |\
 		hfst-minimize -v |\
-		hfst-fst2fst -v -f w -o $@
+		hfst-fst2fst -v -f olw -o $@
 
 hfst/en/errmodel.edit-distance-1.hfst: hfst/en/norvig.hfst
 	python editdist.py -s --no-elim -d 1 -a $< |\
 		hfst-txt2fst -v |\
 		hfst-minimize -v |\
-		hfst-fst2fst -v -f w -o $@
+		hfst-fst2fst -v -f olw -o $@
 
 hfst/kl/errmodel.edit-distance-1.hfst: hfst/kl/kl.hfst
 	python editdist.py -s --no-elim -d 1 -a $< |\
 		hfst-txt2fst -v |\
 		hfst-minimize -v |\
-		hfst-fst2fst -v -f w -o $@
+		hfst-fst2fst -v -f olw -o $@
 
 ### FILL errmodels REST HERE (Sam?)
 
