@@ -132,12 +132,14 @@ results/table1.tex: results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex results
 
 
 results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex: corp/en/enwiki.words
+	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
 		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-1.hfst hfst/en/norvig.hfst < corp/en/enwiki.words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
 results/en/table2.dict-norvig.errm-ed1.corp-wiki.tex: corp/en/enwiki.words $@.tsv
+	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
 		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-1.hfst hfst/en/norvig.hfst < corp/en/enwiki.words > /dev/null ;\
 	done
