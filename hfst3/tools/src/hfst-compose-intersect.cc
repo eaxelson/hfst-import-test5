@@ -258,7 +258,7 @@ compose_streams(HfstInputStream& firststream, HfstInputStream& secondstream,
 	  else if ((symbol = check_multi_char_symbols(lexicon,rules[0])) != "")
 	  { 
 	    warning(0, 0, 
-		    "\nFound output multi-char symbols (e.g. \"%1s\") in \n"
+		    "\nFound output multi-char symbols (\"%1s\") in \n"
 		    "transducer in file %2$s which are not found on the\n"
 		    "output tape of transducers in file %3$s.",
 		    symbol.c_str(), firstfilename, secondfilename);
