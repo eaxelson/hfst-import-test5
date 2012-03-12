@@ -241,18 +241,18 @@ ProcTransducerAlphabet::check_for_overlapping() const
   }
   
   if(!overlapping.empty())
-                  {
-                    if (not silentFlag)
   {
-    std::cerr << "!! Warning: Transducer contains one or more multi-character symbols made up of\n"
-              << "ASCII characters which are also available as single-character symbols. The\n"
-              << "input stream will always be tokenised using the longest symbols available.\n"
-              << "Use the -t option to view the tokenisation. The problematic symbol(s):\n";
-    for(size_t i=0;i<overlapping.size();i++)
-      std::cerr << (i==0?"":" ") << overlapping[i];
-    std::cerr << std::endl;
+      if (not silentFlag)
+      {
+          std::cerr << "!! Warning: Transducer contains one or more multi-character symbols made up of\n"
+                    << "ASCII characters which are also available as single-character symbols. The\n"
+                    << "input stream will always be tokenised using the longest symbols available.\n"
+                    << "Use the -t option to view the tokenisation. The problematic symbol(s):\n";
+          for(size_t i=0;i<overlapping.size();i++)
+              std::cerr << (i==0?"":" ") << overlapping[i];
+          std::cerr << std::endl;
+      }
   }
-                  }
 }
 
 void
