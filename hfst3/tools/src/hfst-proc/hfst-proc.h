@@ -45,6 +45,7 @@ typedef std::vector<Token> TokenVector;
 class OutputFormatter;
 
 extern bool verboseFlag;
+extern bool silentFlag;
 
 extern bool displayWeightsFlag;
 extern int maxAnalyses;

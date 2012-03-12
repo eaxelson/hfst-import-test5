@@ -19,6 +19,7 @@
 #include "applicators.h"
 
 bool verboseFlag = false;
+bool silentFlag = false;
 
 bool displayWeightsFlag = false;
 bool displayUniqueFlag = false;
@@ -207,6 +208,7 @@ int main(int argc, char **argv)
   #endif
       
       verboseFlag = true;
+      silentFlag = false;
       break;
       
     case 'q':
@@ -216,6 +218,7 @@ int main(int argc, char **argv)
       preserveDiacriticRepresentationsFlag = false;
   #endif
       verboseFlag = false;
+      silentFlag = true;
       displayWeightsFlag = true;
       break;
     
