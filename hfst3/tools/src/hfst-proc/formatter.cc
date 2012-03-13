@@ -83,7 +83,7 @@ OutputFormatter::preprocess_finals(const LookupPathSet& finals) const
   LookupPathSet::const_iterator it=new_finals.begin();
   // the for loop filters out > maxAnalyses analyses
   for(int i=0;i<maxAnalyses;i++,it++) {
-      // this condition filters out maxWeightClasses
+      // this condition filters out > maxWeightClasses
       if(dynamic_cast<const LookupPathW*>(*it) != NULL) { // if we actually have weights
 	  Weight current_weight = dynamic_cast<const LookupPathW*>(*it)->get_weight();
 	  if (classes_found == -1) { // we're just starting
