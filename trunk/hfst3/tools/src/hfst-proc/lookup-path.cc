@@ -96,8 +96,11 @@ LookupPathW::follow(const Transition& transition)
 bool
 LookupPathW::operator<(const LookupPathW& o) const
 {
-  return ((get_weight() < o.get_weight()) ||
-          (get_weight() == o.get_weight() && this->LookupPath::operator<(o)));
+    if (get_weight() == o.get_weight()) {
+	return this->LookupPath::operator<(o);
+    } else {
+	return get_weight() < o.get_weight();
+    }
 }
 
 
