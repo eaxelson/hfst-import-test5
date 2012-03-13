@@ -244,7 +244,7 @@ int main(int argc, char **argv)
         output_type = c;
       else
       {
-        std::cerr << "Multiple output modeds given" << std::endl;
+        std::cerr << "Multiple output modes given" << std::endl;
         print_short_help();
         return EXIT_FAILURE;
       }
