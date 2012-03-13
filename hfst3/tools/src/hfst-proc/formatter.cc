@@ -216,7 +216,7 @@ CGOutputFormatter::process_final(const SymbolNumberVector& symbols, Capitalizati
       // Experimentally try to print the full analysis string as well, as a CG subreading:
       res << "\t" << token_stream.get_alphabet().symbols_to_string(
         SymbolNumberVector(symbols.begin()+0,symbols.begin()+symbols.size()), caps);
-      res << " " << "]" << "]" << "]";
+      res << " " << "∏" << "∏";
       if(tag_start != symbols.size())
       {
         for(size_t i=tag_start; i<symbols.size(); i++)
