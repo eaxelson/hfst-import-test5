@@ -65,7 +65,12 @@ OutputFormatter::filter_compound_analyses(LookupPathSet& finals) const
 LookupPathSet
 OutputFormatter::preprocess_finals(const LookupPathSet& finals) const
 {
-  LookupPathSet new_finals = LookupPathSet(finals);
+  LookupPathSet new_finals(LookupPath::compare_pointers);
+  // insertion sort :)
+  for (LookupPathSet::const_iterator it = finals.begin(); it != finals.end();
+       ++it) {
+      new_finals.insert(*it);
+  }
   if(do_compound_filtering)
   {
     filter_compound_analyses(new_finals);
