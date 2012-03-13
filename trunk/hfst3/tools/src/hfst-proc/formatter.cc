@@ -75,17 +75,31 @@ OutputFormatter::preprocess_finals(const LookupPathSet& finals) const
         std::cout << "Filtered " << finals.size()-new_finals.size() << " compound analyses" << std::endl;
     }
   }
-  
-  if(new_finals.size() > (unsigned int)maxAnalyses)
-  {
-    LookupPathSet clipped_finals(LookupPath::compare_pointers);
-    LookupPathSet::const_iterator it=new_finals.begin();
-    for(int i=0;i<maxAnalyses;i++,it++)
+
+  // Remove excess analyses by N-best or N-weight classes
+  int classes_found = -1;
+  Weight last_weight_class = 0.0;
+  LookupPathSet clipped_finals(LookupPath::compare_pointers);
+  LookupPathSet::const_iterator it=new_finals.begin();
+  // the for loop filters out > maxAnalyses analyses
+  for(int i=0;i<maxAnalyses;i++,it++) {
+      // this condition filters out maxWeightClasses
+      if(dynamic_cast<const LookupPathW*>(*it) != NULL) { // if we actually have weights
+	  Weight current_weight = dynamic_cast<const LookupPathW*>(*it)->get_weight();
+	  if (classes_found == -1) { // we're just starting
+	      classes_found = 1;
+	      last_weight_class = current_weight;
+	  } else if (last_weight_class != current_weight) { // we might want to ignore the rest due to weight classes
+	      last_weight_class = current_weight;
+	      ++classes_found;
+	  }
+	  if (classes_found > maxWeightClasses) {
+	      break; // don't insert any more
+	  }
+      }
       clipped_finals.insert(*it);
-    return clipped_finals;
   }
-  else
-    return new_finals;
+  return clipped_finals;
 }
 
 //////////Function definitions for ApertiumOutputFormatter

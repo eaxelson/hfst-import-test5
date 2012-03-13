@@ -49,6 +49,7 @@ extern bool silentFlag;
 
 extern bool displayWeightsFlag;
 extern int maxAnalyses;
+extern int maxWeightClasses;
 extern bool preserveDiacriticRepresentationsFlag;
 extern bool processCompounds;
 
