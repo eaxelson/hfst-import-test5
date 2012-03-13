@@ -24,6 +24,7 @@ bool silentFlag = false;
 bool displayWeightsFlag = false;
 bool displayUniqueFlag = false;
 int maxAnalyses = std::numeric_limits<int>::max();
+int maxWeightClasses = std::numeric_limits<int>::max();
 bool preserveDiacriticRepresentationsFlag = false;
 bool printDebuggingInformationFlag = false;
 bool processCompounds = false;
@@ -111,6 +112,8 @@ bool print_usage(void)
     "  -W, --show-weights      Print final analysis weights (if any)\n" <<
     "  -N N, --analyses=N      Output no more than N analyses\n" <<
     "                          (if the transducer is weighted, the N best analyses)\n" <<
+    "  --weight-classes N      Output no more than N best weight classes\n" <<
+    "                          (where analyses with equal weight constitute a class\n"
     "  -c, --case-sensitive    Perform lookup using the literal case of the input\n" <<
     "                          characters\n" <<
     "  -w  --dictionary-case   Output results using dictionary case instead of\n" <<
@@ -176,6 +179,8 @@ int main(int argc, char **argv)
       {"do-compounds",   no_argument,       0, 'e'},
       {"show-weights",   no_argument,       0, 'W'},
       {"analyses",       required_argument, 0, 'N'},
+      // -l is probably too error prone to document
+      {"weight-classes", required_argument, 0, 'l'}, 
       {"case-sensitive", no_argument,       0, 'c'},
       {"dictionary-case",no_argument,       0, 'w'},
       {"null-flush",     no_argument,       0, 'z'},
@@ -184,7 +189,7 @@ int main(int argc, char **argv)
     };
     
     int option_index = 0;
-    int c = getopt_long(argc, argv, "hVvqsagndtpxCkeWN:cwzX", long_options, &option_index);
+    int c = getopt_long(argc, argv, "hVvqsagndtpxCkeWNw:cwzX", long_options, &option_index);
 
     if (c == -1) // no more options to look at
       break;
@@ -263,6 +268,15 @@ int main(int argc, char **argv)
       if (maxAnalyses < 1)
         {
           std::cerr << "Invalid or no argument for analyses count\n";
+          return EXIT_FAILURE;
+        }
+      break;
+    
+    case 'l':
+      maxWeightClasses = atoi(optarg);
+      if (maxWeightClasses < 1)
+        {
+          std::cerr << "Invalid or no argument for weight class count\n";
           return EXIT_FAILURE;
         }
       break;
