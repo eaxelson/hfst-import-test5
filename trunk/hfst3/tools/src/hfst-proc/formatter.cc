@@ -222,12 +222,17 @@ CGOutputFormatter::process_final(const SymbolNumberVector& symbols, Capitalizati
         for(size_t i=tag_start; i<symbols.size(); i++)
         {
           std::string tag = token_stream.get_alphabet().symbol_to_string(symbols[i]);
-          // remove the < and >
+          // remove the < and > around Apertium tags
           if(tag.size() > 0 && tag[0] == '<')
           {
             tag = tag.substr(1);
             if(tag.size() > 0 && tag[tag.length()-1] == '>')
               tag = tag.substr(0,tag.length()-1);
+          }
+          // remove the + in front of GT/Divvun tags:
+          if(tag.size() > 0 && tag[0] == '+')
+          {
+            tag = tag.substr(1);
           }
           
           res << (i==tag_start?"\t":" ") << tag;
