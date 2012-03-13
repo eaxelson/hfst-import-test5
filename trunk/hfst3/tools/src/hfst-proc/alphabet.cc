@@ -637,6 +637,11 @@ ProcTransducerAlphabet::is_tag(SymbolNumber symbol) const
   std::string str = symbol_to_string(symbol);
   if(str[0] == '<' && str[str.length()-1] == '>')
     return true;
+  // Added a test for GT-style tags, ie tags starting with + and ending with
+  // a non-plus: This might break Apertium! Actually, the tag test should depend
+  // on the output format, but I don't know how to do that
+  if(str[0] == '+' && str.length() > 1)
+    return true;
   return false;
 }
 
