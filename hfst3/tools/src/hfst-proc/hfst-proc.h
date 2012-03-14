@@ -52,6 +52,7 @@ extern int maxAnalyses;
 extern int maxWeightClasses;
 extern bool preserveDiacriticRepresentationsFlag;
 extern bool processCompounds;
+extern bool displayRawAnalysisInCG;
 
 // the following flags are only meaningful with certain debugging #defines
 extern bool printDebuggingInformationFlag;

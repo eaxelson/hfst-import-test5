@@ -29,6 +29,7 @@ bool preserveDiacriticRepresentationsFlag = false;
 bool printDebuggingInformationFlag = false;
 bool processCompounds = false;
 bool rawMode = false;
+bool displayRawAnalysisInCG = false;
 
 static bool handle_hfst3_header(std::istream& is)
 {
@@ -110,6 +111,7 @@ bool print_usage(void)
     "  -k, --keep-compounds    Retain compound analyses even when analyses with fewer\n" <<
     "                          compound-boundaries are available\n" <<
     "  -W, --show-weights      Print final analysis weights (if any)\n" <<
+    "  -r, --show-raw-in-cg    Print the raw analysis string as sub-reading in CG output\n" <<
     "  -N N, --analyses=N      Output no more than N analyses\n" <<
     "                          (if the transducer is weighted, the N best analyses)\n" <<
     "  --weight-classes N      Output no more than N best weight classes\n" <<
@@ -178,6 +180,7 @@ int main(int argc, char **argv)
       {"keep-compounds", no_argument,       0, 'k'},
       {"do-compounds",   no_argument,       0, 'e'},
       {"show-weights",   no_argument,       0, 'W'},
+      {"show-raw-in-cg", no_argument,       0, 'r'},
       {"analyses",       required_argument, 0, 'N'},
       // -l is probably too error prone to document
       {"weight-classes", required_argument, 0, 'l'}, 
@@ -189,7 +192,7 @@ int main(int argc, char **argv)
     };
     
     int option_index = 0;
-    int c = getopt_long(argc, argv, "hVvqsagndtpxCkeWNl:cwzX", long_options, &option_index);
+    int c = getopt_long(argc, argv, "hVvqsagndtpxCkeWrNl:cwzX", long_options, &option_index);
 
     if (c == -1) // no more options to look at
       break;
@@ -261,6 +264,10 @@ int main(int argc, char **argv)
       
     case 'W':
       displayWeightsFlag = true;
+      break;
+      
+    case 'r':
+      displayRawAnalysisInCG = true;
       break;
       
     case 'N':
