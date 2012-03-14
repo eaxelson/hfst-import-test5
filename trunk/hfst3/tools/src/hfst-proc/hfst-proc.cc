@@ -192,7 +192,7 @@ int main(int argc, char **argv)
     };
     
     int option_index = 0;
-    int c = getopt_long(argc, argv, "hVvqsagndtpxCkeWrNl:cwzX", long_options, &option_index);
+    int c = getopt_long(argc, argv, "hVvqsagndtpxCkeWrN:l:cwzX", long_options, &option_index);
 
     if (c == -1) // no more options to look at
       break;
