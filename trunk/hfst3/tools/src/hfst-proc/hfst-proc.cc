@@ -288,9 +288,10 @@ int main(int argc, char **argv)
         }
       break;
     
-    case 'c':
     case 'e': 
       processCompounds = true;
+      break;
+    case 'c':
     case 'w':
     case 'X':
       if(capitalization==0)
