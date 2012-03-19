@@ -313,8 +313,7 @@ results/en/table1.dict-norvig.errm-ed2.corp-wiki.generate-all.tex: corp/en/enwik
 	echo > $@.time
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
 		while read line; do \
-			/usr/bin/time -a -o time echo $line | hfst-optimized-lookup hfst/en/errormodel.edit-distance-2.hfst | cut -f 2 | hfst-optimized-lookup hfst/en/norvig.hfst > /dev/null ; \
-		done \
+			/usr/bin/time -a -o time echo $line | hfst-optimized-lookup hfst/en/errormodel.edit-distance-2.hfst | cut -f 2 | hfst-optimized-lookup hfst/en/norvig.hfst > /dev/null ; done < corp/en/enwiki.words \
 	done
 # postprocessing step goes here
 
