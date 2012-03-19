@@ -8,6 +8,8 @@ from transducer import TransducerW
 
 class OlTransducer:
     def __init__(self, filename):
+        '''Read a transducer from filename
+        '''
         handle = open(filename, "rb")
         self.header = Header(handle)
         self.alphabet = Alphabet(handle, self.header.number_of_symbols)
@@ -16,7 +18,9 @@ class OlTransducer:
         else:
             self.transducer = Transducer(handle, self.header, self.alphabet)
         handle.close()
-    def analyse(string):
+    def analyse(self, string):
+        '''Take string to analyse, return a vector of (string, weight) pairs.
+        '''
         if transducer.analyze(string):
             return transducer.displayVector
         else:

@@ -1,13 +1,43 @@
-hfst-optimized-lookup-python: use a fast morphological transducer to
-analyze words.
+hfst-optimized-lookup-python: perform lookup on a fast transducer format
 
-You need the python interpreter, a transducer in a special fast-lookup format
-(made with separate hfst tools) and this package.
+This package performs transducer lookup (transformation) on a specialised
+file format. The format is fast, but this Python implementation is not
+very fast.
 
-To run, type 
+INSTALLATION
 
-	./hfst-optimized-lookup [name of transducer]
+You can either install the package or just it in the directory it comes in.
+To install, use the standard setup.py. See
+
+   	python setup.py --help
+
+
+You probably just want (as root)
+
+        python setup.py install
+
+You'll need Python's setuptools to be installed for this to work.
+
+RUNNING
+
+You need the Python interpreter (2.7.x), a transducer in a special
+fast-lookup format (made with separate hfst tools) and this package.
+
+The commandline and utility are both provided by hfst_lookup.py. To run the
+lookup utility, type 
+
+	./hfst_lookup.py [name of transducer]
 
 or
 
-	python hfst-optimized-lookup.py [name of transducer]
+	python hfst_lookup.py [name of transducer]
+
+If you load hfst_lookup as a module, you can use the class OlTransducer
+from it to load and run transducers, like so:
+
+my_transducer = OlTransducer(filename)
+for result in my_transducer.analyse(string_to_analyse):
+    print result
+
+The results are (string, weight) pairs (Unicode strings and floating point
+numbers).
