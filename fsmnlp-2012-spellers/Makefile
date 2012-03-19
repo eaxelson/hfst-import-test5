@@ -297,13 +297,10 @@ hfst/kl/errmodel.edit-distance-3-no-initial-no-redundant.hfst: hfst/kl/kl.hfst
 		hfst-fst2fst -v -f olw -o $@
 
 
-### FILL errmodels REST HERE (Sam?)
-
 # (re)generate results in neat tables
 # combine all bits and pieces for table 1:
 results/table1.tex: results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex #results/fi/table1.dict-omorfi.errm-ed1.corp-wiki.tex results/kl/table1.dict-kl.errm-ed1.corp-wiki.tex
 	paste $^ > $@
-
 
 results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex: corp/en/enwiki.words
 	echo > $@.tsv
@@ -311,6 +308,16 @@ results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex: corp/en/enwiki.words
 		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-1.hfst hfst/en/norvig.hfst < corp/en/enwiki.words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/en/table1.dict-norvig.errm-ed2.corp-wiki.generate-all.tex: corp/en/enwiki.words
+	echo > $@.time
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		while read line; do \
+			/usr/bin/time -a -o time echo $line | hfst-optimized-lookup hfst/en/errormodel.edit-distance-2.hfst | cut -f 2 | hfst-optimized-lookup hfst/en/norvig.hfst > /dev/null ; \
+		done \
+	done
+# postprocessing step goes here
+
 
 results/en/table2.dict-norvig.errm-ed1.corp-wiki.tex: corp/en/enwiki.words $@.tsv
 	echo > $@.tsv
