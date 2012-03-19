@@ -149,7 +149,7 @@ class Transducer:
             if x == NO_SYMBOL_NUMBER:
                 break
             output += self.alphabet.keyTable[x]
-        self.displayVector.append(output)
+        self.displayVector.append((output, 0.0))
 
     def analyze(self, string):
         self.outputString = Indexlist([NO_SYMBOL_NUMBER])
@@ -168,7 +168,7 @@ class Transducer:
 
     def printAnalyses(self):
         for x in self.displayVector:
-            print '\t' + x.encode("utf-8")
+            print '\t' + x[0].encode("utf-8") + '\t' + str(x[1])
 
 class TransducerW(Transducer):
 
@@ -285,4 +285,4 @@ class TransducerW(Transducer):
             if x == NO_SYMBOL_NUMBER:
                 break
             output += self.alphabet.keyTable[x]
-        self.displayVector.append(output + '\t' + str(self.current_weight))
+        self.displayVector.append((output, self.current_weight))
