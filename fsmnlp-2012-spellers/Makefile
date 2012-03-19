@@ -58,7 +58,7 @@ corp/kl/klwiki-20120214-pages-articles.xml:
 	$(BZCAT) klwiki-20120214-pages-articles.xml.bz2 > $@
 
 # corpora preprocessing (ugly fixme plz)
-corp/en/enwiki.words: corp/en/enwiki-20120211-pages-articles.10000000.xml
+corp/en/enwiki.words: corp/en/enwiki-20120211-pages-articles.10000000.xml wikipedia-deform.sh
 	awk '/<text/,/<\/text/ {print}' < $< |\
 		./wikipedia-deform.sh |\
 		tr -s ' ' '\n' > $@
@@ -309,12 +309,13 @@ results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex: corp/en/enwiki.words
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
-results/en/table1.dict-norvig.errm-ed2.corp-wiki.generate-all.tex: corp/en/enwiki.words
+results/en/table1.dict-norvig.errm-ed1.corp-wiki.generate-all.tex: corp/en/enwiki.words
 	echo > $@.time
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		/usr/bin/time -a -o $@.time while read line; do \
-			echo $line | hfst-optimized-lookup hfst/en/errormodel.edit-distance-2.hfst | cut -f 2 | hfst-optimized-lookup hfst/en/norvig.hfst > /dev/null ; done < corp/en/enwiki.words \
-	done
+		/usr/bin/time -a -o $@.time hfst-optimized-lookup \
+		hfst/en/errmodel.edit-distance-1.hfst < corp/en/enwiki.words \
+		| cut -f 2  | hfst-optimized-lookup \
+		hfst/en/errmodel.edit-distance-1.hfst > /dev/null ; done
 # postprocessing step goes here
 
 
