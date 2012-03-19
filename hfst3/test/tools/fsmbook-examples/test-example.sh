@@ -45,7 +45,7 @@ fi
 # For all HFST implementation types,
   for i in sfst openfst-tropical foma; do
 
-    # echo "Testing" $i "..."
+    echo "Testing" $i "..."
     if ! ($3/hfst-format --test-format $i); then
 	continue;
     fi
@@ -56,6 +56,7 @@ fi
     $3/hfst-fst2fst -f openfst-tropical $2.hfst.hfst > TMP
   # and compare it with the expected result.
     if ! ( $3/hfst-compare -q TMP $2.xfst.hfst ); then
+	echo "The result is incorrect!"
 	exit 1;
     fi
 
