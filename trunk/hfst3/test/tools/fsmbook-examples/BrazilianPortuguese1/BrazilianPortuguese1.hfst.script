@@ -1,15 +1,12 @@
-FORMAT=TRANSDUCER_FORMAT
-
 echo "[ a | e | i | o | u " \
      "| á | é | í | ó | ú " \
      "| â | ê |     ô     " \
      "| ã |         õ     " \
      "| à                 " \
      "|                 ü " \
-     "]" | hfst-regexp2fst -f $FORMAT > Vowel
+     "]" | hfst-regexp2fst -f $1 > Vowel
 
-echo "[?]" | hfst-regexp2fst -f $FORMAT > Solution
-
+echo "[?]" | hfst-regexp2fst -f $1 > Solution
 for i in \
   '[ s -> z || @"Vowel" _ @"Vowel" ]' \
   "[ ç -> s ]" \
@@ -28,9 +25,9 @@ for i in \
   "[ t -> C || _ [ i | ì ] ]" \
   "[ z -> s || _ .#. ]"; 
 do
-  echo $i | hfst-regexp2fst -f $FORMAT | hfst-compose -1 Solution > TMP;
+  echo $i | hfst-regexp2fst -f $1 | hfst-compose -1 Solution > TMP;
   mv TMP Solution;
 done
 
-mv Solution BrazilianPortuguese.hfst.hfst
+mv Solution BrazilianPortuguese1.hfst.hfst
 
