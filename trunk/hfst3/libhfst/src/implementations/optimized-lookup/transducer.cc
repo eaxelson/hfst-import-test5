@@ -24,27 +24,44 @@ bool should_ascii_tokenize(unsigned char c)
 TransducerAlphabet::TransducerAlphabet(std::istream& is,
                        SymbolNumber symbol_count)
 {
+    unknown_symbol = NO_SYMBOL_NUMBER;
     for(SymbolNumber i=0; i<symbol_count; i++)
     {
     std::string str;
     std::getline(is, str, '\0');
     symbol_table.push_back(str.c_str());
-    if(hfst::FdOperation::is_diacritic(str))
+    if(hfst::FdOperation::is_diacritic(str)) {
         fd_table.define_diacritic(i, str);
+    } else if (hfst::is_unknown(str)) {
+        unknown_symbol = i;
     }
     if(!is) {
       HFST_THROW(TransducerHasWrongTypeException);
+    }
     }
 }
 
 TransducerAlphabet::TransducerAlphabet(const SymbolTable& st):
     symbol_table(st)
 {
+    unknown_symbol = NO_SYMBOL_NUMBER;
     for(SymbolNumber i=0; i<symbol_table.size(); i++)
     {
-    if(hfst::FdOperation::is_diacritic(symbol_table[i]))
-        fd_table.define_diacritic(i, symbol_table[i]);
+        if(hfst::FdOperation::is_diacritic(symbol_table[i])) {
+            fd_table.define_diacritic(i, symbol_table[i]);
+        } else if (hfst::is_unknown(symbol_table[i])) {
+            unknown_symbol = i;
+        }
     }
+}
+
+StringSymbolMap TransducerAlphabet::build_string_symbol_map(void) const
+{
+    StringSymbolMap ss_map;
+    for(SymbolNumber i = 0; i < symbol_table.size(); ++i) {
+        ss_map[symbol_table[i]] = i;
+    }
+    return ss_map;
 }
 
 void TransducerAlphabet::display() const
@@ -651,6 +668,80 @@ TransitionTableIndexSet Transducer::get_transitions_from_state(
     }
     return transitions;
 }
+
+TransitionTableIndex Transducer::next(const TransitionTableIndex i,
+				      const SymbolNumber symbol) const
+{
+    if (i >= TRANSITION_TARGET_TABLE_START) {
+	return i - TRANSITION_TARGET_TABLE_START + 1;
+    } else {
+	return get_index(i+1+symbol).get_target() - TRANSITION_TARGET_TABLE_START;
+    }
+}
+
+bool Transducer::has_transitions(const TransitionTableIndex i,
+				 const SymbolNumber symbol) const
+{
+    if (i >= TRANSITION_TARGET_TABLE_START) {
+	return (get_transition(i - TRANSITION_TARGET_TABLE_START).get_input_symbol() == symbol);
+    } else {
+	return (get_index(i+symbol).get_input_symbol() == symbol);
+    }
+}
+
+bool Transducer::has_epsilons_or_flags(const TransitionTableIndex i)
+{
+    if (i >= TRANSITION_TARGET_TABLE_START) {
+	return(get_transition(i - TRANSITION_TARGET_TABLE_START)
+               .get_input_symbol() == 0 ||
+	       is_flag(get_transition(i - TRANSITION_TARGET_TABLE_START)
+                       .get_input_symbol()));
+    } else {
+	return (get_index(i).get_input_symbol() == 0);
+    }
+}
+
+STransition Transducer::take_epsilons(const TransitionTableIndex i) const
+{
+    if (get_transition(i).get_input_symbol() != 0) {
+	return STransition(0, NO_SYMBOL_NUMBER);
+    }
+    return STransition(get_transition(i).get_target(),
+		       get_transition(i).get_output_symbol(),
+		       get_transition(i).get_weight());
+}
+
+STransition Transducer::take_epsilons_and_flags(const TransitionTableIndex i)
+{
+    if (get_transition(i).get_input_symbol() != 0&&
+	!is_flag(get_transition(i).get_input_symbol())) {
+	return STransition(0, NO_SYMBOL_NUMBER);
+    }
+    return STransition(get_transition(i).get_target(),
+		       get_transition(i).get_output_symbol(),
+		       get_transition(i).get_weight());
+}
+
+STransition Transducer::take_non_epsilons(const TransitionTableIndex i,
+					  const SymbolNumber symbol) const
+{
+    if (get_transition(i).get_input_symbol() != symbol) {
+	return STransition(0, NO_SYMBOL_NUMBER);
+    }
+    return STransition(get_transition(i).get_target(),
+		       get_transition(i).get_output_symbol(),
+		       get_transition(i).get_weight());
+}
+
+Weight Transducer::final_weight(const TransitionTableIndex i) const
+{
+    if (i >= TRANSITION_TARGET_TABLE_START) {
+	return get_transition(i - TRANSITION_TARGET_TABLE_START).get_weight();
+    } else {
+	return get_index(i).final_weight();
+    }
+}
+
 
 }
 
