@@ -1,8 +1,8 @@
 "<test>"
-	"test+n"
+	"test"	n
 "<Test>"
-	"Test+np"
-	"test+nlp"
+	"Test"	np
+	"test"	nlp
 "<TEST>"
 	"*TEST"
 "<TeSt>"
