@@ -1,3 +1,201 @@
+2012-03-26 13:36  eaxelson
+
+	* man/hfst-calculate.1, man/hfst-fst2fst.1, man/hfst-regexp2fst.1,
+	  man/hfst-strings2fst.1, man/hfst-txt2fst.1,
+	  tools/src/hfst-compiler.yy, tools/src/hfst-format.cc,
+	  tools/src/hfst-fst2fst.cc, tools/src/hfst-regexp2fst.cc,
+	  tools/src/hfst-strings2fst.cc, tools/src/hfst-txt2fst.cc: Fixed
+	  help messages of tools.
+
+2012-03-26 10:16  eaxelson
+
+	* tools/src/hfst-lexc.cc: Changed hfst-lexc so that the
+	  implementation format defaults to openfst-tropical.
+
+2012-03-21 18:14  hardwick
+
+	* test/tools/proc-caps-out5.strings: Changed expected output to
+	  reflect current cg printing
+
+2012-03-20 11:00  hardwick
+
+	* libhfst/src/implementations/Makefile.am,
+	  libhfst/src/implementations/optimized-lookup/ospell.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.cc,
+	  libhfst/src/implementations/optimized-lookup/transducer.h:
+	  Integrate ospell, first commit
+
+2012-03-19 15:02  sdrobac
+
+	* test/tools/fsmbook-examples/Makefile.am: updated so that tests
+	  don't fail
+
+2012-03-19 14:38  sdrobac
+
+	* test/tools/fsmbook-examples/BrazilianPortuguese1/BrazilianPortuguese.hfst.script,
+	  test/tools/fsmbook-examples/BrazilianPortuguese1/BrazilianPortuguese.xfst.att,
+	  test/tools/fsmbook-examples/BrazilianPortuguese1/BrazilianPortuguese.xfst.script,
+	  test/tools/fsmbook-examples/BrazilianPortuguese1/BrazilianPortuguese1.hfst.script,
+	  test/tools/fsmbook-examples/BrazilianPortuguese1/BrazilianPortuguese1.xfst.att,
+	  test/tools/fsmbook-examples/BrazilianPortuguese1/BrazilianPortuguese1.xfst.script,
+	  test/tools/fsmbook-examples/BrazilianPortuguese1/Makefile.am,
+	  test/tools/fsmbook-examples/BrazilianPortuguese1/test.script,
+	  test/tools/fsmbook-examples/Makefile.am,
+	  test/tools/fsmbook-examples/test-example.sh: updated one fsmbook
+	  example, still not working properly
+
+2012-03-15 17:59  moshagen
+
+	* tools/src/hfst-proc/formatter.cc: Double greek PI met opposition
+	  in #apertium, hereby changed to double dagger instead (‡). It is
+	  still open whether the raw analysis string should end up in this
+	  position at all.
+
+2012-03-15 09:34  moshagen
+
+	* tools/src/hfst-proc/hfst-proc.cc: Fixed a bug in command-line
+	  option parsing, where -e conflicted with all case-handling
+	  options.
+
+2012-03-14 10:54  hardwick
+
+	* tools/src/hfst-proc/hfst-proc.cc: Fixed bug wrt option counting
+
+2012-03-14 09:02  moshagen
+
+	* tools/src/hfst-proc/formatter.cc,
+	  tools/src/hfst-proc/hfst-proc.cc,
+	  tools/src/hfst-proc/hfst-proc.h: Added a new option to turn on
+	  printing of raw analysis string in CG format output. Default is
+	  to not print it.
+
+2012-03-13 23:51  moshagen
+
+	* tools/src/hfst-proc/formatter.cc: Replaced triple ] (]]]) with
+	  double ∏ (∏∏ - capital greek PI) as the CG sub-reading separator.
+	  It turned out that inserting +]]] into the transducer was not
+	  working very well.
+
+2012-03-13 23:21  moshagen
+
+	* tools/src/hfst-proc/formatter.cc: Deleting the + char in front of
+	  GT/Divvun tags for the CG output. Also, there is no problem with
+	  printing the raw analysis string, all is fine (contrary to what I
+	  said in my previous commit). This tool is now pretty close to
+	  what we need in the Divvun work :)
+
+2012-03-13 23:00  moshagen
+
+	* tools/src/hfst-proc/formatter.cc: Experimenting with the CG
+	  output mode. Using the -C option, the output will now include the
+	  original lemma+tags string, including all tags within compounds
+	  etc. It is printed before the CG-formatted tag list, and
+	  separated with ]]] (suggested CG sub-reading separator). For some
+	  reason, the tags have lost their initial + sign at this point, so
+	  the result is pretty ugly and unusable. I don't know why or where
+	  - feedback appreciated.
+
+2012-03-13 17:06  hardwick
+
+	* tools/src/hfst-proc/formatter.cc: Make sure the outputs are
+	  sorted before filtering and printing
+
+2012-03-13 16:40  hardwick
+
+	* tools/src/hfst-proc/hfst-proc.cc: Corrected key string for
+	  getopt_long
+
+2012-03-13 16:39  hardwick
+
+	* tools/src/hfst-proc/lookup-path.cc: Corrected condition in
+	  LookupPathW::operator< (or at least made it more understandable)
+
+2012-03-13 15:34  hardwick
+
+	* tools/src/hfst-proc/formatter.cc: Correct terminating condition
+
+2012-03-13 15:31  hardwick
+
+	* tools/src/hfst-proc/formatter.cc: Stop before end of output
+	  iterator
+
+2012-03-13 15:20  hardwick
+
+	* tools/src/hfst-proc/formatter.cc: Clarified comment
+
+2012-03-13 15:19  hardwick
+
+	* tools/src/hfst-proc/formatter.cc,
+	  tools/src/hfst-proc/hfst-proc.cc,
+	  tools/src/hfst-proc/hfst-proc.h: Added an option to only print
+	  analyses belonging to N equal-weight classes
+
+2012-03-13 14:42  hardwick
+
+	* tools/src/hfst-proc/hfst-proc.cc: Typo in error message
+
+2012-03-13 10:46  moshagen
+
+	* tools/src/hfst-proc/alphabet.cc: Adding identification and
+	  processing of GT-style tags beginning with +. When formatting for
+	  CG output, this is important, otherwise the output is more or
+	  less useless. This change should probably be enhanced with tests
+	  for the requested output format, so that it does not contaminate
+	  the Apertium analyser. Please have a look.
+
+2012-03-12 20:47  hardwick
+
+	* tools/src/hfst-proc/alphabet.cc: indentation
+
+2012-03-12 20:35  moshagen
+
+	* tools/src/hfst-proc/alphabet.cc,
+	  tools/src/hfst-proc/hfst-proc.cc,
+	  tools/src/hfst-proc/hfst-proc.h: Added a quietFlag variable,
+	  which makes the -s/-q flags actually useful. Using either -s or
+	  -q the warning "Warning: Transducer contains one or more
+	  multi-character symbols made up of ASCII characters which are
+	  also available as single-character symbols." will be suppressed.
+	  There might be other output that should also be suppressed, but
+	  that is not implemented yet.
+
+2012-03-12 17:25  moshagen
+
+	* tools/src/hfst-compose-intersect.cc: Removed "e.g." to avoid
+	  ambiguity in the interpretation of the output.
+
+2012-03-08 16:56  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/HfstXeroxRules.h,
+	  libhfst/src/parsers/xre_lex.ll: Boundary mark in contexts is
+	  beeing handled now.
+
+2012-03-08 15:56  sdrobac
+
+	* libhfst/src/parsers/xre_parse.yy, tools/src/hfst-regexp2fst.cc:
+	  Xfst rules parser should be working now
+
+2012-03-07 14:25  sdrobac
+
+	* libhfst/src/HfstXeroxRules.cc, libhfst/src/parsers/xre_lex.ll,
+	  libhfst/src/parsers/xre_parse.yy,
+	  libhfst/src/parsers/xre_utils.cc, tools/src/hfst-regexp2fst.cc:
+	  regexp updated, precedance seems to be fine now, but parallel
+	  rules with one comma and context still don't work.
+
+2012-03-07 13:49  eaxelson
+
+	* libhfst/src/implementations/FomaTransducer.cc:
+	  FomaTransducer::extract_paths bug fixed, now it does not produces
+	  duplicate paths.
+
+2012-03-06 17:04  eaxelson
+
+	* ChangeLog, ChangeLog.old, NEWS, configure.ac,
+	  libhfst/src/Makefile.am,
+	  libhfst/src/implementations/TropicalWeightTransducer.cc: Ready
+	  for release 3.3.8.
+
 2012-03-06 11:28  hardwick
 
 	* tools/src/hfst-summarize.cc: Add expected arcs per symbol
