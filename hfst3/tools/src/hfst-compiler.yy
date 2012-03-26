@@ -286,7 +286,7 @@ print_usage()
         fprintf(message_out, 
             "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
             "FMT must be one of the following: "
-            "{openfst-tropical, openfst-log, sfst, foma}\n"
+            "{foma, sfst, openfst-tropical, openfst-log}\n"
             );
         fprintf(message_out, "\n");
         fprintf(message_out, "Examples:\n"
@@ -294,7 +294,8 @@ print_usage()
 	    "    create a foma transducer accepting any number of consecutive\n"
 	    "    characters between a and z, inclusive\n"
 	    "\n"
-            "  echo \"a:b (a:<>)+\" > ab.sfst-pl ; %s -f openfst-tropical -i ab.sfst-pl -o ab.tropical\n"
+            "  echo \"a:b (a:<>)+\" > ab.sfst-pl ; %s -f openfst-tropical \\\n"
+	    "   -i ab.sfst-pl -o ab.tropical\n"
 	    "    create a tropical OpenFst transducer that accepts two or more\n"
 	    "    consecutive 'a's and maps them into string \"b\"\n"
              "\n", program_name, program_name);

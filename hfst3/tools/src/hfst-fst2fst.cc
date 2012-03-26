@@ -76,7 +76,7 @@ print_usage()
     print_common_unary_program_parameter_instructions(message_out);
         fprintf(message_out, 
             "FMT must be name of a format usable by libhfst, i.e. one of the following:\n"
-        "{ openfst-tropical, openfst-log, sfst, foma,\n"
+        "{ foma, openfst-tropical, openfst-log, sfst,\n"
         "  optimized-lookup-weighted, optimized-lookup-unweighted }.\n");
     fprintf(message_out, "\n");
     print_report_bugs();
