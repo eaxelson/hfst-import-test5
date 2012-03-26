@@ -1,4 +1,4 @@
-\documentclass[a4paper]{article}
+\documentclass[10pt,a4paper]{article}
 \usepackage{lrec2006}
 \usepackage{url}
 \usepackage{times}
@@ -6,28 +6,31 @@
 \usepackage[small,bf]{caption}
 \usepackage{xltxtra}
 
+% lrec2006 seems borked so here's the margins again:
+\usepackage[margin=1.9cm,top=2.5cm]{geometry}
+
 %\setlength\titlebox{6.5cm}    % You can expand the title box if you
 % really have to
 
 \title{Compiling Apertium morphological dictionaries with HFST and using them
 in HFST applications}
 
-%\author{Tommi A Pirinen, Francis M. Tyers}
-%\address{University of Helsinki,
-% Universitat d'Alacant\\
-% FI-00014 University of Helsinki Finland,
-% E-03071 Alacant Spain \\
-%  \url{tommi.pirinen@helsinki.fi}, \url{ftyers@dlsi.ua.es}\\}
+\name{Tommi A Pirinen, Francis M. Tyers}
+\address{University of Helsinki,
+ Universitat d'Alacant\\
+ FI-00014 University of Helsinki Finland,
+ E-03071 Alacant Spain \\
+\url{tommi.pirinen@helsinki.fi}, \url{ftyers@dlsi.ua.es}\\}
 
 \date{\today}
 
 \abstract{
-  In this paper we aim to improve interoperability and re-usability of the
-  morphological dictionaries of Apertium machine translation system by
-  formulating a generic finite-state compilation formula that is implemented in
-  in HFST finite-state system to compile Apertium dictionaries into general
-  purpose finite-state automata. We demonstrate using of the resulting automaton
-  in FST-based spell-checking system.\\
+In this paper we aim to improve interoperability and re-usability of the
+morphological dictionaries of Apertium machine translation system by
+formulating a generic finite-state compilation formula that is implemented in
+HFST finite-state system to compile Apertium dictionaries into general purpose
+finite-state automata. We demonstrate the use of the resulting automaton in
+FST-based spell-checking system.\\
 \Keywords{finite-state, dictionary, spell-checking}
 }
 
@@ -44,10 +47,10 @@ effective for parsing running text. This format is also used when running
 morphological dictionaries in machine-translation system
 Apertium~\cite{Apertium/2011}\footnote{\url{http://www.apertium.org}}. In this
 paper we propose a generic compilation formula  to compile the
-dictionaries into weighted finite-state automata with for use with any FST 
+dictionaries into weighted finite state automata for use with any FST 
 tool or application.  We implement this system using a free/libre
 open source finite-state API
-HFST~\cite{hfst/2011}\footnote{\url{http://hfst.sf.net}}. HFST is general
+HFST~\cite{hfst/2011}\footnote{\url{http://hfst.sf.net}}. HFST is a general
 purpose programming interface utilising a selection of freely-available
 finite-state libraries for the handling of finite-state automata.
 
@@ -68,7 +71,7 @@ the Apertium dictionary repository and the specific dictionaries we use to
 evaluate our systems. In section~\ref{sec:evaluation} we evaluate speed and
 memory usage of compilation and application of our formula against Apertium's
 own system and show that our system has roughly same coverage and explain
-where the differences arise from.
+the differences arise from.
 
 \section{Methods}
 \label{sec:methods}
@@ -149,24 +152,25 @@ form.
 
 \subsection{Creating a Spell-Checker Automatically}
 
-To create a finite-state spell-checker we need two automata, one for the language
-model, for which the dictionary compiled as described earlier will do, and one for the
-error model~\cite{pirinen/2010/lrec}. A classic baseline error model is based
-on the edit distance algorithm~\cite{levenshtein/1966,damerau/1964}, that
-defines typing errors of four types: pressing extra key (insertion), not
-pressing a key (deletion), pressing wrong key (change) and pressing two keys in
-wrong order (swap). There have been many finite-state formulations of this, we
-use the one defined in~\cite{schulz/2002,pirinen/2010/lrec}. The basic version
-of this where the typing errors of each sort have equal likelihood for each
-letters can be induced from the compiled language model, and this is what we
-use in this paper. The induction of this model is relatively straightforward;
-when compiling the automaton, save each unique UTF-8 codepoint found in the
+To create a finite-state spell-checker we need two automata, one for the
+language model, for which the dictionary compiled as described earlier will do,
+and one for the error model~\cite{pirinen/2010/lrec}. A classic baseline error
+model is based on the edit distance
+algorithm~\cite{levenshtein/1966,damerau/1964}, that defines typing errors of
+four types: pressing extra key (insertion), not pressing a key (deletion),
+pressing wrong key (change) and pressing two keys in wrong order (swap). There
+have been many finite-state formulations of this, we use the one defined
+in~\cite{schulz/2002,pirinen/2010/lrec}. The basic version of this where the
+typing errors of each sort have equal likelihood for each letters can be
+induced from the compiled language model, and this is what we use in this
+paper. The induction of this model is relatively straightforward; when
+compiling the automaton, save each unique UTF-8 codepoint found in the
 morphs\footnote{The description format of Apertium requires declaration of
-exemplar character set as well, but as this is only used in the tokenisation algorithm \cite{garrido-alenda02}
-, which is not going to be used, we induce the set from the morphs}. For each 
-character generate the identities in
-start and end state to model correctly typed runs. For each of the error types
-the generate one arc from initial state to the end state modelling that error,
+exemplar character set as well, but as this is only used in the tokenisation
+algorithm \cite{garrido-alenda02} , which is not going to be used, we induce
+the set from the morphs}. For each character generate the identities in start
+and end state to model correctly typed runs. For each of the error types the
+generate one arc from initial state to the end state modelling that error,
 except for swap which it requires one auxiliary state for each character pair.
 
 \section{Materials}
@@ -183,14 +187,15 @@ into a spell-checker\footnote{We also provide a Makefile script to
 recreate results of this article for any language in Apertium's repository}.
 
 To evaluate the use of resulting morphological dictionaries and spell-checkers
-we use following Wikipedia database 
-dumps\footnote{\url{http://download.wikipedia.org/}}: 
-\texttt{euwiki-20120219-pages-articles.xml.bz2}, 
-\texttt{nnwiki-20120215-pages-articles.xml.bz2},
-and \texttt{gvwiki-20120215-pages-articles.xml.bz2}. For the purpose of this
+we use following Wikipedia database
+dumps\footnote{\url{http://download.wikipedia.org/}}:
+\texttt{euwiki-20120219-pages-articles.xml.bz2},
+\texttt{nnwiki-20120215-pages-articles.xml.bz2}, and
+\texttt{gvwiki-20120215-pages-articles.xml.bz2}. For the purpose of this
 article we performed very crude cleanup and preprocessing to wikipedia data
 picking up the text elements of the article and discarding most of wikipedia
-markup naïvely\footnote{For details see the script in .}.
+markup naïvely\footnote{For details see the script in
+\url{http://hfst.svn.sourceforge.net/viewvc/hfst/trunk/lrec-2011-apertium/}.}.
 
 \section{Test Setting and Evaluation}
 \label{sec:evaluation}
@@ -227,7 +232,7 @@ markup naïvely\footnote{For details see the script in .}.
 
 To get one view on differences made by generic compilation formula instead of
 direct automata building used by apertium we look at the created automata, this
-will also give us rough idea of what its efficiency might be. In
+will also give us a rough idea of what its efficiency might be. In
 table~\ref{table:graph-size} we give the counts of nodes and edges, in that
 order, in the graphs compiled from the dictionaries. Note, that in case
 of Apertium it is the sum of all the separate automata states and edges that
@@ -352,6 +357,13 @@ Manx         &  4,700 \\
 \end{center}
 \end{table}
 
+\section{Conclusions}
+\label{sec:conclusions}
+
+In this article we have shown a general formula to compile morphological
+dictionaries from machine-translation system Apertium in generic FST system of
+HFST and using the result in HFST-based application of spell-checking.
+
 \section{Future Work}
 \label{sec:future}
 
@@ -370,15 +382,10 @@ development in this direction should aim for interoperable formalisms, formats
 and mechanisms for language models and end applications of all relevant
 language technology tools.
 
-\section{Conclusions}
-\label{sec:conclusions}
+\section*{Acknowledgements}
 
-In this article we have shown a general formula to compile morphological
-dictionaries from machine-translation system Apertium in generic FST system of
-HFST and using the result in HFST-based application of spell-checking.
-
-%\section*{Acknowledgements}
-
+We thank the HFST and apertium contributors for fruitful Internet relayed chats,
+and the two anonymous reviewers for good suggestions.
 
 \bibliographystyle{lrec2006}
 \bibliography{lrec2011}
