@@ -5,6 +5,19 @@
 This file contains all noteworthy changes in HFST development between releases.
 For full listing of changes see ChangeLog.
 
+Noteworthy changes in 3.3.9
+---------------------------
+
+* Bugs fixed and new features added to hfst-proc
+
+* Xfst rules tentatively supported in hfst-regexp2fst
+
+* hfst-fst2strings does not produce duplicate paths any more 
+  when using foma as backend
+
+* hfst-lexc implementation format defaults to openfst-tropical
+  instead of foma
+
 Noteworthy changes in 3.3.8
 ---------------------------
 
