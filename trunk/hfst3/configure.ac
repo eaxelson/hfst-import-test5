@@ -19,16 +19,16 @@
 HFST_NAME=hfst
 HFST_MAJOR=3
 HFST_MINOR=3
-HFST_EXTENSION=8
+HFST_EXTENSION=9
 HFST_VERSION=$HFST_MAJOR.$HFST_MINOR.$HFST_EXTENSION
 # for package-config pc file
 LIBHFST_NAME=hfst
 LIBHFST_MAJOR=3
 LIBHFST_MINOR=3
-LIBHFST_EXTENSION=8
+LIBHFST_EXTENSION=9
 LIBHFST_VERSION=$LIBHFST_MAJOR.$LIBHFST_MINOR.$LIBHFST_EXTENSION
 
-AC_INIT([hfst], [3.3.8], [hfst-bugs@helsinki.fi], [hfst], [http://hfst.sf.net])
+AC_INIT([hfst], [3.3.9], [hfst-bugs@helsinki.fi], [hfst], [http://hfst.sf.net])
 AC_CONFIG_AUX_DIR([build-aux])
 AM_INIT_AUTOMAKE([-Wall -Werror std-options foreign check-news])
 
