@@ -153,29 +153,38 @@ parse_options(int argc, char** argv)
 
     if (list_formats)
       {
+	fprintf(stdout,   " Backend                         "
+		"Names recognized\n\n");
+
 	if (HfstTransducer::is_implementation_type_available
 	    (hfst::SFST_TYPE))
-	  fprintf(stdout, "sfst\n");
+	  fprintf(stdout, " SFST                            "
+		  "sfst\n");
 
 	if (HfstTransducer::is_implementation_type_available
 	    (hfst::TROPICAL_OPENFST_TYPE))
-	  fprintf(stdout, "openfst-tropical\n");
+	  fprintf(stdout, " OpenFst (tropical weights)      "
+		  "openfst-tropical, openfst, ofst, ofst-tropical\n");
 	
 	if (HfstTransducer::is_implementation_type_available
 	    (hfst::LOG_OPENFST_TYPE))
-	  fprintf(stdout, "openfst-log\n");
+	  fprintf(stdout, " OpenFst (logarithmic weights)   "
+		  "openfst-log, ofst-log\n");
 	
 	if (HfstTransducer::is_implementation_type_available
 	    (hfst::FOMA_TYPE))
-	  fprintf(stdout, "foma\n");
+	  fprintf(stdout, " foma                            "
+		  "foma\n");
 	
 	if (HfstTransducer::is_implementation_type_available
 	    (hfst::HFST_OL_TYPE))
-	  fprintf(stdout, "optimized-lookup-unweighted\n");	      
+	  fprintf(stdout, " Optimized lookup (weighted)     "
+		  "optimized-lookup-unweighted, olu\n");	      
 	
 	if (HfstTransducer::is_implementation_type_available
 	    (hfst::HFST_OLW_TYPE))
-	  fprintf(stdout, "optimized-lookup-weighted\n");
+	  fprintf(stdout, " Optimized lookup (unweighted)   "
+		  "optimized-lookup-weighted, olw, optimized-lookup, ol\n");
 	
 	exit(0);
       }

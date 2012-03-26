@@ -130,7 +130,8 @@ print_usage()
 
         fprintf(message_out, 
         "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
-        "FMT can be { sfst, openfst-tropical, openfst-log, foma }.\n"
+        "FMT can be { foma, openfst-tropical, openfst-log, sfst, \n"
+	"optimized-lookup-weighted, optimized-lookup-unweighted }.\n"
         "If EPS is not defined, the default representation of @0@ is used.\n"
         "Option --log precedes option --norm.\n"
         "The FILE of option -m lists all multichar-symbols, each symbol\n"

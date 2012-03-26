@@ -91,8 +91,8 @@ print_usage()
 
         fprintf(message_out, 
             "If OUTFILE or INFILE is missing or -, standard streams will be used.\n"
-            "FMT must be name of a format usable by libhfst, such as\n"
-            "openfst-tropical, sfst, foma or hfst-optimized-weighted.\n"
+            "FMT must be one of the following: "
+            "{foma, sfst, openfst-tropical, openfst-log}.\n"
             "If EPS is not defined, the default representation of 0 is used\n"
 	    "Weights are currently not implemented.\n"
 	    "\n"

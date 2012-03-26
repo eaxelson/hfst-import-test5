@@ -36,7 +36,7 @@ Write output transducer to OUTFILE
 Write result in FMT format
 .PP
 If OUTFILE or INFILE is missing or \-, standard streams will be used.
-FMT must be one of the following: {openfst\-tropical, openfst\-log, sfst, foma}
+FMT must be one of the following: {foma, sfst, openfst\-tropical, openfst\-log}
 .SH EXAMPLES
 .IP
 echo "[a\-z]*" | hfst\-sfstpl2fst \fB\-f\fR foma > az.foma
@@ -44,7 +44,9 @@ echo "[a\-z]*" | hfst\-sfstpl2fst \fB\-f\fR foma > az.foma
 create a foma transducer accepting any number of consecutive
 characters between a and z, inclusive
 .IP
-echo "a:b (a:<>)+" > ab.sfst\-pl ; hfst\-sfstpl2fst \fB\-f\fR openfst\-tropical \fB\-i\fR ab.sfst\-pl \fB\-o\fR ab.tropical
+echo "a:b (a:<>)+" > ab.sfst\-pl ; hfst\-sfstpl2fst \fB\-f\fR openfst\-tropical \e
+.HP
+\fB\-i\fR ab.sfst\-pl \fB\-o\fR ab.tropical
 .IP
 create a tropical OpenFst transducer that accepts two or more
 consecutive 'a's and maps them into string "b"
