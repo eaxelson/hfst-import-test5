@@ -139,14 +139,15 @@ parse_options(int argc, char** argv)
 #include "inc/check-params-common.h"
     if (format == hfst::UNSPECIFIED_TYPE)
       {
-#if HAVE_FOMA
+	/*#if HAVE_FOMA
         if (!silent) {
           warning(0, 0, "Defaulting to foma type "
                   "(since it has native lexc support);\n"
                   "Use command-line option --format to override");
         }
         format = hfst::FOMA_TYPE;
-#elif HAVE_OPENFST
+	#elif HAVE_OPENFST*/
+#if HAVE_OPENFST
         if (!silent) {
           warning(0, 0, "Defaulting to using OpenFst with legacy lexc "
                   "compilation scheme\n"
