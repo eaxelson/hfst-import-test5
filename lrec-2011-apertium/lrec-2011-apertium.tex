@@ -49,9 +49,9 @@ Apertium~\cite{Apertium/2011}\footnote{\url{http://www.apertium.org}}. In this
 paper we propose a generic compilation formula  to compile the
 dictionaries into weighted finite state automata for use with any FST 
 tool or application.  We implement this system using a free/libre
-open source finite-state API
+open-source finite-state API
 HFST~\cite{hfst/2011}\footnote{\url{http://hfst.sf.net}}. HFST is a general
-purpose programming interface utilising a selection of freely-available
+purpose programming interface using a selection of freely-available
 finite-state libraries for the handling of finite-state automata.
 
 While Apertium uses the dictionaries and the finite-state automata for machine
@@ -192,8 +192,8 @@ dumps\footnote{\url{http://download.wikipedia.org/}}:
 \texttt{euwiki-20120219-pages-articles.xml.bz2},
 \texttt{nnwiki-20120215-pages-articles.xml.bz2}, and
 \texttt{gvwiki-20120215-pages-articles.xml.bz2}. For the purpose of this
-article we performed very crude cleanup and preprocessing to wikipedia data
-picking up the text elements of the article and discarding most of wikipedia
+article we performed very crude cleanup and preprocessing to Wikipedia data
+picking up the text elements of the article and discarding most of Wikipedia
 markup naïvely\footnote{For details see the script in
 \url{http://hfst.svn.sourceforge.net/viewvc/hfst/trunk/lrec-2011-apertium/}.}.
 
@@ -231,7 +231,7 @@ markup naïvely\footnote{For details see the script in
 %\end{table}
 
 To get one view on differences made by generic compilation formula instead of
-direct automata building used by apertium we look at the created automata, this
+direct automata building used by Apertium we look at the created automata, this
 will also give us a rough idea of what its efficiency might be. In
 table~\ref{table:graph-size} we give the counts of nodes and edges, in that
 order, in the graphs compiled from the dictionaries. Note, that in case
@@ -246,11 +246,11 @@ algorithm used by HFST~\cite{silfverberg/2009/fsmnlp}.
 \begin{center}
 \begin{tabular}{|l|r|r|r|}
 \hline
-\bf Language & \bf Apertium lr & \bf Apertium rl & \bf HFST \\
+\bf Lang. & \bf Apertium {\tt {\small LR}} & \bf Apertium {\tt {\small RL}} & \bf HFST \\
 \hline
-Basque       & 30,114  & 34,005  & 34,824  \\
+Basq.      & 30,114  & 34,005  & 34,824  \\
              & 59,321  & 68,030  & 68,347  \\
-Norwegian    & 56,226  & 55,722  & 56,871  \\
+Norg. & 56,226  & 55,722  & 56,871  \\
              & 138,217 & 132,475 & 139,259 \\
 Manx         & 13,055  & 12,955  & 12,920  \\
              & 28,220  & 27,062  & 27,031  \\
@@ -266,10 +266,10 @@ edges)
 \begin{center}
 \begin{tabular}{|l|r|r|r|}
 \hline
-\bf Language & \bf Apertium lr & \bf Apertium rl & \bf HFST \\
+\bf Lang. & \bf Apertium {\tt {\small LR}} & \bf Apertium {\tt {\small RL}}  & \bf HFST \\
 \hline
-Basque       & 252 KiB & 289 KiB & 1,7 MiB \\
-Norwegian    & 558 KiB & 535 KiB & 3,7 MiB \\
+Basq.       & 252 KiB & 289 KiB & 1,7 MiB \\
+Norg. & 558 KiB & 535 KiB & 3,7 MiB \\
 Manx         & 108 KiB & 110 KiB & 709 KiB \\
 \hline
 \end{tabular}
@@ -325,7 +325,7 @@ Manx         & 0.8 s  & 11.2  s \\
 \hline
 \end{tabular}
 \caption{Speed of HFST-based system against original in compilation
- (as s in user time)
+ (as seconds of user time)
 \label{table:compile-speed}}
 \end{center}
 \end{table}
@@ -384,8 +384,8 @@ language technology tools.
 
 \section*{Acknowledgements}
 
-We thank the HFST and apertium contributors for fruitful Internet relayed chats,
-and the two anonymous reviewers for good suggestions.
+We thank the HFST and Apertium contributors for fruitful internet relayed chats,
+and the two anonymous reviewers for their helpful suggestions.
 
 \bibliographystyle{lrec2006}
 \bibliography{lrec2011}
