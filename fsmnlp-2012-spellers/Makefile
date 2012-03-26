@@ -299,8 +299,10 @@ hfst/kl/errmodel.edit-distance-3-no-initial-no-redundant.hfst: hfst/kl/kl.hfst
 
 # (re)generate results in neat tables
 # combine all bits and pieces for table 1:
-results/table1.tex: results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex #results/fi/table1.dict-omorfi.errm-ed1.corp-wiki.tex results/kl/table1.dict-kl.errm-ed1.corp-wiki.tex
+results/table1.tex: results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex results/fi/table1.dict-omorfi.errm-ed1.corp-wiki.tex results/kl/table1.dict-kl.errm-ed1.corp-wiki.tex
 	paste $^ > $@
+
+# Table 1, ED 1
 
 results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex: corp/en/enwiki.words
 	echo > $@.tsv
@@ -308,6 +310,252 @@ results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex: corp/en/enwiki.words
 		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-1.hfst hfst/en/norvig.hfst < corp/en/enwiki.words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/fi/table1.dict-norvig.errm-ed1.corp-wiki.tex: corp/fi/fiwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-1.hfst hfst/fi/norvig.hfst < corp/fi/fiwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/kl/table1.dict-norvig.errm-ed1.corp-wiki.tex: corp/kl/enwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-1.hfst hfst/kl/norvig.hfst < corp/kl/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+# Table 1, ED 2
+
+results/en/table1.dict-norvig.errm-ed2.corp-wiki.tex: corp/en/enwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-2.hfst hfst/en/norvig.hfst < corp/en/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/fi/table1.dict-norvig.errm-ed2.corp-wiki.tex: corp/fi/fiwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-2.hfst hfst/fi/norvig.hfst < corp/fi/fiwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/kl/table1.dict-norvig.errm-ed2corp-wiki.tex: corp/kl/enwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2.hfst hfst/kl/norvig.hfst < corp/kl/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+# Table 1, ED 3
+
+results/en/table1.dict-norvig.errm-ed3.corp-wiki.tex: corp/en/enwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-3.hfst hfst/en/norvig.hfst < corp/en/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/fi/table1.dict-norvig.errm-ed3.corp-wiki.tex: corp/fi/fiwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-3.hfst hfst/fi/norvig.hfst < corp/fi/fiwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/kl/table1.dict-norvig.errm-ed3corp-wiki.tex: corp/kl/enwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3.hfst hfst/kl/norvig.hfst < corp/kl/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+# Table 1, ED 1, no initial
+
+results/en/table1.dict-norvig.errm-ed1-no-initial.corp-wiki.tex: corp/en/enwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-1-no-initial.hfst hfst/en/norvig.hfst < corp/en/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/fi/table1.dict-norvig.errm-ed1-no-initial.corp-wiki.tex: corp/fi/fiwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-1-no-initial.hfst hfst/fi/norvig.hfst < corp/fi/fiwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/kl/table1.dict-norvig.errm-ed1-no-initial.corp-wiki.tex: corp/kl/enwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-1-no-initial.hfst hfst/kl/norvig.hfst < corp/kl/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+# Table 1, ED 2, no initial
+
+results/en/table1.dict-norvig.errm-ed2-no-initial.corp-wiki.tex: corp/en/enwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-2-no-initial.hfst hfst/en/norvig.hfst < corp/en/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/fi/table1.dict-norvig.errm-ed2-no-initial.corp-wiki.tex: corp/fi/fiwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-2-no-initial.hfst hfst/fi/norvig.hfst < corp/fi/fiwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/kl/table1.dict-norvig.errm-ed2-no-initial.corp-wiki.tex: corp/kl/enwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-initial.hfst hfst/kl/norvig.hfst < corp/kl/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+# Table 1, ED 3, no initial
+
+results/en/table1.dict-norvig.errm-ed3-no-initial.corp-wiki.tex: corp/en/enwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-3-no-initial.hfst hfst/en/norvig.hfst < corp/en/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/fi/table1.dict-norvig.errm-ed3-no-initial.corp-wiki.tex: corp/fi/fiwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-3-no-initial.hfst hfst/fi/norvig.hfst < corp/fi/fiwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/kl/table1.dict-norvig.errm-ed3-no-initial.corp-wiki.tex: corp/kl/enwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3-no-initial.hfst hfst/kl/norvig.hfst < corp/kl/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+# Table 1, ED 2, eliminate redundancies
+
+results/en/table1.dict-norvig.errm-ed2-no-redundant.corp-wiki.tex: corp/en/enwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-2.hfst hfst/en/norvig.hfst < corp/en/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/fi/table1.dict-norvig.errm-ed2-no-redundant.corp-wiki.tex: corp/fi/fiwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-2-no-redundant.hfst hfst/fi/norvig.hfst < corp/fi/fiwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/kl/table1.dict-norvig.errm-ed2-no-redundant.corp-wiki.tex: corp/kl/enwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-redundant.hfst hfst/kl/norvig.hfst < corp/kl/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+# Table 1, ED 3, eliminate redundancies
+
+results/en/table1.dict-norvig.errm-ed3-no-redundant.corp-wiki.tex: corp/en/enwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-3.hfst hfst/en/norvig.hfst < corp/en/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/fi/table1.dict-norvig.errm-ed3-no-redundant.corp-wiki.tex: corp/fi/fiwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-3-no-redundant.hfst hfst/fi/norvig.hfst < corp/fi/fiwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/kl/table1.dict-norvig.errm-ed3-no-redundant.corp-wiki.tex: corp/kl/enwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3-no-redundant.hfst hfst/kl/norvig.hfst < corp/kl/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+# Table 1, ED 2, no first and no redundancies
+
+results/en/table1.dict-norvig.errm-ed2-no-initial-no-redundant.corp-wiki.tex: corp/en/enwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-2-no-initial-no-redundant.hfst hfst/en/norvig.hfst < corp/en/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/fi/table1.dict-norvig.errm-ed2-no-initial-no-redundant.corp-wiki.tex: corp/fi/fiwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-2-no-initial-no-redundant.hfst hfst/fi/norvig.hfst < corp/fi/fiwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/kl/table1.dict-norvig.errm-ed2-no-initial-no-redundant.corp-wiki.tex: corp/kl/enwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-initial-no-redundant.hfst hfst/kl/norvig.hfst < corp/kl/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+# Table 1, ED 3, no first and no redundancies
+
+results/en/table1.dict-norvig.errm-ed3-no-initial-no-redundant.corp-wiki.tex: corp/en/enwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-3-no-initial-no-redundant.hfst hfst/en/norvig.hfst < corp/en/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/fi/table1.dict-norvig.errm-ed3-no-initial-no-redundant.corp-wiki.tex: corp/fi/fiwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-3-no-initial-no-redundant.hfst hfst/fi/norvig.hfst < corp/fi/fiwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/kl/table1.dict-norvig.errm-ed3-no-initial-no-redundant.corp-wiki.tex: corp/kl/enwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3-no-initial-no-redundant.hfst hfst/kl/norvig.hfst < corp/kl/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+# Table 1, ED 2, fallback from ED 1 to ED 2 (no redundancies)
+
+results/en/table1.dict-norvig.errm-fallback.corp-wiki.tex: corp/en/enwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-1.hfst hfst/en/errmodel.edit-distance-2-no-redundant.hfst hfst/en/norvig.hfst < corp/en/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/fi/table1.dict-norvig.errm-fallback.corp-wiki.tex: corp/fi/fiwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-1.hfst hfst/fi/errmodel.edit-distance-2-no-redundant.hfst hfst/fi/norvig.hfst < corp/fi/fiwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/kl/table1.dict-norvig.errm-fallback.corp-wiki.tex: corp/kl/enwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-1.hfst hfst/kl/errmodel.edit-distance-2-no-redundant.hfst hfst/kl/norvig.hfst < corp/kl/enwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+# Table 1, generate all edits first
 
 results/en/table1.dict-norvig.errm-ed1.corp-wiki.generate-all.tex: corp/en/enwiki.words
 	echo > $@.time
