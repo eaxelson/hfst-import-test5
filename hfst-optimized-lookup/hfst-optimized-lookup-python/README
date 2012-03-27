@@ -2,7 +2,8 @@ hfst-optimized-lookup-python: perform lookup on a fast transducer format
 
 This package performs transducer lookup (transformation) on a specialised
 file format. The format is fast, but this Python implementation is not
-very fast.
+very fast. This package also provides a fast C++ implementation with SWIG
+bindings - use either one.
 
 INSTALLATION
 
