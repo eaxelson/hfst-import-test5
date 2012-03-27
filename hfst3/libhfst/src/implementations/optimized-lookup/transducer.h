@@ -31,6 +31,7 @@
 #include "../../HfstFlagDiacritics.h"
 #include "../../HfstSymbolDefs.h"
 
+/** \brief A namespace for optimized-lookup functions and datatypes.*/
 namespace hfst_ol {
 using hfst::FdOperation;
 using hfst::FdState;
@@ -716,6 +717,8 @@ public:
     SymbolNumber find_key(char ** p);
 };
 
+/** \brief A compiled transducer format, suitable for fast lookup operations.
+ */
 class Transducer
 {
 protected:
@@ -828,6 +831,10 @@ public:
 
     bool initialize_input(const char * input_str);
     HfstOneLevelPaths * lookup_fd(const StringVector & s);
+    /* Tokenize and lookup, accounting for flag diacritics, the surface string
+       \a s. The return value, a pointer to HfstOneLevelPaths
+       (which is a set) of analyses, is newly allocated.
+     */
     HfstOneLevelPaths * lookup_fd(const std::string & s);
     HfstOneLevelPaths * lookup_fd(const char * s);
     void note_analysis(SymbolNumber * whole_output_tape);
@@ -1088,6 +1095,9 @@ public:
 	{ }
 };
 
+/** \brief A spellchecker, constructed from two optimized-lookup transducer
+    instances. An alphabet translator is built at construction time.
+ */
 class Speller
 {
 public:
@@ -1118,7 +1128,11 @@ public:
     void mutator_epsilons(void);
     void consume_input(void);
     void lexicon_consume(void);
+    /** See if \a line is in the lexicon.
+     */
     bool check(char * line);
+    /** Return a priority queue of corrections of \a line.
+     */
     CorrectionQueue correct(char * line);
     std::string stringify(SymbolNumberVector symbol_vector);
 };
