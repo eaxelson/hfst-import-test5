@@ -13,6 +13,7 @@ WGET=wget
 BZCAT=bzcat
 
 HUNSPELL=hunspell -1 -a
+VOIKKOSPELL=voikkospell -s
 
 EN_DICT=hfst/en/norvig.hfst
 FI_DICT=hfst/fi/omorfi-20110505.hfst
@@ -51,17 +52,23 @@ clean-models:
 # tests and tables...
 #
 # corpora acquisition
-corp/fi/fiwiki-20120213-pages-articles.2000000.xml:
+fiwiki-20120213-pages-articles.xml.bz2:
 	$(WGET) 'http://dumps.wikimedia.org/fiwiki/20120213/fiwiki-20120213-pages-articles.xml.bz2'
-	$(BZCAT) fiwiki-20120213-pages-articles.xml.bz2 | head -n 2000000 > $@
 
-corp/en/enwiki-20120211-pages-articles.2000000.xml:
+corp/fi/fiwiki-20120213-pages-articles.2000000.xml: fiwiki-20120213-pages-articles.xml.bz2
+	$(BZCAT) $< | head -n 2000000 > $@
+
+enwiki-20120211-pages-articles.xml.bz2:
 	$(WGET) 'http://dumps.wikimedia.org/enwiki/20120211/enwiki-20120211-pages-articles.xml.bz2'
-	$(BZCAT) enwiki-20120211-pages-articles.xml.bz2 | head -n 2000000 > $@
 
-corp/kl/klwiki-20120214-pages-articles.xml:
+corp/en/enwiki-20120211-pages-articles.2000000.xml: enwiki-20120211-pages-articles.xml.bz2
+	$(BZCAT) $< | head -n 2000000 > $@
+
+klwiki-20120214-pages-articles.xml.bz2:
 	$(WGET) 'http://dumps.wikimedia.org/klwiki/20120214/klwiki-20120214-pages-articles.xml.bz2'
-	$(BZCAT) klwiki-20120214-pages-articles.xml.bz2 > $@
+
+corp/kl/klwiki-20120214-pages-articles.xml: klwiki-20120214-pages-articles.xml.bz2
+	$(BZCAT) $< > $@
 
 # corpora preprocessing (ugly fixme plz)
 corp/en/enwiki.words: corp/en/enwiki-20120211-pages-articles.2000000.xml wikipedia-deform.sh
@@ -325,8 +332,9 @@ results/en/table1.dict-hunspell.errm-hunspell.corp-wiki.tex: corp/en/enwiki.word
 	echo > $@.times
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
 		/usr/bin/time -f %U -a -o $@.times \
-			time $(HUNSPELL) -d en_US corp/en/enwiki.words > /dev/null ;\
+			$(HUNSPELL) -d en_US corp/en/enwiki.words > /dev/null ;\
 	done
+	awk -f timelist2tex.awk < $@.times > $@
 
 results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex: corp/en/enwiki.words
 	echo > $@.tsv
@@ -334,6 +342,14 @@ results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex: corp/en/enwiki.words
 		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-1.hfst $(EN_DICT) < corp/en/enwiki.words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/fi/table1.dict-voikko.errm-voikko.corp-wiki.tex: corp/fi/fiwiki.words
+	echo > $@.times
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		/usr/bin/time -f %U -a -o $@.times \
+			$(VOIKKOSPELL) -d fi_FI < corp/fi/fiwiki.words > /dev/null ;\
+	done
+	awk -f timelist2tex.awk < $@.times > $@
 
 results/fi/table1.dict-omorfi.errm-ed1.corp-wiki.tex: corp/fi/fiwiki.words
 	echo > $@.tsv
