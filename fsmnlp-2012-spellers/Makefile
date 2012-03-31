@@ -559,17 +559,34 @@ results/kl/table1.dict-kl.errm-fallback.corp-wiki.tex: corp/kl/enwiki.words
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
-# Table 1, generate all edits first
+# Table 1, generate all edits first for ED2
 
-results/en/table1.dict-norvig.errm-ed1.corp-wiki.generate-all.tex: corp/en/enwiki.words
+results/en/table1.dict-norvig.errm-ed2.corp-wiki.generate-all.tex: corp/en/enwiki.words
 	echo > $@.time
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		/usr/bin/time -a -o $@.time hfst-optimized-lookup \
-		hfst/en/errmodel.edit-distance-1.hfst < corp/en/enwiki.words \
+		/usr/bin/time -f %U -a -o $@.time hfst-optimized-lookup \
+		hfst/en/errmodel.edit-distance-2.hfst < corp/en/enwiki.words \
 		| cut -f 2  | hfst-optimized-lookup \
-		hfst/en/errmodel.edit-distance-1.hfst > /dev/null ; done
-# postprocessing step goes here
+		hfst/en/norvig.hfst > /dev/null ; done
+	awk -f timelist2tex.awk < $@.time > $@
 
+results/fi/table1.dict-omorfi.errm-ed2.corp-wiki.generate-all.tex: corp/fi/fiwiki.words
+	echo > $@.time
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		/usr/bin/time -f %U -a -o $@.time hfst-optimized-lookup \
+		hfst/fi/errmodel.edit-distance-2.hfst < corp/fi/fiwiki.words \
+		| cut -f 2  | hfst-optimized-lookup \
+		$(FI_DICT) > /dev/null ; done
+	awk -f timelist2tex.awk < $@.time > $@
+
+results/kl/table1.dict-kl.errm-ed2.corp-wiki.generate-all.tex: corp/kl/klwiki.words
+	echo > $@.time
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		/usr/bin/time -f %U -a -o $@.time hfst-optimized-lookup \
+		hfst/kl/errmodel.edit-distance-2.hfst < corp/kl/klwiki.words \
+		| cut -f 2  | hfst-optimized-lookup \
+		$(KL_DICT) > /dev/null ; done
+	awk -f timelist2tex.awk < $@.time > $@
 
 results/en/table2.dict-norvig.errm-ed1.corp-wiki.tex: corp/en/enwiki.words $@.tsv
 	echo > $@.tsv
