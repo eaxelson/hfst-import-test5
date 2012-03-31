@@ -25,8 +25,8 @@ fsmnlp-2012-speedspelling.pdf: fsmnlp-2012-speedspelling.tex fsmnlp2012.bib
 	$(XELATEX) fsmnlp-2012-speedspelling.tex
 
 results: corpora dictionaries models tables
-corpora:	corp/fi/fiwiki-20120213-pages-articles.10000000.xml \
-		corp/en/enwiki-20120211-pages-articles.10000000.xml \
+corpora:	corp/fi/fiwiki-20120213-pages-articles.2000000.xml \
+		corp/en/enwiki-20120211-pages-articles.2000000.xml \
 		corp/kl/klwiki-20120214-pages-articles.xml \
 		corp/en/enwiki.words \
 		corp/fi/fiwiki.words \
@@ -49,25 +49,25 @@ clean-models:
 # tests and tables...
 #
 # corpora acquisition
-corp/fi/fiwiki-20120213-pages-articles.10000000.xml:
+corp/fi/fiwiki-20120213-pages-articles.2000000.xml:
 	$(WGET) 'http://dumps.wikimedia.org/fiwiki/20120213/fiwiki-20120213-pages-articles.xml.bz2'
-	$(BZCAT) fiwiki-20120213-pages-articles.xml.bz2 | head -n 10000000 > $@
+	$(BZCAT) fiwiki-20120213-pages-articles.xml.bz2 | head -n 2000000 > $@
 
-corp/en/enwiki-20120211-pages-articles.10000000.xml:
+corp/en/enwiki-20120211-pages-articles.2000000.xml:
 	$(WGET) 'http://dumps.wikimedia.org/enwiki/20120211/enwiki-20120211-pages-articles.xml.bz2'
-	$(BZCAT) enwiki-20120211-pages-articles.xml.bz2 | head -n 10000000 > $@
+	$(BZCAT) enwiki-20120211-pages-articles.xml.bz2 | head -n 2000000 > $@
 
 corp/kl/klwiki-20120214-pages-articles.xml:
 	$(WGET) 'http://dumps.wikimedia.org/klwiki/20120214/klwiki-20120214-pages-articles.xml.bz2'
 	$(BZCAT) klwiki-20120214-pages-articles.xml.bz2 > $@
 
 # corpora preprocessing (ugly fixme plz)
-corp/en/enwiki.words: corp/en/enwiki-20120211-pages-articles.10000000.xml wikipedia-deform.sh
+corp/en/enwiki.words: corp/en/enwiki-20120211-pages-articles.2000000.xml wikipedia-deform.sh
 	awk '/<text/,/<\/text/ {print}' < $< |\
 		./wikipedia-deform.sh |\
 		tr -s ' ' '\n' > $@
 
-corp/fi/fiwiki.words: corp/fi/fiwiki-20120213-pages-articles.10000000.xml
+corp/fi/fiwiki.words: corp/fi/fiwiki-20120213-pages-articles.2000000.xml
 	awk '/<text/,/<\/text/ {print}' < $< |\
 		./wikipedia-deform.sh |\
 		tr -s ' ' '\n' > $@
