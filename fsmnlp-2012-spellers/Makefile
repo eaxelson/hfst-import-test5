@@ -851,56 +851,119 @@ results/kl/table2.dict-kl.errm-fallback.corp-wiki.tex: corp/kl/enwiki.words
 # Table 3, ED 1
 
 results/en/table3.dict-norvig.errm-ed1.corp-wiki.tex: corp/en/automisp.words
-	cut -f 1 corp/en/automisp.words | hfst-ospell-fsmnlp-2012 hfst/en/errmodel.edit-distance-1.hfst hfst/en/norvig.hfst > corp/en/temp_corrections
-# postprocess
+	cut -f 1 corp/en/automisp.words | hfst-ospell-fsmnlp-2012 hfst/en/errmodel.edit-distance-1.hfst hfst/en/norvig.hfst > corp/en/temp_mispell_corrections
+	cut -f 2 corp/en/automisp.words | hfst-optimized-lookup hfst/en/norvig.hfst > corp/en/temp_correct_corrections
+	cut -f 2 corp/en/automisp.words > corp/en/temp_original_correct_words
+	python tally_corrections.py corp/en/temp_mispell_corrections corp/en/temp_correct_corrections corp/en/temp_original_correct_words > $@
 
 results/fi/table3.dict-omorfi.errm-ed1.corp-wiki.tex: corp/fi/automisp.words
-	cut -f 1 corp/fi/automisp.words | hfst-ospell-fsmnlp-2012 hfst/fi/errmodel.edit-distance-1.hfst $(FI_DICT) > corp/en/temp_corrections
-# postprocess
+	cut -f 1 corp/fi/automisp.words | hfst-ospell-fsmnlp-2012 hfst/fi/errmodel.edit-distance-1.hfst $(FI_DICT) > corp/fi/temp_mispell_corrections
+	cut -f 2 corp/fi/automisp.words | hfst-optimized-lookup $(FI_DICT) > corp/fi/temp_correct_corrections
+	cut -f 2 corp/fi/automisp.words > corp/fi/temp_original_correct_words
+	python tally_corrections.py corp/fi/temp_mispell_corrections corp/fi/temp_correct_corrections corp/fi/temp_original_correct_words > $@
 
 results/kl/table3.dict-kl.errm-ed1.corp-wiki.tex: corp/kl/automisp.words
-	cut -f 1 corp/en/automisp.words | hfst-ospell-fsmnlp-2012 hfst/en/errmodel.edit-distance-1.hfst $(KL_DICT) > corp/en/temp_corrections
-# postprocess
+	cut -f 1 corp/kl/automisp.words | hfst-ospell-fsmnlp-2012 hfst/kl/errmodel.edit-distance-1.hfst $(KL_DICT) > corp/kl/temp_mispell_corrections
+	cut -f 2 corp/kl/automisp.words | hfst-optimized-lookup $(KL_DICT) > corp/kl/temp_correct_corrections
+	cut -f 2 corp/kl/automisp.words > corp/kl/temp_original_correct_words
+	python tally_corrections.py corp/kl/temp_mispell_corrections corp/kl/temp_correct_corrections corp/kl/temp_original_correct_words > $@
 
-# Table 2, ED 2
+# Table 3, ED 2
 
 results/en/table3.dict-norvig.errm-ed2.corp-wiki.tex: corp/en/automisp.words
-	cut -f 1 corp/en/automisp.words | hfst-ospell-fsmnlp-2012 hfst/en/errmodel.edit-distance-2.hfst hfst/en/norvig.hfst > corp/en/temp_corrections
-# postprocess
+	cut -f 1 corp/en/automisp.words | hfst-ospell-fsmnlp-2012 hfst/en/errmodel.edit-distance-2.hfst hfst/en/norvig.hfst > corp/en/temp_mispell_corrections
+	cut -f 2 corp/en/automisp.words | hfst-optimized-lookup hfst/en/norvig.hfst > corp/en/temp_correct_corrections
+	cut -f 2 corp/en/automisp.words > corp/en/temp_original_correct_words
+	python tally_corrections.py corp/en/temp_mispell_corrections corp/en/temp_correct_corrections corp/en/temp_original_correct_words > $@
 
 results/fi/table3.dict-omorfi.errm-ed2.corp-wiki.tex: corp/fi/automisp.words
-	cut -f 1 corp/fi/automisp.words | hfst-ospell-fsmnlp-2012 hfst/fi/errmodel.edit-distance-2.hfst $(FI_DICT) > corp/en/temp_corrections
-# postprocess
+	cut -f 1 corp/fi/automisp.words | hfst-ospell-fsmnlp-2012 hfst/fi/errmodel.edit-distance-2.hfst $(FI_DICT) > corp/fi/temp_mispell_corrections
+	cut -f 2 corp/fi/automisp.words | hfst-optimized-lookup $(FI_DICT) > corp/fi/temp_correct_corrections
+	cut -f 2 corp/fi/automisp.words > corp/fi/temp_original_correct_words
+	python tally_corrections.py corp/fi/temp_mispell_corrections corp/fi/temp_correct_corrections corp/fi/temp_original_correct_words > $@
 
 results/kl/table3.dict-kl.errm-ed2.corp-wiki.tex: corp/kl/automisp.words
-	cut -f 1 corp/en/automisp.words | hfst-ospell-fsmnlp-2012 hfst/en/errmodel.edit-distance-2.hfst $(KL_DICT) > corp/en/temp_corrections
-# postprocess
+	cut -f 1 corp/kl/automisp.words | hfst-ospell-fsmnlp-2012 hfst/kl/errmodel.edit-distance-2.hfst $(KL_DICT) > corp/kl/temp_mispell_corrections
+	cut -f 2 corp/kl/automisp.words | hfst-optimized-lookup $(KL_DICT) > corp/kl/temp_correct_corrections
+	cut -f 2 corp/kl/automisp.words > corp/kl/temp_original_correct_words
+	python tally_corrections.py corp/kl/temp_mispell_corrections corp/kl/temp_correct_corrections corp/kl/temp_original_correct_words > $@
 
 # Table 3, ED 3
 
 results/en/table3.dict-norvig.errm-ed3.corp-wiki.tex: corp/en/automisp.words
-	cut -f 1 corp/en/automisp.words | hfst-ospell-fsmnlp-2012 hfst/en/errmodel.edit-distance-3.hfst hfst/en/norvig.hfst > corp/en/temp_corrections
-# postprocess
+	cut -f 1 corp/en/automisp.words | hfst-ospell-fsmnlp-2012 hfst/en/errmodel.edit-distance-3.hfst hfst/en/norvig.hfst > corp/en/temp_mispell_corrections
+	cut -f 2 corp/en/automisp.words | hfst-optimized-lookup hfst/en/norvig.hfst > corp/en/temp_correct_corrections
+	cut -f 2 corp/en/automisp.words > corp/en/temp_original_correct_words
+	python tally_corrections.py corp/en/temp_mispell_corrections corp/en/temp_correct_corrections corp/en/temp_original_correct_words > $@
 
 results/fi/table3.dict-omorfi.errm-ed3.corp-wiki.tex: corp/fi/automisp.words
-	cut -f 1 corp/fi/automisp.words | hfst-ospell-fsmnlp-2012 hfst/fi/errmodel.edit-distance-3.hfst $(FI_DICT) > corp/en/temp_corrections
-# postprocess
+	cut -f 1 corp/fi/automisp.words | hfst-ospell-fsmnlp-2012 hfst/fi/errmodel.edit-distance-3.hfst $(FI_DICT) > corp/fi/temp_mispell_corrections
+	cut -f 2 corp/fi/automisp.words | hfst-optimized-lookup $(FI_DICT) > corp/fi/temp_correct_corrections
+	cut -f 2 corp/fi/automisp.words > corp/fi/temp_original_correct_words
+	python tally_corrections.py corp/fi/temp_mispell_corrections corp/fi/temp_correct_corrections corp/fi/temp_original_correct_words > $@
 
 results/kl/table3.dict-kl.errm-ed3.corp-wiki.tex: corp/kl/automisp.words
-	cut -f 1 corp/en/automisp.words | hfst-ospell-fsmnlp-2012 hfst/en/errmodel.edit-distance-3.hfst $(KL_DICT) > corp/en/temp_corrections
-# postprocess
+	cut -f 1 corp/kl/automisp.words | hfst-ospell-fsmnlp-2012 hfst/kl/errmodel.edit-distance-3.hfst $(KL_DICT) > corp/kl/temp_mispell_corrections
+	cut -f 2 corp/kl/automisp.words | hfst-optimized-lookup $(KL_DICT) > corp/kl/temp_correct_corrections
+	cut -f 2 corp/kl/automisp.words > corp/kl/temp_original_correct_words
+	python tally_corrections.py corp/kl/temp_mispell_corrections corp/kl/temp_correct_corrections corp/kl/temp_original_correct_words > $@
 
 # Table 3, ED 1, no initial
 
+results/en/table3.dict-norvig.errm-ed1-no-initial.corp-wiki.tex: corp/en/automisp.words
+	cut -f 1 corp/en/automisp.words | hfst-ospell-fsmnlp-2012 hfst/en/errmodel.edit-distance-1-no-initial.hfst hfst/en/norvig.hfst > corp/en/temp_mispell_corrections
+	cut -f 2 corp/en/automisp.words | hfst-optimized-lookup hfst/en/norvig.hfst > corp/en/temp_correct_corrections
+	cut -f 2 corp/en/automisp.words > corp/en/temp_original_correct_words
+	python tally_corrections.py corp/en/temp_mispell_corrections corp/en/temp_correct_corrections corp/en/temp_original_correct_words > $@
+
+results/fi/table3.dict-omorfi.errm-ed1-no-initial.corp-wiki.tex: corp/fi/automisp.words
+	cut -f 1 corp/fi/automisp.words | hfst-ospell-fsmnlp-2012 hfst/fi/errmodel.edit-distance-1-no-initial.hfst $(FI_DICT) > corp/fi/temp_mispell_corrections
+	cut -f 2 corp/fi/automisp.words | hfst-optimized-lookup $(FI_DICT) > corp/fi/temp_correct_corrections
+	cut -f 2 corp/fi/automisp.words > corp/fi/temp_original_correct_words
+	python tally_corrections.py corp/fi/temp_mispell_corrections corp/fi/temp_correct_corrections corp/fi/temp_original_correct_words > $@
+
+results/kl/table3.dict-kl.errm-ed1-no-initial.corp-wiki.tex: corp/kl/automisp.words
+	cut -f 1 corp/kl/automisp.words | hfst-ospell-fsmnlp-2012 hfst/kl/errmodel.edit-distance-1-no-initial.hfst $(KL_DICT) > corp/kl/temp_mispell_corrections
+	cut -f 2 corp/kl/automisp.words | hfst-optimized-lookup $(KL_DICT) > corp/kl/temp_correct_corrections
+	cut -f 2 corp/kl/automisp.words > corp/kl/temp_original_correct_words
+	python tally_corrections.py corp/kl/temp_mispell_corrections corp/kl/temp_correct_corrections corp/kl/temp_original_correct_words > $@
+
+# Table 3, ED 2, no initial
+
+results/en/table3.dict-norvig.errm-ed2-no-initial.corp-wiki.tex: corp/en/automisp.words
+	cut -f 1 corp/en/automisp.words | hfst-ospell-fsmnlp-2012 hfst/en/errmodel.edit-distance-2-no-initial.hfst hfst/en/norvig.hfst > corp/en/temp_mispell_corrections
+	cut -f 2 corp/en/automisp.words | hfst-optimized-lookup hfst/en/norvig.hfst > corp/en/temp_correct_corrections
+	cut -f 2 corp/en/automisp.words > corp/en/temp_original_correct_words
+	python tally_corrections.py corp/en/temp_mispell_corrections corp/en/temp_correct_corrections corp/en/temp_original_correct_words > $@
+
+results/fi/table3.dict-omorfi.errm-ed2-no-initial.corp-wiki.tex: corp/fi/automisp.words
+	cut -f 1 corp/fi/automisp.words | hfst-ospell-fsmnlp-2012 hfst/fi/errmodel.edit-distance-2-no-initial.hfst $(FI_DICT) > corp/fi/temp_mispell_corrections
+	cut -f 2 corp/fi/automisp.words | hfst-optimized-lookup $(FI_DICT) > corp/fi/temp_correct_corrections
+	cut -f 2 corp/fi/automisp.words > corp/fi/temp_original_correct_words
+	python tally_corrections.py corp/fi/temp_mispell_corrections corp/fi/temp_correct_corrections corp/fi/temp_original_correct_words > $@
+
+results/kl/table3.dict-kl.errm-ed2-no-initial.corp-wiki.tex: corp/kl/automisp.words
+	cut -f 1 corp/kl/automisp.words | hfst-ospell-fsmnlp-2012 hfst/kl/errmodel.edit-distance-2-no-initial.hfst $(KL_DICT) > corp/kl/temp_mispell_corrections
+	cut -f 2 corp/kl/automisp.words | hfst-optimized-lookup $(KL_DICT) > corp/kl/temp_correct_corrections
+	cut -f 2 corp/kl/automisp.words > corp/kl/temp_original_correct_words
+	python tally_corrections.py corp/kl/temp_mispell_corrections corp/kl/temp_correct_corrections corp/kl/temp_original_correct_words > $@
+
+# Table 3, ED 3, no initial
+
 results/en/table3.dict-norvig.errm-ed3-no-initial.corp-wiki.tex: corp/en/automisp.words
-	cut -f 1 corp/en/automisp.words | hfst-ospell-fsmnlp-2012 hfst/en/errmodel.edit-distance-3.hfst hfst/en/norvig.hfst > corp/en/temp_corrections
-# postprocess
+	cut -f 1 corp/en/automisp.words | hfst-ospell-fsmnlp-2012 hfst/en/errmodel.edit-distance-3-no-initial.hfst hfst/en/norvig.hfst > corp/en/temp_mispell_corrections
+	cut -f 2 corp/en/automisp.words | hfst-optimized-lookup hfst/en/norvig.hfst > corp/en/temp_correct_corrections
+	cut -f 2 corp/en/automisp.words > corp/en/temp_original_correct_words
+	python tally_corrections.py corp/en/temp_mispell_corrections corp/en/temp_correct_corrections corp/en/temp_original_correct_words > $@
 
 results/fi/table3.dict-omorfi.errm-ed3-no-initial.corp-wiki.tex: corp/fi/automisp.words
-	cut -f 1 corp/fi/automisp.words | hfst-ospell-fsmnlp-2012 hfst/fi/errmodel.edit-distance-3.hfst $(FI_DICT) > corp/en/temp_corrections
-# postprocess
+	cut -f 1 corp/fi/automisp.words | hfst-ospell-fsmnlp-2012 hfst/fi/errmodel.edit-distance-3-no-initial.hfst $(FI_DICT) > corp/fi/temp_mispell_corrections
+	cut -f 2 corp/fi/automisp.words | hfst-optimized-lookup $(FI_DICT) > corp/fi/temp_correct_corrections
+	cut -f 2 corp/fi/automisp.words > corp/fi/temp_original_correct_words
+	python tally_corrections.py corp/fi/temp_mispell_corrections corp/fi/temp_correct_corrections corp/fi/temp_original_correct_words > $@
 
 results/kl/table3.dict-kl.errm-ed3-no-initial.corp-wiki.tex: corp/kl/automisp.words
-	cut -f 1 corp/kl/automisp.words | hfst-ospell-fsmnlp-2012 hfst/kl/errmodel.edit-distance-3.hfst $(KL_DICT) > corp/en/temp_corrections
-# postprocess
-
+	cut -f 1 corp/kl/automisp.words | hfst-ospell-fsmnlp-2012 hfst/kl/errmodel.edit-distance-3-no-initial.hfst $(KL_DICT) > corp/kl/temp_mispell_corrections
+	cut -f 2 corp/kl/automisp.words | hfst-optimized-lookup $(KL_DICT) > corp/kl/temp_correct_corrections
+	cut -f 2 corp/kl/automisp.words > corp/kl/temp_original_correct_words
+	python tally_corrections.py corp/kl/temp_mispell_corrections corp/kl/temp_correct_corrections corp/kl/temp_original_correct_words > $@
