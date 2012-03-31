@@ -6,14 +6,14 @@ correct_corrections_f = open(sys.argv[2], 'r')
 original_f = open(sys.argv[3], 'r')
 
 total = 0
-correct_corrections = 0
+corrected_correctly = 0
 
 # gather the tokens in the dictionary
 dictwords = set([])
-for line in correct_corrections.readlines():
+for line in correct_corrections_f.readlines():
     try: # blank lines won't split
         inword, outword = line.split('\t')[:2]
-        if inword == outword:
+        if inword.strip() == outword.strip():
             dictwords.add(inword.strip())
     except:
         pass
@@ -22,6 +22,7 @@ misspelled_corrections = misspelled_corrections_f.readlines()
 misspelled_linenum = 0
 
 def search_to_next_correctionset():
+    global misspelled_linenum
     while misspelled_corrections[misspelled_linenum].strip() != '':
         misspelled_linenum += 1
         if misspelled_linenum >= len(misspelled_corrections):
@@ -29,9 +30,11 @@ def search_to_next_correctionset():
     misspelled_linenum += 1
 
 def search_for_correct_correction(correct):
+    global misspelled_linenum
     found_correct = False
     while misspelled_corrections[misspelled_linenum].strip() != '':
-        if misspelled_corrections[misspelled_linenum].strip() == correct:
+        suggestion = misspelled_corrections[misspelled_linenum].split()[0]
+        if suggestion == correct:
             found_correct = True
         misspelled_linenum += 1
     misspelled_linenum += 1
@@ -55,4 +58,4 @@ for original_line in original_f.readlines():
     # we might have actually corrected it
     corrected_correctly += search_for_correct_correction(correct)
 
-print(float(correct_corrections)/total)
+print(float(corrected_correctly)/total)
