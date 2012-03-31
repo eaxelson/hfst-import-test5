@@ -6,7 +6,7 @@ correct_corrections_f = open(sys.argv[2], 'r')
 original_f = open(sys.argv[3], 'r')
 
 total = 0
-corrected_correctly = 0
+correct_corrections = 0
 
 # gather the tokens in the dictionary
 dictwords = set([])
