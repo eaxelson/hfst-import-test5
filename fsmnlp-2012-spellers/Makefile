@@ -601,7 +601,17 @@ results/kl/table1.dict-kl.errm-ed2.corp-wiki.generate-all.tex: corp/kl/klwiki.wo
 
 # Table 2 (memory)
 
-results/table2.tex: results/en/table2.dict-norvig.errm-ed1.corp-wiki.tex results/fi/table2.dict-omorfi.errm-ed1.corp-wiki.tex results/kl/table2.dict-kl.errm-ed1.corp-wiki.tex
+results/table2.tex: results/en/table2.dict-norvig.errm-ed1.corp-wiki.tex results/fi/table2.dict-omorfi.errm-ed1.corp-wiki.tex results/kl/table2.dict-kl.errm-ed1.corp-wiki.tex \
+			results/en/table2.dict-norvig.errm-ed2.corp-wiki.tex results/fi/table2.dict-omorfi.errm-ed2.corp-wiki.tex results/kl/table2.dict-kl.errm-ed2.corp-wiki.tex \
+			results/en/table2.dict-norvig.errm-ed3.corp-wiki.tex results/fi/table2.dict-omorfi.errm-ed3.corp-wiki.tex results/kl/table2.dict-kl.errm-ed3.corp-wiki.tex \
+			results/en/table2.dict-norvig.errm-ed1-no-initial.corp-wiki.tex results/fi/table2-no-initial.dict-omorfi.errm-ed1.corp-wiki.tex results/kl/table2-no-initial.dict-kl.errm-ed1.corp-wiki.tex \
+			results/en/table2.dict-norvig.errm-ed2-no-initial.corp-wiki.tex results/fi/table2.dict-omorfi.errm-ed2-no-initial.corp-wiki.tex results/kl/table2.dict-kl.errm-ed2-no-initial.corp-wiki.tex \
+			results/en/table2.dict-norvig.errm-ed3-no-initial.corp-wiki.tex results/fi/table2.dict-omorfi.errm-ed3-no-initial.corp-wiki.tex results/kl/table2.dict-kl.errm-ed3-no-initial.corp-wiki.tex \
+			results/en/table2.dict-norvig.errm-ed2-no-redundant.corp-wiki.tex results/fi/table2.dict-omorfi.errm-ed2-no-redundant.corp-wiki.tex results/kl/table2.dict-kl.errm-ed2-no-redundant.corp-wiki.tex \
+			results/en/table2.dict-norvig.errm-ed3-no-redundant.corp-wiki.tex results/fi/table2.dict-omorfi.errm-ed3-no-redundant.corp-wiki.tex results/kl/table2.dict-kl.errm-ed3-no-redundant.corp-wiki.tex \
+			results/en/table2.dict-norvig.errm-ed2-no-initial-no-redundant.corp-wiki.tex results/fi/table2.dict-omorfi.errm-ed2-no-initial-no-redundant.corp-wiki.tex results/kl/table2.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki.tex \
+			results/en/table2.dict-norvig.errm-ed3-no-initial-no-redundant.corp-wiki.tex results/fi/table2.dict-omorfi.errm-ed3-no-initial-no-redundant.corp-wiki.tex results/kl/table2.dict-kl.errm-ed3-no-initial-no-redundant.corp-wiki.tex \
+			results/en/table2.dict-norvig.errm-fallback.corp-wiki.tex results/fi/table2.dict-omorfi.errm-fallback.corp-wiki.tex results/kl/table2.dict-kl.errm-fallback.corp-wiki.tex
 	paste $^ > $@
 
 # Table 2, ED 1
