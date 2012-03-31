@@ -12,6 +12,8 @@ BIBTEX=bibtex
 WGET=wget
 BZCAT=bzcat
 
+HUNSPELL=hunspell -1 -a
+
 EN_DICT=hfst/en/norvig.hfst
 FI_DICT=hfst/fi/omorfi-20110505.hfst
 KL_DICT=hfst/kl/kl.hfst
@@ -319,6 +321,13 @@ results/table1.tex: results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex results
 
 # Table 1, ED 1
 
+results/en/table1.dict-hunspell.errm-hunspell.corp-wiki.tex: corp/en/enwiki.words
+	echo > $@.times
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		/usr/bin/time -f %U -a -o $@.times \
+			time $(HUNSPELL) -d en_US corp/en/enwiki.words > /dev/null ;\
+	done
+
 results/en/table1.dict-norvig.errm-ed1.corp-wiki.tex: corp/en/enwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
@@ -333,10 +342,10 @@ results/fi/table1.dict-omorfi.errm-ed1.corp-wiki.tex: corp/fi/fiwiki.words
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
-results/kl/table1.dict-kl.errm-ed1.corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table1.dict-kl.errm-ed1.corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-1.hfst $(KL_DICT) < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-1.hfst $(KL_DICT) < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
@@ -356,10 +365,10 @@ results/fi/table1.dict-omorfi.errm-ed2.corp-wiki.tex: corp/fi/fiwiki.words
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
-results/kl/table1.dict-kl.errm-ed2corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table1.dict-kl.errm-ed2corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2.hfst $(KL_DICT) < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2.hfst $(KL_DICT) < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
@@ -379,10 +388,10 @@ results/fi/table1.dict-omorfi.errm-ed3.corp-wiki.tex: corp/fi/fiwiki.words
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
-results/kl/table1.dict-kl.errm-ed3corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table1.dict-kl.errm-ed3corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3.hfst hfst/kl/norvig.hfst < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3.hfst hfst/kl/norvig.hfst < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
@@ -402,10 +411,10 @@ results/fi/table1.dict-omorfi.errm-ed1-no-initial.corp-wiki.tex: corp/fi/fiwiki.
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
-results/kl/table1.dict-kl.errm-ed1-no-initial.corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table1.dict-kl.errm-ed1-no-initial.corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-1-no-initial.hfst $(KL_DICT) < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-1-no-initial.hfst $(KL_DICT) < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
@@ -425,10 +434,10 @@ results/fi/table1.dict-omorfi.errm-ed2-no-initial.corp-wiki.tex: corp/fi/fiwiki.
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
-results/kl/table1.dict-kl.errm-ed2-no-initial.corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table1.dict-kl.errm-ed2-no-initial.corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-initial.hfst $(KL_DICT) < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-initial.hfst $(KL_DICT) < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
@@ -448,10 +457,10 @@ results/fi/table1.dict-omorfi.errm-ed3-no-initial.corp-wiki.tex: corp/fi/fiwiki.
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
-results/kl/table1.dict-kl.errm-ed3-no-initial.corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table1.dict-kl.errm-ed3-no-initial.corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3-no-initial.hfst $(KL_DICT) < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3-no-initial.hfst $(KL_DICT) < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
@@ -471,10 +480,10 @@ results/fi/table1.dict-omorfi.errm-ed2-no-redundant.corp-wiki.tex: corp/fi/fiwik
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
-results/kl/table1.dict-kl.errm-ed2-no-redundant.corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table1.dict-kl.errm-ed2-no-redundant.corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-redundant.hfst $(KL_DICT) < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-redundant.hfst $(KL_DICT) < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
@@ -494,10 +503,10 @@ results/fi/table1.dict-omorfi.errm-ed3-no-redundant.corp-wiki.tex: corp/fi/fiwik
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
-results/kl/table1.dict-kl.errm-ed3-no-redundant.corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table1.dict-kl.errm-ed3-no-redundant.corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3-no-redundant.hfst $(KL_DICT) < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3-no-redundant.hfst $(KL_DICT) < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
@@ -517,10 +526,10 @@ results/fi/table1.dict-omorfi.errm-ed2-no-initial-no-redundant.corp-wiki.tex: co
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
-results/kl/table1.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table1.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-initial-no-redundant.hfst $(KL_DICT) < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-initial-no-redundant.hfst $(KL_DICT) < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
@@ -540,10 +549,10 @@ results/fi/table1.dict-omorfi.errm-ed3-no-initial-no-redundant.corp-wiki.tex: co
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
-results/kl/table1.dict-kl.errm-ed3-no-initial-no-redundant.corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table1.dict-kl.errm-ed3-no-initial-no-redundant.corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3-no-initial-no-redundant.hfst $(KL_DICT) < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3-no-initial-no-redundant.hfst $(KL_DICT) < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
@@ -563,10 +572,10 @@ results/fi/table1.dict-omorfi.errm-fallback.corp-wiki.tex: corp/fi/fiwiki.words
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
-results/kl/table1.dict-kl.errm-fallback.corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table1.dict-kl.errm-fallback.corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-1.hfst hfst/kl/errmodel.edit-distance-2-no-redundant.hfst $(KL_DICT) < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-1.hfst hfst/kl/errmodel.edit-distance-2-no-redundant.hfst $(KL_DICT) < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-times2tex.awk < $@.tsv > $@
 
@@ -630,10 +639,10 @@ results/fi/table2.dict-omorfi.errm-ed1.corp-wiki.tex: corp/fi/fiwiki.words
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
-results/kl/table2.dict-kl.errm-ed1.corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table2.dict-kl.errm-ed1.corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-1.hfst $(KL_DICT) < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-1.hfst $(KL_DICT) < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
@@ -653,10 +662,10 @@ results/fi/table2.dict-omorfi.errm-ed2.corp-wiki.tex: corp/fi/fiwiki.words
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
-results/kl/table2.dict-kl.errm-ed2corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table2.dict-kl.errm-ed2corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2.hfst $(KL_DICT) < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2.hfst $(KL_DICT) < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
@@ -676,10 +685,10 @@ results/fi/table2.dict-omorfi.errm-ed3.corp-wiki.tex: corp/fi/fiwiki.words
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
-results/kl/table2.dict-kl.errm-ed3corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table2.dict-kl.errm-ed3corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3.hfst hfst/kl/norvig.hfst < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3.hfst hfst/kl/norvig.hfst < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
@@ -699,10 +708,10 @@ results/fi/table2.dict-omorfi.errm-ed1-no-initial.corp-wiki.tex: corp/fi/fiwiki.
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
-results/kl/table2.dict-kl.errm-ed1-no-initial.corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table2.dict-kl.errm-ed1-no-initial.corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-1-no-initial.hfst $(KL_DICT) < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-1-no-initial.hfst $(KL_DICT) < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
@@ -722,10 +731,10 @@ results/fi/table2.dict-omorfi.errm-ed2-no-initial.corp-wiki.tex: corp/fi/fiwiki.
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
-results/kl/table2.dict-kl.errm-ed2-no-initial.corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table2.dict-kl.errm-ed2-no-initial.corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-initial.hfst $(KL_DICT) < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-initial.hfst $(KL_DICT) < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
@@ -745,10 +754,10 @@ results/fi/table2.dict-omorfi.errm-ed3-no-initial.corp-wiki.tex: corp/fi/fiwiki.
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
-results/kl/table2.dict-kl.errm-ed3-no-initial.corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table2.dict-kl.errm-ed3-no-initial.corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3-no-initial.hfst $(KL_DICT) < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3-no-initial.hfst $(KL_DICT) < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
@@ -768,10 +777,10 @@ results/fi/table2.dict-omorfi.errm-ed2-no-redundant.corp-wiki.tex: corp/fi/fiwik
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
-results/kl/table2.dict-kl.errm-ed2-no-redundant.corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table2.dict-kl.errm-ed2-no-redundant.corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-redundant.hfst $(KL_DICT) < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-redundant.hfst $(KL_DICT) < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
@@ -791,10 +800,10 @@ results/fi/table2.dict-omorfi.errm-ed3-no-redundant.corp-wiki.tex: corp/fi/fiwik
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
-results/kl/table2.dict-kl.errm-ed3-no-redundant.corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table2.dict-kl.errm-ed3-no-redundant.corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3-no-redundant.hfst $(KL_DICT) < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3-no-redundant.hfst $(KL_DICT) < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
@@ -814,10 +823,10 @@ results/fi/table2.dict-omorfi.errm-ed2-no-initial-no-redundant.corp-wiki.tex: co
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
-results/kl/table2.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table2.dict-kl.errm-ed2-no-initial-no-redundant.corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-initial-no-redundant.hfst $(KL_DICT) < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-initial-no-redundant.hfst $(KL_DICT) < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
@@ -837,10 +846,10 @@ results/fi/table2.dict-omorfi.errm-ed3-no-initial-no-redundant.corp-wiki.tex: co
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
-results/kl/table2.dict-kl.errm-ed3-no-initial-no-redundant.corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table2.dict-kl.errm-ed3-no-initial-no-redundant.corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3-no-initial-no-redundant.hfst $(KL_DICT) < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-3-no-initial-no-redundant.hfst $(KL_DICT) < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
@@ -860,10 +869,10 @@ results/fi/table2.dict-omorfi.errm-fallback.corp-wiki.tex: corp/fi/fiwiki.words
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
-results/kl/table2.dict-kl.errm-fallback.corp-wiki.tex: corp/kl/enwiki.words
+results/kl/table2.dict-kl.errm-fallback.corp-wiki.tex: corp/kl/klwiki.words
 	echo > $@.tsv
 	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
-		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-1.hfst hfst/kl/errmodel.edit-distance-2-no-redundant.hfst $(KL_DICT) < corp/kl/enwiki.words > /dev/null ;\
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-1.hfst hfst/kl/errmodel.edit-distance-2-no-redundant.hfst $(KL_DICT) < corp/kl/klwiki.words > /dev/null ;\
 	done
 	awk -f profile-mems2tex.awk < $@.tsv > $@
 
