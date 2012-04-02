@@ -37,9 +37,6 @@ using hfst::FdOperation;
 using hfst::FdState;
 using hfst::FdTable;
 
-//    using namespace hfst;
-
-
 typedef unsigned short SymbolNumber;
 typedef unsigned int TransitionTableIndex;
 typedef unsigned int TransitionNumber;
@@ -81,6 +78,8 @@ const unsigned int MAX_IO_LEN = 10000;
 // single-character ascii lookup tokenization or the regular
 // trie-tokenization
 bool should_ascii_tokenize(unsigned char c);
+
+void skip_hfst3_header(std::istream & is);
 
 inline bool indexes_transition_table(const TransitionTableIndex i)
 {
@@ -211,7 +210,7 @@ public:
         HFST_THROW(TransducerHasWrongTypeException);
       }
     }
-    
+ 
     SymbolNumber symbol_count(void) const { return number_of_symbols; }
     SymbolNumber input_symbol_count(void) const {
     return number_of_input_symbols;
@@ -767,21 +766,9 @@ protected:
 
 public:
     Transducer(const std::string & filename);
-    Transducer(bool weighted);
-    Transducer(Transducer * t);
-    Transducer();
-    Transducer(const TransducerHeader& header,
-           const TransducerAlphabet& alphabet,
-           const TransducerTable<TransitionIndex>& index_table,
-           const TransducerTable<Transition>& transition_table);
-    Transducer(const TransducerHeader& header,
-           const TransducerAlphabet& alphabet,
-           const TransducerTable<TransitionWIndex>& index_table,
-           const TransducerTable<TransitionW>& transition_table);
     virtual ~Transducer();
 
     void write(std::ostream& os) const;
-    Transducer * copy(Transducer * t, bool weighted = false);
     void display() const;
 
     const TransducerHeader& get_header() const
@@ -812,10 +799,6 @@ public:
     {
         return header->probe_flag(Has_input_epsilon_cycles);
     }
-    TransducerTable<TransitionWIndex> & copy_windex_table();
-    TransducerTable<TransitionW> & copy_transitionw_table();
-    TransducerTable<TransitionIndex> & copy_index_table();
-    TransducerTable<Transition> & copy_transition_table();
 
     // state_index must be an index to a state which is defined as either:
     // (1) the start of a set of entries in the transition index table, or
@@ -828,9 +811,9 @@ public:
 
 
     bool initialize_input(const char * input_str);
-    HfstOneLevelPaths * lookup_fd(const StringVector & s);
-    HfstOneLevelPaths * lookup_fd(const std::string & s);
-    HfstOneLevelPaths * lookup_fd(const char * s);
+    std::vector<std::pair<std::string, Weight> > lookup(const StringVector & s);
+    std::vector<std::pair<std::string, Weight> > lookup(const std::string & s);
+    std::vector<std::pair<std::string, Weight> > lookup(const char * s);
     void note_analysis(SymbolNumber * whole_output_tape);
 
     // Methods for supporting ospell

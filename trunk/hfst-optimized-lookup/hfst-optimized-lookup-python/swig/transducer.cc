@@ -21,6 +21,52 @@ bool should_ascii_tokenize(unsigned char c)
     return ((c >= 'a' and c <= 'z') or (c >= 'A' and c <= 'Z'));
 }
 
+void skip_hfst3_header(std::istream & is)
+{
+    const char* header1 = "HFST";
+    unsigned int header_loc = 0; // how much of the header has been found
+    int c;
+    for(header_loc = 0; header_loc < strlen(header1) + 1; header_loc++)
+    {
+	c = is.get();
+	if(c != header1[header_loc]) {
+	    break;
+	}
+    }
+    if(header_loc == strlen(header1) + 1) // we found it
+    {
+	unsigned short remaining_header_len;
+	is.read(reinterpret_cast<char *>(&remaining_header_len),
+		sizeof(remaining_header_len));
+	if (is.get() != '\0' || is.fail()) {
+	    HFST_THROW(TransducerHasWrongTypeException);
+	}
+	char * headervalue = new char[remaining_header_len];
+	is.read(headervalue, remaining_header_len);
+	if (headervalue[remaining_header_len - 1] != '\0' ||
+	    is.fail()) {
+	    HFST_THROW(TransducerHasWrongTypeException);
+	}
+	std::string header_tail(headervalue, remaining_header_len);
+	size_t type_field = header_tail.find("type");
+	if (type_field != std::string::npos) {
+	    if (header_tail.find("HFST_OL") != type_field + 5 &&
+		header_tail.find("HFST_OLW") != type_field + 5) {
+		delete headervalue;
+		HFST_THROW(TransducerHasWrongTypeException);
+	    }
+	}
+    } else // nope. put back what we've taken
+    {
+	is.putback(c); // first the non-matching character
+	    for(int i = header_loc - 1; i>=0; i--) {
+// then the characters that did match (if any)
+		is.putback(header1[i]);
+	    }
+    }
+
+}
+
 TransducerAlphabet::TransducerAlphabet(std::istream& is,
                        SymbolNumber symbol_count)
 {
@@ -199,12 +245,12 @@ bool Transducer::initialize_input(const char * input_str)
     return true;
 }
 
-std::vector<std::pair<std::string, Weight> Transducer::lookup_fd(const std::string & s)
+std::vector<std::pair<std::string, Weight> > Transducer::lookup(const std::string & s)
 {
-    return lookup_fd(s.c_str());
+    return lookup(s.c_str());
 }
 
-std::vector<std::pair<std::string, Weight> > Transducer::lookup_fd(const char * s)
+std::vector<std::pair<std::string, Weight> > Transducer::lookup(const char * s)
 {
     lookup_results.clear();
     if (!initialize_input(s)) {
@@ -213,7 +259,7 @@ std::vector<std::pair<std::string, Weight> > Transducer::lookup_fd(const char * 
     //current_weight += s.second;
     get_analyses(input_tape, output_tape, output_tape, 0);
     //current_weight -= s.second;
-    return lookup_results;
+    return std::vector<std::pair<std::string, Weight> >(lookup_results);
 }
 
 void Transducer::try_epsilon_transitions(SymbolNumber * input_symbol,
@@ -395,83 +441,30 @@ void Transducer::note_analysis(SymbolNumber * whole_output_tape)
     std::string result;
     for (SymbolNumber * num = whole_output_tape; *num != NO_SYMBOL_NUMBER; ++num)
     {
-    result.push_back(alphabet->string_from_symbol(*num));
+    result.append(alphabet->string_from_symbol(*num));
     }
     lookup_results.push_back(std::pair<std::string, Weight>(result, current_weight));
 }
 
 
 
-Transducer::Transducer(): header(NULL), alphabet(NULL), tables(NULL),
-              current_weight(0.0), lookup_paths(NULL), encoder(NULL),
-	      input_tape(NULL), output_tape(NULL), flag_state() {}
-
-Transducer::Transducer(const std::string & filename):
-    std::ifstream is(filename, ifstream::in);
-// the other constructors throw exceptions if data can't be read at some point
-    header(new TransducerHeader(is)),
-    alphabet(new TransducerAlphabet(is, header->symbol_count())),
-    tables(NULL), current_weight(0.0), lookup_paths(NULL),
-    encoder(new Encoder(alphabet->get_symbol_table(),
-            header->input_symbol_count())),
-    input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    flag_state(alphabet->get_fd_table())
+Transducer::Transducer(const std::string & filename)
 {
+    std::ifstream is(filename.c_str(), std::ifstream::in);
+    // the other constructors throw exceptions if data can't be read at some point
+    skip_hfst3_header(is);
+    header = new TransducerHeader(is);
+    alphabet = new TransducerAlphabet(is, header->symbol_count());
+    tables = NULL;
+    current_weight = 0.0;
+    encoder = new Encoder(alphabet->get_symbol_table(),
+			  header->input_symbol_count());
+    input_tape = (SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN));
+    output_tape = (SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN));
+    flag_state = alphabet->get_fd_table();
     load_tables(is);
     is.close();
 }
-
-Transducer::Transducer(bool weighted):
-    header(new TransducerHeader(weighted)),
-    alphabet(new TransducerAlphabet()),
-    current_weight(0.0),
-    lookup_paths(NULL),
-    encoder(new Encoder(alphabet->get_symbol_table(),
-            header->input_symbol_count())),
-    input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    flag_state(alphabet->get_fd_table())
-{
-    if(weighted)
-    tables = new TransducerTables<TransitionWIndex,TransitionW>();
-    else
-    tables = new TransducerTables<TransitionIndex,Transition>();
-}
-
-Transducer::Transducer(const TransducerHeader& header,
-               const TransducerAlphabet& alphabet,
-               const TransducerTable<TransitionIndex>& index_table,
-               const TransducerTable<Transition>& transition_table):
-    header(new TransducerHeader(header)),
-    alphabet(new TransducerAlphabet(alphabet)),
-    tables(new TransducerTables<TransitionIndex,Transition>(
-           index_table, transition_table)),
-    current_weight(0.0),
-    lookup_paths(NULL),
-    encoder(new Encoder(alphabet.get_symbol_table(),
-            header.input_symbol_count())),
-    input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    flag_state(alphabet.get_fd_table())
-{}
-
-Transducer::Transducer(const TransducerHeader& header,
-               const TransducerAlphabet& alphabet,
-               const TransducerTable<TransitionWIndex>& index_table,
-               const TransducerTable<TransitionW>& transition_table):
-    header(new TransducerHeader(header)),
-    alphabet(new TransducerAlphabet(alphabet)),
-    tables(new TransducerTables<TransitionWIndex,TransitionW>(
-           index_table, transition_table)),
-    current_weight(0.0),
-    lookup_paths(NULL),
-    encoder(new Encoder(alphabet.get_symbol_table(),
-            header.input_symbol_count())),
-    input_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    output_tape((SymbolNumber*)(malloc(sizeof(SymbolNumber)*MAX_IO_LEN))),
-    flag_state(alphabet.get_fd_table())
-{}
 
 Transducer::~Transducer()
 {
@@ -482,58 +475,6 @@ Transducer::~Transducer()
     free(input_tape);
     free(output_tape);
 }
-
-TransducerTable<TransitionWIndex> & Transducer::copy_windex_table()
-{
-    if (!header->probe_flag(Weighted)) {
-      HFST_THROW(TransducerHasWrongTypeException);
-    }
-    TransducerTable<TransitionWIndex> * another =
-    new TransducerTable<TransitionWIndex>;
-    for (unsigned int i = 0; i < header->index_table_size(); ++i) {
-    another->append(TransitionWIndex(tables->get_index_input(i),
-                    tables->get_index_target(i)));
-    }
-    return *another;
-}
-TransducerTable<TransitionW> & Transducer::copy_transitionw_table()
-{
-    if (!header->probe_flag(Weighted)) {
-      HFST_THROW(TransducerHasWrongTypeException);
-    }
-    TransducerTable<TransitionW> * another = new TransducerTable<TransitionW>;
-    for (unsigned int i = 0; i < header->target_table_size(); ++i) {
-    another->append(TransitionW(tables->get_transition_input(i),
-                   tables->get_transition_output(i),
-                   tables->get_transition_target(i),
-                   tables->get_weight(i)));
-    }
-    return *another;
-}
-TransducerTable<TransitionIndex> & Transducer::copy_index_table()
-{
-    if (header->probe_flag(Weighted)) {
-      HFST_THROW(TransducerHasWrongTypeException);
-    }
-    TransducerTable<TransitionIndex> * another =
-    new TransducerTable<TransitionIndex>;
-    for (unsigned int i = 0; i < header->index_table_size(); ++i) {
-    another->append(tables->get_index(i));
-    }
-    return *another;
-}
-TransducerTable<Transition> & Transducer::copy_transition_table()
-{
-    if (header->probe_flag(Weighted)) {
-      HFST_THROW(TransducerHasWrongTypeException);
-    }
-    TransducerTable<Transition> * another = new TransducerTable<Transition>();
-    for (unsigned int i = 0; i < header->target_table_size(); ++i) {
-    another->append(tables->get_transition(i));
-    }
-    return *another;
-}
-
 
 void Transducer::load_tables(std::istream& is)
 {
@@ -556,21 +497,6 @@ void Transducer::write(std::ostream& os) const
     tables->get_index(i).write(os, header->probe_flag(Weighted));
     for(size_t i=0;i<header->target_table_size();i++)
     tables->get_transition(i).write(os, header->probe_flag(Weighted));
-}
-
-Transducer * Transducer::copy(Transducer * t, bool weighted)
-{
-    Transducer * another;
-    if (weighted) {
-    another = new Transducer(
-        t->get_header(), t->get_alphabet(),
-        t->copy_windex_table(), t->copy_transitionw_table());
-    } else {
-    another = new Transducer(
-        t->get_header(), t->get_alphabet(),
-        t->copy_index_table(), t->copy_transition_table());
-    }
-    return another;
 }
 
 void Transducer::display() const
