@@ -22,6 +22,7 @@
 #endif
 
 #include <string>
+#include <string.h>
 #include <vector>
 
 #include <cstdlib>
@@ -162,8 +163,8 @@ token_update_positions(const char *token)
     }
     else
     {
-        char *token_last_line_start = rindex((char*) token, '\n');
-        char *token_end = rindex((char*) token, '\0');
+      char *token_last_line_start = strrchr((char*) token, '\n');
+      char *token_end = strrchr((char*) token, '\0');
         hlexclloc.last_column = (token_end - token_last_line_start) - 1;
     }
 }

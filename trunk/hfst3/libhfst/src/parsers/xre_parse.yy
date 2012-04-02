@@ -47,13 +47,13 @@ extern int xrelex();
     hfst::HfstTransducerPair* transducerPair;
     hfst::HfstTransducerPairVector* transducerPairVector;
     
-   pair<hfst::xeroxRules::ReplaceArrow, vector<hfst::xeroxRules::Rule> >* replaceRuleVectorWithArrow;
-   pair< hfst::xeroxRules::ReplaceArrow, hfst::xeroxRules::Rule>* replaceRuleWithArrow;   
-   pair< hfst::xeroxRules::ReplaceArrow, hfst::HfstTransducerVector>* mappingVectorWithArrow;
-   pair< hfst::xeroxRules::ReplaceArrow, hfst::HfstTransducer>* mappingWithArrow;
+   std::pair<hfst::xeroxRules::ReplaceArrow, std::vector<hfst::xeroxRules::Rule> >* replaceRuleVectorWithArrow;
+   std::pair< hfst::xeroxRules::ReplaceArrow, hfst::xeroxRules::Rule>* replaceRuleWithArrow;   
+   std::pair< hfst::xeroxRules::ReplaceArrow, hfst::HfstTransducerVector>* mappingVectorWithArrow;
+   std::pair< hfst::xeroxRules::ReplaceArrow, hfst::HfstTransducer>* mappingWithArrow;
     
    
-   pair<hfst::xeroxRules::ReplaceType, hfst::HfstTransducerPairVector>* contextWithMark;
+   std::pair<hfst::xeroxRules::ReplaceType, hfst::HfstTransducerPairVector>* contextWithMark;
    
    hfst::xeroxRules::ReplaceType replType;
    hfst::xeroxRules::ReplaceArrow replaceArrow; 
@@ -222,10 +222,10 @@ REPLACE : REGEXP3 {}
 PARALLEL_RULES: RULE
          {
          //   std::cerr << "parallel_rules:rule"<< std::endl;        
-            vector<Rule> * ruleVector = new vector<Rule>();
+            std::vector<Rule> * ruleVector = new std::vector<Rule>();
             ruleVector->push_back($1->second);
             
-            $$ =  new pair< ReplaceArrow, vector<Rule> > ($1->first, *ruleVector);
+            $$ =  new std::pair< ReplaceArrow, std::vector<Rule> > ($1->first, *ruleVector);
             delete $1;
          }
          | PARALLEL_RULES COMMACOMMA RULE
@@ -233,7 +233,7 @@ PARALLEL_RULES: RULE
            // std::cerr << "parallel_rules: parallel_rules ,, rule"<< std::endl;      
             Rule tmpRule($3->second);
             $1->second.push_back(tmpRule);
-            $$ =  new pair< ReplaceArrow, vector<Rule> > ($3->first, $1->second);
+            $$ =  new std::pair< ReplaceArrow, std::vector<Rule> > ($3->first, $1->second);
             delete $3;
          }
          ;
@@ -244,7 +244,7 @@ RULE: MAPPING_VECTOR
          HfstTransducer allMappingsDisjuncted = disjunctVectorMembers($1->second);
          
          Rule rule( allMappingsDisjuncted );;
-         $$ =  new pair< ReplaceArrow, Rule> ($1->first, rule);
+         $$ =  new std::pair< ReplaceArrow, Rule> ($1->first, rule);
          delete $1;
       }
       | MAPPING_VECTOR CONTEXTS_WITH_MARK
@@ -253,7 +253,7 @@ RULE: MAPPING_VECTOR
         HfstTransducer allMappingsDisjuncted = disjunctVectorMembers($1->second);
         
         Rule rule( allMappingsDisjuncted, $2->second, $2->first );
-        $$ =  new pair< ReplaceArrow, Rule> ($1->first, rule);
+        $$ =  new std::pair< ReplaceArrow, Rule> ($1->first, rule);
         delete $1, $2;
       }
       ;
@@ -269,7 +269,7 @@ MAPPING_VECTOR: MAPPING_VECTOR COMMA MAPPING
             //exit(1);
          }
          $1->second.push_back($3->second);
-         $$ =  new pair< ReplaceArrow, HfstTransducerVector> ($1->first, $1->second);
+         $$ =  new std::pair< ReplaceArrow, HfstTransducerVector> ($1->first, $1->second);
          delete $3; 
             
       }
@@ -279,7 +279,7 @@ MAPPING_VECTOR: MAPPING_VECTOR COMMA MAPPING
          // std::cerr << "mapping_vector : mapping"<< std::endl;      
          HfstTransducerVector * mappingVector = new HfstTransducerVector();
          mappingVector->push_back( $1->second );
-         $$ =  new pair< ReplaceArrow, HfstTransducerVector> ($1->first, * mappingVector);
+         $$ =  new std::pair< ReplaceArrow, HfstTransducerVector> ($1->first, * mappingVector);
          delete $1; 
       }
      
@@ -292,7 +292,7 @@ MAPPING: REPLACE REPLACE_ARROW REPLACE
   
           HfstTransducer mapping(*$1);
           mapping.cross_product(*$3);
-          $$ =  new pair< ReplaceArrow, HfstTransducer> ($2, mapping);
+          $$ =  new std::pair< ReplaceArrow, HfstTransducer> ($2, mapping);
 
           delete $1, $3;
       }
@@ -302,7 +302,7 @@ MAPPING: REPLACE REPLACE_ARROW REPLACE
           HfstTransducerPair marks(*$3, *$5);
           HfstTransducer mapping = create_mapping_for_mark_up_replace( *$1, marks );
           
-          $$ =  new pair< ReplaceArrow, HfstTransducer> ($2, mapping);
+          $$ =  new std::pair< ReplaceArrow, HfstTransducer> ($2, mapping);
          delete $1, $3, $5;
       }
       | REPLACE REPLACE_ARROW REPLACE MARKUP_MARKER
@@ -314,7 +314,7 @@ MAPPING: REPLACE REPLACE_ARROW REPLACE
           
          
                                 
-          $$ =  new pair< ReplaceArrow, HfstTransducer> ($2, mapping);
+          $$ =  new std::pair< ReplaceArrow, HfstTransducer> ($2, mapping);
          delete $1, $3;
       }
       | REPLACE REPLACE_ARROW MARKUP_MARKER REPLACE
@@ -323,7 +323,7 @@ MAPPING: REPLACE REPLACE_ARROW REPLACE
           HfstTransducerPair marks(epsilon, *$4);
           HfstTransducer mapping = create_mapping_for_mark_up_replace( *$1, marks );
           
-          $$ =  new pair< ReplaceArrow, HfstTransducer> ($2, mapping);
+          $$ =  new std::pair< ReplaceArrow, HfstTransducer> ($2, mapping);
          delete $1, $4;
       }
       
@@ -337,7 +337,7 @@ MAPPING: REPLACE REPLACE_ARROW REPLACE
           HfstTransducer mappingTr(epsilon);
           mappingTr.cross_product(*$4);
           
-          $$ =  new pair< ReplaceArrow, HfstTransducer> ($3, mappingTr);
+          $$ =  new std::pair< ReplaceArrow, HfstTransducer> ($3, mappingTr);
           delete $4;
       }
       | LEFT_BRACKET_DOTTED REPLACE RIGHT_BRACKET_DOTTED REPLACE_ARROW REPLACE
@@ -345,7 +345,7 @@ MAPPING: REPLACE REPLACE_ARROW REPLACE
           HfstTransducer mappingTr(*$2);
           mappingTr.cross_product(*$5);
 
-          $$ =  new pair< ReplaceArrow, HfstTransducer> ($4, mappingTr);
+          $$ =  new std::pair< ReplaceArrow, HfstTransducer> ($4, mappingTr);
           delete $2, $5;
       }
       ;    
@@ -360,7 +360,7 @@ CONTEXTS_WITH_MARK:  CONTEXT_MARK CONTEXTS_VECTOR
        
          //std::cerr << "context w mark: conMark conVect"<< std::endl;      
          
-         $$ =  new pair< ReplaceType, HfstTransducerPairVector> ($1, *$2);
+         $$ =  new std::pair< ReplaceType, HfstTransducerPairVector> ($1, *$2);
          //$$ = $2;
          //std::cerr << "Context Mark: \n" << $1  << std::endl;
    

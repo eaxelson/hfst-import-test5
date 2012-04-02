@@ -132,7 +132,7 @@ namespace hfst
 		HfstTransducer bracketedReplace( const Rule &rule, bool optional);
 
 		/**  \brief Bracketed replace for parallel rules */
-		HfstTransducer parallelBracketedReplace( const vector<Rule> &ruleVector, bool optional);
+		HfstTransducer parallelBracketedReplace( const std::vector<Rule> &ruleVector, bool optional);
 
 
 
@@ -221,26 +221,26 @@ namespace hfst
 		// replace up, left, right, down
 		HfstTransducer replace(	const Rule &rule, bool optional);
 		// for parallel rules
-		HfstTransducer replace(	const vector<Rule> &ruleVector, bool optional);
+		HfstTransducer replace(	const std::vector<Rule> &ruleVector, bool optional);
 		// replace up, left, right, down
 		HfstTransducer replace_left( const Rule &rule, bool optional);
 		// for parallel rules
-		HfstTransducer replace_left( const vector<Rule> &ruleVector, bool optional);
+		HfstTransducer replace_left( const std::vector<Rule> &ruleVector, bool optional);
 		// left to right
 		HfstTransducer replace_leftmost_longest_match( const Rule &rule );
 		// left to right
-		HfstTransducer replace_leftmost_longest_match( const vector<Rule> &ruleVector );
+		HfstTransducer replace_leftmost_longest_match( const std::vector<Rule> &ruleVector );
 		// right to left
 		HfstTransducer replace_rightmost_longest_match( const Rule &rule );
 
 		// right to left
-		HfstTransducer replace_rightmost_longest_match( const vector<Rule> &ruleVector );
+		HfstTransducer replace_rightmost_longest_match( const std::vector<Rule> &ruleVector );
 
 		HfstTransducer replace_leftmost_shortest_match( const Rule &rule);
 
-		HfstTransducer replace_leftmost_shortest_match(const vector<Rule> &ruleVector );
+		HfstTransducer replace_leftmost_shortest_match(const std::vector<Rule> &ruleVector );
 		HfstTransducer replace_rightmost_shortest_match( const Rule &rule );
-		HfstTransducer replace_rightmost_shortest_match( const vector<Rule> &ruleVector );
+		HfstTransducer replace_rightmost_shortest_match( const std::vector<Rule> &ruleVector );
 		HfstTransducer mark_up_replace(	const Rule &rule,
 								const StringPair &marks,
 								bool optional);
@@ -248,11 +248,11 @@ namespace hfst
 			 	  						const HfstTransducerPair &marks,
 			 	  						bool optional);
 
-		HfstTransducer mark_up_replace(	const vector<MarkUpRule> &markUpRuleVector,
+		HfstTransducer mark_up_replace(	const std::vector<MarkUpRule> &markUpRuleVector,
 								bool optional);
 		// replace up, left, right, down
 		HfstTransducer replace_epenthesis(	const Rule &rule, bool optional);
 		// replace up, left, right, down
-		HfstTransducer replace_epenthesis(	const vector<Rule> &ruleVector, bool optional);
+		HfstTransducer replace_epenthesis(	const std::vector<Rule> &ruleVector, bool optional);
 	}
 }
