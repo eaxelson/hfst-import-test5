@@ -6,7 +6,7 @@ from shared import Header, Alphabet, LetterTrie
 from transducer import Transducer
 from transducer import TransducerW
 
-class OlTransducer:
+class Transducer:
     def __init__(self, filename):
         '''Read a transducer from filename
         '''

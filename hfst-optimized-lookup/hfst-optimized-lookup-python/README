@@ -1,9 +1,10 @@
-hfst-optimized-lookup-python: perform lookup on a fast transducer format
+hfst_lookup: perform lookup on a fast transducer format
 
-This package performs transducer lookup (transformation) on a specialised
-file format. The format is fast, but this Python implementation is not
-very fast. This package also provides a fast C++ implementation with SWIG
-bindings - use either one.
+This is a standalone package for performing transducer lookup
+(transformation) using a specialised file format. The format is fast,
+but the pure Python implementation is not very fast.
+This package also provides a fast C++ implementation with SWIG
+bindings - you can use either one.
 
 INSTALLATION
 
@@ -19,10 +20,23 @@ You probably just want (as root)
 
 You'll need Python's setuptools to be installed for this to work.
 
+To install the SWIG-bound C++ code, you'll need a C++ compiler and SWIG.
+
+	cd swig
+	swig -c++ -python hfst_lookup.i
+	python setup.py build_ext --inplace
+
+Should build the module in the local directory. You can run it there, or again
+install it with
+
+	python setup.py install
+
 RUNNING
 
-You need the Python interpreter (2.7.x), a transducer in a special
-fast-lookup format (made with separate hfst tools) and this package.
+For the pure Python package you'll need the Python interpreter (2.7.x),
+a transducer in a special fast-lookup format (made with separate hfst
+tools) and this package. You can look for prebuilt transducers in
+hfst's Sourceforge page, http://hfst.sf.net.
 
 The commandline and utility are both provided by hfst_lookup.py. To run the
 lookup utility, type 
@@ -36,9 +50,10 @@ or
 If you load hfst_lookup as a module, you can use the class OlTransducer
 from it to load and run transducers, like so:
 
-my_transducer = OlTransducer(filename)
+my_transducer = Transducer(filename)
 for result in my_transducer.analyse(string_to_analyse):
     print result
 
 The results are (string, weight) pairs (Unicode strings and floating point
 numbers).
+
