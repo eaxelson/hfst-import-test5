@@ -59,14 +59,20 @@ print_usage()
         "\n", program_name );
         print_common_program_options(message_out);
         print_common_binary_program_options(message_out);
-        print_common_binary_program_parameter_instructions(message_out);
-        fprintf(message_out, "\n");
+        //print_common_binary_program_parameter_instructions(message_out);
+	fprintf(message_out,
+"\nIf OUTFILE, or either INFILE1 or INFILE2 is missing or -, standard\n" 
+"streams will be used. INFILE1, INFILE2, or both, must be specified\n"
+"The format of INFILE1 and INFILE2 must be the same; the result will\n" 
+"have the same format as these.\n"
+"INFILE1 (the lexicon) must contain exactly one transducer.\n" 
+		"INFILE2 (rule file) may contain several transducers.\n");
         fprintf(message_out,
-            "\n"
-            "Examples:\n"
-            "  %s -o analyzer.hfst hfst-lexc-lexicon.hfst " 
-            " hfst-twolc-rules.hfst  compose rules with lexicon\n"
-            "\n",
+"\n"
+"Examples:\n"
+"  %s -o analyzer.hfst lexicon.hfst rules.hfst\n"
+"compose rules with lexicon\n"
+		"\n",
             program_name );
         print_report_bugs();
         fprintf(message_out, "\n");
