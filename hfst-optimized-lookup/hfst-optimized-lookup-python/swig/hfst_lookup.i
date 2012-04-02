@@ -10,16 +10,25 @@
 #include "transducer.h"
 #include "HfstFlagDiacritics.h"
 #include "HfstExceptionDefs.h"
-    %}
+#include "HfstSymbolDefs.h"
+%}
 
+namespace std {
+%template(StringFloatPair) pair<string, float>;
+%template(StringFloatVector) vector<pair<string, float> >;
+}
+
+namespace hfst_ol {
 class Transducer;
-class Speller;
+//class Speller;
 
 class Transducer{
 public:
     Transducer(const std::string & filename);
-    std::vector<std::pair<std::string, float> > analyse(const std::string & input);
+    std::vector<std::pair<std::string, float> > lookup(const std::string & input);
 };
+}
+
 
 //class Speller{
 //public:
