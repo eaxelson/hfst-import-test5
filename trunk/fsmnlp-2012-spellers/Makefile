@@ -1013,3 +1013,51 @@ results/kl/table3.dict-kl.errm-ed3-no-initial.corp-wiki.tex: corp/kl/automisp.wo
 	cut -f 2 corp/kl/automisp.words | hfst-optimized-lookup $(KL_DICT) > corp/kl/temp_correct_corrections
 	cut -f 2 corp/kl/automisp.words > corp/kl/temp_original_correct_words
 	python tally_corrections.py corp/kl/temp_mispell_corrections corp/kl/temp_correct_corrections corp/kl/temp_original_correct_words > $@
+
+# Table 4 (text type vs. speed)
+
+# Automispelled
+
+results/en/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-automispelled.tex: corp/en/automisp.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-2.hfst hfst/en/norvig.hfst < corp/en/automisp.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/fi/table4.dict-omorfi.errm-ed2-no-redundant.corp-wiki-automispelled.tex: corp/fi/automisp.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-2-no-redundant.hfst $(FI_DICT) < corp/fi/automisp.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/kl/table4.dict-kl.errm-ed2-no-redundant.corp-wiki-automispelled.tex: corp/kl/automisp.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-redundant.hfst $(KL_DICT) < corp/kl/automisp.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+# Wrong language
+
+results/en/table4.dict-norvig.errm-ed2-no-redundant.corp-wiki-automispelled.tex: corp/fi/fiwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/en/errmodel.edit-distance-2.hfst hfst/en/norvig.hfst < corp/fi/fiwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/fi/table4.dict-omorfi.errm-ed2-no-redundant.corp-wiki-automispelled.tex: corp/kl/klwiki.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/fi/errmodel.edit-distance-2-no-redundant.hfst $(FI_DICT) < corp/kl/klwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
+
+results/kl/table4.dict-kl.errm-ed2-no-redundant.corp-wiki-automispelled.tex: corp/fi/automisp.words
+	echo > $@.tsv
+	for i in 1 2 3 4 5 6 7 8 9 0 ; do \
+		hfst-ospell-fsmnlp-2012 --profile $@.tsv hfst/kl/errmodel.edit-distance-2-no-redundant.hfst $(KL_DICT) < corp/fi/fiwiki.words > /dev/null ;\
+	done
+	awk -f profile-times2tex.awk < $@.tsv > $@
