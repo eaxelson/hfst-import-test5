@@ -572,7 +572,7 @@ namespace hfst
 
 
 	  // bracketed replace for parallel rules
-	  HfstTransducer parallelBracketedReplace( const vector<Rule> &ruleVector, bool optional)
+    HfstTransducer parallelBracketedReplace( const std::vector<Rule> &ruleVector, bool optional)
 	  {
 	  	HfstTokenizer TOK;
 	  	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
@@ -1804,7 +1804,7 @@ namespace hfst
 	  }
 
 	  // for parallel rules
-	  HfstTransducer replace( const vector<Rule> &ruleVector, bool optional)
+    HfstTransducer replace( const std::vector<Rule> &ruleVector, bool optional)
 	  {
 		  HfstTransducer retval;
 		  // If there is only one rule in the vector, it is not parallel
@@ -1848,7 +1848,7 @@ namespace hfst
 		  return replace( newRule, optional);
 	  }
 	  // replace left parallel
-	  HfstTransducer replace_left( const vector<Rule> &ruleVector, bool optional)
+    HfstTransducer replace_left( const std::vector<Rule> &ruleVector, bool optional)
 	  {
 		  return replace( ruleVector, optional).invert();
 	  }
@@ -1884,7 +1884,7 @@ namespace hfst
 	  	return retval;
 	  }
 	  // left to right
-	  HfstTransducer replace_leftmost_longest_match( const vector<Rule> &ruleVector )
+    HfstTransducer replace_leftmost_longest_match( const std::vector<Rule> &ruleVector )
 	  {
 
 		HfstTransducer uncondidtionalTr;
@@ -1951,7 +1951,7 @@ namespace hfst
 
 
 	  // right to left
-	  HfstTransducer replace_rightmost_longest_match( const vector<Rule> &ruleVector )
+    HfstTransducer replace_rightmost_longest_match( const std::vector<Rule> &ruleVector )
 	  {
 		HfstTransducer uncondidtionalTr;
 		if ( ruleVector.size() == 1 )
@@ -2005,7 +2005,7 @@ namespace hfst
 	  }
 
 
-	  HfstTransducer replace_leftmost_shortest_match(const vector<Rule> &ruleVector )
+    HfstTransducer replace_leftmost_shortest_match(const std::vector<Rule> &ruleVector )
 	  {
 		HfstTransducer uncondidtionalTr;
 		if ( ruleVector.size() == 1 )
@@ -2054,7 +2054,7 @@ namespace hfst
 	  	return retval;
 	  }
 
-	  HfstTransducer replace_rightmost_shortest_match( const vector<Rule> &ruleVector )
+    HfstTransducer replace_rightmost_shortest_match( const std::vector<Rule> &ruleVector )
 	  {
 
 
@@ -2118,14 +2118,14 @@ namespace hfst
 
 
 	  // TODO:
-	  HfstTransducer mark_up_replace(	const vector<MarkUpRule> &markUpRuleVector,
+    HfstTransducer mark_up_replace(	const std::vector<MarkUpRule> &markUpRuleVector,
 	  						bool optional)
 	  {
 	  	HfstTokenizer TOK;
 	  	TOK.add_multichar_symbol("@_EPSILON_SYMBOL_@");
 
 	  	ImplementationType type = markUpRuleVector[0].get_mapping().get_type();
-	  	vector<Rule> ruleVector;
+		std::vector<Rule> ruleVector;
 
 	  	for ( unsigned int i = 0; i < markUpRuleVector.size(); i++ )
 	  	{
@@ -2208,7 +2208,7 @@ namespace hfst
 	  }
 
 	  // replace up, left, right, down
-	  HfstTransducer replace_epenthesis(	const vector<Rule> &ruleVector, bool optional)
+    HfstTransducer replace_epenthesis(	const std::vector<Rule> &ruleVector, bool optional)
 	  {
 	  	HfstTransducer retval(parallelBracketedReplace(ruleVector, optional));
 
@@ -3609,7 +3609,7 @@ void test7a( ImplementationType type )
 	Rule rule1(mapping1);
 	Rule rule2(mapping2);
 
-	vector<Rule> ruleVector;
+	std::vector<Rule> ruleVector;
 
 	ruleVector.push_back(rule1);
 	ruleVector.push_back(rule2);
@@ -3670,7 +3670,7 @@ void test7b( ImplementationType type )
 	Rule rule1(mapping1);
 	Rule rule2(mapping2);
 
-	vector<Rule> ruleVector;
+	std::vector<Rule> ruleVector;
 
 	ruleVector.push_back(rule1);
 	ruleVector.push_back(rule2);
@@ -3738,7 +3738,7 @@ void test7c( ImplementationType type )
 	Rule rule1(mapping1);
 	Rule rule2(mapping2);
 
-	vector<Rule> ruleVector;
+	std::vector<Rule> ruleVector;
 
 	ruleVector.push_back(rule1);
 	ruleVector.push_back(rule2);
@@ -3808,7 +3808,7 @@ void test7c( ImplementationType type )
 	Rule rule2aUp(mapping1, ContextVector1, REPL_UP);
 	Rule rule2bUp(mapping2, ContextVector2, REPL_UP);
 
-	vector<Rule> ruleVector2;
+	std::vector<Rule> ruleVector2;
 	ruleVector2.push_back(rule2aUp);
 	ruleVector2.push_back(rule2bUp);
 
@@ -3836,7 +3836,7 @@ void test7c( ImplementationType type )
 	Rule rule2aDown(mapping1, ContextVector1, REPL_DOWN);
 	Rule rule2bDown(mapping2, ContextVector2, REPL_DOWN);
 
-	vector<Rule> ruleVector3;
+	std::vector<Rule> ruleVector3;
 	ruleVector3.push_back(rule2aDown);
 	ruleVector3.push_back(rule2bDown);
 
@@ -3913,7 +3913,7 @@ void test7d( ImplementationType type )
 	Rule rule1(mapping1, ContextVector1, REPL_DOWN);
 	Rule rule2(mapping2, ContextVector2, REPL_DOWN);
 
-	vector<Rule> ruleVector;
+	std::vector<Rule> ruleVector;
 
 	ruleVector.push_back(rule1);
 	ruleVector.push_back(rule2);
@@ -3966,7 +3966,7 @@ void test7e( ImplementationType type )
 	MarkUpRule markUpRule1(leftMapping1, marks1 );
 	MarkUpRule markUpRule2(leftMapping2, marks2 );
 
-	vector<MarkUpRule> markUpRuleVector;
+	std::vector<MarkUpRule> markUpRuleVector;
 	markUpRuleVector.push_back(markUpRule1);
 	markUpRuleVector.push_back(markUpRule2);
 
@@ -4022,7 +4022,7 @@ void test7f( ImplementationType type )
 	Rule rule1(mapping1);
 	Rule rule2(mapping2);
 
-	vector<Rule> ruleVector;
+	std::vector<Rule> ruleVector;
 
 	ruleVector.push_back(rule1);
 	ruleVector.push_back(rule2);
@@ -4077,7 +4077,7 @@ void test7g( ImplementationType type )
 	Rule rule1(mapping1);
 	Rule rule2(mapping2);
 
-	vector<Rule> ruleVector;
+	std::vector<Rule> ruleVector;
 
 	ruleVector.push_back(rule1);
 	ruleVector.push_back(rule2);
